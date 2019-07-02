@@ -1,0 +1,47 @@
+%Shortcut commands, custom symbols, theorems, etc.
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\e}{\mathrm{E}}
+\newcommand{\E}{\mathrm{E}}
+\newcommand{\Tri}{\Delta}
+\newcommand{\f}{\Delta}
+\newcommand{\oo}{o}
+\newcommand{\T}{\mathsf{T}}
+\newcommand{\bcdot}{\,\boldsymbol{\cdot}\,}
+\DeclareMathOperator{\spann}{span}
+\DeclareMathOperator{\curl}{curl}
+\newtheorem*{definition*}{Definition}%Requires amsthm
+\newtheorem{lemma}{Lemma}%Requires amsthm
+\newtheorem{corollary}{Corollary}%Requires amsthm
+\newtheorem*{remark}{Remark}%Requires amsthm
+\newcommand*\boxednum[1]{\!\scalebox{0.9}{
+	\tikz[baseline=(char.base)]{
+		\node[shape=rectangle,draw,inner sep=2pt](char){#1};}}\,}
+\makeatletter
+\newcommand{\dashto}[1][2pt]{
+	\settowidth{\@tempdima}{${}\rightarrow{}$}
+	\makebox[\@tempdima]{${}\rightarrow{}$}% typeset arrow
+  \makebox[-\@tempdima]{\hspace{-0.1\@tempdima}\color{white}\rule[0.5ex]{#1}{1pt}}% typeset overlay
+  \makebox[\@tempdima]{}% advance appropriate horizontal distance
+	}
+\makeatother
+\newcommand{\tto}{\!\to\!}%tight rightarrow
+\newcommand{\tdashto}{\!\dashto\!}
+\newcommand{\sxi}{\textstyle{\frac{\xi_1}{1-\zeta}}}
+\newcommand{\sxii}{\textstyle{\frac{\xi_2}{1-\zeta}}}
+\newcommand{\sxia}{\textstyle{\frac{\xi_a}{1-\zeta}}}
+\newcommand{\sxib}{\textstyle{\frac{\xi_b}{1-\zeta}}}
+\newcommand{\xieta}{\xi,\zeta}
+\newcommand{\sxz}{\textstyle{\frac{x}{1+z}}}
+\newcommand{\sxxz}{\textstyle{\frac{1-x}{1+z}}}
+\newcommand{\syz}{\textstyle{\frac{y}{1+z}}}
+\newcommand{\syyz}{\textstyle{\frac{1-y}{1+z}}}
+\newcommand{\szz}{\textstyle{\frac{1}{1+z}}}
+\newcommand{\szzz}{\textstyle{\frac{z}{1+z}}}
+\let\tilde\widetilde
+
+%Old unpreferred
+%\newcommand{\bfnab}{\nabla}
+%\newcommand{\ptl}{{\partial}}
+%\def\be{\begin{equation}}
+%\def\ee{\end{equation}}
+%\newcommand{\half}{\frac{1}{2}}

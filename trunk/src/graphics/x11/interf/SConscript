@@ -1,0 +1,11 @@
+Import("*")
+
+filenames = Split("""
+grint.F
+psgr.F
+xglibf.c
+""")
+
+shared_objs = env.SharedObject(filenames)
+
+Return("shared_objs")

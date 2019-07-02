@@ -1,0 +1,470 @@
+\section{Polynomials Prelude}
+\label{sec:Notation}
+
+\subsection{Notation}
+
+% Our construction is based on a few generating families of polynomials. Their general properties are discussed in Appendix~\ref{app:GeneratingFamilies}.
+% In this work, we will use Legendre and Jacobi polynomials.
+
+% The reader will observe that all of the formulas in this section are derived for two certain specified sets of polynomials. Should the reader wish to work with different sets of polynomials, our construction generalizes as discussed in Appendix~\ref{app:GeneratingFamilies}. Therefore, it is certainly not necessary that the constructions of shape functions presented in the later sections require the specific polynomials we have decided to use in our own implementation.
+
+The polynomials of order $p$ with arguments $x\in\mathbb{R}$ will be denoted by
+\begin{equation}
+   	\mathcal{P}^p(x)=\mathrm{span}\{x^j:j=0,\ldots,p\}\,.
+\end{equation}
+Similarly, in two dimensions  the polynomials of total order $p$ with arguments $(x,y)\in\mathbb{R}^2$ are denoted by
+\begin{equation}
+    \mathcal{P}^p(x,y)=\mathrm{span}\{x^iy^j:i\geq0,j\geq0,n=i+j\leq p\}\,,
+\end{equation}
+while the \textit{homogeneous} polynomials of total order $p$ are denoted by
+\begin{equation}
+    \tilde{\mathcal{P}}^p(x,y)=\mathrm{span}\{x^iy^j:i\geq0,j\geq0,i+j=p\}\,.
+\end{equation}
+Similar definitions apply to polynomials of three variables. 
+Moreover, when the domain is clear from the context, we will simply refer to $\mathcal{P}^p(x,y)$ and $\tilde{\mathcal{P}}^p(x,y)$ as $\mathcal{P}^p$ and $\tilde{\mathcal{P}}^p$ respectively.
+
+Define
+\begin{equation}
+ \mathcal{Q}^{p,q}(x,y)=\mathcal{P}^p(x)\otimes\mathcal{P}^q(y)
+        =\spann\{x^i y^j \,:\,0\leq i\leq p,\:0\leq j\leq q\}\,,
+\end{equation}
+and similarly for $\mathcal{Q}^{p,q,r}(x,y,z)$. When the variables are clear from the context, these spaces are simply written as $\mathcal{Q}^{p,q}$ and $\mathcal{Q}^{p,q,r}$ respectively.
+
+The notation for vector valued polynomial spaces will be
+\begin{equation}
+	(\mathcal{P}^p)^2 = \mathcal{P}^p\times\mathcal{P}^p\,,
+\end{equation}
+and similarly for $\left(\mathcal{P}^p\right)^3$, and the vector valued homogeneous polynomials, $(\tilde{\mathcal{P}}^p)^N$, $N=2,3$.
+
+\subsection{Scaled Polynomials}
+
+Given an order $i$ univariate polynomial, $\psi_i(x)\in\mathcal{P}^i(x)$, we define the corresponding {\em scaled polynomial}
+\begin{equation}
+	\psi_i(x; t) = \psi_i\Big(\frac{x}{t}\Big) t^i \, .
+	\label{eq:scaledpolyomials}
+\end{equation}
+% The definition extends to polynomials in many variables. If $\psi_i(x,y)$ is a polynomial of (total) order $i$, then
+% \be
+% \psi_i(x,y;t) := \psi_i( \frac{x}{t}, \frac{y}{t}) \, t^i \, .
+% \ee
+% Obviously, $\psi_i(x;1) = \psi_i(x)$ and $\psi_i(x,y,; 1) = \psi_i(x,y)$, so the scaled polynomials define polynomial extensions into the $x,t$ or $x,y,t$ space.
+Obviously, $\psi_i(x;1) = \psi_i(x)$, so the scaled polynomials define two variable polynomial extensions into the $(x,t)$ space.
+Furthermore, the reader may observe that $\psi_i(x;t)$ is homogenous of order $i$ as a polynomial in this space, i.e. $\psi_i(x;t)\in\tilde{\mathcal{P}}^i(x,t)$.
+
+\subsection{Legendre Polynomials}
+\label{sec:LegendrePol}
+
+In this work, we will use Legendre and Jacobi polynomials for the construction of all shape functions. Should the reader wish to work with different families of polynomials, our construction easily generalizes as discussed in Appendix~\ref{app:GeneratingFamilies}.
+
+The classical Legendre polynomials comprise a specific orthogonal basis for $L^2(-1,1)$. Truncated to the first $p$ elements, $\{\tilde{P}_i:i=0,\ldots,p-1\}$, the Legendre polynomials\footnote{Although the common notation for the classical Legendre polynomials is $P_i$, we choose to denote the elements in this set with $\sim$ as we will only need this definition temporarily.} are a basis for the space of (single variable) polynomials of order $p-1$.
+
+Of many properties of the Legendre polynomials, we list the following recursion formula
+\begin{equation}
+\begin{aligned}
+	\tilde{P}_0(y)&=1\,,\\
+	\tilde{P}_1(y)&=y\,,\\
+	i\tilde{P}_i(y)&=(2i-1)y\tilde{P}_{i-1}(y) - (i-1)\tilde{P}_{i-2}(y)\,, \quad \text{for }\, i\geq2\,,
+\end{aligned}
+\label{eq:recursion1}
+\end{equation}
+and the derivative formula for $i\geq1$,
+\begin{equation}
+(2i+1) \tilde{P}_i(y) = \frac{\partial}{\partial y} \Big(\tilde{P}_{i+1}(y)-\tilde{P}_{i-1}(y)\Big)\,,
+\label{eq:Dervivative1}
+\end{equation}
+which are both well known in the literature. We also make note of the $L^2$ orthogonality relationship
+\begin{equation}
+\int_{-1}^{1} \tilde{P}_i(y)\tilde{P}_j(y)\,\mathrm{d}y=0\,, \quad \text{if } i\neq j\,.
+\label{eq:Orthogonality1}
+\end{equation}
+This relationship, and the definition $\tilde{P}_0(y) = 1$, leads to the zero average property
+\begin{equation}
+\int_{-1}^{1} \tilde{P}_i(y)\,\mathrm{d}y=0\,, \quad \text{for } i\geq1\,.
+\label{eq:ZeroAverage1}
+\end{equation}
+
+\paragraph{Shifting.}
+The range of affine coordinates is always $[0,1]$ (see \eqref{eq:affinesumtoone}).
+Although not clear at the moment, this implies that we want to have the zero average property over the interval $[0,1]$ instead of $[-1,1]$.
+We can obtain this property by composing each Legendre polynomial above with the shifting operation
+%More importantly, the range of the affine shape functionsTherefore, because of how we have defined our master elements, we will wish to have a similar set of polynomials with the zero average property over the interval $[0,1]$ instead of $[-1,1]$. We can form such a set of polynomials by composing each Legendre polynomial above with the shifting operation
+\begin{equation}
+y \mapsto 2x-1\,.
+\label{eq:shift}
+\end{equation}
+The (shifted) Legendre polynomials over $[0,1]$ are defined for $i\geq0$,
+\begin{equation}
+P_i(x) = \tilde{P}_i\left(2x-1\right)\,.
+\end{equation}
+
+% \paragraph{Shifted, scaled Legendre polynomials.}
+
+% With $P_i(x)$ denoting Legendre polynomials, the corresponding {\em scaled Legendre polynomials}
+% are:
+% \be
+% P_i(x;t) = P_i(\frac{x}{t}) t^i \, .
+% \ee
+% A well-known recursive formula for Legendre polynomials extend easily to the scaled Legendre polynomials. The definition of scaled polynomials implies:
+% \be
+% \begin{array}{rl}
+% P_0(x;t)    &=\, 1 \,,\\[2pt]
+% P_1(x;t)    &=\, x \,,\\[2pt]
+% i P_i(x; t) &=\, (2i-1) x  P_{i-1}(x; t) - (i-1)t^2 P_{i-2}(x; t)\,, \quad \text{for }\, i\geq2\, .
+% \end{array}
+% \label{eq:recursion1}
+% \ee
+% % Commutativity of scaling and differentiation in $x$ implies that:
+% % \be
+% % (2i+1)P_i(x; t) = \frac{\ptl }{\ptl x} \left(P_{i+1}(x; t) - t^2 P_{i-1}(x; t)\right) \, .
+% % \label{eq:recursion2}
+% % \ee
+
+% Note that since the the Legendre polynomials are orthogonal with respect to the $L^2$ inner product on the interval $(-1,1)$,
+% % \be
+% % 0 = \int\limits_{-1}^{1} P_i(x)P_j(x), \quad \text{if } i\neq j\,,
+% % \ee
+% the scaled Legendre polynomials are, in turn, orthogonal with respect to the $L^2$ inner product on the interval $(-t,t)$
+% \be
+% \int\limits_{-t}^{t} P_i(x;t)P_j(x;t)\:dx=0\,, \quad \text{if } i\neq j\,.
+% \ee
+
+\paragraph{Scaling.}
+% In the coming constructions of shape functions involving simplicial geometries (traingle, tetrahedron, prism, and pyramid), we also require a one parameter set of basis polynomials with the zero-average property on the interval $(0,t)$, $t\in(0,1)$. We may generate this set from the above shifted Legendre polynomials by the shifting operation defined above
+The (shifted) scaled Legendre polynomials are defined by \eqref{eq:scaledpolyomials} as
+\begin{equation}
+	P_i(x;t) = P_i\left(\frac{x}{t}\right)t^i = \tilde{P}_i\left(2\left(\frac{x}{t}\right)-1\right)t^i = \tilde{P}_i(2x-t;t) \,,
+\end{equation}
+where the domain in $x$ is $[0,t]$.
+
+This set of scaled Legendre polynomials obeys a recursion formula similar to (\ref{eq:recursion1}):
+\begin{equation}
+	\begin{aligned}
+		P_0(x;t)&=1 \,,\\
+		P_1(x;t)&=2x-t \,,\\
+		iP_i(x;t)&=(2i-1)( 2x - t) P_{i-1}(x; t) - (i-1)t^2 P_{i-2}(x; t) \,, \quad \text{for }\, i\geq2\, .
+	\end{aligned}
+\label{eq:recursion2}
+\end{equation}
+Moreover, we carry over the orthogonality and zero average properties from \eqref{eq:Orthogonality1} and \eqref{eq:ZeroAverage1} to the scaled domain $[0,t]$:
+\begin{equation}
+	\begin{gathered}
+		\int_{0}^{t} P_i(x;t)P_j(x;t)\,\mathrm{d}x=0\,, \quad \text{if } i\neq j\,,\\
+		\int_{0}^{t} P_i(x;t)\,\mathrm{d}x=0\,, \quad \text{for } i\geq1\,.
+	\end{gathered}
+	\label{eq:ZeroAverage2}
+\end{equation}
+%which implies the zero-average property,
+%\be
+%\int\limits_{0}^{t} P_i(x;t)\:dx=0\,, \quad \text{for all } i\geq1\,.
+%\label{eq:ZeroAverage2}
+%\ee
+
+\paragraph{Integrated Legendre Polynomials.}
+
+% Defining
+% \be
+% L_0(x;t) = 1-x\,,
+% \ee
+% w
+For all $i\geq1$, we define the (scaled) integrated Legendre polynomials,
+\begin{equation}
+	L_{i}(x; t) = \int_0^{x} P_{i-1}(\tilde{x}; t)\, \mathrm{d}\tilde{x}\,,
+\end{equation}
+where of course $L_i(x)=L_i(x;1)$. Notice that $\mathcal{P}^{p}(x)=\mathrm{span}(\{1\}\cup\{L_i:i=1,\ldots,p\})$. By construction, the $L_i$ are seen as elements of $H^1$ and as a result, their pointwise evaluation is understood to be well defined. Therefore, recalling the zero average property of the Legendre polynomials, we observe that,
+% \footnote{By this observation, for each $i\geq2$, we may factor the product $x(x-1)$ from each $L_i(x)$.}
+\begin{equation}
+	L_i(0)=L_i(0;t)=0=L_i(t;t)=L_i(1)\,,\quad\text{for }\,i\geq2\,.\label{eq:Lvanishatendpoints}
+\end{equation}
+
+Next, \eqref{eq:Dervivative1} motivates the formulas for computing the integrated Legendre polynomials:
+\begin{equation}
+	\begin{aligned}
+		L_1(x;t)&=x\,,\\
+		2(2i-1) L_i(x; t)&=P_i(x; t) - t^2 P_{i-2}(x; t) \,, \quad\text{for }\, i\geq2\,.
+	\end{aligned}
+	\label{eq:shifted_scaled_lobatto}
+\end{equation}
+% By definion,
+% \be
+% \frac{\ptl}{\ptl x'} L_{i+1}(x; t) = P_i(x; t)\,.
+% \ee
+% From~(\ref{eq:shifted_scaled_lobatto}) we get:
+% \be
+% (2i+1) \frac{\ptl}{\ptl t} L_{i+1}(x; t) =
+% \half \left( \frac{\ptl}{\ptl t}  {P}_{i+1}(x; t)
+% - 2t P_{i-1}(x; t) - t^2 \frac{\ptl}{\ptl t} P_{i-1}(x; t)
+% \right) \, ,
+% \ee
+% with derivatives in $t$ evaluated through the recursion:
+% \be
+% \begin{array}{rll}
+% i\frac{\ptl}{\ptl t}  {P}_i(x; t)   = &
+% (2i-1)& \left( - {P}_{i-1}(x; t) + (2x - t) \frac{\ptl}{\ptl t} P_{i-1}(x; t) \right)
+% \\[8pt]
+%  - &(i-1) &
+% \left(
+% 2t P_{i-2}(x; t) + t^2 \frac{\ptl}{\ptl t}   {P}_{i-2}(x; t)
+% \right)\, .
+% \end{array}
+% \ee
+
+Clearly,
+\begin{equation}
+	\frac{\partial}{\partial x} L_{i}(x; t) = P_{i-1}(x; t)\,.
+\end{equation}
+Derivatives of $L_i(x;t)$ with respect to $t$ will also be necessary in our computations.
+For this, we define
+\begin{equation}
+	R_i(x) = (i+1)L_{i+1}(x) - xP_i(x)\,,\quad\text{for }\, i\geq0\,,
+	\label{eq:RDef}
+\end{equation}
+which the reader may observe is an order $i$ polynomial. In Appendix~\ref{app:GeneratingFamilies} we show that
+\begin{equation}
+	\frac{\partial}{\partial t} L_i(x;t) = R_{i-1}(x;t)\,.
+\end{equation}
+Obviously $R_0(x;t)=0$, and by use of \eqref{eq:recursion2} and \eqref{eq:shifted_scaled_lobatto}, one can reduce \eqref{eq:RDef} to
+\begin{equation}
+	R_i(x;t) = -\frac{1}{2} \Big(P_i(x;t)+tP_{i-1}(x;t)\Big)\,,\quad\text{for }\,i\geq1\,.
+\end{equation}
+
+\subsection{Jacobi Polynomials}
+
+Motivated by \citet{Beuchler_Schoeberl_06} and \citet{Beuchler_Pillwein_07}, we use Jacobi polynomials in our constructions of elements involving triangle faces.
+The (shifted to $[0,1]$) Jacobi polynomials, $P^{(\alpha,\beta)}_i(x)$, $\alpha,\beta>-1$, form a two parameter family of polynomials including the Legendre polynomials previously defined ($P_i^{(0,0)} = P_i$). %\footnote{$P_i^{(0,0)} = P_i$ for all $i\geq0$.}
+Jacobi polynomials have similar recursion formulas as the Legendre polynomials.
+One may find a selection of such formulas in \citet{Beuchler_Pillwein_07}.
+For our purposes, we will only consider the case $\beta=0$, so that from now on $P_i^\alpha=P_i^{(\alpha,0)}$.
+
+Jacobi polynomials are also orthogonal in a weighted $L^2$ space. Assuming the scaling operation discussed previously, we have the orthogonality relation
+%\footnote{i.e. we define $$P_i^\alpha(x) := \tilde{P}_i^\alpha(2x-1)\,,$$ where $\tilde{P}_i^\alpha$ is the classical Jacobi polynomial on $[-1,1]$.}
+\begin{equation}
+	\int_{0}^{t} x^\alpha P_i^\alpha(x;t)P_j^\alpha(x;t)\,\mathrm{d}x=0\,, \quad \text{if } i\neq j\,,
+\end{equation}
+which for $\alpha\neq0$ no longer implies the zero average property.
+
+The following is the recursion formula we use to compute the $[0,t]$ Jacobi polynomials:
+% $$
+% \begin{array}{c}
+% \begin{array}{rl}
+%  {P}_0^\alpha(x;t) = & 1 \\[2pt]
+%  {P}_1^\alpha(x;t) = & (2+\alpha)x-t\\[2pt]
+% \end{array}\\
+% a_i  {P}_i^\alpha(x;t)
+% = b_i \left( 2c_i x + (\alpha^2-c_i) t \right) P_{i-1}^\alpha(x;t)
+% - d_i t^2 P_{i-2}^\alpha(x;t)
+% \end{array}
+% $$
+\begin{equation}
+	\begin{aligned}
+		P_0^\alpha(x;t) &= 1\,, \\
+		P_1^\alpha(x;t) &= 2x-t+\alpha x\,,\\
+		a_i {P}_i^\alpha(x;t) &= b_i \left( c_i(2x-t) + \alpha^2 t \right) P_{i-1}^\alpha(x;t) - d_i t^2 P_{i-2}^\alpha(x;t)\,,
+		\quad \text{for }\, i\geq2\, ,
+	\end{aligned}
+\label{eq:RecursionJacobi}
+\end{equation}
+where
+\begin{equation*}
+	\begin{aligned}
+		a_i &=  2i(i+\alpha)\, (2i + \alpha - 2)\,,\\
+		b_i &=  2i + \alpha - 1\,,\\
+		c_i &=  (2i+\alpha)\, (2i + \alpha - 2)\,,\\
+		d_i &=  2(i+\alpha-1)\, (i-1)\, (2i+\alpha)\,.
+	\end{aligned}
+\end{equation*}
+
+We remark that other recursive relations in weight and order to compute Jacobi polynomials, such as $(\alpha+i)P_i^\alpha(x;t)=(\alpha+2i)P_i^{\alpha-1}(x;t)+itP_{i-1}^\alpha(x;t)$, were experimentally found to be numerically unstable as compared to fixing a value of $\alpha$ and using \eqref{eq:RecursionJacobi}, so that the latter approach is recommended.
+% All discussed definitions extend to general Jacobi polynomials $P^{(\alpha,\beta)}_i(x)$. The
+% scaled Jacobi Polynomials are evaluated using the following recursion.
+% $$
+% \begin{array}{c}
+% \begin{array}{rl}
+%  {P}_0^{(\alpha,\beta)}(x;t) = & 1 \\[8pt]
+%  {P}_1^{(\alpha,\beta)}(x;t) = & \half \left( (\beta+1)(x - t) + (\alpha+1) (x +t) \right)\\[8pt]
+% \end{array}\\
+% a_i  {P}_i^{(\alpha,\beta)}(x;t)
+% = b_i \left( c_i x + (\alpha^2 - \beta^2) t \right) P_{i-1}^{(\alpha,\beta)}(x;t)
+% - d_i t^2 P_{i-2}^{(\alpha,\beta)}(x;t)
+% \end{array}
+% $$
+% where
+% $$
+% \begin{array}{rl}
+% a_i = & 2i(i+\alpha+\beta)\, (2i + \alpha + \beta - 2)\\
+% b_i = & 2i + \alpha + \beta - 1\\
+% c_i = & (2i+\alpha+\beta)\, (2i + \alpha + \beta - 2)\\
+% d_i = & 2(i+\alpha-1)\, (i+\beta-1)\, (2i+\alpha+\beta)
+% \end{array}
+% $$
+% For $\alpha=\beta=0$, we recover the formulas for Legendre polynomials. The shifted scaled Jacobi
+% polynomials are defined by:
+% $$
+% \tilde{P}^{(\alpha,\beta)}_i(x;t) = P^{(\alpha,\beta)}_i(2x-t;t) \, .
+% $$
+% We shall use only the Jacobi polynomials with non-zero weight $\alpha$, i.e.
+% $ {P}^{\alpha}_i :=  {P}^{(\alpha,0)}_i$.
+
+
+% As we will need Jacobi polynomials with weight $\alpha$ varying with the polynomial degree $i$, we shall also use an alternate recursion in both weight and degree,
+% \be
+% (\alpha +i) \tilde{P}^{\alpha}_i(x;t) =  (\alpha + 2i) \tilde{P}^{\alpha-1}_i(x;t) + i t \tilde{P}^{\alpha}_{i-1}(x;t) \, .
+% \ee
+
+
+\paragraph{Integrated Jacobi Polynomials.}
+Finally, we define the (scaled) integrated Jacobi polynomials for $i\geq1$:
+\begin{equation}
+	L^{\alpha}_i(x;t) = \int_0^x P^{\alpha}_{i-1} (\tilde{x};t) \, \mathrm{d}\tilde{x} \, ,
+\end{equation}
+with $L^{\alpha}_i(x)=L^{\alpha}_i(x;1)$. Note that because of the absence of the zero average property, we cannot deduce that $L^\alpha_i(1)=0$, and in general, this does not hold. However, it is obvious that for all $\alpha>-1$,
+\begin{equation}
+	L^\alpha_i(0)=L^\alpha_i(0;t)=0\,,\quad\quad\text{for }\,i\geq1\,.\label{eq:Lalphavanishzero}
+\end{equation}
+
+We evaluate the integrated Jacobi polynomials using the following relations:\footnote{cf. (2.9) in \citet{Beuchler_Pillwein_07}.}
+\begin{equation}
+	\begin{aligned}
+		L^{\alpha}_1(x;t) & = x\,, \\
+		L^{\alpha}_i(x;t) & = a_i P^{\alpha}_i(x,t) + b_i t P^{\alpha}_{i-1}(x;t)- c_i t^2 P^{\alpha}_{i-2}(x;t)\,,
+			\quad\text{for }\, i\geq2\,,
+	\end{aligned}
+	\label{eq:IntegratedJacobiFormula}
+\end{equation}
+where
+\begin{equation*}
+	\begin{aligned}
+		a_i = & \frac{i + \alpha}{(2i + \alpha -1)(2i + \alpha)}\,, \\
+		b_i = & \frac{\alpha}{(2i + \alpha -2)(2i + \alpha)}\,, \\
+		c_i = & \frac{i-1}{(2i + \alpha -2)(2i + \alpha-1)}\,.
+	\end{aligned}
+\end{equation*}
+
+As in the case of the integrated Legendre polynomials, we find that
+\begin{equation}
+\frac{\partial }{\partial x}L^\alpha_{i}(x;t) = P^\alpha_{i-1}(x;t)\,,\qquad\quad\frac{\partial}{\partial t} L^\alpha_{i}(x;t) = R^\alpha_{i-1}(x;t)\,,
+\end{equation}
+where again,
+\begin{equation}
+	R^\alpha_i(x) = (i+1)L^\alpha_{i+1}(x) - xP^\alpha_i(x)\,.
+\label{eq:RalphaDef}
+\end{equation}
+% we again have
+% \be
+% \frac{\ptl}{\ptl t} L^\alpha_i(x;t) = R^\alpha_{i-1}(x;t)\,.
+% \ee
+Obviously $R^\alpha_0(x;t)=0$, and by use of \eqref{eq:RecursionJacobi} and \eqref{eq:IntegratedJacobiFormula}, one can reduce \eqref{eq:RalphaDef} to\footnote{cf. (2.16) in \citet{Beuchler_Pillwein_07}.}
+\begin{equation}
+	R^\alpha_i(x;t) = -\frac{i}{2i+\alpha} \Big(P^\alpha_i(x;t)+tP^\alpha_{i-1}(x;t)\Big)\,,\quad\text{for }\,i\geq1\,.
+\end{equation}
+
+
+\subsection{Homogenization}
+
+\begin{definition*}
+For an order $i$ polynomial
+\begin{equation*}
+	\psi_i \in \mathcal{P}^i(s_1,\ldots,s_d)\,,
+\end{equation*}
+we define the operation of homogenization $($of order $i$$)$ as a linear transformation
+\begin{equation}
+ [\,\cdot\,]:\mathcal{P}^i(s_1,\ldots,s_d) \longrightarrow \tilde{\mathcal{P}}^i(s_0,s_1,\ldots,s_d)\,,
+\end{equation}
+where
+\begin{equation*}
+	[\psi_i](s_0,s_1,\ldots,s_d)=\psi_i\left(\frac{s_1}{s_0+\cdots+s_d},\ldots,\frac{s_d}{s_0+\cdots+s_d}\right)\,(s_0+\cdots+s_d)^i\,.
+\end{equation*}
+\end{definition*}
+
+Notice that homogenization is a form of scaling, and as such, it is forming an extension of the particular case in which $s_0+s_1\cdots+s_d=1$.
+It is not a coincidence that this is precisely the property that affine coordinates satisfy (see \eqref{eq:affinesumtoone} in \S\ref{sec:affinecoordinates}).
+Moreover, note that $[\psi_i]$ is always a homogeneous polynomial of degree $i$, so we have the following scaling property for all scalars $\gamma$,
+\begin{equation}
+	[\psi_i](\gamma s_0,\gamma s_1,\ldots,\gamma s_d) = \gamma^i [\psi_i](s_0,s_1,\ldots,s_d)\,.
+	\label{eq:ScalingProperty}
+\end{equation}
+
+One will observe that for the particular case $d=1$,
+\begin{equation}
+	[\psi_i](s_0,s_1) = \psi_i(s_1;s_0+s_1)\, .
+	\label{eq:univariate}
+\end{equation}
+Therefore, we see that
+\begin{equation}
+	[\psi_i](s_0,s_1) = \psi_i(s_1;1) = \psi_i(s_1) \,,\quad \quad\text{if }\,s_0+s_1=1\,,
+	\label{eq:homogfor1Daffine}
+\end{equation}
+where we remind the reader that the 1D affine coordinates satisfy precisely this property.
+
+Moreover, take the case of the integrated Legendre polynomials and recall property \eqref{eq:Lvanishatendpoints}. It follows that for all $s_0,s_1$,
+\begin{equation}
+	[L_i](s_0,0)=L_i(0;s_0)=0=L_i(s_1;s_1)=[L_i](0,s_1)\,,\quad\text{for }\,i\geq2\,.\label{eq:Lhomogvanishatendpoints}
+\end{equation}
+
+In the $d=2$ case, one can make another useful observation.
+Let $\chi_j$ be a one variable polynomial of order $j$, and consider the homogenization of the $i+j$ order (two variable) polynomial
+\begin{equation}
+	\psi_{ij}(s_0,s_1) = [\psi_i](s_0,s_1)\chi_j(1-s_0-s_1)\,.
+\end{equation}
+In this case, using \eqref{eq:ScalingProperty}, we find
+\begin{equation}
+	\begin{aligned}
+		{}[\psi_{ij}](s_2,s_0,s_1)&=[\psi_i]\Big(\frac{s_0}{s_0+s_1+s_2},\frac{s_1}{s_0+s_1+s_2}\Big)
+				\chi_j\Big(1-\frac{s_0+s_1}{s_0+s_1+s_2}\Big)(s_0+s_1+s_2)^{i+j}\\
+			&=\frac{1}{(s_0+s_1+s_2)^{i}}[\psi_i](s_0,s_1)\chi_j\Big(\frac{s_2}{s_0+s_1+s_2}\Big)(s_0+s_1+s_2)^{i+j}\\
+			&=[\psi_i](s_0,s_1)[\chi_j](s_0+s_1,s_2)\,.%\\
+			%&=\psi_i(s_1;s_0+s_1)\,\chi_j(s_2;s_0+s_1+s_2)\,.
+			\label{eq:homogproduct}
+	\end{aligned}
+\end{equation}
+This inspires the following definition for single variable polynomials, $\psi_i$ and $\chi_j$, of order $i$ and $j$ respectively:
+\begin{equation}
+	[\psi_i,\chi_j](s_0,s_1,s_2)= [\psi_i](s_0,s_1)[\chi_j](s_0+s_1,s_2)\,,
+\end{equation}
+where it is clear $[\psi_i,\chi_j]\in\tilde{\mathcal{P}}^{i+j}(s_0,s_1,s_2)$ is a homogeneous polynomial of order $i+j$.
+
+%We now introduce the final notation of this section. , we define the $i+j$ order, homogeneous polynomial
+Again, observe that
+\begin{equation}
+	[\psi_i,\chi_j](s_0,s_1,s_2)=[\psi_i](s_0,s_1)\chi_j(s_2)\,,\quad\quad\text{if }\,s_0+s_1+s_2=1\,,
+\end{equation}
+where we remind the reader that the 2D affine coordinates satisfy precisely this property.
+
+Finally, using properties \eqref{eq:Lvanishatendpoints} and \eqref{eq:Lalphavanishzero} of the integrated Legendre and Jacobi polynomials, it follows that for all $s_0,s_1,s_2$,
+\begin{equation}
+	[L_i,L_j^\alpha](s_0,s_1,0)=[L_i,L_j^\alpha](s_0,0,s_2)=[L_i,L_j^\alpha](0,s_1,s_2)=0\,,\quad\text{for }\,i\geq2\,,\,j\geq1\,.
+	\label{eq:LiLjvanishing}
+\end{equation}
+
+% We now construct an equivalence relation that will be useful in the coming construction of shape functions.
+% For a polynomial $\psi_i(x,y)$ of total degree equal to $i$ in $x,y$,
+% the corresponding {\em homogenized polynomial} $[\psi_i]$ is defined as:
+% \be
+% [\psi_i](x,y) := \psi_i(\frac{x}{x+y},\frac{y}{x+y}) \, (x+y)^i \, .
+% \ee
+% Obviously, $[\psi_i](x,y)$ is a homogeneous polynomial of order $i$.% and we note that this forms an equivalence class of polynomials of degree $i$.
+% Similarly, the operation $[\,\cdot\,]:\mathcal{P}^i\to {\mathcal{P}}^i$, can be extended to polyomials of three arguments. For a polynomial $\psi_i(x,y,z)$,
+% \be
+% [\psi_i](x,y,z) := \psi_i(\frac{x}{x+y+z},\frac{y}{x+y+z},\frac{z}{x+y+z}) \, (x+y+z)^i \, ,
+% \ee
+% is then a projection to a homogeneous polynomials of order $i$ in three space dimensions.
+
+% Note that if $\psi_i(x,y) = \hat\psi(y)$ is univariate but considered as a polynomial in two dimensions, then homogenization is equivalent to scaling by the factor $t=x+y$,
+% \be
+% [\psi_i](x,y) = \hat\psi(y;x+y)\, .
+% \label{eq:univariate}
+% \ee
+
+% Example::: (to edit)
+
+% Observe that the second Lobatto polynomial may be written in more than one different way as a function $\mu_0,\,\mu_1$:
+% \be
+% L_2(\xi) = 2(\xi-1)\xi = 2\mu_0(\xi)\mu_1(\xi) = 2(1-\mu_1(\xi))\mu_1(\xi)\,,
+% \ee
+% where still other possibilities are also available. Although the affine functions (themselves taking as arguments affine coordinates, $\mu_0,\,\mu_1$) are different, their evaluation (as a function in $\xi$) on the edge is, in fact, identical.
+
+% Let $p\geq2$ be the order of the edge and let $\hat\phi_i(\xi), \xi \in \e$, be a polynomial of order $2\leq i\leq p$, vanishing at $\xi = 0,1$.
+% In general, we can represent function $\hat\phi_i$ in the form:
+% \be
+% \hat\phi_i(\xi) = \phi_i (\mu_0,\mu_1)
+% \ee
+% where function $\phi_i$ is a polynomial of (total) degree $i$ in terms of the edge affine coordinates $\mu_0,\mu_1$.

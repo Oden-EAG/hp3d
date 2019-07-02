@@ -1,0 +1,1 @@
+* right now the frontal solver is interfaced to cinout.blk, which is hp3d block file. Remove this dependency.

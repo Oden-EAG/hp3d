@@ -1,0 +1,423 @@
+3   3     NDIM,MANDIM
+
+
+2         NRSURFS
+
+Cylinder            surface 1: infinite cylinder
+.0d0 .0d0 .0d0      point on the cylinder axis
+.0d0 .0d0 1.0d0      cylinder axis vector
+0.176776695296637D0  cylinder radius
+
+Cylinder            surface 2: infinite cylinder
+.0d0 .0d0 .0d0      point on the cylinder axis
+.0d0 .0d0 1.0d0      cylinder axis vector
+3.535533905932738D0  cylinder radius
+
+9         NRDOMAIN
+
+
+24        NRPOINT
+
+Regular             point 1
+-0.0625d0 -0.0625d0 0.d0
+
+Regular             point 2
+0.0625d0 -0.0625d0 0.d0
+
+Regular             point 3
+0.0625d0 0.0625d0 0.d0
+
+Regular             point 4
+-0.0625d0 0.0625d0 0.d0
+
+Regular             point 5
+-0.125d0 -.125d0 0.d0
+
+Regular             point 6
+0.125d0 -0.125d0 0.d0
+
+Regular             point 7
+0.125d0 0.125d0 0.d0
+
+Regular             point 8
+-0.125d0 0.125d0 0.d0
+
+Regular             point 9
+-2.5d0 -2.5d0 0.d0
+
+Regular             point 10
+2.5d0 -2.5d0 0.d0
+
+Regular             point 11
+2.5d0 2.5d0 0.d0
+
+Regular             point 12
+-2.5d0 2.5d0 0.d0
+
+Regular             point 13
+-0.0625d0 -0.0625d0 .5d0
+
+Regular             point 14
+0.0625d0 -0.0625d0 .5d0
+
+Regular             point 15
+0.0625d0 0.0625d0 .5d0
+
+Regular             point 16
+-0.0625d0 0.0625d0 .5d0
+
+Regular             point 17
+-0.125d0 -.125d0 .5d0
+
+Regular             point 18
+0.125d0 -0.125d0 .5d0
+
+Regular             point 19
+0.125d0 0.125d0 .5d0
+
+Regular             point 20
+-0.125d0 0.125d0 .5d0
+
+Regular             point 21
+-2.5d0 -2.5d0 .5d0
+
+Regular             point 22
+2.5d0 -2.5d0 .5d0
+
+Regular             point 23
+2.5d0 2.5d0 .5d0
+
+Regular             point 24
+-2.5d0 2.5d0 .5d0
+
+
+
+52 NRCURVE
+
+Seglin              curve 1
+1 2
+
+Seglin              curve 2
+2 3
+
+Seglin              curve 3
+4 3
+
+Seglin              curve 4
+1 4
+
+Seglin              curve 5
+5 1
+
+Seglin              curve 6
+6 2
+
+Seglin              curve 7
+7 3
+
+Seglin              curve 8
+8 4
+
+QuaCir              curve 9
+5 6
+.0d0, .0d0, .0d0
+
+QuaCir              curve 10
+6 7
+.0d0, .0d0, .0d0
+
+QuaCir              curve 11
+8 7
+.0d0, .0d0, .0d0
+
+QuaCir              curve 12
+5 8
+.0d0, .0d0, .0d0
+
+Seglin              curve 13
+9 5
+
+Seglin              curve 14
+10 6
+
+Seglin              curve 15
+11 7
+
+Seglin              curve 16
+12 8
+
+QuaCir              curve 17
+9 10
+.0d0, .0d0, .0d0
+
+QuaCir              curve 18
+10 11
+.0d0, .0d0, .0d0
+
+QuaCir              curve 19
+12 11
+.0d0, .0d0, .0d0
+
+QuaCir              curve 20
+9 12
+.0d0, .0d0, .0d0
+
+Seglin              curve 21
+13 14
+
+Seglin              curve 22
+14 15
+
+Seglin              curve 23
+16 15
+
+Seglin              curve 24
+13 16
+
+Seglin              curve 25
+17 13
+
+Seglin              curve 26
+18 14
+
+Seglin              curve 27
+19 15
+
+Seglin              curve 28
+20 16
+
+QuaCir              curve 29
+17 18
+.0d0, .0d0, .5d0
+
+QuaCir              curve 30
+18 19
+.0d0, .0d0, .5d0
+
+QuaCir              curve 31
+20 19
+.0d0, .0d0, .5d0
+
+QuaCir              curve 32
+17 20
+.0d0, .0d0, .5d0
+
+Seglin              curve 33
+21 17
+
+Seglin              curve 34
+22 18
+
+Seglin              curve 35
+23 19
+
+Seglin              curve 36
+24 20
+
+QuaCir              curve 37
+21 22
+.0d0, .0d0, .5d0
+
+QuaCir              curve 38
+22 23
+.0d0, .0d0, .5d0
+
+QuaCir              curve 39
+24 23
+.0d0, .0d0, .5d0
+
+QuaCir              curve 40
+21 24
+.0d0, .0d0, .5d0
+
+Seglin              curve 41
+1 13
+
+Seglin              curve 42
+2 14
+
+Seglin              curve 43
+3 15
+
+Seglin              curve 44
+4 16
+
+Seglin              curve 45
+5 17
+
+Seglin              curve 46
+6 18
+
+Seglin              curve 47
+7 19
+
+Seglin              curve 48
+8 20
+
+Seglin              curve 49
+9 21
+
+Seglin              curve 50
+10 22
+
+Seglin              curve 51
+11 23
+
+Seglin              curve 52
+12 24
+
+0  NRTRIAN
+
+
+38 NRRECTA
+
+TraQua              rectangle 1
+1 2 3 4
+
+TraQua              rectangle 2
+5 6 2 1
+
+TraQua              rectangle 3
+6 7 3 2
+
+TraQua              rectangle 4
+8 7 3 4
+
+TraQua              rectangle 5
+5 8 4 1
+
+TraQua              rectangle 6
+9 10 6 5
+
+TraQua              rectangle 7
+10 11 7 6
+
+TraQua              rectangle 8
+12 11 7 8
+
+TraQua              rectangle 9
+9 12 8 5
+
+TraQua              rectangle 10
+13 14 15 16
+
+TraQua              rectangle 11
+17 18 14 13
+
+TraQua              rectangle 12
+18 19 15 14
+
+TraQua              rectangle 13
+20 19 15 16
+
+TraQua              rectangle 14
+17 20 16 13
+
+TraQua              rectangle 15
+21 22 18 17
+
+TraQua              rectangle 16
+22 23 19 18
+
+TraQua              rectangle 17
+24 23 19 20
+
+TraQua              rectangle 18
+21 24 20 17
+
+TraQua              rectangle 19
+1 2 14 13
+
+TraQua              rectangle 20
+2 3 15 14
+
+TraQua              rectangle 21
+4 3 15 16
+
+TraQua              rectangle 22
+1 4 16 13
+
+TraQua              rectangle 23
+5 1 13 17
+
+TraQua              rectangle 24
+6 2 14 18
+
+TraQua              rectangle 25
+7 3 15 19
+
+TraQua              rectangle 26
+8 4 16 20
+
+TraQua              rectangle 27
+5 6 18 17
+
+TraQua              rectangle 28
+6 7 19 18
+
+TraQua              rectangle 29
+8 7 19 20
+
+TraQua              rectangle 30
+5 8 20 17
+
+TraQua              rectangle 31
+9 5 17 21
+
+TraQua              rectangle 32
+10 6 18 22
+
+TraQua              rectangle 33
+11 7 19 23
+
+TraQua              rectangle 34
+12 8 20 24
+
+TraQua              rectangle 35
+9 10 22 21
+
+TraQua              rectangle 36
+10 11 23 22
+
+TraQua              rectangle 37
+12 11 23 24
+
+TraQua              rectangle 38
+9 12 24 21
+
+0 NRPRISM
+
+9 NRHEXAS
+
+TraHex              hexa 1
+1    1 2 3 4 13 14 15 16
+
+TraHex              hexa 2
+2    5 6 2 1 17 18 14 13
+
+TraHex              hexa 3
+3    6 7 3 2 18 19 15 14
+
+TraHex              hexa 4
+4    8 7 3 4 20 19 15 16
+
+TraHex              hexa 5
+5    5 8 4 1 17 20 16 13
+
+TraHex              hexa 6
+6    9 10 6 5 21 22 18 17
+
+TraHex              hexa 7
+7    10 11 7 6 22 23 19 18
+
+TraHex              hexa 8
+8    12 11 7 8 24 23 19 20
+
+TraHex              hexa 9
+9    9 12 8 5 21 24 20 17
+
+0 NRTETRA
+
+0 NRPYRAM
+
+

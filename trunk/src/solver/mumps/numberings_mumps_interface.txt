@@ -1,0 +1,33 @@
+Lokalna macierz elementu
+Globalna macierz
+
+iglobaldof = Globalna numeracja dof na calej siatce 
+  (zliczamy wszystkie dof, jesli wezel sie powtarza to nie zliczamy) OK
+isublocal = Lokalna numeracja dof na poddziedzinie OK
+  (zliczamy wszystkie dof na danej poddziedzinie, jesli wezel sie 
+    powtarza to nie zliczamy)
+ilocaldof = Lokalna numeracja dof na macierzy elementu OK
+  (zliczamy dla kazdego elementu od 0. Jesli wezel sie powtarza to TEZ zliczamy)
+ischur = Globalna numeracja dof na interface
+  (zliczamy wezly interface'u na calej siatce, bez powtorzen)
+TO JUZ JEST ZLICZONE I TRZYMANE W sbs ALE TYLKO LOKALNIE DLA PODDZIEDZINY !!!
+
+isubschur = Lokalna numeracja dof na interface poddziedziny OK
+  (zliczamy tylko wezly interface'u na poddziedzinie, nawet jesli sie
+   powtarzaja)
+
+iglobal(Lokalna numeracja dof na macierzy elementu) = 
+  Lokalna numeracja dof na poddziedzinie  OK
+
+itotaldof = ilocaldof = ilosc dof na lokalnej macierzy elementu
+
+LISTVAR_SCHUR(Lokalna numeracja dof na interface poddziedziny)=
+  Lokalna numeracja dof na dziedzinie OK
+
+ilocal2int(Lokalna numeracja dof na interface poddziedziny) = 
+  Globalna numeracja dof na interface  
+
+Na procesorze 7 mamy wezly z sbs !=0
+ale elementy z takimi wezlami nie naleza do procesora 7 ???
+Elementy ktore naleza do procesora 7 maja zerowy sbs
+NIE ! One nie zostaja przegladniete drugi raz !!!

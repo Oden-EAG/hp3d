@@ -1,0 +1,21 @@
+ccccc module solver_info
+C
+C     Interface to stand-alone solver
+C
+
+c      INTEGER (KIND=4) :: IntParam(34)
+c      common /csolver_info/ IntParam
+
+      INTEGER (KIND=4) :: IntParam
+      common /csolver_info/ IntParam(34)
+
+      REAL    (KIND=8) :: RealParam(17)
+
+      INTEGER (KIND=4) :: Type,Real_Complex,Symmetry
+
+      EQUIVALENCE (IntParam(1),RealParam(1))
+      EQUIVALENCE (IntParam(31),Type),
+     +            (IntParam(32),Real_Complex),
+     +            (IntParam(33),Symmetry)
+
+ccccc end module solver_info

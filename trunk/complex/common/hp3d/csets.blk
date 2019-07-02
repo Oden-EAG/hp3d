@@ -1,0 +1,16 @@
+c
+c  ...defines sets of initial elements:
+c     NRSETS  - number of defined sets
+c
+c  ...for set of elements 'i'
+c     NRELSET(1,i) = number of initial mesh elements in i-th set
+c     NRELSET(2,i) = location of first elements in the i-th set
+c                    in array NELISET
+      common /csets/ NRSETS, NRELSET(2,10), NELISET(10000)
+c
+c  ...active set number
+      common /csetact/ ISETACT
+c
+
+
+

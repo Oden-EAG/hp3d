@@ -1,0 +1,15 @@
+Import("*")
+
+filenames  = get_list_mk_files()
+
+# filenames = Split("""
+# element_norm.F
+# enforce_min_rule.F
+# global_pref.F
+# pstep.F
+# shift_dof.F
+# """)
+
+shared_objs = env.SharedObject(filenames)
+
+Return("shared_objs")

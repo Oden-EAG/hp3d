@@ -1,0 +1,2722 @@
+
+FORTRAN-lint    Rev 5.00.14-UOR (Revision: 2008-08-04)    7-Aug-2018  15:48:43 
+
+Default options:  -w -u -O207,276,76,261 --t --x
+Command options:  -D_OPENMP,C_MODE=1
+                  -I/work/05246/sh43394/stampede2/par_hp3d/trunk/complex/common/hp3d
+                  -I/work/05246/sh43394/stampede2/par_hp3d/trunk/complex/common/graphics
+                  -I/work/05246/sh43394/stampede2/par_hp3d/trunk/complex/module
+                  -I./COMMON_FILES
+                  -I/opt/apps/intel17/impi17_0/tau/2.26.2p1/include
+                  -I/opt/intel/compilers_and_libraries_2017.4.196/linux/mpi/intel64/include
+                  -f -Mpdb=pdtf179166.pdb -openmp
+
+
+
+>>> Source analysis:
+
+
+elem_fi.F90  
+
+*******************************************************************************
+   Subroutine ELEM                      File elem_fi.F90          Line 30
+
+>   use assembly
+>       ^
+elem_fi.F90:ELEM line 32:
+Error #731
+
+>   use CommonParam
+>       ^
+elem_fi.F90:ELEM line 33:
+Error #731
+
+>   use control
+>       ^
+elem_fi.F90:ELEM line 34:
+Error #731
+
+>   use parametersDPG
+>       ^
+elem_fi.F90:ELEM line 35:
+Error #731
+
+>   use data_structure3D
+>       ^
+elem_fi.F90:ELEM line 36:
+Error #731
+
+>   integer,dimension(NR_PHYSA),intent(out) :: Itest,Itrial
+>                     ^
+elem_fi.F90:ELEM line 42:
+Error #136
+
+>   select case(NODES(Mdle)%case)
+>               ^
+elem_fi.F90:ELEM line 57:
+Error #136
+
+>   select case(NODES(Mdle)%case)
+>                          ^
+elem_fi.F90:ELEM line 57:
+Error #7
+
+>      case(63)
+>      ^
+elem_fi.F90:ELEM line 60:
+Error #653
+
+>         select case(NO_PROBLEM)
+>                     ^
+elem_fi.F90:ELEM line 65:
+Error #136
+
+>               call elem_dpgHeat(Mdle, &
+>                 BLOC(1)%nrow,BLOC(4)%nrow, &
+>                 ^
+elem_fi.F90:ELEM line 71:
+Error #136
+
+>               call elem_dpgHeat(Mdle, &
+>                 BLOC(1)%nrow,BLOC(4)%nrow, &
+>                        ^
+elem_fi.F90:ELEM line 71:
+Error #108
+
+>               etype = NODES(Mdle)%type
+>                     ^
+elem_fi.F90:ELEM line 79:
+Error #161
+
+>               etype = NODES(Mdle)%type
+>                                  ^
+elem_fi.F90:ELEM line 79:
+Error #20
+
+>                     nordP = NODES(Mdle)%order+NORD_ADD*111
+>                                        ^
+elem_fi.F90:ELEM line 85:
+Error #20
+
+>                     nordP = NODES(Mdle)%order+NORD_ADD
+>                                        ^
+elem_fi.F90:ELEM line 87:
+Error #20
+
+>                     nordP = NODES(Mdle)%order+NORD_ADD*11
+>                                        ^
+elem_fi.F90:ELEM line 89:
+Error #20
+
+>               call elem_uwMaxwell_fi_TRANS(Mdle,fld_flag, &
+>                 nrdofEE,nrdofH,nrdofE,nrdofQ, &
+>                 BLOC(2)%nrow,BLOC(5)%nrow, &
+>                        ^
+elem_fi.F90:ELEM line 103:
+Error #108
+
+>               etype = NODES(Mdle)%type
+>                     ^
+elem_fi.F90:ELEM line 111:
+Error #161
+
+>               etype = NODES(Mdle)%type
+>                                  ^
+elem_fi.F90:ELEM line 111:
+Error #20
+
+>                     nordP = NODES(Mdle)%order+NORD_ADD*111
+>                                        ^
+elem_fi.F90:ELEM line 117:
+Error #20
+
+>                     nordP = NODES(Mdle)%order+NORD_ADD
+>                                        ^
+elem_fi.F90:ELEM line 119:
+Error #20
+
+>                     nordP = NODES(Mdle)%order+NORD_ADD*11
+>                                        ^
+elem_fi.F90:ELEM line 121:
+Error #20
+
+>               call elem_uwMaxwell_fi_TRANS(Mdle,fld_flag, &
+>                 nrdofEE,nrdofH,nrdofE,nrdofQ, &
+>                 BLOC(3)%nrow,BLOC(6)%nrow, &
+>                        ^
+elem_fi.F90:ELEM line 135:
+Error #108
+
+>      case default
+>      ^
+elem_fi.F90:ELEM line 142:
+Error #653
+
+>         write(*,*) 'elem: Mdle,NODES(Mdle)%case = ', &
+>           Mdle,NODES(Mdle)%case, '. stop.'
+>                           ^
+elem_fi.F90:ELEM line 144:
+Error #36
+
+>         call logic_error(ERR_INVALID_VALUE, __FILE__,__LINE__)
+>                          ^
+elem_fi.F90:ELEM line 145:
+Error #136
+
+>         call logic_error(ERR_INVALID_VALUE, __FILE__,__LINE__)
+>                                             ^
+elem_fi.F90:ELEM line 145:
+Error #136
+
+>         call logic_error(ERR_INVALID_VALUE, __FILE__,__LINE__)
+>                                                      ^
+elem_fi.F90:ELEM line 145:
+Error #136
+
+>   end select
+>   ^
+elem_fi.F90:ELEM line 148:
+Error #654
+
+elem_fi.F90:ELEM line 42:
+Error #126
+
+elem_fi.F90:ELEM line 65:
+Error #126
+
+*******************************************************************************
+   Subroutine ELEM_DPGHEAT              File elem_fi.F90          Line 180
+
+>   use control
+>       ^
+elem_fi.F90:ELEM_DPGHEAT line 183:
+Error #731
+
+>   use parametersDPG
+>       ^
+elem_fi.F90:ELEM_DPGHEAT line 184:
+Error #731
+
+>   use element_data
+>       ^
+elem_fi.F90:ELEM_DPGHEAT line 185:
+Error #731
+
+>   use data_structure3D
+>       ^
+elem_fi.F90:ELEM_DPGHEAT line 186:
+Error #731
+
+>   use LaserParam
+>       ^
+elem_fi.F90:ELEM_DPGHEAT line 187:
+Error #731
+
+>   use CommonParam
+>       ^
+elem_fi.F90:ELEM_DPGHEAT line 188:
+Error #731
+
+>   VTYPE, dimension(MdH),       intent(out) :: ZblocH
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 195:
+Error #28
+
+>   VTYPE, dimension(MdH,MdH),   intent(out) :: ZalocHH
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 196:
+Error #28
+
+>   VTYPE, dimension(MdH,MdV),   intent(out) :: ZalocHV
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 197:
+Error #28
+
+>   VTYPE, dimension(MdV),       intent(out) :: ZblocV
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 198:
+Error #28
+
+>   VTYPE, dimension(MdV,MdH),   intent(out) :: ZalocVH
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 199:
+Error #28
+
+>   VTYPE, dimension(MdV,MdV),   intent(out) :: ZalocVV
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 200:
+Error #28
+
+>   real*8, dimension(3,MAXbrickH) :: xnod
+>                       ^
+elem_fi.F90:ELEM_DPGHEAT line 213:
+Error #136
+
+>   VTYPE, dimension(MAXEQNH,MAXbrickH) :: zdofH
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 216:
+Error #28
+
+>   VTYPE, dimension(MAXEQNE,MAXbrickE) :: zdofE
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 217:
+Error #28
+
+>   VTYPE, dimension(MAXEQNV,MAXbrickV) :: zdofV
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 218:
+Error #28
+
+>   VTYPE, dimension(MAXEQNQ,MAXbrickQ) :: zdofQ
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 219:
+Error #28
+
+>   VTYPE, dimension(  MAXEQNH  ) ::  zsolH_soleval
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 222:
+Error #28
+
+>   VTYPE, dimension(  MAXEQNH,3) :: zdsolH_soleval
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 223:
+Error #28
+
+>   VTYPE, dimension(3,MAXEQNE  ) ::  zsolE_soleval
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 224:
+Error #28
+
+>   VTYPE, dimension(3,MAXEQNE  ) :: zcurlE_soleval
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 225:
+Error #28
+
+>   VTYPE, dimension(3,MAXEQNV  ) ::  zsolV_soleval
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 226:
+Error #28
+
+>   VTYPE, dimension(  MAXEQNV  ) ::  zdivV_soleval
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 227:
+Error #28
+
+>   VTYPE, dimension(  MAXEQNQ  ) ::  zsolQ_soleval
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 228:
+Error #28
+
+>   real*8, dimension(3,MAXbrickE)  :: shapE
+>                       ^
+elem_fi.F90:ELEM_DPGHEAT line 241:
+Error #136
+
+>   real*8, dimension(3,MAXbrickV)  :: shapV
+>                       ^
+elem_fi.F90:ELEM_DPGHEAT line 245:
+Error #136
+
+>   real*8, dimension(MAXbrickQ)    :: shapQ
+>                     ^
+elem_fi.F90:ELEM_DPGHEAT line 249:
+Error #136
+
+>   real*8 , dimension(MAXbrickHH)    :: shapHH
+>                      ^
+elem_fi.F90:ELEM_DPGHEAT line 252:
+Error #136
+
+>   integer, parameter   :: MAXtestH = MAXbrickHH
+>                                      ^
+elem_fi.F90:ELEM_DPGHEAT line 259:
+Error #180
+
+>   VTYPE, dimension(MAXtestH*(MAXtestH+1)/2) :: AP_Heat
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 262:
+Error #28
+
+>   VTYPE, dimension(MAXtestH) :: BLOADH
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 265:
+Error #28
+
+>   VTYPE, dimension(MAXtestH,MAXbrickH) :: STIFFHH
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 268:
+Error #28
+
+>   VTYPE, dimension(MAXtestH,MAXbrickV) :: STIFFHV
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 269:
+Error #28
+
+>   VTYPE, dimension(MAXtestH,MAXbrickH+MAXbrickV+1) :: STIFF_ALLH
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 272:
+Error #28
+
+>   VTYPE, allocatable:: SQUARE_STIFF(:,:)
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 273:
+Error #28
+
+>   VTYPE, allocatable :: AP_eig(:)
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 276:
+Error #28
+
+>   VTYPE, allocatable :: DIAG_E(:)
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 277:
+Error #28
+
+>   VTYPE, allocatable :: DIAG_H(:)
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 278:
+Error #28
+
+>   VTYPE, dimension(MAXtestH*(MAXtestH+1)/2) :: AP
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 281:
+Error #28
+
+>   real*8, dimension(3,MAXNINT3ADD)  :: xiloc
+>                       ^
+elem_fi.F90:ELEM_DPGHEAT line 284:
+Error #136
+
+>   real*8, dimension(2,MAXNINT2ADD)  :: tloc
+>                       ^
+elem_fi.F90:ELEM_DPGHEAT line 288:
+Error #136
+
+>   integer, dimension(6,NR_PHYSA)    :: ibc
+>                        ^
+elem_fi.F90:ELEM_DPGHEAT line 292:
+Error #136
+
+>   VTYPE, dimension(10) :: zaux
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 298:
+Error #28
+
+>   VTYPE, dimension(3) :: zJ
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 301:
+Error #28
+
+>   VTYPE   :: zfval,therm_Load
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 314:
+Error #28
+
+Error #136
+
+Error #136
+
+Error #136
+
+Error #136
+
+Error #136
+
+Error #136
+
+>      write(*,*) 'elem_dpgHeat: NO_PROBLEM    = ',NO_PROBLEM
+>                                                  ^
+elem_fi.F90:ELEM_DPGHEAT line 322:
+Error #136
+
+>      write(*,*) 'elem_dpgHeat: INNER_PRODUCT = ',INNER_PRODUCT
+>                                                  ^
+elem_fi.F90:ELEM_DPGHEAT line 323:
+Error #136
+
+>   etype = NODES(Mdle)%type
+>           ^
+elem_fi.F90:ELEM_DPGHEAT line 329:
+Error #136
+
+>   etype = NODES(Mdle)%type
+>         ^
+elem_fi.F90:ELEM_DPGHEAT line 329:
+Error #161
+
+>   etype = NODES(Mdle)%type
+>                      ^
+elem_fi.F90:ELEM_DPGHEAT line 329:
+Error #20
+
+>   nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
+>         ^
+elem_fi.F90:ELEM_DPGHEAT line 330:
+Error #136
+
+>                       nre = nedge(etype); nrf = nface(etype)
+>                             ^
+elem_fi.F90:ELEM_DPGHEAT line 330:
+Error #136
+
+>                                           nrf = nface(etype)
+>                                                 ^
+elem_fi.F90:ELEM_DPGHEAT line 330:
+Error #136
+
+>                            nordP = NODES(Mdle)%order + NORD_ADD*111
+>                                               ^
+elem_fi.F90:ELEM_DPGHEAT line 337:
+Error #20
+
+>                            nordP = NODES(Mdle)%order + NORD_ADD*1
+>                                               ^
+elem_fi.F90:ELEM_DPGHEAT line 338:
+Error #20
+
+>                            nordP = NODES(Mdle)%order + NORD_ADD*11
+>                                               ^
+elem_fi.F90:ELEM_DPGHEAT line 339:
+Error #20
+
+>         call solelm(Mdle, zdofH,zdofE,zdofV,zdofQ)
+>                           ^
+elem_fi.F90:ELEM_DPGHEAT line 355:
+Error #136
+
+>         call solelm(Mdle, zdofH,zdofE,zdofV,zdofQ)
+>                                 ^
+elem_fi.F90:ELEM_DPGHEAT line 355:
+Error #136
+
+>         call solelm(Mdle, zdofH,zdofE,zdofV,zdofQ)
+>                                       ^
+elem_fi.F90:ELEM_DPGHEAT line 355:
+Error #136
+
+>         call solelm(Mdle, zdofH,zdofE,zdofV,zdofQ)
+>                                             ^
+elem_fi.F90:ELEM_DPGHEAT line 355:
+Error #136
+
+>         write(*,7002) PHYSA(i), ibc(1:nrf,i)
+>                       ^
+elem_fi.F90:ELEM_DPGHEAT line 388:
+Error #136
+
+>   ZblocH = ZERO; ZblocV = ZERO
+>            ^
+elem_fi.F90:ELEM_DPGHEAT line 394:
+Error #136
+
+>   BLOADH=ZERO ; STIFFHH=ZERO ; STIFFHV=ZERO; STIFF_ALLH=ZERO
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 398:
+Error #136
+
+>                 STIFFHH=ZERO ; STIFFHV=ZERO; STIFF_ALLH=ZERO
+>                 ^
+elem_fi.F90:ELEM_DPGHEAT line 398:
+Error #136
+
+>                                STIFFHV=ZERO; STIFF_ALLH=ZERO
+>                                ^
+elem_fi.F90:ELEM_DPGHEAT line 398:
+Error #136
+
+>                                              STIFF_ALLH=ZERO
+>                                              ^
+elem_fi.F90:ELEM_DPGHEAT line 398:
+Error #136
+
+>   AP_Heat=ZERO
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 401:
+Error #136
+
+>   INTEGRATION = NORD_ADD
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 409:
+Error #136
+
+>   INTEGRATION = NORD_ADD
+>                 ^
+elem_fi.F90:ELEM_DPGHEAT line 409:
+Error #136
+
+>      call soleval(Mdle,xi,norient_edge,norient_face,norder,xnod, &
+>        zdofH,zdofE,zdofV,zdofQ,nflag,x,dxdxi,zsolH_soleval,zdsolH_soleval, &
+>                                              ^
+elem_fi.F90:ELEM_DPGHEAT line 432:
+Error #136
+
+>      call soleval(Mdle,xi,norient_edge,norient_face,norder,xnod, &
+>        zdofH,zdofE,zdofV,zdofQ,nflag,x,dxdxi,zsolH_soleval,zdsolH_soleval, &
+>                                                            ^
+elem_fi.F90:ELEM_DPGHEAT line 432:
+Error #136
+
+>      call soleval(Mdle,xi,norient_edge,norient_face,norder,xnod, &
+>        zdofH,zdofE,zdofV,zdofQ,nflag,x,dxdxi,zsolH_soleval,zdsolH_soleval, &
+>        zsolE_soleval,zcurlE_soleval,zsolV_soleval,zdivV_soleval,zsolQ_sole...
+>        ^
+elem_fi.F90:ELEM_DPGHEAT line 433:
+Error #136
+
+>      call soleval(Mdle,xi,norient_edge,norient_face,norder,xnod, &
+>        zdofH,zdofE,zdofV,zdofQ,nflag,x,dxdxi,zsolH_soleval,zdsolH_soleval, &
+>        zsolE_soleval,zcurlE_soleval,zsolV_soleval,zdivV_soleval,zsolQ_sole...
+>                      ^
+elem_fi.F90:ELEM_DPGHEAT line 433:
+Error #136
+
+>      call soleval(Mdle,xi,norient_edge,norient_face,norder,xnod, &
+>        zdofH,zdofE,zdofV,zdofQ,nflag,x,dxdxi,zsolH_soleval,zdsolH_soleval, &
+>        zsolE_soleval,zcurlE_soleval,zsolV_soleval,zdivV_soleval,zsolQ_sole...
+>                                     ^
+elem_fi.F90:ELEM_DPGHEAT line 433:
+Error #136
+
+>      call soleval(Mdle,xi,norient_edge,norient_face,norder,xnod, &
+>        zdofH,zdofE,zdofV,zdofQ,nflag,x,dxdxi,zsolH_soleval,zdsolH_soleval, &
+>        zsolE_soleval,zcurlE_soleval,zsolV_soleval,zdivV_soleval,zsolQ_sole...
+>                                                   ^
+elem_fi.F90:ELEM_DPGHEAT line 433:
+Error #136
+
+>      call soleval(Mdle,xi,norient_edge,norient_face,norder,xnod, &
+>        zdofH,zdofE,zdofV,zdofQ,nflag,x,dxdxi,zsolH_soleval,zdsolH_soleval, &
+>        zsolE_soleval,zcurlE_soleval,zsolV_soleval,zdivV_soleval,zsolQ_sole...
+>                                                                 ^
+elem_fi.F90:ELEM_DPGHEAT line 433:
+Error #136
+
+>         call get_thermLoad(zsolQ_soleval, therm_Load)
+>                                           ^
+elem_fi.F90:ELEM_DPGHEAT line 440:
+Error #136
+
+>      call getf(Mdle,x, zfval,zJ)
+>                        ^
+elem_fi.F90:ELEM_DPGHEAT line 447:
+Error #136
+
+>      call getf(Mdle,x, zfval,zJ)
+>                              ^
+elem_fi.F90:ELEM_DPGHEAT line 447:
+Error #136
+
+>               BLOADH(k1) = BLOADH(k1) + zfval*v1*weight
+>               ^
+elem_fi.F90:ELEM_DPGHEAT line 460:
+Error #27
+
+>               BLOADH(k1) = BLOADH(k1) + zfval*v1*weight
+>                            ^
+elem_fi.F90:ELEM_DPGHEAT line 460:
+Error #27
+
+>               BLOADH(k1) = BLOADH(k1) + (therm_Load*DELTAT+zsolH_soleval(1...
+>               ^
+elem_fi.F90:ELEM_DPGHEAT line 462:
+Error #27
+
+>               BLOADH(k1) = BLOADH(k1) + (therm_Load*DELTAT+zsolH_soleval(1...
+>                            ^
+elem_fi.F90:ELEM_DPGHEAT line 462:
+Error #27
+
+>               BLOADH(k1) = BLOADH(k1) + (therm_Load*DELTAT+zsolH_soleval(1...
+>                                                     ^
+elem_fi.F90:ELEM_DPGHEAT line 462:
+Error #136
+
+>                  BLOADH(k1) = ZERO
+>                  ^
+elem_fi.F90:ELEM_DPGHEAT line 466:
+Error #27
+
+>                  AP_Heat(k) = AP_Heat(k) &
+>                  ^
+elem_fi.F90:ELEM_DPGHEAT line 491:
+Error #27
+
+>                  AP_Heat(k) = AP_Heat(k) &
+>                               ^
+elem_fi.F90:ELEM_DPGHEAT line 491:
+Error #27
+
+>            STIFFHH(k1,k2) = STIFFHH(k1,k2) &
+>            ^
+elem_fi.F90:ELEM_DPGHEAT line 511:
+Error #27
+
+>            STIFFHH(k1,k2) = STIFFHH(k1,k2) &
+>                             ^
+elem_fi.F90:ELEM_DPGHEAT line 511:
+Error #27
+
+>            STIFFHH(k1,k2) = STIFFHH(k1,k2) &
+>                           + (KAPPA*DELTAT * (&
+>                              ^
+elem_fi.F90:ELEM_DPGHEAT line 512:
+Error #136
+
+>            zaux(j) = AP_Heat(nk(j,i))
+>            ^
+elem_fi.F90:ELEM_DPGHEAT line 528:
+Error #115
+
+>            zaux(j) = AP_Heat(nk(i,j))
+>            ^
+elem_fi.F90:ELEM_DPGHEAT line 531:
+Error #115
+
+>         write(*,7011) zaux
+>                       ^
+elem_fi.F90:ELEM_DPGHEAT line 533:
+Error #136
+
+>      nsign = nsign_param(etype,ifc)
+>              ^
+elem_fi.F90:ELEM_DPGHEAT line 547:
+Error #136
+
+>      ftype = face_type(etype,ifc)
+>              ^
+elem_fi.F90:ELEM_DPGHEAT line 550:
+Error #136
+
+>      ftype = face_type(etype,ifc)
+>            ^
+elem_fi.F90:ELEM_DPGHEAT line 550:
+Error #161
+
+>               STIFFHV(k1,k2) = STIFFHV(k1,k2) &
+>               ^
+elem_fi.F90:ELEM_DPGHEAT line 601:
+Error #27
+
+>               STIFFHV(k1,k2) = STIFFHV(k1,k2) &
+>                                ^
+elem_fi.F90:ELEM_DPGHEAT line 601:
+Error #27
+
+>   STIFF_ALLH(1:i1,1:j1) = STIFFHH(1:i1,1:j1)
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 631:
+Error #27
+
+>   STIFF_ALLH(1:i1,1:j1) = STIFFHH(1:i1,1:j1)
+>                           ^
+elem_fi.F90:ELEM_DPGHEAT line 631:
+Error #27
+
+>   STIFF_ALLH(1:i1,j1+1:j1+j2) = STIFFHV(1:i1,1:j2)
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 632:
+Error #27
+
+>   STIFF_ALLH(1:i1,j1+1:j1+j2) = STIFFHV(1:i1,1:j2)
+>                                 ^
+elem_fi.F90:ELEM_DPGHEAT line 632:
+Error #27
+
+>   STIFF_ALLH(1:i1,j1+j2+1) = BLOADH(1:i1)
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 633:
+Error #27
+
+>   STIFF_ALLH(1:i1,j1+j2+1) = BLOADH(1:i1)
+>                              ^
+elem_fi.F90:ELEM_DPGHEAT line 633:
+Error #27
+
+>   allocate(SQUARE_STIFF(NRHS,NRHS))
+>            ^
+elem_fi.F90:ELEM_DPGHEAT line 642:
+Error #115
+
+>  call ZHERK(uplo,trans,NRHS,nrTest,ZONE,STIFF_ALLH, &
+>                                    ^
+elem_fi.F90:ELEM_DPGHEAT line 651:
+Error #136
+
+>  call ZHERK(uplo,trans,NRHS,nrTest,ZONE,STIFF_ALLH, &
+>              MAXtestH,ZERO, &
+>              SQUARE_STIFF(1:NRHS,1:NRHS),NRHS)
+>              ^
+elem_fi.F90:ELEM_DPGHEAT line 653:
+Error #136
+
+>  call ZHERK(uplo,trans,NRHS,nrTest,ZONE,STIFF_ALLH, &
+>              MAXtestH,ZERO, &
+>              SQUARE_STIFF(1:NRHS,1:NRHS),NRHS)
+>                            ^
+elem_fi.F90:ELEM_DPGHEAT line 653:
+Error #107
+
+>      SQUARE_STIFF(i+1:NRHS,i) = conjg(SQUARE_STIFF(i,i+1:NRHS))
+>      ^
+elem_fi.F90:ELEM_DPGHEAT line 657:
+Error #115
+
+>   ZblocH(1:j1) = SQUARE_STIFF(1:j1,j1+j2+1)
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 669:
+Error #27
+
+>   ZblocH(1:j1) = SQUARE_STIFF(1:j1,j1+j2+1)
+>                                ^
+elem_fi.F90:ELEM_DPGHEAT line 669:
+Error #107
+
+>   ZblocV(1:j2) = SQUARE_STIFF(j1+1:j1+j2,j1+j2+1)
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 670:
+Error #27
+
+>   ZblocV(1:j2) = SQUARE_STIFF(j1+1:j1+j2,j1+j2+1)
+>                                   ^
+elem_fi.F90:ELEM_DPGHEAT line 670:
+Error #107
+
+>   ZalocHH(1:j1,1:j1) = SQUARE_STIFF(1:j1,1:j1)
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 672:
+Error #27
+
+>   ZalocHH(1:j1,1:j1) = SQUARE_STIFF(1:j1,1:j1)
+>                                      ^
+elem_fi.F90:ELEM_DPGHEAT line 672:
+Error #107
+
+>   ZalocHV(1:j1,1:j2) = SQUARE_STIFF(1:j1,j1+1:j1+j2)
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 673:
+Error #27
+
+>   ZalocHV(1:j1,1:j2) = SQUARE_STIFF(1:j1,j1+1:j1+j2)
+>                                      ^
+elem_fi.F90:ELEM_DPGHEAT line 673:
+Error #107
+
+>   ZalocVH(1:j2,1:j1) = SQUARE_STIFF(j1+1:j1+j2,1:j1)
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 675:
+Error #27
+
+>   ZalocVH(1:j2,1:j1) = SQUARE_STIFF(j1+1:j1+j2,1:j1)
+>                                         ^
+elem_fi.F90:ELEM_DPGHEAT line 675:
+Error #107
+
+>   ZalocVV(1:j2,1:j2) = SQUARE_STIFF(j1+1:j1+j2,j1+1:j1+j2)
+>   ^
+elem_fi.F90:ELEM_DPGHEAT line 676:
+Error #27
+
+>   ZalocVV(1:j2,1:j2) = SQUARE_STIFF(j1+1:j1+j2,j1+1:j1+j2)
+>                                         ^
+elem_fi.F90:ELEM_DPGHEAT line 676:
+Error #107
+
+>   deallocate(SQUARE_STIFF)
+>              ^
+elem_fi.F90:ELEM_DPGHEAT line 677:
+Error #40
+
+>   deallocate(SQUARE_STIFF)
+>              ^
+elem_fi.F90:ELEM_DPGHEAT line 677:
+Error #24
+
+> 7011   format(10e12.5)
+> ^
+elem_fi.F90:ELEM_DPGHEAT line 683:
+Error #101
+
+elem_fi.F90:ELEM_DPGHEAT line 213:
+Error #126
+
+elem_fi.F90:ELEM_DPGHEAT line 241:
+Error #126
+
+elem_fi.F90:ELEM_DPGHEAT line 245:
+Error #126
+
+elem_fi.F90:ELEM_DPGHEAT line 249:
+Error #126
+
+elem_fi.F90:ELEM_DPGHEAT line 252:
+Error #126
+
+elem_fi.F90:ELEM_DPGHEAT line 284:
+Error #126
+
+elem_fi.F90:ELEM_DPGHEAT line 288:
+Error #126
+
+elem_fi.F90:ELEM_DPGHEAT line 292:
+Error #126
+
+elem_fi.F90:ELEM_DPGHEAT line 322:
+Error #126
+
+elem_fi.F90:ELEM_DPGHEAT line 323:
+Error #126
+
+elem_fi.F90:ELEM_DPGHEAT line 409:
+Error #126
+
+elem_fi.F90:ELEM_DPGHEAT line 462:
+Error #126
+
+elem_fi.F90:ELEM_DPGHEAT line 512:
+Error #126
+
+elem_fi.F90:ELEM_DPGHEAT line 533:
+Error #126
+
+elem_fi.F90:ELEM_DPGHEAT line 325:
+Error #127
+
+elem_fi.F90:ELEM_DPGHEAT line 330:
+Error #127
+
+elem_fi.F90:ELEM_DPGHEAT line 330:
+Error #127
+
+elem_fi.F90:ELEM_DPGHEAT line 523:
+Error #127
+
+elem_fi.F90:ELEM_DPGHEAT line 558:
+Error #127
+
+elem_fi.F90:ELEM_DPGHEAT line 232:
+Error #128
+
+elem_fi.F90:ELEM_DPGHEAT line 241:
+Error #128
+
+elem_fi.F90:ELEM_DPGHEAT line 242:
+Error #128
+
+elem_fi.F90:ELEM_DPGHEAT line 249:
+Error #128
+
+elem_fi.F90:ELEM_DPGHEAT line 311:
+Error #128
+
+elem_fi.F90:ELEM_DPGHEAT line 312:
+Error #128
+
+elem_fi.F90:ELEM_DPGHEAT line 312:
+Error #128
+
+elem_fi.F90:ELEM_DPGHEAT line 312:
+Error #128
+
+elem_fi.F90:ELEM_DPGHEAT line 312:
+Error #128
+
+elem_fi.F90:ELEM_DPGHEAT line 313:
+Error #128
+
+elem_fi.F90:ELEM_DPGHEAT line 193:
+Error #124
+
+elem_fi.F90:ELEM_DPGHEAT line 194:
+Error #124
+
+*******************************************************************************
+   Subroutine ELEM_UWMAXWELL_FI_TRANS   File elem_fi.F90          Line 720
+
+>   use control
+>       ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 726:
+Error #731
+
+>   use parametersDPG
+>       ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 727:
+Error #731
+
+>   use data_structure3D
+>       ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 728:
+Error #731
+
+>   use LaserParam
+>       ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 729:
+Error #731
+
+>   use CommonParam
+>       ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 730:
+Error #731
+
+>   VTYPE, dimension(MdE),     intent(out) :: ZblocE
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 742:
+Error #28
+
+>   VTYPE, dimension(MdE,MdE), intent(out) :: ZalocEE
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 743:
+Error #28
+
+>   VTYPE, dimension(MdE,MdQ), intent(out) :: ZalocEQ
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 744:
+Error #28
+
+>   VTYPE, dimension(MdQ),     intent(out) :: ZblocQ
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 745:
+Error #28
+
+>   VTYPE, dimension(MdQ,MdE), intent(out) :: ZalocQE
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 746:
+Error #28
+
+>   VTYPE, dimension(MdQ,MdQ), intent(out) :: ZalocQQ
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 747:
+Error #28
+
+>   real*8, dimension(3,MAXbrickH) :: xnod
+>                       ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 765:
+Error #136
+
+>   VTYPE, dimension(MAXEQNH,MAXbrickH) :: zdofH
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 768:
+Error #28
+
+>   VTYPE, dimension(MAXEQNE,MAXbrickE) :: zdofE
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 769:
+Error #28
+
+>   VTYPE, dimension(MAXEQNV,MAXbrickV) :: zdofV
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 770:
+Error #28
+
+>   VTYPE, dimension(MAXEQNQ,MAXbrickQ) :: zdofQ
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 771:
+Error #28
+
+>   VTYPE, dimension(  MAXEQNH  ) ::  zsolH_soleval
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 775:
+Error #28
+
+>   VTYPE, dimension(  MAXEQNH,3) :: zdsolH_soleval
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 776:
+Error #28
+
+>   VTYPE, dimension(3,MAXEQNE  ) ::  zsolE_soleval
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 777:
+Error #28
+
+>   VTYPE, dimension(3,MAXEQNE  ) :: zcurlE_soleval
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 778:
+Error #28
+
+>   VTYPE, dimension(3,MAXEQNV  ) ::  zsolV_soleval
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 779:
+Error #28
+
+>   VTYPE, dimension(  MAXEQNV  ) ::  zdivV_soleval
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 780:
+Error #28
+
+>   VTYPE, dimension(  MAXEQNQ  ) ::  zsolQ_soleval
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 781:
+Error #28
+
+>   real*8, dimension(3,MAXbrickE)  :: shapE
+>                       ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 794:
+Error #136
+
+>   real*8, dimension(MAXbrickQ)    :: shapQ
+>                     ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 798:
+Error #136
+
+>   real*8 , dimension(3,MAXbrickEE) :: shapEE
+>                        ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 801:
+Error #136
+
+>   VTYPE, dimension(2*NrdofEE*(2*NrdofEE+1)/2) :: AP_Maxwell
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 818:
+Error #28
+
+>   VTYPE, dimension(2*NrdofEE) :: BLOADE
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 821:
+Error #28
+
+>   VTYPE, dimension(2*NrdofEE,2*NrdofE+6*NrdofQ+1) :: STIFF_ALL
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 824:
+Error #28
+
+>   VTYPE, dimension(6*NrdofQ,2*NrdofEE) :: STIFFEQ_T
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 828:
+Error #28
+
+>   VTYPE, dimension(2*NrdofE,2*NrdofEE) :: STIFFEE_T
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 829:
+Error #28
+
+>   VTYPE, allocatable :: AP_eig(:)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 835:
+Error #28
+
+>   VTYPE, allocatable :: DIAG_E(:)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 836:
+Error #28
+
+>   VTYPE, allocatable :: DIAG_H(:)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 837:
+Error #28
+
+>   VTYPE, dimension(2*NrdofEE*(2*NrdofEE+1)/2) :: AP
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 840:
+Error #28
+
+>   real*8, dimension(3,MAXNINT3ADD)  :: xiloc
+>                       ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 842:
+Error #136
+
+>   real*8, dimension(2,MAXNINT2ADD)  :: tloc
+>                       ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 846:
+Error #136
+
+>   integer, dimension(6,NR_PHYSA)    :: ibc
+>                        ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 850:
+Error #136
+
+>   VTYPE, dimension(21) :: zaux
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 853:
+Error #28
+
+>   VTYPE, dimension(3)  :: zJ,zImp
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 856:
+Error #28
+
+>   VTYPE   :: zfval,za,zb,zc
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 874:
+Error #28
+
+>   VTYPE  :: bg_pol,raman_pol,therm_pol,rndotE,alpha
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 877:
+Error #28
+
+>   VTYPE :: zbeta,zdbeta,zd2beta,detJstretch
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 884:
+Error #28
+
+>   VTYPE, dimension(3,3) :: Jstretch,INVJStretch,JJStretch
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 885:
+Error #28
+
+>   VTYPE, allocatable :: AUXEE_A(:,:,:)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 893:
+Error #28
+
+>   VTYPE, allocatable :: AUXEE_B(:,:,:,:)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 894:
+Error #28
+
+>   VTYPE, allocatable :: AUXCC_A(:,:,:,:,:)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 895:
+Error #28
+
+>   VTYPE, allocatable :: AUXCC_B(:,:,:,:,:,:)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 896:
+Error #28
+
+>   VTYPE, allocatable :: AUXEC_A(:,:,:,:)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 897:
+Error #28
+
+>   VTYPE, allocatable :: AUXCE_A(:,:,:,:)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 898:
+Error #28
+
+>   VTYPE, allocatable :: AUXEC_B(:,:,:,:,:)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 899:
+Error #28
+
+>   VTYPE, allocatable :: AUXCE_B(:,:,:,:,:)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 900:
+Error #28
+
+>   VTYPE, allocatable :: STIFQE_A(:,:,:)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 902:
+Error #28
+
+>   VTYPE, allocatable :: STIFQE_B(:,:,:,:)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 903:
+Error #28
+
+>   VTYPE, allocatable :: STIFQE_ALPHA_A(:,:,:)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 904:
+Error #28
+
+>   VTYPE, allocatable :: STIFQE_ALPHA_B(:,:,:,:)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 905:
+Error #28
+
+>   VTYPE, allocatable :: STIFQC_A(:,:,:,:)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 906:
+Error #28
+
+>   VTYPE, allocatable :: STIFQC_B(:,:,:,:,:)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 907:
+Error #28
+
+>   VTYPE, allocatable :: LOADE_A(:,:)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 908:
+Error #28
+
+>   VTYPE, allocatable :: LOADE_B(:,:,:)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 909:
+Error #28
+
+>   real*8, dimension(MAXPP+1) :: xilocx,xilocy,xilocz
+>                     ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 920:
+Error #136
+
+Error #136
+
+Error #136
+
+Error #136
+
+Error #136
+
+Error #136
+
+Error #136
+
+>   deltak=ZERO
+>          ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 932:
+Error #136
+
+>   etype = NODES(Mdle)%type
+>           ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 947:
+Error #136
+
+>   etype = NODES(Mdle)%type
+>         ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 947:
+Error #161
+
+>   etype = NODES(Mdle)%type
+>                      ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 947:
+Error #20
+
+>   nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
+>         ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 948:
+Error #136
+
+>                       nre = nedge(etype); nrf = nface(etype)
+>                             ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 948:
+Error #136
+
+>                                           nrf = nface(etype)
+>                                                 ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 948:
+Error #136
+
+>         nordP = NODES(Mdle)%order+NORD_ADD*111
+>                            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 958:
+Error #20
+
+>         nordP = NODES(Mdle)%order+NORD_ADD
+>                            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 961:
+Error #20
+
+>         nordP = NODES(Mdle)%order+NORD_ADD*11
+>                            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 964:
+Error #20
+
+>         write(*,7002) PHYSA(i), ibc(1:nrf,i)
+>                       ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 981:
+Error #136
+
+>   BLOADE     = ZERO
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1000:
+Error #136
+
+>   AP_Maxwell = ZERO
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1001:
+Error #136
+
+>   STIFF_ALL  = ZERO
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1002:
+Error #136
+
+>   STIFFEE_T = ZERO
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1005:
+Error #136
+
+>   STIFFEQ_T = ZERO
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1006:
+Error #136
+
+>         OMEGA_RATIO_FLD = OMEGA_RATIO_PUMP
+>                           ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1011:
+Error #136
+
+>         OMEGA_RATIO_FLD = OMEGA_RATIO_SIGNAL ! 1.0d0
+>                           ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1013:
+Error #136
+
+>   za = ZI*OMEGA*OMEGA_RATIO_FLD*EPSILON + SIGMA
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1019:
+Error #136
+
+>   za = ZI*OMEGA*OMEGA_RATIO_FLD*EPSILON + SIGMA
+>        ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1019:
+Error #136
+
+>   za = ZI*OMEGA*OMEGA_RATIO_FLD*EPSILON + SIGMA
+>           ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1019:
+Error #136
+
+>   za = ZI*OMEGA*OMEGA_RATIO_FLD*EPSILON + SIGMA
+>                                           ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1019:
+Error #136
+
+>   zb = -conjg(za)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1020:
+Error #136
+
+>   zc = ZI*OMEGA*OMEGA_RATIO_FLD*MU
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1021:
+Error #136
+
+>   zc = ZI*OMEGA*OMEGA_RATIO_FLD*MU
+>                                 ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1021:
+Error #136
+
+>   Jstretch = ZERO
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1023:
+Error #136
+
+>   Jstretch(1,1) = ZONE
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1024:
+Error #27
+
+>   Jstretch(1,1) = ZONE
+>                   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1024:
+Error #136
+
+>   Jstretch(2,2) = ZONE
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1025:
+Error #27
+
+>   INVJStretch = ZERO
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1027:
+Error #136
+
+>   INVJStretch(1,1) = ZONE
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1028:
+Error #27
+
+>   INVJStretch(2,2) = ZONE
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1029:
+Error #27
+
+>   JJStretch = ZERO
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1031:
+Error #136
+
+>   select case(GEOM_NO)
+>               ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1037:
+Error #136
+
+>         bg_pol = ZERO
+>         ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1039:
+Error #136
+
+>         raman_pol = ZERO
+>         ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1040:
+Error #136
+
+>         therm_pol = ZERO
+>         ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1041:
+Error #136
+
+>      call solelm(Mdle, zdofH,zdofE,zdofV,zdofQ)
+>                        ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1068:
+Error #136
+
+>      call solelm(Mdle, zdofH,zdofE,zdofV,zdofQ)
+>                              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1068:
+Error #136
+
+>      call solelm(Mdle, zdofH,zdofE,zdofV,zdofQ)
+>                                    ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1068:
+Error #136
+
+>      call solelm(Mdle, zdofH,zdofE,zdofV,zdofQ)
+>                                          ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1068:
+Error #136
+
+>   INTEGRATION = NORD_ADD
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1089:
+Error #136
+
+>   INTEGRATION = NORD_ADD
+>                 ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1089:
+Error #136
+
+>   allocate(AUXEE_A(3,3,nrdofH3**2))
+>            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1100:
+Error #115
+
+>   allocate(AUXEE_B(3,3,nrdofH2**2,nrdofH3**2))
+>            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1101:
+Error #115
+
+>   allocate(AUXCC_A(2,2,3,3,nrdofH3**2))
+>            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1102:
+Error #115
+
+>   allocate(AUXCC_B(2,2,3,3,nrdofH2**2,nrdofH3**2))
+>            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1103:
+Error #115
+
+>   allocate(AUXEC_A(2,3,3,nrdofH3**2))
+>            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1104:
+Error #115
+
+>   allocate(AUXEC_B(2,3,3,nrdofH2**2,nrdofH3**2))
+>            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1105:
+Error #115
+
+>   allocate(AUXCE_A(2,3,3,nrdofH3**2))
+>            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1106:
+Error #115
+
+>   allocate(AUXCE_B(2,3,3,nrdofH2**2,nrdofH3**2))
+>            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1107:
+Error #115
+
+>   allocate(STIFQE_A(3,3,nrdofQ3_tr*nrdofH3))
+>            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1109:
+Error #115
+
+>   allocate(STIFQE_B(3,3,nrdofQ2_tr*nrdofH2,nrdofQ3_tr*nrdofH3))
+>            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1110:
+Error #115
+
+>   allocate(STIFQE_ALPHA_A(3,3,nrdofQ3_tr*nrdofH3))
+>            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1111:
+Error #115
+
+>   allocate(STIFQE_ALPHA_B(3,3,nrdofQ2_tr*nrdofH2,nrdofQ3_tr*nrdofH3))
+>            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1112:
+Error #115
+
+>   allocate(STIFQC_A(2,3,3,nrdofQ3_tr*nrdofH3))
+>            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1113:
+Error #115
+
+>   allocate(STIFQC_B(2,3,3,nrdofQ2_tr*nrdofH2,nrdofQ3_tr*nrdofH3))
+>            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1114:
+Error #115
+
+>   allocate(LOADE_A(3,nrdofH3))
+>            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1115:
+Error #115
+
+>   allocate(LOADE_B(3,nrdofH2,nrdofH3))
+>            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1116:
+Error #115
+
+>      AUXEE_B =ZERO
+>      ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1167:
+Error #136
+
+>      AUXCC_B =ZERO
+>      ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1168:
+Error #136
+
+>      AUXEC_B =ZERO
+>      ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1169:
+Error #136
+
+>      AUXCE_B =ZERO
+>      ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1170:
+Error #136
+
+>      STIFQE_B      =ZERO
+>      ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1172:
+Error #136
+
+>      STIFQE_ALPHA_B=ZERO
+>      ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1173:
+Error #136
+
+>      STIFQC_B      =ZERO
+>      ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1174:
+Error #136
+
+>      LOADE_B       =ZERO
+>      ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1175:
+Error #136
+
+>         AUXEE_A =ZERO
+>         ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1193:
+Error #136
+
+>         AUXCC_A =ZERO
+>         ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1194:
+Error #136
+
+>         AUXEC_A =ZERO
+>         ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1195:
+Error #136
+
+>         AUXCE_A =ZERO
+>         ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1196:
+Error #136
+
+>         STIFQE_A      =ZERO
+>         ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1198:
+Error #136
+
+>         STIFQE_ALPHA_A=ZERO
+>         ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1199:
+Error #136
+
+>         STIFQC_A      =ZERO
+>         ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1200:
+Error #136
+
+>         LOADE_A       =ZERO
+>         ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1201:
+Error #136
+
+>            call soleval(Mdle,xip,norient_edge,norient_face,norder,xnod,&
+>              zdofH,zdofE,zdofV,zdofQ,nflag, x,dxdxi,zsolH_soleval,zdsolH_s...
+>                                                     ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1233:
+Error #136
+
+>            call soleval(Mdle,xip,norient_edge,norient_face,norder,xnod,&
+>              zdofH,zdofE,zdofV,zdofQ,nflag, x,dxdxi,zsolH_soleval,zdsolH_s...
+>                                                                   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1233:
+Error #136
+
+>            call soleval(Mdle,xip,norient_edge,norient_face,norder,xnod,&
+>              zdofH,zdofE,zdofV,zdofQ,nflag, x,dxdxi,zsolH_soleval,zdsolH_s...
+>              zsolE_soleval,zcurlE_soleval,zsolV_soleval,zdivV_soleval,zsol...
+>              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1234:
+Error #136
+
+>            call soleval(Mdle,xip,norient_edge,norient_face,norder,xnod,&
+>              zdofH,zdofE,zdofV,zdofQ,nflag, x,dxdxi,zsolH_soleval,zdsolH_s...
+>              zsolE_soleval,zcurlE_soleval,zsolV_soleval,zdivV_soleval,zsol...
+>                            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1234:
+Error #136
+
+>            call soleval(Mdle,xip,norient_edge,norient_face,norder,xnod,&
+>              zdofH,zdofE,zdofV,zdofQ,nflag, x,dxdxi,zsolH_soleval,zdsolH_s...
+>              zsolE_soleval,zcurlE_soleval,zsolV_soleval,zdivV_soleval,zsol...
+>                                           ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1234:
+Error #136
+
+>            call soleval(Mdle,xip,norient_edge,norient_face,norder,xnod,&
+>              zdofH,zdofE,zdofV,zdofQ,nflag, x,dxdxi,zsolH_soleval,zdsolH_s...
+>              zsolE_soleval,zcurlE_soleval,zsolV_soleval,zdivV_soleval,zsol...
+>                                                         ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1234:
+Error #136
+
+>            call soleval(Mdle,xip,norient_edge,norient_face,norder,xnod,&
+>              zdofH,zdofE,zdofV,zdofQ,nflag, x,dxdxi,zsolH_soleval,zdsolH_s...
+>              zsolE_soleval,zcurlE_soleval,zsolV_soleval,zdivV_soleval,zsol...
+>                                                                       ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1234:
+Error #136
+
+>            call getf(Mdle,x, zfval,zJ)
+>                              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1274:
+Error #136
+
+>            call getf(Mdle,x, zfval,zJ)
+>                                    ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1274:
+Error #136
+
+>            call get_Beta(x,fld_flag, zbeta,zdbeta,zd2beta)
+>                                      ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1276:
+Error #136
+
+>            call get_Beta(x,fld_flag, zbeta,zdbeta,zd2beta)
+>                                            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1276:
+Error #136
+
+>            call get_Beta(x,fld_flag, zbeta,zdbeta,zd2beta)
+>                                                   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1276:
+Error #136
+
+>            Jstretch(3,3) = zdbeta
+>            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1285:
+Error #27
+
+>            INVJStretch(3,3) = 1.d0/zdbeta
+>            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1286:
+Error #27
+
+>            detJstretch = zdbeta
+>            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1288:
+Error #136
+
+>                call get_ramanPol(zsolQ_soleval(7:9),zsolQ_soleval(10:12), &
+>                                                 ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1299:
+Error #107
+
+>                call get_ramanPol(zsolQ_soleval(1:3),zsolQ_soleval(4:6), &
+>                                                 ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1302:
+Error #107
+
+>                           AUXEE_A(b,a,k3) = AUXEE_A(b,a,k3)    &
+>                           ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1363:
+Error #27
+
+>                           AUXEE_A(b,a,k3) = AUXEE_A(b,a,k3)    &
+>                                             ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1363:
+Error #27
+
+>                              AUXCC_A(alph,beta,b,a,k3)=                   &
+>                              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1376:
+Error #27
+
+>                              AUXCC_A(alph,beta,b,a,k3)=                   &
+>                                          AUXCC_A(alph,beta,b,a,k3)+       &
+>                                          ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1377:
+Error #27
+
+>                                 AUXCE_A(alph,b,a,k3)=AUXCE_A(alph,b,a,k3) &
+>                                 ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1390:
+Error #27
+
+>                                 AUXCE_A(alph,b,a,k3)=AUXCE_A(alph,b,a,k3) &
+>                                                      ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1390:
+Error #27
+
+>                                 AUXEC_A(beta,b,a,k3)=AUXEC_A(beta,b,a,k3) &
+>                                 ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1402:
+Error #27
+
+>                                 AUXEC_A(beta,b,a,k3)=AUXEC_A(beta,b,a,k3) &
+>                                                      ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1402:
+Error #27
+
+>                           STIFQE_A(a,b,k3) = STIFQE_A(a,b,k3) &
+>                           ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1435:
+Error #27
+
+>                           STIFQE_A(a,b,k3) = STIFQE_A(a,b,k3) &
+>                                              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1435:
+Error #27
+
+>                           STIFQE_ALPHA_A(a,b,k3) = STIFQE_ALPHA_A(a,b,k3) &
+>                           ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1439:
+Error #27
+
+>                           STIFQE_ALPHA_A(a,b,k3) = STIFQE_ALPHA_A(a,b,k3) &
+>                                                    ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1439:
+Error #27
+
+>                              STIFQC_A(alph,a,b,k3) = STIFQC_A(alph,a,b,k3) &
+>                              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1447:
+Error #27
+
+>                              STIFQC_A(alph,a,b,k3) = STIFQC_A(alph,a,b,k3) &
+>                                                      ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1447:
+Error #27
+
+>                     LOADE_A(a,i3)=LOADE_A(a,i3) &
+>                     ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1464:
+Error #27
+
+>                     LOADE_A(a,i3)=LOADE_A(a,i3) &
+>                                   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1464:
+Error #27
+
+>                              AUXEE_B(b,a,k2,k3)=AUXEE_B(b,a,k2,k3)+ &
+>                              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1504:
+Error #27
+
+>                              AUXEE_B(b,a,k2,k3)=AUXEE_B(b,a,k2,k3)+ &
+>                                                 ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1504:
+Error #27
+
+>                              AUXEE_B(b,a,k2,k3)=AUXEE_B(b,a,k2,k3)+ &
+>                                                shapH2(idxa,sa)* &
+>                                                shapH2(idxb,sb)* &
+>                                                AUXEE_A(b,a,k3)
+>                                                ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1507:
+Error #27
+
+>                                 AUXCC_B(alph,beta,b,a,k2,k3)=          &
+>                                 ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1515:
+Error #27
+
+>                                 AUXCC_B(alph,beta,b,a,k2,k3)=          &
+>                                       AUXCC_B(alph,beta,b,a,k2,k3)     &
+>                                       ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1516:
+Error #27
+
+>                                 AUXCC_B(alph,beta,b,a,k2,k3)=          &
+>                                       AUXCC_B(alph,beta,b,a,k2,k3)     &
+>                                       +shapH2(idxa,sa)*shapH2(idxb,sb) &
+>                                       *AUXCC_A(alph,beta,b,a,k3)
+>                                        ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1518:
+Error #27
+
+>                                    AUXCE_B(alph,b,a,k2,k3)=              &
+>                                    ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1526:
+Error #27
+
+>                                    AUXCE_B(alph,b,a,k2,k3)=              &
+>                                          AUXCE_B(alph,b,a,k2,k3)         &
+>                                          ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1527:
+Error #27
+
+>                                    AUXCE_B(alph,b,a,k2,k3)=              &
+>                                          AUXCE_B(alph,b,a,k2,k3)         &
+>                                         +shapH2(idxa,sa)*shapH2(idxb,sb) &
+>                                         *AUXCE_A(alph,b,a,k3)
+>                                          ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1529:
+Error #27
+
+>                                    AUXEC_B(beta,b,a,k2,k3)=              &
+>                                    ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1538:
+Error #27
+
+>                                    AUXEC_B(beta,b,a,k2,k3)=              &
+>                                          AUXEC_B(beta,b,a,k2,k3)         &
+>                                          ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1539:
+Error #27
+
+>                                    AUXEC_B(beta,b,a,k2,k3)=              &
+>                                          AUXEC_B(beta,b,a,k2,k3)         &
+>                                         +shapH2(idxa,sa)*shapH2(idxb,sb) &
+>                                         *AUXEC_A(beta,b,a,k3)
+>                                          ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1541:
+Error #27
+
+>                              STIFQE_B(a,b,k2,k3)=STIFQE_B(a,b,k2,k3)      ...
+>                              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1572:
+Error #27
+
+>                              STIFQE_B(a,b,k2,k3)=STIFQE_B(a,b,k2,k3)      ...
+>                                                  ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1572:
+Error #27
+
+>                              STIFQE_B(a,b,k2,k3)=STIFQE_B(a,b,k2,k3)      ...
+>                                                 +shapH2(j2+1,2)*shapH2(idx...
+>                                                 *STIFQE_A(a,b,k3)
+>                                                  ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1574:
+Error #27
+
+>                              STIFQE_ALPHA_B(a,b,k2,k3)=STIFQE_ALPHA_B(a,b,...
+>                              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1576:
+Error #27
+
+>                              STIFQE_ALPHA_B(a,b,k2,k3)=STIFQE_ALPHA_B(a,b,...
+>                                                        ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1576:
+Error #27
+
+>                              STIFQE_ALPHA_B(a,b,k2,k3)=STIFQE_ALPHA_B(a,b,...
+>                                                 +shapH2(j2+1,2)*shapH2(idx...
+>                                                 *STIFQE_ALPHA_A(a,b,k3)
+>                                                  ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1578:
+Error #27
+
+>                                 STIFQC_B(alph,a,b,k2,k3)=STIFQC_B(alph,a,b...
+>                                 ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1583:
+Error #27
+
+>                                 STIFQC_B(alph,a,b,k2,k3)=STIFQC_B(alph,a,b...
+>                                                          ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1583:
+Error #27
+
+>                                 STIFQC_B(alph,a,b,k2,k3)=STIFQC_B(alph,a,b...
+>                                                 + shapH2(j2+1,2)*shapH2(id...
+>                                                 * STIFQC_A(alph,a,b,k3)
+>                                                   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1585:
+Error #27
+
+>                     LOADE_B(a,i2,i3)=LOADE_B(a,i2,i3)+shapH2(idxa,sa)*LOAD...
+>                     ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1601:
+Error #27
+
+>                     LOADE_B(a,i2,i3)=LOADE_B(a,i2,i3)+shapH2(idxa,sa)*LOAD...
+>                                      ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1601:
+Error #27
+
+>                     LOADE_B(a,i2,i3)=LOADE_B(a,i2,i3)+shapH2(idxa,sa)*LOAD...
+>                                                                       ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1601:
+Error #27
+
+>                                       AP_Maxwell(kk)=AP_Maxwell(kk)      &
+>                                       ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1664:
+Error #27
+
+>                                       AP_Maxwell(kk)=AP_Maxwell(kk)      &
+>                                                      ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1664:
+Error #27
+
+>                                       AP_Maxwell(kk)=AP_Maxwell(kk)      &
+>                                                     +shapH1(idxa,sa)*    &
+>                                                      shapH1(idxb,sb)*    &
+>                                                      AUXEE_B(b,a,k2,k3)* &
+>                                                      ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1667:
+Error #27
+
+>                                          AP_Maxwell(kk)=AP_Maxwell(kk)+    &
+>                                          ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1675:
+Error #27
+
+>                                          AP_Maxwell(kk)=AP_Maxwell(kk)+    &
+>                                                         ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1675:
+Error #27
+
+>                                          AP_Maxwell(kk)=AP_Maxwell(kk)+    &
+>                                                         shapH1(idxa,sa)*   &
+>                                                         shapH1(idxb,sb)*   &
+>                                                         AUXCC_B(alph,beta,...
+>                                                         ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1678:
+Error #27
+
+>                                             AP_Maxwell(kk) = AP_Maxwell(kk...
+>                                             ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1689:
+Error #27
+
+>                                             AP_Maxwell(kk) = AP_Maxwell(kk...
+>                                                              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1689:
+Error #27
+
+>                                             AP_Maxwell(kk) = AP_Maxwell(kk...
+>                                                +conjg(zc)*AUXCE_B(alph,b,a...
+>                                                           ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1690:
+Error #27
+
+>                                             AP_Maxwell(kk) = AP_Maxwell(kk...
+>                                             ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1700:
+Error #27
+
+>                                             AP_Maxwell(kk) = AP_Maxwell(kk...
+>                                                              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1700:
+Error #27
+
+>                                             AP_Maxwell(kk) = AP_Maxwell(kk...
+>                                                   +conjg(zb)*AUXEC_B(beta,...
+>                                                              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1701:
+Error #27
+
+>                                                AP_Maxwell(kk) = AP_Maxwell...
+>                                                ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1715:
+Error #27
+
+>                                                AP_Maxwell(kk) = AP_Maxwell...
+>                                                                 ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1715:
+Error #27
+
+>                                                AP_Maxwell(kk) = AP_Maxwell...
+>                                                   +(zb)*AUXCE_B(alph,b,a,k...
+>                                                         ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1716:
+Error #27
+
+>                                                AP_Maxwell(kk) = AP_Maxwell...
+>                                                ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1726:
+Error #27
+
+>                                                AP_Maxwell(kk) = AP_Maxwell...
+>                                                                 ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1726:
+Error #27
+
+>                                                AP_Maxwell(kk) = AP_Maxwell...
+>                                                      +(zc)*AUXEC_B(beta,b,...
+>                                                            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1727:
+Error #27
+
+>                                       AP_Maxwell(kk)=AP_Maxwell(kk)      &
+>                                       ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1738:
+Error #27
+
+>                                       AP_Maxwell(kk)=AP_Maxwell(kk)      &
+>                                                      ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1738:
+Error #27
+
+>                                       AP_Maxwell(kk)=AP_Maxwell(kk)      &
+>                                                     +shapH1(idxa,sa)*    &
+>                                                      shapH1(idxb,sb)*    &
+>                                                      AUXEE_B(b,a,k2,k3)* &
+>                                                      ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1741:
+Error #27
+
+>                                          AP_Maxwell(kk)=AP_Maxwell(kk)+    &
+>                                          ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1749:
+Error #27
+
+>                                          AP_Maxwell(kk)=AP_Maxwell(kk)+    &
+>                                                         ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1749:
+Error #27
+
+>                                          AP_Maxwell(kk)=AP_Maxwell(kk)+    &
+>                                                         shapH1(idxa,sa)*   &
+>                                                         shapH1(idxb,sb)*   &
+>                                                         AUXCC_B(alph,beta,...
+>                                                         ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1752:
+Error #27
+
+>                                    STIFFEQ_T(k,2*m1-1) = STIFFEQ_T(k,2*m1-...
+>                                    ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1807:
+Error #27
+
+>                                    STIFFEQ_T(k,2*m1-1) = STIFFEQ_T(k,2*m1-...
+>                                                          ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1807:
+Error #27
+
+>                                    STIFFEQ_T(k,2*m1-1) = STIFFEQ_T(k,2*m1-...
+>                                                      + shapH1(idxa,sa)*sha...
+>                                                      * STIFQC_B(alph,a,b,k...
+>                                                        ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1809:
+Error #27
+
+>                                 STIFFEQ_T(k,2*m1-1) = STIFFEQ_T(k,2*m1-1) &
+>                                 ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1817:
+Error #27
+
+>                                 STIFFEQ_T(k,2*m1-1) = STIFFEQ_T(k,2*m1-1) &
+>                                                       ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1817:
+Error #27
+
+>                                 STIFFEQ_T(k,2*m1-1) = STIFFEQ_T(k,2*m1-1) &
+>                                                   +shapH1(idxa,sa)*shapH1(...
+>                                                   *JJStretch(a,a)*STIFQE_A...
+>                                                    ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1819:
+Error #27
+
+>                                 STIFFEQ_T(k,2*m1-1) = STIFFEQ_T(k,2*m1-1) &
+>                                                   +shapH1(idxa,sa)*shapH1(...
+>                                                   *JJStretch(a,a)*STIFQE_A...
+>                                                                   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1819:
+Error #27
+
+>                                 STIFFEQ_T(k,2*m1) = STIFFEQ_T(k,2*m1) &
+>                                 ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1822:
+Error #27
+
+>                                 STIFFEQ_T(k,2*m1) = STIFFEQ_T(k,2*m1) &
+>                                                     ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1822:
+Error #27
+
+>                                 STIFFEQ_T(k,2*m1) = STIFFEQ_T(k,2*m1) &
+>                                                   +shapH1(idxa,sa)*shapH1(...
+>                                                   *JJStretch(a,a)*STIFQE_B...
+>                                                    ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1824:
+Error #27
+
+>                                 STIFFEQ_T(k,2*m1) = STIFFEQ_T(k,2*m1) &
+>                                                   +shapH1(idxa,sa)*shapH1(...
+>                                                   *JJStretch(a,a)*STIFQE_B...
+>                                                                   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1824:
+Error #27
+
+>                                    STIFFEQ_T(k,2*m1) = STIFFEQ_T(k,2*m1) &
+>                                    ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1830:
+Error #27
+
+>                                    STIFFEQ_T(k,2*m1) = STIFFEQ_T(k,2*m1) &
+>                                                        ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1830:
+Error #27
+
+>                                    STIFFEQ_T(k,2*m1) = STIFFEQ_T(k,2*m1) &
+>                                                      + shapH1(idxa,sa)*sha...
+>                                                      * STIFQC_B(alph,a,b,k...
+>                                                        ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1832:
+Error #27
+
+>                     BLOADE(2*m1-1)=BLOADE(2*m1-1)+shapH1(idxa,sa)*LOADE_B(...
+>                     ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1872:
+Error #27
+
+>                     BLOADE(2*m1-1)=BLOADE(2*m1-1)+shapH1(idxa,sa)*LOADE_B(...
+>                                    ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1872:
+Error #27
+
+>                     BLOADE(2*m1-1)=BLOADE(2*m1-1)+shapH1(idxa,sa)*LOADE_B(...
+>                                                                   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1872:
+Error #27
+
+>            zaux(j-69) = AP_Maxwell(nk(j,i))
+>            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1888:
+Error #115
+
+>            zaux(j-69) = AP_Maxwell(nk(i,j))
+>            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1891:
+Error #115
+
+>         write(*,7011) zaux(1:21)
+>                       ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1893:
+Error #136
+
+>         write(*,7011) zaux(1:21)
+>                             ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1893:
+Error #107
+
+>   deallocate(AUXEE_A)
+>              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1898:
+Error #663
+
+>   deallocate(AUXEE_B)
+>              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1899:
+Error #663
+
+>   deallocate(AUXCC_A)
+>              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1900:
+Error #663
+
+>   deallocate(AUXCC_B)
+>              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1901:
+Error #663
+
+>   deallocate(AUXEC_A)
+>              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1902:
+Error #663
+
+>   deallocate(AUXEC_B)
+>              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1903:
+Error #663
+
+>   deallocate(AUXCE_A)
+>              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1904:
+Error #663
+
+>   deallocate(AUXCE_B)
+>              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1905:
+Error #663
+
+>   deallocate(STIFQE_A)
+>              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1907:
+Error #663
+
+>   deallocate(STIFQE_B)
+>              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1908:
+Error #663
+
+>   deallocate(STIFQE_ALPHA_A)
+>              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1909:
+Error #663
+
+>   deallocate(STIFQE_ALPHA_B)
+>              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1910:
+Error #663
+
+>   deallocate(STIFQC_A)
+>              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1911:
+Error #663
+
+>   deallocate(STIFQC_B)
+>              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1912:
+Error #663
+
+>   deallocate(LOADE_A)
+>              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1913:
+Error #663
+
+>   deallocate(LOADE_B)
+>              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1914:
+Error #663
+
+>      nsign = nsign_param(etype,ifc)
+>              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1970:
+Error #136
+
+>      ftype = face_type(etype,ifc)
+>              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1973:
+Error #136
+
+>      ftype = face_type(etype,ifc)
+>            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1973:
+Error #161
+
+>               call get_bdSource(Mdle,x,rn, zImp)
+>                                            ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2019:
+Error #136
+
+>               BLOADE(k) = BLOADE(k) &
+>               ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2022:
+Error #27
+
+>               BLOADE(k) = BLOADE(k) &
+>                           ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2022:
+Error #27
+
+>                  STIFFEE_T(2*k2-1,2*k1-1) = STIFFEE_T(2*k2-1,2*k1-1) &
+>                  ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2037:
+Error #27
+
+>                  STIFFEE_T(2*k2-1,2*k1-1) = STIFFEE_T(2*k2-1,2*k1-1) &
+>                                             ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2037:
+Error #27
+
+>                  STIFFEE_T(2*k2-1,2*k1) = STIFFEE_T(2*k2-1,2*k1) &
+>                  ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2043:
+Error #27
+
+>                  STIFFEE_T(2*k2-1,2*k1) = STIFFEE_T(2*k2-1,2*k1) &
+>                                           ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2043:
+Error #27
+
+>                  STIFFEE_T(2*k2,2*k1-1) = STIFFEE_T(2*k2,2*k1-1) &
+>                  ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2050:
+Error #27
+
+>                  STIFFEE_T(2*k2,2*k1-1) = STIFFEE_T(2*k2,2*k1-1) &
+>                                           ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2050:
+Error #27
+
+>                  STIFFEE_T(2*k2-1,2*k1) = STIFFEE_T(2*k2-1,2*k1) &
+>                  ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2056:
+Error #27
+
+>                  STIFFEE_T(2*k2-1,2*k1) = STIFFEE_T(2*k2-1,2*k1) &
+>                                           ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2056:
+Error #27
+
+>   STIFF_ALL(1:i1,1:j1) = transpose(STIFFEE_T(1:i1,1:j1))
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2107:
+Error #27
+
+>   STIFF_ALL(1:i1,1:j1) = transpose(STIFFEE_T(1:i1,1:j1))
+>                                    ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2107:
+Error #27
+
+>   STIFF_ALL(1:i1,1:j1) = transpose(STIFFEE_T(1:i1,1:j1))
+>                        ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2107:
+Error #452
+
+>   STIFF_ALL(1:i1,j1+1:j1+j2) = transpose(STIFFEQ_T(1:i1,1:j2))
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2108:
+Error #27
+
+>   STIFF_ALL(1:i1,j1+1:j1+j2) = transpose(STIFFEQ_T(1:i1,1:j2))
+>                                          ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2108:
+Error #27
+
+>   STIFF_ALL(1:i1,j1+1:j1+j2) = transpose(STIFFEQ_T(1:i1,1:j2))
+>                              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2108:
+Error #452
+
+>   STIFF_ALL(1:i1,j1+j2+1) = BLOADE(1:i1)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2109:
+Error #27
+
+>   STIFF_ALL(1:i1,j1+j2+1) = BLOADE(1:i1)
+>                             ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2109:
+Error #27
+
+>   call ZTPTRS('U','C','N',nrTest,2*nrdofEi,AP_Maxwell, &
+>     STIFF_ALL(1:nrTest,1:2*nrdofEi),nrTest,info)
+>     ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2223:
+Error #27
+
+>   call ZTPTRS('U','C','N',nrTest,6*NrdofQ+1,AP_Maxwell, &
+>     STIFF_ALL(1:nrTest,2*NrdofE+1:nrTrial+1),nrTest,info)
+>     ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2225:
+Error #27
+
+>   call ZHERK('U','C',2*nrdofEi,nrTest,1.0d0,STIFF_ALL(1:nrTest,1:2*nrdofEi...
+>                                             ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2228:
+Error #27
+
+>   call ZGEMM('C','N',2*nrdofEi,6*NrdofQ+1,nrTest,ZONE,STIFF_ALL(1:nrTest,1...
+>                                                       ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2235:
+Error #27
+
+>   call ZGEMM('C','N',2*nrdofEi,6*NrdofQ+1,nrTest,ZONE,STIFF_ALL(1:nrTest,1...
+>               nrTest, STIFF_ALL(1:nrTest,2*NrdofE+1:nrTrial+1),nrTest,ZERO...
+>                       ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2236:
+Error #27
+
+>   call ZHERK('U','C',6*nrdofQ+1,nrTest,1.0d0,STIFF_ALL(1:nrTest,2*NrdofE+1...
+>                                              ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2249:
+Error #27
+
+>   ZblocE(1:j1) = zaloc(1:j1,j1+j2+1)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2256:
+Error #27
+
+>   ZblocE(1:j1) = zaloc(1:j1,j1+j2+1)
+>                ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2256:
+Error #452
+
+>   ZblocQ(1:j2) = zaloc(j1+1:j1+j2,j1+j2+1)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2257:
+Error #27
+
+>   ZblocQ(1:j2) = zaloc(j1+1:j1+j2,j1+j2+1)
+>                ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2257:
+Error #452
+
+>   ZalocEE(1:j1,1:j1) = zaloc(1:j1,1:j1)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2259:
+Error #27
+
+>   ZalocEE(1:j1,1:j1) = zaloc(1:j1,1:j1)
+>                      ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2259:
+Error #452
+
+>   ZalocEQ(1:j1,1:j2) = zaloc(1:j1,j1+1:j1+j2)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2260:
+Error #27
+
+>   ZalocEQ(1:j1,1:j2) = zaloc(1:j1,j1+1:j1+j2)
+>                      ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2260:
+Error #452
+
+>   ZalocQE(1:j2,1:j1) = zaloc(j1+1:j1+j2,1:j1)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2262:
+Error #27
+
+>   ZalocQE(1:j2,1:j1) = zaloc(j1+1:j1+j2,1:j1)
+>                      ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2262:
+Error #452
+
+>   ZalocQQ(1:j2,1:j2) = zaloc(j1+1:j1+j2,j1+1:j1+j2)
+>   ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2263:
+Error #27
+
+>   ZalocQQ(1:j2,1:j2) = zaloc(j1+1:j1+j2,j1+1:j1+j2)
+>                      ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2263:
+Error #452
+
+>      write(*,7011) ZblocE(1:2*NrdofE)
+>                    ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2283:
+Error #27
+
+>      write(*,7011) ZblocQ(1:6*NrdofQ)
+>                    ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2284:
+Error #27
+
+>         write(*,7013) i,ZalocEE(i,1:2*NrdofE)
+>                         ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2290:
+Error #27
+
+>         write(*,7013) i,ZalocEQ(i,1:6*NrdofQ)
+>                         ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2297:
+Error #27
+
+>         write(*,7013) i,ZalocQQ(i,1:6*NrdofQ)
+>                         ^
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2303:
+Error #27
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 765:
+Error #126
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 794:
+Error #126
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 798:
+Error #126
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 801:
+Error #126
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 842:
+Error #126
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 846:
+Error #126
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 850:
+Error #126
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 920:
+Error #126
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1011:
+Error #126
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1013:
+Error #126
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1019:
+Error #126
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1019:
+Error #126
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1019:
+Error #126
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1019:
+Error #126
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1021:
+Error #126
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1037:
+Error #126
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1089:
+Error #126
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2041:
+Error #126
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 948:
+Error #127
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 2279:
+Error #127
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 940:
+Error #127
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1853:
+Error #127
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1854:
+Error #127
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1618:
+Error #127
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1619:
+Error #127
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1285:
+Error #127
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 1981:
+Error #127
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 785:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 798:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 843:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 857:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 857:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 859:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 860:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 860:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 860:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 869:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 869:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 869:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 869:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 869:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 869:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 869:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 869:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 869:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 869:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 869:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 869:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 871:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 871:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 872:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 873:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 873:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 873:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 888:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 888:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 889:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 889:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 890:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 911:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 918:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 918:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 923:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 923:
+Error #128
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 740:
+Error #124
+
+elem_fi.F90:ELEM_UWMAXWELL_FI_TRANS line 741:
+Error #124
+
+*******************************************************************************
+   Subroutine COMPUTE_ENRICHED_ORDER    File elem_fi.F90          Line 2312
+
+>   use parameters, only : MODORDER
+>       ^
+elem_fi.F90:COMPUTE_ENRICHED_ORDER line 2314:
+Error #731
+
+>   call decod(Nord,MODORDER,2, temp)
+>                   ^
+elem_fi.F90:COMPUTE_ENRICHED_ORDER line 2324:
+Error #136
+
+elem_fi.F90:COMPUTE_ENRICHED_ORDER line 2322:
+Error #128
+
+*******************************************************************************
+

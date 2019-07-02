@@ -1,0 +1,133 @@
+      COMMON /SURFC1/ ISYM, NUMELM, IRESOL, NRHS, MA, IWRT,
+     .                IASSEM, IERR, NNEGP, NPOSP, IPRSTR, 
+     .                IPRPIV, IPRDES, NFSOUT, NICMUL,
+     .                IPFSDB, IPFSS1, IPFSST, IPFSLH, IPFSRH,
+     .                IPFSLF, IPFSRF, IPFSZD, IPFSLE, IPFSRE,
+     .                IPFSBF, IPFSBK, IPFSXX
+C 
+
+C
+C Frontal Solver Common Block
+C ---------------------------
+C  This common is used to pass control info between the calling program
+C    and SURFS and between routines internal to SURFS  
+c  The variables in this common are set by users interfacing w/ SURFS.   
+C
+C Important Notes to Users Interfacing w/ SURFS
+C --------------------------------------------
+C *) If you are using resolution, then take care in sub.solin2 not to 
+C    zero out or touch the element LHS workspace which is sent thru the 
+c    calling arguments when sub.solin2 is called with iflag=1 
+c    where;  iflag=1: get element rhs only ; iflag=2: get lhs and rhs 
+c
+c *) A note on using resolution.  You must set ISYM to 3 or 4 so that
+c    the appropriate eliminated lhs data is written to diskfile.  
+c    Then call surfs with IRESOL=0 at least once to obtain an eliminated lhs.
+c    Subsequent calls may be made with IRESOL=1, using this elimnated lhs. 
+c
+c *) SURFS uses scratch files for equation buffering, (when it has to)
+c    These scratch files are opened with the following unit numbers:   
+c
+c       No resolution:                       19, 18, 20  (ISYM=1,2) 
+c       Unsymetric w/ resolution capability: 21, 22, 23  (ISYM=3) 
+c       Symmetric w/ resolution capability:  24, 25, 26  (ISYM=4)
+c
+c    Note that seperate unit numbers are used for the resolution capability
+c         so that one may solve different sets of equations and still be able
+c         to perform a resolution of a previous set.
+c         (ie: ISYM=3,IRESOL=0,... ISYM=2,ISYM=2,..., ISYM=3,IRESOL=1 ) 
+c
+c    Note that right now you cannot do two different ISYM=3,IRESOL=0 (or 4)
+c          in a row since only one set of buffer tapes is available  
+c
+C
+C
+C Description of Variables
+C ------------------------  
+C NFSOUT = The output diskfile unit number for printed output (ie:6, in general)  
+C
+C NICMUL = The multiplier to be used in packing and unpacking NDOF 
+C             from the destination vectors.
+C             This number reflects the number of digits which you think 
+C             are necessary to hold the number 
+C             (ie: NICMUL=10 ==> NDOF=0-9,  NICMUL=100 ==> NDOF=0-99,  etc)
+C 
+C ISYM  = 1 ; Symmetric coefficient matrix (without resolution capability)
+C       = 2 ; Unsymmetric coefficient matrix (without resolution capability)
+C       = 3 ; Unsymmetric coefficient matrix (with resolution capability)   
+c       = 4 ; Symmetric coefficient matrix (with resolution capability) 
+c
+C  
+C NUMELM = Number of Elements
+C
+C IRESOL = 0 ; Complete Forward Elimination 
+C               (ie: both RHS & LHS)  
+C        = 1 ; Forward Elimination of RHS only 
+C               (ie: resolution)
+C
+C NRHS = Number of RHS to be processed 
+C         (NRHS may be 0 for IRESOL=0)
+C
+C MA = Length of array IA in SUB.SURFSP and the 
+C       length of the work array A in SUB.SURFSS
+C       MA need not be the same in these two routines.
+C 
+cwb **note: setting IWRT does not write the scratch buffers to a permanent
+c           diskfile, this is the responsibilty of the calling program
+c
+C IWRT = 0 ; Minimum Number of buffer dumps.
+C      = 1 ; The last buffer is written to tape. 
+C             This is essential if a problem is to be terminated 
+C             and later restarted using the resolution capabilty.
+C
+C IASSEM = 0 ; Element LHS & RHS  will be assembled into the 
+C               global arrays by the calling program
+C        = 1 ; Element LHS & RHS will be assembled by SURFS
+C
+C IERR = 0 ; Successful execution 
+C      = 1 ; Not enough room allocated for array IA in SURFSP 
+C             (MA must be increased)
+C      = 2 ; Zero pivot
+C      = 3 ; Attempted resolution with ISYM=2
+C      = 4 ; Attempted resolution with NRHS=0
+C      = 5 ; Resolution with insufficient room in the B buffer
+C             (NRHS must be decreased)
+C      = 6 ; Insufficient room in the U buffer 
+C             (MA must be increased)
+C
+C NNEGP = Number of negative pivots
+C NPOSP = Number of positive pivots   
+C **** Note: NNEGP,NPOSP are set to -1 for resolution runs, since they are
+C            determined only during LHS elimination, and are not relevant
+C
+C Print Flags  (=0 ; No prints)
+C -----------
+C IPRSTR = 1 ; Storage allocations and processing times 
+C IPRPIV = 1 ; Pivots
+C IPRDES = 1 ; Destination vectors 
+C  
+C DEBUG Print Flags
+C =================
+C **** Note: turning these flags on could produce a HUGE amount of output
+C  
+C IPFSDB = 1 ; Turns on all of the flags below
+C  
+C IPFSS1 = 1 ; Print the entering contents of this common block 
+C IPFSZD = 1 ; Print buffer dump info  
+C IPFSBF = 1 ; Print first few items in the buffer 
+C
+C **** Note: the flags below may be flagged as: = 1 ; print the info for all elems,
+C                                               = -nel ; print for this element only 
+c                                               = 0 ; no prints
+c
+C IPFSST = 1 ; Print storage variables  
+C IPFSLH = 1 ; Print element lhs  
+C IPFSRH = 1 ; Print element rhs  
+C IPFSLF = 1 ; Print assembled front lhs  
+C IPFSRF = 1 ; Print assembled front rhs  
+C IPFSLE = 1 ; Print eliminated lhs 
+C IPFSRE = 1 ; Print eliminated rhs 
+C IPFSBK = 1 ; Print backward elimination info   
+C IPFSXX = 1 : Print the solution sent to solout
+C 
+C

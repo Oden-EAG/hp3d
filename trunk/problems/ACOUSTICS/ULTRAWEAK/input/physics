@@ -1,0 +1,5 @@
+2000000             MAXNODS  max number of nodes anticipated
+3                   NR_PHYSA number of physics attributes
+trace  contin  1    physics attribute, discretization type, # of components 
+fluxv  normal  1    physics attribute, discretization type, # of components
+field  discon  4    physics attribute, discretization type, # of components

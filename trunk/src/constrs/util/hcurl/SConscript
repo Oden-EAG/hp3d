@@ -1,0 +1,10 @@
+Import("*")
+
+filenames = Split("""
+setcnstr_edge_hcurl.F
+setcnstr_trian_hcurl.F
+setcnstr_trian_iso_hcurl.F
+""")
+shared_objs = env.SharedObject(filenames)
+
+Return("shared_objs")

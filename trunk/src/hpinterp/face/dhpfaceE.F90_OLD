@@ -1,0 +1,471 @@
+!> Purpose : update the Hcurl dirichlet BC for a face node using PB interpolation
+!
+!! @param[in]  Iflag        - a flag specifying the GMP object
+!!                            5 pris, 6 hexa, 7 tetr, 8 pyra
+!! @param[in]  No           - number of a specific object
+!! @param[in]  Etav         - GMP reference coordinates of the element vertices
+!! @param[in]  Type         - element (middle node) type
+!! @param[in]  Icase        - the face node case
+!! @param[in]  Nedge_orient - edge orientation
+!! @param[in]  Nface_orient - face orientation
+!! @param[in]  Norder       - element order
+!! @param[in]  Iface        - face number
+!! @param[in]  ZdofE        - H(curl) dof for the element (edge values really)
+!!
+!! @param[out] ZnodE        - H(curl) dof for the face
+#include "implicit_none.h"
+subroutine dhpfaceE( &
+     Mdle,Iflag,No,Etav, Type,Icase, &
+     Nedge_orient,Nface_orient,Norder,Iface, &
+     ZdofE,ZnodE)
+  use control
+  use parameters
+  use physics
+  use element_data
+  use cross_product_module
+  implicit none
+  !
+  ! ** Arguments
+  !-----------------------------------------------------------------------
+  integer,                                    intent(in)  :: Iflag,No,Mdle
+  integer,                                    intent(in)  :: Icase,Iface
+  real*8,  dimension(3,8),                    intent(in)  :: Etav
+#ifdef _PYHP3D
+  integer, intent(in) :: type
+#else
+  character(len=4),                           intent(in)  :: Type
+#endif
+  integer, dimension(12),                     intent(in)  :: Nedge_orient
+  integer, dimension(6),                      intent(in)  :: Nface_orient
+  integer, dimension(19),                     intent(in)  :: Norder
+
+  VTYPE,   dimension(MAXEQNE,MAXbrickE),      intent(in)  :: ZdofE
+  VTYPE,   dimension(NRCOMS*NREQNE(Icase),*), intent(out) :: ZnodE
+  !
+  ! ** Locals
+  !-----------------------------------------------------------------------
+  ! for vertices and edges
+  integer, dimension(5)                 :: norder_face
+  integer, dimension(19)                :: norder_1
+  real*8,  dimension(MAXbrickH)         ::  shapH
+  real*8,  dimension(3,MAXbrickE)       :: dshapH, shapE, curlE
+  !
+  ! ** parameterization
+  real*8, dimension(3)                  :: xi, eta, x
+  real*8, dimension(3,2)                :: dxdt, dxidt
+  real*8, dimension(3,3)                :: dxdxi,dxdeta,detadxi,dxidx
+
+  real*8, dimension(  MAXmdlqH)         ::  shapH_face
+  real*8, dimension(2,MAXmdlqH)         :: dshapH_face
+
+  real*8, dimension(2,MAXmdlqE)         ::  shapE_face
+  real*8, dimension(  MAXmdlqE)         ::  curlE_face
+
+  ! Dirichlet BC data at a point
+  VTYPE :: &
+       zvalH(MAXEQNH), zdvalH(MAXEQNH,3), &
+       zvalE(3,MAXEQNE), zvalExi(3,MAXEQNE), zvalEt(2,MAXEQNE), &
+       zdvalE(3,MAXEQNE,3), zdvalExi(3,MAXEQNE,3), &
+       zcvalE(3,MAXEQNE), zcvalExi(3,MAXEQNE), zcvalEt(MAXEQNE), &
+       zvalV(3,MAXEQNV), zdvalV(3,MAXEQNV,3)
+
+  integer, dimension(NR_PHYSA)          :: ncase
+
+  ! normal vector
+  real*8,  dimension(3)                 :: rn
+
+  ! linear systems
+  real*8,  dimension(MAXMdlqH+MAXMdlqE,MAXMdlqH+MAXMdlqE) :: aaE
+  integer, dimension(MAXMdlqH+MAXMdlqE) :: ipivE
+  ! load vector and solution
+  VTYPE,   dimension(MAXMdlqH+MAXMdlqE,MAXEQNE)  :: zbE,zuE
+  real*8,  dimension(MAXMdlqH+MAXMdlqE,MAXEQNE)  :: duE_real, duE_imag
+
+  ! quadrature
+  real*8,  dimension(2, MAXquadH)       :: xi_list
+  real*8,  dimension(   MAXquadH)       :: wa_list
+  real*8,  dimension(2)                 :: t
+  real*8                                :: wa
+
+  real*8 :: rjac
+
+  integer :: itmp, &
+       i,j,k,l,ii,ivar,ivarE,nvarE,naE,iprint, iflag_geom, info, &
+       nint,ndofH_face,ndofE_face,ndofV_face,ndofQ_Face, ndofE_tot, &
+       nrdofH, nrdofE, nord, nord_old, norient_old
+
+  ! to reuse precalculated one
+  logical :: recompute
+  save nord_old, norient_old, aaE, ipivE
+  data nord_old /0/
+  data norient_old /-1/
+  !-----------------------------------------------------------------------
+  iprint=0
+
+  ! decide whether to reuse saved inverted stiffness matrix
+  nord = Norder(nedge(Type) + Iface)
+  if ((nord.eq.nord_old).and.(Nface_orient(Iface).eq.norient_old)) then
+    recompute = .FALSE.
+  else
+    recompute = .TRUE.
+  endif
+  if (recompute) then
+     aaE = 0.d0
+  endif
+  zbE = ZERO
+
+  call ndof_nod(face_type(Type,Iface),nord, &
+                ndofH_face,ndofE_face,ndofV_face,ndofQ_face)
+
+  ! if dof is zero, return immediately
+  if (ndofE_face.eq.0) return
+
+  ! set quadrature
+  call face_order(Type,Iface,Norder, norder_face)
+  INTEGRATION=1
+  call set_2Dint(face_type(Type,Iface),norder_face, &
+                 nint,xi_list,wa_list)
+  INTEGRATION=0
+
+  ! set element order, excluding all but edge dof
+  call initiate_order(Type, norder_1)
+  norder_1(1:nedge(Type)) = Norder(1:nedge(Type))
+
+  ! loop through integration points
+  do l=1,nint
+     t(1:2) = xi_list(1:2,l)
+     wa     = wa_list(l)
+
+     call face_param(Type,Iface,t, xi,dxidt)
+
+     ! compute element H1 shape functions (for geometry)
+     call shape3H( &
+          Type,xi, &
+          norder_1,Nedge_orient,Nface_orient, &
+          nrdofH,shapH,dshapH)
+
+     ! compute element Hcurl shape functions (for computing the edge interpolant)
+     call shape3E( &
+          Type,xi, &
+          norder_1,Nedge_orient,Nface_orient, &
+          nrdofE,shapE,curlE)
+
+     !------------------------------------------------------
+     ! ** parameterization
+
+     ! evaluate reference coordinates of the point
+     eta(1:3)         = 0.d0
+     detadxi(1:3,1:3) = 0.d0
+     do k=1,nvert(Type)
+        eta(1:3) = eta(1:3) + Etav(1:3,k)*shapH(k)
+        do i=1,3
+           detadxi(1:3,i) = detadxi(1:3,i) + Etav(1:3,k)*dshapH(i,k)
+        enddo
+     enddo
+
+     ! evaluate derivatives of the physical coordinates wrt
+     ! the reference coordinate
+     select case(Iflag)
+#ifdef _PYHP3D
+     case(NODE_TYPE_PRISM);        call prism(No,eta, x,dxdeta)
+     case(NODE_TYPE_HEXA);         call  hexa(No,eta, x,dxdeta)
+     case(NODE_TYPE_TETRA);        call tetra(No,eta, x,dxdeta)
+     case(NODE_TYPE_PYRAMID);      call pyram(No,eta, x,dxdeta)
+#else
+     case(5);        call prism(No,eta, x,dxdeta)
+     case(6);        call  hexa(No,eta, x,dxdeta)
+     case(7);        call tetra(No,eta, x,dxdeta)
+     case(8);        call pyram(No,eta, x,dxdeta)
+#endif
+     case default
+        write(*,*) 'dhpface: Iflag, Type = ', Iflag, Type
+        call logic_error(ERR_INVALID_VALUE,__FILE__,__LINE__)
+     end select
+
+     ! get the Dirichlet data
+     call dirichlet( &
+          Mdle,x,Icase, &
+          zvalH,zdvalH, &
+          zvalE,zdvalE, &
+          zvalV,zdvalV)
+
+     ! curl for the Dirichlet data
+     zcvalE(1,1:MAXEQNE) = zdvalE(3,1:MAXEQNE,2) - zdvalE(2,1:MAXEQNE,3)
+     zcvalE(2,1:MAXEQNE) = zdvalE(1,1:MAXEQNE,3) - zdvalE(3,1:MAXEQNE,1)
+     zcvalE(3,1:MAXEQNE) = zdvalE(2,1:MAXEQNE,1) - zdvalE(1,1:MAXEQNE,2)
+     if (iprint.eq.1) then
+       write(*,7130) x(1:3)
+7130   format('dhpfaceE: x      = ',3f8.3)
+       write(*,7140) zvalE(1:3,1:MAXEQNE)
+7140   format('          zvalE  = ',2(3(2e10.3,2x),3x))
+       write(*,7150) zcvalE(1:3,1:MAXEQNE)
+7150   format('          zcvalE = ',2(3(2e10.3,2x),3x))
+     endif
+
+     ! evaluate derivatives wrt master coordinates
+     dxdxi(1:3,1:3) = 0.d0
+     do j=1,3
+        do i=1,3
+           dxdxi(1:3,j) = dxdxi(1:3,j) + dxdeta(1:3,i)*detadxi(i,j)
+        enddo
+     enddo
+
+     call geom(dxdxi, dxidx,rjac,iflag_geom)
+     if (iflag_geom.ne.0) then
+        write(*,*) 'dhpfaceE: NEGATIVE JACOBIAN = ',Type, rjac
+        stop 1
+     endif
+
+     dxdt(1:3,1:2) = 0.d0
+     do j=1,2
+        do i=1,3
+           dxdt(1:3,j) = dxdt(1:3,j) + dxdxi(1:3,i)*dxidt(i,j)
+        enddo
+     enddo
+
+     ! normal direction
+     call cross_product3D(dxidt(1:3,1),dxidt(1:3,2),rn)
+
+     ! remove the contribution from edges
+      zvalExi(1:3,1:MAXEQNE) = ZERO
+     zcvalExi(1:3,1:MAXEQNE) = ZERO
+     do k=1,nrdofE
+        do i=1,3
+           zvalExi(i,1:MAXEQNE) &
+                = zvalExi(i,1:MAXEQNE) - ZdofE(1:MAXEQNE,k)*shapE(i,k)
+           zcvalExi(i, 1:MAXEQNE) &
+                = zcvalExi(i,1:MAXEQNE) - ZdofE(1:MAXEQNE,k)*curlE(i,k)
+        enddo
+     enddo
+
+     ! add derivatives of Dirichlet data wrt master coordinates
+     do i=1,3
+        do j=1,3
+           zvalExi(i,1:MAXEQNE) &
+                = zvalExi(i,1:MAXEQNE) + zvalE(j,1:MAXEQNE)*dxdxi(j,i)
+           zcvalExi(i,1:MAXEQNE) &
+                = zcvalExi(i,1:MAXEQNE) + zcvalE(j,1:MAXEQNE)*dxidx(i,j)*rjac
+        enddo
+     enddo
+
+     ! evaluate derivative wrt face coordinate
+     zvalEt(1:2,1:MAXEQNE) = ZERO
+     do i=1,2
+        do j=1,3
+           zvalEt(i,1:MAXEQNE) &
+                = zvalEt(i,1:MAXEQNE) + zvalExi(j,1:MAXEQNE)*dxidt(j,i)
+        enddo
+     enddo
+
+     ! find out a normal component for curl
+     zcvalEt(1:MAXEQNE) = ZERO
+     do j=1,3
+        zcvalEt(1:MAXEQNE) &
+             = zcvalEt(1:MAXEQNE) + zcvalExi(j,1:MAXEQNE)*rn(j)
+     enddo
+
+
+     if (iprint.eq.1) then
+       write(*,7100) l,xi(1:2)
+7100   format('dhpfaceE: l,xi = ',i3,2x,3f8.3)
+       write(*,7110) zvalEt(1:2,1:MAXEQNE)
+7110   format('dhpfaceE: zvalEt(1:2,*) = ',2(2(2e10.3,2x),3x),4x)
+       write(*,7120) zcvalEt(1:MAXEQNE)
+7120   format('dhpfaceE: zcvalEt(*) =    ',2(2e10.3,2x))
+       call pause
+     endif
+
+     !------------------------------------------------------
+     ! ** 2D shape shape function
+     call shapHb2( &
+          face_type(Type,Iface), t, nord, Nface_orient(Iface), &
+          ndofH_face,shapH_face,dshapH_face)
+     call shapEb2( &
+          face_type(Type,Iface), t, nord, Nface_orient(Iface), &
+          ndofE_face,shapE_face,curlE_face)
+
+!     write(*,*) 't,Nface_orient(Iface) = ',t,Nface_orient(Iface)
+!     write(*,*) shapE_face(1,1:ndofE_face)
+!     write(*,*) shapE_face(2,1:ndofE_face)
+!     write(*,*) curlE_face(1:ndofE_face)
+!     call pause
+
+!      if (Mdle.eq.2.and.Iface.eq.4) then
+!        t(1) = .3d0; t(2) = .4d0
+!        call shapHb2( &
+!          face_type(Type,Iface), t, nord, Nface_orient(Iface), &
+!          ndofH_face,shapH_face,dshapH_face)
+!        call shapEb2( &
+!          face_type(Type,Iface), t, nord, Nface_orient(Iface), &
+!         ndofE_face,shapE_face,curlE_face)
+
+!         write(*,*) 't,Nface_orient(Iface) = ',t,Nface_orient(Iface)
+!         write(*,*) dshapH_face(1,1:ndofH_face)
+!         write(*,*) dshapH_face(2,1:ndofH_face)
+!         write(*,*) shapE_face(1,1:ndofE_face)
+!         write(*,*) shapE_face(2,1:ndofE_face)
+!         write(*,*) curlE_face(1:ndofE_face)
+!         stop 1
+!       endif
+
+
+
+
+     !------------------------------------------------------
+     ! ** construct matrix for projection
+
+     ! - B Top
+     do j=1,ndofE_face
+        zbE(j,1:MAXEQNE) &
+             = zbE(j,1:MAXEQNE) + zcvalEt(1:MAXEQNE)*curlE_face(j)*wa
+     enddo
+
+     ! - B Bottom
+     do j=1,ndofH_face
+        do k=1,2
+           zbE(j+ndofE_face,1:MAXEQNE) &
+                = zbE(j+ndofE_face,1:MAXEQNE) &
+                + zvalEt(k,1:MAXEQNE)*dshapH_face(k,j)*wa
+        enddo
+     enddo
+
+     if (recompute) then
+
+        ! - A Top Left
+        do j=1,ndofE_face
+           do i=1,ndofE_face
+              aaE(i,j) = aaE(i,j) + curlE_face(i)*curlE_face(j)*wa
+           enddo
+        enddo
+
+        ! - A Top Right
+        do j=1,ndofH_face
+           do i=1,ndofE_face
+              do k=1,2
+                 aaE(i,ndofE_face+j) &
+                      = aaE(i,ndofE_face+j) + shapE_face(k,i)*dshapH_face(k,j)*wa
+              enddo
+           enddo
+        enddo
+
+     endif
+     !------------------------------------------------------
+  enddo
+
+  ! - A Bottom Left
+  if (recompute) then
+     do j=1,ndofH_face
+        do i=1,ndofE_face
+           aaE(ndofE_face+j,i) = aaE(i,ndofE_face+j)
+        enddo
+     enddo
+  endif
+  ndofE_tot = ndofE_face + ndofH_face
+
+!     if (Mdle.eq.2.and.Iface.eq.4) then
+  if (iprint.ge.1) then
+     write(*,*) 'dhpface: LOAD VECTOR AND STIFFNESS MATRIX(Hcurl) ndofE, ndofH= ', &
+          ndofE_face, ndofH_face
+     do ii=1,ndofE_tot
+        write(*,7015) 'zbE=',zbE(ii,1:MAXEQNE)
+     enddo
+     do ii=1,ndofE_tot
+        write(*,7016) 'aaE=',aaE(ii,1:ndofE_tot)
+     enddo
+7015    format(a4,10(2e12.5,2x))
+7016    format(a4,1x,10(e12.5,2x))
+
+  endif
+
+  !------------------------------------------------------
+  ! solve the linear system
+  naE = MAXmdlqH + MAXmdlqE
+
+  ! if it is not same order, factorize it
+  if (recompute) then
+     ! lu pivot
+     call dgetrf(ndofE_tot,ndofE_tot,aaE,naE,ipivE,info)
+     if (info.ne.0) then
+        write(*,*)'dhpfaceE: DGETRF RETURNED INFO = ',info
+        call logic_error(FAILURE,__FILE__,__LINE__)
+     endif
+     nord_old = nord
+     norient_old = Nface_orient(Iface)
+  endif
+
+  ! solve the matrix
+  if (ndofE_face.gt.0) then
+     ! apply pivots
+     zuE(1:ndofE_tot,:) = zbE(1:ndofE_tot,:)
+
+#if C_MODE
+     call zlaswp(MAXEQNE,zuE(1:ndofE_tot,:),naE,1,ndofE_tot,ipivE,1)
+     duE_real(1:ndofE_tot,:) = real(zuE(1:ndofE_tot,:))
+     duE_imag(1:ndofE_tot,:) = aimag(zuE(1:ndofE_tot,:))
+
+     call dtrsm('L','L','N','U',ndofE_tot,MAXEQNE,1.d0,aaE,naE, &
+          duE_real,naE)
+     call dtrsm('L','U','N','N',ndofE_tot,MAXEQNE,1.d0,aaE,naE, &
+          duE_real,naE)
+
+     call dtrsm('L','L','N','U',ndofE_tot,MAXEQNE,1.d0,aaE,naE, &
+          duE_imag,naE)
+     call dtrsm('L','U','N','N',ndofE_tot,MAXEQNE,1.d0,aaE,naE, &
+          duE_imag,naE)
+
+     zuE(1:ndofE_tot,:) &
+          = cmplx(duE_real(1:ndofE_tot,:), duE_imag(1:ndofE_tot,:))
+#else
+     call dlaswp(MAXEQNE,zuE(1:ndofE_tot,:),naE,1,ndofE_tot,ipivE,1)
+     call dtrsm('L','L','N','U',ndofE_tot,MAXEQNE,1.d0,aaE,naE, &
+          zuE,naE)
+     call dtrsm('L','U','N','N',ndofE_tot,MAXEQNE,1.d0,aaE,naE, &
+          zuE,naE)
+#endif
+
+  endif
+
+  !------------------------------------------------------
+!     if (Mdle.eq.2.and.Iface.eq.4) then
+  if (iprint.ge.1) then
+     write(*,*) 'dhpfaceE: k,zu(k) = '
+     do k=1,ndofE_tot
+        write(*,*) k,zuE(k,1:MAXEQNE)
+     enddo
+     call pause
+  endif
+
+  !------------------------------------------------------
+  ! save the dof, skipping irrelevant entries
+  call decod(Icase,2,NR_PHYSA, ncase)
+  if (iprint.eq.1) then
+     write(*,*) 'dhpface: ncase = ', ncase
+  endif
+
+  !------------------------------------------------------
+  ivarE=0; nvarE=0
+
+  ! loop through multiple copies of variables
+  do j=1,NRCOMS
+     ! loop through physical attributes
+     do i=1,NR_PHYSA
+        ! loop through components
+        do k=1,NR_COMP(i)
+#ifdef _PYHP3D
+           select case(D_TYPE(i))
+           case(E_D_TYPE)
+#else
+           select case(DTYPE(i))
+           case('tangen')
+#endif
+              ivarE=ivarE+1
+              if (ncase(i).eq.1) then
+                 nvarE = nvarE + 1
+                 ZnodE(nvarE,1:ndofE_face) = zuE(1:ndofE_face,ivarE)
+              endif
+           end select
+        enddo
+     enddo
+  enddo
+
+end subroutine dhpfaceE

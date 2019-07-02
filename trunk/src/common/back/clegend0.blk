@@ -1,0 +1,5 @@
+c
+c  ...coefficients to evaluate kernek functions corresponding to integrated
+c     Legendre polynomials
+      common /legend0/ xleg0(9,9)
+c

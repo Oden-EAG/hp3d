@@ -1,0 +1,32 @@
+Import("*")
+
+filenames = Split("""
+bckwrdR.F
+compltR.F
+destR.F
+desvecR.F
+elmrhsR.F
+elmsolR.F
+frwcpR.F
+frwrsR.F
+loclsR.F
+locluR.F
+locrR.F
+resolR.F
+semrhsR.F
+surfspR.F
+surfssR.F
+symasmR.F
+symelmR.F
+unsasmR.F
+unselmR.F
+zdirioR.F
+zecondR.F
+zerorR.F
+zerosR.F
+zerouR.F
+""")
+
+shared_objs = env.SharedObject(filenames)
+
+Return("shared_objs")

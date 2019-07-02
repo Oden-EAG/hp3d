@@ -1,0 +1,10 @@
+Import("*")
+
+filenames = Split("""
+dhpedgeH.F90
+dhpedgeE.F90
+""")
+
+shared_objs = env.SharedObject(filenames)
+
+Return("shared_objs")

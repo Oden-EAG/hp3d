@@ -1,0 +1,269 @@
+3   3     NDIM,MANDIM
+
+
+1         NRSURFS
+
+Cylinder            surface 1: infinite cylinder
+.0d0 .0d0 .0d0      point on the cylinder axis
+.0d0 .0d0 1.0d0      cylinder axis vector
+1.414213562373095D0  cylinder radius
+
+5         NRDOMAIN
+
+
+16        NRPOINT
+
+Regular             point 1
+-0.5d0 -0.5d0 0.d0
+
+Regular             point 2
+0.5d0 -0.5d0 0.d0
+
+Regular             point 3
+0.5d0 0.5d0 0.d0
+
+Regular             point 4
+-0.5d0 0.5d0 0.d0
+
+Regular             point 5
+-1.d0 -1.d0 0.d0
+
+Regular             point 6
+1.d0 -1.d0 0.d0
+
+Regular             point 7
+1.d0 1.d0 0.d0
+
+Regular             point 8
+-1.d0 1.d0 0.d0
+
+Regular             point 9
+-0.5d0 -0.5d0 1.d0
+
+Regular             point 10
+0.5d0 -0.5d0 1.d0
+
+Regular             point 11
+0.5d0 0.5d0 1.d0
+
+Regular             point 12
+-0.5d0 0.5d0 1.d0
+
+Regular             point 13
+-1.d0 -1.d0 1.d0
+
+Regular             point 14
+1.d0 -1.d0 1.d0
+
+Regular             point 15
+1.d0 1.d0 1.d0
+
+Regular             point 16
+-1.d0 1.d0 1.d0
+
+
+
+
+32 NRCURVE
+
+Seglin              curve 1
+1 2
+
+Seglin              curve 2
+2 3
+
+Seglin              curve 3
+4 3
+
+Seglin              curve 4
+1 4
+
+Seglin              curve 5
+5 1
+
+Seglin              curve 6
+6 2
+
+Seglin              curve 7
+7 3
+
+Seglin              curve 8
+8 4
+
+QuaCir              curve 9
+5 6
+.0d0, .0d0, .0d0
+
+QuaCir              curve 10
+6 7
+.0d0, .0d0, .0d0
+
+QuaCir              curve 11
+8 7
+.0d0, .0d0, .0d0
+
+QuaCir              curve 12
+5 8
+.0d0, .0d0, .0d0
+
+Seglin              curve 13
+9 10
+
+Seglin              curve 14
+10 11
+
+Seglin              curve 15
+12 11
+
+Seglin              curve 16
+9 12
+
+Seglin              curve 17
+13 9
+
+Seglin              curve 18
+14 10
+
+Seglin              curve 19
+15 11
+
+Seglin              curve 20
+16 12
+
+QuaCir              curve 21
+13 14
+.0d0, .0d0, 1.d0
+
+QuaCir              curve 22
+14 15
+.0d0, .0d0, 1.d0
+
+QuaCir              curve 23
+16 15
+.0d0, .0d0, 1.d0
+
+QuaCir              curve 24
+13 16
+.0d0, .0d0, 1.d0
+
+Seglin              curve 25
+1 9
+
+Seglin              curve 26
+2 10
+
+Seglin              curve 27
+3 11
+
+Seglin              curve 28
+4 12
+
+Seglin              curve 29
+5 13
+
+Seglin              curve 30
+6 14
+
+Seglin              curve 31
+7 15
+
+Seglin              curve 32
+8 16
+
+0  NRTRIAN
+
+
+22 NRRECTA
+
+TraQua              rectangle 1
+1 2 3 4
+
+TraQua              rectangle 2
+5 6 2 1
+
+TraQua              rectangle 3
+6 7 3 2
+
+TraQua              rectangle 4
+8 7 3 4
+
+TraQua              rectangle 5
+5 8 4 1
+
+TraQua              rectangle 6
+9 10 11 12
+
+TraQua              rectangle 7
+13 14 10 9
+
+TraQua              rectangle 8
+14 15 11 10
+
+TraQua              rectangle 9
+16 15 11 12
+
+TraQua              rectangle 10
+13 9 12 16
+
+TraQua              rectangle 11
+5 6 14 13
+
+TraQua              rectangle 12
+1 2 10 9
+
+TraQua              rectangle 13
+6 7 15 14
+
+TraQua              rectangle 14
+2 3 11 10
+
+TraQua              rectangle 15
+8 7 15 16
+
+TraQua              rectangle 16
+4 3 11 12
+
+TraQua              rectangle 17
+5 8 16 13
+
+TraQua              rectangle 18
+1 4 12 9
+
+TraQua              rectangle 19
+5 1 9 13
+
+TraQua              rectangle 20
+6 2 10 14
+
+TraQua              rectangle 21
+7 3 11 15
+
+TraQua              rectangle 22
+8 4 12 16
+
+
+0 NRPRISM
+
+5 NRHEXAS
+
+TraHex              hexa 1
+1    1 2 3 4 9 10 11 12
+
+TraHex              hexa 2
+2    5 6 2 1 13 14 10 9
+
+TraHex              hexa 3
+3    6 7 3 2 14 15 11 10
+
+TraHex              hexa 4
+4    8 7 3 4 16 15 11 12
+
+TraHex              hexa 5
+5    5 8 4 1 13 16 12 9
+
+0 NRTETRA
+
+
+0 NRPYRAM
+
+

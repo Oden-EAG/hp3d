@@ -1,0 +1,17 @@
+Import("*")
+
+filenames = Split("""
+recta_ConfRec.F
+recta_CylRec.F
+recta_HermRec.F
+recta_ImpRec.F90
+recta_linear.F
+recta_PTIRec.F90
+recta_TraQua.F90
+""")
+
+#recta_HermRec1.F
+
+shared_objs = env.SharedObject(filenames)
+
+Return("shared_objs")

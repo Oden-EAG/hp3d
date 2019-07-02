@@ -1,0 +1,44 @@
+Nov, 27, 2014
+
+Paraview Graphics
+=================
+
+Linking to VTK
+--------------
+
+1. add VTK in your .bashrc file:
+
+module load vtk
+export LD_LIBRARY_PATH=/org/groups/aeg/kyungjoo/lib/HDF5/1.8.9/lib:$LD_LIBRARY_PATH
+
+
+2. add VIS_LIB to your m_option file:
+
+VIS_PATH        =  /org/groups/aeg/kyungjoo/lib/UHM/2.3.1/
+VIS_LIB         =  -L$(VIS_PATH)/lib -lvis \
+                   -L/org/groups/aeg/kyungjoo/lib/HDF5/1.8.9/lib -lhdf5 -lhdf5_hl \
+                   -L$(VTK_LIB) -lvtkhdf5 -lvtkhdf5_hl -lvtklibxml2 -lvtkzlib
+
+
+3. Since visualization libraries have been compiled with "gfortran", you need to compile the code with "gfortran" as well.
+
+
+Using Paraview Graphics from HP3D
+---------------------------------
+
+Create a "vtk" folder inside your project folder. The driver routine is "paraview_driver".
+Each time it is invoked, it increments the POSTFIX (a visitation flag) by 1, and creates files:
+
+PREFIX_POSTFIX.xmf : main file
+
+PREFIX_geom.h5 : geometry file
+
+PREFIX_ ... _POSTFIX.h5 : files containing real (and imaginary) part of solutions for all attributes, components and loads.
+
+Invoke Paraview, and open the .xmf file. In case of multiple .xmf files (with incremental
+postfixes), Paraview groups them together and allows the user to open all of them at the same
+time (which you should do.) The POSTFIX can be understood as a time-step. For example, routine
+"vis_shape_funct", dumps all H1, H(curl), H(div), L2 shape functions to Paraview. The incremental
+postfixes allow us to step through all the shape functions, one a time.
+
+The PREFIX is just a string. It is usefull to distinguish b/w different test cases.

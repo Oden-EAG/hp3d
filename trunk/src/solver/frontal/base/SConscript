@@ -1,0 +1,8 @@
+Import("*")
+
+if arith == "complex":
+    shared_objs = SConscript("complex/SConscript")
+else:
+    shared_objs = SConscript("real/SConscript")
+
+Return("shared_objs")

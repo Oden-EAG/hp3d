@@ -1,0 +1,44 @@
+!-----------------------------------------------------------------------
+!
+!    module name        - assembly_sc
+!
+!-----------------------------------------------------------------------
+!
+!    latest revision    - Sept 2018
+!
+!    purpose            - Module sets up required workspace for the
+!                         assembly of the global stiffness matrix and
+!                         load vector, as well as connectivity maps to 
+!                         avoid recomputation after solve.
+!
+!    contains
+!        subroutines:   - none
+!
+!----------------------------------------------------------------------!
+module assembly_sc
+!
+#include "implicit_none.h"
+!
+!..timers
+   real*8 MTime(20)
+   integer, save :: IPRINT_TIME = 0
+!
+!..offsets for each energy space
+   integer, allocatable :: NFIRSTH(:),NFIRSTE(:),NFIRSTV(:),NFIRSTQ(:)
+!
+!..number of degrees of freedom
+   integer :: NRDOF_CON,NRDOF_TOT
+!
+!..connectivity array
+   integer, allocatable :: LCON(:)
+!$OMP THREADPRIVATE (LCON)
+!
+!..local stiffness matrices
+   VTYPE, allocatable, save :: ZLOAD(:),ZTEMP(:)
+!$OMP THREADPRIVATE (ZLOAD,ZTEMP)
+!
+!..workspace for solution dof
+   VTYPE, allocatable, save :: ZSOL_LOC(:)
+!$OMP THREADPRIVATE (ZSOL_LOC)
+!
+end module assembly_sc
