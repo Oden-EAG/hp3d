@@ -1,4 +1,0 @@
-      common /crrrEM/ RREDGE(MAXP+1,2,MAXP+1)
-
-c  ...constrained approximation coefficients 
-c  ... for basis EDGE shape functions (set in routine setcnstrEM)

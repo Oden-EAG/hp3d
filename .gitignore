@@ -1,6 +1,12 @@
 # MacOS
 ._*
 
+# Other
+*.blk
+*.mk
+*.mk.old
+.dummy
+
 # Prerequisites
 *.d
 
