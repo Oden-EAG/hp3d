@@ -1,0 +1,18 @@
+Import("*")
+
+filenames = Split("""
+hpedge.F
+hpface.F
+hpmdle.F
+hpvert.F
+dhpvert.F90
+initiate_order.F
+update_Ddof.F
+""")
+
+shared_objs = env.SharedObject(filenames)
+
+shared_objs += SConscript("edge/SConscript")
+shared_objs += SConscript("face/SConscript")
+
+Return("shared_objs")

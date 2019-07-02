@@ -1,0 +1,36 @@
+!
+!..coarse grid element nodes first
+   do im= Nrnodm,1,-1
+      nod = Nodm(im)
+      call locate (nod, Nod_macro,Nr_macro, loc)
+      if (loc.ne.0) then
+         kH = naH_macro(loc); kE = naE_macro(loc); kV = naV_macro(loc) 
+         do j=1,NdofmH(im)
+            NrconH_macro(kH+j)=1
+            NacH_macro(1,kH+j) = naH(im)+j
+            ConstrH_macro(1,kH+j) = 1.d0
+         enddo
+         do j=1,NdofmE(im)
+            NrconE_macro(kE+j) = 1
+            NacE_macro(1,kE+j) = naE(im)+j
+            ConstrE_macro(1,kE+j) = 1.d0
+         enddo
+         do j=1,NdofmV(im)
+            NrconV_macro(kV+j) = 1
+            NacV_macro(1,kV+j) = naV(im)+j
+            ConstrV_macro(1,kV+j) = 1.d0
+         enddo
+!
+!     ...there may be excess dof due to p-refinements, they are not
+!        connected
+         do j=NdofmH(im)+1,NdofH_macro(loc)
+            NrconH_macro(kH+j)=0
+         enddo
+         do j=NdofmE(im)+1,NdofE_macro(loc)
+            NrconE_macro(kE+j)=0
+         enddo
+         do j=NdofmV(im)+1,NdofV_macro(loc)
+            NrconV_macro(kV+j)=0
+         enddo
+      endif
+   enddo

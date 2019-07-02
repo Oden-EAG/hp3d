@@ -1,0 +1,5 @@
+Import("*")
+
+shared_objs = SConscript("x11/SConscript")
+
+Return("shared_objs")

@@ -1,0 +1,286 @@
+!-----------------------------------------------------------------------------------
+!> Purpose : routine determines H(div) dof for a mid-face node of an element
+!            by performing L^2 projection on the face of the REFERENCE (NOT master)
+!            element(jacobian may not be constant)
+!!
+!! @param[in]  Iflag         - a flag specifying which of the objects
+!!                             5 pris, 6 hexa, 7 tetr, 8 pyra
+!! @param[in]  No            - number of a specific object
+!! @param[in]  Etav          - reference coordinates of the element vertices
+!! @param[in]  Type          - element (middle node) type
+!! @param[in]  Icase         - the face node case
+!! @param[in]  Nedge_orient  - edge orientation (not needed really)
+!! @param[in]  Nface_orient  - face orientation (not needed really)
+!! @param[in]  Norder        - element order
+!! @param[in]  Iface         - face number
+!! @param[in]  ZdofV         - H(div) dof for the element (edge values really)
+!!
+!! @param[out] ZnodV         - H(div) dof for the edge
+!-----------------------------------------------------------------------------------
+!
+#include "implicit_none.h"
+!
+subroutine dhpfaceV(Mdle,Iflag,No,Etav, Type,Icase,Nedge_orient,Nface_orient,Norder,Iface, &
+                    ZdofV, ZnodV)
+!
+  use control
+  use parameters
+  use physics
+  use element_data
+!
+  implicit none
+  !
+  ! ** Arguments
+  !-----------------------------------------------------------------------
+  integer,                                    intent(in)  :: Iflag,No,Mdle
+  integer,                                    intent(in)  :: Icase,Iface
+  real*8,  dimension(3,8),                    intent(in)  :: Etav
+#ifdef _PYHP3D
+  integer, intent(in) :: type
+#else
+  character(len=4),                           intent(in)  :: Type
+#endif
+  integer, dimension(12),                     intent(in)  :: Nedge_orient
+  integer, dimension(6),                      intent(in)  :: Nface_orient
+  integer, dimension(19),                     intent(in)  :: Norder
+  !
+  VTYPE,   dimension(MAXEQNV,MAXbrickV),      intent(in)  :: ZdofV
+  VTYPE,   dimension(NRCOMS*NREQNV(Icase),*), intent(out) :: ZnodV
+  !
+  ! ** Locals
+  !-----------------------------------------------------------------------
+  !
+  ! H1 (vertex) shape functions
+  integer, dimension(5)                 :: norder_face
+  integer, dimension(19)                :: norder_1
+  real*8,  dimension(  MAXbrickH)       :: shapH
+  real*8,  dimension(3,MAXbrickH)       :: gradH
+  !
+  ! face L2 shape functions
+  real*8,  dimension(MAXquadQ)          :: shapQ
+  !
+  ! Dirichlet BC data at a point
+  VTYPE :: zvalH(MAXEQNH), zdvalH(MAXEQNH,3), &
+           zvalE(3,MAXEQNE), zdvalE(3,MAXEQNE,3), &
+           zvalV(3,MAXEQNV), zdvalV(3,MAXEQNV,3), zvalVeta(3,MAXEQNV), zvalVetan(MAXEQNV)
+  !
+  integer, dimension(NR_PHYSA)          :: ncase
+  !
+  ! geometry
+  real*8,  dimension(3,3)               :: dxdeta,detadx,detadxi,dxideta
+  real*8                                :: jacxeta,jacetaxi,bjacetat
+  real*8,  dimension(3)                 :: x,rneta,eta,xi
+  real*8,  dimension(3,2)               :: dxidt,detadt
+  !
+  ! linear systems
+  real*8,  dimension(MAXquadQ,MAXquadQ) :: aaQ
+  integer, dimension(MAXquadQ)          :: ipivQ
+  !
+  ! load vector and solution
+  VTYPE,   dimension(MAXquadQ,MAXEQNV)  :: zbQ,zuQ
+  real*8,  dimension(MAXquadQ,MAXEQNV)  :: duQ_real, duQ_imag
+  !
+  ! quadrature
+  real*8,  dimension(2, MAXquadH)       :: xi_list
+  real*8,  dimension(   MAXquadH)       :: wa_list
+  real*8,  dimension(2)                 :: t
+  real*8                                :: wa,weight
+  !
+  integer :: i,iflag_geom,info,iprint,ivar,ivarV,nvarV,j,k,k1,k2,l,naQ, &
+             ndofH_face,ndofE_face,ndofV_face,ndofQ_face,nint, &
+             nrdofH,nrdofQ,nsign,nord
+  !
+  !-----------------------------------------------------------------------
+  iprint=0
+  !
+  !  face order
+  nord = Norder(nedge(Type) + Iface)
+  call ndof_nod(face_type(Type,Iface),nord, &
+                ndofH_face,ndofE_face,ndofV_face,ndofQ_face)
+  if (ndofV_face.eq.0) return
+  !
+  ! grep face order to set the quadrature
+  call face_order(Type,Iface,Norder, norder_face)
+  !
+  ! overintegrate
+  INTEGRATION=1
+  call set_2Dint(face_type(Type,Iface),norder_face, &
+                 nint,xi_list,wa_list)
+  INTEGRATION=0
+  !
+  ! set an auxiliary order vector eliminating higher order nodes
+  norder_1 = 1
+  !
+  ! initiate stiffness matrix and load vector
+  aaQ = 0.d0; zbQ = ZERO
+  !
+  ! loop through integration points
+  do l=1,nint
+    t(1:2) = xi_list(1:2,l)
+    wa     = wa_list(l)
+    !
+    call face_param(Type,Iface,t, xi,dxidt)
+    !
+    ! compute 3D element H1 vertex shape functions (to compute eta and detadxi)
+    call shape3H(Type,xi, &
+                 norder_1,Nedge_orient,Nface_orient, &
+                 nrdofH,shapH,gradH)
+    !
+    ! geometry in the reference domain
+    !! Federico June 2015 : nsign does not depend on face orientation.
+    !!                      Outward normal is independent of face orientation.
+    !!                      Corrections below.
+    !!!! determine sign factor accounting for face orientation
+    !!!if (Nface_orient(Iface).lt.nvert(face_type(Type,Iface))) then
+    !!!  nsign = 1
+    !!!else
+    !!!  nsign = -1
+    !!!endif
+    !! Federico June 2015 : correct assignment of nsign
+    ! nsign represents outward normal to the face in a given element shape
+    nsign = Nsign_param(Type,Iface)
+    call brefgeom3D(Mdle,xi,Etav,shapH,gradH,nrdofH,dxidt,nsign, &
+                    eta,detadxi,dxideta,jacetaxi,detadt,rneta,bjacetat)
+    weight = wa*bjacetat
+    !
+    ! evaluate derivatives of the physical coordinates wrt the reference coordinates,
+    ! needed for transforming Dirichlet data from physical to reference coordinates
+    select case(Iflag)
+    case(5);        call prism(No,eta, x,dxdeta)
+    case(6);        call  hexa(No,eta, x,dxdeta)
+    case(7);        call tetra(No,eta, x,dxdeta)
+    case(8);        call pyram(No,eta, x,dxdeta)
+    case default
+      write(*,*) 'dhpface: Type = ', Type
+      call logic_error(ERR_INVALID_VALUE,__FILE__,__LINE__)
+    end select
+    call geom(dxdeta, detadx,jacxeta,iflag_geom)
+    if (iflag_geom.ne.0) then
+      write(*,*) 'dhpfaceV: iflag_geom = ',iflag_geom
+      stop 1
+    endif
+    !
+    ! get the Dirichlet data in physical coordinates x
+    call dirichlet(Mdle,x,Icase, zvalH,zdvalH,zvalE,zdvalE,zvalV,zdvalV)
+    if (iprint.eq.1) then
+      write(*,7010) zvalV(1:3,1:MAXEQNV)
+ 7010 format('dhpfaceV: zvalV = ',10(3e12.5,2x))
+      call pause
+    endif
+    !
+    ! transform H(div) Dirichlet data to eta coordinates
+    do ivar=1,3
+      zvalVeta(ivar,1:MAXEQNV) = detadx(ivar,1)*zvalV(1,1:MAXEQNV) &
+                               + detadx(ivar,2)*zvalV(2,1:MAXEQNV) &
+                               + detadx(ivar,3)*zvalV(3,1:MAXEQNV)
+    enddo
+    zvalVeta = zvalVeta*jacxeta
+    zvalVetan(1:MAXEQNV) = zvalVeta(1,1:MAXEQNV)*rneta(1) &
+                         + zvalVeta(2,1:MAXEQNV)*rneta(2) &
+                         + zvalVeta(3,1:MAXEQNV)*rneta(3)
+    if (iprint.eq.1) then
+      write(*,7020) rneta(1:3),zvalVetan(1:MAXEQNV)
+ 7020 format('dhpfaceV: rneta = ',3f8.3,' zvalVetan = ',10e12.5)
+    endif
+    !
+    ! evaluate the L2 shape functions accounting for orientation
+    call shapVb2(face_type(Type,Iface),t,nord,Nface_orient(Iface), nrdofQ,shapQ)
+    !! Federico June 2015 : 2D shape functions already come with a predefined normal.
+    !!                      This has to be corrected to the outward 3D normal.
+    !!                      It amounts to multiplying by nsign.
+    shapQ = nsign*shapQ
+    !
+    ! accumulate for the stiffness matrix and load vector
+    do k1=1,nrdofQ
+      zbQ(k1,1:MAXEQNV) = zbQ(k1,1:MAXEQNV) &
+                        + zvalVetan(1:MAXEQNV)*shapQ(k1)/bjacetat*weight
+      do k2=1,nrdofQ
+        aaQ(k1,k2) = aaQ(k1,k2) + shapQ(k1)*shapQ(k2)/bjacetat**2*weight
+      enddo
+    enddo
+  !
+  ! end of loop through integration points
+  enddo
+  !
+  if (iprint.eq.1) then
+    do ivar=1,MAXEQNV
+      write(*,7030) ivar
+ 7030 format('dhpfaceV: zbQ FOR ivar = ',i2)
+      write(*,7040) zbQ(1:nrdofQ,ivar)
+#if C_MODE
+ 7040 format(10(2e12.5,2x))
+#else
+ 7040 format(10e12.5)
+#endif
+    enddo
+    write(*,*) 'dhpfaceV: aaV = '
+    do i=1,nrdofQ
+      write(*,7050) aaQ(i,1:nrdofQ)
+ 7050 format(20e12.5)
+    enddo
+  endif
+  !
+  ! factorize the stiffness matrix (always real)
+  naQ = MAXquadQ
+  call dgetrf(nrdofQ,nrdofQ,aaQ,naQ,ipivQ,info)
+  if (info.ne.0) then
+    write(*,*) 'dhpfaceV: info = ',info
+    stop 1
+  endif
+  if (nrdofQ.gt.0) then
+    zuQ(1:nrdofQ,:) = zbQ(1:nrdofQ,:)
+#if C_MODE
+    call zlaswp(MAXEQNV,zuQ(1:nrdofQ,:),naQ,1,nrdofQ,ipivQ,1)
+    duQ_real(1:nrdofQ,:) = real(zuQ(1:nrdofQ,:))
+    duQ_imag(1:nrdofQ,:) = aimag(zuQ(1:nrdofQ,:))
+    !
+    call dtrsm('L','L','N','U',nrdofQ,MAXEQNV,1.d0,aaQ,naQ, duQ_real,naQ)
+    call dtrsm('L','U','N','N',nrdofQ,MAXEQNV,1.d0,aaQ,naQ, duQ_real,naQ)
+   !
+    call dtrsm('L','L','N','U',nrdofQ,MAXEQNV,1.d0,aaQ,naQ, duQ_imag,naQ)
+    call dtrsm('L','U','N','N',nrdofQ,MAXEQNV,1.d0,aaQ,naQ, duQ_imag,naQ)
+   !
+    zuQ(1:nrdofQ,:) = cmplx(duQ_real(1:nrdofQ,:), duQ_imag(1:nrdofQ,:))
+#else
+    call dlaswp(MAXEQNV,zuQ(1:nrdofQ,:),naQ,1,nrdofQ,ipivQ,1)
+    call dtrsm('L','L','N','U',nrdofQ,MAXEQNV,1.d0,aaQ,naQ, zuQ,naQ)
+    call dtrsm('L','U','N','N',nrdofQ,MAXEQNV,1.d0,aaQ,naQ, zuQ,naQ)
+#endif
+  endif
+  !------------------------------------------------------
+  if (iprint.eq.1) then
+     write(*,*) 'dhpfaceV: k,zuQ(k) = '
+     do k=1,nrdofQ
+        write(*,*) k,zuQ(k,1:MAXEQNV)
+     enddo
+     call pause
+  endif
+  !
+  ! save the dof, skipping irrelevant entries
+  call decod(Icase,2,NR_PHYSA, ncase)
+  if (iprint.eq.1) then
+     write(*,*) 'dhpface: ncase = ', ncase
+  endif
+  !
+  ivarV=0; nvarV=0
+  !
+  ! loop through multiple copies of variables
+  do j=1,NRCOMS
+    ! loop through physical attributes
+    do i=1,NR_PHYSA
+      ! loop through components
+      do k=1,NR_COMP(i)
+        select case(DTYPE(i))
+        case('normal')
+          ivarV = ivarV + 1
+          if (ncase(i).eq.1) then
+            nvarV = nvarV + 1
+            ZnodV(nvarV,1:nrdofQ) = zuQ(1:nrdofQ,ivarV)
+          endif
+        end select
+      enddo
+    enddo
+  enddo
+!
+!
+end subroutine dhpfaceV

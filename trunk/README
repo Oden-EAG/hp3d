@@ -1,0 +1,71 @@
+=========================================================================
+  Downloading and installing the HP3D finite element library
+
+                                          Austin & Lausanne , Sep, 2014
+=========================================================================
+
+
+1. Dowloading the library from the repository
+---------------------------------------------
+
+Run the following commands :
+
+  mkdir HP3D (or anything else)
+
+  cd HP3D
+
+  svn co https://svn.ices.utexas.edu/repos/hp3d/LIBRARY/trunk/ . (the dot is important!)
+
+
+2. Linking to external libraries, setting compiler options, etc.
+----------------------------------------------------------------
+
+In folder HP3D/m_options_files, create your own file by hacking an existing one.
+
+Run the following commands :
+
+  cd HP3D
+
+  ln -s  m_options_files/m_options_mine  m_options
+
+
+3. Compiling the library
+------------------------
+
+Compilation is governed by preprocessing flags COMPLEX, PARALLEL, and SHAPE.
+
+  COMPLEX  = 0  -->  real    version : stiffness matrix, load vector(s) and
+                                       solution dofs are real-valued
+
+  COMPLEX  = 1  -->  complex version : stiffness matrix, load vector(s) and
+                                       solution dofs are complex-valued
+
+  PARALLEL = 0  -->  sequential version of MUMPS
+
+  PARALLEL = 1  -->  parallel   version of MUMPS
+
+  SHAPE    = 0  -->  shape functions of Gatto, Demkowicz, Kim, 2008
+                     (H1,H(curl) for selected element shapes only)
+
+  SHAPE    = 1  -->  shape functions of Fuentes et al., 2014
+                     (all spaces, all shapes)
+
+Run the following command :
+
+  make lib COMPLEX=0,1 PARALLEL=0,1 SHAPE=0,1
+
+Library will be created under either HP3D/complex or HP3D/real.
+
+
+4. Existing projects
+--------------------
+
+A few projects have been successfully implemented.
+
+AIR FORCE :
+  svn co https://svn.ices.utexas.edu/repos/hp3d/projects/ongoing/AF
+
+NSF :
+  mkdir BIOEM
+  cd BIOEM
+  svn co https://svn.ices.utexas.edu/repos/hp3d/projects/ongoing/BIOEM/trunk/ . (dot is important!)

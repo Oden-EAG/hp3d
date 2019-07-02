@@ -1,0 +1,25 @@
+Import("*")
+
+filenames = Split("""
+check_derivative.F90
+check_normal_cont.F
+check_normal.F90
+check_tri2edgs_compatibility.F90
+collect_tangent.F
+compute_coefficients.F90
+compute_radial_derivative.F90
+flatten.F90
+generate_Bezier_curve.F90
+generate_Bezier_triangle.F90
+get_curve_velocity.F90
+radial_derivative.F90
+smooth_domain.F90
+""")
+
+# bern poly defined where?:
+#normal_derivative.F90
+#test_normal.F90
+
+shared_objs = env.SharedObject(filenames)
+
+Return("shared_objs")

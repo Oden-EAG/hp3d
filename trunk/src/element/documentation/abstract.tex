@@ -1,0 +1,14 @@
+%Large font for abstract
+\renewcommand{\abstractname}{\large Abstract}
+\begin{abstract}
+\normalsize %Text normal size in abstract
+A unified construction of high order shape functions is given for all four classical energy spaces ($H^1$, $H(\mathrm{curl})$, $H(\mathrm{div})$ and $L^2$) and for elements of ``all'' shapes (segment, quadrilateral, triangle, hexahedron, tetrahedron, triangular prism and pyramid). 
+The discrete spaces spanned by the shape functions satisfy the commuting exact sequence property for each element.
+The shape functions are conforming, hierarchical and compatible with other neighboring elements across shared boundaries so they may be used in hybrid meshes.
+Expressions for the shape functions are given in coordinate free format in terms of the relevant affine coordinates of each element shape. 
+The polynomial order is allowed to differ for each separate topological entity (vertex, edge, face or interior) in the mesh, so the shape functions can be used to implement local $p$ adaptive finite element methods.
+Each topological entity may have its own orientation, and the shape functions can have that orientation embedded by a simple permutation of arguments.
+%Each topological entity (vertex, edge, face or interior) has associated a set of shape functions, a polynomial order and (potentially) an orientation.
+%Hence, the shape functions can be used to implement local $p$ adaptive finite element methods.
+%If desired, shape functions can be orientation embedded simply by permuting some entries in their expressions.
+\end{abstract}

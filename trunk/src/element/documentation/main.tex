@@ -1,0 +1,138 @@
+\documentclass[11pt]{article}%Default is US letter size paper 
+\pdfoutput=1 %For arXiv.org - usually not necessary
+\usepackage[top=1.3in,bottom=1.2in,left=1in,right=1in]{geometry}%Same margins Demkowicz proposed
+%These three ams packages loaded in this order give ALL the ams stuff
+\usepackage{amsmath}%Includes amstext, amsbsy and amsopn (should be loaded before amsthm)
+\usepackage{amssymb}%Includes amsfonts
+\usepackage{amsthm}%For theorem and other math environments
+\usepackage{mathrsfs}%For real part and imaginary part of complex (typically not used)
+\usepackage[english]{babel}%Correct word-splitting
+\usepackage{times}%Change font
+\usepackage{graphicx}%To add figures
+\usepackage[font=small,figurewithin=section]{caption}%Gives extra options for caption (e.g. smaller fonts)
+\usepackage{subcaption}%For subfloats. Requires caption package!
+\usepackage{float}%To place a float exactly at a point (using H intead of !ht)
+\usepackage[authoryear]{natbib}%For Harvard referencing within text
+\usepackage{hyperref}%For referencing - WARNING: If math titles needed use \texorpdfstring{$L^2$}{L2}
+\usepackage[all]{xy}%For commuting diagrams
+\usepackage{multirow}%For tables
+\usepackage{array}%For tables
+\usepackage{enumitem}%For itemized lists
+\usepackage{tikz}%For some graphics stuff if required 
+\usepackage{color}%For customized symbols (see preamble)
+
+%Spacing. 10pt font has baselineskip=12pt, 11pt font has baselineskip=13.6pt, 12pt font has baselineskip=14.5pt 
+\linespread{1.176} %Higher spacing =16pt if font is 11pt (because baselineskip is 13.6pt)
+\setlength{\parskip}{0.294\baselineskip}%Break after paragraph =4pt if font is 11pt (because baselineskip is 13.6pt)
+
+%Sectioning, numbering and TOC (Table of Contents)
+\numberwithin{equation}{section}%Number equations per section
+\setcounter{tocdepth}{2}%List up to 3 levels in TOC
+\makeatletter%Have bold math in titles, but not in TOC
+\g@addto@macro\bfseries{\boldmath}
+\makeatother
+
+%For caption
+\captionsetup{belowskip=-20pt}%Reduce space after caption in figures
+
+%Bibliography natbib options
+\bibpunct{(}{)}{;}{a}{,}{,}
+
+%For hyperref
+\hypersetup{colorlinks=true,citecolor=black,filecolor=black,linkcolor=black,urlcolor=black}
+\hypersetup{pdfstartview=FitB,pdfpagemode=UseNone}
+
+%For enumitem
+\setlist{nolistsep}
+
+%For tables - fix width of column while maintaining alignment
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{N}{@{}m{0pt}@{}}
+
+\input{preamble}
+
+\begin{document}
+
+\renewcommand*{\thepage}{Title}
+\input{title.tex}
+
+%****************************************abstract and TOC
+\newpage
+\pagenumbering{roman}
+\input{abstract}
+
+\newpage
+\tableofcontents
+%*************************************************content
+%Section 1
+\newpage
+\pagenumbering{arabic}
+\input{introduction}
+%Section 2
+\newpage
+\input{notation}
+%Section 3
+\newpage
+\input{segment}
+%Section 4
+\newpage
+\input{quad}
+%Section 5
+\newpage
+%\addtocontents{toc}{\protect\newpage}%No page break at TOC
+\input{triangle}
+%Section 6
+\newpage
+\input{hexa}
+%Section 7
+\newpage
+\input{tet}
+%Section 8
+\newpage
+\input{prism}
+%Section 9
+\newpage
+\input{pyramid}
+%Section 10
+\newpage
+\input{conclusion}
+
+%References
+\newpage
+\phantomsection%For hyperref
+\addcontentsline{toc}{section}{References}
+\bibliographystyle{kbib}
+\bibliography{main}
+
+%Appendices
+\appendix
+%Appendix A
+\newpage
+\pagenumbering{arabic}% resets counter to 1
+\renewcommand*{\thepage}{\thesection-\arabic{page}}%Custom numbering
+\input{genfamilies}
+%Appendix B
+\newpage
+\pagenumbering{arabic}% resets counter to 1
+\renewcommand*{\thepage}{\thesection-\arabic{page}}%Custom numbering
+\input{pyrappendix}
+%Appendix C
+\newpage
+\pagenumbering{arabic}% resets counter to 1
+\renewcommand*{\thepage}{\thesection-\arabic{page}}%Custom numbering
+\input{integration}
+%Appendix D
+\newpage
+\pagenumbering{arabic}% resets counter to 1
+\renewcommand*{\thepage}{\thesection-\arabic{page}}%Custom numbering
+\input{verification}
+%Appendix E
+\newpage
+\pagenumbering{arabic}% resets counter to 1
+\renewcommand*{\thepage}{\thesection-\arabic{page}}%Custom numbering
+\input{tables}
+
+
+\end{document}

@@ -1,0 +1,21 @@
+Import("*")
+
+filenames = Split("""
+cartobs.F
+clip2.F
+colorset.F
+dpborder.F
+dpvisid.F
+finstr.F
+initwin.F
+selwin.F
+sortz.F
+trobs.F
+""")
+# arctan.F
+# draw_line.F
+# mat3prod.F
+
+shared_objs = env.SharedObject(filenames)
+
+Return("shared_objs")

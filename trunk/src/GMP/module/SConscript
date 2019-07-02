@@ -1,0 +1,12 @@
+Import("*")
+
+filenames = Split("""
+PML.F90
+SPLIT_SURF.F90
+U2D.F90
+""")
+#GMP.F
+
+shared_objs = env.SharedObject(filenames)
+
+Return("shared_objs")

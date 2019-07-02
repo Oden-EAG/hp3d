@@ -1,0 +1,12 @@
+Import("*")
+
+filenames = Split("""
+create_communicators.F
+findinitelem.F
+redistribute_mesh.F
+""")
+#initpar.F (see src/pyhp3d/hp3d/initpar.F)
+
+shared_objs = env.SharedObject(filenames)
+
+Return("shared_objs")

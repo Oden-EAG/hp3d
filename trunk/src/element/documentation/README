@@ -1,0 +1,25 @@
+=============================================================================
+F. Fuentes, Jul 15 : documentation of shape functions (in element/shape_1)
+=============================================================================
+This corresponds to the document fully compatible with those shape functions
+coded in src/element/shape_1.
+
+The document was first published as an ICES report at:
+https://www.ices.utexas.edu/media/reports/2015/1507.pdf
+
+It was then submitted to arXiv as a preprint available at:
+http://arxiv.org/abs/1504.03025
+
+It was finally accepted as a journal publication in CAMWA:
+dx.doi.org/10.1016/j.camwa.2015.04.027
+
+The bibtex info for citing is:
+@article{shapearticle2015,
+  title = {Orientation embedded high order shape functions for the exact sequence elements of all shapes},
+  author = {Fuentes, F. and Keith, B. and Demkowicz, L. and Nagaraj, S.},
+  journal = {Comput. Math. Appl.},
+  volume = {70},
+  number = {4},
+  year = {2015},
+  pages = {353--458}
+  }

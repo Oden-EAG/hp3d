@@ -1,0 +1,8 @@
+1000000             MAXNODS  max number of nodes anticipated
+6                   NR_PHYSA number of physics attributes
+tempr   contin 1    temperature H1 1 component
+EHtr1   tangen 2    trace of electric/magnetic field, H(curl), 2 component
+EHtr2   tangen 2    trace of electric/magnetic field, H(curl), 2 component
+hflux   normal 1    heat flux, H(div), 1 component
+EHfd1   discon 6    electric and magnetic fields, L2, 3+3 components
+EHfd2   discon 6    electric and magnetic fields, L2, 3+3 components

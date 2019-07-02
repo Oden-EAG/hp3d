@@ -1,0 +1,93 @@
+\section{Conclusions}
+\label{sec:Conclusions}
+
+We have presented here a full systematic construction of hierarchical higher order shape functions for elements of ``all shapes'' (see Figure \ref{fig:elementsallshapes}) using the exact sequence logic.
+Compatibility of the shape functions at the interelement boundaries is based on the idea of having a known fixed trace at the boundary which is extended (or lifted) to the rest of the element.
+%In this work, this is called dimensional hierarchy.
+Hence, the shape functions can be used in hybrid meshes containing elements of all shapes.
+Furthermore, due to the properties of the discrete spaces, interpolation estimates are ensured in any hybrid master element mesh and for all energy spaces.
+
+The unified construction is based at its core in considering tensor products of polynomials.
+This has positive implications from the computational point of view, and could result in the successful implementation of fast integration techniques as described in Appendix \ref{app:Integration}.
+
+Also, the shape functions allow the polynomial order $p$ to vary accross a given mesh. 
+For example, the quadrilateral, hexahedron and prism shape functions are naturally anisotropic and can have different orders in each direction.
+More so, each edge and face in the mesh can have their own order $p$, independent of the order of the neighboring edges, faces and interiors in the mesh.
+Hence, techniques that exploit the use of local $p$ adaptivity can be implemented using these shape functions.
+
+As polynomial building blocks, Legendre and Jacobi polynomials are used in this work.
+Our results show that the recursive formulas presented in this document to implement those polynomials seem to be the most accurate in comparison to other recursive formulas. 
+The choices of Jacobi and Legendre polynomials are known to have extremely good sparsity and conditioning properties for typical projection problems \citep{Beuchler_Pillwein_Schoeberl_Zaglmayr_12}.
+However, there is flexibility in this choice of polynomials, and it might be worth investigating if there are applications where different choices provide useful advantages (see Appendix \ref{app:GeneratingFamilies}).
+
+All constructions are written in terms of affine coordinates and their gradient.
+Indeed, the shape functions are valid for any (typical) master element geometry, provided the affine coordinates are computed.
+We hope this has convinced the reader that the direct use of affine coordinates for \textit{all} elements (not just simplices) is the ideal approach, and that it motivates other researchers to also communicate in those general terms.
+The polynomials we chose are \textit{shifted} to have the domain $(0,1)$ instead of the typical $(-1,1)$.
+We claim this is the natural choice for construction of shape functions, since all affine cordinates have range $[0,1]$ and affine coordinates are \textit{the} natural inputs for the polynomials.
+Hence, we encourage the implementation of the polynomials in the shifted domain.
+The concept of polynomial homogenization was introduced and heavily used.
+It is a particular form of scaling which is closely related to affine coordinates, and is a tool that provides natural extensions.
+In fact, homogenization provides some level of geometrical intuition, since the projected affine coordinates arise naturally through this process.
+Theoretically it is also a convenient tool since it results in homogeneous polynomials, which have many desirable properties.
+
+Moreover, only \textit{eight} ancillary operators effectively generate all shape functions.
+These ancillary operators are coordinate free, in the sense that the form of the operators is invariant with respect to any transformation. 
+This is important, because it allows to transform nonlinearly to other geometries.
+Hence, it suffices to compute the affine coordinates and their gradient in that deformed space.
+Then, the shape functions resulting from the substitution of the deformed affine coordinates will precisely be the well defined pullback of the original shape functions.
+This has both theoretical and practical implications.
+For example, curved physical elements are deformations of the master element domains. 
+%For example, instead of integrating over a ``difficult'' domain, one can transform to the cube and integrate there (with suitable weights).
+This has the potential to result in more efficient computations when integrating (see Appendix \ref{app:Integration} for the basics of integration).
+
+For the face and edge shape functions, the logic of projecting, evaluating and blending is used consistently for all elements and all energy spaces.
+This provides a firm geometrical intuition of the expressions and formulas for the shape functions, which we hope the reader will appreciate.
+
+Additionally, the shape functions can be converted to orientation embedded shape functions via only \textit{three} local-to-global permutation functions (one for edges, one for triangle faces, and one for quadrilateral faces).
+These orientation embedded shape functions are extremely practical in many applications, especially in the implementation of constrained nodes in $hp$ methods.
+
+All the characteristics above prove to be vital in the implementation of a code.
+Indeed, the number of important routines which are called repeatedly is very small, and this minimizes the sources of errors, while allowing a very focused optimization of the implementation.
+A complete Fortran 90 code supplements this document.\footnote{See the ESEAS library available at https://github.com/libESEAS/ESEAS.}
+It provides an excellent guidance if the reader is ever interested in implementing this construction.  
+The code has been tested thoroughly by numerically checking polynomial reproducibility and exact sequence properties.
+This is described in Appendix \ref{app:verification}.
+The shape functions for all elements and all spaces are conveniently summarized in Appendix \ref{app:ShapeFunctionTable}.
+%This should provide a helpful company for the reader when implementing them numerically.
+%Due to the properties of the discrete spaces, interpolation estimates are ensured in any hybrid master element mesh.
+%Thoughout the construction there is a consistent use of the logic of projecting, evaluating and blending.
+
+%For simplices (segment, triangle, tetrahedron), our construction is hierarchical in polynomial order $p$. For Cartesian product elements, we conform to the tensor product structure (and numbering). This facilitates implementation of hanging nodes.
+
+Lastly, special attention is given to the successful construction of the pyramid shape functions, which is rare in the literature.
+A thorough geometric intuition for the pyramid was described, and the 3D pyramid affine-related coordinates were defined and analyzed.
+The set of exact sequence spaces were taken from \citet{Nigam_Phillips_11}, and they are consistent with the fundamental first order elements described by \citet{Hiptmair99}.
+We believe it to be the first time that an arbitrary high order construction of $H(\mathrm{div})$ shape functions has been implemented whilst respecting those lower order spaces (there have been others where either the lower order spaces have been larger, or simply different).
+This may prove to be very valuable to other researchers even if only for comparison purposes.
+For the pyramid, it might be possible to investigate better choices of polynomials for the bubbles, as this may provide better conditioning and sparsity properties.
+
+To finalize, we hope this construction has been useful in its methoodology and that it motivates further research in this very rich area.
+
+%Moreover, it is also interesting to investigate the spaces of bubbles in more detail, since only by modifying these it might be possible to construct smaller exact sequence discrete spaces.
+%As explained in \S\ref{sec:Introduction}, the shape functions are organized into groups corresponding to different topological entities. These are the element node: vertices, edges, faces, and interiors. This naturally allows for anisotropic orders (spaces) for nodes in Cartesian product elements. The resulting {\em elements of variable order} form a foundation for the $p$ and $hp$ finite element method.
+
+%This work is supplemented with a complete FORTRAN 90 package defining all of the shape functions presented here. The reader may also exploit Tables~\ref{app:ShapeFunctionTable} to reference all the shape functions presented in this document.
+%
+%Although the total number of different shape functions seems to be large, we signal that we have actually required very few unique functions. The simplicity and elegance is reflected in the length and complexity of the code.
+
+%Our methodology, sometimes referred to throughout the document as ``projecting, evaluating, and blending,'' is designed in a general way to apply to all elements discussed and all spaces in the exact sequence. Moreover, this approach does not rely upon any particular geometry for the master elements. It is applicable for {\em all} geometries of the elements of ``all shapes.''%Although we have made a specific choice in our element geometries and exploited this choice, the reader could easily modify the geometry and our methodology would still apply.
+
+%We have demonstrated the utility of the affine coordinate approach to shape function construction. Specifically this is true in regard to orientation embedded shape functions. Readers not interested in orientation embedded constructions can obviously still use our construction with the orientation $o=0$.
+
+% \subsection{Future Directions}
+%Looking forward, we note that our construction of tensor product shape functions (Cartesian product elements) often makes use of blending functions of the first order. This choice has been made to ensure a maximally anisotropic set of shape functions. It is well known \textit{cite} that using higher order blending functions results in better conditioning. The user could easily augment the blending functions we have chosen in order to provide this feature.
+
+%Our initial choice of basis polynomials discussed in Section~\ref{sec:Notation} (Legendre and Jacobi), while adequate for our purposes, may be enhanced by using other polynomial bases. Our choice was motivated by the use of Lagrange and Jacobi polynomials in existing literature. However, a careful analysis of other candidate polynomial spaces may yield other shape functions giving better conditioning as well as sparsity properties. At this time, we know of no strictly better choices.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Throughout the text, we do not separate $H(\text{curl})$ functions into those with nonzero and zero curl (the gradients of $H^1$). Similarly, we do not separate $H(\text{div})$ functions into those with nonzero and zero divergence (the curls of $H(\text{curl})$).% This is because of a ``head on'' conflict of such a separation with tensor product constructions which is essential for our FE codes, in particular implementation of hanging nodes. Such a separation is essential for the construction of iterative solvers for $H(\text{curl})$ and $H(\text{div})$ problems so in that sense, our construction is perhaps a step backwards.
+% However, at the bubble level, such a Helmholtz decomposition may potentially be implemented in the future. {\color{red} $\longleftarrow$ Federico has done this for the pyramid and we believe that we can do it in general.}
+
+\paragraph{Acknowledgements.}
+The work of Fuentes, Keith, Demkowicz and Nagaraj was supported with grants by AFOSR (FA9550-12-1-0484), NSF (DMS-1418822) and Sandia National Laboratories (1536119).

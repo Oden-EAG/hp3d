@@ -1,0 +1,16 @@
+        common /wvglob1/ IOPEN,LWTYPE(10),LWSIZE(10,4),LSCALE(10),
+     .                   IGPSP(10),ILEPSP,ILESCR,ILEDF,
+     .                   ICURRWIN
+        common /wvglob2/ XGSCAL(10,4)
+c
+c  explanation of variables:
+c
+c       IOPEN           .ne.0 if windows initialized at all
+c       LSCALE          0/1 for scaling in windows
+c       XGSCAL(4)       - xscale,yscale,xoff,yoff
+c                       x <- Xworld*xscale+xoff
+c       IGPSP           0/1 for postscript echo
+c       ILEPSP          no of pspactive windows
+c       ILESCR          no of screen windows
+c       ILEDF           no of dump file windows
+c

@@ -1,0 +1,90 @@
+      COMMON /SURFC2/ IB, IU, IL, IFB, IFU ,IFL, MBUF, MW, MKF, 
+     .                MELEM, MFWR, MB, MDOF, MLDEST, NRHSF, NFN,
+     .                NFW, KFW, LFW, NDOFM, MFW, IDUMP, LENU,
+     .                MBUFSV(2,2)
+C
+C Frontal Solver Common Block
+C ---------------------------
+C  This common is used to pass info between routines internal to SURFS
+C
+C Description of Variables
+C ------------------------  
+C Workspace manipulation variables
+C --------------------------------- 
+C BUFFER VARIABLES
+C ---------------- 
+C SURFS uses 3 buffers cut from a common workspace, into which the eliminated 
+C   equations are written.  The length of these buffers is based on available
+C   workspace.  When the buffer fill they are dumped to a scratch diskfile to
+C   make room for new equations.  The buffers are also dumped, full or not, 
+C   for resolution, cuz one cant count on the workspace coming back unaltered 
+C   when resolution is to begin 
+C
+C   The buffers are:
+C   U  :  The eliminated LHS buffer
+C   L  :  The additional eliminated LHS buffer for unsymmetric w/ resolution
+C   B  :  The eliminated RHS buffer
+C   
+C IB    :  Current pointer into the RHS buffer (B)
+C          Note: IB points at the Global RHS within the current buffer 
+C          (Also functions as the Length of the current RHS buffer) 
+C
+C IFB   :  Record counter for the RHS buffer (B) diskfile 
+C
+C IU    : Current pointer into the LHS buffer (U) 
+C          Note: IU points at a Global LHS equation within the current buffer 
+C          (Also functions as the Length of the current LHS buffer)    
+C        *NOTE: IU runs forward into the workspace: BUFF(1-->MBUF)
+C
+C IFU   :  Record counter for the LHS buffer (U) diskfile 
+C
+C IL    : Current pointer into the LHS buffer (L) (Extra unsymmetric LHS buffer)
+C          Note: IL points at a Global LHS equation within the current buffer 
+C          (Also functions as the Length of the current LHS buffer (L) 
+C        *NOTE: IL runs backward into the workspace BUFF(1<--MBUF)
+C
+C IFL   :  Record counter for the LHS buffer (L) diskfile 
+C 
+C IDUMP  : Flag indicating whether buffers have been dumped to diskfiles   
+C
+C LENU   : Length of the U buffer when its all kept in core 
+C-----------------------------------------------------------------------------------  
+C SPACE CUT LENGTH VARIABLES
+C --------------------------
+C MELEM : Temp space required to hold the maximum elem LHS + RHS, during assembly
+C MKF   : Temp space required to hold the LHS equations for the max frontwidth
+C MBUF  : All space which is left over is allocated for buffering equations
+C MFWR  : Temp space required to hold the LHS & RHS equations for the max frontwidth
+C MW    : Total Temp space for front and individual elem temp storage
+C MFWR  : Temp space required to hold the LHS & RHS for the max frontwidth
+C MB    : Temp space which is available for buffering rhs equations 
+C
+C NFN   : Total number of destination vectors in the model (from prefront) 
+C MFW   : Maximum DOF in the front at any given time (from prefront)
+C MDOF  : Max nunber of DOF associatted w/ any elem (from prefront)
+C MLDEST: Max nunber of DESTVECS associatted w/ any elem (from prefront) 
+c
+c MBUFSV: Save the value of MBUF & MW to check against during resolution 
+c *** Note: we cannot let the size of MBUF shrink during resolution 
+c            because then the stuff that was buffered out will not fit back in 
+c         MBUFSV(1,i) for ISYM=3, MBUFSV(2,i) for ISYM=4 
+C
+C FRONT LENGTH VARIABLES
+C ----------------------
+C NFW   : Number of DOF in the current front (while working on this elem)
+C          This comes out of SUB.DEST as the true length 
+C          BUT the front is NOT allowed reduce, only to grow (for indexing reasons) 
+C          NFW is a dynamic counter for the current frontwidth    
+C
+C KFW   : The length of the current front (used for indexing in unsymmetric storage)  
+C          *** the front is NOT allowed reduce, only to grow (for indexing reasons) 
+C          KFW only grows   
+C
+C LFW   : FINAL number of DOF in the last front (while working on the previous elem)
+C 
+C MISC. VARIABLES
+C ---------------
+C NDOFM : Total number of DOF for this elem  (from SUB.DEST)
+C NRHSF : This is simply a copy of NRHS (from SURFSC1.BLK)
+C
+C

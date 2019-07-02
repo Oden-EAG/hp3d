@@ -1,0 +1,128 @@
+c----------------------------------------------------------------------
+c
+c   routine name       - neig_edge
+c
+c----------------------------------------------------------------------
+c
+c   computer           - machine independent
+c
+c   latest revision    - Jan 09
+c
+c   purpose            - find neigbors for an element edge
+c
+c   arguments :
+c     in:
+c         Medg         - a mid-edge node
+c         Maxn         - dimension of the arrays below
+c                        (max number of neighbors)
+c     out:
+c         Neig         - list of neighbors of the edge
+c         Nedg_list    - local edge numbers
+c         Norient_list - orientations of the mid-edge node
+c         Nrneig       - number of adjacent elements
+c
+c   required  routines -
+c
+c----------------------------------------------------------------------
+c
+      subroutine neig_edge(Medg,Maxn,
+     .                     Neig,Nedg_list,Norient_list,Nrneig)
+c
+      use GMP
+      use data_structure3D
+      use element_data
+c
+#include "syscom.blk"
+c
+      dimension Neig(2,Maxn),Nedg_list(Maxn),Norient_list(Maxn)
+c
+c  ...neighbors of a curve
+      dimension neigbl(100)
+c
+c  ...decoded orientations for edges
+      dimension nedge_orient(12)
+c
+c  ...element/node type
+      character(len=4) :: type
+c
+c----------------------------------------------------------------------
+c
+      iprint=0
+c
+      if (NODES(Medg)%type.ne.'medg') then
+        write(*,7001) Medg,NODES(Medg)%type
+ 7001   format('neig_edge: Medg,NODES(Medg)%type = ',i6,2x,a5)
+        stop 1
+      endif
+c
+c  ...a temporary version for the initial mesh only...
+      if (NODES(Medg)%father.gt.0) then
+        write(*,7002) Medg,NODES(Medg)%father
+ 7002   format('neig_edge: Medg,NODES(Medg)%father = ',i6,2x,i6)
+        stop 1
+      endif
+c
+c  ...the number of the GMP curve is (see hp3gen)
+      nod = Medg
+      nc = nod-(NRELIS+NRPOINT)
+c
+c  ...use GMP utility to find the adjacent GMP blocks
+      call find_curve_to_block(nc,100, nrbl,neigbl)
+      if (nrbl.gt.Maxn) then
+        write(*,7003) Maxn,nrbl
+ 7003   format('neig_edge: Maxn,nrbl = ',2i4)
+        stop 1
+      endif
+      Nrneig = nrbl
+c
+c  ...loop through neighboring blocks
+      do ib=1,nrbl
+        call decode(neigbl(ib), nb,lab)
+c
+c  .....determine element number
+        select case(lab)
+c
+c  .....prism
+        case(1); nel= nb
+c
+c  .....hexahedron
+        case(2); nel= NRPRISM+nb
+c
+c  .....tetrahedron
+        case(3); nel= NRPRISM+NRHEXAS+nb
+c
+c  .....pyramid
+        case(4); nel= NRPRISM+NRHEXAS+NRTETRA+nb
+        end select
+c
+c  .....store the neighbor, for the initial mesh
+c       middle node numbers coincide with element numbers...
+        Neig(1,ib) = nel; Neig(2,ib) = 0
+        type = ELEMS(nel)%type
+        ibeg = nvert(type)+1
+        call locate(nod, ELEMS(nel)%nodes(ibeg),nedge(type), ie)
+        if (ie.eq.0) then
+          write(*,7004)
+ 7004     format('neig_edge: INCONSISTENCY')
+          stop 1
+        endif
+        Nedg_list(ib) = ie
+        call decodg(ELEMS(nel)%edge_orient,2,12, nedge_orient)
+        Norient_list(ib) = nedge_orient(ie)
+c
+c  ...end of loop through adjacent blocks
+      enddo
+      if (iprint.eq.1) then
+        write(*,7011) Medg
+ 7011   format('neig_edge: FIRST NEIGHBORS OF Medg = ',i5)
+        write(*,7012) Neig(1,1:Nrneig)
+ 7012   format(10i8)
+        write(*,7012) Nedg_list(1:Nrneig)
+        write(*,7012) Norient_list(1:Nrneig)
+        call pause
+      endif
+c
+c
+      end
+
+

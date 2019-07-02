@@ -1,0 +1,12 @@
+Import("*")
+
+filenames = Split("""
+setcnstr_edge_h1.F
+setcnstr_trian_h1.F
+setcnstr_trian_aniso_h1.F
+""")
+#setcnstr_trian_iso_h1.F
+
+shared_objs = env.SharedObject(filenames)
+
+Return("shared_objs")

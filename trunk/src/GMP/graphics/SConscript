@@ -1,0 +1,19 @@
+Import("*")
+
+filenames = Split("""
+dpallcu.F
+dpblno.F
+dptrno.F
+dpvistr.F
+findcoord.F
+findno.F
+GMPwireframe.F
+lsvistr.F
+object2.F
+object3.F
+""")
+# headgraph.F
+
+shared_objs = env.SharedObject(filenames)
+
+Return("shared_objs")

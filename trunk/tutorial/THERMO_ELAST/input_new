@@ -1,0 +1,227 @@
+3   3     NDIM,MANDIM
+
+0         no surfaces
+
+1         NRDOMAIN
+
+16         NRPOINT
+
+Regular
+0.006d0  0.03d0  0.d0
+
+Regular
+0.006d0  0.13d0  0.d0
+
+Regular
+-0.006d0  0.03d0  0.d0
+
+Regular
+-0.006d0  0.13d0  0.d0
+
+
+
+Regular
+0.006d0  0.d0  0.03d0
+
+Regular
+0.006d0  0.d0  0.13d0
+
+Regular
+-0.006d0  0.d0  0.03d0
+
+Regular
+-0.006d0  0.d0  0.13d0
+
+
+
+Regular
+0.006d0  -0.03d0  0.d0
+
+Regular
+0.006d0 -0.13d0  0.d0
+
+Regular
+-0.006d0 -0.03d0  0.d0
+
+Regular
+-0.006d0  -0.13d0  0.d0
+
+
+
+Regular
+0.006d0  0.d0  -0.03d0
+
+Regular
+0.006d0  0.d0  -0.13d0
+
+Regular
+-0.006d0  0.d0  -0.03d0
+
+Regular
+-0.006d0  0.d0  -0.13d0
+
+
+32 NRCURVE
+
+Seglin
+1 2
+Seglin
+3 4 
+Seglin
+1 3
+Seglin
+2 4
+
+Seglin
+5 6
+Seglin
+7 8
+Seglin
+5 7
+Seglin
+6 8
+
+Seglin
+9 10
+Seglin
+11 12
+Seglin
+9 11
+Seglin
+10 12
+
+Seglin
+13 14
+Seglin
+15 16
+Seglin
+13 15
+Seglin
+14 16
+
+QuaCir
+1 5
+0.006d0 0.d0 0.d0
+QuaCir
+2 6
+0.006d0 0.d0 0.d0
+QuaCir
+3 7
+-0.006d0 0.d0 0.d0
+QuaCir
+4 8
+-0.006d0 0.d0 0.d0
+
+QuaCir
+5 9
+0.006d0 0.d0 0.d0
+QuaCir
+6 10
+0.006d0 0.d0 0.d0
+QuaCir
+7 11
+-0.006d0 0.d0 0.d0
+QuaCir
+8 12
+-0.006d0 0.d0 0.d0
+
+QuaCir
+9 13
+0.006d0 0.d0 0.d0
+QuaCir
+10 14
+0.006d0 0.d0 0.d0
+QuaCir
+11 15
+-0.006d0 0.d0 0.d0
+QuaCir
+12 16
+-0.006d0 0.d0 0.d0
+
+QuaCir
+13 1
+0.006d0 0.d0 0.d0
+QuaCir
+14 2
+0.006d0 0.d0 0.d0
+QuaCir
+15 3
+-0.006d0 0.d0 0.d0
+QuaCir
+16 4
+-0.006d0 0.d0 0.d0
+
+
+
+
+0 NRTRIAN
+
+
+
+20 NRRECTA
+
+BilQua
+1 2 4 3
+BilQua
+5 6 8 7
+BilQua
+9 10 12 11
+BilQua
+13 14 16 15
+
+TraQua
+1 2 6 5
+TraQua
+2 4 8 6
+TraQua
+4 3 7 8
+TraQua
+1 3 7 5
+
+TraQua
+5 6 10 9
+TraQua
+6 8 12 10
+TraQua
+7 8 12 11
+TraQua
+7 5  9 11
+
+TraQua
+10 9 13 14
+TraQua
+12 10 14 16
+TraQua
+12 11 15 16
+TraQua
+9 11 15 13
+
+TraQua
+13 14 2 1
+TraQua
+14 16 4 2
+TraQua
+15 16 4 3
+TraQua
+15 13 1 3
+
+
+
+
+0 NRPRISM
+
+4 NRHEXAS 
+
+TIhexa 
+1 1 2 4 3 5 6 8 7 domain, 8 vertices
+TIhexa 
+1 5 6 8 7 9 10 12 11
+TIhexa 
+1  9 10 12 11 13 14 16 15
+TIhexa 
+1  13 14 16 15 1 2 4 3
+
+
+0 NRTETRA
+
+0 NRPYRAM

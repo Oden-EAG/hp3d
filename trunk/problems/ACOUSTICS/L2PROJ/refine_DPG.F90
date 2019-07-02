@@ -1,0 +1,168 @@
+!--------------------------------------------------------------------
+!
+!     routine name      - refine_DPG
+!
+!--------------------------------------------------------------------
+!
+!     latest revision:  - July 17
+!
+!     purpose:          - refines elements assuming problem has
+!                         already been solved. If uniform refinements
+!                         it refines everything. Otherwise it follows
+!                         greedy strategy based on residual to
+!                         determine which elements to refine.
+!                         It also displays dof, residuals and
+!                         relevant errors at each step.
+!
+!     arguments:
+!
+!     in:
+!             Irefine   = 0 if no refinement -> only display
+!                       = 1 if uniform refinements
+!                       = 2 if adaptive refinements
+!             Nreflag   = 1 for h-refinements
+!                       = 2 for p-refinements
+!                       = 3 for h- or p-refinement, depending
+!                           upon the element size
+!             Factor    - if element error \ge Factor*max_error
+!                         then the element is refined
+!     out:
+!             Nstop     = 1 if refinement did not increase dof
+!
+!---------------------------------------------------------------------
+!
+   subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
+!
+   use control
+   use data_structure3D
+   use parametersDPG, ONLY : NORD_ADD
+   use uhm2
+   use common_prob_data
+   use m_assembly, ONLY: NRDOF_CON, NRDOF_TOT
+!
+   implicit none
+!   
+   integer, intent(in)  :: Irefine
+   integer, intent(in)  :: Nreflag
+   real*8,  intent(in)  :: Factor
+   integer, intent(out) :: Nstop
+!
+   integer, parameter :: max_step = 300
+   integer, dimension(max_step), save :: nrdof_tot_mesh
+   integer, dimension(max_step), save :: nrdof_con_mesh
+   real*8,  dimension(max_step), save :: error_mesh
+   real*8,  dimension(max_step), save :: rel_error_mesh
+   real*8,  dimension(max_step), save :: rate_error_mesh
+
+!
+   integer, save :: istep = 0
+   integer, save :: irefineold = 0
+   integer :: nrdofField, nrdofDPG
+   integer :: nr_elem_to_refine
+   integer, dimension(NR_PHYSA) :: nflag
+   integer, dimension(NRELES)   :: N_elem
+   real*8 :: err, rnorm
+   real*8 :: errorH,errorE,errorV,errorQ,rnormH,rnormE,rnormV,rnormQ
+   integer :: i,iprint,ic,mdle,iel,kref
+   integer :: idec_pref,idec_href, iref, enforce_flag, icpref
+
+!
+!-----------------------------------------------------------------------
+!
+!..initialize
+   iprint = 0
+!
+!..increase step if necessary
+!..irefineold=0 means no refinement was made in the previous step
+!..if first call or if a refinement was made, increase step
+   if ((istep.eq.0).or.(irefineold.ne.0)) istep=istep+1
+   irefineold=Irefine
+!
+!..get dof count from solver
+! call ndof_DPG !calculates nrdofDPG and nrdofField
+   nrdof_tot_mesh(istep) = NRDOF_TOT
+   nrdof_con_mesh(istep) = NRDOF_CON
+!
+!..field variables flag - used inside ndof_DPG and for error calc.
+   nflag=1
+!
+!..create list of mdle nods numbers
+   mdle=0
+   do iel=1,NRELES
+      call nelcon(mdle, mdle)
+      N_elem(iel) = mdle
+   enddo
+!   
+!..initialize global residual and error
+   err = 0.d0; rnorm = 0.d0
+!
+   
+!$OMP PARALLEL DEFAULT(PRIVATE)    &
+!$OMP SHARED(N_elem,NRELES,nflag)  &
+!$OMP REDUCTION(+:err,rnorm)           
+!$OMP DO SCHEDULE(DYNAMIC)
+   do iel=1,NRELES
+      call element_error(N_elem(iel),nflag,errorH,errorE,errorV,errorQ,  &
+                                     rnormH,rnormE,rnormV,rnormQ)
+      err   = err   + errorQ
+      rnorm = rnorm + rnormQ
+   enddo
+!$OMP END DO        
+!$OMP END PARALLEL
+!
+   write(*,*) 'err   = ', err
+   write(*,*) 'rnorm = ', rnorm
+
+!..update and display convergence history
+    error_mesh(istep) = sqrt(err)
+    rel_error_mesh(istep) = sqrt(err/rnorm)
+!
+!..compute decrease rate for the residual and error
+   select case(istep)
+   case(1)
+      rate_error_mesh(istep) = 0.d0
+   case default
+      rate_error_mesh(istep) = &
+      log(rel_error_mesh(istep-1)/rel_error_mesh(istep))/  &
+      log(float(nrdof_tot_mesh(istep-1))/float(nrdof_tot_mesh(istep)))
+   end select
+!
+!..print out the history of refinements
+   write(*,*)
+   write(*,*)
+   write(*,*) 'HISTORY OF REFINEMENTS'
+   write(*,7006)
+ 7006  format(' mesh |',' nrdof_tot |','nrdof_con|',   &
+              ' field error  |','rel field error|','   rate ')
+   write(*,*)
+    
+   do i=1,istep
+      write(*,7004) i,nrdof_tot_mesh(i),nrdof_con_mesh(i), &
+                    error_mesh(i), &
+                    rel_error_mesh(i),rate_error_mesh(i)
+ 7004 format(2x,i2,'  | ',2(i8,' | '), &
+                 2(' | ',e12.5),'  |',f7.2)
+   enddo
+!
+!
+!-----------------------------------------------------------------------
+!                         REFINE AND UPDATE MESH
+!-----------------------------------------------------------------------
+!
+!..use appropriate strategy depening on refinement type
+!  NOTE: if Irefine=0 nothing is done, so only relevant info (the
+!        code above this line) is displayed.
+   select case(Irefine)
+!..uniform refinements
+   case(IUNIFORM)
+      ! call global_href
+      call global_href
+      call update_gdof
+      call update_ddof
+      ! call verify_orient
+      ! call verify_neig
+      nr_elem_to_refine = NRELES
+   end select
+!
+!
+   end subroutine refine_DPG

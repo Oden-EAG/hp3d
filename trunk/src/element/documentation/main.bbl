@@ -1,0 +1,152 @@
+\begin{thebibliography}{23}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlcustom}[1]{#1}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Ainsworth and Coyle(2001)]{AinsworthCoyle01}
+ Ainsworth, M. and Coyle, J. (2001).
+\newblock Hierarchic $hp$-edge element families for {M}axwell's equations on
+  hybrid quadrilateral/triangular meshes.
+\newblock \emph{Comput. Methods Appl. Mech. Engrg.}, 190:\penalty0 6709--6733.
+
+\bibitem[Ainsworth et~al.(2011)Ainsworth, Andriamaro, and
+  Davydov]{AinsworthBezier}
+ Ainsworth, M., Andriamaro, G., and Davydov, O. (2011).
+\newblock Bernstein-{B}\'ezier finite elements of arbitrary order and optimal
+  assembly procedures.
+\newblock \emph{SIAM J. Sci. Comput.}, 33\penalty0 (6):\penalty0 3087--3109.
+
+\bibitem[Bergot and Durufl\'{e}(2013)]{Bergot_Durufle_14}
+ Bergot, M. and Durufl\'{e}, M. (2013).
+\newblock Approximation of {$H(\mathrm{div})$} with high-order optimal finite
+  elements for pyramids, prisms and hexahedra.
+\newblock \emph{Commun. Comput. Phys.}, 14\penalty0 (5):\penalty0 1372--1414.
+
+\bibitem[Bergot et~al.(2010)Bergot, Cohen, and
+  Durufl\'{e}]{Bergot_Gary_Durufle_10}
+ Bergot, M., Cohen, G., and Durufl\'{e}, M. (2010).
+\newblock Higher-order finite elements for hybrid meshes using new nodal
+  pyramidal elements.
+\newblock \emph{J. Sci. Comput.}, 42:\penalty0 345--381.
+
+\bibitem[Beuchler and Pillwein(2007)]{Beuchler_Pillwein_07}
+ Beuchler, S. and Pillwein, V. (2007).
+\newblock Sparse shape functions for tetrahedral $p$-{FEM} using integrated
+  {J}acobi polynomials.
+\newblock \emph{Computing}, 80\penalty0 (4):\penalty0 345--375.
+
+\bibitem[Beuchler and Sch\"oberl(2006)]{Beuchler_Schoeberl_06}
+ Beuchler, S. and Sch\"oberl, J. (2006).
+\newblock New shape functions for triangular $p$-{FEM} using integrated
+  {J}acobi polynomials.
+\newblock \emph{Numer. Math.}, 103\penalty0 (3):\penalty0 339--366.
+
+\bibitem[Beuchler et~al.(2012{\natexlab{a}})Beuchler, Pillwein, Sch\"oberl, and
+  Zaglmayr]{Beuchler_Pillwein_Schoeberl_Zaglmayr_12}
+ Beuchler, S., Pillwein, V., Sch\"oberl, J., and Zaglmayr, S.
+  (2012{\natexlab{a}}).
+\newblock Sparsity optimized high order finite element functions on simplices.
+\newblock In \emph{Numerical and Symbolic Scientific Computing}, edited by
+  Langer, U. and Paule, P., Texts \& Monographs in Symbolic Computation, pp.
+  21--44. Springer, Vienna.
+
+\bibitem[Beuchler et~al.(2012{\natexlab{b}})Beuchler, Pillwein, and
+  Zaglmayr]{Beuchler_Pillwein_Zaglmayr_12}
+ Beuchler, S., Pillwein, V., and Zaglmayr, S. (2012{\natexlab{b}}).
+\newblock Sparsity optimized high order finite element functions for
+  {$H(\mathrm{div})$} on simplices.
+\newblock \emph{Numer. Math.}, 122\penalty0 (2):\penalty0 197--225.
+
+\bibitem[Beuchler et~al.(2013)Beuchler, Pillwein, and
+  Zaglmayr]{Beuchler_Pillwein_Zaglmayr_13}
+ Beuchler, S., Pillwein, V., and Zaglmayr, S. (2013).
+\newblock Sparsity optimized high order finite element functions for
+  {$H(\mathrm{curl})$} on tetrahedra.
+\newblock \emph{Adv. in Appl. Math.}, 50\penalty0 (5):\penalty0 749--769.
+
+\bibitem[Ciarlet(1994)]{Ciarlet}
+ Ciarlet, Ph.~G. (1994).
+\newblock \emph{The Finite Element Methods for Elliptic Problems}.
+\newblock North Holland, New York.
+
+\bibitem[Demkowicz(2006)]{hpbook}
+ Demkowicz, L. (2006).
+\newblock \emph{Computing with $hp$ Finite Elements. I. One and Two Dimensional
+  Elliptic and Maxwell Problems}.
+\newblock Chapman \& Hall/CRC Press, New York.
+
+\bibitem[Demkowicz(2015)]{DemkowiczClosedRange}
+ Demkowicz, L. (2015).
+\newblock Various variational formulations and closed range theorem.
+\newblock ICES Report 15-03, The University of Texas at Austin.
+
+\bibitem[Demkowicz and Gopalakrishnan(2014)]{DemkowiczGopalakrishnan13_2}
+ Demkowicz, L. and Gopalakrishnan, J. (2014).
+\newblock An overview of the {DPG} method.
+\newblock In \emph{Recent Developments in Discontinuous Galerkin Finite Element
+  Methods for Partial Differential Equations}, edited by Feng, X., Karakashian,
+  O., and Xing, Y.,  The {IMA} Volumes in Mathematics and its Applications,
+  Vol.~157, pp. 149--180. Springer.
+
+\bibitem[Demkowicz et~al.(2007)Demkowicz, Kurtz, Pardo, Paszy\'{n}ski,
+  Rachowicz, and Zdunek]{hpbook2}
+ Demkowicz, L., Kurtz, J., Pardo, D., Paszy\'{n}ski, M., Rachowicz, W., and
+  Zdunek, A. (2007).
+\newblock \emph{Computing with $hp$ Finite Elements. II. Frontiers: Three
+  Dimensional Elliptic and Maxwell Problems with Applications}.
+\newblock Chapman \& Hall/CRC, New York.
+
+\bibitem[Gatto and Demkowicz(2010)]{GattoDemkowicz10}
+ Gatto, P. and Demkowicz, L. (2010).
+\newblock Construction of ${H}^1$-conforming hierarchical shape functions for
+  elements of all shapes and transfinite interpolation.
+\newblock \emph{Finite Elem. Anal. Des.}, 46:\penalty0 474--486.
+
+\bibitem[Gradinaru and Hiptmair(1999)]{Hiptmair99}
+ Gradinaru, V. and Hiptmair, R. (1999).
+\newblock Whitney elements on pyramids.
+\newblock \emph{Electron. Trans. Numer. Anal.}, 8:\penalty0 154--168.
+
+\bibitem[Karniadakis and Sherwin(1999)]{karniadakisbook}
+ Karniadakis, G. and Sherwin, S.~J. (1999).
+\newblock \emph{Spectral/$hp$ Element Methods for CFD}.
+\newblock Numerical Mathematics and Scientific Computation. Oxford University
+  Press, New York.
+
+\bibitem[Monk and Demkowicz(2000)]{monk_demkowicz}
+ Monk, P. and Demkowicz, L. (2000).
+\newblock Discrete compactness and the approximation of {M}axwell's equations
+  in $\mathbb{R}^3$.
+\newblock \emph{Math. Comp.}, 70\penalty0 (234):\penalty0 507--523.
+
+\bibitem[N\'ed\'elec(1980)]{Nedelec80}
+ N\'ed\'elec, J.~C. (1980).
+\newblock Mixed finite elements in $\mathbb{R}^3$.
+\newblock \emph{Numer. Math.}, 35:\penalty0 315--341.
+
+\bibitem[Nigam and Phillips(2012)]{Nigam_Phillips_11}
+ Nigam, N. and Phillips, J. (2012).
+\newblock High-order conforming finite elements on pyramids.
+\newblock \emph{IMA J. Numer. Anal.}, 32\penalty0 (2):\penalty0 448--483.
+
+\bibitem[Sch\"oberl and Zaglmayr(2005)]{Schoeberl_Zaglmayr_05}
+ Sch\"oberl, J. and Zaglmayr, S. (2005).
+\newblock High order {N\'ed\'elec} elements with local complete sequence
+  property.
+\newblock \emph{COMPEL}, 24\penalty0 (2):\penalty0 374--384.
+
+\bibitem[Szab\'{o} and Babu\v{s}ka(1991)]{SzaboBabuska91}
+ Szab\'{o}, B.~A. and Babu\v{s}ka, I. (1991).
+\newblock \emph{Finite Element Analysis}.
+\newblock Wiley, New York.
+
+\bibitem[Zaglmayr(2006)]{SabineThesis}
+ Zaglmayr, S. (2006).
+\newblock \emph{High Order Finite Element Methods for Electromagnetic Field
+  Computation}.
+\newblock PhD thesis, Johannes Kepler Universit\"at Linz, Linz.
+
+\end{thebibliography}

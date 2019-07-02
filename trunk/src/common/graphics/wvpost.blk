@@ -1,0 +1,2 @@
+      common /wvpost1/ ILBUF,IBUFC(5),IFILE,icolval
+      common /wvpost2/ BUFOR(2,5)

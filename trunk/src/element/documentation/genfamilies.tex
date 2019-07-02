@@ -1,0 +1,117 @@
+\section{Polynomial Families}
+\label{app:GeneratingFamilies}
+
+Let $\mathcal{P}^i(x)=\mathrm{span}\{x^j:j=0,\ldots,i\}$ be the polynomials of order $i$, and $\mathcal{F}_p=\{P_i:i=0,\ldots,p-1\}$ and $\mathcal{F}_p^\alpha=\{P_j^\alpha:j=0,\ldots,p-1\}$ be sets of polynomials with domain $x\in[0,1]$. 
+The families $\mathcal{F}_p$ and $\mathcal{F}_p^\alpha$ should satisfy that $\mathrm{span}(\mathcal{F}_p)=\mathrm{span}(\mathcal{F}_p^\alpha)=\mathcal{P}^{p-1}(x)$, $P_i\in\mathcal{P}^i(x)$ and $P_j^\alpha\in\mathcal{P}^j(x)$.
+Moreover, the family $\mathcal{F}_p$ should satisfy the zero average property, $\int_0^1 P_i(x)\,\mathrm{d}x=0$, for all $i\geq1$.
+
+These sets of conditions are very easy to satisfy. 
+For example consider any sequence of polynomials of increasing order, say $1,x,x^2,x^3,\ldots,x^{p-1}$.
+Then it is only a matter of adding a suitable constant to all polynomials of order $i\geq1$ such that their integral is $0$.
+For example, $1,x,x^2,x^3,\ldots,x^p$ becomes $1,x-\frac{1}{2},x^2-\frac{1}{3},\ldots,x^{p-1}-\frac{1}{p}$, and this latter one is already a suitable family $\mathcal{F}_p$.
+
+The elements of $\mathcal{F}_p$ and $\mathcal{F}_p^\alpha$ are thought of being elements of $L^2$, even though they are infinitely differentiable as polynomials.
+Indeed, it is often desirable that the elements of $\mathcal{F}_p$ and $\mathcal{F}_p^\alpha$ satisfy certain properties in the $L^2$ (or weighted $L^2$) inner product, since they can result in considerably sparser finite element matrices.
+In fact, orthogonality of the $P_i$, is generally seeked.
+If there is no weight, orthogonality of the $P_i$ is attained uniquely (up to a constant) by the Legendre polynomials, and this is why they are the typical choice.
+Meanwhile, the family $\mathcal{F}_p^\alpha$ can also be chosen wisely by taking into account a weighted $L^2$ space relevant to the triangle element.
+If the $P_i$ are Legendre polynomials, the natural choice for the $P_j^\alpha$ is to be Jacobi polynomials with certain weights.
+
+Now, define the polynomials $L_{i}\in\mathcal{P}^{i}(x)$ and $L_{j}^\alpha\in\mathcal{P}^{j}(x)$ from the $P_{i-1}\in\mathcal{F}_p$ and $P_{j-1}^\alpha\in\mathcal{F}_p^\alpha$ as
+\begin{equation}
+    L_{i}(x)=\int_0^x P_{i-1}(\tilde{x})\,\mathrm{d}\tilde{x}\,,\qquad\qquad 
+    	L_{j}^\alpha(x)=\int_0^x P_{j-1}^\alpha(\tilde{x})\,\mathrm{d}\tilde{x}\,,
+\end{equation}
+for $i=2,\ldots,p$ and $j=1,\ldots,p$.
+Clearly, it follows that $\mathcal{P}^{p}(x)=\mathcal{P}^1(x)\cup\{L_i:i=2,\ldots,p\}$ and $\mathcal{P}^{p}(x)=\mathcal{P}^0(x)\cup\{L_j^\alpha:j=1,\ldots,p\}$.
+By construction, the $L_i$ and $L_j^\alpha$ are elements of $H^1$ and as a result their pointwise evaluation exists. 
+In fact, due to the zero average property, 
+\begin{equation}
+	\begin{alignedat}{3}
+		L_i(0)&=L_i(1)=0\,,\qquad\qquad&&\text{for }i\geq2\,,\\
+		L_j^\alpha(0)&=0\,,\qquad\qquad&&\text{for }i\geq1\,.
+	\end{alignedat}
+	\label{eq:AppLiLjVanishingProperties}
+\end{equation}
+
+%\begin{equation}
+%    \begin{alignedat}{3}
+%        L_i(0)&=0\quad i=1,\ldots,p\,\,\,\Rightarrow\,\,\,
+%            L_i(x)=xf_{i-1}(x)\,\,\, && \text{with }f_{i-1}\in\mathcal{P}^{i-1}(x)\quad i=1,\ldots,p\\
+%        L_i(1)&=0\quad i=2,\ldots,p\,\,\,\Rightarrow\,\,\,
+%            L_i(x)=x(1-x)f_{i-2}(x)\,\,\, && \text{with }f_{i-2}\in\mathcal{P}^{i-2}(x)\quad i=2,\ldots,p\,.
+%    \end{alignedat}
+%\end{equation}
+
+% %I use the properties above. I was thinking you can go on defining scaling, then the partial derivatives. Intorduce R_i before even starting on Legendre and use your general formula you showed this morning. Afterwards in another subsection you introduce Legendre with all the associated formulas and recursions and analogously with Jacobi. This subsection covers the main properties that the families of polynomials should satisfy.
+
+Now, apply the definition of scaling given in \eqref{eq:scaledpolyomials} to the polynomials, yielding $P_i(x;t)$, $P_j^\alpha(x;t)$, $L_i(x;t)$ and $L_j^\alpha(x;t)$, where $x\in[0,t]$.
+In particular, note that
+\begin{equation}
+	L_{i+1}(x;t)=t^{i+1}L_{i+1}\Big(\frac{x}{t}\Big)=t^{i+1}\int_0^{\frac{x}{t}} P_{i}(\tilde{x})\,\mathrm{d}\tilde{x}
+		=t^{i}\int_0^{x} P_{i}\Big(\frac{\tilde{y}}{t}\Big)\,\mathrm{d}\tilde{y}\,.
+\end{equation}
+Since the scaled polynomials are now bivariate polynomials in $(x,t)$, it is useful to find the derivatives in both of these variables.
+Using the latter equality above,
+\begin{equation}
+	\frac{\partial}{\partial x}L_{i+1}(x;t)=t^iP_i\Big(\frac{x}{t}\Big)=P_i(x;t)\,.
+\end{equation}
+Meanwhile, using the other equality, it follows
+\begin{equation}
+	\frac{\partial}{\partial t}L_{i+1}(x;t)
+		=(i+1)t^iL_{i+1}\Big(\frac{x}{t}\Big)+t^{i+1}P_{i}\Big(\frac{x}{t}\Big)\Big(\frac{-x}{t^2}\Big)
+			=t^i\Big((i+1)L_{i+1}\Big(\frac{x}{t}\Big)-\Big(\frac{x}{t}\Big)P_{i}\Big(\frac{x}{t}\Big)\Big)\,.
+\end{equation}
+This suggests the definition
+\begin{equation}
+	R_i(x)=(i+1)L_{i+1}(x) - xP_i(x)\,,
+	\label{eq:R_i_eq1}
+\end{equation}
+for $i\geq1$.
+Using the leading order term of $P_i$, the reader may observe that $R_i$ is an order $i$ polynomial (\textit{not} order $i+1$), so the indexing with $i$ makes sense.
+More importantly,
+\begin{equation}
+	\frac{\partial}{\partial t}L_{i+1}(x;t)
+			=t^i\Big((i+1)L_{i+1}\Big(\frac{x}{t}\Big)-\Big(\frac{x}{t}\Big)P_{i}\Big(\frac{x}{t}\Big)\Big)
+				=R_{i}(x;t)\,.
+\end{equation}
+Exactly the same analysis applies to the $L_{j+1}^\alpha$, meaning that
+\begin{equation}
+	\frac{\partial}{\partial x}L_{j+1}\alpha(x;t)=P_j^\alpha(x;t)\,,\qquad\qquad
+		\frac{\partial}{\partial x}L_{j+1}^\alpha(x;t)=R_j^\alpha(x;t)\,,
+\end{equation}
+for $j\geq0$, and where
+\begin{equation}
+	R_j^\alpha(x)=(j+1)L_{j+1}^\alpha(x) - xP_j^\alpha(x)\,.
+\end{equation}
+
+As observed, all these properties are deduced at a very general level, and apply to any families $\mathcal{F}_p$ and $\mathcal{F}_p^\alpha$ satisfying the simple set of properties mentioned initially.
+To conclude, it follows all the results deduced throughout the document still hold for these more general polynomial families, including the vanishing properties, the ancillary function properties, etc.
+Hence, the reader may decide to change these families if desired.
+This could potentially provide better sparsity properties depending on the problem.
+Nevertheless, be aware that for the classical Laplace problem (and many related sets of problems), the ideal polynomial families are the Legendre and Jacobi polynomials, which are used throughout this document and are conveniently defined through recursive formulas.
+
+%By definion,
+%\begin{equation}
+%L_{i+1}(x;t) = \int_0^x P_i(\tilde{x};t) d\tilde{x}=\int_0^x P_i\left(\frac{\tilde{x}}{t}\right)t^i d\tilde{x}
+%=t^{i+1}\int_0^\frac{x}{t} P_i\left(\tilde{x}\right) d\tilde{x}\,,
+%\end{equation}
+%and so
+%\begin{equation}
+%\frac{\ptl}{\ptl t} L_{i+1}(x;t) = (i+1) t^i\int_0^\frac{x}{t} P_i\left(\tilde{x}\right) d\tilde{x} + t^{i+1}\left(-\frac{x}{t^2}\right)P_i\left(\frac{x}{t}\right)\,.
+%\end{equation}
+%This gives us the useful equation
+%\begin{equation}
+%t \frac{\ptl}{\ptl t} L_{i+1}(x;t) = (i+1)L_{i+1}(x;t) - xP_i(x;t)\,.
+%\end{equation}
+%With the definiton,
+%\begin{equation}
+%R_i(x) := (i+1)L_{i+1}(x) - xP_i(x)\,,
+%\label{eq:R_i_eq1}
+%\end{equation}
+%we observe that
+%\begin{equation}
+%\frac{\ptl}{\ptl t} L_{i+1}(x;t) = R_i(x;t)\,.
+%\end{equation}
+
+

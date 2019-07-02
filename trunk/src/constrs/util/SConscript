@@ -1,0 +1,12 @@
+Import("*")
+
+filenames = Split("""
+""")
+#init_cnstr.F
+
+shared_objs = env.SharedObject(filenames)
+shared_objs += SConscript("h1/SConscript")
+shared_objs += SConscript("hcurl/SConscript")
+#shared_objs += SConscript("hdiv/SConscript")
+
+Return("shared_objs")

@@ -1,0 +1,238 @@
+ p = 3 dp = 1
+
+ pardiso_sc_herm STEP 2: Global Assembly
+ Factorization time =   2.452850341796875E-003
+ Triang. solve time =   3.870010375976562E-003
+ elem time =   8.106803894042969E-002
+ Factorization time =   2.479076385498047E-003
+ Triang. solve time =   3.886938095092773E-003
+ elem time =   8.015108108520508E-002
+ Factorization time =   2.443075180053711E-003
+ Triang. solve time =   3.869056701660156E-003
+ elem time =   7.997703552246094E-002
+ Factorization time =   2.557039260864258E-003
+ Triang. solve time =   3.980875015258789E-003
+ elem time =   8.077788352966309E-002
+ Factorization time =   2.445936203002930E-003
+ Triang. solve time =   3.865957260131836E-003
+ elem time =   8.035778999328613E-002
+ Factorization time =   2.449989318847656E-003
+ Triang. solve time =   3.868818283081055E-003
+ elem time =   8.003020286560059E-002
+ Factorization time =   2.443790435791016E-003
+ Triang. solve time =   3.868103027343750E-003
+ elem time =   8.011484146118164E-002
+ Factorization time =   2.451181411743164E-003
+ Triang. solve time =   3.870010375976562E-003
+ elem time =   8.012104034423828E-002
+ pardiso_sc_herm STEP 2: Finished in     0.65473  seconds
+
+p = 5 dp = 1
+ pardiso_sc_herm STEP 2: Global Assembly
+ Factorization time =   5.475497245788574E-002
+ Triang. solve time =   0.131407022476196     
+ elem time =    2.19262981414795     
+ Factorization time =   5.430912971496582E-002
+ Triang. solve time =   0.130840063095093     
+ elem time =    2.19411993026733     
+ Factorization time =   5.421400070190430E-002
+ Triang. solve time =   0.130722999572754     
+ elem time =    2.19155502319336     
+ Factorization time =   5.428504943847656E-002
+ Triang. solve time =   0.130897045135498     
+ elem time =    2.17276000976562     
+ Factorization time =   5.417990684509277E-002
+ Triang. solve time =   0.130747079849243     
+ elem time =    2.16112303733826     
+ Factorization time =   5.429100990295410E-002
+ Triang. solve time =   0.130810022354126     
+ elem time =    2.16823410987854     
+ Factorization time =   5.438208580017090E-002
+ Triang. solve time =   0.130709886550903     
+ elem time =    2.16594600677490     
+ Factorization time =   5.416893959045410E-002
+ Triang. solve time =   0.130776166915894     
+ elem time =    2.17080116271973     
+ pardiso_sc_herm STEP 2: Finished in    17.79756  seconds
+
+ p = 7 dp = 1
+
+ Factorization time =   0.563092947006226     
+ Triang. solve time =    1.69002103805542     
+ elem time =    51.4037148952484 
+
+
+NEW BLAS 3 ROUTINES
+
+ p=3 dp=1
+
+ pardiso_sc_herm STEP 2: Global Assembly
+ Factorization time =   2.218008041381836E-003
+ Triang. solve time =   3.525018692016602E-003
+ elem time =   7.870507240295410E-002
+ Factorization time =   2.135038375854492E-003
+ Triang. solve time =   3.556966781616211E-003
+ elem time =   7.710409164428711E-002
+ Factorization time =   2.123117446899414E-003
+ Triang. solve time =   3.525972366333008E-003
+ elem time =   8.047199249267578E-002
+ Factorization time =   2.122879028320312E-003
+ Triang. solve time =   3.521203994750977E-003
+ elem time =   8.046698570251465E-002
+ Factorization time =   2.120971679687500E-003
+ Triang. solve time =   3.513097763061523E-003
+ elem time =   8.029913902282715E-002
+ Factorization time =   2.120971679687500E-003
+ Triang. solve time =   3.522872924804688E-003
+ elem time =   8.034396171569824E-002
+ Factorization time =   2.125024795532227E-003
+ Triang. solve time =   3.517866134643555E-003
+ elem time =   8.043217658996582E-002
+ Factorization time =   2.121925354003906E-003
+ Triang. solve time =   3.517866134643555E-003
+ elem time =   8.035898208618164E-002
+ pardiso_sc_herm STEP 2: Finished in     0.64980  seconds
+
+
+ pardiso_sc_herm STEP 2: Global Assembly
+ Factorization time =   2.182960510253906E-003
+ Triang. solve time =   3.525018692016602E-003
+ elem time =   5.967903137207031E-002
+ Factorization time =   2.155780792236328E-003
+ Triang. solve time =   3.560066223144531E-003
+ elem time =   5.813407897949219E-002
+ Factorization time =   2.155065536499023E-003
+ Triang. solve time =   3.523111343383789E-003
+ elem time =   5.814003944396973E-002
+ Factorization time =   2.153873443603516E-003
+ Triang. solve time =   3.524065017700195E-003
+ elem time =   5.803012847900391E-002
+ Factorization time =   2.151966094970703E-003
+ Triang. solve time =   3.525972366333008E-003
+ elem time =   5.787491798400879E-002
+ Factorization time =   2.156972885131836E-003
+ Triang. solve time =   3.531932830810547E-003
+ elem time =   5.804800987243652E-002
+ Factorization time =   2.152919769287109E-003
+ Triang. solve time =   3.525972366333008E-003
+ elem time =   5.804395675659180E-002
+ Factorization time =   2.153158187866211E-003
+ Triang. solve time =   3.525972366333008E-003
+ elem time =   5.802702903747559E-002
+ pardiso_sc_herm STEP 2: Finished in     0.47802  seconds
+
+p = 5 dp = 1
+
+ Factorization time =   4.456281661987305E-002
+ Triang. solve time =   0.121327161788940     
+ elem time =    2.08350706100464     
+ Factorization time =   4.456210136413574E-002
+ Triang. solve time =   0.121695041656494     
+ elem time =    2.11516189575195     
+ Factorization time =   4.443001747131348E-002
+ Triang. solve time =   0.120918035507202     
+ elem time =    2.12039804458618     
+ Factorization time =   4.454016685485840E-002
+ Triang. solve time =   0.121326923370361     
+ elem time =    2.12113189697266     
+ Factorization time =   4.454684257507324E-002
+ Triang. solve time =   0.120830059051514     
+ elem time =    2.11290001869202     
+ Factorization time =   4.450893402099609E-002
+ Triang. solve time =   0.121259927749634     
+ elem time =    2.10992598533630     
+ Factorization time =   4.439210891723633E-002
+ Triang. solve time =   0.120836973190308     
+ elem time =    2.10901308059692     
+ Factorization time =   4.442501068115234E-002
+ Triang. solve time =   0.120704174041748     
+ elem time =    2.10458397865295
+ pardiso_sc_herm STEP 2: Finished in    17.25629  seconds
+
+ pardiso_sc_herm STEP 2: Global Assembly
+ Factorization time =   4.446101188659668E-002
+ Triang. solve time =   0.120841026306152     
+ elem time =    1.67224597930908     
+ Factorization time =   4.517102241516113E-002
+ Triang. solve time =   0.121392011642456     
+ elem time =    1.66518807411194     
+ Factorization time =   4.444789886474609E-002
+ Triang. solve time =   0.120769977569580     
+ elem time =    1.66396403312683     
+ Factorization time =   4.446601867675781E-002
+ Triang. solve time =   0.121111869812012     
+ elem time =    1.66146302223206     
+ Factorization time =   4.497694969177246E-002
+ Triang. solve time =   0.121522903442383     
+ elem time =    1.66243386268616     
+ Factorization time =   4.449200630187988E-002
+ Triang. solve time =   0.120929002761841     
+ elem time =    1.66938996315002     
+ Factorization time =   4.443717002868652E-002
+ Triang. solve time =   0.120765924453735     
+ elem time =    1.66277790069580     
+ Factorization time =   4.457807540893555E-002
+ Triang. solve time =   0.121237993240356     
+ elem time =    1.66321301460266     
+ pardiso_sc_herm STEP 2: Finished in    13.70427  seconds
+
+
+ Factorization time =   0.436487197875977     
+ Triang. solve time =    1.55537104606628     
+ elem time =    56.4491419792175
+
+ Factorization time =   0.436587095260620     
+ Triang. solve time =    1.54829096794128     
+ elem time =    28.1377630233765
+
+
+
+
+
+
+
+ p = 4 dp =1 uniform h refinements
+
+ 
+
+USING ALLOCATABLES
+
+pardiso_sc_herm STEP 2: Finished in     0.77455  seconds
+pardiso_sc_herm STEP 2: Finished in     0.77392  seconds
+pardiso_sc_herm STEP 2: Finished in     2.49436  seconds
+pardiso_sc_herm STEP 2: Finished in    18.32054  seconds
+pardiso_sc_herm STEP 2: Finished in   161.67154  seconds
+memory left 9.15 GB
+
+
+
+USING EXACT STATIC MEMORY
+
+
+pardiso_sc_herm STEP 2: Finished in     0.70388  seconds
+pardiso_sc_herm STEP 2: Finished in     0.71503  seconds
+pardiso_sc_herm STEP 2: Finished in     2.49161  seconds
+pardiso_sc_herm STEP 2: Finished in    17.16969  seconds
+pardiso_sc_herm STEP 2: Finished in   130.15422  seconds
+
+memory left 10.4 GB
+
+
+USING EXACT STATIC MEMORY BUT ONLY STIFF_ALL AND STIFF_ALL_T
+
+pardiso_sc_herm STEP 2: Finished in     0.78126  seconds
+pardiso_sc_herm STEP 2: Finished in     0.76065  seconds
+pardiso_sc_herm STEP 2: Finished in     2.66613  seconds
+pardiso_sc_herm STEP 2: Finished in    19.28674  seconds
+pardiso_sc_herm STEP 2: Finished in   150.13063  seconds
+
+
+
+USING EXACT STATIC MEMORY BUT ONLY STIFF_ALL
+
+
+pardiso_sc_herm STEP 2: Finished in     0.82604  seconds
+pardiso_sc_herm STEP 2: Finished in     0.62093  seconds
+pardiso_sc_herm STEP 2: Finished in     2.72730  seconds
+pardiso_sc_herm STEP 2: Finished in    19.21481  seconds
+pardiso_sc_herm STEP 2: Finished in   150.67687  seconds

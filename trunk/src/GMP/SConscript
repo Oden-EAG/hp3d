@@ -1,0 +1,8 @@
+Import("*")
+
+shared_objs = SConscript("base/SConscript")
+shared_objs += SConscript("graphics/SConscript")
+shared_objs += SConscript("module/SConscript")
+shared_objs += SConscript("util/SConscript")
+
+Return("shared_objs")
