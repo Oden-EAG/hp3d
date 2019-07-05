@@ -19,7 +19,7 @@ mesh_show.F90
 neig_edge.F
 neig_face.F90
 neig_show.F90
-nelcon.F
+nelcon.F90
 result.F
 set_nodal_dof.F90
 0

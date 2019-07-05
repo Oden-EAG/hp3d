@@ -4,34 +4,34 @@ subroutine hp3gen(Fp)
   use GMP
   use element_data
   use data_structure3D
-
-#include "syscom.blk"
-
+  !
+  implicit none
+  !
   ! input argument
   character(len=*) :: Fp
-
+  !
   ! element order (temporary)
   integer, dimension(:), allocatable :: nelem_order
-
+  !
   ! node BC flags
   integer, dimension(:), allocatable :: ibc_nod
-
+  !
   ! physical attributes of a node
   character(len=5), dimension(:), allocatable :: phys_vect
-
+  !
   ! edge, face orientations
-  dimension nedge_orient(12),nface_orient(6)
-
+  integer :: nedge_orient(12),nface_orient(6)
+  !
   ! neighbors of a point or curve
   integer, parameter :: max_neig=150
-  dimension neigbl(max_neig)
+  integer :: neigbl(max_neig)
   !
   !  ...BC for element faces an attribute
-  dimension ibc_elem(6)
+  integer :: ibc_elem(6)
   !
   !  ...faces adjacent to a vertex
-  dimension nofaces(4)
-  dimension x(NDIMEN)
+  integer :: nofaces(4)
+  real*8  :: x(NDIMEN)
   !
   !  ...physical attributes for an element or node
   character(len=5) :: phys
@@ -42,7 +42,13 @@ subroutine hp3gen(Fp)
   !  ...node type
   character(len=4) :: nod_type
   !
-  !general
+  !  ...auxiliary
+  integer :: iprint, iprint_vert, iprint_edge, iprint_face, iprint_mdle
+  integer :: nel, npri, nh, ntet, npyr, np, iv, is, if, ie, mdle
+  integer :: nt, nrbl, nbl, nr, lab, nord, nod_new, nbcond, nod, nrfaces
+  integer :: nb, nc, i, ib, iii, istat, icase, iphys, num, number
+  !
+  ! general
   iprint= -1;
   iprint_vert=0;  iprint_edge=0; iprint_face=0;  iprint_mdle=0
   !----------------------------------------------------------------------
@@ -734,7 +740,13 @@ end subroutine hp3gen
 subroutine copyBCflag(Nflag, IBCelem, IBCnod)
 !
 use data_structure3D
-#include "syscom.blk"
+!
+  implicit none
+!
+  integer, intent(in)    :: NFlag, IBCelem
+  integer, intent(inout) :: IBCnod
+!
+  integer :: loc
 !
   select case(Nflag)
 !

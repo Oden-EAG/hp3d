@@ -5,7 +5,7 @@ display_ref_kind.F90
 execute_pref.F
 perform_pref.F
 nodbreak.F90
-nodgen.F
+nodgen.F90
 nodmod.F
 p_refine.F90
 random_refine.F90
