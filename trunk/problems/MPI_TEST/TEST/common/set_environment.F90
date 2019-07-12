@@ -15,7 +15,7 @@
 !                                                                    
 !----------------------------------------------------------------------
 !
-   subroutine set_environment
+subroutine set_environment
 !    
    use environment
    use common_prob_data

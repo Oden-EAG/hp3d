@@ -1,3 +1,0 @@
-      parameter(MAXNRHS()=90)
-c
-c  ...maximum number of rhs

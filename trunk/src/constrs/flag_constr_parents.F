@@ -6,8 +6,9 @@ c----------------------------------------------------------------------
 c
 c   latest revision    - May 10
 c
-c   purpose            - routine flags parents of an element nodes
-c                        that must be unconstrained in constrained
+c   purpose            - routine flags ancestors of parents of
+c                        constrained nodes of an element that
+c                        must be unconstrained in constrained
 c                        approximation
 c
 c   arguments :

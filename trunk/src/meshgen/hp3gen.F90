@@ -4,34 +4,34 @@ subroutine hp3gen(Fp)
   use GMP
   use element_data
   use data_structure3D
-
-#include "syscom.blk"
-
+  !
+  implicit none
+  !
   ! input argument
   character(len=*) :: Fp
-
+  !
   ! element order (temporary)
   integer, dimension(:), allocatable :: nelem_order
-
+  !
   ! node BC flags
   integer, dimension(:), allocatable :: ibc_nod
-
+  !
   ! physical attributes of a node
   character(len=5), dimension(:), allocatable :: phys_vect
-
+  !
   ! edge, face orientations
-  dimension nedge_orient(12),nface_orient(6)
-
+  integer :: nedge_orient(12),nface_orient(6)
+  !
   ! neighbors of a point or curve
   integer, parameter :: max_neig=150
-  dimension neigbl(max_neig)
+  integer :: neigbl(max_neig)
   !
   !  ...BC for element faces an attribute
-  dimension ibc_elem(6)
+  integer :: ibc_elem(6)
   !
   !  ...faces adjacent to a vertex
-  dimension nofaces(4)
-  dimension x(NDIMEN)
+  integer :: nofaces(4)
+  real*8  :: x(NDIMEN)
   !
   !  ...physical attributes for an element or node
   character(len=5) :: phys
@@ -42,7 +42,13 @@ subroutine hp3gen(Fp)
   !  ...node type
   character(len=4) :: nod_type
   !
-  !general
+  !  ...auxiliary
+  integer :: iprint, iprint_vert, iprint_edge, iprint_face, iprint_mdle
+  integer :: nel, npri, nh, ntet, npyr, np, iv, is, ifc, ie, mdle
+  integer :: nt, nrbl, nbl, nr, lab, nord, nod_new, nbcond, nod, nrfaces
+  integer :: nb, nc, i, ib, iii, istat, icase, iphys, num, number
+  !
+  ! general
   iprint= -1;
   iprint_vert=0;  iprint_edge=0; iprint_face=0;  iprint_mdle=0
   !----------------------------------------------------------------------
@@ -50,7 +56,9 @@ subroutine hp3gen(Fp)
   if (iprint .eq. 1) then
      write(*,*) 'hp3gen: DEBUGGING'
   endif
-
+  !
+  x(1:NDIMEN) = 0.d0
+  !
   call read_input(Fp)
 
   !  ...total number of elements and middle nodes
@@ -95,37 +103,37 @@ subroutine hp3gen(Fp)
         ELEMS(nel)%nodes(6+ie) = NRELIS+NRPOINT &
              + iabs(PRISMS(npri)%EdgeNo(ie))
      enddo
-     do if=1,2
-        call decode(PRISMS(npri)%FigNo(if), nt,nface_orient(if))
-        ELEMS(nel)%nodes(15+if) = NRELIS+NRPOINT+NRCURVE  &
+     do ifc=1,2
+        call decode(PRISMS(npri)%FigNo(ifc), nt,nface_orient(ifc))
+        ELEMS(nel)%nodes(15+ifc) = NRELIS+NRPOINT+NRCURVE  &
              + NRRECTA+nt
         do is=1,2
            if (TRIANGLES(nt)%BlockNo(is).ne.npri*10+1) then
               call decode(TRIANGLES(nt)%BlockNo(is), nbl,lab)
               select case(lab)
               case(1)
-                 ELEMS(nel)%neig(if) = nbl
+                 ELEMS(nel)%neig(ifc) = nbl
               case(3)
-                 ELEMS(nel)%neig(if) = NRPRISM+NRHEXAS+nbl
+                 ELEMS(nel)%neig(ifc) = NRPRISM+NRHEXAS+nbl
               case(4)
-                 ELEMS(nel)%neig(if) = NRPRISM+NRHEXAS+NRTETRA+nbl
+                 ELEMS(nel)%neig(ifc) = NRPRISM+NRHEXAS+NRTETRA+nbl
               end select
            endif
         enddo
      enddo
-     do if=3,5
-        call decode(PRISMS(npri)%FigNo(if), nr,nface_orient(if))
-        ELEMS(nel)%nodes(15+if) = NRELIS+NRPOINT+NRCURVE+nr
+     do ifc=3,5
+        call decode(PRISMS(npri)%FigNo(ifc), nr,nface_orient(ifc))
+        ELEMS(nel)%nodes(15+ifc) = NRELIS+NRPOINT+NRCURVE+nr
         do is=1,2
            if (RECTANGLES(nr)%BlockNo(is).ne.npri*10+1) then
               call decode(RECTANGLES(nr)%BlockNo(is), nbl,lab)
               select case(lab)
               case(1)
-                 ELEMS(nel)%neig(if) = nbl
+                 ELEMS(nel)%neig(ifc) = nbl
               case(2)
-                 ELEMS(nel)%neig(if) = NRPRISM+nbl
+                 ELEMS(nel)%neig(ifc) = NRPRISM+nbl
               case(4)
-                 ELEMS(nel)%neig(if) = NRPRISM+NRHEXAS+NRTETRA+nbl
+                 ELEMS(nel)%neig(ifc) = NRPRISM+NRHEXAS+NRTETRA+nbl
               end select
            endif
         enddo
@@ -154,19 +162,19 @@ subroutine hp3gen(Fp)
         ELEMS(nel)%nodes(8+ie) =  &
              NRELIS+NRPOINT+iabs(HEXAS(nh)%EdgeNo(ie))
      enddo
-     do if=1,6
-        call decode(HEXAS(nh)%FigNo(if), nr,nface_orient(if))
-        ELEMS(nel)%nodes(20+if) = NRELIS+NRPOINT+NRCURVE+nr
+     do ifc=1,6
+        call decode(HEXAS(nh)%FigNo(ifc), nr,nface_orient(ifc))
+        ELEMS(nel)%nodes(20+ifc) = NRELIS+NRPOINT+NRCURVE+nr
         do is=1,2
            if (RECTANGLES(nr)%BlockNo(is).ne.nh*10+2) then
               call decode(RECTANGLES(nr)%BlockNo(is), nbl,lab)
               select case(lab)
               case(1)
-                 ELEMS(nel)%neig(if) = nbl
+                 ELEMS(nel)%neig(ifc) = nbl
               case(2)
-                 ELEMS(nel)%neig(if) = NRPRISM+nbl
+                 ELEMS(nel)%neig(ifc) = NRPRISM+nbl
               case(4)
-                 ELEMS(nel)%neig(if) = NRPRISM+NRHEXAS+NRTETRA+nbl
+                 ELEMS(nel)%neig(ifc) = NRPRISM+NRHEXAS+NRTETRA+nbl
               end select
            endif
         enddo
@@ -195,19 +203,19 @@ subroutine hp3gen(Fp)
         ELEMS(nel)%nodes(4+ie) = NRELIS+NRPOINT &
              + iabs(TETRAS(ntet)%EdgeNo(ie))
      enddo
-     do if=1,4
-        call decode(TETRAS(ntet)%FigNo(if), nt,nface_orient(if))
-        ELEMS(nel)%nodes(10+if) = NRELIS+NRPOINT+NRCURVE+NRRECTA+nt
+     do ifc=1,4
+        call decode(TETRAS(ntet)%FigNo(ifc), nt,nface_orient(ifc))
+        ELEMS(nel)%nodes(10+ifc) = NRELIS+NRPOINT+NRCURVE+NRRECTA+nt
         do is=1,2
            if (TRIANGLES(nt)%BlockNo(is).ne.ntet*10+3) then
               call decode(TRIANGLES(nt)%BlockNo(is), nbl,lab)
               select case(lab)
               case(1)
-                 ELEMS(nel)%neig(if) = nbl
+                 ELEMS(nel)%neig(ifc) = nbl
               case(3)
-                 ELEMS(nel)%neig(if) = NRPRISM+NRHEXAS+nbl
+                 ELEMS(nel)%neig(ifc) = NRPRISM+NRHEXAS+nbl
               case(4)
-                 ELEMS(nel)%neig(if) = NRPRISM+NRHEXAS+NRTETRA+nbl
+                 ELEMS(nel)%neig(ifc) = NRPRISM+NRHEXAS+NRTETRA+nbl
               end select
            endif
         enddo
@@ -251,19 +259,19 @@ subroutine hp3gen(Fp)
            end select
         endif
      enddo
-     do if=2,5
-        call decode(PYRAMIDS(npyr)%FigNo(if), nt,nface_orient(if))
-        ELEMS(nel)%nodes(13+if) = NRELIS+NRPOINT+NRCURVE+NRRECTA+nt
+     do ifc=2,5
+        call decode(PYRAMIDS(npyr)%FigNo(ifc), nt,nface_orient(ifc))
+        ELEMS(nel)%nodes(13+ifc) = NRELIS+NRPOINT+NRCURVE+NRRECTA+nt
         do is=1,2
            if (TRIANGLES(nt)%BlockNo(is).ne.npyr*10+4) then
               call decode(TRIANGLES(nt)%BlockNo(is), nbl,lab)
               select case(lab)
               case(1)
-                 ELEMS(nel)%neig(if) = nbl
+                 ELEMS(nel)%neig(ifc) = nbl
               case(3)
-                 ELEMS(nel)%neig(if) = NRPRISM+NRHEXAS+nbl
+                 ELEMS(nel)%neig(ifc) = NRPRISM+NRHEXAS+nbl
               case(4)
-                 ELEMS(nel)%neig(if) = NRPRISM+NRHEXAS+NRTETRA+nbl
+                 ELEMS(nel)%neig(ifc) = NRPRISM+NRHEXAS+NRTETRA+nbl
               end select
            endif
         enddo
@@ -309,7 +317,7 @@ subroutine hp3gen(Fp)
      case('pyra'); nod_type='mdld'
      end select
      !
-     call nodgen(nod_type,icase,nbcond,-nel,nord,0,1,x, nod)
+     call nodgen(nod_type,icase,nbcond,-nel,nord,0,-1,1,x, nod)
      if (nod_new.ne.nod) then
         write(*,*) 'hp3gen: nod_new,nod = ',nod_new,nod
         stop 1
@@ -388,8 +396,8 @@ subroutine hp3gen(Fp)
            !           use element face BC flags to establish BC flag for the
            !           point
            do i=1,nrfaces
-              if = nofaces(i)
-              call copyBCflag(1,ibc_elem(if), ibc_nod(iii))
+              ifc = nofaces(i)
+              call copyBCflag(1,ibc_elem(ifc), ibc_nod(iii))
            enddo
         enddo
      enddo
@@ -399,7 +407,7 @@ subroutine hp3gen(Fp)
      !  .....encode BC flags for the node into a single nickname
      call encod(ibc_nod,10,NR_PHYSA, nbcond)
      !
-     call nodgen('vert',icase,nbcond,-nel,1,0,1,x, nod)
+     call nodgen('vert',icase,nbcond,-nel,1,0,-1,1,x, nod)
      if (nod_new.ne.nod) then
         write(*,*) 'hp3gen: nod_new,nod = ',nod_new,nod
         stop 1
@@ -481,8 +489,8 @@ subroutine hp3gen(Fp)
            !           use element face BC flags to establish BC flag for the
            !           mid-edge node
            do i=1,2
-              if = nofaces(i)
-              call copyBCflag(2,ibc_elem(if), ibc_nod(iii))
+              ifc = nofaces(i)
+              call copyBCflag(2,ibc_elem(ifc), ibc_nod(iii))
            enddo
         enddo
         !
@@ -496,7 +504,7 @@ subroutine hp3gen(Fp)
      !  .....encode BC flags for the node into a single nickname
      call encod(ibc_nod,10,NR_PHYSA, nbcond)
      !
-     call nodgen('medg',icase,nbcond,-nel,nord,0,1,x, nod)
+     call nodgen('medg',icase,nbcond,-nel,nord,0,-1,1,x, nod)
      if (nod_new.ne.nod) then
         write(*,*) 'hp3gen: nod_new,nod = ',nod_new,nod
         stop 1
@@ -555,7 +563,7 @@ subroutine hp3gen(Fp)
         !  ...determine face local number
         call locate(nod_new, &
              ELEMS(nel)%nodes(nvert(type)+nedge(type)+1), &
-             nface(type), if)
+             nface(type), ifc)
 
         !  ...loop through neighbor's physical attributes
         do iphys=1,ELEMS(nel)%nrphysics
@@ -566,12 +574,12 @@ subroutine hp3gen(Fp)
            call decodg(ELEMS(nel)%bcond(iphys),10,nface(type), ibc_elem)
 
            !  ...copy face BC flag to GLOBAL list associated to the face node
-           call copyBCflag(3,ibc_elem(if), ibc_nod(iii))
+           call copyBCflag(3,ibc_elem(ifc), ibc_nod(iii))
         enddo
         !
         mdle = nel
         call decodg(ELEMS(nel)%face_orient,8,nface(type),nface_orient)
-        call min_order(type,3,if,nface_orient(if),NODES(mdle)%order, &
+        call min_order(type,3,ifc,nface_orient(ifc),NODES(mdle)%order, &
              nord)
 
      !  ...end of loop through neighboring blocks
@@ -582,7 +590,7 @@ subroutine hp3gen(Fp)
      !  ...encode BC flags for the node into a single nickname
      call encod(ibc_nod,10,NR_PHYSA, nbcond)
      !
-     call nodgen('mdlq',icase,nbcond,-nel,nord,0,1,x, nod)
+     call nodgen('mdlq',icase,nbcond,-nel,nord,0,-1,1,x, nod)
      if (nod_new.ne.nod) then
         write(*,*) 'hp3gen: nod_new,nod = ',nod_new,nod
         stop 1
@@ -647,7 +655,7 @@ subroutine hp3gen(Fp)
         !  .......determine adjacent face
         call locate(nod_new, &
              ELEMS(nel)%nodes(nvert(type)+nedge(type)+1), &
-             nface(type), if)
+             nface(type), ifc)
         !
         !  .......loop through the element physics attributes
         do iphys=1,ELEMS(nel)%nrphysics
@@ -657,12 +665,12 @@ subroutine hp3gen(Fp)
            !  .........decode the BC flags for the faces
            call decodg(ELEMS(nel)%bcond(iphys),10,nface(type), &
                 ibc_elem)
-           call copyBCflag(3,ibc_elem(if), ibc_nod(iii))
+           call copyBCflag(3,ibc_elem(ifc), ibc_nod(iii))
         enddo
         !
         mdle = nel
         call decodg(ELEMS(nel)%face_orient,8,nface(type),nface_orient)
-        call min_order(type,3,if,nface_orient(if),NODES(mdle)%order,  &
+        call min_order(type,3,ifc,nface_orient(ifc),NODES(mdle)%order,  &
              nord)
      enddo
      !
@@ -671,7 +679,7 @@ subroutine hp3gen(Fp)
      !  .....encode BC flags for the node into a single nickname
      call encod(ibc_nod,10,NR_PHYSA, nbcond)
      !
-     call nodgen('mdlt',icase,nbcond,-nel,nord,0,1,x, nod)
+     call nodgen('mdlt',icase,nbcond,-nel,nord,0,-1,1,x, nod)
 
      if (nod_new.ne.nod) then
         write(*,*) 'hp3gen: nod_new,nod = ',nod_new,nod
@@ -734,7 +742,13 @@ end subroutine hp3gen
 subroutine copyBCflag(Nflag, IBCelem, IBCnod)
 !
 use data_structure3D
-#include "syscom.blk"
+!
+  implicit none
+!
+  integer, intent(in)    :: NFlag, IBCelem
+  integer, intent(inout) :: IBCnod
+!
+  integer :: loc
 !
   select case(Nflag)
 !

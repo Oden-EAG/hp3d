@@ -1,5 +1,0 @@
-c  ...parameters for logic:
-c     ~~~~~~~~~~~~~~~~~~~~~
-      common /clogicP/ Nod1(20),Nod2(40),Ndof2P(20),
-     .                 NrconP(NDOFMAXP),NacP(NACDIM,NDOFMAXP),
-     .                 ConstrP(NACDIM,NDOFMAXP)

@@ -14,7 +14,7 @@ findmin.F
 int2str.F90
 iwrap.F
 keep_time.F
-locate.F
+locate.F90
 locate_char.F
 number_active_nodes.F90
 number_vert_on_visit.F90

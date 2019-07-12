@@ -4,7 +4,7 @@
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision    - Jul 18
+!    latest revision    - July 2019
 !
 !    purpose            - routine updates values of solution degrees
 !                         of freedom for Dirichlet nodes
@@ -16,7 +16,9 @@
 subroutine update_Ddof()
 !
    use data_structure3D
-   use environment, only : QUIET_MODE
+   use environment, only: QUIET_MODE
+   use par_mesh   , only: DISTRIBUTED
+   use MPI_param  , only: RANK
 !
    implicit none
 !
@@ -45,21 +47,38 @@ subroutine update_Ddof()
    real*8 :: start, OMP_get_wtime
 !
 !..auxiliary array with active mdle nodes
-   integer, dimension(NRELES) :: mdlea
+   integer, dimension(NRELES) :: mdlel
 !
 !..auxiliary variables
    integer :: iel, iv, ie, ifc, ind, iflag
    integer :: k, mdle, nf, no, nod
+!
+!..number of elements in subdomain
+   integer :: nreles_subd, subd
 !
 !-----------------------------------------------------------------------
 !
    start = OMP_get_wtime()
 !
 !..fetch active elements
-   call nelcon(0, mdlea(1))
-   do iel=2,NRELES
-      call nelcon(mdlea(iel-1), mdlea(iel))
-   enddo
+   mdle = 0;
+   if (DISTRIBUTED .eq. 1) then
+      nreles_subd = 0
+      do iel=1,NRELES
+         call nelcon(mdle, mdle)
+         call get_subd(mdle, subd)
+         if (subd .eq. rank) then
+            nreles_subd = nreles_subd + 1
+            mdlel(nreles_subd) = mdle
+         endif
+      enddo
+   else
+      do iel=1,NRELES
+         call nelcon(mdle, mdle)
+         mdlel(iel) = mdle
+      enddo
+      nreles_subd = NRELES
+   endif
 !
 !-----------------------------------------------------------------------
 !..Begin parallel OpenMP environment
@@ -81,8 +100,8 @@ subroutine update_Ddof()
 !  Step 1: Update   V E R T   dof for Dirichlet nodes
 !
 !$OMP DO SCHEDULE(DYNAMIC)
-   do iel=1,NRELES
-      mdle = mdlea(iel)
+   do iel=1,nreles_subd
+      mdle = mdlel(iel)
       call refel(mdle, iflag,no,xsub)
       call elem_nodes(mdle, nodesl,norientl)
       do iv=1,nvert(NODES(mdle)%type)
@@ -110,8 +129,8 @@ subroutine update_Ddof()
 !  Step 2: Update   E D G E   dof for Dirichlet nodes
 !
 !$OMP DO SCHEDULE(DYNAMIC)
-   do iel=1,NRELES
-      mdle = mdlea(iel)
+   do iel=1,nreles_subd
+      mdle = mdlel(iel)
       call refel(mdle, iflag,no,xsub)
       call elem_nodes(mdle, nodesl,norientl)
       call find_orient(mdle, nedge_orient,nface_orient)
@@ -163,8 +182,8 @@ subroutine update_Ddof()
 !  Step 3: Update   F A C E   dof for Dirichlet nodes
 !
 !$OMP DO SCHEDULE(DYNAMIC)
-   do iel=1,NRELES
-      mdle = mdlea(iel)
+   do iel=1,nreles_subd
+      mdle = mdlel(iel)
       call refel(mdle, iflag,no,xsub)
       call elem_nodes(mdle, nodesl,norientl)
       call find_orient(mdle, nedge_orient,nface_orient)
@@ -231,6 +250,7 @@ subroutine update_Ddof()
    enddo
 !$OMP END DO
 !$OMP END PARALLEL
+
 !
 !-----------------------------------------------------------------------
 !

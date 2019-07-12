@@ -14,7 +14,7 @@
 module mumps
 !
 !
-include 'mpif.h'
+use MPI
 !
 #if C_MODE
    include 'zmumps_struc.h'

@@ -6,24 +6,27 @@
 !! @param[in ] Kfilter   - refinement filter
 !! @param[in ] Nord      - order of approximation for the node
 !! @param[in ] Nbc       - BC flags
+!! @param[in ] Nbc       - BC flags
+!! @param[in ] Subd      - subdomain of node
 !! @param[out] Nrsons    - number of sons
 !! @param[out] Type_sons - son type
 !! @param[out] Norder    - order of approximation for sons
 !! @param[out] Nfilter   - refinement filter for sons
 !! @param[out] Nbcond    - BC flags for sons
+!! @param[out] Nsubd     - subdomain for sons
 !!
 !! rev@Dec 12
 !---------------------------------------------------------------------------------------------
-subroutine set_break(Type_nod,Kref,Kfilter,Nord,Nbc, Nrsons,Type_sons,Norder,Nfilter,Nbcond)
+subroutine set_break(Type_nod,Kref,Kfilter,Nord,Nbc,Subd, Nrsons,Type_sons,Norder,Nfilter,Nbcond,Nsubd)
   implicit none
 ! 
   character(len=4),                intent(in)  :: Type_nod
-  integer,                         intent(in)  :: Kref, Kfilter, Nord, Nbc
+  integer,                         intent(in)  :: Kref, Kfilter, Nord, Nbc, Subd
 !
-  integer,          dimension(27), intent(out) :: Norder, Nbcond, Nfilter
+  integer,          dimension(27), intent(out) :: Norder, Nbcond, Nfilter, Nsubd
   integer,                         intent(out) :: Nrsons
   character(len=4), dimension(27), intent(out) :: Type_sons
-
+!
 ! initialize refinement filter for sons
   Nfilter=0
   select case (Type_nod)
@@ -49,5 +52,10 @@ subroutine set_break(Type_nod,Kref,Kfilter,Nord,Nbc, Nrsons,Type_sons,Norder,Nfi
 ! BC flags are inherited directly from the father node
   Nbcond(1:Nrsons)=Nbc
 !
+! inherit subdomain from middle node father
+  Nsubd(1:27) = -1
+  select case (Type_nod)
+  case('mdlb','mdln','mdlp','mdld') ; Nsubd(1:Nrsons) = Subd
+  endselect
 !
 endsubroutine set_break

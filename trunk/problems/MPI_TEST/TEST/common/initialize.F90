@@ -16,6 +16,7 @@ subroutine initialize
   use paraview
   !
   implicit none
+  !
   !--------------------------------------------------------------------------
   ! G E O M E T R Y    S E T T I N G
   integer, parameter :: NDIM_PROB    = 3    ! Dimension
@@ -42,8 +43,8 @@ subroutine initialize
   integer :: iflag,i,INTEGRATION_tmp
   character(len=1024) :: argv
   !--------------------------------------------------------------------------
-  ! output file open for the history of refinements
-  call open_history_file(trim(FILE_HISTORY))
+  ! output file open for the history of refinements (not for MPI)
+  !call open_history_file(trim(FILE_HISTORY))
   !
   ! initialize refinements arrays
   call init_refinements(trim(FILE_REFINE))
@@ -59,9 +60,7 @@ subroutine initialize
   ! alternatively one could set this manually if desired (depends on problem)
   !
   ! read physics file quietly first to automatically setup equation settings
-  QUIET_MODE = .FALSE.
   call read_input(trim(FILE_PHYS))
-  QUIET_MODE = .FALSE.
   !
   ! setup equation settings based on physics data and common problem data
   MAXNRHS_PROB = NR_RHS_PROB !from common_prob_data
