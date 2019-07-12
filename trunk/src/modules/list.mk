@@ -12,11 +12,13 @@ error.F90
 kinds.F90
 locker.F90
 math_constants.F90
+mpi_param.F90
 node_types.F90
 parallelism.F
 paraview.F90
 parameters.F90
 parametersDPG.F90
+par_mesh.F90
 physics.F90
 quick_sort.F90
 refinements.F90

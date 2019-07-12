@@ -3,7 +3,6 @@
 
 # Other
 *.blk
-*.mk
 *.mk.old
 .dummy
 

@@ -12,7 +12,7 @@ c
 c
 c  ...parameters
       integer, parameter :: NHIST = 20
-
+c
 c  ...dirichlet data set up
       integer, save :: NR_DIRICHLET_LIST = 0
       integer, save, dimension(20) :: DIRICHLET_LIST
@@ -26,7 +26,7 @@ c
 c  ...total number of active H1,H(curl),H(div),L2 dofs
       integer, save :: NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ
 c
-c  ...maximum number of nodes, pointer to the first free entry in NODES,
+c  ...maximum number of nodes, pointer to the first free entry in NODES
       integer, save :: MAXNODS,NPNODS
 c
 c----------------------------------------------------------------------
@@ -136,6 +136,9 @@ c  .....activation flag
 c
 c  .....locker number
         integer          :: lock
+c
+c  .....subdomain number (distributed mesh)
+        integer          :: subd
 c
 c  .....geometry dof
         real*8, dimension(:,:), pointer :: coord
@@ -782,6 +785,38 @@ c
       enddo
 c
       end subroutine reset_visit
+c
+c
+c  ...get visitation flag for a node
+      subroutine get_visit(Nod, Vis)
+c
+      integer, intent(in)  :: Nod
+      integer, intent(out) :: Vis
+c
+      Vis = NODES(Nod)%visit
+c
+      end subroutine
+c
+c-----------------------------------------------------------------------
+c
+c  ...get current subdomain of a node
+      subroutine get_subd(Nod, Subd)
+c
+      integer, intent(in)  :: Nod
+      integer, intent(out) :: Subd
+c
+      Subd = NODES(Nod)%subd
+c
+      end subroutine
+c
+c  ...set new subdomain of a node
+      subroutine set_subd(Nod,Subd)
+c
+      integer, intent(in) :: Nod,Subd
+c
+      NODES(Nod)%subd = Subd
+c
+      end subroutine
 c
 c-----------------------------------------------------------------------
       function Is_dirichlet(Nod)

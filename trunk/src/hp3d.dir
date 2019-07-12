@@ -4,6 +4,7 @@ datstrs
 hpinterp
 meshgen
 meshmod
+mpi
 parallel
 solver
 0

@@ -3,7 +3,7 @@
 !!                        Rule 1: no element can be broken unless
 !!                                ALL its mid-face nodes are active
 !!                        Rule 2: an element refinement flag is
-!!                                always upgraded to accomodate
+!!                                always upgraded to accommodate
 !!                                existing refinements of faces
 !! @param[in] Mdle_in - middle node
 !! @param[in] Kref_in - refinement kind
@@ -32,7 +32,6 @@ subroutine refine(Mdle_in,Kref_in)
   logical :: iflag, ideadlock
   !---------------------------------------------------------------------
   iprint=0
-
   if (iprint.ge.1) then
      write(*,*) 'refine: BEGIN Mdle_in,Kref_in, ISO  = ', &
           Mdle_in, Kref_in, is_iso_only()
@@ -46,13 +45,10 @@ subroutine refine(Mdle_in,Kref_in)
   !---------------------------------------------------------------------
   ! ISO ONLY - do not use shelf algorithm
   !---------------------------------------------------------------------
-  if ( is_iso_only() ) then  ! what the hell is that ??????
-     ! ignore given refinement flag
+  if ( is_iso_only() ) then
      call get_isoref(Mdle_in, krefm)
-  !    call break(Mdle_in, krefm)
-  !    return
   else
-    krefm = Kref_in
+     krefm = Kref_in
   endif
 
   !---------------------------------------------------------------------
@@ -66,7 +62,7 @@ subroutine refine(Mdle_in,Kref_in)
   NODES(mdle_list(n))%visit = kref_list(n)
 
   !---------------------------------------------------------------------
-  ! Loop over queue until queue is empty - check quad face only!!!
+  ! Loop over queue until queue is empty - check faces only
   !---------------------------------------------------------------------
   do while (n.gt.0)
 
@@ -225,14 +221,12 @@ subroutine refine(Mdle_in,Kref_in)
      if (iflag) then
 
         call find_element_ref(type,kref,kreff, krefm)
-        ! kyungjoo :: recover this after I complete anisotropic constrained approx
 
-      if ( is_iso_only() ) then 
-        call get_isoref(mdle, krefm)
-      endif  
+        if ( is_iso_only() ) then
+           call get_isoref(mdle, krefm)
+        endif
 
         if (NODES(mdle)%ref_filter.ne.0) then
-!!!           write(*,*)'mdle,filter = ',mdle,NODES(mdle)%ref_filter
            krefm = NODES(mdle)%ref_filter
         endif
 
