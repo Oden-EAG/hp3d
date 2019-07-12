@@ -461,9 +461,11 @@
 !
 !
    subroutine mumps_solve(inz,M_A,M_I,M_J,M_b,Nrdof,NR_RHS)
-!      
+!
+   use MPI
+!
    implicit none
-   include 'mpif.h'
+!
    integer NR_RHS
 #if C_MODE
    include 'zmumps_struc.h'

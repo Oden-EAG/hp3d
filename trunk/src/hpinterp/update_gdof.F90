@@ -47,7 +47,7 @@ subroutine update_gdof()
    real*8 :: start, OMP_get_wtime
 !
 !..auxiliary array with active mdle nodes
-   integer, dimension(NRELES) :: mdlea
+   integer, dimension(NRELES) :: mdlel
 !
 !..auxiliary variables
    integer :: iel, iv, ie, ifc, ind, iflag, i, k, loc
@@ -65,9 +65,10 @@ subroutine update_gdof()
 !-----------------------------------------------------------------------  
 !
 !..fetch active elements
-   call nelcon(0, mdlea(1))
-   do iel=2,NRELES
-      call nelcon(mdlea(iel-1), mdlea(iel))
+   mdle = 0
+   do iel=1,NRELES
+      call nelcon(mdle, mdle)
+      mdlel(iel) = mdle
    enddo
 !
 !-----------------------------------------------------------------------
@@ -81,7 +82,7 @@ subroutine update_gdof()
 !  ...loop through active elements
       do 100 iel=1,NRELES
 !
-         mdle = mdlea(iel)
+         mdle = mdlel(iel)
          call find_elem_type(mdle, mdltype)
 !
 !     ...skip if the element has already been processed
@@ -200,7 +201,7 @@ subroutine update_gdof()
 !$OMP         no,norder,ntype,xnod,xsub)                    &
 !$OMP SCHEDULE(DYNAMIC)
    do iel=1,NRELES
-      mdle = mdlea(iel)
+      mdle = mdlel(iel)
       if (.not.associated(NODES(mdle)%coord)) cycle
       call find_elem_type(mdle, mdltype)
       if (mdltype .ne. 'Linear') then

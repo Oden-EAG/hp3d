@@ -4,8 +4,8 @@ SUBROUTINE mumps_solve_assembled(numrhs)
   USE element_data
   USE assembly
   USE control, ONLY: ISYM_FLAG
+  USE MPI
   IMPLICIT NONE
-  INCLUDE 'mpif.h'
 #if C_MODE
   INCLUDE 'zmumps_struc.h'
   TYPE(zmumps_struc) :: mumps_par

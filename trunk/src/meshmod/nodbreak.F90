@@ -20,7 +20,7 @@ subroutine nodbreak(Nod,Kref,Iact,Novert,Nr_vert)
 ! Local variables
   real*8,           dimension(3)  :: x
   character(len=4), dimension(27) :: type
-  integer,          dimension(27) :: norder, nfilter, nbcond 
+  integer,          dimension(27) :: norder, nfilter, nbcond, nsubd
   integer                         :: nrsons, iprint, i
 !
 !-------------------------------------------------------------------------
@@ -34,9 +34,9 @@ subroutine nodbreak(Nod,Kref,Iact,Novert,Nr_vert)
   endif
 !
 ! record refinement kind
-  NODES(Nod)%ref_kind=Kref 
+  NODES(Nod)%ref_kind=Kref
 !
-! use the face or element centroid as an initial guess for the geoemtry dofs
+! use the face or element centroid as an initial guess for the geometry dofs
   x(1:3)=0.d0
   if (Nr_vert.gt.0) then
      do i=1,Nr_vert
@@ -60,7 +60,8 @@ subroutine nodbreak(Nod,Kref,Iact,Novert,Nr_vert)
                   NODES(Nod)%ref_filter,                  &
                   NODES(Nod)%order,                       &
                   NODES(Nod)%bcond,                       &
-                  nrsons, type, norder, nfilter, nbcond )
+                  NODES(Nod)%subd,                        &
+                  nrsons, type, norder, nfilter, nbcond, nsubd )
 !
 ! generate the son nodes
   allocate(NODES(Nod)%sons(nrsons))
@@ -71,6 +72,7 @@ subroutine nodbreak(Nod,Kref,Iact,Novert,Nr_vert)
                   Nod,                                    &
                   norder(i),                              &
                   nfilter(i),                             &
+                  nsubd(i),                               &
                   Iact,                                   &
                   x,                                      &
                   NODES(Nod)%sons(i) )

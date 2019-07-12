@@ -66,7 +66,7 @@ subroutine close_mesh()
      endif
 
      mdle=0; ic=0
-     do i=1, NRELES
+     do i=1,NRELES
 
         call nelcon(mdle, mdle)
         call elem_nodes(mdle, nodesl,norientl)

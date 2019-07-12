@@ -1,12 +1,12 @@
 !-------------------------------------------------------------------------
 !> Purpose : routine breaks an element middle node according to a given 
-!!           refinement flag. Compatability is assumed across the faces
+!!           refinement flag. Compatibility is assumed across the faces
 !!           and the edges.
 !!
 !> @param[in] Mdle - middle node
 !> @param[in] Kref - refinement flag
 !!
-!> rev@Jan 13
+!> rev@July 2019
 !-------------------------------------------------------------------------
 !
 subroutine break(Mdle,Kref)
@@ -14,11 +14,13 @@ subroutine break(Mdle,Kref)
   use data_structure3D
   use element_data
   use refinements
+  use par_mesh  , only: DISTRIBUTED
+  use MPI_param , only: RANK
 !  
   implicit none
-  !
+!
   integer, intent(in) :: Mdle, Kref
-  !
+!
   character(len=4)        :: type
   integer, dimension(27)  :: nodesl,norientl
   integer, dimension(8)   :: novert
@@ -27,7 +29,8 @@ subroutine break(Mdle,Kref)
   integer, dimension(4)   :: iv
   integer, dimension(4,6) :: neig
   integer :: i,j, is, iprint, iact, iface, ipass
-  integer :: kref_face, nod, nr_vert, nrsons
+  integer :: kref_face, kref_edge, nod, nr_vert, nrsons, subd
+!
 !-------------------------------------------------------------------------
 !
   iprint = 0
@@ -70,8 +73,9 @@ subroutine break(Mdle,Kref)
         nr_vert=2
 !       collect edge vertex nodes        
         do j=1,2 ; novert(j) = nodesl(iv(j)) ; enddo
-!       break edge        
-        call nodbreak(nod,1,0,novert,nr_vert)
+!       break edge
+        iact = 0; kref_edge = 1
+        call nodbreak(nod,kref_edge,iact,novert,nr_vert)
      endif
   enddo
 !
@@ -112,13 +116,11 @@ subroutine break(Mdle,Kref)
         kref_face=kref_face-NODES(nod)%ref_kind
 !
 !       by default, generate INACTIVE son nodes
-        iact=0   
-        ! REMARK : geometry dofs do not need to be generated for inactive nodes,
-        ! hence we can set nr_vert=0 in the following lines of code.
+        iact=0
 !
 !       existing refinement coincides with desired refinement
         if (kref_face.eq.0) then
-           call activate_sons(nod)
+!          do nothing, do not activate
 !
 !       existing refinement does NOT coincide with desired refinement
         else
@@ -137,16 +139,15 @@ subroutine break(Mdle,Kref)
                  call nodbreak(nod,kref_face,iact,novert,nr_vert)
 !             ANISOTROPICALLY REFINED face : break son quads and son edge
               case(10,01)
-                 call activate_sons(nod)
 !                loop over son quads and generate INACTIVE son nodes                 
                  do is=1,2
                     nr_vert=0
                     call nodbreak(NODES(nod)%sons(is),kref_face, &
-                                  0,novert,nr_vert)
+                                  iact,novert,nr_vert)
                  enddo
 !                break edge node                 
                  nr_vert=4
-                 call nodbreak(NODES(nod)%sons(3),1,0,novert,nr_vert)
+                 call nodbreak(NODES(nod)%sons(3),kref_edge,iact,novert,nr_vert)
               endselect
            endselect
         endif
@@ -165,10 +166,12 @@ subroutine break(Mdle,Kref)
      do j=1,8 ; novert(j)=nodesl(j) ; enddo
   endif
 !  
-! break middle node  
-  call nodbreak(Mdle,Kref,1,novert,nr_vert)
+! break middle node
+  iact = 0
+  call nodbreak(Mdle,Kref,iact,novert,nr_vert)
+!
   call activate_sons(Mdle)
-
+!
   call deactivate(Mdle)
 !
 ! update the number of active elements
@@ -180,9 +183,7 @@ subroutine break(Mdle,Kref)
      write(*,7100) Mdle, NODES(Mdle)%type, Kref
   endif
 !
-!
 end subroutine break
-!
 !
 !
 !------------------------------------------------------------------------
@@ -193,9 +194,12 @@ end subroutine break
 !
 subroutine activate_sons(Nod)
   use data_structure3D
+!
   implicit none
+!
   integer, intent(in) :: Nod
   integer :: nrsons, i
+!
 !------------------------------------------------------------------------
 !
   call find_nsons(Nod, nrsons)
@@ -203,6 +207,5 @@ subroutine activate_sons(Nod)
   do i=1,nrsons
      call activate(NODES(Nod)%sons(i))
   enddo
-!
 !
 end subroutine activate_sons

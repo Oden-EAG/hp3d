@@ -24,8 +24,9 @@ subroutine get_isoref(Nod, Kref)
             reshape( (/1,6, 3,5, 4,2/), (/2,3/) )
        integer :: iprint, iflag, no, i,j,k, loc
 !---------------------------------------------------------------------------------       
-!       
-      iprint =0
+!
+      Kref = 0
+      iprint = 0
 !     
 !  ...if refinement filter, then return
       if (NODES(Nod)%ref_filter.ne.0) then

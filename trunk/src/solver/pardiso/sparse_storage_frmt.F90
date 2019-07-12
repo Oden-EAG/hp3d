@@ -139,7 +139,7 @@ end subroutine get_pointers
 !
 !    latest revision:   - Jul 2018
 !
-!    purpose:           - sorts an array of triples (row,col,val) and
+!    purpose:           - sorts an array of triplets (row,col,val) and
 !                         subsequently removes (row,col) duplicates by
 !                         reduction (sum) over val
 !
