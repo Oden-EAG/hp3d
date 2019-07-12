@@ -15,9 +15,9 @@ program main
    use assembly
    use m_assembly
 !
-   implicit none
+   use MPI
 !
-include 'mpif.h'
+   implicit none
 !
 !..declare variables
    real*8  :: err,rnorm,rvoid,factor,geo_err,geo_rnorm

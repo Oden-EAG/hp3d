@@ -10,28 +10,27 @@
 !                                                                    
 !----------------------------------------------------------------------
 !    
-   program main
+program main
 !
    use environment
    use common_prob_data
    use data_structure3D
    use GMP
 !
+   use MPI      , only: MPI_COMM_WORLD
+   use MPI_param, only: ROOT,RANK,NUM_PROCS, &
+                        MPI_param_init,MPI_param_finalize
+!
    implicit none
 !
-include 'mpif.h'
-!
-   integer :: idec, i
-!
-!..OMP variables
-   integer :: num_threads, omp_get_num_threads
-!
-!..MPI variables
-   integer ierr, num_procs, rank
+!..auxiliary variables
+   integer :: i, ierr, req, ret
 !
 !----------------------------------------------------------------------
 !
-!..initialization
+!..Initialize MPI environment
+   call MPI_param_init
+!
 !..Set common hp3D environment parameters (reads in options arguments)
    call begin_environment  ! <-- found inside src/modules/environment.F90
 !
@@ -43,55 +42,112 @@ include 'mpif.h'
 !..Exit if this is a "dry run"
    call end_environment  ! <-- found inside src/modules/environment.F90
 !
-!..Before this line, everything is executed by every MPI proc
+   if (RANK .eq. ROOT) then
+!  ...print header
+      write(6,*)
+      write(6,*) '//                          //'
+      write(6,*) '// --  MPI TEST PROGRAM  -- //'
+      write(6,*) '//                          //'
+      write(6,*)
+   endif
 !
-!..MPI
-   call MPI_INIT ( ierr )
-!..find out my rank (process id)
-   call MPI_COMM_RANK (MPI_COMM_WORLD, rank, ierr)
-   call MPI_COMM_SIZE (MPI_COMM_WORLD, num_procs, ierr)
-   write(*,1010) "Hello world! My MPI Rank is ", rank, " out of ", num_procs, " processes."
- 1010 format (A,I2,A,I2,A)
-
-   call MPI_Barrier (MPI_COMM_WORLD, ierr)
+   flush(6)
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+!
+   write(6,1010) "Hello world! My MPI RANK is ", RANK, " out of ", NUM_PROCS, " processes."
+ 1010 format (A,I3,A,I3,A)
+   flush(6)
+!
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 !..printing in order
 !..this does not guarantee printing in order
 !..but it is "more likely" to print in order
 !..how "fast" print statements are written to stdout depends
 !..on the mpi implementation and runtime environment
-   do i = 0, num_procs-1
-      if (rank == i .and. rank == 0) then
-         write(*,1020) "Master proc [", rank, "]"
-      else if (rank == i) then
-         write(*,1020) "Slave  proc [", rank, "]"
+   do i = 0, NUM_PROCS-1
+      if (RANK == i .and. RANK == ROOT) then
+         write(6,*)
+         write(6,1020) "Master proc [", RANK, "], initialize.."
+         QUIET_MODE = .FALSE.
+         call initialize
+      else if (RANK == i) then
+         write(6,1020) "Worker proc [", RANK, "], initialize.."
+         QUIET_MODE = .TRUE.
+         call initialize
+         QUIET_MODE = .FALSE.
       else
       endif
-      call MPI_Barrier (MPI_COMM_WORLD, ierr)
+      flush(6)
+      call MPI_BARRIER (MPI_COMM_WORLD, ierr)
    enddo
- 1020 format (A,I2,A)
+ 1020 format (A,I3,A,/)
 !
-   if (rank .ne. 0) then
-      goto 99
+   if (RANK .eq. 0) then
+      call master_main
+   else
+      call worker_main
    endif
 !
-!..print fancy header
-   write(*,*)'                      '
-   write(*,*)'// --  MPI TEST PROGRAM  -- //'
-   write(*,*)'                      '
+   call finalize
+   call MPI_param_finalize
+!..END MPI
 !
-!..Initialize common library 
-!  (set common parameters, load solvers, and create initial mesh)
-   call initialize  ! <-- found inside ../common/initialize.F90
+end program main
+!
+!
+!----------------------------------------------------------------------
+! master_main
+!----------------------------------------------------------------------
+subroutine master_main()
+!
+   use environment
+   use common_prob_data
+   use data_structure3D
+   use GMP
+!
+   use MPI      , only: MPI_COMM_WORLD,MPI_INTEGER
+   use MPI_param, only: ROOT,RANK,NUM_PROCS
+!
+   implicit none
+!
+!..MPI variables
+   integer :: ierr
+!
+!..OMP variables
+   integer :: num_threads, omp_get_num_threads
+!
+!..auxiliary variables
+   integer :: idec, i, r, count, src
+!
+!----------------------------------------------------------------------
+!
+!..find out my RANK (process id)
+   !call MPI_COMM_RANK (MPI_COMM_WORLD, RANK, ierr)
+   if (RANK .ne. ROOT) then
+      write(*,*) 'master_main: RANK .ne. ROOT'
+      stop
+   endif
+   !call MPI_COMM_SIZE (MPI_COMM_WORLD, NUM_PROCS, ierr)
+!
+!..start user interface, with idec
+!..broadcast user command to workers
 !
 !..determine number of omp threads running
 !$OMP parallel
 !$OMP single
       num_threads = omp_get_num_threads()
-      write(*,1100) ' Number of OpenMP threads: ', num_threads
- 1100 format(A,I2,/)
+      write(6,8010) '[', RANK, '] : ','Number of OpenMP threads: ',num_threads
+ 8010 format(A,I3,A,A,I3)
 !$OMP end single
 !$OMP end parallel
+!
+!..test accessing data structures
+   write(6,8020) '[', RANK, '] : ', 'NRELIS,NRELES,NRNODS = ',NRELIS,NRELES,NRNODS
+ 8020 format(A,I3,A,A,I4,', ',I4,', ',I4)
+!
+   flush(6)
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 #if DEBUG_MODE
    write(*,*) '========================='
@@ -103,49 +159,219 @@ include 'mpif.h'
    idec = 1
    do while(idec /= 0)
 !
+      write(*,*)
       write(*,*) '=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='
       write(*,*) 'SELECT'
-      write(*,*) 'QUIT ...................................0'
+      write(*,*) 'QUIT....................................0'
       write(*,*) '                                         '
-      write(*,*) 'Print Data Structure arrays ...........10'
+      write(*,*) '    ---- Print Data Structure ----       '
+      write(*,*) 'Print arrays (interactive).............10'
+      write(*,*) 'Print data structure arrays ...........11'
       write(*,*) '                                         '
-      write(*,*) '         ---- Refinements ----           '
-      write(*,*) 'Single Uniform h-refinement............20'
+      write(*,*) '        ---- Refinements ----            '
+      write(*,*) 'Single uniform h-refinement............20'
+      write(*,*) 'Single uniform p-refinement............21'
+      write(*,*) '                                         '
+      write(*,*) '        ---- MPI Routines ----           '
+      write(*,*) 'Distribute mesh........................30'
+      write(*,*) 'Run verification routines..............35'
       write(*,*) '=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='
-
+!
       read( *,*) idec
+      write(6,8010) '[', RANK, '] : ','Broadcast: idec = ', idec
+      count = 1; src = ROOT
+      call MPI_BCAST (idec,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+      call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
       select case(idec)
 !     ...QUIT
-         case(0) ; goto 98
+         case(0) ; goto 89
 !
-!-----------------------------------------------------------------------
-!   ...DATA STRUCTURE
-!-----------------------------------------------------------------------
+!     ...Print data structure
+         case(10,11)
+            write(*,*) 'Select processor RANK: '
+            read (*,*) r
+            count = 1; src = ROOT
+            call MPI_BCAST (r,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+            if (r .eq. RANK) then
+               call exec_case(idec)
+            endif
 !
-!     ...print data structure
-         case(10) ; call result
-!         
-!-----------------------------------------------------------------------
-!  ...REFINEMENTS
-!-----------------------------------------------------------------------
+!     ...Refinements
+         case(20,21)
+            call exec_case(idec)
 !
-!     ...Single uniform refinement
-         case(20)
-            call global_href
-            call close_mesh
-            call update_gdof
-            call update_Ddof
+!     ...MPI Routines
+         case(30,35)
+            call exec_case(idec)
 !
       end select
+!
+      call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 !..end infinite loop
    enddo
 !
-!..finalize library
-   98 call finalize ! <-- found inside ../common/finalize.F90
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
-   99 call MPI_FINALIZE ( ierr )
-!..END MPI
+89 continue
+   write(6,8030) '[', RANK, '] : ','master_main end.'
+ 8030 format(A,I3,A,A)
 !
-   end program main
+end subroutine master_main
+!
+!
+!----------------------------------------------------------------------
+! worker_main
+!----------------------------------------------------------------------
+subroutine worker_main()
+!
+   use environment
+   use common_prob_data
+   use data_structure3D
+   use GMP
+!
+   use MPI      , only: MPI_COMM_WORLD,MPI_INTEGER
+   use MPI_param, only: ROOT,RANK,NUM_PROCS
+!
+   implicit none
+!
+!..MPI variables
+   integer :: ierr
+!
+!..OMP variables
+   integer :: num_threads, omp_get_num_threads
+!
+!..auxiliary variables
+   integer :: idec, i, r, count, src
+!
+!----------------------------------------------------------------------
+!
+   !call MPI_COMM_RANK (MPI_COMM_WORLD, RANK, ierr)
+   if (RANK .eq. ROOT) then
+      write(*,*) 'worker_main: RANK .eq. ROOT'
+      stop
+   endif
+   !call MPI_COMM_SIZE (MPI_COMM_WORLD, NUM_PROCS, ierr)
+!
+!..determine number of omp threads running
+!$OMP parallel
+!$OMP single
+      num_threads = omp_get_num_threads()
+      write(6,9010) '[', RANK, '] : ','Number of OpenMP threads: ',num_threads
+ 9010 format(A,I3,A,A,I3)
+!$OMP end single
+!$OMP end parallel
+!
+!..test accessing data structures
+   write(6,9020) '[', RANK, '] : ', 'NRELIS,NRELES,NRNODS = ',NRELIS,NRELES,NRNODS
+ 9020 format(A,I3,A,A,I4,', ',I4,', ',I4)
+!
+   flush(6)
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+!
+!
+!..receive broadcast from master on how to proceed
+!..do that in a loop, using idec
+!..if receiving '0', end worker_main
+   idec = 1
+   do while(idec /= 0)
+!
+      write(6,9030) '[', RANK, '] : ','Waiting for broadcast from master...'
+      count = 1; src = ROOT
+      call MPI_BCAST (idec,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+      write(6,9010) '[', RANK, '] : ','Broadcast: idec = ', idec
+      flush(6)
+      call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+!
+      select case(idec)
+!     ...QUIT
+         case(0) ; goto 99
+!
+!     ...Print data structure
+         case(10,11)
+            count = 1; src = ROOT
+            call MPI_BCAST (r,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+            if (r .eq. RANK) then
+               call exec_case(idec)
+            endif
+!
+!     ...Refinements
+         case(20,21)
+            call exec_case(idec)
+!
+!     ...MPI Routines
+         case(30,35)
+            call exec_case(idec)
+!
+      end select
+!
+      call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+!
+!..end infinite loop
+   enddo
+!
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+!
+99 continue
+   write(6,9030) '[', RANK, '] : ','worker_main end.'
+ 9030 format(A,I3,A,A)
+!
+end subroutine worker_main
+!
+!
+subroutine exec_case(idec)
+!
+   use data_structure3D
+   use par_mesh
+!
+   implicit none
+!
+   integer, intent(in) :: idec
+!
+!----------------------------------------------------------------------
+!
+   select case(idec)
+!
+!  ...print data structure (interactive)
+      case(10); call result
+!
+!  ...print general data structure info
+      case(11)
+         write(*,110) NRELIS,NRELES,NRNODS
+ 110     format(' NRELIS,NRELES,NRNODS            = ',3I10)
+         write(*,111) NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ
+ 111     format(' NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ = ',4I10)
+         write(*,112) MAXNODS,NPNODS
+ 112     format(' MAXNODS,NPNODS                  = ',2I10)
+!
+!  ...single uniform h-refinement
+      case(20)
+         write(*,*) 'global h-refinement...'
+         call global_href
+         call close_mesh
+         call update_gdof
+         call update_Ddof
+!
+!  ...single uniform p-refinement
+      case(21)
+         write(*,*) 'global p-refinement...'
+         call global_pref
+         call close_mesh
+         call update_gdof
+         call update_Ddof
+!
+!  ...distribute mesh
+      case(30)
+         write(*,*) 'distribute mesh...'
+         call distr_mesh
+!  ...run mesh verification routines
+      case(35)
+         write(*,*) 'verify distributed mesh consistency...'
+         call par_verify
+      case default
+         write(*,*) 'exec_case: unknown case...'
+   end select
+!
+end subroutine exec_case
+
