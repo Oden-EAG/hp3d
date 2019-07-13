@@ -18,7 +18,6 @@ locate.F90
 locate_char.F
 number_active_nodes.F90
 number_vert_on_visit.F90
-pause.F
 print.F
 real_imag.F90
 setz.F
