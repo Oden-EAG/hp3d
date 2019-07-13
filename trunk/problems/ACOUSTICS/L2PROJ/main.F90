@@ -188,7 +188,7 @@
             nsteps=0
             do while (nsteps.le.0)
                write(*,*) 'NUMBER OF REFINEMENTS>0'
-               write(*,*) 'SOLVER:frontal=1,MUMPS=2,PARDISO=3,OMP MUMPS=4'
+               write(*,*) 'SOLVER:frontal=1,MUMPS=2,PARDISO=3'
                write(*,*) 'Provide: NUMBER OF REFINEMENTS, SOLVER'
                read(*,*) nsteps,idec_solve
             enddo
@@ -202,8 +202,6 @@
                      call mumps_sc('G')
                   case(3)
                      call pardiso_sc_herm
-                  case(4)
-                     call mumps_interf(1)
                   end select
                endif
 !           ...say it has solved and save results to paraview file

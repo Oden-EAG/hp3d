@@ -236,7 +236,7 @@
                write(*,*) 'REFINEMENT FLAG:'
                write(*,*) 'h-refine=1,p-refine=2,hp-refine(max)=3,hp-refine(min)=4'
                write(*,*) '0.d0<FACTOR<1.d0'
-               write(*,*) 'SOLVER:frontal=1,MUMPS=2,PARDISO=3,OMP MUMPS=4 '
+               write(*,*) 'SOLVER:frontal=1,MUMPS=2,PARDISO=3'
                write(*,*) 'Provide: NUMBER OF REFINEMENTS,',  &
                           ' REFINEMENT FLAG, FACTOR, SOLVER'
                read(*,*) nsteps,nreflag,factor,idec_solve
@@ -250,18 +250,13 @@
                      call solve1(NR_RHS_PROB)
                   case(2)
                      IPRINT_TIME = 1
-                     call mumps_interf(NR_RHS_PROB)
+                     call mumps_sc('H')
                      IPRINT_TIME = 0
-
                   case(3)
                      IPRINT_TIME = 1
                      call pardiso_sc('H')
                      ! call pardiso_interface
                      IPRINT_TIME = 0
-                  case(4)
-                      IPRINT_TIME = 1
-                     call mumps_sc('H')
-                      IPRINT_TIME = 0
                   end select
                endif
 !           ...say it has solved and save results to paraview file
