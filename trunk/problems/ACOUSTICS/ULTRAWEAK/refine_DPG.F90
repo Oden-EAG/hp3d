@@ -36,7 +36,6 @@
    use control
    use data_structure3D
    use parametersDPG, ONLY : NORD_ADD
-   use uhm2
    use common_prob_data
    use m_assembly, ONLY: NRDOF_CON, NRDOF_TOT
 !

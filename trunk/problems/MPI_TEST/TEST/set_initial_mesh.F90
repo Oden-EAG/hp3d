@@ -42,7 +42,7 @@
 !..check if have not exceeded the maximum order
    if (IP.gt.MAXP) then
       write(*,*) 'set_initial_mesh: IP, MAXP = ', IP,MAXP
-      stop 1
+      stop
    endif
 !
 !..set BC
@@ -69,7 +69,7 @@
 !     ...custom order of approximation (NOT IMPLEMENTED)
          write(*,1003) IP
 1003     format('ERROR in set_initial_mesh: IP = ',i3)
-         stop 2
+         stop
       endif
 !
 !  ...set BC flags: 0 - no BC ; 1 - Dirichlet ; 2 - Neumann ; 3 - Robin ; >3 - Mixed

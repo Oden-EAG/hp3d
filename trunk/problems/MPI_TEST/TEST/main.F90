@@ -122,13 +122,10 @@ subroutine master_main()
 !
 !----------------------------------------------------------------------
 !
-!..find out my RANK (process id)
-   !call MPI_COMM_RANK (MPI_COMM_WORLD, RANK, ierr)
    if (RANK .ne. ROOT) then
       write(*,*) 'master_main: RANK .ne. ROOT'
       stop
    endif
-   !call MPI_COMM_SIZE (MPI_COMM_WORLD, NUM_PROCS, ierr)
 !
 !..start user interface, with idec
 !..broadcast user command to workers
@@ -175,6 +172,10 @@ subroutine master_main()
       write(*,*) '        ---- MPI Routines ----           '
       write(*,*) 'Distribute mesh........................30'
       write(*,*) 'Run verification routines..............35'
+      write(*,*) '                                         '
+      write(*,*) '          ---- Solvers ----              '
+      write(*,*) 'MUMPS (OpenMP).........................40'
+      write(*,*) 'MUMPS (MPI)............................41'
       write(*,*) '=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='
 !
       read( *,*) idec
@@ -203,6 +204,10 @@ subroutine master_main()
 !
 !     ...MPI Routines
          case(30,35)
+            call exec_case(idec)
+!
+!     ...Solvers
+         case(40,41)
             call exec_case(idec)
 !
       end select
@@ -247,12 +252,10 @@ subroutine worker_main()
 !
 !----------------------------------------------------------------------
 !
-   !call MPI_COMM_RANK (MPI_COMM_WORLD, RANK, ierr)
    if (RANK .eq. ROOT) then
       write(*,*) 'worker_main: RANK .eq. ROOT'
       stop
    endif
-   !call MPI_COMM_SIZE (MPI_COMM_WORLD, NUM_PROCS, ierr)
 !
 !..determine number of omp threads running
 !$OMP parallel
@@ -304,6 +307,10 @@ subroutine worker_main()
          case(30,35)
             call exec_case(idec)
 !
+!     ...Solvers
+         case(40,41)
+            call exec_case(idec)
+!
       end select
 !
       call MPI_BARRIER (MPI_COMM_WORLD, ierr)
@@ -320,6 +327,9 @@ subroutine worker_main()
 end subroutine worker_main
 !
 !
+!----------------------------------------------------------------------
+! exec_case
+!----------------------------------------------------------------------
 subroutine exec_case(idec)
 !
    use data_structure3D
@@ -357,7 +367,7 @@ subroutine exec_case(idec)
       case(21)
          write(*,*) 'global p-refinement...'
          call global_pref
-         call close_mesh
+         call close_mesh ! not needed?
          call update_gdof
          call update_Ddof
 !
@@ -365,10 +375,22 @@ subroutine exec_case(idec)
       case(30)
          write(*,*) 'distribute mesh...'
          call distr_mesh
+!
 !  ...run mesh verification routines
       case(35)
          write(*,*) 'verify distributed mesh consistency...'
          call par_verify
+!
+!  ...solve problem with omp_mumps (OpenMP MUMPS)
+      case(40)
+         write(*,*) 'calling OpenMP MUMPS solver...'
+         call mumps_sc('G')
+!
+!  ...solve problem with par_mumps (MPI MUMPS)
+      case(41)
+         write(*,*) 'calling MPI MUMPS solver...'
+         call par_mumps_sc('G')
+!
       case default
          write(*,*) 'exec_case: unknown case...'
    end select

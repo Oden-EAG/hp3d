@@ -27,6 +27,7 @@ module MPI_param
 !     purpose:    initialize MPI environment, and set parameters
 !----------------------------------------------------------------------
    subroutine MPI_param_init()
+!
       integer :: ierr,req,ret
 !
 !  ...MPI initialization

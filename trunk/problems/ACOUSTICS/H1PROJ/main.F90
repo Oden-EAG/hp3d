@@ -16,7 +16,6 @@
    use common_prob_data
    use parameters, only : NSTD_OUT, MAXbrickH
    use data_structure3D , only : NRELES, NRDOFSH, NODES
-   use uhm2
    use m_assembly, ONLY: NRDOF_TOT, NRDOF_CON
 !
    implicit none

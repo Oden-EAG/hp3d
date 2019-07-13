@@ -1,4 +1,0 @@
-mumps_data.F
-mumps_solve_ASSEMBLED_SEQUENTIAL.F
-mumps_solve_ASSEMBLED_PARALLEL.F
-0

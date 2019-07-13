@@ -4,17 +4,19 @@
 !
 ! -----------------------------------------------------------------------
 !
-!    latest revision    - July 18
+!    latest revision    - July 2019
 !
 !    purpose            - module sets up required workspace for 
-!                         interfacing with MUMPS solver
+!                         interfacing with distributed MUMPS solver
 !
-! ----------------------------------------------------------------------!
+! -----------------------------------------------------------------------
+#include "implicit_none.h"
+module par_mumps
 !
-module mumps
+   use MPI      , only: MPI_COMM_SELF,MPI_COMM_WORLD
+   use MPI_param, only: RANK,NUM_PROCS
 !
-!
-use MPI
+   implicit none
 !
 #if C_MODE
    include 'zmumps_struc.h'
@@ -27,13 +29,10 @@ use MPI
    contains
 ! 
 !
-!---------------------------------------------------------------------------------------
+! -----------------------------------------------------------------------
 !
 ! 
 subroutine mumps_start
-!
-   integer num_procs, ierr
-   !call mpi_init(IERR)
 !
 !..NOTE:
 !..If you plan to run MUMPS sequentially from a parallel MPI application,
@@ -41,8 +40,7 @@ subroutine mumps_start
 !  communicator containing a single processor to the MUMPS library
 !
 !..Define a communicator for the package.
-   call MPI_COMM_SIZE (MPI_COMM_WORLD, num_procs, ierr)
-   if (num_procs > 1) then
+   if (NUM_PROCS > 1) then
 !  ...this assumes that this program is only executed by the master
       mumps_par%COMM = MPI_COMM_SELF
    else
@@ -91,7 +89,7 @@ subroutine mumps_start
 end subroutine mumps_start
 ! 
 !
-!---------------------------------------------------------------------------------------
+! -----------------------------------------------------------------------
 !
 ! 
 subroutine mumps_destroy
@@ -117,4 +115,4 @@ subroutine mumps_destroy
 end subroutine mumps_destroy
 ! 
 ! 
-end module mumps
+end module par_mumps

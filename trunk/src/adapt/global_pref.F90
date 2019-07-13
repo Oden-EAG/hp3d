@@ -5,6 +5,7 @@
 !--------------------------------------------------------------------
 subroutine global_pref
 !
+   use parameters      , only: MAXP
    use data_structure3D, only: NRELES,NRNODS,NODES,MAXNODM, &
                                get_subd,set_subd
    use par_mesh        , only: DISTRIBUTED,get_elem_nodes
@@ -12,7 +13,7 @@ subroutine global_pref
 !      
    implicit none
 !
-   integer :: mdle,i,iel,nord,nrnodm,subd
+   integer :: mdle,p,i,iel,nord,nordx,nordy,nordz,naux,nrnodm,subd
    integer :: nodm(MAXNODM)
 !
 !..loop over active elements (middle nodes)
@@ -21,12 +22,26 @@ subroutine global_pref
       call nelcon(mdle, mdle)
       nord = NODES(mdle)%order
       select case(NODES(mdle)%type)
-         case('mdln','mdld'); nord = nord+1
-         case('mdlp'); nord = nord+11
-         case('mdlb'); nord = nord+111
+         case('mdln','mdld')
+            nord = nord+1
+            p = nord
+         case('mdlp')
+            nord = nord+11
+            call decode(nord, nordx,nordz)
+            p = MAX(nordx,nordz)
+         case('mdlb')
+            nord = nord+111
+            call decode(nord, naux ,nordz)
+            call decode(naux, nordx,nordy)
+            p = MAX(nordx,nordy,nordz)
       end select
+      if (p .gt. MAXP) then
+         write(*,100) 'global_pref: mdle,p,MAXP = ',mdle,p,MAXP,'. stop.'
+         stop
+     100 format(A,I7,I3,I3,A)
+      endif
 !     -------- begin setting subdomain for distributed mesh
-      !..should not be necessary anymore with after recent changes in distr_mesh,
+      !..should not be necessary anymore after recent changes in distr_mesh,
       !  because subd values should already be set correctly within subdomain
       !  so that nodmod will work fine.
 !      call get_subd(mdle, subd)

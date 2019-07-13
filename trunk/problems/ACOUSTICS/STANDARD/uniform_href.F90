@@ -27,7 +27,6 @@
    use control
    use data_structure3D
    use environment
-   use uhm2
    use common_prob_data
    use m_assembly, ONLY: NRDOF_CON, NRDOF_TOT
 !

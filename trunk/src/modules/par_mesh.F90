@@ -41,7 +41,7 @@ subroutine distr_mesh()
 !..auxiliary variables
    integer :: subd_next(NRELES), mdle_list(NRELES), nodm(MAXNODM)
    integer :: i, iel, inod, iproc, mdle, nod, subd, subd_size
-   integer :: nrnodm, ndof_nod
+   integer :: nrnodm, nrdof_nod
    integer :: iprint = 1
 !
    if (iprint .eq. 1) then
@@ -89,20 +89,20 @@ subroutine distr_mesh()
       do inod=1,nrnodm
          nod = nodm(inod)
 !     ...3c. Calculate nodal degrees of freedom, and allocate buffer
-         call get_dof_buf_size(nod, ndof_nod)
-         if (ndof_nod .eq. 0) cycle
-         allocate(buf(ndof_nod))
+         call get_dof_buf_size(nod, nrdof_nod)
+         if (nrdof_nod .eq. 0) cycle
+         allocate(buf(nrdof_nod))
          buf = ZERO
 !     ...3d. if current subdomain is my subdomain, send data
          if (subd .eq. RANK) then
 !        ...3e. pack buffer with DOF data
-            call pack_dof_buf(nod,ndof_nod, buf)
+            call pack_dof_buf(nod,nrdof_nod, buf)
 !        ...3f. send buffer to new subdomain
             if (iprint .eq. 1) then
                write(6,130) '[', RANK, ']: ', &
                   'Sending data to [',subd_next(iel),'], nod = ',nod
             endif
-            count = ndof_nod; dest = subd_next(iel); tag = nod
+            count = nrdof_nod; dest = subd_next(iel); tag = nod
             call MPI_SEND(buf,count,MPI_VTYPE,dest,tag,MPI_COMM_WORLD,ierr)
             if (ierr .ne. MPI_SUCCESS) then
                write(6,*) 'MPI_SEND failed. stop.'
@@ -115,7 +115,7 @@ subroutine distr_mesh()
                write(6,130) '[', RANK, ']: ',   &
                   'Receiving data from [',subd,'], nod = ',nod
             endif
-            count = ndof_nod; src = subd; tag = nod
+            count = nrdof_nod; src = subd; tag = nod
             call MPI_RECV(buf,count,MPI_VTYPE,src,tag,MPI_COMM_WORLD,stat,ierr)
             if (ierr .ne. MPI_SUCCESS) then
                write(6,*) 'MPI_RECV failed. stop.'
@@ -123,7 +123,7 @@ subroutine distr_mesh()
             endif
 !        ...3f. unpack DOF data from buffer
             call alloc_nod_dof(nod)
-            call unpack_dof_buf(nod,ndof_nod,buf)
+            call unpack_dof_buf(nod,nrdof_nod,buf)
          endif
          deallocate(buf)
 !
@@ -245,29 +245,29 @@ end subroutine dealloc_nod_dof
 !     routine:    get_dof_buf_size
 !     purpose:    calculate buffer size for message passing of nodal dofs
 !----------------------------------------------------------------------
-subroutine get_dof_buf_size(Nod, Ndof_nod)
+subroutine get_dof_buf_size(Nod, Nrdof_nod)
    integer, intent(in) :: Nod
-   integer, intent(out) :: Ndof_nod
+   integer, intent(out) :: Nrdof_nod
    integer :: ndofH,ndofE,ndofV,ndofQ
    integer :: nvarH,nvarE,nvarV,nvarQ
    call find_ndof(Nod, ndofH,ndofE,ndofV,ndofQ)
    call find_nvar(Nod, nvarH,nvarE,nvarV,nvarQ)
-   Ndof_nod = ndofH*nvarH + ndofE*nvarE + ndofV*nvarV + ndofQ*nvarQ
+   Nrdof_nod = ndofH*nvarH + ndofE*nvarE + ndofV*nvarV + ndofQ*nvarQ
 end subroutine get_dof_buf_size
 !
 !----------------------------------------------------------------------
 !     routine:    pack_dof_buf
 !     purpose:    pack nodal dofs into contiguous buffer for message passing
 !----------------------------------------------------------------------
-subroutine pack_dof_buf(Nod,Ndof_nod, Buf)
+subroutine pack_dof_buf(Nod,Nrdof_nod, Buf)
    integer, intent(in)  :: Nod
-   integer, intent(in)  :: Ndof_nod
-   VTYPE  , intent(out) :: Buf(Ndof_nod)
+   integer, intent(in)  :: Nrdof_nod
+   VTYPE  , intent(out) :: Buf(Nrdof_nod)
    integer :: ndofH,ndofE,ndofV,ndofQ
    integer :: nvarH,nvarE,nvarV,nvarQ
    integer :: ivar,j
 !
-   Buf(1:Ndof_nod) = ZERO
+   Buf(1:Nrdof_nod) = ZERO
 !
 !..calculate ndof,nvar for this node
    call find_ndof(Nod, ndofH,ndofE,ndofV,ndofQ)
@@ -302,9 +302,9 @@ subroutine pack_dof_buf(Nod,Ndof_nod, Buf)
          j = j + ndofQ
       enddo
    endif
-!..verify j equals Ndof_nod
-   if( Ndof_nod .ne. j ) then
-      write(*,*) 'pack_dof_buf: Ndof_nod .ne. j, stop.'
+!..verify j equals Nrdof_nod
+   if( Nrdof_nod .ne. j ) then
+      write(*,*) 'pack_dof_buf: Nrdof_nod .ne. j, stop.'
       stop
    endif
 end subroutine pack_dof_buf
@@ -313,10 +313,10 @@ end subroutine pack_dof_buf
 !     routine:    unpack_dof_buf
 !     purpose:    unpack nodal dofs from contiguous buffer
 !----------------------------------------------------------------------
-subroutine unpack_dof_buf(Nod,Ndof_nod,Buf)
+subroutine unpack_dof_buf(Nod,Nrdof_nod,Buf)
    integer, intent(in) :: Nod
-   integer, intent(in) :: Ndof_nod
-   VTYPE  , intent(in) :: Buf(Ndof_nod)
+   integer, intent(in) :: Nrdof_nod
+   VTYPE  , intent(in) :: Buf(Nrdof_nod)
    integer :: ndofH,ndofE,ndofV,ndofQ
    integer :: nvarH,nvarE,nvarV,nvarQ
    integer :: ivar,j

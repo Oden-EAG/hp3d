@@ -13,7 +13,6 @@ subroutine initialize
   use geometry_transformations
   use testvars
   use frsolmod
-  use uhm2
   use upscale
   use paraview
   implicit none

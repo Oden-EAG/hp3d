@@ -796,6 +796,15 @@ c
       Vis = NODES(Nod)%visit
 c
       end subroutine
+
+c  ...set visitation flag of a node
+      subroutine set_visit(Nod)
+c
+      integer, intent(in) :: Nod
+c
+      NODES(Nod)%visit = 1
+c
+      end subroutine
 c
 c-----------------------------------------------------------------------
 c
