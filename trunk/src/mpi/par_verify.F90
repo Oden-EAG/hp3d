@@ -33,14 +33,14 @@ subroutine par_verify()
       call pause
    endif
 !
-   write(*,*) 'par_verify: Checking collection and distribution of dofs...'
-   call verify_dof(ipass)
-   if (ipass .eq. 1) then
-      write(*,*) 'par_verify: COLLECT/DISTRIBUTE TEST PASSED.'
-   else
-      write(*,*) 'par_verify: COLLECT/DISTRIBUTE TEST FAILED.'
-      call pause
-   endif
+!   write(*,*) 'par_verify: Checking collection and distribution of dofs...'
+!   call verify_dof(ipass)
+!   if (ipass .eq. 1) then
+!      write(*,*) 'par_verify: COLLECT/DISTRIBUTE TEST PASSED.'
+!   else
+!      write(*,*) 'par_verify: COLLECT/DISTRIBUTE TEST FAILED.'
+!      call pause
+!   endif
 !
   190 continue
 !
@@ -114,9 +114,9 @@ subroutine mesh_consistency(ipass)
 !
    deallocate(val,buf)
 !
-!  -------------------------------------------
-!  2. check mdle node subdomains (paritioning)
-!  -------------------------------------------
+!  --------------------------------------------
+!  2. check mdle node subdomains (partitioning)
+!  --------------------------------------------
    count = 0
    do nod=1,NRNODS
       if (Is_middle(nod)) then
@@ -198,8 +198,7 @@ end subroutine mesh_consistency
 !----------------------------------------------------------------------
 subroutine verify_dof(ipass)
 !
-   use data_structure3D
-   use par_mesh , only: DISTRIBUTED
+   use par_mesh , only: DISTRIBUTED,distr_mesh
    use MPI_param, only: ROOT,RANK
    use MPI      , only: MPI_INTEGER,MPI_COMM_WORLD
 !
@@ -216,6 +215,20 @@ subroutine verify_dof(ipass)
       goto 390
    endif
 !
+!..1. Run mesh distribution to obtain current partition
+   call distr_mesh
+!
+!..2. Every processor: store subdomain dofs locally
+
+!
+!..3. Collect all dofs on ROOT processor, delete from other processors
+   call collect_dofs
+!
+!..4. Distribute dofs from ROOT processor by mesh distribution
+   call distr_mesh
+!
+!..5. Compare locally stored dofs to received dofs (fail test if different)
+
 !
   390 continue
 !
