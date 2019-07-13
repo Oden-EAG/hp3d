@@ -7,11 +7,11 @@
 !    latest revision    - July 2019
 !
 !    purpose            - module sets up required workspace for 
-!                         interfacing with MUMPS solver
+!                         interfacing with distributed MUMPS solver
 !
 ! -----------------------------------------------------------------------
 #include "implicit_none.h"
-module mumps
+module par_mumps
 !
    use MPI      , only: MPI_COMM_SELF,MPI_COMM_WORLD
    use MPI_param, only: RANK,NUM_PROCS
@@ -109,8 +109,10 @@ subroutine mumps_destroy
 #else
    call dmumps(mumps_par)
 #endif
+!
+   !call mpi_finalize(IERR)
 ! 
 end subroutine mumps_destroy
 ! 
 ! 
-end module mumps
+end module par_mumps

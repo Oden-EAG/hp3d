@@ -6,7 +6,7 @@
 !
 !    latest revision    - July 2019
 !
-!    purpose            - interface for MUMPS solver
+!    purpose            - interface for distributed MUMPS solver
 !                       - routine computes global stiffness matrix
 !                         and global load vector and solves the global
 !                         linear system with mumps
@@ -19,9 +19,9 @@
 !                                      case for Lapack routines
 !                                'G': General case for Lapack routines
 !
-! ----------------------------------------------------------------------
+! -----------------------------------------------------------------------
 #include "implicit_none.h"
-subroutine mumps_sc(mtype)
+subroutine par_mumps_sc(mtype)
 !
    use data_structure3D, only: NRNODS, NRELES
    use assembly,         only: NR_RHS, MAXDOFM, MAXDOFS,       &
@@ -33,9 +33,9 @@ subroutine mumps_sc(mtype)
                                ALOC, BLOC, AAUX, ZAMOD, ZBMOD, &
                                NR_PHYSA, MAXNODM
    use assembly_sc
-   use control, only: ISTC_FLAG
-   use stc,     only: HERM_STC,CLOC,stc_alloc,stc_dealloc,stc_get_nrdof
-   use mumps,   only: MUMPS_PAR, mumps_start, mumps_destroy
+   use control,   only: ISTC_FLAG
+   use stc,       only: HERM_STC,CLOC,stc_alloc,stc_dealloc,stc_get_nrdof
+   use par_mumps, only: MUMPS_PAR,mumps_start,mumps_destroy
 !
    implicit none
 !
@@ -65,8 +65,8 @@ subroutine mumps_sc(mtype)
 !
    integer*8 :: t1,t2,clock_rate,clock_max
 !
-! ----------------------------------------------------------------------
-! ----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
 !
    select case(mtype)
       case('H')
@@ -484,4 +484,4 @@ subroutine mumps_sc(mtype)
    endif
 !
 !
-end subroutine mumps_sc
+end subroutine par_mumps_sc
