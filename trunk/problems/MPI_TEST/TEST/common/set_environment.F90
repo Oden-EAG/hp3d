@@ -48,8 +48,8 @@ subroutine set_environment
         ('-file-refinement','Refinement files location','../../../files/ref',FILE_REFINE )
 !
    call get_option_int     &
-        ('-p'  ,'Uniform order initial mesh',1 ,IP)
-!        
+        ('-p'  ,'Uniform order initial mesh',3 ,IP)
+!
    call get_option_int     &
         ('-dp' ,'p-enrichment order for DPG',1 ,NORD_ADD)
 !
@@ -63,8 +63,8 @@ subroutine set_environment
    call omp_set_num_threads(nthreads)
 !
    IBC_PROB = BC_DIRICHLET
-   IP = 3
-   NORD_ADD = 1
+   !IP = 3
+   !NORD_ADD = 1
 !
 end subroutine set_environment
 
