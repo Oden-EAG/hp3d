@@ -13,7 +13,8 @@ program main
    use CommonParam
    use LaserParam
    use assembly
-   use m_assembly
+   use assembly_sc
+   use stc
 !
    use MPI
 !
@@ -346,7 +347,7 @@ program main
                      case(1)
                         call solve1(MY_NR_RHS)
                      case(2)
-                        call mumps_solve_seq(MY_NR_RHS)
+                        !call mumps_solve_seq(MY_NR_RHS)
                      case(3)
                         IPRINT_TIME = 1
                         call pardiso_sc('H')
@@ -407,7 +408,7 @@ program main
                      case(1)
                         call solve1(MY_NR_RHS)
                      case(2)
-                        call mumps_solve_seq(MY_NR_RHS)
+                        !call mumps_solve_seq(MY_NR_RHS)
                      case(3)
                         call pardiso_sc('H')
                      case(4)
@@ -487,7 +488,7 @@ program main
                   case(1)
                      call solve1(MY_NR_RHS)
                   case(2)
-                     call mumps_solve_seq(MY_NR_RHS)
+                     !call mumps_solve_seq(MY_NR_RHS)
                   case(3)
                      call pardiso_sc('H')
                   case(4)
@@ -515,7 +516,7 @@ program main
                      case(1)
                         call solve1(MY_NR_RHS)
                      case(2)
-                        call mumps_solve_seq(MY_NR_RHS)
+                        !call mumps_solve_seq(MY_NR_RHS)
                      case(3)
                         call pardiso_sc('H')
                      case(4)

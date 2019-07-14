@@ -92,14 +92,23 @@ MKL_INCS = -i8 -I${MKLROOT}/include/intel64/lp64 -I${MKLROOT}/include
 #------------------------------------------------------------------
 #
 # TACC MUMPS
-# module load mumps/5.1
-# needs PT-SCOTCH and parMETIS
+# module load mumps/4.10
+#
 
-MUMPS_LIBS = -L${TACC_PETSC_LIB} -ldmumps -lzmumps -lmumps_common \
-                                 -lesmumps -lpord \
-                                 -lmetis -lparmetis \
-                                 -lscotch -lscotcherr \
-                                 -lptscotch -lptscotcherr
+#MUMPS_LIBS = ${TACC_MUMPS_LIB}/libdmumps.a \
+#             ${TACC_MUMPS_LIB}/libzmumps.a \
+#             ${TACC_MUMPS_LIB}/libmumps_common.a \
+#             ${TACC_MUMPS_LIB}/libpord.a \
+#             ${TACC_MUMPS_LIB}/libmetis.so \
+#             ${TACC_MUMPS_LIB}/libparmetis.so
+#MUMPS_INCS = -I${TACC_MUMPS_INC}
+
+# TACC MUMPS
+# module load mumps/5.1
+#
+
+#
+MUMPS_LIBS = -L${TACC_PETSC_LIB} -ldmumps -lzmumps -lmumps_common -lpord -lmetis -lparmetis -lesmumps -lscotch -lscotcherr -lptscotch -lptscotcherr
 MUMPS_INCS = -I${TACC_PETSC_INC}
 
 #------------------------------------------------------------------
@@ -133,6 +142,12 @@ VIS_PATH        = $(LIBRARIES)/UHM/intel/VIS
 UHM_INC_PATH    = $(UHM_PATH)/include
 LINAL_INC_PATH  = $(LINAL_PATH)/include
 VIS_INC_PATH    = $(VIS_PATH)/include
+
+# module load paraview/5.5.2
+# module load hdf5/1.8.16
+
+#VIS_LDFLAGS     = -L${TACC_HDF5_LIB} -lhdf5 -lhdf5_hl
+#VIS_LDFLAGS    += -L${TACC_PARAVIEW_LIB} -lvtkhdf5_src-pv5.5 -lvtkhdf5_hl_src-pv5.5 -lvtklibxml2-pv5.5 -lvtkzlib-pv5.5
 
 # module load paraview/5.6.0
 # module load hdf5/1.10.4
@@ -263,12 +278,12 @@ EXTRA_LINK_INCS    =
 # the problem makefile. 
 
 PROB_LIBS    = $(HP3D_LINK_LIBS) \
-               $(MUMPS_LINK_LIBS)  \
+               $(UHM_LINK_LIBS)  \
                $(EXTRA_LINK_LIBS)
 
 PROB_INCS     = -module ./$(MODULE_PATH)
 PROB_INCS    += $(HP3D_LINK_INCS) \
-                $(MUMPS_LINK_INCS)  \
+                $(UHM_LINK_INCS)  \
                 $(EXTRA_LINK_INCS)
 
 # Files with ending in .F and .F90 (not .f and .f90)
