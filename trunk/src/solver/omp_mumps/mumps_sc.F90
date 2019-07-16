@@ -38,7 +38,7 @@ subroutine mumps_sc(mtype)
    use stc,       only: HERM_STC,CLOC,stc_alloc,stc_dealloc,stc_get_nrdof
    use mumps,     only: MUMPS_PAR, mumps_start, mumps_destroy
    use par_mesh,  only: DISTRIBUTED,HOST_MESH
-   use MPI_param, only: RANK,ROOT
+   use mpi_param, only: RANK,ROOT
 !
    implicit none
 !

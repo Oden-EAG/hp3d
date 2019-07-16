@@ -18,7 +18,7 @@ program main
    use GMP
 !
    use MPI      , only: MPI_COMM_WORLD
-   use MPI_param, only: ROOT,RANK,NUM_PROCS, &
+   use mpi_param, only: ROOT,RANK,NUM_PROCS, &
                         MPI_param_init,MPI_param_finalize
 !
    implicit none
@@ -107,7 +107,7 @@ subroutine master_main()
    use GMP
 !
    use MPI      , only: MPI_COMM_WORLD,MPI_INTEGER
-   use MPI_param, only: ROOT,RANK,NUM_PROCS
+   use mpi_param, only: ROOT,RANK,NUM_PROCS
 !
    implicit none
 !
@@ -238,7 +238,7 @@ subroutine worker_main()
    use GMP
 !
    use MPI      , only: MPI_COMM_WORLD,MPI_INTEGER
-   use MPI_param, only: ROOT,RANK,NUM_PROCS
+   use mpi_param, only: ROOT,RANK,NUM_PROCS
 !
    implicit none
 !

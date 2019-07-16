@@ -30,7 +30,7 @@ c
 c
       use data_structure3D
       use element_data
-      use MPI_param, only: RANK
+      use mpi_param, only: RANK
       use par_mesh , only: DISTRIBUTED
 c
 #include "syscom.blk"

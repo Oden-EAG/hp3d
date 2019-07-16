@@ -9,7 +9,7 @@ subroutine global_pref
    use data_structure3D, only: NRELES,NRNODS,NODES,MAXNODM, &
                                get_subd,set_subd
    use par_mesh        , only: DISTRIBUTED,get_elem_nodes
-   use MPI_param       , only: RANK
+   use mpi_param       , only: RANK
 !      
    implicit none
 !

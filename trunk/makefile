@@ -5,10 +5,10 @@
 
 # Set variables if not set by m_options
 COMPLEX    ?= 0
-C_MODE     ?= 1
+C_MODE     ?= 0
 SHAPE      ?= 1
 SHAPE_MODE ?= 1
-DEBUG_MODE ?= 1
+DEBUG_MODE ?= 0
 J          ?= 1
 
 ####################################################

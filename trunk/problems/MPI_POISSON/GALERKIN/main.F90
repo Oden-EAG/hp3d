@@ -21,9 +21,9 @@ program main
    use assembly_sc, only: IPRINT_TIME
    use stc        , only: STORE_STC,HERM_STC
 !
-   use MPI      , only: MPI_COMM_WORLD
-   use MPI_param, only: ROOT,RANK,NUM_PROCS, &
-                        MPI_param_init,MPI_param_finalize
+   use MPI        , only: MPI_COMM_WORLD
+   use mpi_param  , only: ROOT,RANK,NUM_PROCS
+   use mpi_wrapper, only: mpi_w_init,mpi_w_finalize
 !
    implicit none
 !
@@ -33,7 +33,7 @@ program main
 !----------------------------------------------------------------------
 !
 !..Initialize MPI environment
-   call MPI_param_init
+   call mpi_w_init
 !
 !..Set common hp3D environment parameters (reads in options arguments)
    call begin_environment
@@ -94,7 +94,7 @@ program main
    endif
 !
    call finalize
-   call MPI_param_finalize
+   call mpi_w_finalize
 !..END MPI
 !
 end program main
@@ -111,7 +111,7 @@ subroutine master_main()
    use GMP
 !
    use MPI      , only: MPI_COMM_WORLD,MPI_INTEGER
-   use MPI_param, only: ROOT,RANK,NUM_PROCS
+   use mpi_param, only: ROOT,RANK,NUM_PROCS
 !
    implicit none
 !
@@ -256,7 +256,7 @@ subroutine worker_main()
    use GMP
 !
    use MPI      , only: MPI_COMM_WORLD,MPI_INTEGER
-   use MPI_param, only: ROOT,RANK,NUM_PROCS
+   use mpi_param, only: ROOT,RANK,NUM_PROCS
 !
    implicit none
 !

@@ -17,7 +17,7 @@ subroutine collect_dofs()
 !
    use data_structure3D
    use par_mesh
-   use MPI_param, only: ROOT,RANK
+   use mpi_param, only: ROOT,RANK
    use MPI      , only: MPI_COMM_WORLD,MPI_STATUS_SIZE,  &
                         MPI_COMPLEX16,MPI_REAL8
 !
@@ -122,7 +122,7 @@ subroutine print_partition()
 !
    use data_structure3D
    use par_mesh , only: DISTRIBUTED
-   use MPI_param, only: RANK,ROOT,NUM_PROCS
+   use mpi_param, only: RANK,ROOT,NUM_PROCS
 !
    implicit none
 !
@@ -184,7 +184,7 @@ subroutine print_subd()
 !
    use data_structure3D
    use par_mesh , only: DISTRIBUTED
-   use MPI_param, only: RANK,ROOT
+   use mpi_param, only: RANK,ROOT
 !
    implicit none
 !

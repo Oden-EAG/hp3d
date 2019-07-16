@@ -15,10 +15,9 @@ module par_mesh
 !
    use data_structure3D
    use parameters, only: NRCOMS
-   use MPI_param , only: RANK,NUM_PROCS
+   use mpi_param , only: RANK,NUM_PROCS
    use MPI       , only: MPI_COMM_WORLD,MPI_SUCCESS,MPI_STATUS_SIZE,  &
                          MPI_COMPLEX16,MPI_REAL8
-   use zoltan_wrapper
 !
    implicit none
 !
@@ -31,6 +30,11 @@ module par_mesh
 !
 !..T indicates that the ROOT proc holds the entire mesh
    logical, save :: HOST_MESH = .true.
+!
+!..Load balancing strategy
+!  0: use nelcon to distribute elements
+!  1: use (Zoltan)
+   integer, save :: LOAD_BALANCE = 0
 !
    contains
 !
@@ -191,6 +195,24 @@ subroutine get_elem_nodes(Mdle, Nodm,Nrnodm)
    call get_connect_info(Mdle, nodesl,norientl)
    call logic_nodes(Mdle,nodesl, Nodm,Nrnodm)
 end subroutine get_elem_nodes
+!
+!----------------------------------------------------------------------
+!     routine:    get_subd_size
+!     purpose:    get number of elements in subdomain
+!----------------------------------------------------------------------
+subroutine get_subd_size(Subd, Nreles_subd)
+   integer, intent(in)  :: Subd
+   integer, intent(out) :: Nreles_subd
+   integer :: iel,mdle,mdle_subd
+   mdle = 0; Nreles_subd = 0
+   do iel=1,NRELES
+      call nelcon(mdle, mdle)
+      call get_subd(mdle, mdle_subd)
+      if (mdle_subd .eq. Subd) then
+         Nreles_subd = Nreles_subd + 1
+      endif
+   enddo
+end subroutine get_subd_size
 !
 !----------------------------------------------------------------------
 !     routine:    set_subd_elem

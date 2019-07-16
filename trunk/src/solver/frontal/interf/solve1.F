@@ -26,7 +26,7 @@ c
       use assembly_sc, only: NRDOF_TOT, NRDOF_CON
       use stc,         only: stc_alloc, stc_dealloc, stc_get_nrdof
       use par_mesh,    only: DISTRIBUTED,HOST_MESH
-      use MPI_param,   only: RANK,ROOT
+      use mpi_param,   only: RANK,ROOT
 c
 c  ...system common blocks
 #include "syscom.blk"

@@ -9,18 +9,12 @@ HP3D_BASE_PATH  = ${WORK}/par_hp3d/trunk
 # COMPILER SETTINGS (a 64bit processor architecture is assumed)
 #------------------------------------------------------------------
 
-DEBUG      = NO
+DEBUG      = YES
 LARGE      = NO
 OPENMP_USE = YES
 
 # Use parallel threads to compile libraries and problems
-J ?= 24 
-
-# MPI Compilers
-#MPICC  = mpicc
-#MPICXX = mpicxx
-#MPIF77 = mpif77
-#MPIF90 = mpif90
+J ?= 24
 
 # Tau performance tool
 #FF = tau_f90.sh
@@ -94,9 +88,10 @@ MKL_INCS = -i8 -I${MKLROOT}/include/intel64/lp64 -I${MKLROOT}/include
 # TACC MUMPS
 # module load mumps/5.1
 # needs PT-SCOTCH and parMETIS
+# also adding zoltan library dependence
 
 MUMPS_LIBS = -L${TACC_PETSC_LIB} -ldmumps -lzmumps -lmumps_common \
-                                 -lesmumps -lpord \
+                                 -lesmumps -lzoltan -lpord \
                                  -lmetis -lparmetis \
                                  -lscotch -lscotcherr \
                                  -lptscotch -lptscotcherr
@@ -149,7 +144,7 @@ VIS_LIB         = $(VIS_PATH)/lib/libvis.a \
 # PREPROCESSOR VARIABLES
 #------------------------------------------------------------------
 
-COMPLEX    ?= 1
+COMPLEX    ?= 0
 SHAPE      ?= 1
 DEBUG_MODE ?= 0
 ifeq ($(DEBUG),YES)

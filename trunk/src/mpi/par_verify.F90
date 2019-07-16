@@ -64,7 +64,7 @@ subroutine mesh_consistency(ipass)
 !
    use data_structure3D
    use par_mesh , only: DISTRIBUTED
-   use MPI_param, only: ROOT,RANK
+   use mpi_param, only: ROOT,RANK
    use MPI      , only: MPI_INTEGER,MPI_COMM_WORLD
 !
    implicit none
@@ -199,7 +199,7 @@ end subroutine mesh_consistency
 subroutine verify_dof(ipass)
 !
    use par_mesh , only: DISTRIBUTED,distr_mesh
-   use MPI_param, only: ROOT,RANK
+   use mpi_param, only: ROOT,RANK
    use MPI      , only: MPI_INTEGER,MPI_COMM_WORLD
 !
    implicit none

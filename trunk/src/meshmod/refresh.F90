@@ -9,7 +9,7 @@ subroutine refresh
 !
    use data_structure3D
    use par_mesh  , only: DISTRIBUTED
-   use MPI_param , only: RANK
+   use mpi_param , only: RANK
 !
    implicit none
 !
