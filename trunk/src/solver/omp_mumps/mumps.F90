@@ -1,3 +1,5 @@
+!
+#include "implicit_none.h"
 ! -----------------------------------------------------------------------
 !
 !    module name        - mumps
@@ -7,14 +9,12 @@
 !    latest revision    - July 2019
 !
 !    purpose            - module sets up required workspace for 
-!                         interfacing with MUMPS solver
+!                         interfacing with OpenMP MUMPS solver
 !
 ! -----------------------------------------------------------------------
-#include "implicit_none.h"
 module mumps
 !
-   use MPI      , only: MPI_COMM_SELF,MPI_COMM_WORLD
-   use MPI_param, only: RANK,NUM_PROCS
+   use MPI, only: MPI_COMM_SELF
 !
    implicit none
 !
@@ -27,11 +27,9 @@ module mumps
 #endif
 !
    contains
-! 
 !
 ! -----------------------------------------------------------------------
 !
-! 
 subroutine mumps_start
 !
 !..NOTE:
@@ -40,19 +38,21 @@ subroutine mumps_start
 !  communicator containing a single processor to the MUMPS library
 !
 !..Define a communicator for the package.
-   if (NUM_PROCS > 1) then
-!  ...this assumes that this program is only executed by the master
-      mumps_par%COMM = MPI_COMM_SELF
-   else
-      mumps_par%COMM = MPI_COMM_WORLD
-   endif
+   mumps_par%COMM = MPI_COMM_SELF
 !
-!..1 => host involved in factorization/solve phases, 0 otherwise
+!..PAR
+!     0 : host is not involved in factorization/solve phases
+!     1 : host involved in factorization/solve phases
    mumps_par%PAR = 1
-!..Initialize an instance of the package
-   mumps_par%JOB = -1
-!..for L U factorization (sym = 0, with working host)
+!
+!..SYM (for LU factorization, no Hermitian option in version 5.2.1)
+!     0: unsymmetric
+!     1: symmetric positive definite
+!     2: symmetric
    mumps_par%SYM = 0
+!
+!..initialize an instance of the package
+   mumps_par%JOB = -1
 !
 #if C_MODE
    call zmumps(mumps_par)
@@ -72,34 +72,32 @@ subroutine mumps_start
 !..print level for error/warning/diagnostic messages
    mumps_par%icntl(4) = 6
 !
-!..1 => element input format, 0 => assembled input format
+!..icntl(5): matrix input format
+!     0: assembled input format
+!     1: elemental input format
    mumps_par%icntl(5) = 0
-! 
-!..corresponds to the percentage increase in the estimated working space
-   ! mumps_par%icntl(14)  = 100
 !
-!  0 => Approximate Minimum Degree (AMD)
-!  2 => Approximate Minimum Fill (AMF)
-!  4 => PORD
-!  5 => METIS
-!  6 => AMD w/ quasi-dense row detection
-!  7 => automatic value
+!..icntl(7): choice of sequential pivot ordering tool (not used if icntl(28)=2)
+!     0: Approximate Minimum Degree (AMD)
+!     1: pivot order set by the user
+!     2: Approximate Minimum Fill (AMF)
+!     3: Scotch
+!     4: PORD
+!     5: Metis
+!     6: AMD w/ quasi-dense row detection
+!     7: automatic value
    mumps_par%icntl(7) = 5
 !
 end subroutine mumps_start
-! 
 !
 ! -----------------------------------------------------------------------
 !
-! 
 subroutine mumps_destroy
 !
-   if (mumps_par%MYID .eq. 0) then
-      deallocate(mumps_par%IRN)
-      deallocate(mumps_par%JCN)
-      deallocate(mumps_par%A)
-      deallocate(mumps_par%RHS)
-   endif
+   if (associated(mumps_par%IRN)) deallocate(mumps_par%IRN)
+   if (associated(mumps_par%JCN)) deallocate(mumps_par%JCN)
+   if (associated(mumps_par%A  )) deallocate(mumps_par%A)
+   if (associated(mumps_par%RHS)) deallocate(mumps_par%RHS)
 !
 !..Destroy the instance (deallocate internal data structures)
    mumps_par%JOB = -2

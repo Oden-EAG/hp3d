@@ -33,9 +33,11 @@ subroutine pardiso_sc(mtype)
                                ALOC, BLOC, AAUX, ZAMOD, ZBMOD, &
                                NR_PHYSA, MAXNODM
    use assembly_sc
-   use control, only: ISTC_FLAG
-   use stc,     only: HERM_STC, CLOC,                          &
-                      stc_alloc, stc_dealloc, stc_get_nrdof
+   use control,   only: ISTC_FLAG
+   use stc,       only: HERM_STC, CLOC,                          &
+                        stc_alloc, stc_dealloc, stc_get_nrdof
+   use par_mesh,  only: DISTRIBUTED,HOST_MESH
+   use MPI_param, only: RANK,ROOT
 !
    implicit none
 !
@@ -70,6 +72,12 @@ subroutine pardiso_sc(mtype)
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
+!
+   if (RANK .ne. ROOT) return
+   if (DISTRIBUTED .and. (.not. HOST_MESH)) then
+      write(*,*) 'pardiso_sc: mesh is distributed (and not on host). returning...'
+      return
+   endif
 !
    select case(mtype)
       case('H')

@@ -30,7 +30,7 @@
 !                      = 2 compute also the element matrices
 !     out:
 !             Nrdofs   - number of element local dof for each physical
-!                        attribute (needed to dimension work arrays
+!                        attribute (needed to dimension work arrays)
 !             Nrdofm   - number of modified element dof in the expanded
 !                        mode (needed to dimension work arrays in calling
 !                        routines)
@@ -247,8 +247,10 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
 !***********************************************************************
 !
 !..establish extraction vector and Dirichlet data
-   ZDOFD = ZERO
-   IDBC  = 0
+   if (Idec.eq.2) then
+      ZDOFD = ZERO
+      IDBC  = 0
+   endif
 !
 !..count number of variables (not components) for each physics type
    nrPhysH=0; nrPhysE=0; nrPhysV=0
@@ -314,15 +316,17 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
 !
 !           ...dof present but known from Dirichlet BC, save the BC data
                case(1)
-                  IDBC(l)=1
-                  do iload=1,NR_RHS
-                     ZDOFD(l,iload) = NODES(nod)%zdofH((iload-1)*nvarHt+ivar,j)
-                  enddo
+                  if (Idec.eq.2) then
+                     IDBC(l)=1
+                     do iload=1,NR_RHS
+                        ZDOFD(l,iload) = NODES(nod)%zdofH((iload-1)*nvarHt+ivar,j)
+                     enddo
+                  endif
 !
 !           ...dof present and active
                case(2)
                   k=k+1
-                  NEXTRACT(k) = l
+                  if (Idec.eq.2) NEXTRACT(k) = l
 #if DEBUG_MODE
                case default
                   write(*,*) 'celem_systemI: nod,ii,index(ii) = ',nod,ii,index(ii)
@@ -380,15 +384,17 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
 !
 !           ...dof present but known from Dirichlet BC, save the BC data
                case(3)
-                  IDBC(l)=1
-                  do iload=1,NR_RHS
-                     ZDOFD(l,iload) = NODES(nod)%zdofE((iload-1)*nvarEt+ivar,j)
-                  enddo
+                  if (Idec.eq.2) then
+                     IDBC(l)=1
+                     do iload=1,NR_RHS
+                        ZDOFD(l,iload) = NODES(nod)%zdofE((iload-1)*nvarEt+ivar,j)
+                     enddo
+                  endif
 !
 !           ...dof present and active
                case(4)
                   k=k+1
-                  NEXTRACT(k) = l
+                  if (Idec.eq.2) NEXTRACT(k) = l
 #if DEBUG_MODE
                case default
                   write(*,*) 'celem_systemI: nod,ii,index(ii) = ',nod,ii,index(ii)
@@ -446,15 +452,17 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
 !
 !           ...dof present but known from Dirichlet BC, save the BC data
                case(5)
-                  IDBC(l)=1
-                  do iload=1,NR_RHS
-                     ZDOFD(l,iload) = NODES(nod)%zdofV((iload-1)*nvarVt+ivar,j)
-                  enddo
+                  if (Idec.eq.2) then
+                     IDBC(l)=1
+                     do iload=1,NR_RHS
+                        ZDOFD(l,iload) = NODES(nod)%zdofV((iload-1)*nvarVt+ivar,j)
+                     enddo
+                  endif
 !
 !           ...dof present and active
                case(6)
                   k=k+1
-                  NEXTRACT(k) = l
+                  if (Idec.eq.2) NEXTRACT(k) = l
 #if DEBUG_MODE
                case default
                   write(*,*) 'celem_systemI: nod,ii,index(ii) = ',nod,ii,index(ii)
@@ -492,12 +500,14 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
                /,7x,4(i8,4i4,2x),/,7x,4(i8,4i4,2x))
         write(*,7003) Nrdofc
  7003   format('celem_systemI: Nrdofc = ',i4)
-        write(*,7004) NEXTRACT(1:Nrdofc)
- 7004   format('celem_systemI: NEXTRACT = ',10(/,20i5))
-        write(*,7005) IDBC(1:Nrdofm)
- 7005   format('celem_systemI: IDBC = ',10(4i2,1x),                   &
+        if (Idec .eq. 2) then
+          write(*,7004) NEXTRACT(1:Nrdofc)
+ 7004     format('celem_systemI: NEXTRACT = ',10(/,20i5))
+          write(*,7005) IDBC(1:Nrdofm)
+ 7005     format('celem_systemI: IDBC = ',10(4i2,1x),                   &
              10(/,'              ',10(4i2,1x)))
-        call pause
+          call pause
+        endif
       endif
 #endif
 !

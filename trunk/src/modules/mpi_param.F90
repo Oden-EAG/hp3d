@@ -18,7 +18,7 @@ module MPI_param
    integer, parameter :: ROOT = 0
    integer, save      :: RANK = -1
    integer, save      :: NUM_PROCS = -1
-   integer, save      :: INIT = 0
+   logical, save      :: MPI_PARAM_IS_INIT = .false.
 !
    contains
 !
@@ -44,7 +44,7 @@ module MPI_param
       call MPI_COMM_SIZE (MPI_COMM_WORLD, NUM_PROCS, ierr)
 !
 !  ...set initialization flag
-      INIT = 1
+      MPI_PARAM_IS_INIT = .true.
 !
    end subroutine MPI_param_init
 !
@@ -56,21 +56,8 @@ module MPI_param
    subroutine MPI_param_finalize()
       integer :: ierr
       call MPI_FINALIZE ( ierr )
-      INIT = 0
+      MPI_PARAM_IS_INIT = .false.
    end subroutine MPI_param_finalize
 !
-!
-!----------------------------------------------------------------------
-!     function:   Is_init
-!     purpose:    return initialization status
-!----------------------------------------------------------------------
-   function Is_init()
-      logical Is_init
-      if (INIT .eq. 1) then
-         Is_init = .true.
-      else
-         Is_init = .false.
-      endif
-   end function Is_init
 !
 end module MPI_param

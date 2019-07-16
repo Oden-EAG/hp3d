@@ -46,7 +46,7 @@ subroutine refresh
 !     ...if node is visited by an element within my subdomain,
 !        add node to my subdomain (need its dofs). this flag will
 !        indicate that dofs must be allocated in activation.
-         if (DISTRIBUTED.eq.1 .and. subd.eq.RANK) then
+         if (DISTRIBUTED .and. (subd.eq.RANK)) then
             call set_subd(nodesl(i),subd)
          endif
       enddo

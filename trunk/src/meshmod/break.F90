@@ -14,8 +14,6 @@ subroutine break(Mdle,Kref)
   use data_structure3D
   use element_data
   use refinements
-  use par_mesh  , only: DISTRIBUTED
-  use MPI_param , only: RANK
 !  
   implicit none
 !

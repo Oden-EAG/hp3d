@@ -1,3 +1,5 @@
+!
+#include "implicit_none.h"
 ! -----------------------------------------------------------------------
 !
 !    routine name       - mumps_sc
@@ -6,7 +8,7 @@
 !
 !    latest revision    - July 2019
 !
-!    purpose            - interface for MUMPS solver
+!    purpose            - interface for OpenMP MUMPS solver
 !                       - routine computes global stiffness matrix
 !                         and global load vector and solves the global
 !                         linear system with mumps
@@ -17,10 +19,9 @@
 !    in                 - mtype: 'H':  Hermitian (for complex)/
 !                                      Symmetric (for real)
 !                                      case for Lapack routines
-!                                'G': General case for Lapack routines
+!                                'G':  General case for Lapack routines
 !
 ! ----------------------------------------------------------------------
-#include "implicit_none.h"
 subroutine mumps_sc(mtype)
 !
    use data_structure3D, only: NRNODS, NRELES
@@ -33,9 +34,11 @@ subroutine mumps_sc(mtype)
                                ALOC, BLOC, AAUX, ZAMOD, ZBMOD, &
                                NR_PHYSA, MAXNODM
    use assembly_sc
-   use control, only: ISTC_FLAG
-   use stc,     only: HERM_STC,CLOC,stc_alloc,stc_dealloc,stc_get_nrdof
-   use mumps,   only: MUMPS_PAR, mumps_start, mumps_destroy
+   use control,   only: ISTC_FLAG
+   use stc,       only: HERM_STC,CLOC,stc_alloc,stc_dealloc,stc_get_nrdof
+   use mumps,     only: MUMPS_PAR, mumps_start, mumps_destroy
+   use par_mesh,  only: DISTRIBUTED,HOST_MESH
+   use MPI_param, only: RANK,ROOT
 !
    implicit none
 !
@@ -56,7 +59,7 @@ subroutine mumps_sc(mtype)
 !..dummy variables
    integer :: nvoid
    VTYPE   :: zvoid
-! 
+!
 !..work space for celem
    integer, dimension(MAXNODM) :: nodm,ndofmH,ndofmE,ndofmV,ndofmQ
    integer, dimension(NRELES)  :: mdle_list,m_elem_inz
@@ -67,6 +70,13 @@ subroutine mumps_sc(mtype)
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
+!
+   if (DISTRIBUTED .and. (.not. HOST_MESH)) then
+      write(*,*) 'mumps_sc: mesh is distributed (and not on host). calling par_mumps_sc...'
+      call par_mumps_sc(mtype)
+      return
+   endif
+   if (RANK .ne. ROOT) return
 !
    select case(mtype)
       case('H')
@@ -134,9 +144,11 @@ subroutine mumps_sc(mtype)
       mdle_list(iel) = mdle
 !  ...get information from celem
       if (ISTC_FLAG) then
+         !write(*,*) 'celem_systemI, iel = ', iel
          call celem_systemI(iel,mdle,1, nrdofs,nrdofm,nrdofc,nodm,  &
             ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid,zvoid)
       else
+         !write(*,*) 'celem, iel = ', iel
          call celem(mdle,1, nrdofs,nrdofm,nrdofc,nodm,  &
             ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid,zvoid)
       endif
@@ -342,8 +354,9 @@ subroutine mumps_sc(mtype)
 !     ...loop through dof `to the right'
          do k2=1,ndof
 !        ...global dof is:
-            j = lcon(k2)
+            j = LCON(k2)
 !        ...assemble
+!        ...note: repeated indices are summed automatically by MUMPS
             m_elem_inz(iel) = m_elem_inz(iel) + 1
             k = (k1-1)*ndof + k2
             MUMPS_PAR%A(  m_elem_inz(iel)) = ZTEMP(k)

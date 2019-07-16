@@ -18,7 +18,7 @@ subroutine collect_dofs()
    use data_structure3D
    use par_mesh
    use MPI_param, only: ROOT,RANK
-   use MPI      , only: MPI_COMM_WORLD,MPI_SUCCESS,MPI_STATUS_SIZE,  &
+   use MPI      , only: MPI_COMM_WORLD,MPI_STATUS_SIZE,  &
                         MPI_COMPLEX16,MPI_REAL8
 !
    implicit none
@@ -32,13 +32,13 @@ subroutine collect_dofs()
 !..auxiliary variables
    integer :: nodm(MAXNODM)
    integer :: mdle, nod, inod, iel, subd, vis, nrnodm, nrdof_nod
-   integer :: iprint = 1
+   integer :: iprint = 0
 !
 !----------------------------------------------------------------------
 !
-   if (.not. DISTRIBUTED) then
-      write(*,*) 'collect_dofs: mesh is not distributed.'
-      goto 90
+   if ((.not. DISTRIBUTED) .or. HOST_MESH) then
+      write(*,*) 'collect_dofs: mesh is not distributed (or on host).'
+      goto 190
    endif
 !
 !..collect degrees of freedom from every element
@@ -57,8 +57,8 @@ subroutine collect_dofs()
       do inod=1,nrnodm
          nod = nodm(inod)
          call get_visit(nod, vis)
-         if (vis .eq. 1) goto 50
-         if (RANK .ne. ROOT .and. RANK .ne. subd) goto 40
+         if (vis .eq. 1) goto 150
+         if (RANK .ne. ROOT .and. RANK .ne. subd) goto 140
 !     ...3c. Calculate nodal degrees of freedom, and allocate buffer
          call get_dof_buf_size(nod, nrdof_nod)
          if (nrdof_nod .eq. 0) cycle
@@ -70,54 +70,155 @@ subroutine collect_dofs()
             call pack_dof_buf(nod,nrdof_nod, buf)
 !        ...3f. send buffer to new subdomain
             if (iprint .eq. 1) then
-               write(6,100) '[', RANK, ']: ', &
+               write(6,1000) '[', RANK, ']: ', &
                   'Sending data to [',ROOT,'], nod = ',nod
             endif
             count = nrdof_nod; dest = ROOT; tag = nod
             call MPI_SEND(buf,count,MPI_VTYPE,dest,tag,MPI_COMM_WORLD,ierr)
-            if (ierr .ne. MPI_SUCCESS) then
-               write(6,*) 'MPI_SEND failed. stop.'
-               stop
-            endif
 !     ...3d. if new subdomain is my subdomain, receive data
          else if (RANK .eq. ROOT) then
 !        ...3e. receive buffer from old subdomain
             if (iprint .eq. 1) then
-               write(6,100) '[', RANK, ']: ',   &
+               write(6,1000) '[', RANK, ']: ',   &
                   'Receiving data from [',subd,'], nod = ',nod
             endif
             count = nrdof_nod; src = subd; tag = nod
             call MPI_RECV(buf,count,MPI_VTYPE,src,tag,MPI_COMM_WORLD,stat,ierr)
-            if (ierr .ne. MPI_SUCCESS) then
-               write(6,*) 'MPI_RECV failed. stop.'
-               stop
-            endif
 !        ...3f. unpack DOF data from buffer
             call alloc_nod_dof(nod)
             call unpack_dof_buf(nod,nrdof_nod,buf)
          endif
          deallocate(buf)
-      40 continue
+     140 continue
          call set_visit(nod)
-      50 continue
-         if (RANK .eq. subd) then
+         call set_subd(nod,ROOT)
+     150 continue
+         if ((RANK .ne. ROOT) .and. (RANK .eq. subd)) then
             call dealloc_nod_dof(nod)
          endif
       enddo
       call set_subd(mdle, ROOT)
    enddo
-   100 format(A,I2,A,A,I4,A,I6)
-
-!..Delete degrees of freedom for NODES if not ROOT processor
-   if (RANK .ne. ROOT) then
-      do nod=1,NRNODS
-         call get_subd(nod, subd)
-         if (subd .ne. RANK .and. Is_active(nod)) then
-
-         endif
-      enddo
-   endif
+   1000 format(A,I2,A,A,I4,A,I6)
 !
-  90 continue
+   HOST_MESH = .true.
+   write(*,*) 'collect_dofs: mesh is now on host, HOST_MESH = .true.'
+!
+   190 continue
 !
 end subroutine collect_dofs
+!
+!
+!----------------------------------------------------------------------
+!
+!     subroutine:          print_partition
+!
+!     last modified:       July 2019
+!
+!     purpose:             print current partition of distributed mesh
+!
+!----------------------------------------------------------------------
+subroutine print_partition()
+!
+   use data_structure3D
+   use par_mesh , only: DISTRIBUTED
+   use MPI_param, only: RANK,ROOT,NUM_PROCS
+!
+   implicit none
+!
+   integer :: par(NRELES),mdlel(NRELES)
+   integer :: iel,j,k,l,nreles_subd,mdle,subd
+!
+!----------------------------------------------------------------------
+!
+   if (.not. DISTRIBUTED) then
+      write(*,*) 'print_partition: mesh is not distributed.'
+      goto 290
+   endif
+!
+   if (RANK .ne. ROOT) goto 290
+
+!
+   mdle = 0
+   do iel=1,NRELES
+      call nelcon(mdle,mdle)
+      mdlel(iel) = mdle
+   enddo
+!
+   do j=0,NUM_PROCS-1
+      nreles_subd = 0
+      do iel=1,NRELES
+         mdle = mdlel(iel)
+         call get_subd(mdle, subd)
+         if (j .eq. subd) then
+            nreles_subd = nreles_subd+1
+            par(nreles_subd) = mdle
+         endif
+      enddo
+      write(6,2000) 'partition [', j, '] : '
+      k = 0
+      do while (k .lt. nreles_subd)
+         l = MIN(k+10,nreles_subd)
+         write(6,2010) '     ',par(k+1:l)
+         k = l
+      enddo
+   enddo
+  2000 format(A,I3,A)
+  2010 format(A,<l-k>I5)
+!
+  290 continue
+!
+end subroutine print_partition
+!
+!
+!----------------------------------------------------------------------
+!
+!     subroutine:          print_subd
+!
+!     last modified:       July 2019
+!
+!     purpose:             print current subdomain for each process
+!
+!----------------------------------------------------------------------
+subroutine print_subd()
+!
+   use data_structure3D
+   use par_mesh , only: DISTRIBUTED
+   use MPI_param, only: RANK,ROOT
+!
+   implicit none
+!
+   integer :: sub(NRNODS),mdlel(NRELES)
+   integer :: k,l,nod,nrnod_subd,subd,vis
+!
+!----------------------------------------------------------------------
+!
+   if (.not. DISTRIBUTED) then
+      write(*,*) 'print_subd: mesh is not distributed.'
+      goto 390
+   endif
+!
+   call reset_visit
+   nrnod_subd = 0
+   do nod=1,NRNODS
+      call get_subd(nod, subd)
+      if (RANK .ne. subd) cycle
+      call get_visit(nod, vis)
+      if (vis .eq. 1) cycle
+      nrnod_subd = nrnod_subd + 1
+      sub(nrnod_subd) = nod
+      call set_visit(nod)
+   enddo
+   write(6,3000) 'subdomain [', RANK, '] : '
+   k = 0
+   do while (k .lt. nrnod_subd)
+      l = MIN(k+10,nrnod_subd)
+      write(6,3010) '     ',sub(k+1:l)
+      k = l
+   enddo
+ 3000 format(A,I3,A)
+ 3010 format(A,<l-k>I5)
+!
+  390 continue
+!
+end subroutine print_subd
