@@ -1,0 +1,59 @@
+!----------------------------------------------------------------------
+!                                                                     
+!     routine name      - common_prob_data
+!                                                                     
+!---------------------------------------------------------------------- 
+!                                                                     
+!     latest revision:  - July 17
+!                                                                     
+!     purpose:          - module setting up the parameters for the
+!                         acoustics problem
+!                                                                    
+!
+!----------------------------------------------------------------------
+! 
+   module common_prob_data
+   save
+!   
+!------------------------------------------------------------------------------
+!
+!..MATLAB DIR
+   character(len=128) :: MATLAB_DIR
+!..MISCELLANEOUS
+   integer :: NR_RHS_PROB = 1
+!
+!..INITIAL ORDER OF APPROXIMATION\
+   integer :: IP
+!
+!..BOUNDARY CONDITION
+   integer :: IBC_PROB
+   integer, parameter :: BC_NONE        = 0
+   integer, parameter :: BC_DIRICHLET   = 1
+   integer, parameter :: BC_IMPEDANCE   = 3
+   integer, parameter :: BC_CAVITY      = 4
+   integer, parameter :: BC_CAVITY_SCAT = 5
+   integer, parameter :: BC_SPHERE_SCAT = 6
+!   
+!..EXACT SOLUTION
+   integer :: IEXACT_PROB
+   integer, parameter :: IEXACT_POLYNOMIAL  = 0
+   integer, parameter :: IEXACT_SINUSOIDAL  = 1
+!
+!  order of the polynomial exact solution
+   integer :: NPX, NPY, NPZ
+!
+!..pi for sinusoidal solution
+   real*8,  parameter :: PI = 4.d0*datan(1.d0)
+!
+!..REFINEMENT TYPE (refine_DPG.F90)
+   integer, parameter :: INOREFINEMENT  = 0
+   integer, parameter :: IUNIFORM       = 1
+   integer, parameter :: IADAPTIVE      = 2
+!   
+!..DISPLAY SETTINGS (soldis.F90 ...)
+!..DISPLAY SETTINGS (paraview   ...)
+   integer :: IEXACT_DISP, ITANGENT_DISP, ICHOOSE_DISP
+   integer :: IDOMAIN_SMOOTHE = 0
+!
+
+   end module common_prob_data

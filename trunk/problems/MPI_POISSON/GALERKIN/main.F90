@@ -6,7 +6,7 @@
 !                                                                     
 !     latest revision:  - July 2019
 !                                                                     
-!     purpose:          - main driver for MPI Poisson Test Program
+!     purpose:          - main driver for MPI Test Program
 !                                                                    
 !----------------------------------------------------------------------
 !    
@@ -16,6 +16,10 @@ program main
    use common_prob_data
    use data_structure3D
    use GMP
+   use control
+   use assembly
+   use assembly_sc, only: IPRINT_TIME
+   use stc        , only: STORE_STC,HERM_STC
 !
    use MPI      , only: MPI_COMM_WORLD
    use MPI_param, only: ROOT,RANK,NUM_PROCS, &
@@ -32,15 +36,9 @@ program main
    call MPI_param_init
 !
 !..Set common hp3D environment parameters (reads in options arguments)
-   call begin_environment  ! <-- found inside src/modules/environment.F90
-!
-!..This sets default values for: FILE_REFINE,FILE_VIS,VLEVEL,
-!                                FILE_CONTROL,FILE_GEOM,FILE_ERR,
-!                                FILE_HISTORY,FILE_PHYS
-   call set_environment  ! <-- found inside ../common/set_environment.F90
-!
-!..Exit if this is a "dry run"
-   call end_environment  ! <-- found inside src/modules/environment.F90
+   call begin_environment
+   call set_environment
+   call end_environment
 !
    if (RANK .eq. ROOT) then
 !  ...print header
@@ -49,6 +47,7 @@ program main
       write(6,*) '// --  MPI TEST PROGRAM  -- //'
       write(6,*) '//                          //'
       write(6,*)
+      IPRINT_TIME = 1
    endif
 !
    flush(6)
@@ -82,6 +81,11 @@ program main
       call MPI_BARRIER (MPI_COMM_WORLD, ierr)
    enddo
  1020 format (A,I3,A,/)
+!
+!..FLAGS
+   ISTC_FLAG = .true.
+   STORE_STC = .true.
+   HERM_STC  = .false.
 !
    if (RANK .eq. 0) then
       call master_main
@@ -163,11 +167,14 @@ subroutine master_main()
       write(*,*) '                                         '
       write(*,*) '    ---- Print Data Structure ----       '
       write(*,*) 'Print arrays (interactive).............10'
-      write(*,*) 'Print data structure arrays ...........11'
+      write(*,*) 'Print data structure arrays............11'
+      write(*,*) 'Print current partition (elems)........15'
+      write(*,*) 'Print current subdomains (nodes).......16'
       write(*,*) '                                         '
       write(*,*) '        ---- Refinements ----            '
       write(*,*) 'Single uniform h-refinement............20'
       write(*,*) 'Single uniform p-refinement............21'
+      write(*,*) 'Multiple uniform h-refs + solve........22'
       write(*,*) '                                         '
       write(*,*) '        ---- MPI Routines ----           '
       write(*,*) 'Distribute mesh........................30'
@@ -175,8 +182,13 @@ subroutine master_main()
       write(*,*) 'Run verification routines..............35'
       write(*,*) '                                         '
       write(*,*) '          ---- Solvers ----              '
-      write(*,*) 'MUMPS (OpenMP).........................40'
-      write(*,*) 'MUMPS (MPI)............................41'
+      write(*,*) 'MUMPS (MPI)............................40'
+      write(*,*) 'MUMPS (OpenMP).........................41'
+      write(*,*) 'Pardiso (OpenMP).......................42'
+      write(*,*) 'Frontal (Seq)..........................43'
+      write(*,*) '                                         '
+      write(*,*) '     ---- Error and Residual ----        '
+      write(*,*) 'Compute exact error....................50'
       write(*,*) '=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='
 !
       read( *,*) idec
@@ -198,9 +210,11 @@ subroutine master_main()
             if (r .eq. RANK) then
                call exec_case(idec)
             endif
+         case(15,16)
+            call exec_case(idec)
 !
 !     ...Refinements
-         case(20,21)
+         case(20,21,22)
             call exec_case(idec)
 !
 !     ...MPI Routines
@@ -208,7 +222,11 @@ subroutine master_main()
             call exec_case(idec)
 !
 !     ...Solvers
-         case(40,41)
+         case(40,41,42,43)
+            call exec_case(idec)
+!
+!     ...Error and Residual
+         case(50)
             call exec_case(idec)
 !
       end select
@@ -299,9 +317,11 @@ subroutine worker_main()
             if (r .eq. RANK) then
                call exec_case(idec)
             endif
+         case(15,16)
+            call exec_case(idec)
 !
 !     ...Refinements
-         case(20,21)
+         case(20,21,22)
             call exec_case(idec)
 !
 !     ...MPI Routines
@@ -309,7 +329,11 @@ subroutine worker_main()
             call exec_case(idec)
 !
 !     ...Solvers
-         case(40,41)
+         case(40,41,42,43)
+            call exec_case(idec)
+!
+!     ...Error and Residual
+         case(50)
             call exec_case(idec)
 !
       end select
@@ -335,12 +359,18 @@ subroutine exec_case(idec)
 !
    use data_structure3D
    use par_mesh
+   use common_prob_data
 !
    implicit none
 !
    integer, intent(in) :: idec
 !
+   integer :: i,nsteps,nstop
+   logical :: solved
+!
 !----------------------------------------------------------------------
+!
+   solved = .false.
 !
    select case(idec)
 !
@@ -355,6 +385,16 @@ subroutine exec_case(idec)
  111     format(' NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ = ',4I10)
          write(*,112) MAXNODS,NPNODS
  112     format(' MAXNODS,NPNODS                  = ',2I10)
+!
+!  ...print current partition (elems)
+      case(15)
+         write(*,*) 'printing current partition (elems)...'
+         call print_partition
+!
+!  ...print current subdomains (nodes)
+      case(16)
+         write(*,*) 'printing current subdomains (nodes)...'
+         call print_subd
 !
 !  ...single uniform h-refinement
       case(20)
@@ -371,6 +411,35 @@ subroutine exec_case(idec)
          call close_mesh ! not needed?
          call update_gdof
          call update_Ddof
+!
+!  ...Multi-step uniform h refinement
+      case(22)
+         nsteps=0
+         do while (nsteps.le.0)
+            write(*,*) 'Provide: number of uniform h-refinements'
+            read(*,*) nsteps
+         enddo
+         do i=0,nsteps
+!        ...solve first if needed
+            if (.not. solved) then
+               call par_mumps_sc('G')
+               solved = .true.
+            endif
+!        ...display error and refine if necessary
+            if (i.ne.nsteps) then
+               call uniform_href(IUNIFORM,1,0.25d0, nstop)
+               if (nstop.eq.1) then
+                  write(*,*) 'No elements were refined.'
+                  write(*,220) i
+ 220              format('Exiting loop after ',i2,' refinements...')
+                  cycle
+               else
+                  solved = .false.
+               endif
+            else ! Last step only display (no refinement)
+               call uniform_href(INOREFINEMENT,1,0.25d0, nstop)
+            endif
+        enddo
 !
 !  ...distribute mesh
       case(30)
@@ -389,13 +458,27 @@ subroutine exec_case(idec)
 !
 !  ...solve problem with omp_mumps (OpenMP MUMPS)
       case(40)
-         write(*,*) 'calling OpenMP MUMPS solver...'
-         call mumps_sc('G')
+         write(*,*) 'calling MUMPS (MPI) solver...'
+         call par_mumps_sc('G')
 !
 !  ...solve problem with par_mumps (MPI MUMPS)
       case(41)
-         write(*,*) 'calling MPI MUMPS solver...'
-         call par_mumps_sc('G')
+         write(*,*) 'calling MUMPS (OpenMP) solver...'
+         call mumps_sc('G')
+!
+!  ...solve problem with pardiso (OpenMP)
+      case(42)
+         write(*,*) 'calling Pardiso (OpenMP) solver...'
+         call pardiso_sc('G')
+!
+!  ...solve problem with Frontal solver (sequential)
+      case(43)
+         write(*,*) 'calling Frontal (Seq) solver...'
+         call solve1(1)
+!
+      case(50)
+         write(*,*) 'computing error and residual...'
+         call exact_error
 !
       case default
          write(*,*) 'exec_case: unknown case...'
