@@ -7,6 +7,7 @@
 !     latest revision:  - July 2019
 !                                                                     
 !     purpose:          - main driver for MPI Test Program
+!                         Poisson Galerkin implementation
 !                                                                    
 !----------------------------------------------------------------------
 !    
@@ -110,8 +111,10 @@ subroutine master_main()
    use data_structure3D
    use GMP
 !
-   use MPI      , only: MPI_COMM_WORLD,MPI_INTEGER
-   use mpi_param, only: ROOT,RANK,NUM_PROCS
+   use MPI           , only: MPI_COMM_WORLD,MPI_INTEGER
+   use mpi_param     , only: ROOT,RANK,NUM_PROCS
+   use par_mesh      , only: DISTRIBUTED
+   use zoltan_wrapper, only: zoltan_w_set_lb
 !
    implicit none
 !
@@ -122,7 +125,7 @@ subroutine master_main()
    integer :: num_threads, omp_get_num_threads
 !
 !..auxiliary variables
-   integer :: idec, i, r, count, src
+   integer :: idec, i, r, lb, count, src
 !
 !----------------------------------------------------------------------
 !
@@ -179,6 +182,8 @@ subroutine master_main()
       write(*,*) '        ---- MPI Routines ----           '
       write(*,*) 'Distribute mesh........................30'
       write(*,*) 'Collect dofs on ROOT...................31'
+      write(*,*) 'Suggest mesh partition (Zoltan)........32'
+      write(*,*) 'Evaluate mesh partition (Zoltan).......33'
       write(*,*) 'Run verification routines..............35'
       write(*,*) '                                         '
       write(*,*) '          ---- Solvers ----              '
@@ -195,7 +200,6 @@ subroutine master_main()
       write(6,8010) '[', RANK, '] : ','Broadcast: idec = ', idec
       count = 1; src = ROOT
       call MPI_BCAST (idec,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
-      call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
       select case(idec)
 !     ...QUIT
@@ -218,7 +222,25 @@ subroutine master_main()
             call exec_case(idec)
 !
 !     ...MPI Routines
-         case(30,31,35)
+         case(31,33,35)
+            call exec_case(idec)
+!
+!     ...MPI Routines (partitioner)
+         case(30,32)
+!        ...Load balancing strategy
+            if (DISTRIBUTED) then
+               write(*,*) 'Select load balancing strategy:'
+               write(*,*) '  0: nelcon'
+               write(*,*) '  1: BLOCK'
+               write(*,*) '  2: RANDOM'
+               write(*,*) '  3: RCB'
+               write(*,*) '  4: RIB'
+               write(*,*) '  5: HSFC'
+               read (*,*) lb
+               count = 1; src = ROOT
+               call MPI_BCAST (lb,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+               call zoltan_w_set_lb(lb)
+            endif
             call exec_case(idec)
 !
 !     ...Solvers
@@ -255,8 +277,10 @@ subroutine worker_main()
    use data_structure3D
    use GMP
 !
-   use MPI      , only: MPI_COMM_WORLD,MPI_INTEGER
-   use mpi_param, only: ROOT,RANK,NUM_PROCS
+   use MPI           , only: MPI_COMM_WORLD,MPI_INTEGER
+   use mpi_param     , only: ROOT,RANK,NUM_PROCS
+   use par_mesh      , only: DISTRIBUTED
+   use zoltan_wrapper, only: zoltan_w_set_lb
 !
    implicit none
 !
@@ -267,7 +291,7 @@ subroutine worker_main()
    integer :: num_threads, omp_get_num_threads
 !
 !..auxiliary variables
-   integer :: idec, i, r, count, src
+   integer :: idec, i, r, lb, count, src
 !
 !----------------------------------------------------------------------
 !
@@ -303,8 +327,6 @@ subroutine worker_main()
       count = 1; src = ROOT
       call MPI_BCAST (idec,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
       write(6,9010) '[', RANK, '] : ','Broadcast: idec = ', idec
-      flush(6)
-      call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
       select case(idec)
 !     ...QUIT
@@ -325,7 +347,16 @@ subroutine worker_main()
             call exec_case(idec)
 !
 !     ...MPI Routines
-         case(30,31,35)
+         case(31,33,35)
+            call exec_case(idec)
+!
+!     ...MPI Routines (partitioner)
+         case(30,32)
+            if (DISTRIBUTED) then
+               count = 1; src = ROOT
+               call MPI_BCAST (lb,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+               call zoltan_w_set_lb(lb)
+            endif
             call exec_case(idec)
 !
 !     ...Solvers
@@ -360,6 +391,7 @@ subroutine exec_case(idec)
    use data_structure3D
    use par_mesh
    use common_prob_data
+   use zoltan_wrapper, only: zoltan_w_partition,zoltan_w_eval
 !
    implicit none
 !
@@ -367,6 +399,7 @@ subroutine exec_case(idec)
 !
    integer :: i,nsteps,nstop
    logical :: solved
+   integer :: mdle_subd(NRELES)
 !
 !----------------------------------------------------------------------
 !
@@ -450,6 +483,24 @@ subroutine exec_case(idec)
       case(31)
          write(*,*) 'collecting dofs on ROOT...'
          call collect_dofs
+!
+!  ...suggest new mesh partition (Zoltan)
+      case(32)
+         if (DISTRIBUTED) then
+            write(*,*) 'computing new mesh partition (Zoltan)...'
+            call zoltan_w_partition(mdle_subd)
+         else
+            write(*,*) 'distribute mesh first to use Zoltan...'
+         endif
+!
+!  ...evaluate current partition
+      case(33)
+         if (DISTRIBUTED) then
+            write(*,*) 'evaluating current partition...'
+            call zoltan_w_eval
+         else
+            write(*,*) 'distribute mesh first to use Zoltan...'
+         endif
 !
 !  ...run mesh verification routines
       case(35)

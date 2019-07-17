@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# MPI Ranks
+# MPI Procs
 nproc=3
 #
 # OMP THREADS

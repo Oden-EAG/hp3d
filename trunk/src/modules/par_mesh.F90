@@ -14,10 +14,11 @@
 module par_mesh
 !
    use data_structure3D
-   use parameters, only: NRCOMS
-   use mpi_param , only: RANK,NUM_PROCS
-   use MPI       , only: MPI_COMM_WORLD,MPI_SUCCESS,MPI_STATUS_SIZE,  &
-                         MPI_COMPLEX16,MPI_REAL8
+   use parameters,     only: NRCOMS
+   use mpi_param,      only: RANK,NUM_PROCS
+   use MPI,            only: MPI_COMM_WORLD,MPI_STATUS_SIZE, &
+                             MPI_SUCCESS,MPI_COMPLEX16,MPI_REAL8
+   use zoltan_wrapper, only: ZOLTAN_LB,zoltan_w_partition
 !
    implicit none
 !
@@ -30,11 +31,6 @@ module par_mesh
 !
 !..T indicates that the ROOT proc holds the entire mesh
    logical, save :: HOST_MESH = .true.
-!
-!..Load balancing strategy
-!  0: use nelcon to distribute elements
-!  1: use (Zoltan)
-   integer, save :: LOAD_BALANCE = 0
 !
    contains
 !
@@ -70,14 +66,18 @@ subroutine distr_mesh()
    enddo
 !
 !..1. Determine new partition
-   iproc=0
-   do iel=1,NRELES
-!  ...decide subdomain for iel
-      subd_next(iel) = iproc
-      !iproc = MOD(iproc+1,NUM_PROCS)
-      subd_size = (NRELES+NUM_PROCS-1)/NUM_PROCS
-      iproc = iel/subd_size
-   enddo
+   if ((ZOLTAN_LB .eq. 0) .or. (.not. DISTRIBUTED)) then
+      iproc=0
+      do iel=1,NRELES
+!     ...decide subdomain for iel
+         subd_next(iel) = iproc
+         !iproc = MOD(iproc+1,NUM_PROCS)
+         subd_size = (NRELES+NUM_PROCS-1)/NUM_PROCS
+         iproc = iel/subd_size
+      enddo
+   else
+      call zoltan_w_partition(subd_next)
+   endif
 !
 !..2. Reset visit flags for all nodes to 0
    call reset_visit

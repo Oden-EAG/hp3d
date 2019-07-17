@@ -129,11 +129,6 @@ subroutine par_mumps_sc(mtype)
       call system_clock( t1, clock_rate, clock_max )
    endif
 !
-!..allocate required variables for celem (not needed when Idec=1)
-   !allocate(NEXTRACT(MAXDOFM))
-   !allocate(IDBC(MAXDOFM))
-   !allocate(ZDOFD(MAXDOFM,NR_RHS))
-!
    allocate(MAXDOFS(NR_PHYSA))
    MAXDOFS = 0; MAXDOFM = 0
 !
@@ -156,14 +151,11 @@ subroutine par_mumps_sc(mtype)
       call nelcon(mdle, mdle)
       mdle_list(iel) = mdle
       call get_subd(mdle, subd)
-      !call pause
 !  ...get information from celem
       if (ISTC_FLAG) then
-         !write(*,*) 'celem_systemI, iel = ', iel
          call celem_systemI(iel,mdle,idec, nrdofs,nrdofm,nrdofc,nodm,  &
             ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid,zvoid)
       else
-         !write(*,*) 'celem, iel = ', iel
          call celem(mdle,idec, nrdofs,nrdofm,nrdofc,nodm,  &
             ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid,zvoid)
       endif
@@ -243,10 +235,8 @@ subroutine par_mumps_sc(mtype)
 !..end of loop through elements
    enddo
 !
-   !deallocate(NEXTRACT,IDBC,ZDOFD)
-!
 !..total number of (interface) dof is nrdof
-   nrdof = nrdof_H +  nrdof_E + nrdof_V + nrdof_Q
+   nrdof = nrdof_H + nrdof_E + nrdof_V + nrdof_Q
 !
    NRDOF_CON = nrdof
    NRDOF_TOT = nrdof + nrdof_mdl
@@ -278,7 +268,6 @@ subroutine par_mumps_sc(mtype)
 !
 !..memory allocation for MUMPS solver
    mumps_par%N = nrdof
-   !mumps_par%NZ = inz
    mumps_par%NZ_loc = inz_loc
 !
    write(*,2010) '  Number of dof  : nrdof   = ', nrdof
@@ -286,9 +275,6 @@ subroutine par_mumps_sc(mtype)
    write(*,2010) '  Local non-zeros: inz_loc = ', inz_loc
 2010 format(A,I10)
 !
-   !allocate(mumps_par%IRN(inz))
-   !allocate(mumps_par%JCN(inz))
-   !allocate(mumps_par%A(inz))
    allocate(mumps_par%IRN_loc(inz_loc))
    allocate(mumps_par%JCN_loc(inz_loc))
    allocate(mumps_par%A_loc(inz_loc))
@@ -448,7 +434,7 @@ subroutine par_mumps_sc(mtype)
 !
 !..gather RHS vector information on host
    count = mumps_par%N
-   call MPI_REDUCE(RHS,mumps_par%RHS,count,MPI_VTYPE,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+   call MPI_REDUCE(RHS,mumps_par%RHS,count,MPI_VTYPE,MPI_SUM,ROOT,mumps_par%COMM,ierr)
 !
 !..deallocate local RHS vector
    deallocate(RHS)
@@ -499,16 +485,9 @@ subroutine par_mumps_sc(mtype)
    deallocate(mumps_par%RHS)
 !..broadcast global solution from host to other processes
    count = mumps_par%N; src = ROOT
-   call MPI_BCAST (SOL,count,MPI_VTYPE,src,MPI_COMM_WORLD,ierr)
+   call MPI_BCAST (SOL,count,MPI_VTYPE,src,mumps_par%COMM,ierr)
 !
-!$OMP PARALLEL
-!..allocate arrays required by solout for celem (not needed for Idec=1)
-   !allocate(NEXTRACT(MAXDOFM))
-   !allocate(IDBC(MAXDOFM))
-   !allocate(ZDOFD(MAXDOFM,NR_RHS))
-!
-!..loop through elements
-!$OMP DO                             &
+!$OMP PARALLEL DO                    &
 !$OMP PRIVATE(i,k1,ndof,mdle,subd)   &
 !$OMP SCHEDULE(DYNAMIC)
    do iel=1,NRELES
@@ -530,9 +509,7 @@ subroutine par_mumps_sc(mtype)
       deallocate(ZSOL_LOC)
 !
    enddo
-!$OMP END DO
-   !deallocate(NEXTRACT,IDBC,ZDOFD)
-!$OMP END PARALLEL
+!$OMP END PARALLEL DO
 !
 ! ----------------------------------------------------------------------
 !  END OF STEP 4
