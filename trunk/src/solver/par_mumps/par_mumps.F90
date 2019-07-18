@@ -90,6 +90,10 @@ subroutine mumps_start
 !     1: elemental input format
    mumps_par%icntl(5) = 0
 !
+!..icntl(14): percentage increase in estimated workspace
+!     [default: 20] - 20% increase in workspace
+   mumps_par%icntl(14) = 50
+!
 !..icntl(18): distribution strategy of the input matrix
 !     0: centralized on host
 !     1: user provides matrix structure at analysis, MUMPS returns mapping for entries
