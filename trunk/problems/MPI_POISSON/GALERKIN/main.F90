@@ -10,7 +10,7 @@
 !                         Poisson Galerkin implementation
 !                                                                    
 !----------------------------------------------------------------------
-!    
+!
 program main
 !
    use environment
@@ -447,32 +447,7 @@ subroutine exec_case(idec)
 !
 !  ...Multi-step uniform h refinement
       case(22)
-         nsteps=0
-         do while (nsteps.le.0)
-            write(*,*) 'Provide: number of uniform h-refinements'
-            read(*,*) nsteps
-         enddo
-         do i=0,nsteps
-!        ...solve first if needed
-            if (.not. solved) then
-               call par_mumps_sc('G')
-               solved = .true.
-            endif
-!        ...display error and refine if necessary
-            if (i.ne.nsteps) then
-               call uniform_href(IUNIFORM,1,0.25d0, nstop)
-               if (nstop.eq.1) then
-                  write(*,*) 'No elements were refined.'
-                  write(*,220) i
- 220              format('Exiting loop after ',i2,' refinements...')
-                  cycle
-               else
-                  solved = .false.
-               endif
-            else ! Last step only display (no refinement)
-               call uniform_href(INOREFINEMENT,1,0.25d0, nstop)
-            endif
-        enddo
+         call href_solve
 !
 !  ...distribute mesh
       case(30)
@@ -536,4 +511,3 @@ subroutine exec_case(idec)
    end select
 !
 end subroutine exec_case
-
