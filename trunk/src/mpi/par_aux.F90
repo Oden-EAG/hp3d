@@ -163,8 +163,8 @@ subroutine print_partition()
          k = l
       enddo
    enddo
-  2000 format(A,I3,A)
-  2010 format(A,<l-k>I5)
+  2000 format(A,I4,A)
+  2010 format(A,<l-k>I6)
 !
   290 continue
 !

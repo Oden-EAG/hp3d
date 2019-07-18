@@ -116,7 +116,7 @@ module zoltan_wrapper
       call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
 !
 !  ...set debug level for Zoltan library
-      ierr = Zoltan_Set_Param(zz,'DEBUG_LEVEL','1')
+      ierr = Zoltan_Set_Param(zz,'DEBUG_LEVEL','0')
       call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
 !
 !  ...set weights to one floating point value per element
@@ -128,7 +128,10 @@ module zoltan_wrapper
       call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
 !
 !  ...return only information about elements to be exported from a processor
-      ierr = Zoltan_Set_Param(zz,'RETURN_LISTS','ALL')
+!        ALL   : info about elements to be exported or imported
+!        EXPORT: info about elements to be exported
+!        IMPORT: info about elements to be imported
+      ierr = Zoltan_Set_Param(zz,'RETURN_LISTS','EXPORT')
       call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
 !
       ZOLTAN_IS_INIT = .true.
@@ -210,7 +213,7 @@ module zoltan_wrapper
          x(1:3) = x(1:3) + xnod(1:3,i)
       enddo
       Coords(1:3) = x(1:3) / nrv
-      write(*,200) 'Mdle = ', mdle,', Coords = ', x(1:3)/nrv
+      !write(*,200) 'Mdle = ', mdle,', Coords = ', x(1:3)/nrv
   200 format(A,I5,A,3F6.2)
       Ierr = ZOLTAN_OK
    end subroutine zoltan_w_query_coords
@@ -288,12 +291,12 @@ module zoltan_wrapper
 !
       write(*,*) 'zoltan_w_partition:'
       write(*,300) '   changes  = ', changes
-      write(*,301) '   nrImp    = ', nrImp
+      !write(*,301) '   nrImp    = ', nrImp
       write(*,301) '   nrExp    = ', nrExp
-      if (nrImp > 0) write(*,310) '   impProcs = ', impProcs
-      if (nrImp > 0) write(*,310) '   impParts = ', impParts
-      if (nrExp > 0) write(*,320) '   expProcs = ', expProcs
-      if (nrExp > 0) write(*,320) '   expParts = ', expParts
+      !if (nrImp > 0) write(*,310) '   impProcs = ', impProcs
+      !if (nrImp > 0) write(*,310) '   impParts = ', impParts
+      !if (nrExp > 0) write(*,320) '   expProcs = ', expProcs
+      !if (nrExp > 0) write(*,320) '   expParts = ', expParts
   300 format(A,L5)
   301 format(A,I5)
   310 format(A,<nrImp>I5)
@@ -316,8 +319,8 @@ module zoltan_wrapper
          call MPI_BCAST (subd,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr_mpi)
          Mdle_subd(iel) = subd
       enddo
-      write(*,*) 'Suggested new partition is as follows'
-      write(*,330) Mdle_subd
+      !write(*,*) 'Suggested new partition is as follows'
+      !write(*,330) Mdle_subd
   330 format(<NRELES>I4)
 !
 !  ...deallocate internal data structures

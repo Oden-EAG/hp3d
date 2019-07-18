@@ -12,17 +12,19 @@ Mesh distribution:
    - set subdomain sons of mdle nodes, according to father node
    - allocate dofs only within subdomain, using visit flags
    - 'activate' nodes as before, but allocate solutions DOFs only if needed
-7. avoid re-sending/re-receiving edge,face,and vertex dofs
+7. not necessary, avoid re-sending/re-receiving edge,face,and vertex dofs
 8. use OpenMP for loops in par_mesh, whenever possible
 9. not necessary, use non-blocking communication when useful
    (not useful when unpacking is done right after receive)
 10. done, update_Ddof
 11. done, printing and debugging routines (par_aux)
-12. use 64 bit integers
+12. done, use 64 bit integers
 13. job script option in application
 14. done, Solver interface (MUMPS)
 15. use MPI_Wtime/omp_get_wtime instead of other timers
 16. done, load balancing with Zoltan
+17. timer for data migration and load balancing
+18. data migration with zoltan
 
 F --> F90:
 - data_structure3D.F
