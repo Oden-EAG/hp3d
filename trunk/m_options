@@ -88,7 +88,7 @@ MKL_INCS = -i8 -I${MKLROOT}/include/intel64/lp64 -I${MKLROOT}/include
 # TACC MUMPS
 # module load mumps/5.1
 # needs PT-SCOTCH and parMETIS
-# also adding zoltan library dependence
+# also adding Zoltan library dependence
 
 MUMPS_LIBS = -L${TACC_PETSC_LIB} -ldmumps -lzmumps -lmumps_common \
                                  -lesmumps -lzoltan -lpord \
@@ -98,47 +98,16 @@ MUMPS_LIBS = -L${TACC_PETSC_LIB} -ldmumps -lzmumps -lmumps_common \
 MUMPS_INCS = -I${TACC_PETSC_INC}
 
 #------------------------------------------------------------------
-# FLAME LIBRARY
-#------------------------------------------------------------------
-
-FLA_VERSION     = x86_64-5.1.0-48
-
-FLA_LIB_PATH    = $(LIBRARIES)/flame/intel_skx/lib
-FLA_INC_PATH    = $(LIBRARIES)/flame/intel_skx/include-$(FLA_VERSION)
-# Linking associated libraries inside ${INTEL_HOME}/lib/intel64
-FLA_LDFLAGS     = -L${INTEL_HOME}/lib/intel64 \
-                  -lifport -lifcore -limf -lsvml -lipgo -lirc -lirc_s
-# Libraries inside /usr/lib64                  
-FLA_LDFLAGS    += -lgfortran -lstdc++ -lutil -lm -lpthread -ldl
-
-FLA_LIB         = $(FLA_LIB_PATH)/libflame-$(FLA_VERSION).a \
-                  $(FLA_LDFLAGS)
-
-#------------------------------------------------------------------
-# UHM LIBRARY
+# VIS LIBRARY
 #------------------------------------------------------------------
 #
 # TACC HDF5, Paraview
 #
 
-UHM_PATH        = $(LIBRARIES)/UHM/intel/UHM
-LINAL_PATH      = $(LIBRARIES)/UHM/intel/LINAL
-VIS_PATH        = $(LIBRARIES)/UHM/intel/VIS
-
-UHM_INC_PATH    = $(UHM_PATH)/include
-LINAL_INC_PATH  = $(LINAL_PATH)/include
-VIS_INC_PATH    = $(VIS_PATH)/include
-
 # module load paraview/5.6.0
 # module load hdf5/1.10.4
-
-VIS_LDFLAGS     = -L${TACC_HDF5_LIB} -lhdf5 -lhdf5_hl
-VIS_LDFLAGS    += -L${TACC_PARAVIEW_LIB} -lvtkhdf5-pv5.6 -lvtkhdf5_hl-pv5.6 -lvtklibxml2-pv5.6 -lvtkzlib-pv5.6
-
-UHM_LIB         = $(UHM_PATH)/lib/libuhm.a
-LINAL_LIB       = $(LINAL_PATH)/lib/liblinal.a
-VIS_LIB         = $(VIS_PATH)/lib/libvis.a \
-                  $(VIS_LDFLAGS)
+#VIS_LDFLAGS  = -L${TACC_HDF5_LIB} -lhdf5 -lhdf5_hl
+#VIS_LDFLAGS  += -L${TACC_PARAVIEW_LIB} -lvtkhdf5-pv5.6 -lvtkhdf5_hl-pv5.6 -lvtklibxml2-pv5.6 -lvtkzlib-pv5.6
 
 #------------------------------------------------------------------
 # PREPROCESSOR VARIABLES
@@ -180,14 +149,10 @@ ifeq ($(COMPLEX),0)
 OBJ_PATH        = $(OBJ_PATH_REAL)
 endif
 
-HP3D_LIB_EXTRA_INCS    =
-
-ifdef MUMPS_INCS
-HP3D_LIB_EXTRA_INCS   += $(MUMPS_INCS)
-endif
+HP3D_LIB_EXTRA_INCS = $(MUMPS_INCS)
 
 #not used
-HP3D_MOD_OPTION_INC    = -module ./$(MODULE_PATH)
+HP3D_MOD_OPTION_INC = -module ./$(MODULE_PATH)
 
 # For problem makefiles
 HP3D_LIB        = $(HP3D_PATH)/lib/libhp3d.a 
@@ -221,41 +186,17 @@ LIN_ALG_LINK_INCS = $(MKL_INCS)
 # MUMPS LINKING (includes basic linear algebra and METIS)
 
 MUMPS_LINK_LIBS    = $(MUMPS_LIBS)  $(LIN_ALG_LINK_LIBS)
-MUMPS_LINK_INCS    = $(MUMPS_INCS) #$(LIN_ALG_LINK_INCS)
-
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-# UHM SOLVER LINKING (includes all of MUMPS links + FLAME + VIS)
-
-UHM_LINK_LIBS     = $(UHM_LIB) $(VIS_LIB) $(LINAL_LIB) $(FLA_LIB) \
-                    $(MUMPS_LINK_LIBS)
-                    
-UHM_LINK_INCS     = -I$(UHM_INC_PATH) -I$(VIS_INC_PATH) \
-                    -I$(LINAL_INC_PATH) -I$(FLA_INC_PATH) \
-                    $(MUMPS_LINK_INCS)
+MUMPS_LINK_INCS    = $(MUMPS_INCS)  #$(LIN_ALG_LINK_INCS)
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # EXTRA LIBS LINKING
 
 X_LIB = -lX11
-
-# Use PTHREAD_LIB when not using MKL
-#PTHREAD_LIB  = -lpthread
-
-# Use GCOV_LIB when coverage is desired (change FFLAGS as needed)
-#GCOV_LIB     = -lgcov
-
 EXTRA_LINK_LIBS    = $(X_LIB)
 EXTRA_LINK_INCS    =
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-# TYPICAL PROBLEM LINKING
-
-# In what follows UHM_LINK_xxx can be replaced everywhere with
-# MUMPS_LINK_xxx if UHM solver is not desired, or by
-# LIN_ALG_LINK_xxx if neither UHM nor MUMPS are desired, but
-# BLAS and LAPACK support are still desired. Otherwise eliminate.
-# The variable MODULE_PATH (and SRC_PATH) may be redefined inside 
-# the problem makefile. 
+# PROBLEM LINKING
 
 PROB_LIBS    = $(HP3D_LINK_LIBS) \
                $(MUMPS_LINK_LIBS)  \

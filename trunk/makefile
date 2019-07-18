@@ -40,9 +40,6 @@ endif
 CCDEFS    = -D"C_MODE=$(COMPLEX)" \
             -D"SHAPE_MODE=$(SHAPE)" \
             -D"DEBUG_MODE=$(DEBUG_MODE)"
-ifdef PETSC_LIB
-CCDEFS   += -D"__PETSC_USE__=1"
-endif
 
 # -- Includes --
 CCINCS   += -I./$(SRC_PATH) \

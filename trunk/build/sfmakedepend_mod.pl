@@ -443,7 +443,8 @@ sub find_mods {
                             $modname .= "." . $main::mod_ext;
                             push(@module_files, $modname);
                                 } elsif ( !$silent ) {
-                            warn "Couldn't locate source for module $modname\n";
+                            # suppress warning (stefan: 7/17/19)
+                            #warn "Couldn't locate source for module $modname\n";
                                 }
                         }
     }

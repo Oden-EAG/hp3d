@@ -9,18 +9,12 @@ HP3D_BASE_PATH  = ${WORK}/par_hp3d/trunk
 # COMPILER SETTINGS (a 64bit processor architecture is assumed)
 #------------------------------------------------------------------
 
-DEBUG      = NO
+DEBUG      = YES
 LARGE      = NO
 OPENMP_USE = YES
 
 # Use parallel threads to compile libraries and problems
-J ?= 24 
-
-# MPI Compilers
-#MPICC  = mpicc
-#MPICXX = mpicxx
-#MPIF77 = mpif77
-#MPIF90 = mpif90
+J ?= 24
 
 # Tau performance tool
 #FF = tau_f90.sh
@@ -94,8 +88,13 @@ MKL_INCS = -i8 -I${MKLROOT}/include/intel64/lp64 -I${MKLROOT}/include
 # TACC MUMPS
 # module load mumps/5.1
 # needs PT-SCOTCH and parMETIS
+# also adding zoltan library dependence
 
-MUMPS_LIBS = -L${TACC_PETSC_LIB} -ldmumps -lzmumps -lmumps_common -lpord -lmetis -lparmetis -lesmumps -lscotch -lscotcherr -lptscotch -lptscotcherr
+MUMPS_LIBS = -L${TACC_PETSC_LIB} -ldmumps -lzmumps -lmumps_common \
+                                 -lesmumps -lzoltan -lpord \
+                                 -lmetis -lparmetis \
+                                 -lscotch -lscotcherr \
+                                 -lptscotch -lptscotcherr
 MUMPS_INCS = -I${TACC_PETSC_INC}
 
 #------------------------------------------------------------------
@@ -145,7 +144,7 @@ VIS_LIB         = $(VIS_PATH)/lib/libvis.a \
 # PREPROCESSOR VARIABLES
 #------------------------------------------------------------------
 
-COMPLEX    ?= 1
+COMPLEX    ?= 0
 SHAPE      ?= 1
 DEBUG_MODE ?= 0
 ifeq ($(DEBUG),YES)
@@ -181,14 +180,14 @@ ifeq ($(COMPLEX),0)
 OBJ_PATH        = $(OBJ_PATH_REAL)
 endif
 
-HP3D_LIB_EXTRA_INCS    =
+HP3D_LIB_EXTRA_INCS =
 
 ifdef MUMPS_INCS
-HP3D_LIB_EXTRA_INCS   += $(MUMPS_INCS)
+HP3D_LIB_EXTRA_INCS += $(MUMPS_INCS)
 endif
 
 #not used
-HP3D_MOD_OPTION_INC    = -module ./$(MODULE_PATH)
+HP3D_MOD_OPTION_INC  = -module ./$(MODULE_PATH)
 
 # For problem makefiles
 HP3D_LIB        = $(HP3D_PATH)/lib/libhp3d.a 
@@ -259,12 +258,12 @@ EXTRA_LINK_INCS    =
 # the problem makefile. 
 
 PROB_LIBS    = $(HP3D_LINK_LIBS) \
-               $(UHM_LINK_LIBS)  \
+               $(MUMPS_LINK_LIBS)  \
                $(EXTRA_LINK_LIBS)
 
 PROB_INCS     = -module ./$(MODULE_PATH)
 PROB_INCS    += $(HP3D_LINK_INCS) \
-                $(UHM_LINK_INCS)  \
+                $(MUMPS_LINK_INCS)  \
                 $(EXTRA_LINK_INCS)
 
 # Files with ending in .F and .F90 (not .f and .f90)

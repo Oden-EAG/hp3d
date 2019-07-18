@@ -234,14 +234,14 @@ void XGOPW(int *narg,char *SD0,int l0,char *SD1,int l1,char *SD2,
 /* end of F to C interface magic */
 /* ################################################################## */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <X11/Xos.h>
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
+#include <stdlib.h>           /* bogus include */
+#include <stdio.h>            /* bogus include */
+#include <ctype.h>            /* bogus include */
+#include <X11/Xos.h>          /* bogus include */
+#include <X11/Xlib.h>         /* bogus include */
+#include <X11/Xutil.h>        /* bogus include */
 #define XK_LATIN1
-#include <X11/keysymdef.h>
+#include <X11/keysymdef.h>    /* bogus include */
 
 typedef unsigned long Pixel;
 
