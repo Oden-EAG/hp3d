@@ -5,10 +5,10 @@
 
 # Set variables if not set by m_options
 COMPLEX    ?= 0
-C_MODE     ?= 1
+C_MODE     ?= 0
 SHAPE      ?= 1
 SHAPE_MODE ?= 1
-DEBUG_MODE ?= 1
+DEBUG_MODE ?= 0
 J          ?= 1
 
 ####################################################
@@ -40,9 +40,6 @@ endif
 CCDEFS    = -D"C_MODE=$(COMPLEX)" \
             -D"SHAPE_MODE=$(SHAPE)" \
             -D"DEBUG_MODE=$(DEBUG_MODE)"
-ifdef PETSC_LIB
-CCDEFS   += -D"__PETSC_USE__=1"
-endif
 
 # -- Includes --
 CCINCS   += -I./$(SRC_PATH) \

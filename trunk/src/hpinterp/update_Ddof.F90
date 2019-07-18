@@ -18,7 +18,7 @@ subroutine update_Ddof()
    use data_structure3D
    use environment, only: QUIET_MODE
    use par_mesh   , only: DISTRIBUTED
-   use MPI_param  , only: RANK
+   use mpi_param  , only: RANK
 !
    implicit none
 !
@@ -62,12 +62,12 @@ subroutine update_Ddof()
 !
 !..fetch active elements
    mdle = 0;
-   if (DISTRIBUTED .eq. 1) then
+   if (DISTRIBUTED) then
       nreles_subd = 0
       do iel=1,NRELES
          call nelcon(mdle, mdle)
          call get_subd(mdle, subd)
-         if (subd .eq. rank) then
+         if (subd .eq. RANK) then
             nreles_subd = nreles_subd + 1
             mdlel(nreles_subd) = mdle
          endif

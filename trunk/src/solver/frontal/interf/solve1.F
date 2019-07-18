@@ -25,6 +25,8 @@ c
       use control
       use assembly_sc, only: NRDOF_TOT, NRDOF_CON
       use stc,         only: stc_alloc, stc_dealloc, stc_get_nrdof
+      use par_mesh,    only: DISTRIBUTED,HOST_MESH
+      use mpi_param,   only: RANK,ROOT
 c
 c  ...system common blocks
 #include "syscom.blk"
@@ -49,6 +51,12 @@ c  ...number of local element dof for each physics variable
       dimension nrdofi(NR_PHYSA), nrdofb(NR_PHYSA)
 c
 c-----------------------------------------------------------------------
+c
+      if (RANK .ne. ROOT) return
+      if (DISTRIBUTED .and. (.not. HOST_MESH)) then
+        write(*,*) 'solve1: mesh is distributed. returning...'
+        return
+      endif
 c
       iprint=0
 c

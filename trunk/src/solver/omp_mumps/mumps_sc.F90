@@ -1,3 +1,5 @@
+!
+#include "implicit_none.h"
 ! -----------------------------------------------------------------------
 !
 !    routine name       - mumps_sc
@@ -6,7 +8,7 @@
 !
 !    latest revision    - July 2019
 !
-!    purpose            - interface for MUMPS solver
+!    purpose            - interface for OpenMP MUMPS solver
 !                       - routine computes global stiffness matrix
 !                         and global load vector and solves the global
 !                         linear system with mumps
@@ -17,10 +19,9 @@
 !    in                 - mtype: 'H':  Hermitian (for complex)/
 !                                      Symmetric (for real)
 !                                      case for Lapack routines
-!                                'G': General case for Lapack routines
+!                                'G':  General case for Lapack routines
 !
 ! ----------------------------------------------------------------------
-#include "implicit_none.h"
 subroutine mumps_sc(mtype)
 !
    use data_structure3D, only: NRNODS, NRELES
@@ -33,9 +34,11 @@ subroutine mumps_sc(mtype)
                                ALOC, BLOC, AAUX, ZAMOD, ZBMOD, &
                                NR_PHYSA, MAXNODM
    use assembly_sc
-   use control, only: ISTC_FLAG
-   use stc,     only: HERM_STC,CLOC,stc_alloc,stc_dealloc,stc_get_nrdof
-   use mumps,   only: MUMPS_PAR, mumps_start, mumps_destroy
+   use control,   only: ISTC_FLAG
+   use stc,       only: HERM_STC,CLOC,stc_alloc,stc_dealloc,stc_get_nrdof
+   use mumps,     only: MUMPS_PAR, mumps_start, mumps_destroy
+   use par_mesh,  only: DISTRIBUTED,HOST_MESH
+   use mpi_param, only: RANK,ROOT
 !
    implicit none
 !
@@ -48,18 +51,19 @@ subroutine mumps_sc(mtype)
    integer, dimension(NR_PHYSA) :: nrdofi,nrdofb
 ! 
 !..integer counters
-   integer   :: nrdof_H,nrdof_E,nrdof_V,nrdof_Q
-   integer   :: nrdofm,nrdofc,nrnodm,nrdof,ndof
-   integer   :: iel,mdle,i,j,k,l,k1,k2,nod
-   integer   :: inz,nz,nnz,nrdof_mdl
+   integer    :: nrdof_H,nrdof_E,nrdof_V,nrdof_Q
+   integer    :: nrdofm,nrdofc,nrnodm,nrdof,nrdof_mdl,ndof
+   integer    :: iel,mdle,i,j,k,l,k1,k2,nod
+   integer(8) :: nnz
 !
 !..dummy variables
    integer :: nvoid
    VTYPE   :: zvoid
-! 
+!
 !..work space for celem
    integer, dimension(MAXNODM) :: nodm,ndofmH,ndofmE,ndofmV,ndofmQ
-   integer, dimension(NRELES)  :: mdle_list,m_elem_inz
+   integer    :: mdle_list(NRELES)
+   integer(8) :: elem_nnz(NRELES)
 !
    VTYPE, allocatable :: RHS(:)
 !
@@ -67,6 +71,13 @@ subroutine mumps_sc(mtype)
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
+!
+   if (DISTRIBUTED .and. (.not. HOST_MESH)) then
+      write(*,*) 'mumps_sc: mesh is distributed (and not on host). calling par_mumps_sc...'
+      call par_mumps_sc(mtype)
+      return
+   endif
+   if (RANK .ne. ROOT) return
 !
    select case(mtype)
       case('H')
@@ -109,9 +120,6 @@ subroutine mumps_sc(mtype)
    endif
 !
 !..allocate required variables for celem
-   allocate(NEXTRACT(MAXDOFM))
-   allocate(IDBC(MAXDOFM))
-   allocate(ZDOFD(MAXDOFM,NR_RHS))
    allocate(MAXDOFS(NR_PHYSA))
    MAXDOFS = 0; MAXDOFM = 0
 !
@@ -127,26 +135,27 @@ subroutine mumps_sc(mtype)
    nrdof_H = 0; nrdof_E = 0; nrdof_V = 0; nrdof_Q = 0; nrdof_mdl = 0
 !
    mdle = 0
-!..non zero elements counters
-   inz = 0 ; m_elem_inz(1:NRELES) = 0
+!..matrix non-zero entries counter (and element offsets)
+   nnz = 0_8 ; elem_nnz(1:NRELES) = 0_8
    do iel=1,NRELES
       call nelcon(mdle, mdle)
       mdle_list(iel) = mdle
 !  ...get information from celem
       if (ISTC_FLAG) then
+         !write(*,*) 'celem_systemI, iel = ', iel
          call celem_systemI(iel,mdle,1, nrdofs,nrdofm,nrdofc,nodm,  &
             ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid,zvoid)
       else
+         !write(*,*) 'celem, iel = ', iel
          call celem(mdle,1, nrdofs,nrdofm,nrdofc,nodm,  &
             ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid,zvoid)
       endif
 !
-      nz = nrdofc
-      k = nz**2
+      k = nrdofc**2
 !
 !  ...counting for OMP
-      m_elem_inz(iel) = inz
-      inz = inz + k
+      elem_nnz(iel) = nnz
+      nnz = nnz + int8(k)
 !
 !  ...update the maximum number of local dof
       do i=1,NR_PHYSA
@@ -207,14 +216,18 @@ subroutine mumps_sc(mtype)
 !..end of loop through elements
    enddo
 !
-   deallocate(NEXTRACT,IDBC,ZDOFD)
-!
 !..total number of (interface) dof is nrdof
    nrdof = nrdof_H +  nrdof_E + nrdof_V + nrdof_Q
 
    NRDOF_CON = nrdof
    NRDOF_TOT = nrdof + nrdof_mdl
 !
+   if (nrdof .eq. 0) then
+      deallocate(MAXDOFS,NFIRSTH,NFIRSTE,NFIRSTV)
+      if (.not. ISTC_FLAG) deallocate(NFIRSTQ)
+      write(*,*) 'par_mumps_sc: nrdof = 0. returning.'
+      return
+   endif
 !
 ! ----------------------------------------------------------------------
 !  END OF STEP 1
@@ -241,12 +254,12 @@ subroutine mumps_sc(mtype)
    allocate(RHS(nrdof)); RHS=ZERO
 !
 !..memory allocation for mumps
-   MUMPS_PAR%N = nrdof
-   MUMPS_PAR%NZ = inz
+   MUMPS_PAR%N   = nrdof
+   MUMPS_PAR%NNZ = nnz
 !
-   allocate(MUMPS_PAR%IRN(inz))
-   allocate(MUMPS_PAR%JCN(inz))
-   allocate(MUMPS_PAR%A(inz))
+   allocate(MUMPS_PAR%IRN(nnz))
+   allocate(MUMPS_PAR%JCN(nnz))
+   allocate(MUMPS_PAR%A(nnz))
 !   
    call stc_alloc
 !
@@ -342,13 +355,14 @@ subroutine mumps_sc(mtype)
 !     ...loop through dof `to the right'
          do k2=1,ndof
 !        ...global dof is:
-            j = lcon(k2)
+            j = LCON(k2)
 !        ...assemble
-            m_elem_inz(iel) = m_elem_inz(iel) + 1
+!        ...note: repeated indices are summed automatically by MUMPS
+            elem_nnz(iel) = elem_nnz(iel) + 1
             k = (k1-1)*ndof + k2
-            MUMPS_PAR%A(  m_elem_inz(iel)) = ZTEMP(k)
-            MUMPS_PAR%IRN(m_elem_inz(iel)) = i
-            MUMPS_PAR%JCN(m_elem_inz(iel)) = j
+            MUMPS_PAR%A(  elem_nnz(iel)) = ZTEMP(k)
+            MUMPS_PAR%IRN(elem_nnz(iel)) = i
+            MUMPS_PAR%JCN(elem_nnz(iel)) = j
          enddo
       enddo
 !
@@ -428,14 +442,7 @@ subroutine mumps_sc(mtype)
       call system_clock( t1, clock_rate, clock_max )
    endif
 ! 
-!$OMP PARALLEL
-!..allocate arrays required by solout for celem
-   allocate(NEXTRACT(MAXDOFM))
-   allocate(IDBC(MAXDOFM))
-   allocate(ZDOFD(MAXDOFM,NR_RHS))
-!
-!..loop through elements
-!$OMP DO                   &
+!$OMP PARALLEL DO          &
 !$OMP PRIVATE(i,k1,ndof)   &
 !$OMP SCHEDULE(DYNAMIC)
    do iel=1,NRELES
@@ -454,9 +461,7 @@ subroutine mumps_sc(mtype)
       deallocate(ZSOL_LOC)
 !
    enddo
-!$OMP END DO
-   deallocate(NEXTRACT,IDBC,ZDOFD)
-!$OMP END PARALLEL
+!$OMP END PARALLEL DO
 !
 ! ----------------------------------------------------------------------
 !  END OF STEP 4

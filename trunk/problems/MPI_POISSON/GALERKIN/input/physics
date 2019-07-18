@@ -1,0 +1,3 @@
+100000              MAXNODS  max number of nodes anticipated
+1                   NR_PHYSA number of physics attributes
+field  contin  1    H1 variable

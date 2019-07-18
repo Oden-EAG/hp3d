@@ -1,6 +1,8 @@
+!
+#include "implicit_none.h"
 ! -----------------------------------------------------------------------
 !
-!    routine name       - mumps_sc
+!    routine name       - par_mumps_sc
 !
 ! -----------------------------------------------------------------------
 !
@@ -9,21 +11,25 @@
 !    purpose            - interface for distributed MUMPS solver
 !                       - routine computes global stiffness matrix
 !                         and global load vector and solves the global
-!                         linear system with mumps
-!                       - the assembly is computed in parallel using OMP
+!                         linear system with MUMPS
+!                       - the assembly is computed in parallel with one
+!                         MPI process per subdomain, and OpenMP
+!                         parallelization within each subdomain
 !                       - this routine supports both computation with or
 !                         without static condensation (uses module stc)
 !
 !    in                 - mtype: 'H':  Hermitian (for complex)/
 !                                      Symmetric (for real)
 !                                      case for Lapack routines
-!                                'G': General case for Lapack routines
+!                                'G':  General case for Lapack routines
+!               note: MUMPS does currently not support LU factorization
+!                     of Hermitian matrices. In that case, it will use
+!                     the non-symmetric matrix setting
 !
 ! -----------------------------------------------------------------------
-#include "implicit_none.h"
 subroutine par_mumps_sc(mtype)
 !
-   use data_structure3D, only: NRNODS, NRELES
+   use data_structure3D, only: NRNODS, NRELES, get_subd
    use assembly,         only: NR_RHS, MAXDOFM, MAXDOFS,       &
                                MAXbrickH, MAXmdlbH, NRHVAR,    &
                                MAXbrickE, MAXmdlbE, NREVAR,    &
@@ -35,7 +41,10 @@ subroutine par_mumps_sc(mtype)
    use assembly_sc
    use control,   only: ISTC_FLAG
    use stc,       only: HERM_STC,CLOC,stc_alloc,stc_dealloc,stc_get_nrdof
-   use par_mumps, only: MUMPS_PAR,mumps_start,mumps_destroy
+   use par_mumps, only: mumps_par,mumps_start,mumps_destroy
+   use par_mesh , only: DISTRIBUTED,HOST_MESH
+   use mpi_param, only: RANK,ROOT
+   use MPI      , only: MPI_COMM_WORLD,MPI_SUM,MPI_REAL8,MPI_COMPLEX16
 !
    implicit none
 !
@@ -48,25 +57,37 @@ subroutine par_mumps_sc(mtype)
    integer, dimension(NR_PHYSA) :: nrdofi,nrdofb
 ! 
 !..integer counters
-   integer   :: nrdof_H,nrdof_E,nrdof_V,nrdof_Q
-   integer   :: nrdofm,nrdofc,nrnodm,nrdof,ndof
-   integer   :: iel,mdle,i,j,k,l,k1,k2,nod
-   integer   :: inz,nz,nnz,nrdof_mdl
+   integer    :: nrdof_H,nrdof_E,nrdof_V,nrdof_Q
+   integer    :: nrdofm,nrdofc,nrnodm,nrdof,nrdof_mdl,ndof
+   integer    :: iel,mdle,subd,i,j,k,l,k1,k2,nod,idec
+   integer(8) :: nnz,nnz_loc
+!
+!..MPI variables
+   integer :: count,src,ierr
 !
 !..dummy variables
    integer :: nvoid
    VTYPE   :: zvoid
 ! 
-!..work space for celem
+!..workspace for celem
    integer, dimension(MAXNODM) :: nodm,ndofmH,ndofmE,ndofmV,ndofmQ
-   integer, dimension(NRELES)  :: mdle_list,m_elem_inz
 !
-   VTYPE, allocatable :: RHS(:)
+   integer    :: mdle_list(NRELES)
+   integer(8) :: elem_nnz_loc(NRELES)
 !
-   integer*8 :: t1,t2,clock_rate,clock_max
+!..workspace for right-hand side and solution vector
+   VTYPE, allocatable :: RHS(:),SOL(:)
+!
+   integer(8) :: t1,t2,clock_rate,clock_max
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
+!
+   if ((.not. DISTRIBUTED) .or. HOST_MESH) then
+      write(*,*) 'par_mumps_sc: mesh is not distributed (or on host). calling mumps_sc from host...'
+      if (RANK .eq. ROOT) call mumps_sc(mtype)
+      return
+   endif
 !
    select case(mtype)
       case('H')
@@ -75,9 +96,9 @@ subroutine par_mumps_sc(mtype)
          HERM_STC = .false.
    end select
 !
-   if (IPRINT_TIME .eq. 1) then
+   if ((RANK .eq. ROOT) .and. (IPRINT_TIME .eq. 1)) then
       write(*,1000)
-1000  format(' mumps_sc: STARTED')
+1000  format(' par_mumps_sc: STARTED')
       write(*,*)
    endif
 !
@@ -85,12 +106,13 @@ subroutine par_mumps_sc(mtype)
    NR_RHS = 1
    call mumps_start
 !
-!..case with static condensation
+!..calculate maximum number of dofs for a modified element
+!  with static condensation
    if (ISTC_FLAG) then
       MAXDOFM = (MAXbrickH-MAXmdlbH)*NRHVAR   &
               + (MAXbrickE-MAXmdlbE)*NREVAR   &
               + (MAXbrickV-MAXmdlbV)*NRVVAR
-!..no static condensation
+!  without static condensation
    else
       MAXDOFM = MAXbrickH*NRHVAR    & 
               + MAXbrickE*NREVAR    &
@@ -102,16 +124,12 @@ subroutine par_mumps_sc(mtype)
 !  STEP 1 : 1ST LOOP THROUGH ELEMENTS, 1ST CALL TO CELEM TO GET INFO
 ! ----------------------------------------------------------------------
 !
-   if (IPRINT_TIME .eq. 1) then
+   if ((RANK .eq. ROOT) .and. (IPRINT_TIME .eq. 1)) then
       write(*,1001)
 1001  format(' STEP 1 started : Get assembly info')
       call system_clock( t1, clock_rate, clock_max )
    endif
 !
-!..allocate required variables for celem
-   allocate(NEXTRACT(MAXDOFM))
-   allocate(IDBC(MAXDOFM))
-   allocate(ZDOFD(MAXDOFM,NR_RHS))
    allocate(MAXDOFS(NR_PHYSA))
    MAXDOFS = 0; MAXDOFM = 0
 !
@@ -126,34 +144,44 @@ subroutine par_mumps_sc(mtype)
 !..Step 1: determine the first dof offsets for active nodes
    nrdof_H = 0; nrdof_E = 0; nrdof_V = 0; nrdof_Q = 0; nrdof_mdl = 0
 !
-   mdle = 0
-!..non zero elements counters
-   inz = 0 ; m_elem_inz(1:NRELES) = 0
+   mdle = 0; idec = 1
+!..non-zero counters for element offsets in distributed sparse stiffness matrix
+!  using 64 bit integers nnz and nnz_loc
+   nnz     = 0_8; ! global number of non-zeros in matrix (counts duplicate indices)
+   nnz_loc = 0_8; ! local  number of non-zeros in matrix (counts duplicate indices)
+   elem_nnz_loc(1:NRELES) = 0_8 ! local element offsets for subdomain matrix
    do iel=1,NRELES
       call nelcon(mdle, mdle)
       mdle_list(iel) = mdle
+      call get_subd(mdle, subd)
 !  ...get information from celem
       if (ISTC_FLAG) then
-         call celem_systemI(iel,mdle,1, nrdofs,nrdofm,nrdofc,nodm,  &
+         call celem_systemI(iel,mdle,idec, nrdofs,nrdofm,nrdofc,nodm,  &
             ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid,zvoid)
       else
-         call celem(mdle,1, nrdofs,nrdofm,nrdofc,nodm,  &
+         call celem(mdle,idec, nrdofs,nrdofm,nrdofc,nodm,  &
             ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid,zvoid)
       endif
 !
-      nz = nrdofc
-      k = nz**2
+!  ...nrdofc = number of modified element dof after compression
+!  ...k      = number of non-zeros entries in element stiffness matrix
+      k = nrdofc**2
 !
-!  ...counting for OMP
-      m_elem_inz(iel) = inz
-      inz = inz + k
+!  ...global counters for OpenMP
+      nnz = nnz + int8(k)
 !
-!  ...update the maximum number of local dof
-      do i=1,NR_PHYSA
-         MAXDOFS(i) = max0(MAXDOFS(i),nrdofs(i))
-      enddo
-!  ...update the maximum number of modified element dof in the expanded mode
-      MAXDOFM = max0(MAXDOFM,nrdofm)
+      if (subd .eq. RANK) then
+!     ...subdomain counters for OpenMP
+         elem_nnz_loc(iel) = nnz_loc
+         nnz_loc = nnz_loc + int8(k)
+!
+!     ...update the maximum number of local dof
+         do i=1,NR_PHYSA
+            MAXDOFS(i) = max0(MAXDOFS(i),nrdofs(i))
+         enddo
+!     ...update the maximum number of modified element dof in the expanded mode
+         MAXDOFM = max0(MAXDOFM,nrdofm)
+      endif
 !
 !  ...compute offsets for H1 dof
       do i = 1,nrnodm
@@ -199,6 +227,7 @@ subroutine par_mumps_sc(mtype)
          endif
       endif
 !
+!  ...compute number of bubble dof (nrdof_mdl)
       if (ISTC_FLAG) then
          call stc_get_nrdof(mdle, nrdofi,nrdofb)
          nrdof_mdl = nrdof_mdl + sum(nrdofb)
@@ -207,20 +236,25 @@ subroutine par_mumps_sc(mtype)
 !..end of loop through elements
    enddo
 !
-   deallocate(NEXTRACT,IDBC,ZDOFD)
-!
 !..total number of (interface) dof is nrdof
-   nrdof = nrdof_H +  nrdof_E + nrdof_V + nrdof_Q
-
+   nrdof = nrdof_H + nrdof_E + nrdof_V + nrdof_Q
+!
    NRDOF_CON = nrdof
    NRDOF_TOT = nrdof + nrdof_mdl
+!
+   if (nrdof .eq. 0) then
+      deallocate(MAXDOFS,NFIRSTH,NFIRSTE,NFIRSTV)
+      if (.not. ISTC_FLAG) deallocate(NFIRSTQ)
+      if (RANK .eq. ROOT) write(*,*) 'par_mumps_sc: nrdof = 0. returning.'
+      return
+   endif
 !
 !
 ! ----------------------------------------------------------------------
 !  END OF STEP 1
 ! ----------------------------------------------------------------------
 !
-   if (IPRINT_TIME .eq. 1) then
+   if ((RANK .eq. ROOT) .and. (IPRINT_TIME .eq. 1)) then
       call system_clock( t2, clock_rate, clock_max )
       Mtime(1) =  real(t2 - t1,8)/real(clock_rate,8)
       write(*,1002) Mtime(1)
@@ -231,32 +265,38 @@ subroutine par_mumps_sc(mtype)
 !  STEP 2 : ASSEMBLE AND STORE IN SPARSE FORM 
 ! ----------------------------------------------------------------------
 !
-   if (IPRINT_TIME .eq. 1) then
+   if ((RANK .eq. ROOT) .and. (IPRINT_TIME .eq. 1)) then
       write(*,1003)
 1003  format(' STEP 2 started : Global Assembly')
       call system_clock( t1, clock_rate, clock_max )
    endif
 !
-!..memory allocation for assembly
+!..memory allocation for load assembly
    allocate(RHS(nrdof)); RHS=ZERO
 !
-!..memory allocation for mumps
-   MUMPS_PAR%N = nrdof
-   MUMPS_PAR%NZ = inz
+!..memory allocation for MUMPS solver
+   mumps_par%N = nrdof
+   mumps_par%NNZ_loc = nnz_loc
 !
-   allocate(MUMPS_PAR%IRN(inz))
-   allocate(MUMPS_PAR%JCN(inz))
-   allocate(MUMPS_PAR%A(inz))
-!   
+   write(*,2010) '  Number of dof  : nrdof   = ', nrdof
+   write(*,2010) '  Total non-zeros: nnz     = ', nnz
+   write(*,2010) '  Local non-zeros: nnz_loc = ', nnz_loc
+2010 format(A,I12)
+!
+   allocate(mumps_par%IRN_loc(nnz_loc))
+   allocate(mumps_par%JCN_loc(nnz_loc))
+   allocate(mumps_par%A_loc(nnz_loc))
+!
    call stc_alloc
 !
 !..assemble global stiffness matrix
 !..loop through elements
+   idec = 2
 !
 !$OMP PARALLEL                                  &
 !$OMP PRIVATE(nrdofs,nrdofm,nrdofc,nodm,nrnodm, &
 !$OMP         ndofmH,ndofmE,ndofmV,ndofmQ,      &
-!$OMP         i,j,k,k1,k2,l,nod,ndof)
+!$OMP         i,j,k,k1,k2,l,nod,ndof,mdle,subd)
    allocate(NEXTRACT(MAXDOFM))
    allocate(IDBC(MAXDOFM))
    allocate(ZDOFD(MAXDOFM,NR_RHS))
@@ -286,11 +326,14 @@ subroutine par_mumps_sc(mtype)
 !$OMP SCHEDULE(DYNAMIC)  &
 !$OMP REDUCTION(+:RHS)
    do iel=1,NRELES
+      mdle = mdle_list(iel)
+      call get_subd(mdle, subd)
+      if (subd .ne. RANK) cycle
       if (ISTC_FLAG) then
-         call celem_systemI(iel,mdle_list(iel),2, nrdofs,nrdofm,nrdofc,nodm,  &
+         call celem_systemI(iel,mdle,idec, nrdofs,nrdofm,nrdofc,nodm,  &
             ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,ZLOAD,ZTEMP)
       else
-         call celem(mdle_list(iel),2, nrdofs,nrdofm,nrdofc,nodm,  &
+         call celem(mdle,idec, nrdofs,nrdofm,nrdofc,nodm,  &
             ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,ZLOAD,ZTEMP)
       endif
 !
@@ -342,13 +385,14 @@ subroutine par_mumps_sc(mtype)
 !     ...loop through dof `to the right'
          do k2=1,ndof
 !        ...global dof is:
-            j = lcon(k2)
+            j = LCON(k2)
 !        ...assemble
-            m_elem_inz(iel) = m_elem_inz(iel) + 1
+!        ...note: repeated indices are summed automatically by MUMPS
+            elem_nnz_loc(iel) = elem_nnz_loc(iel) + 1_8
             k = (k1-1)*ndof + k2
-            MUMPS_PAR%A(  m_elem_inz(iel)) = ZTEMP(k)
-            MUMPS_PAR%IRN(m_elem_inz(iel)) = i
-            MUMPS_PAR%JCN(m_elem_inz(iel)) = j
+            mumps_par%A_loc(  elem_nnz_loc(iel)) = ZTEMP(k)
+            mumps_par%IRN_loc(elem_nnz_loc(iel)) = i
+            mumps_par%JCN_loc(elem_nnz_loc(iel)) = j
          enddo
       enddo
 !
@@ -371,7 +415,7 @@ subroutine par_mumps_sc(mtype)
    deallocate(ZBMOD,ZAMOD,LCON,ZLOAD,ZTEMP)
 !$OMP END PARALLEL
 !
-   if (IPRINT_TIME .eq. 1) then
+   if ((RANK .eq. ROOT) .and. (IPRINT_TIME .eq. 1)) then
       call system_clock( t2, clock_rate, clock_max )
       Mtime(2) =  real(t2 - t1,8)/real(clock_rate,8)
       write(*,1004) Mtime(2)
@@ -382,36 +426,48 @@ subroutine par_mumps_sc(mtype)
 !  STEP 3: call mumps to solve the linear system
 !----------------------------------------------------------------------
 !
-   if (IPRINT_TIME .eq. 1) then
+   if ((RANK .eq. ROOT) .and. (IPRINT_TIME .eq. 1)) then
       write(*,1009)
 1009  format(' STEP 3 started : Solve')
       call system_clock( t1, clock_rate, clock_max )
    endif
 !
-   allocate(MUMPS_PAR%RHS(MUMPS_PAR%N));
-   MUMPS_PAR%RHS = RHS
-   deallocate(RHS);
+!..allocate RHS vector on host
+   if (RANK .eq. ROOT) then
+      allocate(mumps_par%RHS(mumps_par%N))
+      mumps_par%RHS=ZERO
+   else
+      allocate(mumps_par%RHS(1))
+   endif
+!
+!..gather RHS vector information on host
+   count = mumps_par%N
+   call MPI_REDUCE(RHS,mumps_par%RHS,count,MPI_VTYPE,MPI_SUM,ROOT,mumps_par%COMM,ierr)
+!
+!..deallocate local RHS vector
+   deallocate(RHS)
 !
 #if C_MODE
-   MUMPS_PAR%JOB = 1
-   call zmumps(MUMPS_PAR)
-   MUMPS_PAR%JOB = 2
-   call zmumps(MUMPS_PAR)
-   MUMPS_PAR%JOB = 3
-   call zmumps(MUMPS_PAR)
+   mumps_par%JOB = 1
+   call zmumps(mumps_par)
+   mumps_par%JOB = 2
+   call zmumps(mumps_par)
+   mumps_par%JOB = 3
+   call zmumps(mumps_par)
 #else
-   MUMPS_PAR%JOB = 1
-   call dmumps(MUMPS_PAR)
-   MUMPS_PAR%JOB = 2
-   call dmumps(MUMPS_PAR)
-   MUMPS_PAR%JOB = 3
-   call dmumps(MUMPS_PAR)
+   mumps_par%JOB = 1
+   call dmumps(mumps_par)
+   mumps_par%JOB = 2
+   call dmumps(mumps_par)
+   mumps_par%JOB = 3
+   call dmumps(mumps_par)
 #endif
+!
 ! ----------------------------------------------------------------------
 !  END OF STEP 3
 ! ----------------------------------------------------------------------
 !
-   if (IPRINT_TIME .eq. 1) then
+   if ((RANK .eq. ROOT) .and. (IPRINT_TIME .eq. 1)) then
       call system_clock( t2, clock_rate, clock_max )
       Mtime(3) =  real(t2 - t1,8)/real(clock_rate,8)
       write(*,1010) Mtime(3)
@@ -422,23 +478,30 @@ subroutine par_mumps_sc(mtype)
 !  STEP 4 : STORE SOLUTION IN THE DATASTRACTURE
 ! ----------------------------------------------------------------------
 !
-   if (IPRINT_TIME .eq. 1) then
+   if ((RANK .eq. ROOT) .and. (IPRINT_TIME .eq. 1)) then
       write(*,1011)
 1011  format(' STEP 4 started : Store the solution')
       call system_clock( t1, clock_rate, clock_max )
    endif
-! 
-!$OMP PARALLEL
-!..allocate arrays required by solout for celem
-   allocate(NEXTRACT(MAXDOFM))
-   allocate(IDBC(MAXDOFM))
-   allocate(ZDOFD(MAXDOFM,NR_RHS))
 !
-!..loop through elements
-!$OMP DO                   &
-!$OMP PRIVATE(i,k1,ndof)   &
+!..allocate global solution vector on every processor
+   allocate(SOL(mumps_par%N))
+!..transfer solution from MUMPS structure to solution vector on host
+   if (RANK .eq. ROOT) then
+      SOL(1:mumps_par%N) = mumps_par%RHS(1:mumps_par%N)
+   endif
+   deallocate(mumps_par%RHS)
+!..broadcast global solution from host to other processes
+   count = mumps_par%N; src = ROOT
+   call MPI_BCAST (SOL,count,MPI_VTYPE,src,mumps_par%COMM,ierr)
+!
+!$OMP PARALLEL DO                    &
+!$OMP PRIVATE(i,k1,ndof,mdle,subd)   &
 !$OMP SCHEDULE(DYNAMIC)
    do iel=1,NRELES
+      mdle = mdle_list(iel)
+      call get_subd(mdle, subd)
+      if (subd .ne. RANK) cycle
 !
       ndof = CLOC(iel)%ni
 !
@@ -446,7 +509,7 @@ subroutine par_mumps_sc(mtype)
 !
       do k1=1,ndof
          i = CLOC(iel)%con(k1)
-         ZSOL_LOC(k1) = MUMPS_PAR%RHS(i)
+         ZSOL_LOC(k1) = SOL(i)
       enddo
       deallocate(CLOC(iel)%con)
 !
@@ -454,21 +517,20 @@ subroutine par_mumps_sc(mtype)
       deallocate(ZSOL_LOC)
 !
    enddo
-!$OMP END DO
-   deallocate(NEXTRACT,IDBC,ZDOFD)
-!$OMP END PARALLEL
+!$OMP END PARALLEL DO
 !
 ! ----------------------------------------------------------------------
 !  END OF STEP 4
 ! ----------------------------------------------------------------------
 !
-   if (IPRINT_TIME .eq. 1) then
+   if ((RANK .eq. ROOT) .and. (IPRINT_TIME .eq. 1)) then
       call system_clock( t2, clock_rate, clock_max )
       Mtime(4) =  real(t2 - t1,8)/real(clock_rate,8)
       write(*,1012) Mtime(4)
 1012  format(' STEP 4 finished: ',f12.5,'  seconds',/)
    endif
-!   
+!
+   deallocate(SOL)
    deallocate(MAXDOFS)
    deallocate(NFIRSTH,NFIRSTE,NFIRSTV)
    if (.not. ISTC_FLAG) deallocate(NFIRSTQ)
@@ -477,10 +539,10 @@ subroutine par_mumps_sc(mtype)
 !..Destroy the instance (deallocate internal data structures)
    call mumps_destroy
 !
-   if (IPRINT_TIME .ge. 1) then
+   if ((RANK .eq. ROOT) .and. (IPRINT_TIME .ge. 1)) then
       write(*,*)
       write(*,1013) sum(Mtime(1:4))
-1013  format(' mumps_sc FINISHED: ',f12.5,'  seconds',/)
+1013  format(' par_mumps_sc FINISHED: ',f12.5,'  seconds',/)
    endif
 !
 !

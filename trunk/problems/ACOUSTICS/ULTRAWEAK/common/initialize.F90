@@ -145,10 +145,4 @@ subroutine initialize
   call load_vis(HEXA_VIS, trim(FILE_VIS)//'/hexa_'//trim(VLEVEL), 'hexa')
   !
   !
-  ! if using PETSc
-#ifdef __PETSC_USE__
-  call PetscInitialize("",iflag)
-  write(*,*) 'PETSC initialized'
-#endif
-  !
 end subroutine initialize

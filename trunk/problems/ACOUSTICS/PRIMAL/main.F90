@@ -386,12 +386,12 @@
    implicit none
    integer, intent(in) :: k
    integer :: mdle, nordh,nordv,nord,i
-   real*8, allocatable  :: xnod(:,:)
+   real*8  :: xnod(3,8)
    character(len=20) :: str
 
 !---------------------------------------------------------------------------------
 
-   allocate(xnod(3,MAXbrickH)) ; xnod = 0.0d0
+   xnod = 0.0d0
 !   
    open(12, file='output/MATLAB/mesh_'//trim(str(k))//'.txt',       &
    status='replace',form='formatted',access='sequential')
@@ -415,8 +415,7 @@
       write(12,*) nordv 
    enddo
    write(12,*) NRELES
-   close(12)   
-   deallocate(xnod)
+   close(12)
 !
 !
    end subroutine matlab_dump_mesh

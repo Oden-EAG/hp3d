@@ -1,0 +1,95 @@
+!----------------------------------------------------------------------
+!                                                                     
+!    routine            - exact_error
+!                                                                     
+!---------------------------------------------------------------------- 
+!                                                                     
+!     latest revision:  - July 2019
+!                                                                     
+!     purpose:          - compute and print exact error
+!                                                                    
+!----------------------------------------------------------------------
+subroutine exact_error
+!
+   use data_structure3D
+   use common_prob_data
+   use environment
+   use assembly_sc, only: NRDOF_TOT,NRDOF_CON
+   use par_mesh   , only: DISTRIBUTED,HOST_MESH
+   use mpi_param  , only: ROOT,RANK
+   use MPI        , only: MPI_SUM,MPI_COMM_WORLD,MPI_REAL8
+!   
+   implicit none
+!
+   integer :: iflag(1)
+   integer :: mdle_list(NRELES)
+!
+!..workspace for element_error routine
+   real*8 :: errorH,rnormH,errorE,rnormE
+   real*8 :: errorV,rnormV,errorQ,rnormQ
+   real*8 :: error,rnorm,error_subd,rnorm_subd
+   integer :: iel,mdle,subd,nreles_subd,count,ierr
+!
+!----------------------------------------------------------------------
+!
+   iflag(1) = 1
+!
+!..fetch active elements
+   mdle = 0
+   if ((DISTRIBUTED) .and. (.not. HOST_MESH)) then
+      write(*,*) 'exact_error: mesh is distributed. computing error in parallel...'
+      nreles_subd = 0
+      do iel=1,NRELES
+         call nelcon(mdle, mdle)
+         call get_subd(mdle, subd)
+         if (subd .eq. RANK) then
+            nreles_subd = nreles_subd + 1
+            mdle_list(nreles_subd) = mdle
+         endif
+      enddo
+   else
+      if (RANK .ne. ROOT) goto 90
+      write(*,*) 'exact_error: mesh is not distributed (or on host). computing error on host...'
+      do iel=1,NRELES
+         call nelcon(mdle, mdle)
+         mdle_list(iel) = mdle
+      enddo
+      nreles_subd = NRELES
+   endif
+!
+   error_subd = 0.d0; rnorm_subd = 0.d0
+!
+!$OMP PARALLEL DEFAULT(PRIVATE)              &
+!$OMP SHARED(nreles_subd,iflag,mdle_list)    &
+!$OMP REDUCTION(+:error_subd,rnorm_subd)
+!$OMP DO
+   do iel=1,nreles_subd
+      call element_error(mdle_list(iel),iflag,           &
+                         errorH,errorE,errorV,errorQ,    &
+                         rnormH,rnormE,rnormV,rnormQ)  
+      error_subd = error_subd + errorH
+      rnorm_subd = rnorm_subd + rnormH
+   enddo
+!$OMP END DO
+!$OMP END PARALLEL
+!
+   error = 0.d0; rnorm = 0.d0
+   if (DISTRIBUTED .and. (.not. HOST_MESH)) then
+      count = 1
+      call MPI_REDUCE(error_subd,error,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(rnorm_subd,rnorm,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+   else
+      error = error_subd
+      rnorm = rnorm_subd
+   endif
+!
+   if (RANK .eq. ROOT) then
+      write(*,7020) NRDOF_TOT,sqrt(error),sqrt(rnorm)
+ 7020 format('exact_error: NRDOF_TOT, L2 ERROR AND NORM = ',i8,3x,2es12.5)
+      write(*,7030) NRDOF_TOT,sqrt(error/rnorm)
+ 7030 format('exact_error: NRDOF_TOT, RELATIVE L2 ERROR = ',i8,3x,es12.5)
+   endif
+!
+   90 continue
+!
+end subroutine exact_error

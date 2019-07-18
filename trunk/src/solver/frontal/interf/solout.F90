@@ -114,7 +114,7 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
       endif
 #endif
 !
-   !..count number of variables for each physics type
+!..count number of variables for each physics type
    nrPhysH=0; nrPhysE=0; nrPhysV=0
    do iphys=1,NR_PHYSA
       select case(DTYPE(iphys))

@@ -14,15 +14,23 @@
 module par_mesh
 !
    use data_structure3D
-   use MPI_param, only: RANK,NUM_PROCS
-   use MPI      , only: MPI_COMM_WORLD,MPI_SUCCESS,MPI_STATUS_SIZE,  &
-                        MPI_COMPLEX16,MPI_REAL8
+   use parameters,     only: NRCOMS
+   use mpi_param,      only: RANK,NUM_PROCS
+   use MPI,            only: MPI_COMM_WORLD,MPI_STATUS_SIZE, &
+                             MPI_SUCCESS,MPI_COMPLEX16,MPI_REAL8
+   use zoltan_wrapper, only: ZOLTAN_LB,zoltan_w_partition
 !
    implicit none
 !
-!..0 if current mesh is not distributed (all DOFs present on all procs)
-!..1 if current mesh is distributed (DOFs are distributed across procs)
-   integer, save :: DISTRIBUTED = 0
+!..F if current mesh is not distributed (ALL DOFs present on ALL procs)
+!..T if current mesh is distributed (DOFs are distributed across procs)
+   logical, save :: DISTRIBUTED = .false.
+!
+!..T indicates that dofs should be exchanged (send/rcv) in routine
+   logical, save :: EXCHANGE_DOF = .true.
+!
+!..T indicates that the ROOT proc holds the entire mesh
+   logical, save :: HOST_MESH = .true.
 !
    contains
 !
@@ -42,12 +50,12 @@ subroutine distr_mesh()
    integer :: subd_next(NRELES), mdle_list(NRELES), nodm(MAXNODM)
    integer :: i, iel, inod, iproc, mdle, nod, subd, subd_size
    integer :: nrnodm, nrdof_nod
-   integer :: iprint = 1
+   integer :: iprint = 0
 !
    if (iprint .eq. 1) then
       write(6,100) 'start distr_mesh, DISTRIBUTED = ', DISTRIBUTED
    endif
-   100 format(A,I2)
+   100 format(A,L2)
 !
 !..Preliminary
 !..a. create list of mdle nodes in current mesh
@@ -58,24 +66,25 @@ subroutine distr_mesh()
    enddo
 !
 !..1. Determine new partition
-   iproc=0
-   do iel=1,NRELES
-!  ...decide subdomain for iel
-      subd_next(iel) = iproc
-      if (DISTRIBUTED .eq. 0) then
-         iproc = MOD(iproc+1,NUM_PROCS)
-      else
+   if ((ZOLTAN_LB .eq. 0) .or. (.not. DISTRIBUTED)) then
+      iproc=0
+      do iel=1,NRELES
+!     ...decide subdomain for iel
+         subd_next(iel) = iproc
+         !iproc = MOD(iproc+1,NUM_PROCS)
          subd_size = (NRELES+NUM_PROCS-1)/NUM_PROCS
          iproc = iel/subd_size
-      endif
-   enddo
+      enddo
+   else
+      call zoltan_w_partition(subd_next)
+   endif
 !
 !..2. Reset visit flags for all nodes to 0
    call reset_visit
 !
 !..3. Exchange degrees of freedom with other MPI processes according to partition
 !     (note: this step can be skipped in the initial mesh distribution)
-   if (DISTRIBUTED .eq. 0) goto 50
+   if (.not. DISTRIBUTED) goto 50
    do iel=1,NRELES
       mdle = mdle_list(iel)
       call get_subd(mdle, subd)
@@ -91,6 +100,10 @@ subroutine distr_mesh()
 !     ...3c. Calculate nodal degrees of freedom, and allocate buffer
          call get_dof_buf_size(nod, nrdof_nod)
          if (nrdof_nod .eq. 0) cycle
+         if (.not. EXCHANGE_DOF) then
+            if (subd_next(iel) .eq. RANK) call alloc_nod_dof(nod)
+            cycle
+         endif
          allocate(buf(nrdof_nod))
          buf = ZERO
 !     ...3d. if current subdomain is my subdomain, send data
@@ -161,9 +174,10 @@ subroutine distr_mesh()
       endif
    enddo
 !
-   DISTRIBUTED = 1
+   HOST_MESH = .false.
+   DISTRIBUTED = .true.
    if (iprint .eq. 1) then
-      write(6,100) 'end   distr_mesh, DISTRIBUTED = ', DISTRIBUTED
+      write(6,100) 'end   distr_mesh, DISTRIBUTED = .true.'
    endif
 !
 end subroutine distr_mesh
@@ -181,6 +195,24 @@ subroutine get_elem_nodes(Mdle, Nodm,Nrnodm)
    call get_connect_info(Mdle, nodesl,norientl)
    call logic_nodes(Mdle,nodesl, Nodm,Nrnodm)
 end subroutine get_elem_nodes
+!
+!----------------------------------------------------------------------
+!     routine:    get_subd_size
+!     purpose:    get number of elements in subdomain
+!----------------------------------------------------------------------
+subroutine get_subd_size(Subd, Nreles_subd)
+   integer, intent(in)  :: Subd
+   integer, intent(out) :: Nreles_subd
+   integer :: iel,mdle,mdle_subd
+   mdle = 0; Nreles_subd = 0
+   do iel=1,NRELES
+      call nelcon(mdle, mdle)
+      call get_subd(mdle, mdle_subd)
+      if (mdle_subd .eq. Subd) then
+         Nreles_subd = Nreles_subd + 1
+      endif
+   enddo
+end subroutine get_subd_size
 !
 !----------------------------------------------------------------------
 !     routine:    set_subd_elem
@@ -205,8 +237,14 @@ subroutine alloc_nod_dof(Nod)
    integer, intent(in) :: Nod
    integer :: ndofH,ndofE,ndofV,ndofQ
    integer :: nvarH,nvarE,nvarV,nvarQ
+   integer :: icase
+!..calculate ndof,nvar for this node
    call find_ndof(Nod, ndofH,ndofE,ndofV,ndofQ)
-   call find_nvar(Nod, nvarH,nvarE,nvarV,nvarQ)
+   icase = NODES(Nod)%case
+   nvarH = NREQNH(icase)*NRCOMS
+   nvarE = NREQNE(icase)*NRCOMS
+   nvarV = NREQNV(icase)*NRCOMS
+   nvarQ = NREQNQ(icase)*NRCOMS
 !..allocate H1 DOFs
    if (.not. associated(NODES(Nod)%zdofH)) then
       allocate( NODES(Nod)%zdofH(nvarH, ndofH))
@@ -250,8 +288,13 @@ subroutine get_dof_buf_size(Nod, Nrdof_nod)
    integer, intent(out) :: Nrdof_nod
    integer :: ndofH,ndofE,ndofV,ndofQ
    integer :: nvarH,nvarE,nvarV,nvarQ
+   integer :: icase
    call find_ndof(Nod, ndofH,ndofE,ndofV,ndofQ)
-   call find_nvar(Nod, nvarH,nvarE,nvarV,nvarQ)
+   icase = NODES(Nod)%case
+   nvarH = NREQNH(icase)*NRCOMS
+   nvarE = NREQNE(icase)*NRCOMS
+   nvarV = NREQNV(icase)*NRCOMS
+   nvarQ = NREQNQ(icase)*NRCOMS
    Nrdof_nod = ndofH*nvarH + ndofE*nvarE + ndofV*nvarV + ndofQ*nvarQ
 end subroutine get_dof_buf_size
 !
@@ -265,13 +308,17 @@ subroutine pack_dof_buf(Nod,Nrdof_nod, Buf)
    VTYPE  , intent(out) :: Buf(Nrdof_nod)
    integer :: ndofH,ndofE,ndofV,ndofQ
    integer :: nvarH,nvarE,nvarV,nvarQ
-   integer :: ivar,j
+   integer :: icase,ivar,j
 !
    Buf(1:Nrdof_nod) = ZERO
 !
 !..calculate ndof,nvar for this node
    call find_ndof(Nod, ndofH,ndofE,ndofV,ndofQ)
-   call find_nvar(Nod, nvarH,nvarE,nvarV,nvarQ)
+   icase = NODES(Nod)%case
+   nvarH = NREQNH(icase)*NRCOMS
+   nvarE = NREQNE(icase)*NRCOMS
+   nvarV = NREQNV(icase)*NRCOMS
+   nvarQ = NREQNQ(icase)*NRCOMS
 !
    j = 0
 !..add H1 dof to buffer
@@ -319,11 +366,16 @@ subroutine unpack_dof_buf(Nod,Nrdof_nod,Buf)
    VTYPE  , intent(in) :: Buf(Nrdof_nod)
    integer :: ndofH,ndofE,ndofV,ndofQ
    integer :: nvarH,nvarE,nvarV,nvarQ
-   integer :: ivar,j
+   integer :: icase,ivar,j
 !
 !..calculate ndof,nvar for this node
    call find_ndof(Nod, ndofH,ndofE,ndofV,ndofQ)
-   call find_nvar(Nod, nvarH,nvarE,nvarV,nvarQ)
+!
+   icase = NODES(Nod)%case
+   nvarH = NREQNH(icase)*NRCOMS
+   nvarE = NREQNE(icase)*NRCOMS
+   nvarV = NREQNV(icase)*NRCOMS
+   nvarQ = NREQNQ(icase)*NRCOMS
 !
    j = 0
 !..add H1 dof to buffer

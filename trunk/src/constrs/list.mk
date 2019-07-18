@@ -5,7 +5,7 @@ get_connect_info.F
 logic.F
 logic_nodes.F
 nodcor.F
-nodcor_vert.F
+nodcor_vert.F90
 solelm.F
 solelmI.F
 0

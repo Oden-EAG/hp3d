@@ -6,7 +6,7 @@
 !                                                                     
 !     latest revision:  - July 2019
 !                                                                     
-!     purpose:          - main driver for MPI Test Program
+!     purpose:          - main driver for MPI Poisson Test Program
 !                                                                    
 !----------------------------------------------------------------------
 !    
@@ -18,7 +18,7 @@ program main
    use GMP
 !
    use MPI      , only: MPI_COMM_WORLD
-   use MPI_param, only: ROOT,RANK,NUM_PROCS, &
+   use mpi_param, only: ROOT,RANK,NUM_PROCS, &
                         MPI_param_init,MPI_param_finalize
 !
    implicit none
@@ -107,7 +107,7 @@ subroutine master_main()
    use GMP
 !
    use MPI      , only: MPI_COMM_WORLD,MPI_INTEGER
-   use MPI_param, only: ROOT,RANK,NUM_PROCS
+   use mpi_param, only: ROOT,RANK,NUM_PROCS
 !
    implicit none
 !
@@ -171,6 +171,7 @@ subroutine master_main()
       write(*,*) '                                         '
       write(*,*) '        ---- MPI Routines ----           '
       write(*,*) 'Distribute mesh........................30'
+      write(*,*) 'Collect dofs on ROOT...................31'
       write(*,*) 'Run verification routines..............35'
       write(*,*) '                                         '
       write(*,*) '          ---- Solvers ----              '
@@ -203,7 +204,7 @@ subroutine master_main()
             call exec_case(idec)
 !
 !     ...MPI Routines
-         case(30,35)
+         case(30,31,35)
             call exec_case(idec)
 !
 !     ...Solvers
@@ -237,7 +238,7 @@ subroutine worker_main()
    use GMP
 !
    use MPI      , only: MPI_COMM_WORLD,MPI_INTEGER
-   use MPI_param, only: ROOT,RANK,NUM_PROCS
+   use mpi_param, only: ROOT,RANK,NUM_PROCS
 !
    implicit none
 !
@@ -304,7 +305,7 @@ subroutine worker_main()
             call exec_case(idec)
 !
 !     ...MPI Routines
-         case(30,35)
+         case(30,31,35)
             call exec_case(idec)
 !
 !     ...Solvers
@@ -375,6 +376,11 @@ subroutine exec_case(idec)
       case(30)
          write(*,*) 'distribute mesh...'
          call distr_mesh
+!
+!  ...collect dofs on ROOT processor
+      case(31)
+         write(*,*) 'collecting dofs on ROOT...'
+         call collect_dofs
 !
 !  ...run mesh verification routines
       case(35)

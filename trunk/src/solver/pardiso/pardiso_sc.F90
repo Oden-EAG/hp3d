@@ -33,9 +33,11 @@ subroutine pardiso_sc(mtype)
                                ALOC, BLOC, AAUX, ZAMOD, ZBMOD, &
                                NR_PHYSA, MAXNODM
    use assembly_sc
-   use control, only: ISTC_FLAG
-   use stc,     only: HERM_STC, CLOC,                          &
-                      stc_alloc, stc_dealloc, stc_get_nrdof
+   use control,   only: ISTC_FLAG
+   use stc,       only: HERM_STC, CLOC,                          &
+                        stc_alloc, stc_dealloc, stc_get_nrdof
+   use par_mesh,  only: DISTRIBUTED,HOST_MESH
+   use mpi_param, only: RANK,ROOT
 !
    implicit none
 !
@@ -70,6 +72,12 @@ subroutine pardiso_sc(mtype)
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
+!
+   if (RANK .ne. ROOT) return
+   if (DISTRIBUTED .and. (.not. HOST_MESH)) then
+      write(*,*) 'pardiso_sc: mesh is distributed (and not on host). returning...'
+      return
+   endif
 !
    select case(mtype)
       case('H')
@@ -110,10 +118,6 @@ subroutine pardiso_sc(mtype)
       call system_clock( t1, clock_rate, clock_max )
    endif
 !
-!..allocate required variables for celem
-   allocate(NEXTRACT(MAXDOFM))
-   allocate(IDBC(MAXDOFM))
-   allocate(ZDOFD(MAXDOFM,NR_RHS))
    allocate(MAXDOFS(NR_PHYSA))
    MAXDOFS = 0; MAXDOFM = 0
 !
@@ -213,14 +217,18 @@ subroutine pardiso_sc(mtype)
 !..end of loop through elements
    enddo
 !
-   deallocate(NEXTRACT,IDBC,ZDOFD)
-!
 !..total number of (interface) dof is nrdof
    nrdof = nrdof_H +  nrdof_E + nrdof_V + nrdof_Q
 
    NRDOF_CON = nrdof
    NRDOF_TOT = nrdof + nrdof_mdl
 !
+   if (nrdof .eq. 0) then
+      deallocate(MAXDOFS,NFIRSTH,NFIRSTE,NFIRSTV)
+      if (.not. ISTC_FLAG) deallocate(NFIRSTQ)
+      write(*,*) 'par_mumps_sc: nrdof = 0. returning.'
+      return
+   endif
 !
 ! ----------------------------------------------------------------------
 !  END OF STEP 1
@@ -443,14 +451,7 @@ subroutine pardiso_sc(mtype)
       call system_clock( t1, clock_rate, clock_max )
    endif
 ! 
-!$OMP PARALLEL
-!..allocate arrays required by solout for celem
-   allocate(NEXTRACT(MAXDOFM))
-   allocate(IDBC(MAXDOFM))
-   allocate(ZDOFD(MAXDOFM,NR_RHS))
-!
-!..loop through elements
-!$OMP DO                   &
+!$OMP PARALLEL DO          &
 !$OMP PRIVATE(i,k1,ndof)   &
 !$OMP SCHEDULE(DYNAMIC)
    do iel=1,NRELES
@@ -469,9 +470,7 @@ subroutine pardiso_sc(mtype)
       deallocate(ZSOL_LOC)
 !
    enddo
-!$OMP END DO
-   deallocate(NEXTRACT,IDBC,ZDOFD)
-!$OMP END PARALLEL
+!$OMP END PARALLEL DO
 !
 ! ----------------------------------------------------------------------
 !  END OF STEP 5

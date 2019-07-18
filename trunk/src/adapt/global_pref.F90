@@ -9,7 +9,7 @@ subroutine global_pref
    use data_structure3D, only: NRELES,NRNODS,NODES,MAXNODM, &
                                get_subd,set_subd
    use par_mesh        , only: DISTRIBUTED,get_elem_nodes
-   use MPI_param       , only: RANK
+   use mpi_param       , only: RANK
 !      
    implicit none
 !
@@ -45,7 +45,7 @@ subroutine global_pref
       !  because subd values should already be set correctly within subdomain
       !  so that nodmod will work fine.
 !      call get_subd(mdle, subd)
-!      if ((DISTRIBUTED .eq. 1) .and. (subd .eq. RANK)) then
+!      if ((DISTRIBUTED) .and. (subd .eq. RANK)) then
 !         call get_elem_nodes(mdle, nodm,nrnodm)
 !         do i=1,nrnodm
 !            call set_subd(nodm(i),subd)
@@ -71,7 +71,7 @@ subroutine global_punref
 !
    integer :: mdle,iel,nord
 !
-   if (DISTRIBUTED .eq. 1) then
+   if (DISTRIBUTED) then
       write(*,*) 'global_punref: not implemented for distributed mesh. stop.'
       stop
    endif

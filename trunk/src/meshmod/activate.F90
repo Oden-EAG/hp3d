@@ -10,7 +10,7 @@
 subroutine activate(Nod)
    use data_structure3D
    use par_mesh  , only: DISTRIBUTED
-   use MPI_param , only: RANK
+   use mpi_param , only: RANK
 !
    implicit none
 !
@@ -38,7 +38,7 @@ subroutine activate(Nod)
 !
 !..find out whether node is inside my subdomain
    act_dof = 1
-   if (DISTRIBUTED .eq. 1) then
+   if (DISTRIBUTED) then
       call get_subd(Nod, subd)
       if (RANK .ne. subd) act_dof = 0
    endif

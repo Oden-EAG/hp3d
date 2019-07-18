@@ -45,7 +45,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,nflag,physNick,ires,iso_ans, Nstop)
    use control
    use data_structure3D
    use environment, only : QUIET_MODE
-   use m_assembly, ONLY: NRDOF_CON, NRDOF_TOT
+   use assembly_sc, ONLY: NRDOF_CON, NRDOF_TOT
    use parametersDPG, ONLY : NORD_ADD
 !
    implicit none
