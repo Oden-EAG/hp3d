@@ -119,9 +119,6 @@ subroutine pardiso_sc(mtype)
    endif
 !
 !..allocate required variables for celem
-   allocate(NEXTRACT(MAXDOFM))
-   allocate(IDBC(MAXDOFM))
-   allocate(ZDOFD(MAXDOFM,NR_RHS))
    allocate(MAXDOFS(NR_PHYSA))
    MAXDOFS = 0; MAXDOFM = 0
 !
@@ -221,14 +218,16 @@ subroutine pardiso_sc(mtype)
 !..end of loop through elements
    enddo
 !
-   deallocate(NEXTRACT,IDBC,ZDOFD)
-!
 !..total number of (interface) dof is nrdof
    nrdof = nrdof_H +  nrdof_E + nrdof_V + nrdof_Q
 
    NRDOF_CON = nrdof
    NRDOF_TOT = nrdof + nrdof_mdl
 !
+   if (nrdof .eq. 0) then
+      write(*,*) 'par_mumps_sc: nrdof = 0. returning.'
+      return
+   endif
 !
 ! ----------------------------------------------------------------------
 !  END OF STEP 1
@@ -451,14 +450,7 @@ subroutine pardiso_sc(mtype)
       call system_clock( t1, clock_rate, clock_max )
    endif
 ! 
-!$OMP PARALLEL
-!..allocate arrays required by solout for celem
-   allocate(NEXTRACT(MAXDOFM))
-   allocate(IDBC(MAXDOFM))
-   allocate(ZDOFD(MAXDOFM,NR_RHS))
-!
-!..loop through elements
-!$OMP DO                   &
+!$OMP PARALLEL DO          &
 !$OMP PRIVATE(i,k1,ndof)   &
 !$OMP SCHEDULE(DYNAMIC)
    do iel=1,NRELES
@@ -477,9 +469,7 @@ subroutine pardiso_sc(mtype)
       deallocate(ZSOL_LOC)
 !
    enddo
-!$OMP END DO
-   deallocate(NEXTRACT,IDBC,ZDOFD)
-!$OMP END PARALLEL
+!$OMP END PARALLEL DO
 !
 ! ----------------------------------------------------------------------
 !  END OF STEP 5

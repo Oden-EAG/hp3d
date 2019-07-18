@@ -5,6 +5,8 @@
 *.blk
 *.mk.old
 .dummy
+fort.19
+fort.20
 
 # Prerequisites
 *.d

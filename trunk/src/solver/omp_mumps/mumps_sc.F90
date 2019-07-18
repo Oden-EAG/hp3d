@@ -222,6 +222,10 @@ subroutine mumps_sc(mtype)
    NRDOF_CON = nrdof
    NRDOF_TOT = nrdof + nrdof_mdl
 !
+   if (nrdof .eq. 0) then
+      write(*,*) 'par_mumps_sc: nrdof = 0. returning.'
+      return
+   endif
 !
 ! ----------------------------------------------------------------------
 !  END OF STEP 1
