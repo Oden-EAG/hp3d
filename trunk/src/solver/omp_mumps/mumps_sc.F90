@@ -51,10 +51,10 @@ subroutine mumps_sc(mtype)
    integer, dimension(NR_PHYSA) :: nrdofi,nrdofb
 ! 
 !..integer counters
-   integer   :: nrdof_H,nrdof_E,nrdof_V,nrdof_Q
-   integer   :: nrdofm,nrdofc,nrnodm,nrdof,ndof
-   integer   :: iel,mdle,i,j,k,l,k1,k2,nod
-   integer   :: inz,nz,nnz,nrdof_mdl
+   integer    :: nrdof_H,nrdof_E,nrdof_V,nrdof_Q
+   integer    :: nrdofm,nrdofc,nrnodm,nrdof,nrdof_mdl,ndof
+   integer    :: iel,mdle,i,j,k,l,k1,k2,nod
+   integer(8) :: nnz
 !
 !..dummy variables
    integer :: nvoid
@@ -62,7 +62,8 @@ subroutine mumps_sc(mtype)
 !
 !..work space for celem
    integer, dimension(MAXNODM) :: nodm,ndofmH,ndofmE,ndofmV,ndofmQ
-   integer, dimension(NRELES)  :: mdle_list,m_elem_inz
+   integer    :: mdle_list(NRELES)
+   integer(8) :: elem_nnz(NRELES)
 !
    VTYPE, allocatable :: RHS(:)
 !
@@ -134,8 +135,8 @@ subroutine mumps_sc(mtype)
    nrdof_H = 0; nrdof_E = 0; nrdof_V = 0; nrdof_Q = 0; nrdof_mdl = 0
 !
    mdle = 0
-!..non zero elements counters
-   inz = 0 ; m_elem_inz(1:NRELES) = 0
+!..matrix non-zero entries counter (and element offsets)
+   nnz = 0_8 ; elem_nnz(1:NRELES) = 0_8
    do iel=1,NRELES
       call nelcon(mdle, mdle)
       mdle_list(iel) = mdle
@@ -150,12 +151,11 @@ subroutine mumps_sc(mtype)
             ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid,zvoid)
       endif
 !
-      nz = nrdofc
-      k = nz**2
+      k = nrdofc**2
 !
 !  ...counting for OMP
-      m_elem_inz(iel) = inz
-      inz = inz + k
+      elem_nnz(iel) = nnz
+      nnz = nnz + int8(k)
 !
 !  ...update the maximum number of local dof
       do i=1,NR_PHYSA
@@ -223,6 +223,8 @@ subroutine mumps_sc(mtype)
    NRDOF_TOT = nrdof + nrdof_mdl
 !
    if (nrdof .eq. 0) then
+      deallocate(MAXDOFS,NFIRSTH,NFIRSTE,NFIRSTV)
+      if (.not. ISTC_FLAG) deallocate(NFIRSTQ)
       write(*,*) 'par_mumps_sc: nrdof = 0. returning.'
       return
    endif
@@ -252,12 +254,12 @@ subroutine mumps_sc(mtype)
    allocate(RHS(nrdof)); RHS=ZERO
 !
 !..memory allocation for mumps
-   MUMPS_PAR%N = nrdof
-   MUMPS_PAR%NZ = inz
+   MUMPS_PAR%N   = nrdof
+   MUMPS_PAR%NNZ = nnz
 !
-   allocate(MUMPS_PAR%IRN(inz))
-   allocate(MUMPS_PAR%JCN(inz))
-   allocate(MUMPS_PAR%A(inz))
+   allocate(MUMPS_PAR%IRN(nnz))
+   allocate(MUMPS_PAR%JCN(nnz))
+   allocate(MUMPS_PAR%A(nnz))
 !   
    call stc_alloc
 !
@@ -356,11 +358,11 @@ subroutine mumps_sc(mtype)
             j = LCON(k2)
 !        ...assemble
 !        ...note: repeated indices are summed automatically by MUMPS
-            m_elem_inz(iel) = m_elem_inz(iel) + 1
+            elem_nnz(iel) = elem_nnz(iel) + 1
             k = (k1-1)*ndof + k2
-            MUMPS_PAR%A(  m_elem_inz(iel)) = ZTEMP(k)
-            MUMPS_PAR%IRN(m_elem_inz(iel)) = i
-            MUMPS_PAR%JCN(m_elem_inz(iel)) = j
+            MUMPS_PAR%A(  elem_nnz(iel)) = ZTEMP(k)
+            MUMPS_PAR%IRN(elem_nnz(iel)) = i
+            MUMPS_PAR%JCN(elem_nnz(iel)) = j
          enddo
       enddo
 !

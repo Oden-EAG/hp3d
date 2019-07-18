@@ -57,11 +57,10 @@ subroutine par_mumps_sc(mtype)
    integer, dimension(NR_PHYSA) :: nrdofi,nrdofb
 ! 
 !..integer counters
-   integer   :: nrdof_H,nrdof_E,nrdof_V,nrdof_Q
-   integer   :: nrdofm,nrdofc,nrnodm,nrdof,ndof
-   integer   :: iel,mdle,subd,i,j,k,l,k1,k2,nod,idec
-   integer   :: inz,nz,nnz,nrdof_mdl
-   integer   :: inz_loc
+   integer    :: nrdof_H,nrdof_E,nrdof_V,nrdof_Q
+   integer    :: nrdofm,nrdofc,nrnodm,nrdof,nrdof_mdl,ndof
+   integer    :: iel,mdle,subd,i,j,k,l,k1,k2,nod,idec
+   integer(8) :: nnz,nnz_loc
 !
 !..MPI variables
    integer :: count,src,ierr
@@ -72,7 +71,9 @@ subroutine par_mumps_sc(mtype)
 ! 
 !..workspace for celem
    integer, dimension(MAXNODM) :: nodm,ndofmH,ndofmE,ndofmV,ndofmQ
-   integer, dimension(NRELES)  :: mdle_list,m_elem_inz,m_elem_inz_loc
+!
+   integer    :: mdle_list(NRELES)
+   integer(8) :: elem_nnz_loc(NRELES)
 !
 !..workspace for right-hand side and solution vector
    VTYPE, allocatable :: RHS(:),SOL(:)
@@ -145,8 +146,10 @@ subroutine par_mumps_sc(mtype)
 !
    mdle = 0; idec = 1
 !..non-zero counters for element offsets in distributed sparse stiffness matrix
-   inz = 0; m_elem_inz(1:NRELES) = 0 ! global domain offset
-   inz_loc = 0; m_elem_inz_loc(1:NRELES) = 0 ! local subdomain offset
+!  using 64 bit integers nnz and nnz_loc
+   nnz     = 0_8; ! global number of non-zeros in matrix (counts duplicate indices)
+   nnz_loc = 0_8; ! local  number of non-zeros in matrix (counts duplicate indices)
+   elem_nnz_loc(1:NRELES) = 0_8 ! local element offsets for subdomain matrix
    do iel=1,NRELES
       call nelcon(mdle, mdle)
       mdle_list(iel) = mdle
@@ -160,19 +163,17 @@ subroutine par_mumps_sc(mtype)
             ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid,zvoid)
       endif
 !
-!  ...nz = number of modified element dof after compression
-!  ...k  = number of non-zeros entries in element stiffness matrix
-      nz = nrdofc
-      k = nz**2
+!  ...nrdofc = number of modified element dof after compression
+!  ...k      = number of non-zeros entries in element stiffness matrix
+      k = nrdofc**2
 !
 !  ...global counters for OpenMP
-      m_elem_inz(iel) = inz
-      inz = inz + k
+      nnz = nnz + int8(k)
 !
       if (subd .eq. RANK) then
 !     ...subdomain counters for OpenMP
-         m_elem_inz_loc(iel) = inz_loc
-         inz_loc = inz_loc + k
+         elem_nnz_loc(iel) = nnz_loc
+         nnz_loc = nnz_loc + int8(k)
 !
 !     ...update the maximum number of local dof
          do i=1,NR_PHYSA
@@ -242,6 +243,8 @@ subroutine par_mumps_sc(mtype)
    NRDOF_TOT = nrdof + nrdof_mdl
 !
    if (nrdof .eq. 0) then
+      deallocate(MAXDOFS,NFIRSTH,NFIRSTE,NFIRSTV)
+      if (.not. ISTC_FLAG) deallocate(NFIRSTQ)
       if (RANK .eq. ROOT) write(*,*) 'par_mumps_sc: nrdof = 0. returning.'
       return
    endif
@@ -273,16 +276,16 @@ subroutine par_mumps_sc(mtype)
 !
 !..memory allocation for MUMPS solver
    mumps_par%N = nrdof
-   mumps_par%NZ_loc = inz_loc
+   mumps_par%NNZ_loc = nnz_loc
 !
    write(*,2010) '  Number of dof  : nrdof   = ', nrdof
-   write(*,2010) '  Total non-zeros: inz     = ', inz
-   write(*,2010) '  Local non-zeros: inz_loc = ', inz_loc
-2010 format(A,I10)
+   write(*,2010) '  Total non-zeros: nnz     = ', nnz
+   write(*,2010) '  Local non-zeros: nnz_loc = ', nnz_loc
+2010 format(A,I12)
 !
-   allocate(mumps_par%IRN_loc(inz_loc))
-   allocate(mumps_par%JCN_loc(inz_loc))
-   allocate(mumps_par%A_loc(inz_loc))
+   allocate(mumps_par%IRN_loc(nnz_loc))
+   allocate(mumps_par%JCN_loc(nnz_loc))
+   allocate(mumps_par%A_loc(nnz_loc))
 !
    call stc_alloc
 !
@@ -385,11 +388,11 @@ subroutine par_mumps_sc(mtype)
             j = LCON(k2)
 !        ...assemble
 !        ...note: repeated indices are summed automatically by MUMPS
-            m_elem_inz_loc(iel) = m_elem_inz_loc(iel) + 1
+            elem_nnz_loc(iel) = elem_nnz_loc(iel) + 1_8
             k = (k1-1)*ndof + k2
-            mumps_par%A_loc(  m_elem_inz_loc(iel)) = ZTEMP(k)
-            mumps_par%IRN_loc(m_elem_inz_loc(iel)) = i
-            mumps_par%JCN_loc(m_elem_inz_loc(iel)) = j
+            mumps_par%A_loc(  elem_nnz_loc(iel)) = ZTEMP(k)
+            mumps_par%IRN_loc(elem_nnz_loc(iel)) = i
+            mumps_par%JCN_loc(elem_nnz_loc(iel)) = j
          enddo
       enddo
 !

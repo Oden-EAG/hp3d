@@ -118,7 +118,6 @@ subroutine pardiso_sc(mtype)
       call system_clock( t1, clock_rate, clock_max )
    endif
 !
-!..allocate required variables for celem
    allocate(MAXDOFS(NR_PHYSA))
    MAXDOFS = 0; MAXDOFM = 0
 !
@@ -225,6 +224,8 @@ subroutine pardiso_sc(mtype)
    NRDOF_TOT = nrdof + nrdof_mdl
 !
    if (nrdof .eq. 0) then
+      deallocate(MAXDOFS,NFIRSTH,NFIRSTE,NFIRSTV)
+      if (.not. ISTC_FLAG) deallocate(NFIRSTQ)
       write(*,*) 'par_mumps_sc: nrdof = 0. returning.'
       return
    endif
