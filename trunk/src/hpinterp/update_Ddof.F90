@@ -45,10 +45,10 @@ subroutine update_Ddof()
    VTYPE, dimension(MAXEQNQ,MAXbrickQ) :: zdofQ
 !
 !..auxiliary variables for timing
-   real*8 :: start, OMP_get_wtime
+   real(8) :: MPI_Wtime,start_time,end_time
 !
 !..auxiliary array with active mdle nodes
-   integer, dimension(NRELES) :: mdlel
+   integer :: mdlel(NRELES)
 !
 !..auxiliary variables
    integer :: iel, iv, ie, ifc, ind, iflag, ierr
@@ -60,7 +60,7 @@ subroutine update_Ddof()
 !-----------------------------------------------------------------------
 !
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
-   start = OMP_get_wtime()
+   start_time = MPI_Wtime()
 !
 !..fetch active elements
    mdle = 0;
@@ -258,7 +258,8 @@ subroutine update_Ddof()
 !
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
    if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
-      write(*,8010) OMP_get_wtime()-start
+      end_time = MPI_Wtime()
+      write(*,8010) end_time-start_time
  8010 format(' update_Ddof: ',f12.5,'  seconds',/)
    endif
 !
