@@ -107,7 +107,8 @@ subroutine input_DEFAULT(Fp)
 !
       iprint=0
 !
-      open(unit=nin,file=Fp,form='formatted',access='sequential',status='unknown')
+      open(unit=nin,file=Fp, &
+         form='formatted',access='sequential',status='old',action='read')
 !
 !  ...read in the dimension of the problem and the manifold
       read(nin,*) NDIM,MANDIM

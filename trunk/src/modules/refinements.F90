@@ -108,7 +108,7 @@ contains
     integer            :: i, nr, j, nson, iref1, iref2, n
     !
     open(unit=nin, file=Fp,form='formatted', &
-         access='sequential',status='unknown')
+         access='sequential',status='old',action='read')
     read(nin,*) nr
     do i=1,nr
        read(nin,*) j, nson, iref1, iref2, n
@@ -141,7 +141,7 @@ contains
     integer            :: i, nr, j, nson, iref1, iref2, iref3, n
     !
     open(unit=nin, file=Fp,form='formatted', &
-         access='sequential',status='unknown')
+         access='sequential',status='old',action='read')
     read(nin,*) nr
     do i=1,nr
        read(nin,*) j, nson, iref1, iref2, iref3, n

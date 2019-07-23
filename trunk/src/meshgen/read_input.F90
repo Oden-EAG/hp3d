@@ -20,7 +20,7 @@ subroutine read_input(Fp)
   !----------------------------------------------------------------------
   ! file open
   open(unit=nin,file=Fp, &
-       form='formatted',access='sequential',status='unknown')
+       form='formatted',access='sequential',status='old',action='read')
   !
   !  ...read in the maximum number of nodes
   read(nin,*) MAXNODS
