@@ -9,20 +9,23 @@ HP3D_BASE_PATH  = ${WORK}/par_hp3d/trunk
 # COMPILER SETTINGS (a 64bit processor architecture is assumed)
 #------------------------------------------------------------------
 
-DEBUG      = YES
+DEBUG      = NO
 LARGE      = NO
 OPENMP_USE = YES
+TAU_PERF   = NO
 
 # Use parallel threads to compile libraries and problems
 J ?= 24
 
-# Tau performance tool
-#FF = tau_f90.sh
-#CC = tau_cc.sh
-
 # Compiler
-FF     = mpif90
-CC     = mpicc
+# Tau performance tool
+ifeq ($(TAU_PERF),YES)
+  FF = tau_f90.sh
+  CC = tau_cc.sh
+else
+  FF = mpif90
+  CC = mpicc
+endif
 FC     =  $(FF)
 FFLAGS = -fPIC
 
