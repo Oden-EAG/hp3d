@@ -25,9 +25,9 @@ subroutine exact_error
    integer :: mdle_list(NRELES)
 !
 !..workspace for element_error routine
-   real*8 :: errorH,rnormH,errorE,rnormE
-   real*8 :: errorV,rnormV,errorQ,rnormQ
-   real*8 :: error,rnorm,error_subd,rnorm_subd
+   real(8) :: errorH,rnormH,errorE,rnormE
+   real(8) :: errorV,rnormV,errorQ,rnormQ
+   real(8) :: err,rnorm,error_subd,rnorm_subd
    integer :: iel,mdle,subd,nreles_subd,count,ierr
 !
 !----------------------------------------------------------------------
@@ -37,7 +37,9 @@ subroutine exact_error
 !..fetch active elements
    mdle = 0
    if ((DISTRIBUTED) .and. (.not. HOST_MESH)) then
-      write(*,*) 'exact_error: mesh is distributed. computing error in parallel...'
+      if (RANK .eq. ROOT) then
+         write(*,*) 'exact_error: mesh is distributed. computing error in parallel...'
+      endif
       nreles_subd = 0
       do iel=1,NRELES
          call nelcon(mdle, mdle)
@@ -73,20 +75,20 @@ subroutine exact_error
 !$OMP END DO
 !$OMP END PARALLEL
 !
-   error = 0.d0; rnorm = 0.d0
+   err = 0.d0; rnorm = 0.d0
    if (DISTRIBUTED .and. (.not. HOST_MESH)) then
       count = 1
-      call MPI_REDUCE(error_subd,error,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(error_subd,err  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE(rnorm_subd,rnorm,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
    else
-      error = error_subd
+      err   = error_subd
       rnorm = rnorm_subd
    endif
 !
    if (RANK .eq. ROOT) then
-      write(*,7020) NRDOF_TOT,sqrt(error),sqrt(rnorm)
+      write(*,7020) NRDOF_TOT,sqrt(err),sqrt(rnorm)
  7020 format('exact_error: NRDOF_TOT, L2 ERROR AND NORM = ',i8,3x,2es12.5)
-      write(*,7030) NRDOF_TOT,sqrt(error/rnorm)
+      write(*,7030) NRDOF_TOT,sqrt(err/rnorm)
  7030 format('exact_error: NRDOF_TOT, RELATIVE L2 ERROR = ',i8,3x,es12.5)
    endif
 !

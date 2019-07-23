@@ -12,8 +12,8 @@ MODULE_PATH     = $(OBJ_PATH)
 
 
 # Executable name
-EXEC            = test
-EXECS           = test
+EXEC            = pois
+EXECS           = pois
 
 # Includes and defs
 CCDEFS          = $(PROB_PP_DEFS)

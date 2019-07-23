@@ -17,8 +17,11 @@
 !   
 !------------------------------------------------------------------------------
 !
-!..MATLAB DIR
-   character(len=128) :: MATLAB_DIR
+!..TYPE OF JOB SUBMISSION
+!  0: interactive (usual main file)
+!  1: stampede2 skx slurm job batch script
+   integer :: JOB
+!
 !..MISCELLANEOUS
    integer :: NR_RHS_PROB = 1
 !

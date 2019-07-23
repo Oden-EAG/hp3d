@@ -17,10 +17,10 @@
 !             Itrial    - index for assembly
 !
 !----------------------------------------------------------------------
-subroutine elem(Mdle, Itest, Itrial)
+subroutine elem(Mdle, Itest,Itrial)
 !
    use data_structure3D
-   use physics, only : NR_PHYSA
+   use physics  , only: NR_PHYSA
 !
    implicit none
 !
@@ -76,13 +76,14 @@ subroutine elem_poisson(Mdle)
    use data_structure3D
    use element_data
    use parameters
+   use mpi_param, only: RANK
 !
    implicit none
 !
    integer, intent(in) :: Mdle
 !
 !..aux variables
-   real*8  :: rjac, fval, wa, weight, q, p
+   real(8) :: rjac, fval, wa, weight, q, p
    integer :: iflag, nrv, nre, nrf
    integer :: nrdofH, nrdofE, nrdofV, nrdofQ, nint, k1, k2, l
 !
@@ -94,10 +95,10 @@ subroutine elem_poisson(Mdle)
    integer :: norder(19), norient_edge(12), norient_face(6)
 !
 !..face order
-   integer, dimension(5) :: norderf
+   integer :: norderf(5)
 !
 !..geometry dof
-   integer :: xnod(3,MAXbrickH)
+   real(8) :: xnod(3,MAXbrickH)
 !
 !..geometry
 ! [
@@ -111,27 +112,28 @@ subroutine elem_poisson(Mdle)
 !  rn     normal vec
 !  t      .
 ! ]
-   real*8 :: xi(3), dxidt(3,2), x(3), dxdxi(3,3), dxidx(3,3), dxdt(3,2)
-   real*8 :: rt(3,2),rn(3),t(2)
+   real(8) :: xi(3), dxidt(3,2), x(3), dxdxi(3,3), dxidx(3,3), dxdt(3,2)
+   real(8) :: rt(3,2), rn(3), t(2)
 !
 !..H1 shape functions
-   real*8 :: shapH(MAXbrickH), gradH(3,MAXbrickH)
+   real(8) :: shapH(MAXbrickH), gradH(3,MAXbrickH)
 !
 !..3D quadrature data
 !  [xiloc: integration points (local coordinates)]
 !  [waloc: integration weights per integration point]
-   real*8 :: xiloc(3,MAX_NINT3), waloc(MAX_NINT3)
+   real(8) :: xiloc(3,MAX_NINT3), waloc(MAX_NINT3)
 !
 !..2D quadrature data
-   real*8 :: tloc(2,MAX_NINT2), wtloc(MAX_NINT2)
+   real(8) :: tloc(2,MAX_NINT2), wtloc(MAX_NINT2)
 !
 !..BC's flags
 !  [for each attribute and face (max #faces is 6 for 3D elements]
-   real*8 :: ibc(6,NR_PHYSA)
-!..workspace for trial and test variables
-   real*8 :: dq(3), u(3), dp(1:3), v(3), vec(3)
+   integer :: ibc(6,NR_PHYSA)
 !
-   real*8, allocatable :: Zaloc(:,:), Zbloc(:)
+!..workspace for trial and test variables
+   real(8) :: dq(3), u(3), dp(1:3), v(3), vec(3)
+!
+   real(8), allocatable :: Zaloc(:,:), Zbloc(:)
 !
 !----------------------------------------------------------------------
 !
@@ -142,24 +144,32 @@ subroutine elem_poisson(Mdle)
    nre = nedge(etype)
    nrf = nface(etype)
 !
+   !write(*,2050) '[', RANK, '] FIND ORDER'; call pause
 !..determine order of approximation
    call find_order(Mdle, norder)
 !
+   !write(*,2050) '[', RANK, '] FIND ORIENT'; call pause
 !..determine edge and face orientations
    call find_orient(Mdle, norient_edge, norient_face)
 !
 !..determine nodes coordinates
+   !write(*,2050) '[', RANK, '] FIND NODCOR'; call pause
    call nodcor(Mdle, xnod)
 !
 !..get the element boundary conditions flags
+   !write(*,2050) '[', RANK, '] FIND BC'; call pause
    call find_bc(Mdle, ibc)
 !
 !..find number of trial dof for each energy space supported by the element
+   !write(*,2050) '[', RANK, '] FIND CELNDOF'; call pause
    call celndof(NODES(Mdle)%type,norder, nrdofH,nrdofE,nrdofV,nrdofQ)
 !
 !..allocate space for matrices
    allocate(Zaloc(nrdofH,nrdofH)); Zaloc = ZERO
    allocate(Zbloc(nrdofH))       ; Zbloc = ZERO
+!
+   !write(*,2050) '[', RANK, '] START ELEM INTEGRALS'
+   !2050 format(A,I2,A)
 !
 !----------------------------------------------------------------------
 !     E L E M E N T    I N T E G R A L S                              |

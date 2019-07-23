@@ -53,6 +53,9 @@ subroutine set_environment
    call get_option_int     &
         ('-p','Uniform order initial mesh',3 ,IP)
 !
+   call get_option_int     &
+        ('-job','Type of job submission',0 ,JOB)
+!
    call get_option_int( '-nthreads', 'Number of OpenMP threads', 1, nthreads)
    call omp_set_num_threads(nthreads)
 !

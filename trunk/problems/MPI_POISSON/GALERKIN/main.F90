@@ -31,6 +31,12 @@ program main
 !..auxiliary variables
    integer :: i, ierr, req, ret
 !
+!..OMP variables
+   integer :: num_threads, omp_get_num_threads
+!
+!..timer
+   real(8) :: MPI_Wtime,start_time,end_time
+!
 !----------------------------------------------------------------------
 !
 !..Initialize MPI environment
@@ -44,54 +50,59 @@ program main
    if (RANK .eq. ROOT) then
 !  ...print header
       write(6,*)
-      write(6,*) '//                          //'
-      write(6,*) '// --  MPI TEST PROGRAM  -- //'
-      write(6,*) '//                          //'
+      write(6,*) '//                              //'
+      write(6,*) '// --  MPI POISSON GALERKIN  -- //'
+      write(6,*) '//                              //'
       write(6,*)
-      IPRINT_TIME = 1
    endif
-!
-   flush(6)
-   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
-!
-   write(6,1010) "Hello world! My MPI RANK is ", RANK, " out of ", NUM_PROCS, " processes."
- 1010 format (A,I3,A,I3,A)
    flush(6)
 !
+   IPRINT_TIME = 1
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
-!..printing in order
-!..this does not guarantee printing in order
-!..but it is "more likely" to print in order
-!..how "fast" print statements are written to stdout depends
-!..on the mpi implementation and runtime environment
+!..initialize physics, geometry, etc.
    do i = 0, NUM_PROCS-1
-      if (RANK == i .and. RANK == ROOT) then
+      if ((RANK .eq. i) .and. (RANK .eq. ROOT)) then
          write(6,*)
          write(6,1020) "Master proc [", RANK, "], initialize.."
          QUIET_MODE = .FALSE.
-         call initialize
-      else if (RANK == i) then
+      else if ((RANK .eq. i) .and. (RANK .ne. ROOT)) then
          write(6,1020) "Worker proc [", RANK, "], initialize.."
          QUIET_MODE = .TRUE.
-         call initialize
-         QUIET_MODE = .FALSE.
-      else
       endif
-      flush(6)
-      call MPI_BARRIER (MPI_COMM_WORLD, ierr)
    enddo
- 1020 format (A,I3,A,/)
+ 1020 format (A,I3,A)
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+   call initialize
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
+   if (RANK .eq. ROOT) write(6,1015) end_time-start_time
+ 1015 format(' initialize : ',f12.5,' seconds',/)
 !
 !..FLAGS
    ISTC_FLAG = .true.
    STORE_STC = .true.
    HERM_STC  = .false.
 !
-   if (RANK .eq. 0) then
-      call master_main
+!..determine number of omp threads running
+   if (RANK .eq. ROOT) then
+      write(6,1025) ' Initial polynomial order: ',IP
+!$OMP parallel
+!$OMP single
+      num_threads = omp_get_num_threads()
+      write(6,1025) ' Number of OpenMP threads: ',num_threads
+ 1025 format(A,I2)
+!$OMP end single
+!$OMP end parallel
+   endif
+!
+   if (JOB .ne. 0) then
+      call exec_job
    else
-      call worker_main
+      if (RANK .eq. 0) then
+         call master_main
+      else
+         call worker_main
+      endif
    endif
 !
    call finalize
@@ -121,9 +132,6 @@ subroutine master_main()
 !..MPI variables
    integer :: ierr
 !
-!..OMP variables
-   integer :: num_threads, omp_get_num_threads
-!
 !..auxiliary variables
    integer :: idec, i, r, lb, count, src
 !
@@ -136,15 +144,6 @@ subroutine master_main()
 !
 !..start user interface, with idec
 !..broadcast user command to workers
-!
-!..determine number of omp threads running
-!$OMP parallel
-!$OMP single
-      num_threads = omp_get_num_threads()
-      write(6,8010) '[', RANK, '] : ','Number of OpenMP threads: ',num_threads
- 8010 format(A,I3,A,A,I3)
-!$OMP end single
-!$OMP end parallel
 !
 !..test accessing data structures
    write(6,8020) '[', RANK, '] : ', 'NRELIS,NRELES,NRNODS = ',NRELIS,NRELES,NRNODS
@@ -198,6 +197,7 @@ subroutine master_main()
 !
       read( *,*) idec
       write(6,8010) '[', RANK, '] : ','Broadcast: idec = ', idec
+ 8010 format(A,I3,A,A,I3)
       count = 1; src = ROOT
       call MPI_BCAST (idec,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
 !
@@ -287,9 +287,6 @@ subroutine worker_main()
 !..MPI variables
    integer :: ierr
 !
-!..OMP variables
-   integer :: num_threads, omp_get_num_threads
-!
 !..auxiliary variables
    integer :: idec, i, r, lb, count, src
 !
@@ -299,15 +296,6 @@ subroutine worker_main()
       write(*,*) 'worker_main: RANK .eq. ROOT'
       stop
    endif
-!
-!..determine number of omp threads running
-!$OMP parallel
-!$OMP single
-      num_threads = omp_get_num_threads()
-      write(6,9010) '[', RANK, '] : ','Number of OpenMP threads: ',num_threads
- 9010 format(A,I3,A,A,I3)
-!$OMP end single
-!$OMP end parallel
 !
 !..test accessing data structures
    write(6,9020) '[', RANK, '] : ', 'NRELIS,NRELES,NRNODS = ',NRELIS,NRELES,NRNODS
@@ -327,6 +315,7 @@ subroutine worker_main()
       count = 1; src = ROOT
       call MPI_BCAST (idec,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
       write(6,9010) '[', RANK, '] : ','Broadcast: idec = ', idec
+ 9010 format(A,I3,A,A,I3)
 !
       select case(idec)
 !     ...QUIT
@@ -378,136 +367,6 @@ subroutine worker_main()
 !
 99 continue
    write(6,9030) '[', RANK, '] : ','worker_main end.'
- 9030 format(A,I3,A,A)
+ 9030 format(A,I4,A,A)
 !
 end subroutine worker_main
-!
-!
-!----------------------------------------------------------------------
-! exec_case
-!----------------------------------------------------------------------
-subroutine exec_case(idec)
-!
-   use data_structure3D
-   use par_mesh
-   use common_prob_data
-   use zoltan_wrapper, only: zoltan_w_partition,zoltan_w_eval
-!
-   implicit none
-!
-   integer, intent(in) :: idec
-!
-   integer :: i,nsteps,nstop
-   logical :: solved
-   integer :: mdle_subd(NRELES)
-!
-!----------------------------------------------------------------------
-!
-   solved = .false.
-!
-   select case(idec)
-!
-!  ...print data structure (interactive)
-      case(10); call result
-!
-!  ...print general data structure info
-      case(11)
-         write(*,110) NRELIS,NRELES,NRNODS
- 110     format(' NRELIS,NRELES,NRNODS            = ',3I10)
-         write(*,111) NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ
- 111     format(' NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ = ',4I10)
-         write(*,112) MAXNODS,NPNODS
- 112     format(' MAXNODS,NPNODS                  = ',2I10)
-!
-!  ...print current partition (elems)
-      case(15)
-         write(*,*) 'printing current partition (elems)...'
-         call print_partition
-!
-!  ...print current subdomains (nodes)
-      case(16)
-         write(*,*) 'printing current subdomains (nodes)...'
-         call print_subd
-!
-!  ...single uniform h-refinement
-      case(20)
-         write(*,*) 'global h-refinement...'
-         call global_href
-         call close_mesh
-         call update_gdof
-         call update_Ddof
-!
-!  ...single uniform p-refinement
-      case(21)
-         write(*,*) 'global p-refinement...'
-         call global_pref
-         call close_mesh ! not needed?
-         call update_gdof
-         call update_Ddof
-!
-!  ...Multi-step uniform h refinement
-      case(22)
-         call href_solve
-!
-!  ...distribute mesh
-      case(30)
-         write(*,*) 'distribute mesh...'
-         call distr_mesh
-!
-!  ...collect dofs on ROOT processor
-      case(31)
-         write(*,*) 'collecting dofs on ROOT...'
-         call collect_dofs
-!
-!  ...suggest new mesh partition (Zoltan)
-      case(32)
-         if (DISTRIBUTED) then
-            write(*,*) 'computing new mesh partition (Zoltan)...'
-            call zoltan_w_partition(mdle_subd)
-         else
-            write(*,*) 'distribute mesh first to use Zoltan...'
-         endif
-!
-!  ...evaluate current partition
-      case(33)
-         if (DISTRIBUTED) then
-            write(*,*) 'evaluating current partition...'
-            call zoltan_w_eval
-         else
-            write(*,*) 'distribute mesh first to use Zoltan...'
-         endif
-!
-!  ...run mesh verification routines
-      case(35)
-         write(*,*) 'verify distributed mesh consistency...'
-         call par_verify
-!
-!  ...solve problem with omp_mumps (OpenMP MUMPS)
-      case(40)
-         write(*,*) 'calling MUMPS (MPI) solver...'
-         call par_mumps_sc('G')
-!
-!  ...solve problem with par_mumps (MPI MUMPS)
-      case(41)
-         write(*,*) 'calling MUMPS (OpenMP) solver...'
-         call mumps_sc('G')
-!
-!  ...solve problem with pardiso (OpenMP)
-      case(42)
-         write(*,*) 'calling Pardiso (OpenMP) solver...'
-         call pardiso_sc('G')
-!
-!  ...solve problem with Frontal solver (sequential)
-      case(43)
-         write(*,*) 'calling Frontal (Seq) solver...'
-         call solve1(1)
-!
-      case(50)
-         write(*,*) 'computing error and residual...'
-         call exact_error
-!
-      case default
-         write(*,*) 'exec_case: unknown case...'
-   end select
-!
-end subroutine exec_case

@@ -42,6 +42,7 @@ subroutine initialize
 !--------------------------------------------------------------------------
    integer :: iflag,i,INTEGRATION_tmp
    character(len=1024) :: argv
+   logical :: qtmp
 !--------------------------------------------------------------------------
 !..output file open for the history of refinements (not for MPI)
 !  call open_history_file(trim(FILE_HISTORY))
@@ -49,7 +50,7 @@ subroutine initialize
 !..initialize refinements arrays
    call init_refinements(trim(FILE_REFINE))
 !
-!..generate constraint arrays - needed???
+!..generate constraint arrays
    call init_cnstr
 !
 !..read control file
@@ -60,7 +61,9 @@ subroutine initialize
 !  alternatively one could set this manually if desired (depends on problem)
 !
 !..read physics file quietly first to automatically setup equation settings
+   qtmp = QUIET_MODE; QUIET_MODE = .true.
    call read_input(trim(FILE_PHYS))
+   QUIET_MODE = qtmp
 !
 !..setup equation settings based on physics data and common problem data
    MAXNRHS_PROB = NR_RHS_PROB !from common_prob_data

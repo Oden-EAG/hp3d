@@ -2,10 +2,10 @@
 
 #
 # MPI Procs
-nproc=3
+nproc=4
 #
 # OMP THREADS
-nthreads=1
+nthreads=12
 
 # Configure problem params
 # - initial polynomial order of approximation
@@ -20,5 +20,5 @@ isol=0
 # ibrun -n <mpi_procs>
 #
 # 1)
-#ibrun -n ${nproc} ./test -p ${p} -isol ${isol} -nthreads ${nthreads}
-ibrun -n ${nproc} xterm -hold -e ./test -p ${p} -isol ${isol} -nthreads ${nthreads}
+ibrun -n ${nproc} ./pois -job 1 -p ${p} -isol ${isol} -nthreads ${nthreads}
+#ibrun -n ${nproc} xterm -hold -e ./pois -job 0 -p ${p} -isol ${isol} -nthreads ${nthreads}

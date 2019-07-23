@@ -68,6 +68,10 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
 !..get dof count from solver
    nrdof_tot_mesh(istep) = NRDOF_TOT
    nrdof_con_mesh(istep) = NRDOF_CON
+   if (NRDOF_TOT .eq. 0) then
+      istep=istep-1
+      goto 90
+   endif
 !
 !..field variables flag
    iflag(1) = 1
@@ -119,6 +123,8 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
       rnorm = rnorm_subd
    endif
 !
+   if (RANK .ne. ROOT) goto 90
+!
 !..update and display convergence history
    if (NEXACT.ge.1) then
       error_mesh(istep) = sqrt(error)
@@ -139,18 +145,18 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
    end select
 !
 !..print out the history of refinements
-   if ((NEXACT.gt.0) .and. (RANK.eq.ROOT)) then
+   if (NEXACT.gt.0) then
       write(*,*)
       write(*,*) 'HISTORY OF REFINEMENTS'
       write(*,110)
-  110 format(' mesh |',' nrdof_tot|',' nrdof_con| ',' |',   &
+  110 format(' mesh |',' nrdof_tot |',' nrdof_con | ',' |',   &
              ' field error  |','rel field error|','   rate ')
       write(*,*)
 !
       do i=1,istep
          write(*,120) i, nrdof_tot_mesh(i), nrdof_con_mesh(i), &
             error_mesh(i),rel_error_mesh(i),rate_error_mesh(i)
-  120    format(2x,i2,'  | ',2(i8,' | '), 2(' | ',es12.5),'  |',f7.2)
+  120    format(2x,i2,'  | ',2(i9,' | '), 2(' | ',es12.5),'  |',f7.2)
       enddo
    endif
 !
@@ -160,13 +166,14 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
 !                         REFINE AND UPDATE MESH
 !-----------------------------------------------------------------------
 !
+2010 format(A,I3,A)
    select case(Irefine)
 !  ...uniform refinements
       case(IUNIFORM)
          call global_href
          call close_mesh
          call update_gdof
-         call update_ddof
+         call update_Ddof
    end select
 !
 end subroutine uniform_href

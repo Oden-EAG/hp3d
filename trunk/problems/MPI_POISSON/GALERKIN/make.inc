@@ -17,6 +17,8 @@ SRC_UW  = \
             elem.F90 \
             celem.F90 \
             set_initial_mesh.F90 \
+            exec_case.F90 \
+            exec_job.F90 \
             main.F90
 
 SRC_FILE   += $(SRC_MODULE) $(SRC_COMMON) $(SRC_UW)  
