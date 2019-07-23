@@ -174,8 +174,13 @@ subroutine distr_mesh()
       endif
    enddo
 !
-   HOST_MESH = .false.
+   if (NUM_PROCS > 1) HOST_MESH = .false.
    DISTRIBUTED = .true.
+!
+   !add the next line after distributing geometry dofs
+   !if (.not. EXCHANGE_DOF) call update_Gdof
+   if (.not. EXCHANGE_DOF) call update_Ddof
+!
    if (iprint .eq. 1) then
       write(6,100) 'end   distr_mesh, DISTRIBUTED = .true.'
    endif

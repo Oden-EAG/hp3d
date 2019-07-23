@@ -75,7 +75,7 @@ module zoltan_wrapper
       if (RANK .eq. ROOT) then
          write(*,100) 'Zoltan initialized sucessfully. Version = ', ver
       endif
-  100 format(/,A,F5.2)
+  100 format(A,F5.2)
 !
 !  ...create Zoltan memory, and set default parameters
       zz => Zoltan_Create(MPI_COMM_WORLD)
@@ -289,10 +289,10 @@ module zoltan_wrapper
                                      nrExp,expGIDs,expLIDs,expProcs,expParts )
       call zoltan_w_handle_err(ierr,'Zoltan_LB_Partition')
 !
-      write(*,*) 'zoltan_w_partition:'
-      write(*,300) '   changes  = ', changes
+      !write(*,*) 'zoltan_w_partition:'
+      !write(*,300) '   changes  = ', changes
       !write(*,301) '   nrImp    = ', nrImp
-      write(*,301) '   nrExp    = ', nrExp
+      !write(*,301) '   nrExp    = ', nrExp
       !if (nrImp > 0) write(*,310) '   impProcs = ', impProcs
       !if (nrImp > 0) write(*,310) '   impParts = ', impParts
       !if (nrExp > 0) write(*,320) '   expProcs = ', expProcs
@@ -338,7 +338,7 @@ module zoltan_wrapper
    subroutine zoltan_w_eval()
       logical :: print_stats
       integer(Zoltan_int) :: ierr
-      if (RANK .eq. ROOT) write(*,*) 'Evaluating quality of current partition...'
+      !if (RANK .eq. ROOT) write(*,*) 'Evaluating quality of current partition...'
       print_stats=.true.
       ierr = Zoltan_LB_Eval(zz,print_stats)
       call zoltan_w_handle_err(ierr,'Zoltan_LB_Eval')

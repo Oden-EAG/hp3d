@@ -26,7 +26,7 @@ subroutine break(Mdle,Kref)
   integer, dimension(12)  :: krefe
   integer, dimension(4)   :: iv
   integer, dimension(4,6) :: neig
-  integer :: i,j, is, iprint, iact, iface, ipass
+  integer :: i, j, is, iprint, iact, iface, ipass
   integer :: kref_face, kref_edge, nod, nr_vert, nrsons, subd
 !
 !-------------------------------------------------------------------------
@@ -34,8 +34,9 @@ subroutine break(Mdle,Kref)
   iprint = 0
 !
 ! record on history file (needed for debugging)
-  write(NHIST,8001) Mdle,Kref
-8001 format(i6, 2x,i3,' # element number and refinement kind')
+! don't use in MPI code
+  !write(NHIST,8001) Mdle,Kref
+!8001 format(i6, 2x,i3,' # element number and refinement kind')
 !
 ! nodal connectivities
   call elem_nodes(Mdle, nodesl,norientl)

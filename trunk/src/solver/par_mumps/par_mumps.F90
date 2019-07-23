@@ -61,15 +61,9 @@ subroutine mumps_start
    call dmumps(mumps_par)
 #endif
 !
-!..verify MYID == RANK
-   if (mumps_par%MYID .ne. RANK) then
-      write(*,*) 'par_mumps: MYID .ne. RANK'
-      call pause
-   endif
-!
 !..diagnostics
-   write(*,100) 'par_mumps: MYID           = ', mumps_par%MYID
-   write(*,110) 'par_mumps: VERSION_NUMBER = ', mumps_par%VERSION_NUMBER
+   !write(*,100) 'par_mumps: MYID           = ', mumps_par%MYID
+   !write(*,110) 'par_mumps: VERSION_NUMBER = ', mumps_par%VERSION_NUMBER
  100 format(A,I3)
  110 format(A,A)
 !
@@ -92,7 +86,7 @@ subroutine mumps_start
 !
 !..icntl(14): percentage increase in estimated workspace
 !     [default: 20] - 20% increase in workspace
-   mumps_par%icntl(14) = 50
+   mumps_par%icntl(14) = 30
 !
 !..icntl(18): distribution strategy of the input matrix
 !     0: centralized on host
@@ -117,6 +111,10 @@ subroutine mumps_start
 !     1: PT-Scotch
 !     2: ParMetis
    mumps_par%icntl(29) = 2
+   ! parmetis appears to cause 'integer divide by zero error'
+   ! when using partitions for small problem
+   ! (e.g., try 32 mpi ranks on 64 cubes)
+   ! but parmetis is faster than pt-scotch, at least on uniformly refined cube
 !
 end subroutine mumps_start
 !

@@ -51,7 +51,7 @@ module mpi_wrapper
       if (RANK .eq. ROOT) then
          write(*,100) 'MPI initialized sucessfully. NUM_PROCS = ',NUM_PROCS
       endif
-  100 format(/,A,I3)
+  100 format(/,A,I4)
 !
 !  ...initialize Zoltan environment
       call zoltan_w_init

@@ -18,7 +18,9 @@ subroutine update_gdof()
    use constrained_nodes
    use data_structure3D
    use element_data
-   use environment, only : QUIET_MODE
+   use environment, only: QUIET_MODE
+   use MPI        , only: MPI_COMM_WORLD
+   use mpi_param  , only: RANK,ROOT
    use GMP
 !
    implicit none
@@ -50,11 +52,12 @@ subroutine update_gdof()
    integer, dimension(NRELES) :: mdlel
 !
 !..auxiliary variables
-   integer :: iel, iv, ie, ifc, ind, iflag, i, k, loc
+   integer :: iel, iv, ie, ifc, ind, iflag, i, k, loc, ierr
    integer :: mdle, nf, no, nod, nr_elem_nodes, nrnodm, nr_up_elem
 !
 !-----------------------------------------------------------------------
 !
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
    start = OMP_get_wtime()
 !
 !..lower the GMP interface flag for all nodes
@@ -219,7 +222,8 @@ subroutine update_gdof()
 !
 !-----------------------------------------------------------------------
 !
-   if (.not. QUIET_MODE) then
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+   if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
       write(*,8004) OMP_get_wtime()-start
  8004 format(' update_gdof: ',f12.5,'  seconds')
    endif

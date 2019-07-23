@@ -18,7 +18,8 @@ subroutine update_Ddof()
    use data_structure3D
    use environment, only: QUIET_MODE
    use par_mesh   , only: DISTRIBUTED
-   use mpi_param  , only: RANK
+   use MPI        , only: MPI_COMM_WORLD
+   use mpi_param  , only: RANK,ROOT
 !
    implicit none
 !
@@ -50,7 +51,7 @@ subroutine update_Ddof()
    integer, dimension(NRELES) :: mdlel
 !
 !..auxiliary variables
-   integer :: iel, iv, ie, ifc, ind, iflag
+   integer :: iel, iv, ie, ifc, ind, iflag, ierr
    integer :: k, mdle, nf, no, nod
 !
 !..number of elements in subdomain
@@ -58,6 +59,7 @@ subroutine update_Ddof()
 !
 !-----------------------------------------------------------------------
 !
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
    start = OMP_get_wtime()
 !
 !..fetch active elements
@@ -254,7 +256,8 @@ subroutine update_Ddof()
 !
 !-----------------------------------------------------------------------
 !
-   if (.not. QUIET_MODE) then
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+   if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
       write(*,8010) OMP_get_wtime()-start
  8010 format(' update_Ddof: ',f12.5,'  seconds',/)
    endif
