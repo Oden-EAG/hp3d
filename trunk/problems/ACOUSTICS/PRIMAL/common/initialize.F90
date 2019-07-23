@@ -43,7 +43,7 @@ subroutine initialize
   character(len=1024) :: argv
   !--------------------------------------------------------------------------
   ! output file open for the history of refinements
-  call open_history_file(trim(FILE_HISTORY))
+  !call open_history_file(trim(FILE_HISTORY))
   !
   ! initialize refinements arrays
   call init_refinements(trim(FILE_REFINE))
