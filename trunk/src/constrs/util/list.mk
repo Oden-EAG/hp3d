@@ -1,2 +1,2 @@
-init_cnstr.F
+init_cnstr.F90
 0
