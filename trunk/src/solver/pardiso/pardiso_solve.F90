@@ -41,8 +41,10 @@ subroutine pardiso_solve(ia,ja,a,type,nnz,n,nrhs, b)
    integer         :: mtype,maxfct,mnum,phase,error,msglvl
    integer         :: perm(N)
    character*1     :: type
-   integer(kind=8) :: t1,t2,clock_rate,clock_max
    real*8          :: tm
+!
+!..timer
+   real(8) :: MPI_Wtime,start_time,end_time
 !
 !------------------------------------------------------------------------
 !
@@ -77,7 +79,7 @@ subroutine pardiso_solve(ia,ja,a,type,nnz,n,nrhs, b)
 !
 !------------------------------------------------------------------------
 !
-   call system_clock ( t1, clock_rate, clock_max )
+   start_time = MPI_Wtime()
 !
    phase     = 11  ! analysis
    iparm(8)  = 1   ! max numbers of iterative refinement steps
@@ -85,9 +87,9 @@ subroutine pardiso_solve(ia,ja,a,type,nnz,n,nrhs, b)
    call pardiso(pt,maxfct,mnum,mtype,phase,N,A,Ia,Ja,perm,Nrhs,         &
                iparm,msglvl,B,x,error)
 !
-   call system_clock ( t2, clock_rate, clock_max )
-   tm =  real(t2 - t1,8)/real(clock_rate,8)
-
+   end_time = MPI_Wtime()
+   tm = end_time-start_time
+!
    if (IPRINT_TIME .eq. 1) then
       write(*,1000) tm
  1000 format(' Analysis       : ',f12.5,'  seconds')
@@ -95,14 +97,14 @@ subroutine pardiso_solve(ia,ja,a,type,nnz,n,nrhs, b)
 !
 !------------------------------------------------------------------------
 !
-   call system_clock ( t1, clock_rate, clock_max )
+   start_time = MPI_Wtime()
 !
    phase     = 22  ! factorization
    call pardiso(pt,maxfct,mnum,mtype,phase,N,A,Ia,Ja,perm,Nrhs,         &
                iparm,msglvl,B,x,error)
 !
-   call system_clock ( t2, clock_rate, clock_max )
-   tm =  real(t2 - t1,8)/real(clock_rate,8)
+   end_time = MPI_Wtime()
+   tm = end_time-start_time
 !
    if (IPRINT_TIME .eq. 1) then
       write(*,1001) tm
@@ -111,14 +113,14 @@ subroutine pardiso_solve(ia,ja,a,type,nnz,n,nrhs, b)
 !
 !------------------------------------------------------------------------
 !
-   call system_clock ( t1, clock_rate, clock_max )
+   start_time = MPI_Wtime()
 !
    phase     = 33  ! F/B Substitution
    call pardiso(pt,maxfct,mnum,mtype,phase,N,A,Ia,Ja,perm,Nrhs,         &
                iparm,msglvl,B,x,error)
 !   
-   call system_clock ( t2, clock_rate, clock_max )
-   tm =  real(t2 - t1,8)/real(clock_rate,8)
+   end_time = MPI_Wtime()
+   tm = end_time-start_time
 !
    if (IPRINT_TIME .eq. 1) then
       write(*,1002) tm
