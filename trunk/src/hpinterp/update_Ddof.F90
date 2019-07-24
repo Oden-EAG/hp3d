@@ -252,7 +252,6 @@ subroutine update_Ddof()
    enddo
 !$OMP END DO
 !$OMP END PARALLEL
-
 !
 !-----------------------------------------------------------------------
 !

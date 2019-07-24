@@ -4,7 +4,7 @@
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision    - Jul 18
+!    latest revision    - July 2019
 !
 !    purpose            - routine updates values of geometry degrees
 !                         of freedom, using the GMP parametrizations

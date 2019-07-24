@@ -414,21 +414,21 @@ subroutine mumps_sc(mtype)
    MUMPS_PAR%RHS = RHS
    deallocate(RHS);
 !
-#if C_MODE
-   MUMPS_PAR%JOB = 1
-   call zmumps(MUMPS_PAR)
-   MUMPS_PAR%JOB = 2
-   call zmumps(MUMPS_PAR)
-   MUMPS_PAR%JOB = 3
-   call zmumps(MUMPS_PAR)
-#else
-   MUMPS_PAR%JOB = 1
-   call dmumps(MUMPS_PAR)
-   MUMPS_PAR%JOB = 2
-   call dmumps(MUMPS_PAR)
-   MUMPS_PAR%JOB = 3
-   call dmumps(MUMPS_PAR)
-#endif
+!#if C_MODE
+!   MUMPS_PAR%JOB = 1
+!   call zmumps(MUMPS_PAR)
+!   MUMPS_PAR%JOB = 2
+!   call zmumps(MUMPS_PAR)
+!   MUMPS_PAR%JOB = 3
+!   call zmumps(MUMPS_PAR)
+!#else
+!   MUMPS_PAR%JOB = 1
+!   call dmumps(MUMPS_PAR)
+!   MUMPS_PAR%JOB = 2
+!   call dmumps(MUMPS_PAR)
+!   MUMPS_PAR%JOB = 3
+!   call dmumps(MUMPS_PAR)
+!#endif
 !
 !..MUMPS analysis
    mumps_par%JOB = 1
@@ -437,7 +437,6 @@ subroutine mumps_sc(mtype)
 #else
    call dmumps(mumps_par)
 #endif
-!
    if (mumps_par%INFO(1) .ne. 0) then
       call mumps_destroy
       write(*,*) 'analysis: mumps_par%INFO(1) .ne. 0'

@@ -254,7 +254,6 @@ subroutine par_mumps_sc(mtype)
       return
    endif
 !
-!
 ! ----------------------------------------------------------------------
 !  END OF STEP 1
 ! ----------------------------------------------------------------------
@@ -277,7 +276,6 @@ subroutine par_mumps_sc(mtype)
       call MPI_BARRIER(mumps_par%COMM, ierr)
       start_time = MPI_Wtime()
    endif
-
 !
 !..memory allocation for load assembly
    allocate(RHS(nrdof)); RHS=ZERO

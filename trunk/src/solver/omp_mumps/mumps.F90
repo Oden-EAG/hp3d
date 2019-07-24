@@ -90,7 +90,7 @@ subroutine mumps_start
 !
 !..icntl(14): percentage increase in estimated workspace
 !     [default: 20] - 20% increase in workspace
-   mumps_par%icntl(14) = 20
+   mumps_par%icntl(14) = 30
 !
 end subroutine mumps_start
 !

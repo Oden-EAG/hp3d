@@ -178,8 +178,8 @@ subroutine distr_mesh()
    DISTRIBUTED = .true.
 !
    !add the next line after distributing geometry dofs
-   !if (.not. EXCHANGE_DOF) call update_Gdof
-   if (.not. EXCHANGE_DOF) call update_Ddof
+   if (.not. HOST_MESH) call update_gdof
+   if ((.not. EXCHANGE_DOF) .and. (.not. HOST_MESH)) call update_Ddof
 !
    if (iprint .eq. 1) then
       write(6,100) 'end   distr_mesh, DISTRIBUTED = .true.'
