@@ -248,11 +248,10 @@ subroutine mumps_sc(mtype)
 !  STEP 2 : ASSEMBLE AND STORE IN SPARSE FORM 
 ! ----------------------------------------------------------------------
 !
-   if (IPRINT_TIME .eq. 1) then
-      write(*,1003)
- 1003 format(' STEP 2 started : Global Assembly')
-      start_time = MPI_Wtime()
-   endif
+   write(*,2010) ' Number of dof  : nrdof_con = ', NRDOF_CON
+   write(*,2010) '                  nrdof_tot = ', NRDOF_TOT
+   write(*,2010) ' Total non-zeros: nnz       = ', nnz
+2010 format(A,I12)
 !
 !..memory allocation for assembly
    allocate(RHS(nrdof)); RHS=ZERO
@@ -260,16 +259,18 @@ subroutine mumps_sc(mtype)
 !..memory allocation for mumps
    MUMPS_PAR%N   = nrdof
    MUMPS_PAR%NNZ = nnz
-!
-   write(*,2010) ' Number of dof  : nrdof   = ', nrdof
-   write(*,2010) ' Total non-zeros: nnz     = ', nnz
-2010 format(A,I12)
-!
    allocate(MUMPS_PAR%IRN(nnz))
    allocate(MUMPS_PAR%JCN(nnz))
    allocate(MUMPS_PAR%A(nnz))
-!   
+!
+!..memory allocation for static condensation   
    call stc_alloc
+!
+   if (IPRINT_TIME .eq. 1) then
+      write(*,1003)
+ 1003 format(/,' STEP 2 started : Global Assembly')
+      start_time = MPI_Wtime()
+   endif
 !
 !..assemble global stiffness matrix
 !..loop through elements
@@ -413,22 +414,6 @@ subroutine mumps_sc(mtype)
    allocate(MUMPS_PAR%RHS(MUMPS_PAR%N));
    MUMPS_PAR%RHS = RHS
    deallocate(RHS);
-!
-!#if C_MODE
-!   MUMPS_PAR%JOB = 1
-!   call zmumps(MUMPS_PAR)
-!   MUMPS_PAR%JOB = 2
-!   call zmumps(MUMPS_PAR)
-!   MUMPS_PAR%JOB = 3
-!   call zmumps(MUMPS_PAR)
-!#else
-!   MUMPS_PAR%JOB = 1
-!   call dmumps(MUMPS_PAR)
-!   MUMPS_PAR%JOB = 2
-!   call dmumps(MUMPS_PAR)
-!   MUMPS_PAR%JOB = 3
-!   call dmumps(MUMPS_PAR)
-!#endif
 !
 !..MUMPS analysis
    mumps_par%JOB = 1
