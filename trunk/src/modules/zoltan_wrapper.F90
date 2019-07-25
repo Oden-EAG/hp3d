@@ -131,7 +131,7 @@ module zoltan_wrapper
 !        ALL   : info about elements to be exported or imported
 !        EXPORT: info about elements to be exported
 !        IMPORT: info about elements to be imported
-      ierr = Zoltan_Set_Param(zz,'RETURN_LISTS','EXPORT')
+      ierr = Zoltan_Set_Param(zz,'RETURN_LISTS','ALL')
       call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
 !
       ZOLTAN_IS_INIT = .true.
@@ -294,9 +294,7 @@ module zoltan_wrapper
       !write(*,301) '   nrImp    = ', nrImp
       !write(*,301) '   nrExp    = ', nrExp
       !if (nrImp > 0) write(*,310) '   impProcs = ', impProcs
-      !if (nrImp > 0) write(*,310) '   impParts = ', impParts
       !if (nrExp > 0) write(*,320) '   expProcs = ', expProcs
-      !if (nrExp > 0) write(*,320) '   expParts = ', expParts
   300 format(A,L5)
   301 format(A,I5)
   310 format(A,<nrImp>I5)

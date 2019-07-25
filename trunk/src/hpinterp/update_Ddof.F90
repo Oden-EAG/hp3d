@@ -59,8 +59,7 @@ subroutine update_Ddof()
 !
 !-----------------------------------------------------------------------
 !
-   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
-   start_time = MPI_Wtime()
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 !
 !..fetch active elements
    mdle = 0;
@@ -255,9 +254,8 @@ subroutine update_Ddof()
 !
 !-----------------------------------------------------------------------
 !
-   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
    if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
-      end_time = MPI_Wtime()
       write(*,8010) end_time-start_time
  8010 format(' update_Ddof: ',f12.5,'  seconds',/)
    endif

@@ -26,7 +26,7 @@
 !
 !-----------------------------------------------------------------------
 !
-subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Nfilter,Subd,Iact,X, Nod)
+subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Nfilter,Subd,Iact, Nod)
 !
    use data_structure3D
 !
@@ -40,7 +40,6 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Nfilter,Subd,Iact,X, Nod)
    integer, intent(in)           :: Nfilter
    integer, intent(in)           :: Subd
    integer, intent(in)           :: Iact
-   real*8 , intent(in)           :: X(NDIMEN)
    integer, intent(out)          :: Nod
 !
    integer :: ncase(NR_PHYSA)
@@ -97,37 +96,34 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Nfilter,Subd,Iact,X, Nod)
    endif
 !
 !..allocate and initialize geometry dofs
-   if (ndofH.gt.0) then
+   if ((Iact.eq.1) .and. (ndofH.gt.0)) then
       allocate(NODES(Nod)%coord(NDIMEN,ndofH))
       NODES(Nod)%coord=0.d0
-   endif
-   if (Type.eq.'vert') then
-      NODES(Nod)%coord(1:NDIMEN,1) = X(1:NDIMEN)
    endif
 !
 !..allocate and initialize solution dofs
    if (Iact.eq.1) then
       if ((NREQNH(Icase).gt.0).and.(ndofH.gt.0)) then
          nvar = NREQNH(Icase)*NRCOMS
-         allocate( NODES(Nod)%zdofH(nvar, ndofH))
+         allocate( NODES(Nod)%zdofH(nvar,ndofH))
          NODES(Nod)%zdofH = ZERO
          NRDOFSH = NRDOFSH + ndofH*NREQNH(Icase)
       endif
       if ((NREQNE(Icase).gt.0).and.(ndofE.gt.0)) then
          nvar = NREQNE(Icase)*NRCOMS
-         allocate( NODES(Nod)%zdofE(nvar, ndofE))
+         allocate( NODES(Nod)%zdofE(nvar,ndofE))
          NODES(Nod)%zdofE = ZERO
          NRDOFSE = NRDOFSE + ndofE*NREQNE(Icase)
       endif
       if ((NREQNV(Icase).gt.0).and.(ndofV.gt.0)) then
          nvar = NREQNV(Icase)*NRCOMS
-         allocate( NODES(Nod)%zdofV(nvar, ndofV))
+         allocate( NODES(Nod)%zdofV(nvar,ndofV))
          NODES(Nod)%zdofV = ZERO
          NRDOFSV = NRDOFSV + ndofV*NREQNV(Icase)
       endif
       if ((NREQNQ(Icase).gt.0).and.(ndofQ.gt.0)) then
          nvar = NREQNQ(Icase)*NRCOMS
-         allocate( NODES(Nod)%zdofQ(nvar, ndofQ))
+         allocate( NODES(Nod)%zdofQ(nvar,ndofQ))
          NODES(Nod)%zdofQ = ZERO
          NRDOFSQ = NRDOFSQ + ndofQ*NREQNQ(Icase)
       endif

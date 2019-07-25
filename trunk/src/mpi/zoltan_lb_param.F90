@@ -107,7 +107,7 @@ subroutine zoltan_lb_param_rcb(Ierr_out)
 !     0: no output
 !     1: print summary
 !     2: print for each proc
-   ierr = Zoltan_Set_Param(zz,'RCB_OUTPUT_LEVEL','1')
+   ierr = Zoltan_Set_Param(zz,'RCB_OUTPUT_LEVEL','0')
    call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
    if (ierr > Ierr_out) Ierr_out = ierr
 !
@@ -150,7 +150,7 @@ subroutine zoltan_lb_param_rib(Ierr_out)
 !     0: no output
 !     1: print summary
 !     2: print for each proc
-   ierr = Zoltan_Set_Param(zz,'RIB_OUTPUT_LEVEL','1')
+   ierr = Zoltan_Set_Param(zz,'RIB_OUTPUT_LEVEL','0')
    call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
    if (ierr > Ierr_out) Ierr_out = ierr
 !

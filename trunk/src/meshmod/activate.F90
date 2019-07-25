@@ -44,7 +44,7 @@ subroutine activate(Nod)
    endif
 !
 !..allocate and initialize dofs
-   if (ndofH.gt.0) then
+   if ((ndofH.gt.0) .and. (act_dof.eq.1)) then
       allocate(NODES(Nod)%coord(3, ndofH))
       NODES(Nod)%coord = 0.d0
    endif
