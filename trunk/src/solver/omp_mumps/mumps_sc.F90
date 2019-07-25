@@ -68,7 +68,7 @@ subroutine mumps_sc(mtype)
    VTYPE, allocatable :: RHS(:)
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: MPI_Wtime,start_time,end_time,time_stamp
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
@@ -417,26 +417,40 @@ subroutine mumps_sc(mtype)
 !
 !..MUMPS analysis
    mumps_par%JOB = 1
+!
+   if (IPRINT_TIME .eq. 1) time_stamp = MPI_Wtime()
 #if C_MODE
    call zmumps(mumps_par)
 #else
    call dmumps(mumps_par)
 #endif
+   if (IPRINT_TIME .eq. 1) then
+      time_stamp = MPI_Wtime()-time_stamp
+      write(*,3001) time_stamp
+ 3001 format(' - Analysis : ',f12.5,'  seconds')
+   endif
    if (mumps_par%INFO(1) .ne. 0) then
       call mumps_destroy
       write(*,*) 'analysis: mumps_par%INFO(1) .ne. 0'
       stop
    endif
-   write(*,1100) ' MUMPS: estimated size in GB = ',mumps_par%INFO(15)/1000.d0
+   write(*,1100) '   - estimated size in GB = ',mumps_par%INFO(15)/1000.d0
  1100 format(A,F11.3)
 !
 !..MUMPS factorization
    mumps_par%JOB = 2
+!
+   if (IPRINT_TIME .eq. 1) time_stamp = MPI_Wtime()
 #if C_MODE
    call zmumps(mumps_par)
 #else
    call dmumps(mumps_par)
 #endif
+   if (IPRINT_TIME .eq. 1) then
+      time_stamp = MPI_Wtime()-time_stamp
+      write(*,3002) time_stamp
+ 3002 format(' - Factorize: ',f12.5,'  seconds')
+   endif
    if (mumps_par%INFO(1) .ne. 0) then
       call mumps_destroy
       write(*,*) 'factorization: mumps_par%INFO(1) .ne. 0'
@@ -445,11 +459,18 @@ subroutine mumps_sc(mtype)
 !
 !..MUMPS solve
    mumps_par%JOB = 3
+!
+   if (IPRINT_TIME .eq. 1) time_stamp = MPI_Wtime()
 #if C_MODE
    call zmumps(mumps_par)
 #else
    call dmumps(mumps_par)
 #endif
+   if (IPRINT_TIME .eq. 1) then
+      time_stamp = MPI_Wtime()-time_stamp
+      write(*,3003) time_stamp
+ 3003 format(' - Solve    : ',f12.5,'  seconds')
+   endif
    if (mumps_par%INFO(1) .ne. 0) then
       call mumps_destroy
       write(*,*) 'solve: mumps_par%INFO(1) .ne. 0'

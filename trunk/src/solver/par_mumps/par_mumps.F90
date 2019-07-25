@@ -104,7 +104,12 @@ subroutine mumps_start
 !     0: automatic choice
 !     1: sequential computation
 !     2: parallel computation
-   mumps_par%icntl(28) = 2
+   mumps_par%icntl(28) = 0
+!if (NUM_PROCS < 16)
+!   mumps_par%icntl(28) = 1
+!else
+!   mumps_par%icntl(28) = 2
+!endif
 !
 !..icntl(29): choice of parallel pivot ordering tool (not used if icntl(28)=1)
 !     0: automatic choice
