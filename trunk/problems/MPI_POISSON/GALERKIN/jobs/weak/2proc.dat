@@ -1,0 +1,466 @@
+/work/05246/sh43394/stampede2/par_hp3d/trunk/problems/MPI_POISSON/GALERKIN
+Thu Jul 25 11:28:34 CDT 2019
+TACC:  Starting up job 4042741 
+TACC:  Starting parallel tasks... 
+
+MPI initialized sucessfully. NUM_PROCS =    2
+Zoltan initialized sucessfully. Version =  3.83
+ 
+ //                              //
+ // --  MPI POISSON GALERKIN  -- //
+ //                              //
+ 
+ 
+Master proc [  0], initialize..
+Worker proc [  1], initialize..
+ -- hp3d Control Parameters --
+ INT. LEGENDRE POLYNOMIALS USED
+ EXACT SOLUTION KNOWN
+ UNSYMMETRIC PROBLEM
+ GAUSSIAN QUADRATURE (VOLUME LOAD)
+ GAUSSIAN QUADRATURE (NEUMANN BC)
+ EXTENSION OPERATOR NOT SUPPORTED
+ DEFAULT FORMAT
+ GEOMETRY TOLERANCE = 1.0000E-06
+ INTEGRATION        = 0
+ ISOPARAMETRIC ELEMENTS
+ 
+ -- input_DEFAULT --
+ NRSURFS =     0 ; reading surfaces...
+ NRPOINT =     8 ; reading points...
+ NRCURVE =    12 ; reading curves...
+ NRTRIAN =     0 ; reading triangles...
+ NRRECTA =     6 ; reading rectangles...
+ NRPRISM =     0 ; reading prisms...
+ NRHEXAS =     1 ; reading hexas...
+ NRTETRA =     0 ; reading tets...
+ NRPYRAM =     0 ; reading pyramids...
+ 
+ -- Physics --
+ MAXNODS =      3225000
+ PHYSA,DTYPE,NR_COMP = field  contin  1
+ 
+ update_gdof:      0.00463  seconds
+ update_Ddof:      0.05368  seconds
+
+ initialize :      2.51142 seconds
+
+ Initial polynomial order:  5
+ Number of OpenMP threads: 48
+ ==================
+ exec_job: starting
+ ==================
+ partition time:      0.00000 seconds
+ update_gdof:      0.00012  seconds
+ update_Ddof:      0.00183  seconds
+
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  1
+
+
+-------------------------------------------------------------
+  --> 1. global uniform h-refinement...
+
+ # of elements broken         =        1
+ # of current elements, nodes =        8,       144
+ refinement :      0.00051  seconds
+ update_gdof:      0.00121  seconds
+ update_Ddof:      0.22445  seconds
+
+ timer:      0.22620 seconds
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ partition time:      0.00000 seconds
+ migration time:      0.00013 seconds
+ update_gdof:      0.00084  seconds
+ update_Ddof:      0.10602  seconds
+
+ timer:      0.10713 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  2
+
+
+-------------------------------------------------------------
+  --> 1. global uniform h-refinement...
+
+ # of elements broken         =        8
+ # of current elements, nodes =       64,       846
+ refinement :      0.00522  seconds
+ update_gdof:      0.00655  seconds
+ update_Ddof:      0.57643  seconds
+
+ timer:      0.58824 seconds
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ partition time:      0.00000 seconds
+ migration time:      0.00000 seconds
+ update_gdof:      0.00648  seconds
+ update_Ddof:      0.21121  seconds
+
+ timer:      0.21862 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  3
+
+
+-------------------------------------------------------------
+  --> 1. global anisotropic h-refinement...
+
+ refinement :      0.01325  seconds
+ update_gdof:      0.01602  seconds
+ update_Ddof:      0.10348  seconds
+
+ timer:      0.13278 seconds
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ partition time:      0.00000 seconds
+ migration time:      0.00000 seconds
+ update_gdof:      0.01635  seconds
+ update_Ddof:      0.02479  seconds
+
+ timer:      0.04338 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  4
+
+
+-------------------------------------------------------------
+  --> 1. global anisotropic h-refinement...
+
+ refinement :      0.03607  seconds
+ update_gdof:      0.04336  seconds
+ update_Ddof:      0.04495  seconds
+
+ timer:      0.12441 seconds
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ partition time:      0.00001 seconds
+ migration time:      0.00001 seconds
+ update_gdof:      0.03838  seconds
+ update_Ddof:      0.04463  seconds
+
+ timer:      0.08841 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  5
+
+
+-------------------------------------------------------------
+  --> 1. global anisotropic h-refinement...
+
+ refinement :      0.07965  seconds
+ update_gdof:      0.08833  seconds
+ update_Ddof:      0.08481  seconds
+
+ timer:      0.25282 seconds
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ partition time:      0.00001 seconds
+ migration time:      0.00001 seconds
+ update_gdof:      0.08840  seconds
+ update_Ddof:      0.08618  seconds
+
+ timer:      0.18679 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  6
+
+
+-------------------------------------------------------------
+  --> 1. global anisotropic h-refinement...
+
+ refinement :      0.18505  seconds
+ update_gdof:      0.15238  seconds
+ update_Ddof:      0.16432  seconds
+
+ timer:      0.50178 seconds
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ partition time:      0.00001 seconds
+ migration time:      0.00001 seconds
+ update_gdof:      0.19325  seconds
+ update_Ddof:      0.16394  seconds
+
+ timer:      0.38481 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  7
+
+
+-------------------------------------------------------------
+  --> 1. global anisotropic h-refinement...
+
+ refinement :      0.36925  seconds
+ update_gdof:      0.33813  seconds
+ update_Ddof:      0.32366  seconds
+
+ timer:      1.03108 seconds
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ partition time:      0.00001 seconds
+ migration time:      0.00002 seconds
+ update_gdof:      0.36913  seconds
+ update_Ddof:      0.32253  seconds
+
+ timer:      0.75384 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  8
+
+
+-------------------------------------------------------------
+  --> 1. global anisotropic h-refinement...
+
+ refinement :      0.79043  seconds
+ update_gdof:      0.74444  seconds
+ update_Ddof:      0.63948  seconds
+
+ timer:      2.17441 seconds
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ partition time:      0.00002 seconds
+ migration time:      0.00003 seconds
+ update_gdof:      0.76345  seconds
+ update_Ddof:      0.63663  seconds
+
+ timer:      1.54043 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  9
+
+
+-------------------------------------------------------------
+  --> 1. global anisotropic h-refinement...
+
+ refinement :      1.76940  seconds
+ update_gdof:      1.64644  seconds
+ update_Ddof:      1.28343  seconds
+
+ timer:      4.69976 seconds
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ partition time:      0.00007 seconds
+ migration time:      0.00014 seconds
+ update_gdof:      1.64917  seconds
+ update_Ddof:      1.27977  seconds
+
+ timer:      3.21375 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i = 10
+
+
+-------------------------------------------------------------
+  --> 1. global anisotropic h-refinement...
+
+ refinement :      4.15469  seconds
+ update_gdof:      3.62448  seconds
+ update_Ddof:      2.55874  seconds
+
+ timer:     10.33804 seconds
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ partition time:      0.00005 seconds
+ migration time:      0.00026 seconds
+ update_gdof:      3.89365  seconds
+ update_Ddof:      2.55523  seconds
+
+ timer:      7.02680 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i = 11
+
+
+-------------------------------------------------------------
+  --> 1. global anisotropic h-refinement...
+
+ refinement :     10.05101  seconds
+ update_gdof:      7.83542  seconds
+ update_Ddof:      5.14667  seconds
+
+ timer:     23.03321 seconds
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ partition time:      0.00010 seconds
+ migration time:      0.00055 seconds
+ update_gdof:      7.74305  seconds
+ update_Ddof:      5.13585  seconds
+
+ timer:     14.02884 seconds
+
+-------------------------------------------------------------
+  --> 3. printing current partition (elems)...
+
+    ... skipping for a large number of elements.
+
+-------------------------------------------------------------
+  --> 4. evaluating current partition...
+
+
+Zoltan_LB_Eval_Balance  Part count: 2 requested, 2 actual , 2 non-empty
+Zoltan_LB_Eval_Balance  Statistics with respect to 2 parts: 
+Zoltan_LB_Eval_Balance                             Min      Max      Sum  Imbalance
+Zoltan_LB_Eval_Balance  Number of objects  :  1.64e+04 1.64e+04 3.28e+04     1.000
+
+
+
+-------------------------------------------------------------
+  --> 5. verify distributed mesh consistency...
+
+ par_verify: MESH CONSISTENCY TEST PASSED.
+ timer:      0.09297 seconds
+
+-------------------------------------------------------------
+  --> 6. calling MUMPS (MPI) solver...
+
+ par_mumps_sc: STARTED
+ 
+ STEP 1 started : Get assembly info
+ STEP 1 finished:      6.32713  seconds
+
+[   0] Number of dof  : nrdof_con =      1599127
+[   0]                  nrdof_tot =      3696279
+[   0] Total non-zeros: nnz       =    470115560
+[   0] Local non-zeros: nnz_loc   =    235057780
+[   1] Local non-zeros: nnz_loc   =    235057780
+
+ STEP 2 started : Global Assembly
+ STEP 2 finished:      8.27244  seconds
+
+ STEP 3 started : Solve
+ - Analysis :     14.72009  seconds
+   - MAX estimated size in GB =      12.991
+   - SUM estimated size in GB =      25.846
+ - Factorize:     32.27456  seconds
+ - Solve    :      1.43684  seconds
+ STEP 3 finished:     48.44364  seconds
+
+ STEP 4 started : Store the solution
+ STEP 4 finished:      1.89725  seconds
+
+ par_mumps_sc FINISHED:     64.94046  seconds
+
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i = 12
+
+
+-------------------------------------------------------------
+  --> 1. global anisotropic h-refinement...
+
+ 
+ HISTORY OF REFINEMENTS
+ mesh | nrdof_tot | nrdof_con |  | field error  |rel field error|   rate 
+ 
+   1  |   3696279 |   1599127 |  |  7.67821E-07 |  3.17317E-06  |   0.00
+ 
+ refinement :     26.51060  seconds
+ update_gdof:     16.69332  seconds
+ update_Ddof:     10.40851  seconds
+
+ timer:     58.25463 seconds
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ partition time:      0.00020 seconds
+ migration time:      0.00112 seconds
+ update_gdof:     16.73447  seconds
+ update_Ddof:     10.40629  seconds
+
+ timer:     29.68245 seconds
+
+-------------------------------------------------------------
+  --> 3. printing current partition (elems)...
+
+    ... skipping for a large number of elements.
+
+-------------------------------------------------------------
+  --> 4. evaluating current partition...
+
+
+Zoltan_LB_Eval_Balance  Part count: 2 requested, 2 actual , 2 non-empty
+Zoltan_LB_Eval_Balance  Statistics with respect to 2 parts: 
+Zoltan_LB_Eval_Balance                             Min      Max      Sum  Imbalance
+Zoltan_LB_Eval_Balance  Number of objects  :  3.28e+04 3.28e+04 6.55e+04     1.000
+
+
+
+-------------------------------------------------------------
+  --> 5. verify distributed mesh consistency...
+
+ par_verify: MESH CONSISTENCY TEST PASSED.
+ timer:      0.17820 seconds
+
+-------------------------------------------------------------
+  --> 6. calling MUMPS (MPI) solver...
+
+ par_mumps_sc: STARTED
+ 
+ STEP 1 started : Get assembly info
+ STEP 1 finished:     12.59689  seconds
+
+[   0] Number of dof  : nrdof_con =      3198615
+[   0]                  nrdof_tot =      7392919
+[   0] Total non-zeros: nnz       =    940434664
+[   0] Local non-zeros: nnz_loc   =    470217332
+[   1] Local non-zeros: nnz_loc   =    470217332
+
+ STEP 2 started : Global Assembly
+ STEP 2 finished:     16.69659  seconds
+
+ STEP 3 started : Solve
+ - Analysis :     29.74007  seconds
+   - MAX estimated size in GB =      28.075
+   - SUM estimated size in GB =      51.929
+ - Factorize:     73.24455  seconds
+ - Solve    :      2.49753  seconds
+ STEP 3 finished:    105.50622  seconds
+
+ STEP 4 started : Store the solution
+ STEP 4 finished:      7.31107  seconds
+
+ par_mumps_sc FINISHED:    142.11076  seconds
+
+
+-------------------------------------------------------------
+  --> 7. compute error on last mesh...
+
+ 
+ HISTORY OF REFINEMENTS
+ mesh | nrdof_tot | nrdof_con |  | field error  |rel field error|   rate 
+ 
+   1  |   3696279 |   1599127 |  |  7.67821E-07 |  3.17317E-06  |   0.00
+   2  |   7392919 |   3198615 |  |  7.67821E-07 |  3.17317E-06  |  -0.00
+ 
+ 
+ ==================
+ exec_job: finished
+ ==================
+ 
+TACC:  Shutdown complete. Exiting. 
+Thu Jul 25 11:34:56 CDT 2019

@@ -1,0 +1,494 @@
+/work/05246/sh43394/stampede2/par_hp3d/trunk/problems/MPI_POISSON/GALERKIN
+Tue Jul 23 00:36:32 CDT 2019
+TACC:  Starting up job 4026841 
+TACC:  Starting parallel tasks... 
+
+MPI initialized sucessfully. NUM_PROCS =  32
+
+Zoltan initialized sucessfully. Version =  3.83
+ 
+ //                              //
+ // --  MPI POISSON GALERKIN  -- //
+ //                              //
+ 
+ 
+Master proc [  0], initialize..
+
+ Polynomial order: IP = 3
+ -- hp3d Control Parameters --
+ INT. LEGENDRE POLYNOMIALS USED
+ EXACT SOLUTION KNOWN
+ UNSYMMETRIC PROBLEM
+ GAUSSIAN QUADRATURE (VOLUME LOAD)
+ GAUSSIAN QUADRATURE (NEUMANN BC)
+ EXTENSION OPERATOR NOT SUPPORTED
+ DEFAULT FORMAT
+ GEOMETRY TOLERANCE =  0.10000E-05
+ INTEGRATION        = 0
+ ISOPARAMETRIC ELEMENTS
+ 
+ -- input_DEFAULT --
+ NRSURFS =     0 ; reading surfaces...
+ NRPOINT =     8 ; reading points...
+ NRCURVE =    12 ; reading curves...
+ NRTRIAN =     0 ; reading triangles...
+ NRRECTA =     6 ; reading rectangles...
+ NRPRISM =     0 ; reading prisms...
+ NRHEXAS =     1 ; reading hexas...
+ NRTETRA =     0 ; reading tets...
+ NRPYRAM =     0 ; reading pyramids...
+ 
+ -- Physics --
+ MAXNODS =       315000
+ PHYSA,DTYPE,NR_COMP = field  contin  1
+ 
+Worker proc [  1], initialize..
+ update_gdof:      0.19750  seconds
+Worker proc [  2], initialize..
+Worker proc [  3], initialize..
+ update_Ddof:      0.19970  seconds
+
+ initialize timer:      0.90764 seconds
+Worker proc [  4], initialize..
+Worker proc [  5], initialize..
+Worker proc [  6], initialize..
+Worker proc [  7], initialize..
+Worker proc [  8], initialize..
+Worker proc [  9], initialize..
+Worker proc [ 10], initialize..
+Worker proc [ 11], initialize..
+Worker proc [ 12], initialize..
+Worker proc [ 13], initialize..
+Worker proc [ 14], initialize..
+Worker proc [ 15], initialize..
+Worker proc [ 16], initialize..
+Worker proc [ 17], initialize..
+Worker proc [ 18], initialize..
+Worker proc [ 19], initialize..
+Worker proc [ 20], initialize..
+Worker proc [ 21], initialize..
+Worker proc [ 22], initialize..
+Worker proc [ 23], initialize..
+Worker proc [ 24], initialize..
+Worker proc [ 25], initialize..
+Worker proc [ 26], initialize..
+Worker proc [ 27], initialize..
+Worker proc [ 28], initialize..
+Worker proc [ 29], initialize..
+Worker proc [ 30], initialize..
+Worker proc [ 31], initialize..
+[  0] : Number of OpenMP threads:  24
+ ==================
+ exec_job: starting
+ ==================
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  1
+
+
+-------------------------------------------------------------
+  --> 1. global h-refinement...
+
+   0: breaking mdle nodes:       0.00 seconds
+   1: breaking mdle nodes:       0.00 seconds
+  24: breaking mdle nodes:       0.00 seconds
+  25: breaking mdle nodes:       0.00 seconds
+  30: breaking mdle nodes:       0.00 seconds
+  31: breaking mdle nodes:       0.00 seconds
+  12: breaking mdle nodes:       0.00 seconds
+  13: breaking mdle nodes:       0.00 seconds
+   2: breaking mdle nodes:       0.00 seconds
+   3: breaking mdle nodes:       0.00 seconds
+  18: breaking mdle nodes:       0.00 seconds
+  19: breaking mdle nodes:       0.00 seconds
+  26: breaking mdle nodes:       0.00 seconds
+  27: breaking mdle nodes:       0.00 seconds
+   6: breaking mdle nodes:       0.00 seconds
+   7: breaking mdle nodes:       0.00 seconds
+  10: breaking mdle nodes:       0.00 seconds
+  11: breaking mdle nodes:       0.00 seconds
+  22: breaking mdle nodes:       0.00 seconds
+  23: breaking mdle nodes:       0.00 seconds
+   4: breaking mdle nodes:       0.00 seconds
+   5: breaking mdle nodes:       0.00 seconds
+  28: breaking mdle nodes:       0.00 seconds
+  29: breaking mdle nodes:       0.00 seconds
+  14: breaking mdle nodes:       0.00 seconds
+  15: breaking mdle nodes:       0.00 seconds
+  20: breaking mdle nodes:       0.00 seconds
+  21: breaking mdle nodes:       0.00 seconds
+  16: breaking mdle nodes:       0.00 seconds
+  17: breaking mdle nodes:       0.00 seconds
+   8: breaking mdle nodes:       0.00 seconds
+breaking mdle nodes:       0.01 seconds
+   9: breaking mdle nodes:       0.00 seconds
+ # of elements broken         =        1
+ # of current elements, nodes =        8,       144
+ update_gdof:      0.00131  seconds
+ update_Ddof:      0.20050  seconds
+
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  2
+
+
+-------------------------------------------------------------
+  --> 1. global h-refinement...
+
+  24: breaking mdle nodes:       0.00 seconds
+   1: breaking mdle nodes:       0.00 seconds
+   9: breaking mdle nodes:       0.00 seconds
+  18: breaking mdle nodes:       0.00 seconds
+   8: breaking mdle nodes:       0.00 seconds
+   6: breaking mdle nodes:       0.00 seconds
+   4: breaking mdle nodes:       0.00 seconds
+   2: breaking mdle nodes:       0.00 seconds
+  14: breaking mdle nodes:       0.00 seconds
+  30: breaking mdle nodes:       0.00 seconds
+  10: breaking mdle nodes:       0.00 seconds
+  16: breaking mdle nodes:       0.00 seconds
+  25: breaking mdle nodes:       0.00 seconds
+   0: breaking mdle nodes:       0.00 seconds
+  19: breaking mdle nodes:       0.00 seconds
+  26: breaking mdle nodes:       0.00 seconds
+   7: breaking mdle nodes:       0.00 seconds
+   5: breaking mdle nodes:       0.00 seconds
+  12: breaking mdle nodes:       0.00 seconds
+   3: breaking mdle nodes:       0.00 seconds
+  15: breaking mdle nodes:       0.00 seconds
+  31: breaking mdle nodes:       0.00 seconds
+  28: breaking mdle nodes:       0.00 seconds
+  11: breaking mdle nodes:       0.00 seconds
+  17: breaking mdle nodes:       0.00 seconds
+  22: breaking mdle nodes:       0.00 seconds
+  20: breaking mdle nodes:       0.00 seconds
+breaking mdle nodes:       0.00 seconds
+  27: breaking mdle nodes:       0.00 seconds
+  13: breaking mdle nodes:       0.00 seconds
+  29: breaking mdle nodes:       0.00 seconds
+  23: breaking mdle nodes:       0.00 seconds
+  21: breaking mdle nodes:       0.00 seconds
+ # of elements broken         =        8
+ # of current elements, nodes =       64,       846
+ update_gdof:      0.01229  seconds
+ update_Ddof:      0.25295  seconds
+
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  3
+
+
+-------------------------------------------------------------
+  --> 1. global h-refinement...
+
+  18: breaking mdle nodes:       0.00 seconds
+  12: breaking mdle nodes:       0.00 seconds
+  10: breaking mdle nodes:       0.00 seconds
+  24: breaking mdle nodes:       0.00 seconds
+   1: breaking mdle nodes:       0.00 seconds
+  19: breaking mdle nodes:       0.00 seconds
+  26: breaking mdle nodes:       0.00 seconds
+   8: breaking mdle nodes:       0.00 seconds
+   6: breaking mdle nodes:       0.00 seconds
+   4: breaking mdle nodes:       0.00 seconds
+  13: breaking mdle nodes:       0.00 seconds
+   2: breaking mdle nodes:       0.00 seconds
+  14: breaking mdle nodes:       0.00 seconds
+  30: breaking mdle nodes:       0.00 seconds
+  28: breaking mdle nodes:       0.00 seconds
+  11: breaking mdle nodes:       0.00 seconds
+  16: breaking mdle nodes:       0.00 seconds
+  25: breaking mdle nodes:       0.00 seconds
+  22: breaking mdle nodes:       0.00 seconds
+  20: breaking mdle nodes:       0.00 seconds
+  27: breaking mdle nodes:       0.00 seconds
+   9: breaking mdle nodes:       0.00 seconds
+   7: breaking mdle nodes:       0.00 seconds
+   5: breaking mdle nodes:       0.00 seconds
+   3: breaking mdle nodes:       0.00 seconds
+  15: breaking mdle nodes:       0.00 seconds
+  31: breaking mdle nodes:       0.00 seconds
+  17: breaking mdle nodes:       0.00 seconds
+  23: breaking mdle nodes:       0.00 seconds
+  21: breaking mdle nodes:       0.00 seconds
+  29: breaking mdle nodes:       0.00 seconds
+   0: breaking mdle nodes:       0.00 seconds
+breaking mdle nodes:       0.00 seconds
+ # of elements broken         =       64
+ # of current elements, nodes =      512,      5634
+ update_gdof:      0.12632  seconds
+ update_Ddof:      0.06312  seconds
+
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  4
+
+
+-------------------------------------------------------------
+  --> 1. global h-refinement...
+
+  19: breaking mdle nodes:       0.03 seconds
+  15: breaking mdle nodes:       0.03 seconds
+   9: breaking mdle nodes:       0.03 seconds
+   5: breaking mdle nodes:       0.03 seconds
+  12: breaking mdle nodes:       0.03 seconds
+  14: breaking mdle nodes:       0.03 seconds
+   1: breaking mdle nodes:       0.03 seconds
+   7: breaking mdle nodes:       0.03 seconds
+   4: breaking mdle nodes:       0.03 seconds
+  13: breaking mdle nodes:       0.03 seconds
+  11: breaking mdle nodes:       0.03 seconds
+  17: breaking mdle nodes:       0.03 seconds
+  20: breaking mdle nodes:       0.03 seconds
+  18: breaking mdle nodes:       0.03 seconds
+   8: breaking mdle nodes:       0.03 seconds
+   3: breaking mdle nodes:       0.03 seconds
+  28: breaking mdle nodes:       0.03 seconds
+  16: breaking mdle nodes:       0.03 seconds
+  22: breaking mdle nodes:       0.03 seconds
+  31: breaking mdle nodes:       0.03 seconds
+  29: breaking mdle nodes:       0.03 seconds
+   2: breaking mdle nodes:       0.03 seconds
+  25: breaking mdle nodes:       0.03 seconds
+   6: breaking mdle nodes:       0.03 seconds
+  23: breaking mdle nodes:       0.03 seconds
+  27: breaking mdle nodes:       0.03 seconds
+  30: breaking mdle nodes:       0.03 seconds
+  10: breaking mdle nodes:       0.03 seconds
+  24: breaking mdle nodes:       0.03 seconds
+  21: breaking mdle nodes:       0.03 seconds
+  26: breaking mdle nodes:       0.03 seconds
+   0: breaking mdle nodes:       0.04 seconds
+breaking mdle nodes:       0.04 seconds
+ # of elements broken         =      512
+ # of current elements, nodes =     4096,     40842
+ update_gdof:      0.95456  seconds
+ update_Ddof:      0.26274  seconds
+
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ timer:      0.35442 seconds
+
+-------------------------------------------------------------
+  --> 4. evaluating current partition...
+
+
+Zoltan_LB_Eval_Balance  Part count: 32 requested, 32 actual , 32 non-empty
+Zoltan_LB_Eval_Balance  Statistics with respect to 32 parts: 
+Zoltan_LB_Eval_Balance                             Min      Max      Sum  Imbalance
+Zoltan_LB_Eval_Balance  Number of objects  :       128      128  4.1e+03     1.000
+Zoltan_LB_Eval_Balance  Object weight      :       128      128  4.1e+03     1.000
+
+
+
+-------------------------------------------------------------
+  --> 5. verify distributed mesh consistency...
+
+ par_verify: MESH CONSISTENCY TEST PASSED.
+ timer:      0.00470 seconds
+
+-------------------------------------------------------------
+  --> 6. calling MUMPS (MPI) solver...
+
+ par_mumps_sc: STARTED
+ 
+ STEP 1 started : Get assembly info
+ STEP 1 finished:      0.33435  seconds
+
+ STEP 2 started : Global Assembly
+[   0] Number of dof  : nrdof   =        71055
+[   0] Total non-zeros: nnz     =     10621384
+[   0] Local non-zeros: nnz_loc =       289721
+[   1] Local non-zeros: nnz_loc =       330560
+[   4] Local non-zeros: nnz_loc =       289721
+[   5] Local non-zeros: nnz_loc =       330560
+[  14] Local non-zeros: nnz_loc =       376832
+[  15] Local non-zeros: nnz_loc =       330560
+[  10] Local non-zeros: nnz_loc =       376832
+[  11] Local non-zeros: nnz_loc =       330560
+[   6] Local non-zeros: nnz_loc =       330560
+[   7] Local non-zeros: nnz_loc =       376832
+[  12] Local non-zeros: nnz_loc =       330560
+[  13] Local non-zeros: nnz_loc =       289721
+[  24] Local non-zeros: nnz_loc =       376832
+[  25] Local non-zeros: nnz_loc =       330560
+[  30] Local non-zeros: nnz_loc =       330560
+[  31] Local non-zeros: nnz_loc =       289721
+[  28] Local non-zeros: nnz_loc =       376832
+[  29] Local non-zeros: nnz_loc =       330560
+[  26] Local non-zeros: nnz_loc =       330560
+[  27] Local non-zeros: nnz_loc =       289721
+[  22] Local non-zeros: nnz_loc =       289721
+[  23] Local non-zeros: nnz_loc =       330560
+[  20] Local non-zeros: nnz_loc =       330560
+[  21] Local non-zeros: nnz_loc =       376832
+[  18] Local non-zeros: nnz_loc =       289721
+[  19] Local non-zeros: nnz_loc =       330560
+[   2] Local non-zeros: nnz_loc =       330560
+[   3] Local non-zeros: nnz_loc =       376832
+[  16] Local non-zeros: nnz_loc =       330560
+[  17] Local non-zeros: nnz_loc =       376832
+[   8] Local non-zeros: nnz_loc =       330560
+[   9] Local non-zeros: nnz_loc =       289721
+ STEP 2 finished:      0.05349  seconds
+
+ STEP 3 started : Solve
+ MUMPS: MAX estimated size in GB =       0.175
+ MUMPS: SUM estimated size in GB =       4.622
+ STEP 3 finished:      2.89746  seconds
+
+ STEP 4 started : Store the solution
+ STEP 4 finished:      0.00497  seconds
+
+ 
+ par_mumps_sc FINISHED:      3.29026  seconds
+
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  5
+
+
+-------------------------------------------------------------
+  --> 1. global h-refinement...
+
+ 
+ HISTORY OF REFINEMENTS
+ mesh | nrdof_tot | nrdof_con |  | field error  |rel field error|   rate 
+ 
+   1  |    103823 |     71055 |  |  1.65025E-05 |  6.81997E-05  |   0.00
+  21: breaking mdle nodes:       0.26 seconds
+   9: breaking mdle nodes:       0.26 seconds
+  27: breaking mdle nodes:       0.26 seconds
+  12: breaking mdle nodes:       0.26 seconds
+   3: breaking mdle nodes:       0.27 seconds
+  26: breaking mdle nodes:       0.27 seconds
+  20: breaking mdle nodes:       0.27 seconds
+  15: breaking mdle nodes:       0.27 seconds
+  13: breaking mdle nodes:       0.27 seconds
+   7: breaking mdle nodes:       0.27 seconds
+  14: breaking mdle nodes:       0.27 seconds
+  10: breaking mdle nodes:       0.27 seconds
+   1: breaking mdle nodes:       0.27 seconds
+  18: breaking mdle nodes:       0.27 seconds
+  11: breaking mdle nodes:       0.27 seconds
+  30: breaking mdle nodes:       0.27 seconds
+   6: breaking mdle nodes:       0.27 seconds
+  28: breaking mdle nodes:       0.27 seconds
+  25: breaking mdle nodes:       0.27 seconds
+  22: breaking mdle nodes:       0.27 seconds
+  29: breaking mdle nodes:       0.27 seconds
+   4: breaking mdle nodes:       0.27 seconds
+   2: breaking mdle nodes:       0.27 seconds
+  23: breaking mdle nodes:       0.27 seconds
+  31: breaking mdle nodes:       0.28 seconds
+  19: breaking mdle nodes:       0.28 seconds
+   5: breaking mdle nodes:       0.28 seconds
+   8: breaking mdle nodes:       0.28 seconds
+  16: breaking mdle nodes:       0.28 seconds
+  17: breaking mdle nodes:       0.29 seconds
+  24: breaking mdle nodes:       0.30 seconds
+   0: breaking mdle nodes:       2.04 seconds
+breaking mdle nodes:       2.04 seconds
+ # of elements broken         =     4096
+ # of current elements, nodes =    32768,    310554
+ update_gdof:     11.85434  seconds
+ update_Ddof:      0.06833  seconds
+
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ timer:      0.17519 seconds
+
+-------------------------------------------------------------
+  --> 4. evaluating current partition...
+
+
+Zoltan_LB_Eval_Balance  Part count: 32 requested, 32 actual , 32 non-empty
+Zoltan_LB_Eval_Balance  Statistics with respect to 32 parts: 
+Zoltan_LB_Eval_Balance                             Min      Max      Sum  Imbalance
+Zoltan_LB_Eval_Balance  Number of objects  :  1.02e+03 1.02e+03 3.28e+04     1.000
+Zoltan_LB_Eval_Balance  Object weight      :  1.02e+03 1.02e+03 3.28e+04     1.000
+
+
+
+-------------------------------------------------------------
+  --> 5. verify distributed mesh consistency...
+
+ par_verify: MESH CONSISTENCY TEST PASSED.
+ timer:      0.05102 seconds
+
+-------------------------------------------------------------
+  --> 6. calling MUMPS (MPI) solver...
+
+ par_mumps_sc: STARTED
+ 
+ STEP 1 started : Get assembly info
+ STEP 1 finished:      3.25592  seconds
+
+ STEP 2 started : Global Assembly
+[   0] Number of dof  : nrdof   =       595231
+[   0] Total non-zeros: nnz     =     93597128
+[   0] Local non-zeros: nnz_loc =      2742457
+[  26] Local non-zeros: nnz_loc =      2922112
+[   8] Local non-zeros: nnz_loc =      2922112
+[   4] Local non-zeros: nnz_loc =      2742457
+[  12] Local non-zeros: nnz_loc =      2922112
+[   2] Local non-zeros: nnz_loc =      2922112
+[  30] Local non-zeros: nnz_loc =      2922112
+[  24] Local non-zeros: nnz_loc =      3112960
+[  22] Local non-zeros: nnz_loc =      2742457
+[   1] Local non-zeros: nnz_loc =      2922112
+[  18] Local non-zeros: nnz_loc =      2742457
+[  27] Local non-zeros: nnz_loc =      2742457
+[   9] Local non-zeros: nnz_loc =      2742457
+[   6] Local non-zeros: nnz_loc =      2922112
+[   5] Local non-zeros: nnz_loc =      2922112
+[  13] Local non-zeros: nnz_loc =      2742457
+[   3] Local non-zeros: nnz_loc =      3112960
+[  14] Local non-zeros: nnz_loc =      3112960
+[  31] Local non-zeros: nnz_loc =      2742457
+[  28] Local non-zeros: nnz_loc =      3112960
+[  10] Local non-zeros: nnz_loc =      3112960
+[  16] Local non-zeros: nnz_loc =      2922112
+[  25] Local non-zeros: nnz_loc =      2922112
+[  23] Local non-zeros: nnz_loc =      2922112
+[  20] Local non-zeros: nnz_loc =      2922112
+[  19] Local non-zeros: nnz_loc =      2922112
+[   7] Local non-zeros: nnz_loc =      3112960
+[  15] Local non-zeros: nnz_loc =      2922112
+[  29] Local non-zeros: nnz_loc =      2922112
+[  11] Local non-zeros: nnz_loc =      2922112
+[  17] Local non-zeros: nnz_loc =      3112960
+[  21] Local non-zeros: nnz_loc =      3112960
+ STEP 2 finished:      0.07321  seconds
+
+ STEP 3 started : Solve
+ MUMPS: MAX estimated size in GB =       1.524
+ MUMPS: SUM estimated size in GB =      36.623
+ STEP 3 finished:     14.24671  seconds
+
+ STEP 4 started : Store the solution
+ STEP 4 finished:      0.13913  seconds
+
+ 
+ par_mumps_sc FINISHED:     17.71497  seconds
+
+
+-------------------------------------------------------------
+  --> 7. compute error on last mesh...
+
+ 
+ HISTORY OF REFINEMENTS
+ mesh | nrdof_tot | nrdof_con |  | field error  |rel field error|   rate 
+ 
+   1  |    103823 |     71055 |  |  1.65025E-05 |  6.81997E-05  |   0.00
+   2  |    857375 |    595231 |  |  2.06208E-06 |  8.52195E-06  |  -0.99
+ 
+ ==================
+ exec_job: finished
+ ==================
+ 
+TACC:  Shutdown complete. Exiting. 

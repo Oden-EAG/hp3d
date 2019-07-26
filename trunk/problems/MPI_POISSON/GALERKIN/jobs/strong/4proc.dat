@@ -1,0 +1,245 @@
+/work/05246/sh43394/stampede2/par_hp3d/trunk/problems/MPI_POISSON/GALERKIN
+Mon Jul 22 14:45:51 CDT 2019
+TACC:  Starting up job 4024023 
+TACC:  Starting parallel tasks... 
+
+MPI initialized sucessfully. NUM_PROCS =   4
+
+Zoltan initialized sucessfully. Version =  3.83
+ 
+ //                              //
+ // --  MPI POISSON GALERKIN  -- //
+ //                              //
+ 
+ 
+Master proc [  0], initialize..
+
+ Polynomial order: IP = 3
+ -- hp3d Control Parameters --
+ INT. LEGENDRE POLYNOMIALS USED
+ EXACT SOLUTION KNOWN
+ UNSYMMETRIC PROBLEM
+ GAUSSIAN QUADRATURE (VOLUME LOAD)
+ GAUSSIAN QUADRATURE (NEUMANN BC)
+ EXTENSION OPERATOR NOT SUPPORTED
+ DEFAULT FORMAT
+ GEOMETRY TOLERANCE =  0.10000E-05
+ INTEGRATION        = 0
+ ISOPARAMETRIC ELEMENTS
+ 
+ -- input_DEFAULT --
+ NRSURFS =     0 ; reading surfaces...
+ NRPOINT =     8 ; reading points...
+ NRCURVE =    12 ; reading curves...
+ NRTRIAN =     0 ; reading triangles...
+ NRRECTA =     6 ; reading rectangles...
+ NRPRISM =     0 ; reading prisms...
+ NRHEXAS =     1 ; reading hexas...
+ NRTETRA =     0 ; reading tets...
+ NRPYRAM =     0 ; reading pyramids...
+ 
+ -- Physics --
+ MAXNODS =       315000
+ PHYSA,DTYPE,NR_COMP = field  contin  1
+ 
+Worker proc [  1], initialize..
+ update_gdof:      0.20286  seconds
+Worker proc [  2], initialize..
+Worker proc [  3], initialize..
+ update_Ddof:      0.20196  seconds
+
+ initialize timer:      0.93721 seconds
+[  0] : Number of OpenMP threads:  24
+ ==================
+ exec_job: starting
+ ==================
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  1
+
+
+-------------------------------------------------------------
+  --> 1. global h-refinement...
+
+ # of elements broken         =        1
+ # of current elements, nodes =        8,       144
+ update_gdof:      0.00141  seconds
+ update_Ddof:      0.22033  seconds
+
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  2
+
+
+-------------------------------------------------------------
+  --> 1. global h-refinement...
+
+ # of elements broken         =        8
+ # of current elements, nodes =       64,       846
+ update_gdof:      0.01259  seconds
+ update_Ddof:      0.23147  seconds
+
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  3
+
+
+-------------------------------------------------------------
+  --> 1. global h-refinement...
+
+ # of elements broken         =       64
+ # of current elements, nodes =      512,      5634
+ update_gdof:      0.10412  seconds
+ update_Ddof:      0.06448  seconds
+
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  4
+
+
+-------------------------------------------------------------
+  --> 1. global h-refinement...
+
+ # of elements broken         =      512
+ # of current elements, nodes =     4096,     40842
+ update_gdof:      0.99521  seconds
+ update_Ddof:      0.26258  seconds
+
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ timer:      0.21753 seconds
+
+-------------------------------------------------------------
+  --> 4. evaluating current partition...
+
+
+Zoltan_LB_Eval_Balance  Part count: 4 requested, 4 actual , 4 non-empty
+Zoltan_LB_Eval_Balance  Statistics with respect to 4 parts: 
+Zoltan_LB_Eval_Balance                             Min      Max      Sum  Imbalance
+Zoltan_LB_Eval_Balance  Number of objects  :  1.02e+03 1.02e+03  4.1e+03     1.000
+Zoltan_LB_Eval_Balance  Object weight      :  1.02e+03 1.02e+03  4.1e+03     1.000
+
+
+
+-------------------------------------------------------------
+  --> 5. verify distributed mesh consistency...
+
+ par_verify: MESH CONSISTENCY TEST PASSED.
+ timer:      0.00431 seconds
+
+-------------------------------------------------------------
+  --> 6. calling MUMPS (MPI) solver...
+
+ par_mumps_sc: STARTED
+ 
+ STEP 1 started : Get assembly info
+ STEP 1 finished:      0.33360  seconds
+
+ STEP 2 started : Global Assembly
+[   0] Number of dof  : nrdof   =        71055
+[   0] Total non-zeros: nnz     =     10621384
+[   0] Local non-zeros: nnz_loc =      2655346
+[   1] Local non-zeros: nnz_loc =      2655346
+[   2] Local non-zeros: nnz_loc =      2655346
+[   3] Local non-zeros: nnz_loc =      2655346
+ STEP 2 finished:      0.09042  seconds
+
+ STEP 3 started : Solve
+ MUMPS: MAX estimated size in GB =       0.511
+ MUMPS: SUM estimated size in GB =       1.768
+ STEP 3 finished:      2.12094  seconds
+
+ STEP 4 started : Store the solution
+ STEP 4 finished:      0.02241  seconds
+
+ 
+ par_mumps_sc FINISHED:      2.56737  seconds
+
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  5
+
+
+-------------------------------------------------------------
+  --> 1. global h-refinement...
+
+ 
+ HISTORY OF REFINEMENTS
+ mesh | nrdof_tot | nrdof_con |  | field error  |rel field error|   rate 
+ 
+   1  |    103823 |     71055 |  |  1.65025E-05 |  6.81997E-05  |   0.00
+ # of elements broken         =     4096
+ # of current elements, nodes =    32768,    310554
+ update_gdof:      9.06374  seconds
+ update_Ddof:      0.33391  seconds
+
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ timer:      0.40580 seconds
+
+-------------------------------------------------------------
+  --> 4. evaluating current partition...
+
+
+Zoltan_LB_Eval_Balance  Part count: 4 requested, 4 actual , 4 non-empty
+Zoltan_LB_Eval_Balance  Statistics with respect to 4 parts: 
+Zoltan_LB_Eval_Balance                             Min      Max      Sum  Imbalance
+Zoltan_LB_Eval_Balance  Number of objects  :  8.19e+03 8.19e+03 3.28e+04     1.000
+Zoltan_LB_Eval_Balance  Object weight      :  8.19e+03 8.19e+03 3.28e+04     1.000
+
+
+
+-------------------------------------------------------------
+  --> 5. verify distributed mesh consistency...
+
+ par_verify: MESH CONSISTENCY TEST PASSED.
+ timer:      0.04712 seconds
+
+-------------------------------------------------------------
+  --> 6. calling MUMPS (MPI) solver...
+
+ par_mumps_sc: STARTED
+ 
+ STEP 1 started : Get assembly info
+ STEP 1 finished:      3.24137  seconds
+
+ STEP 2 started : Global Assembly
+[   0] Number of dof  : nrdof   =       595231
+[   0] Total non-zeros: nnz     =     93597128
+[   0] Local non-zeros: nnz_loc =     23399282
+[   1] Local non-zeros: nnz_loc =     23399282
+[   2] Local non-zeros: nnz_loc =     23399282
+[   3] Local non-zeros: nnz_loc =     23399282
+ STEP 2 finished:      0.47109  seconds
+
+ STEP 3 started : Solve
+ MUMPS: MAX estimated size in GB =       8.365
+ MUMPS: SUM estimated size in GB =      30.360
+ STEP 3 finished:     27.26919  seconds
+
+ STEP 4 started : Store the solution
+ STEP 4 finished:      0.81423  seconds
+
+ 
+ par_mumps_sc FINISHED:     31.79588  seconds
+
+
+-------------------------------------------------------------
+  --> 7. compute error on last mesh...
+
+ 
+ HISTORY OF REFINEMENTS
+ mesh | nrdof_tot | nrdof_con |  | field error  |rel field error|   rate 
+ 
+   1  |    103823 |     71055 |  |  1.65025E-05 |  6.81997E-05  |   0.00
+   2  |    857375 |    595231 |  |  2.06208E-06 |  8.52195E-06  |  -0.99
+ 
+ ==================
+ exec_job: finished
+ ==================
+ 
+TACC:  Shutdown complete. Exiting. 
