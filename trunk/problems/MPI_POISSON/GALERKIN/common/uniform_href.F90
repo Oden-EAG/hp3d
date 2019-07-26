@@ -12,8 +12,8 @@
 !        in:
 !             Irefine   = 0 if no refinement -> only display
 !                       = 1 if uniform refinements
-!             Nreflag   = 1 for h-refinements
-!                       = 2 for p-refinements
+!             Nreflag   = 1 for uniform isotropic h-refinements
+!                       = 2 for uniform anisotropic h-refinements (in z)
 !             Factor    - if element error \ge Factor*max_error
 !                         then the element is refined
 !
@@ -27,7 +27,7 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
    use assembly_sc, only: NRDOF_CON,NRDOF_TOT
    use par_mesh   , only: DISTRIBUTED,HOST_MESH
    use mpi_param  , only: ROOT,RANK
-   use MPI        , only: MPI_SUM,MPI_COMM_WORLD,MPI_REAL8
+   use MPI        , only: MPI_COMM_WORLD,MPI_SUM,MPI_COMM_WORLD,MPI_REAL8
 !
    implicit none
 !   
@@ -51,8 +51,10 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
    real*8  :: errorH,errorE,errorV,errorQ
    real*8  :: rnormH,rnormE,rnormV,rnormQ
    real*8  :: error,rnorm,error_subd,rnorm_subd
-   integer :: i,iel,mdle,subd,nreles_subd,count,ierr
+   integer :: i,iel,mdle,subd,nreles_subd,count,ierr,nrelem_ref,kref
    integer :: iprint
+!
+   real(8) :: MPI_Wtime,start_time,end_time
 !
 !-----------------------------------------------------------------------
 !
@@ -157,6 +159,7 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
          write(*,120) i, nrdof_tot_mesh(i), nrdof_con_mesh(i), &
             error_mesh(i),rel_error_mesh(i),rate_error_mesh(i)
   120    format(2x,i2,'  | ',2(i9,' | '), 2(' | ',es12.5),'  |',f7.2)
+         if (i .eq. istep) write(*,*)
       enddo
    endif
 !
@@ -166,14 +169,54 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
 !                         REFINE AND UPDATE MESH
 !-----------------------------------------------------------------------
 !
-2010 format(A,I3,A)
+  2010 format(A,I3,A)
    select case(Irefine)
 !  ...uniform refinements
       case(IUNIFORM)
-         call global_href
-         call close_mesh
-         call update_gdof
-         call update_Ddof
+         if (Nreflag .eq. 1) then
+!        ...isotropic href
+            call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+            call global_href
+            call close_mesh
+            call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+            if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2020) end_time-start_time
+            call update_gdof
+            call update_Ddof
+         elseif (Nreflag .eq. 2) then
+!        ...anisotropic href (z)
+            call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+            mdle = 0
+            do iel=1,NRELES
+               call nelcon(mdle, mdle)
+               mdle_list(iel) = mdle
+            enddo
+            nrelem_ref = NRELES
+            do iel=1,nrelem_ref
+               mdle = mdle_list(iel)
+               select case(NODES(mdle)%type)
+                  case('mdlb')
+                     kref = 1 ! refine in z
+                  case('mdlp')
+                     kref = 1 ! refine in z
+                  case default
+                     write(*,*) 'href WARNING: anisoref for unexpected type. stop.'
+                     stop
+               end select
+               call refine(mdle,kref)
+            enddo
+            call close_mesh
+            call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+            if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
+               write(*,2030) ' # of current elements, nodes = ', NRELES, NRNODS
+               write(*,2020) end_time-start_time
+  2020         format(' refinement : ',f12.5,'  seconds')
+  2030         format(A,I8,', ',I9)
+            endif
+            call update_gdof
+            call update_Ddof
+         else
+            write(*,*) 'href WARNING: unexpected Nreflag'
+         endif
    end select
 !
 end subroutine uniform_href
