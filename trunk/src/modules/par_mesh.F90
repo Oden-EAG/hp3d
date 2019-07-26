@@ -84,7 +84,11 @@ subroutine distr_mesh()
    110 format(' partition time: ',f12.5,' seconds')
 !
 !..2. Reset visit flags for all nodes to 0
-   call reset_visit
+!$OMP PARALLEL DO SCHEDULE(STATIC) PRIVATE(i)
+   do i=1,NRNODS
+      NODES(i)%visit = 0
+   enddo
+!$OMP END PARALLEL DO
 !
 !..3. Exchange degrees of freedom with other MPI processes according to partition
 !     (note: this step can be skipped in the initial mesh distribution)
@@ -153,27 +157,36 @@ subroutine distr_mesh()
    130 format(A,I2,A,A,I4,A,I6)
 !
 !..4. Reset subdomain values for all nodes
+!$OMP PARALLEL DO SCHEDULE(STATIC) PRIVATE(nod)
    do nod=1,NRNODS
       call set_subd(nod,-1)
    enddo
+!$OMP END PARALLEL DO
 !
    50 continue
 !
+!$OMP PARALLEL PRIVATE(iel,mdle,nod,subd)
+!
 !..5. Set new subdomains for middle nodes (elements) everywhere
+!$OMP DO SCHEDULE(STATIC)
    do iel=1,NRELES
       mdle = mdle_list(iel)
       call set_subd(mdle,subd_next(iel))
    enddo
+!$OMP END DO
 !
 !..6. Set subdomain values for all nodes within subdomain
+!$OMP DO SCHEDULE(STATIC)
    do iel=1,NRELES
       if (subd_next(iel) .eq. RANK) then
          mdle = mdle_list(iel)
          call set_subd_elem(mdle)
       endif
    enddo
+!$OMP END DO
 !
 !..7. Delete degrees of freedom for NODES outside of subdomain
+!$OMP DO SCHEDULE(STATIC)
    do nod=1,NRNODS
       call get_subd(nod, subd)
       if (subd .ne. RANK .and. Is_active(nod)) then
@@ -181,6 +194,8 @@ subroutine distr_mesh()
          call dealloc_nod_dof(nod)
       endif
    enddo
+!$OMP END DO
+!$OMP END PARALLEL
 !
    if (NUM_PROCS > 1) HOST_MESH = .false.
    DISTRIBUTED = .true.
