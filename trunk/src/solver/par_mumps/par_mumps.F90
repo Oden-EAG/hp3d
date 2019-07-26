@@ -84,6 +84,17 @@ subroutine mumps_start
 !     1: elemental input format
    mumps_par%icntl(5) = 0
 !
+!..icntl(7): choice of sequential pivot ordering tool (not used if icntl(28)=2)
+!     0: Approximate Minimum Degree (AMD)
+!     1: pivot order set by the user
+!     2: Approximate Minimum Fill (AMF)
+!     3: Scotch
+!     4: PORD
+!     5: Metis
+!     6: AMD w/ quasi-dense row detection
+!     7: automatic value
+   mumps_par%icntl(7) = 5
+!
 !..icntl(14): percentage increase in estimated workspace
 !     [default: 20] - 20% increase in workspace
    mumps_par%icntl(14) = 30

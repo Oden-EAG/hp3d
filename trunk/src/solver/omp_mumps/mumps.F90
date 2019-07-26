@@ -86,7 +86,7 @@ subroutine mumps_start
 !     5: Metis
 !     6: AMD w/ quasi-dense row detection
 !     7: automatic value
-   mumps_par%icntl(7) = 5
+   mumps_par%icntl(7) = 0
 !
 !..icntl(14): percentage increase in estimated workspace
 !     [default: 20] - 20% increase in workspace

@@ -279,6 +279,10 @@ subroutine par_mumps_sc(mtype)
    write(*,2010) '[', RANK, '] Local non-zeros: nnz_loc   = ', nnz_loc
 2010 format(A,I4,A,I12)
 !
+!..use 64bit parallel analysis if nnz_loc > 2B
+!  (sequential metis/scotch using 32bit currently)
+   if (nnz > 2e9) mumps_par%icntl(28) = 2
+!
 !..memory allocation for load assembly
    allocate(RHS(nrdof)); RHS=ZERO
 !
@@ -485,7 +489,10 @@ subroutine par_mumps_sc(mtype)
    if (RANK .eq. ROOT) then
       write(*,1100) '   - MAX estimated size in GB = ',mumps_par%INFOG(16)/1000.d0
       write(*,1100) '   - SUM estimated size in GB = ',mumps_par%INFOG(17)/1000.d0
+      write(*,1200) '   - Seq/parallel analysis    = ',mumps_par%INFOG(32)
+      write(*,1200) '   - Ordering method used     = ',mumps_par%INFOG(7)
  1100 format(A,F11.3)
+ 1200 format(A,I1)
    endif
 !
 !..MUMPS factorization
@@ -510,6 +517,10 @@ subroutine par_mumps_sc(mtype)
       call mumps_destroy
       if (RANK.eq.ROOT) write(*,*) 'factorization: mumps_par%INFOG(1) .ne. 0'
       stop
+   endif
+   if (RANK .eq. ROOT) then
+      write(*,1100) '   - MAX memory used in GB    = ',mumps_par%INFOG(21)/1000.d0
+      write(*,1100) '   - SUM memory used in GB    = ',mumps_par%INFOG(22)/1000.d0
    endif
 !
 !..MUMPS solve

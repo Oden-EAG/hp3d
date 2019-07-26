@@ -435,7 +435,9 @@ subroutine mumps_sc(mtype)
       stop
    endif
    write(*,1100) '   - estimated size in GB = ',mumps_par%INFO(15)/1000.d0
+   write(*,1200) '   - ordering method used = ',mumps_par%INFOG(7)
  1100 format(A,F11.3)
+ 1200 format(A,I1)
 !
 !..MUMPS factorization
    mumps_par%JOB = 2
@@ -456,6 +458,7 @@ subroutine mumps_sc(mtype)
       write(*,*) 'factorization: mumps_par%INFO(1) .ne. 0'
       stop
    endif
+   write(*,1100) '   - memory used in GB    = ',mumps_par%INFO(22)/1000.d0
 !
 !..MUMPS solve
    mumps_par%JOB = 3
