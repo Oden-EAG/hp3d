@@ -12,12 +12,12 @@ subroutine exec_job
 !
    implicit none
 !
-   integer :: i,imax,ierr
+   integer :: i,ierr
    real(8) :: MPI_Wtime,start_time,end_time
 !
 !----------------------------------------------------------------------
 !
-   EXCHANGE_DOF = .true.
+   EXCHANGE_DOF = .false.
 !
    if(RANK .eq. ROOT) then
       write(*,*) '=================='
@@ -28,22 +28,31 @@ subroutine exec_job
 !..distribute mesh initially
    call distr_mesh
 !..set Zoltan partitioner
-   call zoltan_w_set_lb(1)
+   call zoltan_w_set_lb(0)
 !
-!..set number of iterations
-   imax = 4
-!
-   do i=1,imax
+   do i=1,IMAX
 !
       if(RANK .eq. ROOT) write(*,100) 'Beginning iteration i = ', i
 !
-!  ...single uniform h-refinement
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
-      if(RANK .eq. ROOT) write(*,200) '1. global h-refinement...'
-      call uniform_href(IUNIFORM,1,0.25d0)
-      if (i .le. 2) cycle
+      if (i .le. 2) then
+!     ...single uniform h-refinement
+         if(RANK .eq. ROOT) write(*,200) '1. global uniform h-refinement...'
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+         call uniform_href(IUNIFORM,1,0.25d0)
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
+      else
+!     ...single anisotropic (in z) h-refinement
+         if(RANK .eq. ROOT) write(*,200) '1. global anisotropic h-refinement...'
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+         call uniform_href(IUNIFORM,2,0.25d0)
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
+      endif
+      if(RANK .eq. ROOT) write(*,300) end_time - start_time
 !
 !  ...distribute mesh
+      if (i .gt. IMAX-2) call zoltan_w_set_lb(3)
+!
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
       if(RANK .eq. ROOT) write(*,200) '2. distributing mesh...'
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
@@ -51,11 +60,15 @@ subroutine exec_job
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
       if(RANK .eq. ROOT) write(*,300) end_time - start_time
 !
+      if (i .le. IMAX-2) cycle
+!
 !  ...print current partition (elems)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
+      if(RANK .eq. ROOT) write(*,200) '3. printing current partition (elems)...'
       if (i .le. 2) then
-         if(RANK .eq. ROOT) write(*,200) '3. printing current partition (elems)...'
          call print_partition
+      else
+         if(RANK .eq. ROOT) write(*,*) '   ... skipping for a large number of elements.'
       endif
 !
 !  ...evaluate current partition

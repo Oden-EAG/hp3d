@@ -39,8 +39,8 @@
 #SBATCH -e hp3d.e%j        # Name of stderr error file
 #SBATCH -p skx-normal      # Queue (partition) name
 #SBATCH -N 16              # Total # of nodes
-#SBATCH -n 32              # Total # of mpi tasks
-#SBATCH -t 00:04:00        # Run time (hh:mm:ss)
+#SBATCH -n 16              # Total # of mpi tasks
+#SBATCH -t 00:59:00        # Run time (hh:mm:ss)
 #SBATCH --mail-user=stefan@ices.utexas.edu
 #SBATCH --mail-type=all    # Send email at begin and end of job
 #SBATCH -A A-ti2           # Allocation name (req'd if you have more than 1)
@@ -60,8 +60,9 @@ date
 
 # export OMP_NUM_THREADS=24
 
-# Launch MPI code... 
+# Launch MPI code...
 
-ibrun ./pois -job 1 -p 3 -isol 0 -nthreads 24
+ibrun ./pois -job 1 -p 5 -isol 0 -imax 15 -nthreads 48
 
+date
 # ---------------------------------------------------

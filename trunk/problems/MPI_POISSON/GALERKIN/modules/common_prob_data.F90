@@ -38,9 +38,12 @@
    integer, parameter :: BC_SPHERE_SCAT = 6
 !   
 !..EXACT SOLUTION
-   integer :: IEXACT_PROB
+   integer :: ISOL
    integer, parameter :: IEXACT_POLYNOMIAL  = 0
    integer, parameter :: IEXACT_SINUSOIDAL  = 1
+!
+!..NUMBER OF REFINEMENTS (JOB SCRIPT)
+   integer :: IMAX
 !
 !  order of the polynomial exact solution
    integer :: NPX, NPY, NPZ

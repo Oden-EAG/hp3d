@@ -21,7 +21,7 @@
 subroutine solution(X, u,gradu,gradgradu)
 !
    use data_structure3D
-   use common_prob_data, only : PI,IEXACT_PROB
+   use common_prob_data, only : PI,ISOL
    use parameters      , only : ZERO
 !
    implicit none
@@ -33,7 +33,7 @@ subroutine solution(X, u,gradu,gradgradu)
 !
    real*8 :: x1,x2,x3,f_x,f_y,f_z,df_x,df_y,df_z,ddf_x,ddf_y,ddf_z
    real*8 :: np_x,np_y,np_z
-   integer :: isol,isol_p
+   integer :: isol_p
 !
 !--------------------------------------------------------------------------------
 !
@@ -42,7 +42,7 @@ subroutine solution(X, u,gradu,gradgradu)
    u = ZERO; gradu = ZERO; gradgradu = ZERO
 !
 !..select exact solution
-   select case (IEXACT_PROB)
+   select case (ISOL)
 !
 !  ...polynomial solution
       case(0)
@@ -130,7 +130,7 @@ subroutine solution(X, u,gradu,gradgradu)
          gradgradu(3,3) =  2.*   dsin(x1*PI)*dsinh(x2*PI)
 !
       case default
-         write(*,*) 'solution: unknown exact solution (isol).'
+         write(*,*) 'solution: unknown exact solution (ISOL).'
    end select
 !
 end subroutine solution

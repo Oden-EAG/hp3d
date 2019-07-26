@@ -48,7 +48,10 @@ subroutine set_environment
         ('-file-refinement','Refinement files location','../../../files/ref',FILE_REFINE )
 !
    call get_option_int     &
-        ('-isol','Exact manufactured solution',0 ,IEXACT_PROB)
+        ('-isol','Exact manufactured solution',0 ,ISOL)
+!
+   call get_option_int     &
+        ('-imax','Number of refinements for job script',3 ,IMAX)
 !
    call get_option_int     &
         ('-p','Uniform order initial mesh',3 ,IP)
