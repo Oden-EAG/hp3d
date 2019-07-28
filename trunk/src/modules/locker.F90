@@ -1,3 +1,5 @@
+#if DEBUG_MODE
+
 !--------------------------------------------------------
 !> Purpose : contains the environmental variables for UHM
 module locker
@@ -34,7 +36,7 @@ contains
     endif
 
     mdle = 0
-    do iel=1, NRELES
+    do iel=1,NRELES
        call nelcon(mdle, mdle)
        NODES(mdle)%lock = iel
        LOCK_MDLE(iel)   = mdle
@@ -75,3 +77,5 @@ contains
   end subroutine nelcon_from_locker
   
 end module locker
+
+#endif

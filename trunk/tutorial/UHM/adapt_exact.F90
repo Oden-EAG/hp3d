@@ -1,3 +1,5 @@
+#if DEBUG_MODE
+!
 !------------------------------------------------------------------------
 !> Purpose : performs adaptive h-refinements of the geometry
 !------------------------------------------------------------------------
@@ -229,3 +231,5 @@ subroutine adapt_h_refinement_back
 !
 !
 end subroutine adapt_h_refinement_back
+
+#endif

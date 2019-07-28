@@ -92,7 +92,7 @@ module data_structure3D
       type node
 !
 !  .....type - 'vert','medg','mdlt','mdlq','mdlb','mdln','mdlp','mdld'
-        character(len=4) :: type
+        character(4)     :: type
 !
 !  .....case number indicating what physical attributes are supported
         integer          :: case
@@ -107,8 +107,7 @@ module data_structure3D
 !         6 - free H(div) component
 !         7 - L2 component with Dirichlet BC flag
 !         8 - free L2 component
-        integer*8        :: index
-        integer          :: iback
+        integer(8)       :: index
 !
 !  .....order of approximation
         integer          :: order
@@ -134,47 +133,52 @@ module data_structure3D
 !  .....activation flag
         integer          :: act
 !
-!  .....locker number
-        integer          :: lock
-!
 !  .....subdomain number (distributed mesh)
         integer          :: subd
 !
 !  .....geometry dof
-        real*8, dimension(:,:), pointer :: coord
+        real(8), dimension(:,:), pointer :: coord
+!
+#if DEBUG_MODE
+!
+        integer          :: iback
+!
+!  .....locker number
+        integer          :: lock
 !
 !  .....error
 !       0   - scalar error
 !       1-3 - gradient of any vector component-wise error
 !       4   - additional info
-        real*8, dimension(0:4,0:4) :: error
+        real(8), dimension(0:4,0:4) :: error
+#endif
 !
 !  .....H1 solution dof
 #if C_MODE
-        complex*16, dimension(:,:), pointer :: zdofH
+        complex(16), dimension(:,:), pointer :: zdofH
 #else
-        real*8    , dimension(:,:), pointer :: zdofH
+        real(8)    , dimension(:,:), pointer :: zdofH
 #endif
 !
 !  .....H(curl) solution dof
 #if C_MODE
-        complex*16, dimension(:,:), pointer :: zdofE
+        complex(16), dimension(:,:), pointer :: zdofE
 #else
-        real*8    , dimension(:,:), pointer :: zdofE
+        real(8)    , dimension(:,:), pointer :: zdofE
 #endif
 !
 !  .....H(div) solution dof
 #if C_MODE
-        complex*16, dimension(:,:), pointer :: zdofV
+        complex(16), dimension(:,:), pointer :: zdofV
 #else
-        real*8    , dimension(:,:), pointer :: zdofV
+        real(8)    , dimension(:,:), pointer :: zdofV
 #endif
 !
 !  .....L^2 solution dof
 #if C_MODE
-        complex*16, dimension(:,:), pointer :: zdofQ
+        complex(16), dimension(:,:), pointer :: zdofQ
 #else
-        real*8    , dimension(:,:), pointer :: zdofQ
+        real(8)    , dimension(:,:), pointer :: zdofQ
 #endif
       endtype node
 !
@@ -299,7 +303,9 @@ module data_structure3D
         nullify(NODES(nod)%sons)
         NODES(nod)%geom_interf = 0
         nullify (NODES(nod)%coord)
+#if DEBUG_MODE
         NODES(nod)%error = 0.d0
+#endif
         nullify (NODES(nod)%zdofH)
         nullify (NODES(nod)%zdofE)
         nullify (NODES(nod)%zdofV)
@@ -420,7 +426,9 @@ module data_structure3D
         else
           write(ndump,*) 0 , 0
         endif
+#if DEBUG_MODE
         write(ndump,*) NODES(nod)%error
+#endif
         if (associated(NODES(nod)%zdofH)) then
           nn1 = ubound(NODES(nod)%zdofH,1)
           nn2 = ubound(NODES(nod)%zdofH,2)
@@ -697,7 +705,9 @@ module data_structure3D
         else
           nullify(NODES(nod)%coord)
         endif
+#if DEBUG_MODE
         read(ndump,*) NODES(nod)%error
+#endif
 !
         read(ndump,*) nn1, nn2
         if ((nn1.gt.0).and.(nn2.gt.0)) then
