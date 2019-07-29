@@ -4,7 +4,7 @@ assembly_sc.F90
 constrained_nodes.F
 constraints.F
 control.F90
-data_structure3D.F
+data_structure3D.F90
 element_data.F
 environment.F90
 error.F90

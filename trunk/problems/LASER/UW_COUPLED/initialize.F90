@@ -15,7 +15,7 @@ subroutine initialize
 !-----------------------------------------------------------------------
 !
 !     open history file
-      call open_history_file(trim(FILE_HISTORY))
+      !call open_history_file(trim(FILE_HISTORY))
 !
 !     initialize refinements arrays
       call init_refinements( trim(FILE_REFINE) )

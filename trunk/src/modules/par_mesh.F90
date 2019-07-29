@@ -15,8 +15,8 @@ module par_mesh
 !
    use data_structure3D
    use parameters,     only: NRCOMS
-   use mpi_param,      only: RANK,NUM_PROCS
-   use MPI,            only: MPI_COMM_WORLD,MPI_STATUS_SIZE, &
+   use mpi_param,      only: RANK,ROOT,NUM_PROCS
+   use MPI,            only: MPI_COMM_WORLD,MPI_STATUS_IGNORE, &
                              MPI_SUCCESS,MPI_COMPLEX16,MPI_REAL8
    use zoltan_wrapper, only: ZOLTAN_LB,zoltan_w_partition
 !
@@ -43,7 +43,6 @@ subroutine distr_mesh()
 !..MPI variables
    integer :: ierr
    integer :: tag, count, src, dest
-   integer :: stat(MPI_STATUS_SIZE)
    VTYPE, allocatable :: buf(:)
 !
 !..auxiliary variables
@@ -51,6 +50,8 @@ subroutine distr_mesh()
    integer :: i, iel, inod, iproc, mdle, nod, subd, subd_size
    integer :: nrnodm, nrdof_nod
    integer :: iprint = 0
+!
+   real(8) :: MPI_Wtime,start_time,end_time
 !
    if (iprint .eq. 1) then
       write(6,100) 'start distr_mesh, DISTRIBUTED = ', DISTRIBUTED
@@ -66,25 +67,33 @@ subroutine distr_mesh()
    enddo
 !
 !..1. Determine new partition
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    if ((ZOLTAN_LB .eq. 0) .or. (.not. DISTRIBUTED)) then
       iproc=0
       do iel=1,NRELES
 !     ...decide subdomain for iel
          subd_next(iel) = iproc
-         !iproc = MOD(iproc+1,NUM_PROCS)
          subd_size = (NRELES+NUM_PROCS-1)/NUM_PROCS
          iproc = iel/subd_size
       enddo
    else
       call zoltan_w_partition(subd_next)
    endif
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
+   if(RANK .eq. ROOT) write(*,110) end_time - start_time
+   110 format(' partition time: ',f12.5,' seconds')
 !
 !..2. Reset visit flags for all nodes to 0
-   call reset_visit
+!$OMP PARALLEL DO SCHEDULE(STATIC) PRIVATE(i)
+   do i=1,NRNODS
+      NODES(i)%visit = 0
+   enddo
+!$OMP END PARALLEL DO
 !
 !..3. Exchange degrees of freedom with other MPI processes according to partition
 !     (note: this step can be skipped in the initial mesh distribution)
    if (.not. DISTRIBUTED) goto 50
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    do iel=1,NRELES
       mdle = mdle_list(iel)
       call get_subd(mdle, subd)
@@ -97,13 +106,13 @@ subroutine distr_mesh()
 !  ...3b. iterate over list of nodes
       do inod=1,nrnodm
          nod = nodm(inod)
-!     ...3c. Calculate nodal degrees of freedom, and allocate buffer
-         call get_dof_buf_size(nod, nrdof_nod)
-         if (nrdof_nod .eq. 0) cycle
          if (.not. EXCHANGE_DOF) then
             if (subd_next(iel) .eq. RANK) call alloc_nod_dof(nod)
             cycle
          endif
+!     ...3c. Calculate nodal degrees of freedom, and allocate buffer
+         call get_dof_buf_size(nod, nrdof_nod)
+         if (nrdof_nod .eq. 0) cycle
          allocate(buf(nrdof_nod))
          buf = ZERO
 !     ...3d. if current subdomain is my subdomain, send data
@@ -129,7 +138,7 @@ subroutine distr_mesh()
                   'Receiving data from [',subd,'], nod = ',nod
             endif
             count = nrdof_nod; src = subd; tag = nod
-            call MPI_RECV(buf,count,MPI_VTYPE,src,tag,MPI_COMM_WORLD,stat,ierr)
+            call MPI_RECV(buf,count,MPI_VTYPE,src,tag,MPI_COMM_WORLD,MPI_STATUS_IGNORE,ierr)
             if (ierr .ne. MPI_SUCCESS) then
                write(6,*) 'MPI_RECV failed. stop.'
                stop
@@ -142,30 +151,42 @@ subroutine distr_mesh()
 !
       enddo
    enddo
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
+   if(RANK .eq. ROOT) write(*,120) end_time - start_time
+   120 format(' migration time: ',f12.5,' seconds')
    130 format(A,I2,A,A,I4,A,I6)
 !
 !..4. Reset subdomain values for all nodes
+!$OMP PARALLEL DO SCHEDULE(STATIC) PRIVATE(nod)
    do nod=1,NRNODS
       call set_subd(nod,-1)
    enddo
+!$OMP END PARALLEL DO
 !
    50 continue
 !
+!$OMP PARALLEL PRIVATE(iel,mdle,nod,subd)
+!
 !..5. Set new subdomains for middle nodes (elements) everywhere
+!$OMP DO SCHEDULE(STATIC)
    do iel=1,NRELES
       mdle = mdle_list(iel)
       call set_subd(mdle,subd_next(iel))
    enddo
+!$OMP END DO
 !
 !..6. Set subdomain values for all nodes within subdomain
+!$OMP DO SCHEDULE(STATIC)
    do iel=1,NRELES
       if (subd_next(iel) .eq. RANK) then
          mdle = mdle_list(iel)
          call set_subd_elem(mdle)
       endif
    enddo
+!$OMP END DO
 !
 !..7. Delete degrees of freedom for NODES outside of subdomain
+!$OMP DO SCHEDULE(STATIC)
    do nod=1,NRNODS
       call get_subd(nod, subd)
       if (subd .ne. RANK .and. Is_active(nod)) then
@@ -173,9 +194,17 @@ subroutine distr_mesh()
          call dealloc_nod_dof(nod)
       endif
    enddo
+!$OMP END DO
+!$OMP END PARALLEL
 !
-   HOST_MESH = .false.
+   if (NUM_PROCS > 1) HOST_MESH = .false.
    DISTRIBUTED = .true.
+!
+   if ((.not. EXCHANGE_DOF) .and. (.not. HOST_MESH)) then 
+      call update_gdof
+      call update_Ddof
+   endif
+!
    if (iprint .eq. 1) then
       write(6,100) 'end   distr_mesh, DISTRIBUTED = .true.'
    endif
@@ -231,7 +260,7 @@ end subroutine set_subd_elem
 !
 !----------------------------------------------------------------------
 !     routine:    alloc_nod_dof
-!     purpose:    allocate all solution dofs associated with a node
+!     purpose:    allocate all dofs associated with a node
 !----------------------------------------------------------------------
 subroutine alloc_nod_dof(Nod)
    integer, intent(in) :: Nod
@@ -245,23 +274,28 @@ subroutine alloc_nod_dof(Nod)
    nvarE = NREQNE(icase)*NRCOMS
    nvarV = NREQNV(icase)*NRCOMS
    nvarQ = NREQNQ(icase)*NRCOMS
-!..allocate H1 DOFs
-   if (.not. associated(NODES(Nod)%zdofH)) then
+!..allocate geometry DOFs
+   if (.not. associated(NODES(Nod)%coord) .and. (ndofH .gt. 0)) then
+      allocate( NODES(Nod)%coord(NDIMEN, ndofH))
+   endif
+   NODES(Nod)%coord = 0.d0
+!..allocate H1 DOFS
+   if (.not. associated(NODES(Nod)%zdofH) .and. (ndofH .gt. 0)) then
       allocate( NODES(Nod)%zdofH(nvarH, ndofH))
    endif
    NODES(Nod)%zdofH = ZERO
 !..allocate H(curl) DOFs
-   if (.not. associated(NODES(Nod)%zdofE)) then
+   if (.not. associated(NODES(Nod)%zdofE) .and. (ndofE .gt. 0)) then
       allocate( NODES(Nod)%zdofE(nvarE, ndofE))
    endif
    NODES(Nod)%zdofE = ZERO
 !..allocate H(div) DOFs
-   if (.not. associated(NODES(Nod)%zdofV)) then
+   if (.not. associated(NODES(Nod)%zdofV) .and. (ndofV .gt. 0)) then
       allocate( NODES(Nod)%zdofV(nvarV, ndofV))
    endif
    NODES(Nod)%zdofV = ZERO
 !..allocate L2 DOFs
-   if (.not. associated(NODES(Nod)%zdofQ)) then
+   if (.not. associated(NODES(Nod)%zdofQ) .and. (ndofQ .gt.  0)) then
       allocate( NODES(Nod)%zdofQ(nvarQ, ndofQ))
    endif
    NODES(Nod)%zdofQ = ZERO
@@ -269,10 +303,11 @@ end subroutine alloc_nod_dof
 !
 !----------------------------------------------------------------------
 !     routine:    dealloc_nod_dof
-!     purpose:    deallocate all solution dofs associated with a node
+!     purpose:    deallocate all dofs associated with a node
 !----------------------------------------------------------------------
 subroutine dealloc_nod_dof(Nod)
    integer, intent(in) :: Nod
+   if (associated(NODES(Nod)%coord)) deallocate(NODES(Nod)%coord) 
    if (associated(NODES(Nod)%zdofH)) deallocate(NODES(Nod)%zdofH)
    if (associated(NODES(Nod)%zdofE)) deallocate(NODES(Nod)%zdofE)
    if (associated(NODES(Nod)%zdofV)) deallocate(NODES(Nod)%zdofV)
@@ -295,7 +330,7 @@ subroutine get_dof_buf_size(Nod, Nrdof_nod)
    nvarE = NREQNE(icase)*NRCOMS
    nvarV = NREQNV(icase)*NRCOMS
    nvarQ = NREQNQ(icase)*NRCOMS
-   Nrdof_nod = ndofH*nvarH + ndofE*nvarE + ndofV*nvarV + ndofQ*nvarQ
+   Nrdof_nod = ndofH*NDIMEN + ndofH*nvarH + ndofE*nvarE + ndofV*nvarV + ndofQ*nvarQ
 end subroutine get_dof_buf_size
 !
 !----------------------------------------------------------------------
@@ -321,6 +356,14 @@ subroutine pack_dof_buf(Nod,Nrdof_nod, Buf)
    nvarQ = NREQNQ(icase)*NRCOMS
 !
    j = 0
+!
+!..add geometry dof to buffer
+   if(ndofH .gt. 0) then
+      do ivar=1,NDIMEN
+         Buf(j+1:j+ndofH) = NODES(Nod)%coord(ivar,1:ndofH)
+         j = j + ndofH
+      enddo
+   endif
 !..add H1 dof to buffer
    if(nvarH .gt. 0 .and. ndofH .gt. 0) then
       do ivar=1,nvarH
@@ -378,28 +421,35 @@ subroutine unpack_dof_buf(Nod,Nrdof_nod,Buf)
    nvarQ = NREQNQ(icase)*NRCOMS
 !
    j = 0
-!..add H1 dof to buffer
+!..extract geometry dof from buffer
+   if(ndofH .gt. 0) then
+      do ivar=1,NDIMEN
+         NODES(Nod)%coord(ivar,1:ndofH) = Buf(j+1:j+ndofH)
+         j = j + ndofH
+      enddo
+   endif
+!..extract H1 dof from buffer
    if(nvarH .gt. 0 .and. ndofH .gt. 0) then
       do ivar=1,nvarH
          NODES(Nod)%zdofH(ivar,1:ndofH) = Buf(j+1:j+ndofH)
          j = j + ndofH
       enddo
    endif
-!..add H(curl) dof to buffer
+!..extract H(curl) dof from buffer
    if(nvarE .gt. 0 .and. ndofE .gt. 0) then
       do ivar=1,nvarE
          NODES(Nod)%zdofE(ivar,1:ndofE) = Buf(j+1:j+ndofE)
          j = j + ndofE
       enddo
    endif
-!..add H(div) dof to buffer
+!..extract H(div) dof from buffer
    if(nvarV .gt. 0 .and. ndofV .gt. 0) then
       do ivar=1,nvarV
          NODES(Nod)%zdofV(ivar,1:ndofV) = Buf(j+1:j+ndofV)
          j = j + ndofV
       enddo
    endif
-!..add L2 dof to buffer
+!..extract L2 dof from buffer
    if(nvarQ .gt. 0 .and. ndofQ .gt. 0) then
       do ivar=1,nvarQ
          NODES(Nod)%zdofQ(ivar,1:ndofQ) = Buf(j+1:j+ndofQ)

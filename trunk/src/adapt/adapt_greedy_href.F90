@@ -1,3 +1,5 @@
+#if DEBUG_MODE
+
 !-----------------------------------------------------------------------
 !> Purpose : routine employs the greedy strategy to performe adaptive
 !!           h-refinements
@@ -39,7 +41,8 @@ subroutine adapt_greedy_href(Iphy,Imode,Eps,Ath)
          call volume_hp_mdle(mdle, vol_mdle)
          vol_old = vol_old + vol_mdle
     
-         nlist(iel) = mdle 
+         nlist(iel) = mdle
+         
          rlist(iel) = sqrt(sum(NODES(mdle)%error(0:3,Iphy))) 
          err = err + rlist(iel)
       enddo
@@ -96,3 +99,5 @@ subroutine adapt_greedy_href(Iphy,Imode,Eps,Ath)
 
 
 endsubroutine adapt_greedy_href
+
+#endif

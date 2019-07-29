@@ -9,20 +9,23 @@ HP3D_BASE_PATH  = ${WORK}/par_hp3d/trunk
 # COMPILER SETTINGS (a 64bit processor architecture is assumed)
 #------------------------------------------------------------------
 
-DEBUG      = YES
+DEBUG      = NO
 LARGE      = NO
 OPENMP_USE = YES
+TAU_PERF   = NO
 
 # Use parallel threads to compile libraries and problems
 J ?= 24
 
-# Tau performance tool
-#FF = tau_f90.sh
-#CC = tau_cc.sh
-
 # Compiler
-FF     = mpif90
-CC     = mpicc
+# Tau performance tool
+ifeq ($(TAU_PERF),YES)
+  FF = tau_f90.sh
+  CC = tau_cc.sh
+else
+  FF = mpif90
+  CC = mpicc
+endif
 FC     =  $(FF)
 FFLAGS = -fPIC
 
@@ -87,15 +90,23 @@ MKL_INCS = -i8 -I${MKLROOT}/include/intel64/lp64 -I${MKLROOT}/include
 #
 # TACC MUMPS
 # module load mumps/5.1
-# needs PT-SCOTCH and parMETIS
+# needs PT-SCOTCH and parMETIS (64bit versions for large problems)
+# (module petsc/3.11-i64)
 # also adding Zoltan library dependence
 
-MUMPS_LIBS = -L${TACC_PETSC_LIB} -ldmumps -lzmumps -lmumps_common \
-                                 -lesmumps -lzoltan -lpord \
-                                 -lmetis -lparmetis \
-                                 -lscotch -lscotcherr \
-                                 -lptscotch -lptscotcherr
+MUMPS_LIBS = -L${TACC_PETSC_LIB} -ldmumps -lzmumps \
+                                 -lmumps_common -lpord
+
 MUMPS_INCS = -I${TACC_PETSC_INC}
+
+TACC_PETSC64_LIB = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-i64/lib
+TACC_PETSC64_INC = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-i64/include
+
+MUMPS_LIBS += -L$(TACC_PETSC64_LIB) -lesmumps -lzoltan \
+                                    -lmetis -lparmetis \
+                                    -lscotch -lscotcherr \
+                                    -lptscotch -lptscotcherr
+MUMPS_INCS += -I$(TACC_PETSC64_INC)
 
 #------------------------------------------------------------------
 # VIS LIBRARY

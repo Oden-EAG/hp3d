@@ -1,3 +1,5 @@
+#if DEBUG_MODE
+
 !------------------------------------------------------------------------
 !> Purpose : calculate H1- or L2-norm of the PB interpolation error
 !            for GMP parametrizations in reference coordinates
@@ -360,3 +362,5 @@ subroutine geometry_error_elem(Mdle, Derr,Dnorm)
 !
 !
 endsubroutine geometry_error_elem
+
+#endif

@@ -1,3 +1,5 @@
+#if DEBUG_MODE
+
 !------------------------------------------------------------------------
 !> Purpose : calculate geometry error. Refer to hp book, vol. 2,
 !!           page 103, formula 5.4.
@@ -466,3 +468,5 @@ subroutine display_geom_error(Nfath)
 !
 !
 end subroutine display_geom_error
+
+#endif

@@ -18,7 +18,8 @@ subroutine update_Ddof()
    use data_structure3D
    use environment, only: QUIET_MODE
    use par_mesh   , only: DISTRIBUTED
-   use mpi_param  , only: RANK
+   use MPI        , only: MPI_COMM_WORLD
+   use mpi_param  , only: RANK,ROOT
 !
    implicit none
 !
@@ -44,13 +45,13 @@ subroutine update_Ddof()
    VTYPE, dimension(MAXEQNQ,MAXbrickQ) :: zdofQ
 !
 !..auxiliary variables for timing
-   real*8 :: start, OMP_get_wtime
+   real(8) :: MPI_Wtime,start_time,end_time
 !
 !..auxiliary array with active mdle nodes
-   integer, dimension(NRELES) :: mdlel
+   integer :: mdlel(NRELES)
 !
 !..auxiliary variables
-   integer :: iel, iv, ie, ifc, ind, iflag
+   integer :: iel, iv, ie, ifc, ind, iflag, ierr
    integer :: k, mdle, nf, no, nod
 !
 !..number of elements in subdomain
@@ -58,7 +59,7 @@ subroutine update_Ddof()
 !
 !-----------------------------------------------------------------------
 !
-   start = OMP_get_wtime()
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 !
 !..fetch active elements
    mdle = 0;
@@ -250,12 +251,12 @@ subroutine update_Ddof()
    enddo
 !$OMP END DO
 !$OMP END PARALLEL
-
 !
 !-----------------------------------------------------------------------
 !
-   if (.not. QUIET_MODE) then
-      write(*,8010) OMP_get_wtime()-start
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+   if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
+      write(*,8010) end_time-start_time
  8010 format(' update_Ddof: ',f12.5,'  seconds',/)
    endif
 !

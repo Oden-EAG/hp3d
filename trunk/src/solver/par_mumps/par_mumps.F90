@@ -61,15 +61,9 @@ subroutine mumps_start
    call dmumps(mumps_par)
 #endif
 !
-!..verify MYID == RANK
-   if (mumps_par%MYID .ne. RANK) then
-      write(*,*) 'par_mumps: MYID .ne. RANK'
-      call pause
-   endif
-!
 !..diagnostics
-   write(*,100) 'par_mumps: MYID           = ', mumps_par%MYID
-   write(*,110) 'par_mumps: VERSION_NUMBER = ', mumps_par%VERSION_NUMBER
+   !write(*,100) 'par_mumps: MYID           = ', mumps_par%MYID
+   !write(*,110) 'par_mumps: VERSION_NUMBER = ', mumps_par%VERSION_NUMBER
  100 format(A,I3)
  110 format(A,A)
 !
@@ -90,6 +84,21 @@ subroutine mumps_start
 !     1: elemental input format
    mumps_par%icntl(5) = 0
 !
+!..icntl(7): choice of sequential pivot ordering tool (not used if icntl(28)=2)
+!     0: Approximate Minimum Degree (AMD)
+!     1: pivot order set by the user
+!     2: Approximate Minimum Fill (AMF)
+!     3: Scotch
+!     4: PORD
+!     5: Metis
+!     6: AMD w/ quasi-dense row detection
+!     7: automatic value
+   mumps_par%icntl(7) = 5
+!
+!..icntl(14): percentage increase in estimated workspace
+!     [default: 20] - 20% increase in workspace
+   mumps_par%icntl(14) = 30
+!
 !..icntl(18): distribution strategy of the input matrix
 !     0: centralized on host
 !     1: user provides matrix structure at analysis, MUMPS returns mapping for entries
@@ -106,13 +115,22 @@ subroutine mumps_start
 !     0: automatic choice
 !     1: sequential computation
 !     2: parallel computation
-   mumps_par%icntl(28) = 2
+   mumps_par%icntl(28) = 0
+!if (NUM_PROCS < 16)
+!   mumps_par%icntl(28) = 1
+!else
+!   mumps_par%icntl(28) = 2
+!endif
 !
 !..icntl(29): choice of parallel pivot ordering tool (not used if icntl(28)=1)
 !     0: automatic choice
 !     1: PT-Scotch
 !     2: ParMetis
    mumps_par%icntl(29) = 2
+   ! parmetis appears to cause 'integer divide by zero error'
+   ! when using partitions for small problem
+   ! (e.g., try 32 mpi ranks on 64 cubes)
+   ! but parmetis is faster than pt-scotch, at least on uniformly refined cube
 !
 end subroutine mumps_start
 !

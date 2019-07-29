@@ -4,7 +4,7 @@
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision    - Jul 18
+!    latest revision    - July 2019
 !
 !    purpose            - routine updates values of geometry degrees
 !                         of freedom, using the GMP parametrizations
@@ -18,7 +18,10 @@ subroutine update_gdof()
    use constrained_nodes
    use data_structure3D
    use element_data
-   use environment, only : QUIET_MODE
+   use environment, only: QUIET_MODE
+   use MPI        , only: MPI_COMM_WORLD
+   use mpi_param  , only: RANK,ROOT
+   use par_mesh   , only: DISTRIBUTED
    use GMP
 !
    implicit none
@@ -44,18 +47,22 @@ subroutine update_gdof()
    real*8, dimension(3,MAXbrickH) :: xnod
 !
 !..auxiliary variables for timing
-   real*8 :: start, OMP_get_wtime
+   real(8) :: MPI_Wtime,start_time,end_time
 !
 !..auxiliary array with active mdle nodes
-   integer, dimension(NRELES) :: mdlel
+   integer :: mdlel(NRELES)
 !
 !..auxiliary variables
-   integer :: iel, iv, ie, ifc, ind, iflag, i, k, loc
+   integer :: iel, iv, ie, ifc, ind, iflag, i, k, loc, ierr
    integer :: mdle, nf, no, nod, nr_elem_nodes, nrnodm, nr_up_elem
+!
+!..number of elements in subdomain
+   integer :: nreles_subd, subd
 !
 !-----------------------------------------------------------------------
 !
-   start = OMP_get_wtime()
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+   start_time = MPI_Wtime()
 !
 !..lower the GMP interface flag for all nodes
    do nod=1,NRNODS
@@ -65,11 +72,24 @@ subroutine update_gdof()
 !-----------------------------------------------------------------------  
 !
 !..fetch active elements
-   mdle = 0
-   do iel=1,NRELES
-      call nelcon(mdle, mdle)
-      mdlel(iel) = mdle
-   enddo
+   mdle = 0;
+   if (DISTRIBUTED) then
+      nreles_subd = 0
+      do iel=1,NRELES
+         call nelcon(mdle, mdle)
+         call get_subd(mdle, subd)
+         if (subd .eq. RANK) then
+            nreles_subd = nreles_subd + 1
+            mdlel(nreles_subd) = mdle
+         endif
+      enddo
+   else
+      do iel=1,NRELES
+         call nelcon(mdle, mdle)
+         mdlel(iel) = mdle
+      enddo
+      nreles_subd = NRELES
+   endif
 !
 !-----------------------------------------------------------------------
 !
@@ -80,7 +100,7 @@ subroutine update_gdof()
       nr_up_elem=0
 !
 !  ...loop through active elements
-      do 100 iel=1,NRELES
+      do 100 iel=1,nreles_subd
 !
          mdle = mdlel(iel)
          call find_elem_type(mdle, mdltype)
@@ -200,7 +220,7 @@ subroutine update_gdof()
 !$OMP PRIVATE(iflag,mdle,mdltype,nedge_orient,nface_orient, &
 !$OMP         no,norder,ntype,xnod,xsub)                    &
 !$OMP SCHEDULE(DYNAMIC)
-   do iel=1,NRELES
+   do iel=1,nreles_subd
       mdle = mdlel(iel)
       if (.not.associated(NODES(mdle)%coord)) cycle
       call find_elem_type(mdle, mdltype)
@@ -219,8 +239,10 @@ subroutine update_gdof()
 !
 !-----------------------------------------------------------------------
 !
-   if (.not. QUIET_MODE) then
-      write(*,8004) OMP_get_wtime()-start
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+   if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
+      end_time = MPI_Wtime()
+      write(*,8004) end_time-start_time
  8004 format(' update_gdof: ',f12.5,'  seconds')
    endif
 !

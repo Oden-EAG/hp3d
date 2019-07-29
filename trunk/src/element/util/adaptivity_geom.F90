@@ -1,3 +1,5 @@
+#if DEBUG_MODE
+
 !------------------------------------------------------------------------
 !> Purpose : performs adaptive h-refinements of the geometry
 !
@@ -98,6 +100,8 @@ subroutine adaptivity_geom(Eps, Nref,Ratio)
          write(*,*)'adaptivity_geom: rlist not deallocated!'
          stop
       endif
-!  
+!
 !
 endsubroutine adaptivity_geom
+
+#endif

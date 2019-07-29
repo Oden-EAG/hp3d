@@ -44,7 +44,7 @@ subroutine par_mumps_sc(mtype)
    use par_mumps, only: mumps_par,mumps_start,mumps_destroy
    use par_mesh , only: DISTRIBUTED,HOST_MESH
    use mpi_param, only: RANK,ROOT
-   use MPI      , only: MPI_COMM_WORLD,MPI_SUM,MPI_REAL8,MPI_COMPLEX16
+   use MPI      , only: MPI_SUM,MPI_REAL8,MPI_COMPLEX16
 !
    implicit none
 !
@@ -78,14 +78,18 @@ subroutine par_mumps_sc(mtype)
 !..workspace for right-hand side and solution vector
    VTYPE, allocatable :: RHS(:),SOL(:)
 !
-   integer(8) :: t1,t2,clock_rate,clock_max
+!..timer
+   real(8) :: MPI_Wtime,start_time,end_time,time_stamp
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
    if ((.not. DISTRIBUTED) .or. HOST_MESH) then
-      write(*,*) 'par_mumps_sc: mesh is not distributed (or on host). calling mumps_sc from host...'
-      if (RANK .eq. ROOT) call mumps_sc(mtype)
+      if (RANK .eq. ROOT) then
+         write(*,*) 'par_mumps_sc: mesh is not distributed (or on host).'
+         write(*,*) 'calling mumps_sc from host...'
+         call mumps_sc(mtype)
+      endif
       return
    endif
 !
@@ -124,10 +128,11 @@ subroutine par_mumps_sc(mtype)
 !  STEP 1 : 1ST LOOP THROUGH ELEMENTS, 1ST CALL TO CELEM TO GET INFO
 ! ----------------------------------------------------------------------
 !
-   if ((RANK .eq. ROOT) .and. (IPRINT_TIME .eq. 1)) then
-      write(*,1001)
-1001  format(' STEP 1 started : Get assembly info')
-      call system_clock( t1, clock_rate, clock_max )
+   if (IPRINT_TIME .eq. 1) then
+      if (RANK .eq. ROOT) write(*,1001)
+ 1001 format(' STEP 1 started : Get assembly info')
+      call MPI_BARRIER(mumps_par%COMM, ierr)
+      start_time = MPI_Wtime()
    endif
 !
    allocate(MAXDOFS(NR_PHYSA))
@@ -249,27 +254,34 @@ subroutine par_mumps_sc(mtype)
       return
    endif
 !
-!
 ! ----------------------------------------------------------------------
 !  END OF STEP 1
 ! ----------------------------------------------------------------------
 !
-   if ((RANK .eq. ROOT) .and. (IPRINT_TIME .eq. 1)) then
-      call system_clock( t2, clock_rate, clock_max )
-      Mtime(1) =  real(t2 - t1,8)/real(clock_rate,8)
-      write(*,1002) Mtime(1)
-1002  format(' STEP 1 finished: ',f12.5,'  seconds',/)
+   if (IPRINT_TIME .eq. 1) then
+      call MPI_BARRIER(mumps_par%COMM, ierr)
+      end_time = MPI_Wtime()
+      Mtime(1) = end_time-start_time
+      if (RANK .eq. ROOT) write(*,1002) Mtime(1)
+ 1002 format(' STEP 1 finished: ',f12.5,'  seconds',/)
    endif 
 !
 ! ----------------------------------------------------------------------
 !  STEP 2 : ASSEMBLE AND STORE IN SPARSE FORM 
 ! ----------------------------------------------------------------------
 !
-   if ((RANK .eq. ROOT) .and. (IPRINT_TIME .eq. 1)) then
-      write(*,1003)
-1003  format(' STEP 2 started : Global Assembly')
-      call system_clock( t1, clock_rate, clock_max )
+   call MPI_BARRIER(mumps_par%COMM, ierr)
+   if (RANK .eq. ROOT) then
+      write(*,2010) '[', RANK, '] Number of dof  : nrdof_con = ', NRDOF_CON
+      write(*,2010) '[', RANK, ']                  nrdof_tot = ', NRDOF_TOT
+      write(*,2010) '[', RANK, '] Total non-zeros: nnz       = ', nnz
    endif
+   write(*,2010) '[', RANK, '] Local non-zeros: nnz_loc   = ', nnz_loc
+2010 format(A,I4,A,I12)
+!
+!..use 64bit parallel analysis if nnz_loc > 2B
+!  (sequential metis/scotch using 32bit currently)
+   if (nnz > 2e9) mumps_par%icntl(28) = 2
 !
 !..memory allocation for load assembly
    allocate(RHS(nrdof)); RHS=ZERO
@@ -277,17 +289,19 @@ subroutine par_mumps_sc(mtype)
 !..memory allocation for MUMPS solver
    mumps_par%N = nrdof
    mumps_par%NNZ_loc = nnz_loc
-!
-   write(*,2010) '  Number of dof  : nrdof   = ', nrdof
-   write(*,2010) '  Total non-zeros: nnz     = ', nnz
-   write(*,2010) '  Local non-zeros: nnz_loc = ', nnz_loc
-2010 format(A,I12)
-!
    allocate(mumps_par%IRN_loc(nnz_loc))
    allocate(mumps_par%JCN_loc(nnz_loc))
    allocate(mumps_par%A_loc(nnz_loc))
 !
+!..memory allocation for static condensation
    call stc_alloc
+!
+   if (IPRINT_TIME .eq. 1) then
+      if (RANK .eq. ROOT) write(*,1003)
+ 1003 format(/,' STEP 2 started : Global Assembly')
+      call MPI_BARRIER(mumps_par%COMM, ierr)
+      start_time = MPI_Wtime()
+   endif
 !
 !..assemble global stiffness matrix
 !..loop through elements
@@ -415,21 +429,23 @@ subroutine par_mumps_sc(mtype)
    deallocate(ZBMOD,ZAMOD,LCON,ZLOAD,ZTEMP)
 !$OMP END PARALLEL
 !
-   if ((RANK .eq. ROOT) .and. (IPRINT_TIME .eq. 1)) then
-      call system_clock( t2, clock_rate, clock_max )
-      Mtime(2) =  real(t2 - t1,8)/real(clock_rate,8)
-      write(*,1004) Mtime(2)
-1004  format(' STEP 2 finished: ',f12.5,'  seconds',/)
+   if (IPRINT_TIME .eq. 1) then
+      call MPI_BARRIER(mumps_par%COMM, ierr)
+      end_time = MPI_Wtime()
+      Mtime(2) =  end_time-start_time
+      if (RANK .eq. ROOT) write(*,1004) Mtime(2)
+ 1004 format(' STEP 2 finished: ',f12.5,'  seconds',/)
    endif
 !
 !----------------------------------------------------------------------
 !  STEP 3: call mumps to solve the linear system
 !----------------------------------------------------------------------
 !
-   if ((RANK .eq. ROOT) .and. (IPRINT_TIME .eq. 1)) then
-      write(*,1009)
-1009  format(' STEP 3 started : Solve')
-      call system_clock( t1, clock_rate, clock_max )
+   if (IPRINT_TIME .eq. 1) then
+      if (RANK .eq. ROOT) write(*,1009)
+ 1009 format(' STEP 3 started : Solve')
+      call MPI_BARRIER(mumps_par%COMM, ierr)
+      start_time = MPI_Wtime()
    endif
 !
 !..allocate RHS vector on host
@@ -447,41 +463,111 @@ subroutine par_mumps_sc(mtype)
 !..deallocate local RHS vector
    deallocate(RHS)
 !
-#if C_MODE
+!..MUMPS analysis
    mumps_par%JOB = 1
-   call zmumps(mumps_par)
-   mumps_par%JOB = 2
-   call zmumps(mumps_par)
-   mumps_par%JOB = 3
+!
+   if (IPRINT_TIME .eq. 1) then
+      call MPI_BARRIER(mumps_par%COMM, ierr)
+      time_stamp = MPI_Wtime()
+   endif
+#if C_MODE
    call zmumps(mumps_par)
 #else
-   mumps_par%JOB = 1
-   call dmumps(mumps_par)
-   mumps_par%JOB = 2
-   call dmumps(mumps_par)
-   mumps_par%JOB = 3
    call dmumps(mumps_par)
 #endif
+   if (IPRINT_TIME .eq. 1) then
+      call MPI_BARRIER(mumps_par%COMM, ierr)
+      time_stamp = MPI_Wtime()-time_stamp
+      if (RANK .eq. ROOT) write(*,3001) time_stamp
+ 3001 format(' - Analysis : ',f12.5,'  seconds')
+   endif
+   if (mumps_par%INFOG(1) .ne. 0) then
+      call mumps_destroy
+      if (RANK.eq.ROOT) write(*,*) 'analysis: mumps_par%INFOG(1) .ne. 0'
+      stop
+   endif
+   if (RANK .eq. ROOT) then
+      write(*,1100) '   - MAX estimated size in GB = ',mumps_par%INFOG(16)/1000.d0
+      write(*,1100) '   - SUM estimated size in GB = ',mumps_par%INFOG(17)/1000.d0
+      write(*,1200) '   - Seq/parallel analysis    = ',mumps_par%INFOG(32)
+      write(*,1200) '   - Ordering method used     = ',mumps_par%INFOG(7)
+ 1100 format(A,F11.3)
+ 1200 format(A,I1)
+   endif
+!
+!..MUMPS factorization
+   mumps_par%JOB = 2
+!
+   if (IPRINT_TIME .eq. 1) then
+      call MPI_BARRIER(mumps_par%COMM, ierr)
+      time_stamp = MPI_Wtime()
+   endif
+#if C_MODE
+   call zmumps(mumps_par)
+#else
+   call dmumps(mumps_par)
+#endif
+   if (IPRINT_TIME .eq. 1) then
+      call MPI_BARRIER(mumps_par%COMM, ierr)
+      time_stamp = MPI_Wtime()-time_stamp
+      if (RANK .eq. ROOT) write(*,3002) time_stamp
+ 3002 format(' - Factorize: ',f12.5,'  seconds')
+   endif
+   if (mumps_par%INFOG(1) .ne. 0) then
+      call mumps_destroy
+      if (RANK.eq.ROOT) write(*,*) 'factorization: mumps_par%INFOG(1) .ne. 0'
+      stop
+   endif
+   if (RANK .eq. ROOT) then
+      write(*,1100) '   - MAX memory used in GB    = ',mumps_par%INFOG(21)/1000.d0
+      write(*,1100) '   - SUM memory used in GB    = ',mumps_par%INFOG(22)/1000.d0
+   endif
+!
+!..MUMPS solve
+   mumps_par%JOB = 3
+! 
+  if (IPRINT_TIME .eq. 1) then
+      call MPI_BARRIER(mumps_par%COMM, ierr)
+      time_stamp = MPI_Wtime()
+   endif
+#if C_MODE
+   call zmumps(mumps_par)
+#else
+   call dmumps(mumps_par)
+#endif
+   if (IPRINT_TIME .eq. 1) then
+      call MPI_BARRIER(mumps_par%COMM, ierr)
+      time_stamp = MPI_Wtime()-time_stamp
+      if (RANK .eq. ROOT) write(*,3003) time_stamp
+ 3003 format(' - Solve    : ',f12.5,'  seconds')
+   endif
+   if (mumps_par%INFOG(1) .ne. 0) then
+      call mumps_destroy
+      if (RANK.eq.ROOT) write(*,*) 'solve: mumps_par%INFOG(1) .ne. 0'
+      stop
+   endif
 !
 ! ----------------------------------------------------------------------
 !  END OF STEP 3
 ! ----------------------------------------------------------------------
 !
-   if ((RANK .eq. ROOT) .and. (IPRINT_TIME .eq. 1)) then
-      call system_clock( t2, clock_rate, clock_max )
-      Mtime(3) =  real(t2 - t1,8)/real(clock_rate,8)
-      write(*,1010) Mtime(3)
-1010  format(' STEP 3 finished: ',f12.5,'  seconds',/)
+   if (IPRINT_TIME .eq. 1) then
+      call MPI_BARRIER(mumps_par%COMM, ierr)
+      end_time = MPI_Wtime()
+      Mtime(3) =  end_time-start_time
+      if (RANK .eq. ROOT) write(*,1010) Mtime(3)
+ 1010 format(' STEP 3 finished: ',f12.5,'  seconds',/)
    endif
 !
 ! ----------------------------------------------------------------------
 !  STEP 4 : STORE SOLUTION IN THE DATASTRACTURE
 ! ----------------------------------------------------------------------
 !
-   if ((RANK .eq. ROOT) .and. (IPRINT_TIME .eq. 1)) then
-      write(*,1011)
-1011  format(' STEP 4 started : Store the solution')
-      call system_clock( t1, clock_rate, clock_max )
+   if (IPRINT_TIME .eq. 1) then
+      if (RANK .eq. ROOT) write(*,1011)
+ 1011 format(' STEP 4 started : Store the solution')
+      call MPI_BARRIER(mumps_par%COMM, ierr)
+      start_time = MPI_Wtime()
    endif
 !
 !..allocate global solution vector on every processor
@@ -523,11 +609,12 @@ subroutine par_mumps_sc(mtype)
 !  END OF STEP 4
 ! ----------------------------------------------------------------------
 !
-   if ((RANK .eq. ROOT) .and. (IPRINT_TIME .eq. 1)) then
-      call system_clock( t2, clock_rate, clock_max )
-      Mtime(4) =  real(t2 - t1,8)/real(clock_rate,8)
-      write(*,1012) Mtime(4)
-1012  format(' STEP 4 finished: ',f12.5,'  seconds',/)
+   if (IPRINT_TIME .eq. 1) then
+      call MPI_BARRIER(mumps_par%COMM, ierr)
+      end_time = MPI_Wtime()
+      Mtime(4) = end_time-start_time
+      if (RANK .eq. ROOT) write(*,1012) Mtime(4)
+ 1012 format(' STEP 4 finished: ',f12.5,'  seconds',/)
    endif
 !
    deallocate(SOL)
@@ -540,9 +627,8 @@ subroutine par_mumps_sc(mtype)
    call mumps_destroy
 !
    if ((RANK .eq. ROOT) .and. (IPRINT_TIME .ge. 1)) then
-      write(*,*)
       write(*,1013) sum(Mtime(1:4))
-1013  format(' par_mumps_sc FINISHED: ',f12.5,'  seconds',/)
+ 1013 format(' par_mumps_sc FINISHED: ',f12.5,'  seconds',/)
    endif
 !
 !

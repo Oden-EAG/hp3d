@@ -13,24 +13,28 @@
 !----------------------------------------------------------------------
 subroutine par_verify()
 !
-   use par_mesh, only: DISTRIBUTED
+   use mpi_param, only: RANK,ROOT
+   use par_mesh , only: DISTRIBUTED
+   use MPI      , only: MPI_COMM_WORLD,MPI_INTEGER,MPI_MIN
 !
    implicit none
 !
-   integer :: ipass
+   integer :: ipass,ierr,buf,count
 !
    if (.not. DISTRIBUTED) then
-      write(*,*) 'par_verify: mesh is not distributed.'
+      if (RANK.eq.ROOT) write(*,*) 'par_verify: mesh is not distributed.'
       goto 190
    endif
 !
-   write(*,*) 'par_verify: Checking mesh consistency...'
+   !if (RANK.eq.ROOT) write(*,*) 'par_verify: Checking mesh consistency...'
    call mesh_consistency(ipass)
+   count = 1
+   call MPI_ALLREDUCE(ipass,buf,count,MPI_INTEGER,MPI_MIN,MPI_COMM_WORLD,ierr)
    if (ipass .eq. 1) then
-      write(*,*) 'par_verify: MESH CONSISTENCY TEST PASSED.'
+      if (RANK.eq.ROOT)  write(*,*) 'par_verify: MESH CONSISTENCY TEST PASSED.'
    else
-      write(*,*) 'par_verify: MESH CONSISTENCY TEST FAILED.'
-      call pause
+      if (RANK.eq.ROOT)  write(*,*) 'par_verify: MESH CONSISTENCY TEST FAILED.'
+      stop
    endif
 !
 !   write(*,*) 'par_verify: Checking collection and distribution of dofs...'
@@ -107,6 +111,7 @@ subroutine mesh_consistency(ipass)
             write(6,1210) '[', rank, ']: ','mesh inconsistency (1): ', &
                           'i,val,buf = ', i, val(i), buf(i)
             ipass = 0
+            deallocate(val,buf); return
          endif
       enddo
    endif
@@ -145,6 +150,7 @@ subroutine mesh_consistency(ipass)
             write(6,1210) '[', rank, ']: ','mesh inconsistency (2): ', &
                           'i,val,buf = ', i, val(i), buf(i)
             ipass = 0
+            deallocate(val,buf); return
          endif
       enddo
    endif
@@ -154,6 +160,7 @@ subroutine mesh_consistency(ipass)
 !  ----------------------------------------
 !  3. check activation flags in NODES array
 !  ----------------------------------------
+   !goto 290
    allocate(val(NRNODS),buf(NRNODS))
    buf(1:NRNODS) = 0
 !
@@ -173,6 +180,7 @@ subroutine mesh_consistency(ipass)
             write(6,1210) '[', rank, ']: ','mesh inconsistency (3): ', &
                           'i,val,buf = ', i, val(i), buf(i)
             ipass = 0
+            deallocate(val,buf); return
          endif
       enddo
    endif

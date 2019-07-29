@@ -68,7 +68,8 @@ subroutine pardiso_sc(mtype)
 !
    VTYPE, allocatable :: SA(:), RHS(:)
 !
-   integer*8 :: t1,t2,clock_rate,clock_max
+!..timer
+   real(8) :: MPI_Wtime,start_time,end_time
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
@@ -115,7 +116,7 @@ subroutine pardiso_sc(mtype)
    if (IPRINT_TIME .eq. 1) then
       write(*,1001)
 1001  format(' STEP 1 started : Get assembly info')
-      call system_clock( t1, clock_rate, clock_max )
+      start_time = MPI_Wtime()
    endif
 !
    allocate(MAXDOFS(NR_PHYSA))
@@ -235,8 +236,8 @@ subroutine pardiso_sc(mtype)
 ! ----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
-      call system_clock( t2, clock_rate, clock_max )
-      Mtime(1) =  real(t2 - t1,8)/real(clock_rate,8)
+      end_time = MPI_Wtime()
+      Mtime(1) = end_time-start_time
       write(*,1002) Mtime(1)
 1002  format(' STEP 1 finished: ',f12.5,'  seconds',/)
    endif 
@@ -248,7 +249,7 @@ subroutine pardiso_sc(mtype)
    if (IPRINT_TIME .eq. 1) then
       write(*,1003)
 1003  format(' STEP 2 started : Global Assembly')
-      call system_clock( t1, clock_rate, clock_max )
+      start_time = MPI_Wtime()
    endif
 !
 !..memory allocation for assembly
@@ -382,8 +383,8 @@ subroutine pardiso_sc(mtype)
 !$OMP END PARALLEL
 !
    if (IPRINT_TIME .eq. 1) then
-      call system_clock( t2, clock_rate, clock_max )
-      Mtime(2) =  real(t2 - t1,8)/real(clock_rate,8)
+      end_time = MPI_Wtime()
+      Mtime(2) = end_time-start_time
       write(*,1004) Mtime(2)
 1004  format(' STEP 2 finished: ',f12.5,'  seconds',/)
    endif
@@ -395,7 +396,7 @@ subroutine pardiso_sc(mtype)
    if (IPRINT_TIME .eq. 1) then
       write(*,1007)
 1007  format(' STEP 3 started : Convert to CSR')
-      call system_clock( t1, clock_rate, clock_max )
+      start_time = MPI_Wtime()
    endif
 !
    call coo2csr(SIA,SJA,SA,inz, nnz)
@@ -405,8 +406,8 @@ subroutine pardiso_sc(mtype)
 ! ----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
-      call system_clock( t2, clock_rate, clock_max )
-      Mtime(3) =  real(t2 - t1,8)/real(clock_rate,8)
+      end_time = MPI_Wtime()
+      Mtime(3) = end_time-start_time
       write(*,1008) Mtime(3)
 1008  format(' STEP 3 finished: ',f12.5,'  seconds',/)
    endif   
@@ -418,7 +419,7 @@ subroutine pardiso_sc(mtype)
    if (IPRINT_TIME .eq. 1) then
       write(*,1009)
 1009  format(' STEP 4 started : Solve')
-      call system_clock( t1, clock_rate, clock_max )
+      start_time = MPI_Wtime()
    endif
 !
    if (HERM_STC) then
@@ -433,8 +434,8 @@ subroutine pardiso_sc(mtype)
 ! ----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
-      call system_clock( t2, clock_rate, clock_max )
-      Mtime(4) =  real(t2 - t1,8)/real(clock_rate,8)
+      end_time = MPI_Wtime()
+      Mtime(4) = end_time-start_time
       write(*,1010) Mtime(4)
 1010  format(' STEP 4 finished: ',f12.5,'  seconds',/)
    endif
@@ -448,7 +449,7 @@ subroutine pardiso_sc(mtype)
    if (IPRINT_TIME .eq. 1) then
       write(*,1011)
 1011  format(' STEP 5 started : Store the solution')
-      call system_clock( t1, clock_rate, clock_max )
+      start_time = MPI_Wtime()
    endif
 ! 
 !$OMP PARALLEL DO          &
@@ -477,8 +478,8 @@ subroutine pardiso_sc(mtype)
 ! ----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
-      call system_clock( t2, clock_rate, clock_max )
-      Mtime(5) =  real(t2 - t1,8)/real(clock_rate,8)
+      end_time = MPI_Wtime()
+      Mtime(5) = end_time-start_time
       write(*,1012) Mtime(5)
 1012  format(' STEP 5 finished: ',f12.5,'  seconds',/)
    endif

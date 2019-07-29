@@ -17,8 +17,11 @@
 !   
 !------------------------------------------------------------------------------
 !
-!..MATLAB DIR
-   character(len=128) :: MATLAB_DIR
+!..TYPE OF JOB SUBMISSION
+!  0: interactive (usual main file)
+!  1: stampede2 skx slurm job batch script
+   integer :: JOB
+!
 !..MISCELLANEOUS
    integer :: NR_RHS_PROB = 1
 !
@@ -35,9 +38,12 @@
    integer, parameter :: BC_SPHERE_SCAT = 6
 !   
 !..EXACT SOLUTION
-   integer :: IEXACT_PROB
+   integer :: ISOL
    integer, parameter :: IEXACT_POLYNOMIAL  = 0
    integer, parameter :: IEXACT_SINUSOIDAL  = 1
+!
+!..NUMBER OF REFINEMENTS (JOB SCRIPT)
+   integer :: IMAX
 !
 !  order of the polynomial exact solution
    integer :: NPX, NPY, NPZ
