@@ -778,9 +778,11 @@ module data_structure3D
 !  ...reset visitation flags for all nodes
       subroutine reset_visit
 !
+!$OMP PARALLEL DO
       do i=1,NRNODS
         NODES(i)%visit = 0
       enddo
+!$OMP END PARALLEL DO
 !
       end subroutine reset_visit
 !

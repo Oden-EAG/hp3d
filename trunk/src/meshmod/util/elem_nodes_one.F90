@@ -5,7 +5,7 @@
 !! @param[in]  Ison          - son number of this node
 !! @param[out] Nod           - node number
 !! @param[out] Nodesl        - nodal connectivity of node
-!! @param[out] Norinetl      - orientaiton of node
+!! @param[out] Norinetl      - orientation of node
 !-----------------------------------------------------------
 subroutine elem_nodes_one( &
      Nfath, Nodesl_fath, Norientl_fath, Ison, &
@@ -42,7 +42,7 @@ subroutine elem_nodes_one( &
   cur      = NODES(Nod)
 
   !-----------------------------------------------------------
-  ! One steop down the tree reconstructing connectivities
+  ! one step down the tree reconstructing connectivities
   call find_face_ref_flags(fath%type, fath%ref_kind, kref_face)
   call decode_ref(fath%type, fath%ref_kind, iref1, iref2, iref3)
   !
