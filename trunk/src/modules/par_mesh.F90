@@ -84,11 +84,7 @@ subroutine distr_mesh()
    110 format(' partition time: ',f12.5,' seconds')
 !
 !..2. Reset visit flags for all nodes to 0
-!$OMP PARALLEL DO SCHEDULE(STATIC) PRIVATE(i)
-   do i=1,NRNODS
-      NODES(i)%visit = 0
-   enddo
-!$OMP END PARALLEL DO
+   call reset_visit
 !
 !..3. Exchange degrees of freedom with other MPI processes according to partition
 !     (note: this step can be skipped in the initial mesh distribution)

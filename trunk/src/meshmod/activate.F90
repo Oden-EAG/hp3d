@@ -30,11 +30,13 @@ subroutine activate(Nod)
 !..determine number of dofs, update geometry dofs
    call find_ndof(Nod, ndofH,ndofE,ndofV,ndofQ)
 !
+#if DEBUG_MODE
 !..printing
    if (iprint.eq.1) then
       write(*,7001) Nod,ndofH,ndofE,ndofV,ndofQ
  7001 format('activate: Nod=',i10,'ndofH,ndofE,ndofV,ndofQ= ',4i4)
    endif
+#endif
 !
 !..find out whether node is inside my subdomain
    act_dof = 1
@@ -85,10 +87,12 @@ subroutine activate(Nod)
 !..raise activation flag
    NODES(Nod)%act=1
 !
+#if DEBUG_MODE
 !..printing
    if (iprint.ge.1) then
       write(*,*) 'activate : ACTIVATED Nod = ', Nod
    endif
+#endif
 !
 end subroutine activate
 !
@@ -121,11 +125,13 @@ subroutine deactivate(Nod)
 !..find number of dofs associated to node, update number of gdofs
    call find_ndof(Nod, ndofH,ndofE,ndofV,ndofQ)
 !
+#if DEBUG_MODE
 !..printing
    if (iprint.eq.1) then
       write(*,7001) Nod,ndofH,ndofE,ndofV,ndofQ
  7001 format('activate: Nod=',i10,'ndofH,ndofE,ndofV,ndofQ= ',4i4)
    endif
+#endif
 !
 !..deallocate geometry dof
    if (ndofH.gt.0 .and. associated(NODES(Nod)%coord)) then
@@ -163,9 +169,11 @@ subroutine deactivate(Nod)
 !..lower activation flag
    NODES(Nod)%act=0
 !
+#if DEBUG_MODE
 !..printing
    if (iprint.ge.1) then
       write(*,*) 'deactivate : DEACTIVATED Nod = ', Nod
    endif
+#endif
 !
 end subroutine deactivate
