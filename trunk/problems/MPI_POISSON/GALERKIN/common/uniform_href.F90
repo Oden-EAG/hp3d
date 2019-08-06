@@ -50,7 +50,7 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
    integer :: mdle_list(NRELES)
    real*8  :: errorH,errorE,errorV,errorQ
    real*8  :: rnormH,rnormE,rnormV,rnormQ
-   real*8  :: error,rnorm,error_subd,rnorm_subd
+   real*8  :: error_tot,rnorm_tot,error_subd,rnorm_subd
    integer :: i,iel,mdle,subd,nreles_subd,count,ierr,nrelem_ref,kref
    integer :: iprint
 !
@@ -115,22 +115,22 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
 !$OMP END DO
 !$OMP END PARALLEL
 !
-   error = 0.d0; rnorm = 0.d0
+   error_tot = 0.d0; rnorm_tot = 0.d0
    if (DISTRIBUTED .and. (.not. HOST_MESH)) then
       count = 1
-      call MPI_REDUCE(error_subd,error,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE(rnorm_subd,rnorm,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(error_subd,error_tot,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(rnorm_subd,rnorm_tot,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
    else
-      error = error_subd
-      rnorm = rnorm_subd
+      error_tot = error_subd
+      rnorm_tot = rnorm_subd
    endif
 !
    if (RANK .ne. ROOT) goto 90
 !
 !..update and display convergence history
    if (NEXACT.ge.1) then
-      error_mesh(istep) = sqrt(error)
-      rel_error_mesh(istep) = sqrt(error/rnorm)
+      error_mesh(istep) = sqrt(error_tot)
+      rel_error_mesh(istep) = sqrt(error_tot/rnorm_tot)
    endif
 !
 !..compute decrease rate for the residual and error
@@ -177,12 +177,27 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
 !        ...isotropic href
             call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
             call global_href
-            call close_mesh
             call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
             if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2020) end_time-start_time
+            call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+            call close_mesh
+            call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+            if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2025) end_time-start_time
             call update_gdof
             call update_Ddof
          elseif (Nreflag .eq. 2) then
+!        ...anisotropic href (z)
+            call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+            call global_href_aniso(1) ! refine in z
+            call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+            if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2020) end_time-start_time
+            call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+            call close_mesh
+            call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+            if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2025) end_time-start_time
+            call update_gdof
+            call update_Ddof
+         elseif (Nreflag .eq. 3) then
 !        ...anisotropic href (z)
             call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
             mdle = 0
@@ -204,12 +219,16 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
                end select
                call refine(mdle,kref)
             enddo
+            call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+            if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2030) ' # of current elements, nodes = ', NRELES, NRNODS
+            if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2020) end_time-start_time
+            call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
             call close_mesh
             call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
             if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
-               write(*,2030) ' # of current elements, nodes = ', NRELES, NRNODS
-               write(*,2020) end_time-start_time
-  2020         format(' refinement : ',f12.5,'  seconds')
+               write(*,2025) end_time-start_time
+  2020         format(' global ref : ',f12.5,'  seconds')
+  2025         format(' close mesh : ',f12.5,'  seconds')
   2030         format(A,I8,', ',I9)
             endif
             call update_gdof
