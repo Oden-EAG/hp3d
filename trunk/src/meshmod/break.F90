@@ -136,12 +136,13 @@ subroutine break(Mdle,Kref)
 !                loop over son quads and generate INACTIVE son nodes                 
                  do is=1,2
                     nr_vert=0
-                    call nodbreak(NODES(nod)%sons(is),kref_face, &
-                                  iact,novert,nr_vert)
+!                    call nodbreak(NODES(nod)%sons(is),kref_face, iact,novert,nr_vert)
+                    call nodbreak(Son(nod,is),kref_face,iact,novert,nr_vert)
                  enddo
 !                break edge node                 
                  nr_vert=4
-                 call nodbreak(NODES(nod)%sons(3),kref_edge,iact,novert,nr_vert)
+                 !call nodbreak(NODES(nod)%sons(3),kref_edge,iact,novert,nr_vert)
+                 call nodbreak(Son(nod,3),kref_edge,iact,novert,nr_vert)
               endselect
            endselect
         endif
@@ -199,7 +200,8 @@ subroutine activate_sons(Nod)
   call find_nsons(Nod, nrsons)
 ! loop over sons
   do i=1,nrsons
-     call activate(NODES(Nod)%sons(i))
+!     call activate(NODES(Nod)%sons(i))
+     call activate(Son(Nod,i))
   enddo
 !
 end subroutine activate_sons

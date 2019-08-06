@@ -70,13 +70,11 @@ c  .......if nod is active
           if (NODES(nod)%act.eq.1) then
 c
             NODES(nod)%visit = 1
-            if (associated(NODES(nod)%sons)) then
-              nrs = ubound(NODES(nod)%sons,1)
-              do is=1,nrs
-                nods = NODES(nod)%sons(is)
-                NODES(nods)%visit = 1
-              enddo
-            endif
+            nrs = NODES(nod)%nr_sons
+            do is=1,nrs
+              nods = Son(nod,is)
+              NODES(nods)%visit = 1
+            enddo
 c
 c  .......inactive, i.e. constrained node
           else

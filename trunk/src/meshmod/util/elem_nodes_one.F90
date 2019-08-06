@@ -37,8 +37,10 @@ subroutine elem_nodes_one( &
 
   !-----------------------------------------------------------
   ! initialize output
-  Nodesl   = 0;                     Norientl = 0
-  fath     = NODES(Nfath);          Nod      = fath%sons(Ison);
+  Nodesl   = 0
+  Norientl = 0
+  fath     = NODES(Nfath)
+  Nod      = fath%first_son+Ison-1
   cur      = NODES(Nod)
 
   !-----------------------------------------------------------
@@ -67,25 +69,30 @@ subroutine elem_nodes_one( &
            stop 1
         case ('medg')
            call rotate_edge(Norientl_fath(jp),is,nort)
-           Nodesl(j) = NODES( nodp )%sons(is)
+           !Nodesl(j) = NODES( nodp )%sons(is)
+           Nodesl(j) = Son(nodp,is)
         case ('mdlt')
            ! local and global
            iref  = kref_face(jp-nvert(fath%type)-nedge(fath%type))
            ireff = NODES(nodp)%ref_kind
            call rotate_trian(iref,ireff,Norientl_fath(jp),is,nort)
-           Nodesl(j) = NODES( nodp )%sons(is)
+           !Nodesl(j) = NODES( nodp )%sons(is)
+           Nodesl(j) = Son(nodp,is)
         case('mdlq')
            ! local and global
            iref  = kref_face(jp-nvert(fath%type)-nedge(fath%type))
            ireff = NODES(nodp)%ref_kind
            call rotate_quad(iref,ireff,Norientl_fath(jp), is,is1,nort)
-           Nodesl(j) = NODES(nodp)%sons(is)
+           !Nodesl(j) = NODES(nodp)%sons(is)
+           Nodesl(j) = Son(nodp,is)
            if (is1.ne.0) then
               nodpp     = Nodesl(j)
-              Nodesl(j) = NODES(nodpp)%sons(is1)
+              !Nodesl(j) = NODES(nodpp)%sons(is1)
+              Nodesl(j) = Son(nodpp,is1)
            endif
         case default
-           Nodesl(j) = NODES(nodp)%sons(is)
+           !Nodesl(j) = NODES(nodp)%sons(is)
+           Nodesl(j) = Son(nodp,is)
         end select
         Norientl(j) = nort
      endif

@@ -24,7 +24,7 @@
 ! 
    subroutine nelcon_macro(Mdlec,Mdle0, Mdle1)
 ! 
-   use data_structure3D, ONLY: NODES
+   use data_structure3D, ONLY: NODES,Son
    use refinements,      ONLY: nr_mdle_sons
 !
    IMPLICIT NONE
@@ -64,7 +64,8 @@
 ! 
 ! ...find the son number in the family
       call nr_mdle_sons(NODES(nfath)%type,NODES(nfath)%ref_kind,nrbros)
-      call locate(mdle,NODES(nfath)%sons,nrbros, noson)
+!      call locate(mdle,NODES(nfath)%sons,nrbros, noson)
+      noson = mdle - NODES(nfath)%first_son + 1
       if (iprint.eq.1) then
          write(*,7002) mdle,nfath,nrbros,noson
  7002 format('nelcon: mdle,nfath,nrbros,noson = ',2i7,2i3)
@@ -72,7 +73,8 @@
 !                    
 ! ...if mdle is not the last son in the family, go to the next brother
       if (noson.lt.nrbros) then
-         mdle = NODES(nfath)%sons(noson+1)
+!         mdle = NODES(nfath)%sons(noson+1)
+         mdle = Son(nfath,noson+1)
          go to 20
       else
 !                 
@@ -85,7 +87,8 @@
 ! ...Step 2 move vertically down                
    20 continue
    do while (NODES(mdle)%ref_kind.gt.0)
-      mdle = NODES(mdle)%sons(1)
+!      mdle = NODES(mdle)%sons(1)
+      mdle = Son(mdle,1)
    enddo
    Mdle1 = mdle
 !

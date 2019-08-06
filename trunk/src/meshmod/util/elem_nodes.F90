@@ -50,7 +50,9 @@ subroutine elem_nodes(Mdle, Nodesl,Norientl)
      igen=igen+1
      nfathl(igen) = nfath
      call nr_mdle_sons(NODES(nfath)%type,NODES(nfath)%ref_kind,nrsons)
-     call locate(nson,NODES(nfath)%sons,nrsons, isonl(igen))
+!     call locate(nson,NODES(nfath)%sons,nrsons, isonl(igen))
+     isonl(igen) = nson - NODES(nfath)%first_son + 1
+!     if (isonl(igen)<0 .or. isonl(igen)>nrsons) call pause
      nson = nfath
      nfath = NODES(nson)%father
   enddo

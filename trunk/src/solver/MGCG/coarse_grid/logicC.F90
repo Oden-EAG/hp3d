@@ -875,7 +875,8 @@
                   ndofEp(ip) = 1
                case(0)
                   nfath = NODES(nodp)%father
-                  call locate(nodp,NODES(nfath)%sons(1:2),2, ncflag(ip))
+!                  call locate(nodp,NODES(nfath)%sons(1:2),2, ncflag(ip))
+                  ncflag(ip) = nodp - NODES(nfath)%first_son + 1
                   call locate(nfath,Nodm,Nrnodm, locp(ip))
                   ndofHp(ip) = NODES_MG(nfath)%orderC(Igrid)-1
                   ndofEp(ip) = NODES_MG(nfath)%orderC(Igrid)
@@ -1074,7 +1075,8 @@
                   ndofEp(ip) = 1
                case(0)
                   nfath = NODES(nodp)%father
-                  call locate(nodp,NODES(nfath)%sons(1:2),2, ncflag(ip))
+!                  call locate(nodp,NODES(nfath)%sons(1:2),2, ncflag(ip))
+                  ncflag(ip) = nodp - NODES(nfath)%first_son + 1
                   call locate(nfath,Nodm,Nrnodm, locp(ip))
                   ndofHp(ip) = NODES_MG(nfath)%orderC(Igrid)-1
                   ndofEp(ip) = NODES_MG(nfath)%orderC(Igrid)

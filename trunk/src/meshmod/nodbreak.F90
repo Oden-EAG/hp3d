@@ -21,7 +21,7 @@ subroutine nodbreak(Nod,Kref,Iact,Novert,Nr_vert)
 !..Local variables
    character(len=4), dimension(27) :: type_sons
    integer,          dimension(27) :: norder, nfilter, nbcond, nsubd
-   integer                         :: nrsons, iprint, i
+   integer                         :: nrsons, iprint, i, ison
 !
 !-------------------------------------------------------------------------
 !
@@ -47,7 +47,8 @@ subroutine nodbreak(Nod,Kref,Iact,Novert,Nr_vert)
                    nrsons, type_sons, norder, nfilter, nbcond, nsubd )
 !
 !..generate the son nodes
-   allocate(NODES(Nod)%sons(nrsons))
+!   allocate(NODES(Nod)%sons(nrsons))
+   NODES(Nod)%nr_sons = nrsons
    do i=1,nrsons
       call nodgen( type_sons(i),                           &
                    NODES(Nod)%case,                        &
@@ -57,7 +58,9 @@ subroutine nodbreak(Nod,Kref,Iact,Novert,Nr_vert)
                    nfilter(i),                             &
                    nsubd(i),                               &
                    Iact,                                   &
-                   NODES(Nod)%sons(i) )
+                   ison )
+!                   NODES(Nod)%sons(i) )
+      if (i .eq. 1) NODES(Nod)%first_son = ison
    enddo
 !
 !..printing

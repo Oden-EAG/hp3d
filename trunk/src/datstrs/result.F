@@ -127,9 +127,11 @@ c
  9000   format(' REFINEMENT FILTER = ',i3)
         write(*,7028) NODES(nod)%father
  7028   format(' FATHER = ',i10)
-        if (NODES(nod)%ref_kind.ne.0)
-     .  write(*,7029) NODES(nod)%sons
- 7029   format(' SONS = ',9i10)
+        if (NODES(nod)%ref_kind.ne.0) then
+           write(*,7029) NODES(nod)%first_son,NODES(nod)%nr_sons
+ 7029      format(' FIRST_SON = ',i10,', NR_SONS = ',i10)
+        endif
+c
         select case (NODES(nod)%type)
         case ('mdln','mdlp','mdlb','mdld')
            call find_domain(nod,ndom)

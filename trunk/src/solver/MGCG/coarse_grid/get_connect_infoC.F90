@@ -107,7 +107,8 @@
                write(*,7022) j,jp,is
  7022          format('get_connect_info: 2: j,jp,is = ',3i5)
             endif
-            nod = NODES(nodp)%sons(is)
+!            nod = NODES(nodp)%sons(is)
+            nod = Son(nodp,is)
             if (iprint.eq.1) then
                write(*,7023) nodp,nod,NODES(nod)%act
  7023          format('get_connect_info: nodp,nod,NODES(nod)%act = ' &
@@ -155,7 +156,8 @@
 !        ...triangular parent face
             case('mdlt')
                call rotate_trian(iref,ireff,FATH_ORIENT(jp),is,nort)
-               nod = NODES(nodp)%sons(is)
+!               nod = NODES(nodp)%sons(is)
+               nod = Son(nodp,is)
                if (iprint.eq.1) then
                   write(*,7101) nodp,is,nod,NODES(nod)%act
  7101             format('get_connect_info: nodp,is,nod,NODES(nod)%act =',4i5)
@@ -201,9 +203,11 @@
 !        ...quadrilateral parent face
             case('mdlq')
                call rotate_quad(iref,ireff,FATH_ORIENT(jp), is,is1,nort)
-               nod = NODES(nodp)%sons(is)
+!               nod = NODES(nodp)%sons(is)
+               nod = Son(nodp,is)
                if (is1.ne.0) then
-                  nod = NODES(nod)%sons(is1)
+!                  nod = NODES(nod)%sons(is1)
+                  nod = Son(nod,is1)
                endif
 !
 !           ...if the coarse grid node was constrained (inactive), its

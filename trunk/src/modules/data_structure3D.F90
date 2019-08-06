@@ -122,7 +122,9 @@ module data_structure3D
         integer          :: father
 !
 !  .....node sons
-        integer, dimension(:), pointer :: sons
+        !integer, dimension(:), pointer :: sons
+        integer          :: first_son
+        integer          :: nr_sons
 !
 !  .....interface flag with GMP
         integer          :: geom_interf
@@ -248,13 +250,21 @@ module data_structure3D
 !
       integer Nod,Nrsons
 !
-      if (associated(NODES(Nod)%sons)) then
-        Nrsons = ubound(NODES(Nod)%sons,1)
-      else
-        Nrsons = 0
-      endif
+      Nrsons = NODES(Nod)%nr_sons
 !
       end subroutine find_nsons
+!
+!-----------------------------------------------------------------------
+!
+!  ...return i-th son of Nod
+      function Son(Nod,I)
+      integer Nod
+      integer I
+      integer Son
+!
+      Son = NODES(Nod)%first_son+I-1
+!
+      end function
 !
 !-----------------------------------------------------------------------
 !
@@ -300,7 +310,8 @@ module data_structure3D
         NODES(nod)%bcond = nod+1
         NODES(nod)%ref_kind = 0
         NODES(nod)%father = 0
-        nullify(NODES(nod)%sons)
+        NODES(nod)%first_son = 0
+        NODES(nod)%nr_sons = 0
         NODES(nod)%geom_interf = 0
         nullify (NODES(nod)%coord)
 #if DEBUG_MODE
@@ -331,7 +342,6 @@ module data_structure3D
       deallocate(ELEMS)
 !
       do nod=1,MAXNODS
-        if (Associated(NODES(nod)%sons))    deallocate(NODES(nod)%sons)
         if (Associated(NODES(nod)%coord))   deallocate(NODES(nod)%coord)
         if (Associated(NODES(nod)%zdofH))   deallocate(NODES(nod)%zdofH)
         if (Associated(NODES(nod)%zdofE))   deallocate(NODES(nod)%zdofE)
@@ -408,13 +418,8 @@ module data_structure3D
         write(ndump,*) NODES(nod)%ref_kind
         write(ndump,*) NODES(nod)%ref_filter
         write(ndump,*) NODES(nod)%father
-        if (associated(NODES(nod)%sons)) then
-          nn = ubound(NODES(nod)%sons,1)
-          write(ndump,*) nn
-          write(ndump,*) NODES(nod)%sons
-        else
-          write(ndump,*) 0
-        endif
+        write(ndump,*) NODES(nod)%first_son
+        write(ndump,*) NODES(nod)%nr_sons
         write(ndump,*) NODES(nod)%geom_interf
         write(ndump,*) NODES(nod)%visit
         write(ndump,*) NODES(nod)%act
@@ -467,162 +472,7 @@ module data_structure3D
 !
       end subroutine dumpout_hp3d
 !
-!
 !-----------------------------------------------------------------------
-!
-!  ...dump in hp3d data structure in LEGACY format, i.e
-!     NODES%visit , NODES%act are not read from 'dumpc3Dhp'
-!
-      subroutine dumpin_hp3d_LEGACY(Dump_file)
-!
-      character(len=15) :: Dump_file
-      character(len=20) :: type
-      integer           :: npnods_loc
-      integer,parameter :: iprint = 0
-!
-!  ...deallocate DS if necessary
-      if (allocated(ELEMS).or.allocated(NODES)) call deallocds
-!
-      ndump=31
-      open(unit=ndump,file=Dump_file,  &
-           form='formatted',access='sequential',status='unknown')
-!
-      read(ndump,*) NRELIS,NRELES,NRNODS
-      read(ndump,*) NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ
-      read(ndump,*) MAXNODS,NPNODS
-!
-      if (iprint.eq.1) then
-        write(*,*)'------------------------------------------'
-        write(*,*)'dumpin_hp3d_LEGACY:'
-        write(*,8000)NRELIS
- 8000   format('     NRELIS  = ',i12)
-        write(*,8001)NRELES
- 8001   format('     NRELES  = ',i12)
-        write(*,8002)NRNODS
- 8002   format('     NRNODS  = ',i12)
-        write(*,8003)NRDOFSH
- 8003   format('     NRDOFSH = ',i12)
-        write(*,8004)NRDOFSE
- 8004   format('     NRDOFSE = ',i12)
-        write(*,8005)NRDOFSV
- 8005   format('     NRDOFSV = ',i12)
-        write(*,8006)NRDOFSQ
- 8006   format('     NRDOFSQ = ',i12)
-        write(*,8007)MAXNODS
- 8007   format('     MAXNODS = ',i12)
-        write(*,8008)NPNODS
- 8008   format('     NPNODS  = ',i12)
-        write(*,*)'------------------------------------------'
-        call pause
-      endif
-!
-!  ...save NPNODS
-      npnods_loc = NPNODS
-!  ...allocate data structure
-      call allocds
-!  ...reset NPNODS
-      NPNODS = npnods_loc
-!
-      do nel=1,NRELIS
-        read(ndump,*) ELEMS(nel)%type
-        read(ndump,*) ELEMS(nel)%nrphysics
-        read(ndump,*) nn
-        if (nn.gt.0) then
-          allocate(ELEMS(nel)%physics(nn))
-          read(ndump,*) (ELEMS(nel)%physics(i), i=1,nn)
-        else
-          nullify(ELEMS(nel)%physics)
-        endif
-        read(ndump,*) nn
-        if (nn.gt.0) then
-          allocate(ELEMS(nel)%bcond(nn))
-          read(ndump,*) (ELEMS(nel)%bcond(i), i=1,nn)
-        else
-          nullify(ELEMS(nel)%bcond)
-        endif
-        read(ndump,*) nn
-        if (nn.gt.0) then
-          allocate(ELEMS(nel)%nodes(nn))
-          read(ndump,*) (ELEMS(nel)%nodes(i), i=1,nn)
-        else
-          nullify(ELEMS(nel)%nodes)
-        endif
-        read(ndump,*) ELEMS(nel)%edge_orient
-        read(ndump,*) ELEMS(nel)%face_orient
-        read(ndump,*) nn
-        if (nn.gt.0) then
-          allocate(ELEMS(nel)%neig(nn))
-          read(ndump,*) (ELEMS(nel)%neig(i), i=1,nn)
-        else
-          nullify(ELEMS(nel)%neig)
-        endif
-        read(ndump,*) ELEMS(nel)%GMPblock
-      enddo
-!
-!  ...N O D E S........................................................
-      do nod=1,NRNODS
-        read(ndump,*) NODES(nod)%type
-        read(ndump,*) NODES(nod)%case
-        read(ndump,*) NODES(nod)%index
-        read(ndump,*) NODES(nod)%order
-        read(ndump,*) NODES(nod)%bcond
-        read(ndump,*) NODES(nod)%ref_kind
-        read(ndump,*) NODES(nod)%father
-        read(ndump,*) nn
-        if (nn.gt.0) then
-          allocate(NODES(nod)%sons(nn))
-          read(ndump,*) NODES(nod)%sons
-        else
-          nullify(NODES(nod)%sons)
-        endif
-        read(ndump,*) NODES(nod)%geom_interf
-!  .....set undefined flags to 0
-        NODES(nod)%visit=0; NODES(nod)%act=0
-        read(ndump,*) nn1, nn2
-        if ((nn1.gt.0).and.(nn2.gt.0)) then
-          allocate(NODES(nod)%coord(nn1,nn2))
-          read(ndump,*) NODES(nod)%coord
-        else
-          nullify(NODES(nod)%coord)
-        endif
-!
-        read(ndump,*) nn1, nn2
-        if ((nn1.gt.0).and.(nn2.gt.0)) then
-          allocate(NODES(nod)%zdofH(nn1,nn2))
-          read(ndump,*) NODES(nod)%zdofH
-        else
-          nullify(NODES(nod)%zdofH)
-        endif
-        read(ndump,*) nn1, nn2
-        if ((nn1.gt.0).and.(nn2.gt.0)) then
-          allocate(NODES(nod)%zdofE(nn1,nn2))
-          read(ndump,*) NODES(nod)%zdofE
-        else
-          nullify(NODES(nod)%zdofE)
-        endif
-        read(ndump,*) nn1, nn2
-        if ((nn1.gt.0).and.(nn2.gt.0)) then
-          allocate(NODES(nod)%zdofV(nn1,nn2))
-          read(ndump,*) NODES(nod)%zdofV
-        else
-          nullify(NODES(nod)%zdofV)
-        endif
-        read(ndump,*) nn1, nn2
-        if ((nn1.gt.0).and.(nn2.gt.0)) then
-          allocate(NODES(nod)%zdofQ(nn1,nn2))
-          read(ndump,*) NODES(nod)%zdofQ
-        else
-          nullify(NODES(nod)%zdofQ)
-        endif
-      enddo
-!
-      close(ndump)
-!
-      end subroutine dumpin_hp3d_LEGACY
-!
-!
-!-----------------------------------------------------------------------
-!
 !  ...dump in hp3d data structure
       subroutine dumpin_hp3d(Dump_file)
 !
@@ -688,13 +538,8 @@ module data_structure3D
         read(ndump,*) NODES(nod)%ref_kind
         read(ndump,*) NODES(nod)%ref_filter
         read(ndump,*) NODES(nod)%father
-        read(ndump,*) nn
-        if (nn.gt.0) then
-          allocate(NODES(nod)%sons(nn))
-          read(ndump,*) NODES(nod)%sons
-        else
-          nullify(NODES(nod)%sons)
-        endif
+        read(ndump,*) NODES(nod)%first_son
+        read(ndump,*) NODES(nod)%nr_sons
         read(ndump,*) NODES(nod)%geom_interf
         read(ndump,*) NODES(nod)%visit
         read(ndump,*) NODES(nod)%act
