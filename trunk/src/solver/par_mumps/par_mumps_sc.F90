@@ -29,7 +29,7 @@
 ! -----------------------------------------------------------------------
 subroutine par_mumps_sc(mtype)
 !
-   use data_structure3D, only: NRNODS, NRELES, get_subd
+   use data_structure3D, only: NRNODS, NRELES, ELEM_ORDER, get_subd
    use assembly,         only: NR_RHS, MAXDOFM, MAXDOFS,       &
                                MAXbrickH, MAXmdlbH, NRHVAR,    &
                                MAXbrickE, MAXmdlbE, NREVAR,    &
@@ -72,7 +72,6 @@ subroutine par_mumps_sc(mtype)
 !..workspace for celem
    integer, dimension(MAXNODM) :: nodm,ndofmH,ndofmE,ndofmV,ndofmQ
 !
-   integer    :: mdle_list(NRELES)
    integer(8) :: elem_nnz_loc(NRELES)
 !
 !..workspace for right-hand side and solution vector
@@ -149,15 +148,14 @@ subroutine par_mumps_sc(mtype)
 !..Step 1: determine the first dof offsets for active nodes
    nrdof_H = 0; nrdof_E = 0; nrdof_V = 0; nrdof_Q = 0; nrdof_mdl = 0
 !
-   mdle = 0; idec = 1
+   idec = 1
 !..non-zero counters for element offsets in distributed sparse stiffness matrix
 !  using 64 bit integers nnz and nnz_loc
    nnz     = 0_8; ! global number of non-zeros in matrix (counts duplicate indices)
    nnz_loc = 0_8; ! local  number of non-zeros in matrix (counts duplicate indices)
    elem_nnz_loc(1:NRELES) = 0_8 ! local element offsets for subdomain matrix
    do iel=1,NRELES
-      call nelcon(mdle, mdle)
-      mdle_list(iel) = mdle
+      mdle = ELEM_ORDER(iel)
       call get_subd(mdle, subd)
 !  ...get information from celem
       if (ISTC_FLAG) then
@@ -340,7 +338,7 @@ subroutine par_mumps_sc(mtype)
 !$OMP SCHEDULE(DYNAMIC)  &
 !$OMP REDUCTION(+:RHS)
    do iel=1,NRELES
-      mdle = mdle_list(iel)
+      mdle = ELEM_ORDER(iel)
       call get_subd(mdle, subd)
       if (subd .ne. RANK) cycle
       if (ISTC_FLAG) then
@@ -581,29 +579,40 @@ subroutine par_mumps_sc(mtype)
    count = mumps_par%N; src = ROOT
    call MPI_BCAST (SOL,count,MPI_VTYPE,src,mumps_par%COMM,ierr)
 !
-!$OMP PARALLEL DO                    &
-!$OMP PRIVATE(i,k1,ndof,mdle,subd)   &
-!$OMP SCHEDULE(DYNAMIC)
+   if (IPRINT_TIME .eq. 1) then
+      call MPI_BARRIER(mumps_par%COMM, ierr)
+      time_stamp = MPI_Wtime()-start_time
+      if (RANK .eq. ROOT) write(*,3004) time_stamp
+ 3004 format(' - Broadcast: ',f12.5,'  seconds')
+   endif
+!
+   ndof = 0
+!$OMP PARALLEL PRIVATE(mdle,subd)
+!$OMP DO REDUCTION(MAX:ndof)
    do iel=1,NRELES
-      mdle = mdle_list(iel)
+      mdle = ELEM_ORDER(iel)
       call get_subd(mdle, subd)
       if (subd .ne. RANK) cycle
-!
-      ndof = CLOC(iel)%ni
-!
-      allocate(ZSOL_LOC(ndof)); ZSOL_LOC=ZERO
-!
-      do k1=1,ndof
+      if (CLOC(iel)%ni > ndof) ndof = CLOC(iel)%ni
+   enddo
+!$OMP END DO
+   allocate(ZSOL_LOC(ndof))
+!$OMP DO PRIVATE(i,k1) SCHEDULE(DYNAMIC)
+   do iel=1,NRELES
+      mdle = ELEM_ORDER(iel)
+      call get_subd(mdle, subd)
+      if (subd .ne. RANK) cycle
+      ZSOL_LOC=ZERO
+      do k1=1,CLOC(iel)%ni
          i = CLOC(iel)%con(k1)
          ZSOL_LOC(k1) = SOL(i)
       enddo
       deallocate(CLOC(iel)%con)
-!
       call solout(iel,ndof,NR_RHS,ZERO,ZSOL_LOC)
-      deallocate(ZSOL_LOC)
-!
    enddo
-!$OMP END PARALLEL DO
+!$OMP END DO
+   deallocate(ZSOL_LOC)
+!$OMP END PARALLEL
 !
 ! ----------------------------------------------------------------------
 !  END OF STEP 4

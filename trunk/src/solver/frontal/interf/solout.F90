@@ -78,10 +78,7 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
       mdle = NEW_ELEM_ORDER(Iel)
    else
 !  ...find the element number using the standard ordering of elements
-      mdle=0
-      do i=1,Iel
-         call nelcon(mdle, mdle)
-      enddo
+      mdle = ELEM_ORDER(Iel)
    endif
 !
 !..determine nodes of the modified element

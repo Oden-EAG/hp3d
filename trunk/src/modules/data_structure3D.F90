@@ -190,9 +190,24 @@ module data_structure3D
       type(element), allocatable, save  :: ELEMS(:)
       type(node)   , allocatable, save  :: NODES(:)
 !
+      integer      , allocatable, save  :: ELEM_ORDER(:)
+!
 !-----------------------------------------------------------------------
 !
       contains
+!
+!-----------------------------------------------------------------------
+!
+      subroutine update_ELEM_ORDER()
+         integer :: iel,mdle
+         if (allocated(ELEM_ORDER)) deallocate(ELEM_ORDER)
+         allocate(ELEM_ORDER(NRELES))
+         mdle = 0
+         do iel=1,NRELES
+            call nelcon(mdle, mdle)
+            ELEM_ORDER(iel) = mdle
+         enddo
+      end subroutine
 !
 !-----------------------------------------------------------------------
 !
@@ -350,6 +365,7 @@ module data_structure3D
       enddo
       deallocate(NODES)
 !
+      if (allocated(ELEM_ORDER)) deallocate(ELEM_ORDER)
 !
       end subroutine deallocds
 !

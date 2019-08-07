@@ -229,9 +229,9 @@ module zoltan_wrapper
       integer(Zoltan_int), intent(out) :: Ierr
       integer(Zoltan_int) :: nreles_subd
       integer :: iel,mdle,subd
-      mdle = 0; Nreles_subd = 0_Zoltan_int
+      Nreles_subd = 0_Zoltan_int
       do iel=1,NRELES
-         call nelcon(mdle, mdle)
+         mdle = ELEM_ORDER(iel)
          call get_subd(mdle, subd)
          if (subd .eq. RANK) then
             Nreles_subd = Nreles_subd + 1_Zoltan_int
@@ -258,9 +258,9 @@ module zoltan_wrapper
       real(Zoltan_float) , intent(out) :: Wgts(*)
       integer(Zoltan_int), intent(out) :: Ierr
       integer :: iel,j,mdle,subd
-      mdle = 0; j = 0
+      j = 0
       do iel=1,NRELES
-         call nelcon(mdle, mdle)
+         mdle = ELEM_ORDER(iel)
          call get_subd(mdle, subd)
          if (subd .eq. RANK) then
             j = j + 1
@@ -303,9 +303,9 @@ module zoltan_wrapper
 !  ...collect new subdomains for mesh
       Mdle_subd(1:NRELES) = 0
 !
-      mdle = 0; count = 1
+      count = 1
       do iel=1,NRELES
-         call nelcon(mdle, mdle)
+         mdle = ELEM_ORDER(iel)
          call get_subd(mdle, subd)
          src = subd
          if (RANK .eq. src) then

@@ -258,9 +258,8 @@ c
         write(*,7050) nod,NODES(nod)%case,index
  7050   format(' nod,case,index = ',i10,2x,i2,2x,20i2)
         l=0
-        mdle=0
         do iel=1,NRELES
-          call nelcon(mdle, mdle)
+          mdle = ELEM_ORDER(iel)
           call celem(mdle,1,
      .               nrdofs,nrdofm,nrdofc,
      .               nodm,ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,

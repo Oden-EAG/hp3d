@@ -45,9 +45,8 @@ subroutine collect_dofs()
 !..use visit flags to avoid re-sending information
    call reset_visit
 !
-   mdle = 0
    do iel=1,NRELES
-      call nelcon(mdle, mdle)
+      mdle = ELEM_ORDER(iel)
       call get_subd(mdle, subd)
 !     if mdle node is already in ROOT's subdomain
       if (subd .eq. ROOT) cycle
@@ -126,7 +125,7 @@ subroutine print_partition()
 !
    implicit none
 !
-   integer :: par(NRELES),mdlel(NRELES)
+   integer :: par(NRELES)
    integer :: iel,j,k,l,nreles_subd,mdle,subd
 !
 !----------------------------------------------------------------------
@@ -137,18 +136,11 @@ subroutine print_partition()
    endif
 !
    if (RANK .ne. ROOT) goto 290
-
-!
-   mdle = 0
-   do iel=1,NRELES
-      call nelcon(mdle,mdle)
-      mdlel(iel) = mdle
-   enddo
 !
    do j=0,NUM_PROCS-1
       nreles_subd = 0
       do iel=1,NRELES
-         mdle = mdlel(iel)
+         mdle = ELEM_ORDER(iel)
          call get_subd(mdle, subd)
          if (j .eq. subd) then
             nreles_subd = nreles_subd+1
@@ -188,7 +180,7 @@ subroutine print_subd()
 !
    implicit none
 !
-   integer :: sub(NRNODS),mdlel(NRELES)
+   integer :: sub(NRNODS)
    integer :: k,l,nod,nrnod_subd,subd,vis
 !
 !----------------------------------------------------------------------

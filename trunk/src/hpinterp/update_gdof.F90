@@ -64,19 +64,20 @@ subroutine update_gdof()
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
    start_time = MPI_Wtime()
 !
+!$OMP PARALLEL DO
 !..lower the GMP interface flag for all nodes
    do nod=1,NRNODS
       NODES(nod)%geom_interf=0
    enddo
+!$OMP END PARALLEL DO
 !
 !-----------------------------------------------------------------------  
 !
 !..fetch active elements
-   mdle = 0;
    if (DISTRIBUTED) then
       nreles_subd = 0
       do iel=1,NRELES
-         call nelcon(mdle, mdle)
+         mdle = ELEM_ORDER(iel)
          call get_subd(mdle, subd)
          if (subd .eq. RANK) then
             nreles_subd = nreles_subd + 1
@@ -84,10 +85,7 @@ subroutine update_gdof()
          endif
       enddo
    else
-      do iel=1,NRELES
-         call nelcon(mdle, mdle)
-         mdlel(iel) = mdle
-      enddo
+      mdlel(1:NRELES) = ELEM_ORDER(1:NRELES)
       nreles_subd = NRELES
    endif
 !

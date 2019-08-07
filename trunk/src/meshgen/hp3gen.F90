@@ -700,6 +700,13 @@ subroutine hp3gen(Fp)
   !
 !----------------------------------------------------------------------
   !
+  !  ...filling ELEM_ORDER array
+  !
+  if (iprint.ne.-1) then
+     write(*,*)'CALLING update_ELEM_ORDER'
+  endif
+  call update_ELEM_ORDER
+  !
   !  ...generate geometry and Dirichlet dof
   !
   if (iprint.ne.-1) then

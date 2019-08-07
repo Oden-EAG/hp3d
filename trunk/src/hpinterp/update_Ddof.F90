@@ -1,3 +1,4 @@
+#include "implicit_none.h"
 !-----------------------------------------------------------------------
 !
 !    routine name       - update_Ddof
@@ -22,8 +23,6 @@ subroutine update_Ddof()
    use mpi_param  , only: RANK,ROOT
 !
    implicit none
-!
-#include "implicit_none.h"
 !
 !..orientation of element nodes
    integer, dimension(12) :: nedge_orient
@@ -62,11 +61,10 @@ subroutine update_Ddof()
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 !
 !..fetch active elements
-   mdle = 0;
    if (DISTRIBUTED) then
       nreles_subd = 0
       do iel=1,NRELES
-         call nelcon(mdle, mdle)
+         mdle = ELEM_ORDER(iel)
          call get_subd(mdle, subd)
          if (subd .eq. RANK) then
             nreles_subd = nreles_subd + 1
@@ -74,10 +72,7 @@ subroutine update_Ddof()
          endif
       enddo
    else
-      do iel=1,NRELES
-         call nelcon(mdle, mdle)
-         mdlel(iel) = mdle
-      enddo
+      mdlel(1:NRELES) = ELEM_ORDER(1:NRELES)
       nreles_subd = NRELES
    endif
 !

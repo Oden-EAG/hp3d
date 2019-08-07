@@ -24,7 +24,7 @@
 ! ----------------------------------------------------------------------
 subroutine mumps_sc(mtype)
 !
-   use data_structure3D, only: NRNODS, NRELES
+   use data_structure3D, only: NRNODS, NRELES, ELEM_ORDER
    use assembly,         only: NR_RHS, MAXDOFM, MAXDOFS,       &
                                MAXbrickH, MAXmdlbH, NRHVAR,    &
                                MAXbrickE, MAXmdlbE, NREVAR,    &
@@ -62,7 +62,6 @@ subroutine mumps_sc(mtype)
 !
 !..work space for celem
    integer, dimension(MAXNODM) :: nodm,ndofmH,ndofmE,ndofmV,ndofmQ
-   integer    :: mdle_list(NRELES)
    integer(8) :: elem_nnz(NRELES)
 !
    VTYPE, allocatable :: RHS(:)
@@ -138,12 +137,10 @@ subroutine mumps_sc(mtype)
 !..Step 1: determine the first dof offsets for active nodes
    nrdof_H = 0; nrdof_E = 0; nrdof_V = 0; nrdof_Q = 0; nrdof_mdl = 0
 !
-   mdle = 0
 !..matrix non-zero entries counter (and element offsets)
    nnz = 0_8 ; elem_nnz(1:NRELES) = 0_8
    do iel=1,NRELES
-      call nelcon(mdle, mdle)
-      mdle_list(iel) = mdle
+      mdle = ELEM_ORDER(iel)
 !  ...get information from celem
       if (ISTC_FLAG) then
          !write(*,*) 'celem_systemI, iel = ', iel
@@ -278,7 +275,7 @@ subroutine mumps_sc(mtype)
 !$OMP PARALLEL                                  &
 !$OMP PRIVATE(nrdofs,nrdofm,nrdofc,nodm,nrnodm, &
 !$OMP         ndofmH,ndofmE,ndofmV,ndofmQ,      &
-!$OMP         i,j,k,k1,k2,l,nod,ndof)
+!$OMP         i,j,k,k1,k2,l,mdle,nod,ndof)
    allocate(NEXTRACT(MAXDOFM))
    allocate(IDBC(MAXDOFM))
    allocate(ZDOFD(MAXDOFM,NR_RHS))
@@ -308,11 +305,12 @@ subroutine mumps_sc(mtype)
 !$OMP SCHEDULE(DYNAMIC)  &
 !$OMP REDUCTION(+:RHS)
    do iel=1,NRELES
+      mdle = ELEM_ORDER(iel)
       if (ISTC_FLAG) then
-         call celem_systemI(iel,mdle_list(iel),2, nrdofs,nrdofm,nrdofc,nodm,  &
+         call celem_systemI(iel,mdle,2, nrdofs,nrdofm,nrdofc,nodm,  &
             ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,ZLOAD,ZTEMP)
       else
-         call celem(mdle_list(iel),2, nrdofs,nrdofm,nrdofc,nodm,  &
+         call celem(mdle,2, nrdofs,nrdofm,nrdofc,nodm,  &
             ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,ZLOAD,ZTEMP)
       endif
 !
@@ -500,27 +498,28 @@ subroutine mumps_sc(mtype)
  1011 format(' STEP 4 started : Store the solution')
       start_time = MPI_Wtime()
    endif
-! 
-!$OMP PARALLEL DO          &
-!$OMP PRIVATE(i,k1,ndof)   &
-!$OMP SCHEDULE(DYNAMIC)
+!
+   ndof = 0
+!$OMP PARALLEL
+!$OMP DO REDUCTION(MAX:ndof)
    do iel=1,NRELES
-!
-      ndof = CLOC(iel)%ni
-!
-      allocate(ZSOL_LOC(ndof)); ZSOL_LOC=ZERO
-!
-      do k1=1,ndof
+      if (CLOC(iel)%ni > ndof) ndof = CLOC(iel)%ni
+   enddo
+!$OMP END DO
+   allocate(ZSOL_LOC(ndof))
+!$OMP DO PRIVATE(i,k1) SCHEDULE(DYNAMIC)
+   do iel=1,NRELES
+      ZSOL_LOC=ZERO
+      do k1=1,CLOC(iel)%ni
          i = CLOC(iel)%con(k1)
          ZSOL_LOC(k1) = MUMPS_PAR%RHS(i)
       enddo
       deallocate(CLOC(iel)%con)
-!
       call solout(iel,ndof,NR_RHS,ZERO,ZSOL_LOC)
-      deallocate(ZSOL_LOC)
-!
    enddo
-!$OMP END PARALLEL DO
+!$OMP END DO
+   deallocate(ZSOL_LOC)
+!$OMP END PARALLEL
 !
 ! ----------------------------------------------------------------------
 !  END OF STEP 4

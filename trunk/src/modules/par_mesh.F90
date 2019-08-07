@@ -46,7 +46,7 @@ subroutine distr_mesh()
    VTYPE, allocatable :: buf(:)
 !
 !..auxiliary variables
-   integer :: subd_next(NRELES), mdle_list(NRELES), nodm(MAXNODM)
+   integer :: subd_next(NRELES), nodm(MAXNODM)
    integer :: i, iel, inod, iproc, mdle, nod, subd, subd_size
    integer :: nrnodm, nrdof_nod
    integer :: iprint = 0
@@ -57,14 +57,6 @@ subroutine distr_mesh()
       write(6,100) 'start distr_mesh, DISTRIBUTED = ', DISTRIBUTED
    endif
    100 format(A,L2)
-!
-!..Preliminary
-!..a. create list of mdle nodes in current mesh
-   mdle=0
-   do iel=1,NRELES
-      call nelcon(mdle, mdle)
-      mdle_list(iel) = mdle
-   enddo
 !
 !..1. Determine new partition
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
@@ -91,7 +83,7 @@ subroutine distr_mesh()
    if (.not. DISTRIBUTED) goto 50
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    do iel=1,NRELES
-      mdle = mdle_list(iel)
+      mdle = ELEM_ORDER(iel)
       call get_subd(mdle, subd)
 !     if mdle node current subdomain is not equal its new subdomain, and
 !     if current or new subdomain are my subdomain, then
@@ -166,7 +158,7 @@ subroutine distr_mesh()
 !..5. Set new subdomains for middle nodes (elements) everywhere
 !$OMP DO SCHEDULE(STATIC)
    do iel=1,NRELES
-      mdle = mdle_list(iel)
+      mdle = ELEM_ORDER(iel)
       call set_subd(mdle,subd_next(iel))
    enddo
 !$OMP END DO
@@ -175,7 +167,7 @@ subroutine distr_mesh()
 !$OMP DO SCHEDULE(STATIC)
    do iel=1,NRELES
       if (subd_next(iel) .eq. RANK) then
-         mdle = mdle_list(iel)
+         mdle = ELEM_ORDER(iel)
          call set_subd_elem(mdle)
       endif
    enddo
@@ -229,9 +221,9 @@ subroutine get_subd_size(Subd, Nreles_subd)
    integer, intent(in)  :: Subd
    integer, intent(out) :: Nreles_subd
    integer :: iel,mdle,mdle_subd
-   mdle = 0; Nreles_subd = 0
+   Nreles_subd = 0
    do iel=1,NRELES
-      call nelcon(mdle, mdle)
+      mdle = ELEM_ORDER(iel)
       call get_subd(mdle, mdle_subd)
       if (mdle_subd .eq. Subd) then
          Nreles_subd = Nreles_subd + 1
