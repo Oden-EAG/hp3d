@@ -6,7 +6,7 @@
 !> @param[in] Mdle - middle node
 !> @param[in] Kref - refinement flag
 !!
-!> rev@July 2019
+!> rev@Aug 2019
 !-------------------------------------------------------------------------
 !
 subroutine break(Mdle,Kref)
@@ -167,7 +167,7 @@ subroutine break(Mdle,Kref)
 !
   call activate_sons(Mdle)
 !
-  call deactivate(Mdle)
+  call deactivate(Mdle, NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ)
 !
 ! update the number of active elements
   call nr_mdle_sons(type,Kref, nrsons)
@@ -201,7 +201,9 @@ subroutine activate_sons(Nod)
 ! loop over sons
   do i=1,nrsons
 !     call activate(NODES(Nod)%sons(i))
-     call activate(Son(Nod,i))
+      if (NODES(Son(Nod,i))%act.ne.1) then
+         call activate(Son(Nod,i), NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ)
+      endif
   enddo
 !
 end subroutine activate_sons

@@ -12,21 +12,14 @@ subroutine global_href
 !
    implicit none
 !
-   integer :: mdle_list(NRELES)
-   integer :: nr_elements_to_refine,mdle,i,kref,ierr
+   integer :: nr_elem,mdle,i,kref,ierr
 !
 !..collect elements
-   nr_elements_to_refine = NRELES
-!
-   mdle=0
-   do i=1,NRELES
-      call nelcon(mdle, mdle)
-      mdle_list(i) = mdle
-   enddo
+   nr_elem = NRELES
 !
 !..break the elements
-   do i=1,nr_elements_to_refine
-      mdle = mdle_list(i)
+   do i=1,nr_elem
+      mdle = ELEM_ORDER(i)
       if (is_leaf(mdle)) then
          call get_isoref(mdle, kref)
          call break(mdle,kref)
@@ -36,7 +29,7 @@ subroutine global_href
    call refresh
 !
    if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
-      write(*,100) ' # of elements broken         = ', nr_elements_to_refine
+      write(*,100) ' # of elements broken         = ', nr_elem
       write(*,200) ' # of current elements, nodes = ', NRELES, NRNODS
    endif
  100 format(A,I8)
@@ -49,19 +42,15 @@ end subroutine global_href
 !> Purpose : routine performs a global anisotropic h-refinement
 !            note: works only for meshes with hexas/prisms,
 !                  and breaking along the same axis
-!                  (no mesh irregularity check are done here)
+!                  (no mesh irregularity checks are done here)
 !
 !> Arguments:
-!     in:    Kref -   1 (break in z)  - hexa/prism
-!                    10 (break in y)  - hexa only mesh
-!                   100 (break in x)  - hexa only mesh
-!                    11 (break in yz) - hexa only mesh
-!                   101 (break in xz) - hexa only mesh
-!                   110 (break in xy) - hexa/prism
+!     in:    Krefxy -   1 (break in xy)  - hexa/prism mesh
+!            Krefz  -   1 (break in  z)  - hexa/prism mesh
 !
 !> @date Aug 2019
 !--------------------------------------------------------------------
-subroutine global_href_aniso(Kref)
+subroutine global_href_aniso(Krefxy,Krefz)
 !
    use error
    use data_structure3D
@@ -70,51 +59,28 @@ subroutine global_href_aniso(Kref)
 !
    implicit none
 !
-   integer, intent(in) :: Kref
+   integer, intent(in) :: Krefxy,Krefz
 !
-   integer :: mdle_list(NRELES)
-   integer :: nr_elements_to_refine,mdle,i,ierr
+   integer :: nr_elem,mdle,i,ierr
    integer :: kref_mdlb,kref_mdlp
 !
 !..check if valid refinement
-   select case(Kref)
-      case(1,110)
-         kref_mdlb = Kref
-         kref_mdlp = MOD(Kref,100)
-      case(10,100,11,101)
-         kref_mdlb = Kref
-         kref_mdlp = 0
-      case default
-         write(*,*) 'global_href_aniso: invalid Kref. returning...'
-         return
-   end select
+   kref_mdlb = Krefxy*110 + Krefz
+   kref_mdlp = Krefxy*10  + Krefz
 !
 !..collect elements
-   nr_elements_to_refine = NRELES
-!
-   mdle=0
-   do i=1,NRELES
-      call nelcon(mdle, mdle)
-      mdle_list(i) = mdle
-   enddo
+   nr_elem = NRELES
 !
 !..break the elements
-   do i=1,nr_elements_to_refine
-      mdle = mdle_list(i)
+   do i=1,nr_elem
+      mdle = ELEM_ORDER(i)
       if (is_leaf(mdle)) then
          select case(NODES(mdle)%type)
-            case('mdlb')
-               call break(mdle,kref_mdlb)
-            case('mdlp')
-               if (kref_mdlp > 0) then
-                  call break(mdle,kref_mdlp)
-               else
-                  write(*,*) 'global_href_aniso: invalid prism Kref. stop.'
-                  stop
-               endif
+            case('mdlb'); call break(mdle,kref_mdlb)
+            case('mdlp'); call break(mdle,kref_mdlp)
             case default
                write(*,*) 'global_href_aniso: unexpected node type. stop.'
-               stop
+               stop 1
          end select
       endif
    enddo
@@ -122,7 +88,7 @@ subroutine global_href_aniso(Kref)
    call refresh
 !
    if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
-      write(*,100) ' # of elements broken         = ', nr_elements_to_refine
+      write(*,100) ' # of elements broken         = ', nr_elem
       write(*,200) ' # of current elements, nodes = ', NRELES, NRNODS
    endif
  100 format(A,I8)

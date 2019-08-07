@@ -22,7 +22,6 @@ subroutine close_mesh()
 !
    character(4)           :: type
    integer                :: list(2,NRELES)
-   integer                :: mdlel(NRELES)
    integer, dimension(27) :: nodesl,norientl
    integer, dimension(6)  :: kreff
    integer, dimension(12) :: krefe
@@ -59,12 +58,6 @@ subroutine close_mesh()
 !
       list(1:2,1:NRELES) = 0; ic = 0
 !
-      mdle=0
-      do i=1,NRELES
-         call nelcon(mdle, mdle)
-         mdlel(i) = mdle
-      enddo
-!
 !$OMP PARALLEL
 !$OMP DO
       do i=1,NRNODS
@@ -73,7 +66,7 @@ subroutine close_mesh()
 !$OMP END DO
 !$OMP DO PRIVATE(mdle,nodesl,norientl)
       do i=1,NRELES
-         mdle = mdlel(i)
+         mdle = ELEM_ORDER(i)
          call get_connect_info(mdle, nodesl,norientl)
          call flag_constr_parents(mdle)
       enddo
@@ -96,7 +89,7 @@ subroutine close_mesh()
 !$OMP         nflag,krefe,kreff,kref,j)      &
 !$OMP REDUCTION (+:ic)
       do i=1,NRELES
-         mdle=mdlel(i)
+         mdle=ELEM_ORDER(i)
          call elem_nodes(mdle, nodesl,norientl)
 !
          type  = NODES(mdle)%type
