@@ -35,14 +35,13 @@ subroutine exact_error
    iflag(1) = 1
 !
 !..fetch active elements
-   mdle = 0
    if ((DISTRIBUTED) .and. (.not. HOST_MESH)) then
       if (RANK .eq. ROOT) then
          write(*,*) 'exact_error: mesh is distributed. computing error in parallel...'
       endif
       nreles_subd = 0
       do iel=1,NRELES
-         call nelcon(mdle, mdle)
+         mdle = ELEM_ORDER(iel)
          call get_subd(mdle, subd)
          if (subd .eq. RANK) then
             nreles_subd = nreles_subd + 1
@@ -52,10 +51,7 @@ subroutine exact_error
    else
       if (RANK .ne. ROOT) goto 90
       write(*,*) 'exact_error: mesh is not distributed (or on host). computing error on host...'
-      do iel=1,NRELES
-         call nelcon(mdle, mdle)
-         mdle_list(iel) = mdle
-      enddo
+      mdle_list(1:NRELES) = ELEM_ORDER(1:NRELES)
       nreles_subd = NRELES
    endif
 !

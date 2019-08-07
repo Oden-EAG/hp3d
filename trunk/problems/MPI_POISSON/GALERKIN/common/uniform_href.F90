@@ -79,11 +79,10 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
    iflag(1) = 1
 !
 !..fetch active elements
-   mdle = 0
    if ((DISTRIBUTED) .and. (.not. HOST_MESH)) then
       nreles_subd = 0
       do iel=1,NRELES
-         call nelcon(mdle, mdle)
+         mdle = ELEM_ORDER(iel)
          call get_subd(mdle, subd)
          if (subd .eq. RANK) then
             nreles_subd = nreles_subd + 1
@@ -92,10 +91,7 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
       enddo
    else
       if (RANK .ne. ROOT) goto 90
-      do iel=1,NRELES
-         call nelcon(mdle, mdle)
-         mdle_list(iel) = mdle
-      enddo
+      mdle_list(1:NRELES) = ELEM_ORDER(1:NRELES)
       nreles_subd = NRELES
    endif
 !
@@ -179,43 +175,30 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
             call global_href
             call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
             if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2020) end_time-start_time
-            call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-            call close_mesh
-            call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
             if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2025) end_time-start_time
             call update_gdof
             call update_Ddof
          elseif (Nreflag .eq. 2) then
 !        ...anisotropic href (z)
             call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-            call global_href_aniso(1) ! refine in z
+            call global_href_aniso(0,1) ! refine in z
             call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
             if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2020) end_time-start_time
-            call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-            call close_mesh
-            call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
             if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2025) end_time-start_time
             call update_gdof
             call update_Ddof
          elseif (Nreflag .eq. 3) then
 !        ...anisotropic href (z)
             call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-            mdle = 0
-            do iel=1,NRELES
-               call nelcon(mdle, mdle)
-               mdle_list(iel) = mdle
-            enddo
             nrelem_ref = NRELES
             do iel=1,nrelem_ref
-               mdle = mdle_list(iel)
+               mdle = ELEM_ORDER(iel)
                select case(NODES(mdle)%type)
-                  case('mdlb')
-                     kref = 1 ! refine in z
-                  case('mdlp')
-                     kref = 1 ! refine in z
+                  case('mdlb'); kref = 1 ! refine in z
+                  case('mdlp'); kref = 1 ! refine in z
                   case default
                      write(*,*) 'href WARNING: anisoref for unexpected type. stop.'
-                     stop
+                     stop 1
                end select
                call refine(mdle,kref)
             enddo
