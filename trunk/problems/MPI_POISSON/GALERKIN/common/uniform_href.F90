@@ -175,7 +175,6 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
             call global_href
             call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
             if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2020) end_time-start_time
-            if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2025) end_time-start_time
             call update_gdof
             call update_Ddof
          elseif (Nreflag .eq. 2) then
@@ -184,7 +183,6 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
             call global_href_aniso(0,1) ! refine in z
             call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
             if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2020) end_time-start_time
-            if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2025) end_time-start_time
             call update_gdof
             call update_Ddof
          elseif (Nreflag .eq. 3) then
