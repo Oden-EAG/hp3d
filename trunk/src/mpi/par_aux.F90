@@ -215,3 +215,49 @@ subroutine print_subd()
   390 continue
 !
 end subroutine print_subd
+!
+!
+!----------------------------------------------------------------------
+!
+!     subroutine:          print_coord
+!
+!     last modified:       July 2019
+!
+!     purpose:             print current subdomain for each process
+!
+!----------------------------------------------------------------------
+subroutine print_coord()
+!
+   use data_structure3D
+   use par_mesh , only: DISTRIBUTED
+   use mpi_param, only: RANK,ROOT
+!
+   implicit none
+!
+   integer :: par(NRELES)
+   integer :: iel,i,mdle,nrv
+   real*8  :: x(NDIMEN), xnod(NDIMEN,8)
+!
+!----------------------------------------------------------------------
+!
+   if (.not. DISTRIBUTED) then
+      write(*,*) 'print_partition: mesh is not distributed.'
+      return
+   endif
+!
+   write(6,4000) 'partition [', RANK, '] : '
+   do iel=1,NRELES_SUBD
+      mdle = ELEM_SUBD(iel)
+      call nodcor_vert(mdle, xnod)
+      nrv = nvert(NODES(mdle)%type)
+      x(1:3) = 0.d0
+      do i = 1,nrv
+         x(1:3) = x(1:3) + xnod(1:3,i)
+      enddo
+      x(1:3) = x(1:3) / nrv
+      write(*,4010) 'Mdle = ', mdle,', Coords = ', x(1:3)
+   enddo
+  4000 format(A,I4,A)
+  4010 format(A,I5,A,3F6.2)
+!
+end subroutine print_coord

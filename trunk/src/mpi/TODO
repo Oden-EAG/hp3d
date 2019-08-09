@@ -20,19 +20,23 @@ Mesh distribution:
 12. done, timer for data migration and load balancing
 13. done, parallelize initialization routine
 14. done, use MPI_Wtime instead of other timers
-15. distribute geometry dofs, update_gdof
+15. done, distribute geometry dofs, update_gdof
+16. done, node stores too much info; delete unused data (error matrix, etc.)
+17. done, OpenMP parallelize refresh routine
+18. done, OpenMP parallelize close_mesh routine
+19. done, OpenMP parallelize global_pref routine
+20. done, distribute assembly get_info routine
+21. done, graph partitioning with zoltan (parmetis)
 --------------
-16. data migration with zoltan
-17. node stores too much info; delete unused data (what about error matrix?)
-18. not necessary, use non-blocking communication when useful
-   (not useful when unpacking is done right after receive)
-19. not necessary, avoid re-sending/re-receiving edge,face,and vertex dofs
-20. use OpenMP for loops in par_mesh, whenever possible
-21. implement LB weights for elements
+22. implement LB weights for elements
+23. OpenMP parallelize global_href routine
+24. revisit OpenMP parallelization for update_gdof and update_Ddof
+25. remove hard limit on MAXNODES (instead, do realloc with a WARNING, and show time for realloc)
+26. check other loops over NRELES/NRNODS, and parallelize with OpenMP
+27. data migration with zoltan
 
 F --> F90:
-- data_structure3D.F
+- done, data_structure3D.F, and then parallelize loops (e.g., reset_visit)
 
-- do not pass coordinate vector x to nodgen (used for debugging with vertices)
-- delete unnecessary data from the nodes data type
+- done, do not pass coordinate vector x to nodgen (used for debugging with vertices)
 - get rid of Zoltan warning about 'failing to dealloc memory' when 'RETURN_LISTS' is 'EXPORT'

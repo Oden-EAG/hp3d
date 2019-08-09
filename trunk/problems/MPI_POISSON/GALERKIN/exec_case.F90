@@ -44,6 +44,11 @@ subroutine exec_case(idec)
          write(*,*) 'printing current subdomains (nodes)...'
          call print_subd
 !
+!  ...print current partition coordinates
+      case(17)
+         write(*,*) 'printing current partition coordinates...'
+         call print_coord
+!
 !  ...single uniform h-refinement
       case(20)
          write(*,*) 'global h-refinement...'

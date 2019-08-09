@@ -172,6 +172,7 @@ subroutine master_main()
       write(*,*) 'Print data structure arrays............11'
       write(*,*) 'Print current partition (elems)........15'
       write(*,*) 'Print current subdomains (nodes).......16'
+      write(*,*) 'Print partition coordinates............17'
       write(*,*) '                                         '
       write(*,*) '        ---- Refinements ----            '
       write(*,*) 'Single uniform h-refinement............20'
@@ -215,7 +216,7 @@ subroutine master_main()
             if (r .eq. RANK) then
                call exec_case(idec)
             endif
-         case(15,16)
+         case(15,16,17)
             call exec_case(idec)
 !
 !     ...Refinements
@@ -237,6 +238,7 @@ subroutine master_main()
                write(*,*) '  3: RCB'
                write(*,*) '  4: RIB'
                write(*,*) '  5: HSFC'
+               write(*,*) '  6: GRAPH'
                read (*,*) lb
                count = 1; src = ROOT
                call MPI_BCAST (lb,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
@@ -329,7 +331,7 @@ subroutine worker_main()
             if (r .eq. RANK) then
                call exec_case(idec)
             endif
-         case(15,16)
+         case(15,16,17)
             call exec_case(idec)
 !
 !     ...Refinements

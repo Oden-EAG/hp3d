@@ -28,6 +28,7 @@ module zoltan_wrapper
 !  3: RCB    (recursive coordinate bisection)
 !  4: RIB    (recursive inertial bisection)
 !  5: HSFC   (Hilbert space-filling curves)
+!  6: GRAPH  (Graph partitioners: ParMETIS,PT-Scotch)
    integer, save :: ZOLTAN_LB = 0
 !
    contains
@@ -98,7 +99,8 @@ module zoltan_wrapper
       ierr = Zoltan_Set_Fn(zz,ZOLTAN_NUM_GEOM_FN_TYPE,zoltan_w_query_dim)
       call zoltan_w_handle_err(ierr,'Zoltan_Set_Fn')
 !     Return coordinates of an element
-      ierr = Zoltan_Set_Fn(zz,ZOLTAN_GEOM_FN_TYPE,    zoltan_w_query_coords)
+      !ierr = Zoltan_Set_Fn(zz,ZOLTAN_GEOM_FN_TYPE,zoltan_w_query_coords)
+      ierr = Zoltan_Set_Fn(zz,ZOLTAN_GEOM_MULTI_FN_TYPE, zoltan_w_query_coords_omp)
       call zoltan_w_handle_err(ierr,'Zoltan_Set_Fn')
 !     Return number of elements in subdomain
       ierr = Zoltan_Set_Fn(zz,ZOLTAN_NUM_OBJ_FN_TYPE, zoltan_w_query_subd)
@@ -106,13 +108,15 @@ module zoltan_wrapper
 !     Return global IDs of elements in subdomain
       ierr = Zoltan_Set_Fn(zz,ZOLTAN_OBJ_LIST_FN_TYPE,zoltan_w_query_elems)
       call zoltan_w_handle_err(ierr,'Zoltan_Set_Fn')
-!  ...TODO query functions for graph partitioning
 !     Return number of element neighbors for a given element
-      ! ZOLTAN_NUM_EDGES_FN_TYPE
-!     Return lists of global IDs, processor IDs, and optionally edge weights
-!     for objects sharing an edge with a given object
-      ! ZOLTAN_EDGE_LIST_FN_TYPE
-
+      !ierr = Zoltan_Set_Fn(zz,ZOLTAN_NUM_EDGES_FN_TYPE,zoltan_w_query_num_neig)
+      ierr = Zoltan_Set_Fn(zz,ZOLTAN_NUM_EDGES_MULTI_FN_TYPE,zoltan_w_query_num_neig_omp)
+      call zoltan_w_handle_err(ierr,'Zoltan_Set_Fn')
+!     Return lists of neighbors, their owners, and optionally face weights
+!     for elements sharing a face with a given element
+      !ierr = Zoltan_Set_Fn(zz,ZOLTAN_EDGE_LIST_FN_TYPE,zoltan_w_query_neig_list)
+      ierr = Zoltan_Set_Fn(zz,ZOLTAN_EDGE_LIST_MULTI_FN_TYPE,zoltan_w_query_neig_list_omp)
+      call zoltan_w_handle_err(ierr,'Zoltan_Set_Fn')
 !
 !  ...set global IDs to one integer each (mdle)
       ierr = Zoltan_Set_Param(zz,'NUM_GID_ENTRIES','1')
@@ -126,8 +130,12 @@ module zoltan_wrapper
       ierr = Zoltan_Set_Param(zz,'DEBUG_LEVEL','0')
       call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
 !
-!  ...set weights to one floating point value per element
+!  ...set object weights to one floating point value per element
       ierr = Zoltan_Set_Param(zz,'OBJ_WEIGHT_DIM','0')
+      call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
+!
+!  ...set edge weights to one floating point value per neighbor
+      ierr = Zoltan_Set_Param(zz,'EDGE_WEIGHT_DIM','0')
       call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
 !
 !  ...set default timer to MPI_Wtime
@@ -177,6 +185,7 @@ module zoltan_wrapper
          case(3); call zoltan_lb_param_rcb(ierr)
          case(4); call zoltan_lb_param_rib(ierr)
          case(5); call zoltan_lb_param_hsfc(ierr)
+         case(6); call zoltan_lb_param_graph(ierr)
          case default
             write(*,*) 'zoltan_w_set_lb: invalid param LB =', LB
             return
@@ -221,10 +230,53 @@ module zoltan_wrapper
       enddo
       !x(3) = x(3) * 32.d0 ! artificially elongate in Z
       Coords(1:3) = x(1:3) / nrv
+#if DEBUG_MODE
       write(*,200) 'Mdle = ', mdle,', Coords = ', x(1:3)/nrv
   200 format(A,I5,A,3F6.2)
+#endif
       Ierr = ZOLTAN_OK
    end subroutine zoltan_w_query_coords
+!
+!----------------------------------------------------------------------
+!     routine:    zoltan_w_query_coords_omp
+!                 Zoltan query function (ZOLTAN_GEOM_MULTI_FN_TYPE)
+!     purpose:    returns the coordinates of each element in list
+!----------------------------------------------------------------------
+   subroutine zoltan_w_query_coords_omp(Dat,NrGIDs,NrLIDs,NumObj, &
+                                            GIDs,LIDs,NumDim, Coords,Ierr)
+      integer(Zoltan_int) :: Dat(1) ! dummy declaration, do not use
+      integer(Zoltan_int)   , intent(in)  :: NrGIDs,NrLIDs,NumObj
+      integer(Zoltan_int)   , intent(in)  :: GIDs(*)
+      integer(Zoltan_int) :: LIDs(1) ! dummy declaration, do not use
+      integer(Zoltan_int)   , intent(in)  :: NumDim
+      integer(Zoltan_double), intent(out) :: Coords(*)
+      integer(Zoltan_int)   , intent(out) :: Ierr
+      integer :: mdle,i,k,nrv
+      real*8  :: x(NDIMEN), xnod(NDIMEN,8)
+!
+!$OMP PARALLEL DO PRIVATE(mdle,i,nrv,x,xnod)
+      do k = 1,NumObj
+         mdle = GIDs(k)
+         call nodcor_vert(mdle, xnod)
+         nrv = nvert(NODES(mdle)%type)
+         x(1:3) = 0.d0
+         do i = 1,nrv
+            x(1:3) = x(1:3) + xnod(1:3,i)
+         enddo
+         !x(3) = x(3) * 32.d0 ! artificially elongate in Z
+         i = (k-1)*NumDim
+         Coords(i+1:i+3) = x(1:3) / nrv
+#if DEBUG_MODE
+         !$OMP CRITICAL
+         write(*,200) 'Mdle = ', mdle,', Coords = ', x(1:3)/nrv
+     200 format(A,I5,A,3F6.2)
+         !$OMP END CRITICAL
+#endif
+      enddo
+!$OMP END PARALLEL DO
+!
+      Ierr = ZOLTAN_OK
+   end subroutine zoltan_w_query_coords_omp
 !
 !----------------------------------------------------------------------
 !     function:   zoltan_w_query_subd
@@ -238,7 +290,6 @@ module zoltan_wrapper
       zoltan_w_query_subd = NRELES_SUBD
       Ierr = ZOLTAN_OK
    end function zoltan_w_query_subd
-!
 !
 !----------------------------------------------------------------------
 !     routine:    zoltan_w_query_elems
@@ -255,19 +306,202 @@ module zoltan_wrapper
       integer(Zoltan_int), intent(in)  :: Wgt_dim
       real(Zoltan_float) , intent(out) :: Wgts(*)
       integer(Zoltan_int), intent(out) :: Ierr
-      integer :: iel,j,mdle,subd
-      j = 0
-      do iel=1,NRELES
-         mdle = ELEM_ORDER(iel)
-         call get_subd(mdle, subd)
-         if (subd .eq. RANK) then
-            j = j + 1
-            GIDs(j) = mdle
-            if (Wgt_dim > 0) Wgts(j) = 1.0_Zoltan_float
-         endif
+      integer :: iel,mdle
+!$OMP PARALLEL DO PRIVATE(mdle)
+      do iel=1,NRELES_SUBD
+         mdle = ELEM_SUBD(iel)
+         GIDs(iel) = mdle
+         if (Wgt_dim > 0) Wgts(iel) = 1.0_Zoltan_float
       enddo
+!$OMP END PARALLEL DO
       Ierr = ZOLTAN_OK
    end subroutine zoltan_w_query_elems
+!
+!----------------------------------------------------------------------
+!     function:   zoltan_w_query_num_neig
+!                 Zoltan query function (ZOLTAN_NUM_EDGES_FN_TYPE)
+!     purpose :   returns number of neighbors of an element
+!----------------------------------------------------------------------
+   function zoltan_w_query_num_neig(Dat,NrGIDs,NrLIDs,GID,LID, Ierr)
+      integer(Zoltan_int) :: zoltan_w_query_num_neig
+      integer(Zoltan_int) :: Dat(1) ! dummy declaration, do not use
+      integer(Zoltan_int), intent(in)  :: NrGIDs,NrLIDs
+      integer(Zoltan_int), intent(in)  :: GID(1)
+      integer(Zoltan_int) :: LID(1) ! dummy declaration, do not use
+      integer(Zoltan_int), intent(out) :: Ierr
+      integer :: mdle,i,j,num_neig
+      integer :: neig_list(4,6)
+      mdle = GID(1)
+      call find_neig(mdle, neig_list)
+      num_neig = 0
+      do i=1,6
+         do j=1,4
+            if (neig_list(j,i) .ne. 0) num_neig = num_neig + 1
+         enddo
+      enddo
+      zoltan_w_query_num_neig = num_neig
+      Ierr = ZOLTAN_OK
+   end function zoltan_w_query_num_neig
+!
+!----------------------------------------------------------------------
+!   subroutine:   zoltan_w_query_num_neig_omp
+!                 Zoltan query function (ZOLTAN_NUM_EDGES_MULTI_FN_TYPE)
+!     purpose :   returns number of neighbors of each element in list
+!----------------------------------------------------------------------
+   subroutine zoltan_w_query_num_neig_omp(Dat,NrGIDs,NrLIDs,NumObj,GIDs,LIDs, NumNeig,Ierr)
+      integer(Zoltan_int) :: Dat(1) ! dummy declaration, do not use
+      integer(Zoltan_int), intent(in)  :: NrGIDs,NrLIDs,NumObj
+      integer(Zoltan_int), intent(in)  :: GIDs(*)
+      integer(Zoltan_int) :: LIDs(1) ! dummy declaration, do not use
+      integer(Zoltan_int), intent(out) :: NumNeig(*)
+      integer(Zoltan_int), intent(out) :: Ierr
+      integer :: mdle,i,j,k,num_neig
+      integer :: neig_list(4,6)
+!$OMP PARALLEL DO PRIVATE(i,j,k,mdle,neig_list,num_neig)
+      do k = 1,NumObj
+         mdle = GIDs(k)
+         call find_neig(mdle, neig_list)
+         num_neig = 0
+         do i=1,6
+            do j=1,4
+               if (neig_list(j,i) .ne. 0) num_neig = num_neig + 1
+            enddo
+         enddo
+         NumNeig(k) = num_neig
+      enddo
+!$OMP END PARALLEL DO
+      Ierr = ZOLTAN_OK
+   end subroutine zoltan_w_query_num_neig_omp
+!
+!----------------------------------------------------------------------
+!   subroutine:   zoltan_w_query_neig_list
+!                 Zoltan query function (ZOLTAN_EDGE_LIST_MULTI_FN_TYPE)
+!     purpose :   returns list of neighbors of an element, and their
+!                 respective face (connectivity) weights
+!----------------------------------------------------------------------
+   subroutine zoltan_w_query_neig_list(Dat,NrGIDs,NrLIDs,GID,LID, Neig_GIDs,Neig_subd,  &
+                                                         Wgt_dim, Wgts,Ierr)
+      integer(Zoltan_int) :: Dat(1) ! dummy declaration, do not use
+      integer(Zoltan_int), intent(in)  :: NrGIDs,NrLIDs
+      integer(Zoltan_int), intent(in)  :: GID(1)
+      integer(Zoltan_int) :: LID(1) ! dummy declaration, do not use
+      integer(Zoltan_int), intent(out) :: Neig_GIDs(*)
+      integer(Zoltan_int), intent(out) :: Neig_subd(*)
+      integer(Zoltan_int), intent(in)  :: Wgt_dim
+      real(Zoltan_float) , intent(out) :: Wgts(*)
+      integer(Zoltan_int), intent(out) :: Ierr
+      integer :: mdle,i,j,num_neig,neig,subd
+      integer :: neig_list(4,6)
+      mdle = GID(1)
+      call find_neig(mdle, neig_list)
+      num_neig = 0
+      do i=1,6
+         do j=1,4
+            neig = neig_list(j,i)
+            if (neig .ne. 0) then
+               num_neig = num_neig + 1
+               call get_subd(neig, subd)
+               Neig_GIDs(num_neig) = neig
+               Neig_subd(num_neig) = subd
+               if (Wgt_dim > 0) Wgts(num_neig) = 1.0_Zoltan_float
+#if DEBUG_MODE
+               ! DEBUG checks
+               if (NODES(neig)%act .ne. 1) then
+                  write(*,*) 'neig not active'; stop
+               endif
+               if (subd .lt. 0 .or. subd .ge. NUM_PROCS) then
+                  write(*,*) 'neig invalid subd'; stop
+               endif
+               if (neig .eq. mdle) then
+                  write(*,*) 'neig .eq. mdle'; stop
+               endif
+#endif
+            endif
+         enddo
+      enddo
+#if DEBUG_MODE
+      write(*,500) 'Neighbors of mdle = ', mdle
+      do i=1,num_neig
+         write(*,510) '  neig, subd = ', Neig_GIDs(i), Neig_subd(i)
+      enddo
+  500 format(A,I10)
+  510 format(A,I10,I4)
+#endif
+      Ierr = ZOLTAN_OK
+   end subroutine zoltan_w_query_neig_list
+!
+!----------------------------------------------------------------------
+!   subroutine:   zoltan_w_query_neig_list_omp
+!                 Zoltan query function (ZOLTAN_EDGE_LIST_FN_TYPE)
+!     purpose :   returns list of neighbors of each element in list,
+!                 and their respective face (connectivity) weights
+!----------------------------------------------------------------------
+   subroutine zoltan_w_query_neig_list_omp(Dat,NrGIDs,NrLIDs,NumObj,GIDs,LIDs, &
+                                           NumEdges, Neig_GIDs,Neig_subd,      &
+                                           Wgt_dim,  Wgts,Ierr)
+      integer(Zoltan_int) :: Dat(1) ! dummy declaration, do not use
+      integer(Zoltan_int), intent(in)  :: NrGIDs,NrLIDs,NumObj
+      integer(Zoltan_int), intent(in)  :: GIDs(*)
+      integer(Zoltan_int) :: LIDs(1) ! dummy declaration, do not use
+      integer(Zoltan_int), intent(in)  :: NumEdges(*)
+      integer(Zoltan_int), intent(out) :: Neig_GIDs(*)
+      integer(Zoltan_int), intent(out) :: Neig_subd(*)
+      integer(Zoltan_int), intent(in)  :: Wgt_dim
+      real(Zoltan_float) , intent(out) :: Wgts(*)
+      integer(Zoltan_int), intent(out) :: Ierr
+      integer :: mdle,i,j,k,num_neig,neig,subd,nsum
+      integer :: neig_list(4,6)
+      integer :: noffset(NumObj)
+      noffset = 0; nsum = 0
+      do k=1,NumObj
+         noffset(k) = nsum
+         nsum = nsum + NumEdges(k)
+      enddo
+!$OMP PARALLEL DO PRIVATE(i,j,k,mdle,neig_list,num_neig,neig,subd)
+      do k=1,NumObj
+         mdle = GIDs(k)
+         call find_neig(mdle, neig_list)
+         num_neig = 0
+         do i=1,6
+            do j=1,4
+               neig = neig_list(j,i)
+               if (neig .ne. 0) then
+                  num_neig = num_neig + 1
+                  call get_subd(neig, subd)
+                  Neig_GIDs(noffset(k)+num_neig) = neig
+                  Neig_subd(noffset(k)+num_neig) = subd
+                  if (Wgt_dim > 0) Wgts(noffset(k)+num_neig) = 1.0_Zoltan_float
+#if DEBUG_MODE
+                  ! DEBUG checks
+                  !$OMP CRITICAL
+                  if (NODES(neig)%act .ne. 1) then
+                     write(*,*) 'neig not active'; stop
+                  endif
+                  if (subd .lt. 0 .or. subd .ge. NUM_PROCS) then
+                     write(*,*) 'neig invalid subd'; stop
+                  endif
+                  if (neig .eq. mdle) then
+                     write(*,*) 'neig .eq. mdle'; stop
+                  endif
+                  !$OMP END CRITICAL
+#endif
+               endif
+            enddo
+         enddo
+#if DEBUG_MODE
+         !$OMP CRITICAL
+         write(*,600) 'Neighbors of mdle = ', mdle
+         do i=1,num_neig
+            write(*,610) '  neig, subd = ', Neig_GIDs(noffset(k)+i), Neig_subd(noffset(k)+i)
+         enddo
+     600 format(A,I10)
+     610 format(A,I10,I4)
+         !$OMP END CRITICAL
+#endif
+      enddo
+!$OMP END PARALLEL DO
+      Ierr = ZOLTAN_OK
+   end subroutine zoltan_w_query_neig_list_omp
 !
 !----------------------------------------------------------------------
 !     routine:    zoltan_w_partition
@@ -291,8 +525,8 @@ module zoltan_wrapper
       write(*,300) '   changes  = ', changes
       write(*,301) '   nrImp    = ', nrImp
       write(*,301) '   nrExp    = ', nrExp
-      if (nrImp > 0) write(*,310) '   impProcs = ', impProcs
-      if (nrExp > 0) write(*,320) '   expProcs = ', expProcs
+      !if (nrImp > 0) write(*,310) '   impProcs = ', impProcs
+      !if (nrExp > 0) write(*,320) '   expProcs = ', expProcs
   300 format(A,L5)
   301 format(A,I5)
   310 format(A,<nrImp>I5)

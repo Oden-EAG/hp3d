@@ -111,6 +111,26 @@ subroutine zoltan_lb_param_rcb(Ierr_out)
    call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
    if (ierr > Ierr_out) Ierr_out = ierr
 !
+!..RCB_LOCK_DIRECTIONS
+!     0: don't lock directions
+!     1: lock directions
+!   ierr = Zoltan_Set_Param(zz,'RCB_LOCK_DIRECTIONS','1')
+!   call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
+!   if (ierr > Ierr_out) Ierr_out = ierr
+!
+!..RCB_SET_DIRECTIONS
+!     0 = don't order cuts;
+!     1 = xyz; 2 = xzy; 3 = yzx;
+!     4 = yxz; 5 = zxy; 6 = zyx;
+!   ierr = Zoltan_Set_Param(zz,'RCB_SET_DIRECTIONS','6')
+!   call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
+!   if (ierr > Ierr_out) Ierr_out = ierr
+!
+!..RCB_MAX_ASPECT_RATIO
+!   ierr = Zoltan_Set_Param(zz,'RCB_MAX_ASPECT_RATIO','5')
+!   call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
+!   if (ierr > Ierr_out) Ierr_out = ierr
+!
 end subroutine zoltan_lb_param_rcb
 !
 !
@@ -154,6 +174,11 @@ subroutine zoltan_lb_param_rib(Ierr_out)
    call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
    if (ierr > Ierr_out) Ierr_out = ierr
 !
+!..REDUCE_DIMENSIONS
+!   ierr = Zoltan_Set_Param(zz,'REDUCE_DIMENSIONS','1')
+!   call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
+!   if (ierr > Ierr_out) Ierr_out = ierr
+!
 end subroutine zoltan_lb_param_rib
 !
 !
@@ -186,3 +211,67 @@ subroutine zoltan_lb_param_hsfc(Ierr_out)
    if (ierr > Ierr_out) Ierr_out = ierr
 !
 end subroutine zoltan_lb_param_hsfc
+!
+!
+!----------------------------------------------------------------------
+!
+!     routine:    zoltan_lb_param_hsfc
+!     purpose:    set up Hilbert space filling curve load balancer
+!
+!     The following parameters [default values] are available:
+!        GRAPH_PACKAGE [PHG]
+!     ParMETIS parameters:
+!        LB_APPROACH [Repartition]
+!        PARMETIS_METHOD [AdaptiveRepart]
+!        PARMETIS_OUTPUT_LEVEL [0]
+!        PARMETIS_COARSE_ALG [2]
+!        PARMETIS_SEED [15]
+!        PARMETIS_ITR [100]
+!        USE_OBJ_SIZE [1]
+!        CHECK_GRAPH [1]
+!        SCATTER_GRAPH [1]
+!        GRAPH_SYMMETRIZE [NONE]
+!        GRAPH_SYM_WEIGHT [ADD]
+!
+!----------------------------------------------------------------------
+subroutine zoltan_lb_param_graph(Ierr_out)
+   use zoltan_wrapper, only: zz,zoltan_w_handle_err
+   use zoltan
+   implicit none
+   integer(Zoltan_int), intent(out) :: Ierr_out
+   integer(Zoltan_int) :: ierr
+   Ierr_out = ZOLTAN_OK
+!
+   ierr = Zoltan_Set_Param(zz,'LB_METHOD','GRAPH')
+   call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
+   if (ierr > Ierr_out) Ierr_out = ierr
+!
+!..Graph partitioner supports weights
+   ierr = Zoltan_Set_Param(zz,'EDGE_WEIGHT_DIM','1')
+   call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
+   if (ierr > Ierr_out) Ierr_out = ierr
+!
+!..GRAPH_PACKAGE
+!     PHG     : use Zoltan's PHG hypergraph package
+!     PARMETIS: use METIS/ParMETIS ordering
+!     SCOTCH  : use Scotch/PT-Scotch ordering
+   ierr = Zoltan_Set_Param(zz,'GRAPH_PACKAGE','PARMETIS')
+   call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
+   if (ierr > Ierr_out) Ierr_out = ierr
+!
+!..LB_APPROACH
+!     PARTITION  : use Zoltan's PHG hypergraph package
+!     REPARTITION: use METIS/ParMETIS ordering
+!     REFINE     : use Scotch/PT-Scotch ordering
+   ierr = Zoltan_Set_Param(zz,'LB_APPROACH','PARTITION')
+   call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
+   if (ierr > Ierr_out) Ierr_out = ierr
+!
+!..PARMETIS_OUTPUT_LEVEL
+!     0: no output
+!     1: print timing info
+   ierr = Zoltan_Set_Param(zz,'PARMETIS_OUTPUT_LEVEL','0')
+   call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
+   if (ierr > Ierr_out) Ierr_out = ierr
+!
+end subroutine zoltan_lb_param_graph

@@ -10,7 +10,7 @@ subroutine find_neig(Mdle, Neig_list)
   use element_data
   use data_structure3D
   implicit none
-  ! ** Arguements
+  ! ** Arguments
   !---------------------------------------------------
   integer,                 intent(in)  :: Mdle
   integer, dimension(4,6), intent(out) :: Neig_list
@@ -50,7 +50,7 @@ subroutine find_neig(Mdle, Neig_list)
      call neig_face(nod, nrneig,neig,nsid_list,norient_list)
      select case (nrneig)
      case(1)
-        Neig_list(1:4,i) = neig(1)
+        ! Neig_list(1:4,i) = neig(1)
      case(2)
         ! pick the other one
         if (Mdle.eq.neig(1)) then
