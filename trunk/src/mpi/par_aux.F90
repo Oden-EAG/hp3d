@@ -100,6 +100,7 @@ subroutine collect_dofs()
    enddo
    1000 format(A,I2,A,A,I4,A,I6)
 !
+   call update_ELEM_ORDER
    HOST_MESH = .true.
    write(*,*) 'collect_dofs: mesh is now on host, HOST_MESH = .true.'
 !
@@ -126,7 +127,7 @@ subroutine print_partition()
    implicit none
 !
    integer :: par(NRELES)
-   integer :: iel,j,k,l,nreles_subd,mdle,subd
+   integer :: iel,j,k,l,nrelem,mdle,subd
 !
 !----------------------------------------------------------------------
 !
@@ -138,19 +139,19 @@ subroutine print_partition()
    if (RANK .ne. ROOT) goto 290
 !
    do j=0,NUM_PROCS-1
-      nreles_subd = 0
+      nrelem = 0
       do iel=1,NRELES
          mdle = ELEM_ORDER(iel)
          call get_subd(mdle, subd)
          if (j .eq. subd) then
-            nreles_subd = nreles_subd+1
-            par(nreles_subd) = mdle
+            nrelem = nrelem+1
+            par(nrelem) = mdle
          endif
       enddo
       write(6,2000) 'partition [', j, '] : '
       k = 0
-      do while (k .lt. nreles_subd)
-         l = MIN(k+10,nreles_subd)
+      do while (k .lt. nrelem)
+         l = MIN(k+10,nrelem)
          write(6,2010) '     ',par(k+1:l)
          k = l
       enddo

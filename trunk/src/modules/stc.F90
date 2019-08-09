@@ -28,6 +28,7 @@ module stc
 !
    use assembly, only: NR_RHS
    use data_structure3D
+   use par_mesh, only: DISTRIBUTED
 !
 #include "implicit_none.h"
 !
@@ -57,7 +58,8 @@ contains
 !
 !
 subroutine stc_alloc
-   allocate(CLOC(NRELES))
+   if (.not. DISTRIBUTED) NRELES_SUBD = NRELES
+   allocate(CLOC(NRELES_SUBD))
 end subroutine stc_alloc
 !
 !
@@ -520,6 +522,7 @@ end subroutine stc_fwd_gen
 !    arguments:
 !      in:
 !              Iel      - Global element id (used in CLOC)
+!                         Subdomain id (if mesh is distributed)
 !
 !----------------------------------------------------------------------
 subroutine stc_bwd_wrapper(Iel)

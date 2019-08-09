@@ -22,13 +22,12 @@ subroutine exact_error
    implicit none
 !
    integer :: iflag(1)
-   integer :: mdle_list(NRELES)
 !
 !..workspace for element_error routine
    real(8) :: errorH,rnormH,errorE,rnormE
    real(8) :: errorV,rnormV,errorQ,rnormQ
    real(8) :: err,rnorm,error_subd,rnorm_subd
-   integer :: iel,mdle,subd,nreles_subd,count,ierr
+   integer :: iel,mdle,subd,count,ierr
 !
 !----------------------------------------------------------------------
 !
@@ -39,30 +38,21 @@ subroutine exact_error
       if (RANK .eq. ROOT) then
          write(*,*) 'exact_error: mesh is distributed. computing error in parallel...'
       endif
-      nreles_subd = 0
-      do iel=1,NRELES
-         mdle = ELEM_ORDER(iel)
-         call get_subd(mdle, subd)
-         if (subd .eq. RANK) then
-            nreles_subd = nreles_subd + 1
-            mdle_list(nreles_subd) = mdle
-         endif
-      enddo
    else
       if (RANK .ne. ROOT) goto 90
       write(*,*) 'exact_error: mesh is not distributed (or on host). computing error on host...'
-      mdle_list(1:NRELES) = ELEM_ORDER(1:NRELES)
-      nreles_subd = NRELES
+      ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
+      NRELES_SUBD = NRELES
    endif
 !
    error_subd = 0.d0; rnorm_subd = 0.d0
 !
 !$OMP PARALLEL DEFAULT(PRIVATE)              &
-!$OMP SHARED(nreles_subd,iflag,mdle_list)    &
+!$OMP SHARED(NRELES_SUBD,ELEM_SUBD,iflag)    &
 !$OMP REDUCTION(+:error_subd,rnorm_subd)
 !$OMP DO
-   do iel=1,nreles_subd
-      call element_error(mdle_list(iel),iflag,           &
+   do iel=1,NRELES_SUBD
+      call element_error(ELEM_SUBD(iel),iflag,           &
                          errorH,errorE,errorV,errorQ,    &
                          rnormH,rnormE,rnormV,rnormQ)  
       error_subd = error_subd + errorH

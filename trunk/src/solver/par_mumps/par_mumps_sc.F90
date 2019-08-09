@@ -6,7 +6,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-!    latest revision    - July 2019
+!    latest revision    - Aug 2019
 !
 !    purpose            - interface for distributed MUMPS solver
 !                       - routine computes global stiffness matrix
@@ -29,7 +29,8 @@
 ! -----------------------------------------------------------------------
 subroutine par_mumps_sc(mtype)
 !
-   use data_structure3D, only: NRNODS, NRELES, ELEM_ORDER, get_subd
+   use data_structure3D, only: NRNODS, NRELES, NRELES_SUBD,    &
+                               ELEM_ORDER, ELEM_SUBD, get_subd
    use assembly,         only: NR_RHS, MAXDOFM, MAXDOFS,       &
                                MAXbrickH, MAXmdlbH, NRHVAR,    &
                                MAXbrickE, MAXmdlbE, NREVAR,    &
@@ -43,8 +44,10 @@ subroutine par_mumps_sc(mtype)
    use stc,       only: HERM_STC,CLOC,stc_alloc,stc_dealloc,stc_get_nrdof
    use par_mumps, only: mumps_par,mumps_start,mumps_destroy
    use par_mesh , only: DISTRIBUTED,HOST_MESH
-   use mpi_param, only: RANK,ROOT
-   use MPI      , only: MPI_SUM,MPI_REAL8,MPI_COMPLEX16
+   use mpi_param, only: RANK,ROOT,NUM_PROCS
+   use MPI      , only: MPI_SUM,MPI_MIN,MPI_MAX,MPI_IN_PLACE,  &
+                        MPI_INTEGER,MPI_INTEGER8,              &
+                        MPI_REAL8,MPI_COMPLEX16
 !
    implicit none
 !
@@ -57,10 +60,8 @@ subroutine par_mumps_sc(mtype)
    integer, dimension(NR_PHYSA) :: nrdofi,nrdofb
 ! 
 !..integer counters
-   integer    :: nrdof_H,nrdof_E,nrdof_V,nrdof_Q
    integer    :: nrdofm,nrdofc,nrnodm,nrdof,nrdof_mdl,ndof
-   integer    :: iel,mdle,subd,i,j,k,l,k1,k2,nod,idec
-   integer(8) :: nnz,nnz_loc
+   integer    :: iel,mdle,subd,idx,i,j,k,l,k1,k2,nod,idec
 !
 !..MPI variables
    integer :: count,src,ierr
@@ -72,7 +73,12 @@ subroutine par_mumps_sc(mtype)
 !..workspace for celem
    integer, dimension(MAXNODM) :: nodm,ndofmH,ndofmE,ndofmV,ndofmQ
 !
-   integer(8) :: elem_nnz_loc(NRELES)
+!..64 bit non-zero entry counters
+   integer(8) :: nnz,nnz_loc
+   integer(8) :: elem_nnz_loc(NRELES_SUBD)
+!
+!..subdomain dof counters
+   integer :: nrdof_subd(NUM_PROCS)
 !
 !..workspace for right-hand side and solution vector
    VTYPE, allocatable :: RHS(:),SOL(:)
@@ -109,20 +115,6 @@ subroutine par_mumps_sc(mtype)
    NR_RHS = 1
    call mumps_start
 !
-!..calculate maximum number of dofs for a modified element
-!  with static condensation
-   if (ISTC_FLAG) then
-      MAXDOFM = (MAXbrickH-MAXmdlbH)*NRHVAR   &
-              + (MAXbrickE-MAXmdlbE)*NREVAR   &
-              + (MAXbrickV-MAXmdlbV)*NRVVAR
-!  without static condensation
-   else
-      MAXDOFM = MAXbrickH*NRHVAR    & 
-              + MAXbrickE*NREVAR    &
-              + MAXbrickV*NRVVAR    &
-              + MAXbrickQ*NRQVAR
-   endif
-!
 ! ----------------------------------------------------------------------
 !  STEP 1 : 1ST LOOP THROUGH ELEMENTS, 1ST CALL TO CELEM TO GET INFO
 ! ----------------------------------------------------------------------
@@ -134,29 +126,40 @@ subroutine par_mumps_sc(mtype)
       start_time = MPI_Wtime()
    endif
 !
+!..allocate node ownership array
+   allocate(NOD_OWN(NRNODS)); NOD_OWN = NUM_PROCS
+!
+!..compute local node ownership
+!  (assumes node subdomains have previously been set)
+!$OMP PARALLEL DO PRIVATE(nod,subd)
+   do nod=1,NRNODS
+      call get_subd(nod, subd)
+      if (subd .eq. RANK) NOD_OWN(nod) = subd
+   enddo
+!$OMP END PARALLEL DO
+!
+!..compute global node ownership
+   count = NRNODS
+   call MPI_ALLREDUCE(MPI_IN_PLACE,NOD_OWN,count,MPI_INTEGER,MPI_MIN,mumps_par%COMM,ierr)
+!
    allocate(MAXDOFS(NR_PHYSA))
    MAXDOFS = 0; MAXDOFM = 0
 !
-!..allocate and initialize offsets
-   allocate(NFIRSTH(NRNODS)); NFIRSTH = -1
-   allocate(NFIRSTE(NRNODS)); NFIRSTE = -1
-   allocate(NFIRSTV(NRNODS)); NFIRSTV = -1
-   if (.not. ISTC_FLAG) then
-      allocate(NFIRSTQ(NRNODS)); NFIRSTQ = -1
-   endif
+   allocate(NFIRST_DOF(NRNODS)); NFIRST_DOF = -1
 !
 !..Step 1: determine the first dof offsets for active nodes
-   nrdof_H = 0; nrdof_E = 0; nrdof_V = 0; nrdof_Q = 0; nrdof_mdl = 0
+   nrdof = 0; nrdof_mdl = 0; idec = 1
 !
-   idec = 1
 !..non-zero counters for element offsets in distributed sparse stiffness matrix
 !  using 64 bit integers nnz and nnz_loc
    nnz     = 0_8; ! global number of non-zeros in matrix (counts duplicate indices)
    nnz_loc = 0_8; ! local  number of non-zeros in matrix (counts duplicate indices)
-   elem_nnz_loc(1:NRELES) = 0_8 ! local element offsets for subdomain matrix
-   do iel=1,NRELES
-      mdle = ELEM_ORDER(iel)
-      call get_subd(mdle, subd)
+   elem_nnz_loc(1:NRELES_SUBD) = 0_8 ! local element offsets for subdomain matrix
+!
+!..compute offsets for owned nodes
+   ! maybe OMP parallelize later
+   do iel=1,NRELES_SUBD
+      mdle = ELEM_SUBD(iel)
 !  ...get information from celem
       if (ISTC_FLAG) then
          call celem_systemI(iel,mdle,idec, nrdofs,nrdofm,nrdofc,nodm,  &
@@ -167,87 +170,84 @@ subroutine par_mumps_sc(mtype)
       endif
 !
 !  ...nrdofc = number of modified element dof after compression
-!  ...k      = number of non-zeros entries in element stiffness matrix
+!  ...k      = number of non-zero entries in element stiffness matrix
       k = nrdofc**2
 !
-!  ...global counters for OpenMP
-      nnz = nnz + int8(k)
+!  ...subdomain counters for OpenMP
+      elem_nnz_loc(iel) = nnz_loc
+      nnz_loc = nnz_loc + int8(k)
 !
-      if (subd .eq. RANK) then
-!     ...subdomain counters for OpenMP
-         elem_nnz_loc(iel) = nnz_loc
-         nnz_loc = nnz_loc + int8(k)
-!
-!     ...update the maximum number of local dof
-         do i=1,NR_PHYSA
-            MAXDOFS(i) = max0(MAXDOFS(i),nrdofs(i))
-         enddo
-!     ...update the maximum number of modified element dof in the expanded mode
-         MAXDOFM = max0(MAXDOFM,nrdofm)
-      endif
-!
-!  ...compute offsets for H1 dof
-      do i = 1,nrnodm
-         nod = nodm(i)
-!     ...avoid repetition
-         if (NFIRSTH(nod).ge.0) cycle
-!     ...store the first dof offset
-         NFIRSTH(nod) = nrdof_H
-!     ...update the H1 dof counter
-         nrdof_H = nrdof_H + ndofmH(i)
+!  ...update the maximum number of local dof
+      do i=1,NR_PHYSA
+         MAXDOFS(i) = max0(MAXDOFS(i),nrdofs(i))
       enddo
+!  ...update the maximum number of modified element dof in the expanded mode
+      MAXDOFM = max0(MAXDOFM,nrdofm)
 !
-!  ...compute offsets for H(curl) dof
-      do i = 1,nrnodm
-         nod = nodm(i)
-!     ...avoid repetition
-         if (NFIRSTE(nod).ge.0) cycle
-!     ...store the first dof offset
-         NFIRSTE(nod) = nrdof_E
-!     ...update the H(curl) dof counter
-         nrdof_E = nrdof_E + ndofmE(i)
-      enddo
-!
-!  ...compute offsets for H(div) dof
+!  ...compute offsets for nodal dof
       do i=1,nrnodm
          nod = nodm(i)
-!     ...avoid repetition
-         if (NFIRSTV(nod).ge.0) cycle
+!     ...avoid repetition within overlaps with other subdomains
+         if (NOD_OWN(nod) .ne. RANK) cycle
+!     ...avoid repetition within my subdomain
+         if (NFIRST_DOF(nod).ge.0) cycle
 !     ...store the first dof offset
-         NFIRSTV(nod) = nrdof_V
+         NFIRST_DOF(nod) = nrdof
 !     ...update the H(div) dof counter
-         nrdof_V = nrdof_V + ndofmV(i)
+         nrdof = nrdof + ndofmH(i) + ndofmE(i) + ndofmV(i)
       enddo
-!
-      if (.not. ISTC_FLAG) then
-         nod = nodm(nrnodm)
-!     ...avoid repetition
-         if (NFIRSTQ(nod).lt.0) then
-!        ...store the first dof offset
-            NFIRSTQ(nod) = nrdof_Q
-!        ...update the L2 dof counter
-            nrdof_Q = nrdof_Q + ndofmQ(nrnodm)
-         endif
-      endif
+      if (.not. ISTC_FLAG) nrdof = nrdof + ndofmQ(nrnodm)
 !
 !  ...compute number of bubble dof (nrdof_mdl)
       if (ISTC_FLAG) then
          call stc_get_nrdof(mdle, nrdofi,nrdofb)
          nrdof_mdl = nrdof_mdl + sum(nrdofb)
       endif
-!
-!..end of loop through elements
    enddo
 !
-!..total number of (interface) dof is nrdof
-   nrdof = nrdof_H + nrdof_E + nrdof_V + nrdof_Q
+!..compute subdomain offset
+   nrdof_subd(1:NUM_PROCS) = 0
+   nrdof_subd(RANK+1) = nrdof
+   count = NUM_PROCS
+   call MPI_ALLREDUCE(MPI_IN_PLACE,nrdof_subd,count,MPI_INTEGER,MPI_MAX,mumps_par%COMM,ierr)
 !
+!..calculate prefix sum for global offsets
+   nrdof = 0
+   do i = 1,RANK
+      nrdof = nrdof + nrdof_subd(i)
+   enddo
+!$OMP PARALLEL DO
+   do i = 1,NRNODS
+      if (NOD_OWN(i) .eq. RANK) NFIRST_DOF(i) = NFIRST_DOF(i) + nrdof
+   enddo
+!$OMP END PARALLEL DO
+!
+!..communicate offsets (to receive offsets for non-owned nodes within subdomain)
+   count = NRNODS
+   call MPI_ALLREDUCE(MPI_IN_PLACE,NFIRST_DOF,count,MPI_INTEGER,MPI_MAX,mumps_par%COMM,ierr)
+!
+!..calculate total number of (interface) dofs
+   nrdof = 0
+   do i = 1,NUM_PROCS
+      nrdof = nrdof + nrdof_subd(i)
+   enddo
+!
+!..compute total number of condensed bubble dofs
+   count = 1
+   call MPI_ALLREDUCE(MPI_IN_PLACE,nrdof_mdl,count,MPI_INTEGER,MPI_SUM,mumps_par%COMM,ierr)
+!
+!..compute total number of non-zeros in global matrix
+   count = 1
+   call MPI_ALLREDUCE(nnz_loc,nnz,count,MPI_INTEGER8,MPI_SUM,mumps_par%COMM,ierr)
+!
+!..total number of (interface) dof is nrdof
    NRDOF_CON = nrdof
    NRDOF_TOT = nrdof + nrdof_mdl
 !
+   deallocate(NOD_OWN)
+!
    if (nrdof .eq. 0) then
-      deallocate(MAXDOFS,NFIRSTH,NFIRSTE,NFIRSTV)
-      if (.not. ISTC_FLAG) deallocate(NFIRSTQ)
+      deallocate(NFIRST_DOF)
       if (RANK .eq. ROOT) write(*,*) 'par_mumps_sc: nrdof = 0. returning.'
       return
    endif
@@ -277,7 +277,7 @@ subroutine par_mumps_sc(mtype)
    write(*,2010) '[', RANK, '] Local non-zeros: nnz_loc   = ', nnz_loc
 2010 format(A,I4,A,I12)
 !
-!..use 64bit parallel analysis if nnz_loc > 2B
+!..use 64bit parallel analysis if nnz > 2B
 !  (sequential metis/scotch using 32bit currently)
    if (nnz > 2e9) mumps_par%icntl(28) = 2
 !
@@ -337,10 +337,8 @@ subroutine par_mumps_sc(mtype)
 !$OMP DO                 &
 !$OMP SCHEDULE(DYNAMIC)  &
 !$OMP REDUCTION(+:RHS)
-   do iel=1,NRELES
-      mdle = ELEM_ORDER(iel)
-      call get_subd(mdle, subd)
-      if (subd .ne. RANK) cycle
+   do iel=1,NRELES_SUBD
+      mdle = ELEM_SUBD(iel)
       if (ISTC_FLAG) then
          call celem_systemI(iel,mdle,idec, nrdofs,nrdofm,nrdofc,nodm,  &
             ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,ZLOAD,ZTEMP)
@@ -350,13 +348,14 @@ subroutine par_mumps_sc(mtype)
       endif
 !
 !  ...determine local to global dof connectivities
-      l=0
+      l=0 ! element dof counter
+!
 !  ...H1 dof
       do i = nrnodm,1,-1
          nod = nodm(i)
          do j=1,ndofmH(i)
             l=l+1
-            LCON(l) = NFIRSTH(nod)+j
+            LCON(l) = NFIRST_DOF(nod)+j
          enddo
       enddo
 !  ...H(curl) dof
@@ -364,7 +363,7 @@ subroutine par_mumps_sc(mtype)
          nod = nodm(i)
          do j=1,ndofmE(i)
             l=l+1
-            LCON(l) = nrdof_H + NFIRSTE(nod)+j
+            LCON(l) = NFIRST_DOF(nod)+ndofmH(i)+j
          enddo
       enddo
 !  ...H(div) dof
@@ -372,7 +371,7 @@ subroutine par_mumps_sc(mtype)
          nod = nodm(i)
          do j=1,ndofmV(i)
             l=l+1
-            LCON(l) = nrdof_H + nrdof_E + NFIRSTV(nod)+j
+            LCON(l) = NFIRST_DOF(nod)+ndofmH(i)+ndofmE(i)+j
          enddo
       enddo
 !  ...L2 dof
@@ -380,7 +379,7 @@ subroutine par_mumps_sc(mtype)
          nod = nodm(nrnodm)
          do j=1,ndofmQ(nrnodm)
             l=l+1
-            LCON(l) = nrdof_H + nrdof_E + nrdof_V + NFIRSTQ(nod)+j
+            LCON(l) = NFIRST_DOF(nod)+ndofmH(nrnodm)+ndofmE(nrnodm)+ndofmV(nrnodm)+j
          enddo
       endif
 !
@@ -434,6 +433,8 @@ subroutine par_mumps_sc(mtype)
       if (RANK .eq. ROOT) write(*,1004) Mtime(2)
  1004 format(' STEP 2 finished: ',f12.5,'  seconds',/)
    endif
+!
+   deallocate(NFIRST_DOF)
 !
 !----------------------------------------------------------------------
 !  STEP 3: call mumps to solve the linear system
@@ -523,7 +524,7 @@ subroutine par_mumps_sc(mtype)
 !
 !..MUMPS solve
    mumps_par%JOB = 3
-! 
+!
   if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(mumps_par%COMM, ierr)
       time_stamp = MPI_Wtime()
@@ -589,19 +590,15 @@ subroutine par_mumps_sc(mtype)
    ndof = 0
 !$OMP PARALLEL PRIVATE(mdle,subd)
 !$OMP DO REDUCTION(MAX:ndof)
-   do iel=1,NRELES
-      mdle = ELEM_ORDER(iel)
-      call get_subd(mdle, subd)
-      if (subd .ne. RANK) cycle
+   do iel=1,NRELES_SUBD
+      mdle = ELEM_SUBD(iel)
       if (CLOC(iel)%ni > ndof) ndof = CLOC(iel)%ni
    enddo
 !$OMP END DO
    allocate(ZSOL_LOC(ndof))
 !$OMP DO PRIVATE(i,k1) SCHEDULE(DYNAMIC)
-   do iel=1,NRELES
-      mdle = ELEM_ORDER(iel)
-      call get_subd(mdle, subd)
-      if (subd .ne. RANK) cycle
+   do iel=1,NRELES_SUBD
+      mdle = ELEM_SUBD(iel)
       ZSOL_LOC=ZERO
       do k1=1,CLOC(iel)%ni
          i = CLOC(iel)%con(k1)
@@ -628,8 +625,6 @@ subroutine par_mumps_sc(mtype)
 !
    deallocate(SOL)
    deallocate(MAXDOFS)
-   deallocate(NFIRSTH,NFIRSTE,NFIRSTV)
-   if (.not. ISTC_FLAG) deallocate(NFIRSTQ)
    call stc_dealloc
 !
 !..Destroy the instance (deallocate internal data structures)

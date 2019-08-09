@@ -1,5 +1,5 @@
 !----------------------------------------------------------------------
-!   latest revision    - July 2019
+!   latest revision    - Aug 2019
 !
 !   purpose            - module defines date structure arrays
 !----------------------------------------------------------------------
@@ -9,6 +9,7 @@ module data_structure3D
       use physics
       use parameters
       use element_data
+      use mpi_param, only: RANK
 !
 !  ...parameters
       integer, parameter :: NHIST = 20
@@ -20,8 +21,8 @@ module data_structure3D
       integer, save :: NR_DIRICHLET_HOMOGENEOUS_LIST = 0
       integer, save, dimension(20) :: DIRICHLET_HOMOGENEOUS_LIST
 !
-!  ...number of initial mesh elements, active elements, nodes
-      integer, save :: NRELIS,NRELES,NRNODS
+!  ...number of initial mesh elements, active elements (global,local), nodes
+      integer, save :: NRELIS,NRELES,NRELES_SUBD,NRNODS
 !
 !  ...total number of active H1,H(curl),H(div),L2 dofs
       integer, save :: NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ
@@ -190,7 +191,9 @@ module data_structure3D
       type(element), allocatable, save  :: ELEMS(:)
       type(node)   , allocatable, save  :: NODES(:)
 !
+!  ...global and local (subdomain) order of elements
       integer      , allocatable, save  :: ELEM_ORDER(:)
+      integer      , allocatable, save  :: ELEM_SUBD(:)
 !
 !-----------------------------------------------------------------------
 !
@@ -201,11 +204,17 @@ module data_structure3D
       subroutine update_ELEM_ORDER()
          integer :: iel,mdle
          if (allocated(ELEM_ORDER)) deallocate(ELEM_ORDER)
+         if (allocated(ELEM_SUBD))  deallocate(ELEM_SUBD)
          allocate(ELEM_ORDER(NRELES))
-         mdle = 0
+         allocate(ELEM_SUBD(NRELES))
+         mdle = 0; NRELES_SUBD = 0
          do iel=1,NRELES
             call nelcon(mdle, mdle)
             ELEM_ORDER(iel) = mdle
+            if (NODES(mdle)%subd .eq. RANK) then
+               NRELES_SUBD = NRELES_SUBD + 1
+               ELEM_SUBD(NRELES_SUBD) = mdle
+            endif
          enddo
       end subroutine
 !

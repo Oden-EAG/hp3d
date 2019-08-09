@@ -106,6 +106,13 @@ module zoltan_wrapper
 !     Return global IDs of elements in subdomain
       ierr = Zoltan_Set_Fn(zz,ZOLTAN_OBJ_LIST_FN_TYPE,zoltan_w_query_elems)
       call zoltan_w_handle_err(ierr,'Zoltan_Set_Fn')
+!  ...TODO query functions for graph partitioning
+!     Return number of element neighbors for a given element
+      ! ZOLTAN_NUM_EDGES_FN_TYPE
+!     Return lists of global IDs, processor IDs, and optionally edge weights
+!     for objects sharing an edge with a given object
+      ! ZOLTAN_EDGE_LIST_FN_TYPE
+
 !
 !  ...set global IDs to one integer each (mdle)
       ierr = Zoltan_Set_Param(zz,'NUM_GID_ENTRIES','1')
@@ -212,8 +219,9 @@ module zoltan_wrapper
       do i = 1,nrv
          x(1:3) = x(1:3) + xnod(1:3,i)
       enddo
+      !x(3) = x(3) * 32.d0 ! artificially elongate in Z
       Coords(1:3) = x(1:3) / nrv
-      !write(*,200) 'Mdle = ', mdle,', Coords = ', x(1:3)/nrv
+      write(*,200) 'Mdle = ', mdle,', Coords = ', x(1:3)/nrv
   200 format(A,I5,A,3F6.2)
       Ierr = ZOLTAN_OK
    end subroutine zoltan_w_query_coords
@@ -227,17 +235,7 @@ module zoltan_wrapper
       integer(Zoltan_int) :: zoltan_w_query_subd
       integer(Zoltan_int) :: Dat(1) ! dummy declaration, do not use
       integer(Zoltan_int), intent(out) :: Ierr
-      integer(Zoltan_int) :: nreles_subd
-      integer :: iel,mdle,subd
-      Nreles_subd = 0_Zoltan_int
-      do iel=1,NRELES
-         mdle = ELEM_ORDER(iel)
-         call get_subd(mdle, subd)
-         if (subd .eq. RANK) then
-            Nreles_subd = Nreles_subd + 1_Zoltan_int
-         endif
-      enddo
-      zoltan_w_query_subd = Nreles_subd
+      zoltan_w_query_subd = NRELES_SUBD
       Ierr = ZOLTAN_OK
    end function zoltan_w_query_subd
 !
@@ -289,12 +287,12 @@ module zoltan_wrapper
                                      nrExp,expGIDs,expLIDs,expProcs,expParts )
       call zoltan_w_handle_err(ierr,'Zoltan_LB_Partition')
 !
-      !write(*,*) 'zoltan_w_partition:'
-      !write(*,300) '   changes  = ', changes
-      !write(*,301) '   nrImp    = ', nrImp
-      !write(*,301) '   nrExp    = ', nrExp
-      !if (nrImp > 0) write(*,310) '   impProcs = ', impProcs
-      !if (nrExp > 0) write(*,320) '   expProcs = ', expProcs
+      write(*,*) 'zoltan_w_partition:'
+      write(*,300) '   changes  = ', changes
+      write(*,301) '   nrImp    = ', nrImp
+      write(*,301) '   nrExp    = ', nrExp
+      if (nrImp > 0) write(*,310) '   impProcs = ', impProcs
+      if (nrExp > 0) write(*,320) '   expProcs = ', expProcs
   300 format(A,L5)
   301 format(A,I5)
   310 format(A,<nrImp>I5)

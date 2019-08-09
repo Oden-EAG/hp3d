@@ -47,11 +47,10 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
    integer, save :: irefineold = 0
 !
    integer :: iflag(1)
-   integer :: mdle_list(NRELES)
    real*8  :: errorH,errorE,errorV,errorQ
    real*8  :: rnormH,rnormE,rnormV,rnormQ
    real*8  :: error_tot,rnorm_tot,error_subd,rnorm_subd
-   integer :: i,iel,mdle,subd,nreles_subd,count,ierr,nrelem_ref,kref
+   integer :: i,iel,mdle,subd,count,ierr,nrelem_ref,kref
    integer :: iprint
 !
    real(8) :: MPI_Wtime,start_time,end_time
@@ -79,30 +78,20 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
    iflag(1) = 1
 !
 !..fetch active elements
-   if ((DISTRIBUTED) .and. (.not. HOST_MESH)) then
-      nreles_subd = 0
-      do iel=1,NRELES
-         mdle = ELEM_ORDER(iel)
-         call get_subd(mdle, subd)
-         if (subd .eq. RANK) then
-            nreles_subd = nreles_subd + 1
-            mdle_list(nreles_subd) = mdle
-         endif
-      enddo
-   else
-      if (RANK .ne. ROOT) goto 90
-      mdle_list(1:NRELES) = ELEM_ORDER(1:NRELES)
-      nreles_subd = NRELES
+   if (.not. DISTRIBUTED) then
+      ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
+      NRELES_SUBD = NRELES
    endif
+   
 !
    error_subd = 0.d0; rnorm_subd = 0.d0
 !
 !$OMP PARALLEL DEFAULT(PRIVATE)              &
-!$OMP SHARED(nreles_subd,iflag,mdle_list)    &
+!$OMP SHARED(NRELES_SUBD,ELEM_SUBD,iflag)    &
 !$OMP REDUCTION(+:error_subd,rnorm_subd)
 !$OMP DO
-   do iel=1,nreles_subd
-      call element_error(mdle_list(iel),iflag,           &
+   do iel=1,NRELES_SUBD
+      call element_error(ELEM_SUBD(iel),iflag,           &
                          errorH,errorE,errorV,errorQ,    &
                          rnormH,rnormE,rnormV,rnormQ)
       error_subd = error_subd + errorH

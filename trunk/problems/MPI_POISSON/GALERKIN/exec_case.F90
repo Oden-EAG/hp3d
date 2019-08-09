@@ -48,7 +48,6 @@ subroutine exec_case(idec)
       case(20)
          write(*,*) 'global h-refinement...'
          call global_href
-         call close_mesh
          call update_gdof
          call update_Ddof
 !
@@ -56,13 +55,19 @@ subroutine exec_case(idec)
       case(21)
          write(*,*) 'global p-refinement...'
          call global_pref
-         call close_mesh ! not needed?
          call update_gdof
          call update_Ddof
 !
 !  ...Multi-step uniform h refinement
       case(22)
          call href_solve
+!
+!  ...single anisotropic h-refinement (in z)
+      case(23)
+         write(*,*) 'global anisotropic h-refinement...'
+         call global_href_aniso(0,1)
+         call update_gdof
+         call update_Ddof
 !
 !  ...distribute mesh
       case(30)

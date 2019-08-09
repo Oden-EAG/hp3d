@@ -25,6 +25,10 @@ module assembly_sc
 !
 !..offsets for each energy space
    integer, allocatable :: NFIRSTH(:),NFIRSTE(:),NFIRSTV(:),NFIRSTQ(:)
+   integer, allocatable :: NFIRST_DOF(:)
+!
+!..node ownership array for distributed mesh
+   integer, allocatable :: NOD_OWN(:)
 !
 !..number of degrees of freedom
    integer :: NRDOF_CON,NRDOF_TOT

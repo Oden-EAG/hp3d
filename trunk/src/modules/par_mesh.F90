@@ -144,19 +144,19 @@ subroutine distr_mesh()
    120 format(' migration time: ',f12.5,' seconds')
    130 format(A,I2,A,A,I4,A,I6)
 !
-!..4. Reset subdomain values for all nodes
-!$OMP PARALLEL DO SCHEDULE(STATIC) PRIVATE(nod)
-   do nod=1,NRNODS
-      call set_subd(nod,-1)
-   enddo
-!$OMP END PARALLEL DO
-!
    50 continue
 !
 !$OMP PARALLEL PRIVATE(iel,mdle,nod,subd)
 !
+!..4. Reset subdomain values for all nodes
+!$OMP DO
+   do nod=1,NRNODS
+      call set_subd(nod,-1)
+   enddo
+!$OMP END DO
+!
 !..5. Set new subdomains for middle nodes (elements) everywhere
-!$OMP DO SCHEDULE(STATIC)
+!$OMP DO
    do iel=1,NRELES
       mdle = ELEM_ORDER(iel)
       call set_subd(mdle,subd_next(iel))
@@ -164,7 +164,7 @@ subroutine distr_mesh()
 !$OMP END DO
 !
 !..6. Set subdomain values for all nodes within subdomain
-!$OMP DO SCHEDULE(STATIC)
+!$OMP DO SCHEDULE(DYNAMIC)
    do iel=1,NRELES
       if (subd_next(iel) .eq. RANK) then
          mdle = ELEM_ORDER(iel)
@@ -174,7 +174,7 @@ subroutine distr_mesh()
 !$OMP END DO
 !
 !..7. Delete degrees of freedom for NODES outside of subdomain
-!$OMP DO SCHEDULE(STATIC)
+!$OMP DO
    do nod=1,NRNODS
       call get_subd(nod, subd)
       if (subd .ne. RANK .and. Is_active(nod)) then
@@ -187,6 +187,7 @@ subroutine distr_mesh()
 !
    if (NUM_PROCS > 1) HOST_MESH = .false.
    DISTRIBUTED = .true.
+   call update_ELEM_ORDER
 !
    if ((.not. EXCHANGE_DOF) .and. (.not. HOST_MESH)) then 
       call update_gdof
@@ -212,24 +213,6 @@ subroutine get_elem_nodes(Mdle, Nodm,Nrnodm)
    call get_connect_info(Mdle, nodesl,norientl)
    call logic_nodes(Mdle,nodesl, Nodm,Nrnodm)
 end subroutine get_elem_nodes
-!
-!----------------------------------------------------------------------
-!     routine:    get_subd_size
-!     purpose:    get number of elements in subdomain
-!----------------------------------------------------------------------
-subroutine get_subd_size(Subd, Nreles_subd)
-   integer, intent(in)  :: Subd
-   integer, intent(out) :: Nreles_subd
-   integer :: iel,mdle,mdle_subd
-   Nreles_subd = 0
-   do iel=1,NRELES
-      mdle = ELEM_ORDER(iel)
-      call get_subd(mdle, mdle_subd)
-      if (mdle_subd .eq. Subd) then
-         Nreles_subd = Nreles_subd + 1
-      endif
-   enddo
-end subroutine get_subd_size
 !
 !----------------------------------------------------------------------
 !     routine:    set_subd_elem

@@ -49,15 +49,9 @@ subroutine update_gdof()
 !..auxiliary variables for timing
    real(8) :: MPI_Wtime,start_time,end_time
 !
-!..auxiliary array with active mdle nodes
-   integer :: mdlel(NRELES)
-!
 !..auxiliary variables
    integer :: iel, iv, ie, ifc, ind, iflag, i, k, loc, ierr
    integer :: mdle, nf, no, nod, nr_elem_nodes, nrnodm, nr_up_elem
-!
-!..number of elements in subdomain
-   integer :: nreles_subd, subd
 !
 !-----------------------------------------------------------------------
 !
@@ -74,19 +68,9 @@ subroutine update_gdof()
 !-----------------------------------------------------------------------  
 !
 !..fetch active elements
-   if (DISTRIBUTED) then
-      nreles_subd = 0
-      do iel=1,NRELES
-         mdle = ELEM_ORDER(iel)
-         call get_subd(mdle, subd)
-         if (subd .eq. RANK) then
-            nreles_subd = nreles_subd + 1
-            mdlel(nreles_subd) = mdle
-         endif
-      enddo
-   else
-      mdlel(1:NRELES) = ELEM_ORDER(1:NRELES)
-      nreles_subd = NRELES
+   if (.not. DISTRIBUTED) then
+      ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
+      NRELES_SUBD = NRELES
    endif
 !
 !-----------------------------------------------------------------------
@@ -98,9 +82,9 @@ subroutine update_gdof()
       nr_up_elem=0
 !
 !  ...loop through active elements
-      do 100 iel=1,nreles_subd
+      do 100 iel=1,NRELES_SUBD
 !
-         mdle = mdlel(iel)
+         mdle = ELEM_SUBD(iel)
          call find_elem_type(mdle, mdltype)
 !
 !     ...skip if the element has already been processed
@@ -218,8 +202,8 @@ subroutine update_gdof()
 !$OMP PRIVATE(iflag,mdle,mdltype,nedge_orient,nface_orient, &
 !$OMP         no,norder,ntype,xnod,xsub)                    &
 !$OMP SCHEDULE(DYNAMIC)
-   do iel=1,nreles_subd
-      mdle = mdlel(iel)
+   do iel=1,NRELES_SUBD
+      mdle = ELEM_SUBD(iel)
       if (.not.associated(NODES(mdle)%coord)) cycle
       call find_elem_type(mdle, mdltype)
       if (mdltype .ne. 'Linear') then
