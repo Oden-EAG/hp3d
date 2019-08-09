@@ -65,7 +65,9 @@ c  ...go up the tree to find the initial mesh ancestor
         nfather_ref_kind(igen) = NODES(nfath)%ref_kind
         call nr_mdle_sons(NODES(nfath)%type, NODES(nfath)%ref_kind,
      .                    nrsons)
-        call locate(nson,NODES(nfath)%sons,nrsons, noson(igen))
+c        call locate(nson,NODES(nfath)%sons,nrsons, noson(igen))
+        noson(igen) = nson - NODES(nfath)%first_son + 1
+c        if (noson(igen)<0 .or. noson(igen)>nrsons) call pause
 c        
 c  .....extensive printing        
         if (iprint.ge.2) then

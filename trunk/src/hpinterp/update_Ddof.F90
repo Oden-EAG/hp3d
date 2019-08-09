@@ -1,3 +1,4 @@
+#include "implicit_none.h"
 !-----------------------------------------------------------------------
 !
 !    routine name       - update_Ddof
@@ -23,8 +24,6 @@ subroutine update_Ddof()
 !
    implicit none
 !
-#include "implicit_none.h"
-!
 !..orientation of element nodes
    integer, dimension(12) :: nedge_orient
    integer, dimension(6)  :: nface_orient
@@ -47,38 +46,18 @@ subroutine update_Ddof()
 !..auxiliary variables for timing
    real(8) :: MPI_Wtime,start_time,end_time
 !
-!..auxiliary array with active mdle nodes
-   integer :: mdlel(NRELES)
-!
 !..auxiliary variables
    integer :: iel, iv, ie, ifc, ind, iflag, ierr
    integer :: k, mdle, nf, no, nod
-!
-!..number of elements in subdomain
-   integer :: nreles_subd, subd
 !
 !-----------------------------------------------------------------------
 !
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 !
 !..fetch active elements
-   mdle = 0;
-   if (DISTRIBUTED) then
-      nreles_subd = 0
-      do iel=1,NRELES
-         call nelcon(mdle, mdle)
-         call get_subd(mdle, subd)
-         if (subd .eq. RANK) then
-            nreles_subd = nreles_subd + 1
-            mdlel(nreles_subd) = mdle
-         endif
-      enddo
-   else
-      do iel=1,NRELES
-         call nelcon(mdle, mdle)
-         mdlel(iel) = mdle
-      enddo
-      nreles_subd = NRELES
+   if (.not. DISTRIBUTED) then
+      ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
+      NRELES_SUBD = NRELES
    endif
 !
 !-----------------------------------------------------------------------
@@ -101,8 +80,8 @@ subroutine update_Ddof()
 !  Step 1: Update   V E R T   dof for Dirichlet nodes
 !
 !$OMP DO SCHEDULE(DYNAMIC)
-   do iel=1,nreles_subd
-      mdle = mdlel(iel)
+   do iel=1,NRELES_SUBD
+      mdle = ELEM_SUBD(iel)
       call refel(mdle, iflag,no,xsub)
       call elem_nodes(mdle, nodesl,norientl)
       do iv=1,nvert(NODES(mdle)%type)
@@ -130,8 +109,8 @@ subroutine update_Ddof()
 !  Step 2: Update   E D G E   dof for Dirichlet nodes
 !
 !$OMP DO SCHEDULE(DYNAMIC)
-   do iel=1,nreles_subd
-      mdle = mdlel(iel)
+   do iel=1,NRELES_SUBD
+      mdle = ELEM_SUBD(iel)
       call refel(mdle, iflag,no,xsub)
       call elem_nodes(mdle, nodesl,norientl)
       call find_orient(mdle, nedge_orient,nface_orient)
@@ -183,8 +162,8 @@ subroutine update_Ddof()
 !  Step 3: Update   F A C E   dof for Dirichlet nodes
 !
 !$OMP DO SCHEDULE(DYNAMIC)
-   do iel=1,nreles_subd
-      mdle = mdlel(iel)
+   do iel=1,NRELES_SUBD
+      mdle = ELEM_SUBD(iel)
       call refel(mdle, iflag,no,xsub)
       call elem_nodes(mdle, nodesl,norientl)
       call find_orient(mdle, nedge_orient,nface_orient)

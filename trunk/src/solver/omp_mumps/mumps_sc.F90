@@ -24,7 +24,7 @@
 ! ----------------------------------------------------------------------
 subroutine mumps_sc(mtype)
 !
-   use data_structure3D, only: NRNODS, NRELES
+   use data_structure3D, only: NRNODS, NRELES, ELEM_ORDER
    use assembly,         only: NR_RHS, MAXDOFM, MAXDOFS,       &
                                MAXbrickH, MAXmdlbH, NRHVAR,    &
                                MAXbrickE, MAXmdlbE, NREVAR,    &
@@ -51,10 +51,8 @@ subroutine mumps_sc(mtype)
    integer, dimension(NR_PHYSA) :: nrdofi,nrdofb
 ! 
 !..integer counters
-   integer    :: nrdof_H,nrdof_E,nrdof_V,nrdof_Q
    integer    :: nrdofm,nrdofc,nrnodm,nrdof,nrdof_mdl,ndof
    integer    :: iel,mdle,i,j,k,l,k1,k2,nod
-   integer(8) :: nnz
 !
 !..dummy variables
    integer :: nvoid
@@ -62,7 +60,9 @@ subroutine mumps_sc(mtype)
 !
 !..work space for celem
    integer, dimension(MAXNODM) :: nodm,ndofmH,ndofmE,ndofmV,ndofmQ
-   integer    :: mdle_list(NRELES)
+!
+!..64 bit non-zero entry counters
+   integer(8) :: nnz
    integer(8) :: elem_nnz(NRELES)
 !
    VTYPE, allocatable :: RHS(:)
@@ -100,19 +100,6 @@ subroutine mumps_sc(mtype)
    NR_RHS = 1
    call mumps_start
 !
-!..case with static condensation
-   if (ISTC_FLAG) then
-      MAXDOFM = (MAXbrickH-MAXmdlbH)*NRHVAR   &
-              + (MAXbrickE-MAXmdlbE)*NREVAR   &
-              + (MAXbrickV-MAXmdlbV)*NRVVAR
-!..no static condensation
-   else
-      MAXDOFM = MAXbrickH*NRHVAR    & 
-              + MAXbrickE*NREVAR    &
-              + MAXbrickV*NRVVAR    &
-              + MAXbrickQ*NRQVAR
-   endif
-!
 ! ----------------------------------------------------------------------
 !  STEP 1 : 1ST LOOP THROUGH ELEMENTS, 1ST CALL TO CELEM TO GET INFO
 ! ----------------------------------------------------------------------
@@ -128,22 +115,15 @@ subroutine mumps_sc(mtype)
    MAXDOFS = 0; MAXDOFM = 0
 !
 !..allocate and initialize offsets
-   allocate(NFIRSTH(NRNODS)); NFIRSTH = -1
-   allocate(NFIRSTE(NRNODS)); NFIRSTE = -1
-   allocate(NFIRSTV(NRNODS)); NFIRSTV = -1
-   if (.not. ISTC_FLAG) then
-      allocate(NFIRSTQ(NRNODS)); NFIRSTQ = -1
-   endif
+   allocate(NFIRST_DOF(NRNODS)); NFIRST_DOF = -1
 !
 !..Step 1: determine the first dof offsets for active nodes
-   nrdof_H = 0; nrdof_E = 0; nrdof_V = 0; nrdof_Q = 0; nrdof_mdl = 0
+   nrdof = 0; nrdof_mdl = 0
 !
-   mdle = 0
 !..matrix non-zero entries counter (and element offsets)
    nnz = 0_8 ; elem_nnz(1:NRELES) = 0_8
    do iel=1,NRELES
-      call nelcon(mdle, mdle)
-      mdle_list(iel) = mdle
+      mdle = ELEM_ORDER(iel)
 !  ...get information from celem
       if (ISTC_FLAG) then
          !write(*,*) 'celem_systemI, iel = ', iel
@@ -168,50 +148,19 @@ subroutine mumps_sc(mtype)
 !  ...update the maximum number of modified element dof in the expanded mode
       MAXDOFM = max0(MAXDOFM,nrdofm)
 !
-!  ...compute offsets for H1 dof
-      do i = 1,nrnodm
-         nod = nodm(i)
-!     ...avoid repetition
-         if (NFIRSTH(nod).ge.0) cycle
-!     ...store the first dof offset
-         NFIRSTH(nod) = nrdof_H
-!     ...update the H1 dof counter
-         nrdof_H = nrdof_H + ndofmH(i)
-      enddo
-!
-!  ...compute offsets for H(curl) dof
-      do i = 1,nrnodm
-         nod = nodm(i)
-!     ...avoid repetition
-         if (NFIRSTE(nod).ge.0) cycle
-!     ...store the first dof offset
-         NFIRSTE(nod) = nrdof_E
-!     ...update the H(curl) dof counter
-         nrdof_E = nrdof_E + ndofmE(i)
-      enddo
-!
-!  ...compute offsets for H(div) dof
+!  ...compute offsets for nodal dof
       do i=1,nrnodm
          nod = nodm(i)
 !     ...avoid repetition
-         if (NFIRSTV(nod).ge.0) cycle
+         if (NFIRST_DOF(nod).ge.0) cycle
 !     ...store the first dof offset
-         NFIRSTV(nod) = nrdof_V
+         NFIRST_DOF(nod) = nrdof
 !     ...update the H(div) dof counter
-         nrdof_V = nrdof_V + ndofmV(i)
+         nrdof = nrdof + ndofmH(i) + ndofmE(i) + ndofmV(i)
       enddo
+      if (.not. ISTC_FLAG) nrdof = nrdof + ndofmQ(nrnodm)
 !
-      if (.not. ISTC_FLAG) then
-         nod = nodm(nrnodm)
-!     ...avoid repetition
-         if (NFIRSTQ(nod).lt.0) then
-!        ...store the first dof offset
-            NFIRSTQ(nod) = nrdof_Q
-!        ...update the L2 dof counter
-            nrdof_Q = nrdof_Q + ndofmQ(nrnodm)
-         endif
-      endif
-!
+!  ...compute number of bubble dof (nrdof_mdl)
       if (ISTC_FLAG) then
          call stc_get_nrdof(mdle, nrdofi,nrdofb)
          nrdof_mdl = nrdof_mdl + sum(nrdofb)
@@ -221,14 +170,11 @@ subroutine mumps_sc(mtype)
    enddo
 !
 !..total number of (interface) dof is nrdof
-   nrdof = nrdof_H +  nrdof_E + nrdof_V + nrdof_Q
-
    NRDOF_CON = nrdof
    NRDOF_TOT = nrdof + nrdof_mdl
 !
    if (nrdof .eq. 0) then
-      deallocate(MAXDOFS,NFIRSTH,NFIRSTE,NFIRSTV)
-      if (.not. ISTC_FLAG) deallocate(NFIRSTQ)
+      deallocate(NFIRST_DOF)
       write(*,*) 'par_mumps_sc: nrdof = 0. returning.'
       return
    endif
@@ -278,7 +224,7 @@ subroutine mumps_sc(mtype)
 !$OMP PARALLEL                                  &
 !$OMP PRIVATE(nrdofs,nrdofm,nrdofc,nodm,nrnodm, &
 !$OMP         ndofmH,ndofmE,ndofmV,ndofmQ,      &
-!$OMP         i,j,k,k1,k2,l,nod,ndof)
+!$OMP         i,j,k,k1,k2,l,mdle,nod,ndof)
    allocate(NEXTRACT(MAXDOFM))
    allocate(IDBC(MAXDOFM))
    allocate(ZDOFD(MAXDOFM,NR_RHS))
@@ -308,11 +254,12 @@ subroutine mumps_sc(mtype)
 !$OMP SCHEDULE(DYNAMIC)  &
 !$OMP REDUCTION(+:RHS)
    do iel=1,NRELES
+      mdle = ELEM_ORDER(iel)
       if (ISTC_FLAG) then
-         call celem_systemI(iel,mdle_list(iel),2, nrdofs,nrdofm,nrdofc,nodm,  &
+         call celem_systemI(iel,mdle,2, nrdofs,nrdofm,nrdofc,nodm,  &
             ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,ZLOAD,ZTEMP)
       else
-         call celem(mdle_list(iel),2, nrdofs,nrdofm,nrdofc,nodm,  &
+         call celem(mdle,2, nrdofs,nrdofm,nrdofc,nodm,  &
             ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,ZLOAD,ZTEMP)
       endif
 !
@@ -323,7 +270,7 @@ subroutine mumps_sc(mtype)
          nod = nodm(i)
          do j=1,ndofmH(i)
             l=l+1
-            LCON(l) = NFIRSTH(nod)+j
+            LCON(l) = NFIRST_DOF(nod)+j
          enddo
       enddo
 !  ...H(curl) dof
@@ -331,7 +278,7 @@ subroutine mumps_sc(mtype)
          nod = nodm(i)
          do j=1,ndofmE(i)
             l=l+1
-            LCON(l) = nrdof_H + NFIRSTE(nod)+j
+            LCON(l) = NFIRST_DOF(nod)+ndofmH(i)+j
          enddo
       enddo
 !  ...H(div) dof
@@ -339,7 +286,7 @@ subroutine mumps_sc(mtype)
          nod = nodm(i)
          do j=1,ndofmV(i)
             l=l+1
-            LCON(l) = nrdof_H + nrdof_E + NFIRSTV(nod)+j
+            LCON(l) = NFIRST_DOF(nod)+ndofmH(i)+ndofmE(i)+j
          enddo
       enddo
 !  ...L2 dof
@@ -347,7 +294,7 @@ subroutine mumps_sc(mtype)
          nod = nodm(nrnodm)
          do j=1,ndofmQ(nrnodm)
             l=l+1
-            LCON(l) = nrdof_H + nrdof_E + nrdof_V + NFIRSTQ(nod)+j
+            LCON(l) = NFIRST_DOF(nod)+ndofmH(nrnodm)+ndofmE(nrnodm)+ndofmV(nrnodm)+j
          enddo
       endif
 !
@@ -400,6 +347,8 @@ subroutine mumps_sc(mtype)
       write(*,1004) Mtime(2)
  1004 format(' STEP 2 finished: ',f12.5,'  seconds',/)
    endif
+!
+   deallocate(NFIRST_DOF)
 !
 !----------------------------------------------------------------------
 !  STEP 3: call mumps to solve the linear system
@@ -500,27 +449,28 @@ subroutine mumps_sc(mtype)
  1011 format(' STEP 4 started : Store the solution')
       start_time = MPI_Wtime()
    endif
-! 
-!$OMP PARALLEL DO          &
-!$OMP PRIVATE(i,k1,ndof)   &
-!$OMP SCHEDULE(DYNAMIC)
+!
+   ndof = 0
+!$OMP PARALLEL
+!$OMP DO REDUCTION(MAX:ndof)
    do iel=1,NRELES
-!
-      ndof = CLOC(iel)%ni
-!
-      allocate(ZSOL_LOC(ndof)); ZSOL_LOC=ZERO
-!
-      do k1=1,ndof
+      if (CLOC(iel)%ni > ndof) ndof = CLOC(iel)%ni
+   enddo
+!$OMP END DO
+   allocate(ZSOL_LOC(ndof))
+!$OMP DO PRIVATE(i,k1) SCHEDULE(DYNAMIC)
+   do iel=1,NRELES
+      ZSOL_LOC=ZERO
+      do k1=1,CLOC(iel)%ni
          i = CLOC(iel)%con(k1)
          ZSOL_LOC(k1) = MUMPS_PAR%RHS(i)
       enddo
       deallocate(CLOC(iel)%con)
-!
       call solout(iel,ndof,NR_RHS,ZERO,ZSOL_LOC)
-      deallocate(ZSOL_LOC)
-!
    enddo
-!$OMP END PARALLEL DO
+!$OMP END DO
+   deallocate(ZSOL_LOC)
+!$OMP END PARALLEL
 !
 ! ----------------------------------------------------------------------
 !  END OF STEP 4
@@ -534,8 +484,6 @@ subroutine mumps_sc(mtype)
    endif
 !   
    deallocate(MAXDOFS)
-   deallocate(NFIRSTH,NFIRSTE,NFIRSTV)
-   if (.not. ISTC_FLAG) deallocate(NFIRSTQ)
    call stc_dealloc
 !
 !..Destroy the instance (deallocate internal data structures)

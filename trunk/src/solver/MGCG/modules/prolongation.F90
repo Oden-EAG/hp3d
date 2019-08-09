@@ -172,7 +172,8 @@
 !..generate the new nodes
    allocate(NODES_PR(Nodl)%sons(nrsons))
    do is=1,nrsons
-      nson = NODES(nod)%sons(is)
+!      nson = NODES(nod)%sons(is)
+      nson = Son(nod,is)
       call nodgenPR(type(is),Nodl,norder(is),nson, &
                     NODES_PR(Nodl)%sons(is))
    enddo
@@ -1184,7 +1185,8 @@
 !
 !  .....check if sons are active
      do is=1,2
-       nson = NODES(nod)%sons(is)
+!       nson = NODES(nod)%sons(is)
+       nson = Son(nod,is)
        if (NODES(nson)%act.eq.0 .and. NODES(nson)%ref_kind.eq.0) go to 10
      enddo
      ic=ic+1
@@ -1215,7 +1217,8 @@
 !
 !  .........check if sons are active
          do js=1,2
-           nson = NODES(nod)%sons(js)
+!           nson = NODES(nod)%sons(js)
+           nson = Son(nod,js)
            if (NODES(nson)%act.eq.0 .and. NODES(nson)%ref_kind.eq.0) go to 20
          enddo
          if (ic.eq.nlist) then
@@ -1347,7 +1350,8 @@
 !
 !  .......check if sons are active
        do is=1,nrsons
-         nson = NODES(nod)%sons(is)
+!         nson = NODES(nod)%sons(is)
+         nson = Son(nod,is)
          if (NODES(nson)%act.eq.0 .and. NODES(nson)%ref_kind.eq.0) go to 10
        enddo
        ic=ic+1
@@ -1385,7 +1389,8 @@
 !
 !  .........check if sons are active
          do js=1,nrsons
-           nson = NODES(nod)%sons(js)
+!           nson = NODES(nod)%sons(js)
+           nson = Son(nod,js)
            if (NODES(nson)%act.eq.0 .and. NODES(nson)%ref_kind.eq.0) go to 20
          enddo
          if (ic.eq.nlist) then

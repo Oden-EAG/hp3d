@@ -411,7 +411,7 @@
 !
    subroutine find_descendants(Nod, Nlist)
 !
-   use data_structure3D, only: NODES         
+   use data_structure3D, only: NODES,Son
    use refinements_2D,  only : nr_sons
 !   
    IMPLICIT NONE
@@ -452,7 +452,8 @@
       nfath = lista(l)
       call nr_sons(NODES(nfath)%type,NODES(nfath)%ref_kind, nrsons)
       do is=1,nrsons
-         nson = NODES(nfath)%sons(is)
+!         nson = NODES(nfath)%sons(is)
+         nson = Son(nfath,is)
          if (NODES(nson)%ref_kind.eq.0) then
             if (NODES(nson)%act.eq.1) then
                if (Nlist .ge. maxnlist) then 

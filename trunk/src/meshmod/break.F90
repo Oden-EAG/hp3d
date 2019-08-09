@@ -6,7 +6,7 @@
 !> @param[in] Mdle - middle node
 !> @param[in] Kref - refinement flag
 !!
-!> rev@July 2019
+!> rev@Aug 2019
 !-------------------------------------------------------------------------
 !
 subroutine break(Mdle,Kref)
@@ -136,12 +136,13 @@ subroutine break(Mdle,Kref)
 !                loop over son quads and generate INACTIVE son nodes                 
                  do is=1,2
                     nr_vert=0
-                    call nodbreak(NODES(nod)%sons(is),kref_face, &
-                                  iact,novert,nr_vert)
+!                    call nodbreak(NODES(nod)%sons(is),kref_face, iact,novert,nr_vert)
+                    call nodbreak(Son(nod,is),kref_face,iact,novert,nr_vert)
                  enddo
 !                break edge node                 
                  nr_vert=4
-                 call nodbreak(NODES(nod)%sons(3),kref_edge,iact,novert,nr_vert)
+                 !call nodbreak(NODES(nod)%sons(3),kref_edge,iact,novert,nr_vert)
+                 call nodbreak(Son(nod,3),kref_edge,iact,novert,nr_vert)
               endselect
            endselect
         endif
@@ -166,7 +167,7 @@ subroutine break(Mdle,Kref)
 !
   call activate_sons(Mdle)
 !
-  call deactivate(Mdle)
+  call deactivate(Mdle, NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ)
 !
 ! update the number of active elements
   call nr_mdle_sons(type,Kref, nrsons)
@@ -199,7 +200,10 @@ subroutine activate_sons(Nod)
   call find_nsons(Nod, nrsons)
 ! loop over sons
   do i=1,nrsons
-     call activate(NODES(Nod)%sons(i))
+!     call activate(NODES(Nod)%sons(i))
+      if (NODES(Son(Nod,i))%act.ne.1) then
+         call activate(Son(Nod,i), NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ)
+      endif
   enddo
 !
 end subroutine activate_sons

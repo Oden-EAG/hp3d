@@ -13,29 +13,42 @@ subroutine refresh
 !
    implicit none
 !
-   character(len=4) :: type
-   integer, dimension(27) :: nodesl,norientl
+   character(4) :: type
+   integer :: nodesl(27),norientl(27)
    integer :: iprint,i,j,iel,nod,nfath,mdle,ibegin,iend, &
               nrsons,loc,subd
+   integer :: nrdofH,nrdofE,nrdofV,nrdofQ
 !
 !--------------------------------------------------------------------
 !
    iprint=0
 !
+#if DEBUG_MODE
    if (iprint.eq.1) then
       write(*,*) 'refresh: Begin'
    endif
+#endif
+!
+   call update_ELEM_ORDER
+!
+!..set thread local dof counters
+   nrdofH=0; nrdofE=0; nrdofV=0; nrdofQ=0
 !
 !..reset visitation flags for all nodes
-   call reset_visit
+!$OMP PARALLEL
+!$OMP DO
+   do i=1,NRNODS
+      NODES(i)%visit = 0
+   enddo
+!$OMP END DO
 !  
 !--------------------------------------------------------------------
 ! Step 1 : raise visitation flag for vertex, edge and face nodes of |
 !          all active elements                                      |
 !--------------------------------------------------------------------
-   mdle=0
+!$OMP DO PRIVATE(mdle,subd,nodesl,norientl,type,ibegin,iend,i)
    do iel=1,NRELES
-      call nelcon(mdle, mdle)
+      mdle = ELEM_ORDER(iel)
       call get_subd(mdle, subd)
       call elem_nodes(mdle, nodesl,norientl)
       type=NODES(mdle)%type
@@ -51,13 +64,16 @@ subroutine refresh
          endif
       enddo
    enddo
-!  
+!$OMP END DO
+!
 !--------------------------------------------------------------------
 ! Step 2: activate all inactive edge and face nodes whose father    |
 !         node was not visited                                      |
 !--------------------------------------------------------------------
 !
 !..loop over all nodes
+!$OMP DO PRIVATE(nfath,nrsons,loc) SCHEDULE(DYNAMIC) &
+!$OMP REDUCTION(+:nrdofH,nrdofE,nrdofV,nrdofQ)
    do nod=1,NRNODS
 !
 !  ...skip if a middle node
@@ -70,43 +86,30 @@ subroutine refresh
 !
 !  ...skip if active
       if (NODES(nod)%act.eq.1) cycle
-!     
-      if (iprint.eq.1) then
-         write(*,7010) nod
- 7010    format('refresh: INACTIVE MARKED NODE nod = ',i7)
-      endif
 !
       nfath=NODES(nod)%father
-      if (nfath.le.0) then
-         write(*,*) 'refresh: INCONSISTENCY: nod = ',nod
-         stop
-      endif
 !
 !  ...if father node has not been visited, activate the node
       if (NODES(nfath)%visit.eq.0) then
-         call activate(nod)
-         if (iprint.eq.1) then
-            write(*,7020) nod
- 7020       format('refresh: ACTIVATED nod = ',i6)
-         endif
+         call activate(nod, nrdofH,nrdofE,nrdofV,nrdofQ)
 !
 !     ...if this is the last son, deactivate the father
-         nrsons = ubound(NODES(nfath)%sons,1)
-         call locate(nod,NODES(nfath)%sons,nrsons, loc)
+         nrsons = NODES(nfath)%nr_sons
+         loc = nod - NODES(nfath)%first_son + 1
          if (loc.eq.nrsons) then
-            call deactivate(nfath)
-            if (iprint.eq.1) then
-               write(*,7030) nfath
- 7030          format('refresh: DEACTIVATED nfath, loc, nrsons = ',i6,2i3)
-            endif
+            call deactivate(nfath, nrdofH,nrdofE,nrdofV,nrdofQ)
          endif
       endif
 !
 !..end of loop over nodes
    enddo
+!$OMP END DO
+!$OMP END PARALLEL
 !
-!..reset visitation flags
-   call reset_visit
-!
+!..update global dof counters
+   NRDOFSH = NRDOFSH + nrdofH
+   NRDOFSE = NRDOFSE + nrdofE
+   NRDOFSV = NRDOFSV + nrdofV
+   NRDOFSQ = NRDOFSQ + nrdofQ
 !
 end subroutine refresh

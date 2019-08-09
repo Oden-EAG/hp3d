@@ -34,11 +34,7 @@ c  ...element type
 c
 c----------------------------------------------------------------------
 c
-      if (Mdle.eq.111) then
-        iprint=0
-      else
-        iprint=0
-      endif
+      iprint = 0
 c
       type = NODES(Mdle)%type
 c

@@ -2,39 +2,45 @@
 !> Purpose : activate a node and initialize its dofs.
 !            note: if mesh is distributed, routine will only allocate dofs
 !            if the node is within subdomain (NODES(Nod)%subd == rank).
-!!
-!> @date July 2019
-!!
-!> @param[in] Nod - node to be activated
+!
+!> @date Aug 2019
+!
+!> @param[in]    Nod          - node to be activated
+!> @param[inout] NrdofH,E,V,Q - Allocated number of solution dofs
 !-------------------------------------------------------------------------
-subroutine activate(Nod)
+subroutine activate(Nod, NrdofH,NrdofE,NrdofV,NrdofQ)
    use data_structure3D
    use par_mesh  , only: DISTRIBUTED
    use mpi_param , only: RANK
 !
    implicit none
 !
-   integer, intent(in) :: Nod
-   integer :: iprint, icase, nvar, ndofH, ndofE, ndofV, ndofQ
-   integer :: act_dof, subd
+   integer, intent(in)    :: Nod
+   integer, intent(inout) :: NrdofH,NrdofE,NrdofV,NrdofQ
+!
+   integer :: icase,nvar,ndofH,ndofE,ndofV,ndofQ
+   integer :: act_dof,subd
+!
+#if DEBUG_MODE
+   integer :: iprint
+   iprint=0
+#endif
 !
 !-------------------------------------------------------------------------
 !
-   iprint=0
-!
 !..if node is already active, do nothing
-   if (NODES(Nod)%act.eq.1) then
-      return
-   endif
+   if (NODES(Nod)%act.eq.1) return
 !
 !..determine number of dofs, update geometry dofs
    call find_ndof(Nod, ndofH,ndofE,ndofV,ndofQ)
 !
+#if DEBUG_MODE
 !..printing
    if (iprint.eq.1) then
       write(*,7001) Nod,ndofH,ndofE,ndofV,ndofQ
- 7001 format('activate: Nod=',i10,'ndofH,ndofE,ndofV,ndofQ= ',4i4)
+ 7001 format('activate: Nod=',i10,', ndofH,ndofE,ndofV,ndofQ= ',4i4)
    endif
+#endif
 !
 !..find out whether node is inside my subdomain
    act_dof = 1
@@ -55,7 +61,7 @@ subroutine activate(Nod)
          allocate(NODES(Nod)%zdofH(nvar, ndofH))
          NODES(Nod)%zdofH = ZERO
       endif
-      NRDOFSH = NRDOFSH + ndofH*NREQNH(icase)
+      NrdofH = NrdofH + ndofH*NREQNH(icase)
    endif
    if ((NREQNE(icase).gt.0).and.(ndofE.gt.0)) then
       nvar = NREQNE(icase)*NRCOMS
@@ -63,7 +69,7 @@ subroutine activate(Nod)
          allocate(NODES(Nod)%zdofE(nvar, ndofE))
          NODES(Nod)%zdofE = ZERO
       endif
-      NRDOFSE = NRDOFSE + ndofE*NREQNE(icase)
+      NrdofE = NrdofE + ndofE*NREQNE(icase)
    endif
    if ((NREQNV(icase).gt.0).and.(ndofV.gt.0)) then
       nvar = NREQNV(icase)*NRCOMS
@@ -71,7 +77,7 @@ subroutine activate(Nod)
          allocate(NODES(Nod)%zdofV(nvar, ndofV))
          NODES(Nod)%zdofV = ZERO
       endif
-      NRDOFSV = NRDOFSV + ndofV*NREQNV(icase)
+      NrdofV = NrdofV + ndofV*NREQNV(icase)
    endif
    if ((NREQNQ(icase).gt.0).and.(ndofQ.gt.0)) then
       nvar = NREQNQ(icase)*NRCOMS
@@ -79,16 +85,18 @@ subroutine activate(Nod)
          allocate(NODES(Nod)%zdofQ(nvar, ndofQ))
          NODES(Nod)%zdofQ = ZERO
       endif
-      NRDOFSQ = NRDOFSQ + ndofQ*NREQNQ(icase)
+      NrdofQ = NrdofQ + ndofQ*NREQNQ(icase)
    endif
 !
 !..raise activation flag
    NODES(Nod)%act=1
 !
+#if DEBUG_MODE
 !..printing
    if (iprint.ge.1) then
       write(*,*) 'activate : ACTIVATED Nod = ', Nod
    endif
+#endif
 !
 end subroutine activate
 !
@@ -97,35 +105,42 @@ end subroutine activate
 !> Purpose : deactivate a node.
 !            note: dofs are only deallocated if node was in subdomain,
 !                  i.e., if dof pointers were associated with data.
-!!
-!> @param[in] Nod - node to be deactivated
+!
+!> @date Aug 2019
+!
+!> @param[in]    Nod          - node to be deactivated
+!> @param[inout] NrdofH,E,V,Q - Deallocated number of solution dofs
 !-------------------------------------------------------------------------
-subroutine deactivate(Nod)
+subroutine deactivate(Nod, NrdofH,NrdofE,NrdofV,NrdofQ)
    use data_structure3D
 !
    implicit none
 !
-   integer, intent(in) :: Nod
+   integer, intent(in)    :: Nod
+   integer, intent(inout) :: NrdofH,NrdofE,NrdofV,NrdofQ
 !
-   integer :: iprint, icase, ndofH, ndofE, ndofV, ndofQ,nn,nn1
+   integer :: icase,ndofH,ndofE,ndofV,ndofQ,nn,nn1
+!
+#if DEBUG_MODE
+   integer :: iprint
+   iprint=0
+#endif
 !
 !-------------------------------------------------------------------------
 !
-   iprint=0
-!
 !..if node is already inactive, do nothing
-   if (NODES(Nod)%act.eq.0) then
-      return
-   endif
+   if (NODES(Nod)%act.eq.0) return
 !
 !..find number of dofs associated to node, update number of gdofs
    call find_ndof(Nod, ndofH,ndofE,ndofV,ndofQ)
 !
+#if DEBUG_MODE
 !..printing
    if (iprint.eq.1) then
       write(*,7001) Nod,ndofH,ndofE,ndofV,ndofQ
  7001 format('activate: Nod=',i10,'ndofH,ndofE,ndofV,ndofQ= ',4i4)
    endif
+#endif
 !
 !..deallocate geometry dof
    if (ndofH.gt.0 .and. associated(NODES(Nod)%coord)) then
@@ -139,33 +154,35 @@ subroutine deactivate(Nod)
       if (associated(NODES(Nod)%zdofH)) then
          deallocate(NODES(Nod)%zdofH)
       endif
-      NRDOFSH = NRDOFSH - ndofH*NREQNH(icase)
+      NrdofH = NrdofH - ndofH*NREQNH(icase)
    endif
    if ((NREQNE(icase).gt.0).and.(ndofE.gt.0)) then
       if (associated(NODES(Nod)%zdofE)) then
          deallocate(NODES(Nod)%zdofE)
       endif
-      NRDOFSE = NRDOFSE - ndofE*NREQNE(icase)
+      NrdofE = NrdofE - ndofE*NREQNE(icase)
    endif
    if ((NREQNV(icase).gt.0).and.(ndofV.gt.0)) then
       if (associated(NODES(Nod)%zdofV)) then
          deallocate(NODES(Nod)%zdofV)
       endif
-      NRDOFSV = NRDOFSV - ndofV*NREQNV(icase)
+      NrdofV = NrdofV - ndofV*NREQNV(icase)
    endif
    if ((NREQNQ(icase).gt.0).and.(ndofQ.gt.0)) then
       if (associated(NODES(Nod)%zdofQ)) then
          deallocate(NODES(Nod)%zdofQ)
       endif
-      NRDOFSQ = NRDOFSQ - ndofQ*NREQNQ(icase)
+      NrdofQ = NrdofQ - ndofQ*NREQNQ(icase)
    endif
 !
 !..lower activation flag
    NODES(Nod)%act=0
 !
+#if DEBUG_MODE
 !..printing
    if (iprint.ge.1) then
       write(*,*) 'deactivate : DEACTIVATED Nod = ', Nod
    endif
+#endif
 !
 end subroutine deactivate

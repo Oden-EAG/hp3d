@@ -127,9 +127,11 @@ c
  9000   format(' REFINEMENT FILTER = ',i3)
         write(*,7028) NODES(nod)%father
  7028   format(' FATHER = ',i10)
-        if (NODES(nod)%ref_kind.ne.0)
-     .  write(*,7029) NODES(nod)%sons
- 7029   format(' SONS = ',9i10)
+        if (NODES(nod)%ref_kind.ne.0) then
+           write(*,7029) NODES(nod)%first_son,NODES(nod)%nr_sons
+ 7029      format(' FIRST_SON = ',i10,', NR_SONS = ',i10)
+        endif
+c
         select case (NODES(nod)%type)
         case ('mdln','mdlp','mdlb','mdld')
            call find_domain(nod,ndom)
@@ -256,9 +258,8 @@ c
         write(*,7050) nod,NODES(nod)%case,index
  7050   format(' nod,case,index = ',i10,2x,i2,2x,20i2)
         l=0
-        mdle=0
         do iel=1,NRELES
-          call nelcon(mdle, mdle)
+          mdle = ELEM_ORDER(iel)
           call celem(mdle,1,
      .               nrdofs,nrdofm,nrdofc,
      .               nodm,ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,

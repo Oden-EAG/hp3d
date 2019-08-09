@@ -173,7 +173,8 @@
 !        ...edge node
             case('medg')
                do is=1,2
-                  nods = NODES(nod)%sons(is)
+                  !nods = NODES(nod)%sons(is)
+                  nods = Son(nod,is)
                   nord = max(nord,NODES(nods)%visit)
                enddo
 !
@@ -183,7 +184,8 @@
 !
 !        ...communicate the new order to the (inactive) sons
             do is=1,2
-               nods = NODES(nod)%sons(is)
+               !nods = NODES(nod)%sons(is)
+               nods = Son(nod,is)
                NODES(nods)%order = nord
             enddo
 !
@@ -191,7 +193,8 @@
             case('mdlt')
                call nr_face_sons('mdlt',NODES(nod)%ref_kind, nrsons)
                do is=1,nrsons
-                  nods = NODES(nod)%sons(is)
+                  !nods = NODES(nod)%sons(is)
+                  nods = Son(nod,is)
                   select case(NODES(nods)%type)
                   case('mdlt')
                      nord = max(nord,NODES(nods)%visit)
@@ -208,7 +211,8 @@
 !           ...communicate the new order to the (inactive) sons
                call nr_sons('mdlt',NODES(nod)%ref_kind, nrsons)
                do is=1,nrsons
-                  nods = NODES(nod)%sons(is)
+                  !nods = NODES(nod)%sons(is)
+                  nods = Son(nod,is)
                   select case(NODES(nods)%type)
                   case('mdlt'); NODES(nods)%order = nord
                   case('mdlq'); NODES(nods)%order = nord*10+nord
@@ -220,7 +224,8 @@
                call decode(nord, nordh,nordv)
                call nr_face_sons('mdlq',NODES(nod)%ref_kind, nrsons)
                do is=1,nrsons
-                  nods = NODES(nod)%sons(is)
+                  !nods = NODES(nod)%sons(is)
+                  nods = Son(nod,is)
                   call decode(NODES(nods)%visit, nordhs,nordvs)
                   nordh = max(nordh,nordhs); nordv = max(nordv,nordvs)
                enddo
@@ -233,7 +238,8 @@
 !
 !           ...communicate the new order to the (inactive) mid-face sons
                do is=1,nrsons
-                  nods = NODES(nod)%sons(is)
+                  !nods = NODES(nod)%sons(is)
+                  nods = Son(nod,is)
                   NODES(nods)%order = nord
                enddo
 !
@@ -241,17 +247,20 @@
                select case(NODES(nod)%ref_kind)
                case(11)
                   do i=1,4
-                     nods = NODES(nod)%sons(nrsons+i)
+                     !nods = NODES(nod)%sons(nrsons+i)
+                     nods = Son(nod,nrsons+i)
                      select case(i)
                      case(1,3); NODES(nods)%order = nordv
                      case(2,4); NODES(nods)%order = nordh
                      end select
                   enddo
                case(10)
-                  nods = NODES(nod)%sons(nrsons+1)
+                  !nods = NODES(nod)%sons(nrsons+1)
+                  nods = Son(nod,nrsons+1)
                   NODES(nods)%order = nordv
                case(01)
-                  nods = NODES(nod)%sons(nrsons+1)
+                  !nods = NODES(nod)%sons(nrsons+1)
+                  nods = Son(nod,nrsons+1)
                   NODES(nods)%order = nordh
                end select
             end select

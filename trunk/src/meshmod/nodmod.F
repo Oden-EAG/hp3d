@@ -69,7 +69,7 @@ c  ...save current gdofs in local array and update number of gdofs
           deallocate(NODES(Nod)%coord)
         endif
       endif
-c      
+c
 c  ...save current dof in local arrays
       if ((NREQNH(icase).gt.0).and.(ndofH.gt.0)) then
         if (Associated(NODES(Nod)%zdofH)) then

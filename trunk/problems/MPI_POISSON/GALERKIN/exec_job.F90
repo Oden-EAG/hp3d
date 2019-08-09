@@ -6,7 +6,7 @@ subroutine exec_job
    use common_prob_data
    use data_structure3D
    use MPI           , only: MPI_COMM_WORLD
-   use mpi_param     , only: RANK,ROOT
+   use mpi_param     , only: RANK,ROOT,NUM_PROCS
    use par_mesh      , only: EXCHANGE_DOF,distr_mesh
    use zoltan_wrapper, only: zoltan_w_set_lb,zoltan_w_eval
 !
@@ -50,9 +50,14 @@ subroutine exec_job
       endif
       if(RANK .eq. ROOT) write(*,300) end_time - start_time
 !
-!  ...distribute mesh
-      if (i .gt. IMAX-2) call zoltan_w_set_lb(3)
+      if (NUM_PROCS .eq. 1) goto 30
 !
+      if (i .eq. IMAX-5) then
+         call zoltan_w_set_lb(6)
+      elseif (i .gt. IMAX-5) then
+         goto 30
+      endif
+!  ...distribute mesh
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
       if(RANK .eq. ROOT) write(*,200) '2. distributing mesh...'
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
@@ -60,6 +65,7 @@ subroutine exec_job
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
       if(RANK .eq. ROOT) write(*,300) end_time - start_time
 !
+   30 continue
       if (i .le. IMAX-2) cycle
 !
 !  ...print current partition (elems)

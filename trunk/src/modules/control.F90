@@ -162,7 +162,7 @@ contains
 !
       read(ncontrol,*) GEOM_TOL
       if (.not. QUIET_MODE) write(*,8000)GEOM_TOL
- 8000 format(' GEOMETRY TOLERANCE = ',es10.4)
+ 8000 format(' GEOMETRY TOLERANCE = ',es11.4)
 !
       read(ncontrol,*) INTEGRATION
       if (.not. QUIET_MODE) write(*,8001)INTEGRATION

@@ -47,11 +47,10 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
    integer, save :: irefineold = 0
 !
    integer :: iflag(1)
-   integer :: mdle_list(NRELES)
    real*8  :: errorH,errorE,errorV,errorQ
    real*8  :: rnormH,rnormE,rnormV,rnormQ
-   real*8  :: error,rnorm,error_subd,rnorm_subd
-   integer :: i,iel,mdle,subd,nreles_subd,count,ierr,nrelem_ref,kref
+   real*8  :: error_tot,rnorm_tot,error_subd,rnorm_subd
+   integer :: i,iel,mdle,subd,count,ierr,nrelem_ref,kref
    integer :: iprint
 !
    real(8) :: MPI_Wtime,start_time,end_time
@@ -79,34 +78,20 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
    iflag(1) = 1
 !
 !..fetch active elements
-   mdle = 0
-   if ((DISTRIBUTED) .and. (.not. HOST_MESH)) then
-      nreles_subd = 0
-      do iel=1,NRELES
-         call nelcon(mdle, mdle)
-         call get_subd(mdle, subd)
-         if (subd .eq. RANK) then
-            nreles_subd = nreles_subd + 1
-            mdle_list(nreles_subd) = mdle
-         endif
-      enddo
-   else
-      if (RANK .ne. ROOT) goto 90
-      do iel=1,NRELES
-         call nelcon(mdle, mdle)
-         mdle_list(iel) = mdle
-      enddo
-      nreles_subd = NRELES
+   if (.not. DISTRIBUTED) then
+      ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
+      NRELES_SUBD = NRELES
    endif
+   
 !
    error_subd = 0.d0; rnorm_subd = 0.d0
 !
 !$OMP PARALLEL DEFAULT(PRIVATE)              &
-!$OMP SHARED(nreles_subd,iflag,mdle_list)    &
+!$OMP SHARED(NRELES_SUBD,ELEM_SUBD,iflag)    &
 !$OMP REDUCTION(+:error_subd,rnorm_subd)
 !$OMP DO
-   do iel=1,nreles_subd
-      call element_error(mdle_list(iel),iflag,           &
+   do iel=1,NRELES_SUBD
+      call element_error(ELEM_SUBD(iel),iflag,           &
                          errorH,errorE,errorV,errorQ,    &
                          rnormH,rnormE,rnormV,rnormQ)
       error_subd = error_subd + errorH
@@ -115,22 +100,22 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
 !$OMP END DO
 !$OMP END PARALLEL
 !
-   error = 0.d0; rnorm = 0.d0
+   error_tot = 0.d0; rnorm_tot = 0.d0
    if (DISTRIBUTED .and. (.not. HOST_MESH)) then
       count = 1
-      call MPI_REDUCE(error_subd,error,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE(rnorm_subd,rnorm,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(error_subd,error_tot,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(rnorm_subd,rnorm_tot,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
    else
-      error = error_subd
-      rnorm = rnorm_subd
+      error_tot = error_subd
+      rnorm_tot = rnorm_subd
    endif
 !
    if (RANK .ne. ROOT) goto 90
 !
 !..update and display convergence history
    if (NEXACT.ge.1) then
-      error_mesh(istep) = sqrt(error)
-      rel_error_mesh(istep) = sqrt(error/rnorm)
+      error_mesh(istep) = sqrt(error_tot)
+      rel_error_mesh(istep) = sqrt(error_tot/rnorm_tot)
    endif
 !
 !..compute decrease rate for the residual and error
@@ -177,7 +162,6 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
 !        ...isotropic href
             call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
             call global_href
-            call close_mesh
             call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
             if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2020) end_time-start_time
             call update_gdof
@@ -185,31 +169,36 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
          elseif (Nreflag .eq. 2) then
 !        ...anisotropic href (z)
             call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-            mdle = 0
-            do iel=1,NRELES
-               call nelcon(mdle, mdle)
-               mdle_list(iel) = mdle
-            enddo
+            call global_href_aniso(0,1) ! refine in z
+            call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+            if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2020) end_time-start_time
+            call update_gdof
+            call update_Ddof
+         elseif (Nreflag .eq. 3) then
+!        ...anisotropic href (z)
+            call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
             nrelem_ref = NRELES
             do iel=1,nrelem_ref
-               mdle = mdle_list(iel)
+               mdle = ELEM_ORDER(iel)
                select case(NODES(mdle)%type)
-                  case('mdlb')
-                     kref = 1 ! refine in z
-                  case('mdlp')
-                     kref = 1 ! refine in z
+                  case('mdlb'); kref = 1 ! refine in z
+                  case('mdlp'); kref = 1 ! refine in z
                   case default
                      write(*,*) 'href WARNING: anisoref for unexpected type. stop.'
-                     stop
+                     stop 1
                end select
                call refine(mdle,kref)
             enddo
+            call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+            if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2030) ' # of current elements, nodes = ', NRELES, NRNODS
+            if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2020) end_time-start_time
+            call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
             call close_mesh
             call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
             if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
-               write(*,2030) ' # of current elements, nodes = ', NRELES, NRNODS
-               write(*,2020) end_time-start_time
-  2020         format(' refinement : ',f12.5,'  seconds')
+               write(*,2025) end_time-start_time
+  2020         format(' global ref : ',f12.5,'  seconds')
+  2025         format(' close mesh : ',f12.5,'  seconds')
   2030         format(A,I8,', ',I9)
             endif
             call update_gdof

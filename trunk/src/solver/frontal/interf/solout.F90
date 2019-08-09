@@ -26,8 +26,9 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
    use data_structure3D
    use frsolmod
    use assembly
-   use control, only: ISTC_FLAG
-   use stc,     only: stc_bwd_wrapper
+   use control,  only: ISTC_FLAG
+   use par_mesh, only: DISTRIBUTED
+   use stc,      only: stc_bwd_wrapper
 !
    implicit none
 !
@@ -78,10 +79,11 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
       mdle = NEW_ELEM_ORDER(Iel)
    else
 !  ...find the element number using the standard ordering of elements
-      mdle=0
-      do i=1,Iel
-         call nelcon(mdle, mdle)
-      enddo
+      if (DISTRIBUTED) then
+         mdle = ELEM_SUBD(Iel)
+      else
+         mdle = ELEM_ORDER(Iel)
+      endif
    endif
 !
 !..determine nodes of the modified element

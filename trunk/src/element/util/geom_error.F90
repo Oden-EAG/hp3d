@@ -391,7 +391,8 @@ subroutine check_geom_error
 !  .....loop over children
         err_sons=0.d0
         do j=1,nrsons
-          ns=NODES(nfath)%sons(j)
+!          ns=NODES(nfath)%sons(j)
+          ns=Son(nfath,j)
 !          
           select case(NODES(ns)%type)
           case('mdlp','mdln','mdlb','mdld')
@@ -409,7 +410,8 @@ subroutine check_geom_error
 !  .......loop over children
           err_sons=0.d0
           do j=1,nrsons
-            ns=NODES(nfath)%sons(j)
+!            ns=NODES(nfath)%sons(j)
+            ns=Son(nfath,j)
 !          
             select case(NODES(ns)%type)
             case('mdlp','mdln','mdlb','mdld')
@@ -453,7 +455,8 @@ subroutine display_geom_error(Nfath)
 !  ...loop over children
       err_sons=0.d0
       do j=1,nrsons
-        ns=NODES(nfath)%sons(j)
+!        ns=NODES(nfath)%sons(j)
+        ns=Son(nfath,j)
 !      
         select case(NODES(ns)%type)
         case('mdlp','mdln','mdlb','mdld')

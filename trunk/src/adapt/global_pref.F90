@@ -1,13 +1,13 @@
 !--------------------------------------------------------------------
 !> Purpose : routine performs a global p-enrichment
 !!
-!> @date July 2019
+!> @date Aug 2019
 !--------------------------------------------------------------------
 subroutine global_pref
 !
    use parameters      , only: MAXP
    use data_structure3D, only: NRELES,NRNODS,NODES,MAXNODM, &
-                               get_subd,set_subd
+                               ELEM_ORDER,get_subd,set_subd
    use par_mesh        , only: DISTRIBUTED,get_elem_nodes
    use mpi_param       , only: RANK
 !      
@@ -16,10 +16,11 @@ subroutine global_pref
    integer :: mdle,p,i,iel,nord,nordx,nordy,nordz,naux,nrnodm,subd
    integer :: nodm(MAXNODM)
 !
-!..loop over active elements (middle nodes)
-   mdle=0
+!
+!$OMP PARALLEL DO  &
+!$OMP PRIVATE(mdle,nord,nordx,nordy,nordz,naux,p)
    do iel=1,NRELES
-      call nelcon(mdle, mdle)
+      mdle = ELEM_ORDER(iel)
       nord = NODES(mdle)%order
       select case(NODES(mdle)%type)
          case('mdln','mdld')
@@ -52,8 +53,9 @@ subroutine global_pref
 !         enddo
 !      endif
 !     -------- end setting subdomain for distributed mesh
-      call nodmod(mdle, nord)
+      call nodmod(mdle,nord)
    enddo
+!$OMP END PARALLEL DO
 !
 !..raise order of approximation on non-middle nodes by enforcing minimum rule
    call enforce_min_rule
@@ -64,7 +66,7 @@ end subroutine global_pref
 !--------------------------------------------------------------------
 subroutine global_punref
 !
-   use data_structure3D, only: NRELES,NRNODS,NODES
+   use data_structure3D, only: NRELES,NRNODS,NODES,ELEM_ORDER
    use par_mesh        , only: DISTRIBUTED
 !      
    implicit none
@@ -77,9 +79,8 @@ subroutine global_punref
    endif
 !
 !..loop over active elements
-   mdle=0
    do iel=1,NRELES
-      call nelcon(mdle, mdle)
+      mdle = ELEM_ORDER(iel)
       nord = NODES(mdle)%order
       select case(NODES(mdle)%type)
          case('mdln','mdld'); nord = nord-1

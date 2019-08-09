@@ -30,7 +30,7 @@ subroutine par_verify()
    call mesh_consistency(ipass)
    count = 1
    call MPI_ALLREDUCE(ipass,buf,count,MPI_INTEGER,MPI_MIN,MPI_COMM_WORLD,ierr)
-   if (ipass .eq. 1) then
+   if (buf .eq. 1) then
       if (RANK.eq.ROOT)  write(*,*) 'par_verify: MESH CONSISTENCY TEST PASSED.'
    else
       if (RANK.eq.ROOT)  write(*,*) 'par_verify: MESH CONSISTENCY TEST FAILED.'
@@ -115,7 +115,7 @@ subroutine mesh_consistency(ipass)
          endif
       enddo
    endif
- 1210 format(A,I3,A,A,A,I7,I7,I7)
+ 1210 format(A,I3,A,A,A,I7,I10,I10)
 !
    deallocate(val,buf)
 !

@@ -103,7 +103,8 @@ c  .......parent edge node
               write(*,7022) j,jp,is
  7022         format('get_connect_info: 2: j,jp,is = ',3i5)
             endif
-            nod = NODES(nodp)%sons(is)
+c            nod = NODES(nodp)%sons(is)
+            nod = Son(nodp,is)
             if (iprint.eq.1) then
               write(*,7023) nodp,nod,NODES(nod)%act
  7023         format('get_connect_info: nodp,nod,NODES(nod)%act = ',
@@ -151,7 +152,8 @@ c
 c  .........triangular parent face
             case('mdlt')
               call rotate_trian(iref,ireff,FATH_ORIENT(jp),is,nort)
-              nod = NODES(nodp)%sons(is)
+c              nod = NODES(nodp)%sons(is)
+              nod = Son(nodp,is)
               if (iprint.eq.1) then
                 write(*,7101) nodp,is,nod,NODES(nod)%act
  7101           format('get_connect_info: nodp,is,nod,NODES(nod)%act =',
@@ -196,9 +198,11 @@ c  .........quadrilateral parent face
             case('mdlq')
               call rotate_quad(iref,ireff,FATH_ORIENT(jp),
      .                         is,is1,nort)
-              nod = NODES(nodp)%sons(is)
+c              nod = NODES(nodp)%sons(is)
+              nod = Son(nodp,is)
               if (is1.ne.0) then
-                nod = NODES(nod)%sons(is1)
+c                nod = NODES(nod)%sons(is1)
+                nod = Son(nod,is1)
               endif
 c
              if (NODES(nod)%act.eq.0.and.NODES(nod)%ref_kind.eq.0) then
@@ -329,7 +333,8 @@ c  .....offset for the first edge
         call decode(NODES(Nodp)%ref_kind, nvoid,ie1)
 c
 c  .....move to the son
-        nson = NODES(Nodp)%sons(Is)
+c        nson = NODES(Nodp)%sons(Is)
+        nson = Son(Nodp,Is)
         select case(Is)
 c
 c  .....mid-face node son
@@ -353,7 +358,8 @@ c  .........store relevant edges only
                 ise = imod(Is+1,2)
               endif
               NFACE_CONS(ie,NR_FACES) =
-     .        sign(NODES(medg)%sons(ise),NFACE_CONS(ie,ifc))
+     .        sign(Son(medg,ise),NFACE_CONS(ie,ifc))
+c     .        sign(NODES(medg)%sons(ise),NFACE_CONS(ie,ifc))
             enddo
             loc = NR_FACES
           endif
@@ -371,7 +377,8 @@ c  .......set up a new constraining edge
             do iv=1,2
               ie = ie_no(iv,ie1)
               medg = iabs(NFACE_CONS(ie,ifc))
-              nvt = NODES(medg)%sons(3)
+c              nvt = NODES(medg)%sons(3)
+              nvt = Son(medg,3)
 c
 c  ...........inactive vertex node, add the edge to the data base
               if (NODES(nvt)%act.eq.0) then

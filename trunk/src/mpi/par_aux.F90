@@ -45,9 +45,8 @@ subroutine collect_dofs()
 !..use visit flags to avoid re-sending information
    call reset_visit
 !
-   mdle = 0
    do iel=1,NRELES
-      call nelcon(mdle, mdle)
+      mdle = ELEM_ORDER(iel)
       call get_subd(mdle, subd)
 !     if mdle node is already in ROOT's subdomain
       if (subd .eq. ROOT) cycle
@@ -101,6 +100,7 @@ subroutine collect_dofs()
    enddo
    1000 format(A,I2,A,A,I4,A,I6)
 !
+   call update_ELEM_ORDER
    HOST_MESH = .true.
    write(*,*) 'collect_dofs: mesh is now on host, HOST_MESH = .true.'
 !
@@ -126,8 +126,8 @@ subroutine print_partition()
 !
    implicit none
 !
-   integer :: par(NRELES),mdlel(NRELES)
-   integer :: iel,j,k,l,nreles_subd,mdle,subd
+   integer :: par(NRELES)
+   integer :: iel,j,k,l,nrelem,mdle,subd
 !
 !----------------------------------------------------------------------
 !
@@ -137,28 +137,21 @@ subroutine print_partition()
    endif
 !
    if (RANK .ne. ROOT) goto 290
-
-!
-   mdle = 0
-   do iel=1,NRELES
-      call nelcon(mdle,mdle)
-      mdlel(iel) = mdle
-   enddo
 !
    do j=0,NUM_PROCS-1
-      nreles_subd = 0
+      nrelem = 0
       do iel=1,NRELES
-         mdle = mdlel(iel)
+         mdle = ELEM_ORDER(iel)
          call get_subd(mdle, subd)
          if (j .eq. subd) then
-            nreles_subd = nreles_subd+1
-            par(nreles_subd) = mdle
+            nrelem = nrelem+1
+            par(nrelem) = mdle
          endif
       enddo
       write(6,2000) 'partition [', j, '] : '
       k = 0
-      do while (k .lt. nreles_subd)
-         l = MIN(k+10,nreles_subd)
+      do while (k .lt. nrelem)
+         l = MIN(k+10,nrelem)
          write(6,2010) '     ',par(k+1:l)
          k = l
       enddo
@@ -188,7 +181,7 @@ subroutine print_subd()
 !
    implicit none
 !
-   integer :: sub(NRNODS),mdlel(NRELES)
+   integer :: sub(NRNODS)
    integer :: k,l,nod,nrnod_subd,subd,vis
 !
 !----------------------------------------------------------------------
@@ -222,3 +215,49 @@ subroutine print_subd()
   390 continue
 !
 end subroutine print_subd
+!
+!
+!----------------------------------------------------------------------
+!
+!     subroutine:          print_coord
+!
+!     last modified:       July 2019
+!
+!     purpose:             print current subdomain for each process
+!
+!----------------------------------------------------------------------
+subroutine print_coord()
+!
+   use data_structure3D
+   use par_mesh , only: DISTRIBUTED
+   use mpi_param, only: RANK,ROOT
+!
+   implicit none
+!
+   integer :: par(NRELES)
+   integer :: iel,i,mdle,nrv
+   real*8  :: x(NDIMEN), xnod(NDIMEN,8)
+!
+!----------------------------------------------------------------------
+!
+   if (.not. DISTRIBUTED) then
+      write(*,*) 'print_partition: mesh is not distributed.'
+      return
+   endif
+!
+   write(6,4000) 'partition [', RANK, '] : '
+   do iel=1,NRELES_SUBD
+      mdle = ELEM_SUBD(iel)
+      call nodcor_vert(mdle, xnod)
+      nrv = nvert(NODES(mdle)%type)
+      x(1:3) = 0.d0
+      do i = 1,nrv
+         x(1:3) = x(1:3) + xnod(1:3,i)
+      enddo
+      x(1:3) = x(1:3) / nrv
+      write(*,4010) 'Mdle = ', mdle,', Coords = ', x(1:3)
+   enddo
+  4000 format(A,I4,A)
+  4010 format(A,I5,A,3F6.2)
+!
+end subroutine print_coord

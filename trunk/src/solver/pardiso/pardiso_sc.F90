@@ -23,7 +23,7 @@
 #include "implicit_none.h"
 subroutine pardiso_sc(mtype)
 !
-   use data_structure3D, only: NRNODS, NRELES
+   use data_structure3D, only: NRNODS, NRELES, ELEM_ORDER
    use assembly,         only: NR_RHS, MAXDOFM, MAXDOFS,       &
                                MAXbrickH, MAXmdlbH, NRHVAR,    &
                                MAXbrickE, MAXmdlbE, NREVAR,    &
@@ -63,7 +63,7 @@ subroutine pardiso_sc(mtype)
 ! 
 !..work space for celem
    integer, dimension(MAXNODM) :: nodm,ndofmH,ndofmE,ndofmV,ndofmQ
-   integer, dimension(NRELES)  :: mdle_list,m_elem_inz
+   integer, dimension(NRELES)  :: m_elem_inz
    integer, allocatable        :: SIA(:), SJA(:)
 !
    VTYPE, allocatable :: SA(:), RHS(:)
@@ -133,12 +133,10 @@ subroutine pardiso_sc(mtype)
 !..Step 1: determine the first dof offsets for active nodes
    nrdof_H = 0; nrdof_E = 0; nrdof_V = 0; nrdof_Q = 0; nrdof_mdl = 0
 !
-   mdle = 0
 !..non zero elements counters
    inz = 0 ; m_elem_inz(1:NRELES) = 0
    do iel=1,NRELES
-      call nelcon(mdle, mdle)
-      mdle_list(iel) = mdle
+      mdle = ELEM_ORDER(iel)
 !  ...get information from celem
       if (ISTC_FLAG) then
          call celem_systemI(iel,mdle,1, nrdofs,nrdofm,nrdofc,nodm,  &
@@ -266,7 +264,7 @@ subroutine pardiso_sc(mtype)
 !$OMP PARALLEL                                  &
 !$OMP PRIVATE(nrdofs,nrdofm,nrdofc,nodm,nrnodm, &
 !$OMP         ndofmH,ndofmE,ndofmV,ndofmQ,      &
-!$OMP         i,j,k,k1,k2,l,nod,ndof)
+!$OMP         i,j,k,k1,k2,l,mdle,nod,ndof)
    allocate(NEXTRACT(MAXDOFM))
    allocate(IDBC(MAXDOFM))
    allocate(ZDOFD(MAXDOFM,NR_RHS))
@@ -296,11 +294,12 @@ subroutine pardiso_sc(mtype)
 !$OMP SCHEDULE(DYNAMIC)  &
 !$OMP REDUCTION(+:RHS)
    do iel=1,NRELES
+      mdle = ELEM_ORDER(iel)
       if (ISTC_FLAG) then
-         call celem_systemI(iel,mdle_list(iel),2, nrdofs,nrdofm,nrdofc,nodm,  &
+         call celem_systemI(iel,mdle,2, nrdofs,nrdofm,nrdofc,nodm,  &
             ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,ZLOAD,ZTEMP)
       else
-         call celem(mdle_list(iel),2, nrdofs,nrdofm,nrdofc,nodm,  &
+         call celem(mdle,2, nrdofs,nrdofm,nrdofc,nodm,  &
             ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,ZLOAD,ZTEMP)
       endif
 !

@@ -5,7 +5,7 @@
 !! @param[in]  Ison          - son number of this node
 !! @param[out] Nod           - node number
 !! @param[out] Nodesl        - nodal connectivity of node
-!! @param[out] Norinetl      - orientaiton of node
+!! @param[out] Norinetl      - orientation of node
 !-----------------------------------------------------------
 subroutine elem_nodes_one( &
      Nfath, Nodesl_fath, Norientl_fath, Ison, &
@@ -37,12 +37,14 @@ subroutine elem_nodes_one( &
 
   !-----------------------------------------------------------
   ! initialize output
-  Nodesl   = 0;                     Norientl = 0
-  fath     = NODES(Nfath);          Nod      = fath%sons(Ison);
+  Nodesl   = 0
+  Norientl = 0
+  fath     = NODES(Nfath)
+  Nod      = fath%first_son+Ison-1
   cur      = NODES(Nod)
 
   !-----------------------------------------------------------
-  ! One steop down the tree reconstructing connectivities
+  ! one step down the tree reconstructing connectivities
   call find_face_ref_flags(fath%type, fath%ref_kind, kref_face)
   call decode_ref(fath%type, fath%ref_kind, iref1, iref2, iref3)
   !
@@ -67,25 +69,30 @@ subroutine elem_nodes_one( &
            stop 1
         case ('medg')
            call rotate_edge(Norientl_fath(jp),is,nort)
-           Nodesl(j) = NODES( nodp )%sons(is)
+           !Nodesl(j) = NODES( nodp )%sons(is)
+           Nodesl(j) = Son(nodp,is)
         case ('mdlt')
            ! local and global
            iref  = kref_face(jp-nvert(fath%type)-nedge(fath%type))
            ireff = NODES(nodp)%ref_kind
            call rotate_trian(iref,ireff,Norientl_fath(jp),is,nort)
-           Nodesl(j) = NODES( nodp )%sons(is)
+           !Nodesl(j) = NODES( nodp )%sons(is)
+           Nodesl(j) = Son(nodp,is)
         case('mdlq')
            ! local and global
            iref  = kref_face(jp-nvert(fath%type)-nedge(fath%type))
            ireff = NODES(nodp)%ref_kind
            call rotate_quad(iref,ireff,Norientl_fath(jp), is,is1,nort)
-           Nodesl(j) = NODES(nodp)%sons(is)
+           !Nodesl(j) = NODES(nodp)%sons(is)
+           Nodesl(j) = Son(nodp,is)
            if (is1.ne.0) then
               nodpp     = Nodesl(j)
-              Nodesl(j) = NODES(nodpp)%sons(is1)
+              !Nodesl(j) = NODES(nodpp)%sons(is1)
+              Nodesl(j) = Son(nodpp,is1)
            endif
         case default
-           Nodesl(j) = NODES(nodp)%sons(is)
+           !Nodesl(j) = NODES(nodp)%sons(is)
+           Nodesl(j) = Son(nodp,is)
         end select
         Norientl(j) = nort
      endif
