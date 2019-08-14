@@ -1,9 +1,0 @@
-Import("*")
-
-filenames = Split("""
-graphmod.F90
-""")
-
-shared_objs = env.SharedObject(filenames)
-
-Return("shared_objs")
