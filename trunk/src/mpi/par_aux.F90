@@ -3,6 +3,90 @@
 !
 #include "implicit_none.h"
 !
+!
+!----------------------------------------------------------------------
+!
+!     subroutine:          partition_fiber
+!
+!     last modified:       Aug 2019
+!
+!     purpose:             partition a waveguide structure into slabs
+!                          along z-axis (with equal size per proc)
+!
+!----------------------------------------------------------------------
+subroutine partition_fiber(subd_next)
+!
+   use data_structure3D
+   use mpi_param, only: RANK,NUM_PROCS
+   use MPI,       only: MPI_COMM_WORLD,MPI_INTEGER,MPI_REAL8,  &
+                        MPI_MIN,MPI_MAX,MPI_IN_PLACE
+!
+   implicit none
+!
+   integer, intent(out) :: subd_next(NRELES)
+!
+   integer :: iel,mdle,subd,i,k,nrv
+   real(8) :: xnod(NDIMEN,8)
+   real(8) :: x3,x3_lo,x3_hi,x3_subd
+!
+   integer :: count,ierr
+!
+!----------------------------------------------------------------------
+!
+   subd_next(1:NRELES) = 0
+!
+   x3_lo = 100.d0; x3_hi = -100.d0
+!
+!$OMP PARALLEL DO PRIVATE(mdle,i,nrv,xnod,x3)   &
+!$OMP REDUCTION(MIN:x3_lo) REDUCTION(MAX:x3_hi)
+   do iel = 1,NRELES_SUBD
+      mdle = ELEM_SUBD(iel)
+      call nodcor_vert(mdle, xnod)
+      nrv = nvert(NODES(mdle)%type)
+      do i = 1,nrv
+         x3 = xnod(3,i)
+         if (x3 .lt. x3_lo) x3_lo = x3
+         if (x3 .gt. x3_hi) x3_hi = x3
+      enddo
+   enddo
+!$OMP END PARALLEL DO
+!
+   count = 1
+   call MPI_ALLREDUCE(MPI_IN_PLACE,x3_lo,count,MPI_REAL8,MPI_MIN,MPI_COMM_WORLD,ierr)
+   call MPI_ALLREDUCE(MPI_IN_PLACE,x3_hi,count,MPI_REAL8,MPI_MAX,MPI_COMM_WORLD,ierr)
+!
+!   write(*,100) '1. x3_lo = ', x3_lo
+!   write(*,100) '1. x3_hi = ', x3_hi
+   x3_subd = (x3_hi-x3_lo)/NUM_PROCS
+!   write(*,100) ' x3_subd = ', x3_subd
+!   x3_lo = x3_subd * RANK
+!   x3_hi = x3_subd * (RANK+1)
+!   write(*,100) '2. x3_lo = ', x3_lo
+!   write(*,100) '2. x3_hi = ', x3_hi
+ 100 format(A,F8.2)
+!
+!$OMP PARALLEL DO PRIVATE(mdle,subd,i,nrv,xnod,x3) SCHEDULE(DYNAMIC)
+   do iel = 1,NRELES
+      mdle = ELEM_ORDER(iel)
+      call get_subd(mdle, subd)
+      if (subd .ne. RANK) cycle
+      call nodcor_vert(mdle, xnod)
+      nrv = nvert(NODES(mdle)%type)
+      x3 = 0.d0
+      do i = 1,nrv
+         x3 = x3 + xnod(3,i)
+      enddo
+      x3 = x3 / nrv
+      subd_next(iel) = int(x3/x3_subd)
+   enddo
+!$OMP END PARALLEL DO
+!
+   count = NRELES
+   call MPI_ALLREDUCE(MPI_IN_PLACE,subd_next,count,MPI_INTEGER,MPI_MAX,MPI_COMM_WORLD,ierr)
+!
+end subroutine partition_fiber
+!
+!
 !----------------------------------------------------------------------
 !
 !     subroutine:          collect_dofs

@@ -61,13 +61,16 @@ subroutine distr_mesh()
 !..1. Determine new partition
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    if ((ZOLTAN_LB .eq. 0) .or. (.not. DISTRIBUTED)) then
+      subd_size = (NRELES+NUM_PROCS-1)/NUM_PROCS
       iproc=0
       do iel=1,NRELES
 !     ...decide subdomain for iel
          subd_next(iel) = iproc
-         subd_size = (NRELES+NUM_PROCS-1)/NUM_PROCS
          iproc = iel/subd_size
       enddo
+   elseif (ZOLTAN_LB .eq. 7) then
+      if (RANK .eq. ROOT) write(*,*) 'calling partition_fiber...'
+      call partition_fiber(subd_next)
    else
       call zoltan_w_partition(subd_next)
    endif

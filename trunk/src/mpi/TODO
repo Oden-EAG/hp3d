@@ -27,13 +27,18 @@ Mesh distribution:
 19. done, OpenMP parallelize global_pref routine
 20. done, distribute assembly get_info routine
 21. done, graph partitioning with zoltan (parmetis)
+22. done, write custom partitioner for fiber
 --------------
-22. implement LB weights for elements
 23. OpenMP parallelize global_href routine
 24. revisit OpenMP parallelization for update_gdof and update_Ddof
 25. remove hard limit on MAXNODES (instead, do realloc with a WARNING, and show time for realloc)
 26. check other loops over NRELES/NRNODS, and parallelize with OpenMP
 27. data migration with zoltan
+28. remove NODES(nod)%ref_filter
+29. implement LB weights for elements
+30. write MUMPS wrapper for fiber nested dissection
+31. OpenMP parallelize 'enforce_min_rule, enforce_max_rule'
+32. Extend 'find_neig' routine to work in irregular mesh
 
 F --> F90:
 - done, data_structure3D.F, and then parallelize loops (e.g., reset_visit)

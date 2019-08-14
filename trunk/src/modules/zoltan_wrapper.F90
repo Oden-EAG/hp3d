@@ -29,6 +29,7 @@ module zoltan_wrapper
 !  4: RIB    (recursive inertial bisection)
 !  5: HSFC   (Hilbert space-filling curves)
 !  6: GRAPH  (Graph partitioners: ParMETIS,PT-Scotch)
+!  7: FIBER  (Custom partitioner for waveguide geometry)
    integer, save :: ZOLTAN_LB = 0
 !
    contains
@@ -186,6 +187,7 @@ module zoltan_wrapper
          case(4); call zoltan_lb_param_rib(ierr)
          case(5); call zoltan_lb_param_hsfc(ierr)
          case(6); call zoltan_lb_param_graph(ierr)
+         case(7); ierr = Zoltan_Set_Param(zz,'LB_METHOD','NONE')
          case default
             write(*,*) 'zoltan_w_set_lb: invalid param LB =', LB
             return

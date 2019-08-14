@@ -239,6 +239,7 @@ subroutine master_main()
                write(*,*) '  4: RIB'
                write(*,*) '  5: HSFC'
                write(*,*) '  6: GRAPH'
+               write(*,*) '  7: FIBER'
                read (*,*) lb
                count = 1; src = ROOT
                call MPI_BCAST (lb,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
