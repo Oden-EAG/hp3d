@@ -1,6 +1,0 @@
-128 wavelengths:
-
-Start: 20G
-max During assembly: (114G with MUMPS, 94 G with pardiso)
-end of assembly (before solver): (81.3G with MUMPS, 65G with pardiso) (1075 sec)
-max during solve: (130 sec for diagonal scaling) (145G with pardiso, MUMPS fails)
