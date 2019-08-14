@@ -7,7 +7,6 @@ program main
   use environment
   use parameters, only : NSTD_OUT
   use data_structure3D , only : NRELES
-  use uhm2
 
   use proj
   !------------------------------------------------------------------------
@@ -26,15 +25,8 @@ program main
   call set_problem
   call end_environment
   call initialize
-  
-  UHM_SOLVER_REPORT_SHOW = .TRUE.
-  call get_command(argv)
-  call uhm_initialize(argv)
-  call uhm_option_begin
-  call uhm_option_end
 
-  call uhm_direct_lu_piv_initialize( &
-       UHM_DOUBLE, NR_RHS_PROB, 256, UHM_SOLVER_PTR)
+  call get_command(argv)
 
   ! diplay menu
   idec = 1
@@ -73,7 +65,6 @@ program main
 
      case(20); call solve1(NR_RHS_PROB)
      case(30); call mumps_solve_seq(NR_RHS_PROB)
-     case(40); call uhm_solve; call uhm_solver_flush(UHM_SOLVER_PTR);
      case(50); call geometry_error(err, rnorm)
         write(*,7001) err, rnorm, err/rnorm
      case(51); call exact_error(err, rnorm)
@@ -112,7 +103,6 @@ subroutine menu
   write(*,*) '   '
   write(*,*) 'FRONTAL SOLVE PROBLEM .................20'
   write(*,*) 'MUMPS SOLVE (SEQ.) ....................30'
-  write(*,*) 'UHM SOLVE (PAR.) ......................40'
   write(*,*) '   '
   write(*,*) 'GEOMETRY ERROR ........................50'
   write(*,*) 'PROJECTION ERROR ......................51'

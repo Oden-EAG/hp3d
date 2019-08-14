@@ -4,7 +4,6 @@
 !
 program main_poisson
 !
-  use uhm
   use lapl
   use parameters, only : NSTD_OUT
   use data_structure3D , only : NRELES
@@ -63,16 +62,7 @@ program main_poisson
 
     case(20); call solve1(NR_RHS_PROB)
     case(21); call mumps_solve_seq(NR_RHS_PROB)
-    case(30);
-       call uhm_method_disp_all(NSTD_OUT)
-       write(*,*) 'choose a decomposition = '
-       read(*,*) i
 
-       call uhm_initialize( 4, 192, i )
-
-       call uhm_set_nr_rhs(NR_RHS_PROB)
-       call uhm_solve_problem
-       call uhm_finalize
     end select
   enddo
 !  
@@ -99,6 +89,5 @@ subroutine menu
   write(*,*) '   '
   write(*,*) 'FRONTAL SOLVE PROBLEM .................20'
   write(*,*) 'MUMPS SOLVE (SEQ.) ....................21'
-  write(*,*) 'UHM SOLVE (PAR.) ......................30'
   write(*,*) '=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='
 end subroutine menu

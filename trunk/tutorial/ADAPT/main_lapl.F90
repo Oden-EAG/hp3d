@@ -71,7 +71,6 @@ program main
 
      case(20); call solve1(NR_RHS_PROB)
      case(30); call mumps_solve_seq(NR_RHS_PROB)
-     case(40);
      case(50);
         call exact_error(err, rnorm)
         write(*,7001) err, rnorm, err/rnorm
@@ -109,7 +108,6 @@ subroutine menu
   write(*,*) '   '
   write(*,*) 'FRONTAL SOLVE PROBLEM .................20'
   write(*,*) 'MUMPS SOLVE (SEQ.) ....................30'
-  write(*,*) 'UHM SOLVE (PAR.) ......................40'
   write(*,*) '   '
   write(*,*) 'EXACT ERROR ...........................50'
   write(*,*) 'H-ADAPTIVITY ..........................60'

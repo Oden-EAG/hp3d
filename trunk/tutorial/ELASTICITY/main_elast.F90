@@ -6,7 +6,6 @@ program main_dome
 !
   use dome
   use data_structure3D , only : NRELES
-  use uhm
 !---------------------------------------------------------------------------
   implicit none
   character(len=64), dimension(3) :: args
@@ -56,18 +55,7 @@ program main_dome
 
     case(20); call solve1(NR_RHS_PROB)
     case(21); call mumps_solve_seq(NR_RHS_PROB)
-    case(30,31,32,33);
-
-       select case (idec-30)
-       case(0);       call uhm_initialize( 1, 192, UHM_LU_PIV )
-       case(1);       call uhm_initialize( 1, 192, UHM_INTERF_PARDISO )
-       case(2);       call uhm_initialize( 1, 192, UHM_INTERF_WSMP )
-       case(3);       call uhm_initialize( 1, 192, UHM_INTERF_MUMPS )
-       end select
-
-       call uhm_set_nr_rhs(NR_RHS_PROB)
-       call uhm_solve_problem
-       call uhm_finalize
+    
     end select
   enddo
 !  
@@ -93,9 +81,5 @@ subroutine menu
   write(*,*) '   '
   write(*,*) 'FRONTAL SOLVE PROBLEM .................20'
   write(*,*) 'MUMPS SOLVE (SEQ.) ....................21'
-  write(*,*) 'UHM SOLVE (PAR.) ......................30'
-  write(*,*) 'UHM + PARDISO SOLVE (PAR.) ............31'
-  write(*,*) 'UHM + WSMP SOLVE (PAR.) ...............32'
-  write(*,*) 'UHM + MUMPS SOLVE (SEQ.) ..............33'
   write(*,*) '=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='
 end subroutine menu
