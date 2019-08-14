@@ -9,7 +9,6 @@ element_data.F
 environment.F90
 error.F90
 kinds.F90
-locker.F90
 math_constants.F90
 mpi_param.F90
 mpi_wrapper.F90
