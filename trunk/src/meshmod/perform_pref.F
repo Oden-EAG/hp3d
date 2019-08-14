@@ -230,9 +230,8 @@ c
 c-----------------------------------------------------------------------
 c
 c  ...Step 2: loop through all active elements
-      mdle=0
       do iel=1,NRELES
-        call nelcon(mdle, mdle)
+        mdle = ELEM_ORDER(iel)
         call elem_nodes(mdle, nodesl, norientl)
 c
 c  .....determine order of element nodes implied by the middle

@@ -36,10 +36,9 @@ subroutine check_jacobian
   write(*,*)'checking elements jacobians...'
 
   !  ...loop over active elements
-  mdle=0
   do i=1,NRELES
-     call nelcon(mdle, mdle) 
-
+     mdle = ELEM_ORDER(i)
+!
      if (iprint.eq.1) then
         write(*,9999)mdle,NODES(mdle)%type
 9999    format(' mdle,type = ',i7,2x,a4)        

@@ -4,7 +4,7 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - Apr 18
+!   latest revision    - Aug 2019
 !
 !   purpose            - routine enforces the min rule for a FE mesh
 !
@@ -38,9 +38,8 @@
 !----------------------------------------------------------------------
 !
 !..loop through elements in the current mesh
-   mdle=0
    do iel=1,NRELES
-      call nelcon(mdle, mdle)
+      mdle = ELEM_ORDER(iel)
       etype = NODES(Mdle)%type
       nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
       call get_connect_info(mdle, nodesl,norientl)
@@ -91,10 +90,9 @@
 !                 STEP 2: Modify edges (min rule wrt to faces)
 !----------------------------------------------------------------------
 !
-   mdle=0
 !..loop through the elements   
    do iel=1,NRELES
-      call nelcon(mdle, mdle)
+      mdle = ELEM_ORDER(iel)
       call elem_nodes(mdle, nodesl,norientl)
       etype = NODES(Mdle)%type
       nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)

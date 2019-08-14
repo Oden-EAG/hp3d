@@ -14,10 +14,9 @@ subroutine volume_hp(Vol)
   !
   iprint = 0; Vol = 0.d0
 
-  !  loop over active elements      
-  mdle=0
+  !  loop over active elements
   do iel=1,NRELES
-     call nelcon(mdle, mdle)
+     mdle = ELEM_ORDER(iel)
      call volume_hp_mdle(mdle, vol_mdle)
      Vol = Vol + vol_mdle
   enddo

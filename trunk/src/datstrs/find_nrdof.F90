@@ -28,9 +28,8 @@ subroutine find_nrdof(NrdofH, NrdofE, NrdofV, NrdofQ)
   NrdofH=0 ; NrdofE=0 ; NrdofV=0 ; NrdofQ=0
   !
   !  loop over active elements
-  mdle=0 
   do iel=1,NRELES
-     call nelcon(mdle,mdle)
+     mdle = ELEM_ORDER(iel)
      !         
      !  nodes of modified element
      call elem_nodes( mdle, nodesl,norientl)

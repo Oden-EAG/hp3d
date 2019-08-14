@@ -35,9 +35,8 @@ contains
        call logic_error(ERR_ALLOC_FAILURE,__FILE__,__LINE__)
     endif
 
-    mdle = 0
     do iel=1,NRELES
-       call nelcon(mdle, mdle)
+       mdle = ELEM_ORDER(iel)
        NODES(mdle)%lock = iel
        LOCK_MDLE(iel)   = mdle
     end do

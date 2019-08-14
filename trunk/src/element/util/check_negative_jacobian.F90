@@ -31,9 +31,9 @@ subroutine check_negative_jacobian(Nodesl, Nsize)
   int_back = INTEGRATION
 
   ! loop over active elements
-  mdle = 0;   ic = 0
+  ic = 0
   do iel=1,NRELES
-     call nelcon(mdle, mdle) 
+     mdle = ELEM_ORDER(iel)
      call find_elem_nodes(mdle, norder, nedge_orient,nface_orient)
      call nodcor(mdle, xnod)
 

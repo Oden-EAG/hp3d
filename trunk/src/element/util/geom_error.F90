@@ -80,9 +80,8 @@ subroutine geom_error(Err,Rnorm)
       Err=0.d0 ; Rnorm=0.d0
 !    
 !     loop over active elements
-      mdle=0
       do iel=1,NRELES
-        call nelcon(mdle, mdle)
+        mdle = ELEM_ORDER(iel)
         call geom_error_elem(mdle, derr,dnorm)
 !    
 !       accumulate        
@@ -369,14 +368,12 @@ subroutine check_geom_error
     real*8  :: err_fath,err_sons
 
 !  ...lower visitation flag
-      do i=1,NRNODS
-        NODES(i)%visit=0
-      enddo
+      call reset_visit
 !
 !  ...loop over active elements
-      mdle=0 ; nfail=0
+      nfail=0
       do i=1,NRELES
-        call nelcon(mdle,mdle)
+        mdle = ELEM_ORDER(i)
 !
 !  .....if no father, skip      
         nfath=NODES(mdle)%father
@@ -429,9 +426,7 @@ subroutine check_geom_error
       enddo
 !
 !  ...lower visitation flag
-      do i=1,NRNODS
-        NODES(i)%visit=0
-      enddo
+      call reset_visit
 !
 !
 end subroutine check_geom_error

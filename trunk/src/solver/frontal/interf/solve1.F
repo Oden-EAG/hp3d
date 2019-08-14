@@ -104,10 +104,10 @@ c
 c  ...determine the actual maximum number of element dof to allocate
 c     element matrices
       MAXDOFM = 0; MAXDOFC=0
-      mdle=0; nrdof=0; nrdof_mdl=0
-      call reset_visit()
+      nrdof=0; nrdof_mdl=0
+      call reset_visit
       do iel=1,NRELES
-        call nelcon(mdle, mdle)
+        mdle = ELEM_ORDER(iel)
 c
 c  .....determine nodes of the modified element
         if (iprint.eq.1) then
@@ -188,13 +188,10 @@ c
 c  .......reorder the elements in order to minimize the bandwidth...
           direction(1:3) = 0.d0; direction(1) = 1.d0;
           write(*,*) 'solve1: REORDERING ELEMENTS ALONG x DIRECTION'
-          allocate(OLD_ELEM_ORDER(NRELES))
           allocate(NEW_ELEM_ORDER(NRELES))
           allocate(ELEM_CENTER(NRELES))
-          mdle=0
           do iel=1,NRELES
-            call nelcon(mdle, mdle)
-            OLD_ELEM_ORDER(iel)=mdle
+            mdle = ELEM_ORDER(iel)
             call nodcor(mdle, xnod)
             xc(1:3) = 0.d0
             do iv=1,nvert(NODES(mdle)%type)
@@ -206,21 +203,17 @@ c  .......reorder the elements in order to minimize the bandwidth...
           call sortm(NRELES,NEW_ELEM_ORDER,ELEM_CENTER)
           do iel=1,NRELES
             iel1=NEW_ELEM_ORDER(iel)
-            NEW_ELEM_ORDER(iel) = OLD_ELEM_ORDER(iel1)
+            NEW_ELEM_ORDER(iel) = ELEM_ORDER(iel1)
             write(*,*) 'iel,NEW_ELEM_ORDER(iel) = ',
      .                  iel,NEW_ELEM_ORDER(iel)
             if (iel/20*20.eq.iel) call pause
           enddo
-          deallocate(OLD_ELEM_ORDER,ELEM_CENTER)
+          deallocate(ELEM_CENTER)
         endif
       else
         if (.not.allocated(NEW_ELEM_ORDER)) then
           allocate(NEW_ELEM_ORDER(NRELES))
-          mdle=0
-          do iel=1,NRELES
-            call nelcon(mdle, mdle)
-            NEW_ELEM_ORDER(iel)=mdle
-          enddo
+          NEW_ELEM_ORDER(1:NRELES) = ELEM_ORDER(1:NRELES)
         endif
       endif
 c
