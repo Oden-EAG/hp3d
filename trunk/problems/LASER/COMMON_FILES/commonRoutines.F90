@@ -1,0 +1,467 @@
+!
+#include "implicit_none.h"
+!
+!----------------------------------------------------------------------
+!
+!   routine name       - propagate_flag
+!
+!----------------------------------------------------------------------
+!
+!   latest revision    - Oct 2018
+!
+!   purpose            - propagate Nflag from element faces to element
+!                        edges and vertices; the flag is passed
+!                        provided ALL adjacent faces share the flag
+!                        background:
+!                        impedance boundary condition should not be
+!                        inherited by edges and vertices from a face
+!                        during refinement, unless the edge is only
+!                        adjacent to impedance and dirichlet faces.
+!
+!   arguments:
+!     in :
+!              Icomp   - physics attribute number
+!              Nflag   - BC flag
+!
+!----------------------------------------------------------------------
+!
+subroutine propagate_flag(Icomp,Nflag)
+!
+   use data_structure3D
+!
+   implicit none
+!
+   integer :: Icomp,Nflag
+!
+   character(len=4) :: etype
+   integer :: iel,mdle,ifc,nrfn,i,j,nod
+!
+#if DEBUG_MODE
+   integer :: iprint = 0
+#endif
+!
+!----------------------------------------------------------------------
+!
+!..element nodes and orientations, face nodes
+   integer :: nodesl(27),norientl(27),nface_nodes(9)
+!
+!..element face BC flags, decoded BC flag for a node
+   integer :: ibc(6,NR_PHYSA),nodflag(NR_PHYSA)
+!
+!..loop through active elements
+   mdle=0
+   do iel=1,NRELES
+      call nelcon(mdle, mdle)
+      etype = NODES(mdle)%type
+!
+!  ...determine element nodes
+      call elem_nodes(mdle, nodesl,norientl)
+!
+!  ...get the element boundary conditions flags
+      call find_bc(mdle, ibc)
+!
+!  ...loop through element faces
+      do ifc=1,nface(etype)
+!
+!     ...determine face node numbers
+         call face_nodes(etype,ifc, nface_nodes,nrfn)
+#if DEBUG_MODE
+         if (iprint.eq.1) then
+            write(*,7010) mdle,ifc, ibc(ifc,Icomp)
+ 7010       format('propagate_flag: mdle,ifc,ibc(ifc,Icomp) = ',i6,i3,i4)
+         endif
+#endif
+!
+!     ...loop through the face nodes
+         do i=1,nrfn-1
+            j = nface_nodes(i)
+            nod = nodesl(j)
+!
+!        ...propagate the flag unless prohibited
+            if (ibc(ifc,Icomp).eq.Nflag) then
+               if (NODES(nod)%visit.ne.-Nflag) then
+                  NODES(nod)%visit = Nflag
+               endif
+!        ...prohibit the flag to be passed to the node
+            else
+               NODES(nod)%visit = -Nflag
+            endif
+         enddo
+      enddo
+   enddo
+!
+!..change -Nflag to zero
+   do nod=1,NRNODS
+#if DEBUG_MODE
+      if (iprint.eq.1) then
+         write(*,7020) nod,NODES(nod)%visit
+ 7020    format('propagate_flag: nod,NODES(nod)%visit = ',i8,i3)
+      endif
+#endif
+      if (NODES(nod)%visit.eq.0) cycle
+      call decod(NODES(nod)%bcond,10,NR_PHYSA, nodflag)
+      if (NODES(nod)%visit.eq.-Nflag) then
+         if (nodflag(Icomp).eq.Nflag) then
+            nodflag(Icomp)=0
+         endif
+      elseif (NODES(nod)%visit.eq.Nflag) then
+         nodflag(Icomp)=Nflag
+      endif
+      call encod(nodflag,10,NR_PHYSA, NODES(nod)%bcond)
+!
+!     ...reset the node index
+         call set_index(NODES(nod)%case,NODES(nod)%bcond, NODES(nod)%index)
+   enddo
+   call reset_visit
+!
+end subroutine propagate_flag
+!
+!
+!----------------------------------------------------------------------
+!
+!   routine name       - setAnisoRef
+!
+!----------------------------------------------------------------------
+!
+!   latest revision    - Apr 2019
+!
+!   purpose            - Refines hexa and prism elements anisotropically
+!   inputs             - ref_xyz: encoded refinement flag (mod 10)
+!
+!----------------------------------------------------------------------
+subroutine setAnisoRef(ref_xyz)
+!
+   use control
+   use data_structure3D
+   use parameters, only : ZERO,ZONE,ZIMG
+   use commonParam
+!
+   implicit none
+!
+   integer, intent(in)  :: ref_xyz
+!
+   integer :: list_elem((NRELES))
+!
+   integer :: i,ic,mdle,iel,kref,nr_elem_to_refine
+!
+   character(len=4) :: etype
+!
+!----------------------------------------------------------------------
+!
+   if ((ref_xyz .ne. IREFINE_X) .and. (ref_xyz .ne. IREFINE_XY) .and.   &
+       (ref_xyz .ne. IREFINE_Y) .and. (ref_xyz .ne. IREFINE_XZ) .and.   &
+       (ref_xyz .ne. IREFINE_Z) .and. (ref_xyz .ne. IREFINE_YZ)) then
+      write(*,*) 'setAnisoRef: invalid ref_xyz param. stop.'
+      stop
+   endif
+!
+   write(*,1010) ' NRELES before anisotropic refinement: ', NRELES
+1010 format(A,I5)
+!
+   ic=0
+   mdle=0
+   do iel=1,NRELES
+      call nelcon(mdle, mdle)
+      ic=ic+1
+      list_elem(ic) = mdle
+   enddo
+   nr_elem_to_refine = NRELES
+   if (nr_elem_to_refine.gt.0) then
+!  ...refine the elements from the list
+      do iel=1,nr_elem_to_refine
+         mdle = list_elem(iel)
+!     ...check ref flag compatibility with element type
+         etype = NODES(Mdle)%type
+         select case(etype)
+            case('mdlb')
+               kref = ref_xyz
+            case('mdlp')
+               if (ref_xyz .eq. IREFINE_Z) then
+                  kref = ref_xyz
+               else if (ref_xyz .eq. IREFINE_XY) then
+                  kref = 10
+               else
+                  write(*,*) 'setAnisoRef: incompatible ref_xyz. stop.'
+                  stop
+               endif
+            case default
+               write(*,*) 'setAnisoRef: unexpected etype. stop.'
+               stop
+      end select
+         call refine(mdle,kref)
+      enddo
+!  ...close the mesh
+      call close_mesh
+   endif
+!
+   write(*,1010) ' NRELES after  anisotropic refinement: ', NRELES
+!
+end subroutine setAnisoRef
+!
+!
+!----------------------------------------------------------------------
+!..just to display the current size of the
+!  data structure NODES (in bytes)
+!----------------------------------------------------------------------
+subroutine my_sizetest
+!
+        use data_structure3D
+!
+        implicit none
+!
+        integer :: nod, nH,nE,nV,nQ
+        integer*8 :: size_coord, size_h1, size_hcurl, size_hdiv, size_l2, size_tot
+        size_coord = 0
+        size_h1 = 0
+        size_hcurl = 0
+        size_hdiv = 0
+        size_l2 = 0
+!
+         do nod=1,NRNODS
+             if (associated(NODES(nod)%coord).eq. .true.) then
+               size_coord = size_coord + STORAGE_SIZE(NODES(nod)%coord)
+             endif
+             if (associated(NODES(nod)%zdofH).eq. .true.) then
+               size_h1 = size_h1 + STORAGE_SIZE(NODES(nod)%zdofH)
+             endif
+             if (associated(NODES(nod)%zdofE).eq. .true.) then
+               size_hcurl = size_hcurl + STORAGE_SIZE(NODES(nod)%zdofE)
+             endif
+             if (associated(NODES(nod)%zdofV).eq. .true.) then
+               size_hdiv = size_hdiv + STORAGE_SIZE(NODES(nod)%zdofV)
+             endif
+             if (associated(NODES(nod)%zdofQ).eq. .true.) then
+               size_l2 = size_l2 + STORAGE_SIZE(NODES(nod)%zdofQ)
+             endif
+         size_tot = size_coord + size_h1 + size_hcurl + size_hdiv + size_l2
+        enddo
+!
+         write(*,*) '1: total DOF size is: ', size_tot
+         !pause
+!
+         nH=0; nE=0; nV=0; nQ=0
+!
+         write(*,*) 'my_sizetest: NRHVAR, NREVAR, NRVVAR, NRQVAR = ', &
+                                  NRHVAR, NREVAR, NRVVAR, NRQVAR
+        do nod = 1, NRNODS
+          if (NODES(nod)%act .eq. 0) cycle
+          select case(NODES(nod)%type)
+          case('vert')
+            nH = nH + 1
+          case('medg')
+            nH = nH + MAXP-1
+            nE = nE + NREVAR*MAXP
+          case('mdlq')
+            nH = nH + NRHVAR*MAXmdlqH
+            nE = nE + NREVAR*MAXmdlqE
+            nV = nV + NRVVAR*MAXmdlqV
+          case('mdlb')
+            nH = nH + NRHVAR*MAXmdlbH
+            nE = nE + NREVAR*MAXmdlbE
+            nV = nV + NRVVAR*MAXmdlbV
+            nQ = nQ + NRQVAR*MAXmdlbQ
+          end select
+        enddo
+!
+        size_tot = (nH + nE + nV + nQ)*16
+        write(*,*) '2: total DOF size is: ', size_tot
+        pause
+!
+end subroutine my_sizetest
+!
+!
+!---------------------------------------------------------------------------
+!  routine:          set_PML
+!  purpose:          sets the PML data
+!  last modified:    Jan 2018
+!---------------------------------------------------------------------------
+subroutine set_PML
+   use commonParam
+   implicit none
+   PML_REGION=ZL-PML_FRAC*ZL
+end subroutine set_PML
+!
+!
+!---------------------------------------------------------------------------
+!   routine:            get_Beta
+!
+!   last modified:      Oct 2018
+!
+!   purpose:            returns the PML function at a point Xp
+!
+!   arguments:
+!       in:             Xp       - coordinates (x,y,z) at a physical point
+!                       Fld_flag - 1 (signal) / 0 (pump)
+!       out:            Zbeta   - PML stretch function that stretches only in z-direction
+!                       Zdbeta  - z-derivative of PML stretch function
+!                       Zd2beta - second z-derivative of PML stretch function
+!
+!---------------------------------------------------------------------------
+subroutine get_Beta(Xp,Fld_flag, Zbeta,Zdbeta,Zd2beta)
+!
+   use commonParam
+   use laserParam
+!
+   implicit none
+!
+   real*8, dimension(3), intent(in)  :: Xp
+   integer,              intent(in)  :: Fld_flag
+   VTYPE,                intent(out) :: Zbeta,Zdbeta,Zd2beta
+!
+   real*8 :: z,a,b,c,L,n,rho,drho,d2rho
+!
+!..OMEGA_RATIO_SIGNAL or OMEGA_RATIO_PUMP
+   real*8  :: OMEGA_RATIO_FLD
+!
+!---------------------------------------------------------------------------
+!
+!..set OMEGA_RATIO_FLD
+   select case(Fld_flag)
+      case(0)
+         OMEGA_RATIO_FLD = OMEGA_RATIO_PUMP
+      case(1)
+         OMEGA_RATIO_FLD = OMEGA_RATIO_SIGNAL ! 1.0d0
+      case default
+      write(*,*) 'get_Beta: invalid Fld_flag param. stop.'
+         stop
+   end select
+!
+   z = Xp(3)
+   b = PML_REGION
+   L = ZL
+   zbeta = z
+   zdbeta = ZONE
+!..check if the wave is exponential growth (test case)
+   if(SIGMA.ne.ZERO) then
+      a = EXP_COEFF
+      c = 5.d0
+      n = 9.d0
+      if(z.gt.b) then
+         rho = a*c*(z-b)**n*exp(z/L)
+         drho = a*c*(z-b)**(n-1.d0)*dexp(z/L)*(n+(z-b)/L)
+         d2rho = a*c*dexp(z/L)*(z-b)**(n-2.d0)*(((z-b)/L)**2+2.d0*n*((z-b)/L)+n*(n-1))
+         zbeta = z - ZI*rho/OMEGA
+         zdbeta = 1.d0 - ZI*drho/OMEGA
+         zd2beta = -ZI*d2rho/OMEGA
+      endif
+   else
+      c = 25.d0
+      n = 3.d0
+!  ...check for co-pumping: PML on same side for both signal and pump
+      if(COPUMP.eq.1) then
+         if(z.gt.PML_REGION) then
+            rho = c*((z-b)/(ZL-PML_REGION))**n
+            drho = c*n*((z-b)/(ZL-PML_REGION))**(n-1.d0)*(1.d0/(ZL-PML_REGION))
+            d2rho = c*n*(n-1.d0)*((z-b)/(ZL-PML_REGION))**(n-2.d0)*(1.d0/(ZL-PML_REGION)**2)
+            if((rho.le.0.d0).or.(drho.le.0.d0).or.(d2rho.le.0)) then
+               write(*,*) ' get_Beta: rho, drho,d2rho are negative. stop.'
+               stop
+            endif
+            zbeta = z - ZI*rho/(OMEGA*OMEGA_RATIO_FLD)
+            zdbeta = 1.d0 - ZI*drho/(OMEGA*OMEGA_RATIO_FLD)
+            zd2beta = -ZI*d2rho/(OMEGA*OMEGA_RATIO_FLD)
+          endif
+!  ...next check for counter-pumping: PML on opposite side for signal and pump
+!  ...PML @ z.gt.PML_REGION for signal and @ z.lt.PML_FRAC*ZL for pump
+      elseif(COPUMP.eq.0) then
+         if(z.gt.PML_REGION) then
+            rho = c*((z-b)/(ZL-PML_REGION))**n
+            drho = c*n*((z-b)/(ZL-PML_REGION))**(n-1.d0)*(1.d0/(ZL-PML_REGION))
+            d2rho = c*n*(n-1.d0)*((z-b)/(ZL-PML_REGION))**(n-2.d0)*(1.d0/(ZL-PML_REGION)**2)
+            if((rho.le.0.d0).or.(drho.le.0.d0).or.(d2rho.le.0)) then
+               write(*,*) ' get_Beta: rho, drho,d2rho are negative. stop.'
+               stop
+            endif
+            zbeta = z - ZI*rho/(OMEGA*OMEGA_RATIO_FLD)
+            zdbeta = 1.d0 - ZI*drho/(OMEGA*OMEGA_RATIO_FLD)
+            zd2beta = -ZI*d2rho/(OMEGA*OMEGA_RATIO_FLD)
+         endif
+!  ...endif for COPUMP check
+      endif
+!..endif for the wave is exponential growth
+   endif
+!
+end subroutine get_Beta
+!
+!
+!------------------------------------------------------------------------------------
+!
+!  routine: copy_coms
+!
+!  last modified: Jan 2019
+!
+!  purpose: copies all solution dofs from one component set to another
+!
+!  input:   - No1: component to copy from
+!           - No2: component to copy to
+!
+!------------------------------------------------------------------------------------
+!
+subroutine copy_coms(No1,No2)
+!
+   use parameters
+   use data_structure3D
+!
+   implicit none
+!
+   integer, intent(in)  :: No1,No2
+!
+   integer :: nod, nf, nt, nn2, i
+!
+!------------------------------------------------------------------------------------
+!
+!..check consistency
+   if ((No1.lt.0).or.(No2.lt.0).or.(No1.gt.NRCOMS).or.(No2.gt.NRCOMS)) then
+      write(*,*) 'copy_coms: No1,No2,NRCOMS = ', No1,No2,NRCOMS, ' . stop.'
+      stop
+   endif
+   if (No1.eq.No2) return
+!
+!..loop through active nodes
+   do nod=1,NRNODS
+      if (NODES(nod)%act.eq.0) cycle
+!
+!  ...H1 dof
+      nf = (No1-1)*NRHVAR
+      nt = (No2-1)*NRHVAR
+      nn2 = ubound(NODES(nod)%zdofH,2)
+      if(nn2.gt.0) then
+         do i=1,NRHVAR
+            NODES(nod)%zdofH(nt+i,1:nn2) = NODES(nod)%zdofH(nf+i,1:nn2)
+         enddo
+      endif
+!
+!  ...H(curl) dof
+      nf = (No1-1)*NREVAR
+      nt = (No2-1)*NREVAR
+      nn2 = ubound(NODES(nod)%zdofE,2)
+      if(nn2.gt.0) then
+         do i=1,NREVAR
+            NODES(nod)%zdofE(nt+i,1:nn2) = NODES(nod)%zdofE(nf+i,1:nn2)
+         enddo
+      endif
+!
+!  ...H(div) dof
+      nf = (No1-1)*NRVVAR
+      nt = (No2-1)*NRVVAR
+      nn2 = ubound(NODES(nod)%zdofV,2)
+      if(nn2.gt.0) then
+         do i=1,NRVVAR
+            NODES(nod)%zdofV(nt+i,1:nn2) = NODES(nod)%zdofV(nf+i,1:nn2)
+         enddo
+      endif
+!
+!  ...L2 dof
+      nf = (No1-1)*NRQVAR
+      nt = (No2-1)*NRQVAR
+      nn2 = ubound(NODES(nod)%zdofQ,2)
+      if(nn2.gt.0) then
+         do i=1,NRQVAR
+            NODES(nod)%zdofQ(nt+i,1:nn2) = NODES(nod)%zdofQ(nf+i,1:nn2)
+         enddo
+      endif
+!
+!..end of loop through nodes
+   enddo
+!
+end subroutine copy_coms
