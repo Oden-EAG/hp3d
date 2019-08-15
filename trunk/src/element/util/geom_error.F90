@@ -55,7 +55,7 @@
 !
 subroutine geom_error(Err,Rnorm)
 !
-      use data_structure3D , only : NRELES
+      use data_structure3D , only : NRELES,ELEM_ORDER
       use environment      , only : QUIET_MODE,L2GEOM
 !      
       implicit none

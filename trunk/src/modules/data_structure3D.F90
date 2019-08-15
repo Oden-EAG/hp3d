@@ -123,13 +123,12 @@ module data_structure3D
         integer          :: father
 !
 !  .....node sons
-        !integer, dimension(:), pointer :: sons
         integer          :: first_son
         integer          :: nr_sons
 !
 !  .....interface flag with GMP
         integer          :: geom_interf
-
+!
 !  .....visitation flag
         integer          :: visit
 !
@@ -158,30 +157,30 @@ module data_structure3D
 !
 !  .....H1 solution dof
 #if C_MODE
-        complex(16), dimension(:,:), pointer :: zdofH
+        complex(8), dimension(:,:), pointer :: zdofH
 #else
-        real(8)    , dimension(:,:), pointer :: zdofH
+        real(8)   , dimension(:,:), pointer :: zdofH
 #endif
 !
 !  .....H(curl) solution dof
 #if C_MODE
-        complex(16), dimension(:,:), pointer :: zdofE
+        complex(8), dimension(:,:), pointer :: zdofE
 #else
-        real(8)    , dimension(:,:), pointer :: zdofE
+        real(8)   , dimension(:,:), pointer :: zdofE
 #endif
 !
 !  .....H(div) solution dof
 #if C_MODE
-        complex(16), dimension(:,:), pointer :: zdofV
+        complex(8), dimension(:,:), pointer :: zdofV
 #else
-        real(8)    , dimension(:,:), pointer :: zdofV
+        real(8)   , dimension(:,:), pointer :: zdofV
 #endif
 !
-!  .....L^2 solution dof
+!  .....L2 solution dof
 #if C_MODE
-        complex(16), dimension(:,:), pointer :: zdofQ
+        complex(8), dimension(:,:), pointer :: zdofQ
 #else
-        real(8)    , dimension(:,:), pointer :: zdofQ
+        real(8)   , dimension(:,:), pointer :: zdofQ
 #endif
       endtype node
 !
@@ -326,6 +325,7 @@ module data_structure3D
       enddo
 !
       allocate(NODES(MAXNODS))
+!$OMP PARALLEL DO
       do nod=1,MAXNODS
         NODES(nod)%type = 'none'
         NODES(nod)%case = 0
@@ -337,15 +337,16 @@ module data_structure3D
         NODES(nod)%first_son = 0
         NODES(nod)%nr_sons = 0
         NODES(nod)%geom_interf = 0
-        nullify (NODES(nod)%coord)
 #if DEBUG_MODE
         NODES(nod)%error = 0.d0
 #endif
+        nullify (NODES(nod)%coord)
         nullify (NODES(nod)%zdofH)
         nullify (NODES(nod)%zdofE)
         nullify (NODES(nod)%zdofV)
         nullify (NODES(nod)%zdofQ)
       enddo
+!$OMP END PARALLEL DO
       NODES(MAXNODS)%bcond = 0
       NPNODS=1
 !

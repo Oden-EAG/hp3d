@@ -7,7 +7,7 @@
 !------------------------------------------------------------------------
 subroutine adaptivity_geom(Eps, Nref,Ratio)
 !
-      use data_structure3D , only : NRELES , NODES
+      use data_structure3D , only : NRELES,NODES,ELEM_ORDER
       implicit none
 ! 
       real*8, intent(in ) :: Eps

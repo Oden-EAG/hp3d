@@ -171,11 +171,6 @@ $(OBJ_PATH)/%.f90.o : $(SRC_PATH)/%.F90
 
 #-------------------------------------------------
 
-.PHONY : doc
-
-doc :
-	@doxygen doxy.conf
-
 source:
 	@./build/sfmakedepend_src.sh $(SRC_PATH) sources.mk
 

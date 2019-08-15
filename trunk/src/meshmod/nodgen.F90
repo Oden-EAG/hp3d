@@ -52,7 +52,7 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Nfilter,Subd,Iact, Nod)
    if (iprint.eq.1) then
       write(*,7000) Type,Icase,Nbcond,Nfath,Norder,Iact
  7000 format(' nodgen: Type,Icase,Nbcond,Nfath,Norder,Iact = ', &
-                        a4,2x,i3,2x,i5,2x,i6,2x,i3,2x,i2)
+                        a4,2x,i3,2x,i6,2x,i6,2x,i3,2x,i2)
    endif
 !
    call decod(Icase,2,NR_PHYSA, ncase)
@@ -92,7 +92,7 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Nfilter,Subd,Iact, Nod)
 !..printing
    if (iprint.eq.1) then
       write(*,7001) Nod,ndofH,ndofE,ndofV,ndofQ
- 7001 format('nodgen: Nod = ',i10,' ndofH,ndofE,ndofV,ndofQ = ',4i4)
+ 7001 format(' nodgen: Nod = ',i10,' ndofH,ndofE,ndofV,ndofQ = ',4i4)
    endif
 !
 !..allocate and initialize geometry dofs
