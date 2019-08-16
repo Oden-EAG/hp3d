@@ -5,7 +5,7 @@
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision    - July 2019
+!    latest revision    - Aug 2019
 !
 !    purpose            - routine updates values of solution degrees
 !                         of freedom for Dirichlet nodes
@@ -48,7 +48,9 @@ subroutine update_Ddof()
 !
 !..auxiliary variables
    integer :: iel, iv, ie, ifc, ind, iflag, ierr
-   integer :: k, mdle, nf, no, nod
+   integer :: k, mdle, nf, no, nod, nrv, nre, nrf
+!
+   character(4) :: etype
 !
 !-----------------------------------------------------------------------
 !
@@ -60,33 +62,44 @@ subroutine update_Ddof()
       NRELES_SUBD = NRELES
    endif
 !
+!..preprocess for OpenMP (optional)
+!   call reset_visit
+!   do iel=1,NRELES_SUBD
+!      mdle = ELEM_SUBD(iel)
+!      etype = NODES(mdle)%type
+!      call elem_nodes(mdle, nodesl,norientl)
+!      do ind=1,nvert(etype)+nedge(etype)+nface(etype)
+!         nod = nodesl(ind)
+!         if (nod.lt.0) cycle
+!         if (NODES(nod)%visit .eq. 0) NODES(nod)%visit = mdle
+!      enddo
+!   enddo
+!
 !-----------------------------------------------------------------------
 !..Begin parallel OpenMP environment
 !..Note that if Dirichlet vertices or edges are shared between elements,
-!  then concurrent writes to NODES(nod)&zdofH,E may happen,
+!  then concurrent writes to NODES(nod)%zdofH,E may happen,
 !  but they will write the exact same values.
-! TODO this appears to make problems (observed for dirichlet data on Hcurl
-!      flux with multiple non-zero components Ex,Ey)
-!      ..added omp critical sections
-!      ..remove critical sections if possible
-!      ..concurrent writes in dhpedge, etc., seem to be the issue
-!      ..could place OMP CRTICAL there
+!..the preprocessing above avoids that race condition
+!..note: the user subroutine 'dirichlet' must be thread safe!!
 !
 !$OMP PARALLEL                                                 &
 !$OMP PRIVATE(mdle,iflag,no,xsub,nodesl,norientl,nedge_orient, &
 !$OMP         nface_orient,norder,zdofH,zdofE,zdofV,zdofQ,     &
-!$OMP         iel,iv,ie,ifc,k,ind,nod)
+!$OMP         iel,iv,ie,ifc,k,ind,nod,etype)
 !
 !  Step 1: Update   V E R T   dof for Dirichlet nodes
 !
 !$OMP DO SCHEDULE(DYNAMIC)
    do iel=1,NRELES_SUBD
       mdle = ELEM_SUBD(iel)
+      etype = NODES(mdle)%type
       call refel(mdle, iflag,no,xsub)
       call elem_nodes(mdle, nodesl,norientl)
-      do iv=1,nvert(NODES(mdle)%type)
+      do iv=1,nvert(etype)
          nod = nodesl(iv)
          if (nod.lt.0) cycle
+         !if (NODES(nod)%visit .ne. mdle) cycle
          if (is_dirichlet(nod)) then
 !        ...cycle if H1 dofs are not supported by the node
             if (.not.associated(NODES(nod)%zdofH)) cycle
@@ -94,10 +107,8 @@ subroutine update_Ddof()
             if (is_dirichlet_homogeneous(nod)) then
                NODES(nod)%zdofH = ZERO
             else
-               !$OMP CRITICAL
                call dhpvert(mdle,iflag,no,xsub(1:3,iv),NODES(nod)%case, &
                   NODES(nod)%zdofH)
-               !$OMP END CRITICAL
             endif
          endif
       enddo
@@ -111,6 +122,7 @@ subroutine update_Ddof()
 !$OMP DO SCHEDULE(DYNAMIC)
    do iel=1,NRELES_SUBD
       mdle = ELEM_SUBD(iel)
+      etype = NODES(mdle)%type
       call refel(mdle, iflag,no,xsub)
       call elem_nodes(mdle, nodesl,norientl)
       call find_orient(mdle, nedge_orient,nface_orient)
@@ -118,11 +130,12 @@ subroutine update_Ddof()
 !
 !  ...compute solution dofs (need for H1 update)
       call solelm(mdle, zdofH,zdofE,zdofV,zdofQ)
-      do ie=1,nedge(NODES(mdle)%type)
-         ind = nvert(NODES(mdle)%type)+ie
+      do ie=1,nedge(etype)
+         ind = nvert(etype)+ie
          nod = nodesl(ind)
 !
          if (nod.lt.0) cycle
+         !if (NODES(nod)%visit .ne. mdle) cycle
          if (is_dirichlet(nod)) then
 !
 !        ...update H1 Dirichlet dofs
@@ -130,12 +143,10 @@ subroutine update_Ddof()
                if (is_dirichlet_homogeneous(nod)) then
                   NODES(nod)%zdofH = ZERO
                else
-                  !$OMP CRITICAL
                   call dhpedgeH(mdle,iflag,no,xsub,                  &
-                                NODES(mdle)%type,NODES(nod)%case,    &
+                                etype,NODES(nod)%case,               &
                                 nedge_orient,nface_orient,norder,ie, &
                                 zdofH, NODES(nod)%zdofH)
-                  !$OMP END CRITICAL
                endif
             endif
 !
@@ -144,12 +155,11 @@ subroutine update_Ddof()
                if (is_dirichlet_homogeneous(nod)) then
                   NODES(nod)%zdofE = ZERO
                else
-                  !$OMP CRITICAL
                   call dhpedgeE(mdle,iflag,no,xsub,                  &
-                                NODES(mdle)%type,NODES(nod)%case,    &
+                                etype,NODES(nod)%case,               &
                                 nedge_orient,nface_orient,norder,ie, &
                                 NODES(nod)%zdofE)
-                  !$OMP END CRITICAL
+
                endif
             endif
          endif
@@ -164,6 +174,7 @@ subroutine update_Ddof()
 !$OMP DO SCHEDULE(DYNAMIC)
    do iel=1,NRELES_SUBD
       mdle = ELEM_SUBD(iel)
+      etype = NODES(mdle)%type
       call refel(mdle, iflag,no,xsub)
       call elem_nodes(mdle, nodesl,norientl)
       call find_orient(mdle, nedge_orient,nface_orient)
@@ -173,14 +184,15 @@ subroutine update_Ddof()
       call solelm(mdle, zdofH,zdofE,zdofV,zdofQ)
 !
 !  ...loop over faces
-      do ifc=1,nface(NODES(mdle)%type)
+      do ifc=1,nface(etype)
 !
 !     ...get local node number
-         ind = nvert(NODES(mdle)%type)+nedge(NODES(mdle)%type)+ifc
+         ind = nvert(etype)+nedge(etype)+ifc
 !
 !     ...get global node number
          nod = nodesl(ind)
          if (nod.lt.0) cycle
+         !if (NODES(nod)%visit .ne. mdle) cycle
          if (is_dirichlet(nod)) then
 !
 !           -- H1 --
@@ -188,12 +200,10 @@ subroutine update_Ddof()
                if (is_dirichlet_homogeneous(nod)) then
                   NODES(nod)%zdofH = ZERO
                else
-                  !$OMP CRITICAL
                   call dhpfaceH(mdle,iflag,no,xsub,                   &
-                                NODES(mdle)%type,NODES(nod)%case,     &
+                                etype,NODES(nod)%case,                &
                                 nedge_orient,nface_orient,norder,ifc, &
                                 zdofH, NODES(nod)%zdofH)
-                  !$OMP END CRITICAL
                endif
             endif
 !
@@ -202,12 +212,11 @@ subroutine update_Ddof()
                if (is_dirichlet_homogeneous(nod)) then
                   NODES(nod)%zdofE = ZERO
                else
-                  !$OMP CRITICAL
                   call dhpfaceE(mdle,iflag,no,xsub,                   &
-                                NODES(mdle)%type,NODES(nod)%case,     &
+                                etype,NODES(nod)%case,                &
                                 nedge_orient,nface_orient,norder,ifc, &
                                 zdofE, NODES(nod)%zdofE)
-                  !$OMP END CRITICAL
+
                endif
             endif
 !
@@ -216,12 +225,10 @@ subroutine update_Ddof()
                if (is_dirichlet_homogeneous(nod)) then
                   NODES(nod)%zdofV = ZERO
                else
-                  !$OMP CRITICAL
                   call dhpfaceV(mdle,iflag,no,xsub,                   &
-                                NODES(mdle)%type,NODES(nod)%case,     &
+                                etype,NODES(nod)%case,                &
                                 nedge_orient,nface_orient,norder,ifc, &
                                 NODES(nod)%zdofV)
-                  !$OMP END CRITICAL
                endif
             endif
          endif

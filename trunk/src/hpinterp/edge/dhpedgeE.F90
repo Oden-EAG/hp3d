@@ -40,7 +40,8 @@
   integer, dimension(12),                     intent(in)  :: Nedge_orient
   integer, dimension(6),                      intent(in)  :: Nface_orient
   integer, dimension(19),                     intent(in)  :: Norder
-  VTYPE,   dimension(NRCOMS*NREQNE(Icase),*), intent(out) :: ZnodE
+!
+  VTYPE,   dimension(NRCOMS*NREQNE(Icase),*), intent(inout) :: ZnodE
 !
 ! ** Locals
 !-----------------------------------------------------------------------
@@ -96,15 +97,11 @@
              ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_Edge,iflag1
 !      
 !----------------------------------------------------------------------
-!     
-! debug printing flag
-  if (Mdle.eq.1.and.Iedge.eq.6) then
-    iprint=0
-  else
-    iprint=0 
-  endif
+!
 !
   nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
+!
+#if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Icase,Iedge,Type
 7010 format('dhpedgeE: Mdle,Iflag,No,Icase,Iedge,Type = ',5i4,2x,a4)
@@ -118,16 +115,19 @@
 7050 format('          Norder = ',19i4)
      call pause
   endif
+#endif
 !
 ! # of edge dof
   call ndof_nod('medg',norder(Iedge), &
                 ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_edge)
 !
+#if DEBUG_MODE
 ! # of dof cannot be zero
   if (ndofE_edge.le.0) then
     write(*,*) 'dhpedgeE: ndofE_edge = ',ndofE_edge
     stop 1
   endif
+#endif
 !
 ! set order and orientation for the edge node
   call initiate_order(Type, norder_1)
@@ -241,6 +241,7 @@
 ! end of loop through integration points
   enddo
 !
+#if DEBUG_MODE
   if (iprint.eq.1) then
     write(*,*) 'dhpedgeE: LOAD VECTOR AND STIFFNESS MATRIX FOR ', &
                'ndofE_edge = ',ndofE_edge
@@ -255,6 +256,7 @@
 # endif
 7016    format(10e12.5)
   endif
+#endif
 !
 ! projection matrix leading dimension (maximum number of 1D bubbles)
   naE=MAXP
@@ -285,21 +287,16 @@
   uE_imag(1:ndofE_edge,:) = aimag(zuE(1:ndofE_edge,:))
 !
 ! triangular solves for real part
-  call dtrsm('L','L','N','U',ndofE_edge,MAXEQNE,1.d0,aaE,naE, &
-             uE_real,naE)
-  call dtrsm('L','U','N','N',ndofE_edge,MAXEQNE,1.d0,aaE,naE, &
-             uE_real,naE)
+  call dtrsm('L','L','N','U',ndofE_edge,MAXEQNE,1.d0,aaE,naE,uE_real,naE)
+  call dtrsm('L','U','N','N',ndofE_edge,MAXEQNE,1.d0,aaE,naE,uE_real,naE)
 !    
 ! triangular solves for imaginary part
-  call dtrsm('L','L','N','U',ndofE_edge,MAXEQNE,1.d0,aaE,naE, &
-             uE_imag,naE)
-  call dtrsm('L','U','N','N',ndofE_edge,MAXEQNE,1.d0,aaE,naE, &
-             uE_imag,naE)
+  call dtrsm('L','L','N','U',ndofE_edge,MAXEQNE,1.d0,aaE,naE,uE_imag,naE)
+  call dtrsm('L','U','N','N',ndofE_edge,MAXEQNE,1.d0,aaE,naE,uE_imag,naE)
 !         
 ! combine real and imaginary parts by forcing type to DOUBLE 
 ! precision complex 
-  zuE(1:ndofE_edge,:) &
-   = dcmplx(uE_real(1:ndofE_edge,:), uE_imag(1:ndofE_edge,:))
+  zuE(1:ndofE_edge,:) = dcmplx(uE_real(1:ndofE_edge,:), uE_imag(1:ndofE_edge,:))
 !        
 #else
 !    
@@ -312,6 +309,7 @@
 !    
 #endif
 !
+#if DEBUG_MODE
   if (iprint.eq.1) then
    write(*,*) 'dhpedgeE: k,zuE(k) = '
    do k=1,ndofE_edge
@@ -319,6 +317,7 @@
    enddo
    call pause
   endif
+#endif
 !    
 ! save dof's, skipping irrelevant entries
 !
@@ -353,7 +352,7 @@
 !
 !           store Dirichlet dof
             ZnodE(nvarE,1:ndofE_edge) = zuE(1:ndofE_edge,ivarE)
-!                
+!
           endif
         endselect
       enddo
