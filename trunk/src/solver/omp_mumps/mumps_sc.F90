@@ -6,7 +6,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-!    latest revision    - July 2019
+!    latest revision    - Aug 2019
 !
 !    purpose            - interface for OpenMP MUMPS solver
 !                       - routine computes global stiffness matrix
@@ -174,7 +174,7 @@ subroutine mumps_sc(mtype)
    NRDOF_TOT = nrdof + nrdof_mdl
 !
    if (nrdof .eq. 0) then
-      deallocate(NFIRST_DOF)
+      deallocate(MAXDOFS,NFIRST_DOF)
       write(*,*) 'par_mumps_sc: nrdof = 0. returning.'
       return
    endif
@@ -199,6 +199,12 @@ subroutine mumps_sc(mtype)
    write(*,2010) ' Total non-zeros: nnz       = ', nnz
 2010 format(A,I12)
 !
+   if (IPRINT_TIME .eq. 1) then
+      write(*,1003)
+ 1003 format(/,' STEP 2 started : Global Assembly')
+      start_time = MPI_Wtime()
+   endif
+!
 !..memory allocation for assembly
    allocate(RHS(nrdof)); RHS=ZERO
 !
@@ -211,12 +217,6 @@ subroutine mumps_sc(mtype)
 !
 !..memory allocation for static condensation   
    call stc_alloc
-!
-   if (IPRINT_TIME .eq. 1) then
-      write(*,1003)
- 1003 format(/,' STEP 2 started : Global Assembly')
-      start_time = MPI_Wtime()
-   endif
 !
 !..assemble global stiffness matrix
 !..loop through elements
@@ -381,7 +381,7 @@ subroutine mumps_sc(mtype)
    if (mumps_par%INFO(1) .ne. 0) then
       call mumps_destroy
       write(*,*) 'analysis: mumps_par%INFO(1) .ne. 0'
-      stop
+      stop 1
    endif
    write(*,1100) '   - estimated size in GB = ',mumps_par%INFO(15)/1000.d0
    write(*,1200) '   - ordering method used = ',mumps_par%INFOG(7)
@@ -405,7 +405,7 @@ subroutine mumps_sc(mtype)
    if (mumps_par%INFO(1) .ne. 0) then
       call mumps_destroy
       write(*,*) 'factorization: mumps_par%INFO(1) .ne. 0'
-      stop
+      stop 1
    endif
    write(*,1100) '   - memory used in GB    = ',mumps_par%INFO(22)/1000.d0
 !
@@ -426,7 +426,7 @@ subroutine mumps_sc(mtype)
    if (mumps_par%INFO(1) .ne. 0) then
       call mumps_destroy
       write(*,*) 'solve: mumps_par%INFO(1) .ne. 0'
-      stop
+      stop 1
    endif
 !
 ! ----------------------------------------------------------------------

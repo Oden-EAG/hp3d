@@ -1,7 +1,6 @@
 
 TODO
 
-Mesh distribution:
 1. done, take care of contraints in distributing mesh
    (need father nodes if constraint node)
 2. done, allocate solution dofs before receiving them
@@ -28,20 +27,26 @@ Mesh distribution:
 20. done, distribute assembly get_info routine
 21. done, graph partitioning with zoltan (parmetis)
 22. done, write custom partitioner for fiber
+23. done, implement nested dissection MUMPS solver
+24. done, OpenMP parallelization update_Ddof
+25. done, check loops over NRELES/NRNODS, and parallelize with OpenMP
 --------------
-23. OpenMP parallelize global_href routine
-24. revisit OpenMP parallelization for update_gdof and update_Ddof
-25. remove hard limit on MAXNODES (instead, do realloc with a WARNING, and show time for realloc)
-26. check other loops over NRELES/NRNODS, and parallelize with OpenMP
+26. remove hard limit on MAXNODES (instead, do realloc with a WARNING, and show time for realloc)
 27. data migration with zoltan
 28. remove NODES(nod)%ref_filter
 29. implement LB weights for elements
-30. write MUMPS wrapper for fiber nested dissection
+30. revisit OpenMP parallelization update_gdof
 31. OpenMP parallelize 'enforce_min_rule, enforce_max_rule'
 32. Extend 'find_neig' routine to work in irregular mesh
+31. Eliminate all "syscom.blk" dependencies
+32. Integrate LASER code into par_hp3d
+33. OpenMP parallelize global_href routine
+34. Implement paraview/vtk visualization library (parallel I/O)
 
 F --> F90:
 - done, data_structure3D.F, and then parallelize loops (e.g., reset_visit)
+- all other relevant files
+- delete back/ folders and F_OLD files
 
 - done, do not pass coordinate vector x to nodgen (used for debugging with vertices)
 - get rid of Zoltan warning about 'failing to dealloc memory' when 'RETURN_LISTS' is 'EXPORT'
