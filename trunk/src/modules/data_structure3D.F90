@@ -28,7 +28,7 @@ module data_structure3D
       integer, save :: NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ
 !
 !  ...maximum number of nodes, pointer to the first free entry in NODES
-      integer, save :: MAXNODS,NPNODS
+      integer, save :: MAXNODS=0,NPNODS=0
 !
 !----------------------------------------------------------------------
 !  INITIAL MESH ELEMENT                                               |
