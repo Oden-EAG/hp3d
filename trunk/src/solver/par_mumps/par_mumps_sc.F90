@@ -286,6 +286,9 @@ subroutine par_mumps_sc(mtype)
 !  (sequential metis/scotch using 32bit currently)
    if (nnz > 2e9) mumps_par%icntl(28) = 2
 !
+!..percentage increase in estimated workspace for global interface problem
+   mumps_par%icntl(14) = 40
+!
 !..memory allocation for MUMPS solver
    mumps_par%N = nrdof
    mumps_par%NNZ_loc = nnz_loc
@@ -478,7 +481,7 @@ subroutine par_mumps_sc(mtype)
    if (mumps_par%INFOG(1) .ne. 0) then
       call mumps_destroy
       if (RANK.eq.ROOT) write(*,*) 'analysis: mumps_par%INFOG(1) .ne. 0'
-      stop 1
+      stop
    endif
    if (RANK .eq. ROOT) then
       write(*,1100) '   - MAX estimated size in GB = ',mumps_par%INFOG(16)/1000.d0
@@ -488,6 +491,8 @@ subroutine par_mumps_sc(mtype)
  1100 format(A,F11.3)
  1200 format(A,I1)
    endif
+!
+  35 continue
 !
 !..MUMPS factorization
    mumps_par%JOB = 2
@@ -501,20 +506,25 @@ subroutine par_mumps_sc(mtype)
 #else
    call dmumps(mumps_par)
 #endif
+   if (mumps_par%INFOG(1) .ne. 0) then
+      if (RANK.eq.ROOT) write(*,*) 'factorization: mumps_par%INFOG(1) .ne. 0'
+      if (mumps_par%INFOG(1) .eq. -9) then
+         if (RANK.eq.ROOT) write(*,*) 'Increasing workspace, trying factorization again...'
+         mumps_par%icntl(14) = mumps_par%icntl(14) + 10 ! increase workspace by 10 percent
+         goto 35
+      endif
+      call mumps_destroy
+      stop
+   endif
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(mumps_par%COMM, ierr)
       time_stamp = MPI_Wtime()-time_stamp
       if (RANK .eq. ROOT) write(*,3002) time_stamp
  3002 format(' - Factorize: ',f12.5,'  seconds')
-   endif
-   if (mumps_par%INFOG(1) .ne. 0) then
-      call mumps_destroy
-      if (RANK.eq.ROOT) write(*,*) 'factorization: mumps_par%INFOG(1) .ne. 0'
-      stop 1
-   endif
-   if (RANK .eq. ROOT) then
-      write(*,1100) '   - MAX memory used in GB    = ',mumps_par%INFOG(21)/1000.d0
-      write(*,1100) '   - SUM memory used in GB    = ',mumps_par%INFOG(22)/1000.d0
+      if (RANK .eq. ROOT) then
+         write(*,1100) '   - MAX memory used in GB    = ',mumps_par%INFOG(21)/1000.d0
+         write(*,1100) '   - SUM memory used in GB    = ',mumps_par%INFOG(22)/1000.d0
+      endif
    endif
 !
 !..MUMPS solve
@@ -529,16 +539,16 @@ subroutine par_mumps_sc(mtype)
 #else
    call dmumps(mumps_par)
 #endif
+   if (mumps_par%INFOG(1) .ne. 0) then
+      call mumps_destroy
+      if (RANK.eq.ROOT) write(*,*) 'solve: mumps_par%INFOG(1) .ne. 0'
+      stop
+   endif
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(mumps_par%COMM, ierr)
       time_stamp = MPI_Wtime()-time_stamp
       if (RANK .eq. ROOT) write(*,3003) time_stamp
  3003 format(' - Solve    : ',f12.5,'  seconds')
-   endif
-   if (mumps_par%INFOG(1) .ne. 0) then
-      call mumps_destroy
-      if (RANK.eq.ROOT) write(*,*) 'solve: mumps_par%INFOG(1) .ne. 0'
-      stop 1
    endif
 !
 ! ----------------------------------------------------------------------

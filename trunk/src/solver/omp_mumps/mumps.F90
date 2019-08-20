@@ -60,17 +60,28 @@ subroutine mumps_start
    call dmumps(mumps_par)
 #endif
 !
-!..output for error messages
+!..output stream for error messages
+!     0: suppress messages
+!     6: stdout
    mumps_par%icntl(1) = 6
 !
-!..output for diagnostic/statistics/warning messages
+!..output stream for diagnostic/statistics/warning messages
+!     0: suppress messages
+!     6: stdout
    mumps_par%icntl(2) = 0
 !
-!..output for global information
+!..output stream for global information
+!     0: suppress messages
+!     6: stdout
    mumps_par%icntl(3) = 0
 !
 !..print level for error/warning/diagnostic messages
-   mumps_par%icntl(4) = 6
+!     0: no output messages
+!     1: only error messages
+!     2: errors, warnings, and main stats
+!     3: errors, warnings, and terse diagnostics
+!     4: errors, warnings, and info on input/output params
+   mumps_par%icntl(4) = 1
 !
 !..icntl(5): matrix input format
 !     0: assembled input format

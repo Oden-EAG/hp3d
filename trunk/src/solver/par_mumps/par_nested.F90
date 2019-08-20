@@ -89,12 +89,12 @@ subroutine par_nested(mtype)
    integer :: nrdof_subd(0:NUM_PROCS-1)
 !
 !..auxiliary data structures for nested dissection
-   integer, allocatable :: NOD_SUM(:), NFIRST_SUBD(:), LCON_SUBD(:)
+   integer, allocatable :: NOD_SUM(:),NFIRST_SUBD(:),LCON_SUBD(:)
    VTYPE  , allocatable :: ZSOL_SUBD(:),Aib(:,:),Aii(:,:),Bi(:)
-   integer :: nrdof_bub,nrdof_subd_con,nrdof_bub_tot,nrdofc_bub,nrdofc_subd,k_bub,k_ib
-   integer(8) :: nnz_bub,nnz_bub_tot!,nnz_ib
+   integer :: nrdof_subd_bub,nrdof_subd_con,nrdof_bub,nrdofc_bub,nrdofc_subd
+   integer :: ni,nb,k_bub,k_ib
+   integer(8) :: nnz_bub!,nnz_ib
    integer(8) :: elem_nnz_bub(NRELES_SUBD)!,elem_nnz_ib(NRELES_SUBD)
-   integer :: ni,nb
 !
 !..timer
    real(8) :: MPI_Wtime,start_time,end_time,time_stamp
@@ -173,12 +173,13 @@ subroutine par_nested(mtype)
    allocate(NFIRST_SUBD(NRNODS)); NFIRST_SUBD = -1
 !
 !..Step 1: determine the first dof offsets for active nodes
-   nrdof = 0; nrdof_bub = 0; nrdof_subd_con = 0; nrdof_mdl = 0; nrdofc_subd = 0; idec = 1
+   nrdof = 0; nrdof_mdl = 0; nrdofc_subd = 0; idec = 1
+   nrdof_subd_bub = 0; nrdof_subd_con = 0
 !
 !..non-zero counters for element offsets in distributed sparse stiffness matrix
 !  using 64 bit integers nnz and nnz_loc
-   nnz     = 0_8; ! global number of non-zeros in matrix (counts duplicate indices)
-   nnz_loc = 0_8; ! local  number of non-zeros in matrix (counts duplicate indices)
+   !nnz     = 0_8; ! global number of non-zeros in matrix (counts duplicate indices)
+   !nnz_loc = 0_8; ! local  number of non-zeros in matrix (counts duplicate indices)
    !elem_nnz_loc(1:NRELES_SUBD) = 0_8 ! local element offsets for subdomain matrix
 !
 !..non-zero counters for offsets in subdomain interior (bubble-bubble) matrix
@@ -222,8 +223,8 @@ subroutine par_nested(mtype)
 !
 !     ...update the dof counter for subdomain problem
          if (NOD_SUM(nod) .le. 1) then
-            NFIRST_SUBD(nod) = nrdof_bub ! offset in subdomain bubble problem
-            nrdof_bub = nrdof_bub + ndofmH(i) + ndofmE(i) + ndofmV(i)
+            NFIRST_SUBD(nod) = nrdof_subd_bub ! offset in subdomain bubble problem
+            nrdof_subd_bub = nrdof_subd_bub + ndofmH(i) + ndofmE(i) + ndofmV(i)
          else
             NFIRST_SUBD(nod) = nrdof_subd_con
             nrdof_subd_con = nrdof_subd_con + ndofmH(i) + ndofmE(i) + ndofmV(i) ! offset in subdomain interface problem
@@ -239,7 +240,7 @@ subroutine par_nested(mtype)
             nrdof = nrdof + ndofmH(i) + ndofmE(i) + ndofmV(i) ! offset in global interface problem
          endif
       enddo
-      if (.not. ISTC_FLAG) nrdof_bub = nrdof_bub + ndofmQ(nrnodm)
+      if (.not. ISTC_FLAG) nrdof_subd_bub = nrdof_subd_bub + ndofmQ(nrnodm)
 !
 !  ...compute number of middle node bubble dof (nrdof_mdl)
       if (ISTC_FLAG) then
@@ -258,11 +259,11 @@ subroutine par_nested(mtype)
 !  ...k_bub      = number of subdomain interior non-zero entries in element stiffness matrix 'Abb'
 !  ...k_ib       = number of subdomain interface-bubble non-zero entries in element stiffness matrix 'Aib'
       k_bub = nrdofc_bub**2
-      k_ib  = (nrdofc-nrdofc_bub)*nrdofc_bub
+      !k_ib  = (nrdofc-nrdofc_bub)*nrdofc_bub
 !
 !  ...subdomain condensed counters for OpenMP (interface-interface matrix)
       !elem_nnz_loc(iel) = nnz_loc
-      nnz_loc = nnz_loc + int8(k)
+      !nnz_loc = nnz_loc + int8(k)
 !  ...subdomain interior counters for OpenMP (bubble-bubble matrix)
       elem_nnz_bub(iel) = nnz_bub
       nnz_bub = nnz_bub + int8(k_bub)
@@ -304,20 +305,16 @@ subroutine par_nested(mtype)
    call MPI_ALLREDUCE(MPI_IN_PLACE,nrdof_mdl,count,MPI_INTEGER,MPI_SUM,mumps_par%COMM,ierr)
 !
 !..compute total number of condensed subdomain bubble dofs
-   nrdof_bub_tot = 0; count = 1;
-   call MPI_ALLREDUCE(nrdof_bub,nrdof_bub_tot,count,MPI_INTEGER,MPI_SUM,mumps_par%COMM,ierr)
+   nrdof_bub = 0; count = 1;
+   call MPI_ALLREDUCE(nrdof_subd_bub,nrdof_bub,count,MPI_INTEGER,MPI_SUM,mumps_par%COMM,ierr)
 !
 !..compute total number of non-zeros in global interface matrix
-   count = 1
+   nnz_loc = int8(nrdof_subd_con**2); nnz = 0_8; count = 1;
    call MPI_ALLREDUCE(nnz_loc,nnz,count,MPI_INTEGER8,MPI_SUM,mumps_par%COMM,ierr)
-!
-!..compute total number of non-zeros in subdomain bubble matrices
-   count = 1
-   call MPI_ALLREDUCE(nnz_bub,nnz_bub_tot,count,MPI_INTEGER8,MPI_SUM,mumps_par%COMM,ierr)
 !
 !..total number of (interface) dof is nrdof
    NRDOF_CON = nrdof
-   NRDOF_TOT = nrdof + nrdof_bub_tot + nrdof_mdl
+   NRDOF_TOT = nrdof + nrdof_bub + nrdof_mdl
 !
    deallocate(NOD_OWN)
 !
@@ -345,26 +342,27 @@ subroutine par_nested(mtype)
 !
    call MPI_BARRIER(mumps_par%COMM, ierr)
    if (RANK .eq. ROOT) then
-      write(*,2010) '       Number of dof   : nrdof_con      = ', NRDOF_CON,        &
-                    '                         nrdof_bub_tot  = ', nrdof_bub_tot,    &
-                    '                         nrdof_mdl      = ', nrdof_mdl,        &
-                    '                         nrdof_tot      = ', NRDOF_TOT,        &
-                    '       Total non-zeros : nnz            = ', nnz,              &
-                    '       Total bubble nnz: nnz_bub_tot    = ', nnz_bub_tot
+      write(*,2010) '       Number of dof   : nrdof_con      = ', NRDOF_CON,  &
+                    '                         nrdof_bub      = ', nrdof_bub,  &
+                    '                         nrdof_mdl      = ', nrdof_mdl,  &
+                    '                         nrdof_tot      = ', NRDOF_TOT,  &
+                    '       Total interf nnz: nnz            = ', nnz
    endif
    call MPI_BARRIER(mumps_par%COMM, ierr)
-   write(*,2011) '[', RANK, '] Local interf dof: nrdof_subd_con = ', nrdof_subd_con,&
-                       '       Local bubble dof: nrdof_bub      = ', nrdof_bub,     &
+   write(*,2011) '[', RANK, '] Local interf dof: nrdof_subd_con = ', nrdof_subd_con, &
+                       '       Local bubble dof: nrdof_subd_bub = ', nrdof_subd_bub, &
+                       '       Local interf nnz: nnz_loc        = ', nnz_loc,        &
                        '       Local bubble nnz: nnz_bub        = ', nnz_bub
-2010 format(A,I12,/,A,I12,/,A,I12,/,A,I12,/,A,I12,/,A,I12,/)
-2011 format(A,I4,A,I12,/,A,I12,/,A,I12)
+
+2010 format(A,I12,/,A,I12,/,A,I12,/,A,I12,/,A,I12,/)
+2011 format(A,I4,A,I12,/,A,I12,/,A,I12,A,I12,/)
    call MPI_BARRIER(mumps_par%COMM, ierr)
 !
 !..memory allocation for local subdomain MUMPS solve
 !  TODO write warning if subdomain has NO bubble dofs,
 !       and either call normal par_mumps, or skip the bubble solve
-   if (nrdof_bub .eq. 0) then
-      write(*,2011) '[', RANK, '] PAR_NESTED WARNING: nrdof_bub = 0, no subdomain problem.'
+   if (nrdof_subd_bub .eq. 0) then
+      write(*,2011) '[', RANK, '] PAR_NESTED WARNING: nrdof_subd_bub = 0, no subdomain problem.'
    endif
 !
 !
@@ -376,19 +374,19 @@ subroutine par_nested(mtype)
    endif
 !
 !..Set up parameters for local MUMPS solve
-   mumps_bub%N = nrdof_bub
+   mumps_bub%N = nrdof_subd_bub
    mumps_bub%NNZ = nnz_bub
    mumps_bub%NRHS = NR_RHS + nrdof_subd_con
-   mumps_bub%LRHS = nrdof_bub
+   mumps_bub%LRHS = nrdof_subd_bub
    allocate(mumps_bub%IRN(nnz_bub))
    allocate(mumps_bub%JCN(nnz_bub))
    allocate(mumps_bub%A(nnz_bub))
    allocate(mumps_bub%RHS(mumps_bub%N * (NR_RHS+nrdof_subd_con)))
    mumps_bub%RHS=ZERO
 !
-   allocate(Aib(nrdof_subd_con,nrdof_bub))     ; Aib = ZERO
+   allocate(Aib(nrdof_subd_con,nrdof_subd_bub)); Aib = ZERO
    allocate(Aii(nrdof_subd_con,nrdof_subd_con)); Aii = ZERO
-   allocate(Bi(nrdof_subd_con))                ; Bi = ZERO
+   allocate(Bi (nrdof_subd_con))               ; Bi = ZERO
 !
 !..memory allocation for indices of condensed subdomain solution
    allocate(LCON_SUBD(nrdof_subd_con))
@@ -629,6 +627,11 @@ subroutine par_nested(mtype)
 #else
    call dmumps(mumps_bub)
 #endif
+   if (mumps_bub%INFO(1) .ne. 0) then
+      call mumps_destroy_subd
+      write(*,*) '[',RANK,'] analysis: mumps_bub%INFO(1) .ne. 0'
+      stop
+   endif
    if (IPRINT_TIME .eq. 1) then
       time_stamp = MPI_Wtime()-time_stamp
       write(*,3101) RANK,time_stamp,                                       &
@@ -636,13 +639,10 @@ subroutine par_nested(mtype)
          '         - ordering method used = ',mumps_bub%INFOG(7)
  3101 format('[',I4,'] - Analysis : ',f12.5,'  seconds',/,A,F11.3,/,A,I1)
    endif
-   if (mumps_bub%INFO(1) .ne. 0) then
-      call mumps_destroy_subd
-      write(*,*) '[',RANK,'] analysis: mumps_bub%INFO(1) .ne. 0'
-      stop 1
-   endif
 !
    call MPI_BARRIER(mumps_par%COMM, ierr)
+!
+  35 continue
 !
 !..MUMPS factorization
    mumps_bub%JOB = 2
@@ -653,16 +653,21 @@ subroutine par_nested(mtype)
 #else
    call dmumps(mumps_bub)
 #endif
+   if (mumps_bub%INFO(1) .ne. 0) then
+      write(*,*) '[',RANK,'] factorization: mumps_bub%INFO(1) .ne. 0'
+      if (mumps_bub%INFO(1) .eq. -9) then
+         write(*,*) '[',RANK,'] Increasing workspace, trying factorization again...'
+         mumps_bub%icntl(14) = mumps_bub%icntl(14) + 10 ! increase workspace by 10 percent
+         goto 35
+      endif
+      call mumps_destroy_subd
+      stop
+   endif
    if (IPRINT_TIME .eq. 1) then
       time_stamp = MPI_Wtime()-time_stamp
       write(*,3102) RANK,time_stamp,   &
          '         - memory used in GB    = ',mumps_bub%INFO(22)/1000.d0
  3102 format('[',I4,'] - Factorize: ',f12.5,'  seconds',/,A,F11.3)
-   endif
-   if (mumps_bub%INFO(1) .ne. 0) then
-      call mumps_destroy_subd
-      write(*,*) '[',RANK,'] factorization: mumps_bub%INFO(1) .ne. 0'
-      stop 1
    endif
 !
    call MPI_BARRIER(mumps_par%COMM, ierr)
@@ -676,15 +681,15 @@ subroutine par_nested(mtype)
 #else
    call dmumps(mumps_bub)
 #endif
+   if (mumps_bub%INFO(1) .ne. 0) then
+      call mumps_destroy_subd
+      write(*,*) '[',RANK,'] solve: mumps_bub%INFO(1) .ne. 0'
+      stop
+   endif
    if (IPRINT_TIME .eq. 1) then
       time_stamp = MPI_Wtime()-time_stamp
       write(*,3103) RANK,time_stamp
  3103 format('[',I4,'] - Solve    : ',f12.5,'  seconds')
-   endif
-   if (mumps_bub%INFO(1) .ne. 0) then
-      call mumps_destroy_subd
-      write(*,*) '[',RANK,'] solve: mumps_bub%INFO(1) .ne. 0'
-      stop 1
    endif
 !
    if (IPRINT_TIME .eq. 1) then
@@ -736,11 +741,11 @@ subroutine par_nested(mtype)
    if (nnz > 2e9) mumps_par%icntl(28) = 2
 !
 !..percentage increase in estimated workspace for global interface problem
-   mumps_par%icntl(14) = 80
+   mumps_par%icntl(14) = 150 + NUM_PROCS
 !
 !..memory allocation for global MUMPS solve
    mumps_par%N = NRDOF_CON
-   mumps_par%NNZ_loc = nrdof_subd_con**2 !nnz_loc
+   mumps_par%NNZ_loc = nnz_loc
    mumps_par%NRHS = NR_RHS ! currently assumed one right-hand side only
    ! mumps_par%LRHS = NRDOF_CON
    allocate(mumps_par%IRN_loc(mumps_par%NNZ_loc))
@@ -808,25 +813,27 @@ subroutine par_nested(mtype)
 #else
    call dmumps(mumps_par)
 #endif
+   if (mumps_par%INFOG(1) .ne. 0) then
+      call mumps_destroy
+      if (RANK.eq.ROOT) write(*,*) 'analysis: mumps_par%INFOG(1) .ne. 0'
+      stop
+   endif
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(mumps_par%COMM, ierr)
       time_stamp = MPI_Wtime()-time_stamp
       if (RANK .eq. ROOT) write(*,3001) time_stamp
  3001 format(' - Analysis : ',f12.5,'  seconds')
+      if (RANK .eq. ROOT) then
+         write(*,1100) '   - MAX estimated size in GB = ',mumps_par%INFOG(16)/1000.d0
+         write(*,1100) '   - SUM estimated size in GB = ',mumps_par%INFOG(17)/1000.d0
+         write(*,1200) '   - Seq/parallel analysis    = ',mumps_par%INFOG(32)
+         write(*,1200) '   - Ordering method used     = ',mumps_par%INFOG(7)
+    1100 format(A,F11.3)
+    1200 format(A,I1)
+      endif
    endif
-   if (mumps_par%INFOG(1) .ne. 0) then
-      call mumps_destroy
-      if (RANK.eq.ROOT) write(*,*) 'analysis: mumps_par%INFOG(1) .ne. 0'
-      stop 1
-   endif
-   if (RANK .eq. ROOT) then
-      write(*,1100) '   - MAX estimated size in GB = ',mumps_par%INFOG(16)/1000.d0
-      write(*,1100) '   - SUM estimated size in GB = ',mumps_par%INFOG(17)/1000.d0
-      write(*,1200) '   - Seq/parallel analysis    = ',mumps_par%INFOG(32)
-      write(*,1200) '   - Ordering method used     = ',mumps_par%INFOG(7)
- 1100 format(A,F11.3)
- 1200 format(A,I1)
-   endif
+!
+  55 continue
 !
 !..MUMPS factorization
    mumps_par%JOB = 2
@@ -840,20 +847,25 @@ subroutine par_nested(mtype)
 #else
    call dmumps(mumps_par)
 #endif
+   if (mumps_par%INFOG(1) .ne. 0) then
+      if (RANK.eq.ROOT) write(*,*) 'factorization: mumps_par%INFOG(1) .ne. 0'
+      if (mumps_par%INFOG(1) .eq. -9) then
+         if (RANK.eq.ROOT) write(*,*) 'Increasing workspace, trying factorization again...'
+         mumps_par%icntl(14) = mumps_par%icntl(14) + 50 ! increase workspace by 50 percent
+         goto 55
+      endif
+      call mumps_destroy
+      stop
+   endif
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(mumps_par%COMM, ierr)
       time_stamp = MPI_Wtime()-time_stamp
       if (RANK .eq. ROOT) write(*,3002) time_stamp
  3002 format(' - Factorize: ',f12.5,'  seconds')
-   endif
-   if (mumps_par%INFOG(1) .ne. 0) then
-      call mumps_destroy
-      if (RANK.eq.ROOT) write(*,*) 'factorization: mumps_par%INFOG(1) .ne. 0'
-      stop 1
-   endif
-   if (RANK .eq. ROOT) then
-      write(*,1100) '   - MAX memory used in GB    = ',mumps_par%INFOG(21)/1000.d0
-      write(*,1100) '   - SUM memory used in GB    = ',mumps_par%INFOG(22)/1000.d0
+      if (RANK .eq. ROOT) then
+         write(*,1100) '   - MAX memory used in GB    = ',mumps_par%INFOG(21)/1000.d0
+         write(*,1100) '   - SUM memory used in GB    = ',mumps_par%INFOG(22)/1000.d0
+      endif
    endif
 !
 !..MUMPS solve
@@ -868,16 +880,16 @@ subroutine par_nested(mtype)
 #else
    call dmumps(mumps_par)
 #endif
+   if (mumps_par%INFOG(1) .ne. 0) then
+      call mumps_destroy
+      if (RANK.eq.ROOT) write(*,*) 'solve: mumps_par%INFOG(1) .ne. 0'
+      stop
+   endif
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(mumps_par%COMM, ierr)
       time_stamp = MPI_Wtime()-time_stamp
       if (RANK .eq. ROOT) write(*,3003) time_stamp
  3003 format(' - Solve    : ',f12.5,'  seconds')
-   endif
-   if (mumps_par%INFOG(1) .ne. 0) then
-      call mumps_destroy
-      if (RANK.eq.ROOT) write(*,*) 'solve: mumps_par%INFOG(1) .ne. 0'
-      stop 1
    endif
 !
    if (IPRINT_TIME .eq. 1) then
