@@ -226,8 +226,8 @@ subroutine par_nested(mtype)
             NFIRST_SUBD(nod) = nrdof_subd_bub ! offset in subdomain bubble problem
             nrdof_subd_bub = nrdof_subd_bub + ndofmH(i) + ndofmE(i) + ndofmV(i)
          else
-            NFIRST_SUBD(nod) = nrdof_subd_con
-            nrdof_subd_con = nrdof_subd_con + ndofmH(i) + ndofmE(i) + ndofmV(i) ! offset in subdomain interface problem
+            NFIRST_SUBD(nod) = nrdof_subd_con ! offset in subdomain interface problem
+            nrdof_subd_con = nrdof_subd_con + ndofmH(i) + ndofmE(i) + ndofmV(i)
          endif
 !
 !     ...avoid repetition within overlaps with other subdomains
@@ -355,7 +355,7 @@ subroutine par_nested(mtype)
                        '       Local bubble nnz: nnz_bub        = ', nnz_bub
 
 2010 format(A,I12,/,A,I12,/,A,I12,/,A,I12,/,A,I12,/)
-2011 format(A,I4,A,I12,/,A,I12,/,A,I12,A,I12,/)
+2011 format(A,I4,A,I12,/,A,I12,/,A,I12,/,A,I12,/)
    call MPI_BARRIER(mumps_par%COMM, ierr)
 !
 !..memory allocation for local subdomain MUMPS solve
@@ -465,7 +465,7 @@ subroutine par_nested(mtype)
          if (NOD_SUM(nod) .le. 1) then ! bubble node
             do j=1,ndofmE(i)
                l=l+1
-               LCON(l) = -(NFIRST_DOF(nod)+ndofmH(i)+j) ! negative index indicates bubble dof
+               LCON(l) = -(NFIRST_SUBD(nod)+ndofmH(i)+j) ! negative index indicates bubble dof
             enddo
          else ! interface node
             do j=1,ndofmE(i)
@@ -482,7 +482,7 @@ subroutine par_nested(mtype)
          if (NOD_SUM(nod) .le. 1) then ! bubble node
             do j=1,ndofmV(i)
                l=l+1
-               LCON(l) = -(NFIRST_DOF(nod)+ndofmH(i)+ndofmE(i)+j) ! negative index indicates bubble dof
+               LCON(l) = -(NFIRST_SUBD(nod)+ndofmH(i)+ndofmE(i)+j) ! negative index indicates bubble dof
             enddo
          else ! interface node
             do j=1,ndofmV(i)
