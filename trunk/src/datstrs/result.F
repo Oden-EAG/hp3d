@@ -123,8 +123,6 @@ c
  7426   format(' VISITATION FLAG = ',i5)
         write(*,7027) NODES(nod)%ref_kind
  7027   format(' REFINEMENT KIND = ',i3)
-        write(*,9000) NODES(nod)%ref_filter
- 9000   format(' REFINEMENT FILTER = ',i3)
         write(*,7028) NODES(nod)%father
  7028   format(' FATHER = ',i10)
         if (NODES(nod)%ref_kind.ne.0) then

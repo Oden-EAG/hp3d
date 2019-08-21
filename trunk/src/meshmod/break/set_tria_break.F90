@@ -1,12 +1,13 @@
 !> Purpose : set the necessary infomation for the trig break
-subroutine set_trig_break(Kref, Nord, &
-     Nrsons, Type, Norder)
+subroutine set_tria_break(Kref,Nord, Nrsons,Type,Norder)
   implicit none
-  integer,                         intent(in)  :: Kref, Nord
+  integer,                         intent(in)  :: Kref,Nord
   integer,          dimension(27), intent(out) :: Norder
   integer,                         intent(out) :: Nrsons
   character(len=4), dimension(27), intent(out) :: Type
-
+!
+  Norder = 0; Type(1:27) = 'none'
+!
   select case(Kref)
   case(1)
      Nrsons = 7
@@ -24,4 +25,6 @@ subroutine set_trig_break(Kref, Nord, &
   case default
      Nrsons = 0
   end select
-end subroutine set_trig_break
+!
+end subroutine set_tria_break
+

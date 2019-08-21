@@ -116,15 +116,17 @@ module data_structure3D
 !  .....boundary condition flag
         integer          :: bcond
 !
-!  .....refinement flag
-        integer          :: ref_kind, ref_filter
-!
 !  .....father node
         integer          :: father
 !
 !  .....node sons
         integer          :: first_son
         integer          :: nr_sons
+        !integer(2)      :: nr_sons
+!
+!  .....refinement flag
+        integer          :: ref_kind
+        !integer(2)      :: ref_kind
 !
 !  .....interface flag with GMP
         integer          :: geom_interf
@@ -134,6 +136,7 @@ module data_structure3D
 !
 !  .....activation flag
         integer          :: act
+        !logical          :: act
 !
 !  .....subdomain number (distributed mesh)
         integer          :: subd
@@ -442,7 +445,6 @@ module data_structure3D
         write(ndump,*) NODES(nod)%order
         write(ndump,*) NODES(nod)%bcond
         write(ndump,*) NODES(nod)%ref_kind
-        write(ndump,*) NODES(nod)%ref_filter
         write(ndump,*) NODES(nod)%father
         write(ndump,*) NODES(nod)%first_son
         write(ndump,*) NODES(nod)%nr_sons
@@ -562,7 +564,6 @@ module data_structure3D
         read(ndump,*) NODES(nod)%order
         read(ndump,*) NODES(nod)%bcond
         read(ndump,*) NODES(nod)%ref_kind
-        read(ndump,*) NODES(nod)%ref_filter
         read(ndump,*) NODES(nod)%father
         read(ndump,*) NODES(nod)%first_son
         read(ndump,*) NODES(nod)%nr_sons

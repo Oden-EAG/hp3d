@@ -1,20 +1,20 @@
 !> Purpose : prepare the necessary information for breaking a brick middle node
-subroutine set_bric_break( &
-           Kref, Kfilter, Nord, &
-           Nrsons, Type, Norder, Nfilter)
+subroutine set_bric_break(Kref,Nord, Nrsons,Type,Norder)
   implicit none
-  integer,                         intent(in)  :: Kref, Kfilter, Nord
-  integer,          dimension(27), intent(out) :: Norder, Nfilter
+  integer,                         intent(in)  :: Kref,Nord
+  integer,          dimension(27), intent(out) :: Norder
   integer,                         intent(out) :: Nrsons
   character(len=4), dimension(27), intent(out) :: Type
   integer :: nordxy, nordyz, nordxz, nordx, nordy, nordz
-
+!
   call decode(nord,   nordxy,nordz)
   call decode(nordxy, nordx, nordy)
-
+!
   nordxz = nordx*10 + nordz
   nordyz = nordy*10 + nordz
-
+!
+  Norder = 0; Type(1:27) = 'none'
+!  
   select case (Kref)
   case (001,010,100)
      Nrsons = 3
@@ -28,8 +28,6 @@ subroutine set_bric_break( &
      case(100)
         Norder(1:3) = (/nord,nord,nordyz/)
      end select
-
-     Nfilter(1:2) = Kfilter
   case (011,101,110)
      Nrsons      = 9
      Type(1:4)  = 'mdlb' 
@@ -49,10 +47,9 @@ subroutine set_bric_break( &
             nord,nord,nord,nord, &
             nordyz,nordxz,nordyz,nordxz,nordz/)
      end select
-     Nfilter(1:4) = Kfilter
   case (111)
      Nrsons = 27
-     Type(1:8)   = 'mdlb' 
+     Type(1:8)   = 'mdlb'
      Type(9:20)  = 'mdlq'
      Type(21:26) = 'medg'
      Type(27)    = 'vert'
@@ -71,8 +68,9 @@ subroutine set_bric_break( &
           nordxy,nordxy,nordxy,nordxy, &
           nordyz,nordxz,nordyz,nordxz, &
           nordz,nordy,nordx,nordy,nordx,nordz,1/)
-     Nfilter(1:8) = Kfilter
   case default
      Nrsons = 0
   end select
+!
 end subroutine set_bric_break
+

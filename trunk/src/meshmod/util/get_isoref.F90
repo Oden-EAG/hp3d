@@ -27,11 +27,6 @@ subroutine get_isoref(Nod, Kref)
 !
       Kref = 0
       iprint = 0
-!     
-!  ...if refinement filter, then return
-      if (NODES(Nod)%ref_filter.ne.0) then
-        Kref=NODES(Nod)%ref_filter ; return
-      endif
 !
 !  ...select refinement based on node type
       select case(NODES(Nod)%type)
@@ -91,6 +86,10 @@ subroutine get_isoref(Nod, Kref)
           write(*,7000) Kref, dist
 7000      format(' get_isoref : Kref = ',i3,' dist = ',3f8.3)
         endif
+
+      case('mdld')
+        write(*,*) 'get_isoref: no isotropic refinement for pyramid.'
+        stop
       endselect
 !
 !

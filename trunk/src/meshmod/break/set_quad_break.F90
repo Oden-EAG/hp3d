@@ -7,12 +7,12 @@
 !> @param[out] Type    - sons' types
 !> @param[out] Norder  - sons' orders of approximation
 !!
-!> rev@Dec 12
+!> rev@Aug 2019
 !----------------------------------------------------------------------------
 subroutine set_quad_break(Kref,Nord, Nrsons,Type,Norder)
 !
   implicit none
-  integer,                         intent(in)  :: Kref, Nord
+  integer,                         intent(in)  :: Kref,Nord
   integer,          dimension(27), intent(out) :: Norder
   integer,                         intent(out) :: Nrsons
   character(len=4), dimension(27), intent(out) :: Type
@@ -20,8 +20,7 @@ subroutine set_quad_break(Kref,Nord, Nrsons,Type,Norder)
 !----------------------------------------------------------------------------
 !
 ! initialize
-  Type(1:27)='none'
-  Norder(1:27)=0
+  Norder = 0; Type(1:27) = 'none'
 !  
   call decode(Nord, nordx,nordy)
 !
@@ -46,4 +45,6 @@ subroutine set_quad_break(Kref,Nord, Nrsons,Type,Norder)
   case default
      Nrsons = 0
   end select
+!
 end subroutine set_quad_break
+

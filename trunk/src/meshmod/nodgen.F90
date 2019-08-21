@@ -16,7 +16,6 @@
 !              Nbcond  - boundary condition flag
 !              Nfath   - father of the node
 !              Norder  - order of approximation for the new node
-!              Nfilter - refinement filter
 !              Subd    - subdomain of node
 !              Iact    = 1  active node, allocate dof
 !                      = 0  inactive node, DO NOT allocate dof
@@ -26,7 +25,7 @@
 !
 !-----------------------------------------------------------------------
 !
-subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Nfilter,Subd,Iact, Nod)
+subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
 !
    use data_structure3D
 !
@@ -37,7 +36,6 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Nfilter,Subd,Iact, Nod)
    integer, intent(in)           :: Nbcond
    integer, intent(in)           :: Nfath
    integer, intent(in)           :: Norder
-   integer, intent(in)           :: Nfilter
    integer, intent(in)           :: Subd
    integer, intent(in)           :: Iact
    integer, intent(out)          :: Nod
@@ -78,7 +76,6 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Nfilter,Subd,Iact, Nod)
 !
    call set_index(Icase,Nbcond, NODES(Nod)%index)
    NODES(Nod)%ref_kind    = 0
-   NODES(Nod)%ref_filter  = Nfilter
    NODES(Nod)%father      = Nfath
    NODES(Nod)%geom_interf = 0
    NODES(Nod)%visit       = 0

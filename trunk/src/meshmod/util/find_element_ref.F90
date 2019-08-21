@@ -9,17 +9,7 @@ subroutine find_element_ref(Type,Kref,Kreff, Krefm)
   use refinements
   implicit none
   ! ** Arguments
-#ifdef _PYHP3D
-  integer,      intent(in)  :: Type
- 7000 format(' find_element_ref: Type,Kref,Kreff = ',i2,4x,i2,4x,6(i2,2x))
-7001 format('find_element_ref: Type,Kref,Krefm,Kreff = ', &
-          i2,2x,i2,2x,i2,6x,6(2x,i2))
-#else
   character(len=4),      intent(in)  :: Type
- 7000 format(' find_element_ref: Type,Kref,Kreff = ',a4,4x,i2,4x,6(i2,2x))
-7001 format('find_element_ref: Type,Kref,Krefm,Kreff = ', &
-          a5,2x,i2,2x,i2,6x,6(2x,i2))
-#endif
   integer,               intent(in)  :: Kref
   integer, dimension(6), intent(in)  :: Kreff
   integer,               intent(out) :: Krefm
@@ -33,6 +23,9 @@ subroutine find_element_ref(Type,Kref,Kreff, Krefm)
   if (iprint.ge.1) then
       write(*,7000)Type,Kref,Kreff(1:6)
   endif
+
+  7000 format(' find_element_ref: Type,Kref,Kreff = ',a4,4x,i2,4x,6(i2,2x))
+  7001 format(' find_element_ref: Type,Kref,Krefm,Kreff = ',a5,2x,i2,2x,i2,6x,6(2x,i2))
 
   Krefm = -1
   ! be careful, the search direction is from aniso refinement

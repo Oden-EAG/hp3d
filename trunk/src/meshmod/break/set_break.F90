@@ -3,7 +3,6 @@
 !!
 !! @param[in ] Type_nod  - node type
 !! @param[in ] Kref      - refinement kind
-!! @param[in ] Kfilter   - refinement filter
 !! @param[in ] Nord      - order of approximation for the node
 !! @param[in ] Nbc       - BC flags
 !! @param[in ] Nbc       - BC flags
@@ -11,39 +10,38 @@
 !! @param[out] Nrsons    - number of sons
 !! @param[out] Type_sons - son type
 !! @param[out] Norder    - order of approximation for sons
-!! @param[out] Nfilter   - refinement filter for sons
 !! @param[out] Nbcond    - BC flags for sons
 !! @param[out] Nsubd     - subdomain for sons
 !!
 !! rev@Dec 12
 !---------------------------------------------------------------------------------------------
-subroutine set_break(Type_nod,Kref,Kfilter,Nord,Nbc,Subd, Nrsons,Type_sons,Norder,Nfilter,Nbcond,Nsubd)
+subroutine set_break(Type_nod,Kref,Nord,Nbc,Subd, Nrsons,Type_sons,Norder,Nbcond,Nsubd)
   implicit none
 ! 
   character(len=4),                intent(in)  :: Type_nod
-  integer,                         intent(in)  :: Kref, Kfilter, Nord, Nbc, Subd
+  integer,                         intent(in)  :: Kref, Nord, Nbc, Subd
 !
-  integer,          dimension(27), intent(out) :: Norder, Nbcond, Nfilter, Nsubd
+  integer,          dimension(27), intent(out) :: Norder, Nbcond, Nsubd
   integer,                         intent(out) :: Nrsons
   character(len=4), dimension(27), intent(out) :: Type_sons
 !
-! initialize refinement filter for sons
-  Nfilter=0
+! initialize
+  Norder = 0; Nbcond = 0; Type_sons(1:27) = 'none'
   select case (Type_nod)
 ! EDGE  
-  case('medg') ; call set_edge_break(Kref,Kfilter,Nord, Nrsons,Type_sons,Norder,Nfilter)
+  case('medg') ; call set_edge_break(Kref,Nord, Nrsons,Type_sons,Norder)
 ! TRIANGLE          
-  case('mdlt') ; call set_trig_break(Kref,        Nord, Nrsons,Type_sons,Norder        )
+  case('mdlt') ; call set_tria_break(Kref,Nord, Nrsons,Type_sons,Norder)
 ! QUAD          
-  case('mdlq') ; call set_quad_break(Kref,        Nord, Nrsons,Type_sons,Norder        )
+  case('mdlq') ; call set_quad_break(Kref,Nord, Nrsons,Type_sons,Norder)
 ! BRICK          
-  case('mdlb') ; call set_bric_break(Kref,Kfilter,Nord, Nrsons,Type_sons,Norder,Nfilter)
+  case('mdlb') ; call set_bric_break(Kref,Nord, Nrsons,Type_sons,Norder)
 ! TET          
-  case('mdln') ; call set_tetr_break(Kref,Kfilter,Nord, Nrsons,Type_sons,Norder,Nfilter)
+  case('mdln') ; call set_tetr_break(Kref,Nord, Nrsons,Type_sons,Norder)
 ! PRISM          
-  case('mdlp') ; call set_pris_break(Kref,Kfilter,Nord, Nrsons,Type_sons,Norder,Nfilter)
+  case('mdlp') ; call set_pris_break(Kref,Nord, Nrsons,Type_sons,Norder)
 ! PYRAMID          
-  case('mdld') ; call set_pyra_break(Kref,Kfilter,Nord, Nrsons,Type_sons,Norder,Nfilter)
+  case('mdld') ; call set_pyra_break(Kref,Nord, Nrsons,Type_sons,Norder)
   case default
      write(*,*) 'set_break: NOT SUPPORTED TYPE ', Type_nod
      stop

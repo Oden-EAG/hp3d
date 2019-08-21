@@ -191,7 +191,7 @@ subroutine refine(Mdle_in,Kref_in)
  8002           format(' kreff,krefm = ',6(i2,2x),6x,2i2)
               endif
 
-              if ((NODES(mdle_loc)%ref_filter.eq.0).and.(krefm.lt.0)) then
+              if (krefm.lt.0) then
                  write(*,*) 'refine: INCONSISTENCY'
                  write(*,*) 'mdle_loc%type,kreff,krefm      = ', &
                       NODES(mdle_loc)%type,kreff,krefm
@@ -224,10 +224,6 @@ subroutine refine(Mdle_in,Kref_in)
 
         if ( is_iso_only() ) then
            call get_isoref(mdle, krefm)
-        endif
-
-        if (NODES(mdle)%ref_filter.ne.0) then
-           krefm = NODES(mdle)%ref_filter
         endif
 
         if (krefm.gt.0) then
