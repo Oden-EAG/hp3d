@@ -1,5 +1,6 @@
 !-------------------------------------------------------------------------------------
 !> Purpose : find YOUNGEST middle node neighbors across a mid-face node
+!            who own the whole face
 !!
 !!
 !!                   *************************************************

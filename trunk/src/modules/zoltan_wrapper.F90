@@ -334,7 +334,7 @@ module zoltan_wrapper
       integer :: mdle,i,j,num_neig
       integer :: neig_list(4,6)
       mdle = GID(1)
-      call find_neig(mdle, neig_list)
+      call zoltan_w_find_neig(mdle, neig_list)
       num_neig = 0
       do i=1,6
          do j=1,4
@@ -362,7 +362,7 @@ module zoltan_wrapper
 !$OMP PARALLEL DO PRIVATE(i,j,k,mdle,neig_list,num_neig)
       do k = 1,NumObj
          mdle = GIDs(k)
-         call find_neig(mdle, neig_list)
+         call zoltan_w_find_neig(mdle, neig_list)
          num_neig = 0
          do i=1,6
             do j=1,4
@@ -395,7 +395,7 @@ module zoltan_wrapper
       integer :: mdle,i,j,num_neig,neig,subd
       integer :: neig_list(4,6)
       mdle = GID(1)
-      call find_neig(mdle, neig_list)
+      call zoltan_w_find_neig(mdle, neig_list)
       num_neig = 0
       do i=1,6
          do j=1,4
@@ -462,7 +462,7 @@ module zoltan_wrapper
 !$OMP PARALLEL DO PRIVATE(i,j,k,mdle,neig_list,num_neig,neig,subd)
       do k=1,NumObj
          mdle = GIDs(k)
-         call find_neig(mdle, neig_list)
+         call zoltan_w_find_neig(mdle, neig_list)
          num_neig = 0
          do i=1,6
             do j=1,4
@@ -593,6 +593,70 @@ module zoltan_wrapper
      400 format(' zoltan_w_handle_err: ',A,': Ierr = ',I2,A)
       endif
    end subroutine zoltan_w_handle_err
+!
+!--------------------------------------------------------------------------
+!> Purpose : find neighbors (up to 4, for an h4 refined face) across faces
+!! @param[in]  Mdle      - middle node
+!! @param[out] Neig_list - neighbors
+!!
+!! @revision Aug 2019
+!
+!  TODO: verify this routine
+!--------------------------------------------------------------------------
+   subroutine zoltan_w_find_neig(Mdle, Neig_list)
+!
+      integer,                 intent(in)  :: Mdle
+      integer, dimension(4,6), intent(out) :: Neig_list
+!
+      character(len=4) :: etype
+      integer, dimension(27) :: nodesl,norientl
+      integer, dimension(2)  :: neig,nsid_list,norient_list
+      integer :: i,j,k,nod,nodson,nrneig,mdle_neig
+!
+!  ...initialize
+      Neig_list(1:4,1:6)=0
+!
+!---------------------------------------------------
+! Step 0: short cut for initial mesh elements only
+!---------------------------------------------------
+      etype=NODES(Mdle)%type
+      if (is_root(Mdle)) then
+         do i=1,nface(etype)
+            Neig_list(1,i) = ELEMS(Mdle)%neig(i)
+         enddo
+         return
+      endif
+!
+!---------------------------------------------------
+! Step 1: use neig_face
+!---------------------------------------------------
+      call elem_nodes(Mdle, nodesl,norientl)
+      do i=1,nface(etype)
+         nod = nodesl(nvert(etype)+nedge(etype)+i)
+         call neig_face(nod, nrneig,neig,nsid_list,norient_list)
+         select case (nrneig)
+            case(2)
+               ! pick the other one
+               if (Mdle.eq.neig(1)) then
+                  mdle_neig = neig(2)
+               else
+                  mdle_neig = neig(1)
+               endif
+         end select
+         if (NODES(nod)%ref_kind .eq. 0) then
+            Neig_list(1,i) = mdle_neig
+         else
+            do j=1,NODES(nod)%nr_sons
+               nodson = NODES(nod)%first_son + j - 1
+               call neig_face(nodson, nrneig,neig,nsid_list,norient_list)
+               do k=1,nrneig
+                  if (NODES(neig(k))%father .eq. mdle_neig) Neig_list(j,i) = neig(k)
+               enddo
+            enddo
+         endif
+      enddo
+!
+   end subroutine zoltan_w_find_neig
 !
 !
 end module zoltan_wrapper
