@@ -14,7 +14,7 @@
 import math
 
 # Length of fiber (z-direction)
-LZ = 1.2 
+LZ = 1.2
 # Core and cladding size parameters
 core = 0.9
 clad = 9.0
@@ -27,7 +27,7 @@ inner = core/4
 outer = 2*core
 
 # Open geometry file
-f = open("fiber_prism","w+")
+f = open("fiber_prism_1_2","w+")
 # Dimension
 f.write("3 3 NDIM,MANDIM\n")
 f.write("\n")
