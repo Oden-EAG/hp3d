@@ -430,7 +430,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
          fldG = fldF; crlG = crlF
 !
 !     ...accumulate for the load vector (TODO: verify recent change from n=2*k1-1 to n=2*k1)
-         n = 2*k1
+         n = 2*k1-1
          bload_E(n) = bload_E(n)                                   &
                     + (fldG(1)*zJ(1)+fldG(2)*zJ(2)+fldG(3)*zJ(3))  &
                     * weight

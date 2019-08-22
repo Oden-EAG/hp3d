@@ -7,7 +7,7 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision - Jan 2019
+!   latest revision - Aug 2019
 !
 !   purpose         - Driver routine for computing power in UW
 !                     Maxwell, i.e. the Poynting vector at certain
@@ -27,6 +27,8 @@ subroutine get_power(Fld,NumPts,FileIter)
 !
    use commonParam
    use laserParam
+   use mpi_param, only: RANK,ROOT
+   use MPI      , only: MPI_COMM_WORLD,MPI_IN_PLACE,MPI_REAL8,MPI_SUM
 !
    implicit none
 !
@@ -34,10 +36,10 @@ subroutine get_power(Fld,NumPts,FileIter)
    integer, intent(in)    :: FileIter
    integer, intent(inout) :: NumPts
 !
-   real*8, allocatable, dimension(:) :: zValues
-   real*8, allocatable, dimension(:) :: signal_power,pump_power
-   real*8, allocatable, dimension(:) :: diff_power,efficiency
-   real*8, allocatable, dimension(:) :: core_power,clad_power
+   real*8, allocatable :: zValues(:)
+   real*8, allocatable :: sign_power(:),pump_power(:)
+   real*8, allocatable :: diff_power(:),efficiency(:)
+   real*8, allocatable :: core_power(:),clad_power(:)
 !
    real*8  :: a,b
    integer :: i
@@ -45,20 +47,26 @@ subroutine get_power(Fld,NumPts,FileIter)
    character*8  :: fmt,suffix
    character*64 :: filename
 !
+   integer :: count,ierr
+!
 !----------------------------------------------------------------------
 !
    if (NumPts.le.0) NumPts = 4
-   write(*,2001) '  get_power: Number of sample points: ', NumPts
- 2001 format(A,i3)
+   if (RANK .eq. ROOT) then
+      write(*,2001) '  get_power: Number of sample points: ', NumPts
+ 2001 format(A,i5)
+   endif
 !
-   allocate(zValues(NumPts), signal_power(NumPts),  &
+   allocate(zValues(NumPts), sign_power(NumPts),  &
             pump_power(NumPts), diff_power(NumPts), &
             core_power(NumPts), clad_power(NumPts)  )
 !
 !..distributing sample points uniformly
-   write(*,*) ' get_power: Distributing sample points uniformly along waveguide.'
-   write(*,2002) ' ZL = ', ZL
- 2002 format(A,f5.2)
+   if (RANK .eq. ROOT) then
+      write(*,*) ' get_power: Distributing sample points uniformly along waveguide.'
+      write(*,2002) ' ZL = ', ZL
+ 2002 format(A,F7.2,/)
+   endif
    b = ZL/NumPts
    a = b/2.d0
    do i=1,NumPts
@@ -66,38 +74,54 @@ subroutine get_power(Fld,NumPts,FileIter)
    enddo
 !..irrationalize z values to avoid points on element interfaces
    zValues = zValues*PI*(7.d0/22.d0)
-   write(*,*)
 !
 !..init arrays
-   signal_power(1:NumPts) = ZERO
-   pump_power(1:NumPts) = ZERO
-   diff_power(1:NumPts) = ZERO
-   core_power(1:NumPts) = ZERO
-   clad_power(1:NumPts) = ZERO
+   sign_power(1:NumPts) = 0.d0
+   pump_power(1:NumPts) = 0.d0
+   diff_power(1:NumPts) = 0.d0
+   core_power(1:NumPts) = 0.d0
+   clad_power(1:NumPts) = 0.d0
 !
 !..get power
    select case (Fld)
       case(0)
-         write(*,*) ' get_power: computing pump_power..'
+         if (RANK.eq.ROOT) write(*,*) ' get_power: computing pump_power..'
          call compute_power(zValues,NumPts,Fld, pump_power,diff_power,core_power,clad_power)
       case(1)
-         write(*,*) ' get_power: computing signal_power..'
-         call compute_power(zValues,NumPts,Fld, signal_power,diff_power,core_power,clad_power)
+         if (RANK.eq.ROOT) write(*,*) ' get_power: computing sign_power..'
+         call compute_power(zValues,NumPts,Fld, sign_power,diff_power,core_power,clad_power)
       case(2)
-         write(*,*) ' get_power: computing signal_power and pump_power..'
+         if (RANK.eq.ROOT) write(*,*) ' get_power: computing sign_power and pump_power..'
          call compute_power(zValues,NumPts,0, pump_power,diff_power,core_power,clad_power)
-         call compute_power(zValues,NumPts,1, signal_power,diff_power,core_power,clad_power)
+         call compute_power(zValues,NumPts,1, sign_power,diff_power,core_power,clad_power)
       case default
-         write(*,*) ' get_power: invalid Fld param. stop.'
-         stop
+         if (RANK.eq.ROOT) write(*,*) ' get_power: invalid Fld param. stop.'
+         stop 1
    end select
+!
+!..gather RHS vector information on host
+   count = NumPts
+   if (RANK .eq. ROOT) then
+      call MPI_REDUCE(MPI_IN_PLACE,sign_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE,pump_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE,diff_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE,core_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE,clad_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+   else
+      call MPI_REDUCE(sign_power,sign_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(pump_power,pump_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(diff_power,diff_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(core_power,core_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(clad_power,clad_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      goto 90
+   endif
 !
 !..Print signal power output values
    if (Fld .eq. 1 .or. Fld .eq. 2) then
       if (FileIter .eq. -1) then
          write(*,*) ' get_power: printing power values (signal):'
          do i = 1,NumPts
-            write(*,2020) signal_power(i)
+            write(*,2020) sign_power(i)
        2020 format('    ',es12.5)
          enddo
       endif
@@ -109,7 +133,7 @@ subroutine get_power(Fld,NumPts,FileIter)
          filename=trim(OUTPUT_DIR)//'power/signal_'//trim(suffix)//'.dat'
          open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
          do i = 1,NumPts
-            write(UNIT=9, FMT="(es12.5)") signal_power(i)
+            write(UNIT=9, FMT="(es12.5)") sign_power(i)
          enddo
          close(UNIT=9)
       endif
@@ -142,7 +166,7 @@ subroutine get_power(Fld,NumPts,FileIter)
       if (FileIter .eq. -1) then
          write(*,*) ' get_power: printing fiber core power ratio (signal):'
          do i = 1,NumPts
-            write(*,2030) core_power(i)/signal_power(i)
+            write(*,2030) core_power(i)/sign_power(i)
        2030 format('    ',f8.4)
          enddo
       endif
@@ -154,7 +178,7 @@ subroutine get_power(Fld,NumPts,FileIter)
          filename=trim(OUTPUT_DIR)//'power/ratio_'//trim(suffix)//'.dat'
          open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
          do i = 1,NumPts
-            write(UNIT=9, FMT="(f8.4)") core_power(i)/signal_power(i)
+            write(UNIT=9, FMT="(f8.4)") core_power(i)/sign_power(i)
          enddo
          close(UNIT=9)
       endif
@@ -167,10 +191,10 @@ subroutine get_power(Fld,NumPts,FileIter)
       efficiency(1) = 0.d0
       do i = 2,NumPts
          if(COPUMP.eq.1) then
-            efficiency(i) = (signal_power(i)-signal_power(1))&
+            efficiency(i) = (sign_power(i)-sign_power(1))&
                              /(pump_power(1)-pump_power(i))
          elseif(COPUMP.eq.0) then
-            efficiency(i) = (signal_power(i)-signal_power(1))&
+            efficiency(i) = (sign_power(i)-sign_power(1))&
                              /(pump_power(NumPts)-pump_power(i))
          else
             write(*,*) ' get_power: COPUMP must be 1 or 0. stop.'
@@ -198,7 +222,8 @@ subroutine get_power(Fld,NumPts,FileIter)
       deallocate(efficiency)
    endif
 !
-   deallocate(zValues,signal_power,pump_power,diff_power,core_power,clad_power)
+   90 continue
+   deallocate(zValues,sign_power,pump_power,diff_power,core_power,clad_power)
 !
 end subroutine get_power
 !
@@ -209,7 +234,7 @@ end subroutine get_power
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - Nov 2018
+!   latest revision    - Aug 2019
 !
 !   purpose            - Evaluates the electric field power of UW
 !                        Maxwell along the cross sections specified by
@@ -234,6 +259,9 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
    use commonParam
    use data_structure3D
    use environment, only : QUIET_MODE
+   use mpi_param  , only : RANK,ROOT
+   use MPI        , only : MPI_COMM_WORLD
+   use par_mesh   , only : DISTRIBUTED
 !
    implicit none
 !
@@ -250,7 +278,6 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
 !
 !..mdle number
    integer :: mdle
-   integer :: mdlea(NRELES)
 !
 !..element, face order, geometry dof
    real*8 :: xnod (3,MAXbrickH)
@@ -266,31 +293,31 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
 !  (in brick and prism, face 2 is face normal to xi3, at xi3=1)
    integer, parameter :: faceNum = 2
 !
-!..auxiliary variables for timing
-   real*8 :: start, OMP_get_wtime
+!..timer
+   real(8) :: MPI_Wtime,start_time,end_time
+   integer :: ierr
 !
 !---------------------------------------------------------------------------------------
 !
 !..initialize outputs (vector of powers for all z-points)
-   power = 0.d0
+   Power = 0.d0
    DiffPower = 0.d0
+!
+!..initialize core/clad power for fiber geometry
+   CorePower = 0.d0
+   CladPower = 0.d0
 !
 !..initialize running powers computed (elements per z-point)
    facePower = 0.d0
    faceDiffPower  = 0.d0
 !
-!..initialize core/clad power for fiber geometry
-   corePower = ZERO
-   cladPower = ZERO
-!
 !..start timer
-   start = OMP_get_wtime()
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime
 !
-   mdle=0
-   do iel=1,NRELES
-      call nelcon(mdle, mdle)
-      mdlea(iel) = mdle
-   enddo
+   if (.not. DISTRIBUTED) then
+      ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
+      NRELES_SUBD = NRELES
+   endif
 !
 !..iterate over elements
 !
@@ -299,8 +326,8 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
 !$OMP         facePower,faceDiffPower)                   &
 !$OMP REDUCTION(+:Power,DiffPower,corePower,cladPower)   &
 !$OMP SCHEDULE(DYNAMIC)
-   do iel=1,NRELES
-      mdle = mdlea(iel)
+   do iel=1,NRELES_SUBD
+      mdle = ELEM_SUBD(iel)
       if (GEOM_NO .eq. 5) call find_domain(mdle, ndom)
       call nodcor(mdle, xnod)
       etype = NODES(Mdle)%type
@@ -346,8 +373,9 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
 !   enddo
 !
 !..end timer
-   if (.not. QUIET_MODE) then
-      write(*,3010) OMP_get_wtime()-start
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime
+   if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
+      write(*,3010) end_time-start_time
  3010 format('  compute_power : ',f12.5,'  seconds',/)
    endif
 !

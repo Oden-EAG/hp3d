@@ -61,13 +61,7 @@ subroutine elem(Mdle, Itest,Itrial)
 !..fld_flag refers to either pump (0) or signal (1) field
    integer :: fld_flag
 !
-!..auxiliary variables for timing
-   real*8 :: start, OMP_get_wtime
-!
 !----------------------------------------------------------------------
-!
-!..start timer
-   start = OMP_get_wtime()
 !
    Itest (1:NR_PHYSA) = 0
    Itrial(1:NR_PHYSA) = 0
@@ -95,6 +89,7 @@ subroutine elem(Mdle, Itest,Itrial)
          nordP = NODES(Mdle)%order+NORD_ADD*11
       case default
          write(*,*) 'elem: invalid etype param. stop.'
+         write(*,*) 'etype = ', etype
          stop
    end select
 !..note: compute_enriched_order works only for hexa and prism currently
@@ -182,12 +177,6 @@ subroutine elem(Mdle, Itest,Itrial)
          endif
 !..end select for select case(NO_PROBLEM)
    end select
-!
-!..end timer
-! !$OMP CRITICAL
-!      write(*,10) etype, OMP_get_wtime()-start
-! 10   format(A,' elem : ',f12.5,'  seconds')
-! !$OMP END CRITICAL
 !
 end subroutine elem
 !

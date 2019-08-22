@@ -31,7 +31,7 @@ module commonParam
    real*8, parameter :: H_BAR = 1.05457266d-34
 !
 !..set FAST_INT=1 to activate fast integration for hexahedra
-   integer :: FAST_INT = 1 
+   integer :: FAST_INT = 1
 !
 !..material constants
    real*8     :: MU,EPSILON
@@ -55,7 +55,10 @@ module commonParam
 !
 !..additional parameters including those required by the system
    integer :: ORDER_APPROX_X,ORDER_APPROX_Y,ORDER_APPROX_Z
-   integer :: NPX, NPY, NPZ, ICOMP_EXACT
+   integer :: NPX, NPY, NPZ
+   integer :: ICOMP_EXACT
+   integer :: ICOMP_TS
+!$OMP THREADPRIVATE (ICOMP_TS)
    integer :: ICHOOSE_DISP, ICHOOSE_COMP, ICHOOSE_SIGPUMP
    integer :: IEXACT_DISP
    integer, parameter :: MY_NR_RHS=1
@@ -83,6 +86,17 @@ module commonParam
 !
 !..choose case for exact
    integer :: ISOL
+!
+!..TYPE OF JOB SUBMISSION
+!  0: interactive (usual main file)
+!  1: stampede2 skx slurm job batch script
+   integer :: JOB
+!
+!..USER DEFINED MAX NUMBER OF NODES
+   integer :: MAXNODS_USER
+!
+!..NUMBER OF REFINEMENTS (JOB SCRIPT)
+   integer :: IMAX
 !
 !..refinement type (see refine_DPG.F90)
    integer, parameter :: INOREFINEMENT = 0

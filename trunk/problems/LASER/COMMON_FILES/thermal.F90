@@ -23,14 +23,15 @@ subroutine get_avgTemp(NumPts,FileIter)
 !
    use commonParam
    use laserParam
+   use mpi_param, only: RANK,ROOT
+   use MPI      , only: MPI_COMM_WORLD,MPI_IN_PLACE,MPI_REAL8,MPI_SUM
 !
    implicit none
 !
    integer, intent(in)    :: FileIter
    integer, intent(inout) :: NumPts
 !
-   real*8, allocatable, dimension(:) :: zValues
-   real*8, allocatable, dimension(:) :: coreTemp
+   real*8, allocatable :: zValues(:),coreTemp(:)
 !
    real*8  :: a,b
    integer :: i
@@ -38,18 +39,24 @@ subroutine get_avgTemp(NumPts,FileIter)
    character*8  :: fmt,suffix
    character*64 :: filename
 !
+   integer :: count,ierr
+!
 !----------------------------------------------------------------------
 !
    if (NumPts.le.0) NumPts = 4
-   write(*,2001) '  get_avgTemp: Number of sample points: ', NumPts
- 2001 format(A,i3)
+   if (RANK .eq. ROOT) then
+      write(*,2001) '  get_avgTemp: Number of sample points: ', NumPts
+ 2001 format(A,i5)
+   endif
 !
    allocate(zValues(NumPts),coreTemp(NumPts))
 !
 !..distributing sample points uniformly
-   write(*,*) ' get_avgTemp: Distributing sample points uniformly along waveguide.'
-   write(*,2002) '  ZL = ', ZL
- 2002 format(A,f5.2)
+   if (RANK .eq. ROOT) then
+      write(*,*) ' get_avgTemp: Distributing sample points uniformly along waveguide.'
+      write(*,2002) '  ZL = ', ZL
+ 2002 format(A,f7.2,/)
+   endif
    b = ZL/NumPts
    a = b/2.d0
    do i=1,NumPts
@@ -57,10 +64,19 @@ subroutine get_avgTemp(NumPts,FileIter)
    enddo
 !..irrationalize z values to avoid points on element interfaces
    zValues = zValues*PI*(7.d0/22.d0)
-   write(*,*)
 !
-   write(*,*) ' get_avgTemp: computing core temperature values..'
+   if (RANK .eq. ROOT) write(*,*) ' get_avgTemp: computing core temperature values..'
    call comp_avgTemp(zValues,NumPts, coreTemp)
+!
+!
+!..gather RHS vector information on host
+   count = NumPts
+   if (RANK .eq. ROOT) then
+      call MPI_REDUCE(MPI_IN_PLACE,coreTemp,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+   else
+      call MPI_REDUCE(coreTemp,coreTemp,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      goto 90
+   endif
 !
    if (FileIter .eq. -1) then
       write(*,*) ' get_avgTemp: printing core temperature values..'
@@ -82,6 +98,7 @@ subroutine get_avgTemp(NumPts,FileIter)
       close(UNIT=9)
    endif
 !
+   90 continue
    deallocate(zValues,coreTemp)
 !
 end subroutine get_avgTemp
@@ -108,9 +125,12 @@ end subroutine get_avgTemp
 !---------------------------------------------------------------------
 subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
 !
+   use commonParam
    use data_structure3D
    use environment, only : QUIET_MODE
-   use commonParam
+   use mpi_param  , only : RANK,ROOT
+   use MPI        , only : MPI_COMM_WORLD
+   use par_mesh   , only : DISTRIBUTED
 !
    implicit none
 !
@@ -122,7 +142,6 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
 !
 !..mdle number
    integer  :: mdle
-   integer  :: mdlea(NRELES)
 !
 !..element, face order, geometry dof
    real*8  :: xnod (3,MAXbrickH)
@@ -136,8 +155,9 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
 !..element type
    character(len=4) :: etype
 !
-!..auxiliary variables for timing
-   real*8 :: start, OMP_get_wtime
+!..timer
+   real(8) :: MPI_Wtime,start_time,end_time
+   integer :: ierr
 !
 !----------------------------------------------------------------------
 !
@@ -145,22 +165,20 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
    coreVol  = rZero
 !
 !..start timer
-   start = OMP_get_wtime()
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime
 !
-!..mdle node list
-   mdle=0
-   do iel=1,NRELES
-      call nelcon(mdle, mdle)
-      mdlea(iel) = mdle
-   enddo
+   if (.not. DISTRIBUTED) then
+      ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
+      NRELES_SUBD = NRELES
+   endif
 !
 !..iterate over elements
 !$OMP PARALLEL DO                                                 &
 !$OMP PRIVATE(mdle,etype,xnod,maxz,minz,i,ndom,elemTemp,elemVol)  &
 !$OMP REDUCTION(+:coreTemp,coreVol)                               &
 !$OMP SCHEDULE(DYNAMIC)
-   do iel=1,NRELES
-      mdle = mdlea(iel)
+   do iel=1,NRELES_SUBD
+      mdle = ELEM_SUBD(iel)
       if (GEOM_NO .eq. 5) then
          call find_domain(mdle, ndom)
          select case(ndom)
@@ -199,8 +217,9 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
    enddo
 !
 !..end timer
-   if (.not. QUIET_MODE) then
-      write(*,3010) OMP_get_wtime()-start
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime
+   if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
+      write(*,3010) end_time-start_time
  3010 format('  compute_avgTemp : ',f12.5,'  seconds',/)
    endif
 !

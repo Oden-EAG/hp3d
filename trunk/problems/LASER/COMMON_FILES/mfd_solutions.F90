@@ -570,7 +570,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
       select case(Fld)
 !     ...signal field
          case(0)
-            if (ICOMP_EXACT .eq. 1) then
+            if (ICOMP_TS .eq. 1) then
 !              with CORE_NX = 1.4512
 !              with CLAD_NX = 1.4500
                ampl =  0.9d0
@@ -590,7 +590,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
                dE(2) = cb*r_y*exp(-ZI*k*x3)
                E = E*exp(-ZI*k*x3)
                dE(3) = -ZI*k*E
-            else if (ICOMP_EXACT .eq. 2) then
+            else if (ICOMP_TS .eq. 2) then
 !              with CORE_NX = 1.6510
 !              with CLAD_NX = 1.6500
                ampl =  0.3d0
@@ -690,7 +690,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
                endif
             endif
             ! ampl 0.9/0.6 -> ~90% power in LP01, ~10% power in LP11
-            if (ICOMP_EXACT .eq. 1) then
+            if (ICOMP_TS .eq. 1) then
                if (CORE_NX .eq. 1.4512d0 .and. CLAD_NX .eq. 1.4500d0) then
                   ampl =  0.9d0 * cc ! oscillating signal power
                   k    = 85.6833d0
@@ -701,7 +701,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
                   stop
                endif
                call get_LP01(Xp,ampl,k,gamm,beta, E,dE)
-            else if (ICOMP_EXACT .eq. 2) then
+            else if (ICOMP_TS .eq. 2) then
                if (CORE_NY .eq. 1.6510d0 .and. CLAD_NY .eq. 1.6500d0) then
                   ampl =  0.6d0 * cc ! oscillating signal power
                   k    = 97.4662d0
@@ -733,7 +733,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
             endif
 !
             ! ampl 2.0/3.0 -> ~66% power in LP01, ~33% in LP11
-            if (ICOMP_EXACT .eq. 1) then
+            if (ICOMP_TS .eq. 1) then
                if (CORE_NX .eq. 1.4512d0 .and. CLAD_NX .eq. 1.4500d0) then
                   ampl =  2.5d0 * cc ! increasing pump power
                   k    = 93.4108d0
@@ -744,7 +744,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
                   stop
                endif
                call get_LP01(Xp,ampl,k,gamm,beta, E,dE)
-            else if (ICOMP_EXACT .eq. 2) then
+            else if (ICOMP_TS .eq. 2) then
                if (CORE_NY .eq. 1.6510d0 .and. CLAD_NY .eq. 1.6500d0) then
                   ampl =   3.0d0 * cc ! increasing pump power
                   k    = 106.258d0

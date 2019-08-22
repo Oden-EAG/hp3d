@@ -3,6 +3,7 @@ SRC_FILE    = \
         ../COMMON_FILES/laserParam.F90 \
         ../COMMON_FILES/bessel_fn.F90 \
         ../COMMON_FILES/commonRoutines.F90 \
+        ../COMMON_FILES/exact_error.F90 \
         ../COMMON_FILES/mfd_solutions.F90 \
         ../COMMON_FILES/norms.F90 \
         ../COMMON_FILES/polarization.F90 \
@@ -22,11 +23,12 @@ SRC_FILE    = \
         elem/elem_residual_heat.F90 \
         elem/elem_residual_maxwell.F90 \
         exact.F90 \
+        exec_case.F90 \
+        exec_job.F90 \
         fake.F90 \
         getf.F90 \
         finalize.F90 \
         initialize.F90 \
         main.F90 \
-        my_paraview_driver.F90 \
         set_initial_mesh.F90 \
         soldis.F90

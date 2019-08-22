@@ -3,27 +3,30 @@
 !
 subroutine initialize
 !
-      use environment
-      use control
-      use GMP
-      use data_structure3D
-      use refinements
-      use frsolmod
+   use environment
+   use commonParam
+   use control
+   use GMP
+   use data_structure3D
+   use refinements
+   use frsolmod
 !
-      implicit none
+   implicit none
+!
+   integer :: INTEGRATION_tmp
 !
 !-----------------------------------------------------------------------
 !
-!     open history file
-      call open_history_file(trim(FILE_HISTORY))
+!..open history file
+   !call open_history_file(trim(FILE_HISTORY))
 !
-!     initialize refinements arrays
-      call init_refinements( trim(FILE_REFINE) )
+!..initialize refinements arrays
+   call init_refinements(trim(FILE_REFINE))
 !
-!     read control file
-      call read_control(     trim(FILE_CONTROL))
+!..read control file
+   call read_control(trim(FILE_CONTROL))
 !
-!     set Geometry Modeling Package parameters
+!..set Geometry Modeling Package (GMP) parameters
 !=======================================================================
 !  NDIM   - dimension of the problem  (must be = 3)
 !  MANDIM - dimension of the manifold (must be = 3)
@@ -40,15 +43,24 @@ subroutine initialize
 !
 !
 !///////////////////////////////////////////////////////////////////////
-!                               NDIM //   MANDIM //
-      call set_gmp_parameters(     3 ,         3 ,               &
-!                              MAXSU //    MAXNP //    MAXNC //
-                                  30 ,     10000 ,     10000 ,   &
-!                              MAXTR //    MAXRE //    MAXBT //
-                               10000 ,     10000 ,     10000 ,   &
-!                              MAXHE //    MAXTE //    MAXPY //
-                               10000 ,     10000 ,     10000    )
+!!                            NDIM //   MANDIM //
+!   call set_gmp_parameters(     3 ,         3 ,               &
+!!                           MAXSU //    MAXNP //    MAXNC //
+!                               30 ,     10000 ,     10000 ,   &
+!!                           MAXTR //    MAXRE //    MAXBT //
+!                            10000 ,     10000 ,     10000 ,   &
+!!                           MAXHE //    MAXTE //    MAXPY //
+!                            10000 ,     10000 ,     10000    )
 !///////////////////////////////////////////////////////////////////////
+!..set GMP and hp3D parameters
+!                                NDIM //    MANDIM //
+   call set_gmp_parameters(         3 ,          3 , &
+!                                MAXSU //     MAXNP //     MAXNC //
+                                    30 ,      500 ,     600 , &
+!                                MAXTR //     MAXRE //     MAXBT //
+                                   100 ,      100 ,     100 , &
+!                                MAXHE //     MAXTE //     MAXPY //
+                                    50 ,      165 ,       10)
 !
 !
 !     set HP3D parameters
@@ -72,64 +84,36 @@ subroutine initialize
 !  MAXEQNQ >= NRCOMS * number of equations posed in L2
 !=======================================================================
 !
+!                        NRCOMS // MAXNRHS //
+   call set_parameters(      2 ,        1 ,  &
+!                       MAXEQNH // MAXEQNE // MAXEQNV // MAXEQNQ //
+                             2 ,        8,         2,         24)
 !
-!  ...set GMP and hp3D parameters
-      select case(INPUT_FILE)
-      case(DUMPIN_LEGACY_,DUMPIN_)
-        NRCOMS = 2 ; MAXNRHS = 1 ; MAXEQNH = 2 ; MAXEQNE = 8
-                                   MAXEQNV = 2 ; MAXEQNQ = 24
-      case default
-!                                     NDIM //    MANDIM //
-        call set_gmp_parameters(         3 ,          3 , &
-!                                    MAXSU //     MAXNP //     MAXNC //
-                                        30 ,      500 ,      600 , &
-!                                    MAXTR //     MAXRE //     MAXBT //
-                                    100 ,     100 ,     100 , &
-!                                    MAXHE //     MAXTE //     MAXPY //
-                                        50 ,      165 ,       10)
-!                            NRCOMS // MAXNRHS //
-        call set_parameters(      2 ,        1 ,  &
-!                           MAXEQNH // MAXEQNE // MAXEQNV // MAXEQNQ //
-                                  2 ,        8,         2,         24)
-      end select
+!..read geometry file
+   call read_geometry(trim(FILE_GEOM))
 !
-!///////////////////////////////////////////////////////////////////////
-!                          NRCOMS // MAXNRHS // MAXEQNH // MAXEQNE
-!      call set_parameters(      1 ,        1 ,        1 ,        1 ,  &
-!                                            // MAXEQNV // MAXEQNQ
-!                                                      1 ,        1 )
-!///////////////////////////////////////////////////////////////////////
+!..print GMP parameters to screen [OPTIONAL]
+   !call print_GMP_parameters
 !
+!..initialize parameters for X11 graphics [OPTIONAL]
+!                           MXIGTR  //  MXIGSTR  //  MXRGTRZ
+   call set_x11_workspace( 200000000 ,  200000000 ,  400000000 )
 !
-!     read geometry file
-      call read_geometry(trim(FILE_GEOM))
+!..Overwrite MAXNODS if specified by user input via argument list
+   if (MAXNODS_USER .gt. 0) MAXNODS = MAXNODS_USER
+   if (.not. QUIET_MODE) then
+      !write(*,*) 'User specified MAXNODS value:'
+      !write(*,9999) MAXNODS
+9999 format(' MAXNODS = ',i12)
+   endif
 !
-!     print GMP parameters to screen [OPTIONAL]
-      call print_GMP_parameters
+!..generate mesh and read physics file
+!..keep integration flag value
+   INTEGRATION_tmp = INTEGRATION
+   call hp3gen(trim(FILE_PHYS))
+   INTEGRATION = INTEGRATION_tmp
 !
-!     initialize parameters for X11 graphics [OPTIONAL]
-!
-!                              MXIGTR // MXIGSTR // MXRGTRZ
-      call set_x11_workspace( 200000000 ,  200000000 ,  400000000 )
-
-!
-!  ...generate initial mesh
-      select case(INPUT_FILE)
-      case(DUMPIN_LEGACY_)
-        write(*,*)'dumping in physics...'
-        call dumpin_physics_from_file('files/dumpPHYS' )
-        write(*,*)'dumping in hp3d (LEGACY)...'
-        !call dumpin_hp3d_LEGACY(      'files/dumpc3D')
-      case(DUMPIN_)
-        write(*,*)'dumping in physics...'
-        call dumpin_physics_from_file('files/dumpPHYS' )
-        write(*,*)'dumping in hp3d...'
-        call dumpin_hp3d(             'files/dumpc3Dhp')
-      case(NETGEN_,DEFAULT_)
-        call hp3gen(trim(FILE_PHYS))
-      endselect
-!
-!  ...initialize work space for the frontal solver
-      call set_frsol_workspace (10000000)
+!..initialize work space for the frontal solver
+   call set_frsol_workspace (1000000)
 !
  end subroutine initialize

@@ -20,6 +20,7 @@ subroutine set_initial_mesh(Nelem_order)
    use parameters
    use data_structure3D
    use commonParam
+   use mpi_param, only: RANK,ROOT
 !
    implicit none
 !
@@ -45,7 +46,7 @@ subroutine set_initial_mesh(Nelem_order)
    endif
 !
 !..
-   write(*,1010) GEOM_NO
+   if (RANK .eq. ROOT) write(*,1010) GEOM_NO
  1010 format(' GEOM_NO = ',I1,/)
 !
 !..loop through initial mesh elements

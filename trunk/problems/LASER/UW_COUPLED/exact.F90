@@ -105,7 +105,8 @@ subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
 !
 !..LP modes birefringent fiber (using both, polarized in x and y)
    elseif (ISOL .eq. 20 .or. ISOL .eq. 21) then
-      ICOMP_EXACT = 1; icomp = ICOMP_EXACT
+      !ICOMP_EXACT = 1;
+      ICOMP_TS = 1; icomp = 1
 !  ...signal E-field trace (E_x)
       fld = 0
       call mfd_solutions(Xp,fld, ValE(icomp,s),DvalE(icomp,s,1:3),D2valE(icomp,s,1:3,1:3))
@@ -113,7 +114,8 @@ subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
       fld = 1
       call mfd_solutions(Xp,fld, ValE(icomp,p),DvalE(icomp,p,1:3),D2valE(icomp,p,1:3,1:3))
 !
-      ICOMP_EXACT = 2; icomp = ICOMP_EXACT
+      !ICOMP_EXACT = 2;
+      ICOMP_TS = 2; icomp = 2
 !  ...signal E-field trace (E_y)
       fld = 0
       call mfd_solutions(Xp,fld, ValE(icomp,s),DvalE(icomp,s,1:3),D2valE(icomp,s,1:3,1:3))
