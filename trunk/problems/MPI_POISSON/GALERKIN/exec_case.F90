@@ -12,7 +12,6 @@ subroutine exec_case(idec)
 !
    integer, intent(in) :: idec
 !
-   integer :: i,nsteps,nstop
    logical :: solved
    integer :: mdle_subd(NRELES)
 !
@@ -126,6 +125,11 @@ subroutine exec_case(idec)
       case(43)
          write(*,*) 'calling Frontal (Seq) solver...'
          call solve1(1)
+!
+!  ...solve problem with omp_mumps (OpenMP MUMPS)
+      case(44)
+         write(*,*) 'calling MUMPS (MPI) nested dissection solver...'
+         call par_nested('G')
 !
       case(50)
          write(*,*) 'computing error and residual...'

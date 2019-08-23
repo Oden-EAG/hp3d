@@ -1,0 +1,1171 @@
+/work/05246/sh43394/stampede2/par_hp3d/trunk/problems/MPI_POISSON/GALERKIN
+Mon Aug 19 15:52:28 CDT 2019
+TACC:  Starting up job 4194325 
+TACC:  Starting parallel tasks... 
+
+MPI initialized sucessfully. NUM_PROCS =   32
+Zoltan initialized sucessfully. Version =  3.83
+ 
+ //                              //
+ // --  MPI POISSON GALERKIN  -- //
+ //                              //
+ 
+ 
+Master proc [  0], initialize..
+Worker proc [ 18], initialize..
+Worker proc [ 17], initialize..
+Worker proc [ 26], initialize..
+Worker proc [ 19], initialize..
+Worker proc [ 25], initialize..
+Worker proc [  6], initialize..
+Worker proc [ 14], initialize..
+Worker proc [ 11], initialize..
+Worker proc [ 28], initialize..
+Worker proc [  3], initialize..
+Worker proc [ 31], initialize..
+Worker proc [ 15], initialize..
+Worker proc [ 21], initialize..
+Worker proc [ 27], initialize..
+Worker proc [ 29], initialize..
+Worker proc [ 12], initialize..
+Worker proc [  8], initialize..
+Worker proc [  9], initialize..
+Worker proc [ 10], initialize..
+Worker proc [ 20], initialize..
+Worker proc [  5], initialize..
+Worker proc [  2], initialize..
+Worker proc [  1], initialize..
+Worker proc [ 30], initialize..
+Worker proc [ 24], initialize..
+Worker proc [  4], initialize..
+Worker proc [ 22], initialize..
+Worker proc [ 16], initialize..
+Worker proc [ 13], initialize..
+Worker proc [ 23], initialize..
+Worker proc [  7], initialize..
+ -- hp3d Control Parameters --
+ INT. LEGENDRE POLYNOMIALS USED
+ EXACT SOLUTION KNOWN
+ UNSYMMETRIC PROBLEM
+ GAUSSIAN QUADRATURE (VOLUME LOAD)
+ GAUSSIAN QUADRATURE (NEUMANN BC)
+ EXTENSION OPERATOR NOT SUPPORTED
+ DEFAULT FORMAT
+ GEOMETRY TOLERANCE =  1.0000E-06
+ INTEGRATION        = 0
+ ISOPARAMETRIC ELEMENTS
+ 
+ -- input_DEFAULT --
+ NRSURFS =     0 ; reading surfaces...
+ NRPOINT =     8 ; reading points...
+ NRCURVE =    12 ; reading curves...
+ NRTRIAN =     0 ; reading triangles...
+ NRRECTA =     6 ; reading rectangles...
+ NRPRISM =     0 ; reading prisms...
+ NRHEXAS =     1 ; reading hexas...
+ NRTETRA =     0 ; reading tets...
+ NRPYRAM =     0 ; reading pyramids...
+ 
+ -- Physics --
+ MAXNODS =     16025000
+ PHYSA,DTYPE,NR_COMP = field  contin  1
+ 
+ update_gdof:      0.01042  seconds
+ update_Ddof:      0.08151  seconds
+
+ initialize :      0.50114 seconds
+
+ Initial polynomial order:  5
+ Number of OpenMP threads: 48
+ ==================
+ exec_job: starting
+ ==================
+ partition time:      0.00012 seconds
+ update_gdof:      0.00012  seconds
+ update_Ddof:      0.02151  seconds
+
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  1
+
+
+-------------------------------------------------------------
+  --> 1. global uniform h-refinement...
+
+ # of elements broken         =        1
+ # of current elements, nodes =        8,       144
+ refresh    :      0.00047  seconds
+ global ref :      0.00073  seconds
+ update_gdof:      0.00123  seconds
+ update_Ddof:      0.04512  seconds
+
+ timer:      0.04743 seconds
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ partition time:      0.00010 seconds
+ migration time:      0.00015 seconds
+ update_gdof:      0.00025  seconds
+ update_Ddof:      0.05425  seconds
+
+ timer:      0.05521 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  2
+
+
+-------------------------------------------------------------
+  --> 1. global uniform h-refinement...
+
+ # of elements broken         =        8
+ # of current elements, nodes =       64,       846
+ refresh    :      0.00114  seconds
+ global ref :      0.00177  seconds
+ update_gdof:      0.00207  seconds
+ update_Ddof:      0.05008  seconds
+
+ timer:      0.05413 seconds
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ partition time:      0.00007 seconds
+ migration time:      0.00057 seconds
+ update_gdof:      0.00056  seconds
+ update_Ddof:      0.05536  seconds
+
+ timer:      0.05714 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  3
+
+
+-------------------------------------------------------------
+  --> 1. global anisotropic h-refinement...
+
+ # of elements broken         =       64
+ # of current elements, nodes =      128,      1818
+ refresh    :      0.00067  seconds
+ global ref :      0.00254  seconds
+ update_gdof:      0.00130  seconds
+ update_Ddof:      0.04883  seconds
+
+ timer:      0.05299 seconds
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ partition time:      0.00004 seconds
+ migration time:      0.00008 seconds
+ update_gdof:      0.00135  seconds
+ update_Ddof:      0.04987  seconds
+
+ timer:      0.05180 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  4
+
+
+-------------------------------------------------------------
+  --> 1. global anisotropic h-refinement...
+
+ # of elements broken         =      128
+ # of current elements, nodes =      256,      3762
+ refresh    :      0.00078  seconds
+ global ref :      0.00548  seconds
+ update_gdof:      0.00304  seconds
+ update_Ddof:      0.05912  seconds
+
+ timer:      0.06799 seconds
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ partition time:      0.00009 seconds
+ migration time:      0.00010 seconds
+ update_gdof:      0.00300  seconds
+ update_Ddof:      0.04908  seconds
+
+ timer:      0.05287 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  5
+
+
+-------------------------------------------------------------
+  --> 1. global anisotropic h-refinement...
+
+ # of elements broken         =      256
+ # of current elements, nodes =      512,      7650
+ refresh    :      0.00150  seconds
+ global ref :      0.01286  seconds
+ update_gdof:      0.00988  seconds
+ update_Ddof:      0.05937  seconds
+
+ timer:      0.08467 seconds
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ partition time:      0.00006 seconds
+ migration time:      0.00011 seconds
+ update_gdof:      0.00688  seconds
+ update_Ddof:      0.06118  seconds
+
+ timer:      0.07172 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  6
+
+
+-------------------------------------------------------------
+  --> 1. global anisotropic h-refinement...
+
+ # of elements broken         =      512
+ # of current elements, nodes =     1024,     15426
+ refresh    :      0.00284  seconds
+ global ref :      0.02928  seconds
+ update_gdof:      0.01568  seconds
+ update_Ddof:      0.05421  seconds
+
+ timer:      0.09957 seconds
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ partition time:      0.00004 seconds
+ migration time:      0.00005 seconds
+ update_gdof:      0.01572  seconds
+ update_Ddof:      0.04466  seconds
+
+ timer:      0.06138 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  7
+
+
+-------------------------------------------------------------
+  --> 1. global anisotropic h-refinement...
+
+ # of elements broken         =     1024
+ # of current elements, nodes =     2048,     30978
+ refresh    :      0.00605  seconds
+ global ref :      0.06763  seconds
+ update_gdof:      0.03462  seconds
+ update_Ddof:      0.04586  seconds
+
+ timer:      0.14839 seconds
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ partition time:      0.00003 seconds
+ migration time:      0.00007 seconds
+ update_gdof:      0.03444  seconds
+ update_Ddof:      0.04153  seconds
+
+ timer:      0.07741 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  8
+
+
+-------------------------------------------------------------
+  --> 1. global anisotropic h-refinement...
+
+ # of elements broken         =     2048
+ # of current elements, nodes =     4096,     62082
+ refresh    :      0.01301  seconds
+ global ref :      0.14397  seconds
+ update_gdof:      0.07351  seconds
+ update_Ddof:      0.02457  seconds
+
+ timer:      0.24212 seconds
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ partition time:      0.00002 seconds
+ migration time:      0.00014 seconds
+ update_gdof:      0.07662  seconds
+ update_Ddof:      0.00803  seconds
+
+ timer:      0.08781 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i =  9
+
+
+-------------------------------------------------------------
+  --> 1. global anisotropic h-refinement...
+
+ # of elements broken         =     4096
+ # of current elements, nodes =     8192,    124290
+ refresh    :      0.02739  seconds
+ global ref :      0.28277  seconds
+ update_gdof:      0.14137  seconds
+ update_Ddof:      0.01173  seconds
+
+ timer:      0.43597 seconds
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ partition time:      0.00004 seconds
+ migration time:      0.00019 seconds
+ update_gdof:      0.13809  seconds
+ update_Ddof:      0.01153  seconds
+
+ timer:      0.15899 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i = 10
+
+
+-------------------------------------------------------------
+  --> 1. global anisotropic h-refinement...
+
+ # of elements broken         =     8192
+ # of current elements, nodes =    16384,    248706
+ refresh    :      0.05839  seconds
+ global ref :      0.56864  seconds
+ update_gdof:      0.27790  seconds
+ update_Ddof:      0.02030  seconds
+
+ timer:      0.86692 seconds
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ partition time:      0.00007 seconds
+ migration time:      0.00056 seconds
+ update_gdof:      0.27787  seconds
+ update_Ddof:      0.02024  seconds
+
+ timer:      0.30801 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i = 11
+
+
+-------------------------------------------------------------
+  --> 1. global anisotropic h-refinement...
+
+ # of elements broken         =    16384
+ # of current elements, nodes =    32768,    497538
+ refresh    :      0.12428  seconds
+ global ref :      1.15250  seconds
+ update_gdof:      0.55408  seconds
+ update_Ddof:      0.03977  seconds
+
+ timer:      1.74656 seconds
+
+-------------------------------------------------------------
+  --> 2. distributing mesh...
+
+ calling partition_fiber...
+ partition time:      0.00782 seconds
+ migration time:      0.19030 seconds
+ update_gdof:      0.55726  seconds
+ update_Ddof:      0.07434  seconds
+
+ timer:      0.86204 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i = 12
+
+
+-------------------------------------------------------------
+  --> 1. global anisotropic h-refinement...
+
+ # of elements broken         =    32768
+ # of current elements, nodes =    65536,    995202
+ refresh    :      0.26768  seconds
+ global ref :      2.40806  seconds
+ update_gdof:      1.12662  seconds
+ update_Ddof:      0.07167  seconds
+
+ timer:      3.60658 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i = 13
+
+
+-------------------------------------------------------------
+  --> 1. global anisotropic h-refinement...
+
+ # of elements broken         =    65536
+ # of current elements, nodes =   131072,   1990530
+ refresh    :      0.59275  seconds
+ global ref :      5.20217  seconds
+ update_gdof:      2.36472  seconds
+ update_Ddof:      0.14865  seconds
+
+ timer:      7.71589 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i = 14
+
+
+-------------------------------------------------------------
+  --> 1. global anisotropic h-refinement...
+
+ # of elements broken         =   131072
+ # of current elements, nodes =   262144,   3981186
+ refresh    :      1.11493  seconds
+ global ref :     10.89973  seconds
+ update_gdof:      4.97812  seconds
+ update_Ddof:      0.31752  seconds
+
+ timer:     16.19563 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i = 15
+
+
+-------------------------------------------------------------
+  --> 1. global anisotropic h-refinement...
+
+ # of elements broken         =   262144
+ # of current elements, nodes =   524288,   7962498
+ refresh    :      2.18311  seconds
+ global ref :     23.93668  seconds
+ update_gdof:     13.09245  seconds
+ update_Ddof:      0.66790  seconds
+
+ timer:     37.69731 seconds
+
+-------------------------------------------------------------
+  --> 3. printing current partition (elems)...
+
+    ... skipping for a large number of elements.
+
+-------------------------------------------------------------
+  --> 5. verify distributed mesh consistency...
+
+ par_verify: MESH CONSISTENCY TEST PASSED.
+ timer:      1.78894 seconds
+
+-------------------------------------------------------------
+  --> 6. calling MUMPS (MPI) solver...
+
+ par_nested: STARTED
+ 
+ STEP 1 started : Get assembly info
+ STEP 1 finished:      4.20216  seconds
+
+       Number of dof   : nrdof_con      =        11191
+                         nrdof_bub_tot  =     25580256
+                         nrdof_mdl      =     33554432
+                         nrdof_tot      =     59145879
+       Total non-zeros : nnz            =       922808
+       Total bubble nnz: nnz_bub_tot    =   7518592256
+
+[   0] Local interf dof: nrdof_subd_con =          361
+       Local bubble dof: nrdof_bub      =       799383
+[   2] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[   6] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[  18] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[  28] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[  14] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[   4] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[  12] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+       Local bubble nnz: nnz_bub        =    234956008
+[  23] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[  16] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[   1] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[  19] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[   9] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[  30] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[  22] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[  29] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[   7] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[  24] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[  15] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[   3] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[  17] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[  20] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[  27] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[  13] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[  25] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[   8] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+
+ STEP 2 started : Global Assembly
+[  31] Local interf dof: nrdof_subd_con =          361
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[  11] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[   5] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[  10] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[  26] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+[  21] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =       799383
+       Local bubble nnz: nnz_bub        =    234956008
+ STEP 2 finished:     11.22484  seconds
+
+ STEP 3 started : Local solve
+[  18] - Analysis :      6.56432  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[  23] - Analysis :      6.60953  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[  24] - Analysis :      6.61282  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[   9] - Analysis :      6.62799  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[   7] - Analysis :      6.63249  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[  19] - Analysis :      6.63324  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[   4] - Analysis :      6.63400  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[  12] - Analysis :      6.63537  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[   3] - Analysis :      6.64344  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[  22] - Analysis :      6.65418  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[  17] - Analysis :      6.65937  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[   6] - Analysis :      6.66298  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[  28] - Analysis :      6.66468  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[  26] - Analysis :      6.66488  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[   2] - Analysis :      6.67143  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[  15] - Analysis :      6.68086  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[   0] - Analysis :      6.68560  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[   5] - Analysis :      6.68879  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[  13] - Analysis :      6.69216  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[  30] - Analysis :      6.69902  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[  27] - Analysis :      6.70413  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[  21] - Analysis :      6.70605  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[  14] - Analysis :      6.70809  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[  16] - Analysis :      6.71056  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[  31] - Analysis :      6.71761  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[  11] - Analysis :      6.74293  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[  20] - Analysis :      6.80694  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[  29] - Analysis :      6.83635  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[   1] - Analysis :      6.91099  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[   8] - Analysis :      7.08995  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[  10] - Analysis :      7.50833  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[  25] - Analysis :      7.80723  seconds
+         - estimated size in GB =      12.599
+         - ordering method used = 5
+[  18] - Factorize:     21.58851  seconds
+         - memory used in GB    =      10.339
+[  23] - Factorize:     21.88751  seconds
+         - memory used in GB    =      10.339
+[  24] - Factorize:     21.93687  seconds
+         - memory used in GB    =      10.339
+[   4] - Factorize:     22.02552  seconds
+         - memory used in GB    =      10.339
+[  21] - Factorize:     22.02911  seconds
+         - memory used in GB    =      10.339
+[  15] - Factorize:     22.03019  seconds
+         - memory used in GB    =      10.339
+[  12] - Factorize:     22.04201  seconds
+         - memory used in GB    =      10.339
+[  19] - Factorize:     22.04963  seconds
+         - memory used in GB    =      10.339
+[   3] - Factorize:     22.06973  seconds
+         - memory used in GB    =      10.339
+[  14] - Factorize:     22.07112  seconds
+         - memory used in GB    =      10.339
+[  28] - Factorize:     22.07901  seconds
+         - memory used in GB    =      10.339
+[   2] - Factorize:     22.08337  seconds
+         - memory used in GB    =      10.339
+[   6] - Factorize:     22.10325  seconds
+         - memory used in GB    =      10.339
+[   7] - Factorize:     22.11582  seconds
+         - memory used in GB    =      10.339
+[   1] - Factorize:     22.15476  seconds
+         - memory used in GB    =      10.339
+[  26] - Factorize:     22.16142  seconds
+         - memory used in GB    =      10.339
+[   0] - Factorize:     22.20238  seconds
+         - memory used in GB    =      10.339
+[   9] - Factorize:     22.20952  seconds
+         - memory used in GB    =      10.339
+[  17] - Factorize:     22.22800  seconds
+         - memory used in GB    =      10.339
+[  30] - Factorize:     22.24107  seconds
+         - memory used in GB    =      10.339
+[  27] - Factorize:     22.32422  seconds
+         - memory used in GB    =      10.339
+[  13] - Factorize:     22.38227  seconds
+         - memory used in GB    =      10.339
+[  31] - Factorize:     22.39100  seconds
+         - memory used in GB    =      10.339
+[  29] - Factorize:     22.40641  seconds
+         - memory used in GB    =      10.339
+[  22] - Factorize:     22.56568  seconds
+         - memory used in GB    =      10.339
+[  16] - Factorize:     22.60950  seconds
+         - memory used in GB    =      10.339
+[  11] - Factorize:     22.61469  seconds
+         - memory used in GB    =      10.339
+[  10] - Factorize:     22.64748  seconds
+         - memory used in GB    =      10.339
+[  25] - Factorize:     22.67815  seconds
+         - memory used in GB    =      10.339
+[  20] - Factorize:     22.82422  seconds
+         - memory used in GB    =      10.339
+[   8] - Factorize:     22.93113  seconds
+         - memory used in GB    =      10.339
+[   5] - Factorize:     22.96897  seconds
+         - memory used in GB    =      10.339
+[   0] - Solve    :     33.76253  seconds
+[  31] - Solve    :     34.16532  seconds
+[  27] - Solve    :     62.92585  seconds
+[  10] - Solve    :     63.45201  seconds
+[  21] - Solve    :     63.47355  seconds
+[   3] - Solve    :     63.59669  seconds
+[  14] - Solve    :     64.05170  seconds
+[  24] - Solve    :     64.10386  seconds
+[  30] - Solve    :     64.32181  seconds
+[   6] - Solve    :     64.57685  seconds
+[   2] - Solve    :     64.69281  seconds
+[  17] - Solve    :     64.80870  seconds
+[  23] - Solve    :     64.87075  seconds
+[   4] - Solve    :     64.87702  seconds
+[  18] - Solve    :     64.92036  seconds
+[  28] - Solve    :     64.96435  seconds
+[  22] - Solve    :     65.05093  seconds
+[   7] - Solve    :     65.45141  seconds
+[  12] - Solve    :     65.47802  seconds
+[  15] - Solve    :     65.67004  seconds
+[  25] - Solve    :     65.84024  seconds
+[  13] - Solve    :     65.96762  seconds
+[  11] - Solve    :     65.97681  seconds
+[  20] - Solve    :     66.06832  seconds
+[   1] - Solve    :     66.21344  seconds
+[  16] - Solve    :     66.47643  seconds
+[  19] - Solve    :     67.00172  seconds
+[   9] - Solve    :     67.53536  seconds
+[   8] - Solve    :     67.90623  seconds
+[  26] - Solve    :     67.96900  seconds
+[   5] - Solve    :     68.08044  seconds
+[  29] - Solve    :     68.33309  seconds
+ STEP 3 finished:     99.11045  seconds
+
+ STEP 4 started : Construct condensed global system
+ STEP 4 finished:      1.37238  seconds
+
+ STEP 5 started : Global solve
+ - Analysis :      0.31790  seconds
+   - MAX estimated size in GB =       0.135
+   - SUM estimated size in GB =       3.544
+   - Seq/parallel analysis    = 1
+   - Ordering method used     = 5
+ - Factorize:      0.26422  seconds
+   - MAX memory used in GB    =       0.118
+   - SUM memory used in GB    =       3.298
+ - Solve    :      0.02662  seconds
+ STEP 5 finished:      0.60890  seconds
+
+ STEP 6 started : Backsubstitution for bubble solution
+ - Broadcast:      0.00030  seconds
+ STEP 6 finished:      0.07681  seconds
+
+ STEP 7 started : Store the solution
+ STEP 7 finished:      0.46661  seconds
+
+ par_nested FINISHED:    117.06215  seconds
+
+ timer:    117.16147 seconds
+
+/////////////////////////////////////////////////////////////
+             Beginning iteration i = 16
+
+
+-------------------------------------------------------------
+  --> 1. global anisotropic h-refinement...
+
+ 
+ HISTORY OF REFINEMENTS
+ mesh | nrdof_tot | nrdof_con |  | field error  |rel field error|   rate 
+ 
+   1  |  59145879 |     11191 |  |  7.67821E-07 |  3.17317E-06  |   0.00
+ 
+ # of elements broken         =   524288
+ # of current elements, nodes =  1048576,  15925122
+ refresh    :      4.98306  seconds
+ global ref :     51.18763  seconds
+ update_gdof:     22.86135  seconds
+ update_Ddof:      1.44749  seconds
+
+ timer:     83.87012 seconds
+
+-------------------------------------------------------------
+  --> 3. printing current partition (elems)...
+
+    ... skipping for a large number of elements.
+
+-------------------------------------------------------------
+  --> 5. verify distributed mesh consistency...
+
+ par_verify: MESH CONSISTENCY TEST PASSED.
+ timer:      3.62732 seconds
+
+-------------------------------------------------------------
+  --> 6. calling MUMPS (MPI) solver...
+
+ par_nested: STARTED
+ 
+ STEP 1 started : Get assembly info
+ STEP 1 finished:      8.75046  seconds
+
+       Number of dof   : nrdof_con      =        11191
+                         nrdof_bub_tot  =     51172064
+                         nrdof_mdl      =     67108864
+                         nrdof_tot      =    118292119
+       Total non-zeros : nnz            =       922808
+       Total bubble nnz: nnz_bub_tot    =  15043697920
+
+[   0] Local interf dof: nrdof_subd_con =          361
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[  23] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[   2] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[  18] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[   1] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[  22] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[  31] Local interf dof: nrdof_subd_con =          361
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[  29] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[   7] Local interf dof: nrdof_subd_con =          722
+[  14] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[  15] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[   3] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[  11] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[  27] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[  13] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[  21] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+
+ STEP 2 started : Global Assembly
+[   6] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[  16] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[  28] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[  19] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[   9] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[  30] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+       Local bubble dof: nrdof_bub      =      1599127
+[  24] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[  17] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[  20] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[   4] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[   5] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[  12] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[  10] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[  26] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[  25] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+[   8] Local interf dof: nrdof_subd_con =          722
+       Local bubble dof: nrdof_bub      =      1599127
+       Local bubble nnz: nnz_bub        =    470115560
+       Local bubble nnz: nnz_bub        =    470115560
+ STEP 2 finished:     30.71760  seconds
+
+ STEP 3 started : Local solve
+[  23] - Analysis :     13.49307  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[   1] - Analysis :     13.57599  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[  29] - Analysis :     13.62633  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[  25] - Analysis :     13.63784  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[  16] - Analysis :     13.63804  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[  13] - Analysis :     13.68469  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[   9] - Analysis :     13.68896  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[  21] - Analysis :     13.69007  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[   4] - Analysis :     13.69397  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[  20] - Analysis :     13.71467  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[   5] - Analysis :     13.73076  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[  17] - Analysis :     13.85256  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[  30] - Analysis :     13.93753  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[  12] - Analysis :     13.98065  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[  28] - Analysis :     13.98851  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[  10] - Analysis :     13.99421  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[   3] - Analysis :     14.05444  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[  24] - Analysis :     14.05971  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[  19] - Analysis :     14.06699  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[  31] - Analysis :     14.06935  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[   8] - Analysis :     14.11175  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[  15] - Analysis :     14.18612  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[   2] - Analysis :     14.22064  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[  26] - Analysis :     14.23087  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[   0] - Analysis :     14.24464  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[  11] - Analysis :     14.25450  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[  18] - Analysis :     14.26999  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[   6] - Analysis :     14.27985  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[  14] - Analysis :     14.28501  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[   7] - Analysis :     14.30915  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[  27] - Analysis :     14.37281  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[  22] - Analysis :     14.50728  seconds
+         - estimated size in GB =      25.047
+         - ordering method used = 5
+[  21] - Factorize:     43.35260  seconds
+         - memory used in GB    =      20.562
+[  13] - Factorize:     43.42863  seconds
+         - memory used in GB    =      20.562
+[   9] - Factorize:     43.57115  seconds
+         - memory used in GB    =      20.562
+[  25] - Factorize:     43.57800  seconds
+         - memory used in GB    =      20.562
+[  28] - Factorize:     43.60265  seconds
+         - memory used in GB    =      20.562
+[  30] - Factorize:     43.61445  seconds
+         - memory used in GB    =      20.562
+[   4] - Factorize:     43.70802  seconds
+         - memory used in GB    =      20.562
+[  10] - Factorize:     43.73717  seconds
+         - memory used in GB    =      20.562
+[   8] - Factorize:     43.77696  seconds
+         - memory used in GB    =      20.562
+[  16] - Factorize:     43.86130  seconds
+         - memory used in GB    =      20.562
+[  18] - Factorize:     43.86308  seconds
+         - memory used in GB    =      20.562
+[   6] - Factorize:     43.87025  seconds
+         - memory used in GB    =      20.562
+[  26] - Factorize:     43.89462  seconds
+         - memory used in GB    =      20.562
+[   5] - Factorize:     44.05707  seconds
+         - memory used in GB    =      20.562
+[  22] - Factorize:     44.08161  seconds
+         - memory used in GB    =      20.562
+[   0] - Factorize:     44.11857  seconds
+         - memory used in GB    =      20.562
+[  29] - Factorize:     44.12152  seconds
+         - memory used in GB    =      20.562
+[  27] - Factorize:     44.12938  seconds
+         - memory used in GB    =      20.562
+[  24] - Factorize:     44.18637  seconds
+         - memory used in GB    =      20.562
+[  19] - Factorize:     44.21065  seconds
+         - memory used in GB    =      20.562
+[  14] - Factorize:     44.24808  seconds
+         - memory used in GB    =      20.562
+[  11] - Factorize:     44.30518  seconds
+         - memory used in GB    =      20.562
+[  12] - Factorize:     44.32046  seconds
+         - memory used in GB    =      20.562
+[   7] - Factorize:     44.32712  seconds
+         - memory used in GB    =      20.562
+[   2] - Factorize:     44.35001  seconds
+         - memory used in GB    =      20.562
+[  23] - Factorize:     44.41452  seconds
+         - memory used in GB    =      20.562
+[  31] - Factorize:     44.55681  seconds
+         - memory used in GB    =      20.562
+[   1] - Factorize:     44.62083  seconds
+         - memory used in GB    =      20.562
+[  15] - Factorize:     44.83247  seconds
+         - memory used in GB    =      20.562
+[  17] - Factorize:     44.87660  seconds
+         - memory used in GB    =      20.562
+[  20] - Factorize:     44.93281  seconds
+         - memory used in GB    =      20.562
+[   3] - Factorize:     46.78003  seconds
+         - memory used in GB    =      20.562
+[   0] - Solve    :     67.18953  seconds
+[  31] - Solve    :     68.66817  seconds
+[   6] - Solve    :    125.74123  seconds
+[  11] - Solve    :    126.00675  seconds
+[  19] - Solve    :    127.24140  seconds
+[  21] - Solve    :    127.91835  seconds
+[  10] - Solve    :    128.01387  seconds
+[  30] - Solve    :    128.02565  seconds
+[  16] - Solve    :    128.69729  seconds
+[   7] - Solve    :    128.98991  seconds
+[  13] - Solve    :    129.23597  seconds
+[  24] - Solve    :    129.61525  seconds
+[  17] - Solve    :    129.72616  seconds
+[  28] - Solve    :    129.80766  seconds
+[  18] - Solve    :    130.65856  seconds
+[  20] - Solve    :    130.73345  seconds
+[  29] - Solve    :    130.90907  seconds
+[   5] - Solve    :    130.91390  seconds
+[  25] - Solve    :    131.01037  seconds
+[  12] - Solve    :    131.03003  seconds
+[   4] - Solve    :    131.04620  seconds
+[  14] - Solve    :    131.06594  seconds
+[   1] - Solve    :    131.52108  seconds
+[  15] - Solve    :    131.74017  seconds
+[  22] - Solve    :    131.76774  seconds
+[  23] - Solve    :    132.06821  seconds
+[  27] - Solve    :    132.35279  seconds
+[   9] - Solve    :    133.92973  seconds
+[  26] - Solve    :    134.16905  seconds
+[   2] - Solve    :    134.39317  seconds
+[   3] - Solve    :    135.17180  seconds
+[   8] - Solve    :    136.02195  seconds
+ STEP 3 finished:    197.31007  seconds
+
+ STEP 4 started : Construct condensed global system
+ STEP 4 finished:      2.70638  seconds
+
+ STEP 5 started : Global solve
+ - Analysis :      0.27944  seconds
+   - MAX estimated size in GB =       0.129
+   - SUM estimated size in GB =       3.550
+   - Seq/parallel analysis    = 1
+   - Ordering method used     = 5
+ - Factorize:      0.24608  seconds
+   - MAX memory used in GB    =       0.112
+   - SUM memory used in GB    =       3.296
+ - Solve    :      0.00912  seconds
+ STEP 5 finished:      0.53520  seconds
+
+ STEP 6 started : Backsubstitution for bubble solution
+ - Broadcast:      0.00052  seconds
+ STEP 6 finished:      0.15083  seconds
+
+ STEP 7 started : Store the solution
+ STEP 7 finished:      0.88444  seconds
+
+ par_nested FINISHED:    241.05498  seconds
+
+ timer:    241.15559 seconds
+
+-------------------------------------------------------------
+  --> 7. compute error on last mesh...
+
+ 
+ HISTORY OF REFINEMENTS
+ mesh | nrdof_tot | nrdof_con |  | field error  |rel field error|   rate 
+ 
+   1  |  59145879 |     11191 |  |  7.67821E-07 |  3.17317E-06  |   0.00
+   2  | 118292119 |     11191 |  |  7.67822E-07 |  3.17317E-06  |   0.00
+ 
+ 
+ ==================
+ exec_job: finished
+ ==================
+ 
+TACC:  Shutdown complete. Exiting. 
+Mon Aug 19 16:01:21 CDT 2019

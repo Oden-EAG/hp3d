@@ -56,9 +56,13 @@ subroutine initialize
 !..read control file
    call read_control(trim(FILE_CONTROL))
 !
-!..the following is a method to automatically setup the equation settings
-!  by silently reading the physics file and using the data there
-!  alternatively one could set this manually if desired (depends on problem)
+!..Overwrite MAXNODS if specified by user input via argument list
+   if (MAXNODS_USER .gt. 0) MAXNODS = MAXNODS_USER
+   if (.not. QUIET_MODE) then
+      !write(*,*) 'User specified MAXNODS value:'
+      !write(*,9999) MAXNODS
+9999 format(' MAXNODS = ',i12)
+   endif
 !
 !..read physics file quietly first to automatically setup equation settings
    qtmp = QUIET_MODE; QUIET_MODE = .true.

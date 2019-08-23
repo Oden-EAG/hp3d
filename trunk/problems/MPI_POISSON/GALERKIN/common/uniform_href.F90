@@ -82,7 +82,6 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
       ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
       NRELES_SUBD = NRELES
    endif
-   
 !
    error_subd = 0.d0; rnorm_subd = 0.d0
 !
