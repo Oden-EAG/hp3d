@@ -9,8 +9,8 @@
 !
 subroutine set_nodal_dof
 !
-      use data_structure3D , only : NODES,NRNODS , find_ndof
-      use parameters       , only : ZERO , ZONE
+      use data_structure3D , only : NODES,NRNODS,Is_inactive,find_ndof
+      use parameters       , only : ZERO,ZONE
 !
       implicit none
       integer :: inod,ndofH,ndofE,ndofV,ndofQ,ispace,nod,idof
@@ -25,7 +25,7 @@ subroutine set_nodal_dof
       do inod=1,NRNODS
 !
 !       skip inactive nodes      
-        if (NODES(inod)%act == 0)  cycle      
+        if (Is_inactive(inod))  cycle
 !
 !       find number of dofs associated to node
         call find_ndof(inod, ndofH,ndofE,ndofV,ndofQ)        
@@ -50,7 +50,7 @@ subroutine set_nodal_dof
       do inod=1,NRNODS
 !      
 !       skip inactive nodes
-        if (NODES(inod)%act == 0)  cycle
+        if (Is_inactive(inod))  cycle
 !               
 !       reset all dofs to zero
         if (associated(NODES(inod)%zdofH))  NODES(inod)%zdofH=ZERO

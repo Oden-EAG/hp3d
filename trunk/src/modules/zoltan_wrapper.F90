@@ -408,7 +408,7 @@ module zoltan_wrapper
                if (Wgt_dim > 0) Wgts(num_neig) = 1.0_Zoltan_float
 #if DEBUG_MODE
                ! DEBUG checks
-               if (NODES(neig)%act .ne. 1) then
+               if (Is_inactive(neig)) then
                   write(*,*) 'neig not active'; stop
                endif
                if (subd .lt. 0 .or. subd .ge. NUM_PROCS) then
@@ -476,7 +476,7 @@ module zoltan_wrapper
 #if DEBUG_MODE
                   ! DEBUG checks
                   !$OMP CRITICAL
-                  if (NODES(neig)%act .ne. 1) then
+                  if (Is_inactive(neig)) then
                      write(*,*) 'neig not active'; stop
                   endif
                   if (subd .lt. 0 .or. subd .ge. NUM_PROCS) then

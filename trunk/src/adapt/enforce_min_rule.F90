@@ -53,7 +53,7 @@
          call save_min_order(nod,nord)
 !
 !     ...if a constrained node
-         if (NODES(nod)%act.eq.0) then
+         if (Is_inactive(nod)) then
 !
 !        ...identify the constraint case
             call decode2(NODES_CONSTR(i), nc,icase)
@@ -149,7 +149,7 @@
    do nod=1,NRNODS
 !
 !  ...active node
-      if (NODES(nod)%act.eq.1) then
+      if (Is_active(nod)) then
          nord = NODES(nod)%visit
          if (nord.eq.0) cycle
 !

@@ -55,8 +55,8 @@ endsubroutine vis_shape_funct
 !
 subroutine vis_shape_h1(Icount)
 !
-      use data_structure3D , only : NODES,NRNODS , find_ndof
-      use parameters       , only : ZERO , ZONE
+      use data_structure3D , only : NODES,NRNODS,Is_inactive,find_ndof
+      use parameters       , only : ZERO,ZONE
 !
       implicit none
       integer, intent(out) :: Icount
@@ -70,7 +70,7 @@ subroutine vis_shape_h1(Icount)
       do inod=1,NRNODS
 !      
 !       skip inactive nodes
-        if (NODES(inod)%act == 0)  cycle
+        if (Is_inactive(inod))  cycle
 !               
 !       reset all dofs to zero
         if (associated(NODES(inod)%zdofH))  NODES(inod)%zdofH=ZERO
@@ -88,7 +88,7 @@ subroutine vis_shape_h1(Icount)
       do inod=1,NRNODS
 !
 !       skip inactive nodes      
-        if (NODES(inod)%act == 0)  cycle      
+        if (Is_inactive(inod))  cycle
 !
 !       find number of dofs associated to node
         call find_ndof(inod, ndofH,ndofE,ndofV,ndofQ)        
@@ -125,13 +125,13 @@ endsubroutine vis_shape_h1
 !
 subroutine vis_shape_hcurl(Icount)
 !
-      use data_structure3D , only : NODES,NRNODS , find_ndof
-      use parameters       , only : ZERO , ZONE
+      use data_structure3D , only : NODES,NRNODS,Is_inactive,find_ndof
+      use parameters       , only : ZERO,ZONE
 !
       implicit none
       integer,intent(out) :: Icount
       integer :: inod,ndofH,ndofE,ndofV,ndofQ,idof
-!      
+!
 !----------------------------------------------------------------------
 !
 !     Step 1 : reset all dofs to zero
@@ -140,7 +140,7 @@ subroutine vis_shape_hcurl(Icount)
       do inod=1,NRNODS
 !      
 !       skip inactive nodes
-        if (NODES(inod)%act == 0)  cycle
+        if (Is_inactive(inod))  cycle
 !               
 !       reset all dofs to zero
         if (associated(NODES(inod)%zdofH))  NODES(inod)%zdofH=ZERO
@@ -158,7 +158,7 @@ subroutine vis_shape_hcurl(Icount)
       do inod=1,NRNODS
 !
 !       skip inactive nodes      
-        if (NODES(inod)%act == 0)  cycle      
+        if (Is_inactive(inod))  cycle
 !
 !       find number of dofs associated to node
         call find_ndof(inod, ndofH,ndofE,ndofV,ndofQ)        
@@ -193,13 +193,13 @@ endsubroutine vis_shape_hcurl
 !
 subroutine vis_shape_hdiv(Icount)
 !
-      use data_structure3D , only : NODES,NRNODS , find_ndof
-      use parameters       , only : ZERO , ZONE
+      use data_structure3D , only : NODES,NRNODS,Is_inactive,find_ndof
+      use parameters       , only : ZERO,ZONE
 !
       implicit none
       integer,intent(out) :: Icount
       integer :: inod,ndofH,ndofE,ndofV,ndofQ,idof
-!      
+!
 !----------------------------------------------------------------------
 !
 !     Step 1 : reset all dofs to zero
@@ -208,7 +208,7 @@ subroutine vis_shape_hdiv(Icount)
       do inod=1,NRNODS
 !      
 !       skip inactive nodes
-        if (NODES(inod)%act == 0)  cycle
+        if (Is_inactive(inod))  cycle
 !               
 !       reset all dofs to zero
         if (associated(NODES(inod)%zdofH))  NODES(inod)%zdofH=ZERO
@@ -226,7 +226,7 @@ subroutine vis_shape_hdiv(Icount)
       do inod=1,NRNODS
 !
 !       skip inactive nodes      
-        if (NODES(inod)%act == 0)  cycle      
+        if (Is_inactive(inod))  cycle
 !
 !       find number of dofs associated to node
         call find_ndof(inod, ndofH,ndofE,ndofV,ndofQ)        
@@ -261,13 +261,13 @@ endsubroutine vis_shape_hdiv
 !
 subroutine vis_shape_l2(Icount)
 !
-      use data_structure3D , only : NODES,NRNODS , find_ndof
+      use data_structure3D , only : NODES,NRNODS,Is_inactive,find_ndof
       use parameters       , only : ZERO , ZONE
 !
       implicit none
       integer, intent(out) :: Icount
       integer :: inod,ndofH,ndofE,ndofV,ndofQ,idof
-!      
+!
 !----------------------------------------------------------------------
 !
 !     Step 1 : reset all dofs to zero
@@ -276,7 +276,7 @@ subroutine vis_shape_l2(Icount)
       do inod=1,NRNODS
 !      
 !       skip inactive nodes
-        if (NODES(inod)%act == 0)  cycle
+        if (Is_inactive(inod))  cycle
 !               
 !       reset all dofs to zero
         if (associated(NODES(inod)%zdofH))  NODES(inod)%zdofH=ZERO
@@ -294,7 +294,7 @@ subroutine vis_shape_l2(Icount)
       do inod=1,NRNODS
 !
 !       skip inactive nodes      
-        if (NODES(inod)%act == 0)  cycle      
+        if (Is_inactive(inod))  cycle
 !
 !       find number of dofs associated to node
         call find_ndof(inod, ndofH,ndofE,ndofV,ndofQ)        

@@ -29,13 +29,12 @@ subroutine activate(Nod, NrdofH,NrdofE,NrdofV,NrdofQ)
 !-------------------------------------------------------------------------
 !
 !..if node is already active, do nothing
-   if (NODES(Nod)%act.eq.1) return
+   if (Is_active(Nod)) return
 !
 !..determine number of dofs, update geometry dofs
    call find_ndof(Nod, ndofH,ndofE,ndofV,ndofQ)
 !
 #if DEBUG_MODE
-!..printing
    if (iprint.eq.1) then
       write(*,7001) Nod,ndofH,ndofE,ndofV,ndofQ
  7001 format('activate: Nod=',i10,', ndofH,ndofE,ndofV,ndofQ= ',4i4)
@@ -89,10 +88,9 @@ subroutine activate(Nod, NrdofH,NrdofE,NrdofV,NrdofQ)
    endif
 !
 !..raise activation flag
-   NODES(Nod)%act=1
+   NODES(Nod)%act=.true.
 !
 #if DEBUG_MODE
-!..printing
    if (iprint.ge.1) then
       write(*,*) 'activate : ACTIVATED Nod = ', Nod
    endif
@@ -129,13 +127,12 @@ subroutine deactivate(Nod, NrdofH,NrdofE,NrdofV,NrdofQ)
 !-------------------------------------------------------------------------
 !
 !..if node is already inactive, do nothing
-   if (NODES(Nod)%act.eq.0) return
+   if (Is_inactive(Nod)) return
 !
 !..find number of dofs associated to node, update number of gdofs
    call find_ndof(Nod, ndofH,ndofE,ndofV,ndofQ)
 !
 #if DEBUG_MODE
-!..printing
    if (iprint.eq.1) then
       write(*,7001) Nod,ndofH,ndofE,ndofV,ndofQ
  7001 format('activate: Nod=',i10,'ndofH,ndofE,ndofV,ndofQ= ',4i4)
@@ -176,10 +173,9 @@ subroutine deactivate(Nod, NrdofH,NrdofE,NrdofV,NrdofQ)
    endif
 !
 !..lower activation flag
-   NODES(Nod)%act=0
+   NODES(Nod)%act=.false.
 !
 #if DEBUG_MODE
-!..printing
    if (iprint.ge.1) then
       write(*,*) 'deactivate : DEACTIVATED Nod = ', Nod
    endif

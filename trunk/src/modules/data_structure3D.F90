@@ -122,11 +122,9 @@ module data_structure3D
 !  .....node sons
         integer          :: first_son
         integer          :: nr_sons
-        !integer(2)      :: nr_sons
 !
 !  .....refinement flag
         integer          :: ref_kind
-        !integer(2)      :: ref_kind
 !
 !  .....interface flag with GMP
         integer          :: geom_interf
@@ -135,8 +133,7 @@ module data_structure3D
         integer          :: visit
 !
 !  .....activation flag
-        integer          :: act
-        !logical          :: act
+        logical           :: act
 !
 !  .....subdomain number (distributed mesh)
         integer          :: subd
@@ -334,6 +331,7 @@ module data_structure3D
         NODES(nod)%case = 0
         NODES(nod)%index = 0
         NODES(nod)%order = 0
+        NODES(nod)%act = .false.
         NODES(nod)%bcond = nod+1
         NODES(nod)%ref_kind = 0
         NODES(nod)%father = 0
@@ -786,12 +784,13 @@ module data_structure3D
       function Is_active(Nod)
       integer Nod
       logical Is_active
-      select case (NODES(Nod)%act)
-      case (0)
-        Is_active = .FALSE.
-      case default
-        Is_active = .TRUE.
-      end select
+      Is_active = NODES(Nod)%act
+      end function
+!-----------------------------------------------------------------------
+      function Is_inactive(Nod)
+      integer Nod
+      logical Is_inactive
+      Is_inactive = .not. NODES(Nod)%act
       end function
 !-----------------------------------------------------------------------
       function Is_leaf(Nod)

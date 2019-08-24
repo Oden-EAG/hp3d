@@ -26,8 +26,9 @@ subroutine break(Mdle,Kref)
   integer, dimension(12)  :: krefe
   integer, dimension(4)   :: iv
   integer, dimension(4,6) :: neig
-  integer :: i, j, is, iprint, iact, iface, ipass
+  integer :: i, j, is, iprint, iface, ipass
   integer :: kref_face, kref_edge, nod, nr_vert, nrsons, subd
+  logical :: iact
 !
 !-------------------------------------------------------------------------
 !
@@ -41,7 +42,7 @@ subroutine break(Mdle,Kref)
   call find_face_ref_flags(type,Kref, kreff)
   call find_edge_ref_flags(type,Kref, krefe)
 !
-! printing
+#if DEBUG_MODE
   if (iprint.eq.2) then
      call elem_show(Mdle, type, nodesl, norientl)
 7000 format('break: Mdle = ',i6)
@@ -52,6 +53,7 @@ subroutine break(Mdle,Kref)
      write(*,7013) krefe(1:nedge(type))
 7013 format('       krefe = ',12i2)
   endif
+#endif
 !  
 !
 !=========================================================================
@@ -68,7 +70,7 @@ subroutine break(Mdle,Kref)
 !       collect edge vertex nodes        
         do j=1,2 ; novert(j) = nodesl(iv(j)) ; enddo
 !       break edge
-        iact = 0; kref_edge = 1
+        iact = .false.; kref_edge = 1
         call nodbreak(nod,kref_edge,iact,novert,nr_vert)
      endif
   enddo
@@ -110,7 +112,7 @@ subroutine break(Mdle,Kref)
         kref_face=kref_face-NODES(nod)%ref_kind
 !
 !       by default, generate INACTIVE son nodes
-        iact=0
+        iact=.false.
 !
 !       existing refinement coincides with desired refinement
         if (kref_face.eq.0) then
@@ -160,9 +162,9 @@ subroutine break(Mdle,Kref)
      nr_vert=8
      do j=1,8 ; novert(j)=nodesl(j) ; enddo
   endif
-!  
+!
 ! break middle node
-  iact = 0
+  iact = .false.
   call nodbreak(Mdle,Kref,iact,novert,nr_vert)
 !
   call activate_sons(Mdle)
@@ -173,10 +175,11 @@ subroutine break(Mdle,Kref)
   call nr_mdle_sons(type,Kref, nrsons)
   NRELES=NRELES+nrsons-1
 !
-! printing
+#if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,7100) Mdle, NODES(Mdle)%type, Kref
   endif
+#endif
 !
 end subroutine break
 !
@@ -193,6 +196,7 @@ subroutine activate_sons(Nod)
   implicit none
 !
   integer, intent(in) :: Nod
+!
   integer :: nrsons, i
 !
 !------------------------------------------------------------------------
@@ -201,7 +205,7 @@ subroutine activate_sons(Nod)
 ! loop over sons
   do i=1,nrsons
 !     call activate(NODES(Nod)%sons(i))
-      if (NODES(Son(Nod,i))%act.ne.1) then
+      if (Is_inactive(Son(Nod,i))) then
          call activate(Son(Nod,i), NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ)
       endif
   enddo

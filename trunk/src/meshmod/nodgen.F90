@@ -17,8 +17,8 @@
 !              Nfath   - father of the node
 !              Norder  - order of approximation for the new node
 !              Subd    - subdomain of node
-!              Iact    = 1  active node, allocate dof
-!                      = 0  inactive node, DO NOT allocate dof
+!              Iact    = T  active node, allocate dof
+!                      = F  inactive node, DO NOT allocate dof
 !              X       = coord for vertex
 !     out:
 !              Nod     - number of the new node
@@ -37,7 +37,7 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
    integer, intent(in)           :: Nfath
    integer, intent(in)           :: Norder
    integer, intent(in)           :: Subd
-   integer, intent(in)           :: Iact
+   logical, intent(in)           :: Iact
    integer, intent(out)          :: Nod
 !
    integer :: ncase(NR_PHYSA)
@@ -46,17 +46,20 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
 !
 !-----------------------------------------------------------------------
 !
+#if DEBUG_MODE
    iprint=0
    if (iprint.eq.1) then
       write(*,7000) Type,Icase,Nbcond,Nfath,Norder,Iact
  7000 format(' nodgen: Type,Icase,Nbcond,Nfath,Norder,Iact = ', &
                         a4,2x,i3,2x,i6,2x,i6,2x,i3,2x,i2)
    endif
+#endif
 !
    call decod(Icase,2,NR_PHYSA, ncase)
 !
 !..pointer to the first free entry in NODES array
    Nod=NPNODS
+!
    if ( (Nod.eq.0) .or. (Nod.gt.MAXNODS) ) then
       write(*,7002)Nod,NRNODS,MAXNODS
 7002  format(' nodgen: Nod,NRNODS,MAXNODS = ',3(i8,2x))
@@ -87,19 +90,21 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
    call find_ndof(Nod, ndofH,ndofE,ndofV,ndofQ)
 !
 !..printing
+#if DEBUG_MODE
    if (iprint.eq.1) then
       write(*,7001) Nod,ndofH,ndofE,ndofV,ndofQ
  7001 format(' nodgen: Nod = ',i10,' ndofH,ndofE,ndofV,ndofQ = ',4i4)
    endif
+#endif
 !
 !..allocate and initialize geometry dofs
-   if ((Iact.eq.1) .and. (ndofH.gt.0)) then
+   if (Iact .and. (ndofH.gt.0)) then
       allocate(NODES(Nod)%coord(NDIMEN,ndofH))
       NODES(Nod)%coord=0.d0
    endif
 !
 !..allocate and initialize solution dofs
-   if (Iact.eq.1) then
+   if (Iact) then
       if ((NREQNH(Icase).gt.0).and.(ndofH.gt.0)) then
          nvar = NREQNH(Icase)*NRCOMS
          allocate( NODES(Nod)%zdofH(nvar,ndofH))
@@ -129,12 +134,13 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
 !..activation flag
    NODES(Nod)%act=Iact
 !
-!..printing
+#if DEBUG_MODE
    if (iprint.eq.1) then
       write(*,*) 'nodgen: Nod ',Nod,'HAS BEEN GENERATED'
       write(*,*) '        Type ',Type, ', Norder = ',Norder
       call pause
    endif
+#endif
 !
 !
 end subroutine nodgen

@@ -146,7 +146,7 @@ subroutine update_gdof()
                NODES(nod)%geom_interf=1
             endif        
             if (NODES(nod)%geom_interf.eq.1) cycle
-            if (NODES(nod)%act        .eq.0) cycle
+            if (Is_inactive(nod))            cycle
 !
             if (mdltype .ne. 'Linear') then
                call hpedge(mdle,iflag,no,xsub,ntype,             &
@@ -172,7 +172,7 @@ subroutine update_gdof()
                NODES(nod)%geom_interf=1
             endif        
             if (NODES(nod)%geom_interf.eq.1) cycle
-            if (NODES(nod)%act        .eq.0) cycle
+            if (Is_inactive(nod))            cycle
 !
             if (mdltype .ne. 'Linear') then
                call hpface(mdle,iflag,no,xsub,ntype,             &

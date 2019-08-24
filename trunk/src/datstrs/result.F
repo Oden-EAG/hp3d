@@ -108,7 +108,7 @@ c
         write(*,*) 'SET NODE NUMBER'
         read(*,*) nod
         write(*,7021) nod, NODES(nod)%act
- 7021   format(' NODE = ',i10, ' active = ', i2)
+ 7021   format(' NODE = ',i10, ' active = ', l2)
         write(*,7022) NODES(nod)%type
  7022   format(' TYPE = ',a4)
         write(*,7023) NODES(nod)%case

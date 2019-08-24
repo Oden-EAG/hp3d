@@ -8,7 +8,7 @@
 !
 subroutine set_mesh_order(P)
 !      
-      use data_structure3D , only : NODES,NRNODS
+      use data_structure3D , only : NODES,NRNODS,Is_inactive
 !
       implicit none      
       integer,intent(in) :: P
@@ -17,18 +17,18 @@ subroutine set_mesh_order(P)
 !
 !--------------------------------------------------------------------
 !
-!     loop over all nodes and modify order      
+!     loop over all nodes and modify order
       do i=1,NRNODS
-!      
+!
 !       skip inactive nodes
-        if (NODES(i)%act == 0)  cycle
+        if (Is_inactive(i)) cycle
 !
 !       modify order
         call set_p(i, P,P,P)
 !        
       enddo
 !
-!     update geometry and Dirichlet dofs      
+!     update geometry and Dirichlet dofs
       call update_gdof
       call update_ddof
 !
@@ -59,7 +59,7 @@ subroutine set_p(Nod,P,Q,R)
       character(len=4) :: ntype
       integer :: nord
 !    
-!---------------------------------------------------------------------
+!--------------------------------------------------------------------
 !
 !!!      write(*,*)'Nod,P,Q,R [0] = ',Nod,P,Q,R
 !!!!     check upper bound    

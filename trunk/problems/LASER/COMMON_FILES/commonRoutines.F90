@@ -244,7 +244,7 @@ subroutine my_sizetest
          write(*,*) 'my_sizetest: NRHVAR, NREVAR, NRVVAR, NRQVAR = ', &
                                   NRHVAR, NREVAR, NRVVAR, NRQVAR
         do nod = 1, NRNODS
-          if (NODES(nod)%act .eq. 0) cycle
+          if (Is_inactive(nod)) cycle
           select case(NODES(nod)%type)
           case('vert')
             nH = nH + 1
@@ -419,7 +419,7 @@ subroutine copy_coms(No1,No2)
 !
 !..loop through active nodes
    do nod=1,NRNODS
-      if (NODES(nod)%act.eq.0) cycle
+      if (Is_inactive(nod)) cycle
 !
 !  ...H1 dof
       nf = (No1-1)*NRHVAR

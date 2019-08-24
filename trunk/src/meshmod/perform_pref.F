@@ -82,7 +82,7 @@ C
           if (NODES(nod)%type.eq.'mdlq') call decode(newp, newph,newpv)
 c
 c  .......if nod is active
-          if (NODES(nod)%act.eq.1) then
+          if (Is_active(nod)) then
 c
 c  .........raise the flag to enforce the order
             NODES(nod)%visit = 1
@@ -158,7 +158,7 @@ c  ...........parent mid-edge nodes (south,north)
               do ip=1,3,2
                 nodp = iabs(NFACE_CONS(ip,nc))
                 call enforce_order(nodp, newp)
-                if (NODES(nodp)%act.eq.0) then
+                if (Is_inactive(nodp)) then
                   nodp = NODES(nodp)%father
                   call enforce_order(nodp, newp)
                 endif
@@ -184,7 +184,7 @@ c  ...........parent mid-edge nodes (east,west)
               do ip=2,4,2
                 nodp = iabs(NFACE_CONS(ip,nc))
                 call enforce_order(nodp, newp)
-                if (NODES(nodp)%act.eq.0) then
+                if (Is_inactive(nodp)) then
                   nodp = NODES(nodp)%father
                   call enforce_order(nodp, newp)
                 endif

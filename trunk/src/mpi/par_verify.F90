@@ -165,7 +165,11 @@ subroutine mesh_consistency(ipass)
    buf(1:NRNODS) = 0
 !
    do nod=1,NRNODS
-      val(nod) = NODES(nod)%act
+      if(Is_active(nod)) then
+         val(nod) = 1
+      else
+         val(nod) = 0
+      endif
    enddo
    if (rank .eq. ROOT) then
       buf(1:NRNODS) = val(1:NRNODS)

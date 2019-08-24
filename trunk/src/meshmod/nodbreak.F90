@@ -3,8 +3,8 @@
 !!
 !> @param[in] Nod     - node number
 !> @param[in] Kref    - refinement flag
-!> @param[in] Iact    - 1 : generate active   sons
-!!                      0 : generate inactive sons
+!> @param[in] Iact    - T : generate active   sons
+!!                      F : generate inactive sons
 !> @param[in] Novert  - vertex nodes enclosing Nod (either edge, or face,
 !!                                                  or element vertices) 
 !> @param[in] Nr_vert - number of vertices
@@ -16,7 +16,8 @@ subroutine nodbreak(Nod,Kref,Iact,Novert,Nr_vert)
 !
    implicit none
 !..Arguments
-   integer,               intent(in) :: Nod, Kref, Iact, Nr_vert
+   integer,               intent(in) :: Nod, Kref, Nr_vert
+   logical,               intent(in) :: Iact
    integer, dimension(8), intent(in) :: Novert
 !..Local variables
    character(len=4), dimension(27) :: type_sons
@@ -30,7 +31,7 @@ subroutine nodbreak(Nod,Kref,Iact,Novert,Nr_vert)
    iprint = 0
    if (iprint.eq.1) then
       write(*,7001) Nod,Kref,Iact
- 7001 format('nodbreak: Nod,Kref,Iact = ',i6,2x,i4,2x,i2)
+ 7001 format('nodbreak: Nod,Kref,Iact = ',i6,2x,i4,2x,l2)
    endif
 #endif
 !

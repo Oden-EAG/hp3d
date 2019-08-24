@@ -94,9 +94,8 @@ subroutine refine(Mdle_in,Kref_in)
 
         i = nvert(type)+nedge(type)+iface
         nod = nodesl(i)
-
-        select case(NODES(nod)%act)
-        case(1)
+!    ...if nod is active
+        if (Is_active(nod)) then
 
            if (iprint.eq.2) then
              write(*,8000)iface,nod,NODES(nod)%type
@@ -111,12 +110,9 @@ subroutine refine(Mdle_in,Kref_in)
                                    NODES(nod)%ref_kind,norientl(i), &
                                    kreff(iface))
            endif
-
-        case(0)
-
-            if (iprint.eq.2) then
-             write(*,8000)iface,nod,NODES(nod)%type
-           endif
+!    ...if nod is inactive
+        else
+           if (iprint.eq.2) write(*,8000) iface,nod,NODES(nod)%type
 
            ! the face is inactive (constrained)
            !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -213,7 +209,8 @@ subroutine refine(Mdle_in,Kref_in)
               ! exit loop over faces
               exit
            end select
-        end select
+!    ...endif node active/not active
+        endif
      enddo
 
      ! dequeue the mdle from the list
