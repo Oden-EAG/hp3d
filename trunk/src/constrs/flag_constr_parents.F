@@ -168,12 +168,7 @@ c  .......parent mid-edge nodes (south,north)
             if (Is_inactive(nodp)) then
 c
 c  ...........a constraining edge is allowed
-#ifdef _PYHP3D
-              if (NODES(nodp)%type == EDGE_NODE)
-     .              nodp = NODES(nodp)%father
-#else
               if (NODES(nodp)%type.eq.'medg') nodp = NODES(nodp)%father
-#endif
             endif
 ccc            if (Is_inactive(nodp)) nodp = NODES(nodp)%father
 cccc
@@ -209,12 +204,7 @@ c  .......parent mid-edge nodes (east,west)
             if (Is_inactive(nodp)) then
 c
 c  ...........a constraining edge is allowed
-#ifdef _PYHP3D
-              if (NODES(nodp)%type == EDGE_NODE)
-     .              nodp = NODES(nodp)%father
-#else
               if (NODES(nodp)%type.eq.'medg') nodp = NODES(nodp)%father
-#endif
             endif
 c
 ccc  .........check: father MUST be a medg node

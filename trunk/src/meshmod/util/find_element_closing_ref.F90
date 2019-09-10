@@ -9,13 +9,8 @@ subroutine find_element_closing_ref(Type,Kreff,Krefe, Kref)
   implicit none
   ! ** Arguments
   !-------------------------------------------------------
-#ifdef _PYHP3D
-  integer, intent(in) :: type
-7001 format('find_element_closing_ref: Type = ',i2)
-#else
   character(len=4),       intent(in)  :: Type
 7001 format('find_element_closing_ref: Type = ',a5)
-#endif
   integer, dimension(6),  intent(in)  :: Kreff
   integer, dimension(12), intent(in)  :: Krefe
   integer,                intent(out) :: Kref

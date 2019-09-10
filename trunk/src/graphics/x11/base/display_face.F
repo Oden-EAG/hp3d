@@ -45,17 +45,10 @@ c
       use data_structure3D
       use graphmod
       use physics
-#ifndef _PYHP3D
-      use GMP
-#endif
 c
 #include "syscom.blk"
 c
-#ifdef _PYHP3D
-      integer :: type
-#else
       character(len=4) :: type
-#endif
       dimension Nedge_orient(12),Nface_orient(6),Norder(19),Nodesl(27)
       dimension Xnod(3,MAXbrickH),
      .          ZdofH(MAXEQNH,MAXbrickH),ZdofE(MAXEQNE,MAXbrickE),

@@ -33,12 +33,7 @@ c
       subroutine int_coord(Numlev,Nsub,Type,Norder,I,J,
      .                     Ixi1,Ixi2,Np1,Np2,Nsid1,Nsid2)
 c
-#ifdef _PYHP3D
-      use node_types
-      integer :: type
-#else
       character(len=4) Type
-#endif
       dimension Norder(5),Ixi1(2,3),Ixi2(2,3)
 c
       iprint=0

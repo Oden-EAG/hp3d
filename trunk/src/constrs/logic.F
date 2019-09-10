@@ -59,21 +59,6 @@ c
      .          NacV(NACDIM,MAXbrickV),ConstrV(NACDIM,MAXbrickV)
 c
 c  ...middle node type
-#ifdef _PYHP3D
-      integer :: etype
- 7002     format('im = ',i3,' nod = ',i6,' TYPE = ',i2,' ORDER = ',i3,
-     .      ' naH = ',i3,' NdofmH = ',i3,
-     .      ' naE = ',i3,' NdofmE = ',i3,
-     .      ' naV = ',i3,' NdofmV = ',i3)
- 7030       format('logic: ACTIVE NODE      i = ',i3,' nod = ',i6,
-     .             ' TYPE = ',i2,' ORDER = ',i2)
- 7031       format('logic: CONSTRAINED NODE i = ',i3,' nod = ',i6,
-     .             ' TYPE = ',i2,' ORDER = ',i2,' icase = ',i2,
-     .             ' EDGE NODES = ',i5,2x,2i5)
- 7032       format('logic: CONSTRAINED NODE i = ',i3,' nod = ',i6,
-     .             ' TYPE = ',i2,' ORDER = ',i2,' icase = ',i2,
-     .             ' FACE NODES = ',i5,2x,4i5,2x,4i5)
-#else
       character(len=4) :: etype
  7002     format('im = ',i3,' nod = ',i6,' TYPE = ',a6,' ORDER = ',i3,
      .      ' naH = ',i3,' NdofmH = ',i3,
@@ -87,7 +72,6 @@ c  ...middle node type
  7032       format('logic: CONSTRAINED NODE i = ',i3,' nod = ',i6,
      .             ' TYPE = ',a6,' ORDER = ',i2,' icase = ',i2,
      .             ' FACE NODES = ',i5,2x,4i5,2x,4i5)
-#endif
 c
 c  ...element local nodes, orientations
       dimension nodesl(27),norientl(27)
