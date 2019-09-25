@@ -99,6 +99,8 @@ subroutine par_nested(mtype)
 !..timer
    real(8) :: MPI_Wtime,start_time,end_time,time_stamp
 !
+   logical :: info = .true.
+!
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
@@ -349,10 +351,15 @@ subroutine par_nested(mtype)
                     '       Total interf nnz: nnz            = ', nnz
    endif
    call MPI_BARRIER(mumps_par%COMM, ierr)
+   if (info) then
    write(*,2011) '[', RANK, '] Local interf dof: nrdof_subd_con = ', nrdof_subd_con, &
                        '       Local bubble dof: nrdof_subd_bub = ', nrdof_subd_bub, &
                        '       Local interf nnz: nnz_loc        = ', nnz_loc,        &
                        '       Local bubble nnz: nnz_bub        = ', nnz_bub
+   else
+      mumps_bub%icntl(4) = 0
+      mumps_par%icntl(4) = 0
+   endif
 
 2010 format(A,I12,/,A,I12,/,A,I12,/,A,I12,/,A,I12,/)
 2011 format(A,I4,A,I12,/,A,I12,/,A,I12,/,A,I12,/)
@@ -632,7 +639,7 @@ subroutine par_nested(mtype)
       write(*,*) '[',RANK,'] analysis: mumps_bub%INFO(1) .ne. 0'
       stop
    endif
-   if (IPRINT_TIME .eq. 1) then
+   if (IPRINT_TIME .eq. 1 .and. info) then
       time_stamp = MPI_Wtime()-time_stamp
       write(*,3101) RANK,time_stamp,                                       &
          '         - estimated size in GB = ',mumps_bub%INFO(15)/1000.d0,  &
@@ -654,7 +661,7 @@ subroutine par_nested(mtype)
    call dmumps(mumps_bub)
 #endif
    if (mumps_bub%INFO(1) .ne. 0) then
-      write(*,*) '[',RANK,'] factorization: mumps_bub%INFO(1) .ne. 0'
+      if (info) write(*,*) '[',RANK,'] factorization: mumps_bub%INFO(1) .ne. 0'
       if (mumps_bub%INFO(1) .eq. -9) then
          write(*,*) '[',RANK,'] Increasing workspace, trying factorization again...'
          mumps_bub%icntl(14) = mumps_bub%icntl(14) + 10 ! increase workspace by 10 percent
@@ -663,7 +670,7 @@ subroutine par_nested(mtype)
       call mumps_destroy_subd
       stop
    endif
-   if (IPRINT_TIME .eq. 1) then
+   if (IPRINT_TIME .eq. 1 .and. info) then
       time_stamp = MPI_Wtime()-time_stamp
       write(*,3102) RANK,time_stamp,   &
          '         - memory used in GB    = ',mumps_bub%INFO(22)/1000.d0
@@ -686,7 +693,7 @@ subroutine par_nested(mtype)
       write(*,*) '[',RANK,'] solve: mumps_bub%INFO(1) .ne. 0'
       stop
    endif
-   if (IPRINT_TIME .eq. 1) then
+   if (IPRINT_TIME .eq. 1 .and. info) then
       time_stamp = MPI_Wtime()-time_stamp
       write(*,3103) RANK,time_stamp
  3103 format('[',I4,'] - Solve    : ',f12.5,'  seconds')
@@ -741,7 +748,7 @@ subroutine par_nested(mtype)
    if (nnz > 2e9) mumps_par%icntl(28) = 2
 !
 !..percentage increase in estimated workspace for global interface problem
-   mumps_par%icntl(14) = 150 + NUM_PROCS
+   mumps_par%icntl(14) = 200 + NUM_PROCS/4
 !
 !..memory allocation for global MUMPS solve
    mumps_par%N = NRDOF_CON
