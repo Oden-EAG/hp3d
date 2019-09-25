@@ -38,16 +38,18 @@ c
         do inod=1,nnod
           nod = nodesl(inod)
           if (NODES(nod)%geom_interf.eq.0) then
-            if (associated(NODES(nod)%zdofH)) then
-              NODES(nod)%zdofH = ZERO
+            if (associated(NODES(nod)%dof)) then
+              if (associated(NODES(nod)%dof%zdofH)) then
+                NODES(nod)%dof%zdofH = ZERO
+              endif
+              if (associated(NODES(nod)%dof%zdofE)) then                 
+                NODES(nod)%dof%zdofE = ZERO
+              endif
+              if (associated(NODES(nod)%dof%zdofV)) then                 
+                NODES(nod)%dof%zdofV = ZERO
+              endif
+              NODES(nod)%geom_interf=1
             endif
-            if (associated(NODES(nod)%zdofE)) then                 
-              NODES(nod)%zdofE = ZERO
-            endif
-            if (associated(NODES(nod)%zdofV)) then                 
-              NODES(nod)%zdofV = ZERO
-            endif
-            NODES(nod)%geom_interf=1
           endif
         enddo
       enddo

@@ -15,7 +15,7 @@ subroutine find_center(Mdle, X)
 
   X(1:3) = 0.d0
   do i=1,nv 
-     X(1:3) = X(1:3) + NODES(nodesl(i))%coord(1:3,1)
+     X(1:3) = X(1:3) + NODES(nodesl(i))%dof%coord(1:3,1)
   enddo
   X(1:3) = X(1:3)/nv
 

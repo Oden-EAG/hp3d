@@ -50,13 +50,14 @@ subroutine set_nodal_dof
       do inod=1,NRNODS
 !      
 !       skip inactive nodes
-        if (Is_inactive(inod))  cycle
+        if (Is_inactive(inod)) cycle
+        if (.not. associated(NODES(inod)%dof)) cycle
 !               
 !       reset all dofs to zero
-        if (associated(NODES(inod)%zdofH))  NODES(inod)%zdofH=ZERO
-        if (associated(NODES(inod)%zdofE))  NODES(inod)%zdofE=ZERO
-        if (associated(NODES(inod)%zdofV))  NODES(inod)%zdofV=ZERO
-        if (associated(NODES(inod)%zdofQ))  NODES(inod)%zdofQ=ZERO
+        if (associated(NODES(inod)%dof%zdofH)) NODES(inod)%dof%zdofH=ZERO
+        if (associated(NODES(inod)%dof%zdofE)) NODES(inod)%dof%zdofE=ZERO
+        if (associated(NODES(inod)%dof%zdofV)) NODES(inod)%dof%zdofV=ZERO
+        if (associated(NODES(inod)%dof%zdofQ)) NODES(inod)%dof%zdofQ=ZERO
 !
 !       node of interest
         if (inod == nod) then
@@ -64,13 +65,13 @@ subroutine set_nodal_dof
 !         select space 
           select case(ispace)
 !         H1
-          case(1) ; NODES(inod)%zdofH(:,idof)=ZONE
+          case(1) ; NODES(inod)%dof%zdofH(:,idof)=ZONE
 !         H(curl)
-          case(2) ; NODES(inod)%zdofE(:,idof)=ZONE
+          case(2) ; NODES(inod)%dof%zdofE(:,idof)=ZONE
 !         H(div)
-          case(3) ; NODES(inod)%zdofV(:,idof)=ZONE
-!         L2                   
-          case(4) ; NODES(inod)%zdofQ(:,idof)=ZONE
+          case(3) ; NODES(inod)%dof%zdofV(:,idof)=ZONE
+!         L2
+          case(4) ; NODES(inod)%dof%zdofQ(:,idof)=ZONE
           endselect
         endif
 !        

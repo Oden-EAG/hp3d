@@ -794,13 +794,13 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
                      ivar = ivar+1
                      nn = nn+1
 !                 ...copy the dof
-                     NODES(nod)%zdofH(ivar,j) = Xb(nn,load)
+                     NODES(nod)%dof%zdofH(ivar,j) = Xb(nn,load)
 #if DEBUG_MODE
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Xb(nn,load)
  7006                   format('stc_solout: nn,load,Xb(nn,load) = ',i4,i2,x,2e13.5)
-                        write(*,7007) nod,j,ivar,NODES(nod)%zdofH(ivar,j)
- 7007                   format('stc_solout: nod,j,ivar,NODES(nod)%zdofH(ivar,j)', &
+                        write(*,7007) nod,j,ivar,NODES(nod)%dof%zdofH(ivar,j)
+ 7007                   format('stc_solout: nod,j,ivar,NODES(nod)%dof%zdofH(ivar,j)', &
                                ' = ',i5,i3,i3,x,2e13.5)
                      endif
                   case default
@@ -846,12 +846,12 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
                      ivar = ivar+1
                      nn = nn+1
 !                 ...copy the dof
-                     NODES(nod)%zdofE(ivar,j) = Xb(nn,load)
+                     NODES(nod)%dof%zdofE(ivar,j) = Xb(nn,load)
 #if DEBUG_MODE
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Xb(nn,load)
-                        write(*,7009) nod,j,ivar,NODES(nod)%zdofE(ivar,j)
- 7009                   format('stc_solout: nod,j,ivar,NODES(nod)%zdofE(ivar,j)', &
+                        write(*,7009) nod,j,ivar,NODES(nod)%dof%zdofE(ivar,j)
+ 7009                   format('stc_solout: nod,j,ivar,NODES(nod)%dof%zdofE(ivar,j)', &
                                ' = ',i5,i3,i3,x,2e13.5)
                      endif
                   case default
@@ -897,12 +897,12 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
                      ivar = ivar+1
                      nn = nn+1
 !                 ...copy the dof
-                     NODES(nod)%zdofV(ivar,j) = Xb(nn,load)
+                     NODES(nod)%dof%zdofV(ivar,j) = Xb(nn,load)
 #if DEBUG_MODE
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Xb(nn,load)
-                        write(*,7010) nod,j,ivar,NODES(nod)%zdofV(ivar,j)
- 7010                   format('stc_solout: nod,j,ivar,NODES(nod)%zdofV(ivar,j)', &
+                        write(*,7010) nod,j,ivar,NODES(nod)%dof%zdofV(ivar,j)
+ 7010                   format('stc_solout: nod,j,ivar,NODES(nod)%dof%zdofV(ivar,j)', &
                                ' = ',i5,i3,i3,x,2e13.5)
                      endif
                   case default
@@ -953,12 +953,12 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
                      ivar = ivar+1
                      nn = nn+1
 !                 ...copy the dof
-                     NODES(nod)%zdofQ(ivar,j) = Xb(nn,load)
+                     NODES(nod)%dof%zdofQ(ivar,j) = Xb(nn,load)
 #if DEBUG_MODE
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Xb(nn,load)
-                        write(*,7011) nod,j,ivar,NODES(nod)%zdofQ(ivar,j)
- 7011                   format('stc_solout: nod,j,ivar,NODES(nod)%zdofQ(ivar,j)', &
+                        write(*,7011) nod,j,ivar,NODES(nod)%dof%zdofQ(ivar,j)
+ 7011                   format('stc_solout: nod,j,ivar,NODES(nod)%dof%zdofQ(ivar,j)', &
                                ' = ',i5,i3,i3,x,2e13.5)
                      endif
                   case default

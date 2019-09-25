@@ -36,7 +36,7 @@ subroutine nodcor_vert(Mdle, Xnod)
    nrv = nvert(NODES(Mdle)%type)
    do iv=1,nrv
      nod = nodesl(iv)
-     Xnod(1:NDIMEN,iv) = NODES(nod)%coord(1:NDIMEN,1)
+     Xnod(1:NDIMEN,iv) = NODES(nod)%dof%coord(1:NDIMEN,1)
    enddo
 !
    iprint=0

@@ -123,8 +123,11 @@ subroutine update_gdof()
 !     ...loop through the element vertex nodes
          do iv=1,nvert(ntype)
             nod = nodesl(iv)
+            if (.not.associated(NODES(nod)%dof)) then
+               NODES(nod)%geom_interf=1
+            endif
             if (NODES(nod)%geom_interf.eq.1) cycle
-            call hpvert(iflag,no,xsub(1:3,iv), NODES(nod)%coord)
+            call hpvert(iflag,no,xsub(1:3,iv), NODES(nod)%dof%coord)
             NODES(nod)%geom_interf=1
 !
 !     ...end of loop through element vertices
@@ -142,16 +145,18 @@ subroutine update_gdof()
             nod = nodesl(ind)
 !
 !        ...if no gdof, mark as processed
-            if (.not.associated(NODES(nod)%coord)) then
+            if (.not.associated(NODES(nod)%dof)) then
                NODES(nod)%geom_interf=1
-            endif        
+            elseif (.not.associated(NODES(nod)%dof%coord)) then
+               NODES(nod)%geom_interf=1
+            endif
             if (NODES(nod)%geom_interf.eq.1) cycle
             if (Is_inactive(nod))            cycle
 !
             if (mdltype .ne. 'Linear') then
                call hpedge(mdle,iflag,no,xsub,ntype,             &
                            nedge_orient,nface_orient,norder,ie,  &
-                           xnod,NODES(nod)%coord)
+                           xnod,NODES(nod)%dof%coord)
             endif
 !
             NODES(nod)%geom_interf=1
@@ -168,16 +173,18 @@ subroutine update_gdof()
             ind = nvert(ntype)+nedge(ntype)+ifc
             nod = nodesl(ind)
 !        ...if no gdof, mark as processed
-            if (.not.associated(NODES(nod)%coord)) then
+            if (.not.associated(NODES(nod)%dof)) then
                NODES(nod)%geom_interf=1
-            endif        
+            elseif (.not.associated(NODES(nod)%dof%coord)) then
+               NODES(nod)%geom_interf=1
+            endif
             if (NODES(nod)%geom_interf.eq.1) cycle
             if (Is_inactive(nod))            cycle
 !
             if (mdltype .ne. 'Linear') then
                call hpface(mdle,iflag,no,xsub,ntype,             &
                            nedge_orient,nface_orient,norder,ifc, &
-                           xnod,NODES(nod)%coord)
+                           xnod,NODES(nod)%dof%coord)
             endif
             NODES(nod)%geom_interf=1
 !
@@ -204,7 +211,8 @@ subroutine update_gdof()
 !$OMP SCHEDULE(DYNAMIC)
    do iel=1,NRELES_SUBD
       mdle = ELEM_SUBD(iel)
-      if (.not.associated(NODES(mdle)%coord)) cycle
+      if (.not.associated(NODES(mdle)%dof))       cycle
+      if (.not.associated(NODES(mdle)%dof%coord)) cycle
       call find_elem_type(mdle, mdltype)
       if (mdltype .ne. 'Linear') then
          ntype = NODES(mdle)%type
@@ -214,7 +222,7 @@ subroutine update_gdof()
          call nodcor(mdle, xnod)
          call hpmdle(mdle,iflag,no,xsub,ntype,          &
                      nedge_orient,nface_orient,norder,  &
-                     xnod,NODES(mdle)%coord)
+                     xnod,NODES(mdle)%dof%coord)
       endif
    enddo
 !$OMP END PARALLEL DO

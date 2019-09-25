@@ -97,36 +97,46 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
    endif
 #endif
 !
+!..allocate dof data type
+   if (Iact) then
+      allocate(NODES(Nod)%dof)
+      nullify(NODES(Nod)%dof%coord)
+      nullify(NODES(Nod)%dof%zdofH)
+      nullify(NODES(Nod)%dof%zdofE)
+      nullify(NODES(Nod)%dof%zdofV)
+      nullify(NODES(Nod)%dof%zdofQ)
+   endif
+!
 !..allocate and initialize geometry dofs
    if (Iact .and. (ndofH.gt.0)) then
-      allocate(NODES(Nod)%coord(NDIMEN,ndofH))
-      NODES(Nod)%coord=0.d0
+      allocate(NODES(Nod)%dof%coord(NDIMEN,ndofH))
+      NODES(Nod)%dof%coord=0.d0
    endif
 !
 !..allocate and initialize solution dofs
    if (Iact) then
       if ((NREQNH(Icase).gt.0).and.(ndofH.gt.0)) then
          nvar = NREQNH(Icase)*NRCOMS
-         allocate( NODES(Nod)%zdofH(nvar,ndofH))
-         NODES(Nod)%zdofH = ZERO
+         allocate( NODES(Nod)%dof%zdofH(nvar,ndofH))
+         NODES(Nod)%dof%zdofH = ZERO
          NRDOFSH = NRDOFSH + ndofH*NREQNH(Icase)
       endif
       if ((NREQNE(Icase).gt.0).and.(ndofE.gt.0)) then
          nvar = NREQNE(Icase)*NRCOMS
-         allocate( NODES(Nod)%zdofE(nvar,ndofE))
-         NODES(Nod)%zdofE = ZERO
+         allocate( NODES(Nod)%dof%zdofE(nvar,ndofE))
+         NODES(Nod)%dof%zdofE = ZERO
          NRDOFSE = NRDOFSE + ndofE*NREQNE(Icase)
       endif
       if ((NREQNV(Icase).gt.0).and.(ndofV.gt.0)) then
          nvar = NREQNV(Icase)*NRCOMS
-         allocate( NODES(Nod)%zdofV(nvar,ndofV))
-         NODES(Nod)%zdofV = ZERO
+         allocate( NODES(Nod)%dof%zdofV(nvar,ndofV))
+         NODES(Nod)%dof%zdofV = ZERO
          NRDOFSV = NRDOFSV + ndofV*NREQNV(Icase)
       endif
       if ((NREQNQ(Icase).gt.0).and.(ndofQ.gt.0)) then
          nvar = NREQNQ(Icase)*NRCOMS
-         allocate( NODES(Nod)%zdofQ(nvar,ndofQ))
-         NODES(Nod)%zdofQ = ZERO
+         allocate( NODES(Nod)%dof%zdofQ(nvar,ndofQ))
+         NODES(Nod)%dof%zdofQ = ZERO
          NRDOFSQ = NRDOFSQ + ndofQ*NREQNQ(Icase)
       endif
    endif

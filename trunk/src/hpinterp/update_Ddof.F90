@@ -78,7 +78,7 @@ subroutine update_Ddof()
 !-----------------------------------------------------------------------
 !..Begin parallel OpenMP environment
 !..Note that if Dirichlet vertices or edges are shared between elements,
-!  then concurrent writes to NODES(nod)%zdofH,E may happen,
+!  then concurrent writes to NODES(nod)%dof%zdofH,E may happen,
 !  but they will write the exact same values.
 !..the preprocessing above avoids that race condition
 !..note: the user subroutine 'dirichlet' must be thread safe!!
@@ -102,13 +102,14 @@ subroutine update_Ddof()
          !if (NODES(nod)%visit .ne. mdle) cycle
          if (is_dirichlet(nod)) then
 !        ...cycle if H1 dofs are not supported by the node
-            if (.not.associated(NODES(nod)%zdofH)) cycle
+            if (.not.associated(NODES(nod)%dof))       cycle
+            if (.not.associated(NODES(nod)%dof%zdofH)) cycle
 !
             if (is_dirichlet_homogeneous(nod)) then
-               NODES(nod)%zdofH = ZERO
+               NODES(nod)%dof%zdofH = ZERO
             else
                call dhpvert(mdle,iflag,no,xsub(1:3,iv),NODES(nod)%case, &
-                  NODES(nod)%zdofH)
+                  NODES(nod)%dof%zdofH)
             endif
          endif
       enddo
@@ -137,28 +138,29 @@ subroutine update_Ddof()
          if (nod.lt.0) cycle
          !if (NODES(nod)%visit .ne. mdle) cycle
          if (is_dirichlet(nod)) then
+            if (.not.associated(NODES(nod)%dof)) cycle
 !
 !        ...update H1 Dirichlet dofs
-            if (associated(NODES(nod)%zdofH)) then
+            if (associated(NODES(nod)%dof%zdofH)) then
                if (is_dirichlet_homogeneous(nod)) then
-                  NODES(nod)%zdofH = ZERO
+                  NODES(nod)%dof%zdofH = ZERO
                else
                   call dhpedgeH(mdle,iflag,no,xsub,                  &
                                 etype,NODES(nod)%case,               &
                                 nedge_orient,nface_orient,norder,ie, &
-                                zdofH, NODES(nod)%zdofH)
+                                zdofH, NODES(nod)%dof%zdofH)
                endif
             endif
 !
 !        ...update H(curl) Dirichlet dofs
-            if (associated(NODES(nod)%zdofE)) then
+            if (associated(NODES(nod)%dof%zdofE)) then
                if (is_dirichlet_homogeneous(nod)) then
-                  NODES(nod)%zdofE = ZERO
+                  NODES(nod)%dof%zdofE = ZERO
                else
                   call dhpedgeE(mdle,iflag,no,xsub,                  &
                                 etype,NODES(nod)%case,               &
                                 nedge_orient,nface_orient,norder,ie, &
-                                NODES(nod)%zdofE)
+                                NODES(nod)%dof%zdofE)
 
                endif
             endif
@@ -194,41 +196,42 @@ subroutine update_Ddof()
          if (nod.lt.0) cycle
          !if (NODES(nod)%visit .ne. mdle) cycle
          if (is_dirichlet(nod)) then
+            if (.not.associated(NODES(nod)%dof)) cycle
 !
 !           -- H1 --
-            if (associated(NODES(nod)%zdofH)) then
+            if (associated(NODES(nod)%dof%zdofH)) then
                if (is_dirichlet_homogeneous(nod)) then
-                  NODES(nod)%zdofH = ZERO
+                  NODES(nod)%dof%zdofH = ZERO
                else
                   call dhpfaceH(mdle,iflag,no,xsub,                   &
                                 etype,NODES(nod)%case,                &
                                 nedge_orient,nface_orient,norder,ifc, &
-                                zdofH, NODES(nod)%zdofH)
+                                zdofH, NODES(nod)%dof%zdofH)
                endif
             endif
 !
 !           -- H(curl) --
-            if (associated(NODES(nod)%zdofE)) then
+            if (associated(NODES(nod)%dof%zdofE)) then
                if (is_dirichlet_homogeneous(nod)) then
-                  NODES(nod)%zdofE = ZERO
+                  NODES(nod)%dof%zdofE = ZERO
                else
                   call dhpfaceE(mdle,iflag,no,xsub,                   &
                                 etype,NODES(nod)%case,                &
                                 nedge_orient,nface_orient,norder,ifc, &
-                                zdofE, NODES(nod)%zdofE)
+                                zdofE, NODES(nod)%dof%zdofE)
 
                endif
             endif
 !
 !           -- H(div) --
-            if (associated(NODES(nod)%zdofV)) then
+            if (associated(NODES(nod)%dof%zdofV)) then
                if (is_dirichlet_homogeneous(nod)) then
-                  NODES(nod)%zdofV = ZERO
+                  NODES(nod)%dof%zdofV = ZERO
                else
                   call dhpfaceV(mdle,iflag,no,xsub,                   &
                                 etype,NODES(nod)%case,                &
                                 nedge_orient,nface_orient,norder,ifc, &
-                                NODES(nod)%zdofV)
+                                NODES(nod)%dof%zdofV)
                endif
             endif
          endif

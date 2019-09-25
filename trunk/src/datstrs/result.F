@@ -170,79 +170,87 @@ c
  7030   format(' GMP INTERFACE FLAG = ',i2)
         call find_ndof(nod, ndofH,ndofE,ndofV,ndofQ)
 c
-        if (associated(NODES(nod)%coord)) then
-          write(*,7031)
- 7031     format(' COORDINATES = ')
-          do k=1,ndofH
-            write(*,7032) NODES(nod)%coord(1:3,k)
- 7032       format(10x,3f15.8)
-          enddo
+        if (associated(NODES(nod)%dof)) then
+          if (associated(NODES(nod)%dof%coord)) then
+            write(*,7031)
+ 7031       format(' COORDINATES = ')
+            do k=1,ndofH
+              write(*,7032) NODES(nod)%dof%coord(1:3,k)
+ 7032         format(10x,3f15.8)
+            enddo
+          endif
         endif
 c
 c  .....H1 dof
-        if (associated(NODES(nod)%zdofH)) then
-          write(*,7033)
- 7033     format(' H1 DOF = ')
-          nvar=NREQNH(NODES(nod)%case)
-          do icomp=1,NRCOMS
-            write(*,7035) icomp
- 7035       format(' icomp = ',i3)
-            nbeg =(icomp-1)*nvar; nend=nbeg+nvar
-            do k=1,ndofH
-              write(*,7034) NODES(nod)%zdofH(nbeg+1:nend,k)
+        if (associated(NODES(nod)%dof)) then
+          if (associated(NODES(nod)%dof%zdofH)) then
+            write(*,7033)
+ 7033       format(' H1 DOF = ')
+            nvar=NREQNH(NODES(nod)%case)
+            do icomp=1,NRCOMS
+              write(*,7035) icomp
+ 7035         format(' icomp = ',i3)
+              nbeg =(icomp-1)*nvar; nend=nbeg+nvar
+              do k=1,ndofH
+                write(*,7034) NODES(nod)%dof%zdofH(nbeg+1:nend,k)
 #if C_MODE
- 7034         format(10x,5(2e12.5,2x))
+ 7034           format(10x,5(2e12.5,2x))
 #else
- 7034         format(10x,5e23.15)
+ 7034           format(10x,5e23.15)
 #endif
+              enddo
             enddo
-          enddo
+          endif
         endif
 c
 c  .....H(curl) dof
-        if (associated(NODES(nod)%zdofE)) then
-          write(*,7036)
- 7036     format(' H(curl) DOF = ')
-          nvar=NREQNE(NODES(nod)%case)
-          do icomp=1,NRCOMS
-            write(*,7035) icomp
-            nbeg =(icomp-1)*nvar; nend=nbeg+nvar
-            do k=1,ndofE
-              write(*,7034) NODES(nod)%zdofE(nbeg+1:nend,k)
+        if (associated(NODES(nod)%dof)) then
+          if (associated(NODES(nod)%dof%zdofE)) then
+            write(*,7036)
+ 7036       format(' H(curl) DOF = ')
+            nvar=NREQNE(NODES(nod)%case)
+            do icomp=1,NRCOMS
+              write(*,7035) icomp
+              nbeg =(icomp-1)*nvar; nend=nbeg+nvar
+              do k=1,ndofE
+                write(*,7034) NODES(nod)%dof%zdofE(nbeg+1:nend,k)
+              enddo
             enddo
-          enddo
+          endif
         endif
 c
 c  .....H(div) dof
-        if (associated(NODES(nod)%zdofV)) then
-          write(*,7037)
- 7037     format(' H(div) DOF = ')
-          nvar=NREQNV(NODES(nod)%case)
-          do icomp=1,NRCOMS
-            write(*,7035) icomp
-            nbeg =(icomp-1)*nvar; nend=nbeg+nvar
-            do k=1,ndofV
-              write(*,7034) NODES(nod)%zdofV(nbeg+1:nend,k)
+        if (associated(NODES(nod)%dof)) then
+          if (associated(NODES(nod)%dof%zdofV)) then
+            write(*,7037)
+ 7037       format(' H(div) DOF = ')
+            nvar=NREQNV(NODES(nod)%case)
+            do icomp=1,NRCOMS
+              write(*,7035) icomp
+              nbeg =(icomp-1)*nvar; nend=nbeg+nvar
+              do k=1,ndofV
+                write(*,7034) NODES(nod)%dof%zdofV(nbeg+1:nend,k)
+              enddo
             enddo
-          enddo
+          endif
         endif
 c
 c  .....L2 dof
-        if (associated(NODES(nod)%zdofQ)) then
-          write(*,7038)
- 7038     format(' L2 DOF = ')
-          nvar=NREQNQ(NODES(nod)%case)
-          do icomp=1,NRCOMS
-            write(*,7035) icomp
-            nbeg =(icomp-1)*nvar; nend=nbeg+nvar
-            do k=1,ndofQ
-              write(*,7034) NODES(nod)%zdofQ(nbeg+1:nend,k)
+        if (associated(NODES(nod)%dof)) then
+          if (associated(NODES(nod)%dof%zdofQ)) then
+            write(*,7038)
+ 7038       format(' L2 DOF = ')
+            nvar=NREQNQ(NODES(nod)%case)
+            do icomp=1,NRCOMS
+              write(*,7035) icomp
+              nbeg =(icomp-1)*nvar; nend=nbeg+nvar
+              do k=1,ndofQ
+                write(*,7034) NODES(nod)%dof%zdofQ(nbeg+1:nend,k)
+              enddo
             enddo
-          enddo
+          endif
         endif
-
-
-
+c
 c
       case(4)
         MAXDOFM = MAXbrickH*NRHVAR + MAXbrickE*NREVAR
