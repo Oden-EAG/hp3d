@@ -4,20 +4,20 @@ for Complex Multiphysics Applications
 
 ## Downloading the library
 1. Clone the repository
-via HTTPS: `git clone https://github.com/ICES-EAG/par_hp3d.git`
-via SSH: `git clone git@github.com:ICES-EAG/par_hp3d.git`
-2. Access the main directory
-`cd par_hp3d/trunk`
+- via HTTPS: `git clone https://github.com/ICES-EAG/par_hp3d.git`
+- via SSH: `git clone git@github.com:ICES-EAG/par_hp3d.git`
+2. Access the main directory: `cd par_hp3d/trunk`
 
 ## Compiling the library
-1. Create `m_options` file in `par_hp3d/trunk/`
-Use the default `m_options` file in `par_hp3d/trunk/` or copy one of the existing `m_options` files from `par_hp3d/trunk/m_options_files/` into `par_hp3d/trunk/`. For example: `cp m_options_files/m_options_TACC_intel18 m_options`
-2. Modify `m_options` file to set the correct path to the main directory
+1. Create `m_options` file in `par_hp3d/trunk/`:  
+Use the default `m_options` file in `par_hp3d/trunk/` or copy one of the existing `m_options` files from `par_hp3d/trunk/m_options_files/` into `par_hp3d/trunk/`.  
+For example: `cp m_options_files/m_options_TACC_intel18 m_options`
+2. Modify `m_options` file to set the correct path to the main directory:  
 Set the `HP3D_BASE_PATH` to the path of the `par_hp3d/trunk/`
 3. To compile the library, type `make` in `par_hp3d/trunk/`. **Before compiling**, you **must** link to the external libraries and set compiler options by modifying the `m_options` file as described below.
 
 ## Linking to external libraries
-The `m_options` file must link to the correct paths for external libraries. The following external libraries are requried:
+The `m_options` file must link to the correct paths for external libraries. The following external libraries are required:
 - Intel MKL
 - MUMPS
 - Metis/ParMetis
@@ -30,7 +30,7 @@ Compilation is governed by preprocessing flags `COMPLEX`, `SHAPE`, and `DEBUG`.
 - `COMPLEX  = 0` , stiffness matrix, load vector(s) and solution dofs are real-valued
 - `COMPLEX  = 1` , stiffness matrix, load vector(s) and solution dofs are complex-valued
 - `SHAPE = 0` , shape functions of Gatto, Demkowicz, Kim, 2008 (H1,H(curl) for selected element shapes only)
-- `SHAPE = 1` , shape functions of Fuentes et al., 2014 (all spaces, all shapes)
+- `SHAPE = 1` , shape functions of Fuentes, Keith, Demkowicz, 2014 (all spaces, all shapes)
 - `DEBUG = YES` , compiler uses debug flags, and the library performs additional checks during the computation
 - `DEBUG = NO` , compiler uses optimization flags and the library performs only minimal checks during the computation
 
