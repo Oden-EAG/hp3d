@@ -4,7 +4,7 @@
 !                                                                     
 !---------------------------------------------------------------------- 
 !                                                                     
-!     latest revision:  - July 2019
+!     latest revision:  - Aug 2019
 !                                                                     
 !     purpose:          - main driver for MPI Test Program
 !                         Poisson Galerkin implementation
@@ -192,6 +192,7 @@ subroutine master_main()
       write(*,*) 'MUMPS (OpenMP).........................41'
       write(*,*) 'Pardiso (OpenMP).......................42'
       write(*,*) 'Frontal (Seq)..........................43'
+      write(*,*) 'MUMPS (Nested Dissection)..............44'
       write(*,*) '                                         '
       write(*,*) '     ---- Error and Residual ----        '
       write(*,*) 'Compute exact error....................50'
@@ -239,6 +240,7 @@ subroutine master_main()
                write(*,*) '  4: RIB'
                write(*,*) '  5: HSFC'
                write(*,*) '  6: GRAPH'
+               write(*,*) '  7: FIBER'
                read (*,*) lb
                count = 1; src = ROOT
                call MPI_BCAST (lb,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
@@ -247,7 +249,7 @@ subroutine master_main()
             call exec_case(idec)
 !
 !     ...Solvers
-         case(40,41,42,43)
+         case(40,41,42,43,44)
             call exec_case(idec)
 !
 !     ...Error and Residual
@@ -352,7 +354,7 @@ subroutine worker_main()
             call exec_case(idec)
 !
 !     ...Solvers
-         case(40,41,42,43)
+         case(40,41,42,43,44)
             call exec_case(idec)
 !
 !     ...Error and Residual

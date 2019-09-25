@@ -38,9 +38,8 @@
 !----------------------------------------------------------------------
 !
 !..loop through elements in the current mesh
-   mdle=0
    do iel=1,NRELES
-      call nelcon(mdle, mdle)
+      mdle = ELEM_ORDER(iel)
       etype = NODES(Mdle)%type
       nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
       call get_connect_info(mdle, nodesl,norientl)
@@ -54,7 +53,7 @@
          call save_max_order(nod,nord)
 !
 !     ...if a constrained node
-         if (NODES(nod)%act.eq.0) then
+         if (Is_inactive(nod)) then
 !
 !        ...identify the constraint case
             call decode2(NODES_CONSTR(i), nc,icase)
@@ -91,10 +90,9 @@
 !                 STEP 2: Modify faces (min rule for edges wrt faces)
 !----------------------------------------------------------------------
 !
-   mdle=0
 !..loop through the elements   
    do iel=1,NRELES
-      call nelcon(mdle, mdle)
+      mdle = ELEM_ORDER(iel)
       call elem_nodes(mdle, nodesl,norientl)
       etype = NODES(Mdle)%type
       nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
@@ -162,7 +160,7 @@
    do nod=1,NRNODS
 !
 !  ...active node
-      if (NODES(nod)%act.eq.1) then
+      if (Is_active(nod)) then
          nord = NODES(nod)%visit
          if (nord.eq.0) cycle
 !

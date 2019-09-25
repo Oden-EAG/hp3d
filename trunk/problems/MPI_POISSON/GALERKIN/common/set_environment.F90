@@ -59,6 +59,9 @@ subroutine set_environment
    call get_option_int     &
         ('-job','Type of job submission',0 ,JOB)
 !
+   call get_option_int     &
+        ('-maxnods','Maximum number of nodes',0 ,MAXNODS_USER)
+!
    call get_option_int( '-nthreads', 'Number of OpenMP threads', 1, nthreads)
    call omp_set_num_threads(nthreads)
 !

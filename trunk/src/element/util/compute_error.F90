@@ -75,9 +75,8 @@ subroutine compute_error(Flag,Itag)
       errorQ=0.d0 ; rnormQ=0.d0
 !
 !     loop over active elements
-      mdle=0
       do i=1,NRELES
-        call nelcon(mdle,mdle)
+        mdle = ELEM_ORDER(i)
         call element_error(mdle, Flag, derrorH,derrorE,derrorV,derrorQ, &
                                        drnormH,drnormE,drnormV,drnormQ )
 !

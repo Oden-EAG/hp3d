@@ -102,7 +102,7 @@ c  ...loop through nodes
             write(*,*) 'nodcor: DIMENSIONS EXCEEDED !!'
             stop 1
           endif
-          val(1:NDIMEN,k) = NODES(nodm(j))%coord(1:NDIMEN,i)
+          val(1:NDIMEN,k) = NODES(nodm(j))%dof%coord(1:NDIMEN,i)
         enddo
       enddo
 c

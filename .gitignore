@@ -17,6 +17,9 @@ fort.20
 *.o
 *.obj
 
+# Output files
+*.e
+
 # Precompiled Headers
 *.gch
 *.pch

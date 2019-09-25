@@ -7,7 +7,7 @@
 !------------------------------------------------------------------------
 subroutine adaptivity_geom(Eps, Nref,Ratio)
 !
-      use data_structure3D , only : NRELES , NODES
+      use data_structure3D , only : NRELES,NODES,ELEM_ORDER
       implicit none
 ! 
       real*8, intent(in ) :: Eps
@@ -41,9 +41,8 @@ subroutine adaptivity_geom(Eps, Nref,Ratio)
       endif
 !  
 !  ...loop over active elements and record error
-      mdle=0
       do i=1,NRELES
-         call nelcon(mdle, mdle)
+         mdle = ELEM_ORDER(i)
          nlist(i)=mdle ; rlist(i)=NODES(mdle)%error(0,0)
       enddo
 !  

@@ -13,7 +13,6 @@ module frsolmod
   integer, allocatable          :: IAWORK(:)
   !
   !  ...arrays to reorder elements in order to minimize the bandwidth
-  integer, allocatable          :: OLD_ELEM_ORDER(:)
   integer, allocatable          :: NEW_ELEM_ORDER(:)
   double precision, allocatable :: ELEM_CENTER(:)
   !

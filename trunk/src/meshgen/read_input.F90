@@ -23,7 +23,11 @@ subroutine read_input(Fp)
        form='formatted',access='sequential',status='old',action='read')
   !
   !  ...read in the maximum number of nodes
-  read(nin,*) MAXNODS
+  if (MAXNODS .gt. 0) then
+    read(nin,*) i ! use preset user value for MAXNODS
+  else
+    read(nin,*) MAXNODS
+  endif
   !
   !  ...read number of physics variables
   read(nin,*) NR_PHYSA

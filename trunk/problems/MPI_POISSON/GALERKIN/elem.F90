@@ -4,7 +4,7 @@
 !                                                                     
 !----------------------------------------------------------------------
 !                                                                     
-!     latest revision:  - July 2019
+!     latest revision:  - Aug 2019
 !                                                                     
 !     purpose:          - driver for the element routine
 !                                                                    
@@ -21,32 +21,30 @@ subroutine elem(Mdle, Itest,Itrial)
 !
    use data_structure3D
    use physics  , only: NR_PHYSA
+   use assembly , only: ALOC,BLOC
 !
    implicit none
 !
    integer,                    intent(in)  :: Mdle
    integer,dimension(NR_PHYSA),intent(out) :: Itest,Itrial
 !
+   integer :: norder(19)
+   integer :: nrdofH,nrdofE,nrdofV,nrdofQ
+!
 !----------------------------------------------------------------------
 !
-   Itest (1:NR_PHYSA) = 0
-   Itrial(1:NR_PHYSA) = 0
+!..activate one physics variable (H1) for assembly
+   Itest(1) = 1; Itrial(1) = 1
 !
-!..select node%case (see data_structure3D.F)
-!..[case = 2^NR_PHYSA-1]
-   select case (NODES(Mdle)%case)
-!  ...adjust case to problem
-!  ...to support multiple physics on different elements
-      case (1)
-         Itest(1:NR_PHYSA) = 1
-         Itrial(1:NR_PHYSA) = 1
-         call elem_poisson(Mdle)
-      case default
-         write(*,*) 'elem: Mdle,NODES(Mdle)%case = ', &
-                     Mdle,NODES(Mdle)%case
-         call logic_error(ERR_INVALID_VALUE, __FILE__, __LINE__)
-   end select
-   !
+!..determine order of approximation
+   call find_order(Mdle, norder)
+!
+!..find number of dof for each energy space supported by the element
+   call celndof(NODES(Mdle)%type,norder, nrdofH,nrdofE,nrdofV,nrdofQ)
+!
+!..call element integration routine
+   call elem_poisson(Mdle,nrdofH, ALOC(1,1)%array,BLOC(1)%array)
+!
 end subroutine elem
 !
 !-------------------------------------------------------------------------
@@ -63,10 +61,14 @@ end subroutine elem
 !        in:
 !             Mdle      - an element middle node number, identified
 !                         with the element
+!             Nrdof     - trial/test degrees of freedom
+!        out:
+!             Zaloc     - element stiffness matrix
+!             Zbloc     - element load vector
 !
 !-------------------------------------------------------------------------
 !
-subroutine elem_poisson(Mdle)
+subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
 !
 !..ALOC: holds local element stiffness matrices
 !..BLOC: holds local element load vectors
@@ -80,7 +82,9 @@ subroutine elem_poisson(Mdle)
 !
    implicit none
 !
-   integer, intent(in) :: Mdle
+   integer, intent(in)  :: Mdle
+   integer, intent(in)  :: Nrdof
+   real(8), intent(out) :: Zaloc(Nrdof,Nrdof), Zbloc(Nrdof)
 !
 !..aux variables
    real(8) :: rjac, fval, wa, weight, q, p
@@ -126,16 +130,12 @@ subroutine elem_poisson(Mdle)
 !..2D quadrature data
    real(8) :: tloc(2,MAX_NINT2), wtloc(MAX_NINT2)
 !
-!..BC's flags
-!  [for each attribute and face (max #faces is 6 for 3D elements]
-   integer :: ibc(6,NR_PHYSA)
-!
 !..workspace for trial and test variables
    real(8) :: dq(3), u(3), dp(1:3), v(3), vec(3)
 !
-   real(8), allocatable :: Zaloc(:,:), Zbloc(:)
-!
 !----------------------------------------------------------------------
+!
+   Zaloc = ZERO; Zbloc = ZERO
 !
 !..element type
    etype = NODES(Mdle)%type
@@ -150,26 +150,11 @@ subroutine elem_poisson(Mdle)
 !
    !write(*,2050) '[', RANK, '] FIND ORIENT'; call pause
 !..determine edge and face orientations
-   call find_orient(Mdle, norient_edge, norient_face)
+   call find_orient(Mdle, norient_edge,norient_face)
 !
 !..determine nodes coordinates
    !write(*,2050) '[', RANK, '] FIND NODCOR'; call pause
    call nodcor(Mdle, xnod)
-!
-!..get the element boundary conditions flags
-   !write(*,2050) '[', RANK, '] FIND BC'; call pause
-   call find_bc(Mdle, ibc)
-!
-!..find number of trial dof for each energy space supported by the element
-   !write(*,2050) '[', RANK, '] FIND CELNDOF'; call pause
-   call celndof(NODES(Mdle)%type,norder, nrdofH,nrdofE,nrdofV,nrdofQ)
-!
-!..allocate space for matrices
-   allocate(Zaloc(nrdofH,nrdofH)); Zaloc = ZERO
-   allocate(Zbloc(nrdofH))       ; Zbloc = ZERO
-!
-   !write(*,2050) '[', RANK, '] START ELEM INTEGRALS'
-   !2050 format(A,I2,A)
 !
 !----------------------------------------------------------------------
 !     E L E M E N T    I N T E G R A L S                              |
@@ -186,7 +171,7 @@ subroutine elem_poisson(Mdle)
 !   Xiloc     - integration points
 !   Waloc     - weights
 !  ]
-   call set_3Dint(etype, norder, nint, xiloc, waloc)
+   call set_3Dint(etype,norder, nint,xiloc,waloc)
 !
 !..loop over integration points
    do l=1,nint
@@ -268,12 +253,6 @@ subroutine elem_poisson(Mdle)
       enddo
 !..end of loop through integration points
    enddo
-!
-!
-   BLOC(1)%array(1:nrdofH,1) = Zbloc(1:nrdofH)
-   ALOC(1,1)%array(1:nrdofH,1:nrdofH) = Zaloc(1:nrdofH,1:nrdofH)
-!
-   deallocate(Zaloc, Zbloc)
 !
 !
 end subroutine elem_poisson

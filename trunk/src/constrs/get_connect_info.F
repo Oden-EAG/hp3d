@@ -108,13 +108,13 @@ c            nod = NODES(nodp)%sons(is)
             if (iprint.eq.1) then
               write(*,7023) nodp,nod,NODES(nod)%act
  7023         format('get_connect_info: nodp,nod,NODES(nod)%act = ',
-     .               2i6,i2)
+     .               2i6,l2)
               call pause
             endif
 c
 c  .........if the node is constrained (inactive)
-ccc            if (NODES(nod)%act.eq.0) then
-            if (NODES(nod)%act.eq.0 .and. NODES(nod)%ref_kind.eq.0) then
+ccc            if (Is_inactive(nod)) then
+            if (Is_inactive(nod) .and. NODES(nod)%ref_kind.eq.0) then
               call locate(nodp, NEDGC,NR_EDGES,loc)
               if (loc.eq.0) then
                 NR_EDGES = NR_EDGES+1
@@ -157,10 +157,10 @@ c              nod = NODES(nodp)%sons(is)
               if (iprint.eq.1) then
                 write(*,7101) nodp,is,nod,NODES(nod)%act
  7101           format('get_connect_info: nodp,is,nod,NODES(nod)%act =',
-     .                                    4i5)
+     .                                    3i5,l2)
               endif
-              if (NODES(nod)%act.eq.0.and.NODES(nod)%ref_kind.eq.0) then
-ccc              if (NODES(nod)%act.eq.0) then
+              if (Is_inactive(nod).and.NODES(nod)%ref_kind.eq.0) then
+ccc              if (Is_inactive(nod)) then
                 call locate(nodp, NFACEC,NR_FACES,loc)
                 if (loc.eq.0) then
                   NR_FACES = NR_FACES+1
@@ -205,8 +205,8 @@ c                nod = NODES(nod)%sons(is1)
                 nod = Son(nod,is1)
               endif
 c
-             if (NODES(nod)%act.eq.0.and.NODES(nod)%ref_kind.eq.0) then
-ccc             if (NODES(nod)%act.eq.0) then
+             if (Is_inactive(nod).and.NODES(nod)%ref_kind.eq.0) then
+ccc             if (Is_inactive(nod)) then
                 call locate(nodp, NFACEC,NR_FACES,loc)
                 if (loc.eq.0) then
                   NR_FACES = NR_FACES+1
@@ -381,7 +381,7 @@ c              nvt = NODES(medg)%sons(3)
               nvt = Son(medg,3)
 c
 c  ...........inactive vertex node, add the edge to the data base
-              if (NODES(nvt)%act.eq.0) then
+              if (Is_inactive(nvt)) then
                 call locate(medg, NEDGC,NR_EDGES,loc1)
                 if (loc1.eq.0) then
                   NR_EDGES = NR_EDGES+1

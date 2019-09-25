@@ -28,10 +28,9 @@ subroutine find_nrdof(NrdofH, NrdofE, NrdofV, NrdofQ)
   NrdofH=0 ; NrdofE=0 ; NrdofV=0 ; NrdofQ=0
   !
   !  loop over active elements
-  mdle=0 
   do iel=1,NRELES
-     call nelcon(mdle,mdle)
-     !         
+     mdle = ELEM_ORDER(iel)
+     !
      !  nodes of modified element
      call elem_nodes( mdle, nodesl,norientl)
      call logic_nodes(mdle, nodesl,nodm,nrnodm)
@@ -40,8 +39,8 @@ subroutine find_nrdof(NrdofH, NrdofE, NrdofV, NrdofQ)
      do ino=1,nrnodm
         nod=nodm(ino)
         !
-        if ( (NODES(nod)%act.eq.1).and.(NODES(nod)%visit.eq.0) ) then
-           !                    
+        if ( Is_active(nod).and.(NODES(nod)%visit.eq.0) ) then
+           !
            !  number of H1,H(curl),H(div),L2 dof for a SINGLE component
            call find_ndof(nod, ndofH,ndofE,ndofV,ndofQ)
            NrdofH = NrdofH + ndofH
@@ -56,7 +55,7 @@ subroutine find_nrdof(NrdofH, NrdofE, NrdofV, NrdofQ)
      enddo
      !  end loop over active elements
   enddo
-  !  
+  !
   !  lower visitation flag
   call reset_visit
   !

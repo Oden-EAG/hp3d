@@ -1,43 +1,44 @@
-!------------------------------------------------------------------------------
-!> Purpose : exact (manufactured, no miracle!) solution
-!!
-!> @param[in]  X      - a point in physical space
-!> @param[in]  Mdle   - element (middle node) number
-!> @param[out] ValH   - value of the H1 solution
-!> @param[out] DvalH  - corresponding first derivatives
-!> @param[out] D2valH - corresponding second derivatives
-!> @param[out] ValE   - value of the H(curl) solution
-!> @param[out] DvalE  - corresponding first derivatives
-!> @param[out] D2valE - corresponding second derivatives
-!> @param[out] ValV   - value of the H(div) solution
-!> @param[out] DvalV  - corresponding first derivatives
-!> @param[out] D2valV - corresponding second derivatives
-!> @param[out] ValQ   - value of the H(div) solution
-!> @param[out] DvalQ  - corresponding first derivatives
-!> @param[out] D2valQ - corresponding second derivatives
-!------------------------------------------------------------------------------
+!--------------------------------------------------------------------------------
+!> Purpose : exact (manufactured) solution
+!
+!> @param[in]  Xp  - a point in physical space
+!> @param[in]  Fld - 0: signal field, 1: pump field
+!> @param[out] E   - value of the solution (one electric field component)
+!> @param[out] dE  - corresponding first derivatives
+!> @param[out] d2E - corresponding second derivatives
+!--------------------------------------------------------------------------------
 !
 #include "implicit_none.h"
 !
-subroutine mfd_solutions(Xp, E,dE,d2E)
+subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !
    use data_structure3D
    use control, only : GEOM_TOL, NEXACT
-   use CommonParam
-   use LaserParam
+   use commonParam
+   use laserParam
 !
    implicit none
-!  -----------------------------------------------------------------------------------
+!--------------------------------------------------------------------------------
    real*8, dimension(3),   intent(in)  :: Xp
+   integer,                intent(in)  :: Fld
    VTYPE,                  intent(out) :: E   ! solution
    VTYPE,  dimension(3),   intent(out) :: dE  ! 1st derivative
    VTYPE,  dimension(3,3), intent(out) :: d2E ! 2nd derivative
-!  -----------------------------------------------------------------------------------
+!--------------------------------------------------------------------------------
+   integer :: modified
+!
    real*8 :: x1,x2,x3
    real*8 :: nn        ! for EXPONENTIAL solution
    real*8 :: cn,dn     ! for singular solution
-   real*8 :: np_x,np_y,np_z,r0,k0,w0,phase,amplitude,om
-    VTYPE  :: f_x,f_y,f_z,df_x,df_y,df_z,ddf_x,ddf_y,ddf_z
+   real*8 :: np_x,np_y,np_z,r0,k0,w0,phase,ampl,om
+   VTYPE  :: f_x,f_y,f_z,df_x,df_y,df_z,ddf_x,ddf_y,ddf_z
+!..for TE modes
+   real*8 :: gammaTE10
+   real*8 :: gammaTE20
+   real*8 :: r
+!..for LP Modes
+   real*8 :: gamm, beta, k, ca, cb, cc, r_x, r_y
+   real*8 :: BESSEL_dJ1, BESSEL_K0, BESSEL_dK0, BESSEL_K1, BESSEL_dK1
 !..for bessel function modes
    real*8 :: zeta,rho,xi,theta,rcore,rcladding,alpha,alpha_scale
    real*8 :: order, bessJ, bessY, dbessJ, dbessY,bessJc, bessYc, dbessJc, dbessYc
@@ -48,24 +49,22 @@ subroutine mfd_solutions(Xp, E,dE,d2E)
    real*8 :: Jm,Jm_x,Jm_y,Jm_xx,Jm_xy,Jm_yy
    real*8 :: Km,Km_x,Km_y,Km_xx,Km_xy,Km_yy
 !
-   integer    :: icomp
    VTYPE :: c2z,uz,uz_x,uz_y,uz_z,uz_xx,uz_xy,uz_xz,uz_yy,uz_yx,uz_yz
    VTYPE :: uz_zz,uz_zy,uz_zx
    VTYPE :: pz,pz_x,pz_y,pz_z,pz_xx,pz_xy,pz_xz,pz_yy,pz_yx,pz_yz
    VTYPE :: pz_zz,pz_zy,pz_zx, zbeta,zdbeta,zd2beta
 !
-!  -----------------------------------------------------------------------------------
+!--------------------------------------------------------------------------------
 !
 !..initialize variables
    E = ZERO; dE = ZERO; d2E = ZERO;
-   icomp = ICOMP_EXACT
    f_x = ZERO; f_y = ZERO; f_z = ZERO
    df_x = ZERO; df_y = ZERO; df_z = ZERO
    ddf_x = ZERO; ddf_y = ZERO; ddf_z = ZERO
 !
-!-----------------------------------------------------------------------------------
-!      D E C L A R E    S O L U T I O N    V A R I A B L E S                       |
-!-----------------------------------------------------------------------------------
+!--------------------------------------------------------------------------------
+!      D E C L A R E    S O L U T I O N    V A R I A B L E S                    |
+!--------------------------------------------------------------------------------
 !
    x1 = Xp(1); x2 = Xp(2); x3 = Xp(3)
 !
@@ -151,43 +150,49 @@ subroutine mfd_solutions(Xp, E,dE,d2E)
       end select
 !
 !
-!----------- 2nd prob -------------------------------------------------------
+!--------------- 2nd prob -------------------------------------------------------
 !..a smooth solution
    elseif (ISOL .eq. 2) then
 !
-      f_x= sin(OMEGA*Xp(1))
-      f_y= sin(OMEGA*Xp(2))
-      f_z= sin(OMEGA*Xp(3))
+      f_x = sin(OMEGA*x1)
+      f_y = sin(OMEGA*x2)
+      f_z = sin(OMEGA*x3)
 !
-!     1st order derivatives
-      df_x=(OMEGA)*cos(OMEGA*Xp(1))
-      df_y=(OMEGA)*cos(OMEGA*Xp(2))
-      df_z=(OMEGA)*cos(OMEGA*Xp(3))
+!  ...1st order derivatives
+      df_x = OMEGA*cos(OMEGA*x1)
+      df_y = OMEGA*cos(OMEGA*x2)
+      df_z = OMEGA*cos(OMEGA*x3)
 !
-!     2nd order derivatives
-      ddf_x=-OMEGA**2*f_x
-      ddf_y=-OMEGA**2*f_y
-      ddf_z=-OMEGA**2*f_z
+!  ...2nd order derivatives
+      ddf_x = -OMEGA**2*f_x
+      ddf_y = -OMEGA**2*f_y
+      ddf_z = -OMEGA**2*f_z
 !
-!----------- 3rd prob -------------------------------------------------------
+!--------------- 3rd prob -------------------------------------------------------
 !..a plane wave
    elseif (ISOL .eq. 3) then
 !
-      f_x= Xp(1)
-      f_y= 1.d0
-      f_z= 2.d0*cdexp(-ZI*OMEGA*Xp(3))
+      !f_x = ZI + cos(x1)
+      f_x = 1.d0
+      !f_y = ZI + sin(x2)
+      f_y = 1.d0
+      f_z = 2.d0*exp(-ZI*OMEGA*x3)
 !
-!     1st order derivatives
-      df_x= 1.d0
-      df_y= 0.d0
-      df_z=(-ZI*OMEGA)*f_z
+!  ...1st order derivatives
+      !df_x = -sin(x1)
+      df_x = 0.d0
+      !df_y = cos(x2)
+      df_y = 0.d0
+      df_z = (-ZI*OMEGA)*f_z
 !
-!     2nd order derivatives
-      ddf_x=0.d0
-      ddf_y=0.d0
-      ddf_z=-OMEGA**2*f_z
+!  ...2nd order derivatives
+      !ddf_x = -cos(x1)
+      ddf_x = 0.d0
+      !ddf_y = -sin(x2)
+      ddf_y = 0.d0
+      ddf_z = -OMEGA**2*f_z
 !
-!----------- 4th prob -------------------------------------------------------
+!--------------- 4th prob -------------------------------------------------------
 !..an exponential
    elseif (ISOL .eq. 4) then
 !
@@ -195,7 +200,7 @@ subroutine mfd_solutions(Xp, E,dE,d2E)
 !  ...value
       f_x=exp(-Xp(1)**2/2)
       f_y=exp(-Xp(2)**2/2)
-      f_z=1.d0!exp(nn*Xp(3))
+      f_z=1.d0 !exp(nn*Xp(3))
 !
 !  ...1st order derivatives
       df_x=-Xp(1)*f_x
@@ -205,329 +210,155 @@ subroutine mfd_solutions(Xp, E,dE,d2E)
 !  ...2nd order derivatives
       ddf_x=-f_x-(Xp(1)*df_x)
       ddf_y=-f_y-(Xp(2)*df_y)
-      ddf_z=0.d0!nn*df_z
-
-!----------- 5th prob -------------------------------------------------------
-!..fundamental TE10 mode for rectangular waveguide
+      ddf_z=0.d0 !nn*df_z
+!
+!--------------- 5th prob -------------------------------------------------------
+!..fundamental TE10 mode for rectangular waveguide (signal)
    elseif (ISOL .eq. 5) then
-
-      f_x=-ZI*(OMEGA/PI)*sin(PI*Xp(1))
-      f_y= 1.d0
-      f_z=cdexp(-ZI*OMEGA*Xp(3)*GAMMA)
 !
-!     1st order derivatives
-      df_x=-ZI*(OMEGA/PI)*PI*cos(PI*Xp(1))
-      df_y=0.d0
-      df_z=(-ZI*OMEGA*GAMMA)*f_z
+!     ! shifted source (s.t. fields are non-zero at z=0)
+      x1 = Xp(1); x2 = Xp(2); x3 = Xp(3) - .5d0;
 !
-!     2nd order derivatives
-      ddf_x=-PI**2*f_x
-      ddf_y=0.d0
-      ddf_z=(-ZI*OMEGA*GAMMA)*df_z
-
+!     nn = 1: TE10 mode only
+!     nn = 2: TE20 mode only
+!     nn = 3: TE10 + TE20 mode
+!     note OMEGA must be set correctly in set_env routine
+      nn = 1
 !
+      if (nn .eq. 1 .or. nn .eq. 3) then
+!  ...fundamental mode TE10
+      gammaTE10 = sqrt(1.d0-(PI**2)/(OMEGA**2))
 !
-!----------- 6th prob -------------------------------------------------------
-!..Gaussian pulse plane wave
-   elseif (ISOL .eq. 6) then
-      if(NEXACT.ne.0) then
-         write(*,*) 'NEXACT must be 0 for ISOL=6'
-         stop
-      endif
-
-      w0 = BEAM_WAIST
-      k0 = OMEGA
-      c2z = w0**2
-      x1 = Xp(1)
-      x2 = Xp(2)
-      r0 = dsqrt((x1)**2+(x2)**2)
-      uz = cdexp(-ZI*k0*Xp(3))*cdexp(-r0**2/c2z)/c2z
+      f_x=-ZI*(OMEGA/PI)*sin(PI*x1)
+      f_y=1.d0
+      f_z=exp(-ZI*OMEGA*x3*gammaTE10)
 !
-      uz_x = -2.d0*x1*uz/c2z
-      uz_y = -2.d0*x2*uz/c2z
-      uz_z = uz*(-ZI*k0)
-!
-      uz_xx = -2.d0*(uz+x1*uz_x)/c2z
-      uz_xy = -2.d0*x1*uz_y/c2z
-      uz_xz = -2.d0*x1*uz_z/c2z
-!
-      uz_yy = -2.d0*(uz+x2*uz_y)/c2z
-      uz_yx = uz_xy
-      uz_yz = -2.d0*x2*uz_z/c2z
-!
-      uz_zz = uz_z*(-ZI*k0)
-      uz_zx = uz_xz
-      uz_zy = uz_yz
-!
-      E=uz
 !  ...1st order derivatives
-      dE(1) = uz_x
-      dE(2) = uz_y
-      dE(3) = uz_z
+      df_x=-ZI*OMEGA*cos(PI*x1)
+      df_y=0.d0
+      df_z=-(ZI*OMEGA*gammaTE10)*f_z
 !
 !  ...2nd order derivatives
-      d2E(1,1) = uz_xx
-      d2E(1,2) = uz_xy
-      d2E(1,3) = uz_xz
-      d2E(2,1) = d2E(1,2)
-      d2E(2,2) = uz_yy
-      d2E(2,3) = uz_yz
-      d2E(3,1) = d2E(1,3)
-      d2E(3,2) = d2E(2,3)
-      d2E(3,3) = uz_zz
+      ddf_x=-PI**2*f_x
+      ddf_y=0.d0
+      ddf_z=-(ZI*OMEGA*gammaTE10)*df_z
 !
-!----------- 7th prob -------------------------------------------------------
-!...... 3D Plane Wave + Gaussian beam
-   elseif (ISOL .eq. 7) then
+      E=f_x*f_y*f_z
+!     ...1st order derivatives
+         dE(1)=  df_x *   f_y *   f_z
+         dE(2)=   f_x *  df_y *   f_z
+         dE(3)=   f_x *   f_y *  df_z
 !
-      if(NEXACT.ne.0) then
-         write(*,*) 'NEXACT must be 0 for ISOL=7'
+!     ...2nd order derivatives
+         d2E(1,1) = ddf_x *   f_y *   f_z
+         d2E(1,2) =  df_x *  df_y *   f_z
+         d2E(1,3) =  df_x *   f_y *  df_z
+         d2E(2,1) =  d2E(1,2)
+         d2E(2,2) =   f_x * ddf_y *   f_z
+         d2E(2,3) =   f_x *  df_y *  df_z
+         d2E(3,1) =  d2E(1,3)
+         d2E(3,2) =  d2E(2,3)
+         d2E(3,3) =   f_x *   f_y * ddf_z
+      endif
+      if (nn .eq. 2 .or. nn .eq. 3) then
+!
+!  ...next higher mode (TE20, same cutoff as TE01)
+      gammaTE20 = sqrt(1.d0-((2.d0*PI)**2)/(OMEGA**2))
+!
+      f_x=-ZI*(OMEGA/(2.d0*PI))*sin(2.d0*PI*x1)
+      f_y=1.d0
+      f_z=exp(-ZI*OMEGA*x3*gammaTE20)
+!
+!  ...1st order derivatives
+      df_x=-ZI*OMEGA*cos(2.d0*PI*x1)
+      df_y=0.d0
+      df_z=-(ZI*OMEGA*gammaTE20)*f_z
+!
+!  ...2nd order derivatives
+      ddf_x=-(2.d0*PI)**2*f_x
+      ddf_y=0.d0
+      ddf_z=-(ZI*OMEGA*gammaTE20)*df_z
+!
+      E=E+f_x*f_y*f_z
+!     ...1st order derivatives
+         dE(1)=dE(1)+  df_x *   f_y *   f_z
+         dE(2)=dE(2)+   f_x *  df_y *   f_z
+         dE(3)=dE(3)+   f_x *   f_y *  df_z
+!
+!     ...2nd order derivatives
+         d2E(1,1) =d2E(1,1)+ ddf_x *   f_y *   f_z
+         d2E(1,2) =d2E(1,2)+  df_x *  df_y *   f_z
+         d2E(1,3) =d2E(1,3)+  df_x *   f_y *  df_z
+         d2E(2,1) = d2E(1,2)
+         d2E(2,2) =d2E(2,2)+   f_x * ddf_y *   f_z
+         d2E(2,3) =d2E(2,3)+   f_x *  df_y *  df_z
+         d2E(3,1) = d2E(1,3)
+         d2E(3,2) = d2E(2,3)
+         d2E(3,3) =d2E(3,3)+   f_x *   f_y * ddf_z
+      endif
+!
+!--------------- 9th prob -------------------------------------------------------
+!..fundamental TE10 mode for rectangular waveguide (signal) with exponential growth
+   elseif (ISOL .eq. 9) then
+!  ...shifted source (s.t. fields are non-zero at z=0)
+      x1 = Xp(1); x2 = Xp(2); x3 = Xp(3);! - .5d0;
+!
+      f_x=-ZI*(OMEGA/PI)*sin(PI*x1)
+      f_y=1.d0
+      f_z=exp((EXP_COEFF-ZI*OMEGA*GAMMA)*x3)
+!
+!  ...1st order derivatives
+      df_x=-ZI*OMEGA*cos(PI*x1)
+      df_y=0.d0
+      df_z=(EXP_COEFF-ZI*OMEGA*GAMMA)*f_z
+!
+!  ...2nd order derivatives
+      ddf_x=-PI**2*f_x
+      ddf_y=0.d0
+      ddf_z=(EXP_COEFF-ZI*OMEGA*GAMMA)*df_z
+!
+!--------------- 10th prob -------------------------------------------------------
+!..fundamental TE10 mode for rectangular waveguide with exponential growth
+!..with complex stretching
+   elseif (ISOL .eq. 10) then
+!
+      x1 = Xp(1); x2 = Xp(2); x3 = Xp(3);
+!
+      if (NO_PROBLEM .eq. 3) then
+         call get_Beta(Xp,1, zbeta,zdbeta,zd2beta)
+      elseif (NO_PROBLEM .eq. 4) then
+         call get_Beta(Xp,0, zbeta,zdbeta,zd2beta)
+      else
+         write(*,*) 'mfd_solutions: fld_flag unknown. stop.'
          stop
       endif
-!.... beam parameters
-          w0 = (0.65d0+1.619d0*(2.d0*PI*VNUM)**(-1.5d0)+2.879d0*(2.d0*PI*VNUM)**(-6.d0))*R_CORE
-          !w0 = 0.1d0
-          alpha_scale = 1.d0
-          k0 = OMEGA
-          c2z = w0**2
-          c2z= c2z/alpha_scale
-          if(NO_PROBLEM.eq.3) then
-            if(COPUMP.eq.1) then
-              ! copumped pumped, amplitude = 2.0d0
-              amplitude = 2.0d0
-            elseif(COPUMP.eq.0) then
-              ! counter pumped, amplitude = 1.5d0
-              amplitude = 1.50d0
-            else
-              write(*,*) 'error in ISOL = 7 mfd_solution: COPUMP = 0 or 1 only'
-              stop
-            endif
-          elseif(NO_PROBLEM.eq.4) then
-            amplitude = 2.25d0
-          endif
-          x1 = Xp(1)
-          x2 = Xp(2)
-          r0 = dsqrt((x1)**2+(x2)**2)
 !
-          if(NO_PROBLEM.eq.3) then
-            uz = amplitude*cdexp(-ZI*k0*OMEGA_RATIO_SIGNAL*Xp(3))*cdexp(-r0**2/c2z)/c2z
-          elseif(NO_PROBLEM.eq.4) then
-            uz = amplitude*cdexp(-ZI*k0*OMEGA_RATIO_PUMP*Xp(3))*cdexp(-r0**2/c2z)/c2z
-          endif
-    !
-          uz_x = -2.d0*x1*uz/c2z
-          uz_y = -2.d0*x2*uz/c2z
-          uz_z = uz*(-ZI*k0)
-    !
-          uz_xx = -2.d0*(uz+x1*uz_x)/c2z
-          uz_xy = -2.d0*x1*uz_y/c2z
-          uz_xz = -2.d0*x1*uz_z/c2z
-
-          uz_yy = -2.d0*(uz+x2*uz_y)/c2z
-          uz_yx = uz_xy
-          uz_yz = -2.d0*x2*uz_z/c2z
-
-          uz_zz = uz_z*(-ZI*k0)
-          uz_zx = uz_xz
-          uz_zy = uz_yz
-
-!.....     If in the core, exact is  uz
-!.....     else, only ZERO in the cladding
-          if(dsqrt(Xp(1)**2+Xp(2)**2).le.(R_CORE)) then
-            E= uz
-!  .....1st order derivatives
-            dE(1) = uz_x
-            dE(2) = uz_y
-            dE(3) = uz_z
-    !
-!  .....2nd order derivatives
-            d2E(1,1) = uz_xx
-            d2E(1,2) = uz_xy
-            d2E(1,3) = uz_xz
-            d2E(2,1) = d2E(1,2)
-            d2E(2,2) = uz_yy
-            d2E(2,3) = uz_yz
-            d2E(3,1) = d2E(1,3)
-            d2E(3,2) = d2E(2,3)
-            d2E(3,3) = uz_zz
+      f_x=-ZI*(OMEGA/PI)*sin(PI*x1)
+      f_y= 1.d0
+      f_z=exp((EXP_COEFF-ZI*OMEGA*GAMMA)*zbeta)
 !
-          else
-            E= ZERO
-   !  .....1st order derivatives
-            dE(1) = ZERO
-            dE(2) = ZERO
-            dE(3) = ZERO
-  !  !
-  !  .....2nd order derivatives
-            d2E(1,1) = ZERO
-            d2E(1,2) = ZERO
-            d2E(1,3) = ZERO
-            d2E(2,1) = ZERO
-            d2E(2,2) = ZERO
-            d2E(2,3) = ZERO
-            d2E(3,1) = ZERO
-            d2E(3,2) = ZERO
-            d2E(3,3) = ZERO
-!!.....  end if for core/cladding check
-        endif
-
-!----------- 8th prob -------------------------------------------------------
-!..Bessel Function Modes
-   elseif (ISOL .eq. 8) then
-        if(NEXACT.ne.0) then
-          write(*,*) 'NEXACT must be 0 for ISOL=8'
-          stop
-        endif
-          if(NO_PROBLEM.eq.3) then
-            amplitude = 55.d0
-            !amplitude = 1000.d0
-          elseif(NO_PROBLEM.eq.4) then
-            amplitude = 65.d0
-          endif
-          x1 = Xp(1)+GEOM_TOL
-          x2 = Xp(2)+GEOM_TOL
-          x3 = Xp(3)
-          rho = dsqrt((x1)**2+(x2)**2)
-          theta = datan(x2/x1)
-          order = ORDER_BESSEL
-          rcore = R_CORE
-          rcladding = R_CLAD
-          xi = 1.d0
-          zeta = 1.d0
-          zeta = (2.d0*PI*(12.d0/R_CORE))*dsqrt(REF_INDEX_CORE**2-BETA_PROPAGATION**2)
-          alpha = 1.d0
-          alpha = (2.d0*PI*(12.d0/R_CORE))*dsqrt(BETA_PROPAGATION**2-REF_INDEX_CLAD**2)
-
-          hess1(1,1) = 1.d0/rho - (1.d0/rho**3)*x1**2
-          hess1(1,2) = -x1*x2/rho**3
-          hess1(2,1) = hess1(1,2)
-          hess1(2,2) = 1.d0/rho - (1.d0/rho**3)*x2**2
-
-
-          hess2(1,1) = (-order**2*x2**2*cos(order*theta)/rho**4)+ &
-                       (2.d0*order*x2**3*sin(order*theta)/(x1*rho**4)) - &
-                       (2.d0*order*x2*sin(order*theta)/(x1*rho**2))
-          hess2(1,2) = (order**2*x2*x1*cos(order*theta)/rho**4) + &
-                       (order*sin(order*theta)/rho**2) - &
-                       (2.d0*order*x2**2*sin(order*theta)/(rho**4))
-          hess2(2,1) = hess2(1,2)
-          hess2(2,2) = (2.d0*order*x2*x1*sin(order*theta)/rho**4)- &
-                       (order**2*x1**2*cos(order*theta)/rho**4)
-
-          angular = cos(order*theta)
-          angular_x = order*x2*sin(order*theta)/rho**2
-          angular_y = -order*x1*sin(order*theta)/rho**2
-          angular_xx = hess2(1,1)
-          angular_xy = hess2(1,2)
-          angular_yy = hess2(2,2)
-!       Check if in core
-          if(rho.le.rcore) then
-            call dbessJY(rho*zeta, order, bessJ, bessY, dbessJ, dbessY)
-            call dbessJY(rcore*zeta, order, bessJc, bessYc, dbessJc, dbessYc)
-            call d2bessJY(rho*zeta, order, d2bessJ, d2bessY)
-            Jm = bessJ
-            Jm_x = dbessJ*zeta*x1/rho
-            Jm_y = dbessJ*zeta*x2/rho
-            Jm_xx = d2bessJ*(zeta*x1/rho)**2 + dbessJ*zeta*hess1(1,1)
-            Jm_xy = d2bessJ*(zeta)**2*(x1/rho)*(x2/rho) + dbessJ*zeta*hess1(1,2)
-            Jm_yy = d2bessJ*(zeta*x2/rho)**2 + dbessJ*zeta*hess1(2,2)
+!  ...1st order derivatives
+      df_x=-ZI*OMEGA*cos(PI*x1)
+      df_y=0.d0
+      df_z=(EXP_COEFF-ZI*OMEGA*GAMMA)*zdbeta*f_z
 !
-            uz = amplitude*(xi/bessJc)*(bessJ)*angular*cdexp(-ZI*BETA_PROPAGATION*x3)
-            uz_x = (xi/bessJc)*(Jm_x*angular+Jm*angular_x)
-            uz_y = (xi/bessJc)*(Jm_y*angular+Jm*angular_y)
-            uz_xx = (xi/bessJc)*(Jm_xx*angular+2.d0*Jm_x*angular_x+Jm*angular_xx)
-            uz_xy = (xi/bessJc)*(Jm_xy*angular+Jm_x*angular_y+Jm_y*angular_x+Jm*angular_xy)
-            uz_yy = (xi/bessJc)*(Jm_yy*angular+2.d0*Jm_y*angular_y+Jm*angular_yy)
-          else
-            call dbessIK(rho*alpha, order, bessI, bessK, dbessI, dbessK)
-            call dbessIK(rcore*alpha, order, bessIc, bessKc, dbessIc, dbessKc)
-            call d2bessIK(rho*alpha, order, d2bessI, d2bessK)
-
-            Km = bessK
-            Km_x = dbessK*alpha*x1/rho
-            Km_y = dbessK*alpha*x2/rho
-            Km_xx = d2bessK*(alpha*x1/rho)**2 + dbessK*alpha*hess1(1,1)
-            Km_xy = d2bessK*(alpha)**2*(x1/rho)*(x2/rho) + dbessK*alpha*hess1(1,2)
-            Km_yy = d2bessK*(alpha*x2/rho)**2 + dbessK*alpha*hess1(2,2)
+!  ...2nd order derivatives
+      ddf_x=-PI**2*f_x
+      ddf_y=0.d0
+      ddf_z=(EXP_COEFF-ZI*OMEGA*GAMMA)*zd2beta*f_z + &
+            (EXP_COEFF-ZI*OMEGA*GAMMA)*zdbeta*df_z
 !
-            uz = amplitude*(xi/bessKc)*(bessK)*angular*cdexp(-ZI*BETA_PROPAGATION*x3)
-            uz_x = (xi/bessKc)*(Km_x*angular+Km*angular_x)
-            uz_y = (xi/bessKc)*(Km_y*angular+Km*angular_y)
-            uz_xx = (xi/bessKc)*(Km_xx*angular+2.d0*Km_x*angular_x+Km*angular_xx)
-            uz_xy = (xi/bessKc)*(Km_xy*angular+Km_x*angular_y+Km_y*angular_x+Km*angular_xy)
-            uz_yy = (xi/bessKc)*(Km_yy*angular+2.d0*Km_y*angular_y+Km*angular_yy)
-
-          endif    !
-          uz_z = uz*(-ZI*BETA_PROPAGATION)
-          uz_xz = uz_x*(-ZI*BETA_PROPAGATION)
-          uz_yz = uz_y*(-ZI*BETA_PROPAGATION)
-          uz_zz = uz*(-BETA_PROPAGATION**2)
-    !
-          E=uz
-    !  .....1st order derivatives
-          dE(1) = uz_x
-          dE(2) = uz_y
-          dE(3) = uz_z
-!
-!  .....2nd order derivatives
-          d2E(1,1) = uz_xx
-          d2E(1,2) = uz_xy
-          d2E(1,3) = uz_xz
-          d2E(2,1) = d2E(1,2)
-          d2E(2,2) = uz_yy
-          d2E(2,3) = uz_yz
-          d2E(3,1) = d2E(1,3)
-          d2E(3,2) = d2E(2,3)
-          d2E(3,3) = uz_zz
-
-!----------- 9th prob -------------------------------------------------------
-!  ...fundamental TE10 mode for rectangular waveguide with exponential
-!  ... growth
-   elseif (ISOL .eq. 9) then
-        f_x=2.d0*ZI*sin(PI*Xp(1))
-        f_y= 1.d0
-        f_z=cdexp((EXP_COEFF-ZI*OMEGA)*Xp(3))
-  !
-  !     1st order derivatives
-        df_x=PI*2.d0*ZI*cos(PI*Xp(1))
-        df_y=0.d0
-        df_z=(EXP_COEFF-ZI*OMEGA)*f_z
-  !
-  !     2nd order derivatives
-        ddf_x=-PI**2*f_x
-        ddf_y=0.d0
-        ddf_z=(EXP_COEFF-ZI*OMEGA)*df_z
-
-!----------- 10th prob -------------------------------------------------------
-!  ...fundamental TE10 mode for rectangular waveguide with exponential
-!  ... growth with complex stretching
-   elseif (ISOL .eq. 10) then
-        call get_Beta(Xp, zbeta,zdbeta,zd2beta)
-        f_x=2.d0*ZI*sin(PI*Xp(1))
-        f_y= 1.d0
-        f_z=cdexp((EXP_COEFF-ZI*OMEGA)*zbeta)
-  !
-  !     1st order derivatives
-        df_x=PI*2.d0*ZI*cos(PI*Xp(1))
-        df_y=0.d0
-        df_z=(EXP_COEFF-ZI*OMEGA)*zdbeta*f_z
-  !
-  !     2nd order derivatives
-        ddf_x=-PI**2*f_x
-        ddf_y=0.d0
-        ddf_z=(EXP_COEFF-ZI*OMEGA)*zd2beta*f_z + &
-              (EXP_COEFF-ZI*OMEGA)*zdbeta*df_z
-!----------- 11th prob -------------------------------------------------------
-!  ...f(x,y,z) = sin(OMEGA*x)sin(OMEGA*y)
+!--------------- 11th prob -------------------------------------------------------
+!..f(x,y,z) = sin(OMEGA*x)sin(OMEGA*y)
    elseif (ISOL .eq. 11) then
 
-      f_x= sin(OMEGA*Xp(1))
-      f_y= sin(OMEGA*Xp(2))
+      f_x= sin(OMEGA*x1)
+      f_y= sin(OMEGA*x2)
       f_z= 1.d0
 !
 !     1st order derivatives
-      df_x=OMEGA*cos(Xp(1))
-      df_y=OMEGA*cos(Xp(2))
+      df_x=OMEGA*cos(x1)
+      df_y=OMEGA*cos(x2)
       df_z=0.d0
 !
 !     2nd order derivatives
@@ -535,14 +366,410 @@ subroutine mfd_solutions(Xp, E,dE,d2E)
       ddf_y=-OMEGA**2*f_y
       ddf_z=0.d0
 !
+!--------------- 12th prob -------------------------------------------------------
+!..f(x,y,z) = cos(x)cos(y)
+   elseif (ISOL .eq. 12) then
+!
+!  ...TM02 mode in circular waveguide, for a = sqrt(2), omega=4.5
+      r = sqrt(x1*x1+x2*x2)
+      if (r .lt. 1.0d-13) then
+         E = 0.d0
+      else
+         if (ICOMP_EXACT .eq. 1) then
+            E = ZI*BESSEL_J1(3.9d0*r)*x1/r
+         elseif (ICOMP_EXACT .eq. 2) then
+            E = ZI*BESSEL_J1(3.9d0*r)*x2/r
+         endif
+      endif
+!     ...TODO DERIVATIVES dE(1:3)
+!
+!--------------- 13th prob -------------------------------------------------------
+!..Fundamental mode LP01 in dielectric waveguide
+   elseif (ISOL .eq. 13) then
+!
+!  ...shift source away from zero
+      !x1 = Xp(1)+GEOM_TOL
+      !x2 = Xp(2)+GEOM_TOL
+      !x3 = x3-0.05d0
+!
+!  ...radial coordinate
+      r = sqrt(x1*x1+x2*x2)
+!
+!  ...LP01 in dielectric waveguide, a = sqrt(2), omega=25.7
+!      k    = 37.2854d0
+!      gamm =  1.16301d0
+!      beta =  1.23370d0
+!      ampl =  1.0d0
+!
+!  ...LMA fiber
+!  ...LP01 (signal) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
+      if (r .eq. 0.d0) then
+         r_x = 1.d0
+         r_y = 1.d0
+      else
+         r_x = x1/r
+         r_y = x2/r
+      endif
+!
+      select case(Fld)
+!     ...signal field
+         case(0)
+            ampl =  1.0d0
+            k    = 85.6833d0
+            gamm =  1.53131d0
+            beta =  3.12978d0
+            if (r .le. R_CORE) then
+               ca = ampl/BESSEL_J0(gamm*R_CORE)
+               E = ca*BESSEL_J0(gamm*r)
+               cb = -ca*gamm*BESSEL_J1(gamm*r)
+            else
+               ca = ampl/BESSEL_K0(beta*R_CORE)
+               E = ca*BESSEL_K0(beta*r)
+               cb = -ca*beta*BESSEL_K1(beta*r)
+            endif
+!
+            dE(1) = cb*r_x*exp(-ZI*k*x3)
+            dE(2) = cb*r_y*exp(-ZI*k*x3)
+            E = E*exp(-ZI*k*x3)
+            dE(3) = -ZI*k*E
+!
+!     ...pump field
+         case(1)
+            ampl =  2.0d0
+            k    = 93.4108d0
+            gamm =  1.55709d0
+            beta =  3.46466d0
+            if (r .le. R_CORE) then
+               ca = ampl/BESSEL_J0(gamm*R_CORE)
+               E = ca*BESSEL_J0(gamm*r)
+               cb = -ca*gamm*BESSEL_J1(gamm*r)
+            else
+               ca = ampl/BESSEL_K0(beta*R_CORE)
+               E = ca*BESSEL_K0(beta*r)
+               cb = -ca*beta*BESSEL_K1(beta*r)
+            endif
+!
+            dE(1) = cb*r_x*exp(-ZI*k*x3)
+            dE(2) = cb*r_y*exp(-ZI*k*x3)
+            E = E*exp(-ZI*k*x3)
+            dE(3) = -ZI*k*E
+
+         case(2)
+            ! Gaussian
+            ! ampl = 1.0d0
+            ! rho = 1.0d0
+            ! E = ampl*exp(-(x1*x1+x2*x2)/rho)*exp(-ZI*k*x3)
+            ! dE(1) = -(2.d0*x1/rho)*E
+            ! dE(2) = -(2.d0*x2/rho)*E
+            ! dE(3) = -ZI*k*E
+
+            ! Plane Wave (needs one radial refinement)
+            ampl = 0.2d0
+            rho = R_CORE + 0.5d0*(R_CLAD-R_CORE)
+            if (r > rho) then
+               E = ampl*exp(-r**2)/exp(-rho**2)
+               dE(1) = -2.d0*x1*E
+               dE(2) = -2.d0*x2*E
+            else
+               E = ampl
+               dE(1) = 0.d0
+               dE(2) = 0.d0
+            endif
+            k = OMEGA_PUMP/REF_INDEX_CORE
+            E = E*exp(-ZI*k*x3)
+            dE(1) = dE(1)*exp(-ZI*k*x3)
+            dE(2) = dE(2)*exp(-ZI*k*x3)
+            dE(3) = -ZI*k*E;
+         case default
+            write(*,*) 'mfd_solutions: fld_flag invalid. stop.'
+            stop
+      end select
+      if (R_CLAD - r < GEOM_TOL) then
+         E = 0.d0
+         dE(1:3) = 0.d0
+      endif
+!
+!--------------- 14th prob -------------------------------------------------------
+!..LP11 mode in dielectric waveguide
+   elseif (ISOL .eq. 14) then
+!
+!  ...shift source away from zero
+      if (abs(x1) .lt. GEOM_TOL) then
+         x1 = x1+GEOM_TOL
+      endif
+      if (abs(x2) .lt. GEOM_TOL) then
+         x2 = x2+GEOM_TOL
+      endif
+      !x3 = x3-0.05d0
+!
+!  ...LP11 in dielectric waveguide, a = sqrt(2), omega=40.0
+      r = sqrt(x1*x1+x2*x2)
+      k    = 58.0229d0
+      gamm =  2.07563d0
+      beta =  1.62952d0
+      ampl = 1.0d0
+!
+      if (r .le. R_CORE) then
+         ca = ampl/BESSEL_J1(gamm*R_CORE)
+         E = ca*(x1/r)*BESSEL_J1(gamm*r)
+         cb = ca*(((x1/r)**(2.d0))*gamm*BESSEL_dJ1(gamm*r)+((x2/r)**(2.d0))*BESSEL_J1(gamm*r)/r)
+         cc = ca*(x2/r)*(x1/r)*(gamm*BESSEL_dJ1(gamm*r)-BESSEL_J1(gamm*r)/r)
+      else
+         ca = ampl/BESSEL_K1(beta*R_CORE)
+         E = ca*(x1/r)*BESSEL_K1(beta*r)
+         cb = ca*(((x1/r)**(2.d0))*beta*BESSEL_dK1(beta*r)+((x2/r)**(2.d0))*BESSEL_K1(beta*r)/r)
+         cc = ca*(x2/r)*(x1/r)*(beta*BESSEL_dK1(beta*r)-BESSEL_K1(beta*r)/r)
+      endif
+!
+      dE(1) = cb*exp(-ZI*k*x3)
+      dE(2) = cc*exp(-ZI*k*x3)
+      E = E*exp(-ZI*k*x3)
+      dE(3) = -ZI*k*E
+!
+!--------------- 15th prob -------------------------------------------------------
+!..Plane wave in core of dielectric waveguide
+   elseif (ISOL .eq. 15) then
+!
+!      r = sqrt(x1*x1+x2*x2)
+!      if (r .le. R_CORE) then
+!         E = exp(-ZI*OMEGA*x3) !x1*exp(-ZI*OMEGA*x3)
+!         dE(1) = 0.d0 !exp(-ZI*OMEGA*x3)
+!         dE(2) = 0.d0
+!         dE(3) = -ZI*OMEGA*E
+!      else
+!         E = 0.d0
+!         dE(1:3) = 0.d0
+!      endif
+!
+!   test: exp(-r^2)
+      r = sqrt(x1*x1+x2*x2)
+      E = exp(-r**2.d0)
+      dE(1) = -2.d0*x1*E
+      dE(2) = -2.d0*x2*E
+      dE(3) = 0.d0
+!
+!
+!--------------- 20th prob -------------------------------------------------------
+!..Birefringent fiber with LP01 (E_x) and LP11 (E_y)
+   elseif (ISOL .eq. 20) then
+!
+!  ...radial coordinate
+      r = sqrt(x1*x1+x2*x2)
+!
+!  ...LMA fiber
+!  ...LP01 (signal) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
+!
+      if (r .eq. 0.d0) then
+         r_x = 1.d0
+         r_y = 1.d0
+      else
+         r_x = x1/r
+         r_y = x2/r
+      endif
+!
+      select case(Fld)
+!     ...signal field
+         case(0)
+            if (ICOMP_TS .eq. 1) then
+!              with CORE_NX = 1.4512
+!              with CLAD_NX = 1.4500
+               ampl =  0.9d0
+               k    = 85.6833d0
+               gamm =  1.53131d0
+               beta =  3.12978d0
+               if (r .le. R_CORE) then
+                  ca = ampl/BESSEL_J0(gamm*R_CORE)
+                  E = ca*BESSEL_J0(gamm*r)
+                  cb = -ca*gamm*BESSEL_J1(gamm*r)
+               else
+                  ca = ampl/BESSEL_K0(beta*R_CORE)
+                  E = ca*BESSEL_K0(beta*r)
+                  cb = -ca*beta*BESSEL_K1(beta*r)
+               endif
+               dE(1) = cb*r_x*exp(-ZI*k*x3)
+               dE(2) = cb*r_y*exp(-ZI*k*x3)
+               E = E*exp(-ZI*k*x3)
+               dE(3) = -ZI*k*E
+            else if (ICOMP_TS .eq. 2) then
+!              with CORE_NX = 1.6510
+!              with CLAD_NX = 1.6500
+               ampl =  0.3d0
+               if (CLAD_NY .eq. 1.6500d0) then
+                  k    = 97.4838d0
+                  gamm =  1.52302d0
+                  beta =  3.03177d0
+               elseif (CLAD_NY .eq. 1.9500d0) then
+                  k    = 115.195d0
+                  gamm =   1.53261d0
+                  beta =   3.14547d0
+               else
+                  write(*,*) 'mfd_solutions. unexpected CLAD_NY. stop.'
+                  stop
+               endif
+               if (r .le. R_CORE) then
+                  ca = ampl/BESSEL_J0(gamm*R_CORE)
+                  E = ca*BESSEL_J0(gamm*r)
+                  cb = -ca*gamm*BESSEL_J1(gamm*r)
+               else
+                  ca = ampl/BESSEL_K0(beta*R_CORE)
+                  E = ca*BESSEL_K0(beta*r)
+                  cb = -ca*beta*BESSEL_K1(beta*r)
+               endif
+               dE(1) = cb*r_x*exp(-ZI*k*x3)
+               dE(2) = cb*r_y*exp(-ZI*k*x3)
+               E = E*exp(-ZI*k*x3)
+               dE(3) = -ZI*k*E
+            endif
+!
+!     ...pump field
+         case(1)
+            ampl =  2.0d0
+            k    = 93.4108d0
+            gamm =  1.55709d0
+            beta =  3.46466d0
+            if (r .le. R_CORE) then
+               ca = ampl/BESSEL_J0(gamm*R_CORE)
+               E = ca*BESSEL_J0(gamm*r)
+               cb = -ca*gamm*BESSEL_J1(gamm*r)
+            else
+               ca = ampl/BESSEL_K0(beta*R_CORE)
+               E = ca*BESSEL_K0(beta*r)
+               cb = -ca*beta*BESSEL_K1(beta*r)
+            endif
+!
+            dE(1) = cb*r_x*exp(-ZI*k*x3)
+            dE(2) = cb*r_y*exp(-ZI*k*x3)
+            E = E*exp(-ZI*k*x3)
+            dE(3) = -ZI*k*E
+         case default
+            write(*,*) 'mfd_solutions: fld_flag invalid. stop.'
+            stop
+      end select
+      if (R_CLAD - r < GEOM_TOL) then
+         E = 0.d0
+         dE(1:3) = 0.d0
+      endif
+!--------------- 21st prob -------------------------------------------------------
+!..Birefringent fiber with LP01 (E_x) and LP11 (E_y)
+   elseif (ISOL .eq. 21) then
+!
+!  ...LMA fiber
+!  ...a = 0.9*sqrt(2)
+!  ...omega_s=2*pi/0.1064=59.0525
+!  ...omega_p=2*pi/0.0976
+!
+      if (R_CORE .ne. 0.9d0*sqrt(2.0d0)      .or.  &
+          LAMBDA_SIGNAL .ne. 1064.0d-9/L_0   .or.  &
+          LAMBDA_PUMP   .ne.  976.0d-9/L_0 ) then
+         write(*,*) 'mfd_solutions: unexpected parameters. stop.'
+         stop
+      endif
+!
+      select case(Fld)
+!     ...signal field
+         case(0)
+            ! compute signal power oscillation (1% up/down)
+            ! ..if 'modified' activated
+            cc = 1.0d0
+            modified = 0
+            if (modified .eq. 1) then
+               ca = sqrt(0.99d0)
+               cb = sqrt(1.01d0)
+               if (TIMESTEP .le. 100) then
+                  cc = 1.0d0
+               else
+                  ! oscillate at f = 1/(4*DELTA_T)
+                  ! if DELTA_T=0.1ms, then f = 2500Hz
+                  if (MOD(TIMESTEP,4) .eq. 1) then
+                     cc = cb
+                  else if (MOD(TIMESTEP,4) .eq. 3) then
+                     cc = ca
+                  else
+                     cc = 1.0d0
+                  endif
+               endif
+            endif
+            ! ampl 0.9/0.6 -> ~90% power in LP01, ~10% power in LP11
+            if (ICOMP_TS .eq. 1) then
+               if (CORE_NX .eq. 1.4512d0 .and. CLAD_NX .eq. 1.4500d0) then
+                  ampl =  0.9d0 * cc ! oscillating signal power
+                  k    = 85.6833d0
+                  gamm =  1.53131d0
+                  beta =  3.12978d0
+               else
+                  write(*,*) 'mfd_solutions: unexpected CORE_NX,CLAD_NX. stop.'
+                  stop
+               endif
+               call get_LP01(Xp,ampl,k,gamm,beta, E,dE)
+            else if (ICOMP_TS .eq. 2) then
+               if (CORE_NY .eq. 1.6510d0 .and. CLAD_NY .eq. 1.6500d0) then
+                  ampl =  0.6d0 * cc ! oscillating signal power
+                  k    = 97.4662d0
+                  gamm =  2.39795d0
+                  beta =  2.40022d0
+               else
+                  write(*,*) 'mfd_solutions: unexpected CORE_NY,CLAD_NY. stop.'
+                  stop
+               endif
+               call get_LP11(Xp,ampl,k,gamm,beta, E,dE)
+            endif
+!
+!     ...pump field LP01 (E_x)
+         case(1)
+            ! compute increasing pump power
+            ! ..if 'modified' activated
+            cc = 1.0d0
+            modified = 1
+            if (modified .eq. 1) then
+               ca = 1.0d0/sqrt(2.0d0)
+               cb = sqrt(2.0d0)
+               if (TIMESTEP .le. 100) then
+                  cc = ca
+               else if (TIMESTEP .le. 150) then
+                  cc = ca + (cb-ca)*(TIMESTEP-100.d0)/50.d0
+               else
+                  cc = cb
+               endif
+            endif
+!
+            ! ampl 2.0/3.0 -> ~66% power in LP01, ~33% in LP11
+            if (ICOMP_TS .eq. 1) then
+               if (CORE_NX .eq. 1.4512d0 .and. CLAD_NX .eq. 1.4500d0) then
+                  ampl =  2.5d0 * cc ! increasing pump power
+                  k    = 93.4108d0
+                  gamm =  1.55709d0
+                  beta =  3.46466d0
+               else
+                  write(*,*) 'mfd_solutions: unexpected CORE_NX,CLAD_NX. stop.'
+                  stop
+               endif
+               call get_LP01(Xp,ampl,k,gamm,beta, E,dE)
+            else if (ICOMP_TS .eq. 2) then
+               if (CORE_NY .eq. 1.6510d0 .and. CLAD_NY .eq. 1.6500d0) then
+                  ampl =   3.0d0 * cc ! increasing pump power
+                  k    = 106.258d0
+                  gamm =   2.44593d0
+                  beta =   2.77454d0
+               else
+                  write(*,*) 'mfd_solutions. unexpected CLAD_NY. stop.'
+                  stop
+               endif
+               call get_LP11(Xp,ampl,k,gamm,beta, E,dE)
+            endif
+         case default
+            write(*,*) 'mfd_solutions: fld_flag invalid. stop.'
+            stop
+      end select
 !..endif ISOL
    endif
 !
 !
+!---------------------------------------------------------------------------------
+!
 !.... set values as tensor products for all cases except
 !.... Gaussian pulse and fiber beam
    select case(ISOL)
-      case(0,1,2,3,4,5,9,10,11)
+      case(0,1,2,3,4,9,10,11)
 !     ...value
          E=f_x*f_y*f_z
 !     ...1st order derivatives
@@ -561,635 +788,157 @@ subroutine mfd_solutions(Xp, E,dE,d2E)
          d2E(3,2) =  d2E(2,3)
          d2E(3,3) =   f_x *   f_y * ddf_z
 !
+      case(5,8,12,13,14,15,20,21)
+!     ...already computed fields
+!
       case default
-         write(*,*) 'invalid ISOL param. stop.'
+         write(*,*) 'mfd_solutions: invalid ISOL param. stop.'
          stop
    end select
 end subroutine mfd_solutions
 
+function BESSEL_dJ1(x) result(fval)
+   real*8, intent(in)  :: x
+   real*8 :: fval
+   fval = BESSEL_J0(x) - BESSEL_J1(x)/x
+end function
 
+function BESSEL_K0(x) result(fval)
+   real*8, intent(in)  :: x
+   real*8 :: fval
+   real*8 :: a,b,c
+   call dbessIK(x, 0.d0, a, fval, b, c)
+end function
 
-!!!!!!!!!!!!!!!!!!ROUTINES FOR BESSEL FUNCTIONS FROM JAKE!!!!!!!!!!!!!!!!!
+function BESSEL_dK0(x) result(fval)
+   real*8, intent(in)  :: x
+   real*8 :: fval
+   real*8 :: a,b,c
+   call dbessIK(x, 0.d0, a, b, c, fval)
+end function
+
+function BESSEL_K1(x) result(fval)
+   real*8, intent(in)  :: x
+   real*8 :: fval
+   real*8 :: a,b,c
+   call dbessIK(x, 1.d0, a, fval, b, c)
+end function
+
+function BESSEL_dK1(x) result(fval)
+   real*8, intent(in)  :: x
+   real*8 :: fval
+   real*8 :: a,b,c
+   call dbessIK(x, 1.d0, a, b, c, fval)
+end function
 !
-! File:          BesselFunctions.f95
+!------------------------------------------------------
+! subroutine get_LP01
+!------------------------------------------------------
+subroutine get_LP01(Xp,ampl,k,gamm,beta, E,dE)
 !
-! Author:        Jacob Grosek
-! Start Date:    March 31, 2017
-! Last Modified: March 31, 2017
-! Air Force Research Laboratory at Kirtland AFB, Albuquerque, NM
-! Directed Energy Directorate, Laser Division, Modeling & Simulation Program
+   use commonParam
+   use laserParam
+   use control, only : GEOM_TOL
 !
-! Description of the File:
+   implicit none
 !
-! This file contains Fortran Bessel function algorithms, and their
-! derivatives.  These Bessel functions only accept real values, and they
-! only output real values as well.
+   real*8, intent(in)  :: Xp(3)
+   real*8, intent(in)  :: ampl, k, gamm, beta
+   VTYPE , intent(out) :: E, dE(3)
 !
-! This code is modified from "Numerical Recipes in Fortran 77: The Art
-! of Scientific Computing," Cambridge University Press (1992)
+   real*8 :: x1, x2, x3, r, r_x, r_y, ca, cb
+   real*8 :: BESSEL_K0, BESSEL_K1
 !
-! File Parameters/Variables:
+!------------------------------------------------------
 !
-! x
-!   - (input, real, [ ]) the given point at which the Bessel
-!     functions will be calculated
-! order
-!   - (input, real, [ ]) the order of the Bessel functions
-! bessJ
-!   - (output, real, [ ]) the value of the Bessel J function
-! bessY
-!   - (output, real, [ ]) the value of the Bessel Y function
-! bessJder
-!   - (output, real, [ ]) the value of the derivative of the
-!     Bessel J function
-! bessYder
-!   - (output, real, [ ]) the value of the derivative of the
-!     Bessel Y function
+!..Cartesian coordinates
+   x1 = Xp(1); x2 = Xp(2); x3 = Xp(3)
 !
-! File Dependencies:
+!..radial coordinate
+   r = sqrt(x1*x1+x2*x2)
 !
-! This subroutine calls upon the subroutine beschbgamma defined in
-! this same file.  This subroutine returns the Bessel functions
-! bessJ = J_order and bessY = Y_order, and their respective
-! derivatives bessJder = J_order′ and bessYder = Y_order′, for
-! positive x and of an order greater or equal to 0.  The relative
-! accuracy is within one or two significant digits of eps, except
-! near a zero of one of the functions, where eps controls its
-! absolute accuracy. The parameter "floatingpointmin" is a number
-! close to the machine’s smallest floating-point number. All
-! internal arithmetic is accomplished with real numbers. In oder to
-! convert the entire routine to double precision, use the real(8)
-! declaration and decrease eps to 10**−16.  Also convert the
-! subroutine beschbgamma.
+   if (r .eq. 0.d0) then
+      r_x = 1.d0
+      r_y = 1.d0
+   else
+      r_x = x1/r
+      r_y = x2/r
+   endif
 !
-
-subroutine dbessJY(x, order, bessJ, bessY, bessJder, bessYder)
-
-  implicit none
-
-  integer, parameter :: maxit = 10000
-  real(8) :: bessJ,bessJder, bessY, bessYder, x, order
-  real(8), parameter :: eps = 1.d-16, floatingpointmin = 1.e-30, &
-    pi = 3.141592653589793d0, xmin = 2.d0, &
-    emc = 0.577215664901533d0
-  integer :: i, signi, l, nl
-  real(8) :: a, b, br, bi, c, cr, ci, d, del, del1, den, &
-    di, dlr, dli, dr, e, f, fact, fact2, fact3, ff, gam, &
-    gam1, gam2, gammi, gampl, h, p, pimu, pimu2, q, r, &
-    bessJl, bessJl1, bessJmu, bessJder1, bessJderl, &
-    bessJtemp, bessY1, bessYmu, bessYmup, bessYtemp, summ, &
-    summ1, temp, w, x2, xi, xi2, xmu, xmu2, gampl1, negate
-
-  if (order < 0.d0) then
-    order  = dabs(order)
-    negate = (-1.d0)**int(order)
-  else
-    negate = 1.d0
-  endif ! end if statement
-  if (dabs(x) <= 1.d-6) then
-    if ((dabs(x) <= 1.d-17) .and. (order == 0.d0)) then
-      bessJ    = 1.d0 *  negate
-      bessJder = 0.d0
-      bessY    = -1.d30 * negate
-      bessYder = 1.d30 * negate
-    elseif ((dabs(x) <= 1.d-17) .and. (order /= 0.d0)) then
-      bessJ    = 0.d0
-      bessJder = negate * 2.d0 * order * &
-        (x / 2.d0)**(order - 1.d0) / gamma(order + 1.d0)
-      bessY    = -1.d30 * negate
-      bessYder = 1.d30 * negate
-    elseif ((dabs(x) > 1.d-17) .and. (order == 0.d0)) then
-      bessJder = negate * 2.d0 * order * &
-        (x / 2.d0)**(order - 1.d0) / gamma(order + 1.d0)
-      bessY    = negate * (2.d0 / pi) * (dlog(x / 2.d0) + emc)
-      bessYder = negate * 2.d0 / (pi * x)
-    elseif ((dabs(x) > 1.d-17) .and. (order /= 0.d0)) then
-      bessJ    = negate * (x / 2.d0)**order / &
-        gamma(order + 1.d0)
-      bessJder = negate * 2.d0 * order * &
-        (x / 2.d0)**(order - 1.d0) / gamma(order + 1.d0)
-      bessY    = -negate * (gamma(order) / pi) * &
-        (2.d0 / x)**order
-      bessYder = negate * (order * gamma(order) / (pi * x)) * &
-        (2.d0 / x)**order
-    endif ! end if statement
-    return
-  endif ! end if statement
-
-  ! Here "nl" is the number of downward recurrences of the J’s and
-  ! upward recurrences of Y’s. "xmu" lies between −1/2 and 1/2 for
-  ! x < xmin, while it is chosen so that x is greater than the
-  ! turning point for x >= xmin:
-  if (x < xmin) then
-    nl = int(order + 0.5d0)
-  else
-    nl = max(0, int(order - x + 1.5d0))
-  endif ! end if statement
-  xmu  = order - nl
-  xmu2 = xmu * xmu
-  if (x /= 0.d0) then
-    xi = 1.d0 / x
-  else
-    xi = 1.d30
-  endif ! end if statement
-  xi2  = 2.d0 * xi
-  w    = xi2 / pi
-    ! the Wronskian
-
-  ! Here the first continued fraction is found by the modified
-  ! Lentz's method.  The variable "signi" keeps track of sign
-  ! changes in the denominator:
-  signi = 1
-  h     = order * xi
-  if (h < floatingpointmin) then
-    h = floatingpointmin
-  endif ! end if statement
-  b = xi2 * order
-  d = 0.d0
-  c = h
-  do i = 1, maxit
-    b = b + xi2
-    d = b - d
-    if (abs(d) < floatingpointmin) then
-      d = floatingpointmin
-    endif ! end if statement
-    c = b - 1.d0 / c
-    if (abs(c) < floatingpointmin) then
-      c = floatingpointmin
-    endif ! end if statement
-    d   = 1.d0 / d
-    del = c * d
-    h   = del * h
-    if (d < 0.d0) then
-      signi = -signi
-    endif ! end if statement
-    if (dabs(del - 1.d0) < eps) then
-      goto 1
-    endif ! end if statement
-  enddo
-  print *, "x is too large in dbessJY; try asymptotic expansion"
-  print *, "x = ", x
-  1 continue
-
-  ! Here J_order and J_order' are initialized for downward
-  ! recurrence:
-  bessJl    = signi * floatingpointmin
-  bessJderl = h * bessJl
-  bessJl1   = bessJl
-    ! store values for future rescaling
-  bessJder1 = bessJderl
-  fact      = order * xi
-  do l = nl, 1, -1
-    bessJtemp = fact * bessJl + bessJderl
-    fact      = fact - xi
-    bessJderl = fact * bessJtemp - bessJl
-    bessJl    = bessJtemp
-  enddo
-  if (bessJl == 0.d0) then
-    bessJl = eps
-  endif ! end if statement
-
-  ! The subroutine already has calculated unnormalized J_order and
-  ! J_order':
-  f = bessJderl / bessJl
-  if (x < xmin) then ! use series
-    x2   = 0.5d0 * x
-    pimu = pi * xmu
-    if (abs(pimu) < eps) then
-      fact = 1.d0
-    else
-      fact = pimu / dsin(pimu)
-    endif ! end if statement
-    d = -dlog(x2)
-    e = xmu * d
-    if (abs(e) < eps) then
-      fact2 = 1.d0
-    else
-      fact2 = dsinh(e) / e
-    endif ! end if statement
-    call beschbgamma(xmu, gam1, gam2, gampl, gammi)
-      ! Chebyshev evaluation of Gamma1 and Gamma2
-    ff    = 2.d0 / pi * fact * (gam1 * dcosh(e) + gam2 * fact2 * d)
-    e     = dexp(e)
-    p     = e  / (gampl * pi)
-    q     = 1.d0 / (e * pi * gammi)
-    pimu2 = 0.5d0 * pimu
-    if (abs(pimu2) < eps) then
-      fact3 = 1.d0
-    else
-      fact3 = dsin(pimu2) / pimu2
-    endif ! end if statement
-    r     = pi * pimu2 * fact3 * fact3
-    c     = 1.d0
-    d     = -x2 * x2
-    summ  = ff + r * q
-    summ1 = p
-    do i = 1, maxit
-      ff    = (i * ff + p + q) / (i * i - xmu2)
-      c     = c * d / i
-      p     = p / (i - xmu)
-      q     = q / (i + xmu)
-      del   = c * (ff + r * q)
-      summ  = summ + del
-      del1  = c * p - i * del
-      summ1 = summ1 + del1
-      if (abs(del) < (1.d0 + abs(summ)) * eps) then
-        goto 2
-      endif ! end if statement
-    enddo
-    print *, "bessY series failed to converge"
-2   continue
-    bessYmu  = -summ
-    bessY1   = -summ1 * xi2
-    bessYmup = xmu * xi * bessYmu - bessY1
-    bessJmu  = w / (bessYmup - f * bessYmu)
-  else ! evaluate the second continued fraction by Lentz's method
-    a    = 0.25d0 - xmu2
-    p    = -0.5d0 * xi
-    q    = 1.d0
-    br   = 2.d0 * x
-    bi   = 2.d0
-    fact = a * xi / (p * p + q * q)
-    cr   = br + q * fact
-    ci   = bi + p * fact
-    den  = br * br + bi * bi
-    dr   = br / den
-    di   = -bi / den
-    dlr  = cr * dr - ci * di
-    dli  = cr * di + ci * dr
-    temp = p * dlr - q * dli
-    q    = p * dli+q * dlr
-    p    = temp
-    do i = 2, maxit
-      a  = a + 2 * (i - 1)
-      bi = bi + 2.d0
-      dr = a * dr + br
-      di = a * di + bi
-      if ((abs(dr) + abs(di)) < floatingpointmin) then
-        dr = floatingpointmin
-      endif ! end if statement
-      fact = a / (cr * cr +  ci * ci)
-      cr   = br + cr * fact
-      ci   = bi - ci * fact
-      if ((abs(cr) + abs(ci)) < floatingpointmin) then
-        cr = floatingpointmin
-      endif ! end if statement
-      den  = dr * dr + di * di
-      dr   = dr / den
-      di   = -di / den
-      dlr  = cr * dr - ci * di
-      dli  = cr * di + ci * dr
-      temp = p * dlr - q * dli
-      q    = p * dli + q * dlr
-      p    = temp
-      if ((abs(dlr - 1.d0) + abs(dli)) < eps) then
-        goto 3
-      endif ! end if statement
-    enddo
-    print *, "the second continued fraction failed in dbessJY"
-3   continue
-    gam    = (p - f) / q
-    bessJmu  = dsqrt(w / ((p - f) * gam + q))
-    bessJmu  = sign(bessJmu, bessJl)
-    bessYmu  = bessJmu * gam
-    bessYmup = bessYmu * (p + q / gam)
-    bessY1   = xmu * xi * bessYmu - bessYmup
-  endif ! end if statement
-  fact     = bessJmu / bessJl
-  bessJ    = negate * bessJl1 * fact
-    ! scale original J_order and J_order′
-  bessJder = bessJder1 * fact
-
-  ! Here is the upward recurrence of Y_order
-  do i = 1, nl
-    bessYtemp = (xmu + i) * xi2 * bessY1 - bessYmu
-    bessYmu   = bessY1
-    bessY1    = bessYtemp
-  enddo
-  bessY    = negate * bessYmu
-  bessYder = order * xi * bessYmu - bessY1
-
-  return
-end subroutine dbessJY
-
-! This subroutine evaluates Gamma1 and Gamma2 by a Chebyshev
-! expansion for |x| <= 1/2. Also returns 1 / Gamma(1 + x) and
-! 1 / Gamma(1 − x). If converting to real, set nuse1 = 7 and
-! nuse2 = 8.  This subroutine calls the chebev function, which is
-! contained in this file.
-! Subroutine Inputs/Output:
-! x     - (input, real, [ ]) the point at which the gamma functions
-!         are evaluated
-! gam1  - (output, real, [ ]) the function value of Gamma1
-! gam2  - (output, real, [ ]) the function value of Gamma2
-! gampl - (output, real, [ ]) the function value of 1 / Gamma(1 + x)
-! gammi - (output, real, [ ]) the function value of 1 / Gamma(1 − x)
-subroutine beschbgamma(x, gam1, gam2, gampl, gammi)
-
-  implicit none
-
-  integer, parameter :: nuse1 = 7, nuse2 = 8
-  real(8) :: gam1, gam2, gammi, gampl, x
-  real(8) :: xx, c1(7), c2(8)
-  real(8), external :: chebev
-  save c1, c2
-  data c1 /-1.142022680371168d0, 6.5165112670737d-3, &
-    3.087090173086d-4, -3.4706269649d-6, 6.9437664d-9, &
-    3.67795d-11, -1.356d-13/
-  data c2 /1.843740587300905d0, -7.68528408447867d-2, &
-    1.2719271366546d-3, -4.9717367042d-6, -3.31261198d-8, &
-    2.423096d-10, -1.702d-13, -1.49d-15/
-
-  xx    = 8.d0 * x * x - 1.d0
-    ! x is multiplied by 2 in order to change its range to
-    ! -1 to 1, and then another transformation is applied in order
-    ! to evaluate using the even Chebyshev series; since the
-    ! function is even it would be wasteful to call the chebev
-    ! function with all the odd coefficients being zero; an
-    ! approximation of an even function on [-1,1] will only
-    ! involve even Chebyshev polynomials.  Once x is in the range
-    ! -1 to 1, then the transformation being applied is
-    ! T_2n(x) = T_n(2 * x**2 - 1)
-  gam1  = chebev(-1.d0, 1.d0, c1, nuse1, xx)
-  gam2  = chebev(-1.d0, 1.d0, c2, nuse2, xx)
-  gampl = gam2 - x * gam1
-  gammi = gam2 + x * gam1
-
-  return
-end subroutine beschbgamma
-
-! This subroutine calls upon the subroutine beschbgamma defined in
-! this same file.  This subroutine returns the modified Bessel
-! functions bessI = I_order and bessK = K_order, and their
-! respective derivatives bessIder = I_order′ and
-! bessKder = K_order′, for positive x and for an order greater or
-! equal to 0.  The relative accuracy is within one or two
-! significant digits of eps. The parameter "floatingpointmin" is
-! a number close to the machine’s smallest floating point number.
-! All internal arithmetic is accomplished with real numbers. In
-! order to convert the entire routine to double precision, use
-! the real(8) declaration and decrease eps to 10**−16.  Also
-! convert the subroutine beschbgamma.
-! Subroutine Inputs/Output:
-! x        - (input, real, [ ]) the given point at which the Bessel
-!         functions will be calculated
-! order    - (input, real, [ ]) the order of the Bessel functions
-! bessI    - (output, real, [ ]) the value of the Bessel I function
-! bessK    - (output, real, [ ]) the value of the Bessel K function
-! bessIder - (output, real, [ ]) the value of the derivative of the
-!         Bessel I function
-! bessKder - (output, real, [ ]) the value of the derivative of the
-!         Bessel K function
-subroutine dbessIK(x, order, bessI, bessK, bessIder, bessKder)
-
-  implicit none
-
-  integer, parameter :: maxit = 10000
-  real(8) :: bessI, bessIder, bessK, bessKder, x, order
-  real(8), parameter :: eps = 1.d-16, floatingpointmin = 1.e-30, &
-    pi = 3.141592653589793d0, xmin = 2.d0
-  integer :: i, l, nl
-  real(8) :: a, a1, b, c, d, del, del1, delh, dels, e, f, &
-    fact, fact2, ff, gam1, gam2, gammi, gampl, h, p, pimu, &
-    q, q1, q2, qnew, bessIl, bessIl1, bessImu, bessIder1, &
-    bessIderl, bessItemp, bessK1, bessKmu, bessKmup, &
-    bessKtemp, s, summ, summ1, x2, xi, xi2, xmu, xmu2
-
-  if ((x <= 0.d0) .or. (order < 0.d0)) then
-    print *, "Bad arguments were inputed into dbessIK."
-    print *, "x = ", x
-    print *, "order = ", order
-  endif ! end if statement
-
-  ! Here "nl" is the number of downward recurrences of the I’s and
-  ! upward recurrences of K’s. "xmu" lies between −1/2 and 1/2:
-  nl   = int(order + 0.5d0)
-  xmu  = order - nl
-  xmu2 = xmu * xmu
-  xi   = 1.d0 / x
-  xi2  = 2.d0 * xi
-  h    = order * xi
-
-  ! Here the first continued fraction is found by the modified
-  ! Lentz's method:
-  if (h < floatingpointmin) then
-    h = floatingpointmin
-  endif ! end if statement
-  b = xi2 * order
-  d = 0.d0
-  c = h
-  do i = 1, maxit
-    b   = b + xi2
-    d   = 1.d0 / (b + d)
-      ! denominators cannot be zero here, so there is no need for
-      ! special precautions
-    c   = b + 1.d0 / c
-    del = c * d
-    h   = del * h
-    if (abs(del - 1.d0) < eps) then
-      goto 10
-    endif ! end if statement
-  enddo
-  print *, "x is too large in dbessIK; try an asymptotic expansion"
-  print *, "x = ", x
-10  continue
-
-  ! Here I_order and I_order' are initialized for downward
-  ! recurrence:
-  bessIl    = floatingpointmin
-  bessIderl = h * bessIl
-  bessIl1   = bessIl
-  bessIder1 = bessIderl
-    ! store values for future rescaling
-  fact      = order * xi
-  do l = nl, 1, -1
-    bessItemp = fact * bessIl + bessIderl
-    fact      = fact - xi
-    bessIderl = fact * bessItemp + bessIl
-    bessIl    = bessItemp
-  enddo
-
-  ! The subroutine already has calculated unnormalized I_order and
-  ! I_order':
-  f = bessIderl / bessIl
-  if (x <= xmin) then ! use series
-    x2   = 0.5d0 * x
-    pimu = pi * xmu
-    if (abs(pimu) < eps) then
-      fact = 1.d0
-    else
-      fact = pimu / dsin(pimu)
-    endif ! end if statement
-    d = -dlog(x2)
-    e = xmu * d
-    if (abs(e) < eps) then
-      fact2 = 1.d0
-    else
-      fact2 = dsinh(e) / e
-    endif ! end if statement
-    call beschbgamma(xmu, gam1, gam2, gampl, gammi)
-      ! Chebyshev evaluation of Gamma1 and Gamma2
-    ff    = fact * (gam1 * dcosh(e) + gam2 * fact2 * d)
-    summ  = ff
-    e     = dexp(e)
-    p     = 0.5d0 * e / gampl
-    q     = 0.5d0 / (e * gammi)
-    c     = 1.d0
-    d     = x2 * x2
-    summ1 = p
-    do i = 1, maxit
-      ff    = (i * ff + p + q) / (i * i - xmu2)
-      c     = c * d / i
-      p     = p / (i - xmu)
-      q     = q / (i + xmu)
-      del   = c * ff
-      summ  = summ + del
-      del1  = c * (p - i * ff)
-      summ1 = summ1 + del1
-      if (abs(del) < (abs(summ) * eps)) then
-        goto 12
-      endif ! end if statement
-    enddo
-    print *, "bessK series failed to converge"
-12    continue
-    bessKmu = summ
-    bessK1  = summ1 * xi2
-  else ! evaluate the second continued fraction by Steed's algorithm;
-     ! note that there can be no zero denominators
-    b    = 2.d0 * (1.d0 + x)
-    d    = 1.d0 / b
-    delh = d
-    h    = delh
-    q1   = 0.d0       ! initializing for recurrences
-    q2   = 1.d0
-    a1   = 0.25d0 - xmu2
-    c    = a1
-    q    = c
-    a    = -a1
-    s    = 1.d0 + q * delh
-    do i = 2, maxit
-      a    = a - 2 * (i - 1)
-      c    = -a * c / i
-      qnew = (q1 - b * q2) / a
-      q1   = q2
-      q2   = qnew
-      q    = q + c * qnew
-      b    = b + 2.d0
-      d    = 1.d0 / (b + a * d)
-      delh = (b * d - 1.d0) * delh
-      h    = h + delh
-      dels = q * delh
-      s    = s + dels
-      ! Here because the second continued fraction converges
-      ! faster, the convergence of the sum is the only test
-      ! needed:
-      if (abs(dels / s) < eps) then
-        goto 13
-      endif ! end if statement
-    enddo
-    print *, "second continued fraction failed to converge in dbessIK"
-13    continue
-    h       = a1 * h
-    bessKmu = dsqrt(pi / (2.d0 * x)) * dexp(-x) / s
-      ! the exp(-x) factor has been omitted in order to rescale
-      ! the modified Bessel functions by exp(x) for x >= xmin
-    bessK1  = bessKmu * (xmu + x + 0.5d0 - h) * xi
-  endif ! end if statement
-  bessKmup = xmu * xi * bessKmu - bessK1
-  bessImu  = xi  / (f * bessKmu - bessKmup)
-    ! I_order is determined from the Wronskian
-  bessI    = (bessImu * bessIl1) / bessIl
-    ! rescaling of I_order and I_order'
-  bessIder = (bessImu * bessIder1) / bessIl
-
-  ! Here are the upward recurrences of K_order
-  do i = 1, nl
-    bessKtemp = (xmu + i) * xi2 * bessK1 + bessKmu
-    bessKmu   = bessK1
-    bessK1    = bessKtemp
-  enddo
-  bessK    = bessKmu
-  bessKder = order * xi * bessKmu - bessK1
-
-  return
-end subroutine dbessIK
-
-! This function evaluates the Chebyshev polynomial
-! sum_(k = 1)^(m) c_k * T_(k - 1)(y) - c_1 / 2 at the point
-! y = [x - (b + a) / 2] / [(b - a) / 2], where c(m) is an array of
-! the Chebyshev coefficients.
-! Subroutine Inputs/Output:
-! a - (input, real, [ ]) lower endpoint of the interval in which
-!     the Chebyshev polynomial is evaluated
-! b - (input, real, [ ]) upper endpoint of the interval in which the
-!     Chebyshev polynomial is evaluated
-! c - (input, real vector (m), [ ]) array of the Chebyshev
-!       coefficients
-! m - (input, integer, [ ]) number of Chebyshev coefficients to be
-!     calculated
-! x - (input, real, [ ]) the point that decides where the Chebyshev
-!     polynomial is evaluated
-function chebev(a, b, c, m, x)
-
-  integer, intent(in) :: m
-  real(8), intent(in) :: a, b, x, c(m)
-  real(8) :: chebev
-  real(8) :: d, dd, sv, y, y2
-  integer :: j
-
-  if (((x - a) * (x - b)) > 0.d0) then
-    print *, "x must be greater than a and b"
-    print *, "x = ", x
-    print *, "a = ", a, " b = ", b
-  endif ! end if statement
-  d  = 0.d0
-  dd = 0.d0
-  y  = (2.d0 * x - a - b) / (b - a)
-    ! change of variable
-  y2 = 2.d0 * y
-
-  ! Here is Clenshaw's recurrence algorithm:
-  do j = m, 2, -1
-    sv = d
-    d  = y2 * d - dd + c(j)
-    dd = sv
-  enddo
-  chebev = y * d - dd + 0.5d0 * c(1)
-
-  return
-end function chebev
-
-subroutine d2bessJY(x, order, d2bessJ, d2bessY)
-  implicit none
-  real*8, intent(in) :: x, order
-  real*8, intent(out) :: d2bessJ, d2bessY
-  real *8  :: bessJ_1, bessY_1, dbessJ_1, dbessY_1
-  real *8  :: bessJ_2, bessY_2, dbessJ_2, dbessY_2
-  if(order.lt.1.d0) then
-    write(*,*) 'error from d2bessJY: order must be >=1 '
-    stop
-  endif
-  call dbessJY(x, order-1.d0, bessJ_1, bessY_1, dbessJ_1, dbessY_1)
-  call dbessJY(x, order+1.d0, bessJ_2, bessY_2, dbessJ_2, dbessY_2)
-  d2bessJ = 0.5d0*(dbessJ_1-dbessJ_2)
-  d2bessY = 0.5d0*(dbessY_1-dbessY_2)
-
-end subroutine d2bessJY
-
-
-subroutine d2bessIK(x, order, d2bessI, d2bessK)
-  implicit none
-  real*8, intent(in) :: x, order
-  real*8, intent(out) :: d2bessI, d2bessK
-  real *8  :: bessI_1, bessK_1, dbessI_1, dbessK_1
-  real *8  :: bessI_2, bessK_2, dbessI_2, dbessK_2
-  if(order.lt.1.d0) then
-    write(*,*) 'error from d2bessIK: order must be >=1 '
-    stop
-  endif
-  call dbessIK(x, order-1.d0, bessI_1, bessK_1, dbessI_1, dbessK_1)
-  call dbessIK(x, order+1.d0, bessI_2, bessK_2, dbessI_2, dbessK_2)
-  d2bessI =  0.5d0*(dbessI_1+dbessI_2)
-  d2bessK = -0.5d0*(dbessK_1+dbessK_2)
-  !write(*,*)'from d2bessIK: dbessI_1, dbessI_2 = ',dbessI_1, dbessI_2
-end subroutine d2bessIK
+   if (r .le. R_CORE) then
+      ca = ampl/BESSEL_J0(gamm*R_CORE)
+      E = ca*BESSEL_J0(gamm*r)
+      cb = -ca*gamm*BESSEL_J1(gamm*r)
+   else
+      ca = ampl/BESSEL_K0(beta*R_CORE)
+      E = ca*BESSEL_K0(beta*r)
+      cb = -ca*beta*BESSEL_K1(beta*r)
+   endif
+   dE(1) = cb*r_x*exp(-ZI*k*x3)
+   dE(2) = cb*r_y*exp(-ZI*k*x3)
+   E = E*exp(-ZI*k*x3)
+   dE(3) = -ZI*k*E
+!
+end subroutine get_LP01
+!
+!------------------------------------------------------
+! subroutine get_LP11
+!------------------------------------------------------
+subroutine get_LP11(Xp,ampl,k,gamm,beta, E,dE)
+!
+   use commonParam
+   use laserParam
+   use control, only : GEOM_TOL
+!
+   implicit none
+!
+   real*8, intent(in)  :: Xp(3)
+   real*8, intent(in)  :: ampl, k, gamm, beta
+   VTYPE , intent(out) :: E, dE(3)
+!
+   real*8 :: x1, x2, x3, r, ca, cb, cc
+   real*8 :: BESSEL_dJ1, BESSEL_K1, BESSEL_dK1
+!
+!------------------------------------------------------
+!
+!..Cartesian coordinates
+   x1 = Xp(1); x2 = Xp(2); x3 = Xp(3)
+!
+!..radial coordinate
+   r = sqrt(x1*x1+x2*x2)
+!
+!..shift source away from zero
+   if (abs(x1) .lt. GEOM_TOL) then
+      x1 = x1+GEOM_TOL
+   endif
+   if (abs(x2) .lt. GEOM_TOL) then
+      x2 = x2+GEOM_TOL
+   endif
+   r = sqrt(x1*x1+x2*x2)
+!
+!..LP11 in dielectric waveguide
+   if (r .le. R_CORE) then
+      ca = ampl/BESSEL_J1(gamm*R_CORE)
+      E = ca*(x1/r)*BESSEL_J1(gamm*r)
+      cb = ca*(((x1/r)**(2.d0))*gamm*BESSEL_dJ1(gamm*r)+ &
+               ((x2/r)**(2.d0))*BESSEL_J1(gamm*r)/r)
+      cc = ca*(x2/r)*(x1/r)*(gamm*BESSEL_dJ1(gamm*r)-BESSEL_J1(gamm*r)/r)
+   else
+      ca = ampl/BESSEL_K1(beta*R_CORE)
+      E = ca*(x1/r)*BESSEL_K1(beta*r)
+      cb = ca*(((x1/r)**(2.d0))*beta*BESSEL_dK1(beta*r)+ &
+               ((x2/r)**(2.d0))*BESSEL_K1(beta*r)/r)
+      cc = ca*(x2/r)*(x1/r)*(beta*BESSEL_dK1(beta*r)-BESSEL_K1(beta*r)/r)
+   endif
+!
+   dE(1) = cb*exp(-ZI*k*x3)
+   dE(2) = cc*exp(-ZI*k*x3)
+   E = E*exp(-ZI*k*x3)
+   dE(3) = -ZI*k*E
+!
+   if (R_CLAD - r < GEOM_TOL) then
+      E = 0.d0
+      dE(1:3) = 0.d0
+   endif
+!
+end subroutine get_LP11

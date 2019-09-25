@@ -59,9 +59,9 @@ c     nodes
         nod = Nodesl(j)
 c
 c  .....if nod is active
-C         if (NODES(nod)%act.eq.1) then
-         if ((NODES(nod)%act.eq.1).or.(NODES(nod)%act.eq.0 .and. 
-     .                                 NODES(nod)%ref_kind.ne.0)) then  
+C         if (Is_active(nod)) then
+         if ((Is_active(nod)).or.(Is_inactive(nod) .and.
+     .                            NODES(nod)%ref_kind.ne.0)) then
 c
           if (j.le.Nvert(type)) then
             call add_to_list(list_v,16,icv,nod)
@@ -183,8 +183,8 @@ c
 c  .........parent mid-edge nodes (south,north)
             do ip=1,3,2
               nodp = iabs(NFACE_CONS(ip,nc))
-C               if (NODES(nodp)%act.eq.0) nodp = NODES(nodp)%father
-              if (NODES(nodp)%act.eq.0 .and. NODES(nodp)%ref_kind.eq.0 )
+C               if (Is_inactive(nodp)) nodp = NODES(nodp)%father
+              if (Is_inactive(nodp) .and. NODES(nodp)%ref_kind.eq.0)
      .            nodp = NODES(nodp)%father
               call add_to_list(list_e,24,ice,nodp)
             enddo
@@ -207,8 +207,8 @@ c
 c  .........parent mid-edge nodes (east,west)
             do ip=2,4,2
               nodp = iabs(NFACE_CONS(ip,nc))
-C               if (NODES(nodp)%act.eq.0) nodp = NODES(nodp)%father
-              if (NODES(nodp)%act.eq.0 .and. NODES(nodp)%ref_kind.eq.0 )
+C               if (Is_inactive(nodp)) nodp = NODES(nodp)%father
+              if (Is_inactive(nodp) .and. NODES(nodp)%ref_kind.eq.0)
      .            nodp = NODES(nodp)%father
               call add_to_list(list_e,24,ice,nodp)
             enddo

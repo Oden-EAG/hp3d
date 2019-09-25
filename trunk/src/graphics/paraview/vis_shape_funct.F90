@@ -55,8 +55,8 @@ endsubroutine vis_shape_funct
 !
 subroutine vis_shape_h1(Icount)
 !
-      use data_structure3D , only : NODES,NRNODS , find_ndof
-      use parameters       , only : ZERO , ZONE
+      use data_structure3D , only : NODES,NRNODS,Is_inactive,find_ndof
+      use parameters       , only : ZERO,ZONE
 !
       implicit none
       integer, intent(out) :: Icount
@@ -70,13 +70,14 @@ subroutine vis_shape_h1(Icount)
       do inod=1,NRNODS
 !      
 !       skip inactive nodes
-        if (NODES(inod)%act == 0)  cycle
+        if (Is_inactive(inod)) cycle
+        if (.not. associated(NODES(inod)%dof)) cycle
 !               
 !       reset all dofs to zero
-        if (associated(NODES(inod)%zdofH))  NODES(inod)%zdofH=ZERO
-        if (associated(NODES(inod)%zdofE))  NODES(inod)%zdofE=ZERO
-        if (associated(NODES(inod)%zdofV))  NODES(inod)%zdofV=ZERO
-        if (associated(NODES(inod)%zdofQ))  NODES(inod)%zdofQ=ZERO
+        if (associated(NODES(inod)%dof%zdofH))  NODES(inod)%dof%zdofH=ZERO
+        if (associated(NODES(inod)%dof%zdofE))  NODES(inod)%dof%zdofE=ZERO
+        if (associated(NODES(inod)%dof%zdofV))  NODES(inod)%dof%zdofV=ZERO
+        if (associated(NODES(inod)%dof%zdofQ))  NODES(inod)%dof%zdofQ=ZERO
 !
       enddo
 !
@@ -88,7 +89,7 @@ subroutine vis_shape_h1(Icount)
       do inod=1,NRNODS
 !
 !       skip inactive nodes      
-        if (NODES(inod)%act == 0)  cycle      
+        if (Is_inactive(inod))  cycle
 !
 !       find number of dofs associated to node
         call find_ndof(inod, ndofH,ndofE,ndofV,ndofQ)        
@@ -99,7 +100,7 @@ subroutine vis_shape_h1(Icount)
           icount=icount+1
 !          
 !         activate
-          NODES(inod)%zdofH(:,idof)=ZONE
+          NODES(inod)%dof%zdofH(:,idof)=ZONE
 !
 !          write(*,*) 'i,inod,type,idof = ',icount-1,inod,NODES(inod)%type,idof
 
@@ -107,7 +108,7 @@ subroutine vis_shape_h1(Icount)
           call paraview_driver
 !
 !         deactivate
-          NODES(inod)%zdofH(:,idof)=ZERO
+          NODES(inod)%dof%zdofH(:,idof)=ZERO
 ! 
         enddo
       enddo
@@ -125,13 +126,13 @@ endsubroutine vis_shape_h1
 !
 subroutine vis_shape_hcurl(Icount)
 !
-      use data_structure3D , only : NODES,NRNODS , find_ndof
-      use parameters       , only : ZERO , ZONE
+      use data_structure3D , only : NODES,NRNODS,Is_inactive,find_ndof
+      use parameters       , only : ZERO,ZONE
 !
       implicit none
       integer,intent(out) :: Icount
       integer :: inod,ndofH,ndofE,ndofV,ndofQ,idof
-!      
+!
 !----------------------------------------------------------------------
 !
 !     Step 1 : reset all dofs to zero
@@ -140,13 +141,14 @@ subroutine vis_shape_hcurl(Icount)
       do inod=1,NRNODS
 !      
 !       skip inactive nodes
-        if (NODES(inod)%act == 0)  cycle
+        if (Is_inactive(inod)) cycle
+        if (.not. associated(NODES(inod)%dof)) cycle
 !               
 !       reset all dofs to zero
-        if (associated(NODES(inod)%zdofH))  NODES(inod)%zdofH=ZERO
-        if (associated(NODES(inod)%zdofE))  NODES(inod)%zdofE=ZERO
-        if (associated(NODES(inod)%zdofV))  NODES(inod)%zdofV=ZERO
-        if (associated(NODES(inod)%zdofQ))  NODES(inod)%zdofQ=ZERO
+        if (associated(NODES(inod)%dof%zdofH))  NODES(inod)%dof%zdofH=ZERO
+        if (associated(NODES(inod)%dof%zdofE))  NODES(inod)%dof%zdofE=ZERO
+        if (associated(NODES(inod)%dof%zdofV))  NODES(inod)%dof%zdofV=ZERO
+        if (associated(NODES(inod)%dof%zdofQ))  NODES(inod)%dof%zdofQ=ZERO
 !
       enddo
 !
@@ -158,7 +160,7 @@ subroutine vis_shape_hcurl(Icount)
       do inod=1,NRNODS
 !
 !       skip inactive nodes      
-        if (NODES(inod)%act == 0)  cycle      
+        if (Is_inactive(inod))  cycle
 !
 !       find number of dofs associated to node
         call find_ndof(inod, ndofH,ndofE,ndofV,ndofQ)        
@@ -169,13 +171,13 @@ subroutine vis_shape_hcurl(Icount)
           icount=icount+1
 !
 !         activate
-          NODES(inod)%zdofE(:,idof)=ZONE
+          NODES(inod)%dof%zdofE(:,idof)=ZONE
 !
 !         export
           call paraview_driver
 !
 !         deactivate
-          NODES(inod)%zdofE(:,idof)=ZERO
+          NODES(inod)%dof%zdofE(:,idof)=ZERO
 ! 
         enddo
       enddo
@@ -193,13 +195,13 @@ endsubroutine vis_shape_hcurl
 !
 subroutine vis_shape_hdiv(Icount)
 !
-      use data_structure3D , only : NODES,NRNODS , find_ndof
-      use parameters       , only : ZERO , ZONE
+      use data_structure3D , only : NODES,NRNODS,Is_inactive,find_ndof
+      use parameters       , only : ZERO,ZONE
 !
       implicit none
       integer,intent(out) :: Icount
       integer :: inod,ndofH,ndofE,ndofV,ndofQ,idof
-!      
+!
 !----------------------------------------------------------------------
 !
 !     Step 1 : reset all dofs to zero
@@ -208,13 +210,14 @@ subroutine vis_shape_hdiv(Icount)
       do inod=1,NRNODS
 !      
 !       skip inactive nodes
-        if (NODES(inod)%act == 0)  cycle
+        if (Is_inactive(inod)) cycle
+        if (.not. associated(NODES(inod)%dof)) cycle
 !               
 !       reset all dofs to zero
-        if (associated(NODES(inod)%zdofH))  NODES(inod)%zdofH=ZERO
-        if (associated(NODES(inod)%zdofE))  NODES(inod)%zdofE=ZERO
-        if (associated(NODES(inod)%zdofV))  NODES(inod)%zdofV=ZERO
-        if (associated(NODES(inod)%zdofQ))  NODES(inod)%zdofQ=ZERO
+        if (associated(NODES(inod)%dof%zdofH))  NODES(inod)%dof%zdofH=ZERO
+        if (associated(NODES(inod)%dof%zdofE))  NODES(inod)%dof%zdofE=ZERO
+        if (associated(NODES(inod)%dof%zdofV))  NODES(inod)%dof%zdofV=ZERO
+        if (associated(NODES(inod)%dof%zdofQ))  NODES(inod)%dof%zdofQ=ZERO
 !
       enddo
 !
@@ -226,7 +229,7 @@ subroutine vis_shape_hdiv(Icount)
       do inod=1,NRNODS
 !
 !       skip inactive nodes      
-        if (NODES(inod)%act == 0)  cycle      
+        if (Is_inactive(inod))  cycle
 !
 !       find number of dofs associated to node
         call find_ndof(inod, ndofH,ndofE,ndofV,ndofQ)        
@@ -237,13 +240,13 @@ subroutine vis_shape_hdiv(Icount)
           icount=icount+1
 !          
 !         activate
-          NODES(inod)%zdofV(:,idof)=ZONE
+          NODES(inod)%dof%zdofV(:,idof)=ZONE
 !
 !         export
           call paraview_driver
 !
 !         deactivate
-          NODES(inod)%zdofV(:,idof)=ZERO
+          NODES(inod)%dof%zdofV(:,idof)=ZERO
 ! 
         enddo
       enddo
@@ -261,13 +264,13 @@ endsubroutine vis_shape_hdiv
 !
 subroutine vis_shape_l2(Icount)
 !
-      use data_structure3D , only : NODES,NRNODS , find_ndof
+      use data_structure3D , only : NODES,NRNODS,Is_inactive,find_ndof
       use parameters       , only : ZERO , ZONE
 !
       implicit none
       integer, intent(out) :: Icount
       integer :: inod,ndofH,ndofE,ndofV,ndofQ,idof
-!      
+!
 !----------------------------------------------------------------------
 !
 !     Step 1 : reset all dofs to zero
@@ -276,13 +279,14 @@ subroutine vis_shape_l2(Icount)
       do inod=1,NRNODS
 !      
 !       skip inactive nodes
-        if (NODES(inod)%act == 0)  cycle
+        if (Is_inactive(inod)) cycle
+        if (.not. associated(NODES(inod)%dof)) cycle
 !               
 !       reset all dofs to zero
-        if (associated(NODES(inod)%zdofH))  NODES(inod)%zdofH=ZERO
-        if (associated(NODES(inod)%zdofE))  NODES(inod)%zdofE=ZERO
-        if (associated(NODES(inod)%zdofV))  NODES(inod)%zdofV=ZERO
-        if (associated(NODES(inod)%zdofQ))  NODES(inod)%zdofQ=ZERO
+        if (associated(NODES(inod)%dof%zdofH))  NODES(inod)%dof%zdofH=ZERO
+        if (associated(NODES(inod)%dof%zdofE))  NODES(inod)%dof%zdofE=ZERO
+        if (associated(NODES(inod)%dof%zdofV))  NODES(inod)%dof%zdofV=ZERO
+        if (associated(NODES(inod)%dof%zdofQ))  NODES(inod)%dof%zdofQ=ZERO
 !
       enddo
 !
@@ -294,7 +298,7 @@ subroutine vis_shape_l2(Icount)
       do inod=1,NRNODS
 !
 !       skip inactive nodes      
-        if (NODES(inod)%act == 0)  cycle      
+        if (Is_inactive(inod))  cycle
 !
 !       find number of dofs associated to node
         call find_ndof(inod, ndofH,ndofE,ndofV,ndofQ)        
@@ -305,13 +309,13 @@ subroutine vis_shape_l2(Icount)
           icount=icount+1
 !          
 !         activate
-          NODES(inod)%zdofQ(:,idof)=ZONE
+          NODES(inod)%dof%zdofQ(:,idof)=ZONE
 !
 !         export
           call paraview_driver
 !
 !         deactivate
-          NODES(inod)%zdofQ(:,idof)=ZERO
+          NODES(inod)%dof%zdofQ(:,idof)=ZERO
 ! 
         enddo
       enddo

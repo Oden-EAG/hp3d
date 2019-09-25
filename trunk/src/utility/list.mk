@@ -8,7 +8,6 @@ dumpout.F90
 encod.F
 encodg.F
 encode_order.F
-export_mesh2uhm.F
 fact.F90
 findmin.F
 int2str.F90

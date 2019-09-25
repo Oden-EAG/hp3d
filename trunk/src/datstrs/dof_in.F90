@@ -31,6 +31,11 @@ subroutine dof_in(Nod,ZvalH,ZvalE,ZvalV,ZvalQ)
   ! initiate the node component counters
   ivarH=0; ivarE=0; ivarV=0; ivarQ=0
 
+  if (.not. associated(NODES(Nod)%dof)) then
+    write(*,*) 'dof_in: nod dof not associated. returning.'
+    return
+  endif
+
   ! loop through multiple copies of variables
   do j=1,NRCOMS
 
@@ -44,25 +49,25 @@ subroutine dof_in(Nod,ZvalH,ZvalE,ZvalV,ZvalQ)
                  nvar = (j-1)*NRHVAR+ADRES(i)+k
                  ivarH = ivarH+1
                  if (ndofH.gt.0) then
-                    NODES(Nod)%zdofH(ivarH,1:ndofH) = ZvalH(nvar,1:ndofH) 
+                    NODES(Nod)%dof%zdofH(ivarH,1:ndofH) = ZvalH(nvar,1:ndofH) 
                  endif
               case('tangen')
                  nvar = (j-1)*NREVAR+ADRES(i)+k
                  ivarE = ivarE+1
                  if (ndofE.gt.0) then
-                    NODES(Nod)%zdofE(ivarE,1:ndofE) = ZvalE(nvar,1:ndofE) 
+                    NODES(Nod)%dof%zdofE(ivarE,1:ndofE) = ZvalE(nvar,1:ndofE) 
                  endif
               case('normal')
                  nvar = (j-1)*NRVVAR+ADRES(i)+k
                  ivarV = ivarV+1
                  if (ndofV.gt.0) then
-                    NODES(Nod)%zdofV(ivarV,1:ndofV) = ZvalV(nvar,1:ndofV) 
+                    NODES(Nod)%dof%zdofV(ivarV,1:ndofV) = ZvalV(nvar,1:ndofV) 
                  endif
               case('discon')
                  nvar = (j-1)*NRQVAR+ADRES(i)+k
                  ivarQ = ivarQ+1
                  if (ndofQ.gt.0) then
-                    NODES(Nod)%zdofQ(ivarQ,1:ndofQ) = ZvalQ(nvar,1:ndofQ) 
+                    NODES(Nod)%dof%zdofQ(ivarQ,1:ndofQ) = ZvalQ(nvar,1:ndofQ) 
                  endif
               case default
                  write(*,*) 'dofin: NOT SUPPORT DTYPE ', DTYPE(i)

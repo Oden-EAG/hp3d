@@ -46,7 +46,8 @@ subroutine hp3gen(Fp)
   integer :: iprint, iprint_vert, iprint_edge, iprint_face, iprint_mdle
   integer :: nel, npri, nh, ntet, npyr, np, iv, is, ifc, ie, mdle
   integer :: nt, nrbl, nbl, nr, lab, nord, nod_new, nbcond, nod, nrfaces
-  integer :: nb, nc, i, ib, iii, istat, icase, iphys, num, number
+  integer :: nb, nc, i, ib, iii, istat, icase, iphys, num, number, subd
+  logical :: iact
   !
   ! general
   iprint= -1;
@@ -317,7 +318,8 @@ subroutine hp3gen(Fp)
      case('pyra'); nod_type='mdld'
      end select
      !
-     call nodgen(nod_type,icase,nbcond,-nel,nord,0,-1,1, nod)
+     subd = -1; iact = .true.
+     call nodgen(nod_type,icase,nbcond,-nel,nord,subd,iact, nod)
      if (nod_new.ne.nod) then
         write(*,*) 'hp3gen: nod_new,nod = ',nod_new,nod
         stop 1
@@ -407,7 +409,8 @@ subroutine hp3gen(Fp)
      !  .....encode BC flags for the node into a single nickname
      call encod(ibc_nod,10,NR_PHYSA, nbcond)
      !
-     call nodgen('vert',icase,nbcond,-nel,1,0,-1,1, nod)
+     subd = -1; iact = .true.
+     call nodgen('vert',icase,nbcond,-nel,1,subd,iact, nod)
      if (nod_new.ne.nod) then
         write(*,*) 'hp3gen: nod_new,nod = ',nod_new,nod
         stop 1
@@ -504,7 +507,8 @@ subroutine hp3gen(Fp)
      !  .....encode BC flags for the node into a single nickname
      call encod(ibc_nod,10,NR_PHYSA, nbcond)
      !
-     call nodgen('medg',icase,nbcond,-nel,nord,0,-1,1, nod)
+     subd = -1; iact = .true.
+     call nodgen('medg',icase,nbcond,-nel,nord,subd,iact, nod)
      if (nod_new.ne.nod) then
         write(*,*) 'hp3gen: nod_new,nod = ',nod_new,nod
         stop 1
@@ -590,7 +594,8 @@ subroutine hp3gen(Fp)
      !  ...encode BC flags for the node into a single nickname
      call encod(ibc_nod,10,NR_PHYSA, nbcond)
      !
-     call nodgen('mdlq',icase,nbcond,-nel,nord,0,-1,1, nod)
+     subd = -1; iact = .true.
+     call nodgen('mdlq',icase,nbcond,-nel,nord,subd,iact, nod)
      if (nod_new.ne.nod) then
         write(*,*) 'hp3gen: nod_new,nod = ',nod_new,nod
         stop 1
@@ -679,8 +684,9 @@ subroutine hp3gen(Fp)
      !  .....encode BC flags for the node into a single nickname
      call encod(ibc_nod,10,NR_PHYSA, nbcond)
      !
-     call nodgen('mdlt',icase,nbcond,-nel,nord,0,-1,1, nod)
-
+     subd = -1; iact = .true.
+     call nodgen('mdlt',icase,nbcond,-nel,nord,subd,iact, nod)
+     !
      if (nod_new.ne.nod) then
         write(*,*) 'hp3gen: nod_new,nod = ',nod_new,nod
         stop 1

@@ -1,7 +1,10 @@
 !===============================================================================================================
 !  REMARK : unless you are an advanced user, there is no reason to modify this routine.
+!  REMARK : this routine is only called if ISTC_FLAG is .false. (no static condensation).
 !===============================================================================================================
 !> Purpose : routine computes modified stiffness matrix and load vector for an element
+!
+!  last modified: Sept 2018
 !
 !! @param[in]  Mdle   - an element (middle node) number
 !! @param[in]  Idec   - 1 = info on nodes only ; 2 = compute element matrices as well
@@ -42,24 +45,21 @@ subroutine celem(Mdle,Idec, Nrdofs,Nrdofm,Nrdofc,Nodm,NdofmH,NdofmE,NdofmV,Ndofm
 !
 !  ...this is a hack to eliminate middle node dof for traces in celem_system by using NC flag
 !  ...  We assume the following physical attributes for the Laser problem:
-!		(1) - H1 field for heat,
-!		(2) - Hcurl for Maxwell trace for signal (2 components)
-!           (3) - Hcurl for Maxwell trace for pump (2 components)
+!           (1) - H1 field for heat,
+!           (2) - Hcurl for Maxwell trace for signal (2 components)
+!           (3) - Hcurl for Maxwell trace for pump   (2 components)
 !           (4) - Hdiv trace for heat
 !           (5) - L2 field for Maxwell (signal, 6 components)
-!           (6) - L2 field for Maxwell (pump, 6 components)
+!           (6) - L2 field for Maxwell (pump  , 6 components)
 !
-!     redirect to the system routine
-!
-
    nbcond = 0; nbcond(2:4)=1; ! removes the bubbles (instead of hack solver)
    call encod(nbcond,10,NR_PHYSA, NODES(Mdle)%bcond)
    call set_index(NODES(Mdle)%case,NODES(Mdle)%bcond, NODES(Mdle)%index)
 !
-!..redirect to the system routine (notice the M: only a subset of variables solved for at any one time -- specificed by boolean vector (PHYSAm) in main, before solve is called)
-   call celem_systemM(Mdle,Idec, &
-                     Nrdofs,Nrdofm,Nrdofc, &
-                     Nodm,NdofmH,NdofmE,NdofmV,NdofmQ,Nrnodm, &
+!..redirect to the system routine
+   call celem_system(Mdle,Idec,                            &
+                     Nrdofs,Nrdofm,Nrdofc,Nodm,            &
+                     NdofmH,NdofmE,NdofmV,NdofmQ,Nrnodm,   &
                      Bload,Astif)
 !
 !..reset the BC flags back to zero (unknown) (instead of unhack solver)

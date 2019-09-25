@@ -55,7 +55,7 @@
 !
 subroutine geometry_error(Err,Rnorm)
 !
-      use data_structure3D , only : NRELES
+      use data_structure3D , only : NRELES,ELEM_ORDER
       use environment      , only : QUIET_MODE,L2GEOM
 !      
       implicit none
@@ -80,9 +80,8 @@ subroutine geometry_error(Err,Rnorm)
       Err=0.d0 ; Rnorm=0.d0
 !    
 !     loop over active elements
-      mdle=0
       do iel=1,NRELES
-        call nelcon(mdle, mdle)
+        mdle = ELEM_ORDER(iel)
         call geometry_error_elem(mdle, derr,dnorm)
 !    
 !       accumulate        

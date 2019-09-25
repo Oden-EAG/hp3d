@@ -64,44 +64,57 @@ c  ...determine the current number of dof
 c
 c  ...save current gdofs in local array and update number of gdofs
       if (ndofH.gt.0) then
-        if (Associated(NODES(Nod)%coord)) then
-          xnod(1:NDIMEN,1:ndofH) = NODES(Nod)%coord(1:NDIMEN,1:ndofH)
-          deallocate(NODES(Nod)%coord)
+        if (associated(NODES(Nod)%dof)) then
+          if (associated(NODES(Nod)%dof%coord)) then
+            xnod(1:3,1:ndofH) = NODES(Nod)%dof%coord(1:3,1:ndofH)
+            deallocate(NODES(Nod)%dof%coord)
+          endif
         endif
       endif
 c
 c  ...save current dof in local arrays
       if ((NREQNH(icase).gt.0).and.(ndofH.gt.0)) then
-        if (Associated(NODES(Nod)%zdofH)) then
-          nvar = NREQNH(icase)*NRCOMS
-          zdofH(1:nvar,1:ndofH) = NODES(Nod)%zdofH(1:nvar,1:ndofH)
-          deallocate(NODES(Nod)%zdofH)
+        if (associated(NODES(Nod)%dof)) then
+          if (associated(NODES(Nod)%dof%zdofH)) then
+            nvar = NREQNH(icase)*NRCOMS
+            zdofH(1:nvar,1:ndofH)=NODES(Nod)%dof%zdofH(1:nvar,1:ndofH)
+            deallocate(NODES(Nod)%dof%zdofH)
+          endif
         endif
         NRDOFSH = NRDOFSH - ndofH*NREQNH(icase)
       endif
       if ((NREQNE(icase).gt.0).and.(ndofE.gt.0)) then
-        if (Associated(NODES(Nod)%zdofE)) then
-          nvar = NREQNE(icase)*NRCOMS
-          zdofE(1:nvar,1:ndofE) = NODES(Nod)%zdofE(1:nvar,1:ndofE)
-          deallocate(NODES(Nod)%zdofE)
+        if (associated(NODES(Nod)%dof)) then
+          if (associated(NODES(Nod)%dof%zdofE)) then
+            nvar = NREQNE(icase)*NRCOMS
+            zdofE(1:nvar,1:ndofE)=NODES(Nod)%dof%zdofE(1:nvar,1:ndofE)
+            deallocate(NODES(Nod)%dof%zdofE)
+          endif
         endif
         NRDOFSE = NRDOFSE - ndofE*NREQNE(icase)
       endif
       if ((NREQNV(icase).gt.0).and.(ndofV.gt.0)) then
-        if (Associated(NODES(Nod)%zdofV)) then
-          nvar = NREQNV(icase)*NRCOMS
-          zdofV(1:nvar,1:ndofV) = NODES(Nod)%zdofV(1:nvar,1:ndofV)
-          deallocate(NODES(Nod)%zdofV)
+        if (associated(NODES(Nod)%dof)) then
+          if (associated(NODES(Nod)%dof%zdofV)) then
+            nvar = NREQNV(icase)*NRCOMS
+            zdofV(1:nvar,1:ndofV)=NODES(Nod)%dof%zdofV(1:nvar,1:ndofV)
+            deallocate(NODES(Nod)%dof%zdofV)
+          endif
         endif
         NRDOFSV = NRDOFSV - ndofV*NREQNV(icase)
       endif
       if ((NREQNQ(icase).gt.0).and.(ndofQ.gt.0)) then
-        if (Associated(NODES(Nod)%zdofQ)) then
-          nvar = NREQNQ(icase)*NRCOMS
-          zdofQ(1:nvar,1:ndofQ) = NODES(Nod)%zdofQ(1:nvar,1:ndofQ)
-          deallocate(NODES(Nod)%zdofQ)
+        if (associated(NODES(Nod)%dof)) then
+          if (associated(NODES(Nod)%dof%zdofQ)) then
+            nvar = NREQNQ(icase)*NRCOMS
+            zdofQ(1:nvar,1:ndofQ)=NODES(Nod)%dof%zdofQ(1:nvar,1:ndofQ)
+            deallocate(NODES(Nod)%dof%zdofQ)
+          endif
         endif
         NRDOFSQ = NRDOFSQ - ndofQ*NREQNQ(icase)
+      endif
+      if (associated(NODES(Nod)%dof)) then
+         deallocate(NODES(Nod)%dof)
       endif
 c
 c  ...save number of dof corresponding to the old order
@@ -125,56 +138,67 @@ c  ...find out whether node is inside my subdomain
          if (RANK .ne. subd) act_dof = 0
       endif
 c
+      if (act_dof .eq. 1) then
+        allocate(NODES(Nod)%dof)
+        nullify(NODES(Nod)%dof%coord)
+        nullify(NODES(Nod)%dof%zdofH)
+        nullify(NODES(Nod)%dof%zdofE)
+        nullify(NODES(Nod)%dof%zdofV)
+        nullify(NODES(Nod)%dof%zdofQ)
+      endif
+c
 c  ...allocate memory for geometry and solution dof
 c     and copy old dof from the local arrays
       if (ndofH.gt.0) then
-        allocate(NODES(Nod)%coord(NDIMEN,ndofH))
-        NODES(Nod)%coord(1:NDIMEN, 1:ndofH) = 0.d0
-        ndofHm = min(ndofH,ndofHo)
-        NODES(Nod)%coord(1:NDIMEN, 1:ndofHm) = 
-     .              xnod(1:NDIMEN, 1:ndofHm)
+        if (act_dof.eq.1) then
+          allocate(NODES(Nod)%dof%coord(3,ndofH))
+          NODES(Nod)%dof%coord(1:3, 1:ndofH) = 0.d0
+          ndofHm = min(ndofH,ndofHo)
+          NODES(Nod)%dof%coord(1:3, 1:ndofHm) = 
+     .                   xnod(1:3, 1:ndofHm)
+        endif
       endif
       if ((NREQNH(icase).gt.0).and.(ndofH.gt.0)) then
         if (act_dof.eq.1) then
           nvar = NREQNH(icase)*NRCOMS
-          allocate( NODES(Nod)%zdofH(nvar, ndofH))
-          NODES(Nod)%zdofH(1:nvar, 1:ndofH) = ZERO
+          allocate(NODES(Nod)%dof%zdofH(nvar, ndofH))
+          NODES(Nod)%dof%zdofH(1:nvar, 1:ndofH) = ZERO
           ndofHm = min(ndofH,ndofHo)
-          NODES(Nod)%zdofH(1:nvar, 1:ndofHm) =
-     .               zdofH(1:nvar, 1:ndofHm)
+          NODES(Nod)%dof%zdofH(1:nvar, 1:ndofHm) =
+     .                   zdofH(1:nvar, 1:ndofHm)
         endif
         NRDOFSH = NRDOFSH + ndofH*NREQNH(icase)
       endif
       if ((NREQNE(icase).gt.0).and.(ndofE.gt.0)) then
         if (act_dof.eq.1) then
           nvar = NREQNE(icase)*NRCOMS
-          allocate( NODES(Nod)%zdofE(nvar, ndofE))
-          NODES(Nod)%zdofE(1:nvar, 1:ndofE) = ZERO
+          allocate(NODES(Nod)%dof%zdofE(nvar, ndofE))
+          NODES(Nod)%dof%zdofE(1:nvar, 1:ndofE) = ZERO
           ndofEm = min(ndofE,ndofEo)
-          NODES(Nod)%zdofE(1:nvar, 1:ndofEm) =
-     .               zdofE(1:nvar, 1:ndofEm)
+          NODES(Nod)%dof%zdofE(1:nvar, 1:ndofEm) =
+     .                   zdofE(1:nvar, 1:ndofEm)
         endif
         NRDOFSE = NRDOFSE + ndofE*NREQNE(icase)
       endif
       if ((NREQNV(icase).gt.0).and.(ndofV.gt.0)) then
         if (act_dof.eq.1) then
           nvar = NREQNV(icase)*NRCOMS
-          allocate( NODES(Nod)%zdofV(nvar, ndofV))
-          NODES(Nod)%zdofV(1:nvar, 1:ndofV) = ZERO
+          allocate(NODES(Nod)%dof%zdofV(nvar, ndofV))
+          NODES(Nod)%dof%zdofV(1:nvar, 1:ndofV) = ZERO
           ndofVm = min(ndofV,ndofVo)
-          NODES(Nod)%zdofV(1:nvar, 1:ndofVm) =
-     .               zdofV(1:nvar, 1:ndofVm)
+          NODES(Nod)%dof%zdofV(1:nvar, 1:ndofVm) =
+     .                   zdofV(1:nvar, 1:ndofVm)
         endif
         NRDOFSV = NRDOFSV + ndofV*NREQNV(icase)
       endif
       if ((NREQNQ(icase).gt.0).and.(ndofQ.gt.0)) then
         if (act_dof.eq.1) then
           nvar = NREQNQ(icase)*NRCOMS
-          allocate( NODES(Nod)%zdofQ(nvar, ndofQ))
-          NODES(Nod)%zdofQ(1:nvar, 1:ndofQ) = ZERO
+          allocate(NODES(Nod)%dof%zdofQ(nvar, ndofQ))
+          NODES(Nod)%dof%zdofQ(1:nvar, 1:ndofQ) = ZERO
           ndofQm = min(ndofQ,ndofQo)
-          NODES(Nod)%zdofQ(1:nvar, 1:ndofQm) =
-     .               zdofQ(1:nvar, 1:ndofQm)
+          NODES(Nod)%dof%zdofQ(1:nvar, 1:ndofQm) =
+     .                   zdofQ(1:nvar, 1:ndofQm)
         endif
         NRDOFSQ = NRDOFSQ + ndofQ*NREQNQ(icase)
       endif

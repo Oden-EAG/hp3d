@@ -67,7 +67,7 @@ C         do j=nrv+1,nrv+nre+nrf+1
           nod = Nodesl(j)
 c
 c  .......if nod is active
-          if (NODES(nod)%act.eq.1) then
+          if (Is_active(nod)) then
 c
             NODES(nod)%visit = 1
             nrs = NODES(nod)%nr_sons
@@ -143,7 +143,7 @@ c  ...........parent mid-edge nodes (south,north)
               do ip=1,3,2
                 nodp = iabs(NFACE_CONS(ip,nc))
                 NODES(nodp)%visit = 1
-                if (NODES(nodp)%act.eq.0) then
+                if (Is_inactive(nodp)) then
                   nodp = NODES(nodp)%father
                   NODES(nodp)%visit = 1
                 endif
@@ -168,7 +168,7 @@ c  ...........parent mid-edge nodes (east,west)
               do ip=2,4,2
                 nodp = iabs(NFACE_CONS(ip,nc))
                 NODES(nodp)%visit = 1
-                if (NODES(nodp)%act.eq.0) then
+                if (Is_inactive(nodp)) then
                   nodp = NODES(nodp)%father
                   NODES(nodp)%visit = 1
                 endif
@@ -214,9 +214,8 @@ c
 c-----------------------------------------------------------------------
 c
 c  ...Step 2: loop through all elements
-      mdle=0
       do iel=1,NRELES
-        call nelcon(mdle, mdle)
+        mdle = ELEM_ORDER(iel)
         call elem_nodes(mdle, nodesl, norientl)
 c
 c  .....determine order of element nodes implied by the middle

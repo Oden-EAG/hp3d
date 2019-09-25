@@ -1,5 +1,5 @@
 !---------------------------------------------------------------------
-!   latest revision    - Jun 15
+!   latest revision    - Aug 2019
 !
 !   purpose            - set index for a node using the nodal case
 !                        and boundary condition flags
@@ -143,11 +143,13 @@ subroutine set_index(Icase,Iflag, Index)
               if ((ibcd(i).eq.7).and.(j.eq.2)) indexd(ic)=3
 !
 !  ...........Dirichlet BC on 3rd component
-              if ((ibcd(i).eq.8).and.(j.eq.3)) indexd(ic)=3
+              !if ((ibcd(i).eq.8).and.(j.eq.3)) indexd(ic)=3
 !
 !          ...specific for impedance
-!  ...........Dirichlet BC on 2rd component
-              if ((ibcd(i).eq.9).and.(j.eq.2)) indexd(ic)=3              
+!  ...........Impedance BC for Primal Maxwell
+              if ((ibcd(i).eq.8).and.(j.eq.1)) indexd(ic)=3
+!  ...........Impedance BC for UW Maxwell
+              if ((ibcd(i).eq.9).and.(j.eq.2)) indexd(ic)=3
             enddo
 !
 !  .......H(div) variable

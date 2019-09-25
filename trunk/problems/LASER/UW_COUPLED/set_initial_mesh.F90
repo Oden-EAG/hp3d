@@ -4,12 +4,13 @@
 !
 !--------------------------------------------------------------------
 !
-!     latest revision   - Jul 18
+!     latest revision   - Apr 2019
 !
 !     purpose           - TODO
 !
 !     arguments
 !            out:       - Nelem_order
+!                       (polynomial order of each initial mesh element)
 !
 !--------------------------------------------------------------------
 !
@@ -18,40 +19,88 @@ subroutine set_initial_mesh(Nelem_order)
    use GMP
    use parameters
    use data_structure3D
-   use CommonParam
+   use commonParam
+   use mpi_param, only: RANK,ROOT
 !
    implicit none
 !
 !..polynomial order for initial mesh elements
-   integer, dimension(NRELIS), intent(out) :: Nelem_order
+   integer, intent(out) :: Nelem_order(NRELIS)
 !
-   integer                 :: iel,ndom,i,ifc,neig
+!..element type
+   character(len=4) :: etype
+!
+   integer :: iel,ndom,i,ifc,neig,max_order
+!
+!..dimension = num_faces * num_phys
    integer, dimension(6,6) :: ibc
 !
 !----------------------------------------------------------------------
 !
 !..check if have not exceeded the maximum order
-   if (ORDER_APPROX.gt.MAXP) then
-      write(*,1000) 'set_initial_mesh: ',ORDER_APPROX,MAXP
- 1000 format(A,'ORDER_APPROX = ',I3,', MAXP = ', I3, '. stop.')
+   max_order = max(ORDER_APPROX_X,ORDER_APPROX_Y,ORDER_APPROX_Z)
+   if (max_order.gt.MAXP) then
+      write(*,1000) 'set_initial_mesh: ',max_order,MAXP
+ 1000 format(A,'max_order = ',I3,', MAXP = ', I3, '. stop.')
       stop
    endif
 !
 !..
-   write(*,1010) GEOM_NO
+   if (RANK .eq. ROOT) write(*,1010) GEOM_NO
  1010 format(' GEOM_NO = ',I1,/)
 !
 !..loop through initial mesh elements
    do iel=1,NRELIS
 !
+      etype = ELEMS(iel)%type
+!
 !  STEP 1 : set up order of approximation (elements may have different
 !           orders in each direction)
-      select case(ELEMS(iel)%Type)
-         case('pris') ; Nelem_order(iel)=ORDER_APPROX*11
-         case('bric') ; Nelem_order(iel)=ORDER_APPROX*111
-         case('tetr') ; Nelem_order(iel)=ORDER_APPROX*1
-         case('pyra') ; Nelem_order(iel)=ORDER_APPROX*1
+      if (etype .ne. 'bric' .and. etype .ne. 'pris') then
+         write(*,*) 'set_initial mesh: element type not equal bric/pris. stop'
+         stop
+      endif
+
+!  ...uniform isotropic polynomial order
+!      select case(etype)
+!         case('pris') ; Nelem_order(iel)=ORDER_APPROX*11
+!         case('bric') ; Nelem_order(iel)=ORDER_APPROX*111
+!         case('tetr') ; Nelem_order(iel)=ORDER_APPROX*1
+!         case('pyra') ; Nelem_order(iel)=ORDER_APPROX*1
+!      end select
+
+!  ...uniform anisotropic polynomial order (geometry axes: x-y-z)
+      select case(etype)
+         case('pris')
+            if (ORDER_APPROX_X .ne. ORDER_APPROX_Y) then
+               write(*,*) 'set_initial mesh: pris requires ', &
+                          'ORDER_APPROX_X=ORDER_APPROX_Y. stop.'
+               stop
+            endif
+            Nelem_order(iel)= ORDER_APPROX_X*10 + &
+                              ORDER_APPROX_Z*1
+         case('bric')
+            Nelem_order(iel)= ORDER_APPROX_X*100 + &
+                              ORDER_APPROX_Y*10  + &
+                              ORDER_APPROX_Z*1
       end select
+!
+!  ...non-uniform polynomial order (HEXA)
+!  ...set p differently in core and cladding of fiber geometry
+!  ...TODO: apply min/max rule afterwards
+!      if(etype .eq. 'bric') then
+!         call domain_number(iel, ndom)
+!         write(*,1020) 'iel = ', iel, ' , ndom = ', ndom
+! 1020    format(A,i2,A,i2)
+!         if (ndom .eq. 1) then
+!            Nelem_order(iel) = 777
+!         elseif (ndom .le. 5) then
+!            Nelem_order(iel) = 666
+!         else
+!            Nelem_order(iel) = 555
+!         endif
+!      endif
+
 !
 !  STEP 2 : set up physics
 !
@@ -68,17 +117,24 @@ subroutine set_initial_mesh(Nelem_order)
 !  ...initialize BC flags
       ibc = 0
       select case(GEOM_NO)
-!     ...single cube with Dirichlet, PEC BC on all faces
-			case(1)
-            do ifc=1,nface(ELEMS(iel)%Type)
+!     ...single cube/brick with Dirichlet
+!        perfect electrical conductor (PEC) BC on all faces
+			case (1)
+            do ifc=1,nface(etype)
                neig = ELEMS(iel)%neig(ifc)
                select case(neig)
                   case(0)
+!                 ...dirichlet on heat
                      ibc(ifc,1) = 1
+!                 ...BCs on EH-traces signal and pump
                      if((IBCFLAG.eq.3).and.(ifc.eq.2)) then
-                        ibc(ifc,2) = 9
+!                    ...impedance on z=L face
+!                    ...signal
+                        ibc(ifc,2) = 9 !..sets dirichlet flag on H-trace
+!                    ...pump
                         ibc(ifc,3) = 9
                      else
+!                    ...dirichlet on E-trace
                         ibc(ifc,2) = 6
                         ibc(ifc,3) = 6
                      endif
@@ -86,74 +142,38 @@ subroutine set_initial_mesh(Nelem_order)
 !                 ...do nothing
                end select
             enddo
-!     ...fiber core prism: fpcor_curv or fpcor_str
-			case (2)
-            call domain_number(iel, ndom)
-            do ifc=1,nface(ELEMS(iel)%Type)
-               neig = ELEMS(iel)%neig(ifc)
-               select case(neig)
-                  case(0)
-                     ibc(ifc,1) = 1
-                     ibc(ifc,2) = 6
-                     ibc(ifc,3) = 6
-                  case default
-!                 ...do nothing
-               end select
-            enddo
 !
-!     ...full fiber prism: fpcc_curv or fpcc_str
-         case (3)
-            call domain_number(iel, ndom)
-            do ifc=1,nface(ELEMS(iel)%Type)
-               neig = ELEMS(iel)%neig(ifc)
-               select case(neig)
-                  case(0)
-                     ibc(ifc,1) = 1
-                     ibc(ifc,2) = 6
-                     ibc(ifc,3) = 6
-                  case default
-!                 ...do nothing
-               end select
-          enddo
-!
-!     ...fiber core only hexa: fhcor_curv or fhcor_str
+!     ...fiber core hexa: fhcor_curv or fhcor_str
          case (4)
-            call domain_number(iel, ndom)
-            do ifc=1,nface(ELEMS(iel)%Type)
+            do ifc=1,nface(etype)
                neig = ELEMS(iel)%neig(ifc)
                select case(neig)
                   case(0)
+!                 ...dirichlet on heat
                      ibc(ifc,1) = 1
-                     ibc(ifc,2) = 6
-                     ibc(ifc,3) = 6
+!                 ...dirichlet on E-trace
+                     ibc(ifc,2) = 6 ! signal
+                     ibc(ifc,3) = 6 ! pump
                end select
             enddo
 !
 !     ...full fiber hexa: fhcc_curv or fhcc_str
          case (5)
-            call domain_number(iel, ndom)
-            do ifc=1,nface(ELEMS(iel)%Type)
+            do ifc=1,nface(etype)
                neig = ELEMS(iel)%neig(ifc)
                select case(neig)
                   case(0)
+!                 ...dirichlet on heat
                      ibc(ifc,1) = 1
-                     ibc(ifc,2) = 6
-                     ibc(ifc,3) = 6
+!                 ...dirichlet on E-trace
+                     ibc(ifc,2) = 6 ! signal
+                     ibc(ifc,3) = 6 ! pump
                end select
             enddo
 !
-!     ...single prism with Dirichlet, PEC BC on 5 out of 6 faces
-!     ...Impedance one one face
-         case(6)
-            do ifc=1,nface(ELEMS(iel)%Type)
-               neig = ELEMS(iel)%neig(ifc)
-               select case(neig)
-                  case(0)
-                     ibc(ifc,1) = 1
-                     ibc(ifc,2) = 6
-                     ibc(ifc,3) = 6
-               end select
-            enddo
+         case default
+            write(*,*) 'set_initial_mesh: invalid GEOM_NO. stop.'
+            stop
 !
 !  ...end select GEOM_NO
       end select
@@ -161,8 +181,8 @@ subroutine set_initial_mesh(Nelem_order)
 !  ...allocate BC flags (one per attribute)
       allocate(ELEMS(iel)%bcond(6))
 !
-!  ...for each attribute, encode face BC into a single BC flag
-      do i=1,6
+!  ...for each physics variable, encode face BC into a single BC flag
+      do i=1,NR_PHYSA
          call encodg(ibc(1:6,i),10,6, ELEMS(iel)%bcond(i))
       enddo
 !

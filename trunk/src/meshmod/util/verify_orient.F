@@ -40,9 +40,8 @@ c
 c
 c  ...loop through elements and record mid-edge node and mid-face
 c     node orientations as seen by the elements
-      mdle=0
       do iel=1,NRELES
-        call nelcon(mdle, mdle)
+        mdle = ELEM_ORDER(iel)
         nrv = nvert(NODES(mdle)%type)
         nre = nedge(NODES(mdle)%type)
         nrf = nface(NODES(mdle)%type)

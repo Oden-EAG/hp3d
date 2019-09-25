@@ -61,13 +61,16 @@ subroutine distr_mesh()
 !..1. Determine new partition
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    if ((ZOLTAN_LB .eq. 0) .or. (.not. DISTRIBUTED)) then
+      subd_size = (NRELES+NUM_PROCS-1)/NUM_PROCS
       iproc=0
       do iel=1,NRELES
 !     ...decide subdomain for iel
          subd_next(iel) = iproc
-         subd_size = (NRELES+NUM_PROCS-1)/NUM_PROCS
          iproc = iel/subd_size
       enddo
+   elseif (ZOLTAN_LB .eq. 7) then
+      if (RANK .eq. ROOT) write(*,*) 'calling partition_fiber...'
+      call partition_fiber(subd_next)
    else
       call zoltan_w_partition(subd_next)
    endif
@@ -245,31 +248,40 @@ subroutine alloc_nod_dof(Nod)
    nvarE = NREQNE(icase)*NRCOMS
    nvarV = NREQNV(icase)*NRCOMS
    nvarQ = NREQNQ(icase)*NRCOMS
+!..allocate dof data type
+   if (.not. associated(NODES(Nod)%dof)) then
+      allocate(NODES(Nod)%dof)
+      nullify(NODES(Nod)%dof%coord)
+      nullify(NODES(Nod)%dof%zdofH)
+      nullify(NODES(Nod)%dof%zdofE)
+      nullify(NODES(Nod)%dof%zdofV)
+      nullify(NODES(Nod)%dof%zdofQ)
+   endif
 !..allocate geometry DOFs
-   if (.not. associated(NODES(Nod)%coord) .and. (ndofH .gt. 0)) then
-      allocate( NODES(Nod)%coord(NDIMEN, ndofH))
+   if (.not. associated(NODES(Nod)%dof%coord) .and. (ndofH .gt. 0)) then
+      allocate(NODES(Nod)%dof%coord(NDIMEN, ndofH))
+      NODES(Nod)%dof%coord = 0.d0
    endif
-   NODES(Nod)%coord = 0.d0
 !..allocate H1 DOFS
-   if (.not. associated(NODES(Nod)%zdofH) .and. (ndofH .gt. 0)) then
-      allocate( NODES(Nod)%zdofH(nvarH, ndofH))
+   if (.not. associated(NODES(Nod)%dof%zdofH) .and. (ndofH .gt. 0)) then
+      allocate(NODES(Nod)%dof%zdofH(nvarH, ndofH))
+      NODES(Nod)%dof%zdofH = ZERO
    endif
-   NODES(Nod)%zdofH = ZERO
 !..allocate H(curl) DOFs
-   if (.not. associated(NODES(Nod)%zdofE) .and. (ndofE .gt. 0)) then
-      allocate( NODES(Nod)%zdofE(nvarE, ndofE))
+   if (.not. associated(NODES(Nod)%dof%zdofE) .and. (ndofE .gt. 0)) then
+      allocate(NODES(Nod)%dof%zdofE(nvarE, ndofE))
+      NODES(Nod)%dof%zdofE = ZERO
    endif
-   NODES(Nod)%zdofE = ZERO
 !..allocate H(div) DOFs
-   if (.not. associated(NODES(Nod)%zdofV) .and. (ndofV .gt. 0)) then
-      allocate( NODES(Nod)%zdofV(nvarV, ndofV))
+   if (.not. associated(NODES(Nod)%dof%zdofV) .and. (ndofV .gt. 0)) then
+      allocate(NODES(Nod)%dof%zdofV(nvarV, ndofV))
+      NODES(Nod)%dof%zdofV = ZERO
    endif
-   NODES(Nod)%zdofV = ZERO
 !..allocate L2 DOFs
-   if (.not. associated(NODES(Nod)%zdofQ) .and. (ndofQ .gt.  0)) then
-      allocate( NODES(Nod)%zdofQ(nvarQ, ndofQ))
+   if (.not. associated(NODES(Nod)%dof%zdofQ) .and. (ndofQ .gt.  0)) then
+      allocate(NODES(Nod)%dof%zdofQ(nvarQ, ndofQ))
+      NODES(Nod)%dof%zdofQ = ZERO
    endif
-   NODES(Nod)%zdofQ = ZERO
 end subroutine alloc_nod_dof
 !
 !----------------------------------------------------------------------
@@ -278,11 +290,14 @@ end subroutine alloc_nod_dof
 !----------------------------------------------------------------------
 subroutine dealloc_nod_dof(Nod)
    integer, intent(in) :: Nod
-   if (associated(NODES(Nod)%coord)) deallocate(NODES(Nod)%coord) 
-   if (associated(NODES(Nod)%zdofH)) deallocate(NODES(Nod)%zdofH)
-   if (associated(NODES(Nod)%zdofE)) deallocate(NODES(Nod)%zdofE)
-   if (associated(NODES(Nod)%zdofV)) deallocate(NODES(Nod)%zdofV)
-   if (associated(NODES(Nod)%zdofQ)) deallocate(NODES(Nod)%zdofQ)
+   if (associated(NODES(Nod)%dof)) then
+     if (associated(NODES(Nod)%dof%coord)) deallocate(NODES(Nod)%dof%coord) 
+     if (associated(NODES(Nod)%dof%zdofH)) deallocate(NODES(Nod)%dof%zdofH)
+     if (associated(NODES(Nod)%dof%zdofE)) deallocate(NODES(Nod)%dof%zdofE)
+     if (associated(NODES(Nod)%dof%zdofV)) deallocate(NODES(Nod)%dof%zdofV)
+     if (associated(NODES(Nod)%dof%zdofQ)) deallocate(NODES(Nod)%dof%zdofQ)
+     deallocate(NODES(Nod)%dof)
+   endif
 end subroutine dealloc_nod_dof
 !
 !----------------------------------------------------------------------
@@ -331,35 +346,35 @@ subroutine pack_dof_buf(Nod,Nrdof_nod, Buf)
 !..add geometry dof to buffer
    if(ndofH .gt. 0) then
       do ivar=1,NDIMEN
-         Buf(j+1:j+ndofH) = NODES(Nod)%coord(ivar,1:ndofH)
+         Buf(j+1:j+ndofH) = NODES(Nod)%dof%coord(ivar,1:ndofH)
          j = j + ndofH
       enddo
    endif
 !..add H1 dof to buffer
    if(nvarH .gt. 0 .and. ndofH .gt. 0) then
       do ivar=1,nvarH
-         Buf(j+1:j+ndofH) = NODES(Nod)%zdofH(ivar,1:ndofH)
+         Buf(j+1:j+ndofH) = NODES(Nod)%dof%zdofH(ivar,1:ndofH)
          j = j + ndofH
       enddo
    endif
 !..add H(curl) dof to buffer
    if(nvarE .gt. 0 .and. ndofE .gt. 0) then
       do ivar=1,nvarE
-         Buf(j+1:j+ndofE) = NODES(Nod)%zdofE(ivar,1:ndofE)
+         Buf(j+1:j+ndofE) = NODES(Nod)%dof%zdofE(ivar,1:ndofE)
          j = j + ndofE
       enddo
    endif
 !..add H(div) dof to buffer
    if(nvarV .gt. 0 .and. ndofV .gt. 0) then
       do ivar=1,nvarV
-         Buf(j+1:j+ndofV) = NODES(Nod)%zdofV(ivar,1:ndofV)
+         Buf(j+1:j+ndofV) = NODES(Nod)%dof%zdofV(ivar,1:ndofV)
          j = j + ndofV
       enddo
    endif
 !..add L2 dof to buffer
    if(nvarQ .gt. 0 .and. ndofQ .gt. 0) then
       do ivar=1,nvarQ
-         Buf(j+1:j+ndofQ) = NODES(Nod)%zdofQ(ivar,1:ndofQ)
+         Buf(j+1:j+ndofQ) = NODES(Nod)%dof%zdofQ(ivar,1:ndofQ)
          j = j + ndofQ
       enddo
    endif
@@ -395,35 +410,35 @@ subroutine unpack_dof_buf(Nod,Nrdof_nod,Buf)
 !..extract geometry dof from buffer
    if(ndofH .gt. 0) then
       do ivar=1,NDIMEN
-         NODES(Nod)%coord(ivar,1:ndofH) = Buf(j+1:j+ndofH)
+         NODES(Nod)%dof%coord(ivar,1:ndofH) = Buf(j+1:j+ndofH)
          j = j + ndofH
       enddo
    endif
 !..extract H1 dof from buffer
    if(nvarH .gt. 0 .and. ndofH .gt. 0) then
       do ivar=1,nvarH
-         NODES(Nod)%zdofH(ivar,1:ndofH) = Buf(j+1:j+ndofH)
+         NODES(Nod)%dof%zdofH(ivar,1:ndofH) = Buf(j+1:j+ndofH)
          j = j + ndofH
       enddo
    endif
 !..extract H(curl) dof from buffer
    if(nvarE .gt. 0 .and. ndofE .gt. 0) then
       do ivar=1,nvarE
-         NODES(Nod)%zdofE(ivar,1:ndofE) = Buf(j+1:j+ndofE)
+         NODES(Nod)%dof%zdofE(ivar,1:ndofE) = Buf(j+1:j+ndofE)
          j = j + ndofE
       enddo
    endif
 !..extract H(div) dof from buffer
    if(nvarV .gt. 0 .and. ndofV .gt. 0) then
       do ivar=1,nvarV
-         NODES(Nod)%zdofV(ivar,1:ndofV) = Buf(j+1:j+ndofV)
+         NODES(Nod)%dof%zdofV(ivar,1:ndofV) = Buf(j+1:j+ndofV)
          j = j + ndofV
       enddo
    endif
 !..extract L2 dof from buffer
    if(nvarQ .gt. 0 .and. ndofQ .gt. 0) then
       do ivar=1,nvarQ
-         NODES(Nod)%zdofQ(ivar,1:ndofQ) = Buf(j+1:j+ndofQ)
+         NODES(Nod)%dof%zdofQ(ivar,1:ndofQ) = Buf(j+1:j+ndofQ)
          j = j + ndofQ
       enddo
    endif

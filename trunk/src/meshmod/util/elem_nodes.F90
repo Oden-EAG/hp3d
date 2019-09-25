@@ -104,11 +104,7 @@ subroutine elem_nodes(Mdle, Nodesl,Norientl)
      write(*,7202) FATH_ORIENT(1:n_nodes)
 7202 format('NODES ORIENT = ',27i6)
      write(*,7203) FATH_TYPE,SON_NUM
-#ifdef _PYHP3D
-7203 format('FATH_TYPE = ',i2,' SON_NUM = ',i1)
-#else
 7203 format('FATH_TYPE = ',a5,' SON_NUM = ',i1)
-#endif
      call pause
   endif
 end subroutine elem_nodes

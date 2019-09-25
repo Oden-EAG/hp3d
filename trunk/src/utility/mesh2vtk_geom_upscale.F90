@@ -15,12 +15,8 @@ subroutine mesh2vtk_geom_upscale(Nout, Isel, Is)
 !
       type(vis) :: vis_obj
 !      
-#ifdef _PYHP3D
-      integer :: type
-#else
       character(len=4) :: type
-#endif
-
+!
        integer :: &
        i, iv, iel, ioffs, mdle, ndom, &
        nodesl(27), norder(19), &

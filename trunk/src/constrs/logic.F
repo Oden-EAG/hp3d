@@ -59,21 +59,6 @@ c
      .          NacV(NACDIM,MAXbrickV),ConstrV(NACDIM,MAXbrickV)
 c
 c  ...middle node type
-#ifdef _PYHP3D
-      integer :: etype
- 7002     format('im = ',i3,' nod = ',i6,' TYPE = ',i2,' ORDER = ',i3,
-     .      ' naH = ',i3,' NdofmH = ',i3,
-     .      ' naE = ',i3,' NdofmE = ',i3,
-     .      ' naV = ',i3,' NdofmV = ',i3)
- 7030       format('logic: ACTIVE NODE      i = ',i3,' nod = ',i6,
-     .             ' TYPE = ',i2,' ORDER = ',i2)
- 7031       format('logic: CONSTRAINED NODE i = ',i3,' nod = ',i6,
-     .             ' TYPE = ',i2,' ORDER = ',i2,' icase = ',i2,
-     .             ' EDGE NODES = ',i5,2x,2i5)
- 7032       format('logic: CONSTRAINED NODE i = ',i3,' nod = ',i6,
-     .             ' TYPE = ',i2,' ORDER = ',i2,' icase = ',i2,
-     .             ' FACE NODES = ',i5,2x,4i5,2x,4i5)
-#else
       character(len=4) :: etype
  7002     format('im = ',i3,' nod = ',i6,' TYPE = ',a6,' ORDER = ',i3,
      .      ' naH = ',i3,' NdofmH = ',i3,
@@ -87,7 +72,6 @@ c  ...middle node type
  7032       format('logic: CONSTRAINED NODE i = ',i3,' nod = ',i6,
      .             ' TYPE = ',a6,' ORDER = ',i2,' icase = ',i2,
      .             ' FACE NODES = ',i5,2x,4i5,2x,4i5)
-#endif
 c
 c  ...element local nodes, orientations
       dimension nodesl(27),norientl(27)
@@ -204,9 +188,9 @@ c
 c======================================================================
 c       NODE IS UNCONSTRAINED                                         |
 c======================================================================
-C         if (NODES(nod)%act == 1) then
-        if ((NODES(nod)%act == 1) .or.    
-     .      (NODES(nod)%act == 0 .and. NODES(nod)%ref_kind /= 0)) then
+C         if (Is_active(nod)) then
+        if ((Is_active(nod)) .or.
+     .      (Is_inactive(nod) .and. NODES(nod)%ref_kind /= 0)) then
 c
 c         node location on the list of modified element's nodes
 ccc       loc=NODES(nod)%visit
@@ -912,13 +896,12 @@ c
 c           parent mid-edge nodes (south,north)
             do ip=1,3,2
               nodp = iabs(NFACE_CONS(ip,nc))
-              select case(NODES(nodp)%act)
-              case(1)
+              if (Is_active(nodp)) then
                 ncflag(ip)=0
                 call locate(nodp,Nodm,Nrnodm, locp(ip))
                 ndofHp(ip) = 1
                 ndofEp(ip) = 1
-              case(0)
+              else
 c           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !            ...added by S.P Mar 07 2018              
                 select case(NODES(nodp)%ref_kind)
@@ -936,7 +919,7 @@ c                  call locate(nodp,NODES(nfath)%sons(1:2),2, ncflag(ip))
                   ndofEp(ip) = NODES(nfath)%order
                 end select
 c           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-              end select  
+              endif
             enddo
 c
 c           H1::loop through the constrained mid-edge node dof
@@ -1124,13 +1107,12 @@ c
 c           parent mid-edge nodes (east,west)
             do ip=2,4,2
               nodp = iabs(NFACE_CONS(ip,nc))
-              select case(NODES(nodp)%act)
-              case(1)
+              if (Is_active(nodp)) then
                 ncflag(ip)=0
                 call locate(nodp,Nodm,Nrnodm, locp(ip))
                 ndofHp(ip) = 1
                 ndofEp(ip) = 1
-              case(0)
+              else
 c           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 !            ...added by S.P Mar 07 2018       
                 select case(NODES(nodp)%ref_kind)
@@ -1148,7 +1130,7 @@ c                  call locate(nodp,NODES(nfath)%sons(1:2),2, ncflag(ip))
                   ndofEp(ip) = NODES(nfath)%order
                 end select
 c           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-              endselect  
+              endif
             enddo
 c
 c           H1::loop through the constrained mid-edge node dof

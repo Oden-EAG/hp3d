@@ -19,11 +19,7 @@
     real*8, dimension(2) :: t
     real*8, dimension(3) :: xi, xp
     real*8               :: xnod(NDIMEN,MAXbrickH)
-#ifdef _PYHP3D
-    integer :: type
-#else
     character(len=4)     :: type
-#endif
     VTYPE :: &
          zdofH(MAXEQNH,MAXbrickH), &
          zdofE(MAXEQNE,MAXbrickE), &
@@ -86,13 +82,8 @@
 
           do j=0,NRSUB
              select case(face_type(type,iface))
-#ifdef _PYHP3D
-             case(NODE_TYPE_TRI);   nsub=NRSUB-j
-             case(NODE_TYPE_QUAD);   nsub=NRSUB
-#else
              case('tria');   nsub=NRSUB-j
              case('rect');   nsub=NRSUB
-#endif
              end select
 
              do i=0,nsub

@@ -1,8 +1,0 @@
-Import("*")
-
-shared_objs = SConscript("base/SConscript")
-shared_objs += SConscript("trian/SConscript")
-#shared_objs += SConscript("quads/SConscript")
-shared_objs += SConscript("util/SConscript")
-
-Return("shared_objs")

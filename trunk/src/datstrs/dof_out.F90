@@ -38,6 +38,11 @@ subroutine dof_out( &
   ! initiate the node component counters
   ivarH=0; ivarE=0; ivarV=0; ivarQ=0
 
+  if (.not. associated(NODES(Nod)%dof)) then
+    write(*,*) 'dof_out: nod dof not associated. returning.'
+    return
+  endif
+
   ! loop through multiple copies of variables
   do j=1,NRCOMS
 
@@ -53,14 +58,14 @@ subroutine dof_out( &
                  ivarH = ivarH+1
                  if (ndofH.gt.0) then
 
-                    if (.not.associated(NODES(Nod)%zdofH)) then
+                    if (.not.associated(NODES(Nod)%dof%zdofH)) then
                       write(*,*)'zdofH not associated for Nod = ',Nod
                       call pause
                       return
                     endif
 
                     ZvalH(nvar,KdofH+1:KdofH+ndofH) = &
-                         NODES(Nod)%zdofH(ivarH,1:ndofH)
+                         NODES(Nod)%dof%zdofH(ivarH,1:ndofH)
 
                     if (iprint.eq.1) then
                        write(*,7001) ivarH,nvar,KdofH+1,KdofH+ndofH
@@ -73,7 +78,7 @@ subroutine dof_out( &
                  ivarE = ivarE+1
                  if (ndofE.gt.0) then
                     ZvalE(nvar,KdofE+1:KdofE+ndofE) = &
-                         NODES(Nod)%zdofE(ivarE,1:ndofE)
+                         NODES(Nod)%dof%zdofE(ivarE,1:ndofE)
 
                     if (iprint.eq.2) then
                        write(*,7001) ivarE,nvar,KdofE+1,KdofE+ndofE
@@ -86,7 +91,7 @@ subroutine dof_out( &
                  ivarV = ivarV+1
                  if (ndofV.gt.0) then
                     ZvalV(nvar,KdofV+1:KdofV+ndofV) = &
-                         NODES(Nod)%zdofV(ivarV,1:ndofV)
+                         NODES(Nod)%dof%zdofV(ivarV,1:ndofV)
                     if (iprint.eq.3) then
                        write(*,7001) ivarV,nvar,KdofV+1,KdofV+ndofV
                        write(*,*) 'ZvalV = ', ZvalV(nvar,KdofV+1:KdofV+ndofV)
@@ -99,14 +104,14 @@ subroutine dof_out( &
                  ivarQ = ivarQ+1
                  if (ndofQ.gt.0) then
                     ZvalQ(nvar,KdofQ+1:KdofQ+ndofQ) = &
-                         NODES(Nod)%zdofQ(ivarQ,1:ndofQ)
+                         NODES(Nod)%dof%zdofQ(ivarQ,1:ndofQ)
                  endif
 !                 if (ndofQ.gt.0) then
 !                   write(*,*) 'nvar,ivarQ,KdofQ = ',nvar,ivarQ,KdofQ
 !                   write(*,*) 'ZvalQ(nvar,KdofQ+1:KdofQ+ndofQ) = ', &
 !                               ZvalQ(nvar,KdofQ+1:KdofQ+ndofQ)
-!                   write(*,*) 'NODES(Nod)%zdofQ(ivarQ,1:ndofQ) = ', &
-!                               NODES(Nod)%zdofQ(ivarQ,1:ndofQ)
+!                   write(*,*) 'NODES(Nod)%dof%zdofQ(ivarQ,1:ndofQ) = ', &
+!                               NODES(Nod)%dof%zdofQ(ivarQ,1:ndofQ)
 !                 endif
 
               case default

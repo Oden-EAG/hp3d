@@ -20,7 +20,7 @@
 subroutine soldis(Mdle,Xi,X,Rn,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ, Val)
 !
    use data_structure3D
-   use CommonParam
+   use commonParam
 !---------------------------------------------------------------------------------------
    implicit none
 !
@@ -317,7 +317,7 @@ subroutine soldis_select
 !
       use control,    only: NEXACT    ! exact solution flag
       use parameters, only: NSTD_OUT  ! display file
-      use CommonParam
+      use commonParam
 !
       implicit none
       integer :: iprev
@@ -361,7 +361,7 @@ end subroutine soldis_select
 
 subroutine disp_soldis(Nstream)
 !
-      use CommonParam,      only: IEXACT_DISP,ICHOOSE_COMP
+      use commonParam,      only: IEXACT_DISP,ICHOOSE_COMP
 !
       implicit none
       integer, intent(in) :: Nstream

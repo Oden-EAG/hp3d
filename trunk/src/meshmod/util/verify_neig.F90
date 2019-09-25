@@ -10,10 +10,9 @@ subroutine verify_neig
   iprint=0
 
   !  ...loop over active elements  
-  mdle=0
   do i=1,NRELES
-     call nelcon(mdle, mdle)
-     call elem_nodes(mdle, nodesl, norientl)
+     mdle = ELEM_ORDER(i)
+     call elem_nodes(mdle, nodesl,norientl)
      
      !  ...loop over element's faces
      type=NODES(mdle)%type

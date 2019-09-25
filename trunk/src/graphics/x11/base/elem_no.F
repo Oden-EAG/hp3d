@@ -99,18 +99,10 @@ c
 c  .........check if within the face
             ifinside=0
             select case(face_type(NODES(Mdle)%type,If))
-#ifdef _PYHP3D
-            case(NODE_TYPE_TRI)
-#else
             case('tria')
-#endif
               if ((t(1).gt.0.d0).and.(t(2).gt.0.d0).and.
      .            (t(1)+t(2).lt.1.d0)) ifinside=1
-#ifdef _PYHP3D
-           case(NODE_TYPE_QUAD)
-#else
             case('rect')
-#endif
               if ((t(1).gt.0.d0).and.(t(2).gt.0.d0).and.
      .            (t(1).lt.1.d0).and.(t(2).lt.1.d0)) ifinside=1
             end select

@@ -34,8 +34,8 @@ module assembly_sc
    integer :: NRDOF_CON,NRDOF_TOT
 !
 !..connectivity array
-   integer, allocatable :: LCON(:)
-!$OMP THREADPRIVATE (LCON)
+   integer, allocatable :: LCON(:), LCON_SUBD_CON(:)
+!$OMP THREADPRIVATE (LCON,LCON_SUBD_CON)
 !
 !..local stiffness matrices
    VTYPE, allocatable, save :: ZLOAD(:),ZTEMP(:)

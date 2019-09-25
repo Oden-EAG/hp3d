@@ -25,7 +25,7 @@ subroutine close_mesh()
    integer, dimension(27) :: nodesl,norientl
    integer, dimension(6)  :: kreff
    integer, dimension(12) :: krefe
-   integer :: iprint, istat, i, j, ic, mdle, nod, kref, nre, nrf
+   integer :: istat, i, j, ic, mdle, nod, kref, nre, nrf
    logical :: nflag
    real(8) :: MPI_Wtime,start_time,end_time
    integer :: ierr

@@ -38,9 +38,9 @@
 #SBATCH -o hp3d.o%j        # Name of stdout output file
 #SBATCH -e hp3d.e%j        # Name of stderr error file
 #SBATCH -p skx-normal      # Queue (partition) name
-#SBATCH -N 16              # Total # of nodes
-#SBATCH -n 16              # Total # of mpi tasks
-#SBATCH -t 00:59:00        # Run time (hh:mm:ss)
+#SBATCH -N 2               # Total # of nodes
+#SBATCH -n 8               # Total # of mpi tasks
+#SBATCH -t 00:05:00        # Run time (hh:mm:ss)
 #SBATCH --mail-user=stefan@ices.utexas.edu
 #SBATCH --mail-type=all    # Send email at begin and end of job
 #SBATCH -A A-ti2           # Allocation name (req'd if you have more than 1)
@@ -57,12 +57,14 @@ pwd
 date
 
 # Set thread count (default value is 1)...
+# export KMP_NUM_THREADS=12
+nthreads=12
 
-# export OMP_NUM_THREADS=24
+# Set OpenMP stack size per thread
+export KMP_STACKSIZE=64M # p=5
 
 # Launch MPI code...
-
-ibrun ./pois -job 1 -p 5 -isol 0 -imax 15 -nthreads 48
+ibrun ./pois -job 1 -p 5 -isol 0 -imax 12 -maxnods 1025000 -nthreads ${nthreads}
 
 date
 # ---------------------------------------------------

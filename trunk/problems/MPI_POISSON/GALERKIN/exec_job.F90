@@ -53,7 +53,7 @@ subroutine exec_job
       if (NUM_PROCS .eq. 1) goto 30
 !
       if (i .eq. IMAX-5) then
-         call zoltan_w_set_lb(6)
+         call zoltan_w_set_lb(7)
       elseif (i .gt. IMAX-5) then
          goto 30
       endif
@@ -77,10 +77,19 @@ subroutine exec_job
          if(RANK .eq. ROOT) write(*,*) '   ... skipping for a large number of elements.'
       endif
 !
+      if (NUM_PROCS .eq. 1) goto 50
+      goto 50
+!
 !  ...evaluate current partition
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
       if(RANK .eq. ROOT) write(*,200) '4. evaluating current partition...'
+      call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
       call zoltan_w_eval
+      call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
+      if(RANK .eq. ROOT) write(*,300) end_time - start_time
+!
+   50 continue
+      goto 60
 !
 !  ...run mesh verification routines
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
@@ -90,11 +99,16 @@ subroutine exec_job
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
       if(RANK .eq. ROOT) write(*,300) end_time - start_time
 !
+   60 continue
+!
 !  ...solve problem with par_mumps (MPI MUMPS)
-      call MPI_BARRIER (MPI_COMM_WORLD, ierr);
+      call MPI_BARRIER (MPI_COMM_WORLD, ierr)
       if(RANK .eq. ROOT) write(*,200) '6. calling MUMPS (MPI) solver...'
-      call par_mumps_sc('G')
-      call MPI_BARRIER (MPI_COMM_WORLD, ierr);
+      call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+      !call par_mumps_sc('G')
+      call par_nested('G')
+      call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
+      if(RANK .eq. ROOT) write(*,300) end_time - start_time
 !
    enddo
 !

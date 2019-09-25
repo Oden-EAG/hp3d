@@ -15,9 +15,9 @@ subroutine point_with_visit_numbering(Nout, Iflag)
         nod = nodesl(ino)
         if (NODES(nod)%visit.gt.0) then 
            if (Iflag.eq.1) then
-              write(Nout,7000) NODES(nod)%visit, NODES(ino)%coord(1:NDIMEN,1)
+              write(Nout,7000) NODES(nod)%visit, NODES(ino)%dof%coord(1:NDIMEN,1)
            else
-              write(Nout,7001) NODES(nod)%coord(1:NDIMEN,1)
+              write(Nout,7001) NODES(nod)%dof%coord(1:NDIMEN,1)
            end if
            NODES(nod)%visit = -NODES(nod)%visit
         end if

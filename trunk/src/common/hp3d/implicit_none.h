@@ -1,9 +1,9 @@
 ! fortran 90 format to replace syscom.blk
 !
 #if C_MODE
-#define VTYPE complex*16
+#define VTYPE complex(8)
 #else
-#define VTYPE real*8
+#define VTYPE real(8)
 #endif
 
 #if C_MODE

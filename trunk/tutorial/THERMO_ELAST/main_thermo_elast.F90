@@ -12,7 +12,6 @@
 !
 program main
   !
-  use uhm
   use parameters, only : NSTD_OUT
   use data_structure3D
   use thermo_elast
@@ -47,7 +46,6 @@ program main
   write(*,*) '   '
   write(*,*) 'FRONTAL SOLVE..........................20'
   write(*,*) 'MUMPS SOLVE SEQ........................21'
-  write(*,*) 'UHM SOLVE PAR .........................30'
   !
   read(*,*) idec
   !----------------------------------------------------------------------
@@ -80,16 +78,7 @@ program main
      call update_gdof
   case(20); call solve1(NR_RHS_PROB)
   case(21); call mumps_solve_seq(NR_RHS_PROB)
-  case(30);
-     call uhm_method_disp_all(NSTD_OUT)
-     write(*,*) 'choose a decomposition = '
-     read(*,*) i
-
-     call uhm_initialize( 4, 192, i )
-
-     call uhm_set_nr_rhs(NR_RHS_PROB)
-     call uhm_solve_problem
-     call uhm_finalize
+  
   end select
 
   !

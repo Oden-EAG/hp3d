@@ -26,11 +26,7 @@ c
 #include "syscom.blk"
 c
 c  ...element type
-#ifdef _PYHP3D
-      integer :: type
-#else
       character(len=4) :: type
-#endif
 c
 c----------------------------------------------------------------------
 c
@@ -55,14 +51,14 @@ c  .....first and second mid-edge node constrained by an edge.....
 c
 c  .......parent mid-edge node
           nodp = NEDGC(nc)
-          if (NODES(nodp)%act.eq.0) call flag(nodp)
+          if (Is_inactive(nodp)) call flag(nodp)
 c
 c  .....vertex node constrained by an edge.....
         case(13,39,49)
 c
 c  .......parent mid-edge node
           nodp = NEDGC(nc)
-          if (NODES(nodp)%act.eq.0) call flag(nodp)
+          if (Is_inactive(nodp)) call flag(nodp)
 c
 c  .......loop through parent vertices
           do iv=1,2
@@ -70,16 +66,16 @@ c  .......loop through parent vertices
 c
 c  .........vertex node that supposed to be active
             if (nodp.gt.0) then
-              if (NODES(nodp)%act.eq.0) call flag(nodp)
+              if (Is_inactive(nodp)) call flag(nodp)
 c
 c  .........inactive vertex node, just address in NEDGC
             else
               call decode2(-nodp, nce,nvoid)
               nodp = NEDGC(nce)
-              if (NODES(nodp)%act.eq.0) call flag(nodp)
+              if (Is_inactive(nodp)) call flag(nodp)
               do jv=1,2
                 nodp = NEDG_CONS(jv,nce)
-                if (NODES(nodp)%act.eq.0) call flag(nodp)
+                if (Is_inactive(nodp)) call flag(nodp)
               enddo
             endif
           enddo
@@ -91,7 +87,7 @@ c  .......parent mid-face node
           nodp = NFACEC(nc)
 c
 c  .......check: parent mid-face node MUST be active
-          if (NODES(nodp)%act.eq.0) then
+          if (Is_inactive(nodp)) then
             write(*,8001) 1; stop 1
  8001       format('flag_constr_parents: INCONSISTENCY ',i2)
           endif
@@ -101,14 +97,14 @@ c  .....horizontal mid-edge node constrained by an h4-refined face....
 c
 c  .......check: parent mid-face node MUST be active
           nodp = NFACEC(nc)
-          if (NODES(nodp)%act.eq.0) then
+          if (Is_inactive(nodp)) then
             write(*,8001) 2; stop 1
           endif
 c
 c  .......parent mid-edge nodes (south,north)
           do ip=1,3,2
             nodp = iabs(NFACE_CONS(ip,nc))
-            if (NODES(nodp)%act.eq.0) call flag(nodp)
+            if (Is_inactive(nodp)) call flag(nodp)
           enddo
 c
 c  .....vertical mid-edge node constrained by an h4-refined face......
@@ -116,14 +112,14 @@ c  .....vertical mid-edge node constrained by an h4-refined face......
 c
 c  .......check: parent mid-face node MUST be active
           nodp = NFACEC(nc)
-          if (NODES(nodp)%act.eq.0) then
+          if (Is_inactive(nodp)) then
             write(*,8001) 2; stop 1
           endif
 c
 c  .......parent mid-edge nodes (east,west)
           do ip=2,4,2
             nodp = iabs(NFACE_CONS(ip,nc))
-            if (NODES(nodp)%act.eq.0) call flag(nodp)
+            if (Is_inactive(nodp)) call flag(nodp)
           enddo
 c
 c  .....vertex node constrained by an h4-refined face...............
@@ -131,20 +127,20 @@ c  .....vertex node constrained by an h4-refined face...............
 c
 c  .......check: parent mid-face node MUST be active
           nodp = NFACEC(nc)
-          if (NODES(nodp)%act.eq.0) then
+          if (Is_inactive(nodp)) then
             write(*,8001) 2; stop 1
           endif
 c
 c  .......parent mid-edge nodes (south,east,north,west)
           do ip=1,4
             nodp = iabs(NFACE_CONS(ip,nc))
-            if (NODES(nodp)%act.eq.0) call flag(nodp)
+            if (Is_inactive(nodp)) call flag(nodp)
           enddo
 c
 c  .......parent vertex dof
           do ip=1,4
             nodp = NFACE_CONS(4+ip,nc)
-            if (NODES(nodp)%act.eq.0) call flag(nodp)
+            if (Is_inactive(nodp)) call flag(nodp)
           enddo
 c
 c  .....mid-face node constrained by a horizontally h2-refined face...
@@ -152,7 +148,7 @@ c  .....mid-face node constrained by a horizontally h2-refined face...
 c
 c  .......parent mid-face node
           nodp = NFACEC(nc)
-          if (NODES(nodp)%act.eq.0) then
+          if (Is_inactive(nodp)) then
             write(*,8001) 3; stop 1
           endif
 c
@@ -162,30 +158,25 @@ c       h2-refined face...............................................
 c
 c  .......parent mid-face node
           nodp = NFACEC(nc)
-          if (NODES(nodp)%act.eq.0) then
+          if (Is_inactive(nodp)) then
             write(*,8001) 4; stop 1
           endif
 c
 c  .......parent mid-edge nodes (south,north)
           do ip=1,3,2
             nodp = iabs(NFACE_CONS(ip,nc))
-            if (NODES(nodp)%act.eq.0) then
+            if (Is_inactive(nodp)) then
 c
 c  ...........a constraining edge is allowed
-#ifdef _PYHP3D
-              if (NODES(nodp)%type == EDGE_NODE)
-     .              nodp = NODES(nodp)%father
-#else
               if (NODES(nodp)%type.eq.'medg') nodp = NODES(nodp)%father
-#endif
             endif
-ccc            if (NODES(nodp)%act.eq.0) nodp = NODES(nodp)%father
+ccc            if (Is_inactive(nodp)) nodp = NODES(nodp)%father
 cccc
 cccc  .........check: father MUST be a medg node
 ccc            if (NODES(nodp)%type.ne.'medg') then
 ccc              write(*,8001) 5; stop 1
 ccc            endif
-            if (NODES(nodp)%act.eq.0) call flag(nodp)
+            if (Is_inactive(nodp)) call flag(nodp)
           enddo
 c
 c  .....mid-face node constrained by a vertically h2-refined face.....
@@ -193,7 +184,7 @@ c  .....mid-face node constrained by a vertically h2-refined face.....
 c
 c  .......parent mid-face node
           nodp = NFACEC(nc)
-          if (NODES(nodp)%act.eq.0) then
+          if (Is_inactive(nodp)) then
             write(*,8001) 6; stop 1
           endif
 c
@@ -203,22 +194,17 @@ c       face............................................................
 c
 c  .......parent mid-face node
           nodp = NFACEC(nc)
-          if (NODES(nodp)%act.eq.0) then
+          if (Is_inactive(nodp)) then
             write(*,8001) 7; stop 1
           endif
 c
 c  .......parent mid-edge nodes (east,west)
           do ip=2,4,2
             nodp = iabs(NFACE_CONS(ip,nc))
-            if (NODES(nodp)%act.eq.0) then
+            if (Is_inactive(nodp)) then
 c
 c  ...........a constraining edge is allowed
-#ifdef _PYHP3D
-              if (NODES(nodp)%type == EDGE_NODE)
-     .              nodp = NODES(nodp)%father
-#else
               if (NODES(nodp)%type.eq.'medg') nodp = NODES(nodp)%father
-#endif
             endif
 c
 ccc  .........check: father MUST be a medg node
@@ -227,7 +213,7 @@ ccc              write(*,*) 'Mdle,NODES(nodp)%type = ',
 ccc     .                    Mdle,NODES(nodp)%type
 ccc              write(*,8001) 8
 ccc            endif
-            if (NODES(nodp)%act.eq.0) call flag(nodp)
+            if (Is_inactive(nodp)) call flag(nodp)
           enddo
 c
 c  .....mdlt,medg or mdlq node constrained by a triangular face.....
@@ -235,14 +221,14 @@ c  .....mdlt,medg or mdlq node constrained by a triangular face.....
 c
 c  .......parent mid-face node
           nodp = NFACEC(nc)
-          if (NODES(nodp)%act.eq.0) then
+          if (Is_inactive(nodp)) then
             write(*,8001) 9; stop 1
           endif
 c
 c  .......parent medg nodes
           do ie=1,3
             nodp = iabs(NFACE_CONS(ie,nc))
-            if (NODES(nodp)%act.eq.0) call flag(nodp)
+            if (Is_inactive(nodp)) call flag(nodp)
           enddo
 c
         end select
@@ -251,7 +237,7 @@ c  ...end of loop through constrained nodes
       enddo
 c
 c
-      end subroutine
+      end subroutine flag_constr_parents
 c
 c----------------------------------------------------------------------
 c

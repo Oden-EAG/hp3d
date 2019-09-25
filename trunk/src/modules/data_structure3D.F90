@@ -28,7 +28,7 @@ module data_structure3D
       integer, save :: NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ
 !
 !  ...maximum number of nodes, pointer to the first free entry in NODES
-      integer, save :: MAXNODS,NPNODS
+      integer, save :: MAXNODS=0,NPNODS=0
 !
 !----------------------------------------------------------------------
 !  INITIAL MESH ELEMENT                                               |
@@ -116,31 +116,30 @@ module data_structure3D
 !  .....boundary condition flag
         integer          :: bcond
 !
-!  .....refinement flag
-        integer          :: ref_kind, ref_filter
-!
 !  .....father node
         integer          :: father
 !
 !  .....node sons
-        !integer, dimension(:), pointer :: sons
         integer          :: first_son
         integer          :: nr_sons
 !
+!  .....refinement flag
+        integer          :: ref_kind
+!
 !  .....interface flag with GMP
         integer          :: geom_interf
-
+!
 !  .....visitation flag
         integer          :: visit
 !
 !  .....activation flag
-        integer          :: act
+        logical           :: act
 !
 !  .....subdomain number (distributed mesh)
         integer          :: subd
 !
-!  .....geometry dof
-        real(8), dimension(:,:), pointer :: coord
+!  .....geometry and solution degrees of freedom
+        type(dof_data), pointer :: dof
 !
 #if DEBUG_MODE
 !
@@ -156,34 +155,45 @@ module data_structure3D
         real(8), dimension(0:4,0:4) :: error
 #endif
 !
+      endtype node
+!
+!----------------------------------------------------------------------
+!  DOF DATA                                                            |
+!----------------------------------------------------------------------
+      type dof_data
+!
+!  .....geometry dof
+        real(8), dimension(:,:), pointer :: coord
+!
 !  .....H1 solution dof
 #if C_MODE
-        complex(16), dimension(:,:), pointer :: zdofH
+        complex(8), dimension(:,:), pointer :: zdofH
 #else
-        real(8)    , dimension(:,:), pointer :: zdofH
+        real(8)   , dimension(:,:), pointer :: zdofH
 #endif
 !
 !  .....H(curl) solution dof
 #if C_MODE
-        complex(16), dimension(:,:), pointer :: zdofE
+        complex(8), dimension(:,:), pointer :: zdofE
 #else
-        real(8)    , dimension(:,:), pointer :: zdofE
+        real(8)   , dimension(:,:), pointer :: zdofE
 #endif
 !
 !  .....H(div) solution dof
 #if C_MODE
-        complex(16), dimension(:,:), pointer :: zdofV
+        complex(8), dimension(:,:), pointer :: zdofV
 #else
-        real(8)    , dimension(:,:), pointer :: zdofV
+        real(8)   , dimension(:,:), pointer :: zdofV
 #endif
 !
-!  .....L^2 solution dof
+!  .....L2 solution dof
 #if C_MODE
-        complex(16), dimension(:,:), pointer :: zdofQ
+        complex(8), dimension(:,:), pointer :: zdofQ
 #else
-        real(8)    , dimension(:,:), pointer :: zdofQ
+        real(8)   , dimension(:,:), pointer :: zdofQ
 #endif
-      endtype node
+      endtype dof_data
+!
 !
 !-----------------------------------------------------------------------
 !
@@ -326,26 +336,25 @@ module data_structure3D
       enddo
 !
       allocate(NODES(MAXNODS))
+!$OMP PARALLEL DO
       do nod=1,MAXNODS
         NODES(nod)%type = 'none'
         NODES(nod)%case = 0
         NODES(nod)%index = 0
         NODES(nod)%order = 0
+        NODES(nod)%act = .false.
         NODES(nod)%bcond = nod+1
         NODES(nod)%ref_kind = 0
         NODES(nod)%father = 0
         NODES(nod)%first_son = 0
         NODES(nod)%nr_sons = 0
         NODES(nod)%geom_interf = 0
-        nullify (NODES(nod)%coord)
+        nullify (NODES(nod)%dof)
 #if DEBUG_MODE
         NODES(nod)%error = 0.d0
 #endif
-        nullify (NODES(nod)%zdofH)
-        nullify (NODES(nod)%zdofE)
-        nullify (NODES(nod)%zdofV)
-        nullify (NODES(nod)%zdofQ)
       enddo
+!$OMP END PARALLEL DO
       NODES(MAXNODS)%bcond = 0
       NPNODS=1
 !
@@ -366,11 +375,14 @@ module data_structure3D
       deallocate(ELEMS)
 !
       do nod=1,MAXNODS
-        if (Associated(NODES(nod)%coord))   deallocate(NODES(nod)%coord)
-        if (Associated(NODES(nod)%zdofH))   deallocate(NODES(nod)%zdofH)
-        if (Associated(NODES(nod)%zdofE))   deallocate(NODES(nod)%zdofE)
-        if (Associated(NODES(nod)%zdofV))   deallocate(NODES(nod)%zdofV)
-        if (Associated(NODES(nod)%zdofQ))   deallocate(NODES(nod)%zdofQ)
+        if (associated(NODES(nod)%dof)) then
+          if (associated(NODES(nod)%dof%coord)) deallocate(NODES(nod)%dof%coord)
+          if (associated(NODES(nod)%dof%zdofH)) deallocate(NODES(nod)%dof%zdofH)
+          if (associated(NODES(nod)%dof%zdofE)) deallocate(NODES(nod)%dof%zdofE)
+          if (associated(NODES(nod)%dof%zdofV)) deallocate(NODES(nod)%dof%zdofV)
+          if (associated(NODES(nod)%dof%zdofQ)) deallocate(NODES(nod)%dof%zdofQ)
+          deallocate(NODES(nod)%dof)
+        endif
       enddo
       deallocate(NODES)
 !
@@ -441,53 +453,77 @@ module data_structure3D
         write(ndump,*) NODES(nod)%order
         write(ndump,*) NODES(nod)%bcond
         write(ndump,*) NODES(nod)%ref_kind
-        write(ndump,*) NODES(nod)%ref_filter
         write(ndump,*) NODES(nod)%father
         write(ndump,*) NODES(nod)%first_son
         write(ndump,*) NODES(nod)%nr_sons
         write(ndump,*) NODES(nod)%geom_interf
         write(ndump,*) NODES(nod)%visit
         write(ndump,*) NODES(nod)%act
-        if (associated(NODES(nod)%coord)) then
-          nn1 = ubound(NODES(nod)%coord,1)
-          nn2 = ubound(NODES(nod)%coord,2)
-          write(ndump,*) nn1, nn2
-          write(ndump,*) NODES(nod)%coord
+        if (associated(NODES(nod)%dof)) then
+          write(ndump,*) 1
+        else
+          write(ndump,*) 0
+        endif
+        if (associated(NODES(nod)%dof)) then
+          if (associated(NODES(nod)%dof%coord)) then
+            nn1 = ubound(NODES(nod)%dof%coord,1)
+            nn2 = ubound(NODES(nod)%dof%coord,2)
+            write(ndump,*) nn1, nn2
+            write(ndump,*) NODES(nod)%dof%coord
+          else
+            write(ndump,*) 0 , 0
+          endif
         else
           write(ndump,*) 0 , 0
         endif
 #if DEBUG_MODE
         write(ndump,*) NODES(nod)%error
 #endif
-        if (associated(NODES(nod)%zdofH)) then
-          nn1 = ubound(NODES(nod)%zdofH,1)
-          nn2 = ubound(NODES(nod)%zdofH,2)
-          write(ndump,*) nn1, nn2
-          write(ndump,*) NODES(nod)%zdofH
+        if (associated(NODES(nod)%dof)) then
+          if (associated(NODES(nod)%dof%zdofH)) then
+            nn1 = ubound(NODES(nod)%dof%zdofH,1)
+            nn2 = ubound(NODES(nod)%dof%zdofH,2)
+            write(ndump,*) nn1, nn2
+            write(ndump,*) NODES(nod)%dof%zdofH
+          else
+            write(ndump,*) 0 , 0
+          endif
         else
           write(ndump,*) 0 , 0
         endif
-        if (associated(NODES(nod)%zdofE)) then
-          nn1 = ubound(NODES(nod)%zdofE,1)
-          nn2 = ubound(NODES(nod)%zdofE,2)
-          write(ndump,*) nn1, nn2
-          write(ndump,*) NODES(nod)%zdofE
+        if (associated(NODES(nod)%dof)) then
+          if (associated(NODES(nod)%dof%zdofE)) then
+            nn1 = ubound(NODES(nod)%dof%zdofE,1)
+            nn2 = ubound(NODES(nod)%dof%zdofE,2)
+            write(ndump,*) nn1, nn2
+            write(ndump,*) NODES(nod)%dof%zdofE
+          else
+            write(ndump,*) 0 , 0
+          endif
         else
           write(ndump,*) 0 , 0
         endif
-        if (associated(NODES(nod)%zdofV)) then
-          nn1 = ubound(NODES(nod)%zdofV,1)
-          nn2 = ubound(NODES(nod)%zdofV,2)
-          write(ndump,*) nn1, nn2
-          write(ndump,*) NODES(nod)%zdofV
+        if (associated(NODES(nod)%dof)) then
+          if (associated(NODES(nod)%dof%zdofV)) then
+            nn1 = ubound(NODES(nod)%dof%zdofV,1)
+            nn2 = ubound(NODES(nod)%dof%zdofV,2)
+            write(ndump,*) nn1, nn2
+            write(ndump,*) NODES(nod)%dof%zdofV
+          else
+            write(ndump,*) 0 , 0
+          endif
         else
           write(ndump,*) 0 , 0
         endif
-        if (associated(NODES(nod)%zdofQ)) then
-          nn1 = ubound(NODES(nod)%zdofQ,1)
-          nn2 = ubound(NODES(nod)%zdofQ,2)
-          write(ndump,*) nn1, nn2
-          write(ndump,*) NODES(nod)%zdofQ
+        if (associated(NODES(nod)%dof)) then
+          if (associated(NODES(nod)%dof%zdofQ)) then
+            nn1 = ubound(NODES(nod)%dof%zdofQ,1)
+            nn2 = ubound(NODES(nod)%dof%zdofQ,2)
+            write(ndump,*) nn1, nn2
+            write(ndump,*) NODES(nod)%dof%zdofQ
+          else
+            write(ndump,*) 0 , 0
+          endif
         else
           write(ndump,*) 0 , 0
         endif
@@ -561,19 +597,24 @@ module data_structure3D
         read(ndump,*) NODES(nod)%order
         read(ndump,*) NODES(nod)%bcond
         read(ndump,*) NODES(nod)%ref_kind
-        read(ndump,*) NODES(nod)%ref_filter
         read(ndump,*) NODES(nod)%father
         read(ndump,*) NODES(nod)%first_son
         read(ndump,*) NODES(nod)%nr_sons
         read(ndump,*) NODES(nod)%geom_interf
         read(ndump,*) NODES(nod)%visit
         read(ndump,*) NODES(nod)%act
+        read(ndump,*) nn1
+        if (nn1.eq.1) then
+          allocate(NODES(nod)%dof)
+        else
+          nullify(NODES(nod)%dof)
+        endif
         read(ndump,*) nn1, nn2
         if ((nn1.gt.0).and.(nn2.gt.0)) then
-          allocate(NODES(nod)%coord(nn1,nn2))
-          read(ndump,*) NODES(nod)%coord
+          allocate(NODES(nod)%dof%coord(nn1,nn2))
+          read(ndump,*) NODES(nod)%dof%coord
         else
-          nullify(NODES(nod)%coord)
+          if(associated(NODES(nod)%dof)) nullify(NODES(nod)%dof%coord)
         endif
 #if DEBUG_MODE
         read(ndump,*) NODES(nod)%error
@@ -581,31 +622,31 @@ module data_structure3D
 !
         read(ndump,*) nn1, nn2
         if ((nn1.gt.0).and.(nn2.gt.0)) then
-          allocate(NODES(nod)%zdofH(nn1,nn2))
-          read(ndump,*) NODES(nod)%zdofH
+          allocate(NODES(nod)%dof%zdofH(nn1,nn2))
+          read(ndump,*) NODES(nod)%dof%zdofH
         else
-          nullify(NODES(nod)%zdofH)
+          if(associated(NODES(nod)%dof)) nullify(NODES(nod)%dof%zdofH)
         endif
         read(ndump,*) nn1, nn2
         if ((nn1.gt.0).and.(nn2.gt.0)) then
-          allocate(NODES(nod)%zdofE(nn1,nn2))
-          read(ndump,*) NODES(nod)%zdofE
+          allocate(NODES(nod)%dof%zdofE(nn1,nn2))
+          read(ndump,*) NODES(nod)%dof%zdofE
         else
-          nullify(NODES(nod)%zdofE)
+          if(associated(NODES(nod)%dof)) nullify(NODES(nod)%dof%zdofE)
         endif
         read(ndump,*) nn1, nn2
         if ((nn1.gt.0).and.(nn2.gt.0)) then
-          allocate(NODES(nod)%zdofV(nn1,nn2))
-          read(ndump,*) NODES(nod)%zdofV
+          allocate(NODES(nod)%dof%zdofV(nn1,nn2))
+          read(ndump,*) NODES(nod)%dof%zdofV
         else
-          nullify(NODES(nod)%zdofV)
+          if(associated(NODES(nod)%dof)) nullify(NODES(nod)%dof%zdofV)
         endif
         read(ndump,*) nn1, nn2
         if ((nn1.gt.0).and.(nn2.gt.0)) then
-          allocate(NODES(nod)%zdofQ(nn1,nn2))
-          read(ndump,*) NODES(nod)%zdofQ
+          allocate(NODES(nod)%dof%zdofQ(nn1,nn2))
+          read(ndump,*) NODES(nod)%dof%zdofQ
         else
-          nullify(NODES(nod)%zdofQ)
+          if(associated(NODES(nod)%dof)) nullify(NODES(nod)%dof%zdofQ)
         endif
       enddo
 !
@@ -769,7 +810,7 @@ module data_structure3D
 !
         do i=1,4
           nod = ELEMS(Mdle)%nodes(i)
-          v(1:3,i) = NODES(nod)%coord(1:3,1)
+          v(1:3,i) = NODES(nod)%dof%coord(1:3,1)
         enddo
 !
         do i=1,3
@@ -784,12 +825,13 @@ module data_structure3D
       function Is_active(Nod)
       integer Nod
       logical Is_active
-      select case (NODES(Nod)%act)
-      case (0)
-        Is_active = .FALSE.
-      case default
-        Is_active = .TRUE.
-      end select
+      Is_active = NODES(Nod)%act
+      end function
+!-----------------------------------------------------------------------
+      function Is_inactive(Nod)
+      integer Nod
+      logical Is_inactive
+      Is_inactive = .not. NODES(Nod)%act
       end function
 !-----------------------------------------------------------------------
       function Is_leaf(Nod)

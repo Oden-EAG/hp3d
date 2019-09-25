@@ -10,7 +10,6 @@ program main
   use data_structure3D , only : NRELES
   use adaptivity_local
 
-  use uhm2
   !------------------------------------------------------------------------
   implicit none
   character(len=1024) :: argv
@@ -31,21 +30,8 @@ program main
   call end_environment
   call initialize
 
-  !UHM_VERBOSE = .TRUE.
-  UHM_SOLVER_REPORT_SHOW = .TRUE.
-
-
   ! Fortran Mystery or Our code mystery... 
   call get_command(argv)
-  call uhm_initialize(argv)
-
-  call uhm_option_begin
-  call uhm_option_end
-  
-  call uhm_time_begin(UHM_TIME_LEVEL_FRONT)
-
-  call uhm_direct_lu_piv_initialize( &
-       UHM_DOUBLE, NR_RHS_PROB, 256, UHM_SOLVER_PTR)
 
   !
   ! set defaul values for graphics
@@ -93,53 +79,15 @@ program main
         ! call update_ddof
 
      case(20); call solve1(NR_RHS_PROB)
-     case(30); 
-        call uhm_time_in
-        call mumps_solve_seq(NR_RHS_PROB)
-        call uhm_time_out(t)
-        write(*,*) 'time uhm = ', t
-     case(40);
-        call uhm_time_in
-        call uhm_solve
-        call uhm_time_out(t)
-        write(*,*) 'time uhm = ', t
-        call uhm_solver_flush(UHM_SOLVER_PTR)
+     case(30); call mumps_solve_seq(NR_RHS_PROB)
      case(50);
         call exact_error(err, rnorm)
         write(*,7001) &
              0.d0,0.d0, -1, &
              err, rnorm, err/rnorm
-     case(60);
-        open(unit=ADAPT_FILE_OUT, file=trim(PREFIX)//'history', access='append')
-        write(ADAPT_FILE_OUT,*) 'Adaptivity Begin'
-        write(*,*) 'Give me number of h-ref iteration '
-        read(*,*) iter
 
-        do i=1,iter
-           call uhm_solve
-           call uhm_solver_flush(UHM_SOLVER_PTR)
-           call h_adaptivity
-
-           ISEL_PARAVIEW(2) = 0
-           ISEL_PARAVIEW(4) = 0
-           if (IPARA.ge.0) then
-              call paraview('Adapt', 'H1', 1,1)
-              IPARA = IPARA + 1
-           end if
-           call exact_error(err, rnorm)
-           write(ADAPT_FILE_OUT,7001) &
-                ERR_MAX,ERR_MIN,N_LIST, &
-                err, rnorm, err/rnorm
-        end do
-
-        write(ADAPT_FILE_OUT,*) 'Adaptivity End'
-        close(ADAPT_FILE_OUT)
      end select
   enddo
-
-  call uhm_solver_finalize(UHM_SOLVER_PTR)
-  call uhm_finalize
-  call uhm_time_end
 
   call finalize
 
@@ -168,10 +116,8 @@ subroutine menu
   write(*,*) '   '
   write(*,*) 'FRONTAL SOLVE PROBLEM .................20'
   write(*,*) 'MUMPS SOLVE (SEQ.) ....................30'
-  write(*,*) 'UHM SOLVE (PAR.) ......................40'
   write(*,*) '   '
   write(*,*) 'EXACT ERROR ...........................50'
-  write(*,*) 'H-ADAPTIVITY ..........................60'
   write(*,*) '=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='
 
 end subroutine menu

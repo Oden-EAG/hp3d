@@ -1,58 +1,66 @@
 !----------------------------------------------------------------------
-!                                                                     
+!
 !     routine name      - set_3Dint_fi
-!                                                                     
+!
 !----------------------------------------------------------------------
 !                                                                     
-!     latest revision:  - 10/27/2016
-!                                                                     
+!     latest revision:  - Apr 2019
+!
 !     purpose:          - routine sets up quadrature data for a 3D
-!                         element, accouting for different element
+!                         element, accounting for different element
 !                         types and orders of approximation
-!                                                                    
-!     arguments:                                                     
-!                                                                     
-!     in:              
-!             Type      - element type - IT ONLY SUPPORTS BRICK ELEMENTS
+!
+!     arguments:
+!
+!     in:
+!             EType     - element type - IT ONLY SUPPORTS BRICK ELEMENTS
 !             Norder    - order of approximation
 !        
-!     out:    
+!     out:
 !             intx      - number of integration points for parameter 1
 !             inty      - number of integration points for parameter 2
 !             intz      - number of integration points for parameter 3
 !             Xiloc     - integration points
 !             Waloc     - weights
-!             
+!
 !----------------------------------------------------------------------
 !
-subroutine set_3Dint_fi(Type,Norder,nordx,nordy,nordz,nintx,ninty, &
+subroutine set_3Dint_fi(EType,Norder, nordx,nordy,nordz,nintx,ninty, &
                                        nintz,Xiloc,Waloc)
 !
    use parametersDPG    , only : MAXNINT3ADD, MAXPP
    use control          , only : INTEGRATION
    use gauss_quadrature , only : INITIALIZED, XIGAUS1, WAGAUS1
-!      
 !
    implicit none
 !
-   integer :: iprint1,i,l,l1,l2,l3,nintx,ninty,nintz, &
-              nordx,nordy,nordz,nordh,nordv,nord1,nord2,nord3
-   character(len=4),                         intent(in)  :: Type
-   integer,         dimension(19),           intent(in)  :: Norder
-   real*8,          dimension(3,MAXNINT3ADD),intent(out) :: Xiloc,Waloc
+   character(len=4), intent(in)  :: EType
+   integer         , intent(in)  :: Norder(19)
+   real*8          , intent(out) :: Xiloc(3,MAXNINT3ADD)
+   real*8          , intent(out) :: Waloc(3,MAXNINT3ADD)
+   integer, intent(out) :: nordx,nordy,nordz,nintx,ninty,nintz
+!
+   integer :: i,l,l1,l2,l3, &
+             nordh,nordv,nord1,nord2,nord3
+!
+#if DEBUG_MODE
+   integer :: iprint
+#endif
 !
 !----------------------------------------------------------------------
 !
-!  ...initialize if needed
-   if (.NOT. INITIALIZED) call init_gauss_quadrature
-!      
-   iprint1=0
-   if (iprint1.eq.1) then
-      write(*,7001) Type,Norder
+!..initialize if needed
+   if (.not. INITIALIZED) call init_gauss_quadrature
+!
+#if DEBUG_MODE
+   iprint=0
+   if (iprint.eq.1) then
+      write(*,7001) EType,Norder
  7001 format('set_3Dint_fi: Type, Norder = ',a4,2x,19i4)
    endif
+#endif
 !
-   select case(Type)
+   select case(EType)
 !
 !======================================================================      
 !  BRICK                                                              |
@@ -83,7 +91,7 @@ subroutine set_3Dint_fi(Type,Norder,nordx,nordy,nordz,nintx,ninty, &
       !       nordz = max(nordz,nordv)
       !    case(19)
             call decode(Norder(19), nordh,nord3)
-            call decode(nordh, nord1,nord2)
+            call decode(nordh     , nord1,nord2)
             ! nordx = max(nordx,nord1)
             ! nordy = max(nordy,nord2)
             ! nordz = max(nordz,nord3)
@@ -120,7 +128,7 @@ subroutine set_3Dint_fi(Type,Norder,nordx,nordy,nordz,nintx,ninty, &
       enddo
 !
    case default
-      write(*,*) 'set_3Dint_fi:Type = ',Type
+      write(*,*) 'set_3Dint_fi: Type = ', EType
       stop
    endselect
 !

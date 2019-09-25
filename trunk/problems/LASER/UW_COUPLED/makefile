@@ -18,15 +18,9 @@ MODULE_PATH     = $(OBJ_PATH)
 EXEC            = uwLaser
 EXECS           = uwLaser
 
-
 # Includes and defs
-CCDEFS          = -D C_MODE=$(COMPLEX)
-
-CCINCS          = -I$(HP3D_PATH)/common/hp3d \
-                  -I$(HP3D_PATH)/common/graphics \
-                  -I$(HP3D_PATH)/module \
-                  -I$(MUMPS_MPI_INC) \
-                  -I./$(MODULE_PATH)
+CCDEFS          = $(PROB_PP_DEFS)
+CCINCS          = $(PROB_INCS)
 
 ###### User defined libraries
 LIBS            = $(PROB_LIBS)
@@ -54,7 +48,8 @@ FC_WORK     = $(FC) $(CCDEFS) $(CCINCS) $(FFLAGS) $(EXTRA_FFLAGS)
 one : $(OBJ_PATH)/.dummy $(OBJ)
 	@echo " "
 	@echo "- Linking , " $(EXEC)
-	@echo "- COMPLEX = " $(COMPLEX)
+	@echo "- COMPLEX    = " $(COMPLEX)
+	@echo "- DEBUG_MODE = " $(DEBUG_MODE)
 	@echo "------------------------------ "
 	$(FC_WORK) -o $(EXEC) $(OBJ) $(LIBS) $(LDFLAGS)
 
@@ -84,3 +79,13 @@ clean :
 	@rm -f *~
 	@rm -f *.mod
 	@rm -f *genmod.f90
+
+clean-ritz :
+	@rm -f ../outputs/ritz/paraview/*
+	@rm -f ../outputs/ritz/power/*
+	@rm -f ../outputs/ritz/temp/*
+
+clean-typhoon :
+	@rm -f ../outputs/typhoon/paraview/*
+	@rm -f ../outputs/typhoon/power/*
+	@rm -f ../outputs/typhoon/temp/*

@@ -29,13 +29,12 @@ subroutine activate(Nod, NrdofH,NrdofE,NrdofV,NrdofQ)
 !-------------------------------------------------------------------------
 !
 !..if node is already active, do nothing
-   if (NODES(Nod)%act.eq.1) return
+   if (Is_active(Nod)) return
 !
 !..determine number of dofs, update geometry dofs
    call find_ndof(Nod, ndofH,ndofE,ndofV,ndofQ)
 !
 #if DEBUG_MODE
-!..printing
    if (iprint.eq.1) then
       write(*,7001) Nod,ndofH,ndofE,ndofV,ndofQ
  7001 format('activate: Nod=',i10,', ndofH,ndofE,ndofV,ndofQ= ',4i4)
@@ -49,50 +48,59 @@ subroutine activate(Nod, NrdofH,NrdofE,NrdofV,NrdofQ)
       if (RANK .ne. subd) act_dof = 0
    endif
 !
+!..allocate dof data type
+   if (act_dof.eq.1) then
+      allocate(NODES(Nod)%dof)
+      nullify(NODES(Nod)%dof%coord)
+      nullify(NODES(Nod)%dof%zdofH)
+      nullify(NODES(Nod)%dof%zdofE)
+      nullify(NODES(Nod)%dof%zdofV)
+      nullify(NODES(Nod)%dof%zdofQ)
+   endif
+!
 !..allocate and initialize dofs
    if ((ndofH.gt.0) .and. (act_dof.eq.1)) then
-      allocate(NODES(Nod)%coord(3, ndofH))
-      NODES(Nod)%coord = 0.d0
+      allocate(NODES(Nod)%dof%coord(3, ndofH))
+      NODES(Nod)%dof%coord = 0.d0
    endif
    icase = NODES(Nod)%case
    if ((NREQNH(icase).gt.0).and.(ndofH.gt.0)) then
       nvar = NREQNH(icase)*NRCOMS
       if(act_dof.eq.1) then
-         allocate(NODES(Nod)%zdofH(nvar, ndofH))
-         NODES(Nod)%zdofH = ZERO
+         allocate(NODES(Nod)%dof%zdofH(nvar, ndofH))
+         NODES(Nod)%dof%zdofH = ZERO
       endif
       NrdofH = NrdofH + ndofH*NREQNH(icase)
    endif
    if ((NREQNE(icase).gt.0).and.(ndofE.gt.0)) then
       nvar = NREQNE(icase)*NRCOMS
       if(act_dof.eq.1) then
-         allocate(NODES(Nod)%zdofE(nvar, ndofE))
-         NODES(Nod)%zdofE = ZERO
+         allocate(NODES(Nod)%dof%zdofE(nvar, ndofE))
+         NODES(Nod)%dof%zdofE = ZERO
       endif
       NrdofE = NrdofE + ndofE*NREQNE(icase)
    endif
    if ((NREQNV(icase).gt.0).and.(ndofV.gt.0)) then
       nvar = NREQNV(icase)*NRCOMS
       if(act_dof.eq.1) then
-         allocate(NODES(Nod)%zdofV(nvar, ndofV))
-         NODES(Nod)%zdofV = ZERO
+         allocate(NODES(Nod)%dof%zdofV(nvar, ndofV))
+         NODES(Nod)%dof%zdofV = ZERO
       endif
       NrdofV = NrdofV + ndofV*NREQNV(icase)
    endif
    if ((NREQNQ(icase).gt.0).and.(ndofQ.gt.0)) then
       nvar = NREQNQ(icase)*NRCOMS
       if(act_dof.eq.1) then
-         allocate(NODES(Nod)%zdofQ(nvar, ndofQ))
-         NODES(Nod)%zdofQ = ZERO
+         allocate(NODES(Nod)%dof%zdofQ(nvar, ndofQ))
+         NODES(Nod)%dof%zdofQ = ZERO
       endif
       NrdofQ = NrdofQ + ndofQ*NREQNQ(icase)
    endif
 !
 !..raise activation flag
-   NODES(Nod)%act=1
+   NODES(Nod)%act=.true.
 !
 #if DEBUG_MODE
-!..printing
    if (iprint.ge.1) then
       write(*,*) 'activate : ACTIVATED Nod = ', Nod
    endif
@@ -129,57 +137,68 @@ subroutine deactivate(Nod, NrdofH,NrdofE,NrdofV,NrdofQ)
 !-------------------------------------------------------------------------
 !
 !..if node is already inactive, do nothing
-   if (NODES(Nod)%act.eq.0) return
+   if (Is_inactive(Nod)) return
 !
 !..find number of dofs associated to node, update number of gdofs
    call find_ndof(Nod, ndofH,ndofE,ndofV,ndofQ)
 !
 #if DEBUG_MODE
-!..printing
    if (iprint.eq.1) then
       write(*,7001) Nod,ndofH,ndofE,ndofV,ndofQ
- 7001 format('activate: Nod=',i10,'ndofH,ndofE,ndofV,ndofQ= ',4i4)
+ 7001 format('deactivate: Nod=',i10,'ndofH,ndofE,ndofV,ndofQ= ',4i4)
    endif
 #endif
 !
 !..deallocate geometry dof
-   if (ndofH.gt.0 .and. associated(NODES(Nod)%coord)) then
-      deallocate(NODES(Nod)%coord)
+   if (associated(NODES(Nod)%dof)) then
+      if (ndofH.gt.0 .and. associated(NODES(Nod)%dof%coord)) then
+         deallocate(NODES(Nod)%dof%coord)
+      endif
    endif
 !
 !..deallocate solution dofs
    icase=NODES(Nod)%case
 !
    if ((NREQNH(icase).gt.0).and.(ndofH.gt.0)) then
-      if (associated(NODES(Nod)%zdofH)) then
-         deallocate(NODES(Nod)%zdofH)
+      if (associated(NODES(Nod)%dof)) then
+         if (associated(NODES(Nod)%dof%zdofH)) then
+            deallocate(NODES(Nod)%dof%zdofH)
+         endif
       endif
       NrdofH = NrdofH - ndofH*NREQNH(icase)
    endif
    if ((NREQNE(icase).gt.0).and.(ndofE.gt.0)) then
-      if (associated(NODES(Nod)%zdofE)) then
-         deallocate(NODES(Nod)%zdofE)
+      if (associated(NODES(Nod)%dof)) then
+         if (associated(NODES(Nod)%dof%zdofE)) then
+            deallocate(NODES(Nod)%dof%zdofE)
+         endif
       endif
       NrdofE = NrdofE - ndofE*NREQNE(icase)
    endif
    if ((NREQNV(icase).gt.0).and.(ndofV.gt.0)) then
-      if (associated(NODES(Nod)%zdofV)) then
-         deallocate(NODES(Nod)%zdofV)
+      if (associated(NODES(Nod)%dof)) then
+         if (associated(NODES(Nod)%dof%zdofV)) then
+            deallocate(NODES(Nod)%dof%zdofV)
+         endif
       endif
       NrdofV = NrdofV - ndofV*NREQNV(icase)
    endif
    if ((NREQNQ(icase).gt.0).and.(ndofQ.gt.0)) then
-      if (associated(NODES(Nod)%zdofQ)) then
-         deallocate(NODES(Nod)%zdofQ)
+      if (associated(NODES(Nod)%dof)) then
+         if (associated(NODES(Nod)%dof%zdofQ)) then
+            deallocate(NODES(Nod)%dof%zdofQ)
+         endif
       endif
       NrdofQ = NrdofQ - ndofQ*NREQNQ(icase)
    endif
+   if (associated(NODES(Nod)%dof)) then
+      deallocate(NODES(Nod)%dof)
+   endif
 !
 !..lower activation flag
-   NODES(Nod)%act=0
+   NODES(Nod)%act=.false.
 !
 #if DEBUG_MODE
-!..printing
    if (iprint.ge.1) then
       write(*,*) 'deactivate : DEACTIVATED Nod = ', Nod
    endif

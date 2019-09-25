@@ -85,7 +85,7 @@ subroutine refresh
       if (NODES(nod)%visit.eq.0) cycle
 !
 !  ...skip if active
-      if (NODES(nod)%act.eq.1) cycle
+      if (Is_active(nod)) cycle
 !
       nfath=NODES(nod)%father
 !
