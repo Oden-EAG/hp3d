@@ -2,14 +2,14 @@
 # SET HP3D AND LIBRARY PATH
 #------------------------------------------------------------------
 COMPILER        = INTEL
-LIBRARIES       = ${WORK}/LIBS
+# LIBRARIES       = ${WORK}/LIBS
 HP3D_BASE_PATH  = ${WORK}/par_hp3d/trunk
 
 #------------------------------------------------------------------
 # COMPILER SETTINGS (a 64bit processor architecture is assumed)
 #------------------------------------------------------------------
-
 DEBUG      = NO
+
 LARGE      = NO
 OPENMP_USE = YES
 TAU_PERF   = NO
@@ -82,7 +82,8 @@ MKL_LIBS = ${MKLROOT}/lib/intel64/libmkl_blas95_lp64.a \
            ${MKLROOT}/lib/intel64/libmkl_blacs_intelmpi_lp64.a \
          -Wl,--end-group \
            -liomp5 -lpthread -lm -ldl 
-MKL_INCS = -i8 -I${MKLROOT}/include/intel64/lp64 -I${MKLROOT}/include
+MKL_INCS = -I${MKLROOT}/include/intel64/lp64 -I${MKLROOT}/include
+# -i8 (default 64-bit integer)
 
 #------------------------------------------------------------------
 # MUMPS LIBRARY
@@ -94,10 +95,11 @@ MKL_INCS = -i8 -I${MKLROOT}/include/intel64/lp64 -I${MKLROOT}/include
 # (module petsc/3.11-i64)
 # also adding Zoltan library dependence
 
-MUMPS_LIBS = -L${TACC_PETSC_LIB} -ldmumps -lzmumps \
-                                 -lmumps_common -lpord
+TACC_PETSC32_LIB = /home1/apps/intel18/impi18_0/petsc/3.11/skylake/lib
+TACC_PETSC32_INC = /home1/apps/intel18/impi18_0/petsc/3.11/skylake/include
 
-MUMPS_INCS = -I${TACC_PETSC_INC}
+MUMPS_LIBS = -L${TACC_PETSC32_LIB} -ldmumps -lzmumps \
+                                   -lmumps_common -lpord
 
 TACC_PETSC64_LIB = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-i64/lib
 TACC_PETSC64_INC = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-i64/include
@@ -106,7 +108,8 @@ MUMPS_LIBS += -L$(TACC_PETSC64_LIB) -lesmumps -lzoltan \
                                     -lmetis -lparmetis \
                                     -lscotch -lscotcherr \
                                     -lptscotch -lptscotcherr
-MUMPS_INCS += -I$(TACC_PETSC64_INC)
+
+MUMPS_INCS = -I${TACC_PETSC32_INC} -I$(TACC_PETSC64_INC)
 
 #------------------------------------------------------------------
 # VIS LIBRARY
@@ -123,7 +126,6 @@ MUMPS_INCS += -I$(TACC_PETSC64_INC)
 #------------------------------------------------------------------
 # PREPROCESSOR VARIABLES
 #------------------------------------------------------------------
-
 COMPLEX    ?= 0
 SHAPE      ?= 1
 DEBUG_MODE ?= 0
@@ -194,10 +196,10 @@ LIN_ALG_LINK_LIBS = $(MKL_LIBS)
 LIN_ALG_LINK_INCS = $(MKL_INCS)
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-# MUMPS LINKING (includes basic linear algebra and METIS)
+# MUMPS LINKING
 
 MUMPS_LINK_LIBS    = $(MUMPS_LIBS)  $(LIN_ALG_LINK_LIBS)
-MUMPS_LINK_INCS    = $(MUMPS_INCS)  #$(LIN_ALG_LINK_INCS)
+MUMPS_LINK_INCS    = $(MUMPS_INCS)  $(LIN_ALG_LINK_INCS)
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # EXTRA LIBS LINKING
