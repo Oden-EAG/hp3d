@@ -30,7 +30,7 @@ Compilation is governed by preprocessing flags `COMPLEX`, `SHAPE`, and `DEBUG`.
 - `COMPLEX  = 0` , stiffness matrix, load vector(s) and solution dofs are real-valued
 - `COMPLEX  = 1` , stiffness matrix, load vector(s) and solution dofs are complex-valued
 - `SHAPE = 0` , shape functions of Gatto, Demkowicz, Kim, 2008 (H1,H(curl) for selected element shapes only)
-- `SHAPE = 1` , shape functions of Fuentes, Keith, Demkowicz, 2014 (all spaces, all shapes)
+- `SHAPE = 1` , shape functions of Fuentes, Keith, Demkowicz, Nagaraj, 2014 (all spaces, all shapes)
 - `DEBUG = YES` , compiler uses debug flags, and the library performs additional checks during the computation
 - `DEBUG = NO` , compiler uses optimization flags and the library performs only minimal checks during the computation
 
