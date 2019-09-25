@@ -39,8 +39,8 @@ Library will be created under either `par_hp3d/complex/` or `par_hp3d/real/`.
 ## Compiling a problem
 Projects are implemented in `par_hp3d/trunk/problems/`. A few projects have been implemented and can serve as an example. For example, `/problems/MPI_POISSON/GALERKIN/` is a Galerkin implementation for the classical variational Poisson problem. To compile and run the problem, type `make`  in the project folder, i.e., `cd problems/MPI_POISSON/GALERKIN; make; ./run.sh`.
 
-## Citing par_hp3D
-Please add the following citation to any paper, technical report, presentation, or article that incorporated the `par_hp3D` library:
+## Citing par_hp3d
+Please add the following citation to any paper, technical report, or article that incorporated the `par_hp3d` library:
 ```bibtex
 @book{hpbook2,
       Author = {Demkowicz, L. and Kurtz, J. and Pardo, D. and Paszy\'{n}ski, M. and Rachowicz, W. and Zdunek, A.},
