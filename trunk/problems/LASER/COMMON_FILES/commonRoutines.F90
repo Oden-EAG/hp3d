@@ -218,20 +218,21 @@ subroutine my_sizetest
         size_l2 = 0
 !
          do nod=1,NRNODS
-             if (associated(NODES(nod)%coord).eq. .true.) then
-               size_coord = size_coord + STORAGE_SIZE(NODES(nod)%coord)
+             if (.not. associated(NODES(nod)%dof)) cycle
+             if (associated(NODES(nod)%dof%coord).eq. .true.) then
+               size_coord = size_coord + STORAGE_SIZE(NODES(nod)%dof%coord)
              endif
-             if (associated(NODES(nod)%zdofH).eq. .true.) then
-               size_h1 = size_h1 + STORAGE_SIZE(NODES(nod)%zdofH)
+             if (associated(NODES(nod)%dof%zdofH).eq. .true.) then
+               size_h1 = size_h1 + STORAGE_SIZE(NODES(nod)%dof%zdofH)
              endif
-             if (associated(NODES(nod)%zdofE).eq. .true.) then
-               size_hcurl = size_hcurl + STORAGE_SIZE(NODES(nod)%zdofE)
+             if (associated(NODES(nod)%dof%zdofE).eq. .true.) then
+               size_hcurl = size_hcurl + STORAGE_SIZE(NODES(nod)%dof%zdofE)
              endif
-             if (associated(NODES(nod)%zdofV).eq. .true.) then
-               size_hdiv = size_hdiv + STORAGE_SIZE(NODES(nod)%zdofV)
+             if (associated(NODES(nod)%dof%zdofV).eq. .true.) then
+               size_hdiv = size_hdiv + STORAGE_SIZE(NODES(nod)%dof%zdofV)
              endif
-             if (associated(NODES(nod)%zdofQ).eq. .true.) then
-               size_l2 = size_l2 + STORAGE_SIZE(NODES(nod)%zdofQ)
+             if (associated(NODES(nod)%dof%zdofQ).eq. .true.) then
+               size_l2 = size_l2 + STORAGE_SIZE(NODES(nod)%dof%zdofQ)
              endif
          size_tot = size_coord + size_h1 + size_hcurl + size_hdiv + size_l2
         enddo
@@ -424,40 +425,40 @@ subroutine copy_coms(No1,No2)
 !  ...H1 dof
       nf = (No1-1)*NRHVAR
       nt = (No2-1)*NRHVAR
-      nn2 = ubound(NODES(nod)%zdofH,2)
+      nn2 = ubound(NODES(nod)%dof%zdofH,2)
       if(nn2.gt.0) then
          do i=1,NRHVAR
-            NODES(nod)%zdofH(nt+i,1:nn2) = NODES(nod)%zdofH(nf+i,1:nn2)
+            NODES(nod)%dof%zdofH(nt+i,1:nn2) = NODES(nod)%dof%zdofH(nf+i,1:nn2)
          enddo
       endif
 !
 !  ...H(curl) dof
       nf = (No1-1)*NREVAR
       nt = (No2-1)*NREVAR
-      nn2 = ubound(NODES(nod)%zdofE,2)
+      nn2 = ubound(NODES(nod)%dof%zdofE,2)
       if(nn2.gt.0) then
          do i=1,NREVAR
-            NODES(nod)%zdofE(nt+i,1:nn2) = NODES(nod)%zdofE(nf+i,1:nn2)
+            NODES(nod)%dof%zdofE(nt+i,1:nn2) = NODES(nod)%dof%zdofE(nf+i,1:nn2)
          enddo
       endif
 !
 !  ...H(div) dof
       nf = (No1-1)*NRVVAR
       nt = (No2-1)*NRVVAR
-      nn2 = ubound(NODES(nod)%zdofV,2)
+      nn2 = ubound(NODES(nod)%dof%zdofV,2)
       if(nn2.gt.0) then
          do i=1,NRVVAR
-            NODES(nod)%zdofV(nt+i,1:nn2) = NODES(nod)%zdofV(nf+i,1:nn2)
+            NODES(nod)%dof%zdofV(nt+i,1:nn2) = NODES(nod)%dof%zdofV(nf+i,1:nn2)
          enddo
       endif
 !
 !  ...L2 dof
       nf = (No1-1)*NRQVAR
       nt = (No2-1)*NRQVAR
-      nn2 = ubound(NODES(nod)%zdofQ,2)
+      nn2 = ubound(NODES(nod)%dof%zdofQ,2)
       if(nn2.gt.0) then
          do i=1,NRQVAR
-            NODES(nod)%zdofQ(nt+i,1:nn2) = NODES(nod)%zdofQ(nf+i,1:nn2)
+            NODES(nod)%dof%zdofQ(nt+i,1:nn2) = NODES(nod)%dof%zdofQ(nf+i,1:nn2)
          enddo
       endif
 !
