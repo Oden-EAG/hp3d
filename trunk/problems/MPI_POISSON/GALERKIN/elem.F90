@@ -171,7 +171,7 @@ subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
 !   Xiloc     - integration points
 !   Waloc     - weights
 !  ]
-   call set_3Dint(etype,norder, nint,xiloc,waloc)
+   call set_3D_int(etype,norder,norient_face, nint,xiloc,waloc)
 !
 !..loop over integration points
    do l=1,nint
