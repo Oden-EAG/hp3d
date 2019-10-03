@@ -141,17 +141,19 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    VTYPE :: bload_E(NrTest)
 !
 !..Gram matrix in packed format
-   VTYPE :: gramP(NrTest*(NrTest+1)/2)
+   !VTYPE :: gramP(NrTest*(NrTest+1)/2)
+   VTYPE, allocatable :: gramP(:)
    real*8  :: FF, CF, FC
    real*8  :: fldE(3), fldH(3), crlE(3), crlH(3)
    real*8  :: fldF(3), fldG(3), crlF(3), crlG(3)
 !
 !..matrices for transpose filling (swapped loops)
 !..stiffness matrices (transposed) for the enriched test space
-   VTYPE :: stiff_EE_T(2*NrdofEi,NrTest)
-   VTYPE :: stiff_EQ_T(6*NrdofQ ,NrTest)
-   VTYPE :: stiff_ALL(NrTest   ,NrTrial+1)
-   VTYPE :: zaloc    (NrTrial+1,NrTrial+1)
+!   VTYPE :: stiff_EE_T(2*NrdofEi,NrTest)
+!   VTYPE :: stiff_EQ_T(6*NrdofQ ,NrTest)
+!   VTYPE :: stiff_ALL(NrTest   ,NrTrial+1)
+!   VTYPE :: zaloc    (NrTrial+1,NrTrial+1)
+   VTYPE, allocatable :: stiff_EE_T(:,:),stiff_EQ_T(:,:),stiff_ALL(:,:),zaloc(:,:)
 !
 !..3D quadrature data
    real*8, dimension(3,MAXNINT3ADD)  :: xiloc
@@ -211,6 +213,11 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    endif
 #endif
 !
+!..allocate matrices
+   allocate(gramP(NrTest*(NrTest+1)/2))
+   allocate(stiff_EE_T(2*NrdofEi,NrTest))
+   allocate(stiff_EQ_T(6*NrdofQ ,NrTest))
+!
 !..element type
    etype = NODES(Mdle)%type
    nre = nedge(etype); nrf = nface(etype)
@@ -244,7 +251,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !..get the element boundary conditions flags
    call find_bc(Mdle, ibc)
 !
-!..clear space for stiffness matrix and rhsv:
+!..clear space for output matrices
    ZblocE  = ZERO; ZblocQ  = ZERO
    ZalocEE = ZERO; ZalocEQ = ZERO
    ZalocQE = ZERO; ZalocQQ = ZERO
@@ -252,10 +259,6 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !..clear space for auxiliary matrices
    bload_E    = ZERO
    gramP      = ZERO
-   stiff_ALL  = ZERO
-   zaloc      = ZERO
-!
-!..clear space for transpose matrices
    stiff_EE_T = ZERO
    stiff_EQ_T = ZERO
 !
@@ -324,7 +327,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !..use the enriched order to set the quadrature
    INTEGRATION = NORD_ADD
-   call set_3Dint_DPG(etype,norder, nint,xiloc,waloc)
+   call set_3D_int_DPG(etype,norder, nint,xiloc,waloc)
    INTEGRATION = 0
 !
 !..loop over integration points
@@ -555,7 +558,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !  ...set 2D quadrature
       INTEGRATION = NORD_ADD
-      call set_2Dint(ftype,norderf, nint,tloc,wtloc)
+      call set_2D_int_DPG(ftype,norderf, nint,tloc,wtloc)
       INTEGRATION = 0
 !
 !  ...loop through integration points
@@ -667,12 +670,16 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !      Construction of the DPG system
 !----------------------------------------------------------------------
 !
+   allocate(stiff_ALL(NrTest,NrTrial+1))
+!
 !..Total test/trial DOFs of the element
    i1 = NrTest ; j1 = 2*NrdofEi ; j2 = 6*NrdofQ
 !
    stiff_ALL(1:i1,1:j1)       = transpose(stiff_EE_T(1:j1,1:i1))
    stiff_ALL(1:i1,j1+1:j1+j2) = transpose(stiff_EQ_T(1:j2,1:i1))
    stiff_ALL(1:i1,j1+j2+1)    = bload_E(1:i1)
+!
+   deallocate(stiff_EE_T,stiff_EQ_T)
 !
 !..A. Compute Cholesky factorization of Gram Matrix, G=U^*U (=LL^*)
    call ZPPTRF('U',NrTest,gramP,info)
@@ -688,8 +695,13 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
       stop
    endif
 !
+   deallocate(gramP)
+   allocate(zaloc(NrTrial+1,NrTrial+1)); zaloc = ZERO
+!
 !..C. Matrix multiply: B^* G^-1 B (=B~^* B~)
    call ZHERK('U','C',NrTrial+1,NrTest,ZONE,stiff_ALL,NrTest,ZERO,zaloc,NrTrial+1)
+!
+   deallocate(stiff_ALL)
 !
 !..D. Fill lower triangular part of Hermitian matrix
    do i=1,NrTrial
@@ -706,6 +718,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    ZalocQE(1:j2,1:j1) = zaloc(j1+1:j1+j2,1:j1)
    ZalocQQ(1:j2,1:j2) = zaloc(j1+1:j1+j2,j1+1:j1+j2)
 !
+   deallocate(zaloc)
 !
 #if DEBUG_MODE
    iprint = 0

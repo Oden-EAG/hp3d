@@ -4,7 +4,7 @@
 !
 !--------------------------------------------------------------------
 !
-!     latest revision:  - Apr 2019
+!     latest revision:  - Oct 2019
 !
 !     purpose:          - routine returns unconstrained (ordinary)
 !                         stiffness matrix and load vector
@@ -61,7 +61,13 @@ subroutine elem(Mdle, Itest,Itrial)
 !..fld_flag refers to either pump (0) or signal (1) field
    integer :: fld_flag
 !
+!..auxiliary variables for timing
+   real*8 :: start_time, end_time, OMP_get_wtime
+!
 !----------------------------------------------------------------------
+!
+!..start timer
+   start_time = OMP_get_wtime()
 !
    Itest (1:NR_PHYSA) = 0
    Itrial(1:NR_PHYSA) = 0
@@ -72,13 +78,7 @@ subroutine elem(Mdle, Itest,Itrial)
    nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
 !..determine order of approximation
    call find_order(Mdle, norder)
-!        write(*,2040) 'mdle    : ', Mdle
-!        write(*,2020) 'norder e: ', norder(1:12)
-!        write(*,2030) 'norder f: ', norder(13:18)
-!        write(*,2040) 'norder m: ', norder(19)
-! 2020   format(A,12(I3))
-! 2030   format(A,6(I3))
-! 2040   format(A,I3)
+!
 !..set the enriched order of approximation
    select case(etype)
       case('mdlb')
@@ -89,7 +89,6 @@ subroutine elem(Mdle, Itest,Itrial)
          nordP = NODES(Mdle)%order+NORD_ADD*11
       case default
          write(*,*) 'elem: invalid etype param. stop.'
-         write(*,*) 'etype = ', etype
          stop
    end select
 !..note: compute_enriched_order works only for hexa and prism currently
@@ -124,10 +123,10 @@ subroutine elem(Mdle, Itest,Itrial)
          nrTrial = nrdofH + nrdofVi
          Itest(1)=1; Itrial(1)=1
          Itest(4)=1; Itrial(4)=1
-         call elem_heat(Mdle,nrTest,nrTrial,                &
-            nrdofHH,nrdofH,nrdofV,nrdofVi,                  &
-            BLOC(1)%nrow,BLOC(4)%nrow,                      &
-            BLOC(1)%array,ALOC(1,1)%array,ALOC(1,4)%array,  &
+         call elem_heat(Mdle,nrTest,nrTrial,                            &
+            nrdofHH,nrdofH,nrdofV,nrdofVi,                              &
+            BLOC(1)%nrow,BLOC(4)%nrow,                                  &
+            BLOC(1)%array,ALOC(1,1)%array,ALOC(1,4)%array,              &
             BLOC(4)%array,ALOC(4,1)%array,ALOC(4,4)%array)
 !
 !  ...Maxwell cases - signal or pump EH-field
@@ -143,40 +142,61 @@ subroutine elem(Mdle, Itest,Itrial)
             Itest(2)=1; Itrial(2)=1
             Itest(5)=1; Itrial(5)=1
             fld_flag = 1;
+!
             if (FAST_INT .eq. 1 .and. etype .eq. 'mdlb') then
-               call elem_maxwell_fi(Mdle,fld_flag,nrTest,nrTrial, &
-                  nrdofEE,nrdofH,nrdofE,nrdofQ,nrdofEi,           &
-                  BLOC(2)%nrow,BLOC(5)%nrow,                      &
-                  BLOC(2)%array,ALOC(2,2)%array,ALOC(2,5)%array,  &
+               call elem_maxwell_fi(Mdle,fld_flag,nrTest,nrTrial,       &
+                  nrdofEE,nrdofH,nrdofE,nrdofQ,nrdofEi,                 &
+                  BLOC(2)%nrow,BLOC(5)%nrow,                            &
+                  BLOC(2)%array,ALOC(2,2)%array,ALOC(2,5)%array,        &
+                  BLOC(5)%array,ALOC(5,2)%array,ALOC(5,5)%array)
+            elseif (FAST_INT .eq. 1 .and. etype .eq. 'mdlp') then
+               call elem_maxwell_fi_prism(Mdle,fld_flag,nrTest,nrTrial, &
+                  nrdofEE,nrdofH,nrdofE,nrdofQ,nrdofEi,                 &
+                  BLOC(2)%nrow,BLOC(5)%nrow,                            &
+                  BLOC(2)%array,ALOC(2,2)%array,ALOC(2,5)%array,        &
                   BLOC(5)%array,ALOC(5,2)%array,ALOC(5,5)%array)
             else
-               call elem_maxwell(Mdle,fld_flag,nrTest,nrTrial,    &
-                  nrdofEE,nrdofH,nrdofE,nrdofQ,nrdofEi,           &
-                  BLOC(2)%nrow,BLOC(5)%nrow,                      &
-                  BLOC(2)%array,ALOC(2,2)%array,ALOC(2,5)%array,  &
+               call elem_maxwell(Mdle,fld_flag,nrTest,nrTrial,          &
+                  nrdofEE,nrdofH,nrdofE,nrdofQ,nrdofEi,                 &
+                  BLOC(2)%nrow,BLOC(5)%nrow,                            &
+                  BLOC(2)%array,ALOC(2,2)%array,ALOC(2,5)%array,        &
                   BLOC(5)%array,ALOC(5,2)%array,ALOC(5,5)%array)
             endif
+!
          else
 !        ...pump case
             Itest(3)=1; Itrial(3)=1
             Itest(6)=1; Itrial(6)=1
             fld_flag = 0;
             if (FAST_INT .eq. 1 .and. etype .eq. 'mdlb') then
-               call elem_maxwell_fi(Mdle,fld_flag,nrTest,nrTrial, &
-                  nrdofEE,nrdofH,nrdofE,nrdofQ,nrdofEi,           &
-                  BLOC(3)%nrow,BLOC(6)%nrow,                      &
-                  BLOC(3)%array,ALOC(3,3)%array,ALOC(3,6)%array,  &
+               call elem_maxwell_fi(Mdle,fld_flag,nrTest,nrTrial,       &
+                  nrdofEE,nrdofH,nrdofE,nrdofQ,nrdofEi,                 &
+                  BLOC(3)%nrow,BLOC(6)%nrow,                            &
+                  BLOC(3)%array,ALOC(3,3)%array,ALOC(3,6)%array,        &
+                  BLOC(6)%array,ALOC(6,3)%array,ALOC(6,6)%array)
+            elseif (FAST_INT .eq. 1 .and. etype .eq. 'mdlp') then
+               call elem_maxwell_fi_prism(Mdle,fld_flag,nrTest,nrTrial, &
+                  nrdofEE,nrdofH,nrdofE,nrdofQ,nrdofEi,                 &
+                  BLOC(3)%nrow,BLOC(6)%nrow,                            &
+                  BLOC(3)%array,ALOC(3,3)%array,ALOC(3,6)%array,        &
                   BLOC(6)%array,ALOC(6,3)%array,ALOC(6,6)%array)
             else
-               call elem_maxwell(Mdle,fld_flag,nrTest,nrTrial,    &
-                  nrdofEE,nrdofH,nrdofE,nrdofQ,nrdofEi,           &
-                  BLOC(3)%nrow,BLOC(6)%nrow,                      &
-                  BLOC(3)%array,ALOC(3,3)%array,ALOC(3,6)%array,  &
+               call elem_maxwell(Mdle,fld_flag,nrTest,nrTrial,          &
+                  nrdofEE,nrdofH,nrdofE,nrdofQ,nrdofEi,                 &
+                  BLOC(3)%nrow,BLOC(6)%nrow,                            &
+                  BLOC(3)%array,ALOC(3,3)%array,ALOC(3,6)%array,        &
                   BLOC(6)%array,ALOC(6,3)%array,ALOC(6,6)%array)
             endif
          endif
 !..end select for select case(NO_PROBLEM)
    end select
+!
+!..end timer
+   end_time = OMP_get_wtime()
+! !$OMP CRITICAL
+!      write(*,10) etype, end_time-start_time
+! 10   format(A,' elem : ',f12.5,'  seconds')
+! !$OMP END CRITICAL
 !
 end subroutine elem
 !
@@ -238,5 +258,3 @@ subroutine compute_enriched_order(EType,Nord, Norder)
 !
 end subroutine compute_enriched_order
 !
-
-
