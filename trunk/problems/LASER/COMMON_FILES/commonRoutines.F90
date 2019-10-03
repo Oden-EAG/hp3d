@@ -31,16 +31,10 @@ subroutine propagate_flag(Icomp,Nflag)
 !
    implicit none
 !
-   integer :: Icomp,Nflag
+   integer, intent(in) :: Icomp,Nflag
 !
    character(len=4) :: etype
    integer :: iel,mdle,ifc,nrfn,i,j,nod
-!
-#if DEBUG_MODE
-   integer :: iprint = 0
-#endif
-!
-!----------------------------------------------------------------------
 !
 !..element nodes and orientations, face nodes
    integer :: nodesl(27),norientl(27),nface_nodes(9)
@@ -48,10 +42,16 @@ subroutine propagate_flag(Icomp,Nflag)
 !..element face BC flags, decoded BC flag for a node
    integer :: ibc(6,NR_PHYSA),nodflag(NR_PHYSA)
 !
+!----------------------------------------------------------------------
+!
 !..loop through active elements
-   mdle=0
+!$OMP PARALLEL                                     &
+!$OMP PRIVATE(etype,mdle,ifc,nrfn,i,j,nod,nodesl,  &
+!$OMP         norientl,nface_nodes,ibc,nodflag)
+!
+!$OMP DO
    do iel=1,NRELES
-      call nelcon(mdle, mdle)
+      mdle = ELEM_ORDER(iel)
       etype = NODES(mdle)%type
 !
 !  ...determine element nodes
@@ -65,14 +65,9 @@ subroutine propagate_flag(Icomp,Nflag)
 !
 !     ...determine face node numbers
          call face_nodes(etype,ifc, nface_nodes,nrfn)
-#if DEBUG_MODE
-         if (iprint.eq.1) then
-            write(*,7010) mdle,ifc, ibc(ifc,Icomp)
- 7010       format('propagate_flag: mdle,ifc,ibc(ifc,Icomp) = ',i6,i3,i4)
-         endif
-#endif
 !
 !     ...loop through the face nodes
+!$OMP CRITICAL
          do i=1,nrfn-1
             j = nface_nodes(i)
             nod = nodesl(j)
@@ -87,17 +82,14 @@ subroutine propagate_flag(Icomp,Nflag)
                NODES(nod)%visit = -Nflag
             endif
          enddo
+!$OMP END CRITICAL
       enddo
    enddo
+!$OMP END DO
 !
 !..change -Nflag to zero
+!$OMP DO
    do nod=1,NRNODS
-#if DEBUG_MODE
-      if (iprint.eq.1) then
-         write(*,7020) nod,NODES(nod)%visit
- 7020    format('propagate_flag: nod,NODES(nod)%visit = ',i8,i3)
-      endif
-#endif
       if (NODES(nod)%visit.eq.0) cycle
       call decod(NODES(nod)%bcond,10,NR_PHYSA, nodflag)
       if (NODES(nod)%visit.eq.-Nflag) then
@@ -112,6 +104,9 @@ subroutine propagate_flag(Icomp,Nflag)
 !     ...reset the node index
          call set_index(NODES(nod)%case,NODES(nod)%bcond, NODES(nod)%index)
    enddo
+!$OMP END DO
+!$OMP END PARALLEL
+!
    call reset_visit
 !
 end subroutine propagate_flag
