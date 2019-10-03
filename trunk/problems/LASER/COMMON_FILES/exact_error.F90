@@ -47,37 +47,36 @@ subroutine exact_error(Nflag,PhysNick)
 !
    error_subd = 0.d0; rnorm_subd = 0.d0
 !
-!$OMP PARALLEL DEFAULT(PRIVATE)              &
-!$OMP SHARED(NRELES_SUBD,ELEM_SUBD)          &
+!$OMP PARALLEL DO                            &
+!$OMP PRIVATE(errorH,errorE,errorV,errorQ,   &
+!$OMP         rnormH,rnormE,rnormV,rnormQ)   &
 !$OMP REDUCTION(+:error_subd,rnorm_subd)
-!$OMP DO
    do iel=1,NRELES_SUBD
       call element_error(ELEM_SUBD(iel),Nflag,           &
                          errorH,errorE,errorV,errorQ,    &
                          rnormH,rnormE,rnormV,rnormQ)  
       select case(PhysNick)
-            case(1)
-               error_subd = error_subd + errorQ
-               rnorm_subd = rnorm_subd + rnormQ
-            case(10)
-               error_subd = error_subd + errorV
-               rnorm_subd = rnorm_subd + rnormV
-            case(100)
-               error_subd = error_subd + errorE
-               rnorm_subd = rnorm_subd + rnormE
-            case(1000)
-               error_subd = error_subd + errorH
-               rnorm_subd = rnorm_subd + rnormH
-            case(1001)
-               error_subd = error_subd + errorH + errorQ
-               rnorm_subd = rnorm_subd + rnormH + rnormQ
-            case default
-               error_subd = error_subd + errorH + errorE + errorV + errorQ
-               rnorm_subd = rnorm_subd + rnormH + rnormE + rnormV + rnormQ
-         end select
+         case(1)
+            error_subd = error_subd + errorQ
+            rnorm_subd = rnorm_subd + rnormQ
+         case(10)
+            error_subd = error_subd + errorV
+            rnorm_subd = rnorm_subd + rnormV
+         case(100)
+            error_subd = error_subd + errorE
+            rnorm_subd = rnorm_subd + rnormE
+         case(1000)
+            error_subd = error_subd + errorH
+            rnorm_subd = rnorm_subd + rnormH
+         case(1001)
+            error_subd = error_subd + errorH + errorQ
+            rnorm_subd = rnorm_subd + rnormH + rnormQ
+         case default
+            error_subd = error_subd + errorH + errorE + errorV + errorQ
+            rnorm_subd = rnorm_subd + rnormH + rnormE + rnormV + rnormQ
+      end select
    enddo
-!$OMP END DO
-!$OMP END PARALLEL
+!$OMP END PARALLEL DO
 !
    err = 0.d0; rnorm = 0.d0
    if (DISTRIBUTED .and. (.not. HOST_MESH)) then
@@ -91,9 +90,9 @@ subroutine exact_error(Nflag,PhysNick)
 !
    if (RANK .eq. ROOT) then
       write(*,7020) NRDOF_TOT,sqrt(err),sqrt(rnorm)
- 7020 format('exact_error: NRDOF_TOT, L2 ERROR AND NORM = ',i8,3x,2es12.5)
+ 7020 format('exact_error: NRDOF_TOT, L2 ERROR AND NORM = ',i9,3x,2es12.5)
       write(*,7030) NRDOF_TOT,sqrt(err/rnorm)
- 7030 format('exact_error: NRDOF_TOT, RELATIVE L2 ERROR = ',i8,3x,es12.5)
+ 7030 format('exact_error: NRDOF_TOT, RELATIVE L2 ERROR = ',i9,3x,es12.5)
    endif
 !
    90 continue
