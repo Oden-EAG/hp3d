@@ -47,10 +47,10 @@ subroutine exact_error
 !
    error_subd = 0.d0; rnorm_subd = 0.d0
 !
-!$OMP PARALLEL DEFAULT(PRIVATE)              &
-!$OMP SHARED(NRELES_SUBD,ELEM_SUBD,iflag)    &
+!$OMP PARALLEL DO                            &
+!$OMP PRIVATE(errorH,errorE,errorV,errorQ,   &
+!$OMP         rnormH,rnormE,rnormV,rnormQ)   &
 !$OMP REDUCTION(+:error_subd,rnorm_subd)
-!$OMP DO
    do iel=1,NRELES_SUBD
       call element_error(ELEM_SUBD(iel),iflag,           &
                          errorH,errorE,errorV,errorQ,    &
@@ -58,8 +58,7 @@ subroutine exact_error
       error_subd = error_subd + errorH
       rnorm_subd = rnorm_subd + rnormH
    enddo
-!$OMP END DO
-!$OMP END PARALLEL
+!$OMP END PARALLEL DO
 !
    err = 0.d0; rnorm = 0.d0
    if (DISTRIBUTED .and. (.not. HOST_MESH)) then
