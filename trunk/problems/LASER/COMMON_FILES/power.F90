@@ -51,15 +51,20 @@ subroutine get_power(Fld,NumPts,FileIter)
 !
 !----------------------------------------------------------------------
 !
+   if (Fld .ne. 0 .and. Fld .ne. 1 .and. Fld .ne. 2) then
+      if (RANK.eq.ROOT) write(*,*) ' get_power: invalid Fld param. returning.'
+      return
+   endif
+!
    if (NumPts.le.0) NumPts = 4
    if (RANK .eq. ROOT) then
       write(*,2001) '  get_power: Number of sample points: ', NumPts
  2001 format(A,i5)
    endif
 !
-   allocate(zValues(NumPts), sign_power(NumPts),  &
-            pump_power(NumPts), diff_power(NumPts), &
-            core_power(NumPts), clad_power(NumPts)  )
+   allocate(zValues(NumPts+1)   , sign_power(NumPts+1), &
+            pump_power(NumPts+1), diff_power(NumPts+1), &
+            core_power(NumPts+1), clad_power(NumPts+1)  )
 !
 !..distributing sample points uniformly
    if (RANK .eq. ROOT) then
@@ -76,11 +81,11 @@ subroutine get_power(Fld,NumPts,FileIter)
    zValues = zValues*PI*(7.d0/22.d0)
 !
 !..init arrays
-   sign_power(1:NumPts) = 0.d0
-   pump_power(1:NumPts) = 0.d0
-   diff_power(1:NumPts) = 0.d0
-   core_power(1:NumPts) = 0.d0
-   clad_power(1:NumPts) = 0.d0
+   sign_power(1:NumPts+1) = 0.d0
+   pump_power(1:NumPts+1) = 0.d0
+   diff_power(1:NumPts+1) = 0.d0
+   core_power(1:NumPts+1) = 0.d0
+   clad_power(1:NumPts+1) = 0.d0
 !
 !..get power
    select case (Fld)
@@ -98,9 +103,10 @@ subroutine get_power(Fld,NumPts,FileIter)
          if (RANK.eq.ROOT) write(*,*) ' get_power: invalid Fld param. stop.'
          stop 1
    end select
+   !write(*,*) 'finished..'
 !
 !..gather RHS vector information on host
-   count = NumPts
+   count = NumPts+1
    if (RANK .eq. ROOT) then
       call MPI_REDUCE(MPI_IN_PLACE,sign_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE(MPI_IN_PLACE,pump_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
@@ -120,10 +126,18 @@ subroutine get_power(Fld,NumPts,FileIter)
    if (Fld .eq. 1 .or. Fld .eq. 2) then
       if (FileIter .eq. -1) then
          write(*,*) ' get_power: printing power values (signal):'
-         do i = 1,NumPts
+         do i = 1,NumPts+1
             write(*,2020) sign_power(i)
        2020 format('    ',es12.5)
          enddo
+         if (NONLINEAR_FLAG .eq. 0) then
+            i = NumPts
+            if (USE_PML) then
+               i = (1.0d0 - PML_FRAC) * NumPts
+            endif
+            write(*,2021) (sign_power(1)-sign_power(i))/sign_power(1) * 100.d0
+       2021 format(' Power loss: ',f6.2,' %',/)
+         endif
       endif
       if (FileIter .ge. 0) then
          !WRITE TO FILE
@@ -132,7 +146,7 @@ subroutine get_power(Fld,NumPts,FileIter)
          write (suffix,fmt) FileIter
          filename=trim(OUTPUT_DIR)//'power/signal_'//trim(suffix)//'.dat'
          open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
-         do i = 1,NumPts
+         do i = 1,NumPts+1
             write(UNIT=9, FMT="(es12.5)") sign_power(i)
          enddo
          close(UNIT=9)
@@ -143,7 +157,7 @@ subroutine get_power(Fld,NumPts,FileIter)
    if (Fld .eq. 0 .or. Fld .eq. 2) then
       if (FileIter .eq. -1) then
          write(*,*) ' get_power: printing power values (pump):'
-         do i = 1,NumPts
+         do i = 1,NumPts+1
             write(*,2020) pump_power(i)
          enddo
       endif
@@ -154,7 +168,7 @@ subroutine get_power(Fld,NumPts,FileIter)
          write (suffix,fmt) FileIter
          filename=trim(OUTPUT_DIR)//'power/pump_'//trim(suffix)//'.dat'
          open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
-         do i = 1,NumPts
+         do i = 1,NumPts+1
             write(UNIT=9, FMT="(es12.5)") pump_power(i)
          enddo
          close(UNIT=9)
@@ -165,7 +179,7 @@ subroutine get_power(Fld,NumPts,FileIter)
    if (GEOM_NO .eq. 5 .and. (Fld .eq. 1 .or. Fld .eq. 2)) then
       if (FileIter .eq. -1) then
          write(*,*) ' get_power: printing fiber core power ratio (signal):'
-         do i = 1,NumPts
+         do i = 1,NumPts+1
             write(*,2030) core_power(i)/sign_power(i)
        2030 format('    ',f8.4)
          enddo
@@ -177,7 +191,7 @@ subroutine get_power(Fld,NumPts,FileIter)
          write (suffix,fmt) FileIter
          filename=trim(OUTPUT_DIR)//'power/ratio_'//trim(suffix)//'.dat'
          open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
-         do i = 1,NumPts
+         do i = 1,NumPts+1
             write(UNIT=9, FMT="(f8.4)") core_power(i)/sign_power(i)
          enddo
          close(UNIT=9)
@@ -189,7 +203,7 @@ subroutine get_power(Fld,NumPts,FileIter)
       allocate(efficiency(NumPts))
       write(*,*) ' get_power: computing efficiency..'
       efficiency(1) = 0.d0
-      do i = 2,NumPts
+      do i = 2,NumPts+1
          if(COPUMP.eq.1) then
             efficiency(i) = (sign_power(i)-sign_power(1))&
                              /(pump_power(1)-pump_power(i))
@@ -203,7 +217,7 @@ subroutine get_power(Fld,NumPts,FileIter)
       enddo
       if (FileIter .eq. -1) then
          write(*,*) ' get_power: printing efficiency:'
-         do i = 1,NumPts
+         do i = 1,NumPts+1
             write(*,2030) efficiency(i)
          enddo
       endif
@@ -214,7 +228,7 @@ subroutine get_power(Fld,NumPts,FileIter)
          write (suffix,fmt) FileIter
          filename=trim(OUTPUT_DIR)//'power/efficiency_'//trim(suffix)//'.dat'
          open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
-         do i = 1,NumPts
+         do i = 1,NumPts+1
             write(UNIT=9, FMT="(f8.4)") efficiency(i)
          enddo
          close(UNIT=9)
@@ -258,6 +272,7 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
 !
    use commonParam
    use data_structure3D
+   use control    , only : GEOM_TOL
    use environment, only : QUIET_MODE
    use mpi_param  , only : RANK,ROOT
    use MPI        , only : MPI_COMM_WORLD
@@ -268,10 +283,10 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
    integer, intent(in)  :: Num_zpts
    real*8,  intent(in)  :: ZValues(Num_zpts)
    integer, intent(in)  :: Fld
-   real*8,  intent(out) :: Power(Num_zpts)
-   real*8,  intent(out) :: DiffPower(Num_zpts)
-   real*8,  intent(out) :: CorePower(Num_zpts)
-   real*8,  intent(out) :: CladPower(Num_zpts)
+   real*8,  intent(out) :: Power(Num_zpts+1)
+   real*8,  intent(out) :: DiffPower(Num_zpts+1)
+   real*8,  intent(out) :: CorePower(Num_zpts+1)
+   real*8,  intent(out) :: CladPower(Num_zpts+1)
 !
 !..auxiliary variables
    real*8 :: facePower, faceDiffPower, elemPower
@@ -292,6 +307,8 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
 !..face number over which power is computed
 !  (in brick and prism, face 2 is face normal to xi3, at xi3=1)
    integer, parameter :: faceNum = 2
+!  (in brick and prism, face 1 is face normal to xi3, at xi3=0)
+   integer, parameter :: faceIn  = 1
 !
 !..timer
    real(8) :: MPI_Wtime,start_time,end_time
@@ -342,17 +359,30 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
             write(*,*) 'compute_power: invalid etype param. stop.'
             stop
       end select
+      if (minz .lt. GEOM_TOL) then
+         call compute_facePower(mdle,faceIn,Fld, facePower,faceDiffPower)
+         Power(1) = Power(1) + abs(facePower)
+         DiffPower(1) = DiffPower(1) + abs(faceDiffPower)
+         if (GEOM_NO .eq. 5) then
+            select case(ndom)
+               case(1,2)
+                  CorePower(1) = CorePower(1) + abs(facePower)
+               case(3,4)
+                  CladPower(1) = CladPower(1) + abs(facePower)
+            end select
+         endif
+      endif
       do i=1,Num_zpts
          if((ZValues(i).le.maxz).and.(ZValues(i).gt.minz)) then
-            call compute_facePower(mdle,faceNum,Fld,ZValues(i), facePower,faceDiffPower)
-            Power(i) = Power(i) + abs(facePower)
-            DiffPower(i) = DiffPower(i) + abs(faceDiffPower)
+            call compute_facePower(mdle,faceNum,Fld, facePower,faceDiffPower)
+            Power(i+1) = Power(i+1) + abs(facePower)
+            DiffPower(i+1) = DiffPower(i+1) + abs(faceDiffPower)
             if (GEOM_NO .eq. 5) then
                select case(ndom)
                   case(1,2)
-                     CorePower(i) = CorePower(i) + abs(facePower)
+                     CorePower(i+1) = CorePower(i+1) + abs(facePower)
                   case(3,4)
-                     CladPower(i) = CladPower(i) + abs(facePower)
+                     CladPower(i+1) = CladPower(i+1) + abs(facePower)
                end select
             endif
          endif
@@ -399,14 +429,13 @@ end subroutine compute_power
 !                      - Mdle       : middle element node
 !                      - Facenumber :
 !                      - Fld        : 1 (signal) or 0 (pump)
-!                      - Zpoint     : value of z at cross section face
 !       out:
 !                      - FacePower     :
 !                      - FaceDiffPower :
 !
 !----------------------------------------------------------------------
 !
-subroutine compute_facePower(Mdle,Facenumber,Fld,Zpoint, FacePower,FaceDiffPower)
+subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
 !
    use control
    use data_structure3D
@@ -420,7 +449,6 @@ subroutine compute_facePower(Mdle,Facenumber,Fld,Zpoint, FacePower,FaceDiffPower
    integer, intent(in)  :: Mdle
    integer, intent(in)  :: Fld
    integer, intent(in)  :: Facenumber
-   real*8,  intent(in)  :: Zpoint
    real*8,  intent(out) :: FacePower
    real*8,  intent(out) :: FaceDiffPower
 !
