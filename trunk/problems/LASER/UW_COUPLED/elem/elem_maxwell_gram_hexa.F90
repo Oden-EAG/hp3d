@@ -1,13 +1,13 @@
 !--------------------------------------------------------------------
 !
-!     routine name      - elem_maxwell_gram_fi
+!     routine name      - elem_maxwell_gram_hexa
 !
 !--------------------------------------------------------------------
 !
-!     latest revision:  - Apr 2019
+!     latest revision:  - Oct 2019
 !
-!     purpose:          - routine returns element gram matrix
-!                         for the Ultraweak Maxwell formulation
+!     purpose:          - routine returns element Gram matrix
+!                         for the ultraweak Maxwell formulation
 !                         using fast integration for hexahedra
 !
 !     arguments:
@@ -25,7 +25,7 @@
 !
 #include "implicit_none.h"
 !
-   subroutine elem_maxwell_gram_fi(Mdle,Fld_flag,NrTest,NrdofH, GramP)
+   subroutine elem_maxwell_gram_hexa(Mdle,Fld_flag,NrTest,NrdofH, GramP)
 !
    use data_structure3D
    use control, only: INTEGRATION
@@ -164,7 +164,7 @@
       case('mdlb')
          nordP = NODES(Mdle)%order+NORD_ADD*111
       case default
-         write(*,*) 'elem_maxwell_gram_fi: unsupported etype param. stop.'
+         write(*,*) 'elem_maxwell_gram_hexa: unsupported etype param. stop.'
          stop
    end select
 !
@@ -183,7 +183,7 @@
       case(1)
          OMEGA_RATIO_FLD = OMEGA_RATIO_SIGNAL ! 1.0d0
       case default
-      write(*,*) 'elem_maxwell_gram_fi: invalid Fld_flag param. stop.'
+      write(*,*) 'elem_maxwell_gram_hexa: invalid Fld_flag param. stop.'
          stop
    end select
 !
@@ -196,7 +196,7 @@
       case(1)
          bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
       case(2,3)
-         write(*,*) 'elem_maxwell_gram_fi: cannot have prism core geometry with fast integration. stop.'
+         write(*,*) 'elem_maxwell_gram_hexa: cannot have prism core geometry with fast integration. stop.'
          stop
       case(4)
          bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
@@ -210,7 +210,7 @@
                dom_flag = 0 ! Fiber cladding
                call get_bgPol(dom_flag,Fld_flag,0.d0, bg_pol)
             case default
-               write(*,*) 'elem_maxwell_gram_fi: unexpected ndom param. stop.'
+               write(*,*) 'elem_maxwell_gram_hexa: unexpected ndom param. stop.'
                stop
          end select
 !..end select case of GEOM_NO
@@ -842,5 +842,5 @@
    deallocate(AUXCE_B_zb,AUXCE_B_zc)
 !
 !
-end subroutine elem_maxwell_gram_fi
+end subroutine elem_maxwell_gram_hexa
 

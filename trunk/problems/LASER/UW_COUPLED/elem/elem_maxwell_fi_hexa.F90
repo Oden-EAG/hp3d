@@ -1,7 +1,7 @@
 !
 !--------------------------------------------------------------------
 !
-!    routine name      - elem_maxwell_fi
+!    routine name      - elem_maxwell_fi_hexa
 !
 !--------------------------------------------------------------------
 !
@@ -39,14 +39,14 @@
 !
 #include "implicit_none.h"
 !
-subroutine elem_maxwell_fi(Mdle,Fld_flag,                &
-                           NrTest,NrTrial,               &
-                           NrdofEE,                      &
-                           NrdofH,NrdofE,NrdofQ,         &
-                           NrdofEi,                      &
-                           MdE,MdQ,                      &
-                           ZblocE,ZalocEE,ZalocEQ,       &
-                           ZblocQ,ZalocQE,ZalocQQ)
+subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
+                                NrTest,NrTrial,               &
+                                NrdofEE,                      &
+                                NrdofH,NrdofE,NrdofQ,         &
+                                NrdofEi,                      &
+                                MdE,MdQ,                      &
+                                ZblocE,ZalocEE,ZalocEQ,       &
+                                ZblocQ,ZalocQE,ZalocQQ)
 !..modules used
    use control
    use parametersDPG
@@ -254,7 +254,7 @@ subroutine elem_maxwell_fi(Mdle,Fld_flag,                &
    iprint = 0
 #if DEBUG_MODE
    if (iprint.eq.1) then
-      write(*,*) 'elem_maxwell_fi: Mdle = ', Mdle
+      write(*,*) 'elem_maxwell_fi_hexa: Mdle = ', Mdle
    endif
 #endif
 !
@@ -277,7 +277,7 @@ subroutine elem_maxwell_fi(Mdle,Fld_flag,                &
          nordP = NODES(Mdle)%order+NORD_ADD*111
          norderi(nre+nrf+1) = 111
       case default
-         write(*,*) 'elem_maxwell_fi: unsupported etype param. stop.'
+         write(*,*) 'elem_maxwell_fi_hexa: unsupported etype param. stop.'
          stop
    end select
 !
@@ -293,7 +293,7 @@ subroutine elem_maxwell_fi(Mdle,Fld_flag,                &
 #if DEBUG_MODE
    if (iprint.eq.1) then
       write(*,7001) Mdle
-7001  format('elem_maxwell_fi: BCFLAGS FOR Mdle = ',i5)
+7001  format('elem_maxwell_fi_hexa: BCFLAGS FOR Mdle = ',i5)
       do i=1,NR_PHYSA
          write(*,7002) PHYSA(i), ibc(1:nrf,i)
 7002     format('     ATTRIBUTE = ',a6,' FLAGS = ',6i2)
@@ -319,7 +319,7 @@ subroutine elem_maxwell_fi(Mdle,Fld_flag,                &
       case(1)
          OMEGA_RATIO_FLD = OMEGA_RATIO_SIGNAL ! 1.0d0
       case default
-      write(*,*) 'elem_maxwell_fi: invalid Fld_flag param. stop.'
+      write(*,*) 'elem_maxwell_fi_hexa: invalid Fld_flag param. stop.'
          stop
    end select
 !
@@ -342,7 +342,7 @@ subroutine elem_maxwell_fi(Mdle,Fld_flag,                &
       case(1)
          bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
       case(2,3)
-         write(*,*) 'elem_maxwell_fi: cannot have prism core geometry with fast integration. stop.'
+         write(*,*) 'elem_maxwell_fi_hexa: cannot have prism core geometry with fast integration. stop.'
          stop
       case(4)
          bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
@@ -356,7 +356,7 @@ subroutine elem_maxwell_fi(Mdle,Fld_flag,                &
                dom_flag = 0 ! Fiber cladding
                call get_bgPol(dom_flag,Fld_flag,0.d0, bg_pol)
             case default
-               write(*,*) 'elem_maxwell_fi: unexpected ndom param. stop.'
+               write(*,*) 'elem_maxwell_fi_hexa: unexpected ndom param. stop.'
                stop
          end select
 !..end select case of GEOM_NO
@@ -429,14 +429,14 @@ subroutine elem_maxwell_fi(Mdle,Fld_flag,                &
 !..total number of test functions (per field)
    nrdof=nord1*nrdofH2*nrdofH3+nrdofH1*nord2*nrdofH3+nrdofH1*nrdofH2*nord3
    if (NrdofEE .ne. nrdof) then
-      write(*,*) 'elem_maxwell_fi: INCONSISTENCY NrdofEE. stop.'
+      write(*,*) 'elem_maxwell_fi_hexa: INCONSISTENCY NrdofEE. stop.'
       stop
    endif
 !
 !..number of trial functions (per component)
    nrdof=nrdofQ1_tr*nrdofQ2_tr*nrdofQ3_tr
    if (NrdofQ .ne. nrdof) then
-      write(*,*) 'elem_maxwell_fi: INCONSISTENCY NrdofQ. stop.'
+      write(*,*) 'elem_maxwell_fi_hexa: INCONSISTENCY NrdofQ. stop.'
       stop
    endif
 !
@@ -530,7 +530,7 @@ subroutine elem_maxwell_fi(Mdle,Fld_flag,                &
             call shape3H(etype,xip,norder,norient_edge,norient_face, nrdof,shapH,gradH)
 #if DEBUG_MODE
             if (nrdof .ne. NrdofH) then
-               write(*,*) 'elem_maxwell_fi: INCONSISTENCY NrdofH. stop.'
+               write(*,*) 'elem_maxwell_fi_hexa: INCONSISTENCY NrdofH. stop.'
                stop
             endif
 #endif
@@ -539,7 +539,7 @@ subroutine elem_maxwell_fi(Mdle,Fld_flag,                &
 #if DEBUG_MODE
             if (iflag.ne.0) then
                write(*,5999) Mdle,rjac
- 5999          format('elem_maxwell_fi: Negative Jacobian. Mdle,rjac=',i8,2x,e12.5)
+ 5999          format('elem_maxwell_fi_hexa: Negative Jacobian. Mdle,rjac=',i8,2x,e12.5)
                stop
             endif
 #endif
@@ -1388,7 +1388,7 @@ subroutine elem_maxwell_fi(Mdle,Fld_flag,                &
          call shape3EE(etype,xi,nordP, nrdof,shapEE,curlEE)
 #if DEBUG_MODE
          if (nrdof .ne. NrdofEE) then
-            write(*,*) 'elem_maxwell_fi: INCONSISTENCY NrdofEE. stop.'
+            write(*,*) 'elem_maxwell_fi_hexa: INCONSISTENCY NrdofEE. stop.'
             stop
          endif
 #endif
@@ -1398,7 +1398,7 @@ subroutine elem_maxwell_fi(Mdle,Fld_flag,                &
                       nrdof,shapH,gradH)
 #if DEBUG_MODE
          if (nrdof .ne. NrdofH) then
-            write(*,*) 'elem_maxwell_fi: INCONSISTENCY NrdofH. stop.'
+            write(*,*) 'elem_maxwell_fi_hexa: INCONSISTENCY NrdofH. stop.'
             stop
          endif
 #endif
@@ -1409,7 +1409,7 @@ subroutine elem_maxwell_fi(Mdle,Fld_flag,                &
                       nrdof,shapE,curlE)
 #if DEBUG_MODE
          if (nrdof .ne. NrdofEi) then
-            write(*,*) 'elem_maxwell_fi: INCONSISTENCY NrdofEi. stop.'
+            write(*,*) 'elem_maxwell_fi_hexa: INCONSISTENCY NrdofEi. stop.'
             stop
          endif
 #endif
@@ -1499,14 +1499,14 @@ subroutine elem_maxwell_fi(Mdle,Fld_flag,                &
 !..A. Compute Cholesky factorization of Gram Matrix, G=U^*U (=LL^*)
    call ZPPTRF('U',NrTest,gramP,info)
    if (info.ne.0) then
-      write(*,*) 'elem_maxwell_fi: ZPPTRF: Mdle,info = ',Mdle,info,'. stop.'
+      write(*,*) 'elem_maxwell_fi_hexa: ZPPTRF: Mdle,info = ',Mdle,info,'. stop.'
       stop
    endif
 !
 !..B. Solve triangular system to obtain B~, (LX=) U^*X = [B|l]
    call ZTPTRS('U','C','N',NrTest,NrTrial+1,gramP,stiff_ALL,NrTest,info)
    if (info.ne.0) then
-      write(*,*) 'elem_maxwell_fi: ZTPTRS: Mdle,info = ',Mdle,info,'. stop.'
+      write(*,*) 'elem_maxwell_fi_hexa: ZTPTRS: Mdle,info = ',Mdle,info,'. stop.'
       stop
    endif
 !
@@ -1535,5 +1535,5 @@ subroutine elem_maxwell_fi(Mdle,Fld_flag,                &
 !
    deallocate(zaloc)
 !
-end subroutine elem_maxwell_fi
+end subroutine elem_maxwell_fi_hexa
 

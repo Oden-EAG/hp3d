@@ -18,9 +18,10 @@ SRC_FILE    = \
         elem/elem.F90 \
         elem/elem_heat.F90 \
         elem/elem_maxwell.F90 \
-        elem/elem_maxwell_fi.F90 \
-        elem/elem_maxwell_fi_prism.F90 \
-        elem/elem_maxwell_gram_fi.F90 \
+        elem/elem_maxwell_fi_hexa.F90 \
+        elem/elem_maxwell_fi_pris.F90 \
+        elem/elem_maxwell_gram_hexa.F90 \
+        elem/elem_maxwell_gram_pris.F90 \
         elem/elem_residual.F90 \
         elem/elem_residual_heat.F90 \
         elem/elem_residual_maxwell.F90 \

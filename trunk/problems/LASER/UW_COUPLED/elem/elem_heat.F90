@@ -129,14 +129,16 @@ subroutine elem_heat(Mdle,                   &
    real*8 :: bload_H(NrTest)
 !
 !..gram matrix in packed format
-   real*8 :: gramP(NrTest*(NrTest+1)/2)
+   !real*8 :: gramP(NrTest*(NrTest+1)/2)
+   real(8), allocatable :: gramP(:)
    !complex(8), allocatable :: gramEigen(:)
 !
 !..stiffness matrices for the enriched test space
-   real*8 :: stiff_HH (NrTest   ,NrdofH)
-   real*8 :: stiff_HV (NrTest   ,NrdofVi)
-   real*8 :: stiff_ALL(NrTest   ,NrTrial+1)
-   real*8 :: raloc    (NrTrial+1,NrTrial+1)
+!   real*8 :: stiff_HH (NrTest   ,NrdofH)
+!   real*8 :: stiff_HV (NrTest   ,NrdofVi)
+!   real*8 :: stiff_ALL(NrTest   ,NrTrial+1)
+!   real*8 :: raloc    (NrTrial+1,NrTrial+1)
+   real(8), allocatable :: stiff_HH(:,:),stiff_HV(:,:),stiff_ALL(:,:),raloc(:,:)
 !
 !..3D quadrature data
    real*8, dimension(3,MAXNINT3ADD)  :: xiloc
@@ -191,6 +193,11 @@ subroutine elem_heat(Mdle,                   &
       write(*,*) 'elem_heat: Mdle = ', Mdle
    endif
 #endif
+!
+!..allocate auxiliary matrices
+   allocate(gramP(NrTest*(NrTest+1)/2))
+   allocate(stiff_HH (NrTest   ,NrdofH))
+   allocate(stiff_HV (NrTest   ,NrdofVi))
 !
 !..element type
    etype = NODES(Mdle)%type
@@ -259,7 +266,6 @@ subroutine elem_heat(Mdle,                   &
    gramP     = rZERO
    stiff_HH  = rZERO
    stiff_HV  = rZERO
-   stiff_ALL = rZERO
 !
 !---------------------------------------------------------------------
 !              E L E M E N T    I N T E G R A L S                    |
@@ -551,12 +557,16 @@ subroutine elem_heat(Mdle,                   &
 !  Construction of DPG system
 !---------------------------------------------------------------------
 !
+   allocate(stiff_ALL(NrTest,NrTrial+1))
+!
 !..Total test/trial DOFs of the element
    i1 = NrTest ; j1 = NrdofH ; j2 = NrdofVi
 !
    stiff_ALL(1:i1,1:j1)       = stiff_HH(1:i1,1:j1)
    stiff_ALL(1:i1,j1+1:j1+j2) = stiff_HV(1:i1,1:j2)
    stiff_ALL(1:i1,j1+j2+1)    = bload_H(1:i1)
+!
+   deallocate(stiff_HH,stiff_HV)
 !
 !..A. Compute Cholesky factorization of Gram Matrix, G=U^T U (=LL^T)
    call DPPTRF('U',NrTest,gramP,info)
@@ -572,8 +582,12 @@ subroutine elem_heat(Mdle,                   &
       stop
    endif
 !
+   allocate(raloc(NrTrial+1,NrTrial+1)); raloc = rZERO
+!
 !..C. Matrix multiply: B^T G^-1 B (=B~^T B~)
    call DSYRK('U','T',NrTrial+1,NrTest,rONE,stiff_ALL,NrTest,rZERO,raloc,NrTrial+1)
+!
+   deallocate(stiff_ALL)
 !
 !..D. Fill lower triangular part of Hermitian matrix
    do i=1,NrTrial
@@ -590,6 +604,7 @@ subroutine elem_heat(Mdle,                   &
    ZalocVH(1:j2,1:j1) = raloc(j1+1:j1+j2,1:j1)
    ZalocVV(1:j2,1:j2) = raloc(j1+1:j1+j2,j1+1:j1+j2)
 !
+   deallocate(raloc)
 !
 end subroutine elem_heat
 

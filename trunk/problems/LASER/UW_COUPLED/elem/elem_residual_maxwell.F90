@@ -102,7 +102,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    real*8 , dimension(3,MAXbrickEE) :: curlEE
 !
 !..Gram matrix in packed format
-   !VTYPE, dimension(NrTest*(NrTest+1)/2) :: gramP !, gramTest
+!   VTYPE, dimension(NrTest*(NrTest+1)/2) :: gramTest
    VTYPE, allocatable :: gramP(:)
    real*8  :: FF, CF, FC
    real*8  :: fldE(3), fldH(3), crlE(3), crlH(3)
@@ -375,6 +375,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !     ...Computation of Gram Matrix (w/o fast integration)
 !     ...loop through enriched H(curl) trial functions
          if (FAST_INT .eq. 1 .and. etype .eq. 'mdlb') cycle
+         if (FAST_INT .eq. 1 .and. etype .eq. 'mdlp') cycle
          do k2=k1,NrdofEE
 !        ...Piola transformation
             do i = 1,3
@@ -423,8 +424,13 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
       enddo
    enddo
 !
-   if (FAST_INT .eq. 1 .and. etype .eq. 'mdlb') then
-       call elem_maxwell_gram_fi(Mdle,Fld_flag,NrTest,NrdofH, gramP)
+   if (FAST_INT .eq. 1) then
+      select case (etype)
+         case('mdlb')
+            call elem_maxwell_gram_hexa(Mdle,Fld_flag,NrTest,NrdofH, gramP)
+         case('mdlp')
+            call elem_maxwell_gram_pris(Mdle,Fld_flag,NrTest,NrdofH, gramP)
+      end select
 !
 !      do k=1,NrTest*(NrTest+1)/2
 !         if (abs(real(gramP(k))-real(gramTest(k))) > 1.d-8 .or. &

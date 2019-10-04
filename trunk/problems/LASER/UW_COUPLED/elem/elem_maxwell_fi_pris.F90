@@ -1,7 +1,7 @@
 !
 !--------------------------------------------------------------------
 !
-!    routine name      - elem_maxwell_fi_prism
+!    routine name      - elem_maxwell_fi_pris
 !
 !--------------------------------------------------------------------
 !
@@ -42,14 +42,14 @@
 !
 #include "implicit_none.h"
 !
-subroutine elem_maxwell_fi_prism(Mdle,Fld_flag,                &
-                                 NrTest,NrTrial,               &
-                                 NrdofEE,                      &
-                                 NrdofH,NrdofE,NrdofQ,         &
-                                 NrdofEi,                      &
-                                 MdE,MdQ,                      &
-                                 ZblocE,ZalocEE,ZalocEQ,       &
-                                 ZblocQ,ZalocQE,ZalocQQ)
+subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
+                                NrTest,NrTrial,               &
+                                NrdofEE,                      &
+                                NrdofH,NrdofE,NrdofQ,         &
+                                NrdofEi,                      &
+                                MdE,MdQ,                      &
+                                ZblocE,ZalocEE,ZalocEQ,       &
+                                ZblocQ,ZalocQE,ZalocQQ)
 !..modules used
    use control
    use parametersDPG
@@ -160,7 +160,7 @@ subroutine elem_maxwell_fi_prism(Mdle,Fld_flag,                &
 !
 !..2D quadrature data
    real*8, dimension(2,MAXNINT2ADD)  :: tloc
-   real*8, dimension(  MAXNINT2ADD)    :: wtloc
+   real*8, dimension(  MAXNINT2ADD)  :: wtloc
 !
 !..BC's flags
    integer, dimension(6,NR_PHYSA)    :: ibc
@@ -253,7 +253,7 @@ subroutine elem_maxwell_fi_prism(Mdle,Fld_flag,                &
    iprint = 0
 #if DEBUG_MODE
    if (iprint.eq.1) then
-      write(*,*) 'elem_maxwell_fi_prism: Mdle = ', Mdle
+      write(*,*) 'elem_maxwell_fi_pris: Mdle = ', Mdle
    endif
 #endif
 !
@@ -290,7 +290,7 @@ subroutine elem_maxwell_fi_prism(Mdle,Fld_flag,                &
          nordP = NODES(Mdle)%order+NORD_ADD*111
          norderi(nre+nrf+1) = 111
       case default
-         write(*,*) 'elem_maxwell_fi_prism: unsupported etype param. stop.'
+         write(*,*) 'elem_maxwell_fi_pris: unsupported etype param. stop.'
          stop
    end select
 !
@@ -334,7 +334,7 @@ subroutine elem_maxwell_fi_prism(Mdle,Fld_flag,                &
          call tens_hexa_ordQQ(p ,nord3-NORD_ADD, mapQQ)
 !
       case default
-         write(*,*) 'elem_maxwell_fi_prism: unexpected element type:', etype
+         write(*,*) 'elem_maxwell_fi_pris: unexpected element type:', etype
             stop
    end select
 !
@@ -350,7 +350,7 @@ subroutine elem_maxwell_fi_prism(Mdle,Fld_flag,                &
 #if DEBUG_MODE
    if (iprint.eq.1) then
       write(*,7001) Mdle
-7001  format('elem_maxwell_fi_prism: BCFLAGS FOR Mdle = ',i5)
+7001  format('elem_maxwell_fi_pris: BCFLAGS FOR Mdle = ',i5)
       do i=1,NR_PHYSA
          write(*,7002) PHYSA(i), ibc(1:nrf,i)
 7002     format('     ATTRIBUTE = ',a6,' FLAGS = ',6i2)
@@ -376,7 +376,7 @@ subroutine elem_maxwell_fi_prism(Mdle,Fld_flag,                &
       case(1)
          OMEGA_RATIO_FLD = OMEGA_RATIO_SIGNAL ! 1.0d0
       case default
-      write(*,*) 'elem_maxwell_fi_prism: invalid Fld_flag param. stop.'
+      write(*,*) 'elem_maxwell_fi_pris: invalid Fld_flag param. stop.'
          stop
    end select
 !
@@ -412,7 +412,7 @@ subroutine elem_maxwell_fi_prism(Mdle,Fld_flag,                &
                dom_flag = 0 ! Fiber cladding
                call get_bgPol(dom_flag,Fld_flag,0.d0, bg_pol)
             case default
-               write(*,*) 'elem_maxwell_fi_prism: unexpected ndom param. stop.'
+               write(*,*) 'elem_maxwell_fi_pris: unexpected ndom param. stop.'
                stop
          end select
 !..end select case of GEOM_NO
@@ -539,7 +539,7 @@ subroutine elem_maxwell_fi_prism(Mdle,Fld_flag,                &
 #if DEBUG_MODE
          if (iflag.ne.0) then
             write(*,5999) Mdle,rjac
-5999        format('elem_maxwell_fi_prism: Negative Jacobian. Mdle,rjac=',i8,2x,e12.5)
+5999        format('elem_maxwell_fi_pris: Negative Jacobian. Mdle,rjac=',i8,2x,e12.5)
             stop
          endif
 #endif
@@ -1118,14 +1118,14 @@ subroutine elem_maxwell_fi_prism(Mdle,Fld_flag,                &
 !..A. Compute Cholesky factorization of Gram Matrix, G=U^*U (=LL^*)
    call ZPPTRF('U',NrTest,gramP,info)
    if (info.ne.0) then
-      write(*,*) 'elem_maxwell_fi_prism: ZPPTRF: Mdle,info = ',Mdle,info,'. stop.'
+      write(*,*) 'elem_maxwell_fi_pris: ZPPTRF: Mdle,info = ',Mdle,info,'. stop.'
       stop
    endif
 !
 !..B. Solve triangular system to obtain B~, (LX=) U^*X = [B|l]
    call ZTPTRS('U','C','N',NrTest,NrTrial+1,gramP,stiff_ALL,NrTest,info)
    if (info.ne.0) then
-      write(*,*) 'elem_maxwell_fi_prism: ZTPTRS: Mdle,info = ',Mdle,info,'. stop.'
+      write(*,*) 'elem_maxwell_fi_pris: ZTPTRS: Mdle,info = ',Mdle,info,'. stop.'
       stop
    endif
 !
@@ -1154,7 +1154,7 @@ subroutine elem_maxwell_fi_prism(Mdle,Fld_flag,                &
 !
    deallocate(zaloc)
 !
-end subroutine elem_maxwell_fi_prism
+end subroutine elem_maxwell_fi_pris
 !
 !----------------------------------------------------------------------
 ! routine: tens_prism_ordQQ
