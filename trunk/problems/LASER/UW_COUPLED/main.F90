@@ -98,6 +98,9 @@ program main
    if (RANK .ne. ROOT) goto 80
 !
 !..print problem parameters
+   if (GEOM_NO .eq. 1) then
+      write(*,9001) ' Wavelengths/Unit length  = ', sqrt(OMEGA*OMEGA-PI*PI)/(2.d0*PI)
+   endif
    if (GEOM_NO .eq. 5) then
       write(*,9000) ' Fiber length             = ', ZL
       write(*,9000) ' Signal frequency         = ', OMEGA_SIGNAL
@@ -128,6 +131,7 @@ program main
       write(*,9020) ' ALPHA_Z                  = ', ALPHA_Z
    endif
  9000 format(A,F10.6)
+ 9001 format(A,F10.3)
  9010 format(A,I3)
  9020 format(A,ES10.2)
  9030 format(A,' (',I1,',',I1,',',I1,') ')
@@ -270,7 +274,7 @@ subroutine master_main()
       write(*,*) 'Single uniform h-refinement............20'
       write(*,*) 'Single uniform p-refinement............21'
       write(*,*) 'Multiple uniform h-refs + solve........22'
-      write(*,*) 'Single anisotropic h-refinement (z)....23'
+      write(*,*) 'Anisotropic h-refinements (z)..........23'
       write(*,*) '                                         '
       write(*,*) '        ---- MPI Routines ----           '
       write(*,*) 'Distribute mesh........................30'
@@ -286,6 +290,7 @@ subroutine master_main()
       write(*,*) '                                         '
       write(*,*) '     ---- Error and Residual ----        '
       write(*,*) 'Compute exact error....................50'
+      write(*,*) 'Compute residual.......................51'
       write(*,*) '                                         '
       write(*,*) '            ---- Misc ----               '
       write(*,*) 'Compute Power .........................60'
@@ -347,7 +352,7 @@ subroutine master_main()
             call exec_case(idec)
 !
 !     ...Error and Residual
-         case(50)
+         case(50,51)
             call exec_case(idec)
 !
 !     ...Miscellanea
@@ -456,7 +461,7 @@ subroutine worker_main()
             call exec_case(idec)
 !
 !     ...Error and Residual
-         case(50)
+         case(50,51)
             call exec_case(idec)
 !
 !     ...Miscellanea

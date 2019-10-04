@@ -3,7 +3,7 @@
 !     routine name      - set_3Dint_fi
 !
 !----------------------------------------------------------------------
-!                                                                     
+!
 !     latest revision:  - Apr 2019
 !
 !     purpose:          - routine sets up quadrature data for a 3D
@@ -26,7 +26,7 @@
 !----------------------------------------------------------------------
 !
 subroutine set_3Dint_fi(EType,Norder, nordx,nordy,nordz,nintx,ninty, &
-                                       nintz,Xiloc,Waloc)
+                                      nintz,Xiloc,Waloc)
 !
    use parametersDPG    , only : MAXNINT3ADD, MAXPP
    use control          , only : INTEGRATION
@@ -40,8 +40,7 @@ subroutine set_3Dint_fi(EType,Norder, nordx,nordy,nordz,nintx,ninty, &
    real*8          , intent(out) :: Waloc(3,MAXNINT3ADD)
    integer, intent(out) :: nordx,nordy,nordz,nintx,ninty,nintz
 !
-   integer :: i,l,l1,l2,l3, &
-             nordh,nordv,nord1,nord2,nord3
+   integer :: i,l,l1,l2,l3,nordh,nordv,nord1,nord2,nord3
 !
 #if DEBUG_MODE
    integer :: iprint
@@ -61,57 +60,26 @@ subroutine set_3Dint_fi(EType,Norder, nordx,nordy,nordz,nintx,ninty, &
 #endif
 !
    select case(EType)
-!
-!======================================================================      
-!  BRICK                                                              |
-!======================================================================      
    case('mdlb','bric')
 !
 !  ...determine order of approximation
-      ! nordx=0 ; nordy=0 ; nordz=0
-      ! do i=1,19
-      !    select case(i)
-      !    case(1,3,5,7)
-      !       nordx = max(nordx,Norder(i))
-      !    case(2,4,6,8)
-      !       nordy = max(nordy,Norder(i))
-      !    case(9,10,11,12)
-      !       nordz = max(nordz,Norder(i))
-      !    case(13,14)
-      !       call decode(Norder(i), nordh,nordv)
-      !       nordx = max(nordx,nordh)
-      !       nordy = max(nordy,nordv)
-      !    case(15,17)
-      !       call decode(Norder(i), nordh,nordv)
-      !       nordx = max(nordx,nordh)
-      !       nordz = max(nordz,nordv)
-      !    case(16,18)
-      !       call decode(Norder(i), nordh,nordv)
-      !       nordy = max(nordy,nordh)
-      !       nordz = max(nordz,nordv)
-      !    case(19)
-            call decode(Norder(19), nordh,nord3)
-            call decode(nordh     , nord1,nord2)
-            ! nordx = max(nordx,nord1)
-            ! nordy = max(nordy,nord2)
-            ! nordz = max(nordz,nord3)
-            nordx = nord1
-            nordy = nord2
-            nordz = nord3
-         ! end select
-      ! enddo
+      call decode(Norder(19), nordh,nord3)
+      call decode(nordh     , nord1,nord2)
+      nordx = nord1
+      nordy = nord2
+      nordz = nord3
 !
 !  ...account for overintegration
       nordx=min(nordx+INTEGRATION,MAXPP)
       nordy=min(nordy+INTEGRATION,MAXPP)
       nordz=min(nordz+INTEGRATION,MAXPP)
 !
-!  ...compute number of integration points        
+!  ...compute number of integration points
       nintx=nordx+1
       ninty=nordy+1
       nintz=nordz+1
 !
-!  ...compute integration points and weights        
+!  ...compute integration points and weights
       l=0
       do l3=1,nintz 
          do l2=1,ninty 

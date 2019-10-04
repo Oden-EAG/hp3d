@@ -102,7 +102,8 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    real*8 , dimension(3,MAXbrickEE) :: curlEE
 !
 !..Gram matrix in packed format
-   VTYPE, dimension(NrTest*(NrTest+1)/2) :: gramP !, gramTest
+   !VTYPE, dimension(NrTest*(NrTest+1)/2) :: gramP !, gramTest
+   VTYPE, allocatable :: gramP(:)
    real*8  :: FF, CF, FC
    real*8  :: fldE(3), fldH(3), crlE(3), crlH(3)
    real*8  :: fldF(3), fldG(3), crlF(3), crlG(3)
@@ -157,6 +158,8 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !--------------------------------------------------------------------------
 !
    iprint = 0
+!
+   allocate(gramP(NrTest*(NrTest+1)/2))
 !
 !..element type
    etype = NODES(Mdle)%type
@@ -226,7 +229,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !
 !..use the enriched order to set the quadrature
    INTEGRATION = NORD_ADD
-   call set_3Dint_DPG(etype,norder, nint,xiloc,waloc)
+   call set_3D_int_DPG(etype,norder, nint,xiloc,waloc)
    INTEGRATION = 0
 !
 !..loop over
@@ -471,7 +474,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !
 !  ...set 2D quadrature
       INTEGRATION = NORD_ADD
-      call set_2Dint_DPG(ftype,norderf, nint,tloc,wtloc)
+      call set_2D_int_DPG(ftype,norderf, nint,tloc,wtloc)
       INTEGRATION = 0
 !
 !  ...loop through integration points
@@ -582,6 +585,8 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
       !write(*,*) 'elem_residual_maxwell: info = ',info
       !stop
    endif
+!
+   deallocate(gramP)
 !
 !..compute the residual
    zresid = ZERO

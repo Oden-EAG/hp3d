@@ -1,0 +1,193 @@
+3   3     NDIM,MANDIM
+
+0         NRSURFS
+
+1         NRDOMAIN
+
+10        NRPOINT
+
+Regular             point 1
+0.d0 0.d0 0.d0
+
+Regular             point 2
+0.d0 1.d0 0.d0
+
+Regular             point 3
+1.d0 0.d0 0.d0
+
+Regular             point 4
+0.d0 -1.d0 0.d0
+
+Regular             point 5
+-1.d0 0.d0 0.d0
+
+Regular             point 6
+0.d0 0.d0 1.d0
+
+Regular             point 7
+0.d0 1.d0 1.d0
+
+Regular             point 8
+1.d0 0.d0 1.d0
+
+Regular             point 9
+0.d0 -1.d0 1.d0
+
+Regular             point 10
+-1.d0 0.d0 1.d0
+
+
+
+
+21 NRCURVE
+
+Seglin              curve 1
+1 2
+
+Seglin              curve 2
+1 3
+
+Seglin              curve 3
+1 4
+
+Seglin              curve 4
+1 5
+
+QuaCir              curve 5
+2 3
+.0d0, .0d0, .0d0
+
+QuaCir              curve 6
+3 4
+.0d0, .0d0, .0d0
+
+QuaCir              curve 7
+4 5
+.0d0, .0d0, .0d0
+
+QuaCir              curve 8
+5 2
+.0d0, .0d0, .0d0
+
+Seglin              curve 9
+1 6
+
+Seglin              curve 10
+2 7
+
+Seglin              curve 11
+3 8
+
+Seglin              curve 12
+4 9
+
+Seglin              curve 13
+5 10
+
+QuaCir              curve 14
+7 8
+.0d0, .0d0, 1.0d0
+
+QuaCir              curve 15
+8 9
+.0d0, .0d0, 1.0d0
+
+QuaCir              curve 16
+9 10
+.0d0, .0d0, 1.0d0
+
+QuaCir              curve 17
+10 7
+.0d0, .0d0, 1.0d0
+
+Seglin              curve 18
+6 7
+
+Seglin              curve 19
+6 8
+
+Seglin              curve 20
+6 9
+
+Seglin              curve 21
+6 10
+
+
+8  NRTRIAN
+
+TransTri             triangle 1
+1 2 3
+
+TransTri             triangle 2
+1 3 4
+
+TransTri             triangle 3
+1 4 5
+
+TransTri             triangle 4
+1 5 2
+
+TransTri             triangle 5
+6 7 8
+
+TransTri             triangle 6
+6 8 9
+
+TransTri             triangle 7
+6 9 10
+
+TransTri             triangle 8
+6 10 7
+
+
+8 NRRECTA
+
+TraQua              rectangle 1
+2 3 8 7
+
+TraQua              rectangle 2
+3 4 9 8
+
+TraQua              rectangle 3
+4 5 10 9
+
+TraQua              rectangle 4
+5 2 7 10
+
+TraQua              rectangle 5
+1 2 7 6
+
+TraQua              rectangle 6
+1 3 8 6
+
+TraQua              rectangle 7
+1 4 9 6
+
+TraQua              rectangle 8
+1 5 10 6
+
+
+
+4 NRPRISM
+
+TIprism              prism 1
+1    1 3 2 6 8 7
+
+TIprism              prism 2
+2    1 4 3 6 9 8
+
+TIprism              prism 3
+3    1 5 4 6 10 9
+
+TIprism              prism 4
+4    1 2 5 6 7 10
+
+
+0 NRHEXAS
+
+0 NRTETRA
+
+
+0 NRPYRAM
+
+

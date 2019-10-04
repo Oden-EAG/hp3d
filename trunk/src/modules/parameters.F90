@@ -36,9 +36,9 @@ module parameters
   integer, parameter :: MAXGEN = 20
   integer, parameter :: MAXQUEUE = 50
   !
-  !  ...maximum number of quadrature points for 1d,2D,3D elements
-  integer, parameter :: MAX_NINT1 =  MAXP+2
-  integer, parameter :: MAX_NINT2 = (MAXP+2)**2
+  !  ...maximum number of quadrature points for 1D,2D,3D elements
+  integer, parameter :: MAX_NINT1 =  MAXP+1
+  integer, parameter :: MAX_NINT2 = (MAXP+1)**2
   integer, parameter :: MAX_NINT3 = (MAXP+1)**2*(MAXP+2)
   !
   !----------------------------------------------------------------------

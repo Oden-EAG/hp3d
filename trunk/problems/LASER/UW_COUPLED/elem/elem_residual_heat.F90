@@ -173,7 +173,7 @@ subroutine elem_residual_heat(Mdle,                &
 !
 !..use the enriched order to set the quadrature
    INTEGRATION = NORD_ADD
-   call set_3Dint_DPG(etype,norder, nint3,xiloc,waloc)
+   call set_3D_int_DPG(etype,norder, nint3,xiloc,waloc)
    INTEGRATION = 0
 !
 !..loop over integration points
@@ -290,7 +290,7 @@ subroutine elem_residual_heat(Mdle,                &
 !
 !  ...set 2D quadrature
       INTEGRATION = NORD_ADD
-      call set_2Dint_DPG(ftype,norderf, nint,tloc,wtloc)
+      call set_2D_int_DPG(ftype,norderf, nint,tloc,wtloc)
       INTEGRATION = 0
 !
 !  ...loop through integration points

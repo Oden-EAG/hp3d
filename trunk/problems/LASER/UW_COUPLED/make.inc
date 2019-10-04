@@ -9,6 +9,7 @@ SRC_FILE    = \
         ../COMMON_FILES/polarization.F90 \
         ../COMMON_FILES/power.F90 \
         ../COMMON_FILES/refine_DPG.F90 \
+        ../COMMON_FILES/residual.F90 \
         ../COMMON_FILES/set_environment.F90 \
         ../COMMON_FILES/thermal.F90 \
         set_3Dint_fi.F90 \
@@ -18,6 +19,7 @@ SRC_FILE    = \
         elem/elem_heat.F90 \
         elem/elem_maxwell.F90 \
         elem/elem_maxwell_fi.F90 \
+        elem/elem_maxwell_fi_prism.F90 \
         elem/elem_maxwell_gram_fi.F90 \
         elem/elem_residual.F90 \
         elem/elem_residual_heat.F90 \

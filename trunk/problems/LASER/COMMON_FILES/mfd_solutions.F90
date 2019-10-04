@@ -219,31 +219,31 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !     ! shifted source (s.t. fields are non-zero at z=0)
       x1 = Xp(1); x2 = Xp(2); x3 = Xp(3) - .5d0;
 !
-!     nn = 1: TE10 mode only
-!     nn = 2: TE20 mode only
-!     nn = 3: TE10 + TE20 mode
-!     note OMEGA must be set correctly in set_env routine
-      nn = 1
+!        nn = 1: TE10 mode only
+!        nn = 2: TE20 mode only
+!        nn = 3: TE10 + TE20 mode
+!        note OMEGA must be set correctly in set_env routine
+         nn = 1
 !
       if (nn .eq. 1 .or. nn .eq. 3) then
-!  ...fundamental mode TE10
-      gammaTE10 = sqrt(1.d0-(PI**2)/(OMEGA**2))
+!     ...fundamental mode TE10
+         gammaTE10 = sqrt(1.d0-(PI**2)/(OMEGA**2))
 !
-      f_x=-ZI*(OMEGA/PI)*sin(PI*x1)
-      f_y=1.d0
-      f_z=exp(-ZI*OMEGA*x3*gammaTE10)
+         f_x=-ZI*(OMEGA/PI)*sin(PI*x1)
+         f_y=1.d0
+         f_z=exp(-ZI*OMEGA*x3*gammaTE10)
 !
-!  ...1st order derivatives
-      df_x=-ZI*OMEGA*cos(PI*x1)
-      df_y=0.d0
-      df_z=-(ZI*OMEGA*gammaTE10)*f_z
+!     ...1st order derivatives
+         df_x=-ZI*OMEGA*cos(PI*x1)
+         df_y=0.d0
+         df_z=-(ZI*OMEGA*gammaTE10)*f_z
 !
-!  ...2nd order derivatives
-      ddf_x=-PI**2*f_x
-      ddf_y=0.d0
-      ddf_z=-(ZI*OMEGA*gammaTE10)*df_z
+!     ...2nd order derivatives
+         ddf_x=-PI**2*f_x
+         ddf_y=0.d0
+         ddf_z=-(ZI*OMEGA*gammaTE10)*df_z
 !
-      E=f_x*f_y*f_z
+         E=f_x*f_y*f_z
 !     ...1st order derivatives
          dE(1)=  df_x *   f_y *   f_z
          dE(2)=   f_x *  df_y *   f_z
@@ -262,24 +262,24 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
       endif
       if (nn .eq. 2 .or. nn .eq. 3) then
 !
-!  ...next higher mode (TE20, same cutoff as TE01)
-      gammaTE20 = sqrt(1.d0-((2.d0*PI)**2)/(OMEGA**2))
+!     ...next higher mode (TE20, same cutoff as TE01)
+         gammaTE20 = sqrt(1.d0-((2.d0*PI)**2)/(OMEGA**2))
 !
-      f_x=-ZI*(OMEGA/(2.d0*PI))*sin(2.d0*PI*x1)
-      f_y=1.d0
-      f_z=exp(-ZI*OMEGA*x3*gammaTE20)
+         f_x=-ZI*(OMEGA/(2.d0*PI))*sin(2.d0*PI*x1)
+         f_y=1.d0
+         f_z=exp(-ZI*OMEGA*x3*gammaTE20)
 !
-!  ...1st order derivatives
-      df_x=-ZI*OMEGA*cos(2.d0*PI*x1)
-      df_y=0.d0
-      df_z=-(ZI*OMEGA*gammaTE20)*f_z
+!     ...1st order derivatives
+         df_x=-ZI*OMEGA*cos(2.d0*PI*x1)
+         df_y=0.d0
+         df_z=-(ZI*OMEGA*gammaTE20)*f_z
 !
-!  ...2nd order derivatives
-      ddf_x=-(2.d0*PI)**2*f_x
-      ddf_y=0.d0
-      ddf_z=-(ZI*OMEGA*gammaTE20)*df_z
+!     ...2nd order derivatives
+         ddf_x=-(2.d0*PI)**2*f_x
+         ddf_y=0.d0
+         ddf_z=-(ZI*OMEGA*gammaTE20)*df_z
 !
-      E=E+f_x*f_y*f_z
+         E=E+f_x*f_y*f_z
 !     ...1st order derivatives
          dE(1)=dE(1)+  df_x *   f_y *   f_z
          dE(2)=dE(2)+   f_x *  df_y *   f_z

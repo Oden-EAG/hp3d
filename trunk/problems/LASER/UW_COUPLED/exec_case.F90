@@ -4,6 +4,7 @@
 subroutine exec_case(idec)
 !
    use commonParam
+   use control
    use data_structure3D
    use par_mesh
    use zoltan_wrapper, only: zoltan_w_partition,zoltan_w_eval
@@ -20,7 +21,7 @@ subroutine exec_case(idec)
    integer :: flag(6)
    integer :: physNick
 !
-   integer :: fld,numPts
+   integer :: fld,numPts,i,refs
 !
    integer :: src,count,ierr
 !
@@ -66,6 +67,10 @@ subroutine exec_case(idec)
          call global_href
          call update_gdof
          call update_Ddof
+         if (IBCFLAG .eq. 3) then
+            call propagate_flag(2,9)
+            call propagate_flag(3,9)
+         endif
 !
 !  ...single uniform p-refinement
       case(21)
@@ -78,10 +83,22 @@ subroutine exec_case(idec)
       case(22)
          call href_solve(flag,physNick, nstop)
 !
-!  ...single anisotropic h-refinement (in z)
+!  ...anisotropic h-refinements (in z)
       case(23)
+         if (RANK .eq. ROOT) then
+            write(*,*) 'Select number of refinements:'
+            read(*,*) refs
+         endif
+         count = 1; src = ROOT
+         call MPI_BCAST (refs,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
          write(*,*) 'global anisotropic h-refinement...'
-         call global_href_aniso(0,1)
+         do i=1,refs
+            call global_href_aniso(0,1)
+            if (IBCFLAG .eq. 3) then
+               call propagate_flag(2,9)
+               call propagate_flag(3,9)
+            endif
+         enddo
          call update_gdof
          call update_Ddof
 !
@@ -129,9 +146,19 @@ subroutine exec_case(idec)
          write(*,*) 'calling Frontal (Seq) solver...'
          call solve1(1)
 !
+!  ...compute error for problem with known solution
       case(50)
-         write(*,*) 'computing error and residual...'
-         call exact_error(flag,physNick)
+         if (NEXACT .eq. 0) then
+            write(*,*) 'NEXACT=0. Returning...'
+         else
+            write(*,*) 'computing error...'
+            call exact_error(flag,physNick)
+         endif
+!
+!  ...compute the residual
+      case(51)
+         write(*,*) 'computing residual...'
+         call residual()
 !
       case(60)
          if (RANK .eq. ROOT) then
