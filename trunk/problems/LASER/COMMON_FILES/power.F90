@@ -525,28 +525,28 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
 !
 !---------------------------------------------------------------------------------------
 !
-   facePower = 0.d0
-   faceDiffPower = 0.0d0
+   FacePower = 0.d0
+   FaceDiffPower = 0.0d0
    nflag = 1
 !..element type
-   etype = NODES(mdle)%type
+   etype = NODES(Mdle)%type
    nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
-   call find_order(mdle, norder)
-   call find_orient(mdle, nedge_orient,nface_orient)
+   call find_order(Mdle, norder)
+   call find_orient(Mdle, nedge_orient,nface_orient)
    call nodcor(mdle, xnod)
    call solelm(mdle, zdofH,zdofE,zdofV,zdofQ)
 !..sign factor to determine the OUTWARD normal unit vector
-   nsign = nsign_param(etype,facenumber)
+   nsign = nsign_param(etype,Facenumber)
 !
 !..face type
-   ftype = face_type(etype,facenumber)
+   ftype = face_type(etype,Facenumber)
 !
 !..face order of approximation
-   call face_order(etype,facenumber,norder, norderf)
+   call face_order(etype,Facenumber,norder, norderf)
 !
 !..set 2D quadrature
    INTEGRATION = NORD_ADD
-   call set_2Dint(ftype,norderf, nint,tloc,wtloc)
+   call set_2D_int(ftype,norderf,nface_orient(Facenumber), nint,tloc,wtloc)
    INTEGRATION = 0
 !
 !..loop over integration points
@@ -556,18 +556,18 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
       t(1:2) = tloc(1:2,l)
 !
 !  ...face parametrization
-      call face_param(etype,facenumber,t, xi,dxidt)
+      call face_param(etype,Facenumber,t, xi,dxidt)
 !
 !  ...determine element H1 shape functions (for geometry)
       call shape3H(etype,xi,norder,nedge_orient,nface_orient, &
                      nrdofH,shapH,gradH)
 !
 !  ...geometry
-      call bgeom3D(mdle,xi,xnod,shapH,gradH,nrdofH,dxidt,nsign, &
+      call bgeom3D(Mdle,xi,xnod,shapH,gradH,nrdofH,dxidt,nsign, &
                      x,dxdxi,dxidx,rjac,dxdt,rn,bjac)
       weight = bjac*wtloc(l)
 !
-      call soleval(mdle,xi,nedge_orient,nface_orient,norder,xnod, &
+      call soleval(Mdle,xi,nedge_orient,nface_orient,norder,xnod, &
                    zdofH,zdofE,zdofV,zdofQ,nflag,x,dxdxi, &
                    zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
       if(NEXACT.eq.1) then
@@ -583,11 +583,11 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
       if(Fld.eq.1) then
          call zz_cross_product(zsolE(1:3,1),conjg((zsolE(1:3,2))), EtimesH1)
          FdotN = EtimesH1(1)*rn(1)+EtimesH1(2)*rn(2)+EtimesH1(3)*rn(3)
-         facePower = facePower + (real(FdotN))*weight
+         FacePower = FacePower + (real(FdotN))*weight
 !     ...if we have an exact
          if(NEXACT.eq.1) then
             call zz_cross_product(valE(1:3,1),conjg((valE(1:3,2))), EtimesH2)
-            faceDiffPower = faceDiffPower   &
+            FaceDiffPower = FaceDiffPower   &
                            + abs(((EtimesH1(1)*rn(1)+EtimesH1(2)*rn(2)+EtimesH1(3)*rn(3))*weight) - &
                            ((EtimesH2(1)*rn(1)+EtimesH2(2)*rn(2)+EtimesH2(3)*rn(3))*weight))
          endif
@@ -595,11 +595,11 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
       else if(Fld.eq.0) then
          call zz_cross_product(zsolE(1:3,3),conjg((zsolE(1:3,4))), EtimesH1)
          FdotN = EtimesH1(1)*rn(1)+EtimesH1(2)*rn(2)+EtimesH1(3)*rn(3)
-         facePower = facePower + (real(FdotN))*weight
+         FacePower = FacePower + (real(FdotN))*weight
 !     ...if we have an exact
          if(NEXACT.eq.1) then
             call zz_cross_product(valE(1:3,3),conjg((valE(1:3,4))), EtimesH2)
-            faceDiffPower = faceDiffPower   &
+            FaceDiffPower = FaceDiffPower   &
                             + abs(((EtimesH1(1)*rn(1)+EtimesH1(2)*rn(2)+EtimesH1(3)*rn(3))*weight) - &
                                  ((EtimesH2(1)*rn(1)+EtimesH2(2)*rn(2)+EtimesH2(3)*rn(3))*weight))
          endif

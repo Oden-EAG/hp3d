@@ -300,7 +300,7 @@ subroutine comp_elem_avgTemp(Mdle, ElemTemp,ElemVol)
 !
 !..set up the element quadrature
    INTEGRATION=0
-   call set_3Dint_DPG(NODES(mdle)%type,norder, nint,xiloc,wxi)
+   call set_3D_int_DPG(NODES(mdle)%type,norder,nface_orient, nint,xiloc,wxi)
    INTEGRATION=0
 !
    ElemVol  = 0.d0

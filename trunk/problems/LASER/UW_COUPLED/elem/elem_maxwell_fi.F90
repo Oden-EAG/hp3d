@@ -1,11 +1,11 @@
 !
-!-------------------------------------------------------------------
+!--------------------------------------------------------------------
 !
 !    routine name      - elem_maxwell_fi
 !
 !--------------------------------------------------------------------
 !
-!     latest revision:  - Apr 2019
+!     latest revision:  - Oct 2019
 !
 !     purpose:          - routine returns unconstrained (ordinary)
 !                         stiffness matrix and load vector for the
@@ -139,40 +139,41 @@ subroutine elem_maxwell_fi(Mdle,Fld_flag,                &
    integer :: ndofHHmdl,ndofEEmdl,ndofVVmdl,ndofQQmdl
 !
 !..load vector for the enriched space
-   VTYPE :: bload_E(NrTest)
+   complex(8) :: bload_E(NrTest)
 !
 !..Gram matrix in packed format
-   !VTYPE :: gramP(NrTest*(NrTest+1)/2)
-   VTYPE, allocatable :: gramP(:)
-   real*8  :: FF, CF, FC !, CC
+   !complex(8) :: gramP(NrTest*(NrTest+1)/2)
+   complex(8), allocatable :: gramP(:)
+   real*8  :: FF, CF, FC
    real*8  :: fldE(3), fldH(3), crlE(3), crlH(3)
    real*8  :: fldF(3), fldG(3), crlF(3), crlG(3)
 !
 !..matrices for transpose filling (swapped loops)
 !..stiffness matrices (transposed) for the enriched test space
-   !VTYPE :: stiff_EE_T(2*NrdofEi,NrTest)
-   !VTYPE :: stiff_EQ_T(6*NrdofQ ,NrTest)
-   !VTYPE :: stiff_ALL(NrTest   ,NrTrial+1)
-   !VTYPE :: zaloc    (NrTrial+1,NrTrial+1)
-   VTYPE, allocatable :: stiff_EE_T(:,:),stiff_EQ_T(:,:),stiff_ALL(:,:),zaloc(:,:)
+   !complex(8) :: stiff_EE_T(2*NrdofEi,NrTest)
+   !complex(8) :: stiff_EQ_T(6*NrdofQ ,NrTest)
+   !complex(8) :: stiff_ALL(NrTest   ,NrTrial+1)
+   !complex(8) :: zaloc    (NrTrial+1,NrTrial+1)
+   complex(8), allocatable :: stiff_EE_T(:,:),stiff_EQ_T(:,:)
+   complex(8), allocatable :: stiff_ALL(:,:),zaloc(:,:)
 !
 !..3D quadrature data
    real*8, dimension(3,MAXNINT3ADD)  :: xiloc
-   real*8, dimension(MAXNINT3ADD)    :: waloc
+   real*8, dimension(  MAXNINT3ADD)  :: waloc
 !
 !..2D quadrature data
    real*8, dimension(2,MAXNINT2ADD)  :: tloc
-   real*8, dimension(MAXNINT2ADD)    :: wtloc
+   real*8, dimension(  MAXNINT2ADD)  :: wtloc
 !
 !..BC's flags
    integer, dimension(6,NR_PHYSA)    :: ibc
 !
 !..for auxiliary computation
-   VTYPE :: zaux
+   complex(8) :: zaux
 !
 !..Maxwell load and auxiliary variables
-   VTYPE , dimension(3) :: zJ,zImp
-   real*8, dimension(3) :: E1,E2,rntimesE,rn2timesE
+   complex(8), dimension(3) :: zJ,zImp
+   real*8    , dimension(3) :: E1,E2,rntimesE,rn2timesE
 !
 !..number of edge,faces per element type
    integer :: nre, nrf
@@ -183,16 +184,16 @@ subroutine elem_maxwell_fi(Mdle,Fld_flag,                &
    integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,ik,j,k,l,nint,kE,n,m
    integer :: iflag,iprint,itime,iverb
    integer :: nrdof,nordP,nsign,ifc,ndom,info,icomp,idec
-   VTYPE   :: zfval,zc
-   VTYPE   :: za(3,3),zb(3,3)
+   complex(8) :: zfval,zc
+   complex(8) :: za(3,3),zb(3,3)
 !
 !..for polarizations function
-   VTYPE, dimension(3,3) :: bg_pol,gain_pol,raman_pol
+   complex(8), dimension(3,3) :: bg_pol,gain_pol,raman_pol
    real*8  :: delta_n
    integer :: dom_flag
 !
 !..OMEGA_RATIO_SIGNAL or OMEGA_RATIO_PUMP
-   real*8  :: OMEGA_RATIO_FLD
+   real*8 :: OMEGA_RATIO_FLD
 !
 !..for PML
    VTYPE :: zbeta,zdbeta,zd2beta,detJstretch
@@ -1371,7 +1372,7 @@ subroutine elem_maxwell_fi(Mdle,Fld_flag,                &
 !
 !  ...set 2D quadrature
       INTEGRATION = NORD_ADD
-      call set_2D_int_DPG(ftype,norderf, nint,tloc,wtloc)
+      call set_2D_int_DPG(ftype,norderf,norient_face(ifc), nint,tloc,wtloc)
       INTEGRATION = 0
 !
 !  ...loop through integration points

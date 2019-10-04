@@ -229,7 +229,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !
 !..use the enriched order to set the quadrature
    INTEGRATION = NORD_ADD
-   call set_3D_int_DPG(etype,norder, nint,xiloc,waloc)
+   call set_3D_int_DPG(etype,norder,norient_face, nint,xiloc,waloc)
    INTEGRATION = 0
 !
 !..loop over
@@ -474,7 +474,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !
 !  ...set 2D quadrature
       INTEGRATION = NORD_ADD
-      call set_2D_int_DPG(ftype,norderf, nint,tloc,wtloc)
+      call set_2D_int_DPG(ftype,norderf,norient_face(ifc), nint,tloc,wtloc)
       INTEGRATION = 0
 !
 !  ...loop through integration points
