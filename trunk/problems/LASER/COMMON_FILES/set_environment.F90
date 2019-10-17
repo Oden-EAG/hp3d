@@ -108,14 +108,12 @@ subroutine set_environment_maxwell
 !..the propagation constant determining number of wavelengths depends on both OMEGA and GAMMA
    !call get_option_real('-omega' , 'OMEGA', 4.5d0  , OMEGA)
    !call get_option_real('-gamma' , 'GAMMA', 1.0d0  , GAMMA)
-!..OMEGA, GAMMA for fiber
+!..OMEGA, GAMMA for FIBER
    call get_option_real('-omega' , 'OMEGA', OMEGA_SIGNAL, OMEGA) ! LP01 LMA
    !call get_option_real('-omega' , 'OMEGA', 25.7d0, OMEGA) ! LP01 single-mode
    !call get_option_real('-omega' , 'OMEGA', 40.0d0, OMEGA) ! LP11 multi-mode
    !call get_option_real('-omega' , 'OMEGA', 8.1d0*PI, OMEGA)
    call get_option_real('-gamma' , 'GAMMA', 1.0d0, GAMMA)
-   !call get_option_real('-omega' , 'OMEGA', 30.d0*PI                     , OMEGA)
-   !call get_option_real('-gamma' , 'GAMMA', sqrt(1.d0-(PI**2)/(OMEGA**2)), GAMMA)
 !
 !..RECTANGULAR WAVEGUIDE
 !..OMEGA, GAMMA for rectangular waveguide,
@@ -135,7 +133,7 @@ subroutine set_environment_maxwell
 ! ========= PARAVIEW ==========
 ! =============================
 !
-!     -- Parview Interface --
+!     -- Paraview Interface --
 ! Variables relevant to src/modules/paraview
 ! option label // explanation // default value // parameter
    !call get_option_string('-prefix'          ,'Prefix paraview file'               ,'laserUW'           , PREFIX  )
