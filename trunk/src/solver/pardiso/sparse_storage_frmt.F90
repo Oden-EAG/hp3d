@@ -1,3 +1,4 @@
+#include "implicit_none.h"
 !-----------------------------------------------------------------------
 !
 !    routine name:      - coo2csc
@@ -20,19 +21,16 @@
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
-subroutine coo2csc(IA,JA,XA,nz,nnz)
+subroutine coo2csc(IA,JA,XA,nz, nnz)
 !
    implicit none
 !..declare variables
    integer    , intent(in)    :: nz
    integer    , intent(out)   :: nnz
    integer    , intent(inout) :: IA(nz),JA(nz)
-#if C_MODE
-   complex*16 , intent(inout) :: XA(nz)
-#else
-   real*8     , intent(inout) :: XA(nz)
-#endif
-   integer                    :: i,j,p,t
+   VTYPE      , intent(inout) :: XA(nz)
+!
+   integer :: i,j,p,t
 !
 !..sort and remove duplicates
    call assemble_triplet(JA,IA,XA,nz,nnz)
@@ -66,19 +64,16 @@ end subroutine coo2csc
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
-subroutine coo2csr(IA,JA,XA,nz,nnz)
+subroutine coo2csr(IA,JA,XA,nz, nnz)
 !
    implicit none
 !..declare variables
    integer    , intent(in)    :: nz
    integer    , intent(out)   :: nnz
    integer    , intent(inout) :: IA(nz),JA(nz)
-#if C_MODE
-   complex*16 , intent(inout) :: XA(nz)
-#else
-   real*8     , intent(inout) :: XA(nz)
-#endif
-   integer           :: i,j,p,t
+   VTYPE      , intent(inout) :: XA(nz)
+!
+   integer :: i,j,p,t
 !
 !..sort and remove duplicates
    call assemble_triplet(IA,JA,XA,nz,nnz)

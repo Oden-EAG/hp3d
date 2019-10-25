@@ -1,12 +1,13 @@
 !
 #include "implicit_none.h"
+!
 ! -----------------------------------------------------------------------
 !
 !    routine name       - par_nested
 !
 ! -----------------------------------------------------------------------
 !
-!    latest revision    - Aug 2019
+!    latest revision    - Oct 2019
 !
 !    purpose            - interface for distributed MUMPS solver
 !                       - routine computes global stiffness matrix
@@ -15,6 +16,9 @@
 !                       - the assembly is computed in parallel with one
 !                         MPI process per subdomain, and OpenMP
 !                         parallelization within each subdomain
+!                       - nested dissection solver:
+!                         OpenMP MUMPS for local subdomain problem
+!                         MPI MUMPS for global interface problem
 !                       - this routine supports both computation with or
 !                         without static condensation (uses module stc)
 !                       - additionally, the local subdomain problem is
@@ -56,6 +60,7 @@ subroutine par_nested(mtype)
    use MPI       , only: MPI_SUM,MPI_MIN,MPI_MAX,MPI_IN_PLACE, &
                          MPI_INTEGER,MPI_INTEGER8,             &
                          MPI_REAL8,MPI_COMPLEX16
+   use mkl_spblas
 !
    implicit none
 !
@@ -66,7 +71,7 @@ subroutine par_nested(mtype)
 !
 !..number of local element dof for each physics variable
    integer, dimension(NR_PHYSA) :: nrdofi,nrdofb
-! 
+!
 !..integer counters
    integer    :: nrdofm,nrdofc,nrnodm,nrdof,nrdof_mdl,ndof
    integer    :: iel,mdle,subd,idx,i,j,k,l,k1,k2,nod,idec
@@ -83,22 +88,31 @@ subroutine par_nested(mtype)
 !
 !..64 bit non-zero entry counters
    integer(8) :: nnz,nnz_loc
-   !integer(8) :: elem_nnz_loc(NRELES_SUBD)
 !
 !..subdomain dof counters
    integer :: nrdof_subd(0:NUM_PROCS-1)
 !
 !..auxiliary data structures for nested dissection
    integer, allocatable :: NOD_SUM(:),NFIRST_SUBD(:),LCON_SUBD(:)
-   VTYPE  , allocatable :: ZSOL_SUBD(:),Aib(:,:),Aii(:,:),Bi(:)
+   VTYPE  , allocatable :: ZSOL_SUBD(:),Aii(:,:),Bi(:)
    integer :: nrdof_subd_bub,nrdof_subd_con,nrdof_bub,nrdofc_bub,nrdofc_subd
-   integer :: ni,nb,k_bub,k_ib
-   integer(8) :: nnz_bub!,nnz_ib
-   integer(8) :: elem_nnz_bub(NRELES_SUBD)!,elem_nnz_ib(NRELES_SUBD)
+   integer :: ni,nb,k_bub
+   integer(8) :: nnz_bub
+   integer(8) :: elem_nnz_bub(NRELES_SUBD)
+!
+!..sparse MKL
+   integer :: mkl_stat
+   integer :: nnz_ib,k_ib
+   integer :: elem_nnz_ib(NRELES_SUBD)
+   integer, allocatable :: Aib_row(:), Aib_col(:)
+   VTYPE  , allocatable :: Aib_val(:)
+   type (SPARSE_MATRIX_T) :: Aib_sparse
+   type (MATRIX_DESCR)    :: Aib_descr
 !
 !..timer
    real(8) :: MPI_Wtime,start_time,end_time,time_stamp
 !
+!..info (verbose output if true)
    logical :: info = .true.
 !
 ! -----------------------------------------------------------------------
@@ -178,19 +192,13 @@ subroutine par_nested(mtype)
    nrdof = 0; nrdof_mdl = 0; nrdofc_subd = 0; idec = 1
    nrdof_subd_bub = 0; nrdof_subd_con = 0
 !
-!..non-zero counters for element offsets in distributed sparse stiffness matrix
-!  using 64 bit integers nnz and nnz_loc
-   !nnz     = 0_8; ! global number of non-zeros in matrix (counts duplicate indices)
-   !nnz_loc = 0_8; ! local  number of non-zeros in matrix (counts duplicate indices)
-   !elem_nnz_loc(1:NRELES_SUBD) = 0_8 ! local element offsets for subdomain matrix
-!
 !..non-zero counters for offsets in subdomain interior (bubble-bubble) matrix
    nnz_bub = 0_8
    elem_nnz_bub(1:NRELES_SUBD) = 0_8
 !
 !..non-zero counters for offsets in subdomain interface-bubble matrix 'Aib'
-   !nnz_ib = 0_8
-   !elem_nnz_ib(1:NRELES_SUBD) = 0_8
+   nnz_ib = 0
+   elem_nnz_ib(1:NRELES_SUBD) = 0
 !
 !..compute offsets for owned nodes
    do iel=1,NRELES_SUBD
@@ -261,17 +269,14 @@ subroutine par_nested(mtype)
 !  ...k_bub      = number of subdomain interior non-zero entries in element stiffness matrix 'Abb'
 !  ...k_ib       = number of subdomain interface-bubble non-zero entries in element stiffness matrix 'Aib'
       k_bub = nrdofc_bub**2
-      !k_ib  = (nrdofc-nrdofc_bub)*nrdofc_bub
+      k_ib  = (nrdofc-nrdofc_bub)*nrdofc_bub
 !
-!  ...subdomain condensed counters for OpenMP (interface-interface matrix)
-      !elem_nnz_loc(iel) = nnz_loc
-      !nnz_loc = nnz_loc + int8(k)
 !  ...subdomain interior counters for OpenMP (bubble-bubble matrix)
       elem_nnz_bub(iel) = nnz_bub
       nnz_bub = nnz_bub + int8(k_bub)
-!  ...subdomain interior counters for OpenMP (bubble-bubble matrix)
-      !elem_nnz_ib(iel) = nnz_ib
-      !nnz_ib = nnz_ib + int8(k_ib)
+!  ...subdomain interior counters for OpenMP (interface-bubble matrix)
+      elem_nnz_ib(iel) = nnz_ib
+      nnz_ib = nnz_ib + k_ib
  1234 format(A,I10)
    enddo
 !
@@ -291,6 +296,8 @@ subroutine par_nested(mtype)
       if ((NOD_OWN(i).eq.RANK) .and. (NOD_SUM(i).gt.1)) NFIRST_DOF(i) = NFIRST_DOF(i) + nrdof
    enddo
 !$OMP END PARALLEL DO
+!
+   deallocate(NOD_OWN)
 !
 !..communicate offsets (to receive offsets for non-owned nodes within subdomain, i.e., at subdomain interface)
    count = NRNODS
@@ -317,8 +324,6 @@ subroutine par_nested(mtype)
 !..total number of (interface) dof is nrdof
    NRDOF_CON = nrdof
    NRDOF_TOT = nrdof + nrdof_bub + nrdof_mdl
-!
-   deallocate(NOD_OWN)
 !
    if (nrdof .eq. 0) then
       deallocate(MAXDOFS,NFIRST_DOF,NFIRST_SUBD,NOD_SUM)
@@ -355,23 +360,24 @@ subroutine par_nested(mtype)
    write(*,2011) '[', RANK, '] Local interf dof: nrdof_subd_con = ', nrdof_subd_con, &
                        '       Local bubble dof: nrdof_subd_bub = ', nrdof_subd_bub, &
                        '       Local interf nnz: nnz_loc        = ', nnz_loc,        &
-                       '       Local bubble nnz: nnz_bub        = ', nnz_bub
+                       '       Local bubble nnz: nnz_bub        = ', nnz_bub,        &
+                       '       Local interf-bub: nnz_ib         = ', nnz_ib
    else
       mumps_bub%icntl(4) = 0
       mumps_par%icntl(4) = 0
    endif
 
 2010 format(A,I12,/,A,I12,/,A,I12,/,A,I12,/,A,I12,/)
-2011 format(A,I4,A,I12,/,A,I12,/,A,I12,/,A,I12,/)
+2011 format(A,I4,A,I12,/,A,I12,/,A,I12,/,A,I12,/,A,I12,/)
    call MPI_BARRIER(mumps_par%COMM, ierr)
 !
 !..memory allocation for local subdomain MUMPS solve
 !  TODO write warning if subdomain has NO bubble dofs,
-!       and either call normal par_mumps, or skip the bubble solve
+!       then skip the bubble solve with that RANK;
+!       or, possibly modify mumps_par communicator.
    if (nrdof_subd_bub .eq. 0) then
       write(*,2011) '[', RANK, '] PAR_NESTED WARNING: nrdof_subd_bub = 0, no subdomain problem.'
    endif
-!
 !
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(mumps_par%COMM, ierr)
@@ -391,9 +397,13 @@ subroutine par_nested(mtype)
    allocate(mumps_bub%RHS(mumps_bub%N * (NR_RHS+nrdof_subd_con)))
    mumps_bub%RHS=ZERO
 !
-   allocate(Aib(nrdof_subd_con,nrdof_subd_bub)); Aib = ZERO
    allocate(Aii(nrdof_subd_con,nrdof_subd_con)); Aii = ZERO
    allocate(Bi (nrdof_subd_con))               ; Bi = ZERO
+!
+!..Create sparse matrix Aib in COO format
+   allocate(Aib_val(nnz_ib))
+   allocate(Aib_row(nnz_ib))
+   allocate(Aib_col(nnz_ib))
 !
 !..memory allocation for indices of condensed subdomain solution
    allocate(LCON_SUBD(nrdof_subd_con))
@@ -549,14 +559,15 @@ subroutine par_nested(mtype)
                   Aii(i,j) = Aii(i,j) + ZTEMP(k)
                else ! col: bubble dof
 !              ...Assemble local subdomain interface-bubble stiffness matrix 'Aib''
-                  !elem_nnz_ib(iel) = elem_nnz_ib(iel) + 1_8
                   k = (k1-1)*ndof + k2
-                  !Aib_val(elem_nnz_ib(iel)) = ZTEMP(k)
-                  !Aib_row(elem_nnz_ib(iel)) = i
-                  !Aib_col(elem_nnz_ib(iel)) = -j
                   i = LCON_SUBD_CON(k1) ! subdomain interface row
                                         ! -j is subdomain bubble col
-                  Aib(i,-j) = Aib(i,-j) + ZTEMP(k)
+                  !Aib(i,-j) = Aib(i,-j) + ZTEMP(k)
+!              ...sparse assembly
+                  elem_nnz_ib(iel) = elem_nnz_ib(iel) + 1
+                  Aib_val(elem_nnz_ib(iel)) = ZTEMP(k)
+                  Aib_row(elem_nnz_ib(iel)) = i
+                  Aib_col(elem_nnz_ib(iel)) = -j
                endif
             enddo
          else ! row: bubble dof
@@ -718,37 +729,62 @@ subroutine par_nested(mtype)
       start_time = MPI_Wtime()
    endif
 !
-!..Compute condensed RHS Bi (store it in Bi)
-!  Bi = Bi - Aib*inv(Abb)*Bb
-!  GEMM: Bi = -1.0 * Aib * (inv(Abb)*Bb) + 1.0 * Bi
    ni = nrdof_subd_con; nb = mumps_bub%N
+!
+   call MPI_BARRIER(mumps_par%COMM, ierr); time_stamp = MPI_Wtime()
+!
+   Aib_descr%type = SPARSE_MATRIX_TYPE_GENERAL
 #if C_MODE
-   call ZGEMM('N','N',ni,NR_RHS,nb,-ZONE,Aib,ni,mumps_bub%RHS(1:mumps_bub%N*NR_RHS),nb,ZONE,Bi,ni)
+   mkl_stat = MKL_SPARSE_Z_CREATE_COO(Aib_sparse,              &
+                                      SPARSE_INDEX_BASE_ONE,   &
+                                      ni,nb,nnz_ib,            &
+                                      Aib_row,Aib_col,Aib_val)
+   mkl_stat = MKL_SPARSE_Z_MM(SPARSE_OPERATION_NON_TRANSPOSE,              &
+                              -ZONE,                                       &
+                              Aib_sparse,Aib_descr,                        &
+                              SPARSE_LAYOUT_COLUMN_MAJOR,                  &
+                              mumps_bub%RHS(1:nb*NR_RHS),                  &
+                              NR_RHS, nb, ZONE, Bi, ni)
+   mkl_stat = MKL_SPARSE_Z_MM(SPARSE_OPERATION_NON_TRANSPOSE,              &
+                              -ZONE,                                       &
+                              Aib_sparse,Aib_descr,                        &
+                              SPARSE_LAYOUT_COLUMN_MAJOR,                  &
+                              mumps_bub%RHS(nb*NR_RHS+1:nb*(NR_RHS+ni)),   &
+                              ni, nb, ZONE, Aii, ni)
 #else
-   call DGEMM('N','N',ni,NR_RHS,nb,-ZONE,Aib,ni,mumps_bub%RHS(1:mumps_bub%N*NR_RHS),nb,ZONE,Bi,ni)
+   mkl_stat = MKL_SPARSE_D_CREATE_COO(Aib_sparse,              &
+                                      SPARSE_INDEX_BASE_ONE,   &
+                                      ni,nb,nnz_ib,            &
+                                      Aib_row,Aib_col,Aib_val)
+   mkl_stat = MKL_SPARSE_D_MM(SPARSE_OPERATION_NON_TRANSPOSE,              &
+                              -ZONE,                                       &
+                              Aib_sparse,Aib_descr,                        &
+                              SPARSE_LAYOUT_COLUMN_MAJOR,                  &
+                              mumps_bub%RHS(1:nb*NR_RHS),                  &
+                              NR_RHS, nb, ZONE, Bi, ni)
+   mkl_stat = MKL_SPARSE_D_MM(SPARSE_OPERATION_NON_TRANSPOSE,              &
+                              -ZONE,                                       &
+                              Aib_sparse,Aib_descr,                        &
+                              SPARSE_LAYOUT_COLUMN_MAJOR,                  &
+                              mumps_bub%RHS(nb*NR_RHS+1:nb*(NR_RHS+ni)),   &
+                              ni, nb, ZONE, Aii, ni)
 #endif
 !
-!..Compute condensed system Aii
-!  Aii = Aii - Aib*inv(Abb)*Abi
-!  GEMM: Aii = -1.0 * Aib * (inv(Abb)*Abi) + 1.0 * Aii
-#if C_MODE
-   call ZGEMM('N','N',ni,ni,nb,-ZONE,Aib,ni,                                              &
-              mumps_bub%RHS(mumps_bub%N*NR_RHS+1:mumps_bub%N*(NR_RHS+nrdof_subd_con)),    &
-              nb,ZONE,Aii,ni)
-#else
-   call DGEMM('N','N',ni,ni,nb,-ZONE,Aib,ni,                                              &
-              mumps_bub%RHS(mumps_bub%N*NR_RHS+1:mumps_bub%N*(NR_RHS+nrdof_subd_con)),    &
-              nb,ZONE,Aii,ni)
-#endif
+   call MPI_BARRIER(mumps_par%COMM, ierr)
+   if (RANK.eq.ROOT) then
+      write(*,7891) '  Sparse: ', MPI_Wtime()-time_stamp
+7891  format(A,F12.5)
+   endif
 !
-   deallocate(Aib)
+   mkl_stat = MKL_SPARSE_DESTROY(Aib_sparse)
+   deallocate(Aib_val,Aib_row,Aib_col)
 !
 !..use 64bit parallel analysis if nnz > 2B
 !  (sequential metis/scotch using 32bit currently)
-   if (nnz > 2e9) mumps_par%icntl(28) = 2
+   if (nnz > 2.14e9) mumps_par%icntl(28) = 2
 !
 !..percentage increase in estimated workspace for global interface problem
-   mumps_par%icntl(14) = 200 + NUM_PROCS/4
+   mumps_par%icntl(14) = 50 ! 200 + NUM_PROCS/4
 !
 !..memory allocation for global MUMPS solve
    mumps_par%N = NRDOF_CON
@@ -773,8 +809,6 @@ subroutine par_nested(mtype)
          mumps_par%A_loc(l) = Aii(k2,k1)
          mumps_par%IRN_loc(l) = j
          mumps_par%JCN_loc(l) = i
-         !write(*,2345) 'j,i,val = ',j,i,Aii(k2,k1)
-    2345 format(A,I3,',',I3,',',F10.3)
       enddo
    enddo
 !$OMP END PARALLEL DO
@@ -806,6 +840,10 @@ subroutine par_nested(mtype)
       if (RANK .eq. ROOT) write(*,1009)
  1009 format(' STEP 5 started : Global solve')
       start_time = MPI_Wtime()
+   endif
+   if (RANK .eq. ROOT .and. info) then
+      write(*,*) 'mumps_par%icntl(28) = ', mumps_par%icntl(28)
+      write(*,*) 'mumps_par%icntl(29) = ', mumps_par%icntl(29)
    endif
 !
 !..MUMPS analysis
