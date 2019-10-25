@@ -1,187 +1,220 @@
 !----------------------------------------------------------------------------------------
 !> Purpose : write scalar attribute to .h5 file
 !!
-!> @param[in ] Stype   - "Scalar" 
-!> @param[in ] Sname   - name for attribute's .h5 file
-!> @param[in ] Snick   - attribute's nickname to be used in .h5 file
-!> @param[in ] Scenter - "Node"
-!> @param[in ] Domain  - number of subdomain to be displayed (currently inactive)
+!> @param[in ] Sname   - name/description (e.g., 'Scalar')
+!> @param[in ] Sfile   - attribute file name (e.g., ../output/paraview/scalar_00000.h5)
+!> @param[in ] Snick   - attribute nickname to be used in .h5 file
 !> @param[in ] Idx     - index identifying scalar attribute
 !> @param[out] Ic      - number of vertices of visualization object
 !!
-!> @date Apr 2019
+!> @date Oct 2019
 !----------------------------------------------------------------------------------------
 !
 #include "implicit_none.h"
 !
-subroutine scalar2vtk(Stype,Sname,Snick,Scenter,Domain,Idx, Ic)
+subroutine scalar2vtk(Sname,Sfile,Snick,Idx, Ic)
 !
-      use data_structure3D , only : MAXEQNH,MAXEQNE,MAXEQNV,MAXEQNQ,NODES,NRELES, &
-                                    MAXbrickH,MAXbrickE,MAXbrickV,MAXbrickQ,      &
-                                    NRHVAR,NRQVAR
-      use element_data
-      use physics          , only : DTYPE,ADRES
-      use upscale
+   use data_structure3D
+   use element_data
+   use physics          , only : DTYPE,ADRES
+   use upscale
+   use paraview
+   use MPI              , only: MPI_COMM_WORLD,MPI_SUM,MPI_INTEGER
+   use mpi_param        , only: RANK,ROOT,NUM_PROCS
+   use par_mesh         , only: DISTRIBUTED,HOST_MESH
 !
-      implicit none
+   implicit none
 !
-      character(len=*), intent(in ) :: Stype
-      character(len=*), intent(in ) :: Sname
-      character(len=*), intent(in ) :: Snick
-      character(len=*), intent(in ) :: Scenter
-      integer,          intent(in ) :: Domain
-      integer,          intent(in ) :: Idx
-      integer,          intent(out) :: Ic
+   character(len=*), intent(in ) :: Sname
+   character(len=*), intent(in ) :: Sfile
+   character(len=*), intent(in ) :: Snick
+   integer,          intent(in ) :: Idx
+   integer,          intent(out) :: Ic
 !
-      type(vis)        :: vis_obj
-      character(len=4) :: etype
-      integer                             :: mdle, nflag, i, iv, nV
-      real*8,  dimension(3)               :: xi,x
-      integer, dimension(12)              :: nedge_orient
-      integer, dimension(6)               :: nface_orient
-      integer, dimension(19)              :: norder
-      real*8,  dimension(3,MAXbrickH)     :: xnod
-      VTYPE, dimension(MAXEQNH,MAXbrickH) :: zdofH
-      VTYPE, dimension(MAXEQNE,MAXbrickE) :: zdofE
-      VTYPE, dimension(MAXEQNV,MAXbrickV) :: zdofV
-      VTYPE, dimension(MAXEQNQ,MAXbrickQ) :: zdofQ
-      real*8, dimension(3,3)              :: dxdxi
-      VTYPE, dimension(  MAXEQNH  )       :: zsolH
-      VTYPE, dimension(  MAXEQNH,3)       :: zgradH
-      VTYPE, dimension(3,MAXEQNE  )       :: zsolE
-      VTYPE, dimension(3,MAXEQNE  )       :: zcurlE
-      VTYPE, dimension(3,MAXEQNV  )       :: zsolV
-      VTYPE, dimension(  MAXEQNV  )       :: zdivV
-      VTYPE, dimension(  MAXEQNQ  )       :: zsolQ
-      real*8 :: val
-      integer :: ibeg,iattr,icomp,isol,iload,ireal,ndom
+   type(vis)                           :: vis_obj
+   character(len=4)                    :: etype
+   integer                             :: mdle, nflag, iel, iv, nV
+   real(8), dimension(3)               :: xi,x
+   integer, dimension(12)              :: nedge_orient
+   integer, dimension(6)               :: nface_orient
+   integer, dimension(19)              :: norder
+   real(8), dimension(3,MAXbrickH)     :: xnod
+   real(8), dimension(3,3)             :: dxdxi
 !
-      real*8, external :: dreal_part,dimag_part
+   VTYPE, dimension(MAXEQNH,MAXbrickH) :: zdofH
+   VTYPE, dimension(MAXEQNE,MAXbrickE) :: zdofE
+   VTYPE, dimension(MAXEQNV,MAXbrickV) :: zdofV
+   VTYPE, dimension(MAXEQNQ,MAXbrickQ) :: zdofQ
+   VTYPE, dimension(  MAXEQNH  )       :: zsolH
+   VTYPE, dimension(  MAXEQNH,3)       :: zgradH
+   VTYPE, dimension(3,MAXEQNE  )       :: zsolE
+   VTYPE, dimension(3,MAXEQNE  )       :: zcurlE
+   VTYPE, dimension(3,MAXEQNV  )       :: zsolV
+   VTYPE, dimension(  MAXEQNV  )       :: zdivV
+   VTYPE, dimension(  MAXEQNQ  )       :: zsolQ
 !
-!   ..OpenMP parallelization: auxiliary variables
-      integer, dimension(NRELES) :: n_elem, n_vert_offset, n_elem_vert
-      real*8, allocatable :: val_array(:)
+   real(8) :: val
+   integer :: ibeg,iattr,icomp,isol,iload,ireal,ndom
+!
+   real(8), external :: dreal_part,dimag_part
+!
+!..OpenMP parallelization: auxiliary variables
+   integer, dimension(NRELES) :: n_vert_offset, n_elem_vert
+!
+!..timer
+   real(8) :: start_time,end_time
+!
+!..MPI
+   integer :: ierr,count,subd
 !
 !----------------------------------------------------------------------------------------
 !
-!     Step 0 : Clear vis scalar
-      call vis_scalar_clear
+!   if (RANK .eq. ROOT) write(*,*) 'scalar2vtk:'
+!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 !
-!     Step 1 : Write attribute of interest
-      Ic=0
+!..Step 1 : Preliminary calculations (offsets, etc.)
+   Ic=0
 !      
-!     decode
-      ireal = iabs(Idx)/Idx
-      iload = iabs(Idx)/100
-      iattr = iabs(Idx) - iload*100 ; iattr=iattr/10
-      icomp = iabs(Idx) - iload*100 - iattr*10
+!..decode
+   ireal = iabs(Idx)/Idx
+   iload = iabs(Idx)/100
+   iattr = iabs(Idx) - iload*100 ; iattr=iattr/10
+   icomp = iabs(Idx) - iload*100 - iattr*10
 !
-!     address of 1st component for the attribute
-      ibeg=ADRES(iattr)
+!..address of 1st component for the attribute
+   ibeg=ADRES(iattr)
 !
-!   ..create list of mdle node numbers,
-!     and count number of visualization points
-      mdle=0
-      do i=1,NRELES
-        call nelcon(mdle, mdle)
-        n_elem(i) = mdle
-        if (Domain.ne.0) then
-          call find_domain(mdle, ndom)
-          if (ndom.ne.Domain) cycle
-        endif
-        etype = NODES(mdle)%type
-        vis_obj = vis_on_type(etype)
-        n_vert_offset(i) = Ic
-        n_elem_vert(i) = vis_obj%nr_vert
-        Ic = Ic + vis_obj%nr_vert
-      enddo
-      allocate(val_array(Ic))
+!..create list of mdle node numbers,
+!  and count number of visualization points
+   do iel=1,NRELES
+      mdle = ELEM_ORDER(iel)
+      if (PARAVIEW_DOMAIN.ne.0) then
+         call find_domain(mdle, ndom)
+         if (ndom.ne.PARAVIEW_DOMAIN) cycle
+      endif
+      etype = NODES(mdle)%type
+      vis_obj = vis_on_type(etype)
+      n_vert_offset(iel) = Ic
+      n_elem_vert(iel) = vis_obj%nr_vert
+      Ic = Ic + vis_obj%nr_vert
+   enddo
 !
-      nflag=1
+!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+!   if (RANK .eq. ROOT) write(*,300) end_time - start_time
+!   300 format(' timer: ',f12.5,' seconds')
+!
+   call attr_init(1,Ic); ATTR_VAL(1,1:Ic) = 0
+!
+!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+!
+!..Step 2 : Write attribute of interest
+!
+   nflag=1
 !$OMP PARALLEL DO                                     &
 !$OMP PRIVATE(mdle,ndom,etype,iv,nV,xi,               &
 !$OMP         xnod,zdofH,zdofE,zdofV,zdofQ,           &
 !$OMP         norder,nedge_orient,nface_orient,       &
 !$OMP         x,dxdxi,zsolH,zgradH,zsolE,zcurlE,      &
-!$OMP         zsolV,zdivV,zsolQ,isol,val)             &
+!$OMP         zsolV,zdivV,zsolQ,isol,val,subd)        &
 !$OMP SCHEDULE(DYNAMIC)
-      do i=1,NRELES
-        mdle = n_elem(i)
+   do iel=1,NRELES
+      mdle = ELEM_ORDER(iel)
 !
-!       SKIP IF WRONG DOMAIN
-        if (Domain.ne.0) then
-          call find_domain(mdle, ndom)
-          if (ndom.ne.Domain) cycle
-        endif
+!  ...SKIP IF WRONG DOMAIN
+      if (PARAVIEW_DOMAIN.ne.0) then
+         call find_domain(mdle, ndom)
+         if (ndom.ne.PARAVIEW_DOMAIN) cycle
+      endif
 !
-!       element info for computing solution
-        call nodcor(         mdle, xnod)
-        call solelm(         mdle, zdofH,zdofE,zdofV,zdofQ)
-        call find_elem_nodes(mdle, norder,nedge_orient,nface_orient)
+      if (DISTRIBUTED) then
+         call get_subd(mdle, subd)
+         if (RANK .ne. subd) cycle
+      endif
 !
-!       select appropriate visualization object  
-        etype = NODES(mdle)%type
-        nV = n_elem_vert(i)
+!  ...element info for computing solution
+      call nodcor(         mdle, xnod)
+      call solelm(         mdle, zdofH,zdofE,zdofV,zdofQ)
+      call find_elem_nodes(mdle, norder,nedge_orient,nface_orient)
 !
-!       loop over vertices of visualization object
-        do iv=1,nV
+!  ...select appropriate visualization object
+      etype = NODES(mdle)%type
+      nV = n_elem_vert(iel)
+!
+!  ...loop over vertices of visualization object
+      do iv=1,nV
 !        
-!         visualization point accounting for VLEVEL
-          call get_vis_point(vis_on_type(etype),iv-1, xi)
+!     ...visualization point accounting for VLEVEL
+         call get_vis_point(vis_on_type(etype),iv-1, xi)
 !
-!         compute element solution
-          call soleval(mdle,xi,nedge_orient,nface_orient,norder,xnod, &
-                       zdofH,zdofE,zdofV,zdofQ,nflag,x,dxdxi,         &
-                       zsolH,zgradH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
+!     ...compute element solution
+         call soleval(mdle,xi,nedge_orient,nface_orient,norder,xnod, &
+                      zdofH,zdofE,zdofV,zdofQ,nflag,x,dxdxi,         &
+                      zsolH,zgradH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
 !
-!         approximation space
-          select case(DTYPE(iattr))
+!     ...approximation space
+         select case(DTYPE(iattr))
 !
-!         -- H1 --
-          case('contin')
+!        -- H1 --
+         case('contin')
             isol = (iload-1)*NRHVAR + ibeg + icomp
 !
-!           REAL part
+!        ...REAL part
             if (ireal == 1) then
-              val = dreal_part(zsolH(isol))
-!
-!           IMAGINARY part
+               val = dreal_part(zsolH(isol))
+!        ...IMAGINARY part
             else
-              val = dimag_part(zsolH(isol))
+               val = dimag_part(zsolH(isol))
             endif
 !
-!         -- L2 --
-          case('discon')
+!        -- L2 --
+         case('discon')
             isol = (iload-1)*NRQVAR + ibeg + icomp
 !
-!           REAL part
+!        ...REAL part
             if (ireal == 1) then
-              val = dreal_part(zsolQ(isol))
-!
-!           IMAGINARY part
+               val = dreal_part(zsolQ(isol))
+!        ...IMAGINARY part
             else
-              val = dimag_part(zsolQ(isol))
-            endif  
-          endselect
+               val = dimag_part(zsolQ(isol))
+            endif
 !
-!         add value to visualization object
-          val_array(n_vert_offset(i)+iv) = val
-        enddo
-!         
+         case default
+            write(*,*) 'scalar2vtk: unexpected approximation space. stop.'
+            stop
+         end select
+!
+!     ...add value to visualization object
+         ATTR_VAL(1,n_vert_offset(iel)+iv) = val
+!
+!  ...end loop over vis object vertices
       enddo
+!..end loop over elements
+   enddo
 !$OMP END PARALLEL DO
 !
-      do i=1,Ic
-        call vis_scalar_add_value(val_array(i));
-      enddo
-      deallocate(val_array)
+!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+!   if (RANK .eq. ROOT) write(*,300) end_time - start_time
 !
-!     Step 2 : write to file
-      call vis_scalar_write(Stype,len(Stype),Sname,  len(Sname), & 
-                            Snick,len(Snick),Scenter,len(Scenter))
+!..Step 3 : Collect on host
 !
-!     Step 3 : Clear 
-      call vis_scalar_clear
+   if (DISTRIBUTED .and. .not. HOST_MESH) then
+      count = Ic
+      if (RANK .eq. ROOT) then
+         call MPI_REDUCE(MPI_IN_PLACE,ATTR_VAL,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      else
+         call MPI_REDUCE(ATTR_VAL,ATTR_VAL,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      endif
+   endif
 !
+!..Step 4 : Write to file with HDF5
+!
+!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+   if (RANK .eq. ROOT) call attr_write(Sname,len(Sname),Sfile,len(Sfile),Snick,len(Snick))
+!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+!   if (RANK .eq. ROOT) write(*,300) end_time - start_time
+!
+!..Step 5 : Deallocate
+!
+   call attr_close()
 !
 end subroutine scalar2vtk
