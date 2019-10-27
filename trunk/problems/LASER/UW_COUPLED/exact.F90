@@ -1,5 +1,9 @@
+!
+! REMARK: THIS ROUTINE MUST BE OMP THREAD-SAFE
+!         DUE TO OMP PARALLELIZATION OF UPDATE_DDOF->DIRICHLET->EXACT
 !------------------------------------------------------------------------------
 !> Purpose : exact (manufactured) solution
+!> last mod: Oct 2019
 !
 !> @param[in]  X      - a point in physical space
 !> @param[in]  Mdle   - element (middle node) number
@@ -81,20 +85,17 @@ subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
    case(3,4)
 !..ISOL=12 has radial and azimuthal transverse fields (needs both Ex and Ey)
    if (ISOL .eq. 12) then
-      ICOMP_EXACT = 1; icomp = ICOMP_EXACT
+
+      ICOMP_TS = 1; icomp = ICOMP_TS
 !  ...signal E-field trace
       call mfd_solutions(Xp,fld, ValE(icomp,s),DvalE(icomp,s,1:3),D2valE(icomp,s,1:3,1:3))
 !  ...y component
-      ICOMP_EXACT = 2; icomp = ICOMP_EXACT
+      ICOMP_TS = 2; icomp = ICOMP_TS
 !  ...signal E-field trace
       call mfd_solutions(Xp,fld, ValE(icomp,s),DvalE(icomp,s,1:3),D2valE(icomp,s,1:3,1:3))
-!  ...signal H-field trace
-      !ValE(1,2) = -1.74d0 * ValE(2,s) ! Hx ~ -Ey
-      !ValE(2,2) =  1.74d0 * ValE(1,s) ! Hy ~  Ex
-      !ValE(3,2) = 0                   ! Hz = 0
 !
 !..LP modes (polarized in x or y)
-   elseif (ISOL .ge. 13 .and. ISOL .le. 15) then
+   elseif (ISOL .ge. 13 .and. ISOL .le. 19) then
       icomp = ICOMP_EXACT
 !  ...signal E-field trace
       fld = 0
@@ -105,7 +106,7 @@ subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
 !
 !..LP modes birefringent fiber (using both, polarized in x and y)
    elseif (ISOL .eq. 20 .or. ISOL .eq. 21) then
-      !ICOMP_EXACT = 1;
+!     ICOMP_TS IS THREAD_SAFE (declared threadprivate)
       ICOMP_TS = 1; icomp = 1
 !  ...signal E-field trace (E_x)
       fld = 0
@@ -114,7 +115,6 @@ subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
       fld = 1
       call mfd_solutions(Xp,fld, ValE(icomp,p),DvalE(icomp,p,1:3),D2valE(icomp,p,1:3,1:3))
 !
-      !ICOMP_EXACT = 2;
       ICOMP_TS = 2; icomp = 2
 !  ...signal E-field trace (E_y)
       fld = 0
@@ -204,6 +204,19 @@ subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
       ValQ(10:12) = ValE(1:3,4)
 !
    endif
+!
+!  ...2nd H(curl) ATTRIBUTE = curl of the first attribute/-i omega \mu
+!     signal H-field value (H-field trace)
+   ValE(1,2)   = DvalE(3,1,2) - DvalE(2,1,3)
+   ValE(2,2)   = DvalE(1,1,3) - DvalE(3,1,1)
+   ValE(3,2)   = DvalE(2,1,1) - DvalE(1,1,2)
+   ValE(1:3,2) = ValE(1:3,2)/(-ZI*OMEGA*OMEGA_RATIO_SIGNAL*MU)
+!
+!  ...pump H-field value (H-field trace)
+   ValE(1,4)   = DvalE(3,3,2) - DvalE(2,3,3)
+   ValE(2,4)   = DvalE(1,3,3) - DvalE(3,3,1)
+   ValE(3,4)   = DvalE(2,3,1) - DvalE(1,3,2)
+   ValE(1:3,4) = ValE(1:3,4)/(-ZI*OMEGA*OMEGA_RATIO_PUMP*MU)
    end select
 !
 end subroutine exact

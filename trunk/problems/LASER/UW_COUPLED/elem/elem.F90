@@ -67,7 +67,7 @@ subroutine elem(Mdle, Itest,Itrial)
 !----------------------------------------------------------------------
 !
 !..start timer
-   start_time = MPI_Wtime()
+!   start_time = MPI_Wtime()
 !
    Itest (1:NR_PHYSA) = 0
    Itrial(1:NR_PHYSA) = 0
@@ -192,13 +192,13 @@ subroutine elem(Mdle, Itest,Itrial)
    end select
 !
 !..end timer
-   end_time = MPI_Wtime()
-!     !$OMP CRITICAL
-      !write(*,10) etype, end_time-start_time
-      !write(*,11) end_time-start_time
- 10   format(A,' elem : ',f12.5,'  seconds')
- 11   format(f12.5)
-!     !$OMP END CRITICAL
+!   end_time = MPI_Wtime()
+!      !$OMP CRITICAL
+!      write(*,10) etype, end_time-start_time
+!      !write(*,11) end_time-start_time
+! 10   format(A,' elem : ',f12.5,'  seconds')
+! 11   format(f12.5)
+!      !$OMP END CRITICAL
 !
 end subroutine elem
 !

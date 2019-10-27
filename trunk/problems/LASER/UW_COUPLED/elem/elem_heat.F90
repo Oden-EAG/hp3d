@@ -312,7 +312,11 @@ subroutine elem_heat(Mdle,                   &
 !
 !  ...coupled Maxwell/Heat problem
       therm_Load = rZero
-      if(HEAT_FLAG.eq.1) then
+      if(NONLINEAR_FLAG .eq. 1) then
+         if (GEOM_NO .ne. 5) then
+            write(*,*) 'elem_heat: HEAT coupling GEOM_NO .ne. 5'
+            stop
+         endif
 !     ...heat deposition in fiber core only
          if (ndom .eq. 1 .or. ndom .eq.  2) then
 !        ...compute the H1 solution load at the point
