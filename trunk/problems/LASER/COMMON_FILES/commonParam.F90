@@ -97,6 +97,7 @@ module commonParam
 !
 !..NUMBER OF REFINEMENTS (JOB SCRIPT)
    integer :: IMAX
+   integer :: JMAX
 !
 !..refinement type (see refine_DPG.F90)
    integer, parameter :: INOREFINEMENT = 0
@@ -123,5 +124,58 @@ module commonParam
    !integer                            :: IPARADAP
    !integer, dimension(:), ALLOCATABLE :: ISEL_PARAVIEW
    !integer :: IDOMAIN_SMOOTHE = 0
+!
+   contains
+!
+!  return whether Mdle is inside PML region
+!  (only call from MPI ranks who own this Mdle node)
+   function Is_pml(Mdle)
+      use data_structure3D
+      logical :: Is_pml
+      integer, intent(in) :: Mdle
+      real(8)          :: xnod(3,MAXbrickH)
+      real(8)          :: maxz
+      character(len=4) :: etype
+      xnod = 0.d0
+      call nodcor(Mdle, xnod)
+      etype = NODES(Mdle)%type
+      select case(etype)
+         case('mdlb')
+            maxz = maxval(xnod(3,1:8))
+         case('mdlp')
+            maxz = maxval(xnod(3,1:6))
+         case default
+            write(*,*) 'Is_pml: invalid etype param. stop.'
+            stop
+      end select
+      if (maxz .gt. PML_REGION) then
+         Is_pml = .true.
+      else
+         Is_pml = .false.
+      endif
+   end function Is_pml
+!
+!  compare two double complex numbers
+   function cmp_dc(a,b)
+!
+      complex(8) :: a,b
+      logical    :: cmp_dc
+      real(8)    :: max_r,max_i
+      real(8)    :: diff_r,diff_i
+      real(8), parameter :: tol = 5.0d-7
+!
+      diff_r = abs(real(a)-real(b))
+      diff_i = abs(imag(a)-imag(b))
+      max_r = max( abs(real(a)) , abs(real(b)) )
+      max_i = max( abs(imag(a)) , abs(imag(b)) )
+!
+      if (diff_r/(1.d0+max_r) > tol .and. max_r > tol .or. &
+          diff_i/(1.d0+max_i) > tol .and. max_i > tol ) then
+         cmp_dc = .false.
+      else
+         cmp_dc = .true.
+      endif
+!
+   end function cmp_dc
 !
 end module commonParam
