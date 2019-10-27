@@ -26,6 +26,7 @@
 !             Bload     - 1D array containing the modified load vector
 !             Astif     - 1D array containing the modified stiffness matrix!
 !---------------------------------------------------------------------
+#include "implicit_none.h"
 !
    subroutine celem(Mdle,Idec,Nrdofs,Nrdofm,Nrdofc,Nodm, &
                     NdofmH,NdofmE,NdofmV,NdofmQ,Nrnodm,Bload,Astif)
@@ -42,7 +43,7 @@
    integer, dimension(MAXNODM),  intent(out) :: Nodm
    integer, dimension(MAXNODM),  intent(out) :: NdofmH,NdofmE,NdofmV,NdofmQ
    integer,                      intent(out) :: Nrnodm
-   complex*16,                   intent(out) :: Bload(*),Astif(*)
+   VTYPE  ,                      intent(out) :: Bload(*),Astif(*)
    integer, dimension(NR_PHYSA)              :: nbcond
 !   
 !--------------------------------------------------------------------------
