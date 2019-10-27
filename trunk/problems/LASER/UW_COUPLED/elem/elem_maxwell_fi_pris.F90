@@ -128,33 +128,20 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    real*8, dimension(3,MAXbrickE)  :: shapE
    real*8, dimension(3,MAXbrickE)  :: curlE
 !
-!..L2 shape functions
-   real*8, dimension(MAXbrickQ)    :: shapQ
-!
 !..Enriched H1 shape functions
    real*8 , dimension(3,MAXbrickEE) :: shapEE
    real*8 , dimension(3,MAXbrickEE) :: curlEE
 !
 !..nrdof for interface only (without bubbles)
-   integer :: nrdofEEi
-!
-!..element mdle node dof
-   integer :: ndofHHmdl,ndofEEmdl,ndofVVmdl,ndofQQmdl
+   !integer :: nrdofEEi
 !
 !..load vector for the enriched space
    complex(8) :: bload_E(NrTest)
 !
 !..Gram matrix in packed format
    complex(8), allocatable :: gramP(:)
-   real*8  :: FF, CF, FC
-   real*8  :: fldE(3), fldH(3), crlE(3), crlH(3)
-   real*8  :: fldF(3), fldG(3), crlF(3), crlG(3)
 !
 !..matrices for transpose filling (swapped loops)
-!   complex(8) :: stiff_EE_T(2*NrdofEi,NrTest)
-!   complex(8) :: stiff_EQ_T(6*NrdofQ ,NrTest)
-!   complex(8) :: stiff_ALL(NrTest   ,NrTrial+1)
-!   complex(8) :: zaloc    (NrTrial+1,NrTrial+1)
    complex(8), allocatable :: stiff_EE_T(:,:),stiff_EQ_T(:,:)
    complex(8), allocatable :: stiff_ALL(:,:),zaloc(:,:)
 !
@@ -182,8 +169,9 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    integer :: i12,j12,k12,k1,k2,fa,fb,i3mod,j3mod,kH,kk,i,ik,j,k,l,nint,kE,n,m,p,pe
    integer :: iflag,iprint,itime,iverb
    integer :: nordP,nsign,ifc,ndom,info,icomp,idec
-   complex(8) :: zfval,zc
-   complex(8) :: za(3,3),zb(3,3)
+   complex(8) :: zfval
+   complex(8) :: za(3,3),zc(3,3)
+   complex(8) :: zaJ(3,3),zcJ(3,3)
 !
 !..for polarizations function
    complex(8), dimension(3,3) :: bg_pol,gain_pol,raman_pol
@@ -225,8 +213,9 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    real*8 :: wloc_xy(MAXNINT2ADD), wloc_z(MAXPP+1)
    real*8, dimension(3,MAXNINT3ADD) :: wloc3
    real*8, dimension(3) :: xip,dHdx,dHHdx
-   real*8, dimension(3,3) :: D,C,D_zb,D_aux
-   complex(8) , dimension(3,3) :: Z_za,Z_zb,Z_aux
+!
+   real(8)   , dimension(3,3) :: D_za,D_zc,D_aux,C,D
+   complex(8), dimension(3,3) :: Z_za,Z_zc,Z_aux
 !
    real(8), allocatable :: shapeH3(:,:),E12(:,:),C12(:,:),Q12(:)
    real(8), allocatable :: sH12(:,:),gH12(:,:,:),sE12(:,:,:),cE12(:,:),sQ12(:,:)
@@ -380,6 +369,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
          stop
    end select
 !
+!..initialize PML matrices
    Jstretch = ZERO
    Jstretch(1,1) = ZONE
    Jstretch(2,2) = ZONE
@@ -389,6 +379,8 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    invJstretch(2,2) = ZONE
 !
    JJstretch = ZERO
+   zaJ = ZERO
+   zcJ = ZERO
 !
 !..initialize the background polarization
    call find_domain(Mdle, ndom)
@@ -404,24 +396,20 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
          bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
       case(5)
          gain_pol = ZERO; raman_pol = ZERO
+         x(1:3) = 0.d0
          select case(ndom)
             case(1,2)
                dom_flag = 1 ! Fiber core
-               call get_bgPol(dom_flag,Fld_flag,0.d0, bg_pol)
+               call get_bgPol(dom_flag,Fld_flag,0.d0,x, bg_pol)
             case(3,4)
                dom_flag = 0 ! Fiber cladding
-               call get_bgPol(dom_flag,Fld_flag,0.d0, bg_pol)
+               call get_bgPol(dom_flag,Fld_flag,0.d0,x, bg_pol)
             case default
                write(*,*) 'elem_maxwell_fi_pris: unexpected ndom param. stop.'
                stop
          end select
 !..end select case of GEOM_NO
    end select
-!
-!..set auxiliary constants (updated if needed in integration routine)
-   za = (ZI*OMEGA*OMEGA_RATIO_FLD*EPSILON+SIGMA)*IDENTITY+bg_pol
-   zb = -conjg(za)
-   zc = ZI*OMEGA*OMEGA_RATIO_FLD*MU
 !
    if(NONLINEAR_FLAG.eq.1) then
 !  ...get current solution dofs
@@ -535,7 +523,6 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
          call shape3H(etype,xip,norder,norient_edge,norient_face, nrdof,shapH,gradH)
 !     ...Geometry map
          call geom3D(Mdle,xip,xnod,shapH,gradH,NrdofH, x,dxdxi,dxidx,rjac,iflag)
-!
 #if DEBUG_MODE
          if (iflag.ne.0) then
             write(*,5999) Mdle,rjac
@@ -547,28 +534,15 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !     ...get the RHS
          call getf(Mdle,x, zfval,zJ)
 !
-!.....................................................
-!...............toggle PML............................
-!
-         if(USE_PML.eq.0) then
-            JJstretch      = ZERO
-            JJstretch(1,1) = ZONE
-            JJstretch(2,2) = ZONE
-            JJstretch(3,3) = ZONE
-         else
-!        ...get PML function
-            call get_Beta(x,Fld_flag, zbeta,zdbeta,zd2beta)
-            Jstretch(3,3) = zdbeta
-            invJstretch(3,3) = 1.d0/zdbeta
-            call ZGEMM('N', 'N', 3, 3, 3, ZONE, invJstretch, 3, &
-                          invJstretch, 3, ZERO, JJstretch, 3)
-            detJstretch = zdbeta
-            JJstretch = detJstretch*JJstretch
+!     ...set auxiliary constants (updated below if nonlinear)
+!        ...update bgpol depending on coordinates if refractive index is varying
+!           (other than step-index)
+         za = (ZI*OMEGA*OMEGA_RATIO_FLD*EPSILON+SIGMA)*IDENTITY+bg_pol
+         zc = (ZI*OMEGA*OMEGA_RATIO_FLD*MU)*IDENTITY
+         if (GEOM_NO .eq. 5) then
+            call get_bgPol(dom_flag,Fld_flag,0.d0,x, bg_pol)
          endif
 !
-! ...........end toggle PML............................
-! .....................................................
-
 !     ...Nonlinear terms
          if(NONLINEAR_FLAG.eq.1) then
 !        ...compute current solution using soleval
@@ -587,7 +561,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
 !        ...update background polarization with thermal perturbation
             if(delta_n .ne. 0.d0) then
-               call get_bgPol(dom_flag,Fld_flag,delta_n, bg_pol)
+               call get_bgPol(dom_flag,Fld_flag,delta_n,x, bg_pol)
             endif
 !
 !        ...initialize gain polarization, raman polarization
@@ -611,9 +585,41 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !        ...update auxiliary constants for za,zb: this is for
 !        ...Stiffness and Gram matrix that changes with each nonlinear iteration
             za = (ZI*OMEGA*OMEGA_RATIO_FLD*EPSILON+SIGMA)*IDENTITY+bg_pol+gain_pol+raman_pol
-            zb = -conjg(za)
 !     ...endif NONLINEAR_FLAG
          endif
+!
+!.....................................................
+!...............toggle PML............................
+!
+         if(USE_PML.eq.0) then
+            JJstretch      = ZERO
+            JJstretch(1,1) = ZONE
+            JJstretch(2,2) = ZONE
+            JJstretch(3,3) = ZONE
+         else
+!        ...get PML function
+            call get_Beta(x,Fld_flag, zbeta,zdbeta,zd2beta)
+            Jstretch(3,3) = zdbeta
+!        ...compute det(J) * J^-1 * J^-T
+!           (J is a diagonal matrix)
+            invJstretch(3,3) = 1.d0/zdbeta
+            call ZGEMM('N', 'N', 3, 3, 3, ZONE, invJstretch, 3, &
+                          invJstretch, 3, ZERO, JJstretch, 3)
+            detJstretch = zdbeta
+            JJstretch = detJstretch*JJstretch
+         endif
+!
+!     ...PML stretching
+         zaJ(1,1) = JJstretch(1,1)*za(1,1)
+         zaJ(2,2) = JJstretch(2,2)*za(2,2)
+         zaJ(3,3) = JJstretch(3,3)*za(3,3)
+!
+         zcJ(1,1) = JJstretch(1,1)*zc(1,1)
+         zcJ(2,2) = JJstretch(2,2)*zc(2,2)
+         zcJ(3,3) = JJstretch(3,3)*zc(3,3)
+!
+!...........end toggle PML............................
+!.....................................................
 !
 !     ...compute total quadrature weight
          wt123=wt12*wt3
@@ -657,24 +663,27 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
          C = C*weightvv
 !
 !     ...Determine auxiliary matrices to anisotropic refractive index tensor
-         if (ANISO_REF_INDEX .eq. 1) then
-!        ...D_zb = J^-1 (zb)^* zb J^-T
-            D_aux(1:3,1) = dxidx(1:3,1) * abs(zb(1,1))**2
-            D_aux(1:3,2) = dxidx(1:3,2) * abs(zb(2,2))**2
-            D_aux(1:3,3) = dxidx(1:3,3) * abs(zb(3,3))**2
-            call DGEMM('N','T',3,3,3,1.0d0,D_aux,3,dxidx,3,0.0d0,D_zb,3)
-            D_zb = D_zb*weighthh
-!        ...Z_za = J^T * za * J^-T
-            call ZGEMM('N','T',3,3,3,ZONE,za        ,3,ZONE*dxidx,3,ZERO,Z_aux,3)
-            call ZGEMM('T','N',3,3,3,ZONE,ZONE*dxdxi,3,     Z_aux,3,ZERO,Z_za ,3)
-!        ...Z_zb = J^T * zb * J^-T
-            call ZGEMM('T','N',3,3,3,ZONE,zb        ,3,ZONE*dxdxi,3,ZERO,Z_aux,3)
-            call ZGEMM('N','N',3,3,3,ZONE,ZONE*dxidx,3,     Z_aux,3,ZERO,Z_zb ,3)
-         else
-            D_zb = D * abs(zb(1,1))**2
-            Z_za = za
-            Z_zb = zb
-         endif
+!        (also needed for PML stretching in adjoint graph norm)
+!     ...D_za = J^-1 |zaJ|^2 J^-T
+         D_aux(1:3,1) = dxidx(1:3,1) * (abs(zaJ(1,1))**2)
+         D_aux(1:3,2) = dxidx(1:3,2) * (abs(zaJ(2,2))**2)
+         D_aux(1:3,3) = dxidx(1:3,3) * (abs(zaJ(3,3))**2)
+         call DGEMM('N','T',3,3,3,1.0d0,D_aux,3,dxidx,3,0.0d0,D_za,3)
+         D_za = D_za*weighthh
+!     ...D_zc = J^-1 |zcJ|^2 J^-T
+         D_aux(1:3,1) = dxidx(1:3,1) * (abs(zcJ(1,1))**2)
+         D_aux(1:3,2) = dxidx(1:3,2) * (abs(zcJ(2,2))**2)
+         D_aux(1:3,3) = dxidx(1:3,3) * (abs(zcJ(3,3))**2)
+         call DGEMM('N','T',3,3,3,1.0d0,D_aux,3,dxidx,3,0.0d0,D_zc,3)
+         D_zc = D_zc*weighthh
+!     ...Z_za = J^-1 * zaJ^T * J
+         call ZGEMM('T','N',3,3,3,ZONE,zaJ        ,3,ZONE*dxdxi,3,ZERO,Z_aux,3)
+         call ZGEMM('N','N',3,3,3,ZONE,ZONE*dxidx ,3,     Z_aux,3,ZERO,Z_za ,3)
+!     ...Z_zc = J^-1 * zcJ^T * J
+         call ZGEMM('T','N',3,3,3,ZONE,zcJ        ,3,ZONE*dxdxi,3,ZERO,Z_aux,3)
+         call ZGEMM('N','N',3,3,3,ZONE,ZONE*dxidx ,3,     Z_aux,3,ZERO,Z_zc ,3)
+!     ...Z_zb = conjg(transpose(Z_za)) = J^T * zaJ * J^-T
+!     ...Z_zd = conjg(transpose(Z_zc)) = J^T * zcJ * J^-T
 !
 !     ...put appropriate quadrature weight on Jacobian and its inverse
          dxdxi = dxdxi * weightvv
@@ -706,55 +715,42 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                   do a=1,3
 !
 ! Note E terms have a lot of 0s so we only compute if non-zero
-                     if (E12(a,i12).ne.rZero) then
-!                    ...Accumulate for EE terms
-                        if (E12(b,j12).ne.rZero) then
-!                       ...For EE11
-                           AUXEE_zb(a,b,k12) = AUXEE_zb(a,b,k12)           &
-                                 + ( ALPHA_NORM*D(a,b) + D_zb(a,b) )       &
-                                 * E12(a,i12)*E12(b,j12)
-!                       ...For EE22
-                           AUXEE_zc(a,b,k12) = AUXEE_zc(a,b,k12)           &
-                                 + (abs(zc)**2+ALPHA_NORM)                 &
-                                 * E12(a,i12)*E12(b,j12)*D(a,b)
-                        endif
+!                 ...Accumulate for EE terms
+!                    ...For EE11
+                        AUXEE_zb(a,b,k12) = AUXEE_zb(a,b,k12)     &
+                              + (ALPHA_NORM*D(a,b) + D_za(a,b))   &
+                              * E12(a,i12)*E12(b,j12)
+!                    ...For EE22
+                        AUXEE_zc(a,b,k12) = AUXEE_zc(a,b,k12)     &
+                              + (ALPHA_NORM*D(a,b) + D_zc(a,b))   &
+                              * E12(a,i12)*E12(b,j12)
 !
-!                    ...Accumulate for EC terms
-                        if (a.eq.b  .or. ANISO_REF_INDEX.eq.1) then
-                           AUXEC_zb(a,b,k12) = AUXEC_zb(a,b,k12)        &
-                                 - Z_zb(a,b)                            &
-                                 * E12(a,i12)*C12(b,j12)*wt123
-                        endif
+!                 ...Accumulate for EC terms
+                     AUXEC_zb(a,b,k12) = AUXEC_zb(a,b,k12)        &
+                           - Z_za(a,b)                            &
+                           * E12(a,i12)*C12(b,j12)*wt123
 !
-                        if (a.eq.b) then
-                           AUXEC_zc(a,b,k12) = AUXEC_zc(a,b,k12)        &
-                                 + zc                                   &
-                                 * E12(a,i12)*C12(b,j12)*wt123
-                        endif
-                     endif
+                     AUXEC_zc(a,b,k12) = AUXEC_zc(a,b,k12)        &
+                           + Z_zc(a,b)                            &
+                           * E12(a,i12)*C12(b,j12)*wt123
 !
 !                 ...Accumulate for CC terms
-                     AUXCC(a,b,k12) = AUXCC(a,b,k12)                   &
+                     AUXCC(a,b,k12) = AUXCC(a,b,k12)                 &
                            + C12(a,i12)*C12(b,j12)*C(a,b)
 !
 !                 ...Accumulate for CE terms
-                     if (E12(b,j12).ne.rZero) then
-                        if (a.eq.b  .or. ANISO_REF_INDEX.eq.1) then
-                           AUXCE_zb(a,b,k12) = AUXCE_zb(a,b,k12)        &
-                                 + Z_za(a,b)                            &
-                                 * C12(a,i12)*E12(b,j12)*wt123
-                        endif
+!                    (Z_za and Z_zc indices are switched here b/c we need the transpose)
+                     AUXCE_zb(a,b,k12) = AUXCE_zb(a,b,k12)        &
+                           - conjg(Z_za(b,a))                     &
+                           * C12(a,i12)*E12(b,j12)*wt123
 !
-                        if (a.eq.b) then
-                           AUXCE_zc(a,b,k12) = AUXCE_zc(a,b,k12)        &
-                                 + conjg(zc)                            &
-                                 * C12(a,i12)*E12(b,j12)*wt123
-                        endif
-                     endif
+                     AUXCE_zc(a,b,k12) = AUXCE_zc(a,b,k12)        &
+                           + conjg(Z_zc(b,a))                     &
+                           * C12(a,i12)*E12(b,j12)*wt123
 !
-!              ...loop b ends
+!              ...loop a ends
                   enddo
-!           ...loop a ends
+!           ...loop b ends
                enddo
 !        ...loop over 2D test function ends
             enddo
@@ -765,16 +761,14 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                k12 = (i12-1)*nrdofQ12 + j12
                do b=1,3
                   do a=1,3
-                     if (E12(a,i12).ne.rZero) then
-                        STIFQE(a,b,k12) = STIFQE(a,b,k12)                  &
-                              + (dxidx(a,b)*Q12(j12))                      &
-                              * JJstretch(b,b)*zc                          &
-                              * E12(a,i12)
-                        STIFQE_ALPHA(a,b,k12) = STIFQE_ALPHA(a,b,k12)      &
-                              - (dxidx(a,b)*Q12(j12))                      &
-                              * JJstretch(b,b)*za(b,b)                     &
-                              * E12(a,i12)
-                     endif
+                     STIFQE(a,b,k12) = STIFQE(a,b,k12)                  &
+                           + (dxidx(a,b)*Q12(j12))                      &
+                           * zcJ(b,b)                                   &
+                           * E12(a,i12)
+                     STIFQE_ALPHA(a,b,k12) = STIFQE_ALPHA(a,b,k12)      &
+                           - (dxidx(a,b)*Q12(j12))                      &
+                           * zaJ(b,b)                                   &
+                           * E12(a,i12)
 !                 ...Curl
                      STIFQC(a,b,k12) = STIFQC(a,b,k12)                     &
                            + Q12(j12)*dxdxi(b,a)*C12(a,i12)
@@ -786,13 +780,11 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
 ! ------------ Assemble Aux Load Vector --------------    
             do a=1,3
-               if (E12(a,i12).ne.rZero) then
-                  LOADE(a,i12) = LOADE(a,i12)                              &
-                        + ( dxidx(a,1)*zJ(1)+                              &
-                            dxidx(a,2)*zJ(2)+                              &
-                            dxidx(a,3)*zJ(3) )                             &
-                        * E12(a,i12)*rjac
-               endif
+               LOADE(a,i12) = LOADE(a,i12)                              &
+                     + ( dxidx(a,1)*zJ(1)+                              &
+                         dxidx(a,2)*zJ(2)+                              &
+                         dxidx(a,3)*zJ(3) )                             &
+                     * E12(a,i12)*rjac
             enddo
 !
 !     ...loop over 2D test function ends
@@ -928,7 +920,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !                       ...accumulate QC terms
                            k = (m2-1)*6 + b
                            stiff_EQ_T(k,2*m1) = stiff_EQ_T(k,2*m1)         &
-                                 + STIFQC(a,b,k12)*shapeH3(2,j3mod)           &
+                                 + STIFQC(a,b,k12)*shapeH3(2,j3mod)        &
                                  * shapeH3(2-deltak(a,3)*fa,i3mod)
 !                    ...end loop a
                         enddo
@@ -941,10 +933,8 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
 !           ...Assemble Forcing Term
                do a=1,3
-                  if (E12(a,i12).ne.rZero) then
-                     bload_E(2*m1-1) = bload_E(2*m1-1)                     &
-                           +  LOADE(a,i12)*shapeH3(sa,i3mod)
-                  endif
+                  bload_E(2*m1-1) = bload_E(2*m1-1)                     &
+                                  + LOADE(a,i12)*shapeH3(sa,i3mod)
                enddo
             endif
 !     ...end loop 1 over 2D test functions
@@ -1159,18 +1149,18 @@ end subroutine elem_maxwell_fi_pris
 !----------------------------------------------------------------------
 ! routine: tens_prism_ordQQ
 !----------------------------------------------------------------------
-subroutine tens_prism_ordQQ(p,q, map)
+subroutine tens_prism_ordQQ(p,q, mapQQ)
    use parametersDPG
    integer, intent(in)  :: p
    integer, intent(in)  :: q
-   integer, intent(out) :: map((p+1)*p*q/2)
+   integer, intent(out) :: mapQQ((p+1)*p*q/2)
    map = 0
    k = 0
    ! Bubble functions (Tri Bub. x Unit edges) [1/2*(p+1)*p*q]
    do j = 1,q
       do i=1,(p+1)*(p)/2
          k = k+1
-         map((i-1)*(q) + j) = k
+         mapQQ((i-1)*(q) + j) = k
       enddo
    enddo
 end subroutine tens_prism_ordQQ
@@ -1178,41 +1168,41 @@ end subroutine tens_prism_ordQQ
 !----------------------------------------------------------------------
 ! routine: tens_prism_ordEE
 !----------------------------------------------------------------------
-subroutine tens_prism_ordEE(p,q, map)
+subroutine tens_prism_ordEE(p,q, mapEE)
    use parametersDPG
    integer, intent(in)  :: p
    integer, intent(in)  :: q
-   integer, intent(out) :: map((p+2)*p*(q+1)+(p+2)*(p+1)*q/2)
+   integer, intent(out) :: mapEE((p+2)*p*(q+1)+(p+2)*(p+1)*q/2)
    integer :: i,j,k
 !
-   map = 0
+   mapEE = 0
    k = 0
 !
 !..Mixed edge functions (Tri Edges x Unit Verts)    [6*p]
 !..Have edges from both T(curl) [p] and T(H1) [p-2] to account for
    do i=1,3*p
       k = k+1
-      map(i*(q+1) - (q)) = k
+      mapEE(i*(q+1) - (q)) = k
    enddo
    do i=1,3*p
       k = k+1
-      map(i*(q+1) - (q-1)) = k
+      mapEE(i*(q+1) - (q-1)) = k
    enddo
 !
 !..Quad edge functions (Tri Verts. x Unit Edges)     [3*q]
    do i=1,3*q
       k = k+1
-      map(p*(p+2)*(q+1) + i) = k
+      mapEE(p*(p+2)*(q+1) + i) = k
    enddo
 !
 !..Tri face functions (Tri Bub. x Unit Edges)        [2*p*(p-1)]
    do i=1,p*(p-1)
       k = k+1
-      map(3*p*(q+1) + i*(q+1) - (q)) = k
+      mapEE(3*p*(q+1) + i*(q+1) - (q)) = k
    enddo
    do i=1,p*(p-1)
       k = k+1
-      map(3*p*(q+1) + i*(q+1) - (q-1)) = k
+      mapEE(3*p*(q+1) + i*(q+1) - (q-1)) = k
    enddo
 !
 !.. Quad face functions (Tri Hcurl Edges x Unit H1 Edges
@@ -1220,37 +1210,37 @@ subroutine tens_prism_ordEE(p,q, map)
    do j=1,(q-1)
       do i=1,(p)
          k = k+1
-         map(i*(q+1) - (q-1) + j) = k
+         mapEE(i*(q+1) - (q-1) + j) = k
       enddo
    enddo
    do j=1,(q)
       do i=1,(p-1)
          k = k+1
-         map(p*(p+2)*(q+1) + 3*q + (i-1)*q + j) = k
+         mapEE(p*(p+2)*(q+1) + 3*q + (i-1)*q + j) = k
       enddo
    enddo
    do j=1,(q-1)
       do i=1,(p)
          k = k+1
-         map((i+(p))*(q+1) - (q-1) + j) = k
+         mapEE((i+(p))*(q+1) - (q-1) + j) = k
       enddo
    enddo
    do j=1,(q)
       do i=1,(p-1)
          k = k+1
-         map(p*(p+2)*(q+1) + 3*q + (i+(p-1)-1)*q + j) = k
+         mapEE(p*(p+2)*(q+1) + 3*q + (i+(p-1)-1)*q + j) = k
       enddo
    enddo
    do j=1,(q-1)
       do i=1,(p)
          k = k+1
-         map((i+2*(p))*(q+1) - (q-1) + j) = k
+         mapEE((i+2*(p))*(q+1) - (q-1) + j) = k
       enddo
    enddo
    do j=1,(q)
       do i=1,(p-1)
          k = k+1
-         map(p*(p+2)*(q+1) + 3*q + (i+2*(p-1)-1)*q + j) = k
+         mapEE(p*(p+2)*(q+1) + 3*q + (i+2*(p-1)-1)*q + j) = k
       enddo
    enddo
 !
@@ -1259,7 +1249,7 @@ subroutine tens_prism_ordEE(p,q, map)
    do j=1,(q-1)
       do i=1,p*(p-1)
          k = k+1
-         map(3*p*(q+1) + (i-1)*(q+1) + 2 + j) = k
+         mapEE(3*p*(q+1) + (i-1)*(q+1) + 2 + j) = k
       enddo
    enddo
 !
@@ -1267,7 +1257,7 @@ subroutine tens_prism_ordEE(p,q, map)
    do j = 1,q
       do i=1,(p-1)*(p-2)/2
          k = k+1
-         map(p*(p+2)*(q+1) + 3*q*p + (i-1)*q + j) = k
+         mapEE(p*(p+2)*(q+1) + 3*q*p + (i-1)*q + j) = k
       enddo
    enddo
 !
@@ -1277,17 +1267,17 @@ end subroutine tens_prism_ordEE
 ! routine: tens_hexa_ordEE
 !----------------------------------------------------------------------
 ! TODO
-subroutine tens_hexa_ordEE(p,q, map)
+subroutine tens_hexa_ordEE(p,q, mapEE)
    use parametersDPG
    integer, intent(in)  :: p 
    integer, intent(in)  :: q
-   integer, intent(out) :: map(2*(p+1)*p*(q+1) + (p+1)*(p+1)*q)
+   integer, intent(out) :: mapEE(2*(p+1)*p*(q+1) + (p+1)*(p+1)*q)
    integer :: i,j,k
    map = 0
    k = 0
    do i = 1,2*(p+1)*p*(q+1) + (p+1)*(p+1)*q
       k = k+1
-      map(i) = k
+      mapEE(i) = k
    enddo
 end subroutine tens_hexa_ordEE
 !
@@ -1295,16 +1285,16 @@ end subroutine tens_hexa_ordEE
 ! routine: tens_hexa_ordQQ
 !----------------------------------------------------------------------
 ! TODO
-subroutine tens_hexa_ordQQ(p,q, map)
+subroutine tens_hexa_ordQQ(p,q, mapQQ)
    use parametersDPG
    integer, intent(in)  :: p 
    integer, intent(in)  :: q
-   integer, intent(out) :: map(p*p*q)
+   integer, intent(out) :: mapQQ(p*p*q)
    integer :: i,j,k
    map = 0
    k = 0
    do i = 1,p*p*q
       k = k+1
-      map(i) = k
+      mapQQ(i) = k
    enddo
 end subroutine tens_hexa_ordQQ

@@ -184,8 +184,9 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,ik,j,k,l,nint,kE,n,m
    integer :: iflag,iprint,itime,iverb
    integer :: nrdof,nordP,nsign,ifc,ndom,info,icomp,idec
-   complex(8) :: zfval,zc
-   complex(8) :: za(3,3),zb(3,3)
+   complex(8) :: zfval
+   complex(8) :: za(3,3),zc(3,3)
+   complex(8) :: zaJ(3,3),zcJ(3,3)
 !
 !..for polarizations function
    complex(8), dimension(3,3) :: bg_pol,gain_pol,raman_pol
@@ -231,8 +232,8 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    real*8, dimension(MAXPP+1) :: wlocx,wlocy,wlocz
    real*8, dimension(3,MAXNINT3ADD) :: wloc3
    real*8, dimension(3) :: xip,dHdx,dHHdx
-   real*8, dimension(3,3) :: D,C,D_zb,D_aux
-   VTYPE , dimension(3,3) :: Z_za,Z_zb,Z_aux
+   real*8, dimension(3,3) :: D_za,D_zc,D_aux,C,D
+   VTYPE , dimension(3,3) :: Z_za,Z_zc,Z_aux
    real*8, dimension(MAXPP+1,2) :: shapH1,shapH2,shapH3
    real*8, dimension(MAXPP+1,MAXPP+1) :: sH2p,sH3p,dsH2p,dsH3p
    integer, dimension(3,3) :: deltak
@@ -332,6 +333,8 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    invJstretch(2,2) = ZONE
 !
    JJstretch = ZERO
+   zaJ = ZERO
+   zcJ = ZERO
 !
 !..initialize the background polarization
    call find_domain(Mdle, ndom)
@@ -348,24 +351,20 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
          bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
       case(5)
          gain_pol = ZERO; raman_pol = ZERO
+         x(1:3) = 0.d0
          select case(ndom)
             case(1,2)
                dom_flag = 1 ! Fiber core
-               call get_bgPol(dom_flag,Fld_flag,0.d0, bg_pol)
+               call get_bgPol(dom_flag,Fld_flag,0.d0,x, bg_pol)
             case(3,4)
                dom_flag = 0 ! Fiber cladding
-               call get_bgPol(dom_flag,Fld_flag,0.d0, bg_pol)
+               call get_bgPol(dom_flag,Fld_flag,0.d0,x, bg_pol)
             case default
                write(*,*) 'elem_maxwell_fi_hexa: unexpected ndom param. stop.'
                stop
          end select
 !..end select case of GEOM_NO
    end select
-!
-!..set auxiliary constants (updated if needed in integration routine)
-   za = (ZI*OMEGA*OMEGA_RATIO_FLD*EPSILON+SIGMA)*IDENTITY+bg_pol
-   zb = -conjg(za)
-   zc = ZI*OMEGA*OMEGA_RATIO_FLD*MU
 !
    if(NONLINEAR_FLAG.eq.1) then
 !  ...get current solution dofs
@@ -547,27 +546,14 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !        ...get the RHS
             call getf(Mdle,x, zfval,zJ)
 !
-!.....................................................
-!...............toggle PML............................
-!
-            if(USE_PML.eq.0) then
-               JJstretch      = ZERO
-               JJstretch(1,1) = ZONE
-               JJstretch(2,2) = ZONE
-               JJstretch(3,3) = ZONE
-            else
-!           ...get PML function
-               call get_Beta(x,Fld_flag, zbeta,zdbeta,zd2beta)
-               Jstretch(3,3) = zdbeta
-               invJstretch(3,3) = 1.d0/zdbeta
-               call ZGEMM('N', 'N', 3, 3, 3, ZONE, invJstretch, 3, &
-                             invJstretch, 3, ZERO, JJstretch, 3)
-               detJstretch = zdbeta
-               JJstretch = detJstretch*JJstretch
+!        ...set auxiliary constants (updated below if nonlinear)
+!        ...update bgpol depending on coordinates if refractive index is varying
+!           (other than step-index)
+            if (GEOM_NO .eq. 5) then
+               call get_bgPol(dom_flag,Fld_flag,0.d0,x, bg_pol)
             endif
-!
-!...........end toggle PML............................
-!.....................................................
+            za = (ZI*OMEGA*OMEGA_RATIO_FLD*EPSILON+SIGMA)*IDENTITY+bg_pol
+            zc = (ZI*OMEGA*OMEGA_RATIO_FLD*MU)*IDENTITY
 !
 !        ...Nonlinear terms
             if(NONLINEAR_FLAG.eq.1) then
@@ -587,7 +573,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !
 !           ...update background polarization with thermal perturbation
                if(delta_n .ne. 0.d0) then
-                  call get_bgPol(dom_flag,Fld_flag,delta_n, bg_pol)
+                  call get_bgPol(dom_flag,Fld_flag,delta_n,x, bg_pol)
                endif
 !
 !           ...initialize gain polarization, raman polarization
@@ -608,12 +594,43 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                   endif
 !           ...endif RAMAN_GAIN
                endif
-!           ...update auxiliary constants for za,zb: this is for
-!           ...Stiffness and Gram matrix that changes with each nonlinear iteration
+!           ...update auxiliary constant za
                za = (ZI*OMEGA*OMEGA_RATIO_FLD*EPSILON+SIGMA)*IDENTITY+bg_pol+gain_pol+raman_pol
-               zb = -conjg(za)
 !        ...endif NONLINEAR_FLAG
             endif
+!
+!.....................................................
+!...............toggle PML............................
+!
+            if(USE_PML.eq.0) then
+               JJstretch      = ZERO
+               JJstretch(1,1) = ZONE
+               JJstretch(2,2) = ZONE
+               JJstretch(3,3) = ZONE
+            else
+!           ...get PML function
+               call get_Beta(x,Fld_flag, zbeta,zdbeta,zd2beta)
+               Jstretch(3,3) = zdbeta
+!           ...compute det(J) * J^-1 * J^-T
+!              (J is a diagonal matrix)
+               invJstretch(3,3) = 1.d0/zdbeta
+               call ZGEMM('N', 'N', 3, 3, 3, ZONE, invJstretch, 3, &
+                             invJstretch, 3, ZERO, JJstretch, 3)
+               detJstretch = zdbeta
+               JJstretch = detJstretch*JJstretch
+            endif
+!
+!        ...PML stretching
+            zaJ(1,1) = JJstretch(1,1)*za(1,1)
+            zaJ(2,2) = JJstretch(2,2)*za(2,2)
+            zaJ(3,3) = JJstretch(3,3)*za(3,3)
+!
+            zcJ(1,1) = JJstretch(1,1)*zc(1,1)
+            zcJ(2,2) = JJstretch(2,2)*zc(2,2)
+            zcJ(3,3) = JJstretch(3,3)*zc(3,3)
+!
+!...........end toggle PML............................
+!.....................................................
 !
 !        ...compute total quadrature weight
             wt123=wt1*wt2*wt3
@@ -656,24 +673,27 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
             C(3,3) = dxdxi(1,3)**2 + dxdxi(2,3)**2 + dxdxi(3,3)**2
             C = C*weightvv
 !        ...Determine auxiliary matrices to anisotropic refractive index tensor
-            if (ANISO_REF_INDEX .eq. 1) then
-!           ...D_zb = J^-1 (zb)^* zb J^-T
-               D_aux(1:3,1) = dxidx(1:3,1) * abs(zb(1,1))**2
-               D_aux(1:3,2) = dxidx(1:3,2) * abs(zb(2,2))**2
-               D_aux(1:3,3) = dxidx(1:3,3) * abs(zb(3,3))**2
-               call DGEMM('N','T',3,3,3,1.0d0,D_aux,3,dxidx,3,0.0d0,D_zb,3)
-               D_zb = D_zb*weighthh
-!           ...Z_za = J^T * za * J^-T
-               call ZGEMM('N','T',3,3,3,ZONE,za        ,3,ZONE*dxidx,3,ZERO,Z_aux,3)
-               call ZGEMM('T','N',3,3,3,ZONE,ZONE*dxdxi,3,     Z_aux,3,ZERO,Z_za ,3)
-!           ...Z_zb = J^T * zb * J^-T
-               call ZGEMM('T','N',3,3,3,ZONE,zb        ,3,ZONE*dxdxi,3,ZERO,Z_aux,3)
-               call ZGEMM('N','N',3,3,3,ZONE,ZONE*dxidx,3,     Z_aux,3,ZERO,Z_zb ,3)
-            else
-               D_zb = D * abs(zb(1,1))**2
-               Z_za = za
-               Z_zb = zb
-            endif
+!           (also needed for PML stretching in adjoint graph norm)
+!        ...D_za = J^-1 |zaJ|^2 J^-T
+            D_aux(1:3,1) = dxidx(1:3,1) * abs(zaJ(1,1))**2
+            D_aux(1:3,2) = dxidx(1:3,2) * abs(zaJ(2,2))**2
+            D_aux(1:3,3) = dxidx(1:3,3) * abs(zaJ(3,3))**2
+            call DGEMM('N','T',3,3,3,1.0d0,D_aux,3,dxidx,3,0.0d0,D_za,3)
+            D_za = D_za*weighthh
+!        ...D_zc = J^-1 |zcJ|^2 J^-T
+            D_aux(1:3,1) = dxidx(1:3,1) * abs(zcJ(1,1))**2
+            D_aux(1:3,2) = dxidx(1:3,2) * abs(zcJ(2,2))**2
+            D_aux(1:3,3) = dxidx(1:3,3) * abs(zcJ(3,3))**2
+            call DGEMM('N','T',3,3,3,1.0d0,D_aux,3,dxidx,3,0.0d0,D_zc,3)
+            D_zc = D_zc*weighthh
+!        ...Z_za = J^-1 * zaJ^T * J
+            call ZGEMM('T','N',3,3,3,ZONE,zaJ        ,3,ZONE*dxdxi,3,ZERO,Z_aux,3)
+            call ZGEMM('N','N',3,3,3,ZONE,ZONE*dxidx ,3,     Z_aux,3,ZERO,Z_za ,3)
+!        ...Z_zc = J^-1 * zcJ^T * J
+            call ZGEMM('T','N',3,3,3,ZONE,zcJ        ,3,ZONE*dxdxi,3,ZERO,Z_aux,3)
+            call ZGEMM('N','N',3,3,3,ZONE,ZONE*dxidx ,3,     Z_aux,3,ZERO,Z_zc ,3)
+!        ...Z_zb = conjg(transpose(Z_za)) = J^T * zaJ * J^-T
+!        ...Z_zd = conjg(transpose(Z_zc)) = J^T * zcJ * J^-T
 !
 !        ...put appropriate quadrature weight on Jacobian and its inverse
             dxdxi = dxdxi * weightvv
@@ -720,13 +740,16 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !                       ...accumulate innermost 1D integral for EE term in Gram matrix
                            AUXEE_A_zb(b,a,k3) = AUXEE_A_zb(b,a,k3)         &
                                               + (ALPHA_NORM*D(a,b) +       &
-                                                 D_zb(a,b)           )     &
+                                                 D_za(a,b)           )     &
                                               * shapH3(idxa,sa)            &
                                               * shapH3(idxb,sb)
+!
                            AUXEE_A_zc(b,a,k3) = AUXEE_A_zc(b,a,k3)         &
-                                              + (abs(zc)**2+ALPHA_NORM)    &
-                                              * (shapH3(idxa,sa)           &
-                                              * shapH3(idxb,sb)*D(a,b))
+                                              + (ALPHA_NORM*D(a,b) +       &
+                                                 D_zc(a,b)           )     &
+                                              * shapH3(idxa,sa)            &
+                                              * shapH3(idxb,sb)
+!
 !                       ...loop over components a+alph, b+beta, (modulo 3)
 !                          where the curl of the shape functions lie
                            do beta=1,2; do alph=1,2
@@ -751,21 +774,18 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                               sb=1+deltak(b,3)
                               sa=1+1-deltak(idxalph,3)
 !                          ...accumulate innermost 1D integral for CE term
-!                          ...the only nonzero is when idxalph == b [unless anisotropy]
-                              if (idxalph.eq.b  .or. ANISO_REF_INDEX.eq.1) then
-                                 AUXCE_A_zb(alph,b,a,k3) = AUXCE_A_zb(alph,b,a,k3)  &
-                                                         + Z_za(idxalph,b)          &
-                                                         * shapH3(idxa,sa)          &
-                                                         * shapH3(idxb,sb)          &
-                                                         * (-1)**(alph-1)*wt123
-                              endif
-                              if (idxalph .eq. b) then
-                                 AUXCE_A_zc(alph,b,a,k3) = AUXCE_A_zc(alph,b,a,k3)  &
-                                                         + conjg(zc)                &
-                                                         * shapH3(idxa,sa)          &
-                                                         * shapH3(idxb,sb)          &
-                                                         * (-1)**(alph-1)*wt123
-                              endif
+!                             (Z_za and Z_zc indices are switched here b/c we need the transpose)
+                              AUXCE_A_zb(alph,b,a,k3) = AUXCE_A_zb(alph,b,a,k3)     &
+                                                      - conjg(Z_za(b,idxalph))      &
+                                                      * shapH3(idxa,sa)             &
+                                                      * shapH3(idxb,sb)             &
+                                                      * (-1)**(alph-1)*wt123
+!
+                              AUXCE_A_zc(alph,b,a,k3) = AUXCE_A_zc(alph,b,a,k3)     &
+                                                      + conjg(Z_zc(b,idxalph))      &
+                                                      * shapH3(idxa,sa)             &
+                                                      * shapH3(idxb,sb)             &
+                                                      * (-1)**(alph-1)*wt123
                            enddo
 !                       ...loop over components b+beta, where the curl of
 !                          the TRIAL shape function, for the EC term of Gram matrix
@@ -774,21 +794,18 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                               sb=1+1-deltak(idxbeta,3)
                               sa=1+deltak(a,3)
 !                          ...accumulate innermost 1D integral for EC term
-!                          ...the only nonzero is when idxbeta == a [unless anisotropy]
-                              if (idxbeta.eq.a .or. ANISO_REF_INDEX.eq.1) then
-                                 AUXEC_A_zb(beta,b,a,k3) = AUXEC_A_zb(beta,b,a,k3)        &
-                                                        + (-Z_zb(a,idxbeta))              &
-                                                        * shapH3(idxa,sa)                 &
-                                                        * shapH3(idxb,sb)                 &
-                                                        * (-1)**(beta-1)*wt123
-                              endif
-                              if (idxbeta .eq. a) then
-                                 AUXEC_A_zc(beta,b,a,k3) = AUXEC_A_zc(beta,b,a,k3)        &
-                                                        + zc                              &
-                                                        * shapH3(idxa,sa)                 &
-                                                        * shapH3(idxb,sb)                 &
-                                                        * (-1)**(beta-1)*wt123
-                              endif
+                              AUXEC_A_zb(beta,b,a,k3) = AUXEC_A_zb(beta,b,a,k3)        &
+                                                     - Z_za(a,idxbeta)                 &
+                                                     * shapH3(idxa,sa)                 &
+                                                     * shapH3(idxb,sb)                 &
+                                                     * (-1)**(beta-1)*wt123
+!
+                              AUXEC_A_zc(beta,b,a,k3) = AUXEC_A_zc(beta,b,a,k3)        &
+                                                     + Z_zc(a,idxbeta)                 &
+                                                     * shapH3(idxa,sa)                 &
+                                                     * shapH3(idxb,sb)                 &
+                                                     * (-1)**(beta-1)*wt123
+!
 !                          ...loop over beta ends
                            enddo
                         endif
@@ -822,13 +839,13 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !                       ...and account for PML stretching
                            STIFQE_A(a,b,k3) = STIFQE_A(a,b,k3)             &
                                             + (dxidx(a,b)*shapH3(j3+1,2))  &
-                                            * JJstretch(b,b)*zc            &
+                                            * zcJ(b,b)                     &
                                             * shapH3(idxa,sa)
 !                       ...accumulate innermost 1D integral for alpha_scale*QE term
 !                       ...and account for PML stretching
                            STIFQE_ALPHA_A(a,b,k3) = STIFQE_ALPHA_A(a,b,k3)       &
                                                   - (dxidx(a,b)*shapH3(j3+1,2))  &
-                                                  * JJstretch(b,b)*za(b,b)       &
+                                                  * zaJ(b,b)                     &
                                                   * shapH3(idxa,sa)
 !                       ...loop over components a+alph, required for curl of test f
                            do alph=1,2
@@ -919,36 +936,28 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                                  idxalph=mod(a+alph-1,3)+1
                                  sb=1+deltak(b,2)
                                  sa=1+1-deltak(idxalph,2)
-                                 if (idxalph.eq.b .or. ANISO_REF_INDEX.eq.1) then
-                                    AUXCE_B_zb(alph,b,a,k2,k3) =            &
-                                           AUXCE_B_zb(alph,b,a,k2,k3)       &
-                                         + shapH2(idxa,sa)*shapH2(idxb,sb)  &
-                                         * AUXCE_A_zb(alph,b,a,k3)
-                                 endif
-                                 if (idxalph.eq.b) then
-                                    AUXCE_B_zc(alph,b,a,k2,k3) =            &
-                                           AUXCE_B_zc(alph,b,a,k2,k3)       &
-                                         + shapH2(idxa,sa)*shapH2(idxb,sb)  &
-                                         * AUXCE_A_zc(alph,b,a,k3)
-                                 endif
+                                 AUXCE_B_zb(alph,b,a,k2,k3) =            &
+                                        AUXCE_B_zb(alph,b,a,k2,k3)       &
+                                      + shapH2(idxa,sa)*shapH2(idxb,sb)  &
+                                      * AUXCE_A_zb(alph,b,a,k3)
+                                 AUXCE_B_zc(alph,b,a,k2,k3) =            &
+                                        AUXCE_B_zc(alph,b,a,k2,k3)       &
+                                      + shapH2(idxa,sa)*shapH2(idxb,sb)  &
+                                      * AUXCE_A_zc(alph,b,a,k3)
                               enddo
 !                          ... accumulate for EC term
                               do beta=1,2
                                  idxbeta=mod(b+beta-1,3)+1
                                  sb=1+1-deltak(idxbeta,2)
                                  sa=1+deltak(a,2)
-                                 if (idxbeta.eq.a .or. ANISO_REF_INDEX.eq.1) then
-                                    AUXEC_B_zb(beta,b,a,k2,k3) =            &
-                                           AUXEC_B_zb(beta,b,a,k2,k3)       &
-                                         + shapH2(idxa,sa)*shapH2(idxb,sb)  &
-                                         * AUXEC_A_zb(beta,b,a,k3)
-                                 endif
-                                 if (idxbeta.eq.a) then
-                                    AUXEC_B_zc(beta,b,a,k2,k3) =            &
-                                           AUXEC_B_zc(beta,b,a,k2,k3)       &
-                                         + shapH2(idxa,sa)*shapH2(idxb,sb)  &
-                                         * AUXEC_A_zc(beta,b,a,k3)
-                                 endif
+                                 AUXEC_B_zb(beta,b,a,k2,k3) =            &
+                                        AUXEC_B_zb(beta,b,a,k2,k3)       &
+                                      + shapH2(idxa,sa)*shapH2(idxb,sb)  &
+                                      * AUXEC_A_zb(beta,b,a,k3)
+                                 AUXEC_B_zc(beta,b,a,k2,k3) =            &
+                                        AUXEC_B_zc(beta,b,a,k2,k3)       &
+                                      + shapH2(idxa,sa)*shapH2(idxb,sb)  &
+                                      * AUXEC_A_zc(beta,b,a,k3)
                               enddo
                            endif
 !                       ...loop over b ends
@@ -1098,22 +1107,18 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                                           idxalph=mod(a+alph-1,3)+1
                                           sb=1+deltak(b,1)
                                           sa=1+1-deltak(idxalph,1)
-                                          if (idxalph.eq.b) then
-                                             gramP(kk) = gramP(kk)                   &
-                                                       + AUXCE_B_zc(alph,b,a,k2,k3)  &
-                                                       * shapH1(idxa,sa)*shapH1(idxb,sb)
-                                          endif
+                                          gramP(kk) = gramP(kk)                   &
+                                                    + AUXCE_B_zc(alph,b,a,k2,k3)  &
+                                                    * shapH1(idxa,sa)*shapH1(idxb,sb)
                                        enddo
 !                                   ...sum EC terms
                                        do beta=1,2
                                           idxbeta=mod(b+beta-1,3)+1
                                           sb=1+1-deltak(idxbeta,1)
                                           sa=1+deltak(a,1)
-                                          if (idxbeta.eq.a .or. ANISO_REF_INDEX.eq.1) then
-                                             gramP(kk) = gramP(kk)                     &
-                                                       + AUXEC_B_zb(beta,b,a,k2,k3)    &
-                                                       * shapH1(idxa,sa)*shapH1(idxb,sb)
-                                          endif
+                                          gramP(kk) = gramP(kk)                     &
+                                                    + AUXEC_B_zb(beta,b,a,k2,k3)    &
+                                                    * shapH1(idxa,sa)*shapH1(idxb,sb)
                                        enddo
 
                                        if (m1.ne.m2) then
@@ -1124,22 +1129,18 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                                              idxalph=mod(a+alph-1,3)+1
                                              sb=1+deltak(b,1)
                                              sa=1+1-deltak(idxalph,1)
-                                             if (idxalph.eq.b .or. ANISO_REF_INDEX.eq.1) then
-                                                gramP(kk) = gramP(kk)                     &
-                                                          + AUXCE_B_zb(alph,b,a,k2,k3)    &
-                                                          * shapH1(idxa,sa)*shapH1(idxb,sb)
-                                             endif
+                                             gramP(kk) = gramP(kk)                     &
+                                                       + AUXCE_B_zb(alph,b,a,k2,k3)    &
+                                                       * shapH1(idxa,sa)*shapH1(idxb,sb)
                                           enddo
 !                                      ...sum EC terms
                                           do beta=1,2
                                              idxbeta=mod(b+beta-1,3)+1
                                              sb=1+1-deltak(idxbeta,1)
                                              sa=1+deltak(a,1)
-                                             if (idxbeta.eq.a) then
-                                                gramP(kk) = gramP(kk)                   &
-                                                          + AUXEC_B_zc(beta,b,a,k2,k3)  &
-                                                          * shapH1(idxa,sa)*shapH1(idxb,sb)
-                                             endif
+                                             gramP(kk) = gramP(kk)                   &
+                                                       + AUXEC_B_zc(beta,b,a,k2,k3)  &
+                                                       * shapH1(idxa,sa)*shapH1(idxb,sb)
                                           enddo
 
                                        endif
@@ -1421,6 +1422,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 
 !     ...loop through Hcurl enriched test functions
          do ik=1,nrdofEEi
+         !do k1=1,nrdofEE
             k1 = idxEE(ik)
             E1(1:3) = shapEE(1,k1)*dxidx(1,1:3) &
                     + shapEE(2,k1)*dxidx(2,1:3) &

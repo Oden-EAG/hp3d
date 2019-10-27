@@ -149,11 +149,8 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !..matrices for transpose filling (swapped loops)
 !..stiffness matrices (transposed) for the enriched test space
-!   VTYPE :: stiff_EE_T(2*NrdofEi,NrTest)
-!   VTYPE :: stiff_EQ_T(6*NrdofQ ,NrTest)
-!   VTYPE :: stiff_ALL(NrTest   ,NrTrial+1)
-!   VTYPE :: zaloc    (NrTrial+1,NrTrial+1)
-   VTYPE, allocatable :: stiff_EE_T(:,:),stiff_EQ_T(:,:),stiff_ALL(:,:),zaloc(:,:)
+   complex(8), allocatable :: stiff_EE_T(:,:),stiff_EQ_T(:,:)
+   complex(8), allocatable :: stiff_ALL(:,:),zaloc(:,:)
 !
 !..3D quadrature data
    real*8, dimension(3,MAXNINT3ADD)  :: xiloc
@@ -167,7 +164,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    integer, dimension(6,NR_PHYSA)    :: ibc
 !
 !..for auxiliary computation
-   VTYPE :: zaux
+   VTYPE :: zaux,zcux
 !
 !..Maxwell load and auxiliary variables
    VTYPE , dimension(3) :: zJ,zImp
@@ -182,8 +179,9 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,ik,j,k,l,nint,kE,n,m
    integer :: iflag,iprint,itime,iverb
    integer :: nrdof,nordP,nsign,ifc,ndom,info,icomp,idec
-   VTYPE   :: zfval,zc
-   VTYPE   :: za(3,3),zb(3,3)
+   VTYPE   :: zfval
+   VTYPE   :: za(3,3),zc(3,3)
+   VTYPE   :: zaJ(3,3),zcJ(3,3)
 !
 !..for polarizations function
    VTYPE, dimension(3,3) :: bg_pol,gain_pol,raman_pol
@@ -273,6 +271,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
          stop
    end select
 !
+!..initialize PML matrices
    Jstretch = ZERO
    Jstretch(1,1) = ZONE
    Jstretch(2,2) = ZONE
@@ -282,6 +281,8 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    invJstretch(2,2) = ZONE
 !
    JJstretch = ZERO
+   zaJ = ZERO
+   zcJ = ZERO
 !
 !..initialize the background polarization
    call find_domain(Mdle, ndom)
@@ -298,24 +299,20 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
          bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
       case(5)
          gain_pol = ZERO; raman_pol = ZERO
+         x(1:3) = 0.d0
          select case(ndom)
             case(1,2)
                dom_flag = 1 ! Fiber core
-               call get_bgPol(dom_flag,Fld_flag,0.d0, bg_pol)
+               call get_bgPol(dom_flag,Fld_flag,0.d0,x, bg_pol)
             case(3,4)
                dom_flag = 0 ! Fiber cladding
-               call get_bgPol(dom_flag,Fld_flag,0.d0, bg_pol)
+               call get_bgPol(dom_flag,Fld_flag,0.d0,x, bg_pol)
             case default
                write(*,*) 'elem_maxwell: unexpected ndom param. stop.'
                stop
          end select
 !..end select case of GEOM_NO
    end select
-!
-!..set auxiliary constants (updated if needed in integration routine)
-   za = (ZI*OMEGA*OMEGA_RATIO_FLD*EPSILON+SIGMA)*IDENTITY+bg_pol
-   zb = -conjg(za)
-   zc = ZI*OMEGA*OMEGA_RATIO_FLD*MU
 !
    if(NONLINEAR_FLAG.eq.1) then
 !  ...get current solution dofs
@@ -346,6 +343,13 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !  ...geometry map
       call geom3D(Mdle,xi,xnod,shapH,gradH,nrdofH, x,dxdxi,dxidx,rjac,iflag)
+#if DEBUG_MODE
+      if (iflag .ne. 0) then
+         write(*,5999) Mdle,rjac
+   5999  format('elem_maxwell: Negative Jacobian. Mdle,rjac=',i8,2x,e12.5)
+         stop
+      endif
+#endif
 !
 !  ...integration weight
       weight = rjac*wa
@@ -353,27 +357,14 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !  ...get the RHS
       call getf(Mdle,x, zfval,zJ)
 !
-!.....................................................
-!...............toggle PML............................
-!
-      if(USE_PML.eq.0) then
-         JJstretch      = ZERO
-         JJstretch(1,1) = ZONE
-         JJstretch(2,2) = ZONE
-         JJstretch(3,3) = ZONE
-      else
-!     ...get PML function
-         call get_Beta(x,Fld_flag, zbeta,zdbeta,zd2beta)
-         Jstretch(3,3) = zdbeta
-         invJstretch(3,3) = 1.d0/zdbeta
-         call ZGEMM('N', 'N', 3, 3, 3, ZONE, invJstretch, 3, &
-                       invJstretch, 3, ZERO, JJstretch, 3)
-         detJstretch = zdbeta
-         JJstretch = detJstretch*JJstretch
+!  ...set auxiliary constants (updated below if nonlinear)
+!     ...update bgpol depending on coordinates if refractive index is varying
+!        (other than step-index)
+      if (GEOM_NO .eq. 5) then
+         call get_bgPol(dom_flag,Fld_flag,0.d0,x, bg_pol)
       endif
-!
-!...........end toggle PML............................
-!.....................................................
+      za = (ZI*OMEGA*OMEGA_RATIO_FLD*EPSILON+SIGMA)*IDENTITY+bg_pol
+      zc = (ZI*OMEGA*OMEGA_RATIO_FLD*MU)*IDENTITY
 !
 !  ...FOR THE NONLINEAR_FLAG = 1
       if(NONLINEAR_FLAG.eq.1) then
@@ -393,13 +384,13 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !     ...update background polarization with thermal perturbation
          if(delta_n .ne. 0.d0) then
-            call get_bgPol(dom_flag,Fld_flag,delta_n, bg_pol)
+            call get_bgPol(dom_flag,Fld_flag,delta_n,x, bg_pol)
          endif
 !
 !     ...initialize gain polarization, raman polarization
          gain_pol = ZERO; raman_pol = ZERO
          if (ACTIVE_GAIN .gt. 0.d0) then
-            if (dom_flag .eq. 1) then ! .and. x(3).le.PML_REGION) then
+            if (dom_flag .eq. 1) then
                call get_activePol(zsolQ_soleval(1:12),Fld_flag,delta_n, gain_pol)
             endif
          endif
@@ -414,12 +405,43 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
             endif
 !     ...endif RAMAN_GAIN
          endif
-!     ...update auxiliary constants for za,zb: this is for
-!     ...Stiffness and Gram matrix that changes with each nonlinear iteration
+!     ...update auxiliary constant za
          za = (ZI*OMEGA*OMEGA_RATIO_FLD*EPSILON+SIGMA)*IDENTITY+bg_pol+gain_pol+raman_pol
-         zb = -conjg(za)
 !  ...endif NONLINEAR_FLAG
       endif
+!
+!.....................................................
+!...............toggle PML............................
+!
+      if(USE_PML.eq.0) then
+         JJstretch      = ZERO
+         JJstretch(1,1) = ZONE
+         JJstretch(2,2) = ZONE
+         JJstretch(3,3) = ZONE
+      else
+!     ...get PML function
+         call get_Beta(x,Fld_flag, zbeta,zdbeta,zd2beta)
+         Jstretch(3,3) = zdbeta
+!     ...compute det(J) * J^-1 * J^-T
+!        (J is a diagonal matrix)
+         invJstretch(3,3) = 1.d0/zdbeta
+         call ZGEMM('N', 'N', 3, 3, 3, ZONE, invJstretch, 3, &
+                       invJstretch, 3, ZERO, JJstretch, 3)
+         detJstretch = zdbeta
+         JJstretch = detJstretch*JJstretch
+      endif
+!
+!  ...PML stretching
+      zaJ(1,1) = JJstretch(1,1)*za(1,1)
+      zaJ(2,2) = JJstretch(2,2)*za(2,2)
+      zaJ(3,3) = JJstretch(3,3)*za(3,3)
+!
+      zcJ(1,1) = JJstretch(1,1)*zc(1,1)
+      zcJ(2,2) = JJstretch(2,2)*zc(2,2)
+      zcJ(3,3) = JJstretch(3,3)*zc(3,3)
+!
+!...........end toggle PML............................
+!.....................................................
 !
 !  ...loop through enriched H(curl) test functions in the enriched space
       do k1=1,nrdofEE
@@ -432,10 +454,12 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
          crlF(1:3) = crlF(1:3)/rjac
          fldG = fldF; crlG = crlF
 !
-!     ...accumulate for the load vector (TODO: verify recent change from n=2*k1-1 to n=2*k1)
+!        RHS:
+!        (J^imp,F) first  equation RHS (with first H(curl) test function F)
+!        (0    ,G) second equation RHS is zero
          n = 2*k1-1
          bload_E(n) = bload_E(n)                                   &
-                    + (fldG(1)*zJ(1)+fldG(2)*zJ(2)+fldG(3)*zJ(3))  &
+                    + (fldF(1)*zJ(1)+fldF(2)*zJ(2)+fldF(3)*zJ(3))  &
                     * weight
 !
 !     ...loop through L2 trial shape functions
@@ -444,40 +468,40 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !        ...Piola transformation
             fldE(1:3) = shapQ(k2)/rjac; fldH = fldE
 !
-!        ...testing with G (H(curl) test function))
+!        ...testing with F (first H(curl) test function))
             n = 2*k1-1
-!        ...-iωε(E,G)
+!        ...-iωε(E,F)
             m = (k2-1)*6+1
-            Stiff_EQ_T(m,n) = Stiff_EQ_T(m,n) - JJstretch(1,1)*za(1,1)*fldE(1)*fldG(1)*weight
+            stiff_EQ_T(m,n) = stiff_EQ_T(m,n) - zaJ(1,1)*fldE(1)*fldF(1)*weight
             m = (k2-1)*6+2
-            Stiff_EQ_T(m,n) = Stiff_EQ_T(m,n) - JJstretch(2,2)*za(2,2)*fldE(2)*fldG(2)*weight
+            stiff_EQ_T(m,n) = stiff_EQ_T(m,n) - zaJ(2,2)*fldE(2)*fldF(2)*weight
             m = (k2-1)*6+3
-            Stiff_EQ_T(m,n) = Stiff_EQ_T(m,n) - JJstretch(3,3)*za(3,3)*fldE(3)*fldG(3)*weight
-!        ...(H,curl(G))
+            stiff_EQ_T(m,n) = stiff_EQ_T(m,n) - zaJ(3,3)*fldE(3)*fldF(3)*weight
+!        ...(H,curl(F))
             m = (k2-1)*6+4
-            Stiff_EQ_T(m,n) = Stiff_EQ_T(m,n) + fldH(1)*crlG(1)*weight
+            stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + fldH(1)*crlF(1)*weight
             m = (k2-1)*6+5
-            Stiff_EQ_T(m,n) = Stiff_EQ_T(m,n) + fldH(2)*crlG(2)*weight
+            stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + fldH(2)*crlF(2)*weight
             m = (k2-1)*6+6
-            Stiff_EQ_T(m,n) = Stiff_EQ_T(m,n) + fldH(3)*crlG(3)*weight
+            stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + fldH(3)*crlF(3)*weight
 !
-!        ...testing with F (H(curl) test function))
+!        ...testing with G (second H(curl) test function))
             n = 2*k1
-!        ...(E,curl(F))
+!        ...(E,curl(G))
             m = (k2-1)*6+1
-            Stiff_EQ_T(m,n) = Stiff_EQ_T(m,n) + fldE(1)*crlF(1)*weight
+            stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + fldE(1)*crlG(1)*weight
             m = (k2-1)*6+2
-            Stiff_EQ_T(m,n) = Stiff_EQ_T(m,n) + fldE(2)*crlF(2)*weight
+            stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + fldE(2)*crlG(2)*weight
             m = (k2-1)*6+3
-            Stiff_EQ_T(m,n) = Stiff_EQ_T(m,n) + fldE(3)*crlF(3)*weight
+            stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + fldE(3)*crlG(3)*weight
 !
-!        ...iωμ(H,F)
+!        ...iωμ(H,G)
             m = (k2-1)*6+4
-            Stiff_EQ_T(m,n) = Stiff_EQ_T(m,n) + JJstretch(1,1)*zc*fldH(1)*fldF(1)*weight
+            stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + zcJ(1,1)*fldH(1)*fldG(1)*weight
             m = (k2-1)*6+5
-            Stiff_EQ_T(m,n) = Stiff_EQ_T(m,n) + JJstretch(2,2)*zc*fldH(2)*fldF(2)*weight
+            stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + zcJ(2,2)*fldH(2)*fldG(2)*weight
             m = (k2-1)*6+6
-            Stiff_EQ_T(m,n) = Stiff_EQ_T(m,n) + JJstretch(3,3)*zc*fldH(3)*fldF(3)*weight
+            stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + zcJ(3,3)*fldH(3)*fldG(3)*weight
 !
 !     ...end of loop through L2 trial functions
          enddo
@@ -497,37 +521,60 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
             call dot_product(crlF,fldE, CF)
             call dot_product(crlF,crlE, CC)
 !
-!        ...accumulate for the gram matrix
+!        ...accumulate for the Hermitian Gram matrix
+!           (compute upper triangular only)
+!        ...testNorm = Scaled Adjoint Graph norm
+!              ||v|| = alpha*(v,v) + (A^* v, A^* v)
+!           (first eqn multiplied by F, second eqn by G)
+!           G_ij=(phi_j,phi_i)_testNorm is 2x2 matrix
+!           where (phi_j,phi_i)_l2Norm = Int[phi_i^* phi_j]
+!           -------------------------
+!           | (F_i,F_j)   (F_i,G_j) |
+!           | (G_i,F_j)   (G_i,G_j) |
+!           -------------------------
+!           (F_i,F_j) terms
             n = 2*k1-1; m = 2*k2-1
             k = nk(n,m)
-            zaux = abs(zb(1,1))**2*fldF(1)*fldE(1) + &
-                   abs(zb(2,2))**2*fldF(2)*fldE(2) + &
-                   abs(zb(3,3))**2*fldF(3)*fldE(3)
-            gramP(k) = gramP(k)            &
+            zaux = abs(zaJ(1,1))**2*fldF(1)*fldE(1) + &
+                   abs(zaJ(2,2))**2*fldF(2)*fldE(2) + &
+                   abs(zaJ(3,3))**2*fldF(3)*fldE(3)
+            gramP(k) = gramP(k) &
                      + (zaux + ALPHA_NORM*FF + CC)*weight
 !
+!           (F_i,G_j) terms
             n = 2*k1-1; m = 2*k2
             k = nk(n,m)
-            zaux = zb(1,1)*fldF(1)*crlE(1) + &
-                   zb(2,2)*fldF(2)*crlE(2) + &
-                   zb(3,3)*fldF(3)*crlE(3)
-            gramP(k) = gramP(k)            &
-                     + (-zaux + conjg(zc)*CF)*weight
+            zaux = - (zaJ(1,1)*fldF(1)*crlE(1) + &
+                      zaJ(2,2)*fldF(2)*crlE(2) + &
+                      zaJ(3,3)*fldF(3)*crlE(3) )
+            zcux = conjg(zcJ(1,1))*crlF(1)*fldE(1) + &
+                   conjg(zcJ(2,2))*crlF(2)*fldE(2) + &
+                   conjg(zcJ(3,3))*crlF(3)*fldE(3)
+            gramP(k) = gramP(k) + (zaux+zcux)*weight
 !
+!        ...compute lower triangular part of 2x2 G_ij matrix
+!           only if it is not a diagonal element, G_ii
             if (k1 .ne. k2) then
+!              (G_i,F_j) terms
                n = 2*k1; m = 2*k2-1
                k = nk(n,m)
-               zaux = za(1,1)*crlF(1)*fldE(1) + &
-                      za(2,2)*crlF(2)*fldE(2) + &
-                      za(3,3)*crlF(3)*fldE(3)
-               gramP(k) = gramP(k)         &
-                        + (zaux + zc*FC)*weight
+               zaux = - (conjg(zaJ(1,1))*crlF(1)*fldE(1) + &
+                         conjg(zaJ(2,2))*crlF(2)*fldE(2) + &
+                         conjg(zaJ(3,3))*crlF(3)*fldE(3) )
+               zcux = zcJ(1,1)*fldF(1)*crlE(1) + &
+                      zcJ(2,2)*fldF(2)*crlE(2) + &
+                      zcJ(3,3)*fldF(3)*crlE(3)
+               gramP(k) = gramP(k) + (zaux+zcux)*weight
             endif
 !
+!           (G_i,G_j) terms
             n = 2*k1; m = 2*k2
             k = nk(n,m)
-            gramP(k) = gramP(k)            &
-                     + ((abs(zc)**2 + ALPHA_NORM)*FF + CC)*weight
+            zcux = abs(zcJ(1,1))**2*fldF(1)*fldE(1) + &
+                   abs(zcJ(2,2))**2*fldF(2)*fldE(2) + &
+                   abs(zcJ(3,3))**2*fldF(3)*fldE(3)
+            gramP(k) = gramP(k) &
+                     + (zcux + ALPHA_NORM*FF + CC)*weight
 !
 !     ...end of loop through enriched H(curl) test functions
          enddo
