@@ -22,57 +22,74 @@ subroutine get_L2NormCOMS(Flag,No1,No2, L2NormDiff)
    use data_structure3D
    use environment     , only: QUIET_MODE,L2PROJ,FILE_ERR
    use physics
+   use par_mesh        , only: DISTRIBUTED,HOST_MESH
+   use mpi_param       , only: ROOT,RANK
+   use MPI             , only: MPI_SUM,MPI_COMM_WORLD,MPI_REAL8
 !
    implicit none
 !
    integer, intent(in)  :: Flag(NR_PHYSA)
    integer, intent(in)  :: No1, No2
-   real*8 , intent(out) :: L2NormDiff
+   real(8), intent(out) :: L2NormDiff
 !
-   real*8               :: CurrL2NormDiff
+   real(8)              :: currL2NormDiff
 !
    integer, parameter :: nin = 13
    integer, parameter :: maxvis =2000
 !
 !..miscellanea
    integer :: mdle,nint,iattr,nrdof_tot,ic,iel
-   integer :: mdlea(NRELES)
 !
-!..auxiliary variables for timing
-   real*8 :: start, OMP_get_wtime
+!..auxiliary
+   integer :: count,ierr
+   real(8) :: L2NormDiff_subd
+!
+   real(8) :: MPI_Wtime,start_time,end_time
 !
 !-------------------------------------------------------------------
 !
-!..initialize global quantities
-   L2NormDiff = 0.d0
-   CurrL2NormDiff = 0.d0
-!
 !..start timer
-   start = OMP_get_wtime()
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 !
-   mdle=0
-   do iel=1,NRELES
-      call nelcon(mdle, mdle)
-      mdlea(iel) = mdle
-   enddo
+!..fetch active elements
+   if (.not. DISTRIBUTED .or. HOST_MESH) then
+      if (RANK .ne. ROOT) goto 90
+      ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
+      NRELES_SUBD = NRELES
+   endif
+!
+!..initialize global quantities
+   L2NormDiff_subd = 0.d0
+   currL2NormDiff = 0.d0
 !
 !..iterate over elements
 !
 !$OMP PARALLEL DO                    &
-!$OMP PRIVATE(mdle,CurrL2NormDiff)   &
-!$OMP REDUCTION(+:L2NormDiff)        &
+!$OMP PRIVATE(mdle,currL2NormDiff)   &
+!$OMP REDUCTION(+:L2normDiff_subd)   &
 !$OMP SCHEDULE(DYNAMIC)
-   do iel=1,NRELES
-      mdle = mdlea(iel)
-      call get_elem_L2NormCOMS(mdle,Flag,No1,No2, CurrL2NormDiff)
+   do iel=1,NRELES_SUBD
+      mdle = ELEM_SUBD(iel)
+      call get_elem_L2NormCOMS(mdle,Flag,No1,No2, currL2NormDiff)
 !  ...accumulate L2NormDiff
-      L2NormDiff = L2NormDiff + CurrL2NormDiff
+      L2NormDiff_subd = L2NormDiff_subd + currL2NormDiff
    enddo
 !$OMP END PARALLEL DO
 !
+   L2NormDiff = 0.d0
+   if (DISTRIBUTED .and. (.not. HOST_MESH)) then
+      count = 1
+      call MPI_ALLREDUCE(L2NormDiff_subd,L2NormDiff,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
+   else
+      L2NormDiff = L2NormDiff_subd
+   endif
+!
+ 90 continue
+!
 !..end timer
-   if (.not. QUIET_MODE) then
-      write(*,6010) OMP_get_wtime()-start
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+   if (RANK.eq.ROOT .and. .not. QUIET_MODE) then
+      write(*,6010) end_time-start_time
  6010 format('  get_L2NormCOMS : ',f12.5,'  seconds',/)
    endif
 !
@@ -261,69 +278,93 @@ subroutine get_Norm(Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
    use data_structure3D
    use environment      , only: QUIET_MODE,L2PROJ,FILE_ERR
    use physics
+   use par_mesh         , only: DISTRIBUTED,HOST_MESH
+   use mpi_param        , only: ROOT,RANK
+   use MPI              , only: MPI_SUM,MPI_COMM_WORLD,MPI_REAL8
 !
    implicit none
 !
    integer, intent(in) :: Flag(NR_PHYSA)
    integer, intent(in) :: No
 !
-   real*8, intent(out) :: FieldNormH,FieldNormE,FieldNormV,FieldNormQ
+   real(8), intent(out) :: FieldNormH,FieldNormE,FieldNormV,FieldNormQ
 !
-   real*8 :: CurrFieldNormH,CurrFieldNormE,CurrFieldNormV,CurrFieldNormQ
+   real(8) :: currFieldNormH,currFieldNormE,currFieldNormV,currFieldNormQ
 !
    integer, parameter :: nin = 13
    integer, parameter :: maxvis =2000
 !
 !..miscellanea
    integer :: mdle,nint,iattr,nrdof_tot,ic,iel
-   integer :: mdlea(NRELES)
 !
-!..auxiliary variables for timing
-   real*8 :: start, OMP_get_wtime
+!..auxiliary
+   integer :: count, ierr
+   real(8) :: fieldNormH_subd, fieldNormE_subd,  &
+              fieldNormV_subd, fieldNormQ_subd
+!
+!..timer
+   real(8) :: MPI_Wtime,start_time,end_time
 !
 !-------------------------------------------------------------------
 !
-!..initialize global quantities
+!..start timer
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+!
+!..fetch active elements
+   if (.not. DISTRIBUTED .or. HOST_MESH) then
+      if (RANK .ne. ROOT) goto 90
+      ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
+      NRELES_SUBD = NRELES
+   endif
+!
+!..initialize residual
+   fieldNormH_subd = 0.d0
+   fieldNormE_subd = 0.d0
+   fieldNormV_subd = 0.d0
+   fieldNormQ_subd = 0.d0
+!
+!..loop over active elements
+!
+!$OMP PARALLEL DO                                                                   &
+!$OMP PRIVATE(mdle,currFieldNormH,currFieldNormE,currFieldNormV,currFieldNormQ)     &
+!$OMP REDUCTION(+:FieldNormH_subd,FieldNormE_subd,FieldNormV_subd,FieldNormQ_subd)  &
+!$OMP SCHEDULE(DYNAMIC)
+   do iel=1,NRELES_SUBD
+      mdle = ELEM_SUBD(iel)
+      call get_elem_Norm(mdle,Flag,No, &
+         currFieldNormH,currFieldNormE,currFieldNormV,currFieldNormQ)
+!  ...accumulate
+      fieldNormH_subd = fieldNormH_subd + currFieldNormH
+      fieldNormE_subd = fieldNormE_subd + currFieldNormE
+      fieldNormV_subd = fieldNormV_subd + currFieldNormV
+      fieldNormQ_subd = fieldNormQ_subd + currFieldNormQ
+   enddo
+!$OMP END PARALLEL DO
+!
    FieldNormH = 0.d0
    FieldNormE = 0.d0
    FieldNormV = 0.d0
    FieldNormQ = 0.d0
 !
-   CurrFieldNormH = 0.d0
-   CurrFieldNormE = 0.d0
-   CurrFieldNormV = 0.d0
-   CurrFieldNormQ = 0.d0
+   if (DISTRIBUTED .and. (.not. HOST_MESH)) then
+      count = 1
+      call MPI_ALLREDUCE(fieldNormH_subd,FieldNormH,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
+      call MPI_ALLREDUCE(fieldNormE_subd,FieldNormE,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
+      call MPI_ALLREDUCE(fieldNormV_subd,FieldNormV,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
+      call MPI_ALLREDUCE(fieldNormQ_subd,FieldNormQ,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
+   else
+      FieldNormH = fieldNormH_subd
+      FieldNormE = fieldNormE_subd
+      FieldNormV = fieldNormV_subd
+      FieldNormQ = fieldNormQ_subd
+   endif
 !
-!..start timer
-   start = OMP_get_wtime()
-!
-   mdle=0
-   do iel=1,NRELES
-      call nelcon(mdle, mdle)
-      mdlea(iel) = mdle
-   enddo
-!
-!..loop over active elements
-!
-!$OMP PARALLEL DO                                                               &
-!$OMP PRIVATE(mdle,CurrFieldNormH,CurrFieldNormE,CurrFieldNormV,CurrFieldNormQ) &
-!$OMP REDUCTION(+:FieldNormH,FieldNormE,FieldNormV,FieldNormQ)                  &
-!$OMP SCHEDULE(DYNAMIC)
-   do iel=1,NRELES
-      mdle = mdlea(iel)
-      call get_elem_Norm(mdle,Flag,No, &
-         CurrFieldNormH,CurrFieldNormE,CurrFieldNormV,CurrFieldNormQ)
-!  ...accumulate
-      FieldNormH = FieldNormH + CurrFieldNormH
-      FieldNormE = FieldNormE + CurrFieldNormE
-      FieldNormV = FieldNormV + CurrFieldNormV
-      FieldNormQ = FieldNormQ + CurrFieldNormQ
-   enddo
-!$OMP END PARALLEL DO
+ 90 continue
 !
 !..end timer
-   if (.not. QUIET_MODE) then
-      write(*,9010) OMP_get_wtime()-start
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+   if (RANK.eq.ROOT .and. .not. QUIET_MODE) then
+      write(*,9010) end_time-start_time
  9010 format('  get_Norm       : ',f12.5,'  seconds',/)
    endif
 !
