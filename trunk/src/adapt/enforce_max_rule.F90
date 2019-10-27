@@ -4,10 +4,12 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - Apr 18
+!   latest revision    - Aug 2019
 !
 !   purpose            - routine enforces the max rule for a FE mesh
 !
+! REMARK: THIS ROUTINE HAS BEEN OBSERVED TO REFINE (INCREASE P)
+!         UNNECESSARILY WHEN THE MESH HAS ANISOTROPIC ORDER OF APPROX.
 !
 !----------------------------------------------------------------------
 !

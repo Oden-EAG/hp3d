@@ -3,8 +3,8 @@
 !!
 !> @param[in]  How   - 'l2g' : local to global ; 'g2l' - global to local
 !> @param[in]  Type  - face type
-!> @param[in]  Nort  - face orientation
 !> @param[in]  Kref  - face refinement flag (tria : 1,2,3,4 ; rect : 11,10,01 )
+!> @param[in]  Nort  - face orientation
 !> @param[out] Krefm - modified face refinement flag
 !
 !> rev@Mar 13

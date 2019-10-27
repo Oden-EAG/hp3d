@@ -64,7 +64,7 @@ c  .......loop through parent vertices
           do iv=1,2
             nodp = NEDG_CONS(iv,nc)
 c
-c  .........vertex node that supposed to be active
+c  .........vertex node that is supposed to be active
             if (nodp.gt.0) then
               if (Is_inactive(nodp)) call flag(nodp)
 c

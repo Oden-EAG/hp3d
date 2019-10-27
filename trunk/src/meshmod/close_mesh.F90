@@ -16,12 +16,12 @@ subroutine close_mesh()
    use refinements
    use data_structure3D
    use mpi_param  , only: ROOT,RANK
-   use MPI        , only: MPI_COMM_WORLD,MPI_SUM,MPI_COMM_WORLD,MPI_REAL8
+   use MPI        , only: MPI_COMM_WORLD
 !
    implicit none
 !
    character(4)           :: type
-   integer                :: list(2,NRELES)
+   integer, allocatable   :: list(:,:)
    integer, dimension(27) :: nodesl,norientl
    integer, dimension(6)  :: kreff
    integer, dimension(12) :: krefe
@@ -51,11 +51,15 @@ subroutine close_mesh()
 !     Step 1 : check constrained nodes
 !---------------------------------------------------------
 #if DEBUG_MODE
-      if (iprint.eq.2) then
-         write(*,*) 'close_mesh: CHECK CONSTRAINING NODES'
+      if (RANK .eq. ROOT) then
+         if (iprint.eq.2) then
+            write(*,*) 'close_mesh: CHECK CONSTRAINING NODES'
+         endif
       endif
 #endif
 !
+!  ...REMOVED list BUG
+      allocate(list(2,NRELES))
       list(1:2,1:NRELES) = 0; ic = 0
 !
 !$OMP PARALLEL
@@ -67,17 +71,19 @@ subroutine close_mesh()
 !$OMP DO PRIVATE(mdle,nodesl,norientl)
       do i=1,NRELES
          mdle = ELEM_ORDER(i)
-         call get_connect_info(mdle, nodesl,norientl)
+         call get_connect_info(mdle, nodesl,norientl) ! setting internal arrays
          call flag_constr_parents(mdle)
       enddo
 !$OMP END DO
 !
 #if DEBUG_MODE
-!$OMP SINGLE
+   if (RANK .eq. ROOT) then
+      !$OMP SINGLE
       if (iprint.eq.2) then
          write(*,*) 'close_mesh: RESOLVE THE NODES MORE THAN ONE IRREGULARITY'
       endif
-!$OMP END SINGLE
+      !$OMP END SINGLE
+   endif
 #endif
 !
 !---------------------------------------------------------
@@ -122,7 +128,8 @@ subroutine close_mesh()
          if (nflag) then
 !
 #if DEBUG_MODE
-!$OMP CRITICAL
+         if (RANK .eq. ROOT) then
+            !$OMP CRITICAL
             if (iprint.eq.1) then
                nre = nedge(NODES(mdle)%type)
                nrf = nface(NODES(mdle)%type)
@@ -133,18 +140,21 @@ subroutine close_mesh()
 7004           format('kreff = ',6i2)
                call pause
             endif
-!$OMP END CRITICAL
+            !$OMP END CRITICAL
+         endif
 #endif
 !
 !           increment counter
             ic=ic+1
 !
 !           find out proper refinement flag
-            if ( is_iso_only() ) then
+            if (is_iso_only()) then
                call get_isoref(mdle, kref)
             else
                call find_element_closing_ref(type,kreff,krefe, kref)
             endif
+            ! TODO testing with iso only
+            call get_isoref(mdle, kref)
             list(1,i) = mdle
             list(2,i) = kref
          endif
@@ -152,11 +162,13 @@ subroutine close_mesh()
 !$OMP END DO
 !$OMP END PARALLEL
 !
-#if DEBUG_MODE
-      if (iprint.eq.1) then
+!#if DEBUG_MODE
+      if (RANK .eq. ROOT) then
+!      if (iprint.eq.2) then
          write(*,*) 'close_mesh: number of elements to refine ', ic
+!      endif
       endif
-#endif
+!#endif
 !
 !     loop exit condition
       if (ic.eq.0) exit
@@ -168,16 +180,21 @@ subroutine close_mesh()
          if (list(1,i) .eq. 0) cycle
          mdle = list(1,i)
          kref = list(2,i)
-         if ( is_leaf( mdle ) ) then
+         if (is_leaf(mdle)) then
 #if DEBUG_MODE
-            if (iprint.eq.2) then
+         if (RANK .eq. ROOT) then
+            if (iprint.eq.1) then
                write(*,7001) i, mdle, NODES(mdle)%type, kref
  7001          format('close_mesh: i= ',i6,' mdle= ', i6,' ', a4, ' ref_kind = ',i5)
             endif
+         endif
 #endif
-            call refine( mdle, kref )
+            call refine(mdle,kref)
          endif
       enddo
+      deallocate(list)
    enddo
+!
+   if (allocated(list)) deallocate(list)
 !
 end subroutine close_mesh

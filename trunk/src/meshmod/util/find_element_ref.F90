@@ -1,9 +1,9 @@
 !> Purpose : modify the refinement to accommodate existing refinements
 !! @param[in]  Type  - middle node type
 !! @param[in]  Kref  - refinement kind of middle node
-!! @param[in]  Kreff - existing face refimenets
+!! @param[in]  Kreff - existing face refinements
 !!
-!! @param[out] Krefm - modified refinement
+!! @param[out] Krefm - modified (upgraded) refinement
 subroutine find_element_ref(Type,Kref,Kreff, Krefm)
   use element_data
   use refinements

@@ -166,7 +166,7 @@ subroutine distr_mesh()
    enddo
 !$OMP END DO
 !
-!..6. Set subdomain values for all nodes within subdomain
+!..6. Set subdomain values for all (unconstrained) nodes within subdomain
 !$OMP DO SCHEDULE(DYNAMIC)
    do iel=1,NRELES
       if (subd_next(iel) .eq. RANK) then
@@ -205,7 +205,7 @@ end subroutine distr_mesh
 !
 !----------------------------------------------------------------------
 !     routine:    get_elem_nodes
-!     purpose:    get nodes associated with an element
+!     purpose:    get (unconstrained) nodes associated with an element
 !----------------------------------------------------------------------
 subroutine get_elem_nodes(Mdle, Nodm,Nrnodm)
    integer, intent(in)  :: Mdle
@@ -219,7 +219,8 @@ end subroutine get_elem_nodes
 !
 !----------------------------------------------------------------------
 !     routine:    set_subd_elem
-!     purpose:    set subd values for nodes associated with an element
+!     purpose:    set subd values for (unconstrained) nodes associated
+!                 with an element
 !----------------------------------------------------------------------
 subroutine set_subd_elem(Mdle)
    integer, intent(in) :: Mdle

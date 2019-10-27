@@ -4,7 +4,7 @@ flag_constr_parents.F
 get_connect_info.F
 logic.F
 logic_nodes.F
-nodcor.F
+nodcor.F90
 nodcor_vert.F90
 solelm.F
 solelmI.F
