@@ -46,9 +46,9 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
    use assembly_sc  , only: NRDOF_CON, NRDOF_TOT
    use parametersDPG, only: NORD_ADD
    use par_mesh     , only: DISTRIBUTED,HOST_MESH
-   use mpi_param    , only: ROOT,RANK
+   use mpi_param    , only: ROOT,RANK,NUM_PROCS
    use MPI          , only: MPI_COMM_WORLD,MPI_SUM,MPI_COMM_WORLD,   &
-                            MPI_REAL8,MPI_IN_PLACE,MPI_MAX
+                            MPI_REAL8,MPI_INTEGER,MPI_IN_PLACE,MPI_MAX
 !
    implicit none
 !
@@ -71,6 +71,11 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
 !
    real(8) :: elem_resid(NRELES)
    integer :: elem_ref_flag(NRELES)
+!
+!..adaptive refinements
+   integer :: nr_elem_ref,ref_ndom(4),ref_pml
+   integer :: mdle_ref(NRELES),mdle_pml(NRELES)
+   real(8) :: res_sum
 !
    integer, save :: istep = 0
    integer, save :: irefineold = 0
@@ -100,7 +105,9 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
 !-----------------------------------------------------------------------
 !
 !..initialize
-   elem_resid = 0.d0; elem_ref_flag = 0.d0
+   elem_resid(1:NRELES)    = 0.d0
+   elem_ref_flag(1:NRELES) = 0.d0
+   mdle_pml(1:NRELES)      = 0
 !
 !..increase step if necessary
 !..irefineold=0 means no refinement was made in the previous step
@@ -113,14 +120,8 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
    nrdof_con_mesh(istep) = NRDOF_CON
    if (NRDOF_TOT .eq. 0) then
       istep=istep-1
-      goto 90
+      goto 70
    endif
-!!
-!!..fetch active elements
-!   if (.not. DISTRIBUTED) then
-!      ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
-!      NRELES_SUBD = NRELES
-!   endif
 !
 !..initialize residual and error
    resid_subd = 0.d0
@@ -136,7 +137,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
 !$OMP PARALLEL DO                                     &
 !$OMP PRIVATE(errorH,errorE,errorV,errorQ,            &
 !$OMP         rnormH,rnormE,rnormV,rnormQ,            &
-!$OMP         mdle,subd,etype,xnod,maxz,minz,midz)    &
+!$OMP         mdle,subd)                              &
 !$OMP SCHEDULE(DYNAMIC)                               &
 !$OMP REDUCTION(+:resid_subd,error_subd,rnorm_subd)   &
 !$OMP REDUCTION(MAX:elem_resid_max)
@@ -144,23 +145,11 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
       mdle = ELEM_ORDER(iel)
       call get_subd(mdle, subd)
       if (DISTRIBUTED .and. (RANK .ne. subd)) cycle
-      if (USE_PML) then
-         xnod = 0.d0
-         call nodcor(Mdle, xnod)
-         etype = NODES(Mdle)%type
-         select case(etype)
-            case('mdlb')
-               maxz = maxval(xnod(3,1:8))
-               minz = minval(xnod(3,1:8))
-            case('mdlp')
-               maxz = maxval(xnod(3,1:6))
-               minz = minval(xnod(3,1:6))
-            case default
-               write(*,*) 'refine_DPG: invalid etype param. stop.'
-               stop
-         end select
-         !midz = minz + (maxz-minz)/2.d0
-         if (maxz .gt. PML_REGION) cycle
+      if (USE_PML .and. Is_pml(mdle)) then
+         ! treat PML differently if needed
+         mdle_pml(iel) = 1
+      else
+         ! outside PML
       endif
       if(ires) then
          call elem_residual(mdle, elem_resid(iel),elem_ref_flag(iel))
@@ -197,16 +186,28 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
    resid_tot = 0.d0; error_tot = 0.d0; rnorm_tot = 0.d0
    if (DISTRIBUTED .and. (.not. HOST_MESH)) then
       count = 1
-      call MPI_REDUCE(resid_subd,resid_tot,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE(error_subd,error_tot,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE(rnorm_subd,rnorm_tot,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_ALLREDUCE(resid_subd,resid_tot,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
+      call MPI_ALLREDUCE(error_subd,error_tot,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
+      call MPI_ALLREDUCE(rnorm_subd,rnorm_tot,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
       call MPI_ALLREDUCE(MPI_IN_PLACE,elem_resid_max,count,MPI_REAL8,MPI_MAX,MPI_COMM_WORLD,ierr)
       count = NRELES
-      call MPI_ALLREDUCE(MPI_IN_PLACE,elem_resid,count,MPI_REAL8,MPI_MAX,MPI_COMM_WORLD,ierr)
+      call MPI_ALLREDUCE(MPI_IN_PLACE,elem_resid,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
+      call MPI_ALLREDUCE(MPI_IN_PLACE,mdle_pml,count,MPI_INTEGER,MPI_SUM,MPI_COMM_WORLD,ierr)
    else
       resid_tot = resid_subd
       error_tot = error_subd
       rnorm_tot = rnorm_subd
+   endif
+!
+   if (USE_PML) then
+      do iel=1,NRELES
+         mdle = ELEM_ORDER(iel)
+         if (mdle_pml(iel) .gt. 0) then
+            NODES(mdle)%visit = 1
+         else
+            NODES(mdle)%visit = 0
+         endif
+      enddo
    endif
 !
 !..end timer
@@ -216,17 +217,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
  1010 format(' elem_residual  : ',f12.5,'  seconds')
    endif
 !
-!..mark elements for adaptive refinement
-!   do iel=1,NRELES
-!      mdle = ELEM_ORDER(iel)
-!      call find_domain(mdle, i)
-!      if(elem_resid(iel)>0.75d0*elem_resid_max) then
-!         !write(*,1020) 'ndom=',i,', mdle=',mdle,', r =',elem_resid(iel)
-!      endif
-! 1020 format(A,I2,A,I5,A,es12.5)
-!   enddo
-!
-   if (RANK .ne. ROOT) goto 90
+   if (RANK .ne. ROOT) goto 70
 !
 !..update and display convergence history
    residual_mesh(istep) = sqrt(resid_tot)
@@ -273,11 +264,75 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
       if (i .eq. istep) write(*,*)
    enddo
 !
-   90 continue
+   70 continue
 !
 !-----------------------------------------------------------------------
 !                         REFINE AND UPDATE MESH
 !-----------------------------------------------------------------------
+!
+!
+!..mark elements for adaptive refinement
+   if (Irefine .eq. IADAPTIVE) then
+      nr_elem_ref = 0
+      ! strategy 1 (greedy strategy)
+!      do iel=1,NRELES
+!         mdle = ELEM_ORDER(iel)
+!         call find_domain(mdle, i)
+!         if(elem_resid(iel)>0.75d0*elem_resid_max) then
+!            nr_elem_ref = nr_elem_ref + 1
+!            iel_ref(nr_elem_ref) = iel
+!            !if (RANK.eq.ROOT) write(*,1020) 'ndom=',i,', mdle=',mdle,', r =',elem_resid(iel)
+!         endif
+ 1020    format(A,I2,A,I9,A,es12.5)
+!      enddo
+      ! strategy 2 (Doerfler's strategy)
+      ! sort elements (iel_ref) according to residual values
+      mdle_ref(1:NRELES) = ELEM_ORDER(1:NRELES)
+      call qsort_duplet(mdle_ref,elem_resid,NRELES,1,NRELES)
+      ! verify the array is sorted
+      do iel=1,NRELES-1
+         if (elem_resid(iel) .lt. elem_resid(iel+1)) then
+            write(*,1021) 'elem_resid not sorted: elem_resid(',iel  ,') = ',elem_resid(iel), &
+                                               ', elem_resid(',iel+1,') = ',elem_resid(iel+1)
+ 1021       format(A,I9,A,es12.5,A,I9,A,es12.5,/)
+            stop
+         endif
+      enddo
+      !
+      if (RANK.eq.ROOT) write(*,*) 'Array is sorted.'
+      if (RANK.eq.ROOT) write(*,*) 'The following elements are marked for refinement:'
+      call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+      !
+      res_sum = 0.d0
+      ref_ndom(1:4)=0; ref_pml=0 ! stats
+      do iel=1,NRELES
+         mdle = mdle_ref(iel)
+         call find_domain(mdle, i)
+         ref_ndom(i) = ref_ndom(i)+1
+         !
+         if (USE_PML .and. NODES(mdle)%visit .eq. 1) then
+            ! treat PML differently if needed
+            ref_pml = ref_pml+1
+            !if (RANK.eq.ROOT) write(*,1022) 'PML: ndom=',i,', mdle=',mdle,', res =',elem_resid(iel)
+         else
+            ! outside PML
+            !if (RANK.eq.ROOT) write(*,1022) '     ndom=',i,', mdle=',mdle,', res =',elem_resid(iel)
+         endif
+ 1022    format(A,I2,A,I9,A,es12.5)
+         nr_elem_ref = nr_elem_ref + 1
+         res_sum = res_sum + elem_resid(iel)
+         if(res_sum > 0.5d0*resid_tot) exit
+      enddo
+      if (RANK.eq.ROOT) write(*,1023) 'nr_elem_ref = ', nr_elem_ref
+      if (RANK.eq.ROOT) write(*,1023) '        PML = ', ref_pml
+      if (RANK.eq.ROOT) write(*,1023) '     ndom 1 = ', ref_ndom(1)
+      if (RANK.eq.ROOT) write(*,1023) '     ndom 2 = ', ref_ndom(2)
+      if (RANK.eq.ROOT) write(*,1023) '     ndom 3 = ', ref_ndom(3)
+      if (RANK.eq.ROOT) write(*,1023) '     ndom 4 = ', ref_ndom(4)
+ 1023 format(A,I7)
+   endif
+!
+!  END MARKING OF ELEMENTS FOR ADAPTIVE REFINEMENTS
 !
 !..use appropriate strategy depending on refinement type
    Nstop = 0
@@ -291,7 +346,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
          if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2020) end_time-start_time
          call update_gdof
          call update_Ddof
-!   ...anisotropic refinements
+!  ...anisotropic refinements
       case(IANISOTROPIC)
 !     ...anisotropic href (z)
          call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
@@ -300,12 +355,50 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
          if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2020) end_time-start_time
          call update_gdof
          call update_Ddof
+!  ...adaptive refinements
+      case(IADAPTIVE)
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+         if (RANK .eq. ROOT)  write(*,*) 'Starting adaptive refinements...'
+         do iel = 1,nr_elem_ref
+            mdle = mdle_ref(iel)
+            etype = NODES(mdle)%type
+            select case(etype)
+               case('mdlb')
+                  kref = 111
+               case('mdlp')
+                  kref = 11
+            end select
+            call refine(mdle,kref)
+         enddo
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+         if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2020) end_time-start_time
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+         call close_mesh
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+         if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2025) end_time-start_time
+!         call enforce_min_rule
+!         call enforce_max_rule ! MAX RULE ISSUE NEEDS TO BE FIXED
+         call update_gdof
+         call update_Ddof
+!
+!        TODO
+!     ...test mdle 10236 and 10237
+!         call get_subd(10236, subd)
+!         if (RANK.eq.subd) then
+!            write(*,*) 'MY RANK IS ', RANK
+!            write(*,*) 'NRNODS  is ', NRNODS
+!            call result
+!         elseif (NUM_PROCS.eq.1 .and. NRNODS.ge.10236) then
+!            write(*,*) 'NRNODS  is ', NRNODS
+!            call result
+!         endif
+!         call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
       case default; Nstop = 1
 !
    end select
 !
-  2020 format(' global ref : ',f12.5,'  seconds')
+  2020 format(' refinement : ',f12.5,'  seconds')
   2025 format(' close mesh : ',f12.5,'  seconds')
   2030 format(A,I8,', ',I9)
 !
@@ -317,6 +410,8 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
       call propagate_flag(2,9)
       call propagate_flag(3,9)
    endif
+!
+   90 continue
 !
 end subroutine refine_DPG
 !
@@ -389,5 +484,63 @@ subroutine href_solve(Nflag,PhysNick, Nstop)
    enddo
 !
 end subroutine href_solve
-
-
+!
+!-----------------------------------------------------------------------
+!
+!    routine name:      - qsort_duplet
+!
+!-----------------------------------------------------------------------
+!
+!    latest revision:   - Oct 2019
+!
+!    purpose:           - sorts an array of duplets (iel,residual) with
+!                         residual (sort key) in descending order
+!                         (initial call needs: First = 1, Last = N)
+!
+!    arguments:
+!           in/out
+!                       - Iel_array: 1D integer array (element indices)
+!                       - Residuals: 1D real    array (residual values)
+!           in
+!                       - N        : size of array
+!                       - First    : first index of current partition
+!                       - Last     : last  index of current partition
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+recursive subroutine qsort_duplet(Iel_array,Residuals,N,First,Last)
+!
+   implicit none
+!..declare variables
+   integer , intent(in)    :: N,First,Last
+   integer , intent(inout) :: Iel_array(N)
+   real(8) , intent(inout) :: Residuals(N)
+!
+   real(8) :: x,pivot
+   integer :: i,j,l
+!
+   pivot = Residuals((First+Last) / 2)
+   i = First
+   j = Last
+!..iterate through the array to be sorted
+   do
+!  ...find first element from the left that needs to be swapped
+      do while ((Residuals(i) > pivot))
+         i = i + 1
+      end do
+!  ...find first element from the right that needs to be swapped
+      do while ((pivot > Residuals(j)))
+         j = j - 1
+      end do
+!  ...end loop if no elements need to be swapped
+      if (i >= j) exit
+!  ...swap the elements
+      l = Iel_array(i); Iel_array(i) = Iel_array(j); Iel_array(j) = l
+      x = Residuals(i); Residuals(i) = Residuals(j); Residuals(j) = x
+      i = i + 1
+      j = j - 1
+   end do
+   if (First < i-1) call qsort_duplet(Iel_array,Residuals,n,First,i-1 )
+   if (j+1 < Last)  call qsort_duplet(Iel_array,Residuals,n,j+1,  Last)
+!
+end subroutine qsort_duplet
