@@ -4,7 +4,7 @@
 !
 !----------------------------------------------------------------------
 !
-!     latest revision:  - Sep 2019
+!     latest revision:  - Oct 2019
 !
 !     purpose:          - compute and print residual
 !
@@ -29,13 +29,7 @@ subroutine residual()
    real(8) :: elem_resid
    integer :: elem_ref_flag
 !
-!..geometry dof (work space for nodcor)
-   real(8) :: xnod(3,MAXbrickH)
-   real(8) :: maxz,minz,midz
-!
-!..element type
-   character(len=4) :: etype
-!
+!..timer
    real(8) :: MPI_Wtime,start_time,end_time
 !
 !..printing flag
@@ -43,8 +37,11 @@ subroutine residual()
 !
 !-----------------------------------------------------------------------
 !
+!..start timer
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+!
 !..fetch active elements
-   if ((DISTRIBUTED) .and. (.not. HOST_MESH)) then
+   if (DISTRIBUTED .and. (.not. HOST_MESH)) then
       if (RANK .eq. ROOT) then
          write(*,*) 'residual: mesh is distributed. computing error in parallel...'
       endif
@@ -58,38 +55,21 @@ subroutine residual()
 !..initialize residual
    resid_subd = 0.d0
 !
-!..start timer
-   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-!
 !..residual/error computation
 !
-!$OMP PARALLEL DO                                     &
-!$OMP PRIVATE(mdle,etype,xnod,maxz,minz,midz,         &
-!$OMP         elem_resid,elem_ref_flag)               &
-!$OMP SCHEDULE(DYNAMIC)                               &
+!$OMP PARALLEL DO                               &
+!$OMP PRIVATE(mdle,elem_resid,elem_ref_flag)    &
+!$OMP SCHEDULE(DYNAMIC)                         &
 !$OMP REDUCTION(+:resid_subd)
    do iel=1,NRELES_SUBD
       mdle = ELEM_SUBD(iel)
-      if (USE_PML) then
-         xnod = 0.d0
-         call nodcor(Mdle, xnod)
-         etype = NODES(Mdle)%type
-         select case(etype)
-            case('mdlb')
-               maxz = maxval(xnod(3,1:8))
-               minz = minval(xnod(3,1:8))
-            case('mdlp')
-               maxz = maxval(xnod(3,1:6))
-               minz = minval(xnod(3,1:6))
-            case default
-               write(*,*) 'refine_DPG: invalid etype param. stop.'
-               stop
-         end select
-         !midz = minz + (maxz-minz)/2.d0
-         if (maxz .gt. PML_REGION) cycle
-      endif
       call elem_residual(mdle, elem_resid,elem_ref_flag)
-      resid_subd = resid_subd + elem_resid
+      if (USE_PML .and. Is_pml(mdle)) then
+      !  treat PML differently if needed
+         resid_subd = resid_subd + elem_resid
+      else
+         resid_subd = resid_subd + elem_resid
+      endif
    enddo
 !$OMP END PARALLEL DO
 !
@@ -101,6 +81,8 @@ subroutine residual()
       resid_tot = resid_subd
    endif
 !
+ 90 continue
+!
 !..end timer
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
    if (.not. QUIET_MODE) then
@@ -109,11 +91,10 @@ subroutine residual()
    endif
 !
    if (RANK .eq. ROOT) then
-      write(*,7020) NRDOF_TOT,sqrt(resid_tot)
- 7020 format('residual: NRDOF_TOT, RESIDUAL = ',i9,',  ',es12.5)
+      write(*,7020) NRDOF_TOT,NRDOF_CON,sqrt(resid_tot)
+ 7020 format(' residual: NRDOF_TOT, NRDOF_CON, RESIDUAL = ',i9,',  ',i9,',  ',es12.5)
    endif
 !
-   90 continue
-!
 end subroutine residual
-
+!
+!

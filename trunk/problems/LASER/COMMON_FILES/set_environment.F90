@@ -75,9 +75,9 @@ subroutine set_environment_maxwell
    call get_option_int('-py' , 'ORDER_APPROX_Y', 5, ORDER_APPROX_Y)
    call get_option_int('-pz' , 'ORDER_APPROX_Z', 5, ORDER_APPROX_Z)
    call get_option_int('-dp' , 'NORD_ADD'    , 1, NORD_ADD    )
-   call get_option_int('-npx', 'NPX'         , 0, NPX         )
-   call get_option_int('-npy', 'NPY'         , 0, NPY         )
-   call get_option_int('-npz', 'NPZ'         , 0, NPZ         )
+   call get_option_int('-npx', 'NPX'         , 5, NPX         )
+   call get_option_int('-npy', 'NPY'         , 5, NPY         )
+   call get_option_int('-npz', 'NPZ'         , 5, NPZ         )
 !
 !  ...... ICOMP, ISOL, GEOM_NO and NO_PROBLEM
    call get_option_int('-comp', 'ICOMP_EXACT', 1, ICOMP_EXACT  )
@@ -86,6 +86,7 @@ subroutine set_environment_maxwell
    call get_option_int('-prob', 'NO_PROBLEM' , 3, NO_PROBLEM   )
 !
    call get_option_int('-imax', 'IMAX', 3, IMAX)
+   call get_option_int('-jmax', 'JMAX', 0, JMAX)
    call get_option_int('-job' , 'JOB' , 0, JOB )
 !
    call get_option_int('-maxnods','MAXNODS_USER',0 ,MAXNODS_USER)
@@ -136,17 +137,17 @@ subroutine set_environment_maxwell
 !     -- Paraview Interface --
 ! Variables relevant to src/modules/paraview
 ! option label // explanation // default value // parameter
-   !call get_option_string('-prefix'          ,'Prefix paraview file'               ,'laserUW'           , PREFIX  )
-   !call get_option_string('-file_vis_upscale','Visualization upscale file location','../../../files/vis', FILE_VIS)
-   !call get_option_string('-vis_level'       ,'Visualization upscale level (0-3)'  ,'3'                 , VLEVEL  )
+   call get_option_string('-prefix'          ,'Prefix paraview file'               ,'laserUW'           , PREFIX  )
+   call get_option_string('-file_vis_upscale','Visualization upscale file location','../../../files/vis', FILE_VIS)
+   call get_option_string('-vis_level'       ,'Visualization upscale level (0-3)'  ,'3'                 , VLEVEL  )
 !
 !..I/O
-   !call get_option_string('-dir_output','Paraview root directory','../outputs/',OUTPUT_DIR)
-   !PARAVIEW_DIR = trim(OUTPUT_DIR)//'paraview/'
+   call get_option_string('-dir_output','Paraview root directory','../outputs/',OUTPUT_DIR)
+   PARAVIEW_DIR = trim(OUTPUT_DIR)//'paraview/'
 !
 !..Paraview MISC
-   !call get_option_bool('-paraview_geom', 'Dump geom at every Paraview call', .FALSE., PARAVIEW_DUMP_GEOM)
-   !call get_option_bool('-paraview_attr', 'Dump solution to Paraview'       , .TRUE., PARAVIEW_DUMP_ATTR)
+   call get_option_bool('-paraview_geom', 'Dump geom at every Paraview call', .FALSE., PARAVIEW_DUMP_GEOM)
+   call get_option_bool('-paraview_attr', 'Dump solution to Paraview'       , .TRUE. , PARAVIEW_DUMP_ATTR)
 !
 !..FOR DUMPING OUT POWER
 !   call get_option_int('-dumppower', 'DUMP_POWER', 0, DUMP_POWER)
@@ -186,6 +187,7 @@ subroutine set_environment_laser
    call get_option_int ('-heat'           , 'HEAT_FLAG'      , 0       , HEAT_FLAG      )
    call get_option_int ('-aniso_heat'     , 'ANISO_HEAT'     , 0       , ANISO_HEAT     )
    call get_option_int ('-aniso_ref_index', 'ANISO_REF_INDEX', 0       , ANISO_REF_INDEX)
+   call get_option_int ('-art_grating'    , 'ART_GRATING'    , 0       , ART_GRATING    ) 
    call get_option_int ('-copump'         , 'COPUMP'         , 1       , COPUMP         )
    call get_option_real('-raman'          , 'RAMAN_GAIN'     , 1.d-3   , RAMAN_GAIN     )
    call get_option_real('-gain'           , 'ACTIVE_GAIN'    , 1.d3    , ACTIVE_GAIN    )
