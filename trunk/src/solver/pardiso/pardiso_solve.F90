@@ -20,7 +20,7 @@
 !
 !------------------------------------------------------------------------
 #include "implicit_none.h"
-subroutine pardiso_solve(ia,ja,a,type,nnz,n,nrhs, b)
+subroutine pardiso_solve(Ia,Ja,A,Type,Nnz,N,Nrhs, B)
 !
    use assembly_sc, only: IPRINT_TIME
 !
@@ -30,9 +30,9 @@ subroutine pardiso_solve(ia,ja,a,type,nnz,n,nrhs, b)
    integer , intent(in)    :: Nnz,N,Nrhs
    integer , intent(in)    :: Ia(N+1),Ja(Nnz)
    VTYPE   , intent(in)    :: A(Nnz)
-   VTYPE   , intent(inout) :: B(N,Nrhs)
+   VTYPE   , intent(inout) :: B(N*Nrhs)
 !
-   VTYPE :: x(N,Nrhs)
+   VTYPE :: x(N*Nrhs)
 !
 !..pardiso workspace
 !..internal solver memory pointer for 64-bit architectures
@@ -40,7 +40,7 @@ subroutine pardiso_solve(ia,ja,a,type,nnz,n,nrhs, b)
    integer         :: iparm(64)
    integer         :: mtype,maxfct,mnum,phase,error,msglvl
    integer         :: perm(N)
-   character*1     :: type
+   character       :: Type
    real*8          :: tm
 !
 !..timer
@@ -49,22 +49,22 @@ subroutine pardiso_solve(ia,ja,a,type,nnz,n,nrhs, b)
 !------------------------------------------------------------------------
 !
 #if C_MODE    
-   select case(type)
+   select case(Type)
       case('S')  
-         mtype   = 6  ! complex symmetric
+         mtype   = 6   ! complex symmetric
       case('H')  
-         mtype   = 4  ! complex hermitian positive definite
+         mtype   = 4   ! complex hermitian positive definite
       case('I')  
-         mtype   = -4 ! complex hermitian indefinite
+         mtype   = -4  ! complex hermitian indefinite
       case default
          mtype   = 13  ! complex non-symmetric
    end select
 #else 
-   select case(type)
+   select case(Type)
       case('S')  
          mtype   = -2  ! real symmetric indefinite
       case('H')  
-         mtype   = 2  ! real symmetric positive definite
+         mtype   = 2   ! real symmetric positive definite
       case default  
          mtype   = 11  ! real non-symmetric
    end select   
@@ -72,10 +72,10 @@ subroutine pardiso_solve(ia,ja,a,type,nnz,n,nrhs, b)
 !
 !..initialize internal address pointers
    call pardisoinit(pt, mtype, iparm)
-!   
-   mnum    = 1
-   maxfct  = 1
-   msglvl  = 0   ! with statistical no information
+!
+   maxfct  = 1   !
+   mnum    = 1   !
+   msglvl  = 0   ! print statistics (0: no output, 1: output)
 !
 !------------------------------------------------------------------------
 !
@@ -84,8 +84,12 @@ subroutine pardiso_solve(ia,ja,a,type,nnz,n,nrhs, b)
    phase     = 11  ! analysis
    iparm(8)  = 1   ! max numbers of iterative refinement steps
 !
+   iparm(2)  = 3 ! OMP parallelize analysis
+   iparm(6)  = 1 ! store solution in B instead of X
+   iparm(25) = 2 ! OMP parallelize B/F solve
+!
    call pardiso(pt,maxfct,mnum,mtype,phase,N,A,Ia,Ja,perm,Nrhs,         &
-               iparm,msglvl,B,x,error)
+                iparm,msglvl,B,x,error)
 !
    end_time = MPI_Wtime()
    tm = end_time-start_time
@@ -93,7 +97,7 @@ subroutine pardiso_solve(ia,ja,a,type,nnz,n,nrhs, b)
    if (IPRINT_TIME .eq. 1) then
       write(*,1000) tm
  1000 format(' Analysis       : ',f12.5,'  seconds')
-   endif 
+   endif
 !
 !------------------------------------------------------------------------
 !
@@ -101,7 +105,7 @@ subroutine pardiso_solve(ia,ja,a,type,nnz,n,nrhs, b)
 !
    phase     = 22  ! factorization
    call pardiso(pt,maxfct,mnum,mtype,phase,N,A,Ia,Ja,perm,Nrhs,         &
-               iparm,msglvl,B,x,error)
+                iparm,msglvl,B,x,error)
 !
    end_time = MPI_Wtime()
    tm = end_time-start_time
@@ -109,7 +113,7 @@ subroutine pardiso_solve(ia,ja,a,type,nnz,n,nrhs, b)
    if (IPRINT_TIME .eq. 1) then
       write(*,1001) tm
  1001 format(' Factorization  : ',f12.5,'  seconds')
-   endif 
+   endif
 !
 !------------------------------------------------------------------------
 !
@@ -125,7 +129,7 @@ subroutine pardiso_solve(ia,ja,a,type,nnz,n,nrhs, b)
    if (IPRINT_TIME .eq. 1) then
       write(*,1002) tm
  1002 format(' B/F Solve      : ',f12.5,'  seconds')
-   endif 
+   endif
 
    if (IPRINT_TIME .eq. 1) then
       write(*,1003) real(max(iparm(15),iparm(16)+iparm(17)),8)/1e6
@@ -136,7 +140,7 @@ subroutine pardiso_solve(ia,ja,a,type,nnz,n,nrhs, b)
    call pardiso(pt,maxfct,mnum,mtype,phase,N,A,Ia,Ja,perm,Nrhs,         &
                 iparm,msglvl,B,x,error)
 ! 
-   B = x
+!   B = x
 !  
 end subroutine pardiso_solve
 !

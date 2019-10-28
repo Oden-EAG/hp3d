@@ -133,7 +133,7 @@ module data_structure3D
         integer          :: visit
 !
 !  .....activation flag
-        logical           :: act
+        logical          :: act
 !
 !  .....subdomain number (distributed mesh)
         integer          :: subd
@@ -343,6 +343,7 @@ module data_structure3D
         NODES(nod)%index = 0
         NODES(nod)%order = 0
         NODES(nod)%act = .false.
+        NODES(nod)%subd = -1
         NODES(nod)%bcond = nod+1
         NODES(nod)%ref_kind = 0
         NODES(nod)%father = 0

@@ -62,7 +62,7 @@ CDEFS   = -DAdd_
 # See https://software.intel.com/en-us/articles/intel-mkl-link-line-advisor
 #
 # -mkl
-# loads: BLAS, LAPACK, ScaLAPACK, BLACS
+# loads: BLAS, LAPACK, ScaLAPACK, BLACS, SPBLAS
 #
 # see user guide (TACC Stampede2)
 # -mkl (by default: -mkl=parallel)
@@ -98,7 +98,7 @@ MKL_INCS = -I${MKLROOT}/include/intel64/lp64 -I${MKLROOT}/include
 TACC_PETSC32_LIB = /home1/apps/intel18/impi18_0/petsc/3.11/skylake/lib
 TACC_PETSC32_INC = /home1/apps/intel18/impi18_0/petsc/3.11/skylake/include
 
-MUMPS_LIBS = -L${TACC_PETSC32_LIB} -ldmumps -lzmumps \
+MUMPS_LIBS = -L$(TACC_PETSC32_LIB) -ldmumps -lzmumps \
                                    -lmumps_common -lpord
 
 TACC_PETSC64_LIB = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-i64/lib
@@ -109,7 +109,7 @@ MUMPS_LIBS += -L$(TACC_PETSC64_LIB) -lesmumps -lzoltan \
                                     -lscotch -lscotcherr \
                                     -lptscotch -lptscotcherr
 
-MUMPS_INCS = -I${TACC_PETSC32_INC} -I$(TACC_PETSC64_INC)
+MUMPS_INCS = -I$(TACC_PETSC32_INC) -I$(TACC_PETSC64_INC)
 
 #------------------------------------------------------------------
 # VIS LIBRARY
@@ -120,13 +120,14 @@ MUMPS_INCS = -I${TACC_PETSC32_INC} -I$(TACC_PETSC64_INC)
 
 # module load paraview/5.6.0
 # module load hdf5/1.10.4
-#VIS_LDFLAGS  = -L${TACC_HDF5_LIB} -lhdf5 -lhdf5_hl
-#VIS_LDFLAGS  += -L${TACC_PARAVIEW_LIB} -lvtkhdf5-pv5.6 -lvtkhdf5_hl-pv5.6 -lvtklibxml2-pv5.6 -lvtkzlib-pv5.6
+VIS_LIBS   = -L${TACC_HDF5_LIB} -lhdf5 -lhdf5_hl -lhdf5_fortran -lhdf5hl_fortran
+VIS_LIBS  += -L${TACC_PARAVIEW_LIB} -lvtkhdf5-pv5.6 -lvtkhdf5_hl-pv5.6 -lvtklibxml2-pv5.6 -lvtkzlib-pv5.6
+VIS_INCS   = -I${TACC_HDF5_INC} -I${TACC_PARAVIEW_INC}
 
 #------------------------------------------------------------------
 # PREPROCESSOR VARIABLES
 #------------------------------------------------------------------
-COMPLEX    ?= 0
+COMPLEX    ?= 1
 SHAPE      ?= 1
 DEBUG_MODE ?= 0
 ifeq ($(DEBUG),YES)
@@ -162,7 +163,7 @@ ifeq ($(COMPLEX),0)
 OBJ_PATH        = $(OBJ_PATH_REAL)
 endif
 
-HP3D_LIB_EXTRA_INCS = $(MUMPS_INCS)
+HP3D_LIB_EXTRA_INCS = $(MKL_INCS) $(MUMPS_INCS) $(VIS_INCS)
 
 #not used
 HP3D_MOD_OPTION_INC = -module ./$(MODULE_PATH)
@@ -211,13 +212,15 @@ EXTRA_LINK_INCS    =
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # PROBLEM LINKING
 
-PROB_LIBS    = $(HP3D_LINK_LIBS) \
+PROB_LIBS    = $(HP3D_LINK_LIBS)   \
                $(MUMPS_LINK_LIBS)  \
+               $(VIS_LIBS)         \
                $(EXTRA_LINK_LIBS)
 
 PROB_INCS     = -module ./$(MODULE_PATH)
-PROB_INCS    += $(HP3D_LINK_INCS) \
+PROB_INCS    += $(HP3D_LINK_INCS)   \
                 $(MUMPS_LINK_INCS)  \
+                $(VIS_INCS)         \
                 $(EXTRA_LINK_INCS)
 
 # Files with ending in .F and .F90 (not .f and .f90)

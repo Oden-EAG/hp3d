@@ -3,7 +3,6 @@
 !
 #include "implicit_none.h"
 !
-!
 !----------------------------------------------------------------------
 !
 !     subroutine:          partition_fiber
@@ -17,7 +16,7 @@
 subroutine partition_fiber(subd_next)
 !
    use data_structure3D
-   use mpi_param, only: RANK,NUM_PROCS
+   use mpi_param, only: RANK,ROOT,NUM_PROCS
    use MPI,       only: MPI_COMM_WORLD,MPI_INTEGER,MPI_REAL8,  &
                         MPI_MIN,MPI_MAX,MPI_IN_PLACE
 !
@@ -180,7 +179,7 @@ subroutine collect_dofs()
             call dealloc_nod_dof(nod)
          endif
       enddo
-      call set_subd(mdle, ROOT)
+      call set_subd(mdle,ROOT)
    enddo
    1000 format(A,I2,A,A,I4,A,I6)
 !

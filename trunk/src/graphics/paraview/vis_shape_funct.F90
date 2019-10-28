@@ -89,7 +89,8 @@ subroutine vis_shape_h1(Icount)
       do inod=1,NRNODS
 !
 !       skip inactive nodes      
-        if (Is_inactive(inod))  cycle
+        if (Is_inactive(inod)) cycle
+        if (.not. associated(NODES(inod)%dof)) cycle
 !
 !       find number of dofs associated to node
         call find_ndof(inod, ndofH,ndofE,ndofV,ndofQ)        
@@ -160,7 +161,8 @@ subroutine vis_shape_hcurl(Icount)
       do inod=1,NRNODS
 !
 !       skip inactive nodes      
-        if (Is_inactive(inod))  cycle
+        if (Is_inactive(inod)) cycle
+        if (.not. associated(NODES(inod)%dof)) cycle
 !
 !       find number of dofs associated to node
         call find_ndof(inod, ndofH,ndofE,ndofV,ndofQ)        
@@ -229,7 +231,8 @@ subroutine vis_shape_hdiv(Icount)
       do inod=1,NRNODS
 !
 !       skip inactive nodes      
-        if (Is_inactive(inod))  cycle
+        if (Is_inactive(inod)) cycle
+        if (.not. associated(NODES(inod)%dof)) cycle
 !
 !       find number of dofs associated to node
         call find_ndof(inod, ndofH,ndofE,ndofV,ndofQ)        
@@ -298,7 +301,8 @@ subroutine vis_shape_l2(Icount)
       do inod=1,NRNODS
 !
 !       skip inactive nodes      
-        if (Is_inactive(inod))  cycle
+        if (Is_inactive(inod)) cycle
+        if (.not. associated(NODES(inod)%dof)) cycle
 !
 !       find number of dofs associated to node
         call find_ndof(inod, ndofH,ndofE,ndofV,ndofQ)        
@@ -321,4 +325,4 @@ subroutine vis_shape_l2(Icount)
       enddo
 !
 !
-endsubroutine vis_shape_l2
+end subroutine vis_shape_l2

@@ -16,23 +16,39 @@
    use data_structure3D
    use refinements
    use constrained_nodes
-#include "syscom.blk"
+   use mpi_param  , only: ROOT,RANK
+   use MPI        , only: MPI_COMM_WORLD,MPI_COMM_WORLD
+!
+   implicit none
 !
 !..work space for elem_nodes
-   dimension nodesl(27),norientl(27)
+   integer :: nodesl(27),norientl(27)
 !
 !..order for element nodes implied by the order of the middle node
-   dimension norder(19)
+   integer :: norder(19)
 !
    character(len=4) :: etype
 !
+   integer :: iel,mdle,nod,nrv,nre,nrf,nord
+   integer :: i,j,nc,icase,nodp,nordh,nordv
+   integer :: je,jf,ne1,ne2,ne3,ne4,is,nods
+   integer :: nrsons,nordhs,nordvs
+!
+   real(8) :: MPI_Wtime,start_time,end_time
+   integer :: ierr
+!
+#if DEBUG_MODE
+   integer :: iprint
+   iprint = 0
+#endif
+!
 !----------------------------------------------------------------------
 !
-   iprint=0
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 !
 !..reset visitation flags
    call reset_visit
-!   
+!
 !----------------------------------------------------------------------
 !                 STEP 1: Minimum rule for faces
 !----------------------------------------------------------------------
@@ -267,18 +283,25 @@
 !..reset visitation flags
    call reset_visit
 !
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+   if (RANK .eq. ROOT) write(*,2020) end_time-start_time
+ 2020 format(' enforce_min: ',f12.5,'  seconds')
 !
-   end subroutine enforce_min_rule
-
-
-
-
-
-
-
-   subroutine save_min_order(Nod,Nord)
+end subroutine enforce_min_rule
+!
+!
+!
+!
+subroutine save_min_order(Nod,Nord)
+!
    use data_structure3D
-#include "syscom.blk"
+   implicit none
+!
+   integer, intent(in) :: Nod,Nord
+!
+   integer :: nordh ,nordv
+   integer :: nordh1,nordv1
+   integer :: nordh2,nordv2
 !
    if (NODES(Nod)%visit.eq.0) then
       NODES(nod)%visit= Nord
@@ -294,4 +317,4 @@
       end select
    endif
 !
-   end subroutine save_min_order
+end subroutine save_min_order

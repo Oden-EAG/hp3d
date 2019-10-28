@@ -6,8 +6,8 @@
 !
 !   latest revision    - July 2019
 !
-!   purpose            - routine returns vertex coordinates for
-!                        a 3D element
+!   purpose            - routine returns unconstrained geometry dof
+!                        for the vertices of a 3D element
 !
 !   arguments :
 !     in:
@@ -24,29 +24,67 @@ subroutine nodcor_vert(Mdle, Xnod)
    implicit none
 !
    integer, intent(in)  :: Mdle
-   real*8,  intent(out) :: Xnod(NDIMEN,8)
+   real(8), intent(out) :: Xnod(3,8)
 !
-   integer :: nodesl(27),norientl(27)
-   integer :: iv,nrv,nod,iprint
+!..modified element nodes and corresponding number of dof
+   integer :: nodm(MAXNODM),ndofmH(MAXNODM),ndofmE(MAXNODM),   &
+                            ndofmV(MAXNODM),ndofmQ(MAXNODM)
 !
-   Xnod(1:NDIMEN,1:8) = 0.d0
+   integer :: nrconH(MAXbrickH),nacH(NACDIM,MAXbrickH),  &
+              nrconE(MAXbrickE),nacE(NACDIM,MAXbrickE),  &
+              nrconV(MAXbrickV),nacV(NACDIM,MAXbrickV)
 !
-   call elem_nodes(Mdle, nodesl,norientl)
+   real(8) :: constrH(NACDIM,MAXbrickH),  &
+              constrE(NACDIM,MAXbrickE),  &
+              constrV(NACDIM,MAXbrickV)
 !
-   nrv = nvert(NODES(Mdle)%type)
-   do iv=1,nrv
-     nod = nodesl(iv)
-     Xnod(1:NDIMEN,iv) = NODES(nod)%dof%coord(1:NDIMEN,1)
+!..modified element dof
+   real(8) :: val(3,2*MAXbrickH)
+!
+   integer :: i,j,k,l,kp,nrv,nod,nrnodm,iprint,iv
+!
+!----------------------------------------------------------------------
+!
+   Xnod(1:3,1:8) = 0.d0
+   val (1:3,1:2*MAXbrickH) = 0.d0
+
+!..determine constraints' coefficients
+   call logic(Mdle,2,                           &
+              nodm,ndofmH,ndofmE,ndofmV,nrnodm, &
+              nrconH,nacH,constrH,              &
+              nrconE,nacE,constrE,              &
+              nrconV,nacV,constrV)
+!
+!..copy the global dof into the local array
+!  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!
+!..initiate the local dof index
+   k = 0
+!
+!..loop through nodes
+   do j=1,nrnodm
+!#if DEBUG_MODE
+      if (.not. associated(NODES(nodm(j))%dof)) then
+         write(*,*) 'nodcor_vert: dof not associated.'
+      endif
+!#endif
+      do i=1,ndofmH(j)
+         k=k+1
+         val(1:3,k) = NODES(nodm(j))%dof%coord(1:3,i)
+      enddo
    enddo
 !
-   iprint=0
-   if (iprint.eq.1) then
-      write(*,7001) Mdle
- 7001 format('nodcor_vert: VERTEX COORDINATES FOR Mdle = ',i6)
-      do iv=1,nrv
-         write(*,7002) iv,Xnod(1:NDIMEN,iv)
- 7002    format('iv = ',i2,2x,3f8.3)
+!..#vertices = #local vertex dofs
+   nrv = nvert(NODES(Mdle)%type)
+!
+!..loop through the local vertex dof
+   do k=1,nrv
+!  ...accumulate for the values
+!     nrconH(k) = #unconstrained dofs for i-th local dof
+      do kp=1,nrconH(k)
+         l = nacH(kp,k)
+         Xnod(1:3,k) = Xnod(1:3,k) + constrH(kp,k)*val(1:3,l)
       enddo
-   endif
+   enddo
 !
 end subroutine nodcor_vert

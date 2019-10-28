@@ -4,7 +4,7 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - Jan 12
+!   latest revision    - Oct 2019
 !
 !   purpose            - define data point for upscaling of VTK output
 !
@@ -12,26 +12,28 @@
 module upscale
 
   save
-
+!
+! define generic type for a visualization object
   type :: vis
 !
 !    number of vertices required by visualization level (0 - 3)
      integer :: NR_VERT
 !
 !    list of vertices' coordinates
-     real*8,dimension(:,:),allocatable :: VERT
+     real(8), allocatable :: VERT(:,:)
 !
 !    number of elements required by visualization level (0 - 3)
      integer :: NR_ELEM
 !
 !    list of elements' vertices (indexing starts at 0) 
-     integer,dimension(:,:),allocatable :: ELEM
+     integer, allocatable :: ELEM(:,:)
   endtype vis
 !
   type(vis) :: TETR_VIS, PRIS_VIS, HEXA_VIS
 !
 contains
-
+!
+! return cell type (XDMF 2) for vis object
   integer function ivis_type(Type)
     character(len=4) :: Type
     select case(Type)
@@ -40,7 +42,21 @@ contains
     case('hexa','mdlb'); ivis_type = 9
     end select
   end function ivis_type
-
+!
+! return num points to describe vis object
+  integer function nobj_conf(Type)
+     character(len=4) :: Type
+     select case(Type)
+        case('tetr','mdln'); nobj_conf = 4
+        case('pris','mdlp'); nobj_conf = 6
+        case('hexa','mdlb'); nobj_conf = 8
+        case default
+           write(*,*) 'nobj_conf: unexpected type. stop.'
+           stop
+     end select
+  end function nobj_conf
+!
+! return preloaded vis element configuration
   type(vis) function vis_on_type(Type)
     character(len=4) :: Type
     select case(Type)
@@ -49,7 +65,8 @@ contains
     case('hexa','mdlb'); vis_on_type = HEXA_VIS
     end select
   end function vis_on_type
-  
+!
+! deallocate vis object (configuration)
   subroutine clear_vis(V) 
     implicit none
     type(vis), intent(inout) :: V
@@ -63,11 +80,12 @@ contains
        deallocate(V%ELEM)
     end if
   end subroutine clear_vis
-  
-  subroutine load_vis(V, Fp, Type)
+!
+! set up vis element configuration
+  subroutine load_vis(V,Fp,Type)
     implicit none
-    type(vis),        intent(inout):: V
-    character(len=*), intent(in):: Fp, Type
+    type(vis)       , intent(inout) :: V
+    character(len=*), intent(in)    :: Fp, Type
 
     integer, parameter :: nin = 29
     integer            :: i, istat, ierr
@@ -118,23 +136,41 @@ contains
        write(*,*) 'module upscale::Something wrong', ierr
     end if
   end subroutine load_vis
-
-  subroutine get_vis_point(V, Idx, Pt)
+!
+! return point coordinates of a point associated with a vis object
+  subroutine get_vis_point(V,Idx, Pt)
     implicit none
-    type(vis), intent(in):: V
-    integer, intent(in) :: Idx
-    real*8, intent(out), dimension(1:3) :: Pt
+    type(vis), intent(in) :: V
+    integer  , intent(in) :: Idx
+    real*8   , intent(out):: Pt(3)
     Pt(1:3) = V%VERT(Idx,1:3)
   end subroutine get_vis_point
-  
-  subroutine get_vis_elem(V, Idx, Ioffs, Iverl)
+!
+! return list of vertices for vis object
+  subroutine get_vis_elem(V,Idx,Ioffs, Iverl)
     implicit none
-    type(vis), intent(in):: V
-    integer, intent(in) :: Idx, Ioffs
-    integer, intent(out), dimension(1:8) :: Iverl
+    type(vis), intent(in)  :: V
+    integer  , intent(in)  :: Idx, Ioffs
+    integer  , intent(out) :: Iverl(8)
     Iverl(1:8) = V%ELEM(Idx,1:8) + Ioffs
   end subroutine get_vis_elem
-
+!
+! return number of vis elements of the vis object
+  subroutine get_vis_nrelem(Type, Nrelem)
+    implicit none
+    character(len=4), intent(in)  :: Type
+    integer         , intent(out) :: Nrelem
+    select case(Type)
+       case('tetr','mdln'); Nrelem = TETR_VIS%NR_ELEM
+       case('pris','mdlp'); Nrelem = PRIS_VIS%NR_ELEM
+       case('hexa','mdlb'); Nrelem = HEXA_VIS%NR_ELEM
+       case default
+          write(*,*) 'get_vis_nrelem: unexpected type. stop.'
+          stop
+    end select
+  end subroutine get_vis_nrelem
+!
+!
   subroutine disp_vis(Nout, V, Type)
     implicit none
     type(vis), intent(in):: V
@@ -167,7 +203,7 @@ contains
                V%ELEM(i,5), V%ELEM(i,6), V%ELEM(i,7), V%ELEM(i,8)
        end select
     end do
-
   end subroutine disp_vis
-
+!
+!
 end module upscale

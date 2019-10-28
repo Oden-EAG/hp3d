@@ -155,7 +155,7 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
    else
      type = NODES(mdle)%type
      kref = NODES(mdle)%ref_kind
-     call elem_nodes(mdle, nodesl, norientl)
+     call elem_nodes(mdle, nodesl,norientl)
      call nr_mdle_sons(type, kref, nrsons)
      Nrneig = 0
 !

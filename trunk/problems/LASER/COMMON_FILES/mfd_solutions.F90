@@ -54,6 +54,9 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
    VTYPE :: pz,pz_x,pz_y,pz_z,pz_xx,pz_xy,pz_xz,pz_yy,pz_yx,pz_yz
    VTYPE :: pz_zz,pz_zy,pz_zx, zbeta,zdbeta,zd2beta
 !
+   VTYPE               ::  E01,E11,E21,E02
+   VTYPE, dimension(3) :: dE01(3),dE11(3),dE21(3),dE02(3)
+!
 !--------------------------------------------------------------------------------
 !
 !..initialize variables
@@ -375,9 +378,9 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
       if (r .lt. 1.0d-13) then
          E = 0.d0
       else
-         if (ICOMP_EXACT .eq. 1) then
+         if (ICOMP_TS .eq. 1) then
             E = ZI*BESSEL_J1(3.9d0*r)*x1/r
-         elseif (ICOMP_EXACT .eq. 2) then
+         elseif (ICOMP_TS .eq. 2) then
             E = ZI*BESSEL_J1(3.9d0*r)*x2/r
          endif
       endif
@@ -387,14 +390,6 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !..Fundamental mode LP01 in dielectric waveguide
    elseif (ISOL .eq. 13) then
 !
-!  ...shift source away from zero
-      !x1 = Xp(1)+GEOM_TOL
-      !x2 = Xp(2)+GEOM_TOL
-      !x3 = x3-0.05d0
-!
-!  ...radial coordinate
-      r = sqrt(x1*x1+x2*x2)
-!
 !  ...LP01 in dielectric waveguide, a = sqrt(2), omega=25.7
 !      k    = 37.2854d0
 !      gamm =  1.16301d0
@@ -403,6 +398,103 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !
 !  ...LMA fiber
 !  ...LP01 (signal) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
+      k    = 85.6833d0
+      gamm =  1.53131d0
+      beta =  3.12978d0
+      ampl =  1.0d0
+!
+      call get_LP01(Xp,ampl,k,gamm,beta, E,dE)
+!
+!--------------- 14th prob -------------------------------------------------------
+!..LP11 mode in dielectric waveguide
+   elseif (ISOL .eq. 14) then
+!
+!  ...LMA fiber
+!  ...LP11 (signal) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
+      k    = 85.6630d0
+      gamm =  2.41319d0
+      beta =  2.51336d0
+      ampl =  1.0d0
+      call get_LP11(Xp,ampl,k,gamm,beta, E,dE)
+!
+!--------------- 15th prob -------------------------------------------------------
+!..LP21 mode in dielectric waveguide
+   elseif (ISOL .eq. 15) then
+!
+!  ...LMA fiber
+!  ...LP21 (signal) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
+      k    = 85.6380d0
+      gamm =  3.17859d0
+      beta =  1.42726d0
+      ampl =  1.0d0
+      call get_LP21(Xp,ampl,k,gamm,beta, E,dE)
+!
+!--------------- 16th prob -------------------------------------------------------
+!..LP02 mode in dielectric waveguide
+   elseif (ISOL .eq. 16) then
+!
+!  ...LMA fiber
+!  ...LP02 (signal) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
+      k    = 85.6322d0
+      gamm =  3.33123d0
+      beta =  1.02145d0
+      ampl =  1.0d0
+      call get_LP02(Xp,ampl,k,gamm,beta, E,dE)
+!
+!--------------- 17th prob -------------------------------------------------------
+!..Mixed LP01/LP11 mode in dielectric waveguide
+   elseif (ISOL .eq. 17) then
+!
+!  ...LMA fiber, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
+!  ...LP01 (signal)
+      k    = 85.6833d0
+      gamm =  1.53131d0
+      beta =  3.12978d0
+      ampl =  1.0d0
+      call get_LP01(Xp,ampl,k,gamm,beta, E01,dE01)
+!
+!  ...LP11 (signal)
+      k    = 85.6630d0
+      gamm =  2.41319d0
+      beta =  2.51336d0
+      ampl =  1.0d0
+      call get_LP11(Xp,ampl,k,gamm,beta, E11,dE11)
+!
+!  ...LP21 (signal)
+      k    = 85.6380d0
+      gamm =  3.17859d0
+      beta =  1.42726d0
+      ampl =  1.0d0
+      call get_LP21(Xp,ampl,k,gamm,beta, E21,dE21)
+!
+!  ...LP02 (signal)
+      k    = 85.6322d0
+      gamm =  3.33123d0
+      beta =  1.02145d0
+      ampl =  1.0d0
+      call get_LP02(Xp,ampl,k,gamm,beta, E02,dE02)
+!
+      E  =  E01+ E11+ E21+ E02
+      dE = dE01+dE11+dE21+dE02
+!
+!--------------- 18th prob -------------------------------------------------------
+!..LP12 mode in dielectric waveguide
+   elseif (ISOL .eq. 18) then
+!
+!  ...LMA fiber
+!  ...LP12 (signal) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
+      k    = 85.5944d0
+      gamm =  4.19098d0
+      beta =  0.25d0
+      ampl =  1.0d0
+      call get_LP11(Xp,ampl,k,gamm,beta, E,dE)
+!
+!
+!--------------- 19th prob -------------------------------------------------------
+!..Plane wave in core of dielectric waveguide
+   elseif (ISOL .eq. 19) then
+!
+      r = sqrt(x1*x1+x2*x2)
       if (r .eq. 0.d0) then
          r_x = 1.d0
          r_y = 1.d0
@@ -410,143 +502,21 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          r_x = x1/r
          r_y = x2/r
       endif
-!
-      select case(Fld)
-!     ...signal field
-         case(0)
-            ampl =  1.0d0
-            k    = 85.6833d0
-            gamm =  1.53131d0
-            beta =  3.12978d0
-            if (r .le. R_CORE) then
-               ca = ampl/BESSEL_J0(gamm*R_CORE)
-               E = ca*BESSEL_J0(gamm*r)
-               cb = -ca*gamm*BESSEL_J1(gamm*r)
-            else
-               ca = ampl/BESSEL_K0(beta*R_CORE)
-               E = ca*BESSEL_K0(beta*r)
-               cb = -ca*beta*BESSEL_K1(beta*r)
-            endif
-!
-            dE(1) = cb*r_x*exp(-ZI*k*x3)
-            dE(2) = cb*r_y*exp(-ZI*k*x3)
-            E = E*exp(-ZI*k*x3)
-            dE(3) = -ZI*k*E
-!
-!     ...pump field
-         case(1)
-            ampl =  2.0d0
-            k    = 93.4108d0
-            gamm =  1.55709d0
-            beta =  3.46466d0
-            if (r .le. R_CORE) then
-               ca = ampl/BESSEL_J0(gamm*R_CORE)
-               E = ca*BESSEL_J0(gamm*r)
-               cb = -ca*gamm*BESSEL_J1(gamm*r)
-            else
-               ca = ampl/BESSEL_K0(beta*R_CORE)
-               E = ca*BESSEL_K0(beta*r)
-               cb = -ca*beta*BESSEL_K1(beta*r)
-            endif
-!
-            dE(1) = cb*r_x*exp(-ZI*k*x3)
-            dE(2) = cb*r_y*exp(-ZI*k*x3)
-            E = E*exp(-ZI*k*x3)
-            dE(3) = -ZI*k*E
-
-         case(2)
-            ! Gaussian
-            ! ampl = 1.0d0
-            ! rho = 1.0d0
-            ! E = ampl*exp(-(x1*x1+x2*x2)/rho)*exp(-ZI*k*x3)
-            ! dE(1) = -(2.d0*x1/rho)*E
-            ! dE(2) = -(2.d0*x2/rho)*E
-            ! dE(3) = -ZI*k*E
-
-            ! Plane Wave (needs one radial refinement)
-            ampl = 0.2d0
-            rho = R_CORE + 0.5d0*(R_CLAD-R_CORE)
-            if (r > rho) then
-               E = ampl*exp(-r**2)/exp(-rho**2)
-               dE(1) = -2.d0*x1*E
-               dE(2) = -2.d0*x2*E
-            else
-               E = ampl
-               dE(1) = 0.d0
-               dE(2) = 0.d0
-            endif
-            k = OMEGA_PUMP/REF_INDEX_CORE
-            E = E*exp(-ZI*k*x3)
-            dE(1) = dE(1)*exp(-ZI*k*x3)
-            dE(2) = dE(2)*exp(-ZI*k*x3)
-            dE(3) = -ZI*k*E;
-         case default
-            write(*,*) 'mfd_solutions: fld_flag invalid. stop.'
-            stop
-      end select
-      if (R_CLAD - r < GEOM_TOL) then
-         E = 0.d0
-         dE(1:3) = 0.d0
-      endif
-!
-!--------------- 14th prob -------------------------------------------------------
-!..LP11 mode in dielectric waveguide
-   elseif (ISOL .eq. 14) then
-!
-!  ...shift source away from zero
-      if (abs(x1) .lt. GEOM_TOL) then
-         x1 = x1+GEOM_TOL
-      endif
-      if (abs(x2) .lt. GEOM_TOL) then
-         x2 = x2+GEOM_TOL
-      endif
-      !x3 = x3-0.05d0
-!
-!  ...LP11 in dielectric waveguide, a = sqrt(2), omega=40.0
-      r = sqrt(x1*x1+x2*x2)
-      k    = 58.0229d0
-      gamm =  2.07563d0
-      beta =  1.62952d0
-      ampl = 1.0d0
-!
-      if (r .le. R_CORE) then
-         ca = ampl/BESSEL_J1(gamm*R_CORE)
-         E = ca*(x1/r)*BESSEL_J1(gamm*r)
-         cb = ca*(((x1/r)**(2.d0))*gamm*BESSEL_dJ1(gamm*r)+((x2/r)**(2.d0))*BESSEL_J1(gamm*r)/r)
-         cc = ca*(x2/r)*(x1/r)*(gamm*BESSEL_dJ1(gamm*r)-BESSEL_J1(gamm*r)/r)
+      !
+      ampl = 1.d0
+      ca = R_CORE/0.9d0
+      !
+      if (r .le. ca) then
+         E = ampl*exp(-ZI*OMEGA*x3)
+         dE(1) = 0.d0
+         dE(2) = 0.d0
+         dE(3) = -ZI*OMEGA*E
       else
-         ca = ampl/BESSEL_K1(beta*R_CORE)
-         E = ca*(x1/r)*BESSEL_K1(beta*r)
-         cb = ca*(((x1/r)**(2.d0))*beta*BESSEL_dK1(beta*r)+((x2/r)**(2.d0))*BESSEL_K1(beta*r)/r)
-         cc = ca*(x2/r)*(x1/r)*(beta*BESSEL_dK1(beta*r)-BESSEL_K1(beta*r)/r)
+         E = ampl*exp(-((r-ca)**2.d0))*exp(-ZI*OMEGA*x3)
+         dE(1) = -2.d0*(r-ca)*r_x*E
+         dE(2) = -2.d0*(r-ca)*r_y*E
+         dE(3) = -ZI*OMEGA*E
       endif
-!
-      dE(1) = cb*exp(-ZI*k*x3)
-      dE(2) = cc*exp(-ZI*k*x3)
-      E = E*exp(-ZI*k*x3)
-      dE(3) = -ZI*k*E
-!
-!--------------- 15th prob -------------------------------------------------------
-!..Plane wave in core of dielectric waveguide
-   elseif (ISOL .eq. 15) then
-!
-!      r = sqrt(x1*x1+x2*x2)
-!      if (r .le. R_CORE) then
-!         E = exp(-ZI*OMEGA*x3) !x1*exp(-ZI*OMEGA*x3)
-!         dE(1) = 0.d0 !exp(-ZI*OMEGA*x3)
-!         dE(2) = 0.d0
-!         dE(3) = -ZI*OMEGA*E
-!      else
-!         E = 0.d0
-!         dE(1:3) = 0.d0
-!      endif
-!
-!   test: exp(-r^2)
-      r = sqrt(x1*x1+x2*x2)
-      E = exp(-r**2.d0)
-      dE(1) = -2.d0*x1*E
-      dE(2) = -2.d0*x2*E
-      dE(3) = 0.d0
 !
 !
 !--------------- 20th prob -------------------------------------------------------
@@ -788,7 +758,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          d2E(3,2) =  d2E(2,3)
          d2E(3,3) =   f_x *   f_y * ddf_z
 !
-      case(5,8,12,13,14,15,20,21)
+      case(5,8,12,13,14,15,16,17,18,19,20,21)
 !     ...already computed fields
 !
       case default
@@ -803,32 +773,59 @@ function BESSEL_dJ1(x) result(fval)
    fval = BESSEL_J0(x) - BESSEL_J1(x)/x
 end function
 
+function BESSEL_J2(x) result(fval)
+   real*8, intent(in)  :: x
+   real*8 :: fval
+   fval = BESSEL_JN(2, x)
+end function
+
+function BESSEL_dJ2(x) result(fval)
+   real*8, intent(in)  :: x
+   real*8 :: fval
+   real*8 :: a,b,c
+   call dbessJY(x,2.d0, a,b,fval,c)
+end function
+
 function BESSEL_K0(x) result(fval)
    real*8, intent(in)  :: x
    real*8 :: fval
    real*8 :: a,b,c
-   call dbessIK(x, 0.d0, a, fval, b, c)
+   call dbessIK(x,0.d0, a,fval,b,c)
 end function
 
 function BESSEL_dK0(x) result(fval)
    real*8, intent(in)  :: x
    real*8 :: fval
    real*8 :: a,b,c
-   call dbessIK(x, 0.d0, a, b, c, fval)
+   call dbessIK(x,0.d0, a,b,c,fval)
 end function
 
 function BESSEL_K1(x) result(fval)
    real*8, intent(in)  :: x
    real*8 :: fval
    real*8 :: a,b,c
-   call dbessIK(x, 1.d0, a, fval, b, c)
+   call dbessIK(x,1.d0, a,fval,b,c)
 end function
 
 function BESSEL_dK1(x) result(fval)
    real*8, intent(in)  :: x
    real*8 :: fval
    real*8 :: a,b,c
-   call dbessIK(x, 1.d0, a, b, c, fval)
+   call dbessIK(x,1.d0, a,b,c,fval)
+end function
+
+function BESSEL_K2(x) result(fval)
+   real*8, intent(in)  :: x
+   real*8 :: fval
+   real*8 :: a,b,c
+   call dbessIK(x,2.d0, a,fval,b,c)
+end function
+
+function BESSEL_dK2(x) result(fval)
+   real*8, intent(in)  :: x
+   real*8 :: fval
+   real*8 :: a,b,c
+   call dbessIK(x,2.d0, a,b,c,fval)
 end function
 !
 !------------------------------------------------------
@@ -904,9 +901,6 @@ subroutine get_LP11(Xp,ampl,k,gamm,beta, E,dE)
 !..Cartesian coordinates
    x1 = Xp(1); x2 = Xp(2); x3 = Xp(3)
 !
-!..radial coordinate
-   r = sqrt(x1*x1+x2*x2)
-!
 !..shift source away from zero
    if (abs(x1) .lt. GEOM_TOL) then
       x1 = x1+GEOM_TOL
@@ -916,7 +910,6 @@ subroutine get_LP11(Xp,ampl,k,gamm,beta, E,dE)
    endif
    r = sqrt(x1*x1+x2*x2)
 !
-!..LP11 in dielectric waveguide
    if (r .le. R_CORE) then
       ca = ampl/BESSEL_J1(gamm*R_CORE)
       E = ca*(x1/r)*BESSEL_J1(gamm*r)
@@ -942,3 +935,121 @@ subroutine get_LP11(Xp,ampl,k,gamm,beta, E,dE)
    endif
 !
 end subroutine get_LP11
+!
+!------------------------------------------------------
+! subroutine get_LP02
+!------------------------------------------------------
+subroutine get_LP02(Xp,ampl,k,gamm,beta, E,dE)
+!
+   use commonParam
+   use laserParam
+   use control, only : GEOM_TOL
+!
+   implicit none
+!
+   real*8, intent(in)  :: Xp(3)
+   real*8, intent(in)  :: ampl, k, gamm, beta
+   VTYPE , intent(out) :: E, dE(3)
+!
+   real*8 :: x1, x2, x3, r, r_x, r_y, ca, cb
+   real*8 :: BESSEL_K0, BESSEL_K1
+!
+!------------------------------------------------------
+!
+!..Cartesian coordinates
+   x1 = Xp(1); x2 = Xp(2); x3 = Xp(3)
+!
+!..radial coordinate
+   r = sqrt(x1*x1+x2*x2)
+!
+   if (r .eq. 0.d0) then
+      r_x = 1.d0
+      r_y = 1.d0
+   else
+      r_x = x1/r
+      r_y = x2/r
+   endif
+!
+   if (r .le. R_CORE) then
+      ca = ampl/BESSEL_J0(gamm*R_CORE)
+      E = ca*BESSEL_J0(gamm*r)
+      cb = -ca*gamm*BESSEL_J1(gamm*r)
+   else
+      ca = ampl/BESSEL_K0(beta*R_CORE)
+      E = ca*BESSEL_K0(beta*r)
+      cb = -ca*beta*BESSEL_K1(beta*r)
+   endif
+   dE(1) = cb*r_x*exp(-ZI*k*x3)
+   dE(2) = cb*r_y*exp(-ZI*k*x3)
+   E = E*exp(-ZI*k*x3)
+   dE(3) = -ZI*k*E
+!
+end subroutine get_LP02
+!
+!------------------------------------------------------
+! subroutine get_LP21
+!------------------------------------------------------
+subroutine get_LP21(Xp,ampl,k,gamm,beta, E,dE)
+!
+   use commonParam
+   use laserParam
+   use control, only : GEOM_TOL
+!
+   implicit none
+!
+   real*8, intent(in)  :: Xp(3)
+   real*8, intent(in)  :: ampl, k, gamm, beta
+   VTYPE , intent(out) :: E, dE(3)
+!
+   real*8 :: x1, x2, x3, r, r_x, r_y, ca, cb, cc
+   real*8 :: BESSEL_J2, BESSEL_dJ2, BESSEL_K2, BESSEL_dK2
+!
+   real*8 :: cos_t,cos_2t
+   real*8 :: sin_t,sin_2t
+!
+!------------------------------------------------------
+!
+!..Cartesian coordinates
+   x1 = Xp(1); x2 = Xp(2); x3 = Xp(3)
+!
+!..shift source away from zero
+   if (abs(x1) .lt. GEOM_TOL) then
+      x1 = x1+GEOM_TOL
+   endif
+   if (abs(x2) .lt. GEOM_TOL) then
+      x2 = x2+GEOM_TOL
+   endif
+   r = sqrt(x1*x1+x2*x2)
+!
+   cos_t  = x1/r
+   sin_t  = x2/r
+   cos_2t = cos_t**(2.d0) - sin_t**(2.d0)
+   sin_2t = 2 * sin_t * cos_t
+!
+   if (r .le. R_CORE) then
+      ca = ampl/BESSEL_J2(gamm*R_CORE)
+      E = ca*cos_2t*BESSEL_J2(gamm*r)
+      cb = ca*(cos_t*cos_2t*gamm*BESSEL_dJ2(gamm*r) + &
+               2.d0*sin_t*sin_2t*BESSEL_J2(gamm*r)/r)
+      cc = ca*(sin_t*cos_2t*gamm*BESSEL_dJ2(gamm*r) - &
+               2.d0*sin_2t*cos_t*BESSEL_J2(gamm*r)/r)
+   else
+      ca = ampl/BESSEL_K2(beta*R_CORE)
+      E = ca*cos_2t*BESSEL_K2(beta*r)
+      cb = ca*(cos_t*cos_2t*beta*BESSEL_dK2(beta*r) + &
+               2.d0*sin_t*sin_2t*BESSEL_K2(beta*r)/r)
+      cc = ca*(sin_t*cos_2t*beta*BESSEL_dK2(beta*r) - &
+      2.d0*sin_2t*cos_t*BESSEL_K2(beta*r)/r)
+   endif
+!
+   dE(1) = cb*exp(-ZI*k*x3)
+   dE(2) = cc*exp(-ZI*k*x3)
+   E = E*exp(-ZI*k*x3)
+   dE(3) = -ZI*k*E
+!
+   if (R_CLAD - r < GEOM_TOL) then
+      E = 0.d0
+      dE(1:3) = 0.d0
+   endif
+!
+end subroutine get_LP21

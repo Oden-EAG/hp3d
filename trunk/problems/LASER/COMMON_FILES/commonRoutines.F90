@@ -113,88 +113,6 @@ end subroutine propagate_flag
 !
 !
 !----------------------------------------------------------------------
-!
-!   routine name       - setAnisoRef
-!
-!----------------------------------------------------------------------
-!
-!   latest revision    - Apr 2019
-!
-!   purpose            - Refines hexa and prism elements anisotropically
-!   inputs             - ref_xyz: encoded refinement flag (mod 10)
-!
-!----------------------------------------------------------------------
-subroutine setAnisoRef(ref_xyz)
-!
-   use control
-   use data_structure3D
-   use parameters, only : ZERO,ZONE,ZIMG
-   use commonParam
-!
-   implicit none
-!
-   integer, intent(in)  :: ref_xyz
-!
-   integer :: list_elem((NRELES))
-!
-   integer :: i,ic,mdle,iel,kref,nr_elem_to_refine
-!
-   character(len=4) :: etype
-!
-!----------------------------------------------------------------------
-!
-   if ((ref_xyz .ne. IREFINE_X) .and. (ref_xyz .ne. IREFINE_XY) .and.   &
-       (ref_xyz .ne. IREFINE_Y) .and. (ref_xyz .ne. IREFINE_XZ) .and.   &
-       (ref_xyz .ne. IREFINE_Z) .and. (ref_xyz .ne. IREFINE_YZ)) then
-      write(*,*) 'setAnisoRef: invalid ref_xyz param. stop.'
-      stop
-   endif
-!
-   write(*,1010) ' NRELES before anisotropic refinement: ', NRELES
-1010 format(A,I5)
-!
-   ic=0
-   mdle=0
-   do iel=1,NRELES
-      call nelcon(mdle, mdle)
-      ic=ic+1
-      list_elem(ic) = mdle
-   enddo
-   nr_elem_to_refine = NRELES
-   if (nr_elem_to_refine.gt.0) then
-!  ...refine the elements from the list
-      do iel=1,nr_elem_to_refine
-         mdle = list_elem(iel)
-!     ...check ref flag compatibility with element type
-         etype = NODES(Mdle)%type
-         select case(etype)
-            case('mdlb')
-               kref = ref_xyz
-            case('mdlp')
-               if (ref_xyz .eq. IREFINE_Z) then
-                  kref = ref_xyz
-               else if (ref_xyz .eq. IREFINE_XY) then
-                  kref = 10
-               else
-                  write(*,*) 'setAnisoRef: incompatible ref_xyz. stop.'
-                  stop
-               endif
-            case default
-               write(*,*) 'setAnisoRef: unexpected etype. stop.'
-               stop
-      end select
-         call refine(mdle,kref)
-      enddo
-!  ...close the mesh
-      call close_mesh
-   endif
-!
-   write(*,1010) ' NRELES after  anisotropic refinement: ', NRELES
-!
-end subroutine setAnisoRef
-!
-!
-!----------------------------------------------------------------------
 !..just to display the current size of the
 !  data structure NODES (in bytes)
 !----------------------------------------------------------------------
@@ -414,10 +332,15 @@ subroutine copy_coms(No1,No2)
    if (No1.eq.No2) return
 !
 !..loop through active nodes
+!$OMP PARALLEL DO          &
+!$OMP PRIVATE(nf,nt,nn2,i) &
+!$OMP SCHEDULE(DYNAMIC)
    do nod=1,NRNODS
       if (Is_inactive(nod)) cycle
+      if (.not. associated(NODES(nod)%dof)) cycle
 !
 !  ...H1 dof
+      if (.not. associated(NODES(nod)%dof%zdofH)) goto 10
       nf = (No1-1)*NRHVAR
       nt = (No2-1)*NRHVAR
       nn2 = ubound(NODES(nod)%dof%zdofH,2)
@@ -426,8 +349,10 @@ subroutine copy_coms(No1,No2)
             NODES(nod)%dof%zdofH(nt+i,1:nn2) = NODES(nod)%dof%zdofH(nf+i,1:nn2)
          enddo
       endif
+  10  continue
 !
 !  ...H(curl) dof
+      if (.not. associated(NODES(nod)%dof%zdofE)) goto 20
       nf = (No1-1)*NREVAR
       nt = (No2-1)*NREVAR
       nn2 = ubound(NODES(nod)%dof%zdofE,2)
@@ -436,8 +361,10 @@ subroutine copy_coms(No1,No2)
             NODES(nod)%dof%zdofE(nt+i,1:nn2) = NODES(nod)%dof%zdofE(nf+i,1:nn2)
          enddo
       endif
+  20  continue
 !
 !  ...H(div) dof
+      if (.not. associated(NODES(nod)%dof%zdofV)) goto 30
       nf = (No1-1)*NRVVAR
       nt = (No2-1)*NRVVAR
       nn2 = ubound(NODES(nod)%dof%zdofV,2)
@@ -446,8 +373,10 @@ subroutine copy_coms(No1,No2)
             NODES(nod)%dof%zdofV(nt+i,1:nn2) = NODES(nod)%dof%zdofV(nf+i,1:nn2)
          enddo
       endif
+  30  continue
 !
 !  ...L2 dof
+      if (.not. associated(NODES(nod)%dof%zdofQ)) goto 40
       nf = (No1-1)*NRQVAR
       nt = (No2-1)*NRQVAR
       nn2 = ubound(NODES(nod)%dof%zdofQ,2)
@@ -456,8 +385,12 @@ subroutine copy_coms(No1,No2)
             NODES(nod)%dof%zdofQ(nt+i,1:nn2) = NODES(nod)%dof%zdofQ(nf+i,1:nn2)
          enddo
       endif
+  40  continue
 !
 !..end of loop through nodes
    enddo
+!$OMP END PARALLEL DO
 !
 end subroutine copy_coms
+!
+!

@@ -19,6 +19,13 @@ module laserParam
 !..toggle heat flag, nonlinear problem, co/counter pumping, line search scaling
    integer :: HEAT_FLAG, ANISO_HEAT, NONLINEAR_FLAG, COPUMP
 !
+!..HEAT FLAG = 0
+!  ...NONLINEAR_FLAG = 0, Linear Maxwell
+!  ...               = 1, Nonlinear Maxwell (gain)
+!..HEAT_FLAG = 1
+!  ...NONLINEAR_FLAG = 0, Linear Heat
+!  ...               = 1, Coupled Heat/Maxwell
+!
 !..number of heat steps, step size, and max time
    integer :: NSTEPS
    real*8  :: DELTA_T, T_MAX
@@ -85,6 +92,9 @@ module laserParam
    real*8  :: CORE_NX, CORE_NY, CORE_NZ
    real*8  :: CLAD_NX, CLAD_NY, CLAD_NZ
    real*8  :: CORE_N(3,3), CLAD_N(3,3)
+!
+!..induce artificial index grating (see bgpol routine)
+   integer :: ART_GRATING = 0
 !
 !..Signal and Pump wavelengths [m]
    real*8, parameter :: LAMBDA_SIGNAL = 1064.0d-9 / L_0

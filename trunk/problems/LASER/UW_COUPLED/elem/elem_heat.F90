@@ -91,20 +91,20 @@ subroutine elem_heat(Mdle,                   &
    real*8, dimension(3,MAXbrickH) :: xnod
 !
 !..solution dof (work space for solelm)
-   VTYPE, dimension(MAXEQNH,MAXbrickH) :: zdofH
-   VTYPE, dimension(MAXEQNE,MAXbrickE) :: zdofE
-   VTYPE, dimension(MAXEQNV,MAXbrickV) :: zdofV
-   VTYPE, dimension(MAXEQNQ,MAXbrickQ) :: zdofQ
+   complex(8), dimension(MAXEQNH,MAXbrickH) :: zdofH
+   complex(8), dimension(MAXEQNE,MAXbrickE) :: zdofE
+   complex(8), dimension(MAXEQNV,MAXbrickV) :: zdofV
+   complex(8), dimension(MAXEQNQ,MAXbrickQ) :: zdofQ
 !
 !..approximate solution -- using soleval
    integer :: nflag
-   VTYPE, dimension(  MAXEQNH  ) ::  zsolH_soleval
-   VTYPE, dimension(  MAXEQNH,3) :: zdsolH_soleval
-   VTYPE, dimension(3,MAXEQNE  ) ::  zsolE_soleval
-   VTYPE, dimension(3,MAXEQNE  ) :: zcurlE_soleval
-   VTYPE, dimension(3,MAXEQNV  ) ::  zsolV_soleval
-   VTYPE, dimension(  MAXEQNV  ) ::  zdivV_soleval
-   VTYPE, dimension(  MAXEQNQ  ) ::  zsolQ_soleval
+   complex(8), dimension(  MAXEQNH  ) ::  zsolH_soleval
+   complex(8), dimension(  MAXEQNH,3) :: zdsolH_soleval
+   complex(8), dimension(3,MAXEQNE  ) ::  zsolE_soleval
+   complex(8), dimension(3,MAXEQNE  ) :: zcurlE_soleval
+   complex(8), dimension(3,MAXEQNV  ) ::  zsolV_soleval
+   complex(8), dimension(  MAXEQNV  ) ::  zdivV_soleval
+   complex(8), dimension(  MAXEQNQ  ) ::  zsolQ_soleval
    real*8 :: rsolH
 !
 !..variables for geometry
@@ -129,22 +129,24 @@ subroutine elem_heat(Mdle,                   &
    real*8 :: bload_H(NrTest)
 !
 !..gram matrix in packed format
-   real*8 :: gramP(NrTest*(NrTest+1)/2)
-   !complex*16, allocatable :: gramEigen(:)
+   !real*8 :: gramP(NrTest*(NrTest+1)/2)
+   real(8), allocatable :: gramP(:)
+   !complex(8), allocatable :: gramEigen(:)
 !
 !..stiffness matrices for the enriched test space
-   real*8 :: stiff_HH (NrTest   ,NrdofH)
-   real*8 :: stiff_HV (NrTest   ,NrdofVi)
-   real*8 :: stiff_ALL(NrTest   ,NrTrial+1)
-   real*8 :: raloc    (NrTrial+1,NrTrial+1)
+!   real*8 :: stiff_HH (NrTest   ,NrdofH)
+!   real*8 :: stiff_HV (NrTest   ,NrdofVi)
+!   real*8 :: stiff_ALL(NrTest   ,NrTrial+1)
+!   real*8 :: raloc    (NrTrial+1,NrTrial+1)
+   real(8), allocatable :: stiff_HH(:,:),stiff_HV(:,:),stiff_ALL(:,:),raloc(:,:)
 !
 !..3D quadrature data
    real*8, dimension(3,MAXNINT3ADD)  :: xiloc
-   real*8, dimension(MAXNINT3ADD)    :: waloc
+   real*8, dimension(  MAXNINT3ADD)  :: waloc
 !
 !..2D quadrature data
    real*8, dimension(2,MAXNINT2ADD)  :: tloc
-   real*8, dimension(MAXNINT2ADD)    :: wtloc
+   real*8, dimension(  MAXNINT2ADD)  :: wtloc
 !
 !..derivatives wrt physical coordinates, flux
    real*8, dimension(3) :: dv1,dv2,vec
@@ -152,7 +154,7 @@ subroutine elem_heat(Mdle,                   &
 !..for debug printing
    !real*8, dimension(10) :: raux
 !
-   VTYPE, dimension(3) :: zvoid
+   complex(8), dimension(3) :: zvoid
 !
 !..number of vertices,edge,faces per element type
    integer :: nrv,nre,nrf
@@ -162,7 +164,7 @@ subroutine elem_heat(Mdle,                   &
    integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,j,nint,iflag,kE,k
    integer :: nordP,nrdof,l,nsign,ifc,info,ndom
    real*8  :: rfval,therm_Load
-   VTYPE   :: zfval
+   complex(8) :: zfval
 !
 !..for lapack eigensolve
    ! complex*16, allocatable :: Z(:,:), WORK(:)
@@ -191,6 +193,11 @@ subroutine elem_heat(Mdle,                   &
       write(*,*) 'elem_heat: Mdle = ', Mdle
    endif
 #endif
+!
+!..allocate auxiliary matrices
+   allocate(gramP(NrTest*(NrTest+1)/2))
+   allocate(stiff_HH (NrTest   ,NrdofH))
+   allocate(stiff_HV (NrTest   ,NrdofVi))
 !
 !..element type
    etype = NODES(Mdle)%type
@@ -259,7 +266,6 @@ subroutine elem_heat(Mdle,                   &
    gramP     = rZERO
    stiff_HH  = rZERO
    stiff_HV  = rZERO
-   stiff_ALL = rZERO
 !
 !---------------------------------------------------------------------
 !              E L E M E N T    I N T E G R A L S                    |
@@ -267,7 +273,7 @@ subroutine elem_heat(Mdle,                   &
 !
 !..use the enriched order to set the quadrature
    INTEGRATION = NORD_ADD
-   call set_3D_int_DPG(etype,norder, nint,xiloc,waloc)
+   call set_3D_int_DPG(etype,norder,norient_face, nint,xiloc,waloc)
    INTEGRATION = 0
 !
 !..loop over integration points
@@ -306,7 +312,11 @@ subroutine elem_heat(Mdle,                   &
 !
 !  ...coupled Maxwell/Heat problem
       therm_Load = rZero
-      if(HEAT_FLAG.eq.1) then
+      if(NONLINEAR_FLAG .eq. 1) then
+         if (GEOM_NO .ne. 5) then
+            write(*,*) 'elem_heat: HEAT coupling GEOM_NO .ne. 5'
+            stop
+         endif
 !     ...heat deposition in fiber core only
          if (ndom .eq. 1 .or. ndom .eq.  2) then
 !        ...compute the H1 solution load at the point
@@ -447,7 +457,7 @@ subroutine elem_heat(Mdle,                   &
 !
 !  ...set 2D quadrature
       INTEGRATION = NORD_ADD
-      call set_2D_int_DPG(ftype,norderf, nint,tloc,wtloc)
+      call set_2D_int_DPG(ftype,norderf,norient_face(ifc), nint,tloc,wtloc)
       INTEGRATION = 0
 !
 !  ...loop through integration points
@@ -551,12 +561,16 @@ subroutine elem_heat(Mdle,                   &
 !  Construction of DPG system
 !---------------------------------------------------------------------
 !
+   allocate(stiff_ALL(NrTest,NrTrial+1))
+!
 !..Total test/trial DOFs of the element
    i1 = NrTest ; j1 = NrdofH ; j2 = NrdofVi
 !
    stiff_ALL(1:i1,1:j1)       = stiff_HH(1:i1,1:j1)
    stiff_ALL(1:i1,j1+1:j1+j2) = stiff_HV(1:i1,1:j2)
    stiff_ALL(1:i1,j1+j2+1)    = bload_H(1:i1)
+!
+   deallocate(stiff_HH,stiff_HV)
 !
 !..A. Compute Cholesky factorization of Gram Matrix, G=U^T U (=LL^T)
    call DPPTRF('U',NrTest,gramP,info)
@@ -572,8 +586,12 @@ subroutine elem_heat(Mdle,                   &
       stop
    endif
 !
+   allocate(raloc(NrTrial+1,NrTrial+1)); raloc = rZERO
+!
 !..C. Matrix multiply: B^T G^-1 B (=B~^T B~)
    call DSYRK('U','T',NrTrial+1,NrTest,rONE,stiff_ALL,NrTest,rZERO,raloc,NrTrial+1)
+!
+   deallocate(stiff_ALL)
 !
 !..D. Fill lower triangular part of Hermitian matrix
    do i=1,NrTrial
@@ -590,6 +608,7 @@ subroutine elem_heat(Mdle,                   &
    ZalocVH(1:j2,1:j1) = raloc(j1+1:j1+j2,1:j1)
    ZalocVV(1:j2,1:j2) = raloc(j1+1:j1+j2,j1+1:j1+j2)
 !
+   deallocate(raloc)
 !
 end subroutine elem_heat
 

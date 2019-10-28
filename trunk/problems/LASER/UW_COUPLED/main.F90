@@ -121,6 +121,7 @@ program main
       write(*,9020) ' Active gain              = ', ACTIVE_GAIN
    endif
    write(*,9030) ' Polynomial order (x,y,z) = ', ORDER_APPROX_X,ORDER_APPROX_Y,ORDER_APPROX_Z
+   write(*,9010) ' ISOL                     = ', ISOL
    write(*,9010) ' NEXACT                   = ', NEXACT
    write(*,9010) ' FAST INTEGRATION         = ', FAST_INT
    if (HEAT_FLAG .eq. 1) then
@@ -135,14 +136,6 @@ program main
  9010 format(A,I3)
  9020 format(A,ES10.2)
  9030 format(A,' (',I1,',',I1,',',I1,') ')
-!
-!..check if HEAT_FLAG and NONLINEAR_FLAG are compatible:
-   if((HEAT_FLAG.eq.1).and.(NONLINEAR_FLAG.ne.1)) then
-      write(*,*) 'error from main: ', &
-         'NONLINEAR_FLAG must be 1 when running HEAT_FLAG=1. stop.'
-      stop
-   endif
-   write(*,*)
 !
 !$OMP parallel
 !$OMP single
@@ -192,7 +185,19 @@ program main
    PHYSAm(1:6) = (/.false.,.true.,.false.,.false.,.true.,.false./)
 !
    if (JOB .ne. 0) then
-      call exec_job
+      if (NONLINEAR_FLAG .eq. 0) then
+         if (HEAT_FLAG .eq. 0) then
+            call exec_job           ! Linear Maxwell
+         else
+            call exec_job_heat      ! Linear Heat
+         endif
+      else
+         if (HEAT_FLAG .eq. 0) then
+            call exec_job_nl        ! Nonlinear gain fiber
+         else
+            call exec_job_coupled   ! Coupled Heat/Maxwell
+         endif
+      endif
    else
       if (RANK .eq. 0) then
          call master_main
@@ -263,6 +268,9 @@ subroutine master_main()
       write(*,*) 'SELECT'
       write(*,*) 'QUIT....................................0'
       write(*,*) '                                         '
+      write(*,*) '         ----    I/O    ----             '
+      write(*,*) 'Paraview ...............................3'
+      write(*,*) '                                         '
       write(*,*) '    ---- Print Data Structure ----       '
       write(*,*) 'Print arrays (interactive).............10'
       write(*,*) 'Print data structure arrays............11'
@@ -283,10 +291,11 @@ subroutine master_main()
       write(*,*) 'Run verification routines..............35'
       write(*,*) '                                         '
       write(*,*) '          ---- Solvers ----              '
-      write(*,*) 'MUMPS (MPI)............................40'
-      write(*,*) 'MUMPS (OpenMP).........................41'
-      write(*,*) 'Pardiso (OpenMP).......................42'
-      write(*,*) 'Frontal (Seq)..........................43'
+      write(*,*) 'MUMPS (MPI, Nested)....................40'
+      write(*,*) 'MUMPS (MPI)............................41'
+      write(*,*) 'MUMPS (OpenMP).........................42'
+      write(*,*) 'Pardiso (OpenMP).......................43'
+      write(*,*) 'Frontal (Seq)..........................44'
       write(*,*) '                                         '
       write(*,*) '     ---- Error and Residual ----        '
       write(*,*) 'Compute exact error....................50'
@@ -307,12 +316,19 @@ subroutine master_main()
 !     ...QUIT
          case(0) ; goto 89
 !
+!     ...Paraview
+         case(3)
+            call exec_case(idec)
+!
 !     ...Print data structure
          case(10,11)
-            write(*,*) 'Select processor RANK: '
-            read (*,*) r
-            count = 1; src = ROOT
-            call MPI_BCAST (r,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+            r = ROOT
+            if (NUM_PROCS > 1) then
+               write(*,*) 'Select processor RANK: '
+               read (*,*) r
+               count = 1; src = ROOT
+               call MPI_BCAST (r,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+            endif
             if (r .eq. RANK) then
                call exec_case(idec)
             endif
@@ -348,7 +364,7 @@ subroutine master_main()
             call exec_case(idec)
 !
 !     ...Solvers
-         case(40,41,42,43)
+         case(40,41,42,43,44)
             call exec_case(idec)
 !
 !     ...Error and Residual
@@ -429,6 +445,10 @@ subroutine worker_main()
 !     ...QUIT
          case(0) ; goto 99
 !
+!     ...Paraview
+         case(3)
+            call exec_case(idec)
+!
 !     ...Print data structure
          case(10,11)
             count = 1; src = ROOT
@@ -457,7 +477,7 @@ subroutine worker_main()
             call exec_case(idec)
 !
 !     ...Solvers
-         case(40,41,42,43)
+         case(40,41,42,43,44)
             call exec_case(idec)
 !
 !     ...Error and Residual
