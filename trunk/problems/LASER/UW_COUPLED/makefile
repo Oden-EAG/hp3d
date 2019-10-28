@@ -80,12 +80,8 @@ clean :
 	@rm -f *.mod
 	@rm -f *genmod.f90
 
-clean-ritz :
-	@rm -f ../outputs/ritz/paraview/*
-	@rm -f ../outputs/ritz/power/*
-	@rm -f ../outputs/ritz/temp/*
+clean-pv :
+	@rm -f ../outputs/paraview/*
+	@rm -f ../outputs/power/*
+	@rm -f ../output/temp/*
 
-clean-typhoon :
-	@rm -f ../outputs/typhoon/paraview/*
-	@rm -f ../outputs/typhoon/power/*
-	@rm -f ../outputs/typhoon/temp/*

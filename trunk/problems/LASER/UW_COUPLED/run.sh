@@ -1,7 +1,7 @@
 #
 # Script to run the laser code
 #
-# last modified: Apr 2019
+# last modified: Oct 2019
 #
 # =======================
 # I N S T R U C T I O N S
@@ -32,8 +32,13 @@ nproc=1
 nthreads=48
 #
 # set polynomial order p in (xy,z)
-#px=5; py=5; pz=5
- px=6; py=6; pz=6
+#px=2; py=2; pz=2
+#px=3; py=3; pz=3
+#px=4; py=4; pz=4
+px=5; py=5; pz=5
+#px=6; py=6; pz=6
+#px=7; py=7; pz=7
+#px=8; py=8; pz=8
 # set enriched order (p+dp)
 dp=1
 # set length of waveguide
@@ -41,17 +46,20 @@ zl=1.0d0
 # set length of PML
 usepml=1
 
-#
+# EXEC JOB options
 job=0
-imax=5
+imax=4
+jmax=0
+
+# max NODES
 maxnods=105000
 
 #export KMP_STACKSIZE=24M   # p=3
 #export KMP_STACKSIZE=32M   # p=4
-#export KMP_STACKSIZE=48M   # p=5
+export KMP_STACKSIZE=48M   # p=5
 #export KMP_STACKSIZE=64M   # p=6
 #export KMP_STACKSIZE=80M   # p=7
- export KMP_STACKSIZE=96M   # p=8
+#export KMP_STACKSIZE=96M   # p=8
 
 #
 # set BC flag (0 dirichlet, 3 impedance)
@@ -63,14 +71,16 @@ heat=0
 #
 # set anisotropic heat operator
 aniso_heat=1
+# set anisotropic refractive index (CORE_NX,CORE_NY,CORE_NZ)
 aniso_ref_index=0
-#
+# set artificial refractive index grating
+art_grating=0
 # set gain for nonlinear case
 gain=1.0d4
 raman=0.d0
 #
 # set number and size of steps
-nsteps=200
+nsteps=10
 dt=0.1d0
 #
 # ==================
@@ -80,25 +90,32 @@ dt=0.1d0
 # NEW RUN CONFIGS (MPI+OpenMP CODE)
 
 # ============================================================================================
-# A. TESTING (CONVERGENCE RATES ON A CUBE) -- use NEXACT=1
-#ibrun -n ${nproc} ./uwLaser -geom 1 -isol 2 -omega 1.0d0 -comp 1 -job ${job} -maxnods ${maxnods} -imax ${imax} -px ${px} -py ${py} -pz ${pz} -dp ${dp} -ibc ${ibc} -npx 3 -npy 3 -npz 3 -usepml 0 -nlflag 0 -heat 0 -aniso_heat ${aniso_heat} -copump 1 -zl ${zl} -nthreads ${nthreads} -dir_output ${dir_output} -file_geometry ${file_geometry}
-#ibrun -n ${nproc} xterm -hold -e ./uwLaser -geom 1 -isol 2 -omega 1.0d0 -comp 1 -job ${job} -imax ${imax} -px ${px} -py ${py} -pz ${pz} -dp ${dp} -ibc ${ibc} -npx 3 -npy 3 -npz 3 -usepml 0 -nlflag 0 -heat 0 -aniso_heat ${aniso_heat} -copump 1 -zl ${zl} -nthreads ${nthreads} -dir_output ${dir_output} -file_geometry ${file_geometry}
+# A. TESTING (CONVERGENCE RATES ON A CUBE/PRISM) -- use NEXACT=1
+file_geometry='../GEOMETRIES/cubes/cube'
+#file_geometry='../GEOMETRIES/prisms/prism_curv1'
+ctrl='../COMMON_FILES/control_1'
+#ibrun -n ${nproc}
+#./uwLaserY -geom 1 -isol 1 -omega 1.0d0 -comp 1 -file_control ${ctrl} -job ${job} -maxnods ${maxnods} -imax ${imax} jmax ${jmax} -px ${px} -py ${py} -pz ${pz} -dp ${dp} -ibc ${ibc} -npx 4 -npy 4 -npz 4 -usepml 0 -nlflag 0 -heat ${heat} -aniso_heat ${aniso_heat} -copump 1 -zl ${zl} -nthreads ${nthreads} -dir_output ${dir_output} -vis_level ${vis_level} -file_geometry ${file_geometry}
+#ibrun -n ${nproc} xterm -hold -e ./uwLaser -geom 1 -isol 2 -omega 1.0d0 -comp 1 -job ${job} -imax ${imax} -jmax ${jmax} -px ${px} -py ${py} -pz ${pz} -dp ${dp} -ibc ${ibc} -npx 3 -npy 3 -npz 3 -usepml 0 -nlflag 0 -heat 0 -aniso_heat ${aniso_heat} -copump 1 -zl ${zl} -nthreads ${nthreads} -dir_output ${dir_output} -vis_level ${vis_level} -file_geometry ${file_geometry}
 
 # ============================================================================================
 # B. FULL FIBER (non-)linear solve of Maxwell (with heat/gain) (signal+pump fields) -- use NEXACT=0
 
 # set fiber length, length of PML, #refs, maxnodes
 #  1_2 (16 wavelengths), 5 refs (16*  32 elems), 6250 nodes
-zl=1.2d0; pmlfrac=0.25d0; imax=5; maxnods=6250
-file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_1_2'
+#zl=1.2d0; pmlfrac=0.25d0; imax=5; maxnods=6250
+#file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_1_2'
+#gain=4.0d4
 
 #  2_4 (32 wavelengths), 6 refs (16*  64 elems), 12500 nodes
-#zl=2.4d0; pmlfrac=0.125d0; imax=6; maxnods=12500
-#file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_2_4'
+zl=2.4d0; pmlfrac=0.125d0; imax=6; maxnods=12500
+file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_2_4'
+#gain=2.0d4
 
 #  4_8 (64 wavelengths), 7 refs (16*  128 elems), 25000 nodes
 #zl=4.8d0; pmlfrac=0.0625d0; imax=7; maxnods=25000
 #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_4_8'
+#gain=1.0d4
 
 #  9_6 (128 wavelengths), 8 refs (16*  256 elems), 51000 nodes
 #zl=9.6d0; pmlfrac=0.03125d0; imax=8; maxnods=51000
@@ -112,11 +129,13 @@ file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_1_2'
 #zl=38.4d0; pmlfrac=8.0d-3; imax=10; maxnods=201000
 #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_38_4'
 
+maxnods=505000
+
 # omega=59.05249348852994809140307d0
 #-omega ${omega}
 gamma=1.0d0
 ctrl='../COMMON_FILES/control_0'
-ibrun -n ${nproc} ./uwLaser -geom 5 -isol 13 -comp 1  -gamma ${gamma} -file_control ${ctrl} -job ${job} -maxnods ${maxnods} -imax ${imax} -px ${px} -py ${py} -pz ${pz} -dp ${dp} -usepml ${usepml} -pmlfrac ${pmlfrac} -nlflag ${nlflag} -gain ${gain} -raman ${raman} -heat ${heat} -aniso_heat ${aniso_heat} -aniso_ref_index ${aniso_ref_index} -nsteps ${nsteps} -dt ${dt} -copump 1 -zl ${zl} -nthreads ${nthreads} -dir_output ${dir_output} -file_geometry ${file_geometry}
+ibrun -n ${nproc} ./uwLaser -geom 5 -isol 17 -comp 1 -gamma ${gamma} -file_control ${ctrl} -job ${job} -maxnods ${maxnods} -imax ${imax} -jmax ${jmax} -px ${px} -py ${py} -pz ${pz} -dp ${dp} -usepml ${usepml} -pmlfrac ${pmlfrac} -nlflag ${nlflag} -gain ${gain} -raman ${raman} -heat ${heat} -aniso_heat ${aniso_heat} -aniso_ref_index ${aniso_ref_index} -art_grating ${art_grating} -nsteps ${nsteps} -dt ${dt} -copump 1 -zl ${zl} -nthreads ${nthreads} -dir_output ${dir_output} -vis_level ${vis_level} -file_geometry ${file_geometry}
 
 # ============================================================================================
 # C. Rectangular waveguide for linear Maxwell (e.g., pollution study)
@@ -172,7 +191,7 @@ ibrun -n ${nproc} ./uwLaser -geom 5 -isol 13 -comp 1  -gamma ${gamma} -file_cont
 # 1024 wavelengths (256.00 waves/unit length)
 #imax=13; maxnods=256050 ; omega=1608.498506596624078797d0
 
-#ibrun -n ${nproc} ./uwLaser -geom 1 -isol 5 -omega ${omega} -comp 2 -job ${job} -maxnods ${maxnods} -imax ${imax} -px ${px} -py ${py} -pz ${pz} -dp ${dp} -ibc ${ibc} -usepml ${usepml} -nlflag 0 -heat 0 -aniso_heat ${aniso_heat} -copump 1 -zl ${zl} -nthreads ${nthreads} -dir_output ${dir_output} -vis_level ${vis_level} -file_geometry ${file_geometry}
+#ibrun -n ${nproc} ./uwLaser -geom 1 -isol 5 -omega ${omega} -comp 2 -job ${job} -maxnods ${maxnods} -imax ${imax} -jmax ${jmax} -px ${px} -py ${py} -pz ${pz} -dp ${dp} -ibc ${ibc} -usepml ${usepml} -nlflag 0 -heat 0 -aniso_heat ${aniso_heat} -copump 1 -zl ${zl} -nthreads ${nthreads} -dir_output ${dir_output} -vis_level ${vis_level} -file_geometry ${file_geometry}
 
 # ============================================================================================
 # ============================================================================================

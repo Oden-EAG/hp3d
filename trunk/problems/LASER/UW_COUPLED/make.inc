@@ -28,10 +28,15 @@ SRC_FILE    = \
         exact.F90 \
         exec_case.F90 \
         exec_job.F90 \
+        exec_job_heat.F90 \
+        exec_job_nl.F90 \
+        exec_job_coupled.F90 \
         fake.F90 \
         getf.F90 \
         finalize.F90 \
         initialize.F90 \
         main.F90 \
+        main_aux.F90 \
+        my_paraview_driver.F90 \
         set_initial_mesh.F90 \
         soldis.F90

@@ -80,7 +80,7 @@ subroutine soldis(Mdle,Xi,X,Rn,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ, Val)
           case(0)
             call cross_product(rn,ZvalE(1:3,3), rntimesE)
             Val = dreal(rntimesE(1))
-          endselect
+          end select
           !  .....exact (tangential) trace
         case(3)
           select case(ICHOOSE_SIGPUMP)
@@ -90,7 +90,7 @@ subroutine soldis(Mdle,Xi,X,Rn,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ, Val)
           case(0)
             call cross_product(rn,ZvalE(1:3,3), rntimesE)
             Val = dreal(rntimesE(2))
-          endselect
+          end select
           !  .....exact (tangential) trace
         case(4)
           select case(ICHOOSE_SIGPUMP)
@@ -100,7 +100,7 @@ subroutine soldis(Mdle,Xi,X,Rn,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ, Val)
           case(0)
             call cross_product(rn,ZvalE(1:3,3), rntimesE)
             Val = dreal(rntimesE(3))
-          endselect
+          end select
 
 !  .....exact (tangential) trace
         case(5)
@@ -111,7 +111,7 @@ subroutine soldis(Mdle,Xi,X,Rn,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ, Val)
           case(0)
             call cross_product(rn,ZvalE(1:3,4), rntimesE)
             Val = dreal(rntimesE(1))
-          endselect
+          end select
           !  .....exact (tangential) trace
         case(6)
           select case(ICHOOSE_SIGPUMP)
@@ -121,7 +121,7 @@ subroutine soldis(Mdle,Xi,X,Rn,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ, Val)
           case(0)
             call cross_product(rn,ZvalE(1:3,4), rntimesE)
             Val = dreal(rntimesE(2))
-          endselect
+          end select
           !  .....exact (tangential) trace
         case(7)
           select case(ICHOOSE_SIGPUMP)
@@ -131,7 +131,7 @@ subroutine soldis(Mdle,Xi,X,Rn,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ, Val)
           case(0)
             call cross_product(rn,ZvalE(1:3,4), rntimesE)
             Val = dreal(rntimesE(3))
-          endselect
+          end select
 
 !  .....exact (normal) flux
         case(8)
@@ -144,21 +144,21 @@ subroutine soldis(Mdle,Xi,X,Rn,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ, Val)
             Val = dreal(zvalQ(1))
           case(0)
             Val = dreal(zvalQ(7))
-          endselect
+          end select
         case(10)
           select case(ICHOOSE_SIGPUMP)
           case(1)
             Val = dreal(zvalQ(2))
           case(0)
             Val = dreal(zvalQ(8))
-          endselect
+          end select
         case(11)
           select case(ICHOOSE_SIGPUMP)
           case(1)
             Val = dreal(zvalQ(3))
           case(0)
             Val = dreal(zvalQ(9))
-          endselect
+          end select
 
 !  .....exact H Field
         case(12)
@@ -167,21 +167,21 @@ subroutine soldis(Mdle,Xi,X,Rn,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ, Val)
             Val = dreal(zvalQ(4))
           case(0)
             Val = dreal(zvalQ(10))
-          endselect
+          end select
         case(13)
           select case(ICHOOSE_SIGPUMP)
           case(1)
             Val = dreal(zvalQ(5))
           case(0)
             Val = dreal(zvalQ(11))
-          endselect
+          end select
         case(14)
           select case(ICHOOSE_SIGPUMP)
           case(1)
             Val = dreal(zvalQ(6))
           case(0)
-            Val = dreal(zvalQ(112))
-          endselect
+            Val = dreal(zvalQ(12))
+          end select
         end select
 !
       case(0)
@@ -199,7 +199,7 @@ subroutine soldis(Mdle,Xi,X,Rn,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ, Val)
           case(0)
             call cross_product(rn,ZsolE(1:3,3), rntimesE)
             Val = dreal(rntimesE(1))
-          endselect
+          end select
           !  .....exact (tangential) trace
         case(3)
           select case(ICHOOSE_SIGPUMP)
@@ -209,7 +209,7 @@ subroutine soldis(Mdle,Xi,X,Rn,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ, Val)
           case(0)
             call cross_product(rn,ZsolE(1:3,3), rntimesE)
             Val = dreal(rntimesE(2))
-          endselect
+          end select
           !  .....exact (tangential) trace
         case(4)
           select case(ICHOOSE_SIGPUMP)
@@ -219,7 +219,7 @@ subroutine soldis(Mdle,Xi,X,Rn,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ, Val)
           case(0)
             call cross_product(rn,ZsolE(1:3,3), rntimesE)
             Val = dreal(rntimesE(3))
-          endselect
+          end select
 
 !  .....approximate (tangential) trace
         case(5)
@@ -230,7 +230,7 @@ subroutine soldis(Mdle,Xi,X,Rn,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ, Val)
           case(0)
             call cross_product(rn,ZsolE(1:3,4), rntimesE)
             Val = dreal(rntimesE(1))
-          endselect
+          end select
           !  .....exact (tangential) trace
         case(6)
           select case(ICHOOSE_SIGPUMP)
@@ -240,7 +240,7 @@ subroutine soldis(Mdle,Xi,X,Rn,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ, Val)
           case(0)
             call cross_product(rn,ZsolE(1:3,4), rntimesE)
             Val = dreal(rntimesE(2))
-          endselect
+          end select
           !  .....exact (tangential) trace
         case(7)
           select case(ICHOOSE_SIGPUMP)
@@ -250,7 +250,7 @@ subroutine soldis(Mdle,Xi,X,Rn,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ, Val)
           case(0)
             call cross_product(rn,ZsolE(1:3,4), rntimesE)
             Val = dreal(rntimesE(3))
-          endselect
+          end select
 !  .....approximate (normal) flux
         case(8)
           Val = ZsolV(1,1)*Rn(1) + ZsolV(2,1)*Rn(2) + ZsolV(3,1)*Rn(3)
@@ -261,21 +261,21 @@ subroutine soldis(Mdle,Xi,X,Rn,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ, Val)
             Val = dreal(zsolQ(1))
           case(0)
             Val = dreal(zsolQ(7))
-          endselect
+          end select
         case(10)
           select case(ICHOOSE_SIGPUMP)
           case(1)
             Val = dreal(zsolQ(2))
           case(0)
             Val = dreal(zsolQ(8))
-          endselect
+          end select
         case(11)
           select case(ICHOOSE_SIGPUMP)
           case(1)
             Val = dreal(zsolQ(3))
           case(0)
             Val = dreal(zsolQ(9))
-          endselect
+          end select
 !  .....approximate H Field
         case(12)
           select case(ICHOOSE_SIGPUMP)
@@ -283,21 +283,21 @@ subroutine soldis(Mdle,Xi,X,Rn,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ, Val)
             Val = dreal(zsolQ(4))
           case(0)
             Val = dreal(zsolQ(10))
-          endselect
+          end select
         case(13)
           select case(ICHOOSE_SIGPUMP)
           case(1)
             Val = dreal(zsolQ(5))
           case(0)
             Val = dreal(zsolQ(11))
-          endselect
+          end select
         case(14)
           select case(ICHOOSE_SIGPUMP)
           case(1)
             Val = dreal(zsolQ(6))
           case(0)
             Val = dreal(zsolQ(12))
-          endselect
+          end select
         end select
       end select
       if (iprint.eq.1) then
