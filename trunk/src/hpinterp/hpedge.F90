@@ -76,7 +76,7 @@
 ! misc work space
   integer :: iprint,nrv,nre,nrf,i,j,k,ie,kj,ki,&
              ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_Edge,iflag1
-!      
+!
 !----------------------------------------------------------------------
 !     
 ! debug printing flag
