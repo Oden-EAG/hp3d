@@ -4,7 +4,7 @@
 !
 !---------------------------------------------------------------------
 !
-!   latest revision    - May 10
+!   latest revision    - Oct 2019
 !
 !   purpose            - routine generates a new node
 !
@@ -28,6 +28,7 @@
 subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
 !
    use data_structure3D
+   use mpi_param, only: RANK,ROOT
 !
    implicit none
 !
@@ -57,15 +58,14 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
 !
    call decod(Icase,2,NR_PHYSA, ncase)
 !
+   if ((NPNODS.eq.0) .or. (NPNODS.gt.MAXNODS)) then
+      if (RANK .eq. ROOT) then
+         write(*,*) 'nodgen: increasing size of NODES array.'
+      endif
+      call increase_MAXNODS
+   endif
 !..pointer to the first free entry in NODES array
    Nod=NPNODS
-!
-   if ( (Nod.eq.0) .or. (Nod.gt.MAXNODS) ) then
-      write(*,7002)Nod,NRNODS,MAXNODS
-7002  format(' nodgen: Nod,NRNODS,MAXNODS = ',3(i8,2x))
-      write(*,*)'NO ROOM FOR A NEW NODE!!!'
-      stop
-   endif
 !
 !..update
    NRNODS=NRNODS+1
