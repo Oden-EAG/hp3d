@@ -42,14 +42,15 @@ subroutine break(Mdle,Kref)
 !
 #if DEBUG_MODE
    if (iprint.eq.2) then
-      call elem_show(Mdle, type, nodesl, norientl)
- 7000 format('break: Mdle = ',i6)
+      call elem_show(Mdle,type,nodesl,norientl)
+ 7000 format('break: Mdle = ',i7)
       write(*,7011) Kref
- 7011 format('       Kref = ',i2)
+ 7011 format('       Kref  = ',i3)
       write(*,7012) kreff(1:nface(type))
  7012 format('       kreff = ',6i3)
       write(*,7013) krefe(1:nedge(type))
  7013 format('       krefe = ',12i2)
+      call pause
    endif
 #endif
 !
@@ -60,6 +61,7 @@ subroutine break(Mdle,Kref)
 !..loop over edges and generate INACTIVE son nodes
    do i=1,nedge(type)
       nod=nodesl(nvert(type)+i)
+      if (iprint .eq. 2) write(*,*) 'edge nod = ', nod
 !  ...check if edge is unrefined and needs to be refined
       if ((krefe(i).ne.0) .and. (is_leaf(nod))) then
 !     ...break edge
@@ -76,6 +78,7 @@ subroutine break(Mdle,Kref)
    do i=1,nface(type)
       iface=nvert(type)+nedge(type)+i
       nod=nodesl(iface)
+      if (iprint .eq. 2) write(*,*) 'face nod = ', nod
 !
 !  ...face should be refined
       if (kreff(i).ne.0) then
@@ -153,9 +156,9 @@ subroutine break(Mdle,Kref)
    NRELES=NRELES+nrsons-1
 !
 #if DEBUG_MODE
-   if (iprint.eq.1) then
+   if (iprint.ge.1) then
       write(*,7100) Mdle, NODES(Mdle)%type, Kref
- 7100 format('break: Mdle ',i6,' ',a4, ' HAS BEEN BROKEN WITH Kref  ', i2)
+ 7100 format('break: Mdle ',i7,' ',a4, ' HAS BEEN BROKEN WITH Kref = ', i3)
    endif
 #endif
 !

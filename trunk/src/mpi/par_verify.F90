@@ -205,11 +205,28 @@ subroutine mesh_consistency(ipass)
       call logic_nodes(mdle,nodesl, nodm,nrnodm)
       do i=1,nrnodm
          nod = nodm(i)
-         if (Is_inactive(nod))                ipass = 0
-         if (NODES(nod)%subd .ne. RANK)       ipass = 0
-         if (.not.associated(NODES(nod)%dof)) ipass = 0
+         if (Is_inactive(nod)) then
+            write(6,1240) '[', rank, ']: ','mesh inconsistency (4): ', &
+                           'inactive nod = ', nod
+            ipass = 0
+            call result
+         endif
+         if (NODES(nod)%subd .ne. RANK) then
+            write(6,1241) '[', rank, ']: ','mesh inconsistency (4): ', &
+                          'nod,subd = ', nod,NODES(nod)%subd
+            ipass = 0
+            call result
+         endif
+         if (.not.associated(NODES(nod)%dof)) then
+            write(6,1240) '[', rank, ']: ','mesh inconsistency (4): ', &
+                           'dof not associated, nod = ', nod
+            ipass = 0
+            call result
+         endif
       enddo
    enddo
+ 1240 format(A,I3,A,A,A,I7)
+ 1241 format(A,I3,A,A,A,I7,I4)
 !
   290 continue
 !

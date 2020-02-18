@@ -8,7 +8,7 @@
 subroutine refresh
 !
    use data_structure3D
-   use par_mesh  , only: DISTRIBUTED
+   use par_mesh  , only: DISTRIBUTED,set_subd_elem
    use mpi_param , only: RANK
 !
    implicit none
@@ -61,6 +61,7 @@ subroutine refresh
             call set_subd(nodesl(i),subd)
          endif
       enddo
+!
    enddo
 !$OMP END DO
 !
