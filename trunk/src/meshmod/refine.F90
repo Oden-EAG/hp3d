@@ -5,6 +5,7 @@
 !!                        Rule 2: an element refinement flag is
 !!                                always upgraded to accommodate
 !!                                existing refinements of faces
+!!
 !! @param[in] Mdle_in - middle node
 !! @param[in] Kref_in - refinement kind
 !--------------------------------------------------------------------
@@ -23,7 +24,7 @@ subroutine refine(Mdle_in,Kref_in)
    integer, dimension(2)        :: neig,nsid_list,norient_list
    integer, dimension(27)       :: nodesl,norientl
    integer, dimension(6)        :: kreff
-   integer :: iprint, i, n, loc, iface, iface_loc, kref, krefm, kref_iso
+   integer :: iprint, i, n, loc, loc2, iface, iface_loc, kref, krefm, kref_iso
    integer :: nrneig, nod, nodp, mdle, mdle_loc, norient_loc, nc, icase
    logical :: iflag, ideadlock
 !
@@ -57,9 +58,7 @@ subroutine refine(Mdle_in,Kref_in)
    n = 1
    mdle_list(n) = Mdle_in
    kref_list(n) = krefm
-!
-!..check it is on the shelf
-   NODES(mdle_list(n))%visit = kref_list(n)
+   kreff(1:6)   = 0
 !
 !---------------------------------------------------------------------
 !  Loop over queue until queue is empty - check faces only
@@ -77,7 +76,7 @@ subroutine refine(Mdle_in,Kref_in)
          write(*,*)'------------------------------------------------'
          write(*,7003) n,mdle,kref,type
          write(*,*)'------------------------------------------------'
- 7003    format('refine: n,mdle,kref,type = ',i2,',',i9,',',i3,',',a4)
+ 7003    format(' refine: n,mdle,kref,type = ',i2,',',i9,',',i3,',',a4)
       endif
 #endif
 !
@@ -98,7 +97,7 @@ subroutine refine(Mdle_in,Kref_in)
          nod = nodesl(i)
 !
 #if DEBUG_MODE
-         if (iprint.eq.2) then
+         if (RANK.eq.ROOT .and. iprint.eq.2) then
             write(*,8000) iface,nod,NODES(nod)%type
 8000        format('refine: active,iface,nod,type = ',i2,',',i9,',',a4)
          endif
@@ -168,29 +167,40 @@ subroutine refine(Mdle_in,Kref_in)
                iface_loc   = nsid_list(loc)
                norient_loc = norient_list(loc)
 !
-               if (NODES(mdle_loc)%visit.gt.0) then
+!           ...sanity check
+               call locate(mdle_loc,mdle_list(1:n),n, loc2)
+               if (loc2.gt.0) then
 !              ...termination condition for the deadlock
-!                 not necessary to give iso ref at this moment.
-!                 call get_isoref(mdle_list(n), kref_list(n))
-                  iflag = .true.
-!                 exit loop over faces
-                  exit
+                  write(*,*) 'refine: WARNING !! deadlock, exiting...'
+                  stop
                endif
 !
                kreff = 0
                call change_ref_flag('g2l',NODES(nodp)%type, &
                     NODES(nodp)%ref_kind,norient_loc, kreff(iface_loc))
-
+!
+!           ...-------------------------------------------------------------------
 !           ...Option 1: do minimum refinement that is necessary
                !call find_element_ref(NODES(mdle_loc)%type,0,kreff, krefm)
+!           ...-------------------------------------------------------------------
 !           ...Option 2: always ask for isotropic refinement
                call get_isoref(mdle_loc, kref_iso)
                call find_element_ref(NODES(mdle_loc)%type,kref_iso,kreff, krefm)
+!           ...-------------------------------------------------------------------
+!           ...Option 3: always ask for radial (xy) refinement (FIBER LASER)
+               !select case (NODES(mdle_loc)%type)
+               !   case('mdlb'); krefm = 110
+               !   case('mdlp'); krefm = 10
+               !   case default
+               !      write(*,*) 'refine: unexpected element type: mdle_loc,type = ', &
+               !                          mdle_loc,NODES(mdle_loc)%type
+               !end select
+!           ...-------------------------------------------------------------------
 !
 #if DEBUG_MODE
-               if (iprint.eq.2) then
-                  write(*,8002)kreff,krefm
- 8002             format(' kreff,krefm = ',6(i2,2x),6x,2i2)
+               if (RANK.eq.ROOT .and. iprint.eq.2) then
+                  write(*,8002) kreff,krefm
+ 8002             format(' kreff,krefm = ',6(i2,2x),',',i3)
                endif
 #endif
 !
@@ -210,7 +220,6 @@ subroutine refine(Mdle_in,Kref_in)
                endif
                mdle_list(n) = mdle_loc
                kref_list(n) = krefm
-               NODES(mdle_list(n))%visit = kref_list(n)
                iflag = .false.
 !           ...exit loop over faces
                exit
@@ -223,27 +232,35 @@ subroutine refine(Mdle_in,Kref_in)
 !     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       if (iflag) then
 !
+!         write(*,1234) 'refine: type,kref,kreff = ',type,kref,kreff
+! 1234    format(a,a,',',i3,',',6(i3,x))
+!
          if ( is_iso_only() ) then
             call get_isoref(mdle, krefm)
          else
             call find_element_ref(type,kref,kreff, krefm)
          endif
+         if (kref .ne. krefm) then
+            ! CHECK (FOR FIBER ONLY)
+            ! fiber problem with radial refinements:
+            ! krefm should always be equal to kref
+         endif
 !
          if (krefm.gt.0) then
 #if DEBUG_MODE
-            if (iprint.ge.1) then
+            if (RANK.eq.ROOT .and. iprint.ge.1) then
                write(*,7001) mdle,kref,krefm
- 7001          format('refine: BREAKING mdle,kref,krefm = ',i5,2(2x,i3))
+ 7001          format('refine: BREAKING mdle,kref,krefm = ',i7,', ',i3,', ',i3)
             endif
 #endif
             call break(mdle,krefm)
-            NODES(mdle)%visit = 0
             n = n - 1
          else
-            write(*,7010) mdle,type,kref,kreff(1:nface(type))
- 7010       format('refine: INCONSISTENCY, mdle,type,kref,kreff = ', &
-                                           i5,',',a4,',',i2,',',6(i2,2x))
+            write(*,7010) mdle,type,kref,kreff(1:nface(type)),krefm
+ 7010       format('refine: INCONSISTENCY, mdle,type,kref,kreff,krefm = ', &
+                                           i7,',',a4,',',i3,',',6(i3,x),',',i3)
             call logic_error(ERR_INVALID_VALUE, __FILE__,__LINE__)
+            stop
          endif
       endif
 !..end loop over queue
