@@ -179,6 +179,7 @@ subroutine master_main()
       write(*,*) 'Single uniform p-refinement............21'
       write(*,*) 'Multiple uniform h-refs + solve........22'
       write(*,*) 'Single anisotropic h-refinement (z)....23'
+      write(*,*) 'Refine a single element................26'
       write(*,*) '                                         '
       write(*,*) '        ---- MPI Routines ----           '
       write(*,*) 'Distribute mesh........................30'
@@ -196,6 +197,9 @@ subroutine master_main()
       write(*,*) '                                         '
       write(*,*) '     ---- Error and Residual ----        '
       write(*,*) 'Compute exact error....................50'
+      write(*,*) '                                         '
+      write(*,*) '          ---- TESTING ----              '
+      write(*,*) 'Flush dof, update_gdof, update_Ddof....60'
       write(*,*) '=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='
 !
       read( *,*) idec
@@ -210,10 +214,13 @@ subroutine master_main()
 !
 !     ...Print data structure
          case(10,11)
-            write(*,*) 'Select processor RANK: '
-            read (*,*) r
-            count = 1; src = ROOT
-            call MPI_BCAST (r,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+            r = ROOT
+            if (NUM_PROCS .gt. 1) then
+               write(*,*) 'Select processor RANK: '
+               read (*,*) r
+               count = 1; src = ROOT
+               call MPI_BCAST (r,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+            endif
             if (r .eq. RANK) then
                call exec_case(idec)
             endif
@@ -221,7 +228,7 @@ subroutine master_main()
             call exec_case(idec)
 !
 !     ...Refinements
-         case(20,21,22,23)
+         case(20,21,22,23,26)
             call exec_case(idec)
 !
 !     ...MPI Routines
@@ -254,6 +261,10 @@ subroutine master_main()
 !
 !     ...Error and Residual
          case(50)
+            call exec_case(idec)
+!
+!     ...TODO testing
+         case(60)
             call exec_case(idec)
 !
       end select
@@ -337,7 +348,7 @@ subroutine worker_main()
             call exec_case(idec)
 !
 !     ...Refinements
-         case(20,21,22,23)
+         case(20,21,22,23,26)
             call exec_case(idec)
 !
 !     ...MPI Routines
@@ -359,6 +370,10 @@ subroutine worker_main()
 !
 !     ...Error and Residual
          case(50)
+            call exec_case(idec)
+!
+!     ...TODO testing
+         case(60)
             call exec_case(idec)
 !
       end select
