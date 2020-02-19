@@ -6,7 +6,7 @@
 !
 !     subroutine:          par_verify
 !
-!     last modified:       July 2019
+!     last modified:       Oct 2019
 !
 !     purpose:             verify the par_mesh module functionality
 !
@@ -77,8 +77,12 @@ subroutine mesh_consistency(ipass)
    integer, intent(out) :: ipass
 !
 !..auxiliary variables
-   integer :: i, nod, count, src, ierr
+   integer :: i,iel,mdle,nod,nrnodm,count,src,ierr
    integer, allocatable :: val(:),buf(:)
+!
+!..element nodes
+   integer, dimension(27)      :: nodesl, norientl
+   integer, dimension(MAXNODM) :: nodm
 !
 !----------------------------------------------------------------------
 !
@@ -190,6 +194,39 @@ subroutine mesh_consistency(ipass)
    endif
 !
    deallocate(val,buf)
+!
+!  ------------------------------------------------
+!  4. check modified element nodes within subdomain
+!  ------------------------------------------------
+!
+   do iel=1,NRELES_SUBD
+      mdle = ELEM_SUBD(iel)
+      call get_connect_info(mdle, nodesl,norientl)
+      call logic_nodes(mdle,nodesl, nodm,nrnodm)
+      do i=1,nrnodm
+         nod = nodm(i)
+         if (Is_inactive(nod)) then
+            write(6,1240) '[', rank, ']: ','mesh inconsistency (4): ', &
+                           'inactive nod = ', nod
+            ipass = 0
+            call result
+         endif
+         if (NODES(nod)%subd .ne. RANK) then
+            write(6,1241) '[', rank, ']: ','mesh inconsistency (4): ', &
+                          'nod,subd = ', nod,NODES(nod)%subd
+            ipass = 0
+            call result
+         endif
+         if (.not.associated(NODES(nod)%dof)) then
+            write(6,1240) '[', rank, ']: ','mesh inconsistency (4): ', &
+                           'dof not associated, nod = ', nod
+            ipass = 0
+            call result
+         endif
+      enddo
+   enddo
+ 1240 format(A,I3,A,A,A,I7)
+ 1241 format(A,I3,A,A,A,I7,I4)
 !
   290 continue
 !

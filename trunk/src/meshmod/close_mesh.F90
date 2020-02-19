@@ -26,14 +26,13 @@ subroutine close_mesh()
    integer, dimension(6)  :: kreff
    integer, dimension(12) :: krefe
    integer :: istat, i, j, ic, mdle, nod, kref, nre, nrf
+   integer :: nreles_aux
    logical :: nflag
    real(8) :: MPI_Wtime,start_time,end_time
    integer :: ierr
 !
-#if DEBUG_MODE
    integer :: iprint
    iprint = 0
-#endif
 !
 !-----------------------------------------------------------------------------
 !
@@ -51,14 +50,12 @@ subroutine close_mesh()
 !     Step 1 : check constrained nodes
 !---------------------------------------------------------
 #if DEBUG_MODE
-      if (RANK .eq. ROOT) then
-         if (iprint.eq.2) then
-            write(*,*) 'close_mesh: CHECK CONSTRAINING NODES'
-         endif
+      if (RANK.eq.ROOT .and. iprint.eq.2) then
+         write(*,*) 'close_mesh: CHECK CONSTRAINING NODES'
       endif
 #endif
 !
-!  ...REMOVED list BUG
+!  ...allocate list
       allocate(list(2,NRELES))
       list(1:2,1:NRELES) = 0; ic = 0
 !
@@ -77,11 +74,9 @@ subroutine close_mesh()
 !$OMP END DO
 !
 #if DEBUG_MODE
-   if (RANK .eq. ROOT) then
+   if (RANK.eq.ROOT .and. iprint.eq.2) then
       !$OMP SINGLE
-      if (iprint.eq.2) then
-         write(*,*) 'close_mesh: RESOLVE THE NODES MORE THAN ONE IRREGULARITY'
-      endif
+      write(*,*) 'close_mesh: RESOLVE THE NODES MORE THAN ONE IRREGULARITY'
       !$OMP END SINGLE
    endif
 #endif
@@ -100,7 +95,7 @@ subroutine close_mesh()
 !
          type  = NODES(mdle)%type
          nflag = .FALSE.
-        
+!
 !        check edges
 !        ~~~~~~~~~~~~
          krefe = 0
@@ -111,7 +106,7 @@ subroutine close_mesh()
                nflag=.TRUE.
             endif
          enddo
-
+!
 !        check faces
 !        ~~~~~~~~~~~~
          kreff = 0
@@ -128,22 +123,19 @@ subroutine close_mesh()
          if (nflag) then
 !
 #if DEBUG_MODE
-         if (RANK .eq. ROOT) then
-            !$OMP CRITICAL
-            if (iprint.eq.1) then
+            if (RANK.eq.ROOT .and. iprint.eq.1) then
+               !$OMP CRITICAL
                nre = nedge(NODES(mdle)%type)
                nrf = nface(NODES(mdle)%type)
                write(*,*) 'close_mesh: mdle = ', mdle
-               write(*,7003) krefe(1:nre)
-7003           format('krefe = ',12i2)
-               write(*,7004) kreff(1:nrf)
-7004           format('kreff = ',6i2)
+               write(*,7003) krefe(1:12)
+   7003        format('krefe = ',12i2)
+               write(*,7004) kreff(1:6)
+   7004        format('kreff = ',6i3)
                call pause
+               !$OMP END CRITICAL
             endif
-            !$OMP END CRITICAL
-         endif
 #endif
-!
 !           increment counter
             ic=ic+1
 !
@@ -151,10 +143,20 @@ subroutine close_mesh()
             if (is_iso_only()) then
                call get_isoref(mdle, kref)
             else
-               call find_element_closing_ref(type,kreff,krefe, kref)
+!           ...-------------------------------------------------------------------
+!           ...Option 1: do minimum refinement that is necessary
+               !call find_element_closing_ref(type,kreff,krefe, kref)
+!           ...-------------------------------------------------------------------
+!           ...Option 2: always ask for isotropic refinement
+               call get_isoref(mdle, kref)
+!           ...-------------------------------------------------------------------
+!           ...Option 3: always ask for radial (xy) refinement (FIBER LASER)
+               !select case (NODES(mdle)%type)
+               !   case('mdlb'); kref = 110
+               !   case('mdlp'); kref = 10
+               !end select
+!           ...-------------------------------------------------------------------
             endif
-            ! TODO testing with iso only
-            call get_isoref(mdle, kref)
             list(1,i) = mdle
             list(2,i) = kref
          endif
@@ -163,11 +165,11 @@ subroutine close_mesh()
 !$OMP END PARALLEL
 !
 !#if DEBUG_MODE
-      if (RANK .eq. ROOT) then
-!      if (iprint.eq.2) then
+      iprint = 2
+      if (RANK.eq.ROOT .and. iprint.eq.2) then
          write(*,*) 'close_mesh: number of elements to refine ', ic
-!      endif
       endif
+      iprint = 0
 !#endif
 !
 !     loop exit condition
@@ -176,25 +178,26 @@ subroutine close_mesh()
 !---------------------------------------------------------
 !     Step : refine from the list
 !---------------------------------------------------------
-      do i=1,NRELES
+      nreles_aux = NRELES
+      do i=1,nreles_aux
          if (list(1,i) .eq. 0) cycle
          mdle = list(1,i)
          kref = list(2,i)
          if (is_leaf(mdle)) then
 #if DEBUG_MODE
-         if (RANK .eq. ROOT) then
-            if (iprint.eq.1) then
+            if (RANK.eq.ROOT .and. iprint.eq.1) then
                write(*,7001) i, mdle, NODES(mdle)%type, kref
- 7001          format('close_mesh: i= ',i6,' mdle= ', i6,' ', a4, ' ref_kind = ',i5)
+    7001       format('close_mesh: i= ',i6,' mdle= ', i6,' ', a4, ' ref_kind = ',i5)
             endif
-         endif
 #endif
             call refine(mdle,kref)
          endif
       enddo
       deallocate(list)
+!..end outer loop
    enddo
 !
    if (allocated(list)) deallocate(list)
 !
 end subroutine close_mesh
+

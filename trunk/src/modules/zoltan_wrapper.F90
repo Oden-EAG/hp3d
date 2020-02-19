@@ -14,6 +14,8 @@ module zoltan_wrapper
    use MPI
    use mpi_param
    use zoltan
+   !use stc, only: stc_get_nrdof
+   ! TODO: cannot load stc module here (circular reference)
 !
    implicit none
 !
@@ -100,7 +102,7 @@ module zoltan_wrapper
       ierr = Zoltan_Set_Fn(zz,ZOLTAN_NUM_GEOM_FN_TYPE,zoltan_w_query_dim)
       call zoltan_w_handle_err(ierr,'Zoltan_Set_Fn')
 !     Return coordinates of an element
-      !ierr = Zoltan_Set_Fn(zz,ZOLTAN_GEOM_FN_TYPE,zoltan_w_query_coords)
+!      ierr = Zoltan_Set_Fn(zz,ZOLTAN_GEOM_FN_TYPE,zoltan_w_query_coords)
       ierr = Zoltan_Set_Fn(zz,ZOLTAN_GEOM_MULTI_FN_TYPE, zoltan_w_query_coords_omp)
       call zoltan_w_handle_err(ierr,'Zoltan_Set_Fn')
 !     Return number of elements in subdomain
@@ -110,12 +112,12 @@ module zoltan_wrapper
       ierr = Zoltan_Set_Fn(zz,ZOLTAN_OBJ_LIST_FN_TYPE,zoltan_w_query_elems)
       call zoltan_w_handle_err(ierr,'Zoltan_Set_Fn')
 !     Return number of element neighbors for a given element
-      !ierr = Zoltan_Set_Fn(zz,ZOLTAN_NUM_EDGES_FN_TYPE,zoltan_w_query_num_neig)
+!      ierr = Zoltan_Set_Fn(zz,ZOLTAN_NUM_EDGES_FN_TYPE,zoltan_w_query_num_neig)
       ierr = Zoltan_Set_Fn(zz,ZOLTAN_NUM_EDGES_MULTI_FN_TYPE,zoltan_w_query_num_neig_omp)
       call zoltan_w_handle_err(ierr,'Zoltan_Set_Fn')
 !     Return lists of neighbors, their owners, and optionally face weights
 !     for elements sharing a face with a given element
-      !ierr = Zoltan_Set_Fn(zz,ZOLTAN_EDGE_LIST_FN_TYPE,zoltan_w_query_neig_list)
+!      ierr = Zoltan_Set_Fn(zz,ZOLTAN_EDGE_LIST_FN_TYPE,zoltan_w_query_neig_list)
       ierr = Zoltan_Set_Fn(zz,ZOLTAN_EDGE_LIST_MULTI_FN_TYPE,zoltan_w_query_neig_list_omp)
       call zoltan_w_handle_err(ierr,'Zoltan_Set_Fn')
 !
@@ -222,7 +224,7 @@ module zoltan_wrapper
       integer(Zoltan_double), intent(out) :: Coords(*)
       integer(Zoltan_int)   , intent(out) :: Ierr
       integer :: mdle,i,nrv
-      real*8  :: x(NDIMEN), xnod(NDIMEN,8)
+      real*8  :: x(3), xnod(3,8)
       mdle = GID(1)
       call nodcor_vert(mdle, xnod)
       nrv = nvert(NODES(mdle)%type)
@@ -230,7 +232,6 @@ module zoltan_wrapper
       do i = 1,nrv
          x(1:3) = x(1:3) + xnod(1:3,i)
       enddo
-      !x(3) = x(3) * 32.d0 ! artificially elongate in Z
       Coords(1:3) = x(1:3) / nrv
 #if DEBUG_MODE
       write(*,200) 'Mdle = ', mdle,', Coords = ', x(1:3)/nrv
@@ -254,7 +255,7 @@ module zoltan_wrapper
       integer(Zoltan_double), intent(out) :: Coords(*)
       integer(Zoltan_int)   , intent(out) :: Ierr
       integer :: mdle,i,k,nrv
-      real*8  :: x(NDIMEN), xnod(NDIMEN,8)
+      real*8  :: x(3), xnod(3,8)
 !
 !$OMP PARALLEL DO PRIVATE(mdle,i,nrv,x,xnod)
       do k = 1,NumObj
@@ -265,7 +266,6 @@ module zoltan_wrapper
          do i = 1,nrv
             x(1:3) = x(1:3) + xnod(1:3,i)
          enddo
-         !x(3) = x(3) * 32.d0 ! artificially elongate in Z
          i = (k-1)*NumDim
          Coords(i+1:i+3) = x(1:3) / nrv
 #if DEBUG_MODE
@@ -308,12 +308,17 @@ module zoltan_wrapper
       integer(Zoltan_int), intent(in)  :: Wgt_dim
       real(Zoltan_float) , intent(out) :: Wgts(*)
       integer(Zoltan_int), intent(out) :: Ierr
+      integer :: nrdofi(NR_PHYSA),nrdofb(NR_PHYSA)
       integer :: iel,mdle
 !$OMP PARALLEL DO PRIVATE(mdle)
       do iel=1,NRELES_SUBD
          mdle = ELEM_SUBD(iel)
          GIDs(iel) = mdle
-         if (Wgt_dim > 0) Wgts(iel) = 1.0_Zoltan_float
+         if (Wgt_dim > 0) then
+            !call stc_get_nrdof(Mdle, nrdofi,nrdofb)
+            !Wgts(iel) = sum(nrdofb)
+            Wgts(iel) = 1.0_Zoltan_float
+         endif
       enddo
 !$OMP END PARALLEL DO
       Ierr = ZOLTAN_OK
@@ -392,7 +397,8 @@ module zoltan_wrapper
       integer(Zoltan_int), intent(in)  :: Wgt_dim
       real(Zoltan_float) , intent(out) :: Wgts(*)
       integer(Zoltan_int), intent(out) :: Ierr
-      integer :: mdle,i,j,num_neig,neig,subd
+      integer :: mdle,i,j,k,num_neig,neig,subd
+      integer :: ndofH,ndofE,ndofV,ndofQ
       integer :: neig_list(4,6)
       mdle = GID(1)
       call zoltan_w_find_neig(mdle, neig_list)
@@ -405,7 +411,19 @@ module zoltan_wrapper
                call get_subd(neig, subd)
                Neig_GIDs(num_neig) = neig
                Neig_subd(num_neig) = subd
-               if (Wgt_dim > 0) Wgts(num_neig) = 1.0_Zoltan_float
+               if (Wgt_dim > 0) then
+                  call ndof_nod(NODES(neig)%type,NODES(neig)%order, ndofH,ndofE,ndofV,ndofQ)
+                  Wgts(num_neig) = 0.0_Zoltan_float
+                  do k=1,NR_PHYSA
+                     if (.not. PHYSAm(k)) cycle
+                     select case(DTYPE(k))
+                        case('contin') ; Wgts(num_neig) = Wgts(num_neig) + ndofH*NR_COMP(k)
+                        case('tangen') ; Wgts(num_neig) = Wgts(num_neig) + ndofE*NR_COMP(k)
+                        case('normal') ; Wgts(num_neig) = Wgts(num_neig) + ndofV*NR_COMP(k)
+                     end select
+                  enddo
+                  Wgts(num_neig) = 1.0_Zoltan_float
+               endif
 #if DEBUG_MODE
                ! DEBUG checks
                if (Is_inactive(neig)) then
@@ -451,7 +469,7 @@ module zoltan_wrapper
       integer(Zoltan_int), intent(in)  :: Wgt_dim
       real(Zoltan_float) , intent(out) :: Wgts(*)
       integer(Zoltan_int), intent(out) :: Ierr
-      integer :: mdle,i,j,k,num_neig,neig,subd,nsum
+      integer :: mdle,i,j,k,l,n,num_neig,neig,subd,nsum,ndofH,ndofE,ndofV,ndofQ
       integer :: neig_list(4,6)
       integer :: noffset(NumObj)
       noffset = 0; nsum = 0
@@ -459,7 +477,7 @@ module zoltan_wrapper
          noffset(k) = nsum
          nsum = nsum + NumEdges(k)
       enddo
-!$OMP PARALLEL DO PRIVATE(i,j,k,mdle,neig_list,num_neig,neig,subd)
+!$OMP PARALLEL DO PRIVATE(i,j,k,l,n,mdle,neig_list,num_neig,neig,subd,ndofH,ndofE,ndofV,ndofQ)
       do k=1,NumObj
          mdle = GIDs(k)
          call zoltan_w_find_neig(mdle, neig_list)
@@ -470,9 +488,22 @@ module zoltan_wrapper
                if (neig .ne. 0) then
                   num_neig = num_neig + 1
                   call get_subd(neig, subd)
-                  Neig_GIDs(noffset(k)+num_neig) = neig
-                  Neig_subd(noffset(k)+num_neig) = subd
-                  if (Wgt_dim > 0) Wgts(noffset(k)+num_neig) = 1.0_Zoltan_float
+                  n = noffset(k) + num_neig
+                  Neig_GIDs(n) = neig
+                  Neig_subd(n) = subd
+                  if (Wgt_dim > 0) then
+                     call ndof_nod(NODES(neig)%type,NODES(neig)%order, ndofH,ndofE,ndofV,ndofQ)
+                     Wgts(n) = 0.0_Zoltan_float
+                     do l=1,NR_PHYSA
+                        if (.not. PHYSAm(l)) cycle
+                        select case(DTYPE(l))
+                           case('contin') ; Wgts(n) = Wgts(n) + ndofH*NR_COMP(l)
+                           case('tangen') ; Wgts(n) = Wgts(n) + ndofE*NR_COMP(l)
+                           case('normal') ; Wgts(n) = Wgts(n) + ndofV*NR_COMP(l)
+                        end select
+                     enddo
+                     Wgts(n) = 1.0_Zoltan_float
+                  endif
 #if DEBUG_MODE
                   ! DEBUG checks
                   !$OMP CRITICAL
@@ -611,7 +642,7 @@ module zoltan_wrapper
       character(len=4) :: etype
       integer, dimension(27) :: nodesl,norientl
       integer, dimension(2)  :: neig,nsid_list,norient_list
-      integer :: i,j,k,nod,nodson,nrneig,mdle_neig
+      integer :: i,j,k,l,nod,nodson,nrneig,mdle_neig
 !
 !  ...initialize
       Neig_list(1:4,1:6)=0
@@ -642,15 +673,20 @@ module zoltan_wrapper
                else
                   mdle_neig = neig(1)
                endif
+            case default; cycle
          end select
          if (NODES(nod)%ref_kind .eq. 0) then
             Neig_list(1,i) = mdle_neig
          else
+            l = 0
             do j=1,NODES(nod)%nr_sons
                nodson = NODES(nod)%first_son + j - 1
+               if (NODES(nodson)%type .ne. 'mdlt' .and. &
+                   NODES(nodson)%type .ne. 'mdlq') cycle
+               l = l+1
                call neig_face(nodson, nrneig,neig,nsid_list,norient_list)
                do k=1,nrneig
-                  if (NODES(neig(k))%father .eq. mdle_neig) Neig_list(j,i) = neig(k)
+                  if (NODES(neig(k))%father .eq. mdle_neig) Neig_list(l,i) = neig(k)
                enddo
             enddo
          endif

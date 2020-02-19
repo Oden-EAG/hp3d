@@ -38,19 +38,22 @@ TODO
           if this pointer is not associated, then no dof data is held on that node;
           if this pointer is associated, then some dof data is held on that node
 30. done, make node data type as lean as possible (now 64byte)
+31. done, integrate LASER code into par_hp3d
+32. done, implement paraview/vtk visualization library (parallel I/O)
+33. done, remove hard limit on MAXNODES (instead, do realloc with a WARNING, and show time for realloc)
+34. done, implement LB weights for elements
+35. done, update_gdof,update_Ddof for distributed mesh with constrained nodes
 --------------
-31. OpenMP parallelize 'enforce_min_rule, enforce_max_rule'
-32. Integrate LASER code into par_hp3d
-33. OpenMP parallelize global_href routine
-34. Implement paraview/vtk visualization library (parallel I/O)
-35. Eliminate all "syscom.blk" dependencies
-36. data migration with zoltan
-37. remove hard limit on MAXNODES (instead, do realloc with a WARNING, and show time for realloc)
-38. remove old shape functions package (SHAPE=0 option)
-39. implement LB weights for elements
-40. revisit OpenMP parallelization update_gdof
-41. make corrections to find_neig routine
-42. make corrections to global_pref routine (dof copying)
+36. OpenMP parallelize 'enforce_min_rule, enforce_max_rule'
+37. OpenMP parallelize global_href routine
+38. data migration with zoltan
+39. remove old shape functions package (SHAPE=0 option)
+40. make corrections to find_neig routine
+41. make corrections to global_pref routine (dof copying)
+42. fix enforce_max_rule routine (anisotropy issue)
+43. verify enforce_min_rule/enforce_max_rule routines
+44. Eliminate all "syscom.blk" dependencies
+45. Implement PETSc solver interface
 
 F --> F90:
 - done, data_structure3D.F, and then parallelize loops (e.g., reset_visit)

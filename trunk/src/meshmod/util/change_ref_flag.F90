@@ -66,7 +66,7 @@ subroutine change_ref_flag(How,Type,Kref,Nort, Krefm)
           case(1)     ; Krefm=1
           case(2,3,4) ; Krefm=1+glob_to_loc(Kref-1,Nort)
           endselect
-!          
+!
         case('mdlq')
           select case(Kref)
           case(11)        ; Krefm=11
@@ -79,13 +79,15 @@ subroutine change_ref_flag(How,Type,Kref,Nort, Krefm)
         endselect
 !
       endselect
-!  
-!  ...printing  
+!
+!  ...printing
+#if DEBUG_FLAG
       if (iprint.eq.1) then
          write(*,7001) How,Type,Kref,Nort,Krefm
 7001     format('change_ref_flag: How,Type,Kref,Nort,Krefm = ', &
           a3,2x,a5,2x,i2,2x,i2,5x,i2)
       endif
+#endif
 !
 !
-endsubroutine change_ref_flag
+end subroutine change_ref_flag

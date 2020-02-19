@@ -5,6 +5,8 @@ subroutine exec_case(idec)
 !
    use data_structure3D
    use par_mesh
+   use mpi_param
+   use mpi
    use common_prob_data
    use zoltan_wrapper, only: zoltan_w_partition,zoltan_w_eval
 !
@@ -14,6 +16,7 @@ subroutine exec_case(idec)
 !
    logical :: solved
    integer :: mdle_subd(NRELES)
+   integer :: i,mdle,kref,src,count,ierr
 !
 !----------------------------------------------------------------------
 !
@@ -70,6 +73,25 @@ subroutine exec_case(idec)
       case(23)
          write(*,*) 'global anisotropic h-refinement...'
          call global_href_aniso(0,1)
+         call update_gdof
+         call update_Ddof
+!
+      case(26)
+         if (RANK.eq.ROOT) then
+            write(*,*) 'Select on mdle node from the list: '
+            do i=1,NRELES
+               write(*,2610) ELEM_ORDER(i)
+          2610 format(I6)
+            enddo
+            read(*,*) mdle
+         endif
+         if (NUM_PROCS .gt. 1) then
+            count = 1; src = ROOT
+            call MPI_BCAST (mdle,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+         endif
+         kref = 111
+         call refine(mdle,kref)
+         call close_mesh
          call update_gdof
          call update_Ddof
 !
@@ -134,6 +156,21 @@ subroutine exec_case(idec)
       case(50)
          write(*,*) 'computing error and residual...'
          call exact_error
+!
+      case(60)
+         write(*,*) 'flushing dof'
+         do i=1,NRNODS
+            if(associated(NODES(i)%dof)) then
+               if(associated(NODES(i)%dof%coord)) then
+                  NODES(i)%dof%coord = 0.d0
+               endif
+               if(associated(NODES(i)%dof%zdofH)) then
+                  NODES(i)%dof%zdofH = 0.d0
+               endif
+            endif
+         enddo
+         call update_gdof
+         call update_Ddof
 !
       case default
          write(*,*) 'exec_case: unknown case...'
