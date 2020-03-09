@@ -86,33 +86,35 @@ subroutine petsc_solve(mtype)
 ! 
 !..integer counters
    integer    :: nrdofm,nrdofc,nrnodm,nrdof,nrdof_mdl,ndof
-   integer    :: iel,mdle,subd,idx,i,j,k,l,k1,k2,inod,nod,idec
+   integer    :: idec,iel,mdle,subd,idx,i,j,k,l,k1,k2,inod,nod,nod_subd,nsize
 !
 !..MPI variables
    integer :: count,src,rcv,tag,ierr,nr_send,nr_recv
    integer :: reqs(2*NUM_PROCS),stats(MPI_STATUS_SIZE,2*NUM_PROCS)
 !
 !..PETSc variables
+!  note: PetscScalar  can be real (8byte) or complex (16byte), depending on library linking
    PetscErrorCode petsc_ierr
-   PetscScalar petsc_val ! can be real (8byte) or complex (16byte), depending on library linking
-   PetscInt petsc_row, petsc_col, petsc_its
-   PetscInt petsc_low, petsc_high, petsc_void
+   PetscInt petsc_its, petsc_low, petsc_high, petsc_void
    PetscInt petsc_nstash, petsc_reallocs, petsc_nvoid
    PetscInt, allocatable :: petsc_dnz(:), petsc_onz(:)
    Vec petsc_sol_glb
    VecScatter petsc_ctx
    PetscScalar, pointer :: petsc_vec_ptr(:)
+   KSPType petsc_method
    real(8) :: petsc_info(MAT_INFO_SIZE)
    real(8) :: petsc_mallocs,petsc_nz_alloc,petsc_nz_used
    character*64 :: info_string
    character*8  :: fmt,val_string
 !
 !..Non-zero computation
-   integer :: my_dnz, my_onz
-   integer, allocatable :: NOD_INT(:,:)
-   integer, allocatable :: NR_NOD_INT(:),NOD_DOF(:),NOD_LIST(:),NOD_VIS(:)
-   integer :: NR_NOD_LIST
+   integer :: my_dnz, my_onz, NR_NOD_LIST, NR_NODS_SUBD, NRNODS_SUBD
    integer, allocatable :: NOD_COMM(:,:)
+   integer, allocatable :: NR_NOD_INT(:),NOD_DOF(:),NOD_LIST(:),NOD_VIS(:)
+   type NOD_SUBD_LIST
+      integer, allocatable :: LIST(:)
+   end type
+   type(NOD_SUBD_LIST), allocatable :: NOD_INT(:)
    type ONZ_BUF
       integer, allocatable :: SEND_BUF(:)
       integer, allocatable :: RECV_BUF(:) 
@@ -211,13 +213,15 @@ subroutine petsc_solve(mtype)
    elem_nnz_loc(1:NRELES_SUBD) = 0_8 ! local element offsets for subdomain matrix
 !
 !..TODO: size NRNODS arrays are too expensive. We can use a NOD_VIS array to map to local NOD_LIST
-   allocate(NOD_INT(250,NRNODS)); NOD_INT = 0
-   allocate(NR_NOD_INT(NRNODS)); NR_NOD_INT = 0
-   allocate(NOD_DOF(NRNODS)); NOD_DOF = 0
-   allocate(NOD_LIST(NRNODS)); NOD_LIST = 0
+   NRNODS_SUBD = NRNODS
+   allocate(NOD_INT(NRNODS_SUBD)); ! local array (needs dynamic allocation, resizing)
+   allocate(NR_NOD_INT(NRNODS_SUBD)); NR_NOD_INT = 0 ! local array
+   allocate(NOD_DOF(NRNODS_SUBD)); NOD_DOF = 0 ! local array
+   allocate(NOD_LIST(NRNODS_SUBD)); NOD_LIST = 0 ! local array
+   allocate(NOD_VIS(NRNODS)); NOD_VIS = 0 ! global array
    NR_NOD_LIST = 0
-!..Every processor fills its row
-!  each column specified the number of integer values that will be sent to that particular proc
+!..NOD_COMM: Every processor fills its row, where each column
+!  specifies the number of integer values that will be sent to that particular proc
    allocate(NOD_COMM(NUM_PROCS,NUM_PROCS)); NOD_COMM = 0
    allocate(ONZ(NUM_PROCS))
 !
@@ -244,9 +248,6 @@ subroutine petsc_solve(mtype)
       elem_nnz_loc(iel) = nnz_loc
       nnz_loc = nnz_loc + int8(k)
 !
-!  ...for PETSc distributed sparse matrix assembly, we must compute the number of non-zero
-!     entries per row (dof);
-!
 !  ...update the maximum number of local dof
       do i=1,NR_PHYSA
          MAXDOFS(i) = max0(MAXDOFS(i),nrdofs(i))
@@ -257,29 +258,44 @@ subroutine petsc_solve(mtype)
 !  ...create list of node interaction
       do i=1,nrnodm
          nod = nodm(i)
-         if (NOD_DOF(nod) .eq. 0) then
-            NOD_DOF(nod) = ndofmH(i) + ndofmE(i) + ndofmV(i) + ndofmQ(i)
-            if (NOD_DOF(nod) .eq. 0) cycle ! no interaction
-            NR_NOD_LIST = NR_NOD_LIST + 1
-            NOD_LIST(NR_NOD_LIST) = nod
+         if (NOD_VIS(nod) .eq. 0) then ! not yet visited
+            ndof = ndofmH(i) + ndofmE(i) + ndofmV(i) + ndofmQ(i)
+            if (ndof .eq. 0) then ! no interaction
+               NOD_VIS(nod) = -1
+            else
+               NR_NOD_LIST = NR_NOD_LIST + 1
+               NOD_VIS(nod) = NR_NOD_LIST ! set global to local mapping
+               NOD_LIST(NR_NOD_LIST) = nod ! set local to global mapping
+               NOD_DOF(NR_NOD_LIST) = ndof
+            endif
          endif
+         if (NOD_VIS(nod) .eq. -1) cycle ! no interaction
+         nod_subd = NOD_VIS(nod) ! local node number
+         if (.not. allocated(NOD_INT(nod_subd)%LIST)) allocate(NOD_INT(nod_subd)%LIST(250))
          do j=1,nrnodm
             k = nodm(j)
-            if (ndofmH(j) + ndofmE(j) + ndofmV(j) + ndofmQ(j) .eq. 0) cycle ! no interaction
-            do l = 1,NR_NOD_INT(nod)
-               if (NOD_INT(l,nod) .eq. k) then
+            ndof = ndofmH(j) + ndofmE(j) + ndofmV(j) + ndofmQ(j)
+            if (ndof .eq. 0) cycle ! no interaction
+!        ...check if interaction has already been accounted for
+            do l = 1,NR_NOD_INT(nod_subd)
+               if (NOD_INT(nod_subd)%LIST(l) .eq. k) then
                   k = 0
                   exit
                endif
             enddo
+!        ...add new node interaction to the list
             if (k > 0) then
-!           ...skip if node interaction with itself if owned by another subdomain
+!           ...skip node interaction with itself if owned by another subdomain
                if ((NOD_OWN(nod) .ne. RANK) .and. (nod .eq. k)) cycle
-               NR_NOD_INT(nod) = NR_NOD_INT(nod) + 1
-               if (NR_NOD_INT(nod) > 250) then
-                  write(*,*) 'NR_NOD_INT(nod) > 250. stop.'; stop
+               NR_NOD_INT(nod_subd) = NR_NOD_INT(nod_subd) + 1
+               nsize = size(NOD_INT(nod_subd)%LIST)
+               if (NR_NOD_INT(nod_subd) > nsize) then
+                  write(*,*) 'Reallocating NOD_INT...'
+                  allocate(TEMP_BUF(2*nsize))
+                  TEMP_BUF(1:nsize) = NOD_INT(nod_subd)%LIST(1:nsize)
+                  call move_alloc(TEMP_BUF, NOD_INT(nod_subd)%LIST)
                endif
-               NOD_INT(NR_NOD_INT(nod),nod) = k
+               NOD_INT(nod_subd)%LIST(NR_NOD_INT(nod_subd)) = k
             endif
          enddo
       enddo
@@ -319,19 +335,23 @@ subroutine petsc_solve(mtype)
    allocate(petsc_onz(nrdof_subd(RANK+1))); petsc_onz = 0
    do i=1,NR_NOD_LIST
       nod = NOD_LIST(i)
-      if (NOD_DOF(nod) .eq. 0) then ! no interaction with any node
-         write(*,*) 'NOD_DOF(nod) .eq. 0 !!!'; stop ! CHECK (should not happen)
+      nod_subd = NOD_VIS(nod)
+      if (nod_subd .ne. i) then
+         write(*,*) 'nod_subd .ne. i !!!'; stop ! CHECK (should not happen)
+      endif
+      if (NOD_DOF(nod_subd) .eq. 0) then ! no interaction with any node
+         write(*,*) 'NOD_DOF(nod_subd) .eq. 0 !!!'; stop ! CHECK (should not happen)
       endif
 !  ...if node is not owned, the node interactions need to be communicated to the owner
       if (NOD_OWN(nod) .ne. RANK) then
          j = NOD_OWN(nod) ! rank of the node owner
 !     ...check current buffer size
-         if (.not. allocated(ONZ(j+1)%SEND_BUF) ) allocate(ONZ(j+1)%SEND_BUF(10000))
-         k = size(ONZ(j+1)%SEND_BUF)
-         if (NOD_COMM(RANK+1,j+1)+(2+2*NR_NOD_INT(nod)) > k) then
+         if (.not. allocated(ONZ(j+1)%SEND_BUF)) allocate(ONZ(j+1)%SEND_BUF(10000))
+         nsize = size(ONZ(j+1)%SEND_BUF)
+         if (NOD_COMM(RANK+1,j+1)+(2+2*NR_NOD_INT(nod_subd)) > nsize) then
             write(*,*) 'Reallocating SEND_BUF...'
-            allocate(TEMP_BUF(2*k))
-            TEMP_BUF(1:k) = ONZ(j+1)%SEND_BUF(1:k)
+            allocate(TEMP_BUF(2*nsize))
+            TEMP_BUF(1:nsize) = ONZ(j+1)%SEND_BUF(1:nsize)
             call move_alloc(TEMP_BUF, ONZ(j+1)%SEND_BUF) 
          endif
 !     ...fill buffer with this node's interaction with my own subdomain
@@ -339,17 +359,18 @@ subroutine petsc_solve(mtype)
          ONZ(j+1)%SEND_BUF(NOD_COMM(RANK+1,j+1)+1) = nod
          !write(*,*) 'Adding node to send buffer: nod = ', nod
          k1 = 0
-         do l = 1,NR_NOD_INT(nod)
-            k = NOD_INT(l,nod)
+         do l = 1,NR_NOD_INT(nod_subd)
+            k = NOD_INT(nod_subd)%LIST(l)
             if (k .eq. j) then ! owner already knows about this node interaction
                write(*,*) 'k .eq. j !!!'; stop ! CHECK (should not happen)
             endif
-            if (NOD_DOF(k) .eq. 0) then ! no interaction with this node
+            ndof = NOD_DOF(NOD_VIS(k))
+            if (ndof .eq. 0) then ! no interaction with this node
                write(*,*) 'NOD_DOF(k) .eq. 0 ...'; stop ! CHECK (should not happen)
             endif
             ONZ(j+1)%SEND_BUF(NOD_COMM(RANK+1,j+1)+2+k1+1) = k
-            ONZ(j+1)%SEND_BUF(NOD_COMM(RANK+1,j+1)+2+k1+2) = NOD_DOF(k)
-            petsc_nstash = petsc_nstash + NOD_DOF(k)*NOD_DOF(nod)
+            ONZ(j+1)%SEND_BUF(NOD_COMM(RANK+1,j+1)+2+k1+2) = ndof
+            petsc_nstash = petsc_nstash + ndof*NOD_DOF(nod_subd)
             k1 = k1+2
          enddo
          ONZ(j+1)%SEND_BUF(NOD_COMM(RANK+1,j+1)+2) = k1
@@ -358,30 +379,31 @@ subroutine petsc_solve(mtype)
          cycle
       endif
       my_dnz = 0; my_onz = 0
-      do j = 1,NR_NOD_INT(nod)
-         k = NOD_INT(j,nod)
-         if (NOD_DOF(k) .eq. 0) then
-            write(*,*) 'NOD_DOF(k) .eq. 0 !!!'; stop ! CHECK (should not happen)
+      do j = 1,NR_NOD_INT(nod_subd)
+         k = NOD_INT(nod_subd)%LIST(j)
+         ndof = NOD_DOF(NOD_VIS(k))
+         if (ndof .eq. 0) then
+            write(*,*) 'ndof (k) .eq. 0 !!!'; stop ! CHECK (should not happen)
          endif
          if (NOD_OWN(k) .eq. RANK) then
-            my_dnz = my_dnz + NOD_DOF(k)
+            my_dnz = my_dnz + ndof
          else
-            my_onz = my_onz + NOD_DOF(k)
+            my_onz = my_onz + ndof
          endif
       enddo
       if (NFIRST_DOF(nod) < 0) then
          write(*,*) 'NFIRST_DOF(nod) < 0. stop.'; stop ! CHECK (should not happen)
       endif
-      if (NFIRST_DOF(nod)+NOD_DOF(nod) > nrdof_subd(RANK+1)) then
+      if (NFIRST_DOF(nod)+NOD_DOF(nod_subd) > nrdof_subd(RANK+1)) then
          write(*,*) 'NFIRST_DOF(nod)+NOD_DOF(nod) > nrdof_subd(RANK+1). stop.'; stop ! CHECK (should not happen)
       endif
-      do j=1,NOD_DOF(nod)
+      do j=1,NOD_DOF(nod_subd)
          if (petsc_dnz(NFIRST_DOF(nod)+j) .ne. 0) then
             write(*,*) 'petsc_dnz(NFIRST_DOF(nod)+j) .ne. 0'; stop ! CHECK (should not happen)
          endif
       enddo
-      petsc_dnz(NFIRST_DOF(nod)+1 : NFIRST_DOF(nod)+NOD_DOF(nod)) = my_dnz
-      petsc_onz(NFIRST_DOF(nod)+1 : NFIRST_DOF(nod)+NOD_DOF(nod)) = my_onz
+      petsc_dnz(NFIRST_DOF(nod)+1 : NFIRST_DOF(nod)+NOD_DOF(nod_subd)) = my_dnz
+      petsc_onz(NFIRST_DOF(nod)+1 : NFIRST_DOF(nod)+NOD_DOF(nod_subd)) = my_onz
    enddo
 !
 !..communicate which off-diagonal contributions need to be exchanged
@@ -415,8 +437,9 @@ subroutine petsc_solve(mtype)
          call mpi_w_handle_err(ierr,'MPI_IRECV')
       endif
    enddo
-   !write(*,'(A,I2,A,I2)') '[RANK], nr_send = [',RANK,'],',nr_send
-   !write(*,'(A,I2,A,I2)') '[RANK], nr_recv = [',RANK,'],',nr_recv
+   !write(*,'(A,I4,A,I4)') '[RANK], nr_send = [',RANK,'],',nr_send
+   !write(*,'(A,I4,A,I4)') '[RANK], nr_recv = [',RANK,'],',nr_recv
+!
 !..wait until all send and receive operations are completed
    call MPI_Waitall(nr_send+nr_recv,reqs(1:nr_send+nr_recv), stats(:,1:nr_send+nr_recv),ierr)
    call mpi_w_handle_err(ierr,'MPI_Waitall')
@@ -428,55 +451,71 @@ subroutine petsc_solve(mtype)
          l = 0
          do while (l < count)
             nod = ONZ(i)%RECV_BUF(l+1) ! node number
+            nod_subd = NOD_VIS(nod)
+            if (nod_subd .le. 0) then
+               write(*,*) 'nod_subd .le. 0 !!!'; stop ! CHECK (should not happen)
+            endif
             !write(*,*) 'Processing node to from receive buffer: nod = ', nod
             k1  = ONZ(i)%RECV_BUF(l+2) ! number of received node interactions: (nod,ndof) pairs
+            if (k1 .le. 0) then
+               write(*,*) 'k1 .le. 0 !!!'; stop ! CHECK (should not happen)
+            endif
             !write(*,*) 'Number of interactions: k1 = ',k1
             my_dnz = 0; my_onz = 0
             do j = 1,k1,2
                k    = ONZ(i)%RECV_BUF(l+2+j  ) ! fetch node interaction
-               ndof = ONZ(i)%RECV_BUF(l+2+j+1) ! add number of dof of this interaction
-               if (NOD_DOF(k) .eq. 0) NOD_DOF(k) = ndof
 !           ...add node interaction if it has not yet been accounted for
-               do k2 = 1,NR_NOD_INT(nod)
-                  inod = NOD_INT(k2,nod)
+               do k2 = 1,NR_NOD_INT(nod_subd)
+                  inod = NOD_INT(nod_subd)%LIST(k2)
                   if (k .eq. inod) then
                      k = 0; exit
                   endif 
                enddo
                if (k > 0) then
+                  ndof = ONZ(i)%RECV_BUF(l+2+j+1) ! add number of dof of this interaction
                   if (NOD_OWN(k) .eq. RANK) then
                      my_dnz = my_dnz + ndof
                   else
                      my_onz = my_onz + ndof
                   endif
-                  NR_NOD_INT(nod) = NR_NOD_INT(nod) + 1
-                  NOD_INT(NR_NOD_INT(nod),nod) = k
+                  NR_NOD_INT(nod_subd) = NR_NOD_INT(nod_subd) + 1
+                  nsize = size(NOD_INT(nod_subd)%LIST)
+                  if (NR_NOD_INT(nod_subd) > nsize) then
+                     write(*,*) 'Reallocating NOD_INT...'
+                     allocate(TEMP_BUF(2*nsize))
+                     TEMP_BUF(1:nsize) = NOD_INT(nod_subd)%LIST(1:nsize)
+                     call move_alloc(TEMP_BUF, NOD_INT(nod_subd)%LIST)
+                  endif
+                  NOD_INT(nod_subd)%LIST(NR_NOD_INT(nod_subd)) = k
                endif
             enddo
             if (NFIRST_DOF(nod) < 0) then
                write(*,*) 'NFIRST_DOF(nod) < 0'; stop ! CHECK
             endif
-            if (NOD_DOF(nod) .eq. 0) then
-               write(*,*) 'NOD_DOF(nod) = 0'; stop ! CHECK
+            if (NOD_DOF(nod_subd) .eq. 0) then
+               write(*,*) 'NOD_DOF(nod_subd) = 0'; stop ! CHECK
             endif
-            petsc_dnz(NFIRST_DOF(nod)+1 : NFIRST_DOF(nod)+NOD_DOF(nod)) = &
-            petsc_dnz(NFIRST_DOF(nod)+1 : NFIRST_DOF(nod)+NOD_DOF(nod)) + my_dnz
-            petsc_onz(NFIRST_DOF(nod)+1 : NFIRST_DOF(nod)+NOD_DOF(nod)) = &
-            petsc_onz(NFIRST_DOF(nod)+1 : NFIRST_DOF(nod)+NOD_DOF(nod)) + my_onz
+            petsc_dnz(NFIRST_DOF(nod)+1 : NFIRST_DOF(nod)+NOD_DOF(nod_subd)) = &
+            petsc_dnz(NFIRST_DOF(nod)+1 : NFIRST_DOF(nod)+NOD_DOF(nod_subd)) + my_dnz
+            petsc_onz(NFIRST_DOF(nod)+1 : NFIRST_DOF(nod)+NOD_DOF(nod_subd)) = &
+            petsc_onz(NFIRST_DOF(nod)+1 : NFIRST_DOF(nod)+NOD_DOF(nod_subd)) + my_onz
             l = l + (2+k1)
          enddo
       endif
    enddo
 !
 !..deallocate auxiliary arrays
+   do i=1,NRNODS_SUBD
+      if (allocated(NOD_INT(i)%LIST)) deallocate(NOD_INT(i)%LIST)
+   enddo
    do i=1,NUM_PROCS
       if (allocated(ONZ(i)%SEND_BUF)) deallocate(ONZ(i)%SEND_BUF)
       if (allocated(ONZ(i)%RECV_BUF)) deallocate(ONZ(i)%RECV_BUF)
    enddo
-   deallocate(NOD_LIST,NOD_DOF,NOD_INT,NR_NOD_INT,NOD_COMM,ONZ)
-   write(*,'(A,I2,A,I8)') '[RANK], sum(petsc_dnz) = [',RANK,'],',sum(petsc_dnz)
-   write(*,'(A,I2,A,I8)') '[RANK], sum(petsc_onz) = [',RANK,'],',sum(petsc_onz)
-   !write(*,'(A,I2,A,I8)') '[RANK], sum(dnz + onz) = [',RANK,'],',sum(petsc_dnz) + sum(petsc_onz)
+   deallocate(NOD_VIS,NOD_LIST,NOD_DOF,NR_NOD_INT,NOD_INT,NOD_COMM,ONZ)
+   write(*,'(A,I4,A,I8)') '[RANK], sum(petsc_dnz) = [',RANK,'],',sum(petsc_dnz)
+   write(*,'(A,I4,A,I8)') '[RANK], sum(petsc_onz) = [',RANK,'],',sum(petsc_onz)
+   !write(*,'(A,I4,A,I8)') '[RANK], sum(dnz + onz) = [',RANK,'],',sum(petsc_dnz) + sum(petsc_onz)
 !
 !..calculate prefix sum for global offsets
    nrdof = 0
@@ -566,13 +605,13 @@ subroutine petsc_solve(mtype)
    if (RANK .eq. ROOT) then
       do i=1,NUM_PROCS
          write(*,5678) i-1,nrdof_subd(i)
-         5678 format('[',I2,']: nrdof_subd = ',I7)
+         5678 format('[',I4,']: nrdof_subd = ',I7)
       enddo
    endif
 !
-   call VecGetOwnershipRange(petsc_rhs, petsc_low,petsc_high,petsc_ierr); CHKERRQ(petsc_ierr)
-   write(*,5679) RANK,petsc_low,petsc_high
- 5679 format('[',I2,']: ',I8,' to ',I8)
+!   call VecGetOwnershipRange(petsc_rhs, petsc_low,petsc_high,petsc_ierr); CHKERRQ(petsc_ierr)
+!   write(*,5679) RANK,petsc_low,petsc_high
+! 5679 format('[',I4,']: ',I8,' to ',I8)
 !
 !..create distributed sparse stiffness matrix
    call MatCreate(MPI_COMM_WORLD, petsc_A,petsc_ierr); CHKERRQ(petsc_ierr)
@@ -600,7 +639,7 @@ subroutine petsc_solve(mtype)
 !$OMP PRIVATE(nrdofs,nrdofm,nrdofc,nodm,nrnodm, &
 !$OMP         ndofmH,ndofmE,ndofmV,ndofmQ,      &
 !$OMP         i,j,k,k1,k2,l,nod,ndof,mdle,subd, &
-!$OMP         petsc_row,petsc_col,petsc_val)
+!$OMP         petsc_ierr)
    allocate(NEXTRACT(MAXDOFM))
    allocate(IDBC(MAXDOFM))
    allocate(ZDOFD(MAXDOFM,NR_RHS))
@@ -678,32 +717,10 @@ subroutine petsc_solve(mtype)
       ndof = l
 !
 !  ...assemble the global stiffness matrix and load vector
-!  ...loop through element dof
-!  ...omp critical is needed for vecsetvalue,matsetvalue
-!  ...TODO: assemble one block with OpenMP, then call setvalues in critical section
+!  ...omp critical is needed for VecSetValues, MatSetValues
 !$OMP CRITICAL
-      do k1=1,ndof
-!     ...global dof is:
-         petsc_row = LCON(k1)-1 ! petsc indices start with 0
-!     ...Assemble global load vector
-         petsc_val = ZLOAD(k1)
-         call VecSetValue(petsc_rhs,petsc_row,petsc_val,ADD_VALUES, petsc_ierr)!; CHKERRQ(petsc_ierr)
-      enddo
-      do k1=1,ndof
-!     ...global dof is:
-         petsc_row = LCON(k1)-1 ! petsc indices start with 0
-!     ...loop through dof `to the right'
-         do k2=1,ndof
-!        ...global dof is:
-            petsc_col = LCON(k2)-1 ! petsc indices start with 0
-!        ...assemble
-!        ...note: repeated indices are summed automatically by PETSc
-            !elem_nnz_loc(iel) = elem_nnz_loc(iel) + 1_8
-            k = (k1-1)*ndof + k2
-            petsc_val = ZTEMP(k)
-            call MatSetValue(petsc_A,petsc_row,petsc_col,petsc_val,ADD_VALUES, petsc_ierr)!; CHKERRQ(petsc_ierr)
-         enddo
-      enddo
+      call VecSetValues(petsc_rhs,ndof,LCON(1:ndof)-1,ZLOAD(1:ndof),ADD_VALUES, petsc_ierr)
+      call MatSetValues(petsc_A,ndof,LCON(1:ndof)-1,ndof,LCON(1:ndof)-1,ZTEMP(1:ndof*ndof),ADD_VALUES, petsc_ierr)
 !$OMP END CRITICAL
 !
       CLOC(iel)%ni = ndof
@@ -738,16 +755,16 @@ subroutine petsc_solve(mtype)
    call VecAssemblyEnd  (petsc_rhs, petsc_ierr); CHKERRQ(petsc_ierr)
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(MPI_COMM_WORLD, ierr)
-      call MPI_BARRIER(MPI_COMM_WORLD, ierr)
       time_stamp = MPI_Wtime()-time_stamp
       if (RANK .eq. ROOT) write(*,3001) time_stamp
  3001 format(' - VecAssembly : ',f12.5,'  seconds')
    endif
+!
 !..PETSc Stiffness Matrix Assembly
-   write(*,'(A,I2,A,I8)') '[RANK], petsc_nstash   = [',RANK,'],',petsc_nstash
+   write(*,'(A,I4,A,I8)') '[RANK], petsc_nstash   = [',RANK,'],',petsc_nstash
    call MatStashGetInfo(petsc_A, petsc_nstash,petsc_reallocs,petsc_void,petsc_nvoid,petsc_ierr); CHKERRQ(petsc_ierr)
    write(*,2348) RANK,petsc_nstash,petsc_reallocs
-   2348 format('[',I2,']',': nstash = ',I6,', reallocs = ',I6)
+   2348 format('[',I4,']',': nstash = ',I9,', reallocs = ',I6)
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(MPI_COMM_WORLD, ierr)
       call mpi_w_handle_err(ierr,'MPI_BARRIER')
@@ -769,10 +786,13 @@ subroutine petsc_solve(mtype)
    write(*,2349) RANK,'petsc_mallocs  = ',INT(petsc_mallocs)
    write(*,2349) RANK,'petsc_nz_alloc = ',INT(petsc_nz_alloc)
    write(*,2349) RANK,'petsc_nz_used  = ',INT(petsc_nz_used)
-   2349 format('[',I2,']',': ',A,I8)
+   2349 format('[',I4,']',': ',A,I8)
    if (INT(petsc_nz_used) .ne. INT(petsc_nz_alloc)) then
-      write(*,2349) RANK,'Preallocation was not accurate: diff = ', &
+      write(*,2349) RANK,'Preallocation was not accurate: alloc - used  = ', &
                     (INT(petsc_nz_alloc)-INT(petsc_nz_used))
+   endif
+   if (INT(petsc_mallocs) .ne. 0) then
+      write(*,2349) RANK,'Preallocation was not accurate: petsc_mallocs = ', (INT(petsc_mallocs))
    endif
 !
    if (IPRINT_TIME .eq. 1) then
@@ -796,24 +816,21 @@ subroutine petsc_solve(mtype)
       start_time = MPI_Wtime()
    endif
 !
-!..
+!..Set PETSc operator (matrix and preconditioner)
    call KSPSetOperators(petsc_ksp,petsc_A,petsc_A, petsc_ierr); CHKERRQ(petsc_ierr)
 !
-!..
-   !call KSPSetFromOptions(...)
-   !call KSPSetType(petsc_ksp, KSPType petsc_method)
-   ! e.g., KSPCG, KSPGMRES, ...
-   ! default for CG is Hermitian positive definite
-   !call KSPCGSetType(petsc_ksp, KSPCGType KSP_CG_SYMMETRIC)
-!
+!..Set type of PETSc solver
    select case(mtype)
       case('P')
-         ! CG
+         petsc_method = KSPCG
+         ! default for CG is Hermitian positive definite when complex mode
+         !call KSPCGSetType(petsc_ksp, KSPCGType KSP_CG_SYMMETRIC)
       case default
-         ! GMRES
+         petsc_method = KSPGMRES
    end select
+   call KSPSetType(petsc_ksp,petsc_method, petsc_ierr)
 !
-!..default solver is restarted GMRES
+!..Perform global sparse solve
    call KSPSolve(petsc_ksp,petsc_rhs, petsc_sol,petsc_ierr); CHKERRQ(petsc_ierr)
 !
 !..print number of iterations
