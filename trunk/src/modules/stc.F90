@@ -1,3 +1,6 @@
+!
+#include "implicit_none.h"
+!
 !-----------------------------------------------------------------------
 !
 !    module name        - stc
@@ -29,8 +32,6 @@ module stc
    use assembly, only: NR_RHS
    use data_structure3D
    use par_mesh, only: DISTRIBUTED
-!
-#include "implicit_none.h"
 !
 !..storing Schur complements
    logical, save :: STORE_STC   = .true.

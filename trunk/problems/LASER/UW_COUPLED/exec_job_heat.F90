@@ -1,9 +1,10 @@
 !----------------------------------------------------------------------
-! exec_job: Linear Maxwell fiber simulation
+! exec_job: Linear Heat problem simulation
 !----------------------------------------------------------------------
-subroutine exec_job
+subroutine exec_job_heat
 !
    use commonParam
+   use control
    use data_structure3D
    use MPI           , only: MPI_COMM_WORLD
    use mpi_param     , only: RANK,ROOT,NUM_PROCS
@@ -12,7 +13,7 @@ subroutine exec_job
 !
    implicit none
 !
-   integer :: flag(6),iParAttr(6)
+   integer :: flag(6)
    integer :: physNick,nstop
    logical :: ires
 !
@@ -21,19 +22,21 @@ subroutine exec_job
 !
 !----------------------------------------------------------------------
 !
-!..number of adaptive refinements
-   JMAX = 0
+   if(NEXACT.ne.1) then
+      write(*,*) 'NEXACT must be 1 for linear Heat problem. stop.'
+      stop
+   endif
 !
    EXCHANGE_DOF = .false.
 !
-   NO_PROBLEM = 3
+   NO_PROBLEM = 1
    call set_physAm(NO_PROBLEM, physNick,flag)
    ires = .true.
 !
    if(RANK .eq. ROOT) then
-      write(*,*) '=================='
-      write(*,*) 'exec_job: starting'
-      write(*,*) '=================='
+      write(*,*) '======================='
+      write(*,*) 'exec_job_heat: starting'
+      write(*,*) '======================='
    endif
 !
 !..distribute mesh initially
@@ -41,37 +44,31 @@ subroutine exec_job
 !..set Zoltan partitioner
    call zoltan_w_set_lb(0)
 !
-   do i=1,IMAX+JMAX
+   do i=1,IMAX
 !
       if(RANK .eq. ROOT) write(*,100) 'Beginning iteration i = ', i
 !
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
-      if (i .le. 0) then
+      if (i .le. IMAX) then
 !     ...single uniform h-refinement
          if(RANK .eq. ROOT) write(*,200) '1. global uniform h-refinement...'
          call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
          call refine_DPG(IUNIFORM,1,0.25d0,flag,physNick,ires, nstop)
          call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
-      elseif  (i .le. IMAX) then
+      else
 !     ...single anisotropic (in z) h-refinement
          if(RANK .eq. ROOT) write(*,200) '1. global anisotropic h-refinement...'
          call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
          call refine_DPG(IANISOTROPIC,1,0.25d0,flag,physNick,ires, nstop)
-         call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
-      else
-!     ...adaptive h-refinement
-         if(RANK .eq. ROOT) write(*,200) '1. adaptive h-refinement...'
-         call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-         call refine_DPG(IADAPTIVE,1,0.25d0,flag,physNick,ires, nstop)
          call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
       endif
       if(RANK .eq. ROOT) write(*,300) end_time - start_time
 !
       if (NUM_PROCS .eq. 1) goto 30
 !
-      if (i .eq. IMAX) then
+      if (i .eq. IMAX-3) then
          call zoltan_w_set_lb(7)
-      elseif (i .gt. IMAX) then
+      elseif (i .gt. IMAX-3) then
          goto 30
       endif
 !
@@ -84,8 +81,7 @@ subroutine exec_job
       if(RANK .eq. ROOT) write(*,300) end_time - start_time
 !
    30 continue
-      if (i .le. IMAX-1) cycle
-      if (NUM_PROCS .eq. 1) goto 60
+      !if (i .le. IMAX-1) cycle
 !
 !  ...print current partition (elems)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
@@ -96,7 +92,7 @@ subroutine exec_job
          if(RANK .eq. ROOT) write(*,*) '   ... skipping for a large number of elements.'
       endif
 !
-!  ...skip evaluating partition
+      if (NUM_PROCS .eq. 1) goto 50
       goto 50
 !
 !  ...evaluate current partition
@@ -121,7 +117,7 @@ subroutine exec_job
 !
 !  ...solve problem with par_mumps (MPI MUMPS)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr)
-      if(RANK .eq. ROOT) write(*,200) '6. calling MUMPS/PARDISO solver...'
+      if(RANK .eq. ROOT) write(*,200) '6. calling MUMPS (MPI) solver...'
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
       if (NUM_PROCS .eq. 1) then
          call pardiso_sc('H')
@@ -133,43 +129,13 @@ subroutine exec_job
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
       if(RANK .eq. ROOT) write(*,300) end_time - start_time
 !
-   70 continue
-!
-!  ...skip computing power
-      !goto 80
-!
-!  ...compute power in fiber for signal field
-      if(RANK .eq. ROOT) write(*,200) '7. computing power...'
-      numPts = 2**i; fld = 1
-      call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-      call get_power(fld,numPts,-1)
-      !call get_power(fld,numPts,0)
-      call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
-      if(RANK .eq. ROOT) write(*,300) end_time - start_time
-!
-   80 continue
-!
-!      if (i .lt. IMAX) cycle
-      if (i .lt. IMAX+JMAX) cycle
-      cycle
-!
-!  ...write paraview output
-      if(RANK .eq. ROOT) write(*,200) '8. writing paraview output...'
-      iParAttr = (/0,0,0,0,1,0/)
-      call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-      call my_paraview_driver(iParAttr)
-      call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
    enddo
 !
 !..compute error on last mesh
-   if(RANK .eq. ROOT) write(*,200) 'Compute error/residual on last mesh...'
+   if(RANK .eq. ROOT) write(*,200) '7. compute error on last mesh...'
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    call refine_DPG(INOREFINEMENT,1,0.25d0,flag,physNick,ires, nstop)
-   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()!
-!
-!   iParAttr = (/0,0,0,0,6,0/)
-!   call my_paraview_driver(iParAttr)
-!   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
 !
   100 format(/,'/////////////////////////////////////////////////////////////', &
              /,'             ',A,I2,/)
@@ -179,10 +145,10 @@ subroutine exec_job
 !
    if(RANK .eq. ROOT) then
       write(*,*)
-      write(*,*) '=================='
-      write(*,*) 'exec_job: finished'
-      write(*,*) '=================='
+      write(*,*) '======================='
+      write(*,*) 'exec_job_heat: finished'
+      write(*,*) '======================='
       write(*,*)
    endif
 !
-end subroutine exec_job
+end subroutine exec_job_heat

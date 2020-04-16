@@ -3,7 +3,6 @@
 !
 #include "implicit_none.h"
 !
-!
 !----------------------------------------------------------------------
 !
 !     subroutine:          partition_fiber
@@ -17,7 +16,7 @@
 subroutine partition_fiber(subd_next)
 !
    use data_structure3D
-   use mpi_param, only: RANK,NUM_PROCS
+   use mpi_param, only: RANK,ROOT,NUM_PROCS
    use MPI,       only: MPI_COMM_WORLD,MPI_INTEGER,MPI_REAL8,  &
                         MPI_MIN,MPI_MAX,MPI_IN_PLACE
 !
@@ -85,6 +84,155 @@ subroutine partition_fiber(subd_next)
    call MPI_ALLREDUCE(MPI_IN_PLACE,subd_next,count,MPI_INTEGER,MPI_MAX,MPI_COMM_WORLD,ierr)
 !
 end subroutine partition_fiber
+!----------------------------------------------------------------------
+!
+!     subroutine:          partition_fiber
+!
+!     last modified:       Aug 2019
+!
+!     purpose:             partition a waveguide structure into slabs
+!                          along z-axis (with equal size per proc)
+!
+!----------------------------------------------------------------------
+subroutine repartition_fiber(Subd_next)
+!
+   use data_structure3D
+   use mpi_param, only: RANK,ROOT,NUM_PROCS
+   use MPI,       only: MPI_COMM_WORLD,MPI_INTEGER,MPI_REAL8,  &
+                        MPI_SUM,MPI_IN_PLACE
+   use stc,       only: stc_get_nrdof
+!
+   implicit none
+!
+   integer, intent(out) :: Subd_next(NRELES)
+!
+   integer :: iel,mdle,subd,i,k,nrv,proc
+   real(8) :: xnod(NDIMEN,8)
+!
+   integer :: count,ierr
+!
+!..dynamic load balancing
+   real(8) :: x3_mdle(NRELES)
+   real(8) :: x3_subd(NUM_PROCS)
+   integer :: iel_load(NRELES)
+   integer :: iel_array(NRELES)
+   integer :: nrdofi(NR_PHYSA),nrdofb(NR_PHYSA)
+   integer :: load
+!
+!----------------------------------------------------------------------
+!
+   Subd_next(1:NRELES) = 0
+!
+   x3_mdle (1:NRELES) = 0.d0
+   iel_load(1:NRELES) = 0
+!
+!$OMP PARALLEL DO PRIVATE(mdle,subd,i,nrv,xnod,nrdofi,nrdofb)
+   do iel = 1,NRELES
+      mdle = ELEM_ORDER(iel)
+      call get_subd(mdle, subd)
+      if (subd .ne. RANK) cycle
+      call nodcor_vert(mdle, xnod)
+      nrv = nvert(NODES(mdle)%type)
+      x3_mdle(iel) = maxval(xnod(3,1:nrv))
+      call stc_get_nrdof(mdle, nrdofi,nrdofb)
+      iel_load(iel) = sum(nrdofi) + sum(nrdofb)
+   enddo
+!$OMP END PARALLEL DO
+!
+   count = NRELES
+   call MPI_ALLREDUCE(MPI_IN_PLACE,x3_mdle,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
+   call MPI_ALLREDUCE(MPI_IN_PLACE,iel_load,count,MPI_INTEGER,MPI_SUM,MPI_COMM_WORLD,ierr)
+!
+!..sort elements by z-coordinate
+   do iel=1,NRELES
+      iel_array(iel) = iel
+   enddo
+   call qsort_duplet_z(iel_array,x3_mdle,NRELES,1,NRELES)
+!
+!..add elements to processor based on z-coordinate and load
+   load = (sum(iel_load)+NUM_PROCS-1) / NUM_PROCS
+   x3_subd(1:NUM_PROCS) = 0.d0
+   proc = 0; k = 0
+   do i = 1,NRELES
+      iel = iel_array(i)
+      k = k + iel_load(iel)
+      x3_subd(proc+1) = x3_mdle(i)
+      Subd_next(iel) = proc
+      if (k .ge. (proc+1)*load) then
+         if (x3_mdle(i+1) > x3_mdle(i)+1.0d-6) proc = proc+1
+      endif
+   enddo
+!
+   if (RANK.eq.ROOT) then
+      do i=1,NUM_PROCS
+         write(*,130) 'rank, x3_subd = ', i-1,x3_subd(i)
+      enddo
+  130 format(A,I4,F10.4)
+      !do i=1,NRELES
+      !   iel = iel_array(i)
+      !   write(*,140) 'i,iel,x3_mdle(i),iel_load(iel) = ',i,iel,x3_mdle(i),iel_load(iel)
+      !enddo
+  140 format(A,I6,','I6,',',F10.4,',',I6)
+   endif
+!
+end subroutine repartition_fiber
+!
+!
+!-----------------------------------------------------------------------
+!
+!    latest revision:   - Oct 2019
+!
+!    purpose:           - sorts an array of duplets (iel,residual) with
+!                         residual (sort key) in ascending order
+!                         (initial call needs: First = 1, Last = N)
+!
+!    arguments:
+!           in/out
+!                       - Iel_array: 1D integer array (element indices)
+!                       - Residuals: 1D real    array (residual values)
+!           in
+!                       - N        : size of array
+!                       - First    : first index of current partition
+!                       - Last     : last  index of current partition
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+recursive subroutine qsort_duplet_z(Iel_array,Residuals,N,First,Last)
+!
+   implicit none
+!..declare variables
+   integer , intent(in)    :: N,First,Last
+   integer , intent(inout) :: Iel_array(N)
+   real(8) , intent(inout) :: Residuals(N)
+!
+   real(8) :: x,pivot
+   integer :: i,j,l
+!
+   pivot = Residuals((First+Last) / 2)
+   i = First
+   j = Last
+!..iterate through the array to be sorted
+   do
+!  ...find first element from the left that needs to be swapped
+      do while ((Residuals(i) < pivot))
+         i = i + 1
+      end do
+!  ...find first element from the right that needs to be swapped
+      do while ((pivot < Residuals(j)))
+         j = j - 1
+      end do
+!  ...end loop if no elements need to be swapped
+      if (i >= j) exit
+!  ...swap the elements
+      l = Iel_array(i); Iel_array(i) = Iel_array(j); Iel_array(j) = l
+      x = Residuals(i); Residuals(i) = Residuals(j); Residuals(j) = x
+      i = i + 1
+      j = j - 1
+   end do
+   if (First < i-1) call qsort_duplet_z(Iel_array,Residuals,N,First,i-1 )
+   if (j+1 < Last)  call qsort_duplet_z(Iel_array,Residuals,N,j+1,  Last)
+!
+end subroutine qsort_duplet_z
 !
 !
 !----------------------------------------------------------------------
@@ -114,7 +262,7 @@ subroutine collect_dofs()
    VTYPE, allocatable :: buf(:)
 !
 !..auxiliary variables
-   integer :: nodm(MAXNODM)
+   integer :: nodm(MAXNODM), nodesl(27)
    integer :: mdle, nod, inod, iel, subd, vis, nrnodm, nrdof_nod
    integer :: iprint = 0
 !
@@ -135,7 +283,7 @@ subroutine collect_dofs()
 !     if mdle node is already in ROOT's subdomain
       if (subd .eq. ROOT) cycle
 !  ...3a. get list of nodes associated with mdle node
-      call get_elem_nodes(mdle, nodm,nrnodm)
+      call get_elem_nodes(mdle, nodesl,nodm,nrnodm)
 !  ...3b. iterate over list of nodes
       do inod=1,nrnodm
          nod = nodm(inod)
@@ -180,7 +328,7 @@ subroutine collect_dofs()
             call dealloc_nod_dof(nod)
          endif
       enddo
-      call set_subd(mdle, ROOT)
+      call set_subd(mdle,ROOT)
    enddo
    1000 format(A,I2,A,A,I4,A,I6)
 !

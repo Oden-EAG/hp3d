@@ -7,7 +7,7 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision - Aug 2019
+!   latest revision - Oct 2019
 !
 !   purpose         - Driver routine for computing power in UW
 !                     Maxwell, i.e. the Poynting vector at certain
@@ -41,6 +41,15 @@ subroutine get_power(Fld,NumPts,FileIter)
    real*8, allocatable :: diff_power(:),efficiency(:)
    real*8, allocatable :: core_power(:),clad_power(:)
 !
+   real*8, allocatable :: power_LP01(:),power_LP11(:)
+   real*8, allocatable :: power_LP21(:),power_LP02(:)
+   real*8, allocatable :: norm_LP01(:),norm_LP11(:)
+   real*8, allocatable :: norm_LP21(:),norm_LP02(:)
+   real*8, allocatable :: coef_LP01_r(:),coef_LP11_r(:)
+   real*8, allocatable :: coef_LP21_r(:),coef_LP02_r(:)
+   real*8, allocatable :: coef_LP01_c(:),coef_LP11_c(:)
+   real*8, allocatable :: coef_LP21_c(:),coef_LP02_c(:)
+!
    real*8  :: a,b
    integer :: i
 !
@@ -62,9 +71,14 @@ subroutine get_power(Fld,NumPts,FileIter)
  2001 format(A,i5)
    endif
 !
-   allocate(zValues(NumPts+1)   , sign_power(NumPts+1), &
-            pump_power(NumPts+1), diff_power(NumPts+1), &
-            core_power(NumPts+1), clad_power(NumPts+1)  )
+   allocate(zValues(NumPts)   , sign_power(NumPts), &
+            pump_power(NumPts), diff_power(NumPts), &
+            core_power(NumPts), clad_power(NumPts)  )
+!
+   allocate(power_LP01(NumPts),power_LP11(NumPts),power_LP21(NumPts),power_LP02(NumPts))
+   allocate(norm_LP01(NumPts),norm_LP11(NumPts),norm_LP21(NumPts),norm_LP02(NumPts))
+   allocate(coef_LP01_r(NumPts),coef_LP11_r(NumPts),coef_LP21_r(NumPts),coef_LP02_r(NumPts))
+   allocate(coef_LP01_c(NumPts),coef_LP11_c(NumPts),coef_LP21_c(NumPts),coef_LP02_c(NumPts))
 !
 !..distributing sample points uniformly
    if (RANK .eq. ROOT) then
@@ -80,13 +94,6 @@ subroutine get_power(Fld,NumPts,FileIter)
 !..irrationalize z values to avoid points on element interfaces
    zValues = zValues*PI*(7.d0/22.d0)
 !
-!..init arrays
-   sign_power(1:NumPts+1) = 0.d0
-   pump_power(1:NumPts+1) = 0.d0
-   diff_power(1:NumPts+1) = 0.d0
-   core_power(1:NumPts+1) = 0.d0
-   clad_power(1:NumPts+1) = 0.d0
-!
 !..get power
    select case (Fld)
       case(0)
@@ -101,43 +108,106 @@ subroutine get_power(Fld,NumPts,FileIter)
          call compute_power(zValues,NumPts,1, sign_power,diff_power,core_power,clad_power)
       case default
          if (RANK.eq.ROOT) write(*,*) ' get_power: invalid Fld param. stop.'
-         stop 1
+         stop
    end select
-   !write(*,*) 'finished..'
+!
+   if (RANK.eq.ROOT) write(*,*) ' get_power: computing signal mode_power..'
+   i = ISOL
+   ISOL = 13 ! LP01 projection
+   call compute_power(zValues,NumPts,ISOL, power_LP01,norm_LP01,coef_LP01_r,coef_LP01_c)
+   ISOL = 14 ! LP11 projection
+   call compute_power(zValues,NumPts,ISOL, power_LP11,norm_LP11,coef_LP11_r,coef_LP11_c)
+   ISOL = 15 ! LP21 projection
+   call compute_power(zValues,NumPts,ISOL, power_LP21,norm_LP21,coef_LP21_r,coef_LP21_c)
+   ISOL = 16 ! LP02 projection
+   call compute_power(zValues,NumPts,ISOL, power_LP02,norm_LP02,coef_LP02_r,coef_LP02_c)
+   ISOL = i
 !
 !..gather RHS vector information on host
-   count = NumPts+1
+   count = NumPts
    if (RANK .eq. ROOT) then
       call MPI_REDUCE(MPI_IN_PLACE,sign_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE(MPI_IN_PLACE,pump_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE(MPI_IN_PLACE,diff_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE(MPI_IN_PLACE,core_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE(MPI_IN_PLACE,clad_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      !
+      call MPI_REDUCE(MPI_IN_PLACE,power_LP01  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, norm_LP01  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP01_r,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP01_c,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      !
+      call MPI_REDUCE(MPI_IN_PLACE,power_LP11  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, norm_LP11  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP11_r,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP11_c,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      !
+      call MPI_REDUCE(MPI_IN_PLACE,power_LP21  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, norm_LP21  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP21_r,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP21_c,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      !
+      call MPI_REDUCE(MPI_IN_PLACE,power_LP02  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, norm_LP02  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP02_r,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP02_c,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
    else
       call MPI_REDUCE(sign_power,sign_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE(pump_power,pump_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE(diff_power,diff_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE(core_power,core_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE(clad_power,clad_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      !
+      call MPI_REDUCE(power_LP01  ,power_LP01  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( norm_LP01  , norm_LP01  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP01_r, coef_LP01_r,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP01_c, coef_LP01_c,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      !
+      call MPI_REDUCE(power_LP11  ,power_LP11  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( norm_LP11  , norm_LP11  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP11_r, coef_LP11_r,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP11_c, coef_LP11_c,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      !
+      call MPI_REDUCE(power_LP21  ,power_LP21  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( norm_LP21  , norm_LP21  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP21_r, coef_LP21_r,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP21_c, coef_LP21_c,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      !
+      call MPI_REDUCE(power_LP02  ,power_LP02  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( norm_LP02  , norm_LP02  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP02_r, coef_LP02_r,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP02_c, coef_LP02_c,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       goto 90
    endif
+!
+!$OMP PARALLEL DO
+   do i = 1,NumPts
+      norm_LP01(i)   = sqrt(norm_LP01(i))
+      coef_LP01_r(i) = sqrt(coef_LP01_r(i)**2.d0+coef_LP01_c(i)**2.d0) / norm_LP01(i)
+      power_LP01(i)  = power_LP01(i) * ((coef_LP01_r(i) / norm_LP01(i))**2.d0)
+      !
+      norm_LP11(i)   = sqrt(norm_LP11(i))
+      coef_LP11_r(i) = sqrt(coef_LP11_r(i)**2.d0+coef_LP11_c(i)**2.d0) / norm_LP11(i)
+      power_LP11(i)  = power_LP11(i) * ((coef_LP11_r(i) / norm_LP11(i))**2.d0)
+      !
+      norm_LP21(i)   = sqrt(norm_LP21(i))
+      coef_LP21_r(i) = sqrt(coef_LP21_r(i)**2.d0+coef_LP21_c(i)**2.d0) / norm_LP21(i)
+      power_LP21(i)  = power_LP21(i) * ((coef_LP21_r(i) / norm_LP21(i))**2.d0)
+      !
+      norm_LP02(i)   = sqrt(norm_LP02(i))
+      coef_LP02_r(i) = sqrt(coef_LP02_r(i)**2.d0+coef_LP02_c(i)**2.d0) / norm_LP02(i)
+      power_LP02(i)  = power_LP02(i) * ((coef_LP02_r(i) / norm_LP02(i))**2.d0)
+   enddo
+!$OMP END PARALLEL DO
 !
 !..Print signal power output values
    if (Fld .eq. 1 .or. Fld .eq. 2) then
       if (FileIter .eq. -1) then
          write(*,*) ' get_power: printing power values (signal):'
-         do i = 1,NumPts+1
+         do i = 1,NumPts
             write(*,2020) sign_power(i)
        2020 format('    ',es12.5)
          enddo
-         if (NONLINEAR_FLAG .eq. 0) then
-            i = NumPts
-            if (USE_PML) then
-               i = (1.0d0 - PML_FRAC) * NumPts
-            endif
-            write(*,2021) (sign_power(1)-sign_power(i))/sign_power(1) * 100.d0
-       2021 format(' Power loss: ',f6.2,' %',/)
-         endif
       endif
       if (FileIter .ge. 0) then
          !WRITE TO FILE
@@ -146,18 +216,26 @@ subroutine get_power(Fld,NumPts,FileIter)
          write (suffix,fmt) FileIter
          filename=trim(OUTPUT_DIR)//'power/signal_'//trim(suffix)//'.dat'
          open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
-         do i = 1,NumPts+1
+         do i = 1,NumPts
             write(UNIT=9, FMT="(es12.5)") sign_power(i)
          enddo
          close(UNIT=9)
       endif
+      if (NONLINEAR_FLAG .eq. 0) then
+        i = NumPts
+        if (USE_PML) then
+           i = (1.0d0 - PML_FRAC) * NumPts
+        endif
+        write(*,2021) (sign_power(1)-sign_power(i))/sign_power(1) * 100.d0
+   2021 format(' Power loss: ',f6.2,' %',/)
+     endif
    endif
-   !
-   !..Print pump power output values
+!
+!..Print pump power output values
    if (Fld .eq. 0 .or. Fld .eq. 2) then
       if (FileIter .eq. -1) then
          write(*,*) ' get_power: printing power values (pump):'
-         do i = 1,NumPts+1
+         do i = 1,NumPts
             write(*,2020) pump_power(i)
          enddo
       endif
@@ -168,18 +246,18 @@ subroutine get_power(Fld,NumPts,FileIter)
          write (suffix,fmt) FileIter
          filename=trim(OUTPUT_DIR)//'power/pump_'//trim(suffix)//'.dat'
          open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
-         do i = 1,NumPts+1
+         do i = 1,NumPts
             write(UNIT=9, FMT="(es12.5)") pump_power(i)
          enddo
          close(UNIT=9)
       endif
    endif
-   !
-   !..Print fiber core power ratio
+!
+!..Print fiber core power ratio
    if (GEOM_NO .eq. 5 .and. (Fld .eq. 1 .or. Fld .eq. 2)) then
       if (FileIter .eq. -1) then
          write(*,*) ' get_power: printing fiber core power ratio (signal):'
-         do i = 1,NumPts+1
+         do i = 1,NumPts
             write(*,2030) core_power(i)/sign_power(i)
        2030 format('    ',f8.4)
          enddo
@@ -191,7 +269,7 @@ subroutine get_power(Fld,NumPts,FileIter)
          write (suffix,fmt) FileIter
          filename=trim(OUTPUT_DIR)//'power/ratio_'//trim(suffix)//'.dat'
          open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
-         do i = 1,NumPts+1
+         do i = 1,NumPts
             write(UNIT=9, FMT="(f8.4)") core_power(i)/sign_power(i)
          enddo
          close(UNIT=9)
@@ -203,7 +281,7 @@ subroutine get_power(Fld,NumPts,FileIter)
       allocate(efficiency(NumPts))
       write(*,*) ' get_power: computing efficiency..'
       efficiency(1) = 0.d0
-      do i = 2,NumPts+1
+      do i = 2,NumPts
          if(COPUMP.eq.1) then
             efficiency(i) = (sign_power(i)-sign_power(1))&
                              /(pump_power(1)-pump_power(i))
@@ -217,7 +295,7 @@ subroutine get_power(Fld,NumPts,FileIter)
       enddo
       if (FileIter .eq. -1) then
          write(*,*) ' get_power: printing efficiency:'
-         do i = 1,NumPts+1
+         do i = 1,NumPts
             write(*,2030) efficiency(i)
          enddo
       endif
@@ -228,7 +306,7 @@ subroutine get_power(Fld,NumPts,FileIter)
          write (suffix,fmt) FileIter
          filename=trim(OUTPUT_DIR)//'power/efficiency_'//trim(suffix)//'.dat'
          open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
-         do i = 1,NumPts+1
+         do i = 1,NumPts
             write(UNIT=9, FMT="(f8.4)") efficiency(i)
          enddo
          close(UNIT=9)
@@ -236,8 +314,86 @@ subroutine get_power(Fld,NumPts,FileIter)
       deallocate(efficiency)
    endif
 !
+!..Print mode power output values
+      if (FileIter .eq. -1) then
+         write(*,*)
+         write(*,*) ' get_power: printing LP01 mode power (signal):'
+         do i = 1,NumPts
+!            write(*,*) 'norm_LP01: ', norm_LP01(i), ', coef_LP01: ', coef_LP01_r(i)
+!            write(*,2020) power_LP01(i)
+            write(*,2030) power_LP01(i)/sign_power(i)
+         enddo
+         write(*,*)
+         write(*,*) ' get_power: printing LP11 mode power (signal):'
+         do i = 1,NumPts
+!            write(*,*) 'norm_LP11: ', norm_LP11(i), ', coef_LP11: ', coef_LP11_r(i)
+!            write(*,2020) power_LP11(i)
+            write(*,2030) power_LP11(i)/sign_power(i)
+         enddo
+         write(*,*)
+         write(*,*) ' get_power: printing LP21 mode power (signal):'
+         do i = 1,NumPts
+!            write(*,*) 'norm_LP21: ', norm_LP21(i), ', coef_LP21: ', coef_LP21_r(i)
+!            write(*,2020) power_LP21(i)
+            write(*,2030) power_LP21(i)/sign_power(i)
+         enddo
+         write(*,*)
+         write(*,*) ' get_power: printing LP02 mode power (signal):'
+         do i = 1,NumPts
+!            write(*,*) 'norm_LP02: ', norm_LP02(i), ', coef_LP02: ', coef_LP02_r(i)
+!            write(*,2020) power_LP02(i)
+            write(*,2030) power_LP02(i)/sign_power(i)
+         enddo
+      endif
+      if (FileIter .ge. 0) then
+         !WRITE TO FILE
+         write(*,*) ' get_power: printing LP01 mode power (signal) to file..'
+         fmt = '(I5.5)'
+         write (suffix,fmt) FileIter
+         filename=trim(OUTPUT_DIR)//'power/powerLP01_'//trim(suffix)//'.dat'
+         open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
+         do i = 1,NumPts
+            write(UNIT=9, FMT="(es12.5)") power_LP01(i)
+         enddo
+         close(UNIT=9)
+         !WRITE TO FILE
+         write(*,*) ' get_power: printing LP11 mode power (signal) to file..'
+         fmt = '(I5.5)'
+         write (suffix,fmt) FileIter
+         filename=trim(OUTPUT_DIR)//'power/powerLP11_'//trim(suffix)//'.dat'
+         open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
+         do i = 1,NumPts
+            write(UNIT=9, FMT="(es12.5)") power_LP11(i)
+         enddo
+         close(UNIT=9)
+         !WRITE TO FILE
+         write(*,*) ' get_power: printing LP21 mode power (signal) to file..'
+         fmt = '(I5.5)'
+         write (suffix,fmt) FileIter
+         filename=trim(OUTPUT_DIR)//'power/powerLP21_'//trim(suffix)//'.dat'
+         open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
+         do i = 1,NumPts
+            write(UNIT=9, FMT="(es12.5)") power_LP21(i)
+         enddo
+         close(UNIT=9)
+         !WRITE TO FILE
+         write(*,*) ' get_power: printing LP02 mode power (signal) to file..'
+         fmt = '(I5.5)'
+         write (suffix,fmt) FileIter
+         filename=trim(OUTPUT_DIR)//'power/powerLP02_'//trim(suffix)//'.dat'
+         open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
+         do i = 1,NumPts
+            write(UNIT=9, FMT="(es12.5)") power_LP02(i)
+         enddo
+         close(UNIT=9)
+      endif
+!
    90 continue
    deallocate(zValues,sign_power,pump_power,diff_power,core_power,clad_power)
+   deallocate(power_LP01,power_LP11,power_LP21,power_LP02)
+   deallocate(norm_LP01,norm_LP11,norm_LP21,norm_LP02)
+   deallocate(coef_LP01_r,coef_LP11_r,coef_LP21_r,coef_LP02_r)
+   deallocate(coef_LP01_c,coef_LP11_c,coef_LP21_c,coef_LP02_c)
 !
 end subroutine get_power
 !
@@ -248,7 +404,7 @@ end subroutine get_power
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - Aug 2019
+!   latest revision    - Oct 2019
 !
 !   purpose            - Evaluates the electric field power of UW
 !                        Maxwell along the cross sections specified by
@@ -261,10 +417,10 @@ end subroutine get_power
 !                      - Fld         : 1 (signal) or 0 (pump)
 !       out:
 !                      - Power       : Absolute value of power
-!                      - DiffPower   : Diff exact to computed power
+!                      - DiffPower   : Diff exact to computed power ! alt: Norm
 !                                      (available if NEXAXT=1)
-!                      - CorePower   : (available if GEOM_NO=5)
-!                      - CladPower   : (available if GEOM_NO=5)
+!                      - CorePower   : (available if GEOM_NO=5)     ! alt: Coef_r
+!                      - CladPower   : (available if GEOM_NO=5)     ! alt: Coef_c
 !
 !----------------------------------------------------------------------
 !
@@ -283,13 +439,15 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
    integer, intent(in)  :: Num_zpts
    real*8,  intent(in)  :: ZValues(Num_zpts)
    integer, intent(in)  :: Fld
-   real*8,  intent(out) :: Power(Num_zpts+1)
-   real*8,  intent(out) :: DiffPower(Num_zpts+1)
-   real*8,  intent(out) :: CorePower(Num_zpts+1)
-   real*8,  intent(out) :: CladPower(Num_zpts+1)
+   real*8,  intent(out) :: Power(Num_zpts)
+   real*8,  intent(out) :: DiffPower(Num_zpts)
+   real*8,  intent(out) :: CorePower(Num_zpts)
+   real*8,  intent(out) :: CladPower(Num_zpts)
 !
 !..auxiliary variables
-   real*8 :: facePower, faceDiffPower, elemPower
+   real(8)    :: facePower, faceDiffPower, elemPower
+   real(8)    :: modeNorm
+   complex(8) :: modeCoef
 !
 !..mdle number
    integer :: mdle
@@ -307,8 +465,6 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
 !..face number over which power is computed
 !  (in brick and prism, face 2 is face normal to xi3, at xi3=1)
    integer, parameter :: faceNum = 2
-!  (in brick and prism, face 1 is face normal to xi3, at xi3=0)
-   integer, parameter :: faceIn  = 1
 !
 !..timer
    real(8) :: MPI_Wtime,start_time,end_time
@@ -329,7 +485,7 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
    faceDiffPower  = 0.d0
 !
 !..start timer
-   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 !
    if (.not. DISTRIBUTED) then
       ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
@@ -340,7 +496,7 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
 !
 !$OMP PARALLEL DO                                        &
 !$OMP PRIVATE(mdle,etype,xnod,maxz,minz,i,ndom,          &
-!$OMP         facePower,faceDiffPower)                   &
+!$OMP         facePower,faceDiffPower,modeNorm,modeCoef) &
 !$OMP REDUCTION(+:Power,DiffPower,corePower,cladPower)   &
 !$OMP SCHEDULE(DYNAMIC)
    do iel=1,NRELES_SUBD
@@ -359,54 +515,35 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
             write(*,*) 'compute_power: invalid etype param. stop.'
             stop
       end select
-      if (minz .lt. GEOM_TOL) then
-         call compute_facePower(mdle,faceIn,Fld, facePower,faceDiffPower)
-         Power(1) = Power(1) + abs(facePower)
-         DiffPower(1) = DiffPower(1) + abs(faceDiffPower)
-         if (GEOM_NO .eq. 5) then
-            select case(ndom)
-               case(1,2)
-                  CorePower(1) = CorePower(1) + abs(facePower)
-               case(3,4)
-                  CladPower(1) = CladPower(1) + abs(facePower)
-            end select
-         endif
-      endif
       do i=1,Num_zpts
          if((ZValues(i).le.maxz).and.(ZValues(i).gt.minz)) then
-            call compute_facePower(mdle,faceNum,Fld, facePower,faceDiffPower)
-            Power(i+1) = Power(i+1) + abs(facePower)
-            DiffPower(i+1) = DiffPower(i+1) + abs(faceDiffPower)
-            if (GEOM_NO .eq. 5) then
-               select case(ndom)
-                  case(1,2)
-                     CorePower(i+1) = CorePower(i+1) + abs(facePower)
-                  case(3,4)
-                     CladPower(i+1) = CladPower(i+1) + abs(facePower)
-               end select
+            if (Fld .le. 9) then
+               call compute_facePower(mdle,faceNum,Fld, facePower,faceDiffPower)
+               DiffPower(i) = DiffPower(i) + abs(faceDiffPower)
+               if (GEOM_NO .eq. 5) then
+                  select case(ndom)
+                  case(1,2); CorePower(i) = CorePower(i) + abs(facePower)
+                  case(3,4); CladPower(i) = CladPower(i) + abs(facePower)
+                  end select
+               endif
+            elseif (Fld .ge. 13 .and. Fld .le. 16) then
+               call compute_mode_power(mdle,faceNum,Fld, facePower,modeNorm,modeCoef)
+               DiffPower(i) = DiffPower(i) + modeNorm       ! false name (calc norm)
+               CorePower(i) = CorePower(i) + real(modeCoef) ! false name (calc coef_r)
+               CladPower(i) = CladPower(i) + imag(modeCoef) ! false name (calc coef_r)
+               
             endif
+            Power(i) = Power(i) + abs(facePower)
          endif
       enddo
    enddo
 !$OMP END PARALLEL DO
 !
-!..TODO check (why not abs(facePower) above??)
-!..maybe relevant for counter pump configuration
-!..take absolute value after integration
-!   do i=1,Num_zpts
-!      Power(i) = abs(Power(i))
-!      DiffPower(i) = abs(DiffPower(i))
-!      if (GEOM_NO .eq. 5) then
-!         CorePower(i) = abs(CorePower(i))
-!         CladPower(i) = abs(CladPower(i))
-!      endif
-!   enddo
-!
 !..end timer
-   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
    if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
       write(*,3010) end_time-start_time
- 3010 format('  compute_power : ',f12.5,'  seconds',/)
+ 3010 format('  compute_power : ',f12.5,'  seconds')
    endif
 !
 end subroutine compute_power
@@ -418,7 +555,7 @@ end subroutine compute_power
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - Oct 2018
+!   latest revision    - Oct 2019
 !
 !   purpose            - Evaluates the electric field power of UW
 !                        Maxwell by integrating H(curl) trace solution
@@ -427,7 +564,7 @@ end subroutine compute_power
 !   arguments
 !        in:
 !                      - Mdle       : middle element node
-!                      - Facenumber :
+!                      - Facenumber : element face used for integration
 !                      - Fld        : 1 (signal) or 0 (pump)
 !       out:
 !                      - FacePower     :
@@ -525,28 +662,28 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
 !
 !---------------------------------------------------------------------------------------
 !
-   facePower = 0.d0
-   faceDiffPower = 0.0d0
+   FacePower = 0.d0
+   FaceDiffPower = 0.0d0
    nflag = 1
 !..element type
-   etype = NODES(mdle)%type
+   etype = NODES(Mdle)%type
    nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
-   call find_order(mdle, norder)
-   call find_orient(mdle, nedge_orient,nface_orient)
+   call find_order(Mdle, norder)
+   call find_orient(Mdle, nedge_orient,nface_orient)
    call nodcor(mdle, xnod)
    call solelm(mdle, zdofH,zdofE,zdofV,zdofQ)
 !..sign factor to determine the OUTWARD normal unit vector
-   nsign = nsign_param(etype,facenumber)
+   nsign = nsign_param(etype,Facenumber)
 !
 !..face type
-   ftype = face_type(etype,facenumber)
+   ftype = face_type(etype,Facenumber)
 !
 !..face order of approximation
-   call face_order(etype,facenumber,norder, norderf)
+   call face_order(etype,Facenumber,norder, norderf)
 !
 !..set 2D quadrature
-   INTEGRATION = NORD_ADD
-   call set_2Dint(ftype,norderf, nint,tloc,wtloc)
+   INTEGRATION = NORD_ADD ! why ?
+   call set_2D_int(ftype,norderf,nface_orient(Facenumber), nint,tloc,wtloc)
    INTEGRATION = 0
 !
 !..loop over integration points
@@ -556,18 +693,18 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
       t(1:2) = tloc(1:2,l)
 !
 !  ...face parametrization
-      call face_param(etype,facenumber,t, xi,dxidt)
+      call face_param(etype,Facenumber,t, xi,dxidt)
 !
 !  ...determine element H1 shape functions (for geometry)
       call shape3H(etype,xi,norder,nedge_orient,nface_orient, &
                      nrdofH,shapH,gradH)
 !
 !  ...geometry
-      call bgeom3D(mdle,xi,xnod,shapH,gradH,nrdofH,dxidt,nsign, &
+      call bgeom3D(Mdle,xi,xnod,shapH,gradH,nrdofH,dxidt,nsign, &
                      x,dxdxi,dxidx,rjac,dxdt,rn,bjac)
       weight = bjac*wtloc(l)
 !
-      call soleval(mdle,xi,nedge_orient,nface_orient,norder,xnod, &
+      call soleval(Mdle,xi,nedge_orient,nface_orient,norder,xnod, &
                    zdofH,zdofE,zdofV,zdofQ,nflag,x,dxdxi, &
                    zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
       if(NEXACT.eq.1) then
@@ -581,27 +718,27 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
 !                     E/H corresponding to pump   if Fld = 0
 !  ...first check for signal, i.e, if Fld = 1
       if(Fld.eq.1) then
-         call zz_cross_product(zsolE(1:3,1),conjg((zsolE(1:3,2))), EtimesH1)
+         call zz_cross_product(zsolE(1:3,1),conjg(zsolE(1:3,2)), EtimesH1)
          FdotN = EtimesH1(1)*rn(1)+EtimesH1(2)*rn(2)+EtimesH1(3)*rn(3)
-         facePower = facePower + (real(FdotN))*weight
+         FacePower = FacePower + (real(FdotN))*weight
 !     ...if we have an exact
          if(NEXACT.eq.1) then
-            call zz_cross_product(valE(1:3,1),conjg((valE(1:3,2))), EtimesH2)
-            faceDiffPower = faceDiffPower   &
+            call zz_cross_product(valE(1:3,1),conjg(valE(1:3,2)), EtimesH2)
+            FaceDiffPower = FaceDiffPower   &
                            + abs(((EtimesH1(1)*rn(1)+EtimesH1(2)*rn(2)+EtimesH1(3)*rn(3))*weight) - &
-                           ((EtimesH2(1)*rn(1)+EtimesH2(2)*rn(2)+EtimesH2(3)*rn(3))*weight))
+                                 ((EtimesH2(1)*rn(1)+EtimesH2(2)*rn(2)+EtimesH2(3)*rn(3))*weight))
          endif
 !  ...next check for pump, i.e, if Fld = 0
       else if(Fld.eq.0) then
-         call zz_cross_product(zsolE(1:3,3),conjg((zsolE(1:3,4))), EtimesH1)
+         call zz_cross_product(zsolE(1:3,3),conjg(zsolE(1:3,4)), EtimesH1)
          FdotN = EtimesH1(1)*rn(1)+EtimesH1(2)*rn(2)+EtimesH1(3)*rn(3)
-         facePower = facePower + (real(FdotN))*weight
+         FacePower = FacePower + (real(FdotN))*weight
 !     ...if we have an exact
          if(NEXACT.eq.1) then
-            call zz_cross_product(valE(1:3,3),conjg((valE(1:3,4))), EtimesH2)
-            faceDiffPower = faceDiffPower   &
+            call zz_cross_product(valE(1:3,3),conjg(valE(1:3,4)), EtimesH2)
+            FaceDiffPower = FaceDiffPower   &
                             + abs(((EtimesH1(1)*rn(1)+EtimesH1(2)*rn(2)+EtimesH1(3)*rn(3))*weight) - &
-                                 ((EtimesH2(1)*rn(1)+EtimesH2(2)*rn(2)+EtimesH2(3)*rn(3))*weight))
+                                  ((EtimesH2(1)*rn(1)+EtimesH2(2)*rn(2)+EtimesH2(3)*rn(3))*weight))
          endif
       else
          write(*,*) 'compute_facePower: Fld must be 0 or 1. stop.'
@@ -611,3 +748,221 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
    enddo
 !
 end subroutine compute_facePower
+!
+!
+!..purpose:
+!
+
+!
+!
+!----------------------------------------------------------------------
+!
+!   routine name       - compute_mode_power
+!
+!----------------------------------------------------------------------
+!
+!   latest revision    - Oct 2019
+!
+!   purpose            - Compute projection of field onto LP modes
+!
+!   arguments
+!        in:
+!                      - Mdle       : middle element node
+!                      - Facenumber : element face used for integration
+!                      - Fld        : 13 LP01 Mode
+!                                     14 LP11 Mode
+!                                     15 LP21 Mode
+!                                     16 LP02 Mode
+!       out:
+!                      - ModeNorm   : norm of the mode (for normalization)
+!                      - ModeCoef   : coefficient in the projection on mode
+!
+!----------------------------------------------------------------------
+subroutine compute_mode_power(Mdle,Facenumber,Fld, ModePower,ModeNorm,ModeCoef)
+!
+   use control
+   use data_structure3D
+   use environment, only : L2PROJ
+   use physics
+   use parametersDPG
+   use commonParam
+!
+   implicit none
+!
+   integer   , intent(in)  :: Mdle
+   integer   , intent(in)  :: Fld
+   integer   , intent(in)  :: Facenumber
+   real*8    , intent(out) :: ModePower
+   real*8    , intent(out) :: ModeNorm
+   complex(8), intent(out) :: ModeCoef
+!
+!..element, face order, geometry dof
+   integer,dimension(19)          :: norder
+   real*8 ,dimension(3,MAXbrickH) :: xnod
+   integer,dimension(12)          :: nedge_orient
+   integer,dimension(6)           :: nface_orient
+!
+!..face order
+   integer, dimension(5) :: norderf
+!
+!..number of vertices,edge,faces per element type
+   integer :: nrv, nre, nrf
+!
+!..declare edge/face type varibles
+   character(len=4) :: etype,ftype
+!
+!..variables for geometry
+   real*8, dimension(3)      :: xi,x,rn,x_new
+   real*8, dimension(3,2)    :: dxidt,dxdt,rt
+   real*8, dimension(3,3)    :: dxdxi,dxidx
+   real*8, dimension(2)      :: t
+   real*8                    :: rjac,bjac
+!
+!..2D quadrature data
+   real*8, dimension(2,MAXNINT2ADD)  :: tloc
+   real*8, dimension(MAXNINT2ADD)    :: wtloc
+!
+!..approximate solution dof's
+   VTYPE, dimension(MAXEQNH,MAXbrickH) :: zdofH
+   VTYPE, dimension(MAXEQNE,MAXbrickE) :: zdofE
+   VTYPE, dimension(MAXEQNV,MAXbrickV) :: zdofV
+   VTYPE, dimension(MAXEQNQ,MAXbrickQ) :: zdofQ
+!..H1 shape functions
+   integer                         :: nrdofH
+   real*8, dimension(MAXbrickH)    :: shapH
+   real*8, dimension(3,MAXbrickH)  :: gradH
+!
+!..approximate solution
+   VTYPE, dimension(  MAXEQNH  ) ::  zsolH
+   VTYPE, dimension(  MAXEQNH,3) :: zdsolH
+   VTYPE, dimension(3,MAXEQNE  ) ::  zsolE
+   VTYPE, dimension(3,MAXEQNE  ) :: zcurlE
+   VTYPE, dimension(3,MAXEQNV  ) ::  zsolV
+   VTYPE, dimension(  MAXEQNV  ) ::  zdivV
+   VTYPE, dimension(  MAXEQNQ  ) ::  zsolQ
+!
+!..exact solution
+   VTYPE,dimension(  MAXEQNH    )  ::   ValH
+   VTYPE,dimension(  MAXEQNH,3  )  ::  DvalH
+   VTYPE,dimension(  MAXEQNH,3,3)  :: d2valH
+   VTYPE,dimension(3,MAXEQNE    )  ::   ValE
+   VTYPE,dimension(3,MAXEQNE,3  )  ::  DvalE
+   VTYPE,dimension(3,MAXEQNE,3,3)  :: d2valE
+   VTYPE,dimension(3,MAXEQNV    )  ::   ValV
+   VTYPE,dimension(3,MAXEQNV,3  )  ::  DvalV
+!
+!..exact solution (UNUSED)
+   VTYPE,dimension(3,MAXEQNV,3,3)  :: d2valV
+   VTYPE,dimension(  MAXEQNQ    )  ::   valQ
+   VTYPE,dimension(  MAXEQNQ,3  )  ::  dvalQ
+   VTYPE,dimension(  MAXEQNQ,3,3)  :: d2valQ
+!
+!..for Poynting vector
+   VTYPE, dimension(3)  :: EtimesH
+   VTYPE                :: FdotN
+!
+!..miscellanea
+   integer :: nint,icase,iattr,l,i,j
+   real*8  :: weight,wa
+   integer :: iel,nsign
+   integer :: nflag,iload
+!
+!---------------------------------------------------------------------------------------
+!
+   ModePower = 0.d0
+   nflag = 1
+!..element type
+   etype = NODES(Mdle)%type
+   nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
+   call find_order(Mdle, norder)
+   call find_orient(Mdle, nedge_orient,nface_orient)
+   call nodcor(mdle, xnod)
+   call solelm(mdle, zdofH,zdofE,zdofV,zdofQ)
+!..sign factor to determine the OUTWARD normal unit vector
+   nsign = nsign_param(etype,Facenumber)
+!
+!..face type
+   ftype = face_type(etype,Facenumber)
+!
+!..face order of approximation
+   call face_order(etype,Facenumber,norder, norderf)
+!
+!..set 2D quadrature
+   INTEGRATION = NORD_ADD ! why ?
+   call set_2D_int(ftype,norderf,nface_orient(Facenumber), nint,tloc,wtloc)
+   INTEGRATION = 0
+!
+!..first loop over integration points to find projection coefficients
+   ModeNorm = 0.d0; ModeCoef = 0.d0
+   do l=1,nint
+!
+!  ...face coordinates
+      t(1:2) = tloc(1:2,l)
+!
+!  ...face parametrization
+      call face_param(etype,Facenumber,t, xi,dxidt)
+!
+!  ...determine element H1 shape functions (for geometry)
+      call shape3H(etype,xi,norder,nedge_orient,nface_orient, &
+                     nrdofH,shapH,gradH)
+!
+!  ...geometry
+      call bgeom3D(Mdle,xi,xnod,shapH,gradH,nrdofH,dxidt,nsign, &
+                     x,dxdxi,dxidx,rjac,dxdt,rn,bjac)
+      weight = bjac*wtloc(l)
+!
+      call soleval(Mdle,xi,nedge_orient,nface_orient,norder,xnod, &
+                   zdofH,zdofE,zdofV,zdofQ,nflag,x,dxdxi, &
+                   zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
+!
+!  ...compute field of the LP mode
+      call exact(x,Mdle, ValH,DvalH,d2valH, ValE,DvalE,d2valE, &
+                         ValV,DvalV,d2valV, valQ,dvalQ,d2valQ)
+!
+!     accumulate L2 inner product (signal),
+!     i.e., integrate (E     \dot phi_m^*) for m-th mode,
+!       and integrate (phi_m \dot phi_m^*) for m-th mode
+         ModeCoef = ModeCoef +     (zsolE(1,1) * conjg(valE(1,1)) +    &
+                                    zsolE(2,1) * conjg(valE(2,1)) +    &
+                                    zsolE(3,1) * conjg(valE(3,1))) * weight
+         ModeNorm = ModeNorm + real (valE(1,1) * conjg(valE(1,1)) +   &
+                                     valE(2,1) * conjg(valE(2,1)) +   &
+                                     valE(3,1) * conjg(valE(3,1))) * weight
+!..end loop over integration points
+   enddo
+!
+!..second loop over integration points to calculate power of mode projection
+   do l=1,nint
+!
+!  ...face coordinates
+      t(1:2) = tloc(1:2,l)
+!
+!  ...face parametrization
+      call face_param(etype,Facenumber,t, xi,dxidt)
+!
+!  ...determine element H1 shape functions (for geometry)
+      call shape3H(etype,xi,norder,nedge_orient,nface_orient, &
+                     nrdofH,shapH,gradH)
+!
+!  ...geometry
+      call bgeom3D(Mdle,xi,xnod,shapH,gradH,nrdofH,dxidt,nsign, &
+                     x,dxdxi,dxidx,rjac,dxdt,rn,bjac)
+      weight = bjac*wtloc(l)
+!
+!  ...compute field of the LP mode
+      call exact(x,Mdle, ValH,DvalH,d2valH, ValE,DvalE,d2valE, &
+                         ValV,DvalV,d2valV, valQ,dvalQ,d2valQ)
+!
+!     accumulate Poynting vector power for mode in signal
+!     i.e., integrate [Real{n \dot (phi_m x conjg(beta*phi_m))}]
+      call zz_cross_product(ValE(1:3,1),conjg(ValE(1:3,2)), EtimesH)
+      FdotN = EtimesH(1)*rn(1)+EtimesH(2)*rn(2)+EtimesH(3)*rn(3)
+      ModePower = ModePower + weight*real(FdotN)
+!
+!..end loop over integration points
+   enddo
+!
+end subroutine compute_mode_power
+
+
+

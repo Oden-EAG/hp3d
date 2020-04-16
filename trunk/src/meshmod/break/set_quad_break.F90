@@ -21,7 +21,7 @@ subroutine set_quad_break(Kref,Nord, Nrsons,Type,Norder)
 !
 ! initialize
   Norder = 0; Type(1:27) = 'none'
-!  
+!
   call decode(Nord, nordx,nordy)
 !
 ! select refinement kind

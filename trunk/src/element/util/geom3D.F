@@ -81,19 +81,23 @@ c
 c  ...evaluate the inverse Jacobian of the geometry map
       call geom(Dxdxi, Dxidx,Rjac,Iflag)
 c
+      if (Iflag .eq. 1) iprint = 1
+      !$OMP CRITICAL
       if (iprint.eq.1) then
+        write(*,*) 'Mdle    = ', Mdle
         write(*,*) 'X,Dxdxi = '
         do i=1,3
           write(*,7002) X(i),Dxdxi(i,1:3)
- 7002     format(f8.3,3x,3f8.3)
+ 7002     format(f8.3,3x,3f10.3)
         enddo
-        write(*,*) 'Rjac, Dxidx = ',Rjac
+        write(*,*) 'Rjac', Rjac
+        write(*,*) 'Dxidx = '
         do i=1,3
           write(*,7003) Dxidx(i,1:3)
- 7003     format(11x,3f8.3)
+ 7003     format(11x,3f10.3)
         enddo
-        call pause
       endif
+      !$OMP END CRITICAL
 c
       end subroutine geom3D
 c
@@ -148,7 +152,9 @@ c
       call geom3D(Mdle,Xi,Xnod,ShapH,GradH,NrdofH, 
      .            X,Dxdxi,Dxidx,Rjac,iflag)
       if (iflag.ne.0) then
-        write(*,*) 'bgeom3D: ERROR'; stop 1
+        write(*,5999) Mdle,Rjac
+ 5999   format('bgeom3D: Negative Jacobian. Mdle,Rjac=',i10,',',e12.5)
+        stop
       endif
 c
 c  ...derivatives of geometry map wrt face parameters
@@ -177,17 +183,8 @@ c
 c
 c
       end subroutine bgeom3D
-
-
-
-
-
-
-
-
-
-
-
+c
+c
 c----------------------------------------------------------------------
 c
 c   routine name       - refgeom3D
@@ -278,6 +275,7 @@ c
 c
       end subroutine refgeom3D
 c
+c
 c----------------------------------------------------------------------
 c
 c   routine name       - brefgeom3D
@@ -357,4 +355,3 @@ c
 c
 c
       end subroutine brefgeom3D
-

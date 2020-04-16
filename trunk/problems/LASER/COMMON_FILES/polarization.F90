@@ -12,11 +12,12 @@
 !           Dom_flag - 1 for core, 0 for cladding
 !           Fld_flag - 1 for signal, 0 for pump
 !           Delta_n  - thermally induced refractive index perturbation
+!           X        - coordinate
 ! output:
 !           Bg_pol - value of background polarization
 !
 !-------------------------
-subroutine get_bgPol(Dom_flag,Fld_flag,Delta_n, Bg_pol)
+subroutine get_bgPol(Dom_flag,Fld_flag,Delta_n,X, Bg_pol)
 !
    use commonParam
    use laserParam
@@ -24,20 +25,27 @@ subroutine get_bgPol(Dom_flag,Fld_flag,Delta_n, Bg_pol)
    implicit none
 !
    integer, intent(in)  :: Dom_flag,Fld_flag
-   real*8 , intent(in)  :: Delta_n
+   real(8), intent(in)  :: Delta_n
+   real(8), intent(in)  :: X(3)
    VTYPE  , intent(out) :: Bg_pol(3,3)
 !
-   real*8 :: aux(3,3)
+   real(8) :: aux(3,3)
+!
+   real(8), parameter :: gratingCore = 1.0d-3
+   real(8), parameter :: gratingClad = 1.0d-6
+   real(8), parameter :: gratingFreq = 0.0511d0
 !
    aux = 0.d0
    if (Dom_flag.eq.1) then
       aux = CORE_N+Delta_n*IDENTITY
+      if (ART_GRATING .eq. 1) aux = aux + gratingCore*sin(gratingFreq*X(3))*IDENTITY
       aux(1,1) = aux(1,1)*aux(1,1)
       aux(2,2) = aux(2,2)*aux(2,2)
       aux(3,3) = aux(3,3)*aux(3,3)
       Bg_pol = aux-IDENTITY
    elseif (Dom_flag.eq.0) then
       aux = CLAD_N+Delta_n*IDENTITY
+      if (ART_GRATING .eq. 1) aux = aux + gratingClad*sin(gratingFreq*X(3))*IDENTITY
       aux(1,1) = aux(1,1)*aux(1,1)
       aux(2,2) = aux(2,2)*aux(2,2)
       aux(3,3) = aux(3,3)*aux(3,3)

@@ -76,7 +76,7 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
   case('mdlt','mdlq')
   case default
      write(*,1)Mface,NODES(Mface)%type
-1    format(' neig_face: Mface,type = ',i10,2x,a4)
+1    format(' neig_face: Mface,type = ',i10,',',a4)
      call logic_error(ERR_INVALID_VALUE,__FILE__,__LINE__)
   end select
 !
@@ -155,7 +155,7 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
    else
      type = NODES(mdle)%type
      kref = NODES(mdle)%ref_kind
-     call elem_nodes(mdle, nodesl, norientl)
+     call elem_nodes(mdle, nodesl,norientl)
      call nr_mdle_sons(type, kref, nrsons)
      Nrneig = 0
 !

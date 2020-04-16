@@ -133,7 +133,7 @@ module data_structure3D
         integer          :: visit
 !
 !  .....activation flag
-        logical           :: act
+        logical          :: act
 !
 !  .....subdomain number (distributed mesh)
         integer          :: subd
@@ -316,6 +316,8 @@ module data_structure3D
 !  ...allocate memory for data structure
       subroutine allocds
 !
+      integer :: nel,nod
+!
       if (allocated(ELEMS)) then
         write(*,*) 'allocds: WARNING !! DATA STRUCTURE ARRAYS', &
                    ' HAVE NOT BEEN DEALLOCATED'
@@ -343,6 +345,7 @@ module data_structure3D
         NODES(nod)%index = 0
         NODES(nod)%order = 0
         NODES(nod)%act = .false.
+        NODES(nod)%subd = -1
         NODES(nod)%bcond = nod+1
         NODES(nod)%ref_kind = 0
         NODES(nod)%father = 0
@@ -365,6 +368,8 @@ module data_structure3D
 !
 !  ...deallocate data structure arrays
       subroutine deallocds
+!
+      integer :: nel,nod
 !
       do nel=1,NRELIS
         if (associated(ELEMS(nel)%physics)) deallocate(ELEMS(nel)%physics)
@@ -389,6 +394,63 @@ module data_structure3D
       if (allocated(ELEM_ORDER)) deallocate(ELEM_ORDER)
 !
       end subroutine deallocds
+!
+!-----------------------------------------------------------------------
+!
+!  ...increase MAXNODS
+      subroutine increase_MAXNODS()
+!
+      type(node), allocatable :: NODES_NEW(:)
+      integer :: MAXNODS_NEW,nod
+!
+      if (.not. allocated(NODES)) then
+         write(*,*) 'increase_MAXNODS: NODES not allocated. returning...'
+         return
+      endif
+      if (NPNODS .ne. 0 .or. NRNODS .lt. MAXNODS) then
+         write(*,*) 'increase_MAXNODS: INCONSISTENCY. MAXNODS,NRNODS,NPNODS=',&
+                                                      MAXNODS,NRNODS,NPNODS
+         return
+      endif
+!
+!  ...determine size of new NODES array
+      MAXNODS_NEW = 2*MAXNODS
+!
+!  ...allocate new NODES array twice the size of the old
+      allocate(NODES_NEW(MAXNODS_NEW))
+!
+!  ...copy data from old NODES array into the new one
+      NODES_NEW(1:MAXNODS) = NODES(1:MAXNODS)
+!
+      !$OMP PARALLEL DO
+      do nod=MAXNODS+1,MAXNODS_NEW
+        NODES_NEW(nod)%type = 'none'
+        NODES_NEW(nod)%case = 0
+        NODES_NEW(nod)%index = 0
+        NODES_NEW(nod)%order = 0
+        NODES_NEW(nod)%act = .false.
+        NODES_NEW(nod)%subd = -1
+        NODES_NEW(nod)%bcond = nod+1
+        NODES_NEW(nod)%ref_kind = 0
+        NODES_NEW(nod)%father = 0
+        NODES_NEW(nod)%first_son = 0
+        NODES_NEW(nod)%nr_sons = 0
+        NODES_NEW(nod)%geom_interf = 0
+        nullify (NODES_NEW(nod)%dof)
+#if DEBUG_MODE
+        NODES_NEW(nod)%error = 0.d0
+#endif
+      enddo
+      !$OMP END PARALLEL DO
+      NODES_NEW(MAXNODS_NEW)%bcond = 0
+!
+!  ...move NODES pointer to the new array,
+!     and deallocate the old array
+      call move_alloc(NODES_NEW, NODES)
+      NPNODS  = MAXNODS+1
+      MAXNODS = MAXNODS_NEW
+!
+      end subroutine increase_MAXNODS
 !
 !-----------------------------------------------------------------------
 !

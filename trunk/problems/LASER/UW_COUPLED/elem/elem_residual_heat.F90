@@ -92,7 +92,8 @@ subroutine elem_residual_heat(Mdle,                &
    real*8, dimension(3) :: dv1,dv2
 !
 !..Gram matrix in packed format
-   real*8 :: gramP(NrTest*(NrTest+1)/2)
+   !real*8 :: gramP(NrTest*(NrTest+1)/2)
+   real(8), allocatable :: gramP(:)
 !
 !..load vector for the enriched space
    real*8, dimension(NrTest) :: bload_H,bload_Hc
@@ -164,6 +165,9 @@ subroutine elem_residual_heat(Mdle,                &
 !           /,'                    zdofV = ',6(e12.5,2x))
 !   endif
 !
+!..allocate space for auxiliary matrices
+   allocate(gramP(NrTest*(NrTest+1)/2))
+!
 !..clear space for auxiliary matrices
    bload_H = rZERO; gramP = rZERO
 !
@@ -173,7 +177,7 @@ subroutine elem_residual_heat(Mdle,                &
 !
 !..use the enriched order to set the quadrature
    INTEGRATION = NORD_ADD
-   call set_3D_int_DPG(etype,norder, nint3,xiloc,waloc)
+   call set_3D_int_DPG(etype,norder,norient_face, nint3,xiloc,waloc)
    INTEGRATION = 0
 !
 !..loop over integration points
@@ -290,7 +294,7 @@ subroutine elem_residual_heat(Mdle,                &
 !
 !  ...set 2D quadrature
       INTEGRATION = NORD_ADD
-      call set_2D_int_DPG(ftype,norderf, nint,tloc,wtloc)
+      call set_2D_int_DPG(ftype,norderf,norient_face(ifc), nint,tloc,wtloc)
       INTEGRATION = 0
 !
 !  ...loop through integration points
@@ -380,6 +384,8 @@ subroutine elem_residual_heat(Mdle,                &
       write(*,*) 'elem_residual_heat: info = ',info
       stop
    endif
+!
+   deallocate(gramP)
 !
 !..compute the residual
    Resid = 0.d0

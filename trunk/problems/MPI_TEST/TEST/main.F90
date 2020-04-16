@@ -17,9 +17,9 @@ program main
    use data_structure3D
    use GMP
 !
-   use MPI      , only: MPI_COMM_WORLD
-   use mpi_param, only: ROOT,RANK,NUM_PROCS, &
-                        MPI_param_init,MPI_param_finalize
+   use MPI        , only: MPI_COMM_WORLD
+   use mpi_param  , only: ROOT,RANK,NUM_PROCS
+   use mpi_wrapper, only: mpi_w_init,mpi_w_finalize
 !
    implicit none
 !
@@ -29,7 +29,7 @@ program main
 !----------------------------------------------------------------------
 !
 !..Initialize MPI environment
-   call MPI_param_init
+   call mpi_w_init
 !
 !..Set common hp3D environment parameters (reads in options arguments)
    call begin_environment  ! <-- found inside src/modules/environment.F90
@@ -83,14 +83,14 @@ program main
    enddo
  1020 format (A,I3,A,/)
 !
-   if (RANK .eq. 0) then
+   if (RANK .eq. ROOT) then
       call master_main
    else
       call worker_main
    endif
 !
    call finalize
-   call MPI_param_finalize
+   call mpi_w_finalize
 !..END MPI
 !
 end program main

@@ -5,7 +5,7 @@
 !
 !     module:              par_mesh
 !
-!     last modified:       July 2019
+!     last modified:       Oct 2019
 !
 !     purpose:             provides functionality for distributing
 !                          degrees of freedom in the FE mesh
@@ -46,7 +46,7 @@ subroutine distr_mesh()
    VTYPE, allocatable :: buf(:)
 !
 !..auxiliary variables
-   integer :: subd_next(NRELES), nodm(MAXNODM)
+   integer :: subd_next(NRELES), nodm(MAXNODM), nodesl(27)
    integer :: i, iel, inod, iproc, mdle, nod, subd, subd_size
    integer :: nrnodm, nrdof_nod
    integer :: iprint = 0
@@ -69,8 +69,9 @@ subroutine distr_mesh()
          iproc = iel/subd_size
       enddo
    elseif (ZOLTAN_LB .eq. 7) then
-      if (RANK .eq. ROOT) write(*,*) 'calling partition_fiber...'
+      if (RANK .eq. ROOT) write(*,*) 'calling (re-)partition_fiber...'
       call partition_fiber(subd_next)
+      !call repartition_fiber(subd_next)
    else
       call zoltan_w_partition(subd_next)
    endif
@@ -93,7 +94,7 @@ subroutine distr_mesh()
       if (subd .eq. subd_next(iel)) cycle
       if ((subd .ne. RANK) .and. (subd_next(iel) .ne. RANK)) cycle
 !  ...3a. get list of nodes associated with mdle node
-      call get_elem_nodes(mdle, nodm,nrnodm)
+      call get_elem_nodes(mdle, nodesl,nodm,nrnodm)
 !  ...3b. iterate over list of nodes
       do inod=1,nrnodm
          nod = nodm(inod)
@@ -166,7 +167,7 @@ subroutine distr_mesh()
    enddo
 !$OMP END DO
 !
-!..6. Set subdomain values for all nodes within subdomain
+!..6. Set subdomain values for all (unconstrained) nodes within subdomain
 !$OMP DO SCHEDULE(DYNAMIC)
    do iel=1,NRELES
       if (subd_next(iel) .eq. RANK) then
@@ -205,28 +206,36 @@ end subroutine distr_mesh
 !
 !----------------------------------------------------------------------
 !     routine:    get_elem_nodes
-!     purpose:    get nodes associated with an element
+!     purpose:    get (unconstrained) nodes associated with an element
 !----------------------------------------------------------------------
-subroutine get_elem_nodes(Mdle, Nodm,Nrnodm)
+subroutine get_elem_nodes(Mdle, Nodesl,Nodm,Nrnodm)
    integer, intent(in)  :: Mdle
+   integer, intent(out) :: Nodesl(27)
    integer, intent(out) :: Nodm(MAXNODM)
    integer, intent(out) :: Nrnodm
-   integer :: nodesl(27),norientl(27)
+   integer :: norientl(27)
+   Nodesl(1:27) = 0
    Nodm(1:MAXNODM) = 0; Nrnodm = 0
-   call get_connect_info(Mdle, nodesl,norientl)
-   call logic_nodes(Mdle,nodesl, Nodm,Nrnodm)
+   call get_connect_info(Mdle, Nodesl,norientl)
+   call logic_nodes(Mdle,Nodesl, Nodm,Nrnodm)
 end subroutine get_elem_nodes
 !
 !----------------------------------------------------------------------
 !     routine:    set_subd_elem
-!     purpose:    set subd values for nodes associated with an element
+!     purpose:    set subd values for (unconstrained) nodes associated
+!                 with an element
 !----------------------------------------------------------------------
 subroutine set_subd_elem(Mdle)
    integer, intent(in) :: Mdle
-   integer :: nodm(MAXNODM)
-   integer :: i, nrnodm, subd
-   call get_elem_nodes(Mdle, nodm,nrnodm)
+   integer :: nodm(MAXNODM),nodesl(27)
+   integer :: i,nrnodm,subd
+   character(len=4) :: type
+   call get_elem_nodes(Mdle, nodesl,nodm,nrnodm)
    call get_subd(Mdle, subd)
+   type = NODES(Mdle)%type
+   do i=1,nvert(type)+nedge(type)+nface(type)
+      call set_subd(nodesl(i),subd)
+   enddo
    do i=1,nrnodm
       call set_subd(nodm(i),subd)
    enddo
@@ -410,7 +419,7 @@ subroutine unpack_dof_buf(Nod,Nrdof_nod,Buf)
 !..extract geometry dof from buffer
    if(ndofH .gt. 0) then
       do ivar=1,NDIMEN
-         NODES(Nod)%dof%coord(ivar,1:ndofH) = Buf(j+1:j+ndofH)
+         NODES(Nod)%dof%coord(ivar,1:ndofH) = real(Buf(j+1:j+ndofH))
          j = j + ndofH
       enddo
    endif

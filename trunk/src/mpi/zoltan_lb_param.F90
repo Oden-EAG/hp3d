@@ -260,10 +260,13 @@ subroutine zoltan_lb_param_graph(Ierr_out)
    if (ierr > Ierr_out) Ierr_out = ierr
 !
 !..LB_APPROACH
-!     PARTITION  : use Zoltan's PHG hypergraph package
-!     REPARTITION: use METIS/ParMETIS ordering
-!     REFINE     : use Scotch/PT-Scotch ordering
-   ierr = Zoltan_Set_Param(zz,'LB_APPROACH','PARTITION')
+!     PARTITION  : partition "from scratch", not taking into account
+!                  current data distribution (static load balancing)
+!     REPARTITION: partition but take into account current data
+!                  distribution to keep data migration low
+!                  (dynamic load balancing)
+!     REFINE     : quickly improve the current data distribution
+   ierr = Zoltan_Set_Param(zz,'LB_APPROACH','REPARTITION')
    call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
    if (ierr > Ierr_out) Ierr_out = ierr
 !

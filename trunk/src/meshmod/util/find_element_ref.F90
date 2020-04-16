@@ -1,9 +1,9 @@
 !> Purpose : modify the refinement to accommodate existing refinements
 !! @param[in]  Type  - middle node type
 !! @param[in]  Kref  - refinement kind of middle node
-!! @param[in]  Kreff - existing face refimenets
+!! @param[in]  Kreff - existing face refinements
 !!
-!! @param[out] Krefm - modified refinement
+!! @param[out] Krefm - modified (upgraded) refinement
 subroutine find_element_ref(Type,Kref,Kreff, Krefm)
   use element_data
   use refinements
@@ -17,29 +17,31 @@ subroutine find_element_ref(Type,Kref,Kreff, Krefm)
   integer, dimension(6) :: kreff_trial
   integer :: iprint, ipass, isum, iface, i, j, kref_trial
   !-------------------------------------------------------
-
+  !
   iprint=0
-
+#if DEBUG_MODE
   if (iprint.ge.1) then
-      write(*,7000)Type,Kref,Kreff(1:6)
+      write(*,7000) Type,Kref,Kreff(1:6)
   endif
-
-  7000 format(' find_element_ref: Type,Kref,Kreff = ',a4,4x,i2,4x,6(i2,2x))
-  7001 format(' find_element_ref: Type,Kref,Krefm,Kreff = ',a5,2x,i2,2x,i2,6x,6(2x,i2))
-
+#endif
+  !
+  7000 format(' find_element_ref: Type,Kref,Kreff = ',a4,',',i3,',',6(2x,i2))
+  7001 format(' find_element_ref: Type,Kref,Krefm,Kreff = ',   &
+                                  a4,',',i3,',',i3,',',6(2x,i2))
+  !
   Krefm = -1
   ! be careful, the search direction is from aniso refinement
   ! to minimize the unwanted refinements
   do i=nr_ref(Type),1,-1
      kref_trial = kref_kind(i, Type)
      call check_ref(Type,Kref,kref_trial, ipass)
-     
+     !
      ! if not pass, try rest
      if (ipass.eq.0) cycle
-
+     !
      ! if pass element level refinement, check face
      call find_face_ref_flags(Type,kref_trial, kreff_trial)
-
+     !
      isum = 0
      do iface=1,nface(Type)
         j = nvert(Type) + nedge(Type) + iface
@@ -47,17 +49,19 @@ subroutine find_element_ref(Type,Kref,Kreff, Krefm)
                        kreff_trial(iface), ipass)
         isum = isum + ipass
      enddo
-
+     !
      ! pass all test, loop out with modified one
      if (isum.eq.nface(Type)) then
         Krefm = kref_trial
         exit
      endif
   enddo
-!
+  !
+#if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,7001) Type,Kref,Krefm,Kreff(1:nface(Type))
      call pause
   endif
-
+#endif
+  !
 end subroutine find_element_ref

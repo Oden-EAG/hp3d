@@ -2,20 +2,20 @@
 !> Purpose : activate inactive nodes which are not constrained
 !            but in the current mesh
 !!
-!> @date July 2019
+!> @date Oct 2019
 !--------------------------------------------------------------------
 !
 subroutine refresh
 !
    use data_structure3D
-   use par_mesh  , only: DISTRIBUTED
+   use par_mesh  , only: DISTRIBUTED,set_subd_elem
    use mpi_param , only: RANK
 !
    implicit none
 !
    character(4) :: type
    integer :: nodesl(27),norientl(27)
-   integer :: iprint,i,j,iel,nod,nfath,mdle,ibegin,iend, &
+   integer :: iprint,i,j,iel,nod,nfath,mdle, &
               nrsons,loc,subd
    integer :: nrdofH,nrdofE,nrdofV,nrdofQ
 !
@@ -41,20 +41,18 @@ subroutine refresh
       NODES(i)%visit = 0
    enddo
 !$OMP END DO
-!  
+!
 !--------------------------------------------------------------------
 ! Step 1 : raise visitation flag for vertex, edge and face nodes of |
 !          all active elements                                      |
 !--------------------------------------------------------------------
-!$OMP DO PRIVATE(mdle,subd,nodesl,norientl,type,ibegin,iend,i)
+!$OMP DO PRIVATE(mdle,subd,nodesl,norientl,type,i)
    do iel=1,NRELES
       mdle = ELEM_ORDER(iel)
       call get_subd(mdle, subd)
       call elem_nodes(mdle, nodesl,norientl)
       type=NODES(mdle)%type
-      ibegin=1
-      iend  =nvert(type)+nedge(type)+nface(type)
-      do i=ibegin,iend
+      do i=1,nvert(type)+nedge(type)+nface(type)
          NODES(nodesl(i))%visit=1
 !     ...if node is visited by an element within my subdomain,
 !        add node to my subdomain (need its dofs). this flag will
@@ -63,12 +61,14 @@ subroutine refresh
             call set_subd(nodesl(i),subd)
          endif
       enddo
+!
    enddo
 !$OMP END DO
 !
 !--------------------------------------------------------------------
 ! Step 2: activate all inactive edge and face nodes whose father    |
-!         node was not visited                                      |
+!         node was not visited (i.e., activate inactive edge and    |
+!         face nodes that are unconstrained)                        |
 !--------------------------------------------------------------------
 !
 !..loop over all nodes
@@ -81,24 +81,22 @@ subroutine refresh
          case('mdlb','mdln','mdlp','mdld') ; cycle
       end select
 !
-!  ...skip if the node has not been marked
-      if (NODES(nod)%visit.eq.0) cycle
+!  ...skip if the node has not been marked,
+!     and deactivate if it is still active
+      if (NODES(nod)%visit.eq.0) then
+         if (Is_active(nod)) call deactivate(nod, nrdofH,nrdofE,nrdofV,nrdofQ)
+         cycle
+      endif
 !
 !  ...skip if active
       if (Is_active(nod)) cycle
 !
       nfath=NODES(nod)%father
 !
-!  ...if father node has not been visited, activate the node
+!  ...if father node has not been visited, then the node is unconstrained
+!     thus activate the node
       if (NODES(nfath)%visit.eq.0) then
          call activate(nod, nrdofH,nrdofE,nrdofV,nrdofQ)
-!
-!     ...if this is the last son, deactivate the father
-         nrsons = NODES(nfath)%nr_sons
-         loc = nod - NODES(nfath)%first_son + 1
-         if (loc.eq.nrsons) then
-            call deactivate(nfath, nrdofH,nrdofE,nrdofV,nrdofQ)
-         endif
       endif
 !
 !..end of loop over nodes

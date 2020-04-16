@@ -45,7 +45,6 @@ c  ...work space for neig-face
 c
 c----------------------------------------------------------------------
 c
-c
  10   continue
       write(*,*) 'result: SELECT:'
       write(*,*) 'EXIT....................................0'
@@ -61,11 +60,11 @@ c
         return
       case(1)
         write(*,6001) NRELIS,NRELES,NRNODS
- 6001   format(' NRELIS,NRELES,NRNODS = ',3i10)
+ 6001   format(' NRELIS,NRELES,NRNODS            = ',3i10)
         write(*,6002) NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ
  6002   format(' NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ = ',4i10)
         write(*,6003) MAXNODS,NPNODS
- 6003   format(' MAXNODS,NPNODS = ',2i10)
+ 6003   format(' MAXNODS,NPNODS                  = ',2i10)
 c
       case(2)
         write(*,*) 'SET INITIAL MESH ELEMENT NUMBER'
@@ -119,15 +118,17 @@ c
  7025   format(' ORDER = ',i3)
         write(*,7026) NODES(nod)%bcond
  7026   format(' BC FLAG = ',i5)
-        write(*,7426) NODES(nod)%visit
- 7426   format(' VISITATION FLAG = ',i5)
-        write(*,7027) NODES(nod)%ref_kind
- 7027   format(' REFINEMENT KIND = ',i3)
-        write(*,7028) NODES(nod)%father
- 7028   format(' FATHER = ',i10)
+        write(*,7027) NODES(nod)%visit
+ 7027   format(' VISITATION FLAG = ',i5)
+        write(*,7028) NODES(nod)%subd
+ 7028   format(' SUBDOMAIN  FLAG = ',i5)
+        write(*,7029) NODES(nod)%ref_kind
+ 7029   format(' REFINEMENT KIND = ',i3)
+        write(*,7040) NODES(nod)%father
+ 7040   format(' FATHER = ',i10)
         if (NODES(nod)%ref_kind.ne.0) then
-           write(*,7029) NODES(nod)%first_son,NODES(nod)%nr_sons
- 7029      format(' FIRST_SON = ',i10,', NR_SONS = ',i10)
+           write(*,7041) NODES(nod)%first_son,NODES(nod)%nr_sons
+ 7041      format(' FIRST_SON = ',i10,', NR_SONS = ',i10)
         endif
 c
         select case (NODES(nod)%type)
@@ -135,7 +136,7 @@ c
            call find_domain(nod,ndom)
            write(*,8000) ndom
  8000      format(' DOMAIN = ',i3)
-           call elem_nodes(nod, nodesl, norientl)
+           call elem_nodes(nod, nodesl,norientl)
            type = NODES(nod)%type
 c
            ibegin = 1
@@ -170,6 +171,7 @@ c
  7030   format(' GMP INTERFACE FLAG = ',i2)
         call find_ndof(nod, ndofH,ndofE,ndofV,ndofQ)
 c
+c  .....Geometry dof
         if (associated(NODES(nod)%dof)) then
           if (associated(NODES(nod)%dof%coord)) then
             write(*,7031)

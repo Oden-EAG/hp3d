@@ -150,8 +150,8 @@ subroutine par_mumps_sc(mtype)
 !
 !..non-zero counters for element offsets in distributed sparse stiffness matrix
 !  using 64 bit integers nnz and nnz_loc
-   nnz     = 0_8; ! global number of non-zeros in matrix (counts duplicate indices)
-   nnz_loc = 0_8; ! local  number of non-zeros in matrix (counts duplicate indices)
+   nnz     = 0_8 ! global number of non-zeros in matrix (counts duplicate indices)
+   nnz_loc = 0_8 ! local  number of non-zeros in matrix (counts duplicate indices)
    elem_nnz_loc(1:NRELES_SUBD) = 0_8 ! local element offsets for subdomain matrix
 !
 !..compute offsets for owned nodes
@@ -191,7 +191,7 @@ subroutine par_mumps_sc(mtype)
          if (NFIRST_DOF(nod).ge.0) cycle
 !     ...store the first dof offset
          NFIRST_DOF(nod) = nrdof
-!     ...update the H(div) dof counter
+!     ...update the dof counter
          nrdof = nrdof + ndofmH(i) + ndofmE(i) + ndofmV(i)
       enddo
       if (.not. ISTC_FLAG) nrdof = nrdof + ndofmQ(nrnodm)

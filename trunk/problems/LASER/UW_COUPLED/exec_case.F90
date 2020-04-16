@@ -7,6 +7,7 @@ subroutine exec_case(idec)
    use control
    use data_structure3D
    use par_mesh
+   use paraview      , only: VLEVEL
    use zoltan_wrapper, only: zoltan_w_partition,zoltan_w_eval
    use mpi_param     , only: RANK,ROOT
    use MPI           , only: MPI_COMM_WORLD,MPI_INTEGER
@@ -21,6 +22,8 @@ subroutine exec_case(idec)
    integer :: flag(6)
    integer :: physNick
 !
+   integer :: iParAttr(6)
+!
    integer :: fld,numPts,i,refs
 !
    integer :: src,count,ierr
@@ -33,6 +36,42 @@ subroutine exec_case(idec)
    solved = .false.
 !
    select case(idec)
+!
+!  ...Paraview graphics
+      case(3)
+!     ...iParAttr parameter specifies which fields we dump out to paraview:
+!        - 1 H1 (heat)
+!        - 2 H(curl) (signal, E and H flux)
+!        - 2 H(curl) (pump,   E and H flux)
+!        - 1 H(div) (heat flux)
+!        - 6 L2 (signal, E and H field)
+!        - 6 L2 (pump,   E and H Field)
+!
+         iParAttr = (/1,2,2,1,6,6/)
+!         write(*,300) ' paraview output: select fields...'   , &
+!                      '  - 1 H1 (heat)'                      , &
+!                      '  - 2 H(curl) (signal, E and H flux)' , &
+!                      '  - 2 H(curl) (pump,   E and H flux)' , &
+!                      '  - 1 H(div) (heat flux)'             , &
+!                      '  - 6 L2 (signal, E and H field)'     , &
+!                      '  - 6 L2 (pump,   E and H Field)'
+!         read (*,*) iParAttr(1),iParAttr(2),iParAttr(3), &
+!                    iParAttr(4),iParAttr(5),iParAttr(6)
+!     300 format(A,/,A,/,A,/,A,/,A,/,A,/,A)
+!
+!         write(*,*) 'paraview output: select VLEVEL (0-4)...'
+!         read (*,*) vis_level
+!         select case(vis_level)
+!            case('0','1','2','3','4')
+!               VLEVEL = vis_level
+!            case default
+!               write(*,*) ' invalid VLEVEL. setting VLEVEL=3 (default).'
+!               VLEVEL = '3'
+!         end select
+!
+         iParAttr = (/0,0,0,0,1,0/)
+         call my_paraview_driver(iParAttr)
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 !  ...print data structure (interactive)
       case(10); call result
@@ -126,23 +165,28 @@ subroutine exec_case(idec)
          write(*,*) 'verify distributed mesh consistency...'
          call par_verify
 !
-!  ...solve problem with omp_mumps (OpenMP MUMPS)
+!  ...solve problem with par_nested (nested MPI MUMPS)
       case(40)
+         write(*,*) 'calling nested MUMPS (MPI) solver...'
+         call par_nested('H')
+!
+!  ...solve problem with par_mumps_sc (MPI MUMPS)
+      case(41)
          write(*,*) 'calling MUMPS (MPI) solver...'
          call par_mumps_sc('H')
 !
-!  ...solve problem with par_mumps (MPI MUMPS)
-      case(41)
+!  ...solve problem with mumps_sc (OpenMP MUMPS)
+      case(42)
          write(*,*) 'calling MUMPS (OpenMP) solver...'
          call mumps_sc('H')
 !
-!  ...solve problem with pardiso (OpenMP)
-      case(42)
+!  ...solve problem with pardiso_sc (OpenMP Pardiso)
+      case(43)
          write(*,*) 'calling Pardiso (OpenMP) solver...'
          call pardiso_sc('H')
 !
 !  ...solve problem with Frontal solver (sequential)
-      case(43)
+      case(44)
          write(*,*) 'calling Frontal (Seq) solver...'
          call solve1(1)
 !

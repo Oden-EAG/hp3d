@@ -76,7 +76,7 @@
 ! misc work space
   integer :: iprint,nrv,nre,nrf,i,j,k,ie,kj,ki,&
              ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_Edge,iflag1
-!      
+!
 !----------------------------------------------------------------------
 !     
 ! debug printing flag
@@ -248,7 +248,7 @@
 ! triangular solves
   call dtrsm('L','L','N','U',ndofH_edge,3,1.d0,aaH,naH, uu,naH)
   call dtrsm('L','U','N','N',ndofH_edge,3,1.d0,aaH,naH, uu,naH)
-!    
+!
   if (iprint.eq.1) then
    write(*,*) 'hpedge: k,uu(k) = '
    do k=1,ndofH_edge

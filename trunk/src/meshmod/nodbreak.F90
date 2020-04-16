@@ -5,20 +5,16 @@
 !> @param[in] Kref    - refinement flag
 !> @param[in] Iact    - T : generate active   sons
 !!                      F : generate inactive sons
-!> @param[in] Novert  - vertex nodes enclosing Nod (either edge, or face,
-!!                                                  or element vertices) 
-!> @param[in] Nr_vert - number of vertices
 !-------------------------------------------------------------------------
 !
-subroutine nodbreak(Nod,Kref,Iact,Novert,Nr_vert)
+subroutine nodbreak(Nod,Kref,Iact)
 !
    use data_structure3D
 !
    implicit none
 !..Arguments
-   integer,               intent(in) :: Nod, Kref, Nr_vert
+   integer,               intent(in) :: Nod, Kref
    logical,               intent(in) :: Iact
-   integer, dimension(8), intent(in) :: Novert
 !..Local variables
    character(len=4), dimension(27) :: type_sons
    integer,          dimension(27) :: norder, nbcond, nsubd

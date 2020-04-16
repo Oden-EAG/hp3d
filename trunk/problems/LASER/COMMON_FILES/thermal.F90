@@ -165,7 +165,7 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
    coreVol  = rZero
 !
 !..start timer
-   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 !
    if (.not. DISTRIBUTED) then
       ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
@@ -217,7 +217,7 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
    enddo
 !
 !..end timer
-   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
    if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
       write(*,3010) end_time-start_time
  3010 format('  compute_avgTemp : ',f12.5,'  seconds',/)
@@ -300,7 +300,7 @@ subroutine comp_elem_avgTemp(Mdle, ElemTemp,ElemVol)
 !
 !..set up the element quadrature
    INTEGRATION=0
-   call set_3Dint_DPG(NODES(mdle)%type,norder, nint,xiloc,wxi)
+   call set_3D_int_DPG(NODES(mdle)%type,norder,nface_orient, nint,xiloc,wxi)
    INTEGRATION=0
 !
    ElemVol  = 0.d0

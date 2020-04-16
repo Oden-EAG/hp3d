@@ -18,19 +18,25 @@ SRC_FILE    = \
         elem/elem.F90 \
         elem/elem_heat.F90 \
         elem/elem_maxwell.F90 \
-        elem/elem_maxwell_fi.F90 \
-        elem/elem_maxwell_fi_prism.F90 \
-        elem/elem_maxwell_gram_fi.F90 \
+        elem/elem_maxwell_fi_hexa.F90 \
+        elem/elem_maxwell_fi_pris.F90 \
+        elem/elem_maxwell_gram_hexa.F90 \
+        elem/elem_maxwell_gram_pris.F90 \
         elem/elem_residual.F90 \
         elem/elem_residual_heat.F90 \
         elem/elem_residual_maxwell.F90 \
         exact.F90 \
         exec_case.F90 \
         exec_job.F90 \
+        exec_job_heat.F90 \
+        exec_job_nl.F90 \
+        exec_job_coupled.F90 \
         fake.F90 \
         getf.F90 \
         finalize.F90 \
         initialize.F90 \
         main.F90 \
+        main_aux.F90 \
+        my_paraview_driver.F90 \
         set_initial_mesh.F90 \
         soldis.F90

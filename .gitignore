@@ -1,5 +1,6 @@
 # MacOS
 ._*
+.DS_Store
 
 # Other
 *.blk

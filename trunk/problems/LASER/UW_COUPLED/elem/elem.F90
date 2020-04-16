@@ -61,13 +61,13 @@ subroutine elem(Mdle, Itest,Itrial)
 !..fld_flag refers to either pump (0) or signal (1) field
    integer :: fld_flag
 !
-!..auxiliary variables for timing
-   real*8 :: start_time, end_time, OMP_get_wtime
+!..timer
+   real(8) :: MPI_Wtime,start_time,end_time
 !
 !----------------------------------------------------------------------
 !
 !..start timer
-   start_time = OMP_get_wtime()
+!   start_time = MPI_Wtime()
 !
    Itest (1:NR_PHYSA) = 0
    Itrial(1:NR_PHYSA) = 0
@@ -144,13 +144,13 @@ subroutine elem(Mdle, Itest,Itrial)
             fld_flag = 1;
 !
             if (FAST_INT .eq. 1 .and. etype .eq. 'mdlb') then
-               call elem_maxwell_fi(Mdle,fld_flag,nrTest,nrTrial,       &
+               call elem_maxwell_fi_hexa(Mdle,fld_flag,nrTest,nrTrial,  &
                   nrdofEE,nrdofH,nrdofE,nrdofQ,nrdofEi,                 &
                   BLOC(2)%nrow,BLOC(5)%nrow,                            &
                   BLOC(2)%array,ALOC(2,2)%array,ALOC(2,5)%array,        &
                   BLOC(5)%array,ALOC(5,2)%array,ALOC(5,5)%array)
             elseif (FAST_INT .eq. 1 .and. etype .eq. 'mdlp') then
-               call elem_maxwell_fi_prism(Mdle,fld_flag,nrTest,nrTrial, &
+               call elem_maxwell_fi_pris(Mdle,fld_flag,nrTest,nrTrial,  &
                   nrdofEE,nrdofH,nrdofE,nrdofQ,nrdofEi,                 &
                   BLOC(2)%nrow,BLOC(5)%nrow,                            &
                   BLOC(2)%array,ALOC(2,2)%array,ALOC(2,5)%array,        &
@@ -169,13 +169,13 @@ subroutine elem(Mdle, Itest,Itrial)
             Itest(6)=1; Itrial(6)=1
             fld_flag = 0;
             if (FAST_INT .eq. 1 .and. etype .eq. 'mdlb') then
-               call elem_maxwell_fi(Mdle,fld_flag,nrTest,nrTrial,       &
+               call elem_maxwell_fi_hexa(Mdle,fld_flag,nrTest,nrTrial,  &
                   nrdofEE,nrdofH,nrdofE,nrdofQ,nrdofEi,                 &
                   BLOC(3)%nrow,BLOC(6)%nrow,                            &
                   BLOC(3)%array,ALOC(3,3)%array,ALOC(3,6)%array,        &
                   BLOC(6)%array,ALOC(6,3)%array,ALOC(6,6)%array)
             elseif (FAST_INT .eq. 1 .and. etype .eq. 'mdlp') then
-               call elem_maxwell_fi_prism(Mdle,fld_flag,nrTest,nrTrial, &
+               call elem_maxwell_fi_pris(Mdle,fld_flag,nrTest,nrTrial,  &
                   nrdofEE,nrdofH,nrdofE,nrdofQ,nrdofEi,                 &
                   BLOC(3)%nrow,BLOC(6)%nrow,                            &
                   BLOC(3)%array,ALOC(3,3)%array,ALOC(3,6)%array,        &
@@ -192,11 +192,13 @@ subroutine elem(Mdle, Itest,Itrial)
    end select
 !
 !..end timer
-   end_time = OMP_get_wtime()
-! !$OMP CRITICAL
+!   end_time = MPI_Wtime()
+!      !$OMP CRITICAL
 !      write(*,10) etype, end_time-start_time
+!      !write(*,11) end_time-start_time
 ! 10   format(A,' elem : ',f12.5,'  seconds')
-! !$OMP END CRITICAL
+! 11   format(f12.5)
+!      !$OMP END CRITICAL
 !
 end subroutine elem
 !
