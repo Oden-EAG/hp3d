@@ -43,17 +43,17 @@ TODO
 33. done, remove hard limit on MAXNODES (instead, do realloc with a WARNING, and show time for realloc)
 34. done, implement LB weights for elements
 35. done, update_gdof,update_Ddof for distributed mesh with constrained nodes
+36. done, implement PETSc solver interface
 --------------
-36. OpenMP parallelize 'enforce_min_rule, enforce_max_rule'
-37. OpenMP parallelize global_href routine
-38. data migration with zoltan
+37. OpenMP parallelize 'enforce_min_rule, enforce_max_rule'
+38. OpenMP parallelize global_href routine
 39. remove old shape functions package (SHAPE=0 option)
 40. make corrections to find_neig routine
 41. make corrections to global_pref routine (dof copying)
 42. fix enforce_max_rule routine (anisotropy issue)
 43. verify enforce_min_rule/enforce_max_rule routines
 44. Eliminate all "syscom.blk" dependencies
-45. Implement PETSc solver interface
+45. data migration with zoltan
 
 F --> F90:
 - done, data_structure3D.F, and then parallelize loops (e.g., reset_visit)

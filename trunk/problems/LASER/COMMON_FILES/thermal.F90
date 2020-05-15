@@ -25,6 +25,7 @@ subroutine get_avgTemp(NumPts,FileIter)
    use laserParam
    use mpi_param, only: RANK,ROOT
    use MPI      , only: MPI_COMM_WORLD,MPI_IN_PLACE,MPI_REAL8,MPI_SUM
+   use par_mesh , only: DISTRIBUTED,HOST_MESH
 !
    implicit none
 !
@@ -49,6 +50,8 @@ subroutine get_avgTemp(NumPts,FileIter)
  2001 format(A,i5)
    endif
 !
+   if ((.not. DISTRIBUTED .or. HOST_MESH) .and. RANK .ne. ROOT) goto 99
+!
    allocate(zValues(NumPts),coreTemp(NumPts))
 !
 !..distributing sample points uniformly
@@ -70,6 +73,7 @@ subroutine get_avgTemp(NumPts,FileIter)
 !
 !
 !..gather RHS vector information on host
+   if (.not. DISTRIBUTED .or. HOST_MESH) goto 50
    count = NumPts
    if (RANK .eq. ROOT) then
       call MPI_REDUCE(MPI_IN_PLACE,coreTemp,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
@@ -77,6 +81,7 @@ subroutine get_avgTemp(NumPts,FileIter)
       call MPI_REDUCE(coreTemp,coreTemp,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       goto 90
    endif
+   50 continue
 !
    if (FileIter .eq. -1) then
       write(*,*) ' get_avgTemp: printing core temperature values..'
@@ -100,6 +105,8 @@ subroutine get_avgTemp(NumPts,FileIter)
 !
    90 continue
    deallocate(zValues,coreTemp)
+!
+   99 continue
 !
 end subroutine get_avgTemp
 !

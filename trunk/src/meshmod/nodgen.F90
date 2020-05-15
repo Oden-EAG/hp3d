@@ -64,6 +64,7 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
       endif
       call increase_MAXNODS
    endif
+!
 !..pointer to the first free entry in NODES array
    Nod=NPNODS
 !

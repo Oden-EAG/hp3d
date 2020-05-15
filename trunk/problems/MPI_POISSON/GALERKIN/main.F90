@@ -194,6 +194,7 @@ subroutine master_main()
       write(*,*) 'Pardiso (OpenMP).......................42'
       write(*,*) 'Frontal (Seq)..........................43'
       write(*,*) 'MUMPS (Nested Dissection)..............44'
+      write(*,*) 'PETSc (MPI)............................45'
       write(*,*) '                                         '
       write(*,*) '     ---- Error and Residual ----        '
       write(*,*) 'Compute exact error....................50'
@@ -256,7 +257,7 @@ subroutine master_main()
             call exec_case(idec)
 !
 !     ...Solvers
-         case(40,41,42,43,44)
+         case(40,41,42,43,44,45)
             call exec_case(idec)
 !
 !     ...Error and Residual
@@ -365,7 +366,7 @@ subroutine worker_main()
             call exec_case(idec)
 !
 !     ...Solvers
-         case(40,41,42,43,44)
+         case(40,41,42,43,44,45)
             call exec_case(idec)
 !
 !     ...Error and Residual

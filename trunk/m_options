@@ -9,6 +9,7 @@ HP3D_BASE_PATH  = ${WORK}/par_hp3d/trunk
 # COMPILER SETTINGS (a 64bit processor architecture is assumed)
 #------------------------------------------------------------------
 DEBUG      = NO
+#DEBUG      = YES
 
 LARGE      = NO
 OPENMP_USE = YES
@@ -56,6 +57,16 @@ CFLAGS  =
 CDEFS   = -DAdd_
 
 #------------------------------------------------------------------
+# PREPROCESSOR VARIABLES
+#------------------------------------------------------------------
+COMPLEX    ?= 0
+SHAPE      ?= 1
+DEBUG_MODE ?= 0
+ifeq ($(DEBUG),YES)
+DEBUG_MODE = 1
+endif
+
+#------------------------------------------------------------------
 # INTEL MKL LIBRARY
 #------------------------------------------------------------------
 #
@@ -94,22 +105,30 @@ MKL_INCS = -I${MKLROOT}/include/intel64/lp64 -I${MKLROOT}/include
 # needs PT-SCOTCH and parMETIS (64bit versions for large problems)
 # (module petsc/3.11-i64)
 # also adding Zoltan library dependence
+# also adding PETSC library dependence (petsc needs phdf5)
 
-TACC_PETSC32_LIB = /home1/apps/intel18/impi18_0/petsc/3.11/skylake/lib
-TACC_PETSC32_INC = /home1/apps/intel18/impi18_0/petsc/3.11/skylake/include
+ifeq ($(COMPLEX),1)
+  TACC_PETSC32_LIB = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-complex/lib
+  TACC_PETSC32_INC = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-complex/include
+  TACC_PETSC64_LIB = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-complexi64/lib
+  TACC_PETSC64_INC = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-complexi64/include
+else
+  TACC_PETSC32_LIB = /home1/apps/intel18/impi18_0/petsc/3.11/skylake/lib
+  TACC_PETSC32_INC = /home1/apps/intel18/impi18_0/petsc/3.11/skylake/include
+  TACC_PETSC64_LIB = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-i64/lib
+  TACC_PETSC64_INC = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-i64/include
+endif
 
 MUMPS_LIBS = -L$(TACC_PETSC32_LIB) -ldmumps -lzmumps \
                                    -lmumps_common -lpord
-
-TACC_PETSC64_LIB = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-i64/lib
-TACC_PETSC64_INC = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-i64/include
 
 MUMPS_LIBS += -L$(TACC_PETSC64_LIB) -lesmumps -lzoltan \
                                     -lmetis -lparmetis \
                                     -lscotch -lscotcherr \
                                     -lptscotch -lptscotcherr
 
-MUMPS_INCS = -I$(TACC_PETSC32_INC) -I$(TACC_PETSC64_INC)
+MUMPS_INCS = -I$(TACC_PETSC32_INC) -I$(TACC_PETSC64_INC) \
+             -I/home1/apps/intel18/impi18_0/petsc/3.11/include
 
 #------------------------------------------------------------------
 # VIS LIBRARY
@@ -120,19 +139,10 @@ MUMPS_INCS = -I$(TACC_PETSC32_INC) -I$(TACC_PETSC64_INC)
 
 # module load paraview/5.6.0
 # module load hdf5/1.10.4
+# module load phdf5/1.10.4
 VIS_LIBS   = -L${TACC_HDF5_LIB} -lhdf5 -lhdf5_hl -lhdf5_fortran -lhdf5hl_fortran
 VIS_LIBS  += -L${TACC_PARAVIEW_LIB} -lvtkhdf5-pv5.6 -lvtkhdf5_hl-pv5.6 -lvtklibxml2-pv5.6 -lvtkzlib-pv5.6
 VIS_INCS   = -I${TACC_HDF5_INC} -I${TACC_PARAVIEW_INC}
-
-#------------------------------------------------------------------
-# PREPROCESSOR VARIABLES
-#------------------------------------------------------------------
-COMPLEX    ?= 1
-SHAPE      ?= 1
-DEBUG_MODE ?= 0
-ifeq ($(DEBUG),YES)
-DEBUG_MODE = 1
-endif
 
 #------------------------------------------------------------------
 # HP3D PATHS
@@ -192,19 +202,25 @@ HP3D_LINK_INCS    = -I$(HP3D_PATH)/common/hp3d \
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # BASIC LINEAR ALGEBRA LIBRARIES LINKING
 
-#LIN_ALG_LINK_LIBS    = -mkl=cluster
 LIN_ALG_LINK_LIBS = $(MKL_LIBS)
 LIN_ALG_LINK_INCS = $(MKL_INCS)
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# PETSC LINKING
+
+# PETSc
+#PETSC_LINK_LIBS  = -L$(TACC_PETSC32_LIB) -lpetsc
+#PETSC_LINK_INCS  = #-I/home1/apps/intel18/impi18_0/petsc/3.11/include
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # MUMPS LINKING
 
-MUMPS_LINK_LIBS    = $(MUMPS_LIBS)  $(LIN_ALG_LINK_LIBS)
-MUMPS_LINK_INCS    = $(MUMPS_INCS)  $(LIN_ALG_LINK_INCS)
+MUMPS_LINK_LIBS    = $(MUMPS_LIBS) $(LIN_ALG_LINK_LIBS) -L$(TACC_PETSC64_LIB) -lpetsc
+MUMPS_LINK_INCS    = $(MUMPS_INCS) $(LIN_ALG_LINK_INCS)
+
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # EXTRA LIBS LINKING
-
 X_LIB = -lX11
 EXTRA_LINK_LIBS    = $(X_LIB)
 EXTRA_LINK_INCS    =

@@ -153,6 +153,11 @@ subroutine exec_case(idec)
          write(*,*) 'calling MUMPS (MPI) nested dissection solver...'
          call par_nested('G')
 !
+!  ...solve problem with PETSc solver (MPI)
+      case(45)
+         write(*,*) 'calling PETSc (MPI) solver...'
+         call petsc_solve('G')
+!
       case(50)
          write(*,*) 'computing error and residual...'
          call exact_error

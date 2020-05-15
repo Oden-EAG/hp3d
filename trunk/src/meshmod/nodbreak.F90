@@ -18,7 +18,7 @@ subroutine nodbreak(Nod,Kref,Iact)
 !..Local variables
    character(len=4), dimension(27) :: type_sons
    integer,          dimension(27) :: norder, nbcond, nsubd
-   integer                         :: nrsons, i, ison
+   integer                         :: nrsons, i, ison, icase
 !
 !-------------------------------------------------------------------------
 !
@@ -44,9 +44,12 @@ subroutine nodbreak(Nod,Kref,Iact)
 !
 !..generate the son nodes
    NODES(Nod)%nr_sons = nrsons
+   icase = NODES(Nod)%case
+!..Note: do not pass any member variable from NODES(Nod) into nodgen
+!        if MAXNODS is increased, then NODES is reallocated
    do i=1,nrsons
       call nodgen( type_sons(i),                           &
-                   NODES(Nod)%case,                        &
+                   icase,                                  &
                    nbcond(i),                              &
                    Nod,                                    &
                    norder(i),                              &

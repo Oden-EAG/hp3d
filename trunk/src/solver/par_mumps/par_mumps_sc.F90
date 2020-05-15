@@ -6,7 +6,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-!    latest revision    - Aug 2019
+!    latest revision    - Mar 2020
 !
 !    purpose            - interface for distributed MUMPS solver
 !                       - routine computes global stiffness matrix
@@ -43,7 +43,7 @@ subroutine par_mumps_sc(mtype)
    use control,   only: ISTC_FLAG
    use stc,       only: HERM_STC,CLOC,                         &
                         stc_alloc,stc_dealloc,stc_get_nrdof
-   use par_mumps, only: mumps_par,mumps_start,mumps_destroy
+   use par_mumps, only: mumps_par,mumps_start_par,mumps_destroy_par
    use par_mesh , only: DISTRIBUTED,HOST_MESH
    use mpi_param, only: RANK,ROOT,NUM_PROCS
    use MPI      , only: MPI_SUM,MPI_MIN,MPI_MAX,MPI_IN_PLACE,  &
@@ -111,11 +111,11 @@ subroutine par_mumps_sc(mtype)
 !
 !..TODO multiple right-hand sides
    NR_RHS = 1
-   call mumps_start
+   call mumps_start_par
 !
-! ----------------------------------------------------------------------
+!  ----------------------------------------------------------------------
 !  STEP 1 : 1ST LOOP THROUGH ELEMENTS, 1ST CALL TO CELEM TO GET INFO
-! ----------------------------------------------------------------------
+!  ----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(mumps_par%COMM, ierr)
@@ -250,9 +250,9 @@ subroutine par_mumps_sc(mtype)
       return
    endif
 !
-! ----------------------------------------------------------------------
+!  ----------------------------------------------------------------------
 !  END OF STEP 1
-! ----------------------------------------------------------------------
+!  ----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(mumps_par%COMM, ierr)
@@ -262,9 +262,9 @@ subroutine par_mumps_sc(mtype)
  1002 format(' STEP 1 finished: ',f12.5,'  seconds',/)
    endif 
 !
-! ----------------------------------------------------------------------
+!  ----------------------------------------------------------------------
 !  STEP 2 : ASSEMBLE AND STORE IN SPARSE FORM 
-! ----------------------------------------------------------------------
+!  ----------------------------------------------------------------------
 !
    call MPI_BARRIER(mumps_par%COMM, ierr)
    if (RANK .eq. ROOT) then
@@ -287,7 +287,7 @@ subroutine par_mumps_sc(mtype)
    if (nnz > 2e9) mumps_par%icntl(28) = 2
 !
 !..percentage increase in estimated workspace for global interface problem
-   mumps_par%icntl(14) = 40
+   mumps_par%icntl(14) = 30
 !
 !..memory allocation for MUMPS solver
    mumps_par%N = nrdof
@@ -441,9 +441,9 @@ subroutine par_mumps_sc(mtype)
  1004 format(' STEP 2 finished: ',f12.5,'  seconds',/)
    endif
 !
-!----------------------------------------------------------------------
-!  STEP 3: call mumps to solve the linear system
-!----------------------------------------------------------------------
+!  ----------------------------------------------------------------------
+!  STEP 3: CALL MUMPS TO SOLVE THE LINEAR SYSTEM
+!  ----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(mumps_par%COMM, ierr)
@@ -460,100 +460,15 @@ subroutine par_mumps_sc(mtype)
       call MPI_REDUCE(mumps_par%RHS,mumps_par%RHS,count,MPI_VTYPE,MPI_SUM,ROOT,mumps_par%COMM,ierr)
    endif
 !
-!..MUMPS analysis
-   mumps_par%JOB = 1
+   call par_solve(mumps_par)
 !
-   if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
-      time_stamp = MPI_Wtime()
-   endif
-#if C_MODE
-   call zmumps(mumps_par)
-#else
-   call dmumps(mumps_par)
-#endif
-   if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
-      time_stamp = MPI_Wtime()-time_stamp
-      if (RANK .eq. ROOT) write(*,3001) time_stamp
- 3001 format(' - Analysis : ',f12.5,'  seconds')
-   endif
-   if (mumps_par%INFOG(1) .ne. 0) then
-      call mumps_destroy
-      if (RANK.eq.ROOT) write(*,*) 'analysis: mumps_par%INFOG(1) .ne. 0'
-      stop
-   endif
-   if (RANK .eq. ROOT) then
-      write(*,1100) '   - MAX estimated size in GB = ',mumps_par%INFOG(16)/1000.d0
-      write(*,1100) '   - SUM estimated size in GB = ',mumps_par%INFOG(17)/1000.d0
-      write(*,1200) '   - Seq/parallel analysis    = ',mumps_par%INFOG(32)
-      write(*,1200) '   - Ordering method used     = ',mumps_par%INFOG(7)
- 1100 format(A,F11.3)
- 1200 format(A,I1)
-   endif
+   if (associated(mumps_par%A_loc))   deallocate(mumps_par%A_loc)
+   if (associated(mumps_par%IRN_loc)) deallocate(mumps_par%IRN_loc)
+   if (associated(mumps_par%JCN_loc)) deallocate(mumps_par%JCN_loc)
 !
-  35 continue
-!
-!..MUMPS factorization
-   mumps_par%JOB = 2
-!
-   if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
-      time_stamp = MPI_Wtime()
-   endif
-#if C_MODE
-   call zmumps(mumps_par)
-#else
-   call dmumps(mumps_par)
-#endif
-   if (mumps_par%INFOG(1) .ne. 0) then
-      if (RANK.eq.ROOT) write(*,*) 'factorization: mumps_par%INFOG(1) .ne. 0'
-      if (mumps_par%INFOG(1) .eq. -9) then
-         if (RANK.eq.ROOT) write(*,*) 'Increasing workspace, trying factorization again...'
-         mumps_par%icntl(14) = mumps_par%icntl(14) + 10 ! increase workspace by 10 percent
-         goto 35
-      endif
-      call mumps_destroy
-      stop
-   endif
-   if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
-      time_stamp = MPI_Wtime()-time_stamp
-      if (RANK .eq. ROOT) write(*,3002) time_stamp
- 3002 format(' - Factorize: ',f12.5,'  seconds')
-      if (RANK .eq. ROOT) then
-         write(*,1100) '   - MAX memory used in GB    = ',mumps_par%INFOG(21)/1000.d0
-         write(*,1100) '   - SUM memory used in GB    = ',mumps_par%INFOG(22)/1000.d0
-      endif
-   endif
-!
-!..MUMPS solve
-   mumps_par%JOB = 3
-!
-  if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
-      time_stamp = MPI_Wtime()
-   endif
-#if C_MODE
-   call zmumps(mumps_par)
-#else
-   call dmumps(mumps_par)
-#endif
-   if (mumps_par%INFOG(1) .ne. 0) then
-      call mumps_destroy
-      if (RANK.eq.ROOT) write(*,*) 'solve: mumps_par%INFOG(1) .ne. 0'
-      stop
-   endif
-   if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
-      time_stamp = MPI_Wtime()-time_stamp
-      if (RANK .eq. ROOT) write(*,3003) time_stamp
- 3003 format(' - Solve    : ',f12.5,'  seconds')
-   endif
-!
-! ----------------------------------------------------------------------
+!  ----------------------------------------------------------------------
 !  END OF STEP 3
-! ----------------------------------------------------------------------
+!  ----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(mumps_par%COMM, ierr)
@@ -563,9 +478,9 @@ subroutine par_mumps_sc(mtype)
  1010 format(' STEP 3 finished: ',f12.5,'  seconds',/)
    endif
 !
-! ----------------------------------------------------------------------
-!  STEP 4 : STORE SOLUTION IN THE DATASTRACTURE
-! ----------------------------------------------------------------------
+!  ----------------------------------------------------------------------
+!  STEP 4 : STORE SOLUTION IN THE DATA STRUCTURE
+!  ----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(mumps_par%COMM, ierr)
@@ -607,9 +522,9 @@ subroutine par_mumps_sc(mtype)
    deallocate(ZSOL_LOC)
 !$OMP END PARALLEL
 !
-! ----------------------------------------------------------------------
+!  ----------------------------------------------------------------------
 !  END OF STEP 4
-! ----------------------------------------------------------------------
+!  ----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(mumps_par%COMM, ierr)
@@ -622,7 +537,7 @@ subroutine par_mumps_sc(mtype)
    call stc_dealloc
 !
 !..Destroy the instance (deallocate internal data structures)
-   call mumps_destroy
+   call mumps_destroy_par
 !
    call MPI_BARRIER(mumps_par%COMM, ierr)
    if ((RANK .eq. ROOT) .and. (IPRINT_TIME .ge. 1)) then
