@@ -125,9 +125,10 @@ MUMPS_LIBS = -L$(TACC_PETSC32_LIB) -ldmumps -lzmumps \
 MUMPS_LIBS += -L$(TACC_PETSC64_LIB) -lesmumps -lzoltan \
                                     -lmetis -lparmetis \
                                     -lscotch -lscotcherr \
-                                    -lptscotch -lptscotcherr -lpetsc
+                                    -lptscotch -lptscotcherr
 
-MUMPS_INCS = -I$(TACC_PETSC32_INC) -I$(TACC_PETSC64_INC) -I/home1/apps/intel18/impi18_0/petsc/3.11/include
+MUMPS_INCS = -I$(TACC_PETSC32_INC) -I$(TACC_PETSC64_INC) \
+             -I/home1/apps/intel18/impi18_0/petsc/3.11/include
 
 #------------------------------------------------------------------
 # VIS LIBRARY
@@ -201,23 +202,25 @@ HP3D_LINK_INCS    = -I$(HP3D_PATH)/common/hp3d \
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # BASIC LINEAR ALGEBRA LIBRARIES LINKING
 
-#LIN_ALG_LINK_LIBS    = -mkl=cluster
 LIN_ALG_LINK_LIBS = $(MKL_LIBS)
 LIN_ALG_LINK_INCS = $(MKL_INCS)
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# PETSC LINKING
+
+# PETSc
+#PETSC_LINK_LIBS  = -L$(TACC_PETSC32_LIB) -lpetsc
+#PETSC_LINK_INCS  = #-I/home1/apps/intel18/impi18_0/petsc/3.11/include
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # MUMPS LINKING
 
-MUMPS_LINK_LIBS    = $(MUMPS_LIBS)  $(LIN_ALG_LINK_LIBS)
-MUMPS_LINK_INCS    = $(MUMPS_INCS)  $(LIN_ALG_LINK_INCS)
+MUMPS_LINK_LIBS    = $(MUMPS_LIBS) $(LIN_ALG_LINK_LIBS) -L$(TACC_PETSC64_LIB) -lpetsc
+MUMPS_LINK_INCS    = $(MUMPS_INCS) $(LIN_ALG_LINK_INCS)
 
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# PETSC LINKING
-# done in mumps linking
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # EXTRA LIBS LINKING
-
 X_LIB = -lX11
 EXTRA_LINK_LIBS    = $(X_LIB)
 EXTRA_LINK_INCS    =
