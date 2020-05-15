@@ -57,6 +57,7 @@ module commonParam
    integer :: ORDER_APPROX_X,ORDER_APPROX_Y,ORDER_APPROX_Z
    integer :: NPX, NPY, NPZ
    integer :: ICOMP_EXACT
+!..TODO: check if thread safe ICOMP is still needed (delete otherwise)
    integer :: ICOMP_TS
 !$OMP THREADPRIVATE (ICOMP_TS)
    integer :: ICHOOSE_DISP, ICHOOSE_COMP, ICHOOSE_SIGPUMP
@@ -104,6 +105,8 @@ module commonParam
    integer, parameter :: IUNIFORM      = 1
    integer, parameter :: IANISOTROPIC  = 2
    integer, parameter :: IADAPTIVE     = 3
+   integer, parameter :: ICORE         = 10
+   integer, parameter :: ICLAD         = 11
 !
 !..flag for direction of anisotropic refinement
    integer :: ANISO_FLAG
@@ -133,11 +136,11 @@ module commonParam
       use data_structure3D
       logical :: Is_pml
       integer, intent(in) :: Mdle
-      real(8)          :: xnod(3,MAXbrickH)
+      real(8)          :: xnod(3,8)
       real(8)          :: maxz
       character(len=4) :: etype
-      xnod = 0.d0
-      call nodcor(Mdle, xnod)
+      xnod(1:3,1:8) = 0.d0
+      call nodcor_vert(Mdle, xnod)
       etype = NODES(Mdle)%type
       select case(etype)
          case('mdlb')

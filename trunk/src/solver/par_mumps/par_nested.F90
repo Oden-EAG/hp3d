@@ -7,7 +7,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-!    latest revision    - Oct 2019
+!    latest revision    - Mar 2020
 !
 !    purpose            - interface for distributed MUMPS solver
 !                       - routine computes global stiffness matrix
@@ -53,7 +53,7 @@ subroutine par_nested(mtype)
                          stc_get_nrdof,stc_bwd
    use parameters, only: ZONE
    use par_mumps , only: mumps_par,mumps_bub,                  &
-                         mumps_start,mumps_destroy,            &
+                         mumps_start_par,mumps_destroy_par,    &
                          mumps_start_subd,mumps_destroy_subd
    use par_mesh  , only: DISTRIBUTED,HOST_MESH
    use mpi_param , only: RANK,ROOT,NUM_PROCS
@@ -142,7 +142,7 @@ subroutine par_nested(mtype)
 !
 !..TODO multiple right-hand sides
    NR_RHS = 1
-   call mumps_start
+   call mumps_start_par
    call mumps_start_subd
 !
 ! ----------------------------------------------------------------------
@@ -615,7 +615,7 @@ subroutine par_nested(mtype)
    deallocate(ZBMOD,ZAMOD,LCON,LCON_SUBD_CON,ZLOAD,ZTEMP)
 !$OMP END PARALLEL
 !
-   deallocate(MAXDOFS,NFIRST_DOF,NOD_SUM)
+   deallocate(MAXDOFS,NFIRST_DOF,NFIRST_SUBD,NOD_SUM)
 !
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(mumps_par%COMM, ierr)
@@ -718,6 +718,8 @@ subroutine par_nested(mtype)
  1006 format(' STEP 3 finished: ',f12.5,'  seconds',/)
    endif
 !
+   deallocate(mumps_bub%IRN,mumps_bub%JCN,mumps_bub%A)
+!
 !----------------------------------------------------------------------
 !  STEP 4: construct condensed global system from subdomains
 !----------------------------------------------------------------------
@@ -784,7 +786,7 @@ subroutine par_nested(mtype)
    if (nnz > 2.14e9) mumps_par%icntl(28) = 2
 !
 !..percentage increase in estimated workspace for global interface problem
-   mumps_par%icntl(14) = 50 ! 200 + NUM_PROCS/4
+   mumps_par%icntl(14) = 30
 !
 !..memory allocation for global MUMPS solve
    mumps_par%N = NRDOF_CON
@@ -841,109 +843,21 @@ subroutine par_nested(mtype)
  1009 format(' STEP 5 started : Global solve')
       start_time = MPI_Wtime()
    endif
-   if (RANK .eq. ROOT .and. info) then
-      write(*,*) 'mumps_par%icntl(28) = ', mumps_par%icntl(28)
-      write(*,*) 'mumps_par%icntl(29) = ', mumps_par%icntl(29)
-   endif
 !
-!..MUMPS analysis
-   mumps_par%JOB = 1
-!
-   if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
-      time_stamp = MPI_Wtime()
-   endif
-#if C_MODE
-   call zmumps(mumps_par)
-#else
-   call dmumps(mumps_par)
-#endif
-   if (mumps_par%INFOG(1) .ne. 0) then
-      call mumps_destroy
-      if (RANK.eq.ROOT) write(*,*) 'analysis: mumps_par%INFOG(1) .ne. 0'
-      stop
-   endif
-   if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
-      time_stamp = MPI_Wtime()-time_stamp
-      if (RANK .eq. ROOT) write(*,3001) time_stamp
- 3001 format(' - Analysis : ',f12.5,'  seconds')
-      if (RANK .eq. ROOT) then
-         write(*,1100) '   - MAX estimated size in GB = ',mumps_par%INFOG(16)/1000.d0
-         write(*,1100) '   - SUM estimated size in GB = ',mumps_par%INFOG(17)/1000.d0
-         write(*,1200) '   - Seq/parallel analysis    = ',mumps_par%INFOG(32)
-         write(*,1200) '   - Ordering method used     = ',mumps_par%INFOG(7)
-    1100 format(A,F11.3)
-    1200 format(A,I1)
-      endif
-   endif
-!
-  55 continue
-!
-!..MUMPS factorization
-   mumps_par%JOB = 2
-!
-   if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
-      time_stamp = MPI_Wtime()
-   endif
-#if C_MODE
-   call zmumps(mumps_par)
-#else
-   call dmumps(mumps_par)
-#endif
-   if (mumps_par%INFOG(1) .ne. 0) then
-      if (RANK.eq.ROOT) write(*,*) 'factorization: mumps_par%INFOG(1) .ne. 0'
-      if (mumps_par%INFOG(1) .eq. -9) then
-         if (RANK.eq.ROOT) write(*,*) 'Increasing workspace, trying factorization again...'
-         mumps_par%icntl(14) = mumps_par%icntl(14) + 50 ! increase workspace by 50 percent
-         goto 55
-      endif
-      call mumps_destroy
-      stop
-   endif
-   if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
-      time_stamp = MPI_Wtime()-time_stamp
-      if (RANK .eq. ROOT) write(*,3002) time_stamp
- 3002 format(' - Factorize: ',f12.5,'  seconds')
-      if (RANK .eq. ROOT) then
-         write(*,1100) '   - MAX memory used in GB    = ',mumps_par%INFOG(21)/1000.d0
-         write(*,1100) '   - SUM memory used in GB    = ',mumps_par%INFOG(22)/1000.d0
-      endif
-   endif
-!
-!..MUMPS solve
-   mumps_par%JOB = 3
+   call par_solve(mumps_par)
+   !call par_fiber(mumps_par,nrdof_subd,NUM_PROCS)
 !
   if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
-      time_stamp = MPI_Wtime()
-   endif
-#if C_MODE
-   call zmumps(mumps_par)
-#else
-   call dmumps(mumps_par)
-#endif
-   if (mumps_par%INFOG(1) .ne. 0) then
-      call mumps_destroy
-      if (RANK.eq.ROOT) write(*,*) 'solve: mumps_par%INFOG(1) .ne. 0'
-      stop
-   endif
-   if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
-      time_stamp = MPI_Wtime()-time_stamp
-      if (RANK .eq. ROOT) write(*,3003) time_stamp
- 3003 format(' - Solve    : ',f12.5,'  seconds')
-   endif
+     call MPI_BARRIER(mumps_par%COMM, ierr)
+     end_time = MPI_Wtime()
+     Mtime(5) =  end_time-start_time
+     if (RANK .eq. ROOT) write(*,1010) Mtime(5)
+1010 format(' STEP 5 finished: ',f12.5,'  seconds',/)
+  endif
 !
-   if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
-      end_time = MPI_Wtime()
-      Mtime(5) =  end_time-start_time
-      if (RANK .eq. ROOT) write(*,1010) Mtime(5)
- 1010 format(' STEP 5 finished: ',f12.5,'  seconds',/)
-   endif
+   if (associated(mumps_par%A_loc))   deallocate(mumps_par%A_loc)
+   if (associated(mumps_par%IRN_loc)) deallocate(mumps_par%IRN_loc)
+   if (associated(mumps_par%JCN_loc)) deallocate(mumps_par%JCN_loc)
 !
 !----------------------------------------------------------------------
 !  STEP 6: compute bubble solution from condensed solution dofs
@@ -976,17 +890,15 @@ subroutine par_nested(mtype)
       ZSOL_SUBD(k1) = mumps_par%RHS(i)
    enddo
 !$OMP END PARALLEL DO
-!
    deallocate(LCON_SUBD)
 !
 !  NOTE: All vectors and matrices here are dense
 !..1. Compute (dense)  vector: x_b =  -[A_bb^-1 A_bi] x_i + [A_bb^-1 * l_b]
-!  store solution in mumps_bub%RHS(1:mumps_bub%N*NR_RHS)
-!
+!     and store the solution in mumps_bub%RHS(1:mumps_bub%N*NR_RHS)
    ni = nrdof_subd_con; nb = mumps_bub%N
-   call stc_bwd(ni,nb,                                                                    &
-                mumps_bub%RHS(mumps_bub%N*NR_RHS+1:mumps_bub%N*(NR_RHS+nrdof_subd_con)),  &
-                ZSOL_SUBD, mumps_bub%RHS(1:mumps_bub%N*NR_RHS))
+   call stc_bwd(ni,nb,                                      &
+                mumps_bub%RHS(nb*NR_RHS+1:nb*(NR_RHS+ni)),  &
+                ZSOL_SUBD, mumps_bub%RHS(1:nb*NR_RHS))
    deallocate(ZSOL_SUBD)
 !
    if (IPRINT_TIME .eq. 1) then
@@ -998,7 +910,7 @@ subroutine par_nested(mtype)
    endif
 !
 ! ----------------------------------------------------------------------
-!  STEP 4 : STORE SOLUTION IN THE DATASTRACTURE
+!  STEP 4 : STORE SOLUTION IN THE DATA STRUCTURE
 ! ----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
@@ -1046,7 +958,7 @@ subroutine par_nested(mtype)
    call stc_dealloc
 !
 !..Destroy the instance (deallocate internal data structures)
-   call mumps_destroy
+   call mumps_destroy_par
    call mumps_destroy_subd
 !
    call MPI_BARRIER(mumps_par%COMM, ierr)

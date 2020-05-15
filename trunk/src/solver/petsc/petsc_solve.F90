@@ -513,9 +513,9 @@ subroutine petsc_solve(mtype)
       if (allocated(ONZ(i)%RECV_BUF)) deallocate(ONZ(i)%RECV_BUF)
    enddo
    deallocate(NOD_VIS,NOD_LIST,NOD_DOF,NR_NOD_INT,NOD_INT,NOD_COMM,ONZ)
-   write(*,'(A,I4,A,I8)') '[RANK], sum(petsc_dnz) = [',RANK,'],',sum(petsc_dnz)
-   write(*,'(A,I4,A,I8)') '[RANK], sum(petsc_onz) = [',RANK,'],',sum(petsc_onz)
-   !write(*,'(A,I4,A,I8)') '[RANK], sum(dnz + onz) = [',RANK,'],',sum(petsc_dnz) + sum(petsc_onz)
+   write(*,'(A,I4,A,I10)') '[RANK], sum(petsc_dnz) = [',RANK,'],',sum(petsc_dnz)
+   write(*,'(A,I4,A,I10)') '[RANK], sum(petsc_onz) = [',RANK,'],',sum(petsc_onz)
+   !write(*,'(A,I4,A,I10)') '[RANK], sum(dnz + onz) = [',RANK,'],',sum(petsc_dnz) + sum(petsc_onz)
 !
 !..calculate prefix sum for global offsets
    nrdof = 0
@@ -805,7 +805,7 @@ subroutine petsc_solve(mtype)
    endif
 !
 !----------------------------------------------------------------------
-!  STEP 3: call mumps to solve the linear system
+!  STEP 3: call PETSc to solve the linear system
 !----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
