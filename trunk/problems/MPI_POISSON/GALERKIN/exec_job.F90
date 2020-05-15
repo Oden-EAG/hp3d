@@ -35,7 +35,7 @@ subroutine exec_job
       if(RANK .eq. ROOT) write(*,100) 'Beginning iteration i = ', i
 !
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
-      if (i .le. 2) then
+      if (i .le. IMAX) then
 !     ...single uniform h-refinement
          if(RANK .eq. ROOT) write(*,200) '1. global uniform h-refinement...'
          call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
@@ -52,11 +52,11 @@ subroutine exec_job
 !
       if (NUM_PROCS .eq. 1) goto 30
 !
-      if (i .eq. IMAX-5) then
-         call zoltan_w_set_lb(7)
-      elseif (i .gt. IMAX-5) then
-         goto 30
-      endif
+!      if (i .eq. IMAX-5) then
+!         call zoltan_w_set_lb(7)
+!      elseif (i .gt. IMAX-5) then
+!         goto 30
+!      endif
 !  ...distribute mesh
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
       if(RANK .eq. ROOT) write(*,200) '2. distributing mesh...'
@@ -66,7 +66,7 @@ subroutine exec_job
       if(RANK .eq. ROOT) write(*,300) end_time - start_time
 !
    30 continue
-      if (i .le. IMAX-2) cycle
+      !if (i .le. IMAX-2) cycle
 !
 !  ...print current partition (elems)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
@@ -103,10 +103,11 @@ subroutine exec_job
 !
 !  ...solve problem with par_mumps (MPI MUMPS)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr)
-      if(RANK .eq. ROOT) write(*,200) '6. calling MUMPS (MPI) solver...'
+      if(RANK .eq. ROOT) write(*,200) '6. calling PETSc (MPI) solver...'
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
       !call par_mumps_sc('G')
-      call par_nested('G')
+      !call par_nested('G')
+      call petsc_solve('G')
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
       if(RANK .eq. ROOT) write(*,300) end_time - start_time
 !
