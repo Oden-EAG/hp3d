@@ -30,7 +30,7 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
    use MPI        , only: MPI_COMM_WORLD,MPI_SUM,MPI_COMM_WORLD,MPI_REAL8
 !
    implicit none
-!   
+!
    integer, intent(in)  :: Irefine
    integer, intent(in)  :: Nreflag
    real*8,  intent(in)  :: Factor

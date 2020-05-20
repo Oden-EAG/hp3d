@@ -60,7 +60,7 @@ c
       endif
 c                   
 c  ...evaluate the element load vector and stiffness matrix
-      if (ISTC_FLAG .eq. .true.) then
+      if (ISTC_FLAG) then
         call celem_systemI(Iel,mdle,2,
      .           nrdofs,nrdofm,nrdofc,
      .           nodm,ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,

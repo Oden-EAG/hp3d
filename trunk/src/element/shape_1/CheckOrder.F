@@ -8,8 +8,8 @@ c----------------------------------------------------------------------
 c
 c     latest revision:  - Apr 17
 c
-c     purpose:          - routine checks whether polynomial orders of 
-c                         edges, faces and bubbles are within 
+c     purpose:          - routine checks whether polynomial orders of
+c                         edges, faces and bubbles are within
 c                         appropriate bounds. Returns values that help
 c                         to more efficiently size temporary arrays in
 c                         other routines in order to save memory.
@@ -26,7 +26,7 @@ c     out:
 c       Nsize           - highest polynomial order in Norder and other
 c                         values that help appropriately size arrays
 c
-c---------------------------------------------------------------------- 
+c----------------------------------------------------------------------
 c
       subroutine checkorder(Type,Dtype,Norder,MaxOrd, Nsize)
 c
@@ -45,7 +45,7 @@ c  ...intialize printing flag
       iprint = 0
 c
 c  ...The flag confident determines whether you are confident enough to
-c     NOT make a check to Norder. In that case, it is assumed all orders 
+c     NOT make a check to Norder. In that case, it is assumed all orders
 c     are less than MaxOrd, and the size of the arrays assume the worst
 c     case scenario (with MaxOrd).
 c  ...If you are not confident enough (default), this routine will check
@@ -140,7 +140,7 @@ c       Otherwise stop the code as order is too low or too high.
         endif
       endif
 c
-c  ...The sizing of the arrays is based on the value of maxp and is 
+c  ...The sizing of the arrays is based on the value of maxp and is
 c     dependent on element type and discretization type (H1,Hcurl,...).
 c     Compare these values with module parameters.
       Nsize(1)=maxp

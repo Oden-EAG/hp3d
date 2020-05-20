@@ -78,7 +78,8 @@ main()
         done < ${dir_file}
 
         dir_name=$(echo ${sub} | sed 's/\.[^.]*$//')
-        echo -e "MK_${dir_name^^}_SRC += ${src_files}" >> ${out_file}
+        dir_name=`echo "${dir_name}" | tr '[:lower:]' '[:upper:]'`
+        echo -e "MK_${dir_name}_SRC += ${src_files}" >> ${out_file}
     done    
 
     return 0
