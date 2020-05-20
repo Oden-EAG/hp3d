@@ -33,19 +33,19 @@ module assembly
    integer :: MAXDOFM, MAXDOFC
 
 !..element local load vectors stiffness matrices
-   type(super_array), allocatable, save :: BLOC(:), ALOC(:,:), AAUX(:)
+   type(super_array), allocatable :: BLOC(:), ALOC(:,:), AAUX(:)
 !$OMP THREADPRIVATE (BLOC, ALOC, AAUX)
 
 !..modified element load vector and stiffness matrix
-   VTYPE, allocatable, save :: ZBMOD(:,:), ZAMOD(:,:)
+   VTYPE, allocatable :: ZBMOD(:,:), ZAMOD(:,:)
 !$OMP THREADPRIVATE (ZBMOD, ZAMOD)
 
 !..dof extraction vector and dirichlet data flag
-   integer, allocatable, save :: NEXTRACT(:), IDBC(:)
+   integer, allocatable :: NEXTRACT(:), IDBC(:)
 !$OMP THREADPRIVATE (NEXTRACT, IDBC)
 
 !..Dirichlet data
-   VTYPE, allocatable, save :: ZDOFD(:,:)
+   VTYPE, allocatable :: ZDOFD(:,:)
 !$OMP THREADPRIVATE (ZDOFD)
 
 contains
