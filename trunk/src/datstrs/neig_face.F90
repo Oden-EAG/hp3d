@@ -269,7 +269,7 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
               norientl_neig(i,:)=norientl_is
 !
               if (iprint.eq.1) then
-                 write(*,8),i,igen,Neig(i)
+                 write(*,8) i,igen,Neig(i)
 8                format(' neig_face: i,igen,Neig(i) = ',i1,2x,i3,2x,i10)
               endif
               exit
