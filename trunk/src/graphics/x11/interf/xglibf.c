@@ -586,7 +586,7 @@ void XGNXTEV   (int *ev_type,int *ev_val,int *ev_x,int *ev_y)
       done = 1;
 	    
       *ev_type = 0;
-      *ev_val  = (int)(ks & 0x10ff  |
+      *ev_val  = (int)((ks & 0x10ff)  |
 		       ( SHIFT  ) << 8) | (ks>0xff)<<7 ;
       /* adjust for num_pad */
       ks &= 0xff;
