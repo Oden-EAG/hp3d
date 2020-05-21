@@ -136,7 +136,7 @@ c----------------------------------------------------------------------
 c
       subroutine shapeHt(Xi,Norder,Nedge_orient, NrdofH,ShapH,GradH)
 c
-      use parameters , only : MAXtriaH
+      use parameters , only : MAXtriaH, MAXquadH
 c
       implicit none      
       real*8 , intent(in ) :: Xi(2)
@@ -145,13 +145,22 @@ c
       integer, intent(out) :: NrdofH
       real*8 , intent(out) :: ShapH(MAXtriaH),GradH(2,MAXtriaH)
 c
+c  ...locals
+      integer :: norder_loc(5), nedge_orient_loc(4)
+      real*8  :: shapH_loc(MAXquadH),gradH_loc(2,MAXquadH)
+c
 #if SHAPE_MODE==0
 c
       call shapeHt_0(Xi,Norder,Nedge_orient, NrdofH,ShapH,GradH)
 c
 #else
+      norder_loc(1:4) = Norder(1:4)
+      nedge_orient_loc(1:3) = Nedge_orient(1:3)
 c
-      call shape2H('tria',Xi,Norder,Nedge_orient, NrdofH,ShapH,GradH)
+      call shape2H('tria',Xi,norder_loc,nedge_orient_loc, 
+     .              NrdofH,shapH_loc,gradH_loc)
+      ShapH(1:NrdofH) = shapH_loc(1:NrdofH)
+      GradH(1:2,1:NrdofH) = gradH_loc(1:2,1:NrdofH)
 c  
 #endif
 c
@@ -282,7 +291,7 @@ c----------------------------------------------------------------------
 c     
       subroutine shapeEt(Xi,Norder,Nedge_orient, NrdofE,ShapE,CurlE)
 c     
-      use parameters , only : MAXtriaE
+      use parameters , only : MAXtriaE,MaxquadE
 c
       implicit none      
       real*8 , intent(in ) :: Xi(2)
@@ -291,13 +300,24 @@ c
       integer, intent(out) :: NrdofE
       real*8 , intent(out) :: ShapE(2,MAXtriaE),CurlE(MAXtriaE)
 c
+c  ...locals
+      integer  :: norder_loc(5)
+      integer  :: nedge_orient_loc(4)
+      real*8   :: shapE_loc(2,MAXquadE),curlE_loc(MAXquadE)
+
+c
 #if SHAPE_MODE==0
 c
       call shapeEt_0(Xi,Norder,Nedge_orient, NrdofE,ShapE,CurlE)
 c
 #else
 c
-      call shape2E('tria',Xi,Norder,Nedge_orient, NrdofE,ShapE,CurlE)
+      norder_loc(1:4) = Norder(1:4)
+      nedge_orient_loc(1:3) = Nedge_orient(1:3)
+      call shape2E('tria',Xi,norder_loc,nedge_orient_loc, 
+     .              NrdofE,shapE_loc,curlE_loc)
+      ShapE(1:2,1:NrdofE) = shapE_loc(1:2,1:NrdofE)
+      CurlE(1:NrdofE) = curlE_loc(1:NrdofE)
 c  
 #endif
 c
@@ -366,24 +386,28 @@ c
 c     arguments:
 c       in:
 c         Xi            - master element coordinates
-c         Norder        - polynomial order of face node (H1 sense)
+c         Nord          - polynomial order of face node (H1 sense)
 c       out:
 c         NrdofQ        - number of dof
 c         ShapQ         - values of the shape functions at the point
 c
 c----------------------------------------------------------------------
 c
-      subroutine shapeQq(Xi,Norder, NrdofQ,ShapQ)
+      subroutine shapeQq(Xi,Nord, NrdofQ,ShapQ)
 c
       use parameters , only : MAXquadQ
 c
       implicit none
       real*8 , intent(in)  :: Xi(2)
-      integer, intent(in)  :: Norder
+      integer, intent(in)  :: Nord
       integer, intent(out) :: NrdofQ
       real*8 , intent(out) :: ShapQ(MAXquadQ)
 c
-      call shape2Q('quad',Xi,Norder, NrdofQ,ShapQ)
+c  ...locals
+      integer :: norder(5)
+c
+      norder = Nord
+      call shape2Q('quad',Xi,norder, NrdofQ,ShapQ)
 c
       end subroutine shapeQq
 c
@@ -402,24 +426,29 @@ c
 c     arguments:
 c       in:
 c         Xi            - master element coordinates
-c         Norder        - polynomial order of face node (H1 sense)
+c         Nord          - polynomial order of face node (H1 sense)
 c       out:
 c         NrdofQ        - number of dof
 c         ShapQ         - values of the shape functions at the point
 c
 c----------------------------------------------------------------------
 c
-      subroutine shapeQt(Xi,Norder, NrdofQ,ShapQ)
+      subroutine shapeQt(Xi,Nord, NrdofQ,ShapQ)
 c
-      use parameters , only : MAXtriaQ
+      use parameters , only : MAXtriaQ,MAXquadQ
 c
       implicit none
       real*8 , intent(in)  :: Xi(2)
-      integer, intent(in)  :: Norder
+      integer, intent(in)  :: Nord
       integer, intent(out) :: NrdofQ
       real*8 , intent(out) :: ShapQ(MAXtriaQ)
 c
-      call shape2Q('tria',Xi,Norder, NrdofQ,ShapQ)
+c  ...locals
+      integer :: norder(5)
+      real*8  :: shapQ_loc(MAXquadQ)
+c
+      call shape2Q('tria',Xi,Norder, NrdofQ,shapQ_loc)
+      ShapQ(1:NrdofQ) = shapQ_loc(1:NrdofQ)
 c
       end subroutine shapeQt
 c

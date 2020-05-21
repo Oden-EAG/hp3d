@@ -139,7 +139,7 @@ c----------------------------------------------------------------------
 c     
       subroutine shapeVt(Xi,Norder,Nedge_orient, NrdofV,ShapV,DivV)
 c     
-      use parameters , only : MAXtriaV
+      use parameters , only : MAXtriaV,MAXquadV
 c
       implicit none      
       real*8 , intent(in ) :: Xi(2)
@@ -148,7 +148,17 @@ c
       integer, intent(out) :: NrdofV
       real*8 , intent(out) :: ShapV(2,MAXtriaV),DivV(MAXtriaV)
 c
-      call shape2V('tria',Xi,Norder,Nedge_orient, NrdofV,ShapV,DivV)
+c  ...locals
+      integer   :: norder_loc(5)
+      integer   :: nedge_orient_loc(4)
+      real*8    :: shapV_loc(2,MAXquadV),divV_loc(MAXquadV)
+c
+      norder_loc(1:3) = Norder(1:3)
+      nedge_orient_loc(1:3) = Nedge_orient(1:3)
+      call shape2V('tria',Xi,norder_loc,nedge_orient_loc, 
+     .              NrdofV,shapV_loc,divV_loc)
+      ShapV(1:2,1:NrdofV) = shapV_loc(1:2,1:NrdofV)
+      DivV(1:NrdofV) = divV_loc(1:NrdofV)
 c
       end subroutine shapeVt
 c
