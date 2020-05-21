@@ -35,6 +35,7 @@ c
       use GMP
       use control
 #include "syscom.blk"
+ccc      common /common_curve_SegCir/ iprint
 c
       dimension X(NDIM),Dxdeta(NDIM)
 c
@@ -63,7 +64,7 @@ c      endif
 c
       if (iprint.eq.1) then
         write(*,7002) No,Eta
- 7002   format('curve_QuaCir: No,Eta = ',i4,2x,f8.3)
+ 7002   format('curve_SegCir: No,Eta = ',i4,2x,f8.3)
       endif
 c
 c  ...get the endpoints coordinates
@@ -86,25 +87,30 @@ c  ...evaluate radius and segment angle beta
       do i=1,NDIM
         radv1(i) = xv(i,1) - center(i)
         radv2(i) = xv(i,2) - center(i)
-        rad1 = rad1 + (radv1(i))**2              !*** accumulate for radious to 1st vertex
-        rad2 = rad2 + (radv2(i))**2              !*** accumulate for radious to 2nd vertex
+        rad1 = rad1 + (radv1(i))**2              !*** accumulate for radius to 1st vertex
+        rad2 = rad2 + (radv2(i))**2              !*** accumulate for radius to 2nd vertex
         skpr = skpr + radv1(i)*radv2(i)          !*** accumulate for scalar product
       enddo
 c
 c  ...check compatibility
-!      rad1 = sqrt(rad1); rad2 = sqrt(rad2)
-!      if (abs(rad1 - rad2) .gt. GEOM_TOL) then
-!        write(*,7003) rad1,rad2
-! 7003   format('curve_SegCir: INCOMPATIBLE DATA, rad1,rad2 = ',2e12.5)
-!        stop 1
-!      endif
+      rad1 = sqrt(rad1); rad2 = sqrt(rad2)
+      if (abs(rad1 - rad2) .gt. GEOM_TOL) then
+        write(*,7003) rad1,rad2
+ 7003   format('curve_SegCir: INCOMPATIBLE DATA, rad1,rad2 = ',2e12.5)
+        stop 1
+      endif
       radv1(1:NDIM) = radv1(1:NDIM)/rad1         !*** normalize 1st vector
       radv2(1:NDIM) = radv2(1:NDIM)/rad2         !*** normalize 2nd vector
       cobeta = skpr/(rad1*rad2)
       beta = dacos(cobeta)                       !*** get cosine of angle
+      if (iprint.eq.1) then
+        write(*,*) 'curve_SegCir: beta = ',beta
+      endif
 c
 c  ...evaluate the transformation matrix
       call cross_product(radv1,radv2, aij(1:3,3))
+      call norm(aij(1:3,3),rn)
+      aij(1:3,3) = aij(1:3,3)/rn
       aij(1:3,1) = radv1(1:3)
       call cross_product(aij(1:3,3),aij(1:3,1), aij(1:3,2))
 c

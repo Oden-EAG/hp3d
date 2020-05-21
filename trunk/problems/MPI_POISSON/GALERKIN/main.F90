@@ -167,6 +167,10 @@ subroutine master_main()
       write(*,*) 'SELECT'
       write(*,*) 'QUIT....................................0'
       write(*,*) '                                         '
+      write(*,*) '    ----       Graphics       ----       '
+      write(*,*) 'Geometry graphics (graphg)..............1'
+      write(*,*) 'HP3D graphics (graphb)..................2'
+      write(*,*) '                                         '
       write(*,*) '    ---- Print Data Structure ----       '
       write(*,*) 'Print arrays (interactive).............10'
       write(*,*) 'Print data structure arrays............11'
@@ -201,7 +205,8 @@ subroutine master_main()
       write(*,*) '                                         '
       write(*,*) '          ---- TESTING ----              '
       write(*,*) 'Flush dof, update_gdof, update_Ddof....60'
-      write(*,*) '=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='
+      write(*,*) 'my_tests..............................100'
+     write(*,*) '=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='
 !
       read( *,*) idec
       write(6,8010) '[', RANK, '] : ','Broadcast: idec = ', idec
@@ -212,6 +217,12 @@ subroutine master_main()
       select case(idec)
 !     ...QUIT
          case(0) ; goto 89
+!
+!     ...Graphics
+         case(1)
+            call graphg
+         case(2)
+            call graphb
 !
 !     ...Print data structure
          case(10,11)
@@ -267,6 +278,9 @@ subroutine master_main()
 !     ...TODO testing
          case(60)
             call exec_case(idec)
+!
+         case(100)
+            call my_tests
 !
       end select
 !

@@ -332,6 +332,14 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
           endif
           read(nin,*) (CURVES(nc)%Rdata(k),k=1,NDIM)
 !
+!  .....segment of a circle located on a spherical surface Idata(1)
+        case('SegCir')
+          allocate(CURVES(nc)%Idata(1), stat=istat)
+          if (istat.ne.SUCCESS) then
+            call logic_error(ERR_ALLOC_FAILURE,__FILE__,__LINE__)
+          endif
+          read(nin,*) CURVES(nc)%Idata(1)
+!
 !  .....quarter of a superellipse centered at Rdata(1:3) and powers 
 !       R(4) and R(5) (regular ellipse corresponds to R(4)=R(5)=2)
         case('QuaSEl')

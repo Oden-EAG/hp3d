@@ -1,0 +1,255 @@
+ 3  3                                    NDIM,MANDIM
+
+ 1                                           NRSURFS
+
+Sphere                                ...surface # 1
+ 0.d0    0.d0   0.d0           ...center coordinates
+ 3.4641016151377544                        ...radius
+
+ 7                                          NRDOMAIN
+
+16                                           NRPOINT
+
+
+Regular                                 ...point # 1
+-1.d0   -1.d0   -1.d0
+
+Regular                                 ...point # 2
+ 1.d0   -1.d0   -1.d0
+
+Regular                                 ...point # 3
+ 1.d0    1.d0   -1.d0
+
+Regular                                 ...point # 4
+-1.d0    1.d0   -1.d0
+
+Regular                                 ...point # 5
+-1.d0   -1.d0    1.d0
+
+Regular                                 ...point # 6
+ 1.d0   -1.d0    1.d0
+
+Regular                                 ...point # 7
+ 1.d0    1.d0    1.d0
+
+Regular                                 ...point # 8
+-1.d0    1.d0    1.d0
+
+
+Regular                                 ...point # 9
+-2.d0   -2.d0   -2.d0
+
+Regular                                 ...point #10
+ 2.d0   -2.d0   -2.d0
+
+Regular                                 ...point #11
+ 2.d0    2.d0   -2.d0
+
+Regular                                 ...point #12
+-2.d0    2.d0   -2.d0
+
+Regular                                 ...point #13
+-2.d0   -2.d0    2.d0
+
+Regular                                 ...point #14
+ 2.d0   -2.d0    2.d0
+
+Regular                                 ...point #15
+ 2.d0    2.d0    2.d0
+
+Regular                                 ...point #16
+-2.d0    2.d0    2.d0
+
+
+
+
+
+
+32                                           NRCURVE             
+
+Seglin                                  ...curve # 1
+1 2
+Seglin                                  ...curve # 2
+2 3 
+Seglin                                  ...curve # 3
+4 3
+Seglin                                  ...curve # 4
+1 4
+Seglin                                  ...curve # 5
+5 6
+Seglin                                  ...curve # 6
+6 7 
+Seglin                                  ...curve # 7
+8 7 
+Seglin                                  ...curve # 8
+5 8
+Seglin                                  ...curve # 9
+1 5
+Seglin                                  ...curve #10
+2 6
+Seglin                                  ...curve #11
+3 7
+Seglin                                  ...curve #12
+4 8
+
+
+SegCir                                  ...curve #13
+ 9 10
+ 1                       ...spherical surface number
+SegCir                                  ...curve #14
+10 11
+ 1                       ...spherical surface number
+SegCir                                  ...curve #15
+12 11
+ 1                            ...spherical surface #
+SegCir                                  ...curve #16
+ 9 12
+ 1                            ...spherical surface #
+SegCir                                  ...curve #17
+13 14
+ 1                       ...spherical surface number
+SegCir                                  ...curve #18
+14 15 
+ 1                       ...spherical surface number
+SegCir                                  ...curve #19
+16 15 
+ 1                       ...spherical surface number
+SegCir                                  ...curve #20
+13 16
+ 1                       ...spherical surface number
+SegCir                                  ...curve #21
+ 9 13
+ 1                       ...spherical surface number
+SegCir                                  ...curve #22
+10 14
+ 1                       ...spherical surface number
+SegCir                                  ...curve #23
+11 15
+ 1                       ...spherical surface number
+SegCir                                  ...curve #24
+12 16
+ 1                       ...spherical surface number
+
+
+Seglin                                  ...curve #25
+ 1  9
+Seglin                                  ...curve #26
+ 2 10 
+Seglin                                  ...curve #27
+ 3 11
+Seglin                                  ...curve #28
+ 4 12
+Seglin                                  ...curve #29
+ 5 13
+Seglin                                  ...curve #30
+ 6 14 
+Seglin                                  ...curve #31
+ 7 15 
+Seglin                                  ...curve #32
+ 8 16
+
+
+
+
+
+
+
+ 0                                           NRTRIAN
+
+24                                           NRRECTA
+  
+BilQua                              ...rectangle # 1
+1 2 3 4
+BilQua                              ...rectangle # 2
+5 6 7 8
+BilQua                              ...rectangle # 3
+1 2 6 5 
+BilQua                              ...rectangle # 4
+2 3 7 6
+BilQua                              ...rectangle # 5
+4 3 7 8
+BilQua                              ...rectangle # 6
+1 4 8 5
+
+
+PTIRec                              ...rectangle # 7
+ 9 10 11 12
+ 1                                 ...surface number
+PTIRec                              ...rectangle # 8
+13 14 15 16
+ 1                                 ...surface number
+PTIRec                              ...rectangle # 9
+ 9 10 14 13 
+ 1                                 ...surface number
+PTIRec                              ...rectangle #10
+10 11 15 14
+ 1                                 ...surface number
+PTIRec                              ...rectangle #11
+12 11 15 16
+ 1                                 ...surface number
+PTIRec                              ...rectangle #12
+ 9 12 16 13
+ 1                                 ...surface number
+
+
+TraQua                              ...rectangle #13
+ 1  2 10  9
+TraQua                              ...rectangle #14
+ 2  3 11 10
+TraQua                              ...rectangle #15
+ 4  3 11 12 
+TraQua                              ...rectangle #16
+ 1  4 12  9
+
+TraQua                              ...rectangle #17
+ 5  6 14 13
+TraQua                              ...rectangle #18
+ 6  7 15 14
+TraQua                              ...rectangle #19
+ 8  7 15 16
+TraQua                              ...rectangle #20
+ 5  8 16 13
+
+TraQua                              ...rectangle #21
+ 1  5 13  9
+TraQua                              ...rectangle #22
+ 2  6 14 10
+TraQua                              ...rectangle #23
+ 3  7 15 11
+TraQua                              ...rectangle #24
+ 4  8 16 12
+
+
+
+
+ 0                                           NRPRISM
+
+ 7                                           NRHEXAS
+ 
+Linear                                   ...hexa # 1
+1   1  2  3  4  5  6  7  8
+
+TraHex                                   ...hexa # 2
+2   9 10 11 12  1  2  3  4
+
+TraHex                                   ...hexa # 3
+3   5  6  7  8 13 14 15 16
+
+TraHex                                   ...hexa # 4
+4   9 10 14 13  1  2  6  5
+
+TraHex                                   ...hexa # 5
+5  10 11 15 14  2  3  7  6
+
+TraHex                                   ...hexa # 6
+6   4  3  7  8 12 11 15 16
+
+TraHex                                   ...hexa # 7
+7   1  4  8  5  9 12 16 13
+
+
+
+
+ 0                                           NRTETRA
+
+ 0                                           NRPYRAM

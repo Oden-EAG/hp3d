@@ -100,6 +100,9 @@ subroutine curve(No,Eta, X,Dxdeta)
 !  ...quarter of a circle..................................................
       case('QuaCir')    ; call curve_QuaCir(No,Eta, X,Dxdeta)
 !
+!  ...segment of a circle..................................................
+      case('SegCir')    ; call curve_SegCir(No,Eta, X,Dxdeta)
+!
 !  ...quarter of an ellipse (0 to pi/2)....................................
       case('QuaEl1')    ; call curve_QuaEl1(No,Eta, X,Dxdeta)
 !
