@@ -115,7 +115,7 @@ c  .........compute big shape functions at this point:
           enddo
         enddo
         if (icl.ne.nrdofQ) then
-          write(*,*) ' setcnstr_trian_iso_div: icl,nrdofQ = ',icl,nrdofQ
+          write(*,*) ' setcnstr_trian_iso_hdiv: icl,nrdofQ = ',icl,nrdofQ
           stop 1
         endif
 c

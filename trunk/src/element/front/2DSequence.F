@@ -104,7 +104,8 @@ c
 c
 #else
 c
-      call shape2H('quad',Xi,Norder,Nedge_orient, NrdofH,ShapH,GradH)
+ccc      call shape2H('quad',Xi,Norder,Nedge_orient, NrdofH,ShapH,GradH)
+      call shape2DH('quad',Xi,Norder,Nedge_orient, NrdofH,ShapH,GradH)
 c  
 #endif
 c
@@ -154,8 +155,8 @@ c
       call shapeHt_0(Xi,Norder,Nedge_orient, NrdofH,ShapH,GradH)
 c
 #else
-      norder_loc(1:4) = Norder(1:4)
-      nedge_orient_loc(1:3) = Nedge_orient(1:3)
+      norder_loc(1:4) = Norder(1:4); norder_loc(5) = 11
+      nedge_orient_loc(1:3) = Nedge_orient(1:3);nedge_orient_loc(4)=0 
 c
       call shape2H('tria',Xi,norder_loc,nedge_orient_loc, 
      .              NrdofH,shapH_loc,gradH_loc)
@@ -260,7 +261,8 @@ c
 c 
 #else
 c
-      call shape2E('quad',Xi,Norder,Nedge_orient, NrdofE,ShapE,CurlE)
+ccc      call shape2E('quad',Xi,Norder,Nedge_orient, NrdofE,ShapE,CurlE)
+      call shape2DE('quad',Xi,Norder,Nedge_orient, NrdofE,ShapE,CurlE)
 c
 #endif
 c
@@ -312,9 +314,10 @@ c
 c
 #else
 c
-      norder_loc(1:4) = Norder(1:4)
-      nedge_orient_loc(1:3) = Nedge_orient(1:3)
-      call shape2E('tria',Xi,norder_loc,nedge_orient_loc, 
+      norder_loc(1:4) = Norder(1:4); norder_loc(5)=11
+      nedge_orient_loc(1:3) = Nedge_orient(1:3);nedge_orient_loc(4)=0
+ccc      call shape2E('tria',Xi,norder_loc,nedge_orient_loc, 
+      call shape2DE('tria',Xi,norder_loc,nedge_orient_loc, 
      .              NrdofE,shapE_loc,curlE_loc)
       ShapE(1:2,1:NrdofE) = shapE_loc(1:2,1:NrdofE)
       CurlE(1:NrdofE) = curlE_loc(1:NrdofE)
@@ -406,7 +409,8 @@ c
 c  ...locals
       integer :: norder(5)
 c
-      norder = Nord
+      norder(1:4)=1
+      norder(5) = Nord
       call shape2Q('quad',Xi,norder, NrdofQ,ShapQ)
 c
       end subroutine shapeQq
@@ -426,28 +430,29 @@ c
 c     arguments:
 c       in:
 c         Xi            - master element coordinates
-c         Nord          - polynomial order of face node (H1 sense)
+c         Norder        - polynomial order  (H1 sense)
 c       out:
 c         NrdofQ        - number of dof
 c         ShapQ         - values of the shape functions at the point
 c
 c----------------------------------------------------------------------
 c
-      subroutine shapeQt(Xi,Nord, NrdofQ,ShapQ)
+      subroutine shapeQt(Xi,Norder, NrdofQ,ShapQ)
 c
       use parameters , only : MAXtriaQ,MAXquadQ
 c
       implicit none
       real*8 , intent(in)  :: Xi(2)
-      integer, intent(in)  :: Nord
+      integer, intent(in)  :: Norder(4)
       integer, intent(out) :: NrdofQ
       real*8 , intent(out) :: ShapQ(MAXtriaQ)
 c
 c  ...locals
-      integer :: norder(5)
+      integer :: norder_loc(5)
       real*8  :: shapQ_loc(MAXquadQ)
 c
-      call shape2Q('tria',Xi,Norder, NrdofQ,shapQ_loc)
+      norder_loc(1:4) = Norder(1:4); norder_loc(5)=11
+      call shape2Q('tria',Xi,norder_loc, NrdofQ,shapQ_loc)
       ShapQ(1:NrdofQ) = shapQ_loc(1:NrdofQ)
 c
       end subroutine shapeQt

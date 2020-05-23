@@ -153,8 +153,8 @@ c  ...locals
       integer   :: nedge_orient_loc(4)
       real*8    :: shapV_loc(2,MAXquadV),divV_loc(MAXquadV)
 c
-      norder_loc(1:3) = Norder(1:3)
-      nedge_orient_loc(1:3) = Nedge_orient(1:3)
+      norder_loc(1:4) = Norder(1:4);norder_loc(5)=1
+      nedge_orient_loc(1:3) = Nedge_orient(1:3);nedge_orient_loc(4)=0
       call shape2V('tria',Xi,norder_loc,nedge_orient_loc, 
      .              NrdofV,shapV_loc,divV_loc)
       ShapV(1:2,1:NrdofV) = shapV_loc(1:2,1:NrdofV)
