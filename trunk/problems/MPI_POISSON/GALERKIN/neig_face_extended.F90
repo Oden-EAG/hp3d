@@ -36,8 +36,9 @@
   use error
   use refinements
   use data_structure3D
-
   implicit none
+  common /cneig_face_extended/ iprint
+  !
   ! ** Arguments
   integer,                  intent(in)  :: Mface
   integer,                  intent(out) :: Nrneig
@@ -73,12 +74,12 @@
 !    2. we look for neighbors among the sons of mdle                    |
 !========================================================================
   
-  iprint=0
+!!!  iprint=0
   select case(NODES(Mface)%type)
   case('mdlt','mdlq')
   case default
      write(*,1)Mface,NODES(Mface)%type
-1    format(' neig_face: Mface,type = ',i10,2x,a4)
+1    format(' neig_face_extended: Mface,type = ',i10,2x,a4)
      call logic_error(ERR_INVALID_VALUE,__FILE__,__LINE__)
   end select
 
@@ -106,7 +107,7 @@
   if (iprint.eq.1) then
     do i=1,nrgen
       write(*,9)i,nface_list(i)
-9     format(' neig_face: i,nfather(i) = ',i2,2x,i10)
+9     format(' neig_face_extended: i,nfather(i) = ',i2,2x,i10)
     enddo
   endif
 
@@ -116,7 +117,7 @@
           
   if (iprint.eq.1) then
     write(*,3)nrgen,mdle,nod
-3   format(' neig_face: nrgen,mdle,nod = ',i2,2x,2(i10,2x))    
+3   format(' neig_face_extended: nrgen,mdle,nod = ',i2,2x,2(i10,2x))    
   endif
 
   !  ...CASE 1 : initial mesh (element) middle node
@@ -185,20 +186,19 @@
      !  ...check that two neighbors were found
      if (Nrneig.ne.2) then
        write(*,5)Mface
-5      format(' neig_face: has not found 2 neighbors for internal face Mface = ',i10)
-       call result
+5      format(' neig_face_extended: has not found 2 neighbors for internal face Mface = ',i10)
        stop
      endif
      if (iprint.eq.1) then
        write(*,4)Nrneig,Neig(1:2)
-4      format(' neig_face: Nrneig,Neig(:) = ',i1,2x,2(i10,2x))
+4      format(' neig_face_extended: Nrneig,Neig(:) = ',i1,2x,2(i10,2x))
      endif
 
   endif
 
   if (iprint.eq.1) then
     write(*,7) Nrneig,Neig(1:Nrneig)
-7   format(' neig_face: neighbors at top level: Nrneig,Neig = ',i1,4x,2(i10,2x))
+7   format(' neig_face_extended: neighbors at top level: Nrneig,Neig = ',i1,4x,2(i10,2x))
   endif
 
 !------------------------------------------------------------------------
@@ -228,62 +228,66 @@
 !------------------------------------------------------------------------
 
 
-  !  ...loop over number of neighbors
-  do i=1,Nrneig
-     
-     igen=nrgen
-     do while (igen.ge.1)
-        
-        if (is_leaf(Neig(i))) then
-           exit
-        endif
-
-        !  ...pick face node
-        nod =nface_list(igen)
-        type=NODES(Neig(i))%type
-        kref=NODES(Neig(i))%ref_kind
-        call nr_mdle_sons(type, kref, nrsons)
-        
-        if (iprint.eq.1) then
-           write(*,13)i,igen,nod,Neig(i),kref,nrsons
-13         format(' neig_face: i,igen,nod,Neig,kref,nrsons = ',2(i2),2x,2i10,2i3)
-           call result
-        endif
-        
-        !  ...loop over sons of Neig(i)
-        iflag=0
-        do is=1,nrsons
-           call elem_nodes_one( Neig(i), &
-                Nodesl_neig(:,i), Norientl_neig(:,i), is, &
-                mdle_is, nodesl_is, norientl_is )
-           type=NODES(mdle_is)%type
-           nve =nvert(type)+nedge(type)
-           nrf =nface(type)
-           
-           !  ...if face is found, update
-           call locate(nod, nodesl_is(nve+1:nve+nrf),nrf, iface)
-           if (iface.gt.0) then
+!  ...loop over number of neighbors
+      do i=1,Nrneig
+        igen = nrgen
+        do while (igen.ge.1)
+          if (is_leaf(Neig(i))) then
+             exit
+          endif
+!
+!  .......pick face node
+          nod  = nface_list(igen)
+          type = NODES(Neig(i))%type
+          kref = NODES(Neig(i))%ref_kind
+          call nr_mdle_sons(type, kref, nrsons)
+!        
+          if (iprint.eq.1) then
+            write(*,7080)i,igen,nod,Neig(i),kref,nrsons
+ 7080       format(' neig_face_extended: i,igen = ',2i3,' nod,Neig = ',2i6,' kref,nrsons = ',i3,i3)
+          endif
+!        
+!  .......loop over sons of Neig(i)
+          iflag=0
+          do is=1,nrsons
+            call elem_nodes_one(Neig(i), &
+                                Nodesl_neig(:,i), Norientl_neig(:,i), is, &
+                                mdle_is, nodesl_is, norientl_is )
+            type=NODES(mdle_is)%type
+            nve =nvert(type)+nedge(type)
+            nrf =nface(type)
+!           
+!  .........if face is found, update
+            call locate(nod, nodesl_is(nve+1:nve+nrf),nrf, iface)
+            if (iface.gt.0) then
               iflag=1
-              !  ...update Neig
+!
+!  ...........update Neig
               Neig(i)           =mdle_is
               Nsid_neig(i)      =iface
               Nodesl_neig(:,i)  =nodesl_is
               Norientl_neig(:,i)=norientl_is
-              
+!              
               if (iprint.eq.1) then
-                 write(*,8),i,igen,Neig(i)
-8                format(' neig_face: i,igen,Neig(i) = ',i1,2x,i3,2x,i10)
+                write(*,7090)i,igen,Neig(i)
+ 7090           format(' neig_face_extended: i,igen,Neig(i) = ',i1,2x,i3,2x,i10)
               endif
               exit
-           endif
-           !  ...loop over sons of Neig(i)
+            endif
+!
+!  .......end of loop over sons of Neig(i)
+          enddo
+          if (iflag.eq.0) igen=igen-1
         enddo
-        if (iflag.eq.0) igen=igen-1
-     enddo
-     
-     !  ...end of loop over Nrneig   
-  enddo
-  
-
-end subroutine neig_face_extended
+!     
+!  ...end of loop over Nrneig   
+      enddo
+!
+      if (iprint.eq.1) then
+        write(*, 7100) Mface,Neig(1:Nrneig)
+ 7100   format(' neig_face_extended: FINAL NEIGHBORS FOR Mface = ',i6,' = ',2i6)
+        call pause
+      endif
+!
+      end subroutine neig_face_extended
 

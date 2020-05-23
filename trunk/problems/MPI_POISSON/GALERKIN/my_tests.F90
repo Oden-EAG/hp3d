@@ -38,6 +38,14 @@
       integer                 :: mdle,iel,nrf,i
       integer, dimension(4,6) :: neig_list
 !
+!  ...work space for neig_edge
+      integer            :: medge
+      integer, parameter :: maxn=20
+      integer            :: nrneig
+      integer, dimension(maxn) :: neig, nedg_list, norient_list
+      integer                  :: nrv, ie
+      integer, dimension(27)   :: nodesl, norientl
+!
 !------------------------------------------------------------------------------------
 !
       iprint=0
@@ -47,6 +55,8 @@
       write(*,*) 'TEST curve_SegCir......................2'
       write(*,*) 'TEST find_neig.........................3'
       write(*,*) 'verify_neig............................4'
+      write(*,*) 'TEST neig_edge.........................5'
+      write(*,*) 'verify_neig_edge.......................6'
       read(*,*) iselect
 !
       select case(iselect) 
@@ -73,6 +83,15 @@
         enddo
       case(4)
         call verify_neig
+      case(5)
+        write(*,*) 'input mdle, ie'
+        read(*,*)  mdle,ie
+        call elem_nodes(mdle, nodesl,norientl)
+        nrv = nvert(NODES(mdle)%type)
+        medge = nodesl(nrv+ie)
+        call neig_edge(medge,maxn, nrneig,neig,nedg_list,norient_list)
+      case(6)
+        call verify_neig_edge
       end select
       go to 10
 !

@@ -24,7 +24,8 @@ SRC_GALERKIN  = \
             my_tests.F90 \
             neig_face_extended.F90 \
             find_neig_new.F90 \
-            verify_neig.F90
+            verify_neig.F90 \
+            neig_edge_new.F90
 
 
 SRC_FILE   += $(SRC_MODULE) $(SRC_COMMON) $(SRC_GALERKIN)  
