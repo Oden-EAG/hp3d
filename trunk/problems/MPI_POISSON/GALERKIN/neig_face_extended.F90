@@ -263,10 +263,10 @@
               iflag=1
 !
 !  ...........update Neig
-              Neig(i)           =mdle_is
-              Nsid_neig(i)      =iface
-              Nodesl_neig(:,i)  =nodesl_is
-              Norientl_neig(:,i)=norientl_is
+              Neig(i)            = mdle_is
+              Nsid_neig(i)       = iface
+              Nodesl_neig(:,i)   = nodesl_is
+              Norientl_neig(:,i) = norientl_is
 !              
               if (iprint.eq.1) then
                 write(*,7090)i,igen,Neig(i)
