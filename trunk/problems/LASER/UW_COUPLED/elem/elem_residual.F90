@@ -32,7 +32,7 @@ subroutine elem_residual(Mdle, Resid,Nref_flag)
    implicit none
 !..declare input/output variables
    integer, intent(in)  :: Mdle
-   real*8 , intent(out) :: Resid
+   real(8), intent(out) :: Resid
    integer, intent(out) :: Nref_flag
 !
 !..number of test and trial degrees of freedom

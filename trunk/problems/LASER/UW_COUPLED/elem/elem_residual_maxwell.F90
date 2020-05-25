@@ -47,7 +47,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    integer, intent(in)  :: NrdofE
    integer, intent(in)  :: NrdofQ
    integer, intent(out) :: Nref_flag
-   real*8 , intent(out) :: Resid
+   real(8), intent(out) :: Resid
 !
 !..declare edge/face type variables
    character(len=4) :: etype,ftype
@@ -61,7 +61,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    integer, dimension(5)  :: norderf
 !
 !..geometry dof (work space for nodcor)
-   real*8, dimension(3,MAXbrickH) :: xnod
+   real(8) :: xnod(3,MAXbrickH)
 !
 !..solution dof (work space for solelm)
    VTYPE, dimension(MAXEQNH,MAXbrickH) :: zdofH
@@ -78,35 +78,35 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    VTYPE, dimension(3,MAXEQNV  ) ::  zsolV_soleval
    VTYPE, dimension(  MAXEQNV  ) ::  zdivV_soleval
    VTYPE, dimension(  MAXEQNQ  ) ::  zsolQ_soleval
-   real*8 :: rsolH
+   real(8) :: rsolH
 !
 !..variables for geometry
-   real*8, dimension(3)   :: xi,x,rn
-   real*8, dimension(3,2) :: dxidt,dxdt,rt
-   real*8, dimension(3,3) :: dxdxi,dxidx
-   real*8, dimension(2)   :: t
+   real(8), dimension(3)   :: xi,x,rn
+   real(8), dimension(3,2) :: dxidt,dxdt,rt
+   real(8), dimension(3,3) :: dxdxi,dxidx
+   real(8), dimension(2)   :: t
 !
 !..H1 shape functions
-   real*8, dimension(MAXbrickH)   :: shapH
-   real*8, dimension(3,MAXbrickH) :: gradH
+   real(8), dimension(MAXbrickH)   :: shapH
+   real(8), dimension(3,MAXbrickH) :: gradH
 !
 !..H(curl) shape functions
-   real*8, dimension(3,MAXbrickE) :: shapE
-   real*8, dimension(3,MAXbrickE) :: curlE
+   real(8), dimension(3,MAXbrickE) :: shapE
+   real(8), dimension(3,MAXbrickE) :: curlE
 !
 !..L2 shape functions
-   real*8, dimension(MAXbrickQ) :: shapQ
+   real(8), dimension(MAXbrickQ) :: shapQ
 !
 !..enriched Hcurl shape functions
-   real*8 , dimension(3,MAXbrickEE) :: shapEE
-   real*8 , dimension(3,MAXbrickEE) :: curlEE
+   real(8), dimension(3,MAXbrickEE) :: shapEE
+   real(8), dimension(3,MAXbrickEE) :: curlEE
 !
 !..Gram matrix in packed format
    !VTYPE, dimension(NrTest*(NrTest+1)/2) :: gramTest
    VTYPE, allocatable :: gramP(:)
-   real*8  :: FF, CF, FC
-   real*8  :: fldE(3), fldH(3), crlE(3), crlH(3)
-   real*8  :: fldF(3), fldG(3), crlF(3), crlG(3)
+   real(8) :: FF, CF, FC
+   real(8) :: fldE(3), fldH(3), crlE(3), crlH(3)
+   real(8) :: fldF(3), fldG(3), crlF(3), crlG(3)
 !
    real(8) :: D_aux(3,3),D_za(3,3),D_zc(3,3)
 !
@@ -114,32 +114,32 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    VTYPE, dimension(NrTest) :: bload_E,bload_Ec
 !
 !..3D quadrature data
-   real*8, dimension(3,MAXNINT3ADD) :: xiloc
-   real*8, dimension(MAXNINT3ADD)   :: waloc
+   real(8), dimension(3,MAXNINT3ADD) :: xiloc
+   real(8), dimension(MAXNINT3ADD)   :: waloc
 !
 !..2D quadrature data
-   real*8, dimension(2,MAXNINT2ADD) :: tloc
-   real*8, dimension(MAXNINT2ADD)   :: wtloc
+   real(8), dimension(2,MAXNINT2ADD) :: tloc
+   real(8), dimension(MAXNINT2ADD)   :: wtloc
 !
 !..BC's flags
    integer, dimension(6,NR_PHYSA)   :: ibc
 !
 !..Maxwell load and auxiliary variables
-   VTYPE , dimension(3) :: zJ,zImp
-   real*8, dimension(3) :: E1,E2,rntimesE
+   VTYPE  , dimension(3) :: zJ,zImp
+   real(8), dimension(3) :: E1,E2,rntimesE
 !
 !..approximate solution
    VTYPE, dimension(3,2) :: zsolExi,zsolE,zflux,zflux2
    VTYPE, dimension(6)   :: zsolQ
 !
-!..
+!..auxiliary
    VTYPE :: zresid, zaux, zcux
 !
 !..number of faces per element type
    integer :: nrf
 !
 !..various variables for the problem
-   real*8  :: rjac,bjac,weight,wa,CC,EE,CE,E,EC,q,h,tol,diff_r,diff_i,max_r,max_i
+   real(8) :: rjac,bjac,weight,wa,CC,EE,CE,E,EC,q,h,tol,diff_r,diff_i,max_r,max_i
    integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,j,m,n,nint,kE,k,iprint,l,ivar,iflag
    integer :: nordP,nsign,ifc,ndom,info,icomp,nrdof,nrdof_eig,idec
    VTYPE   :: zfval
@@ -151,11 +151,11 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    VTYPE, dimension(3,3) :: Jstretch,invJstretch,JJstretch
 !
 !..OMEGA_RATIO_SIGNAL or OMEGA_RATIO_PUMP
-   real*8  :: OMEGA_RATIO_FLD
+   real(8) :: OMEGA_RATIO_FLD
 !
 !..for polarizations function
    VTYPE, dimension(3,3) :: bg_pol,gain_pol,raman_pol,rndotE
-   real*8  :: delta_n
+   real(8) :: delta_n
    integer :: dom_flag
 !..timer
    real(8) :: MPI_Wtime,start_time,end_time

@@ -49,12 +49,12 @@
    integer :: nre, nrf
 !
 !..declare element order, orientation for edges and faces
-   integer, dimension(19)    :: norder
-   integer, dimension(12)    :: norient_edge
-   integer, dimension(6)     :: norient_face
+   integer, dimension(19) :: norder
+   integer, dimension(12) :: norient_edge
+   integer, dimension(6)  :: norient_face
 !
 !..geometry dof (work space for nodcor)
-   real*8, dimension(3,MAXbrickH) :: xnod
+   real(8) :: xnod(3,MAXbrickH)
 !
 !..solution dof (work space for solelm)
    VTYPE, dimension(MAXEQNH,MAXbrickH) :: zdofH
@@ -71,28 +71,28 @@
    VTYPE, dimension(3,MAXEQNV  ) ::  zsolV_soleval
    VTYPE, dimension(  MAXEQNV  ) ::  zdivV_soleval
    VTYPE, dimension(  MAXEQNQ  ) ::  zsolQ_soleval
-   real*8 :: rsolH
+   real(8) :: rsolH
 !
 !..variables for geometry
-   real*8, dimension(3)    :: xi,x,rn
-   real*8, dimension(3,2)  :: dxidt,dxdt,rt
-   real*8, dimension(3,3)  :: dxdxi,dxidx
-   real*8, dimension(2)    :: t
+   real(8), dimension(3)    :: xi,x,rn
+   real(8), dimension(3,2)  :: dxidt,dxdt,rt
+   real(8), dimension(3,3)  :: dxdxi,dxidx
+   real(8), dimension(2)    :: t
 !
 !..H1 shape functions
-   real*8, dimension(MAXbrickH)    :: shapH
-   real*8, dimension(3,MAXbrickH)  :: gradH
+   real(8), dimension(MAXbrickH)   :: shapH
+   real(8), dimension(3,MAXbrickH) :: gradH
 !
 !..3D quadrature data
-   real*8, dimension(3,MAXNINT3ADD)  :: xiloc
-   real*8, dimension(MAXNINT3ADD)    :: waloc
+   real(8), dimension(3,MAXNINT3ADD) :: xiloc
+   real(8), dimension(MAXNINT3ADD)   :: waloc
 !
 !..for auxiliary computation
    VTYPE :: zaux
 !
 !..various variables for the problem
-   real*8  :: h_elem,rjac,weight,wa,CC,EE,CE,E,EC,q,h,omeg
-   real*8  :: bjac
+   real(8) :: h_elem,rjac,weight,wa,CC,EE,CE,E,EC,q,h,omeg
+   real(8) :: bjac
    integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,ik,j,k,l,nint,kE,n,m
    integer :: iflag,iprint,itime,iverb
    integer :: nrdof,nordP,nsign,ifc,ndom,info,icomp,idec
@@ -106,11 +106,11 @@
 !
 !..for polarizations function
    VTYPE, dimension(3,3) :: bg_pol,gain_pol,raman_pol,rndotE
-   real*8  :: delta_n
+   real(8) :: delta_n
    integer :: dom_flag
 !
 !..OMEGA_RATIO_SIGNAL or OMEGA_RATIO_PUMP
-   real*8  :: OMEGA_RATIO_FLD
+   real(8) :: OMEGA_RATIO_FLD
 !
 !..added to use fast integration
    VTYPE, allocatable :: AUXEE_A_zb(:,:,:)    , AUXEE_A_zc(:,:,:)
@@ -129,16 +129,16 @@
    integer :: nrdofH1,nrdofH2,nrdofH3
    integer :: nrdofH1_tr,nrdofH2_tr,nrdofH3_tr
    integer :: nrdofQ1_tr,nrdofQ2_tr,nrdofQ3_tr
-   real*8 :: xi1,xi2,xi3,wt1,wt2,wt3,clock1,clock2
-   real*8 :: wt123,weighthh,weightvv
-   real*8, dimension(MAXPP+1) :: xilocx,xilocy,xilocz
-   real*8, dimension(MAXPP+1) :: wlocx,wlocy,wlocz
-   real*8, dimension(3,MAXNINT3ADD) :: wloc3
-   real*8, dimension(3) :: xip,dHdx,dHHdx
-   real*8, dimension(3,3) :: D_za,D_zc,D_aux,C,D
-   VTYPE , dimension(3,3) :: Z_za,Z_zc,Z_aux
-   real*8, dimension(MAXPP+1,2) :: shapH1,shapH2,shapH3
-   real*8, dimension(MAXPP+1,MAXPP+1) :: sH2p,sH3p,dsH2p,dsH3p
+   real(8) :: xi1,xi2,xi3,wt1,wt2,wt3,clock1,clock2
+   real(8) :: wt123,weighthh,weightvv
+   real(8), dimension(MAXPP+1) :: xilocx,xilocy,xilocz
+   real(8), dimension(MAXPP+1) :: wlocx,wlocy,wlocz
+   real(8), dimension(3,MAXNINT3ADD) :: wloc3
+   real(8), dimension(3) :: xip,dHdx,dHHdx
+   real(8), dimension(3,3) :: D_za,D_zc,D_aux,C,D
+   VTYPE  , dimension(3,3) :: Z_za,Z_zc,Z_aux
+   real(8), dimension(MAXPP+1,2) :: shapH1,shapH2,shapH3
+   real(8), dimension(MAXPP+1,MAXPP+1) :: sH2p,sH3p,dsH2p,dsH3p
    integer, dimension(3,3) :: deltak
 !
 !..for Gram matrix compressed storage format

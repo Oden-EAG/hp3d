@@ -36,8 +36,8 @@ subroutine set_3Dint_fi(EType,Norder, nordx,nordy,nordz,nintx,ninty, &
 !
    character(len=4), intent(in)  :: EType
    integer         , intent(in)  :: Norder(19)
-   real*8          , intent(out) :: Xiloc(3,MAXNINT3ADD)
-   real*8          , intent(out) :: Waloc(3,MAXNINT3ADD)
+   real(8)         , intent(out) :: Xiloc(3,MAXNINT3ADD)
+   real(8)         , intent(out) :: Waloc(3,MAXNINT3ADD)
    integer, intent(out) :: nordx,nordy,nordz,nintx,ninty,nintz
 !
    integer :: i,l,l1,l2,l3,nordh,nordv,nord1,nord2,nord3

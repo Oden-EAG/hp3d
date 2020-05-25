@@ -70,8 +70,8 @@ subroutine elem_heat(Mdle,                   &
    VTYPE, dimension(MdV,MdV),   intent(out) :: ZalocVV
 !
 !..auxiliary parameters
-   real*8, parameter :: rZERO = 0.d0
-   real*8, parameter :: rONE  = 1.d0
+   real(8), parameter :: rZERO = 0.d0
+   real(8), parameter :: rONE  = 1.d0
 !
 !..declare edge/face type variables
    character(len=4) :: etype,ftype
@@ -88,7 +88,7 @@ subroutine elem_heat(Mdle,                   &
    integer, dimension(5)     :: norderf
 !
 !..geometry dof (work space for nodcor)
-   real*8, dimension(3,MAXbrickH) :: xnod
+   real(8), dimension(3,MAXbrickH) :: xnod
 !
 !..solution dof (work space for solelm)
    complex(8), dimension(MAXEQNH,MAXbrickH) :: zdofH
@@ -105,70 +105,69 @@ subroutine elem_heat(Mdle,                   &
    complex(8), dimension(3,MAXEQNV  ) ::  zsolV_soleval
    complex(8), dimension(  MAXEQNV  ) ::  zdivV_soleval
    complex(8), dimension(  MAXEQNQ  ) ::  zsolQ_soleval
-   real*8 :: rsolH
+   real(8) :: rsolH
 !
 !..variables for geometry
-   real*8, dimension(3)    :: xi,x,rn
-   real*8, dimension(3,2)  :: dxidt,dxdt,rt
-   real*8, dimension(3,3)  :: dxdxi,dxidx
-   real*8, dimension(2)    :: t
+   real(8), dimension(3)    :: xi,x,rn
+   real(8), dimension(3,2)  :: dxidt,dxdt,rt
+   real(8), dimension(3,3)  :: dxdxi,dxidx
+   real(8), dimension(2)    :: t
 !
 !..H1 shape functions
-   real*8, dimension(MAXbrickH)    :: shapH
-   real*8, dimension(3,MAXbrickH)  :: gradH
+   real(8), dimension(MAXbrickH)    :: shapH
+   real(8), dimension(3,MAXbrickH)  :: gradH
 !
 !..H(div) shape functions
-   real*8, dimension(3,MAXbrickV)  :: shapV
-   real*8, dimension(MAXbrickV)    :: divV
+   real(8), dimension(3,MAXbrickV)  :: shapV
+   real(8), dimension(MAXbrickV)    :: divV
 !
 !..Enriched H1 shape functions
-   real*8 , dimension(MAXbrickHH)    :: shapHH
-   real*8 , dimension(3,MAXbrickHH)  :: gradHH
+   real(8) , dimension(MAXbrickHH)    :: shapHH
+   real(8) , dimension(3,MAXbrickHH)  :: gradHH
 !
 !..load vector for the enriched space
-   real*8 :: bload_H(NrTest)
+   real(8) :: bload_H(NrTest)
 !
 !..gram matrix in packed format
-   !real*8 :: gramP(NrTest*(NrTest+1)/2)
+   !real(8) :: gramP(NrTest*(NrTest+1)/2)
    real(8), allocatable :: gramP(:)
    !complex(8), allocatable :: gramEigen(:)
 !
 !..stiffness matrices for the enriched test space
-!   real*8 :: stiff_HH (NrTest   ,NrdofH)
-!   real*8 :: stiff_HV (NrTest   ,NrdofVi)
-!   real*8 :: stiff_ALL(NrTest   ,NrTrial+1)
-!   real*8 :: raloc    (NrTrial+1,NrTrial+1)
+!   real(8) :: stiff_HH (NrTest   ,NrdofH)
+!   real(8) :: stiff_HV (NrTest   ,NrdofVi)
+!   real(8) :: stiff_ALL(NrTest   ,NrTrial+1)
+!   real(8) :: raloc    (NrTrial+1,NrTrial+1)
    real(8), allocatable :: stiff_HH(:,:),stiff_HV(:,:),stiff_ALL(:,:),raloc(:,:)
 !
 !..3D quadrature data
-   real*8, dimension(3,MAXNINT3ADD)  :: xiloc
-   real*8, dimension(  MAXNINT3ADD)  :: waloc
+   real(8), dimension(3,MAXNINT3ADD)  :: xiloc
+   real(8), dimension(  MAXNINT3ADD)  :: waloc
 !
 !..2D quadrature data
-   real*8, dimension(2,MAXNINT2ADD)  :: tloc
-   real*8, dimension(  MAXNINT2ADD)  :: wtloc
+   real(8), dimension(2,MAXNINT2ADD)  :: tloc
+   real(8), dimension(  MAXNINT2ADD)  :: wtloc
 !
 !..derivatives wrt physical coordinates, flux
-   real*8, dimension(3) :: dv1,dv2,vec
+   real(8), dimension(3) :: dv1,dv2,vec
 !
-!..for debug printing
-   !real*8, dimension(10) :: raux
-!
-   complex(8), dimension(3) :: zvoid
+!..auxiliary
+   !real(8) :: raux(10)
+   complex(8) :: zvoid(3)
 !
 !..number of vertices,edge,faces per element type
    integer :: nrv,nre,nrf
 !
 !..various variables for the problem
-   real*8  :: rjac,bjac,weight,wa,v2n,v1,v2
-   integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,j,nint,iflag,kE,k
-   integer :: nordP,nrdof,l,nsign,ifc,info,ndom
-   real*8  :: rfval,therm_Load
+   real(8)    :: rjac,bjac,weight,wa,v2n,v1,v2
+   integer    :: i1,i2,j1,j2,k1,k2,kH,kk,i,j,nint,iflag,kE,k
+   integer    :: nordP,nrdof,l,nsign,ifc,info,ndom
+   real(8)    :: rfval,therm_Load
    complex(8) :: zfval
 !
 !..for lapack eigensolve
-   ! complex*16, allocatable :: Z(:,:), WORK(:)
-   ! real*8, allocatable     :: W(:),   RWORK(:)
+   ! complex(8), allocatable :: Z(:,:), WORK(:)
+   ! real(8), allocatable     :: W(:),   RWORK(:)
    ! integer, allocatable    :: IWORK(:)
 !
 #if DEBUG_MODE

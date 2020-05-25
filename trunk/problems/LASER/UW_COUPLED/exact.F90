@@ -31,7 +31,7 @@ subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
   use laserParam
 !
   implicit none
-  real*8,dimension(3),            intent(in)  :: Xp
+  real(8)                       , intent(in)  :: Xp(3)
   integer                       , intent(in)  :: Mdle
   VTYPE,dimension(  MAXEQNH    ), intent(out) ::   ValH
   VTYPE,dimension(  MAXEQNH,3  ), intent(out) ::  DvalH
@@ -49,16 +49,16 @@ subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
 !------------------------------------------------------------------------------
 !     Space for temporary solutions
 !
-   VTYPE                    :: E
-   VTYPE,dimension(3)       :: dE
-   VTYPE,dimension(3,3)     :: d2E
-   integer                  :: icomp, fld
+   VTYPE                :: E
+   VTYPE,dimension(3)   :: dE
+   VTYPE,dimension(3,3) :: d2E
+   integer              :: icomp, fld
 !
 !..index: signal, pump (E-trace)
    integer, parameter :: s = 1, p = 3
 !
 !..auxiliary variables
-   real*8 :: k,r,n
+   real(8) :: k,r,n
 !
 !------------------------------------------------------------------------------
 !

@@ -25,7 +25,7 @@ subroutine soldis(Mdle,Xi,X,Rn,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ, Val)
    implicit none
 !
    integer,                     intent(in)  :: Mdle
-   real*8,dimension(3),         intent(in)  :: Xi,X,Rn
+   real(8),dimension(3),        intent(in)  :: Xi,X,Rn
    VTYPE,dimension(  MAXEQNH  ),intent(in)  :: ZsolH
    VTYPE,dimension(  MAXEQNH,3),intent(in)  :: ZgradH
    VTYPE,dimension(3,MAXEQNE  ),intent(in)  :: ZsolE
@@ -33,7 +33,7 @@ subroutine soldis(Mdle,Xi,X,Rn,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ, Val)
    VTYPE,dimension(3,MAXEQNV  ),intent(in)  :: ZsolV
    VTYPE,dimension(  MAXEQNV  ),intent(in)  :: ZdivV
    VTYPE,dimension(  MAXEQNQ  ),intent(in)  :: ZsolQ
-   real*8,                      intent(out) :: Val
+   real(8),                     intent(out) :: Val
    VTYPE                                    :: rntimesE(3)
 !---------------------------------------------------------------------------------------
 !..work space for routine 'exact'
