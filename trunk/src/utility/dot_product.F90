@@ -26,10 +26,7 @@ subroutine dot_product(A,B, Prod)
    real(8), intent(in)  :: A(3),B(3)
    real(8), intent(out) :: Prod
 !
-   Prod = 0.d0
-   do i=1,3
-      Prod = Prod + A(i)*B(i)
-   enddo
+   Prod = A(1)*B(1) + A(2)*B(2) + A(3)*B(3)
 !
 end subroutine dot_product
 !
@@ -54,9 +51,6 @@ subroutine zdot_product(Rn,Za, Zprod)
    VTYPE  , intent(in)  :: Za(3)
    VTYPE  , intent(out) :: Zprod
 !
-!---------------------------------------------------------------------
-!
-   Zprod = Rn(1)*Za(1)+Rn(2)*Za(2)+Rn(3)*Za(3)
-!
+   Zprod = Rn(1)*Za(1) + Rn(2)*Za(2) + Rn(3)*Za(3)
 !
 end subroutine zdot_product
