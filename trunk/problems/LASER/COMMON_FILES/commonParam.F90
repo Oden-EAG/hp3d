@@ -15,43 +15,43 @@ module commonParam
    use parameters
 !
 !..i
-   complex*16, parameter :: ZI = (0.d0,1.d0)
+   complex(8), parameter :: ZI = (0.d0,1.d0)
 !
 !..pi
-   real*8, parameter :: PI = 4.D0*DATAN(1.d0)
+   real(8), parameter :: PI = 4.D0*DATAN(1.d0)
 !
 !..Identity matrix
-   real*8, dimension(3,3), parameter :: IDENTITY = &
+   real(8), dimension(3,3), parameter :: IDENTITY = &
       reshape((/1.d0,0.d0,0.d0, 0.d0,1.d0,0.d0, 0.d0,0.d0,1.d0/), (/ 3, 3 /))
 !
 !..Speed of light in vacuum
-   real*8, parameter :: LIGHT_SPEED = 2.99792458d8
+   real(8), parameter :: LIGHT_SPEED = 2.99792458d8
 !
 !..Planck's constant (hbar=h/2pi)
-   real*8, parameter :: H_BAR = 1.05457266d-34
+   real(8), parameter :: H_BAR = 1.05457266d-34
 !
 !..set FAST_INT=1 to activate fast integration for hexahedra
    integer :: FAST_INT = 1
 !
 !..material constants
-   real*8     :: MU,EPSILON
-   complex*16 :: SIGMA
+   real(8)    :: MU,EPSILON
+   complex(8) :: SIGMA
 !
 !..frequency
-   real*8  :: OMEGA
+   real(8) :: OMEGA
 !
 !..impedance constant and IBCFLAG
-   real*8  :: GAMMA
+   real(8) :: GAMMA
    integer :: IBCFLAG
 !
    integer :: TIMESTEP = 0
 !
 !..weight for l2 term in scaled adjoint graph norm (UW Maxwell)
-   real*8 :: ALPHA_NORM = 1.0d0
+   real(8) :: ALPHA_NORM = 1.0d0
 !
 !..for PML: length of Z region and PML_REGION, PML_FRACTION
    integer :: USE_PML
-   real*8  :: ZL, PML_REGION, PML_FRAC, EXP_COEFF
+   real(8) :: ZL, PML_REGION, PML_FRAC, EXP_COEFF
 !
 !..additional parameters including those required by the system
    integer :: ORDER_APPROX_X,ORDER_APPROX_Y,ORDER_APPROX_Z
@@ -118,7 +118,7 @@ module commonParam
    integer, parameter :: IREFINE_YZ = 11;
 !
 !..I/O
-   character*32 :: OUTPUT_DIR
+   character(32) :: OUTPUT_DIR
 !
 !..Maximum number of iterations in nonlinear Solve
    integer, parameter :: MAX_ITER = 30

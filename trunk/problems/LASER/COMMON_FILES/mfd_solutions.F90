@@ -19,7 +19,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !
    implicit none
 !--------------------------------------------------------------------------------
-   real*8, dimension(3),   intent(in)  :: Xp
+   real(8), dimension(3),  intent(in)  :: Xp
    integer,                intent(in)  :: Fld
    VTYPE,                  intent(out) :: E   ! solution
    VTYPE,  dimension(3),   intent(out) :: dE  ! 1st derivative
@@ -27,35 +27,35 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !--------------------------------------------------------------------------------
    integer :: modified
 !
-   real*8 :: x1,x2,x3
-   real*8 :: nn        ! for EXPONENTIAL solution
-   real*8 :: cn,dn     ! for singular solution
-   real*8 :: np_x,np_y,np_z,r0,k0,w0,phase,ampl,om
-   VTYPE  :: f_x,f_y,f_z,df_x,df_y,df_z,ddf_x,ddf_y,ddf_z
+   real(8) :: x1,x2,x3
+   real(8) :: nn        ! for EXPONENTIAL solution
+   real(8) :: cn,dn     ! for singular solution
+   real(8) :: np_x,np_y,np_z,r0,k0,w0,phase,ampl,om
+   VTYPE   :: f_x,f_y,f_z,df_x,df_y,df_z,ddf_x,ddf_y,ddf_z
 !..for TE modes
-   real*8 :: gammaTE10
-   real*8 :: gammaTE20
-   real*8 :: r
+   real(8) :: gammaTE10
+   real(8) :: gammaTE20
+   real(8) :: r
 !..for LP Modes
-   real*8 :: gamm, beta, k, ca, cb, cc, r_x, r_y
-   real*8 :: BESSEL_dJ1, BESSEL_K0, BESSEL_dK0, BESSEL_K1, BESSEL_dK1
+   real(8) :: gamm, beta, k, ca, cb, cc, r_x, r_y
+   real(8) :: BESSEL_dJ1, BESSEL_K0, BESSEL_dK0, BESSEL_K1, BESSEL_dK1
 !..for bessel function modes
-   real*8 :: zeta,rho,xi,theta,rcore,rcladding,alpha,alpha_scale
-   real*8 :: order, bessJ, bessY, dbessJ, dbessY,bessJc, bessYc, dbessJc, dbessYc
-   real*8 :: bessI, bessK, dbessI, dbessK, bessIc, bessKc, dbessIc, dbessKc
-   real*8 :: d2bessJ,d2bessY,d2bessI,d2bessK
-   real*8, dimension(2,2) :: hess1,hess2
-   real*8 :: angular,angular_x,angular_y,angular_xx,angular_xy,angular_yy
-   real*8 :: Jm,Jm_x,Jm_y,Jm_xx,Jm_xy,Jm_yy
-   real*8 :: Km,Km_x,Km_y,Km_xx,Km_xy,Km_yy
+   real(8) :: zeta,rho,xi,theta,rcore,rcladding,alpha,alpha_scale
+   real(8) :: order, bessJ, bessY, dbessJ, dbessY,bessJc, bessYc, dbessJc, dbessYc
+   real(8) :: bessI, bessK, dbessI, dbessK, bessIc, bessKc, dbessIc, dbessKc
+   real(8) :: d2bessJ,d2bessY,d2bessI,d2bessK
+   real(8) :: hess1(2,2),hess2(2,2)
+   real(8) :: angular,angular_x,angular_y,angular_xx,angular_xy,angular_yy
+   real(8) :: Jm,Jm_x,Jm_y,Jm_xx,Jm_xy,Jm_yy
+   real(8) :: Km,Km_x,Km_y,Km_xx,Km_xy,Km_yy
 !
    VTYPE :: c2z,uz,uz_x,uz_y,uz_z,uz_xx,uz_xy,uz_xz,uz_yy,uz_yx,uz_yz
    VTYPE :: uz_zz,uz_zy,uz_zx
    VTYPE :: pz,pz_x,pz_y,pz_z,pz_xx,pz_xy,pz_xz,pz_yy,pz_yx,pz_yz
    VTYPE :: pz_zz,pz_zy,pz_zx, zbeta,zdbeta,zd2beta
 !
-   VTYPE               ::  E01,E11,E21,E02
-   VTYPE, dimension(3) :: dE01(3),dE11(3),dE21(3),dE02(3)
+   VTYPE :: E01,E11,E21,E02
+   VTYPE :: dE01(3),dE11(3),dE21(3),dE02(3)
 !
 !--------------------------------------------------------------------------------
 !
@@ -768,63 +768,63 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 end subroutine mfd_solutions
 
 function BESSEL_dJ1(x) result(fval)
-   real*8, intent(in)  :: x
-   real*8 :: fval
+   real(8), intent(in) :: x
+   real(8) :: fval
    fval = BESSEL_J0(x) - BESSEL_J1(x)/x
 end function
 
 function BESSEL_J2(x) result(fval)
-   real*8, intent(in)  :: x
-   real*8 :: fval
+   real(8), intent(in) :: x
+   real(8) :: fval
    fval = BESSEL_JN(2, x)
 end function
 
 function BESSEL_dJ2(x) result(fval)
-   real*8, intent(in)  :: x
-   real*8 :: fval
-   real*8 :: a,b,c
+   real(8), intent(in) :: x
+   real(8) :: fval
+   real(8) :: a,b,c
    call dbessJY(x,2.d0, a,b,fval,c)
 end function
 
 function BESSEL_K0(x) result(fval)
-   real*8, intent(in)  :: x
-   real*8 :: fval
-   real*8 :: a,b,c
+   real(8), intent(in) :: x
+   real(8) :: fval
+   real(8) :: a,b,c
    call dbessIK(x,0.d0, a,fval,b,c)
 end function
 
 function BESSEL_dK0(x) result(fval)
-   real*8, intent(in)  :: x
-   real*8 :: fval
-   real*8 :: a,b,c
+   real(8), intent(in) :: x
+   real(8) :: fval
+   real(8) :: a,b,c
    call dbessIK(x,0.d0, a,b,c,fval)
 end function
 
 function BESSEL_K1(x) result(fval)
-   real*8, intent(in)  :: x
-   real*8 :: fval
-   real*8 :: a,b,c
+   real(8), intent(in) :: x
+   real(8) :: fval
+   real(8) :: a,b,c
    call dbessIK(x,1.d0, a,fval,b,c)
 end function
 
 function BESSEL_dK1(x) result(fval)
-   real*8, intent(in)  :: x
-   real*8 :: fval
-   real*8 :: a,b,c
+   real(8), intent(in) :: x
+   real(8) :: fval
+   real(8) :: a,b,c
    call dbessIK(x,1.d0, a,b,c,fval)
 end function
 
 function BESSEL_K2(x) result(fval)
-   real*8, intent(in)  :: x
-   real*8 :: fval
-   real*8 :: a,b,c
+   real(8), intent(in) :: x
+   real(8) :: fval
+   real(8) :: a,b,c
    call dbessIK(x,2.d0, a,fval,b,c)
 end function
 
 function BESSEL_dK2(x) result(fval)
-   real*8, intent(in)  :: x
-   real*8 :: fval
-   real*8 :: a,b,c
+   real(8), intent(in) :: x
+   real(8) :: fval
+   real(8) :: a,b,c
    call dbessIK(x,2.d0, a,b,c,fval)
 end function
 !
@@ -839,12 +839,12 @@ subroutine get_LP01(Xp,ampl,k,gamm,beta, E,dE)
 !
    implicit none
 !
-   real*8, intent(in)  :: Xp(3)
-   real*8, intent(in)  :: ampl, k, gamm, beta
-   VTYPE , intent(out) :: E, dE(3)
+   real(8), intent(in)  :: Xp(3)
+   real(8), intent(in)  :: ampl, k, gamm, beta
+   VTYPE  , intent(out) :: E, dE(3)
 !
-   real*8 :: x1, x2, x3, r, r_x, r_y, ca, cb
-   real*8 :: BESSEL_K0, BESSEL_K1
+   real(8) :: x1, x2, x3, r, r_x, r_y, ca, cb
+   real(8) :: BESSEL_K0, BESSEL_K1
 !
 !------------------------------------------------------
 !
@@ -889,12 +889,12 @@ subroutine get_LP11(Xp,ampl,k,gamm,beta, E,dE)
 !
    implicit none
 !
-   real*8, intent(in)  :: Xp(3)
-   real*8, intent(in)  :: ampl, k, gamm, beta
-   VTYPE , intent(out) :: E, dE(3)
+   real(8), intent(in)  :: Xp(3)
+   real(8), intent(in)  :: ampl, k, gamm, beta
+   VTYPE  , intent(out) :: E, dE(3)
 !
-   real*8 :: x1, x2, x3, r, ca, cb, cc
-   real*8 :: BESSEL_dJ1, BESSEL_K1, BESSEL_dK1
+   real(8) :: x1, x2, x3, r, ca, cb, cc
+   real(8) :: BESSEL_dJ1, BESSEL_K1, BESSEL_dK1
 !
 !------------------------------------------------------
 !
@@ -947,12 +947,12 @@ subroutine get_LP02(Xp,ampl,k,gamm,beta, E,dE)
 !
    implicit none
 !
-   real*8, intent(in)  :: Xp(3)
-   real*8, intent(in)  :: ampl, k, gamm, beta
-   VTYPE , intent(out) :: E, dE(3)
+   real(8), intent(in)  :: Xp(3)
+   real(8), intent(in)  :: ampl, k, gamm, beta
+   VTYPE  , intent(out) :: E, dE(3)
 !
-   real*8 :: x1, x2, x3, r, r_x, r_y, ca, cb
-   real*8 :: BESSEL_K0, BESSEL_K1
+   real(8) :: x1, x2, x3, r, r_x, r_y, ca, cb
+   real(8) :: BESSEL_K0, BESSEL_K1
 !
 !------------------------------------------------------
 !
@@ -997,15 +997,15 @@ subroutine get_LP21(Xp,ampl,k,gamm,beta, E,dE)
 !
    implicit none
 !
-   real*8, intent(in)  :: Xp(3)
-   real*8, intent(in)  :: ampl, k, gamm, beta
-   VTYPE , intent(out) :: E, dE(3)
+   real(8), intent(in)  :: Xp(3)
+   real(8), intent(in)  :: ampl, k, gamm, beta
+   VTYPE  , intent(out) :: E, dE(3)
 !
-   real*8 :: x1, x2, x3, r, r_x, r_y, ca, cb, cc
-   real*8 :: BESSEL_J2, BESSEL_dJ2, BESSEL_K2, BESSEL_dK2
+   real(8) :: x1, x2, x3, r, r_x, r_y, ca, cb, cc
+   real(8) :: BESSEL_J2, BESSEL_dJ2, BESSEL_K2, BESSEL_dK2
 !
-   real*8 :: cos_t,cos_2t
-   real*8 :: sin_t,sin_2t
+   real(8) :: cos_t,cos_2t
+   real(8) :: sin_t,sin_2t
 !
 !------------------------------------------------------
 !
