@@ -13,8 +13,8 @@ subroutine set_2Dint(Type,Norder, Nint,Xiloc,Waloc)
       character(len=4)               , intent(in)  :: Type
       integer, dimension(5)          , intent(in)  :: Norder
       integer                        , intent(out) :: Nint
-      real*8 , dimension(2,MAX_NINT2), intent(out) :: Xiloc
-      real*8 , dimension(  MAX_NINT2), intent(out) :: Waloc
+      real(8), dimension(2,MAX_NINT2), intent(out) :: Xiloc
+      real(8), dimension(  MAX_NINT2), intent(out) :: Waloc
 !
       call set_2Dint_aux(Type,Norder,MAXP,MAX_NINT2, Nint,Xiloc,Waloc)
 !
@@ -53,8 +53,8 @@ subroutine set_2D_int(Type,Norder,Norient_face, Nint,Xiloc,Waloc)
       integer, dimension(5)          , intent(in)  :: Norder
       integer                        , intent(in)  :: Norient_face
       integer                        , intent(out) :: Nint
-      real*8 , dimension(2,MAX_NINT2), intent(out) :: Xiloc
-      real*8 , dimension(  MAX_NINT2), intent(out) :: Waloc
+      real(8), dimension(2,MAX_NINT2), intent(out) :: Xiloc
+      real(8), dimension(  MAX_NINT2), intent(out) :: Waloc
 !
       integer, dimension(5) :: norder_loc
       integer               :: nordh,nordv
@@ -87,8 +87,8 @@ subroutine set_2Dint_DPG(Type,Norder, Nint,Xiloc,Waloc)
       character(len=4)                 , intent(in)  :: Type
       integer, dimension(5)            , intent(in)  :: Norder
       integer                          , intent(out) :: Nint
-      real*8 , dimension(2,MAXNINT2ADD), intent(out) :: Xiloc
-      real*8 , dimension(  MAXNINT2ADD), intent(out) :: Waloc
+      real(8), dimension(2,MAXNINT2ADD), intent(out) :: Xiloc
+      real(8), dimension(  MAXNINT2ADD), intent(out) :: Waloc
 !
       call set_2Dint_aux(Type,Norder,MAXPP,MAXNINT2ADD, Nint,Xiloc,Waloc)
 !
@@ -127,8 +127,8 @@ subroutine set_2D_int_DPG(Type,Norder,Norient_face, Nint,Xiloc,Waloc)
       integer, dimension(5)            , intent(in)  :: Norder
       integer                          , intent(in)  :: Norient_face
       integer                          , intent(out) :: Nint
-      real*8 , dimension(2,MAXNINT2ADD), intent(out) :: Xiloc
-      real*8 , dimension(  MAXNINT2ADD), intent(out) :: Waloc
+      real(8), dimension(2,MAXNINT2ADD), intent(out) :: Xiloc
+      real(8), dimension(  MAXNINT2ADD), intent(out) :: Waloc
 !
       integer, dimension(5) :: norder_loc
       integer               :: nordh,nordv
@@ -184,8 +184,8 @@ subroutine set_2Dint_aux(Type,Norder,Maxp,Max_nint2, Nint,Xiloc,Waloc)
       integer, dimension(5)          , intent(in)  :: Norder
       integer                        , intent(in)  :: Maxp,Max_nint2
       integer                        , intent(out) :: Nint
-      real*8 , dimension(2,Max_nint2), intent(out) :: Xiloc
-      real*8 , dimension(  Max_nint2), intent(out) :: Waloc
+      real(8), dimension(2,Max_nint2), intent(out) :: Xiloc
+      real(8), dimension(  Max_nint2), intent(out) :: Waloc
 !
       integer :: nordxy(2)
       integer :: kint,l,l1,l2,nord,nordx,nordy,nintx,ninty

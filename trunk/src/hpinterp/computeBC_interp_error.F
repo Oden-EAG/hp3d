@@ -23,10 +23,10 @@ c  ...visitation flag
       integer, save :: ivis = 0
 c
 c  ...errors for the old mesh
-      real*8,  save :: errorHold, errorEold, errorVold
+      real(8), save :: errorHold, errorEold, errorVold
 c
 c  ...residuals and rates to display
-      real*8 , dimension(6,10), save :: rwork
+      real(8), save :: rwork(6,10)
 c
       iprint=0
 c

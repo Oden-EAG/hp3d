@@ -5,11 +5,11 @@ subroutine find_element_size(Mdle, H)
   use data_structure3D
   implicit none
   integer, intent(in)  :: Mdle
-  real*8,  intent(out) :: H
+  real(8), intent(out) :: H
   !
-  integer, dimension(27) :: nodesl,norientl
-  integer                :: i, j, nv
-  real*8                 :: dist, x(3), y(3)
+  integer :: nodesl(27),norientl(27)
+  integer :: i, j, nv
+  real(8) :: dist, x(3), y(3)
   !
   call elem_nodes(Mdle, nodesl, norientl)
   nv = nvert(NODES(Mdle)%Type)
@@ -32,10 +32,10 @@ subroutine find_element_size_minmax(Idom, Nelts, Hmin, Hmax)
   implicit none
   integer, intent(in)    :: Idom
   integer, intent(out)   :: Nelts
-  real*8,  intent(inout) :: Hmin, Hmax
+  real(8), intent(inout) :: Hmin, Hmax
   !
   integer :: iel, mdle, ndom
-  real*8  :: h
+  real(8) :: h
   !
   Nelts = 0
   mdle = 0; Hmin = 1e10; Hmax = 0.d0;

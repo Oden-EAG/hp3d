@@ -224,7 +224,7 @@ module zoltan_wrapper
       integer(Zoltan_double), intent(out) :: Coords(*)
       integer(Zoltan_int)   , intent(out) :: Ierr
       integer :: mdle,i,nrv
-      real*8  :: x(3), xnod(3,8)
+      real(8) :: x(3), xnod(3,8)
       mdle = GID(1)
       call nodcor_vert(mdle, xnod)
       nrv = nvert(NODES(mdle)%type)
@@ -255,7 +255,7 @@ module zoltan_wrapper
       integer(Zoltan_double), intent(out) :: Coords(*)
       integer(Zoltan_int)   , intent(out) :: Ierr
       integer :: mdle,i,k,nrv
-      real*8  :: x(3), xnod(3,8)
+      real(8) :: x(3), xnod(3,8)
 !
 !$OMP PARALLEL DO PRIVATE(mdle,i,nrv,x,xnod)
       do k = 1,NumObj
@@ -562,8 +562,10 @@ module zoltan_wrapper
       !if (nrExp > 0) write(*,320) '   expProcs = ', expProcs
   300 format(A,L5)
   301 format(A,I5)
-  310 format(A,<nrImp>I5)
-  320 format(A,<nrExp>I5)
+  !!! TODO: fix variable length statement
+  !!! (see https://gcc.gnu.org/onlinedocs/gfortran/Variable-FORMAT-expressions.html)
+  !!! 310 format(A,<nrImp>I5)
+  !!! 320 format(A,<nrExp>I5)
 !
 !  ...collect new subdomains for mesh
       Mdle_subd(1:NRELES) = 0
@@ -584,7 +586,7 @@ module zoltan_wrapper
       enddo
       !write(*,*) 'Suggested new partition is as follows'
       !write(*,330) Mdle_subd
-  330 format(<NRELES>I4)
+  !!! 330 format(<NRELES>I4)
 !
 !  ...deallocate internal data structures
       ierr = Zoltan_LB_Free_Part(impGIDs,impLIDs,impProcs,impParts)

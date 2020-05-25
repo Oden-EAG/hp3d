@@ -35,7 +35,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
    integer :: nodesl(27), norder(19), nverl(8)
    integer :: norientl(27), nedge_orient(12), nface_orient(6)
 !
-   real*8 :: xi(3), x(3), xnod(3,MAXbrickH), dxdxi(3,3)
+   real(8) :: xi(3), x(3), xnod(3,MAXbrickH), dxdxi(3,3)
 !
 !..OpenMP parallelization: auxiliary variables
    integer, dimension(NRELES) :: n_vert_offset,n_obj_offset,n_elem_vert

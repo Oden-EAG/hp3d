@@ -1,4 +1,4 @@
-      real*8 function dreal_part(Z)
+      real(8) function dreal_part(Z)
 !
 #include "syscom.blk"
 !
@@ -12,7 +12,7 @@
 !
 !
 !
-      real*8 function dimag_part(Z)
+      real(8) function dimag_part(Z)
 !
 #include "syscom.blk"
 !

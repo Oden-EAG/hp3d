@@ -7,15 +7,15 @@ subroutine volume(Vol)
       implicit none
 !
 !  ...dummy arguments
-      real*8,intent(out) :: Vol
+      real(8), intent(out) :: Vol
 !
 !  ...local variables      
       integer, dimension(19) :: norder
       character(len=4) :: type
-      real*8 :: xiloc(3,MAX_NINT3),wxi(MAX_NINT3)
-      real*8, dimension(3)   :: xi, x
-      real*8, dimension(3,3) :: dxdxi, dxidx
-      real*8  :: wa, weight, rjac
+      real(8) :: xiloc(3,MAX_NINT3),wxi(MAX_NINT3)
+      real(8) :: xi(3), x(3)
+      real(8) :: dxdxi(3,3), dxidx(3,3)
+      real(8) :: wa, weight, rjac
       integer :: iprint, mdle, nint, l, iflag, i
 !-----------------------------------------------------------------------      
 !

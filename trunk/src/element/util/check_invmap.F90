@@ -8,29 +8,29 @@ subroutine check_invmap
       implicit none
 !
       integer :: mdle,nel,ifig,nint,l,k,i,idec,nrdofH
-      real*8  :: s
+      real(8) :: s
       character (len=4) :: ftype
-      real*8,dimension(3)           :: xi,xi_aux,x,temp
-      real*8,dimension(3,MAXbrickH) :: xnod
-      real*8,dimension(2)           :: t
-      real*8,dimension(3,3)         :: dxdxi
-      real*8,dimension(3,2)         :: dxdt,dxidt
+      real(8),dimension(3)           :: xi,xi_aux,x,temp
+      real(8),dimension(3,MAXbrickH) :: xnod
+      real(8),dimension(2)           :: t
+      real(8),dimension(3,3)         :: dxdxi
+      real(8),dimension(3,2)         :: dxdt,dxidt
 !
       integer,dimension(12) :: nedge_orient
       integer,dimension(6)  :: nface_orient
       integer,dimension(19) :: norder
       integer,dimension(5)  :: nordf
 !
-      real*8,dimension(  MAXbrickH) :: vshapH
-      real*8,dimension(3,MAXbrickH) :: dvshapH
+      real(8),dimension(  MAXbrickH) :: vshapH
+      real(8),dimension(3,MAXbrickH) :: dvshapH
 !
 !  ...integration points      
-      real*8,dimension(3,MAX_NINT3) :: xiloc
-      real*8,dimension(  MAX_NINT3) :: wxi
-      real*8,dimension(2,MAXquadH)  :: tloc
-      real*8,dimension(  MAXquadH)  :: wt
+      real(8),dimension(3,MAX_NINT3) :: xiloc
+      real(8),dimension(  MAX_NINT3) :: wxi
+      real(8),dimension(2,MAXquadH)  :: tloc
+      real(8),dimension(  MAXquadH)  :: wt
 !      
-      real*8, parameter :: eps=1.d-10
+      real(8), parameter :: eps=1.d-10
       integer :: iprint_invmap,iprint
       common /cinvmap/ iprint_invmap
 !

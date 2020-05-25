@@ -38,11 +38,11 @@ c
       use parameters , only : MAXP
 c
       implicit none      
-      real*8 , intent(in ) :: T
+      real(8), intent(in ) :: T
       integer, intent(in ) :: Nord
       integer, intent(in ) :: Norient
       integer, intent(out) :: NrdofH
-      real*8 , intent(out) :: ShapH(MAXP-1),GradH(MAXP-1)
+      real(8), intent(out) :: ShapH(MAXP-1),GradH(MAXP-1)
 c
 #if SHAPE_MODE==0
 c      
@@ -85,11 +85,11 @@ c
       use parameters , only : MAXP
 c
       implicit none      
-      real*8 , intent(in ) :: T
+      real(8), intent(in ) :: T
       integer, intent(in ) :: Nord
       integer, intent(in ) :: Norient
       integer, intent(out) :: NrdofE
-      real*8 , intent(out) :: ShapE(MAXP)
+      real(8), intent(out) :: ShapE(MAXP)
 c     
 #if SHAPE_MODE==0
 c

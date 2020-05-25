@@ -34,17 +34,17 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
 !  
       implicit none
       integer,                             intent(in)  :: Mdle, Nflag
-      real*8,  dimension(3),               intent(in)  :: Xi
+      real(8), dimension(3),               intent(in)  :: Xi
       integer, dimension(12),              intent(in)  :: Nedge_orient
       integer, dimension(6),               intent(in)  :: Nface_orient
       integer, dimension(19),              intent(in)  :: Norder
-      real*8,  dimension(3,MAXbrickH),     intent(in)  :: Xnod
+      real(8), dimension(3,MAXbrickH),     intent(in)  :: Xnod
       VTYPE, dimension(MAXEQNH,MAXbrickH), intent(in)  :: ZdofH
       VTYPE, dimension(MAXEQNE,MAXbrickE), intent(in)  :: ZdofE
       VTYPE, dimension(MAXEQNV,MAXbrickV), intent(in)  :: ZdofV
       VTYPE, dimension(MAXEQNQ,MAXbrickQ), intent(in)  :: ZdofQ
-      real*8, dimension(3),                intent(out) :: X
-      real*8, dimension(3,3),              intent(out) :: Dxdxi
+      real(8), dimension(3),               intent(out) :: X
+      real(8), dimension(3,3),             intent(out) :: Dxdxi
       VTYPE, dimension(  MAXEQNH  ),       intent(out) :: ZsolH
       VTYPE, dimension(  MAXEQNH,3),       intent(out) :: ZgradH
       VTYPE, dimension(3,MAXEQNE  ),       intent(out) :: ZsolE
@@ -55,16 +55,16 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
 !
       character(len=4) :: etype
 !
-      real*8, dimension(3,3) :: dxidx
-      real*8,dimension(  MAXbrickH) :: shapH
-      real*8,dimension(3,MAXbrickH) :: gradH,gradHx
-      real*8,dimension(3,MAXbrickE) :: shapE,shapEx,curlE,curlEx
-      real*8,dimension(3,MAXbrickV) :: shapV,shapVx
-      real*8,dimension(  MAXbrickV) :: divV,divVx
-      real*8,dimension(  MAXbrickQ) :: shapQ
+      real(8),dimension(3,3)         :: dxidx
+      real(8),dimension(  MAXbrickH) :: shapH
+      real(8),dimension(3,MAXbrickH) :: gradH,gradHx
+      real(8),dimension(3,MAXbrickE) :: shapE,shapEx,curlE,curlEx
+      real(8),dimension(3,MAXbrickV) :: shapV,shapVx
+      real(8),dimension(  MAXbrickV) :: divV,divVx
+      real(8),dimension(  MAXbrickQ) :: shapQ
 !
       integer :: iprint,iflag,i,j,k,n, ivar,nrdofH,nrdofE,nrdofV,nrdofQ
-      real*8  :: s, rjac
+      real(8) :: s, rjac
 !-------------------------------------------------------------------------------
 !  
       iprint=0

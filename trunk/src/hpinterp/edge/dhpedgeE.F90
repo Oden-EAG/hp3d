@@ -33,44 +33,43 @@
 ! ** Arguments
 !-----------------------------------------------------------------------
 !      
-  integer,                                    intent(in)  :: Iflag,No,Mdle
-  integer,                                    intent(in)  :: Icase,Iedge
-  real*8,  dimension(3,8),                    intent(in)  :: Etav
-  character(len=4),                           intent(in)  :: Type
-  integer, dimension(12),                     intent(in)  :: Nedge_orient
-  integer, dimension(6),                      intent(in)  :: Nface_orient
-  integer, dimension(19),                     intent(in)  :: Norder
-!
-  VTYPE,   dimension(NRCOMS*NREQNE(Icase),*), intent(inout) :: ZnodE
+  integer,          intent(in)    :: Iflag,No,Mdle
+  integer,          intent(in)    :: Icase,Iedge
+  real(8),          intent(in)    :: Etav(3,8)
+  character(len=4), intent(in)    :: Type
+  integer,          intent(in)    :: Nedge_orient(12)
+  integer,          intent(in)    :: Nface_orient(6)
+  integer,          intent(in)    :: Norder(19)
+  VTYPE,            intent(inout) :: ZnodE(NRCOMS*NREQNE(Icase),*)
 !
 ! ** Locals
 !-----------------------------------------------------------------------
 !
 ! quadrature
   integer                               :: l,nint
-  real*8,  dimension(MAX_NINT1)         :: xi_list
-  real*8,  dimension(MAX_NINT1)         :: wa_list 
-  real*8                                :: wa, weight
+  real(8), dimension(MAX_NINT1)         :: xi_list
+  real(8), dimension(MAX_NINT1)         :: wa_list
+  real(8)                               :: wa, weight
 !
 ! work space for shape3H
   integer                               :: nrdofH
   integer, dimension(19)                :: norder_1
-  real*8,  dimension(MAXbrickH)         :: shapH
-  real*8,  dimension(3,MAXbrickH)       :: gradH
+  real(8), dimension(MAXbrickH)         :: shapH
+  real(8), dimension(3,MAXbrickH)       :: gradH
 !
 ! work space for shape3E
   integer                               :: nrdofE
-  real*8,  dimension(3,MAXbrickE)       :: shapE
-  real*8,  dimension(3,MAXbrickE)       :: curlE
+  real(8), dimension(3,MAXbrickE)       :: shapE
+  real(8), dimension(3,MAXbrickE)       :: curlE
 !
 ! H(curl) shape functions in reference coordinates
-  real*8,  dimension(3)                 :: uEeta,vEeta
+  real(8), dimension(3)                 :: uEeta,vEeta
 !
 ! geometry
-  real*8                                :: t,rjac,bjac,prod
-  real*8, dimension(3)                  :: xi,eta,rn,x
-  real*8, dimension(3)                  :: dxidt,detadt,rt
-  real*8, dimension(3,3)                :: detadxi,dxideta,dxdeta
+  real(8)                               :: t,rjac,bjac,prod
+  real(8), dimension(3)                 :: xi,eta,rn,x
+  real(8), dimension(3)                 :: dxidt,detadt,rt
+  real(8), dimension(3,3)               :: detadxi,dxideta,dxdeta
 !
 ! Dirichlet BC data at a point
   VTYPE :: zvalH(  MAXEQNH), zdvalH(  MAXEQNH,3), &
@@ -85,12 +84,12 @@
 !    
 ! work space for linear solvers
   integer                               :: naE,info
-  real*8,  dimension(MAXP,MAXP)         :: aaE
+  real(8), dimension(MAXP,MAXP)         :: aaE
   integer, dimension(MAXP)              :: ipivE
 !    
 ! load vector and solution
-  VTYPE,  dimension(MAXP,MAXEQNE)       :: zbE,zuE
-  real*8, dimension(MAXP,MAXEQNE)       :: uE_real,uE_imag
+  VTYPE,   dimension(MAXP,MAXEQNE)      :: zbE,zuE
+  real(8), dimension(MAXP,MAXEQNE)      :: uE_real,uE_imag
 !  
 ! misc work space
   integer :: iprint,nrv,nre,nrf,i,j,k,ie,ii,ivar,ivarE,nvarE,kj,ki,&
@@ -361,4 +360,5 @@
 !
 !
   if (iprint.eq.1) call result
-  endsubroutine dhpedgeE
+!
+  end subroutine dhpedgeE

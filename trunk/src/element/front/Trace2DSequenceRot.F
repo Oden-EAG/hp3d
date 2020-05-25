@@ -48,11 +48,11 @@ c
       use parameters , only : MAXP
 c
       implicit none
-      real*8 , intent(in ) :: T
+      real(8), intent(in ) :: T
       integer, intent(in ) :: Nord
       integer, intent(in ) :: Norient
       integer, intent(out) :: NrdofV
-      real*8 , intent(out) :: ShapV(MAXP)
+      real(8), intent(out) :: ShapV(MAXP)
 c
 #if SHAPE_MODE==0
 c

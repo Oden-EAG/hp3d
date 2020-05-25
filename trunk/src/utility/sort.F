@@ -25,11 +25,12 @@ c
       subroutine sort(List,Val,N)
 c      
       implicit none
-      integer,dimension(N),intent(inout) :: List
-      real*8, dimension(N),intent(inout) :: Val
-      integer             ,intent(in   ) :: N
+c
+      integer              , intent(in   ) :: N
+      integer, dimension(N), intent(inout) :: List
+      real(8), dimension(N), intent(inout) :: Val
 c      
-      real*8  :: valmax,valaux
+      real(8) :: valmax,valaux
       integer :: iprint,i,imax,j,laux
 c      
 c-----------------------------------------------------------------------

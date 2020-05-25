@@ -37,10 +37,10 @@ subroutine compute_error(Flag,Itag)
       integer, dimension(NR_PHYSA),intent(in) :: Flag
       integer,                     intent(in) :: Itag
 !
-      real*8 :: errorH,errorE,errorV,errorQ,errorHEVQ,derrorH,derrorE,derrorV,derrorQ
-      real*8 :: rnormH,rnormE,rnormV,rnormQ,rnormHEVQ,drnormH,drnormE,drnormV,drnormQ
-      real*8 :: errorH_rel,errorE_rel,errorV_rel,errorQ_rel,errorHEVQ_rel
-      real*8 :: rateH,rateE,rateV,rateQ,rateHEVQ
+      real(8) :: errorH,errorE,errorV,errorQ,errorHEVQ,derrorH,derrorE,derrorV,derrorQ
+      real(8) :: rnormH,rnormE,rnormV,rnormQ,rnormHEVQ,drnormH,drnormE,drnormV,drnormQ
+      real(8) :: errorH_rel,errorE_rel,errorV_rel,errorQ_rel,errorHEVQ_rel
+      real(8) :: rateH,rateE,rateV,rateQ,rateHEVQ
 !
       integer, parameter :: nin = 13
       integer, parameter :: maxvis =2000
@@ -48,8 +48,8 @@ subroutine compute_error(Flag,Itag)
 !     for computing error rate
       integer, save :: ivis = 0
       integer, save :: nrdof_tot_save
-      real*8 , save :: errorH_save,errorE_save,errorV_save,errorQ_save,errorHEVQ_save
-      real*8 , dimension(maxvis,10), save :: rwork
+      real(8), save :: errorH_save,errorE_save,errorV_save,errorQ_save,errorHEVQ_save
+      real(8), dimension(maxvis,10), save :: rwork
       integer, dimension(maxvis,10), save :: iwork
 !
 !     miscellanea
@@ -220,7 +220,7 @@ ENDIF
       endif
 !
 !
-endsubroutine compute_error
+end subroutine compute_error
 !
 !
 !
@@ -240,26 +240,26 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, rnormH,rnormE,r
       implicit none
       integer, dimension(NR_PHYSA),intent(in ) :: Flag
       integer,                     intent(in ) :: Mdle
-      real*8,                      intent(out) :: errorH,errorE,errorV,errorQ
-      real*8,                      intent(out) :: rnormH,rnormE,rnormV,rnormQ
+      real(8),                      intent(out) :: errorH,errorE,errorV,errorQ
+      real(8),                      intent(out) :: rnormH,rnormE,rnormV,rnormQ
 !
 !     node case (decimal form)
       integer,dimension(NR_PHYSA) :: icased
 !
 !     element, face order, geometry dof
       integer,dimension(19)          :: norder
-      real*8 ,dimension(3,MAXbrickH) :: xnod
+      real(8),dimension(3,MAXbrickH) :: xnod
       integer,dimension(12)          :: nedge_orient
       integer,dimension(6)           :: nface_orient
 !
 !     geometry
-      real*8,dimension(3)   :: xi,x
-      real*8,dimension(3,3) :: dxidx,dxdxi
-      real*8                :: rjac
+      real(8),dimension(3)   :: xi,x
+      real(8),dimension(3,3) :: dxidx,dxdxi
+      real(8)                :: rjac
 !
 !     3D quadrature data
-      real*8,dimension(3,MAX_NINT3) :: xiloc
-      real*8,dimension(  MAX_NINT3) :: wxi
+      real(8),dimension(3,MAX_NINT3) :: xiloc
+      real(8),dimension(  MAX_NINT3) :: wxi
 !
 !     approximate solution dof's
       VTYPE, dimension(MAXEQNH,MAXbrickH) :: zdofH
@@ -294,7 +294,7 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, rnormH,rnormE,r
 !
 !     miscellanea
       integer :: nint,icase,iattr,l,i,j,ibeg,iflag,iload,icomp,ndom,ivar,nflag
-      real*8  :: weight,wa
+      real(8) :: weight,wa
 !
 !     printing flag
       integer :: iprint
@@ -579,4 +579,4 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, rnormH,rnormE,r
         enddo
 !
 !
-endsubroutine element_error
+end subroutine element_error

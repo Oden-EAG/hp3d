@@ -4,8 +4,8 @@
 subroutine find_center(Mdle, X)
   use data_structure3D
   implicit none
-  integer,              intent(in)  :: Mdle
-  real*8, dimension(3), intent(out) :: X
+  integer,               intent(in)  :: Mdle
+  real(8), dimension(3), intent(out) :: X
 
   integer, dimension(27) :: nodesl,norientl
   integer                :: i, nv

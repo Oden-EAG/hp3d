@@ -37,5 +37,5 @@ index_lowertri.F90
 cross_product.F90
 cross_product2D.F90
 cross.F
-dot_product.F
+dot_product.F90
 0

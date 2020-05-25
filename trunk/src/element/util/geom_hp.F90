@@ -32,16 +32,16 @@ subroutine geom_hp(Mdle,Xi, X,Dxdxi)
 !
       implicit none
       integer,                 intent(in)  :: Mdle
-      real*8,  dimension(3),   intent(in)  :: Xi
-      real*8,  dimension(3),   intent(out) :: X
-      real*8,  dimension(3,3), intent(out) :: Dxdxi
+      real(8), dimension(3),   intent(in)  :: Xi
+      real(8), dimension(3),   intent(out) :: X
+      real(8), dimension(3,3), intent(out) :: Dxdxi
 !
-      integer,dimension(19) :: norder
-      integer,dimension(12) :: nedge_orient
-      integer,dimension( 6) :: nface_orient
-      real*8,dimension(3,MAXbrickH) :: xnod
-      real*8,dimension(  MAXbrickH) :: shapeH
-      real*8,dimension(3,MAXbrickH) :: dshapeH
+      integer, dimension(19) :: norder
+      integer, dimension(12) :: nedge_orient
+      integer, dimension( 6) :: nface_orient
+      real(8), dimension(3,MAXbrickH) :: xnod
+      real(8), dimension(  MAXbrickH) :: shapeH
+      real(8), dimension(3,MAXbrickH) :: dshapeH
       integer :: k,i,nrdofH
 !-------------------------------------------------------------------------
 !

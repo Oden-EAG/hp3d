@@ -1,3 +1,6 @@
+!
+#include "implicit_none.h"
+!
 !-----------------------------------------------------------------------
 !
 !> Purpose : update H1 geometry dof interpolating GMP reference map using
@@ -18,8 +21,6 @@
 !!
 !> @date Mar 17
 !-----------------------------------------------------------------------
-!
-#include "implicit_none.h"
   subroutine hpedge(Mdle,Iflag,No,Etav,Type, &
                     Nedge_orient,Nface_orient,Norder,Iedge,&
                     Xnod, Xdof)
@@ -31,47 +32,47 @@
 ! ** Arguments
 !-----------------------------------------------------------------------
 !      
-  integer,                                    intent(in)  :: Iflag,No,Mdle
-  integer,                                    intent(in)  :: Iedge
-  real*8,  dimension(3,8),                    intent(in)  :: Etav
-  character(len=4),                           intent(in)  :: Type
-  integer, dimension(12),                     intent(in)  :: Nedge_orient
-  integer, dimension(6),                      intent(in)  :: Nface_orient
-  integer, dimension(19),                     intent(in)  :: Norder
-  real*8,  dimension(3,MAXbrickH),            intent(in)  :: Xnod
-  real*8,  dimension(3,*),                    intent(out) :: Xdof
+  integer,                         intent(in)  :: Iflag,No,Mdle
+  integer,                         intent(in)  :: Iedge
+  real(8), dimension(3,8),         intent(in)  :: Etav
+  character(len=4),                intent(in)  :: Type
+  integer, dimension(12),          intent(in)  :: Nedge_orient
+  integer, dimension(6),           intent(in)  :: Nface_orient
+  integer, dimension(19),          intent(in)  :: Norder
+  real(8), dimension(3,MAXbrickH), intent(in)  :: Xnod
+  real(8), dimension(3,*),         intent(out) :: Xdof
 !
 ! ** Locals
 !-----------------------------------------------------------------------
 !
 ! quadrature
   integer                               :: l,nint
-  real*8,  dimension(MAX_NINT1)         :: xi_list
-  real*8,  dimension(MAX_NINT1)         :: wa_list 
-  real*8                                :: wa, weight
+  real(8), dimension(MAX_NINT1)         :: xi_list
+  real(8), dimension(MAX_NINT1)         :: wa_list
+  real(8)                               :: wa, weight
 !
 ! work space for shape3H
   integer                               :: nrdofH
   integer, dimension(19)                :: norder_1
-  real*8,  dimension(MAXbrickH)         :: shapH
-  real*8,  dimension(3,MAXbrickH)       :: gradH
+  real(8), dimension(MAXbrickH)         :: shapH
+  real(8), dimension(3,MAXbrickH)       :: gradH
 !
 ! derivatives of a shape function wrt reference coordinates
-  real*8, dimension(3)                  :: duHdeta,dvHdeta
+  real(8), dimension(3)                 :: duHdeta,dvHdeta
 !
 ! geometry
-  real*8                                :: t,rjac,bjac,prod
-  real*8, dimension(3)                  :: xi,eta,rn,x
-  real*8, dimension(3)                  :: dxidt,detadt,rt
-  real*8, dimension(3,3)                :: detadxi,dxideta,dxdeta
+  real(8)                               :: t,rjac,bjac,prod
+  real(8), dimension(3)                 :: xi,eta,rn,x
+  real(8), dimension(3)                 :: dxidt,detadt,rt
+  real(8), dimension(3,3)               :: detadxi,dxideta,dxdeta
 !    
 ! work space for linear solvers
   integer                               :: naH,info
-  real*8,  dimension(MAXP-1,MAXP-1)     :: aaH
+  real(8), dimension(MAXP-1,MAXP-1)     :: aaH
   integer, dimension(MAXP-1)            :: ipivH
 !    
 ! load vector and solution
-  real*8, dimension(MAXP-1,3)           :: bb,uu
+  real(8), dimension(MAXP-1,3)          :: bb,uu
 !  
 ! misc work space
   integer :: iprint,nrv,nre,nrf,i,j,k,ie,kj,ki,&
@@ -263,4 +264,4 @@
   enddo
 !
 !
-  endsubroutine hpedge
+  end subroutine hpedge

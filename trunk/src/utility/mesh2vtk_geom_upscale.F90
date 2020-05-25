@@ -23,7 +23,7 @@ subroutine mesh2vtk_geom_upscale(Nout, Isel, Is)
        norientl(27), nedge_orient(12), nface_orient(6), nverl(8), &
        nr_vert, nr_elem, nr_size
 
-       real*8 :: xi(3), x(3), xnod(3,MAXbrickH), dxdxi(3,3)
+       real(8) :: xi(3), x(3), xnod(3,MAXbrickH), dxdxi(3,3)
 
        VTYPE :: zdofH(MAXEQNH,MAXbrickH),zdofE(MAXEQNE,MAXbrickE), &
                 zdofV(MAXEQNV,MAXbrickV),zdofQ(MAXEQNQ,MAXbrickQ)

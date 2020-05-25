@@ -3,9 +3,9 @@
 MODULE ainsworth_quadrature_module
   IMPLICIT NONE
   LOGICAL :: INITIALIZED = .FALSE.
-  DOUBLE PRECISION :: XI_AINSWORTH_SCALED(10,10)
-  DOUBLE PRECISION :: W_AINSWORTH_SCALED(10,10)
-  DOUBLE PRECISION, PARAMETER :: XI_AINSWORTH(10,10) = reshape( &
+  real(8) :: XI_AINSWORTH_SCALED(10,10)
+  real(8) :: W_AINSWORTH_SCALED(10,10)
+  real(8), PARAMETER :: XI_AINSWORTH(10,10) = reshape( &
        (/ &
        0.d0, &
        0.d0, 0.d0, 0.d0, 0.d0, 0.d0, 0.d0, 0.d0, 0.d0, 0.d0, &
@@ -40,7 +40,7 @@ MODULE ainsworth_quadrature_module
        0.995105205867138d0 &
        /), (/10,10/) )
 
-  DOUBLE PRECISION, PARAMETER :: W_AINSWORTH(10,10) = reshape( &
+  real(8), PARAMETER :: W_AINSWORTH(10,10) = reshape( &
        (/ &
        0.d0, &
        0.d0, 0.d0, 0.d0, 0.d0, 0.d0, 0.d0, 0.d0, 0.d0, 0.d0, &
@@ -97,8 +97,8 @@ SUBROUTINE ainsworth_quadrature_3D(norder, n_xi, xi, w)
   IMPLICIT NONE
   INTEGER, INTENT(IN) :: norder(19) ! order of hexa nodes
   INTEGER, INTENT(OUT) :: n_xi ! total number of integration points
-  DOUBLE PRECISION, INTENT(OUT) :: xi(3,MAXbrickH) ! integration points
-  DOUBLE PRECISION, INTENT(OUT) :: w(MAXbrickH) ! integration weights
+  real(8), INTENT(OUT) :: xi(3,MAXbrickH) ! integration points
+  real(8), INTENT(OUT) :: w(MAXbrickH)    ! integration weights
   INTEGER :: nordx, nordy, nordz, nordxy, n, i, j, k
 
   IF (.NOT. INITIALIZED) THEN

@@ -88,7 +88,7 @@ subroutine dummy_soleval(Mdle)
        i, iv,  &
        nodesl(27), norder(19), &
        norientl(27), nedge_orient(12), nface_orient(6)
-  real*8 :: &
+  real(8) :: &
        xi(3), x(3), xnod(3,MAXbrickH), dxdxi(3,3)
   !                                                                                     
   VTYPE :: &

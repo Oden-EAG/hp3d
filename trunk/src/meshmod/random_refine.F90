@@ -13,12 +13,12 @@ subroutine random_refine(Per, Nitr)
   !
   ! ** Arguments
   !-----------------------------------------------------
-  real*8,  intent(in) :: Per
+  real(8), intent(in) :: Per
   integer, intent(in) :: Nitr
   !
   ! ** Locals
   !-----------------------------------------------------
-  real*8  :: x
+  real(8) :: x
   integer :: iprint, iseed, iel, i, istat
   integer :: nsize_list, kref, mdle, nref, idx, nelts
   integer, allocatable ::  mdle_list(:)

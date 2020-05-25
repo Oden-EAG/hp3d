@@ -30,14 +30,14 @@ subroutine compute_face(Numlev,Mdle,Iface,Nedge_orient,Nface_orient,Norder,Xnod,
       integer, dimension(12),              intent(in)  :: Nedge_orient
       integer, dimension(6),               intent(in)  :: Nface_orient
       integer, dimension(19),              intent(in)  :: Norder
-      real*8,  dimension(3,MAXbrickH),     intent(in)  :: Xnod
+      real(8), dimension(3,MAXbrickH),     intent(in)  :: Xnod
       VTYPE, dimension(MAXEQNH,MAXbrickH), intent(in)  :: ZdofH
       VTYPE, dimension(MAXEQNE,MAXbrickE), intent(in)  :: ZdofE
       VTYPE, dimension(MAXEQNV,MAXbrickV), intent(in)  :: ZdofV
       VTYPE, dimension(MAXEQNQ,MAXbrickQ), intent(in)  :: ZdofQ
-      real*8,  dimension(2),               intent(in)  :: T
-      real*8, dimension(3),                intent(out) :: X
-      real*8,                              intent(out) :: Val
+      real(8), dimension(2),               intent(in)  :: T
+      real(8), dimension(3),               intent(out) :: X
+      real(8),                             intent(out) :: Val
 !
       VTYPE, dimension(  MAXEQNH  ) :: zsolH
       VTYPE, dimension(  MAXEQNH,3) :: zgradH
@@ -47,11 +47,11 @@ subroutine compute_face(Numlev,Mdle,Iface,Nedge_orient,Nface_orient,Norder,Xnod,
       VTYPE, dimension(  MAXEQNV  ) :: zdivV
       VTYPE, dimension(  MAXEQNQ  ) :: zsolQ
 !      
-      real*8, dimension(3)   :: xi
-      real*8, dimension(3,2) :: dxidt
-      real*8, dimension(3,3) :: dxdxi
-      real*8, dimension(3,2) :: dxdt
-      real*8, dimension(3) :: rn
+      real(8), dimension(3)   :: xi
+      real(8), dimension(3,2) :: dxidt
+      real(8), dimension(3,3) :: dxdxi
+      real(8), dimension(3,2) :: dxdt
+      real(8), dimension(3) :: rn
       character(len=4) :: etype
       integer :: iprint, i, j
 !--------------------------------------------------------------------------------------------------

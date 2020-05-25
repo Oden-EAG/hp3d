@@ -59,9 +59,9 @@ subroutine geometry_error(Err,Rnorm)
       use environment      , only : QUIET_MODE,L2GEOM
 !      
       implicit none
-      real*8, intent(out) ::  Err, Rnorm
+      real(8), intent(out) :: Err, Rnorm
 !
-      real*8  :: derr, dnorm, err_rate
+      real(8) :: derr, dnorm, err_rate
       integer :: iprint, mdle, iel, ierr, i, nrgdof, nvoid , ic
 !
       integer,parameter :: nin=13
@@ -69,8 +69,8 @@ subroutine geometry_error(Err,Rnorm)
 !
       integer, save :: ivis = 0
       integer, save :: nrgdof_save
-      real*8 , save ::    err_save
-      real*8 , dimension(maxvis,4), save :: rwork
+      real(8), save ::    err_save
+      real(8), dimension(maxvis,4), save :: rwork
       integer, dimension(maxvis,1), save :: iwork
 !-------------------------------------------------------------------------
 !
@@ -204,7 +204,7 @@ ENDIF
       endif
 !      
 !
-endsubroutine geometry_error
+end subroutine geometry_error
 !
 !
 !
@@ -227,30 +227,30 @@ subroutine geometry_error_elem(Mdle, Derr,Dnorm)
 !
       implicit none
       integer, intent(in   ) :: Mdle
-      real*8,  intent(inout) :: Dnorm, Derr
+      real(8), intent(inout) :: Dnorm, Derr
 !  
 !     order of approx., gdof's, orientations
       integer, dimension(19)          :: norder
-      real*8,  dimension(3,MAXbrickH) :: xnod
+      real(8), dimension(3,MAXbrickH) :: xnod
       integer :: nedge_orient(12), nface_orient(6)
 !
 !     reference coordinates of the element vertices
       integer :: no,iflag
-      real*8 :: etav(3,8)
+      real(8) :: etav(3,8)
 !    
 !     shape functions
-      real*8 :: shapH(MAXbrickH),gradH(3,MAXbrickH)
+      real(8) :: shapH(MAXbrickH),gradH(3,MAXbrickH)
 !
 !     reference geometry
-      real*8 :: eta(3),detadxi(3,3),dxideta(3,3),rjac
+      real(8) :: eta(3),detadxi(3,3),dxideta(3,3),rjac
       integer :: error_flag
 !    
 !     exact and approximate geometry
-      real*8, dimension(3)   :: xi,xex,xhp
-      real*8, dimension(3,3) :: dxhpdxi,dxhpdeta,dxexdeta
+      real(8), dimension(3)   :: xi,xex,xhp
+      real(8), dimension(3,3) :: dxhpdxi,dxhpdeta,dxexdeta
 !    
 !     quadrature
-      real*8 :: xiloc(3,MAX_NINT3),wxi(MAX_NINT3),wa,weight
+      real(8) :: xiloc(3,MAX_NINT3),wxi(MAX_NINT3),wa,weight
 !  
       character(len=4) :: etype
 7001  format(' geometry_error_elem: Mdle,type = ',i10,2x,a4)
@@ -360,6 +360,6 @@ subroutine geometry_error_elem(Mdle, Derr,Dnorm)
       NODES(Mdle)%error(:,0)=0.d0 ; NODES(Mdle)%error(0,0)=Derr
 !
 !
-endsubroutine geometry_error_elem
+end subroutine geometry_error_elem
 
 #endif

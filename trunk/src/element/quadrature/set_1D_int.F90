@@ -28,9 +28,9 @@ subroutine set_1Dint(Nord, Nint,Xiloc,Waloc)
       use gauss_quadrature , only : INITIALIZED,XIGAUS1,WAGAUS1
       implicit none
 !
-      integer,                   intent(in)  :: Nord
-      integer,                   intent(out) :: Nint
-      real*8, dimension(MAXP+1), intent(out) :: Xiloc,Waloc
+      integer,                    intent(in)  :: Nord
+      integer,                    intent(out) :: Nint
+      real(8), dimension(MAXP+1), intent(out) :: Xiloc,Waloc
 !
       integer :: l,nord_aux
 !
@@ -79,9 +79,9 @@ subroutine set_1Dint_DPG(Nord, Nint,Xiloc,Waloc)
       use gauss_quadrature , only : INITIALIZED,XIGAUS1,WAGAUS1
       implicit none 
 !
-      integer,                    intent(in)  :: Nord
-      integer,                    intent(out) :: Nint
-      real*8, dimension(MAXPP+1), intent(out) :: Xiloc,Waloc
+      integer,                     intent(in)  :: Nord
+      integer,                     intent(out) :: Nint
+      real(8), dimension(MAXPP+1), intent(out) :: Xiloc,Waloc
 !
       integer :: l,nord_aux
 !

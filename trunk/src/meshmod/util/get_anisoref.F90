@@ -2,10 +2,10 @@ subroutine get_anisoref(Mdle, Derr, Kref)
   use data_structure3D
   implicit none 
   integer,              intent(in)  :: Mdle
-  real*8, dimension(3), intent(in)  :: Derr
+  real(8), dimension(3), intent(in) :: Derr
   integer,              intent(out) :: Kref
-  real*8  :: derr_xy, derr_yz, derr_xz
-  real*8, parameter :: ratio = 0.01d0
+  real(8) :: derr_xy, derr_yz, derr_xz
+  real(8), parameter :: ratio = 0.01d0
 
   derr_xy = sqrt(Derr(1)**2 + Derr(2)**2)
   derr_xz = sqrt(Derr(1)**2 + Derr(3)**2)

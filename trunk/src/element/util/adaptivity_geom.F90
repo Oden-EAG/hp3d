@@ -10,19 +10,19 @@ subroutine adaptivity_geom(Eps, Nref,Ratio)
       use data_structure3D , only : NRELES,NODES,ELEM_ORDER
       implicit none
 ! 
-      real*8, intent(in ) :: Eps
-      integer,intent(out) :: Nref
-      real*8, intent(out) :: Ratio
+      real(8), intent(in)  :: Eps
+      integer, intent(out) :: Nref
+      real(8), intent(out) :: Ratio
 ! 
       integer, allocatable :: nlist(:)
-      real*8 , allocatable :: rlist(:)
+      real(8), allocatable :: rlist(:)
 !
-      real*8 :: eta,vol
+      real(8) :: eta,vol
       integer :: iprint,mdle,i,kref,istat,j,nreles_save
 !      
-      integer,                save :: ivis=0
-      real*8, dimension(20,2),save :: rwork
-      integer,dimension(20,1),save :: iwork
+      integer,                 save :: ivis=0
+      real(8), dimension(20,2),save :: rwork
+      integer, dimension(20,1),save :: iwork
 ! 
 !-----------------------------------------------------------------------
 !
@@ -101,6 +101,6 @@ subroutine adaptivity_geom(Eps, Nref,Ratio)
       endif
 !
 !
-endsubroutine adaptivity_geom
+end subroutine adaptivity_geom
 
 #endif

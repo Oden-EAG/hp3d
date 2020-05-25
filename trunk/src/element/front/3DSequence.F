@@ -46,9 +46,9 @@ c
       integer, intent(in)  :: Nedge_orient(12)
       integer, intent(in)  :: Nface_orient(6)
       integer, intent(in)  :: Norder(19)
-      real*8 , intent(in)  :: Xi(3)
+      real(8), intent(in)  :: Xi(3)
       integer, intent(out) :: NrdofH
-      real*8 , intent(out) :: ShapH(MAXbrickH),GradH(3,MAXbrickH)
+      real(8), intent(out) :: ShapH(MAXbrickH),GradH(3,MAXbrickH)
 c
 #if SHAPE_MODE==0
 c      
@@ -100,9 +100,9 @@ c
       integer, intent(in)  :: Nedge_orient(12)
       integer, intent(in)  :: Nface_orient(6)
       integer, intent(in)  :: Norder(19)
-      real*8 , intent(in)  :: Xi(3)
+      real(8), intent(in)  :: Xi(3)
       integer, intent(out) :: NrdofE
-      real*8 , intent(out) :: ShapE(3,MAXbrickE),CurlE(3,MAXbrickE)
+      real(8), intent(out) :: ShapE(3,MAXbrickE),CurlE(3,MAXbrickE)
 c     
 #if SHAPE_MODE==0
 c
@@ -152,9 +152,9 @@ c
       character(len=4), intent(in)  :: Type
       integer, intent(in)  :: Nface_orient(6)
       integer, intent(in)  :: Norder(19)
-      real*8 , intent(in)  :: Xi(3)
+      real(8), intent(in)  :: Xi(3)
       integer, intent(out) :: NrdofV
-      real*8 , intent(out) :: ShapV(3,MAXbrickV),DivV(MAXbrickV)
+      real(8), intent(out) :: ShapV(3,MAXbrickV),DivV(MAXbrickV)
 c     
 #if SHAPE_MODE==0
 c
@@ -200,10 +200,10 @@ c
 c
       implicit none
       character(len=4), intent(in)  :: Type
-      real*8 , intent(in)  :: Xi(3)
+      real(8), intent(in)  :: Xi(3)
       integer, intent(in)  :: Norder(19)
       integer, intent(out) :: NrdofQ
-      real*8 , intent(out) :: ShapQ(MAXbrickQ)
+      real(8), intent(out) :: ShapQ(MAXbrickQ)
 c
 #if SHAPE_MODE==0
 c

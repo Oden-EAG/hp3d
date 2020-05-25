@@ -37,7 +37,7 @@ c
 c
       dimension Flhs(*), Ubuf(*)
 c
-      real*8 dreal
+      real(8) dreal
       external dreal
 
       data sml,zero /1.e-30, 0.0/

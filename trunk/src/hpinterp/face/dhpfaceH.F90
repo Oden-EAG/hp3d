@@ -1,4 +1,7 @@
 !
+#include "implicit_none.h"
+!
+!-----------------------------------------------------------------------
 !> Purpose : determine H1 face dof interpolating H1 Dirichlet data using 
 !            PB interpolation
 !  NOTE:     the interpolation (projection) is done in the reference space
@@ -16,8 +19,7 @@
 !! @param[in]  ZdofH        - H1 dof for the element (vertex and edge values)
 !! 
 !! @param[out] ZnodH        - H1 dof for the face
-!
-#include "implicit_none.h"
+!-----------------------------------------------------------------------
   subroutine dhpfaceH(Mdle,Iflag,No,Etav,Type,Icase, &
                       Nedge_orient,Nface_orient,Norder,Iface, &
                       ZdofH, ZnodH)
@@ -31,7 +33,7 @@
 !-----------------------------------------------------------------------
   integer,                                    intent(in)  :: Iflag,No,Mdle
   integer,                                    intent(in)  :: Icase,Iface
-  real*8,  dimension(3,8),                    intent(in)  :: Etav
+  real(8), dimension(3,8),                    intent(in)  :: Etav
   character(len=4),                           intent(in)  :: Type
   integer, dimension(12),                     intent(in)  :: Nedge_orient
   integer, dimension(6),                      intent(in)  :: Nface_orient
@@ -48,28 +50,28 @@
 !
 ! quadrature
   integer                               :: l,nint
-  real*8,  dimension(2, MAXquadH)       :: xi_list
-  real*8,  dimension(   MAXquadH)       :: wa_list 
-  real*8                                :: wa, weight
+  real(8), dimension(2, MAXquadH)       :: xi_list
+  real(8), dimension(   MAXquadH)       :: wa_list
+  real(8)                               :: wa, weight
 !
 ! work space for shape3H
   integer                               :: nrdofH
   integer, dimension(19)                :: norder_1
-  real*8,  dimension(MAXbrickH)         :: shapH
-  real*8,  dimension(3,MAXbrickH)       :: gradH
+  real(8), dimension(MAXbrickH)         :: shapH
+  real(8), dimension(3,MAXbrickH)       :: gradH
 !
 ! derivatives of a shape function wrt reference coordinates
-  real*8, dimension(3)                  :: duHdeta,dvHdeta
+  real(8), dimension(3)                 :: duHdeta,dvHdeta
 !
 ! dot product 
-  real*8                                :: prod
+  real(8)                               :: prod
 !
 ! geometry
-  real*8                                :: rjac,bjac
-  real*8, dimension(2)                  :: t
-  real*8, dimension(3)                  :: xi,eta,rn,x
-  real*8, dimension(3,2)                :: dxidt,detadt
-  real*8, dimension(3,3)                :: detadxi,dxideta,dxdeta
+  real(8)                               :: rjac,bjac
+  real(8), dimension(2)                 :: t
+  real(8), dimension(3)                 :: xi,eta,rn,x
+  real(8), dimension(3,2)               :: dxidt,detadt
+  real(8), dimension(3,3)               :: detadxi,dxideta,dxdeta
 !
 ! Dirichlet BC data at a point
   VTYPE :: zvalH(  MAXEQNH), zdvalH(  MAXEQNH,3), &
@@ -81,12 +83,12 @@
 !
 ! work space for linear solvers
   integer                               :: naH,info
-  real*8,  dimension(MAXMdlqH,MAXMdlqH) :: aaH
+  real(8), dimension(MAXMdlqH,MAXMdlqH) :: aaH
   integer, dimension(MAXMdlqH)          :: ipivH
 !
 ! load vector and solution
   VTYPE,   dimension(MAXMdlqH,MAXEQNH)  :: zbH,zuH
-  real*8,  dimension(MAXMdlqH,MAXEQNH)  :: duH_real,duH_imag
+  real(8), dimension(MAXMdlqH,MAXEQNH)  :: duH_real,duH_imag
 !
 ! decoded case for the face node
   integer, dimension(NR_PHYSA)          :: ncase

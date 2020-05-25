@@ -38,9 +38,9 @@ ccc     &    XGSCAL(10,4),IGPSP(10),ilepsp,ilescr,iledf,icurrwin
 ccc      common/wvpost/ilbuf,ibufc(5),bufor(2,5),ifile
 ccc      common/wvscrn/maxscx,maxscy,maxcol,maxdfx,maxdfy
       
-ccc      character*24 ctime
+ccc      character(24) ctime
 ccc      integer time
-      character*10 name
+      character(10) name
 c
   110 write(*,*)  'Give name for Postscript file (0 - no postscript)'
    10 read(*,1011) name

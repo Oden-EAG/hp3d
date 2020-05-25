@@ -41,11 +41,11 @@ c
 c
       implicit none
       character(len=4), intent(in)  :: Type
-      real*8 , intent(in ) :: T(2)
+      real(8), intent(in ) :: T(2)
       integer, intent(in ) :: Nord
       integer, intent(in ) :: Norient
       integer, intent(out) :: NrdofH
-      real*8 , intent(out) :: ShapH(MAXmdlqH),GradH(2,MAXmdlqH)
+      real(8), intent(out) :: ShapH(MAXmdlqH),GradH(2,MAXmdlqH)
 c
 #if SHAPE_MODE==0
 c
@@ -90,11 +90,11 @@ c
 c
       implicit none      
       character(len=4), intent(in)  :: Type
-      real*8 , intent(in ) :: T(2)
+      real(8), intent(in ) :: T(2)
       integer, intent(in ) :: Nord
       integer, intent(in ) :: Norient
       integer, intent(out) :: NrdofE
-      real*8 , intent(out) :: ShapE(2,MAXmdlqE),CurlE(MAXmdlqE)
+      real(8), intent(out) :: ShapE(2,MAXmdlqE),CurlE(MAXmdlqE)
 c     
 #if SHAPE_MODE==0
 c
@@ -139,11 +139,11 @@ c
 c
       implicit none      
       character(len=4), intent(in)  :: Type
-      real*8 , intent(in ) :: T(2)
+      real(8), intent(in ) :: T(2)
       integer, intent(in ) :: Nord
       integer, intent(in ) :: Norient
       integer, intent(out) :: NrdofV
-      real*8 , intent(out) :: ShapV(MAXmdlqQ)
+      real(8), intent(out) :: ShapV(MAXmdlqQ)
 c     
 #if SHAPE_MODE==0
 c

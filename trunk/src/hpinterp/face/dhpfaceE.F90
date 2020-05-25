@@ -1,4 +1,7 @@
 !
+#include "implicit_none.h"
+!
+!-----------------------------------------------------------------------
 !> Purpose : determine H(curl) face dof interpolating H(curl) Dirichlet 
 !            data using PB interpolation
 !
@@ -15,7 +18,7 @@
 !! @param[in]  ZdofE        - H(curl) dof for the element (edge values only)
 !!
 !! @param[out] ZnodE        - H(curl) dof for the face
-#include "implicit_none.h"
+!-----------------------------------------------------------------------
   subroutine dhpfaceE(Mdle,Iflag,No,Etav, Type,Icase, &
                       Nedge_orient,Nface_orient,Norder,Iface, &
                       ZdofE, ZnodE)
@@ -30,7 +33,7 @@
 !-----------------------------------------------------------------------
   integer,                                    intent(in)  :: Iflag,No,Mdle
   integer,                                    intent(in)  :: Icase,Iface
-  real*8,  dimension(3,8),                    intent(in)  :: Etav
+  real(8), dimension(3,8),                    intent(in)  :: Etav
   character(len=4),                           intent(in)  :: Type
   integer, dimension(12),                     intent(in)  :: Nedge_orient
   integer, dimension(6),                      intent(in)  :: Nface_orient
@@ -47,36 +50,36 @@
 !
 ! quadrature
   integer                               :: l,nint
-  real*8,  dimension(2, MAXquadH)       :: xi_list
-  real*8,  dimension(   MAXquadH)       :: wa_list 
-  real*8                                :: wa, weight
+  real(8), dimension(2, MAXquadH)       :: xi_list
+  real(8), dimension(   MAXquadH)       :: wa_list
+  real(8)                               :: wa, weight
 !
 ! work space for shape3H
   integer                               :: nrdofH
   integer, dimension(19)                :: norder_1
-  real*8,  dimension(MAXbrickH)         :: shapH
-  real*8,  dimension(3,MAXbrickH)       :: gradH
+  real(8), dimension(MAXbrickH)         :: shapH
+  real(8), dimension(3,MAXbrickH)       :: gradH
 !
 ! derivatives of a H1 shape function wrt reference coordinates
-  real*8, dimension(3)                  :: dvHdeta
+  real(8), dimension(3)                 :: dvHdeta
 !
 ! work space for shape3E
   integer                               :: nrdofE
-  real*8,  dimension(3,MAXbrickE)       :: shapE
-  real*8,  dimension(3,MAXbrickE)       :: curlE
+  real(8), dimension(3,MAXbrickE)       :: shapE
+  real(8), dimension(3,MAXbrickE)       :: curlE
 !
 ! H(curl) shape functions in reference coordinates
-  real*8,  dimension(3)                 :: uE,vE,curluE,curlvE
+  real(8), dimension(3)                 :: uE,vE,curluE,curlvE
 !
 ! dot product 
-  real*8                                :: prod
+  real(8)                               :: prod
 !
 ! geometry
-  real*8                                :: rjac,bjac,rjacdxdeta
-  real*8, dimension(2)                  :: t
-  real*8, dimension(3)                  :: xi,eta,rn,x
-  real*8, dimension(3,2)                :: dxidt,detadt
-  real*8, dimension(3,3)                :: detadxi,dxideta,dxdeta,detadx
+  real(8)                               :: rjac,bjac,rjacdxdeta
+  real(8), dimension(2)                 :: t
+  real(8), dimension(3)                 :: xi,eta,rn,x
+  real(8), dimension(3,2)               :: dxidt,detadt
+  real(8), dimension(3,3)               :: detadxi,dxideta,dxdeta,detadx
 !
 ! Dirichlet BC data at a point
   VTYPE :: zvalH(  MAXEQNH), zdvalH(  MAXEQNH,3), &
@@ -87,14 +90,14 @@
   VTYPE :: zvalEeta(3,MAXEQNE),zcurlEeta(3,MAXEQNE)
 !
 ! linear systems
-  real*8,  dimension(MAXMdlqH+MAXMdlqE,MAXMdlqH+MAXMdlqE) :: aaE
+  real(8), dimension(MAXMdlqH+MAXMdlqE,MAXMdlqH+MAXMdlqE) :: aaE
   integer, dimension(MAXMdlqH+MAXMdlqE) :: ipivE
 !
 ! load vector and solution
-  VTYPE,   dimension(MAXMdlqH+MAXMdlqE,MAXEQNE)  :: zbE,zuE
-  real*8,  dimension(MAXMdlqH+MAXMdlqE,MAXEQNE)  :: duE_real, duE_imag
+  VTYPE,   dimension(MAXMdlqH+MAXMdlqE,MAXEQNE) :: zbE,zuE
+  real(8), dimension(MAXMdlqH+MAXMdlqE,MAXEQNE) :: duE_real, duE_imag
 !
-  integer, dimension(NR_PHYSA)          :: ncase
+  integer, dimension(NR_PHYSA) :: ncase
 !
 ! misc
   integer :: nrv,nre,nrf,nsign,nflag, &

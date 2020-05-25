@@ -142,7 +142,7 @@ contains
     implicit none
     type(vis), intent(in) :: V
     integer  , intent(in) :: Idx
-    real*8   , intent(out):: Pt(3)
+    real(8)  , intent(out):: Pt(3)
     Pt(1:3) = V%VERT(Idx,1:3)
   end subroutine get_vis_point
 !

@@ -26,7 +26,7 @@ c
 c
       dimension Zaldest(*)
 #if C_MODE
-      complex*16 dcmplx
+      complex(8) dcmplx
 #endif
 c
       if (Iel.ge.1) then

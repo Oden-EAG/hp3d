@@ -7,8 +7,8 @@ subroutine volume_hp(Vol)
   implicit none
   !
   !  ...dummy arguments
-  real*8,intent(out) :: Vol
-  real*8 :: vol_mdle
+  real(8), intent(out) :: Vol
+  real(8) :: vol_mdle
   integer :: iprint, iel, mdle, i
   !----------------------------------------------------
   !
@@ -20,7 +20,7 @@ subroutine volume_hp(Vol)
      call volume_hp_mdle(mdle, vol_mdle)
      Vol = Vol + vol_mdle
   enddo
-endsubroutine volume_hp
+end subroutine volume_hp
 
 !-----------------------------------------------------------------------      
 subroutine volume_hp_mdle(Mdle, Vol)
@@ -29,18 +29,18 @@ subroutine volume_hp_mdle(Mdle, Vol)
   implicit none
 
   integer, intent(in)  :: Mdle
-  real*8,  intent(out) :: Vol
+  real(8), intent(out) :: Vol
   !
   integer :: norder(19), nedge_orient(12), nface_orient(6)
-  real*8 :: xnod(3,MAXbrickH), shapH(MAXbrickH),dshapH(3,MAXbrickH)
+  real(8) :: xnod(3,MAXbrickH), shapH(MAXbrickH),dshapH(3,MAXbrickH)
   !
   character(len=4) :: type
-  real*8 :: xiloc(3,MAX_NINT3),wxi(MAX_NINT3)
+  real(8) :: xiloc(3,MAX_NINT3),wxi(MAX_NINT3)
 
   ! geometry
-  real*8, dimension(3)   :: xi,x
-  real*8, dimension(3,3) :: dxdxi,dxidx
-  real*8  :: wa,rjac
+  real(8) :: xi(3), x(3)
+  real(8) :: dxdxi(3,3), dxidx(3,3)
+  real(8) :: wa,rjac
   integer :: iprint,nint,i,k,l,iflag,nrdofH
   !
   iprint = 0;  
@@ -83,4 +83,4 @@ subroutine volume_hp_mdle(Mdle, Vol)
      Vol = Vol + wa*rjac
   enddo
   
-endsubroutine volume_hp_mdle
+end subroutine volume_hp_mdle

@@ -1,3 +1,6 @@
+!
+#include"implicit_none.h"
+!
 !-------------------------------------------------------------------------------------
 !> Purpose - Selection for quantities to be displayed by graphics
 !!
@@ -61,8 +64,7 @@ subroutine soldis_select_system
       ISELECT = ireal*1000 + iattr*100 + icomp*10 + iload*1
 !
 !
-endsubroutine soldis_select_system
-!
+end subroutine soldis_select_system
 !
 !
 !-------------------------------------------------------------------------------------
@@ -83,9 +85,6 @@ endsubroutine soldis_select_system
 !!
 !> @data Nov 14
 !-------------------------------------------------------------------------------------
-!
-#include"implicit_none.h"
-!
 subroutine soldis_system(Mdle,Xi,X,Rn,SolH,GradH,SolE,CurlE,SolV,DivV,SolQ, Val)
 !
       use data_structure3D , only : MAXEQNH,MAXEQNE,MAXEQNV,MAXEQNQ,  &
@@ -95,7 +94,7 @@ subroutine soldis_system(Mdle,Xi,X,Rn,SolH,GradH,SolE,CurlE,SolV,DivV,SolQ, Val)
 !
       implicit none
       integer,                     intent(in)  :: Mdle
-      real*8,dimension(3),         intent(in)  :: Xi,X,Rn
+      real(8),dimension(3),        intent(in)  :: Xi,X,Rn
       VTYPE,dimension(  MAXEQNH  ),intent(in)  :: SolH
       VTYPE,dimension(  MAXEQNH,3),intent(in)  :: GradH
       VTYPE,dimension(3,MAXEQNE  ),intent(in)  :: SolE
@@ -103,7 +102,7 @@ subroutine soldis_system(Mdle,Xi,X,Rn,SolH,GradH,SolE,CurlE,SolV,DivV,SolQ, Val)
       VTYPE,dimension(3,MAXEQNV  ),intent(in)  :: SolV
       VTYPE,dimension(  MAXEQNV  ),intent(in)  :: DivV
       VTYPE,dimension(  MAXEQNQ  ),intent(in)  :: SolQ
-      real*8,                      intent(out) :: Val
+      real(8),                     intent(out) :: Val
 !
 !!!!     exact solution
 !!!      VTYPE,dimension(  MAXEQNH    ) ::   valH
@@ -119,11 +118,11 @@ subroutine soldis_system(Mdle,Xi,X,Rn,SolH,GradH,SolE,CurlE,SolV,DivV,SolQ, Val)
 !!!      VTYPE,dimension(  MAXEQNQ,3  ) ::  dvalQ
 !!!      VTYPE,dimension(  MAXEQNQ,3,3) :: d2valQ
 !
-      real*8, dimension(3) :: aux,aux_n
-      real*8 :: s
+      real(8) :: aux(3),aux_n(3)
+      real(8) :: s
       integer :: ivoid,iattr,icomp,ireal,ibeg,iload,isol
 !
-      real*8, external :: dreal_part,dimag_part
+      real(8), external :: dreal_part,dimag_part
 !
 !-------------------------------------------------------------------------------------
 !
@@ -201,4 +200,4 @@ subroutine soldis_system(Mdle,Xi,X,Rn,SolH,GradH,SolE,CurlE,SolV,DivV,SolQ, Val)
       endselect
 !
 !
-endsubroutine soldis_system
+end subroutine soldis_system

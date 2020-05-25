@@ -52,7 +52,7 @@ c---------------------------------------------------------------
 c  ...zooming
       common /cizoo1/ izoo
       common /cizu2/ xmi,xma,ymi,yma,wmi,wma
-      real*8, allocatable :: xnod0(:,:)
+      real(8), allocatable :: xnod0(:,:)
       dimension ibf(6)
 
       common /cnocuts/ NOCUTS
