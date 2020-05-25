@@ -11,8 +11,8 @@
 !                                                                    
 !
 !----------------------------------------------------------------------
-! 
-   module common_prob_data
+!
+module common_prob_data
    save
 !   
 !------------------------------------------------------------------------------
@@ -39,7 +39,7 @@
    integer, parameter :: BC_CAVITY      = 4
    integer, parameter :: BC_CAVITY_SCAT = 5
    integer, parameter :: BC_SPHERE_SCAT = 6
-!   
+!
 !..EXACT SOLUTION
    integer :: ISOL
    integer, parameter :: IEXACT_POLYNOMIAL  = 0
@@ -48,21 +48,21 @@
 !..NUMBER OF REFINEMENTS (JOB SCRIPT)
    integer :: IMAX
 !
-!  order of the polynomial exact solution
+!..order of the polynomial exact solution
    integer :: NPX, NPY, NPZ
 !
 !..pi for sinusoidal solution
-   real*8,  parameter :: PI = 4.d0*datan(1.d0)
+   real(8), parameter :: PI = 4.d0*datan(1.d0)
 !
 !..REFINEMENT TYPE (refine_DPG.F90)
    integer, parameter :: INOREFINEMENT  = 0
    integer, parameter :: IUNIFORM       = 1
    integer, parameter :: IADAPTIVE      = 2
-!   
+!
 !..DISPLAY SETTINGS (soldis.F90 ...)
 !..DISPLAY SETTINGS (paraview   ...)
    integer :: IEXACT_DISP, ITANGENT_DISP, ICHOOSE_DISP
    integer :: IDOMAIN_SMOOTHE = 0
 !
-
-   end module common_prob_data
+!
+end module common_prob_data

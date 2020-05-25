@@ -26,13 +26,13 @@ subroutine solution(X, u,gradu,gradgradu)
 !
    implicit none
 !
-   real*8, dimension(3),   intent(in)  :: X
-   real*8,                 intent(out) :: u
-   real*8, dimension(3),   intent(out) :: gradu     ! 1st derivative - gradient
-   real*8, dimension(3,3), intent(out) :: gradgradu ! 2nd derivative - Hessian
+   real(8), dimension(3),   intent(in)  :: X
+   real(8),                 intent(out) :: u
+   real(8), dimension(3),   intent(out) :: gradu     ! 1st derivative - gradient
+   real(8), dimension(3,3), intent(out) :: gradgradu ! 2nd derivative - Hessian
 !
-   real*8 :: x1,x2,x3,f_x,f_y,f_z,df_x,df_y,df_z,ddf_x,ddf_y,ddf_z
-   real*8 :: np_x,np_y,np_z
+   real(8) :: x1,x2,x3,f_x,f_y,f_z,df_x,df_y,df_z,ddf_x,ddf_y,ddf_z
+   real(8) :: np_x,np_y,np_z
    integer :: isol_p
 !
 !--------------------------------------------------------------------------------
