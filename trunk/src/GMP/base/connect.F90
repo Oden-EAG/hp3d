@@ -1035,7 +1035,7 @@ subroutine connect
       endif
 !
 !
-endsubroutine connect
+end subroutine connect
 !
 !
 !----------------------------------------------------------------------
@@ -1090,4 +1090,4 @@ subroutine clean_GMP
       enddo
 !
 !
-endsubroutine clean_GMP
+end subroutine clean_GMP

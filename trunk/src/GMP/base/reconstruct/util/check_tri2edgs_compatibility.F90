@@ -10,23 +10,23 @@
       implicit none
 !--------------------------------------------------------------------------
 !     DUMMY ARGUMENTS
-      integer,intent(in)      :: Nt
+      integer,intent(in)     :: Nt
 !--------------------------------------------------------------------------
 !     LOCAL VARIBLES
 !  ...master edge coordinate      
-      real*8                :: zeta
+      real(8)                :: zeta
 !  ...master triangle coordiante      
-      real*8,dimension(2)   :: eta
+      real(8),dimension(2)   :: eta
 !  ...physical space coordinates      
-      real*8,dimension(3)   :: x1,x2
+      real(8),dimension(3)   :: x1,x2
 !  ...derivatives      
-      real*8,dimension(2)   :: deta_dzeta      
-      real*8,dimension(3,2) :: dx2_deta
-      real*8,dimension(3)   :: dx1_dzeta,dx2_dzeta 
+      real(8),dimension(2)   :: deta_dzeta
+      real(8),dimension(3,2) :: dx2_deta
+      real(8),dimension(3)   :: dx1_dzeta,dx2_dzeta
 !  ...miscellanea
-      real*8                :: s
-      real*8,dimension(3)   :: temp
-      integer                 :: nc,ie,nsub,i,j,iflag
+      real(8)                :: s
+      real(8),dimension(3)   :: temp
+      integer                :: nc,ie,nsub,i,j,iflag
 !--------------------------------------------------------------------------
 !
 !  ...set number of subdivisions      

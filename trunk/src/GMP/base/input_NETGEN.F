@@ -85,8 +85,8 @@ c       list(1,i) = block connected to a face
 c       list(2,i) = the corresponding face number
 c
 c     nvert_aux - vertices for a surface triangle
-      character*10 type
-      character*10 surfstype(10), surfrtype(10)
+      character(10) type
+      character(10) surfstype(10), surfrtype(10)
 c
 c  ...list of surfaces containing a curve
       integer lists(10)
@@ -773,7 +773,7 @@ c
 c
 c
 c-----------------------------------------------------------------------
-c  STEP 8: upgrade to double precision geometry;
+c  STEP 8: upgrade to double-precision geometry;
 c    REMARK: only TRIANGLES%Idata(1) is needed
 c
       call upgrade2double
@@ -1029,7 +1029,7 @@ c
 ccc      write(*,*)'input_NETGEN: done!'
       close(nin)
 c
-      endsubroutine input_NETGEN
+      end subroutine input_NETGEN
 c
 c
 c
@@ -1336,4 +1336,4 @@ c
  8001 format(3e15.6)
  8002 format(i4,5i9)
 c
-      endsubroutine modify_NETGEN_input
+      end subroutine modify_NETGEN_input

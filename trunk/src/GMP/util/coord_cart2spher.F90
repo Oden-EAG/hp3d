@@ -14,8 +14,8 @@
 subroutine coord_cart2spher(C_in, C_out)
   !
   implicit none
-  real*8,dimension(3),intent(in)  :: C_in
-  real*8,dimension(3),intent(out) :: C_out
+  real(8),dimension(3),intent(in)  :: C_in
+  real(8),dimension(3),intent(out) :: C_out
   !--------------------------------------------------------------------------
   !
   !  ...call old routine
@@ -27,10 +27,10 @@ end subroutine coord_cart2spher
 !
 subroutine coord_cart2sphere(C_in, C_out)
   implicit none
-  real*8,dimension(3),intent(in)  :: C_in
-  real*8,dimension(3),intent(out) :: C_out
+  real(8),dimension(3),intent(in)  :: C_in
+  real(8),dimension(3),intent(out) :: C_out
   !    
-  real*8, parameter :: eps=1.0e-15
+  real(8), parameter :: eps=1.0e-15
   !--------------------------------------------------------------------------
   
   C_out(1) = sqrt(C_in(1)**2 + C_in(2)**2 + C_in(3)**2) 

@@ -23,22 +23,22 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
       use element_data , only : QUADR_EDGE_TO_VERT
       use control      , only : GEOM_TOL
       implicit none
-      integer              ,intent(in ) :: No
-      real*8,dimension(2  ),intent(in ) :: Eta
-      real*8,dimension(3  ),intent(out) :: X
-      real*8,dimension(3,2),intent(out) :: Dxdeta
+      integer               ,intent(in ) :: No
+      real(8),dimension(2  ),intent(in ) :: Eta
+      real(8),dimension(3  ),intent(out) :: X
+      real(8),dimension(3,2),intent(out) :: Dxdeta
 !      
-      real*8, dimension(  4) :: shapH
-      real*8, dimension(2,4) :: dshapH
-      real*8, dimension(3,4) :: xv
-      real*8, dimension(3,3) :: aux,adx1,adx2
-      real*8, dimension(3  ) :: der,der1,der2,xs,xmid,aux1,aux2,xc,dxcdt,de
-      real*8, dimension(4  ) :: sfact,fxi,dfxi
-      real*8, dimension(2  ) :: dtdeta
-      integer,dimension(4  ) :: ncurv,npoint
-      integer,dimension(5  ) :: nsurf
+      real(8), dimension(  4) :: shapH
+      real(8), dimension(2,4) :: dshapH
+      real(8), dimension(3,4) :: xv
+      real(8), dimension(3,3) :: aux,adx1,adx2
+      real(8), dimension(3  ) :: der,der1,der2,xs,xmid,aux1,aux2,xc,dxcdt,de
+      real(8), dimension(4  ) :: sfact,fxi,dfxi
+      real(8), dimension(2  ) :: dtdeta
+      integer, dimension(4  ) :: ncurv,npoint
+      integer, dimension(5  ) :: nsurf
 
-      real*8  :: fval,fval1,fval2,fval3,fval4,fval5,t
+      real(8) :: fval,fval1,fval2,fval3,fval4,fval5,t
       integer :: i,j,iv1,iv2,norient,ifl1,ifl2,ii
       integer :: iprint
 !-----------------------------------------------------------------------
@@ -368,4 +368,4 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
       endif
 !
 !
-endsubroutine recta_ImpRec
+end subroutine recta_ImpRec

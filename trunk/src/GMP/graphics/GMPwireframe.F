@@ -27,7 +27,7 @@ c
 #include "syscom.blk"
 c
 c  ...list of segments
-      double precision, allocatable ::  SEGMENTS(:,:,:)
+      real(8), allocatable ::  SEGMENTS(:,:,:)
       integer, allocatable ::  COLORN(:)
 c
 c  ...list of rectangles to display

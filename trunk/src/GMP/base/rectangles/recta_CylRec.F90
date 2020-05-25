@@ -33,21 +33,21 @@
       use GMP          , only : RECTANGLES,POINTS,NDIM
       implicit none
 !----------------------------------------------------------------------
-      integer,                intent(in)  :: No
-      real*8, dimension(3),   intent(in)  :: Eta(2)
-      real*8, dimension(3),   intent(out) :: X(3)
-      real*8, dimension(3,3), intent(out) :: Dxdeta(3,3)
+      integer,                 intent(in)  :: No
+      real(8), dimension(3),   intent(in)  :: Eta(2)
+      real(8), dimension(3),   intent(out) :: X(3)
+      real(8), dimension(3,3), intent(out) :: Dxdeta(3,3)
 !----------------------------------------------------------------------
 !  ...vertex shape functions
-      real*8, dimension(4)   :: vshape
-      real*8, dimension(3,4) :: dvshape
+      real(8), dimension(4)   :: vshape
+      real(8), dimension(3,4) :: dvshape
 !  ...cylindrical coordinates
-      real*8               :: r,theta,rp,thetap,thetaTmp
-      real*8, dimension(3) :: drdeta,dthetadeta
+      real(8)               :: r,theta,rp,thetap,thetaTmp
+      real(8), dimension(3) :: drdeta,dthetadeta
 !----------------------------------------------------------------------
 !     misc.
       integer :: iprint,iv,np,i
-      real*8  :: pi,twopi,costhet,sinthet
+      real(8) :: pi,twopi,costhet,sinthet
 !----------------------------------------------------------------------
 !
       select case(No)

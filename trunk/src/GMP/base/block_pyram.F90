@@ -17,17 +17,17 @@ subroutine pyram(No,Eta, X,Dxdeta)
 !      
 !------------------------------------------------------------------------------
       implicit none
-      integer,              intent(in)  :: No
-      real*8,dimension(3),  intent(in)  :: Eta
-      real*8,dimension(3),  intent(out) :: X
-      real*8,dimension(3,3),intent(out) :: Dxdeta
+      integer,               intent(in)  :: No
+      real(8),dimension(3),  intent(in)  :: Eta
+      real(8),dimension(3),  intent(out) :: X
+      real(8),dimension(3,3),intent(out) :: Dxdeta
 !
 !  ...vertex point coordinates and their derivatives
-      real*8,dimension(3,5) :: xvert
+      real(8),dimension(3,5) :: xvert
 !
 !  ...pyramid element order and shape functions      
-      real*8,dimension(8)   :: vshap
-      real*8,dimension(3,8) :: dvshap
+      real(8),dimension(8)   :: vshap
+      real(8),dimension(3,8) :: dvshap
 !
       integer :: i,np,k,ivar,nrdof
 !------------------------------------------------------------------------------
@@ -107,7 +107,7 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
 !  ...face kernels
       dimension xf(3),dxfdtf(3,2)
 !
-      double precision x,y,z,xz1,yz1,z1
+      real(8) x,y,z,xz1,yz1,z1
 !
 !----------------------------------------------------------------------
 !

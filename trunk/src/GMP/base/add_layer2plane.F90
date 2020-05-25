@@ -54,19 +54,19 @@ subroutine add_layer2plane(N_plane,Nr_bound,Ns_bound,N_layers,Thickness,N_domain
   integer,                       intent(in) :: N_layers
   integer,                       intent(in) :: Nr_bound
   integer, dimension(Nr_bound),  intent(in) :: Ns_bound
-  real*8, dimension(N_layers), intent(in) :: Thickness
+  real(8), dimension(N_layers),  intent(in) :: Thickness
   integer, dimension(N_layers),  intent(in) :: N_domains
 !-----------------------------------------------------------------------------------------------
 ! LOCAL VARIABLES
   integer                            :: nrtrian_old,nrcurve_old
 ! for np on the plane, surface_points(np) is the first twin point of np  
-  integer, allocatable, dimension(:) :: surface_points
-  real*8, dimension(3,2)             :: aux
-  real*8                             :: prod,dr,fval
+  integer, allocatable               :: surface_points(:)
+  real(8), dimension(3,2)            :: aux
+  real(8)                            :: prod,dr,fval
   integer, dimension(3)              :: nverts,nvert
-  real*8, dimension(3)               :: void,temp,NORMAL
+  real(8), dimension(3)              :: void,temp,NORMAL
   integer, dimension(0:max_layers)   :: n_planes
-  real*8, dimension(max_layers)      :: tlayer
+  real(8), dimension(max_layers)     :: tlayer
   integer                            :: i,idec,jv,np,np1,np2,np3,nt,nc,newp1,newp2
   integer                            :: status
   integer                            :: iprint
@@ -428,10 +428,10 @@ subroutine update_rectangle(Nr)
   integer, intent(in)    :: Nr
 !------------------------------------------------------------------------------------------------------  
 ! VARIABLES
-  real*8               :: fval
-  real*8, dimension(3) :: xp,dfdx
-  integer              :: is,ns,idec,iv,np
-  integer              :: status
+  real(8)               :: fval
+  real(8), dimension(3) :: xp,dfdx
+  integer               :: is,ns,idec,iv,np
+  integer               :: status
 !------------------------------------------------------------------------------------------------------  
 ! printing flag (0,1)
 #define I_PRINT 0

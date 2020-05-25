@@ -17,18 +17,18 @@
 subroutine superellipse(X,Point,Axis1,Axis2,Rs1,Rs2,Pw1,Pw2, Fval,Dfdx)
 !
       implicit none
-      real*8, dimension(3), intent(in ) :: X,Point,Axis1,Axis2
-      real*8              , intent(in ) :: Rs1,Rs2,Pw1,Pw2
-      real*8              , intent(out) :: Fval
-      real*8, dimension(3), intent(out) :: Dfdx
+      real(8), dimension(3), intent(in ) :: X,Point,Axis1,Axis2
+      real(8)              , intent(in ) :: Rs1,Rs2,Pw1,Pw2
+      real(8)              , intent(out) :: Fval
+      real(8), dimension(3), intent(out) :: Dfdx
 !------------------------------------------------------------------------------------
 !  ...superellipse axes unit vectors
-      real*8, dimension(3)   :: unit1,unit2
+      real(8), dimension(3)   :: unit1,unit2
 !  ...relative position vector of X with respect to point of axis
-      real*8, dimension(3)   :: vecV
+      real(8), dimension(3)   :: vecV
 !  ...projections onto unit axes
-      real*8                 :: xx,yy,sgnxx,sgnyy,s
-      integer                :: iprint
+      real(8)                 :: xx,yy,sgnxx,sgnyy,s
+      integer                 :: iprint
 !------------------------------------------------------------------------------------
 !      
       iprint=0

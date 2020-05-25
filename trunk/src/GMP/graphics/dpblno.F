@@ -28,7 +28,7 @@ c
 c
       dimension xcoord(3,8), dxdxi(3,2)
       dimension xav(3),xavob(3), xi(2)
-      character*3 text
+      character(3) text
 c
 c  ...set colour
       ncol=npcol(2)

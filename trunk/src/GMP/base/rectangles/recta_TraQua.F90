@@ -15,26 +15,26 @@ subroutine recta_TraQua(No,Eta, X,Dxdeta)
       use GMP , only : RECTANGLES , SURFACES
 !      
       implicit none
-      integer              ,intent(in ) :: No
-      real*8,dimension(2  ),intent(in ) :: Eta
-      real*8,dimension(3  ),intent(out) :: X
-      real*8,dimension(3,2),intent(out) :: Dxdeta
+      integer               ,intent(in ) :: No
+      real(8),dimension(2  ),intent(in ) :: Eta
+      real(8),dimension(3  ),intent(out) :: X
+      real(8),dimension(3,2),intent(out) :: Dxdeta
 !-----------------------------------------------------------------------
 !  ...edges curves numbers and orientations      
-      integer,dimension(4)  :: noc,norientc
+      integer,dimension(4)   :: noc,norientc
 !  ...point on a curve and its derivative      
-      real*8,dimension(3)   :: xp,dxp
+      real(8),dimension(3)   :: xp,dxp
 !  ...vertex and edge blending functions      
-      real*8,dimension(8)   :: val
+      real(8),dimension(8)   :: val
 !  ...derivatives of blending functions      
-      real*8,dimension(2,8) :: dval
+      real(8),dimension(2,8) :: dval
 !  ...edge coordinate      
-      real*8                :: etac
+      real(8)                :: etac
 !  ...derivative of edge coordinate      
-      real*8,dimension(2)   :: detac
+      real(8),dimension(2)   :: detac
 !      
-      integer               :: k,i,j,np,ns
-      integer               :: iprint
+      integer                :: k,i,j,np,ns
+      integer                :: iprint
 !-----------------------------------------------------------------------
 !
       iprint=0
@@ -136,7 +136,7 @@ subroutine recta_TraQua(No,Eta, X,Dxdeta)
       enddo
 !
 !
-endsubroutine recta_TraQua
+end subroutine recta_TraQua
 !
 !
 !      
@@ -231,4 +231,4 @@ endsubroutine recta_TraQua
       Dval(2,k) =  0.d0
 !
 !
-      endsubroutine recta_blend
+      end subroutine recta_blend

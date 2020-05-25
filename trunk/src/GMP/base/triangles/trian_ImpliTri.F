@@ -36,8 +36,8 @@ c
      .          dxcdt(3),ncurv(3),aux1(3),aux2(3),xc(3),aux(3,3),
      .          sfact(4),de(3),xmid(3),dtdeta(2)
 c
-      real*8,dimension(3)   :: shapH
-      real*8,dimension(2,3) :: dshapH
+      real(8), dimension(3)   :: shapH
+      real(8), dimension(2,3) :: dshapH
 c
       iprint=0
 

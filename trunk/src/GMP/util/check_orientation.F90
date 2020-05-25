@@ -13,11 +13,11 @@ subroutine check_orientation(Lab,Nb)
 !      
       use GMP
       implicit none
-      integer, intent(in)    :: Lab,Nb
+      integer, intent(in)     :: Lab,Nb
 !      
-      real*8, dimension(3,3) :: vect
-      integer                :: np1,np2,np3,np4,iprint
-      real*8                 :: det
+      real(8), dimension(3,3) :: vect
+      integer                 :: np1,np2,np3,np4,iprint
+      real(8)                 :: det
 !---------------------------------------------------------------------      
 !
       iprint=0
@@ -64,4 +64,4 @@ subroutine check_orientation(Lab,Nb)
       endif
 !
 !      
-endsubroutine check_orientation
+end subroutine check_orientation

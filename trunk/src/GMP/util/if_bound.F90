@@ -23,14 +23,14 @@ integer function if_bound(Xp,Nr_bound,Ns_bound)
   use control
 !--------------------------------------------------------------------------
 ! DUMMY ARGUMENTS
-  real*8, dimension(3), intent(in)         :: Xp
+  real(8), dimension(3), intent(in)        :: Xp
   integer, intent(in)                      :: Nr_bound
   integer, dimension(Nr_bound), intent(in) :: Ns_bound
 !--------------------------------------------------------------------------
 ! LOCAL VARIABLES
-  integer              :: is
-  real*8               :: fval
-  real*8, dimension(3) :: dfdx  
+  integer               :: is
+  real(8)               :: fval
+  real(8), dimension(3) :: dfdx
 !--------------------------------------------------------------------------
 ! 
     if_bound = 1

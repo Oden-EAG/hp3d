@@ -102,4 +102,4 @@ c  .....add adge contribution
       endif
 c
 c
-      endsubroutine trian_TransTri
+      end subroutine trian_TransTri

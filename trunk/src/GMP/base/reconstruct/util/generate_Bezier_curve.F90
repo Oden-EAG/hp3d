@@ -9,7 +9,7 @@
 !  ...curve number
       integer,intent(in) :: Nc
 !  ...positions, velocities, accelerations      
-      real*8,dimension(3,2),intent(in) :: X,V,A
+      real(8),dimension(3,2),intent(in) :: X,V,A
 !--------------------------------------------------------------------------------
       integer :: is,iprint,i
 !
@@ -53,4 +53,4 @@
       endif
 !            
 !
-      end
+      end subroutine

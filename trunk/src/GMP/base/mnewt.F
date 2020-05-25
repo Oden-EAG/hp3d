@@ -142,7 +142,7 @@ c
 c  ...end of loop through iterations
       enddo
 c
-      endsubroutine mnewt
+      end subroutine mnewt
 c
 c
 c
@@ -359,4 +359,4 @@ c  ...printing statement
         enddo
       endif
 c
-      endsubroutine usrfun
+      end subroutine usrfun

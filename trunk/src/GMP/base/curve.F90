@@ -16,17 +16,17 @@
 subroutine curve_local(No,Norient,T, X,Dxdt)
 !      
       implicit none
-      integer,            intent(in ) :: No,Norient
-      real*8             ,intent(in ) :: T
-      real*8,dimension(3),intent(out) :: X
-      real*8,dimension(3),intent(out) :: Dxdt
+      integer,             intent(in ) :: No,Norient
+      real(8)             ,intent(in ) :: T
+      real(8),dimension(3),intent(out) :: X
+      real(8),dimension(3),intent(out) :: Dxdt
 !
 !  ...GLOBAL REFERENCE coordinate
-      real*8              :: eta
+      real(8)              :: eta
 !  ...derivative of GLOBAL REFERENCE coordinate wrt GIVEN coordinate      
-      real*8              :: detadt
+      real(8)              :: detadt
 !  ...derivative of PHYSICAL coordinates wrt GLOBAL REFERENCE coordinate      
-      real*8,dimension(3) :: dxdeta
+      real(8),dimension(3) :: dxdeta
 !-----------------------------------------------------------------------
 !
 !  ...GIVEN -> GLOBAL REFERENCE
@@ -46,7 +46,7 @@ subroutine curve_local(No,Norient,T, X,Dxdt)
       Dxdt(1:3)=dxdeta(1:3)*detadt
 !
 !
-endsubroutine curve_local
+end subroutine curve_local
 !
 !
 !
@@ -68,13 +68,13 @@ subroutine curve(No,Eta, X,Dxdeta)
       use bezier
 !      
       implicit none
-      integer            ,intent(in ) :: No
-      real*8             ,intent(in ) :: Eta
-      real*8,dimension(3),intent(out) :: X,Dxdeta
+      integer             ,intent(in ) :: No
+      real(8)             ,intent(in ) :: Eta
+      real(8),dimension(3),intent(out) :: X,Dxdeta
 !
-      real*8, dimension(3,2) :: xv
-      integer                :: iprint,i,np,j,ierror
-      character(len=10)      :: type
+      real(8), dimension(3,2) :: xv
+      integer                 :: iprint,i,np,j,ierror
+      character(len=10)       :: type
 !----------------------------------------------------------------------------
 !
       iprint=0

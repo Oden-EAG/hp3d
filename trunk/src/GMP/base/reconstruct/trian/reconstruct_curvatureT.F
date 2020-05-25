@@ -49,7 +49,7 @@ c  ...work space
 c
       dimension itrian(10)      
 
-      real*8, parameter :: eps = 0.01d0
+      real(8), parameter :: eps = 0.01d0
 c
 c-----------------------------------------------------------------------
 c

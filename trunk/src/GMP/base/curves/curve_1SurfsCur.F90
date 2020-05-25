@@ -12,13 +12,13 @@ subroutine curve_1SurfsCur(Nc,Eta, R,Dr)
 !
       use GMP
       implicit none
-      integer            ,intent(in ) :: Nc
-      real*8             ,intent(in ) :: Eta
-      real*8,dimension(3),intent(out) :: R
-      real*8,dimension(3),intent(out) :: Dr
+      integer             ,intent(in ) :: Nc
+      real(8)             ,intent(in ) :: Eta
+      real(8),dimension(3),intent(out) :: R
+      real(8),dimension(3),intent(out) :: Dr
       !
-      real*8,dimension(3,2) :: v
-      integer               :: nv,ns,i
+      real(8),dimension(3,2) :: v
+      integer                :: nv,ns,i
 !----------------------------------------------------------------------------
 !
       ns=CURVES(nc)%Idata(1)
@@ -41,7 +41,7 @@ subroutine curve_1SurfsCur(Nc,Eta, R,Dr)
       endselect
 !
 !
-endsubroutine curve_1SurfsCur
+end subroutine curve_1SurfsCur
 !
 !
 !
@@ -165,7 +165,7 @@ subroutine diag_segment(Nc,Eta, X,dX_dEta)
       endif
 !
 !
-endsubroutine diag_segment
+end subroutine diag_segment
 !
 !!
 !----------------------------------------------------------------------
@@ -241,7 +241,7 @@ subroutine circular_segment(Nc,Eta, X,dX_dEta)
       endif
 !
 !
-endsubroutine circular_segment
+end subroutine circular_segment
 !
 !
 !
@@ -436,7 +436,7 @@ subroutine cylinder_geodesic(No,Eta, X,Dxdeta)
       endif
 !
 !
-endsubroutine cylinder_geodesic
+end subroutine cylinder_geodesic
 !
 !
 !----------------------------------------------------------------------
@@ -680,4 +680,4 @@ subroutine cone_geodesic(No,Eta, X,Dxdeta)
       endif
 !
 !
-endsubroutine cone_geodesic
+end subroutine cone_geodesic

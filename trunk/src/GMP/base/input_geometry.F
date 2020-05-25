@@ -22,7 +22,7 @@ c
 #include "syscom.blk"
 #include "cinout.blk"
 c
-      character*9 type
+      character(9) type
       integer label, Nrcurv
       integer  tem(8),ttem(12),tttem(6)
 c

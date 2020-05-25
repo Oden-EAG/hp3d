@@ -63,7 +63,7 @@ c     or
 c       list(1,i) = block connected to a face
 c       list(2,i) = the corresponding face number
 c
-      character*10 type
+      character(10) type
 c
       data hexa_edge_to_vert /1,2, 2,3, 4,3, 1,4, 5,6, 6,7, 8,7, 5,8,
      .                        1,5, 2,6, 3,7, 4,8/

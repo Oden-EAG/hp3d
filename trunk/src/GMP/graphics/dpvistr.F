@@ -26,7 +26,7 @@ c
 c
 c  ...flags for drawing boundary segments
       dimension nplotb(3)
-      character*5 text
+      character(5) text
 c
       iprint=0
 c

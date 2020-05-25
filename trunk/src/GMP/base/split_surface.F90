@@ -63,7 +63,7 @@ subroutine split_surface(Nsplit,Nr_bound,Ns_bound,Nr_confm,Ns_confm,Dh1,Dh2)
   integer, dimension(Nr_bound), intent(in) :: Ns_bound
   integer, dimension(Nr_confm), intent(in) :: Ns_confm
   integer,                      intent(in) :: Nsplit,Nr_bound,Nr_confm
-  real*8,                       intent(in) :: Dh1,Dh2
+  real(8),                      intent(in) :: Dh1,Dh2
 !---------------------------------------------------------------------------------------
 ! printing flag (0,1,2)
 #define I_PRINT 0
@@ -147,11 +147,11 @@ subroutine allocate_NEW_POINT
   IMPLICIT NONE
 !--------------------------------------------------------------------------------------
 ! LOCAL VARIABLES
-  real*8               :: fval
-  real*8, dimension(3) :: xp,dfdx
-  real*8               :: pos_shift, neg_shift
-  integer                :: np,np_pos,np_neg
-  integer                :: status
+  real(8)               :: fval
+  real(8), dimension(3) :: xp,dfdx
+  real(8)               :: pos_shift, neg_shift
+  integer               :: np,np_pos,np_neg
+  integer               :: status
 !--------------------------------------------------------------------------------------
 ! FUNCTIONS
   integer                :: if_bound  
@@ -260,7 +260,7 @@ subroutine allocate_FIGS_SPLIT
   use SPLIT_SURF
   use control
 !----------------------------------------------------------------------------------
-  IMPLICIT NONE
+  implicit none
 !----------------------------------------------------------------------------------
 ! VARIABLES
   integer :: i,iter,ifig,nt,ion,iout,iv,np,nr    
@@ -418,10 +418,10 @@ subroutine split_interface
   use SPLIT_SURF
   use GMP
 !------------------------------------------------------------------------  
-IMPLICIT NONE
+  implicit none
 !------------------------------------------------------------------------
 ! VARIABLES  
-  real*8  :: s
+  real(8) :: s
   integer :: i,ns
   integer :: status
 !------------------------------------------------------------------------
@@ -583,7 +583,7 @@ subroutine generate_remaining_CUR_TRI_REC
   use GMP
   use control
 !--------------------------------------------------------------------------------------------------------------
-  IMPLICIT NONE
+  implicit none
 !--------------------------------------------------------------------------------------------------------------
 ! VARIABLES
   integer :: ic_new,ifig,nt,nr,nedg,np,np1,iv,iv1,ie,ifound,ns,is,idec
@@ -809,11 +809,11 @@ subroutine update_conforming_surface(fig_type)
   use SPLIT_SURF
 !------------------------------------------------------------------------------------------------------  
 ! DUMMY ARGUMENTS
-  integer, intent(in)    :: fig_type
+  integer, intent(in)   :: fig_type
 !------------------------------------------------------------------------------------------------------  
 ! VARIABLES
-  real*8               :: fval
-  real*8, dimension(3) :: xp,dfdx
+  real(8)               :: fval
+  real(8), dimension(3) :: xp,dfdx
 !------------------------------------------------------------------------------------------------------  
 ! printing flag (0,1)
 #define I_PRINT 0
@@ -1112,7 +1112,8 @@ subroutine generate_PRI_TET_PYR
 ! PURPOSE: routine generates new prisms, tets and pyramids
 !---------------------------------------------------------------------------------
   use SPLIT_SURF
-  IMPLICIT NONE
+!
+  implicit none
 !---------------------------------------------------------------------------------
   integer :: ifig,nt,nr,ile,iv,iv1,iv2,iv3,ie,np,np1,np2,np3,flag
 ! FUNCTIONS
@@ -1289,16 +1290,16 @@ subroutine create_TW_POINT_AND_CONN_CURVE(Np)
   use SPLIT_SURF
   use U2D
 !--------------------------------------------------------------------------------
-  IMPLICIT NONE
+  implicit none
 !--------------------------------------------------------------------------------
 ! DUMMY ARGUMENTS
   integer, intent(in) :: Np
 !-------------------------------------------------------------------------------- 
 ! VARIABLES
-  real*8, dimension(3)    :: xp
-  integer                   :: nrsrf  
-  integer, dimension(MAXSU) :: SURFS
-  integer                   :: status
+  real(8) :: xp(3)
+  integer :: nrsrf
+  integer :: SURFS(MAXSU)
+  integer :: status
 !--------------------------------------------------------------------------------
 ! printing flag (0,1,2)
 #define I_PRINT 0

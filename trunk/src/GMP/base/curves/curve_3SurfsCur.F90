@@ -12,10 +12,10 @@
 subroutine curve_3SurfsCur(Nc,Eta, R,Dr)
 !      
       implicit none
-      integer            ,intent(in ) :: Nc                          
-      real*8             ,intent(in ) :: Eta               
-      real*8,dimension(3),intent(out) :: R  
-      real*8,dimension(3),intent(out) :: Dr 
+      integer             ,intent(in ) :: Nc
+      real(8)             ,intent(in ) :: Eta
+      real(8),dimension(3),intent(out) :: R
+      real(8),dimension(3),intent(out) :: Dr
 !
       integer :: iflag                                 
 !----------------------------------------------------------------------------
@@ -38,4 +38,4 @@ subroutine curve_3SurfsCur(Nc,Eta, R,Dr)
       endif
 !
 !
-endsubroutine curve_3SurfsCur
+end subroutine curve_3SurfsCur
