@@ -120,7 +120,7 @@
       integer            :: medge
       integer, parameter :: maxn=20
       integer            :: nrneig
-      integer, dimension(maxn) :: neig, nedg_list, norient_list
+      integer, dimension(maxn) :: neig, nedg_list, norient_list, nface_list
 !
       integer :: iprint, iel, mdle, nrv, nre, ie, loc, nflag
 !
@@ -154,7 +154,7 @@
             write(*,7016) ie,medge
  7016       format('                   ie, medge = ',i4,i10)
           endif
-          call neig_edge(medge,maxn, nrneig,neig,nedg_list,norient_list)
+          call neig_edge(medge,maxn, nrneig,neig,nedg_list,norient_list,nface_list)
 !
 !  .......look for the middle on the list of edge neighbors
           call locate(mdle, neig(1:nrneig),nrneig, loc)

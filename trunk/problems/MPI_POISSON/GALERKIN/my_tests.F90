@@ -22,11 +22,12 @@
       implicit none
       common /common_recta_TraQua/ iprint_recta_TraQua
       common /common_curve_SegCir/ iprint_curve_SegCir
+      common /cneig_edge/ iprint_neig_edge
 !
 
 !----------------------------------------------------------------------
 !  
-      integer :: iprint,iselect,iprint_recta_TraQua,iprint_curve_SegCir
+      integer :: iprint,iselect,iprint_recta_TraQua,iprint_curve_SegCir,iprint_neig_edge
 !
 !  ...work space for recta_TraQua, curve_SegCir  
       integer               :: no
@@ -42,7 +43,7 @@
       integer            :: medge
       integer, parameter :: maxn=20
       integer            :: nrneig
-      integer, dimension(maxn) :: neig, nedg_list, norient_list
+      integer, dimension(maxn) :: neig, nedg_list, norient_list, nface_list
       integer                  :: nrv, ie
       integer, dimension(27)   :: nodesl, norientl
 !
@@ -57,6 +58,7 @@
       write(*,*) 'verify_neig............................4'
       write(*,*) 'TEST neig_edge.........................5'
       write(*,*) 'verify_neig_edge.......................6'
+      write(*,*) 'call result............................7'
       read(*,*) iselect
 !
       select case(iselect) 
@@ -84,14 +86,18 @@
       case(4)
         call verify_neig
       case(5)
+        iprint_neig_edge=1
         write(*,*) 'input mdle, ie'
         read(*,*)  mdle,ie
         call elem_nodes(mdle, nodesl,norientl)
         nrv = nvert(NODES(mdle)%type)
         medge = nodesl(nrv+ie)
-        call neig_edge(medge,maxn, nrneig,neig,nedg_list,norient_list)
+        write(*,*) 'my_tests: medge = ',medge
+        call neig_edge(medge,maxn, nrneig,neig,nedg_list,norient_list,nface_list)
       case(6)
         call verify_neig_edge
+      case(7)
+        call result
       end select
       go to 10
 !

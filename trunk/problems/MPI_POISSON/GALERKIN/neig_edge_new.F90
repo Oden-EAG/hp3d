@@ -28,10 +28,12 @@
 !! @param[out] Neig         - middle node neighbors (0 if no neighbor)
 !! @param[out] Nedg_list    - local edge numbers in neighbors' local enumeration
 !! @param[out] Norient_list - orientations of the mid-edge node wrt to the neighbors
+!! @param[out] Nface_list   - local face numbers in neighbors' local enumeration
+!                             if the edge is contained in one of the faces
 !!
 !! @revision May 20
 !-------------------------------------------------------------------------------------
-      subroutine neig_edge(Medge,Maxn, Nrneig,Neig,Nedg_list,Norient_list)
+      subroutine neig_edge(Medge,Maxn, Nrneig,Neig,Nedg_list,Norient_list,Nface_list)
 !
       use error
       use refinements
@@ -46,7 +48,7 @@
       integer,                  intent(in)  :: Medge
       integer,                  intent(in)  :: Maxn
       integer,                  intent(out) :: Nrneig
-      integer, dimension(Maxn), intent(out) :: Neig, Nedg_list, Norient_list
+      integer, dimension(Maxn), intent(out) :: Neig, Nedg_list, Norient_list, Nface_list
 !
 !  ...Locals
       character(len=4)             :: type
@@ -56,7 +58,7 @@
       integer, dimension(12)       :: nface_ort
       integer, dimension(Maxn)     :: neig_double
       integer :: iprint, igen, nrgen, nve, nrf, nod, mdle, mdle_is
-      integer :: kref, i, is, nrsons, iface, iflag, nfath, nrv,nre, ie, loc
+      integer :: kref, i, is, nrsons, iface, iflag, nfath, nrv,nre, ie, loc, j
 !
 !========================================================================
 !  REMARK: 2 types of edges                                             |
@@ -89,6 +91,7 @@
 !!      case default; iprint=0
 !!      end select
 !
+   10 continue
       iprint_neig_edge_mdle  = iprint; iprint_neig_edge_face=iprint
       select case(NODES(Medge)%type)
       case('medg')
@@ -98,7 +101,7 @@
         call logic_error(ERR_INVALID_VALUE,__FILE__,__LINE__)
       end select
 !
-      Nrneig=0; Neig=0; Nedg_list=0; Norient_list=0
+      Nrneig=0; Neig=0; Nedg_list=0; Norient_list=0; Nface_list=0
       if (iprint.eq.1) then
         write(*,7010) Medge, NODES(Medge)%type
       endif
@@ -141,7 +144,7 @@
 !
 !  .....CASE 2: a face node 
         case('mdlt','mdlq')
-          call neig_edge_face(nod,Maxn, Nrneig,Neig,nodesl_neig,norientl_neig)
+          call neig_edge_face(nod,Maxn, Nrneig,Neig,nodesl_neig,norientl_neig,Nface_list)
 !
 !  .....CASE 3: a middle node 
         case('mdlp','mdlb','mdln','mdld')
@@ -171,6 +174,7 @@
         nrv =nvert(type); nre = nedge(type)
         call locate(nod, nodesl_neig(nrv+1:nrv+nre,i),nre, ie)
         Nedg_list(i) = ie
+        if (ie.ne.0) Nface_list(i)=0
       enddo
 !
 !------------------------------------------------------------------------
@@ -181,7 +185,16 @@
       neig_double=1
       do i=2,Nrneig
         call locate(Neig(i), Neig(1:i-1),i-1, loc)
-        if (loc.ne.0) neig_double(i)=2
+        if (loc.ne.0) then
+          neig_double(i)=2
+!
+!  .......check consistency
+          if ((Nedg_list(loc).ne.0).or.(Nedg_list(i).ne.0)) then
+            write(*,*) 'neig_edge: INCONSISTENCY 1'
+            iprint=1
+            go to 10
+          endif
+        endif
       enddo
       if (iprint.eq.1) then
         write(*,7065) neig_double(1:Nrneig)
@@ -254,12 +267,43 @@
 !
 !  ...end of loop over Nrneig
       enddo
+!
+!  ...eliminate possible duplication
+      i=2
+      do while (i.le.Nrneig)
+        call locate(Neig(i), Neig(1:i-1),i-1, loc)
+        if (loc.ne.0) then
+!
+!  .......check consistency
+          if ((Nedg_list(loc).ne.0).or.(Nface_list(loc).eq.0)) then
+            write(*,*) 'neig_edge: INCONSISTENCY 2'
+            iprint=1
+            write(*,7090) Medge
+            do i=1,Nrneig
+              write(*,7100) Neig(i),Nedg_list(i),Norient_list(i),Nface_list(i)
+            enddo
+            go to 10
+          endif
+!
+!  .......restact the output to avoid the repetition
+          Nrneig = Nrneig-1
+          do j=i,Nrneig
+            Neig(j) = Neig(j+1)
+            Nedg_list(j) = Nedg_list(j+1)
+            Norient_list(j) = Norient_list(j+1)
+            Nface_list(j) =  Nface_list(j+1)
+          enddo
+        endif
+        i=i+1
+      enddo
+!
+!
       if (iprint.eq.1) then
         write(*,7090) Medge
- 7090   format(' neig_edge: Neig,Nedg,Norient FOR Medge = ',i6)
+ 7090   format(' neig_edge: Neig,Nedg,Norient,Nface FOR Medge = ',i6)
         do i=1,Nrneig
-          write(*,7100) Neig(i),Nedg_list(i),Norient_list(i)
- 7100     format(i8,i3,i2)
+          write(*,7100) Neig(i),Nedg_list(i),Norient_list(i),Nface_list(i)
+ 7100     format(i8,i3,2i3)
         enddo
         call pause
       endif
@@ -388,10 +432,12 @@
 !! @param[out] Neig          - middle node neighbors
 !! @param[out] Nodesl_neig   - nodes for the neighbors
 !! @param[out] Norientl_neig - node orientations for the neighbors
+!! @param[out] Nface_list   - local face numbers in neighbors' local enumeration
+!                             if the edge is contained in one of the faces
 !!
 !! @revision May 20
 !-------------------------------------------------------------------------------------
-      subroutine neig_edge_face(Medge,Maxn, Nrneig,Neig,Nodesl_neig,Norientl_neig)
+      subroutine neig_edge_face(Medge,Maxn, Nrneig,Neig,Nodesl_neig,Norientl_neig,Nface_neig)
 !
       use data_structure3D
       use element_data
@@ -404,13 +450,12 @@
       integer,                     intent(in)  :: Medge
       integer,                     intent(in)  :: Maxn
       integer,                     intent(out) :: Nrneig
-      integer, dimension(Maxn),    intent(out) :: Neig
+      integer, dimension(Maxn),    intent(out) :: Neig,Nface_neig
       integer, dimension(27,Maxn), intent(out) :: Nodesl_neig,Norientl_neig
 !
 !  ...work space for neig_face_extended
       integer                :: mface
       integer                :: nrneig_face
-      integer, dimension(2)  :: nsid_face_neig
 !
 !  ...element/node type
       character(len=4) :: type
@@ -483,7 +528,7 @@
         mface = son(nfath,brother_mface(i))
 !
 !  .....determine the corresponding middle node neighbors
-        call neig_face_extended(mface, nrneig_face,Neig(Nrneig+1:Nrneig+2),nsid_face_neig, &
+        call neig_face_extended(mface, nrneig_face,Neig(Nrneig+1:Nrneig+2),Nface_neig(Nrneig+1:Nrneig+2), &
                                 Nodesl_neig(:,Nrneig+1:Nrneig+2),Norientl_neig(:,Nrneig+1:Nrneig+2))
         Nrneig = Nrneig + nrneig_face
       enddo
