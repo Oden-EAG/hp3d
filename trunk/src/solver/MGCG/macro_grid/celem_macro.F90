@@ -29,7 +29,7 @@
 !
 !-----------------------------------------------------------------------
 !
-#include 'implicit_none.h'
+#include "implicit_none.h"
 !
    subroutine celem_macro(Igrid,Idec_sch,Ielc,MdleC, Nrdof_macro,Nrnod_macro,Nod_macro,  &
                           NdofH_macro,NdofE_macro,NdofV_macro,Zbload,Zastif)
@@ -45,7 +45,7 @@
    use macro_grid_info,  ONLY: A_MACRO
    use mg_data_structure,ONLY: GRID, NODES_MG, ISTORE, ISTORE_YES
 !
-   IMPLICIT NONE
+   implicit none
 !
 !-----------------------------------------------------------------------
 !

@@ -15,14 +15,14 @@
 subroutine recta_local(No,Norient,T, X,Dxdt)
 !
       implicit none
-      integer,              intent(in ) :: No,Norient
-      real*8,dimension(2  ),intent(in ) :: T
-      real*8,dimension(3  ),intent(out) :: X
-      real*8,dimension(3,2),intent(out) :: Dxdt
+      integer,               intent(in ) :: No,Norient
+      real(8),dimension(2  ),intent(in ) :: T
+      real(8),dimension(3  ),intent(out) :: X
+      real(8),dimension(3,2),intent(out) :: Dxdt
 !
-      real*8,dimension(2  ) :: eta
-      real*8,dimension(2,2) :: detadt
-      real*8,dimension(3,2) :: dxdeta
+      real(8),dimension(2  ) :: eta
+      real(8),dimension(2,2) :: detadt
+      real(8),dimension(3,2) :: dxdeta
       integer :: i,iprint
 !-----------------------------------------------------------------------
 !
@@ -70,15 +70,15 @@ end subroutine recta_local
 subroutine recta(No,Eta, X,Dxdeta)
 !
       use GMP , only : RECTANGLES , CURVES
-      integer              ,intent(in ) :: No
-      real*8,dimension(2  ),intent(in ) :: Eta
-      real*8,dimension(3  ),intent(out) :: X
-      real*8,dimension(3,2),intent(out) :: Dxdeta
+      integer               ,intent(in ) :: No
+      real(8),dimension(2  ),intent(in ) :: Eta
+      real(8),dimension(3  ),intent(out) :: X
+      real(8),dimension(3,2),intent(out) :: Dxdeta
 !--------------------------------------------------------------------------
 !  ...vertex coordinates
-      real*8,dimension(3,4) :: xv
+      real(8),dimension(3,4) :: xv
 !  ...workspace
-      real*8,dimension(3,3) :: aux
+      real(8),dimension(3,3) :: aux
 !
       integer :: i,np,nc,j
       integer :: iprint
@@ -154,4 +154,4 @@ subroutine recta(No,Eta, X,Dxdeta)
       endselect
 !
 !
-endsubroutine recta
+end subroutine recta

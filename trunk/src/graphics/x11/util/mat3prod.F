@@ -23,7 +23,7 @@ c   required  routines - none
 c
 c----------------------------------------------------------------------
 c
-      implicit real*8 (a-h,m-z)
+      implicit real(8) (a-h,m-z)
 c
       dimension Ma(3,3), Mb(3,3), Mc(3,3)
 c

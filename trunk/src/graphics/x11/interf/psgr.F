@@ -27,20 +27,13 @@ C
 C========================================================
 cwr07.08.99
 cwr03.14.02
-ccccc include '../commons/syscom.blk'
-#include "syscom.blk"
+c
+      implicit real (a-h,o-y)
 #include "wvglob.blk"
 #include "wvpost.blk"
 #include "wvscrn.blk"
-      
-ccc      COMMON/WVGLOB/IOPEN,LWTYPE(10),LWSIZE(10,4),LSCALE(10),
-ccc     &    XGSCAL(10,4),IGPSP(10),ilepsp,ilescr,iledf,icurrwin
-ccc      common/wvpost/ilbuf,ibufc(5),bufor(2,5),ifile
-ccc      common/wvscrn/maxscx,maxscy,maxcol,maxdfx,maxdfy
-      
-ccc      character*24 ctime
-ccc      integer time
-      character*10 name
+c
+      character(10) name
 c
   110 write(*,*)  'Give name for Postscript file (0 - no postscript)'
    10 read(*,1011) name
@@ -141,15 +134,11 @@ C
 C  arguments - X1,Y1,X2,Y2-coordinates of the two endpoints
 C              IC - line color
 C---------------------------------------------------------
-
+c
 #include "wvglob.blk"
 #include "wvpost.blk"
 #include "wvscrn.blk"
-ccc        COMMON/WVGLOB/IOPEN,LWTYPE(10),LWSIZE(10,4),LSCALE(10),
-ccc     &    XGSCAL(10,4),IGPSP(10),ilepsp,ilescr,iledf,icurrwin
-ccc        common/wvpost/ilbuf,ibufc(5),bufor(2,5),ifile
-ccc        common/wvscrn/maxscx,maxscy,maxcol,maxdfx,maxdfy
-C
+c
         iprint=0
 c
         if (ifile.eq.0) return
@@ -192,11 +181,6 @@ c
 #include "wvglob.blk"
 #include "wvpost.blk"
 #include "wvscrn.blk"
-ccc      common /wvglob/ IOPEN,LWTYPE(10),LWSIZE(10,4),LSCALE(10),
-ccc     .                XGSCAL(10,4),IGPSP(10),
-ccc     .                ILEPSP,ILESCR,ILEDF,ICURRWIN
-ccc      common /wvpost/ ILBUF,IBUFC(5),BUFOR(2,5),IFILE
-ccc      common /wvscrn/ MAXSCX,MAXSCY,MAXCOL,MAXDFX,MAXDFY
 c
       real Xc(2,N)
 c      
@@ -240,13 +224,10 @@ C========================================================
 
 
         SUBROUTINE WVPSPX(X,Y,IC)
+c
 #include "wvglob.blk"
 #include "wvpost.blk"
 #include "wvscrn.blk"
-ccc      COMMON/WVGLOB/IOPEN,LWTYPE(10),LWSIZE(10,4),LSCALE(10),
-ccc     &    XGSCAL(10,4),IGPSP(10),ilepsp,ilescr,iledf,icurrwin
-ccc        common/wvpost/ilbuf,ibufc(5),bufor(2,5),ifile
-ccc        common/wvscrn/maxscx,maxscy,maxcol,maxdfx,maxdfy
 c
         iprint=0
 
@@ -265,10 +246,11 @@ C========================================================
         integer H,A
 c        CHARACTER MESS*80
         CHARACTER MESS*(*)
-
+c
 #include "wvglob.blk"
 #include "wvpost.blk"
 #include "wvscrn.blk"
+c
         if (ifile.eq.0) return
         call wvpsout(x1,y1,3)
         k=12
@@ -285,12 +267,12 @@ C-------------------------------------------------------------------
 
       subroutine wvpsout(x,y,Icode)
 c
-C=====================================================================
-C     author - Satish Chavva and many others
-C
-C     version - 1998
-C
-C=================================== post script dump to file ========
+c=====================================================================
+c     author - Satish Chavva and many others
+c
+c     version - 1998
+c
+c=================================== post script dump to file ========
 c       send real x,y (in inches) to postcript file
 c       icode values 1:n 2:d 3:m 4:c 5:f 6:s 7:clip 8:font, 9:initclip
 c       explanation of codes as in flushps:
@@ -306,8 +288,8 @@ c          9 - initclip
 c       text printing is inside wvpstx routine
 c       initialization - in wvopps
 c
-C=====================================================================
-c      
+c=====================================================================
+c
 #include "wvglob.blk"
 #include "wvpost.blk"
 #include "wvscrn.blk"
@@ -384,12 +366,11 @@ c
 c-----------------------------------------------------------------------
 c
       use graphmod
+c
 #include "wvglob.blk"
 #include "wvpost.blk"
 #include "wvscrn.blk"
-
 c
-      
       character line*100,text*20,code(4)*1,lineout*100
 c
       data code/'n','d','m','c'/
@@ -522,13 +503,13 @@ c        read(*,*)
 c
       return
       end
-C========================================================
+c========================================================
         subroutine wvclps
 c
 #include "wvglob.blk"
 #include "wvpost.blk"
 #include "wvscrn.blk"
-
+c
         ilepsp=0
         do 10 i=1,10
 10        igpsp(i)=0
@@ -540,15 +521,4 @@ c
         write(*,*)' PostScript file closed'
         return
         end
-
-
-
-
-
-
-
-
-
-
-
 

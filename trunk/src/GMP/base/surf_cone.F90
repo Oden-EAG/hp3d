@@ -14,18 +14,18 @@
 subroutine cone(X,Center,Dirvec,Alpha,  Fval,Dfdx)
 !
       implicit none
-      real*8, dimension(3), intent(in ) :: X,Center,Dirvec
-      real*8              , intent(in ) :: Alpha
-      real*8              , intent(out) :: Fval
-      real*8, dimension(3), intent(out) :: Dfdx
+      real(8), dimension(3), intent(in ) :: X,Center,Dirvec
+      real(8)              , intent(in ) :: Alpha
+      real(8)              , intent(out) :: Fval
+      real(8), dimension(3), intent(out) :: Dfdx
 !------------------------------------------------------------------------------------
 !  ...axis versor, relative position of X wrt cone vertex
-      real*8, dimension(3) :: cvec,xvec
+      real(8), dimension(3) :: cvec,xvec
 !  ...derivative of cone coordinate wrt Cartesian coordinates
-      real*8, dimension(3) :: dzetdx,dr2dx
-      real*8               :: s,rzet,r2,a
-      integer              :: iprint
-      real*8, parameter    :: eps=1.d-15
+      real(8), dimension(3) :: dzetdx,dr2dx
+      real(8)               :: s,rzet,r2,a
+      integer               :: iprint
+      real(8), parameter    :: eps=1.d-15
 !------------------------------------------------------------------------------------
 !
       iprint=0
@@ -75,6 +75,6 @@ subroutine cone(X,Center,Dirvec,Alpha,  Fval,Dfdx)
       endif
 !
 !
-endsubroutine cone
+end subroutine cone
 
 

@@ -32,16 +32,16 @@ subroutine geom_hp(Mdle,Xi, X,Dxdxi)
 !
       implicit none
       integer,                 intent(in)  :: Mdle
-      real*8,  dimension(3),   intent(in)  :: Xi
-      real*8,  dimension(3),   intent(out) :: X
-      real*8,  dimension(3,3), intent(out) :: Dxdxi
+      real(8), dimension(3),   intent(in)  :: Xi
+      real(8), dimension(3),   intent(out) :: X
+      real(8), dimension(3,3), intent(out) :: Dxdxi
 !
-      integer,dimension(19) :: norder
-      integer,dimension(12) :: nedge_orient
-      integer,dimension( 6) :: nface_orient
-      real*8,dimension(3,MAXbrickH) :: xnod
-      real*8,dimension(  MAXbrickH) :: shapeH
-      real*8,dimension(3,MAXbrickH) :: dshapeH
+      integer, dimension(19) :: norder
+      integer, dimension(12) :: nedge_orient
+      integer, dimension( 6) :: nface_orient
+      real(8), dimension(3,MAXbrickH) :: xnod
+      real(8), dimension(  MAXbrickH) :: shapeH
+      real(8), dimension(3,MAXbrickH) :: dshapeH
       integer :: k,i,nrdofH
 !-------------------------------------------------------------------------
 !
@@ -55,8 +55,8 @@ subroutine geom_hp(Mdle,Xi, X,Dxdxi)
 !////////  LOOP OVER INTEGRATION POINTS  ////////
 !
 !  ...compute H1 shape functions
-      call shape3H(NODES(Mdle)%Type,Xi,norder,nedge_orient,  &
-                   nface_orient, nrdofH,shapeH,dshapeH)
+      call shape3DH(NODES(Mdle)%Type,Xi,norder,nedge_orient,  &
+                    nface_orient, nrdofH,shapeH,dshapeH)
 !
 !  ...geometry map 
       X(1:3)=0.d0 ; Dxdxi(1:3,1:3)=0.d0 

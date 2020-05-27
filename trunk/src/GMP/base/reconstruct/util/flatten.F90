@@ -46,13 +46,13 @@ subroutine flatten_trian(Nt)
   use GMP , only : TRIANGLES
   !      
   implicit none
-  integer,intent(in)  :: Nt
-  real*8,dimension(2) :: eta
-  real*8,dimension(3) :: temp,v1,v2,v3
-  integer             :: i,nc,ie,neig,j
-  real*8              :: x,y
-  integer, parameter  :: deg=7
-  integer, external   :: bijec
+  integer,intent(in)   :: Nt
+  real(8),dimension(2) :: eta
+  real(8),dimension(3) :: temp,v1,v2,v3
+  integer              :: i,nc,ie,neig,j
+  real(8)              :: x,y
+  integer, parameter   :: deg=7
+  integer, external    :: bijec
   !
   !--------------------------------------------------------------------------
   !  STEP 1 : straighten edges                                              |
@@ -100,10 +100,10 @@ subroutine straighten_curve(Nc)
   use GMP , only : CURVES,POINTS
   !
   implicit none
-  integer, intent(in) :: Nc
-  integer             :: deg,np,i
-  real*8,dimension(3) :: v1,v2,temp
-  real*8              :: x
+  integer, intent(in)  :: Nc
+  integer              :: deg,np,i
+  real(8),dimension(3) :: v1,v2,temp
+  real(8)              :: x
   !      
   !--------------------------------------------------------------------------
   !  ...determine degree, check curve type
@@ -196,12 +196,12 @@ subroutine modify_G1trian(Nt,Ie)
   use GMP , only : TRIANGLES
   !
   implicit none
-  integer,intent(in)  :: Nt,Ie
-  real*8,dimension(3) :: temp,v1,v2,v3
-  real*8              :: x,y
-  integer             :: i,j,k,iflag
-  integer, parameter  :: deg=7
-  integer, external   :: bijec
+  integer,intent(in)   :: Nt,Ie
+  real(8),dimension(3) :: temp,v1,v2,v3
+  real(8)              :: x,y
+  integer              :: i,j,k,iflag
+  integer, parameter   :: deg=7
+  integer, external    :: bijec
   !
   !--------------------------------------------------------------------------
   !
@@ -238,9 +238,9 @@ subroutine trian2verts(Nt, V1,V2,V3)
   use GMP , only : POINTS, TRIANGLES
   !
   implicit none
-  integer,            intent(in ) :: Nt
-  real*8,dimension(3),intent(out) :: V1,V2,V3
-  integer                         :: i,np
+  integer,            intent(in )  :: Nt
+  real(8),dimension(3),intent(out) :: V1,V2,V3
+  integer                          :: i,np
   !
   !--------------------------------------------------------------------------
   !

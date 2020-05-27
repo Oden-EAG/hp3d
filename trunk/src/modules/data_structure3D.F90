@@ -600,7 +600,6 @@ module data_structure3D
       subroutine dumpin_hp3d(Dump_file)
 !
       character(len=15) :: Dump_file
-      character(len=20) :: type
       integer           :: npnods_loc
 !
       if (allocated(ELEMS).or.allocated(NODES)) call deallocds
@@ -864,7 +863,7 @@ module data_structure3D
       integer :: Mdle
       logical :: Is_right_handed
       integer :: i, nod
-      real*8  :: v(3,4), a(3,3), val
+      real(8) :: v(3,4), a(3,3), val
       select case(ELEMS(Mdle)%type)
       case('bric','pris','pyra')
         Is_right_handed = .true.

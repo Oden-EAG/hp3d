@@ -104,8 +104,8 @@ subroutine petsc_solve(mtype)
    KSPType petsc_method
    real(8) :: petsc_info(MAT_INFO_SIZE)
    real(8) :: petsc_mallocs,petsc_nz_alloc,petsc_nz_used
-   character*64 :: info_string
-   character*8  :: fmt,val_string
+   character(64) :: info_string
+   character(8)  :: fmt,val_string
 !
 !..Non-zero computation
    integer :: my_dnz, my_onz, NR_NOD_LIST, NR_NODS_SUBD, NRNODS_SUBD

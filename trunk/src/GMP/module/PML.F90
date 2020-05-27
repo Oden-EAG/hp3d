@@ -1,6 +1,6 @@
 module PML
   !  ...PML PARAMETERS
-  real*8 :: RPML_MIN, RPML_MAX
+  real(8) :: RPML_MIN, RPML_MAX
   !  ...PML domain, sphere
   integer :: PML_DOMAIN, PML_SPHERE
 contains

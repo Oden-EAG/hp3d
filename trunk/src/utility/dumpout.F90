@@ -12,4 +12,4 @@ subroutine dumpout
       write(*,*)'Done!'
 !
 !
-endsubroutine dumpout
+end subroutine dumpout

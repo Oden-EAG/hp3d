@@ -5,8 +5,8 @@
 !----------------------------------------------------------------------
 !     DUMMY ARGUMENTS
       integer,intent(in)    :: I,N      
-      real*8, intent(in)  :: T
-      real*8, intent(out) :: Poly,dPoly
+      real(8),intent(in)  :: T
+      real(8),intent(out) :: Poly,dPoly
 !----------------------------------------------------------------------
 !     EXTERNAL FUNCTION
       integer,external :: fact

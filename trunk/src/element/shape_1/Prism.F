@@ -1032,7 +1032,7 @@ c
       implicit none
       integer, intent(in)  :: Nord(15),Nsize(2)
       integer, intent(out) :: NrdofQ
-      integer :: i,j,k,nij,nijk,m,N,nordB(2),ndofB,iprint,minalpha
+      integer :: i,j,k,nij,m,N,nordB(2),ndofB,iprint,minalpha
       integer :: minI,minJ,minK,minIJ,maxI,maxJ,maxK,maxIJ
       double precision, intent(in)  :: X(3)
       double precision, intent(out) :: ShapQ(Nsize(2))

@@ -4,7 +4,7 @@ c   routine name       - setcnstr_edge_hcurl
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - May 12
+c   latest revision    - May 2020
 c
 c   purpose            - routine sets coefficients for the constrained
 c                        approximation on the master edge
@@ -37,11 +37,10 @@ c
 c
 c  ...values of small elements shape functions, big element
 c     shape functions, derivatives (not used) 
-      dimension shapsma(MAXP,MAXP),shapbig(MAXP,MAXP), 
-     .          void(MAXP), 
+      dimension shapsma(MAXP,MAXP),shapbig(MAXP,MAXP)
 c
 c  ...pivoting array, work array
-     .          ip(MAXP),r(MAXP,MAXP)
+      dimension ip(MAXP),r(MAXP,MAXP)
 c
       iprint=0
 c
@@ -70,10 +69,10 @@ c  .....local coordinates for big and small elements
         xisma = (i-1)*1.0d0/(nord-1)
 c
 c  .....find small shape functions at this point:
-        call shapEbe(xisma,nord,0, void, shapsma(1:MAXP,icl))
+        call TraceEshapeE(xisma,nord,0, nvoid,shapsma(1:MAXP,icl))
 c
 c  .....find big shape functions at this point:
-        call shapEbe(xibig,nord,0, void, shapbig(1:MAXP,icl))
+        call TraceEshapeE(xibig,nord,0, nvoid,shapbig(1:MAXP,icl))
       enddo
 c
 c  ...transpose shapsma and shapbig
@@ -140,10 +139,10 @@ c  .....big and small element coordinates of the collocation point
         xisma = (i-1)*1.0d0/(nord-1)
 c
 c  .....find small shape functions at this point:
-        call shapEbe(xisma,nord,0, void, shapsma(1:MAXP,icl))
+        call TraceEshapeE(xisma,nord,0, nvoid,shapsma(1:MAXP,icl))
 c
 c  .....find big shape functions at this point:
-        call shapEbe(xibig,nord,0, void, shapbig(1:MAXP,icl))
+        call TraceEshapeE(xibig,nord,0, nvoid,shapbig(1:MAXP,icl))
       enddo
 c
 c  ...transpose shapsma and shapbig
@@ -206,7 +205,7 @@ c
       read(*,*) xibig
 c
 c  ...shape functions of the big element
-      call shapEbe(xibig,nord,0, void, shapbig(1:MAXP,1))
+      call TraceEshapeE(xibig,nord,0, nvoid,shapbig(1:MAXP,1))
 c
 c  ...determine which small element is this, and find the small
 c     element coordinate of the point
@@ -223,7 +222,7 @@ c  .....element 2 - verifying small nodes 2,3
       endif
 c
 c  ...find small shape functions at this point:
-      call shapEbe(xisma,nord,0, void, shapsma(1:MAXP,1))
+      call TraceEshapeE(xisma,nord,0, nvoid,shapsma(1:MAXP,1))
 c
 c  ...verify if the values of the big shape functions match
 c     combinations of the small shape functions.......................

@@ -447,7 +447,7 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
         call pause
       endif
 !
-endsubroutine recta_sphere
+end subroutine recta_sphere
 !
 !
 !

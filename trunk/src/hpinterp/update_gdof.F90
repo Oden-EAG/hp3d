@@ -42,10 +42,10 @@ subroutine update_gdof()
    integer, dimension(19) :: norder
 !
 !..reference coordinates for an element
-   real*8, dimension(3,8) :: xsub
+   real(8), dimension(3,8) :: xsub
 !
 !..geometry dofs for an element
-   real*8, dimension(3,MAXbrickH) :: xnod
+   real(8), dimension(3,MAXbrickH) :: xnod
 !
 !..auxiliary variables for timing
    real(8) :: MPI_Wtime,start_time,end_time

@@ -22,19 +22,19 @@ c
       logical :: INITIALIZED_CONSTR = .FALSE.
 c
 c  ...constrained approximation coefficients for the master edge
-      real*8 :: RRRH(3,MAXP-1,3,MAXP-1),
-     .          RRRE(1,MAXP  ,2,MAXP  )
+      real(8) :: RRRH(3,MAXP-1,3,MAXP-1),
+     .           RRRE(1,MAXP  ,2,MAXP  )
 c
 c  ...constrained approximation coefficients for the master triangle
-      real*8 :: RRTH(4,MAXmdltH,7,MAXmdltH),
-     .          RRTE(4,MAXmdltE,7,MAXmdltE),
-     .          RRTQ(MAXmdltQ,4,MAXmdltQ)
+      real(8) :: RRTH(4,MAXmdltH,7,MAXmdltH),
+     .           RRTE(4,MAXmdltE,7,MAXmdltE),
+     .           RRTQ(MAXmdltQ,4,MAXmdltQ)
 c      
 c  ...constrained approximation coefficients for the master triangle
 c     constraining a triangle and a quad
 c     iref/p_nodes/p_dof/child_dof
 c     for now, hcurl does not support this anisotropic constraints
-      real*8 :: RRQH(2:4,1:4,MAXmdltH,MAXmdlqH)
+      real(8) :: RRQH(2:4,1:4,MAXmdltH,MAXmdlqH)
 c
 c
       contains
@@ -42,9 +42,9 @@ c
       subroutine map_quad(Iref, Xi, X)
 c
       integer :: Iref
-      double precision, dimension(1:2,1:4,2:4) :: pts
+      real(8), dimension(1:2,1:4,2:4) :: pts
 c     
-      double precision, dimension(1:2) :: X, Xi
+      real(8), dimension(1:2) :: X, Xi
 c
       pts = reshape(
      .  (/0.5d0,0.d0, 1.d0 ,0.d0, 0.d0 ,1.d0, 0.d0,0.5d0,
@@ -68,7 +68,7 @@ c       J    :: index of parent dof
 c       Np   :: the order of approximation 
 c
       integer Iref, Np, Ip, J, I, i1, i2, ii
-      double precision Get_rrqh
+      real(8) Get_rrqh
 c 
       i2 = (I-1)/(Np-1)+1
       i1 = I - (i2-1)*(Np-1)

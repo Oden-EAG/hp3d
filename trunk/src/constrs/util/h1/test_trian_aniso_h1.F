@@ -4,7 +4,7 @@ c   routine name       - test_trian_aniso
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Nov 09
+c   latest revision    - May 2020
 c
 c   purpose            - routine evaluates constraint coefficients for
 c                        the triangular master element
@@ -24,14 +24,13 @@ c
 #include "syscom.blk"
 c
       dimension shapsma(MAXquadH,MAXquadH),
-     .          shapbig(MAXtriaH,MAXtriaH),
-     .          void(2,MAXquadH), ip(MAXquadH),
-     .          r(MAXquadH,MAXquadH), norder(5), xibig(2),xisma(2)
+     .          shapbig(MAXquadH,MAXquadH),
+     .          void(2,MAXquadH),xibig(2),xisma(2)
 c
-c  ...edge orientations
-      dimension norient(4)
+c  ...order and edge orientations
+      dimension norder(5),norient(4)
 c
-      iprint=0
+      iprint = 0
 c
       if (MAXP.ne.MAXP) then
         write(*,7005) MAXP,MAXP
@@ -61,16 +60,20 @@ c  ...input from small quad and get xibig with bilinear map
       write(*,*) 'xibig =', xibig(1:2)
 c
 c  ...shape functions of big element
-      call shapeHt(xibig,norder,norient,
-     .             nrdof,shapbig(1:MAXtriaH,1),void)
+c      call shapeHt(xibig,norder,norient,
+c     .             nrdof,shapbig(1:MAXtriaH,1),void)
+      call shape2DH('tria',xibig,norder,norient,
+     .              nrdof,shapbig(:,1),void)
       write(*,*) 'shapbig = '
       do k=1,nrdof
         write(*,*) k,shapbig(k,1)
       enddo
 c
 c  ...find small shape functions at this point:
-      call shapeHq(xisma,norder,norient,
-     .             nrdof,shapsma(1:MAXquadrH,1),void)
+c      call shapeHq(xisma,norder,norient,
+c     .             nrdof,shapsma(1:MAXquadrH,1),void)
+      call shape2DH('quad',xisma,norder,norient,
+     .              nrdof,shapsma(:,1),void)
 c
 c*********************************************************************
 c

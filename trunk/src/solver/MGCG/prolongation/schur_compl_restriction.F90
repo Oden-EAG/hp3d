@@ -27,7 +27,7 @@
 ! ----------------------------------------------------------------------
 !
 !
-#include 'implicit_none.h'
+#include "implicit_none.h"
 
    subroutine schur_compl_restriction(Igrid,Rsd,n)
 !

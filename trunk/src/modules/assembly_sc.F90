@@ -20,7 +20,7 @@ module assembly_sc
 #include "implicit_none.h"
 !
 !..timers
-   real*8 MTime(20)
+   real(8) :: MTime(20)
    integer, save :: IPRINT_TIME = 0
 !
 !..offsets for each energy space

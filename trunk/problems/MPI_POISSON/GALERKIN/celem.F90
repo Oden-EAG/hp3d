@@ -34,16 +34,16 @@ subroutine celem(Mdle,Idec,Nrdofs,Nrdofm,Nrdofc,Nodm, &
 !--------------------------------------------------------------------------
 !
    implicit none
-!  
+!
    integer,                      intent(in)  :: Mdle,Idec
    integer, dimension(NR_PHYSA), intent(out) :: Nrdofs
    integer,                      intent(out) :: Nrdofm,Nrdofc
    integer, dimension(MAXNODM),  intent(out) :: Nodm
    integer, dimension(MAXNODM),  intent(out) :: NdofmH,NdofmE,NdofmV,NdofmQ
    integer,                      intent(out) :: Nrnodm
-   real*8,                       intent(out) :: Bload(*),Astif(*)
+   real(8),                      intent(out) :: Bload(*),Astif(*)
    integer, dimension(NR_PHYSA)              :: nbcond
-!   
+!
 !--------------------------------------------------------------------------
 !
 !..redirect to the system routine

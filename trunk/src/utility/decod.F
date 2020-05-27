@@ -66,13 +66,13 @@ c
 c
       implicit none
 c
-      integer*8,           intent(in)  :: Nick
+      integer(8),          intent(in)  :: Nick
       integer,             intent(in)  :: Mod,N
       integer,dimension(N),intent(out) :: Narray
 c
 c  ...local variables      
-      integer   :: i
-      integer*8 :: nick1,nick2,longmod
+      integer    :: i
+      integer(8) :: nick1,nick2,longmod
 c
 c  ...be careful with integer type - need to convert!
       longmod = int(Mod,8)

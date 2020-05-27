@@ -8,20 +8,20 @@ subroutine check_negative_jacobian(Nodesl, Nsize)
   integer, intent(inout) :: Nsize
   !-------------------------------------------------------------------
   ! reference and physical coordinates
-  real*8, dimension(3)   :: xi,x
-  real*8, dimension(3,3) :: dxdxi,dxidx
+  real(8), dimension(3)   :: xi,x
+  real(8), dimension(3,3) :: dxdxi,dxidx
   ! Gauss points and weights 
-  real*8, dimension(3,MAX_NINT3) :: xiloc
-  real*8, dimension(  MAX_NINT3) :: wxi
+  real(8), dimension(3,MAX_NINT3) :: xiloc
+  real(8), dimension(  MAX_NINT3) :: wxi
   ! shape function
-  real*8, dimension(  MAXbrickH) ::  shapH
-  real*8, dimension(3,MAXbrickH) :: dshapH
-  real*8, dimension(3,MAXbrickH) :: xnod
+  real(8), dimension(  MAXbrickH) ::  shapH
+  real(8), dimension(3,MAXbrickH) :: dshapH
+  real(8), dimension(3,MAXbrickH) :: xnod
   integer, dimension(12) :: nedge_orient
   integer, dimension(6)  :: nface_orient
   integer, dimension(19) :: norder
   ! miscellanea
-  real*8 :: rjac
+  real(8) :: rjac
   integer :: mdle, iel, i, k, nint, int_back, l, iflag, ndom, ic, nrdofH
   character(len=4) :: type
   !-------------------------------------------------------------------
@@ -49,10 +49,9 @@ subroutine check_negative_jacobian(Nodesl, Nsize)
         xi(1:3) = xiloc(1:3,l)
         select case(EXGEOM)
         case(0)
-           call shape3H(type,xi,norder, &
-                nedge_orient,nface_orient, &
-                nrdofH, &
-                shapH,dshapH)
+           call shape3DH(type,xi,norder, &
+                         nedge_orient,nface_orient, &
+                         nrdofH,shapH,dshapH)
            x    (1:3)    =0.d0
            dxdxi(1:3,1:3)=0.d0
            do k=1,nrdofH

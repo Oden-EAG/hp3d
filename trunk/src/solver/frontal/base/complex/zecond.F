@@ -1,5 +1,5 @@
       subroutine zecond(t)
-      double precision t
+      real(8) t
       t = 0.d0
       return
       end

@@ -15,11 +15,11 @@ subroutine curveK(No,T,Norient, X,Dxdt)
       use control , only : GEOM_TOL
 !
       implicit none
-      integer,            intent(in ) :: No,Norient
-      real*8,             intent(in ) :: T
-      real*8,dimension(3),intent(out) :: X,Dxdt
+      integer,             intent(in ) :: No,Norient
+      real(8),             intent(in ) :: T
+      real(8),dimension(3),intent(out) :: X,Dxdt
 !
-      real*8  :: blend,dblend
+      real(8) :: blend,dblend
       integer :: iprint
 !----------------------------------------------------------------------
 !
@@ -41,7 +41,7 @@ subroutine curveK(No,T,Norient, X,Dxdt)
       X(1:3) = X(1:3)/blend
 !
 !
-endsubroutine curveK
+end subroutine curveK
 !
 !
 !
@@ -64,12 +64,12 @@ subroutine curveB(No,T,Norient, X,Dxdt)
       use control      , only : GEOM_TOL
 !      
       implicit none
-      integer,            intent(in ) :: No,Norient
-      real*8,             intent(in ) :: T
-      real*8,dimension(3),intent(out) :: X,Dxdt
+      integer,             intent(in ) :: No,Norient
+      real(8),             intent(in ) :: T
+      real(8),dimension(3),intent(out) :: X,Dxdt
 !
-      real*8,dimension(3,2) :: xv
-      real*8  :: t_aux,smax
+      real(8),dimension(3,2) :: xv
+      real(8) :: t_aux,smax
       integer :: i,iv,np,ivar
       integer :: icheck
       integer :: iprint
@@ -111,7 +111,7 @@ subroutine curveB(No,T,Norient, X,Dxdt)
       Dxdt(1:3) = Dxdt(1:3) - ( xv(1:3,2) - xv(1:3,1))
 !
 !
-endsubroutine curveB
+end subroutine curveB
 !
 !
 !
@@ -130,13 +130,13 @@ endsubroutine curveB
 subroutine trianK(No,T,Norient, X,Dxdt)
 !      
       implicit none
-      integer,              intent(in ) :: No,Norient
-      real*8,dimension(2  ),intent(in ) :: T
-      real*8,dimension(3  ),intent(out) :: X
-      real*8,dimension(3,2),intent(out) :: Dxdt
+      integer,               intent(in ) :: No,Norient
+      real(8),dimension(2  ),intent(in ) :: T
+      real(8),dimension(3  ),intent(out) :: X
+      real(8),dimension(3,2),intent(out) :: Dxdt
 !
-      real*8 :: blend
-      real*8,dimension(2) :: dblend
+      real(8) :: blend
+      real(8) :: dblend(2)
       integer :: i
       integer :: iprint,iprint_trianB
 !      
@@ -160,7 +160,7 @@ subroutine trianK(No,T,Norient, X,Dxdt)
       enddo
       X(1:3) = X(1:3)/blend
 !
-endsubroutine trianK
+end subroutine trianK
 !
 !
 !      
@@ -183,22 +183,22 @@ subroutine trianB(No,T,Norient, X,Dxdt)
       use element_data
 !      
       implicit none
-      integer,              intent(in ) :: No,Norient
-      real*8,dimension(2  ),intent(in ) :: T
-      real*8,dimension(3  ),intent(out) :: X
-      real*8,dimension(3,2),intent(out) :: Dxdt
+      integer,               intent(in ) :: No,Norient
+      real(8),dimension(2  ),intent(in ) :: T
+      real(8),dimension(3  ),intent(out) :: X
+      real(8),dimension(3,2),intent(out) :: Dxdt
 !
 !  ...vertex shape functions
-      real*8,dimension(  4) :: shapH
-      real*8,dimension(2,4) :: dshapH
+      real(8),dimension(  4) :: shapH
+      real(8),dimension(2,4) :: dshapH
 !
-      real*8,dimension(2  ) :: eta,eta_aux,dtedeta,detadte,dblend
-      real*8,dimension(3  ) :: x_aux,xc,dxcdte,dxdte
-      real*8,dimension(2,2) :: detadt
-      real*8,dimension(3,2) :: dxdeta,dxcdeta,dxdeta_aux
+      real(8),dimension(2  ) :: eta,eta_aux,dtedeta,detadte,dblend
+      real(8),dimension(3  ) :: x_aux,xc,dxcdte,dxdte
+      real(8),dimension(2,2) :: detadt
+      real(8),dimension(3,2) :: dxdeta,dxcdeta,dxdeta_aux
 !
-      real*8,dimension(3,3) :: xv
-      real*8 :: smax,dmax,te,blend
+      real(8),dimension(3,3) :: xv
+      real(8) :: smax,dmax,te,blend
       integer :: i,j,ivar,np,nc,norientc,iv1,iv2
 !
 !     consistency of parameterizations:
@@ -374,7 +374,7 @@ subroutine trianB(No,T,Norient, X,Dxdt)
       endif
 !
 !
-endsubroutine trianB
+end subroutine trianB
 !      
 !
 !
@@ -397,22 +397,22 @@ subroutine rectaB(No,T,Norient, X,Dxdt)
       use element_data
 !      
       implicit none
-      integer,              intent(in ) :: No,Norient
-      real*8,dimension(2  ),intent(in ) :: T
-      real*8,dimension(3  ),intent(out) :: X
-      real*8,dimension(3,2),intent(out) :: Dxdt
+      integer,               intent(in ) :: No,Norient
+      real(8),dimension(2  ),intent(in ) :: T
+      real(8),dimension(3  ),intent(out) :: X
+      real(8),dimension(3,2),intent(out) :: Dxdt
 !
 !  ...vertex shape functions
-      real*8,dimension(  4) :: shapH
-      real*8,dimension(2,4) :: dshapH
+      real(8),dimension(  4) :: shapH
+      real(8),dimension(2,4) :: dshapH
 !
-      real*8,dimension(2  ) :: eta,eta_aux,dtedeta,detadte,dblend
-      real*8,dimension(3  ) :: x_aux,xc,dxcdte,dxdte
-      real*8,dimension(2,2) :: detadt
-      real*8,dimension(3,2) :: dxdeta,dxcdeta,dxdeta_aux
+      real(8),dimension(2  ) :: eta,eta_aux,dtedeta,detadte,dblend
+      real(8),dimension(3  ) :: x_aux,xc,dxcdte,dxdte
+      real(8),dimension(2,2) :: detadt
+      real(8),dimension(3,2) :: dxdeta,dxcdeta,dxdeta_aux
 !
-      real*8,dimension(3,4) :: xv
-      real*8 :: smax,dmax,te,blend
+      real(8),dimension(3,4) :: xv
+      real(8) :: smax,dmax,te,blend
       integer :: i,j,ivar,np,nc,norientc,iv1,iv2
 !
 !     consistency of parameterizations:
@@ -589,11 +589,10 @@ subroutine rectaB(No,T,Norient, X,Dxdt)
       endif
 !
 !
-endsubroutine rectaB
+end subroutine rectaB
 
 
-
-      subroutine rectaB_back(No,T,Norient, X,Dxdt)
+subroutine rectaB_back(No,T,Norient, X,Dxdt)
 !  
       use control
       use GMP    
@@ -884,4 +883,4 @@ endsubroutine rectaB
       endif
 !
 !
-      end subroutine rectaB_back
+end subroutine rectaB_back

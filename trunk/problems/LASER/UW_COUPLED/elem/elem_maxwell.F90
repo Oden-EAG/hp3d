@@ -88,7 +88,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    integer, dimension(5)     :: norderf
 !
 !..geometry dof (work space for nodcor)
-   real*8, dimension(3,MAXbrickH) :: xnod
+   real(8), dimension(3,MAXbrickH) :: xnod
 !
 !..solution dof (work space for solelm)
    VTYPE, dimension(MAXEQNH,MAXbrickH) :: zdofH
@@ -105,28 +105,28 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    VTYPE, dimension(3,MAXEQNV  ) ::  zsolV_soleval
    VTYPE, dimension(  MAXEQNV  ) ::  zdivV_soleval
    VTYPE, dimension(  MAXEQNQ  ) ::  zsolQ_soleval
-   real*8 :: rsolH
+   real(8) :: rsolH
 !
 !..variables for geometry
-   real*8, dimension(3)    :: xi,x,rn
-   real*8, dimension(3,2)  :: dxidt,dxdt,rt
-   real*8, dimension(3,3)  :: dxdxi,dxidx
-   real*8, dimension(2)    :: t
+   real(8), dimension(3)    :: xi,x,rn
+   real(8), dimension(3,2)  :: dxidt,dxdt,rt
+   real(8), dimension(3,3)  :: dxdxi,dxidx
+   real(8), dimension(2)    :: t
 !
 !..H1 shape functions
-   real*8, dimension(MAXbrickH)    :: shapH
-   real*8, dimension(3,MAXbrickH)  :: gradH
+   real(8), dimension(MAXbrickH)    :: shapH
+   real(8), dimension(3,MAXbrickH)  :: gradH
 !
 !..H(curl) shape functions
-   real*8, dimension(3,MAXbrickE)  :: shapE
-   real*8, dimension(3,MAXbrickE)  :: curlE
+   real(8), dimension(3,MAXbrickE)  :: shapE
+   real(8), dimension(3,MAXbrickE)  :: curlE
 !
 !..L2 shape functions
-   real*8, dimension(MAXbrickQ)    :: shapQ
+   real(8), dimension(MAXbrickQ)    :: shapQ
 !
 !..Enriched H1 shape functions
-   real*8 , dimension(3,MAXbrickEE) :: shapEE
-   real*8 , dimension(3,MAXbrickEE) :: curlEE
+   real(8) , dimension(3,MAXbrickEE) :: shapEE
+   real(8) , dimension(3,MAXbrickEE) :: curlEE
 !
 !..nrdof for interface only (without bubbles)
    integer :: nrdofEEi
@@ -143,9 +143,9 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !..Gram matrix in packed format
    !VTYPE :: gramP(NrTest*(NrTest+1)/2)
    VTYPE, allocatable :: gramP(:)
-   real*8  :: FF, CF, FC
-   real*8  :: fldE(3), fldH(3), crlE(3), crlH(3)
-   real*8  :: fldF(3), fldG(3), crlF(3), crlG(3)
+   real(8)  :: FF, CF, FC
+   real(8)  :: fldE(3), fldH(3), crlE(3), crlH(3)
+   real(8)  :: fldF(3), fldG(3), crlF(3), crlG(3)
 !
 !..matrices for transpose filling (swapped loops)
 !..stiffness matrices (transposed) for the enriched test space
@@ -153,29 +153,29 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    complex(8), allocatable :: stiff_ALL(:,:),zaloc(:,:)
 !
 !..3D quadrature data
-   real*8, dimension(3,MAXNINT3ADD)  :: xiloc
-   real*8, dimension(MAXNINT3ADD)    :: waloc
+   real(8), dimension(3,MAXNINT3ADD)  :: xiloc
+   real(8), dimension(MAXNINT3ADD)    :: waloc
 !
 !..2D quadrature data
-   real*8, dimension(2,MAXNINT2ADD)  :: tloc
-   real*8, dimension(MAXNINT2ADD)    :: wtloc
+   real(8), dimension(2,MAXNINT2ADD)  :: tloc
+   real(8), dimension(MAXNINT2ADD)    :: wtloc
 !
 !..BC's flags
-   integer, dimension(6,NR_PHYSA)    :: ibc
+   integer, dimension(6,NR_PHYSA)     :: ibc
 !
 !..for auxiliary computation
    VTYPE :: zaux,zcux
 !
 !..Maxwell load and auxiliary variables
-   VTYPE , dimension(3) :: zJ,zImp
-   real*8, dimension(3) :: E1,E2,rntimesE,rn2timesE
+   VTYPE  , dimension(3) :: zJ,zImp
+   real(8), dimension(3) :: E1,E2,rntimesE,rn2timesE
 !
 !..number of edge,faces per element type
    integer :: nre, nrf
 !
 !..various variables for the problem
-   real*8  :: h_elem,rjac,weight,wa,v2n,CC,EE,CE,E,EC,q,h,omeg
-   real*8  :: bjac
+   real(8) :: h_elem,rjac,weight,wa,v2n,CC,EE,CE,E,EC,q,h,omeg
+   real(8) :: bjac
    integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,ik,j,k,l,nint,kE,n,m
    integer :: iflag,iprint,itime,iverb
    integer :: nrdof,nordP,nsign,ifc,ndom,info,icomp,idec
@@ -185,11 +185,11 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !..for polarizations function
    VTYPE, dimension(3,3) :: bg_pol,gain_pol,raman_pol
-   real*8  :: delta_n
+   real(8) :: delta_n
    integer :: dom_flag
 !
 !..OMEGA_RATIO_SIGNAL or OMEGA_RATIO_PUMP
-   real*8  :: OMEGA_RATIO_FLD
+   real(8) :: OMEGA_RATIO_FLD
 !
 !..for PML
    VTYPE :: zbeta,zdbeta,zd2beta,detJstretch
@@ -333,10 +333,10 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
       xi(1:3)=xiloc(1:3,l); wa=waloc(l)
 !
 !  ...H1 shape functions (for geometry)
-      call shape3H(etype,xi,norder,norient_edge,norient_face, nrdofH,shapH,gradH)
+      call shape3DH(etype,xi,norder,norient_edge,norient_face, nrdofH,shapH,gradH)
 !
 !  ...L2 shape functions for the trial space
-      call shape3Q(etype,xi,norder, nrdofQ,shapQ)
+      call shape3DQ(etype,xi,norder, nrdofQ,shapQ)
 !
 !  ...broken H(curl) shape functions for the enriched test space
       call shape3EE(etype,xi,nordP, nrdofEE,shapEE,curlEE)
@@ -413,7 +413,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !.....................................................
 !...............toggle PML............................
 !
-      if(USE_PML.eq.0) then
+      if(.not. USE_PML) then
          JJstretch      = ZERO
          JJstretch(1,1) = ZONE
          JJstretch(2,2) = ZONE
@@ -627,8 +627,8 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 #endif
 !
 !     ...determine element H1 shape functions (for geometry)
-         call shape3H(etype,xi,norder,norient_edge,norient_face, &
-                      nrdof,shapH,gradH)
+         call shape3DH(etype,xi,norder,norient_edge,norient_face, &
+                       nrdof,shapH,gradH)
 #if DEBUG_MODE
          if (nrdof .ne. NrdofH) then
             write(*,*) 'elem_maxwell: INCONSISTENCY NrdofH. stop.'
@@ -638,8 +638,8 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !     ...determine element H(curl) shape functions (for fluxes)
 !     ...for interfaces only (no bubbles)
-         call shape3E(etype,xi,norderi,norient_edge,norient_face, &
-                      nrdof,shapE,curlE)
+         call shape3DE(etype,xi,norderi,norient_edge,norient_face, &
+                       nrdof,shapE,curlE)
 #if DEBUG_MODE
          if (nrdof .ne. NrdofEi) then
             write(*,*) 'elem_maxwell: INCONSISTENCY NrdofEi. stop.'
@@ -775,26 +775,26 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
       write(*,7011) ZblocE(1:2*NrdofE)
       write(*,7011) ZblocQ(1:6*NrdofQ)
 7011  format(12e12.5)
-      pause
+      call pause
       write(*,7012)
 7012  format('elem_maxwell: ZalocEE = ')
       do i=1,2*NrdofE
          write(*,7013) i,ZalocEE(i,1:2*NrdofE)
 7013     format('i = ',i3,10(/,6(2e12.5,2x)))
       enddo
-      pause
+      call pause
       write(*,7014)
 7014  format('elem_maxwell: ZalocEQ = ')
       do i=1,2*NrdofE
          write(*,7013) i,ZalocEQ(i,1:6*NrdofQ)
       enddo
-      pause
+      call pause
       write(*,7015)
 7015  format('elem_maxwell: ZalocQQ = ')
       do i=1,6*NrdofQ
          write(*,7013) i,ZalocQQ(i,1:6*NrdofQ)
       enddo
-      pause
+      call pause
    endif
 #endif
 !

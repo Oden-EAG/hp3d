@@ -36,12 +36,12 @@ subroutine pardiso_solve(Ia,Ja,A,Type,Nnz,N,Nrhs, B)
 !
 !..pardiso workspace
 !..internal solver memory pointer for 64-bit architectures
-   integer*8       :: pt(64)
+   integer(8)      :: pt(64)
    integer         :: iparm(64)
    integer         :: mtype,maxfct,mnum,phase,error,msglvl
    integer         :: perm(N)
    character       :: Type
-   real*8          :: tm
+   real(8)         :: tm
 !
 !..timer
    real(8) :: MPI_Wtime,start_time,end_time
@@ -176,11 +176,11 @@ subroutine pardiso_solve_vect(ia,ja,a,type,nnz,b_vect,n,nrhs,B,bb)
 !
 !..pardiso workspace
 !..internal solver memory pointer for 64-bit architectures
-   integer*8    :: pt(64)
+   integer(8)   :: pt(64)
    integer      :: iparm(64)
    integer      :: mtype, maxfct, mnum, phase, error, msglvl
    integer      :: perm(n)
-   character*1  :: type
+   character(1) :: type
 !
 !------------------------------------------------------------------------
 !------------------------------------------------------------------------

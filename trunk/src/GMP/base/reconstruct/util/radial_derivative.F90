@@ -6,11 +6,11 @@
       implicit none
 !---------------------------------------------------------------------------------
 !     DUMMY ARGUMENTS
-      real*8,intent(in)  :: s
+      real(8), intent(in)  :: s
       integer, intent(in)  :: j,k
-      real*8,intent(out) :: c
+      real(8), intent(out) :: c
 !     LOCAL VARIABLES      
-      real*8             :: poly1,poly2,poly3,dpoly
+      real(8)              :: poly1,poly2,poly3,dpoly
       integer              :: iprint
       integer,parameter    :: deg = 6
 !---------------------------------------------------------------------------------

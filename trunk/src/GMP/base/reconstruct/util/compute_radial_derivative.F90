@@ -8,15 +8,15 @@
       implicit none
 !-------------------------------------------------------------------------------
 !     DUMMY ARGUMENTS
-      integer,intent(in)                :: Nt
-      integer,intent(in)                :: Ie
-      real*8,intent(in)               :: S
-      real*8,dimension(3),intent(out) :: Der
-      real*8,dimension(3),intent(out) :: DDer
-      real*8,dimension(3),intent(out) :: DDDer
+      integer,intent(in)               :: Nt
+      integer,intent(in)               :: Ie
+      real(8),intent(in)               :: S
+      real(8),dimension(3),intent(out) :: Der
+      real(8),dimension(3),intent(out) :: DDer
+      real(8),dimension(3),intent(out) :: DDDer
 !-------------------------------------------------------------------------------
 !     LOCAL VARIABLES
-      real*8 :: c0,c1,c2,poly00,poly10,poly11,poly20,poly21,poly22,dpoly
+      real(8) :: c0,c1,c2,poly00,poly10,poly11,poly20,poly21,poly22,dpoly
       integer :: i,j,k,l,iprint
       integer, parameter :: deg = 7
 !-------------------------------------------------------------------------------
@@ -27,7 +27,7 @@
       iprint=0
 !
       if (iprint.eq.1) then
-!        write(*,1000)Nt,Ie,S
+!        write(*,1000) Nt,Ie,S
  1000   format(' compute_radial_derivative: Nt = ',i4,'; Ie = ',i1,'; S = ',e12.5)
       endif
 !
@@ -95,4 +95,4 @@
  1008   format('   DDDer = ',3(e12.5,2x))      
       endif
 !
-      end
+      end subroutine

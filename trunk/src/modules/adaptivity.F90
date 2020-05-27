@@ -13,11 +13,11 @@ module adaptivity
 
   integer :: N_LIST, IPARA =0
   integer, allocatable :: NODES_LIST(:)
-  real*8 , allocatable :: ERROR_LIST(:)
+  real(8), allocatable :: ERROR_LIST(:)
 
-  real*8 :: GREEDY
+  real(8) :: GREEDY
 
-  real*8 :: ERR_MAX =0.d0, ERR_MIN =0.d0
+  real(8) :: ERR_MAX =0.d0, ERR_MIN =0.d0
   !
 
 contains
@@ -26,17 +26,17 @@ contains
     use data_structure3D
     implicit none
     integer :: iel, mdle, kref, istat
-    real*8 :: eta
+    real(8) :: eta
 
     ! 1 - scalar, 2,3,4 - vector directional error
-    real*8, dimension(4) :: derr
-    real*8, dimension(4):: dnorm
+    real(8), dimension(4) :: derr
+    real(8), dimension(4) :: dnorm
 
      interface
         subroutine Element_Error(Mdle, Derr, Dnorm)
-          integer,            intent(in)  :: Mdle
-          real*8,dimension(:),intent(out) :: Derr
-          real*8,dimension(:),intent(out) :: Dnorm
+          integer,             intent(in)  :: Mdle
+          real(8),dimension(:),intent(out) :: Derr
+          real(8),dimension(:),intent(out) :: Dnorm
         end subroutine Element_Error
      end interface
 

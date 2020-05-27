@@ -25,22 +25,22 @@ subroutine getf(Mdle,X, Fval)
 !
    implicit none
 !-------------------------------------------------------------------
-   integer,              intent(in)  :: Mdle
-   real*8, dimension(3), intent(in)  :: X
-   real*8,               intent(out) :: Fval
+   integer, intent(in)  :: Mdle
+   real(8), intent(in)  :: X(3)
+   real(8), intent(out) :: Fval
 !-------------------------------------------------------------------
-   real*8,dimension(  MAXEQNH    ) ::   ValH
-   real*8,dimension(  MAXEQNH,3  ) ::  DvalH
-   real*8,dimension(  MAXEQNH,3,3) :: D2valH
-   real*8,dimension(3,MAXEQNE    ) ::   ValE
-   real*8,dimension(3,MAXEQNE,3  ) ::  DvalE
-   real*8,dimension(3,MAXEQNE,3,3) :: D2valE
-   real*8,dimension(3,MAXEQNV    ) ::   ValV
-   real*8,dimension(3,MAXEQNV,3  ) ::  DvalV
-   real*8,dimension(3,MAXEQNV,3,3) :: D2valV
-   real*8,dimension(  MAXEQNQ    ) ::   ValQ
-   real*8,dimension(  MAXEQNQ,3  ) ::  DvalQ
-   real*8,dimension(  MAXEQNQ,3,3) :: D2valQ
+   real(8),dimension(  MAXEQNH    ) ::   ValH
+   real(8),dimension(  MAXEQNH,3  ) ::  DvalH
+   real(8),dimension(  MAXEQNH,3,3) :: D2valH
+   real(8),dimension(3,MAXEQNE    ) ::   ValE
+   real(8),dimension(3,MAXEQNE,3  ) ::  DvalE
+   real(8),dimension(3,MAXEQNE,3,3) :: D2valE
+   real(8),dimension(3,MAXEQNV    ) ::   ValV
+   real(8),dimension(3,MAXEQNV,3  ) ::  DvalV
+   real(8),dimension(3,MAXEQNV,3,3) :: D2valV
+   real(8),dimension(  MAXEQNQ    ) ::   ValQ
+   real(8),dimension(  MAXEQNQ,3  ) ::  DvalQ
+   real(8),dimension(  MAXEQNQ,3,3) :: D2valQ
 !
    integer :: icase
 !-------------------------------------------------------------------

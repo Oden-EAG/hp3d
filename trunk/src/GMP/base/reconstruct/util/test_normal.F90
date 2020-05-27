@@ -2,16 +2,18 @@
 
       use GMP
       implicit none
-      real*8 :: x,y,rz,error,error_save,x_save,rz_save,x_in,y_in,rz_in
-      integer, dimension(2,2) :: iwork
-      integer :: idec,i,j,k,iidec,iflag,irow,bijec,iprint,it,ie,nt,i1,j1,i2,j2,i3,j3,i4,j4
+      real(8) :: x,y,rz,error,error_save,x_save,rz_save
+      real(8) :: x_in,y_in,rz_in
+      integer :: iwork(2,2)
+      integer :: idec,i,j,k,iidec,iflag,irow,bijec,iprint
+      integer :: it,ie,nt,i1,j1,i2,j2,i3,j3,i4,j4
       integer :: nsub
-      real*8 :: x1,x2,rz1,rz2,temp,r_c,y1,y2,y_save
-      real*8,dimension(3) :: r_der,b_lo_save,b_up_save
-      real*8,external :: Bern_poly
+      real(8) :: x1,x2,rz1,rz2,temp,r_c,y1,y2,y_save
+      real(8), dimension(3) :: r_der,b_lo_save,b_up_save
+      real(8), external :: Bern_poly
       integer, external :: fact,imod
-      real*8, dimension(3) :: XX
-      real*8, dimension(3,2) :: Dxdeta
+      real(8) :: XX(3)
+      real(8) :: Dxdeta(3,2)
 
       iprint=0
 
@@ -20,7 +22,6 @@
       iwork(1,1) =  3; iwork(1,2) =  1
       iwork(2,1) = 14; iwork(2,2) = -1
 !
-
  10   continue
 !
       write(*,*)'====================================================='

@@ -38,7 +38,7 @@
    use refinements,       only: enable_iso_only
 
 !
-   IMPLICIT NONE
+   implicit none
 
    integer, intent(in)    :: Ref_type,Ref_flag,Mg_csolve,Mg_nrgrids,Mg_nrsmth, Mg_nriter
    integer, intent(in)    :: Mg_iparAttr(NR_PHYSA)

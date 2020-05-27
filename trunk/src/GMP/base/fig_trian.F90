@@ -16,14 +16,14 @@
 subroutine trian_local(No,T,Norient, X,Dxdt)
 !      
       implicit none
-      integer,              intent(in ) :: No,Norient
-      real*8,dimension(2  ),intent(in ) :: T
-      real*8,dimension(3  ),intent(out) :: X
-      real*8,dimension(3,2),intent(out) :: Dxdt
+      integer,               intent(in ) :: No,Norient
+      real(8),dimension(2  ),intent(in ) :: T
+      real(8),dimension(3  ),intent(out) :: X
+      real(8),dimension(3,2),intent(out) :: Dxdt
 !
-      real*8,dimension(2  ) :: eta
-      real*8,dimension(2,2) :: detadt
-      real*8,dimension(3,2) :: dxdeta
+      real(8),dimension(2  ) :: eta
+      real(8),dimension(2,2) :: detadt
+      real(8),dimension(3,2) :: dxdeta
       integer :: i,iprint
 !-----------------------------------------------------------------------
 !
@@ -54,7 +54,7 @@ subroutine trian_local(No,T,Norient, X,Dxdt)
       endif
 !
 !
-endsubroutine trian_local
+end subroutine trian_local
 !
 !
 !
@@ -75,13 +75,13 @@ subroutine trian(No,Eta, X,Dxdeta)
       use GMP , only : TRIANGLES , CURVES
 !-----------------------------------------------------------------------
       implicit none
-      integer,              intent(in)  :: No
-      real*8,dimension(2),  intent(in)  :: Eta
-      real*8,dimension(3),  intent(out) :: X
-      real*8,dimension(3,2),intent(out) :: Dxdeta
+      integer,               intent(in)  :: No
+      real(8),dimension(2),  intent(in)  :: Eta
+      real(8),dimension(3),  intent(out) :: X
+      real(8),dimension(3,2),intent(out) :: Dxdeta
 !-----------------------------------------------------------------------
 !  ...triangle vertices
-      real*8,dimension(3,3) :: xv
+      real(8),dimension(3,3) :: xv
 !  ...edge curves     
       integer,dimension(3) :: ncurv
       integer :: iprint, np, nc, i
@@ -154,4 +154,4 @@ subroutine trian(No,Eta, X,Dxdeta)
       endselect
 !
 !
-endsubroutine trian
+end subroutine trian

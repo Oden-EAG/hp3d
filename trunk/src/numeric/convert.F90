@@ -5,9 +5,9 @@
 subroutine unit_cart2sphere(Theta, Phi, T)
   implicit none
   ! input arguments
-  real*8, intent(in)                  :: Theta, Phi
-  real*8, intent(out), dimension(3,3) :: T
-  real*8 :: siTh, coTh, siPh, coPh
+  real(8), intent(in)                  :: Theta, Phi
+  real(8), intent(out), dimension(3,3) :: T
+  real(8) :: siTh, coTh, siPh, coPh
   
   siTh = sin(Theta); coTh = cos(Theta);
   siPh = sin(Phi);   coPh = cos(Phi);
@@ -26,10 +26,10 @@ end subroutine unit_cart2sphere
 subroutine grad_sphere2cart(R, Theta, Phi, T)
   implicit none
   ! input arguments
-  real*8, intent(in)                  :: R, Theta, Phi
-  real*8, intent(out), dimension(3,3) :: T
-  real*8 :: siTh, coTh, siPh, coPh
-  real*8, parameter :: epsilon = 1.0e-14, pi=4.*ATAN(1.D0)
+  real(8), intent(in)                  :: R, Theta, Phi
+  real(8), intent(out), dimension(3,3) :: T
+  real(8) :: siTh, coTh, siPh, coPh
+  real(8), parameter :: epsilon = 1.0e-14, pi=4.*ATAN(1.D0)
 
 
   ! http://mathworld.wolfram.com/SphericalCoordinates.html
@@ -59,16 +59,16 @@ end subroutine grad_sphere2cart
 subroutine disp_sphere2cart(S, Zs, Zds, Zc, Zdc)
   use parameters
   implicit none
-  real*8, dimension(3),   intent(in)  :: S
+  real(8),dimension(3),   intent(in)  :: S
   VTYPE,  dimension(3),   intent(in)  :: Zs
   VTYPE,  dimension(3,3), intent(in)  :: Zds
   VTYPE,  dimension(3),   intent(out) :: Zc
   VTYPE,  dimension(3,3), intent(out) :: Zdc
   
   integer                :: k1, k2 
-  real*8, dimension(3,3) :: rot_u, rot_g
+  real(8),dimension(3,3) :: rot_u, rot_g
   VTYPE,  dimension(3,3) :: ztmp
-  real*8                 :: coTh, siTh, coPh, siPh
+  real(8)                :: coTh, siTh, coPh, siPh
 
   coTh = cos(S(2));
   siTh = sin(S(2));

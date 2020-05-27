@@ -100,7 +100,7 @@ subroutine set_environment_maxwell
 !
 !..PML VARIABLES
 !..exp_coeff is only used for manufactured solution tests
-   call get_option_int ('-usepml' , 'USE_PML'  , 1      , USE_PML  )
+   call get_option_bool('-usepml' , 'USE_PML'  , .true. , USE_PML  )
    call get_option_real('-expA'   , 'EXP_COEFF', 0.2d0  , EXP_COEFF)
    call get_option_real('-pmlfrac', 'PML_FRAC' , 0.25d0 , PML_FRAC )
    call get_option_real('-zl'     , 'ZL'       , 0.40d0 , ZL       )

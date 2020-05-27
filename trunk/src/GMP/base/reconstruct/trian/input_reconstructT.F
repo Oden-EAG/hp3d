@@ -45,7 +45,7 @@ c  ...temporary connectivities workspaces
 c
 c  ...tet workspace
       integer, dimension(10) :: temp
-      double precision, dimension(3) :: rdata_save
+      real(8), dimension(3)  :: rdata_save
 c
 c  ...maximum anticipated number of tets attached to a point      
       integer, parameter :: mphex = 100
@@ -59,7 +59,7 @@ c     or
 c       list(1,i) = block connected to a face
 c       list(2,i) = the corresponding face number 
 c
-      character*10 type
+      character(10) type
 c
 c----------------------------------------------------------------------
 c

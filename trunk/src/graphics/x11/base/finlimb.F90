@@ -7,26 +7,26 @@
     use data_structure3D
     use graphmod
     implicit none
-    ! ** Arguements
+    ! ** Arguments
     !----------------------------------------
     integer,                          intent(in)  :: Numlev
-    real*8,  dimension(NR_COLORS-10), intent(out) :: Solev
+    real(8), dimension(NR_COLORS-10), intent(out) :: Solev
     ! ** Locals
     !----------------------------------------
     integer :: mdle, ndom, nedge_orient(12),nface_orient(6),norder(19)
     integer :: nrdofH, nrdofE, nrdofV, nrdofQ
-    ! geometry dof and master coordinate
-    real*8, dimension(2) :: t
-    real*8, dimension(3) :: xi, xp
-    real*8               :: xnod(NDIMEN,MAXbrickH)
-    character(len=4)     :: type
+    ! geometry dof and master coordinates
+    real(8), dimension(2) :: t
+    real(8), dimension(3) :: xi, xp
+    real(8)               :: xnod(NDIMEN,MAXbrickH)
+    character(len=4)      :: type
     VTYPE :: &
          zdofH(MAXEQNH,MAXbrickH), &
          zdofE(MAXEQNE,MAXbrickE), &
          zdofV(MAXEQNV,MAXbrickV), &
          zdofQ(MAXEQNQ,MAXbrickQ)
 
-    real*8  :: dsol, dxi, solmax, solmin, val
+    real(8) :: dsol, dxi, solmax, solmin, val
     integer :: iprint, i, j, ivar, loc, iel, idec, iface, nsub
     !----------------------------------------
     iprint=0
@@ -42,7 +42,6 @@
     solmax = -1.d10
     solmin =  1.d10
 
-    
     mdle=0
     do iel=1,NRELES
        call nelcon(mdle, mdle)

@@ -3,7 +3,7 @@
 !========================================================================================
 !  LATEST REVISION: Jul 09                                                              |
 !
-!  PURPOSE: routine upgrades to double precision geometry using Newton
+!  PURPOSE: routine upgrades to real(8) geometry using Newton
 !           method iterations
 !
 !  REMARKS: new general routine!
@@ -23,17 +23,17 @@ subroutine upgrade2double
   integer                   :: np,nr_surf
   integer, dimension(MAXSU) :: SURFS
 #if I_PRINT >= 2
-  real*8, dimension(3)      :: aux
-  real*8                    :: norm_new,norm_old  
+  real(8), dimension(3)     :: aux
+  real(8)                   :: norm_new,norm_old
   integer                   :: np_MAX
 !----------------------------------------------------------------------------------------
 ! FUNCTIONS
-  real*8, external          :: norm
+  real(8), external          :: norm
 #endif  
 !----------------------------------------------------------------------------------------
 !
 #if I_PRINT >= 1
-    write(*,*)'upgrade2double: upgrading to double precision geometry...'
+    write(*,*)'upgrade2double: upgrading to real(8) geometry...'
 #endif
 ! ..allocate
     call generate_POINT_TYPE
@@ -103,8 +103,8 @@ IMPLICIT NONE
 !-----------------------------------------------------------------------------------    
 ! VARIABLES
   integer, dimension(3) :: N_SURF
-  real*8, dimension(3)  :: VOID_1
-  real*8, dimension(4)  :: VOID_2  
+  real(8), dimension(3)  :: VOID_1
+  real(8), dimension(4)  :: VOID_2
 !-----------------------------------------------------------------------------------    
 ! printing flag (0,1)      
 #define I_PRINT 0
@@ -148,10 +148,10 @@ IMPLICIT NONE
   integer, dimension(3), intent(out)    :: SEL_Surfs
 !----------------------------------------------------------------------------------------
 ! VARIABLES
-  real*8                 :: prod_new,prod_old
-  integer                :: i,j,k,l,i1,i2
-  real*8, dimension(3,3) :: GRAD_old, GRAD_new
-  real*8, dimension(3)   :: VOID_1
+  real(8)                 :: prod_new,prod_old
+  integer                 :: i,j,k,l,i1,i2
+  real(8), dimension(3,3) :: GRAD_old, GRAD_new
+  real(8), dimension(3)   :: VOID_1
 !----------------------------------------------------------------------------------------
 ! FUNCTIONS
   integer, external :: combination,my_mod

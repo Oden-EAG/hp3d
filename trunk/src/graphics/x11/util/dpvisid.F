@@ -24,7 +24,7 @@ c
 #include "syscom.blk"
 c
       dimension xyn(2,3)
-      character*5 text
+      character(5) text
 c
       i3(j) = j-(j-1)/3*3
 c   

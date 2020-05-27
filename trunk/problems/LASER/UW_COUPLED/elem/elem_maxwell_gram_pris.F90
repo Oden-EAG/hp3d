@@ -44,7 +44,7 @@
 !
    VTYPE  , intent(out) :: GramP(NrTest*(NrTest+1)/2)
 !
-   real*8, parameter :: rZero = 0.d0
+   real(8), parameter :: rZero = 0.d0
 !
 !..declare edge/face type variables
    character(len=4) :: etype, etype1, ftype
@@ -59,7 +59,7 @@
    integer, dimension(5)     :: norderf
 !
 !..geometry dof (work space for nodcor)
-   real*8, dimension(3,MAXbrickH) :: xnod
+   real(8) :: xnod(3,MAXbrickH)
 !
 !..solution dof (work space for solelm)
    complex(8), dimension(MAXEQNH,MAXbrickH) :: zdofH
@@ -76,40 +76,40 @@
    complex(8), dimension(3,MAXEQNV  ) ::  zsolV_soleval
    complex(8), dimension(  MAXEQNV  ) ::  zdivV_soleval
    complex(8), dimension(  MAXEQNQ  ) ::  zsolQ_soleval
-   real*8 :: rsolH
+   real(8) :: rsolH
 !
 !..variables for geometry
-   real*8, dimension(3)    :: xi,x,rn
-   real*8, dimension(3,2)  :: dxidt,dxdt,rt
-   real*8, dimension(3,3)  :: dxdxi,dxidx
-   real*8, dimension(2)    :: t
+   real(8), dimension(3)    :: xi,x,rn
+   real(8), dimension(3,2)  :: dxidt,dxdt,rt
+   real(8), dimension(3,3)  :: dxdxi,dxidx
+   real(8), dimension(2)    :: t
 !
 !..H1 shape functions
-   real*8, dimension(MAXbrickH)    :: shapH
-   real*8, dimension(3,MAXbrickH)  :: gradH
+   real(8), dimension(MAXbrickH)   :: shapH
+   real(8), dimension(3,MAXbrickH) :: gradH
 !
 !..load vector for the enriched space
    complex(8) :: bload_E(NrTest)
 !
 !..2D quadrature data
-   real*8, dimension(2,MAXNINT2ADD)  :: tloc
-   real*8, dimension(  MAXNINT2ADD)  :: wtloc
+   real(8), dimension(2,MAXNINT2ADD) :: tloc
+   real(8), dimension(  MAXNINT2ADD) :: wtloc
 !
 !..BC's flags
-   integer, dimension(6,NR_PHYSA)    :: ibc
+   integer, dimension(6,NR_PHYSA) :: ibc
 !
 !..for auxiliary computation
    complex(8) :: zaux
 !
 !..Maxwell load and auxiliary variables
-   complex(8), dimension(3) :: zJ
+   complex(8) :: zJ(3)
 !
 !..number of edge,faces per element type
    integer :: nre, nrf
 !
 !..various variables for the problem
-   real*8  :: h_elem,rjac,weight,wa,v2n,CC,EE,CE,E,EC,q,h,omeg,alpha_scale
-   real*8  :: bjac
+   real(8) :: h_elem,rjac,weight,wa,v2n,CC,EE,CE,E,EC,q,h,omeg,alpha_scale
+   real(8) :: bjac
    integer :: i1,j1,i2,j2
    integer :: i12,j12,k12,k1,k2,fa,fb,i3mod,j3mod,kH,kk,i,ik,j,k,l,nint,kE,n,m,p,pe
    integer :: iflag,iprint,itime,iverb
@@ -120,11 +120,11 @@
 !
 !..for polarizations function
    complex(8), dimension(3,3) :: bg_pol,gain_pol,raman_pol
-   real*8  :: delta_n
+   real(8) :: delta_n
    integer :: dom_flag
 !
 !..OMEGA_RATIO_SIGNAL or OMEGA_RATIO_PUMP
-   real*8  :: OMEGA_RATIO_FLD
+   real(8) :: OMEGA_RATIO_FLD
 !
 !..for PML
    complex(8) :: zbeta,zdbeta,zd2beta,detJstretch
@@ -145,12 +145,12 @@
    integer :: nrdof
    integer :: nrdofH12, nrdofE12, nrdofH3
    integer :: nrdofH12_tr,nrdofH3_tr
-   real*8 :: xi12(2),xi3,wt12,wt3
-   real*8 :: wt123,weighthh,weightvv
-   real*8 :: xiloc_xy(2,MAXNINT2ADD), xiloc_z(MAXPP+1)
-   real*8 :: wloc_xy(MAXNINT2ADD), wloc_z(MAXPP+1)
-   real*8, dimension(3,MAXNINT3ADD) :: wloc3
-   real*8, dimension(3) :: xip
+   real(8) :: xi12(2),xi3,wt12,wt3
+   real(8) :: wt123,weighthh,weightvv
+   real(8) :: xiloc_xy(2,MAXNINT2ADD), xiloc_z(MAXPP+1)
+   real(8) :: wloc_xy(MAXNINT2ADD), wloc_z(MAXPP+1)
+   real(8), dimension(3,MAXNINT3ADD) :: wloc3
+   real(8), dimension(3) :: xip
 !
    real(8)   , dimension(3,3) :: D_za,D_zc,D_aux,C,D
    complex(8), dimension(3,3) :: Z_za,Z_zc,Z_aux
@@ -396,7 +396,7 @@
          xip(1:2) = xi12(1:2); xip(3) = xi3
 !
 !     ...Compute shape functions needed for geometry - 3D H1 shape functions
-         call shape3H(etype,xip,norder,norient_edge,norient_face, nrdof,shapH,gradH)
+         call shape3DH(etype,xip,norder,norient_edge,norient_face, nrdof,shapH,gradH)
 !     ...Geometry map
          call geom3D(Mdle,xip,xnod,shapH,gradH,NrdofH, x,dxdxi,dxidx,rjac,iflag)
 !
@@ -459,7 +459,7 @@
 !.....................................................
 !...............toggle PML............................
 !
-         if(USE_PML.eq.0) then
+         if(.not. USE_PML) then
             JJstretch      = ZERO
             JJstretch(1,1) = ZONE
             JJstretch(2,2) = ZONE

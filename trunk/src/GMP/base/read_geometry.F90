@@ -24,4 +24,4 @@ subroutine read_geometry(Fp)
       end select    
 !
 !      
-endsubroutine read_geometry
+end subroutine read_geometry

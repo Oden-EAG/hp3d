@@ -13,14 +13,14 @@ subroutine surf(No,X, Fval,Dfdx)
       use GMP
 !
       implicit none
-      integer             , intent(in ) :: No
-      real*8, dimension(3), intent(in ) :: X
-      real*8              , intent(out) :: Fval
-      real*8, dimension(3), intent(out) :: Dfdx
+      integer              , intent(in ) :: No
+      real(8), dimension(3), intent(in ) :: X
+      real(8)              , intent(out) :: Fval
+      real(8), dimension(3), intent(out) :: Dfdx
 !------------------------------------------------------------------------------------
-      real*8, dimension(3) :: x0
-      character(len=10)    :: stype
-      integer              :: iprint,no1,nsign,np
+      real(8), dimension(3) :: x0
+      character(len=10)     :: stype
+      integer               :: iprint,no1,nsign,np
 !------------------------------------------------------------------------------------
 !
       iprint=0
@@ -105,4 +105,4 @@ subroutine surf(No,X, Fval,Dfdx)
       Fval=Fval*nsign ; Dfdx(1:3)=Dfdx(1:3)*nsign
 !
 !
-endsubroutine surf
+end subroutine surf

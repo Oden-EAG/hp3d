@@ -19,6 +19,8 @@ Set the `HP3D_BASE_PATH` to the path of the `par_hp3d/trunk/`
 ## Linking to external libraries
 The `m_options` file must link to the correct paths for external libraries. The following external libraries are required:
 - Intel MKL
+- PETSc (all following packages can be installed with PETSc)
+- HDF5
 - MUMPS
 - Metis/ParMetis
 - Scotch/PT-Scotch
@@ -27,12 +29,10 @@ The `m_options` file must link to the correct paths for external libraries. The 
 
 ## Compiler options
 Compilation is governed by preprocessing flags `COMPLEX`, `SHAPE`, and `DEBUG`.
-- `COMPLEX  = 0` , stiffness matrix, load vector(s) and solution dofs are real-valued
-- `COMPLEX  = 1` , stiffness matrix, load vector(s) and solution dofs are complex-valued
-- `SHAPE = 0` , shape functions of Gatto, Demkowicz, Kim, 2008 (H1,H(curl) for selected element shapes only)
-- `SHAPE = 1` , shape functions of Fuentes, Keith, Demkowicz, Nagaraj, 2014 (all spaces, all shapes)
-- `DEBUG = YES` , compiler uses debug flags, and the library performs additional checks during the computation
-- `DEBUG = NO` , compiler uses optimization flags and the library performs only minimal checks during the computation
+- `COMPLEX = 0` , stiffness matrix, load vector(s) and solution dofs are real-valued
+- `COMPLEX = 1` , stiffness matrix, load vector(s) and solution dofs are complex-valued
+- `DEBUG   = 0` , compiler uses optimization flags and the library performs only minimal checks during the computation
+- `DEBUG   = 1` , compiler uses debug flags, and the library performs additional checks during the computation
 
 Library will be created under either `par_hp3d/complex/` or `par_hp3d/real/`.
 
@@ -61,7 +61,7 @@ And, optionally,
 ```bibtex
 @article{fuentes2015shape,
     Author = {Fuentes, F. and Keith, B. and Demkowicz, L. and Nagaraj, S.},
-    Journal = CAMWA,
+    Journal = {Comput. Math. Appl.},
     Number = {4},
     Pages = {353--458},
     Publisher = {Elsevier},

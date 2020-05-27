@@ -359,7 +359,6 @@ c
       double precision :: Mu(2,0:1),DMu(3,2,0:1)
       double precision :: Nu(2,0:2),DNu(3,2,0:2)
       double precision :: MuZ(0:1),DMuZ(3,0:1)
-      double precision :: LambV(5),DLambV(5,3)
       double precision :: MubME(4),DMubME(4,3)
       double precision :: NupME(4,0:1),DNupME(4,3,0:1)
       double precision :: GNupME(0:1),GDNupME(3,0:1)
@@ -376,7 +375,6 @@ c
       double precision :: ETri(3,0:Nsize(1)-2,1:Nsize(1)-1)
       double precision :: CurlETri(3,0:Nsize(1)-2,1:Nsize(1)-1)
       double precision :: phiE(2:Nsize(1)),DphiE(3,2:Nsize(1))
-      double precision :: phiE2(2:Nsize(1)),DphiE2(3,2:Nsize(1))
       double precision :: phiQuad(2:Nsize(1),2:Nsize(1))
       double precision :: DphiQuad(3,2:Nsize(1),2:Nsize(1))
       double precision :: DMubMExEE(3),DMuZxEQuad(3),DMubTFxETri(3)
@@ -776,8 +774,8 @@ c
       integer :: iprint,N,m,v,e,f,i,j,k,nij
       integer :: nordQF(2),ndofQF,nordTF,ndofTF,nordB,ndofB,ab(2),a,b
       integer :: minI,minJ,minK,minIJ,maxI,maxJ,maxK,maxIJ,fam
-      integer :: ij(2),ig,jg,minF(2),maxF(2),abc(3),ijmax
-      logical :: IdecME,IdecTE,IdecQF(2),GIdecQF(2),IdecTF,IdecLamTF
+      integer :: ij(2),ig,jg,minF(2),maxF(2),ijmax
+      logical :: IdecQF(2),GIdecQF(2),IdecTF,IdecLamTF
       logical :: IdecB(3)
       double precision, intent(in)  :: Xi(3)
       double precision, intent(out) :: ShapV(3,Nsize(2))

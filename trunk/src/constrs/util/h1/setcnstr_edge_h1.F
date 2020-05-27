@@ -4,7 +4,7 @@ c   routine name       - setcnstr_edge_h1
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Nov 09
+c   latest revision    - May 2020
 c
 c   purpose            - routine sets coefficients for the constrained
 c                        approximation on the master edge
@@ -38,12 +38,12 @@ c
 c  ...values of small elements shape functions, big element
 c     shape functions, derivatives (not used)
       dimension shapsma(MAXP+1,MAXP+1),shapbig(MAXP+1,MAXP+1),
-     .          void(MAXP+1),
+     .          void(MAXP+1)
 c
 c  ...pivoting array, work array
-     .          ip(MAXP+1),r(MAXP+1,MAXP+1)
+      dimension ip(MAXP+1),r(MAXP+1,MAXP+1)
 c
-      iprint=0
+      iprint = 0
 c
 c  ...clear:
       RRRH = 0.d0
@@ -67,10 +67,10 @@ c  .....local coordinates for big and small elements
         xisma = (i-1)*1.0d0/nord
 c
 c  .....find small shape functions at this point:
-        call shape1H(xisma,nord, ndofh, shapsma(1:MAXP+1,icl),void)
+        call shape1DH(xisma,nord, ndofh,shapsma(1:MAXP+1,icl),void)
 c
 c  .....find big shape functions at this point:
-        call shape1H(xibig,nord, ndofh, shapbig(1:MAXP+1,icl),void)
+        call shape1DH(xibig,nord, ndofh,shapbig(1:MAXP+1,icl),void)
       enddo
 c
 c  ...transpose shapsma and shapbig
@@ -156,10 +156,10 @@ c  .....big and small element coordinates of the collocation point
         xisma = (i-1)*1.0d0/nord
 c
 c  .....find small shape functions at this point:
-        call shape1H(xisma,nord, ndofh, shapsma(1:MAXP+1,icl),void)
+        call shape1DH(xisma,nord, ndofh,shapsma(1:MAXP+1,icl),void)
 c
 c  .....find big shape functions at this point:
-        call shape1H(xibig,nord, ndofh, shapbig(1:MAXP+1,icl),void)
+        call shape1DH(xibig,nord, ndofh,shapbig(1:MAXP+1,icl),void)
       enddo
 c
 c  ...transpose shapsma and shapbig
@@ -241,7 +241,7 @@ c
       read(*,*) xibig
 c
 c  ...shape functions of the big element
-      call shape1H(xibig,nord, ndofh, shapbig(1:MAXP+1,1),void)
+      call shape1DH(xibig,nord, ndofh,shapbig(1:MAXP+1,1),void)
 c
 c  ...determine which small element is this, and find the small
 c     element coordinate of the point
@@ -258,7 +258,7 @@ c  .....element 2 - verifying small nodes 2,3
       endif
 c
 c  ...find small shape functions at this point:
-      call shape1H(xisma,nord, ndofh, shapsma(1:MAXP+1,1),void)
+      call shape1DH(xisma,nord, ndofh,shapsma(1:MAXP+1,1),void)
 c
 c  ...verify if the values of the big shape functions match
 c     combinations of the small shape functions.......................

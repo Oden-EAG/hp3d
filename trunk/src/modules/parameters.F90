@@ -148,14 +148,14 @@ module parameters
   !----------------------------------------------------------------------
   ! real parameters
 #if C_MODE
-  complex*16, parameter :: ZERO = (0.d0,0.d0)
-  complex*16, parameter :: ZONE = (1.d0,0.d0)
-  complex*16, parameter :: ZEYE = (1.d0,0.d0)
-  complex*16, parameter :: ZIMG = (0.d0,1.d0)
+  complex(8), parameter :: ZERO = (0.d0,0.d0)
+  complex(8), parameter :: ZONE = (1.d0,0.d0)
+  complex(8), parameter :: ZEYE = (1.d0,0.d0)
+  complex(8), parameter :: ZIMG = (0.d0,1.d0)
 #else
-  real*8, parameter :: ZERO = 0.d0
-  real*8, parameter :: ZONE = 1.d0
-  complex*16, parameter :: ZIMG = (0.d0,1.d0)
+  real(8)   , parameter :: ZERO = 0.d0
+  real(8)   , parameter :: ZONE = 1.d0
+  complex(8), parameter :: ZIMG = (0.d0,1.d0)
 #endif
   !
   contains

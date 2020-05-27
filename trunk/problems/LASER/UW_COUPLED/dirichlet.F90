@@ -25,7 +25,7 @@ subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
    implicit none
 !
    integer,                       intent(in)  :: Mdle
-   real*8, dimension(3),          intent(in)  :: X
+   real(8),                       intent(in)  :: X(3)
    integer,                       intent(in)  :: Icase
 !
    VTYPE,dimension(  MAXEQNH    ),intent(out) ::   ValH

@@ -1,0 +1,5 @@
+      character(8)  lprname
+      common /cdbg/ lsolin21,lsolin22,lmelmco1,lmelmco2,lmelmco3,
+     .              lmelem1 ,lmelem2 ,lbcelem1,lbcelem2,
+     .              lmcoeff ,lbcoeff ,lsolout, lprints(20)
+      common /cdbg1/ nrbreaks,lprname(20)

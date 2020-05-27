@@ -13,10 +13,10 @@
 subroutine sphere1(X,Center,Rs1, Fval,Dfdx)
 !      
       implicit none
-      real*8, dimension(3), intent(in ) :: X,Center
-      real*8              , intent(in ) :: Rs1
-      real*8              , intent(out) :: Fval
-      real*8, dimension(3), intent(out) :: Dfdx
+      real(8), dimension(3), intent(in ) :: X,Center
+      real(8)              , intent(in ) :: Rs1
+      real(8)              , intent(out) :: Fval
+      real(8), dimension(3), intent(out) :: Dfdx
 !------------------------------------------------------------------------------------
 !
       Fval = (X(1)-Center(1))**2+(X(2)-Center(2))**2+(X(3)-Center(3))**2 - Rs1*Rs1
@@ -26,7 +26,7 @@ subroutine sphere1(X,Center,Rs1, Fval,Dfdx)
       Dfdx(3) = (X(3)-Center(3))*2
 !
 !        
-endsubroutine sphere1
+end subroutine sphere1
 
 
        

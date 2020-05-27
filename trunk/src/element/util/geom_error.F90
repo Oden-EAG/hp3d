@@ -59,9 +59,9 @@ subroutine geom_error(Err,Rnorm)
       use environment      , only : QUIET_MODE,L2GEOM
 !      
       implicit none
-      real*8, intent(out) ::  Err, Rnorm
+      real(8), intent(out) ::  Err, Rnorm
 !
-      real*8  :: derr, dnorm, err_rate
+      real(8) :: derr, dnorm, err_rate
       integer :: iprint, mdle, iel, ierr, i, nrgdof, nvoid , ic
 !
       integer,parameter :: nin=13
@@ -69,8 +69,8 @@ subroutine geom_error(Err,Rnorm)
 !
       integer, save :: ivis = 0
       integer, save :: nrgdof_save
-      real*8 , save ::    err_save
-      real*8 , dimension(maxvis,4), save :: rwork
+      real(8), save ::    err_save
+      real(8), dimension(maxvis,4), save :: rwork
       integer, dimension(maxvis,1), save :: iwork
 !-------------------------------------------------------------------------
 !
@@ -207,7 +207,7 @@ ENDIF
       endif
 !      
 !
-endsubroutine geom_error
+end subroutine geom_error
 !
 !
 !
@@ -229,31 +229,31 @@ subroutine geom_error_elem(Mdle, Derr,Dnorm)
 !
       implicit none
       integer, intent(in   ) :: Mdle
-      real*8,  intent(inout) :: Dnorm, Derr
+      real(8), intent(inout) :: Dnorm, Derr
 !  
 !     order of approx., gdof's, orientations
       integer, dimension(19)          :: norder
-      real*8,  dimension(3,MAXbrickH) :: xnod
+      real(8), dimension(3,MAXbrickH) :: xnod
       integer :: nedge_orient(12), nface_orient(6)
 !    
 !     shape functions
-      real*8 :: shapH(MAXbrickH),dshapH(3,MAXbrickH)
+      real(8) :: shapH(MAXbrickH),dshapH(3,MAXbrickH)
 !    
 !     geometry
-      real*8, dimension(3)   :: xi,x_ex,x_hp
-      real*8, dimension(3,3) :: dx_hpdxi,dxidx_ex,dx_exdxi,dx_hpdx_ex
+      real(8), dimension(3)   :: xi,x_ex,x_hp
+      real(8), dimension(3,3) :: dx_hpdxi,dxidx_ex,dx_exdxi,dx_hpdx_ex
 !    
 !     quadrature
-      real*8 :: xiloc(3,MAX_NINT3),wxi(MAX_NINT3)
+      real(8) :: xiloc(3,MAX_NINT3),wxi(MAX_NINT3)
 !  
       character(len=4) :: etype
 7001  format(' geom_error_elem: Mdle,type = ',i10,2x,a4)
 !
-      real*8,dimension(3,3),parameter :: del = &
+      real(8),dimension(3,3),parameter :: del = &
       reshape((/1.d0,0.d0,0.d0, 0.d0,1.d0,0.d0, 0.d0,0.d0,1.d0/),(/3,3/))
 ! 
       integer :: i,j,k,l,nint,nrdofH,iprint,iflag
-      real*8  :: wa,weight,rjac,s
+      real(8) :: wa,weight,rjac,s
 !---------------------------------------------------------------------
 !
       iprint=0
@@ -281,7 +281,7 @@ subroutine geom_error_elem(Mdle, Derr,Dnorm)
         xi(1:3)=xiloc(1:3,l) ; wa=wxi(l)
 !
 !       evaluate appropriate shape functions at the point
-        call shape3H(etype,xi,norder,nedge_orient,nface_orient, nrdofH,shapH,dshapH)
+        call shape3DH(etype,xi,norder,nedge_orient,nface_orient, nrdofH,shapH,dshapH)
 !
 !       ISOPARAMETRIC MAP : x_hp = x_hp(xi)
         x_hp(1:3)=0.d0 ; dx_hpdxi(1:3,1:3)=0.d0 
@@ -356,7 +356,7 @@ subroutine geom_error_elem(Mdle, Derr,Dnorm)
       NODES(Mdle)%error(:,0)=0.d0 ; NODES(Mdle)%error(0,0)=Derr
 !
 !
-endsubroutine geom_error_elem
+end subroutine geom_error_elem
 !
 !
 !
@@ -365,7 +365,7 @@ subroutine check_geom_error
     use data_structure3D
     implicit none
     integer :: mdle,i,j,nfath,ns,nrsons,nfail
-    real*8  :: err_fath,err_sons
+    real(8) :: err_fath,err_sons
 
 !  ...lower visitation flag
       call reset_visit
@@ -438,7 +438,7 @@ subroutine display_geom_error(Nfath)
       use data_structure3D
       implicit none
       integer,intent(in) :: Nfath
-      real*8  :: err_sons
+      real(8) :: err_sons
       integer :: j,nrsons,ns
 !
 !

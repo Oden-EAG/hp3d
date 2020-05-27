@@ -36,25 +36,25 @@ subroutine get_power(Fld,NumPts,FileIter)
    integer, intent(in)    :: FileIter
    integer, intent(inout) :: NumPts
 !
-   real*8, allocatable :: zValues(:)
-   real*8, allocatable :: sign_power(:),pump_power(:)
-   real*8, allocatable :: diff_power(:),efficiency(:)
-   real*8, allocatable :: core_power(:),clad_power(:)
+   real(8), allocatable :: zValues(:)
+   real(8), allocatable :: sign_power(:),pump_power(:)
+   real(8), allocatable :: diff_power(:),efficiency(:)
+   real(8), allocatable :: core_power(:),clad_power(:)
 !
-   real*8, allocatable :: power_LP01(:),power_LP11(:)
-   real*8, allocatable :: power_LP21(:),power_LP02(:)
-   real*8, allocatable :: norm_LP01(:),norm_LP11(:)
-   real*8, allocatable :: norm_LP21(:),norm_LP02(:)
-   real*8, allocatable :: coef_LP01_r(:),coef_LP11_r(:)
-   real*8, allocatable :: coef_LP21_r(:),coef_LP02_r(:)
-   real*8, allocatable :: coef_LP01_c(:),coef_LP11_c(:)
-   real*8, allocatable :: coef_LP21_c(:),coef_LP02_c(:)
+   real(8), allocatable :: power_LP01(:),power_LP11(:)
+   real(8), allocatable :: power_LP21(:),power_LP02(:)
+   real(8), allocatable :: norm_LP01(:),norm_LP11(:)
+   real(8), allocatable :: norm_LP21(:),norm_LP02(:)
+   real(8), allocatable :: coef_LP01_r(:),coef_LP11_r(:)
+   real(8), allocatable :: coef_LP21_r(:),coef_LP02_r(:)
+   real(8), allocatable :: coef_LP01_c(:),coef_LP11_c(:)
+   real(8), allocatable :: coef_LP21_c(:),coef_LP02_c(:)
 !
-   real*8  :: a,b
+   real(8)  :: a,b
    integer :: i
 !
-   character*8  :: fmt,suffix
-   character*64 :: filename
+   character(8)  :: fmt,suffix
+   character(64) :: filename
 !
    integer :: count,ierr
 !
@@ -437,12 +437,12 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
    implicit none
 !
    integer, intent(in)  :: Num_zpts
-   real*8,  intent(in)  :: ZValues(Num_zpts)
+   real(8), intent(in)  :: ZValues(Num_zpts)
    integer, intent(in)  :: Fld
-   real*8,  intent(out) :: Power(Num_zpts)
-   real*8,  intent(out) :: DiffPower(Num_zpts)
-   real*8,  intent(out) :: CorePower(Num_zpts)
-   real*8,  intent(out) :: CladPower(Num_zpts)
+   real(8), intent(out) :: Power(Num_zpts)
+   real(8), intent(out) :: DiffPower(Num_zpts)
+   real(8), intent(out) :: CorePower(Num_zpts)
+   real(8), intent(out) :: CladPower(Num_zpts)
 !
 !..auxiliary variables
    real(8)    :: facePower, faceDiffPower, elemPower
@@ -453,8 +453,8 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
    integer :: mdle
 !
 !..element, face order, geometry dof
-   real*8 :: xnod (3,MAXbrickH)
-   real*8 :: maxz,minz
+   real(8) :: xnod (3,MAXbrickH)
+   real(8) :: maxz,minz
 !
 !..miscellanea
    integer :: iel, i, ndom
@@ -586,17 +586,17 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
    integer, intent(in)  :: Mdle
    integer, intent(in)  :: Fld
    integer, intent(in)  :: Facenumber
-   real*8,  intent(out) :: FacePower
-   real*8,  intent(out) :: FaceDiffPower
+   real(8), intent(out) :: FacePower
+   real(8), intent(out) :: FaceDiffPower
 !
 !..element, face order, geometry dof
-   integer,dimension(19)          :: norder
-   real*8 ,dimension(3,MAXbrickH) :: xnod
-   integer,dimension(12)          :: nedge_orient
-   integer,dimension(6)           :: nface_orient
+   integer, dimension(19)          :: norder
+   real(8), dimension(3,MAXbrickH) :: xnod
+   integer, dimension(12)          :: nedge_orient
+   integer, dimension(6)           :: nface_orient
 !
 !..face order
-   integer, dimension(5) :: norderf
+   integer :: norderf(5)
 !
 !..number of vertices,edge,faces per element type
    integer :: nrv, nre, nrf
@@ -605,15 +605,15 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
    character(len=4) :: etype,ftype
 !
 !..variables for geometry
-   real*8, dimension(3)      :: xi,x,rn,x_new
-   real*8, dimension(3,2)    :: dxidt,dxdt,rt
-   real*8, dimension(3,3)    :: dxdxi,dxidx
-   real*8, dimension(2)      :: t
-   real*8                    :: rjac,bjac
+   real(8), dimension(3)   :: xi,x,rn,x_new
+   real(8), dimension(3,2) :: dxidt,dxdt,rt
+   real(8), dimension(3,3) :: dxdxi,dxidx
+   real(8), dimension(2)   :: t
+   real(8)                 :: rjac,bjac
 !
 !..2D quadrature data
-   real*8, dimension(2,MAXNINT2ADD)  :: tloc
-   real*8, dimension(MAXNINT2ADD)    :: wtloc
+   real(8), dimension(2,MAXNINT2ADD) :: tloc
+   real(8), dimension(MAXNINT2ADD)   :: wtloc
 !
 !..approximate solution dof's
    VTYPE, dimension(MAXEQNH,MAXbrickH) :: zdofH
@@ -622,8 +622,8 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
    VTYPE, dimension(MAXEQNQ,MAXbrickQ) :: zdofQ
 !..H1 shape functions
    integer                         :: nrdofH
-   real*8, dimension(MAXbrickH)    :: shapH
-   real*8, dimension(3,MAXbrickH)  :: gradH
+   real(8), dimension(MAXbrickH)   :: shapH
+   real(8), dimension(3,MAXbrickH) :: gradH
 !
 !..approximate solution
    VTYPE, dimension(  MAXEQNH  ) ::  zsolH
@@ -635,28 +635,28 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
    VTYPE, dimension(  MAXEQNQ  ) ::  zsolQ
 !
 !..exact solution
-   VTYPE,dimension(  MAXEQNH    )  ::   ValH
-   VTYPE,dimension(  MAXEQNH,3  )  ::  DvalH
-   VTYPE,dimension(  MAXEQNH,3,3)  :: d2valH
-   VTYPE,dimension(3,MAXEQNE    )  ::   ValE
-   VTYPE,dimension(3,MAXEQNE,3  )  ::  DvalE
-   VTYPE,dimension(3,MAXEQNE,3,3)  :: d2valE
-   VTYPE,dimension(3,MAXEQNV    )  ::   ValV
-   VTYPE,dimension(3,MAXEQNV,3  )  ::  DvalV
+   VTYPE,dimension(  MAXEQNH    ) ::   ValH
+   VTYPE,dimension(  MAXEQNH,3  ) ::  DvalH
+   VTYPE,dimension(  MAXEQNH,3,3) :: d2valH
+   VTYPE,dimension(3,MAXEQNE    ) ::   ValE
+   VTYPE,dimension(3,MAXEQNE,3  ) ::  DvalE
+   VTYPE,dimension(3,MAXEQNE,3,3) :: d2valE
+   VTYPE,dimension(3,MAXEQNV    ) ::   ValV
+   VTYPE,dimension(3,MAXEQNV,3  ) ::  DvalV
 !
 !..exact solution (UNUSED)
-   VTYPE,dimension(3,MAXEQNV,3,3)  :: d2valV
-   VTYPE,dimension(  MAXEQNQ    )  ::   valQ
-   VTYPE,dimension(  MAXEQNQ,3  )  ::  dvalQ
-   VTYPE,dimension(  MAXEQNQ,3,3)  :: d2valQ
+   VTYPE,dimension(3,MAXEQNV,3,3) :: d2valV
+   VTYPE,dimension(  MAXEQNQ    ) ::   valQ
+   VTYPE,dimension(  MAXEQNQ,3  ) ::  dvalQ
+   VTYPE,dimension(  MAXEQNQ,3,3) :: d2valQ
 !
 !..for Poynting vector
-   VTYPE, dimension(3)  :: EtimesH1,EtimesH2
-   VTYPE                :: FdotN
+   VTYPE, dimension(3) :: EtimesH1,EtimesH2
+   VTYPE               :: FdotN
 !
 !..miscellanea
    integer :: nint,icase,iattr,l,i,j
-   real*8  :: weight,wa
+   real(8) :: weight,wa
    integer :: iel,nsign
    integer :: nflag,iload
 !
@@ -696,12 +696,12 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
       call face_param(etype,Facenumber,t, xi,dxidt)
 !
 !  ...determine element H1 shape functions (for geometry)
-      call shape3H(etype,xi,norder,nedge_orient,nface_orient, &
-                     nrdofH,shapH,gradH)
+      call shape3DH(etype,xi,norder,nedge_orient,nface_orient, &
+                    nrdofH,shapH,gradH)
 !
 !  ...geometry
       call bgeom3D(Mdle,xi,xnod,shapH,gradH,nrdofH,dxidt,nsign, &
-                     x,dxdxi,dxidx,rjac,dxdt,rn,bjac)
+                   x,dxdxi,dxidx,rjac,dxdt,rn,bjac)
       weight = bjac*wtloc(l)
 !
       call soleval(Mdle,xi,nedge_orient,nface_orient,norder,xnod, &
@@ -792,13 +792,13 @@ subroutine compute_mode_power(Mdle,Facenumber,Fld, ModePower,ModeNorm,ModeCoef)
    integer   , intent(in)  :: Mdle
    integer   , intent(in)  :: Fld
    integer   , intent(in)  :: Facenumber
-   real*8    , intent(out) :: ModePower
-   real*8    , intent(out) :: ModeNorm
+   real(8)   , intent(out) :: ModePower
+   real(8)   , intent(out) :: ModeNorm
    complex(8), intent(out) :: ModeCoef
 !
 !..element, face order, geometry dof
    integer,dimension(19)          :: norder
-   real*8 ,dimension(3,MAXbrickH) :: xnod
+   real(8),dimension(3,MAXbrickH) :: xnod
    integer,dimension(12)          :: nedge_orient
    integer,dimension(6)           :: nface_orient
 !
@@ -812,15 +812,15 @@ subroutine compute_mode_power(Mdle,Facenumber,Fld, ModePower,ModeNorm,ModeCoef)
    character(len=4) :: etype,ftype
 !
 !..variables for geometry
-   real*8, dimension(3)      :: xi,x,rn,x_new
-   real*8, dimension(3,2)    :: dxidt,dxdt,rt
-   real*8, dimension(3,3)    :: dxdxi,dxidx
-   real*8, dimension(2)      :: t
-   real*8                    :: rjac,bjac
+   real(8), dimension(3)   :: xi,x,rn,x_new
+   real(8), dimension(3,2) :: dxidt,dxdt,rt
+   real(8), dimension(3,3) :: dxdxi,dxidx
+   real(8), dimension(2)   :: t
+   real(8)                 :: rjac,bjac
 !
 !..2D quadrature data
-   real*8, dimension(2,MAXNINT2ADD)  :: tloc
-   real*8, dimension(MAXNINT2ADD)    :: wtloc
+   real(8), dimension(2,MAXNINT2ADD) :: tloc
+   real(8), dimension(MAXNINT2ADD)   :: wtloc
 !
 !..approximate solution dof's
    VTYPE, dimension(MAXEQNH,MAXbrickH) :: zdofH
@@ -829,8 +829,8 @@ subroutine compute_mode_power(Mdle,Facenumber,Fld, ModePower,ModeNorm,ModeCoef)
    VTYPE, dimension(MAXEQNQ,MAXbrickQ) :: zdofQ
 !..H1 shape functions
    integer                         :: nrdofH
-   real*8, dimension(MAXbrickH)    :: shapH
-   real*8, dimension(3,MAXbrickH)  :: gradH
+   real(8), dimension(MAXbrickH)   :: shapH
+   real(8), dimension(3,MAXbrickH) :: gradH
 !
 !..approximate solution
    VTYPE, dimension(  MAXEQNH  ) ::  zsolH
@@ -842,28 +842,28 @@ subroutine compute_mode_power(Mdle,Facenumber,Fld, ModePower,ModeNorm,ModeCoef)
    VTYPE, dimension(  MAXEQNQ  ) ::  zsolQ
 !
 !..exact solution
-   VTYPE,dimension(  MAXEQNH    )  ::   ValH
-   VTYPE,dimension(  MAXEQNH,3  )  ::  DvalH
-   VTYPE,dimension(  MAXEQNH,3,3)  :: d2valH
-   VTYPE,dimension(3,MAXEQNE    )  ::   ValE
-   VTYPE,dimension(3,MAXEQNE,3  )  ::  DvalE
-   VTYPE,dimension(3,MAXEQNE,3,3)  :: d2valE
-   VTYPE,dimension(3,MAXEQNV    )  ::   ValV
-   VTYPE,dimension(3,MAXEQNV,3  )  ::  DvalV
+   VTYPE,dimension(  MAXEQNH    ) ::   ValH
+   VTYPE,dimension(  MAXEQNH,3  ) ::  DvalH
+   VTYPE,dimension(  MAXEQNH,3,3) :: d2valH
+   VTYPE,dimension(3,MAXEQNE    ) ::   ValE
+   VTYPE,dimension(3,MAXEQNE,3  ) ::  DvalE
+   VTYPE,dimension(3,MAXEQNE,3,3) :: d2valE
+   VTYPE,dimension(3,MAXEQNV    ) ::   ValV
+   VTYPE,dimension(3,MAXEQNV,3  ) ::  DvalV
 !
 !..exact solution (UNUSED)
-   VTYPE,dimension(3,MAXEQNV,3,3)  :: d2valV
-   VTYPE,dimension(  MAXEQNQ    )  ::   valQ
-   VTYPE,dimension(  MAXEQNQ,3  )  ::  dvalQ
-   VTYPE,dimension(  MAXEQNQ,3,3)  :: d2valQ
+   VTYPE,dimension(3,MAXEQNV,3,3) :: d2valV
+   VTYPE,dimension(  MAXEQNQ    ) ::   valQ
+   VTYPE,dimension(  MAXEQNQ,3  ) ::  dvalQ
+   VTYPE,dimension(  MAXEQNQ,3,3) :: d2valQ
 !
 !..for Poynting vector
-   VTYPE, dimension(3)  :: EtimesH
-   VTYPE                :: FdotN
+   VTYPE :: EtimesH(3)
+   VTYPE :: FdotN
 !
 !..miscellanea
    integer :: nint,icase,iattr,l,i,j
-   real*8  :: weight,wa
+   real(8) :: weight,wa
    integer :: iel,nsign
    integer :: nflag,iload
 !
@@ -903,8 +903,8 @@ subroutine compute_mode_power(Mdle,Facenumber,Fld, ModePower,ModeNorm,ModeCoef)
       call face_param(etype,Facenumber,t, xi,dxidt)
 !
 !  ...determine element H1 shape functions (for geometry)
-      call shape3H(etype,xi,norder,nedge_orient,nface_orient, &
-                     nrdofH,shapH,gradH)
+      call shape3DH(etype,xi,norder,nedge_orient,nface_orient, &
+                    nrdofH,shapH,gradH)
 !
 !  ...geometry
       call bgeom3D(Mdle,xi,xnod,shapH,gradH,nrdofH,dxidt,nsign, &
@@ -941,8 +941,8 @@ subroutine compute_mode_power(Mdle,Facenumber,Fld, ModePower,ModeNorm,ModeCoef)
       call face_param(etype,Facenumber,t, xi,dxidt)
 !
 !  ...determine element H1 shape functions (for geometry)
-      call shape3H(etype,xi,norder,nedge_orient,nface_orient, &
-                     nrdofH,shapH,gradH)
+      call shape3DH(etype,xi,norder,nedge_orient,nface_orient, &
+                    nrdofH,shapH,gradH)
 !
 !  ...geometry
       call bgeom3D(Mdle,xi,xnod,shapH,gradH,nrdofH,dxidt,nsign, &

@@ -12,14 +12,19 @@
 !-----------------------------------------------------------------------
 subroutine scalar_product(Vec1,Vec2, Prod)
 !
-      implicit none
-      real*8,dimension(3),intent(in ) :: Vec1,Vec2
-      real*8,             intent(out) :: Prod
+   implicit none
 !
-      integer :: i
+   real(8), intent(in ) :: Vec1(3),Vec2(3)
+   real(8), intent(out) :: Prod
+!
+   integer :: i
+!
 !-----------------------------------------------------------------------
 !  
       Prod=0.d0
-      do i=1,3 ; Prod=Prod+Vec1(i)*Vec2(i) ; enddo
+      do i=1,3
+         Prod = Prod + Vec1(i)*Vec2(i)
+      enddo
 !      
-endsubroutine scalar_product
+end subroutine scalar_product
+

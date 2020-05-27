@@ -2,12 +2,12 @@
       use GMP
       implicit none
       integer, dimension(2,2),intent(in) :: Iwork
-      real*8,dimension(2) :: eta
-      real*8,dimension(3) :: x,vec
-      real*8,dimension(3,2) :: dx,vec_aux
-      real*8 :: nsub = 12.d0
-      integer:: isub = 12
-      real*8 :: error,s
+      real(8),dimension(2)   :: eta
+      real(8),dimension(3)   :: x,vec
+      real(8),dimension(3,2) :: dx,vec_aux
+      real(8) :: nsub = 12.d0
+      integer :: isub = 12
+      real(8) :: error,s
       integer :: nt,i,it,iprint
 
 

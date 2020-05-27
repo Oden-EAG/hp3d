@@ -10,11 +10,11 @@ subroutine adapt_mesh_size(Idom,Hmax)
   use data_structure3D, only : NRELES
   implicit none
   integer, intent(in) :: Idom
-  real*8 , intent(in) :: Hmax
+  real(8), intent(in) :: Hmax
   !
   integer, allocatable :: nlist(:)
   integer :: mdle, iel, ic, istat, kref, ndom, nelts_prev
-  real*8 :: h
+  real(8) :: h
   !
   ic = 1;
   do while (ic > 0)

@@ -20,7 +20,7 @@
 !
 !-----------------------------------------------------------------------
 !
-#include 'implicit_none.h'
+#include "implicit_none.h"
 !
    subroutine get_macro_arrays(Igrid, Ielc, Abi, bb,nb,ni)
 !
@@ -33,7 +33,7 @@
    use macro_grid_info,  ONLY: A_MACRO
    use mg_data_structure,ONLY: GRID, NODES_MG, ISTORE, ISTORE_YES
 !
-   IMPLICIT NONE
+   implicit none
 !
 !-----------------------------------------------------------------------
 !

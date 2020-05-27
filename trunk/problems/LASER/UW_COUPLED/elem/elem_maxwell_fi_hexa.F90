@@ -89,7 +89,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    integer, dimension(5)     :: norderf
 !
 !..geometry dof (work space for nodcor)
-   real*8, dimension(3,MAXbrickH) :: xnod
+   real(8) :: xnod(3,MAXbrickH)
 !
 !..solution dof (work space for solelm)
    VTYPE, dimension(MAXEQNH,MAXbrickH) :: zdofH
@@ -106,28 +106,28 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    VTYPE, dimension(3,MAXEQNV  ) ::  zsolV_soleval
    VTYPE, dimension(  MAXEQNV  ) ::  zdivV_soleval
    VTYPE, dimension(  MAXEQNQ  ) ::  zsolQ_soleval
-   real*8 :: rsolH
+   real(8) :: rsolH
 !
 !..variables for geometry
-   real*8, dimension(3)    :: xi,x,rn
-   real*8, dimension(3,2)  :: dxidt,dxdt,rt
-   real*8, dimension(3,3)  :: dxdxi,dxidx
-   real*8, dimension(2)    :: t
+   real(8), dimension(3)    :: xi,x,rn
+   real(8), dimension(3,2)  :: dxidt,dxdt,rt
+   real(8), dimension(3,3)  :: dxdxi,dxidx
+   real(8), dimension(2)    :: t
 !
 !..H1 shape functions
-   real*8, dimension(MAXbrickH)    :: shapH
-   real*8, dimension(3,MAXbrickH)  :: gradH
+   real(8), dimension(MAXbrickH)    :: shapH
+   real(8), dimension(3,MAXbrickH)  :: gradH
 !
 !..H(curl) shape functions
-   real*8, dimension(3,MAXbrickE)  :: shapE
-   real*8, dimension(3,MAXbrickE)  :: curlE
+   real(8), dimension(3,MAXbrickE)  :: shapE
+   real(8), dimension(3,MAXbrickE)  :: curlE
 !
 !..L2 shape functions
-   real*8, dimension(MAXbrickQ)    :: shapQ
+   real(8), dimension(MAXbrickQ)    :: shapQ
 !
 !..Enriched H1 shape functions
-   real*8 , dimension(3,MAXbrickEE) :: shapEE
-   real*8 , dimension(3,MAXbrickEE) :: curlEE
+   real(8), dimension(3,MAXbrickEE) :: shapEE
+   real(8), dimension(3,MAXbrickEE) :: curlEE
 !
 !..nrdof for interface only (without bubbles)
    integer :: nrdofEEi
@@ -144,9 +144,9 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !..Gram matrix in packed format
    !complex(8) :: gramP(NrTest*(NrTest+1)/2)
    complex(8), allocatable :: gramP(:)
-   real*8  :: FF, CF, FC
-   real*8  :: fldE(3), fldH(3), crlE(3), crlH(3)
-   real*8  :: fldF(3), fldG(3), crlF(3), crlG(3)
+   real(8) :: FF, CF, FC
+   real(8) :: fldE(3), fldH(3), crlE(3), crlH(3)
+   real(8) :: fldF(3), fldG(3), crlF(3), crlG(3)
 !
 !..matrices for transpose filling (swapped loops)
 !..stiffness matrices (transposed) for the enriched test space
@@ -158,29 +158,29 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    complex(8), allocatable :: stiff_ALL(:,:),zaloc(:,:)
 !
 !..3D quadrature data
-   real*8, dimension(3,MAXNINT3ADD)  :: xiloc
-   real*8, dimension(  MAXNINT3ADD)  :: waloc
+   real(8), dimension(3,MAXNINT3ADD)  :: xiloc
+   real(8), dimension(  MAXNINT3ADD)  :: waloc
 !
 !..2D quadrature data
-   real*8, dimension(2,MAXNINT2ADD)  :: tloc
-   real*8, dimension(  MAXNINT2ADD)  :: wtloc
+   real(8), dimension(2,MAXNINT2ADD)  :: tloc
+   real(8), dimension(  MAXNINT2ADD)  :: wtloc
 !
 !..BC's flags
-   integer, dimension(6,NR_PHYSA)    :: ibc
+   integer, dimension(6,NR_PHYSA)     :: ibc
 !
 !..for auxiliary computation
    complex(8) :: zaux
 !
 !..Maxwell load and auxiliary variables
    complex(8), dimension(3) :: zJ,zImp
-   real*8    , dimension(3) :: E1,E2,rntimesE,rn2timesE
+   real(8)   , dimension(3) :: E1,E2,rntimesE,rn2timesE
 !
 !..number of edge,faces per element type
    integer :: nre, nrf
 !
 !..various variables for the problem
-   real*8  :: h_elem,rjac,weight,wa,v2n,CC,EE,CE,E,EC,q,h,omeg,alpha_scale
-   real*8  :: bjac
+   real(8) :: h_elem,rjac,weight,wa,v2n,CC,EE,CE,E,EC,q,h,omeg,alpha_scale
+   real(8) :: bjac
    integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,ik,j,k,l,nint,kE,n,m
    integer :: iflag,iprint,itime,iverb
    integer :: nrdof,nordP,nsign,ifc,ndom,info,icomp,idec
@@ -190,11 +190,11 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !
 !..for polarizations function
    complex(8), dimension(3,3) :: bg_pol,gain_pol,raman_pol
-   real*8  :: delta_n
+   real(8) :: delta_n
    integer :: dom_flag
 !
 !..OMEGA_RATIO_SIGNAL or OMEGA_RATIO_PUMP
-   real*8 :: OMEGA_RATIO_FLD
+   real(8) :: OMEGA_RATIO_FLD
 !
 !..for PML
    VTYPE :: zbeta,zdbeta,zd2beta,detJstretch
@@ -226,16 +226,16 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    integer :: nrdofH1,nrdofH2,nrdofH3
    integer :: nrdofH1_tr,nrdofH2_tr,nrdofH3_tr
    integer :: nrdofQ1_tr,nrdofQ2_tr,nrdofQ3_tr
-   real*8 :: xi1,xi2,xi3,wt1,wt2,wt3,clock1,clock2
-   real*8 :: wt123,weighthh,weightvv
-   real*8, dimension(MAXPP+1) :: xilocx,xilocy,xilocz
-   real*8, dimension(MAXPP+1) :: wlocx,wlocy,wlocz
-   real*8, dimension(3,MAXNINT3ADD) :: wloc3
-   real*8, dimension(3) :: xip,dHdx,dHHdx
-   real*8, dimension(3,3) :: D_za,D_zc,D_aux,C,D
-   VTYPE , dimension(3,3) :: Z_za,Z_zc,Z_aux
-   real*8, dimension(MAXPP+1,2) :: shapH1,shapH2,shapH3
-   real*8, dimension(MAXPP+1,MAXPP+1) :: sH2p,sH3p,dsH2p,dsH3p
+   real(8) :: xi1,xi2,xi3,wt1,wt2,wt3,clock1,clock2
+   real(8) :: wt123,weighthh,weightvv
+   real(8), dimension(MAXPP+1) :: xilocx,xilocy,xilocz
+   real(8), dimension(MAXPP+1) :: wlocx,wlocy,wlocz
+   real(8), dimension(3,MAXNINT3ADD) :: wloc3
+   real(8), dimension(3) :: xip,dHdx,dHHdx
+   real(8), dimension(3,3) :: D_za,D_zc,D_aux,C,D
+   VTYPE  , dimension(3,3) :: Z_za,Z_zc,Z_aux
+   real(8), dimension(MAXPP+1,2) :: shapH1,shapH2,shapH3
+   real(8), dimension(MAXPP+1,MAXPP+1) :: sH2p,sH3p,dsH2p,dsH3p
    integer, dimension(3,3) :: deltak
 !
 !..for Gram matrix compressed storage format
@@ -526,7 +526,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
             shapH3(:,2)=dsH3p(:,pz)
 !
 !        ...Compute shape functions needed for geometry - 3D H1 shape functions
-            call shape3H(etype,xip,norder,norient_edge,norient_face, nrdof,shapH,gradH)
+            call shape3DH(etype,xip,norder,norient_edge,norient_face, nrdof,shapH,gradH)
 #if DEBUG_MODE
             if (nrdof .ne. NrdofH) then
                write(*,*) 'elem_maxwell_fi_hexa: INCONSISTENCY NrdofH. stop.'
@@ -602,7 +602,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !.....................................................
 !...............toggle PML............................
 !
-            if(USE_PML.eq.0) then
+            if(.not. USE_PML) then
                JJstretch      = ZERO
                JJstretch(1,1) = ZONE
                JJstretch(2,2) = ZONE
@@ -1395,8 +1395,8 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 #endif
 !
 !     ...determine element H1 shape functions (for geometry)
-         call shape3H(etype,xi,norder,norient_edge,norient_face, &
-                      nrdof,shapH,gradH)
+         call shape3DH(etype,xi,norder,norient_edge,norient_face, &
+                       nrdof,shapH,gradH)
 #if DEBUG_MODE
          if (nrdof .ne. NrdofH) then
             write(*,*) 'elem_maxwell_fi_hexa: INCONSISTENCY NrdofH. stop.'
@@ -1406,8 +1406,8 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !
 !     ...determine element H(curl) shape functions (for fluxes)
 !     ...for interfaces only (no bubbles)
-         call shape3E(etype,xi,norderi,norient_edge,norient_face, &
-                      nrdof,shapE,curlE)
+         call shape3DE(etype,xi,norderi,norient_edge,norient_face, &
+                       nrdof,shapE,curlE)
 #if DEBUG_MODE
          if (nrdof .ne. NrdofEi) then
             write(*,*) 'elem_maxwell_fi_hexa: INCONSISTENCY NrdofEi. stop.'

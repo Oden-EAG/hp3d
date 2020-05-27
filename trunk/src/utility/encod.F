@@ -68,11 +68,11 @@ c
 c
       integer,             intent(in)    :: Mod,N
       integer,dimension(N),intent(in)    :: Narray
-      integer*8,           intent(out)   :: Nick
+      integer(8),           intent(out)  :: Nick
 c
 c  ...local variables
-      integer   :: i
-      integer*8 :: longmod
+      integer    :: i
+      integer(8) :: longmod
 c  ...be careful with integer type - need to convert!
       longmod = int(Mod,8)
       Nick = int(Narray(1),8)    

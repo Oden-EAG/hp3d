@@ -13,16 +13,16 @@ subroutine prism(No,Eta, X,Dxdeta)
       use GMP
 !
       implicit none
-      integer,              intent(in ) :: No 
-      real*8,dimension(3  ),intent(in ) :: Eta
-      real*8,dimension(3  ),intent(out) :: X
-      real*8,dimension(3,3),intent(out) :: Dxdeta
+      integer,               intent(in ) :: No
+      real(8),dimension(3  ),intent(in ) :: Eta
+      real(8),dimension(3  ),intent(out) :: X
+      real(8),dimension(3,3),intent(out) :: Dxdeta
 !      
 !  ...vertex coordinates
-      real*8,dimension(3,6) :: xv
+      real(8),dimension(3,6) :: xv
 !  ...vertex shape functions
-      real*8,dimension(  8) :: vshape
-      real*8,dimension(3,8) :: dvshape
+      real(8),dimension(  8) :: vshape
+      real(8),dimension(3,8) :: dvshape
       integer :: iv,np,k,i
       integer :: iprint
 !------------------------------------------------------------------------------------

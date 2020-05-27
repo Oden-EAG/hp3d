@@ -131,7 +131,7 @@
 !
    use mg_data_structure, only: GRID
 !
-   IMPLICIT NONE
+   implicit none
 ! 
    integer, intent(in)  :: Igrid
    integer              :: mdle, iel,ip, nf, ne
@@ -222,7 +222,7 @@
    use constrained_nodes
    use constraints
 
-   IMPLICIT NONE
+   implicit none
 !
    integer, intent(in)  :: Igrid
    integer, intent(in)  :: Mdle
@@ -414,7 +414,7 @@
    use data_structure3D, only: NODES,Son
    use refinements_2D,  only : nr_sons
 !   
-   IMPLICIT NONE
+   implicit none
 !   
 !-----------------------------------------------------------------------
 !

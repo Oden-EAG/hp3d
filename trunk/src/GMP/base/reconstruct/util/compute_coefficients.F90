@@ -7,11 +7,11 @@
       implicit none
 !---------------------------------------------------------------------------------
 !     DUMMY ARGUMENTS
-      real*8,intent(in)  :: s
+      real(8), intent(in)  :: s
       integer, intent(in)  :: i,j
-      real*8,intent(out) :: c
+      real(8), intent(out) :: c
 !     LOCAL VARIABLES      
-      real*8             :: poly1,poly2,poly3,dpoly
+      real(8)              :: poly1,poly2,poly3,dpoly
       integer              :: iprint
       integer,parameter    :: deg = 7
 !---------------------------------------------------------------------------------
@@ -27,9 +27,7 @@
  1000   format(' compute_coefficients: i = ',i1,'; j = ',i1,'; --> c = ',e12.5)          
       endif
 !
-      end
-
-
+      end subroutine
 
 
 !---------------------------------------------------------------------------------
@@ -41,11 +39,11 @@
       implicit none
 !---------------------------------------------------------------------------------
 !     DUMMY ARGUMENTS
-      real*8,intent(in)  :: s
+      real(8), intent(in)  :: s
       integer, intent(in)  :: i,j,d
-      real*8,intent(out) :: c
+      real(8), intent(out) :: c
 !     LOCAL VARIABLES      
-      real*8             :: poly1,poly2,poly3,poly4,dpoly
+      real(8)              :: poly1,poly2,poly3,poly4,dpoly
       integer              :: iprint
       integer,parameter    :: deg = 7
 !---------------------------------------------------------------------------------
@@ -83,10 +81,9 @@
             (poly1 - 3.d0*poly2 + 3.d0*poly3 - poly4)*(-1.d0)**(j+1)
       endselect
 
-
       if (iprint.eq.1) then
         write(*,1000)d,i,j,c
  1000   format(' rad_der_coefficient: d = ',i1,'; i = ',i1,'; j = ',i1,'; --> c = ',e12.5)          
       endif
 !
-      end
+      end subroutine

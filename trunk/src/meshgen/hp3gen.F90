@@ -31,7 +31,7 @@ subroutine hp3gen(Fp)
   !
   !  ...faces adjacent to a vertex
   integer :: nofaces(4)
-  real*8  :: x(NDIMEN)
+  real(8) :: x(NDIMEN)
   !
   !  ...physical attributes for an element or node
   character(len=5) :: phys

@@ -57,7 +57,7 @@
    use prolongation
    use mg_data_structure
 !
-   IMPLICIT NONE
+   implicit none
 !
 !..globals in
    integer, intent(in)  :: Igrid, MdleC, Nod_macro(Nrnod_macro), Nrnod_macro

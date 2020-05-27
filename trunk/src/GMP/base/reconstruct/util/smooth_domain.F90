@@ -16,7 +16,7 @@ subroutine smooth_domain(Ndom)
   integer,dimension(NRCURVE)   :: work_cu
   integer,dimension(NRTRIAN,3) :: work_tr
 ! other local variables
-  real*8,dimension(3) :: rdata_save
+  real(8),dimension(3) :: rdata_save
   integer :: i,j,k,np,nc,nt,nick,nb,or,iflag,lab,ie,ifig,is,ns,iprint,jflag, &
              ntet,npyr,npri,nflag,nr
 !
@@ -256,4 +256,4 @@ subroutine smooth_domain(Ndom)
   enddo  
 !
 !
-endsubroutine smooth_domain
+end subroutine smooth_domain

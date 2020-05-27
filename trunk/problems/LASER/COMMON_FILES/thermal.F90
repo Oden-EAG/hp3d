@@ -32,13 +32,13 @@ subroutine get_avgTemp(NumPts,FileIter)
    integer, intent(in)    :: FileIter
    integer, intent(inout) :: NumPts
 !
-   real*8, allocatable :: zValues(:),coreTemp(:)
+   real(8), allocatable :: zValues(:),coreTemp(:)
 !
-   real*8  :: a,b
+   real(8) :: a,b
    integer :: i
 !
-   character*8  :: fmt,suffix
-   character*64 :: filename
+   character(8)  :: fmt,suffix
+   character(64) :: filename
 !
    integer :: count,ierr
 !
@@ -142,22 +142,22 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
    implicit none
 !
    integer, intent(in)  :: NumPts
-   real*8 , intent(in)  :: ZValues(NumPts)
-   real*8 , intent(out) :: CoreTemp(NumPts)
+   real(8) , intent(in)  :: ZValues(NumPts)
+   real(8) , intent(out) :: CoreTemp(NumPts)
 !
-   real*8, parameter :: rZero = 0.d0
+   real(8), parameter :: rZero = 0.d0
 !
 !..mdle number
-   integer  :: mdle
+   integer :: mdle
 !
 !..element, face order, geometry dof
-   real*8  :: xnod (3,MAXbrickH)
-   real*8 :: maxz,minz
+   real(8) :: xnod (3,MAXbrickH)
+   real(8) :: maxz,minz
 !
 !..miscellanea
    integer :: iel, i, ndom
-   real*8  :: elemTemp,elemVol
-   real*8  :: coreVol(NumPts)
+   real(8) :: elemTemp,elemVol
+   real(8) :: coreVol(NumPts)
 !
 !..element type
    character(len=4) :: etype
@@ -260,22 +260,22 @@ subroutine comp_elem_avgTemp(Mdle, ElemTemp,ElemVol)
    implicit none
 !
    integer, intent(in)  :: Mdle
-   real*8 , intent(out) :: ElemTemp,ElemVol
+   real(8), intent(out) :: ElemTemp,ElemVol
 !
 !..element, face order, geometry dof
    integer :: norder(19)
-   real*8  :: xnod(3,MAXbrickH)
+   real(8) :: xnod(3,MAXbrickH)
    integer :: nedge_orient(12)
    integer :: nface_orient(6)
 !
 !..geometry
-   real*8,dimension(3)   :: xi,x
-   real*8,dimension(3,3) :: dxidx,dxdxi
-   real*8                :: rjac,wa,weight
+   real(8),dimension(3)   :: xi,x
+   real(8),dimension(3,3) :: dxidx,dxdxi
+   real(8)                :: rjac,wa,weight
 !
 !..3D quadrature data
-   real*8 :: xiloc(3,MAX_NINT3)
-   real*8 :: wxi(MAX_NINT3)
+   real(8) :: xiloc(3,MAX_NINT3)
+   real(8) :: wxi(MAX_NINT3)
 !
 !..approximate solution dof's
    VTYPE :: zdofH(MAXEQNH,MAXbrickH)
@@ -293,7 +293,7 @@ subroutine comp_elem_avgTemp(Mdle, ElemTemp,ElemVol)
    VTYPE, dimension(  MAXEQNQ  ) ::  zsolQ
 !
    integer :: l,nint,iflag,nflag
-   real*8  :: rsolH
+   real(8) :: rsolH
 !
 !---------------------------------------------------------------------
 !
@@ -363,8 +363,8 @@ subroutine get_thermLoad(ZsolQ, Therm_load)
 !
    implicit none
 !
-   VTYPE,  intent(in)   :: ZsolQ(12)
-   real*8, intent(out)  :: Therm_load
+   VTYPE  , intent(in)  :: ZsolQ(12)
+   real(8), intent(out) :: Therm_load
 !
    VTYPE, dimension(3) :: Es,Hs,Ep,Hp,ETimesHs,ETimesHp
 !
@@ -373,8 +373,8 @@ subroutine get_thermLoad(ZsolQ, Therm_load)
    VTYPE, dimension(3) :: Ep_mod,Hp_mod
    integer :: modified
 !
-   real*8 :: Ip,Is,gp,gs
-   real*8 :: eta,Nex,Ngd,sum1,sum2
+   real(8) :: Ip,Is,gp,gs
+   real(8) :: eta,Nex,Ngd,sum1,sum2
 !
 !---------------------------------------------------------------------
 !

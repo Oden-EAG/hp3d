@@ -22,12 +22,12 @@
 !
 !  ...pardiso workspace
 !  ...internal solver memory pointer for 64-bit architectures
-      integer*8               :: PRDS_PT(64)
+      integer(8)              :: PRDS_PT(64)
       integer                 :: PRDS_IPARM(64)
       integer                 :: PRDS_MTYPE, PRDS_MAXFCT, PRDS_MNUM
       integer                 :: PRDS_PHASE, PRDS_ERROR, PRDS_MSGLVL
       integer, allocatable    :: PRDS_PERM(:)
-      character*1             :: PRDS_TYPE
+      character(1)            :: PRDS_TYPE
 !
       contains
 !

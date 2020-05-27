@@ -1,4 +1,7 @@
 !
+#include "implicit_none.h"
+!
+!-----------------------------------------------------------------------
 !> Purpose : determine H(div) face dof interpolating H(div) Dirichlet data 
 !            using PB interpolation
 !  NOTE:     the interpolation (projection) is done in the reference space
@@ -15,8 +18,7 @@
 !! @param[in]  Iface        - face number 
 !! 
 !! @param[out] ZnodV        - H(div) dof for the face
-!
-#include "implicit_none.h"
+!-----------------------------------------------------------------------
   subroutine dhpfaceV(Mdle,Iflag,No,Etav,Type,Icase, &
                       Nedge_orient,Nface_orient,Norder,Iface, &
                       ZnodV)
@@ -30,7 +32,7 @@
 !-----------------------------------------------------------------------
   integer,                                    intent(in)  :: Iflag,No,Mdle
   integer,                                    intent(in)  :: Icase,Iface
-  real*8,  dimension(3,8),                    intent(in)  :: Etav
+  real(8), dimension(3,8),                    intent(in)  :: Etav
   character(len=4),                           intent(in)  :: Type
   integer, dimension(12),                     intent(in)  :: Nedge_orient
   integer, dimension(6),                      intent(in)  :: Nface_orient
@@ -46,33 +48,33 @@
 !
 ! quadrature
   integer                               :: l,nint
-  real*8,  dimension(2, MAXquadH)       :: xi_list
-  real*8,  dimension(   MAXquadH)       :: wa_list 
-  real*8                                :: wa, weight
+  real(8), dimension(2, MAXquadH)       :: xi_list
+  real(8), dimension(   MAXquadH)       :: wa_list
+  real(8)                               :: wa, weight
 !
 ! work space for shape3H
   integer                               :: nrdofH
   integer, dimension(19)                :: norder_1
-  real*8,  dimension(MAXbrickH)         :: shapH
-  real*8,  dimension(3,MAXbrickH)       :: gradH
+  real(8), dimension(MAXbrickH)         :: shapH
+  real(8), dimension(3,MAXbrickH)       :: gradH
 !
 ! work space for shape3V
   integer                               :: nrdofV
-  real*8,  dimension(3,MAXbrickH)       :: shapV
-  real*8,  dimension(MAXbrickH)         :: divV
+  real(8), dimension(3,MAXbrickH)       :: shapV
+  real(8), dimension(MAXbrickH)         :: divV
 !
 ! H(div) test and trial shape function in reference coordinates
-  real*8, dimension(3)                  :: uVeta,vVeta
+  real(8), dimension(3)                 :: uVeta,vVeta
 !
 ! dot product 
-  real*8                                :: prod
+  real(8)                               :: prod
 !
 ! geometry
-  real*8                                :: rjac,bjac,rjacdxdeta
-  real*8, dimension(2)                  :: t
-  real*8, dimension(3)                  :: xi,eta,rn,x
-  real*8, dimension(3,2)                :: dxidt,detadt
-  real*8, dimension(3,3)                :: detadxi,dxideta,dxdeta,detadx
+  real(8)                               :: rjac,bjac,rjacdxdeta
+  real(8), dimension(2)                 :: t
+  real(8), dimension(3)                 :: xi,eta,rn,x
+  real(8), dimension(3,2)               :: dxidt,detadt
+  real(8), dimension(3,3)               :: detadxi,dxideta,dxdeta,detadx
 !
 ! Dirichlet BC data at a point
   VTYPE :: zvalH(  MAXEQNH), zdvalH(  MAXEQNH,3), &
@@ -84,19 +86,21 @@
 !
 ! work space for linear solvers
   integer                               :: naV,info
-  real*8,  dimension(MAXMdlqV,MAXMdlqV) :: aaV
+  real(8), dimension(MAXMdlqV,MAXMdlqV) :: aaV
   integer, dimension(MAXMdlqV)          :: ipivV
 !
 ! load vector and solution
   VTYPE,   dimension(MAXMdlqV,MAXEQNV)  :: zbV,zuV
-  real*8,  dimension(MAXMdlqV,MAXEQNV)  :: uV_real,uV_imag
+#if C_MODE
+  real(8), dimension(MAXMdlqV,MAXEQNV)  :: uV_real,uV_imag
+#endif
 !
 ! decoded case for the face node
   integer, dimension(NR_PHYSA)          :: ncase
 !  
 ! misc work space
   integer :: iprint,nrv,nre,nrf,nsign,nflag, &
-             i,j,k,ie,ii,ivar,ivarV,nvarV,kj,ki,&
+             i,j,k,ivarV,nvarV,kj,ki,&
              ndofH_face,ndofE_face,ndofV_face,ndofQ_face
 !
 !-----------------------------------------------------------------------
@@ -156,12 +160,12 @@
     call face_param(Type,Iface,t, xi,dxidt)
 !
 !   compute element H1 shape functions (for geometry)
-    call shape3H(Type,xi,norder_1,Nedge_orient,Nface_orient, &
-                 nrdofH,shapH,gradH)
+    call shape3DH(Type,xi,norder_1,Nedge_orient,Nface_orient, &
+                  nrdofH,shapH,gradH)
 !
 !   compute element H(div) shape functions 
-    call shape3V(Type,xi,norder_1,Nface_orient, &
-                 nrdofV,shapV,divV)
+    call shape3DV(Type,xi,norder_1,Nface_orient, &
+                  nrdofV,shapV,divV)
 
 !   evaluate reference coordinates of the point as needed by GMP
     nsign = nsign_param(Type,Iface)

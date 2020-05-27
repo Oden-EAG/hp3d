@@ -16,12 +16,12 @@
 subroutine transform(Idec,Transf,X1,X2)
 !
       implicit none
-      integer,              intent(in   ) :: Idec
-      real*8,dimension(3,3),intent(in   ) :: Transf
-      real*8,dimension(3  ),intent(inout) :: X1
-      real*8,dimension(3  ),intent(inout) :: X2
+      integer, intent(in   ) :: Idec
+      real(8), intent(in   ) :: Transf(3,3)
+      real(8), intent(inout) :: X1(3)
+      real(8), intent(inout) :: X2(3)
 !
-      real*8 :: s      
+      real(8) :: s
       integer :: i,j
 !-----------------------------------------------------------------------
 !
@@ -47,4 +47,4 @@ subroutine transform(Idec,Transf,X1,X2)
       endselect
 !
 !
-endsubroutine transform
+end subroutine transform

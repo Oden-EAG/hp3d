@@ -33,12 +33,12 @@ subroutine set_index(Icase,Iflag, Index)
 !
       implicit none
 
-      integer,   intent(in)  :: Icase,Iflag
-      integer*8, intent(out) :: Index
+      integer,    intent(in)  :: Icase,Iflag
+      integer(8), intent(out) :: Index
 !
 !  ...local variables
 !  ...index in the decimal form
-      integer,dimension(NRINDEX) :: indexd
+      integer,dimension(NRINDEX)  :: indexd
 !  ...binary version of Icase
       integer,dimension(NR_PHYSA) :: ncase
 !  ...decimal version of the BC flag

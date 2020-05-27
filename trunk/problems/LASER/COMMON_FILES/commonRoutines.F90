@@ -118,68 +118,67 @@ end subroutine propagate_flag
 !----------------------------------------------------------------------
 subroutine my_sizetest
 !
-        use data_structure3D
+   use data_structure3D
 !
-        implicit none
+   implicit none
 !
-        integer :: nod, nH,nE,nV,nQ
-        integer*8 :: size_coord, size_h1, size_hcurl, size_hdiv, size_l2, size_tot
-        size_coord = 0
-        size_h1 = 0
-        size_hcurl = 0
-        size_hdiv = 0
-        size_l2 = 0
+   integer :: nod, nH,nE,nV,nQ
+   integer(8) :: size_coord, size_h1, size_hcurl, size_hdiv, size_l2, size_tot
+   size_coord = 0
+   size_h1 = 0
+   size_hcurl = 0
+   size_hdiv = 0
+   size_l2 = 0
 !
-         do nod=1,NRNODS
-             if (.not. associated(NODES(nod)%dof)) cycle
-             if (associated(NODES(nod)%dof%coord).eq. .true.) then
-               size_coord = size_coord + STORAGE_SIZE(NODES(nod)%dof%coord)
-             endif
-             if (associated(NODES(nod)%dof%zdofH).eq. .true.) then
-               size_h1 = size_h1 + STORAGE_SIZE(NODES(nod)%dof%zdofH)
-             endif
-             if (associated(NODES(nod)%dof%zdofE).eq. .true.) then
-               size_hcurl = size_hcurl + STORAGE_SIZE(NODES(nod)%dof%zdofE)
-             endif
-             if (associated(NODES(nod)%dof%zdofV).eq. .true.) then
-               size_hdiv = size_hdiv + STORAGE_SIZE(NODES(nod)%dof%zdofV)
-             endif
-             if (associated(NODES(nod)%dof%zdofQ).eq. .true.) then
-               size_l2 = size_l2 + STORAGE_SIZE(NODES(nod)%dof%zdofQ)
-             endif
-         size_tot = size_coord + size_h1 + size_hcurl + size_hdiv + size_l2
-        enddo
+   do nod=1,NRNODS
+       if (.not. associated(NODES(nod)%dof)) cycle
+       if (associated(NODES(nod)%dof%coord)) then
+         size_coord = size_coord + STORAGE_SIZE(NODES(nod)%dof%coord)
+       endif
+       if (associated(NODES(nod)%dof%zdofH)) then
+         size_h1 = size_h1 + STORAGE_SIZE(NODES(nod)%dof%zdofH)
+       endif
+       if (associated(NODES(nod)%dof%zdofE)) then
+         size_hcurl = size_hcurl + STORAGE_SIZE(NODES(nod)%dof%zdofE)
+       endif
+       if (associated(NODES(nod)%dof%zdofV)) then
+         size_hdiv = size_hdiv + STORAGE_SIZE(NODES(nod)%dof%zdofV)
+       endif
+       if (associated(NODES(nod)%dof%zdofQ)) then
+         size_l2 = size_l2 + STORAGE_SIZE(NODES(nod)%dof%zdofQ)
+       endif
+   size_tot = size_coord + size_h1 + size_hcurl + size_hdiv + size_l2
+   enddo
 !
-         write(*,*) '1: total DOF size is: ', size_tot
-         !pause
+   write(*,*) '1: total DOF size is: ', size_tot
 !
-         nH=0; nE=0; nV=0; nQ=0
+   nH=0; nE=0; nV=0; nQ=0
 !
-         write(*,*) 'my_sizetest: NRHVAR, NREVAR, NRVVAR, NRQVAR = ', &
+   write(*,*) 'my_sizetest: NRHVAR, NREVAR, NRVVAR, NRQVAR = ', &
                                   NRHVAR, NREVAR, NRVVAR, NRQVAR
-        do nod = 1, NRNODS
-          if (Is_inactive(nod)) cycle
-          select case(NODES(nod)%type)
-          case('vert')
+   do nod = 1, NRNODS
+      if (Is_inactive(nod)) cycle
+      select case(NODES(nod)%type)
+         case('vert')
             nH = nH + 1
-          case('medg')
+         case('medg')
             nH = nH + MAXP-1
             nE = nE + NREVAR*MAXP
-          case('mdlq')
+         case('mdlq')
             nH = nH + NRHVAR*MAXmdlqH
             nE = nE + NREVAR*MAXmdlqE
             nV = nV + NRVVAR*MAXmdlqV
-          case('mdlb')
+         case('mdlb')
             nH = nH + NRHVAR*MAXmdlbH
             nE = nE + NREVAR*MAXmdlbE
             nV = nV + NRVVAR*MAXmdlbV
             nQ = nQ + NRQVAR*MAXmdlbQ
-          end select
-        enddo
+      end select
+   enddo
 !
-        size_tot = (nH + nE + nV + nQ)*16
-        write(*,*) '2: total DOF size is: ', size_tot
-        pause
+   size_tot = (nH + nE + nV + nQ)*16
+   write(*,*) '2: total DOF size is: ', size_tot
+   call pause
 !
 end subroutine my_sizetest
 !
@@ -218,14 +217,14 @@ subroutine get_Beta(Xp,Fld_flag, Zbeta,Zdbeta,Zd2beta)
 !
    implicit none
 !
-   real*8, dimension(3), intent(in)  :: Xp
-   integer,              intent(in)  :: Fld_flag
-   VTYPE,                intent(out) :: Zbeta,Zdbeta,Zd2beta
+   real(8), intent(in)  :: Xp(3)
+   integer, intent(in)  :: Fld_flag
+   VTYPE,   intent(out) :: Zbeta,Zdbeta,Zd2beta
 !
-   real*8 :: z,a,b,c,L,n,rho,drho,d2rho
+   real(8) :: z,a,b,c,L,n,rho,drho,d2rho
 !
 !..OMEGA_RATIO_SIGNAL or OMEGA_RATIO_PUMP
-   real*8  :: OMEGA_RATIO_FLD
+   real(8) :: OMEGA_RATIO_FLD
 !
 !---------------------------------------------------------------------------
 !

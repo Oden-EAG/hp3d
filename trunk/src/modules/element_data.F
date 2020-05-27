@@ -11,35 +11,35 @@ c
 c----------------------------------------------------------------------
 c  MASTER ELEMENTS VERTEX COORDINATES (vertex enumeration)            |
 c----------------------------------------------------------------------
-      real*8, parameter, dimension(2,3) :: TRIAN_COORD =
+      real(8), parameter, dimension(2,3) :: TRIAN_COORD =
      .reshape(
      .(/0.d0,0.d0, 1.d0,0.d0, 0.d0,1.d0/)
      .,(/2,3/))
 c
-      real*8, parameter, dimension(2,4) :: QUADR_COORD =
+      real(8), parameter, dimension(2,4) :: QUADR_COORD =
      .reshape(
      .(/0.d0,0.d0, 1.d0,0.d0, 1.d0,1.d0, 0.d0,1.d0/)
      .,(/2,4/))
 c
-      real*8, parameter, dimension(3,6) :: PRISM_COORD =
+      real(8), parameter, dimension(3,6) :: PRISM_COORD =
      .reshape(
      .(/0.d0,0.d0,0.d0, 1.d0,0.d0,0.d0, 0.d0,1.d0,0.d0,
      .  0.d0,0.d0,1.d0, 1.d0,0.d0,1.d0, 0.d0,1.d0,1.d0/)
      .,(/3,6/))
 c
-      real*8, parameter, dimension(3,8) :: BRICK_COORD =
+      real(8), parameter, dimension(3,8) :: BRICK_COORD =
      .reshape(
      .(/0.d0,0.d0,0.d0, 1.d0,0.d0,0.d0, 1.d0,1.d0,0.d0, 0.d0,1.d0,0.d0,
      .  0.d0,0.d0,1.d0, 1.d0,0.d0,1.d0, 1.d0,1.d0,1.d0, 0.d0,1.d0,1.d0/)
      .,(/3,8/))
 c
-      real*8, parameter, dimension(3,4) :: TETRA_COORD =
+      real(8), parameter, dimension(3,4) :: TETRA_COORD =
      .reshape(
      .(/0.d0,0.d0,0.d0, 1.d0,0.d0,0.d0, 0.d0,1.d0,0.d0,
      .  0.d0,0.d0,1.d0/)
      .,(/3,4/))
 c
-      real*8, parameter, dimension(3,5) :: PYRAM_COORD =
+      real(8), parameter, dimension(3,5) :: PYRAM_COORD =
      .reshape(
      .(/0.d0,0.d0,0.d0, 1.d0,0.d0,0.d0, 1.d0,1.d0,0.d0, 0.d0,1.d0,0.d0,
      .  0.d0,0.d0,1.d0/)
@@ -587,8 +587,8 @@ c  ...return local edge parametrizations......
       subroutine edge_param(Type,Ie,T, Xi,Dxidt)
 c
       character(len=4) :: Type
-      double precision T,Xi(*),Dxidt(*)
-      double precision xi1(3),xi2(3)
+      real(8) T,Xi(*),Dxidt(*)
+      real(8) xi1(3),xi2(3)
 c
       select case(Type)
       case('mdlt','tria')
@@ -627,8 +627,8 @@ c
       use control , only : GEOM_TOL
 c
       character(len=4) :: Type
-      double precision T(2),Xi(3),Dxidt(3,2)
-      double precision xi1(3),xi2(3),xi3(3)
+      real(8) T(2),Xi(3),Dxidt(3,2)
+      real(8) xi1(3),xi2(3),xi3(3)
 c
 c  ...check that point is inside master face
       if (face_type(Type,If).eq.'tria') then
@@ -636,8 +636,8 @@ c  ...check that point is inside master face
      .      (T(2)     .lt.-GEOM_TOL    ).or.
      .      (T(1)+T(2).gt.1.d0+GEOM_TOL)    ) then
           write(*,*)'face_param: point outside of tria face'
-          write(*,1000)T(1:2)
- 1000     format(' T = ',2(e12.5,x))
+          write(*,1000) T(1:2)
+ 1000     format(' T = ',2(e12.5,1x))
           call pause
         endif
           k=3
@@ -647,7 +647,7 @@ c
         if ((T(1).lt.-GEOM_TOL).or.(T(1).gt.1.d0+GEOM_TOL).or.
      .      (T(2).lt.-GEOM_TOL).or.(T(2).gt.1.d0+GEOM_TOL)) then
           write(*,*)'face_param: point outside of rect face'
-          write(*,1000)T(1:2)
+          write(*,1000) T(1:2)
           call pause
         endif
           k=4
@@ -842,7 +842,7 @@ c  ...return number of dof for a single component
       subroutine ndof_nod(Type,Nord, NdofH,NdofE,NdofV,NdofQ)
 c
       character(len=4) :: Type
-      integer  Nord,NdofH,NdofE,NdofV,NdofQ
+      integer Nord,NdofH,NdofE,NdofV,NdofQ
       integer nordx,nordy,nordz,naux
 c
       select case(Type)
@@ -948,14 +948,14 @@ c
       use element_data , only : TRIAN_L2G,QUADR_L2G,QUADR_EDGE_TO_VERT
 c
       implicit none
-      character(len=4)     ,intent(in ) :: Type
-      real*8,dimension(2  ),intent(in ) :: T
-      integer              ,intent(in ) :: Norient
-      real*8,dimension(2  ),intent(out) :: Eta
-      real*8,dimension(2,2),intent(out) :: Detadt
+      character(len=4)      ,intent(in ) :: Type
+      real(8),dimension(2  ),intent(in ) :: T
+      integer               ,intent(in ) :: Norient
+      real(8),dimension(2  ),intent(out) :: Eta
+      real(8),dimension(2,2),intent(out) :: Detadt
 c
-      real*8,dimension(  4) :: rlam
-      real*8,dimension(2,4) :: drlam
+      real(8),dimension(  4) :: rlam
+      real(8),dimension(2,4) :: drlam
       integer :: iv,iv1,iv2,iv3,iv4,iedge,i
 c
 c----------------------------------------------------------------------
@@ -1169,8 +1169,8 @@ c----------------------------------------------------------------------
       subroutine list_minus(List1,List2,N, List3,J)
 c
       implicit none
-      integer,dimension(N),intent(in ) :: List1,List2
       integer             ,intent(in ) :: N
+      integer,dimension(N),intent(in ) :: List1,List2
       integer,dimension(N),intent(out) :: List3
       integer             ,intent(out) :: J
       integer :: i,ifound

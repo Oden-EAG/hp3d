@@ -35,7 +35,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
    integer :: nodesl(27), norder(19), nverl(8)
    integer :: norientl(27), nedge_orient(12), nface_orient(6)
 !
-   real*8 :: xi(3), x(3), xnod(3,MAXbrickH), dxdxi(3,3)
+   real(8) :: xi(3), x(3), xnod(3,MAXbrickH), dxdxi(3,3)
 !
 !..OpenMP parallelization: auxiliary variables
    integer, dimension(NRELES) :: n_vert_offset,n_obj_offset,n_elem_vert
@@ -117,7 +117,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
          call get_vis_point(vis_on_type(etype),iv-1, xi)
 !
 !     ...H1 shape functions at visualization point
-         call shape3H(etype,xi,norder,nedge_orient,nface_orient, nrdofH,shapH,gradH)
+         call shape3DH(etype,xi,norder,nedge_orient,nface_orient, nrdofH,shapH,gradH)
 !
 !     ...geometry map
          select case(PARAVIEW_GEOM)

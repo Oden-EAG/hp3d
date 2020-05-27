@@ -14,9 +14,9 @@ subroutine get_isoref(Nod, Kref)
        integer, intent(in)     :: Nod
        integer, intent(out)    :: Kref
 !       
-       real*8, dimension(3,8)  :: xsub
-       real*8, dimension(3)    :: dist, xi
-       real*8, dimension(3,2)  :: x
+       real(8), dimension(3,8) :: xsub
+       real(8), dimension(3)   :: dist, xi
+       real(8), dimension(3,2) :: x
        
        integer, dimension(27)  :: nodesl,norientl
        integer, dimension(2)   :: iv

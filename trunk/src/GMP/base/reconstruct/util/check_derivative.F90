@@ -8,11 +8,11 @@
       implicit none
 !------------------------------------------------------------------------------------      
 !     DUMMY ARGUMENTS
-      integer,                intent(in)  :: Nt,Ie
-      real*8, dimension(3) :: Der
+      integer, intent(in)  :: Nt,Ie
+      real(8) :: Der(3)
 !------------------------------------------------------------------------------------      
 !     LOCAL VARIABLES      
-      real*8 :: c
+      real(8) :: c
       integer :: bijec,fact
       integer :: i,j,irow
 !------------------------------------------------------------------------------------      

@@ -29,7 +29,7 @@
    use assembly,         ONLY: assembly_begin_par, assembly_end_par
    use stc,              ONLY: stc_get_nrdof
 !
-   IMPLICIT NONE
+   implicit none
 !   
 !-----------------------------------------------------------------------
 !

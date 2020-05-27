@@ -16,11 +16,11 @@ subroutine adapt_greedy_href(Iphy,Imode,Eps,Ath)
 !
       implicit none
       integer, intent(in) :: Iphy, Imode
-      real*8 , intent(in) :: Eps, Ath
+      real(8), intent(in) :: Eps, Ath
 !
-      real*8 :: eta, err, vol_mdle, vol_old, vol_new
+      real(8) :: eta, err, vol_mdle, vol_old, vol_new
       integer, allocatable :: nlist(:)
-      real*8 , allocatable :: rlist(:)
+      real(8), allocatable :: rlist(:)
 !       
       integer :: iprint, mdle, iel, i, kref, istat, j, nreles_old
 !-----------------------------------------------------------------------

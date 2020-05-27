@@ -384,12 +384,13 @@ subroutine print_partition()
       k = 0
       do while (k .lt. nrelem)
          l = MIN(k+10,nrelem)
-         write(6,2010) '     ',par(k+1:l)
+         !!!TODO
+         !!!write(6,2010) '     ',par(k+1:l)
          k = l
       enddo
    enddo
   2000 format(A,I4,A)
-  2010 format(A,<l-k>I6)
+  !!!2010 format(A,<l-k>I6)
 !
   290 continue
 !
@@ -438,11 +439,12 @@ subroutine print_subd()
    k = 0
    do while (k .lt. nrnod_subd)
       l = MIN(k+10,nrnod_subd)
-      write(6,3010) '     ',sub(k+1:l)
+      !!!TODO
+      !!!write(6,3010) '     ',sub(k+1:l)
       k = l
    enddo
  3000 format(A,I3,A)
- 3010 format(A,<l-k>I5)
+ !!!3010 format(A,<l-k>I5)
 !
   390 continue
 !
@@ -468,7 +470,7 @@ subroutine print_coord()
 !
    integer :: par(NRELES)
    integer :: iel,i,mdle,nrv
-   real*8  :: x(NDIMEN), xnod(NDIMEN,8)
+   real(8) :: x(NDIMEN), xnod(NDIMEN,8)
 !
 !----------------------------------------------------------------------
 !

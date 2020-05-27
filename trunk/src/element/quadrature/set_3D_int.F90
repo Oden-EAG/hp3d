@@ -13,8 +13,8 @@ subroutine set_3Dint(Type,Norder, Nint,Xiloc,Waloc)
       character(len=4)               , intent(in)  :: Type
       integer, dimension(19)         , intent(in)  :: Norder
       integer                        , intent(out) :: Nint
-      real*8 , dimension(3,MAX_NINT3), intent(out) :: Xiloc
-      real*8 , dimension(  MAX_NINT3), intent(out) :: Waloc
+      real(8), dimension(3,MAX_NINT3), intent(out) :: Xiloc
+      real(8), dimension(  MAX_NINT3), intent(out) :: Waloc
 !
       call set_3Dint_aux(Type,Norder,MAXP,MAX_NINT3, Nint,Xiloc,Waloc)
 !
@@ -53,8 +53,8 @@ subroutine set_3D_int(Type,Norder,Norient_face, Nint,Xiloc,Waloc)
       integer, dimension(19)         , intent(in)  :: Norder
       integer, dimension(6)          , intent(in)  :: Norient_face
       integer                        , intent(out) :: Nint
-      real*8 , dimension(3,MAX_NINT3), intent(out) :: Xiloc
-      real*8 , dimension(  MAX_NINT3), intent(out) :: Waloc
+      real(8), dimension(3,MAX_NINT3), intent(out) :: Xiloc
+      real(8), dimension(  MAX_NINT3), intent(out) :: Waloc
 !
       integer, dimension(19) :: norder_loc
 !
@@ -78,8 +78,8 @@ subroutine set_3Dint_DPG(Type,Norder, Nint,Xiloc,Waloc)
       character(len=4)                 , intent(in)  :: Type
       integer, dimension(19)           , intent(in)  :: Norder
       integer                          , intent(out) :: Nint
-      real*8 , dimension(3,MAXNINT3ADD), intent(out) :: Xiloc
-      real*8 , dimension(  MAXNINT3ADD), intent(out) :: Waloc
+      real(8), dimension(3,MAXNINT3ADD), intent(out) :: Xiloc
+      real(8), dimension(  MAXNINT3ADD), intent(out) :: Waloc
 !
       call set_3Dint_aux(Type,Norder,MAXPP,MAXNINT3ADD, Nint,Xiloc,Waloc)
 !
@@ -118,8 +118,8 @@ subroutine set_3D_int_DPG(Type,Norder,Norient_face, Nint,Xiloc,Waloc)
       integer, dimension(19)           , intent(in)  :: Norder
       integer, dimension(6)            , intent(in)  :: Norient_face
       integer                          , intent(out) :: Nint
-      real*8 , dimension(3,MAXNINT3ADD), intent(out) :: Xiloc
-      real*8 , dimension(  MAXNINT3ADD), intent(out) :: Waloc
+      real(8), dimension(3,MAXNINT3ADD), intent(out) :: Xiloc
+      real(8), dimension(  MAXNINT3ADD), intent(out) :: Waloc
 !
       integer, dimension(19) :: norder_loc
 !
@@ -168,14 +168,14 @@ subroutine set_3Dint_aux(Type,Norder,Maxp,Max_nint3, Nint,Xiloc,Waloc)
       integer, dimension(19)         , intent(in)  :: Norder
       integer                        , intent(in)  :: Maxp,Max_nint3
       integer                        , intent(out) :: Nint
-      real*8 , dimension(3,Max_nint3), intent(out) :: Xiloc
-      real*8 , dimension(  Max_nint3), intent(out) :: Waloc
+      real(8), dimension(3,Max_nint3), intent(out) :: Xiloc
+      real(8), dimension(  Max_nint3), intent(out) :: Waloc
 !
       integer :: nordhv(2), nordxyz(3)
       integer :: nord,nordh,nordx,nordy,nordz
       integer :: kint,nintx,ninty,nintz
       integer :: i,iprint,l,l1,l2,l3
-      real*8  :: factor
+      real(8) :: factor
 !
 !----------------------------------------------------------------------
 !
@@ -405,9 +405,9 @@ subroutine test_set_3Dint
       character(len=4) :: type
 !
       integer :: norder(19)
-      real*8  :: xiloc(3,MAX_NINT3), waloc(MAX_NINT3)
+      real(8) :: xiloc(3,MAX_NINT3), waloc(MAX_NINT3)
 !
-      real*8  :: s,sexact,x,y,z,wa
+      real(8) :: s,sexact,x,y,z,wa
       integer :: iprint,ix,iy,iz,l,nint,np
 !
 !-----------------------------------------------------------------------

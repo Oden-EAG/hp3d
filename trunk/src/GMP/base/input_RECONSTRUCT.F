@@ -63,8 +63,8 @@ c       list(1,i) = block connected to a face
 c       list(2,i) = the corresponding face number
 c
 c     nvert_aux - vertices for a surface triangle
-      character*10 type
-      character*10 surfstype(10), surfrtype(10)
+      character(10) type
+      character(10) surfstype(10), surfrtype(10)
 c
 c  ...list of surfaces containing a curve
       integer lists(10)

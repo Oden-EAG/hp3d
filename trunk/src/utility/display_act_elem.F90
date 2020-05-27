@@ -1,7 +1,7 @@
 subroutine display_act_elem
 !
       use data_structure3D , only : NRELES,NODES
-!      
+!
       implicit none
       integer :: mdle,iel
 !
@@ -11,11 +11,11 @@ subroutine display_act_elem
       mdle=0
       do iel=1,NRELES
         call nelcon(mdle, mdle)
-!        
+!
         write(*,7000) mdle,NODES(mdle)%type,NODES(mdle)%order
  7000   format(' mdle = ',i4,' ; type = ',a4,' ; order = ',i3)
       enddo
-      write(*,*)''
+      write(*,*) ''
 !
-!      
-endsubroutine display_act_elem
+!
+end subroutine display_act_elem

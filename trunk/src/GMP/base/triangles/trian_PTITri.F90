@@ -14,10 +14,10 @@ subroutine trian_PTITri(No,Eta, X,Dxdeta)
       use GMP
 !-------------------------------------------------------------------------------
       implicit none
-      integer,              intent(in)  :: No
-      real*8,dimension(2),  intent(in)  :: Eta
-      real*8,dimension(3),  intent(out) :: X
-      real*8,dimension(3,2),intent(out) :: Dxdeta
+      integer,               intent(in)  :: No
+      real(8),dimension(2),  intent(in)  :: Eta
+      real(8),dimension(3),  intent(out) :: X
+      real(8),dimension(3,2),intent(out) :: Dxdeta
 !-------------------------------------------------------------------------------
       integer :: ns, iprint
 !-------------------------------------------------------------------------------

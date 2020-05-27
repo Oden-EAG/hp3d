@@ -44,7 +44,7 @@ c
       enddo
 c
 c
-      end subroutine
+      end subroutine print_shapeE
 c----------------------------------------------------------------------
 c     
 c     routine name       - print_shapeH
@@ -99,4 +99,4 @@ c
       enddo
 c
 c
-      end subroutine
+      end subroutine print_shapeH

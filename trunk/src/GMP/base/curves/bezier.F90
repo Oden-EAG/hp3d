@@ -16,15 +16,15 @@
       implicit none
 !-------------------------------------------------------------------------------------- 
 !     DUMMY ARGUMENTS
-      integer,intent(in)                            :: Nc
-      real*8,intent(in)                           :: Eta
-      real*8,dimension(3),intent(out)             :: X,dXdEta
-      real*8,dimension(3), optional, intent(out)  :: ddXddEta
-      real*8,dimension(3), optional, intent(out)  :: dddXdddEta
-      real*8,dimension(3), optional, intent(out)  :: ddddXddddEta
+      integer,intent(in)                           :: Nc
+      real(8),intent(in)                           :: Eta
+      real(8),dimension(3),intent(out)             :: X,dXdEta
+      real(8),dimension(3), optional, intent(out)  :: ddXddEta
+      real(8),dimension(3), optional, intent(out)  :: dddXdddEta
+      real(8),dimension(3), optional, intent(out)  :: ddddXddddEta
 !-------------------------------------------------------------------------------------- 
-      real*8 :: poly0,poly1,poly2,poly3,poly4,dpoly
-      integer  :: i,iprint,deg
+      real(8) :: poly0,poly1,poly2,poly3,poly4,dpoly
+      integer :: i,iprint,deg
 !-------------------------------------------------------------------------------------- 
 !      
       iprint = 0

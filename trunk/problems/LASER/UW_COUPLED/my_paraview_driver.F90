@@ -17,8 +17,8 @@ subroutine my_paraview_driver(IParAttr)
 !
    integer, intent(in) :: IParAttr(NR_PHYSA)
 !
-   real*8  :: time
-   integer :: idx,iphys,iload,icomp      
+   real(8) :: time
+   integer :: idx,iphys,iload,icomp
 !
    integer, save :: id = -1
    logical, save :: initialized = .false.

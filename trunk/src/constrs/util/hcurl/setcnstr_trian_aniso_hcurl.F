@@ -4,7 +4,7 @@ c   routine name       - setcnstr_trian_aniso
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Jun 10
+c   latest revision    - May 2020
 c
 c   purpose            - routine evaluates constraint coefficients for
 c                        the triangular master element
@@ -86,11 +86,11 @@ c
 c
       dimension shapsma(MAXquadH,MAXquadH),
      .          shapbig(MAXquadH,MAXquadH),
-     .          void(2,MAXquadH), ip(MAXquadH),
-     .          r(MAXquadH,MAXquadH), norder(5), xibig(2),xisma(2)
+     .          void(2,MAXquadH),ip(MAXquadH),
+     .          r(MAXquadH,MAXquadH),xibig(2),xisma(2)
 c
-c  ...edge orientations
-      dimension norient(4)
+c  ...order and edge orientations
+      dimension norder(5),norient(4)
 c
       iprint=0
 c
@@ -103,7 +103,7 @@ c
 c
 c  ...set uniform order MAXP:
       norder(1:4) = nord
-      norder(5) = nord*10 + nord
+      norder(5)   = nord*10 + nord
 c
 c  ...set orientations
       norient = 0
@@ -122,12 +122,16 @@ c
           icl = icl + 1
 c
 c  .......find small shape functions at this point:
-          call shapeHq(xisma,norder(1:5),norient(1:4),
-     .                 nrdof,shapsma(1:MAXquadH,icl),void)
+c          call shapeHq(xisma,norder(1:5),norient(1:4),
+c     .                 nrdof,shapsma(1:MAXquadH,icl),void)
+          call shape2DH('quad',xisma,norder,norient,
+     .                  nrdof,shapsma(:,icl),void)
 c
 c  .......find big shape functions at this point:
-          call shapeHt(xibig,norder(1:4),norient(1:3),
-     .                 nrdof,shapbig(1:MAXtriaH,icl),void)
+c          call shapeHt(xibig,norder(1:4),norient(1:3),
+c     .                 nrdof,shapbig(1:MAXtriaH,icl),void)
+          call shape2DH('tria',xibig,norder,norient,
+     .                  nrdof,shapbig(:,icl),void)
         enddo
       enddo
 c

@@ -28,13 +28,13 @@
       use GMP
       implicit none
 !----------------------------------------------------------------------
-      integer,                intent(in)  :: No
-      real*8,                 intent(in)  :: Eta
-      real*8, dimension(3),   intent(out) :: X,Dxdeta
+      integer,                 intent(in)  :: No
+      real(8),                 intent(in)  :: Eta
+      real(8), dimension(3),   intent(out) :: X,Dxdeta
 !----------------------------------------------------------------------
-      real*8, dimension(3)   :: aG,bG,center,aC,bC,xL,dxLdeta
-      real*8, dimension(3,3) :: rotM
-      real*8 :: rx,ry,px,py,tt,pihalf
+      real(8), dimension(3)   :: aG,bG,center,aC,bC,xL,dxLdeta
+      real(8), dimension(3,3) :: rotM
+      real(8) :: rx,ry,px,py,tt,pihalf
       integer :: iprint,i
 !----------------------------------------------------------------------
 !

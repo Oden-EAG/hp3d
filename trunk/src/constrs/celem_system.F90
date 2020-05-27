@@ -85,7 +85,7 @@ subroutine celem_system(Mdle,Idec,                                &
    integer :: nrconH(MAXbrickH),nacH(NACDIM,MAXbrickH),  &
               nrconE(MAXbrickE),nacE(NACDIM,MAXbrickE),  &
               nrconV(MAXbrickV),nacV(NACDIM,MAXbrickV)
-   real*8  :: constrH(NACDIM,MAXbrickH),  &
+   real(8) :: constrH(NACDIM,MAXbrickH),  &
               constrE(NACDIM,MAXbrickE),  &
               constrV(NACDIM,MAXbrickV)
 !

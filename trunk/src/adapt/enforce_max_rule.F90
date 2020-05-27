@@ -34,7 +34,7 @@
 !
 !..reset visitation flags
    call reset_visit
-!   
+!
 !----------------------------------------------------------------------
 !        STEP 1: maximum rule for edges and faces wrt elements
 !----------------------------------------------------------------------
@@ -47,7 +47,7 @@
       call get_connect_info(mdle, nodesl,norientl)
       call element_order(mdle,norientl, norder)
 !      
-!  ...loop through edges and faces      
+!  ...loop through edges and faces
       do j=1,nre+nrf
          i=nrv+j
          nod = nodesl(i); nord = norder(j)
@@ -92,7 +92,7 @@
 !                 STEP 2: Modify faces (min rule for edges wrt faces)
 !----------------------------------------------------------------------
 !
-!..loop through the elements   
+!..loop through the elements
    do iel=1,NRELES
       mdle = ELEM_ORDER(iel)
       call elem_nodes(mdle, nodesl,norientl)
@@ -155,7 +155,7 @@
          end select
       enddo
 !
-!..end of loop through the elements   
+!..end of loop through the elements
    enddo
 !
 !..loop through nodes

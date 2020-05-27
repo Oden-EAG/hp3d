@@ -14,20 +14,20 @@
 subroutine cylinder(X,Point,Cvect,Rad, Fval,Dfdx)
 !
       implicit none
-      real*8, dimension(3), intent(in ) :: X,Point,Cvect
-      real*8              , intent(in ) :: Rad
-      real*8              , intent(out) :: Fval
-      real*8, dimension(3), intent(out) :: Dfdx
+      real(8), dimension(3), intent(in ) :: X,Point,Cvect
+      real(8)              , intent(in ) :: Rad
+      real(8)              , intent(out) :: Fval
+      real(8), dimension(3), intent(out) :: Dfdx
 !------------------------------------------------------------------------------------
 !  ...cylinder axis unit vector
-      real*8, dimension(3)   :: unit
+      real(8), dimension(3)   :: unit
 !  ...relative position vector of X and its projection onto the plane normal to the
 !     cylinder axis
-      real*8, dimension(3)   :: xvec,xvecp
+      real(8), dimension(3)   :: xvec,xvecp
 !  ...gradient of xvecp
-      real*8, dimension(3,3) :: dxvecpdx
-      integer                :: iprint,i
-      real*8                 :: s,s1
+      real(8), dimension(3,3) :: dxvecpdx
+      integer                 :: iprint,i
+      real(8)                 :: s,s1
 !------------------------------------------------------------------------------------
 !      
       iprint=0
@@ -88,4 +88,4 @@ subroutine cylinder(X,Point,Cvect,Rad, Fval,Dfdx)
       endif
 !
 !
-endsubroutine cylinder
+end subroutine cylinder

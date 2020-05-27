@@ -604,7 +604,7 @@ IF (.NOT. QUIET_MODE) write(*,*)''
       call connect
 !
 !
-    endsubroutine input_DEFAULT
+    end subroutine input_DEFAULT
 !
 !
 !
@@ -637,7 +637,7 @@ IF (.NOT. QUIET_MODE) write(*,*)''
 #include "syscom.blk"
 #include "cinout.blk"
 !
-      character*10 type
+      character(10) type
 !
 !-----------------------------------------------------------------------
 !

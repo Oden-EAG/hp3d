@@ -607,8 +607,8 @@ end function chebev
 !
 subroutine d2bessJY(x, order, d2bessJ, d2bessY)
   implicit none
-  real*8, intent(in) :: x, order
-  real*8, intent(out) :: d2bessJ, d2bessY
+  real(8), intent(in) :: x, order
+  real(8), intent(out) :: d2bessJ, d2bessY
   real *8  :: bessJ_1, bessY_1, dbessJ_1, dbessY_1
   real *8  :: bessJ_2, bessY_2, dbessJ_2, dbessY_2
   if(order.lt.1.d0) then
@@ -625,8 +625,8 @@ end subroutine d2bessJY
 !
 subroutine d2bessIK(x, order, d2bessI, d2bessK)
   implicit none
-  real*8, intent(in) :: x, order
-  real*8, intent(out) :: d2bessI, d2bessK
+  real(8), intent(in) :: x, order
+  real(8), intent(out) :: d2bessI, d2bessK
   real *8  :: bessI_1, bessK_1, dbessI_1, dbessK_1
   real *8  :: bessI_2, bessK_2, dbessI_2, dbessK_2
   if(order.lt.1.d0) then

@@ -103,13 +103,13 @@
  *   limiting string arguments to only two functions: xgopw and xgdrtxt
  *
  * 4. Most C compilers provide automatic #defines allowing to recognize
- *   the operting system, although sometimes it is necessary to use
- *   'manual' define on the compile command, esp to differentiate between
+ *   the operating system, although sometimes it is necessary to use
+ *   'manual' define on the compile command, esp. to differentiate between
  *   different platforms/versions of operating system (e.g. SGI on MIPS or
  *   Itanium architectures, HP on RISK or Itanium, Sun on Sparc or Intel x86,
- *   etc. For some machines there exists multiple compilers with potentially
+ *   etc. For some machines there exist multiple compilers with potentially
  *   different methods (e.g on Linux: GNU g77, Intel IPF, Portland Group pgf,
- *   Lahey, LCC, etc.
+ *   Lahey, LCC, etc.)
  *
  * 5. We do not handle Windows compilers, because Microsoft graphics
  *   differs significantly from X Windows style. If you need to run

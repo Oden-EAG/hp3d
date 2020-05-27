@@ -1,9 +1,9 @@
 subroutine geom_ex(Mdle,Xi, X,Dxdxi)
 !
-      integer,                 intent(in)  :: Mdle
-      real*8,  dimension(3),   intent(in)  :: Xi
-      real*8,  dimension(3),   intent(out) :: X
-      real*8,  dimension(3,3), intent(out) :: Dxdxi
+      integer,                  intent(in)  :: Mdle
+      real(8),  dimension(3),   intent(in)  :: Xi
+      real(8),  dimension(3),   intent(out) :: X
+      real(8),  dimension(3,3), intent(out) :: Dxdxi
 !
 !  ...redirect to old routine to ensure backward compatibility
       call exact_geom(Mdle,Xi, X,Dxdxi)
@@ -30,14 +30,14 @@ subroutine exact_geom(Mdle,Xi, X,Dxdxi)
       implicit none
       integer :: iprint
       integer,                 intent(in)  :: Mdle
-      real*8,  dimension(3),   intent(in)  :: Xi
-      real*8,  dimension(3),   intent(out) :: X
-      real*8,  dimension(3,3), intent(out) :: Dxdxi
+      real(8), dimension(3),   intent(in)  :: Xi
+      real(8), dimension(3),   intent(out) :: X
+      real(8), dimension(3,3), intent(out) :: Dxdxi
 !
-      real*8,  dimension(  8) ::  shapH
-      real*8,  dimension(3,8) :: dshapH
+      real(8), dimension(  8) ::  shapH
+      real(8), dimension(3,8) :: dshapH
       
-      real*8           :: eta(3),dxdeta(3,3),detadxi(3,3),etav(3,8)
+      real(8)          :: eta(3),dxdeta(3,3),detadxi(3,3),etav(3,8)
       integer          :: iflag, i, j, k, no
       character(len=4) :: type      
 !------------------------------------------------------------------------

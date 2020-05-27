@@ -25,21 +25,21 @@
       implicit none
 !----------------------------------------------------------------------
 !     DUMMY ARGUMENTS      
-      integer,                intent(in)  :: Nt
-      real*8, dimension(2),   intent(in)  :: Eta
-      real*8, dimension(3),   intent(out) :: X
-      real*8, dimension(3,2), intent(out) :: dXdEta
+      integer,                 intent(in)  :: Nt
+      real(8), dimension(2),   intent(in)  :: Eta
+      real(8), dimension(3),   intent(out) :: X
+      real(8), dimension(3,2), intent(out) :: dXdEta
 !----------------------------------------------------------------------
 !     LOCAL VARIABLES
-      integer              :: i,j,k
-      real*8               :: poly
-      real*8, dimension(2) :: dpoly
-      real*8, dimension(3) :: nor
-      integer              :: iprint
-      integer,parameter    :: deg = 7
+      integer               :: i,j,k
+      real(8)               :: poly
+      real(8), dimension(2) :: dpoly
+      real(8), dimension(3) :: nor
+      integer               :: iprint
+      integer,parameter     :: deg = 7
 !----------------------------------------------------------------------
 !     EXTERNAL FUNCTIONS      
-      integer, external    :: bijec
+      integer, external     :: bijec
 !----------------------------------------------------------------------
 !
       iprint=0

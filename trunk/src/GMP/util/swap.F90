@@ -5,4 +5,4 @@ subroutine swap(I,J)
 !      
       k=I ; I=J ; J=k
 !      
-endsubroutine swap
+end subroutine swap

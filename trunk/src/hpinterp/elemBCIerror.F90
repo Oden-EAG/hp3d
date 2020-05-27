@@ -1,12 +1,15 @@
 !
+#include "implicit_none.h"
+!
+!-----------------------------------------------------------------------
 !> Purpose : compute PB interpolation error for Dirichlet data
 !
 !! @param[in]  Mdle                 - element (middle node) number
 !!
 !! @param[out] ErrorH,ErrorE,ErrorV - element interpolaion error
 !                                     for H1,H(curl) and H(div) BC data
-#include "implicit_none.h"
-  subroutine elemBCIerror(Mdle, ErrorH,ErrorE,ErrorV)
+!-----------------------------------------------------------------------
+subroutine elemBCIerror(Mdle, ErrorH,ErrorE,ErrorV)
 !
   use control
   use data_structure3D
@@ -16,9 +19,8 @@
 ! ** Arguments
 !-----------------------------------------------------------------------
 !
-  integer,    intent(in)   :: Mdle
-!
-  real*8,     intent(out)  :: ErrorH,ErrorE,ErrorV
+  integer, intent(in)   :: Mdle
+  real(8), intent(out)  :: ErrorH,ErrorE,ErrorV
 !
 ! ** Locals
 !-----------------------------------------------------------------------
@@ -30,7 +32,7 @@
   integer                               :: iflag,no
 !
 ! element vertices reference coordinates
-  real*8,  dimension(3,8)               :: etav
+  real(8), dimension(3,8)               :: etav
 !
 ! element order
   integer, dimension(19)                :: norder
@@ -61,44 +63,44 @@
 !
 ! quadrature
   integer                               :: l,nint
-  real*8,  dimension(2, MAX_NINT2)      :: xi_list
-  real*8,  dimension(   MAX_NINT2)      :: wa_list 
-  real*8                                :: wa,weight
+  real(8), dimension(2, MAX_NINT2)      :: xi_list
+  real(8), dimension(   MAX_NINT2)      :: wa_list
+  real(8)                               :: wa,weight
 !
 ! work space for shape3H
   integer                               :: nrdofH
   integer, dimension(19)                :: norder_1
-  real*8,  dimension(MAXbrickH)         :: shapH
-  real*8,  dimension(3,MAXbrickH)       :: gradH
+  real(8), dimension(MAXbrickH)         :: shapH
+  real(8), dimension(3,MAXbrickH)       :: gradH
 !
 ! derivatives of a H1 shape function wrt reference coordinates
-  real*8, dimension(3)                  :: duHdeta
+  real(8), dimension(3)                 :: duHdeta
 !
 ! work space for shape3E
   integer                               :: nrdofE
-  real*8,  dimension(3,MAXbrickE)       :: shapE
-  real*8,  dimension(3,MAXbrickE)       :: curlE
+  real(8), dimension(3,MAXbrickE)       :: shapE
+  real(8), dimension(3,MAXbrickE)       :: curlE
 !
 ! H(curl) shape functions in reference coordinates
-  real*8,  dimension(3)                 :: uEeta,curluEeta
+  real(8), dimension(3)                 :: uEeta,curluEeta
 !
 ! work space for shape3V
   integer                               :: nrdofV
-  real*8,  dimension(3,MAXbrickH)       :: shapV
-  real*8,  dimension(MAXbrickH)         :: divV
+  real(8), dimension(3,MAXbrickH)       :: shapV
+  real(8), dimension(MAXbrickH)         :: divV
 !
 ! H(div) test and trial shape function in reference coordinates
-  real*8, dimension(3)                  :: uVeta
+  real(8), dimension(3)                 :: uVeta
 !
 ! dot product 
-  real*8                                :: prod
+  real(8)                               :: prod
 !
 ! geometry
-  real*8                                :: rjac,bjac,rjacdxdeta
-  real*8, dimension(2)                  :: t
-  real*8, dimension(3)                  :: xi,eta,rn,x
-  real*8, dimension(3,2)                :: dxidt,detadt
-  real*8, dimension(3,3)                :: detadxi,dxideta,dxdeta,detadx
+  real(8)                               :: rjac,bjac,rjacdxdeta
+  real(8), dimension(2)                 :: t
+  real(8), dimension(3)                 :: xi,eta,rn,x
+  real(8), dimension(3,2)               :: dxidt,detadt
+  real(8), dimension(3,3)               :: detadxi,dxideta,dxdeta,detadx
 !
 ! Dirichlet BC data at a point
   VTYPE :: zvalH(  MAXEQNH), zdvalH(  MAXEQNH,3), &
@@ -123,7 +125,7 @@
   integer, dimension(NR_PHYSA)          :: ncase
 !
 ! error per component
-  real*8   :: derrorH(MAXEQNH),derrorE(MAXEQNE),derrorV(MAXEQNV)
+  real(8) :: derrorH(MAXEQNH),derrorE(MAXEQNE),derrorV(MAXEQNV)
 !
 ! misc
   integer :: iprint,nrv,nre,nrf,if,nod,nflag,kH,kE,kV,i,j,nsign,&
@@ -197,16 +199,16 @@
       call face_param(type,if,t, xi,dxidt)
 !
 !     compute element H1 shape functions
-      call shape3H(type,xi,norder,nedge_orient,nface_orient, &
-                   nrdofH,shapH,gradH)
+      call shape3DH(type,xi,norder,nedge_orient,nface_orient, &
+                    nrdofH,shapH,gradH)
 !
 !     compute element Hcurl shape functions 
-      call shape3E(type,xi,norder,nedge_orient,nface_orient, &
-                   nrdofE,shapE,curlE)
+      call shape3DE(type,xi,norder,nedge_orient,nface_orient, &
+                    nrdofE,shapE,curlE)
 !
 !     compute element H(div) shape functions 
-      call shape3V(type,xi,norder,nface_orient, &
-                   nrdofV,shapV,divV)
+      call shape3DV(type,xi,norder,nface_orient, &
+                    nrdofV,shapV,divV)
 !
 !     evaluate reference coordinates of the point as needed by GMP
       nsign = nsign_param(type,if)

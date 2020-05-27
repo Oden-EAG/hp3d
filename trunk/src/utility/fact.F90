@@ -19,4 +19,4 @@
         enddo
       endif
 !
-      end
+      end function

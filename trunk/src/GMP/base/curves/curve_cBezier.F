@@ -8,13 +8,13 @@ c----------------------------------------------------------------------
       implicit none
 c----------------------------------------------------------------------
       integer, intent(in) :: Nc
-      real*8, intent(in) :: Eta
-      real*8, dimension(3), intent(out) :: X
-      real*8, dimension(3), intent(out) :: Dxdeta
+      real(8), intent(in) :: Eta
+      real(8), dimension(3), intent(out) :: X
+      real(8), dimension(3), intent(out) :: Dxdeta
 c----------------------------------------------------------------------
       integer :: i,np1,np2
-      real*8, dimension(0:3)     :: B
-      real*8, dimension(0:3,1:3) :: V
+      real(8), dimension(0:3)     :: B
+      real(8), dimension(0:3,1:3) :: V
 c----------------------------------------------------------------------
 c
 c  ...get curve's endpoints      

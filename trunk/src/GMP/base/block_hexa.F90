@@ -14,13 +14,13 @@ subroutine hexa(No,Eta, X,Dxdeta)
       use GMP          , only : HEXAS,POINTS,CURVES,RECTANGLES
 !
       implicit none
-      integer              ,intent(in ) :: No
-      real*8,dimension(3  ),intent(in ) :: Eta
-      real*8,dimension(3  ),intent(out) :: X
-      real*8,dimension(3,3),intent(out) :: Dxdeta
+      integer               ,intent(in ) :: No
+      real(8),dimension(3  ),intent(in ) :: Eta
+      real(8),dimension(3  ),intent(out) :: X
+      real(8),dimension(3,3),intent(out) :: Dxdeta
 !------------------------------------------------------------------------------------
-      real*8,dimension(  8) :: vshape
-      real*8,dimension(3,8) :: dvshape
+      real(8),dimension(  8) :: vshape
+      real(8),dimension(3,8) :: dvshape
 !
       integer :: i,nc,nr,lab,nrdof,np,j
       integer :: iprint
@@ -78,7 +78,7 @@ subroutine hexa(No,Eta, X,Dxdeta)
        endselect
 !
 !
-endsubroutine hexa
+end subroutine hexa
 !
 !
 !
@@ -98,32 +98,32 @@ subroutine hexa_TraHex(No,Eta, X,Dxdeta)
       use GMP          , only : HEXAS,POINTS,CURVES,RECTANGLES
       use element_data , only : BRICK_EDGE_TO_VERT,BRICK_FACE_TO_VERT
       implicit none
-      integer              ,intent(in ) :: No
-      real*8,dimension(3  ),intent(in ) :: Eta
-      real*8,dimension(3  ),intent(out) :: X
-      real*8,dimension(3,3),intent(out) :: Dxdeta
+      integer               ,intent(in ) :: No
+      real(8),dimension(3  ),intent(in ) :: Eta
+      real(8),dimension(3  ),intent(out) :: X
+      real(8),dimension(3,3),intent(out) :: Dxdeta
 !------------------------------------------------------------------------------------
 !  ...vertex shape functions
-      real*8,dimension(  8)   :: vshape
-      real*8,dimension(3,8)   :: dvshape
+      real(8),dimension(  8)  :: vshape
+      real(8),dimension(3,8)  :: dvshape
 !  ...edge blending functions
-      real*8,dimension(  12)  :: blende
-      real*8,dimension(3,12)  :: dblende
+      real(8),dimension(  12) :: blende
+      real(8),dimension(3,12) :: dblende
 !  ...face blending functions
-      real*8,dimension(   6)  :: blendf
-      real*8,dimension(3, 6)  :: dblendf
+      real(8),dimension(   6) :: blendf
+      real(8),dimension(3, 6) :: dblendf
 !  ...local edge coordinate
-      real*8                  :: te
-      real*8,dimension(3)     :: dtedeta
+      real(8)                 :: te
+      real(8),dimension(3)    :: dtedeta
 !  ...curve
-      real*8,dimension(3)     :: xe
-      real*8,dimension(3)     :: dxedte
+      real(8),dimension(3)    :: xe
+      real(8),dimension(3)    :: dxedte
 !  ...local face coodinates
-      real*8,dimension(2)     :: tf
-      real*8,dimension(2,3)   :: dtfdeta
+      real(8),dimension(2)    :: tf
+      real(8),dimension(2,3)  :: dtfdeta
 !  ...quad
-      real*8,dimension(3)     :: xf
-      real*8,dimension(3,2)   :: dxfdtf
+      real(8),dimension(3)    :: xf
+      real(8),dimension(3,2)  :: dxfdtf
 !
       integer                 :: nrdof,i,j,np,nc,norient,nr,iv1,iv2,iv4
       integer                 :: iprint
@@ -262,7 +262,7 @@ subroutine hexa_TraHex(No,Eta, X,Dxdeta)
       endif
 !
 !
-endsubroutine hexa_TraHex
+end subroutine hexa_TraHex
 
 !
 !-----------------------------------------------------------------------
@@ -300,21 +300,21 @@ endsubroutine hexa_TraHex
       use GMP          , only : HEXAS,POINTS,NDIM
       implicit none
 !----------------------------------------------------------------------
-      integer,                intent(in)  :: No
-      real*8, dimension(3),   intent(in)  :: Eta(3)
-      real*8, dimension(3),   intent(out) :: X(3)
-      real*8, dimension(3,3), intent(out) :: Dxdeta(3,3)
+      integer,                 intent(in)  :: No
+      real(8), dimension(3),   intent(in)  :: Eta(3)
+      real(8), dimension(3),   intent(out) :: X(3)
+      real(8), dimension(3,3), intent(out) :: Dxdeta(3,3)
 !----------------------------------------------------------------------
 !  ...vertex shape functions
-      real*8, dimension(8)   :: vshape
-      real*8, dimension(3,8) :: dvshape
+      real(8), dimension(8)   :: vshape
+      real(8), dimension(3,8) :: dvshape
 !  ...cylindrical coordinates
-      real*8               :: r,theta,rp,thetap,thetaTmp
-      real*8, dimension(3) :: drdeta,dthetadeta
+      real(8)               :: r,theta,rp,thetap,thetaTmp
+      real(8), dimension(3) :: drdeta,dthetadeta
 !----------------------------------------------------------------------
 !     misc.
       integer :: iprint,iv,np,i
-      real*8  :: pi,twopi,costhet,sinthet
+      real(8) :: pi,twopi,costhet,sinthet
 !----------------------------------------------------------------------
 !
       iprint=0
