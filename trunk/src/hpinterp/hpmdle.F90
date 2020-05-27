@@ -113,8 +113,8 @@
     wa      = wa_list(l)
 !
 !   compute element H1 shape functions
-    call shape3H(Type,xi,Norder,Nedge_orient,Nface_orient, &
-                 nrdofH,shapH,gradH)
+    call shape3DH(Type,xi,Norder,Nedge_orient,Nface_orient, &
+                  nrdofH,shapH,gradH)
 !
 !   compute reference geometry
     call refgeom3D(Mdle,xi,Etav,shapH,gradH,nrv, &

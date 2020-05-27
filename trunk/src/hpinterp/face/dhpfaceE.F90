@@ -26,7 +26,7 @@
   use parameters
   use physics
   use element_data
-  use cross_product_module
+!
   implicit none
 !
 ! ** Arguments
@@ -164,14 +164,14 @@
      call face_param(Type,Iface,t, xi,dxidt)
 !
 !    compute element H1 shape functions
-     call shape3H(Type,xi, &
-                  norder_1,Nedge_orient,Nface_orient, &
-                  nrdofH,shapH,gradH)
+     call shape3DH(Type,xi, &
+                   norder_1,Nedge_orient,Nface_orient, &
+                   nrdofH,shapH,gradH)
 !
 !    compute element Hcurl shape functions 
-     call shape3E(Type,xi, &
-                  norder_1,Nedge_orient,Nface_orient, &
-                  nrdofE,shapE,curlE)
+     call shape3DE(Type,xi, &
+                   norder_1,Nedge_orient,Nface_orient, &
+                   nrdofE,shapE,curlE)
 !
 !    evaluate reference coordinates of the point as needed by GMP
      nsign = nsign_param(Type,Iface)

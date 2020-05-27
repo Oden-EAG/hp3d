@@ -151,12 +151,12 @@
     call edge_param(Type,Iedge,t, xi,dxidt)
 !
 !   compute element H1 shape functions (for geometry)
-    call shape3H(Type,xi,norder_1,Nedge_orient,Nface_orient, &
-                 nrdofH,shapH,gradH)
+    call shape3DH(Type,xi,norder_1,Nedge_orient,Nface_orient, &
+                  nrdofH,shapH,gradH)
 !
 !   compute element Hcurl shape functions 
-    call shape3E(Type,xi,norder_1,Nedge_orient,Nface_orient, &
-                 nrdofE,shapE,curlE)
+    call shape3DE(Type,xi,norder_1,Nedge_orient,Nface_orient, &
+                  nrdofE,shapE,curlE)
 !
 !   compute reference geometry
     call refgeom3D(Mdle,xi,Etav,shapH,gradH,nrv, &

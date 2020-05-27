@@ -158,12 +158,12 @@
     call face_param(Type,Iface,t, xi,dxidt)
 !
 !   compute element H1 shape functions (for geometry)
-    call shape3H(Type,xi,norder_1,Nedge_orient,Nface_orient, &
-                 nrdofH,shapH,gradH)
+    call shape3DH(Type,xi,norder_1,Nedge_orient,Nface_orient, &
+                  nrdofH,shapH,gradH)
 !
 !   compute element H(div) shape functions 
-    call shape3V(Type,xi,norder_1,Nface_orient, &
-                 nrdofV,shapV,divV)
+    call shape3DV(Type,xi,norder_1,Nface_orient, &
+                  nrdofV,shapV,divV)
 
 !   evaluate reference coordinates of the point as needed by GMP
     nsign = nsign_param(Type,Iface)

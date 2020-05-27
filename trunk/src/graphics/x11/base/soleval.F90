@@ -71,11 +71,11 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
 !
 !     evaluate H1 shape functions
       etype=NODES(Mdle)%type
-      call shape3H(etype,Xi,Norder,Nedge_orient,Nface_orient, nrdofH,shapH,gradH)
-!      
+      call shape3DH(etype,Xi,Norder,Nedge_orient,Nface_orient, nrdofH,shapH,gradH)
+!
 !     geometry map
       select case(EXGEOM)
-!      
+!
 !     -- ISOPARAMETRIC GEOMETRY MAP --
       case(0)
         X(1:3)=0.d0 ; Dxdxi(1:3,1:3)=0.d0
@@ -154,7 +154,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
 !===============================================================================
 !
 !     H(curl) shape functions
-      call shape3E(etype,Xi,Norder,Nedge_orient,Nface_orient, nrdofE,shapE,curlE)
+      call shape3DE(etype,Xi,Norder,Nedge_orient,Nface_orient, nrdofE,shapE,curlE)
 !
 !     Piola transform
       shapEx=ZERO ; curlEx=ZERO
@@ -197,7 +197,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
 !===============================================================================
 !
 !     H(div) shape functions
-      call shape3V(etype,Xi,Norder,Nface_orient, nrdofV,shapV,divV)
+      call shape3DV(etype,Xi,Norder,Nface_orient, nrdofV,shapV,divV)
 !      
 !     Piola transform (H(div) shape functions are transformed as H(curl) curls)
       shapVx=ZERO ; divVx=ZERO
@@ -241,7 +241,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
 !===============================================================================
 !
 !     L2 shape functions
-      call shape3Q(etype,Xi,Norder, nrdofQ,shapQ)
+      call shape3DQ(etype,Xi,Norder, nrdofQ,shapQ)
 !      
 !     Piola transform
       shapQ(1:nrdofQ)=shapQ(1:nrdofQ)/rjac

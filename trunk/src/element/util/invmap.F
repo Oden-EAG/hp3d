@@ -76,8 +76,8 @@ c  ...use element centroid as initial guess
       xi(1:3)=xi(1:3)/nvert(Type)
 
       do iter=1,15
-        call shape3H(Type,xi,Norder, Nedge_orient,Nface_orient,
-     .               nrdofH,shapH,gradH)
+        call shape3DH(Type,xi,Norder, Nedge_orient,Nface_orient,
+     .                nrdofH,shapH,gradH)
 c
 c  .....determine physical coordinates and the derivatives of 
 c       the physical coordinates wrt master element coordinates

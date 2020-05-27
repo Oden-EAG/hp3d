@@ -288,7 +288,7 @@ subroutine geometry_error_elem(Mdle, Derr,Dnorm)
         xi(1:3)=xiloc(1:3,l) ; wa=wxi(l)
 !
 !       evaluate appropriate shape functions at the point
-        call shape3H(etype,xi,norder,nedge_orient,nface_orient, nrdofH,shapH,gradH)
+        call shape3DH(etype,xi,norder,nedge_orient,nface_orient, nrdofH,shapH,gradH)
 !
 !       ISOPARAMETRIC MAP : x_hp = x_hp(xi)
         xhp(1:3)=0.d0 ; dxhpdxi(1:3,1:3)=0.d0 

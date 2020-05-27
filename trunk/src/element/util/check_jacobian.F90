@@ -74,8 +74,8 @@ subroutine check_jacobian
            !  ...parametric element
         case(0)
            !  ...shape functions
-           call shape3H(NODES(Mdle)%type,xi,norder,nedge_orient, &
-                nface_orient, nrdofH,vshapH,dvshapH)
+           call shape3DH(NODES(Mdle)%type,xi,norder,nedge_orient, &
+                         nface_orient, nrdofH,vshapH,dvshapH)
            !  ...accumulate
            x(1:3)=0.d0 ; dxdxi(1:3,1:3)=0.d0 
            do k=1,nrdofH
@@ -140,8 +140,8 @@ subroutine check_jacobian
               !  ...parametric element            
            case(0)
               !  ...derivatives and values of the shape functions
-              call shape3H(NODES(mdle)%type,xi,norder,nedge_orient, &
-                   nface_orient, nrdofH,vshapH,dvshapH)
+              call shape3DH(NODES(mdle)%type,xi,norder,nedge_orient, &
+                            nface_orient, nrdofH,vshapH,dvshapH)
               !  ...accumulate
               x(1:3)=0.d0 ; dxdxi(1:3,1:3)=0.d0 
               do k=1,nrdofH

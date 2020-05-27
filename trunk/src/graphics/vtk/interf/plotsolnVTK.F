@@ -196,11 +196,9 @@ c           set reference coordinates
             xi(3) = dxi*dble(l3)
 c
 c           compute physical coordinates and derivatives
-            call shape3H(NODES(mdle)%type,xi,norder,
-     .                   nedge_orient,nface_orient,
-     .                   nrdofH,shapH,gradH)
-ccc            call shape3_new(NODES(mdle)%type,nedge_orient,nface_orient,
-ccc     .                      xi,norder, nrdofH,shapH,gradH)
+            call shape3DH(NODES(mdle)%type,xi,norder,
+     .                    nedge_orient,nface_orient,
+     .                    nrdofH,shapH,gradH)
 c
             x(:,l) = 0.d0
             dxdxi  = 0.d0
@@ -245,12 +243,9 @@ c           set reference coordinates
             xi(3) = dxi*dble(l3)
 c
 c           compute physical coordinates and derivatives
-            call shape3H(NODES(mdle)%type,xi,norder,
-     .                   nedge_orient,nface_orient,
-     .                   nrdofH,shapH,gradH)
-
-ccc            call shape3_new(NODES(mdle)%type,nedge_orient,nface_orient,
-ccc     .                      xi,norder, nrdofH,shapH,gradH)
+            call shape3DH(NODES(mdle)%type,xi,norder,
+     .                    nedge_orient,nface_orient,
+     .                    nrdofH,shapH,gradH)
 c
             x(:,l) = 0.d0
             dxdxi  = 0.d0
@@ -295,11 +290,9 @@ c           set reference coordinates
             xi(3) = dxi*dble(l3)
 c
 c           compute physical coordinates and derivatives
-            call shape3H(NODES(mdle)%type,xi,norder,
-     .                   nedge_orient,nface_orient,
-     .                   nrdofH,shapH,gradH)
-ccc            call shape3_new(NODES(mdle)%type,nedge_orient,nface_orient,
-ccc     .                      xi,norder, nrdofH,shapH,gradH)
+            call shape3DH(NODES(mdle)%type,xi,norder,
+     .                    nedge_orient,nface_orient,
+     .                    nrdofH,shapH,gradH)
 c
             x(:,l) = 0.d0
             dxdxi  = 0.d0
@@ -344,11 +337,9 @@ c           set reference coordinates
             xi(3) = dxi*dble(l3)
 c
 c           compute physical coordinates and derivatives
-            call shape3H(NODES(mdle)%type,xi,norder,
-     .                   nedge_orient,nface_orient,
-     .                   nrdofH,shapH,gradH)
-ccc            call shape3_new(NODES(mdle)%type,nedge_orient,nface_orient,
-ccc     .                      xi,norder, nrdofH,shapH,gradH)
+            call shape3DH(NODES(mdle)%type,xi,norder,
+     .                    nedge_orient,nface_orient,
+     .                    nrdofH,shapH,gradH)
 c
             x(:,l) = 0.d0
             dxdxi  = 0.d0

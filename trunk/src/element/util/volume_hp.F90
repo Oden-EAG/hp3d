@@ -59,9 +59,9 @@ subroutine volume_hp_mdle(Mdle, Vol)
      xi(1:3) = xiloc(1:3,l); wa = wxi(l)
 
      !  evaluate appropriate shape functions at the point
-     call shape3H(type,xi, &
-          norder,nedge_orient,nface_orient, &
-          nrdofH,shapH,dshapH)
+     call shape3DH(type,xi, &
+                   norder,nedge_orient,nface_orient, &
+                   nrdofH,shapH,dshapH)
 
      !  mapping to master
      x(1:3) = 0.d0; dxdxi(1:3,1:3) = 0.d0 

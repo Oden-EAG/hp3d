@@ -199,16 +199,16 @@ subroutine elemBCIerror(Mdle, ErrorH,ErrorE,ErrorV)
       call face_param(type,if,t, xi,dxidt)
 !
 !     compute element H1 shape functions
-      call shape3H(type,xi,norder,nedge_orient,nface_orient, &
-                   nrdofH,shapH,gradH)
+      call shape3DH(type,xi,norder,nedge_orient,nface_orient, &
+                    nrdofH,shapH,gradH)
 !
 !     compute element Hcurl shape functions 
-      call shape3E(type,xi,norder,nedge_orient,nface_orient, &
-                   nrdofE,shapE,curlE)
+      call shape3DE(type,xi,norder,nedge_orient,nface_orient, &
+                    nrdofE,shapE,curlE)
 !
 !     compute element H(div) shape functions 
-      call shape3V(type,xi,norder,nface_orient, &
-                   nrdofV,shapV,divV)
+      call shape3DV(type,xi,norder,nface_orient, &
+                    nrdofV,shapV,divV)
 !
 !     evaluate reference coordinates of the point as needed by GMP
       nsign = nsign_param(type,if)

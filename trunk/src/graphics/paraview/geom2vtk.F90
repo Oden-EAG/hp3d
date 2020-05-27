@@ -117,7 +117,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
          call get_vis_point(vis_on_type(etype),iv-1, xi)
 !
 !     ...H1 shape functions at visualization point
-         call shape3H(etype,xi,norder,nedge_orient,nface_orient, nrdofH,shapH,gradH)
+         call shape3DH(etype,xi,norder,nedge_orient,nface_orient, nrdofH,shapH,gradH)
 !
 !     ...geometry map
          select case(PARAVIEW_GEOM)

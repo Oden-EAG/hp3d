@@ -95,9 +95,9 @@ c       derivatives wrt master face coordinates
         endif
 c
 c  .....evaluate shape functions at the point
-        call shape3H(NODES(Mdle)%type,
-     .               Xi,norder,nedge_orient,nface_orient,
-     .               nrdofH,vshapH,dvshapH)
+        call shape3DH(NODES(Mdle)%type,
+     .                Xi,norder,nedge_orient,nface_orient,
+     .                nrdofH,vshapH,dvshapH)
 c
 c  .....compute physical coordinates and their derivatives wrt
 c       master element coordinates

@@ -49,10 +49,9 @@ subroutine check_negative_jacobian(Nodesl, Nsize)
         xi(1:3) = xiloc(1:3,l)
         select case(EXGEOM)
         case(0)
-           call shape3H(type,xi,norder, &
-                nedge_orient,nface_orient, &
-                nrdofH, &
-                shapH,dshapH)
+           call shape3DH(type,xi,norder, &
+                         nedge_orient,nface_orient, &
+                         nrdofH,shapH,dshapH)
            x    (1:3)    =0.d0
            dxdxi(1:3,1:3)=0.d0
            do k=1,nrdofH
