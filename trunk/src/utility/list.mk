@@ -31,7 +31,6 @@ mdle_with_visit_numbering.F90
 point_with_visit_numbering.F90
 mesh2vtk_geom_upscale.F90
 mesh2vtk_data_upscale.F90
-matrix2octave_module.F90
 index_uppertri.F90
 index_lowertri.F90
 cross_product.F90
