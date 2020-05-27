@@ -1,7 +1,7 @@
 subroutine get_ddet(A, Adet)
   implicit none
-  real*8, dimension(3,3), intent(in)  :: A
-  real*8,                 intent(out) :: Adet
+  real(8), dimension(3,3), intent(in)  :: A
+  real(8),                 intent(out) :: Adet
   Adet = A(1,1)*A(2,2)*A(3,3) &
        + A(2,1)*A(3,2)*A(1,3) &
        + A(3,1)*A(1,2)*A(2,3) &
@@ -12,8 +12,8 @@ end subroutine get_ddet
 
 subroutine get_zdet(A, Adet)
   implicit none
-  complex*16, dimension(3,3), intent(in)  :: A
-  complex*16,                 intent(out) :: Adet
+  complex(8), dimension(3,3), intent(in)  :: A
+  complex(8),                 intent(out) :: Adet
   Adet = A(1,1)*A(2,2)*A(3,3) &
        + A(2,1)*A(3,2)*A(1,3) &
        + A(3,1)*A(1,2)*A(2,3) &
@@ -24,10 +24,10 @@ end subroutine get_zdet
 
 subroutine dinvert(A, Ainv, Adet)
   implicit none
-  real*8, dimension(3,3), intent(in)  :: A
-  real*8, dimension(3,3), intent(out) :: Ainv
-  real*8,                 intent(out) :: Adet
-  real*8 :: det(3)
+  real(8), dimension(3,3), intent(in)  :: A
+  real(8), dimension(3,3), intent(out) :: Ainv
+  real(8),                 intent(out) :: Adet
+  real(8) :: det(3)
   
   call get_ddet(A, Adet)
 
@@ -60,10 +60,10 @@ end subroutine dinvert
 
 subroutine zinvert(A, Ainv, Adet)
   implicit none
-  complex*16, dimension(3,3), intent(in)  :: A
-  complex*16, dimension(3,3), intent(out) :: Ainv
-  complex*16,                 intent(out) :: Adet
-  complex*16 :: det(3)
+  complex(8), dimension(3,3), intent(in)  :: A
+  complex(8), dimension(3,3), intent(out) :: Ainv
+  complex(8),                 intent(out) :: Adet
+  complex(8) :: det(3)
 
   call get_zdet(A, Adet)
 

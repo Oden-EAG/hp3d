@@ -5,9 +5,9 @@
 !----------------------------------------------------------------------
 !     DUMMY ARGUMENTS
       integer,              intent(in)  :: I,J,N      
-      real*8,               intent(in)  :: U,V
-      real*8,               intent(out) :: Poly
-      real*8, dimension(2), intent(out) :: dPoly
+      real(8),              intent(in)  :: U,V
+      real(8),              intent(out) :: Poly
+      real(8), dimension(2),intent(out) :: dPoly
 !----------------------------------------------------------------------
 !     EXTERNAL FUNCTION
       integer :: fact
