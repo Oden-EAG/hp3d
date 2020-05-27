@@ -396,7 +396,7 @@
          xip(1:2) = xi12(1:2); xip(3) = xi3
 !
 !     ...Compute shape functions needed for geometry - 3D H1 shape functions
-         call shape3H(etype,xip,norder,norient_edge,norient_face, nrdof,shapH,gradH)
+         call shape3DH(etype,xip,norder,norient_edge,norient_face, nrdof,shapH,gradH)
 !     ...Geometry map
          call geom3D(Mdle,xip,xnod,shapH,gradH,NrdofH, x,dxdxi,dxidx,rjac,iflag)
 !

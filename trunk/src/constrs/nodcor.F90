@@ -257,8 +257,8 @@ subroutine test_nodcor(Mdle)
  7001 format(' xi = ',3(e12.5,2x))
 
 !  ...shape functions
-      call shape3H(NODES(Mdle)%type,xi,norder,nedge_orient, &
-                   nface_orient, nrdofH,vshapH,dvshapH)
+      call shape3DH(NODES(Mdle)%type,xi,norder,nedge_orient, &
+                    nface_orient, nrdofH,vshapH,dvshapH)
 
 !  ...accumulate
       x(1:3)=0.d0 ; dxdxi(1:3,1:3)=0.d0

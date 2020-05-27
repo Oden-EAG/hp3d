@@ -526,7 +526,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
             shapH3(:,2)=dsH3p(:,pz)
 !
 !        ...Compute shape functions needed for geometry - 3D H1 shape functions
-            call shape3H(etype,xip,norder,norient_edge,norient_face, nrdof,shapH,gradH)
+            call shape3DH(etype,xip,norder,norient_edge,norient_face, nrdof,shapH,gradH)
 #if DEBUG_MODE
             if (nrdof .ne. NrdofH) then
                write(*,*) 'elem_maxwell_fi_hexa: INCONSISTENCY NrdofH. stop.'
@@ -1395,8 +1395,8 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 #endif
 !
 !     ...determine element H1 shape functions (for geometry)
-         call shape3H(etype,xi,norder,norient_edge,norient_face, &
-                      nrdof,shapH,gradH)
+         call shape3DH(etype,xi,norder,norient_edge,norient_face, &
+                       nrdof,shapH,gradH)
 #if DEBUG_MODE
          if (nrdof .ne. NrdofH) then
             write(*,*) 'elem_maxwell_fi_hexa: INCONSISTENCY NrdofH. stop.'
@@ -1406,8 +1406,8 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !
 !     ...determine element H(curl) shape functions (for fluxes)
 !     ...for interfaces only (no bubbles)
-         call shape3E(etype,xi,norderi,norient_edge,norient_face, &
-                      nrdof,shapE,curlE)
+         call shape3DE(etype,xi,norderi,norient_edge,norient_face, &
+                       nrdof,shapE,curlE)
 #if DEBUG_MODE
          if (nrdof .ne. NrdofEi) then
             write(*,*) 'elem_maxwell_fi_hexa: INCONSISTENCY NrdofEi. stop.'

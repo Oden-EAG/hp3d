@@ -255,8 +255,8 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
       xi(1:3) = xiloc(1:3,l)
       wa = waloc(l)
 !  ...determine element H1 shape functions
-      call shape3H(etype,xi,norder,norient_edge,norient_face,  &
-                   nrdof,shapH,gradH)
+      call shape3DH(etype,xi,norder,norient_edge,norient_face,  &
+                    nrdof,shapH,gradH)
 #if DEBUG_MODE
       if (nrdof .ne. NrdofH) then
          write(*,*) 'elem_residual_maxwell: INCONSISTENCY NrdofH. stop.'
@@ -264,7 +264,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
       endif
 #endif
 !  ...determine element H(curl) shape functions
-      call shape3E(etype,xi,norder,norient_edge,norient_face, &
+      call shape3DE(etype,xi,norder,norient_edge,norient_face, &
                     nrdof,shapE,curlE)
 #if DEBUG_MODE
       if (nrdof .ne. NrdofE) then
@@ -273,7 +273,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
       endif
 #endif
 !  ...determine element L2 shape functions
-      call shape3Q(etype,xi,norder, nrdof,shapQ)
+      call shape3DQ(etype,xi,norder, nrdof,shapQ)
 #if DEBUG_MODE
       if (nrdof .ne. NrdofQ) then
          write(*,*) 'elem_residual_maxwell: INCONSISTENCY NrdofQ. stop.'
@@ -600,8 +600,8 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
          call shape3EE(etype,xi,nordP, NrdofEE,shapEE,curlEE)
 !
 !     ...determine element H1 shape functions (for geometry)
-         call shape3H(etype,xi,norder,norient_edge,norient_face, &
-                      nrdof,shapH,gradH)
+         call shape3DH(etype,xi,norder,norient_edge,norient_face, &
+                       nrdof,shapH,gradH)
 #if DEBUG_MODE
          if (nrdof .ne. NrdofH) then
             write(*,*) 'elem_residual_maxwell: INCONSISTENCY NrdofH. stop.'
@@ -610,8 +610,8 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 #endif
 !
 !     ...determine element H(curl) shape functions (for fluxes)
-         call shape3E(etype,xi,norder,norient_edge,norient_face, &
-                      nrdof,shapE,curlE)
+         call shape3DE(etype,xi,norder,norient_edge,norient_face, &
+                       nrdof,shapE,curlE)
 #if DEBUG_MODE
          if (nrdof .ne. NrdofE) then
             write(*,*) 'elem_residual_maxwell: INCONSISTENCY NrdofE. stop.'

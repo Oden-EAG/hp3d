@@ -186,7 +186,7 @@ subroutine elem_residual_heat(Mdle,                &
       wa = waloc(l)
 !
 !  ...determine element H1 shape functions
-      call shape3H(etype,xi,norder,norient_edge,norient_face, &
+      call shape3DH(etype,xi,norder,norient_edge,norient_face, &
                     nrdof,shapH,gradH)
 #if DEBUG_MODE
       if (nrdof .ne. NrdofH) then
@@ -316,8 +316,8 @@ subroutine elem_residual_heat(Mdle,                &
 #endif
 !
 !     ...determine element H1 shape functions (for geometry)
-         call shape3H(etype,xi,norder,norient_edge,norient_face, &
-                      nrdof,shapH,gradH)
+         call shape3DH(etype,xi,norder,norient_edge,norient_face, &
+                       nrdof,shapH,gradH)
 #if DEBUG_MODE
          if (nrdof .ne. NrdofH) then
             write(*,*) 'elem_residual_heat: INCONSISTENCY NrdofH. stop.'
@@ -326,8 +326,8 @@ subroutine elem_residual_heat(Mdle,                &
 #endif
 !
 !     ...determine element Hdiv shape functions (for fluxes)
-         call shape3V(etype,xi,norder,norient_face, &
-                      nrdof,shapV,divV)
+         call shape3DV(etype,xi,norder,norient_face, &
+                       nrdof,shapV,divV)
 #if DEBUG_MODE
          if (nrdof .ne. NrdofV) then
             write(*,*) 'elem_residual_heat: INCONSISTENCY NrdofV. stop.'

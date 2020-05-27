@@ -696,12 +696,12 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
       call face_param(etype,Facenumber,t, xi,dxidt)
 !
 !  ...determine element H1 shape functions (for geometry)
-      call shape3H(etype,xi,norder,nedge_orient,nface_orient, &
-                     nrdofH,shapH,gradH)
+      call shape3DH(etype,xi,norder,nedge_orient,nface_orient, &
+                    nrdofH,shapH,gradH)
 !
 !  ...geometry
       call bgeom3D(Mdle,xi,xnod,shapH,gradH,nrdofH,dxidt,nsign, &
-                     x,dxdxi,dxidx,rjac,dxdt,rn,bjac)
+                   x,dxdxi,dxidx,rjac,dxdt,rn,bjac)
       weight = bjac*wtloc(l)
 !
       call soleval(Mdle,xi,nedge_orient,nface_orient,norder,xnod, &
@@ -903,8 +903,8 @@ subroutine compute_mode_power(Mdle,Facenumber,Fld, ModePower,ModeNorm,ModeCoef)
       call face_param(etype,Facenumber,t, xi,dxidt)
 !
 !  ...determine element H1 shape functions (for geometry)
-      call shape3H(etype,xi,norder,nedge_orient,nface_orient, &
-                     nrdofH,shapH,gradH)
+      call shape3DH(etype,xi,norder,nedge_orient,nface_orient, &
+                    nrdofH,shapH,gradH)
 !
 !  ...geometry
       call bgeom3D(Mdle,xi,xnod,shapH,gradH,nrdofH,dxidt,nsign, &
@@ -941,8 +941,8 @@ subroutine compute_mode_power(Mdle,Facenumber,Fld, ModePower,ModeNorm,ModeCoef)
       call face_param(etype,Facenumber,t, xi,dxidt)
 !
 !  ...determine element H1 shape functions (for geometry)
-      call shape3H(etype,xi,norder,nedge_orient,nface_orient, &
-                     nrdofH,shapH,gradH)
+      call shape3DH(etype,xi,norder,nedge_orient,nface_orient, &
+                    nrdofH,shapH,gradH)
 !
 !  ...geometry
       call bgeom3D(Mdle,xi,xnod,shapH,gradH,nrdofH,dxidt,nsign, &

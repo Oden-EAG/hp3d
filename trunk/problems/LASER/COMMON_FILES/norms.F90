@@ -814,8 +814,8 @@ end subroutine get_elem_Norm
 !        call face_param(etype,facenumber,t, xi,dxidt)
 !!
 !! .......determine element H1 shape functions (for geometry)
-!        call shape3H(etype,xi,norder,nedge_orient,nface_orient, &
-!                     nrdofH,shapH,gradH)
+!        call shape3DH(etype,xi,norder,nedge_orient,nface_orient, &
+!                      nrdofH,shapH,gradH)
 !!
 !! .......geometry
 !        call bgeom3D(mdle,xi,xnod,shapH,gradH,nrdofH,dxidt,nsign, &

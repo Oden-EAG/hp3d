@@ -333,10 +333,10 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
       xi(1:3)=xiloc(1:3,l); wa=waloc(l)
 !
 !  ...H1 shape functions (for geometry)
-      call shape3H(etype,xi,norder,norient_edge,norient_face, nrdofH,shapH,gradH)
+      call shape3DH(etype,xi,norder,norient_edge,norient_face, nrdofH,shapH,gradH)
 !
 !  ...L2 shape functions for the trial space
-      call shape3Q(etype,xi,norder, nrdofQ,shapQ)
+      call shape3DQ(etype,xi,norder, nrdofQ,shapQ)
 !
 !  ...broken H(curl) shape functions for the enriched test space
       call shape3EE(etype,xi,nordP, nrdofEE,shapEE,curlEE)
@@ -627,8 +627,8 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 #endif
 !
 !     ...determine element H1 shape functions (for geometry)
-         call shape3H(etype,xi,norder,norient_edge,norient_face, &
-                      nrdof,shapH,gradH)
+         call shape3DH(etype,xi,norder,norient_edge,norient_face, &
+                       nrdof,shapH,gradH)
 #if DEBUG_MODE
          if (nrdof .ne. NrdofH) then
             write(*,*) 'elem_maxwell: INCONSISTENCY NrdofH. stop.'
@@ -638,8 +638,8 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !     ...determine element H(curl) shape functions (for fluxes)
 !     ...for interfaces only (no bubbles)
-         call shape3E(etype,xi,norderi,norient_edge,norient_face, &
-                      nrdof,shapE,curlE)
+         call shape3DE(etype,xi,norderi,norient_edge,norient_face, &
+                       nrdof,shapE,curlE)
 #if DEBUG_MODE
          if (nrdof .ne. NrdofEi) then
             write(*,*) 'elem_maxwell: INCONSISTENCY NrdofEi. stop.'
