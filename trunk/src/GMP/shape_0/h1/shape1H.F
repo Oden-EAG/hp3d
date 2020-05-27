@@ -22,7 +22,7 @@ c
 c----------------------------------------------------------------------
 c
       subroutine shape1H_0(Xi,Nord, NrdofH,ShapH,DshapH)
-c      
+c
       use parameters
       use element_data
 #include "syscom.blk"

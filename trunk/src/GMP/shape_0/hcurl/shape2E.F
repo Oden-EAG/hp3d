@@ -22,7 +22,7 @@ c       CurlE     - values of derivatives of the shape functions
 c                   wrt to master element coordinates      
 c     
 c----------------------------------------------------------------------
-c     
+c
       subroutine shapeEt_0(Xi,Norder,Norient, NrdofE,ShapE,CurlE)
 c     
       use element_data
