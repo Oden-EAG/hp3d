@@ -21,7 +21,7 @@
 !> @param[out] D2valQ - corresponding second derivatives
 !------------------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
                           ValV,DvalV,D2valV, ValQ,DvalQ,D2valQ)

@@ -11,7 +11,7 @@
 !                         auxiliary data structure
 !
 ! ----------------------------------------------------------------------
-#include "implicit_none.h"
+#include "typedefs.h"
    subroutine coarse_solve_pardiso
 !
    use data_structure3D, ONLY: NRNODS, NODES

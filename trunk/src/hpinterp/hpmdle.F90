@@ -1,5 +1,5 @@
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 !-----------------------------------------------------------------------
 !> Purpose : determine middle node geometry dof interpolating GMP map using
@@ -19,7 +19,6 @@
 !!
 !! @param[out] Xdof         - geometry dof for the middle node
 !-----------------------------------------------------------------------
-#include "implicit_none.h"
   subroutine hpmdle(Mdle,Iflag,No,Etav,Type, &
                     Nedge_orient,Nface_orient,Norder, &
                     Xnod, Xdof)

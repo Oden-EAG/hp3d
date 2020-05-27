@@ -8,7 +8,7 @@
 !> @param[out] d2E - corresponding second derivatives
 !--------------------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !

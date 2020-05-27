@@ -20,7 +20,7 @@
 !              Zele     - the element dof
 !
 ! -----------------------------------------------------------------------
-#include "implicit_none.h"
+#include "typedefs.h"
 subroutine solout_mg(Ielc,Iel,Mdle,Ndof,Nrhs,Zele)
 !
    use element_data

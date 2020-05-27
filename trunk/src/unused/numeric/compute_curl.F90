@@ -1,4 +1,4 @@
-#include "implicit_none.h"
+#include "typedefs.h"
 subroutine compute_curl(Zdval, Zcurl)
   implicit none
   VTYPE, dimension(3,3), intent(in)  :: Zdval

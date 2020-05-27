@@ -14,7 +14,7 @@
 !
 !-----------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
    subroutine compute_vert_patch(Igrid)
 !

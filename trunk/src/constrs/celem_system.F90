@@ -50,7 +50,7 @@
 !                        matrix
 !
 !----------------------------------------------------------------------
-#include "implicit_none.h"
+#include "typedefs.h"
 subroutine celem_system(Mdle,Idec,                                &
                         Nrdofs,Nrdofm,Nrdofc,                     &
                         Nodm,NdofmH,NdofmE,NdofmV,NdofmQ,Nrnodm,  &

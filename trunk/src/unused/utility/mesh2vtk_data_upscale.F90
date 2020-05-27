@@ -1,4 +1,6 @@
-#include "implicit_none.h"
+!
+#include "typedefs.h"
+!
 subroutine mesh2vtk_data_upscale(Nout, Title, Isel, Z_harmonic, Show_Data )
   !
   use data_structure3D
@@ -74,7 +76,6 @@ end subroutine mesh2vtk_data_upscale
 ! Soleval some times behave very differently...
 ! Definitely data corruption exist. Fortran mystery...
 !
-#include "implicit_none.h"
 subroutine dummy_soleval(Mdle)
   use data_structure3D
   use upscale

@@ -20,7 +20,7 @@
 !
 !-----------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
    subroutine macro_assembly(Igrid, Idec_sch)
 !

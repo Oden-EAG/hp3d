@@ -14,7 +14,7 @@
 !
    module m_assembly
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 !..local stiffness matrices
    VTYPE, allocatable, save :: ZLOAD(:),  ZTEMP(:)

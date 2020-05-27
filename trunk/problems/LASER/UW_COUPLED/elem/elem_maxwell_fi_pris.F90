@@ -40,7 +40,7 @@
 !
 !---------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                                 NrTest,NrTrial,               &

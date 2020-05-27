@@ -1,7 +1,7 @@
 !
 !..auxiliary subroutines for distributed mesh (par_mesh module)
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 !----------------------------------------------------------------------
 !
@@ -360,6 +360,7 @@ subroutine print_partition()
 !
    integer :: par(NRELES)
    integer :: iel,j,k,l,nrelem,mdle,subd
+   character(16) :: fmt
 !
 !----------------------------------------------------------------------
 !
@@ -384,13 +385,12 @@ subroutine print_partition()
       k = 0
       do while (k .lt. nrelem)
          l = MIN(k+10,nrelem)
-         !!!TODO
-         !!!write(6,2010) '     ',par(k+1:l)
+         write(fmt,'("(", I0, "I6)")') l-k
+         write(6,fmt) par(k+1:l)
          k = l
       enddo
    enddo
   2000 format(A,I4,A)
-  !!!2010 format(A,<l-k>I6)
 !
   290 continue
 !
@@ -416,6 +416,7 @@ subroutine print_subd()
 !
    integer :: sub(NRNODS)
    integer :: k,l,nod,nrnod_subd,subd,vis
+   character(16) :: fmt
 !
 !----------------------------------------------------------------------
 !
@@ -439,12 +440,11 @@ subroutine print_subd()
    k = 0
    do while (k .lt. nrnod_subd)
       l = MIN(k+10,nrnod_subd)
-      !!!TODO
-      !!!write(6,3010) '     ',sub(k+1:l)
+      write(fmt,'("(",I0,"I6)")') l-k
+      write(6,fmt) sub(k+1:l)
       k = l
    enddo
  3000 format(A,I3,A)
- !!!3010 format(A,<l-k>I5)
 !
   390 continue
 !

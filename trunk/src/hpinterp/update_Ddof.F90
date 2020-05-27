@@ -1,4 +1,4 @@
-#include "implicit_none.h"
+#include "typedefs.h"
 !-----------------------------------------------------------------------
 !
 !    routine name       - update_Ddof

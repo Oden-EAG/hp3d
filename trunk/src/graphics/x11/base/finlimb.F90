@@ -1,7 +1,7 @@
 !> Purpose : routine finds 'numlev'- levels of solution values
 !! @param[in]  Numlev - number of levels to plot solution values
 !! @param[out] Solev  - limiting values for each level
-#include "implicit_none.h"
+#include "typedefs.h"
   subroutine finlimb(Numlev, Solev)
     use error
     use data_structure3D

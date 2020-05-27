@@ -20,7 +20,7 @@
 !                                'G': General case for Lapack routines
 !
 ! ----------------------------------------------------------------------
-#include "implicit_none.h"
+#include "typedefs.h"
 subroutine pardiso_sc(mtype)
 !
    use data_structure3D, only: NRNODS, NRELES, ELEM_ORDER

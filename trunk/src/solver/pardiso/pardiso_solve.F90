@@ -19,7 +19,7 @@
 !          in/out       - B      : Right hand size/solution array
 !
 !------------------------------------------------------------------------
-#include "implicit_none.h"
+#include "typedefs.h"
 subroutine pardiso_solve(Ia,Ja,A,Type,Nnz,N,Nrhs, B)
 !
    use assembly_sc, only: IPRINT_TIME

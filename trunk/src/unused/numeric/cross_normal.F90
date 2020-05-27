@@ -1,4 +1,4 @@
-#include "implicit_none.h"
+#include "typedefs.h"
 subroutine cross_normal(Rn, Zcurl, Zcurj)
   implicit none
   real*8,dimension(3), intent(in)  :: Rn

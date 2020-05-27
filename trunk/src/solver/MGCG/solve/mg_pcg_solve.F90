@@ -17,7 +17,7 @@
 !-----------------------------------------------------------------------
 !
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
    subroutine mg_pcg_solve(Igrid)
 !

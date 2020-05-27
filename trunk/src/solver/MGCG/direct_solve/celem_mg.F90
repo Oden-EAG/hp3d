@@ -53,7 +53,7 @@
 !                        matrix
 !
 !----------------------------------------------------------------------
-#include "implicit_none.h"
+#include "typedefs.h"
 subroutine celem_mg(Ielc,Iel,Mdle,Idec,                       &
                     Nrdofs,Nrdofm,Nrdofc,                     &
                     Nodm,NdofmH,NdofmE,NdofmV,NdofmQ,Nrnodm,  &

@@ -55,7 +55,7 @@ end subroutine grad_sphere2cart
 !! @param Zds [in]  - derivative in spherical coord
 !! @param Zc  [out] - displacement in cartesian coord
 !! @param Zdc [out] - derivative in cartesian coord
-#include "implicit_none.h"
+#include "typedefs.h"
 subroutine disp_sphere2cart(S, Zs, Zds, Zc, Zdc)
   use parameters
   implicit none

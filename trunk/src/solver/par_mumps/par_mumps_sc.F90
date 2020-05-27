@@ -1,5 +1,5 @@
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 ! -----------------------------------------------------------------------
 !
 !    routine name       - par_mumps_sc

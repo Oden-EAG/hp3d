@@ -19,7 +19,7 @@
 !
 !---------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 subroutine elem_residual(Mdle, Resid,Nref_flag)
 !..modules used

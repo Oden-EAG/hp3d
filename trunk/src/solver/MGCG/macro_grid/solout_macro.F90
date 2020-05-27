@@ -17,7 +17,7 @@
 !             ndof    - size of macro_element solution vector
 ! ----------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
    subroutine solout_macro(Igrid, Ielc,Zsol_globi,Ndof)
 !

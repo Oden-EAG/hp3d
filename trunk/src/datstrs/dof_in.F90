@@ -3,7 +3,7 @@
 !! @param[in] ZvalH,ZvalE,ZvalV,ZvalQ - H1,H(curl),H(div) and L2 dof
 !!                        for the node in the expanded mode
 
-#include "implicit_none.h"
+#include "typedefs.h"
 subroutine dof_in(Nod,ZvalH,ZvalE,ZvalV,ZvalQ)
   use data_structure3D
   implicit none

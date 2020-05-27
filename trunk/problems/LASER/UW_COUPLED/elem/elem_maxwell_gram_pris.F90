@@ -25,7 +25,7 @@
 !
 !---------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
    subroutine elem_maxwell_gram_pris(Mdle,Fld_flag,NrTest,NrdofH, GramP)
 !

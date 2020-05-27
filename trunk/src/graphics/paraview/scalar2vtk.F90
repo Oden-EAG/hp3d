@@ -10,7 +10,7 @@
 !> @date Oct 2019
 !----------------------------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 subroutine scalar2vtk(Sname,Sfile,Snick,Idx, Ic)
 !
