@@ -30,8 +30,6 @@ subroutine coo2csc(IA,JA,XA,nz, nnz)
    integer    , intent(inout) :: IA(nz),JA(nz)
    VTYPE      , intent(inout) :: XA(nz)
 !
-   integer :: i,j,p,t
-!
 !..sort and remove duplicates
    call assemble_triplet(JA,IA,XA,nz,nnz)
 !
@@ -72,8 +70,6 @@ subroutine coo2csr(IA,JA,XA,nz, nnz)
    integer    , intent(out)   :: nnz
    integer    , intent(inout) :: IA(nz),JA(nz)
    VTYPE      , intent(inout) :: XA(nz)
-!
-   integer :: i,j,p,t
 !
 !..sort and remove duplicates
    call assemble_triplet(IA,JA,XA,nz,nnz)

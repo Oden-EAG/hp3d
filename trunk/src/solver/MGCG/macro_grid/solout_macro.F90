@@ -17,7 +17,7 @@
 !             ndof    - size of macro_element solution vector
 ! ----------------------------------------------------------------------
 !
-#include 'implicit_none.h'
+#include "implicit_none.h"
 !
    subroutine solout_macro(Igrid, Ielc,Zsol_globi,Ndof)
 ! 
@@ -26,7 +26,7 @@
    use macro_grid_info,   ONLY: A_MACRO
    use mg_data_structure, ONLY: ISTORE, ISTORE_YES
 !  
-   IMPLICIT NONE
+   implicit none
 !
 !-----------------------------------------------------------------------
 !

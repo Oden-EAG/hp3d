@@ -95,7 +95,9 @@
 !
 ! load vector and solution
   VTYPE,   dimension(MAXMdlqH+MAXMdlqE,MAXEQNE) :: zbE,zuE
+#if C_MODE
   real(8), dimension(MAXMdlqH+MAXMdlqE,MAXEQNE) :: duE_real, duE_imag
+#endif
 !
   integer, dimension(NR_PHYSA) :: ncase
 !
@@ -103,7 +105,7 @@
   integer :: nrv,nre,nrf,nsign,nflag, &
              i,j,iH,jH,iE,jE,kjE,kiE,kiH,kjH,k,kE,&
              ivarE,nvarE,naE,iprint,info, &
-             ndofH_face,ndofE_face,ndofV_face,ndofQ_Face, ndofE_tot
+             ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,ndofE_tot
 !
 !-----------------------------------------------------------------------
   if (Iface.eq.2) then

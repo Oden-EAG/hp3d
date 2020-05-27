@@ -27,7 +27,7 @@
    use data_structure3D, ONLY: NODES,Son
    use refinements,      ONLY: nr_mdle_sons
 !
-   IMPLICIT NONE
+   implicit none
 !
 ! ----------------------------------------------------------------------
 !

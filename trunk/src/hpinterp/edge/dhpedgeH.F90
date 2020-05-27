@@ -64,7 +64,7 @@
 !
 ! geometry
   real(8)                               :: t,rjac,bjac,prod
-  real(8), dimension(3)                 :: xi,eta,rn,x
+  real(8), dimension(3)                 :: xi,eta,x
   real(8), dimension(3)                 :: dxidt,detadt,rt
   real(8), dimension(3,3)               :: detadxi,dxideta,dxdeta
 !
@@ -86,18 +86,20 @@
 !    
 ! load vector and solution
   VTYPE,   dimension(MAXP-1,MAXEQNH)    :: zbH,zuH
+#if C_MODE
   real(8), dimension(MAXP-1,MAXEQNH)    :: duH_real,duH_imag
+#endif
 !  
 ! misc work space
-  integer :: iprint,nrv,nre,nrf,i,j,k,ie,ii,ivar,ivarH,nvarH,kj,ki,&
+  integer :: iprint,nrv,nre,nrf,i,j,k,ivarH,nvarH,kj,ki,&
              ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_Edge,iflag1
 !      
 !----------------------------------------------------------------------
-!     
-! debug printing flag
-  iprint=0 
 !
   nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
+!
+#if DEBUG_MODE
+  iprint = 0
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Icase,Iedge,Type
 7010 format('dhpedgeH: Mdle,Iflag,No,Icase,Iedge,Type = ',5i4,2x,a4)
@@ -111,6 +113,7 @@
 7050 format('          Norder = ',19i4)
      call pause
   endif
+#endif
 !
 ! # of edge dof
   call ndof_nod('medg',norder(Iedge), &
@@ -244,6 +247,7 @@
 !
 ! end of loop through integration points
   enddo
+#if DEBUG_MODE
   if (iprint.eq.1) then
     write(*,*) 'dhpedgeH: LOAD VECTOR AND STIFFNESS MATRIX FOR ', &
                'ndofH_edge = ',ndofH_edge
@@ -258,6 +262,7 @@
 # endif
 7016    format(10e12.5)
   endif
+#endif
 !
 ! projection matrix leading dimension (maximum number of 1D bubbles)
   naH=MAXP-1
@@ -315,6 +320,7 @@
 !    
 #endif
 !
+#if DEBUG_MODE
   if (iprint.eq.1) then
    write(*,*) 'dhpedgeH: k,zu(k) = '
    do k=1,ndofH_edge
@@ -322,6 +328,7 @@
    enddo
    call pause
   endif
+#endif
 !    
 ! save dof's, skipping irrelevant entries
 !

@@ -25,8 +25,7 @@ c
 c
       dimension shapsma(MAXquadH,MAXquadH),
      .          shapbig(MAXquadH,MAXquadH),
-     .          void(2,MAXquadH),ip(MAXquadH),
-     .          r(MAXquadH,MAXquadH),xibig(2),xisma(2)
+     .          void(2,MAXquadH),xibig(2),xisma(2)
 c
 c  ...order and edge orientations
       dimension norder(5),norient(4)

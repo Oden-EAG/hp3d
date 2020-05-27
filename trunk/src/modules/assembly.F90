@@ -72,7 +72,6 @@ contains
 
    subroutine assembly_begin_par
       implicit none
-      integer :: istat
 
 !  ...set the possible maximum and allocate workspace
       MAXDOFM = &

@@ -24,7 +24,7 @@
    use data_structure3D, ONLY : NODES
    use mg_data_structure
 !  
-   IMPLICIT NONE   
+   implicit none   
 !-----------------------------------------------------------------------
    integer, intent(in)   :: Igrid
    integer   :: Master, Nod, nfath

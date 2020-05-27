@@ -600,7 +600,6 @@ module data_structure3D
       subroutine dumpin_hp3d(Dump_file)
 !
       character(len=15) :: Dump_file
-      character(len=20) :: type
       integer           :: npnods_loc
 !
       if (allocated(ELEMS).or.allocated(NODES)) call deallocds

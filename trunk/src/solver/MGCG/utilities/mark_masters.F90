@@ -14,7 +14,7 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 ! 
-#include 'implicit_none.h'
+#include "implicit_none.h"
 !
    subroutine mark_masters(igrid)
 ! 
@@ -25,7 +25,7 @@
    use assembly,          only: assembly_begin, assembly_end
    use mg_data_structure, only: NODES_MG
 !
-   IMPLICIT NONE
+   implicit none
 !   
 !-----------------------------------------------------------------------
 !

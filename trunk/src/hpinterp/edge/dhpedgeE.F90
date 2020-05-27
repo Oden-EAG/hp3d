@@ -67,7 +67,7 @@
 !
 ! geometry
   real(8)                               :: t,rjac,bjac,prod
-  real(8), dimension(3)                 :: xi,eta,rn,x
+  real(8), dimension(3)                 :: xi,eta,x
   real(8), dimension(3)                 :: dxidt,detadt,rt
   real(8), dimension(3,3)               :: detadxi,dxideta,dxdeta
 !
@@ -89,10 +89,12 @@
 !    
 ! load vector and solution
   VTYPE,   dimension(MAXP,MAXEQNE)      :: zbE,zuE
+#if C_MODE
   real(8), dimension(MAXP,MAXEQNE)      :: uE_real,uE_imag
+#endif
 !  
 ! misc work space
-  integer :: iprint,nrv,nre,nrf,i,j,k,ie,ii,ivar,ivarE,nvarE,kj,ki,&
+  integer :: iprint,nrv,nre,nrf,i,j,k,ivarE,nvarE,kj,ki,&
              ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_Edge,iflag1
 !      
 !----------------------------------------------------------------------
@@ -101,6 +103,7 @@
   nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
 !
 #if DEBUG_MODE
+  iprint = 0
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Icase,Iedge,Type
 7010 format('dhpedgeE: Mdle,Iflag,No,Icase,Iedge,Type = ',5i4,2x,a4)

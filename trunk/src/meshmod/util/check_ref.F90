@@ -14,8 +14,8 @@ subroutine check_ref(Type,Kref1,Kref2, Ipass)
       character(len=4), intent(in)  :: Type
       integer,          intent(in)  :: Kref1,Kref2
       integer,          intent(out) :: Ipass
-      integer :: iprint, krefh1,krefv1, krefh2, krefv2
-      integer :: krefx1, krefx2, krefy1, krefy2, krefz1, krefz2
+      integer :: krefh1,krefv1,krefh2,krefv2
+      integer :: krefx1,krefx2,krefy1,krefy2,krefz1,krefz2
 !----------------------------------------------------------------------------
 !
 !  ...initialize to compatible refinements

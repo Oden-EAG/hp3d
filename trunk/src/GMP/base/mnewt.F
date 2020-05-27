@@ -184,11 +184,8 @@ c
 c  ...surface gradients for different surfaces
       dimension der1(3),der2(3),der3(3),der4(3),der5(3)
       dimension dtt(3),dtt2(3)
-c
-c  ...space holder
-      dimension void(3)
 c 
-ccc      iprint=0
+      iprint=0
 c
 c
 c  ...select geometry entity

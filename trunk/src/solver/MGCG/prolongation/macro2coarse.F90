@@ -26,7 +26,7 @@
 !..TODO accommodate usage of PHYSAm (loop through physics variables)
 !..     see solout_mg or compute_sol_dof for example
 !
-#include 'implicit_none.h'
+#include "implicit_none.h"
 !
    subroutine macro2coarse(Igrid,Iel,Zu_m,Nrdof_m, Zu_c,Nrdof_c)
 !
@@ -37,7 +37,7 @@
                                 MAXbrickH, MAXbrickE, MAXbrickV, ZERO                   
    use assembly,          only: NR_RHS 
 !
-   IMPLICIT NONE
+   implicit none
 !
 !
    integer, intent(in)  :: Igrid, Iel, Nrdof_m, Nrdof_c

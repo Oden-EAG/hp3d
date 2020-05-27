@@ -26,7 +26,7 @@
 !
 ! ----------------------------------------------------------------------
 !
-#include 'implicit_none.h'
+#include "implicit_none.h"
 ! 
    subroutine schur_compl_extension(Igrid,z,n)
 

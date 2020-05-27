@@ -26,7 +26,7 @@
          coeff(k,j) = c
 !
 !        write(*,1000)k,j,c
- 1000    format(' k = ',i1,'; j = ',i1,'; --> c = ',e12.5)
+!1000    format(' k = ',i1,'; j = ',i1,'; --> c = ',e12.5)
       enddo
    enddo
 !

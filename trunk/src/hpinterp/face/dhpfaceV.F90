@@ -91,14 +91,16 @@
 !
 ! load vector and solution
   VTYPE,   dimension(MAXMdlqV,MAXEQNV)  :: zbV,zuV
+#if C_MODE
   real(8), dimension(MAXMdlqV,MAXEQNV)  :: uV_real,uV_imag
+#endif
 !
 ! decoded case for the face node
   integer, dimension(NR_PHYSA)          :: ncase
 !  
 ! misc work space
   integer :: iprint,nrv,nre,nrf,nsign,nflag, &
-             i,j,k,ie,ii,ivar,ivarV,nvarV,kj,ki,&
+             i,j,k,ivarV,nvarV,kj,ki,&
              ndofH_face,ndofE_face,ndofV_face,ndofQ_face
 !
 !-----------------------------------------------------------------------

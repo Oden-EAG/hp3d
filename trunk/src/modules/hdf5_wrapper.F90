@@ -20,7 +20,7 @@ module hdf5_wrapper
 !----------------------------------------------------------------------
    subroutine hdf5_w_init()
 !
-      integer :: ierr,req,ret
+      integer :: ierr
 !
       if (HDF5_IS_INIT) then
          write(*,*) 'HDF5_IS_INIT: HDF5 has already been initialized.'

@@ -14,7 +14,7 @@
 !
 !-----------------------------------------------------------------------
 !
-#include 'implicit_none.h'
+#include "implicit_none.h"
 ! 
    subroutine compute_vert_patch(Igrid)
 !
@@ -23,7 +23,7 @@
    use patch_info,         ONLY: CGRID_VERTICES, compute_patch_mdle
    use assembly,           ONLY: MAXNODM,NR_PHYSA, assembly_begin, assembly_end
 !
-   IMPLICIT NONE
+   implicit none
 !
 !-----------------------------------------------------------------------
 !

@@ -20,7 +20,7 @@
 !
 !-----------------------------------------------------------------------
 !
-#include 'implicit_none.h'
+#include "implicit_none.h"
 !
    subroutine macro_assembly(Igrid, Idec_sch)
 !
@@ -30,7 +30,7 @@
    use assembly_sc,        ONLY: NRDOF_TOT, NRDOF_CON,IPRINT_TIME
 
 
-   IMPLICIT NONE
+   implicit none
 !
 !-----------------------------------------------------------------------
 !

@@ -64,7 +64,7 @@ c  ...use collocation points for lagrange shape functions h1
      .          work(lwork),r(MAXtriaE,MAXtriaE),xibig(2),xisma(2)
 c
 c  ...order and edge orientations
-      dimension norder(4),norient(3),nsize(2),t(2),val(2),dbds(2,2)
+      dimension norder(4),norient(3),nsize(2),val(2),dbds(2,2)
 c
       iprint=0
 c

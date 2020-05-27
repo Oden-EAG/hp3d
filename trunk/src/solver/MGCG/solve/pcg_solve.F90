@@ -15,7 +15,7 @@
 !
 !-----------------------------------------------------------------------
 !
-#include 'implicit_none.h'
+#include "implicit_none.h"
 !
    subroutine pcg_solve(Igrid)
 
@@ -27,7 +27,7 @@
 !   
 !-----------------------------------------------------------------------
 !
-   IMPLICIT NONE
+   implicit none
 !
    integer, intent(in) :: Igrid
    integer :: iel,ndof,k,i

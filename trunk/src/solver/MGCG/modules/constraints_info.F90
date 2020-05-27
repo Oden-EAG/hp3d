@@ -204,7 +204,7 @@
 !
    use data_structure3D,  only: NODES,MAXNODM, ndof_nod, NRNODS
 !        
-   IMPLICIT NONE
+   implicit none
 !   
 !-----------------------------------------------------------------------
 !

@@ -22,7 +22,7 @@
    use parameters,        only: ZERO
 
 
-   IMPLICIT NONE
+   implicit none
 !
    integer,intent(in) :: Igrid 
    integer :: ip, inod,jel, iel, i,j, nloc, mdle, nod, l, lp
@@ -391,7 +391,7 @@
    use mg_data_structure,  only: NODES_MG, GRID
    use patch_info
 !
-   IMPLICIT NONE
+   implicit none
 !
    integer, intent(in)  :: Igrid
    integer, allocatable :: nod_macro(:)
