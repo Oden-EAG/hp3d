@@ -7,15 +7,15 @@
 !     latest revision:  - Oct 2019
 !
 !     purpose:          - routine sets up quadrature data for a 2D
-!                         standard element, accounting for different 
+!                         standard element, accounting for different
 !                         element types and orders of approximation
 !
 !     arguments:
 !
-!     in:              
+!     in:
 !             Nord      - order of approximation
 !
-!     out:    
+!     out:
 !             Nint      - number of integration points
 !             Xiloc     - integration points
 !             Waloc     - weights
@@ -45,7 +45,7 @@ subroutine set_1Dint(Nord, Nint,Xiloc,Waloc)
         Xiloc(l) = XIGAUS1(l,Nint)
         Waloc(l) = WAGAUS1(l,Nint)
       enddo
-!      
+!
 end subroutine set_1Dint
 !
 !
@@ -58,15 +58,15 @@ end subroutine set_1Dint
 !     latest revision:  - Oct 2019
 !
 !     purpose:          - routine sets up quadrature data for a 1D
-!                         DPG element, accounting for different 
+!                         DPG element, accounting for different
 !                         element types and orders of approximation
 !
 !     arguments:
 !
-!     in:              
+!     in:
 !             Nord      - order of approximation
 !
-!     out:    
+!     out:
 !             Nint      - number of integration points
 !             Xiloc     - integration points
 !             Waloc     - weights
@@ -77,7 +77,7 @@ subroutine set_1Dint_DPG(Nord, Nint,Xiloc,Waloc)
       use parametersDPG    , only : MAXPP
       use control          , only : INTEGRATION
       use gauss_quadrature , only : INITIALIZED,XIGAUS1,WAGAUS1
-      implicit none 
+      implicit none
 !
       integer,                     intent(in)  :: Nord
       integer,                     intent(out) :: Nint
@@ -85,10 +85,10 @@ subroutine set_1Dint_DPG(Nord, Nint,Xiloc,Waloc)
 !
       integer :: l,nord_aux
 !
-!  ...initialized integration constants, if needed      
+!  ...initialized integration constants, if needed
       if (.not. INITIALIZED) call init_gauss_quadrature
 !
-!  ...collect integration points and weights      
+!  ...collect integration points and weights
       nord_aux = Nord + INTEGRATION
       nord_aux = min(nord_aux,MAXPP)
       Nint = nord_aux + 1

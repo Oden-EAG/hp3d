@@ -915,7 +915,7 @@ ENDIF
       select case(Mdle)
       case(4); iprint=0
       case default; iprint=0
-      end select      
+      end select
 !
       if (iprint.ge.2) then
  20     continue
@@ -1029,7 +1029,7 @@ subroutine modify_index(Indexd)
 !  .....leave it alone
         else
           do j=1,NR_COMP(i)
-            ic=ic+1 
+            ic=ic+1
           enddo
         endif
       enddo
@@ -1047,5 +1047,5 @@ function Dirichlet_flag(Dtype)
   end select
 !
 end function Dirichlet_flag
-  
+
 

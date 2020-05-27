@@ -8,7 +8,7 @@
 !     latest revision:  - July 17
 !
 !     purpose:          - routine returns performs diagonal scaling
-!                         of the form 
+!                         of the form
 !                         GP ---> D^-1/2 * GP * D^-1/2
 !                         B  ---> D^-1/2 * B
 !
@@ -29,7 +29,7 @@
 !
       implicit none
 
-      integer, intent(in)       :: m, n 
+      integer, intent(in)       :: m, n
       integer                   :: i,j,k
       integer                   :: nk, n1, n2
 #if C_MODE
@@ -80,7 +80,7 @@
 !     latest revision:  - July 17
 !
 !     purpose:          - routine returns performs diagonal scaling
-!                         of the form 
+!                         of the form
 !                         GP ---> D^-1/2 * GP * D^-1/2
 !                         B  ---> D^-1/2 * B
 !
@@ -88,11 +88,11 @@
 !
 !     in:
 !          m            - number of test functions
-!          n            - number of trial functions plus one 
+!          n            - number of trial functions plus one
 !                         (for the load vector)
 !     in/out:
 !          GP           - Gram matrix in packed form
-!          B            - Stiffness matrix containing also 
+!          B            - Stiffness matrix containing also
 !                         the load vector in the last column
 !
 !-----------------------------------------------------------------------
@@ -115,7 +115,7 @@
 #endif
 !
 !-----------------------------------------------------------------------
-! 
+!
 !  ...preconditioning: GP ---> D^-1/2 * GP * D^-1/2
 !  ...extract the diagonal of the matrix
       do i=1,m
@@ -127,7 +127,7 @@
             GP(i,j) = GP(i,j)/sqrt(D(i)*D(j))
          enddo
       enddo
-! 
+!
 !  ...preconditioning: B ---> D^-1/2 * B
 !  ...apply the scaling to the Stiffness matrix
       do j=1,n
@@ -148,7 +148,7 @@
 !     latest revision:  - July 17
 !
 !     purpose:          - routine returns performs diagonal scaling
-!                         of the form 
+!                         of the form
 !                         SA   ---> D^-1/2 * SA * D^-1/2
 !                         Rhs  ---> D^-1/2 * Rhs
 !
@@ -175,7 +175,7 @@
       integer, intent(in)       :: n, Nrhs, Nz, IA(Nz), JA(Nz)
       integer                   :: i,j,k
 #if C_MODE
-      complex(8), intent(in)    :: DA(n) 
+      complex(8), intent(in)    :: DA(n)
       complex(8), intent(inout) :: SA(Nz), Rhs(n,Nrhs)
 #else
       real(8),    intent(in)    :: DA(n)

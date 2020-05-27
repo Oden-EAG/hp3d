@@ -6,15 +6,15 @@ subroutine mesh2vtk_geom_upscale(Nout, Isel, Is)
       use data_structure3D
       use element_data
       use upscale
-!  
-      implicit none 
+!
+      implicit none
       integer, intent(in) :: Nout, Isel(10), Is
 !
 !     object containing all data for visualization
-!      
+!
 !
       type(vis) :: vis_obj
-!      
+!
       character(len=4) :: type
 !
        integer :: &
@@ -38,23 +38,23 @@ subroutine mesh2vtk_geom_upscale(Nout, Isel, Is)
 !     Step 0 : Compute nr_vert and nr_cell
 !
       nr_vert=0 ; nr_elem=0 ; nr_size=0
-!      
-      mdle=0 
+!
+      mdle=0
       do i=1,NRELES
         call nelcon(mdle, mdle)
-!        
+!
         call find_domain(mdle, ndom)
         if (Isel(ndom+Is) == 0)  cycle
-!    
+!
 !       select appropriate visualization object (TETR_VIS, PRIS_VIS, HEXA_VIS)
         type = NODES(mdle)%type
         vis_obj = vis_on_type(type)
-!        
+!
         nr_vert = nr_vert + vis_obj%nr_vert
         nr_elem = nr_elem + vis_obj%nr_elem
         nr_size = nr_size + vis_obj%nr_elem*(nvert(type)+1)
       enddo
-!    
+!
 !     Step 1 : Print Header
       write(Nout,6000)
       write(Nout,6001)
@@ -71,7 +71,7 @@ subroutine mesh2vtk_geom_upscale(Nout, Isel, Is)
       mdle=0
       do i=1,NRELES
         call nelcon(mdle, mdle)
-!        
+!
         call find_domain(mdle, ndom)
         if (Isel(ndom+Is) == 0)  cycle
 !
@@ -93,11 +93,11 @@ subroutine mesh2vtk_geom_upscale(Nout, Isel, Is)
 !
 !         vertex coordinates (indexing starts at 0)
           call get_vis_point(vis_obj,iv-1, xi)
-!       
+!
 !         evaluate geometry and solution
           call soleval(mdle,xi,nedge_orient,nface_orient,norder,xnod, &
                zdofH,zdofE,zdofV,zdofQ,0,x,dxdxi,zsolH,zgradH,zsolE,zcurlE,zsolv,zdivV,zsolQ)
-!               
+!
 !         print coordinates in physical space
           write(Nout,6005) x(1:3)
  6005     format('   ', 3(f20.15,2x))
@@ -112,14 +112,14 @@ subroutine mesh2vtk_geom_upscale(Nout, Isel, Is)
       mdle=0 ; ioffs=0
       do i=1,NRELES
          call nelcon(mdle, mdle)
-!         
+!
          call find_domain(mdle, ndom)
          if (Isel(ndom+Is) == 0)  cycle
-!   
+!
 !        select appropriate visualization object (TETR_VIS, PRIS_VIS, HEXA_VIS)
          type = NODES(mdle)%type
          vis_obj = vis_on_type(type)
-!         
+!
 !        loop over elements of visualization object
          do iel=1,vis_obj%nr_elem
 !
@@ -142,14 +142,14 @@ subroutine mesh2vtk_geom_upscale(Nout, Isel, Is)
       mdle=0
       do i=1,NRELES
         call nelcon(mdle, mdle)
-!     
+!
         call find_domain(mdle, ndom)
         if (Isel(ndom+Is) == 0)  cycle
-!    
+!
 !       select appropriate visualization object (TETR_VIS, PRIS_VIS, HEXA_VIS)
         type = NODES(mdle)%type
         vis_obj = vis_on_type(type)
-!    
+!
 !       loop over elements of visualization object
         do iel=1,vis_obj%nr_elem
 !
@@ -159,7 +159,7 @@ subroutine mesh2vtk_geom_upscale(Nout, Isel, Is)
         enddo
       enddo
 
-      write(Nout,5000) nr_vert ! point data                                          
+      write(Nout,5000) nr_vert ! point data
  5000 format('POINT_DATA ', i12)
 !5001 format('CELL_DATA ', i12)
 

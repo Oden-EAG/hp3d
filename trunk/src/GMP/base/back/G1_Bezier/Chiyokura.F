@@ -28,25 +28,25 @@ c----------------------------------------------------------------------
       real(DP), dimension(3,2) :: AA
       real(DP), dimension(3)   :: BB
       real(DP), dimension(4)   :: WORK
-      integer                  :: INFO      
+      integer                  :: INFO
 c----------------------------------------------------------------------
-c  STEP 1: get curve control points and compute tangent vectors 
-c      
+c  STEP 1: get curve control points and compute tangent vectors
+c
       if (iprint.eq.1) then
         write(*,7003)No,Ie
  7003   format(' Chiyokura: No = ',i5,'; Ie = ',i2)
         write(*,7011)a0,a3
- 7011   format(' a0 = ',3(f7.3x),'; a3 = ',3(f7.3x))       
+ 7011   format(' a0 = ',3(f7.3x),'; a3 = ',3(f7.3x))
       endif
-c      
-c  ...get curve number      
+c
+c  ...get curve number
       nc = TRIANGLES(No)%EdgeNo(Ie)
       if (iprint.eq.1) then
         write(*,7007)nc
  7007   format(' Chiyokura: nc = ',i5)
       endif
-c      
-c  ...get control points      
+c
+c  ...get control points
       if (nc.gt.0) then
 c  .....if positive orientation
         call BezCurve_control_points(nc, V1,V2)
@@ -55,13 +55,13 @@ c  .....if positive orientation
         np2 = CURVES(nc)%EndPoNo(2)
         V3  = POINTS(np2)%Rdata(1:3)
       elseif (nc.lt.0) then
-c  .....if negative orientation      
+c  .....if negative orientation
         call BezCurve_control_points(-nc, V2,V1)
         np1 = CURVES(nc)%EndPoNo(2)
         V0  = POINTS(np1)%Rdata(1:3)
         np2 = CURVES(nc)%EndPoNo(1)
         V3  = POINTS(np2)%Rdata(1:3)
-cccc        void = a0;  a0 = a3;  a3 = void 
+cccc        void = a0;  a0 = a3;  a3 = void
       else
         write(*,*)'Chiyokura: invalid curve number, nc = ',nc
         stop
@@ -74,38 +74,38 @@ cccc        void = a0;  a0 = a3;  a3 = void
  7002   format(' V2 = ',3(f7.3,2x),'; V3 = ',3(f7.3,2x))
       endif
 c  ...disregard orientation
-      nc = abs(nc)      
-c      
+      nc = abs(nc)
+c
 c  ...compute tangent vectors along curve
       s0 = V1 - V0;  s1 = V2 - V1; s2 = V3 - V2
       if (iprint.eq.1) then
         write(*,*)'Chiyokura: tangent vectors determined.'
         write(*,7001)s0,s1,s2
- 7001   format(' s0 = ',3(f7.3,2x),'; s1 = ',3(f7.3,2x),'; 
+ 7001   format(' s0 = ',3(f7.3,2x),'; s1 = ',3(f7.3,2x),';
      .s3 = ',3(f7.3,2x))
       endif
 c
 c----------------------------------------------------------------------
-c  STEP 2: determine two adjacent curves      
+c  STEP 2: determine two adjacent curves
 c
-c  ...get number of figures connected to the curve      
+c  ...get number of figures connected to the curve
       ntf = CURVES(nc)%NrFig
-c  ...loop over connected triangles      
+c  ...loop over connected triangles
       iflag = 0
       do i = 1, ntf
         nick = CURVES(nc)%FigNo(i)
         call decode(nick, nt,lab)
 c  .....cycle if original triangle
         if (nt.eq.No) cycle
-c  .....if on the G1 surface store number and increment counter   
+c  .....if on the G1 surface store number and increment counter
         if (TRIANGLES(nt)%Type.eq.'G1RecTri') then
           nnt = nt
           iflag = iflag + 1
         endif
-c  ...end loop over connected triangles        
+c  ...end loop over connected triangles
       enddo
 c
-c  ...check found triangle      
+c  ...check found triangle
       if (iflag.eq.0) then
         write(*,*)'Chiyokura: no adjacent triangle has been found!'
         stop
@@ -115,13 +115,13 @@ c  ...check found triangle
         stop
       endif
       if (iprint.eq.1) then
-        write(*,*)'Chiyokura: neighbooring triangle = ',nnt      
+        write(*,*)'Chiyokura: neighbooring triangle = ',nnt
       endif
-c      
+c
 c  ...loop over neighboor's edges
       iflag = 0
       do iie=1,3
-c  .....if neighboor's edge coincides with original edge, cycle      
+c  .....if neighboor's edge coincides with original edge, cycle
         if (abs(TRIANGLES(nnt)%EdgeNo(iie)).eq.nc) cycle
         iflag = iflag + 1
         nnc(iflag) = abs(TRIANGLES(nnt)%EdgeNo(iie))
@@ -148,13 +148,13 @@ c  ...loop over curves attached to np1
           write(*,7004)i,POINTS(np1)%CurvNo(i)
  7004     format(' i = ',i2x,'; nc = ',i4)
         endif
-c  .....check against 1st neighboring curve      
+c  .....check against 1st neighboring curve
         if (POINTS(np1)%CurvNo(i).eq.nnc(1)) then
           nc1 = nnc(1)
           iflag = 1
           exit
         endif
-c  ...end of loop over curves attached to np1        
+c  ...end of loop over curves attached to np1
       enddo
 c
       if (iflag.eq.1) then
@@ -170,23 +170,23 @@ c
 c
 c----------------------------------------------------------------------
 c  STEP 3: determine control points of adjacent curves and tangent
-c          vectors      
+c          vectors
 c
-c  ...curve adjacent to np1      
+c  ...curve adjacent to np1
       if (CURVES(nc1)%EndPoNo(1).eq.np1) then
         call BezCurve_control_points(nc1, b0,void)
       else
         call BezCurve_control_points(nc1, void,b0)
       endif
-c      
-c  ...curve adjacent to np2      
+c
+c  ...curve adjacent to np2
       if (CURVES(nc2)%EndPoNo(1).eq.np2) then
         call BezCurve_control_points(nc2, b3,void)
       else
         call BezCurve_control_points(nc2, void,b3)
       endif
 c
-c  ...compute b0, b3      
+c  ...compute b0, b3
       b0 = b0 - V0;  b3 = b3 - V3
       if (iprint.eq.1) then
         write(*,7005)b0
@@ -204,9 +204,9 @@ c  ...check linear dependecy of a0,b0,s0
       if (abs(prod).gt.GEOM_TOL) then
         write(*,*)'Chiyokura: a0,b0,s0 are L.I., prod = ',prod
         stop
-      endif      
-c  ...solve least square system 
-      AA(:,1) = s0;  AA(:,2) = b0;  BB = a0     
+      endif
+c  ...solve least square system
+      AA(:,1) = s0;  AA(:,2) = b0;  BB = a0
       call DGELS('N',3,2,1,AA,3,BB,3,WORK,4,INFO)
       if (INFO.ne.0) then
         write(*,*)'Chiyokura: linear system not solved (1)'
@@ -219,19 +219,19 @@ c  ...check solution
       if (temp(1).gt.GEOM_TOL) then
         write(*,*)'Chiyokura: geom toll exceeded, temp = ',temp(1)
         stop
-      endif   
+      endif
       if (iprint.eq.1) then
         write(*,7013)h0,k0
  7013   format(' Chiyokura: h0 = ',f7.3x,'; k0 = ',f7.3x)
       endif
-c       
+c
 
 
 ccc  ...use Cramer rule to solve eq's (6.10)
 cc      det = s0(1)*b0(2) - s0(2)*b0(1)
 cc      if (abs(det).lt.GEOM_TOL) then
 cc        write(*,*)'Chiyokura: det = 0 (1)!'
-cc        stop 
+cc        stop
 cc      endif
 cc      h0 = (a0(1)*b0(2) - b0(1)*a0(2))/det
 cc      k0 = (a0(2)*s0(1) - a0(1)*s0(2))/det
@@ -250,8 +250,8 @@ c  ...check linear dependecy of a3,b3,s2
         write(*,*)'Chiyokura: a3,b3,s2 are L.I., prod = ',prod
         stop
       endif
-c  ...solve least square system 
-      AA(:,1) = s2;  AA(:,2) = b3;  BB = a3     
+c  ...solve least square system
+      AA(:,1) = s2;  AA(:,2) = b3;  BB = a3
       call DGELS('N',3,2,1,AA,3,BB,3,WORK,4,INFO)
       if (INFO.ne.0) then
         write(*,*)'Chiyokura: linear system not solved (2)'
@@ -264,7 +264,7 @@ c  ...check solution
       if (temp(1).gt.GEOM_TOL) then
         write(*,*)'Chiyokura: geom toll exceeded, temp = ',temp(1)
         stop
-      endif      
+      endif
       if (iprint.eq.1) then
         write(*,7014)h1,k1
  7014   format(' Chiyokura: h1 = ',f7.3x,'; k1 = ',f7.3x)
@@ -276,7 +276,7 @@ ccc  ...use Cramer rule to solve eq's (6.10)
 cc      det = s2(1)*b3(2) - s2(2)*b3(1)
 cc      if (abs(det).lt.GEOM_TOL) then
 cc        write(*,*)'Chiyokura: det = 0 (2)!'
-cc        stop 
+cc        stop
 cc      endif
 cc      h1 = (a3(1)*b3(2) - b3(1)*a3(2))/det
 cc      k1 = (a3(2)*s2(1) - a3(1)*s2(2))/det
@@ -291,8 +291,8 @@ c
 
 
 c  ...use eq's (6.11) to compute a1, a2
-      a1 = (2.d0*k0*b1 + k1*b0 + 2.d0*h0*s1 + h1*s0)/3.d0      
-      a2 = (k0*b3 + 2.d0*k1*b1 + h0*s2 + 2.d0*h1*s1)/3.d0  
+      a1 = (2.d0*k0*b1 + k1*b0 + 2.d0*h0*s1 + h1*s0)/3.d0
+      a2 = (k0*b3 + 2.d0*k1*b1 + h0*s2 + 2.d0*h1*s1)/3.d0
       if (iprint.eq.1) then
         write(*,*)'Chiyokura: have determined control points'
         write(*,7012)a1,a2

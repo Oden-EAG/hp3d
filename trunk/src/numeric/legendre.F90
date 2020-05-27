@@ -6,12 +6,12 @@
 !
 !   latest revision    - Sep 10
 !
-!   purpose            - evaluates Scaled Integrated Legendre-type 
+!   purpose            - evaluates Scaled Integrated Legendre-type
 !                        polynomials and their derivatives
 !
 !   arguments :
 !     in:
-!                X,T   - variables 
+!                X,T   - variables
 !                Nord  - order of polynomial
 !     out:
 !                Poly  - polynomials
@@ -20,13 +20,13 @@
 !----------------------------------------------------------------------
 
 subroutine legendre_S_I(X,T,Nord, Poly,Dpoly)
-  !      
+  !
   use parameters
 #include "syscom.blk"
-  ! 
+  !
   !  ...exceed maximum order of approximation
   integer, parameter :: ndelta = 2
-  !      
+  !
   !  ...input output parameters
   dimension Poly(0:MAXP+ndelta),Dpoly(2,0:MAXP+ndelta)
   !
@@ -39,12 +39,12 @@ subroutine legendre_S_I(X,T,Nord, Poly,Dpoly)
      write(*,*)'legendre_S_I: Nord = ',Nord
      stop
   endif
-  !      
+  !
   !----------------------------------------------------------------------
   !  ...from LUCY'S routine..............................................
   !
-  !  ...scaled legendre polynomials only with n>=2 used 
-  !     L^s_1 = x  
+  !  ...scaled legendre polynomials only with n>=2 used
+  !     L^s_1 = x
   !     L^s_2 = 0.5 (x^2-t^2)
   !     L^s_{n+1} = (2n-1)/(n+1) x L^s_{n} - (n-2)/(n+1) t^2 L^s_{n-1}
   !
@@ -55,11 +55,11 @@ subroutine legendre_S_I(X,T,Nord, Poly,Dpoly)
   !                    -(n-2)/(n+1) t^2 dL^s_{n-1}/dx
   !     dL^s_1/ds = 0
   !     dL^s_2/ds =-t
-  !     dL^s_{n+1}/ds = (2n-1)/(n+1) x dL^s_n/dt 
-  !                    -(n-2)/(n+1)(2t L^s_{n-1}+t^2 dL^s_{n-1}/dt) 
+  !     dL^s_{n+1}/ds = (2n-1)/(n+1) x dL^s_n/dt
+  !                    -(n-2)/(n+1)(2t L^s_{n-1}+t^2 dL^s_{n-1}/dt)
   !----------------------------------------------------------------------
   !
-  !       
+  !
   !  ...initialize
   Poly = 0.d0; Dpoly = 0.d0
   !
@@ -75,7 +75,7 @@ subroutine legendre_S_I(X,T,Nord, Poly,Dpoly)
   !
   !  ...L^s_j, 4 =< j =< Nord
   do n=3,Nord-1
-     !  PG, Dec 10: double check c1 and c2      
+     !  PG, Dec 10: double check c1 and c2
      c1 = (2.d0*n-1.d0)/(n+1.d0)
      c2 = (n-2.d0)/(n+1.d0)
      !cc        c1 = (2.d0*n-3.d0)/n
@@ -110,7 +110,7 @@ subroutine legendre_S_I(X,T,Nord, Poly,Dpoly)
   !cc     .                    -c2*( 2.d0*t*Poly(n-1)
   !cc     .                          +t*t*Dpoly(2,n-1) )
   !cc      enddo
-  !        
+  !
   !
   !c ....without recursion formula - not tested
   !      n=0
@@ -132,10 +132,10 @@ subroutine legendre_S_I(X,T,Nord, Poly,Dpoly)
   !c -----------------------------------------------------------
   !c L^s_3 = 0.5 x (x^2-t^2)
   !        Ubb(n,ied)    = 0.5d0*x*x*x-0.5d0*x*t*t
-  !        DUbb(1,n,ied) = 
+  !        DUbb(1,n,ied) =
   !     .   0.5d0*(3.d0*x*x-t*t)*(DshapH(1,ied)-DshapH(1,ied1))
   !     .                  - x*t*(DshapH(1,ied)+DshapH(1,ied1))
-  !        DUbb(2,n,ied) = 
+  !        DUbb(2,n,ied) =
   !     .   0.5d0*(3.d0*x*x-t*t)*(DshapH(2,ied)-DshapH(2,ied1))
   !     .                  - x*t*(DshapH(2,ied)+DshapH(2,ied1))
   !        n = n+1
@@ -147,11 +147,11 @@ subroutine legendre_S_I(X,T,Nord, Poly,Dpoly)
   !     .                 +1.d0/8.d0*t*t*t*t
   !        DUbb(1,n,ied) = (5.d0/4.d0*x*x*x-3.d0/2.d0*x*t*t)*
   !     .                         (DshapH(1,ied)-DshapH(1,ied1))
-  !     .                 +(-3.d0/4.d0*x*x*t+4.d0*t*t*t)* 
+  !     .                 +(-3.d0/4.d0*x*x*t+4.d0*t*t*t)*
   !     .                         (DshapH(1,ied)+DshapH(1,ied1))
   !        DUbb(2,n,ied) = (5.d0/4.d0*x*x*x-3.d0/2.d0*x*t*t)*
   !     .                         (DshapH(2,ied)-DshapH(2,ied1))
-  !     .                 +(-3.d0/4.d0*x*x*t+4.d0*t*t*t)* 
+  !     .                 +(-3.d0/4.d0*x*x*t+4.d0*t*t*t)*
   !     .                         (DshapH(2,ied)+DshapH(2,ied1))
   !        n = n+1
   !        if(n.eq.Nord) return
@@ -165,13 +165,13 @@ subroutine legendre_S_I(X,T,Nord, Poly,Dpoly)
   !     .                  -30.d0/8.d0*x*x*t*t
   !     .                  + 3.d0/8.d0*t*t*t*t)*
   !     .                         (DshapH(1,ied)-DshapH(1,ied1))
-  !     .                 +(5.d0/4.d0*x*x*x*t+3.d0/4.d0*x*t*t*t)* 
+  !     .                 +(5.d0/4.d0*x*x*x*t+3.d0/4.d0*x*t*t*t)*
   !     .                         (DshapH(1,ied)+DshapH(1,ied1))
   !        DUbb(2,n,ied) = (35.d0/8.d0*x*x*x*x
   !     .                  -30.d0/8.d0*x*x*t*t
   !     .                  + 3.d0/8.d0*t*t*t*t)*
   !     .                         (DshapH(2,ied)-DshapH(2,ied1))
-  !     .                 +(5.d0/4.d0*x*x*x*t+3.d0/4.d0*x*t*t*t)* 
+  !     .                 +(5.d0/4.d0*x*x*x*t+3.d0/4.d0*x*t*t*t)*
   !     .                         (DshapH(2,ied)+DshapH(2,ied1))
   !        n = n+1
   !        if(n.eq.Nord) return
@@ -189,33 +189,33 @@ end subroutine legendre_S_I
 !
 !   latest revision    - Oct 10
 !
-!   purpose            - evaluates scaled Legendre polynomials and 
-!                        their derivatives up to degree Nord     
+!   purpose            - evaluates scaled Legendre polynomials and
+!                        their derivatives up to degree Nord
 !
 !   arguments :
 !     in:
 !                  X,T - coordinates
 !                 Nord - degree
 !     out:
-!                 Poly - polynomials up to degree Nord 
+!                 Poly - polynomials up to degree Nord
 !                Dpoly - derivatives
 !
 !----------------------------------------------------------------------
 !
 subroutine legendre_S(X,T,Nord, Poly,Dpoly)
-  !      
+  !
   use parameters
 #include "syscom.blk"
-  !      
+  !
   !  ...exceed maximum order of approximation
   integer, parameter :: ndelta = 2
   !
-  !  ...output    
+  !  ...output
   dimension Poly(0:MAXP+ndelta),Dpoly(2,0:MAXP+ndelta)
-  !      
-  !  ...local variables      
+  !
+  !  ...local variables
   !dimension aux(0:MAXP+ndelta),daux(0:MAXP+ndelta)
-  !      
+  !
   !----------------------------------------------------------------------
   !
   !  ...definition:
@@ -223,27 +223,27 @@ subroutine legendre_S(X,T,Nord, Poly,Dpoly)
   !
   !  ...2-terms recurrence relation from Sabine's dissertation
   !           l^{S}_0     = 1
-  !           l^{S}_1     = x 
+  !           l^{S}_1     = x
   !     (n+1)*l^{S}_{n+1} = (2n+1)*x*l^{S}_n - n*t^2*l^{S}_{n-1}
   !
   !----------------------------------------------------------------------
   !
   if (Nord.gt.MAXP+ndelta) then
      write(*,*)'legendre_S: maximum order of approx. exceeded!'
-     write(*,*)'Nord = ',Nord      
+     write(*,*)'Nord = ',Nord
      stop
   endif
   !
-  !  ...l^{S}_0, \nabla l^{S}_0      
+  !  ...l^{S}_0, \nabla l^{S}_0
   Poly(   0) = 1.d0
   Dpoly(1,0) = 0.d0
   Dpoly(2,0) = 0.d0
-  !  ...l^{S}_1, \nabla l^{S}_1      
+  !  ...l^{S}_1, \nabla l^{S}_1
   Poly(   1) = X
   Dpoly(1,1) = 1.d0
   Dpoly(2,1) = 0.d0
   !
-  !  ...2-terms recurrence relation      
+  !  ...2-terms recurrence relation
   do n=1,Nord-1
      c1 = (2.d0*n+1.d0)/(n+1.d0)
      c2 = n/(n+1.d0)
@@ -255,27 +255,27 @@ subroutine legendre_S(X,T,Nord, Poly,Dpoly)
   enddo
   !
   !
-  !ccc  ...scaled variable      
+  !ccc  ...scaled variable
   !cc      s = X/T
-  !ccc      
-  !ccc  ...compute Legendre polynomials      
-  !cc      call Legendre(s,Nord, aux,daux)      
+  !ccc
+  !ccc  ...compute Legendre polynomials
+  !cc      call Legendre(s,Nord, aux,daux)
   !ccc  ...initialize
   !cc      Poly = 0.d0; Dpoly = 0.d0; Poly(0) = 1.d0; Dpoly(1,1) = 1.d0
-  !ccc   
+  !ccc
   !cc      do i=1,Nord
-  !cc        Poly(i) = T**i*aux(i)  
+  !cc        Poly(i) = T**i*aux(i)
   !cc
   !ccc  .....gradient
   !ccc       dl^S_{n}/dx = t^(n-1) l_{n}'
   !ccc       dl^S_{n}/dt = n t^(n-1) l_{n} - x t^(n-2) l_{n}'
   !ccc
   !cc        if (i.ge.2) then
-  !cc          Dpoly(1,i) = T**(i-1)*daux(i) 
+  !cc          Dpoly(1,i) = T**(i-1)*daux(i)
   !cc          Dpoly(2,i) = i*T**(i-1)*aux(i) - X*T**(i-2)*daux(i)
   !cc        endif
   !cc      enddo
-  !      
+  !
   !
 end subroutine legendre_S
 
@@ -287,36 +287,36 @@ end subroutine legendre_S
 !
 !   latest revision    - Oct 10
 !
-!   purpose            - evaluates Legendre polynomials and 
-!                        their derivatives up to degree Nord     
+!   purpose            - evaluates Legendre polynomials and
+!                        their derivatives up to degree Nord
 !
 !   arguments :
 !     in:
 !                    X - coordinate
 !                 Nord - degree
 !     out:
-!                 Poly - polynomials up to degree Nord 
+!                 Poly - polynomials up to degree Nord
 !                Dpoly - derivatives
 !
 !----------------------------------------------------------------------
 !
 subroutine legendre_I(X,Nord, Poly,Dpoly)
-  !      
+  !
   use parameters
 #include "syscom.blk"
-  !      
+  !
   !  ...exceed maximum order of approximtion
   integer, parameter :: ndelta = 2
   !
-  !  ...output    
+  !  ...output
   dimension Poly(0:MAXP+ndelta),Dpoly(0:MAXP+ndelta)
-  !      
+  !
   if (Nord.gt.MAXP+ndelta) then
      write(*,*)'legendre_I: maximum order of approx. exceeded!'
-     write(*,*)'Nord = ',Nord      
+     write(*,*)'Nord = ',Nord
      stop
   endif
-  !             
+  !
   !  ...l_j, j=0,1
   Poly(0) = 0.d0;               Dpoly(0) = 0.d0
   Poly(1) = X;                  Dpoly(1) = 1.d0
@@ -339,35 +339,35 @@ end subroutine legendre_I
 !
 !   latest revision    - Oct 10
 !
-!   purpose            - evaluates Legendre polynomials and 
-!                        their derivatives up to degree Nord     
+!   purpose            - evaluates Legendre polynomials and
+!                        their derivatives up to degree Nord
 !
 !   arguments :
 !     in:
 !                    X - coordinate
 !                 Nord - degree
 !     out:
-!                 Poly - polynomials up to degree Nord 
+!                 Poly - polynomials up to degree Nord
 !                Dpoly - derivatives
 !
 !----------------------------------------------------------------------
 !
 subroutine legendre(X,Nord, Poly,Dpoly)
-  !      
+  !
   use parameters
 #include "syscom.blk"
-  !      
+  !
   !  ...exceed maximum order of approximtion
   integer, parameter :: ndelta = 2
   !
-  !  ...output    
+  !  ...output
   dimension Poly(0:MAXP+ndelta),Dpoly(0:MAXP+ndelta)
-  !      
-  !  ...local variables      
+  !
+  !  ...local variables
   !dimension sleg(MAXP+ndelta+1),dsleg(MAXP+ndelta+1)
-  !      
+  !
   !----------------------------------------------------------------------
-  !  ...from LUCY'S routine..............................................    
+  !  ...from LUCY'S routine..............................................
   !  ...Legendre polynomials
   !     l_0 = 1                                         ;   n == 0
   !     l_1 = x                                         ;   n == 1
@@ -381,10 +381,10 @@ subroutine legendre(X,Nord, Poly,Dpoly)
   !
   if (Nord.gt.MAXP+ndelta) then
      write(*,*)'legendre: maximum order of approx. exceeded!'
-     write(*,*)'Nord = ',Nord      
+     write(*,*)'Nord = ',Nord
      stop
   endif
-  !             
+  !
   !  ...l_j, j=0,1
   Poly( 0) = 1.d0
   Dpoly(0) = 0.d0
@@ -412,8 +412,8 @@ subroutine legendre(X,Nord, Poly,Dpoly)
   !cc      enddo
   !
   !  ...copy to output
-  !cc      Poly(0:MAXP+ndelta)  = sleg(1:MAXP+ndelta+1)      
-  !cc      Dpoly(0:MAXP+ndelta) = dsleg(1:MAXP+ndelta+1)      
+  !cc      Poly(0:MAXP+ndelta)  = sleg(1:MAXP+ndelta+1)
+  !cc      Dpoly(0:MAXP+ndelta) = dsleg(1:MAXP+ndelta+1)
   !
   !
   !c
@@ -455,7 +455,7 @@ end subroutine legendre
 
 !--------------------------------------------------------------
 !  Apr 2009
-!  
+!
 !  ROUTINES FOR COMPUTING LEGENDRE POLYNOMIALS DOWNLOADED FROM:
 !
 !  http://jin.ece.uiuc.edu/routines/routines.html

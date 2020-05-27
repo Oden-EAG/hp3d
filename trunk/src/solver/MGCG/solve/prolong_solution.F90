@@ -6,7 +6,7 @@
 !
 !    latest revision    - Mar 2018
 !
-!    purpose            - store element modified solution vector, 
+!    purpose            - store element modified solution vector,
 !                         order and geometry dof
 !
 !----------------------------------------------------------------------
@@ -14,7 +14,7 @@
 #include "implicit_none.h"
 !
    subroutine store_elem_sol(Iel, Zelem, Ndof)
-! 
+!
    use macro_grid_info,   only: ZSOL_C
 !
    implicit none
@@ -22,11 +22,11 @@
    integer, intent(in) :: Iel, Ndof
    VTYPE,   intent(in) :: Zelem(Ndof)
    integer :: mdle
-   
+
    ZSOL_C(iel)%ndof_coarse = Ndof
    allocate(ZSOL_C(iel)%coarse(Ndof))
    ZSOL_C(iel)%coarse = Zelem
-! 
+!
 !
    end subroutine store_elem_sol
 !
@@ -45,7 +45,7 @@
 !----------------------------------------------------------------------
 !
    subroutine prolong_solution(Igrid)
-! 
+!
 !
    use mg_data_structure, only: GRID
    use macro_grid_info,   only: ZSOL_C
@@ -73,9 +73,9 @@
                                    ZSOL_C(iel)%macro,  ndof_macro )
 !
       deallocate(ZSOL_C(iel)%coarse)
-!                          
-   enddo   
-!$omp end do   
+!
+   enddo
+!$omp end do
 !$omp end parallel
 !
 !

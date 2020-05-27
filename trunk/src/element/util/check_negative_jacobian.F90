@@ -10,7 +10,7 @@ subroutine check_negative_jacobian(Nodesl, Nsize)
   ! reference and physical coordinates
   real(8), dimension(3)   :: xi,x
   real(8), dimension(3,3) :: dxdxi,dxidx
-  ! Gauss points and weights 
+  ! Gauss points and weights
   real(8), dimension(3,MAX_NINT3) :: xiloc
   real(8), dimension(  MAX_NINT3) :: wxi
   ! shape function
@@ -67,14 +67,14 @@ subroutine check_negative_jacobian(Nodesl, Nsize)
 
         ! check jacobian
         if (iflag.ne.0) then
-           ic = ic + 1 
+           ic = ic + 1
            Nodesl(ic) = mdle
            write(*,*) 'mdle, type, rjac = ', mdle, NODES(mdle)%type, rjac
            exit
         endif
      enddo
   enddo
-  Nsize = ic 
+  Nsize = ic
   write(*,*) Nsize, ' elements jacobians are negative '
 
   INTEGRATION = int_back

@@ -7,7 +7,7 @@ c
 c   latest revision    - Aug 18
 c
 c   purpose            - routine calculates unconstrained INTERFACE
-c                        solution dof for a 3D element      
+c                        solution dof for a 3D element
 c
 c   arguments :
 c     in:
@@ -21,7 +21,7 @@ c----------------------------------------------------------------------
 c
       subroutine solelmI(Mdle, ZdofH,ZdofE,ZdofV)
 c
-      use data_structure3D 
+      use data_structure3D
 #include "syscom.blk"
 c
       dimension ZdofH(MAXEQNH,MAXbrickH-MAXmdlbH)
@@ -42,7 +42,7 @@ c
      .          nacH(NACDIM,MAXbrickH),constrH(NACDIM,MAXbrickH),
      .          nacE(NACDIM,MAXbrickE),constrE(NACDIM,MAXbrickE),
      .          nacV(NACDIM,MAXbrickV),constrV(NACDIM,MAXbrickV)
-c 
+c
 c  ...modified element dof
       dimension zvalH(MAXEQNH,2*MAXbrickH)
       dimension zvalE(MAXEQNE,2*MAXbrickE)
@@ -61,7 +61,7 @@ c  ...determine element order of approximation
       end select
 c
 c  ...determine number of local dof
-      call celndof(etype,norder, 
+      call celndof(etype,norder,
      .             nrdoflH,nrdoflE,nrdoflV,nrdoflQ)
 c
 c  ...determine constraints' coefficients
@@ -76,8 +76,8 @@ c  ...eliminate the middle node from the list of modified element nodes
 c
 c---------------------------------------------------------------------
 c
-c  ...initiate dof's 
-      zvalH=ZERO ; zvalE=ZERO ; zvalV=ZERO 
+c  ...initiate dof's
+      zvalH=ZERO ; zvalE=ZERO ; zvalV=ZERO
 c
 c  ...initiate counters
       kH=0; kE=0; kV=0; kQ=0
@@ -109,7 +109,7 @@ c  ...initiate the dof
       ZdofH(1:MAXEQNH,1:nrdoflH) = ZERO
       ZdofE(1:MAXEQNE,1:nrdoflE) = ZERO
       ZdofV(1:MAXEQNV,1:nrdoflV) = ZERO
-c      
+c
 c
 c-----------------------------------------------------------------------
 c     H1 DOF'S
@@ -122,7 +122,7 @@ c  .....accumulate for the values
         do kp=1,nrconH(kH)
           l = nacH(kp,kH)
           do ivar=1,NRHVAR*NRCOMS
-            ZdofH(ivar,kH) = ZdofH(ivar,kH) 
+            ZdofH(ivar,kH) = ZdofH(ivar,kH)
      .                     + constrH(kp,kH)*zvalH(ivar,l)
           enddo
         enddo
@@ -130,9 +130,9 @@ c
 c  ...loop through local dof
       enddo
 c
-c      
+c
 c-----------------------------------------------------------------------
-c     H(curl) DOF'S      
+c     H(curl) DOF'S
 c-----------------------------------------------------------------------
 c
 c  ...loop through the local dof
@@ -142,7 +142,7 @@ c  .....accumulate for the values
         do kp=1,nrconE(kE)
           l = nacE(kp,kE)
           do ivar=1,NREVAR*NRCOMS
-            ZdofE(ivar,kE) = ZdofE(ivar,kE) 
+            ZdofE(ivar,kE) = ZdofE(ivar,kE)
      .                     + constrE(kp,kE)*zvalE(ivar,l)
           enddo
         enddo
@@ -150,9 +150,9 @@ c
 c  ...loop through local H(curl) dof
       enddo
 c
-c      
+c
 c-----------------------------------------------------------------------
-c     H(div) DOF'S      
+c     H(div) DOF'S
 c-----------------------------------------------------------------------
 c
 c  ...loop through the local dof
@@ -162,7 +162,7 @@ c  .....accumulate for the values
         do kp=1,nrconV(kV)
           l = nacV(kp,kV)
           do ivar=1,NRVVAR*NRCOMS
-            ZdofV(ivar,kV) = ZdofV(ivar,kV) 
+            ZdofV(ivar,kV) = ZdofV(ivar,kV)
      .                     + constrV(kp,kV)*zvalV(ivar,l)
           enddo
         enddo

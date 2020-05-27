@@ -9,7 +9,7 @@ c
 c   purpose            - export domains to vtk format
 c
 c   arguments:
-c                in:   - Fname: file name      
+c                in:   - Fname: file name
 c                      - Nrd  : number of surfaces to be exported
 c                      - Nlist: list of surfaces to be exported
 c
@@ -31,8 +31,8 @@ c
 c
 c  ...open file for writing
       open(unit=nfile, file=Fname, form='formatted')
-c      
-c  ...deallocate Idata for all points   
+c
+c  ...deallocate Idata for all points
       do i=1,NRPOINT
         if(associated(POINTS(i)%Idata)) then
           write(*,*)'Idata associated for point = ',i
@@ -46,7 +46,7 @@ c  ...deallocate Idata for all points
       enddo
 c
 c  ...Step 1: loop over elements and renumber vertices
-c      
+c
       ncell=0 ; npoin=0 ; ncoun=0
       do n=1,NRPRISM
         ndom = PRISMS(n)%Domain
@@ -57,7 +57,7 @@ c
         ctype(ncell)='pris'
         do i=1,6
           nv=PRISMS(n)%VertNo(i)
-c  .......if 1st visit to point          
+c  .......if 1st visit to point
           if (.not.associated(POINTS(nv)%Idata)) then
             npoin=npoin+1
             allocate(POINTS(nv)%Idata(1), stat=istat)
@@ -79,7 +79,7 @@ c
         ctype(ncell)='hexa'
         do i=1,8
           nv=HEXAS(n)%VertNo(i)
-c  .......if 1st visit to point          
+c  .......if 1st visit to point
           if (.not.associated(POINTS(nv)%Idata)) then
             npoin=npoin+1
             allocate(POINTS(nv)%Idata(1), stat=istat)
@@ -105,7 +105,7 @@ c
         ctype(ncell)='tetr'
         do i=1,4
           nv=TETRAS(n)%VertNo(i)
-c  .......if 1st visit to point          
+c  .......if 1st visit to point
           if (.not.associated(POINTS(nv)%Idata)) then
             npoin=npoin+1
             allocate(POINTS(nv)%Idata(1), stat=istat)
@@ -127,7 +127,7 @@ c
         ctype(ncell)='pyra'
         do i=1,5
           nv=PYRAMIDS(n)%VertNo(i)
-c  .......if 1st visit to point          
+c  .......if 1st visit to point
           if (.not.associated(POINTS(nv)%Idata)) then
             npoin=npoin+1
             allocate(POINTS(nv)%Idata(1), stat=istat)
@@ -142,7 +142,7 @@ c  .......if 1st visit to point
 c
 c  ...Step 2
 c
-      write(nfile,1000) 
+      write(nfile,1000)
  1000 format('# vtk DataFile Version 2.0')
       write(nfile,1001)
  1001 format('hp3d export mesh')
@@ -159,11 +159,11 @@ c
         if (nloc.eq.0) cycle
         do i=1,6
           nv=PRISMS(n)%VertNo(i)
-c  .......if 1st visit to point          
+c  .......if 1st visit to point
           if (POINTS(nv)%Idata(1).gt.0) then
             write(nfile,7001) POINTS(nv)%Rdata(1:3)
- 7001       format(3(f20.12,2x))     
-c  .........flip sign            
+ 7001       format(3(f20.12,2x))
+c  .........flip sign
             POINTS(nv)%Idata(1) = -POINTS(nv)%Idata(1)
           endif
         enddo
@@ -175,10 +175,10 @@ c
         if (nloc.eq.0) cycle
         do i=1,8
           nv=HEXAS(n)%VertNo(i)
-c  .......if 1st visit to point          
+c  .......if 1st visit to point
           if (POINTS(nv)%Idata(1).gt.0) then
             write(nfile,7001) POINTS(nv)%Rdata(1:3)
-c  .........flip sign            
+c  .........flip sign
             POINTS(nv)%Idata(1) = -POINTS(nv)%Idata(1)
           endif
         enddo
@@ -194,10 +194,10 @@ c
 
         do i=1,4
           nv=TETRAS(n)%VertNo(i)
-c  .......if 1st visit to point          
+c  .......if 1st visit to point
           if (POINTS(nv)%Idata(1).gt.0) then
             write(nfile,7001) POINTS(nv)%Rdata(1:3)
-c  .........flip sign            
+c  .........flip sign
             POINTS(nv)%Idata(1) = -POINTS(nv)%Idata(1)
           endif
         enddo
@@ -209,10 +209,10 @@ c
         if (nloc.eq.0) cycle
         do i=1,5
           nv=PYRAMIDS(n)%VertNo(i)
-c  .......if 1st visit to point          
+c  .......if 1st visit to point
           if (POINTS(nv)%Idata(1).gt.0) then
             write(nfile,7001) POINTS(nv)%Rdata(1:3)
-c  .........flip sign            
+c  .........flip sign
             POINTS(nv)%Idata(1) = -POINTS(nv)%Idata(1)
           endif
         enddo
@@ -231,7 +231,7 @@ c
           nvert(i) = -POINTS(nv)%Idata(1) - 1
         enddo
         write(nfile,7003) nvert(1:6)
- 7003   format('6 ',4x,6(i6,2x)) 
+ 7003   format('6 ',4x,6(i6,2x))
       enddo
 c
       do n=1,NRHEXAS
@@ -243,7 +243,7 @@ c
           nvert(i) = -POINTS(nv)%Idata(1) - 1
         enddo
         write(nfile,7004) nvert(1:8)
- 7004   format('8 ',4x,8(i6,2x)) 
+ 7004   format('8 ',4x,8(i6,2x))
       enddo
 c
       do n=1,NRTETRA
@@ -259,7 +259,7 @@ c
           nvert(i) = -POINTS(nv)%Idata(1) - 1
         enddo
         write(nfile,7005) nvert(1:4)
- 7005   format('4 ',4x,4(i6,2x)) 
+ 7005   format('4 ',4x,4(i6,2x))
       enddo
 c
       do n=1,NRPYRAM
@@ -271,7 +271,7 @@ c
           nvert(i) = -POINTS(nv)%Idata(1) - 1
         enddo
         write(nfile,7006) nvert(1:5)
- 7006   format('5 ',4x,5(i6,2x)) 
+ 7006   format('5 ',4x,5(i6,2x))
       enddo
 c
       write(nfile,1006)ncell
@@ -298,14 +298,14 @@ c  ...Step 4: deallocate Idata
      .      __FILE__,__LINE__)
         endif
       enddo
-c     
-      close(nfile)         
+c
+      close(nfile)
 c
 c
       end subroutine export_vol2vtk
 c
 c
-c      
+c
 c----------------------------------------------------------------------
 c
       subroutine locate_tetra(Nt, Iflag)
@@ -315,7 +315,7 @@ c
       use GMP
 #include "syscom.blk"
 c
-      dimension temp(3)      
+      dimension temp(3)
 c
       Iflag=0 ; temp=0.d0
       do i=1,4

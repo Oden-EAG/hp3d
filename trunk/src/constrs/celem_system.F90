@@ -101,7 +101,7 @@ subroutine celem_system(Mdle,Idec,                                &
    integer :: nrdoflH,nrdoflE,nrdoflV,nrdoflQ
 !
 #if DEBUG_MODE
-   integer :: ians,ibeg,iend,jbeg,jend,kbeg,kend 
+   integer :: ians,ibeg,iend,jbeg,jend,kbeg,kend
    integer :: iprint=0
 #endif
 !
@@ -934,7 +934,7 @@ subroutine celem_system(Mdle,Idec,                                &
       select case(Mdle)
          case(4); iprint=0
          case default; iprint=0
-      end select      
+      end select
 !
       if (iprint.ge.2) then
  20      continue

@@ -15,9 +15,9 @@ c        Nord          - order of approximation
 c     out:
 c        ShapH         - values of shape functions
 c        DshapH        - values of derivatives of the shape functions
-c                        wrt to master element coordinates      
+c                        wrt to master element coordinates
 c
-c   required  routines - 
+c   required  routines -
 c
 c----------------------------------------------------------------------
 c
@@ -26,7 +26,7 @@ c
       use parameters
       use element_data
 #include "syscom.blk"
-c      
+c
       dimension ShapH(MAXP+1),DshapH(MAXP+1)
 c
 c  ...kernel shape functions

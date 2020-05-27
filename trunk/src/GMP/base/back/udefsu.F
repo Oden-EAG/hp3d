@@ -17,7 +17,7 @@ c   arguments :
 c     in:              - Label,X
 c     out:             - Fval,Dfdx
 c
-c   required  routines - 
+c   required  routines -
 c
 c----------------------------------------------------------------------
       subroutine udefsu(Label,X, Fval,Dfdx)
@@ -36,7 +36,7 @@ c
       ys(3) = .42d0
 c-----------------------------
 c------------------------------
-      rsph2 = rs(2)**2 
+      rsph2 = rs(2)**2
       reli2 = rs(1)**2
 c  ...half-thickness of wings:
       a = .025
@@ -72,16 +72,16 @@ c~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          endif
          Fval = X(1)*X(1) + X(2)*X(2) + X(3)*X(3) - rsph2
 c
-         Dfdx(1) = 2*X(1) 
+         Dfdx(1) = 2*X(1)
          Dfdx(2) = 2*X(2)
-         Dfdx(3) = 2*X(3) 
+         Dfdx(3) = 2*X(3)
 c  ...upper surface of wing:
 c     ~~~~~~~~~~~~~~~~~~~~~
       elseif( Label==103 )then
          sq2 = sqrt(2.d0)/2.d0
          h = hb
          x(2) = x(2)+shift
-         Fval = sq2*(x(1)+x(3)) 
+         Fval = sq2*(x(1)+x(3))
      .
      .        - a * (1-x(2)**2/d**2)
      .
@@ -99,7 +99,7 @@ c
      .                                / (h**2-x(2)**2)**2 *x(2)
      .                 )
 
-         Dfdx(3) = 
+         Dfdx(3) =
      .          sq2
      .
      .        - a * (1-x(2)**2/d**2)
@@ -115,7 +115,7 @@ c~~~~~~~~~~~~~~~~~~~~~~~~~~
           h = hb
 c     ...shift y:
          x(2) = x(2)+shift
-         Fval = -sq2*(x(1)+x(3)) 
+         Fval = -sq2*(x(1)+x(3))
      .
      .        - a * (1-x(2)**2/d**2)
      .
@@ -133,7 +133,7 @@ c
      .                                / (h**2-x(2)**2)**2 *x(2)
      .                 )
 
-         Dfdx(3) = 
+         Dfdx(3) =
      .          -sq2
      .
      .        - a * (1-x(2)**2/d**2)
@@ -152,7 +152,7 @@ c     ...shift y:
 
 
 
-         Fval = sq2*(x(1)+x(3)) 
+         Fval = sq2*(x(1)+x(3))
      .
      .        - a * (1-x(2)**2/d**2)
      .
@@ -170,7 +170,7 @@ c
      .                                / (h**2-x(2)**2)**2 *x(2)
      .                 )
 
-         Dfdx(3) = 
+         Dfdx(3) =
      .          sq2
      .
      .        - a * (1-x(2)**2/d**2)
@@ -178,7 +178,7 @@ c
      .          * 4*((x(1)-x(3)) / (h**2-x(2)**2))
 
 c     ...shift y:
-ccccc    x(2) = x(2)+.145    
+ccccc    x(2) = x(2)+.145
          x(2) = x(2)+shift
 
 
@@ -200,7 +200,7 @@ ccccc    x(2) = x(2)-.145
 
 
 
-         Fval = -sq2*(x(1)+x(3)) 
+         Fval = -sq2*(x(1)+x(3))
      .
      .        - a * (1-x(2)**2/d**2)
      .
@@ -219,7 +219,7 @@ ccccc    x(2) = x(2)-.145
      .                                / (h**2-x(2)**2)**2 *x(2)
      .                 )
 
-         Dfdx(3) = 
+         Dfdx(3) =
      .          -sq2
      .
      .        - a * (1-x(2)**2/d**2)
@@ -227,7 +227,7 @@ ccccc    x(2) = x(2)-.145
      .          * 4*((x(1)-x(3)) / (h**2-x(2)**2))
 
 c     ...shift y:
-ccccc    x(2) = x(2)+.145    
+ccccc    x(2) = x(2)+.145
          x(2) = x(2)+shift
 
 
@@ -247,7 +247,7 @@ ccccc    x(2) = x(2)-.145
 
 
 
-         Fval = sq2*(-x(1)+x(3)) 
+         Fval = sq2*(-x(1)+x(3))
      .
      .        - a * (1-x(2)**2/d**2)
      .
@@ -265,7 +265,7 @@ c
      .                                / (h**2-x(2)**2)**2 *x(2)
      .                 )
 
-         Dfdx(3) = 
+         Dfdx(3) =
      .          sq2
      .
      .        + a * (1-x(2)**2/d**2)
@@ -273,7 +273,7 @@ c
      .          * 4*((x(1)-x(3)) / (h**2-x(2)**2))
 
 c     ...shift y:
-ccccc    x(2) = x(2)+.145    
+ccccc    x(2) = x(2)+.145
          x(2) = x(2)+shift
 
 
@@ -294,7 +294,7 @@ ccccc    x(2) = x(2)-.145
 
 
 
-         Fval = -sq2*(-x(1)+x(3)) 
+         Fval = -sq2*(-x(1)+x(3))
      .
      .        - a * (1-x(2)**2/d**2)
      .
@@ -312,7 +312,7 @@ c
      .                                / (h**2-x(2)**2)**2 *x(2)
      .                 )
 
-         Dfdx(3) = 
+         Dfdx(3) =
      .          -sq2
      .
      .        + a * (1-x(2)**2/d**2)
@@ -320,7 +320,7 @@ c
      .          * 4*((x(1)-x(3)) / (h**2-x(2)**2))
 
 c     ...shift y:
-ccccc    x(2) = x(2)+.145    
+ccccc    x(2) = x(2)+.145
          x(2) = x(2)+shift
 
 
@@ -332,7 +332,7 @@ c  ...nose:
          Fval = -x(2) -hnose*(1-x(1)**2/r**2) * (1-x(3)**2/r**2) -ys(3)
 c
 
-         Dfdx(1) =  hnose * 2*x(1)/r**2 * (1-x(3)**2/r**2) 
+         Dfdx(1) =  hnose * 2*x(1)/r**2 * (1-x(3)**2/r**2)
 
          Dfdx(2) = -1
 
@@ -416,7 +416,7 @@ c
          Dfdx(1) = 2*X(1)
          Dfdx(2) = 2*X(2)
          Dfdx(3) = 1.d0
- 
+
 
       elseif(Label.eq.104)then
          Fval = X(1)*X(1) + X(2)*X(2) + X(3) - 1.d0
@@ -430,7 +430,7 @@ c
          print*,'UDEFSU: UNDEFINED SURFACE Label = ',Label
          stop
       endif
-        
+
       return
       end
 

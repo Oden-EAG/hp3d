@@ -8,4 +8,4 @@ subroutine display_ref_kind
   write(*,*)'mdld (pyramid)                            10                     '
   write(*,*)'================================================================='
 !
-end subroutine 
+end subroutine

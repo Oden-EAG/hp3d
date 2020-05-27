@@ -8,13 +8,13 @@ subroutine number_active_nodes(N)
   integer, dimension(27) :: nodesl, norientl
   integer :: mdle, iel, nod, ino, n_nodes
   !
-  mdle = 0; N = 0 
+  mdle = 0; N = 0
   do iel=1, NRELES
      call nelcon(mdle, mdle)
      call elem_nodes(mdle, nodesl,norientl)
      !
      type = NODES(mdle)%type
-     n_nodes = nvert(type) + nedge(type) + nface(type) + 1 
+     n_nodes = nvert(type) + nedge(type) + nface(type) + 1
      !
      do ino=1, n_nodes
         nod = nodesl(ino)

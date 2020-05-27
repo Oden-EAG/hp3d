@@ -49,7 +49,7 @@ subroutine mumps_sc(mtype)
 !
 !..number of local element dof for each physics variable
    integer, dimension(NR_PHYSA) :: nrdofi,nrdofb
-! 
+!
 !..integer counters
    integer    :: nrdofm,nrdofc,nrnodm,nrdof,nrdof_mdl,ndof
    integer    :: iel,mdle,i,j,k,l,k1,k2,nod
@@ -188,10 +188,10 @@ subroutine mumps_sc(mtype)
       Mtime(1) = end_time-start_time
       write(*,1002) Mtime(1)
  1002 format(' STEP 1 finished: ',f12.5,'  seconds',/)
-   endif 
+   endif
 !
 ! ----------------------------------------------------------------------
-!  STEP 2 : ASSEMBLE AND STORE IN SPARSE FORM 
+!  STEP 2 : ASSEMBLE AND STORE IN SPARSE FORM
 ! ----------------------------------------------------------------------
 !
    write(*,2010) ' Number of dof  : nrdof_con = ', NRDOF_CON
@@ -215,7 +215,7 @@ subroutine mumps_sc(mtype)
    allocate(MUMPS_PAR%JCN(nnz))
    allocate(MUMPS_PAR%A(nnz))
 !
-!..memory allocation for static condensation   
+!..memory allocation for static condensation
    call stc_alloc
 !
 !..assemble global stiffness matrix
@@ -489,7 +489,7 @@ subroutine mumps_sc(mtype)
       write(*,1012) Mtime(4)
  1012 format(' STEP 4 finished: ',f12.5,'  seconds',/)
    endif
-!   
+!
    deallocate(MAXDOFS)
    call stc_dealloc
 !

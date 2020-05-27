@@ -1,8 +1,8 @@
 !---------------------------------------------------------------------------------
 subroutine generate_PRI_TET_PYR
-!--------------------------------------------------------------------------------- 
+!---------------------------------------------------------------------------------
 ! LATEST REVISION: Jul 09
-!      
+!
 ! PURPOSE: routine generates new prisms, tets and pyramids
 !---------------------------------------------------------------------------------
   use SPLIT_SURF
@@ -10,17 +10,17 @@ subroutine generate_PRI_TET_PYR
 !---------------------------------------------------------------------------------
   integer :: ifig,nt,nr,ile,iv,iv1,iv2,iv3,ie,np,np1,np2,np3,flag
 ! FUNCTIONS
-  integer :: mod3,mod4      
+  integer :: mod3,mod4
 !---------------------------------------------------------------------------------
 ! printing flag (0,1,2)
 #define I_PRINT 0
 !
 #if I_PRINT >= 1
-    write(*,*)'generate_PRI_TET_PYR: generating prisms, tets, pyramids...' 
-#endif     
+    write(*,*)'generate_PRI_TET_PYR: generating prisms, tets, pyramids...'
+#endif
     flag = 0
- 
-! ..loop over figures to split      
+
+! ..loop over figures to split
     do ifig = 1, nr_figs_to_split
       select case(figs_split(1,ifig))
 ! ......triangle
@@ -32,7 +32,7 @@ subroutine generate_PRI_TET_PYR
             np = TRIANGLES(nt)%VertNo(iv)
             if (new_point(np) .ne. np)  ile = ile + 1
           enddo
-! ........select number of duplicated points            
+! ........select number of duplicated points
           select case(ile)
 ! ..........generate TETRA
             case(1)
@@ -43,10 +43,10 @@ subroutine generate_PRI_TET_PYR
               endif
               TETRAS(NRTETRA)%Type        = 'Linear'
               TETRAS(NRTETRA)%Domain      = NRDOMAIN
-! ............loop over triangle vertices and identify duplicated point              
+! ............loop over triangle vertices and identify duplicated point
               do iv = 1, 3
                 np = TRIANGLES(nt)%VertNo(iv)
-!  .............save local number of duplicated vertex                
+!  .............save local number of duplicated vertex
                 if (new_point(np) .ne. np) then
                   iv1 = iv; exit
                 endif
@@ -59,9 +59,9 @@ subroutine generate_PRI_TET_PYR
               TETRAS(NRTETRA)%VertNo(4) = new_point(np)
 !  ...........swap x and y-axis if necessary
               call check_orientation(3,NRTETRA)
-#if I_PRINT >= 2                
+#if I_PRINT >= 2
               write(*,*) 'generate_PRI_TET_PYR: GENERATED NEW TET = ',NRTETRA,TETRAS(NRTETRA)%VertNo(1:4)
-#endif                
+#endif
 ! ..........generate PYRAMID
             case(2)
               NRPYRAM = NRPYRAM + 1
@@ -160,7 +160,7 @@ subroutine generate_PRI_TET_PYR
     if (flag.eq.1) NRDOMAIN = NRDOMAIN + 1
 
 #if I_PRINT >= 1
-    write(*,*)'generate_PRI_TET_PYR: done!' 
-#endif      
+    write(*,*)'generate_PRI_TET_PYR: done!'
+#endif
 !
-end subroutine generate_PRI_TET_PYR 
+end subroutine generate_PRI_TET_PYR

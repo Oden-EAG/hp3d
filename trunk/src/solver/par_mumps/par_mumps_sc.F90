@@ -59,7 +59,7 @@ subroutine par_mumps_sc(mtype)
 !
 !..number of local element dof for each physics variable
    integer, dimension(NR_PHYSA) :: nrdofi,nrdofb
-! 
+!
 !..integer counters
    integer    :: nrdofm,nrdofc,nrnodm,nrdof,nrdof_mdl,ndof
    integer    :: iel,mdle,subd,idx,i,j,k,l,k1,k2,nod,idec
@@ -70,7 +70,7 @@ subroutine par_mumps_sc(mtype)
 !..dummy variables
    integer :: nvoid
    VTYPE   :: zvoid
-! 
+!
 !..workspace for celem
    integer, dimension(MAXNODM) :: nodm,ndofmH,ndofmE,ndofmV,ndofmQ
 !
@@ -260,10 +260,10 @@ subroutine par_mumps_sc(mtype)
       Mtime(1) = end_time-start_time
       if (RANK .eq. ROOT) write(*,1002) Mtime(1)
  1002 format(' STEP 1 finished: ',f12.5,'  seconds',/)
-   endif 
+   endif
 !
 !  ----------------------------------------------------------------------
-!  STEP 2 : ASSEMBLE AND STORE IN SPARSE FORM 
+!  STEP 2 : ASSEMBLE AND STORE IN SPARSE FORM
 !  ----------------------------------------------------------------------
 !
    call MPI_BARRIER(mumps_par%COMM, ierr)

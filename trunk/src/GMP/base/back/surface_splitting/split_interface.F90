@@ -10,24 +10,24 @@ subroutine split_interface
 ! MODULES
   use SPLIT_SURF
   use GMP
-!------------------------------------------------------------------------  
+!------------------------------------------------------------------------
 IMPLICIT NONE
 !------------------------------------------------------------------------
-! VARIABLES  
+! VARIABLES
   real*8  :: s
   integer :: i,ns
   integer :: status
 !------------------------------------------------------------------------
-! printing flag (0,1,2) 
-#define I_PRINT 0 
+! printing flag (0,1,2)
+#define I_PRINT 0
 !
 #if I_PRINT >= 1
     write(*,*)'split_interface: splitting interface...'
-#endif    
+#endif
 ! ..add one subdomain
     NRDOMAIN = NRDOMAIN + 1
-#if I_PRINT >= 2  
-    write(*,1) NRDOMAIN 
+#if I_PRINT >= 2
+    write(*,1) NRDOMAIN
 1   format(' split_interface: adding subdomain, NRDOMAINS = ',i2)
 #endif
 ! ..check if split surface is a plane
@@ -35,12 +35,12 @@ IMPLICIT NONE
       write(*,*) 'split_interface: CANNOT SPLIT ns = ',ns
       stop
     endif
-! ..determine normal of split plane      
+! ..determine normal of split plane
     call norm(SURFACES(Nsplit_MOD)%Rdata(4:6), s)
     NORMAL(1:3) = SURFACES(Nsplit_MOD)%Rdata(4:6)/s
 #if I_PRINT >= 2
-    write(*,*)'split_interface: NORMAL = ',NORMAL(1:3) 
-#endif   
+    write(*,*)'split_interface: NORMAL = ',NORMAL(1:3)
+#endif
 ! ..add 2 planes to GMP data structure
     do i = 1, 2
       NRSURFS = NRSURFS + 1
@@ -55,11 +55,11 @@ IMPLICIT NONE
         stop
       endif
       select case(i)
-! ......plane on NEG side of split plane        
+! ......plane on NEG side of split plane
         case(1)
           SURFACES(NRSURFS)%Rdata(1:3) = SURFACES(Nsplit_MOD)%Rdata(1:3) - NORMAL(1:3)*Dh1_MOD
           SURFACES(NRSURFS)%Rdata(4:6) = NORMAL(1:3)
-! ......plane on POS side of split plane          
+! ......plane on POS side of split plane
         case(2)
           SURFACES(NRSURFS)%Rdata(1:3) = SURFACES(Nsplit_MOD)%Rdata(1:3) + NORMAL(1:3)*Dh2_MOD
           SURFACES(NRSURFS)%Rdata(4:6) = NORMAL(1:3)
@@ -71,9 +71,9 @@ IMPLICIT NONE
     write(*,*)'plane 1 = ', (NRSURFS - 1)
     write(*,*)'plane 2 = ', NRSURFS
     call print_GMP
-#endif      
+#endif
 #if I_PRINT >= 1
     write(*,*)'split_interface: done!'
-#endif    
+#endif
 !
-end subroutine split_interface      
+end subroutine split_interface

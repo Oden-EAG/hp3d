@@ -2,7 +2,7 @@
 #include "implicit_none.h"
 !
 !-----------------------------------------------------------------------
-!> Purpose : determine H(curl) face dof interpolating H(curl) Dirichlet 
+!> Purpose : determine H(curl) face dof interpolating H(curl) Dirichlet
 !            data using PB interpolation
 !
 !! @param[in]  Iflag        - a flag specifying the GMP object
@@ -71,7 +71,7 @@
 ! H(curl) shape functions in reference coordinates
   real(8), dimension(3)                 :: uE,vE,curluE,curlvE
 !
-! dot product 
+! dot product
   real(8)                               :: prod
 !
 ! geometry
@@ -147,7 +147,7 @@
 7060 format('dhpfaceE: norder_1 = ',20i4)
   endif
 !
-! get face order to find out quadrature information 
+! get face order to find out quadrature information
   call face_order(Type,Iface,Norder, norder_face)
   INTEGRATION=1   ! overintegrate
   call set_2Dint(face_type(Type,Iface),norder_face, &
@@ -170,7 +170,7 @@
                    norder_1,Nedge_orient,Nface_orient, &
                    nrdofH,shapH,gradH)
 !
-!    compute element Hcurl shape functions 
+!    compute element Hcurl shape functions
      call shape3DE(Type,xi, &
                    norder_1,Nedge_orient,Nface_orient, &
                    nrdofE,shapE,curlE)
@@ -187,7 +187,7 @@
               '          rn,bjac = ',3f8.3,3x,f8.3)
      endif
 !
-!    call GMP routines to evaluate physical coordinates and their 
+!    call GMP routines to evaluate physical coordinates and their
 !    derivatives wrt reference coordinates
      select case(Iflag)
      case(5);        call prism(No,eta, x,dxdeta)
@@ -286,7 +286,7 @@
                    +  detadxi(1:3,2)*curlE(2,kjE) &
                    +  detadxi(1:3,3)*curlE(3,kjE))/rjac
 !
-!      subtract normal component 
+!      subtract normal component
        call dot_product(vE,rn, prod)
        vE(1:3) = vE(1:3) - prod*rn(1:3)
 !
@@ -368,7 +368,7 @@
 ! use symmetry to complete the stiffness matrix
   do jH=1,ndofH_face
   do iE=1,ndofE_face
-    aaE(iE,ndofE_face+jH) = aaE(ndofE_face+jH,iE) 
+    aaE(iE,ndofE_face+jH) = aaE(ndofE_face+jH,iE)
   enddo
   enddo
   ndofE_tot = ndofE_face + ndofH_face

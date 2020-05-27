@@ -10,7 +10,7 @@ c      common /cintr/ XIGAUSS(3,13,11),WAGAUSS(13,11),NRGAUPO(11),
 c     .               NSELECT(9)
       common /cintr/ XIGAUSS(3,79,20),WAGAUSS(79,20),NRGAUPO(20),
      .               NSELECT(9)
-c  
+c
 c  contains integration points and corresponding weights for 2-D
 c  Gaussian integration on any triangle
 c

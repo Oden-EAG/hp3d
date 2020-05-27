@@ -5,7 +5,7 @@ integer function factorial(n)
   if (n .eq. 0) then
     factorial = 1
     return
-  endif   
+  endif
   factorial = 1
   do i = 2, n
     factorial = factorial*i

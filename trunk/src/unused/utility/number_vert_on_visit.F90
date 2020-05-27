@@ -15,10 +15,10 @@ subroutine number_vert_on_visit(Nr_vert)
      do ino=1, nvert(NODES(mdle)%type)
         nod = nodesl(ino)
         if (NODES(nod)%visit.eq.0) then
-           nver = nver + 1 
+           nver = nver + 1
            NODES(nod)%visit = nver
         end if
      end do
   end do
-  Nr_vert = nver 
+  Nr_vert = nver
 end subroutine number_vert_on_visit

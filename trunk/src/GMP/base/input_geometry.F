@@ -473,7 +473,7 @@ c  .....read in and store the coordinates of the center of an ellipse
           end select
 c
 c  .....read in and store the coordinates of the center of a
-c  .....superellipse and its associated powers          
+c  .....superellipse and its associated powers
         else if (Type.eq.'QuaSEl') then
           allocate( CURVES(icur)%Rdata(NDIM+2), STAT = ic)
           if(ic.ne.0)then

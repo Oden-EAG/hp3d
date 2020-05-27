@@ -10,7 +10,7 @@ subroutine set_pris_break(Kref,Nord, Nrsons,Type,Norder)
   call decode(Nord, nordh,nordz)
 !
   Norder = 0; Type(1:27) = 'none'
-!  
+!
   select case(Kref)
   case(01)
      Nrsons       = 3
@@ -29,7 +29,7 @@ subroutine set_pris_break(Kref,Nord, Nrsons,Type,Norder)
      Type(19:21)   = 'medg'
      Norder(1:8)   = nord
      Norder(9:12)  = nordh
-     Norder(13:18) = nord 
+     Norder(13:18) = nord
      Norder(19:21) = nordh
   case default
      Nrsons = 0

@@ -9,9 +9,9 @@
 !************************************************************************************************************************
       use GMP
 !************************************************************************************************************************
-      IMPLICIT NONE   
+      IMPLICIT NONE
 !************************************************************************************************************************
-      !*** DUMMY ARGUMENTS   
+      !*** DUMMY ARGUMENTS
       integer, intent(in) :: nc                                          !*** curve number
       integer, intent(in) :: nsphere                                     !*** cylinder surface number
       integer, intent(in) :: nplane                                      !*** plane surface number
@@ -23,8 +23,8 @@
       double precision :: radius                                         !*** sphere radius
       double precision, dimension(3) :: r_plane, n_plane                 !*** data for plane of type 'VecPt'
       double precision, dimension(3) :: p1, p2                           !*** auxiliary variables
-      double precision, dimension(3,3) :: RBM                            !*** rigid body motion      
-      double precision, dimension(3,3) :: RBM_aux                        !*** auxiliary matrix     
+      double precision, dimension(3,3) :: RBM                            !*** rigid body motion
+      double precision, dimension(3,3) :: RBM_aux                        !*** auxiliary matrix
       double precision, dimension(3) :: v_aux                            !*** auxiliary vector
       double precision, dimension(3,2) :: V                              !*** vertices stored columns-wise
       double precision :: rho, theta, z                                  !*** cylindrical coordinates
@@ -46,7 +46,7 @@
       !
       r_plane(1:3) = SURFACES(nplane)%Rdata(1:3)
       !
-      if (SURFACES(nplane)%Type .eq. 'VecPt') then      
+      if (SURFACES(nplane)%Type .eq. 'VecPt') then
         n_plane(1:3) = SURFACES(nplane)%Rdata(4:6)
       else
         p1(1:3) = SURFACES(nplane)%Rdata(4:6) - r_plane(1:3)
@@ -63,8 +63,8 @@
       !
       v_aux(1:3) = MATMUL(RBM_aux(1:3,1:3), V(1:3,1))                    !*** determine images of 1st vertex
       !
-      v_aux(3) = 0.d0                                                    !*** project onto xy-plane   
-      !   
+      v_aux(3) = 0.d0                                                    !*** project onto xy-plane
+      !
       call rotation(v_aux, e1, RBM)                                      !*** rotation that maps projection onto x-axis
       !
       RBM(1:3,1:3) = MATMUL(RBM(1:3,1:3), RBM_aux(1:3,1:3))              !*** determine rigid body motion

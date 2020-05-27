@@ -12,7 +12,7 @@ c   arguments :
 c     in:
 c               Numlev - number of levels to plot solution values
 c     out:
-c               Solev  - limiting values for each level 
+c               Solev  - limiting values for each level
 c
 c----------------------------------------------------------------------
 c
@@ -53,7 +53,7 @@ c
         call logic_error(ERR_ALLOC_FAILURE,
      .    __FILE__,__LINE__)
       endif
-      
+
 c
 c  ...increment in master element coordinates
       dxi = DX
@@ -62,7 +62,7 @@ c  ...in search for biggest and smallest value
       solmax =-1.d10
       solmin = 1.d10
 c
-c  ...loop through elements      
+c  ...loop through elements
       mdle=0
       do iel=1,NRELES
 c
@@ -87,7 +87,7 @@ c
         endif
 c
         call solelm(mdle, zdofH,zdofE,zdofV,zdofQ)
-        call celndof(NODES(mdle)%type,norder, 
+        call celndof(NODES(mdle)%type,norder,
      .               nrdofH,nrdofE,nrdofV,nrdofQ)
 c
 c  .....loop through element faces
@@ -113,7 +113,7 @@ c  .......loop through points on the face
                 call pause
               endif
 c
-c  ...........update extremes  
+c  ...........update extremes
               solmax = max(solmax,val)
               solmin = min(solmin,val)
             enddo

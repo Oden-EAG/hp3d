@@ -20,13 +20,13 @@ c
 c
       dimension x1(3),dxdx(3),x2(3)
       dimension x(3),xmin(2),xmax(2)
-c                        
+c
       data bigp,bign,small /1.d30,-1.d30,1.d-14/
 c
-c  ...set colour 
+c  ...set colour
 c     ...for curves  ...
       ncol = npcol(8)
-c     ...and for background 
+c     ...and for background
       nbgcol = npcol(1)
 c
 c  ...set up number of line segments for drawing a curve
@@ -116,7 +116,7 @@ c  ...close window
       call closwind(iwindnum)
 c
       write(*,*) 'SELECT OPTION :'
-      write(*,*) '0 - EXIT'   
+      write(*,*) '0 - EXIT'
       write(*,*) '1 - CHANGE THE DEGREE OF COARSENESS FOR OVALS'
       write(*,*) '2 - CHANGE THE CENTRAL POINT OF THE IMAGE'
       write(*,*) '3 - RESCALE THE IMAGE'
@@ -154,7 +154,7 @@ c
         write(*,*) 'SET MAGNIFICATION FACTOR'
         read(*,*) rnsc
         rnsc=dabs(rnsc)
-        DIMIM=DIMIM/rnsc 
+        DIMIM=DIMIM/rnsc
       endif
       if (ichoice.eq.4) then
         DIMIM = dimobj
@@ -166,8 +166,8 @@ c
 c
       end
 
-     
-      
 
 
-      
+
+
+

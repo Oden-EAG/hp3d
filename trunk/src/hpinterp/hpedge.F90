@@ -8,15 +8,15 @@
 !!
 !! @param[in]  Iflag        - a flag specifying which of the objects the
 !!                            edge is on: 5 pris, 6 hexa, 7 tetr, 8 pyra
-!! @param[in]  No           - number of a specific object 
+!! @param[in]  No           - number of a specific object
 !! @param[in]  Etav         - reference coordinates of the element vertices
 !! @param[in]  Type         - element (middle node) type
 !! @param[in]  Nedge_orient - edge orientation
 !! @param[in]  Nface_orient - face orientation (not used)
 !! @param[in]  Norder       - element order
-!! @param[in]  Iedge        - edge number 
+!! @param[in]  Iedge        - edge number
 !! @param[in]  Xnod         - geometry dof for the element (vertex values)
-!! 
+!!
 !! @param[out] Xdof         - geometry dof for the edge
 !!
 !> @date Mar 17
@@ -31,7 +31,7 @@
 !
 ! ** Arguments
 !-----------------------------------------------------------------------
-!      
+!
   integer,                         intent(in)  :: Iflag,No,Mdle
   integer,                         intent(in)  :: Iedge
   real(8), dimension(3,8),         intent(in)  :: Etav
@@ -65,21 +65,21 @@
   real(8), dimension(3)                 :: xi,eta,rn,x
   real(8), dimension(3)                 :: dxidt,detadt,rt
   real(8), dimension(3,3)               :: detadxi,dxideta,dxdeta
-!    
+!
 ! work space for linear solvers
   integer                               :: naH,info
   real(8), dimension(MAXP-1,MAXP-1)     :: aaH
   integer, dimension(MAXP-1)            :: ipivH
-!    
+!
 ! load vector and solution
   real(8), dimension(MAXP-1,3)          :: bb,uu
-!  
+!
 ! misc work space
   integer :: iprint,nrv,nre,nrf,i,j,k,ie,kj,ki,&
              ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_Edge,iflag1
 !
 !----------------------------------------------------------------------
-!     
+!
 ! debug printing flag
   iprint=0
 !
@@ -114,14 +114,14 @@
 !
 ! initialize
   aaH = 0.d0; bb = 0.d0
-!    
+!
 ! loop over integration points
   do l=1,nint
 !
 !   Gauss point and weight
     t  = xi_list(l)
     wa = wa_list(l)
-!    
+!
 !   determine edge parameterization for line integral
     call edge_param(Type,Iedge,t, xi,dxidt)
 !
@@ -141,7 +141,7 @@
     rt(1:3) = detadt(1:3)/bjac
     weight = wa*bjac
 !
-!   call GMP routines to evaluate physical coordinates and their 
+!   call GMP routines to evaluate physical coordinates and their
 !   derivatives wrt reference coordinates
     select case(Iflag)
     case(5) ; call prism(No,eta, x,dxdeta)
@@ -164,7 +164,7 @@
                    + gradH(2,k)*dxideta(2,1:3) &
                    + gradH(3,k)*dxideta(3,1:3)
 !
-!     subtract... 
+!     subtract...
       do i=1,3
         dxdeta(1:3,i) = dxdeta(1:3,i) &
                       - Xnod(1:3,k)*duHdeta(i)
@@ -228,7 +228,7 @@
 !
 ! projection matrix leading dimension (maximum number of 1D bubbles)
   naH=MAXP-1
-!    
+!
 ! over-write aaH with its LU factorization
   call dgetrf(ndofH_edge,ndofH_edge,aaH,naH,ipivH,info)
 !
@@ -237,12 +237,12 @@
     write(*,*)'dhpedge: H1 DGETRF RETURNED INFO = ',info
     call logic_error(FAILURE,__FILE__,__LINE__)
   endif
-!    
+!
 ! solve linear system
 !
 ! copy load vector
   uu(1:ndofH_edge,:) = bb(1:ndofH_edge,:)
-!    
+!
 ! apply pivots to load vector
   call dlaswp(3,uu,naH,1,ndofH_edge,ipivH,1)
 !

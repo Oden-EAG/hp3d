@@ -1,4 +1,4 @@
-      
+
       subroutine decomp(n,na,a,ip,Iflag)
 #include "syscom.blk"
 
@@ -6,7 +6,7 @@
 c
       iprint=0
       if (iprint.eq.1) then
-        write(*,7001) 
+        write(*,7001)
  7001   format('decomp: n,na = ',2i4)
         do i=1,n
           write(*,7002) i,a(i,1:n)
@@ -41,7 +41,7 @@ c
 c
         call dscal(n-k,c,a(k+1,k),inc)
         if (iprint.eq.1) then
-          write(*,7003) k 
+          write(*,7003) k
  7003     format('decomp: k = ',i4)
           do i=1,n
             write(*,7002) i,a(i,1:n)
@@ -71,7 +71,7 @@ c
       iprint=0
 c
       if (iprint.eq.1) then
-        write(*,7001) 
+        write(*,7001)
  7001   format('gauss2: n,na = ',2i4)
         do i=1,n
           write(*,7002) i,a(i,1:n)

@@ -1,16 +1,16 @@
 !**************************************************************************************************************************
       SUBROUTINE cylinderANDsphere(nc, ncylinder, nsphere, eta, r, Dr)
-!**************************************************************************************************************************   
+!**************************************************************************************************************************
       !*** LATEST REVISION:       Aug 08
-      ! 
+      !
       !*** PURPOSE:               routine parametrizes a curve resulting from the intersection of a cylinder and a sphere.
       !
       !*** REQUIRED SUBROUTINES:  planeANDline, rotation, cartesian2cylindrical, scalar_product.
-!**************************************************************************************************************************   
+!**************************************************************************************************************************
       use GMP
-!**************************************************************************************************************************      
+!**************************************************************************************************************************
       IMPLICIT NONE
-!**************************************************************************************************************************      
+!**************************************************************************************************************************
       !*** DUMMY ARGUMENTS
       integer, intent(in) :: nc                                          !*** curve number
       integer, intent(in) :: ncylinder                                   !*** cylinder number
@@ -37,9 +37,9 @@
       integer :: i
       !
       !*** PARAMETERS
-      double precision, dimension(3), parameter :: e1 
+      double precision, dimension(3), parameter :: e1
      .                                = (/1.d0, 0.d0, 0.d0/)             !*** vector (1,0,0)
-      double precision, dimension(3), parameter :: e3 
+      double precision, dimension(3), parameter :: e3
      .                                = (/0.d0, 0.d0, 1.d0/)             !*** vector (0,0,1)
 !*************************************************************************************************************************
       !
@@ -54,7 +54,7 @@
       !
       sphere_center(1:3) = SURFACES(nsphere)%Rdata(1:3)                  !*** get sphere data
       sphere_radius = SURFACES(nsphere)%Rdata(4)
-      !      
+      !
       call planeANDline(cylinder_axis, sphere_center, cylinder_axis,     !*** redefine cylinder center
      .                             cylinder_center, v_aux)
       cylinder_center(1:3) = v_aux(1:3)
@@ -63,10 +63,10 @@
       V(1:3,1) = V(1:3,1) - cylinder_center(1:3)
       V(1:3,2) = V(1:3,2) - cylinder_center(1:3)
       !
-      call rotation(cylinder_axis, e3, RBM_aux)                          !*** get rotation that maps cylinder axis onto z-axis  
+      call rotation(cylinder_axis, e3, RBM_aux)                          !*** get rotation that maps cylinder axis onto z-axis
       v_aux(1:3) = MATMUL(RBM_aux(1:3,1:3), V(1:3,1))                    !*** find image of 1st vertex
       v_aux(3) = 0.d0                                                    !*** project onto xy-plane
-      call rotation(v_aux, e1, RBM)                                      !*** get rotation that maps projection onto x-axis  
+      call rotation(v_aux, e1, RBM)                                      !*** get rotation that maps projection onto x-axis
       RBM(1:3,1:3) = MATMUL(RBM(1:3,1:3), RBM_aux(1:3,1:3))              !*** determine rigid body motion
       !
       sphere_center(1:3) = MATMUL(RBM(1:3,1:3), sphere_center(1:3))      !*** apply rigid body motion
@@ -103,9 +103,9 @@
       Dr(3) = Dr(3)*theta_aux
       !
       RBM(1:3,1:3) = TRANSPOSE(RBM(1:3,1:3))                             !*** invert rigid body motion
-      ! 
+      !
       r(1:3) = MATMUL(RBM(1:3,1:3), r(1:3)) + cylinder_center(1:3)       !*** apply inverse rigid body motion
       Dr(1:3) = MATMUL(RBM(1:3,1:3), Dr(1:3))
-      ! 
+      !
       END SUBROUTINE cylinderANDsphere
-       
+

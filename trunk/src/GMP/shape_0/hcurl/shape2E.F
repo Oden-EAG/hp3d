@@ -1,15 +1,15 @@
 c----------------------------------------------------------------------
-c     
+c
 c     routine name       - shapeEt_0
-c     
+c
 c----------------------------------------------------------------------
-c     
+c
 c     latest revision    - May 12
-c     
+c
 c     purpose            - routine evaluates H(curl) shape functions
 c                          for a triangle, using construction
 c                          of Sabine Zaglmayr
-c     
+c
 c     arguments :
 c     in:
 c       Xi        - master element coordinates
@@ -19,17 +19,17 @@ c     out:
 c       NrdofE    - number of element dof
 c       ShapE     - values of shape functions
 c       CurlE     - values of derivatives of the shape functions
-c                   wrt to master element coordinates      
-c     
+c                   wrt to master element coordinates
+c
 c----------------------------------------------------------------------
 c
       subroutine shapeEt_0(Xi,Norder,Norient, NrdofE,ShapE,CurlE)
-c     
+c
       use element_data
       use parameters
       use cross_product_module
 #include "syscom.blk"
-c     
+c
 c  ...input output parameters
       dimension Xi(2),Norder(4),Norient(3),
      .  ShapE(2,MAXtriaE),CurlE(MAXtriaE)
@@ -42,12 +42,12 @@ c  ...cross checking with tetr
       dimension xi_tetr(3),
      .  norder_tetr(19), ne_orient_tetr(12), nf_orient_tetr(6),
      .  shapE_tetr(3,MAXbrickE),curlE_tetr(3,MAXbrickE)
-c     
+c
 c-----------------------------------------------------------------------
 c
       iprint=0
 c
-c  ...compute the affine coordinates       
+c  ...compute the affine coordinates
       vshap(1) = 1.d0 -  (Xi(1)+Xi(2))
       dshap(1,1) = -1.d0
       dshap(2,1) = -1.d0
@@ -60,7 +60,7 @@ c
       dshap(1,3) = 0.d0
       dshap(2,3) = 1.d0
 c
-c  ...shape function counter     
+c  ...shape function counter
       k = 0
 c
 c  ...mid-edge nodes shape functions
@@ -73,13 +73,13 @@ c
         if (nord.gt.0) then
           if (Norient(ie).eq.1) call swap(iv1, iv2)
 c
-c  .......Whitney function          
+c  .......Whitney function
           k = k + 1
           ShapE(1:2,k) =
      .      dshap(1:2,iv1)*vshap(iv2) - vshap(iv1)*dshap(1:2,iv2)
           call cross_product2D(dshap(1:2,iv2),dshap(1:2,iv1),CurlE(k))
           CurlE(k) = 2.0*CurlE(k)
-c     
+c
 c  .......High order
           p      = vshap(     iv1) - vshap(     iv2)
           dp_dXi = dshap(1:2, iv1) - dshap(1:2, iv2)
@@ -94,8 +94,8 @@ c  .......High order
           enddo
         end if
       enddo
-      
-c     
+
+c
 c  ...middle node shape functions
 c     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
       call shapEbt(Xi,Norder(4),0,vshap,dshap,
@@ -106,13 +106,13 @@ c
 c     ...check with tetr
       if (iprint.eq.1) then
         xi_tetr = 0.d0; xi_tetr(1:2) = Xi(1:2)
-c        
+c
         norder_tetr = 0;
         norder_tetr(1:3) = Norder(1:3); norder_tetr(7) = Norder(4);
 c
         ne_orient_tetr = 0; nf_orient_tetr = 0;
         ne_orient_tetr(1:3) = Norient(1:3)
-c        
+c
         nrdofE_tetr = 0; shapE_tetr = 0.d0; curlE_tetr = 0.d0;
 c
         call shape3nE(
@@ -137,5 +137,5 @@ c
      .    ' Diff = ',e12.5)
         call pause
       endif
-c      
+c
       end subroutine

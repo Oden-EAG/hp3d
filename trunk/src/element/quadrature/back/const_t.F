@@ -20,19 +20,19 @@ c
 #include "syscom.blk"
 #include "cint.blk"
 c
-c  ...force z to real type      
+c  ...force z to real type
       double precision z
 c
       iprint=0
 c
-c  ...set up the number of integration points 
-c     defined in common as: NRGAUPO_TETS(7)      
+c  ...set up the number of integration points
+c     defined in common as: NRGAUPO_TETS(7)
       do np=1,7
         NRGAUPO_TETS(np) = (np+1)*(np+1)*(np+2)
       enddo
 c
 c  ...set the integration rules for different orders p
-c     defined in common as: NSELECT_TETS(7)      
+c     defined in common as: NSELECT_TETS(7)
       do np=1,7
         NSELECT_TETS(np) = np
       enddo
@@ -79,7 +79,7 @@ c
 c
 ccc      return
 c
-c  ...verify the integration rule 
+c  ...verify the integration rule
 c
 c  ...loop through orders p
       do np=1,7

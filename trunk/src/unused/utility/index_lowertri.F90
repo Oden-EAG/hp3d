@@ -3,7 +3,7 @@
 !> returns the index pointing to the same coefficient in a vector used
 !> to store the lower triangular part of the matrix
 !>
-!>  In other words, 
+!>  In other words,
 !>
 !>    matrix_lowertri(index_lowertri(row,column))=matrix_full(row,column)
 !

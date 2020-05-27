@@ -8,17 +8,17 @@
 !
 !    purpose           - routine establishes dof injections
 !                        after a p-refinement
-!                        
+!
 !
 !   arguments :
 !     in:
 !                 Type - type of the nod
 !             Nord_old - old order of the nod
 !                 Nord - new order of the nod
-!     out:     
-!                 InjH - Injection of the H1 dof    
-!                 InjE - Injection of the H(curl) dof    
-!                 InjV - Injection of the H(div) dof    
+!     out:
+!                 InjH - Injection of the H1 dof
+!                 InjE - Injection of the H(curl) dof
+!                 InjV - Injection of the H(div) dof
 !
 !-----------------------------------------------------------------------
 !
@@ -27,12 +27,12 @@
 !
    use data_structure3D, only: ndof_nod
    use parameters
-!   
+!
    implicit none
 !
    character(len=4), intent(in)  :: Type
    integer,          intent(in)  :: Nord_old, Nord
-   integer,          intent(out) :: InjH(MAXquadH), InjE(MAXquadE), InjV(MAXquadV)      
+   integer,          intent(out) :: InjH(MAXquadH), InjE(MAXquadE), InjV(MAXquadV)
 !
    integer :: i, j, kH, kE, kV, mE
    integer :: nordh, nordv, nordh_old, nordv_old
@@ -59,7 +59,7 @@
       call decode(Nord, nordh,nordv)
       call decode(Nord_old, nordh_old,nordv_old)
 !
-!  ...H1     
+!  ...H1
       kH=0
       do j=1,nordv_old-1
          do i=1,nordh_old-1

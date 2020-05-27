@@ -1,12 +1,12 @@
 !----------------------------------------------------------------------
-!> @Purpose - routine rotates a point R by an angle Alpha about an axis 
+!> @Purpose - routine rotates a point R by an angle Alpha about an axis
 !!            Ax through point Pt
 !
 !> @param[in]    Ax         - axis
 !> @param[in]    Pt         - a point on the axis
 !> @param[in]    Alpha      - angle of rotation
 !> @param[inout] R          - point to be rotated / rotated point
-!> @param[out]   dR_dAlpha  - derivative 
+!> @param[out]   dR_dAlpha  - derivative
 !
 !> @revision Feb 13
 !----------------------------------------------------------------------
@@ -20,7 +20,7 @@ subroutine rotation_about_axis(Ax,Pt,Alpha, R,dR_dAlpha)
       real(8),dimension(3),intent(out)   :: dR_dAlpha
 !
       real(8) :: u,v,w,a,b,c,x,y,rz,d,s1,s2,s3,s4
-!      
+!
       u=Ax(1)  ;  v=Ax(2)  ;  w=Ax(3)
       a=Pt(1)  ;  b=Pt(2)  ;  c=Pt(3)
       x=R(1)   ;  y=R(2)   ;  rz=R(3)
@@ -36,7 +36,7 @@ subroutine rotation_about_axis(Ax,Pt,Alpha, R,dR_dAlpha)
        R(3) = (c*(u**2+v**2)+w*(-a*u-b*v+u*x+v*y+w*rz) +                &
               ((rz-c)*(u**2+v**2)+w*(a*u+b*v-u*x-v*y))*cos(Alpha) +     &
                sqrt(u**2+v**2+w**2)*(a*v-b*u-v*x+u*y)* sin(Alpha))/     &
-               (u**2+v**2+w**2) 
+               (u**2+v**2+w**2)
 !
       dR_dAlpha(1) = (                                                  &
               ((x-a)*(v**2+w**2)+u*(b*v+c*w-v*y-w*rz))*(-sin(Alpha)) +  &
@@ -49,7 +49,7 @@ subroutine rotation_about_axis(Ax,Pt,Alpha, R,dR_dAlpha)
       dR_dAlpha(3) = (                                                  &
               ((rz-c)*(u**2+v**2)+w*(a*u+b*v-u*x-v*y))*(-sin(Alpha)) +  &
                sqrt(u**2+v**2+w**2)*(a*v-b*u-v*x+u*y)* cos(Alpha))/     &
-               (u**2+v**2+w**2) 
+               (u**2+v**2+w**2)
 !
 !
 end subroutine rotation_about_axis

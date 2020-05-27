@@ -1,16 +1,16 @@
 !**************************************************************************************************************************
-      SUBROUTINE cone2polar(alpha, r, rho, theta)    
+      SUBROUTINE cone2polar(alpha, r, rho, theta)
 !**************************************************************************************************************************
       !*** LATEST REVISION: Sep 08
       !
       !*** PURPOSE: let us consider a cone of half-aperture alpha, vertex at the origin, and axis coinciding
       !             with the z-axis; when we unfold such a surface on a plane we obatain a cicular sector of amplitude
-      !             2pi/sin(alpha). Given a point on the cone, routine returns the polar coordinates of the image   
+      !             2pi/sin(alpha). Given a point on the cone, routine returns the polar coordinates of the image
       !             point when the cylinder is unfolded on the plane. For mapping the circular sector onto the cone
       !             cf. subroutine POLAR2CONE.
       !
       !*** REQUIRED PROCEDURES: none
-!**************************************************************************************************************************      
+!**************************************************************************************************************************
       IMPLICIT NONE
 !**************************************************************************************************************************
       !*** DUMMY ARGUMENTS

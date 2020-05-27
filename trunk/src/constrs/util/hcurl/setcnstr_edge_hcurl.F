@@ -11,7 +11,7 @@ c                        approximation on the master edge
 c
 c   arguments          - none
 c
-c   required  routines - 
+c   required  routines -
 c
 c----------------------------------------------------------------------
 c
@@ -36,7 +36,7 @@ c
 #include "syscom.blk"
 c
 c  ...values of small elements shape functions, big element
-c     shape functions, derivatives (not used) 
+c     shape functions, derivatives (not used)
       dimension shapsma(MAXP,MAXP),shapbig(MAXP,MAXP)
 c
 c  ...pivoting array, work array
@@ -58,7 +58,7 @@ c  ...small nodes 1:
 c
 c---------------------------------------------------------------------
 c
-      icl = 0 
+      icl = 0
 c
 c  ...loop through collocation points:
       do i=1,nord
@@ -118,7 +118,7 @@ c     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 c
 c  .....big node 1:
         do j=1,nord
-          RRRE(1,j,1,i) = r(i,j)            
+          RRRE(1,j,1,i) = r(i,j)
         enddo
       enddo
 c
@@ -128,7 +128,7 @@ c  ...small element 2 --- small nodes 2 and 3:
 c
 c---------------------------------------------------------------------
 c
-      icl = 0 
+      icl = 0
 c
 c  ...loop through collocation points:
       do i=1,nord
@@ -175,7 +175,7 @@ c     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 c
 c  .....big node 1:
         do j=1,nord
-          RRRE(1,j,2,i) = r(i,j)            
+          RRRE(1,j,2,i) = r(i,j)
         enddo
       enddo
 c
@@ -185,7 +185,7 @@ c  ...clean up machine zeros...
       do is=1,2
         do j=1,nord
           do i=1,nord
-c  .........multiply jacobian            
+c  .........multiply jacobian
             RRRE(1,i,is,j) = 0.5d0*RRRE(1,i,is,j)
             if (abs(RRRE(1,i,is,j)).lt.1.d-12) then
               RRRE(1,i,is,j) = 0.d0

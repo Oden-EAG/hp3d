@@ -15,21 +15,21 @@
    implicit none
 !
    integer, intent(in)  :: Nrgrids,n
-   VTYPE,   intent(in)  :: r(n) 
-   VTYPE,  intent(out)  :: z(n) 
+   VTYPE,   intent(in)  :: r(n)
+   VTYPE,  intent(out)  :: z(n)
    VTYPE , allocatable  :: r_aux(:),z_aux(:)
 
    integer  :: maxit
    integer  :: maxdepth, idepth
    integer  :: m
 !
-!--------------------------------------------------------   
+!--------------------------------------------------------
 !..for now
    maxit = MAX_SM_ITER
-! 
-!..total number of grids   
+!
+!..total number of grids
    maxdepth = Nrgrids - 1
-!   
+!
 !..calculate updated local residuals residual
 
 !..pre-smooth
@@ -49,7 +49,7 @@
 
       call schur_compl_restriction(nrgrids-idepth,r_aux,m)
 !
-      call block_jacobi_smoother(nrgrids-idepth,r_aux,m, maxit,G(nrgrids-idepth)%y1)  
+      call block_jacobi_smoother(nrgrids-idepth,r_aux,m, maxit,G(nrgrids-idepth)%y1)
 !
       deallocate(r_aux)
 !
@@ -57,13 +57,13 @@
       call update_local_residuals(nrgrids-idepth,G(nrgrids-idepth)%y1,m)
 !
 !..end of loop through all the sub master grids
-   enddo   
+   enddo
 !
    if (COARSE_SOLVER /= NO_CSOLVE) then
       call coarse_grid_solve(nrgrids-maxdepth)
-   else   
+   else
       G(nrgrids-maxdepth)%y2 = ZERO
-   endif   
+   endif
 !
 !..loop through all the grids and apply the smoother. Each grid is one level 'up'
    do idepth = maxdepth,0,-1
@@ -74,7 +74,7 @@
       call update_global_residual(nrgrids-idepth,r_aux,m)
 !
 !  ...post smooth on the sub-master grid
-      call block_jacobi_smoother(nrgrids-idepth,r_aux,m,maxit,G(nrgrids-idepth)%y3)  
+      call block_jacobi_smoother(nrgrids-idepth,r_aux,m,maxit,G(nrgrids-idepth)%y3)
 !
       deallocate(r_aux)
 

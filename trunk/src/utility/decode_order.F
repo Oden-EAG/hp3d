@@ -20,8 +20,8 @@ c-----------------------------------------------------------------------
 c
       subroutine decode_orderb(Norderb, Nord1,Nord2,Nord3)
 c
-      use parameters , only : MAXP      
-c      
+      use parameters , only : MAXP
+c
 #include "syscom.blk"
 c
 c     RECALL: Norderb = (Nord1*(MAXP+1)+Nord2)*(MAXP+1)+Nord3
@@ -68,8 +68,8 @@ c-----------------------------------------------------------------------
 c
       subroutine decode_orderq(Norderq, Nord1,Nord2)
 c
-      use parameters , only : MAXP      
-c      
+      use parameters , only : MAXP
+c
 #include "syscom.blk"
 c
 c     RECALL: Norderq = Nord1*(MAXP+1)+Nord2

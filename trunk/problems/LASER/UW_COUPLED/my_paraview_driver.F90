@@ -78,11 +78,11 @@ PARAVIEW_DUMP_GEOM = .true.
 !  ...loop over physics variables
       do iphys=1,NR_PHYSA
 
-         if (IParAttr(iphys) .eq. 0) cycle  
+         if (IParAttr(iphys) .eq. 0) cycle
 !
 !     ...loop over components
          do icomp=1,NR_COMP(iphys)
-            if (IParAttr(iphys) .ge. icomp) then 
+            if (IParAttr(iphys) .ge. icomp) then
 !
 !           ...encode iload, iphys, icomp into a single attribute's index
                idx = iload*100 + iphys*10 + icomp*1

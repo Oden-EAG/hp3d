@@ -14,7 +14,7 @@
 !
 ! ----------------------------------------------------------------------
 subroutine pardiso_sc_herm
-! 
+!
    use data_structure3D, ONLY: NRNODS, NRELES,NODES
    use assembly,         ONLY: NR_RHS, MAXDOFM, MAXbrickH,MAXbrickE,       &
                                MAXbrickV, MAXbrickQ, NRHVAR, NREVAR,       &
@@ -28,7 +28,7 @@ subroutine pardiso_sc_herm
 !
 !..number of variables for each physics attribute for an element
    integer :: nrdofs(NR_PHYSA)
-! 
+!
 !..integer counters
    integer   :: nrdof_H,  nrdof_E,  nrdof_V
    integer   :: nrdof_Hb, nrdof_Eb, nrdof_Vb, nrdof_Q
@@ -36,7 +36,7 @@ subroutine pardiso_sc_herm
    integer   :: iel, mdle,i,j,nod,l,k1,k2
    integer   :: inz,nz,nnz,knz,k
    integer   :: nQ,nHc,nEc,nVc,nHb,nEb,nVb,n1,n2,nH,nE,nV
-! 
+!
 !..work space for celem
    integer :: nodm(MAXNODM),  ndofmH(MAXNODM), &
               ndofmE(MAXNODM),ndofmV(MAXNODM),ndofmQ(MAXNODM)
@@ -48,7 +48,7 @@ subroutine pardiso_sc_herm
    VTYPE, allocatable :: SA(:), RHS(:)
 !
 !..number of variables for each physics attribute for an element
-   integer(kind=8) :: t1,t2,clock_rate,clock_max 
+   integer(kind=8) :: t1,t2,clock_rate,clock_max
    real*8 :: norm_inf, tol,start, end, omp_get_wtime
 !
 ! ----------------------------------------------------------------------
@@ -140,7 +140,7 @@ subroutine pardiso_sc_herm
 !  ...store the first dof offset
       NFIRSTH(nod) = nrdof_Hb
 !  ...update the H1 dof counter
-      nrdof_Hb = nrdof_Hb + ndofmH(i)      
+      nrdof_Hb = nrdof_Hb + ndofmH(i)
 !
 !  ...compute offsets for H(curl) dof
       do i = 1,nrnodm-1
@@ -159,7 +159,7 @@ subroutine pardiso_sc_herm
 !  ...store the first dof offset
       NFIRSTE(nod) = nrdof_Eb
 !  ...update the H1 dof counter
-      nrdof_Eb = nrdof_Eb + ndofmE(i)      
+      nrdof_Eb = nrdof_Eb + ndofmE(i)
 !
 !  ...compute offsets for H(div) dof
       do i=1,nrnodm-1
@@ -198,7 +198,7 @@ subroutine pardiso_sc_herm
    NRDOF_CON = nrdof
    NRDOF_TOT = NRDOF_CON + nrdof_Hb + nrdof_Eb + nrdof_Vb + nrdof_Q
 !
-!   
+!
 ! ----------------------------------------------------------------------
 !  END OF STEP 1
 ! ----------------------------------------------------------------------
@@ -208,10 +208,10 @@ subroutine pardiso_sc_herm
       Mtime(1) =  real(t2 - t1,8)/real(clock_rate,8)
       write(*,1002) Mtime(1)
 1002  format(' STEP 1 finished: ',f12.5,'  seconds',/)
-   endif 
+   endif
 !
 ! ----------------------------------------------------------------------
-!  STEP 2 : ASSEMBLE AND STORE IN SPARSE FORM 
+!  STEP 2 : ASSEMBLE AND STORE IN SPARSE FORM
 ! ----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
@@ -225,7 +225,7 @@ subroutine pardiso_sc_herm
    allocate(SJA(inz))
    allocate(SA(inz))
    allocate(RHS(nrdof)) ; RHS=ZERO
-!   
+!
    allocate(CLOC(NRELES))
 !
 !..assemble global stiffness matrix
@@ -314,7 +314,7 @@ subroutine pardiso_sc_herm
       CLOC(iel)%nHb = nHb
       CLOC(iel)%nEb = nEb
       CLOC(iel)%nVb = nVb
-      CLOC(iel)%nQ  = nQ 
+      CLOC(iel)%nQ  = nQ
 !
       allocate(CLOC(iel)%con(n1))
       CLOC(iel)%con = lcon
@@ -387,7 +387,7 @@ subroutine pardiso_sc_herm
    endif
 !
    call coo2csr(SIA(1:inz),SJA(1:inz),SA(1:inz),inz, nnz)
-!   
+!
 ! ----------------------------------------------------------------------
 !  END OF STEP 3
 ! ----------------------------------------------------------------------
@@ -397,7 +397,7 @@ subroutine pardiso_sc_herm
       Mtime(3) =  real(t2 - t1,8)/real(clock_rate,8)
       write(*,1008) Mtime(3)
 1008  format(' STEP 3 finished: ',f12.5,'  seconds',/)
-   endif   
+   endif
 !
 !----------------------------------------------------------------------
 !  STEP 4: call pardiso to solve the linear system
@@ -433,7 +433,7 @@ subroutine pardiso_sc_herm
 1011  format(' STEP 5 started : Store the solution')
       call system_clock( t1, clock_rate, clock_max )
    endif
-! 
+!
 !$OMP PARALLEL
 !..allocate arrays required by solout for celem
    allocate(NEXTRACT(MAXDOFM))
@@ -446,24 +446,24 @@ subroutine pardiso_sc_herm
 !$OMP         nHb,nEb,nVb,nQ,nH,nE,nV)     &
 !$OMP SCHEDULE(DYNAMIC)
    do iel=1,NRELES
-! 
+!
       nHc =  CLOC(iel)%nHc
       nEc =  CLOC(iel)%nEc
       nVc =  CLOC(iel)%nVc
-! 
+!
       nHb =  CLOC(iel)%nHb
       nEb =  CLOC(iel)%nEb
       nVb =  CLOC(iel)%nVb
       nQ =   CLOC(iel)%nQ
-! 
+!
       nH = nHc+nHb
       nE = nEc+nEb
       nV = nVc+nVb
-! 
+!
       n1 = nHc + nEc + nVc
       n2 = nHb + nEb + nVb + nQ
       ndof = n1 + n2
-! 
+!
       allocate(ZSOL_LOC(ndof)) ; ZSOL_LOC=ZERO
       allocate(ZSOL_LOCc(n1))  ; ZSOL_LOCc=ZERO
 !
@@ -472,9 +472,9 @@ subroutine pardiso_sc_herm
          i = CLOC(iel)%con(k1)
          ZSOL_LOCc(k1) = RHS(i)
       enddo
-! 
+!
       deallocate(CLOC(iel)%con)
-! 
+!
       if (n2 .ne. 0) then
          allocate(ZSOL_LOCb(n2))
          call stc_in(iel,n1,n2,ZSOL_LOCc,ZSOL_LOCb)
@@ -490,10 +490,10 @@ subroutine pardiso_sc_herm
          ZSOL_LOC(nH+nE+nVb+1:nH+nE+nV)  = ZSOL_LOCc(nHc+nEc+1:nHc+nEc+nVc)
          ZSOL_LOC(nH+nE+nV+1:ndof) = ZSOL_LOCb(nHb+nEb+nVb+1:n2)
          deallocate(ZSOL_LOCb)
-      else   
+      else
          ZSOL_LOC = ZSOL_LOCc
-      endif   
-! 
+      endif
+!
       call solout(iel,ndof,NR_RHS,ZERO,ZSOL_LOC)
       deallocate(ZSOL_LOCc,ZSOL_LOC)
 !..end of loop through elements
@@ -512,7 +512,7 @@ subroutine pardiso_sc_herm
       write(*,1012) Mtime(5)
 1012  format(' STEP 5 finished: ',f12.5,'  seconds',/)
    endif
-!   
+!
    deallocate(RHS)
    deallocate(MAXDOFS)
    deallocate(NFIRSTV,NFIRSTH,NFIRSTE)

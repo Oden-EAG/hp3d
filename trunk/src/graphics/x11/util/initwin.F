@@ -12,7 +12,7 @@ c   purpose            - routine initiates a specific display
 c
 c   usage              - call initwin(Iwind)
 c
-c   argument 
+c   argument
 c           in : Iwind - type of display
 c
 c   required  routines  - openwind, closwind, clrwind
@@ -21,7 +21,7 @@ c----------------------------------------------------------------------
 c
       subroutine initwin(Iwind)
       use graphmod
-c     
+c
 #include "syscom.blk"
 c
 c  ...debug print

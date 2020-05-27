@@ -27,5 +27,5 @@ subroutine ellipsoid(X,Center,Rs1,Rs2,Rs3,  Fval,Dfdx)
       Dfdx(2) = (X(2)-Center(2))*2 /Rs2**2
       Dfdx(3) = (X(3)-Center(3))*2 /Rs3**2
 !
-!      
+!
 end subroutine ellipsoid

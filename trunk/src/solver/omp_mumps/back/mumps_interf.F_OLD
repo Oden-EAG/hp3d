@@ -63,9 +63,9 @@
       write(*,1001)
  1001 format('mumps_interf STEP 1: Get assembly info from celem')
    endif
-! 
+!
    call system_clock ( t1, clock_rate, clock_max )
-!   
+!
 !..allocate required variables for celem
    allocate(NEXTRACT(MAXDOFMC))
    allocate(IDBC(MAXDOFMC))
@@ -161,9 +161,9 @@
 !....end of loop through elements
   enddo
 !
-! 
+!
  deallocate(NEXTRACT,IDBC,ZDOFD)
-! 
+!
 !...total number of dof is nrdof
   nrdof = nrdof_H +  nrdof_E + nrdof_V +  nrdof_Q
   NRDOF_TOT = nrdof
@@ -171,7 +171,7 @@
 
 !
 ! ----------------------------------------------------------------------
-! END OF STEP 1 
+! END OF STEP 1
 ! ----------------------------------------------------------------------
 !
    call system_clock ( t2, clock_rate, clock_max )
@@ -282,7 +282,7 @@
 !     ...Assemble global load vector
          do ii = 1, NR_RHS
             M_b(i+(ii-1)*nrdof) = M_b(i+(ii-1)*nrdof) + ZLOAD(k1+(ii-1)*ndof)
-         enddo   
+         enddo
 
 !     ...loop through dof `to the right'
          do k2=1,ndof
@@ -346,7 +346,7 @@
 ! ----------------------------------------------------------------------
 !  STEP 5 : STORE SOLUTION IN THE DATASTRACTURE
 ! ----------------------------------------------------------------------
-!   
+!
    if (IPRINT_TIME .eq. 1) then
       write(*,1009)
  1009 format('mumps_interf STEP 5: Store the solution')
@@ -411,7 +411,7 @@
             i = LCON(k1)
             zsol_loc(k1+(ii-1)*ndof) = M_b(i+(ii-1)*nrdof)
          enddo
-      enddo   
+      enddo
       call solout(iel,ndof,NR_RHS,1,zsol_loc)
       deallocate(zsol_loc)
 !  ...end of loop through elements
@@ -441,7 +441,7 @@
       write(*,1011) sum(Mtime(1:5))
  1011 format('mumps_interf: Finished in',f12.5,'  seconds',/)
    endif
-!   
+!
 !
    end subroutine mumps_interf
 
@@ -521,7 +521,7 @@
    mumps_par%icntl(7)  = 7
 !..dense right hand side
    mumps_par%icntl(20) = 0
-!..solution vector stored in the structure component RHS   
+!..solution vector stored in the structure component RHS
    mumps_par%icntl(21) = 0
 
 !..Define problem on the host (processor 0)
@@ -568,5 +568,5 @@
 #endif
    call mpi_finalize(IERR)
 !
-! 
+!
   end subroutine mumps_solve

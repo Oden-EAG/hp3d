@@ -1,7 +1,7 @@
         SUBROUTINE LPMN(MM,M,N,X,PM,PD)
 C
 C       =====================================================
-C       Purpose: Compute the associated Legendre functions 
+C       Purpose: Compute the associated Legendre functions
 C                Pmn(x) and their derivatives Pmn'(x)
 C       Input :  x  --- Argument of Pmn(x)
 C                m  --- Order of Pmn(x),  m = 0,1,2,...,n

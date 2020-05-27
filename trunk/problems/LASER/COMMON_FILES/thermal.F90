@@ -368,7 +368,7 @@ subroutine get_thermLoad(ZsolQ, Therm_load)
 !
    VTYPE, dimension(3) :: Es,Hs,Ep,Hp,ETimesHs,ETimesHp
 !
-!..modified irradiance experiment (birefringent fiber) 
+!..modified irradiance experiment (birefringent fiber)
    VTYPE, dimension(3) :: Es_mod,Hs_mod
    VTYPE, dimension(3) :: Ep_mod,Hp_mod
    integer :: modified

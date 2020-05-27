@@ -1,12 +1,12 @@
 !-----------------------------------------------------------------------
-!> Purpose : routine evaluates physical coordinates and derivatives of 
-!!           a parametric transfinite interpolation rectangle     
+!> Purpose : routine evaluates physical coordinates and derivatives of
+!!           a parametric transfinite interpolation rectangle
 !!
 !! @param[in]  No     - rectangle number
 !! @param[in]  Eta    - reference coordinates of a point
 !! @param[out] X      - physical coordinates of the point
 !! @param[out] Dxdeta - derivatives of the physical coordinates
-!!      
+!!
 !! @revision Mar 11
 !-----------------------------------------------------------------------
 !
@@ -32,8 +32,8 @@ subroutine recta_PTIRec(No,Eta, X,Dxdeta)
 !
       if (iprint.eq.1) then
         write(*,7001)
- 7001   format(' recta_PTIRec: No,Eta = ',i8,2x,2(e12.5,2x))       
-      endif      
+ 7001   format(' recta_PTIRec: No,Eta = ',i8,2x,2(e12.5,2x))
+      endif
 
       if (.not.associated(RECTANGLES(No)%Idata)) then
         write(*,7002) No
@@ -45,8 +45,8 @@ subroutine recta_PTIRec(No,Eta, X,Dxdeta)
       ns=RECTANGLES(No)%Idata(1)
       if (iprint.eq.1) then
         write(*,7003)ns,SURFACES(ns)%Type
- 7003   format('     ns,type = ',i2,2x,a15)       
-      endif 
+ 7003   format('     ns,type = ',i2,2x,a15)
+      endif
 !
 !  ...select surface type
       select case(SURFACES(ns)%Type)
@@ -78,11 +78,11 @@ end subroutine recta_PTIRec
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : parametric transfinite interpolation for a rectangle on 
+!> Purpose : parametric transfinite interpolation for a rectangle on
 !!           a sphere
 !!
 !! @param[in]  No     - retangle number
-!! @param[in]  Eta    - reference coordinates of a point  
+!! @param[in]  Eta    - reference coordinates of a point
 !! @param[out] X      - physical coordinates of the point
 !! @param[out] Dxdeta - derivatives wrt reference coordinates
 !!
@@ -136,20 +136,20 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
  7001   format(' recta_sphere: No,Eta = ',i4,2x,2e12.5)
       endif
 !
-!  ...check surface type      
+!  ...check surface type
       ns = RECTANGLES(No)%Idata(1)
-      if (SURFACES(ns)%Type.ne.'Sphere') then 
+      if (SURFACES(ns)%Type.ne.'Sphere') then
         write(*,*)'recta_sphere: INCONSISTENT SURFACE TYPE'
         stop
       endif
       rad = SURFACES(ns)%Rdata(4)
 !
-!----------------------------------------------------------------------      
+!----------------------------------------------------------------------
 !  ...compute the relative position vector for vertices
 !
-!  ...loop through vertices      
+!  ...loop through vertices
       do iv=1,4
-!  .....get global point number      
+!  .....get global point number
         np=RECTANGLES(No)%VertNo(iv)
 !
 !  .....check if point is on the surface
@@ -165,9 +165,9 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
           call pause
           call print_GMP
         endif
-!        
+!
         xrelv(1:3,iv) = POINTS(np)%Rdata(1:3) - SURFACES(ns)%Rdata(1:3)
-!  ...end of loop through vertices        
+!  ...end of loop through vertices
       enddo
 !
 !----------------------------------------------------------------------
@@ -217,9 +217,9 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
 !----------------------------------------------------------------------
 !  ...compute the vertex coordinates in the sphere parametric space
       do iv=1,4
-!  .....project on horizontal plane to determine theta      
+!  .....project on horizontal plane to determine theta
         call cart_to_polar(xrelsv(1:2,iv), rsinpsi,xparv(2,iv))
-!  .....project on vertical plane to determind psi        
+!  .....project on vertical plane to determind psi
         call cart_to_polar((/xrelsv(3,iv),rsinpsi/), r,xparv(1,iv))
         if (abs(rad-r) .gt. GEOM_TOL) then
           write(*,7012) iv,rad,r
@@ -232,7 +232,7 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
       if (iprint .eq. 1) then
         write(*,*) 'recta_sphere: RELATIVE VERTEX COORDINATES = '
         do iv=1,4
-          write(*,7031) iv,xrelsv(1:3,iv),xparv(1:2,iv)    
+          write(*,7031) iv,xrelsv(1:3,iv),xparv(1:2,iv)
  7031     format('VERTEX ',i1,' COORDINATES = ',3e12.5,               &
                  ' PSI,THETA = ',2e12.5)
         enddo
@@ -253,7 +253,7 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
       dshapH(1,4) = - Eta(2)
       dshapH(2,4) =   (1.d0 - Eta(1))
 !
-!  ...compute bilinear interpolant 
+!  ...compute bilinear interpolant
       xpar(1:2) = 0.d0; dxpardeta(1:2,1:2) = 0.d0
       do iv=1,4
         xpar(1:2) = xpar(1:2) + xparv(1:2,iv)*shapH(iv)
@@ -263,7 +263,7 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
         enddo
       enddo
 !
-!  ...printing statement      
+!  ...printing statement
       if (iprint.eq.1) then
         write(*,*) 'recta_sphere: AFTER VERT xpar,dxpardeta = '
         do ivar=1,2
@@ -291,7 +291,7 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
 !
 !  .....project Eta onto the edge ie
         call proj_r2e(iv1,iv2,shapH,dshapH, se,dsedeta)
-!  .....cycle if start or end point        
+!  .....cycle if start or end point
         if ((se.lt.GEOM_TOL).or.(se.gt.1.d0-GEOM_TOL)) cycle
 !
 !  .....compute the edge coordinate and its derivative
@@ -312,11 +312,11 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
         enddo
 !
 !  .....transform to the parametric space
-!  .....xepar(1) = psi  ;  xepar(2) = theta        
+!  .....xepar(1) = psi  ;  xepar(2) = theta
         call cart_to_polar(xerels(1:2), rsinpsi,xepar(2))
         call cart_to_polar((/xerels(3),rsinpsi/), r,xepar(1))
 !
-!  .....geometry consistency check and printing statements        
+!  .....geometry consistency check and printing statements
         if (iprint .eq. 1) then
           write(*,7032) s,xerels(1:3),xepar(1:2)
  7032     format('s = ',e12.5,' COORDINATES = ',3e12.5,                &
@@ -332,7 +332,7 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
           write(*,*) 'recta_sphere: POINT ON A POLE'
           stop
         endif
-!        
+!
 !  .....compute dxepardeta(1:2)
         dxepardeta(1) = -dxerelsdeta(3)/(rad*sin(xepar(1)))
         s1 = dxerelsdeta(1) - xerels(3)*dxepardeta(1)*cos(xepar(2))
@@ -340,7 +340,7 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
         ile=0
         if (abs(xerels(2)).gt.GEOM_TOL) then
           ile=ile+1
-          s1 = -s1/xerels(2); dxepardeta(2) = s1 
+          s1 = -s1/xerels(2); dxepardeta(2) = s1
         endif
         if (abs(xerels(1)).gt.GEOM_TOL) then
           ile = ile + 1
@@ -373,9 +373,9 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
 !
 !  .....add the edge contribution
         blend       =  shapH(    iv1) +  shapH(    iv2)
-        dblend(1:2) = dshapH(1:2,iv1) + dshapH(1:2,iv2)    
+        dblend(1:2) = dshapH(1:2,iv1) + dshapH(1:2,iv2)
         xpar(1:2) = xpar(1:2) + xepar(1:2)*blend
-        do j=1,2       
+        do j=1,2
           dxpardeta(1:2,j) = dxpardeta(1:2,j)                      &
                            + dxepardeta(1:2)*dsedeta(j)*blend      &
                            + xepar(1:2)*dblend(j)
@@ -413,7 +413,7 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
           X(i) = X(i) + transf(j,i)*xrels(j)
           Dxdeta(i,1:2) = Dxdeta(i,1:2) + transf(j,i)*dxrels(j,1:2)
         enddo
-      enddo 
+      enddo
 !
 !@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
       if (icheck.ne.0) then
@@ -454,13 +454,13 @@ end subroutine recta_sphere
 !----------------------------------------------------------------------
 !> Purpose : parametric transfinite interpolation for a rectangle
 !!            on a cylinder
-!!      
+!!
 !! @param[in]  No     - triangle number
 !! @param[in]  Eta    - reference coordinates of a point
 !! @param[out] X      - physical coordinates of the point
 !! @param[out] Dxdeta - derivatives wrt reference coordinates
 !!
-!! @revision Mar 11      
+!! @revision Mar 11
 !----------------------------------------------------------------------
 !
 subroutine recta_cylinder(No,Eta, X,Dxdeta)
@@ -513,7 +513,7 @@ subroutine recta_cylinder(No,Eta, X,Dxdeta)
       endif
 !
       ns=RECTANGLES(No)%Idata(1)
-      if (SURFACES(ns)%Type.ne.'Cylinder') then 
+      if (SURFACES(ns)%Type.ne.'Cylinder') then
         write(*,*) 'recta_cylinder: INCONSISTENT SURFACE TYPE'
         stop
       endif
@@ -607,12 +607,12 @@ subroutine recta_cylinder(No,Eta, X,Dxdeta)
       dshapH(2,4) =   (1.d0 - Eta(1))
 !
 !-----------------------------------------------------------------------
-!     B I L I N E A R    I N T E R P O L A T I O N 
+!     B I L I N E A R    I N T E R P O L A T I O N
 !-----------------------------------------------------------------------
       xpar(1:2) = 0.d0; dxpardeta(1:2,1:2) = 0.d0
       do iv=1,4
         xpar(1:2) = xpar(1:2) + xparv(1:2,iv)*shapH(iv)
-        do j=1,2 
+        do j=1,2
           dxpardeta(1:2,j) = dxpardeta(1:2,j)                      &
                            + xparv(1:2,iv)*dshapH(j,iv)
         enddo
@@ -625,7 +625,7 @@ subroutine recta_cylinder(No,Eta, X,Dxdeta)
       endif
 !
 !-----------------------------------------------------------------------
-!     E D G E    B U B B L E S 
+!     E D G E    B U B B L E S
 !-----------------------------------------------------------------------
       do ie=1,4
 !
@@ -686,7 +686,7 @@ subroutine recta_cylinder(No,Eta, X,Dxdeta)
         ile=0
         if (abs(xerels(2)).gt.GEOM_TOL) then
           ile=ile+1
-          s1 = -s1/xerels(2); dxepardeta(1) = s1 
+          s1 = -s1/xerels(2); dxepardeta(1) = s1
         endif
         if (abs(xerels(1)).gt.GEOM_TOL) then
           ile=ile+1
@@ -713,13 +713,13 @@ subroutine recta_cylinder(No,Eta, X,Dxdeta)
 !
 !  .....compute the bubble
         xepar(1:2) = xepar(1:2)                                     &
-                   - (xparv(1:2,iv1)*(1.d0-se)+xparv(1:2,iv2)*se)   
+                   - (xparv(1:2,iv1)*(1.d0-se)+xparv(1:2,iv2)*se)
         dxepardeta(1:2) = dxepardeta(1:2)                           &
                    - (xparv(1:2,iv2) - xparv(1:2,iv1))
 !
 !  .....add the edge contribution
         blend       =  shapH(    iv1) +  shapH(    iv2)
-        dblend(1:2) = dshapH(1:2,iv1) + dshapH(1:2,iv2)    
+        dblend(1:2) = dshapH(1:2,iv1) + dshapH(1:2,iv2)
         xpar(1:2) = xpar(1:2) + xepar(1:2)*blend
         do j=1,2
           dxpardeta(1:2,j) = dxpardeta(1:2,j)                       &
@@ -758,7 +758,7 @@ subroutine recta_cylinder(No,Eta, X,Dxdeta)
           Dxdeta(i,1:2) = Dxdeta(i,1:2) + transf(j,i)*dxrels(j,1:2)
         enddo
         X(i) = X(i) + center(i)
-      enddo 
+      enddo
       if (iprint.eq.1) then
         write(*,*) 'recta_cylinder: X,Dxdeta = '
         do ivar=1,3
@@ -782,7 +782,7 @@ end subroutine recta_cylinder
 !! @param[out] X         - physical coordinates of the point
 !! @param[out] Dxdeta    - derivatives wrt reference coordinates
 !!
-!! @revision      
+!! @revision
 !----------------------------------------------------------------------
 !
 subroutine recta_cone(No,Eta, X,Dxdeta)
@@ -837,7 +837,7 @@ subroutine recta_cone(No,Eta, X,Dxdeta)
       endif
 !
       ns = RECTANGLES(No)%Idata(1)
-      if (SURFACES(ns)%Type.ne.'Cone') then 
+      if (SURFACES(ns)%Type.ne.'Cone') then
         write(*,*) 'recta_cone: INCONSISTENT SURFACE TYPE'
         stop
       endif
@@ -995,7 +995,7 @@ subroutine recta_cone(No,Eta, X,Dxdeta)
         ile=0
         if (abs(xerelc(2)).gt.GEOM_TOL) then
           ile=ile+1
-          s1 = -s1/xerelc(2); dxepardeta(1) = s1 
+          s1 = -s1/xerelc(2); dxepardeta(1) = s1
         endif
         if (abs(xerelc(1)).gt.GEOM_TOL) then
           ile=ile+1
@@ -1010,14 +1010,14 @@ subroutine recta_cone(No,Eta, X,Dxdeta)
         endif
 !
 !  .....compute the bubble
-        xepar(1:2) = xepar(1:2)             & 
+        xepar(1:2) = xepar(1:2)             &
                    - (xparv(1:2,iv1)*(1.d0-se)+xparv(1:2,iv2)*se)
         dxepardeta(1:2) = dxepardeta(1:2)   &
                    - (xparv(1:2,iv2) - xparv(1:2,iv1))
 !
 !  .....add the edge contribution
         blend       =  shapH(    iv1) +  shapH(    iv2)
-        dblend(1:2) = dshapH(1:2,iv1) + dshapH(1:2,iv2)    
+        dblend(1:2) = dshapH(1:2,iv1) + dshapH(1:2,iv2)
         xpar(1:2) = xpar(1:2) + xepar(1:2)*blend
         do j=1,2
           dxpardeta(1:2,j) = dxpardeta(1:2,j)                 &
@@ -1032,7 +1032,7 @@ subroutine recta_cone(No,Eta, X,Dxdeta)
       xrelc(1) = c*xpar(2)*cos(xpar(1))
       dxrelc(1,1:2) = c*dxpardeta(2,1:2)*cos(xpar(1))          &
                     - c*xpar(2)*sin(xpar(1))*dxpardeta(1,1:2)
-      xrelc(2) = c*xpar(2)*sin(xpar(1))  
+      xrelc(2) = c*xpar(2)*sin(xpar(1))
       dxrelc(2,1:2) = c*dxpardeta(2,1:2)*sin(xpar(1))          &
                     + c*xpar(2)*cos(xpar(1))*dxpardeta(1,1:2)
       xrelc(3) = xpar(2)
@@ -1046,7 +1046,7 @@ subroutine recta_cone(No,Eta, X,Dxdeta)
           Dxdeta(i,1:2) = Dxdeta(i,1:2) + transf(j,i)*dxrelc(j,1:2)
         enddo
         X(i) = X(i) + SURFACES(ns)%Rdata(i)
-      enddo 
+      enddo
       if (iprint.eq.1) then
         write(*,*) 'recta_cone: X,Dxdeta = '
         do ivar=1,3
@@ -1056,5 +1056,5 @@ subroutine recta_cone(No,Eta, X,Dxdeta)
         call pause
       endif
 !
-!      
+!
 end subroutine recta_cone

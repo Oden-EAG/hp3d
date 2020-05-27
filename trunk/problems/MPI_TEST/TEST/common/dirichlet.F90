@@ -3,18 +3,18 @@
 !
 !     routine name      - dirichlet
 !
-!---------------------------------------------------------------------- 
+!----------------------------------------------------------------------
 !
 !     latest revision:  - July 17
 !
 !     purpose:          - return dirichlet data at a point
 !
-!     arguments:                                                     
+!     arguments:
 !
-!     in:              
+!     in:
 !             X         - a point in physical space
-!             Icase     - node case (specifies what variables are supported)            
-!     out:              
+!             Icase     - node case (specifies what variables are supported)
+!     out:
 !             ValH      - value of the H1 solution
 !             DvalH     - corresponding first derivatives
 !             DvalE     - value of the H(curl) solution
@@ -47,10 +47,10 @@
    complex(8),dimension(  MAXEQNQ    ) ::   valQ
    complex(8),dimension(  MAXEQNQ,3  ) ::  dvalQ
    complex(8),dimension(  MAXEQNQ,3,3) :: d2valQ
-!   
+!
 !..printing flag
    integer :: iprint
-!   
+!
 !--------------------------------------------------------------------
 !
    iprint = 0

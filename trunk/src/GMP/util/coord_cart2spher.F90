@@ -1,7 +1,7 @@
 !--------------------------------------------------------------------------
 !> @Purpose : convert Cartesian coordinates to spherical coordinates
 !
-!! Spherical coordinates: 
+!! Spherical coordinates:
 !!   r     : radius
 !!   theta : angle from positive z axis
 !!   phi   : angle from positive x axis
@@ -29,12 +29,12 @@ subroutine coord_cart2sphere(C_in, C_out)
   implicit none
   real(8),dimension(3),intent(in)  :: C_in
   real(8),dimension(3),intent(out) :: C_out
-  !    
+  !
   real(8), parameter :: eps=1.0e-15
   !--------------------------------------------------------------------------
-  
-  C_out(1) = sqrt(C_in(1)**2 + C_in(2)**2 + C_in(3)**2) 
-  
+
+  C_out(1) = sqrt(C_in(1)**2 + C_in(2)**2 + C_in(3)**2)
+
   if (C_out(1) > eps) then
      C_out(2) = acos(C_in(3)/C_out(1))
      C_out(3) = atan2(C_in(2), C_in(1))

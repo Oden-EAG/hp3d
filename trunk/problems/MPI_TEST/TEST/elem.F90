@@ -1,13 +1,13 @@
 !----------------------------------------------------------------------
-!                                                                     
+!
 !     routine name      - elem
-!                                                                     
+!
 !----------------------------------------------------------------------
-!                                                                     
+!
 !     latest revision:  - July 2019
-!                                                                     
+!
 !     purpose:          - driver for the element routine
-!                                                                    
+!
 !     arguments:
 !        in:
 !             Mdle      - an element middle node number, identified
@@ -17,9 +17,9 @@
 !             Itrial    - index for assembly
 !
 !----------------------------------------------------------------------
-!  
+!
 #include "implicit_none.h"
-!  
+!
 subroutine elem(Mdle, Itest,Itrial)
 !
 end subroutine elem

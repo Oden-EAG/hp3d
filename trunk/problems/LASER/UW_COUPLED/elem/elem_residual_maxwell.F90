@@ -520,7 +520,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !..end timer
 !   end_time = MPI_Wtime()
 !   !$OMP CRITICAL
-!   write(*,10) etype, end_time-start_time   
+!   write(*,10) etype, end_time-start_time
 !   10 format(A,' gram : ',f12.5,'  seconds')
 !   !$OMP END CRITICAL
 !

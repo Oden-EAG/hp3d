@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------
-!> Purpose : routine evaluates physical coordinates and its derivatives 
+!> Purpose : routine evaluates physical coordinates and its derivatives
 !!           wrt to reference coordinates for a point in reference
 !!           pyramid
 !!
@@ -14,7 +14,7 @@
 subroutine pyram(No,Eta, X,Dxdeta)
 !
       use GMP
-!      
+!
 !------------------------------------------------------------------------------
       implicit none
       integer,               intent(in)  :: No
@@ -25,7 +25,7 @@ subroutine pyram(No,Eta, X,Dxdeta)
 !  ...vertex point coordinates and their derivatives
       real(8),dimension(3,5) :: xvert
 !
-!  ...pyramid element order and shape functions      
+!  ...pyramid element order and shape functions
       real(8),dimension(8)   :: vshap
       real(8),dimension(3,8) :: dvshap
 !
@@ -53,7 +53,7 @@ subroutine pyram(No,Eta, X,Dxdeta)
             Dxdeta(ivar,1:3) = Dxdeta(ivar,1:3) + xvert(ivar,k)*dvshap(1:3,k)
           enddo
         enddo
-!        
+!
 !------------------------------------------------------------------------------
 !     T R A N S F I N I T E    I N T E R P O L A T I O N    P Y R A M I D
 !------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ subroutine pyram(No,Eta, X,Dxdeta)
         stop
       end select
 !
-!      
+!
 end subroutine pyram
 !
 !
@@ -72,12 +72,12 @@ end subroutine pyram
 !
 !-----------------------------------------------------------------------
 !> Purpose : parametric transfinite interpolation for pyramid
-!!      
+!!
 !! @param[in]  No     - a GMP pyramid number
 !! @param[in]  Eta    - reference coordinates
 !! @param[out] X      - physical coordinates
 !! @param[out] Dxdeta - derivatives
-!!      
+!!
 !! @revision Mar 11
 !-----------------------------------------------------------------------
 !
@@ -86,7 +86,7 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
       use control
       use GMP
       use element_data
-!      
+!
 #include"syscom.blk"
 !-----------------------------------------------------------------------
 !
@@ -101,7 +101,7 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
 !  ...projections
       dimension dtedeta(3),tf(2),dtfdeta(2,3)
 !
-!  ...edge kernels 
+!  ...edge kernels
       dimension xe(3),dxedt(3)
 !
 !  ...face kernels
@@ -115,7 +115,7 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
 !
 !  ...initialize
       blend_edge(1:4)=0.d0 ; dblend_edge(1:3,1:4)=0.d0
-!      
+!
       if (iprint.eq.1) then
         write(*,7001) No,Eta(1:3)
  7001   format(' pyram_TI: No,Eta = ',i5,2x,3e12.5)
@@ -124,24 +124,24 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
 !  ...check type
       if (PYRAMIDS(No)%type.ne.'TIpyram') then
         write(*,6000)No,PYRAMIDS(No)%type
- 6000   format(' pyram_TI: wrong type! No,Type = ',i8,2x,a8) 
+ 6000   format(' pyram_TI: wrong type! No,Type = ',i8,2x,a8)
         stop
-      endif    
-!      
+      endif
+!
 !  ...check that coordinates are inside reference pyramid
       if ((Eta(1)       .lt.-GEOM_TOL    ).or.  &
           (Eta(2)       .lt.-GEOM_TOL    ).or.  &
           (Eta(3)       .lt.-GEOM_TOL    ).or.  &
           (Eta(1)+Eta(3).gt.1.d0+GEOM_TOL).or.  &
           (Eta(2)+Eta(3).gt.1.d0+GEOM_TOL)     ) then
-        write(*,*)'pyram_TI: point out of master pyramid!' 
+        write(*,*)'pyram_TI: point out of master pyramid!'
         write(*,1000)Eta(1:3)
-1000    format(' Eta = ',3(e12.5,2x))        
+1000    format(' Eta = ',3(e12.5,2x))
         call pause
       endif
 !
       x = Eta(1); y = Eta(2); z = Eta(3)
-      if (abs(z-1.d0).lt.1.d-12) z = 1.d0-1.d-12 
+      if (abs(z-1.d0).lt.1.d-12) z = 1.d0-1.d-12
       xz1 = 1.d0-x-z
       yz1 = 1.d0-y-z
       z1 = 1.d0-z
@@ -150,11 +150,11 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
       call vshape3('pyra',Eta, shapH,dshapH)
 !
 !-----------------------------------------------------------------------
-!     V E R T E X    C O N T R I B U T I O N S 
+!     V E R T E X    C O N T R I B U T I O N S
 !-----------------------------------------------------------------------
 !
       Xp(1:3)=0.d0 ; Dxdeta(1:3,1:3)=0.d0
-!  ...loop over vertices      
+!  ...loop over vertices
       do iv=1,5
         np = PYRAMIDS(No)%VertNo(iv)
         Xp(1:3) = Xp(1:3) + POINTS(np)%Rdata(1:3)*shapH(iv)
@@ -162,7 +162,7 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
           Dxdeta(ivar,1:3) = Dxdeta(ivar,1:3)                    &
                         + POINTS(np)%Rdata(ivar)*dshapH(1:3,iv)
         enddo
-!  ...loop over vertices        
+!  ...loop over vertices
       enddo
 !
 !  ...printing
@@ -226,7 +226,7 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
           dblend(1:2) = dshapH(1:2,iv)*z
           dblend(3) = dshapH(3,iv)*z + shapH(iv)
         end select
-! ......this is needed for face contributions...       
+! ......this is needed for face contributions...
         if (ie.le.4) then
           blend_edge(ie) = blend
           dblend_edge(1:3,ie) = dblend(1:3)
@@ -242,26 +242,26 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
                            + dxedt(1:3)*dtedeta(ivar)*blend    &
                            + xe(1:3)*dblend(ivar)
         enddo
-!        
+!
         if (iprint.eq.2) then
           write(*,9998)xe(1:3),blend
- 9998     format( ' xe,blend = ',3(e12.5,2x),2x,e12.5)          
+ 9998     format( ' xe,blend = ',3(e12.5,2x),2x,e12.5)
           write(*,9999)ie,Xp(1:3)
  9999     format(' ie,Xp = 'i1,2x,3(e12.5,2x))
         endif
-! 
+!
         if (iprint.eq.1) then
           write(*,2000)ie
  2000     format(' after EDGE = ',i2)
           do i=1,3
             write(*,2001)i,Dxdeta(i,1:3)
- 2001       format(' i,Dxdeta(i,:) = ',i2,2x(3e12.5,2x))           
+ 2001       format(' i,Dxdeta(i,:) = ',i2,2x(3e12.5,2x))
           enddo
         endif
 !
 !  ...loop over edges
       enddo
-!      
+!
       if (iprint.eq.1) then
         write(*,*) 'pyram_TI: AFTER EDGES = '
         do ivar=1,3
@@ -276,7 +276,7 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
 !  ...bottom face number
       ifig=1
       call decode(PYRAMIDS(No)%FigNo(ifig), nr,norient)
-!  ...skip if face contributions is not needed     
+!  ...skip if face contributions is not needed
       if (RECTANGLES(nr)%Type.eq.'BilQua') goto 20
       if (RECTANGLES(nr)%Type.eq.'TraQua') goto 20
       if (iprint.eq.1) then
@@ -309,7 +309,7 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
       if (iprint.eq.1) then
         write(*,*)'pyram_TI: ADDED BOTTOM FACE CONTRIBUTION'
       endif
-!      
+!
         if (iprint.eq.1) then
           write(*,2002)ifig
  2002     format(' after FACE = ',i2)
@@ -328,9 +328,9 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
 !
 !  ...loop over lateral faces
       do ifig=2,5
-!      
+!
         call decode(PYRAMIDS(No)%FigNo(ifig), nt,norient)
-!  .....skip if face contribution is not needed        
+!  .....skip if face contribution is not needed
         if (TRIANGLES(nt)%Type.eq.'TransTri') cycle
         if (TRIANGLES(nt)%Type.eq.'PlaneTri') cycle
 !
@@ -358,7 +358,7 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
         do ivar=1,3
           Dxdeta(1:3,ivar) = Dxdeta(1:3,ivar)                       &
                            + (dxfdtf(1:3,1)*dtfdeta(1,ivar)         &
-                           +  dxfdtf(1:3,2)*dtfdeta(2,ivar))*blend  & 
+                           +  dxfdtf(1:3,2)*dtfdeta(2,ivar))*blend  &
                            + xf(1:3)*dblend(ivar)
         enddo
 !
@@ -367,7 +367,7 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
            write(*,7015)ifig
  7015     format(' pyram_TI: ADDED CONTRIBUTIONS FOR LATERAL FACE ',i1)
         endif
-!        
+!
         if (iprint.eq.1) then
           write(*,2002)ifig
           do i=1,3
@@ -375,7 +375,7 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
           enddo
         endif
 !
-!  ...loop over lateral faces        
+!  ...loop over lateral faces
       enddo
 !
 !

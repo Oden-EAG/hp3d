@@ -58,7 +58,7 @@ c        pause
 c   44 continue
 
 
-      
+
 c
 c loop thru the dof in the element
 c

@@ -1,9 +1,9 @@
 !-------------------------------------------------------------------------------------
-!> Purpose : routine computes physical coordinates and quantity to display 
+!> Purpose : routine computes physical coordinates and quantity to display
 !!
 !> @param[in]  Numlev       - 0:coordinate only, >0 compute quantity to display
 !> @param[in]  Mdle         - element middle node
-!> @param[in]  Iface        - face number 
+!> @param[in]  Iface        - face number
 !> @param[in]  Nedge_orient - edge orientation
 !> @param[in]  Nface_orient - face orientation
 !> @param[in]  Norder       - order of approximation for the element
@@ -22,9 +22,9 @@
 #include "implicit_none.h"
 !
 subroutine compute_face(Numlev,Mdle,Iface,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,ZdofV,ZdofQ,T, X,Val)
-!     
+!
       use data_structure3D
-!  
+!
       implicit none
       integer,                             intent(in)  :: Numlev,Mdle,Iface
       integer, dimension(12),              intent(in)  :: Nedge_orient
@@ -46,7 +46,7 @@ subroutine compute_face(Numlev,Mdle,Iface,Nedge_orient,Nface_orient,Norder,Xnod,
       VTYPE, dimension(3,MAXEQNV  ) :: zsolV
       VTYPE, dimension(  MAXEQNV  ) :: zdivV
       VTYPE, dimension(  MAXEQNQ  ) :: zsolQ
-!      
+!
       real(8), dimension(3)   :: xi
       real(8), dimension(3,2) :: dxidt
       real(8), dimension(3,3) :: dxdxi
@@ -90,7 +90,7 @@ subroutine compute_face(Numlev,Mdle,Iface,Nedge_orient,Nface_orient,Norder,Xnod,
       if (iprint.eq.1) then
         do i=1,2
           write(*,1111)i,dxdt(1:3,i)
-1111      format(' i, dxdt(:,i) = ',i1,2x,3(e12.5,2x))   
+1111      format(' i, dxdt(:,i) = ',i1,2x,3(e12.5,2x))
         enddo
       endif
 !

@@ -3,7 +3,7 @@
 !> returns the index pointing to the same coefficient in a vector used
 !> to store the upper triangular part of the matrix
 !>
-!>  In other words, 
+!>  In other words,
 !>
 !>    matrix_uppertri(index_uppertri(row,column))=matrix_full(row,column)
 !

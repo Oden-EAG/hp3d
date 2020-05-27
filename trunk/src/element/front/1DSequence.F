@@ -27,10 +27,10 @@ c     out:
 c        NrdofH        - number of shape functions
 c        ShapH         - values of shape functions
 c        GradH         - values of derivatives of the shape functions
-c                        wrt to master element coordinates       
+c                        wrt to master element coordinates
 c
 c----------------------------------------------------------------------
-c      
+c
       subroutine shape1H(Xi,Nord, NrdofH,ShapH,GradH)
 c
       use parameters , only : MAXP

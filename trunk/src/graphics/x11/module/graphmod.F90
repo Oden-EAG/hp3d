@@ -1,4 +1,4 @@
-!> Purpose : define the workspace for graphics 
+!> Purpose : define the workspace for graphics
 module graphmod
   !
   ! ** coltab.blk :: color table

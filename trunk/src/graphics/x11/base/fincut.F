@@ -6,19 +6,19 @@ c----------------------------------------------------------------------
 c
 c   latest revision    - Jan 08
 c
-c   purpose            - routine constructs small triangles resulting 
-c                        from cutting a plane triangle with a cutting 
+c   purpose            - routine constructs small triangles resulting
+c                        from cutting a plane triangle with a cutting
 c                        plane
 c
 c   arguments :
-c     in : 
+c     in :
 c              Xtro    - triangle vertex coordinates
 c              Usol    - values of the cutting plane equation at
 c                        vertices
-c     out: 
+c     out:
 c              Nstrl   - number of small triangles
 c              Costr   - small triangles vertex coordinates
-c              Isflag  = 0   -no changes, 
+c              Isflag  = 0   -no changes,
 c                        1   -new triangles
 c
 c---------------------------------------------------------------------
@@ -45,11 +45,11 @@ c  ...perform multistage checking
           else
             Nstrl=1
             do icart=1,3
-              Costr(1,icart,1) = Xtro(icart,1) + 
-     .        (Xtro(icart,3)-Xtro(icart,1)) * (Slev-U1)/(U3-U1)            
-              Costr(1,icart,2) = Xtro(icart,2) + 
-     .        (Xtro(icart,3)-Xtro(icart,2)) * (Slev-U2)/(U3-U2) 
-              Costr(1,icart,3) = Xtro(icart,3)          
+              Costr(1,icart,1) = Xtro(icart,1) +
+     .        (Xtro(icart,3)-Xtro(icart,1)) * (Slev-U1)/(U3-U1)
+              Costr(1,icart,2) = Xtro(icart,2) +
+     .        (Xtro(icart,3)-Xtro(icart,2)) * (Slev-U2)/(U3-U2)
+              Costr(1,icart,3) = Xtro(icart,3)
             enddo
             Isflag=1
           endif
@@ -57,53 +57,53 @@ c  ...perform multistage checking
           if( U3.gt.Slev) then
             Nstrl=1
             do icart=1,3
-              Costr(1,icart,2) = Xtro(icart,1) + 
-     .        (Xtro(icart,2)-Xtro(icart,1)) * (Slev-U1)/(U2-U1)            
-              Costr(1,icart,3) = Xtro(icart,2)          
-              Costr(1,icart,1) = Xtro(icart,2) + 
-     .        (Xtro(icart,3)-Xtro(icart,2)) * (Slev-U2)/(U3-U2) 
+              Costr(1,icart,2) = Xtro(icart,1) +
+     .        (Xtro(icart,2)-Xtro(icart,1)) * (Slev-U1)/(U2-U1)
+              Costr(1,icart,3) = Xtro(icart,2)
+              Costr(1,icart,1) = Xtro(icart,2) +
+     .        (Xtro(icart,3)-Xtro(icart,2)) * (Slev-U2)/(U3-U2)
             enddo
             Isflag=1
           else
             Nstrl=2
             do icart=1,3
-              Costr(1,icart,1) = Xtro(icart,1) + 
-     .        (Xtro(icart,3)-Xtro(icart,1)) * (Slev-U1)/(U3-U1)            
-              Costr(1,icart,2) = Xtro(icart,1) + 
-     .        (Xtro(icart,2)-Xtro(icart,1)) * (Slev-U1)/(U2-U1)            
-              Costr(1,icart,3) = Xtro(icart,3)          
-              Costr(2,icart,1) = Xtro(icart,1) + 
-     .        (Xtro(icart,2)-Xtro(icart,1)) * (Slev-U1)/(U2-U1)            
-              Costr(2,icart,2) = Xtro(icart,2)          
-              Costr(2,icart,3) = Xtro(icart,3)          
+              Costr(1,icart,1) = Xtro(icart,1) +
+     .        (Xtro(icart,3)-Xtro(icart,1)) * (Slev-U1)/(U3-U1)
+              Costr(1,icart,2) = Xtro(icart,1) +
+     .        (Xtro(icart,2)-Xtro(icart,1)) * (Slev-U1)/(U2-U1)
+              Costr(1,icart,3) = Xtro(icart,3)
+              Costr(2,icart,1) = Xtro(icart,1) +
+     .        (Xtro(icart,2)-Xtro(icart,1)) * (Slev-U1)/(U2-U1)
+              Costr(2,icart,2) = Xtro(icart,2)
+              Costr(2,icart,3) = Xtro(icart,3)
             enddo
             Isflag=1
           endif
         endif
-      else 
+      else
         if(U2.gt.Slev) then
           if(U3.gt.Slev) then
             Nstrl=1
             do icart=1,3
-              Costr(1,icart,3) = Xtro(icart,1)          
-              Costr(1,icart,1) = Xtro(icart,1) + 
-     .        (Xtro(icart,2)-Xtro(icart,1)) * (Slev-U1)/(U2-U1)            
-              Costr(1,icart,2) = Xtro(icart,1) + 
-     .        (Xtro(icart,3)-Xtro(icart,1)) * (Slev-U1)/(U3-U1)            
+              Costr(1,icart,3) = Xtro(icart,1)
+              Costr(1,icart,1) = Xtro(icart,1) +
+     .        (Xtro(icart,2)-Xtro(icart,1)) * (Slev-U1)/(U2-U1)
+              Costr(1,icart,2) = Xtro(icart,1) +
+     .        (Xtro(icart,3)-Xtro(icart,1)) * (Slev-U1)/(U3-U1)
             enddo
             Isflag=1
           else
             Nstrl=2
             do icart=1,3
-              Costr(2,icart,1) = Xtro(icart,1)          
-              Costr(2,icart,2) = Xtro(icart,1) + 
-     .        (Xtro(icart,2)-Xtro(icart,1)) * (Slev-U1)/(U2-U1)            
-              Costr(2,icart,3) = Xtro(icart,3)          
-              Costr(1,icart,1) = Xtro(icart,1) + 
-     .        (Xtro(icart,2)-Xtro(icart,1)) * (Slev-U1)/(U2-U1)            
-              Costr(1,icart,2) = Xtro(icart,2) + 
-     .        (Xtro(icart,3)-Xtro(icart,2)) * (Slev-U2)/(U3-U2) 
-              Costr(1,icart,3) = Xtro(icart,3)          
+              Costr(2,icart,1) = Xtro(icart,1)
+              Costr(2,icart,2) = Xtro(icart,1) +
+     .        (Xtro(icart,2)-Xtro(icart,1)) * (Slev-U1)/(U2-U1)
+              Costr(2,icart,3) = Xtro(icart,3)
+              Costr(1,icart,1) = Xtro(icart,1) +
+     .        (Xtro(icart,2)-Xtro(icart,1)) * (Slev-U1)/(U2-U1)
+              Costr(1,icart,2) = Xtro(icart,2) +
+     .        (Xtro(icart,3)-Xtro(icart,2)) * (Slev-U2)/(U3-U2)
+              Costr(1,icart,3) = Xtro(icart,3)
             enddo
             Isflag=1
           endif
@@ -111,15 +111,15 @@ c  ...perform multistage checking
           if (U3.gt.Slev) then
             Nstrl=2
             do icart=1,3
-              Costr(1,icart,3) = Xtro(icart,1)          
-              Costr(1,icart,1) = Xtro(icart,2) + 
-     .        (Xtro(icart,3)-Xtro(icart,2)) * (Slev-U2)/(U3-U2) 
-              Costr(1,icart,2) = Xtro(icart,1) + 
-     .        (Xtro(icart,3)-Xtro(icart,1)) * (Slev-U1)/(U3-U1)            
-              Costr(2,icart,1) = Xtro(icart,1)          
-              Costr(2,icart,2) = Xtro(icart,2)          
-              Costr(2,icart,3) = Xtro(icart,2) + 
-     .        (Xtro(icart,3)-Xtro(icart,2)) * (Slev-U2)/(U3-U2) 
+              Costr(1,icart,3) = Xtro(icart,1)
+              Costr(1,icart,1) = Xtro(icart,2) +
+     .        (Xtro(icart,3)-Xtro(icart,2)) * (Slev-U2)/(U3-U2)
+              Costr(1,icart,2) = Xtro(icart,1) +
+     .        (Xtro(icart,3)-Xtro(icart,1)) * (Slev-U1)/(U3-U1)
+              Costr(2,icart,1) = Xtro(icart,1)
+              Costr(2,icart,2) = Xtro(icart,2)
+              Costr(2,icart,3) = Xtro(icart,2) +
+     .        (Xtro(icart,3)-Xtro(icart,2)) * (Slev-U2)/(U3-U2)
             enddo
             Isflag=1
           else

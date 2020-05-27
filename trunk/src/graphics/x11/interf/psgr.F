@@ -21,7 +21,7 @@ C---------------------------------------------------------
 C      AUTHOR(S)        - Satish Chavva,Tadeusz Liszka and others
 C
 C      version  -   1998
-C   
+C
 C    purpose - to write header of ps file
 C
 C========================================================
@@ -51,7 +51,7 @@ c        Check if color Postscript required
 
           write(*,*) 'B/W or  Color Postscript (0 - B/W  1-Color)'
           read(*,*) icolval
-       
+
  1000     format('%!  TL PostScript file, name ',a10/
      &        '%%BoundingBox: 36 36 518 756',/
      &        '0 setlinewidth',/
@@ -80,7 +80,7 @@ c      write(*,*) 'NO POSTSCRIPT GENERATED, iflag=',iflag
       end
 
 
-c----------------------------------------------------------------- 
+c-----------------------------------------------------------------
       subroutine wvpscl(Clip)
 c
 c----------------------------------------------------------------------
@@ -124,7 +124,7 @@ c
 C========================================================
         SUBROUTINE WVPSDL(X1,Y1,X2,Y2,IC)
 C========================================================
-C 
+C
 C  author - Satish Chavva and many otheres
 C
 C  version - 1998
@@ -183,7 +183,7 @@ c
 #include "wvscrn.blk"
 c
       real Xc(2,N)
-c      
+c
       if (IFILE.eq.0) return
       if (Icf.ge.0) then
 c
@@ -195,7 +195,7 @@ c  .....loop through the consequtive vertices of the polygon
 c
 c  .......line to the vertex point
           call wvpsout(Xc(1,i),Xc(2,i),2)
-   10   continue 
+   10   continue
 c
 c  .....line to the last vertex point and close the path
         call wvpsout(Xc(1,n),Xc(2,n),4)
@@ -209,12 +209,12 @@ c  ...draw the boundary line if a different color
         call wvpsout(Xc(1,1),Xc(2,1),1)
         do 20 i=2,n-1
           call wvpsout(Xc(1,i),Xc(2,i),2)
-   20   continue 
+   20   continue
         call wvpsout(Xc(1,n),Xc(2,n),4)
         call wvpsout(dum,dum,6)
       endif
 c
-c    
+c
       return
       end
 
@@ -299,16 +299,16 @@ c
 c
       iprint=2
 
-c      icolval=1 
+c      icolval=1
 c
       if (ifile.eq.0) return
       ilbuf=ilbuf+1
 c
 c     size is in inches, output in points (1/72")
       scale=72.0
-   
+
       if (icode.eq.5) then
-c         set grayscale colors 
+c         set grayscale colors
          if (icolval.eq.0) then
           color = 1.0 - y / 9.0
           if (color .lt.0.0) color = 1.0 - (y-16)/50.0
@@ -329,7 +329,7 @@ c         set grayscale colors
 c      make sure they are in correct limits
           do 20 i=1,2
               bufor(i,ilbuf)=max(-999.0,min(9990.0,bufor(i,ilbuf)))
-   20     continue 
+   20     continue
       endif
 c
       if (iprint.eq.1) then
@@ -354,14 +354,14 @@ c   computer           - machine independent
 c
 c   latest revision    - 1998
 c
-c   purpose            - routine sends poscript buffer as one line to  
+c   purpose            - routine sends poscript buffer as one line to
 c                        output
 c
 c   usage              - call flushps
 c
 c   arguments          - none
 c
-c   required  routines - 
+c   required  routines -
 c
 c-----------------------------------------------------------------------
 c
@@ -461,7 +461,7 @@ c
             endif
            endif
   100     continue
-c         
+c
 c.......here one may reduce size of output by:
 c.......skipping repeated blanks
 c.......skipping .0 in floating point numbers
@@ -486,7 +486,7 @@ cc          ifrom = ifrom +3
 c
         if (ifrom.lt.linelen) goto 200
         lineout(ito:ito)=line(linelen:linelen)
-c         
+c
 c.......initial character in line is always blank
         if(ito.gt.100)then
 c           write(*,*)"Hi Cam"

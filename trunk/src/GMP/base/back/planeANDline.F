@@ -8,11 +8,11 @@
       !*** REQUIRED PROCEDURES: scalar_product
 !*****************************************************************************************************
       IMPLICIT NONE
-!*****************************************************************************************************      
+!*****************************************************************************************************
       !*** DUMMY ARGUMENTS
       double precision, dimension(3), intent(in) :: n_plane        !*** normal to plane
       double precision, dimension(3), intent(in) :: x_plane        !*** a point on the plane
-      double precision, dimension(3), intent(in) :: n_line         !*** direction of line        
+      double precision, dimension(3), intent(in) :: n_line         !*** direction of line
       double precision, dimension(3), intent(in) :: x_line         !*** a point on the line
       double precision, dimension(3), intent(out) :: r             !*** coordinates of point of intersection
       !
@@ -29,14 +29,14 @@
         write(*,*) 'planeANDline: line is parallel to plane'
         stop
       end if
-      !     
-      call scalar_product(x_plane, n_plane, prod2)
-      call scalar_product(x_line, n_plane, prod3) 
       !
-      t = (prod2 - prod3)/prod1  
+      call scalar_product(x_plane, n_plane, prod2)
+      call scalar_product(x_line, n_plane, prod3)
+      !
+      t = (prod2 - prod3)/prod1
       !
       do i = 1, 3
         r(i) = x_line(i) + t*n_line(i)
       end do
-      !                  
+      !
       END SUBROUTINE planeANDline

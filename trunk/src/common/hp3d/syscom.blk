@@ -1,9 +1,9 @@
 #if C_MODE
       implicit real(8) (a-h,o-y), complex(8) (z)
-#else     
+#else
       implicit real(8) (a-h,o-z)
 #endif
-      
+
 
 
 

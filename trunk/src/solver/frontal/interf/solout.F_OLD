@@ -83,7 +83,7 @@ c  ...determine nodes of the modified element
      .             nodm,ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,
      .             zvoid,zvoid)
       endif
-    
+
       if (iprint.ge.1) then
         write(*,7001) Iel,mdle,nodm(1:nrnodm)
  7001   format(' solout: Iel,mdle = ',i8,i10,' nodm = ',10(/,10i10))

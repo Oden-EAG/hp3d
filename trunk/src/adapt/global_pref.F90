@@ -10,7 +10,7 @@ subroutine global_pref
                                ELEM_ORDER,get_subd,set_subd
    use par_mesh        , only: DISTRIBUTED,get_elem_nodes
    use mpi_param       , only: RANK
-!      
+!
    implicit none
 !
    integer :: mdle,p,i,iel,nord,nordx,nordy,nordz,naux,nrnodm,subd
@@ -68,7 +68,7 @@ subroutine global_punref
 !
    use data_structure3D, only: NRELES,NRNODS,NODES,ELEM_ORDER
    use par_mesh        , only: DISTRIBUTED
-!      
+!
    implicit none
 !
    integer :: mdle,iel,nord

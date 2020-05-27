@@ -14,7 +14,7 @@
 !      in:
 !              Ielc     - global coarse grid element number
 !              Iel      - if macro solout: local fine grid element number
-!                         o/w: -1 
+!                         o/w: -1
 !              Ndof     - number of dof per element (unused)
 !              Nrhs     - number of loads
 !              Zele     - the element dof
@@ -160,8 +160,8 @@ subroutine solout_mg(Ielc,Iel,Mdle,Ndof,Nrhs,Zele)
 !     ...loop through the nodal dof (potentially NONE)
          do j=1,ndofmH(i)/nvarH
             ivar=mvarH(i); k=0
-! 
-!        ...loop through physics variables              
+!
+!        ...loop through physics variables
             do iphys=1,nrPhysH
                il = NR_COMP(iphys)
                if (index(k+1) .eq. 0) then
@@ -236,8 +236,8 @@ subroutine solout_mg(Ielc,Iel,Mdle,Ndof,Nrhs,Zele)
 !     ...loop through the nodal dof
          do j=1,ndofmE(i)/nvarE
             ivar=mvarE(i); k=NRHVAR
-! 
-!        ...loop through physics variables              
+!
+!        ...loop through physics variables
             do iphys=nrPhysH+1,nrPhysHE
                il = NR_COMP(iphys)
                if (index(k+1) .eq. 0) then
@@ -311,8 +311,8 @@ subroutine solout_mg(Ielc,Iel,Mdle,Ndof,Nrhs,Zele)
 !
 !        ...loop through the components
             ivar=mvarV(i); k=nrVarHE
-! 
-!        ...loop through physics variables              
+!
+!        ...loop through physics variables
             do iphys=nrPhysHE+1,nrPhysHEV
                il = NR_COMP(iphys)
                if (index(k+1) .eq. 0) then

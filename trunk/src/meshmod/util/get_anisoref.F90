@@ -1,6 +1,6 @@
 subroutine get_anisoref(Mdle, Derr, Kref)
   use data_structure3D
-  implicit none 
+  implicit none
   integer,              intent(in)  :: Mdle
   real(8), dimension(3), intent(in) :: Derr
   integer,              intent(out) :: Kref

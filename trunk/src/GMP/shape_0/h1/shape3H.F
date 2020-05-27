@@ -7,20 +7,20 @@ c  @param[in ] Xi           - master element coordinates
 c  @param[in ] Norder       - order of approximation for the nodes
 c  @param[in ] Nedge_orient - edge orientations
 c  @param[in ] Nface_orient - face orientations
-c  @param[out] Nrdof        - number of the element shape functions      
+c  @param[out] Nrdof        - number of the element shape functions
 c  @param[out] ShapH        - values of shape functions
 c  @param[out] DshapH       - values of derivatives of shape functions
-c                             wrt to master element coordinates      
+c                             wrt to master element coordinates
 c
 c  rev@Sep 14
 c----------------------------------------------------------------------
 c
-      subroutine shape3H_0(Type,Xi,Norder,Nedge_orient,Nface_orient, 
+      subroutine shape3H_0(Type,Xi,Norder,Nedge_orient,Nface_orient,
      .                     Nrdof,ShapH,DshapH)
 c
       use parameters
 #include "syscom.blk"
-c 
+c
       character(len=4)                 , intent(in)  :: Type
       integer , dimension(12)          , intent(in)  :: Nedge_orient
       integer , dimension(6)           , intent(in)  :: Nface_orient
@@ -31,14 +31,14 @@ c
       real*8  , dimension(3,MAXbrickH) , intent(out) :: DshapH
 c
 c----------------------------------------------------------------------
-c      
+c
       iprint=0
 c
       if (iprint.eq.1) then
         write(*,7001)Type,Xi(1:3)
  7001   format(' shape3H: Type,Xi = ',a5,2x,3(e12.5,2x))
       endif
-c      
+c
       select case(Type)
       case('pris','mdlp')
         call shapeHp(Xi,Norder,Nedge_orient,Nface_orient,
@@ -84,17 +84,17 @@ c     out:
 c         Nrdof        - number of dof
 c         ShapH        - values of shape functions
 c         DshapH       - values of derivatives of the shape functions
-c                        wrt to master element coordinates      
+c                        wrt to master element coordinates
 c
 c----------------------------------------------------------------------
 c
       subroutine shapeHp(Xi,Norder, Nedge_orient,Nface_orient,
      .                   Nrdof,ShapH,DshapH)
-c    
+c
       use parameters
-      use element_data  
+      use element_data
 #include "syscom.blk"
-c      
+c
       dimension Nedge_orient(9), Nface_orient(5),Norder(15)
       dimension Xi(3),ShapH(MAXprismH),DshapH(3,MAXprismH)
 c
@@ -133,11 +133,11 @@ c
 c  ...1D shape functions in the xi_3 direction
       vshap(1) = 1.d0 - Xi(3); dvshap(1) = -1.d0
       vshap(2) = Xi(3); dvshap(2) = 1.d0
-c      
+c
 c
       k=0
 c
-c  ...vertex shape functions 
+c  ...vertex shape functions
       do j=1,2
       do i=1,3
         k=k+1
@@ -162,14 +162,14 @@ c  .....project Xi(1:2) onto the edge
         call proj_t2e(iv1,iv2,vshapt,dvshapt, te,dtedxi(1:2))
 c
 c  .....evaluate edge kernel shape functions
-        call shapHke(te,Norder(ie),Nedge_orient(ie), 
+        call shapHke(te,Norder(ie),Nedge_orient(ie),
      .               nrdofHe,shapHk,dshapHk)
 c
 c  .....evaluate edge shape functions
         do l=1,nrdofHe
           k=k+1
           ShapH(k) = vshapt(iv1)*vshapt(iv2)*vshap(j)*shapHk(l)
-          DshapH(1:2,k) 
+          DshapH(1:2,k)
      .    = dvshapt(1:2,iv1)*vshapt(iv2)*vshap(j)*shapHk(l)
      .    + vshapt(iv1)*dvshapt(1:2,iv2)*vshap(j)*shapHk(l)
      .    + vshapt(iv1)*vshapt(iv2)*vshap(j)*dshapHk(l)*dtedxi(1:2)
@@ -183,7 +183,7 @@ c  ...loop through vertical edges
         ie=ie+1
 c
 c  .....evaluate edge bubble shape functions
-        call shapHbe(Xi(3),Norder(ie),Nedge_orient(ie), 
+        call shapHbe(Xi(3),Norder(ie),Nedge_orient(ie),
      .               nrdofHe,shapHb,dshapHb)
 c
 c  .....evaluate edge shape functions
@@ -205,7 +205,7 @@ c  ...loop through horizontal faces
         if=if+1
 c
 c  .....compute the mid-face node kernel shape functions
-        call shapHbt(Xi(1:2),Norder(9+if),Nface_orient(if), 
+        call shapHbt(Xi(1:2),Norder(9+if),Nface_orient(if),
      .               nrdofHt,shapHt,dshapHt)
 c
 c  .....evaluate the mid-face node shape functions
@@ -240,7 +240,7 @@ c  .....the face axes have NOT been reversed
             do i=1,nrdofHk
               k=k+1
               ShapH(k) = vshapt(iv1)*vshapt(iv2)*shapHk(i)*shapHb(j)
-              DshapH(1:2,k) 
+              DshapH(1:2,k)
      .        = dvshapt(1:2,iv1)*vshapt(iv2)*shapHk(i)*shapHb(j)
      .        + vshapt(iv1)*dvshapt(1:2,iv2)*shapHk(i)*shapHb(j)
      .        + vshapt(iv1)*vshapt(iv2)*dshapHk(i)*dtedxi(1:2)*shapHb(j)
@@ -258,7 +258,7 @@ c  .....the face axes HAVE been reversed
             do j=1,nrdofHb
               k=k+1
               ShapH(k) = vshapt(iv1)*vshapt(iv2)*shapHk(i)*shapHb(j)
-              DshapH(1:2,k) 
+              DshapH(1:2,k)
      .        = dvshapt(1:2,iv1)*vshapt(iv2)*shapHk(i)*shapHb(j)
      .        + vshapt(iv1)*dvshapt(1:2,iv2)*shapHk(i)*shapHb(j)
      .        + vshapt(iv1)*vshapt(iv2)*dshapHk(i)*dtedxi(1:2)*shapHb(j)
@@ -316,7 +316,7 @@ c   purpose            - routine evaluates shape functions for master
 c                        brick
 c
 c   arguments :
-c     in:  
+c     in:
 c         Xi           - master element coordinates
 c         Norder       - order of approximation for the nodes
 c         Nedge_orient - edge orientations
@@ -325,18 +325,18 @@ c     out:
 c         Nrdof        - number of dof
 c         Vshap        - values of shape functions
 c         Dvshap       - values of derivatives of the shape functions
-c                        wrt to master element coordinates      
+c                        wrt to master element coordinates
 c
 c----------------------------------------------------------------------
 c
-      subroutine shapeHb(Xi,Norder, Nedge_orient,Nface_orient, 
+      subroutine shapeHb(Xi,Norder, Nedge_orient,Nface_orient,
      .                   Nrdof,ShapH,DshapH)
-c      
+c
       use element_data , only : NFAXES,IJKV,IXIEDGE,IBLENDE,NBLENDE,
-     .                                      IXIFACE,IBLENDF,NBLENDF 
+     .                                      IXIFACE,IBLENDF,NBLENDF
       use parameters   , only : MAXP,MAXbrickH
 #include "syscom.blk"
-c      
+c
       dimension Nedge_orient(12),Nface_orient(6),Norder(19)
       dimension Xi(3),ShapH(MAXbrickH),DshapH(3,MAXbrickH)
 c
@@ -377,7 +377,7 @@ c----------------------------------------------------------------------
         ixi=IXIEDGE(ie)
         ibl1=IBLENDE(1,ie) ; ibl2=IBLENDE(2,ie)
         nv1 =NBLENDE(1,ie) ; nv2 =NBLENDE(2,ie)
-        call shapHbe(Xi(ixi),Norder(ie),Nedge_orient(ie), 
+        call shapHbe(Xi(ixi),Norder(ie),Nedge_orient(ie),
      .               nrdofHe,shapH1,dshapH1)
         do j=1,nrdofHe
           k=k+1
@@ -451,7 +451,7 @@ c  ...calculate middle node shape functions
         enddo
       enddo
 c
-c  ...total number of dofs      
+c  ...total number of dofs
       Nrdof=k
 c
 c
@@ -478,18 +478,18 @@ c     out:
 c         Nrdof        - number of dof
 c         ShapH        - values of shape functions
 c         DshapH       - values of derivatives of the shape functions
-c                        wrt to master element coordinates      
+c                        wrt to master element coordinates
 c
 c----------------------------------------------------------------------
 c
       subroutine shapeHn(Xi,Norder, Nedge_orient,Nface_orient,
      .                   Nrdof,ShapH,DshapH)
-c    
+c
       use parameters
-      use element_data  
+      use element_data
 #include "syscom.blk"
       common /cshapeHn/ iprint
-c      
+c
       real*8 , dimension(3), intent(in) :: Xi
       dimension Nedge_orient(6), Nface_orient(4),Norder(11)
 ccc      dimension Xi(3),ShapH(MAXbrickH),DshapH(3,MAXbrickH)
@@ -547,7 +547,7 @@ c  .....project Xi onto the edge
         endif
 c
 c  .....evaluate edge kernel shape functions
-        call shapHke(te,Norder(ie),Nedge_orient(ie), 
+        call shapHke(te,Norder(ie),Nedge_orient(ie),
      .               nrdofHe,shapHek,dshapHek)
 c
 c  .....blending function
@@ -578,7 +578,7 @@ c  .....project Xi onto the face
         call proj_n2f(iv1,iv2,iv3,ShapH,DshapH, tf,dtfdxi)
 c
 c  .....compute the mid-face node kernel shape functions
-        call shapHkt(tf,Norder(6+if),Nface_orient(if), 
+        call shapHkt(tf,Norder(6+if),Nface_orient(if),
      .               nrdofHt,shapHtk,dshapHtk)
 c
 c  .....blending function
@@ -607,7 +607,7 @@ c  ...compute the middle node kernel shape functions
       do j=1,nrdofHn
         k=k+1
         ShapH(k) = ShapH(1)*ShapH(2)*ShapH(3)*ShapH(4)*shapHnk(j)
-        DshapH(1:3,k) 
+        DshapH(1:3,k)
      .  = DshapH(1:3,1)*ShapH(2)*ShapH(3)*ShapH(4)*shapHnk(j)
      .  + ShapH(1)*DshapH(1:3,2)*ShapH(3)*ShapH(4)*shapHnk(j)
      .  + ShapH(1)*ShapH(2)*DshapH(1:3,3)*ShapH(4)*shapHnk(j)
@@ -653,23 +653,23 @@ c         Norder       - order of approximation for the nodes
 c         Nedge_orient - edge orientations
 c         Nface_orient - face orientations
 c     out:
-c         Nrdof        - number of the element shape functions      
+c         Nrdof        - number of the element shape functions
 c         ShapH        - values of shape functions
 c         DshapH       - values of derivatives of the shape functions
-c                        wrt to master element coordinates      
+c                        wrt to master element coordinates
 c
 c----------------------------------------------------------------------
 c
       subroutine shapeHd(Xi,Norder, Nedge_orient,Nface_orient,
      .                   Nrdof,ShapH,DshapH)
-c  
+c
       use element_data , only : NFAXES
       use control , only : GEOM_TOL
       use parameters
 #include "syscom.blk"
       common /cshapeHd/ iprint
       common /cshapke/ iprint_shapke
-c 
+c
       dimension Nedge_orient(8),Nface_orient(5),Norder(14)
       dimension Xi(3),ShapH(MAXpyramH),DshapH(3,MAXpyramH)
 c
@@ -698,9 +698,9 @@ c  ...check that coordinates are inside reference pyramid
      .    (Xi(3)      .lt.-GEOM_TOL    ).or.
      .    (Xi(1)+Xi(3).gt.1.d0+GEOM_TOL).or.
      .    (Xi(2)+Xi(3).gt.1.d0+GEOM_TOL)     ) then
-ccc        write(*,*)'shapeHd: point out of master pyramid!' 
+ccc        write(*,*)'shapeHd: point out of master pyramid!'
 ccc        write(*,1000)Xi(1:3)
-1000    format(' Xi = ',3(e12.5,2x))        
+1000    format(' Xi = ',3(e12.5,2x))
 ccc        call pause
       endif
 c
@@ -717,7 +717,7 @@ c  ...auxiliary variables
       yz1 = 1.d0-y-z
       z1 = 1.d0-z
 c
-c  ...initialize dof counter      
+c  ...initialize dof counter
       k=0
 c
 c  ...first vertex shape function
@@ -798,14 +798,14 @@ c  .....project x,y,z onto the edge
 c
 c  .....evaluate the edge kernel functions taking into account
 c       the orientation
-        call shapHke(te,Norder(ie),Nedge_orient(ie), 
+        call shapHke(te,Norder(ie),Nedge_orient(ie),
      .               nrdofHe,shapH1,dshapH1)
 c
 c  .....evaluate the edge shape functions
         do j=1,nrdofHe
           k=k+1
           ShapH(k) = shapH1(j)*blend
-          DshapH(1:3,k) = dshapH1(j)*dtedxi(1:3)*blend 
+          DshapH(1:3,k) = dshapH1(j)*dtedxi(1:3)*blend
      .                  + shapH1(j)*dblend(1:3)
         enddo
       enddo
@@ -835,7 +835,7 @@ c  .....the face axes have NOT been reversed
             do i=1,nrdofH1
 c
 c  ...........the (1-z) factor
-              nexp = max(j-1,i-1)  
+              nexp = max(j-1,i-1)
               fact = z1**nexp
               if (nexp.eq.0) then
                 dfact = 0.d0
@@ -846,7 +846,7 @@ c  ...........the (1-z) factor
               ShapH(k) = shapH1(i)*shapH2(j)*fact
               DshapH(1,k) = dshapH1(i)/z1*shapH2(j)*fact
               DshapH(2,k) = shapH1(i)*dshapH2(j)/z1*fact
-              DshapH(3,k) = (dshapH1(i)*x/z1**2*shapH2(j) 
+              DshapH(3,k) = (dshapH1(i)*x/z1**2*shapH2(j)
      .                     + shapH1(i)*dshapH2(j)*y/z1**2)*fact
      .                    + shapH1(i)*shapH2(j)*dfact
 c
@@ -866,7 +866,7 @@ c  .....the face axes HAVE been reversed
             do j=1,nrdofH2
 c
 c  ...........the (1-z) factor
-              nexp = max(j-1,i-1)  
+              nexp = max(j-1,i-1)
               fact = z1**nexp
               if (nexp.eq.0) then
                 dfact = 0.d0
@@ -877,7 +877,7 @@ c  ...........the (1-z) factor
               ShapH(k) = shapH1(i)*shapH2(j)*fact
               DshapH(1,k) = dshapH1(i)/z1*shapH2(j)*fact
               DshapH(2,k) = shapH1(i)*dshapH2(j)/z1*fact
-              DshapH(3,k) = (dshapH1(i)*x/z1**2*shapH2(j) 
+              DshapH(3,k) = (dshapH1(i)*x/z1**2*shapH2(j)
      .                     + shapH1(i)*dshapH2(j)*y/z1**2)*fact
      .                    + shapH1(i)*shapH2(j)*dfact
 c
@@ -904,7 +904,7 @@ c  .....project xyz onto the face
 c
 c  .....compute the mid-face node kernel shape functions, taking into
 c       account the face orientation
-        call shapHkt(tf,Norder(8+if),Nface_orient(if), 
+        call shapHkt(tf,Norder(8+if),Nface_orient(if),
      .               nrdofHt,shapHtk,dshapHtk)
 c
 c  .....evaluate the mid-face node shape functions
@@ -940,7 +940,7 @@ c  ...evaluate the shape functions
       do kk=1,nord-1
 c
 c  .....evaluate the (1-z)**nexp factor
-        nexp = kk-1                       
+        nexp = kk-1
         fact = z1**nexp
         if (nexp.eq.0) then
           dfact = 0.d0

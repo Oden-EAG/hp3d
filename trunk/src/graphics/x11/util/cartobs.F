@@ -9,7 +9,7 @@ c
 c   latest revision    - Sep 07
 c
 c   purpose            - routine computes matrix of transformation
-c                        from cartesian coordinates to coordinates 
+c                        from cartesian coordinates to coordinates
 c                        in an observer's system
 c
 c   arguments          - none
@@ -23,7 +23,7 @@ c
       use graphmod
 #include "syscom.blk"
 c
-c  ...ortogonal projections of Cartesian unit vectors on the projection 
+c  ...ortogonal projections of Cartesian unit vectors on the projection
 c     plane
       dimension eproj(3,3)
 c

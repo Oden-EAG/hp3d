@@ -8,14 +8,14 @@ c   latest revision    - Aug 2018
 c
 c   purpose            - an interface routine for the frontal solver
 c                        returning for an element its stiffness matrix
-c                        and load vector      
+c                        and load vector
 c
 c   arguments :
 c     in:
-c             Iel      - sequential element number      
+c             Iel      - sequential element number
 c     out:
 c             Zalhs    - stiffness matrix
-c             Zarhs    - load vector      
+c             Zarhs    - load vector
 c
 c----------------------------------------------------------------------
 c
@@ -58,7 +58,7 @@ c
         write(*,7001) Iel,mdle
  7001   format('solin2: Iel,mdle = ',i8,i10)
       endif
-c                   
+c
 c  ...evaluate the element load vector and stiffness matrix
       if (ISTC_FLAG) then
         call celem_systemI(Iel,mdle,2,
@@ -78,5 +78,5 @@ ccc      do ii=1,nrdofc
 ccc        if(abs(Zarhs(ii)).gt.1.d-8)then
 ccc        endif
 ccc      enddo
-c              
+c
       end

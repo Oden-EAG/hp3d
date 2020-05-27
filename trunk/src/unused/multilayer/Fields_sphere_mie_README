@@ -1,6 +1,6 @@
 README FILE
 
-1. There are two input files: mie.inp and points.inp  
+1. There are two input files: mie.inp and points.inp
 
 Input/Output format:
 
@@ -43,7 +43,7 @@ Input/Output format:
 !                                                                *
 !................................................................*
 !  Output data:         filename: Efields.out                    *
-!   1st col: point number                                        * 
+!   1st col: point number                                        *
 !   2nd col: real part of x component   of the electric field    *
 !   3rd col: imag part of x component   of the electric field    *
 !   4th col: real part of y component   of the electric field    *
@@ -52,7 +52,7 @@ Input/Output format:
 !   7th col: imag part of z component   of the electric field    *
 !								 *
 !                       filename: Hfields.out                    *
-!   1st col: point number                                        * 
+!   1st col: point number                                        *
 !   2nd col: real part of x component   of the magnetic field    *
 !   3rd col: imag part of x component   of the magnetic field    *
 !   4th col: real part of y component   of the magnetic field    *
@@ -89,13 +89,13 @@ Input/Output format:
 !
 !*****************************************************************
 !
-'n' can be set to as large as 100,(but atleast 3). 
+'n' can be set to as large as 100,(but atleast 3).
 
 2.  How to use the code
 
 i) 	Open up mie.inp in emacs.  Set all the parameters in the format specified in the file itself.Note that layer 1 is the innermost layer and layer n is the outermost layer.
-   	
+
 ii)  	Use makefile to compile and ./test-code to run the code
 
 
-Last Edited 10/9/2012 by Guneet Kaur 
+Last Edited 10/9/2012 by Guneet Kaur

@@ -123,7 +123,7 @@ c  ...save number of dof corresponding to the old order
       ndofVo = ndofV
       ndofQo = ndofQ
 c
-c  ...modify the order of approximation 
+c  ...modify the order of approximation
       npold = NODES(Nod)%order
       NODES(Nod)%order = Newp
 c
@@ -154,7 +154,7 @@ c     and copy old dof from the local arrays
           allocate(NODES(Nod)%dof%coord(3,ndofH))
           NODES(Nod)%dof%coord(1:3, 1:ndofH) = 0.d0
           ndofHm = min(ndofH,ndofHo)
-          NODES(Nod)%dof%coord(1:3, 1:ndofHm) = 
+          NODES(Nod)%dof%coord(1:3, 1:ndofHm) =
      .                   xnod(1:3, 1:ndofHm)
         endif
       endif

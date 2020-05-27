@@ -1,5 +1,5 @@
 !> Purpose : randomly refine mesh
-!! @param[in] Per   - percentage to refine 
+!! @param[in] Per   - percentage to refine
 !! @param[in] Niter - number of iteration
 !!
 !! REAMARK : routine does NOT update gdofs, since random refinements
@@ -28,7 +28,7 @@ subroutine random_refine(Per, Nitr)
 
   !  ...loop over iteration
   do i=1,Nitr
-     
+
      !  ...allocate a local list
      nsize_list=NRELES
      allocate(mdle_list(nsize_list), stat=istat)
@@ -46,11 +46,11 @@ subroutine random_refine(Per, Nitr)
 !    number of refinements to perform (refine at least one element)
      nref=max(int(Per*nsize_list),1)
 
-IF (.NOT. QUIET_MODE) THEN     
+IF (.NOT. QUIET_MODE) THEN
      write(*,7010) i, nsize_list, nref
 7010 format(1x,i3,' ; elements = ',i7,' ; ref. to perform = ',i7)
 ENDIF
-      
+
      !  ...for each iteration, randomly refine elements
      do while (nref.gt.0)
 
@@ -67,7 +67,7 @@ ENDIF
         if (is_leaf(mdle)) then
 !
 !          pick refinement kind
-           select case (NODES(mdle)%type) 
+           select case (NODES(mdle)%type)
            case ('mdln','mdld','mdlb'); call get_isoref(mdle, kref)
               ! Testing all cases
               ! case ('mdlp'); kref = kref_kind(mod(idx,2)+2, 'mdlp')
@@ -105,7 +105,7 @@ ENDIF
 
      !  ...if last iteration, print
      if (i.eq.Nitr) then
-IF (.NOT. QUIET_MODE) THEN     
+IF (.NOT. QUIET_MODE) THEN
         write(*,7020) NRELES
 7020    format(' NRELES = ',i7)
         write(*,*)'WARNING - Routine does NOT update gdofs!'
@@ -123,4 +123,4 @@ ENDIF
   enddo
 !
 !
-endsubroutine random_refine
+end subroutine random_refine

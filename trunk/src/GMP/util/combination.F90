@@ -5,6 +5,6 @@ integer function combination(n, m)
   if (n .lt. m ) then
     write(*,*)'combinations: n should be greater than m; n, m = ',n,m
     stop
-  endif        
+  endif
   combination = factorial(n)/(factorial(m)*factorial(n - m))
 end function combination

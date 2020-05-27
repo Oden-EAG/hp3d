@@ -31,13 +31,13 @@ c
      .                                 NrdofE,ShapE,CurlE)
 c
       use parameters   , only : NPMAX=>MAXP
-      
+
 #if C_MODE
       implicit real*8 (a-h,o-y), complex*16 (z)
-#else     
+#else
       implicit double precision (a-h,o-z)
 #endif
-      
+
       dimension Xi(3),Norder(19)
       dimension ShapP(*),GradP(3,*),ShapE(3,*),CurlE(3,*)
 c
@@ -53,7 +53,7 @@ c
 c     decode middle node order
       call decode(Norder(19), nordh, nord3)
       call decode(nordh, nord1,nord2)
-c     
+c
 c     evaluate 1D shape functions and E shape functions
       call shape1_Jason (Xi(1),nord1, nvoid,P1,D1)
       call shape1E_Jason(Xi(1),nord1, nvoid,E1)
@@ -392,12 +392,12 @@ c
 
 c     ----------------------------------------------------
       subroutine decode_orderq(Norderq, Nord1,Nord2)
-c     
+c
 c     RECALL: Norderq = Nord1*10+Nord2
-c     
+c
       Nord1 = Norderq/10
       Nord2 = Norderq-Nord1*10
-c     
+c
       if (Nord1<1.or.Nord1>9) then
         write(*,*)'decode_orderq: OUT OF RANGE Nord1 = ',Nord1
         stop
@@ -412,4 +412,4 @@ c     ----------------------------------------------------
 
       end subroutine shape3bEM2
 
-      
+

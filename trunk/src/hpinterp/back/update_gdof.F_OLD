@@ -67,7 +67,7 @@ c  ...lower the GMP interface flag for all nodes
       enddo
 c
 c
-c-----------------------------------------------------------------------  
+c-----------------------------------------------------------------------
 c
 c  ...multiple passes
       do
@@ -111,7 +111,7 @@ c
 c  .......update the number of processed elements
           nr_up_elem = nr_up_elem+1
 c
-c----------------------------------------------------------------------- 
+c-----------------------------------------------------------------------
 c
 c  .......loop through the element vertex nodes
           do iv=1,nvert(type)
@@ -137,7 +137,7 @@ c
 c  .......end of loop through element vertices
           enddo
 c
-c-----------------------------------------------------------------------      
+c-----------------------------------------------------------------------
 c
           call find_orient(mdle, nedge_orient,nface_orient)
           call find_order(mdle, norder)
@@ -148,16 +148,16 @@ c  .......loop through element edge nodes
             in = nvert(type)+ie
             nod = nodesl(in)
 c
-c  .........if no gdof, mark as processed            
+c  .........if no gdof, mark as processed
             if (.not.associated(NODES(nod)%coord)) then
               NODES(nod)%geom_interf=1
-            endif        
+            endif
             if (NODES(nod)%geom_interf.eq.1) cycle
             if (nod.eq.50) then
               iprint_hpedge=0
             else
               iprint_hpedge=0
-            endif  
+            endif
             if (linear.ne.1)
      .      call hpedge(mdle,iflag,no,xsub,type,
      .                  nedge_orient,nface_orient,norder,ie,
@@ -177,7 +177,7 @@ c
 c  .......end of loop through element edges
           enddo
 c
-c-----------------------------------------------------------------------      
+c-----------------------------------------------------------------------
 c
           call nodcor(mdle, xnod)
 c
@@ -188,7 +188,7 @@ c  .......loop through element face nodes
 c  .........if no gdof, mark as processed
             if (.not.associated(NODES(nod)%coord)) then
               NODES(nod)%geom_interf=1
-            endif        
+            endif
             if (NODES(nod)%geom_interf.eq.1) cycle
 
             if (nod.eq.202) then
@@ -214,7 +214,7 @@ c
 c  .......end of loop through element faces
           enddo
 c
-c----------------------------------------------------------------------- 
+c-----------------------------------------------------------------------
 c
 c  .......update the middle node
           NODES(mdle)%geom_interf=1
@@ -228,7 +228,7 @@ c
 c  .....end of loop through elements
  100    continue
 c
-        IF (.NOT. QUIET_MODE) THEN  
+        IF (.NOT. QUIET_MODE) THEN
         write(*,8001) nr_up_elem
  8001   format(' update_gdof: nr_up_elem = ',i6)
         ENDIF

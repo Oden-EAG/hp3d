@@ -43,7 +43,7 @@ cwb       dimension Sbuf(*), nbuf(20), lenf(20)
 c
 cwb       save nbuf,lenf
 ccccc save nbuf, lenf, irsave
-      common /czdirio1/  nbuf, lenf, irsave   
+      common /czdirio1/  nbuf, lenf, irsave
       common /czdirio2/ storage(100)
 
 

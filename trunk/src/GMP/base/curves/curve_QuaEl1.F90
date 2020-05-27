@@ -64,7 +64,7 @@
       call norm(aC, rx)
       call norm(bC, ry)
 !
-!  ...printing      
+!  ...printing
       if (iprint.eq.1) then
         write(*,*) ' '
         write(*,7011) aG(1:3)
@@ -74,12 +74,12 @@
         write(*,7008) center(1:3)
  7008   format(' center  = ',3(e12.5,2x))
         write(*,7009) rx,ry
- 7009   format(' rx,ry = ',2(e12.5,2x))    
+ 7009   format(' rx,ry = ',2(e12.5,2x))
       endif
 !
 !  ...now calculate the coordinates in 2D x-y plane
 !  ...first rescale Eta to between 0 and pi/2
-      pihalf = acos(0.d0) 
+      pihalf = acos(0.d0)
       tt = Eta*pihalf
 !  ...next evaluate the superellipse (and eta derivative)
       xL(1) = rx*cos(tt)
@@ -87,7 +87,7 @@
       xL(3) = 0.d0
       dxLdeta(1) = pihalf*rx*(-sin(tt))
       dxLdeta(2) = pihalf*ry*(+cos(tt))
-      dxLdeta(3) = 0.d0 
+      dxLdeta(3) = 0.d0
 !
 !  ...printing
       if (iprint.eq.1) then
@@ -97,7 +97,7 @@
         write(*,7006) xL(1:3)
  7006   format(' xL  = ',3(e12.5,2x))
         write(*,7007) dxLdeta(1:3)
- 7007   format(' dxLdeta = ',3(e12.5,2x))    
+ 7007   format(' dxLdeta = ',3(e12.5,2x))
       endif
 !
 !  ...the idea is to map these coordinates to the global physical
@@ -116,11 +116,11 @@
       call cross_product(aC(1:3),bC(1:3), rotM(1:3,3))
       rotM(1:3,3) = (1.d0/(rx*ry))*rotM(1:3,3)
 !
-!  ...printing      
+!  ...printing
       if (iprint.eq.1) then
         do i=1,3
           write(*,7005) i,rotM(i,1:3)
- 7005     format(' i,rotM(i,:) = ',i1,2x,3(e12.5,2x))          
+ 7005     format(' i,rotM(i,:) = ',i1,2x,3(e12.5,2x))
         enddo
       endif
 !
@@ -131,7 +131,7 @@
                     rotM(1:3,3)*dxLdeta(3)
 !
 !  ...printing
-      if (iprint.eq.1) then 
+      if (iprint.eq.1) then
         write(*,*) ' '
         write(*,7003) X(1:3)
         write(*,7004) Dxdeta(1:3)

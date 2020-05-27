@@ -22,7 +22,7 @@ subroutine volume_hp(Vol)
   enddo
 end subroutine volume_hp
 
-!-----------------------------------------------------------------------      
+!-----------------------------------------------------------------------
 subroutine volume_hp_mdle(Mdle, Vol)
   use data_structure3D
   use element_data
@@ -43,18 +43,18 @@ subroutine volume_hp_mdle(Mdle, Vol)
   real(8) :: wa,rjac
   integer :: iprint,nint,i,k,l,iflag,nrdofH
   !
-  iprint = 0;  
+  iprint = 0;
   Vol=0.d0
 
   !  element order, orientations, and gdofs
   call find_elem_nodes(mdle, norder, nedge_orient,nface_orient)
   call nodcor(mdle,xnod)
 
-  !  set integration points        
+  !  set integration points
   type = NODES(mdle)%type
   call set_3Dint(type,norder, nint,xiloc,wxi)
 
-  !  loop over integration points        
+  !  loop over integration points
   do l=1,nint
      xi(1:3) = xiloc(1:3,l); wa = wxi(l)
 
@@ -64,7 +64,7 @@ subroutine volume_hp_mdle(Mdle, Vol)
                    nrdofH,shapH,dshapH)
 
      !  mapping to master
-     x(1:3) = 0.d0; dxdxi(1:3,1:3) = 0.d0 
+     x(1:3) = 0.d0; dxdxi(1:3,1:3) = 0.d0
      do k=1,nrdofH
         x(1:3) = x(1:3) + xnod(1:3,k)*shapH(k)
         do i=1,3
@@ -73,7 +73,7 @@ subroutine volume_hp_mdle(Mdle, Vol)
      enddo
 
      !  evaluate the inverse derivatives and jacobian
-     call geom(dxdxi, dxidx,rjac,iflag) 
+     call geom(dxdxi, dxidx,rjac,iflag)
      if (iflag.ne.0) then
         write(*,*)'volume_hp_mdle: NEGATIVE JACOBIAN Mdle = ',Mdle, rjac
         call pause
@@ -82,5 +82,5 @@ subroutine volume_hp_mdle(Mdle, Vol)
      !  accumulate
      Vol = Vol + wa*rjac
   enddo
-  
+
 end subroutine volume_hp_mdle

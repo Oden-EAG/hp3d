@@ -12,7 +12,7 @@ c   usage              - call dpallcu
 c
 c   arguments          -none
 c
-c   required  routines - 
+c   required  routines -
 c
 c-----------------------------------------------------------------------c
       subroutine dpallcu
@@ -49,7 +49,7 @@ c
 c  .......rescale
           do 30 k=1,2
           do 30 ivar=1,2
-            XY(ivar,k) = (xobs(ivar,k)-XCIM(ivar))/DIMIM*SIZE 
+            XY(ivar,k) = (xobs(ivar,k)-XCIM(ivar))/DIMIM*SIZE
      .                   + XCWIN(ivar)
    30     continue
 c

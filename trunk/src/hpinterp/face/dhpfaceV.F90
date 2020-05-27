@@ -2,21 +2,21 @@
 #include "implicit_none.h"
 !
 !-----------------------------------------------------------------------
-!> Purpose : determine H(div) face dof interpolating H(div) Dirichlet data 
+!> Purpose : determine H(div) face dof interpolating H(div) Dirichlet data
 !            using PB interpolation
 !  NOTE:     the interpolation (projection) is done in the reference space
-!!           
-!! @param[in]  Iflag        - a flag specifying which of the objects the 
+!!
+!! @param[in]  Iflag        - a flag specifying which of the objects the
 !!                            face is on: 5 pris, 6 hexa, 7 tetr, 8 pyra
-!! @param[in]  No           - number of a specific object 
+!! @param[in]  No           - number of a specific object
 !! @param[in]  Etav         - reference coordinates of the element vertices
 !! @param[in]  Type         - element (middle node) type
-!! @param[in]  Icase        - the face node case 
+!! @param[in]  Icase        - the face node case
 !! @param[in]  Nedge_orient - edge orientation, never used
-!! @param[in]  Nface_orient - face orientation 
+!! @param[in]  Nface_orient - face orientation
 !! @param[in]  Norder       - element order
-!! @param[in]  Iface        - face number 
-!! 
+!! @param[in]  Iface        - face number
+!!
 !! @param[out] ZnodV        - H(div) dof for the face
 !-----------------------------------------------------------------------
   subroutine dhpfaceV(Mdle,Iflag,No,Etav,Type,Icase, &
@@ -66,7 +66,7 @@
 ! H(div) test and trial shape function in reference coordinates
   real(8), dimension(3)                 :: uVeta,vVeta
 !
-! dot product 
+! dot product
   real(8)                               :: prod
 !
 ! geometry
@@ -97,7 +97,7 @@
 !
 ! decoded case for the face node
   integer, dimension(NR_PHYSA)          :: ncase
-!  
+!
 ! misc work space
   integer :: iprint,nrv,nre,nrf,nsign,nflag, &
              i,j,k,ivarV,nvarV,kj,ki,&
@@ -139,7 +139,7 @@
 7060 format('dhpfaceV: norder_1 = ',20i4)
   endif
 !
-! get face order to find out quadrature information 
+! get face order to find out quadrature information
   call face_order(Type,Iface,Norder, norder_face)
   INTEGRATION=1   ! overintegrate
   call set_2Dint(face_type(Type,Iface),norder_face, &
@@ -163,7 +163,7 @@
     call shape3DH(Type,xi,norder_1,Nedge_orient,Nface_orient, &
                   nrdofH,shapH,gradH)
 !
-!   compute element H(div) shape functions 
+!   compute element H(div) shape functions
     call shape3DV(Type,xi,norder_1,Nface_orient, &
                   nrdofV,shapV,divV)
 
@@ -173,7 +173,7 @@
                     eta,detadxi,dxideta,rjac,detadt,rn,bjac)
     weight = wa*bjac
 !
-!   call GMP routines to evaluate physical coordinates and their 
+!   call GMP routines to evaluate physical coordinates and their
 !   derivatives wrt reference coordinates
     select case(Iflag)
     case(5);        call prism(No,eta, x,dxdeta)
@@ -327,7 +327,7 @@
 !
 !   loop through physical attributes
     do i=1,NR_PHYSA
-!        
+!
 !     loop through components
       do k=1,NR_COMP(i)
         select case(DTYPE(i))

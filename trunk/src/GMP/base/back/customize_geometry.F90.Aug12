@@ -8,10 +8,10 @@ IMPLICIT NONE
   character (len = 20) :: object
   integer              :: error
 !--------------------------------------------------------------------
-!   
+!
      write(*,*)'her e'
 ! ..read object type
-    read(N_GEO, IOSTAT = error) object 
+    read(N_GEO, IOSTAT = error) object
     if (error .ne. 0) then
       write(*,*)' customize_geometry: error reading file.'
       stop
@@ -23,12 +23,12 @@ IMPLICIT NONE
       case('shells')
         call customize_shells
       case('head')
-        call customize_head      
+        call customize_head
       case default
         write(*,*)' customize geometry: unknown object.'
-        stop        
-! ..end select geometry object    
+        stop
+! ..end select geometry object
     end select
-!    
+!
 end subroutine customize_geometry_prova
 !--------------------------------------------------------------------

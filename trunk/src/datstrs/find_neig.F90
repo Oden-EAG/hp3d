@@ -30,7 +30,7 @@ subroutine find_neig(Mdle, Neig_list)
   if (iprint.eq.1) then
      write(*,*) 'find_neig: Mdle, type = ', Mdle, type
   endif
-  
+
   !---------------------------------------------------
   ! Step 0: short cut for initial mesh elements only
   !---------------------------------------------------
@@ -44,7 +44,7 @@ subroutine find_neig(Mdle, Neig_list)
   !---------------------------------------------------
   ! Step 1: use neig_face
   !---------------------------------------------------
-  call elem_nodes(Mdle, nodesl,norientl) 
+  call elem_nodes(Mdle, nodesl,norientl)
   do i=1,nface(type)
      nod = nodesl(nvert(type)+nedge(type)+i)
      call neig_face(nod, nrneig,neig,nsid_list,norient_list)
@@ -60,5 +60,5 @@ subroutine find_neig(Mdle, Neig_list)
         endif
      end select
   enddo
-  
+
 end subroutine find_neig

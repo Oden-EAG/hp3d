@@ -14,14 +14,14 @@
 !                        of coordinates
 !     out:
 !        X             - physical coordinates
-!        dX_dXi        - derivatives of physical coordinates 
+!        dX_dXi        - derivatives of physical coordinates
 !--------------------------------------------------------------------------------------------
 subroutine quadB(No,Xi,Norient, X,dX_dXi)
 !--------------------------------------------------------------------------------------------
 ! MODULES
   use kinds
   use control
-  use GMP    
+  use GMP
   use element_data
 !--------------------------------------------------------------------------------------------
 ! printing flag (0,1,2)
@@ -55,16 +55,16 @@ subroutine quadB(No,Xi,Norient, X,dX_dXi)
                                                             1.d0,  0.d0,  0.d0, -1.d0/),    &
                                                                                   (/2,2,8/))
   real*8, dimension(4)                  :: blend
-  real*8, dimension(4,2)                :: dblend  
+  real*8, dimension(4,2)                :: dblend
   real*8, dimension(4)                  :: shap_v
-  real*8, dimension(4,2)                :: dshap_v  
+  real*8, dimension(4,2)                :: dshap_v
   integer                                 :: norientc
   integer                                 :: iv,nc,ie,ivar,np,i,j
-#if I_PRINT >= 2  
+#if I_PRINT >= 2
   real*8, dimension(3)                  :: aux
   real*8, dimension(3,2)                :: void
   real*8                                :: smax
-#endif  
+#endif
 !--------------------------------------------------------------------------------------------
 !
 ! ..check quad type
@@ -77,7 +77,7 @@ subroutine quadB(No,Xi,Norient, X,dX_dXi)
       case (0)
         eta(1) = Xi(1);         eta(2) = Xi(2)
       case (1)
-        eta(1) = Xi(2);         eta(2) = 1.d0 - Xi(1)       
+        eta(1) = Xi(2);         eta(2) = 1.d0 - Xi(1)
       case (2)
         eta(1) = 1.d0 - Xi(1);  eta(2) = 1.d0 - Xi(2)
       case (3)
@@ -85,7 +85,7 @@ subroutine quadB(No,Xi,Norient, X,dX_dXi)
       case (4)
         eta(2) = Xi(1);         eta(1) = Xi(2)
       case (5)
-        eta(2) = Xi(2);         eta(1) = 1.d0 - Xi(1)       
+        eta(2) = Xi(2);         eta(1) = 1.d0 - Xi(1)
       case (6)
         eta(2) = 1.d0 - Xi(1);  eta(1) = 1.d0 - Xi(2)
       case (7)
@@ -93,7 +93,7 @@ subroutine quadB(No,Xi,Norient, X,dX_dXi)
       case default
         write(*,*)'quadB: unknown orientation.'
         stop
-    end select 
+    end select
 ! ..blending functions
     blend(1)      = 1.d0 - eta(2)
     blend(2)      = eta(1)
@@ -112,20 +112,20 @@ subroutine quadB(No,Xi,Norient, X,dX_dXi)
     dshap_v(2,1:2) = (/1.d0 - eta(2),       -eta(1)/)
     dshap_v(3,1:2) = (/       eta(2),        eta(1)/)
     dshap_v(4,1:2) = (/      -eta(2), 1.d0 - eta(1)/)
-#if I_PRINT >= 1      
+#if I_PRINT >= 1
     write(*,*) 'quadB: computing quad bubble'
     write(*,1) No,Xi(1:2),Norient,eta(1:2)
 1   format(' *****  No,Xi,Norient,eta = ',i6,2e12.5,i3,2x,2e12.5)
 #endif
 ! ..evaluate rectangle parametrization
     call recta(No,eta, X,dX_deta)
-#if I_PRINT >= 2    
+#if I_PRINT >= 2
     write(*,*) 'quadB: ORIGINAL X,dX_deta'
     do ivar = 1, 3
       write(*,7011) X(ivar),dX_deta(ivar,1:2)
 7011  format(e12.5,2x,2e12.5)
     enddo
-#endif      
+#endif
 ! ..get the vertex coordinates
     do iv = 1, 4
       np = RECTANGLES(No)%VertNo(iv)
@@ -133,12 +133,12 @@ subroutine quadB(No,Xi,Norient, X,dX_dXi)
     enddo
 !
 ! *****************************  SUBTRACT LINEAR INTERPOLANT  ***************************** |
-! ..loop through vertices      
+! ..loop through vertices
     do iv = 1, 4
-#if I_PRINT >= 2    
-!============================================================================================     
-! Check consistency of parametrizations btw vertices an 'rect' routine                     |      
-!--------------------------------------------------------------------------------------------      
+#if I_PRINT >= 2
+!============================================================================================
+! Check consistency of parametrizations btw vertices an 'rect' routine                     |
+!--------------------------------------------------------------------------------------------
 ! ....call 'rect' routine at master triangle vertices                                      !
       call recta(No,QUADR_COORD(1:2,iv), aux,void)                                          !
       smax = 0.d0                                                                           !
@@ -146,7 +146,7 @@ subroutine quadB(No,Xi,Norient, X,dX_dXi)
       do ivar = 1, 3                                                                        !
         smax = max(smax,abs(aux(ivar) - xv(ivar,iv)))                                       !
       enddo                                                                                 !
-! ....check whether GEOM_TOL is exceeded                                                    ! 
+! ....check whether GEOM_TOL is exceeded                                                    !
       if (smax .gt. GEOM_TOL) then                                                          !
         write(*,7001) No,iv,smax                                                            !
  7001   format('trianB: No,iv,smax = ',i5,i2,e12.5)                                         !
@@ -162,9 +162,9 @@ subroutine quadB(No,Xi,Norient, X,dX_dXi)
           dX_deta(i,j) = dX_deta(i,j) - xv(i,iv)*dshap_v(iv,j)
         enddo
       enddo
-! ..end of loop through vertices        
+! ..end of loop through vertices
     enddo
-#if I_PRINT >= 2      
+#if I_PRINT >= 2
     write(*,*) 'quadB: AFTER VERTICES  X,dX_deta = '
     do ivar = 1, 3
       write(*,7011) X(ivar),dX_deta(ivar,1:2)
@@ -172,7 +172,7 @@ subroutine quadB(No,Xi,Norient, X,dX_dXi)
 #endif
 !
 ! *****************************  SUBTRACT EDGE CONTRIBUTIONS  ***************************** |
-! ..loop through edges      
+! ..loop through edges
     do ie = 1, 4
 ! ....get the curve number
       nc = RECTANGLES(No)%EdgeNo(ie)
@@ -182,18 +182,18 @@ subroutine quadB(No,Xi,Norient, X,dX_dXi)
       endif
       if (CURVES(nc)%Type .eq.' Seglin') cycle
       call proj_quad2edge(eta,ie, zeta,dzeta_deta)
-#if I_PRINT >= 2       
+#if I_PRINT >= 2
       write(*,9001) ie,zeta
 9001  format(' quadB: ie, zeta = ',I2,' ; ',E12.5)
 #endif
       if ((zeta .lt. GEOM_TOL) .or. (zeta .gt. (1.d0 - GEOM_TOL))) cycle
-#if I_PRINT >= 2 
+#if I_PRINT >= 2
       write(*,7003) ie,nc,CURVES(nc)%Type
 7003  format(' quadB: ie,nc,Type = ',i2,i5,2x,a5)
 #endif
-! ....compute bubble function     
+! ....compute bubble function
       call curveB(nc,zeta,norientc, alpha,dalpha_dzeta)
-! ....subtract edge bubble        
+! ....subtract edge bubble
       X = X - alpha*blend(ie)
       do i = 1, 3
         do j = 1, 2
@@ -201,16 +201,16 @@ subroutine quadB(No,Xi,Norient, X,dX_dXi)
                                       - alpha(i)*dblend(ie,j)
         enddo
       enddo
-#if I_PRINT >= 2        
+#if I_PRINT >= 2
       write(*,*) 'quadB: X,dX_deta AFTER EDGE = ',ie
       do ivar = 1, 3
         write(*,7011) X(ivar),dX_deta(ivar,1:2)
       enddo
       call pause
 #endif
-! ..end of loop through edges        
+! ..end of loop through edges
     enddo
-#if I_PRINT >= 2    
+#if I_PRINT >= 2
     write(*,*) 'quadB: AFTER EDGES  X,dX_deta = '
     do ivar = 1, 3
       write(*,7011) X(ivar),dX_deta(ivar,1:2)
@@ -219,7 +219,7 @@ subroutine quadB(No,Xi,Norient, X,dX_dXi)
 #endif
 ! ..account for orientations in derivatives
     dX_dXi(1:3,1:2) = matmul(dX_deta(1:3,1:2), deta_dXi(1:2,1:2,Norient))
-#if I_PRINT >= 2    
+#if I_PRINT >= 2
     write(*,*) 'trianB: FINAL  X,dX_dXi = '
     do ivar = 1, 3
       write(*,7011) X(ivar),dX_dXi(ivar,1:2)
@@ -228,4 +228,4 @@ subroutine quadB(No,Xi,Norient, X,dX_dXi)
 #endif
 !
 end subroutine quadB
-!----------------------------------------------------------------------------------------------------  
+!----------------------------------------------------------------------------------------------------

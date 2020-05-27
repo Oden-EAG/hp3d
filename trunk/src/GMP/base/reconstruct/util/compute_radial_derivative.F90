@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------
 !
       subroutine compute_radial_derivative(Nt,Ie,S, Der,DDer,DDDer)
-!      
+!
 !-------------------------------------------------------------------------------
       use GMP
 !-------------------------------------------------------------------------------
@@ -33,23 +33,23 @@
 !
 !  ...accumulate
       Der = 0.d0;  DDer = 0.d0;  DDDer = 0.d0
-!  ...loop over control points      
+!  ...loop over control points
       do j = 0,1
         do i = 0,deg-j
           k = deg-i-j
-!  .......compute coefficients            
+!  .......compute coefficients
           call Bernstein_poly(i,deg-j,S, poly00,dpoly)
           c0 = deg*poly00*(-1.d0)**(j+1)
-!          
+!
           call Bernstein_poly(i-1,deg-j-1,S, poly10,dpoly)
           call Bernstein_poly(i  ,deg-j-1,S, poly11,dpoly)
           c1 = deg*(deg-j)*(poly10 - poly11)*(-1.d0)**(j+1)
-!          
+!
           call Bernstein_poly(i-2,deg-j-2,S, poly20,dpoly)
           call Bernstein_poly(i-1,deg-j-2,S, poly21,dpoly)
           call Bernstein_poly(i  ,deg-j-2,S, poly22,dpoly)
           c2 = deg*(deg-j)*(deg-j-1)*(poly20 - 2.d0*poly21 + poly22)*(-1.d0)**(j+1)
-!          
+!
           if (iprint.eq.1) then
 !            write(*,1002)i,j,c0
  1002       format('   i = ',i1,'; j = ',i1,' --> c0 = ',e12.5)
@@ -58,41 +58,41 @@
 !            write(*,1006)c2
  1006       format('                --> c2 = ',e12.5)
           endif
-!  .......account for edge 
+!  .......account for edge
           select case(ie)
           case(1)
-            l = bijec(i,j)      
+            l = bijec(i,j)
           case(2)
-            l = bijec(k,i)      
-          case(3)        
-            l = bijec(j,k)      
+            l = bijec(k,i)
+          case(3)
+            l = bijec(j,k)
           endselect
           if (iprint.eq.1) then
 !            write(*,1003)l,l+2
- 1003       format('   control point = Rdata(',i2,':',i2,')')           
+ 1003       format('   control point = Rdata(',i2,':',i2,')')
           endif
           Der   = Der   + c0*TRIANGLES(Nt)%Rdata(l:l+2)
           DDer  = DDer  + c1*TRIANGLES(Nt)%Rdata(l:l+2)
           DDDer = DDDer + c2*TRIANGLES(Nt)%Rdata(l:l+2)
           if (iprint.eq.1)then
 !            write(*,1009)Der
- 1009       format('                --> Der   = ',3(e12.5,2x))      
+ 1009       format('                --> Der   = ',3(e12.5,2x))
 !            write(*,1010)DDer
- 1010       format('                --> DDer  = ',3(e12.5,2x))      
+ 1010       format('                --> DDer  = ',3(e12.5,2x))
 !            write(*,1011)DDDer
- 1011       format('                --> DDDer = ',3(e12.5,2x))      
+ 1011       format('                --> DDDer = ',3(e12.5,2x))
           endif
         enddo
-!  ...end of loop over control points involved          
-      enddo 
+!  ...end of loop over control points involved
+      enddo
 !
       if (iprint.eq.1) then
 !        write(*,1001)Der
- 1001   format('   Der   = ',3(e12.5,2x))      
+ 1001   format('   Der   = ',3(e12.5,2x))
 !        write(*,1007)DDer
- 1007   format('   DDer  = ',3(e12.5,2x))      
+ 1007   format('   DDer  = ',3(e12.5,2x))
 !        write(*,1008)DDDer
- 1008   format('   DDDer = ',3(e12.5,2x))      
+ 1008   format('   DDDer = ',3(e12.5,2x))
       endif
 !
       end subroutine

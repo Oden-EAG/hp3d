@@ -1,5 +1,5 @@
 c      parameter (MAXNC=300)
-c      parameter (MAXNP=200) 
+c      parameter (MAXNP=200)
 c      parameter (MAXTR=100)
 c      parameter (MAXRE=300)
 c      parameter (MAXBT=100)
@@ -10,7 +10,7 @@ c      parameter (MAXSURF=100)
 c      parameter (MAXDSUR=1000)
 c--------------------------------
       parameter (MAXNC=900)
-      parameter (MAXNP=5000) 
+      parameter (MAXNP=5000)
       parameter (MAXTR=100)
       parameter (MAXRE=8000)
       parameter (MAXBT=100)
@@ -21,7 +21,7 @@ c--------------------------------
       parameter (MAXDSUR=10000)
 c
 c  ...explanation of parameters:
-c     MAXNP  - maximum number of points 
+c     MAXNP  - maximum number of points
 c     MAXNC  - maximum number of curves
 c     MAXTR  - maximum number of triangles
 c     MAXRE  - maximum number of rectangles
@@ -42,7 +42,7 @@ c
      .               IGEOMTR(MAXIG),RGEOMTR(MAXRG),
      .               NADSURF(MAXSURF),DSURF(MAXDSUR)
 
-cwr01.04.02 - filled sizes of matrices IGEOMTR and RGEOMT  
+cwr01.04.02 - filled sizes of matrices IGEOMTR and RGEOMT
       common /cgeom1/ NPIG_SAVE,NPRG_SAVE
 
 c

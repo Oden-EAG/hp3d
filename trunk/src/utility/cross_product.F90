@@ -2,10 +2,10 @@
 #include "implicit_none.h"
 !
 !--------------------------------------------------------------------
-!                                                                     
+!
 !     routine name      - cross_product
-!                                                                     
-!-------------------------------------------------------------------- 
+!
+!--------------------------------------------------------------------
 !
    subroutine cross_product(a,b, c)
 !
@@ -20,7 +20,7 @@
 !
    end subroutine cross_product
 !
-!-------------------------------------------------------------------- 
+!--------------------------------------------------------------------
 !
 !..for backward compatibility
    subroutine cross_product3D(Vec1,Vec2, Vec)
@@ -30,7 +30,7 @@
       call cross_product(Vec1,Vec2, Vec)
    end subroutine cross_product3D
 !
-!-------------------------------------------------------------------- 
+!--------------------------------------------------------------------
 !
 !..for more backward compatibility
    subroutine cross_product3D_int(Vec1,Vec2, Vec)
@@ -42,16 +42,16 @@
 !
 !
 !--------------------------------------------------------------------
-!                                                                     
+!
 !     routine name      - zcross_product
-!                                                                     
-!-------------------------------------------------------------------- 
-!                                                                     
+!
+!--------------------------------------------------------------------
+!
 !     latest revision:  - Feb 2018
-!                                                                     
+!
 !     purpose:          - compute cross product of real and
 !                         (possibly) complex valued vectors
-!                                                                    
+!
 !---------------------------------------------------------------------
 !
    subroutine zcross_product(Rn,Za, Zcross)
@@ -69,19 +69,19 @@
 !
 !
 !--------------------------------------------------------------------
-!                                                                     
+!
 !     routine name      - zz_cross_product
-!                                                                     
-!-------------------------------------------------------------------- 
-!                                                                     
+!
+!--------------------------------------------------------------------
+!
 !     latest revision:  - Aug 2018
-!                                                                     
+!
 !     purpose:          - compute cross product of two
 !                         (possibly) complex valued vectors
 !
 !               in:     - Za, Zb
 !              out:     - Zcross = Za x Zb
-!                                                                    
+!
 !---------------------------------------------------------------------
 !
    subroutine zz_cross_product(Za,Zb, Zcross)

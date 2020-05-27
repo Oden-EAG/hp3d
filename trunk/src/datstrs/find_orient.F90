@@ -21,7 +21,7 @@ subroutine find_orient_from_list(Type, Norientl, Nedge_orient, Nface_orient)
   use data_structure3D
   implicit none
   character(len=4), intent(in)  :: Type
-  integer,          intent(in)  :: Norientl(27) 
+  integer,          intent(in)  :: Norientl(27)
   integer,          intent(out) :: Nedge_orient(12), Nface_orient(6)
   integer :: nrv, nre, nrf
 

@@ -8,7 +8,7 @@ c   latest revision    - Feb 11
 c
 c   purpose            - export GMP outer surface to vtk legacy format
 c
-c   Remarks: routine is written for tets only!       
+c   Remarks: routine is written for tets only!
 c
 c----------------------------------------------------------------------
 c
@@ -19,7 +19,7 @@ c
 #include "syscom.blk"
 c
 c  ...element nodes and their orientations
-      dimension nvert(3) 
+      dimension nvert(3)
       character(len=64) :: Fname
 c
       nfile = 31
@@ -27,7 +27,7 @@ c
 c  ...open file for writing
       open(unit=nfile, file=Fname, form='formatted')
 c
-c  ...deallocate Idata for all points   
+c  ...deallocate Idata for all points
       do i=1,NRPOINT
         if(associated(POINTS(i)%Idata)) then
           write(*,*)'Idata associated for point = ',i
@@ -39,7 +39,7 @@ c  ...deallocate Idata for all points
           endif
         endif
       enddo
-c      
+c
 c  ...Step 1: loop over tets, count and rename surface triangles
       ntria=0
       do i=1,NRTETRA
@@ -48,7 +48,7 @@ c  ...Step 1: loop over tets, count and rename surface triangles
           if (TRIANGLES(nt)%BlockNo(2).eq.0) then
             ntria=ntria+1
             TRIANGLES(nt)%Type = 'PTITri'
-          endif        
+          endif
         enddo
       enddo
 c
@@ -58,7 +58,7 @@ c  ...Step 2: loop over surface triangles and renumber vertices
         if (TRIANGLES(i)%Type.ne.'PTITri') cycle
         do j=1,3
           nv = TRIANGLES(i)%VertNo(j)
-c  .......if 1st visit to point          
+c  .......if 1st visit to point
           if (.not.associated(POINTS(nv)%Idata)) then
             n = n + 1
             allocate(POINTS(nv)%Idata(1), stat=istat)
@@ -72,7 +72,7 @@ c  .......if 1st visit to point
       enddo
 c
 c  ...Step 3: loop over surface triangles and write point's coordinates
-      write(nfile,1000) 
+      write(nfile,1000)
  1000 format('# vtk DataFile Version 2.0')
       write(nfile,1001)
  1001 format('hp3d export mesh')
@@ -86,30 +86,30 @@ c  ...Step 3: loop over surface triangles and write point's coordinates
         if (TRIANGLES(i)%Type.ne.'PTITri') cycle
         do j=1,3
           nv = TRIANGLES(i)%VertNo(j)
-c  .......if 1st visit to point          
+c  .......if 1st visit to point
           if (POINTS(nv)%Idata(1).gt.0) then
-c  .........convert coordinates from [m] to [cm]            
+c  .........convert coordinates from [m] to [cm]
             POINTS(nv)%Rdata(1:3) = POINTS(nv)%Rdata(1:3)*100.d0
             write(nfile,7001) POINTS(nv)%Rdata(1:3)
- 7001       format(3(f20.12,2x))     
-c  .........flip sign            
+ 7001       format(3(f20.12,2x))
+c  .........flip sign
             POINTS(nv)%Idata(1) = -POINTS(nv)%Idata(1)
           endif
         enddo
       enddo
 c
-c  ...Step 4: write elements    
+c  ...Step 4: write elements
       write(nfile,1005)ntria,ntria*4
  1005 format('CELLS ',2(i10,2x))
       do i=1,NRTRIAN
         if (TRIANGLES(i)%Type.ne.'PTITri') cycle
-c  .....collect vertices        
+c  .....collect vertices
         do j=1,3
           nv = TRIANGLES(i)%VertNo(j)
           nvert(j) = -POINTS(nv)%Idata(1) - 1
         enddo
         write(nfile,7003) nvert(1:3)
- 7003   format('3 ',3(i10,2x))       
+ 7003   format('3 ',3(i10,2x))
       enddo
       write(nfile,1006)ntria
  1006 format('CELL_TYPES ',i10)
@@ -118,9 +118,9 @@ c  .....collect vertices
  1007  format('5')
       enddo
 c
-c  ...Step 5: write surface number      
+c  ...Step 5: write surface number
       write(nfile,1008)ntria
- 1008 format('CELL_DATA ',i10)     
+ 1008 format('CELL_DATA ',i10)
       write(nfile,1009)
  1009 format('SCALARS  int  1')
       write(nfile,1010)
@@ -139,7 +139,7 @@ c  ...Step 5: deallocate Idata
      .      __FILE__,__LINE__)
         endif
       enddo
-c     
-      close(nfile)         
+c
+      close(nfile)
 c
       end subroutine

@@ -7,13 +7,13 @@
 !                        identifies the surfaces on which the point
 !                        is located
 !
-!   arguments         
+!   arguments
 !     in:
 !            Xp        - point coordinates
 !            Nr_confm  - number of surfaces
 !            Ns_confm  - list of surfaces
-!     out:  
-!            Nrs       - number of surfaces to which the point belongs       
+!     out:
+!            Nrs       - number of surfaces to which the point belongs
 !            Nos       - surface numbers
 !---------------------------------------------------------------------
 !
@@ -21,7 +21,7 @@
 !
       use control
       use GMP
-#include "syscom.blk"     
+#include "syscom.blk"
 !
       dimension Xp(3),Ns_confm(10),Nos(10)
       dimension dfdx(3)

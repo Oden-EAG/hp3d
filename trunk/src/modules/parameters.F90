@@ -20,7 +20,7 @@ module parameters
   !  ...maximum order of approximation
   integer, parameter :: MAXP=6
   !
-  !  ...modulo to encode polynomial orders 
+  !  ...modulo to encode polynomial orders
   !  ...(do not change unless using stand-alone shape functions package)
   integer, parameter :: MODORDER=10
   !

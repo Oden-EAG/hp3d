@@ -92,7 +92,7 @@ subroutine elemBCIerror(Mdle, ErrorH,ErrorE,ErrorV)
 ! H(div) test and trial shape function in reference coordinates
   real(8), dimension(3)                 :: uVeta
 !
-! dot product 
+! dot product
   real(8)                               :: prod
 !
 ! geometry
@@ -170,7 +170,7 @@ subroutine elemBCIerror(Mdle, ErrorH,ErrorE,ErrorV)
 ! loop through element faces
   do if=1,nrf
 !
-!   face node 
+!   face node
     nod = nodesl(nrv+nre+if)
 !
 !   determine if there are any variables are flagged with Dirichlet flags
@@ -183,7 +183,7 @@ subroutine elemBCIerror(Mdle, ErrorH,ErrorE,ErrorV)
     enddo
     if (.not.Dirichlet_node) cycle
 !
-!   get face order to find out quadrature information 
+!   get face order to find out quadrature information
     call face_order(type,if,norder, norder_face)
     INTEGRATION=1   ! overintegrate
     call set_2Dint(face_type(type,if),norder_face, &
@@ -202,11 +202,11 @@ subroutine elemBCIerror(Mdle, ErrorH,ErrorE,ErrorV)
       call shape3DH(type,xi,norder,nedge_orient,nface_orient, &
                     nrdofH,shapH,gradH)
 !
-!     compute element Hcurl shape functions 
+!     compute element Hcurl shape functions
       call shape3DE(type,xi,norder,nedge_orient,nface_orient, &
                     nrdofE,shapE,curlE)
 !
-!     compute element H(div) shape functions 
+!     compute element H(div) shape functions
       call shape3DV(type,xi,norder,nface_orient, &
                     nrdofV,shapV,divV)
 !
@@ -222,7 +222,7 @@ subroutine elemBCIerror(Mdle, ErrorH,ErrorE,ErrorV)
                '              rn,bjac = ',3f8.3,3x,f8.3)
       endif
 !
-!     call GMP routines to evaluate physical coordinates and their 
+!     call GMP routines to evaluate physical coordinates and their
 !     derivatives wrt reference coordinates
       select case(iflag)
       case(5);        call prism(no,eta, x,dxdeta)

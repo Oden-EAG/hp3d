@@ -1,5 +1,5 @@
 !----------------------------------------------------------------------------
-!> Purpose : - evaluate legendre polynomial base 
+!> Purpose : - evaluate legendre polynomial base
 !!
 !! @param[in]  T        - local edge coordinate [0,1]
 !! @param[in]  LegOrder - order of approximation of polynomial base
@@ -19,8 +19,8 @@ subroutine shap1Q_legendre(T,LegOrder,Npoly,Legendre)
   !-------------------------------------------------------------------
   ! subroutine  arguments
   double precision, intent(in) :: T
-  integer,intent(in) :: LegOrder 
-  integer, intent(out) :: Npoly 
+  integer,intent(in) :: LegOrder
+  integer, intent(out) :: Npoly
   double precision,dimension(MAXP),intent(inout) :: Legendre
   !-------------------------------------------------------------------
   ! local variables
@@ -29,13 +29,13 @@ subroutine shap1Q_legendre(T,LegOrder,Npoly,Legendre)
   double precision, dimension(2,3:MAXP), save :: d
   integer :: k, iprint
   logical :: normalization = .TRUE.
-  double precision, dimension(MAXP), save :: norm_constant 
- 
+  double precision, dimension(MAXP), save :: norm_constant
+
   !-------------------------------------------------------------------
 
   iprint=0
-  
-  if (LegOrder < 0) then 
+
+  if (LegOrder < 0) then
      Npoly=0; Legendre=0.d0
      return
   endif
@@ -70,21 +70,21 @@ subroutine shap1Q_legendre(T,LegOrder,Npoly,Legendre)
         enddo
      endif
   endif
-  
+
 
 ! evaluation of legendre polynomials
 
   x = 2.d0*T-1.d0 ! change from T in [0,1] to x in [-1,1]
 
-  if (LegOrder == 0) then 
+  if (LegOrder == 0) then
      Legendre(1)=1.d0
   endif
-  if (LegOrder == 1) then 
+  if (LegOrder == 1) then
      Legendre(1)=1.d0
      Legendre(2)=x
   endif
-  
-  if (LegOrder > 1) then 
+
+  if (LegOrder > 1) then
      Legendre(1)=1.d0
      Legendre(2)=x
 
@@ -102,7 +102,7 @@ subroutine shap1Q_legendre(T,LegOrder,Npoly,Legendre)
      write(*,*)
   endif
 
-  ! normalization of the base 
+  ! normalization of the base
   if (normalization) then
      Legendre(1:Npoly)=Legendre(1:Npoly)*norm_constant(1:Npoly)
   endif

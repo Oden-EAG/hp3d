@@ -13,12 +13,12 @@ c     in:
 c             Mdle     - an element middle node, identified with
 c                        the element
 c     out:
-c             Ndomain  - GMP domain number 
+c             Ndomain  - GMP domain number
 c
-c   required  routines - 
+c   required  routines -
 c
 c----------------------------------------------------------------------
-c 
+c
       subroutine find_domain(Mdle, Ndom)
 c
       use GMP
@@ -36,5 +36,5 @@ c
 c
       end
 
-      
+
 

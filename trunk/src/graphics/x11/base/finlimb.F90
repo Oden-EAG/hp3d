@@ -1,6 +1,6 @@
 !> Purpose : routine finds 'numlev'- levels of solution values
 !! @param[in]  Numlev - number of levels to plot solution values
-!! @param[out] Solev  - limiting values for each level 
+!! @param[out] Solev  - limiting values for each level
 #include "implicit_none.h"
   subroutine finlimb(Numlev, Solev)
     use error
@@ -49,7 +49,7 @@
 
        ! if it is not visible domain hide it
        call find_domain(mdle, ndom)
-       if (NDOMAIN(ndom).eq.0) then 
+       if (NDOMAIN(ndom).eq.0) then
           cycle
        endif
 
@@ -101,7 +101,7 @@
                    call pause
                 endif
 
-                ! update extremes  
+                ! update extremes
                 solmax = max(solmax,val)
                 solmin = min(solmin,val)
              enddo
@@ -132,7 +132,7 @@
     ! use the volume values
     dsol = (solmax-solmin)/float(Numlev)
     Solev(1) = solmin
-    
+
     do i=1,Numlev
        Solev(i+1) = Solev(1) +float(i)*dsol
     enddo

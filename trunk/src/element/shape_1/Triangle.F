@@ -12,7 +12,7 @@ c----------------------------------------------------------------------
 c
 c     latest revision:  - Nov 14, Apr 17
 c
-c     purpose:          - evaluate triangle H1 shape functions and 
+c     purpose:          - evaluate triangle H1 shape functions and
 c                         their gradient
 c
 c     arguments:

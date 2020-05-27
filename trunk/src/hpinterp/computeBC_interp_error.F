@@ -1,16 +1,16 @@
 c--------------------------------------------------------------------
-c                                                                     
+c
 c     routine name      - compute_BC_interp_error
-c                                                                     
-c-------------------------------------------------------------------- 
-c                                                                     
+c
+c--------------------------------------------------------------------
+c
 c     latest revision:  - Mar 17
-c                                                                     
+c
 c     purpose:          - routine returns global BC interpolation
-c                         error for traces of BC data 
-c                         (a verification for interpolating 
+c                         error for traces of BC data
+c                         (a verification for interpolating
 c                          and exact solution routines)
-c                                                                    
+c
 c---------------------------------------------------------------------
 c
       subroutine computeBC_interp_error
@@ -47,12 +47,12 @@ c  ...compute total errors and number of dof
         errorE = errorE + derrorE
         errorV = errorV + derrorV
       enddo
-      errorH = sqrt(errorH) 
+      errorH = sqrt(errorH)
       errorE = sqrt(errorE)
       errorV = sqrt(errorV)
 c
 c  ...compute rate
-      rateH = 0.d0; rateE = 0.d0; rateV = 0.d0 
+      rateH = 0.d0; rateE = 0.d0; rateV = 0.d0
       if (ivis.ne.0) then
         if (errorH.ne.0.d0.and.errorHold.ne.0.d0) then
           rateH = log(errorHold/errorH)/log(2.d0)
@@ -84,7 +84,7 @@ c  ...display the convergence history
  7100   format(' Mesh,      errorH,  rateH,'
      .         '       errorE,  rateE ',
      .         '       errorV,  rateV ')
-        do i=1,ivis     
+        do i=1,ivis
           write(*,7110)i,rwork(1:6,i)
  7110     format(i3,3x,3(e12.5,f8.2,2x))
         enddo

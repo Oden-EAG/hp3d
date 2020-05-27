@@ -1,6 +1,6 @@
 c//////////////////////////////////////////////////////////////////////
 c P. Gatto, Nov 12 : this is a LEGACY routine. Do not use it, unless
-c                    you revise it!      
+c                    you revise it!
 c//////////////////////////////////////////////////////////////////////
 c
 c
@@ -20,7 +20,7 @@ c                        rectangle was not necessarily consistent
 c                        with the information on surfaces
 c                        forming the rectangle
 c
-c   arguments      
+c   arguments
 c     in:
 c                Irec  - rectangle number
 c
@@ -32,7 +32,7 @@ c
 #include "syscom.blk"
 #include "cinout.blk"
 c
-c  ...rectangle surface numbers read from the input file, 
+c  ...rectangle surface numbers read from the input file,
       dimension nsurf(5)
 c
 c  ...surface numbers for an implicit curve
@@ -61,7 +61,7 @@ c
      .          i4)
       endif
 c
-c  ...initiate 
+c  ...initiate
       RECTANGLES(Irec)%Idata(1:5) = 0
       nbij(1:4) = 0
 c
@@ -83,7 +83,7 @@ c  .....use the connectivity info
         if (CURVES(nc)%type.eq.'ImpCir') then
           nsurfc(1:2) = iabs(CURVES(nc)%Idata(1:2))
 c
-c  .......check if the surfaces defining the curve 
+c  .......check if the surfaces defining the curve
 c         coincide with the surfaces defining the rectangle
           do j=1,2
             call locate(nsurfc(j),nsurf,5, nloc(j))
@@ -138,7 +138,7 @@ c  ...determine the compatibility of orientations
       enddo
       if (iprint.eq.1) then
         write(*,7008) nflag
- 7008   format('read_imprec: ORIENTATIONS COMPATIBILITY FLAG = ',i2) 
+ 7008   format('read_imprec: ORIENTATIONS COMPATIBILITY FLAG = ',i2)
         call pause
       endif
       if (nflag.eq.0) then
@@ -157,7 +157,7 @@ c  ...the orientations are compatible
       if (nflag.eq.1) then
         do j=0,3,1
           j1 = i4(i1+j); j2 = i4(i2+j)
-          if (RECTANGLES(Irec)%Idata(1+j1).eq.0) 
+          if (RECTANGLES(Irec)%Idata(1+j1).eq.0)
      .        RECTANGLES(Irec)%Idata(1+j1) = nsurf(1+j2)
         enddo
 c
@@ -165,7 +165,7 @@ c  ...the orientations are incompatible
       else
         do j=0,3,1
           j1 = i4(i1+j); j2 = i4(4+i2-j)
-          if (RECTANGLES(Irec)%Idata(1+j1).eq.0) 
+          if (RECTANGLES(Irec)%Idata(1+j1).eq.0)
      .        RECTANGLES(Irec)%Idata(1+j1) = nsurf(1+j2)
         enddo
       endif
@@ -184,7 +184,7 @@ c  .....use the connectivity info
         if (CURVES(nc)%type.eq.'ImpCir') then
           nsurfc(1:2) = iabs(CURVES(nc)%Idata(1:2))
 c
-c  .......check if the surfaces defining the curve 
+c  .......check if the surfaces defining the curve
 c         coincides= with the surfaces defining the rectangle
           do j=1,2
             call locate(nsurfc(j),nsurf,5, nloc(j))

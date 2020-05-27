@@ -26,7 +26,7 @@
    select case(Type)
    case('mdlp')
       select case(If)
-      case(1,2); 
+      case(1,2);
          Facetype = 'mdlt'
       case(3,4,5)
          Facetype = 'mdlq'
@@ -40,8 +40,8 @@
       case(1)
          Facetype = 'mdlq'
       case(2,3,4,5)
-         Facetype = 'mdlt' 
+         Facetype = 'mdlt'
       end select
    end select
-!   
+!
    end function Facetype

@@ -164,7 +164,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
       endif
 !
       call elem_nodes(mdle, nodesl,norientl)
-!    
+!
 !  ...select appropriate visualization object
       etype = NODES(mdle)%type
 !

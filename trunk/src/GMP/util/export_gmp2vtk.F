@@ -19,7 +19,7 @@ c
 #include "syscom.blk"
 c
 c  ...element nodes and their orientations
-      dimension nvert(4) 
+      dimension nvert(4)
       character(len=64) :: Fname
 c
       nfile = 31
@@ -27,7 +27,7 @@ c
 c  ...open file for writing
       open(unit=nfile, file=Fname, form='formatted')
 c
-c  ...deallocate Idata for all points   
+c  ...deallocate Idata for all points
       do i=1,NRPOINT
         if(associated(POINTS(i)%Idata)) then
           write(*,*)'Idata associated for point = ',i
@@ -45,7 +45,7 @@ c  ...Step 1: loop over tetra and renumber vertices
       do i=1,NRTETRA
         do j=1,4
           nv = TETRAS(i)%VertNo(j)
-c  .......if 1st visit to point          
+c  .......if 1st visit to point
           if (.not.associated(POINTS(nv)%Idata)) then
             nver = nver + 1
             allocate(POINTS(nv)%Idata(1), stat=istat)
@@ -59,7 +59,7 @@ c  .......if 1st visit to point
       enddo
 c
 c  ...Step 2: loop over tetras and write point's coordinates
-      write(nfile,1000) 
+      write(nfile,1000)
  1000 format('# vtk DataFile Version 2.0')
       write(nfile,1001)
  1001 format('hp3d export mesh')
@@ -72,29 +72,29 @@ c  ...Step 2: loop over tetras and write point's coordinates
       do i=1,NRTETRA
         do j=1,4
           nv = TETRAS(i)%VertNo(j)
-c  .......if 1st visit to point          
+c  .......if 1st visit to point
           if (POINTS(nv)%Idata(1).gt.0) then
-c  .........convert coordinates from [m] to [cm]            
+c  .........convert coordinates from [m] to [cm]
             POINTS(nv)%Rdata(1:3) = POINTS(nv)%Rdata(1:3)*100.d0
             write(nfile,7001) POINTS(nv)%Rdata(1:3)
- 7001       format(3(f20.12,2x))     
-c  .........flip sign            
+ 7001       format(3(f20.12,2x))
+c  .........flip sign
             POINTS(nv)%Idata(1) = -POINTS(nv)%Idata(1)
           endif
         enddo
       enddo
 c
-c  ...Step 3: write elements    
+c  ...Step 3: write elements
       write(nfile,1005)NRTETRA,NRTETRA*5
  1005 format('CELLS ',2(i10,2x))
       do i=1,NRTETRA
-c  .....collect vertices        
+c  .....collect vertices
         do j=1,4
           nv = TETRAS(i)%VertNo(j)
           nvert(j) = -POINTS(nv)%Idata(1) - 1
         enddo
         write(nfile,7003) nvert(1:4)
- 7003   format('4 ',4(i10,2x))       
+ 7003   format('4 ',4(i10,2x))
       enddo
       write(nfile,1006)NRTETRA
  1006 format('CELL_TYPES ',i10)
@@ -112,7 +112,7 @@ c  ...Step 4: deallocate Idata
      .      __FILE__,__LINE__)
         endif
       enddo
-c     
-      close(nfile)         
+c
+      close(nfile)
 c
       end subroutine

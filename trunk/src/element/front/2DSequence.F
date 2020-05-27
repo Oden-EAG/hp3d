@@ -35,13 +35,13 @@ c         GradH         - gradients of the shape functions
 c
 c-----------------------------------------------------------------------
 c
-      subroutine shape2H(Type,Xi,Norder,Nedge_orient, 
+      subroutine shape2H(Type,Xi,Norder,Nedge_orient,
      .                                              NrdofH,ShapH,GradH)
 c
       use parameters , only : MAXquadH
 c
       implicit none
-      character(len=4), intent(in)  :: Type      
+      character(len=4), intent(in)  :: Type
       real(8), intent(in ) :: Xi(2)
       integer, intent(in ) :: Norder(5)
       integer, intent(in ) :: Nedge_orient(4)
@@ -74,7 +74,7 @@ c     out:
 c        NrdofH        - number of dof
 c        ShapH         - values of shape functions
 c        GradH         - values of derivatives of the shape functions
-c                        wrt to master element coordinates      
+c                        wrt to master element coordinates
 c
 c----------------------------------------------------------------------
 c
@@ -82,7 +82,7 @@ c
 c
       use parameters , only : MAXquadH
 c
-      implicit none      
+      implicit none
       real(8), intent(in ) :: Xi(2)
       integer, intent(in ) :: Norder(5)
       integer, intent(in ) :: Nedge_orient(4)
@@ -115,7 +115,7 @@ c     out:
 c        NrdofH        - number of dof
 c        ShapH         - values of shape functions
 c        GradH         - values of derivatives of the shape functions
-c                        wrt to master element coordinates       
+c                        wrt to master element coordinates
 c
 c----------------------------------------------------------------------
 c
@@ -123,7 +123,7 @@ c
 c
       use parameters , only : MAXtriaH
 c
-      implicit none      
+      implicit none
       real(8), intent(in ) :: Xi(2)
       integer, intent(in ) :: Norder(4)
       integer, intent(in ) :: Nedge_orient(3)
@@ -162,9 +162,9 @@ c         CurlE         - curl of the shape functions
 c
 c----------------------------------------------------------------------
 c
-      subroutine shape2E(Type,Xi,Norder,Nedge_orient, 
+      subroutine shape2E(Type,Xi,Norder,Nedge_orient,
      .                                              NrdofE,ShapE,CurlE)
-c     
+c
       use parameters , only : MAXquadE
 c
       implicit none
@@ -200,15 +200,15 @@ c       Nedge_orient   - edge orientations
 c     out:
 c       NrdofE         - number of element dof
 c       ShapE          - values of shape functions
-c       CurlE          - curl of the shape functions      
-c     
+c       CurlE          - curl of the shape functions
+c
 c----------------------------------------------------------------------
 c
       subroutine shapeEq(Xi,Norder,Nedge_orient, NrdofE,ShapE,CurlE)
-c     
+c
       use parameters , only : MAXquadE
 c
-      implicit none      
+      implicit none
       real(8), intent(in ) :: Xi(2)
       integer, intent(in ) :: Norder(5)
       integer, intent(in ) :: Nedge_orient(4)
@@ -240,12 +240,12 @@ c       Nedge_orient   - edge orientations
 c     out:
 c       NrdofE         - number of element dof
 c       ShapE          - values of shape functions
-c       CurlE          - curl of the shape functions      
-c     
+c       CurlE          - curl of the shape functions
+c
 c----------------------------------------------------------------------
-c     
+c
       subroutine shapeEt(Xi,Norder,Nedge_orient, NrdofE,ShapE,CurlE)
-c     
+c
       use parameters , only : MAXtriaE
 c
       implicit none

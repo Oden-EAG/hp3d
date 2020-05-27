@@ -1,7 +1,7 @@
 !-----------------------------------------------------------------------------------------
 !> Purpose : routine determines domain number of an initial mesh element using
 !!           the information contained in the ELEMS array (cf. subroutine
-!!           find_domain to determine domain of a refined element).   
+!!           find_domain to determine domain of a refined element).
 !!
 !! @param[in]  N_elem - element number
 !! @param[out] N_dom  - domain number (= 0, if element N_elem does not exits, e.g., N_elem
@@ -24,11 +24,11 @@ subroutine domain_number(N_elem, N_dom)
 ! LOCAL VARIABLES
   integer :: nbln,labn
 !-----------------------------------------------------------------------------------------
-!  
+!
     if (N_elem.eq.0) then
       N_dom=0 ; return
     endif
-!    
+!
     call decode(ELEMS(N_elem)%GMPblock, nbln,labn)
     select case(labn)
     case(1) ; N_dom=PRISMS(  nbln)%Domain
@@ -38,7 +38,7 @@ subroutine domain_number(N_elem, N_dom)
     case default
       write(*,*)'domain_number: invalid block type!'
       write(*,7000)N_elem,labn
- 7000 format(' N_elem,labn = ',i8,2x,i1)     
+ 7000 format(' N_elem,labn = ',i8,2x,i1)
       call result
       stop
     endselect

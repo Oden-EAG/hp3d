@@ -1,9 +1,9 @@
-2                       !excitation -1)Plane Wave 2)Electric dipole 3)Magnetic dipole 
-1.0                     1.0         !Amplitude of current and length of dipole 
-0.0 0.0 0.              !Position vector of the center of dipole 
-0.0 0.0 1.0             !unit vector along orientation of dipole 
-0.0 180.0                     !Thetastart, Thetaend 
-0.0 360.0                     !Phimin,Phimax 
+2                       !excitation -1)Plane Wave 2)Electric dipole 3)Magnetic dipole
+1.0                     1.0         !Amplitude of current and length of dipole
+0.0 0.0 0.              !Position vector of the center of dipole
+0.0 0.0 1.0             !unit vector along orientation of dipole
+0.0 180.0                     !Thetastart, Thetaend
+0.0 360.0                     !Phimin,Phimax
 181 361                                         !Ntheta, Nphi
 4                                                        !n_l: number of layers
 1.0 0.0                                                        !eps surrounding medium
@@ -11,7 +11,7 @@
 8.977000000000000 -1.83256180944437
 5.462000000000000 -1.01938809606060
 41.41000000000000 -17.3100247424711
-1.0 -0.0          !mu surrounding medium        
+1.0 -0.0          !mu surrounding medium
 1.0 -0.0                  !mu layer 1(2F18.15)
 1.0 -0.0                  !mu layer 2(2F18.15)
 1.0 -0.0                  !mu layer 3(2F18.15)
@@ -24,13 +24,13 @@
 
 
  !!!!! dipole excitation case
-2             !excitation -1)Plane Wave 2)Electric dipole 3)Magnetic dipole 
-1.0           1.0         !Amplitude of current and length of dipole 
-0.0 0.0 -0.5  !Position vector of the center of dipole 
-0.0 0.0 1.0   !unit vector along orientation of dipole 
+2             !excitation -1)Plane Wave 2)Electric dipole 3)Magnetic dipole
+1.0           1.0         !Amplitude of current and length of dipole
+0.0 0.0 -0.5  !Position vector of the center of dipole
+0.0 0.0 1.0   !unit vector along orientation of dipole
 
 
 !!!!! plane wave excitation case
-1                !excitation -1)Plane Wave 2)Electric dipole 3)Magnetic dipole 
-180.0 0.0 1.0 0.0            ! plane wave direction&polarization        
+1                !excitation -1)Plane Wave 2)Electric dipole 3)Magnetic dipole
+180.0 0.0 1.0 0.0            ! plane wave direction&polarization
 

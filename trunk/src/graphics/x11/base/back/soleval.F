@@ -15,7 +15,7 @@ c         Mdle         - element (middle node) number
 c         Xi           - master element coordinates of a point
 c         Nedge_orient - edge orientation
 c         Nface_orient - face orientation
-c         Norder       - order of approximation 
+c         Norder       - order of approximation
 c         Xnod         - geometry dof
 c         ZdofH,ZdofE,ZdofV,ZdofQ - H1,H(curl),H(div) and L2 dof
 c         Nflag        = 0  coordinates only
@@ -36,7 +36,7 @@ c----------------------------------------------------------------------
 c
       subroutine soleval(Mdle,Xi,
      .                   Nedge_orient,Nface_orient,Norder,
-     .                   Xnod,ZdofH,ZdofE,ZdofV,ZdofQ,Nflag, 
+     .                   Xnod,ZdofH,ZdofE,ZdofV,ZdofQ,Nflag,
      .                   X,Dxdxi,
      .                   ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ)
 c
@@ -60,17 +60,17 @@ c
      .          shapV(3,MAXbrickV),divV(MAXbrickV),
      .          shapQ(MAXbrickQ)
       dimension zgradH_dxi(3),dxidx(3,3),zsolExi(3),zcurlExi(3)
-c      
+c
 c----------------------------------------------------------------------
 c
       iprint=0
       type=NODES(Mdle)%type
-c     
+c
 c  ...evaluate shape functions at the point
       call shape3H(Type,Xi,Norder,Nedge_orient,Nface_orient,
      .             nrdofH,shapH,gradH)
 c
-c  ...printing      
+c  ...printing
       if (iprint.eq.1) then
         write(*,*) 'soleval: Xnod = '
         do k=1,nrdofH
@@ -93,7 +93,7 @@ c  ...printing
       endif
 c
       select case(EXGEOM)
-c  ...parametric element      
+c  ...parametric element
       case(0)
         X(1:3)=0.d0 ; Dxdxi(1:3,1:3)=0.d0
         do k=1,nrdofH
@@ -102,14 +102,14 @@ c  ...parametric element
             Dxdxi(1:3,i) = Dxdxi(1:3,i) + Xnod(1:3,k)*gradH(i,k)
           enddo
         enddo
-c  ...exact geometry element        
+c  ...exact geometry element
       case(1)
         call exact_geom(Mdle,Xi, X,Dxdxi)
       end select
 c
 c  ...if geometry only, return
       if (Nflag.eq.0) return
-c      
+c
       call geom(Dxdxi, dxidx,rjac,iflag)
       if (iflag.ne.0) then
         write(*,*) 'soleval: iflag = ',iflag
@@ -128,16 +128,16 @@ c
         ZsolH(i)        = ZERO
         zgradH_dxi(1:3) = ZERO
         do k=1,nrdofH
-          ZsolH(i) = ZsolH(i) 
+          ZsolH(i) = ZsolH(i)
      .             + ZdofH(i,k)*shapH(k)
-          zgradH_dxi(1:3) = zgradH_dxi(1:3) 
+          zgradH_dxi(1:3) = zgradH_dxi(1:3)
      .                    + ZdofH(i,k)*gradH(1:3,k)
         enddo
 c
         do ivar=1,3
-          ZgradH(i,ivar) = zgradH_dxi(1)*dxidx(1,ivar) 
-     .                   + zgradH_dxi(2)*dxidx(2,ivar)  
-     .                   + zgradH_dxi(3)*dxidx(3,ivar) 
+          ZgradH(i,ivar) = zgradH_dxi(1)*dxidx(1,ivar)
+     .                   + zgradH_dxi(2)*dxidx(2,ivar)
+     .                   + zgradH_dxi(3)*dxidx(3,ivar)
         enddo
 c
       enddo
@@ -180,7 +180,7 @@ c
 c  ...evaluate shape functions at the point
       call shape3E(type,Xi,Norder,Nedge_orient,Nface_orient,
      .             nrdofE,shapE,curlE)
-c 
+c
 c  ...evaluate the H(curl) solution and its curl
       ZsolE(1:3,1:MAXEQNE)  = ZERO
       ZcurlE(1:3,1:MAXEQNE) = ZERO
@@ -191,15 +191,15 @@ c
         ZsolExi(1:3)  = ZERO
         zcurlExi(1:3) = ZERO
         do k=1,nrdofE
-          zsolExi(1:3)  = ZsolExi(1:3) 
+          zsolExi(1:3)  = ZsolExi(1:3)
      .                  + ZdofE(i,k)*shapE(1:3,k)
-          zcurlExi(1:3) = zcurlExi(1:3) 
+          zcurlExi(1:3) = zcurlExi(1:3)
      .                  + ZdofE(i,k)*curlE(1:3,k)
         enddo
 c
 c  .....Piola transform
-        ZsolE(1:3,i)  = ( zsolExi(1)*dxidx(1,1:3) 
-     .                +   zsolExi(2)*dxidx(2,1:3)  
+        ZsolE(1:3,i)  = ( zsolExi(1)*dxidx(1,1:3)
+     .                +   zsolExi(2)*dxidx(2,1:3)
      .                +   zsolExi(3)*dxidx(3,1:3) )
         ZcurlE(1:3,i) = ( dxdxi(1:3,1)*zcurlExi(1)
      .                +   dxdxi(1:3,2)*zcurlExi(2)
@@ -207,8 +207,8 @@ c  .....Piola transform
 c
       enddo
 
-      iprint =0 
-      
+      iprint =0
+
       if (iprint.eq.2) then
         write(*,7001) Mdle,Xi(1:3)
         write(*,7002) X(1:3)

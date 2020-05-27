@@ -12,7 +12,7 @@ c==========================================================
       nfather = NODES(nel)%father
 
       ndummy = 0
-   
+
       do while(nfather.gt.0)
          nelanc = nfather
          nfather = NODES(nfather)%father

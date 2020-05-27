@@ -8,10 +8,10 @@
 !! @param[out] Dxdt    - derivatives of the physical coordinates wrt
 !!                       to the local curve coordinate
 !!
-!> @revision Nov 12      
+!> @revision Nov 12
 !----------------------------------------------------------------------
 subroutine curveK(No,T,Norient, X,Dxdt)
-!      
+!
       use control , only : GEOM_TOL
 !
       implicit none
@@ -25,7 +25,7 @@ subroutine curveK(No,T,Norient, X,Dxdt)
 !
       iprint=0
 !
-!  ...check input 
+!  ...check input
       if ((T.lt.GEOM_TOL).or.(T.gt.1.d0-GEOM_TOL)) then
         write(*,7001) No,T
  7001   format(' curveK: No,T = ',i5,2x,e12.5)
@@ -55,14 +55,14 @@ end subroutine curveK
 !! @param[out] Dxdt    - derivatives of the physical coordinates wrt
 !!                       to the local curve coordinate
 !!
-!> @revision Nov 12      
+!> @revision Nov 12
 !----------------------------------------------------------------------
 subroutine curveB(No,T,Norient, X,Dxdt)
-!    
+!
       use element_data , only : EDGE_L2G
       use GMP          , only : POINTS , CURVES
       use control      , only : GEOM_TOL
-!      
+!
       implicit none
       integer,             intent(in ) :: No,Norient
       real(8),             intent(in ) :: T
@@ -80,7 +80,7 @@ subroutine curveB(No,T,Norient, X,Dxdt)
 !
 !  ...collect curve endpoints wrt LOCAL coordinate T
       do i=1,2
-        iv=EDGE_L2G(i,Norient) ; np=CURVES(No)%EndPoNo(iv) 
+        iv=EDGE_L2G(i,Norient) ; np=CURVES(No)%EndPoNo(iv)
         xv(1:3,i)=POINTS(np)%Rdata(1:3)
 !
 !  @@@@ CHECK CONSISTENCY @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -94,9 +94,9 @@ subroutine curveB(No,T,Norient, X,Dxdt)
             write(*,7001) No,i,smax
  7001       format(' curveB: No,i,smax = ',i5,i2,e12.5)
             write(*,7002) x(1:3)
- 7002       format(' x  = ',3(e12.5,2x))          
+ 7002       format(' x  = ',3(e12.5,2x))
             write(*,7003) xv(1:3,i)
- 7003       format(' xv = ',3(e12.5,2x))          
+ 7003       format(' xv = ',3(e12.5,2x))
           endif
         endif
 !  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -125,10 +125,10 @@ end subroutine curveB
 !! @param[out] Dxdt    - derivatives of the physical coordinates wrt
 !!                       to the local curve coordinate
 !!
-!> @revision Nov 12      
+!> @revision Nov 12
 !----------------------------------------------------------------------
 subroutine trianK(No,T,Norient, X,Dxdt)
-!      
+!
       implicit none
       integer,               intent(in ) :: No,Norient
       real(8),dimension(2  ),intent(in ) :: T
@@ -139,7 +139,7 @@ subroutine trianK(No,T,Norient, X,Dxdt)
       real(8) :: dblend(2)
       integer :: i
       integer :: iprint,iprint_trianB
-!      
+!
       common /ctrianK/ iprint
       common /ctrianB/ iprint_trianB
 !----------------------------------------------------------------------
@@ -151,7 +151,7 @@ subroutine trianK(No,T,Norient, X,Dxdt)
       dblend(1) = -T(1)*T(2) + (1.d0 - T(1) - T(2))*T(2)
       dblend(2) = -T(1)*T(2) + (1.d0 - T(1) - T(2))*T(1)
 !
-!  ...evaluate the bubble 
+!  ...evaluate the bubble
       call trianB(No,T,Norient, X,Dxdt)
 !
 !  ...divide by the blending function
@@ -163,7 +163,7 @@ subroutine trianK(No,T,Norient, X,Dxdt)
 end subroutine trianK
 !
 !
-!      
+!
 !----------------------------------------------------------------------
 !> Purpose : triangle bubble parameterization
 !!
@@ -174,14 +174,14 @@ end subroutine trianK
 !! @param[out] Dxdt    - derivatives of the physical coordinates wrt
 !!                       to the local curve coordinate
 !!
-!> @revision Nov 12      
+!> @revision Nov 12
 !----------------------------------------------------------------------
 subroutine trianB(No,T,Norient, X,Dxdt)
-!  
+!
       use control , only : GEOM_TOL
-      use GMP    
+      use GMP
       use element_data
-!      
+!
       implicit none
       integer,               intent(in ) :: No,Norient
       real(8),dimension(2  ),intent(in ) :: T
@@ -202,7 +202,7 @@ subroutine trianB(No,T,Norient, X,Dxdt)
       integer :: i,j,ivar,np,nc,norientc,iv1,iv2
 !
 !     consistency of parameterizations:
-!     0 - no checking 
+!     0 - no checking
 !     1 - checking at vertices
 !     2 - checking at vertices and edges
       integer :: icheck
@@ -214,7 +214,7 @@ subroutine trianB(No,T,Norient, X,Dxdt)
 !
       iprint=0
       icheck=2
-!      
+!
  10   continue
 !
 !  ...if bubble is not needed, return
@@ -247,34 +247,34 @@ subroutine trianB(No,T,Norient, X,Dxdt)
 !  .......compute parameterization at vertex
           eta_aux(1:2)=TRIAN_COORD(1:2,i)
           call trian(No,eta_aux, x_aux,dxdeta_aux)
-!  .......compare to vertex coordinates          
+!  .......compare to vertex coordinates
           smax=0.d0
           do ivar=1,3
-            smax=max(smax,abs(x_aux(ivar) - xv(ivar,i))) 
-          enddo 
-          if (smax.gt.GEOM_TOL) then 
-            write(*,7001) No,i,smax   
- 7001       format(' trianB: No,i,smax = ',i5,i2,e12.5)  
+            smax=max(smax,abs(x_aux(ivar) - xv(ivar,i)))
+          enddo
+          if (smax.gt.GEOM_TOL) then
+            write(*,7001) No,i,smax
+ 7001       format(' trianB: No,i,smax = ',i5,i2,e12.5)
             write(*,7002) x_aux(1:3)
- 7002       format(' x  = ',3(e12.5,2x))          
+ 7002       format(' x  = ',3(e12.5,2x))
             write(*,7003) xv(1:3,i)
- 7003       format(' xv = ',3(e12.5,2x))          
+ 7003       format(' xv = ',3(e12.5,2x))
             call pause
-            iprint=1 ; goto 10    
-          endif       
+            iprint=1 ; goto 10
+          endif
         endif
 !  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 !
-!  .....subtract linear interpolant        
+!  .....subtract linear interpolant
         X(1:3)=X(1:3) - xv(1:3,i)*shapH(i)
         do j=1,2
           dxdeta(1:3,j)=dxdeta(1:3,j) - xv(1:3,i)*dshapH(j,i)
         enddo
 
-!  ...end of loop through vertices        
+!  ...end of loop through vertices
       enddo
-!      
-!  ...printing statement      
+!
+!  ...printing statement
       if (iprint.eq.1) then
         write(*,*) 'trianB: AFTER VERTICES'
         do ivar=1,3
@@ -283,10 +283,10 @@ subroutine trianB(No,T,Norient, X,Dxdt)
         enddo
       endif
 !
-!----------------------------------------------------------------------      
+!----------------------------------------------------------------------
 !  STEP 2 : subtract edge contributions                               |
-!----------------------------------------------------------------------      
-!  ...loop through edges      
+!----------------------------------------------------------------------
+!  ...loop through edges
       do i=1,3
         nc=TRIANGLES(No)%EdgeNo(i) ; norientc=0
         if (nc.lt.0) then ; nc=-nc ; norientc=1 ; endif
@@ -297,7 +297,7 @@ subroutine trianB(No,T,Norient, X,Dxdt)
 !  .....get edge coordinate
         iv1=TRIAN_EDGE_TO_VERT(1,i) ; iv2=TRIAN_EDGE_TO_VERT(2,i)
         call proj_t2e(iv1,iv2,shapH(1:3),dshapH(1:2,1:3), te,dtedeta)
-!        
+!
 !  .....no contribution needed at endpoints
         if ((te.lt.GEOM_TOL).or.(te.gt.(1.d0-GEOM_TOL))) cycle
 !
@@ -308,37 +308,37 @@ subroutine trianB(No,T,Norient, X,Dxdt)
 !
 !  .......(2) curve bubble from triangle parameterization
           call edge_param('tria',i,te, eta_aux,detadte)
-          call trian(No,eta_aux, x_aux,dxdeta_aux)   
+          call trian(No,eta_aux, x_aux,dxdeta_aux)
           dxdte(1:3)=dxdeta_aux(1:3,1)*detadte(1) + &
                      dxdeta_aux(1:3,2)*detadte(2)
           x_aux(1:3)=x_aux(1:3) - ( xv(1:3,iv1)*(1.d0-te) +   &
                                     xv(1:3,iv2)*te          )
-          dxdte(1:3)=dxdte(1:3) - (xv(1:3,iv2) -  xv(1:3,iv1)) 
+          dxdte(1:3)=dxdte(1:3) - (xv(1:3,iv2) -  xv(1:3,iv1))
 !
 !  .......compare (1) & (2)
           smax=0.d0 ; dmax=0.d0
-          do ivar=1,3                        
-            smax=max(smax,abs(x_aux(ivar) - xc(ivar)))  
-            dmax=max(dmax,abs(dxdte(ivar) - dxcdte(ivar))) 
-          enddo                                           
+          do ivar=1,3
+            smax=max(smax,abs(x_aux(ivar) - xc(ivar)))
+            dmax=max(dmax,abs(dxdte(ivar) - dxcdte(ivar)))
+          enddo
           if ((smax.gt.GEOM_TOL).or.(dmax.gt.GEOM_TOL)) then
-            write(*,7004) No,i,smax,dmax                     
- 7004       format(' trianB: No,i,smax,dmax = ',i5,i2,2e12.5)   
-            iprint=1 ; goto 10    
+            write(*,7004) No,i,smax,dmax
+ 7004       format(' trianB: No,i,smax,dmax = ',i5,i2,2e12.5)
+            iprint=1 ; goto 10
           endif
-        endif 
+        endif
 !  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 !
 !  .....construct blending function
         blend      = shapH(iv1)*shapH(iv2)
         dblend(1:2)=dshapH(1:2,iv1)*shapH(iv2) + shapH(iv1)*dshapH(1:2,iv2)
 
-!  .....compute curve kernel        
+!  .....compute curve kernel
         call curveK(nc,te,norientc, xc,dxcdte)
         dxcdeta(1:3,1)=dxcdte(1:3)*dtedeta(1)
         dxcdeta(1:3,2)=dxcdte(1:3)*dtedeta(2)
 
-!  .....subtract edge bubble        
+!  .....subtract edge bubble
         X(1:3) = X(1:3) - xc(1:3)*blend
         do j=1,2
           dxdeta(1:3,j) = dxdeta(1:3,j) - dxcdeta(1:3,j)* blend    &
@@ -348,15 +348,15 @@ subroutine trianB(No,T,Norient, X,Dxdt)
 !  .....printing
         if (iprint.eq.1) then
           write(*,8001) i
- 8001     format(' trianB: AFTER EDGE ',i1)         
+ 8001     format(' trianB: AFTER EDGE ',i1)
           do ivar=1,3
             write(*,8000) ivar,X(ivar),dxdeta(ivar,1:2)
           enddo
           call pause
         endif
-!  ...end of loop through edges        
+!  ...end of loop through edges
       enddo
-!      
+!
 !  ...account for the orientation
       do j=1,2
         Dxdt(1:3,j) = dxdeta(1:3,1)*detadt(1,j) + &
@@ -375,7 +375,7 @@ subroutine trianB(No,T,Norient, X,Dxdt)
 !
 !
 end subroutine trianB
-!      
+!
 !
 !
 !----------------------------------------------------------------------
@@ -388,14 +388,14 @@ end subroutine trianB
 !! @param[out] Dxdt    - derivatives of the physical coordinates wrt
 !!                       to the local curve coordinate
 !!
-!> @revision Nov 12      
+!> @revision Nov 12
 !----------------------------------------------------------------------
 subroutine rectaB(No,T,Norient, X,Dxdt)
-!  
+!
       use control , only : GEOM_TOL
-      use GMP    
+      use GMP
       use element_data
-!      
+!
       implicit none
       integer,               intent(in ) :: No,Norient
       real(8),dimension(2  ),intent(in ) :: T
@@ -416,7 +416,7 @@ subroutine rectaB(No,T,Norient, X,Dxdt)
       integer :: i,j,ivar,np,nc,norientc,iv1,iv2
 !
 !     consistency of parameterizations:
-!     0 - no checking 
+!     0 - no checking
 !     1 - checking at vertices
 !     2 - checking at vertices and edges
       integer :: icheck
@@ -426,7 +426,7 @@ subroutine rectaB(No,T,Norient, X,Dxdt)
 !
       iprint=0
       icheck=2
-!      
+!
  10   continue
 !
 !  ...if bubble is not needed, return
@@ -447,45 +447,45 @@ subroutine rectaB(No,T,Norient, X,Dxdt)
 !----------------------------------------------------------------------
 !  STEP 1 : subtract bilinear interpolant                             |
 !----------------------------------------------------------------------
-!  ...loop over vertices      
+!  ...loop over vertices
       do i=1,4
-!      
+!
 !  .....get rectangle vertex
         np=RECTANGLES(No)%VertNo(i) ; xv(1:3,i)=POINTS(np)%Rdata(1:3)
-! 
+!
 !  @@@@ CHECK CONSISTENCY @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
         if (icheck.ge.1) then
 !  .......compute parameterization at vertex
           eta_aux(1:2)=QUADR_COORD(1:2,i)
           call recta(No,eta_aux, x_aux,dxdeta_aux)
-!  .......compare to vertex coordinates          
+!  .......compare to vertex coordinates
           smax=0.d0
           do ivar=1,3
-            smax=max(smax,abs(x_aux(ivar) - xv(ivar,i))) 
-          enddo 
-          if (smax.gt.GEOM_TOL) then 
-            write(*,7001) No,i,smax   
- 7001       format(' rectaB: No,i,smax = ',i5,i2,e12.5)  
+            smax=max(smax,abs(x_aux(ivar) - xv(ivar,i)))
+          enddo
+          if (smax.gt.GEOM_TOL) then
+            write(*,7001) No,i,smax
+ 7001       format(' rectaB: No,i,smax = ',i5,i2,e12.5)
             write(*,7002) x_aux(1:3)
- 7002       format(' x  = ',3(e12.5,2x))          
+ 7002       format(' x  = ',3(e12.5,2x))
             write(*,7003) xv(1:3,i)
- 7003       format(' xv = ',3(e12.5,2x))          
+ 7003       format(' xv = ',3(e12.5,2x))
             call pause
-            iprint=1 ; goto 10    
-          endif       
+            iprint=1 ; goto 10
+          endif
         endif
 !  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-!        
-!  .....subtract bilinear interpolant        
+!
+!  .....subtract bilinear interpolant
         X(1:3)=X(1:3) - xv(1:3,i)*shapH(i)
         do j=1,2
           dxdeta(1:3,j)=dxdeta(1:3,j) - xv(1:3,i)*dshapH(j,i)
         enddo
-!        
-!  ...end of loop through vertices        
+!
+!  ...end of loop through vertices
       enddo
-!      
-!  ...printing statement      
+!
+!  ...printing statement
       if (iprint.eq.1) then
         write(*,*) 'rectaB: AFTER VERTICES'
         do ivar=1,3
@@ -494,24 +494,24 @@ subroutine rectaB(No,T,Norient, X,Dxdt)
         enddo
       endif
 !
-!----------------------------------------------------------------------      
+!----------------------------------------------------------------------
 !  STEP 2 : subtract edge contributions                               |
-!----------------------------------------------------------------------      
-!  ...loop over edges      
+!----------------------------------------------------------------------
+!  ...loop over edges
       do i=1,4
         nc=RECTANGLES(No)%EdgeNo(i) ; norientc=0
         if (nc.lt.0) then ;  nc=-nc ; norientc=1 ; endif
-!                
+!
 !  .....no contribution needed for straight segmentes
         if (CURVES(nc)%Type.eq.'Seglin') cycle
-!        
+!
 !  .....get edge coordinate
         iv1=QUADR_EDGE_TO_VERT(1,i) ; iv2=QUADR_EDGE_TO_VERT(2,i)
         call proj_r2e(iv1,iv2,shapH,dshapH, te,dtedeta)
 !
 !  .....no contribution needed at endpoints
         if ((te.lt.GEOM_TOL).or.(te.gt.(1.d0-GEOM_TOL))) cycle
-!        
+!
 !  @@@@ CHECK CONSISTENCY @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
         if (icheck.ge.2) then
 !  .......(1) curve bubble from curve parameterization
@@ -519,41 +519,41 @@ subroutine rectaB(No,T,Norient, X,Dxdt)
 !
 !  .......(2) curve bubble from triangle parameterization
           call edge_param('quad',i,te, eta_aux,detadte)
-          call recta(No,eta_aux, x_aux,dxdeta_aux)   
+          call recta(No,eta_aux, x_aux,dxdeta_aux)
           dxdte(1:3)=dxdeta_aux(1:3,1)*detadte(1) + &
                      dxdeta_aux(1:3,2)*detadte(2)
           x_aux(1:3)=x_aux(1:3) - ( xv(1:3,iv1)*(1.d0-te) +   &
                                     xv(1:3,iv2)*te          )
-          dxdte(1:3)=dxdte(1:3) - (xv(1:3,iv2) -  xv(1:3,iv1)) 
+          dxdte(1:3)=dxdte(1:3) - (xv(1:3,iv2) -  xv(1:3,iv1))
 !
 !  .......compare (1) & (2)
           smax=0.d0 ; dmax=0.d0
-          do ivar=1,3                        
-            smax=max(smax,abs(x_aux(ivar) - xc(ivar)))  
-            dmax=max(dmax,abs(dxdte(ivar) - dxcdte(ivar))) 
-          enddo                                           
+          do ivar=1,3
+            smax=max(smax,abs(x_aux(ivar) - xc(ivar)))
+            dmax=max(dmax,abs(dxdte(ivar) - dxcdte(ivar)))
+          enddo
           if ((smax.gt.GEOM_TOL).or.(dmax.gt.GEOM_TOL)) then
-            write(*,7004) No,i,smax,dmax                     
- 7004       format(' rectaB: No,i,smax,dmax = ',i5,i2,2e12.5)   
-            iprint=1 ; goto 10    
+            write(*,7004) No,i,smax,dmax
+ 7004       format(' rectaB: No,i,smax,dmax = ',i5,i2,2e12.5)
+            iprint=1 ; goto 10
           endif
-        endif 
+        endif
 !  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 !
 !  .....construct blending function
         select case(i)
-        case(1) ; blend=1.d0 - eta(2) ; dblend(1:2)=(/ 0.d0, -1.d0/) 
+        case(1) ; blend=1.d0 - eta(2) ; dblend(1:2)=(/ 0.d0, -1.d0/)
         case(2) ; blend=eta(1)        ; dblend(1:2)=(/ 1.d0,  0.d0/)
         case(3) ; blend=eta(2)        ; dblend(1:2)=(/ 0.d0,  1.d0/)
         case(4) ; blend=1.d0 - eta(1) ; dblend(1:2)=(/-1.d0,  0.d0/)
         endselect
-!        
-!  .....compute curve bubble        
+!
+!  .....compute curve bubble
         call curveB(nc,te,norientc, xc,dxcdte)
         dxcdeta(1:3,1)=dxcdte(1:3)*dtedeta(1)
         dxcdeta(1:3,2)=dxcdte(1:3)*dtedeta(2)
-!        
-!  .....subtract edge bubble        
+!
+!  .....subtract edge bubble
         X(1:3) = X(1:3) - xc(1:3)*blend
         do j=1,2
           dxdeta(1:3,j) = dxdeta(1:3,j) - dxcdeta(1:3,j)* blend    &
@@ -563,21 +563,21 @@ subroutine rectaB(No,T,Norient, X,Dxdt)
 !  .....printing
         if (iprint.eq.1) then
           write(*,8001) i
- 8001     format(' rectaB: AFTER EDGE ',i1)         
+ 8001     format(' rectaB: AFTER EDGE ',i1)
           do ivar=1,3
             write(*,8000) ivar,X(ivar),dxdeta(ivar,1:2)
           enddo
           call pause
         endif
-!  ...loop over edges        
+!  ...loop over edges
       enddo
-!      
+!
 !  ...account for the orientation
       do j=1,2
         Dxdt(1:3,j) = dxdeta(1:3,1)*detadt(1,j) + &
                       dxdeta(1:3,2)*detadt(2,j)
       enddo
-!      
+!
 !  ...printing
       if (iprint.eq.1) then
         write(*,*) 'rectaB: FINAL'
@@ -593,14 +593,14 @@ end subroutine rectaB
 
 
 subroutine rectaB_back(No,T,Norient, X,Dxdt)
-!  
+!
       use control
-      use GMP    
+      use GMP
       use element_data
 #include "syscom.blk"
 !cc      common /ctrian_PTITri/ iprint_PTITri
 !cc      common /ctrianB/ iprint
-!      
+!
       dimension T(2),X(3),Dxdt(3,2)
 !
 !  ...derivatives wrt rectangle coordinates
@@ -618,7 +618,7 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
 !  ...edge projection, blending function
       dimension dseds(2), dblend(2)
 !
-      data dsdt / 1.d0,  0.d0,  0.d0,  1.d0, & 
+      data dsdt / 1.d0,  0.d0,  0.d0,  1.d0, &
                   0.d0, -1.d0,  1.d0,  0.d0, &
                  -1.d0,  0.d0,  0.d0, -1.d0, &
                   0.d0,  1.d0, -1.d0,  0.d0, &
@@ -627,8 +627,8 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
                   0.d0, -1.d0, -1.d0,  0.d0, &
                   1.d0,  0.d0,  0.d0, -1.d0 /
 !
-!  ...coordinates of master triangle vertices      
-      data sv /0.d0,0.d0, 1.d0,0.d0, 1.d0,1.d0, 0.d0,1.d0/         
+!  ...coordinates of master triangle vertices
+      data sv /0.d0,0.d0, 1.d0,0.d0, 1.d0,1.d0, 0.d0,1.d0/
 !
 !  ...work space
       dimension sw(2),dswdse(2), &
@@ -642,7 +642,7 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
 !cc        iprint=0
 !cc      endif
       iprint=0
-!      
+!
  10   continue
 !
 !  ...rectangle bubbles are needed only for 'PTIRec'
@@ -669,9 +669,9 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
         write(*,7000)Norient
  7000   format(' rectaB: UNKNOWN ORIENTATION = ',i1)
         stop
-      endselect 
-!      
-!  ...printing statement      
+      endselect
+!
+!  ...printing statement
       if (iprint .eq. 1) then
         write(*,*) '---------------------------------------------------'
         nss = RECTANGLES(No)%Idata(1)
@@ -704,7 +704,7 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
  7011     format(e12.5,2x,2e12.5)
         enddo
       endif
-!      
+!
 !  ...get the vertex coordinates
       do iv=1,4
         nv = RECTANGLES(No)%VertNo(iv)
@@ -715,13 +715,13 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
 !     S U B T R A C T    V E R T E X    I N T E R P O L A T I O N
 !----------------------------------------------------------------------
 !
-!  ...loop over vertices      
+!  ...loop over vertices
       do iv=1,4
-!      
-!======================================================================     
+!
+!======================================================================
 !  check consistency of parametrizations btw vertices an 'recta'      |
-!  routine.                                                           |      
-!----------------------------------------------------------------------      
+!  routine.                                                           |
+!----------------------------------------------------------------------
 !  .....call 'recta' routine at master triangle vertices              !
         call recta(No,sv(1:2,iv), xw,dxwds)                           !
         smax = 0.d0                                                   !
@@ -729,7 +729,7 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
         do ivar=1,3                                                   !
           smax = max(smax,abs(xw(ivar) - xv(ivar,iv)))                !
         enddo                                                         !
-!  .....check whether GEOM_TOL is exceeded                            ! 
+!  .....check whether GEOM_TOL is exceeded                            !
         if (smax .gt. GEOM_TOL) then                                  !
           write(*,7001) No,iv,smax                                    !
  7001     format(' rectaB: No,iv,smax = ',i5,i2,e12.5)                 !
@@ -739,18 +739,18 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
           iprint=1                                                    !
           goto 10                                                     !
         endif                                                         !
-!======================================================================       
-!        
-!  .....subtract bilinear interpolant        
+!======================================================================
+!
+!  .....subtract bilinear interpolant
         X(1:3) = X(1:3) - xv(1:3,iv)*shapH(iv)
         do is=1,2
           dxds(1:3,is) = dxds(1:3,is) - xv(1:3,iv)*dshapH(is,iv)
         enddo
-!        
-!  ...loop over vertices        
+!
+!  ...loop over vertices
       enddo
-!      
-!  ...printing statement      
+!
+!  ...printing statement
       if (iprint.eq.1) then
         write(*,*) 'rectaB: AFTER VERTICES  X,dxds = '
         do ivar=1,3
@@ -758,18 +758,18 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
         enddo
       endif
 !
-!----------------------------------------------------------------------      
-!     S U B T R A C T    E D G E    B U B B L E S 
-!----------------------------------------------------------------------      
+!----------------------------------------------------------------------
+!     S U B T R A C T    E D G E    B U B B L E S
+!----------------------------------------------------------------------
 !
-!  ...loop over edges      
+!  ...loop over edges
       do ie=1,4
 !  .....get the curve number
         nc = RECTANGLES(No)%EdgeNo(ie) ; norientc=0
         if (nc.lt.0) then
           nc = -nc ;  norientc = 1
         endif
-!  .....skip if straight segment        
+!  .....skip if straight segment
         if (CURVES(nc)%Type.eq.'Seglin') cycle
 !  .....get the edge vertices specifying the local edge orientation
         iv1 = QUADR_EDGE_TO_VERT(1,ie) ;  iv2 = QUADR_EDGE_TO_VERT(2,ie)
@@ -778,16 +778,16 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
         if (iprint.eq.1) then
           write(*,9001) ie,se
  9001     format(' rectaB: ie, se = ',I2,' ; ',E12.5)
-        endif 
-!  .....edge contributions (bubbles) are null at the end points        
+        endif
+!  .....edge contributions (bubbles) are null at the end points
         if ((se.lt.GEOM_TOL).or.(se.gt.(1.d0-GEOM_TOL))) cycle
         if (iprint.eq.1) then
           write(*,7003) ie,nc,CURVES(nc)%Type
  7003     format(' rectaB: ie,nc,Type = ',i2,2x,i8,2x,a5)
           call print_GMP
         endif
-!        
-!======================================================================        
+!
+!======================================================================
 !  check consistency of curve and triangle parametrizations by        |
 !  comparing edge bubble with triangle bubble.                        |
 !----------------------------------------------------------------------
@@ -807,7 +807,7 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
                 - (xv(1:3,iv1)*(1.d0 - se) + xv(1:3,iv2)*se)          !
         dxwdse(1:3) = dxwdse(1:3)                            &         !
                 - (xv(1:3,iv2) -  xv(1:3,iv1))                        !
-!----------------------------------------------------------------------        
+!----------------------------------------------------------------------
 !       COMPARE                                                       !
         smax = 0.d0;  dmax = 0.d0                                     !
         do ivar = 1, 3                                                !
@@ -827,19 +827,19 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
 !cc          go to 10                                                    !
         endif                                                         !
 !======================================================================
-!        
+!
 !  .....construct blending function
         select case(ie)
-        case(1); blend = 1.d0 - s(2) ; dblend(1:2) = (/ 0.d0, -1.d0/) 
+        case(1); blend = 1.d0 - s(2) ; dblend(1:2) = (/ 0.d0, -1.d0/)
         case(2); blend = s(1)        ; dblend(1:2) = (/ 1.d0,  0.d0/)
         case(3); blend = s(2)        ; dblend(1:2) = (/ 0.d0,  1.d0/)
         case(4); blend = 1.d0 - s(1) ; dblend(1:2) = (/-1.d0,  0.d0/)
         endselect
-!        
-!  .....compute curve bubble        
+!
+!  .....compute curve bubble
         call curveB(nc,se,norientc, xc,dxcdse)
-!        
-!  .....subtract edge bubble        
+!
+!  .....subtract edge bubble
         X(1:3) = X(1:3) - xc(1:3)*blend
         do is = 1, 2
           dxds(1:3,is) = dxds(1:3,is)  &
@@ -847,7 +847,7 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
                        - xc(1:3)*dblend(is)
         enddo
 !
-!  .....printing        
+!  .....printing
         if (iprint .eq. 1) then
           write(*,*)'rectaB: X,dxds AFTER EDGE = ',ie
           do ivar = 1, 3
@@ -855,11 +855,11 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
           enddo
           call pause
         endif
-!        
-!  ...loop over edges        
+!
+!  ...loop over edges
       enddo
-!      
-!  ...printing statement      
+!
+!  ...printing statement
       if (iprint.eq.1) then
         write(*,*) 'rectaB: AFTER EDGES  X,dxds = '
         do ivar=1,3
@@ -868,7 +868,7 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
         call pause
       endif
 !
-!---------------------------------------------------------------------      
+!---------------------------------------------------------------------
 !  ...account for the orientation
       do is=1,2
         Dxdt(1:3,is) = dxds(1:3,1)*dsdt(1,is,Norient) &

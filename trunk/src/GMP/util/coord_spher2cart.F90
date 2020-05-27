@@ -1,7 +1,7 @@
 !--------------------------------------------------------------------------
 !> @Purpose : convert spherical coordinates to Cartasian coordinates
 !
-!! Spherical coordinates: 
+!! Spherical coordinates:
 !!   r     : radius
 !!   theta : angle from positive z axis
 !!   phi   : angle from positive x axis

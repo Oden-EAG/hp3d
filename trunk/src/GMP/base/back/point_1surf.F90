@@ -18,28 +18,28 @@ subroutine point_1surf(Np)
 ! FUNCTIONS
   integer :: my_mod
 !-------------------------------------------------------------------------
-! printing flag (0,1,2)  
+! printing flag (0,1,2)
 #define I_PRINT 0
 !
 #if I_PRINT >= 1
     write(*,*)'point_1surf: projecting on 1 surface Np = ',Np
-#endif    
+#endif
 ! ..store point surface number and extra planes surface number
     surfs(1) = POINT_TYPE(2,Np)
     surfs(2) = NRSURFS - 1
-    surfs(3) = NRSURFS    
+    surfs(3) = NRSURFS
 #if I_PRINT >= 2
     write(*,*)'point_1surf: surface numbers = ',surfs(1:3)
-#endif    
+#endif
 ! ..compute normal
     call surf(surfs(1),POINTS(Np)%Rdata(1:3), VOID_1,GRAD(1:3,1))
     call normalize(GRAD(1:3,1))
-! ..rotate normal by 90 deg    
+! ..rotate normal by 90 deg
     do i = 1, 3
       i1 = my_mod(i + 1,3)
       i2 = my_mod(i + 2,3)
-! ....choose direction of rotation based on NORMAL(i)                    
-      if (GRAD(i,1) .ne. 0d0) then 
+! ....choose direction of rotation based on NORMAL(i)
+      if (GRAD(i,1) .ne. 0d0) then
         GRAD(i1,2) =  GRAD(i,1)
         GRAD(i,2)  = -GRAD(i1,1)
         GRAD(i2,2) = 0.d0
@@ -63,6 +63,6 @@ subroutine point_1surf(Np)
 #endif
 #if I_PRINT >= 1
     write(*,*)'point_1surf: done!'
-#endif    
+#endif
 !
 end subroutine point_1surf

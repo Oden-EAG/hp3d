@@ -256,7 +256,7 @@ c          CurlE        - cur lof the shape functions
 c
 c-----------------------------------------------------------------------
 c
-      subroutine shape3DETet(X,Nord,NoriE,NoriF,Nsize, 
+      subroutine shape3DETet(X,Nord,NoriE,NoriF,Nsize,
      .                                              NrdofE,ShapE,CurlE)
 c
       implicit none

@@ -1,6 +1,6 @@
 !----------------------------------------------------------------------
 !> Purpose - routine sets interactively dof for nodes
-!!      
+!!
 !> @data Oct 14
 !----------------------------------------------------------------------
 ! REMARK : routine should eventually be moved to TEST_PROJ, since it is
@@ -14,7 +14,7 @@ subroutine set_nodal_dof
 !
       implicit none
       integer :: inod,ndofH,ndofE,ndofV,ndofQ,ispace,nod,idof
-!      
+!
 !----------------------------------------------------------------------
 !
 !     1. Print header
@@ -24,13 +24,13 @@ subroutine set_nodal_dof
 !     loop over active nodes and print info
       do inod=1,NRNODS
 !
-!       skip inactive nodes      
+!       skip inactive nodes
         if (Is_inactive(inod))  cycle
 !
 !       find number of dofs associated to node
-        call find_ndof(inod, ndofH,ndofE,ndofV,ndofQ)        
+        call find_ndof(inod, ndofH,ndofE,ndofV,ndofQ)
 !
-!       print        
+!       print
         write(*,1000) inod,NODES(inod)%type,ndofH,ndofE,ndofV,ndofQ
  1000   format(' node = ',i3,' ; type = ',a4,' ; dof H,E,V,Q = ',4(i3,' ; '))
 !
@@ -48,11 +48,11 @@ subroutine set_nodal_dof
 !
 !     loop over active nodes
       do inod=1,NRNODS
-!      
+!
 !       skip inactive nodes
         if (Is_inactive(inod)) cycle
         if (.not. associated(NODES(inod)%dof)) cycle
-!               
+!
 !       reset all dofs to zero
         if (associated(NODES(inod)%dof%zdofH)) NODES(inod)%dof%zdofH=ZERO
         if (associated(NODES(inod)%dof%zdofE)) NODES(inod)%dof%zdofE=ZERO
@@ -62,7 +62,7 @@ subroutine set_nodal_dof
 !       node of interest
         if (inod == nod) then
 !
-!         select space 
+!         select space
           select case(ispace)
 !         H1
           case(1) ; NODES(inod)%dof%zdofH(:,idof)=ZONE
@@ -74,7 +74,7 @@ subroutine set_nodal_dof
           case(4) ; NODES(inod)%dof%zdofQ(:,idof)=ZONE
           endselect
         endif
-!        
+!
       enddo
 !
 !

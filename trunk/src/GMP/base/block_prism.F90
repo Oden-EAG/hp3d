@@ -17,7 +17,7 @@ subroutine prism(No,Eta, X,Dxdeta)
       real(8),dimension(3  ),intent(in ) :: Eta
       real(8),dimension(3  ),intent(out) :: X
       real(8),dimension(3,3),intent(out) :: Dxdeta
-!      
+!
 !  ...vertex coordinates
       real(8),dimension(3,6) :: xv
 !  ...vertex shape functions
@@ -28,17 +28,17 @@ subroutine prism(No,Eta, X,Dxdeta)
 !------------------------------------------------------------------------------------
 !
       iprint=0
-!      
+!
 ! ....printing statement
       if (iprint.eq.1) then
         write(*,7001) No,PRISMS(No)%Type
  7001   format('prism: No,PRISMS(No)%Type = ',i8,2x,a10)
         call pause
-      endif   
-!      
+      endif
+!
 ! ....select prism type
       select case(PRISMS(No)%Type)
-!      
+!
 !------------------------------------------------------------------------------------
 !     L I N E A R
 !------------------------------------------------------------------------------------
@@ -57,13 +57,13 @@ subroutine prism(No,Eta, X,Dxdeta)
             Dxdeta(1:3,i) = Dxdeta(1:3,i) + xv(1:3,k)*dvshape(i,k)
           enddo
         enddo
-!        
+!
 !------------------------------------------------------------------------------------
-!     T R A N S F I N I T E    I N T E R P O L A T I O N  
+!     T R A N S F I N I T E    I N T E R P O L A T I O N
 !------------------------------------------------------------------------------------
       case('TIprism')
         call prism_TI(No,Eta, X,Dxdeta)
-!        
+!
       case default
         write(*,7002) PRISMS(No)%Type
  7002   format('prism: unknown prism type = ',a10)
@@ -95,8 +95,8 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
       common /cprism_TI/ iprint
 !
       dimension Eta(3),X(3),Dxdeta(3,3)
-! 
-!  ...vertex shape functions     
+!
+!  ...vertex shape functions
       dimension shapH(6),dshapH(3,6)
 !  ...2D and 1D barycentric coordinates
       dimension vshapt(3),dvshapt(2,3), vshap(2),dvshap(2)
@@ -107,7 +107,7 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
 !  ...face coordinates
       dimension tf(2),dtfdeta(2,3)
 !
-!  ...edge kernels 
+!  ...edge kernels
       dimension xe(3),dxedt(3)
 !
 !  ...face kernels
@@ -130,7 +130,7 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
         write(*,7001) No,Eta(1:3)
  7001   format(' prism_TI: No,Eta = ',i5,2x,3e12.5)
       endif
-!      
+!
 !  ...affine coordinates for the triangular faces
       vshapt(1) = 1.d0 - Eta(1) - Eta(2)
       dvshapt(1,1) = -1.d0 ; dvshapt(2,1) = -1.d0
@@ -182,7 +182,7 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
       do j=1,2
         do i=1,3
           ie=ie+1
-!          
+!
 !  .......get curve
           nc=PRISMS(No)%EdgeNo(ie) ; norient=0
           if (nc.lt.0) then
@@ -196,7 +196,7 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
 !  .......project Eta onto the edge
           call proj_t2e(iv1,iv2,vshapt,dvshapt, te,dtedeta(1:2))
           dtedeta(3)=0
-!          
+!
           if ((abs(te).lt.GEOM_TOL).or.(abs(1.d0-te).lt.GEOM_TOL)) cycle
 !
           if (iprint.eq.1) then
@@ -242,18 +242,18 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
 !  ...loop over vertical edges
       do i=1,3
         ie=ie+1
-!        
+!
 !  .....get curve
         nc=PRISMS(No)%EdgeNo(ie) ; norient=0
         if (nc.lt.0) then
           nc = -nc; norient=1
         endif
         if (CURVES(nc)%Type.eq.'Seglin') cycle
-!        
+!
 ! ......simple projection
         te=Eta(3)
         dtedeta(1:2)=0.d0 ; dtedeta(3)=1.d0
-!        
+!
 !  .....if at endpoint cycle
         if ((abs(te).lt.GEOM_TOL).or.(abs(1.d0-te).lt.GEOM_TOL)) cycle
 !
@@ -275,7 +275,7 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
                            + dxedt(1:3)*dtedeta(ivar)*blend    &
                            + xe(1:3)*dblend(ivar)
         enddo
-!  .....printing        
+!  .....printing
         if (iprint.eq.1) then
           write(*,*) 'prism_TI: AFTER EDGE ie = ',ie
           do ivar=1,3
@@ -293,14 +293,14 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
       ifig=0
 !  ...loop over horizontal faces
       do i=1,2
-!      
+!
         ifig=ifig+1
         call decode(PRISMS(No)%FigNo(ifig), nt,norient)
-!  .....skip if triangle type does not apply        
+!  .....skip if triangle type does not apply
         if ((TRIANGLES(nt)%Type.eq.'TransTri') .or.              &
             (TRIANGLES(nt)%Type.eq.'PlaneTri')      ) cycle
 !
-!  .....printing            
+!  .....printing
         if (iprint.eq.1) then
           write(*,7013) ifig,nt,TRIANGLES(nt)%Type
  7013     format(' prism_TI: ifig,nt,Type = ',i2,i8,2x,a10)
@@ -325,7 +325,7 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
                            + (dxfdtf(1:3,1)*dtfdeta(1,ivar)          &
                              +dxfdtf(1:3,2)*dtfdeta(2,ivar))*blend   &
                            + xf(1:3)*dblend(ivar)
-        enddo       
+        enddo
 !  .....printing
         if (iprint.eq.1) then
           write(*,*)'prism_TI: AFTER FACE ifig = ',ifig
@@ -341,12 +341,12 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
 !------------------------------------------------------------------------
 !     V E R T I C A L    F A C E    B U B B L E S
 !------------------------------------------------------------------------
-!  ...loop over vertical faces 
+!  ...loop over vertical faces
       do i=1,3
-!      
+!
         ifig=ifig+1
         call decode(PRISMS(No)%FigNo(ifig), nr,norient)
-!  .....skip if rectangle type does not apply        
+!  .....skip if rectangle type does not apply
         if ((RECTANGLES(nr)%Type.eq.'TraQua') .or.              &
             (RECTANGLES(nr)%Type.eq.'BilQua')      ) cycle
 !
@@ -359,13 +359,13 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
         iv1=TRIAN_EDGE_TO_VERT(1,i) ; iv2=TRIAN_EDGE_TO_VERT(2,i)
 !  .....project Eta onto face
         call proj_t2e(iv1,iv2,vshapt,dvshapt, tf(1),dtfdeta(1,1:2))
-        dtfdeta(1,3) = 0.d0 
+        dtfdeta(1,3) = 0.d0
         tf(2)=Eta(3) ; dtfdeta(2,1:3) = (/0.d0,0.d0,1.d0/)
 !  .....if point is on the edge, then the bubble contribution is zero
         if ((abs(tf(2)     ).lt.GEOM_TOL) .or.             &
             (abs(tf(1)     ).lt.GEOM_TOL) .or.             &
             (abs(1.d0-tf(2)).lt.GEOM_TOL) .or.             &
-            (abs(1.d0-tf(1)).lt.GEOM_TOL)      ) cycle 
+            (abs(1.d0-tf(1)).lt.GEOM_TOL)      ) cycle
 !  .....compute the face bubble
         call rectaB(nr,tf,norient, xf,dxfdtf)
 
@@ -375,13 +375,13 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
         fact=(1.d0-tf(1))*tf(1) ; dfact(1)=1.d0-2.d0*tf(1) ; dfact(2) = 0.d0
         do ivar=1,2
           dxfdtf(1:3,ivar) = (dxfdtf(1:3,ivar)*fact - xf(1:3)*dfact(ivar))/fact**2
-        enddo        
+        enddo
         xf(1:3) = xf(1:3)/fact
 !  .....blending function
-         blend      =  vshapt(    iv1)* vshapt(    iv2) 
+         blend      =  vshapt(    iv1)* vshapt(    iv2)
         dblend(1:2) = dvshapt(1:2,iv1)* vshapt(    iv2) +     &
                        vshapt(    iv1)*dvshapt(1:2,iv2)
-        dblend(3)   = 0.d0  
+        dblend(3)   = 0.d0
 !  .....add face contribution
 
 !!!        write(*,*)'X before = ',X
@@ -395,7 +395,7 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
                            + (dxfdtf(1:3,1)*dtfdeta(1,ivar)          &
                              +dxfdtf(1:3,2)*dtfdeta(2,ivar))*blend   &
                            + xf(1:3)*dblend(ivar)
-        enddo       
+        enddo
 !  .....printing
         if (iprint.eq.1) then
           write(*,*)'prism_TI: AFTER FACE ifig = ',ifig
@@ -407,6 +407,6 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
 !
 !  ...loop over vertical faces
       enddo
-!      
+!
 !
 end subroutine prism_TI

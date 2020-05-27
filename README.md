@@ -9,10 +9,10 @@ for Complex Multiphysics Applications
 2. Access the main directory: `cd par_hp3d/trunk`
 
 ## Compiling the library
-1. Create `m_options` file in `par_hp3d/trunk/`:  
-Use the default `m_options` file in `par_hp3d/trunk/` or copy one of the existing `m_options` files from `par_hp3d/trunk/m_options_files/` into `par_hp3d/trunk/`.  
+1. Create `m_options` file in `par_hp3d/trunk/`:
+Use the default `m_options` file in `par_hp3d/trunk/` or copy one of the existing `m_options` files from `par_hp3d/trunk/m_options_files/` into `par_hp3d/trunk/`.
 For example: `cp m_options_files/m_options_TACC_intel18 m_options`
-2. Modify `m_options` file to set the correct path to the main directory:  
+2. Modify `m_options` file to set the correct path to the main directory:
 Set the `HP3D_BASE_PATH` to the path of the `par_hp3d/trunk/`
 3. To compile the library, type `make` in `par_hp3d/trunk/`. **Before compiling**, you **must** link to the external libraries and set compiler options by modifying the `m_options` file as described below.
 
@@ -74,4 +74,4 @@ And, optionally,
 ... in development
 
 ## Support
-Contact: ``stefan@ices.utexas.edu``, ``leszek@ices.utexas.edu``
+Contact: ``stefan@oden.utexas.edu``, ``leszek@oden.utexas.edu``

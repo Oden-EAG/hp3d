@@ -284,9 +284,9 @@ c
         Newp = 1
       case('medg','mdlt','mdln','mdld')
         Newp = NODES(Nod)%order+1
-      case('mdlq','mdlp')     
+      case('mdlq','mdlp')
         Newp = NODES(Nod)%order+11
-      case('mdlb')     
+      case('mdlb')
         Newp = NODES(Nod)%order+111
       end select
 c

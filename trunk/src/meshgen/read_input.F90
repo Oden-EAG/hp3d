@@ -39,7 +39,7 @@ subroutine read_input(Fp)
   call alloc_physics
   !
   !  ...read in the physics attributes, the corresponding discretization
-  !     type and number of components, compute the number of entries in 
+  !     type and number of components, compute the number of entries in
   !     index and the total number of different components
   NRHVAR=0; NREVAR=0; NRVVAR=0; NRQVAR=0
   NRINDEX=0
@@ -57,19 +57,19 @@ subroutine read_input(Fp)
   !
      call locate_char(DTYPE(i),type_array,4, loc(i))
      select case(DTYPE(i))
-        !  .....H^1        
+        !  .....H^1
      case('contin')
         ADRES(i) = NRHVAR
         NRHVAR = NRHVAR + NR_COMP(i)
-        !  .....H(curl)          
+        !  .....H(curl)
      case('tangen')
         ADRES(i) = NREVAR
         NREVAR = NREVAR + NR_COMP(i)
-        !  .....H(div)          
+        !  .....H(div)
      case('normal')
         ADRES(i) = NRVVAR
         NRVVAR = NRVVAR + NR_COMP(i)
-        !  .....L^2          
+        !  .....L^2
      case('discon')
         ADRES(i) = NRQVAR
         NRQVAR = NRQVAR + NR_COMP(i)
@@ -128,7 +128,7 @@ IF (.NOT. QUIET_MODE) write(*,*)''
      enddo
      if (iprint.eq.1) then
        write(*,9998)i,NREQNH(i),NREQNE(i),NREQNV(i),NREQNQ(i)
-9998   format(' Icase,NREQNH,NREQNE,NREQNV,NREQNQ = ',5(i2,2x))       
+9998   format(' Icase,NREQNH,NREQNE,NREQNV,NREQNQ = ',5(i2,2x))
      endif
   enddo
 

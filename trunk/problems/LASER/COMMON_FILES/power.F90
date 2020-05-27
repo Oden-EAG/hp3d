@@ -531,7 +531,7 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
                DiffPower(i) = DiffPower(i) + modeNorm       ! false name (calc norm)
                CorePower(i) = CorePower(i) + real(modeCoef) ! false name (calc coef_r)
                CladPower(i) = CladPower(i) + imag(modeCoef) ! false name (calc coef_r)
-               
+
             endif
             Power(i) = Power(i) + abs(facePower)
          endif

@@ -2,7 +2,7 @@
 subroutine flatten_trian2(Nt)
 !
       use GMP , only : TRIANGLES
-!      
+!
       implicit none
       integer,intent(in)   :: Nt
       real(8),dimension(3) :: temp,v1,v2,v3

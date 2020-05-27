@@ -1,14 +1,14 @@
 !------------------------------------------------------------------------
-!> Purpose : routine evaluates the geometry H_0^1 interpolation error. 
+!> Purpose : routine evaluates the geometry H_0^1 interpolation error.
 !!           Refer to hp book, vol. 2, page 103, formula 5.4.
 !!
-!! @param[out] Err  
+!! @param[out] Err
 !!
 !! @revision Nov 12
 !------------------------------------------------------------------------
 subroutine geom_interp_error(Err)
 !
-      use data_structure3D , only : NRELES, NODES 
+      use data_structure3D , only : NRELES, NODES
       use parameters       , only : MAXbrickH
 !
       implicit none
@@ -32,9 +32,9 @@ subroutine geom_interp_error(Err)
 !
       iprint=0
 !
-!  ...initialize global quantities  
+!  ...initialize global quantities
       Err=0.d0
-!      
+!
 !  ...loop over active elements
       mdle=0
       do iel=1,NRELES
@@ -49,33 +49,33 @@ subroutine geom_interp_error(Err)
         endif
       enddo
       Err=sqrt(Err)
-!  
+!
 !  ...number of geometry dof, namely number of H1 dof for a single component
       call find_nrdof(nrgdof,nvoid,nvoid,nvoid)
-!  
-      err_rate=0.d0 
+!
+      err_rate=0.d0
 !
 !  ...if not 1st visit, compute rate
       if (ivis.gt.0) then
         if (nrgdof.gt.nrgdof_save) then
           if (Err.gt.0.d0) then
             err_rate = log(err_save/Err)/log(float(nrgdof_save)/nrgdof)
-      endif ; endif ; endif      
+      endif ; endif ; endif
 !
 !  ...save error and number of geometry dofs
       err_save=Err ; nrgdof_save=nrgdof
-!      
+!
 !  ...raise visitation flag
       ivis=ivis+1
-!     
+!
 !  ...store
       rwork(ivis,1)=Err
       rwork(ivis,2)=err_rate
       iwork(ivis,1)=nrgdof
 !
-!  ...printing      
+!  ...printing
       write(*,*)'-- Geometry Interp. Error Report --'
-      do i=1,ivis     
+      do i=1,ivis
         write(*,9999)i,iwork(i,1),rwork(i,1:2)
 9999    format(' i,gdofs,err,rate = ',i2,2x,i6,2x,e12.5,2x,f9.6)
       enddo
@@ -92,12 +92,12 @@ end subroutine geom_interp_error
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : element H01-interpolation error^2    
+!> Purpose : element H01-interpolation error^2
 !!
-!! @param[in ] Mdle - an element middle node number 
+!! @param[in ] Mdle - an element middle node number
 !! @param[out] Derr - the square of the error
 !!
-!! @revision Nov 12     
+!! @revision Nov 12
 !----------------------------------------------------------------------
 subroutine  geom_interp_error_elem(Mdle, Derr)
 !
@@ -107,7 +107,7 @@ subroutine  geom_interp_error_elem(Mdle, Derr)
       implicit none
       integer,intent(in ) :: Mdle
       real*8, intent(out) :: Derr
-!      
+!
       character(len=4) :: etype
       integer,dimension(12) :: nedge_orient
       integer,dimension( 6) :: nface_orient
@@ -127,31 +127,31 @@ subroutine  geom_interp_error_elem(Mdle, Derr)
 !----------------------------------------------------------------------
 !
       iprint=0
-!     
+!
       etype=NODES(Mdle)%type
 !
 !  ...element order of approximation, orientations, gdof's
       call find_order( Mdle, norder)
       call find_orient(Mdle, nedge_orient,nface_orient)
       call nodcor(     Mdle, xnod)
-!     
+!
 !  ...Gauss integration points and weights
       call set_3Dint(etype,norder, nint,xiloc,wxi)
 !
 !  ...initialize
       Derr=0.d0
-!      
+!
 !  ...loop through integration points
       do l=1,nint
 !
 !  .....integration point and weight
         xi(1:3)=xiloc(1:3,l) ; wa=wxi(l)
-!        
+!
 !  .....shape functions
         call shape3H(etype,xi,norder,nedge_orient,nface_orient, nrdof,shapH,dshapH)
 !
 !  .....ISOPARAMETRIC MAP : x_hp = x_hp(xi)
-        x_hp(1:3)=0.d0 ; dx_hpdxi(1:3,1:3)=0.d0 
+        x_hp(1:3)=0.d0 ; dx_hpdxi(1:3,1:3)=0.d0
         do k=1,nrdof
           x_hp(1:3) = x_hp(1:3) + xnod(1:3,k)*shapH(k)
           do i=1,3
@@ -160,7 +160,7 @@ subroutine  geom_interp_error_elem(Mdle, Derr)
         enddo
 !
 !  .....EXACT GEOMETRY MAP : x_ex = x_ex(xi)
-        call exact_geom(mdle,xi, x_ex,dx_exdxi) 
+        call exact_geom(mdle,xi, x_ex,dx_exdxi)
         call geom(dx_exdxi, dxidx_ex,rjac,iflag)
 !
 !  .....dx_hp / dx_ex = dx_hp / dxi * dxi / dx_ex
@@ -182,14 +182,14 @@ subroutine  geom_interp_error_elem(Mdle, Derr)
             Derr = Derr + (del(i,j)-dx_hpdx_ex(i,j))**2*weight
           enddo
         enddo
-!     
+!
 !  ...end of loop through integration points
       enddo
-!      
+!
 !  ...printing
       if (iprint.eq.1) then
         write(*,7000)Mdle,etype
- 7000   format(' Mdle,etype,Derr = ',i8,2x,a4,2x,e12.5)       
+ 7000   format(' Mdle,etype,Derr = ',i8,2x,a4,2x,e12.5)
       endif
 !
 !

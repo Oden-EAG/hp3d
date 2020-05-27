@@ -1,6 +1,6 @@
 c//////////////////////////////////////////////////////////////////////
 c P. Gatto, Nov 12 : this is a LEGACY routine. Do not use it, unless
-c                    you revise it!      
+c                    you revise it!
 c//////////////////////////////////////////////////////////////////////
 c
 c
@@ -75,7 +75,7 @@ ccc      imod(j,mod) = j-(j-1)/mod*mod
       data iprint/0/
 c
 c------------------------------------------------------------------------
-c       
+c
       if ((RECTANGLES(No)%Type.ne.'HermRec').or.(NDIM.ne.3)) then
         write(*,7000)
  7000   format('recta_HermRec: WRONG CALL')
@@ -194,7 +194,7 @@ c
 c-----------------------------------------------------------------------
 c
       if (iprint.eq.1) then
-        write(*,7003) 
+        write(*,7003)
  7003   format('recta_HermRec: VERTEX DATA = ')
         do j=1,2
         do i=1,2
@@ -220,12 +220,12 @@ c  ...vertex contributions (notice negative signs!)
      .                  - av(1:3,i,j)*vHshap1(2+i)*vHshap2(j)
      .                  - bv(1:3,i,j)*vHshap1(i)  *vHshap2(2+j)
      .                  - dv(1:3,i,j)*vHshap1(2+i)*vHshap2(2+j)
-        Dxdeta(1:3,1) = Dxdeta(1:3,1) 
+        Dxdeta(1:3,1) = Dxdeta(1:3,1)
      .                  - xv(1:3,i,j)*dvHshap1(i)  *vHshap2(j)
      .                  - av(1:3,i,j)*dvHshap1(2+i)*vHshap2(j)
      .                  - bv(1:3,i,j)*dvHshap1(i)  *vHshap2(2+j)
      .                  - dv(1:3,i,j)*dvHshap1(2+i)*vHshap2(2+j)
-        Dxdeta(1:3,2) = Dxdeta(1:3,2) 
+        Dxdeta(1:3,2) = Dxdeta(1:3,2)
      .                  - xv(1:3,i,j)*vHshap1(i)  *dvHshap2(j)
      .                  - av(1:3,i,j)*vHshap1(2+i)*dvHshap2(j)
      .                  - bv(1:3,i,j)*vHshap1(i)  *dvHshap2(2+j)
@@ -254,13 +254,13 @@ c  ...edge contributions
           gdof(1:3,3) = dv(1:3,1,1); gdof(1:3,4) = dv(1:3,2,1)
 c
 c  .......dof for component gendf...
-          call get_gcomp(gdof(1:3,1),gdof(1:3,3), 
-     .         rndof(1:3,1,1),rndof(1:3,3,1), 
-     .         xedof(1:3,3,1),xedof(1:3,5,1),  
+          call get_gcomp(gdof(1:3,1),gdof(1:3,3),
+     .         rndof(1:3,1,1),rndof(1:3,3,1),
+     .         xedof(1:3,3,1),xedof(1:3,5,1),
      .         gendf_dof(1),gendf_dof(3),gdf_dof(1),gdf_dof(3))
-          call get_gcomp(gdof(1:3,2),gdof(1:3,4), 
-     .         rndof(1:3,2,1),rndof(1:3,4,1), 
-     .         xedof(1:3,4,1),xedof(1:3,6,1),  
+          call get_gcomp(gdof(1:3,2),gdof(1:3,4),
+     .         rndof(1:3,2,1),rndof(1:3,4,1),
+     .         xedof(1:3,4,1),xedof(1:3,6,1),
      .         gendf_dof(2),gendf_dof(4),gdf_dof(2),gdf_dof(4))
           it=1; in=2
         case(2)
@@ -409,5 +409,5 @@ c  ...end of loop through edges
         call pause
       endif
 c
-c     
+c
       end

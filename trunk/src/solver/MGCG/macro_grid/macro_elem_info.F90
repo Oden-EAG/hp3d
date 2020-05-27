@@ -12,8 +12,8 @@
 !   arguments :
 !     in:
 !             MdleC    - middle node of a coarse element
-!     out:     
-!             nrdof    - number of condensed element dof 
+!     out:
+!             nrdof    - number of condensed element dof
 !         nrnod_macro  - number of nodes
 !           nod_macro  - node list
 !         ndofmH_macro - the corresponding number of H1 dof
@@ -30,7 +30,7 @@
    use stc,              ONLY: stc_get_nrdof
 !
    implicit none
-!   
+!
 !-----------------------------------------------------------------------
 !
    integer, intent(in)   :: Igrid, MdleC, Nrnod_macro
@@ -47,10 +47,10 @@
                            ndofmE(MAXNODM),ndofmV(MAXNODM), ndofmQ(MAXNODM)
    character(len=4)     :: type
    integer, allocatable :: nvisitH(:),nvisitE(:), nvisitV(:), nvisit(:)
-!   
+!
    integer              :: nrdofs(NR_PHYSA)
    integer              :: nrdof_H,  nrdof_E,  nrdof_V
-   integer              :: nrdof_Hb, nrdof_Eb, nrdof_Vb 
+   integer              :: nrdof_Hb, nrdof_Eb, nrdof_Vb
    integer              :: mdle, imdle, nrdofc
    integer              :: nrnodm, nrdofm, nrdof_mdl
    complex*16           :: zvoid(1)
@@ -82,26 +82,26 @@
       call celem_mg(-1,-1,mdle,1,nrdofs,nrdofm,nrdofc,nodm,ndofmH, &
                     ndofmE,ndofmV,ndofmQ,nrnodm, zvoid,zvoid)
 !
-!  ...fill in the lists for macro element nodes      
+!  ...fill in the lists for macro element nodes
       do i = 1,nrnodm ! no need to check the mdle node
          nod = nodm(i)
          if (nvisit(nod) .gt. 0) cycle
 !     ...find its coarse master
          call find_master(Igrid,nod, master)
-!     ...check if the the type of the master node 
+!     ...check if the the type of the master node
          type = NODES(master)%type
          select case(type)
          case('mdlb','mdln','mdlp','mdld')
          case default
-!        ...update the macro nod counter            
-            inod = inod + 1 
-!        ...fill in the lists            
+!        ...update the macro nod counter
+            inod = inod + 1
+!        ...fill in the lists
             nod_macro(inod) = nod
             ndofmH_macro(inod) = ndofmH(i)
             ndofmE_macro(inod) = ndofmE(i)
             ndofmV_macro(inod) = ndofmV(i)
-!            
-!        ...raise the visitation flag            
+!
+!        ...raise the visitation flag
             nvisit(nod) = 1
          end select
       enddo
@@ -113,7 +113,7 @@
 
 !     ...find its coarse master
          call find_master(Igrid,nod, master)
-!     ...check if the the type of the master node 
+!     ...check if the the type of the master node
          type = NODES(master)%type
          select case(type)
          case('mdlb','mdln','mdlp','mdld')
@@ -135,7 +135,7 @@
          if (nvisitE(nod).ge.0) cycle
 !     ...find its coarse master
          call find_master(Igrid,nod, master)
-!     ...check if the the type of the master node 
+!     ...check if the the type of the master node
          type = NODES(master)%type
          select case(type)
          case('mdlb','mdln','mdlp','mdld')
@@ -150,14 +150,14 @@
             nrdof_E = nrdof_E + ndofmE(i)
          end select
       enddo
-! 
+!
 !  ...H(div) dof
       do i = 1,nrnodm
          nod = nodm(i)
          if (nvisitV(nod).ge.0) cycle
 !     ...find its coarse master
          call find_master(Igrid,nod, master)
-!     ...check if the the type of the master node 
+!     ...check if the the type of the master node
          type = NODES(master)%type
          select case(type)
          case('mdlb','mdln','mdlp','mdld')
@@ -182,11 +182,11 @@
 !
    Nrdof = nrdof_H + nrdof_E + nrdof_V
    Nrdofb = nrdof_Hb + nrdof_Eb + nrdof_Vb + nrdof_mdl
-!   
+!
    call assembly_end_par
    deallocate(nvisitH,nvisitE,nvisitV, nvisit)
-! 
-! 
+!
+!
    end subroutine macro_elem_info
 
 

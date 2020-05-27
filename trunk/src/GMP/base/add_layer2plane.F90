@@ -5,7 +5,7 @@ subroutine add_layer2plane(N_plane,Nr_bound,Ns_bound,N_layers,Thickness,N_domain
 !
 ! PURPOSE: routine adds N_layers prismatic layers to plane N_plane
 !
-! ARGUMENTS: 
+! ARGUMENTS:
 !     in:
 !            N_plane     - plane number (in GMP data structure)
 !            Nr_bound    - number of bounding surfaces
@@ -18,7 +18,7 @@ subroutine add_layer2plane(N_plane,Nr_bound,Ns_bound,N_layers,Thickness,N_domain
 !
 ! REMARKS:
 !   1. plane needs to be given in 'VecPt' form and normal must point outward
-!   2. for newly created POINTS, CURVES, TRIANGLES and PRISM, routine generates 
+!   2. for newly created POINTS, CURVES, TRIANGLES and PRISM, routine generates
 !      following connectivities:
 !
 !        POINTS%Type            = 'Regular'
@@ -29,10 +29,10 @@ subroutine add_layer2plane(N_plane,Nr_bound,Ns_bound,N_layers,Thickness,N_domain
 !
 !        TRIANGLES%Type         = 'PTITri'
 !                 %VertNo       = vertex numbers
-!                 %Idata(1)     = surface number 
+!                 %Idata(1)     = surface number
 !
 !        RECTANGLES%Type        = 'BilQua','PTIRec'
-!                  %VertNo(1:3) = vertex numbers 
+!                  %VertNo(1:3) = vertex numbers
 !                  %Idata(1)    = surface number
 !
 !        PRISMS%Type            = 'TIprism'
@@ -44,11 +44,11 @@ subroutine add_layer2plane(N_plane,Nr_bound,Ns_bound,N_layers,Thickness,N_domain
   use control
   use GMP
 !-----------------------------------------------------------------------------------------------
-  IMPLICIT NONE      
+  IMPLICIT NONE
 !-----------------------------------------------------------------------------------------------
 ! PARAMETER
   integer, parameter :: max_layers = 16
-!-----------------------------------------------------------------------------------------------  
+!-----------------------------------------------------------------------------------------------
 ! DUMMY ARGUMENTS
   integer,                       intent(in) :: N_plane
   integer,                       intent(in) :: N_layers
@@ -59,7 +59,7 @@ subroutine add_layer2plane(N_plane,Nr_bound,Ns_bound,N_layers,Thickness,N_domain
 !-----------------------------------------------------------------------------------------------
 ! LOCAL VARIABLES
   integer                            :: nrtrian_old,nrcurve_old
-! for np on the plane, surface_points(np) is the first twin point of np  
+! for np on the plane, surface_points(np) is the first twin point of np
   integer, allocatable               :: surface_points(:)
   real(8), dimension(3,2)            :: aux
   real(8)                            :: prod,dr,fval
@@ -76,7 +76,7 @@ subroutine add_layer2plane(N_plane,Nr_bound,Ns_bound,N_layers,Thickness,N_domain
 !
 !
  20   continue
-! 
+!
 ! ..read in plane data
     if (SURFACES(N_plane)%Type .ne. 'VecPt') then
       write(*,7002) N_plane
@@ -87,7 +87,7 @@ subroutine add_layer2plane(N_plane,Nr_bound,Ns_bound,N_layers,Thickness,N_domain
       NORMAL(1:3) = SURFACES(N_plane)%Rdata(4:6)
       call normalize(NORMAL)
       if (iprint .eq. 1) then
-        write(*,*)'add_layer2plane: N_plane = ',N_plane      
+        write(*,*)'add_layer2plane: N_plane = ',N_plane
         write(*,7003) SURFACES(N_plane)%Rdata(1:3)
 7003    format(' ***************  POINT   = ',3F8.3)
         write(*,1) SURFACES(N_plane)%Rdata(4:6)
@@ -114,7 +114,7 @@ subroutine add_layer2plane(N_plane,Nr_bound,Ns_bound,N_layers,Thickness,N_domain
       write(*,7030) dr
 7030  format(' add_layer2plane: dr = ',f8.3)
       write(*,2) tlayer(1:N_layers)
-2     format(' ************ tlayer = ',10F8.3)      
+2     format(' ************ tlayer = ',10F8.3)
     endif
 ! ..allocate RECTANGLES and PRISM if necessary
     if (.not.allocated(RECTANGLES)) then
@@ -123,7 +123,7 @@ subroutine add_layer2plane(N_plane,Nr_bound,Ns_bound,N_layers,Thickness,N_domain
         write(*,*)'add_layer2plane: RECTANGLES not allocated.'
         stop
       endif
-    endif  
+    endif
     if (.not.allocated(PRISMS)) then
       allocate(PRISMS(MAXBT), STAT = status)
       if (status .ne. 0) then
@@ -155,7 +155,7 @@ subroutine add_layer2plane(N_plane,Nr_bound,Ns_bound,N_layers,Thickness,N_domain
       SURFACES(NRSURFS)%Rdata(4:6) = NORMAL(1:3)
     enddo
     if (iprint .eq. 1) then
-      write(*,7006) 
+      write(*,7006)
  7006 format(' add_layer2plane: surfaces have been added.')
     endif
 !
@@ -182,18 +182,18 @@ subroutine add_layer2plane(N_plane,Nr_bound,Ns_bound,N_layers,Thickness,N_domain
       do jv = 1, 3
         np = TRIANGLES(nt)%VertNo(jv)
         call surf(N_plane,POINTS(np)%Rdata(1:3), fval,void)
-!----------------------------------------------------------------------------------       
+!----------------------------------------------------------------------------------
 !    PRINTING
         if (iprint .eq. 10) then
           write(*,7007) N_plane, POINTS(np)%Rdata(1:3), fval
  7007     format(' add_layer2plane: N_plane, point, fval = ',i3,2x,3f8.3,2x,e12.5)
             call pause
           endif
-!---------------------------------------------------------------------------------          
+!---------------------------------------------------------------------------------
 ! ......if point is on the plane
         if (abs(fval) .le. GEOM_TOL)  idec = idec + 1
       enddo
-!-----------------------------------------------------------------------------------      
+!-----------------------------------------------------------------------------------
 !       PRINTING
 !!!        if (iprint.eq.1) then
         if ((iprint .eq. 1) .and. (idec .eq. 3)) then
@@ -225,7 +225,7 @@ subroutine add_layer2plane(N_plane,Nr_bound,Ns_bound,N_layers,Thickness,N_domain
 ! ......loop through the triangle vertices
         do jv = 1, 3
           np = nverts(jv)
-! ........if 1st visit to vertex          
+! ........if 1st visit to vertex
           if (surface_points(np) .eq. 0) then
 ! ..........save twin point number
             surface_points(np) = NRPOINT + 1
@@ -261,7 +261,7 @@ subroutine add_layer2plane(N_plane,Nr_bound,Ns_bound,N_layers,Thickness,N_domain
                   CURVES(NRCURVE)%EndPoNo(1) = NRPOINT - 1
                   CURVES(NRCURVE)%EndPoNo(2) = NRPOINT
               end select
-! ..........end of loop through layers              
+! ..........end of loop through layers
             enddo
 !
 !  .........if the new points have not been generated yet
@@ -320,7 +320,7 @@ subroutine add_layer2plane(N_plane,Nr_bound,Ns_bound,N_layers,Thickness,N_domain
           enddo
 !
 !  .....if a triangle on the truncating sphere
-        endif  
+        endif
 !
 !  ...end of loop through triangles
       enddo
@@ -350,14 +350,14 @@ subroutine add_layer2plane(N_plane,Nr_bound,Ns_bound,N_layers,Thickness,N_domain
       endif
 ! ....if 1 endpoint is not on the plane, cycle
       if (idec .ne. 2)   cycle
-! ....get twin points of curve end points      
+! ....get twin points of curve end points
       np1   = CURVES(nc)%EndPoNo(1)
       newp1 = surface_points(np1)
       np2   = CURVES(nc)%EndPoNo(2)
       newp2 = surface_points(np2)
 !
 ! ***********************************  TWIN CURVES  ******************************* |
-! ....loop over layers      
+! ....loop over layers
       do i = 1, N_layers
         NRCURVE = NRCURVE + 1
         if (NRCURVE .gt. MAXNC) then
@@ -374,10 +374,10 @@ subroutine add_layer2plane(N_plane,Nr_bound,Ns_bound,N_layers,Thickness,N_domain
         CURVES(NRCURVE)%NrFig      = 0                         ! <-- TWIN CURVES
         CURVES(NRCURVE)%EndPoNo(1) = newp1 + i - 1             ! <-- TWIN CURVES
         CURVES(NRCURVE)%EndPoNo(2) = newp2 + i - 1             ! <-- TWIN CURVES
-! ....end of loop over layers        
+! ....end of loop over layers
       enddo
-!        
-! *****************************  CONNECTING RECTANGLES  ***************************** |     
+!
+! *****************************  CONNECTING RECTANGLES  ***************************** |
 ! ....loop over layers
       do i = 1, N_layers
         NRRECTA = NRRECTA + 1
@@ -388,13 +388,13 @@ subroutine add_layer2plane(N_plane,Nr_bound,Ns_bound,N_layers,Thickness,N_domain
         endif
         RECTANGLES(NRRECTA)%Type = 'BilQua'                    ! <-- CONN RECTANGLE
         select case(i)
-! ........1st connecting rectangle        
+! ........1st connecting rectangle
           case(1)
             RECTANGLES(NRRECTA)%VertNo(1) = np1                ! <-- CONN RECTANGLE
             RECTANGLES(NRRECTA)%VertNo(2) = np2                ! <-- CONN RECTANGLE
             RECTANGLES(NRRECTA)%VertNo(3) = newp2              ! <-- CONN RECTANGLE
             RECTANGLES(NRRECTA)%VertNo(4) = newp1              ! <-- CONN RECTANGLE
-! ........subsequent connecting rectangles            
+! ........subsequent connecting rectangles
           case default
             RECTANGLES(NRRECTA)%VertNo(1) = newp1 + i - 2      ! <-- CONN RECTANGLE
             RECTANGLES(NRRECTA)%VertNo(2) = newp2 + i - 2      ! <-- CONN RECTANGLE
@@ -406,7 +406,7 @@ subroutine add_layer2plane(N_plane,Nr_bound,Ns_bound,N_layers,Thickness,N_domain
         call update_rectangle(NRRECTA)                         ! <-- CONN RECTANGLE
 ! ....end of loop over layers
       enddo
-!      
+!
 ! ..end of loop through original curves
     enddo
 !
@@ -418,21 +418,21 @@ subroutine add_layer2plane(N_plane,Nr_bound,Ns_bound,N_layers,Thickness,N_domain
       endif
 !
     contains
-!    
+!
 !------------------------------------------------------------------------------------------------------
 subroutine update_rectangle(Nr)
 !------------------------------------------------------------------------------------------------------
   use control
-!------------------------------------------------------------------------------------------------------  
+!------------------------------------------------------------------------------------------------------
 ! DUMMY ARGUMENTS
   integer, intent(in)    :: Nr
-!------------------------------------------------------------------------------------------------------  
+!------------------------------------------------------------------------------------------------------
 ! VARIABLES
   real(8)               :: fval
   real(8), dimension(3) :: xp,dfdx
   integer               :: is,ns,idec,iv,np
   integer               :: status
-!------------------------------------------------------------------------------------------------------  
+!------------------------------------------------------------------------------------------------------
 ! printing flag (0,1)
 #define I_PRINT 0
 !
@@ -446,26 +446,26 @@ subroutine update_rectangle(Nr)
             call surf(ns,xp, fval,dfdx)
             if (abs(fval) .lt. GEOM_TOL)  idec = idec + 1
           enddo
-! ........if a surface was found         
+! ........if a surface was found
           if (idec .eq. 4) then
             RECTANGLES(Nr)%Type = 'PTIRec'                               ! <-- CONN RECTANGLE
             allocate(RECTANGLES(Nr)%Idata(1), STAT = status)
             if (status .ne. 0) then
               write(*,*)'update_conforming_surface: Idata not allocated for nr = ',Nr
-            endif        
+            endif
             RECTANGLES(Nr)%Idata(1) = ns                                 ! <-- CONN RECTANGLE
-#if I_PRINT >= 1            
+#if I_PRINT >= 1
             write(*,10) Nr,ns
 10           format('update_conforming_surface: attaching rectangle ',I5,' to surface ', I3)
 #endif
 ! ..........since rectangle can conform only to 1 surface, exit when done
             exit
           endif
-! ......end of loop over bounding surfaces 
-        enddo   
+! ......end of loop over bounding surfaces
+        enddo
 !
 end subroutine update_rectangle
-!------------------------------------------------------------------------------------------------------  
+!------------------------------------------------------------------------------------------------------
 !
 !
 end subroutine add_layer2plane

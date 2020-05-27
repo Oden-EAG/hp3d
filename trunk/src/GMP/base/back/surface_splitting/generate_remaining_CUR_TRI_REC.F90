@@ -5,7 +5,7 @@ subroutine generate_remaining_CUR_TRI_REC
 !
 ! PURPORSE: routine generates TWIN CURVES, CONNECTING FIGURES, TWIN FIGURES
 !            and updates ORIGINAL FIGURES
-!  
+!
 ! STRUCTURE:
 !
 !    LOOP through figs to split
@@ -44,10 +44,10 @@ subroutine generate_remaining_CUR_TRI_REC
 ! ..allocate new_curves and initialize to 0
     call allocate_NEW_CURVES
     new_curves = 0
-! ..loop through figures to be split      
+! ..loop through figures to be split
     ic_new = 0
     do ifig = 1, nr_figs_to_split
-! ....select figure type      
+! ....select figure type
       select case(figs_split(1,ifig))
         case(1);  nt = figs_split(2,ifig);  nedg = 3
         case(2);  nr = figs_split(2,ifig);  nedg = 4
@@ -55,7 +55,7 @@ subroutine generate_remaining_CUR_TRI_REC
 ! ***********************************  TWIN CURVES & CONNECTING FIGURES  ************************************  |
 ! ....loop through figure edges
       do ie = 1, nedg
-! ......local edge endpoints   
+! ......local edge endpoints
         iv = ie;  iv1 = my_mod(iv + 1,nedg)
         select case(figs_split(1,ifig))
           case(1)
@@ -77,7 +77,7 @@ subroutine generate_remaining_CUR_TRI_REC
             stop
           endif
           CURVES(NRCURVE)%Type = 'Seglin'                                    ! <-- TWIN CURVE
-! ........endpoints of new curve are twin points of old curve            
+! ........endpoints of new curve are twin points of old curve
           CURVES(NRCURVE)%EndPoNo(1) = new_point(np)                         ! <-- TWIN CURVE
           CURVES(NRCURVE)%EndPoNo(2) = new_point(np1)                        ! <-- TWIN CURVE
           ic_new = ic_new + 1
@@ -85,13 +85,13 @@ subroutine generate_remaining_CUR_TRI_REC
             write(*,*)'generate_remaining_CUR_TRI_REC: increase MAX_NEW_CURVES.'
             stop
           endif
-! ........update list of new curves endpoints            
+! ........update list of new curves endpoints
           new_curves(1,ic_new) = np
           new_curves(2,ic_new) = np1
 !==============================================================================================================
 !  REMARK: recall that we are looping over curves that need to be duplicated, see (*) above, hence at least   |
 !    one curve endpoint is not on the bounding surface!                                                       |
-!==============================================================================================================   
+!==============================================================================================================
 ! ........if 1st endpoint lays on bounding surface (hence 2nd doesn't)
           if (new_point(np) .eq. np) then
 ! ..........generate a new triangle
@@ -125,7 +125,7 @@ subroutine generate_remaining_CUR_TRI_REC
               write(*,*) 'generate_remaining_CUR_TRI_REC: increase MAXRE.'
               stop
             endif
-            RECTANGLES(NRRECTA)%Type      = 'BilQua'                         ! <-- CONNECTING RECTANGLE 
+            RECTANGLES(NRRECTA)%Type      = 'BilQua'                         ! <-- CONNECTING RECTANGLE
             RECTANGLES(NRRECTA)%VertNo(1) = np                               ! <-- CONNECTING RECTANGLE
             RECTANGLES(NRRECTA)%VertNo(2) = np1                              ! <-- CONNECTING RECTANGLE
             RECTANGLES(NRRECTA)%VertNo(3) = new_point(np1)                   ! <-- CONNECTING RECTANGLE
@@ -134,20 +134,20 @@ subroutine generate_remaining_CUR_TRI_REC
          endif
 ! ......end if 1st visit to curve
         endif
-! ....end of loop through figure edges          
+! ....end of loop through figure edges
       enddo
 ! ***********************************************  TWIN FIGURE *********************************************** |
-! ....select figure type        
+! ....select figure type
       select case(figs_split(1,ifig))
-! ......figure is a triangle        
+! ......figure is a triangle
         case(1)
-! ........add triangle          
+! ........add triangle
           NRTRIAN = NRTRIAN + 1
           if (NRTRIAN .gt. MAXTR) then
             write(*,*)'generate_remaining_CUR_TRI_REC: increase MAXTR.'
             stop
           endif
-! ........duplicate vertices          
+! ........duplicate vertices
           do iv = 1, 3
             np = TRIANGLES(nt)%VertNo(iv)
             TRIANGLES(NRTRIAN)%VertNo(iv) = new_point(np)                    ! <-- TWIN TRIANGLE
@@ -156,7 +156,7 @@ subroutine generate_remaining_CUR_TRI_REC
           idec = 0
           do iv = 1, 3
             np = TRIANGLES(nt)%VertNo(iv)
-! ..........if np is different from its twin point idec++           
+! ..........if np is different from its twin point idec++
             if (new_point(np) .ne. np) idec = idec + 1
           enddo
 !===========================================================================
@@ -168,35 +168,35 @@ subroutine generate_remaining_CUR_TRI_REC
 ! ..........up to 2 vertices have been duplicated
             case(0,1,2)
 ! ............detach old triangle from the original surface if dh1>0 and not a plane triangle (presence of a plane triangle may result from successive splittings...)
-!!!              if ((Dh1_MOD .gt. 0.d0) .and. (TRIANGLES(nt)%Type .ne. 'PlaneTri')) then  
+!!!              if ((Dh1_MOD .gt. 0.d0) .and. (TRIANGLES(nt)%Type .ne. 'PlaneTri')) then
               if (Dh1_MOD .gt. 0.d0) then
                 deallocate(TRIANGLES(nt)%Idata, STAT = status)
                 if (status .ne. 0) then
                   write(*,*)'generate_remaining_CUR_TRI_REC: Idata not deallocated for nt = ',nt
                   stop
-                endif  
+                endif
                 TRIANGLES(nt)%Type = 'PlaneTri'                              ! <-- ORIG TRIANGLE
-              endif 
+              endif
               TRIANGLES(NRTRIAN)%Type = 'PlaneTri'                           ! <-- TWIN TRIANGLE
-! ..........all 3 vertices have been duplicated            
+! ..........all 3 vertices have been duplicated
             case(3)
 ! ............attach old triangle to the plane on NEG side
               if (Dh1_MOD .gt. 0.d0)  TRIANGLES(nt)%Idata(1) = NRSURFS - 1   ! <-- ORIG TRIANGLE
               TRIANGLES(NRTRIAN)%Type = 'PTITri'                             ! <-- TWIN TRIANGLE
-              allocate(TRIANGLES(NRTRIAN)%Idata(1))                
-! ............attach new triangle to the plane on POS side   
+              allocate(TRIANGLES(NRTRIAN)%Idata(1))
+! ............attach new triangle to the plane on POS side
               TRIANGLES(NRTRIAN)%Idata(1) = NRSURFS                          ! <-- TWIN TRIANGLE
-! ........end select number of duplicated vertices              
+! ........end select number of duplicated vertices
           end select
-! ......figure is a rectangle          
+! ......figure is a rectangle
         case(2)
-! ........add rectangle          
+! ........add rectangle
           NRRECTA = NRRECTA + 1
           if (NRRECTA .gt. MAXRE) then
             write(*,*)'generate_remaining_CUR_TRI_REC: increase MAXRE.'
             stop
           endif
-! ........duplicate vertices 
+! ........duplicate vertices
           do iv = 1, 4
             np = RECTANGLES(nr)%VertNo(iv)
             RECTANGLES(NRRECTA)%VertNo(iv) = new_point(np)                   ! <-- TWIN RECTANGLE
@@ -207,17 +207,17 @@ subroutine generate_remaining_CUR_TRI_REC
             np = RECTANGLES(nr)%VertNo(iv)
             if (new_point(np) .ne. np)  idec = idec + 1
           enddo
-! ........select number of duplicated vertices         
+! ........select number of duplicated vertices
           select case(idec)
-! ..........up to 3 duplicated vertices          
+! ..........up to 3 duplicated vertices
             case(0,1,2,3)
 ! ............detach old rectangle from the original surface if dh1>0
-              if (Dh1_MOD .gt. 0.d0) then   
-                deallocate(RECTANGLES(nr)%Idata)  
+              if (Dh1_MOD .gt. 0.d0) then
+                deallocate(RECTANGLES(nr)%Idata)
                 RECTANGLES(nr)%Type = 'BilQua'                               ! <-- ORIG RECTANGLE
-              endif 
+              endif
               RECTANGLES(NRRECTA)%Type = 'BilQua'                            ! <-- TWIN RECTANGLE
-! ..........all vertices have been duplicated              
+! ..........all vertices have been duplicated
             case(4)
               if (Dh1_MOD .gt. 0.d0) RECTANGLES(nr)%Idata(1) = NRSURFS - 1   ! <-- ORIG RECTANGLE
               RECTANGLES(NRRECTA)%Type = 'PTIRec'                            ! <-- TWIN RECTANGLE
@@ -228,18 +228,18 @@ subroutine generate_remaining_CUR_TRI_REC
               endif
               RECTANGLES(NRRECTA)%Idata(1) = NRSURFS                         ! <-- TWIN RECTANGLE
           end select
-#if I_PRINT >= 2          
+#if I_PRINT >= 2
             write(*,7024) nr,NRRECTA
  7024       format('generate_remaining_CUR_TRI_REC: have duplicated rectangle ',i5,' ; twin rectangle = ',i5)
 !!!            call print_GMP
 #endif
-! ....end select figure type          
+! ....end select figure type
       end select
 ! ..end of loop through figures to split
     enddo
 #if I_PRINT >= 1
-    write(*,*)'generate_remaining_CUR_TRI_REC: done!'   
-#endif    
+    write(*,*)'generate_remaining_CUR_TRI_REC: done!'
+#endif
 !
     contains
 !
@@ -250,20 +250,20 @@ subroutine update_conforming_surface(fig_type)
 !------------------------------------------------------------------------------------------------------
   use control
   use SPLIT_SURF
-!------------------------------------------------------------------------------------------------------  
+!------------------------------------------------------------------------------------------------------
 ! DUMMY ARGUMENTS
   integer, intent(in)    :: fig_type
-!------------------------------------------------------------------------------------------------------  
+!------------------------------------------------------------------------------------------------------
 ! VARIABLES
   real*8               :: fval
   real*8, dimension(3) :: xp,dfdx
-!------------------------------------------------------------------------------------------------------  
+!------------------------------------------------------------------------------------------------------
 ! printing flag (0,1)
 #define I_PRINT 0
 !
 ! ..select figure type
     select case(fig_type)
-! **********************************************  TRIANGLE  ***************************************** |    
+! **********************************************  TRIANGLE  ***************************************** |
       case(1)
 ! ......loop through surfaces
         do is = 1, Nr_confm_MOD
@@ -275,15 +275,15 @@ subroutine update_conforming_surface(fig_type)
             call surf(ns,xp, fval,dfdx)
             if (abs(fval) .lt. GEOM_TOL)  idec = idec + 1
           enddo
-! ........if a surface was found         
+! ........if a surface was found
           if (idec .eq. 3) then
             TRIANGLES(NRTRIAN)%Type = 'PTITri'                          ! <-- CONNECTING TRIANGLE
             allocate(TRIANGLES(NRTRIAN)%Idata(1), STAT = status)
             if (status .ne. 0) then
               write(*,*)'update_conforming_surface: Idata not allocated for nt = ',NRTRIAN
-            endif        
+            endif
             TRIANGLES(NRTRIAN)%Idata(1) = ns                            ! <-- CONNECTING TRIANGLE
-#if I_PRINT >= 1        
+#if I_PRINT >= 1
             write(*,1) NRTRIAN,ns
 1           format('update_conforming_surface: attaching triangle ',I5,' to surface ', I3)
 #endif
@@ -291,8 +291,8 @@ subroutine update_conforming_surface(fig_type)
             exit
           endif
 ! ......end of loop through surfaces to conform to
-        enddo   
-! **********************************************  RECTANGLE  **************************************** |    
+        enddo
+! **********************************************  RECTANGLE  **************************************** |
       case(2)
 ! ......loop through surfaces to conform to
         do is = 1, Nr_confm_MOD
@@ -304,33 +304,33 @@ subroutine update_conforming_surface(fig_type)
             call surf(ns,xp, fval,dfdx)
             if (abs(fval) .lt. GEOM_TOL)  idec = idec + 1
           enddo
-! ........if a surface was found         
+! ........if a surface was found
           if (idec .eq. 4) then
             RECTANGLES(NRRECTA)%Type = 'PTIRec'                          ! <-- CONNECTING RECTANGLE
             allocate(RECTANGLES(NRRECTA)%Idata(1), STAT = status)
             if (status .ne. 0) then
               write(*,*)'update_conforming_surface: Idata not allocated for nr = ',NRRECTA
-            endif        
+            endif
             RECTANGLES(NRRECTA)%Idata(1) = ns                            ! <-- CONNECTING RECTANGLE
-#if I_PRINT >= 1            
+#if I_PRINT >= 1
             write(*,2) NRRECTA,ns
 2           format('update_conforming_surface: attaching rectangle ',I5,' to surface ', I3)
 #endif
 ! ..........since rectangle can conform only to 1 surface, exit when done
             exit
           endif
-! ......end of loop through surfaces to conform to  
-        enddo   
+! ......end of loop through surfaces to conform to
+        enddo
       case default
         write(*,*)'update_conforming_surface: unkwon figure type.'
-        stop        
+        stop
     end select
-! ..end select figure type  
+! ..end select figure type
 !
 end subroutine update_conforming_surface
-!------------------------------------------------------------------------------------------------------  
+!------------------------------------------------------------------------------------------------------
 !
 !
 !
 end subroutine generate_remaining_CUR_TRI_REC
-!------------------------------------------------------------------------------------------------------  
+!------------------------------------------------------------------------------------------------------

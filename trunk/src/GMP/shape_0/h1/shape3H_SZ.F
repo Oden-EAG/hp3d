@@ -1,14 +1,14 @@
 c----------------------------------------------------------------------
-c     
+c
 c     routine name       - shapHbt_SZ
-c     
+c
 c----------------------------------------------------------------------
-c     
+c
 c     latest revision    - Jan 11
-c     
+c
 c     purpose            - evalute triangle H1 bubble shape functions
 c                          using Sabine Zaglmayr construction
-c     
+c
 c     arguments :
 c     in:
 c       Xi        - master element coordinates
@@ -20,10 +20,10 @@ c     out:
 c       NrdofH    - number of element dof
 c       ShapH     - values of shape functions
 c       DshapH    - values of derivatives of the shape functions
-c                   wrt to master element coordinates      
-c     
+c                   wrt to master element coordinates
+c
 c----------------------------------------------------------------------
-c     
+c
       subroutine shapHbt_SZ(Xi,Nord,Nort,Vshap,Dvshap,
      .                      NrdofH,ShapH,DshapH)
 c
@@ -34,7 +34,7 @@ c
       dimension Xi(2), Vshap(3),Dvshap(2,3),
      .          ShapH(MAXmdltH),DshapH(2,MAXmdltH)
 c
-c  ...allow for exceeding the order of approximation  
+c  ...allow for exceeding the order of approximation
       integer, parameter :: ndelta = 2
 c
       integer :: jtemp(1:3) = (/1,2,3/),iv(1:3)
@@ -53,14 +53,14 @@ c
 c
 c  ...account for orientation
       iv(1:3) = jtemp(TRIAN_L2G(1:3,Nort))
-c     
+c
 c  ...compute Scaled Integrated Legendre polynomials
       p      =  Vshap(    iv(1)) -  Vshap(    iv(2))
       dp_dXi = Dvshap(1:2,iv(1)) - Dvshap(1:2,iv(2))
       q      =  Vshap(    iv(1)) +  Vshap(    iv(2))
       dq_dXi = Dvshap(1:2,iv(1)) + Dvshap(1:2,iv(2))
       call Legendre_S_I(p,q,Nord, uu,duu)
-c     
+c
 c  ...compute Legendre polynomials
       s      = Vshap (    iv(3)) - Vshap (    iv(1)) - Vshap(     iv(2))
       ds_dXi = Dvshap(1:2,iv(3)) - Dvshap(1:2,iv(1)) - Dvshap(1:2,iv(2))
@@ -87,14 +87,14 @@ c ......loop through order of i
      .                  + uu(i)*vv(j)*Dvshap(1:2,3)
         enddo
       enddo
-c     
-c  ...save total number of dof's      
+c
+c  ...save total number of dof's
  999  NrdofH = k
-c     
+c
 c  ...printing
       if (iprint.eq.1) then
         write(*,7010) Xi(1:2)
- 7010   format('shapHbt_SZ:   Xi = ',2(e12.5,2x))       
+ 7010   format('shapHbt_SZ:   Xi = ',2(e12.5,2x))
         do n=1,NrdofH
           write(*,7020) n,ShapH(n),DshapH(1:2,n)
  7020     format(' n = ',i3,'; ShapH,DshapH = ',e12.5,3x,2e12.5)

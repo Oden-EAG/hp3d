@@ -27,7 +27,7 @@ c                        1 negative jacobian
 c
 c----------------------------------------------------------------------
 c
-      subroutine geom3D(Mdle,Xi,Xnod,ShapH,GradH,NrdofH, 
+      subroutine geom3D(Mdle,Xi,Xnod,ShapH,GradH,NrdofH,
      .                  X,Dxdxi,Dxidx,Rjac,Iflag)
 c
       use control
@@ -44,11 +44,11 @@ c
  7001   format('geom3D: Mdle,Xi = ',i6,3x,3f8.3,' EXGEOM = ',i3)
       endif
 c
-c  ...determine physical coordinates and the derivatives of 
-c     the physical coordinates wrt master element ccordinates 
+c  ...determine physical coordinates and the derivatives of
+c     the physical coordinates wrt master element ccordinates
       select case(EXGEOM)
 c
-c  ...isoparametric element        
+c  ...isoparametric element
       case(0)
         if (iprint.eq.1) then
           write(*,*) 'geom3D: xnod,shapH = '
@@ -68,13 +68,13 @@ c  ...isoparametric element
         do imas=1,3
           Dxdxi(1:3,imas) = 0.d0
           do k=1,NrdofH
-            Dxdxi(1:3,imas) = 
+            Dxdxi(1:3,imas) =
      .      Dxdxi(1:3,imas) + Xnod(1:3,k)*GradH(imas,k)
           enddo
         enddo
 c
-c  ...exact geometry element          
-      case(1) 
+c  ...exact geometry element
+      case(1)
         call geom_ex(Mdle,Xi, X,Dxdxi)
       end select
 c
@@ -136,7 +136,7 @@ c             Bjac     - boundary jacobian (norm of Dxdt)
 c
 c----------------------------------------------------------------------
 c
-      subroutine bgeom3D(Mdle,Xi,Xnod,ShapH,GradH,NrdofH,Dxidt,Nsign, 
+      subroutine bgeom3D(Mdle,Xi,Xnod,ShapH,GradH,NrdofH,Dxidt,Nsign,
      .                   X,Dxdxi,Dxidx,Rjac,Dxdt,Rn,Bjac)
 c
       use data_structure3D
@@ -149,7 +149,7 @@ c
 c
       iprint=0
 c
-      call geom3D(Mdle,Xi,Xnod,ShapH,GradH,NrdofH, 
+      call geom3D(Mdle,Xi,Xnod,ShapH,GradH,NrdofH,
      .            X,Dxdxi,Dxidx,Rjac,iflag)
       if (iflag.ne.0) then
         write(*,5999) Mdle,Rjac
@@ -214,7 +214,7 @@ c                        1 negative jacobian
 c
 c----------------------------------------------------------------------
 c
-      subroutine refgeom3D(Mdle,Xi,Etav,ShapH,GradH,NrdofH, 
+      subroutine refgeom3D(Mdle,Xi,Etav,ShapH,GradH,NrdofH,
      .                     Eta,Detadxi,Dxideta,Rjac,Iflag)
 c
       use control
@@ -231,8 +231,8 @@ c
  7001   format('refgeom3D: Mdle,Xi = ',i6,3x,3f8.3)
       endif
 c
-c  ...determine reference coordinates and the derivatives of 
-c     the reference coordinates wrt master element ccordinates 
+c  ...determine reference coordinates and the derivatives of
+c     the reference coordinates wrt master element ccordinates
       if (iprint.eq.1) then
         write(*,*) 'refgeom3D: Etav,ShapH = '
         do i=1,3
@@ -251,7 +251,7 @@ c     the reference coordinates wrt master element ccordinates
       do imas=1,3
         Detadxi(1:3,imas) = 0.d0
         do k=1,NrdofH
-          Detadxi(1:3,imas) = 
+          Detadxi(1:3,imas) =
      .    Detadxi(1:3,imas) + Etav(1:3,k)*GradH(imas,k)
         enddo
       enddo
@@ -305,12 +305,12 @@ c             Eta      - reference coordinates of the point
 c             Detadxi  - derivatives wrt master coordinates
 c             Dxideta  - inverse Jacobian
 c             Detadt   - derivatives wrt the face parameters
-c             Rn       - the normal unit vector 
+c             Rn       - the normal unit vector
 c             Bjac     - boundary jacobian (norm of Detadxi)
 c
 c----------------------------------------------------------------------
 c
-      subroutine brefgeom3D(Mdle,Xi,Etav,ShapH,GradH,NrdofH,Dxidt,Nsign, 
+      subroutine brefgeom3D(Mdle,Xi,Etav,ShapH,GradH,NrdofH,Dxidt,Nsign,
      .                      Eta,Detadxi,Dxideta,Rjac,Detadt,Rn,Bjac)
 c
       use data_structure3D
@@ -323,7 +323,7 @@ c
 c
       iprint=0
 c
-      call refgeom3D(Mdle,Xi,Etav,ShapH,GradH,NrdofH, 
+      call refgeom3D(Mdle,Xi,Etav,ShapH,GradH,NrdofH,
      .               Eta,Detadxi,Dxideta,Rjac,iflag)
       if (iflag.ne.0) then
         write(*,*) 'brefgeom3D: ERROR'; stop 1

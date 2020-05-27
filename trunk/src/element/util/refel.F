@@ -8,7 +8,7 @@ c   latest revision    - Mar 11
 c
 c   purpose            - for an element, routine returns reference
 c                        coordinates of its vertices wrt particular
-c                        GMP block, the element is lying on      
+c                        GMP block, the element is lying on
 c
 c   arguments :
 c     in:
@@ -20,11 +20,11 @@ c                      = 6 GMP hexa
 c                      = 7 GMP tetra
 c                      = 8 GMP pyramid
 c             No       - GMP block number
-c             Xsubel   - GMP block reference coordinates 
+c             Xsubel   - GMP block reference coordinates
 c                        for the element vertices
 c
 c----------------------------------------------------------------------
-c 
+c
       subroutine refel(Mdle, Iflag,No,Xsubel)
 c
       use parameters
@@ -32,7 +32,7 @@ c
       use element_data
       use data_structure3D
 #include "syscom.blk"
-c   
+c
 ccc      common /comm_refel/iprint_refel
 c
       dimension Xsubel(3,8)
@@ -45,7 +45,7 @@ c  ...history information: father, its type, refinement kind, son number
      .          nfather_ref_kind(MAXGEN),noson(MAXGEN)
 c
 c----------------------------------------------------------------------
-c      
+c
 ccc      iprint=iprint_refel
       iprint=0
       Xsubel = 0.d0
@@ -53,7 +53,7 @@ c
       if (iprint.ge.1) then
         write(*,7000)mdle
  7000   format(' refel: mdle = ',i10)
-      endif      
+      endif
 c
 c  ...go up the tree to find the initial mesh ancestor
       nson = Mdle; nfath = NODES(nson)%father; igen=0
@@ -68,16 +68,16 @@ c  ...go up the tree to find the initial mesh ancestor
 c        call locate(nson,NODES(nfath)%sons,nrsons, noson(igen))
         noson(igen) = nson - NODES(nfath)%first_son + 1
 c        if (noson(igen)<0 .or. noson(igen)>nrsons) call pause
-c        
-c  .....extensive printing        
+c
+c  .....extensive printing
         if (iprint.ge.2) then
           write(*,7002)igen,nfath,nson,father_type(igen),son_type(igen),
      .                 nfather_ref_kind(igen),noson(igen)
 7002      format(' igen,nfath,nson,nfath_type,nson_type,nfath_refk,
      .ison = ',i2,4x,i8,2x,i8,2x,a4,2x,a4,2x,i2,2x,i2)
         endif
-c        
-c  .....update        
+c
+c  .....update
         nson = nfath
         nfath = NODES(nson)%father
       enddo
@@ -86,7 +86,7 @@ c
 c  ...initial mesh ancestor is
       nel = abs(nfath)
 c
-c  ...reference coordinates of ancestor      
+c  ...reference coordinates of ancestor
       select case(NODES(nel)%type)
       case('mdlp'); x(1:3,1:6) = PRISM_COORD(1:3,1:6)
       case('mdlb'); x(1:3,1:8) = BRICK_COORD(1:3,1:8)
@@ -94,12 +94,12 @@ c  ...reference coordinates of ancestor
       case('mdld'); x(1:3,1:5) = PYRAM_COORD(1:3,1:5)
       end select
 c
-c  ...printing      
+c  ...printing
       if (iprint.ge.2) then
         do i=1,Nvert(NODES(nel)%type)
           write(*,8005)i,x(1:3,i)
         enddo
-8005    format( 'i,x(1:3,i) = ',i2,2x,3(e12.5,2x))        
+8005    format( 'i,x(1:3,i) = ',i2,2x,3(e12.5,2x))
       endif
 c
 c  ...corresponding GMP block
@@ -141,7 +141,7 @@ c  .........parent edge node
               ie = jp-nvert(ftype)
               call edge_to_vert(ftype,ie, nv1,nv2)
               x_new(1:3,j) = (x(1:3,nv1) + x(1:3,nv2))/2.d0
-c              
+c
               if (iprint.ge.2) then
                 write(*,*)'parent edge node: nv1,nv2 = ',nv1,nv2
                 write(*,8000)j,x_new(1:3,j)
@@ -176,9 +176,9 @@ c
 c
             endif
           endif
-c          
+c
  8000   format(' j,x_new(1:3,j) = ',i2,2x,3(e12.5,2x))
-c   
+c
 c  .....end of loop through vertex nodes
         enddo
 c
@@ -188,17 +188,17 @@ c  .....printing
  7003     format(' igen,nvert_son = ',i2,2x,i2)
           do i=1,Nvert(son_type(igen))
             write(*,7004)i,x_new(1:3,i)
- 7004       format(' i,x_new(1:3,i) = ',i2,2x,3(e12.5,2x))         
+ 7004       format(' i,x_new(1:3,i) = ',i2,2x,3(e12.5,2x))
           enddo
         endif
 c
-c  .....update        
+c  .....update
         x = x_new
 c
 c  ...end of loop through generations
       enddo
 c
-      Xsubel(1:3,1:nvert(NODES(Mdle)%type)) =  
+      Xsubel(1:3,1:nvert(NODES(Mdle)%type)) =
      .     x(1:3,1:nvert(NODES(Mdle)%type))
       if (iprint.eq.1) then
         write(*,7001) Mdle,Xsubel(1:3,1:nvert(NODES(Mdle)%type))

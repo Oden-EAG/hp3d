@@ -1,5 +1,5 @@
       parameter (MAXNC=300)
-      parameter (MAXNP=200) 
+      parameter (MAXNP=200)
       parameter (MAXTR=100)
       parameter (MAXRE=300)
       parameter (MAXBT=100)
@@ -9,7 +9,7 @@
       parameter (MAXRG=15000)
 c
 c  ...explanation of parameters:
-c     MAXNP  - maximum number of points 
+c     MAXNP  - maximum number of points
 c     MAXNC  - maximum number of curves
 c     MAXTR  - maximum number of triangles
 c     MAXRE  - maximum number of rectangles
