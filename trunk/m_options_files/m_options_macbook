@@ -1,24 +1,19 @@
 #------------------------------------------------------------------
 # SET HP3D AND LIBRARY PATH
 #------------------------------------------------------------------
-COMPILER        = INTEL
+# COMPILER        = INTEL
 # LIBRARIES       = ${WORK}/LIBS
 HP3D_BASE_PATH  = /Users/stefan/hp3D/LIBS/par_hp3d/trunk
-
-PETSC_LIB = /Users/stefan/hp3D/LIBS/petsc-3.13.1/arch-darwin-c/lib
-PETSC_INC = /Users/stefan/hp3D/LIBS/petsc-3.13.1/arch-darwin-c/include
 
 #------------------------------------------------------------------
 # COMPILER SETTINGS (a 64bit processor architecture is assumed)
 #------------------------------------------------------------------
-DEBUG      = NO
-#DEBUG      = YES
 
 LARGE      = NO
 OPENMP_USE = NO
 
 # Use parallel threads to compile libraries and problems
-J ?= 1
+J ?= 4
 
 FF = mpifort
 CC = mpicc
@@ -30,20 +25,10 @@ ifeq ($(OPENMP_USE),YES)
 FFLAGS += -qopenmp
 endif
 
-# Debug flags
-ifeq ($(DEBUG),YES)
-FFLAGS += -O0 -g -traceback -check all -debug all -check noarg_temp_created -assume noprotect_constants
-endif
-
-# Optimization flags
-ifeq ($(DEBUG),NO)
-FFLAGS += -O3
-endif
-
-# use the following flags if need >2G static data
-ifeq ($(LARGE),YES)
-FFLAGS += -mcmodel large -shared-intel
-endif
+# Additional gfortran compiler flags to generate warnings
+#FFLAGS += -std=legacy
+#FFLAGS += -std=f2018
+#FFLAGS += -Wall
 
 CFLAGS  =
 
@@ -54,11 +39,17 @@ CDEFS   = -DAdd_
 #------------------------------------------------------------------
 # PREPROCESSOR VARIABLES
 #------------------------------------------------------------------
-COMPLEX    ?= 0
-SHAPE      ?= 1
-DEBUG_MODE ?= 0
-ifeq ($(DEBUG),YES)
-DEBUG_MODE = 1
+COMPLEX ?= 0
+DEBUG   ?= 0
+
+# Debug flags
+ifeq ($(DEBUG),1)
+FFLAGS += -O0 -g -traceback -check all -debug all -check noarg_temp_created -assume noprotect_constants
+endif
+
+# Optimization flags
+ifeq ($(DEBUG),0)
+FFLAGS += -O3
 endif
 
 #------------------------------------------------------------------
@@ -94,6 +85,14 @@ MKL_INCS = -I/opt/intel/mkl/include
 # also adding Zoltan library dependence
 # also adding PETSC library dependence (petsc needs phdf5)
 
+ifeq ($(COMPLEX),1)
+  PETSC_LIB = /Users/stefan/hp3D/LIBS/petsc-3.13.1/arch-darwin-c-complex/lib
+  PETSC_INC = /Users/stefan/hp3D/LIBS/petsc-3.13.1/arch-darwin-c-complex/include
+else
+  PETSC_LIB = /Users/stefan/hp3D/LIBS/petsc-3.13.1/arch-darwin-c/lib
+  PETSC_INC = /Users/stefan/hp3D/LIBS/petsc-3.13.1/arch-darwin-c/include
+endif
+
 MUMPS_LIBS = -L$(PETSC_LIB) -lpetsc -ldmumps -lzmumps \
                             -lmumps_common -lpord -lscalapack \
                             -lflapack -lfblas -lzoltan \
@@ -109,10 +108,7 @@ MUMPS_INCS = -I$(PETSC_INC) -I/Users/stefan/hp3D/LIBS/petsc-3.13.1/include
 #
 
 VIS_LIBS   = -L$(PETSC_LIB) -lhdf5 -lhdf5_hl -lhdf5_fortran -lhdf5hl_fortran
-
-#VIS_LIBS  += -L${PARAVIEW_LIB} -lvtkhdf5-pv5.6 -lvtkhdf5_hl-pv5.6 -lvtklibxml2-pv5.6 -lvtkzlib-pv5.6
 VIS_INCS   = -I${PETSC_INC}
-#-I${PARAVIEW_INC}
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # EXTRA LIBS LINKING
@@ -126,11 +122,9 @@ EXTRA_LINK_INCS    = -I/opt/X11/include
 # Mainly for library makefile
 
 ifeq ($(COMPLEX),1)
-HP3D_PATH       = $(HP3D_BASE_PATH)/complex
-endif
-
-ifeq ($(COMPLEX),0)
-HP3D_PATH       = $(HP3D_BASE_PATH)/real
+  HP3D_PATH     = $(HP3D_BASE_PATH)/complex
+else
+  HP3D_PATH     = $(HP3D_BASE_PATH)/real
 endif
 
 SRC_PATH        = src
@@ -141,11 +135,9 @@ OBJ_PATH_COMPLEX =  _obj_complex_
 OBJ_PATH_REAL    =  _obj_real_
 
 ifeq ($(COMPLEX),1)
-OBJ_PATH        = $(OBJ_PATH_COMPLEX)
-endif
-
-ifeq ($(COMPLEX),0)
-OBJ_PATH        = $(OBJ_PATH_REAL)
+  OBJ_PATH      = $(OBJ_PATH_COMPLEX)
+else
+  OBJ_PATH      = $(OBJ_PATH_REAL)
 endif
 
 HP3D_LIB_EXTRA_INCS = $(MKL_INCS) $(MUMPS_INCS) $(VIS_INCS) $(EXTRA_LINK_INCS)
@@ -208,6 +200,5 @@ PROB_INCS    += $(HP3D_LINK_INCS)   \
 # are preprocessed according to certain directives
 
 PROB_PP_DEFS  = -D"C_MODE=$(COMPLEX)" \
-                -D"SHAPE_MODE=$(SHAPE)" \
-                -D"DEBUG_MODE=$(DEBUG_MODE)"
+                -D"DEBUG_MODE=$(DEBUG)"
 
