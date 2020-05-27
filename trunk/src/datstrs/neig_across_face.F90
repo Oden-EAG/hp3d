@@ -22,18 +22,18 @@ subroutine neig_across_face(Mdle,Iface, Neig)
   integer :: mdlf,nrneig,ipos,ifound
 !------------------------------------------------------------------------------
 
-  !  ...initialze to NO neighbor 
+  !  ...initialze to NO neighbor
   Neig=0
 
   !  ...determine face node
   call elem_face(Mdle,Iface, mdlf)
- 
+
   !  ...determine neighboring element(s)
   call neig_face(mdlf, nrneig,nlist,nvoid,nvoid)
 
-  !  ...if only one neighbor, return 
+  !  ...if only one neighbor, return
   if (nrneig.ne.2) return
- 
+
   !  ...locate element other than Mdle on the list
   call locate(Mdle,nlist,2, ifound)
   select case(ifound)
@@ -47,5 +47,5 @@ subroutine neig_across_face(Mdle,Iface, Neig)
   case(2) ; ipos=1
   endselect
   Neig=nlist(ipos)
-  
+
 end subroutine neig_across_face

@@ -2,7 +2,7 @@ subroutine mesh2vtk(Nout, Nr_vert)
 
   use data_structure3D
   use element_data
-  implicit none 
+  implicit none
 
   integer, intent(in)  :: Nout
   integer, intent(out) :: Nr_vert
@@ -10,14 +10,14 @@ subroutine mesh2vtk(Nout, Nr_vert)
 
   ! Step 0: Numbering
   call number_vert_on_visit(Nr_vert)
-  
+
   ! Step 1: Header
   write(Nout,6000)
   write(Nout,6001)
   write(Nout,6002)
   write(Nout,6003)
   write(Nout,6004) Nr_vert
-  
+
 6000 format('# vtk DataFile Version 2.0')
 6001 format('hp3d export mesh ')
 6002 format('ASCII')
@@ -32,7 +32,7 @@ subroutine mesh2vtk(Nout, Nr_vert)
   do i=1,NRELES
      call nelcon(mdle, mdle)
      call elem_nodes(mdle, nodesl,norientl)
-     
+
      nr_cell = nr_cell + nvert(NODES(mdle)%type)
   enddo
 

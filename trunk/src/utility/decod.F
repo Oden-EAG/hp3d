@@ -26,10 +26,10 @@ c
       integer,             intent(in)    :: Nick,Mod,N
       integer,dimension(N),intent(inout) :: Narray
 c
-c  ...local variables      
+c  ...local variables
       integer :: i,nick1,nick2
 c
-      nick1 = Nick    
+      nick1 = Nick
       do i=1,N-1
         nick2 = nick1/Mod
         Narray(N+1-i) = nick1 - nick2*Mod
@@ -70,13 +70,13 @@ c
       integer,             intent(in)  :: Mod,N
       integer,dimension(N),intent(out) :: Narray
 c
-c  ...local variables      
+c  ...local variables
       integer    :: i
       integer(8) :: nick1,nick2,longmod
 c
 c  ...be careful with integer type - need to convert!
       longmod = int(Mod,8)
-      nick1 = Nick    
+      nick1 = Nick
       do i=1,N
         nick2 = nick1/longmod
 c    ...be careful with integer type - need to convert!

@@ -32,11 +32,11 @@ subroutine proj_prism2face(Eta,Ifig, Xi,dXi_dEta)
 ! ..project on vertical edge
     Xi(2) = Eta(3)
     dXi_dEta(2,1:3) = (/0.d0, 0.d0, 1.d0/)
-! ..project on horizontal edge    
+! ..project on horizontal edge
     iv1 =  TRIAN_EDGE_TO_VERT(1,Ifig - 2)
     iv2 =  TRIAN_EDGE_TO_VERT(2,Ifig - 2)
     call proj_t2e(Eta(1:2),iv1,iv2,vshapt,dvshapt, Xi(1),dXi_dEta(1,1:2))
-    dXi_dEta(1,3) = 0.d0 
+    dXi_dEta(1,3) = 0.d0
 !
 end subroutine proj_prism2face
 !--------------------------------------------------------------------------------------------

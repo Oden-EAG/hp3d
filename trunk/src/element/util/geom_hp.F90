@@ -17,10 +17,10 @@
 !       ...
 !     ENDLOOP
 !
-!  The first three instruction of this routine, marked with (*), do not 
-!  depend upon Xi. Therefore, for a more efficient implementation of the 
+!  The first three instruction of this routine, marked with (*), do not
+!  depend upon Xi. Therefore, for a more efficient implementation of the
 !  element routine, they should be moved out of the loop. In other words,
-!  rather then using this routine, it should be incorporated into the 
+!  rather then using this routine, it should be incorporated into the
 !  element routine, and a loop over integration points added where
 !  indicated.
 !-------------------------------------------------------------------------
@@ -45,7 +45,7 @@ subroutine geom_hp(Mdle,Xi, X,Dxdxi)
       integer :: k,i,nrdofH
 !-------------------------------------------------------------------------
 !
-!  ...determine order of approximation, orientations, geometry dofs 
+!  ...determine order of approximation, orientations, geometry dofs
       call find_order( Mdle, norder)                                 !/
       call find_orient(Mdle, nedge_orient,nface_orient)              !/ (*)
       call nodcor(     Mdle, xnod)                                   !/
@@ -58,18 +58,18 @@ subroutine geom_hp(Mdle,Xi, X,Dxdxi)
       call shape3DH(NODES(Mdle)%Type,Xi,norder,nedge_orient,  &
                     nface_orient, nrdofH,shapeH,dshapeH)
 !
-!  ...geometry map 
-      X(1:3)=0.d0 ; Dxdxi(1:3,1:3)=0.d0 
+!  ...geometry map
+      X(1:3)=0.d0 ; Dxdxi(1:3,1:3)=0.d0
       do k=1,nrdofH
         X(1:3) = X(1:3) + xnod(1:3,k)*shapeH(k)
         do i=1,3
           Dxdxi(1:3,i) = Dxdxi(1:3,i) + xnod(1:3,k)*dshapeH(i,k)
         enddo
       enddo
-! 
+!
 !////////  BODY OF ELEMENT ROUTINE //////////////
 !
 !////////  END OF LOOP  /////////////////////////
-!      
+!
 !
 endsubroutine geom_hp

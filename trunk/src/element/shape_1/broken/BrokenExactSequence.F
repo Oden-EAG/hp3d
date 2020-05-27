@@ -118,7 +118,7 @@ c----------------------------------------------------------------------
 c
 c     latest revision:  - Nov 14, Apr 17
 c
-c     purpose:          - routine evaluates BROKEN H1 shape 
+c     purpose:          - routine evaluates BROKEN H1 shape
 c                         functions for 2D elements of various types
 c
 c     arguments:
@@ -176,7 +176,7 @@ c----------------------------------------------------------------------
 c
 c     latest revision:  - Nov 14, Apr 17
 c
-c     purpose:          - routine evaluates BROKEN H(curl) shape 
+c     purpose:          - routine evaluates BROKEN H(curl) shape
 c                         functions for 2D elements of various types
 c
 c     arguments:
@@ -234,7 +234,7 @@ c----------------------------------------------------------------------
 c
 c     latest revision:  - Nov 14, Apr 17
 c
-c     purpose:          - routine evaluates BROKEN H(div) shape 
+c     purpose:          - routine evaluates BROKEN H(div) shape
 c                         functions for 2D elements of various types
 c                         NOTE: only relevant in 2D problems!!
 c
@@ -293,7 +293,7 @@ c----------------------------------------------------------------------
 c
 c     latest revision:  - Nov 14, Apr 17
 c
-c     purpose:          - routine evaluates BROKEN L2 shape 
+c     purpose:          - routine evaluates BROKEN L2 shape
 c                         functions for 2D elements of various types
 c
 c     arguments:
@@ -357,7 +357,7 @@ c----------------------------------------------------------------------
 c
 c     latest revision:  - Nov 14, Apr 17
 c
-c     purpose:          - routine evaluates BROKEN H1 shape 
+c     purpose:          - routine evaluates BROKEN H1 shape
 c                         functions for 3D elements of various types
 c
 c     arguments:
@@ -433,7 +433,7 @@ c----------------------------------------------------------------------
 c
 c     latest revision:  - Oct 14, Apr 17
 c
-c     purpose:          - routine evaluates BROKEN H(curl) shape 
+c     purpose:          - routine evaluates BROKEN H(curl) shape
 c                         functions for 3D elements of various types
 c
 c     arguments:
@@ -509,7 +509,7 @@ c----------------------------------------------------------------------
 c
 c     latest revision:  - Oct 14, Apr 17
 c
-c     purpose:          - routine evaluates BROKEN H(div) shape 
+c     purpose:          - routine evaluates BROKEN H(div) shape
 c                         functions for 3D elements of various types
 c
 c     arguments:
@@ -585,7 +585,7 @@ c----------------------------------------------------------------------
 c
 c     latest revision:  - Oct 14, Apr 17
 c
-c     purpose:          - routine evaluates BROKEN L2 shape 
+c     purpose:          - routine evaluates BROKEN L2 shape
 c                         functions for 3D elements of various types
 c
 c     arguments:

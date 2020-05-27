@@ -2,16 +2,16 @@
 !!           H1 projection for ZnodH, L2 projection for ZnodE
 !! @param[in]  Iflag        - a flag specifying which of the objects
 !!                            5 pris, 6 hexa, 7 tetr, 8 pyra
-!! @param[in]  No           - number of a specific object 
+!! @param[in]  No           - number of a specific object
 !! @param[in]  Etav         - reference coordinates of the element vertices
 !! @param[in]  Type         - element (middle node) type
 !! @param[in]  Icase        - the mid-edge node case
 !! @param[in]  Nedge_orient - edge orientation (not needed really)
 !! @param[in]  Nface_orient - face orientation (not needed really)
 !! @param[in]  Norder       - element order
-!! @param[in]  Iedg         - edge number 
+!! @param[in]  Iedg         - edge number
 !! @param[in]  ZdofH        - H1 dof for the element (vertex values really)
-!! 
+!!
 !! @param[out] ZnodH        - H1 dof for the edge
 !! @param[out] ZnodE        - H(curl) dof for the edge
 
@@ -53,7 +53,7 @@ subroutine dhpedge( &
 
   ! geometry for solelm
   real*8 :: xnod(3,MAXbrickH)
-  
+
   VTYPE :: &
        zdofH_c(MAXEQNH,MAXbrickH),zdofE_c(MAXEQNE,MAXbrickE),&
        zdofV_c(MAXEQNV,MAXbrickV),zdofQ_c(MAXEQNQ,MAXbrickQ)
@@ -89,7 +89,7 @@ subroutine dhpedge( &
   integer :: &
        i,j,k,l,ii,ivar,ivarH,ivarE,nvarH,nvarE,naH,naE,iprint, &
        nint,ndofH_edge,ndofE_edge,nrdofH, nord, nord_old
-  real*8,  dimension(MAXP+1)         :: xi_list, wa_list 
+  real*8,  dimension(MAXP+1)         :: xi_list, wa_list
   real*8                             :: t, wa
 
   ! to reuse precalculated one
@@ -100,7 +100,7 @@ subroutine dhpedge( &
 
   ! decide whether it reuse saved one
   nord = Norder(Iedg)
-  if (nord.ne.nord_old) then 
+  if (nord.ne.nord_old) then
      aaH = 0.d0; aaE = 0.d0
   endif
   zbH = ZERO; zbE = ZERO
@@ -126,10 +126,10 @@ subroutine dhpedge( &
           Type,xi, &
           norder_1,Nedge_orient,Nface_orient, &
           nrdofH,shapH,dshapH)
-     
+
      ! evaluate reference coordinates of the point
      eta(1:3)         = 0.d0
-     detadxi(1:3,1:3) = 0.d0 
+     detadxi(1:3,1:3) = 0.d0
      do k=1,nrdofH
         eta(1:3) = eta(1:3) + etav(1:3,k)*shapH(k)
         do i=1,3
@@ -203,9 +203,9 @@ subroutine dhpedge( &
      ! add derivatives of Dirichlet data wrt master coordinates
      do i=1,3
         do j=1,3
-           zdvalHdxi(1:MAXEQNH,i) = & 
+           zdvalHdxi(1:MAXEQNH,i) = &
                 zdvalHdxi(1:MAXEQNH,i) + zdvalH(1:MAXEQNH,j)*dxdxi(j,i)
-           zvalExi(i,1:MAXEQNE) = & 
+           zvalExi(i,1:MAXEQNE) = &
                 zvalExi(i,1:MAXEQNE) + zvalE(j,1:MAXEQNE)*dxdxi(j,i)
         enddo
      enddo
@@ -362,7 +362,7 @@ subroutine dhpedge( &
   if (iprint.ne.0) then
     mdle=iprint
     nrp=10; dt=1.d0/nrp
-    call nodcor(mdle,xnod) 
+    call nodcor(mdle,xnod)
     call solelm(mdle, zdofH_c,zdofE_c,zdofV_c,zdofQ_c)
     ! loop through points along the edge
     Nflag = 1
@@ -383,7 +383,7 @@ subroutine dhpedge( &
             x,dxdxi,&
             ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ)
       dxdt(1:3) = dxdxi(1:3,1)*dxidt(1) + dxdxi(1:3,2)*dxidt(2) &
-                + dxdxi(1:3,3)*dxidt(3) 
+                + dxdxi(1:3,3)*dxidt(3)
 
       call dirichlet( &
            x,Icase, &

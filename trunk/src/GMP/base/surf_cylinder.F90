@@ -29,9 +29,9 @@ subroutine cylinder(X,Point,Cvect,Rad, Fval,Dfdx)
       integer                 :: iprint,i
       real(8)                 :: s,s1
 !------------------------------------------------------------------------------------
-!      
+!
       iprint=0
-!  ...printing      
+!  ...printing
       if (iprint.eq.1) then
         write(*,7000) Point(1:3),Cvect(1:3),Rad,X(1:3)
  7000   format(' cylinder: Point = ',3e12.5,/, &
@@ -47,7 +47,7 @@ subroutine cylinder(X,Point,Cvect,Rad, Fval,Dfdx)
 !  ...evaluate the relative position vector of X
       xvec(1:3) = X(1:3) - Point(1:3)
 !
-!  ...printing      
+!  ...printing
       if (iprint.eq.1) then
         write(*,7001) unit(1:3),xvec(1:3)
  7001   format(' cylinder: unit = ',3e12.5,' xvec = ',3e12.5)
@@ -58,7 +58,7 @@ subroutine cylinder(X,Point,Cvect,Rad, Fval,Dfdx)
       call scalar_product(xvec,unit, s)
       xvecp(1:3) = xvec(1:3) - s*unit(1:3)
 !
-!  ...printing      
+!  ...printing
       if (iprint.eq.1) then
         write(*,7002) xvecp(1:3)
  7002   format('cylinder: xvecp = ',3e12.5)

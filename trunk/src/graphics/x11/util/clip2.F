@@ -15,7 +15,7 @@ c                        triangles
 c
 c   usage              - call clip2(Trc,Imod)
 c
-c   arguments 
+c   arguments
 c            in :  Trc - triangle's vertices coordinates
 c           out : Imod - clipping indicator
 c
@@ -41,9 +41,9 @@ c     if any vertex far from the window ignore the triangle
       enddo
    10 continue
 c
-c  .....if visible 
-      Imod = 1 
-c         
+c  .....if visible
+      Imod = 1
+c
       return
       end
 

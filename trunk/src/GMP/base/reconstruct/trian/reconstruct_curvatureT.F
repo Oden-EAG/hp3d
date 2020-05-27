@@ -9,17 +9,17 @@ c
 c   purpose            - given a patch of elements surrounding a point
 c                        with a normal vector, routine reconstructs
 c                        second derivatives of an implicit quadratic
-c                        surface passing through the point and 
+c                        surface passing through the point and
 c                        orthogonal to the vector, by solving a least
 c                        squares fit problem
 c
-c   arguments          
+c   arguments
 c     in:
 c          Np          - a point on the surface
 c          List_curves - list of surface curves connected to the point
-c          Nrcurves    - number of curves on the list 
+c          Nrcurves    - number of curves on the list
 c          Idec        - 0: do not modify the normal
-c                        1: modify normal 
+c                        1: modify normal
 c          Rn          - suggested normal at the point
 c     out:
 c          Acoeff      - second derivatives
@@ -47,7 +47,7 @@ c
 c  ...work space
       dimension eigen(3),work(37),iwork(18),rnw(3),aGauss(3,3),temp(3)
 c
-      dimension itrian(10)      
+      dimension itrian(10)
 
       real(8), parameter :: eps = 0.01d0
 c
@@ -61,7 +61,7 @@ c
 c
       if (iprint.eq.1) then
         write(*,7006) Np,Nrcurves,Rn
- 7006   format(' reconstruct_curvature: Np = ',i4'; 
+ 7006   format(' reconstruct_curvature: Np = ',i4';
      . Nrcurves = ',i2,'; Rn = ',3(e12.5))
         write(*,6999)List_curves(1:Nrcurves)
  6999   format(' List_curves = ',10(i8,2x))
@@ -75,76 +75,76 @@ c  ...determine if fine grid is available
       else
         ifine_grid = 0
       endif
-              
+
 c  STEP -1: if fine grid is on, find reconstructed surface number
 c
       if (ifine_grid.eq.1) then
 c
-c  ...look for a 'G1RecTri' adjacent to the first 2 curves in the bundle      
+c  ...look for a 'G1RecTri' adjacent to the first 2 curves in the bundle
       nc1 = List_curves(1); nc2 = List_curves(2)
-c      
-c  ...build up list of 'G1RecTri' attached to nc1     
+c
+c  ...build up list of 'G1RecTri' attached to nc1
       itrian = 0; nr_trian = 0
-c  ...loop over figures attached to nc1       
+c  ...loop over figures attached to nc1
       do i = 1,CURVES(nc1)%NrFig
         call decode(CURVES(nc1)%FigNo(i), it,lab)
         it = abs(it)
         if (TRIANGLES(it)%Type.ne.'G1RecTri') cycle
         call locate(it,itrian,nr_trian, j)
-c  .....if triangle is not on the list          
+c  .....if triangle is not on the list
         if (j.eq.0) then
           nr_trian = nr_trian + 1
-          itrian(nr_trian) = it      
-        endif  
-c  ...end of loop over attached figures          
+          itrian(nr_trian) = it
+        endif
+c  ...end of loop over attached figures
       enddo
-c      
-c  ...loop over figures attached to nc2       
+c
+c  ...loop over figures attached to nc2
       do i = 1,CURVES(nc2)%NrFig
         call decode(CURVES(nc2)%FigNo(i), it,lab)
         it = abs(it)
         call locate(it,itrian,nr_trian, j)
-c  .....if triangle is on the list          
+c  .....if triangle is on the list
         if (j.ne.0) then
           nrs = TRIANGLES(it)%Idata(1)
           exit
-        endif  
-c  ...end of loop over attached figures          
+        endif
+c  ...end of loop over attached figures
       enddo
 c
       if (iprint.eq.1) then
         write(*,7022)nrs
  7022   format(' reconstruct_curvature: nrs = ',i2)
-      endif      
-c 
-      endif      
+      endif
+c
+      endif
 c
 c-----------------------------------------------------------------------
-c      
+c
 c  STEP 0: collect point coordinates in a system with origin shifted to
 c          "Np" and compute weights
 c
 c  ...initialize minimum weight to big number
       dmin = 1.d30
-c 
-c  ...F I N E    G R I D    O N      
+c
+c  ...F I N E    G R I D    O N
       if (ifine_grid.eq.1) then
-c       
+c
 c  ...save # of curves and reset number of curves in the bundle to zero
       nrcurves_save = Nrcurves ; Nrcurves = 0
-c      
+c
 c  ...loop over fine grid points
       do i=1,NRPO_FG
-c      
-c  .....skip if not on the surface      
+c
+c  .....skip if not on the surface
         if (POINTS_FG(i)%Idata(1).ne.nrs) cycle
         temp(1:3) = POINTS_FG(i)%Rdata(1:3) - POINTS(Np)%Rdata(1:3)
         call norm(temp(1:3), s)
-c  .....skip if outside of an annulus of radius eps        
-c=======================================================================        
-c  REMARK: right value for phantom 1        
+c  .....skip if outside of an annulus of radius eps
+c=======================================================================
+c  REMARK: right value for phantom 1
 ccc        if (s.gt.2.d0*eps) cycle
-c=======================================================================        
+c=======================================================================
 ccc        if (s.lt.1.d0*eps) cycle
 ccc        if (s.gt.2.d0*eps) cycle
         if (s.gt.SCALE_FG) cycle
@@ -152,23 +152,23 @@ ccc        if (s.gt.0.7d0) cycle
         Nrcurves = Nrcurves + 1
 c
         if (Nrcurves.gt.n_cur_max) then
-          write(*,*)'reconstruct_curvature: increase n_cur_max, 
+          write(*,*)'reconstruct_curvature: increase n_cur_max,
      . Nrcurves = ',Nrcurves
           stop
         endif
-c        
-c  .....collect weight and secant        
+c
+c  .....collect weight and secant
         weight(Nrcurves) = s
         dmin = min(dmin,weight(Nrcurves))
-        xp(1:3,Nrcurves) = temp(1:3) 
-c        
-c  ...end of loop over fine grid points      
+        xp(1:3,Nrcurves) = temp(1:3)
+c
+c  ...end of loop over fine grid points
       enddo
 c
-c  ...C O U R S E    G R I D    O N      
+c  ...C O U R S E    G R I D    O N
       else
 c
-c  ...loop over curves      
+c  ...loop over curves
       do ic = 1,Nrcurves
         nc = List_curves(ic)
         do j = 1,2
@@ -178,27 +178,27 @@ c  ...loop over curves
           endif
         enddo
         call norm(xp(1:3,ic), weight(ic))
-c  .....updated mininum weight        
+c  .....updated mininum weight
         dmin = min(dmin,weight(ic))
-c  ...end of loop over curves        
+c  ...end of loop over curves
       enddo
 c
       endif
-c      
+c
 c  ...store weights
       do ic = 1,Nrcurves
 ccc        if (weight(ic).lt.GEOM_TOL) then
 ccc          weight(ic) = 1000.d0
 ccc        else
 ccc           weight(ic) = (dmin/weight(ic))!**.7d0
-ccc        endif   
+ccc        endif
 c======================================================================
 c  REMARK: right option for phantom_1
         weight(ic) = 1.d0
 c======================================================================
       enddo
-c      
-c  ...printing      
+c
+c  ...printing
       if (iprint.eq.1) then
         write(*,7000)Np,Nrcurves
  7000   format(' reconstruct_curvature: Np = ',i7,'; Nrcurves = ',i3)
@@ -215,33 +215,33 @@ c  ...printing
       endif
 c
 c---------------------------------------------------------------------
-c      
-c  STEP 1: set up the matrices aa and bb for the linear system 
+c
+c  STEP 1: set up the matrices aa and bb for the linear system
 c     corresponding to the least squares fit problem
 c
       aa(1:6,1:6) = 0.d0; bb(1:6,1:3) = 0.d0
-c  ...set row index for aa & bb      
+c  ...set row index for aa & bb
       jj = 0
-c  ...loops over Hessian indices      
+c  ...loops over Hessian indices
       do i = 1,3
         do j = i,3
-c  .......compute coefficient for a_ij        
+c  .......compute coefficient for a_ij
           if (i.eq.j) then
             ddd = 0.5d0
           else
             ddd = 1.d0
           endif
-c  .......update row index          
+c  .......update row index
           jj = jj + 1
 c  .......loop over connected points
           do ic = 1,Nrcurves
             do k = 1,3
-              bb(jj,k) = bb(jj,k) + 
+              bb(jj,k) = bb(jj,k) +
      .                   ddd*xp(i,ic)*xp(j,ic)*xp(k,ic)*weight(ic)
             enddo
-c  .........set column index for aa            
+c  .........set column index for aa
             ii = 0
-c  .........loops over Hessian indices            
+c  .........loops over Hessian indices
             do k = 1,3
               do l = k,3
                 ii = ii + 1
@@ -250,15 +250,15 @@ c  .........loops over Hessian indices
                 else
                   ccc = 1.d0
                 endif
-                aa(jj,ii) = aa(jj,ii) 
+                aa(jj,ii) = aa(jj,ii)
      .                    + ccc*xp(k,ic)*xp(l,ic)*ddd*xp(i,ic)*xp(j,ic)
      .                     *weight(ic)
-c  ...........end of loops over Hessian indices                
+c  ...........end of loops over Hessian indices
               enddo
             enddo
-c  .......end of loop over connected points            
+c  .......end of loop over connected points
           enddo
-c  .....end of loops over Hessian indices          
+c  .....end of loops over Hessian indices
         enddo
       enddo
 c
@@ -269,19 +269,19 @@ c  ...compute the maximum diagonal entry
       enddo
 c
 c  ...add the regularizing term of two magnitudes smaller if needed
-c======================================================================      
+c======================================================================
 c  REMARK: recall that we are storing the Hessian in the following
-c    order: (11,12,13,22,23,33)   
-c      
+c    order: (11,12,13,22,23,33)
+c
 c           j
 c         --------->
-c         | 1 2 3 
-c       i |   4 5 
-c         |     6 
+c         | 1 2 3
+c       i |   4 5
+c         |     6
 c         |
 c         V
 c
-c======================================================================   
+c======================================================================
       if (Nrcurves.lt.6) then
         jj = 0
         do i = 1,3
@@ -292,7 +292,7 @@ c======================================================================
             else
               ddd = .02d0
             endif
-c  .........add penalty term to diagonal entry of matrix          
+c  .........add penalty term to diagonal entry of matrix
             aa(jj,jj) = aa(jj,jj) + scale*ddd
           enddo
         enddo
@@ -315,9 +315,9 @@ c
 c-----------------------------------------------------------------------
 c
 c  STEP 2: set up matrices cc and dd, cc being transpose(bb)
-c      
+c
       cc(1:3,1:6) = 0.d0;  dd(1:3,1:3) = 0.d0
-c      
+c
       do j = 1,3
 c  .....loop through the points
         do ic = 1,Nrcurves
@@ -333,7 +333,7 @@ c  .....loop through the points
             else
               ccc = 1.d0
             endif
-            cc(j,ii) = cc(j,ii) 
+            cc(j,ii) = cc(j,ii)
      .               + ccc*xp(k,ic)*xp(l,ic)*xp(j,ic)*weight(ic)
           enddo
           enddo
@@ -354,19 +354,19 @@ c
 c-----------------------------------------------------------------------
 c
 c  STEP 3: set up and solve the eigenvalue problem
-c      
+c
 c  ...perform forward Gauss elimination
       ipiv = 0
       aux(1:6,1:3) = bb(1:6,1:3)
       call DGESV( 6, 3, aa, 6, ipiv, aux(1:6,1:3), 6, info )
-c      
+c
 ccc      call dgetrf(6,6,aa,6,ipiv,info)
       if (info.ne.0) then
         write(*,*)'reconstruct_curvature: DGETRF RETURNED INFO=',info
         call pause
         stop 1
       endif
-c      
+c
 ccc      call tri(aa,6,6)
 c  ...perform backward Gauss substitution
 ccc      aux(1:6,1:3) = bb(1:6,1:3)
@@ -384,8 +384,8 @@ c$$$      write(*,*)'here 4'
 ccc      do k = 1,3
 ccc        call rhsub(aa,aux(1:6,k),bb(1:6,k),6,6)
 ccc      enddo
-      
-c  ...build  D - B'*A^(-1)*B , see eq (4.61), and store in dd(1:3,1:3) 
+
+c  ...build  D - B'*A^(-1)*B , see eq (4.61), and store in dd(1:3,1:3)
       do k = 1,3
         do l = 1,3
           s = 0.d0
@@ -402,7 +402,7 @@ c  ...build  D - B'*A^(-1)*B , see eq (4.61), and store in dd(1:3,1:3)
  7008     format('   dd(',i1,',1:3) = ',3(e12.5,2x))
         enddo
       endif
-c  ...compute eigenvalues and eigenvectors      
+c  ...compute eigenvalues and eigenvectors
       call DSYEVD('V','U',3,dd,3,eigen,work,37,iwork,18,info)
       if (iprint.eq.1) then
         write(*,*)''
@@ -438,34 +438,34 @@ c  ...loop over eigenvectors
         if (dnew.lt.dist) then
           sign = -1.d0;  ibest = i;  dist = dnew
         endif
-c  ...end of loop over eigenvectors        
+c  ...end of loop over eigenvectors
       enddo
 c
-c----------------------------------------------------------------------     
+c----------------------------------------------------------------------
 c
 c  STEP 5: check whether the selected vector indeed minimizes the
 c     the misfit function, if Nrcurves >= 6.
-c  REMARK: when the penalty term is added, the normal does not 
+c  REMARK: when the penalty term is added, the normal does not
 c     minimizes the misfit function any more!
 c
       if (Nrcurves.lt.6) then
 ccc        ivmin = ibest
         goto 10
-      endif  
+      endif
 
       fmin = 1.d30
-c  ...loop over possible choices of normals: original + 3 eigenvectors      
+c  ...loop over possible choices of normals: original + 3 eigenvectors
 ccc      do iv = 0,3
       do iv = 1,3
-c  .....pick normal      
+c  .....pick normal
         select case(iv)
         case(0)
           rnw(1:3) = Rn(1:3)
         case(1,2,3)
           rnw(1:3) = dd(1:3,iv)
         end select
-c  .....compute the corresponding 6 entries of the Hessian using 
-c       eq (4.60):  Hessian = -A^(-1) * B * n        
+c  .....compute the corresponding 6 entries of the Hessian using
+c       eq (4.60):  Hessian = -A^(-1) * B * n
         do i = 1,6
           s = 0.d0
           do k = 1,3
@@ -482,20 +482,20 @@ c  .....store the Hessian in matrix form
             Acoeff(j,i) = uu(ii)
           enddo
         enddo
-c        
-c        
+c
+c
 ccc======================================================================
-ccc                     G  A  U  S  S '   M  A  P 
+ccc                     G  A  U  S  S '   M  A  P
 ccc
-ccc    STEP 1: compute s = (A * n) * n     
+ccc    STEP 1: compute s = (A * n) * n
 cc        s = 0.d0
 cc        do i = 1,3
 cc          do j = 1,3
 cc            s = s + rnw(i)*rnw(j)*Acoeff(i,j)
 cc          enddo
 cc        enddo
-ccc    STEP 2: compute composition of the projection on the tangent 
-ccc       plane with the Gauss' map. i.e. eq (2.33)        
+ccc    STEP 2: compute composition of the projection on the tangent
+ccc       plane with the Gauss' map. i.e. eq (2.33)
 cc        do i = 1,3
 cc          do j = 1,3
 cc            s1 = 0.d0; s2 = 0.d0
@@ -503,10 +503,10 @@ cc            do l = 1,3
 cc              s1 = s1 + rnw(l)*Acoeff(l,j)
 cc              s2 = s2 + rnw(l)*Acoeff(l,i)
 cc            enddo
-cc            aGauss(i,j) = Acoeff(i,j) - rnw(i)*s1 - rnw(j)*s2 
+cc            aGauss(i,j) = Acoeff(i,j) - rnw(i)*s1 - rnw(j)*s2
 cc     .                  + rnw(i)*rnw(j)*s
 cc          enddo
-cc        enddo        
+cc        enddo
 cc        if (iprint.eq.1) then
 cc          write(*,8050)iv
 cc 8050     format('   case ',i1,':')
@@ -535,7 +535,7 @@ c  .....compute scaling for misfit function
             s = s + Acoeff(i,j)**2
           enddo
         enddo
-        s = s*scale*0.01d0       
+        s = s*scale*0.01d0
 c  .....compute misfit function
         do ic = 1,Nrcurves
 c  .......compute: s1 = 0.5*(Hess*x)*x + n*x
@@ -561,7 +561,7 @@ c  .....update if necessary
         if (s.lt.fmin) then
           fmin = s;  ivmin = iv
         endif
-c  ...end of loop over possible normals        
+c  ...end of loop over possible normals
       enddo
 c
 c  ...check consistency
@@ -578,15 +578,15 @@ ccc        call pause
       endif
 c
 c----------------------------------------------------------------------
-c      
-c  STEP 6: store definite normal and compute corresponding Hessian      
+c
+c  STEP 6: store definite normal and compute corresponding Hessian
 
 c  ...if required reset the normal
  10   continue
       if (Idec.eq.1) then
         Rn(1:3) = sign*dd(1:3,ibest)
 ccc        Rn(1:3) = sign*dd(1:3,ivmin)
-      endif  
+      endif
 cccc  ...determine sign of normal
 ccc      call norm(dd(1:3,ivmin)-Rn, dnew)
 ccc      sign =  1.d0;  dist = dnew
@@ -629,7 +629,7 @@ c
       if (ifine_grid.eq.1) then
 c  .....restore original Nrcurves
         Nrcurves = nrcurves_save
-      endif      
+      endif
 c
-c      
+c
       end

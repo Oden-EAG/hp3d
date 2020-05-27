@@ -9,7 +9,7 @@
 !
 !    latest revision    - Feb 2020
 !
-!    purpose            - module sets up required workspace for 
+!    purpose            - module sets up required workspace for
 !                         interfacing with linear PETSc solvers
 !
 ! -----------------------------------------------------------------------

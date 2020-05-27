@@ -9,11 +9,11 @@ c
 c   purpose            - routine returns neighbors through faces
 c                        for an element
 c
-c   arguments 
+c   arguments
 c     in:
 c            Mdle      - (middle node of an) element
 c     out:
-c                
+c
 c            Neig      - neighbors
 c
 c----------------------------------------------------------------------
@@ -60,7 +60,7 @@ c
 c
 c  Step 1: find neighbors for element mid-face nodes
 c
-      call elem_nodes(Mdle, nodesl,norientl) 
+      call elem_nodes(Mdle, nodesl,norientl)
       do if=1,nface(type)
         nod = nodesl(nvert(type)+nedge(type)+if)
         if (iprint.eq.1) then

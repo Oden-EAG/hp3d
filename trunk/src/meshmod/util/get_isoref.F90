@@ -1,56 +1,56 @@
-!---------------------------------------------------------------------------------       
+!---------------------------------------------------------------------------------
 !> Purpose : return isotropic refinement flag
 !!
 !! @param[in ] Nod  - a node number
 !! @param[out] Kref - isotropic refinement flag
 !!
 !> rev@Dec 12
-!---------------------------------------------------------------------------------       
+!---------------------------------------------------------------------------------
 subroutine get_isoref(Nod, Kref)
 !
        use data_structure3D
-!       
+!
        implicit none
        integer, intent(in)     :: Nod
        integer, intent(out)    :: Kref
-!       
+!
        real(8), dimension(3,8) :: xsub
        real(8), dimension(3)   :: dist, xi
        real(8), dimension(3,2) :: x
-       
+
        integer, dimension(27)  :: nodesl,norientl
        integer, dimension(2)   :: iv
        integer, dimension(2,3), parameter :: ie = &
             reshape( (/1,6, 3,5, 4,2/), (/2,3/) )
        integer :: iprint, iflag, no, i,j,k, loc
-!---------------------------------------------------------------------------------       
+!---------------------------------------------------------------------------------
 !
       Kref = 0
       iprint = 0
 !
 !  ...select refinement based on node type
       select case(NODES(Nod)%type)
-!      
+!
 !     EDGE
       case('medg') ; Kref=1
-!              
-!     TRIANGLE              
+!
+!     TRIANGLE
       case('mdlt') ; Kref=1
-!              
-!     QUAD              
+!
+!     QUAD
       case('mdlq') ; Kref=11
-!              
-!     PRISM              
+!
+!     PRISM
       case('mdlp') ; Kref=11
-!              
-!     BRICK              
+!
+!     BRICK
       case('mdlb') ; Kref=111
-!              
-!     TET              
+!
+!     TET
       case('mdln')
         call refel(     Nod, iflag,no,xsub)
         call elem_nodes(Nod, nodesl,norientl)
-!        
+!
 !  .....measure 3 diagonals
         dist(1:3)=0.d0
         do i=1,3
@@ -81,7 +81,7 @@ subroutine get_isoref(Nod, Kref)
 !
 !  .....selec appropriate refinement kind
         Kref = 10 + loc
-        
+
         if (iprint.eq.1) then
           write(*,7000) Kref, dist
 7000      format(' get_isoref : Kref = ',i3,' dist = ',3f8.3)

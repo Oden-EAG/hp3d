@@ -8,7 +8,7 @@ c   latest revision    - Feb 11
 c
 c   purpose            - routine identifies sharp curves
 c
-c   arguments    
+c   arguments
 c     in:
 c              Ncu     - a curve
 c     out:
@@ -26,52 +26,52 @@ c
 c
 c  ...list of attached triangles
       dimension itrian(2),aux1(3),aux2(3),aux3(3),aux4(3),ntest(200)
-c      
+c
 c  ...list of sharp edges
       dimension nsharp(1000)
 c
-c  ...visitation flag      
+c  ...visitation flag
       data ivisit /0/
-c  ...save visitation flag and list of sharp edges      
+c  ...save visitation flag and list of sharp edges
       save ivisit,nsharp,nr_sharp
-c      
+c
 c-----------------------------------------------------------------------
-c      
+c
 c  ...select routine vesion you want to use (100 - default)
       goto 100
 
 c=======================================================================
 c  VERSION 1: use surface numbers to determine sharp edges
-c     
+c
 c
 c  STEP 0: if 1st visit determine list of sharp edges
-c      
+c
  100  continue
 
       Idec=0
 c
       if (ivisit.eq.0) then
         ivisit = 1
-c        
-        nr_sharp = 0      
-c  .....loop over curves      
+c
+        nr_sharp = 0
+c  .....loop over curves
         do nc = 1,NRCURVE
-c  .......skip if not an Hermite curve      
-          if (CURVES(nc)%Type.ne.'HermCur') cycle        
-c  .......build up list of attached 'G1RecTri'        
+c  .......skip if not an Hermite curve
+          if (CURVES(nc)%Type.ne.'HermCur') cycle
+c  .......build up list of attached 'G1RecTri'
           itrian = 0; nr_trian = 0
-c  .......loop over attached figures        
+c  .......loop over attached figures
           do i = 1,CURVES(nc)%NrFig
             call decode(CURVES(nc)%FigNo(i), it,lab)
             it = abs(it)
             if (TRIANGLES(it)%Type.ne.'G1RecTri') cycle
             call locate(it,itrian,nr_trian, j)
-c  .........if triangle is not on the list          
+c  .........if triangle is not on the list
             if (j.eq.0) then
               nr_trian = nr_trian + 1
-              itrian(nr_trian) = it      
-            endif  
-c  .......end of loop over attached figures          
+              itrian(nr_trian) = it
+            endif
+c  .......end of loop over attached figures
           enddo
           if (nr_trian.ne.2) then
             write(*,*)'check_edge: have found an Hermite curve
@@ -86,10 +86,10 @@ c  .......end of loop over attached figures
             nr_sharp = nr_sharp + 1
             nsharp(nr_sharp) = nc
           endif
-c  .....end of loop over curves        
+c  .....end of loop over curves
         enddo
 c
-        if (nr_sharp.gt.0) then        
+        if (nr_sharp.gt.0) then
           write(*,*)'-------------------------------------------'
           write(*,*)'SHARP EDGES:'
           do i = 1,nr_sharp
@@ -100,17 +100,17 @@ c
         endif
 c
 c  ...end of 1st visit
-      endif        
+      endif
 c
-c      
-c  STEP 1: determine wheter curve is on the list of sharp edges      
+c
+c  STEP 1: determine wheter curve is on the list of sharp edges
 c
       Idec = 0
       call locate(Ncu,nsharp,nr_sharp, ifound)
       if (ifound.ne.0) Idec = 2
 c
       return
-c      
+c
 c=======================================================================
 c  VERSION 2: use dot product b/w normals to detect sharp edges
 c
@@ -119,26 +119,26 @@ c
 c
       if (ivisit.eq.0) then
         ivisit = 1
-c        
-        nr_sharp = 0      
-c  .....loop over curves      
+c
+        nr_sharp = 0
+c  .....loop over curves
         do nc = 1,NRCURVE
-c  .......skip if not an Hermite curve      
-          if (CURVES(nc)%Type.ne.'HermCur') cycle        
-c  .......build up list of attached 'G1RecTri'        
+c  .......skip if not an Hermite curve
+          if (CURVES(nc)%Type.ne.'HermCur') cycle
+c  .......build up list of attached 'G1RecTri'
           itrian = 0; nr_trian = 0
-c  .......loop over attached figures        
+c  .......loop over attached figures
           do i = 1,CURVES(nc)%NrFig
             call decode(CURVES(nc)%FigNo(i), it,lab)
             it = abs(it)
             if (TRIANGLES(it)%Type.ne.'G1RecTri') cycle
             call locate(it,itrian,nr_trian, j)
-c  .........if triangle is not on the list          
+c  .........if triangle is not on the list
             if (j.eq.0) then
               nr_trian = nr_trian + 1
-              itrian(nr_trian) = it      
-            endif  
-c  .......end of loop over attached figures          
+              itrian(nr_trian) = it
+            endif
+c  .......end of loop over attached figures
           enddo
           if (nr_trian.ne.2) then
             write(*,*)'check_edge: have found an Hermite curve
@@ -167,17 +167,17 @@ c  .......end of loop over attached figures
           call cross_product(aux3,aux2, aux4)
           call normalize(aux4)
           call scalar_product(aux1,aux4, s)
-c          
-c         SET DOT PRODUCT HERE ------------------------|          
+c
+c         SET DOT PRODUCT HERE ------------------------|
           if (s.lt.0.6d0) then !  <--------------------|
-c                  
+c
             nr_sharp = nr_sharp + 1
             nsharp(nr_sharp) = nc
           endif
-c  .....end of loop over curves        
+c  .....end of loop over curves
         enddo
 c
-        if (nr_sharp.gt.0) then        
+        if (nr_sharp.gt.0) then
           write(*,*)'-------------------------------------------'
           write(*,*)'SHARP EDGES:'
           do i = 1,nr_sharp
@@ -188,14 +188,14 @@ c
         endif
 c
 c  ...end of 1st visit
-      endif        
-c      
+      endif
+c
       Idec = 0
       call locate(Ncu,nsharp,nr_sharp, ifound)
       if (ifound.ne.0) Idec = 2
 c
       return
-c      
+c
 c=======================================================================
 c  VERSION 3: explicitly list sharp edges
 c

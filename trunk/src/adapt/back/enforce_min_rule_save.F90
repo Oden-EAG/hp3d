@@ -61,7 +61,7 @@
               NODES(nod)%visit = nordh*10+nordv
             end select
           endif
-        enddo 
+        enddo
       enddo
       if (iprint.eq.1) write(*,*) 'enforce_min_rule: DONE WITH Step 1'
 !

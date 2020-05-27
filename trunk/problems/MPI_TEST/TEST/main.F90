@@ -1,15 +1,15 @@
 !----------------------------------------------------------------------
-!                                                                     
+!
 !     program name      - main
-!                                                                     
-!---------------------------------------------------------------------- 
-!                                                                     
-!     latest revision:  - July 2019
-!                                                                     
-!     purpose:          - main driver for MPI Poisson Test Program
-!                                                                    
+!
 !----------------------------------------------------------------------
-!    
+!
+!     latest revision:  - July 2019
+!
+!     purpose:          - main driver for MPI Poisson Test Program
+!
+!----------------------------------------------------------------------
+!
 program main
 !
    use environment

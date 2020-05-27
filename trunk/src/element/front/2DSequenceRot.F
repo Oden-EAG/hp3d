@@ -1,7 +1,7 @@
 c----------------------------------------------------------------------
 c----------------------------------------------------------------------
 c
-c             IMPORTANT: This only applies for 2D problems!!! 
+c             IMPORTANT: This only applies for 2D problems!!!
 c                 (when/if a 2D option is ever included)
 c
 c----------------------------------------------------------------------
@@ -44,13 +44,13 @@ c         DivV          - divergences of the shape functions
 c
 c----------------------------------------------------------------------
 c
-      subroutine shape2V(Type,Xi,Norder,Nedge_orient, 
+      subroutine shape2V(Type,Xi,Norder,Nedge_orient,
      .                                              NrdofV,ShapV,DivV)
-c   
+c
       use parameters , only : MAXquadV
 c
       implicit none
-      character(len=4), intent(in)  :: Type      
+      character(len=4), intent(in)  :: Type
       real(8), intent(in ) :: Xi(2)
       integer, intent(in ) :: Norder(5)
       integer, intent(in ) :: Nedge_orient(4)
@@ -84,15 +84,15 @@ c     out:
 c       NrdofV         - number of element dof
 c       ShapV          - values of shape functions
 c       DivV           - values of derivatives of the shape functions
-c                        wrt to master element coordinates      
-c     
+c                        wrt to master element coordinates
+c
 c----------------------------------------------------------------------
-c     
+c
       subroutine shapeVq(Xi,Norder,Nedge_orient, NrdofV,ShapV,DivV)
-c     
+c
       use parameters , only : MAXquadV
 c
-      implicit none      
+      implicit none
       real(8), intent(in ) :: Xi(2)
       integer, intent(in ) :: Norder(5)
       integer, intent(in ) :: Nedge_orient(4)
@@ -126,12 +126,12 @@ c     out:
 c       NrdofV         - number of element dof
 c       ShapV          - values of shape functions
 c       DivV           - values of derivatives of the shape functions
-c                        wrt to master element coordinates      
-c     
+c                        wrt to master element coordinates
+c
 c----------------------------------------------------------------------
-c     
+c
       subroutine shapeVt(Xi,Norder,Nedge_orient, NrdofV,ShapV,DivV)
-c     
+c
       use parameters , only : MAXtriaV
 c
       implicit none

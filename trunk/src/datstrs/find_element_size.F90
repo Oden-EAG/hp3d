@@ -17,7 +17,7 @@ subroutine find_element_size(Mdle, H)
   H = 0.d0
   do i=1,nv
      x = NODES(nodesl(i))%dof%coord(1:3,1)
-     do j=1,nv 
+     do j=1,nv
         y = NODES(nodesl(j))%dof%coord(1:3,1)
         call norm(x-y, dist)
         if (dist.gt.H) then

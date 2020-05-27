@@ -435,10 +435,10 @@ c           call pause
 
          endif
 
-         
+
          irecp0 = irecp - (numfile-1)*irecpmax
 
-c         write(*,*)'2 read, ntape0, irecp,irecp0=',ntape0,irecp,irecp0 
+c         write(*,*)'2 read, ntape0, irecp,irecp0=',ntape0,irecp,irecp0
          read (ntape0, rec=irecp0, err=9300) (Sbuf(i),i=inow,iend)
 c---------------------------------------------------------------
 

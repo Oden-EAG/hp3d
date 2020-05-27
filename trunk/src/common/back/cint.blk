@@ -8,11 +8,11 @@ c
 c
       common /cintr/  XIGAUSS(3,79,20),WAGAUSS(79,20),NRGAUPO(20),
      .                NSELECT(9)
-c  
+c
 c  contains integration points and corresponding weights for 2-D
 c  Gaussian integration on any triangle
 c
-c  XIGAUSS(i,j,k) = i-th affine coordinate of j-th point of k-th 
+c  XIGAUSS(i,j,k) = i-th affine coordinate of j-th point of k-th
 c                   point set
 c  WAGAUSS(j,k)   = weight at j-th point if k-th point set
 c  NRGAUPO(k)     = number of gauss points in the k-th set
@@ -21,7 +21,7 @@ c                   mass matrix for an affine element and order k
 c
       common /cint_tets/ XIGAUSS_TETS(3,720,7),WAGAUSS_TETS(720,7),
      .                   NRGAUPO_TETS(7), NSELECT_TETS(7)
-c  
+c
 c  contains integration points and corresponding weights for 3-D
 c  Gaussian integration on the master tetrahedron
 c

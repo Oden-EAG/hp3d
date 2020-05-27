@@ -8,21 +8,21 @@
 !
 !   purpose            - file element mdle nod list for a grid
 !
-!   arguments          
-!       in     
-!              igrid   - grid index   
+!   arguments
+!       in
+!              igrid   - grid index
 !
 !----------------------------------------------------------------------
 !
    subroutine fill_mdle_list(igrid)
-!   
+!
    use data_structure3D,  only: NRELES
    use mg_data_structure, only: GRID, NODES_MG
 !
    implicit none
 !
    integer :: igrid, mdle, iel
-!   
+!
 !-------------------------------------------------
 !
    GRID(igrid)%nreles = NRELES

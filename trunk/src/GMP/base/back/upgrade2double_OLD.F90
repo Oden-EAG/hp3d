@@ -54,10 +54,10 @@ subroutine upgrade2double_NEW
       if (POINTS(np)%Type .eq. 'Regular') cycle
       if (POINTS(np)%Idata(1) .gt. max_surfs) max_surfs = POINTS(np)%Idata(1)
     enddo
-! ..allocate S_PROD and M_PROD accordingly    
+! ..allocate S_PROD and M_PROD accordingly
     if (max_surfs .lt. 3) then
       allocate(S_PROD(3,2), STAT = status)
-! ....if allocation not successful      
+! ....if allocation not successful
       if (status .ne. 0) then
         write(*,*)'upgrade2double: S_PROD not allocated.'
         stop
@@ -68,10 +68,10 @@ subroutine upgrade2double_NEW
         write(*,*)'upgrade2double: M_PROD not allocated.'
         stop
       endif
-! ..at least 3 surfaces      
-    else      
+! ..at least 3 surfaces
+    else
       allocate(S_PROD(3,combinations(max_surfs,2)), STAT = status)
-! ....if allocation not successful      
+! ....if allocation not successful
       if (status .ne. 0) then
         write(*,*)'upgrade2double: S_PROD not allocated.'
         stop
@@ -94,7 +94,7 @@ subroutine upgrade2double_NEW
 #if I_PRINT >= 2
       write(*,*)'****************************************************************'
       write(*,*)'upgrade2double: nt, type =',nt,TRIANGLES(nt)%Type
-#endif  
+#endif
 ! ....loop through vertices
       do iv = 1, 3
 ! ......get point number
@@ -104,9 +104,9 @@ subroutine upgrade2double_NEW
 ! ......select number of surfaces
 #if I_PRINT >= 2
         write(*,*)'upgrade2double: first visit to point np =',np
-#endif  
+#endif
         select case (POINTS(np)%Idata(1))
-! ........point lies on ONE surface        
+! ........point lies on ONE surface
           case (1)
 #if I_PRINT >= 2
             write(*,*)'upgrade2double: 1_surf point.'
@@ -116,42 +116,42 @@ subroutine upgrade2double_NEW
 ! ..........create 2 extra planes and store their surface number
             NRSURFS = NRSURFS + 1;  surfs(2) = NRSURFS
             NRSURFS = NRSURFS + 1;  surfs(3) = NRSURFS
-! ..........get 1st curve number          
+! ..........get 1st curve number
             nc = abs(TRIANGLES(nt)%EdgeNo(iv))
 #if I_PRINT >= 2
   write(*,*)'upgrade2double: nc_1 =',nc
-#endif  
+#endif
 ! ..........get 1st curve start point
             np_s = CURVES(nc)%EndPoNo(1)
-! ..........account for orientation and compute gradient          
+! ..........account for orientation and compute gradient
             if (np .eq. np_s) then
               call curve(nc,0.d0, void_1,GRAD(1:3,1))
-            else  
+            else
               call curve(nc,1.d0, void_1,GRAD(1:3,1))
             endif
             call normalize(GRAD(1:3,1))
 #if I_PRINT >= 2
             write(*,1) GRAD(1:3,1)
 1           format(' upgrade2double: grad_1 =',3(E12.5,2X))
-#endif  
+#endif
 ! ..........get 2nd curve number
             nc = abs(TRIANGLES(nt)%EdgeNo(mod3(iv + 2)))
-#if I_PRINT >= 2 
+#if I_PRINT >= 2
             write(*,*)'upgrade2double: nc_2 =',nc
-#endif  
+#endif
 ! ..........get 2nd curve start point
             np_s = CURVES(nc)%EndPoNo(1)
-! ..........compute gradient          
+! ..........compute gradient
             if (np .eq. np_s) then
               call curve(nc,0.d0, void_1,GRAD(1:3,2))
-            else  
+            else
               call curve(nc,1.d0, void_1,GRAD(1:3,2))
             endif
             call normalize(GRAD(1:3,2))
 #if I_PRINT >= 2
             write(*,1) GRAD(1:3,2)
 2           format(' upgrade2double: grad_2 =',3(E12.5,2X))
-#endif  
+#endif
 ! ..........check orthogonality
             call surf(surfs(1),POINTS(np)%Rdata(1:3), void_1,GRAD(1:3,3))
             call normalize(GRAD(1:3,3))
@@ -159,7 +159,7 @@ subroutine upgrade2double_NEW
             M_PROD(1,1) = abs(M_PROD(1,1))
             if (M_PROD(1,1) .lt. 0.3d0) then
               write(*,*)'upgrade2double: warning, M_PROD = ',M_PROD(1,1)
-            endif        
+            endif
 ! ..........create 2 extra planes
             SURFACES(surfs(2))%Type = 'VecPt';                      SURFACES(surfs(3))%Type = 'VecPt'
             allocate (SURFACES(surfs(2))%Rdata(6));                 allocate (SURFACES(surfs(3))%Rdata(6))
@@ -167,7 +167,7 @@ subroutine upgrade2double_NEW
             SURFACES(surfs(2))%Rdata(4:6) = GRAD(1:3,1);            SURFACES(surfs(3))%Rdata(4:6) = GRAD(1:3,2)
 #if I_PRINT >= 2
             write(*,*)'upgrade2double: 2 extra planes defined.'
-#endif  
+#endif
 ! ..........apply Newton-Rapson method; use point coordinats as initial guess
             void_1 = 0.d0
             call mnewt(1,surfs,void_1,void_2,POINTS(np)%Rdata(1:3),void_2, POINTS(np)%Rdata(1:3))
@@ -177,8 +177,8 @@ subroutine upgrade2double_NEW
 ! ..........delete extra surfaces
             SURFACES(surfs(2))%Type = 'Void';     SURFACES(surfs(3))%Type = 'Void'
             deallocate(SURFACES(surfs(2))%Rdata); deallocate(SURFACES(surfs(3))%Rdata)
-            NRSURFS = NRSURFS - 2 
-! ........point lies on TWO surfaces            
+            NRSURFS = NRSURFS - 2
+! ........point lies on TWO surfaces
           case (2)
 #if I_PRINT >= 2
             write(*,*)'upgrade2double: 2_surf point.'
@@ -187,31 +187,31 @@ subroutine upgrade2double_NEW
             surfs(1:2) = POINTS(np)%Idata(2:3)
 ! ..........create 1 extra plane and store its surface number
             NRSURFS = NRSURFS + 1;  surfs(3) = NRSURFS
-! ..........get 1st curve number          
+! ..........get 1st curve number
             nc = abs(TRIANGLES(nt)%EdgeNo(iv))
 #if I_PRINT >= 2
             write(*,*)'upgrade2double: nc_1 = ',nc
 #endif
 ! ..........get curve start point
             np_s = CURVES(nc)%EndPoNo(1)
-! ..........account for orientation and compute gradient          
+! ..........account for orientation and compute gradient
             if (np .eq. np_s) then
               call curve(nc,0.d0, void_1,GRAD(1:3,1))
-            else  
+            else
               call curve(nc,1.d0, void_1,GRAD(1:3,1))
             endif
             call normalize(GRAD(1:3,1))
 #if I_PRINT >= 2
             write(*,1) GRAD(1:3,1)
 #endif
-! ..........get 2nd curve number          
+! ..........get 2nd curve number
             nc = abs(TRIANGLES(nt)%EdgeNo(mod3(iv + 2)))
 ! ..........get curve start point
             np_s = CURVES(nc)%EndPoNo(1)
-! ..........account for orientation, compute gradient and normalize it      
+! ..........account for orientation, compute gradient and normalize it
             if (np .eq. np_s) then
               call curve(nc,0.d0, void_1,GRAD(1:3,2))
-            else  
+            else
               call curve(nc,1.d0, void_1,GRAD(1:3,2))
             endif
             call normalize(GRAD(1:3,2))
@@ -229,7 +229,7 @@ subroutine upgrade2double_NEW
 ! ..........compute maximum and check if it is an appropriate value
             if (maxval(M_PROD(1,1:2)) .lt. 0.3d0) then
               write(*,*)'upgrade2double: warning, mixed product less than 0.03.'
-            endif        
+            endif
 ! ..........create plane
             SURFACES(surfs(3))%Type = 'VecPt'
             allocate (SURFACES(surfs(3))%Rdata(6))
@@ -257,8 +257,8 @@ subroutine upgrade2double_NEW
 ! ..........delete extra surface
             SURFACES(surfs(3))%Type = 'Void'
             deallocate(SURFACES(surfs(3))%Rdata)
-            NRSURFS = NRSURFS - 1 
-! ........point lies on THREE OR MORE surfaces            
+            NRSURFS = NRSURFS - 1
+! ........point lies on THREE OR MORE surfaces
           case default
 #if I_PRINT >= 2
             write(*,*)'upgrade2double: point lies on 3 surfaces or more.'
@@ -270,7 +270,7 @@ subroutine upgrade2double_NEW
                 do k = 1, POINTS(np)%Idata(1)
 ! ................increment counter
                   l = l + 1
-! ................compute gradients of 3 selected surfaces and normalize them         
+! ................compute gradients of 3 selected surfaces and normalize them
                   call surf(POINTS(np)%Idata(i + 1),POINTS(np)%Rdata(1:3), void_1,GRAD(1:3,1))
                   call surf(POINTS(np)%Idata(j + 1),POINTS(np)%Rdata(1:3), void_1,GRAD(1:3,2))
                   call surf(POINTS(np)%Idata(k + 1),POINTS(np)%Rdata(1:3), void_1,GRAD(1:3,3))
@@ -290,27 +290,27 @@ subroutine upgrade2double_NEW
             if (maxval(M_PROD(1,1:l)) .gt. 0.1) then
 #if I_PRINT >= 2
               write(*,*)'upgrade2double: found 3 appropriate surfaces.'
-#endif              
-! ............get position of greates mixed product                    
-              temp = maxloc(M_PROD(1,1:l))      
-! ............apply Newton method         
+#endif
+! ............get position of greates mixed product
+              temp = maxloc(M_PROD(1,1:l))
+! ............apply Newton method
               void_1 = 0.d0;  void_2 = 0.d0
               call mnewt(1,M_PROD(2:4,temp(1)),void_1,void_2,POINTS(np)%Rdata(1:3),void_2, POINTS(np)%Rdata(1:3))
-#if I_PRINT >= 2  
+#if I_PRINT >= 2
               write(*,*)'upgrade2double: Newton method applied.'
 #endif
 ! ..........else treat point as a 2 surf point
             else
 #if I_PRINT >= 2
               write(*,*)'upgrade2double: redefining point as 2_surf point.'
-#endif              
+#endif
 ! ............loop through all possible choices of 2 surfaces
               l = 0
               do i = 1, (POINTS(np)%Idata(1) - 1)
                 do j = 1, POINTS(np)%Idata(1)
 ! ................increment counter
                   l = l + 1
-! ................compute gradients of 2 selected surfaces and normalize them          
+! ................compute gradients of 2 selected surfaces and normalize them
                   call surf(POINTS(np)%Idata(i + 1),POINTS(np)%Rdata(1:3), void_1,GRAD(1:3,1))
                   call surf(POINTS(np)%Idata(j + 1),POINTS(np)%Rdata(1:3), void_1,GRAD(1:3,2))
                   call normalize(GRAD(1:3,1))
@@ -325,9 +325,9 @@ subroutine upgrade2double_NEW
 ! ............choose smallest scalar product in order to retrive surfaces number
               temp = minloc(S_PROD(1,1:l))
               surfs(1:2) = S_PROD(2:3,temp(1))
-#if I_PRINT >= 2  
+#if I_PRINT >= 2
               write(*,*)'upgrade2double: appropriate surfaces = ',surfs(1:2)
-#endif              
+#endif
 ! ............create 1 extra plane and store its surface number
               NRSURFS = NRSURFS + 1
               if (NRSURFS .gt. MAXSU) then
@@ -335,25 +335,25 @@ subroutine upgrade2double_NEW
                 stop
               endif
               surfs(3) = NRSURFS
-! ............get 1st curve number          
+! ............get 1st curve number
               nc = abs(TRIANGLES(nt)%EdgeNo(iv))
 ! ............get curve start point
               np_s = CURVES(nc)%EndPoNo(1)
-! ............account for orientation, compute gradient and normalize it      
+! ............account for orientation, compute gradient and normalize it
               if (np .eq. np_s) then
                 call curve(nc,0.d0, void_1,GRAD(1:3,3))
-              else  
+              else
                 call curve(nc,1.d0, void_1,GRAD(1:3,3))
               endif
               call normalize(GRAD(1:3,3))
-! ............get 2nd curve number          
+! ............get 2nd curve number
               nc = abs(TRIANGLES(nt)%EdgeNo(mod3(iv + 2)))
 ! ............get curve start point
               np_s = CURVES(nc)%EndPoNo(1)
-! ............account for orientation, compute gradient and normalize it      
+! ............account for orientation, compute gradient and normalize it
               if (np .eq. np_s) then
                 call curve(nc,0.d0, void_1,GRAD(1:3,4))
-              else  
+              else
                 call curve(nc,1.d0, void_1,GRAD(1:3,4))
               endif
               call normalize(GRAD(1:3,4))
@@ -367,7 +367,7 @@ subroutine upgrade2double_NEW
 
 ! ............compute maximum and check if it is an appropriate value
               if (maxval(M_PROD(1,1:2)) .lt. 0.2d0) then
-                write(*,*)'upgrade2double: mixed product is small'      
+                write(*,*)'upgrade2double: mixed product is small'
               endif
 
               write(*,*)'here2'
@@ -382,7 +382,7 @@ subroutine upgrade2double_NEW
               if (status .ne. 0) then
                 write(*,*)'upgrade2double: allocation failed.'
                 stop
-              endif      
+              endif
               write(*,*)'here3'
               SURFACES(surfs(3))%Rdata(1:3) = POINTS(np)%Rdata(1:3)
 
@@ -400,20 +400,20 @@ subroutine upgrade2double_NEW
               endif
 #if I_PRINT >= 2
               write(*,*)'upgrade2double: appropriate plane defined.'
-#endif              
+#endif
 ! ............apply Newton-Rapson method; use points coordinates as initial guess
               void_1 = 0.d0;  void_2 = 0.d0
               call mnewt(1,surfs,void_1,void_2,POINTS(np)%Rdata(1:3),void_2, POINTS(np)%Rdata(1:3))
 #if I_PRINT >= 2
               write(*,*)'upgrade2double: Newton method applied.'
-#endif              
+#endif
 ! ............delete extra surface
               SURFACES(surfs(3))%Type = 'Void'
               deallocate(SURFACES(surfs(3))%Rdata)
-              NRSURFS = NRSURFS - 1 
-! ..........end treat as a 2 surf point              
-            endif   
-! ......end select number of surfaces            
+              NRSURFS = NRSURFS - 1
+! ..........end treat as a 2 surf point
+            endif
+! ......end select number of surfaces
         end select
 ! ......reset point type
         POINTS(np)%Type = 'Regular'
@@ -423,14 +423,14 @@ subroutine upgrade2double_NEW
 #endif
 ! ....end of loop through vertices
       enddo
-! ..end of loop through triangles 
+! ..end of loop through triangles
     enddo
 !
 ! ..reset GEOM_TOL to original value
     GEOM_TOL = geom_tol_orig
 #if I_PRINT >= 1
     write(*,*)'upgrade2double: done!'
-#endif  
+#endif
 !
 end subroutine upgrade2double_NEW
 
@@ -443,7 +443,7 @@ integer function factorial(n)
   if (n .eq. 0) then
     factorial = 1
     return
-  endif   
+  endif
   factorial = 1
   do i = 2, n
     factorial = factorial*i
@@ -458,6 +458,6 @@ integer function combinations(n, m)
   if (n .lt. m ) then
     write(*,*)'combinations: n should be greater than m; n, m = ',n,m
     stop
-  endif        
+  endif
   combinations = factorial(n)/(factorial(m)*factorial(n - m))
 end function combinations

@@ -3,13 +3,13 @@ module error
   integer, parameter :: ERR_INVALID_VALUE     = -10
   integer, parameter :: ERR_ALLOC_FAILURE     = -11
   integer, parameter :: ERR_OUT_OF_RANGE      = -12
-  
+
   integer, parameter :: SUCCESS               = 0
   integer, parameter :: FAILURE               = -1
-  
+
 
 contains
-  
+
   subroutine logic_error(Ierr, File, Line)
     implicit none
     integer, intent(in) :: Ierr, Line
@@ -28,5 +28,5 @@ contains
     call pause
     stop 1
   end subroutine logic_error
-    
+
 end module error

@@ -2,15 +2,15 @@
 !> Purpose : computes vertex shape functions for a master triangle or
 !            quad
 !
-!  @param[in ] Type  - shape      
-!  @param[in ] Xi    - master element coordinates     
+!  @param[in ] Type  - shape
+!  @param[in ] Xi    - master element coordinates
 !  @param[out] Rlam  - vertex shape functions (i.e. baricentric coord.)
 !  @param[out] Drlam - derivatives wrt master element coordinates
 !----------------------------------------------------------------------
 subroutine vshape2(Type,Xi, Rlam,Drlam)
 !
    use parameters   , only : MAXquadH,MAXtriaH
-!      
+!
    implicit none
 !
    character(len=4)      , intent(in ) :: Type
@@ -26,9 +26,9 @@ subroutine vshape2(Type,Xi, Rlam,Drlam)
 !
    integer :: i,iprint
 !----------------------------------------------------------------------
-!      
+!
    iprint=0
-!      
+!
 !..compute vertex shape functions
    select case(Type)
       case('tria')
@@ -43,7 +43,7 @@ subroutine vshape2(Type,Xi, Rlam,Drlam)
  7000    format(' vshape2 : unknown figure! Type = ',a12)
    end select
    call shape2DH(Type,Xi,norder,nedge_orient, nrdof,vshape,dvshape)
-!      
+!
 !..store
    rlam(1:4)=vshape(1:4) ; drlam(1:2,1:4)=dvshape(1:2,1:4)
 !

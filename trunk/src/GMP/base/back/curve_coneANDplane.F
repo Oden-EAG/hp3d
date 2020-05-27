@@ -1,9 +1,9 @@
 !*************************************************************************************************************************
       SUBROUTINE coneANDplane(nc, ncone, nplane, eta, r, Dr)
-!*************************************************************************************************************************    
+!*************************************************************************************************************************
       !*** LATEST REVISION:     Aug 08
       !
-      !*** PURPOSE:             routine parametrizes a curve that results from the intersection between a 
+      !*** PURPOSE:             routine parametrizes a curve that results from the intersection between a
       !                         cone and a plane.
       !
       !*** REQUIRED PROCEDURES: rotation, cross_product, scalar_product, normalize, cartesian2cylindrical.
@@ -39,13 +39,13 @@
       integer :: i
       !
       !*** PARAMETERS
-      double precision, dimension(3), parameter :: e1 = 
+      double precision, dimension(3), parameter :: e1 =
      .                               (/1.d0, 0.d0, 0.d0/)               !*** vector (1,0,0)
-      double precision, dimension(3), parameter :: e3 = 
+      double precision, dimension(3), parameter :: e3 =
      .                               (/0.d0, 0.d0, 1.d0/)               !*** vector (0,0,1)
       double precision, parameter :: eps = 1.d-13                       !*** geometric tolerance
 !*************************************************************************************************************************
-      !  
+      !
       if (SURFACES(ncone)%Type .ne. 'Cone') then                        !*** check surface type
         write(*,*)'------------------------------------------'
         write(*,*)'coneANDplane:                             '
@@ -53,13 +53,13 @@
         write(*,*)'------------------------------------------'
         stop
       end if
-      ! 
+      !
       vertex = SURFACES(ncone)%Rdata(1:3)                               !*** get cone data
-      axis = SURFACES(ncone)%Rdata(4:6)              
+      axis = SURFACES(ncone)%Rdata(4:6)
       alpha = SURFACES(ncone)%Rdata(7)
       !
       r_plane(1:3) = SURFACES(nplane)%Rdata(1:3)                        !*** get plane data
-      if (SURFACES(nplane)%Type .eq. 'VecPt') then      
+      if (SURFACES(nplane)%Type .eq. 'VecPt') then
         n_plane(1:3) = SURFACES(nplane)%Rdata(4:6)
       else if (SURFACES(nplane)%Type .eq. 'ThreePt') then
         p1(1:3) = SURFACES(nplane)%Rdata(4:6) - r_plane(1:3)
@@ -80,7 +80,7 @@
       !
       do i = 1, 2                                                       !*** flip axis orientation if needed
         call scalar_product(axis, V(1:3,i), prod)
-        if (prod .lt. 0.d0) then                                        
+        if (prod .lt. 0.d0) then
           axis(1:3) = -axis(1:3)
           exit
         end if
@@ -95,13 +95,13 @@
         call scalar_product(axis, n_plane, cosine)
         beta = acos(cosine)
         pi_halves = acos(-1.d0)/2.d0
-      !  
+      !
         if (abs(beta - pi_halves) .le. alpha) then                      !***** IF intersection does not reduce to vertex only
           do i = 1, 3                                                   !***** intersection is a straight line
             r(i) = (1.d0 - eta)*V(i,1) + eta*V(i,2) + vertex(i)
           end do
           Dr(1:3) = V(1:3,2) - V(1:3,1)
-      !    
+      !
         else                                                            !***** ELSE intersection reduces to vertex only
           r(1:3) = vertex(1:3)
           Dr(1:3) = 0.d0
@@ -113,7 +113,7 @@
         end if                                                          !***** END IF
       !
       else                                                              !*** ELSE cone vertex does not lay on plane
-        call rotation(axis, e3, A)                                      !*** determine rotation that aligns cone axis to z-axis      
+        call rotation(axis, e3, A)                                      !*** determine rotation that aligns cone axis to z-axis
         V(1:3,1:2) = MATMUL(A(1:3,1:3), V(1:3,1:2))                     !*** apply A to vertices
         v_aux(1:3) = V(1:3,1)                                           !*** project 1st vertex onto xy plane
         v_aux(3) = 0.d0
@@ -134,16 +134,16 @@
      .                n_plane(2)*tan(alpha)*sin(theta) + n_plane(3))
         r(1) = tan(alpha)*cos(theta)*r(3)
         r(2) = tan(alpha)*sin(theta)*r(3)
-      !  
+      !
         Dr(3) = - (n_plane(2)*tan(alpha)*cos(theta) -                   !*** evaluate d(x,y,z)/dtheta
      .                      n_plane(1)*tan(alpha)*sin(theta))/
      .                              (n_plane(1)*tan(alpha)*cos(theta) +
      .                n_plane(2)*tan(alpha)*sin(theta) + n_plane(3))**2
         Dr(1) = tan(alpha)*(cos(theta)*Dr(3) - sin(theta)*r(3))
-        Dr(2) = tan(alpha)*(sin(theta)*Dr(3) + cos(theta)*r(3))  
-      !  
+        Dr(2) = tan(alpha)*(sin(theta)*Dr(3) + cos(theta)*r(3))
+      !
         Dr(1) = Dr(1)*theta_aux                                         !*** chain rule: d(x,y,z)/deta = d(x,y,z)/dtheta dtheta/deta
-        Dr(2) = Dr(2)*theta_aux 
+        Dr(2) = Dr(2)*theta_aux
         Dr(3) = Dr(3)*theta_aux
       !
         RBM(1:3,1:3) = TRANSPOSE(RBM(1:3,1:3))                          !*** determine inverse rigid body motion

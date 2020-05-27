@@ -1,15 +1,15 @@
 c----------------------------------------------------------------------
-c     
+c
 c     routine name       - shapEbq
-c     
+c
 c----------------------------------------------------------------------
-c     
+c
 c     latest revision    - Feb 11
-c     
+c
 c     purpose            - routine evaluates H(curl) bubbles
 c                          for a quad, using construction
 c                          of Sabine Zaglmayr
-c     
+c
 c     arguments :
 c     in:
 c       Xi        - master element coordinates
@@ -21,40 +21,40 @@ c     out:
 c       NrdofE    - number of element dof
 c       ShapE     - values of shape functions
 c       CurlE     - values of derivatives of the shape functions
-c                   wrt to master element coordinates      
-c     
+c                   wrt to master element coordinates
+c
 c----------------------------------------------------------------------
 c
       subroutine shapEbq(Xi,Nord,Nort,
      .                   NrdofE,ShapE,CurlE)
-c     
+c
       use element_data
       use parameters
 #include "syscom.blk"
-c     
+c
 c  ...input output parameters
       dimension Xi(2),
      .          ShapE(2,MAXmdlqE),CurlE(MAXmdlqE)
-c     
-c  ...allow for exceeding the order of approximation  
+c
+c  ...allow for exceeding the order of approximation
       integer, parameter :: ndelta = 2
 
       integer :: jtemp(1:4) = (/1,2,3,4/), iv(1:4)
-c     
+c
 c-----------------------------------------------------------------------
 c
-      iprint=0      
+      iprint=0
 c
 c  ...paolo, Mar 11
       ShapE = 0.d0 ; CurlE = 0.d0
       write(*,*)'shapEbq: return 0 for now'
-      return      
-c      
+      return
+c
 ccc      vsig(1) = 1.d0 - Xi(1) + 1.d0 - Xi(2)
 ccc      vsig(2) =        Xi(1) + 1.d0 - Xi(2)
 ccc      vsig(3) =        Xi(1) +        Xi(2)
 ccc      vsig(4) = 1.d0 - Xi(1) +        Xi(2)
-ccc      
+ccc
 ccc      iv(1:4) = jtemp(QUADR_L2G(1:4,Nort))
 ccc      call decode(Nord, nordh,nordv)
 cccc

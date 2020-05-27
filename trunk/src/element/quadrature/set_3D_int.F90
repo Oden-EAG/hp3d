@@ -182,7 +182,7 @@ subroutine set_3Dint_aux(Type,Norder,Maxp,Max_nint3, Nint,Xiloc,Waloc)
 !  ...initialize if needed
       if (.not. INITIALIZED) call init_gauss_quadrature
 !
-#if DEBUG_MODE      
+#if DEBUG_MODE
       iprint=0
       if (iprint.eq.1) then
         write(*,7001) Type,Norder
@@ -215,7 +215,7 @@ subroutine set_3Dint_aux(Type,Norder,Maxp,Max_nint3, Nint,Xiloc,Waloc)
 !  .....account for over-integration
         nordh=min(nordh+INTEGRATION,Maxp)
         nordz=min(nordz+INTEGRATION,Maxp)
-!        
+!
 !  .....compute number of integration points
         kint =NSELECT(nordh)
         nintx=NRGAUPO(kint)
@@ -224,13 +224,13 @@ subroutine set_3Dint_aux(Type,Norder,Maxp,Max_nint3, Nint,Xiloc,Waloc)
 !
 !  .....compute integration points and weights
         l=0
-        do l2=1,nintz 
+        do l2=1,nintz
           do l1=1,nintx
             l=l+1
             Xiloc(1:2,l)=XIGAUSS(2:3,l1,kint)
             Xiloc(  3,l)=XIGAUS1(l2,nintz)
             Waloc(    l)=WAGAUSS(l1,kint)/2.d0*WAGAUS1(l2,nintz)
-          enddo 
+          enddo
         enddo
 !
 !======================================================================
@@ -290,8 +290,8 @@ subroutine set_3Dint_aux(Type,Norder,Maxp,Max_nint3, Nint,Xiloc,Waloc)
               Xiloc(3,l)=XIGAUS1(l3,nintz)
               Waloc(  l)=WAGAUS1(l1,nintx)*WAGAUS1(l2,ninty)* &
                          WAGAUS1(l3,nintz)
-            enddo 
-          enddo 
+            enddo
+          enddo
         enddo
 !
 !======================================================================
@@ -349,7 +349,7 @@ subroutine set_3Dint_aux(Type,Norder,Maxp,Max_nint3, Nint,Xiloc,Waloc)
         enddo
 !
 !  .....account for overintegration
-        nordx=min(nordx+INTEGRATION,Maxp) 
+        nordx=min(nordx+INTEGRATION,Maxp)
         nordy=min(nordy+INTEGRATION,Maxp)
         nordz=min(nordz+INTEGRATION,Maxp)
 !
@@ -372,7 +372,7 @@ subroutine set_3Dint_aux(Type,Norder,Maxp,Max_nint3, Nint,Xiloc,Waloc)
               Waloc(  l)=WAGAUS1(l1,nintx)*WAGAUS1(l2,ninty)  &
                         *WAGAUS1(l3,nintz)*factor**2
             enddo
-          enddo 
+          enddo
         enddo
 !
       case default

@@ -14,7 +14,7 @@ c
 c     in:
 c             Type      - element type
 c             Xi        - master coordinates
-c             Norder    - polynomial order 
+c             Norder    - polynomial order
 c             Norient   - edge orientation
 c
 c     out:

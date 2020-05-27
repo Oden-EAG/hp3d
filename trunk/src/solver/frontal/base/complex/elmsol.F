@@ -63,7 +63,7 @@ c
 
 c
       iprint=0
-c      
+c
       id = Aidx
       idm = id - 1
       idp = id + 1

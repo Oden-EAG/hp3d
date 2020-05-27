@@ -36,16 +36,16 @@ c
       endif
 c
 c  ...get the point's type
-      type = POINTS(No)%Type 
+      type = POINTS(No)%Type
 c
       select case(type)
 c
-c  ...regular point, or point with a normal, or point on an algebraic 
+c  ...regular point, or point with a normal, or point on an algebraic
 c     surface
       case('Regular','CoorNrm','SharpPt')
         X(1:NDIM) = POINTS(No)%Rdata(1:NDIM)
 c
-c  ...implicit  point  
+c  ...implicit  point
       case('Implicit')
 c
 c  .....get surface numbers

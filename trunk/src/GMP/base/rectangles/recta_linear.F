@@ -34,7 +34,7 @@ c  ...vertex coordinates, work space
       dimension xv(NDIM,4),aux(NDIM,3)
 c
 c------------------------------------------------------------------------
-c       
+c
       iprint=0
 c
 c  ...evaluate vertex coordinates

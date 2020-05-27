@@ -33,7 +33,7 @@ c
 c
       iprint=0
 c
-      x = r(1) 
+      x = r(1)
       y = r(2)
 c
 c  ...determine polar coordinates for the point
@@ -54,7 +54,7 @@ c  ...determine polar coordinates for the point
           polar(2) = -acos(x/rho)
         endif
       endif
-c      
+c
       polar(1) = rho
 c
       Dpolar(1,1) = cos(polar(2))                            !*** compute drho/d(x,y)

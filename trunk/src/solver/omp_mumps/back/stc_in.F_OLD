@@ -31,7 +31,7 @@
 #endif
    else
       call compute_schur_complement(iel,nc,nb,xc,xb)
-   endif    
+   endif
 !
 !
    end subroutine stc_in
@@ -42,7 +42,7 @@
 !
    use m_assembly, only: CLOC, ZLOAD, ZTEMP
    use assembly,   only: NR_RHS,NR_PHYSA, MAXNODM, MAXDOFS, MAXDOFM, &
-                         BLOC, AAUX,ALOC, ZBMOD, ZAMOD 
+                         BLOC, AAUX,ALOC, ZBMOD, ZAMOD
 !
    IMPLICIT NONE
 
@@ -64,7 +64,7 @@
 
 
 
-!...find the mdle number 
+!...find the mdle number
    mdle = 0
    do i = 1, iel
       call nelcon(mdle,mdle)
@@ -326,13 +326,13 @@
    if (info2.ne.0) then
       write(*,*) '_herm_in: info2 = ',info2
       stop 2
-   endif      
+   endif
    xb = bb - xb
 !
 !
    end subroutine stc_herm_in
 !
-! 
+!
 ! -----------------------------------------------------------------------
 !
 !    routine name       - stc_gen
@@ -367,7 +367,7 @@
 !----------------------------------------------------------------------
 !
    subroutine stc_gen_in(iel,Atemp,b,n,nc,nb,nHc,nHb,nEc,nEb,nVc,nVb,nQ,Abc,bb)
-!      
+!
    use m_assembly, only: CLOC, STORE_STC
 !
    IMPLICIT NONE
@@ -377,40 +377,40 @@
    integer           :: n, nc,nb,nHc,nHb,nEc,nEb,nVc,nVb,nQ, k1, k2,k
 #if C_MODE
    complex*16        :: Atemp(n**2), b(n), Ac(nc**2), bc(nc), A(n,n)
-   complex*16        :: Acc(nc,nc), Acb(nc,nb),Abc(nb,nc) , Abb(nb,nb) 
+   complex*16        :: Acc(nc,nc), Acb(nc,nb),Abc(nb,nc) , Abb(nb,nb)
    complex*16        :: bb(nb)
-#else 
+#else
    real*8            :: Atemp(n**2), b(n), Ac(nc**2), bc(nc), A(n,n)
-   real*8            :: Acc(nc,nc), Acb(nc,nb),Abc(nb,nc) , Abb(nb,nb) 
+   real*8            :: Acc(nc,nc), Acb(nc,nb),Abc(nb,nc) , Abb(nb,nb)
    real*8            :: bb(nb)
 #endif
-! 
+!
    integer           :: nk, nH,nE,nV,i,j,iel
    character*1       :: uplo
    integer           :: info,info1,info2
    integer, allocatable :: IPIV(:)
-! 
+!
 !----------------------------------------------------------------------
 !----------------------------------------------------------------------
-! 
-!..set up the indices. 
+!
+!..set up the indices.
 !..check if the indices are compatible
-   if(nHc+nEc+nVc .ne. nc) then 
+   if(nHc+nEc+nVc .ne. nc) then
       write(*,*) 'stc: incompatible indices for the condensed system '
       write(*,*) 'iel, nHc+nEc+nVc, nc = ', iel, nHc+nEc+nVc, nc
       stop 1
-   endif   
-   if(nHb+nEb+nVb+nQ .ne. nb) then 
+   endif
+   if(nHb+nEb+nVb+nQ .ne. nb) then
       write(*,*) 'stc: incompatible indices for the bubbles'
       stop 2
-   endif  
-   if(nc+nb .ne. n) then 
+   endif
+   if(nc+nb .ne. n) then
       write(*,*) 'stc: incompatible indices for the total system'
       stop 3
-   endif  
+   endif
 
 !..total dof for each space
-   nH = nHc + nHb 
+   nH = nHc + nHb
    nE = nEc + nEb
    nV = nVc + nVb
 
@@ -422,7 +422,7 @@
          k = (i-1)*n + j
          A(i,j) = Atemp(k)
       enddo
-   enddo       
+   enddo
 !
 !
 !..first Acc and bc
@@ -464,10 +464,10 @@
                                       A(nH+nE+nVb+1:nH+nE+nV,nH+nE+nV+1:nH+nE+nV+nQ)
 !..Abc
 #if C_MODE
-   Abc = conjg(transpose(Acb))    
+   Abc = conjg(transpose(Acb))
 #else
    Abc = transpose(Acb)
-#endif       
+#endif
 !
 !..Abb
 !..H1 dof
@@ -490,18 +490,18 @@
    Abb(nHb+nEb+1:nHb+nEb+nVb,nHb+nEb+nVb+1:nb) =              &
                                        A(nH+nE+1:nH+nE+nVb,nH+nE+nV+1:nH+nE+nV+nQ)
    bb(nHb+nEb+1:nHb+nEb+nVb) = b(nH+nE+1:nH+nE+nVb)
-! 
+!
 !..L2 dof
    Abb(nHb+nEb+nVb+1:nb,1:nHb) = A(nH+nE+nV+1:nH+nE+nV+nQ,1:nHb)
    Abb(nHb+nEb+nVb+1:nb,nHb+1:nHb+nEb) = A(nH+nE+nV+1:nH+nE+nV+nQ,nH+1:nH+nEb)
    Abb(nHb+nEb+nVb+1:nb,nHb+nEb+1:nHb+nEb+nVb) = A(nH+nE+nV+1:nH+nE+nV+nQ,nH+nE+1:nH+nE+nVb)
    Abb(nHb+nEb+nVb+1:nb,nHb+nEb+nVb+1:nb) = A(nH+nE+nV+1:nH+nE+nV+nQ,nH+nE+nV+1:nH+nE+nV+nQ)
    bb(nHb+nEb+nVb+1:nb) = b(nH+nE+nV+1:nH+nE+nV+nQ)
-! 
-! 
+!
+!
 !..factorize Abb
    allocate(IPIV(nb))
-! 
+!
 #if C_MODE
       call ZGETRF(nb,nb,Abb,nb,IPIV,info)
 !..store to module the LU factorization of A22
@@ -513,21 +513,21 @@
          stop 1
       endif
 ! ...compute the products of inverted AP with Abc and bb
-#if C_MODE      
+#if C_MODE
       call ZGETRS('N',nb,1,Abb,nb,IPIV,bb,nb,info1)
 #else
       call DGETRS('N',nb,1,Abb,nb,IPIV,bb,nb,info1)
-#endif      
+#endif
       if (info1.ne.0) then
          write(*,*) 'stc: info1 = ',info1
          stop
       endif
-! 
-#if C_MODE      
+!
+#if C_MODE
       call ZGETRS('N',nb,nc,Abb,nb,IPIV,Abc,nb,info2)
 #else
       call DGETRS('N',nb,nc,Abb,nb,IPIV,Abc,nb,info2)
-#endif 
+#endif
       if (info2.ne.0) then
          write(*,*) 'stc: info2 = ',info2
          stop
@@ -537,4 +537,4 @@
    end subroutine stc_gen_in
 !
 !
- 
+

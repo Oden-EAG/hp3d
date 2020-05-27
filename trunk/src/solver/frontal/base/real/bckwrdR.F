@@ -48,7 +48,7 @@ c
      .          Bbuf(*), Ubuf(*), Alelm(*)
 c
       iprint=0
-c      
+c
       iuu = 1
       jel = NUMELM + 1
 c

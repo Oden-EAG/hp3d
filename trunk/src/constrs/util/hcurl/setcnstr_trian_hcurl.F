@@ -14,7 +14,7 @@ c
 c----------------------------------------------------------------------
 c
       subroutine setcnstr_trian_hcurl
-c      
+c
       use parameters
       use constraints
 #include "syscom.blk"
@@ -25,5 +25,5 @@ c
 ccc      do i=2,4
 ccc        call setcnstr_trian_aniso_hcurl(i)
 ccc      enddo
-c      
+c
       end subroutine setcnstr_trian_hcurl

@@ -48,9 +48,9 @@ c  ...get curve endpoints
       enddo
 c
 c  ...get velocities at endpoints
-      gdof(1:3,3) = CURVES(No)%Rdata(1:3) 
+      gdof(1:3,3) = CURVES(No)%Rdata(1:3)
       gdof(1:3,4) = CURVES(No)%Rdata(4:6)
-ccc      gdof(1:3,5) = CURVES(No)%Rdata(7:9) 
+ccc      gdof(1:3,5) = CURVES(No)%Rdata(7:9)
 ccc      gdof(1:3,6) = CURVES(No)%Rdata(10:12)
       if (iprint.eq.1) then
         write(*,7002) No, Eta
@@ -75,15 +75,15 @@ c
         write(*,7003) X(1:3), Dxdeta(1:3)
         call pause
       endif
-c          
+c
 c
       end
 c
 c
 c----------------------------------------------------------------------
-c      
+c
       subroutine cubic_Hermite(Eta, Vshap,Dvshap)
-c      
+c
 c----------------------------------------------------------------------
 c
 #include "syscom.blk"

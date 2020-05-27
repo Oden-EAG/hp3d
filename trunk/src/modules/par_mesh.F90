@@ -193,7 +193,7 @@ subroutine distr_mesh()
    DISTRIBUTED = .true.
    call update_ELEM_ORDER
 !
-   if ((.not. EXCHANGE_DOF) .and. (.not. HOST_MESH)) then 
+   if ((.not. EXCHANGE_DOF) .and. (.not. HOST_MESH)) then
       call update_gdof
       call update_Ddof
    endif
@@ -300,7 +300,7 @@ end subroutine alloc_nod_dof
 subroutine dealloc_nod_dof(Nod)
    integer, intent(in) :: Nod
    if (associated(NODES(Nod)%dof)) then
-     if (associated(NODES(Nod)%dof%coord)) deallocate(NODES(Nod)%dof%coord) 
+     if (associated(NODES(Nod)%dof%coord)) deallocate(NODES(Nod)%dof%coord)
      if (associated(NODES(Nod)%dof%zdofH)) deallocate(NODES(Nod)%dof%zdofH)
      if (associated(NODES(Nod)%dof%zdofE)) deallocate(NODES(Nod)%dof%zdofE)
      if (associated(NODES(Nod)%dof%zdofV)) deallocate(NODES(Nod)%dof%zdofV)

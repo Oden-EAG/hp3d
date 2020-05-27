@@ -1,5 +1,5 @@
 !-------------------------------------------------------------------------
-!> Purpose : routine breaks an element middle node according to a given 
+!> Purpose : routine breaks an element middle node according to a given
 !!           refinement flag. Compatibility is assumed across the faces
 !!           and the edges.
 !!
@@ -13,7 +13,7 @@ subroutine break(Mdle,Kref)
    use data_structure3D
    use element_data
    use refinements
-!  
+!
    implicit none
 !
    integer, intent(in) :: Mdle, Kref
@@ -112,7 +112,7 @@ subroutine break(Mdle,Kref)
 !     ...existing refinement does NOT coincide with desired refinement
          else
             select case(NODES(nod)%type)
-!           
+!
 !        ...triangular face
             case('mdlt')
                call nodbreak(nod,kref_face,iact)

@@ -529,7 +529,7 @@ subroutine elem_heat(Mdle,                   &
 !..end loop through element faces
    enddo
 !
-!..Compute condition number of Gram matrix 
+!..Compute condition number of Gram matrix
       !kk = NrTest*(NrTest+1)/2
       !allocate(gramEigen(kk))
       !gramEigen(1:kk)=gramP(1:kk)
@@ -554,7 +554,7 @@ subroutine elem_heat(Mdle,                   &
  !      deallocate(IWORK,W,WORK)
  !      deallocate(RWORK,Z)
  !      deallocate(gramEigen)
- !      pause 
+ !      pause
 !
 !---------------------------------------------------------------------
 !  Construction of DPG system

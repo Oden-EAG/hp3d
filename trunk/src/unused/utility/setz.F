@@ -13,20 +13,20 @@ c
 c   arguments :
 c     in:
 c                 a    - a real array
-c                 n    - total length of the array      
+c                 n    - total length of the array
 c
 c   required  routines - none
 c
 c-----------------------------------------------------------------------c
       subroutine setz(a,n)
-c      
+c
 #include "syscom.blk"
-c      
+c
       dimension a(*)
-c      
+c
       do 10 i=1,n
         a(i)=0.d0
    10 continue
-c      
+c
       return
       end

@@ -5,16 +5,16 @@
 !!
 !! @param[in]  Iflag        - a flag specifying which of the objects the
 !!                            edge is on: 5 pris, 6 hexa, 7 tetr, 8 pyra
-!! @param[in]  No           - number of a specific object 
+!! @param[in]  No           - number of a specific object
 !! @param[in]  Etav         - reference coordinates of the element vertices
 !! @param[in]  Type         - element (middle node) type
-!! @param[in]  Icase        - the edge node case 
+!! @param[in]  Icase        - the edge node case
 !! @param[in]  Nedge_orient - edge orientation
 !! @param[in]  Nface_orient - face orientation (not used)
 !! @param[in]  Norder       - element order
-!! @param[in]  Iedge        - edge number 
+!! @param[in]  Iedge        - edge number
 !! @param[in]  ZdofH        - H1 dof for the element (vertex values)
-!! 
+!!
 !! @param[out] ZnodH        - H1 dof for the edge
 !!
 !> @date Mar 17
@@ -33,7 +33,7 @@
 !
 ! ** Arguments
 !-----------------------------------------------------------------------
-!      
+!
   integer,           intent(in)    :: Iflag,No,Mdle
   integer,           intent(in)    :: Icase,Iedge
   real(8),           intent(in)    :: Etav(3,8)
@@ -78,22 +78,22 @@
 !
 ! decoded case for the face node
   integer, dimension(NR_PHYSA)          :: ncase
-!    
+!
 ! work space for linear solvers
   integer                               :: naH,info
   real(8), dimension(MAXP-1,MAXP-1)     :: aaH
   integer, dimension(MAXP-1)            :: ipivH
-!    
+!
 ! load vector and solution
   VTYPE,   dimension(MAXP-1,MAXEQNH)    :: zbH,zuH
 #if C_MODE
   real(8), dimension(MAXP-1,MAXEQNH)    :: duH_real,duH_imag
 #endif
-!  
+!
 ! misc work space
   integer :: iprint,nrv,nre,nrf,i,j,k,ivarH,nvarH,kj,ki,&
              ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_Edge,iflag1
-!      
+!
 !----------------------------------------------------------------------
 !
   nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
@@ -133,14 +133,14 @@
 !
 ! initialize
   aaH = 0.d0; zbH = ZERO
-!    
+!
 ! loop over integration points
   do l=1,nint
 !
 !   Gauss point and weight
     t  = xi_list(l)
     wa = wa_list(l)
-!    
+!
 !   determine edge parameterization for line integral
     call edge_param(Type,Iedge,t, xi,dxidt)
 !
@@ -160,7 +160,7 @@
     rt(1:3) = detadt(1:3)/bjac
     weight = wa*bjac
 !
-!   call GMP routines to evaluate physical coordinates and their 
+!   call GMP routines to evaluate physical coordinates and their
 !   derivatives wrt reference coordinates
     select case(Iflag)
     case(5) ; call prism(No,eta, x,dxdeta)
@@ -196,7 +196,7 @@
                    + gradH(2,k)*dxideta(2,1:3) &
                    + gradH(3,k)*dxideta(3,1:3)
 !
-!     subtract... 
+!     subtract...
       do i=1,3
         zdvalHdeta(1:MAXEQNH,i) = zdvalHdeta(1:MAXEQNH,i) &
                                 - ZdofH(1:MAXEQNH,k)*duHdeta(i)
@@ -266,7 +266,7 @@
 !
 ! projection matrix leading dimension (maximum number of 1D bubbles)
   naH=MAXP-1
-!    
+!
 ! over-write aaH with its LU factorization
   call dgetrf(ndofH_edge,ndofH_edge,aaH,naH,ipivH,info)
 !
@@ -275,12 +275,12 @@
     write(*,*)'dhpedge: H1 DGETRF RETURNED INFO = ',info
     call logic_error(FAILURE,__FILE__,__LINE__)
   endif
-!    
+!
 ! solve linear system
 !
 ! copy load vector
   zuH(1:ndofH_edge,:) = zbH(1:ndofH_edge,:)
-!    
+!
 #if C_MODE
 !
 ! apply pivots to load vector
@@ -297,27 +297,27 @@
              duH_real,naH)
   call dtrsm('L','U','N','N',ndofH_edge,MAXEQNH,1.d0,aaH,naH, &
              duH_real,naH)
-!    
+!
 ! triangular solves for imaginary part
   call dtrsm('L','L','N','U',ndofH_edge,MAXEQNH,1.d0,aaH,naH, &
              duH_imag,naH)
   call dtrsm('L','U','N','N',ndofH_edge,MAXEQNH,1.d0,aaH,naH, &
              duH_imag,naH)
-!         
-! combine real and imaginary parts by forcing type to DOUBLE 
-! precision complex 
+!
+! combine real and imaginary parts by forcing type to DOUBLE
+! precision complex
   zuH(1:ndofH_edge,:) &
    = dcmplx(duH_real(1:ndofH_edge,:), duH_imag(1:ndofH_edge,:))
-!        
+!
 #else
-!    
+!
 ! apply pivots to load vector
   call dlaswp(MAXEQNH,zuH,naH,1,ndofH_edge,ipivH,1)
 !
 ! triangular solves
   call dtrsm('L','L','N','U',ndofH_edge,MAXEQNH,1.d0,aaH,naH, zuH,naH)
   call dtrsm('L','U','N','N',ndofH_edge,MAXEQNH,1.d0,aaH,naH, zuH,naH)
-!    
+!
 #endif
 !
 #if DEBUG_MODE
@@ -329,24 +329,24 @@
    call pause
   endif
 #endif
-!    
+!
 ! save dof's, skipping irrelevant entries
 !
 ! decoded node case, indicating supported variables
   call decod(Icase,2,NR_PHYSA, ncase)
-!    
+!
 ! initialize global variable counter, and node local variable counter
   ivarH=0 ; nvarH=0
-!    
-! loop through multiple copies of variables 
+!
+! loop through multiple copies of variables
   do j=1,NRCOMS
-!    
+!
 !   loop through physical attributes
     do i=1,NR_PHYSA
-!    
+!
 !     loop through components of physical attribute
       do k=1,NR_COMP(i)
-!          
+!
         select case(DTYPE(i))
 !
 !       H1 component
@@ -363,7 +363,7 @@
 !
 !           store Dirichlet dof
             ZnodH(nvarH,1:ndofH_edge) = zuH(1:ndofH_edge,ivarH)
-!                
+!
           endif
         endselect
       enddo

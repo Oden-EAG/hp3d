@@ -14,4 +14,4 @@ SRC_UW  = \
             set_initial_mesh.F90 \
             main.F90
 
-SRC_FILE   += $(SRC_MODULE) $(SRC_COMMON) $(SRC_UW)  
+SRC_FILE   += $(SRC_MODULE) $(SRC_COMMON) $(SRC_UW)

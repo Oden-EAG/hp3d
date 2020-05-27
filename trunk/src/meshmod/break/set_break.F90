@@ -17,7 +17,7 @@
 !---------------------------------------------------------------------------------------------
 subroutine set_break(Type_nod,Kref,Nord,Nbc,Subd, Nrsons,Type_sons,Norder,Nbcond,Nsubd)
   implicit none
-! 
+!
   character(len=4),                intent(in)  :: Type_nod
   integer,                         intent(in)  :: Kref, Nord, Nbc, Subd
 !
@@ -28,19 +28,19 @@ subroutine set_break(Type_nod,Kref,Nord,Nbc,Subd, Nrsons,Type_sons,Norder,Nbcond
 ! initialize
   Norder = 0; Nbcond = 0; Type_sons(1:27) = 'none'
   select case (Type_nod)
-! EDGE  
+! EDGE
   case('medg') ; call set_edge_break(Kref,Nord, Nrsons,Type_sons,Norder)
-! TRIANGLE          
+! TRIANGLE
   case('mdlt') ; call set_tria_break(Kref,Nord, Nrsons,Type_sons,Norder)
-! QUAD          
+! QUAD
   case('mdlq') ; call set_quad_break(Kref,Nord, Nrsons,Type_sons,Norder)
-! BRICK          
+! BRICK
   case('mdlb') ; call set_bric_break(Kref,Nord, Nrsons,Type_sons,Norder)
-! TET          
+! TET
   case('mdln') ; call set_tetr_break(Kref,Nord, Nrsons,Type_sons,Norder)
-! PRISM          
+! PRISM
   case('mdlp') ; call set_pris_break(Kref,Nord, Nrsons,Type_sons,Norder)
-! PYRAMID          
+! PYRAMID
   case('mdld') ; call set_pyra_break(Kref,Nord, Nrsons,Type_sons,Norder)
   case default
      write(*,*) 'set_break: NOT SUPPORTED TYPE ', Type_nod

@@ -19,9 +19,9 @@ c               Narray - digits to be encoded
 c               Mod    - system number
 c               N      - number of the digits stored in the nickname
 c     out:
-c               Nick   - the nickname 
+c               Nick   - the nickname
 c
-c   required  routines - 
+c   required  routines -
 c
 c----------------------------------------------------------------------
 c

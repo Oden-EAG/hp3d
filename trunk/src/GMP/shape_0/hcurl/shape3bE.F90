@@ -3,8 +3,8 @@
 !!
 !! @param[in] Xi        - master element coordinates
 !! @param[in] Norder    - order of approximation for the nodes
-!! @param[in] Ne_orient - edge orientations 
-!! @param[in] Nf_orient - face orientations 
+!! @param[in] Ne_orient - edge orientations
+!! @param[in] Nf_orient - face orientations
 
 !! @param[out]            NrdofE    - number of element dof
 !! @param[out]            ShapE     - values of shape functions
@@ -13,11 +13,11 @@
 !
 
 subroutine shape3bE(Xi,Norder,Nedge_orient,Nface_orient, NrdofE,ShapE,CurlE)
-  
+
   use element_data , only : NFAXES,IJKV,IXIEDGE,IBLENDE,NBLENDE, &
-                                        IXIFACE,IBLENDF,NBLENDF 
+                                        IXIFACE,IBLENDF,NBLENDF
   use parameters   , only : MAXP,MAXbrickE
-  
+
   implicit none
   !-------------------------------------------------------------------
   ! subroutine  arguments
@@ -35,8 +35,8 @@ subroutine shape3bE(Xi,Norder,Nedge_orient,Nface_orient, NrdofE,ShapE,CurlE)
   logical, save :: initialized_curl_signs = .FALSE.
   integer, save, dimension(3,3) :: sign_curl_matrix = 0
 
-  double precision :: shapE1D(3,MAXP,0:1) ! chequear dimension MAXP 
-  double precision :: shapH1D(3,MAXP,0:1),dshapH1D(3,MAXP,0:1) ! chequear dimension MAXP 
+  double precision :: shapE1D(3,MAXP,0:1) ! chequear dimension MAXP
+  double precision :: shapH1D(3,MAXP,0:1),dshapH1D(3,MAXP,0:1) ! chequear dimension MAXP
 
   double precision :: shapE1Daux(MAXP), &
        shapH1D_1(MAXP), shapH1D_2(MAXP), dshapH1D_1(MAXP), dshapH1D_2(MAXP)
@@ -70,12 +70,12 @@ subroutine shape3bE(Xi,Norder,Nedge_orient,Nface_orient, NrdofE,ShapE,CurlE)
   real*8,dimension(3,MAXbrickE) :: fakeGradP
 
 
- 
+
   iflag=0
   if (iflag == 1) then
      write(*,*) 'JASON SHAPE FUNCTIONS'
      call shape3bEM2(xi,Norder, fakeNrdofP,fakeShapP,fakeGradP, &
-          NrdofEjason,ShapEjason,CurlEjason) 
+          NrdofEjason,ShapEjason,CurlEjason)
      nrdofE=nrdofEjason
      ShapE(1:3,1:nrdofE)=ShapEjason(1:3,1:nrdofE)
      CurlE(1:3,1:nrdofE)=CurlEjason(1:3,1:nrdofE)
@@ -102,7 +102,7 @@ subroutine shape3bE(Xi,Norder,Nedge_orient,Nface_orient, NrdofE,ShapE,CurlE)
   orientation_loop_0: do orientation=0,1
 
      direction_loop_0: do direction=1,3
-       
+
         select case(orientation)
         case(0)
            call shape1_Jason (Xi(direction),nord_interior(direction), nvoid,&
@@ -117,7 +117,7 @@ subroutine shape3bE(Xi,Norder,Nedge_orient,Nface_orient, NrdofE,ShapE,CurlE)
                 shapE1D(direction,:,1))
            shapE1D(direction,:,1) = - shapE1D(direction,:,1)
         end select
-           
+
      end do direction_loop_0
 
   enddo orientation_loop_0
@@ -126,7 +126,7 @@ subroutine shape3bE(Xi,Norder,Nedge_orient,Nface_orient, NrdofE,ShapE,CurlE)
 
   ShapE = 0.d0  ! better initialize only up to the required
                 ! order: ShapE(:,1:"orden")
-  CurlE = 0.d0  ! idem 
+  CurlE = 0.d0  ! idem
 
 
   ! initialization (if not done in a previous call) of matrix with
@@ -136,19 +136,19 @@ subroutine shape3bE(Xi,Norder,Nedge_orient,Nface_orient, NrdofE,ShapE,CurlE)
      initialized_curl_signs = .TRUE.
   endif
 
-  
+
   !-----------------------------------------------------------------------------
 
-  
+
   !    GATTO:
   !  ...calculate 1D linear shape functions (used as blending functions)
-  ! TO CLEAN 
+  ! TO CLEAN
   do ixi=1,3 ! direction x,y,z
 
      vshap(1,ixi) = shapH1D(ixi,1,0);
-     dvshap(1,ixi)=dshapH1D(ixi,1,0) 
+     dvshap(1,ixi)=dshapH1D(ixi,1,0)
      vshap(2,ixi) = shapH1D(ixi,1,1);
-     dvshap(2,ixi)=dshapH1D(ixi,1,1) 
+     dvshap(2,ixi)=dshapH1D(ixi,1,1)
 
 !!$     vshap(1,ixi) = 1.d0 - Xi(ixi); dvshap(1,ixi) = -1.d0
 !!$     vshap(2,ixi) =        Xi(ixi); dvshap(2,ixi) =  1.d0
@@ -160,15 +160,15 @@ subroutine shape3bE(Xi,Norder,Nedge_orient,Nface_orient, NrdofE,ShapE,CurlE)
   ! calculate edge shape functions
   do ie=1,12
      ! determines if edge is along x,  y or z
-     ixi = IXIEDGE(ie) 
+     ixi = IXIEDGE(ie)
      !  linear blending functions along directions x, y, or z
      ibl1 = IBLENDE(1,ie);
-     ibl2 = IBLENDE(2,ie) 
+     ibl2 = IBLENDE(2,ie)
      ! determines in what extreme the linear blending function is one
      ! or zero
-     nv1 = NBLENDE(1,ie); 
-     nv2 = NBLENDE(2,ie) 
-     
+     nv1 = NBLENDE(1,ie);
+     nv2 = NBLENDE(2,ie)
+
      nrdofEe=Norder(ie)
      if (Norder(ie) > MAXP) then
         write(*,*) 'ERROR shape3bE: edge order higher than MAXP'
@@ -186,8 +186,8 @@ subroutine shape3bE(Xi,Norder,Nedge_orient,Nface_orient, NrdofE,ShapE,CurlE)
              * sign_curl_matrix(ixi,ibl1)
      enddo
   enddo
-  
-  
+
+
   !--------------------------------------------------------------
   ! face node shape functions
 
@@ -198,7 +198,7 @@ subroutine shape3bE(Xi,Norder,Nedge_orient,Nface_orient, NrdofE,ShapE,CurlE)
      ixi2 = IXIFACE(2,if)
 !     ixiface_aux=IXIFACE(1:2,if)  !(/ ixi1, ixi2 /) ! CLEAN
      !  linear blending function along directions x, y, or z
-     ibl = IBLENDF(if); 
+     ibl = IBLENDF(if);
      ! determines in what extreme the linear blending function is one
      ! or zero
      nv = NBLENDF(if)
@@ -213,7 +213,7 @@ subroutine shape3bE(Xi,Norder,Nedge_orient,Nface_orient, NrdofE,ShapE,CurlE)
 !!$     endif
 
 
-!!!!! QUIZAS ESTO VAYA DENTRO DE BUCLE FACE_DIRECTION_LOOP     
+!!!!! QUIZAS ESTO VAYA DENTRO DE BUCLE FACE_DIRECTION_LOOP
 !!!! O NO HAGA FALTA!!!
      select case(NFAXES(3,Nface_orient(if)))
         !
@@ -227,18 +227,18 @@ subroutine shape3bE(Xi,Norder,Nedge_orient,Nface_orient, NrdofE,ShapE,CurlE)
         write(*,*) 'shape3bE. ERROR: orientation different from 0,1'
         stop
      end select
-     
+
      face_direction_loop_pre: do face_direction=1,2
         nrdofExy(face_direction)=nord_face(face_direction)
         nrdofH1xy(face_direction)=nord_face(face_direction)-1
      enddo face_direction_loop_pre
 
-     
+
      face_direction_loop: do face_direction=1,2
         direction=IXIFACE(face_direction,if)
         orient_direction=NFAXES(direction,Nface_orient(if))
-        
-        other_direction=IXIFACE(next_direction_number(face_direction,2),if) 
+
+        other_direction=IXIFACE(next_direction_number(face_direction,2),if)
         orient_other_direction=NFAXES(other_direction,Nface_orient(if))
 
         select case(NFAXES(3,Nface_orient(if)))
@@ -247,10 +247,10 @@ subroutine shape3bE(Xi,Norder,Nedge_orient,Nface_orient, NrdofE,ShapE,CurlE)
         case(0)
 
            do cont_diraux=1,nrdofH1xy(next_direction_number(face_direction,2))
-              do kk=1,nrdofExy(face_direction) 
+              do kk=1,nrdofExy(face_direction)
 
                  k=k+1
-                 
+
                  ShapE(direction,k) = shapE1D(direction,kk,orient_direction)* &
                       shapH1D(other_direction,cont_diraux+2,orient_other_direction)*vshap(nv,ibl)
 
@@ -266,17 +266,17 @@ subroutine shape3bE(Xi,Norder,Nedge_orient,Nface_orient, NrdofE,ShapE,CurlE)
 
         case(1)
            ! the face axes HAVE been reversed =>  order of loops gets REVERSED
-           
+
            !¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡ CAMBIAR variable k N VEZ DE COPIAR Y PEGAR LOOP
 
            do cont_diraux=1,nrdofH1xy(next_direction_number(face_direction,2))
-              do kk=1,nrdofExy(face_direction) 
+              do kk=1,nrdofExy(face_direction)
 
                  k=k+1
-                 
+
                  ShapE(other_direction,k) = shapE1D(other_direction,kk,orient_other_direction)* &
                       shapH1D(direction,cont_diraux+2,orient_direction)*vshap(nv,ibl)
-                 
+
                  CurlE(direction,k) = shapE1D(other_direction,kk,orient_other_direction)* &
                       shapH1D(direction,cont_diraux+2,orient_direction)*dvshap(nv,ibl) &
                       * sign_curl_matrix(other_direction,ibl)
@@ -290,7 +290,7 @@ subroutine shape3bE(Xi,Norder,Nedge_orient,Nface_orient, NrdofE,ShapE,CurlE)
            write(*,*) 'shape3bE. ERROR: orientation different from 0,1'
            stop
         end select
-        
+
      enddo face_direction_loop
 
   enddo ! loop over faces
@@ -311,8 +311,8 @@ subroutine shape3bE(Xi,Norder,Nedge_orient,Nface_orient, NrdofE,ShapE,CurlE)
 !!$     other_direction_2=ibl_interior(2,direction)
 
      ! Another way to compute the "other" two directions
-     other_direction_1=next_direction_number(direction,3) 
-     other_direction_2=next_direction_number(direction+1,3) 
+     other_direction_1=next_direction_number(direction,3)
+     other_direction_2=next_direction_number(direction+1,3)
 
 
      ! CAMBIAR FILAS POR COLUMNAS EN TODOS LOS ARRAYS DE RANK>=2
@@ -348,18 +348,18 @@ subroutine shape3bE(Xi,Norder,Nedge_orient,Nface_orient, NrdofE,ShapE,CurlE)
   enddo direction_loop_interior
 
   !--------------------------------------------------------------
-  
+
   ! count of total number of dof
   NrdofE=k
 
   !--------------------------------------------------------------
-  
+
 CONTAINS
 
   !----------------------------------------------------------------------------
   !> Purpose : compute the sign (1 or -1) of terms dE_i/dx_j that
   !appear on calculation of 3D curl
-  !  
+  !
   ! Example: Assuming 3D Cartesian axis numerated such as: x->x_1,
   ! y->x_2, z-> x_3
   !
@@ -369,7 +369,7 @@ CONTAINS
   !  curlE(2) = + dE_1/dx_3
   !  curlE(3) = - dE_1/dx_2
   !
-  ! Then, this function computes the sign (+1,-1) above, i.e., 
+  ! Then, this function computes the sign (+1,-1) above, i.e.,
   ! curlE(2)=sign_curl_component(1,3) dE_1/dx_3
   ! curlE(3)=sign_curl_component(1,2) dE_1/dx_2
   !
@@ -378,7 +378,7 @@ CONTAINS
   !
   !! @param[in] direction1              - intepreted as 1->x, 2->y, 3->z
   !! @param[in] direction2              - idem
-  
+
   !! @param[out] sign_curl_component    - value  +1 or -1
   !----------------------------------------------------------------------------
   !
@@ -389,7 +389,7 @@ CONTAINS
     integer, intent(in) :: Direction1,Direction2
     integer             :: sign_curl_component
     !----------------------------------------------
-    
+
     integer, dimension(3) :: vec1,vec2,vec_result
     logical, dimension(3) :: mask
 
@@ -422,8 +422,8 @@ CONTAINS
             'wrong output from cross_product3D_int'
        stop
     endif
-    
-    ! we detect which component != 0 
+
+    ! we detect which component != 0
     cross_direction_vec=maxloc(abs(vec_result))
     cross_direction=cross_direction_vec(1)
 
@@ -437,11 +437,11 @@ CONTAINS
   !> Purpose : Precompute matrix containing the "sign_curl_components"
   !(see function "sign_curl_component") for a Cartesian system of
   !coordinates of dimension Ndim
-  !  
+  !
   ! Note: See  function "sign_curl_component"
   !
   !! @param[in] Ndim                - Dimension of the space, e.g., 3->3D)
-  
+
   !! @param[out] Sign_curl_matrix        - Matrix with ij component =
   !!                                          sign_curl_component(i,j)
   !----------------------------------------------------------------------------
@@ -458,7 +458,7 @@ CONTAINS
        do jj=ii+1,Ndim
            Sign_curl_matrix(ii,jj) = &
                 sign_curl_component(ii,jj)
-           Sign_curl_matrix(jj,ii) = - Sign_curl_matrix(ii,jj) 
+           Sign_curl_matrix(jj,ii) = - Sign_curl_matrix(ii,jj)
         enddo
      enddo
 
@@ -466,7 +466,7 @@ CONTAINS
 
   !----------------------------------------------------------------------------
   !> Purpose : compute the next "Direction number" in a Ndim dimensional space
-  !  
+  !
   ! Example: Assuming 3D Cartesian axis numerated such as: x->1, y->2, z-> 3
   !   next_direction_number(1->"x") = 2->"y"
   !   next_direction_number(2->"y") = 3->"z"
@@ -475,16 +475,16 @@ CONTAINS
   !!
   !! @param[in] Direction_number    - interpreted as 1->x, 2->y, 3->z
   !! @param[in] Ndim                - dimensional of the space (=3 for 3D)
-  
+
   !! @param[out]                    - next_direction_number
   !----------------------------------------------------------------------------
   !
   function next_direction_number(Direction_number,Ndim)
-    
+
     implicit none
     integer, intent(in) :: Direction_number,Ndim
     integer             :: Next_direction_number
-    
+
     if ( (Direction_number <= 0) .or. (Ndim <= 0) ) then
        write(*,*) 'function next_direction. ERROR: input ', &
             'parameter must be positive'
@@ -494,10 +494,10 @@ CONTAINS
     if (Next_direction_number == 0) then
        Next_direction_number=Ndim
     endif
-    
+
   end function next_direction_number
-  
-  
+
+
 end subroutine shape3bE
 
 

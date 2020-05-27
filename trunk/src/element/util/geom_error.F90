@@ -27,7 +27,7 @@
 !
 !  Thus:
 !
-!     #dof's = p^3 meas{Omega}/h^{3,2,1}  
+!     #dof's = p^3 meas{Omega}/h^{3,2,1}
 !
 !  In terms of h:
 !
@@ -57,7 +57,7 @@ subroutine geom_error(Err,Rnorm)
 !
       use data_structure3D , only : NRELES,ELEM_ORDER
       use environment      , only : QUIET_MODE,L2GEOM
-!      
+!
       implicit none
       real(8), intent(out) ::  Err, Rnorm
 !
@@ -76,20 +76,20 @@ subroutine geom_error(Err,Rnorm)
 !
       iprint=0
 !
-!     initialize global quantities  
+!     initialize global quantities
       Err=0.d0 ; Rnorm=0.d0
-!    
+!
 !     loop over active elements
       do iel=1,NRELES
         mdle = ELEM_ORDER(iel)
         call geom_error_elem(mdle, derr,dnorm)
-!    
-!       accumulate        
+!
+!       accumulate
         Err=Err+derr ; Rnorm=Rnorm+dnorm
 !
 !       printing
         if (iprint.eq.1) then
-          write(*,7004)mdle,derr,dnorm              
+          write(*,7004)mdle,derr,dnorm
  7004     format(' geometry_error: mdle,err^2,rnorm^2 = ',i7,2x,2(e12.5,2x))
         endif
 !
@@ -98,36 +98,36 @@ subroutine geom_error(Err,Rnorm)
 !
 !     check that sons error is less than father error
       call check_geom_error
-!  
+!
 !     the much neglected square root!
       Err=sqrt(Err) ; Rnorm=sqrt(Rnorm)
 !
 !     number of geometry dof, namely number of H1 dof for a single component
       call find_nrdof(nrgdof,nvoid,nvoid,nvoid)
-!  
-      err_rate=0.d0 
+!
+      err_rate=0.d0
 !
 !     if not 1st visit, compute rate
       if (ivis.gt.0) then
         if (nrgdof.gt.nrgdof_save) then
           if (Err.gt.0.d0) then
             err_rate = log(err_save/Err)/log(float(nrgdof_save)/nrgdof)
-      endif ; endif ; endif      
+      endif ; endif ; endif
 !
 !     save error and number of gdofs
       err_save=Err ; nrgdof_save=nrgdof
-!      
+!
 !     raise visitation flag
       ivis=ivis+1
 !
 IF (.NOT. QUIET_MODE) THEN
-!        
-!     check        
-      if (ivis > maxvis) then  
+!
+!     check
+      if (ivis > maxvis) then
         write(*,*) 'geom_error: increase maxvis!'
         stop
       endif
-!     
+!
 !     store
       rwork(ivis,1)=Err
       rwork(ivis,2)=Rnorm
@@ -136,13 +136,13 @@ IF (.NOT. QUIET_MODE) THEN
       iwork(ivis,1)=nrgdof
 !
 ENDIF
-!      
+!
 !     printing
 !
 !     -- 1st visit --
       if (ivis == 1) then
 !
-!       open file for printing      
+!       open file for printing
         open(unit   = nin                    , &
              file   = './files/dump_geo_err' , &
              form   = 'formatted'            , &
@@ -159,13 +159,13 @@ IF (.NOT. L2GEOM) THEN
         write(nin,*)'-- Geometry Error Report --'
 ELSE
         write(nin,*)'-- Geometry Error Report (L2 only) --'
-ENDIF        
+ENDIF
         write(nin,1000)
  1000   format('          Gdofs // ' , &
                  '        Error // ' , &
                  '         Norm // ' , &
                  '   Rel. Error //'  , &
-                   '       Rate '        )       
+                   '       Rate '        )
 !
 !     -- subsequent visits --
       else
@@ -192,20 +192,20 @@ ENDIF
 IF (.NOT. QUIET_MODE) THEN ; write(*,*)''
   IF (.NOT. L2GEOM) THEN   ; write(*,*)'-- Geometry Error Report --'
   ELSE                     ; write(*,*)'-- Geometry Error Report (L2 only) --'
-  ENDIF        
+  ENDIF
                              write(*,1000)
         do i=1,ivis        ; write(*,9998)i,iwork(i,1),rwork(i,1:4)
         enddo
                              write(*,*)''
-ENDIF        
+ENDIF
 !
 !     close file
-      close(unit=nin,iostat=ic)      
+      close(unit=nin,iostat=ic)
       if (ic /= 0) then
         write(*,*)'error_geom: COULD NOT CLOSE FILE!'
         stop
       endif
-!      
+!
 !
 end subroutine geom_error
 !
@@ -230,28 +230,28 @@ subroutine geom_error_elem(Mdle, Derr,Dnorm)
       implicit none
       integer, intent(in   ) :: Mdle
       real(8), intent(inout) :: Dnorm, Derr
-!  
+!
 !     order of approx., gdof's, orientations
       integer, dimension(19)          :: norder
       real(8), dimension(3,MAXbrickH) :: xnod
       integer :: nedge_orient(12), nface_orient(6)
-!    
+!
 !     shape functions
       real(8) :: shapH(MAXbrickH),dshapH(3,MAXbrickH)
-!    
+!
 !     geometry
       real(8), dimension(3)   :: xi,x_ex,x_hp
       real(8), dimension(3,3) :: dx_hpdxi,dxidx_ex,dx_exdxi,dx_hpdx_ex
-!    
+!
 !     quadrature
       real(8) :: xiloc(3,MAX_NINT3),wxi(MAX_NINT3)
-!  
+!
       character(len=4) :: etype
 7001  format(' geom_error_elem: Mdle,type = ',i10,2x,a4)
 !
       real(8),dimension(3,3),parameter :: del = &
       reshape((/1.d0,0.d0,0.d0, 0.d0,1.d0,0.d0, 0.d0,0.d0,1.d0/),(/3,3/))
-! 
+!
       integer :: i,j,k,l,nint,nrdofH,iprint,iflag
       real(8) :: wa,weight,rjac,s
 !---------------------------------------------------------------------
@@ -284,7 +284,7 @@ subroutine geom_error_elem(Mdle, Derr,Dnorm)
         call shape3DH(etype,xi,norder,nedge_orient,nface_orient, nrdofH,shapH,dshapH)
 !
 !       ISOPARAMETRIC MAP : x_hp = x_hp(xi)
-        x_hp(1:3)=0.d0 ; dx_hpdxi(1:3,1:3)=0.d0 
+        x_hp(1:3)=0.d0 ; dx_hpdxi(1:3,1:3)=0.d0
         do k=1,nrdofH
            x_hp(1:3)=x_hp(1:3)+xnod(1:3,k)*shapH(k)
            do i=1,3
@@ -293,8 +293,8 @@ subroutine geom_error_elem(Mdle, Derr,Dnorm)
         enddo
 !
 !       EXACT GEOMETRY MAP : x_ex = x_ex(xi)
-        call exact_geom(Mdle,xi, x_ex,dx_exdxi) 
-        call geom(dx_exdxi, dxidx_ex,rjac,iflag) 
+        call exact_geom(Mdle,xi, x_ex,dx_exdxi)
+        call geom(dx_exdxi, dxidx_ex,rjac,iflag)
 !
 !       check Jacobian
         if (iflag.ne.0) then
@@ -315,13 +315,13 @@ subroutine geom_error_elem(Mdle, Derr,Dnorm)
 !
 !       L2 contribution
         do i=1,3
-           Dnorm=Dnorm+(x_ex(i)        )**2*weight 
-           Derr =Derr +(x_ex(i)-x_hp(i))**2*weight 
+           Dnorm=Dnorm+(x_ex(i)        )**2*weight
+           Derr =Derr +(x_ex(i)-x_hp(i))**2*weight
         enddo
 !
 !       H1 contribution
         if (.NOT. L2GEOM) then
-!           
+!
 !          dx_hp / dx_ex = dx_hp / dxi * dxi / dx_ex
            do i=1,3
               do j=1,3
@@ -375,13 +375,13 @@ subroutine check_geom_error
       do i=1,NRELES
         mdle = ELEM_ORDER(i)
 !
-!  .....if no father, skip      
+!  .....if no father, skip
         nfath=NODES(mdle)%father
         if (nfath.lt.0) cycle
         nfath=iabs(nfath)
 !  .....if father has already been visited, skip
         if (NODES(nfath)%visit.ne.0) cycle
-      
+
         err_fath = NODES(nfath)%error(0,0)
         call find_nsons(nfath, nrsons)
 !
@@ -390,11 +390,11 @@ subroutine check_geom_error
         do j=1,nrsons
 !          ns=NODES(nfath)%sons(j)
           ns=Son(nfath,j)
-!          
+!
           select case(NODES(ns)%type)
           case('mdlp','mdln','mdlb','mdld')
             err_sons=err_sons+NODES(ns)%error(0,0)
-          endselect        
+          endselect
         enddo
 !
 !  .....C H E C K
@@ -403,19 +403,19 @@ subroutine check_geom_error
         if (err_sons.gt.err_fath) then
           nfail=nfail+1
           write(*,9000)nfail,nfath,err_fath
-9000      format(' nfail,nfath,err_fath = ',2(i7,2x),e12.5)          
+9000      format(' nfail,nfath,err_fath = ',2(i7,2x),e12.5)
 !  .......loop over children
           err_sons=0.d0
           do j=1,nrsons
 !            ns=NODES(nfath)%sons(j)
             ns=Son(nfath,j)
-!          
+!
             select case(NODES(ns)%type)
             case('mdlp','mdln','mdlb','mdld')
 9001          format('   ns,type,err,err_sons = ',i7,2x,a4,2x,2(e12.5,2x))
               err_sons=err_sons+NODES(ns)%error(0,0)
               write(*,9001)ns,NODES(ns)%type,NODES(ns)%error(0,0),err_sons
-            endselect        
+            endselect
           enddo
         endif
 !
@@ -443,22 +443,22 @@ subroutine display_geom_error(Nfath)
 !
 !
       write(*,5000)Nfath,NODES(Nfath)%error(0,0)
-5000  format(' nfath,err_fath = ',i7,2x,e12.5)          
+5000  format(' nfath,err_fath = ',i7,2x,e12.5)
 !
       call find_nsons(nfath, nrsons)
-!      
+!
 !  ...loop over children
       err_sons=0.d0
       do j=1,nrsons
 !        ns=NODES(nfath)%sons(j)
         ns=Son(nfath,j)
-!      
+!
         select case(NODES(ns)%type)
         case('mdlp','mdln','mdlb','mdld')
           err_sons=err_sons+NODES(ns)%error(0,0)
           write(*,5001)ns,NODES(ns)%error(0,0),err_sons
 5001      format('   ns,err,err_sons = ',i7,2x,2(e12.5))
-        endselect        
+        endselect
       enddo
       if (err_sons.gt.NODES(Nfath)%error(0,0)) then
         write(*,*)'  F A I L'

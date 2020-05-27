@@ -171,7 +171,7 @@ contains
             call logic_error(ERR_ALLOC_FAILURE,__FILE__,__LINE__)
          endif
       enddo
-      
+
       deallocate(BLOC,AAUX,ALOC,ZBMOD,ZAMOD, stat=istat)
       if (istat.ne.SUCCESS) then
          call logic_error(ERR_ALLOC_FAILURE,__FILE__,__LINE__)

@@ -7,12 +7,12 @@ c
 c   latest revision    - Mar 10
 c
 c   purpose            - routine sets tangent and normal directions
-c                        for curves connected to a point on a surface 
+c                        for curves connected to a point on a surface
 c
-c   arguments    
+c   arguments
 c     in:
 c      Np              - a point
-c      Nrcurves        - number of curves on the list 
+c      Nrcurves        - number of curves on the list
 c      Rn              - normal at the point
 c      Newlist_curves  - list of the curves connected to the point
 c                        organized in the couterclockwise fashion;
@@ -25,8 +25,8 @@ c                        surface normal,
 c                         = 0 if the orientations are consistent
 c                         = 1 if the orientations are opposite
 c     out:
-c                        for each curve in the bundle: unit (!) tangent 
-c                        vectors and curve principal normal multiplied 
+c                        for each curve in the bundle: unit (!) tangent
+c                        vectors and curve principal normal multiplied
 c                        by curve curvature stored in data structure
 c
 c----------------------------------------------------------------------
@@ -80,7 +80,7 @@ c
 c
       integer, external :: imod
 ccc      imod(j,mod) = j-(j-1)/mod*mod
-c      
+c
       twopi = 2.d0*pi
 ccc      theta_min = 1.d0/9.d0*pi
       theta_min = 1.d0/10.d0*pi
@@ -89,7 +89,7 @@ c
 c-----------------------------------------------------------------------
 c
       iprint=0
-c      
+c
  5    continue
 c
 c  ...there must be at least three curves...
@@ -106,15 +106,15 @@ c
 c-----------------------------------------------------------------------
 c
 c  STEP 1: for each tetrahedron adjacent to the point, determine the
-c          normal component of the unit vector for the edge connected 
-c          to the point "Np" that does NOT lie on the reconstructed 
+c          normal component of the unit vector for the edge connected
+c          to the point "Np" that does NOT lie on the reconstructed
 c          surface
 c
 c  ...loop over curves
       do ir = 1,Nrcurves
-c  .....get corresponding triangle      
+c  .....get corresponding triangle
         nr = List_trian(1,ir)
-c  .....find attached tet      
+c  .....find attached tet
         call decode(TRIANGLES(nr)%BlockNo(1), nh,lab)
 c  .....loop over the edges
         do ie = 1,6
@@ -122,14 +122,14 @@ c  .....loop over the edges
 c  .......loop over endpoints
           do ive = 1,2
             iv = TETRA_EDGE_TO_VERT(ive,ie)
-c  .........if endpoint coincides with Np            
+c  .........if endpoint coincides with Np
             if (TETRAS(nh)%VertNo(iv).eq.Np) then
               call locate(nc,Newlist_curves,Nrcurves, ii)
-c  ...........if curve is not on list, it is the wanted one              
-              if (ii.eq.0) then  
+c  ...........if curve is not on list, it is the wanted one
+              if (ii.eq.0) then
                 ive1 = imod(ive+1,2)
                 iv1 = TETRA_EDGE_TO_VERT(ive1,ie)
-                np1 = TETRAS(nh)%VertNo(iv1) 
+                np1 = TETRAS(nh)%VertNo(iv1)
                 temp(1:3) = POINTS(Np)%Rdata(1:3)-POINTS(np1)%Rdata(1:3)
                 call normalize(temp)
 ccc                call scalar_product(temp,Rn(1:3), edge_comp(ir))
@@ -137,11 +137,11 @@ ccc                call scalar_product(temp,Rn(1:3), edge_comp(ir))
                 call norm(temp1, edge_comp(ir))
               endif
             endif
-c  .......end of loop over endpoints            
+c  .......end of loop over endpoints
           enddo
-c  .....end of loop over edges          
+c  .....end of loop over edges
         enddo
-c  ...end of loop over curves        
+c  ...end of loop over curves
       enddo
 c
 c  ...check the orientation
@@ -157,7 +157,7 @@ c  ...check the orientation
         ! call pause
       endif
 c
-c  ...printing      
+c  ...printing
       if (iprint.eq.1) then
         write(*,7003) edge_comp(1:Nrcurves)
  7003   format(' set_bundle: edge_comp = ',10f8.3)
@@ -169,7 +169,7 @@ c  STEP 2: determine the angles for the tangent bundle
 c
 c  ...compute the transformation matrix to the patch coordinates
       nc = Newlist_curves(1)
-c  ...loop over curve endpoints      
+c  ...loop over curve endpoints
       do ivc = 1,2
         np1 = CURVES(nc)%EndPoNo(ivc)
         if (np1.ne.Np) then
@@ -179,7 +179,7 @@ c  .......project on the tangent plane
           call scalar_product(tangent,Rn(1:3), s)
           tangent(1:3) = tangent(1:3) - s*Rn(1:3)
         endif
-c  ...end of loop over curve endpoints        
+c  ...end of loop over curve endpoints
       enddo
       call normalize(tangent)
       transf(1,1:3) = tangent(1:3)
@@ -305,12 +305,12 @@ c  ...collect neighboring points
           endif
         enddo
       enddo
-c      
-c  ...reconstruct Hessian of tangent surface      
+c
+c  ...reconstruct Hessian of tangent surface
       call reconstruct_curvature(Np,Newlist_curves,Nrcurves,
      .                           0,Rn,acoeff)
 c
-c  ...loop over connected curves   
+c  ...loop over connected curves
       do ic = 1,Nrcurves
         nc = Newlist_curves(ic)
         xy(1,ic) = cos(theta_new(ic))
@@ -337,7 +337,7 @@ c  .....compute the curve (!) curvature using eq (2.27)
             s = s + acoeff(i,j)*temp(i)*temp(j)
           enddo
         enddo
-c  .....store (curve principal normal) * curvature        
+c  .....store (curve principal normal) * curvature
         call locate(Np,CURVES(nc)%EndPoNo(1:2),2, i)
         select case(i)
         case(1)
@@ -349,7 +349,7 @@ c  .....store (curve principal normal) * curvature
         end select
 c
 cc        iprint = 1
-c  .....printing        
+c  .....printing
         if (iprint.eq.1) then
           write(*,7020) nc,temp(1:3)
  7020     format(' set_bundle: STORING TANGENT FOR
@@ -358,11 +358,11 @@ c  .....printing
  7022     format('   STORING NORMAL RESCALED BY
      . CURVATURE FOR CURVE ',i5,': ',3(e12.5,2x))
         endif
-c        
-c  ...end of loop over conneceted curves        
+c
+c  ...end of loop over conneceted curves
       enddo
 c
-c  ...printing      
+c  ...printing
       if (iprint.eq.1) then
         write(*,*) 'set_bundle: EXITING'
       endif

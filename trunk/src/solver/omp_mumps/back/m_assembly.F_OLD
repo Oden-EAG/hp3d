@@ -6,7 +6,7 @@
 !
 !    latest revision    - July 17
 !
-!    purpose            - module sets up required workspace for the 
+!    purpose            - module sets up required workspace for the
 !                         assembly of the global stiffness matrix and
 !                         load vector.
 !
@@ -34,7 +34,7 @@
 !..connectivity array
    parameter (MAX_EL_DOF=2000)
    dimension LCON(MAX_EL_DOF), LCONB(MAX_EL_DOF)
-! 
+!
 !..timers
    real*8 MTime(20)
 !..printing flag for timers
@@ -44,7 +44,7 @@
 !..number of degrees of freedom
    integer NRDOF_CON, NRDOF_TOT, NRDOFB
 !..workspace for storing element matrices
-! 
+!
    type super_mat
 !  ...local matrix A21
       VTYPE, allocatable  :: array(:,:)
@@ -59,8 +59,8 @@
 !
 !..element local load vectors
    type(super_mat), allocatable :: CLOC(:)
-! 
-! 
+!
+!
    end module m_assembly
 
 

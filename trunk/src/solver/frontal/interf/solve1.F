@@ -82,16 +82,16 @@ c     Dirichlet dof vectors
 c
 c  ...case with static condensation
       if (ISTC_FLAG) then
-        MAXDOFM = (MAXbrickH-MAXmdlbH)*NRHVAR 
-     .          + (MAXbrickE-MAXmdlbE)*NREVAR 
+        MAXDOFM = (MAXbrickH-MAXmdlbH)*NRHVAR
+     .          + (MAXbrickE-MAXmdlbE)*NREVAR
      .          + (MAXbrickV-MAXmdlbV)*NRVVAR
 c
 c  ...no static condensation
       else
-        MAXDOFM = MAXbrickH*NRHVAR 
-     .          + MAXbrickE*NREVAR 
-     .          + MAXbrickV*NRVVAR 
-     .          + MAXbrickQ*NRQVAR 
+        MAXDOFM = MAXbrickH*NRHVAR
+     .          + MAXbrickE*NREVAR
+     .          + MAXbrickV*NRVVAR
+     .          + MAXbrickQ*NRQVAR
       endif
 c
       allocate(NEXTRACT(MAXDOFM))

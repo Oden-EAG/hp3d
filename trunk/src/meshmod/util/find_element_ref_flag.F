@@ -6,13 +6,13 @@ c----------------------------------------------------------------------
 c
 c   latest revision    - May 10
 c
-c   purpose            - given a middle node type and refinement flag 
+c   purpose            - given a middle node type and refinement flag
 c                        'Kref', and refinement flags 'Kreff' for the
 c                        element faces, routine checks the consistency
 c                        of the refinements and updates the middle
 c                        node refinement flag to accomodate face
 c                        refinements
-c                         
+c
 c
 c   arguments :
 c     in:
@@ -132,13 +132,13 @@ c----------------------------------------------------------------------
 c
 c   latest revision    - May 10
 c
-c   purpose            - given an element  middle node type, refinement 
-c                        flags 'Kreff' for the element faces, and 
+c   purpose            - given an element  middle node type, refinement
+c                        flags 'Kreff' for the element faces, and
 c                        refinement flags 'Krefe' for the element edges,
 c                        routine determines a minimum refinement to
 c                        accomodate the requested refinements of faces
 c                        and edges
-c                         
+c
 c
 c   arguments :
 c     in:
@@ -217,7 +217,7 @@ c
 
 
 
-      
+
 
 
 

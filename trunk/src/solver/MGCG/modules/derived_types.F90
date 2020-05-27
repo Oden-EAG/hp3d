@@ -18,25 +18,25 @@
    use parameters
 !
 !---------------------------------------------------------------------
-!   
+!
 !..node_mg data structure
    type node_mg
 !  ...order of a nod on the coarse grid
       integer, allocatable :: orderC(:)
-!  ...master flag      
+!  ...master flag
       integer, allocatable :: master(:)
 !
 !  ...natural ordering of elements
       integer, allocatable :: iel(:)
 !  ...number of dof supported by the node
       integer, allocatable :: nod_ndof(:)
-!  ...visitation flag      
-      integer :: visit      
-!            
+!  ...visitation flag
+      integer :: visit
+!
    end type node_mg
 !
 !---------------------------------------------------------------------
-!      
+!
    type super_vector
       integer              :: ndof_macro, nrnod_macro
       integer, allocatable :: nod_macro(:)  , ndofH_macro(:)
@@ -44,7 +44,7 @@
    end type super_vector
 !
 !---------------------------------------------------------------------
-! 
+!
 !..workspace for prolong solution
    type sol_struct
       integer    :: ndof_coarse
@@ -54,11 +54,11 @@
       VTYPE, allocatable :: zdofH(:,:),zdofE(:,:)
       VTYPE, allocatable :: zdofV(:,:),zdofQ(:,:)
       VTYPE, allocatable :: coarse(:)
-      VTYPE, allocatable :: macro(:)  
+      VTYPE, allocatable :: macro(:)
    endtype sol_struct
 !
 !---------------------------------------------------------------------
-! 
+!
 !..workspace for celem_macro
 !..store matrices and connectivities for the macro element
    type con_info
@@ -67,23 +67,23 @@
 !  ...size
       integer :: ndof, ndof_c
 !  ...mdle number
-      integer :: mdle      
+      integer :: mdle
 !
-      integer :: iel      
+      integer :: iel
 !  ...element matrices
       VTYPE, allocatable :: zstiff(:), zbload(:)
 
 !  ...Schur complement corresponding to element interior dof
-!    
+!
    end type con_info
 !
 !---------------------------------------------------------------------
-! 
+!
   type con_info2
 !  ...local connectivity map
       integer, allocatable :: lcon(:)
 !  ...size
-      integer :: mdle     
+      integer :: mdle
       integer :: ndof
 !
       integer :: iel
@@ -91,7 +91,7 @@
 !  ...Schur complement corresponding to element interior dof
       VTYPE, allocatable :: array(:,:), vect(:)
       integer :: ni
-!    
+!
    end type con_info2
 
 
@@ -103,18 +103,18 @@
       VTYPE, allocatable :: array(:,:), vect(:)
 !  ...size
       integer :: ni, nb
-!  ...number of mdle nodes within a macro_element      
-      integer :: nrmdle   
+!  ...number of mdle nodes within a macro_element
+      integer :: nrmdle
    end type store_mat
 !
 !---------------------------------------------------------------------
-! 
+!
    integer, parameter :: MAX_NREDGES = 150
    integer, parameter :: MAX_NRFACES = 150
    integer, parameter :: MAX_PATCH_MDLE = 100
-!   
+!
    type patch1
-!   
+!
 !  ...mdle number
       integer :: mdle
 !  ...number of local dof for each element in the patch
@@ -123,14 +123,14 @@
       integer, allocatable :: lcon(:)
    end type patch1
 !
-!..patch information   
+!..patch information
    type patch
 !  ...number of coarse grid edges and faces in the patch
       integer :: nredges
       integer :: nrfaces
-      integer :: nsz    
+      integer :: nsz
 !  ...edge and face lists (these are coarse grid nodes)
-      integer :: nedgel(MAX_NREDGES), nfacel(MAX_NRFACES)    
+      integer :: nedgel(MAX_NREDGES), nfacel(MAX_NRFACES)
 !  ...the list of nodes for each patch
       integer, allocatable :: nodl(:)
 !
@@ -138,17 +138,17 @@
       integer :: nrmdle
 !  ...list of mdle nodes contributing to the patch
       type(patch1) :: mdlel(MAX_PATCH_MDLE)
-!  ...total number of dof in the patch      
+!  ...total number of dof in the patch
       integer :: nrdof
 !  ...connectivity map form patch to global
       integer, allocatable :: lcon(:)
 !  ...Cholesky decomposition of the assembled block in Lapack packed form (dense matrix)
-      VTYPE,  allocatable :: zAp(:) 
-!  
+      VTYPE,  allocatable :: zAp(:)
+!
    end type patch
 !
 !---------------------------------------------------------------------
-! 
+!
    type constraint
 !  ...modified coarse grid element
       integer              :: nrnodm, nodm(MAXNODM), nrdof
@@ -164,7 +164,7 @@
    end type constraint
 !
 !---------------------------------------------------------------------
-! 
+!
 !..local data needed by the solver
    type sarray
       VTYPE, allocatable :: z(:), z_c(:) ,r(:), r_c(:)
@@ -174,33 +174,33 @@
 !..required structure for multigrid
    type schur_compl
       type(con_info), allocatable :: GLOC(:)
-!                 
-!  ...local matrix A22 in sparse form 
+!
+!  ...local matrix A22 in sparse form
       integer, allocatable :: IA(:), JA(:)
       VTYPE,   allocatable :: SA(:)
 !  ...local vector  A22^(-1) * A21
       VTYPE,   allocatable :: A21(:,:), r2(:)
 ! ....size
       integer n1, n2, inz
-!  ...number of mdle nodes within a macro_element      
+!  ...number of mdle nodes within a macro_element
       integer nrmdle
    end type schur_compl
 !
-!      
+!
    type ssarray
-!   
+!
 !  ...Number of macro elements
       integer :: nreles
-!      
-!  ...Number of patches  
+!
+!  ...Number of patches
       integer :: nrpatch
-!      
-!  ...list of macro mdle nodes   
+!
+!  ...list of macro mdle nodes
       integer, allocatable :: mdlel(:)
 !
 !  ...macro element nod list and number of nodes
       type(super_vector), allocatable :: macro_elem(:)
-!  
+!
 !  ...matrices and connectivities for the macro element
       type(con_info), allocatable :: dloc(:)
 !

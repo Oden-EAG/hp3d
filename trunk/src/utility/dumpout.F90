@@ -1,8 +1,8 @@
 subroutine dumpout
-!      
+!
       use GMP              , only : dumpout_GMP
       use data_structure3D , only : dumpout_physics,dumpout_hp3d
-!      
+!
       implicit none
       write(*,*)'Dumping out GMP...'     ; call dumpout_GMP
       write(*,*)'Done!'

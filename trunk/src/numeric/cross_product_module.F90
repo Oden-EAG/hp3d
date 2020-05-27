@@ -1,7 +1,7 @@
 
 module cross_product_module
 
-implicit none 
+implicit none
 
 interface cross_product2D
    module procedure cross_product2D_int
@@ -63,7 +63,7 @@ contains
     Vec_result(2) = - Vec1(1)*Vec2(3) + Vec1(3)*Vec2(1)
     Vec_result(3) =   Vec1(1)*Vec2(2) - Vec1(2)*Vec2(1)
   end subroutine cross_product3D_real
-  
+
   subroutine cross_product3D_complex(Vec1,Vec2,Vec_result)
     implicit none
     complex(kind=kind(1.d0)), dimension(3), intent(in)  :: Vec1, Vec2

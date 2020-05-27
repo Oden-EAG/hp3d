@@ -19,7 +19,7 @@
 !
 !     --1--3--2-->
 !
-!  ...denumeration of sons of an h11-refined quad middle node, 
+!  ...denumeration of sons of an h11-refined quad middle node,
 !     in the local system of coordinates
 !
 !     -----------------
@@ -88,7 +88,7 @@
 !
 !  ...for j-th node of i-th son
 !     PARENT_NODES_???(1,j,i) = number of the parent node of the father
-!     PARENT_NODES_???(2,j,i) = the corresponding son's node number 
+!     PARENT_NODES_???(2,j,i) = the corresponding son's node number
 !
       integer  :: T4_ORIENT(3,4) = reshape( &
         (/0,0,0, 0,0,0, 0,0,0, 1,1,1/), (/3,4/))
@@ -246,8 +246,8 @@
 !
 !-----------------------------------------------------------------------
 !
-!  ...modify son number 'Is' and node orientation 'Nort' for a son of 
-!     a mid-edge node according to the orientation 'Norient' of 
+!  ...modify son number 'Is' and node orientation 'Nort' for a son of
+!     a mid-edge node according to the orientation 'Norient' of
 !     the father
       subroutine rotate_edge(Norient,Is,Nort)
       integer Norient,Is,Nort,imod,j,m

@@ -7,7 +7,7 @@ c
 c   latest revision    - Apr 14
 c
 c   purpose            - routine calculates unconstrained solution dof
-c                        for a 3D element      
+c                        for a 3D element
 c
 c   arguments :
 c     in:
@@ -22,7 +22,7 @@ c----------------------------------------------------------------------
 c
       subroutine solelm(Mdle, ZdofH,ZdofE,ZdofV,ZdofQ)
 c
-      use data_structure3D 
+      use data_structure3D
 #include "syscom.blk"
 c
       dimension ZdofH(MAXEQNH,MAXbrickH)
@@ -41,7 +41,7 @@ c
      .          nacH(NACDIM,MAXbrickH),constrH(NACDIM,MAXbrickH),
      .          nacE(NACDIM,MAXbrickE),constrE(NACDIM,MAXbrickE),
      .          nacV(NACDIM,MAXbrickV),constrV(NACDIM,MAXbrickV)
-c 
+c
 c  ...modified element dof
       dimension zvalH(MAXEQNH,2*MAXbrickH)
       dimension zvalE(MAXEQNE,2*MAXbrickE)
@@ -61,7 +61,7 @@ c
       endif
 c
 c  ...determine number of local dof
-      call celndof(NODES(Mdle)%type,norder, 
+      call celndof(NODES(Mdle)%type,norder,
      .             nrdoflH,nrdoflE,nrdoflV,nrdoflQ)
 c
 c  ...determine constraints' coefficients
@@ -76,8 +76,8 @@ c
 c  ...initiate dof's (use ZdofQ for simplicity)
       zvalH=ZERO ; zvalE=ZERO ; zvalV=ZERO ; ZdofQ=ZERO
 c
-c  ...initiate counter for some mystic reason      
-      kH=0; kE=0; kV=0; kQ=0 
+c  ...initiate counter for some mystic reason
+      kH=0; kE=0; kV=0; kQ=0
 c
 c  ...copy dof's into the local arrays
       do j=1,nrnodm
@@ -88,7 +88,7 @@ c  ...initiate the dof
       ZdofH(1:MAXEQNH,1:nrdoflH) = ZERO
       ZdofE(1:MAXEQNE,1:nrdoflE) = ZERO
       ZdofV(1:MAXEQNV,1:nrdoflV) = ZERO
-c      
+c
 c
 c-----------------------------------------------------------------------
 c     H1 DOF'S
@@ -96,7 +96,7 @@ c-----------------------------------------------------------------------
 c
 c  ...loop through the local dof
       do k=1,nrdoflH
-c      
+c
         if (iprint.eq.1) then
           write(*,*)'k = ',k
           write(*,7001) (nacH(l,k),l=1,nrconH(k))
@@ -134,9 +134,9 @@ c
 c  ...loop through local dof
       enddo
 c
-c      
+c
 c-----------------------------------------------------------------------
-c     H(curl) DOF'S      
+c     H(curl) DOF'S
 c-----------------------------------------------------------------------
 c
 c  ...loop through the local dof
@@ -154,7 +154,7 @@ c  .....accumulate for the values
         do kp=1,nrconE(kE)
           l = nacE(kp,kE)
           do ivar=1,NREVAR*NRCOMS
-            ZdofE(ivar,kE) = ZdofE(ivar,kE) 
+            ZdofE(ivar,kE) = ZdofE(ivar,kE)
      .                      + constrE(kp,kE)*zvalE(ivar,l)
           enddo
         enddo
@@ -167,9 +167,9 @@ c
 c  ...loop through local H(curl) dof
       enddo
 c
-c      
+c
 c-----------------------------------------------------------------------
-c     H(div) DOF'S      
+c     H(div) DOF'S
 c-----------------------------------------------------------------------
 c
 c  ...loop through the local dof
@@ -187,7 +187,7 @@ c  .....accumulate for the values
         do kp=1,nrconV(kV)
           l = nacV(kp,kV)
           do ivar=1,NRVVAR*NRCOMS
-            ZdofV(ivar,kV) = ZdofV(ivar,kV) 
+            ZdofV(ivar,kV) = ZdofV(ivar,kV)
      .                      + constrV(kp,kV)*zvalV(ivar,l)
           enddo
         enddo
@@ -199,9 +199,9 @@ ccc           call pause
 c
 c  ...loop through local H(div) dof
       enddo
-c      
+c
 c-----------------------------------------------------------------------
-c     L2 DOF'S , nothing to do...    
+c     L2 DOF'S , nothing to do...
 c-----------------------------------------------------------------------
 c
       if (iprint.eq.4) then

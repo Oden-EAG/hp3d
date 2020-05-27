@@ -7,7 +7,7 @@
 !> @revision Feb 13
 !-------------------------------------------------------------------------
 subroutine norm(Vec, Rnorm)
-!  
+!
       implicit none
       real(8), intent(in ) :: Vec(3)
       real(8), intent(out) :: Rnorm

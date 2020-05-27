@@ -1,5 +1,5 @@
 !-------------------------------------------------------------------------------
-!> Purpose : set the 
+!> Purpose : set the
 !!
 !! @param[in]  Nxigtr
 !! @param[in]  Nxigstr
@@ -8,7 +8,7 @@
 !-------------------------------------------------------------------------------
 !
 subroutine set_x11_workspace(Nxigtr, Nxigstr, Nxrgtrz)
-!     
+!
   use graphmod , only : MXIGTR,MXIGSTR,MXRGTRZ,INITIALIZED
 
   implicit none
@@ -20,7 +20,7 @@ subroutine set_x11_workspace(Nxigtr, Nxigstr, Nxrgtrz)
   MXIGTR  = Nxigtr
   MXIGSTR = Nxigstr
   MXRGTRZ = Nxrgtrz
- 
+
   INITIALIZED = .TRUE.
 
 end subroutine set_x11_workspace

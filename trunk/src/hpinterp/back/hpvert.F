@@ -7,7 +7,7 @@ c
 c   latest revision    - Dec 07
 c
 c   purpose            - routine determines geometry dof for a vertex
-c                        node      
+c                        node
 c
 c   arguments :
 c     in:
@@ -21,12 +21,12 @@ c            No        - number of a specific object (point,curve,triangle,
 c                        rectangle...)
 c            Xi        - reference coordinates of the point
 c     out:
-c            Xnod      - geometry dof      
+c            Xnod      - geometry dof
 c
 c----------------------------------------------------------------------
 c
       subroutine hpvert(Iflag,No,Xi, Xnod)
-c     
+c
       use parameters , only : NDIMEN
 #include "syscom.blk"
 c
@@ -47,7 +47,7 @@ c  ...determine coordinates of the point
          print *, "hpvert: unknown node type =", iflag
          stop 1
       end select
-c     
+c
 c  ...printing
       if (iprint.eq.1) then
         write(*,7005) Iflag,No,Xi,Xnod
@@ -55,6 +55,6 @@ c  ...printing
      .          '  Xnod = ',3f8.3)
         call pause
       endif
-c     
+c
 c
       end

@@ -30,7 +30,7 @@ c          GradH        - gradients of the shape functions
 c
 c-----------------------------------------------------------------------
 c
-      subroutine shape3DHPris(X,Nord,NoriE,NoriF,Nsize, 
+      subroutine shape3DHPris(X,Nord,NoriE,NoriF,Nsize,
      .                                              NrdofH,ShapH,GradH)
 c
       use parameters , only : MODORDER

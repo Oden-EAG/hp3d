@@ -41,12 +41,12 @@ c  ...work space for routine IJacobi
       double precision z
 c
 c-----------------------------------------------------------------------
-c      
+c
       iprint=0
 c
       x = Xi(1); y = Xi(2); z = Xi(3)
 c
-c  ...if no middle node bubbles, return      
+c  ...if no middle node bubbles, return
       if (Nord.lt.4) then
         NrdofH=0 ; return
       endif
@@ -78,10 +78,10 @@ c
 c
 c  .........order in z
             l = np-nxy
-c            
-c  .........increment shape function counter            
+c
+c  .........increment shape function counter
             k=k+1
-c            
+c
             ShapH(k)    =    u1(i)  * u2(i,j)  * u3(nxy,l)
             DshapH(1,k) =   du1dx(i)* u2(i,j)  * u3(nxy,l)
             DshapH(2,k) = - du1dt(i)* u2(i,j)  * u3(nxy,l)

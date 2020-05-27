@@ -2,21 +2,21 @@
 #include "implicit_none.h"
 !
 !-----------------------------------------------------------------------
-!> Purpose : determine face geometry dof interpolating GMP map using 
+!> Purpose : determine face geometry dof interpolating GMP map using
 !            PB interpolation
 !  NOTE:     the interpolation (projection) is done in the reference space
-!!           
-!! @param[in]  Iflag        - a flag specifying which of the objects the 
+!!
+!! @param[in]  Iflag        - a flag specifying which of the objects the
 !!                            face is on: 5 pris, 6 hexa, 7 tetr, 8 pyra
-!! @param[in]  No           - number of a specific object 
+!! @param[in]  No           - number of a specific object
 !! @param[in]  Etav         - reference coordinates of the element vertices
 !! @param[in]  Type         - element (middle node) type
-!! @param[in]  Nedge_orient - edge orientation 
-!! @param[in]  Nface_orient - face orientation 
+!! @param[in]  Nedge_orient - edge orientation
+!! @param[in]  Nface_orient - face orientation
 !! @param[in]  Norder       - element order
-!! @param[in]  Iface        - face number 
+!! @param[in]  Iface        - face number
 !! @param[in]  Xnod         - geometry dof for the element (vertex and edge values)
-!! 
+!!
 !! @param[out] Xdof         - geometry dof for the face
 !-----------------------------------------------------------------------
   subroutine hpface(Mdle,Iflag,No,Etav,Type, &
@@ -60,7 +60,7 @@
 ! derivatives of a shape function wrt reference coordinates
   real(8), dimension(3)                 :: duHdeta,dvHdeta
 !
-! dot product 
+! dot product
   real(8)                               :: prod
 !
 ! geometry
@@ -77,7 +77,7 @@
 !
 ! load vector and solution
   real(8), dimension(MAXMdlqH,3)        :: bb,uu
-!  
+!
 ! misc work space
   integer :: iprint,nrv,nre,nrf,i,j,k,ie,kj,ki,&
              ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,nsign
@@ -118,7 +118,7 @@
 7060 format('hpface: norder_1 = ',20i4)
   endif
 !
-! get face order to find out quadrature information 
+! get face order to find out quadrature information
   call face_order(Type,Iface,Norder, norder_face)
   call set_2Dint(face_type(Type,Iface),norder_face, &
                  nint,xi_list,wa_list)
@@ -146,7 +146,7 @@
                     eta,detadxi,dxideta,rjac,detadt,rn,bjac)
     weight = wa*bjac
 !
-!   call GMP routines to evaluate physical coordinates and their 
+!   call GMP routines to evaluate physical coordinates and their
 !   derivatives wrt reference coordinates
     select case(Iflag)
     case(5);        call prism(No,eta, x,dxdeta)
@@ -169,7 +169,7 @@
                    + gradH(2,k)*dxideta(2,1:3) &
                    + gradH(3,k)*dxideta(3,1:3)
 !
-!     subtract... 
+!     subtract...
       do i=1,3
         dxdeta(1:3,i) = dxdeta(1:3,i) &
                       - Xnod(1:3,k)*duHdeta(i)

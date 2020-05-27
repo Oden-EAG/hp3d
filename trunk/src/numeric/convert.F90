@@ -8,7 +8,7 @@ subroutine unit_cart2sphere(Theta, Phi, T)
   real(8), intent(in)                  :: Theta, Phi
   real(8), intent(out), dimension(3,3) :: T
   real(8) :: siTh, coTh, siPh, coPh
-  
+
   siTh = sin(Theta); coTh = cos(Theta);
   siPh = sin(Phi);   coPh = cos(Phi);
 
@@ -39,7 +39,7 @@ subroutine grad_sphere2cart(R, Theta, Phi, T)
      siTh = sin(Theta)
   end if
   coTh = cos(Theta);
-  siPh = sin(Phi);   
+  siPh = sin(Phi);
   coPh = cos(Phi);
 
   T(1,1)   =  coPh*siTh;    T(1,2)   =  coPh*coTh/R;     T(1,3)   = -siPh/(R*siTh)
@@ -64,8 +64,8 @@ subroutine disp_sphere2cart(S, Zs, Zds, Zc, Zdc)
   VTYPE,  dimension(3,3), intent(in)  :: Zds
   VTYPE,  dimension(3),   intent(out) :: Zc
   VTYPE,  dimension(3,3), intent(out) :: Zdc
-  
-  integer                :: k1, k2 
+
+  integer                :: k1, k2
   real(8),dimension(3,3) :: rot_u, rot_g
   VTYPE,  dimension(3,3) :: ztmp
   real(8)                :: coTh, siTh, coPh, siPh
@@ -92,7 +92,7 @@ subroutine disp_sphere2cart(S, Zs, Zds, Zc, Zdc)
   ! add its derivative r, theta and phi
   ztmp(1,2) = ztmp(1,2) + coTh*coPh*Zs(1) - siTh*coPh*Zs(2)
   ztmp(1,3) = ztmp(1,3) - siTh*siPh*Zs(1) - coTh*siPh*Zs(2) - coPh*Zs(3)
-  
+
   ztmp(2,2) = ztmp(2,2) + coTh*siPh*Zs(1) - siTh*siPh*Zs(2)
   ztmp(2,3) = ztmp(2,3) + siTh*coPh*Zs(1) + coTh*coPh*Zs(2) - siPh*Zs(3)
 
@@ -105,6 +105,6 @@ subroutine disp_sphere2cart(S, Zs, Zds, Zc, Zdc)
      Zdc(2,k1) = dot_product(rot_g(2,1:3), ztmp(k1,1:3))
      Zdc(3,k1) = dot_product(rot_g(3,1:3), ztmp(k1,1:3))
   end do
-  
+
 end subroutine disp_sphere2cart
 

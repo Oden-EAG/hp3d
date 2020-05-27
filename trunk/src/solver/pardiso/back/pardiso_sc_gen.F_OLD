@@ -15,8 +15,8 @@
 ! ----------------------------------------------------------------------
 
    subroutine pardiso_sc_gen
-! 
-! 
+!
+!
    use data_structure3D, ONLY: NRNODS, NRELES
    use assembly,         ONLY: NR_RHS, MAXDOFM, MAXbrickH,MAXbrickE,       &
                                MAXbrickV, MAXbrickQ, NRHVAR, NREVAR,       &
@@ -29,7 +29,7 @@
 !
 !..number of variables for each physics attribute for an element
    integer :: nrdofs(NR_PHYSA)
-! 
+!
 !..integer counters
    integer :: nrdof_H,  nrdof_E,  nrdof_V
    integer :: nrdof_Hb, nrdof_Eb, nrdof_Vb, nrdof_Q
@@ -37,20 +37,20 @@
    integer :: iel, mdle,i,j,nod,l,k1,k2,k, inz, nz, nnz,knz
    integer :: nQ,nHc,nEc,nVc,nHb,nEb,nVb,n1,n2,nH,nE,nV
    real*8  :: norm_inf, tol
-! 
+!
 !..work space for celem
    integer :: nodm(MAXNODM),  ndofmH(MAXNODM), &
               ndofmE(MAXNODM),ndofmV(MAXNODM),ndofmQ(MAXNODM)
    integer    M_elem_nz(NRELES), M_elem_inz(NRELES)
    integer    mdle_list(NRELES)
    integer, allocatable    :: SIA(:), SJA(:)
-#if C_MODE   
+#if C_MODE
    complex*16              :: zvoid
    complex*16, allocatable :: SA(:),  RHS(:),diag(:)
 #else
    real*8                  :: zvoid
    real*8, allocatable     :: SA(:),  RHS(:),diag(:)
-#endif  
+#endif
 !
 !..number of variables for each physics attribute for an element
    integer(kind=8) :: t1,t2,clock_rate,clock_max
@@ -74,7 +74,7 @@
       write(*,1001)
  1001 format(' pardiso_sc_gen STEP 1: Get assembly info from celem')
    endif
-! 
+!
    call system_clock ( t1, clock_rate, clock_max )
 !..allocate required variables for celem
    allocate(NEXTRACT(MAXDOFM))
@@ -92,7 +92,7 @@
 !..Step 1: determine the first dof offsets for active nodes
    nrdof_H = 0 ; nrdof_E = 0; nrdof_V = 0; nrdof_Q = 0
    nrdof_Hb = 0 ; nrdof_Eb = 0; nrdof_Vb = 0
-  
+
    mdle = 0
 !..non zero elements for PARDISO
    inz = 0 ; M_elem_inz = 0
@@ -133,7 +133,7 @@
 !  ...store the first dof offset
       NFIRSTH(nod) = nrdof_Hb
 !  ...update the H1 dof counter
-      nrdof_Hb = nrdof_Hb + ndofmH(i)      
+      nrdof_Hb = nrdof_Hb + ndofmH(i)
 !
 !  ...compute offsets for H(curl) dof
       do i = 1,nrnodm-1
@@ -152,7 +152,7 @@
 !  ...store the first dof offset
       NFIRSTE(nod) = nrdof_Eb
 !  ...update the H1 dof counter
-      nrdof_Eb = nrdof_Eb + ndofmE(i)      
+      nrdof_Eb = nrdof_Eb + ndofmE(i)
 !
 !  ...compute offsets for H(div) dof
       do i=1,nrnodm-1
@@ -200,7 +200,7 @@
    if (IPRINT_TIME .eq. 1) then
       write(*,1002) Mtime(1)
  1002 format(' pardiso_sc_gen STEP 1: Finished in',f12.5,'  seconds',/)
-   endif   
+   endif
 !
 ! ----------------------------------------------------------------------
 !  STEP 2 : ASSEMBLE AND STORE IN SPARSE FORM FOR MUMPS
@@ -210,7 +210,7 @@
       write(*,1003)
  1003 format(' pardiso_sc_gen STEP 2: Global Assembly')
    endif
-   call system_clock ( t1, clock_rate, clock_max )   
+   call system_clock ( t1, clock_rate, clock_max )
 !
 !..memory allocation for assembly
    allocate(SIA(inz))
@@ -218,7 +218,7 @@
    allocate(SA(inz))
    allocate(RHS(nrdof)) ; RHS=ZERO
    allocate(diag(nrdof)); diag = ZERO
-!   
+!
    allocate(CLOC(NRELES))
 !
 !..assemble global stiffness matrix
@@ -254,7 +254,7 @@
                  ndofmE,ndofmV,ndofmQ,nrnodm, ZLOAD,ZTEMP)
 !
 !  ...determine local to global dof connectivities
-      l=0; nHc = 0 ; nEc = 0 ; nVc = 0 ; 
+      l=0; nHc = 0 ; nEc = 0 ; nVc = 0 ;
 !  ...H1 dof
       do i = nrnodm-1,1,-1
          nod = nodm(i)
@@ -318,7 +318,7 @@
 !     ...Assemble global load vector
 !$OMP CRITICAL
          RHS(i) = RHS(i) + ZLOADc(k1)
-!$OMP END CRITICAL         
+!$OMP END CRITICAL
 !     ...loop through dof `to the right'
          do k2=1,n1
 !        ...global dof is:
@@ -352,7 +352,7 @@
    deallocate(NEXTRACT,IDBC,ZDOFD,BLOC,AAUX,ALOC,ZBMOD,ZAMOD)
    deallocate(ZLOAD,ZTEMP)
 !$OMP END PARALLEL
-! 
+!
 
    call system_clock ( t2, clock_rate, clock_max )
    Mtime(2) =  real(t2 - t1,8)/real(clock_rate,8)
@@ -360,7 +360,7 @@
    if (IPRINT_TIME .eq. 1) then
       write(*,1004) Mtime(2)
  1004 format(' pardiso_sc_gen STEP 2: Finished in',f12.5,'  seconds',/)
-   endif  
+   endif
 !
 !----------------------------------------------------------------------
 !  STEP 3 : DIAGONAL SCALING
@@ -371,7 +371,7 @@
  ! 1005 format(' pardiso_sc_gen STEP 3: Diagonal scaling and zero filtering')
  !   endif
 
-   call system_clock ( t1, clock_rate, clock_max )    
+   call system_clock ( t1, clock_rate, clock_max )
 !    do k = 1, inz
 ! !  ...get the row number
 !       i = SIA(k)
@@ -398,17 +398,17 @@
    !    endif
    ! enddo
    ! inz = knz
-!   
+!
 ! ----------------------------------------------------------------------
-!  END OF STEP 3 
+!  END OF STEP 3
 ! ----------------------------------------------------------------------
-!   
+!
    ! call system_clock ( t2, clock_rate, clock_max )
    Mtime(3) =  real(t2 - t1,8)/real(clock_rate,8)
  !   if (IPRINT_TIME .eq. 1) then
  !      write(*,1006) Mtime(3)
  ! 1006 format(' pardiso_sc_gen STEP 3: Finished in',f12.5,'  seconds',/)
- !   endif   
+ !   endif
 !
 !----------------------------------------------------------------------
 !  STEP 4: convert to compressed column format
@@ -422,9 +422,9 @@
    call system_clock ( t1, clock_rate, clock_max )
 
    call coo2csr(SIA(1:inz),SJA(1:inz),SA(1:inz),inz, nnz)
-!   
+!
 ! ----------------------------------------------------------------------
-!  END OF STEP 4 
+!  END OF STEP 4
 ! ----------------------------------------------------------------------
 !
    call system_clock ( t2, clock_rate, clock_max )
@@ -432,10 +432,10 @@
    if (IPRINT_TIME .eq. 1) then
       write(*,1008) Mtime(4)
  1008 format(' pardiso_sc_gen STEP 4: Finished in',f12.5,'  seconds',/)
-      write(*,2008) inz, nnz 
+      write(*,2008) inz, nnz
  2008 format(' pardiso_sc_gen STEP 4: inz, nnz =', 2i16,/)
-   
-   endif   
+
+   endif
 !
 !----------------------------------------------------------------------
 !  STEP 5: call pardiso to solve the linear system
@@ -446,7 +446,7 @@
  1009 format(' pardiso_sc_gen STEP 5: Solve')
    endif
    call system_clock ( t1, clock_rate, clock_max )
-!   
+!
    call pardiso_solve(SIA(1:nrdof+1),SJA(1:nnz),SA(1:nnz),'G',nnz,nrdof,1,RHS(1:nrdof))
 !
    ! do i = 1, nrdof
@@ -465,7 +465,7 @@
       write(*,1010) Mtime(5)
  1010 format(' pardiso_sc_gen STEP 5: Finished in',f12.5,'  seconds',/)
    endif
-!   
+!
    deallocate(SIA,SJA,SA)
 !
 ! ----------------------------------------------------------------------
@@ -477,7 +477,7 @@
  1011 format(' pardiso_sc_gen STEP 6: Store the solution')
    endif
    call system_clock ( t1, clock_rate, clock_max )
-!   
+!
 !$OMP PARALLEL
 !..allocate arrays required by solout for celem
    allocate(NEXTRACT(MAXDOFM))
@@ -487,24 +487,24 @@
 !$OMP DO PRIVATE(k1,i,ndof,n1,n2,nHc,nEc,nVc,nHb,nEb,nVb,nQ,nH,nE,nV)
 ! ...loop through elements
    do iel=1,NRELES
-! 
+!
       nHc =  CLOC(iel)%nHc
       nEc =  CLOC(iel)%nEc
       nVc =  CLOC(iel)%nVc
-! 
+!
       nHb =  CLOC(iel)%nHb
       nEb =  CLOC(iel)%nEb
       nVb =  CLOC(iel)%nVb
       nQ =   CLOC(iel)%nQ
-! 
+!
       nH = nHc+nHb
       nE = nEc+nEb
       nV = nVc+nVb
-! 
+!
       n1 = nHc + nEc + nVc
       n2 = nHb + nEb + nVb + nQ
       ndof = n1 + n2
-! 
+!
       allocate(ZSOL_LOC(ndof)); ZSOL_LOC=ZERO
       allocate(ZSOL_LOCc(n1)) ; ZSOL_LOCc=ZERO
 !
@@ -513,9 +513,9 @@
          i = CLOC(iel)%con(k1)
          ZSOL_LOCc(k1) = RHS(i)
       enddo
-! 
+!
       deallocate(CLOC(iel)%con)
-! 
+!
       if (n2 .ne. 0) then
          allocate(ZSOL_LOCb(n2))
          call stc_in(iel,n1,n2,ZSOL_LOCc,ZSOL_LOCb)
@@ -527,10 +527,10 @@
          ZSOL_LOC(nH+nE+nVb+1:nH+nE+nV)  = ZSOL_LOCc(nHc+nEc+1:nHc+nEc+nVc)
          ZSOL_LOC(nH+nE+nV+1:ndof) = ZSOL_LOCb(nHb+nEb+nVb+1:n2)
          deallocate(ZSOL_LOCb)
-      else   
+      else
          ZSOL_LOC = ZSOL_LOCc
-      endif   
-! 
+      endif
+!
       call solout(iel,ndof,NR_RHS,ZERO,ZSOL_LOC)
       deallocate(ZSOL_LOCc,ZSOL_LOC)
 !
@@ -550,7 +550,7 @@
       write(*,1012) Mtime(6)
  1012 format(' pardiso_sc_gen STEP 6: Finished in',f12.5,'  seconds',/)
    endif
-!   
+!
    deallocate(RHS)
    deallocate(MAXDOFS)
    deallocate(NFIRSTV,NFIRSTH,NFIRSTE)

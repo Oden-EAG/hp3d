@@ -39,22 +39,22 @@ C     REPS   : sqrt(EPS)
 C     SFARL  : farthest SIGMA to the left  of ORIGIN
 C     SFARR  : farthest SIGMA to the right of ORIGIN
 C     THETA0 : reference point for THETA
-C     THETAL : inferior limit to eig(TB)               
-C     THETAR : superior limit to eig(TB)               
+C     THETAL : inferior limit to eig(TB)
+C     THETAR : superior limit to eig(TB)
 C     THRSH  : threshold for convergence (default)
 C     TRUSTL : inferior trust bound
 C     TRUSTR : superior trust bound
 C
-      INTEGER    BIGNUM     , EIGL       , EIGR       , ENDL       , 
-     &           ENDR       , EPS        , EPS1       , GRNRM      , 
+      INTEGER    BIGNUM     , EIGL       , EIGR       , ENDL       ,
+     &           ENDR       , EPS        , EPS1       , GRNRM      ,
      &           ORIGIN     , RADIUS     , REPS       , SFARL      ,
-     &           SFARR      , THETA0     , THETAL     , THETAR     , 
-     &           THRSH      , TRUSTL     , TRUSTR 
+     &           SFARR      , THETA0     , THETAL     , THETAR     ,
+     &           THRSH      , TRUSTL     , TRUSTR
 C
-      PARAMETER (BIGNUM =  1, EIGL   =  2, EIGR   =  3, ENDL   =  4, 
-     &           ENDR   =  5, EPS    =  6, EPS1   =  7, GRNRM  =  8, 
+      PARAMETER (BIGNUM =  1, EIGL   =  2, EIGR   =  3, ENDL   =  4,
+     &           ENDR   =  5, EPS    =  6, EPS1   =  7, GRNRM  =  8,
      &           ORIGIN =  9, RADIUS = 10, REPS   = 11, SFARL  = 12,
-     &           SFARR  = 13, THETA0 = 14, THETAL = 15, THETAR = 16, 
+     &           SFARR  = 13, THETA0 = 14, THETAL = 15, THETAR = 16,
      &           THRSH  = 17, TRUSTL = 18, TRUSTR = 19)
 C
 C.... RUSED defines the number of positions already used in RSTOR ......
@@ -91,16 +91,16 @@ C     LRWRN  : code for warning messages (see subroutine lzwrns.f)
 C     LTAU   : leading dimension of (TAU)
 C     MYPE   : process rank in the parallel version
 C     N      : dimension of the eigenvalue problem
-C     NBX    : number of vectors in (X) multiplied by (B) 
-C     NBXMAX : maximum number of vectors in (BX) 
-C     NDEIG  : number of eigenpairs required in the run 
+C     NBX    : number of vectors in (X) multiplied by (B)
+C     NBXMAX : maximum number of vectors in (BX)
+C     NDEIG  : number of eigenpairs required in the run
 C     NEPIN  : number of eigenpairs given as input
 C     NEWSIG : flag for a new SIGMA
 C              = 0 : exit
 C              = 1 : no need for a new SIGMA
 C              = 2 : cost-effectiveness point reached
 C              = 3 : potential ill-conditioning detected
-C              = 4 : all solutions in subinterval have been found 
+C              = 4 : all solutions in subinterval have been found
 C     NFARL  : number of eigenvalues less than SFARL
 C     NFARR  : number of eigenvalues less than SFARR
 C     NI     : dimension of the vectors in (U), (V) and (X)
@@ -113,7 +113,7 @@ C     NONEWS : number of runs without any converged solution
 C     NPE    : number of processes in the parallel version
 C     NPORTH : number of partial reorthogonalizations performed
 C     NQMAX  : maximum number of vectors in (BASIS)
-C     NREIG  : number of required eigenpairs  
+C     NREIG  : number of required eigenpairs
 C     NREIGL : number of required eigenvalues less    than EIGR
 C     NREIGR : number of required eigenvalues greater than EIGL
 C     NRITZ  : number of Ritz values stored in (RITZ)
@@ -164,11 +164,11 @@ C                (3,:) : new translation     to the right of xi_L
 C                (4,:) : new translation     to the left  of xi_R
 C                (5,:) : farthest Ritz value to the left  of xi_R
 C                (6,:) : xi_R
-C     ISSLOG --> SSLOG : spectrum slicing history, 
+C     ISSLOG --> SSLOG : spectrum slicing history,
 C                        dimension (8,NRUNMX)
 C                (1,:) : SIGMA
-C                (2,:) : ENDL 
-C                (3,:) : ENDR 
+C                (2,:) : ENDL
+C                (3,:) : ENDR
 C                (4,:) : time spent in the run
 C                (5,:) : number of eigenvalues to the left of SIGMA
 C                (6,:) : number of eigenvalues computed in the run
@@ -221,7 +221,7 @@ C             (3) : (Q), index j-1
 C             (4) : (Q), index j
 C     LOPTS : options for the algorithm,
 C             dimension (4)
-C             (1) : problem type flag 
+C             (1) : problem type flag
 C             (2) : spectrum slicing flag
 C             (3) : eigenvectors purification flag
 C             (4) : reserved for future use
@@ -229,11 +229,11 @@ C     LBLAS : BLAS levels,
 C             dimension (4)
 C             (1) : (R):=(R)-(Q)*(BETA^T)
 C             (2) : (ALPHA):=(Q^T)*(B)*(R)
-C             (3) : (R):=(R)-(Q)*(ALPHA)           
+C             (3) : (R):=(R)-(Q)*(ALPHA)
 C             (4) : (R)=(Q)*(BETA)
 C     FHNDL : file handle,
 C             dimension (4)
-C             (1) : blzpack.__.BQ 
+C             (1) : blzpack.__.BQ
 C             (2) : blzpack.__.BX
 C             (3) : blzpack.__.Q
 C             (4) : blzpack.__.X
@@ -243,29 +243,29 @@ C             (1,:) : number of eigenvalues to the left of xi_L
 C             (2,:) : number of eigenvalues to the left of xi_R
 C
       INTEGER    INDSI      , JL         , JLMAX      , JT         ,
-     &           JTMAX      , JTMIN      , LCOMM      , LEIG       , 
+     &           JTMAX      , JTMIN      , LCOMM      , LEIG       ,
      &           LFILE      , LNI        , LPRNT      , LRERR      ,
      &           LRMDE      , LRWRN      , LTAU       , MYPE       ,
-     &           N          , NBX        , NBXMAX     , NDEIG      , 
-     &           NEPIN      , NEWSIG     , NFARL      , NFARR      , 
-     &           NI         , NMOPA      , NMOPB      , NNSPNT     , 
+     &           N          , NBX        , NBXMAX     , NDEIG      ,
+     &           NEPIN      , NEWSIG     , NFARL      , NFARR      ,
+     &           NI         , NMOPA      , NMOPB      , NNSPNT     ,
      &           NNTRTL     , NNTRTR     , NONEWS     , NPE        ,
-     &           NPORTH     , NQMAX      , NREIG      , NREIGL     , 
-     &           NREIGR     , NRITZ      , NRUN       , NRUNMX     , 
-     &           NSFAIL     , NSIGMA     , NSIMAX     , NSINT      , 
-     &           NSLOG      , NSORTH     , NSRLS      , NSRRS      , 
-     &           NSVIN      , NTEIG      , NULLDQ     , NULLDR     , 
-     &           NVB        , NWBSY      , NWMAX      , NWMIN      , 
-     &           NXMAX      , ITIME      , IRSINT     , ISSLOG     , 
-     &           IRITZ      , ITB        , IALPHA     , IBETAQ     , 
-     &           IBETAR     , IANORM     , IBNORM     , IETA       , 
-     &           ITAU       , IR         , ITHETA     , IS         , 
-     &           IBASIS     , IBX        , IRWORK     , IIWORK     , 
-     &           INDR       , LOPTS      , LBLAS      , FHNDL      , 
+     &           NPORTH     , NQMAX      , NREIG      , NREIGL     ,
+     &           NREIGR     , NRITZ      , NRUN       , NRUNMX     ,
+     &           NSFAIL     , NSIGMA     , NSIMAX     , NSINT      ,
+     &           NSLOG      , NSORTH     , NSRLS      , NSRRS      ,
+     &           NSVIN      , NTEIG      , NULLDQ     , NULLDR     ,
+     &           NVB        , NWBSY      , NWMAX      , NWMIN      ,
+     &           NXMAX      , ITIME      , IRSINT     , ISSLOG     ,
+     &           IRITZ      , ITB        , IALPHA     , IBETAQ     ,
+     &           IBETAR     , IANORM     , IBNORM     , IETA       ,
+     &           ITAU       , IR         , ITHETA     , IS         ,
+     &           IBASIS     , IBX        , IRWORK     , IIWORK     ,
+     &           INDR       , LOPTS      , LBLAS      , FHNDL      ,
      &           ISINT
 C
       PARAMETER (INDSI  =  1, JL     =  2, JLMAX  =  3, JT     =  4,
-     &           JTMAX  =  5, JTMIN  =  6, LCOMM  =  7, LEIG   =  8, 
+     &           JTMAX  =  5, JTMIN  =  6, LCOMM  =  7, LEIG   =  8,
      &           LFILE  =  9, LNI    = 10, LPRNT  = 11, LRERR  = 12,
      &           LRMDE  = 13, LRWRN  = 14, LTAU   = 15, MYPE   = 16,
      &           N      = 17, NBX    = 18, NBXMAX = 19, NDEIG  = 20,
@@ -273,17 +273,17 @@ C
      &           NI     = 25, NMOPA  = 26, NMOPB  = 27, NNSPNT = 28,
      &           NNTRTL = 29, NNTRTR = 30, NONEWS = 31, NPE    = 32,
      &           NPORTH = 33, NQMAX  = 34, NREIG  = 35, NREIGL = 36,
-     &           NREIGR = 37, NRITZ  = 38, NRUN   = 39, NRUNMX = 40, 
-     &           NSFAIL = 41, NSIGMA = 42, NSIMAX = 43, NSINT  = 44, 
-     &           NSLOG  = 45, NSORTH = 46, NSRLS  = 47, NSRRS  = 48, 
-     &           NSVIN  = 49, NTEIG  = 50, NULLDQ = 51, NULLDR = 52, 
-     &           NVB    = 53, NWBSY  = 54, NWMAX  = 55, NWMIN  = 56, 
-     &           NXMAX  = 57, ITIME  = 58, IRSINT = 59, ISSLOG = 60, 
-     &           IRITZ  = 61, ITB    = 62, IALPHA = 63, IBETAQ = 64, 
-     &           IBETAR = 65, IANORM = 66, IBNORM = 67, IETA   = 68, 
-     &           ITAU   = 69, IR     = 70, ITHETA = 71, IS     = 72, 
-     &           IBASIS = 73, IBX    = 74, IRWORK = 75, IIWORK = 76, 
-     &           INDR   = 77, LOPTS  = 81, LBLAS  = 85, FHNDL  = 89, 
+     &           NREIGR = 37, NRITZ  = 38, NRUN   = 39, NRUNMX = 40,
+     &           NSFAIL = 41, NSIGMA = 42, NSIMAX = 43, NSINT  = 44,
+     &           NSLOG  = 45, NSORTH = 46, NSRLS  = 47, NSRRS  = 48,
+     &           NSVIN  = 49, NTEIG  = 50, NULLDQ = 51, NULLDR = 52,
+     &           NVB    = 53, NWBSY  = 54, NWMAX  = 55, NWMIN  = 56,
+     &           NXMAX  = 57, ITIME  = 58, IRSINT = 59, ISSLOG = 60,
+     &           IRITZ  = 61, ITB    = 62, IALPHA = 63, IBETAQ = 64,
+     &           IBETAR = 65, IANORM = 66, IBNORM = 67, IETA   = 68,
+     &           ITAU   = 69, IR     = 70, ITHETA = 71, IS     = 72,
+     &           IBASIS = 73, IBX    = 74, IRWORK = 75, IIWORK = 76,
+     &           INDR   = 77, LOPTS  = 81, LBLAS  = 85, FHNDL  = 89,
      &           ISINT  = 93)
 C
 C.... IUSED defines the number of positions already used in ISTOR ......

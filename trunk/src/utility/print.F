@@ -1,22 +1,22 @@
 c----------------------------------------------------------------------
-c     
+c
 c     routine name       - print_shapeE
-c     
+c
 c----------------------------------------------------------------------
-c     
+c
 c     latest revision    - Jan 11
-c     
+c
 c     purpose            - print element shape functions
-c     
+c
 c     arguments :
 c     in:
 c       Type      - element type
 c       Norder    - element order of approximation
 c       ShapE     - values of shape functions
 c       CurlE     - the corresponding curl
-c     
+c
 c----------------------------------------------------------------------
-c     
+c
       subroutine print_shapeE(Type,Norder,ShapE,CurlE)
 c
       use element_data
@@ -30,7 +30,7 @@ c
       k=0
       do i=1,nedge(Type)+nface(Type)+1
         j=nvert(Type)+i
-        call ndof_nod(type_nod(Type, j),Norder(i), 
+        call ndof_nod(type_nod(Type, j),Norder(i),
      .                ndofH,ndofE,ndofV,ndofQ)
         write(*,7001) j,type_nod(Type, j), Norder(i), ndofE
  7001   format('NODE = ',i2,' TYPE = ',a4,' NORD = ',i2, ' NDOF = ',i3)
@@ -46,24 +46,24 @@ c
 c
       end subroutine print_shapeE
 c----------------------------------------------------------------------
-c     
+c
 c     routine name       - print_shapeH
-c     
+c
 c----------------------------------------------------------------------
-c     
+c
 c     latest revision    - Jan 11
-c     
+c
 c     purpose            - print element shape functions
-c     
+c
 c     arguments :
 c     in:
 c       Type      - element type
 c       Norder    - element order of approximation
 c       ShapH     - values of shape functions
 c       DshapH    - the corresponding curl
-c     
+c
 c----------------------------------------------------------------------
-c     
+c
       subroutine print_shapeH(Type,Norder,ShapH,DshapH)
 c
       use element_data

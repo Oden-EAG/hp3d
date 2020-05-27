@@ -1,6 +1,6 @@
 !----------------------------------------------------------------------------
 !> Purpose : module defines test variables info
-!!   
+!!
 !!   @date Jun 15
 !----------------------------------------------------------------------------
 module testvars
@@ -33,7 +33,7 @@ contains
   !
   !> Purpose : allocate data structure for test variables
   subroutine alloc_testvars
-    ! 
+    !
     if (allocated(TEST_NAMES)) then
        deallocate(TEST_NAMES,NR_TESTCOMP,TEST_SPACES)
     endif
@@ -60,12 +60,12 @@ contains
     integer                      :: i
     open(unit=ndump,file=fp, &
          form='formatted',access='sequential',status='unknown')
-    !     
+    !
     write(ndump,*) NR_TEST
     write(ndump,*) (TEST_NAMES(i),'  ',i=1,NR_TEST)
     write(ndump,*) NR_TESTCOMP
     write(ndump,*) (TEST_SPACES(i),'  ',i=1,NR_TEST)
-    !     
+    !
     close(ndump)
   end subroutine dumpout_testvars_to_file
   !
@@ -108,7 +108,7 @@ contains
     integer :: i
     logical :: exist
     !----------------------------------------------------------------------
-    ! file 
+    ! file
     inquire(file=Fp,exist=exist)
     if (.NOT.exist) then
       write(*,*) ''

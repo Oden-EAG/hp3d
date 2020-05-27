@@ -32,10 +32,10 @@ c
 c----------------------------------------------------------------------
 c
       subroutine shapHbe(T,Nord,Norient, NrdofH,ShapH,GradH)
-c      
+c
       use parameters , only : MAXP
 c
-      implicit none      
+      implicit none
       real(8), intent(in ) :: T
       integer, intent(in ) :: Nord
       integer, intent(in ) :: Norient
@@ -50,17 +50,17 @@ c
 c
 c
 c----------------------------------------------------------------------
-c     
+c
 c   routine name       - shapEbe
-c     
+c
 c----------------------------------------------------------------------
-c     
+c
 c   latest revision    - Nov 14
-c     
+c
 c   purpose            - 1D edge trace of 2D H(curl) edge functions
-c                        (these are oriented 1D L2 functions - 
+c                        (these are oriented 1D L2 functions -
 c                        not 'bubbles')
-c     
+c
 c   arguments :
 c     in:
 c       T              - local edge coordinate
@@ -69,11 +69,11 @@ c       Norient        - edge orientation
 c     out:
 c       NrdofE         - number of shape functions
 c       ShapE          - values of shape functions
-c     
+c
 c----------------------------------------------------------------------
-c     
+c
       subroutine shapEbe(T,Nord,Norient, NrdofE,ShapE)
-c      
+c
       use parameters , only : MAXP
 c
       implicit none

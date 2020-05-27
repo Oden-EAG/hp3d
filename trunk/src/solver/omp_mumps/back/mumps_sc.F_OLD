@@ -14,12 +14,12 @@
 !    in                 - mtype:  'H': Hermitian (for complex)/Symmetric
 !                                      (for real) case for Lapack routines
 !                                 'G': General case for Lapack routines
-!                         
+!
 !
 ! ----------------------------------------------------------------------
 !
 subroutine mumps_sc(mtype)
-!      
+!
    use data_structure3D, ONLY: NRNODS, NRELES
    use assembly,         ONLY: NR_RHS, MAXDOFM, MAXbrickH,MAXbrickE,       &
                                MAXbrickV, MAXbrickQ, NRHVAR, NREVAR,       &
@@ -28,7 +28,7 @@ subroutine mumps_sc(mtype)
                                ZAMOD, NR_PHYSA, MAXNODM
    use stc
    use mumps,            ONLY: MUMPS_PAR, mumps_start, mumps_destroy
-! 
+!
    implicit none
 !
 !..number of variables for each physics attribute for an element
@@ -200,7 +200,7 @@ subroutine mumps_sc(mtype)
    NRDOF_TOT = NRDOF_CON + nrdof_Hb + nrdof_Eb + nrdof_Vb + nrdof_Q
 !
 ! ----------------------------------------------------------------------
-! END OF STEP 1 
+! END OF STEP 1
 ! ----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
@@ -238,7 +238,7 @@ subroutine mumps_sc(mtype)
 !$OMP PRIVATE(nrdofs,nrdofm,nrdofc,nodm,ndofmH, &
 !$OMP         ndofmE,ndofmV,nrnodm,ndofmQ, &
 !$OMP         i,j,k,k1,k2,l,nod,ndof,n1,n2,nHb, &
-!$OMP         nEb,nVb,nQ,nHc,nEc,nVc) 
+!$OMP         nEb,nVb,nQ,nHc,nEc,nVc)
    allocate(NEXTRACT(MAXDOFM))
    allocate(IDBC(MAXDOFM))
    allocate(ZDOFD(MAXDOFM,NR_RHS))
@@ -325,10 +325,10 @@ subroutine mumps_sc(mtype)
          case('H')
             call stc_herm(iel,ZTEMP(1:ndof**2),ZLOAD(1:ndof),ndof,n1,n2,  &
                  nHc,nHb,nEc,nEb,nVc,nVb,nQ,ZTEMPc,ZLOADc)
-         case default   
+         case default
             call stc_gen(iel,ZTEMP(1:ndof**2),ZLOAD(1:ndof),ndof,n1,n2,  &
                  nHc,nHb,nEc,nEb,nVc,nVb,nQ,ZTEMPc,ZLOADc)
-         end select   
+         end select
       else
          ZTEMPc(1:n1**2) = ZTEMP(1:n1**2)
          ZLOADc(1:n1) = ZLOAD(1:n1)

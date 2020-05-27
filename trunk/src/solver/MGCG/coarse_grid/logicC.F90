@@ -9,7 +9,7 @@
 !
 !   purpose            - routine establishes list of nodes
 !                        for a modified element, and the corresponding
-!                        constraints coefficients 
+!                        constraints coefficients
 !                        (taking to account the master flag)
 !
 !   arguments :
@@ -350,7 +350,7 @@
                ConstrH(jp,kH)=RRRH(1,lp,3,1)
             enddo
 !
-!        ...STEP 2 : loop through parent edge vertex dofs                        
+!        ...STEP 2 : loop through parent edge vertex dofs
             do iv=1,2
 !
 !           ...parent vertex node
@@ -1443,7 +1443,7 @@
                NrconH(kH) = jp
 !
             enddo
-!         
+!
 !-----------------------------------------------------------------------
 !
          end select

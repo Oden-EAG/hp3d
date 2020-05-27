@@ -11,7 +11,7 @@ C     DTEST2   More detailed test driver for DCUTET.
 C              Sample output from a SUN 3/50 is included.
 C     DCUTET   Main Integrator.DCUTET calls DCHTET and DADTET.
 C     DCHTET   Checks the input to DCUTET.
-C     DADTET   The adaptive integration routine. 
+C     DADTET   The adaptive integration routine.
 C              DADTET calls DTRTET and DRLTET.
 C     DTRTET   Maintaines the heap of subtetrahedronds.
 C     DRLTET   Computes estimates of integral and error over
@@ -65,7 +65,7 @@ C
 C     MACHINE CONSTANTS FOR IEEE ARITHMETIC MACHINES, SUCH AS THE AT&T
 C     3B SERIES AND MOTOROLA 68000 BASED MACHINES (E.G. SUN 3 AND AT&T
 C     PC 7300), IN WHICH THE MOST SIGNIFICANT BYTE IS STORED FIRST.
-C     
+C
        DATA SMALL(1),SMALL(2) /    1048576,          0 /
        DATA LARGE(1),LARGE(2) / 2146435071,         -1 /
        DATA RIGHT(1),RIGHT(2) / 1017118720,          0 /
@@ -907,7 +907,7 @@ C
      +        LENVER,IFAIL
       real(8) VER(3,4,NUMTET),EPSABS,EPSREL
 C
-C   Local variables. 
+C   Local variables.
 C   NUM is set equal to the number of evaluation points used
 C   by the cubature rule over each tetrahedron.
 C
@@ -942,10 +942,10 @@ C
      +     ((VER(2,3,J)-VER(2,1,J))*(VER(3,4,J)-VER(3,1,J)) -
      +      (VER(2,4,J)-VER(2,1,J))*(VER(3,3,J)-VER(3,1,J))) -
      +              (VER(2,2,J)-VER(2,1,J))*
-     +     ((VER(1,3,J)-VER(1,1,J))*(VER(3,4,J)-VER(3,1,J)) - 
+     +     ((VER(1,3,J)-VER(1,1,J))*(VER(3,4,J)-VER(3,1,J)) -
      +      (VER(1,4,J)-VER(1,1,J))*(VER(3,3,J)-VER(3,1,J))) +
-     +              (VER(3,2,J)-VER(3,1,J))* 
-     +     ((VER(1,3,J)-VER(1,1,J))*(VER(2,4,J)-VER(2,1,J)) -  
+     +              (VER(3,2,J)-VER(3,1,J))*
+     +     ((VER(1,3,J)-VER(1,1,J))*(VER(2,4,J)-VER(2,1,J)) -
      +      (VER(1,4,J)-VER(1,1,J))*(VER(2,3,J)-VER(2,1,J)))
            VOLUME = VOLUME/6
           IF (VOLUME.EQ.0) THEN
@@ -1583,7 +1583,7 @@ C          FACOPT is the safety coefficient used in the optimistic part
 C          of the error estimator.
 C   FACMED Real
 C          FACMED is the safety coefficient used in the non-optimistic
-C          part of the error estimator. FACMED is related to CRIVAL 
+C          part of the error estimator. FACMED is related to CRIVAL
 C          and FACOPT.
 C
       INTEGER ORBITS
@@ -1864,19 +1864,19 @@ C   DTEST2 checks that the restart feature of DCUTET works and
 C   that the routine works with vectors of functions.
 C
 C   Output produced on a SUN 3/50
-C      
+C
 C     INTEGRATE MONOMIALS OF DEGREE 0
 C          SUBROUTINE CALLS =     43, IFAIL =  0
 C            N   ABSOLUTE ERROR  ESTIMATED ERROR    INTEGRAL
 C             1       0.00E+00       0.11E-13   1.0000000000000000
-C      
+C
 C     INTEGRATE MONOMIALS OF DEGREE 1
 C          SUBROUTINE CALLS =     43, IFAIL =  0
 C            N   ABSOLUTE ERROR  ESTIMATED ERROR    INTEGRAL
 C             1       0.00E+00       0.11E-13   1.0000000000000000
 C             2       0.00E+00       0.11E-13   1.0000000000000000
 C             3       0.22E-15       0.11E-13   1.0000000000000002
-C      
+C
 C     INTEGRATE MONOMIALS OF DEGREE 2
 C          SUBROUTINE CALLS =     43, IFAIL =  0
 C            N   ABSOLUTE ERROR  ESTIMATED ERROR    INTEGRAL
@@ -1886,7 +1886,7 @@ C             3       0.00E+00       0.11E-13   1.0000000000000000
 C             4       0.00E+00       0.11E-13   1.0000000000000000
 C             5       0.00E+00       0.11E-13   1.0000000000000000
 C             6       0.00E+00       0.11E-13   1.0000000000000000
-C      
+C
 C     INTEGRATE MONOMIALS OF DEGREE 3
 C          SUBROUTINE CALLS =     43, IFAIL =  0
 C            N   ABSOLUTE ERROR  ESTIMATED ERROR    INTEGRAL
@@ -1900,7 +1900,7 @@ C             7       0.00E+00       0.11E-13   1.0000000000000000
 C             8       0.22E-15       0.11E-13   0.9999999999999998
 C             9       0.00E+00       0.11E-13   1.0000000000000000
 C            10       0.00E+00       0.11E-13   1.0000000000000000
-C      
+C
 C     INTEGRATE MONOMIALS OF DEGREE 4
 C          SUBROUTINE CALLS =     43, IFAIL =  0
 C            N   ABSOLUTE ERROR  ESTIMATED ERROR    INTEGRAL
@@ -1919,7 +1919,7 @@ C            12       0.00E+00       0.11E-13   1.0000000000000000
 C            13       0.22E-15       0.11E-13   0.9999999999999998
 C            14       0.22E-15       0.11E-13   0.9999999999999998
 C            15       0.00E+00       0.11E-13   1.0000000000000000
-C      
+C
 C     INTEGRATE MONOMIALS OF DEGREE 5
 C          SUBROUTINE CALLS =  12771, IFAIL =  0
 C            N   ABSOLUTE ERROR  ESTIMATED ERROR    INTEGRAL
@@ -1944,7 +1944,7 @@ C            18       0.22E-15       0.20E-05   0.9999999999999998
 C            19       0.22E-15       0.26E-06   0.9999999999999998
 C            20       0.11E-15       0.45E-05   0.9999999999999999
 C            21       0.11E-15       0.28E-06   0.9999999999999999
-C      
+C
 C     INTEGRATE MONOMIALS OF DEGREE 6
 C          SUBROUTINE CALLS =  16899, IFAIL =  0
 C            N   ABSOLUTE ERROR  ESTIMATED ERROR    INTEGRAL
@@ -1976,7 +1976,7 @@ C            25       0.11E-15       0.62E-05   0.9999999999999999
 C            26       0.00E+00       0.23E-05   1.0000000000000000
 C            27       0.00E+00       0.26E-05   1.0000000000000000
 C            28       0.00E+00       0.56E-06   1.0000000000000000
-C      
+C
 C     INTEGRATE MONOMIALS OF DEGREE 7
 C          SUBROUTINE CALLS =  23091, IFAIL =  0
 C            N   ABSOLUTE ERROR  ESTIMATED ERROR    INTEGRAL
@@ -2016,7 +2016,7 @@ C            33       0.22E-15       0.93E-06   0.9999999999999998
 C            34       0.00E+00       0.13E-05   1.0000000000000000
 C            35       0.00E+00       0.98E-06   1.0000000000000000
 C            36       0.00E+00       0.30E-06   1.0000000000000000
-C      
+C
 C     INTEGRATE MONOMIALS OF DEGREE 8
 C          SUBROUTINE CALLS =  39947, IFAIL =  0
 C            N   ABSOLUTE ERROR  ESTIMATED ERROR    INTEGRAL
@@ -2065,7 +2065,7 @@ C            42       0.00E+00       0.76E-06   1.0000000000000000
 C            43       0.00E+00       0.39E-06   1.0000000000000000
 C            44       0.00E+00       0.10E-05   1.0000000000000000
 C            45       0.00E+00       0.11E-06   1.0000000000000000
-C      
+C
 C     INTEGRATE INVARIANT POLYNOMIALS
 C          SUBROUTINE CALLS =   1763, IFAIL =  0
 C            N   ABSOLUTE ERROR  ESTIMATED ERROR    INTEGRAL
@@ -4192,19 +4192,19 @@ C   that the routine works with vectors of functions.
 C
 C   Output produced on a SUN 3/50
 C
-C        
+C
 C       INTEGRATE MONOMIALS OF DEGREE 0
 C            SUBROUTINE CALLS =     43, IFAIL =  0
 C              N   ABSOLUTE ERROR  ESTIMATED ERROR    INTEGRAL
 C               1       0.00E+00       0.60E-05   1.0000000000000000
-C        
+C
 C       INTEGRATE MONOMIALS OF DEGREE 1
 C            SUBROUTINE CALLS =     43, IFAIL =  0
 C              N   ABSOLUTE ERROR  ESTIMATED ERROR    INTEGRAL
 C               1       0.00E+00       0.60E-05   1.0000000000000000
 C               2       0.60E-07       0.60E-05   0.9999999403953552
 C               3       0.60E-07       0.60E-05   0.9999999403953552
-C        
+C
 C       INTEGRATE MONOMIALS OF DEGREE 2
 C            SUBROUTINE CALLS =     43, IFAIL =  0
 C              N   ABSOLUTE ERROR  ESTIMATED ERROR    INTEGRAL
@@ -4214,7 +4214,7 @@ C               3       0.00E+00       0.60E-05   1.0000000000000000
 C               4       0.12E-06       0.60E-05   0.9999998807907104
 C               5       0.60E-07       0.60E-05   0.9999999403953552
 C               6       0.60E-07       0.60E-05   0.9999999403953552
-C        
+C
 C       INTEGRATE MONOMIALS OF DEGREE 3
 C            SUBROUTINE CALLS =     43, IFAIL =  0
 C              N   ABSOLUTE ERROR  ESTIMATED ERROR    INTEGRAL
@@ -4228,7 +4228,7 @@ C               7       0.00E+00       0.60E-05   1.0000000000000000
 C               8       0.24E-06       0.60E-05   1.0000002384185791
 C               9       0.00E+00       0.60E-05   1.0000000000000000
 C              10       0.00E+00       0.60E-05   1.0000000000000000
-C        
+C
 C       INTEGRATE MONOMIALS OF DEGREE 4
 C            SUBROUTINE CALLS =     43, IFAIL =  0
 C              N   ABSOLUTE ERROR  ESTIMATED ERROR    INTEGRAL
@@ -4247,7 +4247,7 @@ C              12       0.00E+00       0.60E-05   1.0000000000000000
 C              13       0.60E-07       0.60E-05   0.9999999403953552
 C              14       0.12E-06       0.60E-05   1.0000001192092896
 C              15       0.00E+00       0.60E-05   1.0000000000000000
-C        
+C
 C       INTEGRATE MONOMIALS OF DEGREE 5
 C            SUBROUTINE CALLS =    387, IFAIL =  0
 C              N   ABSOLUTE ERROR  ESTIMATED ERROR    INTEGRAL
@@ -4272,7 +4272,7 @@ C              18       0.00E+00       0.96E-03   1.0000000000000000
 C              19       0.00E+00       0.91E-03   1.0000000000000000
 C              20       0.00E+00       0.18E-02   1.0000000000000000
 C              21       0.00E+00       0.38E-04   1.0000000000000000
-C        
+C
 C       INTEGRATE MONOMIALS OF DEGREE 6
 C            SUBROUTINE CALLS =    731, IFAIL =  0
 C              N   ABSOLUTE ERROR  ESTIMATED ERROR    INTEGRAL
@@ -4304,7 +4304,7 @@ C              25       0.00E+00       0.46E-03   1.0000000000000000
 C              26       0.00E+00       0.16E-02   1.0000000000000000
 C              27       0.00E+00       0.28E-02   1.0000000000000000
 C              28       0.24E-06       0.16E-03   0.9999997615814209
-C        
+C
 C       INTEGRATE MONOMIALS OF DEGREE 7
 C            SUBROUTINE CALLS =   2107, IFAIL =  0
 C              N   ABSOLUTE ERROR  ESTIMATED ERROR    INTEGRAL
@@ -4344,7 +4344,7 @@ C              33       0.00E+00       0.10E-02   1.0000000000000000
 C              34       0.60E-07       0.23E-02   0.9999999403953552
 C              35       0.00E+00       0.19E-02   1.0000000000000000
 C              36       0.12E-06       0.16E-03   0.9999998807907104
-C        
+C
 C       INTEGRATE MONOMIALS OF DEGREE 8
 C            SUBROUTINE CALLS =   2795, IFAIL =  0
 C              N   ABSOLUTE ERROR  ESTIMATED ERROR    INTEGRAL
@@ -4393,7 +4393,7 @@ C              42       0.12E-06       0.55E-03   1.0000001192092896
 C              43       0.00E+00       0.38E-03   1.0000000000000000
 C              44       0.00E+00       0.34E-03   1.0000000000000000
 C              45       0.00E+00       0.86E-04   1.0000000000000000
-C        
+C
 C       INTEGRATE INVARIANT POLYNOMIALS
 C            SUBROUTINE CALLS =   1763, IFAIL =  0
 C              N   ABSOLUTE ERROR  ESTIMATED ERROR    INTEGRAL

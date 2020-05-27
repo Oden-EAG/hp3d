@@ -7,7 +7,7 @@
 !
 !> @revision Feb 13
 !
-!! Remark : the intrinsic Fortran fuction dot_product( , ) could be 
+!! Remark : the intrinsic Fortran fuction dot_product( , ) could be
 !!          used instead
 !-----------------------------------------------------------------------
 subroutine scalar_product(Vec1,Vec2, Prod)
@@ -20,11 +20,11 @@ subroutine scalar_product(Vec1,Vec2, Prod)
    integer :: i
 !
 !-----------------------------------------------------------------------
-!  
+!
       Prod=0.d0
       do i=1,3
          Prod = Prod + Vec1(i)*Vec2(i)
       enddo
-!      
+!
 end subroutine scalar_product
 

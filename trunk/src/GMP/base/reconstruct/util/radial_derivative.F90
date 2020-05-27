@@ -1,6 +1,6 @@
 !---------------------------------------------------------------------------------
 !
-      subroutine radial_derivative(s,j,k, c) 
+      subroutine radial_derivative(s,j,k, c)
 !
 !---------------------------------------------------------------------------------
       implicit none
@@ -9,7 +9,7 @@
       real(8), intent(in)  :: s
       integer, intent(in)  :: j,k
       real(8), intent(out) :: c
-!     LOCAL VARIABLES      
+!     LOCAL VARIABLES
       real(8)              :: poly1,poly2,poly3,dpoly
       integer              :: iprint
       integer,parameter    :: deg = 6
@@ -23,7 +23,7 @@
       c = deg*(deg-k)*(deg-k-1)*(poly1 - 2.d0*poly2 + poly3)*(-1.d0)**(k+1)
       if (iprint.eq.1) then
         write(*,1000)k,j,c
- 1000   format(' radial_derivative: k = ',i1,'; j = ',i1,'; --> c = ',e12.5)          
+ 1000   format(' radial_derivative: k = ',i1,'; j = ',i1,'; --> c = ',e12.5)
       endif
 !
       end

@@ -55,13 +55,13 @@ contains
        NODES_LIST(iel) = mdle
        ERROR_LIST(iel) = derr(1)
     enddo
-    
+
     call sort(NODES_LIST, ERROR_LIST, N_LIST)
     eta = GREEDY*ERROR_LIST(1)
 
-    
+
     iel = 1
-    do while ((ERROR_LIST(iel)>eta).and.(iel<N_LIST)) 
+    do while ((ERROR_LIST(iel)>eta).and.(iel<N_LIST))
        call get_isoref(NODES_LIST(iel), kref)
        call refine(NODES_LIST(iel), kref)
        if (IVERBOSE_) then

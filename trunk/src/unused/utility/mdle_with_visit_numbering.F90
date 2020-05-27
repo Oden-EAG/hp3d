@@ -5,12 +5,12 @@ subroutine mdle_with_visit_numbering(Nout, Nbegin, Iflag)
   implicit none
   integer, intent(in) :: Nout, Iflag, Nbegin
   character(len=4) :: type
-  integer :: iv, iel, mdle, ndom, nr_vert, nverl(8), ntmp(3), nodesl(27), norientl(27) 
+  integer :: iv, iel, mdle, ndom, nr_vert, nverl(8), ntmp(3), nodesl(27), norientl(27)
 
   mdle = 0
   do iel=1,NRELES
 
-     call nelcon(mdle, mdle)        
+     call nelcon(mdle, mdle)
      call elem_nodes(mdle, nodesl,norientl)
 
      type    = NODES(mdle)%type

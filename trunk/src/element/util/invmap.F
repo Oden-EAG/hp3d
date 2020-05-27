@@ -6,7 +6,7 @@ c----------------------------------------------------------------------
 c
 c   latest revision    - Jan 09
 c
-c   purpose            - given physical coordinates Xp of a point in 
+c   purpose            - given physical coordinates Xp of a point in
 c                        space and geometry dof for an element,
 c                        routine determines whether the point lies within
 c                        the element and returns its master element
@@ -28,7 +28,7 @@ c----------------------------------------------------------------------
 c
       subroutine invmap(Type,Xp,Norder,Nedge_orient,Nface_orient,
      .                  Xnod, Idec,Xi)
-c  
+c
       use data_structure3D
       use element_data
       use control
@@ -66,7 +66,7 @@ c
 c  ...use element centroid as initial guess
       xi(1:3)=0.d0
       do i=1,nvert(Type)
-        select case(Type) 
+        select case(Type)
         case('mdln','tetr') ; xi(1:3) = xi(1:3) + TETRA_COORD(1:3,i)
         case('mdlb','bric') ; xi(1:3) = xi(1:3) + BRICK_COORD(1:3,i)
         case('mdlp','pris') ; xi(1:3) = xi(1:3) + PRISM_COORD(1:3,i)
@@ -79,9 +79,9 @@ c  ...use element centroid as initial guess
         call shape3DH(Type,xi,Norder, Nedge_orient,Nface_orient,
      .                nrdofH,shapH,gradH)
 c
-c  .....determine physical coordinates and the derivatives of 
+c  .....determine physical coordinates and the derivatives of
 c       the physical coordinates wrt master element coordinates
-        x(1:3) = 0.d0; dxdxi(1:3,1:3) = 0.d0 
+        x(1:3) = 0.d0; dxdxi(1:3,1:3) = 0.d0
         do k=1,nrdofH
           x(1:3) = x(1:3) + Xnod(1:3,k)*shapH(k)
           do i=1,3
@@ -142,25 +142,25 @@ c  ...check if the point lies within the element
         if ((xi(1).lt.-GEOM_TOL).or.(xi(1).gt.1.d0+GEOM_TOL).or.
      .      (xi(2).lt.-GEOM_TOL).or.(xi(2).gt.1.d0+GEOM_TOL).or.
      .      (xi(3).lt.-GEOM_TOL).or.(xi(3).gt.1.d0+GEOM_TOL)) then
-          Idec=0; 
+          Idec=0;
         endif
       case('mdln')
         if ((xi(1).lt.-GEOM_TOL).or.(xi(2).lt.-GEOM_TOL).or.
      .      (xi(3).lt.-GEOM_TOL).or.
      .      ((xi(1)+xi(2)+xi(3)).gt.1.d0+GEOM_TOL)) then
-          Idec=0; 
+          Idec=0;
         endif
       case('mdld')
         if ((xi(1).lt.-GEOM_TOL).or.
      .      (xi(2).lt.-GEOM_TOL).or.
      .      (xi(3).lt.-GEOM_TOL).or.((xi(1)+xi(3)).gt.1.d0+GEOM_TOL).or.
      .      ((xi(2)+xi(3)).gt.1.d0+GEOM_TOL)) then
-          Idec=0; 
+          Idec=0;
         endif
       end select
 c
       if(iprint.eq.1)then
         write(*,*)'Exiting invmap with Idec=',Idec
       endif
-c     
+c
       end

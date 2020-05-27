@@ -2,13 +2,13 @@
       subroutine generate_Bezier_curve(Nc,X,V,A)
 !--------------------------------------------------------------------------------
       use GMP
-!--------------------------------------------------------------------------------     
+!--------------------------------------------------------------------------------
       implicit none
-!--------------------------------------------------------------------------------      
+!--------------------------------------------------------------------------------
 !     DUMMY ARGUMENTS
 !  ...curve number
       integer,intent(in) :: Nc
-!  ...positions, velocities, accelerations      
+!  ...positions, velocities, accelerations
       real(8),dimension(3,2),intent(in) :: X,V,A
 !--------------------------------------------------------------------------------
       integer :: is,iprint,i
@@ -39,7 +39,7 @@
 !  ...velocity control points:                          b_1, b_4
       CURVES(Nc)%Rdata(3:5)   = X(1:3,1) + V(1:3,1)/5.d0
       CURVES(Nc)%Rdata(12:14) = X(1:3,2) - V(1:3,2)/5.d0
-!  ...acceleration control points:                      b_2, b_3      
+!  ...acceleration control points:                      b_2, b_3
       CURVES(Nc)%Rdata(6:8)   = X(1:3,1) + 2.d0*V(1:3,1)/5.d0 + A(1:3,1)/20.d0
       CURVES(Nc)%Rdata(9:11) = X(1:3,2) - 2.d0*V(1:3,2)/5.d0 + A(1:3,2)/20.d0
 
@@ -51,6 +51,6 @@
         enddo
         write(*,*)'----------------------------------------------------'
       endif
-!            
+!
 !
       end subroutine

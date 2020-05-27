@@ -21,7 +21,7 @@ c               N      - number of the digits stored in the nickname
 c     out:
 c               Narray - the decoded digits
 c
-c   required  routines - 
+c   required  routines -
 c
 c----------------------------------------------------------------------
 c
@@ -29,7 +29,7 @@ c
 c
       dimension Narray(N)
 c
-      nick1 = Nick    
+      nick1 = Nick
       do i=1,N
         nick2 = nick1/Mod
         Narray(i) = nick1 - nick2*Mod
@@ -41,7 +41,7 @@ c
       end
 
 
-     
-        
-      
+
+
+
 

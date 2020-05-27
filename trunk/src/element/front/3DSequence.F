@@ -27,18 +27,18 @@ c       Norder         - polynomial order for the nodes (H1 sense)
 c       Nedge_orient   - edge orientations
 c       Nface_orient   - face orientations
 c     out:
-c       NrdofH         - number of the element shape functions      
+c       NrdofH         - number of the element shape functions
 c       ShapH          - values of shape functions
 c       GradH          - values of derivatives of the shape functions
-c                        wrt to master element coordinates      
+c                        wrt to master element coordinates
 c
 c----------------------------------------------------------------------
 c
-      subroutine shape3H(Type,Xi,Norder,Nedge_orient,Nface_orient, 
+      subroutine shape3H(Type,Xi,Norder,Nedge_orient,Nface_orient,
      .                   NrdofH,ShapH,GradH)
 c
       use parameters , only : MAXbrickH
-c 
+c
       implicit none
       character(len=4), intent(in)  :: Type
       integer, intent(in)  :: Nedge_orient(12)
@@ -64,7 +64,7 @@ c----------------------------------------------------------------------
 c
 c   latest revision    - Oct 14
 c
-c   purpose            - routine evaluates H(curl) shape functions for 
+c   purpose            - routine evaluates H(curl) shape functions for
 c                        3D elements of various types
 c
 c   arguments :
@@ -75,17 +75,17 @@ c       Norder         - polynomial order for the nodes (H1 sense)
 c       Nedge_orient   - edge orientations
 c       Nface_orient   - face orientations
 c     out:
-c       NrdofE         - number of the element shape functions      
+c       NrdofE         - number of the element shape functions
 c       ShapE          - shape functions
 c       CurlE          - curl of shape functions
 c
 c----------------------------------------------------------------------
 c
-      subroutine shape3E(Type,Xi,Norder,Nedge_orient,Nface_orient, 
-     .                   NrdofE,ShapE,CurlE)    
+      subroutine shape3E(Type,Xi,Norder,Nedge_orient,Nface_orient,
+     .                   NrdofE,ShapE,CurlE)
 c
       use parameters , only : MAXbrickE
-c 
+c
       implicit none
       character(len=4), intent(in)  :: Type
       integer, intent(in)  :: Nedge_orient(12)
@@ -111,7 +111,7 @@ c----------------------------------------------------------------------
 c
 c   latest revision    - Oct 14
 c
-c   purpose            - routine evaluates H(div) shape functions for 
+c   purpose            - routine evaluates H(div) shape functions for
 c                        3D elements of various types
 c
 c   arguments :
@@ -121,13 +121,13 @@ c       Xi             - master element coordinates
 c       Norder         - polynomial order for the nodes (H1 sense)
 c       Nface_orient   - face orientations
 c     out:
-c       NrdofV         - number of the element shape functions      
+c       NrdofV         - number of the element shape functions
 c       ShapV          - shape functions
 c       DivV           - divergence of shape functions
 c
 c----------------------------------------------------------------------
 c
-      subroutine shape3V(Type,Xi,Norder,Nface_orient, 
+      subroutine shape3V(Type,Xi,Norder,Nface_orient,
      .                   NrdofV,ShapV,DivV)
 c
       use parameters , only : MAXbrickV
@@ -186,4 +186,4 @@ c
 c     call shape3DQ(Type,Xi,Norder, NrdofQ,ShapQ)
 c
       end subroutine shape3Q
-c      
+c

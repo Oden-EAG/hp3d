@@ -6,7 +6,7 @@
 !
 !> rev@Feb 13
 !
-!  REMARK : -pi <= Theta <= pi     
+!  REMARK : -pi <= Theta <= pi
 !----------------------------------------------------------------------
 subroutine coord_cart2polar(X, R,Theta)
 !
@@ -28,7 +28,7 @@ end subroutine coord_cart2polar
 subroutine cart_to_polar(Xp, R,Theta)
 !
       use math_constants , only : PI
-!      
+!
       implicit none
       real(8), intent(in ) :: Xp(2)
       real(8), intent(out) :: R,Theta

@@ -5,7 +5,7 @@ subroutine elem_face(Mdle,Iface, Mdlf)
       integer, intent(in)  :: Mdle
       integer, intent(in)  :: Iface
       integer, intent(out) :: Mdlf
-!      
+!
       character(len=4)      :: etype
       integer,dimension(27) :: nodesl,void
       integer :: inode
@@ -20,7 +20,7 @@ subroutine elem_face(Mdle,Iface, Mdlf)
  9999   format(' elem_face: inconsistent node type! Mdle,type = ',i7,2x,a4)
         stop
       endselect
-!    
+!
 !  ...determine face node
       call elem_nodes(Mdle, nodesl,void)
       inode = nvert(etype) + nedge(etype) + Iface

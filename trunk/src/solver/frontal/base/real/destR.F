@@ -46,7 +46,7 @@ c
  7001   format(1x,6f10.1)
         call pause
       endif
-c      
+c
 c initialize
 c
       NFW = 0

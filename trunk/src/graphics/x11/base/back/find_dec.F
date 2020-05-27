@@ -19,7 +19,7 @@ c     out:
 c              Nflag   = 0 for h-refinements
 c                      = 1,...,8 for p-refinements
 c
-c   required  routines - 
+c   required  routines -
 c
 c----------------------------------------------------------------------
 c
@@ -62,7 +62,7 @@ ccc        endif
         write(*,*) 'find_dec: Nflag = ',Nflag
       endif
 c
-c  
+c
       return
       end
 

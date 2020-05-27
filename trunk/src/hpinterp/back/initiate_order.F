@@ -10,7 +10,7 @@ c
      . (/1,1,1,1, 1,1,1,1, 1,1,1,1, 11,11,11,11,11,11, 111/)
       integer,parameter,dimension(11) :: norder_tetra =
      . (/1,1,1,1,1,1, 1,1,1,1, 1/)
-      integer,parameter,dimension(14) :: norder_pyram = 
+      integer,parameter,dimension(14) :: norder_pyram =
      . (/1,1,1,1, 1,1,1,1, 11,1,1,1,1, 1/)
 c
       select case(Type)
@@ -20,5 +20,5 @@ c
       case('mdld','pyra') ; Norder(1:14)=norder_pyram(1:14)
       endselect
 c
-c      
+c
       end subroutine

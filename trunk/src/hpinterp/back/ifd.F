@@ -44,7 +44,7 @@ c  ...lower the GMP interface flag for all nodes
         NODES(nod)%geom_interf=0
       enddo
 c
-c-----------------------------------------------------------------------     
+c-----------------------------------------------------------------------
 c
 c  Step 1: Update   V E R T   dof for Dirichlet nodes
 c
@@ -64,7 +64,7 @@ c
  7002         format(' update_Ddof: mdle,iflag,no,iv,nod = ',
      .                i8,2x,i1,2x,i8,2x,i2,2x,i8)
             endif
-c  .........cycle if H1 dofs are not supported by the node            
+c  .........cycle if H1 dofs are not supported by the node
             if (.not.associated(NODES(nod)%zdofH)) cycle
             call dhpvert(iflag,no,xsub(1:3,iv),NODES(nod)%case,
      .                   NODES(nod)%zdofH)
@@ -80,21 +80,21 @@ c  .........cycle if H1 dofs are not supported by the node
         enddo
       enddo
 c
-c-----------------------------------------------------------------------      
+c-----------------------------------------------------------------------
 c
 c  Step 2: Update   E D G E   dof for Dirichlet nodes
 c
       if (iprint.ge.1) write(*,*) 'update_Ddof: MID-EDGE NODES...'
 c
       mdle=0
-      do iel=1,NRELES 
+      do iel=1,NRELES
         call nelcon(mdle, mdle)
         iprint_parameter = mdle
         call refel(mdle, iflag,no,xsub)
         call elem_nodes(mdle, nodesl, norientl)
         call find_orient(mdle, nedge_orient,nface_orient)
         call find_order(mdle, norder)
-c  .....compute solution dofs (need for H1 update)       
+c  .....compute solution dofs (need for H1 update)
         call solelm(mdle, zdofH,zdofE,zdofV,zdofQ)
         do ie=1,nedge(NODES(mdle)%type)
           in = nvert(NODES(mdle)%type)+ie
@@ -104,25 +104,25 @@ c
           if ((NODES(nod)%geom_interf.eq.0).and.(ifD(nod).eq.1)) then
 cc            write(*,*) 'update_Ddof : MAXEQNV ', MAXEQNV
 
-c                  
+c
 c  .........update H^1 Dirichlet dofs
-            if (associated(NODES(nod)%zdofH)) then                 
+            if (associated(NODES(nod)%zdofH)) then
               call dhpedgeH(iflag,no,xsub,
      .                      NODES(mdle)%type,NODES(nod)%case,
      .                      nedge_orient,nface_orient,norder,ie,
      .                      zdofH, NODES(nod)%zdofH)
             endif
-c            
+c
 c  .........update H(curl) Dirichlet dofs
-            if (associated(NODES(nod)%zdofE)) then                 
+            if (associated(NODES(nod)%zdofE)) then
               call dhpedgeE(iflag,no,xsub,
      .                      NODES(mdle)%type,NODES(nod)%case,
      .                      nedge_orient,nface_orient,norder,ie,
      .                      NODES(nod)%zdofE)
             endif
-c            
+c
 c  .........update H(div) Dirichlet dofs
-            if (associated(NODES(nod)%zdofV)) then                 
+            if (associated(NODES(nod)%zdofV)) then
               call dhpedgeV(iflag,no,xsub,
      .                      NODES(mdle)%type,NODES(nod)%case,
      .                      nedge_orient,nface_orient,norder,ie,
@@ -152,12 +152,12 @@ c
         enddo
       enddo
 c
-c-----------------------------------------------------------------------      
+c-----------------------------------------------------------------------
 c
 c  Step 3: Update   F A C E   dof for Dirichlet nodes
 c
       if (iprint.ge.1) write(*,*) 'update_Ddof: MID-FACE NODES...'
-c     
+c
       mdle=0
       do iel=1,NRELES
         call nelcon(mdle, mdle)
@@ -165,18 +165,18 @@ c
         call elem_nodes(mdle, nodesl, norientl)
         call find_orient(mdle, nedge_orient,nface_orient)
         call find_order(mdle, norder)
-c  .....compute solution dofs (needed for H1 and Hcurl update)       
+c  .....compute solution dofs (needed for H1 and Hcurl update)
         call solelm(mdle, zdofH,zdofE,zdofV,zdofQ)
-c  .....loop over faces        
+c  .....loop over faces
         do if=1,nface(NODES(mdle)%type)
-c  .......get local node number        
+c  .......get local node number
           in = nvert(NODES(mdle)%type)+nedge(NODES(mdle)%type)+if
-c  .......get global node number          
+c  .......get global node number
           nod = nodesl(in)
           if (nod.lt.0) cycle
           if (NODES(nod)%geom_interf.eq.0.and.(ifD(nod).eq.1))then
 c
-c  .........update H^1 Dirichlet dofs                  
+c  .........update H^1 Dirichlet dofs
             if (associated(NODES(nod)%zdofH)) then
               call dhpfaceH(iflag,no,xsub,
      .                      NODES(mdle)%type,NODES(nod)%case,
@@ -184,16 +184,16 @@ c  .........update H^1 Dirichlet dofs
      .                      zdofH, NODES(nod)%zdofH)
             endif
 c
-c  .........update H(curl) Dirichlet dofs                  
+c  .........update H(curl) Dirichlet dofs
             if (associated(NODES(nod)%zdofE)) then
               call dhpfaceE(iflag,no,xsub,
      .                      NODES(mdle)%type,NODES(nod)%case,
      .                      nedge_orient,nface_orient,norder,if,
      .                      zdofE, NODES(nod)%zdofE)
             endif
-c            
+c
 c  .........update H(div) Dirichlet dofs
-            if (associated(NODES(nod)%zdofV)) then                 
+            if (associated(NODES(nod)%zdofV)) then
               call dhpfaceV(iflag,no,xsub,
      .                      NODES(mdle)%type,NODES(nod)%case,
      .                      nedge_orient,nface_orient,norder,if,
@@ -210,7 +210,7 @@ c
             endif
             NODES(nod)%geom_interf=1
           endif
-c  .....end of loop over faces          
+c  .....end of loop over faces
         enddo
       enddo
 c
@@ -226,10 +226,10 @@ c
 c
 c   latest revision    - Jan 07
 c
-c   purpose            - routine checks if the node has a Dirichlet BC 
+c   purpose            - routine checks if the node has a Dirichlet BC
 c                        flag
 c
-c   arguments 
+c   arguments
 c     in:
 c                 Nod  - node number
 c     out:

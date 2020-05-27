@@ -13,7 +13,7 @@ subroutine point_with_visit_numbering(Nout, Iflag)
      !
      do ino=1, nvert(NODES(mdle)%type)
         nod = nodesl(ino)
-        if (NODES(nod)%visit.gt.0) then 
+        if (NODES(nod)%visit.gt.0) then
            if (Iflag.eq.1) then
               write(Nout,7000) NODES(nod)%visit, NODES(ino)%dof%coord(1:NDIMEN,1)
            else

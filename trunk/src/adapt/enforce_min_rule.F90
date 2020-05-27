@@ -60,8 +60,8 @@
       nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
       call get_connect_info(mdle, nodesl,norientl)
       call element_order(mdle,norientl, norder)
-!      
-!  ...loop through edges and faces      
+!
+!  ...loop through edges and faces
       do j=1,nre+nrf
          i=nrv+j
          nod = nodesl(i); nord = norder(j)
@@ -98,15 +98,15 @@
                call save_min_order(nodp,nord)
             end select
          endif
-      enddo 
+      enddo
    enddo
 !
-!   
+!
 !----------------------------------------------------------------------
 !                 STEP 2: Modify edges (min rule wrt to faces)
 !----------------------------------------------------------------------
 !
-!..loop through the elements   
+!..loop through the elements
    do iel=1,NRELES
       mdle = ELEM_ORDER(iel)
       call elem_nodes(mdle, nodesl,norientl)
@@ -158,7 +158,7 @@
          NODES(nod)%visit = min(NODES(nod)%visit,norder(je))
       enddo
 !
-!..end of loop through the elements   
+!..end of loop through the elements
    enddo
 !
 !..loop through nodes

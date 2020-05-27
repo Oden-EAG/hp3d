@@ -17,7 +17,7 @@ c I   Aldest  nodal destination vectors
 c O   Nee     number of dof to eliminate from the front
 c O   Amdest  dof destination vectors
 c O   Andest  destination in the front where the remaining values
-c             in the front will transfer to, as each exiting dof is 
+c             in the front will transfer to, as each exiting dof is
 c             eliminated
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 c AUTHOR:                             LATEST REVISION:
@@ -46,7 +46,7 @@ c
         write(NFSOUT,7001) (Aldest(iii),iii=1,Nd)
  7001   format(1x,6f10.1)
       endif
-c      
+c
 c initialize
 c
       NFW = 0
@@ -125,12 +125,12 @@ c set the current frontwidth number
 cwb >
 c ATTENTION, modified by me !!!!!!!!!!!!!!!!!!!!!!!!!!
 ccc         l = iabs(idnint(ZABS(Amdest(km-1))))
-cldem, 11.6.98             
+cldem, 11.6.98
 cwr10.07.99
 ccccc       l = iabs(nint( real(Amdest(km-1))))
 cccccc      l =  abs( int( real(Amdest(km-1))))
 c
-cwr07.12.00 - the above change was not necessary and may cause errors, 
+cwr07.12.00 - the above change was not necessary and may cause errors,
 cwr07.12.00   back to original "nint":
             l = iabs(nint( dreal(Amdest(km-1))))
 

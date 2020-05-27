@@ -14,13 +14,13 @@ subroutine upgrade2double_NEW
   use U2D
 !----------------------------------------------------------------------------------------
 ! printing flag (0,1,2)
-#define I_PRINT 2  
+#define I_PRINT 2
 !----------------------------------------------------------------------------------------
   IMPLICIT NONE
 !----------------------------------------------------------------------------------------
 ! VARIABLES
   integer  :: np
-#if I_PRINT >= 2  
+#if I_PRINT >= 2
   integer  :: n_0surf,n_1surf,n_2surf,n_3surf
   real(DP), dimension(3) :: aux_v
   real(DP)               :: aux_old,aux_new
@@ -34,24 +34,24 @@ subroutine upgrade2double_NEW
     call generate_POINT_TYPE
 #if I_PRINT >= 2
     write(*,*)'upgrade2double_NEW: POINT_TYPE generated.'
-#endif    
+#endif
     call allocate_S_PROD
 #if I_PRINT >= 2
     write(*,*)'upgrade2double_NEW: S_PROD allocated.'
-#endif    
+#endif
     call allocate_M_PROD
 #if I_PRINT >= 2
     write(*,*)'upgrade2double_NEW: M_PROD allocated.'
-#endif    
+#endif
     call allocate_EXTRA_PLANES
 #if I_PRINT >= 2
     write(*,*)'upgrade2double_NEW: EXTRA_PLANES allocated.'
-#endif    
+#endif
 !
 #if I_PRINT >= 2
     n_0surf = 0;  n_1surf = 0;  n_2surf = 0;  n_3surf = 0
     aux_old = 0.d0
-#endif    
+#endif
 ! ..loop through points
     do np = 1, NRPOINT
 #if I_PRINT >= 2
@@ -59,29 +59,29 @@ subroutine upgrade2double_NEW
       write(*,2) np, POINT_TYPE(1,np)
 2     format(' upgrade2double_NEW: np  = ',I6,' ; number of surfaces = ',I2)
       aux_v(1:3) = POINTS(np)%Rdata(1:3)
-#endif  
+#endif
       select case (POINT_TYPE(1,np))
-! ......nothing to do!      
+! ......nothing to do!
         case (0)
 #if I_PRINT >= 2
-          n_0surf = n_0surf + 1       
+          n_0surf = n_0surf + 1
           write(*,*)'upgrade2double_NEW: 0_surf point, n_0surf = ',n_0surf
 #endif
-! ......point lies on ONE surface        
+! ......point lies on ONE surface
         case (1)
 #if I_PRINT >= 2
-          n_1surf = n_1surf + 1       
+          n_1surf = n_1surf + 1
           write(*,*)'upgrade2double_NEW: 1_surf point, n_1surf = ',n_1surf
 #endif
           call point_1surf(np)
-! ......point lies on TWO surfaces            
-        case (2)      
+! ......point lies on TWO surfaces
+        case (2)
 #if I_PRINT >= 2
           n_2surf = n_2surf + 1
           write(*,*)'upgrade2double_NEW: 2_surf point, n_2surf = ',n_2surf
 #endif
           call point_2surf(np)
-! ......point lies on THREE OR MORE surfaces            
+! ......point lies on THREE OR MORE surfaces
         case default
 #if I_PRINT >= 2
           n_3surf = n_3surf + 1
@@ -105,9 +105,9 @@ subroutine upgrade2double_NEW
     write(*,1) n_0surf,n_1surf,n_2surf,n_3surf
 1   format(' upgrade2double_NEW: n_0surf, n_1surf, n_2surf, n_3surf = '4(6I,1X))
     write(*,*)'upgrade2double_NEW: max shift = ',aux_old
-#endif  
+#endif
 #if I_PRINT >= 1
 write(*,*)'upgrade2double_NEW: done!'
-#endif  
+#endif
 !
 end subroutine upgrade2double_NEW

@@ -67,7 +67,7 @@
       rx = alphax*sqrt(2.d0)
       ry = alphay*sqrt(2.d0)
 !
-!  ...printing      
+!  ...printing
       if (iprint.eq.1) then
         write(*,*) ' '
         write(*,7011) aG(1:3)
@@ -79,12 +79,12 @@
         write(*,7009) rx,alphax
  7009   format(' rx,alphax = ',3(e12.5,2x))
         write(*,7010) ry,alphay
- 7010   format(' ry,alphay = ',3(e12.5,2x))    
+ 7010   format(' ry,alphay = ',3(e12.5,2x))
       endif
 !
 !  ...now calculate the coordinates in 2D x-y plane
 !  ...first rescale Eta to between -pi/4 and pi/4
-      pihalf = acos(0.d0) 
+      pihalf = acos(0.d0)
       tt = Eta*pihalf-0.5d0*pihalf
 !  ...next evaluate the ellipse (and eta derivative)
       xL(1) = rx*cos(tt)
@@ -92,9 +92,9 @@
       xL(3) = 0.d0
       dxLdeta(1) = pihalf*rx*(-sin(tt))
       dxLdeta(2) = pihalf*ry*(+cos(tt))
-      dxLdeta(3) = 0.d0 
+      dxLdeta(3) = 0.d0
 !
-!  ...printing      
+!  ...printing
       if (iprint.eq.1) then
         write(*,*) ' '
         write(*,7013) tt
@@ -102,7 +102,7 @@
         write(*,7006) xL(1:3)
  7006   format(' xL  = ',3(e12.5,2x))
         write(*,7007) dxLdeta(1:3)
- 7007   format(' dxLdeta = ',3(e12.5,2x))       
+ 7007   format(' dxLdeta = ',3(e12.5,2x))
       endif
 !
 !  ...the idea is to map these coordinates to the global physical
@@ -122,11 +122,11 @@
       call cross_product(aC(1:3),bC(1:3), rotM(1:3,3))
       rotM(1:3,1:3) = (1.d0/(2.d0*alphax*alphay))*rotM(1:3,1:3)
 !
-!  ...printing      
+!  ...printing
       if (iprint.eq.1) then
         do i=1,3
           write(*,7005) i,rotM(i,1:3)
- 7005     format(' i,rotM(i,:) = ',i1,2x,3(e12.5,2x))          
+ 7005     format(' i,rotM(i,:) = ',i1,2x,3(e12.5,2x))
         enddo
       endif
 !
@@ -137,7 +137,7 @@
                     rotM(1:3,3)*dxLdeta(3)
 !
 !  ...printing
-      if (iprint.eq.1) then 
+      if (iprint.eq.1) then
         write(*,*) ' '
         write(*,7003) X(1:3)
         write(*,7004) Dxdeta(1:3)

@@ -6,18 +6,18 @@
 !
 !   latest revision    - Sept 2018
 !
-!   purpose            - module sets up the workspace for multigrid 
+!   purpose            - module sets up the workspace for multigrid
 !                        solver
 !
 !----------------------------------------------------------------------
 !
 module mg_data_structure
-!      
+!
    use derived_types
    use data_structure3D
    use macro_grid_info
 !
-!   
+!
 !..coarse solver choice
    integer :: COARSE_SOLVER
    integer, parameter :: NO_CSOLVE      = 0
@@ -31,7 +31,7 @@ module mg_data_structure
 
 
    integer :: MAXGEN_PR, NRGRIDS
-!   
+!
    type(node_mg), allocatable :: NODES_MG(:)
 !
 !..global structure for multigrid
@@ -47,14 +47,14 @@ module mg_data_structure
 
    integer :: i
    do i = 1, NRNODS
-      NODES_MG(i)%visit = 0   
+      NODES_MG(i)%visit = 0
    enddo
 !
    end subroutine mg_reset_visit
 !
 !
    subroutine mg_init
-!   
+!
    implicit none
 !
    integer :: i
@@ -75,7 +75,7 @@ module mg_data_structure
       NODES_MG(i)%master = 0
       NODES_MG(i)%iel  = 0
       NODES_MG(i)%visit  = 0
-   enddo   
+   enddo
 !
    end subroutine mg_init
 !
@@ -92,7 +92,7 @@ module mg_data_structure
       deallocate(NODES_MG(i)%orderC)
       deallocate(NODES_MG(i)%master)
       deallocate(NODES_MG(i)%iel)
-   enddo   
+   enddo
 !
    deallocate(NODES_MG)
 !
@@ -100,24 +100,24 @@ module mg_data_structure
    write(*,*) 'mg_finalize: deallocating GRID array'
    do i = 1, NRGRIDS
       deallocate(GRID(i)%mdlel)
-      if (i .lt. NRGRIDS)  then 
+      if (i .lt. NRGRIDS)  then
          deallocate(GRID(i)%sch)
       endif
-   enddo   
-   deallocate(GRID, NRDOF_MACRO)   
+   enddo
+   deallocate(GRID, NRDOF_MACRO)
 !
    end subroutine mg_finalize
 
 end module mg_data_structure
-   
+
 !
 !--------------------------------------------------------------------
 !--------------------------------------------------------------------
 !
 ! !..determine number of dof for a higher order node
 !    subroutine find_ndofC(Nod, NdofH,NdofE,NdofV,NdofQ)
-! !      
-!    implicit none  
+! !
+!    implicit none
 ! !
 !    integer, intent(in)  :: Nod
 !    integer, intent(out) :: NdofH,NdofE,NdofV,NdofQ
@@ -131,11 +131,11 @@ end module mg_data_structure
 !--------------------------------------------------------------------
 !
 !    subroutine find_orderC(Mdle, Norder)
-! !      
+! !
 !    use element_data
-! !   
+! !
 !    implicit none
-! !   
+! !
 !    integer, intent(in)  :: Mdle
 !    integer, intent(out) :: Norder(19)
 ! !
@@ -150,7 +150,7 @@ end module mg_data_structure
 ! !
 !    type = NODES(Mdle)%Type
 !    nrv  = nvert(type) ; nre = nedge(type); nrf = nface(type)
-! !   
+! !
 !    do i=1,nre+nrf+1
 !       j = nrv+i
 !       nod = nodesl(j)

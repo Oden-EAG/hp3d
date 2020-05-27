@@ -1,5 +1,5 @@
 c-----------------------------------------------------------------------
-c      
+c
       subroutine trian_G1RecTri(No,Eta, X,Dxdeta)
 c
 c-----------------------------------------------------------------------
@@ -17,13 +17,13 @@ c               X      - physical coordinates of the point
 c               Dxdeta - derivatives of the physical coordinates wrt
 c                        to the parameters
 c----------------------------------------------------------------------
-c     MODULES      
+c     MODULES
       use kinds
       use GMP
 c----------------------------------------------------------------------
       implicit none
 c----------------------------------------------------------------------
-c     DUMMY ARGUMENTS      
+c     DUMMY ARGUMENTS
       integer                  :: No
       real(DP), dimension(2)   :: Eta
       real(DP), dimension(3)   :: X
@@ -52,14 +52,14 @@ c     VARIABLES
       integer :: deg,i,j,ipatch
       integer :: iprint = 0
 c
-c----------------------------------------------------------------------      
+c----------------------------------------------------------------------
 c  STEP 1: determine all control points (BRUTE FORCE APPROACH!)
 c
       if (iprint.eq.1) then
         write(*,7005) No,Eta
  7005   format(' trian_G1RecTri: No = ',i4,'; Eta = '2(f7.3x))
       endif
-c      
+c
 c  ...get triangle's vertices
       nv1 = TRIANGLES(No)%VertNo(1);  T1 = POINTS(nv1)%Rdata(1:3)
       nv2 = TRIANGLES(No)%VertNo(2);  T3 = POINTS(nv2)%Rdata(1:3)
@@ -79,7 +79,7 @@ c  ...get control points of edges: B1,B2; C1,C2; D1,D2;
       endif
       ne2 = TRIANGLES(No)%EdgeNo(2)
       if (ne2.gt.0) then
-        call BezCurve_control_points(ne2,D1,D2) 
+        call BezCurve_control_points(ne2,D1,D2)
       else
         call BezCurve_control_points(-ne2, D2,D1)
       endif
@@ -98,7 +98,7 @@ c  ...get control points of edges: B1,B2; C1,C2; D1,D2;
         write(*,7003)C1,C2
  7003   format(' C1 = ',3(f7.3x),'; C2 = ',3(f7.3x))
       endif
-c      
+c
 c  ...compute S1,S2,S3 as center of masses of suitable triangles
       S1 = (T1 + B1 + C1)/3.d0
       S2 = (T2 + C2 + D2)/3.d0
@@ -109,13 +109,13 @@ c  ...compute S1,S2,S3 as center of masses of suitable triangles
  7004 format(' S1 = ',3(f7.3x),'; S2 =  ',3(f7.3x),'; S3 = ',3(f7.3x))
       endif
 c
-c  ...elevate degree to obtain corresponding control points for a 
+c  ...elevate degree to obtain corresponding control points for a
 c     quartic: B1q,B2q,B3; C1q,C2q,C3; D1q,D2q,D3;
       call cub2quar_BezCurve(T1,B1,B2,T3, B1q,B3,B2q)
       call cub2quar_BezCurve(T3,D1,D2,T2, D1q,D3,D2q)
       call cub2quar_BezCurve(T1,C1,C2,T2, C1q,C3,C2q)
 c
-c  ...compute 1st row of inner control points using Chiyokura's 
+c  ...compute 1st row of inner control points using Chiyokura's
 c     method: L13,M13; L23,M23; L12,M12
       call Chiyokura(No,1,S1-T1,S3-T3, a1,a2)
       L13 = B1 + a1;  M13 = B2 + a2
@@ -137,13 +137,13 @@ c  ...compute remaining inner control points N13,N12,N23 using eq's (7.13)
       N13 = (-S1 + S2 - S3 + 4.d0*P1 - 3.d0*P2 + 4.d0*P3)/4.d0
       N23 = ( S1 - S2 - S3 - 3.d0*P1 + 4.d0*P2 + 4.d0*P3)/4.d0
 c
-c  ...upgrade control points P's and S's of inner boundary to quartic 
+c  ...upgrade control points P's and S's of inner boundary to quartic
 c     control points
       call cub2quar_BezCurve(T1,S1,P1,Z, S1q,R1,P1q)
       call cub2quar_BezCurve(T3,S3,P3,Z, S3q,R3,P3q)
       call cub2quar_BezCurve(T2,S2,P2,Z, S2q,R2,P2q)
 c
-c----------------------------------------------------------------------      
+c----------------------------------------------------------------------
 c  STEP 2: determine subpatch (i-th subpatch is adjacent to i-th local
 c           edge) and store appropriate control points
 c
@@ -172,22 +172,22 @@ c  .....store control points
         VV(2,2,0,1:3) = B3
         VV(1,3,0,1:3) = B2q
         VV(0,4,0,1:3) = T3
-c  ............................. 
+c  .............................
         VV(3,0,1,1:3) = S1q
         VV(2,1,1,1:3) = L13
         VV(1,2,1,1:3) = M13
         VV(0,3,1,1:3) = S3q
-c  ............................. 
+c  .............................
         VV(2,0,2,1:3) = R1
         VV(1,1,2,1:3) = N13
         VV(0,2,2,1:3) = R3
-c  ............................. 
+c  .............................
         VV(1,0,3,1:3) = P1q
         VV(0,1,3,1:3) = P3q
-c  ............................. 
+c  .............................
         VV(0,0,4,1:3) = Z
-c  ............................. 
-c        
+c  .............................
+c
 c  ...2nd subpatch.....................................................
       elseif (2.d0*Eta(1)+Eta(2)-1.d0.ge.0.d0) then
         ipatch = 2
@@ -208,21 +208,21 @@ c  .....store control points
         VV(2,2,0,1:3) = D3
         VV(1,3,0,1:3) = D2q
         VV(0,4,0,1:3) = T2
-c  ............................. 
+c  .............................
         VV(3,0,1,1:3) = S3q
         VV(2,1,1,1:3) = M23
         VV(1,2,1,1:3) = K23
         VV(0,3,1,1:3) = S2q
-c  ............................. 
+c  .............................
         VV(2,0,2,1:3) = R3
         VV(1,1,2,1:3) = N23
         VV(0,2,2,1:3) = R2
-c  ............................. 
+c  .............................
         VV(1,0,3,1:3) = P3q
         VV(0,1,3,1:3) = P2q
-c  ............................. 
+c  .............................
         VV(0,0,4,1:3) = Z
-c  ............................. 
+c  .............................
 c
 c  ...3rd subpatch.....................................................
       else
@@ -244,29 +244,29 @@ c  .....store control points
         VV(2,2,0,1:3) = C3
         VV(1,3,0,1:3) = C1q
         VV(0,4,0,1:3) = T1
-c  ............................. 
+c  .............................
         VV(3,0,1,1:3) = S2q
         VV(2,1,1,1:3) = K12
         VV(1,2,1,1:3) = L12
         VV(0,3,1,1:3) = S1q
-c  ............................. 
+c  .............................
         VV(2,0,2,1:3) = R2
         VV(1,1,2,1:3) = N12
         VV(0,2,2,1:3) = R1
-c  ............................. 
+c  .............................
         VV(1,0,3,1:3) = P2q
         VV(0,1,3,1:3) = P1q
-c  ............................. 
+c  .............................
         VV(0,0,4,1:3) = Z
-c  ............................. 
+c  .............................
 c
       endif
 c
       if (iprint.eq.1) then
-        write(*,*)'trian_G1RecTri: subpatch control points'      
+        write(*,*)'trian_G1RecTri: subpatch control points'
         write(*,7021)ipatch
- 7021   format(' ipatch = ',i)       
-        write(*,7006)VV(4,0,0,1:3) 
+ 7021   format(' ipatch = ',i)
+        write(*,7006)VV(4,0,0,1:3)
  7006   format(' V400 = ',3(f7.3x))
         write(*,7007)VV(3,1,0,1:3)
  7007   format(' V310 = ',3(f7.3x))
@@ -276,7 +276,7 @@ c
  7009   format(' V130 = ',3(f7.3x))
         write(*,7010)VV(0,4,0,1:3)
  7010   format(' V040 = ',3(f7.3x))
-        write(*,*)'..............................' 
+        write(*,*)'..............................'
         write(*,7011)VV(3,0,1,1:3)
  7011   format(' V301 = ',3(f7.3x))
         write(*,7012)VV(2,1,1,1:3)
@@ -285,25 +285,25 @@ c
  7013   format(' V121 = ',3(f7.3x))
         write(*,7014)VV(0,3,1,1:3)
  7014   format(' V031 = ',3(f7.3x))
-        write(*,*)'..............................' 
+        write(*,*)'..............................'
         write(*,7015)VV(2,0,2,1:3)
  7015   format(' V202 = ',3(f7.3x))
         write(*,7016)VV(1,1,2,1:3)
  7016   format(' V112 = ',3(f7.3x))
         write(*,7017)VV(0,2,2,1:3)
  7017   format(' V022 = ',3(f7.3x))
-        write(*,*)'..............................' 
+        write(*,*)'..............................'
         write(*,7018)VV(1,0,3,1:3)
  7018   format(' V103 = ',3(f7.3x))
         write(*,7019)VV(0,1,3,1:3)
  7019   format(' V013 = ',3(f7.3x))
-        write(*,*)'..............................' 
+        write(*,*)'..............................'
         write(*,7020)VV(0,0,4,1:3)
  7020   format(' V004 = ',3(f7.3x))
-        write(*,*)'..............................' 
+        write(*,*)'..............................'
       endif
 c
-c----------------------------------------------------------------------      
+c----------------------------------------------------------------------
 c  STEP 3: evaluate quartic Bezier patch
 c
 c  ...determine bivariate Bernstein polynomials
@@ -319,7 +319,7 @@ c  ...determine bivariate Bernstein polynomials
 c
 c     dirty fix:
       Dxdeta = 0.d0
-c      
+c
 ccc      call pause
 c
       end

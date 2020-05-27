@@ -1,20 +1,20 @@
       SUBROUTINE dielsph(xyz,wk,zE)
 
       IMPLICIT NONE
-c      double precision, parameter :: pi       = 3.141592653589793, 
+c      double precision, parameter :: pi       = 3.141592653589793,
 c     &                               c0       = 2.99792458d8,
 c     &                               my0      = 4*pi*1.d-7,
 c     &                               epsilon0 = 1.d0/my0/c0**2
 
-      double precision, parameter ::  pi       = 3.141592653589793, 
+      double precision, parameter ::  pi       = 3.141592653589793,
      &                                c0       = 1.d0,
      &                                my0      = 1.d0,
      &                                epsilon0 = 1.d0
       complex*16          zE(3)
       double precision::  xyz(3),wk
-      double precision::  r32(2), epsilon1, epsilon2, 
+      double precision::  r32(2), epsilon1, epsilon2,
      &                    epsilon3, eps(3)
-      double precision::  my1, my2, my3, my(3), sigma1, sigma2, 
+      double precision::  my1, my2, my3, my(3), sigma1, sigma2,
      &                    sigma3, sigma(3)
       character*8::       Etot
 
@@ -68,7 +68,7 @@ c      u0=1.d0
 
       complex*16, parameter:: im=(0.d0,1.d0)
       complex*16:: zE(3)
-      complex*16:: kr,  setkr, kr32(4) 
+      complex*16:: kr,  setkr, kr32(4)
       complex*16:: xx, seteta, eta(3)
       complex*16, allocatable:: mainbe(:,:),  mainha(:,:)
       complex*16, allocatable:: tbe(:), tha(:), ps(:,:,:,:)
@@ -76,7 +76,7 @@ c      u0=1.d0
       complex*16, allocatable:: tmpps(:,:,:,:)
       character*8:: Etot
 
-      allocate(mainbe(4,lmax+1), mainha(4,lmax+1), 
+      allocate(mainbe(4,lmax+1), mainha(4,lmax+1),
      &         tbe(lmax+1), tha(lmax+1))
       allocate(fa(8,lmax))
       allocate(ps(3,2,m1+1,lmax+1),tmpps(3,2,m1+1,lmax+1))
@@ -91,8 +91,8 @@ c      u0=1.d0
             call csfhan(xx, lmax+1, tbe, tha)
             mainbe(k,:) = tbe
             mainha(k,:) = tha
-         enddo                  
-      enddo                    
+         enddo
+      enddo
 
       deallocate(tbe, tha)
       do i=1,3
@@ -103,7 +103,7 @@ c      u0=1.d0
          call coeff(fa(1,l),fa(2,l),fa(3,l),fa(4,l),fa(5,l),fa(6,l),
      &         fa(7,l),fa(8,l),l,u0,eta,kr32,
      &         mainbe(:,l-1:l+1), mainha(:,l-1:l+1))
-      enddo                    
+      enddo
 
 
       y = xyz(2)
@@ -121,7 +121,7 @@ c      u0=1.d0
       kr = setkr(my(1), eps(1), sigma(1), omega, r)
 
 
-      
+
 
       zE(1:3) =(0.0d0,0.0d0)
       ps(:,:,:,:)=(0.d0,0.d0)
@@ -132,11 +132,11 @@ c      u0=1.d0
          ps(1,tao,m1,2:lmax-1)=tmpps(1,tao,m1,2:lmax-1)*cphi
          ps(2,tao,m1,2:lmax-1)=tmpps(2,tao,m1,2:lmax-1)*cphi
          ps(3,tao,m1,2:lmax-1)=tmpps(3,tao,m1,2:lmax-1)*sphi
-      enddo 
+      enddo
       do l=2,lmax-1
-         do j=1,3 
-            zE(j) = zE(j)  
-     &            + fa(3,l) * ps(j,1,m1,l) 
+         do j=1,3
+            zE(j) = zE(j)
+     &            + fa(3,l) * ps(j,1,m1,l)
      &            + fa(4,l) * ps(j,2,m1,l)
          enddo
       enddo
@@ -167,9 +167,9 @@ C
 CCalculates the coefficients for the scattered and incoming fields.
 C
 CInput: order > 1, u0 = incoming field amplitude, eta, r32 = r1 and r2,
-Cbe and ha = a 4 x 3 matrix with bessel and hankel function of 
-Corder-2, order-1, order stored in columns. Note that order represents 
-Cthe index in the bessel arrays. If l is the desired order to calculate 
+Cbe and ha = a 4 x 3 matrix with bessel and hankel function of
+Corder-2, order-1, order stored in columns. Note that order represents
+Cthe index in the bessel arrays. If l is the desired order to calculate
 Cthen: l = order - 1
 C
 COutput: The calculated coefficients are stored in a1, a2, f1, and f2
@@ -178,22 +178,22 @@ CUses: sfderive and Tcalc in this file
 C
 C===============================================================================
       SUBROUTINE coeff
-     &(f1, f2, f3, f4, fapp1, fapp2, a1, a2, 
+     &(f1, f2, f3, f4, fapp1, fapp2, a1, a2,
      & order, u0, eta, kr32, be, ha)
 
       implicit none
       integer:: i, order
       double precision, parameter  :: pi = 3.141592653589793
       double precision:: u0
-      complex*16, parameter :: im=(0.d0,1.d0) 
-      complex*16:: ne(4,3), dbe(4), dha(4), dne(4), T(4), 
+      complex*16, parameter :: im=(0.d0,1.d0)
+      complex*16:: ne(4,3), dbe(4), dha(4), dne(4), T(4),
      &             f1, f2, a1, a2
-      complex*16:: f3, f4, fapp1, fapp2, ny, kr32(4), 
+      complex*16:: f3, f4, fapp1, fapp2, ny, kr32(4),
      &             eta(3), be(4,3), ha(4,3)
 
       do i=1,4
          ne(i,1:3) = -im*(ha(i,1:3)-be(i,1:3))
-      enddo 
+      enddo
       call sfderive(kr32, be, ha, ne, dbe, dha, dne, order-1)
       call Tcalc(T, eta, be(:,2), ha(:,2), ne(:,2), dbe, dha, dne)
       a1 = u0*im**(order-1)*dsqrt(2*pi*(2*(order-1)+1))
@@ -223,17 +223,17 @@ C===============================================================================
       SUBROUTINE Tcalc(T, eta, bef, haf, nef, dbe, dha, dne)
 
       implicit none
-      complex*16:: T(4), eta(3), bef(4), haf(4), nef(4), 
+      complex*16:: T(4), eta(3), bef(4), haf(4), nef(4),
      &             dbe(4), dha(4), dne(4)
       complex*16:: m1, m2, t1, t2, n1, n2
       complex*16:: t3, n3, t4, n4 ! , m3, m4 C remember T(4)!
 
-      m1 = (bef(2)*eta(3)*dne(1)-nef(1)*eta(2)*dbe(2)) / 
-     &     (bef(1)*eta(2)*dbe(2)-bef(2)*eta(3)*dbe(1)) 
-      m2 = (nef(1)*eta(3)*dbe(2)-bef(2)*eta(2)*dne(1)) / 
+      m1 = (bef(2)*eta(3)*dne(1)-nef(1)*eta(2)*dbe(2)) /
+     &     (bef(1)*eta(2)*dbe(2)-bef(2)*eta(3)*dbe(1))
+      m2 = (nef(1)*eta(3)*dbe(2)-bef(2)*eta(2)*dne(1)) /
      &     (bef(2)*eta(2)*dbe(1)-bef(1)*eta(3)*dbe(2))
 
-      if ((dabs(real(m1)) .lt. 1d-16) .and. 
+      if ((dabs(real(m1)) .lt. 1d-16) .and.
      &(dabs(imag(m1)+1) .lt. 1d-16)) then
          t1 = -eta(2)*dbe(3)+eta(1)*bef(3)*dbe(4)/bef(4)
          n1 = eta(2)*dha(3)-eta(1)*haf(3)*dbe(4)/bef(4)
@@ -245,7 +245,7 @@ cccc        print '(a0, \)', 's1'
      &        (bef(4)*m1+nef(4))*eta(2)*dha(3)
       endif
 
-      if ((dabs(real(m2)) .lt. 1d-16) .and. 
+      if ((dabs(real(m2)) .lt. 1d-16) .and.
      &    (dabs(imag(m2)+1) .lt. 1d-16)) then
          t2 = -eta(1)*dbe(3)+eta(2)*bef(3)*dbe(4)/bef(4)
          n2 = eta(1)*dha(3)-eta(2)*haf(3)*dbe(4)/bef(4)
@@ -301,8 +301,8 @@ CSubroutine sfderive, by Henrik Stensson 980610
 C
 CCalculates the derivative of spherical bessel functions for use only with Tcalc
 C
-CInput: Spherical bessel functions, radius and order of the functions. 
-CThe input functions needs to be 4 x 3 matrices with the order l-1 to l+1 
+CInput: Spherical bessel functions, radius and order of the functions.
+CThe input functions needs to be 4 x 3 matrices with the order l-1 to l+1
 Cstored in the columns.
 C
 COutput: The results are put in dbe, dha and dne.
@@ -311,7 +311,7 @@ C===============================================================================
       SUBROUTINE sfderive(kr32, be, ha, ne, dbe, dha, dne, ord)
 
       IMPLICIT NONE
-      complex*16:: be(4, 3), ha(4, 3), ne(4, 3), dbe(4), 
+      complex*16:: be(4, 3), ha(4, 3), ne(4, 3), dbe(4),
      &             dha(4), dne(4), bep(4)
       complex*16:: hap(4), nep(4), kr32(4)
       integer:: k, ord
@@ -320,13 +320,13 @@ C===============================================================================
          bep(k) = (ord*be(k,1)-(ord+1)*be(k,3))/(2*ord+1)
          hap(k) = (ord*ha(k,1)-(ord+1)*ha(k,3))/(2*ord+1)
          nep(k) = (ord*ne(k,1)-(ord+1)*ne(k,3))/(2*ord+1)
-      enddo                
+      enddo
 
       do k=1,4
          dbe(k) = be(k,2)/kr32(k)+bep(k)
          dha(k) = ha(k,2)/kr32(k)+hap(k)
          dne(k) = ne(k,2)/kr32(k)+nep(k)
-      enddo 
+      enddo
 
       RETURN
       END SUBROUTINE sfderive
@@ -340,7 +340,7 @@ CCalculates the variable kr for use with the spherical bessel functions.
 C
 CInput: m = my, e = epsilon, s = sigma, w = omega, r = radius.
 C
-COutput: k * r, where k^2 = w^2 * my * epsilon * (1 + i * sigma / w / epsilon) 
+COutput: k * r, where k^2 = w^2 * my * epsilon * (1 + i * sigma / w / epsilon)
 C
 C===============================================================================
       COMPLEX*16 FUNCTION setkr(m, e, s, w, r)
@@ -350,7 +350,7 @@ C===============================================================================
       double precision:: m, e, s, w, r
 
       setkr = r*w*cdsqrt(m*(e+im*s/w))
-      
+
       RETURN
       END FUNCTION setkr
 
@@ -386,7 +386,7 @@ C===============================================================================
       COMPLEX*16, ALLOCATABLE :: Y(:)
 
       ALLOCATE (Y(LDIM))
-      
+
       SIN=CDSIN(X)
       COS=CDCOS(X)
       Y1=-COS/X
@@ -430,10 +430,10 @@ C===============================================================================
 
 
 C===============================================================================
-C      
+C
 C Subroutine PSI
 C
-C COMPUTES PSI AT KS AND TH 
+C COMPUTES PSI AT KS AND TH
 C
 C===============================================================================
       SUBROUTINE PSI(MMAX1,LMAX1,TH,KS,PS)
@@ -446,7 +446,7 @@ c      COMPLEX*16 PS(3,2,MMAX1,LMAX1)
       COMPLEX*16 PS(3,2,MMAX1,LMAX1)
       COMPLEX*16 KS
 
-      COMPLEX*16, ALLOCATABLE :: BS(:),HS(:)      
+      COMPLEX*16, ALLOCATABLE :: BS(:),HS(:)
       COMPLEX*16, ALLOCATABLE  :: H1(:),H2(:), H3(:)
       DOUBLE PRECISION, ALLOCATABLE  :: G(:,:,:), P(:)
 
@@ -457,7 +457,7 @@ c      ALLOCATE( G(3,MMAX1,LMAX1) , P(LMAX1+1) )
       ALLOCATE( H1(LMAX1), H2(LMAX1), H3(LMAX1) )
       ALLOCATE( BS(LMAX1+1),HS(LMAX1+1) )
       ALLOCATE( G(3,MMAX1,LMAX1+1) , P(LMAX1+1) )
-       
+
       LMAX2=LMAX1+1
       SI=DSIN(TH)
       CO=DCOS(TH)
@@ -506,7 +506,7 @@ C===============================================================================
 
       DOUBLE PRECISION, ALLOCATABLE :: FCT(:)
       ALLOCATE (FCT(MDIM+LDIM))
- 
+
       PI=3.141592653589793D0
       FCT(1)=1.D0
       LM=LDIM+MDIM-2
@@ -554,7 +554,7 @@ C===============================================================================
       RETURN
       END
 C===============================================================================
-C      
+C
 C Subroutine CSFBES
 C
 C COMPUTES THE SPHERICAL BESSEL FUNCTION JL(X), L>0
@@ -564,7 +564,7 @@ C===============================================================================
       IMPLICIT   NONE
       INTEGER    L,J,K,I
       COMPLEX*16 X,B,A,X2
-      
+
       B=1.D0
       A=1.D0
       X2=-X*X/2

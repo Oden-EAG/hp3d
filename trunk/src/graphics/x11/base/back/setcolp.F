@@ -78,7 +78,7 @@ c    ...second quarter
            jcase = 2; ii = I-nhalf; jj = J
            norv = nord(9+Nside);  norh = nordh(9+Nside)
         else
-           print*,'SETCOLB: I,J,Nsub1 = ',I,J,Nsub1 
+           print*,'SETCOLB: I,J,Nsub1 = ',I,J,Nsub1
            stop
         endif
       endif
@@ -188,7 +188,7 @@ c
 c
       if (iprint.eq.1) then
         write(*,*) 'SETCOLP: Icase,Nside,Nsub1,Nsub2,I,J,Ncol = '
-        write(*,*)  Icase,Nside,Nsub1,Nsub2,I,J,Ncol 
+        write(*,*)  Icase,Nside,Nsub1,Nsub2,I,J,Ncol
         call pause
       endif
 c

@@ -34,12 +34,12 @@
    real*8, allocatable, save :: COEFFPH(:,:),COEFFPE(:,:),COEFFPV(:,:)
 !$OMP THREADPRIVATE(COEFFPH, COEFFPE, COEFFPV)
 !
-!..number of parent nodes dof 
+!..number of parent nodes dof
    integer :: MDOFH,MDOFE,MDOFV
 !$OMP THREADPRIVATE(MDOFH,MDOFE,MDOFV)
 !
 !----------------------------------------------------------------------
-! 
+!
 !..node
    type nodePR
 !
@@ -49,7 +49,7 @@
 !  ...order
       integer          :: order
 !
-!  ...global node number 
+!  ...global node number
       integer          :: nod
 !
 !  ...refinement flag
@@ -77,7 +77,7 @@
 !$OMP THREADPRIVATE(NODES_PR)
 !
    CONTAINS
-!      
+!
 !----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !     routine breaks a node in the auxiliary data structure supporting
@@ -118,7 +118,7 @@
    kref = NODES(nod)%ref_kind
 !
 !..record the refinement kind
-   NODES_PR(Nodl)%ref_kind = kref 
+   NODES_PR(Nodl)%ref_kind = kref
 !
    select case(Nod)
    case(140)
@@ -201,7 +201,7 @@
 
    if (iprint .eq. 1) then
       write(*,5000) nodesl(1:nrp)
-5000  format('nodbreakPR: nodesl     = ', 9i6)        
+5000  format('nodbreakPR: nodesl     = ', 9i6)
       write(*,5001) NODES_PR(nodesl(1:nrp))%nod
 5001  format('nodbreakPR: nodesl nod = ', 9i6)
    endif
@@ -302,7 +302,7 @@
    end subroutine nodbreakPR
 !
 !-----------------------------------------------------------------------
-!     routine generates a new node in the auxiliary data structure for 
+!     routine generates a new node in the auxiliary data structure for
 !                        a face or edge of the coarse mesh
 !     in:     Type     - the new node type
 !             Nafth    - father of the new node
@@ -324,7 +324,7 @@
    endif
    NR_NODES_PR = NR_NODES_PR+1
 !
-!..store node information 
+!..store node information
    NODES_PR(Nodl)%type  = Type
    NODES_PR(Nodl)%order = Norder
    NODES_PR(Nodl)%ref_kind = 0
@@ -340,7 +340,7 @@
 !                        the element
 !     out:    Nodesl   - element nodes
 !-----------------------------------------------------------------------
-! 
+!
    subroutine face_nodesPR(Mdle, Nodesl)
 !
    integer :: Mdle,Nodesl(9)
@@ -367,7 +367,7 @@
      write(*,7001) Mdle
 7001   format('face_nodesPR: DEBUGGING FOR Mdle = ',i6)
    endif
-!      
+!
    Nodesl=0
 !
 !..Step 1: Go up the tree to the initial mesh ancestor
@@ -558,7 +558,7 @@
      endif
    enddo
 !
-   do 
+   do
       nfath = Nodesl(3)
       if (igen.eq.0) exit
       select case(no_son(igen))
@@ -600,7 +600,7 @@
 !     REMARK: order of parent nodes implies the order of nodal sons,
 !             if sons are of higher order, the prolongation coefficients
 !             are zero, if their order happens to be lower, the
-!             corresponding prolongation coefficients should be 
+!             corresponding prolongation coefficients should be
 !             disregarded in the calling routine
 !-----------------------------------------------------------------------
 !
@@ -616,7 +616,7 @@
              NacH(MaxquadH,MAXmdlqH),ConstrH(MaxquadH,MAXmdlqH), &
              NacE(MaxquadE,MAXmdlqE),ConstrE(MaxquadE,MAXmdlqE), &
              NacV(MaxquadV,MAXmdlqV),ConstrV(MaxquadV,MAXmdlqV)
-   
+
 !
 !  ...local variables
    integer :: kH,kE,kV,loc,ndofH,ndofE,ndofV,l,jp,lp,is,ish,isv,&
@@ -682,7 +682,7 @@
 !
 !       parent mid-edge node
      nord = Nordp(1)
-     loc=3; ndofH = nord-1; ndofE = nord 
+     loc=3; ndofH = nord-1; ndofE = nord
 !
      kH=kH+1
      NrconH(kH)=Nord+1
@@ -721,7 +721,7 @@
 !       end of loop through vertex parent nodes
      enddo
 !
-!  ...MID-FACE NODE CONSTRAINED BY AN H4-REFINED FACE 
+!  ...MID-FACE NODE CONSTRAINED BY AN H4-REFINED FACE
    case(21,22,23,24)
 !
 !       determine horizontal and vertical son number
@@ -823,7 +823,7 @@
      enddo
 !
 !
-!  ...HORIZONTAL MID-EDGE NODE CONSTRAINED BY AN H4-REFINED FACE 
+!  ...HORIZONTAL MID-EDGE NODE CONSTRAINED BY AN H4-REFINED FACE
    case(26,28)
 !
 !       determine horizontal son number
@@ -961,7 +961,7 @@
      do l=1,ndofE
        kE=kE+1
        NrconE(kE) = ndofHh*ndofEv + ndofEp(2) + ndofEp(4)
-!  
+!
 !         loop through the parent mid-face node dof
        jp=0
        do lpv=1,ndofEv
@@ -1041,10 +1041,10 @@
    end subroutine logicPR
 !
 !-----------------------------------------------------------------------
-!     routine allocates data struture arrays for a macroelement edge or 
+!     routine allocates data struture arrays for a macroelement edge or
 !     face node
 !
-!     in:     Type   - node type 
+!     in:     Type   - node type
 !             Nordp  - order of the parent nodes
 !
 !----------------------------------------------------------------------
@@ -1058,7 +1058,7 @@
    integer :: max_nrnodes_pr
 !
 
-   
+
    MAX_NODES_PR = max_nrnodes_pr(Type, MAXGEN_PR)
    select case(Type)
    case('medg')
@@ -1093,7 +1093,7 @@
 !
    end subroutine allocate_PR
 !-----------------------------------------------------------------------
-!     routine deallocates data structure arrays for a macro-element edge 
+!     routine deallocates data structure arrays for a macro-element edge
 !     or face node
 !
 !----------------------------------------------------------------------
@@ -1119,7 +1119,7 @@
 !-----------------------------------------------------------------------
 !     routine builds the local data structure for an element edge node
 !
-!     in:     
+!     in:
 !         Nodes_edge - edge nodes in the order consistent with the
 !                      global orientation
 !         Nordp      - order of the parent edge
@@ -1170,7 +1170,7 @@
    NODES_PR(nodl)%father = -1
    allocate(NODES_PR(nodl)%coeffH(MDOFH,nord-1)); NODES_PR(nodl)%coeffH = 0.d0
    allocate(NODES_PR(nodl)%coeffE(MDOFE,nord))  ; NODES_PR(nodl)%coeffE = 0.d0
-   nrdofH = nord-1 ; nrdofE = nord 
+   nrdofH = nord-1 ; nrdofE = nord
    do k=1,nrdofH
      NODES_PR(nodl)%coeffH(2+k,k) = 1.d0
    enddo
@@ -1242,7 +1242,7 @@
 !     routine builds the local data structure for a coarse mesh element
 !     face node
 !
-!     in: 
+!     in:
 !         Type         - face nod type
 !         Nordp        - parent nodes order
 !         Nodes_face   - nodes on the face using global orientation
@@ -1284,7 +1284,7 @@
      NODES_PR(nodl)%nod = Nodes_face(iv)
      NODES_PR(nodl)%ref_kind = 0
      NODES_PR(nodl)%father = -1
-     allocate(NODES_PR(nodl)%coeffH(MDOFH,1)) 
+     allocate(NODES_PR(nodl)%coeffH(MDOFH,1))
      NODES_PR(nodl)%coeffH = 0.d0; NODES_PR(nodl)%coeffH(iv,1) = 1.d0
    enddo
    ndofHt=nrv; ndofEt=0
@@ -1326,7 +1326,7 @@
    NODES_PR(nodl)%ref_kind = 0
    NODES_PR(nodl)%father = -1
    call ndof_nod(Type,Nordp(nre+1), ndofH,ndofE,ndofV,ndofQ)
-   allocate(NODES_PR(nodl)%coeffH(MDOFH,ndofH)) ; NODES_PR(nodl)%coeffH = 0.d0 
+   allocate(NODES_PR(nodl)%coeffH(MDOFH,ndofH)) ; NODES_PR(nodl)%coeffH = 0.d0
    allocate(NODES_PR(nodl)%coeffE(MDOFE,ndofE)) ; NODES_PR(nodl)%coeffE = 0.d0
    allocate(NODES_PR(nodl)%coeffV(MDOFV,ndofV)) ; NODES_PR(nodl)%coeffV = 0.d0
    do k=1,ndofH
@@ -1373,7 +1373,7 @@
      nodl = list(i)
 !
 !  .....break the node from the list
-     if (iprint .eq. 1) then 
+     if (iprint .eq. 1) then
        write(*,*) 'calling nodbreakPR for, nodl, nod = ', nodl, NODES_PR(nodl)%nod
        call pause
      endif
@@ -1413,7 +1413,7 @@
 !  ...returns the information whether the node is in the interior
 !     of the face
    function Face_interior_node(Nodl)
-!        
+!
    integer :: Nodl,nson,nfath
    logical :: Face_interior_node
 !
@@ -1426,7 +1426,7 @@
    enddo
    select case(NODES_PR(nson)%type)
    case('mdlt','mdlq')
-      Face_interior_node = .TRUE. 
+      Face_interior_node = .TRUE.
    case default
       Face_interior_node = .false.
    end select
@@ -1439,7 +1439,7 @@
 !  ...returns the information whether the node is in the interior
 !     of the face
    function Edge_interior_node(Nodl)
-!        
+!
    integer :: Nodl,nson,nfath
    logical :: Edge_interior_node
 !
@@ -1452,7 +1452,7 @@
    enddo
    select case(NODES_PR(nson)%type)
    case('medg')
-      Edge_interior_node = .TRUE. 
+      Edge_interior_node = .TRUE.
    case default
       Edge_interior_node = .false.
    end select
@@ -1466,7 +1466,7 @@
 
 
 
-   function max_nrnodes_pr(Type, Maxgen)  
+   function max_nrnodes_pr(Type, Maxgen)
 
    implicit none
 
@@ -1494,8 +1494,8 @@
          e_2 = e_1 + 2*(e_1-e_0) + 4**i
          e_0 = e_1
          e_1 = e_2
-      enddo   
-      max_nredge = e_2      
+      enddo
+      max_nredge = e_2
 !
 !  ...max number of faces
       max_nrface = 1
@@ -1504,7 +1504,7 @@
       enddo
       max_nrnodes_pr = max_nrvert + max_nredge + max_nrface
 !
-   end select      
+   end select
 !
 !
    end function max_nrnodes_pr

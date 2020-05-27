@@ -13,7 +13,7 @@ c
       use control
       use GMP
       use AF
-#include "syscom.blk" 
+#include "syscom.blk"
 c
 c  ...layer thickness
       dimension thickness(10), no_dom(10), xp(3)
@@ -22,12 +22,12 @@ c  ...set number of truncating sphere
       nts = 1
 c
 c  ...set the number of layers to add and their thickness
-      n_lay = 1                               
+      n_lay = 1
       thickness(1:n_lay) = (/ 0.2d0 /)
 c
 c  ...set subdomain numbers....
       do i = 1, n_lay
-        no_dom(i) = 2             
+        no_dom(i) = 2
       enddo
 c
 c  ...rescale sphere radius
@@ -35,7 +35,7 @@ c  ...rescale sphere radius
       SURFACES(nts)%Rdata(4) = r
       do i = 1, NRPOINT
         POINTS(i)%Rdata(1:3) = r*POINTS(i)%Rdata(1:3)
-      end do 
+      end do
 c
 c  ...add layers
       write(*,1000)

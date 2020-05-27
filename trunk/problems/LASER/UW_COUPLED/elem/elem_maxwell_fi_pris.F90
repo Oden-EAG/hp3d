@@ -456,7 +456,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    allocate(LOADE(3,(nrdofE12+nrdofH12)))
 !
 !..Loop over quadrature points in direction \xi_1
-   do pz=1,nintz 
+   do pz=1,nintz
 !  ...read quadrature point location and weight
       xi3=xiloc_z(pz)
       wt3=wloc_z(pz)
@@ -778,7 +778,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !        ...loop over 2D trial function ends
             enddo
 !
-! ------------ Assemble Aux Load Vector --------------    
+! ------------ Assemble Aux Load Vector --------------
             do a=1,3
                LOADE(a,i12) = LOADE(a,i12)                              &
                      + ( dxidx(a,1)*zJ(1)+                              &
@@ -832,7 +832,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                         m2 = mapEE(j3 + (j12-nrdofE12-1)*(nrdofH3-1) + nrdofE12*nrdofH3)
                      endif
 !
-                     if (m1.le.m2) then 
+                     if (m1.le.m2) then
                         if (j3mod.le.nrdofH3) then
                            do b=1,3
                               do a=1,3
@@ -841,11 +841,11 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
                                  gramP(kk) = gramP(kk)                    &
                                     + AUXEE_zb(a,b,k12)                   &
-                                       * shapeH3(sa,i3mod)                & 
+                                       * shapeH3(sa,i3mod)                &
                                        * shapeH3(sb,j3mod)                &
                                     + AUXCC(a,b,k12)                      &
                                        * shapeH3(2-deltak(a,3)*fa,i3mod)  &
-                                       * shapeH3(2-deltak(b,3)*fb,j3mod) 
+                                       * shapeH3(2-deltak(b,3)*fb,j3mod)
 !
 !                             ...Sum CE and EC terms
                                  kk = nk(2*m1-1,2*m2)
@@ -855,7 +855,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                                        * shapeH3(sb,j3mod)                &
                                     + AUXEC_zb(a,b,k12)                   &
                                        * shapeH3(sa,i3mod)                &
-                                       * shapeH3(2-deltak(b,3)*fb,j3mod)  
+                                       * shapeH3(2-deltak(b,3)*fb,j3mod)
 !
 !                             ...Sum other CE and EC terms
                                  if (m1.ne.m2) then
@@ -866,18 +866,18 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                                           * shapeH3(sb,j3mod)                &
                                        + AUXEC_zc(a,b,k12)                   &
                                           * shapeH3(sa,i3mod)                &
-                                          * shapeH3(2-deltak(b,3)*fb,j3mod)   
+                                          * shapeH3(2-deltak(b,3)*fb,j3mod)
                                  endif
 !
 !                             ...Sum EE_22 and CC_22 terms
                                  kk = nk(2*m1  ,2*m2  )
                                  gramP(kk) = gramP(kk)                    &
                                     + AUXEE_zc(a,b,k12)                   &
-                                       * shapeH3(sa,i3mod)                & 
+                                       * shapeH3(sa,i3mod)                &
                                        * shapeH3(sb,j3mod)                &
                                     + AUXCC(a,b,k12)                      &
                                        * shapeH3(2-deltak(a,3)*fa,i3mod)  &
-                                       * shapeH3(2-deltak(b,3)*fb,j3mod) 
+                                       * shapeH3(2-deltak(b,3)*fb,j3mod)
 !                          ...end loop a
                               enddo
 !                       ...end loop b
@@ -1269,7 +1269,7 @@ end subroutine tens_prism_ordEE
 ! TODO
 subroutine tens_hexa_ordEE(p,q, mapEE)
    use parametersDPG
-   integer, intent(in)  :: p 
+   integer, intent(in)  :: p
    integer, intent(in)  :: q
    integer, intent(out) :: mapEE(2*(p+1)*p*(q+1) + (p+1)*(p+1)*q)
    integer :: i,j,k
@@ -1287,7 +1287,7 @@ end subroutine tens_hexa_ordEE
 ! TODO
 subroutine tens_hexa_ordQQ(p,q, mapQQ)
    use parametersDPG
-   integer, intent(in)  :: p 
+   integer, intent(in)  :: p
    integer, intent(in)  :: q
    integer, intent(out) :: mapQQ(p*p*q)
    integer :: i,j,k

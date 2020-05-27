@@ -1,19 +1,19 @@
 !-----------------------------------------------------------------------
 !
-!> Purpose : update H(curl) edge dof interpolating H1 Dirichlet data 
+!> Purpose : update H(curl) edge dof interpolating H1 Dirichlet data
 !            using PB interpolation
 !!
 !! @param[in]  Iflag        - a flag specifying which of the objects the
 !!                            edge is on: 5 pris, 6 hexa, 7 tetr, 8 pyra
-!! @param[in]  No           - number of a specific object 
+!! @param[in]  No           - number of a specific object
 !! @param[in]  Etav         - reference coordinates of the element vertices
 !! @param[in]  Type         - element (middle node) type
-!! @param[in]  Icase        - the edge node case 
+!! @param[in]  Icase        - the edge node case
 !! @param[in]  Nedge_orient - edge orientation
 !! @param[in]  Nface_orient - face orientation (not used)
 !! @param[in]  Norder       - element order
-!! @param[in]  Iedge        - edge number 
-!! 
+!! @param[in]  Iedge        - edge number
+!!
 !! @param[out] ZnodE        - H(curl) dof for the edge
 !!
 !> @date Mar 17
@@ -32,7 +32,7 @@
 !
 ! ** Arguments
 !-----------------------------------------------------------------------
-!      
+!
   integer,          intent(in)    :: Iflag,No,Mdle
   integer,          intent(in)    :: Icase,Iedge
   real(8),          intent(in)    :: Etav(3,8)
@@ -81,22 +81,22 @@
 !
 ! decoded case for the face node
   integer, dimension(NR_PHYSA)          :: ncase
-!    
+!
 ! work space for linear solvers
   integer                               :: naE,info
   real(8), dimension(MAXP,MAXP)         :: aaE
   integer, dimension(MAXP)              :: ipivE
-!    
+!
 ! load vector and solution
   VTYPE,   dimension(MAXP,MAXEQNE)      :: zbE,zuE
 #if C_MODE
   real(8), dimension(MAXP,MAXEQNE)      :: uE_real,uE_imag
 #endif
-!  
+!
 ! misc work space
   integer :: iprint,nrv,nre,nrf,i,j,k,ivarE,nvarE,kj,ki,&
              ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_Edge,iflag1
-!      
+!
 !----------------------------------------------------------------------
 !
 !
@@ -142,14 +142,14 @@
 !
 ! initialize
   aaE = 0.d0; zbE = ZERO
-!    
+!
 ! loop over integration points
   do l=1,nint
 !
 !   Gauss point and weight
     t  = xi_list(l)
     wa = wa_list(l)
-!    
+!
 !   determine edge parameterization for line integral
     call edge_param(Type,Iedge,t, xi,dxidt)
 !
@@ -157,7 +157,7 @@
     call shape3DH(Type,xi,norder_1,Nedge_orient,Nface_orient, &
                   nrdofH,shapH,gradH)
 !
-!   compute element Hcurl shape functions 
+!   compute element Hcurl shape functions
     call shape3DE(Type,xi,norder_1,Nedge_orient,Nface_orient, &
                   nrdofE,shapE,curlE)
 !
@@ -173,7 +173,7 @@
     rt(1:3) = detadt(1:3)/bjac
     weight = wa*bjac
 !
-!   call GMP routines to evaluate physical coordinates and their 
+!   call GMP routines to evaluate physical coordinates and their
 !   derivatives wrt reference coordinates
     select case(Iflag)
     case(5) ; call prism(No,eta, x,dxdeta)
@@ -262,7 +262,7 @@
 !
 ! projection matrix leading dimension (maximum number of 1D bubbles)
   naE=MAXP
-!    
+!
 ! over-write aaE with its LU factorization
   call dgetrf(ndofE_edge,ndofE_edge,aaE,naE,ipivE,info)
 !
@@ -271,12 +271,12 @@
     write(*,*)'dhpedge: H(curl) DGETRF RETURNED INFO = ',info
     call logic_error(FAILURE,__FILE__,__LINE__)
   endif
-!    
+!
 ! solve linear system
 !
 ! copy load vector
   zuE(1:ndofE_edge,:) = zbE(1:ndofE_edge,:)
-!    
+!
 #if C_MODE
 !
 ! apply pivots to load vector
@@ -291,24 +291,24 @@
 ! triangular solves for real part
   call dtrsm('L','L','N','U',ndofE_edge,MAXEQNE,1.d0,aaE,naE,uE_real,naE)
   call dtrsm('L','U','N','N',ndofE_edge,MAXEQNE,1.d0,aaE,naE,uE_real,naE)
-!    
+!
 ! triangular solves for imaginary part
   call dtrsm('L','L','N','U',ndofE_edge,MAXEQNE,1.d0,aaE,naE,uE_imag,naE)
   call dtrsm('L','U','N','N',ndofE_edge,MAXEQNE,1.d0,aaE,naE,uE_imag,naE)
-!         
-! combine real and imaginary parts by forcing type to DOUBLE 
-! precision complex 
+!
+! combine real and imaginary parts by forcing type to DOUBLE
+! precision complex
   zuE(1:ndofE_edge,:) = dcmplx(uE_real(1:ndofE_edge,:), uE_imag(1:ndofE_edge,:))
-!        
+!
 #else
-!    
+!
 ! apply pivots to load vector
   call dlaswp(MAXEQNE,zuE,naE,1,ndofE_edge,ipivE,1)
 !
 ! triangular solves
   call dtrsm('L','L','N','U',ndofE_edge,MAXEQNE,1.d0,aaE,naE, zuE,naE)
   call dtrsm('L','U','N','N',ndofE_edge,MAXEQNE,1.d0,aaE,naE, zuE,naE)
-!    
+!
 #endif
 !
 #if DEBUG_MODE
@@ -320,24 +320,24 @@
    call pause
   endif
 #endif
-!    
+!
 ! save dof's, skipping irrelevant entries
 !
 ! decoded node case, indicating supported variables
   call decod(Icase,2,NR_PHYSA, ncase)
-!    
+!
 ! initialize global variable counter, and node local variable counter
   ivarE=0 ; nvarE=0
-!    
-! loop through multiple copies of variables 
+!
+! loop through multiple copies of variables
   do j=1,NRCOMS
-!    
+!
 !   loop through physical attributes
     do i=1,NR_PHYSA
-!    
+!
 !     loop through components of physical attribute
       do k=1,NR_COMP(i)
-!          
+!
         select case(DTYPE(i))
 !
 !       H(curl) component

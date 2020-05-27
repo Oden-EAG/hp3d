@@ -1,6 +1,6 @@
 !> Purpose : find order of approximation for Mdle. It calls elem_nodes
 !! @param[in]  Mdle   - middle node number
-!! @param[out] Norder - order of approximation 
+!! @param[out] Norder - order of approximation
 subroutine find_elem_nodes(Mdle, Norder, Nedge_orient,Nface_orient)
   use data_structure3D
   implicit none

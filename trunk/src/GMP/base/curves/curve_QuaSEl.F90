@@ -8,8 +8,8 @@
 !
 !   purpose            - routine defines a parametrization for
 !                        a quarter of superellipse between 0 and pi/2
-!                        WARNING: The derivative of this 
-!                        parametrization has singularities at the 
+!                        WARNING: The derivative of this
+!                        parametrization has singularities at the
 !                        endpoints (the semiaxes).
 !
 !   arguments :
@@ -69,7 +69,7 @@
       call norm(aC, rx)
       call norm(bC, ry)
 !
-!  ...printing      
+!  ...printing
       if (iprint.eq.1) then
         write(*,*) ' '
         write(*,7011) aG(1:3)
@@ -81,12 +81,12 @@
         write(*,7009) rx,px
  7009   format(' rx,px = ',2(e12.5,2x))
         write(*,7010) ry,py
- 7010   format(' ry,py = ',2(e12.5,2x))    
+ 7010   format(' ry,py = ',2(e12.5,2x))
       endif
 !
 !  ...now calculate the coordinates in 2D x-y plane
 !  ...first rescale Eta to between 0 and pi/2
-      pihalf = acos(0.d0) 
+      pihalf = acos(0.d0)
       tt = Eta*pihalf
 !  ...next evaluate the superellipse (and eta derivative)
 !  ...NOTE: No need for abs and sgn functions - it's the first quadrant
@@ -98,9 +98,9 @@
                    (cos(tt)**(2.d0/px-1.d0))
       dxLdeta(2) = pihalf*ry*(+cos(tt))*(2.d0/py)* &
                    (sin(tt)**(2.d0/py-1.d0))
-      dxLdeta(3) = 0.d0 
+      dxLdeta(3) = 0.d0
 !
-!  ...printing      
+!  ...printing
       if (iprint.eq.1) then
         write(*,*) ' '
         write(*,7013) tt
@@ -108,7 +108,7 @@
         write(*,7006) xL(1:3)
  7006   format(' xL  = ',3(e12.5,2x))
         write(*,7007) dxLdeta(1:3)
- 7007   format(' dxLdeta = ',3(e12.5,2x))    
+ 7007   format(' dxLdeta = ',3(e12.5,2x))
       endif
 !
 !  ...the idea is to map these coordinates to the global physical
@@ -127,11 +127,11 @@
       call cross_product(aC(1:3),bC(1:3), rotM(1:3,3))
       rotM(1:3,3) = (1.d0/(rx*ry))*rotM(1:3,3)
 !
-!  ...printing      
+!  ...printing
       if (iprint.eq.1) then
         do i=1,3
           write(*,7005) i,rotM(i,1:3)
- 7005     format(' i,rotM(i,:) = ',i1,2x,3(e12.5,2x))          
+ 7005     format(' i,rotM(i,:) = ',i1,2x,3(e12.5,2x))
         enddo
       endif
 !
@@ -142,7 +142,7 @@
                     rotM(1:3,3)*dxLdeta(3)
 !
 !  ...printing
-      if (iprint.eq.1) then 
+      if (iprint.eq.1) then
         write(*,*) ' '
         write(*,7003) X(1:3)
         write(*,7004) Dxdeta(1:3)

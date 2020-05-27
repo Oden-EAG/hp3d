@@ -34,9 +34,9 @@
    use data_structure3D
 !
 !--------------------------------------------------------------------------
-! 
+!
   implicit none
-!  
+!
    integer,                      intent(in)  :: Mdle,Idec
    integer, dimension(NR_PHYSA), intent(out) :: Nrdofs
    integer,                      intent(out) :: Nrdofm,Nrdofc
@@ -45,7 +45,7 @@
    integer,                      intent(out) :: Nrnodm
    VTYPE  ,                      intent(out) :: Bload(*),Astif(*)
    integer, dimension(NR_PHYSA)              :: nbcond
-!   
+!
 !--------------------------------------------------------------------------
 !
 !..This is a hack to eliminate the bubbles in the trace physics variables,

@@ -332,7 +332,7 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
           endif
           read(nin,*) (CURVES(nc)%Rdata(k),k=1,NDIM)
 !
-!  .....quarter of a superellipse centered at Rdata(1:3) and powers 
+!  .....quarter of a superellipse centered at Rdata(1:3) and powers
 !       R(4) and R(5) (regular ellipse corresponds to R(4)=R(5)=2)
         case('QuaSEl')
           allocate(CURVES(nc)%Rdata(NDIM+2), stat=istat)
@@ -910,7 +910,7 @@ IF (.NOT. QUIET_MODE) write(*,*)''
 !
         case('QuaSEl')
 !
-!  .......read in and store the coordinates of the center of a 
+!  .......read in and store the coordinates of the center of a
 !         superellipse and powers
           allocate(CURVES(ic)%Rdata(NDIM+2))
           read(NWE,*) (CURVES(ic)%Rdata(k),k=1,NDIM+2)
@@ -1292,7 +1292,7 @@ IF (.NOT. QUIET_MODE) write(*,*)''
                     '                ...FIGURES NUMBERS'
             end select
             write(NIN,*)''
-            
+
         elseif(CURVES(i)%Type.eq.'QuaSEl')then
             write(NIN,*)-5,'                         ...TYPE OF CURVE',i
             write(NIN,*) (CURVES(i)%EndPoNo(j),j=1,2), &

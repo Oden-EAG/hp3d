@@ -1,5 +1,5 @@
       subroutine clfil
-c              
+c
 c-----------------------------------------------------------------------c
 c   routine name       - clfil
 c
@@ -19,15 +19,15 @@ c
 c-----------------------------------------------------------------------c
 #include "syscom.blk"
 #include "cinout.blk"
-c      
+c
       close(NIN)
 c
       close(NOUT)
-c      
+c
       close(N_GEO)
 c
       close(NPROFB)
 c
-c      
+c
       return
       end

@@ -2,7 +2,7 @@
 !
 #include "syscom.blk"
 !
-#if C_MODE 
+#if C_MODE
       dreal_part = real(Z)
 #else
       dreal_part = Z

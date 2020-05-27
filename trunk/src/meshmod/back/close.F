@@ -22,7 +22,7 @@ c
       character(len=4) type
 c
 c  ...element nodes and their orientations
-      dimension nodesl(27), norientl(27) 
+      dimension nodesl(27), norientl(27)
 c
       iprint=0
       if (iprint.eq.1) then
@@ -70,7 +70,7 @@ c
 c
 c
 c
-c      
+c
 c---------------------------------------------------------------------
 c
 c   routine name       - close
@@ -79,7 +79,7 @@ c---------------------------------------------------------------------
 c
 c   latest revision    - May 10
 c
-c   purpose            - enforce 1-irregularity of the mesh 
+c   purpose            - enforce 1-irregularity of the mesh
 c
 c-----------------------------------------------------------------------
 c
@@ -104,7 +104,7 @@ c
 c
       allocate(list(2,NRELES))
 c
-      do 
+      do
 c
 c  .....activate nodes that can be activated
         call refresh
@@ -136,7 +136,7 @@ c  .....identify elements to refine
             endif
             if (NODES(nod)%visit.eq.1) then
               krefe(j)=1; nflag=1
-            endif 
+            endif
           enddo
           kreff=0
           do j=1,nface(type)
@@ -148,7 +148,7 @@ c  .....identify elements to refine
               case('mdlq'); kreff(j)=11
               end select
               nflag=1
-            endif 
+            endif
           enddo
           if (nflag.eq.1) then
             if (iprint.eq.1) then
@@ -183,7 +183,7 @@ c  .....refine the elements from the list
       enddo
 c
       call reset_visit
-      deallocate(list) 
+      deallocate(list)
 c
-c     
-      end subroutine 
+c
+      end subroutine

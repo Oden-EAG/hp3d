@@ -25,7 +25,7 @@ c                      = 4 color monitor with 8 colors
 c                      = 5 color monitors with 256 colors
 c     out:
 c
-c   required  routines - 
+c   required  routines -
 c
 c----------------------------------------------------------------------
 c
@@ -65,7 +65,7 @@ c
 c  ...first clear array of colors
       NPCOL(1:NR_COLORS) = 0
 c
-c  ...set white 
+c  ...set white
       call xgsetcm(0,255,255,255)
       call   afill(1,255,255,255)
       NPCOL(1)=0
@@ -75,10 +75,10 @@ c  ...set black
       call   afill(2,  0,  0,  0)
       NPCOL(2)=1
 c
-c  ...when on B&W machine 
+c  ...when on B&W machine
       if (Iwind.eq.1) return
 c
-c  ...when on gray scale      
+c  ...when on gray scale
       if ((Iwind.eq.2).or.(Iwind.eq.3)) then
         ncol = 8
         ndcol = 255 / (ncol+1)
@@ -92,7 +92,7 @@ c  ...when on gray scale
             NPCOL(j+10)=j/24+2
           enddo
 c
-c  .....when more colors possible on grayscale monitor 
+c  .....when more colors possible on grayscale monitor
         elseif (Iwind.eq.3) then
           ncol = 190
           do i = 1,ncol
@@ -199,7 +199,7 @@ c
  7002   format(10i4)
         call pause
       endif
-c   
+c
       return
       end
 c----------------------------------------------------------------------
@@ -225,6 +225,6 @@ c
       IBLUE(index1)=ib1
 c
       return
-      end      
-      
+      end
+
 

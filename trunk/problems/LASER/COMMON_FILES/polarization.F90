@@ -107,7 +107,7 @@ subroutine get_activePol(ZsolQ,Fld_flag,Delta_n, Active_pol)
 !
    VTYPE, dimension(3) :: Es,Hs,Ep,Hp,ETimesHs,ETimesHp
 !
-!..modified irradiance experiment (birefringent fiber) 
+!..modified irradiance experiment (birefringent fiber)
    VTYPE, dimension(3) :: Es_mod,Hs_mod
    integer :: modified
 !

@@ -14,11 +14,11 @@
 !------------------------------------------------------------------------------
 subroutine find_nrdof(NrdofH, NrdofE, NrdofV, NrdofQ)
   !
-  use data_structure3D 
-  !      
+  use data_structure3D
+  !
   implicit none
   integer, intent(out) :: NrdofH, NrdofE, NrdofV, NrdofQ
-  ! 
+  !
   integer :: iel, ino, iprint
   integer :: mdle, nod, nrnodm, ndofH,ndofE,ndofV,ndofQ
   integer :: nodesl(27), norientl(27), nodm(MAXNODM)

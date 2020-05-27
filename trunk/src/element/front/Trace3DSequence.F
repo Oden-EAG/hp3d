@@ -34,7 +34,7 @@ c
 c----------------------------------------------------------------------
 c
       subroutine shapHb2(Type,T,Nord,Norient, NrdofH,ShapH,GradH)
-c      
+c
       use parameters , only : MAXmdlqH
 c
       implicit none
@@ -53,16 +53,16 @@ c
 c
 c
 c----------------------------------------------------------------------
-c     
+c
 c   routine name       - shapEb2
-c     
+c
 c----------------------------------------------------------------------
-c     
+c
 c   latest revision    - Nov 14
-c     
+c
 c   purpose            - 2D face trace of 3D H(curl) face functions
 c                        (these are oriented 2D H(curl) 'bubbles')
-c     
+c
 c   arguments :
 c     in:
 c       Type           - face type (quad or tria)
@@ -73,14 +73,14 @@ c     out:
 c       NrdofE         - number of shape functions
 c       ShapE          - values of shape functions
 c       CurlE          - curl of shape functions
-c     
+c
 c----------------------------------------------------------------------
-c     
+c
       subroutine shapEb2(Type,T,Nord,Norient, NrdofE,ShapE,CurlE)
-c   
+c
       use parameters , only : MAXmdlqE
 c
-      implicit none      
+      implicit none
       character(len=4), intent(in)  :: Type
       real(8), intent(in ) :: T(2)
       integer, intent(in ) :: Nord
@@ -96,17 +96,17 @@ c
 c
 c
 c----------------------------------------------------------------------
-c     
+c
 c   routine name       - shapVb2
-c     
+c
 c----------------------------------------------------------------------
-c     
+c
 c   latest revision    - Nov 14
-c     
+c
 c   purpose            - 2D face trace of 3D H(div) face functions
 c                        (these are oriented 2D L2 functions -
 c                        not 'bubbles')
-c     
+c
 c   arguments :
 c     in:
 c       Type           - face type (quad or tria)
@@ -115,15 +115,15 @@ c       Nord           - polynomial face order (H1 sense)
 c       Norient        - face orientation
 c     out:
 c       NrdofV         - number of shape functions
-c       ShapV          - values of shape functions   
-c     
+c       ShapV          - values of shape functions
+c
 c----------------------------------------------------------------------
-c     
+c
       subroutine shapVb2(Type,T,Nord,Norient, NrdofV,ShapV)
-c   
+c
       use parameters , only : MAXmdlqQ
 c
-      implicit none      
+      implicit none
       character(len=4), intent(in)  :: Type
       real(8), intent(in ) :: T(2)
       integer, intent(in ) :: Nord

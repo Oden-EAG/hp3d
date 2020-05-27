@@ -11,7 +11,7 @@ c
 c   usage              - call decode(Nick, Nick1,Nick2)
 c
 c   arguments :
-c     in:       Nick   - a nickname 
+c     in:       Nick   - a nickname
 c     out:
 c               Nick1  - the first part of the nickname
 c               Nick2  - the second part of the nickname

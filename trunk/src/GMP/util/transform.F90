@@ -4,7 +4,7 @@
 !
 !> @param[in]    Idec   = 12  transform from system 1 to system 2
 !>                        21  transform from system 2 to system 1
-!> @param[in]    Transf - transformation matrix from system 1 to 
+!> @param[in]    Transf - transformation matrix from system 1 to
 !>                        system 2, i.e. columns of the matrix are
 !>                        versors of system 2 according to system 1
 !> @param[inout] X1(X2) - components of a vector in system 1(2)

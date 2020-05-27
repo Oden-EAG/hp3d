@@ -903,7 +903,7 @@ c           parent mid-edge nodes (south,north)
                 ndofEp(ip) = 1
               else
 c           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-!            ...added by S.P Mar 07 2018              
+!            ...added by S.P Mar 07 2018
                 select case(NODES(nodp)%ref_kind)
                 case default
                   ncflag(ip)=0
@@ -1114,7 +1114,7 @@ c           parent mid-edge nodes (east,west)
                 ndofEp(ip) = 1
               else
 c           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-!            ...added by S.P Mar 07 2018       
+!            ...added by S.P Mar 07 2018
                 select case(NODES(nodp)%ref_kind)
                 case default
                   ncflag(ip)=0

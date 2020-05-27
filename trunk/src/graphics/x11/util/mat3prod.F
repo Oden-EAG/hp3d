@@ -15,7 +15,7 @@ c                        matrices 3x3
 c
 c   usage              - call mat3prod(Ma,Mb,Mc)
 c
-c   arguments   
+c   arguments
 c             in       - Ma, Mb - matrices 3x3
 c             out      - Mc - their product
 c
@@ -37,4 +37,4 @@ c
   10        continue
       return
       end
-        
+

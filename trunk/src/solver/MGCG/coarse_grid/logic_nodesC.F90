@@ -34,9 +34,9 @@
 
       integer, intent(in) :: Igrid
       dimension Nodesl(27),Nodm(MAXNODM)
-!      
+!
 !  ...element type
-      character(len=4) :: type      
+      character(len=4) :: type
 !
 !  ...local lists of nodes
       dimension list_v(16),list_e(24),list_f(12)

@@ -2,7 +2,7 @@
 #include "util.h"
 
 int hexa(int n,int i,int j,int k){
-  return (k*(n+1)+j)*(n+1)+i;  
+  return (k*(n+1)+j)*(n+1)+i;
 }
 
 int nrpt_hexa(int n){

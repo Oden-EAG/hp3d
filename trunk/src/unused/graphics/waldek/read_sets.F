@@ -8,7 +8,7 @@ c
 #include "cnelcon.blk"
 #include "csets.blk"
 c
-c  ...to read element sets 
+c  ...to read element sets
       dimension istep(10),nrelrnd(10)
 c
 
@@ -35,10 +35,10 @@ c  .....loop through rounds:
         do k=1,iround
 c
           if (istep(k).eq.0) then
-c             
+c
 c  .........all elements are read:
               read(LIN,*)(NELISET(ic-1+j),j=1,nrelrnd(k))
-c             
+c
           else
              read(LIN,*)iaux
 

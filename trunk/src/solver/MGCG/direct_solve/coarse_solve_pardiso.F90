@@ -6,9 +6,9 @@
 !
 !    latest revision    - Sept 2018
 !
-!    purpose            - routine solves the coarse system of the multigrid 
-!                         solver and saves the solution vectors in an 
-!                         auxiliary data structure 
+!    purpose            - routine solves the coarse system of the multigrid
+!                         solver and saves the solution vectors in an
+!                         auxiliary data structure
 !
 ! ----------------------------------------------------------------------
 #include "implicit_none.h"
@@ -31,7 +31,7 @@
    use macro_grid_info,  ONLY: ZSOL_C, NRDOF_COARSE
    use patch_info,       ONLY: CGRID_VERTICES, compute_patch_mdle
    use pardiso_data
-! 
+!
    implicit none
 !
 !..number of variables for each physics attribute for an element
@@ -76,7 +76,7 @@
 ! ----------------------------------------------------------------------
 !  STEP 1 : 1ST LOOP THROUGH ELEMENTS, 1ST CALL TO CELEM TO GET INFO
 ! ----------------------------------------------------------------------
-! 
+!
 !..allocate required variables for celem
    allocate(NEXTRACT(MAXDOFM))
    allocate(IDBC(MAXDOFM))
@@ -98,27 +98,27 @@
    call mg_reset_visit
 
    nrpatch = 0
-!   
-!..loop through coarse grid elements   
+!
+!..loop through coarse grid elements
    do iel=1,GRID(1)%nreles
 !
-!  ...pick up mdle node number      
+!  ...pick up mdle node number
       mdle = GRID(1)%mdlel(iel)
-!      
+!
 !  ...get information from celem
       call celem_mg(iel,-1,mdle,1, nrdofs,nrdofm,nrdofc,nodm,  &
             ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid,zvoid)
-!      
+!
 !  ...loop through active nodes
       do i=1,nrnodm
 !
 !     ...pick up the node number
          nod = nodm(i)
-!         
+!
 !     ...avoid repetition
          if (NODES_MG(nod)%visit.gt.0) cycle
 !
-!     ...check if the node is a vertex         
+!     ...check if the node is a vertex
          if (NODES(nod)%type .eq. 'vert') then
             nrpatch = nrpatch + 1
          endif
@@ -127,7 +127,7 @@
          NODES_MG(nod)%visit = 1
       enddo
 !
-!..end of loop through coarse grid elements   
+!..end of loop through coarse grid elements
    enddo
 !
 !..reset visitation flag
@@ -166,19 +166,19 @@
 !
 !     ...pick up the node number
          nod = nodm(i)
-!         
+!
 !     ...avoid repetition
          if (NODES_MG(nod)%visit.ne.0) cycle
 !
-!     ...check if the node is a vertex         
+!     ...check if the node is a vertex
          if (NODES(nod)%type .eq. 'vert') then
-            nrpatch = nrpatch + 1 
+            nrpatch = nrpatch + 1
             CGRID_VERTICES(nrpatch) = nod
             NODES_MG(nod)%visit = nrpatch
-         else   
+         else
 !        ...raise visitation flag
             NODES_MG(nod)%visit = -1
-         endif   
+         endif
       enddo
 !
 !  ...compute offsets for H1 dof
@@ -221,7 +221,7 @@
    enddo
 !
    deallocate(NEXTRACT,IDBC,ZDOFD)
-! 
+!
 !...total number of dof is nrdof
    nrdof = nrdof_H +  nrdof_E + nrdof_V
    NRDOF_CON = nrdof
@@ -361,13 +361,13 @@
 !
 !..convert to compressed column format
    call coo2csr(PRDS_IA,PRDS_JA,PRDS_A,inz, PRDS_NZ)
-!   
+!
 !----------------------------------------------------------------------
 !  STEP 4: call pardiso to solve the linear system
 !----------------------------------------------------------------------
 !
    PRDS_PHASE = 11 ! analysis, factorization, solve
-   
+
    call pardiso(PRDS_PT,PRDS_MAXFCT,PRDS_MNUM,PRDS_MTYPE,PRDS_PHASE,   &
                 PRDS_N,PRDS_A(1:PRDS_NZ),PRDS_IA(1:nrdof+1),           &
                 PRDS_JA(1:PRDS_NZ),PRDS_PERM,PRDS_NRHS,PRDS_IPARM,     &
@@ -379,7 +379,7 @@
                 PRDS_N,PRDS_A(1:PRDS_NZ),PRDS_IA(1:nrdof+1),           &
                 PRDS_JA(1:PRDS_NZ),PRDS_PERM,PRDS_NRHS,PRDS_IPARM,     &
                 PRDS_MSGLVL,PRDS_RHS,PRDS_XSOL,PRDS_ERROR)
-   
+
    PRDS_PHASE = 33 ! only solve
    PRDS_IPARM(8) = 0 ! max numbers of iterative refinement steps
 
@@ -437,11 +437,11 @@
 !----------------------------------------------------------------------
 !
 !..if multigrid is not used release memory
-   if (COARSE_SOLVER .eq. NO_CSOLVE) then 
+   if (COARSE_SOLVER .eq. NO_CSOLVE) then
       call finalize_pardiso
-   endif 
+   endif
 !
    call compute_patch_mdle(1)
-! 
+!
 !
    end subroutine coarse_solve_pardiso

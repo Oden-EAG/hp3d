@@ -11,13 +11,13 @@ subroutine compute_sol_dof(Igrid)
    use macro_grid_info,   only: ZSOL_C
 !
    implicit none
-!   
+!
 !-----------------------------------------------------------------------
 !
    integer, intent(in) :: Igrid
 !
    integer :: iel, mdle
-! 
+!
 !----------------------------------------------------------------------
 !
 !..Step 1: determine the first dof offsets for active nodes
@@ -73,7 +73,7 @@ subroutine compute_local_sol_dof(Iel,Mdle)
    integer :: nn, load, ivar, i, j, k, nod, iphys, icomp, il
    integer :: ndof, ndofH, ndofE, ndofV
    VTYPE   :: zvoid(1)
-! 
+!
 !..component counters for the nodes (used in case of multiple loads)
    integer, dimension(MAXNODM) :: mvarH,mvarE,mvarV
 !
@@ -117,7 +117,7 @@ subroutine compute_local_sol_dof(Iel,Mdle)
    ZSOL_C(Iel)%ndof_coarse = ndof
    allocate(ZSOL_C(Iel)%coarse(ndof))
    ZSOL_C(Iel)%coarse = ZERO
-!   
+!
 !..initiate dof counter
    nn=0
 !
@@ -154,8 +154,8 @@ subroutine compute_local_sol_dof(Iel,Mdle)
 !     ...loop through the nodal dof (potentially NONE)
          do j=1,ndofmH(i)/nvarH
             ivar=mvarH(i); k=0
-! 
-!        ...loop through physics variables              
+!
+!        ...loop through physics variables
             do iphys=1,nrPhysH
                il = NR_COMP(iphys)
                if (index(k+1) .eq. 0) then
@@ -218,8 +218,8 @@ subroutine compute_local_sol_dof(Iel,Mdle)
 !     ...loop through the nodal dof
          do j=1,ndofmE(i)/nvarE
             ivar=mvarE(i); k=NRHVAR
-! 
-!        ...loop through physics variables              
+!
+!        ...loop through physics variables
             do iphys=nrPhysH+1,nrPhysHE
                il = NR_COMP(iphys)
                if (index(k+1) .eq. 0) then
@@ -283,8 +283,8 @@ subroutine compute_local_sol_dof(Iel,Mdle)
 !
 !        ...loop through the components
             ivar=mvarV(i); k=nrVarHE
-! 
-!        ...loop through physics variables              
+!
+!        ...loop through physics variables
             do iphys=nrPhysHE+1,nrPhysHEV
                il = NR_COMP(iphys)
                if (index(k+1) .eq. 0) then

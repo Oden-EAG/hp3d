@@ -1,4 +1,4 @@
-      
+
 c--------------------------------------------------------------
 c  Apr 2009
 c
@@ -60,7 +60,7 @@ C
            IF (DABS(SA).LE.DABS(SB)) CS=SB/F0
            DO 20 K=0,NM
 20            SJ(K)=CS*SJ(K)
-        ENDIF      
+        ENDIF
         DJ(0)=(DCOS(X)-DSIN(X)/X)/X
         DO 25 K=1,NM
 25         DJ(K)=SJ(K-1)-(K+1.0D0)*SJ(K)/X
@@ -71,12 +71,12 @@ c
         INTEGER FUNCTION MSTA1(X,MP)
 C
 C       ===================================================
-C       Purpose: Determine the starting point for backward  
-C                recurrence such that the magnitude of    
+C       Purpose: Determine the starting point for backward
+C                recurrence such that the magnitude of
 C                Jn(x) at that point is about 10^(-MP)
 C       Input :  x     --- Argument of Jn(x)
 C                MP    --- Value of magnitude
-C       Output:  MSTA1 --- Starting point   
+C       Output:  MSTA1 --- Starting point
 C       ===================================================
 C
         IMPLICIT DOUBLE PRECISION (A-H,O-Z)
@@ -85,8 +85,8 @@ C
         F0=ENVJ(N0,A0)-MP
         N1=N0+5
         F1=ENVJ(N1,A0)-MP
-        DO 10 IT=1,20             
-           NN=N1-(N1-N0)/(1.0D0-F0/F1)                  
+        DO 10 IT=1,20
+           NN=N1-(N1-N0)/(1.0D0-F0/F1)
            F=ENVJ(NN,A0)-MP
            IF(ABS(NN-N1).LT.1) GO TO 20
            N0=N1
@@ -173,7 +173,7 @@ C
         DO 15 K=2,N
            F=(2.0D0*K-1.0D0)*F1/X-F0
            SY(K)=F
-           IF (DABS(F).GE.1.0D+300) GO TO 20              
+           IF (DABS(F).GE.1.0D+300) GO TO 20
            F0=F1
 15         F1=F
 20      NM=K-1
@@ -184,14 +184,14 @@ C
         END
 
 
-      
+
 C$$$      subroutine spherical_bessel(Kind, N, Z, ZS, ZD)
 C$$$#include "syscom.blk"
 C$$$      dimension ZS(0:N+1), ZD(0:N+1)
 C$$$c
 C$$$      iprint = 0
 C$$$      if (N.eq.0) return
-C$$$c      
+C$$$c
 C$$$      select case (Kind)
 C$$$      case (1)
 C$$$        ZS(0) = ( sin(Z)/Z )

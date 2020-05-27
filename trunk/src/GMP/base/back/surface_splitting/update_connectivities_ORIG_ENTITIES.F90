@@ -2,8 +2,8 @@
 subroutine update_connectivities_ORIG_ENTITIES
 !---------------------------------------------------------------------------------
 ! LATEST REVISION: Jul 09
-!      
-! PURPOSE: routine updates connectivities to points for the 
+!
+! PURPOSE: routine updates connectivities to points for the
 !          original mesh entities
 !---------------------------------------------------------------------------------
   use SPLIT_SURF
@@ -17,7 +17,7 @@ subroutine update_connectivities_ORIG_ENTITIES
 !
 #if I_PRINT >= 1
     write(*,*)'update_connectivities_ORIG_ENTITIES: updating connectivities...'
-#endif  
+#endif
 !---------------------------------------------------------------------------------
 !  STEP 1: update CURVES --> POINTS connectivities
 !
@@ -29,27 +29,27 @@ subroutine update_connectivities_ORIG_ENTITIES
 ! ......a twin point exists
         if (new_point(np) .gt. 0) then
           ion = ion + 1
-! ......point on NEG side of split surface          
+! ......point on NEG side of split surface
         elseif (new_point(np) .eq. -1) then
           ileft = ileft + 1
-! ......point on POS side of split surface          
+! ......point on POS side of split surface
         elseif (new_point(np) .eq. -2) then
           iright = iright + 1
         endif
       enddo
       if ((ion .eq. 1) .and. (iright .eq. 1)) then
-! ......loop over curve endpoints              
+! ......loop over curve endpoints
         do iv = 1, 2
           np = CURVES(nc)%EndPoNo(iv)
-! ........if endpoint has a twin point          
+! ........if endpoint has a twin point
           if (new_point(np) .gt. 0)  CURVES(nc)%EndPoNo(iv) = new_point(np)
         enddo
       endif
-! ..end of loop through curves        
+! ..end of loop through curves
     enddo
 #if I_PRINT >= 2
     write(*,*)'update_connectivities: CURVES connectivities updated.'
-#endif    
+#endif
 !
 !---------------------------------------------------------------------------------
 !  STEP 2: update TRIANGLES --> POINTS connectivities
@@ -57,20 +57,20 @@ subroutine update_connectivities_ORIG_ENTITIES
 ! ..loop through original triangles
     do nt = 1, nrtrian_orig
       ileft = 0;  iright = 0;  ion = 0
-! ....loop through vertices        
+! ....loop through vertices
       do iv = 1, 3
         np = TRIANGLES(nt)%VertNo(iv)
-! ......vertex was duplicated (INT)     
+! ......vertex was duplicated (INT)
         if ((new_point(np) .gt. 0) .and. (new_point(np) .ne. np)) then
           ion = ion + 1
-! ......vertex on NEG_SIDE of split surface            
+! ......vertex on NEG_SIDE of split surface
         elseif (new_point(np) .eq. -1) then
           ileft = ileft + 1
-! ......vertex on POS_SIDE of split surface            
+! ......vertex on POS_SIDE of split surface
         elseif (new_point(np) .eq. -2) then
           iright = iright + 1
         endif
-! ....end loop through vertices          
+! ....end loop through vertices
       enddo
       if ((ion .gt. 0) .and. (iright .gt. 0) .and. (ileft .eq. 0)) then
         do iv = 1, 3
@@ -88,7 +88,7 @@ subroutine update_connectivities_ORIG_ENTITIES
         call print_GMP
         stop
       endif
-! ..end of loop through original triangles        
+! ..end of loop through original triangles
     enddo
 !
 ! ..loop through rectangles
@@ -124,9 +124,9 @@ subroutine update_connectivities_ORIG_ENTITIES
 !
 !  ...loop through prisms
       do npri=1,nrprism_orig
-#if I_PRINT >= 2      
+#if I_PRINT >= 2
           write(*,*) 'split_surface: RECONNECTING PRISM ',npri
-#endif          
+#endif
         ileft=0; iright=0; ion=0
         do iv=1,6
           np = PRISMS(npri)%VertNo(iv)

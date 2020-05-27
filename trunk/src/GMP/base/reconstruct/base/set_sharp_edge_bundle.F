@@ -8,12 +8,12 @@ c   latest revision    - Sep 07
 c
 c   purpose            - routine sets tangent and normal dircetions
 c                        for curves connected to a point on a sharp
-c                        edge 
+c                        edge
 c
-c   arguments    
+c   arguments
 c     in:
 c      Np              - a point
-c      Nrcurves        - number of curves on the list 
+c      Nrcurves        - number of curves on the list
 c      Newlist_curves  - list of the curves connected to the point
 c                        organized in the couterclockwise fashion;
 c                        for i-th curve on the list:
@@ -25,7 +25,7 @@ c                        surface normal,
 c                         = 0 if the orientations are consistent
 c                         = 1 if the orientations are opposite
 c      Ifirst, Isecond = the edge curve numbers
-c      Rn1,Rn2         - normals for the two surfaces 
+c      Rn1,Rn2         - normals for the two surfaces
 c     out:
 c                        unit tangent vectors for the curves and
 c                        normal components of the second derivatives
@@ -46,13 +46,13 @@ c
      .          List_recta(3,Nrcurves)
       dimension Rn1(3),Rn2(3)
 c
-c  ...edge vector, dual basis to Rn1, Rn2 in the plane orthogonal 
+c  ...edge vector, dual basis to Rn1, Rn2 in the plane orthogonal
 c     to edge vector
       dimension evect(3),dual1(3),dual2(3)
-c 
+c
 c  ...work space
       dimension temp(3),list(10),Rn1_save(3),Rn2_save(3)
-c 
+c
 c  ...second derivatives of the implicit reconstruction of surfaces
       dimension acoeff1(3,3),acoeff2(3,3)
 c
@@ -141,8 +141,8 @@ c
 c
       do ic = 1,Nrcurves
         nc = Newlist_curves(ic)
-c        
-c       1  s  t    S  U  B  P  A  T  C  H        
+c
+c       1  s  t    S  U  B  P  A  T  C  H
         if ((ic.eq.Ifirst).or.(ic.eq.Isecond)) then
           s1 = 0.d0; s2 = 0.d0
           do i = 1,3
@@ -166,7 +166,7 @@ c  .......store the normals premultiplied with the curvatures
      . FOR CURVE ',i5,2x,3e12.5)
           endif
 c
-c       2  n  d    S  U  B  P  A  T  C  H        
+c       2  n  d    S  U  B  P  A  T  C  H
         else
 c  .......copy the unit vector
           call locate(Np,CURVES(nc)%EndPoNo(1:2),2, i)

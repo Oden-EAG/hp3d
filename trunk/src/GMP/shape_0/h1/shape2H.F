@@ -17,18 +17,18 @@ c     out:
 c        Nrdof         - number of dof
 c        ShapH         - values of shape functions
 c        DshapH        - values of derivatives of the shape functions
-c                        wrt to master element coordinates      
+c                        wrt to master element coordinates
 c
-c   required  routines - 
+c   required  routines -
 c
 c----------------------------------------------------------------------
 c
       subroutine shapeHt_0(Xi,Norder,Nedge_orient, Nrdof,ShapH,DshapH)
-c      
+c
       use parameters
       use element_data
 #include "syscom.blk"
-c      
+c
       dimension Xi(2),Norder(4),Nedge_orient(3),
      .          ShapH(MAXtriaH),DshapH(2,MAXtriaH)
 c
@@ -68,7 +68,7 @@ c  .....project Xi onto the edge
         call proj_t2e(iv1,iv2,ShapH,DshapH, t,dtdxi)
 c
 c  .....evaluate edge kernel shape functions
-        call shapHke(t,Norder(ie),Nedge_orient(ie), 
+        call shapHke(t,Norder(ie),Nedge_orient(ie),
      .               nrdofHe,shapHek,dshapHek)
 c
 c  .....evaluate edge shape functions
@@ -112,18 +112,18 @@ c     out:
 c        Nrdof         - number of dof
 c        ShapH         - values of shape functions
 c        DshapH        - values of derivatives of the shape functions
-c                        wrt to master element coordinates      
+c                        wrt to master element coordinates
 c
-c   required  routines - 
+c   required  routines -
 c
 c----------------------------------------------------------------------
 c
       subroutine shapeHq_0(Xi,Norder,Nedge_orient, Nrdof,ShapH,DshapH)
-c      
+c
       use parameters
       use element_data
 #include "syscom.blk"
-c      
+c
       dimension Xi(2),Norder(5),Nedge_orient(4),
      .          ShapH(MAXquadH),DshapH(2,MAXquadH)
 c
@@ -137,7 +137,7 @@ c     ijv(ixi,iv) = number of 1D linear shape function in Xi(ixi)
 c
 c  ...defines edge shape functions; for edge ie
 c     ixiedg(ie) = edge coordinate
-c     iblend(ie) = blending direction 
+c     iblend(ie) = blending direction
 c     nblend(ie) = number of blending linear shape function
       dimension ixiedg(4),iblend(4),nblend(4)
 c
@@ -171,7 +171,7 @@ c
 c  ...calculate edge shape functions
       do ie=1,4
         ixi = ixiedg(ie); ibl = iblend(ie); nv = nblend(ie)
-        call shapHbe(Xi(ixi),Norder(ie),Nedge_orient(ie), 
+        call shapHbe(Xi(ixi),Norder(ie),Nedge_orient(ie),
      .               nrdofHe,shapH1,dshapH1)
         do j=1,nrdofHe
           k=k+1

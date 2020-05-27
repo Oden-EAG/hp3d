@@ -7,7 +7,7 @@ subroutine display_act_elem
 !
       write(*,*)''
       write(*,*)'Active elements:'
-!      
+!
       mdle=0
       do iel=1,NRELES
         call nelcon(mdle, mdle)

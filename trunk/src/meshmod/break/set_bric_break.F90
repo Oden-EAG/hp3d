@@ -14,7 +14,7 @@ subroutine set_bric_break(Kref,Nord, Nrsons,Type,Norder)
   nordyz = nordy*10 + nordz
 !
   Norder = 0; Type(1:27) = 'none'
-!  
+!
   select case (Kref)
   case (001,010,100)
      Nrsons = 3
@@ -30,7 +30,7 @@ subroutine set_bric_break(Kref,Nord, Nrsons,Type,Norder)
      end select
   case (011,101,110)
      Nrsons      = 9
-     Type(1:4)  = 'mdlb' 
+     Type(1:4)  = 'mdlb'
      Type(5:8)  = 'mdlq'
      Type(9)    = 'medg'
      select case (Kref)

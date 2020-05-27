@@ -10,7 +10,7 @@ subroutine face_bubble_prism(Eta,Ifig,Nr,Orie, Phi,dPhi_dEta)
   integer,                  intent(in)  :: Orie
   real*8, dimension(3,1), intent(out) :: Phi
   real*8, dimension(3,3), intent(out) :: dPhi_dEta
-!--------------------------------------------------------------------------------------------  
+!--------------------------------------------------------------------------------------------
 ! LOCAL VARIABLES
   real*8                              :: blend
   real*8, dimension(1,3)              :: dblend

@@ -13,8 +13,8 @@ c
       use control
       use GMP
       use element_data
-c      
-#include "syscom.blk"     
+c
+#include "syscom.blk"
 #include "cinout.blk"
 c
       integer, dimension(:),   pointer :: vpoint_to_spoint
@@ -24,24 +24,24 @@ c
 c  ...work space
       dimension rdata(6)
 c
-c  ...maximum anticipated number of tets attached to a point      
+c  ...maximum anticipated number of tets attached to a point
       parameter (mphex = 20)
 c
-c  ...work space      
+c  ...work space
       integer list(2,20)
 c     for i-th block on the list
 c       list(1,i) = block connected to an edge
 c       list(2,i) = the corresponding edge number
 c     or
 c       list(1,i) = block connected to a face
-c       list(2,i) = the corresponding face number 
+c       list(2,i) = the corresponding face number
 c
       character*10 type
 c
 c----------------------------------------------------------------------
 c
       iprint=0
-c      
+c
       write(*,*)'entered input_trianG1...'
 c
 c  ...set up the dimension of the problem
@@ -54,19 +54,19 @@ c----------------------------------------------------------------------
 c
 c  Step 1: Input points
 c
-c======================================================================      
+c======================================================================
 c  REMARK: the numbering of the points is dictated by the order of    |
 c          the SURFACE points, ie surface points are read first, then |
 c          volume points are read and, if volume point is not on the  |
 c          surface, a new point is created.                           |
-c======================================================================      
+c======================================================================
 c
 c  ...read the number of points on the surface and in the
 c     TOTAL (!) number of points, hence including surface points
       read(KIN,*) nrsp, NRPOINT
 c
 c  ...allocate the memory dynamically
-      allocate(POINTS(NRPOINT), STAT=is) 
+      allocate(POINTS(NRPOINT), STAT=is)
       if (is.ne.0) then
         write(*,*) 'input_trianG1: POINTS ARE NOT ALLOCATED'
         stop
@@ -82,7 +82,7 @@ c  ...read in the surface points
         POINTS(np)%Type  = 'CoorNrm'
         POINTS(np)%NrCurv = 0
         allocate(POINTS(np)%Rdata(6), STAT=is)
-        if (is.ne.0) then 
+        if (is.ne.0) then
           write(*,*) 'input_trianG1: Rdata IS  NOT ALLOCATED',
      .               'POINT NUMBER = ', np
           stop
@@ -90,10 +90,10 @@ c  ...read in the surface points
         read(KIN,*) POINTS(np)%Rdata(1:6)
 c  .....renormalize the normal
         call normalize(POINTS(np)%Rdata(4:6))
-      enddo   
+      enddo
 c
 c  ...allocate volume points to surface points connectivities
-      allocate(vpoint_to_spoint(NRPOINT), STAT=is) 
+      allocate(vpoint_to_spoint(NRPOINT), STAT=is)
       if (is.ne.0) then
         write(*,*) 'input_trianG1: vpoint_to_spoint ALLOCATION ',
      .             ' FAILED'
@@ -108,7 +108,7 @@ c
 c**********************************************************************
 c  ...read in the volume points
       np=nrsp
-c  ...loop through volume points      
+c  ...loop through volume points
       do ip=1,NRPOINT
         read(KIN,*) rdata(1:3)
 c  .....search for a corresponding point on the surface
@@ -126,7 +126,7 @@ c  .........save the connectivity
 c  .....end of loop through surface points
         enddo
 c
-c  .....if no surface point has been found, ie point is INSIDE 
+c  .....if no surface point has been found, ie point is INSIDE
 c       the surface
         if (vpoint_to_spoint(ip).eq.0) then
 c  .......generate a new regular point
@@ -140,7 +140,7 @@ c  .......generate a new regular point
           POINTS(np)%Type  = 'Regular'
           POINTS(np)%NrCurv = 0
           allocate(POINTS(np)%Rdata(3), STAT=is)
-          if (is.ne.0) then 
+          if (is.ne.0) then
             write(*,*) 'input_trianG1: Rdata IS  NOT ALLOCATED',
      .                 'POINT NUMBER = ', np
             stop
@@ -176,7 +176,7 @@ c  ...set up the dimension of the manifold
       endif
 c
 c  ...allocate dynamically the memory for the tets
-      allocate(TETRAS(NRTETRA), STAT=is ) 
+      allocate(TETRAS(NRTETRA), STAT=is )
       if (is.ne.0) then
         write(*,*) 'input_trianG1: TETS ARE NOT ALLOCATED'
         stop
@@ -185,10 +185,10 @@ c
       if (iprint.eq.1) then
         write(*,*) 'input_trianG1: READING TETS...'
       endif
-c 
-c  ...loop over tets      
+c
+c  ...loop over tets
       do ih=1,NRTETRA
-c  .....set tet's type equal to transfinite interpolation      
+c  .....set tet's type equal to transfinite interpolation
         TETRAS(ih)%Type = 'TraTet'
         read(KIN,*) TETRAS(ih)%VertNo(1:4)
 c  .....change the enumeration if needed
@@ -200,10 +200,10 @@ c  .....change the enumeration if needed
           write(*,7636) ih, TETRAS(ih)%VertNo(1:4)
  7636     format('HEXA = ',i6,' VERTICES = ',8i7)
         endif
-c  ...end of loop through tets        
+c  ...end of loop through tets
       enddo
 c
-c  ...printing statement      
+c  ...printing statement
       if (iprint.ge.1) then
         write(*,*) 'input_trianG1: HAVE READ TETS'
         call pause
@@ -213,14 +213,14 @@ c----------------------------------------------------------------------
 c
 c  Step 3: Determine point to tets connectivities
 c
-c  ...allocate work spaces      
-      allocate(point_to_blocks(1:mphex,1:NRPOINT), STAT=is ) 
+c  ...allocate work spaces
+      allocate(point_to_blocks(1:mphex,1:NRPOINT), STAT=is )
       allocate(point_nrbl(1:NRPOINT), STAT=is)
       point_nrbl(1:NRPOINT) = 0
 c
 c  ...loop through tets
-      do nh=1,NRTETRA    
-c  .....compute nickname for tet      
+      do nh=1,NRTETRA
+c  .....compute nickname for tet
         nick = nh*10+3
 c  .....loop through tet vertex points
         do jv=1,4
@@ -228,24 +228,24 @@ c  .....loop through tet vertex points
           nrbl = point_nrbl(np)
 c  .......check if the tet is on the list of blocks connected to the point
           call locate(nick,point_to_blocks(1:nrbl,np),nrbl, ii)
-c  .......if tet was not found          
+c  .......if tet was not found
           if (ii.eq.0) then
-c  .........update number of connected tets                  
+c  .........update number of connected tets
             nrbl = nrbl+1
             if (nrbl.gt.mphex) then
               write(*,*) 'input_trianG1: INCREASE mphex = ',mphex
               stop
             endif
-c  .........store tet's nickname            
+c  .........store tet's nickname
             point_to_blocks(nrbl,np) = nick
-            point_nrbl(np) = nrbl 
+            point_nrbl(np) = nrbl
           endif
 c  .....end loop through vertices
         enddo
 c  ...end of loop through tets
       enddo
 
-c  ...printing statements      
+c  ...printing statements
       if (iprint.eq.1) then
         do np=1,NRPOINT
           write(*,7005) np, (point_to_blocks(ii,np),ii=1,point_nrbl(np))
@@ -264,15 +264,15 @@ c  Step 4a: Count curves and determine temporary connectivities
 c
       NRCURVE=0
 c
-c  ...initialize edge number to 0      
+c  ...initialize edge number to 0
       do nh=1,NRTETRA
         TETRAS(nh)%EdgeNo(1:6) = 0
       enddo
 c
 c
 c
-c PG, Feb 10: NEEDS TO BE FINISHED!!!!       
-c     LOOP over tets 
+c PG, Feb 10: NEEDS TO BE FINISHED!!!!
+c     LOOP over tets
 c     | LOOP over edges
 c     | | IF 1st visit to edge
 c     | | | get 1st and 2nd endpoint
@@ -298,11 +298,11 @@ c
 cc
 c
 c  ...loop through tets
-      do nh=1,NRTETRA  
-c  .....compute nickname for tet      
+      do nh=1,NRTETRA
+c  .....compute nickname for tet
         nick = nh*10+3
 c  .....loop through the tet edge curves
-        do je=1,6  
+        do je=1,6
 c  .......if the edge has not been connected yet
           if (TETRAS(nh)%EdgeNo(je).eq.0) then
 c  .........initiate the list of blocks connected to the edge
@@ -320,7 +320,7 @@ c  .........loop through the tets connected to 1st endpoint
             do k=1,nrbl
               nick1 = point_to_blocks(k,np1)
               call decode(nick1, nh1,lab)
-c  ...........select block type              
+c  ...........select block type
               select case(lab)
 c  .............tetrahedron
                 case(3)
@@ -344,7 +344,7 @@ c  ...............end of loop through the edge sharing the vertex
 c  ...............if the curve has already been counted
                   if (nc.ne.0) then
 c  .................store the connection for the original hexa
-                    TETRAS(nh)%EdgeNo(je) = nc  
+                    TETRAS(nh)%EdgeNo(je) = nc
                     go to 20
                   else
 c  .................add the block to the list of blocks
@@ -357,7 +357,7 @@ c  .................proceed to the next connected block
                 case default
                   write(*,*) 'input_trianG1: WRONG lab = ',lab
                   stop
-c  ...........end select block type                  
+c  ...........end select block type
               end select
 c
  10           continue
@@ -385,7 +385,7 @@ c  .........connect all blocks from the list to the curve
             do ibl=1,nrbl
               call decode(list(1,ibl), nn,lab)
               select case(lab)
-c  ...........tetrahedron              
+c  ...........tetrahedron
               case(3)
                 ie = list(2,ibl)
                 TETRAS(nn)%EdgeNo(ie) = nc
@@ -403,7 +403,7 @@ c  ...end of loop through tets
       enddo
 c
 c  ...define curves..................
-      allocate(CURVES(NRCURVE), STAT=is) 
+      allocate(CURVES(NRCURVE), STAT=is)
       if (is.ne.0) then
         write(*,*) 'input_trianG1: CURVES ARE NOT ALLOCATED'
         stop
@@ -413,10 +413,10 @@ c  ...define curves..................
       enddo
 c
 c  ...loop through tets
-      do nh=1,NRTETRA  
+      do nh=1,NRTETRA
 c
 c  .....loop through the tet's edge curves
-        do je=1,6  
+        do je=1,6
 c
 c  .......get the connected curve
           nc = TETRAS(nh)%EdgeNo(je)
@@ -467,15 +467,15 @@ c          connectivities
 c
       NRTRIAN=0
 c
-c  ...initialize fig number to 0      
+c  ...initialize fig number to 0
       do nh=1,NRTETRA
         TETRAS(nh)%FigNo(1:6) = 0
       enddo
 c
 c  ...loop through tetra
-      do nh=1,NRTETRA  
+      do nh=1,NRTETRA
 c
-c  .....store nickname for tet      
+c  .....store nickname for tet
         nick = nh*10+3
 c
 c  .....loop through the tet faces
@@ -500,12 +500,12 @@ c  .........determine number of tets connected to the first vertex
             nrbl = point_nrbl(np1)
 c  .........loop over tets connected to the first vertex
             do k=1,nrbl
-c  ...........determine tet's nickname            
+c  ...........determine tet's nickname
               nick1 = point_to_blocks(k,np1)
-c  ...........determine tet's number              
+c  ...........determine tet's number
               call decode(nick1, nh1,lab)
-c              
-c  ...........select element type              
+c
+c  ...........select element type
               select case(lab)
 c
 c  ...........tetrahedron
@@ -514,9 +514,9 @@ c  .............determine local number of vertex, when visited
 c               from tet nh1
                 call locate(np1,TETRAS(nh1)%VertNo(1:4),4, iv1)
 c
-c  .............loop through the faces sharing the point 
+c  .............loop through the faces sharing the point
                 do l=1,3
-c  ...............determine local number of face                
+c  ...............determine local number of face
                   if = TETRA_VERT_TO_FACE(l,iv1)
 c
 c  ...............look for two other common points
@@ -564,7 +564,7 @@ c  .........no block connected to the face has been found, the
 c           face rectangle has to be created
             NRTRIAN = NRTRIAN + 1
             nr = NRTRIAN
-c  .........printing statement            
+c  .........printing statement
             if (iprint.eq.5) then
               write(*,7008) nr,nh,jf
  7008         format('input_trianG1: HAVE DEFINED RECTA ',i4,
@@ -579,9 +579,9 @@ c  .........connect all blocks from the list to the rectangle
             nrbl = ibl
             do ibl=1,nrbl
               call decode(list(1,ibl), nn,lab)
-c  ...........select block type              
+c  ...........select block type
               select case(lab)
-c  ...........tetrahedron              
+c  ...........tetrahedron
               case(3)
                 if = list(2,ibl)
                 TETRAS(nn)%FigNo(if) = nr
@@ -600,7 +600,7 @@ c  ...end of loop through hexas
 c
 c
 c  ...define the rectangles......................
-      allocate( TRIANGLES(NRTRIAN), STAT=is ) 
+      allocate( TRIANGLES(NRTRIAN), STAT=is )
       if (is.ne.0) then
         write(*,*) 'input_trianG1: TRIANGLES ARE NOT ALLOCATED'
         stop
@@ -610,10 +610,10 @@ c  ...define the rectangles......................
       enddo
 c
 c  ...loop through tets
-      do nh=1,NRTETRA  
+      do nh=1,NRTETRA
 c
 c  .....loop through the tet's faces
-        do jf=1,4  
+        do jf=1,4
           nr = TETRAS(nh)%FigNo(jf)
 c
 c  .......if visited for the first time
@@ -650,9 +650,9 @@ c  ...erase the temporary block to face rectangles connectivities
         call pause
       endif
 c
-c      
+c
 c----------------------------------------------------------------------
-c      
+c
 c  Step 6: set up the domain number
 c
       NRDOMAIN = 0
@@ -663,7 +663,7 @@ c
 c
 c
 c----------------------------------------------------------------------
-c      
+c
 c  Step 7: complete connectivities
 c
       deallocate(point_to_blocks,point_nrbl, STAT=is)
@@ -687,18 +687,18 @@ c
 c  ...loop over curves
       do nc = 1,NRCURVE
         iflag = 1
-c  .....loop over curve's endpoints        
+c  .....loop over curve's endpoints
         do iv = 1,2
           nv = CURVES(nc)%EndPoNo(iv)
-c  .......lower flag if endpoint is not on surface          
+c  .......lower flag if endpoint is not on surface
           if (POINTS(nv)%Type.ne.'CoorNrm') iflag = 0
-c  .....end loop over endpoints          
+c  .....end loop over endpoints
         enddo
-c  .....update curve's type if needed        
+c  .....update curve's type if needed
         if (iflag.eq.1) CURVES(nc)%Type='cBezier'
-c  ...end loop over curves        
+c  ...end loop over curves
       enddo
-c      
+c
 c----------------------------------------------------------------------
 c
 c  Step 9: update triangle type for triangles on the surface
@@ -706,12 +706,12 @@ c
 c  ...loop over triangles
       do nt = 1,NRTRIAN
         iflag = 0
-c  .....loop over triangle's edge  
+c  .....loop over triangle's edge
         do ie = 1,3
           nc = abs(TRIANGLES(nt)%EdgeNo(ie))
           if (CURVES(nc)%Type.eq.'cBezier') iflag = iflag + 1
         enddo
-c  .....update triangle's type if needed        
+c  .....update triangle's type if needed
         if (iflag.ge.1) TRIANGLES(nt)%Type = 'TransTri'
         if (iflag.eq.3) TRIANGLES(nt)%Type = 'G1RecTri'
 c  ...end loop over triangles
@@ -723,20 +723,20 @@ c  ...end loop over triangles
 ccc  ...loop over triangles
 cc      do nt = 1,NRTRIAN
 cc        iflag = 1
-ccc  .....loop over triangle's vertices     
+ccc  .....loop over triangle's vertices
 cc        do iv = 1,3
 cc          nv = TRIANGLES(nt)%VertNo(iv)
-ccc  .......lower flag if endpoint is not on surface          
+ccc  .......lower flag if endpoint is not on surface
 cc          if (POINTS(nv)%Type.ne.'CoorNrm') iflag = 0
-ccc  .....end loop over vertices          
+ccc  .....end loop over vertices
 cc        enddo
-ccc  .....update triangle's type if needed        
+ccc  .....update triangle's type if needed
 cc        if (iflag.eq.1) TRIANGLES(nt)%Type='G1RecTri'
 ccc  ...end loop over triangles
 cc      enddo
-       
+
 c----------------------------------------------------------------------
-c      
+c
 c  Step 9: reconstruct the geometry
 c
       if (iprint.ge.1) then
@@ -749,5 +749,5 @@ ccc        write(*,*) 'input_trianG1: FINISHED RECONSTRUCTION'
 c
 c
       write(*,*)'exited input_trianG1...'
-c      
+c
       end

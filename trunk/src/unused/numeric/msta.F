@@ -1,12 +1,12 @@
         INTEGER FUNCTION MSTA1(X,MP)
 C
 C       ===================================================
-C       Purpose: Determine the starting point for backward  
-C                recurrence such that the magnitude of    
+C       Purpose: Determine the starting point for backward
+C                recurrence such that the magnitude of
 C                Jn(x) at that point is about 10^(-MP)
 C       Input :  x     --- Argument of Jn(x)
 C                MP    --- Value of magnitude
-C       Output:  MSTA1 --- Starting point   
+C       Output:  MSTA1 --- Starting point
 C       ===================================================
 C
         IMPLICIT DOUBLE PRECISION (A-H,O-Z)
@@ -15,8 +15,8 @@ C
         F0=ENVJ(N0,A0)-MP
         N1=N0+5
         F1=ENVJ(N1,A0)-MP
-        DO 10 IT=1,20             
-           NN=N1-(N1-N0)/(1.0D0-F0/F1)                  
+        DO 10 IT=1,20
+           NN=N1-(N1-N0)/(1.0D0-F0/F1)
            F=ENVJ(NN,A0)-MP
            IF(ABS(NN-N1).LT.1) GO TO 20
            N0=N1

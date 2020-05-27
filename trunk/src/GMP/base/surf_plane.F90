@@ -11,7 +11,7 @@
 !------------------------------------------------------------------------------------
 !
 subroutine plane1(X,X0,Rn, Fval,Dfdx)
-!      
+!
       implicit none
       real(8), dimension(3), intent(in )   :: X,X0
       real(8), dimension(3), intent(inout) :: Rn
@@ -34,7 +34,7 @@ subroutine plane1(X,X0,Rn, Fval,Dfdx)
  20   continue
 !
 !  ...caculate coefficients of the plane
-      d = -( X0(1)*Rn(1) + X0(2)*Rn(2) + X0(3)*Rn(3) ) 
+      d = -( X0(1)*Rn(1) + X0(2)*Rn(2) + X0(3)*Rn(3) )
 !
       Fval =  X(1)*Rn(1) + X(2)*Rn(2) + X(3)*Rn(3) + d
 !
@@ -58,7 +58,7 @@ end subroutine plane1
 !------------------------------------------------------------------------------------
 !
 subroutine plane2(X,X1,X2,X3, Fval,Dfdx)
-!      
+!
       implicit none
       real(8), dimension(3), intent(in ) :: X,X1,X2,X3
       real(8)              , intent(out) :: Fval
@@ -84,7 +84,7 @@ subroutine plane2(X,X1,X2,X3, Fval,Dfdx)
       s = sqrt(rn(1)**2+rn(2)**2+rn(3)**2)
       rn(1:3) = rn(1:3)/s
 !
-      d = -( X1(1)*rn(1) + X1(2)*rn(2) + X1(3)*rn(3) ) 
+      d = -( X1(1)*rn(1) + X1(2)*rn(2) + X1(3)*rn(3) )
       Fval =  X(1)*rn(1) + X(2)*rn(2) + X(3)*rn(3) + d
 !
       Dfdx(1) = rn(1)
@@ -97,7 +97,7 @@ end subroutine plane2
 !
 !
 !------------------------------------------------------------------------------------
-!> Purpose : routine determines a unit vector orthogonal to a plane that passes 
+!> Purpose : routine determines a unit vector orthogonal to a plane that passes
 !!           through a point X and is at a minimum distance from points Y1,2,3
 !!
 !! @param[in ] X,Y  - coordinates of points

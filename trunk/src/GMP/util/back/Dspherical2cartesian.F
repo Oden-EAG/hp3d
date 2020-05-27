@@ -17,11 +17,11 @@
       double precision, dimension(3), intent(out) :: r
       double precision, dimension(3,3), intent(out) :: Dr
 !*****************************************************************************
-      !	  	  
+      !
       r(1) = rho*sin(phi)*cos(theta)
       r(2) = rho*sin(phi)*sin(theta)
       r(3) = rho*cos(phi)
-      !	  
+      !
       Dr(1,1) = sin(phi)*cos(theta)
       Dr(1,2) = -rho*sin(phi)*sin(theta)
       Dr(1,3) = rho*cos(phi)*cos(theta)
@@ -34,9 +34,9 @@
       !
       END SUBROUTINE Dspherical2cartesian
 
-	 
-	 
-	 
-	 
-	 
-	 
+
+
+
+
+
+

@@ -11,11 +11,11 @@
 !----------------------------------------------------------------------
 !
    module macro_grid_info
-!    
-   use derived_types  
+!
+   use derived_types
 !
    integer  :: NRELES_COARSE
-   integer  :: NRDOF_COARSE  
+   integer  :: NRDOF_COARSE
    integer, allocatable :: NRDOF_MACRO(:)
 !
    type (sol_struct),allocatable :: ZSOL_C(:)

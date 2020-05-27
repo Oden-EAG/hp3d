@@ -141,7 +141,7 @@ subroutine ref_core()
    nr_elem_ref = 0
    do iel=1,NRELES
       mdle = ELEM_ORDER(iel)
-!  ...check if mdle is in the fiber core 
+!  ...check if mdle is in the fiber core
       call find_domain(mdle, ndom)
       select case(ndom)
          case(1,2)

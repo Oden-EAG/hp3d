@@ -14,14 +14,14 @@ subroutine soldis_select_system
       use graphmod         , only : ISELECT
 !
       integer :: iattr,icomp,ireal,iload
-!      
+!
 !-------------------------------------------------------------------------------------
-!      
+!
 !     print attributes info
       write(*,*)'========================================='
       write(*,*)'     ATTRIBUTE | DISC. SPACE | COMPONENTS'
       do iattr=1,NR_PHYSA
-!      
+!
         write(*,1000) iattr, PHYSA(iattr), DTYPE(iattr), NR_COMP(iattr)
  1000   format(i2,' - ',a6,7x,a6,8x,i10)
 !
@@ -74,7 +74,7 @@ end subroutine soldis_select_system
 !> @param[in]  Xi     - master element coordinates
 !> @param[in]  X      - coordinates of a point
 !> @param[in]  Rn     - outward normal unit vector
-!> @param[in]  ZsolH  - value of H1      solution 
+!> @param[in]  ZsolH  - value of H1      solution
 !> @param[in]  ZgradH - grad  of H1      solution
 !> @param[in]  ZsolE  - value of H(curl) solution
 !> @param[in]  ZcurlE - curl  of H(curl) solution
@@ -127,7 +127,7 @@ subroutine soldis_system(Mdle,Xi,X,Rn,SolH,GradH,SolE,CurlE,SolV,DivV,SolQ, Val)
 !-------------------------------------------------------------------------------------
 !
 !
-!!!!     compute exact solution      
+!!!!     compute exact solution
 !!!      ivoid=0
 !!!      call exact(X,ivoid, valH,dvalH,d2valH,valE,dvalE,d2valE, &
 !!!                          valV,dvalV,d2valV,valQ,dvalQ,d2valQ )
@@ -139,28 +139,28 @@ subroutine soldis_system(Mdle,Xi,X,Rn,SolH,GradH,SolE,CurlE,SolV,DivV,SolQ, Val)
 !
 !     address of 1st component for the attribute
       ibeg=ADRES(iattr)
-!      
+!
 !     discretization type
       select case(DTYPE(iattr))
-!      
-!     -- H1 --     
+!
+!     -- H1 --
       case('contin')
-!              
+!
         isol = (iload-1)*NRHVAR + ibeg + icomp
-!        
+!
         if (ireal == 1) then ; Val = dreal_part(SolH(isol))
         else                 ; Val = dimag_part(SolH(isol))
         endif
-! 
+!
 !     -- H(curl) --
       case('tangen')
 !
         isol = (iload-1)*NREVAR + ibeg + icomp
 !
-        if (ireal == 1) then ; aux(1) = dreal_part(SolE(1,isol)) 
+        if (ireal == 1) then ; aux(1) = dreal_part(SolE(1,isol))
                                aux(2) = dreal_part(SolE(2,isol))
                                aux(3) = dreal_part(SolE(3,isol))
-        else                 ; aux(1) = dimag_part(SolE(1,isol)) 
+        else                 ; aux(1) = dimag_part(SolE(1,isol))
                                aux(2) = dimag_part(SolE(2,isol))
                                aux(3) = dimag_part(SolE(3,isol))
         endif
@@ -172,12 +172,12 @@ subroutine soldis_system(Mdle,Xi,X,Rn,SolH,GradH,SolE,CurlE,SolV,DivV,SolQ, Val)
 !       tangential component
         aux = aux - aux_n
         call norm(aux, Val)
-!              
+!
 !     -- H(div) --
       case('normal')
-!              
+!
         isol = (iload-1)*NRVVAR + ibeg + icomp
-!        
+!
         if (ireal == 1) then ; aux(1) = dreal_part(SolV(1,isol))
                                aux(2) = dreal_part(SolV(2,isol))
                                aux(3) = dreal_part(SolV(3,isol))
@@ -188,10 +188,10 @@ subroutine soldis_system(Mdle,Xi,X,Rn,SolH,GradH,SolE,CurlE,SolV,DivV,SolQ, Val)
 
         call scalar_product(aux,Rn, s)
         Val = abs(s)
-!        
+!
 !     -- L2 --
-      case('discon') 
-!              
+      case('discon')
+!
         isol = (iload-1)*NRQVAR + ibeg + icomp
 !
         if (ireal == 1) then ; Val = dreal_part(SolQ(isol))

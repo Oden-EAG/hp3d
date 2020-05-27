@@ -5,13 +5,13 @@
 !> @param[in]  Xi           - master element coordinates of a point
 !> @param[in]  Nedge_orient - edge orientation
 !> @param[in]  Nface_orient - face orientation
-!> @param[in]  Norder       - order of approximation 
+!> @param[in]  Norder       - order of approximation
 !> @param[in]  Xnod         - geometry dof
 !> @param[in]  ZdofH        - H1      dofs
 !> @param[in]  ZdofE        - H(curl) dofs
 !> @param[in]  ZdofV        - H(div)  dofs
 !> @param[in]  ZdofQ        - L^2     dofs
-!> @param[in]  Nflag        - 0 : geometry map only  
+!> @param[in]  Nflag        - 0 : geometry map only
 !!
 !> @param[out] X            - physical coordinates
 !> @param[out] Dxdxi        - derivatives of physical coordinates wrt
@@ -28,10 +28,10 @@
 !
 subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,ZdofV,ZdofQ,Nflag, &
                    X,Dxdxi,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ                          )
-!     
+!
       use control
       use data_structure3D
-!  
+!
       implicit none
       integer,                             intent(in)  :: Mdle, Nflag
       real(8), dimension(3),               intent(in)  :: Xi
@@ -66,7 +66,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
       integer :: iprint,iflag,i,j,k,n, ivar,nrdofH,nrdofE,nrdofV,nrdofQ
       real(8) :: s, rjac
 !-------------------------------------------------------------------------------
-!  
+!
       iprint=0
 !
 !     evaluate H1 shape functions
@@ -100,7 +100,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
          call pause
          return
       endif
-!      
+!
 !     if only geometry map is needed, return
       if (Nflag.eq.0) return
 !
@@ -111,7 +111,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
       ZsolQ(    1:MAXEQNQ)=ZERO
 !
 !===============================================================================
-!  H1 SOLUTION                                                                 | 
+!  H1 SOLUTION                                                                 |
 !===============================================================================
 !
 !     compute derivatives wrt physical coordinates
@@ -125,7 +125,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
 !     loop through components
       do n=1,MAXEQNH
 !
-!       loop through dof's      
+!       loop through dof's
         do k=1,nrdofH
           ZsolH( n    ) = ZsolH( n    ) + ZdofH(n,k)*shapH(     k)
           ZgradH(n,1:3) = ZgradH(n,1:3) + ZdofH(n,k)*gradHx(1:3,k)
@@ -166,7 +166,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
             enddo
          enddo
       enddo
-!    
+!
 !     H(curl) solution and its curl
       do n=1,MAXEQNE
          do k=1,nrdofE
@@ -198,7 +198,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
 !
 !     H(div) shape functions
       call shape3DV(etype,Xi,Norder,Nface_orient, nrdofV,shapV,divV)
-!      
+!
 !     Piola transform (H(div) shape functions are transformed as H(curl) curls)
       shapVx=ZERO ; divVx=ZERO
       do k=1,nrdofV
@@ -209,8 +209,8 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
         enddo
         divVx(k) = divV(k)/rjac
       enddo
-!       
-!     H(div) solution and its divergence 
+!
+!     H(div) solution and its divergence
       ZsolV(1:3,1:MAXEQNV)=ZERO ; ZdivV(1:MAXEQNV)=ZERO
       do k=1,nrdofV
         do ivar=1,MAXEQNV
@@ -242,10 +242,10 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
 !
 !     L2 shape functions
       call shape3DQ(etype,Xi,Norder, nrdofQ,shapQ)
-!      
+!
 !     Piola transform
       shapQ(1:nrdofQ)=shapQ(1:nrdofQ)/rjac
-!      
+!
 !     evaluate the approximate solution
       ZsolQ(1:MAXEQNQ)=ZERO
       do k=1,nrdofQ

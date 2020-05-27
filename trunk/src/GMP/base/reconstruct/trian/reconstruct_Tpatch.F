@@ -3,16 +3,16 @@ c
 c   routine name       - reconstruct_patch
 c
 c----------------------------------------------------------------------
-c      
+c
 c   latest revision    - Mar 10
 c
 c   purpose            - routine solves a patch problem determining
 c                        second derivatives and derivatives of the
-c                        normal; this is a new version based on 
+c                        normal; this is a new version based on
 c                        reconstructing Hesjans at the points
 c
-c   arguments      
-c     in:  
+c   arguments
+c     in:
 c      Np              - point on a reconstructed surface
 c      List_curves     - a list of the curves forming the patch
 c                        organized in the couterclockwise fashion
@@ -71,8 +71,8 @@ c
      .; Ipatch = ',i1)
       endif
 c
-c------------------------------------------------------------------------ 
-c      
+c------------------------------------------------------------------------
+c
 c  STEP 0: reconstruct the Hessian at the point
 c
       call reconstruct_curvature(Np,List_curves,Nrcurves,0,
@@ -80,14 +80,14 @@ c
       if (iprint.eq.1) then
         do i = 1,3
           write(*,1000)i,acoeff(i,1:3)
- 1000     format(' Hessian('i1',1:3) = ',3(e12.5,2x))         
+ 1000     format(' Hessian('i1',1:3) = ',3(e12.5,2x))
         enddo
       endif
 c
 c------------------------------------------------------------------------
 c
 c  STEP 1: for each curve in the patch determine velocity vector
-c      
+c
 c  ...loop over patch curves
       do i = 1,Nrcurves
         nc = List_curves(i)
@@ -131,15 +131,15 @@ c  .....check consistency
      . 'prod = ',e12.5)
           stop
         endif
-c  ...end of loop over patch curves       
+c  ...end of loop over patch curves
       enddo
-c      
+c
 c------------------------------------------------------------------------
 c
 c  STEP 2: for each triangle in the patch determine normal component
 c     of mixed derivative and store it
 c
-c  ...determine # of triangles according to patch type      
+c  ...determine # of triangles according to patch type
       select case(Ipatch)
 c  ...360 degrees patch
       case(0)
@@ -151,15 +151,15 @@ c  ...less than 360 degrees (open) patch
 c
 c  ...loop over patch triangles
       do i = 1,nr_trian
-c  .....1st curve      
+c  .....1st curve
         nc  = List_curves(i)
-        i1  = imod(i+1,nr_trian)   
-c  .....2nd curve        
-        nc1 = List_curves(i1)        
+        i1  = imod(i+1,nr_trian)
+c  .....2nd curve
+        nc1 = List_curves(i1)
         nr  = List_trian(1,i)
         iv  = List_trian(2,i)
         io  = List_trian(3,i)
-c        
+c
 c  .....compute mixed derivative using eq. (2.29)
         dd = 0.d0
         do k = 1,3
@@ -171,8 +171,8 @@ c  .....compute mixed derivative using eq. (2.29)
         if (iprint.eq.1) then
           write(*,1001)temp
  1001     format(' normal component of mixed derivative: ',3(e12.5,2x))
-        endif   
-c        
+        endif
+c
 c  .....store in data structure according to orientation
         select case(iv)
         case(1)
@@ -182,8 +182,8 @@ c  .....store in data structure according to orientation
         case(3)
           TRIANGLES(nr)%Rdata(93:95) = temp
         case default
-          write(*,*)'reconstruct_patch: unknown vertex!'   
-          stop                     
+          write(*,*)'reconstruct_patch: unknown vertex!'
+          stop
         endselect
 c
 c  ...end of loop over patch triangles

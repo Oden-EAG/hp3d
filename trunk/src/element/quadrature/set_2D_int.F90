@@ -142,7 +142,7 @@ subroutine set_2D_int_DPG(Type,Norder,Norient_face, Nint,Xiloc,Waloc)
         endif
       end select
 !
-      call set_2Dint_DPG(Type,norder_loc, Nint,Xiloc,Waloc)       
+      call set_2Dint_DPG(Type,norder_loc, Nint,Xiloc,Waloc)
 !
 end subroutine set_2D_int_DPG
 !

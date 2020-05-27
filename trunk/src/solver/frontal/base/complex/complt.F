@@ -196,7 +196,7 @@ c
      .           /,10x,8i10)
          write(NFSOUT,7702) MBUF,MA,MW,ia1,ial,iam,ian,iae,iaf,iab
  7702     format(1x,'COMPLT: MBUF,MA,MW,ia1,ial,iam,ian,iae,iaf,iab',
-     .           /,10x,10i10) 
+     .           /,10x,10i10)
       endif
 
 

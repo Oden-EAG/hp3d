@@ -1,6 +1,6 @@
 !> Purpose : with given element refinement flag, return the edge refinements
 !! @param[in]  Type     - middle node type
-!! @param[in]  Kref     - refinement flag for the middle node 
+!! @param[in]  Kref     - refinement flag for the middle node
 !! @param[out] Krefe    - refinement flags for the edges
 subroutine find_edge_ref_flags(Type,Kref, Krefe)
   character(len=4),       intent(in)  :: Type

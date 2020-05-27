@@ -15,21 +15,21 @@ c
 c   arguments :
 c     in:
 c                Ia    - an integer vector
-c                N     - number of elements to be zeroed      
+c                N     - number of elements to be zeroed
 c
 c   required  routines - none
 c
 c-----------------------------------------------------------------------
 c
       subroutine setzi(Ia,N)
-c      
+c
 #include "syscom.blk"
-c      
+c
       dimension Ia(*)
-c      
+c
       do 10 i=1,N
         Ia(i)=0
    10 continue
-c      
+c
       return
       end

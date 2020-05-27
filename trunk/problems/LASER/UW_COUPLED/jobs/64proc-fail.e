@@ -7,7 +7,7 @@ Currently Loaded Modules:
   5) cmake/3.10.2   11) petsc/3.11
   6) intel/18.0.2   12) swr/18.3.3
 
- 
+
 
    Current memory used:   111576872 bytes
    Maximum memory used:  12242629420 bytes
@@ -778,7 +778,7 @@ Currently Loaded Modules:
    Maximum memory used:  12237185436 bytes
 ***Memory allocation failed for gk_mcoremalloc: ptr. Requested size: 18446744068839236432 bytes
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B1D4DEF1280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B1D4C23449B  raise                 Unknown  Unknown
@@ -806,7 +806,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B1D4DEDD3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B5C6B654280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B5C6999749B  raise                 Unknown  Unknown
@@ -834,7 +834,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B5C6B6403D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002AE2D429B280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002AE2D25DE49B  raise                 Unknown  Unknown
@@ -862,7 +862,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002AE2D42873D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002AD66B71C280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002AD669A5F49B  raise                 Unknown  Unknown
@@ -890,7 +890,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002AD66B7083D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002ADBA4B28280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002ADBA2E6B49B  raise                 Unknown  Unknown
@@ -918,7 +918,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002ADBA4B143D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002AE1B0110280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002AE1AE45349B  raise                 Unknown  Unknown
@@ -946,7 +946,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002AE1B00FC3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B4AF0EA3280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B4AEF1E649B  raise                 Unknown  Unknown
@@ -974,7 +974,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B4AF0E8F3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002AC6E1451280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002AC6DF79449B  raise                 Unknown  Unknown
@@ -1002,7 +1002,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002AC6E143D3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B9F6E07A280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B9F6C3BD49B  raise                 Unknown  Unknown
@@ -1030,7 +1030,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B9F6E0663D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B645E652280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B645C99549B  raise                 Unknown  Unknown
@@ -1058,7 +1058,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B645E63E3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B1F09F45280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B1F0828849B  raise                 Unknown  Unknown
@@ -1086,7 +1086,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B1F09F313D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B1339C6B280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B1337FAE49B  raise                 Unknown  Unknown
@@ -1114,7 +1114,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B1339C573D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002AF5DFA79280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002AF5DDDBC49B  raise                 Unknown  Unknown
@@ -1142,7 +1142,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002AF5DFA653D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002AF59A7D7280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002AF598B1A49B  raise                 Unknown  Unknown
@@ -1170,7 +1170,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002AF59A7C33D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B7873B17280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B7871E5A49B  raise                 Unknown  Unknown
@@ -1198,7 +1198,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B7873B033D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002AC9CD1F2280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002AC9CB53549B  raise                 Unknown  Unknown
@@ -1226,7 +1226,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002AC9CD1DE3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002AB39484F280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002AB392B9249B  raise                 Unknown  Unknown
@@ -1254,7 +1254,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002AB39483B3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002AB371A88280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002AB36FDCB49B  raise                 Unknown  Unknown
@@ -1282,7 +1282,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002AB371A743D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B5F81A62280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B5F7FDA549B  raise                 Unknown  Unknown
@@ -1310,7 +1310,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B5F81A4E3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B9D202CA280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B9D1E60D49B  raise                 Unknown  Unknown
@@ -1338,7 +1338,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B9D202B63D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B387FA78280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B387DDBB49B  raise                 Unknown  Unknown
@@ -1366,7 +1366,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B387FA643D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B5D3D790280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B5D3BAD349B  raise                 Unknown  Unknown
@@ -1394,7 +1394,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B5D3D77C3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B6B1EEDF280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B6B1D22249B  raise                 Unknown  Unknown
@@ -1422,7 +1422,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B6B1EECB3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B5DC1E93280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B5DC01D649B  raise                 Unknown  Unknown
@@ -1450,7 +1450,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B5DC1E7F3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B22B4A70280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B22B2DB349B  raise                 Unknown  Unknown
@@ -1478,7 +1478,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B22B4A5C3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B634C4F1280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B634A83449B  raise                 Unknown  Unknown
@@ -1506,7 +1506,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B634C4DD3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B6588AFD280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B6586E4049B  raise                 Unknown  Unknown
@@ -1534,7 +1534,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B6588AE93D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B30E5474280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B30E37B749B  raise                 Unknown  Unknown
@@ -1562,7 +1562,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B30E54603D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B0992400280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B099074349B  raise                 Unknown  Unknown
@@ -1590,7 +1590,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B09923EC3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B27EB947280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B27E9C8A49B  raise                 Unknown  Unknown
@@ -1618,7 +1618,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B27EB9333D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B3CE0A33280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B3CDED7649B  raise                 Unknown  Unknown
@@ -1646,7 +1646,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B3CE0A1F3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002AD2D5B92280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002AD2D3ED549B  raise                 Unknown  Unknown
@@ -1674,7 +1674,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002AD2D5B7E3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B2D34D90280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B2D330D349B  raise                 Unknown  Unknown
@@ -1702,7 +1702,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B2D34D7C3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B948B446280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B948978949B  raise                 Unknown  Unknown
@@ -1730,7 +1730,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B948B4323D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B92BB84E280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B92B9B9149B  raise                 Unknown  Unknown
@@ -1758,7 +1758,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B92BB83A3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B86EC499280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B86EA7DC49B  raise                 Unknown  Unknown
@@ -1786,7 +1786,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B86EC4853D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002AAB739B6280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002AAB71CF949B  raise                 Unknown  Unknown
@@ -1814,7 +1814,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002AAB739A23D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B54F3A69280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B54F1DAC49B  raise                 Unknown  Unknown
@@ -1842,7 +1842,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B54F3A553D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B362F743280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B362DA8649B  raise                 Unknown  Unknown
@@ -1870,7 +1870,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B362F72F3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B9930198280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B992E4DB49B  raise                 Unknown  Unknown
@@ -1898,7 +1898,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B99301843D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B2AFCB90280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B2AFAED349B  raise                 Unknown  Unknown
@@ -1926,7 +1926,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B2AFCB7C3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002AC5CBCCE280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002AC5CA01149B  raise                 Unknown  Unknown
@@ -1954,7 +1954,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002AC5CBCBA3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002AD6C8036280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002AD6C637949B  raise                 Unknown  Unknown
@@ -1982,7 +1982,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002AD6C80223D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B5C33F2B280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B5C3226E49B  raise                 Unknown  Unknown
@@ -2010,7 +2010,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B5C33F173D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B672A5D8280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B672891B49B  raise                 Unknown  Unknown
@@ -2038,7 +2038,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B672A5C43D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B5D23840280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B5D21B8349B  raise                 Unknown  Unknown
@@ -2066,7 +2066,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B5D2382C3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B3D96911280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B3D94C5449B  raise                 Unknown  Unknown
@@ -2094,7 +2094,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B3D968FD3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B885827A280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B88565BD49B  raise                 Unknown  Unknown
@@ -2122,7 +2122,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B88582663D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B263A338280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B263867B49B  raise                 Unknown  Unknown
@@ -2150,7 +2150,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B263A3243D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B1463A7D280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B1461DC049B  raise                 Unknown  Unknown
@@ -2178,7 +2178,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B1463A693D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B6800D0F280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B67FF05249B  raise                 Unknown  Unknown
@@ -2206,7 +2206,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B6800CFB3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002AF35F33C280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002AF35D67F49B  raise                 Unknown  Unknown
@@ -2234,7 +2234,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002AF35F3283D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002ADE7F099280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002ADE7D3DC49B  raise                 Unknown  Unknown
@@ -2262,7 +2262,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002ADE7F0853D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002AD438CE1280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002AD43702449B  raise                 Unknown  Unknown
@@ -2290,7 +2290,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002AD438CCD3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B77FBEC7280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B77FA20A49B  raise                 Unknown  Unknown
@@ -2318,7 +2318,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B77FBEB33D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B29D2B36280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B29D0E7949B  raise                 Unknown  Unknown
@@ -2346,7 +2346,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B29D2B223D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B9BD3DE2280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B9BD212549B  raise                 Unknown  Unknown
@@ -2374,7 +2374,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B9BD3DCE3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002ABD9B237280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002ABD9957A49B  raise                 Unknown  Unknown
@@ -2402,7 +2402,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002ABD9B2233D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B241A23A280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B241857D49B  raise                 Unknown  Unknown
@@ -2430,7 +2430,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B241A2263D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B2E72CC5280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B2E7100849B  raise                 Unknown  Unknown
@@ -2458,7 +2458,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B2E72CB13D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002ADFD327F280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002ADFD15C249B  raise                 Unknown  Unknown
@@ -2486,7 +2486,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002ADFD326B3D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002ABE41A78280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002ABE3FDBB49B  raise                 Unknown  Unknown
@@ -2514,7 +2514,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002ABE41A643D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B9BB47FC280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B9BB2B3F49B  raise                 Unknown  Unknown
@@ -2531,7 +2531,7 @@ libparmetis.so     00002B9BB25F0F44  ParMETIS_V3_NodeN     Unknown  Unknown
 
 Stack trace terminated abnormally.
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B11AE14D280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B11AC49049B  raise                 Unknown  Unknown
@@ -2559,7 +2559,7 @@ uwLaser            000000000040BB3E  Unknown               Unknown  Unknown
 libc-2.17.so       00002B11AE1393D5  __libc_start_main     Unknown  Unknown
 uwLaser            000000000040BA29  Unknown               Unknown  Unknown
 forrtl: error (76): Abort trap signal
-Image              PC                Routine            Line        Source             
+Image              PC                Routine            Line        Source
 uwLaser            0000000007C08DCF  Unknown               Unknown  Unknown
 libc-2.17.so       00002B13C086A280  Unknown               Unknown  Unknown
 libpthread-2.17.s  00002B13BEBAD49B  raise                 Unknown  Unknown

@@ -30,8 +30,8 @@ c  ... subroutine arguments
       integer,intent(in) :: Nord ! Order p of the element understood in the H1 sense
       integer, intent(out) :: Nrdof ! Number of L2 dof
       double precision,dimension(MAXP),intent(inout) :: Shap1Q
-      
-      
+
+
 c     ...local variables
       double precision :: x
       double precision,dimension(MAXP-1) :: fake_dshapH ! needed to call H1 routines
@@ -42,8 +42,8 @@ c
 c$$$      iprint_shapke=iprint
 c
       nordL2 = Nord-1           ! WE ASSUME DUMMY ARGUMENT Nord REFERS TO H1 ORDER
-      
-      if (nordL2.lt.0) then 
+
+      if (nordL2.lt.0) then
         Nrdof=0; Shap1Q=0.d0
         return
       endif
@@ -53,14 +53,14 @@ c
         stop
       endif
 c
-      
+
       select case(SHAPE_FLAG)
 c
 c  ...PEANO SHAPE FUNCTION.............................................
       case(1)
-        write(*,*)'PEANO SHAPE FUNCTIONS, REALLY?'                
-        call pause     
-c     ..we simly call an existing routine for 1D 
+        write(*,*)'PEANO SHAPE FUNCTIONS, REALLY?'
+        call pause
+c     ..we simly call an existing routine for 1D
 c       that have PEANO basis functions coded
         call shapHke(T,nordL2+2,0, Nrdof,Shap1Q,
      .               fake_dshapH)
@@ -80,9 +80,9 @@ c
         write(*,*)'shape1Q: INVALID SHAPE_FLAG = ',SHAPE_FLAG
         stop
       end select
-c  
+c
 
-      
+
       if (iprint.eq.1) then
         write(*,7002) T,nordL2
  7002   format('shape1Q: T,nordL2 = ',f8.3,2x,i2,' Shap1Q = ')

@@ -17,12 +17,12 @@ c----------------------------------------------------------------------
 c
       subroutine setcnstr_trian_iso_hcurl
 c
-c    'big' parent nodes 
+c    'big' parent nodes
 c
 c      *
 c      * *
 c      *   *
-c      *     * 
+c      *     *
 c      *       *
 c      *         *
 c    4 *           *  3
@@ -38,7 +38,7 @@ c      'small' constrained nodes
 c      *
 c      * *
 c      *   *
-c      *     * 
+c      *     *
 c      *   3   *
 c      *         *
 c      ******7******
@@ -78,7 +78,7 @@ c
       call ndof_nod('medg',nord, ivoid, ndof_medg, ivoid, ivoid)
       call ndof_nod('mdlt',nord, ivoid, ndof_mdlt, ivoid, ivoid)
       nrdof = 3*ndof_medg + ndof_mdlt
-c           
+c
 c*********************************************************************
 c
 c  ...small triangle 1 -- small nodes 1 and 5:
@@ -89,18 +89,18 @@ c
       dbds    = 0.d0;   curl    = 0.d0;
       shapsma = 0.d0;   shapbig = 0.d0;
       evalsma = 0.d0;   evalbig = 0.d0;
-c  ...derivative dx/dxi 
+c  ...derivative dx/dxi
       dbds(1,1) = 0.5d0;
       dbds(2,2) = 0.5d0
-c      
-c  ...loop through collocation points: 
+c
+c  ...loop through collocation points:
       do i=1,nspan
 c
         xibig(1) = (i-1)*0.5d0/(nspan-1)
         xisma(1) = (i-1)*1.0d0/(nspan-1)
 c
         do j=1,nspan-(i-1)
-c 
+c
           xibig(2) = 0.5d0/(nspan-1)*(j-1)
           xisma(2) = 1.0d0/(nspan-1)*(j-1)
 c
@@ -119,14 +119,14 @@ c     .      shapbig(1:2,1:MAXtriaE),
 c     .      curl(1:MAXtriaE))
           call shape2DETri(xibig,norder,norient,nsize,
      .                     ivoid,shapbig(1:2,:),curl)
-c  .......for each component variable, 
+c  .......for each component variable,
           if ((ic+2).gt.npts) then
             write(*,*) '1 setcnstr_trian_iso_hcurl: INCREASE WORKSPACE',
      .        npts, (ic+2)
           endif
-c          
+c
           do k=1,2
-            evalbig(ic+k, 1:MAXtriaE) = shapbig(k,1:MAXtriaE)*dbds(k,1) 
+            evalbig(ic+k, 1:MAXtriaE) = shapbig(k,1:MAXtriaE)*dbds(k,1)
      .                                + shapbig(k,1:MAXtriaE)*dbds(k,2)
             evalsma(ic+k, 1:MAXtriaE) = shapsma(k,1:MAXtriaE)
           enddo
@@ -162,7 +162,7 @@ ccc      r = 2.d0*evalbig(1:nrdof,1:nrdof)
         write(*,7002) r(1:nrdof,1:nrdof)
  7002   format('r=', 10e12.5)
       endif
-      
+
 c
 c  ...degrees of freedom of small node 5:
 c****************************************
@@ -173,14 +173,14 @@ c  .....big node 2,3,4:
         do ib=2,4
           nrb = (ib-2)*ndof_medg
           do j=1,ndof_medg
-            RRTE(ib,j,5,i) = r(nrs+i,nrb+j)            
+            RRTE(ib,j,5,i) = r(nrs+i,nrb+j)
           enddo
         enddo
 c
 c  .....big node 1:
         nrb = 3*ndof_medg
         do j=1,ndof_mdlt
-          RRTE(1,j,5,i) = r(nrs+i,nrb+j)            
+          RRTE(1,j,5,i) = r(nrs+i,nrb+j)
         enddo
       enddo
 c
@@ -193,14 +193,14 @@ c  .....big node 2,3,4:
         do ib=2,4
           nrb = (ib-2)*ndof_medg
           do j=1,ndof_medg
-            RRTE(ib,j,1,i) = r(nrs+i,nrb+j)            
+            RRTE(ib,j,1,i) = r(nrs+i,nrb+j)
           enddo
         enddo
 c
 c  .....big node 1:
         nrb = 3*ndof_medg
         do j=1,ndof_mdlt
-          RRTE(1,j,1,i) = r(nrs+i,nrb+j)            
+          RRTE(1,j,1,i) = r(nrs+i,nrb+j)
         enddo
       enddo
 c*********************************************************************
@@ -213,18 +213,18 @@ c
       dbds    = 0.d0;   curl    = 0.d0;
       shapsma = 0.d0;   shapbig = 0.d0;
       evalsma = 0.d0;   evalbig = 0.d0;
-c  ...derivative dx/dxi 
+c  ...derivative dx/dxi
       dbds(1,1) = 0.5d0;
       dbds(2,2) = 0.5d0
-c      
-c  ...loop through collocation points: 
+c
+c  ...loop through collocation points:
       do i=1,nspan
 c
         xibig(1) = (i-1)*0.5d0/(nspan-1) + 0.5d0
         xisma(1) = (i-1)*1.0d0/(nspan-1)
 c
         do j=1,nspan-(i-1)
-c 
+c
           xibig(2) = 0.5d0/(nspan-1)*(j-1)
           xisma(2) = 1.0d0/(nspan-1)*(j-1)
 c
@@ -244,14 +244,14 @@ c     .      curl(1:MAXtriaE))
           call shape2DETri(xibig,norder,norient,nsize,
      .                     ivoid,shapbig(1:2,:),curl)
 c
-c  .......for each component variable, 
+c  .......for each component variable,
           if ((ic+2).gt.npts) then
             write(*,*) '2 setcnstr_trian_iso_hcurl: INCREASE WORKSPACE',
      .        npts
           endif
-c          
+c
           do k=1,2
-            evalbig(ic+k, 1:MAXtriaE) = shapbig(k,1:MAXtriaE)*dbds(k,1) 
+            evalbig(ic+k, 1:MAXtriaE) = shapbig(k,1:MAXtriaE)*dbds(k,1)
      .                                + shapbig(k,1:MAXtriaE)*dbds(k,2)
             evalsma(ic+k, 1:MAXtriaE) = shapsma(k,1:MAXtriaE)
           enddo
@@ -285,7 +285,7 @@ ccc      r = 2.d0*evalbig(1:nrdof,1:nrdof)
       if (iprint.eq.1) then
         write(*,7002) r(1:nrdof,1:nrdof)
       endif
-      
+
 c
 c  ...degrees of freedom of small node 6:
 c****************************************
@@ -296,14 +296,14 @@ c  .....big node 2,3,4:
         do ib=2,4
           nrb = (ib-2)*ndof_medg
           do j=1,ndof_medg
-            RRTE(ib,j,6,i) = r(nrs+i,nrb+j)            
+            RRTE(ib,j,6,i) = r(nrs+i,nrb+j)
           enddo
         enddo
 c
 c  .....big node 1:
         nrb = 3*ndof_medg
         do j=1,ndof_mdlt
-          RRTE(1,j,6,i) = r(nrs+i,nrb+j)            
+          RRTE(1,j,6,i) = r(nrs+i,nrb+j)
         enddo
       enddo
 c
@@ -316,14 +316,14 @@ c  .....big node 2,3,4:
         do ib=2,4
           nrb = (ib-2)*ndof_medg
           do j=1,ndof_medg
-            RRTE(ib,j,2,i) = r(nrs+i,nrb+j)            
+            RRTE(ib,j,2,i) = r(nrs+i,nrb+j)
           enddo
         enddo
 c
 c  .....big node 1:
         nrb = 3*ndof_medg
         do j=1,ndof_mdlt
-          RRTE(1,j,2,i) = r(nrs+i,nrb+j)            
+          RRTE(1,j,2,i) = r(nrs+i,nrb+j)
         enddo
       enddo
 c
@@ -337,18 +337,18 @@ c
       dbds    = 0.d0;   curl    = 0.d0;
       shapsma = 0.d0;   shapbig = 0.d0;
       evalsma = 0.d0;   evalbig = 0.d0;
-c  ...derivative dx/dxi 
+c  ...derivative dx/dxi
       dbds(1,1) = 0.5d0;
       dbds(2,2) = 0.5d0
-c      
-c  ...loop through collocation points: 
+c
+c  ...loop through collocation points:
       do i=1,nspan
 c
         xibig(1) = (i-1)*0.5d0/(nspan-1)
         xisma(1) = (i-1)*1.0d0/(nspan-1)
 c
         do j=1,nspan-(i-1)
-c 
+c
           xibig(2) = 0.5d0/(nspan-1)*(j-1) + 0.5d0
           xisma(2) = 1.0d0/(nspan-1)*(j-1)
 c
@@ -368,14 +368,14 @@ c     .      curl(1:MAXtriaE))
           call shape2DETri(xibig,norder,norient,nsize,
      .                     ivoid,shapbig(1:2,:),curl)
 c
-c  .......for each component variable, 
+c  .......for each component variable,
           if ((ic+2).gt.npts) then
             write(*,*) '3 setcnstr_trian_iso_hcurl: INCREASE WORKSPACE',
      .        npts
           endif
-c          
+c
           do k=1,2
-            evalbig(ic+k, 1:MAXtriaE) = shapbig(k,1:MAXtriaE)*dbds(k,1) 
+            evalbig(ic+k, 1:MAXtriaE) = shapbig(k,1:MAXtriaE)*dbds(k,1)
      .                                + shapbig(k,1:MAXtriaE)*dbds(k,2)
             evalsma(ic+k, 1:MAXtriaE) = shapsma(k,1:MAXtriaE)
           enddo
@@ -409,7 +409,7 @@ ccc      r = 2.d0*evalbig(1:nrdof,1:nrdof)
       if (iprint.eq.1) then
         write(*,7002) r(1:nrdof,1:nrdof)
       endif
-      
+
 c
 c  ...degrees of freedom of small node 7:
 c****************************************
@@ -420,14 +420,14 @@ c  .....big node 2,3,4:
         do ib=2,4
           nrb = (ib-2)*ndof_medg
           do j=1,ndof_medg
-            RRTE(ib,j,7,i) = r(nrs+i,nrb+j)            
+            RRTE(ib,j,7,i) = r(nrs+i,nrb+j)
           enddo
         enddo
 c
 c  .....big node 1:
         nrb = 3*ndof_medg
         do j=1,ndof_mdlt
-          RRTE(1,j,7,i) = r(nrs+i,nrb+j)            
+          RRTE(1,j,7,i) = r(nrs+i,nrb+j)
         enddo
       enddo
 c
@@ -440,14 +440,14 @@ c  .....big node 2,3,4:
         do ib=2,4
           nrb = (ib-2)*ndof_medg
           do j=1,ndof_medg
-            RRTE(ib,j,3,i) = r(nrs+i,nrb+j)            
+            RRTE(ib,j,3,i) = r(nrs+i,nrb+j)
           enddo
         enddo
 c
 c  .....big node 1:
         nrb = 3*ndof_medg
         do j=1,ndof_mdlt
-          RRTE(1,j,3,i) = r(nrs+i,nrb+j)            
+          RRTE(1,j,3,i) = r(nrs+i,nrb+j)
         enddo
       enddo
 c
@@ -461,19 +461,19 @@ c
       dbds    = 0.d0;   curl    = 0.d0;
       shapsma = 0.d0;   shapbig = 0.d0;
       evalsma = 0.d0;   evalbig = 0.d0;
-c  ...derivative dx/dxi 
+c  ...derivative dx/dxi
       dbds(1,1) = -0.5d0;
       dbds(2,2) = -0.5d0
-c      
-c  ...loop through collocation points: 
+c
+c  ...loop through collocation points:
       do i=1,nspan
 c
         xibig(1) = 0.5d0 - (i-1)*0.5d0/(nspan-1)
         xisma(1) =         (i-1)*1.0d0/(nspan-1)
 c
         do j=1,nspan-(i-1)
-c 
-          xibig(2) = 0.5d0 - 0.5d0/(nspan-1)*(j-1) 
+c
+          xibig(2) = 0.5d0 - 0.5d0/(nspan-1)*(j-1)
           xisma(2) =         1.0d0/(nspan-1)*(j-1)
 c
 c  .......find small shape functions at this point:
@@ -492,14 +492,14 @@ c     .      curl(1:MAXtriaE))
           call shape2DETri(xibig,norder,norient,nsize,
      .                     ivoid,shapbig(1:2,:),curl)
 c
-c  .......for each component variable, 
+c  .......for each component variable,
           if ((ic+2).gt.npts) then
             write(*,*) '4 setcnstr_trian_iso_hcurl: INCREASE WORKSPACE',
      .        npts
           endif
-c          
+c
           do k=1,2
-            evalbig(ic+k, 1:MAXtriaE) = shapbig(k,1:MAXtriaE)*dbds(k,1) 
+            evalbig(ic+k, 1:MAXtriaE) = shapbig(k,1:MAXtriaE)*dbds(k,1)
      .                                + shapbig(k,1:MAXtriaE)*dbds(k,2)
             evalsma(ic+k, 1:MAXtriaE) = shapsma(k,1:MAXtriaE)
           enddo
@@ -533,7 +533,7 @@ ccc      r = -2.d0*evalbig(1:nrdof,1:nrdof)
       if (iprint.eq.1) then
         write(*,7002) r(1:nrdof,1:nrdof)
       endif
-      
+
 c
 c  ...degrees of freedom of small node 4:
 c*****************************************
@@ -544,14 +544,14 @@ c  .....big node 2,3,4:
         do ib=2,4
           nrb = (ib-2)*ndof_medg
           do j=1,ndof_medg
-            RRTE(ib,j,4,i) = r(nrs+i,nrb+j)            
+            RRTE(ib,j,4,i) = r(nrs+i,nrb+j)
           enddo
         enddo
 c
 c  .....big node 1:
         nrb = 3*ndof_medg
         do j=1,ndof_mdlt
-          RRTE(1,j,4,i) = r(nrs+i,nrb+j)            
+          RRTE(1,j,4,i) = r(nrs+i,nrb+j)
         enddo
       enddo
 c
@@ -561,7 +561,7 @@ c  ...clean up machine zeros...
       ibcase = 0; iscase = 0;
       do ib=1,4
         do is=1,7
-c          
+c
           select case(ib)
           case(1);     ndof_i = ndof_mdlt; ibcase = 0
           case(2,3,4); ndof_i = ndof_medg; ibcase = 1
@@ -651,7 +651,7 @@ c     .  curl(1:MAXtriaE))
 c
 c*********************************************************************
 c
-c  ...verify if big shape functions are right combinations of small 
+c  ...verify if big shape functions are right combinations of small
 c     ones:
 c
 c  ...loop through big shape functions - central node:
@@ -722,7 +722,7 @@ c  ........small node 6:
            enddo
 c
 c  ........small node 7:
-           nrs = 0 
+           nrs = 0
            do j=1,ndof_medg
              val(1:2) = val(1:2)+2.d0*RRTE(1,i, 7,j)
      .         * shapsma(1:2,nrs+j)*(-1)**(j+1)
@@ -742,13 +742,13 @@ c
      .     abs(val(1:2)-shapbig(1:2,nrb+i))
  8002    format('setcnstr_trian: i,shapebig,difference = ',
      .     i3,2(2e12.5,2x))
-c     
+c
 c   ...end of loop through shape functions of big element
        enddo
-c     
+c
        write(*,*) 'setcnstr_trian: CONTINUE ?(1/0)'
        read(*,*) ians
 c
        if (ians.eq.1) go to 777
-c     
-       end subroutine 
+c
+       end subroutine

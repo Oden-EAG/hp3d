@@ -170,7 +170,7 @@ subroutine set_index(Icase,Iflag, Index)
               if (ibcd(i).eq.9) then
 !             ...Eliminate H(div) dof (trick to avoid singular ZalocVV)
                 indexd(ic)=5
-              endif              
+              endif
 !
 !  ...........Dirichlet BC on 1st component
               if ((ibcd(i).eq.3).and.(j.eq.1)) then

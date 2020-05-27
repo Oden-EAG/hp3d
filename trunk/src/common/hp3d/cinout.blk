@@ -10,7 +10,7 @@
 !     NPROFB      - a file containing data for drawing a body profile
 !     NHIST       - a file containing a history of refinements
 !
-!     NWE         - a file with modified input for GMP 
+!     NWE         - a file with modified input for GMP
 !
 !     LIN         - standard input file for the debugger
 !     LTERM       - standard terminal (in)

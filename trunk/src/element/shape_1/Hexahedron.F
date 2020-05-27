@@ -30,7 +30,7 @@ c          GradH        - gradients of the shape functions
 c
 c-----------------------------------------------------------------------
 c
-      subroutine shape3DHHexa(Xi,Nord,NoriE,NoriF,Nsize, 
+      subroutine shape3DHHexa(Xi,Nord,NoriE,NoriF,Nsize,
      .                                              NrdofH,ShapH,GradH)
 c
       use parameters , only : MODORDER
@@ -82,12 +82,12 @@ c  ...call the blending and projections
       call BlendProjectHexaE(Mu,DMu, MubE,DMubE,MupE,DMupE,IdecE)
       do e=1,12
         ndofE=Nord(e)-1
-        if (ndofE.gt.0) then        
+        if (ndofE.gt.0) then
 c      ...orient first
-          call OrientE(MupE(e,0:1),DMupE(e,1:N,0:1),NoriE(e),N, 
+          call OrientE(MupE(e,0:1),DMupE(e,1:N,0:1),NoriE(e),N,
      .                                                 GMupE,GDMupE)
 c      ...construct the shape functions
-          call AncPhiE(GMupE,GDMupE,Nord(e),IdecE,N, 
+          call AncPhiE(GMupE,GDMupE,Nord(e),IdecE,N,
      .                         phiE(2:Nord(e)),DphiE(1:N,2:Nord(e)))
           do i=2,Nord(e)
             m=m+1
@@ -105,14 +105,14 @@ c  ...call the blending and projections
       do f=1,6
         call decod(Nord(12+f),MODORDER,2, nordF)
         ndofF = (nordF(1)-1)*(nordF(2)-1)
-        if (ndofF.gt.0) then        
+        if (ndofF.gt.0) then
 c      ...orient first
           call OrientQuad(MupF(f,1:2,0:1),DMupF(f,1:N,1:2,0:1),
      .                         NoriF(f),IdecF,N, GMupF,GDMupF,GIdecF)
 c      ...orders already take into account the orientations, so
 c      ...no need for swapping nordF
 c      ...now construct the shape functions
-          call AncPhiQuad(GMupF,GDMupF,nordF,GIdecF,N, 
+          call AncPhiQuad(GMupF,GDMupF,nordF,GIdecF,N,
      .                          phiQuad(2:nordF(1),2:nordF(2)),
      .                           DphiQuad(1:N,2:nordF(1),2:nordF(2)))
           do j=2,nordF(2)
@@ -137,7 +137,7 @@ c    ...call phiQuad and phiE - no need to orient
         call AncPhiQuad(Mu(1:2,0:1),DMu(1:N,1:2,0:1),nordB(1:2),
      .                 IdecB(1:2),N, phiQuad(2:nordB(1),2:nordB(2)),
      .                            DphiQuad(1:N,2:nordB(1),2:nordB(2)))
-        call AncPhiE(Mu(3,0:1),DMu(1:N,3,0:1),nordB(3),IdecB(3),N, 
+        call AncPhiE(Mu(3,0:1),DMu(1:N,3,0:1),nordB(3),IdecB(3),N,
      .                        phiE(2:nordB(3)),DphiE(1:N,2:nordB(3)))
         do k=2,nordB(3)
           do j=2,nordB(2)
@@ -274,12 +274,12 @@ c  ...call the blending and projections
       call BlendProjectHexaE(Mu,DMu, MubE,DMubE,MupE,DMupE,IdecE)
       do e=1,12
         ndofE=Nord(e)
-        if (ndofE.gt.0) then        
+        if (ndofE.gt.0) then
 c      ...orient first
-          call OrientE(MupE(e,0:1),DMupE(e,1:N,0:1),NoriE(e),N, 
+          call OrientE(MupE(e,0:1),DMupE(e,1:N,0:1),NoriE(e),N,
      .                                                 GMupE,GDMupE)
 c      ...construct the shape functions
-          call AncEE(GMupE,GDMupE,Nord(e),IdecE,N, 
+          call AncEE(GMupE,GDMupE,Nord(e),IdecE,N,
      .                    EE(1:N,0:Nord(e)-1),curlEE(1:N,0:Nord(e)-1))
           do i=0,Nord(e)-1
             m=m+1
@@ -305,14 +305,14 @@ c    ...loop over the two families
         do fam=0,1
 c      ...get the (global) face axis indexing for the family (a,b)
 c      ...fam=0->(1,2), fam=1->(2,1)
-          ab = cshift((/1,2/),fam); 
+          ab = cshift((/1,2/),fam);
           a = ab(1); b = ab(2)
 c      ...degrees of freedom (dof) for this family
           ndofF(fam) = nordF(a)*(nordF(b)-1)
 c      ...now construct the shape functions if necessary
           if (ndofF(fam).gt.0) then
             call AncEQuad(GMupF(ab,0:1),GDMupF(1:N,ab,0:1),
-     .                       nordF(ab),GIdecF(ab),N, 
+     .                       nordF(ab),GIdecF(ab),N,
      .                        EQuad(1:N,0:nordF(a)-1,2:nordF(b)),
      .                         curlEQuad(1:N,0:nordF(a)-1,2:nordF(b)))
 c        ...the following manipulations are necessary due to
@@ -323,7 +323,7 @@ c        ...numbered wrt the second global face axis
             minF = cshift(minF,-fam); maxF = cshift(maxF,-fam)
             do jg=minF(2),maxF(2)
               do ig=minF(1),maxF(1)
-                ij = cshift((/ig,jg/),fam); 
+                ij = cshift((/ig,jg/),fam);
                 i = ij(1); j = ij(2)
                 m=m+1
                 call cross(N,DMubF(f,1:N),EQuad(1:N,i,j), CTemp)
@@ -343,7 +343,7 @@ c  ...loop over the three families
       do fam=0,2
 c    ...get the interior axis indexing for the family (a,b,c)
 c    ...fam=0->(1,2,3), fam=1->(2,3,1), fam=2->(3,1,2)
-        abc = cshift((/1,2,3/),fam); 
+        abc = cshift((/1,2,3/),fam);
         a = abc(1); b = abc(2); c = abc(3); ab(1) = a; ab(2) = b
 c    ...degrees of freedom (dof) for this family
         ndofB(fam) = nordB(a)*(nordB(b)-1)*(nordB(c)-1)
@@ -354,18 +354,18 @@ c      ...call EQuad and phiE with appropriate indexing
      .                                nordB(ab),IdecB(ab),N,
      .                     EQuad(1:N,0:nordB(a)-1,2:nordB(b)),
      .                   curlEQuad(1:N,0:nordB(a)-1,2:nordB(b)))
-          call AncPhiE(Mu(c,0:1),DMu(1:N,c,0:1),nordB(c),IdecB(c),N, 
+          call AncPhiE(Mu(c,0:1),DMu(1:N,c,0:1),nordB(c),IdecB(c),N,
      .                        phiE(2:nordB(c)),DphiE(1:N,2:nordB(c)))
 c      ...the following manipulations are necessary due to
-c      ...some conventions in the code: the outer loop always wrt the 
+c      ...some conventions in the code: the outer loop always wrt the
 c      ...third axis, the inner loop wrt to the first axis.
           minB(1) = 0; minB(2) = 2; minB(3) = 2
           maxB(1) = nordB(a)-1; maxB(2) = nordB(b); maxB(3) = nordB(c)
           minB = cshift(minB,-fam); maxB = cshift(maxB,-fam)
           do kg=minB(3),maxB(3)
             do jg=minB(2),maxB(2)
-              do ig=minB(1),maxB(1) 
-                ijk = cshift((/ig,jg,kg/),fam); 
+              do ig=minB(1),maxB(1)
+                ijk = cshift((/ig,jg,kg/),fam);
                 i = ijk(1); j = ijk(2); k = ijk(3)
                 m=m+1
                 call cross(N,DphiE(1:N,k),EQuad(1:N,i,j), CTemp)
@@ -498,7 +498,7 @@ c    ...orient the variables first (except the order)
         ndofF = nordF(1)*nordF(2)
 c    ...now construct the shape functions if necessary
         if (ndofF.gt.0) then
-          call AncVQuad(GMupF,GDMupF,nordF,GIdecF,N, 
+          call AncVQuad(GMupF,GDMupF,nordF,GIdecF,N,
      .                   VQuad(1:N,0:nordF(1)-1,0:nordF(2)-1),
      .                       divVQuad(0:nordF(1)-1,0:nordF(2)-1))
           do j=0,nordF(2)-1
@@ -519,7 +519,7 @@ c  ...loop over the three families
       do fam=0,2
 c    ...get the interior axis indexing for the family (a,b,c)
 c    ...fam=0->(1,2,3), fam=1->(2,3,1), fam=2->(3,1,2)
-        abc = cshift((/1,2,3/),fam); 
+        abc = cshift((/1,2,3/),fam);
         a = abc(1); b = abc(2); c = abc(3); ab(1) = a; ab(2) = b
 c    ...degrees of freedom (dof) for this family
         ndofB(fam) = nordB(a)*nordB(b)*(nordB(c)-1)
@@ -530,10 +530,10 @@ c      ...call VQuad and phiE with appropriate indexing
      .                                nordB(ab),IdecB(ab),N,
      .                   VQuad(1:N,0:nordB(a)-1,0:nordB(b)-1),
      .                         divVQuad(0:nordB(a)-1,0:nordB(b)-1))
-          call AncPhiE(Mu(c,0:1),DMu(1:N,c,0:1),nordB(c),IdecB(c),N, 
+          call AncPhiE(Mu(c,0:1),DMu(1:N,c,0:1),nordB(c),IdecB(c),N,
      .                        phiE(2:nordB(c)),DphiE(1:N,2:nordB(c)))
 c      ...the following manipulations are necessary due to
-c      ...some conventions in the code: the outer loop always wrt the 
+c      ...some conventions in the code: the outer loop always wrt the
 c      ...third axis, the inner loop wrt to the first axis.
           minB(1) = 0; minB(2) = 0; minB(3) = 2
           maxB(1) = nordB(a)-1; maxB(2) = nordB(b)-1; maxB(3) = nordB(c)
@@ -541,7 +541,7 @@ c      ...third axis, the inner loop wrt to the first axis.
           do kg=minB(3),maxB(3)
             do jg=minB(2),maxB(2)
               do ig=minB(1),maxB(1)
-                ijk = cshift((/ig,jg,kg/),fam); 
+                ijk = cshift((/ig,jg,kg/),fam);
                 i = ijk(1); j = ijk(2); k = ijk(3)
                 m=m+1
                 ShapV(1:N,m) = phiE(k)*VQuad(1:N,i,j)

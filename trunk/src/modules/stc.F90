@@ -78,7 +78,7 @@ end subroutine stc_dealloc
 !    latest revision    - Sept 2018
 !
 !    purpose            - routine computes the number of interface and
-!                         bubble dof for each physics variable of this 
+!                         bubble dof for each physics variable of this
 !                         element. It accounts only for variables that
 !                         are supported on the middle node of the element.
 !
@@ -291,7 +291,7 @@ subroutine stc_fwd_wrapper(Iel,Mdle)
 !     ...extract condensed stiffness into ALOC
          ii = nrdofi(i)
          if (ii > 0 .and. ji > 0) then
-            ALOC(i,j)%array(1:ii,1:ji) = Aii(ki+1:ki+ii,ni+1:ni+ji) 
+            ALOC(i,j)%array(1:ii,1:ji) = Aii(ki+1:ki+ii,ni+1:ni+ji)
          endif
          ki = ki + ii
       enddo
@@ -467,22 +467,22 @@ subroutine stc_fwd_gen(Ni,Nb, Aii,Abi,Aib,Abb,Bi,Bb)
    endif
 !
 !..Compute inv(Abb)*Bb
-#if C_MODE      
+#if C_MODE
       call ZGETRS('N',Nb,NR_RHS,Abb,Nb,piv,Bb,Nb,info)
 #else
       call DGETRS('N',Nb,NR_RHS,Abb,Nb,piv,Bb,Nb,info)
-#endif      
+#endif
    if (info.ne.0) then
       write(*,*) 'stc_gen: GETRS: info = ', info
       stop
    endif
 !
 !..Compute inv(Abb)*Abi
-#if C_MODE      
+#if C_MODE
       call ZGETRS('N',Nb,Ni,Abb,Nb,piv,Abi,Nb,info)
 #else
       call DGETRS('N',Nb,Ni,Abb,Nb,piv,Abi,Nb,info)
-#endif 
+#endif
    if (info.ne.0) then
       write(*,*) 'stc_gen: GETRS: info = ', info
       stop
@@ -648,7 +648,7 @@ end subroutine stc_bwd_wrapper
 !    latest revision    - Sept 2018
 !
 !    purpose            - routine perform backsubstitution to obtain
-!                         bubble solution dof. It makes use of the 
+!                         bubble solution dof. It makes use of the
 !                         Schur complements stored in CLOC.
 !
 !    arguments :
@@ -985,7 +985,7 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
 #endif
 !
 !..end of loop through loads
-   enddo       
+   enddo
 !
 #if DEBUG_MODE
    if (iprint.eq.1) write(*,*) 'stc_solout finished.'

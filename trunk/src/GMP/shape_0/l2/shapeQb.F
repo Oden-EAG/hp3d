@@ -10,7 +10,7 @@ c   purpose            - routine evaluates L2 shape functions for master
 c                        brick
 c
 c   arguments :
-c     in:  
+c     in:
 c         Xi           - master element coordinates
 c         Norder       - order of approximation for the nodes (in the H1 sense)
 c     out:
@@ -21,24 +21,24 @@ c   Note: Inspired in shapeHb but simplified to adapt it to L2 case
 c----------------------------------------------------------------------
 c
       subroutine shapeQb(Xi,Norder,Nrdof,ShapQ)
-c      
+c
       use parameters
 
       implicit none
-      
+
 c  ...subroutine arguments
       double precision,intent(in) :: Xi(3)
       integer, intent(in) :: Norder(19)
       integer, intent(out) :: Nrdof
       double precision, intent(inout) ::  ShapQ(MAXbrickQ)
-      
+
 c  ...local variables
       double precision :: shapQ1(MAXP),shapQ2(MAXP),shapQ3(MAXP)
       integer :: nordh,nord1,nord2,nord3
       integer :: nrdofQ1,nrdofQ2,nrdofQ3
       integer :: i,j,k,kk
 
-c     
+c
 c
 c----------------------------------------------------------------------
 c
@@ -70,7 +70,7 @@ c
 c----------------------------------------------------------------------
 c
 c     routines to be implemented here (not done yet):
-      
+
 c                        - shapeQp (prism)
 c                        - shapeQn (tetr)
 c                        - shapeQd (pyra)
@@ -83,7 +83,7 @@ c   purpose            - routine evaluates L2 shape functions for master
 c                        XXXXX
 c
 c   arguments :
-c     in:  
+c     in:
 c         Xi           - master element coordinates
 c         Norder       - order of approximation for the nodes
 c     out:
@@ -93,4 +93,4 @@ c
 c   Note: Inspired in shapeHx but simplify to adapted it for L2 case
 c----------------------------------------------------------------------
 
-      
+

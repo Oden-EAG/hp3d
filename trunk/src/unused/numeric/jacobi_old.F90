@@ -1,5 +1,5 @@
-!>  Purpose : 
-!!    build_block of weighted integrated jacobi polynomials and 
+!>  Purpose :
+!!    build_block of weighted integrated jacobi polynomials and
 !!    their derivatives
 !!
 !! @param Nord order of polynomial
@@ -7,7 +7,7 @@
 !! @param X     variable
 !! @param Poly  polynomials
 !! @param Dpoly derivatives
-!! @revision Dec 10 
+!! @revision Dec 10
 subroutine build_jacobi_w_i (A,X,Nord, Poly,Dpoly)
 
   use error
@@ -17,24 +17,24 @@ subroutine build_jacobi_w_i (A,X,Nord, Poly,Dpoly)
   ! functions in use
   real, external ::  jacobi_w_i
   real, external :: djacobi_w_i
-  
+
   ! arguments in out
-  integer, intent(in) &                          
-       :: Nord 
+  integer, intent(in) &
+       :: Nord
   real*8, intent(in) &
-       :: A, X 
+       :: A, X
   real*8, intent(out),dimension(1:) &
        :: Poly, Dpoly
-  
+
   ! local variables
   integer :: n
-  
+
   ! == Pre-condition
   if (Nord.gt.size(Poly)) then
      write(*,*)'Nord = ',Nord, ' Size = ', size(Poly)
      call logic_error(ERR_OUT_OF_RANGE,__FILE__,__LINE__)
   endif
-  
+
   ! == Body
   do n=1,Nord
      Poly(n)  =  jacobi_w_i(A,X,n)
@@ -51,38 +51,38 @@ end subroutine build_jacobi_w_i
 !  2-terms recurrence relation from Wolfram
 !
 !  c1 P_n+1^(a,b) = c2 P_n^(a,b) + c3 P_n-1^(a,b)
-!       P_0^(a,b) = 1  
+!       P_0^(a,b) = 1
 !       P_1^(a,b) = [2(a + 1) + (a + b + 2) (x - 1)]/2
 !
-!  c1 = 2(n + 1) (n + a + b + 1) (2n + a + b) 
+!  c1 = 2(n + 1) (n + a + b + 1) (2n + a + b)
 !  c2 = (2n + a + b + 1) (a^2 - b^2) (2n + a + b + 2) *
-!       (2n + a + b + 1) (2n + a + b) 
+!       (2n + a + b + 1) (2n + a + b)
 !  c3 = -2(n + a) (n + b) (2n + a + b + 2)
-!   
+!
 !----------------------------------------------------------------------
-!>  Purpose : 
+!>  Purpose :
 !!    evaluate weighted jacobi polynomial
 !!
 !! @param Nord order of polynomial
 !! @param A     weights
 !! @param B     weights
 !! @param X     variable
-!! @revision Dec 10 
+!! @revision Dec 10
 real*8 function jacobi_w (A,B,X,Nord)
   use error
 
-  implicit none 
+  implicit none
 
   ! arguements in out
   integer, intent(in) &
        :: Nord
   real*8, intent(in) &
        :: A, B, X
-  
+
   ! local variables
   real*8, dimension(0:Nord) &
        :: poly
-  real*8 &                   
+  real*8 &
        :: c1, c2, c3, c4
   integer &
        :: iprint=0, n
@@ -101,20 +101,20 @@ real*8 function jacobi_w (A,B,X,Nord)
      !  .....recurrence relation
      poly(n+1) = ((c2 + c3*X)*poly(n) + c4*poly(n-1))/c1
   enddo
-  
+
   !
   jacobi_w = poly(Nord)
   !
 end function jacobi_w
 
-!>  Purpose : 
+!>  Purpose :
 !!    evaluate derivative of weighted jacobi polynomial
 !!
 !! @param Nord order of polynomial
 !! @param A     weights
 !! @param B     weights
 !! @param X     variable
-!! @revision Dec 10 
+!! @revision Dec 10
 real*8 function djacobi_w(A,B,X,Nord)
   !----------------------------------------------------------------------
   !
@@ -126,7 +126,7 @@ real*8 function djacobi_w(A,B,X,Nord)
   use error
 
   implicit none
-  
+
   ! functions in use
   real, external :: jacobi_w
 
@@ -139,7 +139,7 @@ real*8 function djacobi_w(A,B,X,Nord)
   ! local variables
   integer &
        :: iprint = 0
-  
+
   if (Nord.eq.0) then
      djacobi_w = 0.d0
   else
@@ -148,21 +148,21 @@ real*8 function djacobi_w(A,B,X,Nord)
 
 end function djacobi_w
 
-!>  Purpose : 
+!>  Purpose :
 !!    evaluate weighted integrated jacobi polynomial
 !!
 !! @param Nord order of polynomial
 !! @param A     weights
 !! @param X     variable
-!! @revision Dec 10 
+!! @revision Dec 10
 real*8 function jacobi_w_i(A,X,Nord)
   !----------------------------------------------------------------------
   !   p_n^a := P_n^(a,0)
-  !  
-  !   \hat{p}_0^a = 1                                         
+  !
+  !   \hat{p}_0^a = 1
   !   \hat{p}_n^a = \int_{-1}^x p_{n-1}^a , n >= 1
   !   Recurrence relations from Beuchler's papers:
-  !  
+  !
   !   n >= 2
   !   \hat{p}_n^a = c1 p_n^a + c2 p_{n-1}^a + c3 p_{n-2}^a
   !
@@ -190,7 +190,7 @@ real*8 function jacobi_w_i(A,X,Nord)
        :: c1,c2,c3
   integer &
        :: iprint = 0
-  
+
   select case (Nord)
   case(0)
      Jacobi_W_I = 1.d0
@@ -214,13 +214,13 @@ real*8 function jacobi_w_i(A,X,Nord)
 
 end function jacobi_w_i
 
-!>  Purpose : 
+!>  Purpose :
 !!    evaluate derivative of weighted integrated jacobi polynomial
 !!
 !! @param Nord order of polynomial
 !! @param A     weights
 !! @param X     variable
-!! @revision Dec 10 
+!! @revision Dec 10
 real*8 function djacobi_w_i(A,X,Nord)
   use error
 
@@ -230,11 +230,11 @@ real*8 function djacobi_w_i(A,X,Nord)
   real, external :: djacobi_w
 
   ! arguements in out
-  integer, intent(in) &                       
+  integer, intent(in) &
        :: Nord
   real*8, intent(in) &
        :: A, X
-  
+
   ! local variables
   real*8  &
        :: c1, c2, c3
@@ -260,7 +260,7 @@ real*8 function djacobi_w_i(A,X,Nord)
 
      dJacobi_W_I = c1*dJacobi_W(A,0.d0,X,Nord) + &
           c2*dJacobi_W(A,0.d0,X,Nord-1) + &
-          c3*dJacobi_W(A,0.d0,X,Nord-2) 
+          c3*dJacobi_W(A,0.d0,X,Nord-2)
   end select
 
 end function djacobi_w_i

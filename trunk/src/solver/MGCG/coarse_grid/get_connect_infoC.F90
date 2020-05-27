@@ -7,7 +7,7 @@
 !   latest revision    - Jan 18
 !
 !   purpose            - routine returns element to nodes connectivities
-!                        for a coarse grid element, including info on 
+!                        for a coarse grid element, including info on
 !                        constrained nodes
 !
 !   arguments :
@@ -31,7 +31,7 @@
                                 NR_EDGES,NEDGC,NEDG_CONS,NR_FACES,NFACEC,  &
                                 NFACE_CONS, SON_NUM,FATH_TYPE,FATH_ORIENT, &
                                 FATH_NODES, rotate_edge_nodes,rotate_trian_nodes,  &
-                                rotate_quadr_nodes  
+                                rotate_quadr_nodes
    use mg_data_structure
 #include "syscom.blk"
 !

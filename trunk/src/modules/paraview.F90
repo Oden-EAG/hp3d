@@ -7,7 +7,7 @@ module paraview
    implicit none
 !
    save
-! 
+!
    character(len=128) :: FILE_VIS = '../../files/vis'
    character(len=2  ) :: VLEVEL = '2'
    character(len=128) :: PARAVIEW_DIR = 'vtk/'

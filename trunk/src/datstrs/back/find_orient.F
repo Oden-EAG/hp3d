@@ -9,11 +9,11 @@ c
 c   purpose            - routine returns orientation for an element
 c                        edge and face nodes
 c
-c   arguments 
+c   arguments
 c     in:
 c         Mdle         - (middle node of) element
 c     out:
-c                
+c
 c         Nedge_orient - egde orientations (0,1)
 c         Nface_orient - face orientations (0,1,...,7)
 c
@@ -41,4 +41,4 @@ c
       end
 
 
-      
+

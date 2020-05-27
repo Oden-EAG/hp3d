@@ -4,7 +4,7 @@ subroutine mesh2vtk_data_upscale(Nout, Title, Isel, Z_harmonic, Show_Data )
   use data_structure3D
   use element_data
   use upscale
-  implicit none 
+  implicit none
   !
   integer, intent(in)  :: Nout, Isel(10)
   VTYPE, intent(in) :: Z_harmonic
@@ -23,7 +23,7 @@ subroutine mesh2vtk_data_upscale(Nout, Title, Isel, Z_harmonic, Show_Data )
         VTYPE,                  intent(in) :: Z_harmonic
      end subroutine Show_Data
   end interface
-  
+
   ! Step 0: Compute nr_vert and nr_cell
   write(*,*) 'mesh2vtk:: Compupting nr verts and nr cells '
   mdle = 0; nr_vert = 0; nr_elem = 0;
@@ -46,12 +46,12 @@ subroutine mesh2vtk_data_upscale(Nout, Title, Isel, Z_harmonic, Show_Data )
 ! 5001 format('CELL_DATA ', i12)
 
   select case(Isel(2))
-  case(0); 
+  case(0);
      write(Nout,6000) title
-     write(Nout,8000) 
-  case(1); 
+     write(Nout,8000)
+  case(1);
      write(Nout,6001) title
-!     write(Nout,8000) 
+!     write(Nout,8000)
   end select
 
 6000 format('SCALARS  ',a16,' double 1')
@@ -79,28 +79,28 @@ subroutine dummy_soleval(Mdle)
   use data_structure3D
   use upscale
   implicit none
-  ! ** Arguements                                                                       
-  !----------------------------------------------------------------------               
+  ! ** Arguements
+  !----------------------------------------------------------------------
   integer, intent(in) :: Mdle
   character(len=4) :: type
-  !                                                                                     
+  !
   integer :: &
        i, iv,  &
        nodesl(27), norder(19), &
        norientl(27), nedge_orient(12), nface_orient(6)
   real(8) :: &
        xi(3), x(3), xnod(3,MAXbrickH), dxdxi(3,3)
-  !                                                                                     
+  !
   VTYPE :: &
        zdofH(MAXEQNH,MAXbrickH),zdofE(MAXEQNE,MAXbrickE), &
        zdofV(MAXEQNV,MAXbrickV),zdofQ(MAXEQNQ,MAXbrickQ)
-  !                                                                                     
+  !
   VTYPE :: &
        zsolH(MAXEQNH),  zgradH(MAXEQNH,3), &
        zsolE(3,MAXEQNE),zcurlE(3,MAXEQNE), &
        zsolV(3,MAXEQNV),zdivV(MAXEQNV), &
        zsolQ(MAXEQNQ)
-  !                                                                                     
+  !
   VTYPE:: &
        zvalH(MAXEQNH), &
        zdvalH(MAXEQNH,3),zd2valH(MAXEQNH,3,3), &

@@ -1,14 +1,14 @@
 !----------------------------------------------------------------------
-!                                                                     
+!
 !     routine name      - common_prob_data
-!                                                                     
-!---------------------------------------------------------------------- 
-!                                                                     
+!
+!----------------------------------------------------------------------
+!
 !     latest revision:  - July 17
-!                                                                     
+!
 !     purpose:          - module setting up the parameters for the
 !                         acoustics problem
-!                                                                    
+!
 !
 !----------------------------------------------------------------------
 !
@@ -70,12 +70,12 @@ module common_prob_data
    integer, parameter :: INOREFINEMENT  = 0
    integer, parameter :: IUNIFORM       = 1
    integer, parameter :: IADAPTIVE      = 2
-!   
+!
 !..DISPLAY SETTINGS (soldis.F90 ...)
 !..DISPLAY SETTINGS (paraview   ...)
    integer :: IEXACT_DISP, ITANGENT_DISP, ICHOOSE_DISP
    integer :: IDOMAIN_SMOOTHE = 0
-!   
+!
 !..DISPLAY SETTINGS - paraview
    integer, dimension(10) :: ISEL_PARAVIEW = (/0,0,0,0,0,1,1,1,1,1/)
 !
@@ -91,7 +91,7 @@ module common_prob_data
 !..ELEMENT CALCULATIONS (elem.F90)
    real(8), parameter :: SYMMETRY_TOL = 1.d-9
 !
-!..number of wavelengths and angular frequency 
+!..number of wavelengths and angular frequency
    real(8) :: RNUM, OMEGA
 
 !..permittivity (ε) and permeability (μ)

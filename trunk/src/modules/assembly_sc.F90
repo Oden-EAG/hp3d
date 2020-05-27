@@ -8,7 +8,7 @@
 !
 !    purpose            - Module sets up required workspace for the
 !                         assembly of the global stiffness matrix and
-!                         load vector, as well as connectivity maps to 
+!                         load vector, as well as connectivity maps to
 !                         avoid recomputation after solve.
 !
 !    contains

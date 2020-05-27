@@ -18,7 +18,7 @@
 !        in:
 !              Mdle     - element middle node number
 !
-!        out:   
+!        out:
 !              Itest    - index for assembly
 !              Itrial   - index for assembly
 !

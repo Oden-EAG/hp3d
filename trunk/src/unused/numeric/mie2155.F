@@ -13,15 +13,15 @@ cc and size parameter x=k0*a, where k0= wave number
 cc in the ambient medium, a=sphere radius;
 cc p. 100, 477 in Bohren and Huffman (1983) BEWI:TDD122
 cc C. Mätzler, June 2002
-c------------------------------------------------------      
+c------------------------------------------------------
       subroutine mie_coeff(
      .  N, Zref,X,
-     .  Za,Zb,Zc,Zd) 
+     .  Za,Zb,Zc,Zd)
 #include "syscom.blk"
-c      
+c
       integer, parameter :: idelta = 1
-c      
-      dimension Za(N), Zb(N), Zc(N), Zd(N) 
+c
+      dimension Za(N), Zb(N), Zc(N), Zd(N)
 c
 c     local variables
       dimension
@@ -63,7 +63,7 @@ c
 c
         Za(i) = ( zref2*ztemp(1,1) - ztemp(1,2) )/
      .          ( zref2*ztemp(2,1) - ztemp(2,2) )
-        
+
         Zb(i) = ( ztemp(1,1) - ztemp(1,2) )/
      .          ( ztemp(2,1) - ztemp(2,2) )
 c
@@ -79,14 +79,14 @@ c
 c
 c
       end subroutine mie_coeff
-c------------------------------------------------------      
+c------------------------------------------------------
 c> Computation of Mie Efficiencies for given
 cc complex refractive-index ratio m=m'+im"
 cc and size parameter x=k0*a, where k0= wave number in ambient
 cc medium, a=sphere radius, using complex Mie Coefficients
 cc an and bn for n=1 to nmax,
 cc s. Bohren and Huffman (1983) BEWI:TDD122, p. 103,119-122,477.
-c------------------------------------------------------      
+c------------------------------------------------------
       subroutine mie(
      .  N, Zref, X,
      .  Qext, Qsca, Qabs, Qb)
@@ -94,11 +94,11 @@ c------------------------------------------------------
       integer, parameter :: idelta = 2
       complex*16 :: zqb
       complex*16, dimension(N+idelta) :: za, zb, zc, zd
-c      
+c
       Qext = 0.d0; Qsca = 0.d0; Qabs = 0.d0; Qb = 0.d0;
       zqb  = cmplx(0.d0, 0.d0)
       if (X.eq.0.d0) return
-c      
+c
       call mie_coeff(N,Zref,X,  za,zb,zc,zd)
 c
       write(*,*) zqb
@@ -115,11 +115,11 @@ c
       Qext = Qext*2.d0/(x**2)
       Qabs = Qext - Qsca
       Qb   = (zqb*conjg(zqb))/(x**2)
-c      
-      end subroutine
-c------------------------------------------------------            
 c
-c------------------------------------------------------            
+      end subroutine
+c------------------------------------------------------
+c
+c------------------------------------------------------
       subroutine mie_phitau(N, U, P, T)
 #include "syscom.blk"
       integer, parameter :: idelta = 2
@@ -139,9 +139,9 @@ c
       enddo
 c
       end subroutine
-c------------------------------------------------------            
+c------------------------------------------------------
 c
-c------------------------------------------------------      
+c------------------------------------------------------
       subroutine mie_s12(
      .  N, Zref, X, U,
      .  ZS1, ZS2)
@@ -150,7 +150,7 @@ c
       integer, parameter :: idelta = 2
       real*8,     dimension(N+idelta) :: p, t
       complex*16, dimension(N+idelta) :: za, zb, zc, zd
-c      
+c
       call mie_coeff(N,Zref,X,  za,zb,zc,zd)
       call mie_phitau(N, U, p, t);
 c
@@ -165,17 +165,17 @@ ccc        write(*,*) d, p(i), t(i)
 c
       end subroutine
 c
-c------------------------------------------------------            
+c------------------------------------------------------
 c
-c------------------------------------------------------      
+c------------------------------------------------------
       subroutine mie_far_field(
-     .  N, Zref, X, 
+     .  N, Zref, X,
      .  Rk, Rad, Theta, Phi,
      .  ZST, ZSP)
 #include "syscom.blk"
 c
       call mie_s12(N, Zref, X, dcos(Theta), zs1, zs2)
-c      
+c
       ZST =
      .  exp(cmplx(0.d0, 1.d0)*Rk*Rad)
      .  /(-cmplx(0.d0, 1.d0)*Rk*Rad)
@@ -185,24 +185,24 @@ c
      .  exp(cmplx(0.d0, 1.d0)*Rk*Rad)
      .  /(cmplx(0.d0, 1.d0)*Rk*Rad)
      .  *dsin(Phi)*zs1
-c     
+c
       end subroutine
 c
 c
-c------------------------------------------------------            
+c------------------------------------------------------
 c
-c------------------------------------------------------      
+c------------------------------------------------------
       subroutine mie_near_field(
-     .  N, Zref, X,  
+     .  N, Zref, X,
      .  Rad, Theta, Phi,
      .  Z_int, Z_sca)
 #include "syscom.blk"
-c      
+c
 c     ... Internal field on spherical coord
       complex*16, dimension(3)            :: Z_int, Z_sca
-      
+
       integer, parameter                  :: idelta = 2
-c      
+c
       real*8,     dimension(N+idelta)     :: p, t
       complex*16, dimension(N+idelta)     :: za, zb, zc, zd
 c
@@ -211,18 +211,18 @@ c
 c
       complex*16, dimension(3)            :: zm, zn
       real*8, parameter :: eps = 1.0e-14
-c     
+c
       z   = Rad*Zref*X
 c
       if (abs(z).lt.eps) then
         z = z + eps
       endif
-c      
+c
       call mie_coeff(N,Zref,X,  za,zb,zc,zd)
       call mie_phitau(N, dcos(Theta), p, t);
 c
       call sphj(N, real(z), N, rj, rjd)
-      zj = rj;    zjd = rjd      
+      zj = rj;    zjd = rjd
 c
       Z_int(1:3) = cmplx(0.d0, 0.d0)
       Z_sca(1:3) = cmplx(0.d0, 0.d0)
@@ -234,21 +234,21 @@ c
         zm(3) = -dsin(Phi)*t(i)*zj(i)
 c
         zdd   = (zj(i)+z*zjd(i))
-c        
+c
         zn(1) =  i*(i+1)*dcos(Phi)*dsin(Theta)*p(i)*zj(i)/z
         zn(2) =  dcos(Phi)*t(i)*zdd/z
         zn(3) = -dsin(Phi)*p(i)*zdd/z
 c
         Z_n = (cmplx(0.d0, 1.d0)**i)*(2*i+1.d0)/(i*(i+1.d0))
-        
-        Z_int(1:3) = Z_int(1:3) 
+
+        Z_int(1:3) = Z_int(1:3)
      .    + Z_n * ( zc(i)*zm(1:3) - cmplx(0.d0, 1.d0)*zd(i)*zn(1:3) )
 
         Z_sca(1:3) = Z_sca(1:3)
      .    + Z_n * (-zb(i)*zm(1:3) + cmplx(0.d0, 1.d0)*za(i)*zn(1:3) )
-c        
+c
       enddo
-c     
+c
       end subroutine
 c
 c

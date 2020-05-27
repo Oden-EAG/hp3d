@@ -177,7 +177,7 @@ c----------------------------------------------------------------------
 c
 c     latest revision:  - Nov 14, Apr 17
 c
-c     purpose:          - evaluate quad H(curl) shape functions and 
+c     purpose:          - evaluate quad H(curl) shape functions and
 c                         their curls
 c
 c     arguments:

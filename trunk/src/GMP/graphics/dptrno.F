@@ -8,14 +8,14 @@ c   computer           - machine independent
 c
 c   latest revision    - Dec, 01
 c
-c   purpose            - routine displays the nicknames of 
+c   purpose            - routine displays the nicknames of
 c                        all 2D blocks
 c
 c   usage              - call dptrno
 c
 c   arguments          - none
 c
-c   required  routines - 
+c   required  routines -
 c
 c----------------------------------------------------------------------
 c
@@ -55,7 +55,7 @@ c  .....get the bases, next edges and then the vertices
               if (nc.gt.0) then
                 np = CURVES(nc)% EndPoNo(1)
               else
-                np = CURVES(-nc)% EndPoNo(2) 
+                np = CURVES(-nc)% EndPoNo(2)
               endif
               iv=iv+1
               call pointr(np, xcoord(1,iv))
@@ -92,7 +92,7 @@ c  .....transform to observer's system
 c
 c  .....rescale
         do 95 ivar=1,2
-          XY(ivar,1) = (xavob(ivar)-XCIM(ivar))/DIMIM*SIZE 
+          XY(ivar,1) = (xavob(ivar)-XCIM(ivar))/DIMIM*SIZE
      .                 + XCWIN(ivar)
    95   continue
 c
@@ -145,7 +145,7 @@ c  .....transform
 c
 c  .....rescale
         do 195 ivar=1,2
-          XY(ivar,1) = (xavob(ivar)-XCIM(ivar))/DIMIM*SIZE 
+          XY(ivar,1) = (xavob(ivar)-XCIM(ivar))/DIMIM*SIZE
      .                 + XCWIN(ivar)
   195     continue
 c

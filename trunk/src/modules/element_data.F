@@ -569,12 +569,12 @@ c
       select case(Ftype)
       case('mdlt')
         do ie=1,3
-          Nfedg_or(ie) = 
+          Nfedg_or(ie) =
      .            mod(Nedge_or(ie)+TRIAN_ORIENT_L2G(ie,Nface_or),2)
         enddo
       case('mdlq')
         do ie=1,4
-          Nfedg_or(ie) = 
+          Nfedg_or(ie) =
      .            mod(Nedge_or(ie)+QUADR_ORIENT_L2G(ie,Nface_or),2)
         enddo
       end select

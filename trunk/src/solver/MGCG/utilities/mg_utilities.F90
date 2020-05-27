@@ -1,4 +1,4 @@
-!  
+!
 !
 #include "implicit_none.h"
 
@@ -8,11 +8,11 @@
 
    VTYPE,   intent(in) :: v(:)
    real*8 :: l2norm
-#if C_MODE   
+#if C_MODE
    real*8,  external   :: dznrm2
-#else   
+#else
    real*8,  external   :: dnrm2
-#endif   
+#endif
    integer :: n
 !
 !------------------------------------------------------------
@@ -23,7 +23,7 @@
    l2norm = dznrm2(n,v,1)
 #else
    l2norm = dnrm2(n,v,1)
-#endif   
+#endif
 
    end function l2norm
 !
@@ -41,7 +41,7 @@
    complex*16, external :: zdotc
 #else
    real*8, external :: ddot
-#endif      
+#endif
 !
 !------------------------------------------------------------
 !
@@ -55,6 +55,6 @@
    dotp = zdotc(n,v,1,u,1)
 #else
    dotp =  ddot(n,v,1,u,1)
-#endif   
+#endif
 
    end function dotp

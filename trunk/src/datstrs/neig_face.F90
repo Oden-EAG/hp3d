@@ -16,8 +16,8 @@
 !!           *       *               *************       *   *       *
 !!           *       *               *\\\\\\\*(2)*       *   *       *
 !!           *       *************************************************
-!!           *     *                 *\\\\\*     *     *     *     *  
-!!           *   *                   *\\\*       *   *       *   *    
+!!           *     *                 *\\\\\*     *     *     *     *
+!!           *   *                   *\\\*       *   *       *   *
 !!           * *                     *\*         * *         * *
 !!           *************************************************
 !!
@@ -87,7 +87,7 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
 !
 !------------------------------------------------------------------------
 !  Step 1 : go UP the tree and record FACE refienement history.         |
-!  REMARK: all recorded father nodes are mid-FACE nodes.                |     
+!  REMARK: all recorded father nodes are mid-FACE nodes.                |
 !------------------------------------------------------------------------
    nod=Mface ; igen=0
    do
@@ -108,7 +108,7 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
 !
   ! CASE 1 : initial mesh middle node // initial mesh face node
   ! CASE 2 : middle father node       // face node (namely Mface)
-             mdle=nod                 ;  nod=nface_list(nrgen) 
+             mdle=nod                 ;  nod=nface_list(nrgen)
 !
    if (iprint.eq.1) then
      write(*,3)nrgen,mdle,nod
@@ -130,7 +130,7 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
      Nrneig=1 ; Neig(1)=mdle ; Nsid_list(1)=iface ; Norient_list(1)=nface_ort(iface)
 !
 ! ...nodes and orientations of "mdle"
-     call elem_nodes(mdle, nodesl_neig(1,:),norientl_neig(1,:)) 
+     call elem_nodes(mdle, nodesl_neig(1,:),norientl_neig(1,:))
 !
 ! ...look for a neighbor of "mdle" across face
      mdle=ELEMS(mdle)%neig(iface)
@@ -148,7 +148,7 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
         Nrneig=2 ; Neig(2)=mdle ; Nsid_list(2)=iface ; Norient_list(2)=nface_ort(iface)
 !
 !    ...nodes and orientations of neighbor of "mdle"
-        call elem_nodes(mdle, nodesl_neig(2,:),norientl_neig(2,:)) 
+        call elem_nodes(mdle, nodesl_neig(2,:),norientl_neig(2,:))
      endif
 !
 !..CASE 2 : internal face
@@ -209,7 +209,7 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
 !
 !     face = face(igen)
 !
-!     look for son of Neig attached to face 
+!     look for son of Neig attached to face
 !
 !     IF found [update neighbor]
 !
@@ -240,7 +240,7 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
         type=NODES(Neig(i))%type
         kref=NODES(Neig(i))%ref_kind
         call nr_mdle_sons(type, kref, nrsons)
-        
+
         if (iprint.eq.1) then
            write(*,13)i,igen,nod,Neig(i),kref,nrsons
 13         format(' neig_face: i,igen,nod,Neig,kref,nrsons = ',2(i2),2x,2i10,2i3)

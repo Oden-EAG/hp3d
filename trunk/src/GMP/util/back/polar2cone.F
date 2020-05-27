@@ -4,16 +4,16 @@
       !*** LATEST REVISION:     Aug 08
       !
       !*** PURPOSE:             subroutine maps a circular sector of amplitude beta to a cone of half-aperture
-      !                         alpha, vertex at the origin, and axis oriented as the z-axis. 
+      !                         alpha, vertex at the origin, and axis oriented as the z-axis.
       !
       !*** REQUIRED PROCEDURES: none
       !
       !*** REMARKS:             angle alpha must belong to (0, pi); the relationship between alpha and beta is:
       !                         beta = 2pi*sin(alpha).
 !**************************************************************************************************************
-      IMPLICIT NONE      
+      IMPLICIT NONE
 !**************************************************************************************************************
-      !*** DUMMY ARGUMENTS     
+      !*** DUMMY ARGUMENTS
       double precision, intent(in) :: alpha               !*** half-aperture for cone
       double precision, intent(in) :: rho, theta          !*** polar cordinates for a point
       double precision, dimension(3), intent(out) :: r    !*** cartesian coordinates for image point
@@ -40,4 +40,4 @@
       r(3) = rho*cos(alpha)
       !
       END SUBROUTINE polar2cone
-  
+

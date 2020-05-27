@@ -14,11 +14,11 @@ c
 c
 c  ...initialized dimensions for workspaces, if not set by the user
       if (.NOT. INITIALIZED) then
-c                                MXIGTR // MXIGSTR // MXRGTRZ 
+c                                MXIGTR // MXIGSTR // MXRGTRZ
         call set_x11_workspace(10000000,10000000,10000000)
       endif
 c
-c  ...allocate workspaces for graphics      
+c  ...allocate workspaces for graphics
       allocate(IGTRCU(MXIGTR ), stat=istat)
       if (istat.ne.0) then
         write(*,*)'graphb: IGTRCU not allocated!' ; stop
@@ -51,7 +51,7 @@ ccc      read(*,*) iwin
       iwin = 5 ! who uses anything but 5 these days? - jz
       call initwin(iwin)
 c
-c  ...display in infinite loop      
+c  ...display in infinite loop
    10 continue
       write(*,*)
       write(*,*)'graphb: SELECT:'

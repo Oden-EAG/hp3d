@@ -7,7 +7,7 @@
 !
 !    latest revision    - FEB 17
 !
-!    purpose            - routine computes the maximum eigenvalue using 
+!    purpose            - routine computes the maximum eigenvalue using
 !                         power iteration method
 !
 !-----------------------------------------------------------------------
@@ -16,25 +16,25 @@
 
    subroutine sparse_power_iteration(SA,IA,JA,nz,n,lamda)
 !
-   implicit none      
-! 
+   implicit none
+!
 #if C_MODE
    complex*16 :: SA(nz), x(n), y(n)
    real*8     :: dznrm2
-#else   
+#else
    real*8     :: SA(nz), x(n), y(n)
    real*8     :: dnrm2
 #endif
-   integer    :: IA(nz), JA(nz), i, nz,n, maxit   
+   integer    :: IA(nz), JA(nz), i, nz,n, maxit
    real*8     :: lamda, lamda_old
 
 !..workspace for mkl_?coomv
    character  :: matdescra(4)
-! 
+!
 !-----------------------------------------------------------------------
-! 
+!
    matdescra(1) = 'G' ;  matdescra(2) = 'U' ;
-   matdescra(3) = 'N' ;  matdescra(4) = 'F'     
+   matdescra(3) = 'N' ;  matdescra(4) = 'F'
    maxit = 200
 
 !..initialize x
@@ -45,7 +45,7 @@
 #else
    x = 1.d0
    lamda = dnrm2(n,x,1)
-#endif      
+#endif
 
    x = x/lamda
    lamda_old = lamda
@@ -56,14 +56,14 @@
       call mkl_zcoomv('N',n,n,(1.d0,0.d0),matdescra,SA,IA,JA,nz,x,(0.d0,0.d0),y)
 #else
       call mkl_dcoomv('N',n,n,1.d0,matdescra,SA,IA,JA,nz,x,0.d0,y)
-#endif      
+#endif
 
 #if C_MODE
       lamda = dznrm2(n,y,1)
 #else
       lamda = dnrm2(n,y,1)
 
-#endif      
+#endif
       if (abs(lamda_old-lamda)/abs(lamda) .le. 1e-10 )  then
          exit
       endif
@@ -88,7 +88,7 @@
 !
 !    latest revision    - FEB 17
 !
-!    purpose            - routine computes the minimum eigenvalue using 
+!    purpose            - routine computes the minimum eigenvalue using
 !                         inverse iteration method
 !
 !-----------------------------------------------------------------------
@@ -100,9 +100,9 @@
    use mumps
 
 #if C_MODE
-   complex*16 :: temp(n) 
+   complex*16 :: temp(n)
    real*8     :: dznrm2
-#else   
+#else
    real*8     :: temp(n)
    real*8     :: dnrm2
 #endif
@@ -118,8 +118,8 @@
 #else
    mumps_par%RHS = 1.0d0
    lamda = dnrm2(n,mumps_par%RHS,1)
-#endif   
-! 
+#endif
+!
    lamda_old = lamda
    mumps_par%RHS = mumps_par%RHS/lamda
 
@@ -133,16 +133,16 @@
 #else
       call dmumps(mumps_par)
       lamda = dnrm2(n,mumps_par%RHS,1)
-#endif      
+#endif
 
-      if (abs(lamda_old-lamda)/abs(lamda) .le. 1e-12 ) then 
+      if (abs(lamda_old-lamda)/abs(lamda) .le. 1e-12 ) then
          exit
-      endif   
+      endif
       lamda_old = lamda
       ! write(*,*) 1.0d0/lamda
       mumps_par%RHS = mumps_par%RHS/lamda
    enddo
-      
+
    mumps_par%RHS = temp
    lamda = 1.0d0/lamda
 
@@ -164,7 +164,7 @@
 !
 !    latest revision    - FEB 17
 !
-!    purpose            - routine computes the maximum eigenvalue using 
+!    purpose            - routine computes the maximum eigenvalue using
 !                         power iteration method
 !
 !-----------------------------------------------------------------------
@@ -173,25 +173,25 @@
 
    subroutine sparse_power_iteration_indefinite(SA,IA,JA,nz,n,lamda)
 !
-   implicit none      
-! 
+   implicit none
+!
 #if C_MODE
    complex*16 :: SA(nz), x(n), y(n)
    real*8     :: dznrm2
-#else   
+#else
    real*8     :: SA(nz), x(n), y(n)
    real*8     :: dnrm2
 #endif
-   integer    :: IA(nz), JA(nz), i, nz,n, maxit   
+   integer    :: IA(nz), JA(nz), i, nz,n, maxit
    real*8     :: lamda, lamda_old
 
 !..workspace for mkl_?coomv
    character  :: matdescra(4)
-! 
+!
 !-----------------------------------------------------------------------
-! 
+!
    matdescra(1) = 'G' ;  matdescra(2) = 'U' ;
-   matdescra(3) = 'N' ;  matdescra(4) = 'F'     
+   matdescra(3) = 'N' ;  matdescra(4) = 'F'
    maxit = 50
 
 !..initialize x
@@ -202,7 +202,7 @@
 #else
    x = 1.d0
    lamda = dnrm2(n,x,1)
-#endif      
+#endif
 
    x = x/lamda
    lamda_old = lamda
@@ -215,14 +215,14 @@
       y=x
 #else
       call mkl_dcoomv('N',n,n,1.d0,matdescra,SA,IA,JA,nz,x,0.d0,y)
-#endif      
+#endif
 
 #if C_MODE
       lamda = dznrm2(n,y,1)
 #else
       lamda = dnrm2(n,y,1)
 
-#endif      
+#endif
       if (abs(lamda_old-lamda)/abs(lamda) .le. 1e-10 )  then
          exit
       endif
@@ -247,7 +247,7 @@
 !
 !    latest revision    - FEB 17
 !
-!    purpose            - routine computes the minimum eigenvalue using 
+!    purpose            - routine computes the minimum eigenvalue using
 !                         inverse iteration method
 !
 !-----------------------------------------------------------------------
@@ -259,10 +259,10 @@
    use mumps
 
 #if C_MODE
-   complex*16 :: temp(n) , tempA(mumps_par%NZ),A(mumps_par%NZ)  
+   complex*16 :: temp(n) , tempA(mumps_par%NZ),A(mumps_par%NZ)
    real*8     :: dznrm2
-#else   
-   real*8     :: temp(n), tempA(mumps_par%NZ),A(mumps_par%NZ) 
+#else
+   real*8     :: temp(n), tempA(mumps_par%NZ),A(mumps_par%NZ)
    real*8     :: dnrm2
 #endif
    integer    :: i, maxit, tempIA(mumps_par%NZ), tempJA(mumps_par%NZ)
@@ -276,11 +276,11 @@
 
    nz = mumps_par%NZ
    nrdof = mumps_par%N
-#if C_MODE   
+#if C_MODE
    tempA = conjg(mumps_par%A)
 #else
    tempA = mumps_par%A
-#endif      
+#endif
    tempIA = mumps_par%JCN
    tempJA = mumps_par%IRN
 
@@ -293,8 +293,8 @@
 #else
    mumps_par%RHS = 1.0d0
    lamda = dnrm2(n,mumps_par%RHS,1)
-#endif   
-! 
+#endif
+!
    lamda_old = lamda
    mumps_par%RHS = mumps_par%RHS/lamda
 
@@ -316,15 +316,15 @@
 #else
       call dmumps(mumps_par)
       lamda = dnrm2(n,mumps_par%RHS,1)
-#endif      
+#endif
 
-      if (abs(lamda_old-lamda)/abs(lamda) .le. 1e-10 ) then 
+      if (abs(lamda_old-lamda)/abs(lamda) .le. 1e-10 ) then
          exit
-      endif   
+      endif
       lamda_old = lamda
       mumps_par%RHS = mumps_par%RHS/lamda
    enddo
-      
+
    mumps_par%RHS = temp
    lamda = 1.0d0/lamda
 
