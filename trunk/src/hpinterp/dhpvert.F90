@@ -1,5 +1,5 @@
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 !-----------------------------------------------------------------------
 !> Purpose :  routine determines Dirichlet dof for a vertex

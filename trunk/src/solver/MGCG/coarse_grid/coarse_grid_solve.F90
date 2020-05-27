@@ -16,7 +16,7 @@
 !
 !-----------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
    ! subroutine coarse_grid_solve(Igrid,z,m)
    subroutine coarse_grid_solve(Igrid)

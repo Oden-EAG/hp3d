@@ -24,7 +24,7 @@
 !> @data Nov 14
 !-------------------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,ZdofV,ZdofQ,Nflag, &
                    X,Dxdxi,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ                          )

@@ -23,7 +23,7 @@
 !
 !--------------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
                                  NrTest,NrdofEE,         &

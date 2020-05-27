@@ -22,7 +22,7 @@
 !
 !---------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 subroutine elem_residual_heat(Mdle,                &
                               NrTest,NrdofHH,      &

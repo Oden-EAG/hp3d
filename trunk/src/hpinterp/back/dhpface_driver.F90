@@ -16,7 +16,7 @@
 !! @param[out] ZnodH        - H1 dof for the edge
 !! @param[out] ZnodE        - H(curl) dof for the edge
 !! @param[out] ZnodV        - H(div) dof for the edge
-#include "implicit_none.h"
+#include "typedefs.h"
 subroutine dhpface( &
      Iflag,No,Etav, Type,Icase, &
      Nedge_orient,Nface_orient,Norder,Iface, &

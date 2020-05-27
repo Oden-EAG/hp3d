@@ -1,7 +1,7 @@
 !
 !..verification subroutines
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !----------------------------------------------------------------------
 !
 !     subroutine:          par_verify

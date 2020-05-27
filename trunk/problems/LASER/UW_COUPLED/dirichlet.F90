@@ -13,7 +13,7 @@
 !! @param[out] DvalV - H(div) corresponding first derivatives
 !----------------------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
 !

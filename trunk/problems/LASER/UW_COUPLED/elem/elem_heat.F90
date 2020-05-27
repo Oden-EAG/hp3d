@@ -33,7 +33,7 @@
 !
 !---------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 subroutine elem_heat(Mdle,                   &
                      NrTest,NrTrial,         &

@@ -20,7 +20,7 @@
 !> @date Mar 17
 !-----------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
   subroutine dhpedgeH(Mdle,Iflag,No,Etav,Type,Icase,&
                       Nedge_orient,Nface_orient,Norder,Iedge,&
                       ZdofH, ZnodH)

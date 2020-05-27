@@ -1,6 +1,6 @@
 !
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 
    function l2norm(v)
 

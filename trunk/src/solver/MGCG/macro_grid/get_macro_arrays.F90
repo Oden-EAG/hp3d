@@ -20,7 +20,7 @@
 !
 !-----------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
    subroutine get_macro_arrays(Igrid, Ielc, Abi, bb,nb,ni)
 !

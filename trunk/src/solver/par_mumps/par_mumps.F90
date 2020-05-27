@@ -1,5 +1,5 @@
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 ! -----------------------------------------------------------------------
 !
 !    module name        - par_mumps

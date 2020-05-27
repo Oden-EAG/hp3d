@@ -26,7 +26,7 @@
 !..TODO accommodate usage of PHYSAm (loop through physics variables)
 !..     see solout_mg or compute_sol_dof for example
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
    subroutine coarse2macro(Igrid,Iel,Zu_c,Nrdof_c, Zu_m,Nrdof_m)
 !

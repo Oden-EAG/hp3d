@@ -11,7 +11,7 @@
 !
 !----------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 
    module derived_types
 !

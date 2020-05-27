@@ -1,7 +1,7 @@
 !
 !..auxiliary subroutines for distributed mesh (par_mesh module)
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 !----------------------------------------------------------------------
 !

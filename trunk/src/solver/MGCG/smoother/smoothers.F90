@@ -22,7 +22,7 @@
 !-----------------------------------------------------------------------
 !
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
    subroutine block_jacobi_smoother(Igrid,r,n, maxit, z)
 !

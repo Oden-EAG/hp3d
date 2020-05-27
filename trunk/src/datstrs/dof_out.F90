@@ -5,7 +5,7 @@
 !!                                         from the data structure in the
 !!                                         expanded mode
 
-#include "implicit_none.h"
+#include "typedefs.h"
 subroutine dof_out( &
      Nod, &
      KdofH,KdofE,KdofV,KdofQ, &

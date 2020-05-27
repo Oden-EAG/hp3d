@@ -3,7 +3,7 @@
 !    routine name       - compute_sol_dof
 !
 ! ----------------------------------------------------------------------
-#include "implicit_none.h"
+#include "typedefs.h"
 subroutine compute_sol_dof(Igrid)
 !
    use mg_data_structure, only: GRID

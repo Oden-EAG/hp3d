@@ -29,7 +29,7 @@
 !
 !-----------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
    subroutine celem_macro(Igrid,Idec_sch,Ielc,MdleC, Nrdof_macro,Nrnod_macro,Nod_macro,  &
                           NdofH_macro,NdofE_macro,NdofV_macro,Zbload,Zastif)

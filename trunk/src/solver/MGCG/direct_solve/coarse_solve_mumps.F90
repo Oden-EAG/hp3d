@@ -15,7 +15,7 @@
 !                                 'G': General case for Lapack routines
 !
 ! ----------------------------------------------------------------------
-#include "implicit_none.h"
+#include "typedefs.h"
    subroutine coarse_solve_mumps(mtype)
 !
    use data_structure3D, ONLY: NRNODS, NODES

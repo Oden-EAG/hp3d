@@ -10,7 +10,7 @@
 !
 !----------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 
    module pcg_info
 

@@ -1,5 +1,5 @@
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 !-------------------------------------------------------------------
 !  subroutine: get_L2NormCOMS

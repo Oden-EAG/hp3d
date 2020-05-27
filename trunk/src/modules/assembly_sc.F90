@@ -17,7 +17,7 @@
 !----------------------------------------------------------------------!
 module assembly_sc
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 !..timers
    real(8) :: MTime(20)

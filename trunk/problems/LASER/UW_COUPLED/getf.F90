@@ -9,7 +9,7 @@
 !! @param[out] ZJval - rhs J
 !------------------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 subroutine getf(Mdle,X, Zfval,ZJval)
 !

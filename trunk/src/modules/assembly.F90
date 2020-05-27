@@ -5,7 +5,7 @@ module assembly
    use physics
    use error
 
-#include "implicit_none.h"
+#include "typedefs.h"
 
 ! Type definition
 !~~~~~~~~~~~~~~~~

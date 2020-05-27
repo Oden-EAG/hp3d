@@ -24,7 +24,7 @@
 !  REMARK : do NOT change field delimiter ";" in dump file! It is used by
 !           testing script!
 !---------------------------------------------------------------------------------------
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 subroutine compute_error(Flag,Itag)
 !

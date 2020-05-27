@@ -10,7 +10,7 @@
 !> @date Oct 2019
 !----------------------------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !

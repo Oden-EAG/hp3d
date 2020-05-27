@@ -23,7 +23,7 @@
 !
 !---------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
    subroutine elem_maxwell_gram_hexa(Mdle,Fld_flag,NrTest,NrdofH, GramP)
 !

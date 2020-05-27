@@ -18,7 +18,7 @@
 !
 !----------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 subroutine elem(Mdle, Itest,Itrial)
 !

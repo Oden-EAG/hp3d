@@ -1,6 +1,6 @@
 !
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 
    subroutine mg_preconditioner(Nrgrids,r,z,n)
 !
