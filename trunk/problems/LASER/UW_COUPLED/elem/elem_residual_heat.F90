@@ -357,12 +357,12 @@ subroutine elem_residual_heat(Mdle,                &
             bload_H(k1) = bload_H(k1) - DELTA_T*ALPHA_0*rsolVn*v1*weight
          enddo
       enddo
-      if (iprint.eq.1) pause
+      if (iprint.eq.1) call pause
    enddo
    if (iprint.ge.1) then
       write(*,7015) bload_H(1:NrTest)
 7015  format('elem_residual_heat: FINAL bload_H = ',10(/,10(e12.5,2x)))
-      pause
+      call pause
    endif
 !
 !-----------------------------------------------------------------------
@@ -396,7 +396,7 @@ subroutine elem_residual_heat(Mdle,                &
    if (iprint.ge.1) then
       write(*,7010) Mdle, Resid
  7010 format('elem_residual_heat: Mdle, Resid = ',i5,3x,e12.5)
-      pause
+      call pause
    endif
 !
 end subroutine elem_residual_heat

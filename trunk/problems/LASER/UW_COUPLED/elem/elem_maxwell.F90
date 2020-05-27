@@ -413,7 +413,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !.....................................................
 !...............toggle PML............................
 !
-      if(USE_PML.eq.0) then
+      if(.not. USE_PML) then
          JJstretch      = ZERO
          JJstretch(1,1) = ZONE
          JJstretch(2,2) = ZONE
@@ -775,26 +775,26 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
       write(*,7011) ZblocE(1:2*NrdofE)
       write(*,7011) ZblocQ(1:6*NrdofQ)
 7011  format(12e12.5)
-      pause
+      call pause
       write(*,7012)
 7012  format('elem_maxwell: ZalocEE = ')
       do i=1,2*NrdofE
          write(*,7013) i,ZalocEE(i,1:2*NrdofE)
 7013     format('i = ',i3,10(/,6(2e12.5,2x)))
       enddo
-      pause
+      call pause
       write(*,7014)
 7014  format('elem_maxwell: ZalocEQ = ')
       do i=1,2*NrdofE
          write(*,7013) i,ZalocEQ(i,1:6*NrdofQ)
       enddo
-      pause
+      call pause
       write(*,7015)
 7015  format('elem_maxwell: ZalocQQ = ')
       do i=1,6*NrdofQ
          write(*,7013) i,ZalocQQ(i,1:6*NrdofQ)
       enddo
-      pause
+      call pause
    endif
 #endif
 !

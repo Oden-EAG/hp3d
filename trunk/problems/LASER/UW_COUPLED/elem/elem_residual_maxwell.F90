@@ -367,7 +367,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !.....................................................
 !...............toggle PML............................
 !
-      if(USE_PML.eq.0) then
+      if(.not. USE_PML) then
          JJstretch      = ZERO
          JJstretch(1,1) = ZONE
          JJstretch(2,2) = ZONE

@@ -50,7 +50,7 @@ module commonParam
    real(8) :: ALPHA_NORM = 1.0d0
 !
 !..for PML: length of Z region and PML_REGION, PML_FRACTION
-   integer :: USE_PML
+   logical :: USE_PML
    real(8) :: ZL, PML_REGION, PML_FRAC, EXP_COEFF
 !
 !..additional parameters including those required by the system

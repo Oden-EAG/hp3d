@@ -133,7 +133,7 @@ subroutine getf(Mdle,X, Zfval,ZJval)
    if (iprint.eq.1) then
       write(*,7010) Zfval
  7010 format(' getf: Zfval = ',2e12.5)
-      pause
+      call pause
    endif
 !
 end subroutine getf

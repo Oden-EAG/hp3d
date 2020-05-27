@@ -132,19 +132,19 @@ subroutine my_sizetest
 !
    do nod=1,NRNODS
        if (.not. associated(NODES(nod)%dof)) cycle
-       if (associated(NODES(nod)%dof%coord).eq. .true.) then
+       if (associated(NODES(nod)%dof%coord)) then
          size_coord = size_coord + STORAGE_SIZE(NODES(nod)%dof%coord)
        endif
-       if (associated(NODES(nod)%dof%zdofH).eq. .true.) then
+       if (associated(NODES(nod)%dof%zdofH)) then
          size_h1 = size_h1 + STORAGE_SIZE(NODES(nod)%dof%zdofH)
        endif
-       if (associated(NODES(nod)%dof%zdofE).eq. .true.) then
+       if (associated(NODES(nod)%dof%zdofE)) then
          size_hcurl = size_hcurl + STORAGE_SIZE(NODES(nod)%dof%zdofE)
        endif
-       if (associated(NODES(nod)%dof%zdofV).eq. .true.) then
+       if (associated(NODES(nod)%dof%zdofV)) then
          size_hdiv = size_hdiv + STORAGE_SIZE(NODES(nod)%dof%zdofV)
        endif
-       if (associated(NODES(nod)%dof%zdofQ).eq. .true.) then
+       if (associated(NODES(nod)%dof%zdofQ)) then
          size_l2 = size_l2 + STORAGE_SIZE(NODES(nod)%dof%zdofQ)
        endif
    size_tot = size_coord + size_h1 + size_hcurl + size_hdiv + size_l2
