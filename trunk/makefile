@@ -6,8 +6,6 @@
 # Set variables if not set by m_options
 COMPLEX    ?= 0
 C_MODE     ?= 0
-SHAPE      ?= 1
-SHAPE_MODE ?= 1
 DEBUG_MODE ?= 0
 J          ?= 1
 
@@ -38,7 +36,6 @@ endif
 # Files with ending in .F and .F90 (not .f and .f90)
 # are preprocessed according to certain directives
 CCDEFS    = -D"C_MODE=$(COMPLEX)" \
-            -D"SHAPE_MODE=$(SHAPE)" \
             -D"DEBUG_MODE=$(DEBUG_MODE)"
 
 # -- Includes --
@@ -126,8 +123,8 @@ fastlib :
 	@(cd $(FRONTAL_PATH) ; make -j $(J) lib); \
 	(cp -f $(FRONTAL_PATH)/$(FRONTAL_NAME) $(LIB_PATH));
 	@echo "------------------------------------------"
-	@echo " - COMPLEX, SHAPE, DEBUG:" $(COMPLEX) $(SHAPE) $(DEBUG)
-	@echo " - Preprocessor options :" $(CCDEFS)
+	@echo " - COMPLEX, DEBUG         :" $(COMPLEX) $(DEBUG)
+	@echo " - Preprocessor options   :" $(CCDEFS)
 	@echo " - HP3D Library           :" $(LIB_PATH)/$(HP3D_LIBNAME)
 	@echo " - Frontal Solver Library :" $(LIB_PATH)/$(FRONTAL_NAME)
 	@echo " - Finished HP3D Library"

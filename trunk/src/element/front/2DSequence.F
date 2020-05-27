@@ -1,13 +1,12 @@
 c----------------------------------------------------------------------
 c----------------------------------------------------------------------
-c In this file all the forking for SHAPE=0 or SHAPE=1 is performed for
-c the case of the 2D sequence
-c                      2D:    H1--->H(curl)--->L2
-c If SHAPE=0 the subroutines are located in shape_0/h1/shape2H.F
-c                                           shape_0/hcurl/shape2E.F 
-c If SHAPE=1 the subroutines are located in shape_1/ContExactSequence.F
-c                                           shape_1/Quadrilateral.F
-c                                           shape_1/Triangle.F
+c DEPRECATED INTERFACE:
+c previously used to fork between old and new shape functions package.
+c
+c Use the new shape functions, located in:
+c     shape_1/ContExactSequence.F
+c     shape_1/Quadrilateral.F
+c     shape_1/Triangle.F
 c----------------------------------------------------------------------
 c----------------------------------------------------------------------
 c
@@ -43,23 +42,15 @@ c
 c
       implicit none
       character(len=4), intent(in)  :: Type      
-      real*8 , intent(in ) :: Xi(2)
+      real(8), intent(in ) :: Xi(2)
       integer, intent(in ) :: Norder(5)
       integer, intent(in ) :: Nedge_orient(4)
       integer, intent(out) :: NrdofH
-      real*8 , intent(out) :: ShapH(MAXquadH),GradH(2,MAXquadH)
+      real(8), intent(out) :: ShapH(MAXquadH),GradH(2,MAXquadH)
 c
-#if SHAPE_MODE==0
-c
-      write(*,*) 'shape2H:This has NOT been implemented with SHAPE=0.'
-      write(*,*) '        Use shapeHq and shapeHt directly.'
+      write(*,*) 'shape2H error: call shape2DH instead'
       stop
-c
-#else
-c
-      call shape2DH(Type,Xi,Norder,Nedge_orient, NrdofH,ShapH,GradH)
-c  
-#endif
+c     call shape2DH(Type,Xi,Norder,Nedge_orient, NrdofH,ShapH,GradH)
 c
       end subroutine shape2H
 c
@@ -92,21 +83,15 @@ c
       use parameters , only : MAXquadH
 c
       implicit none      
-      real*8 , intent(in ) :: Xi(2)
+      real(8), intent(in ) :: Xi(2)
       integer, intent(in ) :: Norder(5)
       integer, intent(in ) :: Nedge_orient(4)
       integer, intent(out) :: NrdofH
-      real*8 , intent(out) :: ShapH(MAXquadH),GradH(2,MAXquadH)
+      real(8), intent(out) :: ShapH(MAXquadH),GradH(2,MAXquadH)
 c
-#if SHAPE_MODE==0
-c
-      call shapeHq_0(Xi,Norder,Nedge_orient, NrdofH,ShapH,GradH)
-c
-#else
-c
-      call shape2H('quad',Xi,Norder,Nedge_orient, NrdofH,ShapH,GradH)
-c  
-#endif
+      write(*,*) 'shapeHq error: call shape2DH instead'
+      stop
+c     call shape2H('quad',Xi,Norder,Nedge_orient, NrdofH,ShapH,GradH)
 c
       end subroutine shapeHq
 c
@@ -139,21 +124,16 @@ c
       use parameters , only : MAXtriaH
 c
       implicit none      
-      real*8 , intent(in ) :: Xi(2)
+      real(8), intent(in ) :: Xi(2)
       integer, intent(in ) :: Norder(4)
       integer, intent(in ) :: Nedge_orient(3)
       integer, intent(out) :: NrdofH
-      real*8 , intent(out) :: ShapH(MAXtriaH),GradH(2,MAXtriaH)
+      real(8), intent(out) :: ShapH(MAXtriaH),GradH(2,MAXtriaH)
 c
-#if SHAPE_MODE==0
+      write(*,*) 'shapeHt error: call shape2DH instead'
+      stop
+c     call shape2H('tria',Xi,Norder,Nedge_orient, NrdofH,ShapH,GradH)
 c
-      call shapeHt_0(Xi,Norder,Nedge_orient, NrdofH,ShapH,GradH)
-c
-#else
-c
-      call shape2H('tria',Xi,Norder,Nedge_orient, NrdofH,ShapH,GradH)
-c  
-#endif
 c
       end subroutine shapeHt
 c
@@ -189,23 +169,15 @@ c
 c
       implicit none
       character(len=4), intent(in)  :: Type
-      real*8 , intent(in ) :: Xi(2)
+      real(8), intent(in ) :: Xi(2)
       integer, intent(in ) :: Norder(5)
       integer, intent(in ) :: Nedge_orient(4)
       integer, intent(out) :: NrdofE
-      real*8 , intent(out) :: ShapE(2,MAXquadE),CurlE(MAXquadE)
+      real(8), intent(out) :: ShapE(2,MAXquadE),CurlE(MAXquadE)
 c
-#if SHAPE_MODE==0
-c
-      write(*,*) 'shape2E:This has NOT been implemented with SHAPE=0.'
-      write(*,*) '        Use shapeEq and shapeEt directly.'
+      write(*,*) 'shape2E error: call shape2DE instead'
       stop
-c
-#else
-c
-      call shape2DE(Type,Xi,Norder,Nedge_orient, NrdofE,ShapE,CurlE)
-c  
-#endif
+c     call shape2DE(Type,Xi,Norder,Nedge_orient, NrdofE,ShapE,CurlE)
 c
       end subroutine shape2E
 c
@@ -231,29 +203,21 @@ c       ShapE          - values of shape functions
 c       CurlE          - curl of the shape functions      
 c     
 c----------------------------------------------------------------------
-c     
+c
       subroutine shapeEq(Xi,Norder,Nedge_orient, NrdofE,ShapE,CurlE)
 c     
       use parameters , only : MAXquadE
 c
       implicit none      
-      real*8 , intent(in ) :: Xi(2)
+      real(8), intent(in ) :: Xi(2)
       integer, intent(in ) :: Norder(5)
       integer, intent(in ) :: Nedge_orient(4)
       integer, intent(out) :: NrdofE
-      real*8 , intent(out) :: ShapE(2,MAXquadE),CurlE(MAXquadE)
+      real(8), intent(out) :: ShapE(2,MAXquadE),CurlE(MAXquadE)
 c
-#if SHAPE_MODE==0
-c
-      write(*,*) 'shapeEq:This has NOT been implemented with SHAPE=0.'
-      write(*,*) '        Please switch to SHAPE=1.'
+      write(*,*) 'shapeEq error: call shape2DE instead'
       stop
-c 
-#else
-c
-      call shape2E('quad',Xi,Norder,Nedge_orient, NrdofE,ShapE,CurlE)
-c
-#endif
+c     call shape2E('quad',Xi,Norder,Nedge_orient, NrdofE,ShapE,CurlE)
 c
       end subroutine shapeEq
 c
@@ -284,22 +248,17 @@ c
 c     
       use parameters , only : MAXtriaE
 c
-      implicit none      
-      real*8 , intent(in ) :: Xi(2)
+      implicit none
+c
+      real(8), intent(in ) :: Xi(2)
       integer, intent(in ) :: Norder(4)
       integer, intent(in ) :: Nedge_orient(3)
       integer, intent(out) :: NrdofE
-      real*8 , intent(out) :: ShapE(2,MAXtriaE),CurlE(MAXtriaE)
+      real(8), intent(out) :: ShapE(2,MAXtriaE),CurlE(MAXtriaE)
 c
-#if SHAPE_MODE==0
-c
-      call shapeEt_0(Xi,Norder,Nedge_orient, NrdofE,ShapE,CurlE)
-c
-#else
-c
-      call shape2E('tria',Xi,Norder,Nedge_orient, NrdofE,ShapE,CurlE)
-c  
-#endif
+      write(*,*) 'shapeEt error: call shape2DE instead'
+      stop
+c     call shape2E('tria',Xi,Norder,Nedge_orient, NrdofE,ShapE,CurlE)
 c
       end subroutine shapeEt
 c
@@ -332,22 +291,14 @@ c
 c
       implicit none
       character(len=4), intent(in)  :: Type
-      real*8 , intent(in)  :: Xi(2)
+      real(8), intent(in)  :: Xi(2)
       integer, intent(in)  :: Norder(5)
       integer, intent(out) :: NrdofQ
-      real*8 , intent(out) :: ShapQ(MAXquadQ)
+      real(8), intent(out) :: ShapQ(MAXquadQ)
 c
-#if SHAPE_MODE==0
-c
-      write(*,*) 'shape2Q:This has NOT been implemented with SHAPE=0.'
-      write(*,*) '        Please switch to SHAPE=1.'
+      write(*,*) 'shape2Q error: call shape2DQ instead'
       stop
-c
-#else
-c
-      call shape2DQ(Type,Xi,Norder, NrdofQ,ShapQ)
-c
-#endif
+c     call shape2DQ(Type,Xi,Norder, NrdofQ,ShapQ)
 c
       end subroutine shape2Q
 c
@@ -378,12 +329,14 @@ c
       use parameters , only : MAXquadQ
 c
       implicit none
-      real*8 , intent(in)  :: Xi(2)
+      real(8), intent(in)  :: Xi(2)
       integer, intent(in)  :: Norder
       integer, intent(out) :: NrdofQ
-      real*8 , intent(out) :: ShapQ(MAXquadQ)
+      real(8), intent(out) :: ShapQ(MAXquadQ)
 c
-      call shape2Q('quad',Xi,Norder, NrdofQ,ShapQ)
+      write(*,*) 'shapeQq error: call shape2DQ instead'
+      stop
+c     call shape2Q('quad',Xi,Norder, NrdofQ,ShapQ)
 c
       end subroutine shapeQq
 c
@@ -414,12 +367,14 @@ c
       use parameters , only : MAXtriaQ
 c
       implicit none
-      real*8 , intent(in)  :: Xi(2)
+      real(8), intent(in)  :: Xi(2)
       integer, intent(in)  :: Norder
       integer, intent(out) :: NrdofQ
-      real*8 , intent(out) :: ShapQ(MAXtriaQ)
+      real(8), intent(out) :: ShapQ(MAXtriaQ)
 c
-      call shape2Q('tria',Xi,Norder, NrdofQ,ShapQ)
+      write(*,*) 'shapeQt error: call shape2DQ instead'
+      stop
+c     call shape2Q('tria',Xi,Norder, NrdofQ,ShapQ)
 c
       end subroutine shapeQt
 c

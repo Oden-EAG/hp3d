@@ -50,12 +50,14 @@ c
       implicit none
       integer, intent(in)  :: Nord
       integer, intent(out) :: NrdofH
-      integer :: nsize(2)
       double precision, intent(in)  :: Xi
       double precision, intent(out) :: ShapH(MAXP+1)
       double precision, intent(out) :: GradH(MAXP+1)
 c
-      call checkorder('segm','contin',Nord,MAXP, nsize)
+      integer :: nsize(2), Norder(19)
+      Norder = 0; Norder(1) = Nord
+c
+      call checkorder('segm','contin',Norder,MAXP, nsize)
       call shape1DHSeg(Xi,Nord,nsize, NrdofH,ShapH,GradH)
 c
       end subroutine shape1DH
@@ -89,13 +91,15 @@ c
       use parameters , only : MAXP
 c
       implicit none
-      integer, intent(in)  :: Nord
-      integer, intent(out) :: NrdofQ
-      integer :: nsize(2)
       double precision, intent(in)  :: Xi
+      integer         , intent(in)  :: Nord
+      integer         , intent(out) :: NrdofQ
       double precision, intent(out) :: ShapQ(MAXP)
 c
-      call checkorder('segm','discon',Nord,MAXP, nsize)
+      integer :: nsize(2), Norder(19)
+      Norder = 0; Norder(1) = Nord
+c
+      call checkorder('segm','discon',Norder,MAXP, nsize)
       call shape1DQSeg(Xi,Nord,nsize, NrdofQ,ShapQ)
 c
       end subroutine shape1DQ
@@ -143,15 +147,19 @@ c
 c
       implicit none
       character(len=4), intent(in)  :: Type
-      integer, intent(in)  :: Norder(5)
-      integer, intent(in)  :: NoriE(4)
-      integer, intent(out) :: NrdofH
-      integer :: nsize(2)
       double precision, intent(in)  :: Xi(2)
+      integer         , intent(in)  :: Norder(5)
+      integer         , intent(in)  :: NoriE(4)
+      integer         , intent(out) :: NrdofH
       double precision, intent(out) :: ShapH(MAXquadH)
       double precision, intent(out) :: GradH(2,MAXquadH)
 c
-      call checkorder(Type,'contin',Norder,MAXP, nsize)
+      integer :: nsize(2), Norder3D(19)
+      Norder3D = 0; Norder3D(1:5) = Norder
+c
+      ShapH = 0.d0; GradH = 0.d0
+c
+      call checkorder(Type,'contin',Norder3D,MAXP, nsize)
       select case(Type)
       case('tria','mdlt')
         call shape2DHTri(Xi,Norder,NoriE,nsize, NrdofH,ShapH,GradH)
@@ -197,15 +205,19 @@ c
 c
       implicit none
       character(len=4), intent(in)  :: Type
-      integer, intent(in)  :: Norder(5)
-      integer, intent(in)  :: NoriE(4)
-      integer, intent(out) :: NrdofE
-      integer :: nsize(2)
       double precision, intent(in)  :: Xi(2)
+      integer         , intent(in)  :: Norder(5)
+      integer         , intent(in)  :: NoriE(4)
+      integer         , intent(out) :: NrdofE
       double precision, intent(out) :: ShapE(2,MAXquadE)
       double precision, intent(out) :: CurlE(MAXquadE)
 c
-      call checkorder(Type,'tangen',Norder,MAXP, nsize)
+      integer :: nsize(2), Norder3D(19)
+      Norder3D = 0; Norder3D(1:5) = Norder
+c
+      ShapE = 0.d0; CurlE = 0.d0
+c
+      call checkorder(Type,'tangen',Norder3D,MAXP, nsize)
       select case(Type)
       case('tria','mdlt')
         call shape2DETri(Xi,Norder,NoriE,nsize, NrdofE,ShapE,CurlE)
@@ -253,15 +265,19 @@ c
 c
       implicit none
       character(len=4), intent(in)  :: Type
-      integer, intent(in)  :: Norder(5)
-      integer, intent(in)  :: NoriE(4)
-      integer, intent(out) :: NrdofV
-      integer :: nsize(2)
       double precision, intent(in)  :: Xi(2)
+      integer         , intent(in)  :: Norder(5)
+      integer         , intent(in)  :: NoriE(4)
+      integer         , intent(out) :: NrdofV
       double precision, intent(out) :: ShapV(2,MAXquadV)
       double precision, intent(out) :: DivV(MAXquadV)
 c
-      call checkorder(Type,'normal',Norder,MAXP, nsize)
+      integer :: nsize(2), Norder3D(19)
+      Norder3D = 0; Norder3D(1:5) = Norder
+c
+      ShapV = 0.d0; DivV = 0.d0
+c
+      call checkorder(Type,'normal',Norder3D,MAXP, nsize)
       select case(Type)
       case('tria','mdlt')
         call shape2DVTri(Xi,Norder,NoriE,nsize, NrdofV,ShapV,DivV)
@@ -305,14 +321,18 @@ c
       use parameters , only : MAXP,MAXquadQ
 c
       implicit none
-      character(len=4), intent(in)  :: Type
-      integer, intent(in)  :: Norder(5)
-      integer, intent(out) :: NrdofQ
-      integer :: nsize(2)
+      character(len=4), intent(in) :: Type
       double precision, intent(in)  :: Xi(2)
+      integer         , intent(in)  :: Norder(5)
+      integer         , intent(out) :: NrdofQ
       double precision, intent(out) :: ShapQ(MAXquadQ)
 c
-      call checkorder(Type,'discon',Norder,MAXP, nsize)
+      integer :: nsize(2), Norder3D(19)
+      Norder3D = 0; Norder3D(1:5) = Norder
+c
+      ShapQ = 0.d0
+c
+      call checkorder(Type,'discon',Norder3D,MAXP, nsize)
       select case(Type)
       case('tria','mdlt')
         call shape2DQTri(Xi,Norder,nsize, NrdofQ,ShapQ)
@@ -363,20 +383,23 @@ c
 c----------------------------------------------------------------------
 c
       subroutine shape3DH(Type,Xi,Norder,NoriE,NoriF,
-     .                                             NrdofH,ShapH,GradH)
+     .                    NrdofH,ShapH,GradH)
 c
       use parameters , only : MAXP,MAXbrickH
 c
       implicit none
       character(len=4), intent(in)  :: Type
-      integer, intent(in)  :: NoriE(12)
-      integer, intent(in)  :: NoriF(6)
-      integer, intent(in)  :: Norder(19)
-      integer, intent(out) :: NrdofH
-      integer :: nsize(2)
       double precision, intent(in)  :: Xi(3)
+      integer         , intent(in)  :: Norder(19)
+      integer         , intent(in)  :: NoriE(12)
+      integer         , intent(in)  :: NoriF(6)
+      integer         , intent(out) :: NrdofH
       double precision, intent(out) :: ShapH(MAXbrickH)
       double precision, intent(out) :: GradH(3,MAXbrickH)
+c
+      integer :: nsize(2)
+c
+      ShapH = 0.d0; GradH = 0.d0
 c
       call checkorder(Type,'contin',Norder,MAXP, nsize)
       select case(Type)
@@ -429,20 +452,23 @@ c
 c----------------------------------------------------------------------
 c
       subroutine shape3DE(Type,Xi,Norder,NoriE,NoriF,
-     .                                             NrdofE,ShapE,CurlE)
+     .                    NrdofE,ShapE,CurlE)
 c
       use parameters , only : MAXP,MAXbrickE
 c
       implicit none
       character(len=4), intent(in)  :: Type
-      integer, intent(in)  :: NoriE(12)
-      integer, intent(in)  :: NoriF(6)
-      integer, intent(in)  :: Norder(19)
-      integer, intent(out) :: NrdofE
-      integer :: nsize(2)
       double precision, intent(in)  :: Xi(3)
+      integer         , intent(in)  :: Norder(19)
+      integer         , intent(in)  :: NoriE(12)
+      integer         , intent(in)  :: NoriF(6)
+      integer         , intent(out) :: NrdofE
       double precision, intent(out) :: ShapE(3,MAXbrickE)
       double precision, intent(out) :: CurlE(3,MAXbrickE)
+c
+      integer :: nsize(2)
+c
+      ShapE = 0.d0; CurlE = 0.d0
 c
       call checkorder(Type,'tangen',Norder,MAXP, nsize)
       select case(Type)
@@ -499,13 +525,16 @@ c
 c
       implicit none
       character(len=4), intent(in)  :: Type
-      integer, intent(in)  :: NoriF(6)
-      integer, intent(in)  :: Norder(19)
-      integer, intent(out) :: NrdofV
-      integer :: nsize(2)
       double precision, intent(in)  :: Xi(3)
+      integer         , intent(in)  :: Norder(19)
+      integer         , intent(in)  :: NoriF(6)
+      integer         , intent(out) :: NrdofV
       double precision, intent(out) :: ShapV(3,MAXbrickV)
       double precision, intent(out) :: DivV(MAXbrickV)
+c
+      integer :: nsize(2)
+c
+      ShapV = 0.d0; DivV = 0.d0
 c
       call checkorder(Type,'normal',Norder,MAXP, nsize)
       select case(Type)
@@ -556,11 +585,14 @@ c
 c
       implicit none
       character(len=4), intent(in)  :: Type
-      integer, intent(in)  :: Norder(19)
-      integer, intent(out) :: NrdofQ
-      integer :: nsize(2)
       double precision, intent(in)  :: Xi(3)
+      integer         , intent(in)  :: Norder(19)
+      integer         , intent(out) :: NrdofQ
       double precision, intent(out) :: ShapQ(MAXbrickQ)
+c
+      integer :: nsize(2)
+c
+      ShapQ = 0.d0
 c
       call checkorder(Type,'discon',Norder,MAXP, nsize)
       select case(Type)

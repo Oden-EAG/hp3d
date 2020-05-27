@@ -9,14 +9,13 @@ c----------------------------------------------------------------------
 c
 c----------------------------------------------------------------------
 c----------------------------------------------------------------------
-c In this file all the forking for SHAPE=0 or SHAPE=1 is performed for
-c the case of the 2D H(div), which is part of the 2D rotated sequence
-c                     2D(Rot):    H1--->H(div)--->L2
-c The H1 and L2 functions for this sequence are already in 2DSequence.F
-c If SHAPE=0 the subroutines are nowhere (they are the rotated H(curl))
-c If SHAPE=1 the subroutines are located in shape_1/ContExactSequence.F
-c                                           shape_1/Quadrilateral.F
-c                                           shape_1/Triangle.F
+c DEPRECATED INTERFACE:
+c previously used to fork between old and new shape functions package.
+c
+c Use the new shape functions, located in:
+c     shape_1/ContExactSequence.F
+c     shape_1/Quadrilateral.F
+c     shape_1/Triangle.F
 c----------------------------------------------------------------------
 c----------------------------------------------------------------------
 c
@@ -52,23 +51,15 @@ c
 c
       implicit none
       character(len=4), intent(in)  :: Type      
-      real*8 , intent(in ) :: Xi(2)
+      real(8), intent(in ) :: Xi(2)
       integer, intent(in ) :: Norder(5)
       integer, intent(in ) :: Nedge_orient(4)
       integer, intent(out) :: NrdofV
-      real*8 , intent(out) :: ShapV(2,MAXquadV),DivV(MAXquadV)
+      real(8), intent(out) :: ShapV(2,MAXquadV),DivV(MAXquadV)
 c
-#if SHAPE_MODE==0
-c
-      write(*,*) 'shape2V:This has NOT been implemented with SHAPE=0.'
-      write(*,*) '        Please switch to SHAPE=1.'
+      write(*,*) 'shape2V error: call shape2DV instead'
       stop
-c 
-#else
-c
-      call shape2DV(Type,Xi,Norder,Nedge_orient, NrdofV,ShapV,DivV)
-c
-#endif
+c     call shape2DV(Type,Xi,Norder,Nedge_orient, NrdofV,ShapV,DivV)
 c
       end subroutine shape2V
 c
@@ -102,13 +93,15 @@ c
       use parameters , only : MAXquadV
 c
       implicit none      
-      real*8 , intent(in ) :: Xi(2)
+      real(8), intent(in ) :: Xi(2)
       integer, intent(in ) :: Norder(5)
       integer, intent(in ) :: Nedge_orient(4)
       integer, intent(out) :: NrdofV
-      real*8 , intent(out) :: ShapV(2,MAXquadV),DivV(MAXquadV)
+      real(8), intent(out) :: ShapV(2,MAXquadV),DivV(MAXquadV)
 c
-      call shape2V('quad',Xi,Norder,Nedge_orient, NrdofV,ShapV,DivV)
+      write(*,*) 'shapeVq error: call shape2DV instead'
+      stop
+c     call shape2V('quad',Xi,Norder,Nedge_orient, NrdofV,ShapV,DivV)
 c
       end subroutine shapeVq
 c
@@ -141,14 +134,16 @@ c
 c     
       use parameters , only : MAXtriaV
 c
-      implicit none      
-      real*8 , intent(in ) :: Xi(2)
+      implicit none
+      real(8), intent(in ) :: Xi(2)
       integer, intent(in ) :: Norder(4)
       integer, intent(in ) :: Nedge_orient(3)
       integer, intent(out) :: NrdofV
-      real*8 , intent(out) :: ShapV(2,MAXtriaV),DivV(MAXtriaV)
+      real(8), intent(out) :: ShapV(2,MAXtriaV),DivV(MAXtriaV)
 c
-      call shape2V('tria',Xi,Norder,Nedge_orient, NrdofV,ShapV,DivV)
+      write(*,*) 'shapeVt error: call shape2DV instead'
+      stop
+c     call shape2V('tria',Xi,Norder,Nedge_orient, NrdofV,ShapV,DivV)
 c
       end subroutine shapeVt
 c

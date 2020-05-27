@@ -1,12 +1,10 @@
 c----------------------------------------------------------------------
 c----------------------------------------------------------------------
-c In this file all the forking for SHAPE=0 or SHAPE=1 is performed for
-c the traces of the 2D sequence
-c                      2D:    H1  -->  H(curl)  -->  L2
-c            Traces of 2D:  tr(H1)-->tr(H(curl))
-c If SHAPE=0 the subroutines are located in shape_0/h1/Hkernels.F
-c                                           shape_0/hcurl/shapEbe.F
-c If SHAPE=1 the subroutines are located in shape_1/TraceSequence.F
+c DEPRECATED INTERFACE:
+c previously used to fork between old and new shape functions package.
+c
+c Use the new shape functions, located in:
+c     shape_1/TraceSequence.F
 c----------------------------------------------------------------------
 c----------------------------------------------------------------------
 c
@@ -44,15 +42,9 @@ c
       integer, intent(out) :: NrdofH
       real(8), intent(out) :: ShapH(MAXP-1),GradH(MAXP-1)
 c
-#if SHAPE_MODE==0
-c      
-      call shapHbe_0(T,Nord,Norient, NrdofH,ShapH,GradH)
-c      
-#else
-c
-      call TraceEshapeH(T,Nord,Norient, NrdofH,ShapH,GradH)
-c      
-#endif
+      write(*,*) 'shapHbe error: call TraceEshapeH instead'
+      stop
+c     call TraceEshapeH(T,Nord,Norient, NrdofH,ShapH,GradH)
 c
       end subroutine shapHbe
 c
@@ -84,22 +76,16 @@ c
 c      
       use parameters , only : MAXP
 c
-      implicit none      
+      implicit none
       real(8), intent(in ) :: T
       integer, intent(in ) :: Nord
       integer, intent(in ) :: Norient
       integer, intent(out) :: NrdofE
       real(8), intent(out) :: ShapE(MAXP)
-c     
-#if SHAPE_MODE==0
 c
-      call shapEbe_0(T,Nord,Norient, NrdofE,ShapE)
-c 
-#else
-c
-      call TraceEshapeE(T,Nord,Norient, NrdofE,ShapE)
-c         
-#endif
+      write(*,*) 'shapEbe error: call TraceEshapeE instead'
+      stop
+c     call TraceEshapeE(T,Nord,Norient, NrdofE,ShapE)
 c
       end subroutine shapEbe
 c

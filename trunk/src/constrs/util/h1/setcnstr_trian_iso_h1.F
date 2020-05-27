@@ -4,7 +4,7 @@ c   routine name       - setcnstr_trian_iso
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Nov 09
+c   latest revision    - May 2020
 c
 c   purpose            - routine evaluates constraint coefficients for
 c                        the triangular master element
@@ -57,20 +57,20 @@ c
 c
       dimension shapsma(MAXtriaH,MAXtriaH),
      .          shapbig(MAXtriaH,MAXtriaH),
-     .          void(2,MAXtriaH), ip(MAXtriaH),
-     .          r(MAXtriaH,MAXtriaH), norder(4), xibig(2),xisma(2)
+     .          void(2,MAXtriaH),ip(MAXtriaH),
+     .          r(MAXtriaH,MAXtriaH),xibig(2),xisma(2)
 c
-c  ...edge orientations
-      dimension norient(3)
+c  ...order and edge orientations
+      dimension norder(4),norient(3),nsize(2)
 c
-      iprint=0
+      iprint = 0
 c
       nord = MAXP
 c
 c  ...set uniform order MAXP:
-      norder(1:4) = nord
-c
-      norient=0
+      norder  = nord
+      norient = 0
+      nsize   = (/MAXP,MAXtriaH/)
 c
 c  ...initiate the matrix of coefficients
 cccc      RRTH = 0.d0
@@ -96,12 +96,16 @@ c
           xisma(2) = 1.0d0/nord*(j-1)
 c
 c  .......find small shape functions at this point:
-          call shapeHt(xisma,norder,norient,
-     .                 nrdof,shapsma(1:MAXtriaH,icl),void)
+c          call shapeHt(xisma,norder,norient,
+c     .                 nrdof,shapsma(1:MAXtriaH,icl),void)
+          call shape2DHTri(xisma,norder,norient,nsize,
+     .                     nrdof,shapsma(:,icl),void)
 c
 c  .......find big shape functions at this point:
-          call shapeHt(xibig,norder,norient,
-     .                 nrdof,shapbig(1:MAXtriaH,icl),void)
+c          call shapeHt(xibig,norder,norient,
+c     .                 nrdof,shapbig(1:MAXtriaH,icl),void)
+          call shape2DHTri(xibig,norder,norient,nsize,
+     .                     nrdof,shapbig(:,icl),void)
         enddo
       enddo
 c
@@ -246,12 +250,16 @@ c
           xisma(2) = 1.0d0/nord*(j-1)
 c
 c  .......find small shape functions at this point:
-          call shapeHt(xisma,norder,norient,
-     .                 nrdof,shapsma(1:MAXtriaH,icl),void)
+c          call shapeHt(xisma,norder,norient,
+c     .                 nrdof,shapsma(1:MAXtriaH,icl),void)
+          call shape2DHTri(xisma,norder,norient,nsize,
+     .                     nrdof,shapsma(:,icl),void)
 c
 c  .......find big   shape functions at this point:
-          call shapeHt(xibig,norder,norient,
-     .                 nrdof,shapbig(1:MAXtriaH,icl),void)
+c          call shapeHt(xibig,norder,norient,
+c     .                 nrdof,shapbig(1:MAXtriaH,icl),void)
+          call shape2DHTri(xibig,norder,norient,nsize,
+     .                     nrdof,shapbig(:,icl),void)
         enddo
       enddo
 c
@@ -382,12 +390,16 @@ c
           xisma(2) = 1.0d0/nord*(j-1)
 c
 c  .......find small shape functions at this point:
-          call shapeHt(xisma,norder,norient,
-     .                 nrdof,shapsma(1:MAXtriaH,icl),void)
+c          call shapeHt(xisma,norder,norient,
+c     .                 nrdof,shapsma(1:MAXtriaH,icl),void)
+          call shape2DHTri(xisma,norder,norient,nsize,
+     .                     nrdof,shapsma(:,icl),void)
 c
 c  .......find big   shape functions at this point:
-          call shapeHt(xibig,norder,norient,
-     .                 nrdof,shapbig(1:MAXtriaH,icl),void)
+c          call shapeHt(xibig,norder,norient,
+c     .                 nrdof,shapbig(1:MAXtriaH,icl),void)
+          call shape2DHTri(xibig,norder,norient,nsize,
+     .                     nrdof,shapbig(:,icl),void)
         enddo
 c
       enddo
@@ -520,12 +532,16 @@ c
           xisma(2) =         1.0d0/nord*(j-1)
 c
 c  .......find small shape functions at this point:
-          call shapeHt(xisma,norder,norient,
-     .                 nrdof,shapsma(1:MAXtriaH,icl),void)
+c          call shapeHt(xisma,norder,norient,
+c     .                 nrdof,shapsma(1:MAXtriaH,icl),void)
+          call shape2DHTri(xisma,norder,norient,nsize,
+     .                     nrdof,shapsma(:,icl),void)
 c
 c  .......find big   shape functions at this point:
-          call shapeHt(xibig,norder,norient,
-     .                 nrdof,shapbig(1:MAXtriaH,icl),void)
+c          call shapeHt(xibig,norder,norient,
+c     .                 nrdof,shapbig(1:MAXtriaH,icl),void)
+          call shape2DHTri(xibig,norder,norient,nsize,
+     .                     nrdof,shapbig(:,icl),void)
         enddo
 c
       enddo
@@ -663,8 +679,10 @@ c
       read(*,*) xibig(1:2)
 c
 c  ...shape functions of big element
-      call shapeHt(xibig,norder,norient,
-     .             nrdof,shapbig(1:MAXtriaH,1),void)
+c      call shapeHt(xibig,norder,norient,
+c     .             nrdof,shapbig(1:MAXtriaH,1),void)
+      call shape2DHTri(xibig,norder,norient,nsize,
+     .                 nrdof,shapbig(:,1),void)
       write(*,*) 'xibig = ',xibig
       write(*,*) 'shapbig = '
       do k=1,nrdof
@@ -704,8 +722,10 @@ c  .....element 4:
       endif
 c
 c  ...find small shape functions at this point:
-      call shapeHt(xisma,norder,norient,
-     .             nrdof,shapsma(1:MAXtriaH,1),void)
+c      call shapeHt(xisma,norder,norient,
+c     .             nrdof,shapsma(1:MAXtriaH,1),void)
+      call shape2DHTri(xisma,norder,norient,nsize,
+     .                 nrdof,shapsma(:,1),void)
 c
 c*********************************************************************
 c

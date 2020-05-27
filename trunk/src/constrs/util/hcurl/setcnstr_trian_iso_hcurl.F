@@ -4,7 +4,7 @@ c   routine name       - setcnstr_trian_iso
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Nov 09
+c   latest revision    - May 2020
 c
 c   purpose            - routine evaluates constraint coefficients for
 c                        the triangular master element
@@ -58,22 +58,21 @@ c
 c  ...use collocation points for lagrange shape functions h1
       integer, parameter :: npts = 4*(MAXtriaE)
       integer, parameter :: lwork = MAXtriaE**2
-      dimension
-     .  shapsma(2,MAXtriaE),curl(MAXtriaE), 
-     .  shapbig(2,MAXtriaE),
-     .  evalsma(npts,MAXtriaE),evalbig(npts,MAXtriaE),
-     .  work(lwork),
-     .  r(MAXtriaE,MAXtriaE), norder(4), xibig(2), xisma(2)
+      dimension shapsma(2,MAXtriaE),curl(MAXtriaE),
+     .          shapbig(2,MAXtriaE),
+     .          evalsma(npts,MAXtriaE),evalbig(npts,MAXtriaE),
+     .          work(lwork),r(MAXtriaE,MAXtriaE),xibig(2),xisma(2)
 c
-c  ...edge orientations
-      dimension norient(3), t(2), val(2), dbds(2,2)
+c  ...order and edge orientations
+      dimension norder(4),norient(3),nsize(2),t(2),val(2),dbds(2,2)
 c
       iprint=0
-c      
+c
 c  ...set up order and orientation
       nord = MAXP
-      norder(1:4) = nord
+      norder  = nord
       norient = 0
+      nsize   = (/MAXP,MAXtriaE/)
 c
       ivoid = 0
       call ndof_nod('medg',nord, ivoid, ndof_medg, ivoid, ivoid)
@@ -106,16 +105,20 @@ c
           xisma(2) = 1.0d0/(nspan-1)*(j-1)
 c
 c  .......find small shape functions at this point:
-          call shapeEt(
-     .      xisma,norder,norient,ivoid,
-     .      shapsma(1:2,1:MAXtriaE),
-     .      curl(1:MAXtriaE))
+c          call shapeEt(
+c     .      xisma,norder,norient,ivoid,
+c     .      shapsma(1:2,1:MAXtriaE),
+c     .      curl(1:MAXtriaE))
+          call shape2DETri(xisma,norder,norient,nsize,
+     .                     ivoid,shapsma(1:2,:),curl)
 c
 c  .......find big shape functions at this point:
-          call shapeEt(
-     .      xibig,norder,norient,ivoid,
-     .      shapbig(1:2,1:MAXtriaE),
-     .      curl(1:MAXtriaE))
+c          call shapeEt(
+c     .      xibig,norder,norient,ivoid,
+c     .      shapbig(1:2,1:MAXtriaE),
+c     .      curl(1:MAXtriaE))
+          call shape2DETri(xibig,norder,norient,nsize,
+     .                     ivoid,shapbig(1:2,:),curl)
 c  .......for each component variable, 
           if ((ic+2).gt.npts) then
             write(*,*) '1 setcnstr_trian_iso_hcurl: INCREASE WORKSPACE',
@@ -226,16 +229,21 @@ c
           xisma(2) = 1.0d0/(nspan-1)*(j-1)
 c
 c  .......find small shape functions at this point:
-          call shapeEt(
-     .      xisma,norder,norient,ivoid,
-     .      shapsma(1:2,1:MAXtriaE),
-     .      curl(1:MAXtriaE))
+c          call shapeEt(
+c     .      xisma,norder,norient,ivoid,
+c     .      shapsma(1:2,1:MAXtriaE),
+c     .      curl(1:MAXtriaE))
+          call shape2DETri(xisma,norder,norient,nsize,
+     .                     ivoid,shapsma(1:2,:),curl)
 c
 c  .......find big shape functions at this point:
-          call shapeEt(
-     .      xibig,norder,norient,ivoid,
-     .      shapbig(1:2,1:MAXtriaE),
-     .      curl(1:MAXtriaE))
+c          call shapeEt(
+c     .      xibig,norder,norient,ivoid,
+c     .      shapbig(1:2,1:MAXtriaE),
+c     .      curl(1:MAXtriaE))
+          call shape2DETri(xibig,norder,norient,nsize,
+     .                     ivoid,shapbig(1:2,:),curl)
+c
 c  .......for each component variable, 
           if ((ic+2).gt.npts) then
             write(*,*) '2 setcnstr_trian_iso_hcurl: INCREASE WORKSPACE',
@@ -345,16 +353,21 @@ c
           xisma(2) = 1.0d0/(nspan-1)*(j-1)
 c
 c  .......find small shape functions at this point:
-          call shapeEt(
-     .      xisma,norder,norient,ivoid,
-     .      shapsma(1:2,1:MAXtriaE),
-     .      curl(1:MAXtriaE))
+c          call shapeEt(
+c     .      xisma,norder,norient,ivoid,
+c     .      shapsma(1:2,1:MAXtriaE),
+c     .      curl(1:MAXtriaE))
+          call shape2DETri(xisma,norder,norient,nsize,
+     .                     ivoid,shapsma(1:2,:),curl)
 c
 c  .......find big shape functions at this point:
-          call shapeEt(
-     .      xibig,norder,norient,ivoid,
-     .      shapbig(1:2,1:MAXtriaE),
-     .      curl(1:MAXtriaE))
+c          call shapeEt(
+c     .      xibig,norder,norient,ivoid,
+c     .      shapbig(1:2,1:MAXtriaE),
+c     .      curl(1:MAXtriaE))
+          call shape2DETri(xibig,norder,norient,nsize,
+     .                     ivoid,shapbig(1:2,:),curl)
+c
 c  .......for each component variable, 
           if ((ic+2).gt.npts) then
             write(*,*) '3 setcnstr_trian_iso_hcurl: INCREASE WORKSPACE',
@@ -464,16 +477,21 @@ c
           xisma(2) =         1.0d0/(nspan-1)*(j-1)
 c
 c  .......find small shape functions at this point:
-          call shapeEt(
-     .      xisma,norder,norient,ivoid,
-     .      shapsma(1:2,1:MAXtriaE),
-     .      curl(1:MAXtriaE))
+c          call shapeEt(
+c     .      xisma,norder,norient,ivoid,
+c     .      shapsma(1:2,1:MAXtriaE),
+c     .      curl(1:MAXtriaE))
+          call shape2DETri(xisma,norder,norient,nsize,
+     .                     ivoid,shapsma(1:2,:),curl)
 c
 c  .......find big shape functions at this point:
-          call shapeEt(
-     .      xibig,norder,norient,ivoid,
-     .      shapbig(1:2,1:MAXtriaE),
-     .      curl(1:MAXtriaE))
+c          call shapeEt(
+c     .      xibig,norder,norient,ivoid,
+c     .      shapbig(1:2,1:MAXtriaE),
+c     .      curl(1:MAXtriaE))
+          call shape2DETri(xibig,norder,norient,nsize,
+     .                     ivoid,shapbig(1:2,:),curl)
+c
 c  .......for each component variable, 
           if ((ic+2).gt.npts) then
             write(*,*) '4 setcnstr_trian_iso_hcurl: INCREASE WORKSPACE',
@@ -575,10 +593,12 @@ c
       read(*,*) xibig(1:2)
 c
 c  ...shape functions of big element
-      call shapeEt(
-     .  xibig,norder,norient,ivoid,
-     .  shapbig(1:2,1:MAXtriaE),
-     .  curl(1:MAXtriaE))
+c      call shapeEt(
+c     .  xibig,norder,norient,ivoid,
+c     .  shapbig(1:2,1:MAXtriaE),
+c     .  curl(1:MAXtriaE))
+      call shape2DETri(xibig,norder,norient,nsize,
+     .                 ivoid,shapbig(1:2,:),curl)
 c
       write(*,*) 'xibig = ',xibig
 c
@@ -622,10 +642,12 @@ c  .....element 4:
       write(*,*) 'setcnstr_trian: nel = ', nel
 c
 c  ...find small shape functions at this point:
-      call shapeEt(
-     .  xisma,norder,norient,ivoid,
-     .  shapsma(1:2,1:MAXtriaE),
-     .  curl(1:MAXtriaE))
+c      call shapeEt(
+c     .  xisma,norder,norient,ivoid,
+c     .  shapsma(1:2,1:MAXtriaE),
+c     .  curl(1:MAXtriaE))
+      call shape2DETri(xisma,norder,norient,nsize,
+     .                 ivoid,shapsma(1:2,:),curl)
 c
 c*********************************************************************
 c

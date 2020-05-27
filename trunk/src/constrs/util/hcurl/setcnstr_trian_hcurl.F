@@ -4,7 +4,7 @@ c   routine name       - setcnstr_trian
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - May 12
+c   latest revision    - May 2020
 c
 c   purpose            - routine evaluates constraint coefficients for
 c                        the triangular master element

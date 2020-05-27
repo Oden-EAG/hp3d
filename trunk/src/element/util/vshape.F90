@@ -1,6 +1,6 @@
 !----------------------------------------------------------------------
 !> Purpose : computes vertex shape functions for a master triangle or
-!            quad      
+!            quad
 !
 !  @param[in ] Type  - shape      
 !  @param[in ] Xi    - master element coordinates     
@@ -33,15 +33,16 @@ subroutine vshape2(Type,Xi, Rlam,Drlam)
    select case(Type)
       case('tria')
          norder=(/1,1,1,1,0/)
-         call shapeHt(Xi,norder(1:4),nedge_orient(1:3), nrdof, &
-                      vshape(1:MAXtriaH),dvshape(1:2,1:MAXtriaH))
+!         call shapeHt(Xi,norder(1:4),nedge_orient(1:3), nrdof, &
+!                      vshape(1:MAXtriaH),dvshape(1:2,1:MAXtriaH))
       case('quad')
          norder=(/1,1,1,1,11/)
-         call shapeHq(Xi,norder,nedge_orient, nrdof,vshape,dvshape)
+!         call shapeHq(Xi,norder,nedge_orient, nrdof,vshape,dvshape)
       case default
          write(*,7000) Type
  7000    format(' vshape2 : unknown figure! Type = ',a12)
    end select
+   call shape2DH(Type,Xi,norder,nedge_orient, nrdof,vshape,dvshape)
 !      
 !..store
    rlam(1:4)=vshape(1:4) ; drlam(1:2,1:4)=dvshape(1:2,1:4)
@@ -92,7 +93,7 @@ subroutine vshape3(Type,Xi, Rlam,Drlam)
    call initiate_order(Type, norder)
 !
 !..compute vertex shape functions
-   call shape3H(Type,Xi,norder,nedge_orient,nface_orient, nrdof,vshape,dvshape)
+   call shape3DH(Type,Xi,norder,nedge_orient,nface_orient, nrdof,vshape,dvshape)
 !
 !..store
    rlam(1:8) = vshape(1:8); drlam(1:3,1:8) = dvshape(1:3,1:8)

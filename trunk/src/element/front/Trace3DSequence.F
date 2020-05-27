@@ -1,12 +1,10 @@
 c----------------------------------------------------------------------
 c----------------------------------------------------------------------
-c In this file all the forking for SHAPE=0 or SHAPE=1 is performed for
-c the traces of the 3D sequence
-c              3D:    H1  -->  H(curl)  -->  H(div)  -->  L2
-c    Traces of 3D:  tr(H1)-->tr(H(curl))-->tr(H(div))
-c If SHAPE=0 the subroutines are located in shape_0/h1/Hkernels.F
-c                                           shape_0/hcurl/shapEb2.F
-c If SHAPE=1 the subroutines are located in shape_1/TraceSequence.F
+c DEPRECATED INTERFACE:
+c previously used to fork between old and new shape functions package.
+c
+c Use the new shape functions, located in:
+c     shape_1/TraceSequence.F
 c----------------------------------------------------------------------
 c----------------------------------------------------------------------
 c
@@ -31,7 +29,7 @@ c     out:
 c       NrdofH         - number of shape functions
 c       ShapH          - values of shape functions
 c       GradH          - values of derivatives of the shape functions
-c                        wrt to master element coordinates      
+c                        wrt to master element coordinates
 c
 c----------------------------------------------------------------------
 c
@@ -47,15 +45,9 @@ c
       integer, intent(out) :: NrdofH
       real(8), intent(out) :: ShapH(MAXmdlqH),GradH(2,MAXmdlqH)
 c
-#if SHAPE_MODE==0
-c
-      call shapHb2_0(Type,T,Nord,Norient, NrdofH,ShapH,GradH)
-c
-#else
-c
-      call TraceFshapeH(Type,T,Nord,Norient, NrdofH,ShapH,GradH)
-c  
-#endif
+      write(*,*) 'shapHb2 error: call TraceFshapeH instead'
+      stop
+c     call TraceFshapeH(Type,T,Nord,Norient, NrdofH,ShapH,GradH)
 c
       end subroutine shapHb2
 c
@@ -80,7 +72,7 @@ c       Norient        - face orientation
 c     out:
 c       NrdofE         - number of shape functions
 c       ShapE          - values of shape functions
-c       CurlE          - curl of shape functions      
+c       CurlE          - curl of shape functions
 c     
 c----------------------------------------------------------------------
 c     
@@ -95,16 +87,10 @@ c
       integer, intent(in ) :: Norient
       integer, intent(out) :: NrdofE
       real(8), intent(out) :: ShapE(2,MAXmdlqE),CurlE(MAXmdlqE)
-c     
-#if SHAPE_MODE==0
 c
-      call shapEb2_0(Type,T,Nord,Norient, NrdofE,ShapE,CurlE)
-c 
-#else
-c
-      call TraceFshapeE(Type,T,Nord,Norient, NrdofE,ShapE,CurlE)
-c         
-#endif
+      write(*,*) 'shapEb2 error: call TraceFshapeE instead'
+      stop
+c     call TraceFshapeE(Type,T,Nord,Norient, NrdofE,ShapE,CurlE)
 c
       end subroutine shapEb2
 c
@@ -144,18 +130,10 @@ c
       integer, intent(in ) :: Norient
       integer, intent(out) :: NrdofV
       real(8), intent(out) :: ShapV(MAXmdlqQ)
-c     
-#if SHAPE_MODE==0
 c
-      write(*,*) 'shapeVb2:This has NOT been implemented with SHAPE=0.'
-      write(*,*) '         Please switch to SHAPE=1.'
+      write(*,*) 'shapVb2 error: call TraceFshapeV instead'
       stop
-c
-#else
-c
-      call TraceFshapeV(Type,T,Nord,Norient, NrdofV,ShapV)
-c         
-#endif
+c     call TraceFshapeV(Type,T,Nord,Norient, NrdofV,ShapV)
 c
       end subroutine shapVb2
 c
