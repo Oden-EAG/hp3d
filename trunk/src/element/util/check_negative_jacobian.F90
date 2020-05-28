@@ -26,7 +26,7 @@ subroutine check_negative_jacobian(Nodesl, Nsize)
   character(len=4) :: type
   !-------------------------------------------------------------------
 
-  write(*,*)'checking elements negative  jacobians...', NRELES
+  write(*,*) 'checking elements negative Jacobians...', NRELES
 
   int_back = INTEGRATION
 
@@ -38,7 +38,7 @@ subroutine check_negative_jacobian(Nodesl, Nsize)
      call nodcor(mdle, xnod)
 
      type = NODES(mdle)%type
-     ! over integration to detect negative jacobian when refined
+     ! over integration to detect negative Jacobian when refined
      !
      INTEGRATION = 2
      call set_3Dint(type,norder, nint,xiloc,wxi)
@@ -65,7 +65,7 @@ subroutine check_negative_jacobian(Nodesl, Nsize)
         end select
         call geom(dxdxi, dxidx,rjac,iflag)
 
-        ! check jacobian
+        ! check Jacobian
         if (iflag.ne.0) then
            ic = ic + 1
            Nodesl(ic) = mdle
@@ -75,7 +75,7 @@ subroutine check_negative_jacobian(Nodesl, Nsize)
      enddo
   enddo
   Nsize = ic
-  write(*,*) Nsize, ' elements jacobians are negative '
+  write(*,*) Nsize, ' elements Jacobians are negative '
 
   INTEGRATION = int_back
 endsubroutine check_negative_jacobian

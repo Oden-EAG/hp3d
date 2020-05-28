@@ -46,8 +46,8 @@
           vec_aux(1:3,it) = vec
           if (iprint.eq.1) then
             write(*,8000)i,nt,Iwork(it,2),eta(1:2),vec(1:3)
- 8000       format(' isub = ',i2,',   nt = ',i3,', ie = ',i2,' eta = (',2(e12.5,2x),'), &
-                     norm = (',3(e12.5,2x),')')
+ 8000       format(' isub = ',i2,',   nt = ',i3,', ie = ',i2,' eta = (',2(e12.5,2x), &
+                   '), norm = (',3(e12.5,2x),')')
           endif
 !  .....end of loop over attached triangles
         enddo
