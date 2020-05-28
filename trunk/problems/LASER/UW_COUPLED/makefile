@@ -14,15 +14,14 @@ SRC_PATH        = .
 OBJ_PATH        = COMMON_FILES
 MODULE_PATH     = $(OBJ_PATH)
 
-# executable name
+# Executable name
 EXEC            = uwLaser
-EXECS           = uwLaser
 
 # Includes and defs
 CCDEFS          = $(PROB_PP_DEFS)
 CCINCS          = $(PROB_INCS)
 
-###### User defined libraries
+# User defined libraries
 LIBS            = $(PROB_LIBS)
 
 ifdef CUDA_PATH

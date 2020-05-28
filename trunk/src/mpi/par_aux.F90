@@ -158,8 +158,8 @@ subroutine repartition_fiber(Subd_next)
       k = k + iel_load(iel)
       x3_subd(proc+1) = x3_mdle(i)
       Subd_next(iel) = proc
-      if (k .ge. (proc+1)*load) then
-         if (x3_mdle(i+1) > x3_mdle(i)+1.0d-6) proc = proc+1
+      if ((k .ge. (proc+1)*load) .and. (i < NRELES)) then
+         if (x3_mdle(i+1) > (x3_mdle(i)+1.0d-6)) proc = proc+1
       endif
    enddo
 !
@@ -172,7 +172,7 @@ subroutine repartition_fiber(Subd_next)
       !   iel = iel_array(i)
       !   write(*,140) 'i,iel,x3_mdle(i),iel_load(iel) = ',i,iel,x3_mdle(i),iel_load(iel)
       !enddo
-  140 format(A,I6,','I6,',',F10.4,',',I6)
+  140 format(A,I6,',',I6,',',F10.4,',',I6)
    endif
 !
 end subroutine repartition_fiber

@@ -70,8 +70,8 @@ subroutine distr_mesh()
       enddo
    elseif (ZOLTAN_LB .eq. 7) then
       if (RANK .eq. ROOT) write(*,*) 'calling (re-)partition_fiber...'
-      call partition_fiber(subd_next)
-      !call repartition_fiber(subd_next)
+      !call partition_fiber(subd_next)
+      call repartition_fiber(subd_next)
    else
       call zoltan_w_partition(subd_next)
    endif
