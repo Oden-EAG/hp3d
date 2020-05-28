@@ -45,8 +45,8 @@ subroutine find_GMPtriangle(Nvert, Ntfound)
         endif
       enddo
       write(*,7002)
- 7002 format('find_GMPtriangle: HAVE NOT FOUND THE TRIANGLE, INITIATING &
-                                A BRUTE FORCE SEARCH THROUGH TETS')
+ 7002 format('find_GMPtriangle: HAVE NOT FOUND THE TRIANGLE, INITIATING ', &
+                               'A BRUTE FORCE SEARCH THROUGH TETS')
       do ntet = 1, NRTETRA
         iflag = 0
         do iv = 1, 4

@@ -1086,8 +1086,8 @@ IF (.NOT. QUIET_MODE) write(*,*)''
                     '       ...CURVES NUMBERS'
           end select
             write(NIN,30)(POINTS(i)%Idata(j),j=1,3), &
-                 '                   ...SURFACES THAT CONSTITUTE THE &
-                 POINT'
+                 '                   ...SURFACES THAT CONSTITUTE THE', &
+                 ' POINT'
           write(NIN,300)(POINTS(i)%Rdata(k),k=1,3), &
                  '          ...INITIAL APPROXIMATION POINT'
 !
