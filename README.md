@@ -19,8 +19,9 @@ Set the `HP3D_BASE_PATH` to the path of the `par_hp3d/trunk/`
 ## Linking to external libraries
 The `m_options` file must link to the correct paths for external libraries. The following external libraries are required:
 - Intel MKL
+- X11
 - PETSc (all following packages can be installed with PETSc)
-- HDF5
+- HDF5/pHDF5
 - MUMPS
 - Metis/ParMetis
 - Scotch/PT-Scotch
@@ -46,8 +47,7 @@ Please add the following citation to any paper, technical report, or article tha
       Author = {Demkowicz, L. and Kurtz, J. and Pardo, D. and Paszy\'{n}ski, M. and Rachowicz, W. and Zdunek, A.},
       Publisher = {Chapman \& Hall/CRC},
       Title = {Computing with $hp$ Finite Elements. II. Frontiers: Three-Dimensional Elliptic and Maxwell Problems with Applications},
-      Year = {2007}
-      }
+      Year = {2007}}
 ```
 And, optionally,
 ```bibtex
@@ -55,8 +55,7 @@ And, optionally,
       Author = {Demkowicz, L.},
       Publisher = {Chapman \& Hall/CRC Press, Taylor and Francis},
       Title = {Computing with $hp$ Finite Elements. I. One- and Two-Dimensional Elliptic and Maxwell Problems},
-      Year = {2006}
-   }
+      Year = {2006}}
 ```
 ```bibtex
 @article{fuentes2015shape,
