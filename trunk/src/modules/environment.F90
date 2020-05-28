@@ -352,7 +352,8 @@ contains
 
     ! read in arguments
     do i=1,ARGC_
-       call getarg(i, ARGS_(i))
+       !call getarg(i, ARGS_(i))
+       call get_command_argument(i, ARGS_(i))
     end do
 
     ! set up options : -help , -verbose
@@ -366,7 +367,7 @@ contains
   subroutine end_environment
     implicit none
     if (IDRY_) then
-       call exit(0)
+       stop 1
     end if
   end subroutine end_environment
 

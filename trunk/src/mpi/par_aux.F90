@@ -172,7 +172,7 @@ subroutine repartition_fiber(Subd_next)
       !   iel = iel_array(i)
       !   write(*,140) 'i,iel,x3_mdle(i),iel_load(iel) = ',i,iel,x3_mdle(i),iel_load(iel)
       !enddo
-  140 format(A,I6,','I6,',',F10.4,',',I6)
+  140 format(A,I6,',',I6,',',F10.4,',',I6)
    endif
 !
 end subroutine repartition_fiber
