@@ -3,7 +3,7 @@
 # geometry.py
 # 
 # ---------------------------------------------------------------------------- 
-# latest revision:  - Apr 2019
+# latest revision:  - Mar 2020
 # 
 # purpose:          - generates geometry file for full fiber (core + cladding)
 #                     with 4 prism and 12 hexa elements
@@ -13,8 +13,18 @@
 
 import math
 
-# Length of fiber (z-direction)
-LZ = 1.2
+# Set the length of the fiber (z-direction)
+# and open geometry file
+LZ =   1.2; f = open("fiber_prism_1_2","w+")
+#LZ =   2.4; f = open("fiber_prism_2_4","w+")
+#LZ =   4.8; f = open("fiber_prism_4_8","w+")
+#LZ =   9.6; f = open("fiber_prism_9_6","w+")
+#LZ =  19.2; f = open("fiber_prism_19_2","w+")
+#LZ =  38.4; f = open("fiber_prism_38_4","w+")
+#LZ =  76.8; f = open("fiber_prism_76_8","w+")
+#LZ = 153.6; f = open("fiber_prism_153_6","w+")
+#LZ = 307.2; f = open("fiber_prism_307_2","w+")
+
 # Core and cladding size parameters
 core = 0.9
 clad = 9.0
@@ -24,10 +34,8 @@ print("Fiber length: %.1f" % LZ)
 print("Core radius : %.5f" % r_core)
 print("Clad radius : %.5f" % r_clad)
 inner = core/4
-outer = 2*core
+outer = 3.0*core
 
-# Open geometry file
-f = open("fiber_prism_1_2","w+")
 # Dimension
 f.write("3 3 NDIM,MANDIM\n")
 f.write("\n")
@@ -643,10 +651,10 @@ f.write("TraHex              hexa 2\n")
 f.write("2    6 7 3 2 22 23 19 18\n")
 f.write("\n")
 f.write("TraHex              hexa 3\n")
-f.write("2    8 7 3 4 24 23 19 20\n")
+f.write("2    4 3 7 8 20 19 23 24\n")
 f.write("\n")
 f.write("TraHex              hexa 4\n")
-f.write("2    5 8 4 1 21 24 20 17\n")
+f.write("2    1 4 8 5 17 20 24 21\n")
 f.write("\n")
 f.write("TraHex              hexa 5\n")
 f.write("3    9 10 6 5 25 26 22 21\n")
@@ -655,10 +663,10 @@ f.write("TraHex              hexa 6\n")
 f.write("3    10 11 7 6 26 27 23 22\n")
 f.write("\n")
 f.write("TraHex              hexa 7\n")
-f.write("3    12 11 7 8 28 27 23 24\n")
+f.write("3    8 7 11 12 24 23 27 28\n")
 f.write("\n")
 f.write("TraHex              hexa 8\n")
-f.write("3    9 12 8 5 25 28 24 21\n")
+f.write("3    5 8 12 9 21 24 28 25\n")
 f.write("\n")
 f.write("TraHex              hexa 9\n")
 f.write("4    13 14 10 9 29 30 26 25\n")
@@ -667,10 +675,10 @@ f.write("TraHex              hexa 10\n")
 f.write("4    14 15 11 10 30 31 27 26\n")
 f.write("\n")
 f.write("TraHex              hexa 11\n")
-f.write("4    16 15 11 12 32 31 27 28\n")
+f.write("4    12 11 15 16 28 27 31 32\n")
 f.write("\n")
 f.write("TraHex              hexa 12\n")
-f.write("4    13 16 12 9 29 32 28 25\n")
+f.write("4    9 12 16 13 25 28 32 29\n")
 f.write("\n")
 # Tetrahedra
 f.write("0 NRTETRA\n")
