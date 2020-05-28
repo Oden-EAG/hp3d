@@ -21,7 +21,7 @@
 !> @param[out] ZsolV,ZdiV   - H(div) solution
 !> @param[out] ZsolQ        - L2 solution
 !!
-!> @data Nov 14
+!> @date May 2020
 !-------------------------------------------------------------------------------
 !
 #include "typedefs.h"
@@ -33,7 +33,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
       use data_structure3D
 !
       implicit none
-      integer,                             intent(in)  :: Mdle, Nflag
+      integer,                             intent(in)  :: Mdle
       real(8), dimension(3),               intent(in)  :: Xi
       integer, dimension(12),              intent(in)  :: Nedge_orient
       integer, dimension(6),               intent(in)  :: Nface_orient
@@ -43,6 +43,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
       VTYPE, dimension(MAXEQNE,MAXbrickE), intent(in)  :: ZdofE
       VTYPE, dimension(MAXEQNV,MAXbrickV), intent(in)  :: ZdofV
       VTYPE, dimension(MAXEQNQ,MAXbrickQ), intent(in)  :: ZdofQ
+      integer,                             intent(in)  :: Nflag
       real(8), dimension(3),               intent(out) :: X
       real(8), dimension(3,3),             intent(out) :: Dxdxi
       VTYPE, dimension(  MAXEQNH  ),       intent(out) :: ZsolH
@@ -63,8 +64,9 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
       real(8),dimension(  MAXbrickV) :: divV,divVx
       real(8),dimension(  MAXbrickQ) :: shapQ
 !
-      integer :: iprint,iflag,i,j,k,n, ivar,nrdofH,nrdofE,nrdofV,nrdofQ
-      real(8) :: s, rjac
+      integer :: iprint,iflag,i,j,k,n,ivar,nrdofH,nrdofE,nrdofV,nrdofQ
+      real*8  :: s,rjac
+!
 !-------------------------------------------------------------------------------
 !
       iprint=0
@@ -74,32 +76,8 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
       call shape3DH(etype,Xi,Norder,Nedge_orient,Nface_orient, nrdofH,shapH,gradH)
 !
 !     geometry map
-      select case(EXGEOM)
-!
-!     -- ISOPARAMETRIC GEOMETRY MAP --
-      case(0)
-        X(1:3)=0.d0 ; Dxdxi(1:3,1:3)=0.d0
-        do k=1,nrdofH
-          X(1:3) = X(1:3) + Xnod(1:3,k)*shapH(k)
-          do i=1,3
-            Dxdxi(1:3,i) = Dxdxi(1:3,i) + Xnod(1:3,k)*gradH(i,k)
-          enddo
-        enddo
-!
-!     -- EXACT GEOMETRY MAP --
-      case(1) ; call exact_geom(Mdle,Xi, X,Dxdxi)
-      endselect
-!
-!     check Jacobian
-      call geom(Dxdxi, dxidx,rjac,iflag)
-      if (iflag /= 0) then
-         write(*,8000) Mdle, iflag, Xi, rjac
- 8000    format(' soleval: negative jacobian, Mdle, iflag, Xi, rjac = ', &
-         i4,2x,i1,2x,4(e12.5,2x))
-         write(*,*)'Exiting routine'
-         call pause
-         return
-      endif
+      call geom3D(Mdle,Xi,Xnod,shapH,gradH,nrdofH, &
+                  X,Dxdxi,dxidx,rjac,iflag)
 !
 !     if only geometry map is needed, return
       if (Nflag.eq.0) return

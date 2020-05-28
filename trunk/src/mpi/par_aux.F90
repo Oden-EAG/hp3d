@@ -158,8 +158,8 @@ subroutine repartition_fiber(Subd_next)
       k = k + iel_load(iel)
       x3_subd(proc+1) = x3_mdle(i)
       Subd_next(iel) = proc
-      if (k .ge. (proc+1)*load) then
-         if (x3_mdle(i+1) > x3_mdle(i)+1.0d-6) proc = proc+1
+      if ((k .ge. (proc+1)*load) .and. (i < NRELES)) then
+         if (x3_mdle(i+1) > (x3_mdle(i)+1.0d-6)) proc = proc+1
       endif
    enddo
 !

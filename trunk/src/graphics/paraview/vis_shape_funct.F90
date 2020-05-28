@@ -42,15 +42,12 @@ subroutine vis_shape_funct
 !     reset quiet mode
       QUIET_MODE = mode_save
 !
-!
-endsubroutine vis_shape_funct
-!
+end subroutine vis_shape_funct
 !
 !
 !----------------------------------------------------------------------
 !> Purpose - routine dumps H1 shape functions to Paraview
-!!
-!> @data Oct 14
+!> @date Oct 14
 !----------------------------------------------------------------------
 !
 subroutine vis_shape_h1(Icount)
@@ -115,14 +112,12 @@ subroutine vis_shape_h1(Icount)
       enddo
 !
 !
-endsubroutine vis_shape_h1
-!
+end subroutine vis_shape_h1
 !
 !
 !----------------------------------------------------------------------
 !> Purpose - routine dumps H(curl) shape functions to Paraview
-!!
-!> @data Oct 14
+!> @date Oct 14
 !----------------------------------------------------------------------
 !
 subroutine vis_shape_hcurl(Icount)
@@ -184,15 +179,12 @@ subroutine vis_shape_hcurl(Icount)
         enddo
       enddo
 !
-!
-endsubroutine vis_shape_hcurl
-!
+end subroutine vis_shape_hcurl
 !
 !
 !----------------------------------------------------------------------
 !> Purpose - routine dumps H(div) shape functions to Paraview
-!!
-!> @data Oct 14
+!> @date Oct 14
 !----------------------------------------------------------------------
 !
 subroutine vis_shape_hdiv(Icount)
@@ -258,11 +250,9 @@ subroutine vis_shape_hdiv(Icount)
 endsubroutine vis_shape_hdiv
 !
 !
-!
 !----------------------------------------------------------------------
 !> Purpose - routine dumps L2 shape functions to Paraview
-!!
-!> @data Oct 14
+!> @date Oct 14
 !----------------------------------------------------------------------
 !
 subroutine vis_shape_l2(Icount)

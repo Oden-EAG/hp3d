@@ -17,7 +17,7 @@
 !       ...
 !     ENDLOOP
 !
-!  The first three instruction of this routine, marked with (*), do not
+!  The first three instructions of this routine, marked with (*), do not
 !  depend upon Xi. Therefore, for a more efficient implementation of the
 !  element routine, they should be moved out of the loop. In other words,
 !  rather then using this routine, it should be incorporated into the
@@ -72,4 +72,4 @@ subroutine geom_hp(Mdle,Xi, X,Dxdxi)
 !////////  END OF LOOP  /////////////////////////
 !
 !
-endsubroutine geom_hp
+end subroutine geom_hp

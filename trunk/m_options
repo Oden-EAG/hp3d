@@ -8,8 +8,6 @@ HP3D_BASE_PATH  = ${WORK}/par_hp3d/trunk
 #------------------------------------------------------------------
 # COMPILER SETTINGS (a 64bit processor architecture is assumed)
 #------------------------------------------------------------------
-DEBUG      = NO
-#DEBUG      = YES
 
 LARGE      = NO
 OPENMP_USE = YES
@@ -30,19 +28,12 @@ endif
 FC     =  $(FF)
 FFLAGS = -fPIC
 
+# Additional Intel compiler flags
+#FFLAGS += -stand
+
 # OpenMP
 ifeq ($(OPENMP_USE),YES)
 FFLAGS += -qopenmp
-endif
-
-# Debug flags
-ifeq ($(DEBUG),YES)
-FFLAGS += -O0 -g -traceback -check all -debug all -check noarg_temp_created -assume noprotect_constants
-endif
-
-# Optimization flags
-ifeq ($(DEBUG),NO)
-FFLAGS += -O3 -xCORE-AVX512
 endif
 
 # use the following flags if need >2G static data
@@ -59,11 +50,17 @@ CDEFS   = -DAdd_
 #------------------------------------------------------------------
 # PREPROCESSOR VARIABLES
 #------------------------------------------------------------------
-COMPLEX    ?= 0
-SHAPE      ?= 1
-DEBUG_MODE ?= 0
-ifeq ($(DEBUG),YES)
-DEBUG_MODE = 1
+COMPLEX ?= 0
+DEBUG   ?= 0
+
+# Debug flags
+ifeq ($(DEBUG),1)
+  FFLAGS += -O0 -g -traceback -check all -debug all -check noarg_temp_created -assume noprotect_constants
+endif
+
+# Optimization flags
+ifeq ($(DEBUG),0)
+  FFLAGS += -O3 -xCORE-AVX512
 endif
 
 #------------------------------------------------------------------
@@ -134,15 +131,13 @@ MUMPS_INCS = -I$(TACC_PETSC32_INC) -I$(TACC_PETSC64_INC) \
 # VIS LIBRARY
 #------------------------------------------------------------------
 #
-# TACC HDF5, Paraview
+# TACC HDF5
 #
 
-# module load paraview/5.6.0
 # module load hdf5/1.10.4
 # module load phdf5/1.10.4
 VIS_LIBS   = -L${TACC_HDF5_LIB} -lhdf5 -lhdf5_hl -lhdf5_fortran -lhdf5hl_fortran
-VIS_LIBS  += -L${TACC_PARAVIEW_LIB} -lvtkhdf5-pv5.6 -lvtkhdf5_hl-pv5.6 -lvtklibxml2-pv5.6 -lvtkzlib-pv5.6
-VIS_INCS   = -I${TACC_HDF5_INC} -I${TACC_PARAVIEW_INC}
+VIS_INCS   = -I${TACC_HDF5_INC}
 
 #------------------------------------------------------------------
 # HP3D PATHS
@@ -151,26 +146,22 @@ VIS_INCS   = -I${TACC_HDF5_INC} -I${TACC_PARAVIEW_INC}
 # Mainly for library makefile
 
 ifeq ($(COMPLEX),1)
-HP3D_PATH       = $(HP3D_BASE_PATH)/complex
+  HP3D_PATH      = $(HP3D_BASE_PATH)/complex
+else
+  HP3D_PATH      = $(HP3D_BASE_PATH)/real
 endif
 
-ifeq ($(COMPLEX),0)
-HP3D_PATH       = $(HP3D_BASE_PATH)/real
-endif
-
-SRC_PATH        = src
-MODULE_PATH     = module
-LIB_PATH        = lib
+SRC_PATH         = src
+MODULE_PATH      = module
+LIB_PATH         = lib
 
 OBJ_PATH_COMPLEX =  _obj_complex_
 OBJ_PATH_REAL    =  _obj_real_
 
 ifeq ($(COMPLEX),1)
-OBJ_PATH        = $(OBJ_PATH_COMPLEX)
-endif
-
-ifeq ($(COMPLEX),0)
-OBJ_PATH        = $(OBJ_PATH_REAL)
+  OBJ_PATH       = $(OBJ_PATH_COMPLEX)
+else
+  OBJ_PATH       = $(OBJ_PATH_REAL)
 endif
 
 HP3D_LIB_EXTRA_INCS = $(MKL_INCS) $(MUMPS_INCS) $(VIS_INCS)
@@ -201,20 +192,16 @@ HP3D_LINK_INCS    = -I$(HP3D_PATH)/common/hp3d \
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # BASIC LINEAR ALGEBRA LIBRARIES LINKING
-
 LIN_ALG_LINK_LIBS = $(MKL_LIBS)
 LIN_ALG_LINK_INCS = $(MKL_INCS)
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # PETSC LINKING
-
-# PETSc
 #PETSC_LINK_LIBS  = -L$(TACC_PETSC32_LIB) -lpetsc
 #PETSC_LINK_INCS  = #-I/home1/apps/intel18/impi18_0/petsc/3.11/include
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # MUMPS LINKING
-
 MUMPS_LINK_LIBS    = $(MUMPS_LIBS) $(LIN_ALG_LINK_LIBS) -L$(TACC_PETSC64_LIB) -lpetsc
 MUMPS_LINK_INCS    = $(MUMPS_INCS) $(LIN_ALG_LINK_INCS)
 
@@ -243,6 +230,5 @@ PROB_INCS    += $(HP3D_LINK_INCS)   \
 # are preprocessed according to certain directives
 
 PROB_PP_DEFS  = -D"C_MODE=$(COMPLEX)" \
-                -D"SHAPE_MODE=$(SHAPE)" \
-                -D"DEBUG_MODE=$(DEBUG_MODE)"
+                -D"DEBUG_MODE=$(DEBUG)"
 
