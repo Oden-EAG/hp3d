@@ -4,7 +4,7 @@ c   routine name       - setcnstr_trian_iso_div
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - May 14
+c   latest revision    - May 2020
 c
 c   purpose            - routine evaluates constraint coefficients for
 c                        the triangular master element and H(div) (L2)
@@ -56,13 +56,18 @@ c
 #include "syscom.blk"
 c
 c  ...big(parent) and small element shape functions, collocation points
-      dimension shapsma(MAXtriaQ,MAXtriaQ),shapbig(MAXtriaQ,MAXtriaQ),
-     .          ip(MAXtriaQ),xibig(2), xisma(2)
+      dimension shapsma(MAXtriaQ,MAXtriaQ),
+     .          shapbig(MAXtriaQ,MAXtriaQ),
+     .          ip(MAXtriaQ),xibig(2),xisma(2)
+c
+      dimension norder(4),nsize(2)
 c
       iprint=0
 c
-c  ...set up order and orientation
-      nord = MAXP
+c  ...set up order
+      nord   = MAXP
+      norder = (/1,1,1,nord/)
+      nsize  = (/MAXP,MAXtriaQ/)
 c
 c  ...loop through small triangles
       do nel=1,4
@@ -103,15 +108,19 @@ c
             end select
 c
 c  .........compute small shape functions at this point:
-            call shapeQt(xisma,(/1,1,1,nord/),
-     .                        nrdofQ,shapsma(1:MAXtriaQ,icl))
+c            call shapeQt(xisma,(/1,1,1,nord/),
+c     .                        nrdofQ,shapsma(1:MAXtriaQ,icl))
+            call shape2DQTri(xisma,norder,nsize,
+     .                       nrdofQ,shapsma(:,icl))
 c
 c  .........Piola transform (divide by jacobian)
             shapsma(1:MAXtriaQ,icl) = shapsma(1:MAXtriaQ,icl)/.25d0
 c
 c  .........compute big shape functions at this point:
-            call shapeQt(xibig,(/1,1,1,nord/),
-     .                        nrdofQ,shapbig(1:MAXtriaQ,icl))
+c            call shapeQt(xibig,(/1,1,1,nord/),
+c     .                        nrdofQ,shapbig(1:MAXtriaQ,icl))
+            call shape2DQTri(xibig,norder,nsize,
+     .                       nrdofQ,shapbig(:,icl))
           enddo
         enddo
         if (icl.ne.nrdofQ) then
@@ -175,7 +184,8 @@ c
       write(*,*) 'xibig = ',xibig
 c
 c  ...shape functions of big element
-      call shapeQt(xibig,(/1,1,1,nord/), nrdofQ,shapbig(1:MAXtriaQ,1))
+c     call shapeQt(xibig,(/1,1,1,nord/), nrdofQ,shapbig(1:MAXtriaQ,1))
+      call shape2DQTri(xibig,norder,nsize, nrdofQ,shapbig(:,1))
 c
 c  ...determine which small element is this:
 c  ...coordinates in a small element:
@@ -212,7 +222,8 @@ c  .....element 4:
       write(*,*) 'setcnstr_trian: nel = ', nel
 c
 c  ...find small shape functions at this point:
-      call shapeQt(xisma,(/1,1,1,nord/), nrdofQ,shapsma(1:MAXtriaQ,1))
+c     call shapeQt(xisma,(/1,1,1,nord/), nrdofQ,shapsma(1:MAXtriaQ,1))
+      call shape2DQTri(xisma,norder,nsize, nrdofQ,shapsma(:,1))
 c
 c*********************************************************************
 c

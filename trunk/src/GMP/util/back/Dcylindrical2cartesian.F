@@ -11,7 +11,7 @@
       IMPLICIT NONE
 !***********************************************************************************************************
       !*** DUMMY ARGUMENTS
-      double precision, intent(in) :: rho, theta, z            !*** cylindrical coordinates          
+      double precision, intent(in) :: rho, theta, z            !*** cylindrical coordinates
       double precision, dimension(3), intent(out) :: r         !*** cartesian coordinates
       double precision, dimension(3,3), intent(out) :: Dr      !*** derivatives
 !***********************************************************************************************************

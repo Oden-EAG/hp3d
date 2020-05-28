@@ -43,13 +43,13 @@ cwb       dimension Sbuf(*), nbuf(20), lenf(20)
 c
 cwb       save nbuf,lenf
 ccccc save nbuf, lenf, irsave
-      common /czdirio1/  nbuf, lenf, irsave   
+      common /czdirio1/  nbuf, lenf, irsave
       common /czdirio2/ storage(100)
 
 
 c  ...test......test......test......test......test......test......test...
 c      allocatable sbuf1(:)
-c      character*6 TAPES(40)
+c      character(6) TAPES(40)
 c      data TAPES /'TAPE41','TAPE42','TAPE43','TAPE44','TAPE45',
 c     .            'TAPE46','TAPE47','TAPE48','TAPE49','TAPE50',
 c     .            'TAPE51','TAPE52','TAPE53','TAPE54','TAPE55',
@@ -67,7 +67,7 @@ c ...................................................
 c within zdirio1.blk is contained the data statement:
 c
       data maxrec,lenwrd /10000, 16/
-c for COMPLEX*16, lenwrd = 16
+c for complex(8), lenwrd = 16
 c where:
 c   maxrec = the maximum record length for a direct access file
 c     **Note: on most machines this is bytes

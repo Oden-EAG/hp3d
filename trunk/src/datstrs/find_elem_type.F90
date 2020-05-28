@@ -1,4 +1,4 @@
-! 
+!
 !-----------------------------------------------------------------------
 !
 !   routine name       - find_elem_type
@@ -16,7 +16,7 @@
 !           out        - Type: type of the initial mesh element (ancestor)
 !
 !-----------------------------------------------------------------------
-!  
+!
 !
 subroutine find_elem_type(Mdle, Type)
 !
@@ -61,6 +61,6 @@ subroutine find_elem_type(Mdle, Type)
       case(4)
          Type = PYRAMIDS(no)%type
 !
-   end select   
+   end select
 !
 end subroutine find_elem_type

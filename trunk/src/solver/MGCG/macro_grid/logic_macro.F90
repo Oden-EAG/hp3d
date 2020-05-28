@@ -19,7 +19,7 @@
 !         NrdofH_macro - # of H1      macro element dofs
 !         NrdofE_macro - # of H(curl) macro element dofs
 !         NrdofV_macro - # of H(div)  macro element dofs
-!     out:     
+!     out:
 !               Nrnodm - # of modified coarse grid element nodes
 !                        (excluding the middle node)
 !                 Nodm - nodes of the modified coarse grid element
@@ -57,25 +57,25 @@
    use prolongation
    use mg_data_structure
 !
-   IMPLICIT NONE
+   implicit none
 !
 !..globals in
    integer, intent(in)  :: Igrid, MdleC, Nod_macro(Nrnod_macro), Nrnod_macro
-!..total number of dof for a macro-element   
+!..total number of dof for a macro-element
    integer, intent(in)  :: NrdofH_macro, NrdofE_macro, NrdofV_macro
-!  
-!..globals out 
+!
+!..globals out
    integer, intent(out) :: Nrnodm
    integer, intent(out) :: Nodm(MAXNODM),   NdofmH(MAXNODM),      &
                            NdofmE(MAXNODM), NdofmV(MAXNODM)
    integer, intent(out) :: NdofH_macro(Nrnod_macro),              &
-                           NdofE_macro(Nrnod_macro),   NdofV_macro(Nrnod_macro)  
+                           NdofE_macro(Nrnod_macro),   NdofV_macro(Nrnod_macro)
    integer, intent(out) :: NrconH_macro(NrdofH_macro), NacH_macro(NACDIM,NrdofH_macro),   &
                            NrconE_macro(NrdofE_macro), NacE_macro(NACDIM,NrdofE_macro),   &
                            NrconV_macro(NrdofV_macro), NacV_macro(NACDIM,NrdofV_macro)
    real*8,  intent(out) :: ConstrH_macro(NACDIM,NrdofH_macro),  &
-                           ConstrE_macro(NACDIM,NrdofE_macro),  &                        
-                           ConstrV_macro(NACDIM,NrdofV_macro)  
+                           ConstrE_macro(NACDIM,NrdofE_macro),  &
+                           ConstrV_macro(NACDIM,NrdofV_macro)
 !
 !..locals
 !..element characteristics
@@ -87,14 +87,14 @@
 !
 !..offsets for first dof for coarse (local) element nodes
    integer              :: naHl(26), naEl(26), naVl(26)
-! 
+!
 !..offsets for first dof for coarse (coarse) element nodes
    integer              :: naH(MAXNODM),naE(MAXNODM),naV(MAXNODM)
 !
 !..offsets for first dof for macro-element element nodes
    integer              :: naH_macro(Nrnod_macro),naE_macro(Nrnod_macro),  &
-                           naV_macro(Nrnod_macro)  
-!   
+                           naV_macro(Nrnod_macro)
+!
 !..workspace for logicC
    integer              :: idec
    integer              :: nrconH(MAXbrickH), nacH(NACDIM,MAXbrickH),   &
@@ -104,18 +104,18 @@
                            ConstrE(NACDIM,MAXbrickE),                   &
                            ConstrV(NACDIM,MAXbrickV)
 !
-!..local offsets and dof counters 
+!..local offsets and dof counters
    integer              :: icH, icE, icV, ndofH, ndofE, ndofV, nvoid
-!..local counters       
+!..local counters
    integer              :: i, j, nod, loc, loc1, locC, iv, nodl
-   integer              :: kH, kE, kV, kHC, kEC, kVC   
+   integer              :: kH, kE, kV, kHC, kEC, kVC
 !
 !..maps establishing injections between edge or face dof and element dof
    integer              :: mapH(MAXquadH),mapE(MAXquadE),mapV(MAXquadQ)
-!   
+!
 !..local for edges
    integer              :: ie, je, jp, kp, iedg(2), nodes_edge(3)
-   integer              :: kH_macro, kE_macro, kV_macro  
+   integer              :: kH_macro, kE_macro, kV_macro
 !
 !..# of connected modified coarse grid element parent dof
    integer              :: ndof_macroH, ndof_macroE, ndof_macroV
@@ -123,15 +123,15 @@
 !
 !..local for faces
    integer              :: if, nface_or, nrvf, nrfn, nod_face(9), nodesl_face(9)
-!   
+!
 !..workspace for face_to_vert_nos and face_to_vert_orient
-   integer              :: nedge_or(4), nfedg_or(4) , nfver(4), nfedg(4)  
+   integer              :: nedge_or(4), nfedg_or(4) , nfver(4), nfedg(4)
 !
    integer              :: nord, nordh, nordv, nordp(5), nordh_new
 !
 !..injection of a coarse grid node dof into dof after p-refinement
    integer              :: InjH(MAXquadH), InjE(MAXquadE), InjV(MAXquadV)
-!   
+!
 !..printing flag
    integer              :: iprint, inod
 !
@@ -142,14 +142,14 @@
       iprint = 0
    case default
       iprint = 0
-   end select 
+   end select
 
-!..initialization 
+!..initialization
 !..modified coarse element
-   Nrnodm = 0; Nodm = 0 
+   Nrnodm = 0; Nodm = 0
    NdofmH = 0; NdofmE = 0; NdofmV = 0
 !..macro-element
-   NdofH_macro   = 0;    NdofE_macro   = 0;     NdofV_macro   = 0 
+   NdofH_macro   = 0;    NdofE_macro   = 0;     NdofV_macro   = 0
 !
 !----------------------------------------------------------------------------------------
 !
@@ -157,7 +157,7 @@
    type = NODES(MdleC)%type
    nrv = nvert(type); nre = nedge(type); nrf = nface(type)
 
-!   
+!
 !..get element nodes and build the local database on constraints for the element
    call get_connect_infoC(Igrid,MdleC, nodesl,norientl)
 !
@@ -173,8 +173,8 @@
 !
 !..remove the middle node from the list
    Nodm(Nrnodm) = 0; Nrnodm = Nrnodm-1
-!   
-!..establish offsets for the coarse element nodal dof 
+!
+!..establish offsets for the coarse element nodal dof
    icH=0; icE=0; icV=0
    do i = 1,nrv+nre+nrf
       naHl(i)=icH; naEl(i)=icE; naVl(i)=icV
@@ -184,7 +184,7 @@
       icH=icH+ndofH; icE=icE+NdofE; icV=icV+NdofV
    enddo
 !
-!..establish offsets for the modified coarse element nodal dof 
+!..establish offsets for the modified coarse element nodal dof
    icH=0; icE=0; icV=0
    do i = 1,Nrnodm
       naH(i)=icH; naE(i)=icE; naV(i)=icV
@@ -211,7 +211,7 @@
              ' naH = ',i3,' NdofH = ',i3, &
              ' naE = ',i3,' NdofE = ',i3, &
              ' naV = ',i3,' NdofV = ',i3)
-! 
+!
       write(*,7001) MdleC
  7001 format('logic_macro: COARSE LOCAL ELEMENT NODES FOR MdleC = ',i6)
       do i = 1,nrv+nre+nrf
@@ -222,7 +222,7 @@
                        naHl(i),ndofH, &
                        naEl(i),ndofE, &
                        naVl(i),ndofV
-      enddo 
+      enddo
 
       write(*,7002) MdleC
  7002 format('logic_macro: COARSE MODIFIED ELEMENT NODES FOR MdleC = ',i6)
@@ -262,7 +262,7 @@
 !
 !  ...if the node belongs also to the macro-element then connect it to itself
       if (loc.ne.0) then
-         kH = naH_macro(loc); kE = naE_macro(loc); kV = naV_macro(loc) 
+         kH = naH_macro(loc); kE = naE_macro(loc); kV = naV_macro(loc)
          call inject_dof(NODES(nod)%type, NODES_MG(nod)%orderC(Igrid),NODES(nod)%order,   &
                          InjH, InjE, InjV)
          do j=1,NdofmH(i)
@@ -321,8 +321,8 @@
 !
 !  ...local mid-edge node number
       i = nrv + ie
-!      
-!  ...mid-edge node     
+!
+!  ...mid-edge node
       nodes_edge(3) = nodesl(i)
 
 !  ...vertex nodes (account for edge orientation)
@@ -358,10 +358,10 @@
 !     ...skip if on the list of modified coarse element node
          call locate(nod,Nodm,Nrnodm, locC)
          if (locC.ne.0) cycle
-!    
+!
 !     ...skip if the node is not in the interior of the edge
 !        (i.e. it has been considered in the loop through vertices)
-         if (.not. Edge_interior_node(nodl)) cycle         
+         if (.not. Edge_interior_node(nodl)) cycle
 !
          call ndof_nod(NODES(nod)%type,NODES_PR(nodl)%order, &
                         ndofH,ndofE,nvoid,nvoid)
@@ -393,8 +393,8 @@
                   call add_dof(kp,coeff, &
                   NacH_macro(:,kH_macro),ndof_macroH,ConstrH_macro(:,kH_macro))
 !
-!           ...end of loop through the ultimate modified coarse grid element 
-!              parent dof         
+!           ...end of loop through the ultimate modified coarse grid element
+!              parent dof
                enddo
 !
 !        ...end of loop through connected parent edge dof
@@ -402,9 +402,9 @@
 !
 !        ...save the # of connected parent dof
             NrconH_macro(kH_macro) = ndof_macroH
-!                  
+!
 !     ...loop through nodal H1 dof
-         enddo 
+         enddo
 !
 !     ...loop through nodal H(curl) dof
          do j=1,ndofE
@@ -433,8 +433,8 @@
                   call add_dof(kp,coeff, &
                   NacE_macro(:,kE_macro),ndof_macroE,ConstrE_macro(:,kE_macro))
 !
-!           ...end of loop through the ultimate modified coarse grid element 
-!              parent dof         
+!           ...end of loop through the ultimate modified coarse grid element
+!              parent dof
                enddo
 !
 !        ...end of loop through connected parent edge dof
@@ -442,9 +442,9 @@
 !
 !        ...save the # of connected parent dof
             NrconE_macro(kE_macro) = ndof_macroE
-!                  
+!
 !     ...loop through nodal H(curl) dof
-         enddo 
+         enddo
 !
 !  ...end of loop through nodes in the tree
       enddo
@@ -460,7 +460,7 @@
    do if=1,nrf
 !
       ftype = facetype(type,if); nface_or = norientl(nrv+nre+if)
-!      
+!
 !  ...number of vertices on the face (3 or 4)
       nrvf = nvert(ftype)
 !
@@ -472,7 +472,7 @@
 !
 !  ...pick up edge numbers in the face global coordinates
       call face_to_edge_nos(ftype,nface_or, nfedg)
-!      
+!
 !  ...collect element orientations for the face edges
       do i=1,nrvf
         ie = nod_face(nrvf+i)
@@ -481,14 +481,14 @@
 !
 !  ...pick up edge orientations in the face global coordinates
       call face_to_edge_orient(ftype,nface_or,nedge_or, nfedg_or)
-!      
+!
 !  ...pick up the global face nodes numbers in global face coordinates
       do i=1,nrvf
          nodesl_face(i) = nodesl(nod_face(nfver(i)))
          nodesl_face(nrvf+i) = nodesl(nod_face(nrvf+nfedg(i)))
       enddo
       nodesl_face(nrvf+nrvf+1) = nodesl(nrv+nre+if)
-!  
+!
 !  ...determine the face parent nodes order for the prolongation operator
       do i=1,nrvf+1
         nordp(i) = NODES_MG(nodesl_face(nrvf+i))%orderC(Igrid)
@@ -533,7 +533,7 @@
       do kV=1,ndofV
          mapV(kV) = naVl(j)+kV
       enddo
-!      
+!
       icH = icH + ndofH; icE = icE + ndofE
 !
       call build_face_tree(ftype,nordp,nfedg_or,nodesl_face)
@@ -552,9 +552,9 @@
          call locate(nod,Nodm,Nrnodm, locC)
          if (locC.ne.0) cycle
 !
-!     ...skip if the node is not in the interior of the face 
+!     ...skip if the node is not in the interior of the face
 !     ...(i.e. it has been considered in the loop through edges)
-         if(.not. Face_interior_node(nodl)) cycle         
+         if(.not. Face_interior_node(nodl)) cycle
 !
 !     ...get the # number of dof implied by the parent (coarse) order
          call ndof_nod(NODES(nod)%type,NODES_PR(nodl)%order, &
@@ -590,8 +590,8 @@
                   call add_dof(kp,coeff, &
                   NacH_macro(:,kH_macro),ndof_macroH,ConstrH_macro(:,kH_macro))
 !
-!           ...end of loop through the ultimate modified coarse grid element 
-!              parent dof         
+!           ...end of loop through the ultimate modified coarse grid element
+!              parent dof
                enddo
 !
 !        ...end of loop through connected parent edge dof
@@ -599,9 +599,9 @@
 !
 !        ...save the # of connected parent dof
             NrconH_macro(kH_macro) = ndof_macroH
-!                  
+!
 !     ...end of loop through nodal H1 dof
-         enddo 
+         enddo
 !
 !     ...loop through nodal H(curl) dof
          do j=1,ndofE
@@ -624,14 +624,14 @@
                   coeff = constrE(jp,kE)*NODES_PR(nodl)%coeffE(je,j)
 !
                   if (coeff .eq. 0.d0) cycle
-! 
+!
 !              ...adjust # of connected parent dof and accumulate for
 !                 the prolongation coefficient
                   call add_dof(kp,coeff, &
                   NacE_macro(:,kE_macro),ndof_macroE,ConstrE_macro(:,kE_macro))
 !
-!           ...end of loop through the ultimate modified coarse grid element 
-!              parent dof         
+!           ...end of loop through the ultimate modified coarse grid element
+!              parent dof
                enddo
 !
 !        ...end of loop through connected parent edge dof
@@ -639,9 +639,9 @@
 !
 !        ...save the # of connected parent dof
             NrconE_macro(kE_macro) = ndof_macroE
-!                  
+!
 !     ...end of loop through nodal H(curl) dof
-         enddo 
+         enddo
 !
 !     ...loop through nodal H(div) dof
          do j=1,ndofV
@@ -670,8 +670,8 @@
                   call add_dof(kp,coeff, &
                   NacV_macro(:,kV_macro),ndof_macroV,ConstrV_macro(:,kV_macro))
 !
-!           ...end of loop through the ultimate modified coarse grid element 
-!              parent dof         
+!           ...end of loop through the ultimate modified coarse grid element
+!              parent dof
                enddo
 !
 !        ...end of loop through connected parent edge dof
@@ -679,14 +679,14 @@
 !
 !        ...save the # of connected parent dof
             NrconV_macro(kV_macro) = ndof_macroV
-!                  
+!
 !     ...loop through nodal H(div) dof
-         enddo 
+         enddo
 !
 !  ...end of loop through nodes in the tree
       enddo
 !..end of loop through faces
-   enddo      
+   enddo
 !
 !
    end subroutine logic_macro
@@ -700,7 +700,7 @@
 !
 !    latest revision   - Jan 2018
 !
-!    purpose           - Routine updates prolongation (constraint) 
+!    purpose           - Routine updates prolongation (constraint)
 !                        coefficients for the macro-element dofs
 !
 !   arguments :
@@ -711,7 +711,7 @@
 !         Nac_macro    - current list of modified coarse grid element
 !                        dof connected to a macro-element dof
 !         Ndof_macro   - current # of entries in Nac_macro
-!       Constr_macro   - the corresponding list of constraint 
+!       Constr_macro   - the corresponding list of constraint
 !                        coefficients
 !
 !-----------------------------------------------------------------------
@@ -726,7 +726,7 @@
 !
 !..locals
    integer :: loc
-!   
+!
 !-----------------------------------------------------------------------
 !
 !..locate the parent dof on the list of connected parent dof so far

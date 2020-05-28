@@ -15,7 +15,7 @@ c                        triangles
 c
 c   usage              - call clip2(Trc,Imod)
 c
-c   arguments 
+c   arguments
 c            in :  Trc - triangle's vertices coordinates
 c           out : Imod - clipping indicator
 c
@@ -32,16 +32,18 @@ c
 c
 c  ...get triangle's vertices coordinates, rescale them and
 c     if any vertex far from the window ignore the triangle
-      do 10 k=1,3
-      do 10 ivar=1,2
-        xy(ivar,k) = (Trc(ivar,k)-XCIM(ivar))/DIMIM
-        if(xy(ivar,k).lt.-1.5d0) return
-        if(xy(ivar,k).gt.1.5d0) return
+      do k=1,3
+         do ivar=1,2
+            xy(ivar,k) = (Trc(ivar,k)-XCIM(ivar))/DIMIM
+            if(xy(ivar,k).lt.-1.5d0) return
+            if(xy(ivar,k).gt.1.5d0) return
+         enddo
+      enddo
    10 continue
 c
-c  .....if visible 
-      Imod = 1 
-c         
+c  .....if visible
+      Imod = 1
+c
       return
       end
 

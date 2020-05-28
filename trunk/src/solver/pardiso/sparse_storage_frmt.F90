@@ -1,4 +1,4 @@
-#include "implicit_none.h"
+#include "typedefs.h"
 !-----------------------------------------------------------------------
 !
 !    routine name:      - coo2csc
@@ -30,14 +30,12 @@ subroutine coo2csc(IA,JA,XA,nz, nnz)
    integer    , intent(inout) :: IA(nz),JA(nz)
    VTYPE      , intent(inout) :: XA(nz)
 !
-   integer :: i,j,p,t
-!
 !..sort and remove duplicates
    call assemble_triplet(JA,IA,XA,nz,nnz)
 !
 !..create column pointers
    call get_pointers(JA(1:nnz), nnz)
-   
+
 !
 end subroutine coo2csc
 !
@@ -73,14 +71,12 @@ subroutine coo2csr(IA,JA,XA,nz, nnz)
    integer    , intent(inout) :: IA(nz),JA(nz)
    VTYPE      , intent(inout) :: XA(nz)
 !
-   integer :: i,j,p,t
-!
 !..sort and remove duplicates
    call assemble_triplet(IA,JA,XA,nz,nnz)
 !
 !..create CSR row pointers
    call get_pointers(IA(1:nnz), nnz)
-!   
+!
 end subroutine coo2csr
 !
 !
@@ -92,7 +88,7 @@ end subroutine coo2csr
 !
 !    latest revision:   - Aug 2018
 !
-!    purpose:           - convert row vector indices to pointers 
+!    purpose:           - convert row vector indices to pointers
 !                         (compatible to CSR format)
 !
 !    arguments:
@@ -155,9 +151,9 @@ subroutine assemble_triplet(row,col,val,nz,nnz)
 !..declare variables
    integer    , intent(inout) :: row(nz),col(nz)
 #if C_MODE
-   complex*16 , intent(inout) :: val(nz)
+   complex(8) , intent(inout) :: val(nz)
 #else
-   real*8     , intent(inout) :: val(nz)
+   real(8)    , intent(inout) :: val(nz)
 #endif
    integer    , intent(in)    :: nz
    integer    , intent(out)   :: nnz
@@ -190,7 +186,7 @@ subroutine assemble_triplet(row,col,val,nz,nnz)
       else
          val(j) = val(j) + val(i)
       endif
-   enddo   
+   enddo
 !
    nnz = j
 !
@@ -226,12 +222,12 @@ recursive subroutine qsort_triplet_old(ia,ja,xa,n,first,last)
 !..declare variables
    integer     , intent(in)    :: n,first,last
    integer     , intent(inout) :: ia(n), ja(n)
-#if C_MODE   
-   complex*16  , intent(inout) :: xa(n)
-   complex*16                  :: x
+#if C_MODE
+   complex(8)  , intent(inout) :: xa(n)
+   complex(8)                  :: x
 #else
-   real*8      , intent(inout) :: xa(n)
-   real*8                      :: x
+   real(8)     , intent(inout) :: xa(n)
+   real(8)                     :: x
 #endif
    integer                     :: i,j,k,l
 !
@@ -255,7 +251,7 @@ recursive subroutine qsort_triplet_old(ia,ja,xa,n,first,last)
    if (first < i-1) call qsort_triplet_old(ia,ja,xa,n,first,i-1 )
    if (j+1 < last)  call qsort_triplet_old(ia,ja,xa,n,j+1,  last)
 !
-!  
+!
 end subroutine qsort_triplet_old
 !
 !
@@ -288,12 +284,12 @@ recursive subroutine qsort_triplet(ia,ja,xa,n,first,last)
 !..declare variables
    integer     , intent(in)    :: n,first,last
    integer     , intent(inout) :: ia(n), ja(n)
-#if C_MODE   
-   complex*16  , intent(inout) :: xa(n)
-   complex*16                  :: x
+#if C_MODE
+   complex(8)  , intent(inout) :: xa(n)
+   complex(8)                  :: x
 #else
-   real*8      , intent(inout) :: xa(n)
-   real*8                      :: x
+   real(8)     , intent(inout) :: xa(n)
+   real(8)                     :: x
 #endif
    integer                     :: i,j,ki,kj,l
 !
@@ -331,7 +327,7 @@ end subroutine qsort_triplet
 !
 !    purpose:           - partitions an array of triples around a pivot
 !
-!    arguments:         
+!    arguments:
 !           in/out
 !                       - ia : 1D integer array (row indices)
 !                       - ja : 1D integer array (column indices)
@@ -353,12 +349,12 @@ recursive subroutine partition_triplet_omp(ip,jp,n,k,ia,ja,xa)
    integer    , intent(in)     :: ip,jp,n
    integer    , intent(out)    :: k
    integer    , intent(inout)  :: ia(n), ja(n)
-#if C_MODE   
-   complex*16 , intent(inout)  :: xa(n)
-   complex*16                  :: xaux
+#if C_MODE
+   complex(8) , intent(inout)  :: xa(n)
+   complex(8)                  :: xaux
 #else
-   real*8     , intent(inout)  :: xa(n)
-   real*8                      :: xaux
+   real(8)    , intent(inout)  :: xa(n)
+   real(8)                     :: xaux
 #endif
    integer                     :: i,ig,iaux,jaux,kl,kr,kto
 !..tuning parameter
@@ -435,9 +431,9 @@ recursive subroutine qsort_triplet_omp(n,ia,ja,xa)
    integer    , intent(in)    :: n
    integer    , intent(inout) :: ia(n), ja(n)
 #if C_MODE
-   complex*16 , intent(inout) :: xa(n)
+   complex(8) , intent(inout) :: xa(n)
 #else
-   real*8     , intent(inout) :: xa(n)
+   real(8)    , intent(inout) :: xa(n)
 #endif
    integer                    :: i,ig,ip,jp,n_le
    real                       :: r
@@ -485,9 +481,9 @@ end subroutine qsort_triplet_omp
 !
 !    latest revision:   - Nov 2016
 !
-!    purpose:           - 
+!    purpose:           -
 !
-!    arguments:         - 
+!    arguments:         -
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
@@ -496,20 +492,20 @@ subroutine assemble_double(row,val,nz,nnz)
 
    integer       :: row(nz)
 #if C_MODE
-   complex*16    :: Val(nz)
+   complex(8)    :: Val(nz)
 #else
-   real*8        :: Val(nz)            
+   real(8)       :: Val(nz)
 #endif
    integer       :: nz, nnz
-   integer       :: first, last, k, i 
+   integer       :: first, last, k, i
 
    first = 1
-   last  = nz 
+   last  = nz
 
 !..sort first
 !
    call qsort_double(row,val,nz,first, last)
-! 
+!
 !..remove duplicates
    k=1
    do i=2,nz
@@ -520,10 +516,10 @@ subroutine assemble_double(row,val,nz,nnz)
       else
          val(k) = val(k) + val(i)
       endif
-   enddo   
+   enddo
 !
    nnz = k
-!   
+!
 end subroutine assemble_double
 !
 !
@@ -535,7 +531,7 @@ end subroutine assemble_double
 !
 !    latest revision    - NOV 16
 !
-!    purpose            - sort the couple JA, Val for 
+!    purpose            - sort the couple JA, Val for
 !                         sparse coordinate format
 !
 !   arguments:
@@ -551,12 +547,12 @@ recursive subroutine qsort_double(ia,val,n,first, last)
 !
    implicit none
    integer     :: i, j, n, k, l
-   integer     :: ia(n) 
-#if C_MODE   
-   complex*16  :: val(n), x
+   integer     :: ia(n)
+#if C_MODE
+   complex(8)  :: val(n), x
 #else
-   real*8      :: val(n), x
-#endif   
+   real(8)     :: val(n), x
+#endif
    integer :: first, last
 !
    k = ia( (first+last) / 2 )

@@ -70,7 +70,7 @@ c
 c loop over the Elements
 c **********************
       if (iprint.eq.1) then
-        write(nfsout,*) 'FRWCP: NUMELM = ',NUMELM 
+        write(nfsout,*) 'FRWCP: NUMELM = ',NUMELM
       endif
       do 200 iel=1,NUMELM
 c     ********************
@@ -101,7 +101,7 @@ c            if(ndest1(i) .ne. nint(dreal(aldest(i))))then
 c              write(*,*)'FRWCP:IEL,I=',iel,i
 c              write(*,*)ndest1(i),nint(dreal(aldest(i)))
 c              stop
-c            endif 
+c            endif
 c            enddo
 c  ...test......test......test......test......test......test......test...
 c  ...test......test......test......test......test......test......test...
@@ -197,7 +197,7 @@ cwb <
 c
 c symmetric
 c
-            
+
             if (ISYM.eq.1 .or. ISYM.eq.4) then
                call symasm (Amdest, Elem, Frnt)
 c              --------------------------------

@@ -33,23 +33,23 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
 !
    integer, intent(in)  :: Irefine
    integer, intent(in)  :: Nreflag
-   real*8,  intent(in)  :: Factor
+   real(8),  intent(in) :: Factor
 !
    integer, parameter :: max_step = 20
    integer, dimension(max_step), save :: nrdof_tot_mesh
    integer, dimension(max_step), save :: nrdof_con_mesh
-   real*8,  dimension(max_step), save :: rate_mesh
-   real*8,  dimension(max_step), save :: error_mesh
-   real*8,  dimension(max_step), save :: rel_error_mesh
-   real*8,  dimension(max_step), save :: rate_error_mesh
+   real(8), dimension(max_step), save :: rate_mesh
+   real(8), dimension(max_step), save :: error_mesh
+   real(8), dimension(max_step), save :: rel_error_mesh
+   real(8), dimension(max_step), save :: rate_error_mesh
 !
    integer, save :: istep = 0
    integer, save :: irefineold = 0
 !
    integer :: iflag(1)
-   real*8  :: errorH,errorE,errorV,errorQ
-   real*8  :: rnormH,rnormE,rnormV,rnormQ
-   real*8  :: error_tot,rnorm_tot,error_subd,rnorm_subd
+   real(8) :: errorH,errorE,errorV,errorQ
+   real(8) :: rnormH,rnormE,rnormV,rnormQ
+   real(8) :: error_tot,rnorm_tot,error_subd,rnorm_subd
    integer :: i,iel,mdle,subd,count,ierr,nrelem_ref,kref
    integer :: iprint
 !

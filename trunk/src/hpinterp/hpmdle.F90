@@ -1,4 +1,7 @@
 !
+#include "typedefs.h"
+!
+!-----------------------------------------------------------------------
 !> Purpose : determine middle node geometry dof interpolating GMP map using
 !            PB interpolation
 !  NOTE:     the interpolation (projection) is done in the reference space
@@ -15,8 +18,7 @@
 !!                            and face  values)
 !!
 !! @param[out] Xdof         - geometry dof for the middle node
-!
-#include "implicit_none.h"
+!-----------------------------------------------------------------------
   subroutine hpmdle(Mdle,Iflag,No,Etav,Type, &
                     Nedge_orient,Nface_orient,Norder, &
                     Xnod, Xdof)
@@ -27,45 +29,45 @@
 !
 ! ** Arguments
 !-----------------------------------------------------------------------
-  integer,                                    intent(in)  :: Iflag,No,Mdle
-  real*8,  dimension(3,8),                    intent(in)  :: Etav
-  character(len=4),                           intent(in)  :: Type
-  integer, dimension(12),                     intent(in)  :: Nedge_orient
-  integer, dimension(6),                      intent(in)  :: Nface_orient
-  integer, dimension(19),                     intent(in)  :: Norder
+  integer,                         intent(in)  :: Iflag,No,Mdle
+  real(8),  dimension(3,8),        intent(in)  :: Etav
+  character(len=4),                intent(in)  :: Type
+  integer, dimension(12),          intent(in)  :: Nedge_orient
+  integer, dimension(6),           intent(in)  :: Nface_orient
+  integer, dimension(19),          intent(in)  :: Norder
 !
-  real*8,  dimension(3,MAXbrickH),            intent(in)  :: Xnod
-  real*8,  dimension(3,*),                    intent(out) :: Xdof
+  real(8), dimension(3,MAXbrickH), intent(in)  :: Xnod
+  real(8), dimension(3,*),         intent(out) :: Xdof
 !
 ! ** Locals
 !-----------------------------------------------------------------------
 !
 ! quadrature
   integer                               :: l,nint
-  real*8,  dimension(3, MAX_NINT3)      :: xi_list
-  real*8,  dimension(   MAX_NINT3)      :: wa_list
-  real*8                                :: wa, weight
+  real(8), dimension(3, MAX_NINT3)      :: xi_list
+  real(8), dimension(   MAX_NINT3)      :: wa_list
+  real(8)                               :: wa, weight
 !
 ! work space for shape3H
   integer                               :: nrdofH
-  real*8,  dimension(MAXbrickH)         :: shapH
-  real*8,  dimension(3,MAXbrickH)       :: gradH
+  real(8), dimension(MAXbrickH)         :: shapH
+  real(8), dimension(3,MAXbrickH)       :: gradH
 !
 ! derivatives of a shape function wrt reference coordinates
-  real*8, dimension(3)                  :: duHdeta,dvHdeta
+  real(8), dimension(3)                 :: duHdeta,dvHdeta
 !
 ! geometry
-  real*8                                :: rjac
-  real*8, dimension(3)                  :: xi,eta,x
-  real*8, dimension(3,3)                :: detadxi,dxideta,dxdeta
+  real(8)                               :: rjac
+  real(8), dimension(3)                 :: xi,eta,x
+  real(8), dimension(3,3)               :: detadxi,dxideta,dxdeta
 !
 ! work space for linear solvers
   integer                               :: naH,info
-  real*8,  dimension(MAXMdlbH,MAXMdlbH) :: aaH
+  real(8), dimension(MAXMdlbH,MAXMdlbH) :: aaH
   integer, dimension(MAXMdlbH)          :: ipivH
 !
 ! load vector and solution
-  real*8,  dimension(MAXMdlbH,3)        :: bb,uu
+  real(8), dimension(MAXMdlbH,3)        :: bb,uu
 !
 ! misc work space
   integer :: iprint,nrv,nre,nrf,i,j,k,kj,ki,&
@@ -110,8 +112,8 @@
     wa      = wa_list(l)
 !
 !   compute element H1 shape functions
-    call shape3H(Type,xi,Norder,Nedge_orient,Nface_orient, &
-                 nrdofH,shapH,gradH)
+    call shape3DH(Type,xi,Norder,Nedge_orient,Nface_orient, &
+                  nrdofH,shapH,gradH)
 !
 !   compute reference geometry
     call refgeom3D(Mdle,xi,Etav,shapH,gradH,nrv, &

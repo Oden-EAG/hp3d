@@ -8,7 +8,7 @@ c   computer           - machine independent
 c
 c   latest revision    - Aug 08
 c
-c   purpose            - given an element face and a point, both 
+c   purpose            - given an element face and a point, both
 c                        projected onto a plane, find the correspon-
 c                        ding master element coordinates for a point
 c                        on the element face such that the projection
@@ -18,7 +18,7 @@ c
 c   arguments :
 c     in:
 c                Mdle  - An element (middle node)
-c                If    - face number 
+c                If    - face number
 c                Xy_in    - coordinates of a projected point
 c     out
 c                T     - master face coordinates of the point
@@ -27,7 +27,7 @@ c                        the projection)
 c                Ierr  = 0, if the procedure has converged
 c                        1  otherwise
 c
-c   required  routines - 
+c   required  routines -
 c
 c----------------------------------------------------------------------
 c
@@ -46,7 +46,7 @@ c
 c  ...orientation for element nodes, order
       dimension nedge_orient(12),nface_orient(6),norder(19)
 c
-c  ...geometry 
+c  ...geometry
       dimension xi(3),dxdxi(3,3),
      .          dt(2),dXidt(3,2),dxdt(3,2),xp(3),dxpdt(3,2)
 c
@@ -95,9 +95,9 @@ c       derivatives wrt master face coordinates
         endif
 c
 c  .....evaluate shape functions at the point
-        call shape3H(NODES(Mdle)%type,
-     .               Xi,norder,nedge_orient,nface_orient,
-     .               nrdofH,vshapH,dvshapH)
+        call shape3DH(NODES(Mdle)%type,
+     .                Xi,norder,nedge_orient,nface_orient,
+     .                nrdofH,vshapH,dvshapH)
 c
 c  .....compute physical coordinates and their derivatives wrt
 c       master element coordinates
@@ -116,7 +116,7 @@ c       master element coordinates
         endif
 c
 c  .....compute derivatives of the physical coordinates wrt master face
-c       coordinates 
+c       coordinates
         dxdt(1:3,1:2) = 0.d0
         do i=1,2
           do j=1,3

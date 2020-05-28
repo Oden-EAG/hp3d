@@ -6,14 +6,14 @@
 !
 !   latest revision    - Feb 2018
 !
-!   purpose            - routine applies the prolongation operator to 
-!                        a coarse-grid solution vector using the 
+!   purpose            - routine applies the prolongation operator to
+!                        a coarse-grid solution vector using the
 !                        coefficients from logic_macro
 !                        (including Dirichlet dof)
 !
 !   arguments :
 !     in:
-!             Igrid    - 
+!             Igrid    -
 !             Iel      - natural order of elements
 !             Zu_c     - solution vector for the modified coarse element
 !             nrdof_c  - length of Zu_c
@@ -26,50 +26,50 @@
 !..TODO accommodate usage of PHYSAm (loop through physics variables)
 !..     see solout_mg or compute_sol_dof for example
 !
-#include 'implicit_none.h'
+#include "typedefs.h"
 !
    subroutine coarse2macro(Igrid,Iel,Zu_c,Nrdof_c, Zu_m,Nrdof_m)
 !
    use data_structure3D,  only: NODES, get_index
    use mg_data_structure, only: GRID
-   use physics,           only: NRHVAR, NREVAR, NRVVAR, NRINDEX     
+   use physics,           only: NRHVAR, NREVAR, NRVVAR, NRINDEX
    use parameters,        only: NRCOMS, MAXEQNH, MAXEQNE, MAXEQNV,      &
-                                MAXbrickH, MAXbrickE, MAXbrickV, ZERO                   
-   use assembly,          only: NR_RHS 
+                                MAXbrickH, MAXbrickE, MAXbrickV, ZERO
+   use assembly,          only: NR_RHS
 !
-   IMPLICIT NONE
+   implicit none
 !
 !
    integer, intent(in)  :: Igrid,Iel, Nrdof_c, Nrdof_m
 !
-   VTYPE, intent(in)  :: Zu_c(nrdof_c) 
+   VTYPE, intent(in)  :: Zu_c(nrdof_c)
    VTYPE, intent(out) :: Zu_m(nrdof_m)
 !
 !..locals
    VTYPE           :: zdofH_c(MAXEQNH,MAXbrickH),     &
                       zdofE_c(MAXEQNE,MAXbrickE),     &
-                      zdofV_c(MAXEQNV,MAXbrickV) 
+                      zdofV_c(MAXEQNV,MAXbrickV)
    VTYPE           :: zdofH_m(MAXEQNH,GRID(Igrid)%constr(Iel)%nrdofH_macro),   &
                       zdofE_m(MAXEQNE,GRID(Igrid)%constr(Iel)%nrdofE_macro),   &
-                      zdofV_m(MAXEQNV,GRID(Igrid)%constr(Iel)%nrdofV_macro) 
+                      zdofV_m(MAXEQNV,GRID(Igrid)%constr(Iel)%nrdofV_macro)
 !
 !..component counters for the nodes (used in case of multiple loads)
    integer, allocatable :: mvarH(:),mvarE(:), mvarV(:)
 !
-   integer              :: iH(MAXEQNH), iE(MAXEQNE), iV(MAXEQNV)  
+   integer              :: iH(MAXEQNH), iE(MAXEQNE), iV(MAXEQNV)
    integer              :: nrnod_macro, nrdofH_macro, nrdofE_macro, nrdofV_macro
    integer              :: nrnodm, nvarH, nvarE, nvarV, ivar
    integer              :: naH, naE, naV,i,k,load,nn,nod,j
    integer              :: kH, kE, kV, kp,lH, lE,lV
-!   
+!
 !..decoded index for a node
    integer              :: index(NRINDEX)
-!   
+!
 !--------------------------------------------------------------------------
 !
 !..macro-element number of nodes
    nrnod_macro = GRID(Igrid)%constr(Iel)%nrnod_macro
-!   
+!
 !..modified coarse element number of nodes
    nrnodm   = GRID(Igrid)%constr(Iel)%nrnodm
 !
@@ -86,7 +86,7 @@
    nrdofH_macro = naH; nrdofE_macro = naE; nrdofV_macro = naV
 
 !..initiate dof counter
-   nn = 0; 
+   nn = 0;
 !..initialize the number of H1,H(curl),H(div),L2 copied so far
    ivar=0
 
@@ -96,24 +96,24 @@
    allocate(mvarV(nrnodm)); mvarV = 0
 
 !..initialize dof matrices
-   zdofH_c = ZERO; zdofE_c = ZERO; zdofV_c = ZERO 
+   zdofH_c = ZERO; zdofE_c = ZERO; zdofV_c = ZERO
 !
 !..loop through loads
    do load=1,NR_RHS
-!      
-!  ...H1 dof 
+!
+!  ...H1 dof
       if (NRHVAR.eq.0) goto 100
-!      
+!
 !  ...initialize H1 column indices
       iH = 0
 !
 !  ...loop through coarse element nodes
       do i = 1, nrnodm
-!         
-!     ...pick up the node number from the list   
+!
+!     ...pick up the node number from the list
          nod = GRID(Igrid)%constr(Iel)%nodm(i)
-!         
-!     ...compute the number of active H1 variables for the node         
+!
+!     ...compute the number of active H1 variables for the node
          call get_index(nod, index)
 !
 !     ...loop through the nodal dof (potentially NONE)
@@ -132,31 +132,31 @@
                   zdofH_c(ivar,iH(ivar)) = Zu_c(nn)
                end select
 !
-!        ...end of loop through NRINDEX               
-            enddo   
+!        ...end of loop through NRINDEX
+            enddo
 !     ...end of loop through the nodal dof
          enddo
 !
 !     ...update the number of components stored so far
-         mvarH(i) = ivar   
+         mvarH(i) = ivar
 
-!  ...end of loop through coarse element nodes            
-      enddo   
+!  ...end of loop through coarse element nodes
+      enddo
 !
   100 continue
-!      
-!  ...H(curl) dof 
+!
+!  ...H(curl) dof
       if (NREVAR.eq.0) goto 200
       ivar = 0
-!      
+!
 !  ...initialize H(curl) column indices
       iE = 0
 !
 !  ...loop through coarse element nodes
       do i = 1, nrnodm
-!     ...pick up the node number from the list   
+!     ...pick up the node number from the list
          nod = GRID(Igrid)%constr(Iel)%nodm(i)
-!         
+!
 !     ...compute the number of active H(curl) variables for the node
          call get_index(nod, index)
 !
@@ -176,31 +176,31 @@
                   zdofE_c(ivar,iE(ivar)) = Zu_c(nn)
                end select
 !
-!        ...end of loop through NRINDEX               
+!        ...end of loop through NRINDEX
             enddo
-!            
+!
 !     ...end of loop through the nodal dof
          enddo
 !
 !     ...update the number of components stored so far
          mvarE(i) = ivar
 
-!  ...end of loop through coarse element nodes            
-      enddo  
+!  ...end of loop through coarse element nodes
+      enddo
 !
   200 continue
 !
-!  ...H(div) dof 
+!  ...H(div) dof
       if (NRVVAR.eq.0) goto 300
-!      
+!
 !  ...initialize H(div) column indices
       iV = 0
 !
 !  ...loop through coarse element nodes
       do i = 1, nrnodm
-!     ...pick up the node number from the list   
+!     ...pick up the node number from the list
          nod = GRID(Igrid)%constr(Iel)%nodm(i)
-!         
+!
 !     ...compute the number of active H(curl) variables for the node
          call get_index(nod, index)
 !
@@ -220,22 +220,22 @@
                   zdofV_c(ivar,iV(ivar)) = Zu_c(nn)
                end select
 !
-!        ...end of loop through NRINDEX               
+!        ...end of loop through NRINDEX
             enddo
-!            
+!
 !     ...end of loop through the nodal dof
          enddo
 !
 !     ...update the number of components stored so far
          mvarV(i) = ivar
 
-!  ...end of loop through coarse element nodes            
-      enddo  
+!  ...end of loop through coarse element nodes
+      enddo
 
   300 continue
 
 !..end of loop through loads
-   enddo  
+   enddo
 !
    deallocate(mvarH, mvarE, mvarV)
 !
@@ -245,7 +245,7 @@
 !
 !..initialize the macro dof matrices
    ZdofH_m = ZERO; ZdofE_m = ZERO; ZdofV_m = ZERO
-!      
+!
 !..loop through the macro-element H1 dof
    do kH=1,nrdofH_macro
 !
@@ -259,7 +259,7 @@
       enddo
 !...end of loop through macro-element H1 dof
    enddo
-!      
+!
 !..loop through the macro-element H(curl) dof
    do kE=1,nrdofE_macro
 !
@@ -287,11 +287,11 @@
       enddo
 !...end of loop through macro-element H(curl) dof
    enddo
-!   
+!
 !..reconstruct the macro element solution vector
 !
 !..initiate dof counter
-   nn = 0; 
+   nn = 0;
 !..initialize the number of H1,H(curl),H(div),L2 copied so far
    ivar=0
 
@@ -302,8 +302,8 @@
 !
 !..loop through loads
    do load=1,NR_RHS
-!      
-!  ...H1 dof 
+!
+!  ...H1 dof
       if (NRHVAR.eq.0) goto 400
 !
 !  ...initialize H1 column indices
@@ -311,11 +311,11 @@
 !
 !  ...loop through macro element nodes
       do i = 1, nrnod_macro
-!         
-!     ...pick up the node number from the list   
+!
+!     ...pick up the node number from the list
          nod = GRID(Igrid)%constr(Iel)%nod_macro(i)
-!         
-!     ...compute the number of active H1 variables for the node         
+!
+!     ...compute the number of active H1 variables for the node
          call get_index(nod, index)
 !
 !     ...loop through the nodal dof (potentially NONE)
@@ -334,30 +334,30 @@
                   Zu_m(nn) = zdofH_m(ivar,iH(ivar))
                end select
 !
-!        ...end of loop through NRINDEX               
-            enddo   
+!        ...end of loop through NRINDEX
+            enddo
 !     ...end of loop through the nodal dof
          enddo
 !
 !     ...update the number of components stored so far
-         mvarH(i) = ivar   
+         mvarH(i) = ivar
 
-!  ...end of loop through macro element nodes            
-      enddo   
+!  ...end of loop through macro element nodes
+      enddo
 !
   400 continue
-!      
-!  ...H(curl) dof 
+!
+!  ...H(curl) dof
       if (NREVAR.eq.0) goto 500
-!      
+!
 !  ...initialize H(curl) column indices
       iE = 0
 !
 !  ...loop through macro element nodes
       do i = 1, nrnod_macro
-!     ...pick up the node number from the list   
+!     ...pick up the node number from the list
          nod = GRID(Igrid)%constr(Iel)%nod_macro(i)
-!         
+!
 !     ...compute the number of active H(curl) variables for the node
          call get_index(nod, index)
 !
@@ -377,32 +377,32 @@
                   Zu_m(nn) = zdofE_m(ivar,iE(ivar))
                end select
 !
-!        ...end of loop through NRINDEX               
+!        ...end of loop through NRINDEX
             enddo
-!            
+!
 !     ...end of loop through the nodal dof
          enddo
 !
 !     ...update the number of components stored so far
          mvarE(i) = ivar
 
-!  ...end of loop through macro element nodes            
-      enddo  
+!  ...end of loop through macro element nodes
+      enddo
 
   500 continue
 !
-!  ...H(div) dof 
+!  ...H(div) dof
       if (NRVVAR.eq.0) goto 600
-!      
+!
 !  ...initialize H(div) column indices
       iV = 0
 !
 !  ...loop through macro element nodes
       do i = 1, nrnod_macro
 
-!     ...pick up the node number from the list   
+!     ...pick up the node number from the list
          nod = GRID(Igrid)%constr(Iel)%nod_macro(i)
-!         
+!
 !     ...compute the number of active H(curl) variables for the node
          call get_index(nod, index)
 !
@@ -422,24 +422,24 @@
                   Zu_m(nn) = zdofV_m(ivar,iV(ivar))
                end select
 !
-!        ...end of loop through NRINDEX               
+!        ...end of loop through NRINDEX
             enddo
-!            
+!
 !     ...end of loop through the nodal dof
          enddo
 !
 !     ...update the number of components stored so far
          mvarV(i) = ivar
 
-!  ...end of loop through macro element nodes            
-      enddo  
+!  ...end of loop through macro element nodes
+      enddo
 !
   600 continue
 !
 !..end of loop through loads
-   enddo  
+   enddo
 !
    deallocate(mvarH, mvarE, mvarV)
-! 
+!
 !
    end subroutine coarse2macro

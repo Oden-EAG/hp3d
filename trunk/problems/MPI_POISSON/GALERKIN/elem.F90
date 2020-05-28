@@ -195,7 +195,7 @@ subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
 !                        wrt to master element coordinates
 !
 ! ]
-      call shape3H(etype,xi,norder,norient_edge,norient_face, nrdofH,shapH,gradH)
+      call shape3DH(etype,xi,norder,norient_edge,norient_face, nrdofH,shapH,gradH)
 !
 ! geometry map
 ! [

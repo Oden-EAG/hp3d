@@ -1,3 +1,6 @@
+!
+#include "typedefs.h"
+!
 !-----------------------------------------------------------------------
 !
 !> Purpose : update H1 geometry dof interpolating GMP reference map using
@@ -5,21 +8,19 @@
 !!
 !! @param[in]  Iflag        - a flag specifying which of the objects the
 !!                            edge is on: 5 pris, 6 hexa, 7 tetr, 8 pyra
-!! @param[in]  No           - number of a specific object 
+!! @param[in]  No           - number of a specific object
 !! @param[in]  Etav         - reference coordinates of the element vertices
 !! @param[in]  Type         - element (middle node) type
 !! @param[in]  Nedge_orient - edge orientation
 !! @param[in]  Nface_orient - face orientation (not used)
 !! @param[in]  Norder       - element order
-!! @param[in]  Iedge        - edge number 
+!! @param[in]  Iedge        - edge number
 !! @param[in]  Xnod         - geometry dof for the element (vertex values)
-!! 
+!!
 !! @param[out] Xdof         - geometry dof for the edge
 !!
 !> @date Mar 17
 !-----------------------------------------------------------------------
-!
-#include "implicit_none.h"
   subroutine hpedge(Mdle,Iflag,No,Etav,Type, &
                     Nedge_orient,Nface_orient,Norder,Iedge,&
                     Xnod, Xdof)
@@ -30,55 +31,55 @@
 !
 ! ** Arguments
 !-----------------------------------------------------------------------
-!      
-  integer,                                    intent(in)  :: Iflag,No,Mdle
-  integer,                                    intent(in)  :: Iedge
-  real*8,  dimension(3,8),                    intent(in)  :: Etav
-  character(len=4),                           intent(in)  :: Type
-  integer, dimension(12),                     intent(in)  :: Nedge_orient
-  integer, dimension(6),                      intent(in)  :: Nface_orient
-  integer, dimension(19),                     intent(in)  :: Norder
-  real*8,  dimension(3,MAXbrickH),            intent(in)  :: Xnod
-  real*8,  dimension(3,*),                    intent(out) :: Xdof
+!
+  integer,                         intent(in)  :: Iflag,No,Mdle
+  integer,                         intent(in)  :: Iedge
+  real(8), dimension(3,8),         intent(in)  :: Etav
+  character(len=4),                intent(in)  :: Type
+  integer, dimension(12),          intent(in)  :: Nedge_orient
+  integer, dimension(6),           intent(in)  :: Nface_orient
+  integer, dimension(19),          intent(in)  :: Norder
+  real(8), dimension(3,MAXbrickH), intent(in)  :: Xnod
+  real(8), dimension(3,*),         intent(out) :: Xdof
 !
 ! ** Locals
 !-----------------------------------------------------------------------
 !
 ! quadrature
   integer                               :: l,nint
-  real*8,  dimension(MAX_NINT1)         :: xi_list
-  real*8,  dimension(MAX_NINT1)         :: wa_list 
-  real*8                                :: wa, weight
+  real(8), dimension(MAX_NINT1)         :: xi_list
+  real(8), dimension(MAX_NINT1)         :: wa_list
+  real(8)                               :: wa, weight
 !
 ! work space for shape3H
   integer                               :: nrdofH
   integer, dimension(19)                :: norder_1
-  real*8,  dimension(MAXbrickH)         :: shapH
-  real*8,  dimension(3,MAXbrickH)       :: gradH
+  real(8), dimension(MAXbrickH)         :: shapH
+  real(8), dimension(3,MAXbrickH)       :: gradH
 !
 ! derivatives of a shape function wrt reference coordinates
-  real*8, dimension(3)                  :: duHdeta,dvHdeta
+  real(8), dimension(3)                 :: duHdeta,dvHdeta
 !
 ! geometry
-  real*8                                :: t,rjac,bjac,prod
-  real*8, dimension(3)                  :: xi,eta,rn,x
-  real*8, dimension(3)                  :: dxidt,detadt,rt
-  real*8, dimension(3,3)                :: detadxi,dxideta,dxdeta
-!    
+  real(8)                               :: t,rjac,bjac,prod
+  real(8), dimension(3)                 :: xi,eta,rn,x
+  real(8), dimension(3)                 :: dxidt,detadt,rt
+  real(8), dimension(3,3)               :: detadxi,dxideta,dxdeta
+!
 ! work space for linear solvers
   integer                               :: naH,info
-  real*8,  dimension(MAXP-1,MAXP-1)     :: aaH
+  real(8), dimension(MAXP-1,MAXP-1)     :: aaH
   integer, dimension(MAXP-1)            :: ipivH
-!    
+!
 ! load vector and solution
-  real*8, dimension(MAXP-1,3)           :: bb,uu
-!  
+  real(8), dimension(MAXP-1,3)          :: bb,uu
+!
 ! misc work space
   integer :: iprint,nrv,nre,nrf,i,j,k,ie,kj,ki,&
              ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_Edge,iflag1
 !
 !----------------------------------------------------------------------
-!     
+!
 ! debug printing flag
   iprint=0
 !
@@ -113,20 +114,20 @@
 !
 ! initialize
   aaH = 0.d0; bb = 0.d0
-!    
+!
 ! loop over integration points
   do l=1,nint
 !
 !   Gauss point and weight
     t  = xi_list(l)
     wa = wa_list(l)
-!    
+!
 !   determine edge parameterization for line integral
     call edge_param(Type,Iedge,t, xi,dxidt)
 !
 !   compute element H1 shape functions
-    call shape3H(Type,xi,norder_1,Nedge_orient,Nface_orient, &
-                 nrdofH,shapH,gradH)
+    call shape3DH(Type,xi,norder_1,Nedge_orient,Nface_orient, &
+                  nrdofH,shapH,gradH)
 !
 !   compute reference geometry
     call refgeom3D(Mdle,xi,Etav,shapH,gradH,nrv, &
@@ -140,7 +141,7 @@
     rt(1:3) = detadt(1:3)/bjac
     weight = wa*bjac
 !
-!   call GMP routines to evaluate physical coordinates and their 
+!   call GMP routines to evaluate physical coordinates and their
 !   derivatives wrt reference coordinates
     select case(Iflag)
     case(5) ; call prism(No,eta, x,dxdeta)
@@ -163,7 +164,7 @@
                    + gradH(2,k)*dxideta(2,1:3) &
                    + gradH(3,k)*dxideta(3,1:3)
 !
-!     subtract... 
+!     subtract...
       do i=1,3
         dxdeta(1:3,i) = dxdeta(1:3,i) &
                       - Xnod(1:3,k)*duHdeta(i)
@@ -227,7 +228,7 @@
 !
 ! projection matrix leading dimension (maximum number of 1D bubbles)
   naH=MAXP-1
-!    
+!
 ! over-write aaH with its LU factorization
   call dgetrf(ndofH_edge,ndofH_edge,aaH,naH,ipivH,info)
 !
@@ -236,12 +237,12 @@
     write(*,*)'dhpedge: H1 DGETRF RETURNED INFO = ',info
     call logic_error(FAILURE,__FILE__,__LINE__)
   endif
-!    
+!
 ! solve linear system
 !
 ! copy load vector
   uu(1:ndofH_edge,:) = bb(1:ndofH_edge,:)
-!    
+!
 ! apply pivots to load vector
   call dlaswp(3,uu,naH,1,ndofH_edge,ipivH,1)
 !
@@ -263,4 +264,4 @@
   enddo
 !
 !
-  endsubroutine hpedge
+  end subroutine hpedge

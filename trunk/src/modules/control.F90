@@ -35,7 +35,7 @@ module control
    integer, parameter :: NETGEN_         =  5
 !
 !..geometry tolerance
-   real*8             :: GEOM_TOL
+   real(8)            :: GEOM_TOL
 !
 !..overintegration index
    integer            :: INTEGRATION

@@ -6,7 +6,7 @@ c----------------------------------------------------------------------
 c
 c   latest revision    - Feb 11
 c
-c   purpose            - routine makes a list of all visible 
+c   purpose            - routine makes a list of all visible
 c                        triangles and stores rescaled coordinates
 c                        of their end-points (vertices) in an array
 c                        RGTR for an element face
@@ -17,7 +17,7 @@ c     in:
 c         Numlev       - number of levels to plot solution values
 c                        (0-encode p-approximation colors)
 c         Mdle         - element number, same as the middle node
-c         If           - face number 
+c         If           - face number
 c         Nodesl       - element nodes
 c         Nedge_orient - edge orientation
 c         Nface_orient - face orientation
@@ -32,7 +32,7 @@ c         ZdofV        - H(div) dof for the element
 c         ZdofQ        - L2 dof for the element
 c         Solev        - scale of solution levels
 c         Xmin,Xmax    - bounds for the picture
-c            
+c
 c----------------------------------------------------------------------
 c
       subroutine display_face(Numlev,Mdle,If,Nodesl,
@@ -105,7 +105,7 @@ c  ...get the element boundary conditions flags
       call find_bc(Mdle, ibc)
 c
 c  ...determine the local number of the nodes on the face
-c     [vertices ; edges ; middle ]      
+c     [vertices ; edges ; middle ]
       call face_nodes(type,If, nface_nodes,nrfn)
       if (iprint.eq.1) then
         write(*,7010) If, nface_nodes(1:nrfn)
@@ -122,20 +122,20 @@ c        LOCAL system of coordinates
       do i=1,nrfn
         k=nface_nodes(i)-nvert(type)
 c
-c  .....record global node number          
-        l=nface_nodes(i)          
+c  .....record global node number
+        l=nface_nodes(i)
         nface_nodes_global(i)=Nodesl(l)
 c
 c  .....if node is not a vertex
         if (k.gt.0) then
           j=j+1
 c
-c  .......record order of approximation accounting for orientation          
+c  .......record order of approximation accounting for orientation
 ccccc          nod=nface_nodes(j)
           nod = nface_nodes_global(i)
           select case(NODES(nod)%type)
 c
-c  .......rectangular face node          
+c  .......rectangular face node
           case('mdlq','rect')
             select case(NFAXES(3,Nface_orient(If)))
 c  .........the face axes have NOT been reversed
@@ -146,7 +146,7 @@ c  .........the face axes HAVE been reversed
               call decode(Norder(k), nordh,nordv)
               norder_face(j)=nordv*10+nordh
             endselect
-c            
+c
 c  .......all other nodes
           case default
             norder_face(j)=Norder(k)
@@ -192,7 +192,7 @@ c
 c  .........check if the triangle is to be displayed
             if (mpcol(l).eq.0) go to 20
 c
-c  .........find coordinates of vertices 
+c  .........find coordinates of vertices
             do k=1,3
               t(1:2) = it(1:2,k,l)*dt
               call compute_face(Numlev,Mdle,If,
@@ -253,10 +253,10 @@ c
 c
 c  .........loop over visible cut triangles
             do itriancut=1,nrtriancut
-c                  
-c  ...........if we have  new triangles 
-              if (isflag.eq.1) then 
-c                     
+c
+c  ...........if we have  new triangles
+              if (isflag.eq.1) then
+c
 c  .............collect new vertices
                 Nrinter=Nrinter+1
                 Nrintertot=Nrintertot+1
@@ -268,7 +268,7 @@ c  .............collect new vertices
                 do il=1,3
                   Xlocinter(il,Nrintertot)=cotriancut(1,il,2)
                 enddo
-c                     
+c
 c  .............skip not visible small triangles
                 if (iclip.eq.0) go to 20
                 select case (If)
@@ -283,10 +283,10 @@ c                 normal
                   case(1,5,6)
                     if (-vis.lt.small) go to 20
                 end select
-c                         
-c                        
+c
+c
                 iflag=0
-c                    
+c
 c  .............substitute new local coordinates
                 do k=1,3
                   do il=1,3
@@ -296,14 +296,14 @@ c  .............substitute new local coordinates
      .                              Nedge_orient,Nface_orient,Norder,
      .                              Xnod,ZdofH,t,
      .                              xcoord(1:3,k),val(k))
-c                          
+c
 c  ...............transform the coordinates to observer's system
                   call trobs(xcoord(1,k), xtro(1,k))
-c                      
+c
                 enddo
-c                    
+c
               endif
-c                     
+c
 c  ...........skip not visible small triangles
               if (iprint.eq.1) then
                 write(*,*) 'display_face: iclip,vis = ',iclip,vis
@@ -425,7 +425,7 @@ c
 c  .............save storage information
                 isav=nstr+100*ifree
                 IGTRNO(NRVISTR)=isav
-              endif                    
+              endif
 c
 c  ...........update list of triangles midpoints
               if (iprint.eq.1) then

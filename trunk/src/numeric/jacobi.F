@@ -35,7 +35,7 @@ c  .......values at -1
           if (err .ge. eps) then
 ccc            min_a = min(min_a,ia); min_n = min(min_n,n)
             write(*,7001)ia,n,rJacobi_W(a,0.d0,-1.d0,n),r,err
- 7001       format(' a,n = ',2(i2,2x)'; p(-1),r,err = ',3(e12.5,2x))
+ 7001       format(' a,n = ',2(i2,2x),'; p(-1),r,err = ',3(e12.5,2x))
 ccc            call pause
           endif
 c
@@ -70,7 +70,7 @@ c  ...........1st test: eq (2.5)
               if (err .ge. eps) then
                 min_a = min(min_a,ia); min_n = min(min_n,n)
                 write(*,7006)ia,n,x,rJacobi_W(a-1,0.d0,x,n),r,err
- 7006           format(' I:  a,n = ',2(i2,2x)'; x = ',e12.5,
+ 7006           format(' I:  a,n = ',2(i2,2x),'; x = ',e12.5,
      .                 '; p(x),r,err = ',3(e12.5,2x))
 ccc                call pause
               endif
@@ -85,7 +85,7 @@ c  ...........2nd test: eq (2.6)
               if (err .ge. eps) then
                 min_a = min(min_a,ia); min_n = min(min_n,n)
                 write(*,7007)ia,n,x,rJacobi_W(a,0.d0,x,n+1),r,err
- 7007           format(' II: a,n = ',2(i2,2x)'; x = ',e12.5,
+ 7007           format(' II: a,n = ',2(i2,2x),'; x = ',e12.5,
      .                 '; p(x),r,err = ',3(e12.5,2x))
 ccc                call pause
               endif
@@ -106,7 +106,7 @@ c  .......values at -1
           if (err .ge. eps) then
             min_a = min(min_a,ia); min_n = min(min_n,n)
             write(*,7008)ia,n,rJacobi_W_I(a,-1.d0,n),r,err
- 7008       format(' a,n = ',2(i2,2x)'; \hat{p}(-1),r,err = ',
+ 7008       format(' a,n = ',2(i2,2x),'; \hat{p}(-1),r,err = ',
      .              3(e12.5,2x))
 ccc            call pause
           endif
@@ -124,7 +124,7 @@ c  .......values in [-1,1]: eq (2.11)
             if (err .ge. eps) then
               min_a = min(min_a,ia); min_n = min(min_n,n)
               write(*,7009)ia,n,x,rJacobi_W_I(a,x,n+1),r,err
- 7009         format(' a,n = ',2(i2,2x)'; x = ',e12.5,
+ 7009         format(' a,n = ',2(i2,2x),'; x = ',e12.5,
      .               '; \hat{p}(x),r,err = ',3(e12.5,2x))
 ccc              call pause
             endif

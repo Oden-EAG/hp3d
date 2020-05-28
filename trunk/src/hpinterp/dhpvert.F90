@@ -1,3 +1,7 @@
+!
+#include "typedefs.h"
+!
+!-----------------------------------------------------------------------
 !> Purpose :  routine determines Dirichlet dof for a vertex
 !! @param[in]  Iflag - a flag specifying which of the objects the vertex
 !! @param[in]  No    - number of a specific object
@@ -5,16 +9,17 @@
 !! @param[in]  Icase - node case
 !!
 !! @param[out] ZdofH - updated dirichlet bc
-#include "implicit_none.h"
+!-----------------------------------------------------------------------
 subroutine dhpvert(Mdle,Iflag,No,Xi,Icase, ZdofH)
   use data_structure3D
   implicit none
-  ! ** Argumenet
+  !
+  ! ** Arguments
   !---------------------------------------------------------------------
-  integer,                                 intent(in)  :: Iflag,No,Icase,Mdle
-  real*8, dimension(3),                    intent(in)  :: Xi
-  VTYPE,  dimension(NRCOMS*NREQNH(Icase)), intent(out) :: ZdofH
-
+  integer, intent(in)  :: Iflag,No,Icase,Mdle
+  real(8), intent(in)  :: Xi(3)
+  VTYPE  , intent(out) :: ZdofH(NRCOMS*NREQNH(Icase))
+  !
   ! ** Locals
   !---------------------------------------------------------------------
   ! Dirichlet BC data
@@ -24,10 +29,10 @@ subroutine dhpvert(Mdle,Iflag,No,Xi,Icase, ZdofH)
        zvalE(3,MAXEQNE), zdvalE(3,MAXEQNE,3), &
        zvalV(3,MAXEQNV), zdvalV(3,MAXEQNV,3)
 
-  real*8,  dimension(3)   :: x
-  real*8,  dimension(3,3) :: void
+  real(8), dimension(3)   :: x
+  real(8), dimension(3,3) :: void
 
-  integer, dimension(NR_PHYSA) :: ncase
+  integer :: ncase(NR_PHYSA)
   integer :: iprint, ivarH, nvarH, iattr,iload,icomp
   !---------------------------------------------------------------------
       iprint=0
@@ -81,4 +86,4 @@ subroutine dhpvert(Mdle,Iflag,No,Xi,Icase, ZdofH)
       enddo
 !
 !
-endsubroutine dhpvert
+end subroutine dhpvert

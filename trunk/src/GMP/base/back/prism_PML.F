@@ -22,7 +22,7 @@ c               X      - physical coordinates of the point
 c               Dxdeta - derivatives of the physical coordinates wrt
 c                        to the reference coordinates
 c
-c   required  routines - 
+c   required  routines -
 c
 c---------------------------------------------------------------------
 c
@@ -36,16 +36,16 @@ c---------------------------------------------------------------------
 c---------------------------------------------------------------------
 c     DUMMY ARGUMENTS
       integer, intent(in) :: No
-      double precision, dimension(3), intent(in) :: Eta    
+      double precision, dimension(3), intent(in) :: Eta
       double precision, dimension(3), intent(out) :: X
       double precision, dimension(3,3), intent(out) :: Dxdeta
 c---------------------------------------------------------------------
-c     LOCAL VARIABLES 
+c     LOCAL VARIABLES
       integer :: nt1,nt2,lab1,lab2
       double precision, dimension(2) :: zetaB                            ! local coordinates of bottom face of master prism
-      double precision, dimension(2) :: zetaT                            ! local coordinates of top face of master prism  
+      double precision, dimension(2) :: zetaT                            ! local coordinates of top face of master prism
       double precision, dimension(2,2) :: dzetaB                         ! derivatives
-      double precision, dimension(2,2) :: dzetaT                         ! derivatives   
+      double precision, dimension(2,2) :: dzetaT                         ! derivatives
       double precision, dimension(3) :: x1                               ! physical coordinates of bottom face of prism
       double precision, dimension(3) :: x2                               ! physical coordinates of top face of prism
       double precision, dimension(3,2) :: dx1, dx2                       ! derivatives
@@ -83,28 +83,28 @@ c
       case (1); zetaB(1) = Eta(2); zetaB(2) = 1.d0 - Eta(1) - Eta(2)
       case (2); zetaB(1) = 1.d0 - Eta(1) - Eta(2); zetaB(2) = Eta(1)
       case (3); zetaB(1) = Eta(2); zetaB(2) = Eta(1)
-      case (4); zetaB(1) = 1.d0 - Eta(1) - Eta(2); zetaB(2) = Eta(2) 
+      case (4); zetaB(1) = 1.d0 - Eta(1) - Eta(2); zetaB(2) = Eta(2)
       case (5); zetaB(1) = Eta(1); zetaB(2) = 1.d0 - Eta(1) - Eta(2)
       case default
         write(*,7003)
  7003   format('prism_PML: unknown orientation of bottom face')
         stop
-      end select      
-      dzetaB(1:2,1:2) = dzeta(1:2,1:2,lab1 + 1) 
+      end select
+      dzetaB(1:2,1:2) = dzeta(1:2,1:2,lab1 + 1)
 c
       select case(lab2)                                                  ! account for orientation of top face
       case (0); zetaT(1:2) = Eta(1:2)
       case (1); zetaT(1) = Eta(2); zetaT(2) = 1.d0 - Eta(1) - Eta(2)
       case (2); zetaT(1) = 1.d0 - Eta(1) - Eta(2); zetaT(2) = Eta(1)
       case (3); zetaT(1) = Eta(2); zetaT(2) = Eta(1)
-      case (4); zetaT(1) = 1.d0 - Eta(1) - Eta(2); zetaT(2) = Eta(2) 
+      case (4); zetaT(1) = 1.d0 - Eta(1) - Eta(2); zetaT(2) = Eta(2)
       case (5); zetaT(1) = Eta(1); zetaT(2) = 1.d0 - Eta(1) - Eta(2)
       case default
         write(*,7004)
  7004   format('prism_PML: unknown orientation of top face')
         stop
-      end select   
-      dzetaT(1:2,1:2) = dzeta(1:2,1:2,lab2 + 1)    
+      end select
+      dzetaT(1:2,1:2) = dzeta(1:2,1:2,lab2 + 1)
 c
       call trian(nt1,zetaB, x1,dx1)                                      ! physical coordinates of bottom and top face
       call trian(nt2,zetaT, x2,dx2)
@@ -125,7 +125,7 @@ c
 c
       X(1:3) = x1(1:3)*(1.d0 - Eta(3)) + x2(1:3)*Eta(3)                  ! interpolate linearly between bottom and top face
       Dxdeta(1:3,1:2) = matmul(dx1,dzetaB)*(1.d0 - Eta(3)) +             ! compute derivative wrt eta1,eta2
-     .                  matmul(dx2,dzetaT)*Eta(3) 
+     .                  matmul(dx2,dzetaT)*Eta(3)
       Dxdeta(1:3,3) = x2(1:3) - x1(1:3)                                  ! compute derivative wrt eta3
 c
       end subroutine prism_PML

@@ -36,7 +36,7 @@ c
 c  ...start sorting (heapsort algorithm)
       l=NRVISTR/2+1
       ir=NRVISTR
-   20 continue 
+   20 continue
       if (l.gt.1) then
         l=l-1
         index=IGTR(l)
@@ -76,8 +76,8 @@ c  ...start sorting (heapsort algorithm)
       go to 20
 c
       end
-   
-      
+
+
 
 
 

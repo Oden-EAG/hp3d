@@ -10,7 +10,7 @@
 !> @date Oct 2019
 !----------------------------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 subroutine scalar2vtk(Sname,Sfile,Snick,Idx, Ic)
 !
@@ -74,7 +74,7 @@ subroutine scalar2vtk(Sname,Sfile,Snick,Idx, Ic)
 !
 !..Step 1 : Preliminary calculations (offsets, etc.)
    Ic=0
-!      
+!
 !..decode
    ireal = iabs(Idx)/Idx
    iload = iabs(Idx)/100
@@ -142,7 +142,7 @@ subroutine scalar2vtk(Sname,Sfile,Snick,Idx, Ic)
 !
 !  ...loop over vertices of visualization object
       do iv=1,nV
-!        
+!
 !     ...visualization point accounting for VLEVEL
          call get_vis_point(vis_on_type(etype),iv-1, xi)
 !

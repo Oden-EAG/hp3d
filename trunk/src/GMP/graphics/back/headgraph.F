@@ -12,7 +12,7 @@ c   purpose            - display the head model
 c
 c   arguments :
 c
-c   required  routines - 
+c   required  routines -
 c
 c----------------------------------------------------------------------
 c
@@ -22,7 +22,7 @@ c
 #include "syscom.blk"
 c
  10   continue
-c      
+c
       write(*,*)
       write(*,*)'headgraph: SELECT:'
       write(*,*)'           RETURN.............................0'
@@ -31,8 +31,8 @@ c
       write(*,*)'           INSIDE AND OUTSIDE THE HEAD........3'
       read(*,*) idec
 c
-c     
-      if(idec.eq.0)then         
+c
+      if(idec.eq.0)then
          return
       elseif(idec.eq.1)then
          call input_head(1)
@@ -52,4 +52,4 @@ c
       endif
 c
       end
-      
+

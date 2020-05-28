@@ -1,5 +1,5 @@
 c-----------------------------------------------------------------------
-c> Purpose : routine uses Newton-Raphson iterations to solve a nonlinear 
+c> Purpose : routine uses Newton-Raphson iterations to solve a nonlinear
 c            system of equations defining an implicit parametrization
 c            for a GMP point, curve, triangle or rectangle.
 c
@@ -16,7 +16,7 @@ c> @param[in ]  Xs      - a starting point
 c> @param[in ]  Sfact   - renormalization factors for the surfaces
 c> @param[out]  X       - physical coordinates of the point
 c
-c> @revision Nov 12 
+c> @revision Nov 12
 c-----------------------------------------------------------------------
 c
       subroutine mnewt(Nusf,Nsurf,Eta,Feta,Xs,Sfact, X)
@@ -32,15 +32,15 @@ c  ...stiffness matrix and load vector for NR iterations
       dimension aux(3)
       data eps /1.d-12/
 c-----------------------------------------------------------------------
-c      
+c
       iprint=0
  10   continue
       iprint_usrfun = iprint
-c      
-c  ...maximum number of iterations      
+c
+c  ...maximum number of iterations
       ntrial = 10
 c
-c  ...printing   
+c  ...printing
       if (iprint.eq.1) then
         write(*,1000)Nusf,Nsurf
  1000   format(' Nusf,Nsurf = ',7(i1,2x))
@@ -56,20 +56,20 @@ c  ...printing
         endselect
       endif
 c
-c  ...set X equal to initial guess Xs      
+c  ...set X equal to initial guess Xs
       X(1:3)=Xs(1:3)
 c
-c  ...loop through N-R iterations      
-      do k=1,ntrial       
+c  ...loop through N-R iterations
+      do k=1,ntrial
 c
 c       N-R iteration:  x_n+1 = x_n - DF(x_n)^-T * F(x_n)
 c
 c  .....construct the N-R system:
         call usrfun(Nusf,Nsurf,Eta,Feta,X,Sfact, alpha,beta)
 c       alpha = DF^T (still needs to be inverted!)
-c       beta  = -F      
+c       beta  = -F
 c
-c  .....printing statements         
+c  .....printing statements
         if (iprint .eq. 1) then
           select case(Nusf)
 c
@@ -94,15 +94,15 @@ c  .......implicit rectangle
  5002     format(' mnewt: k,X         = ',i2,2x,3e12.5)
           write(*,5003)
  5003     format(' mnewt: beta, alpha = ')
-          do i = 1, 3        
+          do i = 1, 3
             write(*,5004) beta(i),(alpha(i,j),j=1,3)
  5004       format(e12.5,4x,3(e12.5,2x))
           enddo
           call pause
-c  .....end of printing statements          
+c  .....end of printing statements
         endif
 c
-c  .....compute L^1 norm of beta        
+c  .....compute L^1 norm of beta
         errf = 0.d0
         do i = 1, 3
           errf = errf + abs(beta(i))
@@ -110,9 +110,9 @@ c  .....compute L^1 norm of beta
 c  .....if beta is small, then return
         if (errf .le. eps) return
 c
-c  .....solve linear system:  alpha*aux = beta  ==>  aux = -DF^-T * F         
+c  .....solve linear system:  alpha*aux = beta  ==>  aux = -DF^-T * F
         call saruss(alpha,beta, aux,ifl)
-c  .....if system is not solved        
+c  .....if system is not solved
         if (ifl .ne. 0) then
           iprint = 1
           go to 10
@@ -122,7 +122,7 @@ c
         beta(2) = aux(2)
         beta(3) = aux(3)
 c
-c  .....compute L^1 norm of beta and update X      
+c  .....compute L^1 norm of beta and update X
         errx = 0.d0
         do i = 1, 3
           errx = errx + abs(beta(i))
@@ -131,7 +131,7 @@ c  .....compute L^1 norm of beta and update X
 c  .....if beta is small, then return
         if (errx .le. eps) return
 c
-c  .....if maximum number of iterations has been reached        
+c  .....if maximum number of iterations has been reached
         if (k .eq. ntrial) then
           write(*,*)'mnewt: NEWTON-RAPSON METHOD HAS NOT CONVERGED!'
           call pause
@@ -142,7 +142,7 @@ c
 c  ...end of loop through iterations
       enddo
 c
-      endsubroutine mnewt
+      end subroutine mnewt
 c
 c
 c
@@ -167,7 +167,7 @@ c> @param[in ]  Sfact   - renormalization factors for the surfaces
 c> @param[out]  Alpha   - 3 x 3 stiffness matrix
 c> @param[out]  Beta    - load vector
 c
-c> @revision Nov 12 
+c> @revision Nov 12
 c-----------------------------------------------------------------------
 c
       subroutine usrfun(Nusf,Nsurf,Eta,Feta,X,Sfact, Alpha,Beta)
@@ -185,19 +185,16 @@ c  ...surface gradients for different surfaces
       dimension der1(3),der2(3),der3(3),der4(3),der5(3)
       dimension dtt(3),dtt2(3)
 c
-c  ...space holder
-      dimension void(3)
-c 
-ccc      iprint=0
+      iprint=0
 c
 c
 c  ...select geometry entity
       select case(Nusf)
 c
-c----------------------------------------------------------------------    
+c----------------------------------------------------------------------
 c  ...implicit point: intersection of three surfaces
       case(1)
-c  .....compute F(x)              
+c  .....compute F(x)
         call surf(Nsurf(1),X, Fval1,der1)
         Beta(1) = -Fval1
         call surf(Nsurf(2),X, Fval2,der2)
@@ -213,7 +210,7 @@ c  .....compute DF^T(x)
         enddo
 c
 c----------------------------------------------------------------------
-c  ...implicit curve 
+c  ...implicit curve
       case(2)
       if (iprint.eq.1) then
         write(*,7004) Eta(1), X(1:3)
@@ -232,7 +229,7 @@ c
       fval3 = fval3*Sfact(1); der3(1:3) = der3(1:3)*Sfact(1)
       fval4 = fval4*Sfact(2); der4(1:3) = der4(1:3)*Sfact(2)
 c
-      Beta(3) = -(1.d0-Eta(1))*Fval3 - Eta(1)*Fval4 
+      Beta(3) = -(1.d0-Eta(1))*Fval3 - Eta(1)*Fval4
       do  i=1,3
         Alpha(1,i) = der1(i)
         Alpha(2,i) = der2(i)
@@ -240,7 +237,7 @@ c
       enddo
 c
 c----------------------------------------------------------------------
-c  ...implicit triangle 
+c  ...implicit triangle
       case(3)
       write(*,*) 'usrfun: NOT TESTED'
 c
@@ -267,7 +264,7 @@ c
       xf2 = 1.d0 - Feta(4)
 c
       Beta(3) = -Eta(1)*(xf1*fval5+Feta(1)*fval3)
-     .        -  Eta(2)*(xf2*fval5+Feta(4)*fval3)   
+     .        -  Eta(2)*(xf2*fval5+Feta(4)*fval3)
 
       do i=1,3
         Alpha(3,i) = Eta(1)*(xf1*der5(i)+Feta(1)*der3(i))
@@ -317,19 +314,19 @@ c
       call surf(Nsurf(4),X, fval4,der4)
       fval2 = fval2*Sfact(1); der2(1:3) = der2(1:3)*Sfact(1)
       fval4 = fval4*Sfact(3); der4(1:3) = der4(1:3)*Sfact(3)
-c             
+c
       xf1 = 1.d0 - Feta(4)
       xf2 = 1.d0 - Feta(2)
 c
       tt        =  (xf1*fval2     + Feta(4)*fval4)
-      dtt(1:3)  =  (xf1*der2(1:3) + Feta(4)*der4(1:3))        
+      dtt(1:3)  =  (xf1*der2(1:3) + Feta(4)*der4(1:3))
 c
       tt2       = (xf2*fval2     + Feta(2)*fval4)
-      dtt2(1:3) = (xf2*der2(1:3) + Feta(2)*der4(1:3))        
+      dtt2(1:3) = (xf2*der2(1:3) + Feta(2)*der4(1:3))
 c
 c
       Beta(3) = -(1.d0-Eta(1))*tt
-     .        -  Eta(1)*tt2 
+     .        -  Eta(1)*tt2
 
       do  i=1,3
         Alpha(3,i) = (1.d0-Eta(1))*dtt(i)
@@ -350,7 +347,7 @@ c  ...end select geometry entity
       endselect
 c
 c--------------------------------------------------------------------
-c  ...printing statement      
+c  ...printing statement
       if (iprint .eq. 1) then
         write(*,*) 'usrfun: Beta, Alpha = '
         do i=1,3
@@ -359,4 +356,4 @@ c  ...printing statement
         enddo
       endif
 c
-      endsubroutine usrfun
+      end subroutine usrfun

@@ -23,7 +23,7 @@
 !! @param[out] Astif  - 1D array containing the modified stiffness matrix
 !---------------------------------------------------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 subroutine celem(Mdle,Idec, Nrdofs,Nrdofm,Nrdofc,Nodm,NdofmH,NdofmE,NdofmV,NdofmQ,Nrnodm,Bload,Astif)
 !

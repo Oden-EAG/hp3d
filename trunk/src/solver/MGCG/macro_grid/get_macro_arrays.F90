@@ -8,19 +8,19 @@
 !
 !    purpose            - returns Schur complement matrices for
 !                         computation of statically condensed unknowns
-!                         
+!
 !
 !   arguments :
 !     in:
 !              Ielc     - element number
 !     out:
 !
-!             Abi       - Schur Complement matrix 
-!             bb        - Schur Complement vector                       
+!             Abi       - Schur Complement matrix
+!             bb        - Schur Complement vector
 !
 !-----------------------------------------------------------------------
 !
-#include 'implicit_none.h'
+#include "typedefs.h"
 !
    subroutine get_macro_arrays(Igrid, Ielc, Abi, bb,nb,ni)
 !
@@ -33,14 +33,14 @@
    use macro_grid_info,  ONLY: A_MACRO
    use mg_data_structure,ONLY: GRID, NODES_MG, ISTORE, ISTORE_YES
 !
-   IMPLICIT NONE
+   implicit none
 !
 !-----------------------------------------------------------------------
 !
-!..globals  
+!..globals
    integer, intent( in) :: Igrid, Ielc, nb, ni
    VTYPE,   intent(out) :: Abi(nb,ni), bb(nb)
-!   
+!
 !..dof offsets
    integer, allocatable :: mdle_macro(:)
 !
@@ -69,7 +69,7 @@
 !..required structure for efficient assembly of global stiffness
 !..matrix to CSR format
    type sparse_matrix
-!  ...number of non-zero with duplicates    
+!  ...number of non-zero with duplicates
       integer :: nz_old
 !  ...number of non-zero after removing the duplicates
       integer :: nz
@@ -97,14 +97,14 @@
    integer              :: n1, n2
 !
 !-----------------------------------------------------------------------
-!  
+!
    maxdofm = MAXbrickH*NRHVAR + MAXbrickE*NREVAR  &
            + MAXbrickV*NRVVAR + MAXbrickQ*NRQVAR
-!           
+!
 !..allocate required variables for celem
    allocate(NEXTRACT(maxdofm), IDBC(maxdofm))
    allocate(ZDOFD(maxdofm,NR_RHS))
-!   
+!
    allocate(maxdofs(NR_PHYSA)); maxdofs = 0
 !
 !..initialize offsets
@@ -112,10 +112,10 @@
    allocate(naE(NRNODS)); naE = -1
    allocate(naV(NRNODS)); naV = -1
 !
-!..Initialize dof counters 
+!..Initialize dof counters
    nrdof_Hi = 0 ; nrdof_Ei = 0; nrdof_Vi = 0; nrdof_Qi = 0
    nrdof_Hb = 0 ; nrdof_Eb = 0; nrdof_Vb = 0; nrdof_Qb = 0
-!   
+!
    nz_b = 0; nz_ib = 0
 !
    nrmdle = A_MACRO(Ielc)%nrmdle
@@ -123,22 +123,22 @@
    allocate(mdle_macro(nrmdle))
 !
    idec = 1
-!..loop through the sub-element within the macro elements   
+!..loop through the sub-element within the macro elements
    do iel = 1,nrmdle
-!      
+!
       mdle =  A_MACRO(ielc)%GLOC(iel)%mdle
-!      
+!
       call celem1(mdle,idec,nrdofs,nrdofm,nrdofc,nodm,ndofmH, &
                   ndofmE,ndofmV,ndofmQ,nrnodm, zvoid,zvoid)
-!      
+!
 !  ...update the maximum number of local dof
       do i=1,NR_PHYSA
          maxdofs(i) = max0(maxdofs(i),nrdofs(i))
       enddo
-!      
+!
 !  ...update the maximum number of modified element dof in the expanded mode
       maxdofm = max0(maxdofm,nrdofm)
-!      
+!
 !-------------------------------------------------------------------------------
 !
 !  ...count non zero for sparse assembly of Abb
@@ -147,14 +147,14 @@
          nod = nodm(i)
          call find_master(Igrid,nod, master)
          type = NODES(master)%type
-!         
+!
          select case(type)
          case('mdlb','mdln','mdlp','mdld')
             nsum_b = nsum_b + ndofmH(i) + ndofmE(i) + ndofmV(i)
          case default
             nsum_i = nsum_i + ndofmH(i) + ndofmE(i) + ndofmV(i)
          end select
-!         
+!
       enddo
 !  ...non zero for sparse assembly
       nz_b  = nz_b  + nsum_b*(nsum_b+1)/2
@@ -166,20 +166,20 @@
       do i = 1, nrnodm-1
          nod = nodm(i)
          if (naH(nod).ge.0) cycle
-!         
+!
 !     ...find its coarse master
          call find_master(Igrid,nod, master)
-!         
-!     ...check if the the type of the master node 
+!
+!     ...check if the the type of the master node
          type = NODES(master)%type
          select case(type)
          case('mdlb','mdln','mdlp','mdld')
-!            
+!
 !        ...store the first dof offset
             naH(nod) = nrdof_Hb
 !        ...update the H1 dof counter
             nrdof_Hb = nrdof_Hb + ndofmH(i)
-!            
+!
          case default
 !        ...store the first dof offset
             naH(nod) = nrdof_Hi
@@ -192,50 +192,50 @@
       do i = 1, nrnodm-1
          nod = nodm(i)
          if (naE(nod).ge.0) cycle
-!         
+!
 !     ...find its coarse master
          call find_master(Igrid,nod, master)
-!         
-!     ...check if the the type of the master node 
+!
+!     ...check if the the type of the master node
          type = NODES(master)%type
          select case(type)
          case('mdlb','mdln','mdlp','mdld')
-!            
+!
 !        ...store the first dof offset
             naE(nod) = nrdof_Eb
 !        ...update the H(curl) dof counter
             nrdof_Eb = nrdof_Eb + ndofmE(i)
-!            
+!
          case default
-!            
+!
 !        ...store the first dof offset
             naE(nod) = nrdof_Ei
 !        ...update the H(curl) dof counter
             nrdof_Ei = nrdof_Ei + ndofmE(i)
          end select
-      enddo      
+      enddo
 !
 !  ...compute offsets for H(div) (excluding interior dof)
       do i = 1, nrnodm-1
          nod = nodm(i)
          if (naV(nod).ge.0) cycle
-!         
+!
 !     ...find its coarse master
          call find_master(Igrid,nod, master)
-!         
-!     ...check if the the type of the master node 
+!
+!     ...check if the the type of the master node
          type = NODES(master)%type
          select case(type)
          case('mdlb','mdln','mdlp','mdld')
-!            
+!
 !        ...store the first dof offset
             naV(nod) = nrdof_Vb
-!            
+!
 !        ...update the H(div) dof counter
             nrdof_Vb = nrdof_Vb + ndofmV(i)
-!            
+!
          case default
-!            
+!
 !        ...store the first dof offset
             naV(nod) = nrdof_Vi
 !        ...update the H(div) dof counter
@@ -253,12 +253,12 @@
    nrdofb = nrdof_Hb + nrdof_Eb + nrdof_Vb +  nrdof_Qb
 !
 !..build and store connectivity maps
-   if (nrdofb .gt. 0) then 
+   if (nrdofb .gt. 0) then
       allocate(SKbb(nrdofb))
 !  ...initialize
-      do j=1,nrdofb   
+      do j=1,nrdofb
          SKbb(j)%nz_old = 0
-      enddo 
+      enddo
    endif
 !
 !----------------------------------------------------------------------
@@ -271,7 +271,7 @@
    allocate(IDBC(maxdofm))
    allocate(ZDOFD(maxdofm,NR_RHS))
    allocate(lcon(maxdofm))
-   
+
 !
 !..loop through elements
    do iel = 1, nrmdle
@@ -282,26 +282,26 @@
       nHb = A_MACRO(Ielc)%GLOC(iel)%nHb
       nEb = A_MACRO(Ielc)%GLOC(iel)%nEb
       nVb = A_MACRO(Ielc)%GLOC(iel)%nVb
-      nQ  = A_MACRO(Ielc)%GLOC(iel)%nQ 
+      nQ  = A_MACRO(Ielc)%GLOC(iel)%nQ
 !
       ndof = nHc + nEc + nVc
       ndofb = nHb + nEb + nVb + nQ
       ndofi = l-lb
 !
-      lcon(1:ndof) = A_MACRO(ielc)%GLOC(iel)%lcon(1:ndof) 
+      lcon(1:ndof) = A_MACRO(ielc)%GLOC(iel)%lcon(1:ndof)
 !
 !  ...loop through number of dof for the element
       if (ndofb .eq. 0) cycle
       do k1=1,ndof
-!         
+!
 !     ...global dof is:
          i = lcon(k1)
          if (i .lt. 0 ) then
             i = abs(i)
-!            
-!        ...loop through dof 
+!
+!        ...loop through dof
             do k2=1,ndof
-!               
+!
 !           ...global dof is:
                j = lcon(k2)
                if (j .lt. 0 ) then
@@ -317,7 +317,7 @@
 
 !  ...end of loop through number of dof for the element
       enddo
-!      
+!
 !..end of loop through elements
    enddo
 !
@@ -325,14 +325,14 @@
       do i = 1,nrdofb
          allocate(SKbb(i)%col(SKbb(i)%nz_old))
          allocate(SKbb(i)%val(SKbb(i)%nz_old))
-!     ...reinitialize counters      
+!     ...reinitialize counters
          SKbb(i)%nz_old = 0
       enddo
 !
       allocate(Abi_ext(nrdofb,1+nrdofi)); Abi_ext = ZERO
-   endif   
+   endif
 !
-!..allocate required arrays for celem  
+!..allocate required arrays for celem
    allocate(BLOC(NR_PHYSA))
    allocate(AAUX(NR_PHYSA))
    allocate(ALOC(NR_PHYSA,NR_PHYSA))
@@ -361,34 +361,34 @@
    do iel=1,nrmdle
 !  ...pick up the mdle number
       mdle =  A_MACRO(ielc)%GLOC(iel)%mdle
-!      
+!
       call celem1(mdle,idec,nrdofs,nrdofm,nrdofc,nodm,ndofmH, &
                   ndofmE,ndofmV,ndofmQ,nrnodm,zload,ztemp)
-!     
-      
+!
+
       nHc = A_MACRO(Ielc)%GLOC(iel)%nHc
       nEc = A_MACRO(Ielc)%GLOC(iel)%nEc
       nVc = A_MACRO(Ielc)%GLOC(iel)%nVc
       nHb = A_MACRO(Ielc)%GLOC(iel)%nHb
       nEb = A_MACRO(Ielc)%GLOC(iel)%nEb
       nVb = A_MACRO(Ielc)%GLOC(iel)%nVb
-      nQ  = A_MACRO(Ielc)%GLOC(iel)%nQ 
+      nQ  = A_MACRO(Ielc)%GLOC(iel)%nQ
 !
       n1 = nHc + nEc + nVc
       n2 = nHb + nEb + nVb + nQ
       ndof = n1 + n2
-!      
+!
       allocate(ztempc(n1**2))
       allocate(zloadc(n1))
 !
       if (n2 .gt. 0) then
          call stc_macro_out_nostore(Ielc,iel,ztemp(1:ndof**2),zload(1:ndof),ndof,n1,n2,  &
-                            nHc,nHb,nEc,nEb,nVc,nVb,nQ,ztempc,zloadc) 
+                            nHc,nHb,nEc,nEb,nVc,nVb,nQ,ztempc,zloadc)
       else
          ztempc(1:n1**2) = ztemp(1:n1**2)
          zloadc(1:n1) = zload(1:n1)
-      endif 
-!      
+      endif
+!
 !  ...assemble the global stiffness matrix and load vector
 !  ...loop through element dof
       ndof = n1
@@ -398,8 +398,8 @@
          if (i .lt. 0 ) then
             i = abs(i)
 !        ...Assemble global load vector
-            Abi_ext(i,nrdofi+1) = Abi_ext(i,nrdofi+1) + zloadc(k1)  
-!        ...loop through dof 
+            Abi_ext(i,nrdofi+1) = Abi_ext(i,nrdofi+1) + zloadc(k1)
+!        ...loop through dof
             do k2=1,ndof
 !           ...global dof is:
                j = A_MACRO(ielc)%GLOC(iel)%lcon(k2)
@@ -407,7 +407,7 @@
                   j = abs(j)
                   if (i.le.j) then
                      k = (k1-1)*ndof + k2
-!                    ...sparse storage 
+!                    ...sparse storage
                         SKbb(i)%nz_old = SKbb(i)%nz_old + 1
                         SKbb(i)%col(SKbb(i)%nz_old) = j
                         SKbb(i)%val(SKbb(i)%nz_old) = ztempc(k)
@@ -418,9 +418,9 @@
                endif
             enddo
          endif
-      enddo 
+      enddo
       deallocate(ztempc)
-      deallocate(zloadc)    
+      deallocate(zloadc)
 ! ...end of loop through the elements
    enddo
 !
@@ -450,13 +450,13 @@
       j = SKbb(i)%nz_old
       call assemble_double(SKbb(i)%col(1:j),SKbb(i)%val(1:j),j,SKbb(i)%nz)
       nnz_tot = nnz_tot + SKbb(i)%nz
-   enddo   
-!   
+   enddo
+!
    allocate(IAbb(nnz_tot))
    allocate(JAbb(nnz_tot))
    allocate(SAbb(nnz_tot))
-!   
-   k = 0 
+!
+   k = 0
    do i = 1, nrdofb
       do j =  1, SKbb(i)%nz
          k = k + 1
@@ -464,18 +464,18 @@
          JAbb(k) = SKbb(i)%col(j)
          SAbb(k) = SKbb(i)%val(j)
       enddo
-   enddo  
-!    
-!..free memory   
+   enddo
+!
+!..free memory
    do i = 1,nrdofb
       deallocate(SKbb(i)%col)
       deallocate(SKbb(i)%val)
-   enddo   
+   enddo
    deallocate(SKbb)
 !
    call get_pointers(IAbb(1:nnz_tot), nnz_tot)
 
-! 
+!
 !..call pardiso to solve
    call pardiso_solve(IAbb(1:nrdofb+1),JAbb(1:nnz_tot),SAbb(1:nnz_tot),'H', &
                       nnz_tot,nrdofb,nrdofi+1,Abi_ext)

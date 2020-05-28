@@ -15,15 +15,15 @@ c     in:
 c               Dxdxi  - derivatives of the physical coordinnates wrt
 c                        master element coordinates
 c                             first index is the physical coord
-c                             second index is the master coord      
+c                             second index is the master coord
 c     out:
 c               Dxidx  - derivatives of the master coord wrt to the
 c                        physical ones
 c                             first index is the master coordinate
 c                             second index is the physical coordinate
-c               Rjac   - the jacobian      
+c               Rjac   - the jacobian
 c               Iflag  = 0 if the jacobian is positive
-c                      = 1 otherwise   
+c                      = 1 otherwise
 c
 c
 c-----------------------------------------------------------------------
@@ -40,11 +40,11 @@ ccc      iprint=0
       if (iprint.eq.1) then
         do i=1,3
           write(*,9999)i,Dxdxi(i,1:3)
- 9999     format(' geom: i,Dxdxiz(i,1:3) = ',i2,2x,3(e12.5,2x))       
+ 9999     format(' geom: i,Dxdxiz(i,1:3) = ',i2,2x,3(e12.5,2x))
         enddo
       endif
       Iflag=0
-c      
+c
 c
 c  ...jacobian
       Rjac = Dxdxi(1,1)*Dxdxi(2,2)*Dxdxi(3,3)
@@ -61,9 +61,9 @@ c  ...jacobian
         if (iprint.eq.1) then
 c
 c  .......compute vector product of first two derivatives
-          a1 = Dxdxi(2,1)*Dxdxi(3,2) - Dxdxi(3,1)*Dxdxi(2,2)        
-          a2 = Dxdxi(3,1)*Dxdxi(1,2) - Dxdxi(1,1)*Dxdxi(3,2)        
-          a3 = Dxdxi(1,1)*Dxdxi(2,2) - Dxdxi(2,1)*Dxdxi(1,2)        
+          a1 = Dxdxi(2,1)*Dxdxi(3,2) - Dxdxi(3,1)*Dxdxi(2,2)
+          a2 = Dxdxi(3,1)*Dxdxi(1,2) - Dxdxi(1,1)*Dxdxi(3,2)
+          a3 = Dxdxi(1,1)*Dxdxi(2,2) - Dxdxi(2,1)*Dxdxi(1,2)
           write(*,7001) Dxdxi(1:3,1), Dxdxi(1:3,2)
  7001     format('geom: Dxdxi1 = ',3e12.5,' Dxdxi2 = ',3e12.5)
           write(*,7002) a1,a2,a3,  Dxdxi(1:3,3)
@@ -123,5 +123,5 @@ c
 c
       end
 
-      
+
 

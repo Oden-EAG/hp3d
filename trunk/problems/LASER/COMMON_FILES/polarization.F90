@@ -1,5 +1,5 @@
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 !-------------------------
 ! Routine: get_bgPol
@@ -102,17 +102,17 @@ subroutine get_activePol(ZsolQ,Fld_flag,Delta_n, Active_pol)
 !
    VTYPE  , intent(in)  :: ZsolQ(12)
    integer, intent(in)  :: Fld_flag
-   real*8 , intent(in)  :: Delta_n
+   real(8), intent(in)  :: Delta_n
    VTYPE  , intent(out) :: Active_pol(3,3)
 !
    VTYPE, dimension(3) :: Es,Hs,Ep,Hp,ETimesHs,ETimesHp
 !
-!..modified irradiance experiment (birefringent fiber) 
+!..modified irradiance experiment (birefringent fiber)
    VTYPE, dimension(3) :: Es_mod,Hs_mod
    integer :: modified
 !
-   real*8 :: eta,Nex,Ngd,sum1,sum2,Is,Ip,g0,gain_ampl
-   VTYPE  :: gain
+   real(8) :: eta,Nex,Ngd,sum1,sum2,Is,Ip,g0,gain_ampl
+   VTYPE   :: gain
 !
 !---------------------------------------------------------------------------
 !
@@ -211,7 +211,7 @@ subroutine get_ramanPol(E,H,Dom_flag,Fld_flag,Delta_n, Raman_pol)
 !--------------------------------------------------
    VTYPE  , intent(in)  :: E(3), H(3)
    integer, intent(in)  :: Dom_flag, Fld_flag
-   real*8 , intent(in)  :: Delta_n
+   real(8), intent(in)  :: Delta_n
    VTYPE  , intent(out) :: Raman_pol(3,3)
 !..irradiance: |Re{ExH^*}|
    VTYPE :: EtimesH(3)

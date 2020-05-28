@@ -16,7 +16,7 @@ c   usage              - call select
 c
 c   arguments          - none
 c
-c   required  routines - 
+c   required  routines -
 c
 c----------------------------------------------------------------------
 c

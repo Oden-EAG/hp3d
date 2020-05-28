@@ -2,43 +2,38 @@
 # SET HP3D AND LIBRARY PATH
 #------------------------------------------------------------------
 COMPILER        = INTEL
-LIBRARIES       = ${WORK}/LIBS
+# LIBRARIES       = ${WORK}/LIBS
 HP3D_BASE_PATH  = ${WORK}/par_hp3d/trunk
 
 #------------------------------------------------------------------
 # COMPILER SETTINGS (a 64bit processor architecture is assumed)
 #------------------------------------------------------------------
 
-DEBUG      = YES
 LARGE      = NO
 OPENMP_USE = YES
+TAU_PERF   = NO
 
 # Use parallel threads to compile libraries and problems
 J ?= 24
 
-# Tau performance tool
-#FF = tau_f90.sh
-#CC = tau_cc.sh
-
 # Compiler
-FF     = mpif90
-CC     = mpicc
+# Tau performance tool
+ifeq ($(TAU_PERF),YES)
+  FF = tau_f90.sh
+  CC = tau_cc.sh
+else
+  FF = mpif90
+  CC = mpicc
+endif
 FC     =  $(FF)
 FFLAGS = -fPIC
+
+# Additional Intel compiler flags
+#FFLAGS += -stand
 
 # OpenMP
 ifeq ($(OPENMP_USE),YES)
 FFLAGS += -qopenmp
-endif
-
-# Debug flags
-ifeq ($(DEBUG),YES)
-FFLAGS += -O0 -g -traceback -check all -debug all -check noarg_temp_created -assume noprotect_constants
-endif
-
-# Optimization flags
-ifeq ($(DEBUG),NO)
-FFLAGS += -O3 -xCORE-AVX512
 endif
 
 # use the following flags if need >2G static data
@@ -53,13 +48,29 @@ CFLAGS  =
 CDEFS   = -DAdd_
 
 #------------------------------------------------------------------
+# PREPROCESSOR VARIABLES
+#------------------------------------------------------------------
+COMPLEX ?= 0
+DEBUG   ?= 0
+
+# Debug flags
+ifeq ($(DEBUG),1)
+  FFLAGS += -O0 -g -traceback -check all -debug all -check noarg_temp_created -assume noprotect_constants
+endif
+
+# Optimization flags
+ifeq ($(DEBUG),0)
+  FFLAGS += -O3 -xCORE-AVX512
+endif
+
+#------------------------------------------------------------------
 # INTEL MKL LIBRARY
 #------------------------------------------------------------------
 #
 # See https://software.intel.com/en-us/articles/intel-mkl-link-line-advisor
 #
 # -mkl
-# loads: BLAS, LAPACK, ScaLAPACK, BLACS
+# loads: BLAS, LAPACK, ScaLAPACK, BLACS, SPBLAS
 #
 # see user guide (TACC Stampede2)
 # -mkl (by default: -mkl=parallel)
@@ -79,7 +90,8 @@ MKL_LIBS = ${MKLROOT}/lib/intel64/libmkl_blas95_lp64.a \
            ${MKLROOT}/lib/intel64/libmkl_blacs_intelmpi_lp64.a \
          -Wl,--end-group \
            -liomp5 -lpthread -lm -ldl 
-MKL_INCS = -i8 -I${MKLROOT}/include/intel64/lp64 -I${MKLROOT}/include
+MKL_INCS = -I${MKLROOT}/include/intel64/lp64 -I${MKLROOT}/include
+# -i8 (default 64-bit integer)
 
 #------------------------------------------------------------------
 # MUMPS LIBRARY
@@ -87,69 +99,45 @@ MKL_INCS = -i8 -I${MKLROOT}/include/intel64/lp64 -I${MKLROOT}/include
 #
 # TACC MUMPS
 # module load mumps/5.1
-# needs PT-SCOTCH and parMETIS
-# also adding zoltan library dependence
+# needs PT-SCOTCH and parMETIS (64bit versions for large problems)
+# (module petsc/3.11-i64)
+# also adding Zoltan library dependence
+# also adding PETSC library dependence (petsc needs phdf5)
 
-MUMPS_LIBS = -L${TACC_PETSC_LIB} -ldmumps -lzmumps -lmumps_common \
-                                 -lesmumps -lzoltan -lpord \
-                                 -lmetis -lparmetis \
-                                 -lscotch -lscotcherr \
-                                 -lptscotch -lptscotcherr
-MUMPS_INCS = -I${TACC_PETSC_INC}
-
-#------------------------------------------------------------------
-# FLAME LIBRARY
-#------------------------------------------------------------------
-
-FLA_VERSION     = x86_64-5.1.0-48
-
-FLA_LIB_PATH    = $(LIBRARIES)/flame/intel_skx/lib
-FLA_INC_PATH    = $(LIBRARIES)/flame/intel_skx/include-$(FLA_VERSION)
-# Linking associated libraries inside ${INTEL_HOME}/lib/intel64
-FLA_LDFLAGS     = -L${INTEL_HOME}/lib/intel64 \
-                  -lifport -lifcore -limf -lsvml -lipgo -lirc -lirc_s
-# Libraries inside /usr/lib64                  
-FLA_LDFLAGS    += -lgfortran -lstdc++ -lutil -lm -lpthread -ldl
-
-FLA_LIB         = $(FLA_LIB_PATH)/libflame-$(FLA_VERSION).a \
-                  $(FLA_LDFLAGS)
-
-#------------------------------------------------------------------
-# UHM LIBRARY
-#------------------------------------------------------------------
-#
-# TACC HDF5, Paraview
-#
-
-UHM_PATH        = $(LIBRARIES)/UHM/intel/UHM
-LINAL_PATH      = $(LIBRARIES)/UHM/intel/LINAL
-VIS_PATH        = $(LIBRARIES)/UHM/intel/VIS
-
-UHM_INC_PATH    = $(UHM_PATH)/include
-LINAL_INC_PATH  = $(LINAL_PATH)/include
-VIS_INC_PATH    = $(VIS_PATH)/include
-
-# module load paraview/5.6.0
-# module load hdf5/1.10.4
-
-VIS_LDFLAGS     = -L${TACC_HDF5_LIB} -lhdf5 -lhdf5_hl
-VIS_LDFLAGS    += -L${TACC_PARAVIEW_LIB} -lvtkhdf5-pv5.6 -lvtkhdf5_hl-pv5.6 -lvtklibxml2-pv5.6 -lvtkzlib-pv5.6
-
-UHM_LIB         = $(UHM_PATH)/lib/libuhm.a
-LINAL_LIB       = $(LINAL_PATH)/lib/liblinal.a
-VIS_LIB         = $(VIS_PATH)/lib/libvis.a \
-                  $(VIS_LDFLAGS)
-
-#------------------------------------------------------------------
-# PREPROCESSOR VARIABLES
-#------------------------------------------------------------------
-
-COMPLEX    ?= 0
-SHAPE      ?= 1
-DEBUG_MODE ?= 0
-ifeq ($(DEBUG),YES)
-DEBUG_MODE = 1
+ifeq ($(COMPLEX),1)
+  TACC_PETSC32_LIB = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-complex/lib
+  TACC_PETSC32_INC = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-complex/include
+  TACC_PETSC64_LIB = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-complexi64/lib
+  TACC_PETSC64_INC = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-complexi64/include
+else
+  TACC_PETSC32_LIB = /home1/apps/intel18/impi18_0/petsc/3.11/skylake/lib
+  TACC_PETSC32_INC = /home1/apps/intel18/impi18_0/petsc/3.11/skylake/include
+  TACC_PETSC64_LIB = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-i64/lib
+  TACC_PETSC64_INC = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-i64/include
 endif
+
+MUMPS_LIBS = -L$(TACC_PETSC32_LIB) -ldmumps -lzmumps \
+                                   -lmumps_common -lpord
+
+MUMPS_LIBS += -L$(TACC_PETSC64_LIB) -lesmumps -lzoltan \
+                                    -lmetis -lparmetis \
+                                    -lscotch -lscotcherr \
+                                    -lptscotch -lptscotcherr
+
+MUMPS_INCS = -I$(TACC_PETSC32_INC) -I$(TACC_PETSC64_INC) \
+             -I/home1/apps/intel18/impi18_0/petsc/3.11/include
+
+#------------------------------------------------------------------
+# VIS LIBRARY
+#------------------------------------------------------------------
+#
+# TACC HDF5
+#
+
+# module load hdf5/1.10.4
+# module load phdf5/1.10.4
+VIS_LIBS   = -L${TACC_HDF5_LIB} -lhdf5 -lhdf5_hl -lhdf5_fortran -lhdf5hl_fortran
+VIS_INCS   = -I${TACC_HDF5_INC}
 
 #------------------------------------------------------------------
 # HP3D PATHS
@@ -158,36 +146,28 @@ endif
 # Mainly for library makefile
 
 ifeq ($(COMPLEX),1)
-HP3D_PATH       = $(HP3D_BASE_PATH)/complex
+  HP3D_PATH      = $(HP3D_BASE_PATH)/complex
+else
+  HP3D_PATH      = $(HP3D_BASE_PATH)/real
 endif
 
-ifeq ($(COMPLEX),0)
-HP3D_PATH       = $(HP3D_BASE_PATH)/real
-endif
-
-SRC_PATH        = src
-MODULE_PATH     = module
-LIB_PATH        = lib
+SRC_PATH         = src
+MODULE_PATH      = module
+LIB_PATH         = lib
 
 OBJ_PATH_COMPLEX =  _obj_complex_
 OBJ_PATH_REAL    =  _obj_real_
 
 ifeq ($(COMPLEX),1)
-OBJ_PATH        = $(OBJ_PATH_COMPLEX)
+  OBJ_PATH       = $(OBJ_PATH_COMPLEX)
+else
+  OBJ_PATH       = $(OBJ_PATH_REAL)
 endif
 
-ifeq ($(COMPLEX),0)
-OBJ_PATH        = $(OBJ_PATH_REAL)
-endif
-
-HP3D_LIB_EXTRA_INCS =
-
-ifdef MUMPS_INCS
-HP3D_LIB_EXTRA_INCS += $(MUMPS_INCS)
-endif
+HP3D_LIB_EXTRA_INCS = $(MKL_INCS) $(MUMPS_INCS) $(VIS_INCS)
 
 #not used
-HP3D_MOD_OPTION_INC  = -module ./$(MODULE_PATH)
+HP3D_MOD_OPTION_INC = -module ./$(MODULE_PATH)
 
 # For problem makefiles
 HP3D_LIB        = $(HP3D_PATH)/lib/libhp3d.a 
@@ -212,64 +192,43 @@ HP3D_LINK_INCS    = -I$(HP3D_PATH)/common/hp3d \
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # BASIC LINEAR ALGEBRA LIBRARIES LINKING
-
-#LIN_ALG_LINK_LIBS    = -mkl=cluster
 LIN_ALG_LINK_LIBS = $(MKL_LIBS)
 LIN_ALG_LINK_INCS = $(MKL_INCS)
 
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# PETSC LINKING
+#PETSC_LINK_LIBS  = -L$(TACC_PETSC32_LIB) -lpetsc
+#PETSC_LINK_INCS  = #-I/home1/apps/intel18/impi18_0/petsc/3.11/include
+
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-# MUMPS LINKING (includes basic linear algebra and METIS)
+# MUMPS LINKING
+MUMPS_LINK_LIBS    = $(MUMPS_LIBS) $(LIN_ALG_LINK_LIBS) -L$(TACC_PETSC64_LIB) -lpetsc
+MUMPS_LINK_INCS    = $(MUMPS_INCS) $(LIN_ALG_LINK_INCS)
 
-MUMPS_LINK_LIBS    = $(MUMPS_LIBS)  $(LIN_ALG_LINK_LIBS)
-MUMPS_LINK_INCS    = $(MUMPS_INCS) #$(LIN_ALG_LINK_INCS)
-
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-# UHM SOLVER LINKING (includes all of MUMPS links + FLAME + VIS)
-
-UHM_LINK_LIBS     = $(UHM_LIB) $(VIS_LIB) $(LINAL_LIB) $(FLA_LIB) \
-                    $(MUMPS_LINK_LIBS)
-                    
-UHM_LINK_INCS     = -I$(UHM_INC_PATH) -I$(VIS_INC_PATH) \
-                    -I$(LINAL_INC_PATH) -I$(FLA_INC_PATH) \
-                    $(MUMPS_LINK_INCS)
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # EXTRA LIBS LINKING
-
 X_LIB = -lX11
-
-# Use PTHREAD_LIB when not using MKL
-#PTHREAD_LIB  = -lpthread
-
-# Use GCOV_LIB when coverage is desired (change FFLAGS as needed)
-#GCOV_LIB     = -lgcov
-
 EXTRA_LINK_LIBS    = $(X_LIB)
 EXTRA_LINK_INCS    =
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-# TYPICAL PROBLEM LINKING
+# PROBLEM LINKING
 
-# In what follows UHM_LINK_xxx can be replaced everywhere with
-# MUMPS_LINK_xxx if UHM solver is not desired, or by
-# LIN_ALG_LINK_xxx if neither UHM nor MUMPS are desired, but
-# BLAS and LAPACK support are still desired. Otherwise eliminate.
-# The variable MODULE_PATH (and SRC_PATH) may be redefined inside 
-# the problem makefile. 
-
-PROB_LIBS    = $(HP3D_LINK_LIBS) \
+PROB_LIBS    = $(HP3D_LINK_LIBS)   \
                $(MUMPS_LINK_LIBS)  \
+               $(VIS_LIBS)         \
                $(EXTRA_LINK_LIBS)
 
 PROB_INCS     = -module ./$(MODULE_PATH)
-PROB_INCS    += $(HP3D_LINK_INCS) \
+PROB_INCS    += $(HP3D_LINK_INCS)   \
                 $(MUMPS_LINK_INCS)  \
+                $(VIS_INCS)         \
                 $(EXTRA_LINK_INCS)
 
 # Files with ending in .F and .F90 (not .f and .f90)
 # are preprocessed according to certain directives
 
 PROB_PP_DEFS  = -D"C_MODE=$(COMPLEX)" \
-                -D"SHAPE_MODE=$(SHAPE)" \
-                -D"DEBUG_MODE=$(DEBUG_MODE)"
+                -D"DEBUG_MODE=$(DEBUG)"
 

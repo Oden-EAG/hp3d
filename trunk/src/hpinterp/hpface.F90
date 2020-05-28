@@ -1,22 +1,24 @@
 !
-!> Purpose : determine face geometry dof interpolating GMP map using 
+#include "typedefs.h"
+!
+!-----------------------------------------------------------------------
+!> Purpose : determine face geometry dof interpolating GMP map using
 !            PB interpolation
 !  NOTE:     the interpolation (projection) is done in the reference space
-!!           
-!! @param[in]  Iflag        - a flag specifying which of the objects the 
+!!
+!! @param[in]  Iflag        - a flag specifying which of the objects the
 !!                            face is on: 5 pris, 6 hexa, 7 tetr, 8 pyra
-!! @param[in]  No           - number of a specific object 
+!! @param[in]  No           - number of a specific object
 !! @param[in]  Etav         - reference coordinates of the element vertices
 !! @param[in]  Type         - element (middle node) type
-!! @param[in]  Nedge_orient - edge orientation 
-!! @param[in]  Nface_orient - face orientation 
+!! @param[in]  Nedge_orient - edge orientation
+!! @param[in]  Nface_orient - face orientation
 !! @param[in]  Norder       - element order
-!! @param[in]  Iface        - face number 
+!! @param[in]  Iface        - face number
 !! @param[in]  Xnod         - geometry dof for the element (vertex and edge values)
-!! 
+!!
 !! @param[out] Xdof         - geometry dof for the face
-!
-#include "implicit_none.h"
+!-----------------------------------------------------------------------
   subroutine hpface(Mdle,Iflag,No,Etav,Type, &
                     Nedge_orient,Nface_orient,Norder,Iface, &
                     Xnod, Xdof)
@@ -26,16 +28,16 @@
 !
 ! ** Arguments
 !-----------------------------------------------------------------------
-  integer,                                    intent(in)  :: Iflag,No,Mdle
-  integer,                                    intent(in)  :: Iface
-  real*8,  dimension(3,8),                    intent(in)  :: Etav
-  character(len=4),                           intent(in)  :: Type
-  integer, dimension(12),                     intent(in)  :: Nedge_orient
-  integer, dimension(6),                      intent(in)  :: Nface_orient
-  integer, dimension(19),                     intent(in)  :: Norder
+  integer,                          intent(in)  :: Iflag,No,Mdle
+  integer,                          intent(in)  :: Iface
+  real(8), dimension(3,8),          intent(in)  :: Etav
+  character(len=4),                 intent(in)  :: Type
+  integer, dimension(12),           intent(in)  :: Nedge_orient
+  integer, dimension(6),            intent(in)  :: Nface_orient
+  integer, dimension(19),           intent(in)  :: Norder
 !
-  real*8,  dimension(3,MAXbrickH),            intent(in)  :: Xnod
-  real*8,  dimension(3,*),                    intent(out) :: Xdof
+  real(8), dimension(3,MAXbrickH),  intent(in)  :: Xnod
+  real(8), dimension(3,*),          intent(out) :: Xdof
 !
 ! ** Locals
 !-----------------------------------------------------------------------
@@ -45,37 +47,37 @@
 !
 ! quadrature
   integer                               :: l,nint
-  real*8,  dimension(2, MAX_NINT2)      :: xi_list
-  real*8,  dimension(   MAX_NINT2)      :: wa_list 
-  real*8                                :: wa, weight
+  real(8), dimension(2, MAX_NINT2)      :: xi_list
+  real(8), dimension(   MAX_NINT2)      :: wa_list
+  real(8)                               :: wa, weight
 !
 ! work space for shape3H
   integer                               :: nrdofH
   integer, dimension(19)                :: norder_1
-  real*8,  dimension(MAXbrickH)         :: shapH
-  real*8,  dimension(3,MAXbrickH)       :: gradH
+  real(8), dimension(MAXbrickH)         :: shapH
+  real(8), dimension(3,MAXbrickH)       :: gradH
 !
 ! derivatives of a shape function wrt reference coordinates
-  real*8, dimension(3)                  :: duHdeta,dvHdeta
+  real(8), dimension(3)                 :: duHdeta,dvHdeta
 !
-! dot product 
-  real*8                                :: prod
+! dot product
+  real(8)                               :: prod
 !
 ! geometry
-  real*8                                :: rjac,bjac
-  real*8, dimension(2)                  :: t
-  real*8, dimension(3)                  :: xi,eta,rn,x
-  real*8, dimension(3,2)                :: dxidt,detadt
-  real*8, dimension(3,3)                :: detadxi,dxideta,dxdeta
+  real(8)                               :: rjac,bjac
+  real(8), dimension(2)                 :: t
+  real(8), dimension(3)                 :: xi,eta,rn,x
+  real(8), dimension(3,2)               :: dxidt,detadt
+  real(8), dimension(3,3)               :: detadxi,dxideta,dxdeta
 !
 ! work space for linear solvers
   integer                               :: naH,info
-  real*8,  dimension(MAXMdlqH,MAXMdlqH) :: aaH
+  real(8), dimension(MAXMdlqH,MAXMdlqH) :: aaH
   integer, dimension(MAXMdlqH)          :: ipivH
 !
 ! load vector and solution
-  real*8,  dimension(MAXMdlqH,3)        :: bb,uu
-!  
+  real(8), dimension(MAXMdlqH,3)        :: bb,uu
+!
 ! misc work space
   integer :: iprint,nrv,nre,nrf,i,j,k,ie,kj,ki,&
              ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,nsign
@@ -116,7 +118,7 @@
 7060 format('hpface: norder_1 = ',20i4)
   endif
 !
-! get face order to find out quadrature information 
+! get face order to find out quadrature information
   call face_order(Type,Iface,Norder, norder_face)
   call set_2Dint(face_type(Type,Iface),norder_face, &
                  nint,xi_list,wa_list)
@@ -135,8 +137,8 @@
     call face_param(Type,Iface,t, xi,dxidt)
 !
 !   compute element H1 shape functions
-    call shape3H(Type,xi,norder_1,Nedge_orient,Nface_orient, &
-                 nrdofH,shapH,gradH)
+    call shape3DH(Type,xi,norder_1,Nedge_orient,Nface_orient, &
+                  nrdofH,shapH,gradH)
 !
 !   evaluate reference coordinates of the point as needed by GMP
     nsign = nsign_param(Type,Iface)
@@ -144,7 +146,7 @@
                     eta,detadxi,dxideta,rjac,detadt,rn,bjac)
     weight = wa*bjac
 !
-!   call GMP routines to evaluate physical coordinates and their 
+!   call GMP routines to evaluate physical coordinates and their
 !   derivatives wrt reference coordinates
     select case(Iflag)
     case(5);        call prism(No,eta, x,dxdeta)
@@ -167,7 +169,7 @@
                    + gradH(2,k)*dxideta(2,1:3) &
                    + gradH(3,k)*dxideta(3,1:3)
 !
-!     subtract... 
+!     subtract...
       do i=1,3
         dxdeta(1:3,i) = dxdeta(1:3,i) &
                       - Xnod(1:3,k)*duHdeta(i)

@@ -1,5 +1,5 @@
 !----------------------------------------------------------------------
-!> Purpose : reconstruction of complete connectivities from partial 
+!> Purpose : reconstruction of complete connectivities from partial
 !!           connectivities used in the new format
 !!
 !! @revision Nov 12
@@ -30,7 +30,7 @@ subroutine connect
 !
 !  Step 1: Reconstruct points to curves connectivities
 !
-      allocate(iwork(1:maxnrcurv,1:NRPOINT), STAT=ic ) 
+      allocate(iwork(1:maxnrcurv,1:NRPOINT), STAT=ic )
       iwork(1:maxnrcurv,1:NRPOINT) = 0
 !
 !  ...loop through curves
@@ -66,9 +66,9 @@ subroutine connect
           write(*,7038) POINTS(np)%CurvNo(1:POINTS(np)%NrCurv)
  7038     format(10i7)
         endif
-      enddo  
+      enddo
       if (iprint.eq.1) call pause
-      deallocate(iwork)   
+      deallocate(iwork)
 !
 !----------------------------------------------------------------------
 !
@@ -175,7 +175,7 @@ subroutine connect
 !
 !  Step 4: Reconstruct curves to adjacent figures connectivities
 !
-      allocate(iwork(1:maxnrfig,1:NRCURVE), STAT=ic ) 
+      allocate(iwork(1:maxnrfig,1:NRCURVE), STAT=ic )
       iwork(1:maxnrfig,1:NRCURVE) = 0
 !
 !  ...loop through rectangles
@@ -233,8 +233,8 @@ subroutine connect
         do j=1,CURVES(nc)%NrFig
           CURVES(nc)%FigNo(j) = iwork(j,nc)
         enddo
-      enddo  
-      deallocate(iwork)   
+      enddo
+      deallocate(iwork)
       if (NDIM.eq.2) return
 !
 !----------------------------------------------------------------------
@@ -243,7 +243,7 @@ subroutine connect
 !          rectangles connectivities
 !
 !  ...loop through hexahedra
-      do nh=1,NRHEXAS    
+      do nh=1,NRHEXAS
 !
 !  .....loop through the hexa edges
         do j=1,12
@@ -376,11 +376,11 @@ subroutine connect
 !          rectangles and triangles connectivities
 !
 !  ...loop through prisms
-      do np=1,NRPRISM  
+      do np=1,NRPRISM
         if (iprint.eq.1) then
           write(*,8001) np
  8001     format('connect: PRISM np = ',i8)
-        endif  
+        endif
 !
 !  .....loop through the prism edges
         do j=1,9
@@ -423,7 +423,7 @@ subroutine connect
         if (iprint.eq.1) then
           write(*,8002) PRISMS(np)%EdgeNo(1:9)
  8002     format('connect: edges = ',9i8)
-        endif  
+        endif
 !
 !  .....loop through the prism faces
         do j=1,5
@@ -549,7 +549,7 @@ subroutine connect
         if (iprint.eq.1) then
           write(*,8003) PRISMS(np)%FigNo(1:5)
  8003     format('connect: faces = ',9i8)
-        endif  
+        endif
 !
 !  ...end of loop through prisms
       enddo
@@ -561,7 +561,7 @@ subroutine connect
 !          triangles connectivities
 !
 !  ...loop through tetrahedra
-      do ntet=1,NRTETRA  
+      do ntet=1,NRTETRA
 !
 !  .....loop through the tet edges
         do j=1,6
@@ -688,7 +688,7 @@ subroutine connect
         if (iprint.eq.1) then
           write(*,7101) npyr
  7101     format('connect: PYRAMID npyr = ',i8)
-        endif  
+        endif
 !
 !  .....loop through the pyramid edges
         do j=1,8
@@ -732,7 +732,7 @@ subroutine connect
         enddo
         if (iprint.eq.1) then
           write(*,8002) PYRAMIDS(npyr)%EdgeNo(1:8)
-        endif  
+        endif
 !
 !  .....loop through the pyramid faces
         do j=1,5
@@ -860,7 +860,7 @@ subroutine connect
         enddo
         if (iprint.eq.1) then
           write(*,8003) PYRAMIDS(npyr)%FigNo(1:5)
-        endif  
+        endif
 !
 !  ...end of loop through pyramids
       enddo
@@ -870,7 +870,7 @@ subroutine connect
 !  Step 8: Reconstruct rectangles to blocks connectivities
 !
 !  ...loop through hexa
-      do nh=1,NRHEXAS    
+      do nh=1,NRHEXAS
         nick = nh*10+2
 !
 !  .....loop through hexa faces
@@ -897,7 +897,7 @@ subroutine connect
       endif
 !
 !  ...loop through prisms
-      do np=1,NRPRISM    
+      do np=1,NRPRISM
         nick = np*10+1
 !
 !  .....loop through prism faces
@@ -924,7 +924,7 @@ subroutine connect
       endif
 !
 !  ...loop through pyramids
-      do npyr=1,NRPYRAM    
+      do npyr=1,NRPYRAM
         nick = npyr*10+4
 !
 !  .....bottom face only
@@ -954,7 +954,7 @@ subroutine connect
 !
 !
 !  ...loop through prisms
-      do np=1,NRPRISM    
+      do np=1,NRPRISM
         nick = np*10+1
 !
 !  .....loop through prism bases
@@ -1008,7 +1008,7 @@ subroutine connect
       endif
 !
 !  ...loop through pyramids
-      do npyr=1,NRPYRAM   
+      do npyr=1,NRPYRAM
         nick = npyr*10+4
 !
 !  .....loop through the pyramid lateral faces
@@ -1035,7 +1035,7 @@ subroutine connect
       endif
 !
 !
-endsubroutine connect
+end subroutine connect
 !
 !
 !----------------------------------------------------------------------
@@ -1090,4 +1090,4 @@ subroutine clean_GMP
       enddo
 !
 !
-endsubroutine clean_GMP
+end subroutine clean_GMP

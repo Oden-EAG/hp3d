@@ -9,7 +9,7 @@ c
 c   purpose            - routine performs G^1 reconstruction of
 c                        geometry for a triangulated surface
 c
-c   arguments          - none   
+c   arguments          - none
 c
 c----------------------------------------------------------------------
 c
@@ -21,7 +21,7 @@ c
 #include "syscom.blk"
 
       integer, parameter :: nsub = 3
-c      
+c
       dimension eta(2),void(3),dxdeta(3,2)
       dimension rnorm1(1:3,0:nsub),rnorm2(1:3,0:nsub)
       dimension nt_save(2),nedg_save(2),nblock_save(2)
@@ -29,9 +29,9 @@ c
 c
 c
       iprint=0
-c      
+c
       nfail = 0
-c      
+c
 c  ...loop through all curves
       do nc = 1,NRCURVE
 c  .....skip if not a quintic Bezier curve
@@ -47,9 +47,9 @@ c  .....loop through connected triangles
         ifound = 0
         do it = 1,CURVES(nc)%NrFig
           call decode(abs(CURVES(nc)%FigNo(it)), nt,lab)
-c  .......cycle if not a triangle          
+c  .......cycle if not a triangle
           if (lab.ne.1) cycle
-c  .......cycle if not a G1RecTri          
+c  .......cycle if not a G1RecTri
           if (TRIANGLES(nt)%Type.ne.'G1RecTri') cycle
 c  .......loop through edges of the triangle
           do ie = 1,3
@@ -57,16 +57,16 @@ c  .......loop through edges of the triangle
             if (nc1.ne.nc) cycle
             ifound = ifound + 1
             nt_save(ifound) = nt; nedg_save(ifound) = ie
-c  .........loop through adjacent blocks            
+c  .........loop through adjacent blocks
             do is = 1,2
               if (TRIANGLES(nt)%BlockNo(is).ne.0) then
                 nblock_save(ifound) = TRIANGLES(nt)%BlockNo(is)
               endif
             enddo
 c
-c  for each subdivision point collect normals   
-c            
-c  .........loop over subdivision points            
+c  for each subdivision point collect normals
+c
+c  .........loop over subdivision points
             do i = 0,nsub
               xi = i*1.d0/nsub
               select case(ie)
@@ -83,7 +83,7 @@ c  .........loop over subdivision points
               call trian(nt,eta, void,dxdeta)
               call cross_product(dxdeta(1:3,1),dxdeta(1:3,2), void)
               call normalize(void)
-c  ...........use 1st subdivision point to determine triangle orientation              
+c  ...........use 1st subdivision point to determine triangle orientation
               if (i.eq.0) then
                 select case (POINTS(np)%Type)
                 case ('CoorNrm')
@@ -108,20 +108,20 @@ c  ...........use 1st subdivision point to determine triangle orientation
                     endselect
                   enddo
                   if (iflag.eq.0) then
-                    write(*,*)'check_normal_cont: topology 
+                    write(*,*)'check_normal_cont: topology
      . inconsistency!'
                     write(*,*)'np,it,Idata = ',np,it,POINTS(np)%Idata
                     call print_GMP
                     stop
-                  endif        
+                  endif
                 case default
-                  write(*,*)'check_normal_cont: inconsistent point 
+                  write(*,*)'check_normal_cont: inconsistent point
      . type!'
                   write(*,*)'np,type = ',np,POINTS(np)%Type
                   stop
-                endselect  
+                endselect
                 factor = 1.d0
-c  .............sign function returns 1 if s > 0, -1 otherwise                
+c  .............sign function returns 1 if s > 0, -1 otherwise
                 rsign = sign(factor,s)
               endif
               if (iprint.eq.1) then
@@ -139,11 +139,11 @@ c  .............sign function returns 1 if s > 0, -1 otherwise
                 write(*,*)'check_normal_cont: INCONSISTENCY '
                 stop
               end select
-c  .........end of loop over subdivision points              
+c  .........end of loop over subdivision points
             enddo
-c  .......end of loop over triangle edges            
+c  .......end of loop over triangle edges
           enddo
-c  .....end of loop over connected triangles          
+c  .....end of loop over connected triangles
         enddo
 c  .....printing
         if (iprint.eq.1) then
@@ -154,26 +154,26 @@ c  .....printing
  2046       format('   rnorm2 = ',3(e12.5,2x))
             enddo
             call pause
-        endif 
+        endif
 c
-        iflag = 0 
-c  for each subdivision point compare normals        
-c  .....loop over subdivisions        
+        iflag = 0
+c  for each subdivision point compare normals
+c  .....loop over subdivisions
         do i = 0,nsub
           if (iprint.eq.1) then
             write(*,2045)rnorm1(1:3,i)
             write(*,2046)rnorm2(1:3,i)
             call pause
           endif
-c  .......loop over components        
+c  .......loop over components
           do j = 1,3
-c  .........if geometrical tollerance is exceeded          
+c  .........if geometrical tollerance is exceeded
             if (abs(rnorm2(j,i)-rnorm1(j,i)).gt.GEOM_TOL) then
 c  ...........raise flag
-              iflag = 1                    
-              write(*,3334)nc,i,rnorm1(1:3,i)     
+              iflag = 1
+              write(*,3334)nc,i,rnorm1(1:3,i)
  3334         format(' nc = ',i8,'; sub = ',i2,'; norm1 = ',3(e12.5,2x))
-              write(*,3335)rnorm2(1:3,i)     
+              write(*,3335)rnorm2(1:3,i)
  3335         format('                          norm2 = ',3(e12.5,2x))
 cc              write(*,3333)nc,i,j,abs(rnorm2(j,i)-rnorm1(j,i))
 cc 3333         format(' nc = ',i3,'; sub = ',i2,'; comp = ',i1,'; error
@@ -192,31 +192,31 @@ cc 8021         format('             endpoints = ',2i5)
 cc              call pause
 cc              go to 50
             endif
-c  .......end of loop over components            
+c  .......end of loop over components
           enddo
-c  .....end of loop over subdivision points          
+c  .....end of loop over subdivision points
         enddo
 c  .....increment counter and save curve number
         if (iflag.eq.1) then
           nfail = nfail + 1; ncurve_fail(nfail) = nc
         endif
 c 50     continue
-cc      call pause  
+cc      call pause
 c  ...end of loop through curves
       enddo
-c      
+c
       if (nfail.eq.0) then
         write(*,*)'G1 OBJECT!!!'
-      else        
+      else
         write(*,*)'=================================================='
         write(*,555)NRCURVE,nfail
- 555    format(' NRCURVE = ',i10,'; nfail = ',i10)       
+ 555    format(' NRCURVE = ',i10,'; nfail = ',i10)
         do i = 1,nfail
         write(*,557)i,ncurve_fail(i),CURVES(ncurve_fail(i))%EndPoNo(1:2)
  557      format(' i = ',i2,'; nc = ',i7,', endpoints = ',i8,', ',i8)
-        enddo     
+        enddo
         write(*,*)'=================================================='
-      endif        
+      endif
 c
 c
       end

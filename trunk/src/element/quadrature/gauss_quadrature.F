@@ -9,7 +9,7 @@ c======================================================================
 c  Constants for normalized integrated Legendre polynomials           |
 c======================================================================
 c
-      real*8, dimension(9,9) :: XLEG0
+      real(8), dimension(9,9) :: XLEG0
 c$OMP THREADPRIVATE (XLEG0)
 c
 c
@@ -20,9 +20,9 @@ c  Remark: they are rescaled to interval [0,1] by routine             |
 c  init_gauss_quadrature                                              |
 c======================================================================
 c
-      real*8, dimension(10,10) :: XIGAUS1
+      real(8), dimension(10,10) :: XIGAUS1
 c$OMP THREADPRIVATE (XIGAUS1)
-      real*8, dimension(10,10) :: WAGAUS1
+      real(8), dimension(10,10) :: WAGAUS1
 c$OMP THREADPRIVATE (WAGAUS1)
 c
 c
@@ -30,9 +30,9 @@ c======================================================================
 c  Gauss-Jacoby points and weights                                    |
 c======================================================================
 c
-      real*8, dimension(10,10) :: XIGAUSJ
+      real(8), dimension(10,10) :: XIGAUSJ
 c$OMP THREADPRIVATE (XIGAUSJ)
-      real*8, dimension(10,10) :: WAGAUSJ
+      real(8), dimension(10,10) :: WAGAUSJ
 c$OMP THREADPRIVATE (WAGAUSJ)
 c
 c
@@ -48,9 +48,9 @@ c  NSELECT(k)     = number of points set to integrate exactly         |
 c                   mass matrix for an affine element and order k     |
 c======================================================================
 c
-      real*8, dimension(3,79,20) :: XIGAUSS
+      real(8), dimension(3,79,20) :: XIGAUSS
 c$OMP THREADPRIVATE (XIGAUSS)
-      real*8, dimension(  79,20) :: WAGAUSS
+      real(8), dimension(  79,20) :: WAGAUSS
 c$OMP THREADPRIVATE (WAGAUSS)
 c
       integer, parameter, dimension(20) :: NRGAUPO =
@@ -73,9 +73,9 @@ c                        exactly mass matrix for k-th order of        |
 c                        approximation                                |
 c======================================================================
 c
-      real*8, dimension(3,720,7) :: XIGAUSS_TETS
+      real(8), dimension(3,720,7) :: XIGAUSS_TETS
 c$OMP THREADPRIVATE (XIGAUSS_TETS)
-      real*8, dimension(  720,7) :: WAGAUSS_TETS
+      real(8), dimension(  720,7) :: WAGAUSS_TETS
 c$OMP THREADPRIVATE (WAGAUSS_TETS)
 c
       integer, parameter, dimension(7) :: NRGAUPO_TETS =
@@ -96,12 +96,12 @@ c
       implicit none
 c
 c  ...workspaces
-      integer,dimension(19,20)   :: nnod
-      integer,dimension(20)      :: nw
-      real*8, dimension(6)       :: x
-      real*8, dimension(4,79,20) :: barcoo
+      integer, dimension(19,20)   :: nnod
+      integer, dimension(20)      :: nw
+      real(8), dimension(6)       :: x
+      real(8), dimension(4,79,20) :: barcoo
 c
-      real*8 :: w,sum1,sum2,ab,ws,xx,y,z,wx,wy,wz,val1,val2,wa,diff
+      real(8) :: w,sum1,sum2,ab,ws,xx,y,z,wx,wy,wz,val1,val2,wa,diff
       integer :: kwrite,np,i,j,k,l,n1,n2,nsum,kint,nint,nord
 c
 c  ...initialize workspaces [Yes, should have been declared as
@@ -696,8 +696,8 @@ c======================================================================
         nsum = nsum + nnod(j,np)
  160  continue
       if(nsum.ne.NRGAUPO(np))then
-        write(*,1003)np,NRGAUPO(np),nsum
- 1003   format(1h ,'FOR THE ',i2,'ORDER OF INTEGRATION',/,1h ,
+        write(*,1003) np,NRGAUPO(np),nsum
+ 1003   format('FOR THE ',i2,'ORDER OF INTEGRATION',/,
      .  'GAUSS POINTS NUMBER = ',i2,' CALCULATED NUMBER = ',i2,' !!!')
         call pause
       else
@@ -713,8 +713,8 @@ c======================================================================
         ab = dabs(sum2 - 1.0d0)
         if(ab.gt.1.0d-13) then
             write(*,1004) np,j,sum2
- 1004       format(1h ,'FOR THE ',i2,' ORDER OF INTEGRATION',/1h ,
-     .      ' IN ',i2,' POINT SUM OF COORDINATES = ',f20.15,' !!!')
+ 1004       format('FOR THE ',i2,' ORDER OF INTEGRATION',/,
+     .         ' IN ',i2,' POINT SUM OF COORDINATES = ',f20.15,' !!!')
             call pause
         else
         endif
@@ -723,8 +723,8 @@ c======================================================================
       ab = dabs(sum1 - 1.0d0)
       if(ab.gt.1.0d-13) then
           write(*,1005) np,sum1
- 1005     format(1h ,'FOR THE ',i2,' ORDER OF INTEGRATION',/,1H ,
-     . 'SUM OF WEIGHTS = ',f20.15,' !!!')
+ 1005     format('FOR THE ',i2,' ORDER OF INTEGRATION',/,
+     .           'SUM OF WEIGHTS = ',f20.15,' !!!')
       call pause
       else
       endif
@@ -737,10 +737,10 @@ c======================================================================
         else
         endif
  210  continue
- 1001 format(1H , 'ORDER OF INTEGRATION NP =',I2,/1H , 'WAGAUSS(.,',i2,
-     .') ',7X,'XIGAUSS(1,.,',i2,')     XIGAUSS(2,.,',i2,
-     .') =   XIGAUSS(3,.,',i2,') =')
- 1002 format(1H ,4F20.15)
+ 1001 format('ORDER OF INTEGRATION NP =',I2,/, 'WAGAUSS(.,',i2,
+     .       ') ',7X,'XIGAUSS(1,.,',i2,')     XIGAUSS(2,.,',i2,
+     .       ') =   XIGAUSS(3,.,',i2,') =')
+ 1002 format(4F20.15)
 c
 c
 c======================================================================

@@ -42,7 +42,7 @@ cwb       dimension Sbuf(*), nbuf(20), lenf(20)
 c
 cwb       save nbuf,lenf
 ccccc save nbuf, lenf, irsave
-      common /czdirio1/  nbuf, lenf, irsave   
+      common /czdirio1/  nbuf, lenf, irsave
       common /czdirio2/ storage(100)
 cwb <
 c
@@ -51,7 +51,7 @@ c ...................................................
 c within zdirio1.blk is contained the data statement:
 c
       data maxrec,lenwrd /10000, 16/
-c for COMPLEX*16, lenwrd = 16
+c for complex(8), lenwrd = 16
 c where:
 c   maxrec = the maximum record length for a direct access file
 c     **Note: on most machines this is bytes

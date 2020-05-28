@@ -7,7 +7,7 @@ c
 c   latest revision    - Dec 10
 c
 c   purpose            - routine determines Dirichlet dof for a vertex
-c                        node      
+c                        node
 c
 c   arguments :
 c     in:
@@ -22,12 +22,12 @@ c                        rectangle...)
 c            Xi        - reference coordinates of the point
 c            Icase     - node case
 c     out:
-c            Xnod      - geometry dof      
+c            Xnod      - geometry dof
 c
 c----------------------------------------------------------------------
 c
       subroutine dhpvert(Iflag,No,Xi,Icase, ZdofH)
-c     
+c
       use data_structure3D
 #include "syscom.blk"
 c
@@ -76,7 +76,7 @@ c  ...shift the data skipping irrelevant entries
  7002   format('dhpvert: ncase = ',5i1)
       endif
 c
-      ivarH=0;  nvarH=0 
+      ivarH=0;  nvarH=0
 c
       if (iprint.eq.1) then
         write(*,*) 'dhpvert: NRCOMS = ',NRCOMS
@@ -86,7 +86,7 @@ c  ...loop through multiple copies of variables
       do j=1,NRCOMS
 c
 c  .....loop through physical attributes
-        do i=1,NR_PHYSA         
+        do i=1,NR_PHYSA
 c
 c  .......loop through components
           do k=1,NR_COMP(i)

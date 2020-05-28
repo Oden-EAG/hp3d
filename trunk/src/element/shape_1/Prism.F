@@ -30,7 +30,7 @@ c          GradH        - gradients of the shape functions
 c
 c-----------------------------------------------------------------------
 c
-      subroutine shape3DHPris(X,Nord,NoriE,NoriF,Nsize, 
+      subroutine shape3DHPris(X,Nord,NoriE,NoriF,Nsize,
      .                                              NrdofH,ShapH,GradH)
 c
       use parameters , only : MODORDER
@@ -1032,7 +1032,7 @@ c
       implicit none
       integer, intent(in)  :: Nord(15),Nsize(2)
       integer, intent(out) :: NrdofQ
-      integer :: i,j,k,nij,nijk,m,N,nordB(2),ndofB,iprint,minalpha
+      integer :: i,j,k,nij,m,N,nordB(2),ndofB,iprint,minalpha
       integer :: minI,minJ,minK,minIJ,maxI,maxJ,maxK,maxIJ
       double precision, intent(in)  :: X(3)
       double precision, intent(out) :: ShapQ(Nsize(2))

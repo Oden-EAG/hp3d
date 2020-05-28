@@ -9,7 +9,7 @@
 !-------------------------------------------------------------
 !
       if (n.lt.0) then
-        fact = 0 
+        fact = 0
       elseif (n.eq.0) then
         fact = 1
       else
@@ -19,4 +19,4 @@
         enddo
       endif
 !
-      end
+      end function

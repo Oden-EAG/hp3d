@@ -1,5 +1,4 @@
       program test_locate
-      use util
       implicit none
       integer :: a(10), loc
       a(7) = 5

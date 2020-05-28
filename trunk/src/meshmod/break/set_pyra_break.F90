@@ -20,7 +20,7 @@ subroutine set_pyra_break(Kref,Nord, Nrsons,Type,Norder)
 !---------------------------------------------------------------------------------
 !
   nordp=nord*10+nord
-!  
+!
 ! initialize
   Norder = 0; Type(1:27) = 'none'
 !
@@ -28,7 +28,7 @@ subroutine set_pyra_break(Kref,Nord, Nrsons,Type,Norder)
   select case(Kref)
   case(10)
      Nrsons = 7
-!                  | INTERIOR NODES            | FACE NODES         | 
+!                  | INTERIOR NODES            | FACE NODES         |
      Type(  1:7)=(/ 'mdld','mdlp','mdlp','mdlp','mdlq','mdlq','mdlq' /)
      Norder(1:7)=(/   nord, nordp, nordp, nordp, nordp, nordp, nordp /)
   case default

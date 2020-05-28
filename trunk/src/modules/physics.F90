@@ -184,20 +184,20 @@ contains
   do i=1,NR_PHYSA
      if (PHYSAi(i)) then
        select case(DTYPE(i))
-          !  .....H^1        
+          !  .....H^1
        case('contin')
-          InrHvar = InrHvar+1  
-          !  .....H(curl)          
+          InrHvar = InrHvar+1
+          !  .....H(curl)
        case('tangen')
-          InrEvar = InrEvar+1  
-          !  .....H(div)          
+          InrEvar = InrEvar+1
+          !  .....H(div)
        case('normal')
-          InrVvar = InrVvar+1  
+          InrVvar = InrVvar+1
        case('discon')
           write(*,*) 'get_num_interf_vars: L2 INTERFACE VARIABLE ??'
           stop 1
        end select
-     endif  
+     endif
   enddo
   end subroutine get_num_interf_vars
 

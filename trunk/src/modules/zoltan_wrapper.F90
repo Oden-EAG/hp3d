@@ -1,5 +1,5 @@
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 !----------------------------------------------------------------------
 !
@@ -224,7 +224,7 @@ module zoltan_wrapper
       integer(Zoltan_double), intent(out) :: Coords(*)
       integer(Zoltan_int)   , intent(out) :: Ierr
       integer :: mdle,i,nrv
-      real*8  :: x(3), xnod(3,8)
+      real(8) :: x(3), xnod(3,8)
       mdle = GID(1)
       call nodcor_vert(mdle, xnod)
       nrv = nvert(NODES(mdle)%type)
@@ -255,7 +255,7 @@ module zoltan_wrapper
       integer(Zoltan_double), intent(out) :: Coords(*)
       integer(Zoltan_int)   , intent(out) :: Ierr
       integer :: mdle,i,k,nrv
-      real*8  :: x(3), xnod(3,8)
+      real(8) :: x(3), xnod(3,8)
 !
 !$OMP PARALLEL DO PRIVATE(mdle,i,nrv,x,xnod)
       do k = 1,NumObj
@@ -547,6 +547,7 @@ module zoltan_wrapper
       integer(Zoltan_int),pointer,dimension(:) :: impGIDs,impLIDs,impProcs,impParts
       integer(Zoltan_int),pointer,dimension(:) :: expGIDs,expLIDs,expProcs,expParts
       integer :: iel,i,mdle,subd,src,count,ierr_mpi
+      character(16) :: fmt
 !
 !  ...find new partition
       ierr = Zoltan_LB_Partition(zz, changes,nrGIDs,nrLIDs,                   &
@@ -558,12 +559,15 @@ module zoltan_wrapper
       write(*,300) '   changes  = ', changes
       write(*,301) '   nrImp    = ', nrImp
       write(*,301) '   nrExp    = ', nrExp
-      !if (nrImp > 0) write(*,310) '   impProcs = ', impProcs
-      !if (nrExp > 0) write(*,320) '   expProcs = ', expProcs
+!
+      write(fmt,'("(A,",I0,"I5)")') nrImp
+      write(6,fmt) '   impProcs = ', impProcs
+!
+      write(fmt,'("(A,",I0,"I5)")') nrExp
+      write(6,fmt) '   expProcs = ', expProcs
+!
   300 format(A,L5)
   301 format(A,I5)
-  310 format(A,<nrImp>I5)
-  320 format(A,<nrExp>I5)
 !
 !  ...collect new subdomains for mesh
       Mdle_subd(1:NRELES) = 0
@@ -584,7 +588,7 @@ module zoltan_wrapper
       enddo
       !write(*,*) 'Suggested new partition is as follows'
       !write(*,330) Mdle_subd
-  330 format(<NRELES>I4)
+  !!! 330 format(<NRELES>I4)
 !
 !  ...deallocate internal data structures
       ierr = Zoltan_LB_Free_Part(impGIDs,impLIDs,impProcs,impParts)

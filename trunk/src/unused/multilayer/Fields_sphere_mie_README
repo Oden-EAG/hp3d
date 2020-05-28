@@ -1,0 +1,101 @@
+README FILE
+
+1. There are two input files: mie.inp and points.inp
+
+Input/Output format:
+
+!***************** Scattering by Spherical Particles *************
+!            Calculations of fields for n-layered spheres.       *
+!................................................................*
+!  Input data:      1)filename: mie.inp                          *
+!   exc           : Mode of excitation, can take values from     *
+! 		    1 to 3, 1 for plane wave excitation, 2 for   *
+!                   electric dipole, 3 for magnetic dipole       *
+!   if exc is 1, next line in input is :			 *
+!   the_angle,phi_angle,ethetad,ephid				 *
+!   else if exc is 2 or 3, next 3 lines in input is :	         *
+!   curr_mag,len_dipole: Amplitude of current, length of dipole	 *
+! posit_dipole(1:3):	Position vector of the center of dipole  *
+! orient_dipole(1:3):	unit vector along orientation of dipole  *
+!   n_l           : number of layers (=> 3 !)                    *
+!   eps(0) : complex epsilon values of outer medium              *
+!   eps(1)  : complex epsilonvalues of layer 1    	         *
+!         ...............................................        *
+!         ...............................................        *
+!   eps(n_l)  : complex epsilon and real mu values of layer n_l  *
+!   mu(0)  : complex mu values of outer medium                   *
+!   mu(1)  : complex mu values of layer 1	 		 *
+!         ...............................................        *
+!         ...............................................        *
+!   mu(n_l)  : complex mu values of layer n_l	 		 *
+!         a(1)  :  radius of layer 1      			 *
+!         a(2)  :  radius of layer 2    		         *
+!         ...............................................        *
+!         ...............................................        *
+!         a(n_l): relative radius of layer n_l 			 *
+!           freq.: Frequency                                     *
+!  Input data:      2)filename: points.inp                       *
+!   The following rows have format as follows:                   *
+!   1st col: x coordinate of the observation point               *
+!   2nd col: y coordinate of the observation point               *
+!   3rd col: z coordinate of the observation point               *
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                                                                *
+!................................................................*
+!  Output data:         filename: Efields.out                    *
+!   1st col: point number                                        *
+!   2nd col: real part of x component   of the electric field    *
+!   3rd col: imag part of x component   of the electric field    *
+!   4th col: real part of y component   of the electric field    *
+!   5th col: imag part of y component   of the electric field    *
+!   6th col: real part of z component   of the electric field    *
+!   7th col: imag part of z component   of the electric field    *
+!								 *
+!                       filename: Hfields.out                    *
+!   1st col: point number                                        *
+!   2nd col: real part of x component   of the magnetic field    *
+!   3rd col: imag part of x component   of the magnetic field    *
+!   4th col: real part of y component   of the magnetic field    *
+!   5th col: imag part of y component   of the magnetic field    *
+!   6th col: real part of z component   of the magnetic field    *
+!   7th col: imag part of z component   of the magnetic field    *
+!								 *
+!                       filename: abs_power.out                  *
+! outputs the absorbed power in each layer 			 *
+!								 *
+!		        filename: frcs_mie.out                   *
+!   1st col: frequency                                           *
+!   2nd col: theta                                               *
+!   3rd col: phi                                                 *
+!   4th col: rcs_theta                                           *
+!   5th col: rcs_phi                                             *
+!		        filename: E_farfields.out                *
+!   2nd col: theta                                               *
+!   3rd col: phi                                                 *
+!   4th col: abs(Esc_theta)                                      *
+!   5th col: abs(Esc_phi)                                        *
+!                                                                *
+!                                                                *
+!................................................................*
+! NB! In order to treat very large spheres,                      *
+!     one needs to enlarge the parameter NTERMS.                 *
+!................................................................*
+!This is a modified version of the original code((c) 1999 Sobolev*
+! Astronomical Institute, St. Petersburg Univ).----available at  *
+! http://www.astro.spbu.ru/staff/ilin2/SOFTWARE/nmie0.html..based*
+! on the following publication:                                  *
+! Recursive algorithms of Wu & Wang (Radio Sci. 26, 1393, 1991)  *
+! created by N.V. Voshchinnikov                                  *
+!
+!*****************************************************************
+!
+'n' can be set to as large as 100,(but atleast 3).
+
+2.  How to use the code
+
+i) 	Open up mie.inp in emacs.  Set all the parameters in the format specified in the file itself.Note that layer 1 is the innermost layer and layer n is the outermost layer.
+
+ii)  	Use makefile to compile and ./test-code to run the code
+
+
+Last Edited 10/9/2012 by Guneet Kaur

@@ -8,7 +8,7 @@ c   latest revision    - Aug 17
 c
 c   purpose            - routine executes p-refinements for a group
 c                        of element middle nodes, along with the
-c                        corresponding p-refinements of edge and face 
+c                        corresponding p-refinements of edge and face
 c                        nodes
 c
 c   arguments :
@@ -35,7 +35,7 @@ c
 c  ...element nodes
       dimension nodesl(27), norientl(27)
 c
-c  ...order for element nodes 
+c  ...order for element nodes
       dimension norder(19)
 c
       iprint=0
@@ -76,9 +76,9 @@ c  .....loop through element higher order nodes
 c
           nod = Nodesl(j)
 c
-c  .......new order for the node 
-          newp = norder(j-nrv) 
-C          
+c  .......new order for the node
+          newp = norder(j-nrv)
+C
           if (NODES(nod)%type.eq.'mdlq') call decode(newp, newph,newpv)
 c
 c  .......if nod is active

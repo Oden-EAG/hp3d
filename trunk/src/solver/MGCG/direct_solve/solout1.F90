@@ -90,7 +90,7 @@
 !  ...H1 dof .................................
       if (NRHVAR.eq.0) goto 200
 !
-!  ...loop through nodes of modified element 
+!  ...loop through nodes of modified element
       do i=1,nrnodm
          nod = nodm(i)
 !
@@ -146,7 +146,7 @@
 !..H(curl) dof .................................
  200 if (NREVAR.eq.0) go to 300
 !
-!..loop through nodes 
+!..loop through nodes
    do i=1,nrnodm
       nod = nodm(i)
 !
@@ -196,7 +196,7 @@
 !..H(div) dof .................................
  300 if (NRVVAR.eq.0) go to 400
 !
-!..loop through nodes 
+!..loop through nodes
    do i=1,nrnodm
       nod = nodm(i)
 !

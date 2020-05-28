@@ -14,7 +14,7 @@ c
 c----------------------------------------------------------------------
 c
       subroutine setcnstr_trian_h1
-c      
+c
       use parameters
       use constraints
 #include "syscom.blk"
@@ -25,5 +25,5 @@ c
       do i=2,4
         call setcnstr_trian_aniso_h1(i)
       enddo
-c      
+c
       end subroutine setcnstr_trian_h1

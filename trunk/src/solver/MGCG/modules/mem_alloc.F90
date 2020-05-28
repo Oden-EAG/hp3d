@@ -11,7 +11,7 @@
 !----------------------------------------------------------------------
 !
    module mem_alloc
-!  
+!
    use patch_info,        only: deallocate_patches
    use constraints_info,  only: deallocate_constr
    use pcg_info,          only: deallocate_macro_system
@@ -28,10 +28,10 @@
    write(*,*) 'mg_dealloc: deallocating patches, constraints and macro system'
    do igrid = 1,NRGRIDS
       call deallocate_constr(igrid)
-      call deallocate_patches(Igrid)   
+      call deallocate_patches(Igrid)
       call deallocate_macro_system(Igrid)
-   enddo   
-! 
+   enddo
+!
 !..release memory for the coarse grid
    write(*,*) 'mg_dealloc: deallocating coarse grid'
    call deallocate_coarse_grid
@@ -40,7 +40,7 @@
 !
 !
    subroutine deallocate_coarse_grid
-!   
+!
    use mumps
    use pardiso_data
    use mg_data_structure
@@ -59,17 +59,17 @@
       call mumps_destroy
    case(PARDISO_SOLVER)
       call finalize_pardiso
-   end select   
+   end select
 
 !
    do iel = 1, GRID(1)%nreles
       deallocate(CLOC(iel)%con)
-   enddo   
+   enddo
 !
    deallocate(CGRID_VERTICES)
    deallocate(GRID(1)%ptch)
    deallocate(CLOC)
-!   
+!
    end subroutine deallocate_coarse_grid
 !
 !

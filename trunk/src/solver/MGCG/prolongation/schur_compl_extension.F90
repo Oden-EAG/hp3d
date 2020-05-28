@@ -12,22 +12,22 @@
 !                             |        I        |
 !                         P = |                 |
 !                             |  -A22^(-1)*A21  |
-!                              --             --  
+!                              --             --
 !    arguments
 !           in
 !               Igrid   - grid index
-!                 Iel   - element identifier corresponding to 
+!                 Iel   - element identifier corresponding to
 !                         the natural ordering of elements
-!                  n1   - size of the solution vector  
+!                  n1   - size of the solution vector
 !                  z1   - coarse grid solution vector
 !          out
 !               the extension is stored in the module mg_data_structure
-!                  
+!
 !
 ! ----------------------------------------------------------------------
 !
-#include 'implicit_none.h'
-! 
+#include "typedefs.h"
+!
    subroutine schur_compl_extension(Igrid,z,n)
 
    use mg_data_structure,only: GRID
@@ -53,8 +53,8 @@
       enddo
 !  ...compute Schur complement extension
       call local_schur_compl_extension(Igrid,iel,ndof_m,GRID(Igrid)%loc(iel)%z)
-   enddo   
-! 
+   enddo
+!
 !..prolong the correction to the finest level
    do iel=1,GRID(Igrid+1)%nreles
       ndof_m = GRID(Igrid+1)%dloc(iel)%ndof ! macro dof
@@ -62,7 +62,7 @@
 !  ...apply the prolongation operator
       call coarse2macro(Igrid+1,iel,GRID(Igrid+1)%loc(iel)%z_c, &
                         ndof_c,GRID(Igrid+1)%loc(iel)%z,ndof_m)
-!      
+!
    enddo
 
    IPRINT_TIME = iprint_temp
@@ -83,27 +83,27 @@
 !                             |        I        |
 !                         P = |                 |
 !                             |  -A22^(-1)*A21  |
-!                              --             --  
+!                              --             --
 !    arguments
 !           in
 !               Igrid   - grid index
-!                 Iel   - element identifier corresponding to 
+!                 Iel   - element identifier corresponding to
 !                         the natural ordering of elements
-!                  n1   - size of the solution vector  
+!                  n1   - size of the solution vector
 !                  z1   - coarse grid solution vector
 !          out
 !               the extension is stored in the module mg_data_structure
-!                  
+!
 !
 ! ----------------------------------------------------------------------
 !
 !
-! 
+!
    subroutine local_schur_compl_extension(Igrid,Iel,n1,z1)
-! 
+!
    use mg_data_structure,  only: GRID
    use parameters,         only: ZERO, ZONE
-!  
+!
    implicit none
 !
 !-----------------------------------------------------------------------
@@ -119,15 +119,15 @@
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
-! 
+!
 
    n2 = GRID(igrid)%sch(Iel)%n2
 !
 !..check if there is anything to put in. Otherwise return
-   if (n2 .eq. 0) then 
+   if (n2 .eq. 0) then
 
       do ielm = 1, GRID(Igrid)%sch(Iel)%nrmdle
-!         
+!
 !     ...find the correct mdle number according to the natural order
          iel_index = GRID(Igrid)%sch(Iel)%GLOC(ielm)%iel
 
@@ -140,9 +140,9 @@
             i = GRID(Igrid)%sch(iel)%gloc(ielm)%lcon(k)
             if (i .lt. 0) then
                write(*,*) 'schur_complement_in: INCONSISTENCY'
-            else    
+            else
                Zsol(k) = z1(i)
-            endif   
+            endif
          enddo
 !
 !     ...store the solution in the solution arrays
@@ -151,7 +151,7 @@
       enddo
 !
       return
-!      
+!
    endif
 
    inz = GRID(Igrid)%sch(Iel)%inz
@@ -163,10 +163,10 @@
    allocate(IA(n2+1))
    IA = GRID(Igrid)%sch(iel)%IA
 
-   allocate(JA(inz)) 
+   allocate(JA(inz))
    JA = GRID(Igrid)%sch(iel)%JA
 
-   allocate(SA(inz)) 
+   allocate(SA(inz))
    SA = GRID(Igrid)%sch(iel)%SA
 
 
@@ -177,12 +177,12 @@
    call ZGEMV('N',n2,n1,-ZONE,GRID(Igrid)%sch(iel)%A21,n2,z1,1,ZERO,z2,1)
 #else
    call DGEMV('N',n2,n1,-ZONE,GRID(Igrid)%sch(iel)%A21,n2,z1,1,ZERO,z2,1)
-#endif   
-!  
+#endif
+!
 !..now restrict solutions z1 and z2 each element
 !
    do ielm = 1, GRID(Igrid)%sch(Iel)%nrmdle
-!      
+!
 !  ...find the correct mdle number according to the natural order
       iel_index = GRID(Igrid)%sch(iel)%gloc(ielm)%iel
       ndof_c = GRID(Igrid)%sch(iel)%gloc(ielm)%ndof_c
@@ -194,9 +194,9 @@
          if (i .lt. 0) then
             i = abs(i)
             Zsol(k) = z2(i)
-         else    
+         else
             Zsol(k) = z1(i)
-         endif   
+         endif
       enddo
 !
 !  ...store the solution in the solution arrays

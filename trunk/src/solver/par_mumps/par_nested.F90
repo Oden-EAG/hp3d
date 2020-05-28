@@ -1,5 +1,5 @@
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 ! -----------------------------------------------------------------------
 !
@@ -82,7 +82,7 @@ subroutine par_nested(mtype)
 !..dummy variables
    integer :: nvoid
    VTYPE   :: zvoid
-! 
+!
 !..workspace for celem
    integer, dimension(MAXNODM) :: nodm,ndofmH,ndofmE,ndofmV,ndofmQ
 !
@@ -341,10 +341,10 @@ subroutine par_nested(mtype)
       Mtime(1) = end_time-start_time
       if (RANK .eq. ROOT) write(*,1002) Mtime(1)
  1002 format(' STEP 1 finished: ',f12.5,'  seconds',/)
-   endif 
+   endif
 !
 ! ----------------------------------------------------------------------
-!  STEP 2 : ASSEMBLE AND STORE IN SPARSE FORM 
+!  STEP 2 : ASSEMBLE AND STORE IN SPARSE FORM
 ! ----------------------------------------------------------------------
 !
    call MPI_BARRIER(mumps_par%COMM, ierr)

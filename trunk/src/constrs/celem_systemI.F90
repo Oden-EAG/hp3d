@@ -50,7 +50,7 @@
 !                        matrix
 !
 !----------------------------------------------------------------------
-#include "implicit_none.h"
+#include "typedefs.h"
 subroutine celem_systemI(Iel,Mdle,Idec,                            &
                          Nrdofs,Nrdofm,Nrdofc,                     &
                          Nodm,NdofmH,NdofmE,NdofmV,NdofmQ,Nrnodm,  &
@@ -89,7 +89,7 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
    integer :: nrconH(MAXbrickH),nacH(NACDIM,MAXbrickH),  &
               nrconE(MAXbrickE),nacE(NACDIM,MAXbrickE),  &
               nrconV(MAXbrickV),nacV(NACDIM,MAXbrickV)
-   real*8  :: constrH(NACDIM,MAXbrickH),  &
+   real(8) :: constrH(NACDIM,MAXbrickH),  &
               constrE(NACDIM,MAXbrickE),  &
               constrV(NACDIM,MAXbrickV)
 !
@@ -106,7 +106,7 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
    integer :: nrdoflHi,nrdoflEi,nrdoflVi
 !
 #if DEBUG_MODE
-   integer :: ians,ibeg,iend,jbeg,jend,kbeg,kend 
+   integer :: ians,ibeg,iend,jbeg,jend,kbeg,kend
    integer :: iprint=0
 #endif
 !
@@ -231,7 +231,7 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
 !
       nrdofmHE  = nrdofmH   + nrdofmE
       nrdofmHEV = nrdofmHE  + nrdofmV
-      Nrdofm    = nrdofmHEV 
+      Nrdofm    = nrdofmHEV
 !
 #if DEBUG_MODE
       if (iprint .eq. 1) then
@@ -527,7 +527,7 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
        stop
      endif
    enddo
-#endif 
+#endif
 !
 !..perform static condensation of middle node dof
    call stc_fwd_wrapper(Iel,Mdle)

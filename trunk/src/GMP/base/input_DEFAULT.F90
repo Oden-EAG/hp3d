@@ -612,7 +612,7 @@ IF (.NOT. QUIET_MODE) write(*,*)''
       call connect
 !
 !
-    endsubroutine input_DEFAULT
+    end subroutine input_DEFAULT
 !
 !
 !
@@ -645,7 +645,7 @@ IF (.NOT. QUIET_MODE) write(*,*)''
 #include "syscom.blk"
 #include "cinout.blk"
 !
-      character*10 type
+      character(10) type
 !
 !-----------------------------------------------------------------------
 !
@@ -918,7 +918,7 @@ IF (.NOT. QUIET_MODE) write(*,*)''
 !
         case('QuaSEl')
 !
-!  .......read in and store the coordinates of the center of a 
+!  .......read in and store the coordinates of the center of a
 !         superellipse and powers
           allocate(CURVES(ic)%Rdata(NDIM+2))
           read(NWE,*) (CURVES(ic)%Rdata(k),k=1,NDIM+2)
@@ -1094,8 +1094,8 @@ IF (.NOT. QUIET_MODE) write(*,*)''
                     '       ...CURVES NUMBERS'
           end select
             write(NIN,30)(POINTS(i)%Idata(j),j=1,3), &
-                 '                   ...SURFACES THAT CONSTITUTE THE &
-                 POINT'
+                 '                   ...SURFACES THAT CONSTITUTE THE', &
+                 ' POINT'
           write(NIN,300)(POINTS(i)%Rdata(k),k=1,3), &
                  '          ...INITIAL APPROXIMATION POINT'
 !
@@ -1300,7 +1300,7 @@ IF (.NOT. QUIET_MODE) write(*,*)''
                     '                ...FIGURES NUMBERS'
             end select
             write(NIN,*)''
-            
+
         elseif(CURVES(i)%Type.eq.'QuaSEl')then
             write(NIN,*)-5,'                         ...TYPE OF CURVE',i
             write(NIN,*) (CURVES(i)%EndPoNo(j),j=1,2), &

@@ -1,11 +1,11 @@
 !-----------------------------------------------------------------------
 !> Purpose : parametric transfinite interpolation for pyramid
-!!      
+!!
 !! @param[in]  No     - a GMP pyramid number
 !! @param[in]  Eta    - reference coordinates
 !! @param[out] X      - physical coordinates
 !! @param[out] Dxdeta - derivatives
-!!      
+!!
 !! @revision Mar 11
 !-----------------------------------------------------------------------
 !
@@ -14,13 +14,13 @@ subroutine pyram_PTI(No,Eta, Xp,Dxdeta)
       use control
       use GMP
       use element_data
-!      
+!
 #include"syscom.blk"
 !-----------------------------------------------------------------------
 !
       dimension Eta(3),Xp(3),Dxdeta(3,3)
 !
-!  ...pyramid element order and shape functions      
+!  ...pyramid element order and shape functions
       dimension norder(14),shapH(5),dshapH(3,5)
 !
 !  ...blending functions
@@ -29,7 +29,7 @@ subroutine pyram_PTI(No,Eta, Xp,Dxdeta)
 !  ...projections
       dimension dtedeta(3),tf(2),dtfdeta(2,3)
 !
-!  ...edge kernels 
+!  ...edge kernels
       dimension xe(3),dxedt(3)
 !
 !  ...face kernels
@@ -50,7 +50,7 @@ subroutine pyram_PTI(No,Eta, Xp,Dxdeta)
       endif
 !
       x = Eta(1); y = Eta(2); z = Eta(3)
-      if (abs(z-1.d0).lt.1.d-12) z = 1.d0-1.d-12 
+      if (abs(z-1.d0).lt.1.d-12) z = 1.d0-1.d-12
       xz1 = 1.d0-x-z
       yz1 = 1.d0-y-z
       z1 = 1.d0-z
@@ -60,11 +60,11 @@ subroutine pyram_PTI(No,Eta, Xp,Dxdeta)
       call shapeHd(Eta,norder,nvoid,nvoid, nrdofH,shapH,dshapH)
 !
 !-----------------------------------------------------------------------
-!     V E R T E X    C O N T R I B U T I O N S 
+!     V E R T E X    C O N T R I B U T I O N S
 !-----------------------------------------------------------------------
 !
       Xp(1:3) = 0.d0; Dxdeta(1:3,1:3) = 0.d0
-!  ...loop over vertices      
+!  ...loop over vertices
       do iv=1,5
         np = PYRAMIDS(No)%VertNo(iv)
         Xp(1:3) = Xp(1:3) + POINTS(np)%Rdata(1:3)*shapH(iv)
@@ -72,7 +72,7 @@ subroutine pyram_PTI(No,Eta, Xp,Dxdeta)
           Dxdeta(ivar,1:3) = Dxdeta(ivar,1:3)                    &
                         + POINTS(np)%Rdata(ivar)*dshapH(1:3,iv)
         enddo
-!  ...loop over vertices        
+!  ...loop over vertices
       enddo
 !
 !  ...printing
@@ -109,7 +109,7 @@ subroutine pyram_PTI(No,Eta, Xp,Dxdeta)
         select case(ie)
         case(1,2,3,4)
           call curveB(nc,te,norient, xe,dxedt)
-        case(5,6,7,8)        
+        case(5,6,7,8)
           call curveK(nc,te,norient, xe,dxedt)
         endselect
 !
@@ -141,7 +141,7 @@ subroutine pyram_PTI(No,Eta, Xp,Dxdeta)
           dblend(1:2) = DshapH(1:2,iv)*z
           dblend(3) = DshapH(3,iv)*z + ShapH(iv)
         end select
-! ......this is needed for face contributions...       
+! ......this is needed for face contributions...
         if (ie.le.4) then
           blend_edge(ie) = blend
           dblend_edge(1:3,ie) = dblend(1:3)
@@ -157,7 +157,7 @@ subroutine pyram_PTI(No,Eta, Xp,Dxdeta)
 !
 !  ...loop over edges
       enddo
-!      
+!
       if (iprint.eq.1) then
         write(*,*) 'pyram_TI: AFTER EDGES = '
         do ivar=1,3
@@ -172,7 +172,7 @@ subroutine pyram_PTI(No,Eta, Xp,Dxdeta)
 !  ...bottom face number
       ifig=1
       call decode(PYRAMIDS(No)%FigNo(ifig), nr,norient)
-!  ...skip if face contributions is not needed     
+!  ...skip if face contributions is not needed
       if (RECTANGLES(nr)%Type.eq.'BilQua') goto 20
       if (RECTANGLES(nr)%Type.eq.'TraQua') goto 20
 !!!          (RECTANGLES(nr)%Type .eq. 'PTIRec')) go to 20
@@ -204,7 +204,7 @@ subroutine pyram_PTI(No,Eta, Xp,Dxdeta)
       if (iprint.eq.1) then
         write(*,*)'pyram_PTI: ADDED BOTTOM FACE CONTRIBUTION'
       endif
-!      
+!
  20   continue
 !
 !-----------------------------------------------------------------------
@@ -213,9 +213,9 @@ subroutine pyram_PTI(No,Eta, Xp,Dxdeta)
 !
 !  ...loop over lateral faces
       do ifig=2,5
-!      
+!
         call decode(PYRAMIDS(No)%FigNo(ifig), nt,norient)
-!  .....skip if face contribution is not needed        
+!  .....skip if face contribution is not needed
         if (TRIANGLES(nt)%Type.eq.'TransTri') cycle
         if (TRIANGLES(nt)%Type.eq.'PlaneTri') cycle
 !
@@ -252,8 +252,8 @@ subroutine pyram_PTI(No,Eta, Xp,Dxdeta)
           write(*,7015)ie
  7015     format(' pyram_PTI: ADDED CONTRIBUTIONS FOR LATERAL FACE ',i1)
         endif
-!        
-!  ...loop over lateral faces        
+!
+!  ...loop over lateral faces
       enddo
 !
 !

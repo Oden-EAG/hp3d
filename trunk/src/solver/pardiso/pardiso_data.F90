@@ -1,5 +1,5 @@
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 !----------------------------------------------------------------------
 !
@@ -15,19 +15,19 @@
 !
       module pardiso_data
 !
-!  ...problem workspace   
+!  ...problem workspace
       integer                 :: PRDS_N,PRDS_NZ,PRDS_NRHS
       integer,    allocatable :: PRDS_IA(:), PRDS_JA(:)
       VTYPE,      allocatable :: PRDS_A(:),PRDS_RHS(:),PRDS_XSOL(:)
 !
 !  ...pardiso workspace
 !  ...internal solver memory pointer for 64-bit architectures
-      integer*8               :: PRDS_PT(64)
+      integer(8)              :: PRDS_PT(64)
       integer                 :: PRDS_IPARM(64)
       integer                 :: PRDS_MTYPE, PRDS_MAXFCT, PRDS_MNUM
       integer                 :: PRDS_PHASE, PRDS_ERROR, PRDS_MSGLVL
       integer, allocatable    :: PRDS_PERM(:)
-      character*1             :: PRDS_TYPE
+      character(1)            :: PRDS_TYPE
 !
       contains
 !
@@ -37,31 +37,31 @@
 !
       implicit none
 !
-#if C_MODE    
+#if C_MODE
       select case(PRDS_TYPE)
-      case('S')  
+      case('S')
          PRDS_MTYPE   = 6  ! complex symmetric
-      case('H')  
+      case('H')
          PRDS_MTYPE   = 4  ! complex hermitian positive definite
-      case('I')  
+      case('I')
          PRDS_MTYPE   = -4 ! complex hermitian indefinite
       case default
          PRDS_MTYPE   = 13  ! complex non-symmetric
       end select
-#else 
+#else
       select case(PRDS_TYPE)
-      case('S')  
+      case('S')
          PRDS_MTYPE   = -2  ! real symmetric indefinite
-      case('H')  
+      case('H')
          PRDS_MTYPE   = 2  ! real symmetric positive definite
-      case default  
+      case default
          PRDS_MTYPE   = 11  ! real non-symmetric
-      end select   
+      end select
 #endif
       PRDS_IPARM(8) = 0
 !
       call pardisoinit(PRDS_PT, PRDS_MTYPE, PRDS_IPARM)
-!   
+!
       PRDS_MNUM    = 1
       PRDS_MAXFCT  = 1
       PRDS_MSGLVL  = 0       ! with statistical no information
@@ -69,7 +69,7 @@
       end subroutine start_pardiso
 !
 !----------------------------------------------------------------------
-!      
+!
       subroutine finalize_pardiso
 !
       implicit none

@@ -1,7 +1,7 @@
 
 C THIS ROUTINE IS STILL INCOMPLETE. IT WILL EVENTUALLY SUBSTITUTE THE
-C CURRENT VERSION OF NODMOD. 
-C THE PURPOSE OF THIS UPDATED VERSION IS TO UPDATE CORRECTLY THE DOFS 
+C CURRENT VERSION OF NODMOD.
+C THE PURPOSE OF THIS UPDATED VERSION IS TO UPDATE CORRECTLY THE DOFS
 C IN THE DATASTRUCTURE AFTER A NODE IS P-REFINED
 
 
@@ -61,7 +61,7 @@ c  ...save current gdofs in local array and update number of gdofs
         xnod(1:NDIMEN,1:ndofH) = NODES(Nod)%coord(1:NDIMEN,1:ndofH)
         deallocate(NODES(Nod)%coord)
       endif
-c      
+c
 c  ...save current dof in local arrays
       if (Associated(NODES(Nod)%zdofH)) then
         nvar = NREQNH(icase)*NRCOMS
@@ -94,7 +94,7 @@ c  ...save number of dof corresponding to the old order
       ndofVo = ndofV
       ndofQo = ndofQ
 c
-c  ...modify the order of approximation 
+c  ...modify the order of approximation
       NODES(Nod)%order = Nordn
 c
 c  ...calculate the new number of dof for the node
@@ -195,7 +195,7 @@ c  ...quad, prism
         case('mdlp')
           ndofGhn = (nordhn-2)*(nordhn-1)/2
           ndofGho = (nordho-2)*(nordho-1)/2
-        end select 
+        end select
         ndofGh = min(ndofGhn,ndofGho)
         ndofGv = min(nordvo-1,nordvn-1)
         ibegn=0; ibego=0
@@ -279,7 +279,7 @@ c  ...quad, prism
         case('mdlp')
           ndofHhn = (nordhn-2)*(nordhn-1)/2
           ndofHho = (nordho-2)*(nordho-1)/2
-        end select 
+        end select
         ndofHh = min(ndofHhn,ndofHho)
         ndofHv = min(nordvo-1,nordvn-1)
         ibegn=0; ibego=0
@@ -353,10 +353,10 @@ c
       case('mdlt')
       end select
 c
-c    
-      end subroutine 
-        
-    
+c
+      end subroutine
+
+
 
 
 
@@ -461,7 +461,7 @@ c
 
 
 
- 
+
 
 
 

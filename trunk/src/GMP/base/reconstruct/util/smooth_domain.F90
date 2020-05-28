@@ -8,15 +8,15 @@
 !
 subroutine smooth_domain(Ndom)
   use GMP
-  implicit none  
+  implicit none
   integer,intent(in) :: Ndom
-!  
+!
 ! workspaces
   integer,dimension(NRPOINT)   :: work_pt
   integer,dimension(NRCURVE)   :: work_cu
   integer,dimension(NRTRIAN,3) :: work_tr
 ! other local variables
-  real*8,dimension(3) :: rdata_save
+  real(8),dimension(3) :: rdata_save
   integer :: i,j,k,np,nc,nt,nick,nb,or,iflag,lab,ie,ifig,is,ns,iprint,jflag, &
              ntet,npyr,npri,nflag,nr
 !
@@ -29,10 +29,10 @@ subroutine smooth_domain(Ndom)
   endif
 !
 !----------------------------------------------------------------------------
-! STEP 1 : record point, curve, triangle types pertaining to reconstructed 
+! STEP 1 : record point, curve, triangle types pertaining to reconstructed
 !          geometry. Reset all of those types to linear geometry.
 !
-! P O I N T S       : 0 - Regular ; 1 - CoorNrm ; 2 - SharpPt  
+! P O I N T S       : 0 - Regular ; 1 - CoorNrm ; 2 - SharpPt
   work_pt = 0
   do i=1,NRPOINT
     select case(POINTS(i)%Type)
@@ -48,12 +48,12 @@ subroutine smooth_domain(Ndom)
     case('HermCur') ; work_cu(i)=1 ; CURVES(i)%Type='Seglin'
     endselect
   enddo
-!  
+!
 ! T R I A N G L E S : 1 - G1RecTri
   work_tr = 0
   do i=1,NRTRIAN
     select case(TRIANGLES(i)%Type)
-    case('G1RecTri') 
+    case('G1RecTri')
       work_tr(i,1)=1 ; work_tr(i,2:3)=TRIANGLES(i)%BlockNo(1:2)
       TRIANGLES(i)%Type   ='PlaneTri'
       TRIANGLES(i)%BlockNo=0
@@ -73,28 +73,28 @@ subroutine smooth_domain(Ndom)
       call decode(nick, nt,or)
       if (.not.associated(TRIANGLES(nt)%Idata)) cycle
       ns=TRIANGLES(nt)%Idata(1)
-!     if triangle is on reconstructed surface 
+!     if triangle is on reconstructed surface
       if (SURFACES(ns)%Type.eq.'RecSurf') then
 !
 !  .....update face............................................................
         TRIANGLES(nt)%Type='G1RecTri'
         work_tr(nt,1)=1 ; work_tr(nt,2:3)=TRIANGLES(nt)%BlockNo(1:2)
         TRIANGLES(nt)%BlockNo(1:2)=0 ; jflag=0
-!       loop over adjacent blocks        
+!       loop over adjacent blocks
         do k=2,3
           call decode(work_tr(nt,k), nb,lab)
           if (lab.ne.3) cycle
           if (TETRAS(nb)%Domain.eq.Ndom) then
             jflag=k ; exit
-          endif                  
+          endif
         enddo
         if (jflag.eq.0) then
           write(*,*)'smooth_domain: neighboring block not found!'
           stop
         endif
         TRIANGLES(nt)%BlockNo(1)=work_tr(nt,jflag)
-!        
-!  .....update vertices........................................................        
+!
+!  .....update vertices........................................................
         do k=1,3
           np = TRIANGLES(nt)%VertNo(k)
 !         if vertex has already been visited, cycle
@@ -112,8 +112,8 @@ subroutine smooth_domain(Ndom)
           endif
           POINTS(np)%Rdata(1:3) = rdata_save(1:3)
         enddo
-!        
-!  .....update edges...........................................................        
+!
+!  .....update edges...........................................................
         do k=1,3
           nc=iabs(TRIANGLES(nt)%EdgeNo(k))
           CURVES(nc)%Type='HermCur'
@@ -145,16 +145,16 @@ subroutine smooth_domain(Ndom)
 !
   do i=1,NRCURVE
     select case(work_cu(i))
-    case(1) 
+    case(1)
       if(CURVES(i)%Type.eq.'5Bezier') cycle
       if(CURVES(i)%Type.eq.'7Bezier') cycle
       CURVES(i)%Type='HermCur'
     endselect
   enddo
-!  
+!
   do i=1,NRTRIAN
     select case(work_tr(i,1))
-    case(1) 
+    case(1)
       TRIANGLES(i)%Type         ='G1RecTri'
       TRIANGLES(i)%BlockNo(1:2) = work_tr(i,2:3)
     endselect
@@ -162,7 +162,7 @@ subroutine smooth_domain(Ndom)
 !
 !----------------------------------------------------------------------------
 ! STEP 5: redefine curvilinear triangles and rectangles
-!       
+!
   do i=1,NRTRIAN
     if (TRIANGLES(i)%Type.eq.'PlaneTri') then
       iflag=0
@@ -187,7 +187,7 @@ subroutine smooth_domain(Ndom)
 !
 !----------------------------------------------------------------------
 ! STEP 6: redefine curvilinear tets, prisms and pyramids
-!       
+!
   do ntet=1,NRTETRA
     nflag=0
     do ie=1,6
@@ -205,7 +205,7 @@ subroutine smooth_domain(Ndom)
       endif
       TETRAS(ntet)%Type = 'TraTet'
     endif
-  enddo  
+  enddo
 !
   do npri=1,NRPRISM
     nflag=0
@@ -229,7 +229,7 @@ subroutine smooth_domain(Ndom)
       endif
       PRISMS(npri)%Type = 'TIprism'
     endif
-  enddo  
+  enddo
 !
   do npyr=1,NRPYRAM
     nflag=0
@@ -253,7 +253,7 @@ subroutine smooth_domain(Ndom)
       endif
       PYRAMIDS(npyr)%Type = 'TIpyram'
     endif
-  enddo  
+  enddo
 !
 !
-endsubroutine smooth_domain
+end subroutine smooth_domain

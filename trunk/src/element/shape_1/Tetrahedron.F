@@ -54,7 +54,6 @@ c
       double precision :: DphiTri(3,2:Nsize(1)-1,1:Nsize(1)-2)
       double precision :: homLbet(3:Nsize(1)-1,1:Nsize(1)-3)
       double precision :: DhomLbet(3,3:Nsize(1)-1,1:Nsize(1)-3)
-      double precision :: templam(0:1),tempDlam(3,0:1)
 c
 c  ...debugging flag
       iprint=0
@@ -257,7 +256,7 @@ c          CurlE        - cur lof the shape functions
 c
 c-----------------------------------------------------------------------
 c
-      subroutine shape3DETet(X,Nord,NoriE,NoriF,Nsize, 
+      subroutine shape3DETet(X,Nord,NoriE,NoriF,Nsize,
      .                                              NrdofE,ShapE,CurlE)
 c
       implicit none
@@ -509,7 +508,7 @@ c
       integer :: i,j,k,nij,nijk,m,f,N,nordF,ndofF
       integer :: minI,minJ,minK,minIJ,minIJK,maxI,maxJ,maxK,maxIJ,maxIJK
       integer :: nordB,ndofB,iprint,minbeta,famctr,fam,abc(3),abcd(4),d
-      logical :: IdecE,IdecF,IdecB(2)
+      logical :: IdecF,IdecB(2)
       double precision, intent(in)  :: X(3)
       double precision, intent(out) :: ShapV(3,Nsize(2))
       double precision, intent(out) :: DivV(Nsize(2))

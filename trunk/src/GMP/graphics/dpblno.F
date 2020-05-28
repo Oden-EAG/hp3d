@@ -15,7 +15,7 @@ c   usage              - call dpblno
 c
 c   arguments          - none
 c
-c   required  routines - 
+c   required  routines -
 c
 c----------------------------------------------------------------------
 c
@@ -28,7 +28,7 @@ c
 c
       dimension xcoord(3,8), dxdxi(3,2)
       dimension xav(3),xavob(3), xi(2)
-      character*3 text
+      character(3) text
 c
 c  ...set colour
       ncol=npcol(2)
@@ -55,7 +55,7 @@ c  .....get the bases, next edges and then the vertices
               if (nc.gt.0) then
                 np = CURVES(nc)% EndPoNo(1)
               else
-                np = CURVES(-nc)% EndPoNo(2) 
+                np = CURVES(-nc)% EndPoNo(2)
               endif
               iv=iv+1
               call pointr(np, xcoord(1,iv))
@@ -92,7 +92,7 @@ c  .....transform to observer's system
 c
 c  .....rescale
         do 95 ivar=1,2
-          XY(ivar,1) = (xavob(ivar)-XCIM(ivar))/DIMIM*SIZE 
+          XY(ivar,1) = (xavob(ivar)-XCIM(ivar))/DIMIM*SIZE
      .                 + XCWIN(ivar)
    95   continue
 c
@@ -145,7 +145,7 @@ c  .....transform
 c
 c  .....rescale
         do 195 ivar=1,2
-          XY(ivar,1) = (xavob(ivar)-XCIM(ivar))/DIMIM*SIZE 
+          XY(ivar,1) = (xavob(ivar)-XCIM(ivar))/DIMIM*SIZE
      .                 + XCWIN(ivar)
   195     continue
 c

@@ -6,7 +6,7 @@ c---------------------------------------------------------------------
 c
 c   latest revision    - May 10
 c
-c   purpose            - activate and initialize the dofs 
+c   purpose            - activate and initialize the dofs
 c
 c   arguments :
 c
@@ -70,8 +70,8 @@ c  ...allocate dofs
 c  ...set active flag on
       NODES(Nod)%act = 1
 c
-      if (iprint.ge.1) then 
+      if (iprint.ge.1) then
         write(*,*) 'activate : HAS ACTIVATED', Nod
       endif
-c     
-      end subroutine 
+c
+      end subroutine

@@ -1,5 +1,5 @@
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 !-------------------------------------------------------------------
 !  subroutine: get_L2NormCOMS
@@ -127,25 +127,25 @@ subroutine get_elem_L2NormCOMS(mdle,Flag,No1,No2, FieldNormQ)
 !
    integer, dimension(NR_PHYSA),intent(in ) :: Flag
    integer,                     intent(in ) :: mdle,No1,No2
-   real*8,                      intent(out) :: FieldNormQ
+   real(8),                     intent(out) :: FieldNormQ
 !
 !..node case (decimal form)
    integer,dimension(NR_PHYSA) :: icased
 !
 !..element, face order, geometry dof
-   integer,dimension(19)          :: norder
-   real*8 ,dimension(3,MAXbrickH) :: xnod
-   integer,dimension(12)          :: nedge_orient
-   integer,dimension(6)           :: nface_orient
+   integer,dimension(19)           :: norder
+   real(8) ,dimension(3,MAXbrickH) :: xnod
+   integer,dimension(12)           :: nedge_orient
+   integer,dimension(6)            :: nface_orient
 !
 !..geometry
-   real*8,dimension(3)   :: xi,x
-   real*8,dimension(3,3) :: dxidx,dxdxi
-   real*8                :: rjac
+   real(8),dimension(3)   :: xi,x
+   real(8),dimension(3,3) :: dxidx,dxdxi
+   real(8)                :: rjac
 !
 !..3D quadrature data
-   real*8,dimension(3,MAX_NINT3) :: xiloc
-   real*8,dimension(  MAX_NINT3) :: wxi
+   real(8),dimension(3,MAX_NINT3) :: xiloc
+   real(8),dimension(  MAX_NINT3) :: wxi
 !
 !..approximate solution dof's
    VTYPE, dimension(MAXEQNH,MAXbrickH) :: zdofH
@@ -164,7 +164,7 @@ subroutine get_elem_L2NormCOMS(mdle,Flag,No1,No2, FieldNormQ)
 !
 !..miscellanea
    integer :: nint,icase,iattr,l,i,j,ibeg,iflag,iload,icomp,ndom,ivar,nflag
-   real*8  :: weight,wa
+   real(8) :: weight,wa
 !
 !---------------------------------------------------------------------------------------
 !
@@ -284,8 +284,8 @@ subroutine get_Norm(Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
 !
    implicit none
 !
-   integer, intent(in) :: Flag(NR_PHYSA)
-   integer, intent(in) :: No
+   integer, intent(in)  :: Flag(NR_PHYSA)
+   integer, intent(in)  :: No
 !
    real(8), intent(out) :: FieldNormH,FieldNormE,FieldNormV,FieldNormQ
 !
@@ -407,25 +407,25 @@ subroutine get_elem_Norm(Mdle,Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNor
 !
    integer, intent(in)  :: Flag(NR_PHYSA)
    integer, intent(in)  :: Mdle,No
-   real*8,  intent(out) :: FieldNormH,FieldNormE,FieldNormV,FieldNormQ
+   real(8), intent(out) :: FieldNormH,FieldNormE,FieldNormV,FieldNormQ
 !
 !..node case (decimal form)
    integer :: icased(NR_PHYSA)
 !
 !..element, face order, geometry dof
    integer :: norder(19)
-   real*8  :: xnod(3,MAXbrickH)
+   real(8) :: xnod(3,MAXbrickH)
    integer :: nedge_orient(12)
    integer :: nface_orient(6)
 !
 !..geometry
-   real*8,dimension(3)   :: xi,x
-   real*8,dimension(3,3) :: dxidx,dxdxi
-   real*8                :: rjac
+   real(8), dimension(3)   :: xi,x
+   real(8), dimension(3,3) :: dxidx,dxdxi
+   real(8)                 :: rjac
 !
 !..3D quadrature data
-   real*8 :: xiloc(3,MAX_NINT3)
-   real*8 :: wxi(MAX_NINT3)
+   real(8) :: xiloc(3,MAX_NINT3)
+   real(8) :: wxi(MAX_NINT3)
 !
 !..approximate solution dof's
    VTYPE :: zdofH(MAXEQNH,MAXbrickH)
@@ -444,7 +444,7 @@ subroutine get_elem_Norm(Mdle,Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNor
 !
 !..miscellanea
    integer :: nint,icase,iattr,l,i,j,ibeg,iflag,iload,icomp,ndom,ivar,nflag
-   real*8  :: weight,wa
+   real(8) :: weight,wa
 !
 !---------------------------------------------------------------------------------------
 !
@@ -711,14 +711,14 @@ end subroutine get_elem_Norm
 !      integer, intent(in)                         :: mdle
 !      integer, intent(in)                         :: fld_flag
 !      integer, intent(in)                         :: facenumber
-!      real*8,  intent(in)                         :: zpoint
-!      real*8,  intent(out)                        :: faceNorm,face_diff_norm
+!      real(8),  intent(in)                        :: zpoint
+!      real(8),  intent(out)                       :: faceNorm,face_diff_norm
 !!
 !!     element, face order, geometry dof
-!      integer,dimension(19)          :: norder
-!      real*8 ,dimension(3,MAXbrickH) :: xnod
-!      integer,dimension(12)          :: nedge_orient
-!      integer,dimension(6)           :: nface_orient
+!      integer,dimension(19)           :: norder
+!      real(8) ,dimension(3,MAXbrickH) :: xnod
+!      integer,dimension(12)           :: nedge_orient
+!      integer,dimension(6)            :: nface_orient
 !! ...face order
 !      integer, dimension(5)     :: norderf
 !! .... number of vertices,edge,faces per element type
@@ -728,15 +728,15 @@ end subroutine get_elem_Norm
 !!
 !!     geometry
 !! ... variables for geometry
-!      real*8, dimension(3)      :: xi,x,rn,x_new
-!      real*8, dimension(3,2)    :: dxidt,dxdt,rt
-!      real*8, dimension(3,3)    :: dxdxi,dxidx
-!      real*8, dimension(2)      :: t
-!      real*8                    :: rjac,bjac
+!      real(8), dimension(3)      :: xi,x,rn,x_new
+!      real(8), dimension(3,2)    :: dxidt,dxdt,rt
+!      real(8), dimension(3,3)    :: dxdxi,dxidx
+!      real(8), dimension(2)      :: t
+!      real(8)                    :: rjac,bjac
 !!
 !!     2D quadrature data
-!      real*8, dimension(2,MAXNINT2ADD)  :: tloc
-!      real*8, dimension(MAXNINT2ADD)    :: wtloc
+!      real(8), dimension(2,MAXNINT2ADD)  :: tloc
+!      real(8), dimension(MAXNINT2ADD)    :: wtloc
 !!
 !!     approximate solution dof's
 !      VTYPE, dimension(MAXEQNH,MAXbrickH) :: zdofH
@@ -745,8 +745,8 @@ end subroutine get_elem_Norm
 !      VTYPE, dimension(MAXEQNQ,MAXbrickQ) :: zdofQ
 !! ...H1 shape functions
 !      integer                         :: nrdofH
-!      real*8, dimension(MAXbrickH)    :: shapH
-!      real*8, dimension(3,MAXbrickH)  :: gradH
+!      real(8), dimension(MAXbrickH)   :: shapH
+!      real(8), dimension(3,MAXbrickH) :: gradH
 !!
 !!     approximate solution
 !      VTYPE, dimension(  MAXEQNH  )   ::  zsolH
@@ -775,7 +775,7 @@ end subroutine get_elem_Norm
 !!
 !!     miscellanea
 !      integer :: nint,icase,iattr,l,i,j
-!      real*8  :: weight,wa
+!      real(8) :: weight,wa
 !      integer :: iel,nsign
 !      integer :: nflag,iload
 !!
@@ -814,8 +814,8 @@ end subroutine get_elem_Norm
 !        call face_param(etype,facenumber,t, xi,dxidt)
 !!
 !! .......determine element H1 shape functions (for geometry)
-!        call shape3H(etype,xi,norder,nedge_orient,nface_orient, &
-!                     nrdofH,shapH,gradH)
+!        call shape3DH(etype,xi,norder,nedge_orient,nface_orient, &
+!                      nrdofH,shapH,gradH)
 !!
 !! .......geometry
 !        call bgeom3D(mdle,xi,xnod,shapH,gradH,nrdofH,dxidt,nsign, &
@@ -883,15 +883,15 @@ end subroutine get_elem_Norm
 !      use data_structure3D
 !      implicit none
 !
-!      integer, intent(in)                         :: Num_zpts
-!      real*8, dimension(Num_zpts), intent(in)  :: zValues
-!      integer, intent(in)                         :: fld_flag
-!      real*8, dimension(Num_zpts), intent(out) :: norm,diff_norm
-!      real*8 :: faceNorm, face_diff_norm, elemNorm
+!      integer, intent(in)                       :: Num_zpts
+!      real(8), dimension(Num_zpts), intent(in)  :: zValues
+!      integer, intent(in)                       :: fld_flag
+!      real(8), dimension(Num_zpts), intent(out) :: norm,diff_norm
+!      real(8) :: faceNorm, face_diff_norm, elemNorm
 !! .... Mdle number
-!      integer                        :: mdle
-!!     element, face order, geometry dof
-!      real*8 ,dimension(3,MAXbrickH) :: xnod
+!      integer :: mdle
+!! .... element, face order, geometry dof
+!      real(8), dimension(3,MAXbrickH) :: xnod
 !! .... number of vertices,edge,faces per element type
 !      integer :: nrv, nre, nrf
 !!
@@ -938,13 +938,13 @@ end subroutine get_elem_Norm
 !  use commonParam
 !  use laserParam
 !  implicit none
-!  integer                           :: fld_flag
-!  real*8, allocatable, dimension(:) :: zValues
-!  real*8, allocatable, dimension(:) :: face_norm
-!  real*8, allocatable, dimension(:) :: diff_face_norm
-!  integer              :: zlength,numPts
-!  real*8 a,b
-!  integer i
+!  integer                            :: fld_flag
+!  real(8), allocatable, dimension(:) :: zValues
+!  real(8), allocatable, dimension(:) :: face_norm
+!  real(8), allocatable, dimension(:) :: diff_face_norm
+!  integer :: zlength,numPts
+!  real(8) :: a,b
+!  integer :: i
 !  a = 0.05d0 ! Initial value
 !  b = 0.005d0
 !  numPts = 200

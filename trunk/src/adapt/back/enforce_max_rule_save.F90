@@ -64,7 +64,7 @@
               NODES(nod)%visit = max(nordh*10+nordv, NODES(nod)%order)
             end select
           endif
-        enddo 
+        enddo
       enddo
 !
 !  ...second loop through element in the current mesh
@@ -152,11 +152,11 @@
               call decode(norder(nre+jf), nordhl,nordvl)
               select case(norientl(nrv+nre+jf))
               case(0,2,5,7)
-                nordh = max(nordh,nordhl); nordv = max(nordv,nordvl) 
+                nordh = max(nordh,nordhl); nordv = max(nordv,nordvl)
               case(1,3,4,6)
                 nordh = max(nordh,nordvl); nordv = max(nordv,nordhl)
               end select
-              NODES(nod)%visit = nordh*10+nordv 
+              NODES(nod)%visit = nordh*10+nordv
             end select
           enddo
         end select

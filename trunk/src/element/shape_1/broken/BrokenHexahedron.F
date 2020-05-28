@@ -289,7 +289,7 @@ c
       double precision :: shapH3(Nsize(1)+1),dshapH3(Nsize(1)+1)
       double precision :: shapQ1(Nsize(1))
       double precision :: shapQ2(Nsize(1))
-      double precision :: shapQ3(Nsize(1)) 
+      double precision :: shapQ3(Nsize(1))
 c
 c  ...Option 1: Simply call the usual shape functions with enrichment
 c      noriF(1:6)=0

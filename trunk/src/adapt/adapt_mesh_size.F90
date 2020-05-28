@@ -2,7 +2,7 @@
 !> Purpose : routine employs the greedy strategy to performe adaptive
 !!           h-refinements
 !!
-!> @param[in] Idom  - target domain, if 0, exmaine all elements 
+!> @param[in] Idom  - target domain, if 0, exmaine all elements
 !> @param[in] H     - control element size
 !> rev@Dec 13
 !-----------------------------------------------------------------------
@@ -10,16 +10,16 @@ subroutine adapt_mesh_size(Idom,Hmax)
   use data_structure3D, only : NRELES
   implicit none
   integer, intent(in) :: Idom
-  real*8 , intent(in) :: Hmax
+  real(8), intent(in) :: Hmax
   !
   integer, allocatable :: nlist(:)
   integer :: mdle, iel, ic, istat, kref, ndom, nelts_prev
-  real*8 :: h
+  real(8) :: h
   !
   ic = 1;
   do while (ic > 0)
      allocate(nlist(NRELES), STAT=istat)
-     if (istat.ne.0) then 
+     if (istat.ne.0) then
         write(*,*) 'adapt_mesh_size: allocation error', istat
         stop 1
      end if
@@ -36,7 +36,7 @@ subroutine adapt_mesh_size(Idom,Hmax)
            end if
         end if
      enddo
-     ! 
+     !
      nelts_prev = NRELES
      do iel=1,ic
         mdle = nlist(iel)
@@ -50,7 +50,7 @@ subroutine adapt_mesh_size(Idom,Hmax)
      write(*,*) 'Please update geometry and dirichlet boundary contidions'
      !
      deallocate(nlist, STAT=istat)
-     if (istat.ne.0) then 
+     if (istat.ne.0) then
         write(*,*) 'adapt_mesh_size: deallocation error', istat
         stop 1
      end if

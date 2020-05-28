@@ -14,7 +14,7 @@
 
    use mg_data_structure, only: GRID
 !
-! 
+!
    CONTAINS
 !
 !---------------------------------------------------------------------------------
@@ -24,7 +24,7 @@
 !
    use assembly_sc, only : NRDOF_TOT
    implicit none
-!   
+!
    integer, intent(in) :: Igrid
    integer :: iel, mdle, ndofb, nrdofb, nreles
    integer :: nrnod_macro, nrdofH_macro, nrdofE_macro, nrdofV_macro
@@ -34,7 +34,7 @@
    nreles = GRID(Igrid)%nreles
    allocate(GRID(Igrid)%constr(nreles))
    allocate(GRID(Igrid)%macro_elem(nreles))
-!   
+!
    nrdofb = 0
 !
 !$omp parallel default(shared)  &
@@ -52,7 +52,7 @@
       allocate(GRID(Igrid)%macro_elem(iel)%ndofH_macro(nrnod_macro))
       allocate(GRID(Igrid)%macro_elem(iel)%ndofE_macro(nrnod_macro))
       allocate(GRID(Igrid)%macro_elem(iel)%ndofV_macro(nrnod_macro))
-!      
+!
       call macro_elem_info(Igrid,mdle,                                      &
                            GRID(Igrid)%macro_elem(iel)%ndof_macro, ndofb ,  &
                            GRID(Igrid)%macro_elem(iel)%nrnod_macro,         &
@@ -62,19 +62,19 @@
                            GRID(Igrid)%macro_elem(iel)%ndofV_macro)
 !
       nrdofb = nrdofb + ndofb
-!      
+!
       GRID(Igrid)%constr(iel)%nrnod_macro = nrnod_macro
       GRID(Igrid)%constr(iel)%nrdofH_macro = nrdofH_macro
       GRID(Igrid)%constr(iel)%nrdofE_macro = nrdofE_macro
       GRID(Igrid)%constr(iel)%nrdofV_macro = nrdofV_macro
-      allocate(GRID(Igrid)%constr(iel)%nod_macro(nrnod_macro))   
-      allocate(GRID(Igrid)%constr(iel)%ndofH_macro(nrnod_macro)) 
-      allocate(GRID(Igrid)%constr(iel)%ndofE_macro(nrnod_macro)) 
-      allocate(GRID(Igrid)%constr(iel)%ndofV_macro(nrnod_macro)) 
-!      
+      allocate(GRID(Igrid)%constr(iel)%nod_macro(nrnod_macro))
+      allocate(GRID(Igrid)%constr(iel)%ndofH_macro(nrnod_macro))
+      allocate(GRID(Igrid)%constr(iel)%ndofE_macro(nrnod_macro))
+      allocate(GRID(Igrid)%constr(iel)%ndofV_macro(nrnod_macro))
+!
       GRID(Igrid)%constr(iel)%nod_macro =  GRID(Igrid)%macro_elem(iel)%nod_macro
 !
-   enddo   
+   enddo
 !$omp end do
 !$omp end parallel
 
@@ -92,7 +92,7 @@
    integer, intent(in) :: Igrid
    integer :: iel
    do iel = 1, GRID(Igrid)%nreles
-!    
+!
       deallocate(GRID(Igrid)%macro_elem(iel)%nod_macro)
       deallocate(GRID(Igrid)%macro_elem(iel)%ndofH_macro)
       deallocate(GRID(Igrid)%macro_elem(iel)%ndofE_macro)
@@ -110,12 +110,12 @@
       deallocate(GRID(Igrid)%constr(iel)%constrE_macro)
       deallocate(GRID(Igrid)%constr(iel)%constrV_macro)
 !
-      deallocate(GRID(Igrid)%constr(iel)%nod_macro)   
-      deallocate(GRID(Igrid)%constr(iel)%ndofH_macro) 
-      deallocate(GRID(Igrid)%constr(iel)%ndofE_macro) 
-      deallocate(GRID(Igrid)%constr(iel)%ndofV_macro) 
+      deallocate(GRID(Igrid)%constr(iel)%nod_macro)
+      deallocate(GRID(Igrid)%constr(iel)%ndofH_macro)
+      deallocate(GRID(Igrid)%constr(iel)%ndofE_macro)
+      deallocate(GRID(Igrid)%constr(iel)%ndofV_macro)
 !
-   enddo   
+   enddo
    deallocate(GRID(Igrid)%constr)
    deallocate(GRID(Igrid)%macro_elem)
 ! !
@@ -136,11 +136,11 @@
 !$omp private(iel,mdle,nrdofH_macro,nrdofE_macro,nrdofV_macro)
 !$omp do schedule(guided)
    do iel = 1, GRID(Igrid)%nreles
-      mdle = GRID(Igrid)%mdlel(iel) 
+      mdle = GRID(Igrid)%mdlel(iel)
 
-      nrdofH_macro = GRID(Igrid)%constr(iel)%nrdofH_macro 
-      nrdofE_macro = GRID(Igrid)%constr(iel)%nrdofE_macro 
-      nrdofV_macro = GRID(Igrid)%constr(iel)%nrdofV_macro 
+      nrdofH_macro = GRID(Igrid)%constr(iel)%nrdofH_macro
+      nrdofE_macro = GRID(Igrid)%constr(iel)%nrdofE_macro
+      nrdofV_macro = GRID(Igrid)%constr(iel)%nrdofV_macro
 
       allocate(GRID(Igrid)%constr(iel)%constrH_macro(NACDIM,nrdofH_macro))
       allocate(GRID(Igrid)%constr(iel)%constrE_macro(NACDIM,nrdofE_macro))
@@ -153,7 +153,7 @@
       allocate(GRID(Igrid)%constr(iel)%nrconH_macro(nrdofH_macro))
       allocate(GRID(Igrid)%constr(iel)%nrconE_macro(nrdofE_macro))
       allocate(GRID(Igrid)%constr(iel)%nrconV_macro(nrdofV_macro))
-!        
+!
       call logic_macro(Igrid, mdle,                                                      &
            GRID(Igrid)%constr(iel)%nod_macro,     GRID(Igrid)%constr(iel)%nrnod_macro,   &
            nrdofH_macro, nrdofE_macro, nrdofV_macro,                                     &
@@ -185,13 +185,13 @@
 !
 !    latest revision   - Mar 2018
 !
-!    purpose           - returns Nrnod_macro, NrdofH_macro, 
-!                        NrdofE_macro, NrdofV_macro 
+!    purpose           - returns Nrnod_macro, NrdofH_macro,
+!                        NrdofE_macro, NrdofV_macro
 !
 !   arguments :
 !     in:
 !             MdleC    - middle node of a coarse element
-!     out:     
+!     out:
 !          Nrnod_macro - number of nodes
 !         NrdofH_macro - number of H1      dof for the macro element
 !         NrdofE_macro - number of H(curl) dof for the macro element
@@ -203,9 +203,9 @@
                                          NrdofE_macro, NrdofV_macro)
 !
    use data_structure3D,  only: NODES,MAXNODM, ndof_nod, NRNODS
-!        
-   IMPLICIT NONE
-!   
+!
+   implicit none
+!
 !-----------------------------------------------------------------------
 !
    integer, intent(in)  :: Igrid,MdleC
@@ -215,10 +215,10 @@
 !..locals
 !..work space for elem_nodes and logic_nodes
    integer              :: nodesl(27),norientl(27), nodm(MAXNODM)
-!   
+!
    integer              :: mdle, imdle, i, nod, master
    integer              :: nrnodm, nH, nE, nV, nQ
-   integer, allocatable :: nvisit(:)              
+   integer, allocatable :: nvisit(:)
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
@@ -236,7 +236,7 @@
       imdle = imdle +1
       call get_connect_info(mdle, nodesl,norientl)
 !
-!   ..get nodes of the modified coarse element 
+!   ..get nodes of the modified coarse element
       call logic_nodes(mdle, nodesl, nodm, nrnodm )
 !
       do i = 1,nrnodm-1
@@ -248,8 +248,8 @@
          case default
             Nrnod_macro = Nrnod_macro + 1
             call ndof_nod(NODES(nod)%type,NODES(nod)%order,nH,nE,nV,nQ)
-            NrdofH_macro=NrdofH_macro+nH 
-            NrdofE_macro=NrdofE_macro+nE 
+            NrdofH_macro=NrdofH_macro+nH
+            NrdofE_macro=NrdofE_macro+nE
             NrdofV_macro=NrdofV_macro+nV
             nvisit(nod) = 1
          end select
@@ -257,9 +257,9 @@
 !
       call nelcon_macro(MdleC,mdle, mdle)
    enddo
-!   
-   deallocate(nvisit) 
-! 
+!
+   deallocate(nvisit)
+!
    end subroutine constraints_compute_bounds
 ! !
 ! !

@@ -18,7 +18,7 @@ subroutine find_element_closing_ref(Type,Kreff,Krefe, Kref)
   !-------------------------------------------------------
   integer, dimension(6)  :: Kreff_trial
   integer, dimension(12) :: Krefe_trial
-  
+
   integer :: iprint, i, j, isum, ipass, iref, kref_trial
   !-------------------------------------------------------
   iprint=0

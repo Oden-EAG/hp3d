@@ -13,8 +13,8 @@ c                        and the color table
 c
 c   usage              - call dpborder(Ibf)
 c
-c   arguments 
-c     in: 
+c   arguments
+c     in:
 c                  Ibf - a flag whether to display color table
 c
 c   required  routines - none
@@ -142,7 +142,7 @@ c  .....loop through the color boxes of p-approximation
           xgr(2,2) = xgr(2,1)
           xgr(1,3) = xgr(1,2)
           xgr(2,3) = xgr(2,1)+vbox
-          xgr(1,4) = xgr(1,1) 
+          xgr(1,4) = xgr(1,1)
           xgr(2,4) = xgr(2,3)
           call fillpoly(4,xgr,NPCOL(i+2),NPCOL(i+2))
           do j=1,2
@@ -175,7 +175,7 @@ c  .....loop through the color boxes of isolines
           xgr(2,2) = xgr(2,1)
           xgr(1,3) = xgr(1,2)
           xgr(2,3) = xgr(2,1)+vbox
-          xgr(1,4) = xgr(1,1) 
+          xgr(1,4) = xgr(1,1)
           xgr(2,4) = xgr(2,3)
           call fillpoly(4,xgr,NPCOL(i+10),NPCOL(i+10))
         enddo

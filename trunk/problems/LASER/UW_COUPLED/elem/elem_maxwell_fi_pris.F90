@@ -40,7 +40,7 @@
 !
 !---------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                                 NrTest,NrTrial,               &
@@ -77,7 +77,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    complex(8), dimension(MdQ,MdE), intent(out) :: ZalocQE
    complex(8), dimension(MdQ,MdQ), intent(out) :: ZalocQQ
 !
-   real*8, parameter :: rZero = 0.d0
+   real(8), parameter :: rZero = 0.d0
 !
 !..declare edge/face type variables
    character(len=4) :: etype, etype1, ftype
@@ -95,7 +95,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    integer, dimension(5)     :: norderf
 !
 !..geometry dof (work space for nodcor)
-   real*8, dimension(3,MAXbrickH) :: xnod
+   real(8) :: xnod(3,MAXbrickH)
 !
 !..solution dof (work space for solelm)
    complex(8), dimension(MAXEQNH,MAXbrickH) :: zdofH
@@ -112,25 +112,25 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    complex(8), dimension(3,MAXEQNV  ) ::  zsolV_soleval
    complex(8), dimension(  MAXEQNV  ) ::  zdivV_soleval
    complex(8), dimension(  MAXEQNQ  ) ::  zsolQ_soleval
-   real*8 :: rsolH
+   real(8) :: rsolH
 !
 !..variables for geometry
-   real*8, dimension(3)    :: xi,x,rn
-   real*8, dimension(3,2)  :: dxidt,dxdt,rt
-   real*8, dimension(3,3)  :: dxdxi,dxidx
-   real*8, dimension(2)    :: t
+   real(8), dimension(3)    :: xi,x,rn
+   real(8), dimension(3,2)  :: dxidt,dxdt,rt
+   real(8), dimension(3,3)  :: dxdxi,dxidx
+   real(8), dimension(2)    :: t
 !
 !..H1 shape functions
-   real*8, dimension(MAXbrickH)    :: shapH
-   real*8, dimension(3,MAXbrickH)  :: gradH
+   real(8), dimension(MAXbrickH)    :: shapH
+   real(8), dimension(3,MAXbrickH)  :: gradH
 !
 !..H(curl) shape functions
-   real*8, dimension(3,MAXbrickE)  :: shapE
-   real*8, dimension(3,MAXbrickE)  :: curlE
+   real(8), dimension(3,MAXbrickE)  :: shapE
+   real(8), dimension(3,MAXbrickE)  :: curlE
 !
 !..Enriched H1 shape functions
-   real*8 , dimension(3,MAXbrickEE) :: shapEE
-   real*8 , dimension(3,MAXbrickEE) :: curlEE
+   real(8) , dimension(3,MAXbrickEE) :: shapEE
+   real(8) , dimension(3,MAXbrickEE) :: curlEE
 !
 !..nrdof for interface only (without bubbles)
    !integer :: nrdofEEi
@@ -146,8 +146,8 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    complex(8), allocatable :: stiff_ALL(:,:),zaloc(:,:)
 !
 !..2D quadrature data
-   real*8, dimension(2,MAXNINT2ADD)  :: tloc
-   real*8, dimension(  MAXNINT2ADD)  :: wtloc
+   real(8), dimension(2,MAXNINT2ADD)  :: tloc
+   real(8), dimension(  MAXNINT2ADD)  :: wtloc
 !
 !..BC's flags
    integer, dimension(6,NR_PHYSA)    :: ibc
@@ -157,14 +157,14 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
 !..Maxwell load and auxiliary variables
    complex(8), dimension(3) :: zJ,zImp
-   real*8    , dimension(3) :: E1,E2,rntimesE,rn2timesE
+   real(8)   , dimension(3) :: E1,E2,rntimesE,rn2timesE
 !
 !..number of edge,faces per element type
    integer :: nre, nrf
 !
 !..various variables for the problem
-   real*8  :: h_elem,rjac,weight,wa,v2n,CC,EE,CE,E,EC,q,h,omeg,alpha_scale
-   real*8  :: bjac
+   real(8) :: h_elem,rjac,weight,wa,v2n,CC,EE,CE,E,EC,q,h,omeg,alpha_scale
+   real(8) :: bjac
    integer :: i1,j1,i2,j2
    integer :: i12,j12,k12,k1,k2,fa,fb,i3mod,j3mod,kH,kk,i,ik,j,k,l,nint,kE,n,m,p,pe
    integer :: iflag,iprint,itime,iverb
@@ -175,11 +175,11 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
 !..for polarizations function
    complex(8), dimension(3,3) :: bg_pol,gain_pol,raman_pol
-   real*8  :: delta_n
+   real(8) :: delta_n
    integer :: dom_flag
 !
 !..OMEGA_RATIO_SIGNAL or OMEGA_RATIO_PUMP
-   real*8  :: OMEGA_RATIO_FLD
+   real(8) :: OMEGA_RATIO_FLD
 !
 !..for PML
    complex(8) :: zbeta,zdbeta,zd2beta,detJstretch
@@ -207,12 +207,12 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    integer :: nrdofH12, nrdofE12, nrdofQ12, nrdofH3, nrdofQ3
    integer :: nrdofH12_tr,nrdofH3_tr
    integer :: nrdofQ12_tr,nrdofQ3_tr
-   real*8 :: xi12(2),xi3,wt12,wt3
-   real*8 :: wt123,weighthh,weightvv
-   real*8 :: xiloc_xy(2,MAXNINT2ADD), xiloc_z(MAXPP+1)
-   real*8 :: wloc_xy(MAXNINT2ADD), wloc_z(MAXPP+1)
-   real*8, dimension(3,MAXNINT3ADD) :: wloc3
-   real*8, dimension(3) :: xip,dHdx,dHHdx
+   real(8) :: xi12(2),xi3,wt12,wt3
+   real(8) :: wt123,weighthh,weightvv
+   real(8) :: xiloc_xy(2,MAXNINT2ADD), xiloc_z(MAXPP+1)
+   real(8) :: wloc_xy(MAXNINT2ADD), wloc_z(MAXPP+1)
+   real(8), dimension(3,MAXNINT3ADD) :: wloc3
+   real(8), dimension(3) :: xip,dHdx,dHHdx
 !
    real(8)   , dimension(3,3) :: D_za,D_zc,D_aux,C,D
    complex(8), dimension(3,3) :: Z_za,Z_zc,Z_aux
@@ -456,7 +456,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    allocate(LOADE(3,(nrdofE12+nrdofH12)))
 !
 !..Loop over quadrature points in direction \xi_1
-   do pz=1,nintz 
+   do pz=1,nintz
 !  ...read quadrature point location and weight
       xi3=xiloc_z(pz)
       wt3=wloc_z(pz)
@@ -520,7 +520,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
          xip(1:2) = xi12(1:2); xip(3) = xi3
 !
 !     ...Compute shape functions needed for geometry - 3D H1 shape functions
-         call shape3H(etype,xip,norder,norient_edge,norient_face, nrdof,shapH,gradH)
+         call shape3DH(etype,xip,norder,norient_edge,norient_face, nrdof,shapH,gradH)
 !     ...Geometry map
          call geom3D(Mdle,xip,xnod,shapH,gradH,NrdofH, x,dxdxi,dxidx,rjac,iflag)
 #if DEBUG_MODE
@@ -591,7 +591,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !.....................................................
 !...............toggle PML............................
 !
-         if(USE_PML.eq.0) then
+         if(.not. USE_PML) then
             JJstretch      = ZERO
             JJstretch(1,1) = ZONE
             JJstretch(2,2) = ZONE
@@ -778,7 +778,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !        ...loop over 2D trial function ends
             enddo
 !
-! ------------ Assemble Aux Load Vector --------------    
+! ------------ Assemble Aux Load Vector --------------
             do a=1,3
                LOADE(a,i12) = LOADE(a,i12)                              &
                      + ( dxidx(a,1)*zJ(1)+                              &
@@ -832,7 +832,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                         m2 = mapEE(j3 + (j12-nrdofE12-1)*(nrdofH3-1) + nrdofE12*nrdofH3)
                      endif
 !
-                     if (m1.le.m2) then 
+                     if (m1.le.m2) then
                         if (j3mod.le.nrdofH3) then
                            do b=1,3
                               do a=1,3
@@ -841,11 +841,11 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
                                  gramP(kk) = gramP(kk)                    &
                                     + AUXEE_zb(a,b,k12)                   &
-                                       * shapeH3(sa,i3mod)                & 
+                                       * shapeH3(sa,i3mod)                &
                                        * shapeH3(sb,j3mod)                &
                                     + AUXCC(a,b,k12)                      &
                                        * shapeH3(2-deltak(a,3)*fa,i3mod)  &
-                                       * shapeH3(2-deltak(b,3)*fb,j3mod) 
+                                       * shapeH3(2-deltak(b,3)*fb,j3mod)
 !
 !                             ...Sum CE and EC terms
                                  kk = nk(2*m1-1,2*m2)
@@ -855,7 +855,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                                        * shapeH3(sb,j3mod)                &
                                     + AUXEC_zb(a,b,k12)                   &
                                        * shapeH3(sa,i3mod)                &
-                                       * shapeH3(2-deltak(b,3)*fb,j3mod)  
+                                       * shapeH3(2-deltak(b,3)*fb,j3mod)
 !
 !                             ...Sum other CE and EC terms
                                  if (m1.ne.m2) then
@@ -866,18 +866,18 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                                           * shapeH3(sb,j3mod)                &
                                        + AUXEC_zc(a,b,k12)                   &
                                           * shapeH3(sa,i3mod)                &
-                                          * shapeH3(2-deltak(b,3)*fb,j3mod)   
+                                          * shapeH3(2-deltak(b,3)*fb,j3mod)
                                  endif
 !
 !                             ...Sum EE_22 and CC_22 terms
                                  kk = nk(2*m1  ,2*m2  )
                                  gramP(kk) = gramP(kk)                    &
                                     + AUXEE_zc(a,b,k12)                   &
-                                       * shapeH3(sa,i3mod)                & 
+                                       * shapeH3(sa,i3mod)                &
                                        * shapeH3(sb,j3mod)                &
                                     + AUXCC(a,b,k12)                      &
                                        * shapeH3(2-deltak(a,3)*fa,i3mod)  &
-                                       * shapeH3(2-deltak(b,3)*fb,j3mod) 
+                                       * shapeH3(2-deltak(b,3)*fb,j3mod)
 !                          ...end loop a
                               enddo
 !                       ...end loop b
@@ -1004,8 +1004,8 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 #endif
 !
 !     ...determine element H1 shape functions (for geometry)
-         call shape3H(etype,xi,norder,norient_edge,norient_face, &
-                      nrdof,shapH,gradH)
+         call shape3DH(etype,xi,norder,norient_edge,norient_face, &
+                       nrdof,shapH,gradH)
 #if DEBUG_MODE
          if (nrdof .ne. NrdofH) then
             write(*,*) 'elem_maxwell: INCONSISTENCY NrdofH. stop.'
@@ -1015,8 +1015,8 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
 !     ...determine element H(curl) shape functions (for fluxes)
 !     ...for interfaces only (no bubbles)
-         call shape3E(etype,xi,norderi,norient_edge,norient_face, &
-                      nrdof,shapE,curlE)
+         call shape3DE(etype,xi,norderi,norient_edge,norient_face, &
+                       nrdof,shapE,curlE)
 #if DEBUG_MODE
          if (nrdof .ne. NrdofEi) then
             write(*,*) 'elem_maxwell: INCONSISTENCY NrdofEi. stop.'
@@ -1269,7 +1269,7 @@ end subroutine tens_prism_ordEE
 ! TODO
 subroutine tens_hexa_ordEE(p,q, mapEE)
    use parametersDPG
-   integer, intent(in)  :: p 
+   integer, intent(in)  :: p
    integer, intent(in)  :: q
    integer, intent(out) :: mapEE(2*(p+1)*p*(q+1) + (p+1)*(p+1)*q)
    integer :: i,j,k
@@ -1287,7 +1287,7 @@ end subroutine tens_hexa_ordEE
 ! TODO
 subroutine tens_hexa_ordQQ(p,q, mapQQ)
    use parametersDPG
-   integer, intent(in)  :: p 
+   integer, intent(in)  :: p
    integer, intent(in)  :: q
    integer, intent(out) :: mapQQ(p*p*q)
    integer :: i,j,k

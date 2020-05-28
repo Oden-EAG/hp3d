@@ -11,15 +11,15 @@
 !------------------------------------------------------------------------------------
 !
 subroutine plane1(X,X0,Rn, Fval,Dfdx)
-!      
+!
       implicit none
-      real*8, dimension(3), intent(in )   :: X,X0
-      real*8, dimension(3), intent(inout) :: Rn
-      real*8              , intent(out)   :: Fval
-      real*8, dimension(3), intent(out)   :: Dfdx
+      real(8), dimension(3), intent(in )   :: X,X0
+      real(8), dimension(3), intent(inout) :: Rn
+      real(8)              , intent(out)   :: Fval
+      real(8), dimension(3), intent(out)   :: Dfdx
 !------------------------------------------------------------------------------------
       integer :: i
-      real*8  :: dRn,dRh,d
+      real(8)  :: dRn,dRh,d
 !------------------------------------------------------------------------------------
 !
       dRn=0.d0
@@ -34,7 +34,7 @@ subroutine plane1(X,X0,Rn, Fval,Dfdx)
  20   continue
 !
 !  ...caculate coefficients of the plane
-      d = -( X0(1)*Rn(1) + X0(2)*Rn(2) + X0(3)*Rn(3) ) 
+      d = -( X0(1)*Rn(1) + X0(2)*Rn(2) + X0(3)*Rn(3) )
 !
       Fval =  X(1)*Rn(1) + X(2)*Rn(2) + X(3)*Rn(3) + d
 !
@@ -43,7 +43,7 @@ subroutine plane1(X,X0,Rn, Fval,Dfdx)
       Dfdx(3) = Rn(3)
 !
 !
-endsubroutine plane1
+end subroutine plane1
 !
 !
 !------------------------------------------------------------------------------------
@@ -58,15 +58,15 @@ endsubroutine plane1
 !------------------------------------------------------------------------------------
 !
 subroutine plane2(X,X1,X2,X3, Fval,Dfdx)
-!      
+!
       implicit none
-      real*8, dimension(3), intent(in ) :: X,X1,X2,X3
-      real*8              , intent(out) :: Fval
-      real*8, dimension(3), intent(out) :: Dfdx
+      real(8), dimension(3), intent(in ) :: X,X1,X2,X3
+      real(8)              , intent(out) :: Fval
+      real(8), dimension(3), intent(out) :: Dfdx
 !------------------------------------------------------------------------------------
 !  ...vectors X1X2, X1X3, and the normal versor
-      real*8, dimension(3) :: ver1,ver2,rn
-      real*8               :: s,d
+      real(8), dimension(3) :: ver1,ver2,rn
+      real(8)               :: s,d
       integer              :: iprint
 !------------------------------------------------------------------------------------
 !
@@ -84,7 +84,7 @@ subroutine plane2(X,X1,X2,X3, Fval,Dfdx)
       s = sqrt(rn(1)**2+rn(2)**2+rn(3)**2)
       rn(1:3) = rn(1:3)/s
 !
-      d = -( X1(1)*rn(1) + X1(2)*rn(2) + X1(3)*rn(3) ) 
+      d = -( X1(1)*rn(1) + X1(2)*rn(2) + X1(3)*rn(3) )
       Fval =  X(1)*rn(1) + X(2)*rn(2) + X(3)*rn(3) + d
 !
       Dfdx(1) = rn(1)
@@ -92,12 +92,12 @@ subroutine plane2(X,X1,X2,X3, Fval,Dfdx)
       Dfdx(3) = rn(3)
 !
 !
-endsubroutine plane2
+end subroutine plane2
 !
 !
 !
 !------------------------------------------------------------------------------------
-!> Purpose : routine determines a unit vector orthogonal to a plane that passes 
+!> Purpose : routine determines a unit vector orthogonal to a plane that passes
 !!           through a point X and is at a minimum distance from points Y1,2,3
 !!
 !! @param[in ] X,Y  - coordinates of points
@@ -108,18 +108,18 @@ endsubroutine plane2
 subroutine determine_plane1(X,Y, Rn)
 !
       implicit none
-      real*8,dimension(3  ),intent(in ) :: X
-      real*8,dimension(3,3),intent(in ) :: Y
-      real*8,dimension(3  ),intent(out) :: Rn
+      real(8),dimension(3  ),intent(in ) :: X
+      real(8),dimension(3,3),intent(in ) :: Y
+      real(8),dimension(3  ),intent(out) :: Rn
 !
 !  ...auxiliary matrices
-      real*8,dimension(3,3) :: a,b
+      real(8),dimension(3,3) :: a,b
 !
 !  ...eigenvalues and work space
-      real*8,dimension(3)   :: w
-      real*8,dimension(102) :: work
+      real(8),dimension(3)   :: w
+      real(8),dimension(102) :: work
 !
-      real*8 :: s,rlambda
+      real(8) :: s,rlambda
       integer :: i,j,k,iprint,info
 !------------------------------------------------------------------------------------
 !
@@ -164,7 +164,7 @@ subroutine determine_plane1(X,Y, Rn)
       endif
 !
 !
-endsubroutine determine_plane1
+end subroutine determine_plane1
 !
 !
 !------------------------------------------------------------------------------------
@@ -179,23 +179,23 @@ endsubroutine determine_plane1
 subroutine determine_plane2(X,Y, Rn)
 !
       implicit none
-      real*8,dimension(3,2),intent(in ) :: X
-      real*8,dimension(3,2),intent(in ) :: Y
-      real*8,dimension(3  ),intent(out) :: Rn
+      real(8),dimension(3,2),intent(in ) :: X
+      real(8),dimension(3,2),intent(in ) :: Y
+      real(8),dimension(3  ),intent(out) :: Rn
 !
 !  ...basis of normal vectors
-      real*8,dimension(3,2) :: rna
+      real(8),dimension(3,2) :: rna
 
 !  ...auxiliary matrices
-      real*8,dimension(2) :: x0,x1
-      real*8,dimension(3) :: x12,y12,c,d
-      real*8,dimension(2,2) :: a,b
+      real(8),dimension(2)   :: x0,x1
+      real(8),dimension(3)   :: x12,y12,c,d
+      real(8),dimension(2,2) :: a,b
 !
 !  ...eigenvalues and work space
-      real*8,dimension(2)   :: w
-      real*8,dimension(68) :: work
+      real(8),dimension(2)  :: w
+      real(8),dimension(68) :: work
 !
-      real*8 :: s,rlambda
+      real(8) :: s,rlambda
       integer :: i,j,k,iprint,info,l
 !------------------------------------------------------------------------------------
 !
@@ -310,4 +310,4 @@ subroutine determine_plane2(X,Y, Rn)
       endif
 !
 !
-endsubroutine determine_plane2
+end subroutine determine_plane2

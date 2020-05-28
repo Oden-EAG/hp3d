@@ -1,13 +1,13 @@
 subroutine geom_ex(Mdle,Xi, X,Dxdxi)
 !
-      integer,                 intent(in)  :: Mdle
-      real*8,  dimension(3),   intent(in)  :: Xi
-      real*8,  dimension(3),   intent(out) :: X
-      real*8,  dimension(3,3), intent(out) :: Dxdxi
+      integer,                  intent(in)  :: Mdle
+      real(8),  dimension(3),   intent(in)  :: Xi
+      real(8),  dimension(3),   intent(out) :: X
+      real(8),  dimension(3,3), intent(out) :: Dxdxi
 !
 !  ...redirect to old routine to ensure backward compatibility
       call exact_geom(Mdle,Xi, X,Dxdxi)
-!      
+!
 endsubroutine geom_ex
 !
 !
@@ -26,32 +26,32 @@ endsubroutine geom_ex
 subroutine exact_geom(Mdle,Xi, X,Dxdxi)
 !
       use data_structure3D
-!      
+!
       implicit none
       integer :: iprint
       integer,                 intent(in)  :: Mdle
-      real*8,  dimension(3),   intent(in)  :: Xi
-      real*8,  dimension(3),   intent(out) :: X
-      real*8,  dimension(3,3), intent(out) :: Dxdxi
+      real(8), dimension(3),   intent(in)  :: Xi
+      real(8), dimension(3),   intent(out) :: X
+      real(8), dimension(3,3), intent(out) :: Dxdxi
 !
-      real*8,  dimension(  8) ::  shapH
-      real*8,  dimension(3,8) :: dshapH
-      
-      real*8           :: eta(3),dxdeta(3,3),detadxi(3,3),etav(3,8)
+      real(8), dimension(  8) ::  shapH
+      real(8), dimension(3,8) :: dshapH
+
+      real(8)          :: eta(3),dxdeta(3,3),detadxi(3,3),etav(3,8)
       integer          :: iflag, i, j, k, no
-      character(len=4) :: type      
+      character(len=4) :: type
 !------------------------------------------------------------------------
 !
       iprint=0
       type=NODES(Mdle)%type
-!              
-!  ...element vertices in the reference space      
+!
+!  ...element vertices in the reference space
       call refel(Mdle, iflag,no,etav)
-!      
+!
 !  ...vertex shape functions
       call vshape3(type,Xi, shapH,dshapH)
-!        
-!  ...determine refinement map : Eta = Eta(Xi)      
+!
+!  ...determine refinement map : Eta = Eta(Xi)
       eta(1:3)=0.d0 ; detadxi(1:3,1:3)=0.d0
       do k=1,nvert(type)
         eta(1:3) = eta(1:3) + etav(1:3,k)*shapH(k)

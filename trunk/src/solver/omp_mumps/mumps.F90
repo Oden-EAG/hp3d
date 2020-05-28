@@ -1,5 +1,5 @@
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 ! -----------------------------------------------------------------------
 !
 !    module name        - mumps
@@ -8,7 +8,7 @@
 !
 !    latest revision    - July 2019
 !
-!    purpose            - module sets up required workspace for 
+!    purpose            - module sets up required workspace for
 !                         interfacing with OpenMP MUMPS solver
 !
 ! -----------------------------------------------------------------------
@@ -122,8 +122,8 @@ subroutine mumps_destroy
 #else
    call dmumps(mumps_par)
 #endif
-! 
+!
 end subroutine mumps_destroy
-! 
-! 
+!
+!
 end module mumps

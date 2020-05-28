@@ -3,7 +3,7 @@
 !! @param[out] Nodesl   - element nodes
 !! @param[out] Norientl - their orientations
 !-----------------------------------------------------------------------
-subroutine elem_nodes(Mdle, Nodesl,Norientl) 
+subroutine elem_nodes(Mdle, Nodesl,Norientl)
 !
   use data_structure3D
   use refinements
@@ -65,7 +65,7 @@ subroutine elem_nodes(Mdle, Nodesl,Norientl)
      enddo
   endif
   !-------------------------------------------------------------
-  ! Step 3: Dump elem information 
+  ! Step 3: Dump elem information
   !-------------------------------------------------------------
   ! nson is the top level element
   call elem_dump(nson, nodesl_fath,norientl_fath)
@@ -79,7 +79,7 @@ subroutine elem_nodes(Mdle, Nodesl,Norientl)
      call elem_nodes_one( &
           nfathl(igen),nodesl_fath,norientl_fath,isonl(igen), &
           nod,Nodesl,Norientl)
-     
+
      if ((igen.eq.1).and.(INFO_CONSTRAINTS.eq.1)) then
         FATH_NODES  = nodesl_fath
         FATH_ORIENT = norientl_fath

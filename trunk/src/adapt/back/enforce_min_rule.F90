@@ -44,7 +44,7 @@
           write(*,7001) mdle,norder(1:nre+nrf+1)
  7001     format('enforce_min_rule: mdle = ',i5,' Norder = ',19i4)
         endif
-!     ..minimum rule for faces and edges wrt elements mdle node order       
+!     ..minimum rule for faces and edges wrt elements mdle node order
         do j=1,nre+nrf
           nod = nodesl(nrv+j)
 !
@@ -62,7 +62,7 @@
               NODES(nod)%visit = nordh*10+nordv
             end select
           endif
-        enddo 
+        enddo
       enddo
       if (iprint.eq.1) write(*,*) 'enforce_min_rule: DONE WITH Step 1'
 !
@@ -71,9 +71,9 @@
       do nod=1,NRNODS
         if (NODES(nod)%type .ne. 'mdlq' .and. NODES(nod)%type .ne. 'mdlt') cycle
 
-        if (nod .eq. 1504 ) then 
+        if (nod .eq. 1504 ) then
           write(*,*) 'nod, NODES(nod)%visit=',nod, NODES(nod)%visit
-        endif  
+        endif
 !
 !  .....active node
         if (NODES(nod)%act.eq.1) then
@@ -254,21 +254,21 @@
 !  .....loop through edges
         do je=1,nre
           nod = nodesl(nrv+je)
-          if (nod .eq. 464) then 
+          if (nod .eq. 464) then
             write(*,*) '1:nod, NODES(nod)%visit = ', nod, norder(j)
-          endif 
+          endif
           NODES(nod)%visit = min(NODES(nod)%visit,norder(je))
         enddo
 !  ...end of loop through the elements
-      enddo        
+      enddo
 
 
 !  ...loop through nodes
       do nod=1,NRNODS
 
-        if (nod .eq. 464) then 
+        if (nod .eq. 464) then
           write(*,*) '2:nod, NODES(nod)%visit = ', nod, NODES(nod)%visit
-        endif  
+        endif
 
         if(NODES(nod)%type .ne. 'medg') cycle
 !
@@ -313,7 +313,7 @@
 !  ...reset visitation flags
       call reset_visit
 !
- 
+
 
 !
       end subroutine enforce_min_rule

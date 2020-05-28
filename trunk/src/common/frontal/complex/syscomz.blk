@@ -1,1 +1,1 @@
-      implicit complex*16 (a-h,o-z)
+      implicit complex(8) (a-h,o-z)

@@ -45,8 +45,8 @@
          write(*,7001) mdle,norder(1:nre+nrf+1)
  7001    format('enforce_min_rule: mdle = ',i5,' Norder = ',19i4)
       endif
-!      
-!  ...loop through edges and faces      
+!
+!  ...loop through edges and faces
       do j=1,nre+nrf
          i=nrv+j
          nod = nodesl(i); nord = norder(j)
@@ -83,7 +83,7 @@
                call save_order(nodp,nord)
             end select
          endif
-      enddo 
+      enddo
    enddo
    if (iprint.eq.1) write(*,*) 'enforce_min_rule: DONE WITH Step 1'
 !

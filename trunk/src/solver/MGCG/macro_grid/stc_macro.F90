@@ -1,5 +1,5 @@
 !
-#include 'implicit_none.h'
+#include "typedefs.h"
 !
 !----------------------------------------------------------------------
 !
@@ -134,7 +134,7 @@ subroutine stc_fwd_wrapper_mg(Ielc,Iel,Mdle)
 !     ...extract condensed stiffness into ALOC
          ii = nrdofi(i)
          if (ii > 0 .and. ji > 0) then
-            ALOC(i,j)%array(1:ii,1:ji) = Aii(ki+1:ki+ii,ni+1:ni+ji) 
+            ALOC(i,j)%array(1:ii,1:ji) = Aii(ki+1:ki+ii,ni+1:ni+ji)
          endif
          ki = ki + ii
       enddo

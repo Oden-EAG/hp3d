@@ -7,12 +7,12 @@
       !
       !*** REQUIRED PROCEDURES: scalar_product, rotation, cone2polar, Dpolar2cone, Dcartesian2polar.
       !
-!**************************************************************************************************************      
+!**************************************************************************************************************
       use GMP
-!**************************************************************************************************************      
+!**************************************************************************************************************
       IMPLICIT NONE
 !**************************************************************************************************************
-      !*** DUMMY ARGUMENTS      
+      !*** DUMMY ARGUMENTS
       integer, intent(in) :: nc                                          !*** curve number
       double precision, intent(in) :: eta                                !*** curvilinear coordinate
       double precision, dimension(3), intent(out) :: r                   !*** cartesian coordinates (x,y,z)
@@ -30,22 +30,22 @@
       double precision, dimension(3) :: v_aux                            !*** auxiliary vector
       double precision, dimension(3,3) :: RBM                            !*** rigid body motion
       double precision, dimension(3,3) :: RBM_aux                        !*** auxiliary matrix
-      double precision :: rho, theta                                     !*** polar coordinates     
+      double precision :: rho, theta                                     !*** polar coordinates
       double precision, dimension(2,2) :: A                              !*** end points in parameter space
       double precision, dimension(2) :: r_par                            !*** coordinates (x,y) in parameter space
-      double precision, dimension(2) :: Dr_par                           !*** derivatives d(x,y)/d(eta) in parameter space 
+      double precision, dimension(2) :: Dr_par                           !*** derivatives d(x,y)/d(eta) in parameter space
       double precision, dimension(3,2) :: Dr_aux                         !*** auxiliary variables
       double precision, dimension(2) :: polar                            !*** coordinates (rho,theta) in parameter space
       double precision, dimension(2,2) :: Dpolar                         !*** derivatives d(rho,theta)/d(eta1,eta2) in parameter space
       integer :: i
       !
       !*** PARAMETERS
-      double precision, dimension(3), parameter :: e1 
+      double precision, dimension(3), parameter :: e1
      .                                = (/1.d0, 0.d0, 0.d0/)             !*** vector (1,0,0)
-      double precision, dimension(3), parameter :: e3 
+      double precision, dimension(3), parameter :: e3
      .                                = (/0.d0, 0.d0, 1.d0/)             !*** vector (0,0,1)
-!**************************************************************************************************************  
-      !   
+!**************************************************************************************************************
+      !
       ns = CURVES(nc)%Idata(1)
       !
       if (SURFACES(ns)%Type .ne. 'Cone') then
@@ -56,7 +56,7 @@
       vertex(1:3) = SURFACES(ns)%Rdata(1:3)                              !*** get cone data
       axis(1:3) = SURFACES(ns)%Rdata(4:6)
       alpha = SURFACES(ns)%Rdata(7)
-      !                                                                   
+      !
       do i = 1, 2                                                        !*** get endpoints wrt center
         nv = CURVES(nc)%EndPoNo(i)
         V(1:3,i) = POINTS(nv)%Rdata(1:3) - vertex(1:3)
@@ -64,8 +64,8 @@
       !
       do i = 1, 2
         call scalar_product(axis, V(1:3,i), prod)                        !*** account for orientation of axis
-        if (prod .lt. 0.d0) then   
-          pi = acos(-1.d0)                                     
+        if (prod .lt. 0.d0) then
+          pi = acos(-1.d0)
           alpha = pi - alpha
           exit
         end if
@@ -74,7 +74,7 @@
       call rotation(axis, e3, RBM_aux)
       !
       v_aux = MATMUL(RBM_aux, V(1:3,1))                                  !*** get image of start point
-      v_aux(3) = 0.d0                                                    !*** project onto xy-plane 
+      v_aux(3) = 0.d0                                                    !*** project onto xy-plane
       call rotation(v_aux, e1, RBM)
       !
       RBM(1:3,1:3) = MATMUL(RBM(1:3,1:3), RBM_aux(1:3,1:3))              !*** rigid body motion
@@ -105,5 +105,5 @@
       !
       r(1:3) = MATMUL(RBM(1:3,1:3), r(1:3)) + vertex(1:3)                !*** apply inverse rigid body motion
       Dr(1:3) = MATMUL(RBM(1:3,1:3), Dr(1:3))
-      !  
+      !
       END SUBROUTINE cone_geodesic

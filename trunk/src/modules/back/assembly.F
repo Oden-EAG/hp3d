@@ -13,7 +13,7 @@ c-----------------------------------------------------------------------
 c
       module assembly
       save
-c     
+c
 c  ...number of right-hand sides (load vectors)
       integer :: NR_RHS
 c
@@ -23,15 +23,15 @@ c
 c  ...maximum number of modified element dof for all variables
       integer :: MAXDOFM
 c
-c  ...maximum number of modified element dof for all variables after 
+c  ...maximum number of modified element dof for all variables after
 c     compresssion
       integer :: MAXDOFC
 c
 c
 c
-c**********************************************************************      
+c**********************************************************************
 c  ...PG, Nov 10: this type is not used ANYWHERE in the code!!!
-c                 consider removing it!!!      
+c                 consider removing it!!!
       type super_vector
 c
 c  ...number of rows
@@ -42,9 +42,9 @@ c  ...number of rows
       double precision, allocatable :: vect(:)
 #endif
       endtype super_vector
-c**********************************************************************      
+c**********************************************************************
 c
-c      
+c
 c
       type super_array
 c
@@ -91,5 +91,5 @@ c  ...Dirichlet data
       double precision, allocatable :: ZDOFD(:)
 #endif
 c
-c      
+c
       end module assembly

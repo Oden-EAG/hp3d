@@ -1,5 +1,5 @@
-!======================================================================      
-! REMARK: unused routine!!!      
+!======================================================================
+! REMARK: unused routine!!!
 c----------------------------------------------------------------------
 c
 c   routine name       - curve_2SurfrCur
@@ -9,7 +9,7 @@ c
 c   latest revision    - Dec 07
 c
 c   purpose            - routine support parametrization of a curve
-c                        lying on intersection of two reconstructed 
+c                        lying on intersection of two reconstructed
 c                        surfaces
 c
 c   arguments :

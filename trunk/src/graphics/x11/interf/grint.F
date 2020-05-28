@@ -137,14 +137,14 @@ c---------------------------------------------------------------------
 c
       subroutine openwind(Iwtype,Iwsize,Iwin)
 c
-      integer*4 Iwtype,Iwsize(4),Iwin
+      integer(4) Iwtype,Iwsize(4),Iwin
 c
 #include "wvglob.blk"
 #include "wvscrn.blk"
 c
 c     dumpfile maxx and maxy
 c
-      real*8 range(4)
+      real(8) range(4)
 c
       data range /0d0,0d0,1d0,1d0/
 c
@@ -343,7 +343,7 @@ c   required  routines -
 c
 c---------------------------------------------------------------------
 c
-      real*8 X1,X2,Y1,Y2
+      real(8) X1,X2,Y1,Y2
       integer sx1,sx2,sy1,sy2
 c
 #include "wvglob.blk"
@@ -425,7 +425,7 @@ c
 c   required  routines - fillpoly
 c
 c-----------------------------------------------------------------------c
-      real*8 Coor(2,N)
+      real(8) Coor(2,N)
 c
       call fillpoly(N,Coor,-1,Ilcol)
 c
@@ -460,7 +460,7 @@ c   required  routines - wvpsfp,wvwarn
 c
 c-----------------------------------------------------------------------
 c
-      real*8 Coor(2,Nin)
+      real(8) Coor(2,Nin)
 c
       integer scoor(2,65)
       real xcoor(2,65)
@@ -541,7 +541,7 @@ c
 c   required  routines -
 c
 c-----------------------------------------------------------------------c
-      real*8 X1,Y1,Height,Angle
+      real(8) X1,Y1,Height,Angle
       integer h,a,sx1,sy1
       character Mess*(*)
 c
@@ -663,7 +663,7 @@ c
 c-----------------------------------------------------------------------c
 #include "wvglob.blk"
 c
-      real*8 xy(2,4)
+      real(8) xy(2,4)
 c
       is = LSCALE(ICURRWIN)
       xy(1,1)=LWSIZE(ICURRWIN,1)
@@ -732,7 +732,7 @@ c
 c   required  routines -
 c
 c-----------------------------------------------------------------------c
-      real*8 Range(4)
+      real(8) Range(4)
 c
 #include "wvglob.blk"
 c
@@ -1148,7 +1148,7 @@ ccc      call xgopw(3,'GRAPHICS'//char(0),'-geometry'//char(0),
 ccc     .    '1000x600'//char(0),char(0),char(0),char(0))
 ccc      call xgopw(3,'GRAPHICS'//char(0),'-geometry'//char(0),
 ccc     .    '667x400'//char(0),char(0),char(0),char(0))
-      write(res_string, fmt="(i0'x'i0)") IWINDL, IWINDH ! jz 1/21/2013
+      write(res_string, fmt="(i0,'x',i0)") IWINDL, IWINDH ! jz 1/21/2013
       call xgopw(3,'GRAPHICS'//char(0),'-geometry'//char(0),
      .    trim(res_string)//char(0),char(0),char(0),char(0))
 c     .    '1334x800'//char(0),char(0),char(0),char(0))

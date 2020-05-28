@@ -175,8 +175,8 @@ contains
 !
     implicit none
     character(len=*),intent(in ) :: Aopt, Atext
-    real*8,          intent(in ) :: Def
-    real*8,          intent(out) :: Val
+    real(8),         intent(in ) :: Def
+    real(8),         intent(out) :: Val
 !
     character(len=20 ) :: str1
     character(len=25 ) :: str2
@@ -237,8 +237,8 @@ contains
 
     implicit none
     character(len=*),intent(in ) :: Aopt, Atext
-    complex*16,      intent(in ) :: Def
-    complex*16,      intent(out) :: Val
+    complex(8),      intent(in ) :: Def
+    complex(8),      intent(out) :: Val
 
     integer :: i, ifound
 !----------------------------------------------------------------------------
@@ -348,11 +348,12 @@ contains
 !----------------------------------------------------------------------------
 
     ! number of arguments
-    ARGC_ = iargc()
+    ARGC_ = command_argument_count()
 
     ! read in arguments
     do i=1,ARGC_
-       call getarg(i, ARGS_(i))
+       !call getarg(i, ARGS_(i))
+       call get_command_argument(i, ARGS_(i))
     end do
 
     ! set up options : -help , -verbose
@@ -366,7 +367,7 @@ contains
   subroutine end_environment
     implicit none
     if (IDRY_) then
-       call exit(0)
+       stop 1
     end if
   end subroutine end_environment
 

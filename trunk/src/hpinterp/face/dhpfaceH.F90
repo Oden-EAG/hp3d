@@ -1,23 +1,25 @@
 !
-!> Purpose : determine H1 face dof interpolating H1 Dirichlet data using 
+#include "typedefs.h"
+!
+!-----------------------------------------------------------------------
+!> Purpose : determine H1 face dof interpolating H1 Dirichlet data using
 !            PB interpolation
 !  NOTE:     the interpolation (projection) is done in the reference space
-!!           
-!! @param[in]  Iflag        - a flag specifying which of the objects the 
+!!
+!! @param[in]  Iflag        - a flag specifying which of the objects the
 !!                            face is on: 5 pris, 6 hexa, 7 tetr, 8 pyra
-!! @param[in]  No           - number of a specific object 
+!! @param[in]  No           - number of a specific object
 !! @param[in]  Etav         - reference coordinates of the element vertices
 !! @param[in]  Type         - element (middle node) type
-!! @param[in]  Icase        - the face node case 
-!! @param[in]  Nedge_orient - edge orientation 
-!! @param[in]  Nface_orient - face orientation 
+!! @param[in]  Icase        - the face node case
+!! @param[in]  Nedge_orient - edge orientation
+!! @param[in]  Nface_orient - face orientation
 !! @param[in]  Norder       - element order
-!! @param[in]  Iface        - face number 
+!! @param[in]  Iface        - face number
 !! @param[in]  ZdofH        - H1 dof for the element (vertex and edge values)
-!! 
+!!
 !! @param[out] ZnodH        - H1 dof for the face
-!
-#include "implicit_none.h"
+!-----------------------------------------------------------------------
   subroutine dhpfaceH(Mdle,Iflag,No,Etav,Type,Icase, &
                       Nedge_orient,Nface_orient,Norder,Iface, &
                       ZdofH, ZnodH)
@@ -31,7 +33,7 @@
 !-----------------------------------------------------------------------
   integer,                                    intent(in)  :: Iflag,No,Mdle
   integer,                                    intent(in)  :: Icase,Iface
-  real*8,  dimension(3,8),                    intent(in)  :: Etav
+  real(8), dimension(3,8),                    intent(in)  :: Etav
   character(len=4),                           intent(in)  :: Type
   integer, dimension(12),                     intent(in)  :: Nedge_orient
   integer, dimension(6),                      intent(in)  :: Nface_orient
@@ -48,28 +50,28 @@
 !
 ! quadrature
   integer                               :: l,nint
-  real*8,  dimension(2, MAXquadH)       :: xi_list
-  real*8,  dimension(   MAXquadH)       :: wa_list 
-  real*8                                :: wa, weight
+  real(8), dimension(2, MAXquadH)       :: xi_list
+  real(8), dimension(   MAXquadH)       :: wa_list
+  real(8)                               :: wa, weight
 !
 ! work space for shape3H
   integer                               :: nrdofH
   integer, dimension(19)                :: norder_1
-  real*8,  dimension(MAXbrickH)         :: shapH
-  real*8,  dimension(3,MAXbrickH)       :: gradH
+  real(8), dimension(MAXbrickH)         :: shapH
+  real(8), dimension(3,MAXbrickH)       :: gradH
 !
 ! derivatives of a shape function wrt reference coordinates
-  real*8, dimension(3)                  :: duHdeta,dvHdeta
+  real(8), dimension(3)                 :: duHdeta,dvHdeta
 !
-! dot product 
-  real*8                                :: prod
+! dot product
+  real(8)                               :: prod
 !
 ! geometry
-  real*8                                :: rjac,bjac
-  real*8, dimension(2)                  :: t
-  real*8, dimension(3)                  :: xi,eta,rn,x
-  real*8, dimension(3,2)                :: dxidt,detadt
-  real*8, dimension(3,3)                :: detadxi,dxideta,dxdeta
+  real(8)                               :: rjac,bjac
+  real(8), dimension(2)                 :: t
+  real(8), dimension(3)                 :: xi,eta,rn,x
+  real(8), dimension(3,2)               :: dxidt,detadt
+  real(8), dimension(3,3)               :: detadxi,dxideta,dxdeta
 !
 ! Dirichlet BC data at a point
   VTYPE :: zvalH(  MAXEQNH), zdvalH(  MAXEQNH,3), &
@@ -81,18 +83,20 @@
 !
 ! work space for linear solvers
   integer                               :: naH,info
-  real*8,  dimension(MAXMdlqH,MAXMdlqH) :: aaH
+  real(8), dimension(MAXMdlqH,MAXMdlqH) :: aaH
   integer, dimension(MAXMdlqH)          :: ipivH
 !
 ! load vector and solution
   VTYPE,   dimension(MAXMdlqH,MAXEQNH)  :: zbH,zuH
-  real*8,  dimension(MAXMdlqH,MAXEQNH)  :: duH_real,duH_imag
+#if C_MODE
+  real(8), dimension(MAXMdlqH,MAXEQNH)  :: duH_real,duH_imag
+#endif
 !
 ! decoded case for the face node
   integer, dimension(NR_PHYSA)          :: ncase
-!  
+!
 ! misc work space
-  integer :: iprint,nrv,nre,nrf,i,j,k,ie,ii,ivar,ivarH,nvarH,kj,ki,&
+  integer :: iprint,nrv,nre,nrf,i,j,k,ie,ivarH,nvarH,kj,ki,&
              ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,nsign
 !
 !-----------------------------------------------------------------------
@@ -131,7 +135,7 @@
 7060 format('dhpfaceH: norder_1 = ',20i4)
   endif
 !
-! get face order to find out quadrature information 
+! get face order to find out quadrature information
   call face_order(Type,Iface,Norder, norder_face)
   INTEGRATION=1   ! overintegrate
   call set_2Dint(face_type(Type,Iface),norder_face, &
@@ -152,8 +156,8 @@
     call face_param(Type,Iface,t, xi,dxidt)
 !
 !   compute element H1 shape functions
-    call shape3H(Type,xi,norder_1,Nedge_orient,Nface_orient, &
-                 nrdofH,shapH,gradH)
+    call shape3DH(Type,xi,norder_1,Nedge_orient,Nface_orient, &
+                  nrdofH,shapH,gradH)
 !
 !   evaluate reference coordinates of the point as needed by GMP
     nsign = nsign_param(Type,Iface)
@@ -161,7 +165,7 @@
                     eta,detadxi,dxideta,rjac,detadt,rn,bjac)
     weight = wa*bjac
 !
-!   call GMP routines to evaluate physical coordinates and their 
+!   call GMP routines to evaluate physical coordinates and their
 !   derivatives wrt reference coordinates
     select case(Iflag)
     case(5);        call prism(No,eta, x,dxdeta)
@@ -197,7 +201,7 @@
                    + gradH(2,k)*dxideta(2,1:3) &
                    + gradH(3,k)*dxideta(3,1:3)
 !
-!     subtract... 
+!     subtract...
       do i=1,3
         zdvalHdeta(1:MAXEQNH,i) = zdvalHdeta(1:MAXEQNH,i) &
                                 - ZdofH(1:MAXEQNH,k)*duHdeta(i)
@@ -323,7 +327,7 @@
 !
 !   loop through physical attributes
     do i=1,NR_PHYSA
-!        
+!
 !     loop through components
       do k=1,NR_COMP(i)
         select case(DTYPE(i))

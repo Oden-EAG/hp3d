@@ -16,8 +16,8 @@ subroutine add_void_curve(Iv1, Iv2, Icurve)
      end if
   enddo
   if (iflag.eq.0) then
-     NRCURVE = NRCURVE + 1 
-     Icurve  = NRCURVE; 
+     NRCURVE = NRCURVE + 1
+     Icurve  = NRCURVE;
      CURVES(Icurve)%Type = 'Seglin'
      CURVES(Icurve)%EndPoNo(1) = Iv1
      CURVES(Icurve)%EndPoNo(2) = Iv2

@@ -1,0 +1,251 @@
+c-----------------------------------------------------------------------
+c   latest revision    - Mar 12
+c
+c   purpose            - routine updates values of geometry degrees
+c                        of freedom, using the GMP parametrizations
+c
+c   arguments          - none
+c-----------------------------------------------------------------------
+c
+      subroutine update_gdof
+c
+      use data_structure3D
+      use element_data
+      use constrained_nodes
+      use GMP
+      use environment , only : QUIET_MODE
+c
+#include "syscom.blk"
+      common /chpedge/ iprint_hpedge
+      common /chpface/ iprint_hpface
+c
+      character(len=4) :: type
+c
+c  ...orientation of element nodes
+      dimension nedge_orient(12),nface_orient(6)
+c
+c  ...element nodes
+      dimension nodesl(27), norientl(27), nodm(MAXNODM)
+c
+c  ...order of approximation for an element
+      dimension norder(19)
+c
+c  ...reference coordinates for an element
+      dimension xsub(3,8)
+c
+c  ...geometry dofs for an element
+      dimension xnod(3,MAXbrickH)
+c
+      real*8 :: ta,tb,OMP_get_wtime
+c
+c  ...rectilinear geometry flag
+      integer :: linear=-1
+      save linear
+      if (linear.eq.-1) then
+ 10     write(*,*) 'update_gdof: RECTILINEAR GEOMETRY ? (1/0)'
+        read(*,*) linear
+        select case(linear)
+        case(-1)
+          go to 10
+        case(1)
+          write(*,*) 'SKIPPING GENERATION OF HIGH ORDER DOF'
+        case default
+          write(*,*) 'GENERATING HIGH ORDER DOF'
+        end select
+      endif
+c
+c-----------------------------------------------------------------------
+c
+      time1 = OMP_get_wtime()
+c
+      iprint=0
+      iprint_hpface=0
+c
+c  ...lower the GMP interface flag for all nodes
+      do nod=1,NRNODS
+        NODES(nod)%geom_interf=0
+      enddo
+c
+c
+c-----------------------------------------------------------------------
+c
+c  ...multiple passes
+      do
+c
+c  .....initiate number of updated elements
+        nr_up_elem=0
+c
+c  .....loop through active elements
+        mdle=0
+        do 100 iel=1,NRELES
+          call nelcon(mdle, mdle)
+c
+c  .......skip if the element has already been processed
+          if (NODES(mdle)%geom_interf.eq.1) cycle
+          call refel(mdle, iflag,no,xsub)
+c
+c  .......determine nodes for the element (active and constrained)
+c         and build the data base for the constrained nodes
+c         (module constrained_nodes)
+          call get_connect_info(mdle, nodesl, norientl)
+c
+c  .......use the info to determine all nodes of the corresponding
+c         modified element
+          call logic_nodes(mdle,nodesl, nodm,nrnodm)
+c
+c  .......check if all parent nodes have been updated
+          type = NODES(mdle)%type
+          nr_elem_nodes = nvert(type)+nedge(type)+nface(type)+1
+          do i=1,nrnodm
+            nod = nodm(i)
+            call locate(nod,nodesl,nr_elem_nodes, loc)
+c
+c  .........if not a regular node of the element
+            if (loc.eq.0) then
+c
+c  ...........check if the node has been updated
+              if (NODES(nod)%geom_interf.eq.0) go to 100
+            endif
+          enddo
+c
+c  .......update the number of processed elements
+          nr_up_elem = nr_up_elem+1
+c
+c-----------------------------------------------------------------------
+c
+c  .......loop through the element vertex nodes
+          do iv=1,nvert(type)
+            nod = nodesl(iv)
+            if (NODES(nod)%geom_interf.eq.1) cycle
+            if (iprint.eq.2) then
+              write(*,*) 'update_gdof: BEFORE THE UPDATE OF VERTEX NODE'
+              write(*,7003) nod,NODES(nod)%coord(1:3,1)
+              write(*,7004) nod,xsub(1:3,iv)
+ 7004         format('             nod,xsub  = ',i8,2x,3f15.7)
+            endif
+            call hpvert(iflag,no,xsub(1:3,iv), NODES(nod)%coord)
+            if (iprint.eq.2) then
+              write(*,7002) mdle,iflag,no,iv,nod
+ 7002         format('update_gdof: mdle,iflag,no,iv,nod = ',
+     .                i8,2x,i1,2x,i8,2x,i2,2x,i8)
+              write(*,7003) nod,NODES(nod)%coord(1:3,1)
+ 7003         format('             nod,coord = ',i8,2x,3f15.7)
+              call pause
+            endif
+            NODES(nod)%geom_interf=1
+c
+c  .......end of loop through element vertices
+          enddo
+c
+c-----------------------------------------------------------------------
+c
+          call find_orient(mdle, nedge_orient,nface_orient)
+          call find_order(mdle, norder)
+          call nodcor(mdle, xnod)
+c
+c  .......loop through element edge nodes
+          do ie=1,nedge(type)
+            in = nvert(type)+ie
+            nod = nodesl(in)
+c
+c  .........if no gdof, mark as processed
+            if (.not.associated(NODES(nod)%coord)) then
+              NODES(nod)%geom_interf=1
+            endif
+            if (NODES(nod)%geom_interf.eq.1) cycle
+            if (nod.eq.50) then
+              iprint_hpedge=0
+            else
+              iprint_hpedge=0
+            endif
+            if (linear.ne.1)
+     .      call hpedge(mdle,iflag,no,xsub,type,
+     .                  nedge_orient,nface_orient,norder,ie,
+     .                  xnod,NODES(nod)%coord)
+            if (iprint.eq.3) then
+              call find_ndof(nod, ndofH,ndofE,ndofV,ndofQ)
+              write(*,7011) nod,norder(ie)
+ 7011         format('update_gdof: nod,nord = ',i8,i3,
+     .               ' NODES(nod)%coord = ')
+              do k=1,ndofH
+                write(*,7012) k,NODES(nod)%coord(1:3,k)
+ 7012           format(i2,2x,3e12.5)
+              enddo
+            endif
+            NODES(nod)%geom_interf=1
+c
+c  .......end of loop through element edges
+          enddo
+c
+c-----------------------------------------------------------------------
+c
+          call nodcor(mdle, xnod)
+c
+c  .......loop through element face nodes
+          do if=1,nface(type)
+            in = nvert(type)+nedge(type)+if
+            nod = nodesl(in)
+c  .........if no gdof, mark as processed
+            if (.not.associated(NODES(nod)%coord)) then
+              NODES(nod)%geom_interf=1
+            endif
+            if (NODES(nod)%geom_interf.eq.1) cycle
+
+            if (nod.eq.202) then
+              iprint_hpface=0
+            else
+              iprint_hpface=0
+            endif
+c
+            if (linear.ne.1)
+     .      call hpface(mdle,iflag,no,xsub,type,
+     .                  nedge_orient,nface_orient,norder,if,
+     .                  xnod,NODES(nod)%coord)
+            NODES(nod)%geom_interf=1
+            if (iprint_hpface.eq.1) then
+              call find_ndof(nod, ndofH,ndofE,ndofV,ndofQ)
+              nf = nedge(type)+if
+              write(*,7011) nod,norder(nf)
+              do k=1,ndofH
+                write(*,7012) k,NODES(nod)%coord(1:3,k)
+              enddo
+            endif
+c
+c  .......end of loop through element faces
+          enddo
+c
+c-----------------------------------------------------------------------
+c
+c  .......update the middle node
+          NODES(mdle)%geom_interf=1
+          if (.not.associated(NODES(mdle)%coord)) cycle
+          call nodcor(mdle, xnod)
+          if (linear.ne.1)
+     .    call hpmdle(mdle,iflag,no,xsub,type,
+     .                nedge_orient,nface_orient,norder,
+     .                xnod,NODES(mdle)%coord)
+c
+c  .....end of loop through elements
+ 100    continue
+c
+        IF (.NOT. QUIET_MODE) THEN
+        write(*,8001) nr_up_elem
+ 8001   format(' update_gdof: nr_up_elem = ',i6)
+        ENDIF
+        if (nr_up_elem.eq.0) exit
+c
+c  ...end of infinite loop through multiple passes
+      enddo
+c
+c  ...lower the GMP interface flag for all nodes
+      do nod=1,NRNODS
+        NODES(nod)%geom_interf=0
+      enddo
+c
+      IF (.NOT. QUIET_MODE) THEN
+         time2 = OMP_get_wtime()
+         write(*,8002) time2-time1
+ 8002    format(' update_gdof: ',f12.5,'  seconds',/)
+      ENDIF
+c
+      end subroutine

@@ -1,7 +1,7 @@
 !-----------------------------------------------------------------------
-!> Purpose : check of jacobian for GMP blocks      
+!> Purpose : check of jacobian for GMP blocks
 !!
-!! @revision Apr 11      
+!! @revision Apr 11
 !-----------------------------------------------------------------------
 !
 subroutine check_jacobian_gmp
@@ -15,10 +15,10 @@ subroutine check_jacobian_gmp
       common /ctrian_PTITri/ iprint_trian_PTITri
 !-----------------------------------------------------------------------
 !     LOCAL VARIABLES
-      double precision, dimension(2,5000) :: x_tri                        ! 
-      double precision, dimension(3,5000) :: x_tet                        ! 
-      double precision, dimension(3,5000) :: x_pri                        ! 
-      double precision, dimension(3,5000) :: x_pyr                        !  
+      double precision, dimension(2,5000) :: x_tri                        !
+      double precision, dimension(3,5000) :: x_tet                        !
+      double precision, dimension(3,5000) :: x_pri                        !
+      double precision, dimension(3,5000) :: x_pyr                        !
       integer                            :: n_tri,n_tet,n_pri,n_pyr
       double precision, dimension(3)     :: x, prod_new,prod_old
       double precision, dimension(3,3)   :: dx,dxdeta
@@ -37,7 +37,7 @@ subroutine check_jacobian_gmp
       double precision        :: dr(3,3),s1,s2
 !-----------------------------------------------------------------------
 !     PARAMETERS
-      double precision, parameter      :: eps = 1.d-13                   ! geometric tolerance 
+      double precision, parameter      :: eps = 1.d-13                   ! geometric tolerance
       integer, parameter :: nsub = 5                                     ! number of subdivisions
 !-----------------------------------------------------------------------
 !     generate grid on triangle
@@ -46,14 +46,14 @@ subroutine check_jacobian_gmp
       do j=0,nsub
         do i=0,(nsub-j)
           if ((i.eq.0)    .AND. (j.eq.0))    cycle
-          if ((i.eq.nsub) .AND. (j.eq.0))    cycle 
+          if ((i.eq.nsub) .AND. (j.eq.0))    cycle
           if ((i.eq.0)    .AND. (j.eq.nsub)) cycle
           n=n+1
           x_tri(1,n) = dble(i)/dble(nsub)
           x_tri(2,n) = dble(j)/dble(nsub)
           if ((x_tri(1,n)+x_tri(2,n)).gt.1.d0) then
             x_tri(1:2,n) = (1.d0-GEOM_TOL)*x_tri(1:2,n)
-          endif 
+          endif
         enddo
       enddo
       n_tri=n
@@ -74,7 +74,7 @@ subroutine check_jacobian_gmp
             x_tet(3,n) = dble(k)/dble(nsub)
             if ((x_tet(1,n) + x_tet(2,n) + x_tet(3,n)) .gt. 1.d0) then
               x_tet(1:3,n) = (1.d0 - GEOM_TOL)*x_tet(1:3,n)
-            end if 
+            end if
           end do
         end do
       end do
@@ -92,10 +92,10 @@ subroutine check_jacobian_gmp
             n = n + 1
             x_pri(1,n) = dble(i)/dble(nsub)
             x_pri(2,n) = dble(j)/dble(nsub)
-            x_pri(3,n) = dble(k)/dble(nsub) 
+            x_pri(3,n) = dble(k)/dble(nsub)
             if ((x_pri(1,n) + x_pri(2,n)) .gt. 1.d0) then
               x_pri(1:2,n) = (1.d0 - GEOM_TOL)*x_pri(1:2,n)
-            end if 
+            end if
             if (x_pri(3,n) .gt. 1.d0) then
               x_pri(3,n) = (1.d0 - GEOM_TOL)*x_pri(3,n)
             end if
@@ -118,7 +118,7 @@ subroutine check_jacobian_gmp
             n = n + 1
             x_pyr(1,n) = dble(i)/dble(nsub)
             x_pyr(2,n) = dble(j)/dble(nsub)
-            x_pyr(3,n) = dble(k)/dble(nsub) 
+            x_pyr(3,n) = dble(k)/dble(nsub)
           end do
         end do
       end do
@@ -132,11 +132,11 @@ subroutine check_jacobian_gmp
       prod_new = 0.d0
       prod_old = 0.d0
 
-!  ...T R I A N G L E S................................................      
-      neg_tri=0 
+!  ...T R I A N G L E S................................................
+      neg_tri=0
       ! loop over triangles
       do k=1,NRTRIAN
-        if (TRIANGLES(k)%Type.eq.'PlaneTri') cycle    
+        if (TRIANGLES(k)%Type.eq.'PlaneTri') cycle
 
         ! loop over triangle grid
         iflag=0
@@ -153,12 +153,12 @@ subroutine check_jacobian_gmp
           endif
         ! loop over triangle grid
         enddo
-       
+
         ! check error flag
         if (iflag.eq.1) then
           neg_tri=neg_tri+1
           if (TRIANGLES(k)%Type.eq.'PTITri') then
-            ns=TRIANGLES(k)%Idata(1) ; n_surface(ns)=n_surface(ns)+1  
+            ns=TRIANGLES(k)%Idata(1) ; n_surface(ns)=n_surface(ns)+1
           endif
         endif
 
@@ -211,16 +211,16 @@ subroutine check_jacobian_gmp
 !!!                neg_tri = neg_tri + 1
 !!!                if (TRIANGLES(k)%Type.eq.'PTITri') then
 !!!                  ns = TRIANGLES(k)%Idata(1)
-!!!                  n_surface(ns) = n_surface(ns) + 1  
+!!!                  n_surface(ns) = n_surface(ns) + 1
 !!!                endif
 !!!                exit middle
 !!!              end if
-!!!            end if 
+!!!            end if
 !!!            iflag = 1                                                    ! raise iflag
-!!!            if ((i+j) .eq. nsub) iflag = 0                               ! IF last point in row 
+!!!            if ((i+j) .eq. nsub) iflag = 0                               ! IF last point in row
 !!!          end do
 !!!        end do
-!!!      end do 
+!!!      end do
 !
 !-----------------------------------------------------------------------
 !      do i = 1, n_tri
@@ -262,7 +262,7 @@ subroutine check_jacobian_gmp
           if (jac .lt. 0.d0) then
             write(*,*) 'check_jacobian_gmp: jacobian = ',jac
             nd = TETRAS(i)%Domain
-            n_domain(nd) = n_domain(nd) + 1  
+            n_domain(nd) = n_domain(nd) + 1
             neg_tet = neg_tet + 1
             write(*,7024) x_tet(1:3,j)
  7024       format('check_jacobian_gmp: x_tet = ',3f8.3)
@@ -288,7 +288,7 @@ subroutine check_jacobian_gmp
       end do
 !
       pri_min_jac = 1.d30
-      neg_pri = 0   
+      neg_pri = 0
       do i = 1, NRPRISM
         if (PRISMS(i)%Type .eq. 'Linear') cycle
         do j = 1, n_pri
@@ -307,11 +307,11 @@ subroutine check_jacobian_gmp
             write(*,*)'xi = ',x_pri(1:3,j)
             go to 151
             nd = PRISMS(i)%Domain
-            n_domain(nd) = n_domain(nd) + 1  
+            n_domain(nd) = n_domain(nd) + 1
             neg_pri = neg_pri + 1
             exit
           end if
-        end do     
+        end do
       end do
 !
       pyr_min_jac = 1.d30
@@ -329,7 +329,7 @@ subroutine check_jacobian_gmp
           pyr_min_jac = min(pyr_min_jac,jac)
           if (jac .lt. 0.d0) then
             nd = PYRAMIDS(i)%Domain
-            n_domain(nd) = n_domain(nd) + 1  
+            n_domain(nd) = n_domain(nd) + 1
             neg_pyr = neg_pyr + 1
             exit
 !            write(*,*)'negative jacobian for pyramid = ',i
@@ -352,7 +352,7 @@ subroutine check_jacobian_gmp
       end do
       write(*,*)'--------------------------------------'
       write(*,*)'points per tri = ',n_tri
-      write(*,*)'tris with neg jac  = ', neg_tri 
+      write(*,*)'tris with neg jac  = ', neg_tri
       write(*,*)'triangles with neg jac per surface'
       do i = 1, NRSURFS
         write(*,*)i,n_surface(i)

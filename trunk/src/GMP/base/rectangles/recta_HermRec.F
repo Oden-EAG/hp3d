@@ -1,6 +1,6 @@
 c//////////////////////////////////////////////////////////////////////
 c P. Gatto, Nov 12 : this is a LEGACY routine. Do not use it, unless
-c                    you revise it!      
+c                    you revise it!
 c//////////////////////////////////////////////////////////////////////
 c
 c
@@ -55,7 +55,7 @@ c
 c  ...dof for functions psi
       dimension psidof(1:3,4,4)
 c
-c  ...coefficients alpha,beta,gamma for edges 
+c  ...coefficients alpha,beta,gamma for edges
       dimension alpha(2,2),beta(2,2),deldof(2,4),gamdof(4,4)
 c
 c  ...dual basis vectors at a vertex
@@ -84,10 +84,10 @@ c
 ccc      imod(j,mod) = j-(j-1)/mod*mod
       data iprint/0/
 c
-      data iedge_vert/ 1,1,2,1, 2,1,2,2, 1,2,2,2, 1,1,1,2/ 
+      data iedge_vert/ 1,1,2,1, 2,1,2,2, 1,2,2,2, 1,1,1,2/
 c
 c------------------------------------------------------------------------
-c       
+c
       if ((RECTANGLES(No)%Type.ne.'HermRec').or.(NDIM.ne.3)) then
         write(*,7000)
  7000   format('recta_HermRec: WRONG CALL')
@@ -216,7 +216,7 @@ c
 c
 c-----------------------------------------------------------------------
 c
-c  Step 2: Generate the data for edge functions psi, coefficients 
+c  Step 2: Generate the data for edge functions psi, coefficients
 c          alpha,beta and tangential components of the mixed derivatives
 c          at the vertices
 c
@@ -283,7 +283,7 @@ c
 c  .......compute vector psi and coefficient gamma
           temp(1:3) = av(1:3,i,j); call normalize(temp)
           call cross_product(rnvert(1:3,i,j),temp, psidof(1:3,iv,ie))
-          call scalar_product(bv(1:3,i,j),psidof(1:3,iv,ie), 
+          call scalar_product(bv(1:3,i,j),psidof(1:3,iv,ie),
      .                        gamdof(iv,ie))
 c
 c  .......compute derivative of coefficient gamma
@@ -324,7 +324,7 @@ c
 c  .......compute vector psi and coefficient gamma
           temp(1:3) = bv(1:3,i,j); call normalize(temp)
           call cross_product(rnvert(1:3,i,j),temp, psidof(1:3,iv,ie))
-          call scalar_product(av(1:3,i,j),psidof(1:3,iv,ie), 
+          call scalar_product(av(1:3,i,j),psidof(1:3,iv,ie),
      .                        gamdof(iv,ie))
 c
 c  .......compute derivative of coefficient gamma
@@ -385,12 +385,12 @@ c  ...vertex contributions (notice negative signs!)
      .                  - av(1:3,i,j)*vHshap1(2+i)*vHshap2(j)
      .                  - bv(1:3,i,j)*vHshap1(i)  *vHshap2(2+j)
      .                  - dv(1:3,i,j)*vHshap1(2+i)*vHshap2(2+j)
-        Dxdeta(1:3,1) = Dxdeta(1:3,1) 
+        Dxdeta(1:3,1) = Dxdeta(1:3,1)
      .                  - xv(1:3,i,j)*dvHshap1(i)  *vHshap2(j)
      .                  - av(1:3,i,j)*dvHshap1(2+i)*vHshap2(j)
      .                  - bv(1:3,i,j)*dvHshap1(i)  *vHshap2(2+j)
      .                  - dv(1:3,i,j)*dvHshap1(2+i)*vHshap2(2+j)
-        Dxdeta(1:3,2) = Dxdeta(1:3,2) 
+        Dxdeta(1:3,2) = Dxdeta(1:3,2)
      .                  - xv(1:3,i,j)*vHshap1(i)  *dvHshap2(j)
      .                  - av(1:3,i,j)*vHshap1(2+i)*dvHshap2(j)
      .                  - bv(1:3,i,j)*vHshap1(i)  *dvHshap2(2+j)
@@ -438,7 +438,7 @@ c
 c  .....compute the normal derivative (vector g)
         del = deldof(1,ie)*(1.d0-etac) + deldof(2,ie)*etac
         ddel = deldof(2,ie) - deldof(1,ie)
-        psi(1:3) = 0.d0; dpsi(1:3) = 0.d0; 
+        psi(1:3) = 0.d0; dpsi(1:3) = 0.d0;
         gamma = 0.d0; dgamma = 0.d0
 c
         select case(ie)
@@ -463,7 +463,7 @@ c
  5027     format('ie,gamma = ',i2,2x,f8.3)
         endif
         g(1:3) = df(1:3)*del + psi(1:3)*gamma
-        dg(1:3) = ddf(1:3)*del + df(1:3)*ddel 
+        dg(1:3) = ddf(1:3)*del + df(1:3)*ddel
      .          + dpsi(1:3)*gamma + psi(1:3)*dgamma
 c
 c  .....blending function and its derivative
@@ -509,6 +509,6 @@ c  ...end of loop through edges
         call pause
       endif
 c
-c     
+c
       end
 

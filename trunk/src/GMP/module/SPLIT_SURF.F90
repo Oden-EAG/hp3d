@@ -5,7 +5,7 @@ module SPLIT_SURF                                                    !
   use GMP                                                            !
   use control                                                        !
 !---------------------------------------------------------------------
-! ** SHARED VARIABLES **                                             | 
+! ** SHARED VARIABLES **                                             |
 !---------------------------------------------------------------------
   IMPLICIT NONE                                                      !
   SAVE                                                               !
@@ -60,7 +60,7 @@ subroutine allocate_Ns_bound_MOD
 !
 #if I_PRINT >= 1
     write(*,*)'allocate_Ns_bound_MOD: allocating Ns_bound_MOD...'
-#endif    
+#endif
     allocate(Ns_bound_MOD(Nr_bound_MOD), STAT = status)
     if (status .ne. 0) then
       write(*,*)'allocate_Ns_bound_MOD: Ns_bound_MOD not allocated.'
@@ -68,7 +68,7 @@ subroutine allocate_Ns_bound_MOD
     endif
 #if I_PRINT >= 1
     write(*,*)'allocate_Ns_bound_MOD: Ns_bound_MOD allocated successfully.'
-#endif    
+#endif
 end subroutine allocate_Ns_bound_MOD
 !-------------------------------------------------------------------------------
 !
@@ -84,7 +84,7 @@ subroutine deallocate_Ns_bound_MOD
 !
 #if I_PRINT >= 1
     write(*,*)'deallocate_Ns_bound_MOD: deallocating Ns_bound_MOD...'
-#endif    
+#endif
     deallocate(Ns_bound_MOD, STAT = status)
     if (status .ne. 0) then
       write(*,*)'deallocate_Ns_bound_MOD: Ns_bound_MOD not deallocated.'
@@ -92,7 +92,7 @@ subroutine deallocate_Ns_bound_MOD
     endif
 #if I_PRINT >= 1
     write(*,*)'deallocate_Ns_bound_MOD: Ns_bound_MOD deallocated successfully.'
-#endif    
+#endif
 end subroutine deallocate_Ns_bound_MOD
 !-------------------------------------------------------------------------------
 !
@@ -108,7 +108,7 @@ subroutine allocate_Ns_confm_MOD
 !
 #if I_PRINT >= 1
     write(*,*)'allocate_Ns_confm_MOD: allocating Ns_confm_MOD...'
-#endif    
+#endif
     allocate(Ns_confm_MOD(Nr_confm_MOD), STAT = status)
     if (status .ne. 0) then
       write(*,*)'allocate_Ns_confm_MOD: Ns_confm_MOD not allocated.'
@@ -116,7 +116,7 @@ subroutine allocate_Ns_confm_MOD
     endif
 #if I_PRINT >= 1
     write(*,*)'allocate_Ns_confm_MOD: Ns_confm_MOD allocated successfully.'
-#endif    
+#endif
 end subroutine allocate_Ns_confm_MOD
 !-------------------------------------------------------------------------------
 !
@@ -132,7 +132,7 @@ subroutine deallocate_Ns_confm_MOD
 !
 #if I_PRINT >= 1
     write(*,*)'deallocate_Ns_confm_MOD: deallocating Ns_confm_MOD...'
-#endif    
+#endif
     deallocate(Ns_confm_MOD, STAT = status)
     if (status .ne. 0) then
       write(*,*)'deallocate_Ns_confm_MOD: Ns_confm_MOD not deallocated.'
@@ -140,7 +140,7 @@ subroutine deallocate_Ns_confm_MOD
     endif
 #if I_PRINT >= 1
     write(*,*)'deallocate_Ns_confm_MOD: Ns_confm_MOD deallocated successfully.'
-#endif    
+#endif
 end subroutine deallocate_Ns_confm_MOD
 !-------------------------------------------------------------------------------
 !
@@ -151,7 +151,7 @@ subroutine deallocate_FIGS_SPLIT
 !-------------------------------------------------------------------------------
   integer :: status
 !-------------------------------------------------------------------------------
-! printing flag (0,1)  
+! printing flag (0,1)
 #define I_PRINT 0
 !
     deallocate(figs_split, STAT = status)
@@ -161,7 +161,7 @@ subroutine deallocate_FIGS_SPLIT
     endif
 #if I_PRINT >= 1
     write(*,*)'deallocate_FIGS_SPLIT: figs_split deallocated successfully.'
-#endif    
+#endif
 end subroutine deallocate_FIGS_SPLIT
 !-------------------------------------------------------------------------------
 !
@@ -172,9 +172,9 @@ subroutine deallocate_NEW_POINT
 !-------------------------------------------------------------------------------
   integer :: status
 !-------------------------------------------------------------------------------
-! printing flag (0,1)  
+! printing flag (0,1)
 #define I_PRINT 0
-! 
+!
     deallocate(new_point, STAT = status)
     if (status .ne. 0) then
       write(*,*)'deallocate_NEW_POINT: new_point not deallocated.'
@@ -182,7 +182,7 @@ subroutine deallocate_NEW_POINT
     endif
 #if I_PRINT >= 1
     write(*,*)'deallocate_NEW_POINT: new_point deallocated successfully.'
-#endif    
+#endif
 end subroutine deallocate_NEW_POINT
 !-------------------------------------------------------------------------------
 !
@@ -193,7 +193,7 @@ subroutine allocate_NEW_CURVES
 !-------------------------------------------------------------------------------
   integer :: status
 !-------------------------------------------------------------------------------
-! printing flag (0,1)  
+! printing flag (0,1)
 #define I_PRINT 0
 !
     allocate(new_curves(2,MAX_NEW_CURVES), STAT = status)
@@ -202,7 +202,7 @@ subroutine allocate_NEW_CURVES
       stop
     endif
 #if I_PRINT >= 1
-    write(*,*)'allocate_NEW_CURVES: new_curves allocate successfully.'    
+    write(*,*)'allocate_NEW_CURVES: new_curves allocate successfully.'
 #endif
 end subroutine allocate_NEW_CURVES
 !-------------------------------------------------------------------------------
@@ -214,7 +214,7 @@ subroutine deallocate_NEW_CURVES
 !-------------------------------------------------------------------------------
   integer :: status
 !-------------------------------------------------------------------------------
-! printing flag (0,1)  
+! printing flag (0,1)
 #define I_PRINT 0
 !
     deallocate(new_curves, STAT = status)
@@ -224,7 +224,7 @@ subroutine deallocate_NEW_CURVES
     endif
 #if I_PRINT >= 1
     write(*,*)'deallocate_NEW: new_curves deallocated successfully.'
-#endif        
+#endif
 end subroutine deallocate_NEW_CURVES
 !-------------------------------------------------------------------------------
 !

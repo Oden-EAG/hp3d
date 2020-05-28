@@ -19,10 +19,10 @@ subroutine create_TW_POINT_AND_CONN_CURVE(Np)
 !--------------------------------------------------------------------------------
 ! DUMMY ARGUMENTS
   integer, intent(in) :: Np
-!-------------------------------------------------------------------------------- 
+!--------------------------------------------------------------------------------
 ! VARIABLES
   real*8, dimension(3)    :: xp
-  integer                   :: nrsrf  
+  integer                   :: nrsrf
   integer, dimension(MAXSU) :: SURFS
   integer                   :: status
 !--------------------------------------------------------------------------------
@@ -31,15 +31,15 @@ subroutine create_TW_POINT_AND_CONN_CURVE(Np)
 !
 #if I_PRINT >= 1
     write(*,*)'create_TW_POINT_AND_CONN_CURVE: Np = ',Np
-#endif  
+#endif
 ! ..if point does not need to be duplicated, twin point is point itself
     if (new_point(np) .eq. 0) then
-      new_point(np) = np      
+      new_point(np) = np
 #if I_PRINT >= 1
       write(*,*)'create_TW_POINT_AND_CONN_CURVE: no need to duplicate point!'
 #endif
       return
-    endif  
+    endif
 ! *************  MOVE ORIGINAL POINT  *******************************************
     xp(1:3) = POINTS(Np)%Rdata(1:3)
 ! ..determine surfaces point must conform to
@@ -48,7 +48,7 @@ subroutine create_TW_POINT_AND_CONN_CURVE(Np)
     nrsrf = nrsrf + 1
     SURFS(nrsrf) = NRSURFS - 3
     call reproject_point(Np,nrsrf,SURFS)
-!  
+!
 ! *************  GENERATE TWIN POINT  *******************************************
     NRPOINT = NRPOINT + 1
     if (NRPOINT .gt. MAXNP) then
@@ -65,18 +65,18 @@ subroutine create_TW_POINT_AND_CONN_CURVE(Np)
 ! ..add plane shifted on POS side to conforming surfaces
     SURFS(nrsrf) = NRSURFS - 2
     call reproject_point(NRPOINT,nrsrf,SURFS)
-#if I_PRINT >= 2   
+#if I_PRINT >= 2
     write(*,*)'**************  Np = ',Np
     write(*,*)'**  conf. surfaces = ',SURFS(1:nrsrf - 1)
     write(*,*)'*****  orig. point = ',xp(1:3)
     write(*,*)'**  point NEG side = ',POINTS(Np)%Rdata(1:3)
     write(*,*)'**  point POS side = ',POINTS(NRPOINT)%Rdata(1:3)
-#endif 
+#endif
 ! ..store new point to its old point connectivities
     new_point(Np) = NRPOINT
 #if I_PRINT >= 2
     write(*,*)'************  twin point generated.'
-#endif 
+#endif
 !
 ! *************  GENERATE CONNECTING CURVE  *************************************
     NRCURVE = NRCURVE + 1
@@ -89,9 +89,9 @@ subroutine create_TW_POINT_AND_CONN_CURVE(Np)
     CURVES(NRCURVE)%EndPoNo(2) = NRPOINT
 #if I_PRINT >= 2
     write(*,*)'************  connecting curve generated.'
-#endif 
+#endif
 #if I_PRINT >= 1
     write(*,*)'create_TW_POINT_AND_CONN_CURVE: done!'
-#endif    
-!    
+#endif
+!
 end subroutine create_TW_POINT_AND_CONN_CURVE

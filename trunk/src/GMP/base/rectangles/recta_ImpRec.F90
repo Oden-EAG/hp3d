@@ -1,12 +1,12 @@
 !-----------------------------------------------------------------------
-!> Purpose : routine evaluates physical coordinates and derivatives of 
+!> Purpose : routine evaluates physical coordinates and derivatives of
 !!           of an implicit rectangle
 !!
 !! @param[in ] No     - rectangle number
 !! @param[in ] Eta    - reference coordinates of a point
 !! @param[out] X      - physical coordinates of the point
 !! @param[out] Dxdeta - derivatives of the physical coordinates
-!!      
+!!
 !! @revision Nov 12
 !-----------------------------------------------------------------------
 !  System of equations:
@@ -23,22 +23,22 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
       use element_data , only : QUADR_EDGE_TO_VERT
       use control      , only : GEOM_TOL
       implicit none
-      integer              ,intent(in ) :: No
-      real*8,dimension(2  ),intent(in ) :: Eta
-      real*8,dimension(3  ),intent(out) :: X
-      real*8,dimension(3,2),intent(out) :: Dxdeta
-!      
-      real*8, dimension(  4) :: shapH
-      real*8, dimension(2,4) :: dshapH
-      real*8, dimension(3,4) :: xv
-      real*8, dimension(3,3) :: aux,adx1,adx2
-      real*8, dimension(3  ) :: der,der1,der2,xs,xmid,aux1,aux2,xc,dxcdt,de
-      real*8, dimension(4  ) :: sfact,fxi,dfxi
-      real*8, dimension(2  ) :: dtdeta
-      integer,dimension(4  ) :: ncurv,npoint
-      integer,dimension(5  ) :: nsurf
+      integer               ,intent(in ) :: No
+      real(8),dimension(2  ),intent(in ) :: Eta
+      real(8),dimension(3  ),intent(out) :: X
+      real(8),dimension(3,2),intent(out) :: Dxdeta
+!
+      real(8), dimension(  4) :: shapH
+      real(8), dimension(2,4) :: dshapH
+      real(8), dimension(3,4) :: xv
+      real(8), dimension(3,3) :: aux,adx1,adx2
+      real(8), dimension(3  ) :: der,der1,der2,xs,xmid,aux1,aux2,xc,dxcdt,de
+      real(8), dimension(4  ) :: sfact,fxi,dfxi
+      real(8), dimension(2  ) :: dtdeta
+      integer, dimension(4  ) :: ncurv,npoint
+      integer, dimension(5  ) :: nsurf
 
-      real*8  :: fval,fval1,fval2,fval3,fval4,fval5,t
+      real(8) :: fval,fval1,fval2,fval3,fval4,fval5,t
       integer :: i,j,iv1,iv2,norient,ifl1,ifl2,ii
       integer :: iprint
 !-----------------------------------------------------------------------
@@ -98,25 +98,25 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
         write(*,7002) ncurv, npoint, nsurf
  7002   format(' recta_ImpRec: CURVES   = ',4i6, &
              /,'               POINTS   = ',4i6, &
-             /,'               SURFACES = ',5i6) 
+             /,'               SURFACES = ',5i6)
       endif
 !
 !  ...determine the sign factors to adjust orientation of surfaces
 !
-!                 
+!
 !       4        |        3
-!        * * * * * * * * * 
+!        * * * * * * * * *
 !        *       4       *
 !        *               *
 !        *               *
-!      5 * --    1     3 * --  
+!      5 * --    1     3 * --
 !        *               *
 !        *               *
 !        *       |       *
 !        * * * * * * * * *
 !       1        2        2
 !
-!      
+!
       sfact(1:4) = 1.d0
       call surf(nsurf(2),xmid, fval,de)
       if (fval.lt.0) sfact(1) = -1.d0
@@ -155,7 +155,7 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
       enddo
 !
 !-----------------------------------------------------------------------
-!  Step 1 : evaluate stretching functions and their derivatives wrt 
+!  Step 1 : evaluate stretching functions and their derivatives wrt
 !           reference coordinates
 !-----------------------------------------------------------------------
 !
@@ -179,7 +179,7 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
 !  ...surfaces bounding 1st edge curve
       call surf(nsurf(5),xc, fval1,der1)
       call surf(nsurf(3),xc, fval2,der2)
-!  ...adjust orientations 
+!  ...adjust orientations
       fval1=fval1*sfact(4) ; der1(1:3)=der1(1:3)*sfact(4)
       fval2=fval2*sfact(2) ; der2(1:3)=der2(1:3)*sfact(2)
       if (iprint.eq.1) then
@@ -206,10 +206,10 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
         stop
       endif
 !
-!  ...bounding surfaces      
+!  ...bounding surfaces
       call surf(nsurf(2),xc, fval1,der1)
       call surf(nsurf(4),xc, fval2,der2)
-!  ...adjust orientations 
+!  ...adjust orientations
       fval1=fval1*sfact(1) ; der1(1:3)=der1(1:3)*sfact(1)
       fval2=fval2*sfact(3) ; der2(1:3)=der2(1:3)*sfact(3)
       if (iprint.eq.1) then
@@ -237,10 +237,10 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
         stop
       endif
 !
-!  ...bounding surfaces      
+!  ...bounding surfaces
       call surf(nsurf(5),xc, fval1,der1)
       call surf(nsurf(3),xc, fval2,der2)
-!  ...adjust orientations 
+!  ...adjust orientations
       fval1=fval1*sfact(4) ; der1(1:3)=der1(1:3)*sfact(4)
       fval2=fval2*sfact(2) ; der2(1:3)=der2(1:3)*sfact(2)
       if (iprint.eq.1) then
@@ -249,7 +249,7 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
       endif
 !
       fxi(3) = fval1/(fval1-fval2)
-      dfxi(3) = ((1.d0-fxi(3))*dot_product(der1,dxcdt)                & 
+      dfxi(3) = ((1.d0-fxi(3))*dot_product(der1,dxcdt)                &
                       +fxi(3) *dot_product(der2,dxcdt))/(fval1-fval2)
 !
 !
@@ -267,10 +267,10 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
         stop
       endif
 !
-!  ...bounding surfaces      
+!  ...bounding surfaces
       call surf(nsurf(2),xc, fval1,der1)
       call surf(nsurf(4),xc, fval2,der2)
-!  ...adjust orientations 
+!  ...adjust orientations
       fval1=fval1*sfact(1) ; der1(1:3)=der1(1:3)*sfact(1)
       fval2=fval2*sfact(3) ; der2(1:3)=der2(1:3)*sfact(3)
       if (iprint.eq.1) then
@@ -368,4 +368,4 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
       endif
 !
 !
-endsubroutine recta_ImpRec
+end subroutine recta_ImpRec

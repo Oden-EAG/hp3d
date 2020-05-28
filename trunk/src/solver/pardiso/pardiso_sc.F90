@@ -20,7 +20,7 @@
 !                                'G': General case for Lapack routines
 !
 ! ----------------------------------------------------------------------
-#include "implicit_none.h"
+#include "typedefs.h"
 subroutine pardiso_sc(mtype)
 !
    use data_structure3D, only: NRNODS, NRELES, ELEM_ORDER
@@ -50,7 +50,7 @@ subroutine pardiso_sc(mtype)
 !
 !..number of local element dof for each physics variable
    integer, dimension(NR_PHYSA) :: nrdofi,nrdofb
-! 
+!
 !..integer counters
    integer   :: nrdof_H,nrdof_E,nrdof_V,nrdof_Q
    integer   :: nrdofm,nrdofc,nrnodm,nrdof,ndof
@@ -60,7 +60,7 @@ subroutine pardiso_sc(mtype)
 !..dummy variables
    integer :: nvoid
    VTYPE   :: zvoid
-! 
+!
 !..work space for celem
    integer, dimension(MAXNODM) :: nodm,ndofmH,ndofmE,ndofmV,ndofmQ
    integer, dimension(NRELES)  :: m_elem_inz
@@ -103,7 +103,7 @@ subroutine pardiso_sc(mtype)
               + (MAXbrickV-MAXmdlbV)*NRVVAR
 !..no static condensation
    else
-      MAXDOFM = MAXbrickH*NRHVAR    & 
+      MAXDOFM = MAXbrickH*NRHVAR    &
               + MAXbrickE*NREVAR    &
               + MAXbrickV*NRVVAR    &
               + MAXbrickQ*NRQVAR
@@ -238,10 +238,10 @@ subroutine pardiso_sc(mtype)
       Mtime(1) = end_time-start_time
       write(*,1002) Mtime(1)
 1002  format(' STEP 1 finished: ',f12.5,'  seconds',/)
-   endif 
+   endif
 !
 ! ----------------------------------------------------------------------
-!  STEP 2 : ASSEMBLE AND STORE IN SPARSE FORM 
+!  STEP 2 : ASSEMBLE AND STORE IN SPARSE FORM
 ! ----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
@@ -255,7 +255,7 @@ subroutine pardiso_sc(mtype)
    allocate(SJA(inz))
    allocate(SA(inz))
    allocate(RHS(nrdof)); RHS=ZERO
-!   
+!
    call stc_alloc
 !
 !..assemble global stiffness matrix
@@ -399,7 +399,7 @@ subroutine pardiso_sc(mtype)
    endif
 !
    call coo2csr(SIA,SJA,SA,inz, nnz)
-!   
+!
 ! ----------------------------------------------------------------------
 !  END OF STEP 3
 ! ----------------------------------------------------------------------
@@ -409,7 +409,7 @@ subroutine pardiso_sc(mtype)
       Mtime(3) = end_time-start_time
       write(*,1008) Mtime(3)
 1008  format(' STEP 3 finished: ',f12.5,'  seconds',/)
-   endif   
+   endif
 !
 !----------------------------------------------------------------------
 !  STEP 4: call pardiso to solve the linear system
@@ -450,7 +450,7 @@ subroutine pardiso_sc(mtype)
 1011  format(' STEP 5 started : Store the solution')
       start_time = MPI_Wtime()
    endif
-! 
+!
 !$OMP PARALLEL DO          &
 !$OMP PRIVATE(i,k1,ndof)   &
 !$OMP SCHEDULE(DYNAMIC)
@@ -482,7 +482,7 @@ subroutine pardiso_sc(mtype)
       write(*,1012) Mtime(5)
 1012  format(' STEP 5 finished: ',f12.5,'  seconds',/)
    endif
-!   
+!
    deallocate(RHS)
    deallocate(MAXDOFS)
    deallocate(NFIRSTV,NFIRSTH,NFIRSTE)

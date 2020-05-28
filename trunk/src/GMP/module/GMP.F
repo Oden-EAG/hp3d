@@ -36,7 +36,7 @@ c     number of subdomains
 c     number of fine grid points
       integer, save :: NRPO_FG
 c     fine grid scale
-      double precision, save :: SCALE_FG
+      real(8), save :: SCALE_FG
 c
 c     maximum number of algebraic surfaces
       integer, save :: MAXSU
@@ -118,7 +118,7 @@ c----------------------------------------------------------------------
       type surface
         character(len=10)                       :: Type
         integer,          dimension(:), pointer :: Idata
-        double precision, dimension(:), pointer :: Rdata
+        real(8),          dimension(:), pointer :: Rdata
       endtype surface
 c
 c
@@ -158,7 +158,7 @@ c----------------------------------------------------------------------
         integer                                 :: NrCurv
         integer,          dimension(:), pointer :: CurvNo
         integer,          dimension(:), pointer :: Idata
-        double precision, dimension(:), pointer :: Rdata
+        real(8),          dimension(:), pointer :: Rdata
       endtype point
 c
 c
@@ -233,7 +233,7 @@ c----------------------------------------------------------------------
         integer                                 :: NrFig
         integer,          dimension(:), pointer :: FigNo
         integer,          dimension(:), pointer :: Idata
-        double precision, dimension(:), pointer :: Rdata
+        real(8),          dimension(:), pointer :: Rdata
       endtype ccurve
 c
 c
@@ -295,7 +295,7 @@ c----------------------------------------------------------------------
         integer                                 :: EdgeNo(3)
         integer                                 :: BlockNo(2)
         integer,          dimension(:), pointer :: Idata
-        double precision, dimension(:), pointer :: Rdata
+        real(8),          dimension(:), pointer :: Rdata
       endtype triangle
 c
 c
@@ -355,7 +355,7 @@ c----------------------------------------------------------------------
         integer                                 :: EdgeNo(4)
         integer                                 :: BlockNo(2)
         integer,          dimension(:), pointer :: Idata
-        double precision, dimension(:), pointer :: Rdata
+        real(8),          dimension(:), pointer :: Rdata
       endtype rectangle
 c
 c
@@ -1475,7 +1475,7 @@ c
         write(*,7006) MAXSU,
      .                MAXNP,MAXNC,MAXTR,MAXRE,
      .                MAXBT,MAXHE,MAXTE,MAXPY
- 7006   format(' MAXSU,MAXNP,MAXNC,MAXTR,MAXRE,MAXBT,MAXHE,MAXTE,'
+ 7006   format(' MAXSU,MAXNP,MAXNC,MAXTR,MAXRE,MAXBT,MAXHE,MAXTE,',
      .         'MAXPY = ',9i7)
 c
       case(2)

@@ -30,25 +30,25 @@ subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
 !   
    implicit none
 !   
-   real*8, dimension(3), intent(in)  :: X
-   integer,              intent(in)  :: Icase,Mdle
+   real(8), intent(in)  :: X(3)
+   integer, intent(in)  :: Icase,Mdle
 !..exact solution
-   real*8,dimension(  MAXEQNH    ) ::   ValH
-   real*8,dimension(  MAXEQNH,3  ) ::  DvalH
-   real*8,dimension(  MAXEQNH,3,3) :: d2valH
-   real*8,dimension(3,MAXEQNE    ) ::   ValE
-   real*8,dimension(3,MAXEQNE,3  ) ::  DvalE
-   real*8,dimension(3,MAXEQNE,3,3) :: d2valE
-   real*8,dimension(3,MAXEQNV    ) ::   ValV
-   real*8,dimension(3,MAXEQNV,3  ) ::  DvalV
-   real*8,dimension(3,MAXEQNV,3,3) :: d2valV
-   real*8,dimension(  MAXEQNQ    ) ::   valQ
-   real*8,dimension(  MAXEQNQ,3  ) ::  dvalQ
-   real*8,dimension(  MAXEQNQ,3,3) :: d2valQ
-!   
+   real(8),dimension(  MAXEQNH    ) ::   ValH
+   real(8),dimension(  MAXEQNH,3  ) ::  DvalH
+   real(8),dimension(  MAXEQNH,3,3) :: d2valH
+   real(8),dimension(3,MAXEQNE    ) ::   ValE
+   real(8),dimension(3,MAXEQNE,3  ) ::  DvalE
+   real(8),dimension(3,MAXEQNE,3,3) :: d2valE
+   real(8),dimension(3,MAXEQNV    ) ::   ValV
+   real(8),dimension(3,MAXEQNV,3  ) ::  DvalV
+   real(8),dimension(3,MAXEQNV,3,3) :: d2valV
+   real(8),dimension(  MAXEQNQ    ) ::   valQ
+   real(8),dimension(  MAXEQNQ,3  ) ::  dvalQ
+   real(8),dimension(  MAXEQNQ,3,3) :: d2valQ
+!
 !..printing flag
    integer :: iprint
-!   
+!
 !--------------------------------------------------------------------
 !
    iprint = 0

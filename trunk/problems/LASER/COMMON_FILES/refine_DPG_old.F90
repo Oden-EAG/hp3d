@@ -51,7 +51,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires,Iso_ans, Nstop)
 !
    integer, intent(in)  :: Irefine
    integer, intent(in)  :: Nreflag
-   real*8,  intent(in)  :: Factor
+   real(8), intent(in)  :: Factor
    integer, intent(in)  :: Nflag(NR_PHYSA)
    integer, intent(in)  :: PhysNick
    integer, intent(in)  :: Iso_ans
@@ -61,13 +61,13 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires,Iso_ans, Nstop)
    integer, parameter :: max_step = 300
    integer, dimension(max_step), save :: nrdof_tot_mesh
    integer, dimension(max_step), save :: nrdof_con_mesh
-   real*8,  dimension(max_step), save :: residual_mesh
-   real*8,  dimension(max_step), save :: rate_mesh
-   real*8,  dimension(max_step), save :: error_mesh
-   real*8,  dimension(max_step), save :: rel_error_mesh
-   real*8,  dimension(max_step), save :: rate_error_mesh
+   real(8), dimension(max_step), save :: residual_mesh
+   real(8), dimension(max_step), save :: rate_mesh
+   real(8), dimension(max_step), save :: error_mesh
+   real(8), dimension(max_step), save :: rel_error_mesh
+   real(8), dimension(max_step), save :: rate_error_mesh
 !
-   real*8,  allocatable :: elem_resid(:)
+   real(8), allocatable :: elem_resid(:)
    integer, allocatable :: elem_ref_flag(:)
    integer, allocatable :: list_elem(:)
    integer, allocatable :: elem_pref(:), elem_pref_ord(:)
@@ -79,8 +79,8 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires,Iso_ans, Nstop)
    integer :: nrdofField, nrdofDPG
    integer :: nr_elem_to_refine
    integer :: n_elem(NRELES)
-   real*8  :: residual, elem_resid_max, err, rnorm
-   real*8  :: errorH,errorE,errorV,errorQ,rnormH,rnormE,rnormV,rnormQ
+   real(8) :: residual, elem_resid_max, err, rnorm
+   real(8) :: errorH,errorE,errorV,errorQ,rnormH,rnormE,rnormV,rnormQ
    integer :: i,ic,mdle,iel,kref,iii
    integer :: vref(3), jref(3)
    integer :: nord, nordx, nordy, nordz, nordyz
@@ -88,14 +88,14 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires,Iso_ans, Nstop)
    integer :: idec_pref,idec_href, iref, enforce_flag, icpref
 !
 !..geometry dof (work space for nodcor)
-   real*8, dimension(3,MAXbrickH) :: xnod
-   real*8 :: maxz,minz,midz
+   real(8) :: xnod(3,MAXbrickH)
+   real(8) :: maxz,minz,midz
 !
 !..element type
    character(len=4) :: etype
 !
 !..auxiliary variables for timing
-   real*8 :: start, OMP_get_wtime
+   real(8) :: start, OMP_get_wtime
 !
 !..printing flag
    integer :: iprint = 0
@@ -479,7 +479,7 @@ subroutine select_refinement(Mdle,Iref)
    integer, intent(in)  :: Mdle
    integer, intent(out) :: Iref
 !..geometry dof
-   real*8  :: xnod(3,MAXbrickH), hmin
+   real(8) :: xnod(3,MAXbrickH), hmin
 !
 !---------------------------------------------------------------------
 !

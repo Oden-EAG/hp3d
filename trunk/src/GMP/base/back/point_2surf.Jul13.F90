@@ -26,28 +26,28 @@ subroutine point_2surf(Np,Iv,Nt,NSURFS)
 ! FUNCTIONS
   integer :: mod3
 !-------------------------------------------------------------------------
-!  
-! printing flag (0,1,2)  
+!
+! printing flag (0,1,2)
 #define I_PRINT 0
 !
 #if I_PRINT >= 1
     write(*,*)'point_2surf: reprojecting point np = ',Np
-#endif    
+#endif
 ! ..store first 2 surface numbers
     surfs(1:2) = NSURFS(1:2)
 ! ..create 1 extra plane and store its surface number
     NRSURFS = NRSURFS + 1;  surfs(3) = NRSURFS
-! ..get 1st curve number          
+! ..get 1st curve number
     nc = abs(TRIANGLES(Nt)%EdgeNo(Iv))
 #if I_PRINT >= 2
     write(*,*)'point_2surf: nc_1 = ',nc
 #endif
 ! ..get curve start point
     np_s = CURVES(nc)%EndPoNo(1)
-! ..account for orientation and compute gradient          
+! ..account for orientation and compute gradient
     if (Np .eq. np_s) then
       call curve(nc,0.d0, void_1,GRAD(1:3,1))
-    else  
+    else
       call curve(nc,1.d0, void_1,GRAD(1:3,1))
     endif
     call normalize(GRAD(1:3,1))
@@ -55,14 +55,14 @@ subroutine point_2surf(Np,Iv,Nt,NSURFS)
     write(*,1) GRAD(1:3,1)
 1   format(' point_2surf: grad_1 =',3(E12.5,2X))
 #endif
-! ..get 2nd curve number          
+! ..get 2nd curve number
     nc = abs(TRIANGLES(Nt)%EdgeNo(mod3(Iv + 2)))
 ! ..get curve start point
     np_s = CURVES(nc)%EndPoNo(1)
-! ..account for orientation, compute gradient and normalize it      
+! ..account for orientation, compute gradient and normalize it
     if (np .eq. np_s) then
       call curve(nc,0.d0, void_1,GRAD(1:3,2))
-    else  
+    else
       call curve(nc,1.d0, void_1,GRAD(1:3,2))
     endif
     call normalize(GRAD(1:3,2))
@@ -81,7 +81,7 @@ subroutine point_2surf(Np,Iv,Nt,NSURFS)
 ! ..compute maximum and check if it is an appropriate value
     if (maxval(M_PROD(1:2)) .lt. 0.3d0) then
       write(*,*)'point_2surf: warning, mixed product less than 0.03.'
-    endif        
+    endif
 ! ..create plane
     SURFACES(surfs(3))%Type = 'VecPt'
     allocate (SURFACES(surfs(3))%Rdata(6), STAT = status)
@@ -115,18 +115,18 @@ subroutine point_2surf(Np,Iv,Nt,NSURFS)
     if (status .ne. 0 ) then
       write(*,*)'point_2surf: plane not deallocated.'
       stop
-    endif  
+    endif
     NRSURFS = NRSURFS - 1
 #if I_PRINT >= 2
     write(*,*)'point_2surf: extra surface deallocated.'
-#endif    
-! ..delete point type  
+#endif
+! ..delete point type
     POINTS(Np)%Type = 'Regular'
     deallocate(POINTS(Np)%Idata, STAT = status)
     if (status .ne. 0) then
       write(*,*)'point_2surf: point Idata not deallocated.'
       stop
-    endif      
+    endif
 #if I_PRINT >= 2
     write(*,*)'point_2surf: point type redefined.'
 #endif

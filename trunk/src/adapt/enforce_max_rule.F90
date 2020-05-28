@@ -34,7 +34,7 @@
 !
 !..reset visitation flags
    call reset_visit
-!   
+!
 !----------------------------------------------------------------------
 !        STEP 1: maximum rule for edges and faces wrt elements
 !----------------------------------------------------------------------
@@ -46,8 +46,8 @@
       nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
       call get_connect_info(mdle, nodesl,norientl)
       call element_order(mdle,norientl, norder)
-!      
-!  ...loop through edges and faces      
+!
+!  ...loop through edges and faces
       do j=1,nre+nrf
          i=nrv+j
          nod = nodesl(i); nord = norder(j)
@@ -84,15 +84,15 @@
                call save_max_order(nodp,nord)
             end select
          endif
-      enddo 
+      enddo
    enddo
 !
-!   
+!
 !----------------------------------------------------------------------
 !                 STEP 2: Modify faces (min rule for edges wrt faces)
 !----------------------------------------------------------------------
 !
-!..loop through the elements   
+!..loop through the elements
    do iel=1,NRELES
       mdle = ELEM_ORDER(iel)
       call elem_nodes(mdle, nodesl,norientl)
@@ -145,17 +145,17 @@
             call decode(norder(nre+jf), nordhl,nordvl)
             select case(norientl(nrv+nre+jf))
             case(0,2,5,7)
-               nordh = max(nordh,nordhl); nordv = max(nordv,nordvl) 
+               nordh = max(nordh,nordhl); nordv = max(nordv,nordvl)
             case(1,3,4,6)
                nordh = max(nordh,nordvl); nordv = max(nordv,nordhl)
             end select
             nordhv = max(nordh,nordv)
-            NODES(nod)%visit = nordhv*10+nordhv 
-            ! NODES(nod)%visit = nordh*10+nordv 
+            NODES(nod)%visit = nordhv*10+nordhv
+            ! NODES(nod)%visit = nordh*10+nordv
          end select
       enddo
 !
-!..end of loop through the elements   
+!..end of loop through the elements
    enddo
 !
 !..loop through nodes
@@ -304,7 +304,7 @@
       select case(NODES(Nod)%type)
       case('medg','mdlt')
          NODES(nod)%visit = max(NODES(nod)%visit,Nord,NODES(nod)%order)
-         ! write(*,*) 'save_max_order: Nod, NODES(nod)%visit = ', Nod,NODES(nod)%visit 
+         ! write(*,*) 'save_max_order: Nod, NODES(nod)%visit = ', Nod,NODES(nod)%visit
       case('mdlq')
          call decode(NODES(nod)%order, nordh,nordv)
          call decode(Nord, nordh1,nordv1)

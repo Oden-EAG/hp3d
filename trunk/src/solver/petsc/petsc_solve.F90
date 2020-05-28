@@ -1,5 +1,5 @@
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 #include <petsc/finclude/petscksp.h>
 ! -----------------------------------------------------------------------
 !
@@ -83,7 +83,7 @@ subroutine petsc_solve(mtype)
 !
 !..number of local element dof for each physics variable
    integer, dimension(NR_PHYSA) :: nrdofi,nrdofb
-! 
+!
 !..integer counters
    integer    :: nrdofm,nrdofc,nrnodm,nrdof,nrdof_mdl,ndof
    integer    :: idec,iel,mdle,subd,idx,i,j,k,l,k1,k2,inod,nod,nod_subd,nsize
@@ -104,8 +104,8 @@ subroutine petsc_solve(mtype)
    KSPType petsc_method
    real(8) :: petsc_info(MAT_INFO_SIZE)
    real(8) :: petsc_mallocs,petsc_nz_alloc,petsc_nz_used
-   character*64 :: info_string
-   character*8  :: fmt,val_string
+   character(64) :: info_string
+   character(8)  :: fmt,val_string
 !
 !..Non-zero computation
    integer :: my_dnz, my_onz, NR_NOD_LIST, NR_NODS_SUBD, NRNODS_SUBD
@@ -117,7 +117,7 @@ subroutine petsc_solve(mtype)
    type(NOD_SUBD_LIST), allocatable :: NOD_INT(:)
    type ONZ_BUF
       integer, allocatable :: SEND_BUF(:)
-      integer, allocatable :: RECV_BUF(:) 
+      integer, allocatable :: RECV_BUF(:)
    end type
    type(ONZ_BUF), allocatable :: ONZ(:)
    integer, allocatable :: TEMP_BUF(:)
@@ -125,7 +125,7 @@ subroutine petsc_solve(mtype)
 !..dummy variables
    integer :: nvoid
    VTYPE   :: zvoid
-! 
+!
 !..workspace for celem
    integer, dimension(MAXNODM) :: nodm,ndofmH,ndofmE,ndofmV,ndofmQ
 !
@@ -352,7 +352,7 @@ subroutine petsc_solve(mtype)
             write(*,*) 'Reallocating SEND_BUF...'
             allocate(TEMP_BUF(2*nsize))
             TEMP_BUF(1:nsize) = ONZ(j+1)%SEND_BUF(1:nsize)
-            call move_alloc(TEMP_BUF, ONZ(j+1)%SEND_BUF) 
+            call move_alloc(TEMP_BUF, ONZ(j+1)%SEND_BUF)
          endif
 !     ...fill buffer with this node's interaction with my own subdomain
 !        data = (nod, NR_NOD_INT(nod), (nod_int,dof), (nod_int,dof), .. )
@@ -469,7 +469,7 @@ subroutine petsc_solve(mtype)
                   inod = NOD_INT(nod_subd)%LIST(k2)
                   if (k .eq. inod) then
                      k = 0; exit
-                  endif 
+                  endif
                enddo
                if (k > 0) then
                   ndof = ONZ(i)%RECV_BUF(l+2+j+1) ! add number of dof of this interaction
@@ -572,10 +572,10 @@ subroutine petsc_solve(mtype)
       Mtime(1) = end_time-start_time
       if (RANK .eq. ROOT) write(*,1002) Mtime(1)
  1002 format(' STEP 1 finished: ',f12.5,'  seconds',/)
-   endif 
+   endif
 !
 ! ----------------------------------------------------------------------
-!  STEP 2 : ASSEMBLE AND STORE IN SPARSE FORM 
+!  STEP 2 : ASSEMBLE AND STORE IN SPARSE FORM
 ! ----------------------------------------------------------------------
 !
    call MPI_BARRIER(MPI_COMM_WORLD, ierr)

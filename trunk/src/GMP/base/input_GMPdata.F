@@ -44,7 +44,7 @@ c     or
 c       list(1,i) = block connected to a face
 c       list(2,i) = the corresponding face number
 c
-      character*10 type
+      character(10) type
 c
 c---------------------------------------------------------------------
 c
@@ -505,7 +505,7 @@ c  ...clean up...
       deallocate (hexa_to_surf)
 c
 c
-      endsubroutine input_GMPdata
+      end subroutine input_GMPdata
 c
 c
 c
@@ -619,7 +619,7 @@ c
       enddo
 !
 !
-      endsubroutine input_SURFACES
+      end subroutine input_SURFACES
 !
 !
 !
@@ -639,7 +639,7 @@ c
       use GMP
 #include "syscom.blk"
 !
-      character*10 type
+      character(10) type
 !
 !---------------------------------------------------------------------
 !
@@ -692,7 +692,7 @@ c
       enddo
 !
 !
-      endsubroutine input_POINTS
+      end subroutine input_POINTS
 !
 !
 !

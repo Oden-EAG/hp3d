@@ -5,10 +5,10 @@
 subroutine unit_cart2sphere(Theta, Phi, T)
   implicit none
   ! input arguments
-  real*8, intent(in)                  :: Theta, Phi
-  real*8, intent(out), dimension(3,3) :: T
-  real*8 :: siTh, coTh, siPh, coPh
-  
+  real(8), intent(in)                  :: Theta, Phi
+  real(8), intent(out), dimension(3,3) :: T
+  real(8) :: siTh, coTh, siPh, coPh
+
   siTh = sin(Theta); coTh = cos(Theta);
   siPh = sin(Phi);   coPh = cos(Phi);
 
@@ -26,10 +26,10 @@ end subroutine unit_cart2sphere
 subroutine grad_sphere2cart(R, Theta, Phi, T)
   implicit none
   ! input arguments
-  real*8, intent(in)                  :: R, Theta, Phi
-  real*8, intent(out), dimension(3,3) :: T
-  real*8 :: siTh, coTh, siPh, coPh
-  real*8, parameter :: epsilon = 1.0e-14, pi=4.*ATAN(1.D0)
+  real(8), intent(in)                  :: R, Theta, Phi
+  real(8), intent(out), dimension(3,3) :: T
+  real(8) :: siTh, coTh, siPh, coPh
+  real(8), parameter :: epsilon = 1.0e-14, pi=4.*ATAN(1.D0)
 
 
   ! http://mathworld.wolfram.com/SphericalCoordinates.html
@@ -39,7 +39,7 @@ subroutine grad_sphere2cart(R, Theta, Phi, T)
      siTh = sin(Theta)
   end if
   coTh = cos(Theta);
-  siPh = sin(Phi);   
+  siPh = sin(Phi);
   coPh = cos(Phi);
 
   T(1,1)   =  coPh*siTh;    T(1,2)   =  coPh*coTh/R;     T(1,3)   = -siPh/(R*siTh)
@@ -55,20 +55,20 @@ end subroutine grad_sphere2cart
 !! @param Zds [in]  - derivative in spherical coord
 !! @param Zc  [out] - displacement in cartesian coord
 !! @param Zdc [out] - derivative in cartesian coord
-#include "implicit_none.h"
+#include "typedefs.h"
 subroutine disp_sphere2cart(S, Zs, Zds, Zc, Zdc)
   use parameters
   implicit none
-  real*8, dimension(3),   intent(in)  :: S
+  real(8),dimension(3),   intent(in)  :: S
   VTYPE,  dimension(3),   intent(in)  :: Zs
   VTYPE,  dimension(3,3), intent(in)  :: Zds
   VTYPE,  dimension(3),   intent(out) :: Zc
   VTYPE,  dimension(3,3), intent(out) :: Zdc
-  
-  integer                :: k1, k2 
-  real*8, dimension(3,3) :: rot_u, rot_g
+
+  integer                :: k1, k2
+  real(8),dimension(3,3) :: rot_u, rot_g
   VTYPE,  dimension(3,3) :: ztmp
-  real*8                 :: coTh, siTh, coPh, siPh
+  real(8)                :: coTh, siTh, coPh, siPh
 
   coTh = cos(S(2));
   siTh = sin(S(2));
@@ -92,7 +92,7 @@ subroutine disp_sphere2cart(S, Zs, Zds, Zc, Zdc)
   ! add its derivative r, theta and phi
   ztmp(1,2) = ztmp(1,2) + coTh*coPh*Zs(1) - siTh*coPh*Zs(2)
   ztmp(1,3) = ztmp(1,3) - siTh*siPh*Zs(1) - coTh*siPh*Zs(2) - coPh*Zs(3)
-  
+
   ztmp(2,2) = ztmp(2,2) + coTh*siPh*Zs(1) - siTh*siPh*Zs(2)
   ztmp(2,3) = ztmp(2,3) + siTh*coPh*Zs(1) + coTh*coPh*Zs(2) - siPh*Zs(3)
 
@@ -105,6 +105,6 @@ subroutine disp_sphere2cart(S, Zs, Zds, Zc, Zdc)
      Zdc(2,k1) = dot_product(rot_g(2,1:3), ztmp(k1,1:3))
      Zdc(3,k1) = dot_product(rot_g(3,1:3), ztmp(k1,1:3))
   end do
-  
+
 end subroutine disp_sphere2cart
 

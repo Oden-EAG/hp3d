@@ -6,7 +6,7 @@ c  @param[in ] Eta       - reference coordinates of a point
 c  @param[out] X         - physical coordinates of the point
 c  @param[out] Dxdeta    - derivatives wrt reference coordinates
 c
-c  @revision Nov 12      
+c  @revision Nov 12
 c----------------------------------------------------------------------
 c
       subroutine trian_TransTri(No,Eta, X,Dxdeta)
@@ -34,17 +34,17 @@ c
 c
 c  ...evaluate linear shape functions
       shapH(1) = 1.d0-Eta(1)-Eta(2); dshapH(1:2,1) = -1.d0
-      shapH(2) = Eta(1); dshapH(1,2) = 1.d0; dshapH(2,2) = 0.d0   
-      shapH(3) = Eta(2); dshapH(1,3) = 0.d0; dshapH(2,3) = 1.d0  
+      shapH(2) = Eta(1); dshapH(1,2) = 1.d0; dshapH(2,2) = 0.d0
+      shapH(3) = Eta(2); dshapH(1,3) = 0.d0; dshapH(2,3) = 1.d0
 c
-      X(1:3) = 0.d0; Dxdeta(1:3,1:2) = 0.d0 
+      X(1:3) = 0.d0; Dxdeta(1:3,1:2) = 0.d0
 c
 c  ...compute vertex interpolant
       do iv=1,3
         np = TRIANGLES(No)%VertNo(iv)
         X(1:3) = X(1:3) + POINTS(np)%Rdata(1:3)*shapH(iv)
         do j=1,2
-          Dxdeta(1:3,j) = Dxdeta(1:3,j) 
+          Dxdeta(1:3,j) = Dxdeta(1:3,j)
      .                  + POINTS(np)%Rdata(1:3)*dshapH(j,iv)
         enddo
       enddo
@@ -88,7 +88,7 @@ c
 c  .....add adge contribution
         X(1:3) = X(1:3) + xc(1:3)*blend
         do j=1,2
-          Dxdeta(1:3,j) = Dxdeta(1:3,j) 
+          Dxdeta(1:3,j) = Dxdeta(1:3,j)
      .                  + dxcdse(1:3)*dseds(j)*blend
      .                  + xc(1:3)*dblend(j)
         enddo
@@ -102,4 +102,4 @@ c  .....add adge contribution
       endif
 c
 c
-      endsubroutine trian_TransTri
+      end subroutine trian_TransTri

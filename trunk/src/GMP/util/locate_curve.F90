@@ -5,7 +5,7 @@
 !
 !   purpose            - Routine locates a curve on a list
 !
-!   arguments         
+!   arguments
 !     in:
 !            Np1,Np2   - endpoints of a curve
 !            List      - list of endpoints for a collection of
@@ -18,13 +18,13 @@
 !
       subroutine locate_curve(Np1,Np2,List,Nlist, Ifound)
 !
-#include "syscom.blk"     
+#include "syscom.blk"
 !
       dimension List(2,Nlist)
 !
       Ifound = 0
       do l = 1, Nlist
-! ......recall to account for both possible orietations      
+! ......recall to account for both possible orietations
         if ((Np1 .eq. List(1,l)) .and. (Np2 .eq. List(2,l)))  Ifound = 1
         if ((Np2 .eq. List(1,l)) .and. (Np1 .eq. List(2,l)))  Ifound = 1
       enddo

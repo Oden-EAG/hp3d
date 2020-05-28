@@ -4,7 +4,7 @@ c   routine name       - geom3D
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Apr 14
+c   latest revision    - May 2020
 c
 c   purpose            - element geometry routine
 c
@@ -21,13 +21,13 @@ c     out:
 c             X        - physical coordinates of the point
 c             Dxdxi    - Jacobian matrix
 c             Dxidx    - inverse Jacobian matrix
-c             Rjac     - jacobian (determinant of the Jacobian matrix)
+c             Rjac     - Jacobian (determinant of the Jacobian matrix)
 c             Iflag    = 0 OK
-c                        1 negative jacobian
+c                        1 negative Jacobian
 c
 c----------------------------------------------------------------------
 c
-      subroutine geom3D(Mdle,Xi,Xnod,ShapH,GradH,NrdofH, 
+      subroutine geom3D(Mdle,Xi,Xnod,ShapH,GradH,NrdofH,
      .                  X,Dxdxi,Dxidx,Rjac,Iflag)
 c
       use control
@@ -44,60 +44,59 @@ c
  7001   format('geom3D: Mdle,Xi = ',i6,3x,3f8.3,' EXGEOM = ',i3)
       endif
 c
-c  ...determine physical coordinates and the derivatives of 
-c     the physical coordinates wrt master element ccordinates 
+c  ...determine physical coordinates and the derivatives of
+c     the physical coordinates wrt master element ccordinates
       select case(EXGEOM)
 c
-c  ...isoparametric element        
+c  ...isoparametric element
       case(0)
         if (iprint.eq.1) then
-          write(*,*) 'geom3D: xnod,shapH = '
+          write(*,*) 'geom3D: Xnod  = '
           do i=1,3
-            write(*,7010) xnod(i,1:NrdofH)
+            write(*,7010) Xnod(i,1:NrdofH)
  7010       format(10(27f7.2,1x,/))
           enddo
-          write(*,*) '        gradH = '
+          write(*,*) '        ShapH = '
+          write(*,7010) ShapH(1:NrdofH)
+          write(*,*) '        GradH = '
           do i=1,3
-            write(*,7010) gradH(i,1:NrdofH)
+            write(*,7010) GradH(i,1:NrdofH)
           enddo
         endif
-        X(1:3) = 0.d0
-        do k=1,NrdofH
+        X(1:3)=0.d0 ; Dxdxi(1:3,1:3)=0.d0
+        do k=1,nrdofH
           X(1:3) = X(1:3) + Xnod(1:3,k)*ShapH(k)
-        enddo
-        do imas=1,3
-          Dxdxi(1:3,imas) = 0.d0
-          do k=1,NrdofH
-            Dxdxi(1:3,imas) = 
-     .      Dxdxi(1:3,imas) + Xnod(1:3,k)*GradH(imas,k)
+          do i=1,3
+            Dxdxi(1:3,i) = Dxdxi(1:3,i) + Xnod(1:3,k)*GradH(i,k)
           enddo
         enddo
 c
-c  ...exact geometry element          
-      case(1) 
-        call geom_ex(Mdle,Xi, X,Dxdxi)
+c  ...exact geometry element
+      case(1)
+        call exact_geom(Mdle,Xi, X,Dxdxi)
       end select
 c
 c  ...evaluate the inverse Jacobian of the geometry map
       call geom(Dxdxi, Dxidx,Rjac,Iflag)
 c
-      if (Iflag .eq. 1) iprint = 1
-      !$OMP CRITICAL
-      if (iprint.eq.1) then
-        write(*,*) 'Mdle    = ', Mdle
-        write(*,*) 'X,Dxdxi = '
+      if (Iflag .ne. 0) then
+        !$OMP CRITICAL
+        write(*,*) 'geom3D: negative Jacobian!'
+        write(*,*) 'Mdle  = ', Mdle
+        write(*,*) 'Rjac  = ', Rjac
+        write(*,*) 'X     = '
+        write(*,7002) X(1:3)
+        write(*,*) 'Dxdxi = '
         do i=1,3
-          write(*,7002) X(i),Dxdxi(i,1:3)
- 7002     format(f8.3,3x,3f10.3)
+          write(*,7002) Dxdxi(i,1:3)
         enddo
-        write(*,*) 'Rjac', Rjac
         write(*,*) 'Dxidx = '
         do i=1,3
-          write(*,7003) Dxidx(i,1:3)
- 7003     format(11x,3f10.3)
+          write(*,7002) Dxidx(i,1:3)
         enddo
+ 7002   format(3f10.3)
+        !$OMP END CRITICAL
       endif
-      !$OMP END CRITICAL
 c
       end subroutine geom3D
 c
@@ -129,14 +128,14 @@ c     out:
 c             X        - physical coordinates of the point
 c             Dxdxi    - Jacobian matrix
 c             Dxidx    - inverse Jacobian matrix
-c             Rjac     - jacobian (determinant of the Jacobian matrix)
+c             Rjac     - Jacobian (determinant of the Jacobian matrix)
 c             Dxdt     - derivatives wrt the face parameters
 c             Rn       - the normal unit vector
-c             Bjac     - boundary jacobian (norm of Dxdt)
+c             Bjac     - boundary Jacobian (norm of Dxdt)
 c
 c----------------------------------------------------------------------
 c
-      subroutine bgeom3D(Mdle,Xi,Xnod,ShapH,GradH,NrdofH,Dxidt,Nsign, 
+      subroutine bgeom3D(Mdle,Xi,Xnod,ShapH,GradH,NrdofH,Dxidt,Nsign,
      .                   X,Dxdxi,Dxidx,Rjac,Dxdt,Rn,Bjac)
 c
       use data_structure3D
@@ -149,7 +148,7 @@ c
 c
       iprint=0
 c
-      call geom3D(Mdle,Xi,Xnod,ShapH,GradH,NrdofH, 
+      call geom3D(Mdle,Xi,Xnod,ShapH,GradH,NrdofH,
      .            X,Dxdxi,Dxidx,Rjac,iflag)
       if (iflag.ne.0) then
         write(*,5999) Mdle,Rjac
@@ -208,13 +207,13 @@ c     out:
 c             Eta      - reference coordinates of the point
 c             Detadxi  - Jacobian matrix
 c             Dxideta  - inverse Jacobian matrix
-c             Rjac     - jacobian (determinant of the Jacobian matrix)
+c             Rjac     - Jacobian (determinant of the Jacobian matrix)
 c             Iflag    = 0 OK
-c                        1 negative jacobian
+c                        1 negative Jacobian
 c
 c----------------------------------------------------------------------
 c
-      subroutine refgeom3D(Mdle,Xi,Etav,ShapH,GradH,NrdofH, 
+      subroutine refgeom3D(Mdle,Xi,Etav,ShapH,GradH,NrdofH,
      .                     Eta,Detadxi,Dxideta,Rjac,Iflag)
 c
       use control
@@ -231,8 +230,8 @@ c
  7001   format('refgeom3D: Mdle,Xi = ',i6,3x,3f8.3)
       endif
 c
-c  ...determine reference coordinates and the derivatives of 
-c     the reference coordinates wrt master element ccordinates 
+c  ...determine reference coordinates and the derivatives of
+c     the reference coordinates wrt master element ccordinates
       if (iprint.eq.1) then
         write(*,*) 'refgeom3D: Etav,ShapH = '
         do i=1,3
@@ -251,7 +250,7 @@ c     the reference coordinates wrt master element ccordinates
       do imas=1,3
         Detadxi(1:3,imas) = 0.d0
         do k=1,NrdofH
-          Detadxi(1:3,imas) = 
+          Detadxi(1:3,imas) =
      .    Detadxi(1:3,imas) + Etav(1:3,k)*GradH(imas,k)
         enddo
       enddo
@@ -305,12 +304,12 @@ c             Eta      - reference coordinates of the point
 c             Detadxi  - derivatives wrt master coordinates
 c             Dxideta  - inverse Jacobian
 c             Detadt   - derivatives wrt the face parameters
-c             Rn       - the normal unit vector 
-c             Bjac     - boundary jacobian (norm of Detadxi)
+c             Rn       - the normal unit vector
+c             Bjac     - boundary Jacobian (norm of Detadxi)
 c
 c----------------------------------------------------------------------
 c
-      subroutine brefgeom3D(Mdle,Xi,Etav,ShapH,GradH,NrdofH,Dxidt,Nsign, 
+      subroutine brefgeom3D(Mdle,Xi,Etav,ShapH,GradH,NrdofH,Dxidt,Nsign,
      .                      Eta,Detadxi,Dxideta,Rjac,Detadt,Rn,Bjac)
 c
       use data_structure3D
@@ -323,7 +322,7 @@ c
 c
       iprint=0
 c
-      call refgeom3D(Mdle,Xi,Etav,ShapH,GradH,NrdofH, 
+      call refgeom3D(Mdle,Xi,Etav,ShapH,GradH,NrdofH,
      .               Eta,Detadxi,Dxideta,Rjac,iflag)
       if (iflag.ne.0) then
         write(*,*) 'brefgeom3D: ERROR'; stop 1

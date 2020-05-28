@@ -50,7 +50,7 @@
 !                        matrix
 !
 !----------------------------------------------------------------------
-#include "implicit_none.h"
+#include "typedefs.h"
 subroutine celem_system(Mdle,Idec,                                &
                         Nrdofs,Nrdofm,Nrdofc,                     &
                         Nodm,NdofmH,NdofmE,NdofmV,NdofmQ,Nrnodm,  &
@@ -85,7 +85,7 @@ subroutine celem_system(Mdle,Idec,                                &
    integer :: nrconH(MAXbrickH),nacH(NACDIM,MAXbrickH),  &
               nrconE(MAXbrickE),nacE(NACDIM,MAXbrickE),  &
               nrconV(MAXbrickV),nacV(NACDIM,MAXbrickV)
-   real*8  :: constrH(NACDIM,MAXbrickH),  &
+   real(8) :: constrH(NACDIM,MAXbrickH),  &
               constrE(NACDIM,MAXbrickE),  &
               constrV(NACDIM,MAXbrickV)
 !
@@ -101,7 +101,7 @@ subroutine celem_system(Mdle,Idec,                                &
    integer :: nrdoflH,nrdoflE,nrdoflV,nrdoflQ
 !
 #if DEBUG_MODE
-   integer :: ians,ibeg,iend,jbeg,jend,kbeg,kend 
+   integer :: ians,ibeg,iend,jbeg,jend,kbeg,kend
    integer :: iprint=0
 #endif
 !
@@ -934,7 +934,7 @@ subroutine celem_system(Mdle,Idec,                                &
       select case(Mdle)
          case(4); iprint=0
          case default; iprint=0
-      end select      
+      end select
 !
       if (iprint.ge.2) then
  20      continue

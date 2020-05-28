@@ -72,7 +72,7 @@
  *   Some compilers allow to choose any of the above methods or even
  *   choose yet different variant, but it is always best to use default
  *   method, which avoids possible problems when linking with system and/or
- *   third party libraries. 
+ *   third party libraries.
  *
  * 2. Most standard arguments are passed as pointers
  *    a)  integer          -> int *
@@ -103,13 +103,13 @@
  *   limiting string arguments to only two functions: xgopw and xgdrtxt
  *
  * 4. Most C compilers provide automatic #defines allowing to recognize
- *   the operting system, although sometimes it is necessary to use
- *   'manual' define on the compile command, esp to differentiate between
+ *   the operating system, although sometimes it is necessary to use
+ *   'manual' define on the compile command, esp. to differentiate between
  *   different platforms/versions of operating system (e.g. SGI on MIPS or
  *   Itanium architectures, HP on RISK or Itanium, Sun on Sparc or Intel x86,
- *   etc. For some machines there exists multiple compilers with potentially
+ *   etc. For some machines there exist multiple compilers with potentially
  *   different methods (e.g on Linux: GNU g77, Intel IPF, Portland Group pgf,
- *   Lahey, LCC, etc.
+ *   Lahey, LCC, etc.)
  *
  * 5. We do not handle Windows compilers, because Microsoft graphics
  *   differs significantly from X Windows style. If you need to run
@@ -155,7 +155,7 @@
    Linux x86, and ConvexOS.  */
 #   define WRAPPER_FUNC( lowerCaseName )  lowerCaseName##_
 
-#endif 
+#endif
 
 /* To handle string length ordering we define two macro's:
  * #define STRING_LENGTHS_AFTER 0  --- to handle case 3a
@@ -256,7 +256,7 @@ static int textloc_x,textloc_y;
 static int shift;
 
 #define SHIFT (!(!(shift&ShiftMask)))<<3 | (!(!(shift&ControlMask)))<<2 \
-  | (!(!(shift&Mod1Mask)))<<1 | !(!(shift&LockMask)) 
+  | (!(!(shift&Mod1Mask)))<<1 | !(!(shift&LockMask))
 
 #define CHGY(A) (window_height - (A))
 #define GABS(A) ((A)>0?(A):(-(A)))
@@ -265,7 +265,7 @@ static int shift;
 
 #define ProgramTitle "MeshGen"
 
-#define MAXCOLS 4100 
+#define MAXCOLS 4100
 XColor colors[MAXCOLS];
 /* .................................................................. */
 static void xg_open_window (int argc,char ** argv);
@@ -319,12 +319,12 @@ void XGOPW(int *narg,Str_Desc *SD0,Str_Desc *SD1,Str_Desc *SD2,
   argv[3] = SD3;
   argv[4] = SD4;
   argv[5] = SD5;
-  
+
 #endif
 
 
   /*  decode text parameters and lengths, remove trailing blanks  */
-  
+
   for ( i=0 ; i < *narg ; i++) {
     leng[i]=strlen(argv[i]);
     for ( j=leng[i]-1; j>1; j-- ) {
@@ -354,12 +354,12 @@ static void xg_open_window (int argc,char ** argv)
   XGCValues xgcv;
   int geom_result;
   int x,y,h,wd;
-  
-  
+
+
   ProgramName = argv[0];
   for (i = 1; i < argc; i++) {
     char *arg = argv[i];
-    
+
     if (arg[0] == '-') {
       switch (arg[1]) {
       case 'd':			/* -display host:dpy */
@@ -374,36 +374,36 @@ static void xg_open_window (int argc,char ** argv)
 	usage ();
 	/* doesn't return */
       }
-    } else 
+    } else
       usage ();
   }
   fprintf (stderr, "%s: Opening display '%s'\n",
 	   ProgramName, XDisplayName (displayname));
-  
+
   dpy = XOpenDisplay (displayname);
   if (!dpy) {
     fprintf (stderr, "%s:  unable to open display '%s'\n",
 	     ProgramName, XDisplayName (displayname));
     exit (1);
   }
-  
-  set_sizehints (&hints, 10, 10, 1000, 750, 10, 10, geom); 
-  
-  
+
+  set_sizehints (&hints, 10, 10, 1000, 750, 10, 10, geom);
+
+
   /*    printf (" Size after Parse: %d  %d  %d  %d : 0x%x  \n",
 	hints.x, hints.y,
 	hints.width, hints.height,
 	geom_result);
-	
+
 	set_sizehints (hintp, min_width, min_height,
 	defwidth, defheight, defx, defy, geom)
   */
-  
+
   screen = DefaultScreen (dpy);
   fore = BlackPixel (dpy, screen);
   back = WhitePixel (dpy, screen);
   border = fore ;
-  
+
 
   hints.min_width = 100;
   hints.max_width = 1500;
@@ -411,38 +411,38 @@ static void xg_open_window (int argc,char ** argv)
   hints.max_height= 1500;
   hints.width_inc = 1;
   hints.height_inc = 1;
-  
-  
+
+
   window_width  = hints.width;
   window_height = hints.height;
-  
-  
+
+
   w = XCreateSimpleWindow (dpy, RootWindow (dpy, screen), hints.x, hints.y,
 			   hints.width, hints.height, 2, border, back);
-  
+
   xwindow = w;
-  
+
   XSetStandardProperties (dpy, w, ProgramName , NULL, (Pixmap) 0,
 			  argv, argc, &hints);
-  
-  XSelectInput (dpy, w, (KeyPressMask | 
+
+  XSelectInput (dpy, w, (KeyPressMask |
 			 ExposureMask | StructureNotifyMask |
 			 ButtonPressMask | ButtonReleaseMask));
-  
-  
+
+
   XMapWindow (dpy, w);
-  
+
   xgcv.function = GXcopy;
-  
-  xgcv.foreground = BlackPixel(dpy,screen); 
+
+  xgcv.foreground = BlackPixel(dpy,screen);
   xgcv.background = WhitePixel(dpy,screen);
-  
+
   xgcv.fill_style = FillSolid;
-  
+
   gc = (GC)XCreateGC(dpy, w,
-		     GCFunction | GCForeground | GCBackground 
+		     GCFunction | GCForeground | GCBackground
 		     | GCFillStyle, &xgcv);
-  
+
   colormap = DefaultColormap(dpy, screen);
 
 }
@@ -463,7 +463,7 @@ void XGSETCM   (int *index,int *ir,int *ig,int *ib)
   colors[*index].red = ((*ir)<<8);
   colors[*index].green = ((*ig)<<8);
   colors[*index].blue = ((*ib)<<8);
-  
+
   if ( XAllocColor(dpy,colormap,&colors[*index]) == 0 ) {
     printf("*** XAllocColor died\n");
     exit(1);
@@ -488,11 +488,11 @@ void XGSENDCOL (int *index,int *ir,int *ib,int *ig)
   XGCValues xgcv;
   xgcv.foreground = colors[*index].pixel;
   XChangeGC(dpy, gc, GCForeground, &xgcv);
-  
+
   *ir = colors[*index].red;
   *ib = colors[*index].blue;
   *ig = colors[*index].green;
-  
+
   return;
   /* SetForeground(dpy, gc, colors[index].pixel); */
 }
@@ -501,16 +501,16 @@ void XGSENDCOL (int *index,int *ir,int *ib,int *ig)
 /*  FORTRAN INTERFACE ======== Get the position of the mouse key */
 
 void XMOUSEPOS (int *imx,int *imy)
-{      
+{
   XEvent event;
-  
+
   while ( XCheckWindowEvent( dpy, xwindow, ButtonPress, &event ) ){
     /* empty loop to discard old button events */
   }
 
   /* get next button event in the given window */
   XWindowEvent ( dpy, xwindow, ButtonPress, &event );
-  
+
   *imx = event.xbutton.x;
   *imy = CHGY(event.xbutton.y);
 }
@@ -536,7 +536,7 @@ void XGNXTEV   (int *ev_type,int *ev_val,int *ev_x,int *ev_y)
   char *ksname;
   int done;
 
-	
+
   for (done = 0; !done; ) {
     XNextEvent (dpy, &event);
     switch (event.type) {
@@ -553,7 +553,7 @@ void XGNXTEV   (int *ev_type,int *ev_val,int *ev_x,int *ev_y)
 	done = 0 ; continue;
       default : ;
       }
-      /*      adjust for shift and shift lock - VT100 keyboard */	    
+      /*      adjust for shift and shift lock - VT100 keyboard */
       if ((ks<='z' && ks >='a') &&
 	  (!(shift&ShiftMask) != !(shift&LockMask)) )
 	ks = toupper(ks);
@@ -582,9 +582,9 @@ void XGNXTEV   (int *ev_type,int *ev_val,int *ev_x,int *ev_y)
 	default:;
 	}
       }
-      
+
       done = 1;
-	    
+
       *ev_type = 0;
       *ev_val  = (int)((ks & 0x10ff)  |
 		       ( SHIFT  ) << 8) | (ks>0xff)<<7 ;
@@ -597,27 +597,27 @@ void XGNXTEV   (int *ev_type,int *ev_val,int *ev_x,int *ev_y)
 	*ev_val  &= 0xff7f;
       *ev_x    = (int)kep->x;
       *ev_y    = (int)CHGY(kep->y);
-      
+
       continue;
-	    
-	    
+
+
       /*	  case KeyRelease:
                   kep = (XKeyEvent *) &event;
                   ks = XLookupKeysym (kep, 0);
-	  
+
                   printf ("%s\n\t(%d,%d) root:(%d,%d), state 0x%x, ",
                   "KeyRelease",
                   kep->x, kep->y, kep->x_root, kep->y_root,
                   kep->state);
-                  printf ("keycode %d = 0x%x,\n", kep->keycode, kep->keycode);  
+                  printf ("keycode %d = 0x%x,\n", kep->keycode, kep->keycode);
                   ksname = XKeysymToString (ks);
                   printf ("\tkeysym %d = 0x%x (%s)\n",
-                  ks, ks, ksname ? ksname : "?");  
-                  printf("integer of key: %d\n",(int)ks);  
+                  ks, ks, ksname ? ksname : "?");
+                  printf("integer of key: %d\n",(int)ks);
                   done = 0;
                   .........  only shift keys are tested for release ........
                   continue;       .... event locked out ....*/
-      
+
     case ButtonPress:
       bep = (XButtonEvent *) &event;
       /*	    printf ("%s\n\t(%d,%d) root:(%d,%d), state 0x%x, ",
@@ -627,15 +627,15 @@ void XGNXTEV   (int *ev_type,int *ev_val,int *ev_x,int *ev_y)
                     printf ("button %d = 0x%x\n", bep->button, bep->button);  */
       shift = bep->state &
 	(ShiftMask | LockMask | ControlMask | Mod1Mask);
-      
+
       done = 1;
-      
+
       *ev_type = 2;
       *ev_val  = (int)bep->button |
 	( SHIFT ) << 8;
       *ev_x    = (int)bep->x;
       *ev_y    = (int)CHGY(bep->y);
-      
+
       continue;
     case ButtonRelease:
       bep = (XButtonEvent *) &event;
@@ -648,38 +648,38 @@ void XGNXTEV   (int *ev_type,int *ev_val,int *ev_x,int *ev_y)
                     printf ("button %d = 0x%x\n", bep->button, bep->button);  */
 
       done = 1;
-      
+
       *ev_type = 3;
       *ev_val  = (int)bep->button |
 	( SHIFT ) << 8;
       *ev_x    = (int)bep->x;
       *ev_y    = (int)CHGY(bep->y);
-      
+
       continue;
-      
+
     case ConfigureNotify:
       cep = (XConfigureEvent *) &event;
       /*	    printf ("ConfigureNotify\n");  */
-	    
+
       done = 1;
-      
+
       *ev_type = 4;
       *ev_val  = 0;
       window_width =
 	*ev_x    = (int)event.xconfigure.width;
-      window_height = 
+      window_height =
 	*ev_y    = (int)event.xconfigure.height;
       continue;
-      
+
     case Expose:
     case GraphicsExpose:
     case NoExpose:
       /* get rid of all other Expose events on queue */
       while (XCheckTypedEvent (dpy, Expose, &event));
-      
+
       exep = (XExposeEvent *) &event;
       /*          printf ("Expose  %d \n",event.type);  */
-	    
+
       done = 1;
 
       *ev_type = 5;
@@ -691,9 +691,9 @@ void XGNXTEV   (int *ev_type,int *ev_val,int *ev_x,int *ev_y)
       /*	  case VisibilityNotify:
                   vep = (XVisibilityEvent *) &event;
                   printf ("Visibility  %d \n",event.type);
-	  
+
                   done = 1;
-	  
+
                   *ev_type = 6;
                   *ev_val  = (int)vep->state;
                   continue;
@@ -712,27 +712,27 @@ void XGSETCLIP (int *xl,int *yl,int *xu,int *yu)
 {
 
   XRectangle rects[1];
-  
+
   rects[0].x = MINA(*xl,*xu);
   rects[0].y = CHGY(MAXA(*yl,*yu));
   rects[0].width = GABS(*xu-*xl);
   rects[0].height = GABS(*yu-*yl);
-  
+
   XSetClipRectangles(dpy, gc, 0,0, rects, 1, YXBanded);
 }
-    
+
 /* FORTRAN interface ============================= draw rectangle */
 
 void XGDRRECT  (int *xl,int *yl,int *xu,int *yu)
 {
 
   XRectangle rects[1];
-  
+
   rects[0].x = MINA(*xl,*xu);
   rects[0].y = CHGY(MAXA(*yl,*yu));
   rects[0].width = GABS(*xu-*xl);
   rects[0].height = GABS(*yu-*yl);
-  
+
   XDrawRectangles(dpy, xwindow, gc, rects, 1);
 }
 
@@ -746,12 +746,12 @@ void XGDRFRECT (int *xl,int *yl,int *xu,int *yu)
 static void xg_draw_fill_rectangle(int xl,int yl,int xu,int yu)
 {
   XRectangle rects[1];
-  
+
   rects[0].x = MINA(xl,xu);
   rects[0].y = CHGY(MAXA(yl,yu));
   rects[0].width = GABS(xu-xl);
   rects[0].height = GABS(yu-yl);
-  
+
   XFillRectangles(dpy, xwindow, gc, rects, 1);
 }
 
@@ -761,12 +761,12 @@ void XGDRPOLY  (int *npts,int ix[],int iy[])
 {
   XPoint points[256];
   int i;
-  
+
   for ( i=0; i<MINA(*npts,256); i++ ) {
     points[i].x = (short)ix[i];
     points[i].y = (short)CHGY(iy[i]);
   }
-   
+
   XDrawLines(dpy, xwindow, gc, points, MINA(*npts,256), CoordModeOrigin);
 }
 
@@ -777,15 +777,15 @@ void XGDRFPOLY (int *npts,int ix[],int iy[])
 {
   XPoint points[256];
   int i;
-  
+
   for ( i=0; i<MINA(*npts,256); i++ ) {
     points[i].x = (short)ix[i];
     points[i].y = (short)CHGY(iy[i]);
   }
-  
+
   XFillPolygon(dpy, xwindow, gc, points, MINA(*npts,256),
 	       Nonconvex, CoordModeOrigin);
-	 
+
 }
 
 /* FORTRAN interface ============================= set text location */
@@ -830,7 +830,7 @@ static void set_sizehints (XSizeHints *hintp, int min_width, int min_height,
                            int defwidth, int defheight,int defx,int defy,char *geom)
 {
   int geom_result;
-  
+
   /* set the size hints, algorithm from xlib xbiff */
 
   hintp->width = hintp->min_width = min_width;
@@ -841,7 +841,7 @@ static void set_sizehints (XSizeHints *hintp, int min_width, int min_height,
   if (geom != NULL) {
 
     geom_result = XParseGeometry (geom, &hintp->x, &hintp->y,
-				  (unsigned int *)&hintp->width, 
+				  (unsigned int *)&hintp->width,
 				  (unsigned int *)&hintp->height);
 
     if ((geom_result & WidthValue) && (geom_result & HeightValue)) {
@@ -863,7 +863,7 @@ static void set_sizehints (XSizeHints *hintp, int min_width, int min_height,
     hintp->y = defy;
     hintp->flags |= PPosition;
   }
-  
+
   if (geom_result & XNegative) {
     hintp->x = DisplayWidth (dpy, DefaultScreen (dpy)) + hintp->x -
       hintp->width;
@@ -877,7 +877,7 @@ static void set_sizehints (XSizeHints *hintp, int min_width, int min_height,
 
 static void usage ( void )
 {
-  fprintf (stderr, 
+  fprintf (stderr,
 	   "usage:  %s [-display host:dpy] [-geometry geom]\n", ProgramName);
   exit (1);
 }
@@ -897,7 +897,7 @@ void XGMOUSE   (int *x,int *y)
 {
   Window root,child;
   int rx,ry,wx,wy;
-  unsigned int keys_buttons; 
+  unsigned int keys_buttons;
   XQueryPointer(dpy,xwindow,&root,&child,&rx,&ry,&wx,&wy,
 		&keys_buttons);
   *x = wx;
@@ -909,17 +909,17 @@ void XGMOUSE   (int *x,int *y)
 void XGINFO    (int *x,int *y,int *mxcol,int *mxx,int *mxy)
 {
   int scr_num,i1,i2,i3,i4;
-  
+
   *x = window_width;
   *y = window_height;
-  
+
   scr_num = DefaultScreen(dpy);
-  
+
   *mxx = DisplayWidth(dpy,scr_num);
   *mxy = DisplayHeight(dpy,scr_num);
-  
+
   *mxcol = DisplayCells(dpy,scr_num);
-  
+
   XSync(dpy,0);     /* extra service : sync and delete queued events */
   while (QLength(dpy)) XGNXTEV ( &i1, &i2, &i3, &i4 );
   /* they are processed to get all Configure events */

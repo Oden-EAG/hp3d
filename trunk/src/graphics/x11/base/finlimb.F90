@@ -1,32 +1,32 @@
 !> Purpose : routine finds 'numlev'- levels of solution values
 !! @param[in]  Numlev - number of levels to plot solution values
-!! @param[out] Solev  - limiting values for each level 
-#include "implicit_none.h"
+!! @param[out] Solev  - limiting values for each level
+#include "typedefs.h"
   subroutine finlimb(Numlev, Solev)
     use error
     use data_structure3D
     use graphmod
     implicit none
-    ! ** Arguements
+    ! ** Arguments
     !----------------------------------------
     integer,                          intent(in)  :: Numlev
-    real*8,  dimension(NR_COLORS-10), intent(out) :: Solev
+    real(8), dimension(NR_COLORS-10), intent(out) :: Solev
     ! ** Locals
     !----------------------------------------
     integer :: mdle, ndom, nedge_orient(12),nface_orient(6),norder(19)
     integer :: nrdofH, nrdofE, nrdofV, nrdofQ
-    ! geometry dof and master coordinate
-    real*8, dimension(2) :: t
-    real*8, dimension(3) :: xi, xp
-    real*8               :: xnod(NDIMEN,MAXbrickH)
-    character(len=4)     :: type
+    ! geometry dof and master coordinates
+    real(8), dimension(2) :: t
+    real(8), dimension(3) :: xi, xp
+    real(8)               :: xnod(NDIMEN,MAXbrickH)
+    character(len=4)      :: type
     VTYPE :: &
          zdofH(MAXEQNH,MAXbrickH), &
          zdofE(MAXEQNE,MAXbrickE), &
          zdofV(MAXEQNV,MAXbrickV), &
          zdofQ(MAXEQNQ,MAXbrickQ)
 
-    real*8  :: dsol, dxi, solmax, solmin, val
+    real(8) :: dsol, dxi, solmax, solmin, val
     integer :: iprint, i, j, ivar, loc, iel, idec, iface, nsub
     !----------------------------------------
     iprint=0
@@ -42,7 +42,6 @@
     solmax = -1.d10
     solmin =  1.d10
 
-    
     mdle=0
     do iel=1,NRELES
        call nelcon(mdle, mdle)
@@ -50,7 +49,7 @@
 
        ! if it is not visible domain hide it
        call find_domain(mdle, ndom)
-       if (NDOMAIN(ndom).eq.0) then 
+       if (NDOMAIN(ndom).eq.0) then
           cycle
        endif
 
@@ -102,7 +101,7 @@
                    call pause
                 endif
 
-                ! update extremes  
+                ! update extremes
                 solmax = max(solmax,val)
                 solmin = min(solmin,val)
              enddo
@@ -133,7 +132,7 @@
     ! use the volume values
     dsol = (solmax-solmin)/float(Numlev)
     Solev(1) = solmin
-    
+
     do i=1,Numlev
        Solev(i+1) = Solev(1) +float(i)*dsol
     enddo

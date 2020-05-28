@@ -9,13 +9,11 @@ c----------------------------------------------------------------------
 c
 c----------------------------------------------------------------------
 c----------------------------------------------------------------------
-c In this file all the forking for SHAPE=0 or SHAPE=1 is performed for
-c the traces of the 2D rotated sequence
-c                   2D(Rot):    H1  -->  H(div)  -->  L2
-c         Traces of 2D(Rot):  tr(H1)-->tr(H(div))
-c The tr(H1) functions for this sequence are in Trace2DSequence.F
-c If SHAPE=0 the subroutines are nowhere (rotated tr(H(curl) - shapEbe)
-c If SHAPE=1 the subroutines are located in shape_1/TraceSequence.F
+c DEPRECATED INTERFACE:
+c previously used to fork between old and new shape functions package.
+c
+c Use the new shape functions, located in:
+c     shape_1/TraceSequence.F
 c----------------------------------------------------------------------
 c----------------------------------------------------------------------
 c
@@ -48,23 +46,15 @@ c
       use parameters , only : MAXP
 c
       implicit none
-      real*8 , intent(in ) :: T
+      real(8), intent(in ) :: T
       integer, intent(in ) :: Nord
       integer, intent(in ) :: Norient
       integer, intent(out) :: NrdofV
-      real*8 , intent(out) :: ShapV(MAXP)
+      real(8), intent(out) :: ShapV(MAXP)
 c
-#if SHAPE_MODE==0
-c
-      write(*,*) 'shapVbe:This has NOT been implemented with SHAPE=0.'
-      write(*,*) '        Please switch to SHAPE=1.'
+      write(*,*) 'shapVbe error: call TraceEshapeV instead'
       stop
-c
-#else
-c
-      call TraceEshapeV(T,Nord,Norient, NrdofV,ShapV)
-c
-#endif
+c     call TraceEshapeV(T,Nord,Norient, NrdofV,ShapV)
 c
       end subroutine shapVbe
 c

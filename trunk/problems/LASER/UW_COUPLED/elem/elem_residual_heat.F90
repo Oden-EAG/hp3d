@@ -22,7 +22,7 @@
 !
 !---------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 subroutine elem_residual_heat(Mdle,                &
                               NrTest,NrdofHH,      &
@@ -43,10 +43,10 @@ subroutine elem_residual_heat(Mdle,                &
    integer, intent(in)  :: NrdofHH
    integer, intent(in)  :: NrdofH
    integer, intent(in)  :: NrdofV
-   real*8,  intent(out) :: Resid
+   real(8), intent(out) :: Resid
    integer, intent(out) :: Nref_flag
 !..auxiliary parameter
-   real*8, parameter :: rZERO = 0.d0
+   real(8), parameter :: rZERO = 0.d0
 !
 !..declare edge/face type variables
    character(len=4) :: etype,ftype
@@ -59,7 +59,7 @@ subroutine elem_residual_heat(Mdle,                &
    integer, dimension(5)   :: norderf
 !
 !..geometry dof (work space for nodcor)
-   real*8, dimension(3,MAXbrickH) :: xnod
+   real(8) :: xnod(3,MAXbrickH)
 !
 !..solution dof (work space for solelm)
    VTYPE, dimension(MAXEQNH,MAXbrickH) :: zdofH
@@ -67,61 +67,61 @@ subroutine elem_residual_heat(Mdle,                &
    VTYPE, dimension(MAXEQNV,MAXbrickV) :: zdofV
    VTYPE, dimension(MAXEQNQ,MAXbrickQ) :: zdofQ
 !..current H1 solution
-   real*8 :: rsolH
+   real(8) :: rsolH
 !
 !..variables for geometry
-   real*8, dimension(3)    :: xi,x,rn
-   real*8, dimension(3,2)  :: dxidt,dxdt,rt
-   real*8, dimension(3,3)  :: dxdxi,dxidx
-   real*8, dimension(2)    :: t
+   real(8), dimension(3)    :: xi,x,rn
+   real(8), dimension(3,2)  :: dxidt,dxdt,rt
+   real(8), dimension(3,3)  :: dxdxi,dxidx
+   real(8), dimension(2)    :: t
 !
 !..H1 shape functions
-   real*8, dimension(MAXbrickH)    :: shapH
-   real*8, dimension(3,MAXbrickH)  :: gradH
+   real(8), dimension(MAXbrickH)    :: shapH
+   real(8), dimension(3,MAXbrickH)  :: gradH
 !
 !..enriched H1 shape functions
-   real*8, dimension(MAXbrickHH)   :: shapHH
-   real*8, dimension(3,MAXbrickHH) :: gradHH
+   real(8), dimension(MAXbrickHH)   :: shapHH
+   real(8), dimension(3,MAXbrickHH) :: gradHH
 !
 !..H(div) shape functions
-   real*8, dimension(3,MAXbrickV)  :: shapV
-   real*8, dimension(MAXbrickV)    :: divV
+   real(8), dimension(3,MAXbrickV)  :: shapV
+   real(8), dimension(MAXbrickV)    :: divV
 !
 !..test functions and gradients
-   real*8  :: v1,v2,v2n
-   real*8, dimension(3) :: dv1,dv2
+   real(8) :: v1,v2,v2n
+   real(8), dimension(3) :: dv1,dv2
 !
 !..Gram matrix in packed format
-   !real*8 :: gramP(NrTest*(NrTest+1)/2)
+   !real(8) :: gramP(NrTest*(NrTest+1)/2)
    real(8), allocatable :: gramP(:)
 !
 !..load vector for the enriched space
-   real*8, dimension(NrTest) :: bload_H,bload_Hc
+   real(8), dimension(NrTest) :: bload_H,bload_Hc
 !
 !..3D quadrature data
-   real*8, dimension(3,MAXNINT3ADD)  :: xiloc
-   real*8, dimension(MAXNINT3ADD)    :: waloc
+   real(8), dimension(3,MAXNINT3ADD)  :: xiloc
+   real(8), dimension(MAXNINT3ADD)    :: waloc
 !
 !..2D quadrature data
-   real*8, dimension(2,MAXNINT2ADD)  :: tloc
-   real*8, dimension(MAXNINT2ADD)    :: wtloc
+   real(8), dimension(2,MAXNINT2ADD)  :: tloc
+   real(8), dimension(MAXNINT2ADD)    :: wtloc
 !
 !..BC's flags
    integer, dimension(6,NR_PHYSA)    :: ibc
 !
 !..approximate solution
-   real*8, dimension(3) :: rgradHxi,rgradH
-   real*8, dimension(3) :: rsolVxi,rsolV
-   real*8               :: rfval,rsolVn
-   VTYPE                :: zfval
+   real(8), dimension(3) :: rgradHxi,rgradH
+   real(8), dimension(3) :: rsolVxi,rsolV
+   real(8)               :: rfval,rsolVn
+   VTYPE                 :: zfval
 !
-   VTYPE, dimension(3) :: zvoid
+   VTYPE :: zvoid(3)
 !
 !..number of faces per element type
    integer :: nrf
 !..various variables for the problem
-   real*8  :: rjac,weight,wa
-   real*8  :: bjac
+   real(8) :: rjac,weight,wa
+   real(8) :: bjac
    integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,j,nint,nint3,iflag,kE,k,iprint,l
    integer :: nordP,nsign,ifc,info,icomp,nrdof
 !
@@ -186,7 +186,7 @@ subroutine elem_residual_heat(Mdle,                &
       wa = waloc(l)
 !
 !  ...determine element H1 shape functions
-      call shape3H(etype,xi,norder,norient_edge,norient_face, &
+      call shape3DH(etype,xi,norder,norient_edge,norient_face, &
                     nrdof,shapH,gradH)
 #if DEBUG_MODE
       if (nrdof .ne. NrdofH) then
@@ -316,8 +316,8 @@ subroutine elem_residual_heat(Mdle,                &
 #endif
 !
 !     ...determine element H1 shape functions (for geometry)
-         call shape3H(etype,xi,norder,norient_edge,norient_face, &
-                      nrdof,shapH,gradH)
+         call shape3DH(etype,xi,norder,norient_edge,norient_face, &
+                       nrdof,shapH,gradH)
 #if DEBUG_MODE
          if (nrdof .ne. NrdofH) then
             write(*,*) 'elem_residual_heat: INCONSISTENCY NrdofH. stop.'
@@ -326,8 +326,8 @@ subroutine elem_residual_heat(Mdle,                &
 #endif
 !
 !     ...determine element Hdiv shape functions (for fluxes)
-         call shape3V(etype,xi,norder,norient_face, &
-                      nrdof,shapV,divV)
+         call shape3DV(etype,xi,norder,norient_face, &
+                       nrdof,shapV,divV)
 #if DEBUG_MODE
          if (nrdof .ne. NrdofV) then
             write(*,*) 'elem_residual_heat: INCONSISTENCY NrdofV. stop.'
@@ -357,12 +357,12 @@ subroutine elem_residual_heat(Mdle,                &
             bload_H(k1) = bload_H(k1) - DELTA_T*ALPHA_0*rsolVn*v1*weight
          enddo
       enddo
-      if (iprint.eq.1) pause
+      if (iprint.eq.1) call pause
    enddo
    if (iprint.ge.1) then
       write(*,7015) bload_H(1:NrTest)
 7015  format('elem_residual_heat: FINAL bload_H = ',10(/,10(e12.5,2x)))
-      pause
+      call pause
    endif
 !
 !-----------------------------------------------------------------------
@@ -396,7 +396,7 @@ subroutine elem_residual_heat(Mdle,                &
    if (iprint.ge.1) then
       write(*,7010) Mdle, Resid
  7010 format('elem_residual_heat: Mdle, Resid = ',i5,3x,e12.5)
-      pause
+      call pause
    endif
 !
 end subroutine elem_residual_heat

@@ -12,9 +12,9 @@
       !*** REMARKS:             angle alpha must belong to (0, pi); the relationship between alpha and beta is:
       !                         beta = 2pi*sin(alpha).
 !**************************************************************************************************************
-      IMPLICIT NONE      
+      IMPLICIT NONE
 !**************************************************************************************************************
-      !*** DUMMY ARGUMENTS     
+      !*** DUMMY ARGUMENTS
       double precision, intent(in) :: alpha                    !*** half-aperture for cone
       double precision, intent(in) :: rho, theta               !*** polar cordinates for a point
       double precision, dimension(3), intent(out) :: r         !*** cartesian coordinates for image point
@@ -44,7 +44,7 @@
       Dr(1,1) = sin(alpha)*cos(theta/sin(alpha))               !*** compute d(x,y,z)/d(rho,theta)
       Dr(2,1) = sin(alpha)*sin(theta/sin(alpha))
       Dr(3,1) = cos(alpha)
-      Dr(1,2) = -rho*sin(theta/sin(alpha))     
+      Dr(1,2) = -rho*sin(theta/sin(alpha))
       Dr(2,2) = rho*cos(theta/sin(alpha))
       Dr(3,2) = 0.d0
       !

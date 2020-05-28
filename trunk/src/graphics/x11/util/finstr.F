@@ -26,7 +26,7 @@ c              Costr   - small triangles vertices coordinates
 c              Nsid_flag - a flag indicating which edge should be
 c                        be drawn (B/W version)
 c
-c   required  routines - 
+c   required  routines -
 c
 c----------------------------------------------------------------------
 c
@@ -57,11 +57,11 @@ c  ...perform multistage checking
             Nstrl=1
             Nsid_flag(1)=-1
             do 10 icart=1,3
-              Costr(1,icart,1) = Xtro(icart,1) + 
-     . (Xtro(icart,3)-Xtro(icart,1)) * (Slev-Usol(1))/(Usol(3)-Usol(1))            
-              Costr(1,icart,2) = Xtro(icart,2) + 
-     . (Xtro(icart,3)-Xtro(icart,2)) * (Slev-Usol(2))/(Usol(3)-Usol(2)) 
-              Costr(1,icart,3) = Xtro(icart,3)          
+              Costr(1,icart,1) = Xtro(icart,1) +
+     . (Xtro(icart,3)-Xtro(icart,1)) * (Slev-Usol(1))/(Usol(3)-Usol(1))
+              Costr(1,icart,2) = Xtro(icart,2) +
+     . (Xtro(icart,3)-Xtro(icart,2)) * (Slev-Usol(2))/(Usol(3)-Usol(2))
+              Costr(1,icart,3) = Xtro(icart,3)
    10       continue
             return
           endif
@@ -70,56 +70,56 @@ c  ...perform multistage checking
             Nstrl=1
             Nsid_flag(1)=-3
             do 20 icart=1,3
-              Costr(1,icart,1) = Xtro(icart,1) + 
-     . (Xtro(icart,2)-Xtro(icart,1)) * (Slev-Usol(1))/(Usol(2)-Usol(1))            
-              Costr(1,icart,2) = Xtro(icart,2)          
-              Costr(1,icart,3) = Xtro(icart,2) + 
-     . (Xtro(icart,3)-Xtro(icart,2)) * (Slev-Usol(2))/(Usol(3)-Usol(2)) 
+              Costr(1,icart,1) = Xtro(icart,1) +
+     . (Xtro(icart,2)-Xtro(icart,1)) * (Slev-Usol(1))/(Usol(2)-Usol(1))
+              Costr(1,icart,2) = Xtro(icart,2)
+              Costr(1,icart,3) = Xtro(icart,2) +
+     . (Xtro(icart,3)-Xtro(icart,2)) * (Slev-Usol(2))/(Usol(3)-Usol(2))
    20       continue
             return
           else
             Nstrl=2
             Nsid_flag(1)=-1
             do 30 icart=1,3
-              Costr(1,icart,1) = Xtro(icart,1) + 
-     . (Xtro(icart,3)-Xtro(icart,1)) * (Slev-Usol(1))/(Usol(3)-Usol(1))            
-              Costr(1,icart,2) = Xtro(icart,1) + 
-     . (Xtro(icart,2)-Xtro(icart,1)) * (Slev-Usol(1))/(Usol(2)-Usol(1))            
-              Costr(1,icart,3) = Xtro(icart,3)          
-              Costr(2,icart,1) = Xtro(icart,1) + 
-     . (Xtro(icart,2)-Xtro(icart,1)) * (Slev-Usol(1))/(Usol(2)-Usol(1))            
-              Costr(2,icart,2) = Xtro(icart,2)          
-              Costr(2,icart,3) = Xtro(icart,3)          
+              Costr(1,icart,1) = Xtro(icart,1) +
+     . (Xtro(icart,3)-Xtro(icart,1)) * (Slev-Usol(1))/(Usol(3)-Usol(1))
+              Costr(1,icart,2) = Xtro(icart,1) +
+     . (Xtro(icart,2)-Xtro(icart,1)) * (Slev-Usol(1))/(Usol(2)-Usol(1))
+              Costr(1,icart,3) = Xtro(icart,3)
+              Costr(2,icart,1) = Xtro(icart,1) +
+     . (Xtro(icart,2)-Xtro(icart,1)) * (Slev-Usol(1))/(Usol(2)-Usol(1))
+              Costr(2,icart,2) = Xtro(icart,2)
+              Costr(2,icart,3) = Xtro(icart,3)
    30       continue
             return
           endif
         endif
-      else 
+      else
         if (Usol(2).le.Slev) then
           if (Usol(3).le.Slev) then
             Nstrl=1
             Nsid_flag(1)=-2
             do 40 icart=1,3
-              Costr(1,icart,1) = Xtro(icart,1)          
-              Costr(1,icart,2) = Xtro(icart,1) + 
-     . (Xtro(icart,2)-Xtro(icart,1)) * (Slev-Usol(1))/(Usol(2)-Usol(1))            
-              Costr(1,icart,3) = Xtro(icart,1) + 
-     . (Xtro(icart,3)-Xtro(icart,1)) * (Slev-Usol(1))/(Usol(3)-Usol(1))            
+              Costr(1,icart,1) = Xtro(icart,1)
+              Costr(1,icart,2) = Xtro(icart,1) +
+     . (Xtro(icart,2)-Xtro(icart,1)) * (Slev-Usol(1))/(Usol(2)-Usol(1))
+              Costr(1,icart,3) = Xtro(icart,1) +
+     . (Xtro(icart,3)-Xtro(icart,1)) * (Slev-Usol(1))/(Usol(3)-Usol(1))
    40       continue
             return
           else
             Nstrl=2
             Nsid_flag(2)=-1
             do 50 icart=1,3
-              Costr(1,icart,1) = Xtro(icart,1)          
-              Costr(1,icart,2) = Xtro(icart,1) + 
-     . (Xtro(icart,2)-Xtro(icart,1)) * (Slev-Usol(1))/(Usol(2)-Usol(1))            
-              Costr(1,icart,3) = Xtro(icart,3)          
-              Costr(2,icart,1) = Xtro(icart,1) + 
-     . (Xtro(icart,2)-Xtro(icart,1)) * (Slev-Usol(1))/(Usol(2)-Usol(1))            
-              Costr(2,icart,2) = Xtro(icart,2) + 
-     . (Xtro(icart,3)-Xtro(icart,2)) * (Slev-Usol(2))/(Usol(3)-Usol(2)) 
-              Costr(2,icart,3) = Xtro(icart,3)          
+              Costr(1,icart,1) = Xtro(icart,1)
+              Costr(1,icart,2) = Xtro(icart,1) +
+     . (Xtro(icart,2)-Xtro(icart,1)) * (Slev-Usol(1))/(Usol(2)-Usol(1))
+              Costr(1,icart,3) = Xtro(icart,3)
+              Costr(2,icart,1) = Xtro(icart,1) +
+     . (Xtro(icart,2)-Xtro(icart,1)) * (Slev-Usol(1))/(Usol(2)-Usol(1))
+              Costr(2,icart,2) = Xtro(icart,2) +
+     . (Xtro(icart,3)-Xtro(icart,2)) * (Slev-Usol(2))/(Usol(3)-Usol(2))
+              Costr(2,icart,3) = Xtro(icart,3)
    50       continue
             return
           endif
@@ -128,15 +128,15 @@ c  ...perform multistage checking
             Nstrl=2
             Nsid_flag(1)=-2
             do 60 icart=1,3
-              Costr(1,icart,1) = Xtro(icart,1)          
-              Costr(1,icart,2) = Xtro(icart,2) + 
-     . (Xtro(icart,3)-Xtro(icart,2)) * (Slev-Usol(2))/(Usol(3)-Usol(2)) 
-              Costr(1,icart,3) = Xtro(icart,1) + 
-     . (Xtro(icart,3)-Xtro(icart,1)) * (Slev-Usol(1))/(Usol(3)-Usol(1))            
-              Costr(2,icart,1) = Xtro(icart,1)          
-              Costr(2,icart,2) = Xtro(icart,2)          
-              Costr(2,icart,3) = Xtro(icart,2) + 
-     . (Xtro(icart,3)-Xtro(icart,2)) * (Slev-Usol(2))/(Usol(3)-Usol(2)) 
+              Costr(1,icart,1) = Xtro(icart,1)
+              Costr(1,icart,2) = Xtro(icart,2) +
+     . (Xtro(icart,3)-Xtro(icart,2)) * (Slev-Usol(2))/(Usol(3)-Usol(2))
+              Costr(1,icart,3) = Xtro(icart,1) +
+     . (Xtro(icart,3)-Xtro(icart,1)) * (Slev-Usol(1))/(Usol(3)-Usol(1))
+              Costr(2,icart,1) = Xtro(icart,1)
+              Costr(2,icart,2) = Xtro(icart,2)
+              Costr(2,icart,3) = Xtro(icart,2) +
+     . (Xtro(icart,3)-Xtro(icart,2)) * (Slev-Usol(2))/(Usol(3)-Usol(2))
    60       continue
             return
           else
@@ -149,10 +149,10 @@ c              Nstrl=0
 c              return
 c            else
               Nstrl=1
-              do 80 icart=1,3        
-                Costr(1,icart,1) = Xtro(icart,1)          
-                Costr(1,icart,2) = Xtro(icart,2)          
-                Costr(1,icart,3) = Xtro(icart,3)          
+              do 80 icart=1,3
+                Costr(1,icart,1) = Xtro(icart,1)
+                Costr(1,icart,2) = Xtro(icart,2)
+                Costr(1,icart,3) = Xtro(icart,3)
    80         continue
               return
 c            endif

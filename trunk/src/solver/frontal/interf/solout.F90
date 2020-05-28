@@ -19,7 +19,7 @@
 !              Zele     - the element dof
 !
 ! -----------------------------------------------------------------------
-#include "implicit_none.h"
+#include "typedefs.h"
 subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
 !
    use element_data
@@ -180,8 +180,8 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
 !     ...loop through the nodal dof (potentially NONE)
          do j=1,ndofmH(i)/nvarH
             ivar=mvarH(i); k=0
-! 
-!        ...loop through physics variables              
+!
+!        ...loop through physics variables
             do iphys=1,nrPhysH
                il = NR_COMP(iphys)
                if (index(k+1) .eq. 0) then
@@ -256,8 +256,8 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
 !     ...loop through the nodal dof
          do j=1,ndofmE(i)/nvarE
             ivar=mvarE(i); k=NRHVAR
-! 
-!        ...loop through physics variables              
+!
+!        ...loop through physics variables
             do iphys=nrPhysH+1,nrPhysHE
                il = NR_COMP(iphys)
                if (index(k+1) .eq. 0) then
@@ -331,8 +331,8 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
 !
 !        ...loop through the components
             ivar=mvarV(i); k=nrVarHE
-! 
-!        ...loop through physics variables              
+!
+!        ...loop through physics variables
             do iphys=nrPhysHE+1,nrPhysHEV
                il = NR_COMP(iphys)
                if (index(k+1) .eq. 0) then
@@ -404,8 +404,8 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
 !
 !     ...loop through the components
          ivar=mvarQ; k=nrVarHEV
-! 
-!     ...loop through physics variables              
+!
+!     ...loop through physics variables
          do iphys=nrPhysHEV+1,NR_PHYSA
             il = NR_COMP(iphys)
             if (index(k+1) .eq. 0) then

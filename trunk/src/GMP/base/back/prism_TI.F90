@@ -5,7 +5,7 @@
 !
 !   purpose            - routine defines the parameterization
 !                        for a prism based on a transfinite
-!                        interpolation (with linear and singular 
+!                        interpolation (with linear and singular
 !                        blending functions) of the paramaterization
 !                        of its faces
 !
@@ -42,7 +42,7 @@
 !  ...blending function
       dimension dblend(2)
 !
-!  ...edge kernels 
+!  ...edge kernels
       dimension xe(3),dxedt(3)
 !
 !  ...face kernels
@@ -107,7 +107,7 @@
           iv1 = TRIAN_EDGE_TO_VERT(1,i);  iv2 = TRIAN_EDGE_TO_VERT(2,i)
 !  .......project Eta(1:2) onto the edge
           call proj_t2e(Eta(1:2),iv1,iv2,vshapt,dvshapt, te,dtedeta(1:2))
-! ........if edge enpoint cycle          
+! ........if edge enpoint cycle
           if ((abs(te) .lt. GEOM_TOL) .or. (abs(1.d0 - te) .lt. GEOM_TOL))  cycle
           if (iprint .eq. 1) then
             write(*,7012) ie,nc,CURVES(nc)%Type
@@ -126,7 +126,7 @@
                           + xe(1:3)*dblend(k)*vshap(j)
           enddo
           Dxdeta(1:3,3) = Dxdeta(1:3,3) + xe(1:3)*blend*dvshap(j)
-!  .......printing statement          
+!  .......printing statement
           if (iprint .eq. 1) then
             write(*,*)'prism_TI: AFTER HORIZONTAL EDGE i,j',i,j
             do ivar = 1, 3
@@ -156,7 +156,7 @@
         enddo
         Dxdeta(1:3,3) = Dxdeta(1:3,3) + dxedt(1:3)*blend
       enddo
-!  ...printing statement      
+!  ...printing statement
       if (iprint .eq. 1) then
         write(*,*) 'prism_TI: AFTER VERTICAL EDGES = '
         do ivar = 1, 3
@@ -170,14 +170,14 @@
         ifig = ifig + 1
         call decode(PRISMS(No)%FigNo(ifig), nt,norient)
         if ((TRIANGLES(nt)%Type .eq. 'TransTri') .or. (TRIANGLES(nt)%Type .eq. 'PlaneTri'))  cycle
-!  .....printing statement        
+!  .....printing statement
         if (iprint .eq. 1) then
           write(*,7013) ifig,nt,TRIANGLES(nt)%Type
  7013     format('prism_TI: ifig,nt,Type = ',i2,i5,2x,a5)
         endif
 !  .....compute the face bubble
         call trianB(nt,Eta(1:2),norient, xf,dxfdtf)
-!  .....printing statement        
+!  .....printing statement
         if (iprint .eq. 1) then
           do ivar = 1, 3
             write(*,7033) ivar,xf(ivar),dxfdtf(ivar,1:2)
@@ -191,7 +191,7 @@
         enddo
         Dxdeta(1:3,3) = Dxdeta(1:3,3) + xf(1:3)*dvshap(j)
       enddo
-!  ...printing statement      
+!  ...printing statement
       if (iprint .eq. 1) then
         write(*,*) 'prism_TI: AFTER HORIZONTAL FACES = '
         do ivar = 1, 3
@@ -206,7 +206,7 @@
         call decode(PRISMS(No)%FigNo(ifig), nr,norient)
         if ((RECTANGLES(nr)%Type .eq. 'BilQua') .or. (RECTANGLES(nr)%Type .eq. 'TraQua') .or. &
             (RECTANGLES(nr)%Type .eq. 'PTIRec'))   cycle
-!  .....printing statement     
+!  .....printing statement
         if (iprint .eq. 1) then
           write(*,7014) ifig,nr,RECTANGLES(nr)%Type
  7014     format('prism_TI: ifig,nr,Type = ',i2,i5,2x,a5)

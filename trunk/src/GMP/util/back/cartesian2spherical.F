@@ -23,7 +23,7 @@
       integer :: iverb                                          !*** verbosity flag: 0, 1, 2
       !
       !*** constants
-      double precision, parameter :: eps = 1.d-13               !*** geometrical tolerance    
+      double precision, parameter :: eps = 1.d-13               !*** geometrical tolerance
 !*****************************************************************************************************************
       iverb = 0
       !
@@ -59,10 +59,10 @@
           else if (r(1) .gt. 0.d0) then
             theta = 0.d0
           end if
-        else if (r(2) .gt. 0.d0) then                                !***** ELSE IF strictly above x-axis 
+        else if (r(2) .gt. 0.d0) then                                !***** ELSE IF strictly above x-axis
           theta = acos(r(1)/rho_aux)
         else                                                         !***** ELSE strictly below the x-axis
-          theta = - acos(r(1)/rho_aux)              
+          theta = - acos(r(1)/rho_aux)
         end if                                                       !***** END IF
       end if                                                         !*** END IF
       !

@@ -12,10 +12,10 @@ c   purpose            - routine displays the wireframe for a 3D manifold
 c
 c
 c   arguments :
-c     in:     
+c     in:
 c               Iwind  - window number
 c
-c   required  routines - 
+c   required  routines -
 c
 c----------------------------------------------------------------------
 c
@@ -27,7 +27,7 @@ c
 #include "syscom.blk"
 c
 c  ...list of segments
-      double precision, allocatable ::  SEGMENTS(:,:,:)
+      real(8), allocatable ::  SEGMENTS(:,:,:)
       integer, allocatable ::  COLORN(:)
 c
 c  ...list of rectangles to display
@@ -68,7 +68,7 @@ c  ...set initial scaling constants
       XCWIN(2) = rmargin + ylength/2.d0
 c
 c  ...set up number of line segments for drawing a curve
-      nrsub1 = 2      
+      nrsub1 = 2
       NRSUB = 2**nrsub1
       DX = 1.d0/NRSUB
 c
@@ -82,7 +82,7 @@ c  ...determine data for projection...
 c
  10   continue
 c
-c  ...prepare data for transformation from physical coordinates to 
+c  ...prepare data for transformation from physical coordinates to
 c     the observer's system
       call cartobs
 c
@@ -191,7 +191,7 @@ ccc      do i=1,2
 ccc        write(*,*) xmin(i),xmax(i)
 ccc      enddo
 c
-c  ...compute object's dimensions and coordinates of its 
+c  ...compute object's dimensions and coordinates of its
 c     central point
       DIMOB(1) = (xmax(1)-xmin(1))/2.d0
       DIMOB(2) = (xmax(2)-xmin(2))/2.d0
@@ -226,7 +226,7 @@ c  ...display the wireframe
         ncol = COLORN(ic)
         do k=1,2
           xyp(1:2,k) = SEGMENTS(1:2,k,ic)
-          xyp(1:2,k) = (xyp(1:2,k)-XCIM(1:2))/DIMIM*SIZE 
+          xyp(1:2,k) = (xyp(1:2,k)-XCIM(1:2))/DIMIM*SIZE
      .               + XCWIN(1:2)
         enddo
         call drawline(xyp(1,1),xyp(2,1), xyp(1,2),xyp(2,2), ncol)
@@ -240,7 +240,7 @@ c  ...close window
       call closwind(iwindnum)
 c
       write(*,*) ' SELECT OPTION :'
-      write(*,*) ' 0 - EXIT'   
+      write(*,*) ' 0 - EXIT'
       write(*,*) ' 1 - CHANGE THE POINT OF VIEW (WITH RESCALING)'
       write(*,*) ' 2 - CHANGE THE DEGREE OF COARSENESS FOR OVALS'
       write(*,*) ' 3 - DISPLAY ALL CURVES'
@@ -250,7 +250,7 @@ c
       write(*,*) ' 7 - DISPLAY CURVES ON SHARP EDGES ONLY'
       write(*,*) ' 8 - DISPLAY NORMALS'
       write(*,*) ' 9 - DISPLAY SELECTED CURVES'
-      write(*,*) '10 - CHANGE THE CENTRAL POINT OF THE IMAGE AND', 
+      write(*,*) '10 - CHANGE THE CENTRAL POINT OF THE IMAGE AND',
      .           ' RESCALE THE IMAGE'
       read(*,*) ichoice
 c
@@ -294,9 +294,9 @@ c
         idec_edge=0
       case(4)
 c
-c  .....reset to the default 
+c  .....reset to the default
         idec_Hermite=1
-      case(5)      
+      case(5)
         idec_rectangle=1
         idec_curve=0
         idec_bundle=0
@@ -312,7 +312,7 @@ c  .....reset to the default
         endif
         write(*,*) 'INPUT THE RECTANGLE NUMBERS'
         read(*,*) nrect(1:nr_rect)
-      case(6)      
+      case(6)
         idec_rectangle=0
         idec_curve=0
         idec_bundle=1
@@ -323,10 +323,10 @@ c  .....reset to the default
         idec_rectangle=0
         idec_curve=0
         idec_bundle=0
-        idec_edge=1      
+        idec_edge=1
       case(8)
         idec_normal=1
-      case(9)      
+      case(9)
         idec_rectangle=0
         idec_curve=1
         idec_bundle=0
@@ -358,8 +358,8 @@ c
       goto 10
       end
 
-     
-      
 
 
-      
+
+
+

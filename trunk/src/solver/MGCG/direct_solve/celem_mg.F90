@@ -53,7 +53,7 @@
 !                        matrix
 !
 !----------------------------------------------------------------------
-#include "implicit_none.h"
+#include "typedefs.h"
 subroutine celem_mg(Ielc,Iel,Mdle,Idec,                       &
                     Nrdofs,Nrdofm,Nrdofc,                     &
                     Nodm,NdofmH,NdofmE,NdofmV,NdofmQ,Nrnodm,  &
@@ -109,7 +109,7 @@ subroutine celem_mg(Ielc,Iel,Mdle,Idec,                       &
    integer :: nrdoflHi,nrdoflEi,nrdoflVi
 !
 #if DEBUG_MODE
-   integer :: ians,ibeg,iend,jbeg,jend,kbeg,kend 
+   integer :: ians,ibeg,iend,jbeg,jend,kbeg,kend
    integer :: iprint=0
 #endif
 !
@@ -234,7 +234,7 @@ subroutine celem_mg(Ielc,Iel,Mdle,Idec,                       &
 !
       nrdofmHE  = nrdofmH   + nrdofmE
       nrdofmHEV = nrdofmHE  + nrdofmV
-      Nrdofm    = nrdofmHEV 
+      Nrdofm    = nrdofmHEV
 !
 #if DEBUG_MODE
       if (iprint .eq. 1) then
@@ -520,7 +520,7 @@ subroutine celem_mg(Ielc,Iel,Mdle,Idec,                       &
        stop
      endif
    enddo
-#endif 
+#endif
 !
 !..perform static condensation of middle node dof
    if (Iel .ge. 0) then

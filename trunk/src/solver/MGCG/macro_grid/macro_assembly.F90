@@ -8,19 +8,19 @@
 !
 !    purpose            - routine computes global stiffness matrix
 !                         and global load vector corresponding to a
-!                         macro-grid 
-!    in :             
-!               Igrid   - Mesh index 
+!                         macro-grid
+!    in :
+!               Igrid   - Mesh index
 !
-!           Idec_sch    - flag to store or not store data for the 
+!           Idec_sch    - flag to store or not store data for the
 !                         extension operator (Schur complements)
 !                         0: Compute A_MACRO structure for the finest Mesh
 !                         1: Compute Schur complement too
-!                         
+!
 !
 !-----------------------------------------------------------------------
 !
-#include 'implicit_none.h'
+#include "typedefs.h"
 !
    subroutine macro_assembly(Igrid, Idec_sch)
 !
@@ -30,7 +30,7 @@
    use assembly_sc,        ONLY: NRDOF_TOT, NRDOF_CON,IPRINT_TIME
 
 
-   IMPLICIT NONE
+   implicit none
 !
 !-----------------------------------------------------------------------
 !
@@ -42,10 +42,10 @@
 !..locals for with macro_elem_info
    integer :: mdle, nrnod_macro, maxndof, nod
    integer :: iprint_temp
-!..offsets   
+!..offsets
    integer, allocatable :: naH(:), naE(:), naV(:)
    integer, allocatable, save :: nod_macro(:),   ndofH_macro(:),  &
-                                 ndofE_macro(:), ndofV_macro(:) 
+                                 ndofE_macro(:), ndofV_macro(:)
 !$omp threadprivate(nod_macro,ndofH_macro,ndofE_macro,ndofV_macro)
 !
 !-----------------------------------------------------------------------
@@ -58,8 +58,8 @@
       do iel=1,nreles
          call nelcon(mdle,mdle)
          NODES_MG(mdle)%visit = iel
-      enddo   
-   endif   
+      enddo
+   endif
 
 !..allocate and initialize offsets
    allocate(naH(NRNODS)); naH = -1
@@ -75,8 +75,8 @@
 !
       ndof_macro = GRID(Igrid)%macro_elem(iel)%ndof_macro
       nrnod_macro = GRID(Igrid)%macro_elem(iel)%nrnod_macro
-      allocate(nod_macro(nrnod_macro),ndofH_macro(nrnod_macro))  ; 
-      allocate(ndofE_macro(nrnod_macro),ndofV_macro(nrnod_macro)); 
+      allocate(nod_macro(nrnod_macro),ndofH_macro(nrnod_macro))  ;
+      allocate(ndofE_macro(nrnod_macro),ndofV_macro(nrnod_macro));
 !
       nod_macro   = GRID(Igrid)%macro_elem(iel)%nod_macro
       ndofH_macro = GRID(Igrid)%macro_elem(iel)%ndofH_macro
@@ -130,15 +130,15 @@
    allocate(GRID(Igrid)%dloc(GRID(Igrid)%nreles))
 !
    allocate(A_MACRO(GRID(Igrid)%nreles))
-   if(Idec_sch .eq. 1) then   
+   if(Idec_sch .eq. 1) then
       allocate(GRID(Igrid)%sch(GRID(igrid)%nreles))
-   endif   
+   endif
 !
 !
-!..supress printing statements 
+!..supress printing statements
    iprint_temp = IPRINT_TIME
    IPRINT_TIME = 0
-!   
+!
 !$omp parallel default(shared)    &
 !$omp private(iel,mdle,nrnod_macro, ndof_macro,l,i,nod,j)
 !$omp do schedule(guided)
@@ -147,23 +147,23 @@
 !
       nrnod_macro = GRID(Igrid)%macro_elem(iel)%nrnod_macro
       ndof_macro  = GRID(Igrid)%macro_elem(iel)%ndof_macro
-      allocate(nod_macro(nrnod_macro))  
+      allocate(nod_macro(nrnod_macro))
       allocate(ndofH_macro(nrnod_macro))
       allocate(ndofE_macro(nrnod_macro))
       allocate(ndofV_macro(nrnod_macro))
       allocate(GRID(Igrid)%dloc(iel)%zstiff(ndof_macro*(ndof_macro+1)/2))
       allocate(GRID(Igrid)%dloc(iel)%zbload(ndof_macro))
-!    
+!
       call celem_macro(Igrid,Idec_sch,iel,mdle,ndof_macro,nrnod_macro,nod_macro,  &
                        ndofH_macro, ndofE_macro, ndofV_macro,      &
-                       GRID(Igrid)%dloc(iel)%zbload, GRID(Igrid)%dloc(iel)%zstiff)    
+                       GRID(Igrid)%dloc(iel)%zbload, GRID(Igrid)%dloc(iel)%zstiff)
 !
       GRID(Igrid)%dloc(iel)%ndof = ndof_macro
       allocate(GRID(Igrid)%dloc(iel)%lcon(ndof_macro))
 !
 !  ...create connectivity maps
       l=0
-!  ...H1 dof 
+!  ...H1 dof
       do i = 1,nrnod_macro
          nod = nod_macro(i)
          do j=1,ndofH_macro(i)
@@ -171,7 +171,7 @@
             GRID(Igrid)%dloc(iel)%lcon(l) = naH(nod)+j
          enddo
       enddo
-!  ...H(curl) dof 
+!  ...H(curl) dof
       do i =1,nrnod_macro
          nod = nod_macro(i)
          do j=1,ndofE_macro(i)
@@ -179,7 +179,7 @@
             GRID(Igrid)%dloc(iel)%lcon(l) = nrdof_H + naE(nod)+j
          enddo
       enddo
-!  ...H(div) dof 
+!  ...H(div) dof
       do i = 1,nrnod_macro
          nod = nod_macro(i)
          do j=1,ndofV_macro(i)
@@ -187,12 +187,12 @@
             GRID(Igrid)%dloc(iel)%lcon(l) = nrdof_H + nrdof_E + naV(nod)+j
          enddo
       enddo
-!      
+!
       deallocate(nod_macro,ndofH_macro, ndofE_macro, ndofV_macro)
-!      
+!
 !..assembly finished
    enddo
-!$omp end do   
+!$omp end do
 !$omp end parallel
 !
    IPRINT_TIME = iprint_temp

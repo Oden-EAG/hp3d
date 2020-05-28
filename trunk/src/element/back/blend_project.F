@@ -13,14 +13,14 @@ c
 c   arguments :
 c     in:
 c        Xi            - master element coordinates of a point
-c 
+c
 c     out:
 c        Psi           - blending function values
 c        Gradpsi       - gradient of psi
 c        Te            - element to edge projections
 c        Gradte        - gradient of Te
 c
-c   required  routines - 
+c   required  routines -
 c
 c----------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ c----------------------------------------------------------------------
 c
 #include "syscom.blk"
 c
-      dimension Xi(2),Psi(4),Gradpsi(2,4),Te(4),Gradte(2,4) 
+      dimension Xi(2),Psi(4),Gradpsi(2,4),Te(4),Gradte(2,4)
 c
 c----------------------------------------------------------------------
 c
@@ -43,9 +43,9 @@ c  ...projections
       Te(2) = Xi(2); Gradte(1,2) = 0.d0; Gradte(2,2) = 1.d0
       Te(3) = Xi(1); Gradte(1,3) = 1.d0; Gradte(2,3) = 0.d0
       Te(4) = Xi(2); Gradte(1,4) = 0.d0; Gradte(2,4) = 1.d0
-c 
 c
-      end subroutine blend_project_quad 
+c
+      end subroutine blend_project_quad
 c
 c----------------------------------------------------------------------
 c
@@ -55,14 +55,14 @@ c----------------------------------------------------------------------
 c
 c   latest revision    - Nov 13
 c
-c   purpose            - routine returns values of brick edge 
-c                        blending functions along with brick to edge 
+c   purpose            - routine returns values of brick edge
+c                        blending functions along with brick to edge
 c                        projections with their gradients
 c
 c   arguments :
 c     in:
 c        Xi            - master element coordinates of a point
-c 
+c
 c     out:
 c        Psie          - edge blending function values
 c        Gradpsie      - gradient of psie
@@ -76,7 +76,7 @@ c
 #include "syscom.blk"
 c
       dimension Xi(3),
-     .          Psie(12),Gradpsie(3,12),Te(12),Gradte(3,12) 
+     .          Psie(12),Gradpsie(3,12),Te(12),Gradte(3,12)
       double precision z,z1
 c
       iprint=0
@@ -89,7 +89,7 @@ c
       z = Xi(3); z1 = 1.d0-z
 c
 c  ...edge blending functions;
-c     
+c
 c  ...edges parallel to x-axis
       Psie(1) = y1*z1; Gradpsie(2,1) = -z1; Gradpsie(3,1) = -y1
       Psie(3) = y *z1; Gradpsie(2,3) =  z1; Gradpsie(3,3) = -y
@@ -137,7 +137,7 @@ c
       endif
 c
 c
-      end subroutine blend_project_edges_bric 
+      end subroutine blend_project_edges_bric
 
 
 c----------------------------------------------------------------------
@@ -148,14 +148,14 @@ c----------------------------------------------------------------------
 c
 c   latest revision    - Nov 13
 c
-c   purpose            - routine returns values of brick face blending 
-c                        functions along with brick to face projections 
+c   purpose            - routine returns values of brick face blending
+c                        functions along with brick to face projections
 c                        with their gradients
 c
 c   arguments :
 c     in:
 c        Xi            - master element coordinates of a point
-c 
+c
 c     out:
 c        Psif          - face blending function values
 c        Gradpsif      - gradient of psif
@@ -169,7 +169,7 @@ c
 #include "syscom.blk"
 c
       dimension Xi(3),
-     .          Psif(6),Gradpsif(3,6),Tf(2,6),Gradtf(2,3,6) 
+     .          Psif(6),Gradpsif(3,6),Tf(2,6),Gradtf(2,3,6)
       double precision z,z1
 c
 c----------------------------------------------------------------------
@@ -194,9 +194,9 @@ c  ...face projections:
       Tf(1,5)=x; Tf(2,5)=z; Gradtf(1,1,5) = 1.d0; Gradtf(2,3,5) = 1.d0
       Tf(1,4)=y; Tf(2,4)=z; Gradtf(1,2,4) = 1.d0; Gradtf(2,3,4) = 1.d0
       Tf(1,6)=y; Tf(2,6)=z; Gradtf(1,2,6) = 1.d0; Gradtf(2,3,6) = 1.d0
-c 
 c
-      end subroutine blend_project_faces_bric 
+c
+      end subroutine blend_project_faces_bric
 c
 c----------------------------------------------------------------------
 c
@@ -213,7 +213,7 @@ c
 c   arguments :
 c     in:
 c        Xip           - master element coordinates of a point
-c 
+c
 c     out:
 c        X,GradXmY,GradY,Z,GradZ - infinite element coordinates
 c                        with gradients
@@ -225,7 +225,7 @@ c        Vshap,Gradv   - vertex shape functions an dtheir gradients
 c
 c----------------------------------------------------------------------
 
-      subroutine blend_pyram(Xip,X,GradX,Y,GradY,Z,GradZ, 
+      subroutine blend_pyram(Xip,X,GradX,Y,GradY,Z,GradZ,
      .                       Psi,GradPsi,Alpha,GradAlpha,
      .                       Vshap,Gradv)
 c
@@ -244,7 +244,7 @@ c
       Gradv = 0.d0
 c
 c  ...avoid singularity at zeta = 1
-      if (abs(zeta - 1.d0) < eps)  zeta=1.d0-eps      
+      if (abs(zeta - 1.d0) < eps)  zeta=1.d0-eps
 c
 c  ...infinite element coordinates with gradients
       X = xi/(1.d0-zeta)
@@ -266,22 +266,22 @@ c  ...modified edge vertex shape functions
         case(1,3)
           Alpha(1,i) = 1.d0-xi-zeta
           GradAlpha(1:3,1,i) = (/-1.d0, 0.d0,-1.d0/)
-          Alpha(2,i) =      xi     
+          Alpha(2,i) =      xi
           GradAlpha(1:3,2,i) = (/ 1.d0, 0.d0, 0.d0/)
         case(2,4)
           Alpha(1,i) = 1.d0-eta-zeta
           GradAlpha(1:3,1,i) = (/ 0.d0,-1.d0,-1.d0/)
-          Alpha(2,i) =      eta     
+          Alpha(2,i) =      eta
           GradAlpha(1:3,2,i) = (/ 0.d0, 1.d0, 0.d0/)
         end select
       enddo
 c
 c  ...vertex shape functions
       Vshap(1) =     (1.d0-X)*(1.d0-eta-zeta)
-      Gradv(1:3,1) =   -GradX*(1.d0-eta-zeta) 
+      Gradv(1:3,1) =   -GradX*(1.d0-eta-zeta)
      .             + (1.d0-X)*(/0.d0,-1.d0,-1.d0/)
       Vshap(2) =           X *(1.d0-eta-zeta)
-      Gradv(1:3,2) =    GradX*(1.d0-eta-zeta) 
+      Gradv(1:3,2) =    GradX*(1.d0-eta-zeta)
      .             +        X*(/0.d0,-1.d0,-1.d0/)
       Vshap(3) =           X * eta
       Gradv(1:3,3) =    GradX* eta

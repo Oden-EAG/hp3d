@@ -1,13 +1,13 @@
 !----------------------------------------------------------------------
-!                                                                     
+!
 !    routine            - exact_error
-!                                                                     
-!---------------------------------------------------------------------- 
-!                                                                     
+!
+!----------------------------------------------------------------------
+!
 !     latest revision:  - Aug 2019
-!                                                                     
+!
 !     purpose:          - compute and print exact error
-!                                                                    
+!
 !----------------------------------------------------------------------
 subroutine exact_error(Nflag,PhysNick)
 !
@@ -19,7 +19,7 @@ subroutine exact_error(Nflag,PhysNick)
    use par_mesh   , only: DISTRIBUTED,HOST_MESH
    use mpi_param  , only: ROOT,RANK
    use MPI        , only: MPI_SUM,MPI_COMM_WORLD,MPI_REAL8
-!   
+!
    implicit none
 !
    integer, intent(in)  :: Nflag(NR_PHYSA)
@@ -54,7 +54,7 @@ subroutine exact_error(Nflag,PhysNick)
    do iel=1,NRELES_SUBD
       call element_error(ELEM_SUBD(iel),Nflag,           &
                          errorH,errorE,errorV,errorQ,    &
-                         rnormH,rnormE,rnormV,rnormQ)  
+                         rnormH,rnormE,rnormV,rnormQ)
       select case(PhysNick)
          case(1)
             error_subd = error_subd + errorQ

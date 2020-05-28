@@ -17,22 +17,22 @@
 subroutine superellipse(X,Point,Axis1,Axis2,Rs1,Rs2,Pw1,Pw2, Fval,Dfdx)
 !
       implicit none
-      real*8, dimension(3), intent(in ) :: X,Point,Axis1,Axis2
-      real*8              , intent(in ) :: Rs1,Rs2,Pw1,Pw2
-      real*8              , intent(out) :: Fval
-      real*8, dimension(3), intent(out) :: Dfdx
+      real(8), dimension(3), intent(in ) :: X,Point,Axis1,Axis2
+      real(8)              , intent(in ) :: Rs1,Rs2,Pw1,Pw2
+      real(8)              , intent(out) :: Fval
+      real(8), dimension(3), intent(out) :: Dfdx
 !------------------------------------------------------------------------------------
 !  ...superellipse axes unit vectors
-      real*8, dimension(3)   :: unit1,unit2
+      real(8), dimension(3)   :: unit1,unit2
 !  ...relative position vector of X with respect to point of axis
-      real*8, dimension(3)   :: vecV
+      real(8), dimension(3)   :: vecV
 !  ...projections onto unit axes
-      real*8                 :: xx,yy,sgnxx,sgnyy,s
-      integer                :: iprint
+      real(8)                 :: xx,yy,sgnxx,sgnyy,s
+      integer                 :: iprint
 !------------------------------------------------------------------------------------
-!      
+!
       iprint=0
-!  ...printing      
+!  ...printing
       if (iprint.eq.1) then
         write(*,7000) Point(1:3),Axis1(1:3),Axis2(1:3),Rs1,Rs2,Pw1,Pw2,X(1:3)
  7000   format(' superellipse: Point = ',3e12.5,/, &
@@ -50,7 +50,7 @@ subroutine superellipse(X,Point,Axis1,Axis2,Rs1,Rs2,Pw1,Pw2, Fval,Dfdx)
 !                   abs(xx/Rs1)**Pw1+abs(yy/Rs2)**Pw2=1
 !     thereofore, in 2D when Rs1=Rs2 and Pw1=Pw2=p, it is an Lp ball, and in 3D if
 !     Rs1=Rs2 and Pw1=Pw2=2, it is a cylinder.
-!  
+!
 !  ...evaluate axis unit vectors
       call norm(Axis1, s)
       unit1(1:3) = Axis1(1:3)/s
@@ -60,7 +60,7 @@ subroutine superellipse(X,Point,Axis1,Axis2,Rs1,Rs2,Pw1,Pw2, Fval,Dfdx)
 !  ...evaluate the relative position vector of X
       vecV(1:3) = X(1:3) - Point(1:3)
 !
-!  ...printing      
+!  ...printing
       if (iprint.eq.1) then
         write(*,7001) unit1(1:3),unit2(1:3),vecV(1:3)
  7001   format(' superellipse: unit1 = ',3e12.5,' unit2 = ',3e12.5,' vecV = ',3e12.5)

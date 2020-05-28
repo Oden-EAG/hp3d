@@ -102,7 +102,7 @@ subroutine print_order(Type, Norder)
   implicit none
   character(len=4), intent(in) :: Type
   integer, intent(in), dimension(19) :: Norder
-  integer :: in, nn 
+  integer :: in, nn
 !
   in=0; nn = nedge(Type)
   write(*,7001) Norder(in+1:in+nn)

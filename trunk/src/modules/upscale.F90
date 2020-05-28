@@ -25,7 +25,7 @@ module upscale
 !    number of elements required by visualization level (0 - 3)
      integer :: NR_ELEM
 !
-!    list of elements' vertices (indexing starts at 0) 
+!    list of elements' vertices (indexing starts at 0)
      integer, allocatable :: ELEM(:,:)
   endtype vis
 !
@@ -67,7 +67,7 @@ contains
   end function vis_on_type
 !
 ! deallocate vis object (configuration)
-  subroutine clear_vis(V) 
+  subroutine clear_vis(V)
     implicit none
     type(vis), intent(inout) :: V
     V%NR_VERT = 0
@@ -132,7 +132,7 @@ contains
 
     close(nin)
     ierr = ierr + istat
-    if (ierr.ne.0) then 
+    if (ierr.ne.0) then
        write(*,*) 'module upscale::Something wrong', ierr
     end if
   end subroutine load_vis
@@ -142,7 +142,7 @@ contains
     implicit none
     type(vis), intent(in) :: V
     integer  , intent(in) :: Idx
-    real*8   , intent(out):: Pt(3)
+    real(8)  , intent(out):: Pt(3)
     Pt(1:3) = V%VERT(Idx,1:3)
   end subroutine get_vis_point
 !
@@ -174,11 +174,11 @@ contains
   subroutine disp_vis(Nout, V, Type)
     implicit none
     type(vis), intent(in):: V
-    integer,   intent(in):: Nout   
+    integer,   intent(in):: Nout
     character(len=*), intent(in):: Type
 
     integer :: i
-    
+
     write(Nout,*) Type, ' NR_VERT = ', V%NR_VERT
     do i=0,(V%NR_VERT-1)
        write(Nout,*) V%VERT(i,1:3)

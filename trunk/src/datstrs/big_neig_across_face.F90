@@ -1,5 +1,5 @@
 !------------------------------------------------------------------------------
-!> Purpose : for an ACTIVE element Mdle, routine finds a big neighbor Neig 
+!> Purpose : for an ACTIVE element Mdle, routine finds a big neighbor Neig
 !!           across face Iface
 !!
 !! @param[in]  Mdle  - middle node
@@ -24,21 +24,21 @@ subroutine big_neig_across_face(Mdle,Iface, Neig)
   integer :: mdlf,nrneig,ipos,i,inode,ifound
 !------------------------------------------------------------------------------
 
-  !  ...initialze to NO neighbor 
+  !  ...initialze to NO neighbor
   Neig=0
 
   !  ...determine face node
   call elem_face(Mdle,Iface, mdlf)
-  
+
   !  ...if the face is refined, NO big neighbor on the other side can exist
   if (NODES(mdlf)%ref_kind.ne.0) return
- 
+
   !  ...determine neighboring element(s)
   call neig_face(mdlf, nrneig,neig_ls,iface_ls,orient_ls)
 
-  !  ...if only one neighbor, return 
+  !  ...if only one neighbor, return
   if (Nrneig.ne.2) return
- 
+
   !  ...locate element other than Mdle on the list
   call locate(Mdle,neig_ls,2, ifound)
   select case(ifound)
@@ -56,6 +56,6 @@ subroutine big_neig_across_face(Mdle,Iface, Neig)
   !  ...check that YOUNGEST neighbor across face is unrefined
   !     [refer to subroutine "neig_face" for details]
   if (NODES(Neig)%ref_kind.ne.0) Neig=0
- 
-  
+
+
 end subroutine big_neig_across_face

@@ -7,13 +7,13 @@ c
 c   latest revision    - Jan 06
 c
 c   purpose            - routine evaluates physical coordinates
-c                        and its derivatives wrt to reference 
+c                        and its derivatives wrt to reference
 c                        coordinates for an implicit triangle
 c
 c   arguments :
 c     in:
 c               No     - the curve number
-c               Xi     - a value of the curve parameter (between 0 
+c               Xi     - a value of the curve parameter (between 0
 c                        and 1)
 c     out:
 c               X      - physical coordinates of the point
@@ -36,8 +36,8 @@ c
      .          dxcdt(3),ncurv(3),aux1(3),aux2(3),xc(3),aux(3,3),
      .          sfact(4),de(3),xmid(3),dtdeta(2)
 c
-      real*8,dimension(3)   :: shapH
-      real*8,dimension(2,3) :: dshapH
+      real(8), dimension(3)   :: shapH
+      real(8), dimension(2,3) :: dshapH
 c
       iprint=0
 
@@ -63,29 +63,29 @@ c
 c  ...store first vertex, compute centroid
       ctr50(1:3)=xv(1:3,1)
       xmid(1:3)=xv(1:3,1)+xv(1:3,2)+xv(1:3,3) ; xmid(1:3)=xmid(1:3)/3.d0
-c      
+c
 c  ...linear vertex interpolant (start point for NR iterations)
       Dxdxi(1:3,1) = xv(1:3,2)-xv(1:3,1)
       Dxdxi(1:3,2) = xv(1:3,3)-xv(1:3,1)
       xs(1:3) = xv(1:3,1) + Xi(1)*Dxdxi(1:3,1)+Xi(2)*Dxdxi(1:3,2)
 c
-c  ...if at first vertex, done      
+c  ...if at first vertex, done
       if ((Xi(1)+Xi(2)).eq.0) then
         X(1:3)=xs(1:3) ; return
       endif
 c
 c  ...get number of surfaces
       nsutr(1:4)=TRIANGLES(No)%Idata(1:4)
-c      
-c  ...sign factors to adjust orientation of surfaces      
+c
+c  ...sign factors to adjust orientation of surfaces
       sfact(1:4)=1.d0
       call surf(nsutr(2),xmid, fval,de) ; if (fval.lt.0) sfact(1)=-1.d0
       call surf(nsutr(3),xmid, fval,de) ; if (fval.lt.0) sfact(2)= 1.d0
       call surf(nsutr(4),xmid, fval,de) ; if (fval.lt.0) sfact(3)= 1.d0
-c 
+c
 c  ...if close to first vertex, do not be too close!
       if ((Xi(1)+Xi(2)).lt.1.d-6) then
-        Xi(1)=1.d-6 ; Xi(2)=1.d-6 
+        Xi(1)=1.d-6 ; Xi(2)=1.d-6
       endif
 c
 c  ...1st EDGE : SURFS sph -> 3.........................................
@@ -102,16 +102,16 @@ ccc        xic = 1.d0 - Xi(1)-Xi(2)
 ccc        sign= -1.d0
 ccc      endif
 ccc      call curve(iabs(ncurv(1)),xic, xc,dxcdt)
-ccc      dxcdt(1:3) = sign*dxcdt(1:3)  
+ccc      dxcdt(1:3) = sign*dxcdt(1:3)
 c
 c
-c  ...surfaces bounding 1st edge      
+c  ...surfaces bounding 1st edge
       call sphere1(xc,ctr50,0.d0, fval2,der2)
       call surf(Nsutr(3),xc,      fval1,der1)
-c  ...adjust orientation      
+c  ...adjust orientation
       fval1=fval1*sfact(2) ; der1(1:3)=der1(1:3)*sfact(2)
 c
-c  ...value of stretching function and its derivative      
+c  ...value of stretching function and its derivative
       xif(1) = fval2/(fval2-fval1)
       xifdxi(1,1) = ((1.d0-xif(1))*dip(der2,dxcdt)
      .                   + xif(1) *dip(der1,dxcdt))/(fval2-fval1)
@@ -136,17 +136,17 @@ ccc        xic = 1.d0 - xih
 ccc        sign=-1.d0
 ccc      endif
 ccc      call curve(iabs(ncurv(2)),xic, xc,dxcdt)
-ccc      dxcdt(1:3) = sign*dxcdt(1:3)  
+ccc      dxcdt(1:3) = sign*dxcdt(1:3)
 c
 c
 c
-c  ...surfaces bounding 2nd edge      
+c  ...surfaces bounding 2nd edge
       call surf(Nsutr(2),xc, fval1,der1)
       call surf(Nsutr(4),xc, fval2,der2)
 c  ...adjust orientations
       fval1=fval1*sfact(1) ; der1(1:3)=der1(1:3)*sfact(1)
       fval2=fval2*sfact(3) ; der2(1:3)=der2(1:3)*sfact(3)
-c      
+c
 c  ...stretching function and its derivative
       xif(3) = fval1/(fval1-fval2)
       xifdxi(1,2) = ((1.d0-xif(3))*dip(der1,dxcdt)
@@ -170,10 +170,10 @@ ccc      call curve(iabs(ncurv(3)),xic, xc,dxcdt)
 ccc      dxcdt(1:3) = sign*dxcdt(1:3)
 c
 c
-c  ...surfaces bounding 3rd edge      
+c  ...surfaces bounding 3rd edge
       call sphere1(xc,ctr50,0.d0, fval2,der2)
       call surf(nsutr(3),xc, fval1,der1)
-c  ...adjust orientation      
+c  ...adjust orientation
       fval1=fval1*sfact(3) ; der1(1:3)=der1(1:3)*sfact(3)
 c
 c  ...stretching function and its derivative
@@ -182,7 +182,7 @@ c  ...stretching function and its derivative
      .                    + xif(4)*dip(der1,dxcdt))/(fval2-fval1)
 
 ccc      write(*,1111)nsutr(1:4),Xi,xif,xs
-ccc 1111 format(' nsutr,Xi,xif,xs = ',4(i1,2x),2x,9(e12.5,2x))      
+ccc 1111 format(' nsutr,Xi,xif,xs = ',4(i1,2x),2x,9(e12.5,2x))
       call mnewt(3,nsutr,Xi,xif,xs,sfact, X)
 c
 c
@@ -225,7 +225,7 @@ c
       aux2(3) = (fval2-fval1)*(Xi(2)*xifdxi(2,1)+Xi(1)*xifdxi(1,1)
      .        + xif(4)) - fval2
       aux1(3) = (fval2-fval1)*(Xi(2)*xifdxi(2,1)+Xi(1)*xifdxi(1,1)
-     .        + xif(1)) - fval2 
+     .        + xif(1)) - fval2
 
       call saruss(aux,aux1, Dxdxi(1,1),ifl1)
       call saruss(aux,aux2, Dxdxi(1,2),ifl2)
@@ -241,7 +241,7 @@ c
         function dip(A,B)
 c----------------------------------------------------------------------
 c
-c   routine name       - 
+c   routine name       -
 c
 c----------------------------------------------------------------------
 c
@@ -251,19 +251,19 @@ c   latest revision    - June,1992
 c
 c   purpose            - compute inner product
 c
-c   usage              - x = dip(A,B) 
+c   usage              - x = dip(A,B)
 c
 c   arguments :
 c     in:              -A(3),B(3)
 c     out:             -
 c
-c   required  routines - 
+c   required  routines -
 c
 c----------------------------------------------------------------------
 c
 #include "syscom.blk"
       dimension A(3),B(3)
-      dip =  A(1)*B(1)+A(2)*B(2)+A(3)*B(3)    
+      dip =  A(1)*B(1)+A(2)*B(2)+A(3)*B(3)
         return
         end
 

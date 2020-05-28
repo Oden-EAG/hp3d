@@ -12,17 +12,17 @@ c   purpose            - solve a linear 3 times 3 system of equations
 c                        using determinants (Cramer's rule)
 c
 c   arguments :
-c     in:  
+c     in:
 c                A     - lhs matrix
 c                B     - rhs vector
 c
-c     out:      
+c     out:
 c                C     - the solution
 c                Nfl   - return flag
 c                        = 0 if non-singular system
 c                        = 1 if numerically singular system
 c
-c   required  routines - 
+c   required  routines -
 c
 c-----------------------------------------------------------------------
 c
@@ -41,7 +41,7 @@ c  ...compute the main determinant
      .     + A(2,3)*A(3,2)*A(1,1 )+A(3,3)*A(1,2)*A(2,1))
 c
 c
-      if (abs(B(1)).le.eps.and.abs(B(2)).le.eps.and.abs(B(3)).le.eps) 
+      if (abs(B(1)).le.eps.and.abs(B(2)).le.eps.and.abs(B(3)).le.eps)
      .  then
         C(1:3) = 0.d0
         return
@@ -75,6 +75,6 @@ c
       C(1) = detX/detA
       C(2) = detY/detA
       C(3) = detZ/detA
-c   
+c
 c
       end

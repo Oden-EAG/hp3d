@@ -13,7 +13,7 @@ c
 c   arguments :
 c     in:
 c                Nf    = 10*(number of levels for contour plot)+
-c                        flag whether to display elements numbers 
+c                        flag whether to display elements numbers
 c
 c-----------------------------------------------------------------------
 c
@@ -24,10 +24,10 @@ c
 #include "syscom.blk"
 c
       dimension xyn(2,3)
-      character*5 text
+      character(5) text
 c
       i3(j) = j-(j-1)/3*3
-c   
+c
       nick=0; nickno=0
 c
 c  ...decode flag
@@ -75,7 +75,7 @@ c  .......rescale
           do k=1,3
             do ivar=1,2
               XY(ivar,k) = RGTR((itr-1)*9+(k-1)*3+ivar)
-              XY(ivar,k) = (XY(ivar,k)-XCIM(ivar))/DIMIM*SIZE 
+              XY(ivar,k) = (XY(ivar,k)-XCIM(ivar))/DIMIM*SIZE
      .                     + XCWIN(ivar)
               xyn(ivar,k) = XY(ivar,k)
             enddo
@@ -96,48 +96,48 @@ c  .......find entries in matrix of small triangles
 c
 c  .......in a loop over small triangles
           do i=1,nstr
-c              
+c
 c  .........set color
             ncol=IGSTR(nfstr+i)
             if (ncol.ge.0) then
-c               
+c
 c  ...........interpolate the color scale for the right color index
               aux = float(ncol)/float(numlev+1)
 cldem 04.03.02
 ccc              ncol=NPCOL(11+int(aux*(NR_COLORS-10)))
               ncol=NPCOL(11+int(aux*(NR_COLORS-11)))
             endif
-c                    
+c
 c  .........rescale
             do k=1,3
               do ivar=1,2
                 isub = (nfstr+i-1)*9+(k-1)*3+ivar
                 XY(ivar,k) = RGTR(isub)
-                XY(ivar,k) = (XY(ivar,k)-XCIM(ivar))/DIMIM*SIZE 
+                XY(ivar,k) = (XY(ivar,k)-XCIM(ivar))/DIMIM*SIZE
      .                       + XCWIN(ivar)
                 if (i.eq.1) xyn(ivar,k) = XY(ivar,k)
               enddo
             enddo
-c                      
+c
             if (IDISPLAY_TYPE.eq.1) then
               ncol_line=npcol(2)
-c               
+c
 c  ...........decode the edge number to draw
               nsid = iabs(ncol)
               nsid1 = i3(nsid+1)
 ccc              write(*,*) 'dpvisid: ncol = ',ncol
-              if (ncol.ne.0) 
+              if (ncol.ne.0)
      .        call drawline(XY(1,nsid),XY(2,nsid),
      .                      XY(1,nsid1),XY(2,nsid1),ncol_line)
             else
-c                
+c
 c  ...........fill the subtriangle
               call fillpoly(3,XY,ncol,ncol)
             endif
-c                    
+c
 c  .........clear the buffer
             call flushx
-c              
+c
 c  .......end of loop through subtriangles
           enddo
         endif
@@ -166,7 +166,7 @@ c  .........clear the buffer
             call flushx
 c
           endif
-        endif 
+        endif
 c
 c  .....check whether subsequent edges are to be displayed
 c       and draw them when needed
@@ -177,9 +177,9 @@ c       and draw them when needed
           iflag3 = iflag-4*iflag1-2*iflag2
 ccc          write(*,*) 'dpvisid: iflag1,iflag2,iflag3,ncol = ',
 ccc     .                         iflag1,iflag2,iflag3,ncol
-          if (iflag1.eq.1) 
+          if (iflag1.eq.1)
      .       call drawline(xyn(1,1),xyn(2,1),xyn(1,2),xyn(2,2),ncol)
-          if (iflag2.eq.1) 
+          if (iflag2.eq.1)
      .       call drawline(xyn(1,3),xyn(2,3),xyn(1,2),xyn(2,2),ncol)
           if (iflag3.eq.1)
      .       call drawline(xyn(1,1),xyn(2,1),xyn(1,3),xyn(2,3),ncol)

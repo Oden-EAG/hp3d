@@ -1,4 +1,4 @@
-!> Purpose : define the workspace for graphics 
+!> Purpose : define the workspace for graphics
 module graphmod
   !
   ! ** coltab.blk :: color table
@@ -21,7 +21,7 @@ module graphmod
   integer :: ISIZE(4),IWINDNUM,IDISPLAY_TYPE
   ! modify IWINDL, IWINDH to change X11 window size:
   integer :: IWINDL = 1334, IWINDH = 800
-  real*8  :: RWINDL,RWINDH,RMARGIN,XLENGTH,YLENGTH,RSIZE(4),RANGE(4)
+  real(8) :: RWINDL,RWINDH,RMARGIN,XLENGTH,YLENGTH,RSIZE(4),RANGE(4)
   !      ISIZE   - window size
   !      ISIZE(1) = 0
   !      ISIZE(2) = 0
@@ -36,7 +36,7 @@ module graphmod
   !      YLENGTH = RWINDH - 2.d0*rmargin
   !
   !      IDISPLAY_TYPE  -  type of display
-  real*8 :: RN(3), RMTR(3,3)
+  real(8) :: RN(3), RMTR(3,3)
   !
   !     RN  - components of the normal unit vector for a projection
   !           plane
@@ -51,14 +51,14 @@ module graphmod
 
   ! list of invisible blocks
   integer, dimension(MAXNRINVBL)  :: IGINV
-  real*8,  dimension(300)         :: RTRMP
+  real(8), dimension(300)         :: RTRMP
   integer, dimension(MAXNRCURVBL) :: NLINBLOCKS
   integer, dimension(MAXNRDOMAIN) :: NDOMAIN
   !
   ! physical attribute
   integer :: NRPHY_DISP
 
-  real*8, dimension(1:3,1:2) :: BOX_CUT
+  real(8), dimension(1:3,1:2) :: BOX_CUT
   integer :: IBOX_CUT
 
   ! ** Visible objects :: gparams.blk
@@ -69,16 +69,15 @@ module graphmod
   !       NRCURVBL - number of curvilinear blocks
 
   ! ** Color boxes :: gbox.blk
-  real*8, dimension(1:2,4,0:8) :: XY_BOX
+  real(8), dimension(1:2,4,0:8) :: XY_BOX
 
   ! ** Select the display quantity :: gselect.blk
   integer, save :: ISELECT
 
   ! ** Define sclae of triangles :: gscale.blk
   integer :: NRSUB
-  real*8  :: &
-       DX, DIMOB(3), XCENTR(3), XCIM(2), &
-       XY(2,3), SIZE, XCWIN(2), DIMIM, XEX(6), CLPL(4)
+  real(8) :: DX, DIMOB(3), XCENTR(3), XCIM(2), XY(2,3), &
+             SIZE, XCWIN(2), DIMIM, XEX(6), CLPL(4)
 
   !     NRSUB - number of subdivisions for each edge
   !     DX    = 1/NRSUB
@@ -104,8 +103,8 @@ module graphmod
   !--------------------------------------------------------------
   integer, save :: MXIGTR=0,MXIGSTR=0,MXRGTRZ=0
   integer, allocatable, dimension(:) :: IGTRCU, IGTRNO, IGTR, IGSTR
-  real*8, allocatable, dimension(:)  :: RGTR, RGTRZ
-  logical :: INITIALIZED = .FALSE.
+  real(8), allocatable, dimension(:) :: RGTR, RGTRZ
+  logical :: INITIALIZED = .false.
   !  explanation of variables:
   !     RGTR   - real storage place for points coordinates
   !              for graphics (in observer's system) for

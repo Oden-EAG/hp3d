@@ -8,7 +8,7 @@
 !
 !    purpose            - Module sets up required workspace for the
 !                         assembly of the global stiffness matrix and
-!                         load vector, as well as connectivity maps to 
+!                         load vector, as well as connectivity maps to
 !                         avoid recomputation after solve.
 !
 !    contains
@@ -17,10 +17,10 @@
 !----------------------------------------------------------------------!
 module assembly_sc
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 !..timers
-   real*8 MTime(20)
+   real(8) :: MTime(20)
    integer, save :: IPRINT_TIME = 0
 !
 !..offsets for each energy space

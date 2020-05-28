@@ -22,7 +22,7 @@ c
 #include "syscom.blk"
 #include "cinout.blk"
 c
-      character*9 type
+      character(9) type
       integer label, Nrcurv
       integer  tem(8),ttem(12),tttem(6)
 c
@@ -473,7 +473,7 @@ c  .....read in and store the coordinates of the center of an ellipse
           end select
 c
 c  .....read in and store the coordinates of the center of a
-c  .....superellipse and its associated powers          
+c  .....superellipse and its associated powers
         else if (Type.eq.'QuaSEl') then
           allocate( CURVES(icur)%Rdata(NDIM+2), STAT = ic)
           if(ic.ne.0)then

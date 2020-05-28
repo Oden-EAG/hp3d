@@ -41,7 +41,7 @@ c
 c  ...start sorting (heapsort algorithm)
       l=NRVISTR/2+1
       ir=NRVISTR
-   20 continue 
+   20 continue
       if (l.gt.1) then
         l=l-1
         index=IGTR(l)
@@ -92,8 +92,8 @@ c      write(*,*)'SORT: IGTR=',(igtr(i),i=1,nrvistr)
 c      pause
 
       end
-   
-      
+
+
 
 
 

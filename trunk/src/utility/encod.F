@@ -17,9 +17,9 @@ c               Narray - digits to be encoded
 c               Mod    - system number
 c               N      - number of the digits stored in the nickname
 c     out:
-c               Nick   - the nickname 
+c               Nick   - the nickname
 c
-c   required  routines - 
+c   required  routines -
 c
 c----------------------------------------------------------------------
 c
@@ -56,26 +56,26 @@ c               Narray - digits to be encoded
 c               Mod    - system number
 c               N      - number of the digits stored in the nickname
 c     out:
-c               Nick   - the LONG (integer) nickname 
+c               Nick   - the LONG (integer) nickname
 c
-c   required  routines - 
+c   required  routines -
 c
 c----------------------------------------------------------------------
 c
       subroutine encodLong(Narray,Mod,N, Nick)
-c 
+c
       implicit none
 c
       integer,             intent(in)    :: Mod,N
       integer,dimension(N),intent(in)    :: Narray
-      integer*8,           intent(out)   :: Nick
+      integer(8),           intent(out)  :: Nick
 c
 c  ...local variables
-      integer   :: i
-      integer*8 :: longmod
+      integer    :: i
+      integer(8) :: longmod
 c  ...be careful with integer type - need to convert!
       longmod = int(Mod,8)
-      Nick = int(Narray(1),8)    
+      Nick = int(Narray(1),8)
       do i=2,N
 c    ...be careful with integer type - need to convert!
         Nick = Nick*longmod + int(Narray(i),8)

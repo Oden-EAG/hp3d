@@ -1,16 +1,16 @@
-!> Purpose : copy dof for a node from data structure into local arrays 
+!> Purpose : copy dof for a node from data structure into local arrays
 !! @param[in]    Nod                     - a node number
 !! @param[inout] KdofH,KdofE,KdofV,KdofQ - dof counters for the local arrays
 !! @param[out]   ZvalH,ZvalE,ZvalV,ZvalQ - H1,H(curl),H(div) and L2 dof
 !!                                         from the data structure in the
 !!                                         expanded mode
 
-#include "implicit_none.h"
+#include "typedefs.h"
 subroutine dof_out( &
      Nod, &
      KdofH,KdofE,KdofV,KdofQ, &
      ZvalH,ZvalE,ZvalV,ZvalQ)
-  use data_structure3D 
+  use data_structure3D
   implicit none
   !
   ! ** Arguments

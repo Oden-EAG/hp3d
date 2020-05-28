@@ -11,7 +11,7 @@ c
 c   purpose            - routine displays the solution along
 c                        a line
 c
-c   required  routines - 
+c   required  routines -
 c
 c----------------------------------------------------------------------
 c
@@ -55,7 +55,7 @@ c
 c
 c----------------------------------------------------------------------
 c
-c  ...step 1: Determine the maximum and minimum values of 
+c  ...step 1: Determine the maximum and minimum values of
 c             the solution
 c
       y_max = -1.d30
@@ -87,7 +87,7 @@ c  ...step 2: set up coordinates of the origin and draw horizontal and
 c             vertical axes
 c
       origin(1) = 2.d0*RMARGIN
-      origin(2) = 2.d0*RMARGIN 
+      origin(2) = 2.d0*RMARGIN
       xlen = XLENGTH - 2.d0*RMARGIN
       ylen = YLENGTH - 2.d0*RMARGIN
 c
@@ -142,15 +142,15 @@ c  .....close the window
 c
         write(*,*) 'section: SET x-axis description'
         read(*,*) comment10
-        x = origin(1) + xlen 
-ccc        y = origin(2) + 3*RMARGIN/8.d0 
+        x = origin(1) + xlen
+ccc        y = origin(2) + 3*RMARGIN/8.d0
         y = origin(2) + (0.d0 - y_min)/dy*ylen + RMARGIN/8.d0
         call symbol(x,y,10.d0,comment10,0.d0,10,1)
 c
         write(*,*) 'section: SET y-axis description'
         read(*,*) comment10
         write(*,*) comment10
-        x = origin(1) + 3*RMARGIN/8.d0 
+        x = origin(1) + 3*RMARGIN/8.d0
         y = origin(2) + ylen + RMARGIN/4.d0
         call symbol(x,y,10.d0,comment10,0.d0,10,1)
 c
@@ -164,7 +164,7 @@ c  .....marks on the horizontal axis
           y2 = y1 - RMARGIN/2.d0
           call drawline(x1,y1,x2,y2,nblack)
           x = x1 + RMARGIN/8.d0
-          y = y2 
+          y = y2
 c
 c  .......find out the value to write out
           xx = x_min + (x_max-x_min)/nr_marks*i
@@ -212,8 +212,8 @@ c  .....write out additional comments
             call symbol(x,y,20.d0,comment20,0.d0,20,1)
           enddo
         endif
-        x = origin(1)+ .7d0*xlen  
-        y = YLENGTH - 2.*RMARGIN 
+        x = origin(1)+ .7d0*xlen
+        y = YLENGTH - 2.*RMARGIN
 c
 c  .....close the window
         call closwind(1)

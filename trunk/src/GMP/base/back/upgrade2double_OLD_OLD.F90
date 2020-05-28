@@ -56,21 +56,21 @@ subroutine upgrade2double
       if (TRIANGLES(nt)%Type .ne. 'PTITri') cycle
 #if I_PRINT >= 2
       write(*,*)'upgrade2double: nt, type =',nt,TRIANGLES(nt)%Type
-#endif  
+#endif
 ! ....loop through vertices
       do iv = 1, 3
 ! ......get point number
         np = TRIANGLES(nt)%VertNo(iv)
 #if I_PRINT >= 2
         write(*,*)'upgrade2double: np =',np
-#endif  
+#endif
 ! ......cycle if point has already been visited
         if (POINTS(np)%Type .eq. 'Regular') cycle
 ! ......get intial guess for Newton-Rapson method
         x_0(1:3) = POINTS(np)%Rdata(1:3)
 ! ......select number of surfaces
         select case (POINTS(np)%Idata(1))
-! ........point lies on ONE surface        
+! ........point lies on ONE surface
           case (1)
 #if I_PRINT >= 2
             write(*,*)'upgrade2double: 1_surf point.'
@@ -78,40 +78,40 @@ subroutine upgrade2double
 ! ..........create two extra planes
             NRSURFS = NRSURFS + 1;  ns_1 = NRSURFS
             NRSURFS = NRSURFS + 1;  ns_2 = NRSURFS
-! ..........get curve number          
+! ..........get curve number
             nc = abs(TRIANGLES(nt)%EdgeNo(iv))
 #if I_PRINT >= 2
   write(*,*)'upgrade2double: nc_1 =',nc
-#endif  
+#endif
 ! ..........get curve start point
             np_s = CURVES(nc)%EndPoNo(1)
-! ..........compute gradient          
+! ..........compute gradient
             if (np .eq. np_s) then
               call curve(nc,0.d0, void_1,grad_1)
-            else  
+            else
               call curve(nc,1.d0, void_1,grad_1)
             endif
 ! ..........normalize gradient
             call normalize(grad_1)
 #if I_PRINT >= 2
             write(*,*)'upgrade2double: grad_1 =',grad_1
-#endif  
+#endif
 ! ..........get curve
             nc = abs(TRIANGLES(nt)%EdgeNo(mod3(iv + 2)))
-#if I_PRINT >= 2 
+#if I_PRINT >= 2
             write(*,*)'upgrade2double: nc_2 =',nc
-#endif  
-! ..........compute gradient          
+#endif
+! ..........compute gradient
             if (np .eq. np_s) then
               call curve(nc,0.d0, void_1,grad_2)
-            else  
+            else
               call curve(nc,1.d0, void_1,grad_2)
             endif
 ! ..........normalize gradient
             call normalize(grad_2)
 #if I_PRINT >= 2
             write(*,*)'upgrade2double: grad_2 =',grad_2
-#endif  
+#endif
 ! ..........create first plane
             SURFACES(ns_1)%Type = 'VecPt'
             allocate (SURFACES(ns_1)%Rdata(6))
@@ -119,16 +119,16 @@ subroutine upgrade2double
             SURFACES(ns_1)%Rdata(4:6) = grad_1
 #if I_PRINT >= 2
             write(*,*)'upgrade2double: 1st plane defined.'
-#endif  
-! ..........create second plane         
+#endif
+! ..........create second plane
             SURFACES(ns_2)%Type = 'VecPt'
             allocate (SURFACES(ns_2)%Rdata(6))
             SURFACES(ns_2)%Rdata(1:3) = POINTS(np)%Rdata(1:3)
             SURFACES(ns_2)%Rdata(4:6) = grad_2
 #if I_PRINT >= 2
             write(*,*)'upgrade2double: 2nd plane defined.'
-#endif  
-! ..........create array of surface numbers          
+#endif
+! ..........create array of surface numbers
             surfs(1) = POINTS(np)%Idata(2);  surfs(2) = ns_1;  surfs(3) = ns_2
 ! ..........apply Newton-Rapson method
             void_1 = 0.d0
@@ -139,25 +139,25 @@ subroutine upgrade2double
 ! ..........delete extra surfaces
             SURFACES(ns_1)%Type = 'Void';     SURFACES(ns_2)%Type = 'Void'
             deallocate(SURFACES(ns_1)%Rdata); deallocate(SURFACES(ns_2)%Rdata)
-            NRSURFS = NRSURFS - 2 
-! ........poiint lies on TWO surfaces            
+            NRSURFS = NRSURFS - 2
+! ........poiint lies on TWO surfaces
           case (2)
 #if I_PRINT >= 2
             write(*,*)'upgrade2double: 2_surf point.'
 #endif
 ! ..........create one extra plane
 10          NRSURFS = NRSURFS + 1;  ns_1 = NRSURFS
-! ..........get curve number          
+! ..........get curve number
             nc = abs(TRIANGLES(nt)%EdgeNo(iv))
 #if I_PRINT >= 2
             write(*,*)'upgrade2double: nc_1 = ',nc
 #endif
 ! ..........get curve start point
             np_s = CURVES(nc)%EndPoNo(1)
-! ..........compute gradient          
+! ..........compute gradient
             if (np .eq. np_s) then
               call curve(nc,0.d0, void_1,grad_1)
-            else  
+            else
               call curve(nc,1.d0, void_1,grad_1)
             endif
 ! ..........normalize gradient
@@ -173,7 +173,7 @@ subroutine upgrade2double
 #if I_PRINT >= 2
             write(*,*)'upgrade2double: extra plane defined.'
 #endif
-! ..........create array of surface numbers          
+! ..........create array of surface numbers
             surfs(1:2) = POINTS(np)%Idata(2:3);  surfs(3) = ns_1
 ! ..........apply Newton-Rapson method
             void_1 = 0.d0
@@ -184,8 +184,8 @@ subroutine upgrade2double
 ! ..........delete extra surface
             SURFACES(ns_1)%Type = 'Void'
             deallocate(SURFACES(ns_1)%Rdata)
-            NRSURFS = NRSURFS - 1 
-! ........point lies on THREE surfaces            
+            NRSURFS = NRSURFS - 1
+! ........point lies on THREE surfaces
           case (3)
 #if I_PRINT >= 2
             write(*,*)'upgrade2double: 3_surf point.'
@@ -199,9 +199,9 @@ subroutine upgrade2double
 #if I_PRINT >= 2
             write(*,*)'upgrade2double: mixed_product = ',prod
 #endif
-! ..........if a surface is redundant, treat it as a 2_surf point            
+! ..........if a surface is redundant, treat it as a 2_surf point
             if (abs(prod) .lt. GEOM_TOL) goto 10
-! ..........apply Newton method                
+! ..........apply Newton method
             call mnewt(1,POINTS(np)%Idata(2:4),void_1,void_2,x_0,void_2, POINTS(np)%Rdata(1:3))
 #if I_PRINT >= 2
             write(*,*)'upgrade2double: Newton method applied.'
@@ -210,7 +210,7 @@ subroutine upgrade2double
           case default
             write(*,*)'upgrade2double: case not supported yet!'
             stop
-! ......end select number of sufaces            
+! ......end select number of sufaces
         end select
 ! ......reset point type
         POINTS(np)%Type = 'Regular'
@@ -223,13 +223,13 @@ subroutine upgrade2double
 #if I_PRINT >= 2
       call pause
 #endif
-! ..end of loop through triangles 
+! ..end of loop through triangles
     enddo
 !
 ! ..reset GEOM_TOL to original value
     GEOM_TOL = geom_tol_orig
 #if I_PRINT >= 1
     write(*,*)'upgrade2double: done!'
-#endif  
+#endif
 !
 end subroutine upgrade2double

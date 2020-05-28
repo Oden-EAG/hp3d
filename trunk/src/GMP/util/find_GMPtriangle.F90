@@ -19,7 +19,7 @@
 subroutine find_GMPtriangle(Nvert, Ntfound)
 !
       use GMP
-#include "syscom.blk"     
+#include "syscom.blk"
 #include "cinout.blk"
 !
       dimension Nvert(3)
@@ -44,9 +44,9 @@ subroutine find_GMPtriangle(Nvert, Ntfound)
           return
         endif
       enddo
-      write(*,7002) 
- 7002 format('find_GMPtriangle: HAVE NOT FOUND THE TRIANGLE, INITIATING &
-                                A BRUTE FORCE SEARCH THROUGH TETS')
+      write(*,7002)
+ 7002 format('find_GMPtriangle: HAVE NOT FOUND THE TRIANGLE, INITIATING ', &
+                               'A BRUTE FORCE SEARCH THROUGH TETS')
       do ntet = 1, NRTETRA
         iflag = 0
         do iv = 1, 4
@@ -61,4 +61,4 @@ subroutine find_GMPtriangle(Nvert, Ntfound)
         endif
       enddo
 !
-end subroutine find_GMPtriangle 
+end subroutine find_GMPtriangle

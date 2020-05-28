@@ -58,7 +58,7 @@ c  ...test......test......test......test......test......test......test...
 
 c
       iprint=0
-c      
+c
       iuu = 1
       jel = NUMELM + 1
 c
@@ -112,7 +112,7 @@ c            if(ndest1(i) .ne. nint(dreal(aldest(i))))then
 c              write(*,*)'BCKWRD:IEL,I=',iel,i
 c              write(*,*)ndest1(i),nint(dreal(aldest(i)))
 c              stop
-c            endif 
+c            endif
 c            enddo
 c  ...test......test......test......test......test......test......test...
 c  ...test......test......test......test......test......test......test...

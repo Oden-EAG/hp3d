@@ -1,6 +1,6 @@
 !> Purpose : with given element refinement flag, return the face refinements
 !! @param[in]  Type     - middle node type
-!! @param[in]  Kref     - refinement flag for the middle node 
+!! @param[in]  Kref     - refinement flag for the middle node
 !! @param[out] Kreff    - refinement flags for the element faces
 subroutine find_face_ref_flags(Type,Kref, Kreff)
   character(len=4),      intent(in)  :: Type
@@ -37,7 +37,7 @@ subroutine find_face_ref_flags(Type,Kref, Kreff)
      case(100);             Kreff( (/1,2,3,5/) ) = 10
      case(010);             Kreff( (/1,2,4,6/) ) = (/01,01,10,10/)
      case(001);             Kreff(3:6)=01
-     case default;          write(*,7001) Type, Kref; call pause 
+     case default;          write(*,7001) Type, Kref; call pause
      end select
   end select
 

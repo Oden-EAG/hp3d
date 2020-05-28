@@ -8,7 +8,7 @@
 !
 !   purpose            - for a node in a given mesh, routine returns
 !                        the corresponding node ancestor marked as
-!                        ``master node''            
+!                        ``master node''
 !
 !
 !   arguments:
@@ -23,8 +23,8 @@
 !
    use data_structure3D, ONLY : NODES
    use mg_data_structure
-!  
-   IMPLICIT NONE   
+!
+   implicit none
 !-----------------------------------------------------------------------
    integer, intent(in)   :: Igrid
    integer   :: Master, Nod, nfath

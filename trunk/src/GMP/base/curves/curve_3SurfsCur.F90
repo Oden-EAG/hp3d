@@ -10,32 +10,32 @@
 !! @revision Nov 12
 !----------------------------------------------------------------------------
 subroutine curve_3SurfsCur(Nc,Eta, R,Dr)
-!      
-      implicit none
-      integer            ,intent(in ) :: Nc                          
-      real*8             ,intent(in ) :: Eta               
-      real*8,dimension(3),intent(out) :: R  
-      real*8,dimension(3),intent(out) :: Dr 
 !
-      integer :: iflag                                 
+      implicit none
+      integer             ,intent(in ) :: Nc
+      real(8)             ,intent(in ) :: Eta
+      real(8),dimension(3),intent(out) :: R
+      real(8),dimension(3),intent(out) :: Dr
+!
+      integer :: iflag
 !----------------------------------------------------------------------------
 !
 !  ...try all possible choices of 2 out of 3 surfaces
       call curve_2SurfsCur(Nc,1,2,Eta, R,Dr,iflag)
 !
-      if (iflag.eq.1) then                          
+      if (iflag.eq.1) then
       call curve_2SurfsCur(Nc,1,3,Eta, R,Dr,iflag)
       endif
 !
-      if (iflag.eq.1) then                         
+      if (iflag.eq.1) then
       call curve_2SurfsCur(Nc,2,3,Eta, R,Dr,iflag)
       endif
 !
-      if (iflag.eq.1) then                        
+      if (iflag.eq.1) then
         write(*,1000)Nc,Eta
  1000   format(' curve_3SurfsCur: Nc,Eta = ',i7,2x,e12.5)
         stop
       endif
 !
 !
-endsubroutine curve_3SurfsCur
+end subroutine curve_3SurfsCur

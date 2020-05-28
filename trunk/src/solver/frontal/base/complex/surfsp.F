@@ -44,7 +44,7 @@ c
 #include "surfsc2.blk"
 c
       dimension In(*), Ia(*)
-      double precision t0,t1
+      real(8) t0,t1
 c
       iprint=0
 c

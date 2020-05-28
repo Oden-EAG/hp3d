@@ -47,35 +47,35 @@ c     GST(1,0:1)=GS(0:1)=ST(OrPa(Nori,1),OrGS(Nori,0:1))
 c     GST(2,0:1)=GT(0:1)=ST(OrPa(Nori,2),OrGT(Nori,0:1))
 c
 c  ...Nori=0 => ((s0,s1),(t0,t1))->((s0,s1),(t0,t1))
-      OrPa(0,1) = 1; OrPa(0,2) = 2 
+      OrPa(0,1) = 1; OrPa(0,2) = 2
       OrGS(0,0) = 0; OrGS(0,1) = 1
       OrGT(0,0) = 0; OrGT(0,1) = 1
 c  ...Nori=1 => ((s0,s1),(t0,t1))->((t0,t1),(s1,s0))
-      OrPa(1,1) = 2; OrPa(1,2) = 1 
+      OrPa(1,1) = 2; OrPa(1,2) = 1
       OrGS(1,0) = 0; OrGS(1,1) = 1
       OrGT(1,0) = 1; OrGT(1,1) = 0
 c  ...Nori=2 => ((s0,s1),(t0,t1))->((s1,s0),(t1,t0))
-      OrPa(2,1) = 1; OrPa(2,2) = 2 
+      OrPa(2,1) = 1; OrPa(2,2) = 2
       OrGS(2,0) = 1; OrGS(2,1) = 0
       OrGT(2,0) = 1; OrGT(2,1) = 0
 c  ...Nori=3 => ((s0,s1),(t0,t1))->((t1,t0),(s0,s1))
-      OrPa(3,1) = 2; OrPa(3,2) = 1 
+      OrPa(3,1) = 2; OrPa(3,2) = 1
       OrGS(3,0) = 1; OrGS(3,1) = 0
       OrGT(3,0) = 0; OrGT(3,1) = 1
 c  ...Nori=4 => ((s0,s1),(t0,t1))->((t0,t1),(s0,s1))
-      OrPa(4,1) = 2; OrPa(4,2) = 1 
+      OrPa(4,1) = 2; OrPa(4,2) = 1
       OrGS(4,0) = 0; OrGS(4,1) = 1
       OrGT(4,0) = 0; OrGT(4,1) = 1
 c  ...Nori=5 => ((s0,s1),(t0,t1))->((s1,s0),(t0,t1))
-      OrPa(5,1) = 1; OrPa(5,2) = 2 
+      OrPa(5,1) = 1; OrPa(5,2) = 2
       OrGS(5,0) = 1; OrGS(5,1) = 0
       OrGT(5,0) = 0; OrGT(5,1) = 1
 c  ...Nori=6 => ((s0,s1),(t0,t1))->((t1,t0),(s1,s0))
-      OrPa(6,1) = 2; OrPa(6,2) = 1 
+      OrPa(6,1) = 2; OrPa(6,2) = 1
       OrGS(6,0) = 1; OrGS(6,1) = 0
       OrGT(6,0) = 1; OrGT(6,1) = 0
 c  ...Nori=7 => ((s0,s1),(t0,t1))->((s0,s1),(t1,t0))
-      OrPa(7,1) = 1; OrPa(7,2) = 2 
+      OrPa(7,1) = 1; OrPa(7,2) = 2
       OrGS(7,0) = 0; OrGS(7,1) = 1
       OrGT(7,0) = 1; OrGT(7,1) = 0
 c
@@ -120,7 +120,7 @@ c  ...Nori=5 => (s0,s1,s2)->(s2,s1,s0)
       Or(5,0) = 2; Or(5,1) = 1; Or(5,2) = 0
 c
 c  ...Local-to-global transformation
-      GS(0) = S(Or(Nori,0)) 
+      GS(0) = S(Or(Nori,0))
       GS(1) = S(Or(Nori,1))
       GS(2) = S(Or(Nori,2))
 c

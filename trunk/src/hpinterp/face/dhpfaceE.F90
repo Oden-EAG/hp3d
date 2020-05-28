@@ -1,5 +1,8 @@
 !
-!> Purpose : determine H(curl) face dof interpolating H(curl) Dirichlet 
+#include "typedefs.h"
+!
+!-----------------------------------------------------------------------
+!> Purpose : determine H(curl) face dof interpolating H(curl) Dirichlet
 !            data using PB interpolation
 !
 !! @param[in]  Iflag        - a flag specifying the GMP object
@@ -15,7 +18,7 @@
 !! @param[in]  ZdofE        - H(curl) dof for the element (edge values only)
 !!
 !! @param[out] ZnodE        - H(curl) dof for the face
-#include "implicit_none.h"
+!-----------------------------------------------------------------------
   subroutine dhpfaceE(Mdle,Iflag,No,Etav, Type,Icase, &
                       Nedge_orient,Nface_orient,Norder,Iface, &
                       ZdofE, ZnodE)
@@ -23,14 +26,14 @@
   use parameters
   use physics
   use element_data
-  use cross_product_module
+!
   implicit none
 !
 ! ** Arguments
 !-----------------------------------------------------------------------
   integer,                                    intent(in)  :: Iflag,No,Mdle
   integer,                                    intent(in)  :: Icase,Iface
-  real*8,  dimension(3,8),                    intent(in)  :: Etav
+  real(8), dimension(3,8),                    intent(in)  :: Etav
   character(len=4),                           intent(in)  :: Type
   integer, dimension(12),                     intent(in)  :: Nedge_orient
   integer, dimension(6),                      intent(in)  :: Nface_orient
@@ -47,36 +50,36 @@
 !
 ! quadrature
   integer                               :: l,nint
-  real*8,  dimension(2, MAXquadH)       :: xi_list
-  real*8,  dimension(   MAXquadH)       :: wa_list 
-  real*8                                :: wa, weight
+  real(8), dimension(2, MAXquadH)       :: xi_list
+  real(8), dimension(   MAXquadH)       :: wa_list
+  real(8)                               :: wa, weight
 !
 ! work space for shape3H
   integer                               :: nrdofH
   integer, dimension(19)                :: norder_1
-  real*8,  dimension(MAXbrickH)         :: shapH
-  real*8,  dimension(3,MAXbrickH)       :: gradH
+  real(8), dimension(MAXbrickH)         :: shapH
+  real(8), dimension(3,MAXbrickH)       :: gradH
 !
 ! derivatives of a H1 shape function wrt reference coordinates
-  real*8, dimension(3)                  :: dvHdeta
+  real(8), dimension(3)                 :: dvHdeta
 !
 ! work space for shape3E
   integer                               :: nrdofE
-  real*8,  dimension(3,MAXbrickE)       :: shapE
-  real*8,  dimension(3,MAXbrickE)       :: curlE
+  real(8), dimension(3,MAXbrickE)       :: shapE
+  real(8), dimension(3,MAXbrickE)       :: curlE
 !
 ! H(curl) shape functions in reference coordinates
-  real*8,  dimension(3)                 :: uE,vE,curluE,curlvE
+  real(8), dimension(3)                 :: uE,vE,curluE,curlvE
 !
-! dot product 
-  real*8                                :: prod
+! dot product
+  real(8)                               :: prod
 !
 ! geometry
-  real*8                                :: rjac,bjac,rjacdxdeta
-  real*8, dimension(2)                  :: t
-  real*8, dimension(3)                  :: xi,eta,rn,x
-  real*8, dimension(3,2)                :: dxidt,detadt
-  real*8, dimension(3,3)                :: detadxi,dxideta,dxdeta,detadx
+  real(8)                               :: rjac,bjac,rjacdxdeta
+  real(8), dimension(2)                 :: t
+  real(8), dimension(3)                 :: xi,eta,rn,x
+  real(8), dimension(3,2)               :: dxidt,detadt
+  real(8), dimension(3,3)               :: detadxi,dxideta,dxdeta,detadx
 !
 ! Dirichlet BC data at a point
   VTYPE :: zvalH(  MAXEQNH), zdvalH(  MAXEQNH,3), &
@@ -87,20 +90,22 @@
   VTYPE :: zvalEeta(3,MAXEQNE),zcurlEeta(3,MAXEQNE)
 !
 ! linear systems
-  real*8,  dimension(MAXMdlqH+MAXMdlqE,MAXMdlqH+MAXMdlqE) :: aaE
+  real(8), dimension(MAXMdlqH+MAXMdlqE,MAXMdlqH+MAXMdlqE) :: aaE
   integer, dimension(MAXMdlqH+MAXMdlqE) :: ipivE
 !
 ! load vector and solution
-  VTYPE,   dimension(MAXMdlqH+MAXMdlqE,MAXEQNE)  :: zbE,zuE
-  real*8,  dimension(MAXMdlqH+MAXMdlqE,MAXEQNE)  :: duE_real, duE_imag
+  VTYPE,   dimension(MAXMdlqH+MAXMdlqE,MAXEQNE) :: zbE,zuE
+#if C_MODE
+  real(8), dimension(MAXMdlqH+MAXMdlqE,MAXEQNE) :: duE_real, duE_imag
+#endif
 !
-  integer, dimension(NR_PHYSA)          :: ncase
+  integer, dimension(NR_PHYSA) :: ncase
 !
 ! misc
   integer :: nrv,nre,nrf,nsign,nflag, &
              i,j,iH,jH,iE,jE,kjE,kiE,kiH,kjH,k,kE,&
              ivarE,nvarE,naE,iprint,info, &
-             ndofH_face,ndofE_face,ndofV_face,ndofQ_Face, ndofE_tot
+             ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,ndofE_tot
 !
 !-----------------------------------------------------------------------
   if (Iface.eq.2) then
@@ -142,7 +147,7 @@
 7060 format('dhpfaceE: norder_1 = ',20i4)
   endif
 !
-! get face order to find out quadrature information 
+! get face order to find out quadrature information
   call face_order(Type,Iface,Norder, norder_face)
   INTEGRATION=1   ! overintegrate
   call set_2Dint(face_type(Type,Iface),norder_face, &
@@ -161,14 +166,14 @@
      call face_param(Type,Iface,t, xi,dxidt)
 !
 !    compute element H1 shape functions
-     call shape3H(Type,xi, &
-                  norder_1,Nedge_orient,Nface_orient, &
-                  nrdofH,shapH,gradH)
+     call shape3DH(Type,xi, &
+                   norder_1,Nedge_orient,Nface_orient, &
+                   nrdofH,shapH,gradH)
 !
-!    compute element Hcurl shape functions 
-     call shape3E(Type,xi, &
-                  norder_1,Nedge_orient,Nface_orient, &
-                  nrdofE,shapE,curlE)
+!    compute element Hcurl shape functions
+     call shape3DE(Type,xi, &
+                   norder_1,Nedge_orient,Nface_orient, &
+                   nrdofE,shapE,curlE)
 !
 !    evaluate reference coordinates of the point as needed by GMP
      nsign = nsign_param(Type,Iface)
@@ -182,7 +187,7 @@
               '          rn,bjac = ',3f8.3,3x,f8.3)
      endif
 !
-!    call GMP routines to evaluate physical coordinates and their 
+!    call GMP routines to evaluate physical coordinates and their
 !    derivatives wrt reference coordinates
      select case(Iflag)
      case(5);        call prism(No,eta, x,dxdeta)
@@ -281,7 +286,7 @@
                    +  detadxi(1:3,2)*curlE(2,kjE) &
                    +  detadxi(1:3,3)*curlE(3,kjE))/rjac
 !
-!      subtract normal component 
+!      subtract normal component
        call dot_product(vE,rn, prod)
        vE(1:3) = vE(1:3) - prod*rn(1:3)
 !
@@ -363,7 +368,7 @@
 ! use symmetry to complete the stiffness matrix
   do jH=1,ndofH_face
   do iE=1,ndofE_face
-    aaE(iE,ndofE_face+jH) = aaE(ndofE_face+jH,iE) 
+    aaE(iE,ndofE_face+jH) = aaE(ndofE_face+jH,iE)
   enddo
   enddo
   ndofE_tot = ndofE_face + ndofH_face

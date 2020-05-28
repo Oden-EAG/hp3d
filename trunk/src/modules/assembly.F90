@@ -5,7 +5,7 @@ module assembly
    use physics
    use error
 
-#include "implicit_none.h"
+#include "typedefs.h"
 
 ! Type definition
 !~~~~~~~~~~~~~~~~
@@ -72,7 +72,6 @@ contains
 
    subroutine assembly_begin_par
       implicit none
-      integer :: istat
 
 !  ...set the possible maximum and allocate workspace
       MAXDOFM = &
@@ -172,7 +171,7 @@ contains
             call logic_error(ERR_ALLOC_FAILURE,__FILE__,__LINE__)
          endif
       enddo
-      
+
       deallocate(BLOC,AAUX,ALOC,ZBMOD,ZAMOD, stat=istat)
       if (istat.ne.SUCCESS) then
          call logic_error(ERR_ALLOC_FAILURE,__FILE__,__LINE__)

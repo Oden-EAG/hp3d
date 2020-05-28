@@ -2,14 +2,14 @@
 subroutine flatten_trian2(Nt)
 !
       use GMP , only : TRIANGLES
-!      
+!
       implicit none
-      integer,intent(in)  :: Nt
-      real*8,dimension(3) :: temp,v1,v2,v3
-      integer             :: i,j
-      real*8              :: x,y
-      integer, parameter  :: deg=7
-      integer, external   :: bijec
+      integer,intent(in)   :: Nt
+      real(8),dimension(3) :: temp,v1,v2,v3
+      integer              :: i,j
+      real(8)              :: x,y
+      integer, parameter   :: deg=7
+      integer, external    :: bijec
 !
 !--------------------------------------------------------------------------
 !  STEP 1 : modify interior control points of triangle                    |

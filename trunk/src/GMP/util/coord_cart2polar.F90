@@ -6,20 +6,21 @@
 !
 !> rev@Feb 13
 !
-!  REMARK : -pi <= Theta <= pi     
+!  REMARK : -pi <= Theta <= pi
 !----------------------------------------------------------------------
 subroutine coord_cart2polar(X, R,Theta)
 !
       implicit none
-      real*8,dimension(2),intent(in ) :: X
-      real*8,             intent(out) :: R,Theta
+!
+      real(8), intent(in ) :: X(2)
+      real(8), intent(out) :: R,Theta
 !----------------------------------------------------------------------
 !
 !  ...call old routine
       call cart_to_polar(X, R,Theta)
 !
 !
-endsubroutine coord_cart2polar
+end subroutine coord_cart2polar
 !
 !
 !
@@ -27,13 +28,13 @@ endsubroutine coord_cart2polar
 subroutine cart_to_polar(Xp, R,Theta)
 !
       use math_constants , only : PI
-!      
-      implicit none
-      real*8,dimension(2),intent(in ) :: Xp
-      real*8,             intent(out) :: R,Theta
 !
-      real*8 :: x,y
-      integer,parameter :: eps=1.d-13
+      implicit none
+      real(8), intent(in ) :: Xp(2)
+      real(8), intent(out) :: R,Theta
+!
+      real(8) :: x,y
+      real(8), parameter :: eps=1.d-13
       integer :: iprint
 !----------------------------------------------------------------------
 !
@@ -65,4 +66,4 @@ subroutine cart_to_polar(Xp, R,Theta)
       endif
 !
 !
-endsubroutine cart_to_polar
+end subroutine cart_to_polar

@@ -24,7 +24,7 @@ c            NdofmH,NdofmE,NdofmV - the corresponding number of
 c                        H1, H(curl) and H(div) dof
 c            Nrnodm    - number of modified element nodes
 c            NrconH    - number of parent dof's for an i-th local H1 dof
-c            NacH(j,i),j=1,...,nrcon(i) - list of parent dof's 
+c            NacH(j,i),j=1,...,nrcon(i) - list of parent dof's
 c                        for i-th local dof
 c            ConstrH(j,i),j=1,...,nrcon(i) - the corresponding
 c                        constraints coefficients
@@ -42,7 +42,7 @@ c
       use element_data
       use data_structure3D
 #include "syscom.blk"
-c      
+c
       dimension Nodm(MAXNODM),NdofmH(MAXNODM),NdofmE(MAXNODM),
      .                        NdofmV(MAXNODM),NdofmQ(MAXNODM)
 c
@@ -71,7 +71,7 @@ ccc      write(*,*)'type = ',type
 
       Nrnodm = nvert(type)+nedge(type)+nface(type)+1
       do i=1,nvert(type)
-        call ndof_nod('vert',1, 
+        call ndof_nod('vert',1,
      .    NdofmH(i),NdofmE(i),NdofmV(i),NdofmQ(i))
       enddo
       do j=1,nedge(type)+nface(type)+1
@@ -80,10 +80,10 @@ ccc      write(*,*)'type = ',type
 ccc        write(*,*)'i,Nodm(i) = ',i,Nodm(i)
 
         nod = Nodm(i)
-        call ndof_nod(NODES(nod)%type,norder(j), 
+        call ndof_nod(NODES(nod)%type,norder(j),
      .    NdofmH(i),NdofmE(i),NdofmV(i),NdofmQ(i))
       enddo
-c      
+c
       if (iprint.eq.1) then
         write(*,7001) Mdle,NODES(Mdle)%type,Nrnodm
  7001   format('logic: Mdle, type, Nrnodm = ',i8,2x,a5,2x,i4)
@@ -97,7 +97,7 @@ c
       if (Idec.eq.1) return
 c
       call celndof(type,Norder, nrdofH,nrdofE,nrdofV,nrdofQ)
-c      
+c
       do k=1,nrdofH
         nrconH(k)=1; nacH(1,k)=k; constrH(1,k) = 1.d0
       enddo
@@ -112,4 +112,4 @@ c
 c
 c
       end
-      
+

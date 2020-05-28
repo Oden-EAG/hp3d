@@ -1,9 +1,9 @@
 !-----------------------------------------------------------------------
-!      
+!
 !   routine name       - pyram_TI
-!      
+!
 !-----------------------------------------------------------------------
-!      
+!
 !   latest revision    - Dec 08
 !
 !   purpose            - transfinite interpolation pyramid
@@ -17,7 +17,7 @@
 !               Xp      - physical coordinates of the point
 !               Dxdeta - derivatives of the physical coordinates wrt
 !                        to the parameters
-!      
+!
 !-----------------------------------------------------------------------
 !
       subroutine pyram_TI(No,Eta, Xp,Dxdeta)
@@ -29,7 +29,7 @@
 !
       dimension Eta(3),Xp(3),Dxdeta(3,3)
 !
-!  ...pyramid element order and shape functions      
+!  ...pyramid element order and shape functions
       dimension norder(14),shapH(5),dshapH(3,5)
 !
 !  ...blending functions
@@ -38,7 +38,7 @@
 !  ...projections
       dimension dtedeta(3),tf(2),dtfdeta(2,3)
 !
-!  ...edge kernels 
+!  ...edge kernels
       dimension xe(3),dxedt(3)
 !
 !  ...face kernels
@@ -58,7 +58,7 @@
       endif
 !
       x = Eta(1); y = Eta(2); z = Eta(3)
-      if (abs(z-1.d0).lt.1.d-12) z = 1.d0-1.d-12 
+      if (abs(z-1.d0).lt.1.d-12) z = 1.d0-1.d-12
       xz1 = 1.d0-x-z
       yz1 = 1.d0-y-z
       z1 = 1.d0-z

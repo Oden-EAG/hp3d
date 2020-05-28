@@ -14,24 +14,24 @@
 subroutine cylinder(X,Point,Cvect,Rad, Fval,Dfdx)
 !
       implicit none
-      real*8, dimension(3), intent(in ) :: X,Point,Cvect
-      real*8              , intent(in ) :: Rad
-      real*8              , intent(out) :: Fval
-      real*8, dimension(3), intent(out) :: Dfdx
+      real(8), dimension(3), intent(in ) :: X,Point,Cvect
+      real(8)              , intent(in ) :: Rad
+      real(8)              , intent(out) :: Fval
+      real(8), dimension(3), intent(out) :: Dfdx
 !------------------------------------------------------------------------------------
 !  ...cylinder axis unit vector
-      real*8, dimension(3)   :: unit
+      real(8), dimension(3)   :: unit
 !  ...relative position vector of X and its projection onto the plane normal to the
 !     cylinder axis
-      real*8, dimension(3)   :: xvec,xvecp
+      real(8), dimension(3)   :: xvec,xvecp
 !  ...gradient of xvecp
-      real*8, dimension(3,3) :: dxvecpdx
-      integer                :: iprint,i
-      real*8                 :: s,s1
+      real(8), dimension(3,3) :: dxvecpdx
+      integer                 :: iprint,i
+      real(8)                 :: s,s1
 !------------------------------------------------------------------------------------
-!      
+!
       iprint=0
-!  ...printing      
+!  ...printing
       if (iprint.eq.1) then
         write(*,7000) Point(1:3),Cvect(1:3),Rad,X(1:3)
  7000   format(' cylinder: Point = ',3e12.5,/, &
@@ -47,7 +47,7 @@ subroutine cylinder(X,Point,Cvect,Rad, Fval,Dfdx)
 !  ...evaluate the relative position vector of X
       xvec(1:3) = X(1:3) - Point(1:3)
 !
-!  ...printing      
+!  ...printing
       if (iprint.eq.1) then
         write(*,7001) unit(1:3),xvec(1:3)
  7001   format(' cylinder: unit = ',3e12.5,' xvec = ',3e12.5)
@@ -58,7 +58,7 @@ subroutine cylinder(X,Point,Cvect,Rad, Fval,Dfdx)
       call scalar_product(xvec,unit, s)
       xvecp(1:3) = xvec(1:3) - s*unit(1:3)
 !
-!  ...printing      
+!  ...printing
       if (iprint.eq.1) then
         write(*,7002) xvecp(1:3)
  7002   format('cylinder: xvecp = ',3e12.5)
@@ -88,4 +88,4 @@ subroutine cylinder(X,Point,Cvect,Rad, Fval,Dfdx)
       endif
 !
 !
-endsubroutine cylinder
+end subroutine cylinder

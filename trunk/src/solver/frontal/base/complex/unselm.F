@@ -58,7 +58,7 @@ c
       k = idm*KFW
       mp = k + id
       if (iprint.eq.1) then
-        write(*,7001) Aidx,id,idm,idp,KFW,k,mp 
+        write(*,7001) Aidx,id,idm,idp,KFW,k,mp
         write(*,7002) (Flhs(mp+ii),ii=-3,3)
  7001   format('unselm: Aidx,id,idm,idp,KFW,k,mp = ', 2e12.5,2x,6i4)
  7002   format('unselm: Flhs(mp+ii),ii=-3,3 = ',7(2e12.5,2x))

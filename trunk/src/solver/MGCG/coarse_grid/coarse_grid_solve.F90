@@ -1,4 +1,4 @@
-!   
+!
 !-----------------------------------------------------------------------
 !
 !   routine name       - coarse_grid_solve
@@ -7,16 +7,16 @@
 !
 !   latest revision    - Mar 2018
 !
-!   purpose            - perform the coarse grid solve of 
+!   purpose            - perform the coarse grid solve of
 !                        the multigrid solver
 !   arguments :
 !
-!              out 
+!              out
 !                 z    - the correction to the solution vector
 !
 !-----------------------------------------------------------------------
-! 
-#include 'implicit_none.h'
+!
+#include "typedefs.h"
 !
    ! subroutine coarse_grid_solve(Igrid,z,m)
    subroutine coarse_grid_solve(Igrid)
@@ -29,14 +29,14 @@
    use pardiso_data
 !
    implicit none
-!   
+!
 !-----------------------------------------------------------------------
 !
    integer, intent(in) :: Igrid
    ! VTYPE,   intent(out):: z(m)
    VTYPE               :: rhs_coarse(NRDOF_COARSE)
    VTYPE, allocatable, save :: r_coarse(:), z_coarse(:), z_macro(:)
-!$omp threadprivate(r_coarse,z_coarse,z_macro)   
+!$omp threadprivate(r_coarse,z_coarse,z_macro)
    integer             :: iel, k, i !,m
    integer             :: ndof_coarse, ndof_macro
 !
@@ -88,10 +88,10 @@
       call pardiso(PRDS_PT,PRDS_MAXFCT,PRDS_MNUM,PRDS_MTYPE,PRDS_PHASE,   &
                    PRDS_N,PRDS_A(1:PRDS_NZ),PRDS_IA(1:NRDOF_COARSE+1),    &
                    PRDS_JA(1:PRDS_NZ),PRDS_PERM,PRDS_NRHS,PRDS_IPARM,     &
-                   PRDS_MSGLVL,PRDS_RHS,PRDS_XSOL,PRDS_ERROR)  
+                   PRDS_MSGLVL,PRDS_RHS,PRDS_XSOL,PRDS_ERROR)
 
       rhs_coarse = PRDS_XSOL
-   endif   
+   endif
 !
 !..restrict the element, prolong to the macro grid and assemble
 !$omp parallel default(shared)   &
@@ -102,14 +102,14 @@
       ndof_macro = GRID(Igrid)%dloc(iel)%ndof
       ndof_coarse = CLOC(iel)%ni
 !
-      allocate(z_coarse(ndof_coarse)) 
-      allocate(z_macro(ndof_macro)) 
+      allocate(z_coarse(ndof_coarse))
+      allocate(z_macro(ndof_macro))
 !
       do k=1,ndof_coarse
          i = CLOC(iel)%con(k)
          z_coarse(k) = rhs_coarse(i)
       enddo
-!      
+!
 !  ...apply the prolongation operator
       call coarse2macro(Igrid,iel,z_coarse,ndof_coarse,z_macro,ndof_macro)
 !
@@ -124,5 +124,5 @@
 !$omp end do
 !$omp end parallel
 !
-! 
+!
    end subroutine coarse_grid_solve

@@ -8,12 +8,12 @@ c   computer           - machine independent
 c
 c   latest revision    - Sep 07
 c
-c   purpose            - routine transforms cartesian coordinates 
-c                        of a point into observer's coordinates; the 
+c   purpose            - routine transforms cartesian coordinates
+c                        of a point into observer's coordinates; the
 c                        first two correspond to the projection plane,
 c                        the third to the direction of projection;
 c                        the third coordinate decides about the order
-c                        in which objects are displayed 
+c                        in which objects are displayed
 c
 c   arguments :
 c     in:
@@ -27,7 +27,7 @@ c-----------------------------------------------------------------------
 c
       subroutine trobs(Xcart, Xobs)
       use graphmod
-c     
+c
 #include "syscom.blk"
 c
       dimension Xcart(3),Xobs(3)

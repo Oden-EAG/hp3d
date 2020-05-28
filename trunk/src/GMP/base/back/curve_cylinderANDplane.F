@@ -9,9 +9,9 @@
 !************************************************************************************************************************
       use GMP
 !************************************************************************************************************************
-      IMPLICIT NONE   
+      IMPLICIT NONE
 !************************************************************************************************************************
-      !*** DUMMY ARGUMENTS   
+      !*** DUMMY ARGUMENTS
       integer, intent(in) :: nc                                          !*** curve number
       integer, intent(in) :: ncylinder                                   !*** cylinder surface number
       integer, intent(in) :: nplane                                      !*** plane surface number
@@ -24,7 +24,7 @@
       double precision, dimension(3) :: r_plane, n_plane                 !*** data for plane of type 'VecPt'
       double precision, dimension(3) :: p1, p2                           !*** auxiliary variables
       double precision :: prod                                           !*** auxiliary variable
-      double precision, dimension(3,3) :: RBM                            !*** rigid body motion                        
+      double precision, dimension(3,3) :: RBM                            !*** rigid body motion
       double precision, dimension(3,3) :: RBM_aux                        !*** auxiliary matrix
       double precision, dimension(3,2) :: V                              !*** vertices stored columns-wise
       double precision, dimension(3) :: v_aux                            !*** auxiliary matrix
@@ -47,7 +47,7 @@
       !
       r_plane(1:3) = SURFACES(nplane)%Rdata(1:3)                         !*** get plane data
       !
-      if (SURFACES(nplane)%Type .eq. 'VecPt') then      
+      if (SURFACES(nplane)%Type .eq. 'VecPt') then
         n_plane(1:3) = SURFACES(nplane)%Rdata(4:6)
       else
         p1(1:3) = SURFACES(nplane)%Rdata(4:6) - r_plane(1:3)
@@ -72,13 +72,13 @@
         if (sqrt(r_plane(1)**2 + r_plane(2)**2) .le. radius) then        !***** IF intersection is not empty
       !
           do i = 1, 3                                                    !***** determine r
-            r(i) = (1.d0 - eta)*V(i,1) + eta*V(i,2)                     
+            r(i) = (1.d0 - eta)*V(i,1) + eta*V(i,2)
           end do
       !
           Dr(1:3) = V(1:3,2) - V(1:3,1)                                  !***** determine Dr
       !
           RBM(1:3,1:3) = TRANSPOSE(RBM(1:3,1:3))                         !***** invert rigid body motion
-      !     
+      !
          r(1:3) = MATMUL(RBM(1:3,1:3), r(1:3)) + center(1:3)             !***** apply inverse rigid body motion
          Dr(1:3) = MATMUL(RBM(1:3,1:3), Dr(1:3))
       !
@@ -93,7 +93,7 @@
       !
       else                                                               !*** ELSE plane is not parallel to cylinder axis
         V(1:3,1:2) = MATMUL(RBM(1:3,1:3), V(1:3,1:2))                    !*** rotate vertices
-      !         
+      !
         v_aux(1:3) = V(1:3,1)                                            !*** project 1st vertex onto xy-plane
         v_aux(3) = 0.d0
       !
@@ -105,9 +105,9 @@
       !
         RBM(1:3,1:3) = MATMUL(RBM_aux(1:3,1:3), RBM(1:3,1:3))            !*** determine rigid body motion
       !
-        r_plane(1:3) = MATMUL(RBM_aux(1:3,1:3), r_plane(1:3))            !*** apply rigid body motion to plane   
-        n_plane(1:3) = MATMUL(RBM(1:3,1:3), n_plane(1:3)) 
-      ! 
+        r_plane(1:3) = MATMUL(RBM_aux(1:3,1:3), r_plane(1:3))            !*** apply rigid body motion to plane
+        n_plane(1:3) = MATMUL(RBM(1:3,1:3), n_plane(1:3))
+      !
         call scalar_product(r_plane, n_plane, prod)                      !*** determine r
         r(1) = radius*cos(theta)
         r(2) = radius*sin(theta)

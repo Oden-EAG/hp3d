@@ -21,7 +21,7 @@ c
       subroutine encode_orderb(Nord1,Nord2,Nord3, Norderb)
 c
       use parameters , only : MAXP
-c      
+c
 #include "syscom.blk"
 c
       if (Nord1<1.or.Nord1>MAXP) then
@@ -64,7 +64,7 @@ c
       subroutine encode_orderq(Nord1,Nord2, Norderq)
 c
       use parameters , only : MAXP
-c      
+c
 #include "syscom.blk"
 c
       if (Nord1<1.or.Nord1>MAXP) then

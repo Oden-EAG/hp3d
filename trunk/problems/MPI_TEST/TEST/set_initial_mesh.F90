@@ -1,32 +1,32 @@
 !--------------------------------------------------------------------
-!                                                                     
+!
 !     routine name      - set_initial_mesh
-!                                                                     
-!-------------------------------------------------------------------- 
-!                                                                     
+!
+!--------------------------------------------------------------------
+!
 !     latest revision:  - July 17
-!                                                                     
-!     purpose:          - define problem dependent data 
-!                         (multiphysics, BC, approximation) 
-!                                                                    
-!     arguments:                                                     
-!                                                                     
-!     in:              
-!     out:              
+!
+!     purpose:          - define problem dependent data
+!                         (multiphysics, BC, approximation)
+!
+!     arguments:
+!
+!     in:
+!     out:
 !           Nelem_order - order for initial mesh elements
 !
 !---------------------------------------------------------------------
-!    
+!
    subroutine set_initial_mesh(Nelem_order)
-!   
+!
    use GMP
    use common_prob_data
    use data_structure3D
-!   
+!
    implicit none
 !
 !----------------------------------------------------------------------
-!  
+!
    integer,dimension(NRELIS),intent(out) :: Nelem_order
 !..BC flags
    integer, dimension(6,NR_PHYSA) :: ibc

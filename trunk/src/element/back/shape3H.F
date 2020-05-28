@@ -707,7 +707,7 @@ c  ...work space for ILegendre and IJacobi
       dimension rL1(2:MAXP),dLdx1(2:MAXP),
      .          rL2(2:MAXP),dLdx2(2:MAXP),
      .          rL3(1:MAXP+1,1:MAXP),dLdx3(1:MAXP+1,1:MAXP)
-ccc P.Gatto, Nov 24, 2014      
+ccc P.Gatto, Nov 24, 2014
 ccc     .          rL3(1:MAXP+1,1:MAXP-1),dLdx3(1:MAXP+1,1:MAXP-1)
 c
 c  ...work space for the pullback
@@ -728,11 +728,11 @@ c
       iprint=0
 c
       xi = Xip(1); eta = Xip(2); zeta = Xip(3)
-c      
-c  ...avoid singularity at zeta = 1
-      if (abs(zeta - 1.d0) < eps)  zeta=1.d0-eps      
 c
-      call blend_pyram(Xip,x,gradx,y,grady,z,gradz, 
+c  ...avoid singularity at zeta = 1
+      if (abs(zeta - 1.d0) < eps)  zeta=1.d0-eps
+c
+      call blend_pyram(Xip,x,gradx,y,grady,z,gradz,
      .                 psi,gradpsi,alpha,gradalpha,
      .                 ShapH,GradH)
 c

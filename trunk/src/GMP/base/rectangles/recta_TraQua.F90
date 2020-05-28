@@ -1,45 +1,45 @@
 !-----------------------------------------------------------------------
-!> Purpose : routine evaluates physical coordinates and derivatives of 
-!!           a transfinite interpolation rectangle     
+!> Purpose : routine evaluates physical coordinates and derivatives of
+!!           a transfinite interpolation rectangle
 !!
 !! @param[in]  No     - rectangle number
 !! @param[in]  Eta    - reference coordinates of a point
 !! @param[out] X      - physical coordinates of the point
 !! @param[out] Dxdeta - derivatives of the physical coordinates
-!!      
+!!
 !! @revision Nov 12
 !-----------------------------------------------------------------------
 !
 subroutine recta_TraQua(No,Eta, X,Dxdeta)
 !
       use GMP , only : RECTANGLES , SURFACES
-!      
+!
       implicit none
-      integer              ,intent(in ) :: No
-      real*8,dimension(2  ),intent(in ) :: Eta
-      real*8,dimension(3  ),intent(out) :: X
-      real*8,dimension(3,2),intent(out) :: Dxdeta
+      integer               ,intent(in ) :: No
+      real(8),dimension(2  ),intent(in ) :: Eta
+      real(8),dimension(3  ),intent(out) :: X
+      real(8),dimension(3,2),intent(out) :: Dxdeta
 !-----------------------------------------------------------------------
-!  ...edges curves numbers and orientations      
-      integer,dimension(4)  :: noc,norientc
-!  ...point on a curve and its derivative      
-      real*8,dimension(3)   :: xp,dxp
-!  ...vertex and edge blending functions      
-      real*8,dimension(8)   :: val
-!  ...derivatives of blending functions      
-      real*8,dimension(2,8) :: dval
-!  ...edge coordinate      
-      real*8                :: etac
-!  ...derivative of edge coordinate      
-      real*8,dimension(2)   :: detac
-!      
-      integer               :: k,i,j,np,ns
-      integer               :: iprint
+!  ...edges curves numbers and orientations
+      integer,dimension(4)   :: noc,norientc
+!  ...point on a curve and its derivative
+      real(8),dimension(3)   :: xp,dxp
+!  ...vertex and edge blending functions
+      real(8),dimension(8)   :: val
+!  ...derivatives of blending functions
+      real(8),dimension(2,8) :: dval
+!  ...edge coordinate
+      real(8)                :: etac
+!  ...derivative of edge coordinate
+      real(8),dimension(2)   :: detac
+!
+      integer                :: k,i,j,np,ns
+      integer                :: iprint
 !-----------------------------------------------------------------------
 !
       iprint=0
 !
-!  ...check consistency      
+!  ...check consistency
       select case(RECTANGLES(No)%Type)
       case('TraQua')
       case('PTIRec')
@@ -62,7 +62,7 @@ subroutine recta_TraQua(No,Eta, X,Dxdeta)
       if (RECTANGLES(No)%EdgeNo(3).lt.0) norientc(3)=1
       if (RECTANGLES(No)%EdgeNo(4).lt.0) norientc(4)=1
 !
-!  ...printing      
+!  ...printing
       if (iprint.eq.1) then
         write(*,7001) No,Eta(1:2),noc(1:4),norientc(1:4)
  7001   format(' recta_TraQua: No,Eta,noc,norientc = ',i7,2(e12.5,2x),2x,4i4,2x,4i2)
@@ -77,7 +77,7 @@ subroutine recta_TraQua(No,Eta, X,Dxdeta)
 !-----------------------------------------------------------------------
 !  STEP 1 : subtract vertex interpolant
 !-----------------------------------------------------------------------
-!  ...loop over vertices      
+!  ...loop over vertices
       do i=1,4
         k=k+1
         np=RECTANGLES(No)%VertNo(i)
@@ -88,7 +88,7 @@ subroutine recta_TraQua(No,Eta, X,Dxdeta)
         enddo
       enddo
 !
-!  ...printing      
+!  ...printing
       if (iprint.eq.1) then
         write(*,7002)
  7002   format(' recta_TraQua: AFTER VERTEX CONTRIBUTIONS')
@@ -103,7 +103,7 @@ subroutine recta_TraQua(No,Eta, X,Dxdeta)
 !-----------------------------------------------------------------------
 !  STEP 2 : add edge bubbles
 !-----------------------------------------------------------------------
-!  ...loop over edges      
+!  ...loop over edges
       do i=1,4
         k=k+1
 !
@@ -123,7 +123,7 @@ subroutine recta_TraQua(No,Eta, X,Dxdeta)
                            + xp(1:3)*dval(j,k)
         enddo
 !
-!  .....printing        
+!  .....printing
         if (iprint.eq.1) then
           write(*,6999) i
  6999     format(' recta_TraQua: AFTER EDGE ',i1)
@@ -136,10 +136,10 @@ subroutine recta_TraQua(No,Eta, X,Dxdeta)
       enddo
 !
 !
-endsubroutine recta_TraQua
+end subroutine recta_TraQua
 !
 !
-!      
+!
 !-----------------------------------------------------------------------
 !
 !   routine name       - recta_blend
@@ -159,12 +159,12 @@ endsubroutine recta_TraQua
 !   arguments :
 !     in:
 !               Eta    - reference coordinates of a point in the
-!                        reference rectangle   
+!                        reference rectangle
 !     out:
 !               Val    - value of the blending functions
 !               Dval   - derivatives
 !
-!   required  routines - 
+!   required  routines -
 !
 !-----------------------------------------------------------------------
 !
@@ -177,7 +177,7 @@ endsubroutine recta_TraQua
 !-----------------------------------------------------------------------
 !
 !  ...vertex bilinear blending functions...
-!     
+!
 !  ...first vertex bilinear function
       k=1
       Val(k) = (1.d0-Eta(1))*(1.d0-Eta(2))
@@ -231,4 +231,4 @@ endsubroutine recta_TraQua
       Dval(2,k) =  0.d0
 !
 !
-      endsubroutine recta_blend
+      end subroutine recta_blend

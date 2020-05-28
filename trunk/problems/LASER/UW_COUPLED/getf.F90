@@ -9,7 +9,7 @@
 !! @param[out] ZJval - rhs J
 !------------------------------------------------------------------------------
 !
-#include "implicit_none.h"
+#include "typedefs.h"
 !
 subroutine getf(Mdle,X, Zfval,ZJval)
 !
@@ -20,10 +20,10 @@ subroutine getf(Mdle,X, Zfval,ZJval)
 !
    implicit none
 !
-   integer,               intent(in)  :: Mdle
-   real*8 , dimension(3), intent(in)  :: X
-   VTYPE  ,               intent(out) :: Zfval
-   VTYPE  , dimension(3), intent(out) :: ZJval
+   integer, intent(in)  :: Mdle
+   real(8), intent(in)  :: X(3)
+   VTYPE  , intent(out) :: Zfval
+   VTYPE  , intent(out) :: ZJval(3)
 !
 !..auxiliary variable
    VTYPE :: zaux
@@ -133,7 +133,7 @@ subroutine getf(Mdle,X, Zfval,ZJval)
    if (iprint.eq.1) then
       write(*,7010) Zfval
  7010 format(' getf: Zfval = ',2e12.5)
-      pause
+      call pause
    endif
 !
 end subroutine getf
@@ -155,10 +155,11 @@ subroutine get_bdSource(Mdle,X,Rn, Imp_val)
    use commonParam
 !
    implicit none
-   integer,                  intent(in)  :: Mdle
-   real*8,dimension(3),      intent(in)  :: X
-   real*8,dimension(3),      intent(in)  :: Rn
-   VTYPE,dimension(3),       intent(out) :: Imp_val
+!
+   integer, intent(in)  :: Mdle
+   real(8), intent(in)  :: X(3)
+   real(8), intent(in)  :: Rn(3)
+   VTYPE  , intent(out) :: Imp_val(3)
 !
 !------------------------------------------------------------------------------
 !
@@ -178,13 +179,12 @@ subroutine get_bdSource(Mdle,X,Rn, Imp_val)
 !
 !..miscellaneus
    integer :: iload,ivar,ibeg,icomp,jcomp,k,l
-   complex*16 :: zaux
-   VTYPE,dimension(3) ::   rntimesE,rn2timesE
-   VTYPE,dimension(3) ::   rntimesH
-   real*8                    :: impedanceConstant
-   real*8                    :: E   ! vector field
-   real*8, dimension(3)      :: dE  ! 1st derivative
-   real*8, dimension(3,3)    :: d2E ! 2nd derivative
+   complex(8) :: zaux
+   VTYPE, dimension(3) :: rntimesE,rn2timesE,rntimesH
+   real(8)                 :: impedanceConstant
+   real(8)                 :: E   ! vector field
+   real(8), dimension(3)   :: dE  ! 1st derivative
+   real(8), dimension(3,3) :: d2E ! 2nd derivative
 !
 !..printing flag
    integer :: iprint = 0
