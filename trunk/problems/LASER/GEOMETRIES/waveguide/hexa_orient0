@@ -1,11 +1,10 @@
-3   3     NDIM,MANDIM
+3    3    NDIM,MANDIM
 
 0         no surfaces
 
 1         NRDOMAIN
 
-
-8          NRPOINT
+8         NRPOINT
 
 Regular             point 1
 0.d0 0.d0 0.d0
@@ -83,7 +82,7 @@ BilQua              rectangle 2
 5 6 7 8
 
 BilQua              rectangle 3
-1 2 6 5  
+1 2 6 5
 
 BilQua              rectangle 4
 2 3 7 6
@@ -106,7 +105,7 @@ BilQua              rectangle 6
 Linear              hexa 1
 1    1 2 3 4 5 6 7 8
 
- 
+
 
 0 NRTETRA
 
