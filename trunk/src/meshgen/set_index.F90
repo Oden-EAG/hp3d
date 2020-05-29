@@ -1,5 +1,5 @@
 !---------------------------------------------------------------------
-!   latest revision    - Aug 2019
+!   latest revision    - May 2020
 !
 !   purpose            - set index for a node using the nodal case
 !                        and boundary condition flags
@@ -44,11 +44,13 @@ subroutine set_index(Icase,Iflag, Index)
 !  ...decimal version of the BC flag
       integer,dimension(NR_PHYSA) :: ibcd
 !  ...others
-      integer :: i,j,ic,iprint
+      integer :: i,j,ic
+!
+#if DEBUG_MODE
+      integer :: iprint = 0
+#endif
 !
 !-----------------------------------------------------------------------
-!
-      iprint=0
 !
 !  ...decode the Icase flag, decode the BC flag
       call decod(Icase, 2,NR_PHYSA, ncase)
@@ -198,7 +200,7 @@ subroutine set_index(Icase,Iflag, Index)
               endif
             enddo
 !
-!  ...........specific for acoustics impedance BC:
+!  ...........specific for acoustic impedance BC:
               !if (ibcd(i).eq.9) then
 !             ...Eliminate H(div) dof (trick to avoid singular ZalocVV)
               !  indexd(ic)=5
@@ -223,13 +225,14 @@ subroutine set_index(Icase,Iflag, Index)
 !  ...end of loop through physics attributes
       enddo
       if (ic.ne.NRINDEX) then
-        write(*,*) 'set_index: INCONSISTENCY '
+        write(*,*) 'set_index: INCONSISTENCY.'
         stop
       endif
 !
       call encodLong(indexd,10,NRINDEX, Index)
 !
 !
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7001) Icase,Iflag,indexd
  7001   format('set_index: Icase,Iflag,indexd = ',i3,i3,3x,10i1)
@@ -237,6 +240,7 @@ subroutine set_index(Icase,Iflag, Index)
  7002   format('           Index = ',i10)
         call pause
       endif
+#endif
 !
 !
-      end
+end subroutine
