@@ -73,8 +73,10 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
    integer :: elem_ref_flag(NRELES)
 !
 !..adaptive refinements
-   integer :: nr_elem_ref,ref_ndom(4),ref_pml
-   integer :: mdle_ref(NRELES),mdle_pml(NRELES)
+   integer :: nr_elem_ref,ref_pml
+   integer :: ref_ndom(4)
+   integer :: mdle_ref(NRELES)
+   integer :: mdle_pml(NRELES)
    real(8) :: res_sum
 !
    integer, save :: istep = 0
@@ -84,15 +86,8 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
    real(8) :: errorH,errorE,errorV,errorQ,rnormH,rnormE,rnormV,rnormQ
    real(8) :: error_tot,rnorm_tot,error_subd,rnorm_subd
 !
-   integer :: i,ic,mdle,iel,kref,iii,subd,count,ierr
-   integer :: vref(3), jref(3)
-   integer :: nord, nordx, nordy, nordz, nordyz
-   integer :: nordx_new, nordy_new, nordz_new, nord_new
-   integer :: idec_pref,idec_href, iref, enforce_flag, icpref
-!
-!..geometry dof (work space for nodcor)
-   real(8) :: xnod(3,MAXbrickH)
-   real(8) :: maxz,minz,midz
+   integer :: i,ic,mdle,iel,kref,subd,count,ierr
+   real(8) :: x(3), xnod(3,8)
 !
 !..element type
    character(len=4) :: etype
@@ -101,12 +96,14 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
 !
 !..printing flag
    integer :: iprint = 0
+   !character(len=8) :: filename
 !
 !-----------------------------------------------------------------------
 !
 !..initialize
    elem_resid(1:NRELES)    = 0.d0
-   elem_ref_flag(1:NRELES) = 0.d0
+   elem_ref_flag(1:NRELES) = 0
+   mdle_ref(1:NRELES)      = 0
    mdle_pml(1:NRELES)      = 0
 !
 !..increase step if necessary
@@ -323,6 +320,15 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
          res_sum = res_sum + elem_resid(iel)
          if(res_sum > 0.5d0*resid_tot) exit
       enddo
+      ! WRITE HISTORY FILE FOR DEBUGGING
+!      filename='HIST.dat'
+!      open(UNIT=9,FILE=filename,FORM="FORMATTED",ACCESS="APPEND",STATUS="UNKNOWN",ACTION="WRITE")
+!      write(UNIT=9, FMT="(I6)") nr_elem_ref
+!      do iel=1,nr_elem_ref
+!         write(UNIT=9, FMT="(I6)") mdle_ref(iel)
+!      enddo
+!      close(UNIT=9)
+      ! END WRITE FOR DEBUGGING
       if (RANK.eq.ROOT) write(*,1023) 'nr_elem_ref = ', nr_elem_ref
       if (RANK.eq.ROOT) write(*,1023) '        PML = ', ref_pml
       if (RANK.eq.ROOT) write(*,1023) '     ndom 1 = ', ref_ndom(1)
@@ -333,6 +339,22 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
    endif
 !
 !  END MARKING OF ELEMENTS FOR ADAPTIVE REFINEMENTS
+!
+   if (Irefine.eq.ICORE .or. Irefine.eq.ICLAD) then
+      nr_elem_ref = 0
+      do iel=1,NRELES
+         mdle = ELEM_ORDER(iel)
+         call find_domain(mdle, i)
+         if (Irefine.eq.ICORE .and. (i.eq.1 .or. i.eq.2)) then
+            nr_elem_ref = nr_elem_ref + 1
+            mdle_ref(nr_elem_ref) = mdle
+         !elseif (Irefine.eq.ICLAD .and. (i.eq.3 .or. i.eq.4)) then
+         elseif (Irefine.eq.ICLAD .and. (i.eq.3)) then
+            nr_elem_ref = nr_elem_ref + 1
+            mdle_ref(nr_elem_ref) = mdle
+         endif
+      enddo
+   endif
 !
 !..use appropriate strategy depending on refinement type
    Nstop = 0
@@ -356,17 +378,25 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
          call update_gdof
          call update_Ddof
 !  ...adaptive refinements
-      case(IADAPTIVE)
+      case(IADAPTIVE,ICORE,ICLAD)
          call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
          if (RANK .eq. ROOT)  write(*,*) 'Starting adaptive refinements...'
+         if (RANK .eq. ROOT)  write(*,*) 'NRELES = ', NRELES
          do iel = 1,nr_elem_ref
             mdle = mdle_ref(iel)
             etype = NODES(mdle)%type
             select case(etype)
                case('mdlb')
-                  kref = 111
+                  !kref = 111 ! iso
+                  !kref = 110  ! radial
+                  kref = 10 ! refining in r
+                  !kref = 100 ! refining in theta
                case('mdlp')
-                  kref = 11
+                  !kref = 11  ! iso
+                  kref = 10   ! radial
+               case default
+                  write(*,*) 'refine_DPG: READING UNEXPECTED ELEMENT TYPE: ',etype
+                  call pause
             end select
             call refine(mdle,kref)
          enddo
@@ -378,21 +408,12 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
          if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2025) end_time-start_time
 !         call enforce_min_rule
 !         call enforce_max_rule ! MAX RULE ISSUE NEEDS TO BE FIXED
+         call par_verify
          call update_gdof
          call update_Ddof
 !
-!        TODO
-!     ...test mdle 10236 and 10237
-!         call get_subd(10236, subd)
-!         if (RANK.eq.subd) then
-!            write(*,*) 'MY RANK IS ', RANK
-!            write(*,*) 'NRNODS  is ', NRNODS
-!            call result
-!         elseif (NUM_PROCS.eq.1 .and. NRNODS.ge.10236) then
-!            write(*,*) 'NRNODS  is ', NRNODS
-!            call result
-!         endif
-!         call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+         if (RANK .eq. ROOT) write(*,*) 'NRELES = ', NRELES
+         if (RANK .eq. ROOT) write(*,*) 'Finished adaptive refinements...'
 !
       case default; Nstop = 1
 !
@@ -540,7 +561,7 @@ recursive subroutine qsort_duplet(Iel_array,Residuals,N,First,Last)
       i = i + 1
       j = j - 1
    end do
-   if (First < i-1) call qsort_duplet(Iel_array,Residuals,n,First,i-1 )
-   if (j+1 < Last)  call qsort_duplet(Iel_array,Residuals,n,j+1,  Last)
+   if (First < i-1) call qsort_duplet(Iel_array,Residuals,N,First,i-1 )
+   if (j+1 < Last)  call qsort_duplet(Iel_array,Residuals,N,j+1,  Last)
 !
 end subroutine qsort_duplet

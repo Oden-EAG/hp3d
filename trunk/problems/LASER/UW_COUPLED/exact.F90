@@ -95,7 +95,7 @@ subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
       call mfd_solutions(Xp,fld, ValE(icomp,s),DvalE(icomp,s,1:3),D2valE(icomp,s,1:3,1:3))
 !
 !..LP modes (polarized in x or y)
-   elseif (ISOL .ge. 13 .and. ISOL .le. 19) then
+   elseif ((ISOL .ge. 13 .and. ISOL .le. 19) .or. (ISOL .eq. 140 .or. ISOL .eq. 150)) then
       icomp = ICOMP_EXACT
 !  ...signal E-field trace
       fld = 0
