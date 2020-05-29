@@ -1,22 +1,22 @@
 !
 !----------------------------------------------------------------------
-!                                                                     
+!
 !     routine name      - set environment
-!                                                                     
-!---------------------------------------------------------------------- 
-!                                                                     
+!
+!----------------------------------------------------------------------
+!
 !     latest revision:  - May 2020
-!                                                                     
+!
 !     purpose:          - define options for main file specific to the problem.
 !                         These can be consulted with the -help option when running
-!                         the executable. It is especially important to define 
+!                         the executable. It is especially important to define
 !                         the global environment variables in module/environment.
 !                         The other options are problem specific.
-!                                                                    
+!
 !----------------------------------------------------------------------
 !
 subroutine set_environment
-!    
+!
    use environment
    use common_prob_data
    use paraview
