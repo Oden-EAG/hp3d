@@ -2,16 +2,23 @@
 # SET HP3D AND LIBRARY PATH
 #------------------------------------------------------------------
 COMPILER        = INTEL
-# LIBRARIES       = ${WORK}/LIBS
 HP3D_BASE_PATH  = ${WORK}/par_hp3d/trunk
+
+#------------------------------------------------------------------
+# PREPROCESSOR VARIABLES
+#------------------------------------------------------------------
+COMPLEX  ?= 0
+DEBUG    ?= 0
 
 #------------------------------------------------------------------
 # COMPILER SETTINGS (a 64bit processor architecture is assumed)
 #------------------------------------------------------------------
 
-LARGE      = NO
-OPENMP_USE = YES
-TAU_PERF   = NO
+# Enable OpenMP threading
+OPENMP   ?= 1
+
+# Enable performance profiling with TAU
+TAU_PERF ?= 0
 
 # Use parallel threads to compile libraries and problems
 J ?= 24
@@ -32,14 +39,21 @@ FFLAGS = -fPIC
 #FFLAGS += -stand
 
 # OpenMP
-ifeq ($(OPENMP_USE),YES)
-FFLAGS += -qopenmp
+ifeq ($(OPENMP),1)
+  FFLAGS += -qopenmp
 endif
 
-# use the following flags if need >2G static data
-ifeq ($(LARGE),YES)
-FFLAGS += -mcmodel large -shared-intel
+# Optimization flags
+ifeq ($(DEBUG),0)
+  FFLAGS += -O3 -xCORE-AVX512
 endif
+
+# Debug flags
+ifeq ($(DEBUG),1)
+  FFLAGS += -O0 -g -traceback -check all -debug all
+  FFLAGS += -check noarg_temp_created -assume noprotect_constants
+endif
+
 
 CFLAGS  =
 
@@ -48,38 +62,13 @@ CFLAGS  =
 CDEFS   = -DAdd_
 
 #------------------------------------------------------------------
-# PREPROCESSOR VARIABLES
-#------------------------------------------------------------------
-COMPLEX ?= 0
-DEBUG   ?= 0
-
-# Debug flags
-ifeq ($(DEBUG),1)
-  FFLAGS += -O0 -g -traceback -check all -debug all -check noarg_temp_created -assume noprotect_constants
-endif
-
-# Optimization flags
-ifeq ($(DEBUG),0)
-  FFLAGS += -O3 -xCORE-AVX512
-endif
-
-#------------------------------------------------------------------
 # INTEL MKL LIBRARY
 #------------------------------------------------------------------
 #
 # See https://software.intel.com/en-us/articles/intel-mkl-link-line-advisor
 #
-# -mkl
 # loads: BLAS, LAPACK, ScaLAPACK, BLACS, SPBLAS
 #
-# see user guide (TACC Stampede2)
-# -mkl (by default: -mkl=parallel)
-# -mkl=sequential
-# -mkl=parallel   (multi-threaded)
-# -mkl=cluster    (distributed memory, but single threaded)
-#
-# see linking in section below:
-# LIN_ALG_LINK_LIBS
 MKL_LIBS = ${MKLROOT}/lib/intel64/libmkl_blas95_lp64.a \
            ${MKLROOT}/lib/intel64/libmkl_lapack95_lp64.a \
            ${MKLROOT}/lib/intel64/libmkl_scalapack_lp64.a \
@@ -184,7 +173,7 @@ HP3D_GMP        = $(HP3D_PATH)/lib/libhp3d_gmp.a
 # Cyclic dependencies force to compile as a group.
 HP3D_LINK_LIBS    = -Wl,--start-group \
                     $(HP3D_LIB) $(HP3D_FRONTAL)
-# HP3D_LINK_LIBS   += $(HP3D_COMMON) $(HP3D_GMP)
+#HP3D_LINK_LIBS   += $(HP3D_COMMON) $(HP3D_GMP)
 HP3D_LINK_LIBS   += -Wl,--end-group
 HP3D_LINK_INCS    = -I$(HP3D_PATH)/common/hp3d \
                     -I$(HP3D_PATH)/common/graphics \

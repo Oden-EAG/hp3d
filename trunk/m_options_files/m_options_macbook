@@ -1,16 +1,21 @@
 #------------------------------------------------------------------
 # SET HP3D AND LIBRARY PATH
 #------------------------------------------------------------------
-# COMPILER        = INTEL
-# LIBRARIES       = ${WORK}/LIBS
+COMPILER        = GNU
 HP3D_BASE_PATH  = /Users/stefan/hp3D/LIBS/par_hp3d/trunk
+
+#------------------------------------------------------------------
+# PREPROCESSOR VARIABLES
+#------------------------------------------------------------------
+COMPLEX ?= 0
+DEBUG   ?= 0
 
 #------------------------------------------------------------------
 # COMPILER SETTINGS (a 64bit processor architecture is assumed)
 #------------------------------------------------------------------
 
-LARGE      = NO
-OPENMP_USE = NO
+# Enable OpenMP threading
+OPENMP  ?= 0
 
 # Use parallel threads to compile libraries and problems
 J ?= 4
@@ -21,36 +26,34 @@ FC     =  $(FF)
 FFLAGS = -fPIC -ffree-line-length-none
 
 # OpenMP
-ifeq ($(OPENMP_USE),YES)
-FFLAGS += -qopenmp
+ifeq ($(OPENMP),1)
+  FFLAGS += -fopenmp
 endif
 
-# Additional gfortran compiler flags to generate warnings
+# Additional gfortran compiler flags check Fortran standard
 #FFLAGS += -std=legacy
 #FFLAGS += -std=f2018
+
+# Additional gfortran compiler flags to generate warnings
 #FFLAGS += -Wall
-
-CFLAGS  =
-
-# Preprocessor defs to call Fortran from C 
-# (-DAdd_ or -DAdd__ or -DUPPER)
-CDEFS   = -DAdd_
-
-#------------------------------------------------------------------
-# PREPROCESSOR VARIABLES
-#------------------------------------------------------------------
-COMPLEX ?= 0
-DEBUG   ?= 0
-
-# Debug flags
-ifeq ($(DEBUG),1)
-FFLAGS += -O0 -g -traceback -check all -debug all -check noarg_temp_created -assume noprotect_constants
-endif
+#FFLAGS += -Wextra
+#FFLAGS += -Wpedantic
 
 # Optimization flags
 ifeq ($(DEBUG),0)
-FFLAGS += -O3
+  FFLAGS += -O3
 endif
+
+# Debug flags
+ifeq ($(DEBUG),1)
+  FFLAGS += -Og -g -fbacktrace -fcheck=all
+endif
+
+CFLAGS  =
+
+# Preprocessor defs to call Fortran from C
+# (-DAdd_ or -DAdd__ or -DUPPER)
+CDEFS   = -DAdd_
 
 #------------------------------------------------------------------
 # INTEL MKL LIBRARY
@@ -58,17 +61,6 @@ endif
 #
 # See https://software.intel.com/en-us/articles/intel-mkl-link-line-advisor
 #
-# -mkl
-# loads: BLAS, LAPACK, ScaLAPACK, BLACS, SPBLAS
-#
-# see user guide (TACC Stampede2)
-# -mkl (by default: -mkl=parallel)
-# -mkl=sequential
-# -mkl=parallel   (multi-threaded)
-# -mkl=cluster    (distributed memory, but single threaded)
-#
-# see linking in section below:
-# LIN_ALG_LINK_LIBS
 MKL_LIBS = /opt/intel/mkl/lib/libmkl_intel_lp64.a \
            /opt/intel/mkl/lib/libmkl_intel_thread.a \
            /opt/intel/mkl/lib/libmkl_core.a \
@@ -78,7 +70,7 @@ MKL_INCS = -I/opt/intel/mkl/include
 # -i8 (default 64-bit integer)
 
 #------------------------------------------------------------------
-# MUMPS LIBRARY
+# SOLVER LIBRARY
 #------------------------------------------------------------------
 #
 # also adding PT-SCOTCH and parMETIS
@@ -93,14 +85,14 @@ else
   PETSC_INC = /Users/stefan/hp3D/LIBS/petsc-3.13.1/arch-darwin-c/include
 endif
 
-MUMPS_LIBS = -L$(PETSC_LIB) -lpetsc -ldmumps -lzmumps \
-                            -lmumps_common -lpord -lscalapack \
-                            -lflapack -lfblas -lzoltan \
-                            -lptscotchparmetis -lptscotch \
-                            -lptscotcherr -lesmumps -lscotch \
-                            -lscotcherr -lparmetis -lmetis
+SOLVER_LIBS = -L$(PETSC_LIB) -lpetsc -ldmumps -lzmumps \
+                             -lmumps_common -lpord -lscalapack \
+                             -lflapack -lfblas -lzoltan \
+                             -lptscotchparmetis -lptscotch \
+                             -lptscotcherr -lesmumps -lscotch \
+                             -lscotcherr -lparmetis -lmetis
 
-MUMPS_INCS = -I$(PETSC_INC) -I/Users/stefan/hp3D/LIBS/petsc-3.13.1/include
+SOLVER_INCS = -I$(PETSC_INC) -I/Users/stefan/hp3D/LIBS/petsc-3.13.1/include
 
 #------------------------------------------------------------------
 # VIS LIBRARY
@@ -110,7 +102,7 @@ MUMPS_INCS = -I$(PETSC_INC) -I/Users/stefan/hp3D/LIBS/petsc-3.13.1/include
 VIS_LIBS   = -L$(PETSC_LIB) -lhdf5 -lhdf5_hl -lhdf5_fortran -lhdf5hl_fortran
 VIS_INCS   = -I${PETSC_INC}
 
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # EXTRA LIBS LINKING
 EXTRA_LINK_LIBS    = -L/opt/X11/lib -lX11
 EXTRA_LINK_INCS    = -I/opt/X11/include
@@ -140,14 +132,12 @@ else
   OBJ_PATH      = $(OBJ_PATH_REAL)
 endif
 
-HP3D_LIB_EXTRA_INCS = $(MKL_INCS) $(MUMPS_INCS) $(VIS_INCS) $(EXTRA_LINK_INCS)
+HP3D_LIB_EXTRA_INCS = $(MKL_INCS) $(SOLVER_INCS) $(VIS_INCS) $(EXTRA_LINK_INCS)
 
-#not used
-#HP3D_MOD_OPTION_INC = -module ./$(MODULE_PATH)
 HP3D_MOD_OPTION_INC = -J./$(MODULE_PATH)
 
 # For problem makefiles
-HP3D_LIB        = $(HP3D_PATH)/lib/libhp3d.a 
+HP3D_LIB        = $(HP3D_PATH)/lib/libhp3d.a
 HP3D_FRONTAL    = $(HP3D_PATH)/lib/libfrontal.a
 HP3D_COMMON     = $(HP3D_PATH)/lib/libhp3d_common.a
 HP3D_GMP        = $(HP3D_PATH)/lib/libhp3d_gmp.a
@@ -155,13 +145,13 @@ HP3D_GMP        = $(HP3D_PATH)/lib/libhp3d_gmp.a
 #------------------------------------------------------------------
 # FOR PROBLEM LINKING
 #------------------------------------------------------------------
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # HP3D LINKING (includes frontal solver)
 
 # Cyclic dependencies force to compile as a group.
 #HP3D_LINK_LIBS    = -Wl,--start-group \
 #                    $(HP3D_LIB) $(HP3D_FRONTAL) \
-## HP3D_LINK_LIBS   += $(HP3D_COMMON) $(HP3D_GMP)
+#HP3D_LINK_LIBS   += $(HP3D_COMMON) $(HP3D_GMP)
 #HP3D_LINK_LIBS   += -Wl,--end-group
 
 HP3D_LINK_LIBS    = $(HP3D_LIB) $(HP3D_FRONTAL)
@@ -169,30 +159,24 @@ HP3D_LINK_INCS    = -I$(HP3D_PATH)/common/hp3d \
                     -I$(HP3D_PATH)/common/graphics \
                     -I$(HP3D_PATH)/module
 
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-# BASIC LINEAR ALGEBRA LIBRARIES LINKING
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# SOLVER & MKL LINKING
 
-LIN_ALG_LINK_LIBS = $(MKL_LIBS)
-LIN_ALG_LINK_INCS = $(MKL_INCS)
+SOLVER_LINK_LIBS    = $(SOLVER_LIBS) $(MKL_LIBS)
+SOLVER_LINK_INCS    = $(SOLVER_INCS) $(MKL_INCS)
 
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-# MUMPS LINKING
-
-MUMPS_LINK_LIBS    = $(MUMPS_LIBS) $(LIN_ALG_LINK_LIBS)
-MUMPS_LINK_INCS    = $(MUMPS_INCS) $(LIN_ALG_LINK_INCS)
-
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # PROBLEM LINKING
 
 PROB_LIBS    = $(HP3D_LINK_LIBS)   \
-               $(MUMPS_LINK_LIBS)  \
+               $(SOLVER_LINK_LIBS) \
                $(VIS_LIBS)         \
                $(EXTRA_LINK_LIBS)
 
 #PROB_INCS     = -module ./$(MODULE_PATH)
 PROB_INCS     = -J./$(MODULE_PATH)
 PROB_INCS    += $(HP3D_LINK_INCS)   \
-                $(MUMPS_LINK_INCS)  \
+                $(SOLVER_LINK_INCS) \
                 $(VIS_INCS)         \
                 $(EXTRA_LINK_INCS)
 
