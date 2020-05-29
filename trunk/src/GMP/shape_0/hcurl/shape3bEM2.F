@@ -33,7 +33,7 @@ c
       use parameters   , only : NPMAX=>MAXP
 
 #if C_MODE
-      implicit real*8 (a-h,o-y), complex*16 (z)
+      implicit real(8) (a-h,o-y), complex(8) (z)
 #else
       implicit double precision (a-h,o-z)
 #endif

@@ -21,7 +21,7 @@
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
-subroutine coo2csc(IA,JA,XA,nz, nnz)
+subroutine coo2csc(IA,JA,XA,nz,nnz)
 !
    implicit none
 !..declare variables
@@ -62,7 +62,7 @@ end subroutine coo2csc
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
-subroutine coo2csr(IA,JA,XA,nz, nnz)
+subroutine coo2csr(IA,JA,XA,nz,nnz)
 !
    implicit none
 !..declare variables
@@ -149,14 +149,14 @@ subroutine assemble_triplet(row,col,val,nz,nnz)
 !
    implicit none
 !..declare variables
+   integer    , intent(in)    :: nz
+   integer    , intent(out)   :: nnz
    integer    , intent(inout) :: row(nz),col(nz)
 #if C_MODE
    complex(8) , intent(inout) :: val(nz)
 #else
    real(8)    , intent(inout) :: val(nz)
 #endif
-   integer    , intent(in)    :: nz
-   integer    , intent(out)   :: nnz
    integer                    :: i,j,k
    integer    , external      :: OMP_GET_NUM_THREADS
 !
@@ -489,14 +489,14 @@ end subroutine qsort_triplet_omp
 !-----------------------------------------------------------------------
 subroutine assemble_double(row,val,nz,nnz)
    implicit none
-
+!
+   integer       :: nz, nnz
    integer       :: row(nz)
 #if C_MODE
    complex(8)    :: Val(nz)
 #else
    real(8)       :: Val(nz)
 #endif
-   integer       :: nz, nnz
    integer       :: first, last, k, i
 
    first = 1
