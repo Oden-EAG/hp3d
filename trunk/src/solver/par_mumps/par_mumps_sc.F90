@@ -29,13 +29,13 @@
 ! -----------------------------------------------------------------------
 subroutine par_mumps_sc(mtype)
 !
-   use data_structure3D, only: NRNODS, NRELES, NRELES_SUBD,    &
-                               ELEM_ORDER, ELEM_SUBD, get_subd
+   use data_structure3D, only: NRNODS, NRELES_SUBD, ELEM_SUBD, &
+                               get_subd
    use assembly,         only: NR_RHS, MAXDOFM, MAXDOFS,       &
-                               MAXbrickH, MAXmdlbH, NRHVAR,    &
-                               MAXbrickE, MAXmdlbE, NREVAR,    &
-                               MAXbrickV, MAXmdlbV, NRVVAR,    &
-                               MAXbrickQ, NRQVAR,              &
+                               MAXbrickH, MAXmdlbH,            &
+                               MAXbrickE, MAXmdlbE,            &
+                               MAXbrickV, MAXmdlbV,            &
+                               MAXbrickQ,                      &
                                NEXTRACT, IDBC, ZDOFD, ZERO,    &
                                ALOC, BLOC, AAUX, ZAMOD, ZBMOD, &
                                NR_PHYSA, MAXNODM
@@ -62,13 +62,12 @@ subroutine par_mumps_sc(mtype)
 !
 !..integer counters
    integer    :: nrdofm,nrdofc,nrnodm,nrdof,nrdof_mdl,ndof
-   integer    :: iel,mdle,subd,idx,i,j,k,l,k1,k2,nod,idec
+   integer    :: iel,mdle,subd,i,j,k,l,k1,k2,nod,idec
 !
 !..MPI variables
    integer :: count,src,ierr
 !
 !..dummy variables
-   integer :: nvoid
    VTYPE   :: zvoid
 !
 !..workspace for celem

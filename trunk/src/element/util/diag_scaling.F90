@@ -102,8 +102,7 @@
       implicit none
 
       integer, intent(in)       :: m, n
-      integer                   :: i,j,k
-      integer                   :: nk, n1, n2
+      integer                   :: i,j
 #if C_MODE
       complex(8), intent(inout) :: GP(m,m)
       complex(8), intent(inout) :: B(m,n)

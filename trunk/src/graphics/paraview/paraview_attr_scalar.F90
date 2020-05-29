@@ -12,7 +12,6 @@ subroutine paraview_attr_scalar(Id, Idx)
    use environment , only : PREFIX
    use paraview    , only : PARAVIEW_IO,PARAVIEW_DIR
    use physics     , only : PHYSA
-   use paraview    , only : PARAVIEW_DOMAIN
    use mpi_param   , only : RANK,ROOT
 !
    implicit none

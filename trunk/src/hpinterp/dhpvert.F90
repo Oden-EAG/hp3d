@@ -23,11 +23,9 @@ subroutine dhpvert(Mdle,Iflag,No,Xi,Icase, ZdofH)
   ! ** Locals
   !---------------------------------------------------------------------
   ! Dirichlet BC data
-  VTYPE :: &
-       zvalH(MAXEQNH), &
-       zdvalH(MAXEQNH,3), zdvalHdxi(MAXEQNH,3),zdvalHdt(MAXEQNH), &
-       zvalE(3,MAXEQNE), zdvalE(3,MAXEQNE,3), &
-       zvalV(3,MAXEQNV), zdvalV(3,MAXEQNV,3)
+  VTYPE :: zvalH(  MAXEQNH),zdvalH(  MAXEQNH,3), &
+           zvalE(3,MAXEQNE),zdvalE(3,MAXEQNE,3), &
+           zvalV(3,MAXEQNV),zdvalV(3,MAXEQNV,3)
 
   real(8), dimension(3)   :: x
   real(8), dimension(3,3) :: void
@@ -48,10 +46,13 @@ subroutine dhpvert(Mdle,Iflag,No,Xi,Icase, ZdofH)
 1000    format(' dhpvert: unknown iflag = ',i7)
         stop
       end select
+!
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7010) No, Xi, x
  7010   format('dhpvert: No = ',i3,' Xi = ',3f8.3,' x = ',3f8.3)
       endif
+#endif
 !
 !  ...dirichlet value in compact mode
       call dirichlet(Mdle,x,Icase, zvalH,zdvalH,zvalE,zdvalE,zvalV,zdvalV)

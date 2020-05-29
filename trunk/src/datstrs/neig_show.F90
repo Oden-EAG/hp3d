@@ -4,7 +4,7 @@ subroutine neig_show
   use refinements
   implicit none
   character(len=4)        :: type
-  integer                 :: mdle, i, j
+  integer                 :: mdle, i
   integer, dimension(4,6) :: neig
   !
   mdle = 0

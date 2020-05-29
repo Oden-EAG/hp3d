@@ -98,8 +98,8 @@
 !
   nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
 !
-#if DEBUG_MODE
   iprint = 0
+#if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Icase,Iedge,Type
 7010 format('dhpedgeH: Mdle,Iflag,No,Icase,Iedge,Type = ',5i4,2x,a4)
@@ -247,6 +247,7 @@
 !
 ! end of loop through integration points
   enddo
+!
 #if DEBUG_MODE
   if (iprint.eq.1) then
     write(*,*) 'dhpedgeH: LOAD VECTOR AND STIFFNESS MATRIX FOR ', &

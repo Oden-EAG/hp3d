@@ -26,7 +26,7 @@ subroutine refine(Mdle_in,Kref_in)
    integer, dimension(6)        :: kreff
    integer :: iprint, i, n, loc, loc2, iface, iface_loc, kref, krefm, kref_iso
    integer :: nrneig, nod, nodp, mdle, mdle_loc, norient_loc, nc, icase
-   logical :: iflag, ideadlock
+   logical :: iflag
 !
 !---------------------------------------------------------------------
 !

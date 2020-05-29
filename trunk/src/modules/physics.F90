@@ -130,7 +130,6 @@ contains
     implicit none
     character(len=*), intent(in) :: fp
     integer, parameter           :: ndump = 31
-    integer                      :: i
     open(unit=ndump,file=fp, &
          form='formatted',access='sequential',status='unknown')
     !

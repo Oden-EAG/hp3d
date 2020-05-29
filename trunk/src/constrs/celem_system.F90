@@ -94,14 +94,14 @@ subroutine celem_system(Mdle,Idec,                                &
 !
 !..auxiliary variables
    integer :: i,ii,il,j,k,k1,k2,kk,kold,kp,l,l1,l2,ll,ll1,load,nvoid
-   integer :: iphys,iphys1,iphys2,icomp,iload,ivar,ivar1,ivar2
+   integer :: iphys,iphys1,iphys2,icomp,iload,ivar
    integer :: nod,nvarHt,nvarEt,nvarVt,nvarQt
    integer :: nrPhysH,nrPhysE,nrPhysV,nrPhysHE,nrPhysHEV,nrPhysQ
    integer :: nrdofmH,nrdofmE,nrdofmV,nrdofmHE,nrdofmHEV,ndofQ
    integer :: nrdoflH,nrdoflE,nrdoflV,nrdoflQ
 !
 #if DEBUG_MODE
-   integer :: ians,ibeg,iend,jbeg,jend,kbeg,kend
+   integer :: ians,ibeg,iend,jbeg,jend,kbeg,kend,ivar1,ivar2
    integer :: iprint=0
 #endif
 !

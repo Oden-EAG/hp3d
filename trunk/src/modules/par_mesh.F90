@@ -47,7 +47,7 @@ subroutine distr_mesh()
 !
 !..auxiliary variables
    integer :: subd_next(NRELES), nodm(MAXNODM), nodesl(27)
-   integer :: i, iel, inod, iproc, mdle, nod, subd, subd_size
+   integer :: iel, inod, iproc, mdle, nod, subd, subd_size
    integer :: nrnodm, nrdof_nod
    integer :: iprint = 0
 !

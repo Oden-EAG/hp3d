@@ -127,11 +127,10 @@ subroutine deactivate(Nod, NrdofH,NrdofE,NrdofV,NrdofQ)
    integer, intent(in)    :: Nod
    integer, intent(inout) :: NrdofH,NrdofE,NrdofV,NrdofQ
 !
-   integer :: icase,ndofH,ndofE,ndofV,ndofQ,nn,nn1
+   integer :: icase,ndofH,ndofE,ndofV,ndofQ
 !
 #if DEBUG_MODE
-   integer :: iprint
-   iprint=0
+   integer :: iprint = 0
 #endif
 !
 !-------------------------------------------------------------------------

@@ -20,7 +20,7 @@ subroutine random_refine(Per, Nitr)
   !-----------------------------------------------------
   real(8) :: x
   integer :: iprint, iseed, iel, i, istat
-  integer :: nsize_list, kref, mdle, nref, idx, nelts
+  integer :: nsize_list, kref, mdle, nref, idx
   integer, allocatable ::  mdle_list(:)
   logical :: mode_save
   !-----------------------------------------------------

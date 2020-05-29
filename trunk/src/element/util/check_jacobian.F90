@@ -12,7 +12,7 @@ subroutine check_jacobian
   real(8), dimension(3)   :: xi,x
   real(8), dimension(2)   :: t
   real(8), dimension(3,3) :: dxdxi,dxidx
-  real(8), dimension(3,2) :: dxdt ,dxidt
+  real(8), dimension(3,2) :: dxidt
   ! Gauss points and weights
   real(8), dimension(3,MAX_NINT3) :: xiloc
   real(8), dimension(  MAX_NINT3) :: wxi

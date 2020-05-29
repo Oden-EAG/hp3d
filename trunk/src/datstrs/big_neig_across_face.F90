@@ -18,10 +18,8 @@ subroutine big_neig_across_face(Mdle,Iface, Neig)
   integer, intent(out) :: Neig
 
   !  ...Locals
-  character(len=4) :: etype
   integer,dimension(2) :: neig_ls,iface_ls,orient_ls
-  integer,dimension(27) :: nodesl,void
-  integer :: mdlf,nrneig,ipos,i,inode,ifound
+  integer :: mdlf,nrneig,ipos,ifound
 !------------------------------------------------------------------------------
 
   !  ...initialze to NO neighbor
@@ -43,7 +41,7 @@ subroutine big_neig_across_face(Mdle,Iface, Neig)
   call locate(Mdle,neig_ls,2, ifound)
   select case(ifound)
   case(0)
-    write(*,1)Mdle,Iface,mdlf
+    write(*,1) Mdle,Iface,mdlf
 1   format(' big_neig_across_face: inconsistency! Mdle,Iface,mdlf = ',3(i12,2x))
     write(*,*)'neig_ls = ',neig_ls(1:2)
     call result

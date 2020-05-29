@@ -31,7 +31,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
    real(8),dimension(  MAXbrickH) :: shapH
    real(8),dimension(3,MAXbrickH) :: gradH
    character(len=4) :: etype
-   integer :: iv, nV, ico, iel, ioffs, mdle, nrdofH, i, j, k, l, ivis, ndom
+   integer :: iv, nV, ico, iel, mdle, nrdofH, i, j, k, l, ivis, ndom
    integer :: nodesl(27), norder(19), nverl(8)
    integer :: norientl(27), nedge_orient(12), nface_orient(6)
 !
@@ -41,7 +41,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
    integer, dimension(NRELES) :: n_vert_offset,n_obj_offset,n_elem_vert
 !
 !..timer
-   real(8) :: start_time,end_time
+   !real(8) :: start_time,end_time
 !
 !..MPI
    integer :: ierr,count,subd,ice_subd,icn_subd

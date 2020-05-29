@@ -15,13 +15,14 @@ subroutine refresh
 !
    character(4) :: type
    integer :: nodesl(27),norientl(27)
-   integer :: iprint,i,j,iel,nod,nfath,mdle, &
-              nrsons,loc,subd
+   integer :: i,iel,nod,nfath,mdle,subd
    integer :: nrdofH,nrdofE,nrdofV,nrdofQ
 !
-!--------------------------------------------------------------------
+#if DEBUG_MODE
+   integer :: iprint = 0
+#endif
 !
-   iprint=0
+!--------------------------------------------------------------------
 !
 #if DEBUG_MODE
    if (iprint.eq.1) then
@@ -72,7 +73,7 @@ subroutine refresh
 !--------------------------------------------------------------------
 !
 !..loop over all nodes
-!$OMP DO PRIVATE(nfath,nrsons,loc) SCHEDULE(DYNAMIC) &
+!$OMP DO PRIVATE(nfath) SCHEDULE(DYNAMIC) &
 !$OMP REDUCTION(+:nrdofH,nrdofE,nrdofV,nrdofQ)
    do nod=1,NRNODS
 !

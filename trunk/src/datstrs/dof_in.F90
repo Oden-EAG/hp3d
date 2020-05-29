@@ -17,7 +17,7 @@ subroutine dof_in(Nod,ZvalH,ZvalE,ZvalV,ZvalQ)
   ! ** Locals
   ! node physics attributes flags
   integer, dimension(NR_PHYSA) :: ncase
-  integer :: i, j, k, ivarH, ivarE, ivarV, ivarQ, iprint, icase
+  integer :: i, j, k, ivarH, ivarE, ivarV, ivarQ, icase
   integer :: ndofH, ndofE, ndofV, ndofQ, nvar
 
 

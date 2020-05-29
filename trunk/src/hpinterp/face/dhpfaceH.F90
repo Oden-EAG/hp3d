@@ -100,9 +100,11 @@
              ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,nsign
 !
 !-----------------------------------------------------------------------
-  iprint=0
 !
   nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
+!
+  iprint = 0
+#if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Icase,Iface,Type
 7010 format('dhpfaceH: Mdle,Iflag,No,Icase,Iface,Type = ',5i4,a4)
@@ -116,6 +118,7 @@
 7050 format('          Norder = ',19i4)
      call pause
   endif
+#endif
 !
 ! determine # of dof for the face node
   call ndof_nod(face_type(Type,Iface),Norder(nre+Iface), &
@@ -130,10 +133,13 @@
     norder_1(ie) = Norder(ie)
   enddo
   norder_1(nre+Iface) = Norder(nre+Iface)
+!
+#if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,7060) norder_1; call pause
 7060 format('dhpfaceH: norder_1 = ',20i4)
   endif
+#endif
 !
 ! get face order to find out quadrature information
   call face_order(Type,Iface,Norder, norder_face)
@@ -253,6 +259,7 @@
 ! end of loop through integration points
   enddo
 !
+#if DEBUG_MODE
   if (iprint.eq.1) then
     write(*,*) 'dhpfaceH: LOAD VECTOR AND STIFFNESS MATRIX FOR ', &
                'ndofH_face = ',ndofH_face
@@ -267,6 +274,7 @@
 # endif
 7016    format(10e12.5)
   endif
+#endif
 !
 !-----------------------------------------------------------------------
 !
@@ -305,6 +313,7 @@
              zuH,naH)
 #endif
 !
+#if DEBUG_MODE
   if (iprint.eq.1) then
    write(*,*) 'dhpfaceH: k,zu(k) = '
    do k=1,ndofH_face
@@ -312,12 +321,16 @@
    enddo
    call pause
   endif
+#endif
 !
 ! save the dof, skipping irrelevant entries
   call decod(Icase,2,NR_PHYSA, ncase)
+!
+#if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,*) 'dhpfaceH: ncase = ', ncase
   endif
+#endif
 !
 !------------------------------------------------------
   ivarH=0; nvarH=0

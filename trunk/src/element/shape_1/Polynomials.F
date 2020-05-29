@@ -109,7 +109,7 @@ c
       double precision, intent(in)  ::                              X,T
       double precision, intent(out) ::    L(2:Nord),P(Nord-1),R(Nord-1)
       integer ::                                         i,ifact,iprint
-      double precision ::                            ptemp(0:Nord),tt,y
+      double precision ::                              ptemp(0:Nord),tt
 c
       iprint=0
 c

@@ -117,10 +117,11 @@ subroutine soldis_system(Mdle,Xi,X,Rn,SolH,GradH,SolE,CurlE,SolV,DivV,SolQ, Val)
 !!!      VTYPE,dimension(  MAXEQNQ    ) ::   valQ
 !!!      VTYPE,dimension(  MAXEQNQ,3  ) ::  dvalQ
 !!!      VTYPE,dimension(  MAXEQNQ,3,3) :: d2valQ
+!!!      integer :: ivoid
 !
       real(8) :: aux(3),aux_n(3)
       real(8) :: s
-      integer :: ivoid,iattr,icomp,ireal,ibeg,iload,isol
+      integer :: iattr,icomp,ireal,ibeg,iload,isol
 !
       real(8), external :: dreal_part,dimag_part
 !

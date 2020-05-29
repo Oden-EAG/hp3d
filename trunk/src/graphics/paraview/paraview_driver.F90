@@ -6,7 +6,7 @@ subroutine paraview_driver
    use upscale
    use physics          , only : DTYPE,NR_COMP,NR_PHYSA,PHYSA
    use data_structure3D , only : NRCOMS
-   use environment      , only : PREFIX,QUIET_MODE
+   use environment      , only : QUIET_MODE
    use paraview         , only : PARAVIEW_DUMP_ATTR,VLEVEL,FILE_VIS,PARAVIEW_DOMAIN
    use mpi_param        , only : RANK,ROOT
 !
