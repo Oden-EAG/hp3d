@@ -143,13 +143,13 @@ subroutine set_index(Icase,Iflag, Index)
               if ((ibcd(i).eq.7).and.(j.eq.2)) indexd(ic)=3
 !
 !  ...........Dirichlet BC on 3rd component
-              !if ((ibcd(i).eq.8).and.(j.eq.3)) indexd(ic)=3
+              if ((ibcd(i).eq.8).and.(j.eq.3)) indexd(ic)=3
 !
-!          ...specific for impedance
+!          ...specific for EM impedance BC
 !  ...........Impedance BC for Primal Maxwell
-              if ((ibcd(i).eq.8).and.(j.eq.1)) indexd(ic)=3
+              !if ((ibcd(i).eq.8).and.(j.eq.1)) indexd(ic)=3
 !  ...........Impedance BC for UW Maxwell
-              if ((ibcd(i).eq.9).and.(j.eq.2)) indexd(ic)=3
+              !if ((ibcd(i).eq.9).and.(j.eq.2)) indexd(ic)=3
             enddo
 !
 !  .......H(div) variable
@@ -164,11 +164,6 @@ subroutine set_index(Icase,Iflag, Index)
 !
 !  ...........Dirichlet BC
               if (ibcd(i).eq.1) then
-                indexd(ic)=5
-              endif
-!  ...........impedance bc:
-              if (ibcd(i).eq.9) then
-!             ...Eliminate H(div) dof (trick to avoid singular ZalocVV)
                 indexd(ic)=5
               endif
 !
@@ -202,6 +197,12 @@ subroutine set_index(Icase,Iflag, Index)
                 indexd(ic)=5
               endif
             enddo
+!
+!  ...........specific for acoustics impedance BC:
+              !if (ibcd(i).eq.9) then
+!             ...Eliminate H(div) dof (trick to avoid singular ZalocVV)
+              !  indexd(ic)=5
+              !endif
 !
 !  .......L2 variable
           case('discon')
