@@ -4,7 +4,7 @@
 !                                                                     
 !---------------------------------------------------------------------- 
 !                                                                     
-!     latest revision:  - July 17
+!     latest revision:  - May 2020
 !                                                                     
 !     purpose:          - module setting up the parameters for the
 !                         acoustics problem
@@ -63,6 +63,8 @@ module common_prob_data
 !..DISPLAY SETTINGS (paraview   ...)
    integer :: IEXACT_DISP, ITANGENT_DISP, ICHOOSE_DISP
    integer :: IDOMAIN_SMOOTHE = 0
+!
+   character(32) :: OUTPUT_DIR
 !
 !
 end module common_prob_data

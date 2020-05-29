@@ -34,7 +34,7 @@ subroutine exact_error
    iflag(1) = 1
 !
 !..fetch active elements
-   if ((DISTRIBUTED) .and. (.not. HOST_MESH)) then
+   if (DISTRIBUTED .and. (.not. HOST_MESH)) then
       if (RANK .eq. ROOT) then
          write(*,*) 'exact_error: mesh is distributed. computing error in parallel...'
       endif
