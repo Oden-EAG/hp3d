@@ -783,7 +783,7 @@ subroutine par_nested(mtype)
 !
 !..use 64bit parallel analysis if nnz > 2B
 !  (sequential metis/scotch using 32bit currently)
-   if (nnz > 2.14e9) mumps_par%icntl(28) = 2
+   if (nnz > 2.14e9_8) mumps_par%icntl(28) = 2
 !
 !..percentage increase in estimated workspace for global interface problem
    mumps_par%icntl(14) = 30
