@@ -78,18 +78,18 @@ subroutine exec_case(idec)
 !
       case(26)
          if (RANK.eq.ROOT) then
-            write(*,*) 'Select on mdle node from the list: '
+            write(*,*) 'Select on mdle node from the list, and input kref: '
             do i=1,NRELES
                write(*,2610) ELEM_ORDER(i)
           2610 format(I6)
             enddo
-            read(*,*) mdle
+            read(*,*) mdle, kref
          endif
          if (NUM_PROCS .gt. 1) then
             count = 1; src = ROOT
             call MPI_BCAST (mdle,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
          endif
-         kref = 111
+!!!         kref = 111
          call refine(mdle,kref)
          call close_mesh
          call update_gdof

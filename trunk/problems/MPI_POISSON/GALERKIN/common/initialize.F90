@@ -25,7 +25,7 @@ subroutine initialize
    integer, parameter :: MAXSU_PROB   = 1    ! surfaces
    integer, parameter :: MAXNP_PROB   = 32768! points
    integer, parameter :: MAXNC_PROB   = 49152! curves
-   integer, parameter :: MAXTR_PROB   = 1    ! triangles
+   integer, parameter :: MAXTR_PROB   = 100  ! triangles
    integer, parameter :: MAXRE_PROB   = 24576! rectangles
    integer, parameter :: MAXBT_PROB   = 1    ! prisms
    integer, parameter :: MAXHE_PROB   = 4096 ! hexas
