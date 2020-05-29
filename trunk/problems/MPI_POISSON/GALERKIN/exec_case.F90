@@ -24,6 +24,11 @@ subroutine exec_case(idec)
 !
    select case(idec)
 !
+!  ...paraview graphics
+      case(3)
+         call my_paraview_driver(1)
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+!
 !  ...print data structure (interactive)
       case(10); call result
 !

@@ -7,7 +7,7 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision - Oct 2019
+!   latest revision - Apr 2020
 !
 !   purpose         - Driver routine for computing power in UW
 !                     Maxwell, i.e. the Poynting vector at certain
@@ -29,6 +29,7 @@ subroutine get_power(Fld,NumPts,FileIter)
    use laserParam
    use mpi_param, only: RANK,ROOT
    use MPI      , only: MPI_COMM_WORLD,MPI_IN_PLACE,MPI_REAL8,MPI_SUM
+   use par_mesh , only: DISTRIBUTED,HOST_MESH
 !
    implicit none
 !
@@ -41,17 +42,26 @@ subroutine get_power(Fld,NumPts,FileIter)
    real(8), allocatable :: diff_power(:),efficiency(:)
    real(8), allocatable :: core_power(:),clad_power(:)
 !
-   real(8), allocatable :: power_LP01(:),power_LP11(:)
-   real(8), allocatable :: power_LP21(:),power_LP02(:)
-   real(8), allocatable :: norm_LP01(:),norm_LP11(:)
-   real(8), allocatable :: norm_LP21(:),norm_LP02(:)
-   real(8), allocatable :: coef_LP01_r(:),coef_LP11_r(:)
-   real(8), allocatable :: coef_LP21_r(:),coef_LP02_r(:)
-   real(8), allocatable :: coef_LP01_c(:),coef_LP11_c(:)
-   real(8), allocatable :: coef_LP21_c(:),coef_LP02_c(:)
+   real(8), allocatable :: power_LP01_x(:),power_LP11a_x(:),power_LP11b_x(:)
+   real(8), allocatable :: power_LP21a_x(:),power_LP21b_x(:),power_LP02_x(:)
+   real(8), allocatable :: norm_LP01_x(:),norm_LP11a_x(:),norm_LP11b_x(:)
+   real(8), allocatable :: norm_LP21a_x(:),norm_LP21b_x(:),norm_LP02_x(:)
+   real(8), allocatable :: coef_LP01_r_x(:),coef_LP11a_r_x(:),coef_LP11b_r_x(:)
+   real(8), allocatable :: coef_LP21a_r_x(:),coef_LP21b_r_x(:),coef_LP02_r_x(:)
+   real(8), allocatable :: coef_LP01_c_x(:),coef_LP11a_c_x(:),coef_LP11b_c_x(:)
+   real(8), allocatable :: coef_LP21a_c_x(:),coef_LP21b_c_x(:),coef_LP02_c_x(:)
 !
-   real(8)  :: a,b
-   integer :: i
+   real(8), allocatable :: power_LP01_y(:),power_LP11a_y(:),power_LP11b_y(:)
+   real(8), allocatable :: power_LP21a_y(:),power_LP21b_y(:),power_LP02_y(:)
+   real(8), allocatable :: norm_LP01_y(:),norm_LP11a_y(:),norm_LP11b_y(:)
+   real(8), allocatable :: norm_LP21a_y(:),norm_LP21b_y(:),norm_LP02_y(:)
+   real(8), allocatable :: coef_LP01_r_y(:),coef_LP11a_r_y(:),coef_LP11b_r_y(:)
+   real(8), allocatable :: coef_LP21a_r_y(:),coef_LP21b_r_y(:),coef_LP02_r_y(:)
+   real(8), allocatable :: coef_LP01_c_y(:),coef_LP11a_c_y(:),coef_LP11b_c_y(:)
+   real(8), allocatable :: coef_LP21a_c_y(:),coef_LP21b_c_y(:),coef_LP02_c_y(:)
+!
+   real(8) :: a,b
+   integer :: i,j
 !
    character(8)  :: fmt,suffix
    character(64) :: filename
@@ -71,14 +81,25 @@ subroutine get_power(Fld,NumPts,FileIter)
  2001 format(A,i5)
    endif
 !
+   if ((.not. DISTRIBUTED .or. HOST_MESH) .and. RANK .ne. ROOT) goto 99
+!
    allocate(zValues(NumPts)   , sign_power(NumPts), &
             pump_power(NumPts), diff_power(NumPts), &
             core_power(NumPts), clad_power(NumPts)  )
 !
-   allocate(power_LP01(NumPts),power_LP11(NumPts),power_LP21(NumPts),power_LP02(NumPts))
-   allocate(norm_LP01(NumPts),norm_LP11(NumPts),norm_LP21(NumPts),norm_LP02(NumPts))
-   allocate(coef_LP01_r(NumPts),coef_LP11_r(NumPts),coef_LP21_r(NumPts),coef_LP02_r(NumPts))
-   allocate(coef_LP01_c(NumPts),coef_LP11_c(NumPts),coef_LP21_c(NumPts),coef_LP02_c(NumPts))
+   allocate(power_LP01_x(NumPts),norm_LP01_x(NumPts),coef_LP01_r_x(NumPts),coef_LP01_c_x(NumPts))
+   allocate(power_LP11a_x(NumPts),norm_LP11a_x(NumPts),coef_LP11a_r_x(NumPts),coef_LP11a_c_x(NumPts))
+   allocate(power_LP11b_x(NumPts),norm_LP11b_x(NumPts),coef_LP11b_r_x(NumPts),coef_LP11b_c_x(NumPts))
+   allocate(power_LP21a_x(NumPts),norm_LP21a_x(NumPts),coef_LP21a_r_x(NumPts),coef_LP21a_c_x(NumPts))
+   allocate(power_LP21b_x(NumPts),norm_LP21b_x(NumPts),coef_LP21b_r_x(NumPts),coef_LP21b_c_x(NumPts))
+   allocate(power_LP02_x(NumPts),norm_LP02_x(NumPts),coef_LP02_r_x(NumPts),coef_LP02_c_x(NumPts))
+!
+   allocate(power_LP01_y(NumPts),norm_LP01_y(NumPts),coef_LP01_r_y(NumPts),coef_LP01_c_y(NumPts))
+   allocate(power_LP11a_y(NumPts),norm_LP11a_y(NumPts),coef_LP11a_r_y(NumPts),coef_LP11a_c_y(NumPts))
+   allocate(power_LP11b_y(NumPts),norm_LP11b_y(NumPts),coef_LP11b_r_y(NumPts),coef_LP11b_c_y(NumPts))
+   allocate(power_LP21a_y(NumPts),norm_LP21a_y(NumPts),coef_LP21a_r_y(NumPts),coef_LP21a_c_y(NumPts))
+   allocate(power_LP21b_y(NumPts),norm_LP21b_y(NumPts),coef_LP21b_r_y(NumPts),coef_LP21b_c_y(NumPts))
+   allocate(power_LP02_y(NumPts),norm_LP02_y(NumPts),coef_LP02_r_y(NumPts),coef_LP02_c_y(NumPts))
 !
 !..distributing sample points uniformly
    if (RANK .eq. ROOT) then
@@ -112,18 +133,38 @@ subroutine get_power(Fld,NumPts,FileIter)
    end select
 !
    if (RANK.eq.ROOT) write(*,*) ' get_power: computing signal mode_power..'
-   i = ISOL
-   ISOL = 13 ! LP01 projection
-   call compute_power(zValues,NumPts,ISOL, power_LP01,norm_LP01,coef_LP01_r,coef_LP01_c)
-   ISOL = 14 ! LP11 projection
-   call compute_power(zValues,NumPts,ISOL, power_LP11,norm_LP11,coef_LP11_r,coef_LP11_c)
-   ISOL = 15 ! LP21 projection
-   call compute_power(zValues,NumPts,ISOL, power_LP21,norm_LP21,coef_LP21_r,coef_LP21_c)
-   ISOL = 16 ! LP02 projection
-   call compute_power(zValues,NumPts,ISOL, power_LP02,norm_LP02,coef_LP02_r,coef_LP02_c)
-   ISOL = i
+   i = ISOL; j = ICOMP_EXACT
+   ISOL = 13; ICOMP_EXACT = 1 ! LP01 projection (x-polarized)
+   call compute_power(zValues,NumPts,ISOL, power_LP01_x,norm_LP01_x,coef_LP01_r_x,coef_LP01_c_x)
+   ISOL = 13; ICOMP_EXACT = 2 ! LP01 projection (y-polarized)
+   call compute_power(zValues,NumPts,ISOL, power_LP01_y,norm_LP01_y,coef_LP01_r_y,coef_LP01_c_y)
+!
+   ISOL = 14 ; ICOMP_EXACT = 1 ! LP11a projection (x-polarized)
+   call compute_power(zValues,NumPts,ISOL, power_LP11a_x,norm_LP11a_x,coef_LP11a_r_x,coef_LP11a_c_x)
+   ISOL = 140; ICOMP_EXACT = 1 ! LP11b projection (x-polarized)
+   call compute_power(zValues,NumPts,ISOL, power_LP11b_x,norm_LP11b_x,coef_LP11b_r_x,coef_LP11b_c_x)
+   ISOL = 14 ; ICOMP_EXACT = 2 ! LP11a projection (y-polarized)
+   call compute_power(zValues,NumPts,ISOL, power_LP11a_y,norm_LP11a_y,coef_LP11a_r_y,coef_LP11a_c_y)
+   ISOL = 140; ICOMP_EXACT = 2 ! LP11b projection (y-polarized)
+   call compute_power(zValues,NumPts,ISOL, power_LP11b_y,norm_LP11b_y,coef_LP11b_r_y,coef_LP11b_c_y)
+!
+   ISOL = 15 ; ICOMP_EXACT = 1 ! LP21a projection (x-polarized)
+   call compute_power(zValues,NumPts,ISOL, power_LP21a_x,norm_LP21a_x,coef_LP21a_r_x,coef_LP21a_c_x)
+   ISOL = 150; ICOMP_EXACT = 1 ! LP21b projection (x-polarized)
+   call compute_power(zValues,NumPts,ISOL, power_LP21b_x,norm_LP21b_x,coef_LP21b_r_x,coef_LP21b_c_x)
+   ISOL = 15 ; ICOMP_EXACT = 2 ! LP21a projection (y-polarized)
+   call compute_power(zValues,NumPts,ISOL, power_LP21a_y,norm_LP21a_y,coef_LP21a_r_y,coef_LP21a_c_y)
+   ISOL = 150; ICOMP_EXACT = 2 ! LP21b projection (y-polarized)
+   call compute_power(zValues,NumPts,ISOL, power_LP21b_y,norm_LP21b_y,coef_LP21b_r_y,coef_LP21b_c_y)
+!
+   ISOL = 16; ICOMP_EXACT = 1 ! LP02 projection (x-polarized)
+   call compute_power(zValues,NumPts,ISOL, power_LP02_x,norm_LP02_x,coef_LP02_r_x,coef_LP02_c_x)
+   ISOL = 16; ICOMP_EXACT = 2 ! LP02 projection (y-polarized)
+   call compute_power(zValues,NumPts,ISOL, power_LP02_y,norm_LP02_y,coef_LP02_r_y,coef_LP02_c_y)
+   ISOL = i; ICOMP_EXACT = j
 !
 !..gather RHS vector information on host
+   if (.not. DISTRIBUTED .or. HOST_MESH) goto 50
    count = NumPts
    if (RANK .eq. ROOT) then
       call MPI_REDUCE(MPI_IN_PLACE,sign_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
@@ -132,25 +173,65 @@ subroutine get_power(Fld,NumPts,FileIter)
       call MPI_REDUCE(MPI_IN_PLACE,core_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE(MPI_IN_PLACE,clad_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       !
-      call MPI_REDUCE(MPI_IN_PLACE,power_LP01  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE(MPI_IN_PLACE, norm_LP01  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE(MPI_IN_PLACE, coef_LP01_r,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE(MPI_IN_PLACE, coef_LP01_c,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE,power_LP01_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, norm_LP01_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP01_r_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP01_c_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       !
-      call MPI_REDUCE(MPI_IN_PLACE,power_LP11  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE(MPI_IN_PLACE, norm_LP11  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE(MPI_IN_PLACE, coef_LP11_r,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE(MPI_IN_PLACE, coef_LP11_c,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE,power_LP01_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, norm_LP01_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP01_r_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP01_c_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       !
-      call MPI_REDUCE(MPI_IN_PLACE,power_LP21  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE(MPI_IN_PLACE, norm_LP21  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE(MPI_IN_PLACE, coef_LP21_r,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE(MPI_IN_PLACE, coef_LP21_c,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE,power_LP11a_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, norm_LP11a_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP11a_r_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP11a_c_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       !
-      call MPI_REDUCE(MPI_IN_PLACE,power_LP02  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE(MPI_IN_PLACE, norm_LP02  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE(MPI_IN_PLACE, coef_LP02_r,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE(MPI_IN_PLACE, coef_LP02_c,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE,power_LP11b_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, norm_LP11b_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP11b_r_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP11b_c_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      !
+      call MPI_REDUCE(MPI_IN_PLACE,power_LP11a_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, norm_LP11a_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP11a_r_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP11a_c_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      !
+      call MPI_REDUCE(MPI_IN_PLACE,power_LP11b_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, norm_LP11b_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP11b_r_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP11b_c_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      !
+      call MPI_REDUCE(MPI_IN_PLACE,power_LP21a_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, norm_LP21a_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP21a_r_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP21a_c_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      !
+      call MPI_REDUCE(MPI_IN_PLACE,power_LP21b_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, norm_LP21b_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP21b_r_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP21b_c_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      !
+      call MPI_REDUCE(MPI_IN_PLACE,power_LP21a_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, norm_LP21a_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP21a_r_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP21a_c_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      !
+      call MPI_REDUCE(MPI_IN_PLACE,power_LP21b_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, norm_LP21b_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP21b_r_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP21b_c_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      !
+      call MPI_REDUCE(MPI_IN_PLACE,power_LP02_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, norm_LP02_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP02_r_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP02_c_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      !
+      call MPI_REDUCE(MPI_IN_PLACE,power_LP02_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, norm_LP02_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP02_r_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE, coef_LP02_c_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
    else
       call MPI_REDUCE(sign_power,sign_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE(pump_power,pump_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
@@ -158,45 +239,119 @@ subroutine get_power(Fld,NumPts,FileIter)
       call MPI_REDUCE(core_power,core_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE(clad_power,clad_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       !
-      call MPI_REDUCE(power_LP01  ,power_LP01  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE( norm_LP01  , norm_LP01  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE( coef_LP01_r, coef_LP01_r,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE( coef_LP01_c, coef_LP01_c,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(power_LP01_x  ,power_LP01_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( norm_LP01_x  , norm_LP01_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP01_r_x, coef_LP01_r_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP01_c_x, coef_LP01_c_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       !
-      call MPI_REDUCE(power_LP11  ,power_LP11  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE( norm_LP11  , norm_LP11  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE( coef_LP11_r, coef_LP11_r,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE( coef_LP11_c, coef_LP11_c,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(power_LP01_y  ,power_LP01_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( norm_LP01_y  , norm_LP01_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP01_r_y, coef_LP01_r_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP01_c_y, coef_LP01_c_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       !
-      call MPI_REDUCE(power_LP21  ,power_LP21  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE( norm_LP21  , norm_LP21  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE( coef_LP21_r, coef_LP21_r,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE( coef_LP21_c, coef_LP21_c,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(power_LP11a_x  ,power_LP11a_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( norm_LP11a_x  , norm_LP11a_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP11a_r_x, coef_LP11a_r_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP11a_c_x, coef_LP11a_c_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       !
-      call MPI_REDUCE(power_LP02  ,power_LP02  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE( norm_LP02  , norm_LP02  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE( coef_LP02_r, coef_LP02_r,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE( coef_LP02_c, coef_LP02_c,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(power_LP11b_x  ,power_LP11b_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( norm_LP11b_x  , norm_LP11b_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP11b_r_x, coef_LP11b_r_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP11b_c_x, coef_LP11b_c_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      !
+      call MPI_REDUCE(power_LP11a_y  ,power_LP11a_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( norm_LP11a_y  , norm_LP11a_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP11a_r_y, coef_LP11a_r_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP11a_c_y, coef_LP11a_c_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      !
+      call MPI_REDUCE(power_LP11b_y  ,power_LP11b_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( norm_LP11b_y  , norm_LP11b_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP11b_r_y, coef_LP11b_r_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP11b_c_y, coef_LP11b_c_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      !
+      call MPI_REDUCE(power_LP21a_x  ,power_LP21a_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( norm_LP21a_x  , norm_LP21a_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP21a_r_x, coef_LP21a_r_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP21a_c_x, coef_LP21a_c_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      !
+      call MPI_REDUCE(power_LP21b_x  ,power_LP21b_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( norm_LP21b_x  , norm_LP21b_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP21b_r_x, coef_LP21b_r_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP21b_c_x, coef_LP21b_c_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      !
+      call MPI_REDUCE(power_LP21a_y  ,power_LP21a_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( norm_LP21a_y  , norm_LP21a_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP21a_r_y, coef_LP21a_r_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP21a_c_y, coef_LP21a_c_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      !
+      call MPI_REDUCE(power_LP21b_y  ,power_LP21b_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( norm_LP21b_y  , norm_LP21b_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP21b_r_y, coef_LP21b_r_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP21b_c_y, coef_LP21b_c_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      !
+      call MPI_REDUCE(power_LP02_x  ,power_LP02_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( norm_LP02_x  , norm_LP02_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP02_r_x, coef_LP02_r_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP02_c_x, coef_LP02_c_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      !
+      call MPI_REDUCE(power_LP02_y  ,power_LP02_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( norm_LP02_y  , norm_LP02_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP02_r_y, coef_LP02_r_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE( coef_LP02_c_y, coef_LP02_c_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       goto 90
    endif
 !
+   50 continue
+!
 !$OMP PARALLEL DO
    do i = 1,NumPts
-      norm_LP01(i)   = sqrt(norm_LP01(i))
-      coef_LP01_r(i) = sqrt(coef_LP01_r(i)**2.d0+coef_LP01_c(i)**2.d0) / norm_LP01(i)
-      power_LP01(i)  = power_LP01(i) * ((coef_LP01_r(i) / norm_LP01(i))**2.d0)
+      norm_LP01_x(i)   = sqrt(norm_LP01_x(i))
+      coef_LP01_r_x(i) = sqrt(coef_LP01_r_x(i)**2.d0+coef_LP01_c_x(i)**2.d0) / norm_LP01_x(i)
+      power_LP01_x(i)  = power_LP01_x(i) * ((coef_LP01_r_x(i) / norm_LP01_x(i))**2.d0)
       !
-      norm_LP11(i)   = sqrt(norm_LP11(i))
-      coef_LP11_r(i) = sqrt(coef_LP11_r(i)**2.d0+coef_LP11_c(i)**2.d0) / norm_LP11(i)
-      power_LP11(i)  = power_LP11(i) * ((coef_LP11_r(i) / norm_LP11(i))**2.d0)
+      norm_LP11a_x(i)   = sqrt(norm_LP11a_x(i))
+      coef_LP11a_r_x(i) = sqrt(coef_LP11a_r_x(i)**2.d0+coef_LP11a_c_x(i)**2.d0) / norm_LP11a_x(i)
+      power_LP11a_x(i)  = power_LP11a_x(i) * ((coef_LP11a_r_x(i) / norm_LP11a_x(i))**2.d0)
       !
-      norm_LP21(i)   = sqrt(norm_LP21(i))
-      coef_LP21_r(i) = sqrt(coef_LP21_r(i)**2.d0+coef_LP21_c(i)**2.d0) / norm_LP21(i)
-      power_LP21(i)  = power_LP21(i) * ((coef_LP21_r(i) / norm_LP21(i))**2.d0)
+      norm_LP11b_x(i)   = sqrt(norm_LP11b_x(i))
+      coef_LP11b_r_x(i) = sqrt(coef_LP11b_r_x(i)**2.d0+coef_LP11b_c_x(i)**2.d0) / norm_LP11b_x(i)
+      power_LP11b_x(i)  = power_LP11b_x(i) * ((coef_LP11b_r_x(i) / norm_LP11b_x(i))**2.d0)
       !
-      norm_LP02(i)   = sqrt(norm_LP02(i))
-      coef_LP02_r(i) = sqrt(coef_LP02_r(i)**2.d0+coef_LP02_c(i)**2.d0) / norm_LP02(i)
-      power_LP02(i)  = power_LP02(i) * ((coef_LP02_r(i) / norm_LP02(i))**2.d0)
+      norm_LP21a_x(i)   = sqrt(norm_LP21a_x(i))
+      coef_LP21a_r_x(i) = sqrt(coef_LP21a_r_x(i)**2.d0+coef_LP21a_c_x(i)**2.d0) / norm_LP21a_x(i)
+      power_LP21a_x(i)  = power_LP21a_x(i) * ((coef_LP21a_r_x(i) / norm_LP21a_x(i))**2.d0)
+      !
+      norm_LP21b_x(i)   = sqrt(norm_LP21b_x(i))
+      coef_LP21b_r_x(i) = sqrt(coef_LP21b_r_x(i)**2.d0+coef_LP21b_c_x(i)**2.d0) / norm_LP21b_x(i)
+      power_LP21b_x(i)  = power_LP21b_x(i) * ((coef_LP21b_r_x(i) / norm_LP21b_x(i))**2.d0)
+      !
+      norm_LP02_x(i)   = sqrt(norm_LP02_x(i))
+      coef_LP02_r_x(i) = sqrt(coef_LP02_r_x(i)**2.d0+coef_LP02_c_x(i)**2.d0) / norm_LP02_x(i)
+      power_LP02_x(i)  = power_LP02_x(i) * ((coef_LP02_r_x(i) / norm_LP02_x(i))**2.d0)
+      !
+      norm_LP01_y(i)   = sqrt(norm_LP01_y(i))
+      coef_LP01_r_y(i) = sqrt(coef_LP01_r_y(i)**2.d0+coef_LP01_c_y(i)**2.d0) / norm_LP01_y(i)
+      power_LP01_y(i)  = power_LP01_y(i) * ((coef_LP01_r_y(i) / norm_LP01_y(i))**2.d0)
+      !
+      norm_LP11a_y(i)   = sqrt(norm_LP11a_y(i))
+      coef_LP11a_r_y(i) = sqrt(coef_LP11a_r_y(i)**2.d0+coef_LP11a_c_y(i)**2.d0) / norm_LP11a_y(i)
+      power_LP11a_y(i)  = power_LP11a_y(i) * ((coef_LP11a_r_y(i) / norm_LP11a_y(i))**2.d0)
+      !
+      norm_LP11b_y(i)   = sqrt(norm_LP11b_y(i))
+      coef_LP11b_r_y(i) = sqrt(coef_LP11b_r_y(i)**2.d0+coef_LP11b_c_y(i)**2.d0) / norm_LP11b_y(i)
+      power_LP11b_y(i)  = power_LP11b_y(i) * ((coef_LP11b_r_y(i) / norm_LP11b_y(i))**2.d0)
+      !
+      norm_LP21a_y(i)   = sqrt(norm_LP21a_y(i))
+      coef_LP21a_r_y(i) = sqrt(coef_LP21a_r_y(i)**2.d0+coef_LP21a_c_y(i)**2.d0) / norm_LP21a_y(i)
+      power_LP21a_y(i)  = power_LP21a_y(i) * ((coef_LP21a_r_y(i) / norm_LP21a_y(i))**2.d0)
+      !
+      norm_LP21b_y(i)   = sqrt(norm_LP21b_y(i))
+      coef_LP21b_r_y(i) = sqrt(coef_LP21b_r_y(i)**2.d0+coef_LP21b_c_y(i)**2.d0) / norm_LP21b_y(i)
+      power_LP21b_y(i)  = power_LP21b_y(i) * ((coef_LP21b_r_y(i) / norm_LP21b_y(i))**2.d0)
+      !
+      norm_LP02_y(i)   = sqrt(norm_LP02_y(i))
+      coef_LP02_r_y(i) = sqrt(coef_LP02_r_y(i)**2.d0+coef_LP02_c_y(i)**2.d0) / norm_LP02_y(i)
+      power_LP02_y(i)  = power_LP02_y(i) * ((coef_LP02_r_y(i) / norm_LP02_y(i))**2.d0)
    enddo
 !$OMP END PARALLEL DO
 !
@@ -317,83 +472,232 @@ subroutine get_power(Fld,NumPts,FileIter)
 !..Print mode power output values
       if (FileIter .eq. -1) then
          write(*,*)
-         write(*,*) ' get_power: printing LP01 mode power (signal):'
+         write(*,*) ' get_power: printing LP01 (x) mode power (signal):'
          do i = 1,NumPts
-!            write(*,*) 'norm_LP01: ', norm_LP01(i), ', coef_LP01: ', coef_LP01_r(i)
-!            write(*,2020) power_LP01(i)
-            write(*,2030) power_LP01(i)/sign_power(i)
+!            write(*,*) 'norm_LP01_x: ', norm_LP01_x(i), ', coef_LP01_x: ', coef_LP01_r_x(i)
+!            write(*,2020) power_LP01_x(i)
+            write(*,2030) power_LP01_x(i)/sign_power(i)
          enddo
          write(*,*)
-         write(*,*) ' get_power: printing LP11 mode power (signal):'
+         write(*,*) ' get_power: printing LP11a (x) mode power (signal):'
          do i = 1,NumPts
-!            write(*,*) 'norm_LP11: ', norm_LP11(i), ', coef_LP11: ', coef_LP11_r(i)
-!            write(*,2020) power_LP11(i)
-            write(*,2030) power_LP11(i)/sign_power(i)
+!            write(*,*) 'norm_LP11a_x: ', norm_LP11a_x(i), ', coef_LP11a_x: ', coef_LP11a_r_x(i)
+!            write(*,2020) power_LP11a_x(i)
+            write(*,2030) power_LP11a_x(i)/sign_power(i)
          enddo
          write(*,*)
-         write(*,*) ' get_power: printing LP21 mode power (signal):'
+         write(*,*) ' get_power: printing LP11b (x) mode power (signal):'
          do i = 1,NumPts
-!            write(*,*) 'norm_LP21: ', norm_LP21(i), ', coef_LP21: ', coef_LP21_r(i)
-!            write(*,2020) power_LP21(i)
-            write(*,2030) power_LP21(i)/sign_power(i)
+!            write(*,*) 'norm_LP11b_x: ', norm_LP11b_x(i), ', coef_LP11b_x: ', coef_LP11b_r_x(i)
+!            write(*,2020) power_LP11b_x(i)
+            write(*,2030) power_LP11b_x(i)/sign_power(i)
          enddo
          write(*,*)
-         write(*,*) ' get_power: printing LP02 mode power (signal):'
+         write(*,*) ' get_power: printing LP21a (x) mode power (signal):'
          do i = 1,NumPts
-!            write(*,*) 'norm_LP02: ', norm_LP02(i), ', coef_LP02: ', coef_LP02_r(i)
-!            write(*,2020) power_LP02(i)
-            write(*,2030) power_LP02(i)/sign_power(i)
+!            write(*,*) 'norm_LP21a_x: ', norm_LP21a_x(i), ', coef_LP21a_x: ', coef_LP21a_r_x(i)
+!            write(*,2020) power_LP21a_x(i)
+            write(*,2030) power_LP21a_x(i)/sign_power(i)
+         enddo
+         write(*,*)
+         write(*,*) ' get_power: printing LP21b (x) mode power (signal):'
+         do i = 1,NumPts
+!            write(*,*) 'norm_LP21b_x: ', norm_LP21b_x(i), ', coef_LP21b_x: ', coef_LP21b_r_x(i)
+!            write(*,2020) power_LP21b_x(i)
+            write(*,2030) power_LP21b_x(i)/sign_power(i)
+         enddo
+         write(*,*)
+         write(*,*) ' get_power: printing LP02 (x) mode power (signal):'
+         do i = 1,NumPts
+!            write(*,*) 'norm_LP02_x: ', norm_LP02_x(i), ', coef_LP02_x: ', coef_LP02_r_x(i)
+!            write(*,2020) power_LP02_x(i)
+            write(*,2030) power_LP02_x(i)/sign_power(i)
+         enddo
+!
+         write(*,*)
+         write(*,*) ' get_power: printing LP01 (y) mode power (signal):'
+         do i = 1,NumPts
+!            write(*,*) 'norm_LP01_y: ', norm_LP01_y(i), ', coef_LP01_y: ', coef_LP01_r_y(i)
+!            write(*,2020) power_LP01_y(i)
+            write(*,2030) power_LP01_y(i)/sign_power(i)
+         enddo
+         write(*,*)
+         write(*,*) ' get_power: printing LP11a (y) mode power (signal):'
+         do i = 1,NumPts
+!            write(*,*) 'norm_LP11a_y: ', norm_LP11a_y(i), ', coef_LP11a_y: ', coef_LP11a_r_y(i)
+!            write(*,2020) power_LP11a_y(i)
+            write(*,2030) power_LP11a_y(i)/sign_power(i)
+         enddo
+         write(*,*)
+         write(*,*) ' get_power: printing LP11b (y) mode power (signal):'
+         do i = 1,NumPts
+!            write(*,*) 'norm_LP11b_y: ', norm_LP11b_y(i), ', coef_LP11b_y: ', coef_LP11b_r_y(i)
+!            write(*,2020) power_LP11b_y(i)
+            write(*,2030) power_LP11b_y(i)/sign_power(i)
+         enddo
+         write(*,*)
+         write(*,*) ' get_power: printing LP21a (y) mode power (signal):'
+         do i = 1,NumPts
+!            write(*,*) 'norm_LP21a_y: ', norm_LP21a_y(i), ', coef_LP21a_y: ', coef_LP21a_r_y(i)
+!            write(*,2020) power_LP21a(i)
+            write(*,2030) power_LP21a_y(i)/sign_power(i)
+         enddo
+         write(*,*)
+         write(*,*) ' get_power: printing LP21b (y) mode power (signal):'
+         do i = 1,NumPts
+!            write(*,*) 'norm_LP21b_y: ', norm_LP21b_y(i), ', coef_LP21b_y: ', coef_LP21b_r_y(i)
+!            write(*,2020) power_LP21b(i)
+            write(*,2030) power_LP21b_y(i)/sign_power(i)
+         enddo
+         write(*,*)
+         write(*,*) ' get_power: printing LP02 (y) mode power (signal):'
+         do i = 1,NumPts
+!            write(*,*) 'norm_LP02_y: ', norm_LP02_y(i), ', coef_LP02_y: ', coef_LP02_r_y(i)
+!            write(*,2020) power_LP02_y(i)
+            write(*,2030) power_LP02_y(i)/sign_power(i)
          enddo
       endif
       if (FileIter .ge. 0) then
          !WRITE TO FILE
-         write(*,*) ' get_power: printing LP01 mode power (signal) to file..'
+         write(*,*) ' get_power: printing LP01 (x) mode power (signal) to file..'
          fmt = '(I5.5)'
          write (suffix,fmt) FileIter
-         filename=trim(OUTPUT_DIR)//'power/powerLP01_'//trim(suffix)//'.dat'
+         filename=trim(OUTPUT_DIR)//'power/powerLP01_x_'//trim(suffix)//'.dat'
          open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
          do i = 1,NumPts
-            write(UNIT=9, FMT="(es12.5)") power_LP01(i)
+            write(UNIT=9, FMT="(es12.5)") power_LP01_x(i)
          enddo
          close(UNIT=9)
          !WRITE TO FILE
-         write(*,*) ' get_power: printing LP11 mode power (signal) to file..'
+         write(*,*) ' get_power: printing LP11a (x) mode power (signal) to file..'
          fmt = '(I5.5)'
          write (suffix,fmt) FileIter
-         filename=trim(OUTPUT_DIR)//'power/powerLP11_'//trim(suffix)//'.dat'
+         filename=trim(OUTPUT_DIR)//'power/powerLP11a_x_'//trim(suffix)//'.dat'
          open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
          do i = 1,NumPts
-            write(UNIT=9, FMT="(es12.5)") power_LP11(i)
+            write(UNIT=9, FMT="(es12.5)") power_LP11a_x(i)
          enddo
          close(UNIT=9)
          !WRITE TO FILE
-         write(*,*) ' get_power: printing LP21 mode power (signal) to file..'
+         write(*,*) ' get_power: printing LP11b (x) mode power (signal) to file..'
          fmt = '(I5.5)'
          write (suffix,fmt) FileIter
-         filename=trim(OUTPUT_DIR)//'power/powerLP21_'//trim(suffix)//'.dat'
+         filename=trim(OUTPUT_DIR)//'power/powerLP11b_x_'//trim(suffix)//'.dat'
          open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
          do i = 1,NumPts
-            write(UNIT=9, FMT="(es12.5)") power_LP21(i)
+            write(UNIT=9, FMT="(es12.5)") power_LP11b_x(i)
          enddo
          close(UNIT=9)
          !WRITE TO FILE
-         write(*,*) ' get_power: printing LP02 mode power (signal) to file..'
+         write(*,*) ' get_power: printing LP21a (x) mode power (signal) to file..'
          fmt = '(I5.5)'
          write (suffix,fmt) FileIter
-         filename=trim(OUTPUT_DIR)//'power/powerLP02_'//trim(suffix)//'.dat'
+         filename=trim(OUTPUT_DIR)//'power/powerLP21a_x_'//trim(suffix)//'.dat'
          open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
          do i = 1,NumPts
-            write(UNIT=9, FMT="(es12.5)") power_LP02(i)
+            write(UNIT=9, FMT="(es12.5)") power_LP21a_x(i)
+         enddo
+         close(UNIT=9)
+         !WRITE TO FILE
+         write(*,*) ' get_power: printing LP21b (x) mode power (signal) to file..'
+         fmt = '(I5.5)'
+         write (suffix,fmt) FileIter
+         filename=trim(OUTPUT_DIR)//'power/powerLP21b_x_'//trim(suffix)//'.dat'
+         open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
+         do i = 1,NumPts
+            write(UNIT=9, FMT="(es12.5)") power_LP21b_x(i)
+         enddo
+         close(UNIT=9)
+         !WRITE TO FILE
+         write(*,*) ' get_power: printing LP02 (x) mode power (signal) to file..'
+         fmt = '(I5.5)'
+         write (suffix,fmt) FileIter
+         filename=trim(OUTPUT_DIR)//'power/powerLP02_x_'//trim(suffix)//'.dat'
+         open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
+         do i = 1,NumPts
+            write(UNIT=9, FMT="(es12.5)") power_LP02_x(i)
+         enddo
+         close(UNIT=9)
+         !WRITE TO FILE
+         write(*,*) ' get_power: printing LP01 (y) mode power (signal) to file..'
+         fmt = '(I5.5)'
+         write (suffix,fmt) FileIter
+         filename=trim(OUTPUT_DIR)//'power/powerLP01_y_'//trim(suffix)//'.dat'
+         open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
+         do i = 1,NumPts
+            write(UNIT=9, FMT="(es12.5)") power_LP01_y(i)
+         enddo
+         close(UNIT=9)
+         !WRITE TO FILE
+         write(*,*) ' get_power: printing LP11a (y) mode power (signal) to file..'
+         fmt = '(I5.5)'
+         write (suffix,fmt) FileIter
+         filename=trim(OUTPUT_DIR)//'power/powerLP11a_y_'//trim(suffix)//'.dat'
+         open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
+         do i = 1,NumPts
+            write(UNIT=9, FMT="(es12.5)") power_LP11a_y(i)
+         enddo
+         close(UNIT=9)
+         !WRITE TO FILE
+         write(*,*) ' get_power: printing LP11b (y) mode power (signal) to file..'
+         fmt = '(I5.5)'
+         write (suffix,fmt) FileIter
+         filename=trim(OUTPUT_DIR)//'power/powerLP11b_y_'//trim(suffix)//'.dat'
+         open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
+         do i = 1,NumPts
+            write(UNIT=9, FMT="(es12.5)") power_LP11b_y(i)
+         enddo
+         close(UNIT=9)
+         !WRITE TO FILE
+         write(*,*) ' get_power: printing LP21a (y) mode power (signal) to file..'
+         fmt = '(I5.5)'
+         write (suffix,fmt) FileIter
+         filename=trim(OUTPUT_DIR)//'power/powerLP21a_y_'//trim(suffix)//'.dat'
+         open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
+         do i = 1,NumPts
+            write(UNIT=9, FMT="(es12.5)") power_LP21a_y(i)
+         enddo
+         close(UNIT=9)
+         !WRITE TO FILE
+         write(*,*) ' get_power: printing LP21b (y) mode power (signal) to file..'
+         fmt = '(I5.5)'
+         write (suffix,fmt) FileIter
+         filename=trim(OUTPUT_DIR)//'power/powerLP21b_y_'//trim(suffix)//'.dat'
+         open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
+         do i = 1,NumPts
+            write(UNIT=9, FMT="(es12.5)") power_LP21b_y(i)
+         enddo
+         close(UNIT=9)
+         !WRITE TO FILE
+         write(*,*) ' get_power: printing LP02 (y) mode power (signal) to file..'
+         fmt = '(I5.5)'
+         write (suffix,fmt) FileIter
+         filename=trim(OUTPUT_DIR)//'power/powerLP02_y_'//trim(suffix)//'.dat'
+         open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
+         do i = 1,NumPts
+            write(UNIT=9, FMT="(es12.5)") power_LP02_y(i)
          enddo
          close(UNIT=9)
       endif
 !
    90 continue
    deallocate(zValues,sign_power,pump_power,diff_power,core_power,clad_power)
-   deallocate(power_LP01,power_LP11,power_LP21,power_LP02)
-   deallocate(norm_LP01,norm_LP11,norm_LP21,norm_LP02)
-   deallocate(coef_LP01_r,coef_LP11_r,coef_LP21_r,coef_LP02_r)
-   deallocate(coef_LP01_c,coef_LP11_c,coef_LP21_c,coef_LP02_c)
+!
+   deallocate(power_LP01_x,norm_LP01_x,coef_LP01_r_x,coef_LP01_c_x)
+   deallocate(power_LP11a_x,norm_LP11a_x,coef_LP11a_r_x,coef_LP11a_c_x)
+   deallocate(power_LP11b_x,norm_LP11b_x,coef_LP11b_r_x,coef_LP11b_c_x)
+   deallocate(power_LP21a_x,norm_LP21a_x,coef_LP21a_r_x,coef_LP21a_c_x)
+   deallocate(power_LP21b_x,norm_LP21b_x,coef_LP21b_r_x,coef_LP21b_c_x)
+   deallocate(power_LP02_x,norm_LP02_x,coef_LP02_r_x,coef_LP02_c_x)
+!
+   deallocate(power_LP01_y,norm_LP01_y,coef_LP01_r_y,coef_LP01_c_y)
+   deallocate(power_LP11a_y,norm_LP11a_y,coef_LP11a_r_y,coef_LP11a_c_y)
+   deallocate(power_LP11b_y,norm_LP11b_y,coef_LP11b_r_y,coef_LP11b_c_y)
+   deallocate(power_LP21a_y,norm_LP21a_y,coef_LP21a_r_y,coef_LP21a_c_y)
+   deallocate(power_LP21b_y,norm_LP21b_y,coef_LP21b_r_y,coef_LP21b_c_y)
+   deallocate(power_LP02_y,norm_LP02_y,coef_LP02_r_y,coef_LP02_c_y)
+!
+   99 continue
 !
 end subroutine get_power
 !
@@ -453,8 +757,8 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
    integer :: mdle
 !
 !..element, face order, geometry dof
-   real(8) :: xnod (3,MAXbrickH)
-   real(8) :: maxz,minz
+   real*8 :: xnod (3,8)
+   real*8 :: maxz,minz
 !
 !..miscellanea
    integer :: iel, i, ndom
@@ -502,7 +806,7 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
    do iel=1,NRELES_SUBD
       mdle = ELEM_SUBD(iel)
       if (GEOM_NO .eq. 5) call find_domain(mdle, ndom)
-      call nodcor(mdle, xnod)
+      call nodcor_vert(mdle, xnod)
       etype = NODES(Mdle)%type
       select case(etype)
          case('mdlb')
@@ -526,7 +830,7 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
                   case(3,4); CladPower(i) = CladPower(i) + abs(facePower)
                   end select
                endif
-            elseif (Fld .ge. 13 .and. Fld .le. 16) then
+            elseif ((Fld .ge. 13 .and. Fld .le. 16) .or. Fld .eq. 140 .or. Fld .eq. 150) then
                call compute_mode_power(mdle,faceNum,Fld, facePower,modeNorm,modeCoef)
                DiffPower(i) = DiffPower(i) + modeNorm       ! false name (calc norm)
                CorePower(i) = CorePower(i) + real(modeCoef) ! false name (calc coef_r)
@@ -769,10 +1073,12 @@ end subroutine compute_facePower
 !        in:
 !                      - Mdle       : middle element node
 !                      - Facenumber : element face used for integration
-!                      - Fld        : 13 LP01 Mode
-!                                     14 LP11 Mode
-!                                     15 LP21 Mode
-!                                     16 LP02 Mode
+!                      - Fld        : 13  LP01  Mode
+!                                     14  LP11a Mode
+!                                     140 LP11b Mode
+!                                     15  LP21a Mode
+!                                     150 LP21b Mode
+!                                     16  LP02  Mode
 !       out:
 !                      - ModeNorm   : norm of the mode (for normalization)
 !                      - ModeCoef   : coefficient in the projection on mode

@@ -46,7 +46,7 @@ subroutine volume_hp_mdle(Mdle, Vol)
    real(8), dimension(3)   :: xi,x
    real(8), dimension(3,3) :: dxdxi,dxidx
    real(8) :: wa,rjac
-   integer :: nint,i,k,l,iflag,nrdofH
+   integer :: nint,l,iflag,nrdofH
 !
 !------------------------------------------------------
 !

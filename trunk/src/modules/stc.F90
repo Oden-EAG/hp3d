@@ -103,7 +103,7 @@ subroutine stc_get_nrdof(Mdle, Nrdofi,Nrdofb)
 !..element order
    integer :: nord,norderi(19)
 !
-   integer :: index(NRINDEX),ncase(NR_PHYSA)
+   integer :: ncase(NR_PHYSA)
 !
    integer :: nrdofHmdl,nrdofEmdl,nrdofVmdl,nrdofQmdl
    integer :: nrdoflHi,nrdoflEi,nrdoflVi
@@ -551,7 +551,7 @@ subroutine stc_bwd_wrapper(Iel)
    VTYPE, allocatable :: xi(:,:),xb(:,:)
 !
 !..aux variables
-   integer :: i,j,k,l,ii,load,lH,lE,lV
+   integer :: j,k,l,ii,load,lH,lE,lV
 !
 !--------------------------------------------------------------
 !
@@ -596,11 +596,9 @@ subroutine stc_bwd_wrapper(Iel)
                xi(ni+1:ni+ii,load) = RESHAPE(zdofE(lE+1:lE+l,1:k),(/ii/))
             case('normal')
                xi(ni+1:ni+ii,load) = RESHAPE(zdofV(lV+1:lV+l,1:k),(/ii/))
-#if DEBUG_MODE
             case default
                write(*,*) 'stc_bwd_wrapper: INCONSISTENCY. stop.'
                stop
-#endif
          end select
 !
          ni = ni+ii
@@ -633,8 +631,6 @@ subroutine stc_bwd_wrapper(Iel)
 !
   500 continue
 !
-!   write(*,*) 'stc_bwd_wrapper finished. stop.'
-!   stop
 !
 end subroutine stc_bwd_wrapper
 !
@@ -804,11 +800,11 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
  7007                   format('stc_solout: nod,j,ivar,NODES(nod)%dof%zdofH(ivar,j)', &
                                ' = ',i5,i3,i3,x,2e13.5)
                      endif
+#endif
                   case default
 !                 ...No other case should ever occur on middle node
                      write(*,*) 'stc_solout: INCONSISTENCY. stop.'
                      stop
-#endif
                end select
             enddo
 !     ...end loop over dofs
@@ -855,11 +851,11 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
  7009                   format('stc_solout: nod,j,ivar,NODES(nod)%dof%zdofE(ivar,j)', &
                                ' = ',i5,i3,i3,x,2e13.5)
                      endif
+#endif
                   case default
 !                 ...No other case should ever occur on middle node
                      write(*,*) 'stc_solout: INCONSISTENCY. stop.'
                      stop
-#endif
                end select
             enddo
 !     ...end loop over dofs
@@ -906,11 +902,11 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
  7010                   format('stc_solout: nod,j,ivar,NODES(nod)%dof%zdofV(ivar,j)', &
                                ' = ',i5,i3,i3,x,2e13.5)
                      endif
+#endif
                   case default
 !                 ...No other case should ever occur on middle node
                      write(*,*) 'stc_solout: INCONSISTENCY. stop.'
                      stop
-#endif
                end select
             enddo
 !     ...end loop over dofs
@@ -962,11 +958,11 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
  7011                   format('stc_solout: nod,j,ivar,NODES(nod)%dof%zdofQ(ivar,j)', &
                                ' = ',i5,i3,i3,x,2e13.5)
                      endif
+#endif
                   case default
 !                 ...No other case should ever occur on middle node
                      write(*,*) 'stc_solout: INCONSISTENCY. stop.'
                      stop
-#endif
                end select
             enddo
 !     ...end loop over dofs

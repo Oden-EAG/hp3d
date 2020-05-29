@@ -182,8 +182,8 @@ subroutine set_3Dint_aux(Type,Norder,Maxp,Max_nint3, Nint,Xiloc,Waloc)
 !  ...initialize if needed
       if (.not. INITIALIZED) call init_gauss_quadrature
 !
-#if DEBUG_MODE
       iprint=0
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7001) Type,Norder
  7001   format('set_3Dint_aux: Type, Norder = ',a4,2x,19i4)

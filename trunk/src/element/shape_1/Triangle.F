@@ -196,7 +196,7 @@ c
       implicit none
       integer, intent(in)  :: Nord(4),NoriE(3),Nsize(2)
       integer, intent(out) :: NrdofE
-      integer :: i,j,nij,m,v,e,N,nordE,ndofE,nordF,ndofF,iprint
+      integer :: i,j,nij,m,e,N,nordE,ndofE,nordF,ndofF,iprint
       integer :: minI,minJ,minIJ,maxI,maxJ,maxIJ,abc(3),fam,famctr
       logical :: IdecE,IdecF
       double precision, intent(in)  :: X(2)

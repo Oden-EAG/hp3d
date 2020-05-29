@@ -64,12 +64,14 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
       real(8),dimension(  MAXbrickV) :: divV,divVx
       real(8),dimension(  MAXbrickQ) :: shapQ
 !
-      integer :: iprint,iflag,i,j,k,n,ivar,nrdofH,nrdofE,nrdofV,nrdofQ
-      real*8  :: s,rjac
+      integer :: iflag,i,j,k,n,ivar,nrdofH,nrdofE,nrdofV,nrdofQ
+      real(8) :: rjac
+!
+#if DEBUG_MODE
+      integer :: iprint = 0
+#endif
 !
 !-------------------------------------------------------------------------------
-!
-      iprint=0
 !
 !     evaluate H1 shape functions
       etype=NODES(Mdle)%type
@@ -110,7 +112,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
         enddo
       enddo
 !
-!     printing
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7001) Mdle,Xi(1:3)
 7001    format('soleval: Mdle,Xi = ',i8,2x,3f8.3)
@@ -126,6 +128,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
         enddo
         call pause
       endif
+#endif
 !
 !===============================================================================
 !  H(curl) SOLUTION                                                            |
@@ -153,7 +156,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
          enddo
       enddo
 !
-!     printing
+#if DEBUG_MODE
       if (iprint.eq.2) then
          write(*,7001) Mdle,Xi(1:3)
          write(*,7002) X(1:3)
@@ -169,6 +172,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
          enddo
          call pause
       endif
+#endif
 !
 !===============================================================================
 !  H(div) SOLUTION                                                             |
@@ -197,7 +201,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
         enddo
       enddo
 !
-!     printing
+#if DEBUG_MODE
       if (iprint.eq.2) then
         write(*,7001) Mdle,Xi(1:3)
         write(*,7002) X(1:3)
@@ -213,6 +217,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
         enddo
         call pause
       endif
+#endif
 !
 !===============================================================================
 !  L2 SOLUTION                                                                 |
@@ -232,7 +237,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
         enddo
       enddo
 !
-!     printing
+#if DEBUG_MODE
       if (iprint.eq.2) then
         write(*,7001) Mdle,Xi(1:3)
         write(*,7002) X(1:3)
@@ -246,6 +251,6 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
         enddo
         call pause
       endif
-!
+#endif
 !
 end subroutine soleval

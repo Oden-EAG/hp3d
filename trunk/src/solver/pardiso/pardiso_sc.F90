@@ -58,7 +58,6 @@ subroutine pardiso_sc(mtype)
    integer   :: inz,nz,nnz,nrdof_mdl
 !
 !..dummy variables
-   integer :: nvoid
    VTYPE   :: zvoid
 !
 !..work space for celem

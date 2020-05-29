@@ -27,8 +27,8 @@ subroutine nodcor_vert(Mdle, Xnod)
    real(8), intent(out) :: Xnod(3,8)
 !
 !..modified element nodes and corresponding number of dof
-   integer :: nodm(MAXNODM),ndofmH(MAXNODM),ndofmE(MAXNODM),   &
-                            ndofmV(MAXNODM),ndofmQ(MAXNODM)
+   integer :: nodm  (MAXNODM),ndofmH(MAXNODM), &
+              ndofmE(MAXNODM),ndofmV(MAXNODM)
 !
    integer :: nrconH(MAXbrickH),nacH(NACDIM,MAXbrickH),  &
               nrconE(MAXbrickE),nacE(NACDIM,MAXbrickE),  &
@@ -41,13 +41,13 @@ subroutine nodcor_vert(Mdle, Xnod)
 !..modified element dof
    real(8) :: val(3,2*MAXbrickH)
 !
-   integer :: i,j,k,l,kp,nrv,nod,nrnodm,iprint,iv
+   integer :: i,j,k,l,kp,nrv,nrnodm
 !
 !----------------------------------------------------------------------
 !
    Xnod(1:3,1:8) = 0.d0
    val (1:3,1:2*MAXbrickH) = 0.d0
-
+!
 !..determine constraints' coefficients
    call logic(Mdle,2,                           &
               nodm,ndofmH,ndofmE,ndofmV,nrnodm, &
@@ -63,11 +63,12 @@ subroutine nodcor_vert(Mdle, Xnod)
 !
 !..loop through nodes
    do j=1,nrnodm
-!#if DEBUG_MODE
+#if DEBUG_MODE
       if (.not. associated(NODES(nodm(j))%dof)) then
          write(*,*) 'nodcor_vert: dof not associated.'
+         stop
       endif
-!#endif
+#endif
       do i=1,ndofmH(j)
          k=k+1
          val(1:3,k) = NODES(nodm(j))%dof%coord(1:3,i)

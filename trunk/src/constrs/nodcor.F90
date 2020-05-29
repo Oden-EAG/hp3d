@@ -30,8 +30,8 @@ subroutine nodcor(Mdle, Xnod)
    integer :: norder(19)
 !
 !..modified element nodes and corresponding number of dof
-   integer :: nodm(MAXNODM),ndofmH(MAXNODM),ndofmE(MAXNODM),   &
-                            ndofmV(MAXNODM),ndofmQ(MAXNODM)
+   integer :: nodm  (MAXNODM),ndofmH(MAXNODM),  &
+              ndofmE(MAXNODM),ndofmV(MAXNODM)
 !
    integer :: nrconH(MAXbrickH),nacH(NACDIM,MAXbrickH),  &
               nrconE(MAXbrickE),nacE(NACDIM,MAXbrickE),  &
@@ -44,14 +44,15 @@ subroutine nodcor(Mdle, Xnod)
 !..modified element dof
    real(8) :: val(NDIMEN,2*MAXbrickH)
 !
-!..element nodes
-   integer :: nodesl(27), norientl(27)
-!
    integer :: nrdoflH,nrdoflE,nrdoflV,nrdoflQ
-   integer :: nrnodm,nod,ndofH,ndofE,ndofV,ndofQ
-   integer :: i,j,k,l,kp,inod,ivar
+   integer :: nrnodm
+   integer :: i,j,k,l,kp,ivar
 !
+#if DEBUG_MODE
+   integer :: nodesl(27), norientl(27)
+   integer :: inod,nod,ndofH,ndofE,ndofV,ndofQ
    integer :: iprint = 0
+#endif
 !
 !---------------------------------------------------------------------
 !
@@ -205,7 +206,6 @@ subroutine test_nodcor(Mdle)
 !
 !..order of approximation
    integer, dimension(19) :: norder
-   integer, dimension(5)  :: nordf
 !..reference and physical coordinates
    real(8), dimension(3)   :: xi,x
    real(8), dimension(3,3) :: dxdxi,dxidx
@@ -214,27 +214,25 @@ subroutine test_nodcor(Mdle)
    real(8), dimension(  MAX_NINT3) :: wxi
 !..miscellanea
    real(8) :: rjac
-   integer :: mdle, i, nint, l, iflag, ndom, nrdofH, k, j, ifig, &
-              iprint,nv,icheck
-   character(len=4) :: ftype
-
+   integer :: mdle,nint,j,k,l,iflag,ndom,nrdofH,nv
+!
 !..shape function
    real(8), dimension(  MAXbrickH) :: vshapH
    real(8), dimension(3,MAXbrickH) :: dvshapH
-   integer, dimension(12)         :: nedge_orient
-   integer, dimension(6)          :: nface_orient
+   integer, dimension(12)          :: nedge_orient
+   integer, dimension(6)           :: nface_orient
    real(8), dimension(3,MAXbrickH) :: xnod
 !
 !-------------------------------------------------------------------
 !
    if (EXGEOM.ne.0) then
-      write(*,5000)Mdle
+      write(*,5000) Mdle
  5000 format(' test_nodcor: EXACT geometry element! Mdle = ',i10)
       return
    endif
 !
-   call find_domain(mdle, ndom)
-   write(*,7000) mdle,NODES(mdle)%type,ndom
+   call find_domain(Mdle, ndom)
+   write(*,7000) Mdle,NODES(mdle)%type,ndom
 7000 format(' test_nodcor: Mdle,type,ndom = ',i8,2x,a4,2x,i2)
 !
 !..order, orientations, geometry dof
@@ -243,10 +241,10 @@ subroutine test_nodcor(Mdle)
    call nodcor(     Mdle, xnod)
 !
 !..integration points
-   call set_3Dint(NODES(mdle)%type,norder, nint,xiloc,wxi)
+   call set_3Dint(NODES(Mdle)%type,norder, nint,xiloc,wxi)
 !
 !..number of element vertices, need to perform incremental check
-   nv=nvert(NODES(mdle)%type)
+   nv=nvert(NODES(Mdle)%type)
 !
 !..loop over integration points
    do l=1,nint
@@ -255,11 +253,11 @@ subroutine test_nodcor(Mdle)
       xi(1:3) = xiloc(1:3,l)
       write(*,7001)xi(1:3)
  7001 format(' xi = ',3(e12.5,2x))
-
+!
 !  ...shape functions
       call shape3DH(NODES(Mdle)%type,xi,norder,nedge_orient, &
                     nface_orient, nrdofH,vshapH,dvshapH)
-
+!
 !  ...accumulate
       x(1:3)=0.d0 ; dxdxi(1:3,1:3)=0.d0
       do k=1,nrdofH
@@ -270,7 +268,7 @@ subroutine test_nodcor(Mdle)
 !
 !  ...incremental check of geometry dof and jacobian
          rjac=0.d0 ; if (k.ge.nv) call geom(dxdxi, dxidx,rjac,iflag)
-         write(*,6999)k,xnod(1:3,k),rjac
+         write(*,6999) k,xnod(1:3,k),rjac
  6999    format(' k,xnod(1:3,k),rjac = ',i3,2x,3(e12.5,2x),2x,e12.5)
       enddo
 !

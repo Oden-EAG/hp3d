@@ -53,7 +53,7 @@ subroutine compute_error(Flag,Itag)
       integer, dimension(maxvis,10), save :: iwork
 !
 !     miscellanea
-      integer :: mdle,i,nint,iattr,nrdof_tot,ic
+      integer :: mdle,i,iattr,nrdof_tot,ic
 !
 !     printing flag
       integer :: iprint

@@ -8,10 +8,10 @@
 !
 subroutine set_mesh_order(P)
 !
-      use data_structure3D , only : NODES,NRNODS,Is_inactive
+      use data_structure3D , only : NRNODS,Is_inactive
 !
       implicit none
-      integer,intent(in) :: P
+      integer, intent(in) :: P
 !
       integer :: i
 !
@@ -33,7 +33,7 @@ subroutine set_mesh_order(P)
       call update_ddof
 !
 !
-endsubroutine set_mesh_order
+end subroutine set_mesh_order
 !
 !
 !
@@ -88,4 +88,4 @@ subroutine set_p(Nod,P,Q,R)
       call nodmod(Nod, nord)
 !
 !
-endsubroutine set_p
+end subroutine set_p

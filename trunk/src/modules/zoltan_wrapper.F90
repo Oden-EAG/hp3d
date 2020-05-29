@@ -66,7 +66,7 @@ module zoltan_wrapper
 !
       integer(Zoltan_int)   :: ierr
       real   (Zoltan_float) :: ver
-      character(len=4)      :: str
+      !character(len=4)      :: str
 !
       if (ZOLTAN_IS_INIT) then
          write(*,*) 'zoltan_w_init: Zoltan has already been initialized.'
@@ -308,7 +308,7 @@ module zoltan_wrapper
       integer(Zoltan_int), intent(in)  :: Wgt_dim
       real(Zoltan_float) , intent(out) :: Wgts(*)
       integer(Zoltan_int), intent(out) :: Ierr
-      integer :: nrdofi(NR_PHYSA),nrdofb(NR_PHYSA)
+      !integer :: nrdofi(NR_PHYSA),nrdofb(NR_PHYSA)
       integer :: iel,mdle
 !$OMP PARALLEL DO PRIVATE(mdle)
       do iel=1,NRELES_SUBD
@@ -555,19 +555,22 @@ module zoltan_wrapper
                                      nrExp,expGIDs,expLIDs,expProcs,expParts )
       call zoltan_w_handle_err(ierr,'Zoltan_LB_Partition')
 !
-      write(*,*) 'zoltan_w_partition:'
-      write(*,300) '   changes  = ', changes
-      write(*,301) '   nrImp    = ', nrImp
-      write(*,301) '   nrExp    = ', nrExp
+      print_stats = .true.
+      if (print_stats) then
+         write(*,*) 'zoltan_w_partition:'
+         write(*,300) '   changes  = ', changes
+         write(*,301) '   nrImp    = ', nrImp
+         write(*,301) '   nrExp    = ', nrExp
 !
-      write(fmt,'("(A,",I0,"I5)")') nrImp
-      write(6,fmt) '   impProcs = ', impProcs
+         write(fmt,'("(A,",I0,"I5)")') nrImp
+         write(6,fmt) '   impProcs = ', impProcs
 !
-      write(fmt,'("(A,",I0,"I5)")') nrExp
-      write(6,fmt) '   expProcs = ', expProcs
+         write(fmt,'("(A,",I0,"I5)")') nrExp
+         write(6,fmt) '   expProcs = ', expProcs
 !
-  300 format(A,L5)
-  301 format(A,I5)
+  300    format(A,L5)
+  301    format(A,I5)
+      endif
 !
 !  ...collect new subdomains for mesh
       Mdle_subd(1:NRELES) = 0
@@ -586,9 +589,6 @@ module zoltan_wrapper
          call MPI_BCAST (subd,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr_mpi)
          Mdle_subd(iel) = subd
       enddo
-      !write(*,*) 'Suggested new partition is as follows'
-      !write(*,330) Mdle_subd
-  !!! 330 format(<NRELES>I4)
 !
 !  ...deallocate internal data structures
       ierr = Zoltan_LB_Free_Part(impGIDs,impLIDs,impProcs,impParts)

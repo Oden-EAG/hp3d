@@ -52,7 +52,7 @@ subroutine update_gdof()
 !
 !..auxiliary variables
    integer :: iel,iv,ie,ifc,ind,iflag,i,k,loc
-   integer :: mdle,nf,no,nod,nr_elem_nodes,nrnodm,nr_up_elem
+   integer :: mdle,no,nod,nr_elem_nodes,nrnodm,nr_up_elem
 !
 !..additional variables for distributed case
    integer :: src,rcv,tag,count,ierr,j_loc,j_glb,j_off,loc_max

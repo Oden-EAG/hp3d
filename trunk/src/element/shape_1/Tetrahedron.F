@@ -262,7 +262,7 @@ c
       implicit none
       integer, intent(in)  :: Nord(11),NoriE(6),NoriF(4),Nsize(2)
       integer, intent(out) :: NrdofE
-      integer :: i,j,k,nij,nijk,m,v,e,f,N,nordE,ndofE,nordF,ndofF
+      integer :: i,j,k,nij,nijk,m,e,f,N,nordE,ndofE,nordF,ndofF
       integer :: minI,minJ,minK,minIJ,minIJK,maxI,maxJ,maxK,maxIJ,maxIJK
       integer :: nordB,ndofB,iprint,minbeta,famctr,fam,abc(3),abcd(4),d
       logical :: IdecE,IdecF,IdecB(2)

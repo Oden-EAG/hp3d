@@ -1,19 +1,19 @@
 !----------------------------------------------------------------------
-!                                                                     
+!
 !     routine name      - dirichlet
-!                                                                     
-!---------------------------------------------------------------------- 
-!                                                                     
+!
+!----------------------------------------------------------------------
+!
 !     latest revision:  - July 2019
-!                                                                     
+!
 !     purpose:          - return dirichlet data at a point
-!                                                                    
-!     arguments:                                                     
-!                                                                     
-!     in:              
+!
+!     arguments:
+!
+!     in:
 !             X         - a point in physical space
-!             Icase     - node case (specifies what variables are supported)            
-!     out:              
+!             Icase     - node case (specifies what variables are supported)
+!     out:
 !             ValH      - value of the H1 solution
 !             DvalH     - corresponding first derivatives
 !             valE     - value of the H(curl) solution
@@ -23,13 +23,13 @@
 !
 !----------------------------------------------------------------------
 subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
-!    
+!
    use control    , only : NEXACT, GEOM_TOL
    use parameters , only : MAXEQNH,MAXEQNE,MAXEQNV,MAXEQNQ, ZERO
    use common_prob_data
-!   
+!
    implicit none
-!   
+!
    real(8), intent(in)  :: X(3)
    integer, intent(in)  :: Icase,Mdle
 !..exact solution

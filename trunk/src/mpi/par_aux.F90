@@ -24,7 +24,7 @@ subroutine partition_fiber(subd_next)
 !
    integer, intent(out) :: subd_next(NRELES)
 !
-   integer :: iel,mdle,subd,i,k,nrv
+   integer :: iel,mdle,subd,i,nrv
    real(8) :: xnod(NDIMEN,8)
    real(8) :: x3,x3_lo,x3_hi,x3_subd
 !
@@ -468,7 +468,6 @@ subroutine print_coord()
 !
    implicit none
 !
-   integer :: par(NRELES)
    integer :: iel,i,mdle,nrv
    real(8) :: x(NDIMEN), xnod(NDIMEN,8)
 !

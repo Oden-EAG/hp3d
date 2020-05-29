@@ -148,7 +148,7 @@
       integer, dimension(19), intent(out) :: Norder
 !
       character(len=4)           :: type
-      integer :: iprint,nord,nord1,nord2,nord3,norda,i,ie,if,nordh,nordv
+      integer :: nord,nord1,nord2,nord3,norda,i,ie,if,nordh,nordv
 !
 !
       type = NODES(Mdle)%type

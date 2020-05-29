@@ -55,10 +55,6 @@ c
      .          ZdofV(MAXEQNV,MAXbrickV),ZdofQ(MAXEQNQ,MAXbrickQ),
      .          Solev(*),Xmin(3),Xmax(3)
 c
-c  ...approximate solution at a point
-      dimension zsolH(MAXEQNH),zsolE(MAXEQNE),
-     .          zsolV(MAXEQNV),zsolQ(MAXEQNQ)
-c
 c  ...local face nodes numbers
       dimension nface_nodes(9)
 c
@@ -69,10 +65,9 @@ c  ...local order of approximation (4 edges + 1 middle)
       dimension norder_face(5)
 c
 c  ...master face and element coordinates
-      dimension it(2,3,2),t(2),xi(3,3),dxidt(3,2),id_flag(2)
+      dimension it(2,3,2),t(2),xi(3,3),id_flag(2)
       dimension pm(2),pn(2),xtro(3,3),xcoord(3,3),val(3),costr(2,3,3)
-      dimension dxdxi(3,3),dxdt(3,2)
-      dimension e0(3,6),e1(3,6),e2(3,6),utemp(3),cotriancut(2,3,3)
+      dimension utemp(3),cotriancut(2,3,3)
       dimension Xlocinter(3,500)
 c
 c  ...color code for subtriangles, nicknames encoding which edges

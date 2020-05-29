@@ -315,7 +315,7 @@ c  ...left big vertex node
         val = RRRH(2,1, 3,1)*shapsma(1,1)
       end select
       write(*,7005) shapbig(1,1),abs(val-shapbig(1,1))
- 7005 format('setcnstr_edge: LEFT VERTEX NODE SHAPE FUNCTION '
+ 7005 format('setcnstr_edge: LEFT VERTEX NODE SHAPE FUNCTION ',
      .       ' VALUE = ',e12.5, ' DIFFERENCE = ',e12.5)
 c
 c  ...right big vertex node
@@ -327,7 +327,7 @@ c  ...right big vertex node
      .      + 1.0d0        *shapsma(2,1)
       end select
       write(*,7006) shapbig(2,1),abs(val-shapbig(2,1))
- 7006 format('setcnstr_edge: RIGHT VERTEX NODE SHAPE FUNCTION '
+ 7006 format('setcnstr_edge: RIGHT VERTEX NODE SHAPE FUNCTION ',
      .       ' VALUE = ',e12.5, ' DIFFERENCE = ',e12.5)
 c
       write(*,*) 'setcnstr: CONTINUE ?(1/0)'

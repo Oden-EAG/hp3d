@@ -29,13 +29,13 @@
 ! -----------------------------------------------------------------------
 subroutine petsc_solve(mtype)
 !
-   use data_structure3D, only: NRNODS, NRELES, NRELES_SUBD,       &
-                               ELEM_ORDER, ELEM_SUBD,get_subd
+   use data_structure3D, only: NRNODS, NRELES_SUBD, ELEM_SUBD,    &
+                               get_subd
    use assembly,         only: NR_RHS, MAXDOFM, MAXDOFS,          &
-                               MAXbrickH, MAXmdlbH, NRHVAR,       &
-                               MAXbrickE, MAXmdlbE, NREVAR,       &
-                               MAXbrickV, MAXmdlbV, NRVVAR,       &
-                               MAXbrickQ, NRQVAR,                 &
+                               MAXbrickH, MAXmdlbH,               &
+                               MAXbrickE, MAXmdlbE,               &
+                               MAXbrickV, MAXmdlbV,               &
+                               MAXbrickQ,                         &
                                NEXTRACT, IDBC, ZDOFD, ZERO,       &
                                ALOC, BLOC, AAUX, ZAMOD, ZBMOD,    &
                                NR_PHYSA, MAXNODM
@@ -59,7 +59,6 @@ subroutine petsc_solve(mtype)
                            PETSC_VIEWER_STDOUT_WORLD,             &
                            PETSC_DECIDE,KSPSolve,KSPView,         &
                            MAT_FINAL_ASSEMBLY,ADD_VALUES,         &
-                           INSERT_VALUES,PETSC_NULL_INTEGER,      &
                            VecScatterCreateToAll,VecScatterBegin, &
                            VecScatterEnd,VecScatterDestroy,       &
                            SCATTER_FORWARD,VecGetArrayReadF90,    &
@@ -69,8 +68,9 @@ subroutine petsc_solve(mtype)
                            MAT_NEW_NONZERO_ALLOCATION_ERR,        &
                            PETSC_FALSE,VecGetOwnershipRange,      &
                            MatStashGetInfo,MatGetInfo,MAT_LOCAL,  &
-                           MAT_INFO_SIZE,MAT_INFO_MALLOCS,        &
-                           MAT_INFO_NZ_ALLOCATED,MAT_INFO_NZ_USED
+                           MAT_INFO_MALLOCS,MAT_INFO_NZ_USED,     &
+                           MAT_INFO_NZ_ALLOCATED,MAT_INFO_SIZE,   &
+                           INSERT_VALUES !,PETSC_NULL_INTEGER
    use petsc_w_ksp, only:  petsc_ksp_start,petsc_ksp_destroy,     &
                            petsc_ksp,petsc_A,petsc_rhs,petsc_sol
 !
@@ -86,7 +86,7 @@ subroutine petsc_solve(mtype)
 !
 !..integer counters
    integer    :: nrdofm,nrdofc,nrnodm,nrdof,nrdof_mdl,ndof
-   integer    :: idec,iel,mdle,subd,idx,i,j,k,l,k1,k2,inod,nod,nod_subd,nsize
+   integer    :: idec,iel,mdle,subd,i,j,k,l,k1,k2,inod,nod,nod_subd,nsize
 !
 !..MPI variables
    integer :: count,src,rcv,tag,ierr,nr_send,nr_recv
@@ -95,7 +95,7 @@ subroutine petsc_solve(mtype)
 !..PETSc variables
 !  note: PetscScalar  can be real (8byte) or complex (16byte), depending on library linking
    PetscErrorCode petsc_ierr
-   PetscInt petsc_its, petsc_low, petsc_high, petsc_void
+   PetscInt petsc_its, petsc_void !, petsc_low, petsc_high
    PetscInt petsc_nstash, petsc_reallocs, petsc_nvoid
    PetscInt, allocatable :: petsc_dnz(:), petsc_onz(:)
    Vec petsc_sol_glb
@@ -108,7 +108,7 @@ subroutine petsc_solve(mtype)
    character(8)  :: fmt,val_string
 !
 !..Non-zero computation
-   integer :: my_dnz, my_onz, NR_NOD_LIST, NR_NODS_SUBD, NRNODS_SUBD
+   integer :: my_dnz, my_onz, NR_NOD_LIST, NRNODS_SUBD
    integer, allocatable :: NOD_COMM(:,:)
    integer, allocatable :: NR_NOD_INT(:),NOD_DOF(:),NOD_LIST(:),NOD_VIS(:)
    type NOD_SUBD_LIST
@@ -123,7 +123,6 @@ subroutine petsc_solve(mtype)
    integer, allocatable :: TEMP_BUF(:)
 !
 !..dummy variables
-   integer :: nvoid
    VTYPE   :: zvoid
 !
 !..workspace for celem

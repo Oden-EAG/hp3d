@@ -16,7 +16,7 @@ subroutine volume(Vol)
       real(8) :: xi(3), x(3)
       real(8) :: dxdxi(3,3), dxidx(3,3)
       real(8) :: wa, weight, rjac
-      integer :: iprint, mdle, nint, l, iflag, i
+      integer :: iprint, mdle, nint, l, iflag
 !-----------------------------------------------------------------------
 !
       iprint=0

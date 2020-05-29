@@ -99,11 +99,10 @@
 !
 !----------------------------------------------------------------------
 !
-!
   nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
 !
-#if DEBUG_MODE
   iprint = 0
+#if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Icase,Iedge,Type
 7010 format('dhpedgeE: Mdle,Iflag,No,Icase,Iedge,Type = ',5i4,2x,a4)
@@ -123,13 +122,11 @@
   call ndof_nod('medg',norder(Iedge), &
                 ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_edge)
 !
-#if DEBUG_MODE
 ! # of dof cannot be zero
   if (ndofE_edge.le.0) then
     write(*,*) 'dhpedgeE: ndofE_edge = ',ndofE_edge
     stop 1
   endif
-#endif
 !
 ! set order and orientation for the edge node
   call initiate_order(Type, norder_1)
@@ -361,7 +358,8 @@
     enddo
   enddo
 !
-!
+#if DEBUG_MODE
   if (iprint.eq.1) call result
+#endif
 !
   end subroutine dhpedgeE

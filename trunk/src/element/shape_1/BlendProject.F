@@ -928,7 +928,7 @@ c----------------------------------------------------------------------
       subroutine ProjectPyraQF(Mu,DMu, MupF,DMupF,IdecQF)
 c
       implicit none
-      integer :: N,f
+      integer :: N
       logical, intent(out) :: IdecQF(1:2)
       double precision, intent(in)  :: Mu(1:2,0:1),DMu(1:3,1:2,0:1)
       double precision, intent(out) :: MupF(1:2,0:1),DMupF(1:3,1:2,0:1)

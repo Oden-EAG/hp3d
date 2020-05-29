@@ -21,13 +21,13 @@ subroutine shape3bE(Xi,Norder,Nedge_orient,Nface_orient, NrdofE,ShapE,CurlE)
   implicit none
   !-------------------------------------------------------------------
   ! subroutine  arguments
-  real*8, dimension(3)         ,intent(in ) :: Xi
+  real(8),dimension(3)         ,intent(in ) :: Xi
   integer,dimension(19)        ,intent(in ) :: Norder
   integer,dimension(12)        ,intent(in ) :: Nedge_orient
   integer,dimension(6)         ,intent(in ) :: Nface_orient
   integer                      ,intent(out) :: NrdofE
-  real*8,dimension(3,MAXbrickE),intent(out) :: ShapE
-  real*8,dimension(3,MAXbrickE),intent(out) :: CurlE
+  real(8),dimension(3,MAXbrickE),intent(out) :: ShapE
+  real(8),dimension(3,MAXbrickE),intent(out) :: CurlE
   !-------------------------------------------------------------------
   ! local variables
   !-------------------------------------------------------------------
@@ -63,11 +63,11 @@ subroutine shape3bE(Xi,Norder,Nedge_orient,Nface_orient, NrdofE,ShapE,CurlE)
   integer, save :: iflag=0
 
   ! shape Hcurl functions and "derivatives" and others FOR JASON ROUTINE
-  real*8,dimension(3,MAXbrickE) :: shapEjason
-  real*8,dimension(3,MAXbrickE) :: curlEjason
+  real(8),dimension(3,MAXbrickE) :: shapEjason
+  real(8),dimension(3,MAXbrickE) :: curlEjason
   integer :: nrdofEjason, fakenrdofP
-  real*8,dimension(MAXbrickE) :: fakeShapP
-  real*8,dimension(3,MAXbrickE) :: fakeGradP
+  real(8),dimension(MAXbrickE)   :: fakeShapP
+  real(8),dimension(3,MAXbrickE) :: fakeGradP
 
 
 

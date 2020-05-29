@@ -28,15 +28,15 @@ c
       use gauss_quadrature , only : INITIALIZED,XLEG0
 c
       implicit none
-      real*8,                  intent(in ) :: T
-      integer,                 intent(in ) :: Nord
-      integer,                 intent(in ) :: Norient
-      integer,                 intent(out) :: Nrdof
-      real*8,dimension(MAXP-1),intent(out) :: ShapH,DshapH
+      real(8),                  intent(in ) :: T
+      integer,                  intent(in ) :: Nord
+      integer,                  intent(in ) :: Norient
+      integer,                  intent(out) :: Nrdof
+      real(8),dimension(MAXP-1),intent(out) :: ShapH,DshapH
 c
-      real*8 :: s,dsdt,x,x2,dx
+      real(8) :: s,dsdt,x,x2,dx
       integer :: iprint,k,i
-      real*8,dimension(8) :: v,d
+      real(8),dimension(8) :: v,d
 c
 c----------------------------------------------------------------------
 c
@@ -54,7 +54,7 @@ c
 c  ...check maximum order of approximation
       if (Nord.gt.MAXP) then
         write(*,7001) Nord,MAXP
- 7001   format(' shapHke: Nord,MAXP = ',2(i3x))
+ 7001   format(' shapHke: Nord,MAXP = ',2(i3,1x))
         stop
       endif
 c
@@ -173,13 +173,13 @@ c
       use parameters , only : MAXP
 c
       implicit none
-      real*8,                  intent(in ) :: T
-      integer,                 intent(in ) :: Nord
-      integer,                 intent(in ) :: Norient
-      integer,                 intent(out) :: Nrdof
-      real*8,dimension(MAXP-1),intent(out) :: ShapH,DshapH
+      real(8),                  intent(in ) :: T
+      integer,                  intent(in ) :: Nord
+      integer,                  intent(in ) :: Norient
+      integer,                  intent(out) :: Nrdof
+      real(8),dimension(MAXP-1),intent(out) :: ShapH,DshapH
 c
-      real*8 :: v,dv
+      real(8) :: v,dv
       integer :: iprint,k
       logical :: JASON
 c
@@ -236,16 +236,16 @@ c
       use parameters , only : MAXP
       implicit none
 c
-      real*8,                  intent(in ) :: T
-      integer,                 intent(in ) :: Nord
-      integer,                 intent(in ) :: Norient
-      integer,                 intent(out) :: Nrdof
-      real*8,dimension(MAXP-1),intent(out) :: ShapH,DshapH
+      real(8),                  intent(in ) :: T
+      integer,                  intent(in ) :: Nord
+      integer,                  intent(in ) :: Norient
+      integer,                  intent(out) :: Nrdof
+      real(8),dimension(MAXP-1),intent(out) :: ShapH,DshapH
 c
-      real*8,dimension(MAXP+1) :: v,d
+      real(8),dimension(MAXP+1) :: v,d
       integer :: nvoid,i
-      real*8 :: s,dsdt
-      real*8,parameter :: factor=0.5d0
+      real(8) :: s,dsdt
+      real(8),parameter :: factor=0.5d0
 c----------------------------------------------------------------------
 c
 c  ...number of dof's associated to edge

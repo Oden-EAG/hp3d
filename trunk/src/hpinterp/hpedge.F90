@@ -62,7 +62,7 @@
 !
 ! geometry
   real(8)                               :: t,rjac,bjac,prod
-  real(8), dimension(3)                 :: xi,eta,rn,x
+  real(8), dimension(3)                 :: xi,eta,x
   real(8), dimension(3)                 :: dxidt,detadt,rt
   real(8), dimension(3,3)               :: detadxi,dxideta,dxdeta
 !
@@ -75,7 +75,7 @@
   real(8), dimension(MAXP-1,3)          :: bb,uu
 !
 ! misc work space
-  integer :: iprint,nrv,nre,nrf,i,j,k,ie,kj,ki,&
+  integer :: iprint,nrv,nre,nrf,i,j,k,kj,ki,&
              ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_Edge,iflag1
 !
 !----------------------------------------------------------------------

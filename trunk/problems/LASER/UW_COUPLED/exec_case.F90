@@ -23,8 +23,9 @@ subroutine exec_case(idec)
    integer :: physNick
 !
    integer :: iParAttr(6)
+   character(len=2) :: vis_level
 !
-   integer :: fld,numPts,i,refs
+   integer :: fld,numPts,i,mdle,kref,refs
 !
    integer :: src,count,ierr
 !
@@ -48,28 +49,28 @@ subroutine exec_case(idec)
 !        - 6 L2 (pump,   E and H Field)
 !
          iParAttr = (/1,2,2,1,6,6/)
-!         write(*,300) ' paraview output: select fields...'   , &
-!                      '  - 1 H1 (heat)'                      , &
-!                      '  - 2 H(curl) (signal, E and H flux)' , &
-!                      '  - 2 H(curl) (pump,   E and H flux)' , &
-!                      '  - 1 H(div) (heat flux)'             , &
-!                      '  - 6 L2 (signal, E and H field)'     , &
-!                      '  - 6 L2 (pump,   E and H Field)'
-!         read (*,*) iParAttr(1),iParAttr(2),iParAttr(3), &
-!                    iParAttr(4),iParAttr(5),iParAttr(6)
-!     300 format(A,/,A,/,A,/,A,/,A,/,A,/,A)
-!
-!         write(*,*) 'paraview output: select VLEVEL (0-4)...'
-!         read (*,*) vis_level
-!         select case(vis_level)
-!            case('0','1','2','3','4')
-!               VLEVEL = vis_level
-!            case default
-!               write(*,*) ' invalid VLEVEL. setting VLEVEL=3 (default).'
-!               VLEVEL = '3'
-!         end select
-!
-         iParAttr = (/0,0,0,0,1,0/)
+         write(*,300) ' paraview output: select fields...'   , &
+                      '  - 1 H1 (heat)'                      , &
+                      '  - 2 H(curl) (signal, E and H flux)' , &
+                      '  - 2 H(curl) (pump,   E and H flux)' , &
+                      '  - 1 H(div) (heat flux)'             , &
+                      '  - 6 L2 (signal, E and H field)'     , &
+                      '  - 6 L2 (pump,   E and H Field)'
+         read (*,*) iParAttr(1),iParAttr(2),iParAttr(3), &
+                    iParAttr(4),iParAttr(5),iParAttr(6)
+     300 format(A,/,A,/,A,/,A,/,A,/,A,/,A)
+
+         write(*,*) 'paraview output: select VLEVEL (0-4)...'
+         read (*,*) vis_level
+         select case(vis_level)
+            case('0','1','2','3','4')
+               VLEVEL = vis_level
+            case default
+               write(*,*) ' invalid VLEVEL. setting VLEVEL=3 (default).'
+               VLEVEL = '3'
+         end select
+
+!         iParAttr = (/0,0,0,0,2,0/)
          call my_paraview_driver(iParAttr)
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
@@ -190,6 +191,12 @@ subroutine exec_case(idec)
          write(*,*) 'calling Frontal (Seq) solver...'
          call solve1(1)
 !
+!  ...solve problem with PETSc solver (MPI)
+      case(45)
+!     ...TODO: use positive definite flag here
+         write(*,*) 'calling PETSc (MPI) solver...'
+         call petsc_solve('H')
+!
 !  ...compute error for problem with known solution
       case(50)
          if (NEXACT .eq. 0) then
@@ -227,6 +234,44 @@ subroutine exec_case(idec)
          count = 1; src = ROOT
          call MPI_BCAST (numPts,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
          call get_avgTemp(numPts,-1)
+!
+!  ...debugging routines
+      case(70)
+         if (RANK.eq.ROOT) then
+            write(*,*) 'Select on mdle node from the list: '
+            do i=1,NRELES
+               write(*,2610) ELEM_ORDER(i)
+          2610 format(I6)
+            enddo
+            read(*,*) mdle
+         endif
+         if (NUM_PROCS .gt. 1) then
+            count = 1; src = ROOT
+            call MPI_BCAST (mdle,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+         endif
+         select case(NODES(mdle)%type)
+            case('mdlb'); kref = 110
+            case('mdlp'); kref = 10
+         end select
+         call refine(mdle,kref)
+         call close_mesh
+         call update_gdof
+         call update_Ddof
+      case(71)
+         do i = 1,13
+            write(*,100) 'Iteration ', i
+            mdle = ELEM_ORDER(NRELES/2)
+            select case(NODES(mdle)%type)
+               case('mdlb'); kref = 110
+               case('mdlp'); kref = 10
+            end select
+            call refine(mdle,kref)
+            call close_mesh
+            call update_gdof
+            call update_Ddof
+         enddo
+     100 format(/,'/////////////////////////////////////////////////////////////', &
+                /,'             ',A,I4,/)
 !
       case default
          write(*,*) 'exec_case: unknown case...'

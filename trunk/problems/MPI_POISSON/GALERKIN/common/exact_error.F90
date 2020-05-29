@@ -1,13 +1,13 @@
 !----------------------------------------------------------------------
-!                                                                     
+!
 !    routine            - exact_error
-!                                                                     
-!---------------------------------------------------------------------- 
-!                                                                     
+!
+!----------------------------------------------------------------------
+!
 !     latest revision:  - July 2019
-!                                                                     
+!
 !     purpose:          - compute and print exact error
-!                                                                    
+!
 !----------------------------------------------------------------------
 subroutine exact_error
 !
@@ -18,7 +18,7 @@ subroutine exact_error
    use par_mesh   , only: DISTRIBUTED,HOST_MESH
    use mpi_param  , only: ROOT,RANK
    use MPI        , only: MPI_SUM,MPI_COMM_WORLD,MPI_REAL8
-!   
+!
    implicit none
 !
    integer :: iflag(1)
@@ -34,7 +34,7 @@ subroutine exact_error
    iflag(1) = 1
 !
 !..fetch active elements
-   if ((DISTRIBUTED) .and. (.not. HOST_MESH)) then
+   if (DISTRIBUTED .and. (.not. HOST_MESH)) then
       if (RANK .eq. ROOT) then
          write(*,*) 'exact_error: mesh is distributed. computing error in parallel...'
       endif
@@ -54,7 +54,7 @@ subroutine exact_error
    do iel=1,NRELES_SUBD
       call element_error(ELEM_SUBD(iel),iflag,           &
                          errorH,errorE,errorV,errorQ,    &
-                         rnormH,rnormE,rnormV,rnormQ)  
+                         rnormH,rnormE,rnormV,rnormQ)
       error_subd = error_subd + errorH
       rnorm_subd = rnorm_subd + rnormH
    enddo

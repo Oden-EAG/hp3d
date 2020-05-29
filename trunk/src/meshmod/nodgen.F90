@@ -43,12 +43,15 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
 !
    integer :: ncase(NR_PHYSA)
 !
-   integer :: iprint,ndofH,ndofE,ndofV,ndofQ,nvar
+   integer :: ndofH,ndofE,ndofV,ndofQ,nvar
+!
+#if DEBUG_MODE
+   integer :: iprint = 0
+#endif
 !
 !-----------------------------------------------------------------------
 !
 #if DEBUG_MODE
-   iprint=0
    if (iprint.eq.1) then
       write(*,7000) Type,Icase,Nbcond,Nfath,Norder,Iact
  7000 format(' nodgen: Type,Icase,Nbcond,Nfath,Norder,Iact = ', &

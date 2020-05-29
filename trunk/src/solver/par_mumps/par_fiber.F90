@@ -42,7 +42,7 @@ recursive subroutine par_fiber(mumps,nrdof,nproc)
    use MPI       , only: MPI_UNDEFINED,MPI_STATUS_IGNORE,      &
                          MPI_REAL8,MPI_COMPLEX16,MPI_INTEGER,  &
                          MPI_IN_PLACE,MPI_SUM
-   use mpi_param , only: RANK,ROOT,NUM_PROCS
+   use mpi_param , only: RANK,ROOT
    use parameters, only: ZERO,ZONE
    use stc,        only: stc_bwd
    use par_mumps
@@ -91,10 +91,10 @@ recursive subroutine par_fiber(mumps,nrdof,nproc)
    VTYPE, allocatable :: Aii(:,:),Bi(:)
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time,time_stamp
+   real(8) :: MPI_Wtime,time_stamp
 !
 !..info (verbose output if true)
-   logical :: info = .true.
+   !logical :: info = .true.
    logical :: dbg  = .false. ! print additional info for debugging purposes
 !
 !..auxiliary storage for reallocation
@@ -194,8 +194,8 @@ recursive subroutine par_fiber(mumps,nrdof,nproc)
 !
 !..allocate subproblem data structures
    mumps_sub%N = dof_sub
-   nnz_sub = mumps%NNZ_loc     ! -> TODO: can we give a better estimate (upper bound)
-   mumps_sub%NNZ_loc = nnz_sub ! -> adjust later before calling solver
+   nnz_sub = int(mumps%NNZ_loc,4) ! -> TODO: can we give a better estimate (upper bound)
+   mumps_sub%NNZ_loc = nnz_sub    ! -> adjust later before calling solver
    mumps_sub%NRHS = NR_RHS + dof_int
    mumps_sub%LRHS = dof_sub
    allocate(mumps_sub%IRN_loc(nnz_sub))
@@ -213,7 +213,7 @@ recursive subroutine par_fiber(mumps,nrdof,nproc)
       endif
 !
 !  ...create sparse matrix Aib in COO format
-      nnz_ib = mumps%NNZ_loc ! -> TODO: can we give a better estimate (upper bound)
+      nnz_ib = int(mumps%NNZ_loc,4) ! -> TODO: can we give a better estimate (upper bound)
       allocate(Aib_val(nnz_ib))
       allocate(Aib_row(nnz_ib))
       allocate(Aib_col(nnz_ib))
@@ -239,7 +239,7 @@ recursive subroutine par_fiber(mumps,nrdof,nproc)
       enddo
    endif
    kbb = 0; kib = 0 ! nnz counters
-   do k = 1,mumps%NNZ_loc
+   do k = 1,int(mumps%NNZ_loc,4)
       i = mumps%IRN_loc(k)
       j = mumps%JCN_loc(k)
       x = mumps%A_loc(k)

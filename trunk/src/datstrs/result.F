@@ -38,9 +38,10 @@ c  ...egde and face orientations decode
 c  ...tetra elem print
       dimension nodesl(27),norientl(27)
 c
-c  ...work space for neig-face
-      dimension neig(2), nsid_list(2),norient_list(2)
-      dimension neig_mdle(4,6)
+c  ...work space for neig_face
+ccc      dimension neig(2),nsid_list(2),norient_list(2)
+ccc      dimension neig_mdle(4,6)
+c
       character(len=4) :: type
 c
 c----------------------------------------------------------------------

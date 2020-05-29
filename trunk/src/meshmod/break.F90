@@ -22,10 +22,8 @@ subroutine break(Mdle,Kref)
    integer, dimension(27)  :: nodesl,norientl
    integer, dimension(6)   :: kreff
    integer, dimension(12)  :: krefe
-   integer, dimension(4)   :: iv
-   integer, dimension(4,6) :: neig
-   integer :: i, j, is, iprint, iface, ipass
-   integer :: kref_face, kref_edge, nod, nrsons, subd
+   integer :: i, is, iprint, iface, ipass
+   integer :: kref_face, kref_edge, nod, nrsons
    logical :: iact
 !
 !-------------------------------------------------------------------------

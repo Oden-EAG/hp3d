@@ -1,14 +1,14 @@
 !----------------------------------------------------------------------
-!                                                                     
+!
 !     program name      - main
-!                                                                     
-!---------------------------------------------------------------------- 
-!                                                                     
-!     latest revision:  - Aug 2019
-!                                                                     
+!
+!----------------------------------------------------------------------
+!
+!     latest revision:  - May 2020
+!
 !     purpose:          - main driver for MPI Test Program
 !                         Poisson Galerkin implementation
-!                                                                    
+!
 !----------------------------------------------------------------------
 !
 program main
@@ -124,7 +124,7 @@ subroutine master_main()
 !
    use MPI           , only: MPI_COMM_WORLD,MPI_INTEGER
    use mpi_param     , only: ROOT,RANK,NUM_PROCS
-   use par_mesh      , only: DISTRIBUTED
+   use par_mesh      , only: DISTRIBUTED,HOST_MESH
    use zoltan_wrapper, only: zoltan_w_set_lb
 !
    implicit none
@@ -166,6 +166,11 @@ subroutine master_main()
       write(*,*) '=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='
       write(*,*) 'SELECT'
       write(*,*) 'QUIT....................................0'
+      write(*,*) '                                         '
+      write(*,*) '     ---- Visualization, I/O ----        '
+      write(*,*) 'HP3D graphics (graphb)..................1'
+      write(*,*) 'HP3D graphics (graphg)..................2'
+      write(*,*) 'Paraview................................3'
       write(*,*) '                                         '
       write(*,*) '    ---- Print Data Structure ----       '
       write(*,*) 'Print arrays (interactive).............10'
@@ -212,6 +217,23 @@ subroutine master_main()
       select case(idec)
 !     ...QUIT
          case(0) ; goto 89
+!
+!     ...HP3D graphics
+         case(1)
+            if (DISTRIBUTED .and. (.not. HOST_MESH)) then
+               write(*,*) 'Cannot use HP3D graphics with distributed mesh!'
+            else
+               call graphb
+            endif
+         case(2)
+            if (DISTRIBUTED .and. (.not. HOST_MESH)) then
+               write(*,*) 'Cannot use HP3D graphics with distributed mesh!'
+            else
+               call graphg
+            endif
+!
+!     ...Paraview graphics
+         case(3) ; call exec_case(idec)
 !
 !     ...Print data structure
          case(10,11)
@@ -337,6 +359,12 @@ subroutine worker_main()
       select case(idec)
 !     ...QUIT
          case(0) ; goto 99
+!
+!     ...HP3D graphics (do not use with distributed mesh)
+         case(1,2) ;
+!
+!     ...Paraview graphics
+         case(3) ; call exec_case(idec)
 !
 !     ...Print data structure
          case(10,11)

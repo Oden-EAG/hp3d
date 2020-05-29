@@ -35,8 +35,8 @@ c  ...element order of approximation
       dimension norder(19)
 c
 c  ...modified element nodes and corresponding number of dof
-      dimension nodm(MAXNODM),ndofmH(MAXNODM),ndofmE(MAXNODM),
-     .                        ndofmV(MAXNODM),ndofmQ(MAXNODM)
+      dimension nodm  (MAXNODM),ndofmH(MAXNODM),
+     .          ndofmE(MAXNODM),ndofmV(MAXNODM)
 c
       dimension nrconH(MAXbrickH),nrconE(MAXbrickE),nrconV(MAXbrickV),
      .          nacH(NACDIM,MAXbrickH),constrH(NACDIM,MAXbrickH),

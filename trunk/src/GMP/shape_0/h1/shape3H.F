@@ -25,10 +25,10 @@ c
       integer , dimension(12)          , intent(in)  :: Nedge_orient
       integer , dimension(6)           , intent(in)  :: Nface_orient
       integer , dimension(19)          , intent(in)  :: Norder
-      real*8  , dimension(3)           , intent(in)  :: Xi
+      real(8) , dimension(3)           , intent(in)  :: Xi
       integer ,                          intent(out) :: Nrdof
-      real*8  , dimension(  MAXbrickH) , intent(out) :: ShapH
-      real*8  , dimension(3,MAXbrickH) , intent(out) :: DshapH
+      real(8) , dimension(  MAXbrickH) , intent(out) :: ShapH
+      real(8) , dimension(3,MAXbrickH) , intent(out) :: DshapH
 c
 c----------------------------------------------------------------------
 c
@@ -490,7 +490,7 @@ c
 #include "syscom.blk"
       common /cshapeHn/ iprint
 c
-      real*8 , dimension(3), intent(in) :: Xi
+      real(8) , dimension(3), intent(in) :: Xi
       dimension Nedge_orient(6), Nface_orient(4),Norder(11)
 ccc      dimension Xi(3),ShapH(MAXbrickH),DshapH(3,MAXbrickH)
       dimension ShapH(MAXbrickH),DshapH(3,MAXbrickH)

@@ -32,7 +32,7 @@ subroutine par_solve(mumps)
    integer :: ierr,mRANK,mNUM_PROCS
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time,time_stamp
+   real(8) :: MPI_Wtime,time_stamp
 !
 !..info (verbose output if true)
    logical :: info = .true.
@@ -42,7 +42,7 @@ subroutine par_solve(mumps)
    call MPI_COMM_RANK(mumps%COMM, mRANK     ,ierr)
    call MPI_COMM_SIZE(mumps%COMM, mNUM_PROCS,ierr)
 !
-   if (mRANK .eq. ROOT .and. info) then
+   if ((mRANK.eq.ROOT) .and. info) then
       write(*,*) '[',RANK,'] par_solve:'
       write(*,*) ' - solving distributed sparse problem: mNUM_PROCS = ',mNUM_PROCS
       write(*,*) ' - mumps%icntl(28) = ', mumps%icntl(28)

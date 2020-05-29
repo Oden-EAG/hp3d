@@ -25,14 +25,16 @@ subroutine close_mesh()
    integer, dimension(27) :: nodesl,norientl
    integer, dimension(6)  :: kreff
    integer, dimension(12) :: krefe
-   integer :: istat, i, j, ic, mdle, nod, kref, nre, nrf
+   integer :: i, j, ic, mdle, nod, kref
    integer :: nreles_aux
    logical :: nflag
    real(8) :: MPI_Wtime,start_time,end_time
    integer :: ierr
 !
-   integer :: iprint
-   iprint = 0
+#if DEBUG_MODE
+   integer :: nre, nrf
+   integer :: iprint = 0
+#endif
 !
 !-----------------------------------------------------------------------------
 !
@@ -50,7 +52,7 @@ subroutine close_mesh()
 !     Step 1 : check constrained nodes
 !---------------------------------------------------------
 #if DEBUG_MODE
-      if (RANK.eq.ROOT .and. iprint.eq.2) then
+      if ((RANK.eq.ROOT) .and. (iprint.eq.2)) then
          write(*,*) 'close_mesh: CHECK CONSTRAINING NODES'
       endif
 #endif
@@ -74,7 +76,7 @@ subroutine close_mesh()
 !$OMP END DO
 !
 #if DEBUG_MODE
-   if (RANK.eq.ROOT .and. iprint.eq.2) then
+   if ((RANK.eq.ROOT) .and. (iprint.eq.2)) then
       !$OMP SINGLE
       write(*,*) 'close_mesh: RESOLVE THE NODES MORE THAN ONE IRREGULARITY'
       !$OMP END SINGLE
@@ -123,7 +125,7 @@ subroutine close_mesh()
          if (nflag) then
 !
 #if DEBUG_MODE
-            if (RANK.eq.ROOT .and. iprint.eq.1) then
+            if ((RANK.eq.ROOT) .and. (iprint.eq.1)) then
                !$OMP CRITICAL
                nre = nedge(NODES(mdle)%type)
                nrf = nface(NODES(mdle)%type)
@@ -164,13 +166,13 @@ subroutine close_mesh()
 !$OMP END DO
 !$OMP END PARALLEL
 !
-!#if DEBUG_MODE
+#if DEBUG_MODE
       iprint = 2
-      if (RANK.eq.ROOT .and. iprint.eq.2) then
+      if ((RANK.eq.ROOT) .and. (iprint.eq.2)) then
          write(*,*) 'close_mesh: number of elements to refine ', ic
       endif
       iprint = 0
-!#endif
+#endif
 !
 !     loop exit condition
       if (ic.eq.0) exit
@@ -185,7 +187,7 @@ subroutine close_mesh()
          kref = list(2,i)
          if (is_leaf(mdle)) then
 #if DEBUG_MODE
-            if (RANK.eq.ROOT .and. iprint.eq.1) then
+            if ((RANK.eq.ROOT) .and. (iprint.eq.1)) then
                write(*,7001) i, mdle, NODES(mdle)%type, kref
     7001       format('close_mesh: i= ',i6,' mdle= ', i6,' ', a4, ' ref_kind = ',i5)
             endif

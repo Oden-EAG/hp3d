@@ -69,7 +69,6 @@ subroutine elemBCIerror(Mdle, ErrorH,ErrorE,ErrorV)
 !
 ! work space for shape3H
   integer                               :: nrdofH
-  integer, dimension(19)                :: norder_1
   real(8), dimension(MAXbrickH)         :: shapH
   real(8), dimension(3,MAXbrickH)       :: gradH
 !
@@ -121,8 +120,6 @@ subroutine elemBCIerror(Mdle, ErrorH,ErrorE,ErrorV)
   VTYPE :: zddifHdeta(MAXEQNH,3)
   VTYPE :: zdifEeta(3,MAXEQNE),zcdifEeta(3,MAXEQNE)
   VTYPE :: zdifVeta(3,MAXEQNV)
-!
-  integer, dimension(NR_PHYSA)          :: ncase
 !
 ! error per component
   real(8) :: derrorH(MAXEQNH),derrorE(MAXEQNE),derrorV(MAXEQNV)

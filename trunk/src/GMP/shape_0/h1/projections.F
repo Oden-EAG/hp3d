@@ -13,11 +13,11 @@ c----------------------------------------------------------------------
       subroutine proj_t2e(Iv1,Iv2,Vshape,Dvshape, T,Dtdxi)
 c
       implicit none
-      integer              ,intent(in ) :: Iv1,Iv2
-      real*8,dimension(  3),intent(in ) :: Vshape
-      real*8,dimension(2,3),intent(in ) :: Dvshape
-      real*8               ,intent(out) :: T
-      real*8,dimension(2)  ,intent(out) :: Dtdxi
+      integer               ,intent(in ) :: Iv1,Iv2
+      real(8),dimension(  3),intent(in ) :: Vshape
+      real(8),dimension(2,3),intent(in ) :: Dvshape
+      real(8)               ,intent(out) :: T
+      real(8),dimension(2)  ,intent(out) :: Dtdxi
 c----------------------------------------------------------------------
 c
       T = (Vshape(Iv2)-Vshape(Iv1)+1.d0)*.5d0
@@ -43,11 +43,11 @@ c
       use element_data , only : QUADR_EDGE_TO_VERT
 c
       implicit none
-      integer              ,intent(in ) :: Iv1,Iv2
-      real*8,dimension(  4),intent(in ) :: Vshape
-      real*8,dimension(2,4),intent(in ) :: Dvshape
-      real*8               ,intent(out) :: T
-      real*8,dimension(2)  ,intent(out) :: Dtdxi
+      integer               ,intent(in ) :: Iv1,Iv2
+      real(8),dimension(  4),intent(in ) :: Vshape
+      real(8),dimension(2,4),intent(in ) :: Dvshape
+      real(8)               ,intent(out) :: T
+      real(8),dimension(2)  ,intent(out) :: Dtdxi
 c
       integer :: iedge,i,iv
 c----------------------------------------------------------------------
@@ -80,11 +80,11 @@ c----------------------------------------------------------------------
       subroutine proj_n2e(Iv1,Iv2,Vshape,Dvshape, T,Dtdxi)
 c
       implicit none
-      integer              ,intent(in ) :: Iv1,Iv2
-      real*8,dimension(  4),intent(in ) :: Vshape
-      real*8,dimension(3,4),intent(in ) :: Dvshape
-      real*8               ,intent(out) :: T
-      real*8,dimension(3)  ,intent(out) :: Dtdxi
+      integer               ,intent(in ) :: Iv1,Iv2
+      real(8),dimension(  4),intent(in ) :: Vshape
+      real(8),dimension(3,4),intent(in ) :: Dvshape
+      real(8)               ,intent(out) :: T
+      real(8),dimension(3)  ,intent(out) :: Dtdxi
 c----------------------------------------------------------------------
 c
       T         =( Vshape(    Iv2)- Vshape(    Iv1)+1.d0)*0.5d0
@@ -108,14 +108,14 @@ c----------------------------------------------------------------------
       subroutine proj_n2f(Iv1,Iv2,Iv3,Vshape,Dvshape, T,Dtdxi)
 c
       implicit none
-      integer              ,intent(in ) :: Iv1,Iv2,Iv3
-      real*8,dimension(  4),intent(in ) :: Vshape
-      real*8,dimension(3,4),intent(in ) :: Dvshape
-      real*8,dimension(2)  ,intent(out) :: T
-      real*8,dimension(2,3),intent(out) :: Dtdxi
+      integer               ,intent(in ) :: Iv1,Iv2,Iv3
+      real(8),dimension(  4),intent(in ) :: Vshape
+      real(8),dimension(3,4),intent(in ) :: Dvshape
+      real(8),dimension(2)  ,intent(out) :: T
+      real(8),dimension(2,3),intent(out) :: Dtdxi
 c
-      real*8              :: tsum
-      real*8,dimension(3) :: dtsum
+      real(8)              :: tsum
+      real(8),dimension(3) :: dtsum
 c----------------------------------------------------------------------
 c
       tsum  =  1.d0 - Vshape(Iv1) - Vshape(Iv2) - Vshape(Iv3)
@@ -256,11 +256,11 @@ c
       use element_data , only : BRICK_FACE_TO_VERT
 c
       implicit none
-      integer              ,intent(in ) :: Iv1,Iv2
-      real*8,dimension(  8),intent(in ) :: Vshape
-      real*8,dimension(3,8),intent(in ) :: Dvshape
-      real*8               ,intent(out) :: T
-      real*8,dimension(3  ),intent(out) :: Dtdxi
+      integer               ,intent(in ) :: Iv1,Iv2
+      real(8),dimension(  8),intent(in ) :: Vshape
+      real(8),dimension(3,8),intent(in ) :: Dvshape
+      real(8)               ,intent(out) :: T
+      real(8),dimension(3  ),intent(out) :: Dtdxi
 c
       integer :: iface,i,iv
 c----------------------------------------------------------------------
@@ -294,11 +294,11 @@ c----------------------------------------------------------------------
       subroutine proj_b2f(Iv1,Iv2,Iv4,Vshape,Dvshape, T,Dtdxi)
 c
       implicit none
-      integer              ,intent(in ) :: Iv1,Iv2,Iv4
-      real*8,dimension(  8),intent(in ) :: Vshape
-      real*8,dimension(3,8),intent(in ) :: Dvshape
-      real*8,dimension(2  ),intent(out) :: T
-      real*8,dimension(2,3),intent(out) :: Dtdxi
+      integer               ,intent(in ) :: Iv1,Iv2,Iv4
+      real(8),dimension(  8),intent(in ) :: Vshape
+      real(8),dimension(3,8),intent(in ) :: Dvshape
+      real(8),dimension(2  ),intent(out) :: T
+      real(8),dimension(2,3),intent(out) :: Dtdxi
 c----------------------------------------------------------------------
 c
 c  ...project on 1st axis

@@ -4,7 +4,7 @@
 # for TACC Stampede2 SKX nodes
 #
 #   *** Hybrid Job on SKX Normal Queue ***
-# 
+#
 #       This sample script specifies:
 #         10 nodes (capital N)
 #         40 total MPI tasks (lower case n); this is 4 tasks/node
@@ -27,7 +27,7 @@
 #      to a number no more than 48 (total cores).
 #
 #   -- If you're running out of memory, try running
-#      fewer tasks and/or threads per node to give each 
+#      fewer tasks and/or threads per node to give each
 #      process access to more memory.
 #
 #   -- IMPI and MVAPICH2 both do sensible process pinning by default.

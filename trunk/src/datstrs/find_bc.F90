@@ -15,8 +15,8 @@ subroutine find_bc(Mdle, Ibc)
   integer, intent(in)    :: Mdle
   integer, intent(out)   :: Ibc(6,NR_PHYSA)
   ! ** Locals
-  integer, dimension(27) :: nodesl, norientl
-  integer :: i, j, nve, iprint
+  integer, dimension(27) :: nodesl,norientl
+  integer :: i,nve,iprint
 !--------------------------------------------------------------------------------
 !
   iprint=0

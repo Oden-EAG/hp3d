@@ -6,15 +6,16 @@
 subroutine global_pref
 !
    use parameters      , only: MAXP
-   use data_structure3D, only: NRELES,NRNODS,NODES,MAXNODM, &
+   use data_structure3D, only: NRELES,NODES,MAXNODM, &
                                ELEM_ORDER,get_subd,set_subd
-   use par_mesh        , only: DISTRIBUTED,get_elem_nodes
-   use mpi_param       , only: RANK
+   use par_mesh        , only: get_elem_nodes!,DISTRIBUTED
+   !use mpi_param       , only: RANK
 !
    implicit none
 !
-   integer :: mdle,p,i,iel,nord,nordx,nordy,nordz,naux,nrnodm,subd
-   integer :: nodm(MAXNODM)
+   integer :: mdle,p,iel,nord,nordx,nordy,nordz,naux
+   !integer :: i,nrnodm,subd
+   !integer :: nodm(MAXNODM)
 !
 !
 !$OMP PARALLEL DO  &
@@ -66,7 +67,7 @@ end subroutine global_pref
 !--------------------------------------------------------------------
 subroutine global_punref
 !
-   use data_structure3D, only: NRELES,NRNODS,NODES,ELEM_ORDER
+   use data_structure3D, only: NRELES,NODES,ELEM_ORDER
    use par_mesh        , only: DISTRIBUTED
 !
    implicit none

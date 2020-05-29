@@ -21,9 +21,6 @@ subroutine exec_job
 !
 !----------------------------------------------------------------------
 !
-!..number of adaptive refinements
-   JMAX = 0
-!
    EXCHANGE_DOF = .false.
 !
    NO_PROBLEM = 3
@@ -62,16 +59,21 @@ subroutine exec_job
 !     ...adaptive h-refinement
          if(RANK .eq. ROOT) write(*,200) '1. adaptive h-refinement...'
          call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-         call refine_DPG(IADAPTIVE,1,0.25d0,flag,physNick,ires, nstop)
+         call refine_DPG(ICLAD,1,0.25d0,flag,physNick,ires, nstop)
+         !call refine_DPG(IADAPTIVE,1,0.25d0,flag,physNick,ires, nstop)
          call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
       endif
       if(RANK .eq. ROOT) write(*,300) end_time - start_time
 !
       if (NUM_PROCS .eq. 1) goto 30
 !
-      if (i .eq. IMAX) then
+      if (i .eq. IMAX-2) then
          call zoltan_w_set_lb(7)
       elseif (i .gt. IMAX) then
+!     ...set load balancing to graph partitioner, and redistribute
+         !call zoltan_w_set_lb(6)
+         goto 30 ! NO LOAD BALANCING
+      else
          goto 30
       endif
 !
@@ -84,7 +86,7 @@ subroutine exec_job
       if(RANK .eq. ROOT) write(*,300) end_time - start_time
 !
    30 continue
-      if (i .le. IMAX-1) cycle
+      if (i .le. IMAX) cycle
       if (NUM_PROCS .eq. 1) goto 60
 !
 !  ...print current partition (elems)
@@ -137,28 +139,32 @@ subroutine exec_job
 !
 !  ...skip computing power
       !goto 80
+      !if (i .lt. IMAX) cycle
+      if (i .lt. IMAX+JMAX) cycle
 !
 !  ...compute power in fiber for signal field
       if(RANK .eq. ROOT) write(*,200) '7. computing power...'
-      numPts = 2**i; fld = 1
+      numPts = 2**min(i,IMAX); fld = 1
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-      call get_power(fld,numPts,-1)
-      !call get_power(fld,numPts,0)
+      !call get_power(fld,numPts,-1) ! write to stdout
+      !call get_power(fld,numPts,i-IMAX) ! write to file
+      call get_power(fld,numPts,i-(IMAX+JMAX)) ! write to file
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
       if(RANK .eq. ROOT) write(*,300) end_time - start_time
 !
    80 continue
 !
-!      if (i .lt. IMAX) cycle
-      if (i .lt. IMAX+JMAX) cycle
-      cycle
+      !if (i .lt. IMAX) cycle
+      !if (i .lt. IMAX+JMAX) cycle
+      cycle ! (do not write paraview output)
 !
 !  ...write paraview output
       if(RANK .eq. ROOT) write(*,200) '8. writing paraview output...'
-      iParAttr = (/0,0,0,0,1,0/)
+      iParAttr = (/0,0,0,0,2,0/)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
       call my_paraview_driver(iParAttr)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
+      if(RANK .eq. ROOT) write(*,300) end_time - start_time
    enddo
 !
 !..compute error on last mesh

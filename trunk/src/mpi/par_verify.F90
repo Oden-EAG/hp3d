@@ -260,7 +260,7 @@ subroutine verify_dof(ipass)
    ipass = 1
 !
    if (.not. DISTRIBUTED) then
-      write(*,*) 'verify_dof: mesh is not distributed.'
+      if (RANK.eq.ROOT) write(*,*) 'verify_dof: mesh is not distributed.'
       goto 390
    endif
 !

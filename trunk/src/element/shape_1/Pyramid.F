@@ -347,7 +347,7 @@ c
       implicit none
       integer, intent(in)  :: Nord(14),NoriE(8),NoriF(5),Nsize(2)
       integer, intent(out) :: NrdofE
-      integer :: iprint,N,m,v,e,f,i,j,k,nij,nordME,ndofME,nordTE,ndofTE
+      integer :: iprint,N,m,e,f,i,j,k,nij,nordME,ndofME,nordTE,ndofTE
       integer :: nordQF(2),ndofQF,nordTF,ndofTF,nordB,ndofB,ab(2),a,b
       integer :: minI,minJ,minK,minIJ,maxI,maxJ,maxK,maxIJ,fam,famctr
       integer :: ij(2),ig,jg,minF(2),maxF(2),abc(3),ijmax
@@ -771,7 +771,7 @@ c
       implicit none
       integer, intent(in)  :: Nord(14),NoriF(5),Nsize(2)
       integer, intent(out) :: NrdofV
-      integer :: iprint,N,m,v,e,f,i,j,k,nij
+      integer :: iprint,N,m,f,i,j,k,nij
       integer :: nordQF(2),ndofQF,nordTF,ndofTF,nordB,ndofB,ab(2),a,b
       integer :: minI,minJ,minK,minIJ,maxI,maxJ,maxK,maxIJ,fam
       integer :: ij(2),ig,jg,minF(2),maxF(2),ijmax

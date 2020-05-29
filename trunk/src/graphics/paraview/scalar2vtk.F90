@@ -62,7 +62,7 @@ subroutine scalar2vtk(Sname,Sfile,Snick,Idx, Ic)
    integer, dimension(NRELES) :: n_vert_offset, n_elem_vert
 !
 !..timer
-   real(8) :: start_time,end_time
+   !real(8) :: start_time,end_time
 !
 !..MPI
    integer :: ierr,count,subd

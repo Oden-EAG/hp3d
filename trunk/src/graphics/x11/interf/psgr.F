@@ -340,7 +340,10 @@ c
       ibufc(ilbuf)=icode
       if (ilbuf.eq.5) call flushps
       return
-      end
+      end subroutine
+c
+c-----------------------------------------------------------------------
+c
       subroutine flushps
 c
 c-----------------------------------------------------------------------
@@ -511,8 +514,9 @@ c
 #include "wvscrn.blk"
 c
         ilepsp=0
-        do 10 i=1,10
-10        igpsp(i)=0
+        do i=1,10
+          igpsp(i)=0
+        enddo
         if (ifile.eq.0) return
         call flushps
         write(ifile,1000)
@@ -520,5 +524,5 @@ c
         close(ifile)
         write(*,*)' PostScript file closed'
         return
-        end
+        end subroutine
 

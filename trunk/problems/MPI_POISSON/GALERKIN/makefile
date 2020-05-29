@@ -41,7 +41,7 @@ one : $(OBJ_PATH)/.dummy $(OBJ)
 
 	@echo " "
 	@echo "- Linking - ", $(EXEC)
-	@echo "- COMPLEX, DEBUG_MODE =" $(COMPLEX), $(DEBUG_MODE)
+	@echo "- COMPLEX, DEBUG =" $(COMPLEX), $(DEBUG)
 	@echo "------------------------------ "
 	$(FC_WORK) -o $(EXEC) $(OBJ) $(PROB_LIBS)
 
@@ -68,3 +68,7 @@ clean :
 	@rm -rf $(OBJ_ROOT)
 	@rm -f $(EXECS)
 	@rm -f *~
+
+clean-pv :
+	@rm -f ../outputs/paraview/*.xmf
+	@rm -f ../outputs/paraview/*.h5

@@ -70,6 +70,11 @@ program main
       write(6,*) '//  -- MPI LASER AMPLIFIER  --  //'
       write(6,*) '//                              //'
       write(6,*)
+#if DEBUG_MODE
+      write(*,*) '    =========================    '
+      write(*,*) '      RUNNING in DEBUG_MODE      '
+      write(*,*) '    =========================    '
+#endif
    endif
    flush(6)
 !
@@ -107,11 +112,16 @@ program main
       write(*,9000) ' Wavelengths/Unit length  = ', 1.d0/(LAMBDA_SIGNAL/REF_INDEX_CORE)
       write(*,9000) ' Numerical Aperture       = ', NA
       write(*,9000) ' V-number                 = ', VNUM
+      write(*,9000) ' Core ref index           = ', CORE_NX
+      write(*,9000) ' Clad ref index           = ', CLAD_NX
    endif
    if (ANISO_REF_INDEX .eq. 1) then
       write(*,9010) ' ANISO_REF_INDEX          = ', ANISO_REF_INDEX
       write(*,9000) ' CORE_NY                  = ', CORE_NY
       write(*,9000) ' CLAD_NY                  = ', CLAD_NY
+   endif
+   if (ART_GRATING .eq. 1) then
+      write(*,9010) ' ART_GRATING              = ', ART_GRATING
    endif
    if (USE_PML) then
       write(*,9000) ' PML_REGION               = ', PML_REGION
@@ -235,6 +245,8 @@ subroutine master_main()
 !
 !..auxiliary variables
    integer :: idec, i, r, lb, count, src
+   character(len=8) :: filename
+   integer :: mdle,nr_elem_ref,kref
 !
 !----------------------------------------------------------------------
 !
@@ -296,6 +308,7 @@ subroutine master_main()
       write(*,*) 'MUMPS (OpenMP).........................42'
       write(*,*) 'Pardiso (OpenMP).......................43'
       write(*,*) 'Frontal (Seq)..........................44'
+      write(*,*) 'PETSc (MPI)............................45'
       write(*,*) '                                         '
       write(*,*) '     ---- Error and Residual ----        '
       write(*,*) 'Compute exact error....................50'
@@ -304,6 +317,11 @@ subroutine master_main()
       write(*,*) '            ---- Misc ----               '
       write(*,*) 'Compute Power .........................60'
       write(*,*) 'Compute Temperature ...................61'
+      write(*,*) '                                         '
+      write(*,*) '          ---- Debugging ----            '
+      write(*,*) 'Refine a single element................70'
+      write(*,*) 'Random refinements.....................71'
+      write(*,*) 'Read HIST file.........................72'
       write(*,*) '=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='
 !
       read( *,*) idec
@@ -364,7 +382,7 @@ subroutine master_main()
             call exec_case(idec)
 !
 !     ...Solvers
-         case(40,41,42,43,44)
+         case(40,41,42,43,44,45)
             call exec_case(idec)
 !
 !     ...Error and Residual
@@ -374,6 +392,57 @@ subroutine master_main()
 !     ...Miscellanea
          case(60,61)
             call exec_case(idec)
+!
+!     ...Debugging routines
+         case(70,71)
+            call exec_case(idec)
+!
+         case(72)
+            if (NUM_PROCS > 1) then
+               write(*,*) 'cannot use NHIST for MPI currently. returning...'
+               cycle
+            endif
+            ! WRITE FOR DEBUGGING
+            filename='HIST.dat'
+            open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="UNKNOWN",ACTION="READ")
+            do
+               write(*,*) 'A. reading from file and refining'
+               read(UNIT=9, FMT="(I6)") nr_elem_ref
+               write(*,*) '   nr_elem_ref = ', nr_elem_ref
+               do i=1,nr_elem_ref
+                  read(UNIT=9, FMT="(I6)") mdle
+                  select case (NODES(mdle)%type)
+                     case('mdlb'); kref = 110
+                     case('mdlp'); kref = 10
+                     case default
+                        write(*,*) 'READING UNEXPECTED ELEMENT TYPE (mdle): ',NODES(mdle)%type,' (',mdle,')'
+                        call pause
+                  end select
+                  call refine(mdle,kref)
+               enddo
+               call pause
+               write(*,*) 'B. calling close_mesh'
+               call close_mesh
+               call pause
+               write(*,*) 'C. calling update_gdof'
+               call update_gdof
+!               call pause
+               write(*,*) 'D. calling update_Ddof'
+               call update_Ddof
+               write(*,*) 'solve?  1 = YES; 0 = NO'
+               read(*,*) i
+               if (i .eq. 1) then
+                  write(*,*) 'E. calling pardiso_sc'
+                  call pardiso_sc('H')
+                  write(*,*) '   computing residual'
+                  call residual()
+               endif
+               write(*,*) 'continue?  1 = YES; 0 = NO'
+               read(*,*) i
+               if (i .eq. 0) exit
+            enddo
+            close(UNIT=9)
+            ! END WRITE FOR DEBUGGING
 !
       end select
 !
@@ -477,7 +546,7 @@ subroutine worker_main()
             call exec_case(idec)
 !
 !     ...Solvers
-         case(40,41,42,43,44)
+         case(40,41,42,43,44,45)
             call exec_case(idec)
 !
 !     ...Error and Residual
@@ -486,6 +555,10 @@ subroutine worker_main()
 !
 !     ...Miscellanea
          case(60,61)
+            call exec_case(idec)
+!
+!     ...Debugging routines
+         case(70,71)
             call exec_case(idec)
 !
       end select

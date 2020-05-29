@@ -22,7 +22,7 @@ subroutine check_negative_jacobian(Nodesl, Nsize)
   integer, dimension(19) :: norder
   ! miscellanea
   real(8) :: rjac
-  integer :: mdle, iel, i, k, nint, int_back, l, iflag, ndom, ic, nrdofH
+  integer :: mdle, iel, i, k, nint, int_back, l, iflag, ic, nrdofH
   character(len=4) :: type
   !-------------------------------------------------------------------
 

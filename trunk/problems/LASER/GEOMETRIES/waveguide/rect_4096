@@ -35,7 +35,7 @@ Regular
 Seglin
 1 2
 Seglin
-2 3 
+2 3
 Seglin
 4 3
 Seglin
@@ -43,9 +43,9 @@ Seglin
 Seglin
 5 6
 Seglin
-6 7 
+6 7
 Seglin
-8 7 
+8 7
 Seglin
 5 8
 Seglin
@@ -67,7 +67,7 @@ BilQua
 BilQua
 5 6 7 8
 BilQua
-1 2 6 5 
+1 2 6 5
 BilQua
 2 3 7 6
 BilQua
@@ -77,7 +77,7 @@ BilQua
 
 0 NRPRISM
 
-1 NRHEXAS 
+1 NRHEXAS
 Linear
 1  1 2 3 4 5 6 7 8
 

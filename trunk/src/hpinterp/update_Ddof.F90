@@ -53,7 +53,7 @@ subroutine update_Ddof()
 !
 !..auxiliary variables
    integer :: iel,iv,ie,ifc,ind,iflag
-   integer :: mdle,nf,no,nod,nrv,nre,nrf
+   integer :: mdle,no,nod
    integer :: i,k,loc,nr_elem_nodes,nrnodm,nr_up_elem
 !
 !..additional variables for distributed case

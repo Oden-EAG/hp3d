@@ -14,7 +14,7 @@ subroutine check_invmap
       real(8),dimension(3,MAXbrickH) :: xnod
       real(8),dimension(2)           :: t
       real(8),dimension(3,3)         :: dxdxi
-      real(8),dimension(3,2)         :: dxdt,dxidt
+      real(8),dimension(3,2)         :: dxidt
 !
       integer,dimension(12) :: nedge_orient
       integer,dimension(6)  :: nface_orient

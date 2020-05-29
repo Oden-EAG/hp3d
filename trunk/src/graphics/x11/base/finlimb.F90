@@ -17,7 +17,7 @@
     integer :: nrdofH, nrdofE, nrdofV, nrdofQ
     ! geometry dof and master coordinates
     real(8), dimension(2) :: t
-    real(8), dimension(3) :: xi, xp
+    real(8), dimension(3) :: xp
     real(8)               :: xnod(NDIMEN,MAXbrickH)
     character(len=4)      :: type
     VTYPE :: &

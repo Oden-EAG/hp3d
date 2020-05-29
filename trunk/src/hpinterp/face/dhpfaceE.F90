@@ -103,18 +103,16 @@
 !
 ! misc
   integer :: nrv,nre,nrf,nsign,nflag, &
-             i,j,iH,jH,iE,jE,kjE,kiE,kiH,kjH,k,kE,&
+             i,j,jH,iE,jE,kjE,kiE,kjH,k,kE,&
              ivarE,nvarE,naE,iprint,info, &
              ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,ndofE_tot
 !
 !-----------------------------------------------------------------------
-  if (Iface.eq.2) then
-    iprint=0
-  else
-    iprint=0
-  endif
 !
   nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
+!
+  iprint = 0
+#if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Icase,Iface,Type
 7010 format('dhpfaceE: Mdle,Iflag,No,Icase,Iface,Type = ',5i4,2x,a4)
@@ -128,6 +126,7 @@
 7050 format('          Norder = ',19i4)
      call pause
   endif
+#endif
 !
 ! determine # of dof for the face node
   call ndof_nod(face_type(Type,Iface),Norder(nre+Iface), &
@@ -142,10 +141,13 @@
      norder_1(ie) = Norder(ie)
   enddo
   norder_1(nre+Iface) = Norder(nre+Iface)
+!
+#if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,7060) norder_1; call pause
 7060 format('dhpfaceE: norder_1 = ',20i4)
   endif
+#endif
 !
 ! get face order to find out quadrature information
   call face_order(Type,Iface,Norder, norder_face)
@@ -180,12 +182,15 @@
      call brefgeom3D(Mdle,xi,Etav,shapH,gradH,nrv,dxidt,nsign, &
                      eta,detadxi,dxideta,rjac,detadt,rn,bjac)
      weight = wa*bjac
+!
+#if DEBUG_MODE
      if (iprint.eq.1) then
        write(*,7100) xi(1:2),eta(1:3),detadxi(1:3,1:3),rn(1:3),bjac
 7100   format('dhpfaceE: xi,eta  = ',2f8.3,3x,3f8.3,/, &
               '          detadxi = ',3(3f8.3,2x),/, &
               '          rn,bjac = ',3f8.3,3x,f8.3)
      endif
+#endif
 !
 !    call GMP routines to evaluate physical coordinates and their
 !    derivatives wrt reference coordinates
@@ -214,6 +219,8 @@
      zcurlE(1,1:MAXEQNE) = zdvalE(3,1:MAXEQNE,2) - zdvalE(2,1:MAXEQNE,3)
      zcurlE(2,1:MAXEQNE) = zdvalE(1,1:MAXEQNE,3) - zdvalE(3,1:MAXEQNE,1)
      zcurlE(3,1:MAXEQNE) = zdvalE(2,1:MAXEQNE,1) - zdvalE(1,1:MAXEQNE,2)
+!
+#if DEBUG_MODE
      if (iprint.eq.1) then
        write(*,7130) x(1:3)
 7130   format('dhpfaceE: x      = ',3f8.3)
@@ -226,6 +233,7 @@
               '                    ',3(2e12.5,2x),/,&
               '                    ',3(2e12.5,2x))
      endif
+#endif
 !
 !    use Piola transforms to transform the Dirichlet data to reference
 !    coordinates
@@ -239,12 +247,15 @@
                            + detadx(i,j)*zcurlE(j,1:MAXEQNE)*rjacdxdeta
        enddo
      enddo
+!
+#if DEBUG_MODE
      if (iprint.eq.1) then
        write(*,*) 'zvalEeta, zcurlEeta BEFORE EDGE SUBTRACTION = '
        write(*,7110) zvalEeta(1:3,1:MAXEQNE)
 7110   format(2(3(2e10.3,2x),3x))
        write(*,7110) zcurlEeta(1:3,1:MAXEQNE)
      endif
+#endif
 !
 !    remove contributions from edges
 !
@@ -267,12 +278,15 @@
                                - ZdofE(1:MAXEQNE,kE)*curluE(i)
        enddo
      enddo
+!
+#if DEBUG_MODE
      if (iprint.eq.1) then
        write(*,*) 'zvalEeta, zcurlEeta AFTER EDGE SUBTRACTION = '
        write(*,7110) zvalEeta(1:3,1:MAXEQNE)
        write(*,7110) zcurlEeta(1:3,1:MAXEQNE)
        call pause
      endif
+#endif
 !
 !    loop through element face test H(curl) functions
      do jE=1,ndofE_face
@@ -373,6 +387,7 @@
   enddo
   ndofE_tot = ndofE_face + ndofH_face
 !
+#if DEBUG_MODE
   if (iprint.ge.1) then
     write(*,*) 'dhpfaceE: LOAD VECTOR AND STIFFNESS MATRIX FOR ', &
                'ndofE_face,ndofH_face = ',ndofE_face,ndofH_face
@@ -387,6 +402,7 @@
 # endif
 7016    format(10e12.5)
   endif
+#endif
 !
 !------------------------------------------------------
 !
@@ -429,7 +445,7 @@
           zuE,naE)
 #endif
 !
-!
+#if DEBUG_MODE
   if (iprint.ge.1) then
      write(*,*) 'dhpfaceE: k,zuE(k) = '
      do k=1,ndofE_tot
@@ -437,14 +453,18 @@
      enddo
      call pause
   endif
+#endif
 !
 !------------------------------------------------------
 !
 ! save the dof
   call decod(Icase,2,NR_PHYSA, ncase)
+!
+#if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,*) 'dhpfaceE: ncase = ', ncase
   endif
+#endif
 !
   ivarE=0; nvarE=0
 !
@@ -468,5 +488,8 @@
     enddo
   enddo
 !
+#if DEBUG_MODE
   if (iprint.eq.1) call result
+#endif
+!
   end subroutine dhpfaceE
