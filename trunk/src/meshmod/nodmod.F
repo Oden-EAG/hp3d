@@ -33,15 +33,16 @@ c
      .           iprint_copy_dofV,iprint_copy_dofQ
 c
       integer                              :: Nod,Nordn
-      real*8, dimension(NDIMEN,MAXmdlbH)   ::  xnod
-      VTYPE,  dimension(MAXEQNH,MAXmdlbH)  :: zdofH
-      VTYPE,  dimension(MAXEQNE,MAXmdlbE)  :: zdofE
-      VTYPE,  dimension(MAXEQNV,MAXmdlbV)  :: zdofV
-      VTYPE,  dimension(MAXEQNQ,MAXmdlbQ)  :: zdofQ
+      real*8, allocatable   ::  xnod(:,:)
+      VTYPE,  allocatable   :: zdofH(:,:)
+      VTYPE,  allocatable   :: zdofE(:,:)
+      VTYPE,  allocatable   :: zdofV(:,:)
+      VTYPE,  allocatable   :: zdofQ(:,:)
 c
       character(len=4) :: ntype
       integer          :: iprint,icase,nordo,ndofH,ndofE,ndofV,ndofQ,
-     .                    ndofHo,ndofEo,ndofVo,ndofQo,nvar
+     .                    ndofHo,ndofEo,ndofVo,ndofQo,
+     .                    nvarH,nvarE,nvarV,nvarQ
 c
       select case(Nod)
       case(1)
@@ -72,32 +73,37 @@ c  ...determine the current number of dof
 c
 c  ...save current gdofs in local array and update number of gdofs
       if (Associated(NODES(Nod)%dof%coord)) then
+        allocate(xnod(NDIMEN,ndofH))
         xnod(1:NDIMEN,1:ndofH) = NODES(Nod)%dof%coord(1:NDIMEN,1:ndofH)
         deallocate(NODES(Nod)%dof%coord)
       endif
 c      
 c  ...save current dof in local arrays
       if (Associated(NODES(Nod)%dof%zdofH)) then
-        nvar = NREQNH(icase)*NRCOMS
-        zdofH(1:nvar,1:ndofH) = NODES(Nod)%dof%zdofH(1:nvar,1:ndofH)
+        nvarH = NREQNH(icase)*NRCOMS
+        allocate(zdofH(nvarH,ndofH))
+        zdofH(1:nvarH,1:ndofH) = NODES(Nod)%dof%zdofH(1:nvarH,1:ndofH)
         deallocate(NODES(Nod)%dof%zdofH)
         NRDOFSH = NRDOFSH - ndofH*NREQNH(icase)
       endif
       if (Associated(NODES(Nod)%dof%zdofE)) then
-        nvar = NREQNE(icase)*NRCOMS
-        zdofE(1:nvar,1:ndofE) = NODES(Nod)%dof%zdofE(1:nvar,1:ndofE)
+        nvarE = NREQNE(icase)*NRCOMS
+        allocate(zdofE(nvarE,ndofE))
+        zdofE(1:nvarE,1:ndofE) = NODES(Nod)%dof%zdofE(1:nvarE,1:ndofE)
         deallocate(NODES(Nod)%dof%zdofE)
         NRDOFSE = NRDOFSE - ndofE*NREQNE(icase)
       endif
       if (Associated(NODES(Nod)%dof%zdofV)) then
-        nvar = NREQNV(icase)*NRCOMS
-        zdofV(1:nvar,1:ndofV) = NODES(Nod)%dof%zdofV(1:nvar,1:ndofV)
+        nvarV = NREQNV(icase)*NRCOMS
+        allocate(zdofV(nvarV,ndofV))
+        zdofV(1:nvarV,1:ndofV) = NODES(Nod)%dof%zdofV(1:nvarV,1:ndofV)
         deallocate(NODES(Nod)%dof%zdofV)
         NRDOFSV = NRDOFSV - ndofV*NREQNV(icase)
       endif
       if (Associated(NODES(Nod)%dof%zdofQ)) then
-        nvar = NREQNQ(icase)*NRCOMS
-        zdofQ(1:nvar,1:ndofQ) = NODES(Nod)%dof%zdofQ(1:nvar,1:ndofQ)
+        nvarQ = NREQNQ(icase)*NRCOMS
+        allocate(zdofQ(nvarQ,ndofQ))
+        zdofQ(1:nvarQ,1:ndofQ) = NODES(Nod)%dof%zdofQ(1:nvarQ,1:ndofQ)
         deallocate(NODES(Nod)%dof%zdofQ)
         NRDOFSQ = NRDOFSQ - ndofQ*NREQNQ(icase)
       endif
@@ -123,36 +129,61 @@ c  ...allocate memory for geometry and solution dof
 c     and copy old dof from the local arrays
       if (ndofH.gt.0) then
         allocate(NODES(Nod)%dof%coord(NDIMEN,ndofH))
-        call copy_dofG(ntype,nordo,Nordn,ndofHo,ndofH,
-     .                 xnod,NODES(Nod)%dof%coord)
+        if (ndofHo.gt.0) then
+          call copy_dofG(ntype,nordo,Nordn,ndofHo,ndofH,
+     .                   xnod,NODES(Nod)%dof%coord)
+          deallocate(xnod)
+        else
+          NODES(Nod)%dof%coord=0.d0
+        endif
       endif
       if ((NREQNH(icase).gt.0).and.(ndofH.gt.0)) then
-        nvar = NREQNH(icase)*NRCOMS
-        allocate( NODES(Nod)%dof%zdofH(nvar, ndofH))
+        nvarH = NREQNH(icase)*NRCOMS
+        allocate( NODES(Nod)%dof%zdofH(nvarH, ndofH))
         NRDOFSH = NRDOFSH + ndofH*NREQNH(icase)
-        call copy_dofH(ntype,nordo,Nordn,ndofHo,ndofH,
-     .                 zdofH,NODES(Nod)%dof%zdofH)
+        if (ndofHo.gt.0) then
+          call copy_dofH(ntype,nordo,Nordn,ndofHo,ndofH,
+     .                   nvarH,zdofH,NODES(Nod)%dof%zdofH)
+          deallocate(zdofH)
+        else
+          NODES(Nod)%dof%zdofH = ZERO
+        endif
       endif
       if ((NREQNE(icase).gt.0).and.(ndofE.gt.0)) then
-        nvar = NREQNE(icase)*NRCOMS
-        allocate( NODES(Nod)%dof%zdofE(nvar, ndofE))
+        nvarE = NREQNE(icase)*NRCOMS
+        allocate( NODES(Nod)%dof%zdofE(nvarE, ndofE))
         NRDOFSE = NRDOFSE + ndofE*NREQNE(icase)
-        call copy_dofE(ntype,nordo,Nordn,ndofEo,ndofE,
-     .                 zdofE,NODES(Nod)%dof%zdofE)
+        if (ndofEo.gt.0) then
+          call copy_dofE(ntype,nordo,Nordn,ndofEo,ndofE,
+     .                   nvarE,zdofE,NODES(Nod)%dof%zdofE)
+          deallocate(zdofE)
+        else
+          NODES(Nod)%dof%zdofE = ZERO
+        endif
       endif
       if ((NREQNV(icase).gt.0).and.(ndofV.gt.0)) then
-        nvar = NREQNV(icase)*NRCOMS
-        allocate( NODES(Nod)%dof%zdofV(nvar, ndofV))
+        nvarV = NREQNV(icase)*NRCOMS
+        allocate( NODES(Nod)%dof%zdofV(nvarV, ndofV))
         NRDOFSV = NRDOFSV + ndofV*NREQNV(icase)
-        call copy_dofV(ntype,nordo,Nordn,ndofVo,ndofV,
-     .                 zdofV,NODES(Nod)%dof%zdofV)
+        if (ndofVo.gt.0) then
+          call copy_dofV(ntype,nordo,Nordn,ndofVo,ndofV,
+     .                   nvarV,zdofV,NODES(Nod)%dof%zdofV)
+          deallocate(zdofV)
+        else
+          NODES(Nod)%dof%zdofV = ZERO
+        endif
       endif
       if ((NREQNQ(icase).gt.0).and.(ndofQ.gt.0)) then
-        nvar = NREQNQ(icase)*NRCOMS
-        allocate( NODES(Nod)%dof%zdofQ(nvar, ndofQ))
+        nvarQ = NREQNQ(icase)*NRCOMS
+        allocate( NODES(Nod)%dof%zdofQ(nvarQ, ndofQ))
         NRDOFSQ = NRDOFSQ + ndofQ*NREQNQ(icase)
-        call copy_dofQ(ntype,nordo,Nordn,ndofQo,ndofQ,
-     .                 zdofQ,NODES(Nod)%dof%zdofQ)
+        if (ndofQo.gt.0) then
+          call copy_dofQ(ntype,nordo,Nordn,ndofQo,ndofQ,
+     .                   nvarQ,zdofQ,NODES(Nod)%dof%zdofQ)
+          deallocate(zdofQ)
+        else
+          NODES(Nod)%dof%zdofQ = ZERO
+        endif
       endif
 c
 c
@@ -260,22 +291,23 @@ c     in:
 c        Ntype         - node type
 c        Nordo,Nordn   - old and new orders of the node
 c        NdofHo,NdofHn - old and new # dof
+c        NvarH         - first dimension of ZdofHo,ZdofHn
 c        ZdofHo,ZdofHn - old and new dof
 c
 c-----------------------------------------------------------------------
 c
       subroutine copy_dofH(Ntype,Nordo,Nordn,NdofHo,NdofHn,
-     .                     ZdofHo,ZdofHn)
+     .                     NvarH,ZdofHo,ZdofHn)
 c
       use parameters, only: MAXEQNH
       implicit none
       common /ccopy_dofH/ iprint
       integer :: iprint
 c
-      character(len=4)                  :: Ntype
-      integer                           :: Nordo,Nordn,NdofHo,NdofHn
-      VTYPE, dimension (MAXEQNH,NdofHo) :: ZdofHo
-      VTYPE, dimension (MAXEQNH,NdofHn) :: ZdofHn
+      character(len=4)                :: Ntype
+      integer                         :: Nordo,Nordn,NdofHo,NdofHn,NvarH
+      VTYPE, dimension (NvarH,NdofHo) :: ZdofHo
+      VTYPE, dimension (NvarH,NdofHn) :: ZdofHn
 c
       integer :: nord1o,nord2o,nord3o,
      .           nord1n,nord2n,nord3n
@@ -290,20 +322,20 @@ c
 c
 c  ...edge, triangle, tet, pyramid
       case('medg','mdlt','mdln','mdld')
-        call copy_1array(MAXEQNH,ZdofHo,NdofHo, ZdofHn,NdofHn)
+        call copy_1array(NvarH,ZdofHo,NdofHo, ZdofHn,NdofHn)
 c
 c  ...quad
       case('mdlq')
         call decode(Nordo, nord1o,nord2o)
         call decode(Nordn, nord1n,nord2n)
-        call copy_2array(MAXEQNH,ZdofHo,nord1o-1,nord2o-1, 
-     .                           ZdofHn,nord1n-1,nord2n-1)
+        call copy_2array(NvarH,ZdofHo,nord1o-1,nord2o-1, 
+     .                         ZdofHn,nord1n-1,nord2n-1)
 c
 c  ...prism
       case('mdlp')
         call decode(Nordo, nord1o,nord2o)
         call decode(Nordn, nord1n,nord2n)
-        call copy_2array(MAXEQNH,
+        call copy_2array(NvarH,
      .                   ZdofHo,(nord1o-2)*(nord1o-1)/2,nord2o-1, 
      .                   ZdofHn,(nord1n-2)*(nord1n-1)/2,nord2n-1)
 c
@@ -311,8 +343,8 @@ c  ...hexa
       case('mdlb')
         call ddecode(Nordo, nord1o,nord2o,nord3o)
         call ddecode(Nordn, nord1n,nord2n,nord3n)
-        call copy_3array(MAXEQNH,ZdofHo,nord1o-1,nord2o-1,nord3o-1,
-     .                           ZdofHn,nord1n-1,nord2n-1,nord3n-1)
+        call copy_3array(NvarH,ZdofHo,nord1o-1,nord2o-1,nord3o-1,
+     .                         ZdofHn,nord1n-1,nord2n-1,nord3n-1)
 c
       end select
       if (iprint.eq.1) write(*,*) 'copy_dofH: DONE'
@@ -337,22 +369,23 @@ c     in:
 c        Ntype         - node type
 c        Nordo,Nordn   - old and new orders of the node
 c        NdofEo,NdofEn - old and new # dof
+c        NvarE         - first dimension of ZdofEo,ZdofEn
 c        ZdofEo,ZdofEn - old and new dof
 c
 c-----------------------------------------------------------------------
 c
       subroutine copy_dofE(Ntype,Nordo,Nordn,NdofEo,NdofEn,
-     .                     ZdofEo,ZdofEn)
+     .                     NvarE,ZdofEo,ZdofEn)
 c
       use parameters, only: MAXEQNE
       implicit none
       common /ccopy_dofE/ iprint
       integer :: iprint
 c
-      character(len=4)                 :: Ntype
-      integer                          :: Nordo,Nordn,NdofEo,NdofEn
-      VTYPE, dimension(MAXEQNE,NdofEo) :: ZdofEo
-      VTYPE, dimension(MAXEQNE,NdofEn) :: ZdofEn
+      character(len=4)               :: Ntype
+      integer                        :: Nordo,Nordn,NdofEo,NdofEn,NvarE
+      VTYPE, dimension(NvarE,NdofEo) :: ZdofEo
+      VTYPE, dimension(NvarE,NdofEn) :: ZdofEn
 c
       integer :: nord1o,nord2o,nord3o,
      .           nord1n,nord2n,nord3n,
@@ -368,13 +401,13 @@ c
 c
 c  ...segment
       case('medg')
-        call copy_1array(MAXEQNE,ZdofEo,NdofEo, ZdofEn,NdofEn)
+        call copy_1array(NvarE,ZdofEo,NdofEo, ZdofEn,NdofEn)
 c
 c  ...triangle
       case('mdlt')
 c
 c  .....the 2 families are intertwined to form a hierarchy
-        call copy_1array(MAXEQNE,ZdofEo,NdofEo, ZdofEn,NdofEn)
+        call copy_1array(NvarE,ZdofEo,NdofEo, ZdofEn,NdofEn)
 c
 c  ...quadrilateral
       case('mdlq')
@@ -383,14 +416,14 @@ c  ...quadrilateral
         ibego=1; ibegn=1
 c
 c  .....family 1
-        call copy_2array(MAXEQNE,ZdofEo(1,ibego),nord1o,nord2o-1, 
-     .                           ZdofEn(1,ibegn),nord1n,nord2n-1)
+        call copy_2array(NvarE,ZdofEo(1,ibego),nord1o,nord2o-1, 
+     .                         ZdofEn(1,ibegn),nord1n,nord2n-1)
         ibego=ibego+nord1o*(nord2o-1)
         ibegn=ibegn+nord1n*(nord2n-1)
 c
 c  .....family 2
-        call copy_2array(MAXEQNE,ZdofEo(1,ibego),nord1o-1,nord2o, 
-     .                           ZdofEn(1,ibegn),nord1n-1,nord2n)
+        call copy_2array(NvarE,ZdofEo(1,ibego),nord1o-1,nord2o, 
+     .                         ZdofEn(1,ibegn),nord1n-1,nord2n)
         ibego=ibego+(nord1o-1)*nord2o - 1
         ibegn=ibegn+(nord1n-1)*nord2n - 1
 c
@@ -403,7 +436,7 @@ c  ...tetrahedron
       case('mdln')
 c
 c  .....the 3 families are intertwined to form a hierarchy
-        call copy_1array(MAXEQNE,ZdofEo,NdofEo, ZdofEn,NdofEn)
+        call copy_1array(NvarE,ZdofEo,NdofEo, ZdofEn,NdofEn)
 c
 c  ...prism
       case('mdlp')
@@ -412,14 +445,14 @@ c  ...prism
         ibego=1; ibegn=1
 c
 c  .....first 2 families are (horizontally) intertwined 
-        call copy_2array(MAXEQNE,
+        call copy_2array(NvarE,
      .                   ZdofEo(1,ibego),nord1o*(nord1o-1),nord2o-1, 
      .                   ZdofEn(1,ibegn),nord1n*(nord1n-1),nord2n-1)
         ibego=ibego+nord1o*(nord1o-1)*(nord2o-1)
         ibegn=ibegn+nord1n*(nord1n-1)*(nord2n-1)
 c
 c  .....3rd family
-        call copy_2array(MAXEQNE,
+        call copy_2array(NvarE,
      .                   ZdofEo(1,ibego),(nord1o-2)*(nord1o-1)/2,nord2o, 
      .                   ZdofEn(1,ibegn),(nord1n-2)*(nord1n-1)/2,nord2n)
         ibego=ibego+(nord1o-2)*(nord1o-1)/2*nord2o - 1
@@ -439,21 +472,21 @@ c  ...hexahedron
         ibego=1; ibegn=1
 c
 c  .....family 1
-        call copy_3array(MAXEQNE,
+        call copy_3array(NvarE,
      .                   ZdofEo(1,ibego),nord1o,nord2o-1,nord3o-1,
      .                   ZdofEn(1,ibegn),nord1n,nord2n-1,nord3n-1)
         ibego=ibego+nord1o*(nord2o-1)*(nord3o-1)
         ibegn=ibegn+nord1n*(nord2n-1)*(nord3n-1)
 c
 c  .....family 2
-        call copy_3array(MAXEQNE,
+        call copy_3array(NvarE,
      .                   ZdofEo(1,ibego),nord1o-1,nord2o,nord3o-1,
      .                   ZdofEn(1,ibegn),nord1n-1,nord2n,nord3n-1)
         ibego=ibego+(nord1o-1)*nord2o*(nord3o-1)
         ibegn=ibegn+(nord1n-1)*nord2n*(nord3n-1)
 c
 c  .....family 3
-        call copy_3array(MAXEQNE,
+        call copy_3array(NvarE,
      .                   ZdofEo(1,ibego),nord1o-1,nord2o-1,nord3o,
      .                   ZdofEn(1,ibegn),nord1n-1,nord2n-1,nord3n)
         ibego=ibego+(nord1o-1)*(nord2o-1)*nord3o - 1
@@ -471,24 +504,24 @@ c  ...pyramid
         ibego=1; ibegn=1
 c
 c  .....FAMILY 1 (gradients of H1 bubbles) 
-        call copy_3array(MAXEQNE,
+        call copy_3array(NvarE,
      .                   ZdofEo(1,ibego),Nordo-1,Nordo-1,Nordo-1,
      .                   ZdofEn(1,ibegn),Nordn-1,Nordn-1,Nordn-1)
         ibego=ibego+(Nordo-1)**3
         ibegn=ibegn+(Nordn-1)**3
 c
 c  .....FAMILY 2 AND 3 (induced from quad face functions)
-        call copy_3array(MAXEQNE,ZdofEo(1,ibego),Nordo,Nordo-1,Nordo-1,
-     .                           ZdofEn(1,ibegn),Nordn,Nordn-1,Nordn-1)
+        call copy_3array(NvarE,ZdofEo(1,ibego),Nordo,Nordo-1,Nordo-1,
+     .                         ZdofEn(1,ibegn),Nordn,Nordn-1,Nordn-1)
         ibego=ibego+Nordo*(Nordo-1)**2
         ibegn=ibegn+Nordn*(Nordn-1)**2
-        call copy_3array(MAXEQNE,ZdofEo(1,ibego),Nordo-1,Nordo,Nordo-1,
-     .                           ZdofEn(1,ibegn),Nordn-1,Nordn,Nordn-1)
+        call copy_3array(NvarE,ZdofEo(1,ibego),Nordo-1,Nordo,Nordo-1,
+     .                         ZdofEn(1,ibegn),Nordn-1,Nordn,Nordn-1)
         ibego=ibego+Nordo*(Nordo-1)**2
         ibegn=ibegn+Nordn*(Nordn-1)**2
 c
 c  .....FAMILY 4 
-        call copy_2array(MAXEQNE,
+        call copy_2array(NvarE,
      .                   ZdofEo(1,ibego),Nordo-1,Nordo-1, 
      .                   ZdofEn(1,ibegn),Nordn-1,Nordn-1)
         ibego=ibego+(Nordo-1)**2 - 1
@@ -522,22 +555,23 @@ c     in:
 c        Ntype         - node type
 c        Nordo,Nordn   - old and new orders of the node
 c        NdofEo,NdofEn - old and new # dof
+c        NvarV         - first dimension of ZdofVo,ZdofVn
 c        ZdofEo,ZdofEn - old and new dof
 c
 c-----------------------------------------------------------------------
 c
       subroutine copy_dofV(Ntype,Nordo,Nordn,NdofVo,NdofVn,
-     .                     ZdofVo,ZdofVn)
+     .                     NvarV,ZdofVo,ZdofVn)
 c
       use parameters, only: MAXEQNV
       implicit none
       common /ccopy_dofV/ iprint
       integer :: iprint
 c
-      character(len=4)                 :: Ntype
-      integer                          :: Nordo,Nordn,NdofVo,NdofVn
-      VTYPE, dimension(MAXEQNV,NdofVo) :: ZdofVo
-      VTYPE, dimension(MAXEQNV,NdofVn) :: ZdofVn
+      character(len=4)               :: Ntype
+      integer                        :: Nordo,Nordn,NdofVo,NdofVn,NvarV
+      VTYPE, dimension(NvarV,NdofVo) :: ZdofVo
+      VTYPE, dimension(NvarV,NdofVn) :: ZdofVn
 c
       integer :: nord1o,nord2o,nord3o,
      .           nord1n,nord2n,nord3n,
@@ -555,7 +589,7 @@ c  ...triangle
       case('mdlt')
 c
 c  .....a hierarchical family
-        call copy_1array(MAXEQNV,ZdofVo,NdofVo, ZdofVn,NdofVn)
+        call copy_1array(NvarV,ZdofVo,NdofVo, ZdofVn,NdofVn)
 c
 c  ...quadrilateral
       case('mdlq')
@@ -563,14 +597,14 @@ c  ...quadrilateral
         call decode(Nordn, nord1n,nord2n)
 c
 c  .....tensor product of hierarchical 1D families
-        call copy_2array(MAXEQNV,ZdofVo,nord1o,nord2o, 
+        call copy_2array(NvarV,ZdofVo,nord1o,nord2o, 
      .                           ZdofVn,nord1n,nord2n)
 c
 c  ...tetrahedron
       case('mdln')
 c
 c  .....3 intertwined hierarchical families form a hierarchical family
-        call copy_1array(MAXEQNV,ZdofVo,NdofVo, ZdofVn,NdofVn)
+        call copy_1array(NvarV,ZdofVo,NdofVo, ZdofVn,NdofVn)
 c
 c  ...prism
       case('mdlp')
@@ -579,14 +613,14 @@ c  ...prism
         ibego=1; ibegn=1
 c
 c  .....first 2 families are (horizontally) intertwined 
-        call copy_2array(MAXEQNV,
+        call copy_2array(NvarV,
      .                   ZdofVo(1,ibego),(nord1o-1)*nord1o,nord2o, 
      .                   ZdofVn(1,ibegn),(nord1n-1)*nord1n,nord2n)
         ibego=ibego+(nord1o-1)*nord1o*nord2o
         ibegn=ibegn+(nord1n-1)*nord1n*nord2n
 c
 c  .....3rd family
-        call copy_2array(MAXEQNV,
+        call copy_2array(NvarV,
      .                   ZdofVo(1,ibego),nord1o*(nord1o+1)/2,nord2o-1, 
      .                   ZdofVn(1,ibegn),nord1n*(nord1n+1)/2,nord2n-1)
         ibego=ibego+nord1o*(nord1o+1)/2*(nord2o-1) - 1
@@ -606,20 +640,20 @@ c  ...hexahedron
         ibego=1; ibegn=1
 c
 c  .....family 1
-        call copy_3array(MAXEQNV,ZdofVo(1,ibego),nord1o,nord2o,nord3o-1,
-     .                           ZdofVn(1,ibegn),nord1n,nord2n,nord3n-1)
+        call copy_3array(NvarV,ZdofVo(1,ibego),nord1o,nord2o,nord3o-1,
+     .                         ZdofVn(1,ibegn),nord1n,nord2n,nord3n-1)
         ibego=ibego+nord1o*nord2o*(nord3o-1)
         ibegn=ibegn+nord1n*nord2n*(nord3n-1)
 c
 c  .....family 2
-        call copy_3array(MAXEQNV,ZdofVo(1,ibego),nord2o,nord3o,nord1o-1,
-     .                           ZdofVn(1,ibegn),nord2n,nord3n,nord1n-1)
+        call copy_3array(NvarV,ZdofVo(1,ibego),nord2o,nord3o,nord1o-1,
+     .                         ZdofVn(1,ibegn),nord2n,nord3n,nord1n-1)
         ibego=ibego+nord2o*nord3o*(nord1o-1)
         ibegn=ibegn+nord2n*nord3n*(nord1n-1)
 c
 c  .....family 3
-        call copy_3array(MAXEQNV,ZdofVo(1,ibego),nord3o,nord1o,nord2o-1,
-     .                           ZdofVn(1,ibegn),nord3n,nord1n,nord2n-1)
+        call copy_3array(NvarV,ZdofVo(1,ibego),nord3o,nord1o,nord2o-1,
+     .                         ZdofVn(1,ibegn),nord3n,nord1n,nord2n-1)
         ibego=ibego+nord3o*nord1o*(nord2o-1) - 1
         ibegn=ibegn+nord3n*nord1n*(nord2n-1) - 1
 c
@@ -635,40 +669,40 @@ c  ...pyramid
         ibego=1; ibegn=1
 c
 c  .....FAMILY 1 AND 2 (curl of families 2 and 3 from H(curl))
-        call copy_3array(MAXEQNV,ZdofVo(1,ibego),Nordo,Nordo-1,Nordo-1,
-     .                           ZdofVn(1,ibegn),Nordn,Nordn-1,Nordn-1)
+        call copy_3array(NvarV,ZdofVo(1,ibego),Nordo,Nordo-1,Nordo-1,
+     .                         ZdofVn(1,ibegn),Nordn,Nordn-1,Nordn-1)
         ibego=ibego+Nordo*(Nordo-1)**2
         ibegn=ibegn+Nordn*(Nordn-1)**2
-        call copy_3array(MAXEQNV,ZdofVo(1,ibego),Nordo,Nordo-1,Nordo-1,
-     .                           ZdofVn(1,ibegn),Nordn,Nordn-1,Nordn-1)
+        call copy_3array(NvarV,ZdofVo(1,ibego),Nordo,Nordo-1,Nordo-1,
+     .                         ZdofVn(1,ibegn),Nordn,Nordn-1,Nordn-1)
         ibego=ibego+Nordo*(Nordo-1)**2
         ibegn=ibegn+Nordn*(Nordn-1)**2
 c
 c  .....FAMILY 3 (curl of family 4 from H(curl))
-        call copy_2array(MAXEQNV,ZdofVo(1,ibego),Nordo-1,Nordo-1, 
-     .                           ZdofVn(1,ibegn),Nordn-1,Nordn-1)
+        call copy_2array(NvarV,ZdofVo(1,ibego),Nordo-1,Nordo-1, 
+     .                         ZdofVn(1,ibegn),Nordn-1,Nordn-1)
         ibego=ibego+(Nordo-1)**2
         ibegn=ibegn+(Nordn-1)**2
 c
 c  .....FAMILY 4 (induced from quad face functions)
-        call copy_3array(MAXEQNV,ZdofVo(1,ibego),Nordo,Nordo,Nordo-1,
-     .                           ZdofVn(1,ibegn),Nordn,Nordn,Nordn-1)
+        call copy_3array(NvarV,ZdofVo(1,ibego),Nordo,Nordo,Nordo-1,
+     .                         ZdofVn(1,ibegn),Nordn,Nordn,Nordn-1)
         ibego=ibego+Nordo**2*(Nordo-1)
         ibegn=ibegn+Nordn**2*(Nordn-1)
 c
 c  .....FAMILY 5
-        call copy_2array(MAXEQNV,ZdofVo(1,ibego),Nordo-1,Nordo-1, 
-     .                           ZdofVn(1,ibegn),Nordn-1,Nordn-1)
+        call copy_2array(NvarV,ZdofVo(1,ibego),Nordo-1,Nordo-1, 
+     .                         ZdofVn(1,ibegn),Nordn-1,Nordn-1)
         ibego=ibego+(Nordo-1)**2 
         ibegn=ibegn+(Nordn-1)**2
 c
 c  .....FAMILY 6 AND 7
-        call copy_1array(MAXEQNV,ZdofVo(1,ibego),Nordo-1, 
-     .                           ZdofVn(1,ibegn),Nordn-1)
+        call copy_1array(NvarV,ZdofVo(1,ibego),Nordo-1, 
+     .                         ZdofVn(1,ibegn),Nordn-1)
         ibego=ibego+Nordo-1
         ibegn=ibegn+Nordn-1
-        call copy_1array(MAXEQNV,ZdofVo(1,ibego),Nordo-1, 
-     .                           ZdofVn(1,ibegn),Nordn-1)
+        call copy_1array(NvarV,ZdofVo(1,ibego),Nordo-1, 
+     .                         ZdofVn(1,ibegn),Nordn-1)
         ibego=ibego+Nordo-1 - 1
         ibegn=ibegn+Nordn-1 - 1
 c
@@ -702,22 +736,23 @@ c     in:
 c        Ntype         - node type
 c        Nordo,Nordn   - old and new orders of the node
 c        ZdofQo,ZdofQn - old and new dof
+c        NvarQ         - first dimension of ZdofQo,ZdofQn
 c        NdofQo,NdofQn - old and new # dof
 c
 c-----------------------------------------------------------------------
 c
       subroutine copy_dofQ(Ntype,Nordo,Nordn,NdofQo,NdofQn,
-     .                     ZdofQo,ZdofQn)
+     .                     NvarQ,ZdofQo,ZdofQn)
 c
       use parameters, only: MAXEQNQ
       implicit none
       common /ccopy_dofQ/ iprint
       integer :: iprint
 c      
-      character(len=4)                  :: Ntype
-      integer                           :: Nordo,Nordn,NdofQo,NdofQn
-      VTYPE, dimension (MAXEQNQ,NdofQo) :: ZdofQo
-      VTYPE, dimension (MAXEQNQ,NdofQn) :: ZdofQn
+      character(len=4)                :: Ntype
+      integer                         :: Nordo,Nordn,NdofQo,NdofQn,NvarQ
+      VTYPE, dimension (NvarQ,NdofQo) :: ZdofQo
+      VTYPE, dimension (NvarQ,NdofQn) :: ZdofQn
 c
       integer :: nord1o,nord2o,nord3o,
      .           nord1n,nord2n,nord3n
@@ -734,14 +769,14 @@ c  ...tet
       case('mdln')
 c
 c  .....a hierarchical family
-        call copy_1array(MAXEQNQ,ZdofQo,NdofQo, ZdofQn,NdofQn)
+        call copy_1array(NvarQ,ZdofQo,NdofQo, ZdofQn,NdofQn)
 c
 c  ...prism
       case('mdlp')
         call decode(Nordo, nord1o,nord2o)
         call decode(Nordn, nord1n,nord2n)
-        call copy_2array(MAXEQNQ,ZdofQo,nord1o*(nord1o+1)/2,nord2o, 
-     .                           ZdofQn,nord1n*(nord1n+1)/2,nord2n)
+        call copy_2array(NvarQ,ZdofQo,nord1o*(nord1o+1)/2,nord2o, 
+     .                         ZdofQn,nord1n*(nord1n+1)/2,nord2n)
 c
 c  ...hexa
       case('mdlb')
@@ -749,14 +784,14 @@ c
 c  .....tensor products of 1D hierarchical families
         call ddecode(Nordo, nord1o,nord2o,nord3o)
         call ddecode(Nordn, nord1n,nord2n,nord3n)
-        call copy_3array(MAXEQNQ,ZdofQo,nord1o,nord2o,nord3o,
-     .                           ZdofQn,nord1n,nord2n,nord3n)
+        call copy_3array(NvarQ,ZdofQo,nord1o,nord2o,nord3o,
+     .                         ZdofQn,nord1n,nord2n,nord3n)
 c
 c  ...pyramid
       case('mdld')
 c
 c  .....tensor products of 1D hierarchical families
-        call copy_3array(MAXEQNQ,ZdofQo,Nordo,Nordo,Nordo,
+        call copy_3array(NvarQ,ZdofQo,Nordo,Nordo,Nordo,
      .                           ZdofQn,Nordn,Nordn,Nordn)
 c
       end select
