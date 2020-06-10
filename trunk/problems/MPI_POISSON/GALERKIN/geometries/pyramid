@@ -1,0 +1,98 @@
+3   3     NDIM,MANDIM
+
+0         no surfaces
+
+1         NRDOMAIN
+
+
+5         NRPOINT
+
+Regular             point 1
+0.0d0  0.0d0 0.0d0
+
+Regular             point 2
+1.0d0  0.0d0 0.0d0
+
+Regular             point 3
+1.0d0  1.0d0 0.0d0
+
+Regular             point 4
+0.0d0  1.0d0 0.0d0
+
+Regular             point 5
+0.0d0  0.0d0 1.0d0
+
+
+
+
+
+8 NRCURVE
+
+Seglin              curve 1
+1 2
+
+Seglin              curve 2
+2 3
+
+Seglin              curve 3
+4 3
+
+Seglin              curve 4
+1 4 
+
+Seglin              curve 5
+1 5
+
+Seglin              curve 6
+2 5
+
+Seglin              curve 7
+3 5
+
+Seglin              curve 8
+4 5
+
+
+
+
+
+4  NRTRIAN
+
+PlaneTri            triangle 1
+1 2 5
+
+PlaneTri            triangle 2
+2 3 5
+
+PlaneTri            triangle 3
+4 5 3
+
+PlaneTri            triangle 4
+1 4 5
+
+
+
+
+
+1 NRRECTA
+
+BilQua              rectangle 1
+1 2 3 4
+
+
+
+
+
+0 NRPRISM   
+
+
+
+0 NRHEXAS   
+ 
+
+0 NRTETRA   
+
+
+1 NRPYRAM   
+Linear              pyramid 1      
+1    1 2 3 4 5

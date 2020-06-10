@@ -185,9 +185,9 @@
       enddo
       select case(nflag)
       case(0)
-        write(*,*) 'verify_neig: PASSED THE CONSISTENCY TEST'
+        write(*,*) 'verify_neig_edge: PASSED THE CONSISTENCY TEST'
       case(1)
-        write(*,*) 'verify_neig: FAILED THE CONSISTENCY TEST'
+        write(*,*) 'verify_neig_edge: FAILED THE CONSISTENCY TEST'
       end select
 !
       end subroutine verify_neig_edge

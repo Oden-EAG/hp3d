@@ -1,3 +1,4 @@
+#include "typedefs.h"
 !--------------------------------------------------------------------
 !                                                                     
 !     routine name      - set_initial_mesh
@@ -18,6 +19,8 @@
       use GMP
       use element_data
       use data_structure3D
+      use refinements
+      use refinements_history
 !   
       implicit none
       common /common_recta_TraQua/ iprint_recta_TraQua
@@ -54,9 +57,29 @@
 !  ...work space for nodmod
       integer :: nod,newp,ndofH,ndofE,ndofV,ndofQ,oldp,ndofHn,ndofEn,ndofVn,ndofQn
 !
+!  ...work space for solelm
+      VTYPE ::  zdofH(MAXEQNH,MAXbrickH)
+      VTYPE ::  zdofE(MAXEQNE,MAXbrickE)
+      VTYPE ::  zdofV(MAXEQNV,MAXbrickV)
+      VTYPE ::  zdofQ(MAXEQNQ,MAXbrickQ)
+!
+!  ...workspace for compute_error
+      integer :: flag(NR_PHYSA), itag
+!
+!  ...workspace for nodcor
+      integer :: kref,nrs
+      real*8 :: xnod(3,MAXbrickH)
+!
+!  ...workspace for initiate_dof
+      integer :: nel, nrH, nrE, nrQ
+!
 !------------------------------------------------------------------------------------
 !
       iprint=0
+!
+!  ...set MAX_ELEMS_REF in module refinements_history
+      MAX_ELEMS_REF = NRELES
+!
    10 write(*,*) 'my_tests: SELECT:'
       write(*,*) 'EXIT...........................................0'
       write(*,*) 'TEST recta_TraQua..............................1'
@@ -68,6 +91,11 @@
       write(*,*) 'call result....................................7'
       write(*,*) 'call random_refine and verify neig routines....8'
       write(*,*) 'test nodmod....................................9'
+      write(*,*) 'test solelm...................................10'
+      write(*,*) 'compute_error.................................11'
+      write(*,*) 'initiate dof..................................12'
+      write(*,*) 'initiate vertex coordinates...................13'
+      write(*,*) 'execute initiate_dof..........................14'
       read(*,*) iselect
 !
       select case(iselect) 
@@ -147,6 +175,66 @@
         write(*,7030) NODES(nod)%dof%zdofV(1,1:ndofV)
         write(*,7030) NODES(nod)%dof%zdofQ(1,1:ndofQ)
 !
+      case(10)
+        do nod=1,NRNODS
+          call ndof_nod(NODES(nod)%type,NODES(nod)%order, ndofH,ndofE,ndofV,ndofQ)
+          select case(NODES(nod)%case)
+          case(2)
+            NODES(nod)%dof%zdofH(1,1:ndofH) = float(nod)
+          case(1)
+            NODES(nod)%dof%zdofH(1,1:ndofH) = float(nod)*10
+          case(3)
+            NODES(nod)%dof%zdofH(1,1:ndofH) = float(nod)
+            NODES(nod)%dof%zdofH(2,1:ndofH) = float(nod)*10
+          end select
+        enddo
+        write(*,*) 'my_tests: SET mdle'
+        read(*,*) mdle
+        call solelm(mdle, zdofH,zdofE,zdofV,zdofQ)
+      case(11)
+        flag=1
+        call compute_error(flag,itag)
+      case(12)
+        do nod=1,NRNODS
+          call ndof_nod(NODES(nod)%type,NODES(nod)%order, ndofH,ndofE,ndofV,ndofQ)
+          if (ndofH.ne.0) then
+            NODES(nod)%dof%zdofH=float(nod)
+          endif
+          if (ndofE.ne.0) then
+            NODES(nod)%dof%zdofE=float(nod)
+          endif
+          if (ndofV.ne.0) then
+            NODES(nod)%dof%zdofV=float(nod)
+          endif
+          if (ndofQ.ne.0) then
+            NODES(nod)%dof%zdofQ=float(nod)
+          endif
+        enddo
+      case(13)
+        write(*,*) 'DID U REMEMBER TO MODIFY break ?'
+        write(*,*) 'SELECT kref'
+        read(*,*) kref
+        call break(1,kref)
+        call nr_mdle_sons(NODES(1)%type,kref, nrs)
+        do i=1,nrs
+          mdle = son(1,i)
+          call nodcor(mdle, xnod)
+          write(*,7040) xnod(1:3,1:nvert(NODES(mdle)%type))
+ 7040     format(10(6x,3(3(e8.3,','),1x)/))
+        enddo     
+!
+      case(14)
+        do nel=1,NR_ELEMS_REF
+          mdle = ELEMS_REF(nel)%mdle
+          nrH = ubound(ELEMS_REF(nel)%xnod,2)
+          nrE = ubound(ELEMS_REF(nel)%zdofE,2)
+          nrV = ubound(ELEMS_REF(nel)%zdofV,2)
+          nrQ = ubound(ELEMS_REF(nel)%zdofQ,2)
+          call initiate_dof(mdle,ELEMS_REF(nel)%xnod,ELEMS_REF(nel)%zdofH,  &
+                                 ELEMS_REF(nel)%zdofE,ELEMS_REF(nel)%zdofV, &
+                                 ELEMS_REF(nel)%zdofQ,nrH,nrE,nrV,nrQ)
+        enddo
+        call deallocref
       end select
       go to 10
 !

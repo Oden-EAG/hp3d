@@ -53,14 +53,14 @@ subroutine compute_error(Flag,Itag)
       integer, dimension(maxvis,10), save :: iwork
 !
 !     miscellanea
-      integer :: mdle,i,nint,iattr,nrdof_tot,ic
+      integer :: mdle,i,j,nint,iattr,nrdof_tot,ic,flag_loc(NR_PHYSA),index(NR_PHYSA)
 !
 !     printing flag
       integer :: iprint
 !
 !---------------------------------------------------------------------------------------
 !
-      iprint=0
+      iprint=1
 !
 !     check that exact solution is indeed known
       if (NEXACT == 0) then
@@ -77,8 +77,14 @@ subroutine compute_error(Flag,Itag)
 !     loop over active elements
       do i=1,NRELES
         mdle = ELEM_ORDER(i)
-        call element_error(mdle, Flag, derrorH,derrorE,derrorV,derrorQ, &
-                                       drnormH,drnormE,drnormV,drnormQ )
+        call get_index(mdle, index)
+        do j=1,NR_PHYSA
+          flag_loc(j) = min(Flag(j),index(j))
+        enddo
+!
+        if (iprint.eq.1) write(*,*) 'compute_error: mdle, flag_loc = ',mdle, flag_loc
+        call element_error(mdle,flag_loc, derrorH,derrorE,derrorV,derrorQ, &
+                                          drnormH,drnormE,drnormV,drnormQ )
 !
 !       accumulate
         errorH = errorH + derrorH; rnormH = rnormH + drnormH
@@ -302,6 +308,8 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, rnormH,rnormE,r
 !---------------------------------------------------------------------------------------
 !
       iprint=0
+      if (iprint.eq.1) write(*,*) 'element_error: Mel = ',Mdle
+     
 !
 !     initialize global quantities
       errorH=0.d0 ; rnormH=0.d0
@@ -397,6 +405,7 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, rnormH,rnormE,r
 !
 !         loop over integration points
           enddo
+          if (iprint.eq.1) write(*,*) 'element_error: DONE WITH H1 ERROR'
 !
 !===================================================================================
 !  H(curl) ATTRIBUTE                                                               |
@@ -459,6 +468,7 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, rnormH,rnormE,r
 !
 !         loop over integration points
           enddo
+          if (iprint.eq.1) write(*,*) 'element_error: DONE WITH H(curl) ERROR'
 !
 !===================================================================================
 !  H(div) ATTRIBUTE                                                                |
@@ -520,6 +530,7 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, rnormH,rnormE,r
 !
 !         loop over integration points
           enddo
+          if (iprint.eq.1) write(*,*) 'element_error: DONE WITH H(div) ERROR'
 !
 !===================================================================================
 !  L2 ATTRIBUTE                                                                    |
@@ -568,6 +579,7 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, rnormH,rnormE,r
 !
 !         loop over integration points
           enddo
+          if (iprint.eq.1) write(*,*) 'element_error: DONE WITH L2 ERROR'
 !
           case default
           write(*,*)'element_error: UNKNOWN PHYSICAL ATTRIBUTE TYPE!'

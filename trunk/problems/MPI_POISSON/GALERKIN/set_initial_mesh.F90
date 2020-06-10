@@ -48,9 +48,29 @@
    do iel=1,NRELIS
 !
 !  ...set physics
-      ELEMS(iel)%nrphysics = 1
-      allocate(ELEMS(iel)%physics(1))
-      ELEMS(iel)%physics(1) ='field'
+!!!      ELEMS(iel)%nrphysics = 1
+!!!      allocate(ELEMS(iel)%physics(1))
+!!!      ELEMS(iel)%physics(1) ='field'
+!!      ELEMS(iel)%nrphysics = 4
+!!      allocate(ELEMS(iel)%physics(4))
+!!      ELEMS(iel)%physics(1) ='field'
+!!      ELEMS(iel)%physics(2) ='Efild'
+!!      ELEMS(iel)%physics(3) ='Vfild'
+!!      ELEMS(iel)%physics(4) ='Qfild'
+      ELEMS(iel)%nrphysics = 4
+      allocate(ELEMS(iel)%physics(4))
+      select case(iel)
+      case(1,3)
+        ELEMS(iel)%physics(1) ='Hfld1'
+        ELEMS(iel)%physics(2) ='Efld1'
+        ELEMS(iel)%physics(3) ='Vfld1'
+        ELEMS(iel)%physics(4) ='Qfld1'
+      case(2,4)
+        ELEMS(iel)%physics(1) ='Hfld2'
+        ELEMS(iel)%physics(2) ='Efld2'
+        ELEMS(iel)%physics(3) ='Vfld2'
+        ELEMS(iel)%physics(4) ='Qfld2'
+      end select
 !
 !  ...set order of approximation
       if (IP.gt.0) then
@@ -89,9 +109,12 @@
       end select
 !
 !  ...allocate BC flags (one per attribute)
-      allocate(ELEMS(iel)%bcond(1))
+!!!      allocate(ELEMS(iel)%bcond(1))
+!!      allocate(ELEMS(iel)%bcond(4))
+      allocate(ELEMS(iel)%bcond(4))
 !  ...encode face BC into a single BC flag
-      call encodg(ibc(1:6,1),10,6, ELEMS(iel)%bcond(1))
+!!      call encodg(ibc(1:6,1),10,6, ELEMS(iel)%bcond(1))
+      ELEMS(iel)%bcond(1:4)=0
 !
 !  ...print order of approximation
       if (iprint.eq.1 .and. IP.gt.0) then
