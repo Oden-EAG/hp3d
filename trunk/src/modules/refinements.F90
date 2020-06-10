@@ -26,10 +26,10 @@ module refinements
   !integer, dimension(1:13), parameter :: TETRA_REF = &
   !     (/11,12,13, 21,22,23,24,25,26, 31,32,33,34/)
   integer, dimension(1:5), parameter :: TETRA_REF = &
-       (/11,12,13, 24,32/)
+       (/11,12,13, 24,32/)   !  the last two are not operational !
   integer, dimension(1:3),  parameter :: PRISM_REF = (/11,10,01/)
   !integer, dimension(1:2),  parameter :: PYRAM_REF = (/10,01/)
-  integer, dimension(1:1),  parameter :: PYRAM_REF = (/10/)
+  integer, dimension(1:1),  parameter :: PYRAM_REF = (/10/)  ! inoperational
   integer, dimension(1:7),  parameter :: BRICK_REF = &
        (/111,110,101,011,100,010,001/)
   !
