@@ -69,9 +69,9 @@ subroutine exact(X,Icase, ValH,DvalH,D2valH, &
 !..get exact solution
    call solution(X, u,gradu,gradgradu)
 !
-   ValH (1)          = u         ! H1
-   DvalH(1,1:3)      = gradu     ! 1st derivative [gradient]
-   D2valH(1,1:3,1:3) = gradgradu ! 2nd derivative [Hessian]
+!   ValH (1)          = u         ! H1
+!   DvalH(1,1:3)      = gradu     ! 1st derivative [gradient]
+!   D2valH(1,1:3,1:3) = gradgradu ! 2nd derivative [Hessian]
 !
 !
 end subroutine exact
