@@ -326,11 +326,6 @@
 !
 !  ...local mid-edge node number
       i = nrv + ie
-<<<<<<< Updated upstream
-!
-=======
-!      
->>>>>>> Stashed changes
 !  ...mid-edge node
       nodes_edge(3) = nodesl(i)
 
