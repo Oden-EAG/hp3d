@@ -617,9 +617,10 @@
    dimension NrconH(MAXmdlqH),NrconE(MAXmdlqE),NrconV(MAXmdlqV), &
              NacH(MaxquadH,MAXmdlqH),ConstrH(MaxquadH,MAXmdlqH), &
              NacE(MaxquadE,MAXmdlqE),ConstrE(MaxquadE,MAXmdlqE), &
+             NacV(MaxquadV,MAXmdlqV),ConstrV(MaxquadV,MAXmdlqV)
 !
 !  ...local variables
-   integer :: kH,kE,kV,loc,ndofH,ndofE,ndofV,l,jp,lp,is,ish,isv,&
+   integer :: kH,kE,kV,loc,ndofH,ndofE,ndofV,l,jp,lp,is,ish,isv, &
               ndofHh,ndofEh,ndofVh,ndofHv,ndofEv,ndofVv,lpv,lph, &
               lv,lh,nord,nordh,nordv,iprint,iv,ip
    integer :: ndofHp(4),ndofEp(4),locp(4)
