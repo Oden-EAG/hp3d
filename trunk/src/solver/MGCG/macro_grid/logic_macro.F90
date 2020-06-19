@@ -173,15 +173,8 @@
 !
 !..remove the middle node from the list
    Nodm(Nrnodm) = 0; Nrnodm = Nrnodm-1
-<<<<<<< Updated upstream
-!
-!..establish offsets for the coarse element nodal dof
-=======
 !   
 !..establish offsets for the coarse element nodal dof 
-!
-! J- Looks like these just establish index where each type starts.
->>>>>>> Stashed changes
    icH=0; icE=0; icV=0
    do i = 1,nrv+nre+nrf
       naHl(i)=icH; naEl(i)=icE; naVl(i)=icV
