@@ -173,8 +173,15 @@
 !
 !..remove the middle node from the list
    Nodm(Nrnodm) = 0; Nrnodm = Nrnodm-1
+<<<<<<< Updated upstream
 !
 !..establish offsets for the coarse element nodal dof
+=======
+!   
+!..establish offsets for the coarse element nodal dof 
+!
+! J- Looks like these just establish index where each type starts.
+>>>>>>> Stashed changes
    icH=0; icE=0; icV=0
    do i = 1,nrv+nre+nrf
       naHl(i)=icH; naEl(i)=icE; naVl(i)=icV
@@ -261,6 +268,7 @@
       call locate (nod, Nod_macro,Nrnod_macro, loc)
 !
 !  ...if the node belongs also to the macro-element then connect it to itself
+! -J These are simply the unconstrained DoFs, so nac (naH,naE,naV) is just global node number and constr = 1
       if (loc.ne.0) then
          kH = naH_macro(loc); kE = naE_macro(loc); kV = naV_macro(loc)
          call inject_dof(NODES(nod)%type, NODES_MG(nod)%orderC(Igrid),NODES(nod)%order,   &
@@ -294,12 +302,16 @@
       nod = nodesl(iv)
 !
 !  ...skip if not on the list of macro-element nodes
+! -J These are the ones condensed out already (I think)
       call locate(nod,Nod_macro,Nrnod_macro, loc)
       if (loc.eq.0) cycle
 !
 !  ...skip if on the list of modified coarse element node
+! -J These don't need to be touched since not constrained
       call locate(nod,Nodm,Nrnodm, locC)
       if (locC.ne.0) cycle
+!
+! -J on verticies we just copy since constraints will be the same.
 !
 !  ...the vertex is a constrained vertex of the coarse grid element,
 !     copy prolongation coefficients from those delivered by logicC
@@ -321,7 +333,11 @@
 !
 !  ...local mid-edge node number
       i = nrv + ie
+<<<<<<< Updated upstream
 !
+=======
+!      
+>>>>>>> Stashed changes
 !  ...mid-edge node
       nodes_edge(3) = nodesl(i)
 
@@ -332,7 +348,7 @@
       nodes_edge(1:2) = nodesl(iedg(1:2))
 !
 !  ...establish the injections between edge and element dof
-      mapH(1:2) = naHl(iedg(1:2))+1
+      mapH(1:2) = naHl(iedg(1:2))+1   ! -J why +1? To get past vertex functions?
       nod = nodes_edge(3)
       call ndof_nod(NODES(nod)%type,NODES_MG(nod)%orderC(Igrid), &
                     ndofH,ndofE,nvoid,nvoid)

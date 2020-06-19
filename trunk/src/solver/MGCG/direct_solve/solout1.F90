@@ -20,16 +20,23 @@
 !   required  routines -
 !
 !-----------------------------------------------------------------------
-!
+#include "typedefs.h"
    subroutine solout1(Mdle,Ndof,Nrhs,Mdest,Zele)
 !
    use element_data
    use data_structure3D
    use frsolmod
    use assembly
-#include "syscom.blk"
+   use control,  only: ISTC_FLAG
+   use par_mesh, only: DISTRIBUTED
+   use stc,      only: stc_bwd_wrapper
 !
-   dimension Zele(*)
+   implicit none
+!
+   integer, intent(in) :: Mdle
+   integer, intent(in) :: Ndof
+   integer, intent(in) :: Nrhs
+   VTYPE  , intent(in) :: Zele(Ndof)
 !
 !..nodes for a modified element and the corresponding number
 !  of H1,H(curl),H(div) and L2 dof

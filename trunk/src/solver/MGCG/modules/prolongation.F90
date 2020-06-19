@@ -86,6 +86,8 @@
 !     in:     Nodl - the node to be broken
 !-----------------------------------------------------------------------
 !
+! -J- Why are we breaking nodes during prolongation?
+
    subroutine nodbreakPR(Nodl)
 !
    integer :: Nodl
@@ -615,8 +617,13 @@
    dimension NrconH(MAXmdlqH),NrconE(MAXmdlqE),NrconV(MAXmdlqV), &
              NacH(MaxquadH,MAXmdlqH),ConstrH(MaxquadH,MAXmdlqH), &
              NacE(MaxquadE,MAXmdlqE),ConstrE(MaxquadE,MAXmdlqE), &
+<<<<<<< Updated upstream
              NacV(MaxquadV,MAXmdlqV),ConstrV(MaxquadV,MAXmdlqV)
 
+=======
+             NacV(MaxquadV,MAXmdlqV)nodbreakPR,ConstrV(MaxquadV,MAXmdlqV)
+   
+>>>>>>> Stashed changes
 !
 !  ...local variables
    integer :: kH,kE,kV,loc,ndofH,ndofE,ndofV,l,jp,lp,is,ish,isv,&
@@ -1181,6 +1188,7 @@
 !  ...initiate list of nodes to refine with the mid-edge node
    ic=0
 !
+! -J note this is not NODES_PR, it is just NODES, we are reconstructing tree.
    if (NODES(nod)%ref_kind.ne.0) then
 !
 !  .....check if sons are active
@@ -1190,7 +1198,8 @@
        if (NODES(nson)%act.eq.0 .and. NODES(nson)%ref_kind.eq.0) go to 10
      enddo
      ic=ic+1
-     list(ic)=3
+     list(ic)=3 ! -J Add middle node for refinement if sons are not active and still need refinement.
+                ! -J if this is not true we are done, we have sons and they are refined so we skip next part.
    endif
    if (iprint.eq.1) then
      write(*,7003) list(1:ic)
@@ -1298,7 +1307,7 @@
      nord = Nordp(ie); ndofH = nord-1 ; ndofE = nord
      allocate(NODES_PR(nodl)%coeffH(MDOFH,ndofH)) ; NODES_PR(nodl)%coeffH = 0.d0
      allocate(NODES_PR(nodl)%coeffE(MDOFE,ndofE)) ; NODES_PR(nodl)%coeffE = 0.d0
-     select case(Nfedg_or(ie))
+     select case(Nfedg_or(ie))  ! -J orientation of face edge
      case(0)
        do k=1,ndofH
          NODES_PR(nodl)%coeffH(ndofHt+k,k) = 1.d0
