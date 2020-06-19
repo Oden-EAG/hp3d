@@ -617,13 +617,6 @@
    dimension NrconH(MAXmdlqH),NrconE(MAXmdlqE),NrconV(MAXmdlqV), &
              NacH(MaxquadH,MAXmdlqH),ConstrH(MaxquadH,MAXmdlqH), &
              NacE(MaxquadE,MAXmdlqE),ConstrE(MaxquadE,MAXmdlqE), &
-<<<<<<< Updated upstream
-             NacV(MaxquadV,MAXmdlqV),ConstrV(MaxquadV,MAXmdlqV)
-
-=======
-             NacV(MaxquadV,MAXmdlqV)nodbreakPR,ConstrV(MaxquadV,MAXmdlqV)
-   
->>>>>>> Stashed changes
 !
 !  ...local variables
    integer :: kH,kE,kV,loc,ndofH,ndofE,ndofV,l,jp,lp,is,ish,isv,&
