@@ -40,19 +40,26 @@
 !
 !..nodes for a modified element and the corresponding number
 !  of H1,H(curl),H(div) and L2 dof
-   dimension nodm(MAXNODM),ndofmH(MAXNODM),ndofmE(MAXNODM),   &
-             ndofmV(MAXNODM),ndofmQ(MAXNODM)
+   integer, dimension(MAXNODM) :: nodm,ndofmH,ndofmE,   &
+             ndofmV,ndofmQ
 !
 !..number of variables for each physics attribute for an element
-   dimension nrdofs(NR_PHYSA)
+   integer :: nrdofs(NR_PHYSA)
 !
 !..decoded index for a node
-   dimension index(NRINDEX)
+   integer :: index(NRINDEX)
 !
 !..component counters for the nodes (use in case of multiple loads)
-   dimension mvarH(MAXNODM),mvarE(MAXNODM), mvarV(MAXNODM),mvarQ(MAXNODM)
+   integer, dimension(MAXNODM) :: mvarH,mvarE,mvarV
+   integer                     :: mvarQ
 
-   dimension zvoid(1)
+!..auxiliary variables
+   integer :: nrPhysH,nrPhysE,nrPhysV,nrPhysHE,nrPhysHEV
+   integer :: nrVarHE,nrVarHEV
+   integer :: i,j,k,il,iphys,icomp,ivar,load,mdle,nn,nod
+   VTYPE   :: zvoid
+
+
 !
 !----------------------------------------------------------------------
 !
