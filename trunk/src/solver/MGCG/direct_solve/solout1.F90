@@ -38,6 +38,7 @@
    integer, intent(in) :: Mdle
    integer, intent(in) :: Ndof
    integer, intent(in) :: Nrhs
+   integer, intent(in) :: Mdest
    VTYPE  , intent(in) :: Zele(Ndof)
 !
 !..nodes for a modified element and the corresponding number
@@ -52,8 +53,8 @@
    integer :: index(NRINDEX)
 !
 !..component counters for the nodes (use in case of multiple loads)
-   integer, dimension(MAXNODM) :: mvarH,mvarE,mvarV
-   integer                     :: mvarQ
+   integer, dimension(MAXNODM) :: mvarH,mvarE,mvarV,mvarQ
+! TODO- update like solout.F90, mvarQ shouldn't be array
 !
 !..dof counters
    integer :: nrdofm,nrdofc,nrnodm
