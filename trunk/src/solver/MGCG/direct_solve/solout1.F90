@@ -27,9 +27,11 @@
    use data_structure3D
    use frsolmod
    use assembly
-   use control,  only: ISTC_FLAG
-   use par_mesh, only: DISTRIBUTED
-   use stc,      only: stc_bwd_wrapper
+   use control,  only: ISTC_FLAG          ! Condesed or no?
+   use par_mesh, only: DISTRIBUTED        ! Distributed?
+   use stc,      only: stc_bwd_wrapper    ! For uncondensing system
+!
+! TODO: add in MPI support as in frontal solver solout routine
 !
    implicit none
 !
@@ -52,18 +54,27 @@
 !..component counters for the nodes (use in case of multiple loads)
    integer, dimension(MAXNODM) :: mvarH,mvarE,mvarV
    integer                     :: mvarQ
-
+!
+!..dof counters
+   integer :: nrdofm,nrdofc,nrnodm
+!
+!..active component counter
+   integer :: nvarH,nvarE,nvarV,nvarQ
+!
 !..auxiliary variables
    integer :: nrPhysH,nrPhysE,nrPhysV,nrPhysHE,nrPhysHEV
    integer :: nrVarHE,nrVarHEV
-   integer :: i,j,k,il,iphys,icomp,ivar,load,mdle,nn,nod
+   integer :: i,j,k,il,iphys,icomp,ivar,load,nn,nod
+   integer :: iprint
    VTYPE   :: zvoid
 
 
 !
 !----------------------------------------------------------------------
 !
-   iprint=0
+#if DEBUG_MODE
+   integer :: iprint=0
+#endif
 !
 !..initiate component counters
    mvarH = 0; mvarE = 0; mvarV = 0; mvarQ = 0
