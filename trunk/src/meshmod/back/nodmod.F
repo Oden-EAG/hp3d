@@ -41,13 +41,6 @@ c
 c
       integer :: act_dof, subd
 c
-      select case(Nod)
-      case(2348)
-        iprint=0
-      case default
-        iprint=0
-      end select
-c
 c  ...exit if the order is the same
       if (Newp.eq.NODES(Nod)%order) return
 c
