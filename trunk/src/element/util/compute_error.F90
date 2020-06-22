@@ -230,7 +230,8 @@ end subroutine compute_error
 !>  @date : Nov 2014
 !---------------------------------------------------------------------------------------
 !
-subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, rnormH,rnormE,rnormV,rnormQ)
+subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, &
+                                    rnormH,rnormE,rnormV,rnormQ)
 !
       use control          , only : INTEGRATION
       use data_structure3D
@@ -240,8 +241,8 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, rnormH,rnormE,r
       implicit none
       integer, dimension(NR_PHYSA),intent(in ) :: Flag
       integer,                     intent(in ) :: Mdle
-      real(8),                      intent(out) :: errorH,errorE,errorV,errorQ
-      real(8),                      intent(out) :: rnormH,rnormE,rnormV,rnormQ
+      real(8),                     intent(out) :: errorH,errorE,errorV,errorQ
+      real(8),                     intent(out) :: rnormH,rnormE,rnormV,rnormQ
 !
 !     node case (decimal form)
       integer,dimension(NR_PHYSA) :: icased
@@ -351,8 +352,9 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, rnormH,rnormE,r
 !
 !           -- APPROXIMATE SOLUTION --
             nflag=1
-            call soleval(mdle,xi,nedge_orient,nface_orient,norder,xnod,zdofH,zdofE,zdofV,zdofQ,nflag, &
-                         x,dxdxi,zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ                          )
+            call soleval(mdle,xi,nedge_orient,nface_orient,norder,   &
+                         xnod,zdofH,zdofE,zdofV,zdofQ,nflag,x,dxdxi, &
+                         zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
 !
 !           -- EXACT SOLUTION --
             call exact(x,icase, zvalH,zdvalH,zd2valH, zvalE,zdvalE,zd2valE, &
@@ -411,8 +413,9 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, rnormH,rnormE,r
 !
 !           -- APPROXIMATE SOLUTION --
             nflag=1
-            call soleval(mdle,xi,nedge_orient,nface_orient,norder,xnod,zdofH,zdofE,zdofV,zdofQ,nflag, &
-                         x,dxdxi,zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ                          )
+            call soleval(mdle,xi,nedge_orient,nface_orient,norder,   &
+                         xnod,zdofH,zdofE,zdofV,zdofQ,nflag,x,dxdxi, &
+                         zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
 !
 !           -- EXACT SOLUTION --
             call exact(x,icase, zvalH,zdvalH,zd2valH, zvalE,zdvalE,zd2valE, &
@@ -473,8 +476,9 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, rnormH,rnormE,r
 !
 !           -- APPROXIMATE SOLUTION --
             nflag=1
-            call soleval(mdle,xi,nedge_orient,nface_orient,norder,xnod,zdofH,zdofE,zdofV,zdofQ,nflag, &
-                         x,dxdxi,zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ                          )
+            call soleval(mdle,xi,nedge_orient,nface_orient,norder,   &
+                         xnod,zdofH,zdofE,zdofV,zdofQ,nflag,x,dxdxi, &
+                         zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
 !
 !           -- EXACT SOLUTION --
             call exact(x,icase, zvalH,zdvalH,zd2valH, zvalE,zdvalE,zd2valE, &
@@ -534,8 +538,9 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, rnormH,rnormE,r
 !
 !           -- APPROXIMATE SOLUTION --
             nflag=1
-            call soleval(mdle,xi,nedge_orient,nface_orient,norder,xnod,zdofH,zdofE,zdofV,zdofQ,nflag, &
-                         x,dxdxi,zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ                          )
+            call soleval(mdle,xi,nedge_orient,nface_orient,norder,   &
+                         xnod,zdofH,zdofE,zdofV,zdofQ,nflag,x,dxdxi, &
+                         zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
 !
 !           -- EXACT SOLUTION --
             call exact(x,icase, zvalH,zdvalH,zd2valH, zvalE,zdvalE,zd2valE, &
