@@ -47,7 +47,7 @@
       VTYPE  , allocatable :: zdofQ(:,:)
 !
 !  ...set whether current dofxs should be copied to modified node
-      logical, parameter :: COPY_DOFS = .true.
+      logical, parameter :: COPY_DOFS = .false.
 !
       character(4) :: ntype
       logical      :: act_dof
