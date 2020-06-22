@@ -28,6 +28,7 @@
 !
       implicit none
 !
+#if DEBUG_MODE
       common /ccopy_dofG/ iprint_copy_dofG
       common /ccopy_dofH/ iprint_copy_dofH
       common /ccopy_dofE/ iprint_copy_dofE
@@ -35,6 +36,7 @@
       common /ccopy_dofQ/ iprint_copy_dofQ
       integer :: iprint_copy_dofG,iprint_copy_dofH,iprint_copy_dofE, &
                  iprint_copy_dofV,iprint_copy_dofQ
+#endif
 !
       integer, intent(in)   :: Nod,Nordn
 !
@@ -44,8 +46,8 @@
       VTYPE  , allocatable :: zdofV(:,:)
       VTYPE  , allocatable :: zdofQ(:,:)
 !
-!  ...set whether current dofs should be copied to modified node
-      logical, parameter :: COPY_DOFS = .false.
+!  ...set whether current dofxs should be copied to modified node
+      logical, parameter :: COPY_DOFS = .true.
 !
       character(4) :: ntype
       logical      :: act_dof
@@ -54,22 +56,26 @@
                       ndofH ,ndofE ,ndofV ,ndofQ , &
                       ndofHo,ndofEo,ndofVo,ndofQo
 !
+#if DEBUG_MODE
       iprint=0
       iprint_copy_dofG=iprint
       iprint_copy_dofH=iprint; iprint_copy_dofE=iprint
       iprint_copy_dofV=iprint; iprint_copy_dofQ=iprint
+#endif
 !
 !  ...node case
       icase = NODES(Nod)%case
       ntype = NODES(Nod)%type
       nordo = NODES(Nod)%order
 !
+#if DEBUG_MODE
       if (iprint.eq.1) then
          write(*,7010) Nod,ntype,nordo,icase
  7010    format('nodmod: Nod,type,order,icase = ',i6,2x,a5,2x,2i3)
          write(*,7013) NREQNH(icase),NREQNE(icase),NREQNV(icase),NREQNQ(icase)
  7013    format('nodmod: NREQNH,NREQNE,NREQNV,NREQNQ(icase) = ',4i2)
       endif
+#endif
 !
 !  ...exit if the order is the same
       if (Nordn.eq.nordo) return
@@ -161,10 +167,12 @@
 !  ...calculate the new number of dof for the node
       call ndof_nod(ntype,Nordn, ndofH,ndofE,ndofV,ndofQ)
 !
+#if DEBUG_MODE
       if (iprint.eq.1) then
          write(*,7015) ndofH,ndofE,ndofV,ndofQ
  7015    format('nodmod: ndofH,ndofE,ndofV,ndofQ = ',4i5)
       endif
+#endif
 !
 !  ...find out whether node is inside my subdomain
       act_dof = .true.
@@ -245,13 +253,14 @@
       if (allocated(zdofV)) deallocate(zdofV)
       if (allocated(zdofQ)) deallocate(zdofQ)
 !
+#if DEBUG_MODE
       if (iprint.eq.1) then
          write(*,7020) Nod
  7020    format('nodmod: Nod = ',i6,' HAS BEEN UPDATED ')
          write(*,7030) nordo,Nordn
- 7030    format('        OLD ORDER = ',i3,' NEW ORDER = ',i3)
-         call pause
+ 7030    format('        OLD ORDER = ',i3,', NEW ORDER = ',i3)
       endif
+#endif
 !
 !
       end subroutine nodmod
@@ -282,8 +291,11 @@
 !
       use parameters, only: NDIMEN
       implicit none
+!
+#if DEBUG_MODE
       common /ccopy_dofG/ iprint
       integer :: iprint
+#endif
 !
       character(4) :: Ntype
       integer      :: Nordo,Nordn,NdofGo,NdofGn
@@ -293,11 +305,13 @@
       integer :: nord1o,nord2o,nord3o, &
                  nord1n,nord2n,nord3n
 !
+#if DEBUG_MODE
       if (iprint.eq.1) then
          write(*,7010) Ntype,Nordo,Nordn,NdofGo,NdofGn
  7010    format(' copy_dofG: Ntype,Nordo,Nordn,NdofGo,NdofGn = ', &
                              a4,2i4,2i6)
       endif
+#endif
 !
       select case(Ntype)
 !
@@ -327,7 +341,10 @@
                                  Xnodn,nord1n-1,nord2n-1,nord3n-1)
 !
       end select
+!
+#if DEBUG_MODE
       if (iprint.eq.1) write(*,*) 'copy_dofG: DONE'
+#endif
 !
 !
       end subroutine copy_dofG
@@ -359,8 +376,11 @@
 !
       use parameters, only: MAXEQNH
       implicit none
+!
+#if DEBUG_MODE
       common /ccopy_dofH/ iprint
       integer :: iprint
+#endif
 !
       character(4) :: Ntype
       integer      :: Nordo,Nordn,NdofHo,NdofHn,NvarH
@@ -370,11 +390,13 @@
       integer :: nord1o,nord2o,nord3o, &
                  nord1n,nord2n,nord3n
 !
+#if DEBUG_MODE
       if (iprint.eq.1) then
          write(*,7010) Ntype,Nordo,Nordn,NdofHo,NdofHn
  7010    format(' copy_dofH: Ntype,Nordo,Nordn,NdofHo,NdofHn = ', &
                              a4,2i4,2i6)
       endif
+#endif
 !
       select case(Ntype)
 !
@@ -405,7 +427,10 @@
                                 ZdofHn,nord1n-1,nord2n-1,nord3n-1)
 !
       end select
+!
+#if DEBUG_MODE
       if (iprint.eq.1) write(*,*) 'copy_dofH: DONE'
+#endif
 !
 !
       end subroutine copy_dofH
@@ -437,8 +462,11 @@
 !
       use parameters, only: MAXEQNE
       implicit none
+!
+#if DEBUG_MODE
       common /ccopy_dofE/ iprint
       integer :: iprint
+#endif
 !
       character(4) :: Ntype
       integer      :: Nordo,Nordn,NdofEo,NdofEn,NvarE
@@ -449,11 +477,13 @@
                  nord1n,nord2n,nord3n, &
                  ibego,ibegn
 !
+#if DEBUG_MODE
       if (iprint.eq.1) then
          write(*,7010) Ntype,Nordo,Nordn,NdofEo,NdofEn
  7010    format(' copy_dofE: Ntype,Nordo,Nordn,NdofEo,NdofEn = ', &
                              a4,2i4,2i6)
       endif
+#endif
 !
       select case(Ntype)
 !
@@ -592,7 +622,10 @@
          endif
 !
       end select
+!
+#if DEBUG_MODE
       if (iprint.eq.1) write(*,*) 'copy_dofE: DONE'
+#endif
 !
 !
       end subroutine copy_dofE
@@ -624,8 +657,11 @@
 !
       use parameters, only: MAXEQNV
       implicit none
+!
+#if DEBUG_MODE
       common /ccopy_dofV/ iprint
       integer :: iprint
+#endif
 !
       character(4) :: Ntype
       integer      :: Nordo,Nordn,NdofVo,NdofVn,NvarV
@@ -636,11 +672,13 @@
                  nord1n,nord2n,nord3n, &
                  ibego,ibegn
 !
+#if DEBUG_MODE
       if (iprint.eq.1) then
          write(*,7010) Ntype,Nordo,Nordn,NdofVo,NdofVn
  7010    format(' copy_dofV: Ntype,Nordo,Nordn,NdofVo,NdofVn = ', &
                              a4,2i4,2i6)
       endif
+#endif
 !
       select case(Ntype)
 !
@@ -773,7 +811,10 @@
          endif
 !
       end select
+!
+#if DEBUG_MODE
       if (iprint.eq.1) write(*,*) 'copy_dofV: DONE'
+#endif
 !
 !
       end subroutine copy_dofV
@@ -805,8 +846,11 @@
 !
       use parameters, only: MAXEQNQ
       implicit none
+!
+#if DEBUG_MODE
       common /ccopy_dofQ/ iprint
       integer :: iprint
+#endif
 !
       character(4) :: Ntype
       integer      :: Nordo,Nordn,NdofQo,NdofQn,NvarQ
@@ -816,11 +860,13 @@
       integer :: nord1o,nord2o,nord3o, &
                  nord1n,nord2n,nord3n
 !
+#if DEBUG_MODE
       if (iprint.eq.1) then
          write(*,7010) Ntype,Nordo,Nordn,NdofQo,NdofQn
  7010    format(' copy_dofQ: Ntype,Nordo,Nordn,NdofQo,NdofQn = ', &
                              a4,2i4,2i6)
       endif
+#endif
 !
       select case(Ntype)
 !
@@ -854,7 +900,10 @@
                                 ZdofQn,Nordn,Nordn,Nordn)
 !
       end select
+!
+#if DEBUG_MODE
       if (iprint.eq.1) write(*,*) 'copy_dofQ: DONE'
+#endif
 !
 !
       end subroutine copy_dofQ
