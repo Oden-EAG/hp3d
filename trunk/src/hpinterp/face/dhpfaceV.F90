@@ -38,7 +38,7 @@
   integer, dimension(6),                      intent(in)  :: Nface_orient
   integer, dimension(19),                     intent(in)  :: Norder
 !
-  VTYPE,   dimension(NRCOMS*NREQNH(Icase),*), intent(inout) :: ZnodV
+  VTYPE,   dimension(NRCOMS*NREQNV(Icase),*), intent(inout) :: ZnodV
 !
 ! ** Locals
 !-----------------------------------------------------------------------
@@ -60,8 +60,8 @@
 !
 ! work space for shape3V
   integer                               :: nrdofV
-  real(8), dimension(3,MAXbrickH)       :: shapV
-  real(8), dimension(MAXbrickH)         :: divV
+  real(8), dimension(3,MAXbrickV)       :: shapV
+  real(8), dimension(MAXbrickV)         :: divV
 !
 ! H(div) test and trial shape function in reference coordinates
   real(8), dimension(3)                 :: uVeta,vVeta
