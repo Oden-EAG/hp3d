@@ -41,7 +41,7 @@
   integer, dimension(6),   intent(in)  :: Nface_orient
   integer, dimension(19),  intent(in)  :: Norder
 !
-  VTYPE,   dimension(NRCOMS*NREQNH(Icase),*), intent(inout) :: ZnodV
+  VTYPE,   dimension(NRCOMS*NREQNV(Icase),*), intent(inout) :: ZnodV
 !
 ! ** Locals
 !-----------------------------------------------------------------------
