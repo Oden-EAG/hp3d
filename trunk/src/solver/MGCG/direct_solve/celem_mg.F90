@@ -319,7 +319,7 @@ subroutine celem_mg(Ielc,Iel,Mdle,Idec,                       &
                case(1)
                   IDBC(l)=1
                   do iload=1,NR_RHS
-                     ZDOFD(l,iload) = NODES(nod)%zdofH((iload-1)*nvarHt+ivar,j)
+                     ZDOFD(l,iload) = NODES(nod)%dof%zdofH((iload-1)*nvarHt+ivar,j)
                   enddo
 !
 !           ...dof present and active
@@ -385,7 +385,7 @@ subroutine celem_mg(Ielc,Iel,Mdle,Idec,                       &
                case(3)
                   IDBC(l)=1
                   do iload=1,NR_RHS
-                     ZDOFD(l,iload) = NODES(nod)%zdofE((iload-1)*nvarEt+ivar,j)
+                     ZDOFD(l,iload) = NODES(nod)%dof%zdofE((iload-1)*nvarEt+ivar,j)
                   enddo
 !
 !           ...dof present and active
@@ -451,7 +451,7 @@ subroutine celem_mg(Ielc,Iel,Mdle,Idec,                       &
                case(5)
                   IDBC(l)=1
                   do iload=1,NR_RHS
-                     ZDOFD(l,iload) = NODES(nod)%zdofV((iload-1)*nvarVt+ivar,j)
+                     ZDOFD(l,iload) = NODES(nod)%dof%zdofV((iload-1)*nvarVt+ivar,j)
                   enddo
 !
 !           ...dof present and active

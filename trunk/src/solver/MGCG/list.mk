@@ -14,7 +14,6 @@
 ./utilities/inject_dof.F90
 ./utilities/mg_utilities.F90
 ./direct_solve/coarse_solve_mumps.F90
-./direct_solve/coarse_solve_pardiso.F90
 ./direct_solve/solout1.F90
 ./direct_solve/solout_mg.F90
 ./direct_solve/celem_mg.F90

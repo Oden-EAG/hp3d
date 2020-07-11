@@ -175,7 +175,7 @@ subroutine compute_local_sol_dof(Iel,Mdle)
                      nn=nn+1
 !
 !                 ...copy the dof
-                     ZSOL_C(Iel)%coarse(nn) = NODES(nod)%zdofH(ivar,j)
+                     ZSOL_C(Iel)%coarse(nn) = NODES(nod)%dof%zdofH(ivar,j)
                   case default
                   end select
 !           ...end loop over components
@@ -238,7 +238,7 @@ subroutine compute_local_sol_dof(Iel,Mdle)
                      nn=nn+1
 !
 !                 ...copy the dof
-                     ZSOL_C(Iel)%coarse(nn) = NODES(nod)%zdofE(ivar,j)
+                     ZSOL_C(Iel)%coarse(nn) = NODES(nod)%dof%zdofE(ivar,j)
                   case default
                   end select
 !           ...end loop over components
@@ -303,7 +303,7 @@ subroutine compute_local_sol_dof(Iel,Mdle)
                      nn=nn+1
 !
 !                 ...copy the dof
-                     ZSOL_C(Iel)%coarse(nn) = NODES(nod)%zdofV(ivar,j)
+                     ZSOL_C(Iel)%coarse(nn) = NODES(nod)%dof%zdofV(ivar,j)
 case default
                   end select
 !           ...end loop over components

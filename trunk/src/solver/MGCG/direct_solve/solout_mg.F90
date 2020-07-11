@@ -181,13 +181,13 @@ subroutine solout_mg(Ielc,Iel,Mdle,Ndof,Nrhs,Zele)
                      nn=nn+1
 !
 !                 ...copy the dof
-                     NODES(nod)%zdofH(ivar,j) = Zele(nn)
+                     NODES(nod)%dof%zdofH(ivar,j) = Zele(nn)
 #if DEBUG_MODE
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Zele(nn)
   7006                  format('solout_mg: nn,load,Zele(nn) = ',i4,i3,x,2e13.5)
-                        write(*,7007) nod,j,ivar,NODES(nod)%zdofH(ivar,j)
-  7007                  format('solout_mg: nod,j,ivar,NODES(nod)%zdofH(ivar,j)', &
+                        write(*,7007) nod,j,ivar,NODES(nod)%dof%zdofH(ivar,j)
+  7007                  format('solout_mg: nod,j,ivar,NODES(nod)%dof%zdofH(ivar,j)', &
                                ' = ',i5,i3,i3,x,2e13.5)
                      endif
 #endif
@@ -256,12 +256,12 @@ subroutine solout_mg(Ielc,Iel,Mdle,Ndof,Nrhs,Zele)
                      nn=nn+1
 !
 !                 ...copy the dof
-                     NODES(nod)%zdofE(ivar,j) = Zele(nn)
+                     NODES(nod)%dof%zdofE(ivar,j) = Zele(nn)
 #if DEBUG_MODE
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Zele(nn)
-                        write(*,7009) nod,j,ivar,NODES(nod)%zdofE(ivar,j)
- 7009                   format('solout_mg: nod,j,ivar,NODES(nod)%zdofE(ivar,j)', &
+                        write(*,7009) nod,j,ivar,NODES(nod)%dof%zdofE(ivar,j)
+ 7009                   format('solout_mg: nod,j,ivar,NODES(nod)%dof%zdofE(ivar,j)', &
                                ' = ',i5,i3,i3,x,2e13.5)
                      endif
 #endif
@@ -331,12 +331,12 @@ subroutine solout_mg(Ielc,Iel,Mdle,Ndof,Nrhs,Zele)
                      nn=nn+1
 !
 !                 ...copy the dof
-                     NODES(nod)%zdofV(ivar,j) = Zele(nn)
+                     NODES(nod)%dof%zdofV(ivar,j) = Zele(nn)
 #if DEBUG_MODE
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Zele(nn)
-                        write(*,7010) nod,j,ivar,NODES(nod)%zdofV(ivar,j)
- 7010                   format('solout_mg: nod,j,ivar,NODES(nod)%zdofV(ivar,j)', &
+                        write(*,7010) nod,j,ivar,NODES(nod)%dof%zdofV(ivar,j)
+ 7010                   format('solout_mg: nod,j,ivar,NODES(nod)%dof%zdofV(ivar,j)', &
                                ' = ',i5,i3,i3,x,2e13.5)
                      endif
 #endif

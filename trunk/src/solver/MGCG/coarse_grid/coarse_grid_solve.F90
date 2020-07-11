@@ -26,7 +26,8 @@
    use macro_grid_info,   only: NRDOF_COARSE
    use stc,               only: CLOC
    use mumps,             only: MUMPS_PAR
-   use pardiso_data
+!!!   use pardiso_data
+! TODO: Fix pardiso_data file
 !
    implicit none
 !
@@ -81,16 +82,16 @@
       rhs_coarse = mumps_par%RHS
    else
 !
-      PRDS_RHS = rhs_coarse
-      PRDS_PHASE = 33 ! only solve
-      PRDS_IPARM(8) = 1 ! max numbers of iterative refinement steps
-
-      call pardiso(PRDS_PT,PRDS_MAXFCT,PRDS_MNUM,PRDS_MTYPE,PRDS_PHASE,   &
-                   PRDS_N,PRDS_A(1:PRDS_NZ),PRDS_IA(1:NRDOF_COARSE+1),    &
-                   PRDS_JA(1:PRDS_NZ),PRDS_PERM,PRDS_NRHS,PRDS_IPARM,     &
-                   PRDS_MSGLVL,PRDS_RHS,PRDS_XSOL,PRDS_ERROR)
-
-      rhs_coarse = PRDS_XSOL
+!      PRDS_RHS = rhs_coarse
+!      PRDS_PHASE = 33 ! only solve
+!      PRDS_IPARM(8) = 1 ! max numbers of iterative refinement steps
+!
+!      call pardiso(PRDS_PT,PRDS_MAXFCT,PRDS_MNUM,PRDS_MTYPE,PRDS_PHASE,   &
+!                   PRDS_N,PRDS_A(1:PRDS_NZ),PRDS_IA(1:NRDOF_COARSE+1),    &
+!                   PRDS_JA(1:PRDS_NZ),PRDS_PERM,PRDS_NRHS,PRDS_IPARM,     &
+!                   PRDS_MSGLVL,PRDS_RHS,PRDS_XSOL,PRDS_ERROR)
+!
+!      rhs_coarse = PRDS_XSOL
    endif
 !
 !..restrict the element, prolong to the macro grid and assemble

@@ -434,7 +434,7 @@
 !
 !..place 'Nod' on the auxiliary list
    if (NODES(Nod)%ref_kind.eq.0) then
-      if (NODES(Nod)%act.eq.1) then
+      if (NODES(Nod)%act) then
          Nlist=Nlist+1
          DESCENDANTS(Nlist) = Nod
          return
@@ -455,7 +455,7 @@
 !         nson = NODES(nfath)%sons(is)
          nson = Son(nfath,is)
          if (NODES(nson)%ref_kind.eq.0) then
-            if (NODES(nson)%act.eq.1) then
+            if (NODES(nson)%act) then
                if (Nlist .ge. maxnlist) then
                   maxnlist = 2*Nlist
                   allocate(listb(maxnlist)); listb(1:Nlist) = DESCENDANTS(1:Nlist)
