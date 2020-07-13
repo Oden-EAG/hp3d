@@ -5,8 +5,7 @@
 
 # Set variables if not set by m_options
 COMPLEX    ?= 0
-C_MODE     ?= 0
-DEBUG_MODE ?= 0
+DEBUG      ?= 0
 J          ?= 1
 
 ####################################################
@@ -36,7 +35,7 @@ endif
 # Files with ending in .F and .F90 (not .f and .f90)
 # are preprocessed according to certain directives
 CCDEFS    = -D"C_MODE=$(COMPLEX)" \
-            -D"DEBUG_MODE=$(DEBUG_MODE)"
+            -D"DEBUG_MODE=$(DEBUG)"
 
 # -- Includes --
 CCINCS   += -I./$(SRC_PATH) \
