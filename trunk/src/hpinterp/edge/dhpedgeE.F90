@@ -51,13 +51,13 @@
   real(8), dimension(MAX_NINT1)         :: wa_list
   real(8)                               :: wa, weight
 !
-! work space for shape3H
+! work space for shape3DH
   integer                               :: nrdofH
   integer, dimension(19)                :: norder_1
   real(8), dimension(MAXbrickH)         :: shapH
   real(8), dimension(3,MAXbrickH)       :: gradH
 !
-! work space for shape3E
+! work space for shape3DE
   integer                               :: nrdofE
   real(8), dimension(3,MAXbrickE)       :: shapE
   real(8), dimension(3,MAXbrickE)       :: curlE

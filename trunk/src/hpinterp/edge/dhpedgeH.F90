@@ -53,7 +53,7 @@
   real(8), dimension(MAX_NINT1)         :: wa_list
   real(8)                               :: wa, weight
 !
-! work space for shape3H
+! work space for shape3DH
   integer                               :: nrdofH
   integer, dimension(19)                :: norder_1
   real(8), dimension(MAXbrickH)         :: shapH
