@@ -52,16 +52,17 @@
   real(8), dimension(   MAXquadH)       :: wa_list
   real(8)                               :: wa, weight
 !
-! work space for shape3H
+! work space for shape3DH
   integer                               :: nrdofH
   integer, dimension(19)                :: norder_1
+!
   real(8), dimension(MAXbrickH)         :: shapH
   real(8), dimension(3,MAXbrickH)       :: gradH
 !
-! work space for shape3V
+! work space for shape3DV
   integer                               :: nrdofV
-  real(8), dimension(3,MAXbrickH)       :: shapV
-  real(8), dimension(MAXbrickH)         :: divV
+  real(8), dimension(3,MAXbrickV)       :: shapV
+  real(8), dimension(MAXbrickV)         :: divV
 !
 ! H(div) test and trial shape function in reference coordinates
   real(8), dimension(3)                 :: uVeta,vVeta

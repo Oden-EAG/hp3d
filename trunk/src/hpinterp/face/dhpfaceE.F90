@@ -54,7 +54,7 @@
   real(8), dimension(   MAXquadH)       :: wa_list
   real(8)                               :: wa, weight
 !
-! work space for shape3H
+! work space for shape3DH
   integer                               :: nrdofH
   integer, dimension(19)                :: norder_1
   real(8), dimension(MAXbrickH)         :: shapH
@@ -63,7 +63,7 @@
 ! derivatives of a H1 shape function wrt reference coordinates
   real(8), dimension(3)                 :: dvHdeta
 !
-! work space for shape3E
+! work space for shape3DE
   integer                               :: nrdofE
   real(8), dimension(3,MAXbrickE)       :: shapE
   real(8), dimension(3,MAXbrickE)       :: curlE
