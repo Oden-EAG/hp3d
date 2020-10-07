@@ -31,21 +31,83 @@ subroutine get_bgPol(Dom_flag,Fld_flag,Delta_n,X, Bg_pol)
 !
    real(8) :: aux(3,3)
 !
-   real(8), parameter :: gratingCore = 1.0d-3
-   real(8), parameter :: gratingClad = 1.0d-6
-   real(8), parameter :: gratingFreq = 0.0511d0
+   real(8), parameter :: spatialFreq = 1.0d0
+   real(8), parameter :: temporalFreq = 1.0d0
+!..perturbation amplitude
+   !real(8), parameter :: gratingCore = 1.25d-4
+   real(8), parameter :: gratingCore = 2.50d-4
+   !real(8), parameter :: gratingCore = 5.00d-4
+   !real(8), parameter :: gratingCore = 1.00d-3
+!
+   real(8), parameter :: gratingClad = 0.0d0
+!
+!..Grating frequency depends on beatLength
+!   real(8), parameter :: beatLength =  0.0511d0 ! LP01 (x), LP02 (x); nx = 1.45
+    real(8), parameter :: beatLength =  0.0203d0 ! LP01 (x), LP11 (x); nx = 1.45
+!   real(8), parameter :: beatLength =  0.0453d0 ! LP01 (x), LP21 (x); nx = 1.45
+!
+   !real(8), parameter :: beatLength =  0.0719d0 ! LP01 (x), LP02 (x); nx = 1.15
+   !real(8), parameter :: beatLength = 11.8005d0 ! LP01 (x), LP01 (y); nx = 1.45, ny = 1.65
+!
+   real(8), parameter :: gratingFreq =  beatLength * spatialFreq
+!
+!..define asymmetric perturbation region
+   real(8) :: x_perturb, y_perturb ! coordinates of the center of perturbation region
+   real(8) :: r_perturb ! radius of the perturbation region (relative to core size)
+   real(8) :: r ! radial distance of X from perturbation center
+!
+!..define a phase shift for the sin(z) perturbation function
+   !real(8) :: phaseShift = 0.d0
+   !real(8) :: phaseShift = PI / 2.d0
+   real(8) :: phaseShift = PI
 !
    aux = 0.d0
    if (Dom_flag.eq.1) then
       aux = CORE_N+Delta_n*IDENTITY
-      if (ART_GRATING .eq. 1) aux = aux + gratingCore*sin(gratingFreq*X(3))*IDENTITY
+      if (ART_GRATING .eq. 1) then
+      !  symmetric grating
+      !..EXP 0 (LP01 to LP02)
+!         x_perturb = 0.0d0; y_perturb = 0.0d0
+!         r_perturb = 0.5d0*R_CORE
+      !  asymmetric grating
+      !..EXP 1 (LP01 to LP02)
+!         x_perturb = 0.3d0*R_CORE; y_perturb = 0.0d0
+!         r_perturb = 0.7d0*R_CORE
+      !..EXP 2 (LP01 to LP11a)
+         x_perturb = -0.4d0*R_CORE; y_perturb = 0.0d0
+         r_perturb =  0.6d0*R_CORE
+      !..EXP 3 (LP01 to LP21a (and LP11b))
+!         x_perturb = 0.0d0; y_perturb = 0.5d0*R_CORE
+!         r_perturb = 0.5d0*R_CORE
+      !..EXP 4 (LP01 to LP21b)
+!         x_perturb = 0.35d0*R_CORE; y_perturb = -0.35d0*R_CORE
+!         r_perturb = 0.5d0*R_CORE
+!
+         r = sqrt((X(1)-x_perturb)**2.d0+(X(2)-y_perturb)**2.d0)
+!     ...circular perturbation region
+         if (r .le. r_perturb) then
+            aux = aux + gratingCore*sin(gratingFreq*X(3) + phaseShift)*IDENTITY
+!     ...annulus perturbation region
+         else
+            !aux = aux + gratingCore*sin(gratingFreq*X(3) + phaseShift)*IDENTITY
+         endif
+      endif
+      !if (ART_GRATING .eq. 1) aux(1,2) = aux(1,2) + gratingCore*sin(gratingFreq*X(3))
+      !if (ART_GRATING .eq. 1) aux(2,1) = aux(2,1) + gratingCore*sin(gratingFreq*X(3))
+      !if (ART_GRATING .eq. 1) aux(1,1) = aux(1,1) + gratingCore*sin(gratingFreq*X(3)) ! grating in x-pol. only
+!     TODO: double check if eps*eps is correct here, or if it is eps^T * eps, etc.
+      !call DGEMM('N', 'N', 3, 3, 3, 1.d0, aux, 3, aux, 3, 0.d0, aux, 3)
       aux(1,1) = aux(1,1)*aux(1,1)
       aux(2,2) = aux(2,2)*aux(2,2)
       aux(3,3) = aux(3,3)*aux(3,3)
       Bg_pol = aux-IDENTITY
    elseif (Dom_flag.eq.0) then
       aux = CLAD_N+Delta_n*IDENTITY
-      if (ART_GRATING .eq. 1) aux = aux + gratingClad*sin(gratingFreq*X(3))*IDENTITY
+      !if (ART_GRATING .eq. 1) aux = aux + gratingClad*sin(gratingFreq*X(3))*IDENTITY
+      !if (ART_GRATING .eq. 1) aux(1,2) = aux(1,2) + gratingClad*sin(gratingFreq*X(3))
+      !if (ART_GRATING .eq. 1) aux(2,1) = aux(2,1) + gratingClad*sin(gratingFreq*X(3))
+      !if (ART_GRATING .eq. 1) aux(1,1) = aux(1,1) + gratingClad*sin(gratingFreq*X(3)) ! grating in x-pol. only
+      !call DGEMM('N', 'N', 3, 3, 3, 1.d0, aux, 3, aux, 3, 0.d0, aux, 3)
       aux(1,1) = aux(1,1)*aux(1,1)
       aux(2,2) = aux(2,2)*aux(2,2)
       aux(3,3) = aux(3,3)*aux(3,3)
