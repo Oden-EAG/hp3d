@@ -57,7 +57,6 @@ module commonParam
    integer :: ORDER_APPROX_X,ORDER_APPROX_Y,ORDER_APPROX_Z
    integer :: NPX, NPY, NPZ
    integer :: ICOMP_EXACT
-!..TODO: check if thread safe ICOMP is still needed (delete otherwise)
    integer :: ICOMP_TS
 !$OMP THREADPRIVATE (ICOMP_TS)
    integer :: ICHOOSE_DISP, ICHOOSE_COMP, ICHOOSE_SIGPUMP
