@@ -99,7 +99,7 @@ subroutine soln2vtk(Sname, Sfile, Snick, Icomp, Ic)
 !$OMP         xnod,zdofH,zdofE,zdofV,zdofQ,           &
 !$OMP         norder,nedge_orient,nface_orient,       &
 !$OMP         x,dxdxi,zsolH,zgradH,zsolE,zcurlE,      &
-!$OMP         zsolV,zdivV,zsolQ,val,subd)        &
+!$OMP         zsolV,zdivV,zsolQ,isol,val,subd)        &
 !$OMP SCHEDULE(DYNAMIC)
     do iel=1,NRELES
       mdle = ELEM_ORDER(iel)

@@ -63,9 +63,6 @@ else
    LOAD_FACTOR_PREV = LOAD_FACTOR
 endif
 
-! call mumps_sc('G')
-! call pause
-
 ! prepare connectivity and array sizing (using celem, etc.) - THIS ASSUMES A CONSTANT MESH ALL ALONG
 call prep_mumps('G')
 

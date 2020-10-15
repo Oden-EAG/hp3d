@@ -52,7 +52,7 @@ module common_prob_data
   integer, parameter :: IEXACT_SINGULAR    = 5
 
 ! exponents defining exact polynomial solution (IEXACT_PROB = IEXACT_POLYNOMIAL)
-  integer :: NP1 = 6, NP2 = 6, NP3 = 6
+  integer :: NP1 = 2, NP2 = 2, NP3 = 2
 ! pi for sinusiondal solution
   real*8,  parameter :: PI = 4.d0*datan(1.d0)
 ! tolerance for singular solution

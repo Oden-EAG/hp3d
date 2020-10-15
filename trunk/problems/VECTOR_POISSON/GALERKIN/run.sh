@@ -21,8 +21,6 @@ imax=3
 # - MAXNODS
 maxnods=525000
 
-export KMP_STACKSIZE=64M # p=5
-
 # TACC MPI
 # ibrun -n <mpi_procs>
 #

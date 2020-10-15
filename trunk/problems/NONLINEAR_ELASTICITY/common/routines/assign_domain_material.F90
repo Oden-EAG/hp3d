@@ -15,9 +15,8 @@ enddo
 
 ! For particular problems uncomment and fill the following
 !
-if (NRDOMAIN.gt.1) then
-GMP_MAT = 1
-GMP_MAT(NRDOMAIN) = 2
-endif
+! if (NRDOMAIN.gt.1) then
+
+! endif
 
 end subroutine

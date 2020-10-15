@@ -8,7 +8,7 @@ HP3D_BASE_PATH  = /Users/jaimedavid/hp3D/LIBS/par_hp3d/trunk
 # PREPROCESSOR VARIABLES
 #------------------------------------------------------------------
 COMPLEX ?= 0
-DEBUG   ?= 0
+DEBUG   ?= 1
 
 #------------------------------------------------------------------
 # COMPILER SETTINGS (a 64bit processor architecture is assumed)
