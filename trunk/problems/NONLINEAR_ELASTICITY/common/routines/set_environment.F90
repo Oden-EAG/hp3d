@@ -18,12 +18,12 @@ subroutine set_environment
 ! Variables relevant to src/modules/environment
 !                        option label     // explanation               // default value             // parameter
   call get_option_string('-file-control'    ,'Control file'              ,'../common/control/control' ,FILE_CONTROL)
-  call get_option_string('-file-geometry'   ,'Geometry file'             ,'../common/geometries/quarter_sphere' ,FILE_GEOM   )
+  call get_option_string('-file-geometry'   ,'Geometry file'             ,'../common/geometries/hexa' ,FILE_GEOM   )
   call get_option_string('-file-phys'       ,'Physics file'              ,'./input/physics'           ,FILE_PHYS   )
   call get_option_string('-file-history'    ,'History file'              ,'./input/history'           ,FILE_HISTORY)
   call get_option_string('-file-err'        ,'Error file'                ,'./output/errorlogs/log.txt',FILE_ERR    )
   call get_option_string('-file-refinement' ,'Refinement files location' ,'../../../files/ref'        ,FILE_REFINE )
-  call get_option_string('-prefix'          ,'Prefix for paraview files' ,'qs_'                     ,PREFIX      )
+  call get_option_string('-prefix'          ,'Prefix for paraview files' ,'hx_'                     ,PREFIX      )
 !
 ! Variables relevant to src/modules/paraview
 !                        option label     // explanation                        // default value     // parameter

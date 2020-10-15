@@ -81,6 +81,7 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
    NODES(Nod)%order = Norder
    NODES(Nod)%bcond = Nbcond
 !
+   if (.not.associated(NODES(Nod)%index)) allocate(NODES(Nod)%index(NRINDEX))
    call set_index(Icase,Nbcond, NODES(Nod)%index)
    NODES(Nod)%ref_kind    = 0
    NODES(Nod)%father      = Nfath

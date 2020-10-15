@@ -1,5 +1,5 @@
 !---------------------------------------------------------------------
-!   latest revision    - May 2020
+!   latest revision    - OCT 2020
 !
 !   purpose            - set index for a node using the nodal case
 !                        and boundary condition flags
@@ -9,12 +9,10 @@
 !          Icase       - node case
 !          Iflag       - BC flag
 !     out:
-!          Index       - Vector indicating presence and kind of
-!                        particular variables encoded decimally
-!                        into a single (LONG) integer
+!          Indexd      - NRINDEX-long Vector of 1-byte integers indicating
+!                        presence and kind of particular variables
 !
-!          Explanation of index in the expanded (or decimal) mode
-!          indexd. For the i-th component:
+!          Explanation of indexd for the i-th component:
 !
 !          indexd(i) = 0  component does not exist
 !                    = 1  H1 component with Dirichlet BC flag
@@ -27,18 +25,18 @@
 !                    = 8  free L2 component
 !---------------------------------------------------------------------
 !
-subroutine set_index(Icase,Iflag, Index)
+subroutine set_index(Icase,Iflag, Indexd)
 !
       use physics
 !
       implicit none
 
       integer,    intent(in)  :: Icase,Iflag
-      integer(16), intent(out) :: Index
+      integer(1), intent(out) :: Indexd(*)
 !
 !  ...local variables
 !  ...index in the decimal form
-      integer,dimension(NRINDEX)  :: indexd
+      ! integer,dimension(NRINDEX)  :: indexd
 !  ...binary version of Icase
       integer,dimension(NR_PHYSA) :: ncase
 !  ...decimal version of the BC flag
@@ -65,7 +63,7 @@ subroutine set_index(Icase,Iflag, Index)
 !  .....if physical attribute is absent, skip its components
         if (ncase(i).eq.0) then
           do j=1,NR_COMP(i)
-            ic=ic+1 ; indexd(ic)=0
+            ic=ic+1 ; indexd(ic)=0_1
           enddo
 !
 !  .....physical attribute is present
@@ -80,34 +78,34 @@ subroutine set_index(Icase,Iflag, Index)
               ic=ic+1
 !
 !  ...........free H1 component
-              indexd(ic)=2
+              indexd(ic)=2_1
 !
 !  ...........Dirichlet BC on ALL components
-              if (ibcd(i).eq.1) indexd(ic)=1
+              if (ibcd(i).eq.1) indexd(ic)=1_1
 !
 !  ...........Dirichlet BC on 2nd and 3rd components
               if ((ibcd(i).eq.3).and.((j.eq.2).or.(j.eq.3))) then
-                indexd(ic)=1
+                indexd(ic)=1_1
               endif
 !
 !  ...........Dirichlet BC on 1st and 3rd components
               if ((ibcd(i).eq.4).and.((j.eq.1).or.(j.eq.3))) then
-                indexd(ic)=1
+                indexd(ic)=1_1
               endif
 !
 !  ...........Dirichlet BC on 1st and 2nd components
               if ((ibcd(i).eq.5).and.((j.eq.1).or.(j.eq.2))) then
-                indexd(ic)=1
+                indexd(ic)=1_1
               endif
 !
 !  ...........Dirichlet BC on 1st component
-              if ((ibcd(i).eq.6).and.(j.eq.1)) indexd(ic)=1
+              if ((ibcd(i).eq.6).and.(j.eq.1)) indexd(ic)=1_1
 !
 !  ...........Dirichlet BC on 2nd component
-              if ((ibcd(i).eq.7).and.(j.eq.2)) indexd(ic)=1
+              if ((ibcd(i).eq.7).and.(j.eq.2)) indexd(ic)=1_1
 !
 !  ...........Dirichlet BC on 3rd component
-              if ((ibcd(i).eq.8).and.(j.eq.3)) indexd(ic)=1
+              if ((ibcd(i).eq.8).and.(j.eq.3)) indexd(ic)=1_1
             enddo
 !
 !  .......H(curl) variable
@@ -118,34 +116,34 @@ subroutine set_index(Icase,Iflag, Index)
               ic=ic+1
 !
 !  ...........free H(curl) component
-              indexd(ic)=4
+              indexd(ic)=4_1
 !
 !  ...........Dirichlet BC
-              if (ibcd(i).eq.1) indexd(ic)=3
+              if (ibcd(i).eq.1) indexd(ic)=3_1
 !
 !  ...........Dirichlet BC on 2nd and 3rd components
               if ((ibcd(i).eq.3).and.((j.eq.2).or.(j.eq.3))) then
-                indexd(ic)=3
+                indexd(ic)=3_1
               endif
 !
 !  ...........Dirichlet BC on 1st and 3rd components
               if ((ibcd(i).eq.4).and.((j.eq.1).or.(j.eq.3))) then
-                indexd(ic)=3
+                indexd(ic)=3_1
               endif
 !
 !  ...........Dirichlet BC on 1st and 2nd components
               if ((ibcd(i).eq.5).and.((j.eq.1).or.(j.eq.2))) then
-                indexd(ic)=3
+                indexd(ic)=3_1
               endif
 !
 !  ...........Dirichlet BC on 1st component
-              if ((ibcd(i).eq.6).and.(j.eq.1)) indexd(ic)=3
+              if ((ibcd(i).eq.6).and.(j.eq.1)) indexd(ic)=3_1
 !
 !  ...........Dirichlet BC on 2nd component
-              if ((ibcd(i).eq.7).and.(j.eq.2)) indexd(ic)=3
+              if ((ibcd(i).eq.7).and.(j.eq.2)) indexd(ic)=3_1
 !
 !  ...........Dirichlet BC on 3rd component
-              if ((ibcd(i).eq.8).and.(j.eq.3)) indexd(ic)=3
+              if ((ibcd(i).eq.8).and.(j.eq.3)) indexd(ic)=3_1
 !
 !          ...specific for EM impedance BC
 !  ...........Impedance BC for Primal Maxwell
@@ -162,41 +160,41 @@ subroutine set_index(Icase,Iflag, Index)
               ic=ic+1
 !
 !  ...........free H(div) component
-              indexd(ic)=6
+              indexd(ic)=6_1
 !
 !  ...........Dirichlet BC
               if (ibcd(i).eq.1) then
-                indexd(ic)=5
+                indexd(ic)=5_1
               endif
 !
 !  ...........Dirichlet BC on 1st component
               if ((ibcd(i).eq.3).and.(j.eq.1)) then
-                indexd(ic)=5
+                indexd(ic)=5_1
               endif
 !
 !  ...........Dirichlet BC on 2nd component
               if ((ibcd(i).eq.4).and.(j.eq.2)) then
-                indexd(ic)=5
+                indexd(ic)=5_1
               endif
 !
 !  ...........Dirichlet BC on 3rd component
               if ((ibcd(i).eq.5).and.(j.eq.3)) then
-                indexd(ic)=5
+                indexd(ic)=5_1
               endif
 !
 !  ...........Dirichlet BC on 2nd and 3rd components
               if ((ibcd(i).eq.6).and.((j.eq.2).or.(j.eq.3))) then
-                indexd(ic)=5
+                indexd(ic)=5_1
               endif
 !
 !  ...........Dirichlet BC on 1st and 3rd components
               if ((ibcd(i).eq.7).and.((j.eq.1).or.(j.eq.3))) then
-                indexd(ic)=5
+                indexd(ic)=5_1
               endif
 !
 !  ...........Dirichlet BC on 1st and 2nd components
               if ((ibcd(i).eq.8).and.((j.eq.1).or.(j.eq.2))) then
-                indexd(ic)=5
+                indexd(ic)=5_1
               endif
             enddo
 !
@@ -214,10 +212,10 @@ subroutine set_index(Icase,Iflag, Index)
               ic=ic+1
 !
 !  ...........free L2 component
-              indexd(ic)=8
+              indexd(ic)=8_1
 !
 !  ...........Dirichlet BC
-              if (ibcd(i).eq.1) indexd(ic)=7
+              if (ibcd(i).eq.1) indexd(ic)=7_1
             enddo
           end select
         endif
@@ -229,15 +227,13 @@ subroutine set_index(Icase,Iflag, Index)
         stop
       endif
 !
-      call encodLonger(indexd,10,NRINDEX, Index)
+      ! call encodLonger(indexd,10,NRINDEX, Index)
 !
 !
 #if DEBUG_MODE
       if (iprint.eq.1) then
-        write(*,7001) Icase,Iflag,indexd
- 7001   format('set_index: Icase,Iflag,indexd = ',i3,i3,3x,10i1)
-        write(*,7002) Index
- 7002   format('           Index = ',i10)
+        write(*,7001) Icase,Iflag,indexd(1:NRINDEX)
+ 7001   format('set_index: Icase,Iflag,indexd = ',i3,i3,3x,32i2)
         call pause
       endif
 #endif

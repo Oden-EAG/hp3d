@@ -15,7 +15,7 @@ subroutine exec_case(idec)
 !
    integer, intent(in) :: idec
 !
-   logical :: solved , Lsflag_tmp,Bfgs_tmp
+   logical :: solved , Lsflag_tmp,Bfgs_tmp , pvflag
    integer :: mdle_subd(NRELES)
    integer :: i,mdle,kref,src,count,ierr
    integer :: physNick, flag(2), nstop , nsteps
@@ -198,8 +198,10 @@ subroutine exec_case(idec)
          read (*,*) Lsflag_tmp
          write(*,*) 'Use BFGS updates (T/F)'
          read (*,*) Bfgs_tmp
-         
-         call nl_elast_solve(N_incr,Step_size,Abs_tol,Rel_tol,Maxiter,Nupdate,Lsflag_tmp,Bfgs_tmp)
+         write(*,*) 'Write Paraview output (T/F)'
+         read (*,*) pvflag
+
+         call nl_elast_solve(N_incr,Step_size,Abs_tol,Rel_tol,Maxiter,Nupdate,Lsflag_tmp,Bfgs_tmp,pvflag)
 
 
 

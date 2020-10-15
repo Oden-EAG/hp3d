@@ -114,7 +114,7 @@ c
         write(*,7023) NODES(nod)%case
  7023   format(' CASE = ',i5)
         write(*,7024) NODES(nod)%index
- 7024   format(' INDEX = ',i40)
+ 7024   format(' INDEX = ',32(i2))
         write(*,7025) NODES(nod)%order
  7025   format(' ORDER = ',i3)
         write(*,7026) NODES(nod)%bcond

@@ -108,7 +108,7 @@ module data_structure3D
 !         6 - free H(div) component
 !         7 - L2 component with Dirichlet BC flag
 !         8 - free L2 component
-        integer(16)       :: index
+        integer(1),dimension(:),pointer :: index
 !
 !  .....order of approximation
         integer          :: order
@@ -305,9 +305,12 @@ module data_structure3D
 !  ...get index for a node
       subroutine get_index(Nod, Indexd)
 !
-      integer Indexd(NRINDEX)
+      integer Indexd(NRINDEX),i
 !
-      call decodLonger(NODES(Nod)%index,10,NRINDEX, Indexd)
+      do i=1,NRINDEX
+        Indexd(i) = INT(NODES(Nod)%index(i),4)
+      enddo
+      ! call decodLonger(NODES(Nod)%index,10,NRINDEX, Indexd)
 !
       end subroutine get_index
 !
@@ -342,7 +345,7 @@ module data_structure3D
       do nod=1,MAXNODS
         NODES(nod)%type = 'none'
         NODES(nod)%case = 0
-        NODES(nod)%index = 0
+        nullify (NODES(nod)%index)
         NODES(nod)%order = 0
         NODES(nod)%act = .false.
         NODES(nod)%subd = -1
@@ -380,6 +383,7 @@ module data_structure3D
       deallocate(ELEMS)
 !
       do nod=1,MAXNODS
+        if (associated(NODES(nod)%index)) deallocate(NODES(nod)%index)
         if (associated(NODES(nod)%dof)) then
           if (associated(NODES(nod)%dof%coord)) deallocate(NODES(nod)%dof%coord)
           if (associated(NODES(nod)%dof%zdofH)) deallocate(NODES(nod)%dof%zdofH)
