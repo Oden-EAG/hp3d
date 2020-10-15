@@ -1,0 +1,367 @@
+3   3     NDIM,MANDIM
+
+
+1         no surfaces
+
+Sphere             surface 1: sphere
+0.d0 0.0d0 0.0d0   sphere center
+1.0d0              sphere radius
+
+1         NRDOMAIN
+
+22        NRPOINT
+
+Regular             point 1
+0.d0 0.d0 -2.d0
+
+Regular             point 2
+2.d0 0.d0 -2.d0
+
+Regular             point 3
+0.d0 2.d0 -2.d0
+
+Regular             point 4
+2.d0 2.d0 -2.d0
+
+Regular             point 5
+2.d0 0.d0 0.d0
+
+Regular             point 6
+0.d0 2.d0 0.d0
+
+Regular             point 7
+2.d0 2.d0 0.d0
+
+Regular             point 8
+0.d0 0.d0 2.d0
+
+Regular             point 9
+2.d0 0.d0 2.d0
+
+Regular             point 10
+0.d0 2.d0 2.d0
+
+Regular             point 11
+2.d0 2.d0 2.d0
+
+Regular             point 12
+0.d0 0.d0 -1.d0
+
+Regular             point 13
+0.d0 0.7071067811865475d0 -0.7071067811865475d0
+
+Regular             point 14
+0.d0 1.d0 0.d0
+
+Regular             point 15
+0.d0 0.7071067811865475d0 0.7071067811865475d0
+
+Regular             point 16
+0.d0 0.d0 1.d0
+
+Regular             point 17
+0.7071067811865475d0 0.d0 -0.7071067811865475d0
+
+Regular             point 18
+0.7071067811865475d0 0.5d0 -0.5d0
+
+Regular             point 19
+0.7071067811865475d0 0.7071067811865475d0 0.d0
+
+Regular             point 20
+0.7071067811865475d0 0.5d0 0.5d0
+
+Regular             point 21
+0.7071067811865475d0 0.d0 0.7071067811865475d0
+
+Regular             point 22
+1.d0 0.d0 0.d0
+
+
+
+
+43 NRCURVE
+
+Seglin              curve 1
+3 6
+
+Seglin              curve 2
+6 10
+
+Seglin              curve 3
+2 5
+
+Seglin              curve 4
+4 7
+
+Seglin              curve 5
+5 9
+
+Seglin              curve 6
+7 11
+
+Seglin              curve 7
+1 3
+
+Seglin              curve 8
+8 10
+
+Seglin              curve 9
+2 4
+
+Seglin              curve 10
+5 7
+
+Seglin              curve 11
+9 11
+
+Seglin              curve 12
+1 2
+
+Seglin              curve 13
+3 4
+
+Seglin              curve 14
+6 7
+
+Seglin              curve 15
+8 9
+
+Seglin              curve 16
+10 11
+
+Seglin              curve 17
+1 12
+
+Seglin              curve 18
+3 13
+
+Seglin              curve 19
+6 14
+
+Seglin              curve 20
+10 15
+
+Seglin              curve 21
+8 16
+
+Seglin              curve 22
+2 17
+
+Seglin              curve 23
+4 18
+
+Seglin              curve 24
+7 19
+
+Seglin              curve 25
+11 20
+
+Seglin              curve 26
+9 21
+
+Seglin              curve 27
+5 22
+
+
+
+1SurfsCur              curve 28
+12 13
+1
+
+1SurfsCur              curve 29
+13 14
+1
+
+1SurfsCur              curve 30
+14 15
+1
+
+1SurfsCur              curve 31
+15 16
+1
+
+1SurfsCur              curve 32
+17 18
+1
+
+1SurfsCur              curve 33
+18 19
+1
+
+1SurfsCur              curve 34
+19 20
+1
+
+1SurfsCur              curve 35
+20 21
+1
+
+1SurfsCur              curve 36
+12 17
+1
+
+1SurfsCur              curve 37
+13 18
+1
+
+1SurfsCur              curve 38
+14 19
+1
+
+1SurfsCur              curve 39
+15 20
+1
+
+1SurfsCur              curve 40
+16 21
+1
+
+1SurfsCur              curve 41
+17 22
+1
+
+1SurfsCur              curve 42
+19 22
+1
+
+1SurfsCur              curve 43
+21 22
+1
+
+
+0  NRTRIAN
+
+
+28 NRRECTA
+
+BilQua              rectangle 1
+2 4 7 5
+
+BilQua              rectangle 2
+5 7 11 9
+
+BilQua              rectangle 3
+1 3 4 2
+
+BilQua              rectangle 4
+8 10 11 9
+
+BilQua              rectangle 5
+3 6 7 4
+
+BilQua              rectangle 6
+6 10 11 7
+
+
+
+TraQua              rectangle 7
+1 12 13 3
+
+TraQua              rectangle 8
+3 13 14 6
+
+TraQua              rectangle 9
+6 14 15 10
+
+TraQua              rectangle 10
+10 15 16 8
+
+TraQua              rectangle 11
+1 12 17 2
+
+TraQua              rectangle 12
+3 13 18 4
+
+TraQua              rectangle 13
+6 14 19 7
+
+TraQua              rectangle 14
+10 15 20 11
+
+TraQua              rectangle 15
+8 16 21 9
+
+TraQua              rectangle 16
+2 17 18 4
+
+TraQua              rectangle 17
+4 18 19 7
+
+TraQua              rectangle 18
+7 19 20 11
+
+TraQua              rectangle 19
+11 20 21 9
+
+TraQua              rectangle 20
+2 17 22 5
+
+TraQua              rectangle 21
+5 22 19 7
+
+TraQua              rectangle 22
+5 22 21 9
+
+
+
+PTIRec              rectangle 23
+12 13 18 17
+1
+
+PTIRec              rectangle 24
+13 14 19 18
+1
+
+PTIRec              rectangle 25
+14 15 20 19
+1
+
+PTIRec              rectangle 26
+15 16 21 20
+1
+
+PTIRec              rectangle 27
+17 18 19 22
+1
+
+PTIRec              rectangle 28
+19 20 21 22
+1
+
+
+0 NRPRISM
+
+
+6 NRHEXAS
+
+TraHex              hexa 1
+1    1 2 4 3 12 17 18 13
+
+TraHex              hexa 2
+1    3 4 7 6 13 18 19 14
+
+TraHex              hexa 3
+1    6 7 11 10 14 19 20 15
+
+TraHex              hexa 4
+1    10 11 9 8 15 20 21 16
+
+TraHex              hexa 5
+1    2 5 7 4 17 22 19 18
+
+TraHex              hexa 6
+1    5 9 11 7 22 21 20 19
+
+
+0 NRTETRA
+
+
+0 NRPYRAM
+
+0    number of curves to ``rotate''
+
+0    number of triangles to ``rotate''
+
+0    number of rectangles to ``rotate''
+

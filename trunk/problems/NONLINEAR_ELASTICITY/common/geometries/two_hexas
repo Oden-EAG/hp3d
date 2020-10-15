@@ -1,0 +1,170 @@
+3   3     NDIM,MANDIM
+
+0         no surfaces
+
+1         NRDOMAIN
+
+
+12          NRPOINT
+
+Regular                      ...TYPE OF POINT             1
+0.0d0    0.0d0    0.0d0      ...COORDINATES OF THE POINT
+
+Regular                      ...TYPE OF POINT             2
+1.0d0    0.0d0    0.0d0      ...COORDINATES OF THE POINT
+
+Regular                      ...TYPE OF POINT             3
+1.0d0    1.0d0    0.0d0      ...COORDINATES OF THE POINT
+
+Regular                      ...TYPE OF POINT             4
+0.0d0    1.0d0    0.0d0      ...COORDINATES OF THE POINT
+
+Regular                      ...TYPE OF POINT             5
+0.0d0    0.0d0    1.0d0      ...COORDINATES OF THE POINT
+
+Regular                      ...TYPE OF POINT             6
+1.0d0    0.0d0    1.0d0      ...COORDINATES OF THE POINT
+
+Regular                      ...TYPE OF POINT             7
+1.0d0    1.0d0    1.0d0      ...COORDINATES OF THE POINT
+
+Regular                      ...TYPE OF POINT             8
+0.0d0    1.0d0    1.0d0      ...COORDINATES OF THE POINT
+
+Regular                      ...TYPE OF POINT             9
+0.0d0    2.0d0    0.0d0      ...COORDINATES OF THE POINT
+
+Regular                      ...TYPE OF POINT            10
+1.0d0    2.0d0    0.0d0      ...COORDINATES OF THE POINT
+
+Regular                      ...TYPE OF POINT            11
+1.0d0    2.0d0    1.0d0      ...COORDINATES OF THE POINT
+
+Regular                      ...TYPE OF POINT            12
+0.0d0    2.0d0    1.0d0      ...COORDINATES OF THE POINT
+
+
+20          NRCURVE
+
+Seglin                       ...TYPE OF CURVE           1
+1   2
+
+Seglin                       ...TYPE OF CURVE           2
+2   3
+
+Seglin                       ...TYPE OF CURVE           3
+4   3
+
+Seglin                       ...TYPE OF CURVE           4
+1   4
+
+Seglin                       ...TYPE OF CURVE           5
+5   6
+
+Seglin                       ...TYPE OF CURVE           6
+6   7
+
+Seglin                       ...TYPE OF CURVE           7
+8   7
+
+Seglin                       ...TYPE OF CURVE           8
+5   8
+
+Seglin                       ...TYPE OF CURVE           9
+1   5
+
+Seglin                       ...TYPE OF CURVE          10
+2   6
+
+Seglin                       ...TYPE OF CURVE          11
+3   7
+
+Seglin                       ...TYPE OF CURVE          12
+4   8
+
+Seglin                       ...TYPE OF CURVE          13
+4   9
+
+Seglin                       ...TYPE OF CURVE          14
+3  10
+
+Seglin                       ...TYPE OF CURVE          15
+9 10
+
+Seglin                       ...TYPE OF CURVE          16
+8 12
+
+Seglin                       ...TYPE OF CURVE          17
+7 11
+
+Seglin                       ...TYPE OF CURVE          18
+11 12
+
+Seglin                       ...TYPE OF CURVE          19
+9 12
+
+Seglin                       ...TYPE OF CURVE          20
+10 11
+
+
+0          NRTRIAN
+
+
+11          NRRECTA
+
+BilQua                       ...TYPE OF RECTANGLE           1
+1   2   3   4
+
+BilQua                       ...TYPE OF RECTANGLE           2
+5   6   7   8
+
+BilQua                       ...TYPE OF RECTANGLE           3
+1   2   6   5
+
+BilQua                       ...TYPE OF RECTANGLE           4
+2   3   7   6
+
+BilQua                       ...TYPE OF RECTANGLE           5
+4   3   7   8
+
+BilQua                       ...TYPE OF RECTANGLE           6
+1   4   8   5
+
+BilQua                       ...TYPE OF RECTANGLE           7
+4   9  10   3
+
+BilQua                       ...TYPE OF RECTANGLE           8
+8  12  11   7
+
+BilQua                       ...TYPE OF RECTANGLE           9
+3  10  11   7
+
+BilQua                       ...TYPE OF RECTANGLE          10
+4   9  12   8
+
+BilQua                       ...TYPE OF RECTANGLE          11
+9  10  11  12
+
+
+0          NRPRISM
+
+2          NRHEXAS
+
+Linear              hexa 1
+1      1  2  3  4  5  6  7  8
+
+Linear              hexa 2
+1      4  3 10  9  8  7 11 12
+
+
+0 NRTETRA
+
+
+
+0 NRPYRAM
+
+0    number of curves to ``rotate''
+
+0     number of triangles to ``rotate''
+
+0     number of rectangles to ``rotate''

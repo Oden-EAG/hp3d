@@ -1,0 +1,3 @@
+2                   NR_TEST number of test attributes
+Tstrs  normal  3    test attribute, discretization type, # of variables
+Tdisp  contin  3    test attribute, discretization type, # of variables

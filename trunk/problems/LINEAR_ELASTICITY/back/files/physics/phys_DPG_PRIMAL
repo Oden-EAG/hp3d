@@ -1,0 +1,4 @@
+100000              MAXNODS  max number of nodes anticipated
+2                   NR_PHYSA number of physics attributes
+elast  contin  3    physics attribute, discretization type, # of variables
+eflux  normal  3    physics attribute, discretization type, # of variables

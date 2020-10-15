@@ -414,6 +414,7 @@ subroutine update_gdof()
          call refel(mdle, iflag,no,xsub)
          call find_orient(mdle, nedge_orient,nface_orient)
          call find_order(mdle, norder)
+         if (.not.associated(NODES(mdle)%dof%coord)) cycle
          call nodcor(mdle, xnod)
          call hpmdle(mdle,iflag,no,xsub,ntype,          &
                      nedge_orient,nface_orient,norder,  &

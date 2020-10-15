@@ -6,7 +6,7 @@
 # Set variables if not set by m_options
 COMPLEX    ?= 0
 C_MODE     ?= 0
-DEBUG_MODE ?= 0
+DEBUG_MODE ?= 1
 J          ?= 1
 
 ####################################################

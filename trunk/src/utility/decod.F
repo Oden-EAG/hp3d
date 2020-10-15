@@ -86,3 +86,51 @@ c    ...be careful with integer type - need to convert!
 c
 c
       end subroutine decodLong
+c
+c
+c
+c----------------------------------------------------------------------
+c
+c   routine name       - decodLonger
+c
+c----------------------------------------------------------------------
+c
+c   latest revision    - Sep 2020
+c
+c   purpose            -routine decodes a 128bit integer into a sequence
+c                        of digits organized from left to right
+c
+c   arguments :
+c     in:
+c               Nick   - a nickname to be decoded (128bit integer)
+c               Mod    - system number
+c               N      - number of the digits stored in the nickname
+c     out:
+c               Narray - the decoded digits
+c
+c----------------------------------------------------------------------
+c
+      subroutine decodLonger(Nick,Mod,N, Narray)
+c
+      implicit none
+c
+      integer(16),         intent(in)  :: Nick
+      integer,             intent(in)  :: Mod,N
+      integer,dimension(N),intent(out) :: Narray
+c
+c  ...local variables
+      integer    :: i
+      integer(16):: nick1,nick2,longmod
+c
+c  ...be careful with integer type - need to convert!
+      longmod = int(Mod,16)
+      nick1 = Nick
+      do i=1,N
+        nick2 = nick1/longmod
+c    ...be careful with integer type - need to convert!
+        Narray(N+1-i) = int(nick1 - nick2*longmod,4)
+        nick1 = nick2
+      enddo
+c
+c
+      end subroutine decodLonger

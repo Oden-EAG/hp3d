@@ -19,7 +19,7 @@ module petsc_w_ksp
    use mpi_param, only: RANK,NUM_PROCS
    use petscksp , only: PetscInitialize,PetscFinalize,   &
                         KSPCreate,KSPDestroy,            &
-                        tKSP,tMat,tVec,                  &
+                        tKSP,tMat,tVec,tPC,              &
                         PETSC_NULL_CHARACTER
 !
    implicit none
@@ -28,6 +28,7 @@ module petsc_w_ksp
    Mat petsc_A
    Vec petsc_rhs
    Vec petsc_sol
+   PC  prec
 !
    contains
 !

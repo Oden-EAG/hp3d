@@ -98,6 +98,8 @@
 ! misc work space
   integer :: iprint,nrv,nre,nrf,i,j,k,ie,ivarH,nvarH,kj,ki,&
              ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,nsign
+! 
+  logical :: Dflag(NR_PHYSA)
 !
 !-----------------------------------------------------------------------
 !
@@ -333,6 +335,10 @@
 #endif
 !
 !------------------------------------------------------
+! use this subroutine to flag the phys. attr. that do require Dirichlet dof update
+! Jaime, Aug. 2020
+  call node_physics_dirichlet(Mdle,nrv+nre+Iface,Dflag)
+! 
   ivarH=0; nvarH=0
 !
 ! loop through multiple copies of variables
@@ -348,7 +354,7 @@
           ivarH = ivarH + 1
           if (ncase(i).eq.1) then
             nvarH = nvarH + 1
-            ZnodH(nvarH,1:ndofH_face) = zuH(1:ndofH_face,ivarH)
+            if (Dflag(i)) ZnodH(nvarH,1:ndofH_face) = zuH(1:ndofH_face,ivarH)
           endif
         end select
       enddo

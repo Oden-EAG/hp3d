@@ -96,6 +96,8 @@
 ! misc work space
   integer :: iprint,nrv,nre,nrf,i,j,k,ivarE,nvarE,kj,ki,&
              ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_Edge,iflag1
+! 
+  logical :: Dflag(NR_PHYSA)
 !
 !----------------------------------------------------------------------
 !
@@ -320,6 +322,10 @@
 !
 ! save dof's, skipping irrelevant entries
 !
+! use this subroutine to flag the phys. attr. that do require Dirichlet dof update
+! Jaime, Aug. 2020 
+  call node_physics_dirichlet(Mdle,nrv+Iedge,Dflag)
+! 
 ! decoded node case, indicating supported variables
   call decod(Icase,2,NR_PHYSA, ncase)
 !
@@ -350,7 +356,7 @@
             nvarE = nvarE + 1
 !
 !           store Dirichlet dof
-            ZnodE(nvarE,1:ndofE_edge) = zuE(1:ndofE_edge,ivarE)
+            if (Dflag(i)) ZnodE(nvarE,1:ndofE_edge) = zuE(1:ndofE_edge,ivarE)
 !
           endif
         endselect

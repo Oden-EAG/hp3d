@@ -1,0 +1,25 @@
+%!  TL PostScript file, name 20        
+%%BoundingBox: 36 36 518 756
+0 setlinewidth
+/n {newpath moveto} def
+/c {lineto closepath} def
+/m {moveto} def
+/d {lineto} def
+/f {setgray fill} def
+/s {0 setgray stroke} def
+/rf {setrgbcolor fill} def
+/rs {setrgbcolor stroke} def
+/gs {gsave} def
+/gr {grestore} def
+/fo { /Times-Roman findfont } def /sc { scalefont setfont } def
+50 750 translate -90 rotate fo 12 sc newpath
+ initclip
+     0.0     0.0 n
+     0.0   431.8 d
+   720.0   431.8 d
+   720.0     0.0 c
+  clip 
+     0.0     0.0 n
+     0.0   431.2 d
+   719.5   431.2 d
+   719.5     0.0 c

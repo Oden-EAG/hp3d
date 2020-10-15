@@ -83,3 +83,52 @@ c    ...be careful with integer type - need to convert!
 c
 c
       end subroutine encodLong
+c
+c
+c
+c----------------------------------------------------------------------
+c
+c   routine name       - encodLonger
+c
+c----------------------------------------------------------------------
+c
+c   computer           - machine independent
+c
+c   latest revision    - Sep 2020
+c
+c   purpose            - routine encodes a sequence of digits
+c                        into a 128bit nickname from left to right
+c
+c   arguments :
+c     in:
+c               Narray - digits to be encoded
+c               Mod    - system number
+c               N      - number of the digits stored in the nickname
+c     out:
+c               Nick   - the 16byte-integer nickname
+c
+c   required  routines -
+c
+c----------------------------------------------------------------------
+c
+      subroutine encodLonger(Narray,Mod,N, Nick)
+c
+      implicit none
+c
+      integer,             intent(in)    :: Mod,N
+      integer,dimension(N),intent(in)    :: Narray
+      integer(16),         intent(out)   :: Nick
+c
+c  ...local variables
+      integer    :: i
+      integer(16):: longmod
+c  ...be careful with integer type - need to convert!
+      longmod = int(Mod,16)
+      Nick = int(Narray(1),16)
+      do i=2,N
+c    ...be careful with integer type - need to convert!
+        Nick = Nick*longmod + int(Narray(i),16)
+      enddo
+c
+c
+      end subroutine encodLonger

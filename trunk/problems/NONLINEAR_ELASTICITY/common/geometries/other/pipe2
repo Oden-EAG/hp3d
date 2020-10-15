@@ -1,0 +1,253 @@
+3   3     NDIM,MANDIM
+
+
+0         no surfaces
+
+
+1         NRDOMAIN
+
+
+16        NRPOINT
+
+Regular             point 1
+0.d0 0.d0 0.d0
+
+Regular             point 2
+0.d0 3.d0 0.d0
+
+Regular             point 3
+0.d0 1.d0 1.d0
+
+Regular             point 4
+0.d0 2.d0 1.d0
+
+Regular             point 5
+0.d0 1.d0 2.d0
+
+Regular             point 6
+0.d0 2.d0 2.d0
+
+Regular             point 7
+0.d0 0.d0 3.d0
+
+Regular             point 8
+0.d0 3.d0 3.d0
+
+Regular             point 9
+10.d0 0.d0 0.d0
+
+Regular             point 10
+10.d0 3.d0 0.d0
+
+Regular             point 11
+10.d0 1.d0 1.d0
+
+Regular             point 12
+10.d0 2.d0 1.d0
+
+Regular             point 13
+10.d0 1.d0 2.d0
+
+Regular             point 14
+10.d0 2.d0 2.d0
+
+Regular             point 15
+10.d0 0.d0 3.d0
+
+Regular             point 16
+10.d0 3.d0 3.d0
+
+
+32 NRCURVE
+
+Seglin              curve 1
+1 2
+
+Seglin              curve 2
+3 4
+
+Seglin              curve 3
+5 6
+
+Seglin              curve 4
+7 8
+
+Seglin              curve 5
+1 7
+
+Seglin              curve 6
+3 5
+
+Seglin              curve 7
+4 6
+
+Seglin              curve 8
+2 8
+
+Seglin              curve 9
+1 3
+
+Seglin              curve 10
+2 4
+
+Seglin              curve 11
+5 7
+
+Seglin              curve 12
+6 8
+
+Seglin              curve 13
+9 10
+
+Seglin              curve 14
+11 12
+
+Seglin              curve 15
+13 14
+
+Seglin              curve 16
+15 16
+
+Seglin              curve 17
+9 15
+
+Seglin              curve 18
+11 13
+
+Seglin              curve 19
+12 14
+
+Seglin              curve 20
+10 16
+
+Seglin              curve 21
+9 11
+
+Seglin              curve 22
+10 12
+
+Seglin              curve 23
+13 15
+
+Seglin              curve 24
+14 16
+
+Seglin              curve 25
+1 9
+
+Seglin              curve 26
+2 10
+
+Seglin              curve 27
+3 11
+
+Seglin              curve 28
+4 12
+
+Seglin              curve 29
+5 13
+
+Seglin              curve 30
+6 14
+
+Seglin              curve 31
+7 15
+
+Seglin              curve 32
+8 16
+
+
+0  NRTRIAN
+
+20 NRRECTA
+
+BilQua              rectangle 1
+1 2 10 9
+
+BilQua              rectangle 2
+3 4 12 11
+
+BilQua              rectangle 3
+5 6 14 13
+
+BilQua              rectangle 4
+7 8 16 15
+
+BilQua              rectangle 5
+1 9 15 7
+
+BilQua              rectangle 6
+3 11 13 5
+
+BilQua              rectangle 7
+4 12 14 6
+
+BilQua              rectangle 8
+2 10 16 8
+
+BilQua              rectangle 9
+1 9 11 3
+
+BilQua              rectangle 10
+2 10 12 4
+
+BilQua              rectangle 11
+5 13 15 7
+
+BilQua              rectangle 12
+6 14 16 8
+
+BilQua              rectangle 13
+1 2 4 3
+
+BilQua              rectangle 14
+1 3 5 7
+
+BilQua              rectangle 15
+2 8 6 4
+
+BilQua              rectangle 16
+5 6 8 7
+
+BilQua              rectangle 17
+9 10 12 11
+
+BilQua              rectangle 18
+9 11 13 15
+
+BilQua              rectangle 19
+12 10 16 14
+
+BilQua              rectangle 20
+13 14 16 15
+
+
+0 NRPRISM
+
+
+4 NRHEXAS
+
+Linear              hexa 1
+1    1 2 10 9 3 4 12 11
+
+Linear              hexa 2
+1    1 9 11 3 7 15 13 5
+
+Linear              hexa 3
+1    4 12 10 2 6 14 16 8
+
+Linear              hexa 4
+1    5 6 14 13 7 8 16 15
+
+
+0 NRTETRA
+
+
+0 NRPYRAM
+
+0    number of curves to ``rotate''
+
+0    number of triangles to ``rotate''
+
+0    number of rectangles to ``rotate''
+

@@ -1,0 +1,7 @@
+100000              MAXNODS  max number of nodes anticipated
+5                   NR_PHYSA number of physics attributes
+Displ  contin  3    physics attribute, discretization type, # of variables
+Tract  normal  3    physics attribute, discretization type, # of variables
+u_fld  discon  3
+PK1st  discon  9
+Gradu  discon  9

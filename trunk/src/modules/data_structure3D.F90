@@ -108,7 +108,7 @@ module data_structure3D
 !         6 - free H(div) component
 !         7 - L2 component with Dirichlet BC flag
 !         8 - free L2 component
-        integer(8)       :: index
+        integer(16)       :: index
 !
 !  .....order of approximation
         integer          :: order
@@ -307,7 +307,7 @@ module data_structure3D
 !
       integer Indexd(NRINDEX)
 !
-      call decodLong(NODES(Nod)%index,10,NRINDEX, Indexd)
+      call decodLonger(NODES(Nod)%index,10,NRINDEX, Indexd)
 !
       end subroutine get_index
 !

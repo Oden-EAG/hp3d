@@ -34,7 +34,7 @@ subroutine set_index(Icase,Iflag, Index)
       implicit none
 
       integer,    intent(in)  :: Icase,Iflag
-      integer(8), intent(out) :: Index
+      integer(16), intent(out) :: Index
 !
 !  ...local variables
 !  ...index in the decimal form
@@ -229,7 +229,7 @@ subroutine set_index(Icase,Iflag, Index)
         stop
       endif
 !
-      call encodLong(indexd,10,NRINDEX, Index)
+      call encodLonger(indexd,10,NRINDEX, Index)
 !
 !
 #if DEBUG_MODE

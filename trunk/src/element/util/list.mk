@@ -3,7 +3,8 @@ celndof.F
 check_invmap.F90
 check_jacobian.F90
 check_negative_jacobian.F90
-compute_error.F90
+compute_error_mpi.F90
+compute_error_modif.F90
 diag_scaling.F90
 geom_error.F90
 geom_ex.F90

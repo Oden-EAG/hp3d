@@ -106,6 +106,8 @@
              i,j,jH,iE,jE,kjE,kiE,kjH,k,kE,&
              ivarE,nvarE,naE,iprint,info, &
              ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,ndofE_tot
+! 
+  logical :: Dflag(NR_PHYSA)
 !
 !-----------------------------------------------------------------------
 !
@@ -465,6 +467,9 @@
      write(*,*) 'dhpfaceE: ncase = ', ncase
   endif
 #endif
+! use this subroutine to flag the phys. attr. that do require Dirichlet dof update
+! Jaime, Aug. 2020
+  call node_physics_dirichlet(Mdle,nrv+nre+Iface,Dflag)
 !
   ivarE=0; nvarE=0
 !
@@ -481,7 +486,7 @@
           ivarE=ivarE+1
           if (ncase(i).eq.1) then
             nvarE = nvarE + 1
-            ZnodE(nvarE,1:ndofE_face) = zuE(1:ndofE_face,ivarE)
+            if (Dflag(i)) ZnodE(nvarE,1:ndofE_face) = zuE(1:ndofE_face,ivarE)
           endif
         end select
       enddo

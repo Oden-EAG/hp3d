@@ -18,7 +18,7 @@ module parameters
   integer, parameter :: MAXPHYA=6
   !
   !  ...maximum order of approximation
-  integer, parameter :: MAXP=6
+  integer, parameter :: MAXP=4
   !
   !  ...modulo to encode polynomial orders
   !  ...(do not change unless using stand-alone shape functions package)

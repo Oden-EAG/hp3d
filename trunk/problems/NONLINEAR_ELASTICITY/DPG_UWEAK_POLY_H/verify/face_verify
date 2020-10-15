@@ -1,0 +1,35 @@
+4                    NUMBER OF VERTICES ON FACE
+
+1.d0	0.d0	0.d0 vertex 1
+
+1.d0	1.d0	-1.d0 vertex 2
+
+0.d0	1.d0	0.d0 vertex 3
+
+0.d0	0.d0	1.d0 vertex 4
+
+1     Flag for exact normal to be read
+
+0.577350269189626d0	0.577350269189626d0	0.577350269189626d0    Exact normal
+
+1     	Flag for exact area to be read
+
+1.732050807568877d0      Exact area
+
+1		Flag for exact centroid to be read
+
+0.5d0	0.5d0 	0.0d0    Exact face centroid
+
+1		Flag for exact radius
+
+1.224744871391589d0     Exact radius
+
+1		Flag for exact rotated coordinates
+
+0.707106781186548d0	0.d0	0.d0 		rotated vertex 1
+
+0.d0	1.224744871391589d0	0.d0 		rotated vertex 2
+
+-0.707106781186548d0	0.d0	0.d0 	rotated vertex 3
+
+0.d0	-1.224744871391589d0	0.d0 	rotated vertex 4
