@@ -119,7 +119,7 @@ subroutine set_initial_mesh(Nelem_order)
       select case(GEOM_NO)
 !     ...single cube/brick with Dirichlet
 !        perfect electrical conductor (PEC) BC on all faces
-			case (1)
+         case (1)
             do ifc=1,nface(etype)
                neig = ELEMS(iel)%neig(ifc)
                select case(neig)
