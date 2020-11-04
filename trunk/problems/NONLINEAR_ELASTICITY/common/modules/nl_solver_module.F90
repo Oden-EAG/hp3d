@@ -639,7 +639,11 @@ if (LINESEARCH_FLAG) then
    write(*,*) 'get_step_illinois: beggining line search...'
    maxiter_g = 5
    smax= 16.d0
+<<<<<<< HEAD
    smin=-1.d0
+=======
+   ! smin=-16.d0
+>>>>>>> c2c6bcb (Meshes, problem setup and run scripts for foam simulation in UW and PR)
    LINESEARCH_FACTOR = 0.d0
    call compute_g(0, g0 )
    LINESEARCH_FACTOR = 1.d0
