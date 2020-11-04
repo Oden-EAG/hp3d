@@ -6,7 +6,7 @@
 !! @param[out] X      - physical coordinates of the point
 !! @param[out] Dxdeta - derivatives of the physical coordinates
 !!
-!! @ revision Mar 11
+!! @ revision Oct 20
 !-------------------------------------------------------------------------------
 !
 subroutine trian_PTITri(No,Eta, X,Dxdeta)
@@ -74,6 +74,8 @@ subroutine spherical_triangle(No,Eta, X,Dxdeta)
 !
       dimension Eta(2), X(3),Dxdeta(3,2)
 !
+!  ...X - center of the sphere  ! added to fix bug
+      dimension x0(3)
 !  ...relative position vectors wrt sphere origin
       dimension xrels(3),xpar(2),dxrels(3,2),dxpardeta(2,2)
 !
@@ -368,24 +370,24 @@ subroutine spherical_triangle(No,Eta, X,Dxdeta)
       dxrels(3,1:2) = -rad*sin(xpar(1))*dxpardeta(1,1:2)
 !
 !  ...transform to global Cartesian coordinates
-      X(1:3) = 0.d0; Dxdeta(1:3,1:2) = 0.d0
+      x0(1:3) = 0.d0; Dxdeta(1:3,1:2) = 0.d0
       do i=1,3
         do j=1,3
-          X(i) = X(i) + transf(j,i)*xrels(j)
+          x0(i) = x0(i) + transf(j,i)*xrels(j)
           Dxdeta(i,1:2) = Dxdeta(i,1:2) + transf(j,i)*dxrels(j,1:2)
         enddo
-        X(i) = X(i) + SURFACES(ns)%Rdata(i)
+        X(i) = x0(i) + SURFACES(ns)%Rdata(i)
       enddo
 !
 !  ...verification....
-      call norm(X, radnew)
+      call norm(x0, radnew)
       if (abs(radnew-rad).gt.GEOM_TOL) then
         write(*,8001) rad,radnew
  8001   format('spherical_triangle: rad,radnew = ',2e12.5)
         call pause
       endif
       do ieta=1,2
-        call scalar_product(X,Dxdeta(1:3,ieta), s)
+        call scalar_product(x0,Dxdeta(1:3,ieta), s)
         if (abs(s).gt.GEOM_TOL) then
           write(*,8002) ieta,s
  8002     format('spherical_triangle: ieta,s = ',i1,e12.5)

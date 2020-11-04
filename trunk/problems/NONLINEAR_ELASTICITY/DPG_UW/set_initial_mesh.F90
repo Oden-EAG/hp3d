@@ -14,7 +14,7 @@ subroutine set_initial_mesh(Nelem_order)
 ! BC flags
   integer, dimension(6,NR_PHYSA) :: ibc
 ! miscellanea
-  integer :: iprint,ifc,iel,neig,iDisplacement
+  integer :: iprint,ifc,iel,neig,iDisplacement ,mdlf,itri,nsurf,ib
 !
 !------------------------------------------------------------------------------------
 !     I N I T I A L I Z E
@@ -153,6 +153,127 @@ subroutine set_initial_mesh(Nelem_order)
           ibc(6,1:2) = (/0,0/)  ! none
         end select
       endif
+
+    case(15)! assume all elements are tetrahedra
+
+      ! if exterior face, set boundary condition
+      do ifc=1,4
+        ! get triangle number
+        itri = TETRAS(iel)%Figno(ifc)
+        itri = itri/10
+        ! check that triangle is the face of a single block
+        if (TRIANGLES(itri)%BlockNo(1).ne.0 .and. TRIANGLES(itri)%BlockNo(2).ne.0) cycle
+        ! get surface number
+        nsurf= TRIANGLES(itri)%idata(1)
+
+! CUBE
+        select case(Nsurf)
+        case(1,5) !normal pointing in direction +/-Z
+          ibc(ifc,1) = 1
+          ibc(ifc,2) = 0
+        case default !remaining surfaces have a zero traction b.c.
+          ibc(ifc,1) = 0
+          ibc(ifc,2) = 1
+        end select
+
+      enddo        
+
+
+    case(21)! assume all elements are tetrahedra
+
+      ! if exterior face, set boundary condition
+      do ifc=1,4
+        ! get triangle number
+        itri = TETRAS(iel)%Figno(ifc)
+        itri = itri/10
+        ! check that triangle is the face of a single block
+        if (TRIANGLES(itri)%BlockNo(1).ne.0 .and. TRIANGLES(itri)%BlockNo(2).ne.0) cycle
+        ! get surface number
+        nsurf= TRIANGLES(itri)%idata(1)
+        ! neig = ELEMS(iel)%neig(ifc)
+        ! if (neig.ne.0) cycle
+        ! ! mdlf = ELEMS(iel)%nodes(9+ifc)
+        ! ! itri = Mdlf-NRTETRA-NRPOINT-NRCURVE
+        ! ib = ELEMS(iel)%GMPblock
+        ! ib = ib/10
+
+        ! itri = TETRAS(ib)%Figno(ifc)
+
+
+
+        ! itri = TETRAS(ib)%Figno(ifc)
+        ! itri = itri/10
+        ! nsurf= TRIANGLES(itri)%idata(1)
+
+! SILICON FOAM
+        select case(Nsurf)
+        case(1) !normal pointing in direction -Z
+          ibc(ifc,1) = 8
+          ibc(ifc,2) = 8
+        case(2) !normal pointing in direction -X
+          ibc(ifc,1) = 6
+          ibc(ifc,2) = 6
+        case(3) !normal pointing in direction +Y
+          ibc(ifc,1) = 0
+          ibc(ifc,2) = 1
+        case(4) !normal pointing in direction +X
+          ibc(ifc,1) = 0
+          ibc(ifc,2) = 1
+        case(5) !normal pointing in direction +Z
+          ibc(ifc,1) = 0
+          ibc(ifc,2) = 1
+        case(6) !normal pointing in direction -Y
+          ibc(ifc,1) = 7
+          ibc(ifc,2) = 7
+        case default !spherical surfaces have a zero traction b.c.
+          ibc(ifc,1) = 0
+          ibc(ifc,2) = 1
+        end select
+
+      enddo      
+
+    case(36)! assume all elements are tetrahedra
+
+      ! if exterior face, set boundary condition
+      do ifc=1,4
+        ! get triangle number
+        itri = TETRAS(iel)%Figno(ifc)
+        itri = itri/10
+        ! check that triangle is the face of a single block
+        if (TRIANGLES(itri)%BlockNo(1).ne.0 .and. TRIANGLES(itri)%BlockNo(2).ne.0) cycle
+        ! get surface number
+        nsurf= TRIANGLES(itri)%idata(1)
+
+! SYNTACTIC FOAM
+        select case(Nsurf)
+        case(1) !normal pointing in direction -Z
+          ibc(ifc,1) = 8
+          ibc(ifc,2) = 8
+        case(2) !normal pointing in direction -X
+          ibc(ifc,1) = 6
+          ibc(ifc,2) = 6
+        case(3) !normal pointing in direction +Y
+          ibc(ifc,1) = 0
+          ibc(ifc,2) = 1
+        case(4) !normal pointing in direction +X
+          ibc(ifc,1) = 0
+          ibc(ifc,2) = 1
+        case(5) !normal pointing in direction +Z
+          ibc(ifc,1) = 0
+          ibc(ifc,2) = 1
+        case(6) !normal pointing in direction -Y
+          ibc(ifc,1) = 7
+          ibc(ifc,2) = 7
+        case default !spherical surfaces have a zero traction b.c.
+
+          if (Nsurf.ge.22) then
+            ibc(ifc,1) = 1
+            ibc(ifc,2) = 0
+          endif
+
+        end select  
+      enddo  
+
     end select
 !
 !   allocate BC flags (one per attribute)

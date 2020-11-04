@@ -110,9 +110,10 @@ subroutine elem_DPG_UW_uPD(Mdle)
       real*8, dimension(9*MAXbrickQ,3*MAXbrickVV+3*MAXbrickHH) :: EnrFieldGrad!,EnrFieldStressc
       real*8, dimension(3*MAXbrickVV+3*MAXbrickHH,MAXNRHS_MOD) :: EnrLoad
 !     ENRICHED STIFFNESS matrix (excludes least squares part)
-      real*8, dimension(3*MAXbrickVV+3*MAXbrickHH,3*(MAXbrickH-MAXmdlbH)+3*(MAXbrickV-MAXmdlbV)+21*MAXbrickQ) :: EnrStiffness
+      ! real*8, dimension(3*MAXbrickVV+3*MAXbrickHH,3*(MAXbrickH-MAXmdlbH)+3*(MAXbrickV-MAXmdlbV)+21*MAXbrickQ) :: EnrStiffness
+      real*8, allocatable :: EnrStiffness(:,:),EnrEverything(:,:)
 !     full enriched [stiffness | load] matrix
-      real*8, dimension(3*MAXbrickVV+3*MAXbrickHH,3*(MAXbrickH-MAXmdlbH)+3*(MAXbrickV-MAXmdlbV)+21*MAXbrickQ+MAXNRHS_MOD) :: EnrEverything
+      ! real*8, dimension(3*MAXbrickVV+3*MAXbrickHH,3*(MAXbrickH-MAXmdlbH)+3*(MAXbrickV-MAXmdlbV)+21*MAXbrickQ+MAXNRHS_MOD) :: EnrEverything
 !     Gram matrix for the local Riesz matrix in LAPACK format
       real*8, dimension((3*MAXbrickVV+3*MAXbrickHH)*(3*MAXbrickVV+3*MAXbrickHH+1)/2) :: Gram
 !     (TRANSPOSED) stiffness and load matrices for Least Squares equations
@@ -147,7 +148,7 @@ subroutine elem_DPG_UW_uPD(Mdle)
       integer :: i,j,k,l,m,n,k1,k2,k3,k4,k5,m1,m2,m3,m4,m5,n1,n2,n3,nsign,ipt,ifc,  &
                  icomp,jcomp,kcomp,lcomp,nint,iprint,iflag,info,info1,info2,info3,  &
                  kH,kV,kQ,lH,lV,lQ,kmin,kmax,enrdof,                                &
-                 nrHbub,nrEbub,nrVbub,nrQbub,       gdump,bdump6,bdump7
+                 nrHbub,nrEbub,nrVbub,nrQbub,       gdump,bdump6,bdump7 , trialdof
       integer, dimension(NR_PHYSA) :: ndofphysics
       real*8  :: weight,wa,rjac,brjac,tmp,diffmax,dmax
 ! 
@@ -833,10 +834,14 @@ subroutine elem_DPG_UW_uPD(Mdle)
 !
 !  ...Create vector of indices with dof of each physics variable (in the same order of physics file)
       ndofphysics = (/3*(nrdofH-nrHbub),3*(nrdofV-nrVbub),3*nrdofQ,9*nrdofQ,9*nrdofQ/)
+
+      trialdof = sum(ndofphysics)
 !
 !  ...Construct EnrEverything by packing all Enriched Matrices in the order H1,Hcurl,Hdiv,L2 
 !     (in the same order of physics file) and load
+      allocate(EnrStiffness(enrdof,trialdof))
       EnrStiffness=ZERO
+      allocate(EnrEverything(enrdof,trialdof+NR_RHS))
       EnrEverything=ZERO
 !  ...EnrTraceDispl (H1)
       kmin=0
@@ -883,7 +888,8 @@ subroutine elem_DPG_UW_uPD(Mdle)
 !
 !
 !  ...G^-1 * EnrEverything
-      call DPPTRS(uplo,enrdof,kmax,Gram,EnrEverything(:,1:kmax),3*MAXbrickVV+3*MAXbrickHH,info1)
+      ! call DPPTRS(uplo,enrdof,kmax,Gram,EnrEverything(:,1:kmax),3*MAXbrickVV+3*MAXbrickHH,info1)
+      call DPPTRS(uplo,enrdof,kmax,Gram,EnrEverything(:,1:kmax),enrdof,info1)
       if (info1.ne.0) then
         write(*,*) 'elem_DPG_UWEAK: info1 = ',info1 ; stop
       endif
@@ -905,8 +911,9 @@ subroutine elem_DPG_UW_uPD(Mdle)
       m = kmin
       n = kmax
       k = enrdof
-      l = 3*MAXbrickVV+3*MAXbrickHH
-      call DGEMM(transa,transb,m,n,k,1.d0,EnrStiffness,l,EnrEverything,l,0.d0,FullDPG,m)!3*(MAXbrickH-MAXmdlbH)+3*(MAXbrickV-MAXmdlbV)+12*MAXbrickQ)
+      l = enrdof! 3*MAXbrickVV+3*MAXbrickHH
+      ! call DGEMM(transa,transb,m,n,k,1.d0,EnrStiffness,l,EnrEverything,l,0.d0,FullDPG,m)!3*(MAXbrickH-MAXmdlbH)+3*(MAXbrickV-MAXmdlbV)+12*MAXbrickQ)
+      call DGEMM(transa,transb,m,n,k,1.d0,EnrStiffness,l,EnrEverything,l,0.d0,FullDPG,m)
 !
       !write(*,*) 'elem: after local Riesz problem...'
  !            bdump7=88
@@ -974,6 +981,7 @@ subroutine elem_DPG_UW_uPD(Mdle)
       enddo
       !write(*,*) 'elem: before test part...'
 !
+      iprint=0
       if (iprint.eq.1) then
         write(*,*) 'EnrStiffness = '
         do i=1,enrdof
@@ -988,8 +996,13 @@ subroutine elem_DPG_UW_uPD(Mdle)
           write(*,6001) i,FullDPG(i,1:kmax)
         enddo
       endif
+      ! call pause
 ! 
       deallocate(FullDPG)
+      deallocate(EnrStiffness,EnrEverything)
 !
 end subroutine elem_DPG_UW_uPD
 ! 
+subroutine elem_DPG_UW_uPD_test(Mdle)
+  integer :: Mdle
+  end subroutine

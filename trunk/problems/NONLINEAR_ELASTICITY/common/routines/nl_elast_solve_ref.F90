@@ -9,12 +9,12 @@ implicit none
 integer, intent(in) :: N_incr,Maxiter,Nupdate
 real*8 , intent(in) :: Step_size,Abs_tol,Rel_tol
 logical, intent(in) :: Lsflag,Bfgs
-logical, optional :: pvflag
+logical, intent(inout), optional :: pvflag
 
 integer :: iParAttr(NR_PHYSA)
-logical :: icustom(NR_DISP),ires
+logical :: icustom(NR_DISP),ires , pvfloc
 integer :: n,iter,i,m,iref,nopt,nflag(NR_PHYSA),physnick,physerr(4),nstop
-real*8  :: tol,res_norm,res_norm0,lstol
+real*8  :: tol,res_norm,res_norm0,lstol, update_norm
 
 ! Set the parameters for refinements
 ires=.true.
@@ -65,7 +65,11 @@ end select
 
 
 ! check if paraview plot flag is given. If not, default is false
-if (.not.present(pvflag)) pvflag=.false.
+if (present(pvflag)) then
+   pvfloc = pvflag
+else
+   pvfloc=.false.
+endif
 
 iParAttr = NR_COMP
 ! ! do not dump trace vaiables
@@ -90,6 +94,8 @@ call set_nl_solver_params(lstol,lsflag,bfgs)
 
 
 ! print parameters
+write(*,*) 'nl_elast_solve: N_incr          =',N_incr
+write(*,*) 'nl_elast_solve: Step_size       =',Step_size
 write(*,*) 'nl_elast_solve_ref: Abs_tol         =',Abs_tol
 write(*,*) 'nl_elast_solve_ref: Rel_tol         =',Rel_tol
 write(*,*) 'nl_elast_solve_ref: MAXITER         =',Maxiter
@@ -126,6 +132,7 @@ do n=1,N_incr
       ! call map_dofs_to_local(NEW_SOL)
       call reset_coms
       write(*,*) 'nl_elast_solve_ref: dof values have been reset'
+      if (pvfloc) call my_paraview_driver(iParAttr,icustom)
    ! else
    !  if not the first call, the guess is assigned to be the DOF values in memory
       ! call map_dofs_to_global(NEW_SOL)
@@ -240,8 +247,8 @@ do n=1,N_incr
       call map_dofs_to_local(MUMPS_PAR%RHS)
       write(*,*) 'nl_elast_solve_ref:              delta solved for iteration ',iter
 !     we compute factor s for line search (if not enabled, this sets LINESEARCH_FACTOR=1)
-      ! call get_delta_factor
-      call get_step_illinois
+      call get_delta_factor
+      ! call get_step_illinois
       write(*,*) 'nl_elast_solve_ref: line s. factor determined for iteration ',iter
 !     update solution: slot 2 += ls_factor*delta and reset first slot
       call update_sol(LINESEARCH_FACTOR)
@@ -265,6 +272,9 @@ do n=1,N_incr
       write(*,4003) res_norm,iter
  4003 format(   ' nl_elast_solve_ref: residual norm =',es10.3,' for iteration ',i12)
 !
+      call resid_norm(MUMPS_PAR%RHS,NRDOF_CON,update_norm)
+      write(*,4004) LINESEARCH_FACTOR * update_norm , iter
+ 4004 format(   ' nl_elast_solve:sol.update norm=',es10.3,' for iteration ',i12)
 ! 
       write(*,*) 'nl_elast_solve_ref:                     completed iteration ',iter
 ! 
@@ -285,7 +295,7 @@ do n=1,N_incr
       write(*,4001) n,iter
  4001 format(/,'nl_elast_solve_ref: convergence attained in step ',i4,' in ',i5,' iterations.',/)
 
-      if (pvflag) call my_paraview_driver(iParAttr,icustom)
+      if (pvfloc) call my_paraview_driver(iParAttr,icustom)
       ! if refinement is necessary...
       if (iref.gt.0) then
          ! no refinement after last step

@@ -18,13 +18,13 @@ SRC_COMMON = \
             ../common/routines/soln2vtk.F90 \
             ../common/routines/loads.F90 \
             ../common/routines/assign_domain_material.F90 \
-            ../common/routines/nl_elast_solve.F90
+            ../common/routines/nl_elast_solve.F90 \
+            ../common/routines/nl_elast_solve_ref.F90
 
 SRC_HYPER  = \
             celem.F90 \
             elem.F90 \
-            elem_uPD.F90 \
-            elem_residual_uPD.F90 \
+            elem_residual.F90 \
             exact.F90 \
             exact_error.F90 \
             set_initial_mesh.F90 \

@@ -4,7 +4,7 @@
            0     INT_LOAD:    GAUSS QUAD. FOR VOL. LOAD
            0     INT_NEUMANN: ADAPTIVE QUAD. FOR BDRY. LOAD
            0     NFLAG2GRID:  NO 2-GRID SOLVER
-           2     INPUT_FILE:  1) legacy 2) default 3) compact 4) recon 5)netgen
+           5     INPUT_FILE:  1) legacy 2) default 3) compact 4) recon 5)netgen
        1.d-8     GEOM_TOL:    GEOMETRY TOLERANCE
            0     INTEGRATION  OVERINTEGRATION QUADRATURE INCREASE
            0     EXGEOM       EXACT GEOMETRY FLAG

@@ -31,6 +31,7 @@ subroutine elem(Mdle, Itest,Itrial)
     ! write(*,*) 'before elem...'
     ! call elem_DPG_UW_general(Mdle)
     call elem_DPG_UW_upd(Mdle)
+    ! call elem_DPG_UW_upd_test(Mdle)
     ! call elem_DPG_UW_upd_angular(Mdle)
     ! write (*,*) 'after elem...'
   case default
@@ -775,7 +776,7 @@ subroutine elem_DPG_UW_general(Mdle)
 
       !write(*,*) 'elem: after boundary integral...'
 !
-      iprint=2
+      iprint=0
       if (iprint.eq.2) then
         write(*,*) 'Gram = '
         do i=1,25
@@ -853,14 +854,14 @@ subroutine elem_DPG_UW_general(Mdle)
 !  ...Compact enriched number of rows (total enriched test dof)
       enrdof = 3*nrdofVV+3*nrdofHH
 ! 
-            gdump=75
-        open(unit=gdump,file='output/gram', &
-          form='formatted',access='sequential',status='unknown')
-        do i=1,enrdof
-          write(gdump,5999)Gram((i+1)*i/2-(i-1):(i+1)*i/2)
- 5999     format(189(e12.5,","))
-        enddo
-        close(gdump)
+ !            gdump=75
+ !        open(unit=gdump,file='output/gram', &
+ !          form='formatted',access='sequential',status='unknown')
+ !        do i=1,enrdof
+ !          write(gdump,5999)Gram((i+1)*i/2-(i-1):(i+1)*i/2)
+ ! 5999     format(189(e12.5,","))
+ !        enddo
+ !        close(gdump)
 !
 !  ...factor the Gram matrix
       uplo = 'U'

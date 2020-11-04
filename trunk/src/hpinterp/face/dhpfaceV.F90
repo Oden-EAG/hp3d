@@ -196,7 +196,7 @@
 !   compute inverse jacobian (for Piola transform)
     call geom(dxdeta, detadx, rjacdxdeta, nflag)
     if (nflag.ne.0) then
-      write(*,*) 'dhpfaceV: rjacdxdeta = ',rjacdxdeta
+      write(*,*) 'dhpfaceV: rjacdxdeta = ',rjacdxdeta ; write(*,*) 'Mdle,Iflag,No,Iface=',Mdle,Iflag,No,Iface
       stop 1
     endif
 !

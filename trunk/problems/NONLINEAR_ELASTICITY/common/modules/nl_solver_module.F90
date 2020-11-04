@@ -13,7 +13,8 @@ logical,save :: FIRST_NLSOLVE = .true.
 
 real*8,allocatable :: RES_GLOBAL(:),RES_PREV(:),RES_CURR(:),V_BFGS(:,:),W_BFGS(:,:)!,NEW_SOL
 
-integer(8),allocatable :: ELEM_NNZ(:)
+integer(8),allocatable :: ELEM_NNZ(:),LCON0(:)
+!$OMP THREADPRIVATE(LCON0)
 
 ! !..element local residual vectors
 !    type(super_array), allocatable :: RLOC(:)
@@ -193,17 +194,21 @@ implicit none
    allocate(MUMPS_PAR%JCN(nnz))
    allocate(MUMPS_PAR%A(nnz))
    allocate(MUMPS_PAR%RHS(nrdof));
+
+   allocate(LCON0(MAXDOFM))
 !
 !..memory allocation for static condensation
    call stc_alloc
 
-!$OMP PARALLEL                                  &
-!$OMP PRIVATE(nrdofs,nrdofm,nrdofc,nodm,nrnodm, &
-!$OMP         ndofmH,ndofmE,ndofmV,ndofmQ,      &
-!$OMP         i,j,k,k1,k2,l,mdle,nod,ndof)
-   allocate(LCON(MAXDOFM))
-!$OMP DO                 &
-!$OMP SCHEDULE(DYNAMIC)
+   ! allocate(NEXTRACT(MAXDOFM))
+   ! allocate(IDBC(MAXDOFM))
+   ! allocate(ZDOFD(MAXDOFM,NR_RHS)) 
+! $OMP PARALLEL                                  & 
+! $OMP PRIVATE(nrdofs,nrdofm,nrdofc,nodm,nrnodm, &
+! $OMP         ndofmH,ndofmE,ndofmV,ndofmQ,      &
+! $OMP         i,j,k,k1,k2,l,mdle,nod,ndof)      &
+! $OMP DO                                        &
+! $OMP SCHEDULE(DYNAMIC)
    do iel=1,NRELES
       mdle = ELEM_ORDER(iel)
       if (ISTC_FLAG) then
@@ -221,7 +226,7 @@ implicit none
          nod = nodm(i)
          do j=1,ndofmH(i)
             l=l+1
-            LCON(l) = NFIRST_DOF(nod)+j
+            LCON0(l) = NFIRST_DOF(nod)+j
          enddo
       enddo
 !  ...H(curl) dof
@@ -229,7 +234,7 @@ implicit none
          nod = nodm(i)
          do j=1,ndofmE(i)
             l=l+1
-            LCON(l) = NFIRST_DOF(nod)+ndofmH(i)+j
+            LCON0(l) = NFIRST_DOF(nod)+ndofmH(i)+j
          enddo
       enddo
 !  ...H(div) dof
@@ -237,7 +242,7 @@ implicit none
          nod = nodm(i)
          do j=1,ndofmV(i)
             l=l+1
-            LCON(l) = NFIRST_DOF(nod)+ndofmH(i)+ndofmE(i)+j
+            LCON0(l) = NFIRST_DOF(nod)+ndofmH(i)+ndofmE(i)+j
          enddo
       enddo
 !  ...L2 dof
@@ -245,27 +250,26 @@ implicit none
          nod = nodm(nrnodm)
          do j=1,ndofmQ(nrnodm)
             l=l+1
-            LCON(l) = NFIRST_DOF(nod)+ndofmH(nrnodm)+ndofmE(nrnodm)+ndofmV(nrnodm)+j
+            LCON0(l) = NFIRST_DOF(nod)+ndofmH(nrnodm)+ndofmE(nrnodm)+ndofmV(nrnodm)+j
          enddo
       endif
 
       ! write(*,*) 'iel=',iel
-      ! write(*,*) LCON
+      ! write(*,*) LCON0
 
       ndof = l
 !
       CLOC(iel)%ni = ndof
       allocate(CLOC(iel)%con(ndof))
-      CLOC(iel)%con = LCON(1:ndof)
+      CLOC(iel)%con = LCON0(1:ndof)
 !..end of loop through elements
-   enddo
-   
-!$OMP END DO
-!
-   deallocate(LCON)
+   enddo  
+! $OMP END DO
 
-!$OMP END PARALLEL
+!    deallocate(NEXTRACT,IDBC,ZDOFD)
+! $OMP END PARALLEL
 
+   deallocate(LCON0)
 
 
  !   if (IPRINT_TIME .eq. 1) then
@@ -337,10 +341,14 @@ VTYPE  ,intent(out):: RHS(Neq)
 !..assemble global stiffness matrix
 !..loop through elements
 !
-!$OMP PARALLEL                                  &
-!$OMP PRIVATE(nrdofs,nrdofm,nrdofc,nodm,nrnodm, &
-!$OMP         ndofmH,ndofmE,ndofmV,ndofmQ,      &
-!$OMP         i,j,k,k1,k2,l,mdle,nod,ndof)
+! $OMP PARALLEL                                  &
+! $OMP DEFAULT(NONE)                             &
+! $OMP SHARED(Isel,RHS,NRELES,ELEM_ORDER,        &
+! $OMP        ELEM_NNZ,MAXDOFM,MAXDOFS,NR_PHYSA, &
+! $OMP        NR_RHS,ISTC_FLAG,MUMPS_PAR,CLOC   )&
+! $OMP PRIVATE(nrdofs,nrdofm,nrdofc,nodm,nrnodm, &
+! $OMP         ndofmH,ndofmE,ndofmV,ndofmQ,      &
+! $OMP         i,j,k,k1,k2,l,mdle,nod,ndof)
    allocate(NEXTRACT(MAXDOFM))
    allocate(IDBC(MAXDOFM))
    allocate(ZDOFD(MAXDOFM,NR_RHS))
@@ -362,15 +370,18 @@ VTYPE  ,intent(out):: RHS(Neq)
    enddo
    allocate(ZBMOD(MAXDOFM,NR_RHS))
    allocate(ZAMOD(MAXDOFM,MAXDOFM))
-   if (.not.allocated(LCON)) allocate(LCON(MAXDOFM))
+   ! if (.not.allocated(LCON0)) 
+   ! allocate(LCON0(MAXDOFM))
    allocate(ZLOAD(MAXDOFM))
    allocate(ZTEMP(MAXDOFM**2))
 !
-!$OMP DO                 &
-!$OMP SCHEDULE(DYNAMIC)  &
-!$OMP REDUCTION(+:RHS)
+! $OMP DO                 &
+! $OMP SCHEDULE(DYNAMIC)  &
+! $OMP REDUCTION(+:RHS)
    do iel=1,NRELES
       mdle = ELEM_ORDER(iel)
+      ! write(*,*) 'CLOC(iel)%con=',CLOC(iel)%con
+      ! call pause
       if (ISTC_FLAG) then
          call celem_systemI(iel,mdle,2, nrdofs,nrdofm,nrdofc,nodm,  &
             ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,ZLOAD,ZTEMP)
@@ -386,7 +397,7 @@ VTYPE  ,intent(out):: RHS(Neq)
 !          nod = nodm(i)
 !          do j=1,ndofmH(i)
 !             l=l+1
-!             LCON(l) = NFIRST_DOF(nod)+j
+!             LCON0(l) = NFIRST_DOF(nod)+j
 !          enddo
 !       enddo
 ! !  ...H(curl) dof
@@ -394,7 +405,7 @@ VTYPE  ,intent(out):: RHS(Neq)
 !          nod = nodm(i)
 !          do j=1,ndofmE(i)
 !             l=l+1
-!             LCON(l) = NFIRST_DOF(nod)+ndofmH(i)+j
+!             LCON0(l) = NFIRST_DOF(nod)+ndofmH(i)+j
 !          enddo
 !       enddo
 ! !  ...H(div) dof
@@ -402,7 +413,7 @@ VTYPE  ,intent(out):: RHS(Neq)
 !          nod = nodm(i)
 !          do j=1,ndofmV(i)
 !             l=l+1
-!             LCON(l) = NFIRST_DOF(nod)+ndofmH(i)+ndofmE(i)+j
+!             LCON0(l) = NFIRST_DOF(nod)+ndofmH(i)+ndofmE(i)+j
 !          enddo
 !       enddo
 ! !  ...L2 dof
@@ -410,7 +421,7 @@ VTYPE  ,intent(out):: RHS(Neq)
 !          nod = nodm(nrnodm)
 !          do j=1,ndofmQ(nrnodm)
 !             l=l+1
-!             LCON(l) = NFIRST_DOF(nod)+ndofmH(nrnodm)+ndofmE(nrnodm)+ndofmV(nrnodm)+j
+!             LCON0(l) = NFIRST_DOF(nod)+ndofmH(nrnodm)+ndofmE(nrnodm)+ndofmV(nrnodm)+j
 !          enddo
 !       endif
 !
@@ -430,9 +441,9 @@ VTYPE  ,intent(out):: RHS(Neq)
       !    write(*,*) 'ubound(CLOC(iel)%con,1)',ubound(CLOC(iel)%con,1)
       ! endif
 
-      LCON(1:ndof) = CLOC(iel)%con(1:ndof)
+      ! LCON0(1:ndof) = CLOC(iel)%con(1:ndof)
 
-      ! write(*,*) LCON
+      ! write(*,*) LCON0
       ! write(*,*) 'ZLOAD'
       ! write(*,*) ZLOAD(1:3)
       ! write(*,*) 'ZTEMP'
@@ -444,7 +455,8 @@ VTYPE  ,intent(out):: RHS(Neq)
 !  ...loop through element dof
       do k1=1,ndof
 !     ...global dof is:
-         i = LCON(k1)
+         ! i = LCON0(k1)
+         i = CLOC(iel)%con(k1)
 !     ...Assemble global load vector
          if (isnan(ZLOAD(k1))) then
             write(*,*) 'NaN found in local load vector'
@@ -456,7 +468,8 @@ VTYPE  ,intent(out):: RHS(Neq)
 !     ...loop through dof `to the right'
          do k2=1,ndof
 !        ...global dof is:
-            j = LCON(k2)
+            ! j = LCON0(k2)
+            j = CLOC(iel)%con(k2)
 !        ...assemble
 !        ...note: repeated indices are summed automatically by MUMPS
             ! ELEM_NNZ(iel) = ELEM_NNZ(iel) + 1
@@ -483,10 +496,10 @@ VTYPE  ,intent(out):: RHS(Neq)
 !
       ! CLOC(iel)%ni = ndof
       ! allocate(CLOC(iel)%con(ndof))
-      ! CLOC(iel)%con = LCON(1:ndof)
+      ! CLOC(iel)%con = LCON0(1:ndof)
 !..end of loop through elements
    enddo
-!$OMP END DO
+! $OMP END DO
 !
    do i=1,NR_PHYSA
       deallocate(BLOC(i)%array)
@@ -498,8 +511,9 @@ VTYPE  ,intent(out):: RHS(Neq)
 !
    deallocate(NEXTRACT,IDBC,ZDOFD,BLOC,AAUX,ALOC)
    deallocate(ZBMOD,ZAMOD,ZLOAD,ZTEMP)
-   if (allocated(LCON)) deallocate(LCON)
-!$OMP END PARALLEL
+   ! if (allocated(LCON0)) 
+   ! deallocate(LCON0)
+! $OMP END PARALLEL
 !
  !   if (IPRINT_TIME .eq. 1) then
  !      end_time = MPI_Wtime()
@@ -625,7 +639,7 @@ if (LINESEARCH_FLAG) then
    write(*,*) 'get_step_illinois: beggining line search...'
    maxiter_g = 5
    smax= 16.d0
-   smin=-16.d0
+   ! smin=-16.d0
    LINESEARCH_FACTOR = 0.d0
    call compute_g(0, g0 )
    LINESEARCH_FACTOR = 1.d0
@@ -634,17 +648,17 @@ if (LINESEARCH_FLAG) then
    sa = 1.d0; sb = 0.d0
    ga = g1  ; gb = g0
 
-   do while (ga*gb.gt.0.d0 .and. sa.lt.smax .and. sb.gt.smin)
-      gab = ga - gb
-      if (gab*ga.gt.0.d0) then
-         sb = min(-1.d0,sb*2.d0)
-         LINESEARCH_FACTOR = sb; call compute_g(1,gb)
-      else
-         sa = sa*2.d0
-         LINESEARCH_FACTOR = sa; call compute_g(1,ga)
-      endif
-      ! sb=sa; sa=2.d0*sa; gb=ga
-      ! LINESEARCH_FACTOR = sa; call compute_g(1,ga)
+   do while (ga*gb.gt.0.d0 .and. sa.lt.smax)
+      ! gab = ga - gb
+      ! if (gab*ga.gt.0.d0) then
+      !    sb = min(-1.d0,sb*2.d0)
+      !    LINESEARCH_FACTOR = sb; call compute_g(1,gb)
+      ! else
+      !    sa = sa*2.d0
+      !    LINESEARCH_FACTOR = sa; call compute_g(1,ga)
+      ! endif
+      sb=sa; sa=2.d0*sa; gb=ga
+      LINESEARCH_FACTOR = sa; call compute_g(1,ga)
    enddo
 
    step = sa; g1 = ga
@@ -1166,7 +1180,7 @@ real*8, intent(in) :: Factor
 
 integer :: nod,ndofH,ndofE,ndofV,ndofQ
 
-!$OMP DO
+!$OMP DO PRIVATE( ndofH,ndofE,ndofV,ndofQ)
    do nod=1,NRNODS
 !  ...skip if node inactive
       if (Is_inactive(nod)) cycle

@@ -14,16 +14,18 @@ subroutine set_environment
   use testvars
   use hyperelasticity
   implicit none
+
+  integer :: nthreads
 !
 ! Variables relevant to src/modules/environment
 !                        option label     // explanation               // default value             // parameter
   call get_option_string('-file-control'    ,'Control file'              ,'../common/control/control' ,FILE_CONTROL)
-  call get_option_string('-file-geometry'   ,'Geometry file'             ,'../common/geometries/hexa' ,FILE_GEOM   )
+  call get_option_string('-file-geometry'   ,'Geometry file'             ,'../common/geometries/cube_ng_61e.mesh' ,FILE_GEOM   )
   call get_option_string('-file-phys'       ,'Physics file'              ,'./input/physics'           ,FILE_PHYS   )
   call get_option_string('-file-history'    ,'History file'              ,'./input/history'           ,FILE_HISTORY)
   call get_option_string('-file-err'        ,'Error file'                ,'./output/errorlogs/log.txt',FILE_ERR    )
   call get_option_string('-file-refinement' ,'Refinement files location' ,'../../../files/ref'        ,FILE_REFINE )
-  call get_option_string('-prefix'          ,'Prefix for paraview files' ,'hx_'                     ,PREFIX      )
+  call get_option_string('-prefix'          ,'Prefix for paraview files' ,'c61_'                     ,PREFIX      )
 !
 ! Variables relevant to src/modules/paraview
 !                        option label     // explanation                        // default value     // parameter
@@ -35,8 +37,8 @@ subroutine set_environment
 !
 ! LOCAL variables relevant to the problem - see ../module/common_prob_data
 !                        option label     // explanation                                   // default       // parameter
-  call get_option_int(   '-p'               ,'Uniform order p of initial mesh approximation'  ,3               ,IP         )
-  call get_option_int(   '-bc'              ,'Bound. Cond.: 1)Dirichlet, 2)Neumann, 8)Mixed'  ,BC_DIRICHLET    ,IBC_PROB   )
+  call get_option_int(   '-p'               ,'Uniform order p of initial mesh approximation'  ,2               ,IP         )
+  call get_option_int(   '-bc'              ,'Bound. Cond.: 1)Dirichlet, 2)Neumann, 8)Mixed'  ,1    ,IBC_PROB   )
   call get_option_int(   '-exact'           ,'Manufactured solution (integer: 1-5)'           ,12,IEXACT_PROB)
   ! call get_option_int(   '-error-attribute' ,'1)Displacement, 2)Stress, 3)Combined, 4)Custom' ,DISPLACEMENT    ,IERROR_ATTR)
   call get_option_int(   '-norm-trial'      ,'1)L2, 2)Natural, 3)Custom'                      ,IERROR_NATURAL  ,IERROR_PROB)
@@ -62,5 +64,8 @@ subroutine set_environment
 !                        option label     // explanation                        // default value     // parameter
   call get_option_string('-file-testvars','Test variables file for DPG'           ,'./input/testvars'  ,FILE_TESTVARS)
 !
+!..OpenMP threading
+  call get_option_int('-nthreads','Number of OpenMP threads',1,nthreads)
+  call omp_set_num_threads(nthreads)
 !
 end subroutine set_environment

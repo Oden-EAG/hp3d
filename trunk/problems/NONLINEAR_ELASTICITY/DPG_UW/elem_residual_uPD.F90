@@ -553,7 +553,7 @@
 !  ...compute the residual
       Resid = 0.d0
 !  ...contribution from enriched test functions
-      do k=1,3*nrdofHH
+      do k=1,enrdof
         Resid = Resid  &
               + EnrResidc(k)*EnrResid(k)
       enddo

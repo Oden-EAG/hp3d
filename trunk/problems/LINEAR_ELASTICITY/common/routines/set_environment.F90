@@ -17,12 +17,12 @@ subroutine set_environment
 ! Variables relevant to src/modules/environment
 !                        option label     // explanation               // default value             // parameter
   call get_option_string('-file-control'    ,'Control file'              ,'../common/control/control' ,FILE_CONTROL)
-  call get_option_string('-file-geometry'   ,'Geometry file'             ,'../common/geometries/hexa' ,FILE_GEOM   )
+  call get_option_string('-file-geometry'   ,'Geometry file'             ,'../common/geometries/cube_ng_61e.mesh' ,FILE_GEOM   )
   call get_option_string('-file-phys'       ,'Physics file'              ,'./input/physics'           ,FILE_PHYS   )
   call get_option_string('-file-history'    ,'History file'              ,'./input/history'           ,FILE_HISTORY)
   call get_option_string('-file-err'        ,'Error file'                ,'./output/errorlogs/log.txt',FILE_ERR    )
   call get_option_string('-file-refinement' ,'Refinement files location' ,'../../../files/ref'        ,FILE_REFINE )
-  call get_option_string('-prefix'          ,'Prefix for paraview files' ,'cube_'                     ,PREFIX      )
+  call get_option_string('-prefix'          ,'Prefix for paraview files' ,'cng61_'                     ,PREFIX      )
 !
 ! Variables relevant to src/modules/paraview
 !                        option label     // explanation                        // default value     // parameter
@@ -34,7 +34,7 @@ subroutine set_environment
 !
 ! LOCAL variables relevant to the problem - see ../module/common_prob_data
 !                        option label     // explanation                                   // default       // parameter
-  call get_option_int(   '-p'               ,'Uniform order p of initial mesh approximation'  ,1               ,IP         )
+  call get_option_int(   '-p'               ,'Uniform order p of initial mesh approximation'  ,2               ,IP         )
   call get_option_int(   '-bc'              ,'Bound. Cond.: 1)Dirichlet, 2)Neumann, 8)Mixed'  ,BC_DIRICHLET    ,IBC_PROB   )
   call get_option_int(   '-exact'           ,'Manufactured solution (integer: 1-5)'           ,IEXACT_TRILINEAR,IEXACT_PROB)
   ! call get_option_int(   '-error-attribute' ,'1)Displacement, 2)Stress, 3)Combined, 4)Custom' ,DISPLACEMENT    ,IERROR_ATTR)

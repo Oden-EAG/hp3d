@@ -13,7 +13,8 @@
 subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
   use control    , only : NEXACT,GEOM_TOL
   use parameters , only : MAXEQNH,MAXEQNE,MAXEQNV,MAXEQNQ, ZERO
-  use hyperelasticity, only: LOAD_FACTOR
+  use hyperelasticity, only: LOAD_FACTOR,DEL
+  use common_prob_data
   implicit none
   real*8, dimension(3),          intent(in)  :: X
   integer,                       intent(in)  :: Icase,Mdle
@@ -51,7 +52,41 @@ subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
       ! elseif (abs(X(3)+2.d0).lt.GEOM_TOL) then
       !   ValH(3)=-2.d0
       ! endif
+      ! ValH = ValH*LOAD_FACTOR
+
+      select case(IBC_PROB)
+
+      case(15)
+        ! if (abs(X(1)-1.d0).lt.GEOM_TOL) then
+        !   ValH(4:6)=(-1.d0,0.d0,0.d0)
+        ! endif
+        ! if (abs(X(1)).lt.GEOM_TOL) then
+        !   ValH(4:6)=(1.d0,0.d0,0.d0)
+        ! endif
+
+        ! if (abs(X(2)-1.d0).lt.GEOM_TOL) then
+        !   ValH(4:6)=(0.d0,-1.d0,0.d0)
+        ! endif
+        if (abs(X(3)-1.d0).lt.GEOM_TOL) then
+          ValH(4:6)=(/0.d0,0.d0,-1.d0/)
+        endif
+        if (abs(X(3)).lt.GEOM_TOL) then
+          ValH(4:6)=(/0.d0,0.d0,0.d0/)
+        endif
+
+      case(21,36)
+
+        if (abs(X(1)-1.d0).lt.GEOM_TOL .or.   &
+            abs(X(2)-1.d0).lt.GEOM_TOL .or.   &
+            abs(X(3)-1.d0).lt.GEOM_TOL      ) &
+        ValV(1:3,4:6) = -1.d0*DEL
+
+      end select
+
       ValH = ValH*LOAD_FACTOR
+      DvalH=DvalH*LOAD_FACTOR
+      ValV = ValV*LOAD_FACTOR
+
 !==============================================================================
 !  KNOWN EXACT SOLUTION                                                       |
 !==============================================================================

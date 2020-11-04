@@ -14,7 +14,7 @@ subroutine set_initial_mesh(Nelem_order)
 ! BC flags
   integer, dimension(6,NR_PHYSA) :: ibc
 ! miscellanea
-  integer :: iprint,ifc,iel,neig,iDisplacement
+  integer :: iprint,ifc,iel,neig,iDisplacement,itri,nsurf,ib
 !
 !------------------------------------------------------------------------------------
 !     I N I T I A L I Z E
@@ -150,6 +150,32 @@ subroutine set_initial_mesh(Nelem_order)
           ibc(6,1:2) = (/0,0/)  ! none
         end select
       endif
+
+    case(15)! assume all elements are tetrahedra
+
+      ! if exterior face, set boundary condition
+      do ifc=1,4
+        ! get triangle number
+        itri = TETRAS(iel)%Figno(ifc)
+        itri = itri/10
+        ! check that triangle is the face of a single block
+        if (TRIANGLES(itri)%BlockNo(1).ne.0 .and. TRIANGLES(itri)%BlockNo(2).ne.0) cycle
+        ! get surface number
+        nsurf= TRIANGLES(itri)%idata(1)
+
+! CUBE
+        select case(Nsurf)
+        case(1,5) !normal pointing in direction +/-Z
+          ibc(ifc,1) = 1
+          ibc(ifc,2) = 0
+        case default !remaining surfaces have a zero traction b.c.
+          ibc(ifc,1) = 0
+          ibc(ifc,2) = 1
+        end select
+
+      enddo    
+
+      
     end select
 !
 !   allocate BC flags (one per attribute)

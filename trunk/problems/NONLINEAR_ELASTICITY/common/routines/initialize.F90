@@ -24,14 +24,14 @@ subroutine initialize
   integer, parameter :: NDIM_PROB    = 3    ! Dimension
   integer, parameter :: MANDIM_PROB  = 3    ! Manifold dimension
                                             ! EXPECTED MAX NUMBER OF:
-  integer, parameter :: MAXSU_PROB   = 21    ! surfaces
-  integer, parameter :: MAXNP_PROB   = 309  ! points
-  integer, parameter :: MAXNC_PROB   = 12000  ! curves
-  integer, parameter :: MAXTR_PROB   = 10000  ! triangles
+  integer, parameter :: MAXSU_PROB   = 50    ! surfaces
+  integer, parameter :: MAXNP_PROB   = 2012  ! points
+  integer, parameter :: MAXNC_PROB   = 30000  ! curves
+  integer, parameter :: MAXTR_PROB   = 20000  ! triangles
   integer, parameter :: MAXRE_PROB   = 100  ! rectangles
   integer, parameter :: MAXBT_PROB   = 1    ! prismsm
-  integer, parameter :: MAXHE_PROB   = 100  ! hexas
-  integer, parameter :: MAXTE_PROB   = 1545  ! tetras
+  integer, parameter :: MAXHE_PROB   = 10  ! hexas
+  integer, parameter :: MAXTE_PROB   = 7453  ! tetras
   integer, parameter :: MAXPY_PROB   = 1    ! pyramids
   !--------------------------------------------------------------------------
   ! E Q U A T I O N    S E T T I N G
@@ -134,11 +134,13 @@ subroutine initialize
   !SOLVERS
   ! frontal solver: initialize workspace
   call set_frsol_workspace (100000)
+  ! call set_frsol_workspace (10)
   !
   !
   !GRAPHICS
   ! X11 graphics optional: initialize parameters
   call set_x11_workspace(40000000,60000000,200000000)
+  ! call set_x11_workspace(40,40,200)
   !
   ! vis file - for vtk file for paraview
 !   call load_vis(TETR_VIS, trim(FILE_VIS)//'/tetra_'//trim(VLEVEL), 'tetr')

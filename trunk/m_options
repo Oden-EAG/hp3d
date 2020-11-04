@@ -15,7 +15,7 @@ DEBUG   ?= 1
 #------------------------------------------------------------------
 
 # Enable OpenMP threading
-OPENMP  ?= 0
+OPENMP  ?= 1
 
 # Use parallel threads to compile libraries and problems
 J ?= 4
