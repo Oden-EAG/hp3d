@@ -36,7 +36,7 @@ module laserParam
    real(8), parameter :: FIBER_LENGTH_0 = 10.d0
 !
 !..Dimensionalization constants (Maxwell)
-!  ...l_0    : length scale [m]
+!  ...L_0    : length scale [m]
 !  ...omega_0: frequency scale [rad/s]
 !  ...I_0    : irradiance scale [W/m^2]
 !  ...nu_0   : Yb population concentration scale [ion/m^3]
@@ -80,7 +80,7 @@ module laserParam
 !
 !..Non-dimensional real fiber length
    real(8), parameter :: FIBER_LENGTH = FIBER_LENGTH_0/L_0
-
+!
 !..refractive index of core (n1) and cladding (n2)
    !real(8) :: REF_INDEX_CORE = 1.4515d0
    real(8) :: REF_INDEX_CORE = 1.4512d0
@@ -101,8 +101,8 @@ module laserParam
    real(8), parameter :: LAMBDA_PUMP   =  976.0d-9 / L_0
 !
 !..Raman gain wavelengths [m] (Signal=Stokes, Pump)
-   !real(8), parameter :: LAMBDA_SIGNAL = 1116.0d-9 / l_0
-   !real(8), parameter :: LAMBDA_PUMP   = 1064.0d-9 / l_0
+   !real(8), parameter :: LAMBDA_SIGNAL = 1116.0d-9 / L_0
+   !real(8), parameter :: LAMBDA_PUMP   = 1064.0d-9 / L_0
 !
 !..Signal and Pump angular frequency
    real(8), parameter :: OMEGA_SIGNAL = 2.d0*PI/LAMBDA_SIGNAL
