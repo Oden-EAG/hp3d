@@ -68,6 +68,8 @@ subroutine get_power(Fld,NumPts,FileIter)
 !
    integer :: count,ierr
 !
+   logical, parameter :: modeProj = .false.
+!
 !----------------------------------------------------------------------
 !
    if (Fld .ne. 0 .and. Fld .ne. 1 .and. Fld .ne. 2) then
@@ -87,6 +89,7 @@ subroutine get_power(Fld,NumPts,FileIter)
             pump_power(NumPts), diff_power(NumPts), &
             core_power(NumPts), clad_power(NumPts)  )
 !
+   if (modeProj) then
    allocate(power_LP01_x(NumPts),norm_LP01_x(NumPts),coef_LP01_r_x(NumPts),coef_LP01_c_x(NumPts))
    allocate(power_LP11a_x(NumPts),norm_LP11a_x(NumPts),coef_LP11a_r_x(NumPts),coef_LP11a_c_x(NumPts))
    allocate(power_LP11b_x(NumPts),norm_LP11b_x(NumPts),coef_LP11b_r_x(NumPts),coef_LP11b_c_x(NumPts))
@@ -100,6 +103,7 @@ subroutine get_power(Fld,NumPts,FileIter)
    allocate(power_LP21a_y(NumPts),norm_LP21a_y(NumPts),coef_LP21a_r_y(NumPts),coef_LP21a_c_y(NumPts))
    allocate(power_LP21b_y(NumPts),norm_LP21b_y(NumPts),coef_LP21b_r_y(NumPts),coef_LP21b_c_y(NumPts))
    allocate(power_LP02_y(NumPts),norm_LP02_y(NumPts),coef_LP02_r_y(NumPts),coef_LP02_c_y(NumPts))
+   endif
 !
 !..distributing sample points uniformly
    if (RANK .eq. ROOT) then
@@ -132,6 +136,7 @@ subroutine get_power(Fld,NumPts,FileIter)
          stop
    end select
 !
+   if (modeProj) then
    if (RANK.eq.ROOT) write(*,*) ' get_power: computing signal mode_power..'
    i = ISOL; j = ICOMP_EXACT
    ISOL = 13; ICOMP_EXACT = 1 ! LP01 projection (x-polarized)
@@ -162,6 +167,7 @@ subroutine get_power(Fld,NumPts,FileIter)
    ISOL = 16; ICOMP_EXACT = 2 ! LP02 projection (y-polarized)
    call compute_power(zValues,NumPts,ISOL, power_LP02_y,norm_LP02_y,coef_LP02_r_y,coef_LP02_c_y)
    ISOL = i; ICOMP_EXACT = j
+   endif
 !
 !..gather RHS vector information on host
    if (.not. DISTRIBUTED .or. HOST_MESH) goto 50
@@ -173,6 +179,7 @@ subroutine get_power(Fld,NumPts,FileIter)
       call MPI_REDUCE(MPI_IN_PLACE,core_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE(MPI_IN_PLACE,clad_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       !
+      if (modeProj) then
       call MPI_REDUCE(MPI_IN_PLACE,power_LP01_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE(MPI_IN_PLACE, norm_LP01_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE(MPI_IN_PLACE, coef_LP01_r_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
@@ -232,6 +239,7 @@ subroutine get_power(Fld,NumPts,FileIter)
       call MPI_REDUCE(MPI_IN_PLACE, norm_LP02_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE(MPI_IN_PLACE, coef_LP02_r_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE(MPI_IN_PLACE, coef_LP02_c_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      endif
    else
       call MPI_REDUCE(sign_power,sign_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE(pump_power,pump_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
@@ -239,6 +247,7 @@ subroutine get_power(Fld,NumPts,FileIter)
       call MPI_REDUCE(core_power,core_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE(clad_power,clad_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       !
+      if (modeProj) then
       call MPI_REDUCE(power_LP01_x  ,power_LP01_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE( norm_LP01_x  , norm_LP01_x  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE( coef_LP01_r_x, coef_LP01_r_x,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
@@ -298,11 +307,13 @@ subroutine get_power(Fld,NumPts,FileIter)
       call MPI_REDUCE( norm_LP02_y  , norm_LP02_y  ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE( coef_LP02_r_y, coef_LP02_r_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE( coef_LP02_c_y, coef_LP02_c_y,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      endif
       goto 90
    endif
 !
    50 continue
 !
+   if (modeProj) then
 !$OMP PARALLEL DO
    do i = 1,NumPts
       norm_LP01_x(i)   = sqrt(norm_LP01_x(i))
@@ -354,6 +365,7 @@ subroutine get_power(Fld,NumPts,FileIter)
       power_LP02_y(i)  = power_LP02_y(i) * ((coef_LP02_r_y(i) / norm_LP02_y(i))**2.d0)
    enddo
 !$OMP END PARALLEL DO
+   endif
 !
 !..Print signal power output values
    if (Fld .eq. 1 .or. Fld .eq. 2) then
@@ -470,6 +482,7 @@ subroutine get_power(Fld,NumPts,FileIter)
    endif
 !
 !..Print mode power output values
+   if (modeProj) then
       if (FileIter .eq. -1) then
          write(*,*)
          write(*,*) ' get_power: printing LP01 (x) mode power (signal):'
@@ -679,10 +692,12 @@ subroutine get_power(Fld,NumPts,FileIter)
          enddo
          close(UNIT=9)
       endif
+   endif
 !
    90 continue
    deallocate(zValues,sign_power,pump_power,diff_power,core_power,clad_power)
 !
+   if (modeProj) then
    deallocate(power_LP01_x,norm_LP01_x,coef_LP01_r_x,coef_LP01_c_x)
    deallocate(power_LP11a_x,norm_LP11a_x,coef_LP11a_r_x,coef_LP11a_c_x)
    deallocate(power_LP11b_x,norm_LP11b_x,coef_LP11b_r_x,coef_LP11b_c_x)
@@ -696,6 +711,7 @@ subroutine get_power(Fld,NumPts,FileIter)
    deallocate(power_LP21a_y,norm_LP21a_y,coef_LP21a_r_y,coef_LP21a_c_y)
    deallocate(power_LP21b_y,norm_LP21b_y,coef_LP21b_r_y,coef_LP21b_c_y)
    deallocate(power_LP02_y,norm_LP02_y,coef_LP02_r_y,coef_LP02_c_y)
+   endif
 !
    99 continue
 !
