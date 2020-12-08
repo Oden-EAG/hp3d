@@ -407,8 +407,8 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
       else if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.1520d0 .and. CLAD_NX.eq.1.1500d0) .or.  &
                (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.1520d0 .and. CLAD_NY.eq.1.1500d0)) then
          k    = 68.0103d0
-         gamm = 1.57221d0
-         beta = 3.68554d0
+         gamm =  1.57221d0
+         beta =  3.68554d0
       else if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.6510d0 .and. CLAD_NX.eq.1.6500d0) .or.  &
                (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.6510d0 .and. CLAD_NY.eq.1.6500d0)) then
          k    = 97.4838d0
@@ -417,6 +417,17 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
       else
          write(*,*) 'mfd_solutions: ISOL 13, unexpected case. stop.'
          stop
+      endif
+!
+!  ...LP01 (pump) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.0976
+      if (Fld .eq. 1) then
+         ampl =  2.0d0
+         if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.4512d0 .and. CLAD_NX.eq.1.4500d0) .or.   &
+             (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.4512d0 .and. CLAD_NY.eq.1.4500d0)) then
+            k    = 93.4108d0
+            gamm =  1.55709d0
+            beta =  3.46466d0
+         endif
       endif
 !
       call get_LP01(Xp,ampl,k,gamm,beta, E,dE)
