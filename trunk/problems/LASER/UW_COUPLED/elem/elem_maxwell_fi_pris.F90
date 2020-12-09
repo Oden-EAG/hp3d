@@ -566,6 +566,11 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
 !        ...initialize gain polarization, raman polarization
             gain_pol = ZERO; raman_pol = ZERO
+!        ...skip nonlinear gain computation if inside PML region
+            if ( USE_PML .and. ( (x(3).gt.PML_REGION) .or. &
+                                 ( (COPUMP.eq.0).and.(x(3).lt.(ZL-PML_REGION)) ) &
+                               ) &
+               ) goto 190
             if (ACTIVE_GAIN .gt. 0.d0) then
                if (dom_flag .eq. 1) then ! .and. x(3).le.PML_REGION) then
                   call get_activePol(zsolQ_soleval(1:12),Fld_flag,delta_n, gain_pol)
@@ -582,6 +587,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                endif
 !        ...endif RAMAN_GAIN
             endif
+ 190        continue
 !        ...update auxiliary constants for za,zb: this is for
 !        ...Stiffness and Gram matrix that changes with each nonlinear iteration
             za = (ZI*OMEGA*OMEGA_RATIO_FLD*EPSILON+SIGMA)*IDENTITY+bg_pol+gain_pol+raman_pol
