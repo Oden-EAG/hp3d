@@ -369,6 +369,11 @@ subroutine get_power(Fld,NumPts,FileIter)
    endif
 !
 !..Print signal power output values
+   if(NONLINEAR_FLAG.eq.1 .and. COPUMP.eq.0) then
+!  ...explicitly set signal power on dirichlet face at fiber output to zero
+!     since signal dirichlet dofs are not correct when pump was computed latest
+      sign_power(NumPts) = 0.d0
+   endif
    if (Fld .eq. 1 .or. Fld .eq. 2) then
       if (FileIter .eq. -1) then
          write(*,*) ' get_power: printing power values (signal):'
@@ -451,11 +456,20 @@ subroutine get_power(Fld,NumPts,FileIter)
       efficiency(1) = 0.d0
       do i = 2,NumPts
          if(COPUMP.eq.1) then
-            efficiency(i) = (sign_power(i)-sign_power(1))&
-                             /(pump_power(1)-pump_power(i))
+            if (zValues(i) .gt. PML_REGION) then
+               efficiency(i) = 0.d0
+            else
+               efficiency(i) = (sign_power(i)-sign_power(1)) &
+                              /(pump_power(1)-pump_power(i))
+            endif
          elseif(COPUMP.eq.0) then
-            efficiency(i) = (sign_power(i)-sign_power(1))&
-                             /(pump_power(NumPts)-pump_power(i))
+            if (zValues(i).lt.(ZL-PML_REGION) .or. &
+                zValues(i).gt.PML_REGION) then
+               efficiency(i) = 0.d0
+            else
+               efficiency(i) = (sign_power(i)-sign_power(1)) &
+                              /(pump_power(NumPts)-pump_power(i))
+            endif
          else
             write(*,*) ' get_power: COPUMP must be 1 or 0. stop.'
             stop

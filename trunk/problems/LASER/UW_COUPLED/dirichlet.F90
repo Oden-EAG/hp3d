@@ -83,7 +83,7 @@ subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
                      endif
 !              ...Next check for pump and launch at X(3) = ZL
                   case(4)
-                     if((X(3).ge.(ZL-GEOM_TOL))) then
+                     if((X(3).gt.(ZL-GEOM_TOL))) then
 !                    ...E-trc value
                         call exact(X,Mdle, ValH,DvalH,d2valH,ValE,DvalE,d2valE,  &
                                            ValV,DvalV,d2valV,valQ,dvalQ,d2valQ)
