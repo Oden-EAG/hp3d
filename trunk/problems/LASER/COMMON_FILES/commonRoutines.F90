@@ -205,9 +205,9 @@ end subroutine set_PML
 !   arguments:
 !       in:             Xp       - coordinates (x,y,z) at a physical point
 !                       Fld_flag - 1 (signal) / 0 (pump)
-!       out:            Zbeta   - PML stretch function that stretches only in z-direction
-!                       Zdbeta  - z-derivative of PML stretch function
-!                       Zd2beta - second z-derivative of PML stretch function
+!       out:            Zbeta    - PML stretch function that stretches only in z-direction
+!                       Zdbeta   - z-derivative of PML stretch function
+!                       Zd2beta  - second z-derivative of PML stretch function
 !
 !---------------------------------------------------------------------------
 subroutine get_Beta(Xp,Fld_flag, Zbeta,Zdbeta,Zd2beta)
@@ -222,6 +222,7 @@ subroutine get_Beta(Xp,Fld_flag, Zbeta,Zdbeta,Zd2beta)
    VTYPE,   intent(out) :: Zbeta,Zdbeta,Zd2beta
 !
    real(8) :: z,a,b,c,L,n,rho,drho,d2rho
+   real(8) :: pml_left
 !
 !..OMEGA_RATIO_SIGNAL or OMEGA_RATIO_PUMP
    real(8) :: OMEGA_RATIO_FLD
@@ -245,7 +246,7 @@ subroutine get_Beta(Xp,Fld_flag, Zbeta,Zdbeta,Zd2beta)
    zbeta = z
    zdbeta = ZONE
 !..check if the wave is exponential growth (test case)
-   if(SIGMA.ne.ZERO) then
+   if(.false. .and. SIGMA.ne.ZERO) then ! deactivated (not used currently)
       a = EXP_COEFF
       c = 5.d0
       n = 9.d0
@@ -273,14 +274,28 @@ subroutine get_Beta(Xp,Fld_flag, Zbeta,Zdbeta,Zd2beta)
             zbeta = z - ZI*rho/(OMEGA*OMEGA_RATIO_FLD)
             zdbeta = 1.d0 - ZI*drho/(OMEGA*OMEGA_RATIO_FLD)
             zd2beta = -ZI*d2rho/(OMEGA*OMEGA_RATIO_FLD)
-          endif
+         endif
 !  ...next check for counter-pumping: PML on opposite side for signal and pump
 !  ...PML @ z.gt.PML_REGION for signal and @ z.lt.PML_FRAC*ZL for pump
       elseif(COPUMP.eq.0) then
-         if(z.gt.PML_REGION) then
+         pml_left = PML_FRAC*ZL;
+!     ...signal
+         if((Fld_flag.eq.1) .and. (z.gt.PML_REGION)) then
             rho = c*((z-b)/(ZL-PML_REGION))**n
             drho = c*n*((z-b)/(ZL-PML_REGION))**(n-1.d0)*(1.d0/(ZL-PML_REGION))
             d2rho = c*n*(n-1.d0)*((z-b)/(ZL-PML_REGION))**(n-2.d0)*(1.d0/(ZL-PML_REGION)**2)
+            if((rho.le.0.d0).or.(drho.le.0.d0).or.(d2rho.le.0)) then
+               write(*,*) ' get_Beta: rho, drho,d2rho are negative. stop.'
+               stop
+            endif
+            zbeta = z - ZI*rho/(OMEGA*OMEGA_RATIO_FLD)
+            zdbeta = 1.d0 - ZI*drho/(OMEGA*OMEGA_RATIO_FLD)
+            zd2beta = -ZI*d2rho/(OMEGA*OMEGA_RATIO_FLD)
+!     ...pump
+         else if((Fld_flag.eq.0) .and. (z.lt.pml_left)) then
+            rho = c*((pml_left-z)/pml_left)**n
+            drho = c*n*((pml_left-z)/pml_left)**(n-1.d0)*(1.d0/(pml_left))
+            d2rho = c*n*(n-1.d0)*((pml_left-z)/pml_left)**(n-2.d0)*(1.d0/(pml_left)**2)
             if((rho.le.0.d0).or.(drho.le.0.d0).or.(d2rho.le.0)) then
                write(*,*) ' get_Beta: rho, drho,d2rho are negative. stop.'
                stop

@@ -68,6 +68,7 @@ subroutine get_power(Fld,NumPts,FileIter)
 !
    integer :: count,ierr
 !
+!..activate to calculate power in each signal LP mode (by projection)
    logical, parameter :: modeProj = .false.
 !
 !----------------------------------------------------------------------
