@@ -199,6 +199,9 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    integer :: nk
    nk(k1,k2) = (k2-1)*k2/2+k1
 !
+!..timer
+   real(8) :: MPI_Wtime,start_time,end_time
+!
 !---------------------------------------------------------------------
 !
 !..Set iverb = 0/1 (Non-/VERBOSE)
@@ -326,6 +329,9 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    INTEGRATION = NORD_ADD
    call set_3D_int_DPG(etype,norder,norient_face, nint,xiloc,waloc)
    INTEGRATION = 0
+!
+!..start timer
+   start_time = MPI_Wtime()
 !
 !..loop over integration points
    do l=1,nint
@@ -590,6 +596,15 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !..end of loop through integration points
    enddo
+!
+!..end timer
+   end_time = MPI_Wtime()
+   !$OMP CRITICAL
+      !write(*,10) etype, end_time-start_time
+      write(*,11) end_time-start_time
+! 10   format(A,' elem : ',f12.5,'  seconds')
+ 11   format(f12.5)
+   !$OMP END CRITICAL
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------

@@ -234,6 +234,9 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
      deltak(a,a)=1
    enddo
 !
+!..timer
+   real(8) :: MPI_Wtime,start_time,end_time
+!
 !---------------------------------------------------------------------
 !
 !..Set iverb = 0/1 (Non-/VERBOSE)
@@ -454,6 +457,9 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    allocate(STIFQC      (3,3,nrdofQ12*(nrdofE12+nrdofH12)))
 !
    allocate(LOADE(3,(nrdofE12+nrdofH12)))
+!
+!..start timer
+   start_time = MPI_Wtime()
 !
 !..Loop over quadrature points in direction \xi_1
    do pz=1,nintz
@@ -949,6 +955,15 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
       enddo
 !..end loop over z direction quadrature points
    enddo
+!
+!..end timer
+   end_time = MPI_Wtime()
+   !$OMP CRITICAL
+      !write(*,10) etype, end_time-start_time
+      write(*,11) end_time-start_time
+! 10   format(A,' elem : ',f12.5,'  seconds')
+ 11   format(f12.5)
+   !$OMP END CRITICAL
 !
    deallocate(mapEE,mapQQ)
    deallocate(shapeH3,E12,C12,Q12)

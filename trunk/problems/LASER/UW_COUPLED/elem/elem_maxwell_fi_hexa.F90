@@ -247,6 +247,10 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    do a=1,3
      deltak(a,a)=1
    enddo
+!
+!..timer
+   real(8) :: MPI_Wtime,start_time,end_time
+!
 !---------------------------------------------------------------------
 !
 !..Set iverb = 0/1 (Non-/VERBOSE)
@@ -460,6 +464,9 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    enddo
 !
    xip=ZERO
+!
+!..start timer
+   start_time = MPI_Wtime()
 !
 !..Loop over quadrature points in direction \xi_1
    do px=1,nintx
@@ -1296,6 +1303,14 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !  ...loop over px ends
    enddo
 !
+!..end timer
+   end_time = MPI_Wtime()
+   !$OMP CRITICAL
+      !write(*,10) etype, end_time-start_time
+      write(*,11) end_time-start_time
+! 10   format(A,' elem : ',f12.5,'  seconds')
+ 11   format(f12.5)
+   !$OMP END CRITICAL
 !
    deallocate(AUXEE_A_zb,AUXEE_A_zc)
    deallocate(AUXEE_B_zb,AUXEE_B_zc)
