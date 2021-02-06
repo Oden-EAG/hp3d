@@ -195,12 +195,12 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    VTYPE :: zbeta,zdbeta,zd2beta,detJstretch
    VTYPE, dimension(3,3) :: Jstretch,invJstretch,JJstretch
 !
+!..timer
+   real(8) :: MPI_Wtime,start_time,end_time
+!
 !..for Gram matrix compressed storage format
    integer :: nk
    nk(k1,k2) = (k2-1)*k2/2+k1
-!
-!..timer
-   real(8) :: MPI_Wtime,start_time,end_time
 !
 !---------------------------------------------------------------------
 !

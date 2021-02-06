@@ -236,6 +236,10 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    VTYPE  , dimension(3,3) :: Z_za,Z_zc,Z_aux
    real(8), dimension(MAXPP+1,2) :: shapH1,shapH2,shapH3
    real(8), dimension(MAXPP+1,MAXPP+1) :: sH2p,sH3p,dsH2p,dsH3p
+!
+!..timer
+   real(8) :: MPI_Wtime,start_time,end_time
+!
    integer, dimension(3,3) :: deltak
 !
 !..for Gram matrix compressed storage format
@@ -247,9 +251,6 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    do a=1,3
      deltak(a,a)=1
    enddo
-!
-!..timer
-   real(8) :: MPI_Wtime,start_time,end_time
 !
 !---------------------------------------------------------------------
 !

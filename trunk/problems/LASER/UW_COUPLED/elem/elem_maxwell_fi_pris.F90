@@ -222,6 +222,9 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
    integer, allocatable :: mapEE(:),mapQQ(:)
 !
+!..timer
+   real(8) :: MPI_Wtime,start_time,end_time
+!
    integer, dimension(3,3) :: deltak
 !
 !..for Gram matrix compressed storage format
@@ -233,9 +236,6 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    do a=1,3
      deltak(a,a)=1
    enddo
-!
-!..timer
-   real(8) :: MPI_Wtime,start_time,end_time
 !
 !---------------------------------------------------------------------
 !
