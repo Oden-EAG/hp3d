@@ -111,11 +111,11 @@ module laserParam
 !
 !..Active Yb gain population dynamics parameters
 !  ...N_TOTAL    : Total population concentration [ion/m^3]
-!  ...SIGMA_S_ABS: Signal absorption crossection [m^2/ion]
-!  ...SIGMA_S_EMS: Signal emission crossection [m^2/ion]
-!  ...SIGMA_P_ABS: Pump absorption crossection [m^2/ion]
-!  ...SIGMA_P_EMS: Pump emission crossection [m^2/ion]
-!  ...SIGMA_P_EMS: Pump emission crossection [m^2/ion]
+!  ...SIGMA_S_ABS: Signal absorption cross-section [m^2/ion]
+!  ...SIGMA_S_EMS: Signal emission cross-section [m^2/ion]
+!  ...SIGMA_P_ABS: Pump absorption cross-section [m^2/ion]
+!  ...SIGMA_P_EMS: Pump emission cross-section [m^2/ion]
+!  ...SIGMA_P_EMS: Pump emission cross-section [m^2/ion]
 !  ...TAU_0      : Non-dimensional value in gain expression
 !  ...ACTIVE_GAIN: Non-dimensional amplifier for active gain
    real(8), parameter :: N_TOTAL = 6.0d25 / NU_0
