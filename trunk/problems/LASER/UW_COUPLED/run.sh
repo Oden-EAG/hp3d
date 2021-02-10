@@ -98,11 +98,11 @@ dt=0.1d0
 
 # ============================================================================================
 # A. TESTING (CONVERGENCE RATES ON A CUBE/PRISM) -- use NEXACT=1
-#file_geometry='../GEOMETRIES/cubes/cube'
+file_geometry='../GEOMETRIES/cubes/cube'
 #file_geometry='../GEOMETRIES/prisms/prism_curv1'
-#ctrl='../COMMON_FILES/control_1'
+ctrl='../COMMON_FILES/control_1'
 #ibrun -n ${nproc}
-#./uwLaser -geom 1 -isol 1 -omega 1.0d0 -comp 1 -file_control ${ctrl} -job ${job} -maxnods ${maxnods} -imax ${imax} jmax ${jmax} -px ${px} -py ${py} -pz ${pz} -dp ${dp} -ibc ${ibc} -npx 4 -npy 4 -npz 4 -usepml 0 -nlflag 0 -heat ${heat} -aniso_heat ${aniso_heat} -copump 1 -zl ${zl} -nthreads ${nthreads} -dir_output ${dir_output} -vis_level ${vis_level} -file_geometry ${file_geometry}
+./uwLaser -geom 1 -isol 1 -omega 1.0d0 -comp 1 -file_control ${ctrl} -job ${job} -maxnods ${maxnods} -imax ${imax} -jmax ${jmax} -px ${px} -py ${py} -pz ${pz} -dp ${dp} -ibc ${ibc} -npx 4 -npy 4 -npz 4 -usepml 0 -nlflag 0 -heat ${heat} -aniso_heat ${aniso_heat} -copump 1 -zl ${zl} -nthreads ${nthreads} -dir_output ${dir_output} -vis_level ${vis_level} -file_geometry ${file_geometry}
 #ibrun -n ${nproc} xterm -hold -e ./uwLaser -geom 1 -isol 2 -omega 1.0d0 -comp 1 -job ${job} -imax ${imax} -jmax ${jmax} -px ${px} -py ${py} -pz ${pz} -dp ${dp} -ibc ${ibc} -npx 3 -npy 3 -npz 3 -usepml 0 -nlflag 0 -heat 0 -aniso_heat ${aniso_heat} -copump 1 -zl ${zl} -nthreads ${nthreads} -dir_output ${dir_output} -vis_level ${vis_level} -file_geometry ${file_geometry}
 
 # ============================================================================================
@@ -142,7 +142,7 @@ file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_1_2'
 gamma=1.0d0
 ctrl='../COMMON_FILES/control_0'
 #ibrun -n ${nproc} xterm -hold -e ./uwLaser .....
-ibrun -n ${nproc} ./uwLaser -geom 5 -isol 17 -ref_core ${ref_core} -ref_clad ${ref_clad} -comp 1 -gamma ${gamma} -file_control ${ctrl} -job ${job} -maxnods ${maxnods} -imax ${imax} -jmax ${jmax} -px ${px} -py ${py} -pz ${pz} -dp ${dp} -usepml ${usepml} -pmlfrac ${pmlfrac} -nlflag ${nlflag} -gain ${gain} -raman ${raman} -heat ${heat} -aniso_heat ${aniso_heat} -aniso_ref_index ${aniso_ref_index} -art_grating ${art_grating} -nsteps ${nsteps} -dt ${dt} -copump 1 -zl ${zl} -nthreads ${nthreads} -dir_output ${dir_output} -vis_level ${vis_level} -file_geometry ${file_geometry}
+#ibrun -n ${nproc} ./uwLaser -geom 5 -isol 17 -ref_core ${ref_core} -ref_clad ${ref_clad} -comp 1 -gamma ${gamma} -file_control ${ctrl} -job ${job} -maxnods ${maxnods} -imax ${imax} -jmax ${jmax} -px ${px} -py ${py} -pz ${pz} -dp ${dp} -usepml ${usepml} -pmlfrac ${pmlfrac} -nlflag ${nlflag} -gain ${gain} -raman ${raman} -heat ${heat} -aniso_heat ${aniso_heat} -aniso_ref_index ${aniso_ref_index} -art_grating ${art_grating} -nsteps ${nsteps} -dt ${dt} -copump 1 -zl ${zl} -nthreads ${nthreads} -dir_output ${dir_output} -vis_level ${vis_level} -file_geometry ${file_geometry}
 
 # ============================================================================================
 # C. Rectangular waveguide for linear Maxwell (e.g., pollution study)
