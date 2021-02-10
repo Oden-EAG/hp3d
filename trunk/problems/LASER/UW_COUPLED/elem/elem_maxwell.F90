@@ -196,7 +196,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    VTYPE, dimension(3,3) :: Jstretch,invJstretch,JJstretch
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time
+!   real(8) :: MPI_Wtime,start_time,end_time
 !
 !..for Gram matrix compressed storage format
    integer :: nk
@@ -331,7 +331,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    INTEGRATION = 0
 !
 !..start timer
-   start_time = MPI_Wtime()
+!   start_time = MPI_Wtime()
 !
 !..loop over integration points
    do l=1,nint
@@ -598,13 +598,13 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    enddo
 !
 !..end timer
-   end_time = MPI_Wtime()
-   !$OMP CRITICAL
-      !write(*,10) etype, end_time-start_time
-      write(*,11) end_time-start_time
-! 10   format(A,' elem : ',f12.5,'  seconds')
- 11   format(f12.5)
-   !$OMP END CRITICAL
+!   end_time = MPI_Wtime()
+!   !$OMP CRITICAL
+!      !write(*,10) etype, end_time-start_time
+!      write(*,11) end_time-start_time
+!! 10   format(A,' elem : ',f12.5,'  seconds')
+! 11   format(f12.5)
+!   !$OMP END CRITICAL
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
