@@ -25,6 +25,7 @@ subroutine exec_job_coupled
    integer :: No,No1,No2
    real(8) :: L2NormDiff,stopEpsilon
    real(8) :: L2NormDiffIter(100)
+   real(8) :: res
    real(8) :: FieldNormH,FieldNormE,FieldNormV,FieldNormQ
 !
    integer :: i,j,ierr,numPts,fld,time_step
@@ -196,7 +197,7 @@ subroutine exec_job_coupled
 !        QUIET_MODE = .true.; IPRINT_TIME = 0
 !        if (RANK.eq.ROOT) write(*,*)
 !        if (RANK.eq.ROOT) write(*,*) '   Signal residual:'
-!        call residual
+!        call residual(res)
          if (RANK.eq.ROOT) write(*,*)
 !        if (RANK.eq.ROOT) write(*,*)
 !        QUIET_MODE = .false.; IPRINT_TIME = 1
@@ -214,7 +215,7 @@ subroutine exec_job_coupled
 !        QUIET_MODE = .true.; IPRINT_TIME = 0
          if (RANK.eq.ROOT) write(*,*)
 !        if (RANK.eq.ROOT) write(*,*) '   Pump residual:'
-!        call residual
+!        call residual(res)
 !        QUIET_MODE = .false.; IPRINT_TIME = 1
 !
 !     ...copy components and calculate norm corresponding to signal
@@ -274,7 +275,7 @@ subroutine exec_job_coupled
 !   if (RANK.eq.ROOT) write(*,*) '   Pump residual:'
 !   NO_PROBLEM = 4
 !   call set_physAm(NO_PROBLEM, physNick,flag)
-!   call residual
+!   call residual(res)
 !!
 !   if (RANK.eq.ROOT) write(*,*)
 !   if (RANK.eq.ROOT) write(*,*) '   Signal residual:'
@@ -286,7 +287,7 @@ subroutine exec_job_coupled
 !   else
 !      call par_nested('H')
 !   endif
-!   call residual
+!   call residual(res)
 !   QUIET_MODE = .false.; IPRINT_TIME = 1
 !!
 !   if (RANK.eq.ROOT) then

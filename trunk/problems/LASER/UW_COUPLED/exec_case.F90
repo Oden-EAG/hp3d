@@ -26,6 +26,7 @@ subroutine exec_case(idec)
    character(len=2) :: vis_level
 !
    integer :: fld,numPts,i,mdle,kref,refs
+   real(8) :: res
 !
    integer :: src,count,ierr
 !
@@ -209,7 +210,7 @@ subroutine exec_case(idec)
 !  ...compute the residual
       case(51)
          write(*,*) 'computing residual...'
-         call residual()
+         call residual(res)
 !
       case(60)
          if (RANK .eq. ROOT) then

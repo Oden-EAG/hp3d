@@ -67,7 +67,7 @@ subroutine exec_job
 !
       if (NUM_PROCS .eq. 1) goto 30
 !
-      if (i .eq. IMAX-2) then
+      if (i .eq. IMAX-3) then
          call zoltan_w_set_lb(7)
       elseif (i .gt. IMAX) then
 !     ...set load balancing to graph partitioner, and redistribute
@@ -86,8 +86,11 @@ subroutine exec_job
       if(RANK .eq. ROOT) write(*,300) end_time - start_time
 !
    30 continue
-      if (i .le. IMAX) cycle
+      if (i .le. IMAX .and. JMAX .gt. 0) cycle
       if (NUM_PROCS .eq. 1) goto 60
+!
+!  ...skip printing partition
+      goto 40
 !
 !  ...print current partition (elems)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
@@ -97,6 +100,8 @@ subroutine exec_job
       else
          if(RANK .eq. ROOT) write(*,*) '   ... skipping for a large number of elements.'
       endif
+!
+   40 continue
 !
 !  ...skip evaluating partition
       goto 50
@@ -126,7 +131,8 @@ subroutine exec_job
       if(RANK .eq. ROOT) write(*,200) '6. calling MUMPS/PARDISO solver...'
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
       if (NUM_PROCS .eq. 1) then
-         call pardiso_sc('H')
+         !call pardiso_sc('H')
+         call par_mumps_sc('H')
       else
          !call par_mumps_sc('H')
          call par_nested('H')
@@ -141,6 +147,7 @@ subroutine exec_job
       !goto 80
       !if (i .lt. IMAX) cycle
       if (i .lt. IMAX+JMAX) cycle
+      cycle
 !
 !  ...compute power in fiber for signal field
       if(RANK .eq. ROOT) write(*,200) '7. computing power...'
@@ -167,7 +174,7 @@ subroutine exec_job
       if(RANK .eq. ROOT) write(*,300) end_time - start_time
    enddo
 !
-!..compute error on last mesh
+!..compute residual/error on last mesh
    if(RANK .eq. ROOT) write(*,200) 'Compute error/residual on last mesh...'
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    call refine_DPG(INOREFINEMENT,1,0.25d0,flag,physNick,ires, nstop)
