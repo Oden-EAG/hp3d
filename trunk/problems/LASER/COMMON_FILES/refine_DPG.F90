@@ -244,18 +244,18 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
    write(*,*) 'HISTORY OF REFINEMENTS'
    if (NEXACT.eq.0) write(*,7005)
    if (NEXACT.gt.0) write(*,7006)
- 7005  format(' mesh |',' nrdof_tot |',' nrdof_con |','    residual   |','   residual rate  ',/)
- 7006  format(' mesh |',' nrdof_tot |',' nrdof_con |','    residual   |','   residual rate  |', &
+ 7005  format(' mesh |','  nrdof_tot |','  nrdof_con |','    residual   |','   residual rate  ',/)
+ 7006  format(' mesh |','  nrdof_tot |','  nrdof_con |','    residual   |','   residual rate  |', &
               ' field error  |','rel field error|','   error rate ',/)
 !
    do i=1,istep
       if (NEXACT.eq.0) then
          write(*,7003) i,nrdof_tot_mesh(i),nrdof_con_mesh(i),residual_mesh(i),rate_mesh(i)
- 7003    format(2x,i2,'  | ',2(i9,' | '),es12.5,'  |',f7.2)
+ 7003    format(2x,i2,'  | ',2(i10,' | '),es12.5,'  |',f7.2)
       else
          write(*,7004) i,nrdof_tot_mesh(i),nrdof_con_mesh(i),residual_mesh(i),rate_mesh(i), &
                        error_mesh(i),rel_error_mesh(i),rate_error_mesh(i)
- 7004    format(2x,i2,'  | ',2(i9,' | '),es12.5,'  |',f7.2,'          ', &
+ 7004    format(2x,i2,'  | ',2(i10,' | '),es12.5,'  |',f7.2,'          ', &
                 2(' | ',es12.5),'  |',f7.2)
       endif
       if (i .eq. istep) write(*,*)
