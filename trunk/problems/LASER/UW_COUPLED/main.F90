@@ -25,20 +25,24 @@ program main
    use assembly_sc, only: IPRINT_TIME
    use stc        , only: STORE_STC,HERM_STC
 !
-   use MPI        , only: MPI_COMM_WORLD
+   use MPI        , only: MPI_COMM_WORLD,MPI_BARRIER, &
+                          MPI_GET_PROCESSOR_NAME,MPI_MAX_PROCESSOR_NAME
    use mpi_param  , only: ROOT,RANK,NUM_PROCS
    use mpi_wrapper, only: mpi_w_init,mpi_w_finalize
 !
    implicit none
 !
 !..auxiliary variables
-   integer :: i, ierr, req, ret
+   integer :: i, ierr, req, ret, plen
 !
    integer :: flag(6)
    integer :: physNick
 !
 !..OMP variables
    integer :: num_threads, omp_get_num_threads
+!
+!..MPI variables
+   character(MPI_MAX_PROCESSOR_NAME) :: pname
 !
 !..timer
    real(8) :: MPI_Wtime,start_time,end_time
@@ -82,17 +86,18 @@ program main
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 !..initialize physics, geometry, etc.
+   call MPI_GET_PROCESSOR_NAME (pname,plen,ierr);
    do i = 0, NUM_PROCS-1
       if ((RANK .eq. i) .and. (RANK .eq. ROOT)) then
          write(6,*)
-         write(6,1020) "Master proc [", RANK, "], initialize.."
+         write(6,1020) "Master proc [",RANK,"] on node [",trim(pname),"]: initialize..."
          QUIET_MODE = .FALSE.
       else if ((RANK .eq. i) .and. (RANK .ne. ROOT)) then
-         write(6,1020) "Worker proc [", RANK, "], initialize.."
+         write(6,1020) "Worker proc [",RANK,"] on node [",trim(pname),"]: initialize..."
          QUIET_MODE = .TRUE.
       endif
    enddo
- 1020 format (A,I3,A)
+ 1020 format (A,I4,A,A,A)
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    call initialize
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
@@ -129,11 +134,13 @@ program main
    if (NONLINEAR_FLAG .eq. 1) then
       write(*,9020) ' Raman gain               = ', RAMAN_GAIN
       write(*,9020) ' Active gain              = ', ACTIVE_GAIN
+      write(*,9010) ' COPUMP                   = ', COPUMP
    endif
    write(*,9030) ' Polynomial order (x,y,z) = ', ORDER_APPROX_X,ORDER_APPROX_Y,ORDER_APPROX_Z
    write(*,9010) ' ISOL                     = ', ISOL
    write(*,9010) ' NEXACT                   = ', NEXACT
    write(*,9010) ' FAST INTEGRATION         = ', FAST_INT
+   write(*,9015) ' OUTPUT_DIR               = ', trim(OUTPUT_DIR)
    if (HEAT_FLAG .eq. 1) then
       write(*,9010) ' NSTEPS                   = ', NSTEPS
       write(*,9000) ' DELTA_T                  = ', DELTA_T
@@ -141,10 +148,11 @@ program main
    if (ANISO_HEAT .eq. 1) then
       write(*,9020) ' ALPHA_Z                  = ', ALPHA_Z
    endif
- 9000 format(A,F10.6)
- 9001 format(A,F10.3)
+ 9000 format(A,F11.6)
+ 9001 format(A,F11.3)
  9010 format(A,I3)
- 9020 format(A,ES10.2)
+ 9015 format(A,A)
+ 9020 format(A,ES11.2)
  9030 format(A,' (',I1,',',I1,',',I1,') ')
 !
 !$OMP parallel
@@ -216,6 +224,9 @@ program main
       endif
    endif
 !
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+   if (RANK.eq.ROOT) write(*,*) 'Back in main. Just finishing up...'
+!
    call finalize
    call mpi_w_finalize
 !..END MPI
@@ -247,6 +258,7 @@ subroutine master_main()
    integer :: idec, i, r, lb, count, src
    character(len=8) :: filename
    integer :: mdle,nr_elem_ref,kref
+   real(8) :: res
 !
 !----------------------------------------------------------------------
 !
@@ -435,7 +447,7 @@ subroutine master_main()
                   write(*,*) 'E. calling pardiso_sc'
                   call pardiso_sc('H')
                   write(*,*) '   computing residual'
-                  call residual()
+                  call residual(res)
                endif
                write(*,*) 'continue?  1 = YES; 0 = NO'
                read(*,*) i
