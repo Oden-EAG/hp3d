@@ -9,7 +9,7 @@
 !     purpose:          - compute and print residual
 !
 !----------------------------------------------------------------------
-subroutine residual()
+subroutine residual(res)
 !
    use data_structure3D
    use commonParam
@@ -21,6 +21,9 @@ subroutine residual()
    use MPI        , only: MPI_SUM,MPI_COMM_WORLD,MPI_REAL8
 !
    implicit none
+!
+!..computed total residual
+   real(8), intent(out) :: res
 !
 !..workspace for element_error routine
    real(8) :: resid_subd,resid_tot
@@ -90,8 +93,10 @@ subroutine residual()
  1010 format(' elem_residual  : ',f12.5,'  seconds')
    endif
 !
+   res = 0.d0
    if (RANK .eq. ROOT) then
-      write(*,7020) NRDOF_TOT,NRDOF_CON,sqrt(resid_tot)
+      res = sqrt(resid_tot)
+      write(*,7020) NRDOF_TOT,NRDOF_CON,res
  7020 format(' residual: NRDOF_TOT, NRDOF_CON, RESIDUAL = ',i9,',  ',i9,',  ',es12.5)
    endif
 !
