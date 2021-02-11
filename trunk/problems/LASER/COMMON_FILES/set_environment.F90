@@ -100,10 +100,10 @@ subroutine set_environment_maxwell
 !
 !..PML VARIABLES
 !..exp_coeff is only used for manufactured solution tests
-   call get_option_bool('-usepml' , 'USE_PML'  , .true. , USE_PML  )
-   call get_option_real('-expA'   , 'EXP_COEFF', 0.2d0  , EXP_COEFF)
-   call get_option_real('-pmlfrac', 'PML_FRAC' , 0.25d0 , PML_FRAC )
-   call get_option_real('-zl'     , 'ZL'       , 0.40d0 , ZL       )
+   call get_option_bool('-usepml' , 'USE_PML'  , .false. , USE_PML  )
+   call get_option_real('-expA'   , 'EXP_COEFF', 0.2d0   , EXP_COEFF)
+   call get_option_real('-pmlfrac', 'PML_FRAC' , 0.25d0  , PML_FRAC )
+   call get_option_real('-zl'     , 'ZL'       , 0.40d0  , ZL       )
 !
 !..Set frequency OMEGA and impedance constant GAMMA
 !..the propagation constant determining number of wavelengths depends on both OMEGA and GAMMA

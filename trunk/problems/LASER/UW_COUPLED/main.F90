@@ -35,8 +35,8 @@ program main
 !..auxiliary variables
    integer :: i, ierr, req, ret, plen
 !
-   integer :: flag(6)
-   integer :: physNick
+   !integer :: flag(6)
+   !integer :: physNick
 !
 !..OMP variables
    integer :: num_threads, omp_get_num_threads
@@ -108,10 +108,11 @@ program main
    if (RANK .ne. ROOT) goto 80
 !
 !..print problem parameters
-   if (GEOM_NO .eq. 1) then
+   if ((GEOM_NO .eq. 1) .and. (ZL .gt. 1.d0)) then ! rectangular waveguide
       write(*,9001) ' Wavelengths/Unit length  = ', sqrt(OMEGA*OMEGA-PI*PI)/(2.d0*PI)
+      write(*,9000) ' Waveguide length         = ', ZL
    endif
-   if (GEOM_NO .eq. 5) then
+   if (GEOM_NO .eq. 5) then ! fiber waveguide
       write(*,9000) ' Fiber length             = ', ZL
       write(*,9000) ' Signal frequency         = ', OMEGA_SIGNAL
       write(*,9000) ' Wavelengths/Unit length  = ', 1.d0/(LAMBDA_SIGNAL/REF_INDEX_CORE)
@@ -198,8 +199,7 @@ program main
 !
 !..Maxwell signal solve
    NO_PROBLEM = 3
-   physNick = 1
-   flag=0; flag(5)=1
+   ! physNick = 1; flag=0; flag(5)=1
    PHYSAm(1:6) = (/.false.,.true.,.false.,.false.,.true.,.false./)
 !
    if (JOB .ne. 0) then
