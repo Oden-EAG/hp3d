@@ -74,49 +74,58 @@ gain=1.0d4
 
 # set fiber length, length of PML, #refs, maxnodes
 #  1_2 (16 wavelengths), 5 refs (16*  32 elems), 6250 nodes
-#zl=1.2d0; pmlfrac=0.25d0; imax=5; maxnods=6250
-#file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_1_2'
-#gain=4.0d4
+zl=1.2d0; pmlfrac=0.25d0; imax=5; maxnods=8000 #6250
+file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_1_2'
+#gain=3.2d4
+#dir_output='../gain/outputs16/'
 
 #  2_4 (32 wavelengths), 6 refs (16*  64 elems), 12500 nodes
-zl=2.4d0; pmlfrac=0.125d0; imax=6; maxnods=12500
-file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_2_4'
-#gain=2.0d4
+#zl=2.4d0; pmlfrac=0.125d0; imax=6; maxnods=16000 #12500
+#file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_2_4'
+#gain=1.6d4
+#dir_output='../gain/outputs32/'
 
 #  4_8 (64 wavelengths), 7 refs (16*  128 elems), 25000 nodes
-#zl=4.8d0; pmlfrac=0.0625d0; imax=7; maxnods=25000
+#zl=4.8d0; pmlfrac=0.0625d0; imax=7; maxnods=32000 #25000
 #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_4_8'
-#gain=1.0d4
+#gain=8.0d3
+#dir_output='../gain/outputs64/'
 
 #  9_6 (128 wavelengths), 8 refs (16*  256 elems), 51000 nodes
-#zl=9.6d0; pmlfrac=0.03125d0; imax=8; maxnods=51000
+#zl=9.6d0; pmlfrac=0.03125d0; imax=8; maxnods=63000 #51000
 #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_9_6'
-#gain=5.0d3
+#gain=4.0d3
+#dir_output='../gain/outputs128/'
 
 #  19_2 (256 wavelengths), 9 refs (16*  512 elems), 101000 nodes
-#zl=19.2d0; pmlfrac=0.015625d0; imax=9; maxnods=101000
+#zl=19.2d0; pmlfrac=0.015625d0; imax=9; maxnods=126000 #101000
 #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_19_2'
-#gain=2.5d3
+#gain=2.0d3
+#dir_output='../gain/outputs256/'
 
 #  38_4 (512 wavelengths), 10 refs (16*  1024 elems), 201000 nodes
-#zl=38.4d0; pmlfrac=8.0d-3; imax=10; maxnods=201000
+#zl=38.4d0; pmlfrac=8.0d-3; imax=10; maxnods=251000 #201000
 #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_38_4'
-#gain=1.25d3
+#gain=1.0d3
+#dir_output='../gain/outputs512/'
 
 #  76_8 (1024 wavelengths), 11 refs (16*  2048 elems), 401000 nodes
-#zl=76.8d0; pmlfrac=4.0d-3; imax=11; maxnods=401000
+#zl=76.8d0; pmlfrac=4.0d-3; imax=11; maxnods=501000
 #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_76_8'
-#gain=6.25d2
+#gain=5.0d2
+#dir_output='../gain/outputs1024/'
 
 #  153_6 (2048 wavelengths), 12 refs (16*  4096 elems), 801000 nodes
-#zl=153.6d0; pmlfrac=2.0d-3; imax=12; maxnods=801000
+#zl=153.6d0; pmlfrac=2.0d-3; imax=12; maxnods=1001000 #801000
 #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_153_6'
-#gain=3.125d2
+#gain=2.5d2
+#dir_output='../gain/outputs2048/'
 
 #  307_2 (4096 wavelengths), 13 refs (16*  8192 elems), 1601000 nodes
-#zl=307.2d0; pmlfrac=1.0d-3; imax=13; maxnods=1601000
+#zl=307.2d0; pmlfrac=1.0d-3; imax=13; maxnods=2001000 #1601000
 #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_307_2'
-#gain=1.5625d2
+#gain=1.25d2
+#dir_output='../gain/outputs4096/'
 #
 # set job type
 job=1
@@ -136,12 +145,14 @@ dp=1
 # set refractive index
 ref_core=1.4512d0
 ref_clad=1.4500d0
+#ref_core=1.1520d0
+#ref_clad=1.1500d0
 #
 # set BC flag
 ibc=0
 #
 # set PML flag
-usepml=1
+usepml=true
 #
 # set nonlinear flags
 nlflag=0
@@ -167,9 +178,29 @@ ctrl='../COMMON_FILES/control_0'
 #
 # set output
 dir_output='../outputs/'
+vis_level=3
+
+args=" -geom 5 -isol 13 -gamma ${gamma} -comp 1"
+#args+=" -omega ${omega}"
+args+=" -ref_core ${ref_core} -ref_clad ${ref_clad}"
+args+=" -aniso_ref_index ${aniso_ref_index}"
+args+=" -art_grating ${art_grating}"
+args+=" -job ${job} -imax ${imax} -jmax ${jmax}"
+args+=" -ibc ${ibc}"
+args+=" -px ${px} -py ${py} -pz ${pz} -dp ${dp}"
+args+=" -copump 1 -nlflag ${nlflag} -gain ${gain} -raman ${raman}"
+args+=" -heat ${heat} -aniso_heat ${aniso_heat} -nsteps ${nsteps} -dt ${dt}"
+args+=" -dir_output ${dir_output} -vis_level ${vis_level}"
+args+=" -file_geometry ${file_geometry} -zl ${zl}"
+args+=" -file_control ${ctrl}"
+args+=" -maxnods ${maxnods}"
+args+=" -nthreads ${nthreads}"
+if [ "$usepml" = true ] ; then
+   args+=" -usepml -pmlfrac ${pmlfrac}"
+fi
 
 # Launch MPI code...
-ibrun ./uwLaser -geom 5 -isol 13 -comp 1 -ref_core ${ref_core} -ref_clad ${ref_clad} -gamma ${gamma} -file_control ${ctrl} -job ${job} -maxnods ${maxnods} -imax ${imax} -jmax ${jmax} -px ${px} -py ${py} -pz ${pz} -dp ${dp} -usepml ${usepml} -pmlfrac ${pmlfrac} -nlflag ${nlflag} -gain ${gain} -raman ${raman} -heat ${heat} -aniso_heat ${aniso_heat} -aniso_ref_index ${aniso_ref_index} -art_grating ${art_grating} -nsteps ${nsteps} -dt ${dt} -copump 1 -zl ${zl} -nthreads ${nthreads} -dir_output ${dir_output} -file_geometry ${file_geometry}
+ibrun ./uwLaser ${args}
 
 date
 # ---------------------------------------------------
