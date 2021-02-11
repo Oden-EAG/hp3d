@@ -60,7 +60,7 @@ subroutine get_power(Fld,NumPts,FileIter)
    real(8), allocatable :: coef_LP01_c_y(:),coef_LP11a_c_y(:),coef_LP11b_c_y(:)
    real(8), allocatable :: coef_LP21a_c_y(:),coef_LP21b_c_y(:),coef_LP02_c_y(:)
 !
-   real(8) :: a,b
+   real(8) :: a,b,gain,loss
    integer :: i,j
 !
    character(8)  :: fmt,suffix
@@ -369,7 +369,7 @@ subroutine get_power(Fld,NumPts,FileIter)
    endif
 !
 !..Print signal power output values
-   if(NONLINEAR_FLAG.eq.1 .and. COPUMP.eq.0) then
+   if((Fld.eq.2) .and. (COPUMP.eq.0)) then
 !  ...explicitly set signal power on dirichlet face at fiber output to zero
 !     since signal dirichlet dofs are not correct when pump was computed latest
       sign_power(NumPts) = 0.d0
@@ -453,28 +453,31 @@ subroutine get_power(Fld,NumPts,FileIter)
    if (Fld .eq. 2) then
       allocate(efficiency(NumPts))
       write(*,*) ' get_power: computing efficiency..'
-      efficiency(1) = 0.d0
-      do i = 2,NumPts
-         if(COPUMP.eq.1) then
+      if (COPUMP .eq. 1) then
+         efficiency(1) = 0.d0
+         do i = 2,NumPts
             if (zValues(i) .gt. PML_REGION) then
                efficiency(i) = 0.d0
             else
                efficiency(i) = (sign_power(i)-sign_power(1)) &
                               /(pump_power(1)-pump_power(i))
             endif
-         elseif(COPUMP.eq.0) then
-            if (zValues(i).lt.(ZL-PML_REGION) .or. &
-                zValues(i).gt.PML_REGION) then
-               efficiency(i) = 0.d0
-            else
-               efficiency(i) = (sign_power(i)-sign_power(1)) &
-                              /(pump_power(NumPts)-pump_power(i))
+         enddo
+      elseif(COPUMP.eq.0) then
+         ! define efficiency not point-wise but over the whole fiber
+         ! compute signal gain and pump loss over amplifier (exclude pml)
+         gain = maxval(sign_power) - sign_power(1) ! signal gain
+         do i = 1,NumPts
+            if (zValues(i).gt.(ZL-PML_REGION)) then
+               loss = pump_power(NumPts) - pump_power(i) ! pump loss
+               exit
             endif
-         else
-            write(*,*) ' get_power: COPUMP must be 1 or 0. stop.'
-            stop
-         endif
-      enddo
+         enddo
+         efficiency(1:NumPts) = gain / loss
+      else
+         write(*,*) ' get_power: COPUMP must be 1 or 0. stop.'
+         stop
+      endif
       if (FileIter .eq. -1) then
          write(*,*) ' get_power: printing efficiency:'
          do i = 1,NumPts
