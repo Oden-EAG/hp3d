@@ -41,7 +41,7 @@
 #SBATCH -N 2               # Total # of nodes
 #SBATCH -n 8               # Total # of mpi tasks
 #SBATCH -t 00:05:00        # Run time (hh:mm:ss)
-#SBATCH --mail-user=stefan@ices.utexas.edu
+#SBATCH --mail-user=stefan@oden.utexas.edu
 #SBATCH --mail-type=all    # Send email at begin and end of job
 #SBATCH -A A-ti2           # Allocation name (req'd if you have more than 1)
 
@@ -66,6 +66,9 @@ nthreads=12
 #export KMP_STACKSIZE=64M    # p=6
 #export KMP_STACKSIZE=80M    # p=7
 #export KMP_STACKSIZE=96M    # p=8
+#
+# Fix Intel18 OMP issue
+export KMP_INIT_AT_FORK=FALSE
 #
 # Rectangular waveguide for linear Maxwell (e.g., pollution study)
 #    / with dirichlet BC (-ibc 0), or impedance BC (-ibc 3), or PML

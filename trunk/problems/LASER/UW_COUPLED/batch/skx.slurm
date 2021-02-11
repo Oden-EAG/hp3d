@@ -67,6 +67,8 @@ export KMP_STACKSIZE=64M   # p=6
 #export KMP_STACKSIZE=80M   # p=7
 #export KMP_STACKSIZE=96M   # p=8
 #
+# Fix Intel18 OMP issue
+export KMP_INIT_AT_FORK=FALSE
 #
 gain=1.0d4
 
