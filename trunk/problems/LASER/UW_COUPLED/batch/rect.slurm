@@ -170,12 +170,34 @@ dp=1
 ibc=3
 #
 # set PML flag
-usepml=0
+usepml=false
+pmlfrac=0.25d0
+#
+# other params
+ctrl='../COMMON_FILES/control_0'
+#
+# set output
+dir_output='../outputs/'
+vis_level=3
+
+args=" -geom 1 -isol 5 -comp 2"
+args+=" -job ${job} -imax ${imax} -jmax 0"
+args+=" -px ${px} -py ${py} -pz ${pz} -dp ${dp}"
+args+=" -ibc ${ibc}"
+args+=" -nlflag 0 -heat 0 -copump 1"
+args+=" -dir_output ${dir_output} -vis_level ${vis_level}"
+args+=" -file_geometry ${file_geometry} -zl ${zl}"
+args+=" -file_control ${ctrl}"
+args+=" -maxnods ${maxnods}"
+args+=" -nthreads ${nthreads}"
+if [ "$usepml" = true ] ; then
+   args+=" -usepml -pmlfrac ${pmlfrac}"
+fi
 
 # ADD optionally -omega ${omega}
 
 # Launch MPI code...
-ibrun ./uwLaser -geom 1 -isol 5 -comp 2 -job ${job} -maxnods ${maxnods} -imax ${imax} -px ${px} -py ${py} -pz ${pz} -dp ${dp} -ibc ${ibc} -usepml ${usepml} -nlflag 0 -heat 0 -copump 1 -zl ${zl} -nthreads ${nthreads} -file_geometry ${file_geometry}
+ibrun ./uwLaser ${args}
 
 date
 # ---------------------------------------------------
