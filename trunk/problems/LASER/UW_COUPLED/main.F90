@@ -145,9 +145,9 @@ program main
    if (HEAT_FLAG .eq. 1) then
       write(*,9010) ' NSTEPS                   = ', NSTEPS
       write(*,9000) ' DELTA_T                  = ', DELTA_T
-   endif
-   if (ANISO_HEAT .eq. 1) then
-      write(*,9020) ' ALPHA_Z                  = ', ALPHA_Z
+      if (ANISO_HEAT .eq. 1) then
+         write(*,9020) ' ALPHA_Z                  = ', ALPHA_Z
+      endif
    endif
  9000 format(A,F11.6)
  9001 format(A,F11.3)

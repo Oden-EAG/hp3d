@@ -27,7 +27,9 @@ subroutine my_paraview_driver(IParAttr)
 !
 !-------------------------------------------------------------------------------------------
 !
-PARAVIEW_DUMP_GEOM = .true.
+!..Set true to write out geometry file on every call to this routine
+!  Set false to write out geometry file only on first call to this routine
+   PARAVIEW_DUMP_GEOM = .false.
 !
 !..load files for visualization upscale
    if (.not. initialized) then
@@ -45,21 +47,21 @@ PARAVIEW_DUMP_GEOM = .true.
 !..TODO no need for extra routines for paraview_begin/end
 !  (simply modify prefix) -> does not work for geom b/c of id counter
 !  WRITE GEOMETRY WITH VIS 0 TO FILE (VISUALIZE ADAPTIVE REFS)
-   if (RANK .eq. ROOT) then
-      call paraview_begin_vis0(id,time)
-   endif
-   vis_level = VLEVEL; VLEVEL = '0'
-   call load_vis(TETR_VIS,trim(FILE_VIS)//'/tetra_'//trim(VLEVEL),'tetr')
-   call load_vis(PRIS_VIS,trim(FILE_VIS)//'/prism_'//trim(VLEVEL),'pris')
-   call load_vis(HEXA_VIS,trim(FILE_VIS)//'/hexa_'//trim(VLEVEL),'hexa')
-   call paraview_geom_vis0
-   VLEVEL = vis_level
-   call load_vis(TETR_VIS,trim(FILE_VIS)//'/tetra_'//trim(VLEVEL),'tetr')
-   call load_vis(PRIS_VIS,trim(FILE_VIS)//'/prism_'//trim(VLEVEL),'pris')
-   call load_vis(HEXA_VIS,trim(FILE_VIS)//'/hexa_'//trim(VLEVEL),'hexa')
-   if (RANK .eq. ROOT) then
-      call paraview_end_vis0
-   endif
+!   if (RANK .eq. ROOT) then
+!      call paraview_begin_vis0(id,time)
+!   endif
+!   vis_level = VLEVEL; VLEVEL = '0'
+!   call load_vis(TETR_VIS,trim(FILE_VIS)//'/tetra_'//trim(VLEVEL),'tetr')
+!   call load_vis(PRIS_VIS,trim(FILE_VIS)//'/prism_'//trim(VLEVEL),'pris')
+!   call load_vis(HEXA_VIS,trim(FILE_VIS)//'/hexa_'//trim(VLEVEL),'hexa')
+!   call paraview_geom_vis0
+!   VLEVEL = vis_level
+!   call load_vis(TETR_VIS,trim(FILE_VIS)//'/tetra_'//trim(VLEVEL),'tetr')
+!   call load_vis(PRIS_VIS,trim(FILE_VIS)//'/prism_'//trim(VLEVEL),'pris')
+!   call load_vis(HEXA_VIS,trim(FILE_VIS)//'/hexa_'//trim(VLEVEL),'hexa')
+!   if (RANK .eq. ROOT) then
+!      call paraview_end_vis0
+!   endif
 !..END ADAPTIVE REFS GEOMETRY WRITING
 !
    if (RANK .eq. ROOT) then

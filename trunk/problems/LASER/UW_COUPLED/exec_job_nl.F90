@@ -17,7 +17,7 @@ subroutine exec_job_nl
 !
    implicit none
 !
-   integer :: flag(6)
+   integer :: flag(6),iParAttr(6)
    integer :: physNick,nstop
    logical :: ires
 !
@@ -161,13 +161,13 @@ subroutine exec_job_nl
 !
 !  ...in first iteration, switch NL FLAG off to get initial linear solution
 !     tweak with sigma parameter to get better "initial guess"
-      if (i .eq. 0) then
-         NONLINEAR_FLAG = 0
-         SIGMA = -4.d0 ! induce signal amplification in initial solve
-      else
-         NONLINEAR_FLAG = 1
-         SIGMA = 0.0d0
-      endif
+      !if (i .eq. 0) then
+      !   NONLINEAR_FLAG = 0
+      !   SIGMA = -4.d0 ! induce signal amplification in initial solve
+      !else
+      !   NONLINEAR_FLAG = 1
+      !   SIGMA = 0.0d0
+      !endif
 !
 !  ...check stopping criterion
       L2NormDiffIter(i+1) = L2NormDiff/FieldNormQ
@@ -207,20 +207,20 @@ subroutine exec_job_nl
       else
          call par_nested('H')
       endif
-      QUIET_MODE = .true.; IPRINT_TIME = 0
-      if (RANK.eq.ROOT) write(*,*)
-      if (RANK.eq.ROOT) write(*,*) '   Signal residual:'
-      call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-      call residual(SignalRes(i+1))
-      call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
-      if (RANK.eq.ROOT) write(*,300) end_time - start_time
-      if (RANK.eq.ROOT) write(*,*)
-      QUIET_MODE = .false.; IPRINT_TIME = 1
+      !QUIET_MODE = .true.; IPRINT_TIME = 0
+      !if (RANK.eq.ROOT) write(*,*)
+      !if (RANK.eq.ROOT) write(*,*) '   Signal residual:'
+      !call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+      !call residual(SignalRes(i+1))
+      !call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
+      !if (RANK.eq.ROOT) write(*,300) end_time - start_time
+      !if (RANK.eq.ROOT) write(*,*)
+      !QUIET_MODE = .false.; IPRINT_TIME = 1
 !
 !  ...next solve for pump
-      if (i .eq. 0) then
-         SIGMA = 4.0d0 ! induce pump loss in initial solve
-      endif
+      !if (i .eq. 0) then
+      !   SIGMA = 4.0d0 ! induce pump loss in initial solve
+      !endif
       if (RANK.eq.ROOT) write(*,*) '   Pump solve..'
       NO_PROBLEM = 4
       call set_physAm(NO_PROBLEM, physNick,flag)
@@ -230,22 +230,22 @@ subroutine exec_job_nl
       else
          call par_nested('H')
       endif
-      QUIET_MODE = .true.; IPRINT_TIME = 0
-      if (RANK.eq.ROOT) write(*,*)
-      if (RANK.eq.ROOT) write(*,*) '   Pump residual:'
-      call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-      call residual(PumpRes(i+1))
-      call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
-      if (RANK.eq.ROOT) write(*,300) end_time - start_time
-      QUIET_MODE = .false.; IPRINT_TIME = 1
+      !QUIET_MODE = .true.; IPRINT_TIME = 0
+      !if (RANK.eq.ROOT) write(*,*)
+      !if (RANK.eq.ROOT) write(*,*) '   Pump residual:'
+      !call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+      !call residual(PumpRes(i+1))
+      !call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
+      !if (RANK.eq.ROOT) write(*,300) end_time - start_time
+      !QUIET_MODE = .false.; IPRINT_TIME = 1
 !
 !  ...compute power in fiber for signal and pump field
-      if(RANK.eq.ROOT) write(*,200) '  Computing power...'
-      numPts = 2**IMAX; fld = 2
-      call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-      call get_power(fld,numPts,i) ! write to file
-      call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
-      if (RANK.eq.ROOT) write(*,300) end_time - start_time
+      !if(RANK.eq.ROOT) write(*,200) '  Computing power...'
+      !numPts = 2**IMAX; fld = 2
+      !call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+      !call get_power(fld,numPts,i) ! write to file
+      !call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
+      !if (RANK.eq.ROOT) write(*,300) end_time - start_time
 !
 !  ...copy components and calculate norm corresponding to signal
       NO_PROBLEM = 3
@@ -272,50 +272,58 @@ subroutine exec_job_nl
    end do
 !
 !..Last step only display (no refinement)
-!   QUIET_MODE = .true.; IPRINT_TIME = 0
-!   if (RANK.eq.ROOT) write(*,*)
-!   if (RANK.eq.ROOT) write(*,*) '   Pump residual:'
-!   NO_PROBLEM = 4
-!   call set_physAm(NO_PROBLEM, physNick,flag)
-!   call residual(SignalRes(i+1))
+   !QUIET_MODE = .true.; IPRINT_TIME = 0
+   !if (RANK.eq.ROOT) write(*,*)
+   !if (RANK.eq.ROOT) write(*,*) '   Pump residual:'
+   !NO_PROBLEM = 4
+   !call set_physAm(NO_PROBLEM, physNick,flag)
+   !call residual(PumpRes(i+1))
 !
-!   if (RANK.eq.ROOT) write(*,*)
-!   if (RANK.eq.ROOT) write(*,*) '   Signal residual:'
-!   NO_PROBLEM = 3
-!   call set_physAm(NO_PROBLEM, physNick,flag)
-!   call update_Ddof
-!   if (NUM_PROCS .eq. 1) then
-!      call pardiso_sc('H')
-!   else
-!      call par_nested('H')
-!   endif
-!   call residual(PumpRes(i+1))
-!   QUIET_MODE = .false.; IPRINT_TIME = 1
+   !if (RANK.eq.ROOT) write(*,*)
+   !if (RANK.eq.ROOT) write(*,*) '   Signal residual:'
+   !NO_PROBLEM = 3
+   !call set_physAm(NO_PROBLEM, physNick,flag)
+   !call update_Ddof
+   !if (NUM_PROCS .eq. 1) then
+   !   call pardiso_sc('H')
+   !else
+   !   call par_nested('H')
+   !endif
+   !call residual(SignalRes(i+1))
+   !QUIET_MODE = .false.; IPRINT_TIME = 1
 !
    if (RANK.eq.ROOT) then
       write(*,*) 'L2NormDiff/FieldNormQ:'
       do j=1,i+1
          write(*,4241) L2NormDiffIter(j)
       enddo
-      write(*,*) 'Signal Residuals:'
-      do j=1,i+1
-         write(*,4241) SignalRes(j)
-      enddo
-      write(*,*) 'Pump Residuals:'
-      do j=1,i+1
-         write(*,4241) PumpRes(j)
-      enddo
+      !write(*,*) 'Signal Residuals:'
+      !do j=1,i+1
+      !   write(*,4241) SignalRes(j)
+      !enddo
+      !write(*,*) 'Pump Residuals:'
+      !do j=1,i+1
+      !   write(*,4241) PumpRes(j)
+      !enddo
  4241 format(es14.5)
    endif
 !
 !..compute power in fiber for signal and pump field
-   !if(RANK.eq.ROOT) write(*,200) '7. computing power...'
-   !numPts = 2**IMAX; fld = 2
-   !call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+   if(RANK.eq.ROOT) write(*,200) '7. computing power...'
+   numPts = 2**IMAX; fld = 2
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    !call get_power(fld,numPts,-1) ! write to stdout
-   !call get_power(fld,numPts,0) ! write to file
-   !call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
-   !if(RANK.eq.ROOT) write(*,300) end_time - start_time
+   call get_power(fld,numPts,0) ! write to file
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
+   if(RANK.eq.ROOT) write(*,300) end_time - start_time
+!
+!..write paraview output
+   if(RANK .eq. ROOT) write(*,200) '8. writing paraview output...'
+   iParAttr = (/0,0,0,0,6,0/)
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+   call my_paraview_driver(iParAttr)
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
+   if(RANK .eq. ROOT) write(*,300) end_time - start_time
 !
 !
   100 format(/,'/////////////////////////////////////////////////////////////', &
