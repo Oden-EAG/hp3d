@@ -43,6 +43,10 @@ subroutine exec_job_nl
 !
    EXCHANGE_DOF = .false.
 !
+   NO_PROBLEM = 3
+   call set_physAm(NO_PROBLEM, physNick,flag)
+   ires = .true.
+!
    if(RANK .eq. ROOT) then
       write(*,*) '====================='
       write(*,*) 'exec_job_nl: starting'
@@ -76,7 +80,7 @@ subroutine exec_job_nl
       endif
       if (RANK.eq.ROOT) write(*,300) end_time - start_time
 !
-      if (NUM_PROCS .eq. 1) goto 30
+      if (NUM_PROCS .eq. 1) cycle
 !
       if (i .eq. IMAX-3) then
          call zoltan_w_set_lb(7)
@@ -95,7 +99,6 @@ subroutine exec_job_nl
 !
    30 continue
       if (i .le. IMAX .and. JMAX .gt. 0) cycle
-      if (NUM_PROCS .eq. 1) goto 60
 !
 !  ...skip printing partition
       goto 40
@@ -144,6 +147,7 @@ subroutine exec_job_nl
    L2NormDiff = 1.d0
    FieldNormQ = 1.d0
    L2NormDiffIter = 0.d0
+!
    SignalRes = 0.d0
    PumpRes = 0.d0
    i = 0

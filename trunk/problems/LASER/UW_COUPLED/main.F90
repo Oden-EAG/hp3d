@@ -33,7 +33,7 @@ program main
    implicit none
 !
 !..auxiliary variables
-   integer :: i, ierr, req, ret, plen
+   integer :: i, iargs, ierr, req, ret, plen
 !
    !integer :: flag(6)
    !integer :: physNick
@@ -47,12 +47,33 @@ program main
 !..timer
    real(8) :: MPI_Wtime,start_time,end_time
 !
-   character :: arg
+   character      :: arg
+   character(32)  :: args
+   character(512) :: cmd
 !
 !----------------------------------------------------------------------
 !
 !..Initialize MPI environment
    call mpi_w_init
+!
+   if (RANK .eq. ROOT) then
+      write(*,*) '    =========================    '
+      write(*,*) '    Program command and args     '
+      write(*,*) '    =========================    '
+!  ...read command
+      call get_command(cmd)
+      write(*,*) cmd
+!  ...read number of arguments
+      iargs = command_argument_count()
+!  ...read arguments
+      do i=0,iargs
+         call get_command_argument(i, args)
+         write(*,*) args
+      end do
+      write(*,*) '    =========================    '
+   endif
+!
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 !..Set common hp3D environment parameters (reads in options arguments)
    call begin_environment
@@ -136,6 +157,7 @@ program main
       write(*,9020) ' Raman gain               = ', RAMAN_GAIN
       write(*,9020) ' Active gain              = ', ACTIVE_GAIN
       write(*,9010) ' COPUMP                   = ', COPUMP
+      write(*,9010) ' FAKE_PUMP                = ', FAKE_PUMP
    endif
    write(*,9030) ' Polynomial order (x,y,z) = ', ORDER_APPROX_X,ORDER_APPROX_Y,ORDER_APPROX_Z
    write(*,9010) ' ISOL                     = ', ISOL

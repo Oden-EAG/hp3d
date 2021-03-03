@@ -126,6 +126,8 @@ subroutine set_initial_mesh(Nelem_order)
                   case(0)
 !                 ...dirichlet on heat
                      ibc(ifc,1) = 1
+!                 ...Neumann on heat (for min z /max z faces)
+!                    TODO (becomes essential BC for normal trace/flux)
 !                 ...BCs on EH-traces signal and pump
                      if((IBCFLAG.eq.3).and.(ifc.eq.2)) then
 !                    ...impedance on z=L face
@@ -151,6 +153,8 @@ subroutine set_initial_mesh(Nelem_order)
                   case(0)
 !                 ...dirichlet on heat
                      ibc(ifc,1) = 1
+!                 ...Neumann on heat (for input/output faces)
+!                    TODO (becomes essential BC for normal trace/flux)
 !                 ...dirichlet on E-trace
                      ibc(ifc,2) = 6 ! signal
                      ibc(ifc,3) = 6 ! pump
@@ -165,6 +169,8 @@ subroutine set_initial_mesh(Nelem_order)
                   case(0)
 !                 ...dirichlet on heat
                      ibc(ifc,1) = 1
+!                 ...Neumann on heat (for input/output faces)
+!                    TODO (becomes essential BC for normal trace/flux)
 !                 ...dirichlet on E-trace
                      ibc(ifc,2) = 6 ! signal
                      ibc(ifc,3) = 6 ! pump

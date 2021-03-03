@@ -158,7 +158,13 @@ usepml=true
 nlflag=0
 heat=0
 #
-# set Raman gain for nonlinear case
+# set pump field
+fake_pump=0
+#
+# set pump direction
+copump=1
+#
+# set Raman gain
 raman=0.d0
 #
 # set anisotropic heat operator
@@ -188,7 +194,7 @@ args+=" -art_grating ${art_grating}"
 args+=" -job ${job} -imax ${imax} -jmax ${jmax}"
 args+=" -ibc ${ibc}"
 args+=" -px ${px} -py ${py} -pz ${pz} -dp ${dp}"
-args+=" -copump 1 -nlflag ${nlflag} -gain ${gain} -raman ${raman}"
+args+=" -copump ${copump} -nlflag ${nlflag} -gain ${gain} -raman ${raman} -fake_pump ${fake_pump}"
 args+=" -heat ${heat} -aniso_heat ${aniso_heat} -nsteps ${nsteps} -dt ${dt}"
 args+=" -dir_output ${dir_output} -vis_level ${vis_level}"
 args+=" -file_geometry ${file_geometry} -zl ${zl}"

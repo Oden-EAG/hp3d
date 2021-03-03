@@ -16,8 +16,8 @@ module laserParam
    use commonParam
 !
 !
-!..toggle heat flag, nonlinear problem, co/counter pumping, line search scaling
-   integer :: HEAT_FLAG, ANISO_HEAT, NONLINEAR_FLAG, COPUMP
+!..toggle heat flag, nonlinear problem, co/counter pumping, plane pump
+   integer :: HEAT_FLAG, ANISO_HEAT, NONLINEAR_FLAG, COPUMP, FAKE_PUMP
 !
 !..HEAT FLAG = 0
 !  ...NONLINEAR_FLAG = 0, Linear Maxwell

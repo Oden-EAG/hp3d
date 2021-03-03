@@ -189,6 +189,7 @@ subroutine set_environment_laser
    call get_option_int ('-aniso_ref_index', 'ANISO_REF_INDEX', 0       , ANISO_REF_INDEX)
    call get_option_int ('-art_grating'    , 'ART_GRATING'    , 0       , ART_GRATING    )
    call get_option_int ('-copump'         , 'COPUMP'         , 1       , COPUMP         )
+   call get_option_int ('-fake_pump'      , 'FAKE_PUMP'      , 0       , FAKE_PUMP      )
    call get_option_real('-raman'          , 'RAMAN_GAIN'     , 1.d-3   , RAMAN_GAIN     )
    call get_option_real('-gain'           , 'ACTIVE_GAIN'    , 1.d3    , ACTIVE_GAIN    )
 !

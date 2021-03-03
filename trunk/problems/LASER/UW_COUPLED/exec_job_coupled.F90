@@ -17,7 +17,7 @@ subroutine exec_job_coupled
 !
    implicit none
 !
-   integer :: flag(6)
+   integer :: flag(6),iParAttr(6)
    integer :: physNick,nstop
    logical :: ires
 !
@@ -48,6 +48,10 @@ subroutine exec_job_coupled
 !
    EXCHANGE_DOF = .false.
 !
+   NO_PROBLEM = 3
+   call set_physAm(NO_PROBLEM, physNick,flag)
+   ires = .true.
+!
    if(RANK .eq. ROOT) then
       write(*,*) '=========================='
       write(*,*) 'exec_job_coupled: starting'
@@ -60,23 +64,32 @@ subroutine exec_job_coupled
    call zoltan_w_set_lb(0)
 !
 !..refine the mesh anisotropically
-   do i=1,IMAX
+   do i=1,IMAX+JMAX
 !
       if(RANK .eq. ROOT) write(*,100) 'Mesh refinement step: i = ', i
 !
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
 !     ...single anisotropic (in z) h-refinement
-      if(RANK .eq. ROOT) write(*,200) '1. global anisotropic h-refinement...'
-      call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-      call global_href_aniso(0,1) ! refine in z
-      call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
+      if (i .le. IMAX) then
+         if (RANK.eq.ROOT) write(*,200) '1. global anisotropic h-refinement...'
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+         call global_href_aniso(0,1) ! refine in z
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
+      else
+!     ...adaptive h-refinement
+      if (RANK.eq.ROOT) write(*,200) '1. adaptive h-refinement...'
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+         call refine_DPG(ICLAD,1,0.25d0,flag,physNick,ires, nstop)
+         !call refine_DPG(IADAPTIVE,1,0.25d0,flag,physNick,ires, nstop)
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
+      endif
       if(RANK .eq. ROOT) write(*,300) end_time - start_time
 !
-      if (NUM_PROCS .eq. 1) goto 30
+      if (NUM_PROCS .eq. 1) cycle
 !
-      if (i .eq. IMAX-2) then
+      if (i .eq. IMAX-3) then
          call zoltan_w_set_lb(7)
-      elseif (i .gt. IMAX-2) then
+      else
          goto 30
       endif
 !
@@ -90,6 +103,10 @@ subroutine exec_job_coupled
       if(RANK .eq. ROOT) write(*,300) end_time - start_time
 !
    30 continue
+      if (i .le. IMAX .and. JMAX .gt. 0) cycle
+!
+!  ...skip printing partition
+      goto 40
 !
 !  ...print current partition (elems)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
@@ -100,7 +117,9 @@ subroutine exec_job_coupled
          if(RANK .eq. ROOT) write(*,*) '   ... skipping for a large number of elements.'
       endif
 !
-      if (NUM_PROCS .eq. 1) goto 50
+   40 continue
+!
+!  ...skip evaluating partition
       goto 50
 !
 !  ...evaluate current partition
@@ -121,6 +140,8 @@ subroutine exec_job_coupled
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
       if(RANK .eq. ROOT) write(*,300) end_time - start_time
 !
+   60 continue
+!
    enddo
 !
 !..update geometry degrees of freedom for current mesh
@@ -134,22 +155,48 @@ subroutine exec_job_coupled
 !
 !..set components (1: signal, 2: pump)
    No1 = 1; No2 = 2
-
+!
 !..start time stepping
    if (RANK.eq.ROOT) write(*,*) 'Begin time stepping..'
-   do time_step = 1,NSTEPS
-      TIMESTEP = time_step !setting global variable
-      if (RANK.eq.ROOT) write(*,*) '---------------------------------------------'
+   do time_step = 0,NSTEPS ! initial step has ambient temperature (no solve)
+      TIMESTEP = time_step ! setting global variable
+      if (RANK.eq.ROOT) write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++'
       if (RANK.eq.ROOT) write(*,4220) ' Proceeding with time step = ', time_step
-!  ...activate to compute maxwell only in first time step
-      if(time_step .gt. 1 .and. time_step .le. 100) goto 420
+      if (RANK.eq.ROOT) write(*,*) '+++++++++++++++++++++++++++++++++++++++++++++'
 !
-!  ...first solve Nonlinear Maxwell loop for SIGNAL and PUMP
-      physNick = 1
+!  ...solve heat equation
+      if (time_step .eq. 0) then
+         if (RANK.eq.ROOT) write(*,4200) ' Skipping heat solve at initial time...'
+      else
+         if (RANK.eq.ROOT) write(*,4200) ' Solving the heat equation...'
+      endif
+      if (RANK.eq.ROOT) write(*,*) ''
+      NO_PROBLEM = 2
+      call set_physAm(NO_PROBLEM, physNick,flag)
+      call update_Ddof
+      if (time_step .gt. 0) then
+         if (NUM_PROCS .eq. 1) then
+            call pardiso_sc('H')
+         else
+            call par_nested('H')
+         endif
+      endif
+!  ...calculating temperature
+      numPts = 2**IMAX
+      call get_avgTemp(numPts,time_step)
+      !call get_avgTemp(numPts,-1)
+!
+      call MPI_BARRIER (MPI_COMM_WORLD, ierr);
+!
+!  ...activate to compute maxwell problem only in the initial time step
+      !if (time_step .ge. 1 .and. time_step .le. 100) goto 420
+!
+!  ...solve nonlinear Maxwell loop for SIGNAL and PUMP
       L2NormDiff = 1.d0
       FieldNormQ = 1.d0
-!              ...do until stopping criterion is satisfied
-      if (RANK.eq.ROOT) write(*,4200) ' Beginning nonlinear iterations..'
+!
+!  ...do until stopping criterion is satisfied
+      if (RANK.eq.ROOT) write(*,4200) ' Beginning nonlinear iterations...'
  4200 format(/,A)
  4201 format(A,/)
 !
@@ -160,6 +207,7 @@ subroutine exec_job_coupled
 !
 !     ...check stopping criterion
          L2NormDiffIter(i+1) = L2NormDiff/FieldNormQ
+         if (i .eq. 0) goto 405
          if((L2NormDiff/FieldNormQ).lt.(stopEpsilon)) then
             if (RANK .eq. ROOT) then
                write(*,4230) '   ', L2NormDiff/FieldNormQ, ' < ', stopEpsilon
@@ -184,8 +232,10 @@ subroutine exec_job_coupled
             exit
          endif
 !
+   405   continue
+!
 !     ...solve for signal first
-         if (RANK.eq.ROOT) write(*,*) '   Signal solve..'
+         if (RANK.eq.ROOT) write(*,*) '   Signal solve...'
          NO_PROBLEM = 3
          call set_physAm(NO_PROBLEM, physNick,flag)
          call update_Ddof
@@ -202,8 +252,14 @@ subroutine exec_job_coupled
 !        if (RANK.eq.ROOT) write(*,*)
 !        QUIET_MODE = .false.; IPRINT_TIME = 1
 !
+!     ...assuming pump plane wave
+         if (FAKE_PUMP .eq. 1) then
+            if (RANK.eq.ROOT) write(*,*) '   Assuming pump plane wave...'
+            goto 410
+         endif
+!
 !     ...next solve for pump
-         if (RANK.eq.ROOT) write(*,*) '   Pump solve..'
+         if (RANK.eq.ROOT) write(*,*) '   Pump solve...'
          NO_PROBLEM = 4
          call set_physAm(NO_PROBLEM, physNick,flag)
          call update_Ddof
@@ -218,10 +274,12 @@ subroutine exec_job_coupled
 !        call residual(res)
 !        QUIET_MODE = .false.; IPRINT_TIME = 1
 !
+   410   continue
+!
 !     ...copy components and calculate norm corresponding to signal
          NO_PROBLEM = 3
          call set_physAm(NO_PROBLEM, physNick,flag)
-         if (i .gt. 0) then
+         if (i .gt. 0 .or. time_step .gt. 0) then
             call get_L2NormCOMS(flag,No1,No2, L2NormDiff)
             call get_Norm(flag,No2, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
          endif
@@ -238,33 +296,28 @@ subroutine exec_job_coupled
          i = i + 1
 !  ...end nonlinear loop
       enddo
+!
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
 !  ...calculating power
       !if (time_step .eq. 1) then
-         if (RANK.eq.ROOT) write(*,*) 'Computing power..'
-         numPts=32
-         !call get_power(2,numPts,time_step-1)
-         call get_power(2,numPts,-1)
+         if (RANK.eq.ROOT) write(*,*) 'Computing power...'
+         numPts = 2**IMAX; fld = 2
+         if (FAKE_PUMP .eq. 1) fld = 1
+         call get_power(fld,numPts,time_step)
+         !call get_power(2,numPts,-1)
          write(*,*) ''
       !endif
+!
  420  continue
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
-!  ...now solve heat equation
-      if (RANK.eq.ROOT) write(*,*) ''
-      if (RANK.eq.ROOT) write(*,4210) ' Computing time-step ', time_step, &
-                                      ' for heat equation..'
-      if (RANK.eq.ROOT) write(*,*) ''
-      NO_PROBLEM = 2
-      call set_physAm(NO_PROBLEM, physNick,flag)
-      call update_Ddof
-      if (NUM_PROCS .eq. 1) then
-         call pardiso_sc('H')
-      else
-         call par_nested('H')
-      endif
-!  ...calculating temperature
-      !call get_avgTemp(numPts,time_step-1)
-      call get_avgTemp(numPts,-1)
+!
+!  ...write paraview output
+      if(RANK .eq. ROOT) write(*,200) ' Writing paraview output...'
+      iParAttr = (/1,0,0,0,6,0/)
+      call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+      call my_paraview_driver(iParAttr)
+      call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
+      if(RANK .eq. ROOT) write(*,300) end_time - start_time
 !
 !..end time-stepping loop
    enddo

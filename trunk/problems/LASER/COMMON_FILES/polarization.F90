@@ -169,11 +169,7 @@ subroutine get_activePol(ZsolQ,Fld_flag,Delta_n, Active_pol)
 !
    VTYPE, dimension(3) :: Es,Hs,Ep,Hp,ETimesHs,ETimesHp
 !
-!..modified irradiance experiment (birefringent fiber)
-   VTYPE, dimension(3) :: Es_mod,Hs_mod
-   integer :: modified
-!
-   real(8) :: eta,Nex,Ngd,sum1,sum2,Is,Ip,g0,gain_ampl
+   real(8) :: eta,Nex,Ngd,sum1,sum2,Is,Ip,Pp,g0,gain_ampl
    VTYPE   :: gain
 !
 !---------------------------------------------------------------------------
@@ -184,28 +180,20 @@ subroutine get_activePol(ZsolQ,Fld_flag,Delta_n, Active_pol)
    Ep = ZsolQ(7:9)
    Hp = ZsolQ(10:12)
 !
-!..modified irradiance experiment
-!   Es_mod(1) = Es(1)+Es(2)
-!   Es_mod(2) = ZERO
-!   Es_mod(3) = Es(3)
-!!
-!   Hs_mod(1) = ZERO
-!   Hs_mod(2) = Hs(1)+Hs(2)
-!   Hs_mod(3) = Hs(3)
-!
-!..compute irradiance
-! if modified=1, then gain model is not working properly (yields wrong efficiency)
-   modified = 0
-   if (modified .eq. 1) then
-      !call zz_cross_product(Es_mod,conjg(Hs_mod), ETimesHs)
-      write(*,*) 'do not use modified=1 in polarization! stop.'
-      stop
-   else
-      call zz_cross_product(Es,conjg(Hs), ETimesHs)
-   endif
-   call zz_cross_product(Ep,conjg(Hp), ETimesHp)
+!..compute signal irradiance
+   call zz_cross_product(Es,conjg(Hs), ETimesHs)
    Is = sqrt((real(EtimesHs(1))**2+real(EtimesHs(2))**2+real(EtimesHs(3))**2))
-   Ip = sqrt((real(EtimesHp(1))**2+real(EtimesHp(2))**2+real(EtimesHp(3))**2))
+!
+!..compute pump irradiance
+   Ip = 0.d0
+   if (FAKE_PUMP .eq. 1) then
+!  ...assume pump is a plane wave in fiber core
+      Pp = 100.d0 ! set non-dimensional core pump power (scaled by I_0*L_0*L_0)
+      Ip = Pp / (PI*R_CORE*R_CORE) ! calculate non-dimensional irradiance
+   else
+      call zz_cross_product(Ep,conjg(Hp), ETimesHp)
+      Ip = sqrt((real(EtimesHp(1))**2+real(EtimesHp(2))**2+real(EtimesHp(3))**2))
+   endif
 !
    if (Is .eq. 0.d0 .or. Ip .eq. 0.d0) then
       active_pol = ZERO

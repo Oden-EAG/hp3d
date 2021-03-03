@@ -368,12 +368,7 @@ subroutine get_thermLoad(ZsolQ, Therm_load)
 !
    VTYPE, dimension(3) :: Es,Hs,Ep,Hp,ETimesHs,ETimesHp
 !
-!..modified irradiance experiment (birefringent fiber)
-   VTYPE, dimension(3) :: Es_mod,Hs_mod
-   VTYPE, dimension(3) :: Ep_mod,Hp_mod
-   integer :: modified
-!
-   real(8) :: Ip,Is,gp,gs
+   real(8) :: gs,gp,Is,Ip,Pp
    real(8) :: eta,Nex,Ngd,sum1,sum2
 !
 !---------------------------------------------------------------------
@@ -384,33 +379,20 @@ subroutine get_thermLoad(ZsolQ, Therm_load)
    Ep = ZsolQ(7:9)
    Hp = ZsolQ(10:12)
 !
-   Es_mod(1) = Es(1)+Es(2)
-   Es_mod(2) = ZERO
-   Es_mod(3) = Es(3)
-!
-   Hs_mod(1) = ZERO
-   Hs_mod(2) = Hs(1)+Hs(2)
-   Hs_mod(3) = Hs(3)
-!
-   Ep_mod(1) = Ep(1)+Ep(2)
-   Ep_mod(2) = ZERO
-   Ep_mod(3) = Ep(3)
-!
-   Hp_mod(1) = ZERO
-   Hp_mod(2) = Hp(1)+Hp(2)
-   Hp_mod(3) = Hp(3)
-!
-!..compute irradiance
-   modified = 0
-   if (modified .eq. 1) then
-      call zz_cross_product(Es_mod,conjg(Hs_mod), ETimesHs)
-      call zz_cross_product(Ep_mod,conjg(Hp_mod), ETimesHp)
-   else
-      call zz_cross_product(Es,conjg(Hs), ETimesHs)
-      call zz_cross_product(Ep,conjg(Hp), ETimesHp)
-   endif
+!..compute signal irradiance
+   call zz_cross_product(Es,conjg(Hs), ETimesHs)
    Is = sqrt((real(EtimesHs(1))**2+real(EtimesHs(2))**2+real(EtimesHs(3))**2))
-   Ip = sqrt((real(EtimesHp(1))**2+real(EtimesHp(2))**2+real(EtimesHp(3))**2))
+!
+!..compute pump irradiance
+   Ip = 0.d0
+   if (FAKE_PUMP .eq. 1) then
+!  ...assume pump is a plane wave in fiber core
+      Pp = 100.d0 ! set non-dimensional core pump power (scaled by I_0*L_0*L_0)
+      Ip = Pp / (PI*R_CORE*R_CORE) ! calculate non-dimensional irradiance
+   else
+      call zz_cross_product(Ep,conjg(Hp), ETimesHp)
+      Ip = sqrt((real(EtimesHp(1))**2+real(EtimesHp(2))**2+real(EtimesHp(3))**2))
+   endif
 !
    sum1 = (SIGMA_S_ABS/OMEGA_SIGNAL)*Is+(SIGMA_P_ABS/OMEGA_PUMP)*Ip
    sum2 = ((SIGMA_S_ABS+SIGMA_S_EMS)/OMEGA_SIGNAL)*Is + &
