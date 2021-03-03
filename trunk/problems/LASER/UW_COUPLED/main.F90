@@ -63,13 +63,6 @@ program main
 !  ...read command
       call get_command(cmd)
       write(*,*) cmd
-!  ...read number of arguments
-      iargs = command_argument_count()
-!  ...read arguments
-      do i=0,iargs
-         call get_command_argument(i, args)
-         write(*,*) args
-      end do
       write(*,*) '    =========================    '
    endif
 !
