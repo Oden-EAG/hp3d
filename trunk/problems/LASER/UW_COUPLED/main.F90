@@ -47,9 +47,9 @@ program main
 !..timer
    real(8) :: MPI_Wtime,start_time,end_time
 !
-   character      :: arg
-   character(32)  :: args
-   character(512) :: cmd
+   character       :: arg
+   character(32)   :: args
+   character(1024) :: cmd
 !
 !----------------------------------------------------------------------
 !
