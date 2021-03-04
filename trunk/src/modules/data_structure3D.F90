@@ -805,9 +805,18 @@ module data_structure3D
       integer ibc(NR_PHYSA), loc
       logical Is_dirichlet
 
+!  ...TODO: verify correctness of the following approach
+!     Return false if node is marked as Dirichlet node for a physics
+!     variable that is currently not activated. This should prevent
+!     updateDdof from overwriting boundary solution from a variable
+!     that was previously computed but is now deactivated via PHYSAm(:)
+!     This overwriting otherwise happens if the node is marked as
+!     Dirichlet node for the purpose of Dirichlet data in some other
+!     variable which is a problem for coupled formulations.
       call decod(NODES(Nod)%bcond,10,NR_PHYSA, ibc)
       Is_dirichlet = .false.
       do iphys=1,NR_PHYSA
+        if (.not. PHYSAm(iphys)) cycle
         if (ibc(iphys).eq.1) then
           Is_dirichlet = .true.
         else
