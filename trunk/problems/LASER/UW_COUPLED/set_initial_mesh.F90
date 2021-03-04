@@ -169,8 +169,12 @@ subroutine set_initial_mesh(Nelem_order)
                   case(0)
 !                 ...dirichlet on heat
                      ibc(ifc,1) = 1
-!                 ...Neumann on heat (for input/output faces)
-!                    TODO (becomes essential BC for normal trace/flux)
+!                 ...dirichlet on heat flux (for input/output faces)
+!                     if((ifc.eq.1) .or. (ifc.eq.2)) then
+!                        ibc(ifc,4) = 1
+!                     else
+!                        ibc(ifc,1) = 1
+!                     endif
 !                 ...dirichlet on E-trace
                      ibc(ifc,2) = 6 ! signal
                      ibc(ifc,3) = 6 ! pump
