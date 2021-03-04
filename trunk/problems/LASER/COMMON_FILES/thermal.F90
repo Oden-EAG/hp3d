@@ -219,8 +219,8 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
 !
    do i=1,NumPts
       CoreTemp(i) = CoreTemp(i)/coreVol(i)
-!      write(*,3005) 'i = ',i, ', CoreTemp = ',CoreTemp(i),', CoreVol = ',coreVol(i)
-! 3005 format(A,I3,A,F6.2,A,F6.2)
+      write(*,3005) 'i = ',i, ', CoreTemp = ',CoreTemp(i),', CoreVol = ',coreVol(i)
+ 3005 format(A,I3,A,F6.2,A,F6.2)
    enddo
 !
 !..end timer
@@ -327,6 +327,11 @@ subroutine comp_elem_avgTemp(Mdle, ElemTemp,ElemVol)
 !  ...Jacobian
       call geom(dxdxi, dxidx,rjac,iflag)
       weight = wa*rjac
+#if DEBUG_MODE
+      if (iflag .ne. 0) then
+        write(*,*) 'geom iflag != 0. Mdle,rjac = ',Mdle,rjac
+      endif
+#endif
 !
 !  ...accumulate element volume
       ElemVol = ElemVol + weight
@@ -338,6 +343,9 @@ subroutine comp_elem_avgTemp(Mdle, ElemTemp,ElemVol)
    enddo
 !
 !..compute average temperature in element
+   if (ElemVol .eq. 0.d0) then
+     write(*,*) 'Mdle,ElemTemp,ElemVol = ',Mdle,ElemTemp,ElemVol
+   endif
    ElemTemp = ElemTemp / ElemVol
 !
 end subroutine comp_elem_avgTemp
