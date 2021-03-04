@@ -24,7 +24,7 @@ subroutine get_avgTemp(NumPts,FileIter)
    use commonParam
    use laserParam
    use mpi_param, only: RANK,ROOT
-   use MPI      , only: MPI_COMM_WORLD,MPI_IN_PLACE,MPI_REAL8,MPI_SUM
+   use MPI      , only: MPI_COMM_WORLD
    use par_mesh , only: DISTRIBUTED,HOST_MESH
 !
    implicit none
@@ -71,17 +71,8 @@ subroutine get_avgTemp(NumPts,FileIter)
    if (RANK .eq. ROOT) write(*,*) ' get_avgTemp: computing core temperature values..'
    call comp_avgTemp(zValues,NumPts, coreTemp)
 !
-!
-!..gather RHS vector information on host
-   if (.not. DISTRIBUTED .or. HOST_MESH) goto 50
-   count = NumPts
-   if (RANK .eq. ROOT) then
-      call MPI_REDUCE(MPI_IN_PLACE,coreTemp,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-   else
-      call MPI_REDUCE(coreTemp,coreTemp,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      goto 90
-   endif
-   50 continue
+!..only ROOT proc has valid coreTemp values
+   if (RANK .ne. ROOT) goto 90
 !
    if (FileIter .eq. -1) then
       write(*,*) ' get_avgTemp: printing core temperature values..'
@@ -136,8 +127,8 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
    use data_structure3D
    use environment, only : QUIET_MODE
    use mpi_param  , only : RANK,ROOT
-   use MPI        , only : MPI_COMM_WORLD
-   use par_mesh   , only : DISTRIBUTED
+   use MPI        , only : MPI_COMM_WORLD,MPI_IN_PLACE,MPI_REAL8,MPI_SUM
+   use par_mesh   , only : DISTRIBUTED,HOST_MESH
 !
    implicit none
 !
@@ -217,11 +208,28 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
    enddo
 !$OMP END PARALLEL DO
 !
+!..gather information on host
+   if (.not. DISTRIBUTED .or. HOST_MESH) goto 50
+   count = NumPts
+   if (RANK .eq. ROOT) then
+      call MPI_REDUCE(MPI_IN_PLACE,coreTemp,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE,coreVol ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+   else
+      call MPI_REDUCE(coreTemp,coreTemp,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(coreVol ,coreVol ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+   endif
+   50 continue
+!
+   if (RANK .ne. ROOT) goto 90
+!
+!..compute average temperature in fiber core at the sample points
    do i=1,NumPts
       CoreTemp(i) = CoreTemp(i)/coreVol(i)
-      write(*,3005) 'i = ',i, ', CoreTemp = ',CoreTemp(i),', CoreVol = ',coreVol(i)
- 3005 format(A,I3,A,F6.2,A,F6.2)
+!      write(*,3005) 'i = ',i, ', CoreTemp = ',CoreTemp(i),', CoreVol = ',coreVol(i)
+! 3005 format(A,I3,A,F6.2,A,F6.2)
    enddo
+!
+   90 continue
 !
 !..end timer
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
@@ -343,9 +351,6 @@ subroutine comp_elem_avgTemp(Mdle, ElemTemp,ElemVol)
    enddo
 !
 !..compute average temperature in element
-   if (ElemVol .eq. 0.d0) then
-     write(*,*) 'Mdle,ElemTemp,ElemVol = ',Mdle,ElemTemp,ElemVol
-   endif
    ElemTemp = ElemTemp / ElemVol
 !
 end subroutine comp_elem_avgTemp
