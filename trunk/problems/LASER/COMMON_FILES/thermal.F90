@@ -40,7 +40,7 @@ subroutine get_avgTemp(NumPts,FileIter)
    character(8)  :: fmt,suffix
    character(64) :: filename
 !
-   integer :: count,ierr
+   integer :: ierr
 !
 !----------------------------------------------------------------------
 !
@@ -155,7 +155,7 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
 !
 !..timer
    real(8) :: MPI_Wtime,start_time,end_time
-   integer :: ierr
+   integer :: count,ierr
 !
 !----------------------------------------------------------------------
 !
@@ -225,8 +225,8 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
 !..compute average temperature in fiber core at the sample points
    do i=1,NumPts
       CoreTemp(i) = CoreTemp(i)/coreVol(i)
-!      write(*,3005) 'i = ',i, ', CoreTemp = ',CoreTemp(i),', CoreVol = ',coreVol(i)
-! 3005 format(A,I3,A,F6.2,A,F6.2)
+      !write(*,3005) 'i = ',i, ', CoreTemp = ',CoreTemp(i),', CoreVol = ',coreVol(i)
+ !3005 format(A,I3,A,F6.2,A,F6.2)
    enddo
 !
    90 continue
