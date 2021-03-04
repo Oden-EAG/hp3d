@@ -313,7 +313,7 @@ subroutine exec_job_coupled
 !
 !  ...write paraview output
       if(RANK .eq. ROOT) write(*,200) ' Writing paraview output...'
-      iParAttr = (/1,0,0,0,6,0/)
+      iParAttr = (/1,0,0,1,6,0/)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
       call my_paraview_driver(iParAttr)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
