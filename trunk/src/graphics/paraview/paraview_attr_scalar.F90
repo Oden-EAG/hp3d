@@ -63,7 +63,7 @@ subroutine paraview_attr_scalar(Id, Idx)
 !
 !..TODO: do not push to main repo master
 !  skipping imaginary component for real-valued heat solution
-   if (PHYSA(iattr).eq.'tempr' .or. PHYSA(iattr).eq.'hflux') goto 80
+   if (PHYSA(iattr) .eq. 'tempr') goto 80
 !
 #if C_MODE
 !

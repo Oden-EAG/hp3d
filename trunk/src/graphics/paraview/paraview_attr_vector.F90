@@ -61,6 +61,10 @@ subroutine paraview_attr_vector(Id, Idx)
 !
    50 continue
 !
+!..TODO: do not push to main repo master
+!  skipping imaginary component for real-valued heat solution
+   if (PHYSA(iattr) .eq. 'hflux') goto 80
+!
 #if C_MODE
 !
 !  -- IMAGINARY PART --
@@ -86,6 +90,8 @@ subroutine paraview_attr_vector(Id, Idx)
    70 continue
 !
 #endif
+!
+   80 continue
 !
  1101 format("      <Attribute Name='",a,"' AttributeType='Vector' Center='Node'>")
  1102 format("        <DataItem Dimensions='",i14, " 3' NumberType='Float' Precision='4' Format='HDF'>")
