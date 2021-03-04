@@ -141,8 +141,8 @@ subroutine update_Ddof()
             if (.not.associated(NODES(nod)%dof))       cycle
             if (.not.associated(NODES(nod)%dof%zdofH)) cycle
             if (NODES(nod)%geom_interf.eq.1) cycle
-            if (is_dirichlet(nod)) then
-               if (is_dirichlet_homogeneous(nod)) then
+            if (is_dirichlet_attr(nod,'contin')) then
+               if (is_dirichlet_attr_homogeneous(nod,'contin')) then
                   NODES(nod)%dof%zdofH = ZERO
                else
                   call dhpvert(mdle,iflag,no,xsub(1:3,iv),NODES(nod)%case, &
@@ -166,10 +166,10 @@ subroutine update_Ddof()
             nod = nodesl(ind)
             if (.not.associated(NODES(nod)%dof)) cycle
             if (NODES(nod)%geom_interf.eq.1)     cycle
-            if (is_dirichlet(nod)) then
+            if (is_dirichlet_attr(nod,'contin')) then
 !           ...update H1 Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofH)) then
-                  if (is_dirichlet_homogeneous(nod)) then
+                  if (is_dirichlet_attr_homogeneous(nod,'contin')) then
                      NODES(nod)%dof%zdofH = ZERO
                   else
                      call dhpedgeH(mdle,iflag,no,xsub,                  &
@@ -178,9 +178,12 @@ subroutine update_Ddof()
                                    zdofH, NODES(nod)%dof%zdofH)
                   endif
                endif
+               NODES(nod)%geom_interf=1
+            endif
+            if (is_dirichlet_attr(nod,'tangen')) then
 !           ...update H(curl) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofE)) then
-                  if (is_dirichlet_homogeneous(nod)) then
+                  if (is_dirichlet_attr_homogeneous(nod,'tangen')) then
                      NODES(nod)%dof%zdofE = ZERO
                   else
                      call dhpedgeE(mdle,iflag,no,xsub,                  &
@@ -208,10 +211,10 @@ subroutine update_Ddof()
             nod = nodesl(ind)
             if (.not.associated(NODES(nod)%dof)) cycle
             if (NODES(nod)%geom_interf.eq.1)     cycle
-            if (is_dirichlet(nod)) then
+            if (is_dirichlet_attr(nod,'contin')) then
 !           ...update H1 Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofH)) then
-                  if (is_dirichlet_homogeneous(nod)) then
+                  if (is_dirichlet_attr_homogeneous(nod,'contin')) then
                      NODES(nod)%dof%zdofH = ZERO
                   else
                      call dhpfaceH(mdle,iflag,no,xsub,                   &
@@ -220,9 +223,12 @@ subroutine update_Ddof()
                                    zdofH, NODES(nod)%dof%zdofH)
                   endif
                endif
+               NODES(nod)%geom_interf=1
+            endif
+            if (is_dirichlet_attr(nod,'tangen')) then
 !           ...update H(curl) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofE)) then
-                  if (is_dirichlet_homogeneous(nod)) then
+                  if (is_dirichlet_attr_homogeneous(nod,'tangen')) then
                      NODES(nod)%dof%zdofE = ZERO
                   else
                      call dhpfaceE(mdle,iflag,no,xsub,                   &
@@ -232,9 +238,12 @@ subroutine update_Ddof()
 
                   endif
                endif
+               NODES(nod)%geom_interf=1
+            endif
+            if (is_dirichlet_attr(nod,'normal')) then
 !           ...update H(div) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofV)) then
-                  if (is_dirichlet_homogeneous(nod)) then
+                  if (is_dirichlet_attr_homogeneous(nod,'normal')) then
                      NODES(nod)%dof%zdofV = ZERO
                   else
                      call dhpfaceV(mdle,iflag,no,xsub,                   &
