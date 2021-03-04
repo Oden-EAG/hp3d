@@ -857,7 +857,7 @@ module data_structure3D
       Is_dirichlet_attr = .false.
       do iphys=1,NR_PHYSA
         if (.not. PHYSAm(iphys)) cycle
-        if (PHYSAi(iphys) .ne. Attr) cycle
+        if (DTYPE(iphys) .ne. Attr) cycle
         if (ibc(iphys).eq.1) then
           Is_dirichlet_attr = .true.
         else
@@ -880,7 +880,7 @@ module data_structure3D
       Is_dirichlet_attr_homogeneous = .false.
       do iphys=1,NR_PHYSA
         if (.not. PHYSAm(iphys)) cycle
-        if (PHYSAi(iphys) .ne. Attr) cycle
+        if (DTYPE(iphys) .ne. Attr) cycle
         call locate(ibc(iphys),DIRICHLET_HOMOGENEOUS_LIST,  &
                     NR_DIRICHLET_HOMOGENEOUS_LIST, loc)
         if (loc.ne.0) then
