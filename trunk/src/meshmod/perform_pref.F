@@ -19,6 +19,9 @@ c            List_ord  - the corresponding orders for the middle
 c                        nodes
 c            Nlist     - length of both lists
 c
+c    REMARK: routine appears to call nodmod more often than necessary
+c            need to check correctness of the routine
+c
 c-----------------------------------------------------------------------
 c
       subroutine perform_pref(List_elem,List_nord,Nlist)
@@ -74,7 +77,7 @@ c
 c  .....loop through element higher order nodes
         do j=nrv+1,nrv+nre+nrf
 c
-          nod = Nodesl(j)
+          nod = nodesl(j)
 c
 c  .......new order for the node
           newp = norder(j-nrv)
@@ -232,7 +235,7 @@ c
 c  ...Step 2: loop through all active elements
       do iel=1,NRELES
         mdle = ELEM_ORDER(iel)
-        call elem_nodes(mdle, nodesl, norientl)
+        call elem_nodes(mdle, nodesl,norientl)
 c
 c  .....determine order of element nodes implied by the middle
 c       node order
@@ -245,7 +248,7 @@ c  .....determine whether the element will be p-refined
 c
 c  .......loop through element higher order nodes
           do j=1,nre+nrf+1
-            nod = Nodesl(nrv+j)
+            nod = nodesl(nrv+j)
 c
 c  .........if the node order is protected
             if (NODES(nod)%visit.eq.1) then

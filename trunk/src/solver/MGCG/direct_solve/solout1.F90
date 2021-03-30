@@ -150,12 +150,12 @@
                   write(*,7021) load,i,ivar,j,nn
  7021             format('solout1: load,i,ivar,j,nn = ',5i5)
                endif
-               NODES(nod)%zdofH(ivar,j) = Zele(nn)
+               NODES(nod)%dof%zdofH(ivar,j) = Zele(nn)
                if (iprint.eq.1) then
                   write(*,7006) nn,Zele(nn)
  7006             format('solout1: nn, Zele(nn) = ',i4,2e12.5)
-                  write(*,7007) nod,j,ivar,NODES(nod)%zdofH(ivar,j)
- 7007             format('solout1: nod,j,ivar,NODES(nod)%zdofH(ivar,1)',   &
+                  write(*,7007) nod,j,ivar,NODES(nod)%dof%zdofH(ivar,j)
+ 7007             format('solout1: nod,j,ivar,NODES(nod)%dof%zdofH(ivar,1)',   &
                          ' = ',i5,i3,i3,2x,2e12.5)
                endif
             end select
@@ -202,11 +202,11 @@
                nn=nn+1
 !
 !           ...copy the dof
-               NODES(nod)%zdofE(ivar,j) = Zele(nn)
+               NODES(nod)%dof%zdofE(ivar,j) = Zele(nn)
                if (iprint.eq.1) then
                   write(*,7006) nn,Zele(nn)
-                  write(*,7009) nod,j,ivar,NODES(nod)%zdofE(ivar,j)
- 7009             format('solout: nod,j,ivar,NODES(nod)%zdofE(ivar,1)',   &
+                  write(*,7009) nod,j,ivar,NODES(nod)%dof%zdofE(ivar,j)
+ 7009             format('solout: nod,j,ivar,NODES(nod)%dof%zdofE(ivar,1)',   &
                          ' = ',i5,i3,i3,2x,2e12.5)
                endif
             end select
@@ -248,11 +248,11 @@
                   nn=nn+1
 !
 !              ...copy the dof
-                  NODES(nod)%zdofV(ivar,j) = Zele(nn)
+                  NODES(nod)%dof%zdofV(ivar,j) = Zele(nn)
                   if (iprint.eq.1) then
                      write(*,7006) nn,Zele(nn)
-                     write(*,7010) nod,j,ivar,NODES(nod)%zdofV(ivar,j)
- 7010                format('solout: nod,j,ivar,NODES(nod)%zdofV(ivar,1)',    &
+                     write(*,7010) nod,j,ivar,NODES(nod)%dof%zdofV(ivar,j)
+ 7010                format('solout: nod,j,ivar,NODES(nod)%dof%zdofV(ivar,1)',    &
                             ' = ',i5,i3,i3,2x,2e12.5)
                   endif
                end select
@@ -294,11 +294,11 @@
                nn=nn+1
 !
 !           ...copy the dof
-               NODES(nod)%zdofQ(ivar,j) = Zele(nn)
+               NODES(nod)%dof%zdofQ(ivar,j) = Zele(nn)
                if (iprint.eq.1) then
                   write(*,7006) nn,Zele(nn)
-                  write(*,7011) nod,j,ivar,NODES(nod)%zdofQ(ivar,j)
- 7011          format('solout: nod,j,ivar,NODES(nod)%zdofQ(ivar,1)',     &
+                  write(*,7011) nod,j,ivar,NODES(nod)%dof%zdofQ(ivar,j)
+ 7011          format('solout: nod,j,ivar,NODES(nod)%dof%zdofQ(ivar,1)',     &
                       ' = ',i5,i3,i3,2x,2e12.5)
             endif
          end select

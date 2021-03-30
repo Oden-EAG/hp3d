@@ -42,7 +42,7 @@
    subroutine deallocate_coarse_grid
 !
    use mumps
-   use pardiso_data
+!   use pardiso_data
    use mg_data_structure
    use patch_info
    use stc,       only: CLOC
@@ -58,7 +58,8 @@
    case(MUMPS_SOLVER)
       call mumps_destroy
    case(PARDISO_SOLVER)
-      call finalize_pardiso
+!!!      call finalize_pardiso
+! TODO: Fix pardiso_data
    end select
 
 !

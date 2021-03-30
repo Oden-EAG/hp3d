@@ -1189,7 +1189,7 @@
      do is=1,2
 !       nson = NODES(nod)%sons(is)
        nson = Son(nod,is)
-       if (NODES(nson)%act.eq.0 .and. NODES(nson)%ref_kind.eq.0) go to 10
+if (.not.NODES(nson)%act .and. NODES(nson)%ref_kind.eq.0) go to 10
      enddo
      ic=ic+1
      list(ic)=3 ! -J Add middle node for refinement if sons are not active and still need refinement.
@@ -1222,7 +1222,7 @@
          do js=1,2
 !           nson = NODES(nod)%sons(js)
            nson = Son(nod,js)
-           if (NODES(nson)%act.eq.0 .and. NODES(nson)%ref_kind.eq.0) go to 20
+if (.not.NODES(nson)%act .and. NODES(nson)%ref_kind.eq.0) go to 20
          enddo
          if (ic.eq.nlist) then
             nlist = 2*ic
@@ -1355,7 +1355,7 @@
        do is=1,nrsons
 !         nson = NODES(nod)%sons(is)
          nson = Son(nod,is)
-         if (NODES(nson)%act.eq.0 .and. NODES(nson)%ref_kind.eq.0) go to 10
+if (.not.NODES(nson)%act .and. NODES(nson)%ref_kind.eq.0) go to 10
        enddo
        ic=ic+1
        list(ic)=nodl
@@ -1394,7 +1394,7 @@
          do js=1,nrsons
 !           nson = NODES(nod)%sons(js)
            nson = Son(nod,js)
-           if (NODES(nson)%act.eq.0 .and. NODES(nson)%ref_kind.eq.0) go to 20
+if (.not.NODES(nson)%act .and. NODES(nson)%ref_kind.eq.0) go to 20
          enddo
          if (ic.eq.nlist) then
             nlist = 2*ic
