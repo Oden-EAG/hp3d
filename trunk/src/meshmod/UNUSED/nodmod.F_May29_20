@@ -1,0 +1,1119 @@
+
+#include "typedefs.h"
+c
+c---------------------------------------------------------------------
+c
+c   routine name       - nodmod
+c
+c---------------------------------------------------------------------
+c
+c   latest revision    - May 20
+c
+c   purpose            - routine modifies order of approximation
+c                        for a node
+c
+c   arguments :
+c
+c     in:
+c             Nod      - node number
+c             Nordn    - new order of approximation
+c
+c-----------------------------------------------------------------------
+c
+      subroutine nodmod(Nod,Nordn)
+c 
+      use data_structure3D
+      implicit none
+      common /ccopy_dofG/ iprint_copy_dofG
+      common /ccopy_dofH/ iprint_copy_dofH
+      common /ccopy_dofE/ iprint_copy_dofE
+      common /ccopy_dofV/ iprint_copy_dofV
+      common /ccopy_dofQ/ iprint_copy_dofQ
+      integer :: iprint_copy_dofG,iprint_copy_dofH,iprint_copy_dofE,
+     .           iprint_copy_dofV,iprint_copy_dofQ
+c
+      integer                              :: Nod,Nordn
+      real*8, dimension(NDIMEN,MAXmdlbH)   ::  xnod
+      VTYPE,  dimension(MAXEQNH,MAXmdlbH)  :: zdofH
+      VTYPE,  dimension(MAXEQNE,MAXmdlbE)  :: zdofE
+      VTYPE,  dimension(MAXEQNV,MAXmdlbV)  :: zdofV
+      VTYPE,  dimension(MAXEQNQ,MAXmdlbQ)  :: zdofQ
+c
+      character(len=4) :: ntype
+      integer          :: iprint,icase,nordo,ndofH,ndofE,ndofV,ndofQ,
+     .                    ndofHo,ndofEo,ndofVo,ndofQo,nvar
+c
+      select case(Nod)
+      case(1)
+        iprint=1
+      case default
+        iprint=1
+      end select
+      iprint_copy_dofG=iprint
+      iprint_copy_dofH=iprint; iprint_copy_dofE=iprint
+      iprint_copy_dofV=iprint; iprint_copy_dofQ=iprint
+c
+c  ...node case
+      icase = NODES(Nod)%case
+      ntype = NODES(Nod)%type
+      nordo = NODES(Nod)%order
+      if (iprint.eq.1) then
+        write(*,7010) Nod,ntype,nordo,icase
+ 7010   format('nodmod: Nod,type,order,icase = ',i6,2x,a5,2x,2i3)
+      endif
+      if (Nordn.eq.nordo) return
+c
+c  ...determine the current number of dof
+      call ndof_nod(ntype,nordo,
+     .              ndofH,ndofE,ndofV,ndofQ)
+c
+c  ...save current gdofs in local array and update number of gdofs
+      if (Associated(NODES(Nod)%dof%coord)) then
+        xnod(1:NDIMEN,1:ndofH) = NODES(Nod)%dof%coord(1:NDIMEN,1:ndofH)
+        deallocate(NODES(Nod)%dof%coord)
+      endif
+c      
+c  ...save current dof in local arrays
+      if (Associated(NODES(Nod)%dof%zdofH)) then
+        nvar = NREQNH(icase)*NRCOMS
+        zdofH(1:nvar,1:ndofH) = NODES(Nod)%dof%zdofH(1:nvar,1:ndofH)
+        deallocate(NODES(Nod)%dof%zdofH)
+        NRDOFSH = NRDOFSH - ndofH*NREQNH(icase)
+      endif
+      if (Associated(NODES(Nod)%dof%zdofE)) then
+        nvar = NREQNE(icase)*NRCOMS
+        zdofE(1:nvar,1:ndofE) = NODES(Nod)%dof%zdofE(1:nvar,1:ndofE)
+        deallocate(NODES(Nod)%dof%zdofE)
+        NRDOFSE = NRDOFSE - ndofE*NREQNE(icase)
+      endif
+      if (Associated(NODES(Nod)%dof%zdofV)) then
+        nvar = NREQNV(icase)*NRCOMS
+        zdofV(1:nvar,1:ndofV) = NODES(Nod)%dof%zdofV(1:nvar,1:ndofV)
+        deallocate(NODES(Nod)%dof%zdofV)
+        NRDOFSV = NRDOFSV - ndofV*NREQNV(icase)
+      endif
+      if (Associated(NODES(Nod)%dof%zdofQ)) then
+        nvar = NREQNQ(icase)*NRCOMS
+        zdofQ(1:nvar,1:ndofQ) = NODES(Nod)%dof%zdofQ(1:nvar,1:ndofQ)
+        deallocate(NODES(Nod)%dof%zdofQ)
+        NRDOFSQ = NRDOFSQ - ndofQ*NREQNQ(icase)
+      endif
+c
+c  ...save number of dof corresponding to the old order
+      ndofHo = ndofH
+      ndofEo = ndofE
+      ndofVo = ndofV
+      ndofQo = ndofQ
+c
+c  ...modify the order of approximation 
+      NODES(Nod)%order = Nordn
+c
+c  ...calculate the new number of dof for the node
+      call ndof_nod(ntype,Nordn,
+     .              ndofH,ndofE,ndofV,ndofQ)
+c
+c  ...allocate memory for geometry and solution dof
+c     and copy old dof from the local arrays
+      if (ndofH.gt.0) then
+        allocate(NODES(Nod)%dof%coord(NDIMEN,ndofH))
+        call copy_dofG(ntype,nordo,Nordn,ndofHo,ndofH,
+     .                 xnod,NODES(Nod)%dof%coord)
+      endif
+      if ((NREQNH(icase).gt.0).and.(ndofH.gt.0)) then
+        nvar = NREQNH(icase)*NRCOMS
+        allocate( NODES(Nod)%dof%zdofH(nvar, ndofH))
+        NRDOFSH = NRDOFSH + ndofH*NREQNH(icase)
+        call copy_dofH(ntype,nordo,Nordn,ndofHo,ndofH,
+     .                 zdofH,NODES(Nod)%dof%zdofH)
+      endif
+      if ((NREQNE(icase).gt.0).and.(ndofE.gt.0)) then
+        nvar = NREQNE(icase)*NRCOMS
+        allocate( NODES(Nod)%dof%zdofE(nvar, ndofE))
+        NRDOFSE = NRDOFSE + ndofE*NREQNE(icase)
+        call copy_dofE(ntype,nordo,Nordn,ndofEo,ndofE,
+     .                 zdofE,NODES(Nod)%dof%zdofE)
+      endif
+      if ((NREQNV(icase).gt.0).and.(ndofV.gt.0)) then
+        nvar = NREQNV(icase)*NRCOMS
+        allocate( NODES(Nod)%dof%zdofV(nvar, ndofV))
+        NRDOFSV = NRDOFSV + ndofV*NREQNV(icase)
+        call copy_dofV(ntype,nordo,Nordn,ndofVo,ndofV,
+     .                 zdofV,NODES(Nod)%dof%zdofV)
+      endif
+      if ((NREQNQ(icase).gt.0).and.(ndofQ.gt.0)) then
+        nvar = NREQNQ(icase)*NRCOMS
+        allocate( NODES(Nod)%dof%zdofQ(nvar, ndofQ))
+        NRDOFSQ = NRDOFSQ + ndofQ*NREQNQ(icase)
+        call copy_dofQ(ntype,nordo,Nordn,ndofQo,ndofQ,
+     .                 zdofQ,NODES(Nod)%dof%zdofQ)
+      endif
+c
+c
+      if (iprint.eq.1) then
+        write(*,7020) Nod
+ 7020   format('nodmod: Nod = ',i6,' HAS BEEN UPDATED ')
+        write(*,7030) nordo,Nordn
+ 7030   format('        OLD ORDER = ',i3,' NEW ORDER = ',i3)
+        call pause
+      endif
+c
+c
+      end
+c
+c---------------------------------------------------------------------
+c
+c   routine name       - copy_dofG
+c
+c---------------------------------------------------------------------
+c
+c   latest revision    - May 20
+c
+c   purpose            - routine copies G1 dof for a node of order
+c                        Nordo to a node of order Nordn
+c
+c   arguments :
+c
+c     in:
+c        Ntype         - node type
+c        Nordo,Nordn   - old and new orders of the node
+c        Xnodo,Xnodn - old and new dof
+c        NdofGo,NdofGn - old and new # dof
+c
+c-----------------------------------------------------------------------
+c
+      subroutine copy_dofG(Ntype,Nordo,Nordn,NdofGo,NdofGn,
+     .                     Xnodo,Xnodn)
+c
+      use data_structure3D
+      implicit none
+      common /ccopy_dofG/ iprint
+      integer :: iprint
+c
+      character(len=4)            :: Ntype
+      integer                     :: Nordo,Nordn,NdofGo,NdofGn
+      real*8, dimension(3,NdofGo) :: Xnodo
+      real*8, dimension(3,NdofGn) :: Xnodn
+c
+      integer :: ndofG,nordho,nordvo,nordhn,nordvn,ndofGhn,ndofGho,
+     .           ndofGh,ndofGv,ibegn,ibego,j,k,ibeg2n,ibeg2o,
+     .           nord1o,nord2o,nord3o,nord1n,nord2n,nord3n,nord1
+c
+      if (iprint.eq.1) then
+        write(*,7010) Ntype,Nordo,Nordn,NdofGo,NdofGn
+ 7010   format('copy_dofG: Ntype,Nordo,Nordn,NdofGo,NdofGn = ',
+     .                     a4,2i4,2i6)
+      endif
+      Xnodn = 0.d0
+      select case(Ntype)
+c
+c  ...edge, triangle, tet, pyramid
+      case('medg','mdlt','mdln','mdld')
+        ndofG = min(NdofGn,NdofGo)
+        Xnodn(1:3,1:NdofG) = Xnodo(1:3,1:NdofG)
+c
+c  ...quad, prism
+      case('mdlq','mdlp')
+        call decode(Nordo, nordho,nordvo)
+        call decode(Nordn, nordhn,nordvn)
+        select case(Ntype)
+        case('mdlq')
+          ndofGhn = nordhn-1; ndofGho = nordho-1
+        case('mdlp')
+          ndofGhn = (nordhn-2)*(nordhn-1)/2
+          ndofGho = (nordho-2)*(nordho-1)/2
+        end select 
+        ndofGh = min(ndofGhn,ndofGho)
+        ndofGv = min(nordvo-1,nordvn-1)
+        ibegn=0; ibego=0
+        do j=1,ndofGv
+          Xnodn(1:3,ibegn+1:ibegn+ndofGh)
+     .  = Xnodo(1:3,ibego+1:ibego+ndofGh)
+c
+c  .......update counters
+          ibegn = ibegn + ndofGhn
+          ibego = ibego + ndofGho
+        enddo
+c
+c  ...hexa
+      case('mdlb')
+        call decode(Nordo, nordho,nord3o)
+        call decode(nordho, nord1o,nord2o)
+        call decode(Nordn, nordhn,nord3n)
+        call decode(nordhn, nord1n,nord2n)
+        ibegn=0; ibego=0
+        do k=1,min(nord3o,nord3n)-1
+          ibeg2n=0; ibeg2o=0
+          do j=1,min(nord2o,nord2n)-1
+            nord1 = min(nord1o,nord1n)
+            Xnodn(1:3,ibegn+ibeg2n+1:ibegn+ibeg2n+nord1-1) =
+     .      Xnodo(1:3,ibego+ibeg2o+1:ibego+ibeg2o+nord1-1)
+c
+c  .........update counters
+            ibeg2n = ibeg2n + nord1n-1
+            ibeg2o = ibeg2o + nord1o-1
+          enddo
+c
+c  .......update counters
+          ibegn = ibegn + (nord1n-1)*(nord2n-1)
+          ibego = ibego + (nord1o-1)*(nord2o-1)
+        enddo
+      end select
+      if (iprint.eq.1) write(*,*) 'copy_dofG: DONE'
+c
+c
+      end subroutine
+c
+c---------------------------------------------------------------------
+c
+c   routine name       - copy_dofH
+c
+c---------------------------------------------------------------------
+c
+c   latest revision    - May 20
+c
+c   purpose            - routine copies H1 dof for a node of order
+c                        Nordo to a node of order Nordn
+c
+c   arguments :
+c
+c     in:
+c        Ntype         - node type
+c        Nordo,Nordn   - old and new orders of the node
+c        NdofHo,NdofHn - old and new # dof
+c        ZdofHo,ZdofHn - old and new dof
+c
+c-----------------------------------------------------------------------
+c
+      subroutine copy_dofH(Ntype,Nordo,Nordn,NdofHo,NdofHn,
+     .                     ZdofHo,ZdofHn)
+c
+      use data_structure3D
+      implicit none
+      common /ccopy_dofH/ iprint
+      integer :: iprint
+c
+      character(len=4)                  :: Ntype
+      integer                           :: Nordo,Nordn,NdofHo,NdofHn
+      VTYPE, dimension (MAXEQNH,NdofHo) :: ZdofHo
+      VTYPE, dimension (MAXEQNH,NdofHn) :: ZdofHn
+c
+      integer :: ndofH,nordho,nordvo,nordhn,nordvn,ndofHhn,ndofHho,
+     .           ndofHh,ndofHv,ibegn,ibego,j,k,ibeg2n,ibeg2o,
+     .           nord1o,nord2o,nord3o,nord1n,nord2n,nord3n,nord1
+c
+      if (iprint.eq.1) then
+        write(*,7010) Ntype,Nordo,Nordn,NdofHo,NdofHn
+ 7010   format('copy_dofH: Ntype,Nordo,Nordn,NdofHo,NdofHn = ',
+     .                     a4,2i4,2i6)
+      endif
+      ZdofHn = ZERO
+      select case(Ntype)
+c
+c  ...edge, triangle, tet, pyramid
+      case('medg','mdlt','mdln','mdld')
+        ndofH = min(NdofHn,NdofHo)
+        ZdofHn(1:MAXEQNH,1:NdofH) = ZdofHo(1:MAXEQNH,1:NdofH)
+c
+c  ...quad, prism
+      case('mdlq','mdlp')
+        call decode(Nordo, nordho,nordvo)
+        call decode(Nordn, nordhn,nordvn)
+        select case(Ntype)
+        case('mdlq')
+          ndofHhn = nordhn-1; ndofHho = nordho-1
+        case('mdlp')
+          ndofHhn = (nordhn-2)*(nordhn-1)/2
+          ndofHho = (nordho-2)*(nordho-1)/2
+        end select 
+        ndofHh = min(ndofHhn,ndofHho)
+        ndofHv = min(nordvo-1,nordvn-1)
+        ibegn=0; ibego=0
+        do j=1,ndofHv
+          ZdofHn(1:MAXEQNH,ibegn+1:ibegn+ndofHh)
+     .  = ZdofHo(1:MAXEQNH,ibego+1:ibego+ndofHh)
+c
+c  .......update counters
+          ibegn = ibegn + ndofHhn
+          ibego = ibego + ndofHho
+        enddo
+c
+c  .....update the pointers for the consistency check
+        do j=ndofHv+1,nordvo-1
+          ibego = ibego + ndofHho
+        enddo
+        do j=ndofHv+1,nordvn-1
+          ibegn = ibegn + ndofHhn
+        enddo
+        if ((ibegn.ne.NdofHn).or.(ibego.ne.NdofHo)) then
+          write(*,*) 'copy_dofH: INCONSISTENCY 1'
+          stop 1
+        endif
+c
+c  ...hexa
+      case('mdlb')
+        call decode_orderb(Nordo, nord1o,nord2o,nord3o)
+        call decode_orderb(Nordn, nord1n,nord2n,nord3n)
+        call copy_3array(MAXEQNH,ZdofHo,nord1o-1,nord2o-1,nord3o-1,
+     .                           ZdofHn,nord1n-1,nord2n-1,nord3n-1)
+
+        call pause
+
+        call decode(Nordo, nordho,nord3o)
+        call decode(nordho, nord1o,nord2o)
+        call decode(Nordn, nordhn,nord3n)
+        call decode(nordhn, nord1n,nord2n)
+        ibegn=0; ibego=0
+        do k=1,min(nord3o,nord3n)-1
+          ibeg2n=0; ibeg2o=0
+          do j=1,min(nord2o,nord2n)-1
+            nord1 = min(nord1o,nord1n)
+            ZdofHn(1:MAXEQNH,ibegn+ibeg2n+1:ibegn+ibeg2n+nord1-1)
+     .    = ZdofHo(1:MAXEQNH,ibego+ibeg2o+1:ibego+ibeg2o+nord1-1)
+c
+c  .........update counters
+            ibeg2n = ibeg2n + nord1n-1
+            ibeg2o = ibeg2o + nord1o-1
+          enddo
+c
+c  .......update counters
+          ibegn = ibegn + (nord1n-1)*(nord2n-1)
+          ibego = ibego + (nord1o-1)*(nord2o-1)
+        enddo
+c
+c  .....update the pointers for the consistency check
+        do k=min(nord3o,nord3n),nord3o-1
+          ibego = ibego + (nord1o-1)*(nord2o-1)
+        enddo
+        do k=min(nord3o,nord3n),nord3n-1
+          ibegn = ibegn + (nord1n-1)*(nord2n-1)
+        enddo
+        if ((ibegn.ne.NdofHn).or.(ibego.ne.NdofHo)) then
+          write(*,*) 'copy_dofH: INCONSISTENCY 2'
+          stop 1
+        endif
+      end select
+      if (iprint.eq.1) write(*,*) 'copy_dofH: DONE'
+c
+c
+      end subroutine copy_dofH
+c
+c---------------------------------------------------------------------
+c
+c   routine name       - copy_dofE
+c
+c---------------------------------------------------------------------
+c
+c   latest revision    - May 20
+c
+c   purpose            - routine copies H(curl) dof for a node of order
+c                        Nordo to a node of order Nordn
+c
+c   arguments :
+c
+c     in:
+c        Ntype         - node type
+c        Nordo,Nordn   - old and new orders of the node
+c        NdofEo,NdofEn - old and new # dof
+c        ZdofEo,ZdofEn - old and new dof
+c
+c-----------------------------------------------------------------------
+c
+      subroutine copy_dofE(Ntype,Nordo,Nordn,NdofEo,NdofEn,
+     .                     ZdofEo,ZdofEn)
+c
+      use data_structure3D
+      implicit none
+      common /ccopy_dofE/ iprint
+      integer :: iprint
+c
+      character(len=4)                 :: Ntype
+      integer                          :: Nordo,Nordn,NdofEo,NdofEn
+      VTYPE, dimension(MAXEQNE,NdofEo) :: ZdofEo
+      VTYPE, dimension(MAXEQNE,NdofEn) :: ZdofEn
+c
+      integer :: ndofE,m,nordho,nordvo,nordhn,nordvn,
+     .           nordh,nordv,ibego,ibegn,ibeg2o,ibeg2n,
+     .           ndofEhn,ndofEho,ndofEh,
+     .           ndofHhn,ndofHho,ndofHh,j,k,nord,
+     .           nord1n,nord2n,nord3n,nord1o,nord2o,nord3o,
+     .           nord1,nord2,nord3
+c
+      if (iprint.eq.1) then
+        write(*,7010) Ntype,Nordo,Nordn,NdofEo,NdofEn
+ 7010   format('copy_dofE: Ntype,Nordo,Nordn,NdofEo,NdofEn = ',
+     .                     a4,2i4,2i6)
+      endif
+      ZdofEn = ZERO
+      select case(Ntype)
+c
+c  ...segment
+      case('medg')
+        ndofE = min(NdofEo,NdofEn)
+        ZdofEn(1:MAXEQNE,1:NdofE) = ZdofEo(1:MAXEQNE,1:NdofE)
+c
+c  ...triangle
+      case('mdlt')
+c
+c  .....the 2 families are intertwined to form a hierarchy
+        ndofE = min(NdofEo,NdofEn)
+        ZdofEn(1:MAXEQNE,1:ndofE) = ZdofEo(1:MAXEQNE,1:ndofE)
+c
+c  ...quadrilateral
+      case('mdlq')
+        call decode(Nordo, nordho,nordvo)
+        call decode(Nordn, nordhn,nordvn)
+        nordh = min(nordho,nordhn)
+        nordv = min(nordvo,nordvn)
+c
+c  .....family 1
+        ibego=0; ibegn=0
+        do j=1,nordv-1
+          ZdofEn(1:MAXEQNE,ibegn+1:ibegn+nordh) 
+     .      = ZdofEo(1:MAXEQNE,ibego+1:ibego+nordh)
+          ibego=ibego+nordho; ibegn=ibegn+nordhn
+        enddo
+        do j=nordv,nordvo-1
+          ibego=ibego+nordho
+        enddo
+        do j=nordv,nordvn-1
+          ibegn=ibegn+nordhn
+        enddo
+c
+c  .....family 2
+        do j=1,nordv
+          ZdofEn(1:MAXEQNE,ibegn+1:ibegn+nordh-1) =
+     .    ZdofEo(1:MAXEQNE,ibego+1:ibego+nordh-1)
+          ibego=ibego+nordho-1; ibegn=ibegn+nordhn-1
+        enddo
+        do j=nordv+1,nordvo
+          ibego=ibego+nordho-1
+        enddo
+        do j=nordv+1,nordvn
+          ibegn=ibegn+nordhn-1
+        enddo
+        if ((ibegn.ne.NdofEn).or.(ibego.ne.NdofEo)) then
+          write(*,*) 'copy_dofE: INCONSISTENCY 1'
+          stop 1
+        endif
+c
+c  ...tetrahedron
+      case('mdln')
+c
+c  .....the 3 families are intertwined to form a hierarchy
+        ndofE = min(NdofEo,NdofEn)
+        ZdofEn(1:MAXEQNE,1:ndofE) = ZdofEo(1:MAXEQNE,1:ndofE)
+c
+c  ...prism
+      case('mdlp')
+        call decode(Nordo, nordho,nordvo)
+        call decode(Nordn, nordhn,nordvn)
+        nordh = min(nordho,nordhn)
+        nordv = min(nordvo,nordvn)
+        ndofEhn = nordhn*(nordhn-1)
+        ndofEho = nordho*(nordho-1)
+        ndofEh  = min(ndofEhn,ndofEho)
+        ndofHhn = (nordhn-2)*(nordhn-1)/2
+        ndofHho = (nordho-2)*(nordho-1)/2
+        ndofHh  = min(ndofHhn,ndofHho)
+c
+c  .....first 2 families are (horizontally) intertwined 
+        ibegn=0; ibego=0
+        do j=1,nordv-1
+          ZdofEn(1:MAXEQNE,ibegn+1:ibegn+ndofEh) = 
+     .    ZdofEo(1:MAXEQNE,ibego+1:ibego+ndofEh)
+          ibegn=ibegn+ndofEhn; ibego=ibego+ndofEho
+        enddo
+        do j=nordv,nordvo-1
+          ibego=ibego+ndofEho
+        enddo
+        do j=nordv,nordvn-1
+          ibegn=ibegn+ndofEhn
+        enddo
+c
+c  .....3rd family
+        do j=1,nordv
+          ZdofEn(1:MAXEQNE,ibegn+1:ibegn+ndofHh) = 
+     .    ZdofEo(1:MAXEQNE,ibego+1:ibego+ndofHh)
+          ibegn=ibegn+ndofHhn; ibego=ibego+ndofHho
+        enddo
+        do j=nordv+1,nordvo
+          ibego=ibego+ndofHho
+        enddo
+        do j=nordv+1,nordvn
+          ibegn=ibegn+ndofHhn
+        enddo
+        if ((ibegn.ne.NdofEn).or.(ibego.ne.NdofEo)) then
+          write(*,*) 'ibegn,NdofEn,ibego,NdofEo = ',
+     .                ibegn,NdofEn,ibego,NdofEo
+          write(*,*) 'copy_dofE: INCONSISTENCY 2'
+          stop 1
+        endif
+c
+c  ...hexahedron
+      case('mdlb')
+        call decode(Nordo,  nordho,nord3o)
+        call decode(nordho, nord1o,nord2o)
+        call decode(Nordn,  nordhn,nord3n)
+        call decode(nordhn, nord1n,nord2n)
+        nord1=min(nord1n,nord1o)
+        nord2=min(nord2n,nord2o)
+        nord3=min(nord3n,nord3o);
+c
+c  .....family 1
+        ibego=0; ibegn=0
+        do k=1,nord3-1
+          ibeg2o=0; ibeg2n=0
+          do j=1,nord2-1
+            ZdofEn(1:MAXEQNE,ibegn+ibeg2n+1:ibegn+ibeg2n+nord1) =
+     .      ZdofEo(1:MAXEQNE,ibego+ibeg2o+1:ibego+ibeg2o+nord1)
+            ibeg2o=ibeg2o+nord1o; ibeg2n=ibeg2n+nord1n
+          enddo
+            ibego=ibego+nord1o*(nord2o-1); ibegn=ibegn+nord1n*(nord2n-1)
+        enddo
+        do k=nord3,nord3o-1
+          ibego=ibego+nord1o*(nord2o-1)
+        enddo
+        do k=nord3,nord3n-1
+          ibegn=ibegn+nord1n*(nord2n-1)
+        enddo
+c
+c  .....family 2
+        do k=1,nord3-1
+          ibeg2o=0; ibeg2n=0
+          do j=1,nord2
+            ZdofEn(1:MAXEQNE,ibegn+ibeg2n+1:ibegn+ibeg2n+nord1-1) =
+     .      ZdofEo(1:MAXEQNE,ibego+ibeg2o+1:ibego+ibeg2o+nord1-1)
+            ibeg2o=ibeg2o+nord1o-1; ibeg2n=ibeg2n+nord1n-1
+          enddo
+          ibego=ibego+(nord1o-1)*nord2o; ibegn=ibegn+(nord1n-1)*nord2n
+        enddo
+        do k=nord3,nord3o-1
+          ibego=ibego+(nord1o-1)*nord2o
+        enddo
+        do k=nord3,nord3n-1
+          ibegn=ibegn+(nord1n-1)*nord2n
+        enddo
+c
+c  .....family 3
+        do k=1,nord3
+          ibeg2o=0; ibeg2n=0
+          do j=1,nord2-1
+            ZdofEn(1:MAXEQNE,ibegn+1:ibegn+nord1-1) =
+     .      ZdofEo(1:MAXEQNE,ibego+1:ibego+nord1-1)
+            ibeg2o=ibeg2o+nord1o-1; ibeg2n=ibeg2n+nord1n-1
+          enddo
+          ibego=ibego+(nord1o-1)*(nord2o-1)
+          ibegn=ibegn+(nord1n-1)*(nord2n-1)
+        enddo
+        do k=nord3+1,nord3o
+          ibego=ibego+(nord1o-1)*(nord2o-1)
+        enddo
+        do k=nord3+1,nord3n
+          ibegn=ibegn+(nord1n-1)*(nord2n-1)
+        enddo
+        if ((ibegn.ne.NdofEn).or.(ibego.ne.NdofEo)) then
+          write(*,*) 'ibegn,NdofEn,ibego,NdofEo = ',
+     .                ibegn,NdofEn,ibego,NdofEo
+          write(*,*) 'copy_dofE: INCONSISTENCY 3'
+          stop 1
+        endif
+c
+c  ...pyramid
+      case('mdld')
+c
+c  .....FAMILY 1 (gradients of H1 bubbles) is hierarchical
+        ndofE = min(Nordn,Nordo)**3
+        ZdofEn(1:MAXEQNE,1:ndofE) = ZdofEo(1:MAXEQNE,1:ndofE)
+        ibego=Nordo**3; ibegn=Nordn**3
+c
+c  .....FAMILY 2 AND 3 (induced from quad face functions)
+        nord = min(Nordn,Nordo)
+        do k=2,nord
+          ibeg2o=0; ibeg2n=0
+          do j=1,nord-1
+            ZdofEn(1:MAXEQNE,ibegn+ibeg2n+1:ibegn+ibeg2n+nord) =
+     .      ZdofEo(1:MAXEQNE,ibego+ibeg2o+1:ibego+ibeg2o+nord)
+            ibeg2o=ibeg2o+Nordo; ibeg2n=ibeg2n+Nordn
+          enddo
+          ibego=ibego+Nordo*(Nordo-1); ibegn=ibegn+Nordn*(Nordn-1)
+        enddo
+        do k=nord+1,Nordo
+          ibego=ibego+Nordo*(Nordo-1)
+        enddo
+        do k=nord+1,Nordn
+          ibegn=ibegn+Nordn*(Nordn-1)
+        enddo
+        do k=2,nord
+          ibeg2o=0; ibeg2n=0
+          do j=1,nord
+            ZdofEn(1:MAXEQNE,ibegn+ibeg2n+1:ibegn+ibeg2n+nord-1) =
+     .      ZdofEo(1:MAXEQNE,ibego+ibeg2o+1:ibego+ibeg2o+nord-1)
+            ibeg2o=ibeg2o+Nordo-1; ibeg2n=ibeg2n+Nordn-1
+          enddo
+          ibego=ibego+(Nordo-1)*Nordo; ibegn=ibegn+(Nordn-1)*Nordn
+        enddo
+        do k=nord+1,Nordo
+          ibego=ibego+(Nordo-1)*Nordo
+        enddo
+        do k=nord+1,Nordn
+          ibegn=ibegn+(Nordn-1)*Nordn
+        enddo
+c
+c  .....FAMILY 4 (weird but hierarchical)
+        ndofE = min(Nordn-1,Nordo-1)**2
+        ZdofEn(1:MAXEQNE,ibegn+1:ibegn+ndofE) = 
+     .  ZdofEo(1:MAXEQNE,ibego+1:ibego+ndofE)
+        ibego=ibego+(Nordo-1)**2
+        ibegn=ibegn+(Nordn-1)**2
+        if ((ibegn.ne.NdofEn).or.(ibego.ne.NdofEo)) then
+          write(*,*) 'copy_dofE: INCONSISTENCY 4'
+          stop 1
+        endif
+      end select
+      if (iprint.eq.1) write(*,*) 'copy_dofE: DONE'
+c
+c    
+      end subroutine copy_dofE
+c
+c---------------------------------------------------------------------
+c
+c   routine name       - copy_dofV
+c
+c---------------------------------------------------------------------
+c
+c   latest revision    - May 20
+c
+c   purpose            - routine copies H(div) dof for a node of order
+c                        Nordo to a node of order Nordn
+c
+c   arguments :
+c
+c     in:
+c        Ntype         - node type
+c        Nordo,Nordn   - old and new orders of the node
+c        NdofEo,NdofEn - old and new # dof
+c        ZdofEo,ZdofEn - old and new dof
+c
+c-----------------------------------------------------------------------
+c
+      subroutine copy_dofV(Ntype,Nordo,Nordn,NdofVo,NdofVn,
+     .                     ZdofVo,ZdofVn)
+c
+      use data_structure3D
+      implicit none
+      common /ccopy_dofV/ iprint
+      integer :: iprint
+c
+      character(len=4)                 :: Ntype
+      integer                          :: Nordo,Nordn,NdofVo,NdofVn
+      VTYPE, dimension(MAXEQNV,NdofVo) :: ZdofVo
+      VTYPE, dimension(MAXEQNV,NdofVn) :: ZdofVn
+c
+      integer :: ndofV,m,nordho,nordvo,nordhn,nordvn,
+     .           nordh,nordv,ibego,ibegn,ibeg2o,ibeg2n,
+     .           ndofVhn,ndofVho,ndofVh,
+     .           ndofHhn,ndofHho,ndofHh,j,k,nord,
+     .           nord1n,nord2n,nord3n,nord1o,nord2o,nord3o,
+     .           nord1,nord2,nord3
+c
+      if (iprint.eq.1) then
+        write(*,7010) Ntype,Nordo,Nordn,NdofVo,NdofVn
+ 7010   format('copy_dofV: Ntype,Nordo,Nordn,NdofVo,NdofVn = ',
+     .                     a4,2i4,2i6)
+      endif
+      ZdofVn = ZERO
+      select case(Ntype)
+c
+c  ...triangle
+      case('mdlt')
+c
+c  .....a hierarchical family
+        ndofV = min(NdofVo,NdofVn)
+        ZdofVn(1:MAXEQNV,1:ndofV) = ZdofVo(1:MAXEQNV,1:ndofV)
+c
+c  ...quadrilateral
+      case('mdlq')
+        call decode(Nordo, nordho,nordvo)
+        call decode(Nordn, nordhn,nordvn)
+        nordh = min(nordho,nordhn)
+        nordv = min(nordvo,nordvn)
+c
+c  .....tensor product of hierarchical 1D families
+        ibego=0; ibegn=0
+        do j=1,nordv
+          ZdofVn(1:MAXEQNV,ibegn+1:ibegn+nordh) 
+     .      = ZdofVo(1:MAXEQNV,ibego+1:ibego+nordh)
+          ibego=ibego+nordho; ibegn=ibegn+nordhn
+        enddo
+        do j=nordv+1,nordvo
+          ibego=ibego+nordho
+        enddo
+        do j=nordv+1,nordvn
+          ibegn=ibegn+nordhn
+        enddo
+        if ((ibegn.ne.NdofVn).or.(ibego.ne.NdofVo)) then
+          write(*,*) 'copy_dofV: INCONSISTENCY 1'
+          stop 1
+        endif
+c
+c  ...tetrahedron
+      case('mdln')
+c
+c  .....3 intertwined hierarchical families form a hierarchical family
+        ndofV = min(NdofVo,NdofVn)
+        ZdofVn(1:MAXEQNV,1:ndofV) = ZdofVo(1:MAXEQNV,1:ndofV)
+c
+c  ...prism
+      case('mdlp')
+        call decode(Nordo, nordho,nordvo)
+        call decode(Nordn, nordhn,nordvn)
+        nordv = min(nordvo,nordvn)
+        ndofVhn = nordhn*(nordhn-1)
+        ndofVho = nordho*(nordho-1)
+        ndofVh  = min(ndofVhn,ndofVho)
+c
+c  .....first 2 families are (horizontally) intertwined 
+        ibegn=0; ibego=0
+        do j=1,nordv
+          ZdofVn(1:MAXEQNV,ibegn+1:ibegn+ndofVh) = 
+     .    ZdofVo(1:MAXEQNV,ibego+1:ibego+ndofVh)
+          ibegn=ibegn+ndofVhn; ibego=ibego+ndofVho
+        enddo
+        do j=nordv+1,nordvo
+          ibego=ibego+ndofVho
+        enddo
+        do j=nordv+1,nordvn
+          ibegn=ibegn+ndofVhn
+        enddo
+c
+c  .....3rd family
+        ndofVhn = (nordhn+1)*nordhn/2
+        ndofVho = (nordho+1)*nordho/2
+        ndofVh  = min(ndofVhn,ndofVho)
+        do j=1,nordv-1
+          ZdofVn(1:MAXEQNV,ibegn+1:ibegn+ndofVh) = 
+     .    ZdofVo(1:MAXEQNV,ibego+1:ibego+ndofVh)
+          ibegn=ibegn+ndofVhn; ibego=ibego+ndofVho
+        enddo
+        do j=nordv,nordvo-1
+          ibego=ibego+ndofVho
+        enddo
+        do j=nordv,nordvn-1
+          ibegn=ibegn+ndofVhn
+        enddo
+        if ((ibegn.ne.NdofVn).or.(ibego.ne.NdofVo)) then
+          write(*,*) 'ibegn,NdofVn,ibego,NdofVo = ',
+     .                 ibegn,NdofVn,ibego,NdofVo
+          write(*,*) 'copy_dofV: INCONSISTENCY 2'
+          stop 1
+        endif
+c
+c  ...hexahedron
+      case('mdlb')
+        call decode(Nordo, nordho,nord3o)
+        call decode(nordho, nord1o,nord2o)
+        call decode(Nordn, nordhn,nord3n)
+        call decode(nordhn, nord1n,nord2n)
+        nord1=min(nord1n,nord1o)
+        nord2=min(nord2n,nord2o)
+        nord3=min(nord3n,nord3o);
+c
+c  .....family 1
+        ibego=0; ibegn=0
+        do k=1,nord3-1
+          ibeg2o=0; ibeg2n=0
+          do j=1,nord2
+            ZdofVn(1:MAXEQNV,ibegn+ibeg2n+1:ibegn+ibeg2n+nord1) =
+     .      ZdofVo(1:MAXEQNV,ibego+ibeg2o+1:ibego+ibeg2o+nord1)
+            ibeg2o=ibeg2o+nord1o; ibeg2n=ibeg2n+nord1n
+          enddo
+          ibego=ibego+nord1o*nord2o; ibegn=ibegn+nord1n*nord2n
+        enddo
+        do k=nord3,nord3o-1
+          ibego=ibego+nord1o*nord2o
+        enddo
+        do k=nord3,nord3n-1
+          ibegn=ibegn+nord1n*nord2n
+        enddo
+c
+c  .....family 2
+        do k=1,nord1-1
+          ibeg2o=0; ibeg2n=0
+          do j=1,nord3
+            ZdofVn(1:MAXEQNV,ibegn+ibeg2n+1:ibegn+ibeg2n+nord2) =
+     .      ZdofVo(1:MAXEQNV,ibego+ibeg2o+1:ibego+ibeg2o+nord2)
+            ibeg2o=ibeg2o+nord2o; ibeg2n=ibeg2n+nord2n
+          enddo
+          ibego=ibego+nord2o*nord3o; ibegn=ibegn+nord2n*nord3n
+        enddo
+        do k=nord1,nord1o-1
+          ibego=ibego+nord2o*nord3o
+        enddo
+        do k=nord1,nord1n-1
+          ibegn=ibegn+nord2n*nord3n
+        enddo
+c
+c  .....family 3
+        do k=1,nord2-1
+          ibeg2o=0; ibeg2n=0
+          do j=1,nord1
+            ZdofVn(1:MAXEQNV,ibegn+ibeg2n+1:ibegn+ibeg2n+nord3) =
+     .      ZdofVo(1:MAXEQNV,ibego+ibeg2o+1:ibego+ibeg2o+nord3)
+            ibeg2o=ibeg2o+nord3o; ibeg2n=ibeg2n+nord3n
+          enddo
+          ibego=ibego+nord3o*nord1o
+          ibegn=ibegn+nord3n*nord1n
+        enddo
+        do k=nord2,nord2o-1
+          ibego=ibego+nord3o*nord1o
+        enddo
+        do k=nord2,nord2n-1
+          ibegn=ibegn+nord3n*nord1n
+        enddo
+        if ((ibegn.ne.NdofVn).or.(ibego.ne.NdofVo)) then
+          write(*,*) 'ibegn,NdofVn,ibego,NdofVo = ',
+     .                ibegn,NdofVn,ibego,NdofVo
+          write(*,*) 'copy_dofV: INCONSISTENCY 3'
+          stop 1
+        endif
+c
+c  ...pyramid
+      case('mdld')
+c
+c  .....FAMILY 1 (gradients of H1 bubbles) is hierarchical
+        ndofV = min(Nordn,Nordo)**3
+        ZdofVn(1:MAXEQNV,1:ndofV) = ZdofVo(1:MAXEQNV,1:ndofV)
+        ibego=Nordo**3; ibegn=Nordn**3
+c
+c  .....FAMILY 2 AND 3 (induced from quad face functions)
+        nord = min(Nordn,Nordo)
+        do k=2,nord
+          do j=1,nord-1
+            ZdofVn(1:MAXEQNV,ibegn+1:ibegn+nord) =
+     .      ZdofVo(1:MAXEQNV,ibego+1:ibego+nord)
+            ibego=ibego+Nordo; ibegn=ibegn+Nordn
+          enddo
+        enddo
+        do k=2,nord
+          do j=1,nord
+            ZdofVn(1:MAXEQNV,ibegn+1:ibegn+nord-1) =
+     .      ZdofVo(1:MAXEQNV,ibego+1:ibego+nord-1)
+            ibego=ibego+Nordo-1; ibegn=ibegn+Nordn-1
+          enddo
+        enddo
+c
+c  .....FAMILY 4 (weird but hierarchical)
+        ndofV = min(Nordn-1,Nordo-1)**2
+        ZdofVn(1:MAXEQNV,ibegn+1:ibegn+ndofV) = 
+     .  ZdofVo(1:MAXEQNV,ibego+1:ibego+ndofV)
+        ibego=ibego+(Nordo-1)**2
+        ibegn=ibegn+(Nordn-1)**2
+        if ((ibegn.ne.NdofVn).or.(ibego.ne.NdofVo)) then
+          write(*,*) 'copy_dofV: INCONSISTENCY 4'
+          stop 1
+        endif
+      end select
+      if (iprint.eq.1) write(*,*) 'copy_dofV: DONE'
+c
+c    
+      end subroutine copy_dofV
+c
+c---------------------------------------------------------------------
+c
+c   routine name       - copy_dofQ
+c
+c---------------------------------------------------------------------
+c
+c   latest revision    - May 20
+c
+c   purpose            - routine copies L2 dof for a node of order
+c                        Nordo to a node of order Nordn
+c
+c   arguments :
+c
+c     in:
+c        Ntype         - node type
+c        Nordo,Nordn   - old and new orders of the node
+c        ZdofQo,ZdofQn - old and new dof
+c        NdofQo,NdofQn - old and new # dof
+c
+c-----------------------------------------------------------------------
+c
+      subroutine copy_dofQ(Ntype,Nordo,Nordn,NdofQo,NdofQn,
+     .                     ZdofQo,ZdofQn)
+c
+      use data_structure3D
+      implicit none
+      common /ccopy_dofQ/ iprint
+      integer :: iprint
+c      
+      character(len=4)                  :: Ntype
+      integer                           :: Nordo,Nordn,NdofQo,NdofQn
+      VTYPE, dimension (MAXEQNQ,NdofQo) :: ZdofQo
+      VTYPE, dimension (MAXEQNQ,NdofQn) :: ZdofQn
+c
+      integer :: nord,nord1n,nord2n,nord3n,nord1o,nord2o,nord3o,nord1,
+     .           nordhn,nordvn,nordho,nordvo,ndofQhn,ndofQho,ndofQh,
+     .           nordv,j,k,ibegjn,ibegjo,ibegin,ibegio,ibegn,ibego,ndofQ
+c
+      if (iprint.eq.1) then
+        write(*,7010) Ntype,Nordo,Nordn,NdofQo,NdofQn
+ 7010   format('copy_dofQ: Ntype,Nordo,Nordn,NdofQo,NdofQn = ',
+     .                     a4,2i4,2i6)
+      endif
+      ZdofQn = ZERO
+      select case(Ntype)
+c
+c  ...tet
+      case('mdln')
+c
+c  .....a hierarchical family
+        ndofQ = min(NdofQn,NdofQo)
+        ZdofQn(1:MAXEQNQ,1:NdofQ) = ZdofQo(1:MAXEQNQ,1:NdofQ)
+c
+c  ...prism
+      case('mdlp')
+        call decode(Nordo, nordho,nordvo)
+        call decode(Nordn, nordhn,nordvn)
+        ndofQhn = (nordhn+1)*nordhn/2
+        ndofQho = (nordho+1)*nordho/2
+        ndofQh = min(ndofQhn,ndofQho)
+        nordv = min(nordvo,nordvn)
+        ibegn=0; ibego=0
+        do j=1,nordv
+          ZdofQn(1:MAXEQNQ,ibegn+1:ibegn+ndofQh)
+     .  = ZdofQo(1:MAXEQNQ,ibego+1:ibego+ndofQh)
+c
+c  .......update counters
+          ibegn = ibegn + ndofQhn
+          ibego = ibego + ndofQho
+        enddo
+        do j=nordv+1,nordvo
+          ibego=ibego+ndofQho
+        enddo
+        do j=nordv+1,nordvn
+          ibegn=ibegn+ndofQhn
+        enddo
+        if ((ibegn.ne.NdofQn).or.(ibego.ne.NdofQo)) then
+          write(*,*) 'ibegn,NdofQn,ibego,NdofQo = ',
+     .                ibegn,NdofQn,ibego,NdofQo
+          write(*,*) 'copy_dofQ: INCONSISTENCY 1'
+          stop 1
+        endif
+c
+c  ...hexa
+      case('mdlb')
+c
+c  .....tensor products of 1D hierarchical families
+        call decode(Nordo, nordho,nord3o)
+        call decode(nordho, nord1o,nord2o)
+        call decode(Nordn, nordhn,nord3n)
+        call decode(nordhn, nord1n,nord2n)
+        nord1 = min(nord1n,nord1o)
+        ibegjn=0; ibegjo=0
+        do k=1,min(nord3o,nord3n)
+          ibegin=0; ibegio=0
+          do j=1,min(nord2o,nord2n)
+            ZdofQn(1:MAXEQNQ,ibegjn+ibegin+1:ibegjn+ibegin+nord1)
+     .    = ZdofQo(1:MAXEQNQ,ibegjn+ibegin+1:ibegjn+ibegin+nord1)
+            ibegin=ibegin+nord1n; ibegio=ibegio+nord1o
+          enddo
+          ibegjn=ibegjn+nord1n*nord2n; ibegjo=ibegjo+nord1o*nord2o
+        enddo
+        do k=min(nord3o,nord3n)+1,nord3o
+          ibegjo=ibegjo+nord1o*nord2o
+        enddo
+        do k=min(nord3o,nord3n)+1,nord3n
+          ibegjn=ibegjn+nord1n*nord2n
+        enddo
+
+
+
+        if ((ibegjn.ne.NdofQn).or.(ibegjo.ne.NdofQo)) then
+          write(*,*) 'copy_dofQ: INCONSISTENCY 2'
+          stop 1
+        endif
+c
+c  ...pyramid
+      case('mdld')
+c
+c  .....tensor products of 1D hierarchical families
+        nord = min(Nordo,Nordn)
+        ibegjn=0; ibegjo=0
+        do k=1,nord
+          ibegin=0; ibegio=0
+          do j=1,nord
+            ZdofQn(1:MAXEQNQ,ibegjn+ibegin+1:ibegjn+ibegin+nord)
+     .    = ZdofQo(1:MAXEQNQ,ibegjo+ibegio+1:ibegjo+ibegio+nord)
+            ibegin=ibegin+Nordn; ibegio=ibegio+Nordo
+          enddo
+          ibegjn=ibegjn+Nordn**2; ibegjo=ibegjo+Nordo**2
+        enddo
+        if ((ibegjn.ne.NdofQn).or.(ibegjo.ne.NdofQo)) then
+          write(*,*) 'copy_dofQ: INCONSISTENCY 3'
+          stop 1
+        endif
+      end select
+      if (iprint.eq.1) write(*,*) 'copy_dofQ: DONE'
+c
+c
+      end subroutine copy_dofQ
+
+
+      subroutine copy_1array(M,A,Ia, B,Ib)
+c
+      use parameters, only: ZERO
+      implicit none
+      integer                 :: M,Ia,Ib,i
+      VTYPE, dimension(M,Ia) :: A
+      VTYPE, dimension(M,Ib) :: B
+c
+      B = ZERO
+      i=min(Ia,Ib)
+      B(1:M,1:i) =  A(1:M,1:i)
+c
+      end subroutine copy_1array
+
+
+
+      subroutine copy_2array(M,A,Ia,Ja, B,Ib,Jb)
+c
+      use parameters, only: ZERO
+      implicit none
+      integer                 :: M,Ia,Ja,Ib,Jb,i,j
+      VTYPE, dimension(M,Ia,Ja) :: A
+      VTYPE, dimension(M,Ib,Jb) :: B
+c
+      B = ZERO
+      i=min(Ia,Ib)
+      j=min(Ja,Jb)
+      B(1:M,1:i,1:j) =  A(1:M,1:i,1:j)
+c
+      end subroutine copy_2array
+
+
+      subroutine copy_3array(M,A,Ia,Ja,Ka, B,Ib,Jb,Kb)
+c
+      use parameters, only: ZERO
+      implicit none
+      integer                 :: M,Ia,Ja,Ka,Ib,Jb,Kb,i,j,k
+      VTYPE, dimension(M,Ia,Ja,Ka) :: A
+      VTYPE, dimension(M,Ib,Jb,Kb) :: B
+c
+      B = ZERO
+      i=min(Ia,Ib)
+      j=min(Ja,Jb)
+      k=min(Ka,Kb)
+      B(1:M,1:i,1:j,1:k) =  A(1:M,1:i,1:j,1:k)
+c
+      end subroutine copy_3array
+
+
+
+
+
+
+
+
+
+

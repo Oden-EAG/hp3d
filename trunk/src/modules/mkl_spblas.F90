@@ -1,2 +1,2 @@
 
-include 'mkl_spblas.f90'
+include '/opt/intel/mkl/include/mkl_spblas.f90'

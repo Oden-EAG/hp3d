@@ -1,0 +1,399 @@
+#include "typedefs.h"
+!-------------------------------------------------------------------------
+!> Purpose : initiate H1, H(curl) and H(div), i.e. L2 dof for a son of 
+!            a mid-face rectangular node
+!
+!> @date May 20
+!
+!> @param[in]  Kref    - refinement type
+!> @param[in]  Nson    = 1,...,9 (the son number)
+!> @param[in]  Norder  - polynomial order for the face
+!> @param[in]  NvarH,NvarE,NvarV - number of H1, H(curl) and H(div) components
+!> @param[in]  Xnod    - geometry dof for the face
+!> @param[in]  DofH    - H1 dof for the face
+!> @param[in]  DofE    - H(curl) dof for the face
+!> @param[in]  DofV    - H(div) dof for the face
+!
+!> @param[out] Xnod_son - geometry dof for the son
+!> @param[out] DofH_son - H1 dof for the son
+!> @param[out] DofE_son - H(curl) dof for the son
+!> @param[out] DofV_son - H(div) dof for the son
+!-------------------------------------------------------------------------
+!
+      subroutine initiate_mdlq_dof(Kref,Nson,Norder,NvarH,NvarE,NvarV, &
+                                   Xnod,DofH,DofE,DofV, &
+                                   Xnod_son,DofH_son,DofE_son,DofV_son)
+!
+      use constraints
+      implicit none
+!
+      integer,              intent(in)  :: Kref,Nson,NvarH,NvarE,NvarV
+      integer,dimension(5),                intent(in)  :: Norder
+      real*8, dimension(NDIMEN,MAXquadH),  intent(in)  :: Xnod
+      VTYPE,  dimension(NvarH, MAXquadH),  intent(in)  :: DofH
+      VTYPE,  dimension(NvarE, MAXquadE),  intent(in)  :: DofE
+      VTYPE,  dimension(NvarV, MAXquadV),  intent(in)  :: DofV
+!
+      real*8, dimension(NDIMEN,MAXmdlqH),  intent(out) :: Xnod_son
+      VTYPE,  dimension(NvarH, MAXmdlqH),  intent(out) :: DofH_son
+      VTYPE,  dimension(NvarE, MAXmdlqE),  intent(out) :: DofE_son
+      VTYPE,  dimension(NvarV ,MAXmdlqV),  intent(out) :: DofV_son
+!
+!  ...locals
+      integer                          :: nord1,nord2,i,j,ndofH,ndofE
+      integer,dimension(5)             :: naH,naE
+      real*8, dimension(MAXP+1,MAXP-1) :: coeffH1,coeffH2
+      real*8, dimension(MAXP,MAXP)     :: coeffE1,coeffE2
+!
+      Xnod_son = 0.d0; DofH_son = ZERO; DofE_son = ZERO; DofV_son = ZERO
+!
+      call decode(Norder(5), nord1,nord2)
+!
+      ndofH=4; ndofE=0
+      do i=1,5
+        naH(i) = ndofH; naE(i) = ndofE;
+        ndofH = ndofH + Norder(i)-1; ndofE = ndofE + Norder(i)
+      enddo
+!
+      select case(Kref)
+!
+!  ...isotropic refinement
+      case(11)
+!  
+      select case(Nson)
+!
+!  ...mid-face sons
+      case(1,2,3,4)
+        select case(Nson)
+        case(1); i=1;j=1
+        case(2); i=2;j=1
+        case(3); i=2;j=2
+        case(4); i=1;j=2
+        end select
+        coeffH1(1:nord1-1,1:nord1-1) = RRRH(1,1:nord1-1,i,1:nord1-1)
+        coeffH2(1:nord2-1,1:nord2-1) = RRRH(1,1:nord2-1,j,1:nord2-1)
+        call transform2(Xnod(1,naH(5)+1),NDIMEN,nord1-1,nord2-1, &
+                        coeffH1,coeffH2,  &
+                        Xnod_son,nord1-1,nord2-1)
+        call transform2(DofH(1,naH(5)+1),NvarH,nord1-1,nord2-1, &
+                        coeffH1,coeffH2,  &
+                        DofH_son,nord1-1,nord2-1)
+        coeffE1(1:nord1,1:nord1) = RRRE(1,1:nord1,i,1:nord1)
+        coeffE2(1:nord2,1:nord2) = RRRE(1,1:nord2,j,1:nord2)
+        call transform2(DofE(1,naE(5)+1),NvarE,nord1,nord2-1, &
+                        coeffE1,coeffH2,  &
+                        DofE_son,nord1,nord2-1)
+        call transform2(DofE(1,naE(5)+nord1*(nord2-1)),NvarE,nord1-1,nord2, &
+                        coeffH1,coeffE2,  &
+                        DofE_son(1,nord1*(nord2-1)+1),nord1-1,nord2)
+        call transform2(DofV,NvarV,nord1,nord2, &
+                        coeffE1,coeffE2,  &
+                        DofV_son,nord1,nord2)
+!
+!  ...fourth or second mid-edge son
+      case(8,6)
+        select case(Nson)
+        case(8); i=1
+        case(6); i=2
+        end select
+        coeffH1(1:nord1-1,1:nord1-1) = RRRH(1,1:nord1-1,i,1:nord1-1)
+        coeffH2(1:nord2-1,1) = RRRH(1,1:nord2-1,3,1)
+        call transform2(Xnod(1,naH(5)+1),NDIMEN,nord1-1,nord2-1, &
+                        coeffH1,coeffH2,  &
+                        Xnod_son,nord1-1,1)
+        call transform2(Xnod(1,naH(1)+1),NDIMEN,Norder(1)-1,1, &
+                        coeffH1,.5d0,  &
+                        Xnod_son,Norder(1)-1,1)
+        call transform2(Xnod(1,naH(3)+1),NDIMEN,Norder(3)-1,1, &
+                        coeffH1,.5d0,  &
+                        Xnod_son,Norder(3)-1,1)
+!
+        call transform2(DofH(1,naH(5)+1),NvarH,nord1-1,nord2-1, &
+                        coeffH1,coeffH2,  &
+                        DofH_son,nord1-1,1)
+        call transform2(DofH(1,naH(1)+1),NvarH,Norder(1)-1,1, &
+                        coeffH1,.5d0,  &
+                        DofH_son,Norder(1)-1,1)
+        call transform2(DofH(1,naH(3)+1),NvarH,Norder(3)-1,1, &
+                        coeffH1,.5d0,  &
+                        DofH_son,Norder(3)-1,1)
+!
+        coeffE1(1:nord1,1:nord1) = RRRE(1,1:nord1,i,1:nord1)
+        call transform2(DofE(1,naE(5)+1),NvarE,nord1,nord2-1, &
+                        coeffE1,coeffH2,  &
+                        DofE_son,nord1,1)
+        call transform2(DofE(1,naE(1)+1),NvarE,Norder(1),1, &
+                        coeffE1,.5d0,  &
+                        DofE_son,Norder(1),1)
+        call transform2(DofE(1,naE(3)+1),NvarE,Norder(3),1, &
+                        coeffE1,.5d0,  &
+                        DofE_son,Norder(3),1)
+!
+!  ...first or third mid-edge son
+      case(5,7)
+        select case(Nson)
+        case(5); j=1
+        case(7); j=2
+        end select
+        coeffH1(1:nord1-1,1) = RRRH(1,1:nord1-1,3,1)
+        coeffH2(1:nord2-1,1:nord2-1) = RRRH(1,1:nord2-1,j,1:nord2-1)
+        call transform2(Xnod(1,naH(5)+1),NDIMEN,nord1-1,nord2-1, &
+                        coeffH1,coeffH2,  &
+                        Xnod_son,1,nord2-1)
+        call transform2(Xnod(1,naH(2)+1),NDIMEN,1,Norder(2)-1, &
+                        .5d0,coeffH2,  &
+                        Xnod_son,1,Norder(2)-1)
+        call transform2(Xnod(1,naH(4)+1),NDIMEN,1,Norder(4)-1, &
+                        .5d0,coeffH2,  &
+                        Xnod_son,1,Norder(4)-1)
+!
+        call transform2(DofH(1,naH(5)+1),NvarH,nord1-1,nord2-1, &
+                        coeffH1,coeffH2,  &
+                        DofH_son,1,nord2-1)
+        call transform2(DofH(1,naH(2)+1),NvarH,1,Norder(2)-1, &
+                        .5d0,coeffH2,  &
+                        DofH_son,1,Norder(2)-1)
+        call transform2(DofH(1,naH(4)+1),NvarH,1,Norder(4)-1, &
+                        .5d0,coeffH2,  &
+                        DofH_son,1,Norder(4)-1)
+!
+        coeffE2(1:nord2,1:nord2) = RRRE(1,1:nord2,j,1:nord2)
+        call transform2(DofE(1,naE(5)+nord1*(nord2-1)+1),NvarE,nord1-1,nord2, &
+                        coeffE1,coeffH2,  &
+                        DofE_son,1,nord2)
+        call transform2(DofE(1,naE(2)+1),NvarE,1,Norder(2), &
+                        .5d0,coeffE2,  &
+                        DofE_son,1,Norder(2))
+        call transform2(DofE(1,naE(4)+1),NvarE,1,Norder(2), &
+                        .5d0,coeffE2,  &
+                        DofE_son,1,Norder(4))
+!
+!  ...vertex son
+      case(9)
+        coeffH1(1:nord1-1,1) = RRRH(1,1:nord1-1,3,1)
+        coeffH2(1:nord2-1,1) = RRRH(1,1:nord2-1,3,1)
+        call transform2(Xnod(1,naH(5)+1),NDIMEN,nord1-1,nord2-1, &
+                        coeffH1,coeffH2,  &
+                        Xnod_son,1,1)
+        call transform2(Xnod(1,naH(1)+1),NDIMEN,Norder(1)-1,1, &
+                        coeffH1,.5d0,  &
+                        Xnod_son,1,1)
+        call transform2(Xnod(1,naH(3)+1),NDIMEN,Norder(3)-1,1, &
+                        coeffH1,.5d0,  &
+                        Xnod_son,1,1)
+        call transform2(Xnod(1,naH(2)+1),NDIMEN,1,Norder(2)-1, &
+                        .5d0,coeffH2,  &
+                        Xnod_son,1,1)
+        call transform2(Xnod(1,naH(4)+1),NDIMEN,1,Norder(4)-1, &
+                        .5d0,coeffH2,  &
+                        Xnod_son,1,1)
+        do j=1,4
+          Xnod_son(1:NDIMEN,1) = Xnod_son(1:NDIMEN,1) &
+                               + Xnod(1:NDIMEN,j)*.25d0
+        enddo
+!
+        call transform2(DofH(1,naH(5)+1),NvarH,nord1-1,nord2-1, &
+                        coeffH1,coeffH2,  &
+                        DofH_son,1,1)
+        call transform2(DofH(1,naH(1)+1),NvarH,Norder(1)-1,1, &
+                        coeffH1,.5d0,  &
+                        DofH_son,1,1)
+        call transform2(DofH(1,naH(3)+1),NvarH,Norder(3)-1,1, &
+                        coeffH1,.5d0,  &
+                        DofH_son,1,1)
+        call transform2(DofH(1,naH(2)+1),NvarH,1,Norder(2)-1, &
+                        .5d0,coeffH2,  &
+                        DofH_son,1,1)
+        call transform2(DofH(1,naH(4)+1),NvarH,1,Norder(4)-1, &
+                        .5d0,coeffH2,  &
+                        DofH_son,1,1)
+        do j=1,4
+          DofH_son(1:NvarH,1) = DofH_son(1:NvarH,1) &
+                                + DofH(1:NvarH,j)*.25d0
+        enddo
+      end select
+!
+!  ...anisotropic refinement across the first axis
+      case(10)
+        select case(Nson)
+!
+!  .....mid-face sons
+        case(1,2)
+          coeffH1(1:nord1-1,1:nord1-1) = RRRH(1,1:nord1-1,Nson,1:nord1-1)
+          coeffH2(1:nord2-1,1:nord2-1) = 0.d0
+          do i=1,nord2-1
+            coeffH2(i,i) = 1.d0
+          enddo
+          call transform2(Xnod(1,naH(5)+1),NDIMEN,nord1-1,nord2-1, &
+                          coeffH1,coeffH2,  &
+                          Xnod_son,nord1-1,nord2-1)
+          call transform2(DofH(1,naH(5)+1),NvarH,nord1-1,nord2-1, &
+                          coeffH1,coeffH2,  &
+                          DofH_son,nord1-1,nord2-1)
+          coeffE1(1:nord1,1:nord1) = RRRE(1,1:nord1,Nson,1:nord1)
+          coeffE2(1:nord2,1:nord2) = 0.d0
+          do i=1,nord2
+            coeffE2(i,i) = 1.d0
+          enddo
+          call transform2(DofE(1,naE(5)+1),NvarE,nord1,nord2-1, &
+                          coeffE1,coeffH2,  &
+                          DofE_son,nord1,nord2-1)
+          call transform2(DofE(1,naE(5)+nord1*(nord2-1)),NvarE,nord1-1,nord2, &
+                          coeffH1,coeffE2,  &
+                          DofE_son(1,nord1*(nord2-1)+1),nord1-1,nord2)
+          call transform2(DofV,NvarV,nord1,nord2, &
+                          coeffE1,coeffE2,  &
+                          DofV_son,nord1,nord2)
+!
+!  .....mid-edge son
+        case(3)
+          coeffH1(1:nord1-1,1) = RRRH(1,1:nord1-1,3,1)
+          coeffH2(1:nord2-1,1:nord2-1) = 0.d0
+          do i=1,nord2-1
+            coeffH2(i,i) = 1.d0
+          enddo
+          call transform2(Xnod(1,naH(5)+1),NDIMEN,nord1-1,nord2-1, &
+                          coeffH1,coeffH2,  &
+                          Xnod_son,1,nord2-1)
+          call transform2(Xnod(1,naH(2)+1),NDIMEN,1,Norder(2)-1, &
+                          .5d0,coeffH2,  &
+                          Xnod_son,1,Norder(2)-1)
+          call transform2(Xnod(1,naH(4)+1),NDIMEN,1,Norder(4)-1, &
+                          .5d0,coeffH2,  &
+                          Xnod_son,1,Norder(4)-1)
+!
+          call transform2(DofH(1,naH(5)+1),NvarH,nord1-1,nord2-1, &
+                          coeffH1,coeffH2,  &
+                          DofH_son,1,nord2-1)
+          call transform2(DofH(1,naH(2)+1),NvarH,1,Norder(2)-1, &
+                          .5d0,coeffH2,  &
+                          DofH_son,1,Norder(2)-1)
+          call transform2(DofH(1,naH(4)+1),NvarH,1,Norder(4)-1, &
+                          .5d0,coeffH2,  &
+                          DofH_son,1,Norder(4)-1)
+!
+          coeffE2(1:nord2,1:nord2) = 0.d0
+          do i=1,nord2
+            coeffE2(i,i) = 1.d0
+          enddo
+          call transform2(DofE(1,naE(5)+nord1*(nord2-1)+1),NvarE,nord1-1,nord2, &
+                          coeffE1,coeffH2,  &
+                          DofE_son,1,nord2)
+          call transform2(DofE(1,naE(2)+1),NvarE,1,Norder(2), &
+                          .5d0,coeffE2,  &
+                          DofE_son,1,Norder(2))
+          call transform2(DofE(1,naE(4)+1),NvarE,1,Norder(2), &
+                          .5d0,coeffE2,  &
+                          DofE_son,1,Norder(4))
+        end select
+!
+!  ...anisotropic refinement across the second axis
+      case(01)
+        select case(Nson)
+!
+!  .....mid-face sons
+        case(1,2)
+          coeffH1(1:nord1-1,1:nord1-1) = 0.d0
+          do i=1,nord1-1
+            coeffH1(i,i) = 1.d0
+          enddo
+          coeffH2(1:nord2-1,1:nord2-1) = RRRH(1,1:nord2-1,Nson,1:nord2-1)
+          call transform2(Xnod(1,naH(5)+1),NDIMEN,nord1-1,nord2-1, &
+                          coeffH1,coeffH2,  &
+                          Xnod_son,nord1-1,nord2-1)
+          call transform2(DofH(1,naH(5)+1),NvarH,nord1-1,nord2-1, &
+                          coeffH1,coeffH2,  &
+                          DofH_son,nord1-1,nord2-1)
+          coeffE1(1:nord1,1:nord1) = 0.d0
+          do i=1,nord1
+            coeffE1(i,i) = 1.d0
+          enddo
+          coeffE2(1:nord2,1:nord2) = RRRE(1,1:nord2,Nson,1:nord2)
+          call transform2(DofE(1,naE(5)+1),NvarE,nord1,nord2-1, &
+                          coeffE1,coeffH2,  &
+                          DofE_son,nord1,nord2-1)
+          call transform2(DofE(1,naE(5)+nord1*(nord2-1)),NvarE,nord1-1,nord2, &
+                          coeffH1,coeffE2,  &
+                          DofE_son(1,nord1*(nord2-1)+1),nord1-1,nord2)
+          call transform2(DofV,NvarV,nord1,nord2, &
+                          coeffE1,coeffE2,  &
+                          DofV_son,nord1,nord2)
+!
+!  .....mid-edge son
+        case(3)
+          coeffH1(1:nord1-1,1:nord1-1) = 0.d0
+          do i=1,nord1-1
+            coeffH1(i,i) = 1.d0
+          enddo
+          coeffH2(1:nord2-1,1) = RRRH(1,1:nord2-1,3,1)
+          call transform2(Xnod(1,naH(5)+1),NDIMEN,nord1-1,nord2-1, &
+                          coeffH1,coeffH2,  &
+                          Xnod_son,nord1-1,1)
+          call transform2(Xnod(1,naH(1)+1),NDIMEN,Norder(1)-1,1, &
+                          coeffH1,.5d0,  &
+                          Xnod_son,Norder(1)-1,1)
+          call transform2(Xnod(1,naH(3)+1),NDIMEN,Norder(3)-1,1, &
+                          coeffH1,.5d0,  &
+                          Xnod_son,Norder(3)-1,1)
+!
+          call transform2(DofH(1,naH(5)+1),NvarH,nord1-1,nord2-1, &
+                          coeffH1,coeffH2,  &
+                          DofH_son,nord1-1,1)
+          call transform2(DofH(1,naH(1)+1),NvarH,Norder(1)-1,1, &
+                          coeffH1,.5d0,  &
+                          DofH_son,Norder(1)-1,1)
+          call transform2(DofH(1,naH(3)+1),NvarH,Norder(3)-1,1, &
+                          coeffH1,.5d0,  &
+                          DofH_son,Norder(3)-1,1)
+!
+          coeffE1(1:nord1,1:nord1) = 0.d0
+          do i=1,nord1
+            coeffE1(i,i) = 1.d0
+          enddo
+          call transform2(DofE(1,naE(5)+1),NvarE,nord1,nord2-1, &
+                          coeffE1,coeffH2,  &
+                          DofE_son,nord1,1)
+          call transform2(DofE(1,naE(1)+1),NvarE,Norder(1),1, &
+                          coeffE1,.5d0,  &
+                          DofE_son,Norder(1),1)
+          call transform2(DofE(1,naE(3)+1),NvarE,Norder(3),1, &
+                          coeffE1,.5d0,  &
+                          DofE_son,Norder(3),1)
+        end select
+!  
+      end select
+
+!
+!
+      end subroutine initiate_mdlq_dof
+
+
+      subroutine transform2(Uu,M,Iu,Ju,Coeff1,Coeff2, Vv,Iv,Jv)
+      use parameters, only: ZERO
+      implicit none
+!
+      integer,                   intent(in)  :: M,Iu,Ju,Iv,Jv
+      VTYPE, dimension(M,Iu,Ju), intent(in)  :: Uu
+      VTYPE, dimension(Iu,Iv),   intent(in)  :: Coeff1
+      VTYPE, dimension(Ju,Jv),   intent(in)  :: Coeff2
+      VTYPE, dimension(M,Iv,Jv), intent(out) :: Vv
+!
+      integer :: i,j
+      VTYPE, dimension(M,Ju,Iv)  :: aa
+!
+      aa = ZERO
+      do i=1,Iu
+        do j=1,Iv
+          aa(1:M,1:Ju,j) = aa(1:M,1:Ju,j) &
+                         + Uu(1:M,j,1:Ju)*Coeff1(i,j)
+        enddo
+      enddo
+      do i=1,Ju
+        do j=1,Jv
+          Vv(1:M,1:Iv,j) = Vv(1:M,1:Iv,j) &
+                         + aa(1:M,i,1:Iv)*Coeff2(i,j)
+        enddo
+      enddo
+!
+      end subroutine transform2
+

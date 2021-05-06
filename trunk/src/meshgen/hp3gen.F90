@@ -649,7 +649,7 @@ subroutine hp3gen(Fp)
            ! physics attribute label
            phys = ELEMS(nel)%physics(iphys)
            !
-           !  .........check if on the list of the physics attributes for the node
+           !  .........check if on the list of physics attributes for the node
            call locate_char(phys,phys_vect,num, number)
            if (number.eq.0) then
               num=num+1

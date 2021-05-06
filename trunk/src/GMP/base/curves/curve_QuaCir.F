@@ -24,6 +24,7 @@ c
 c
       use GMP
 #include "syscom.blk"
+ccc      common /common_curve_QuaCir/ iprint
 c
       dimension X(3),Dxdeta(3)
 c
@@ -51,7 +52,6 @@ c
         write(*,*)'No,Eta = ',No,Eta
 ccc        write(*,7002) No, Eta
 ccc 7002   format(' curve_QuaCir: No,Eta = ',i4,2x,f8.3)
-        call pause
       endif
 c
 c  ...get the endpoints coordinates
@@ -69,6 +69,9 @@ c  ...evaluate the radius
         rad = rad + (xv(i,1) - center(i))**2
       enddo
       rad = sqrt(rad)
+      if (iprint.eq.1) then
+        write(*,*) 'curve_QuaCir: rad = ',rad
+      endif
 c
 c  ...evaluate the transformation matrix
       do i=1,3
@@ -123,6 +126,7 @@ c  ...printing
         write(*,7004) Dxdeta(1:3)
  7003   format(' X      = ',3(e12.5,2x))
  7004   format(' Dxdeta = ',3(e12.5,2x))
+        call pause
       endif
 c
 c

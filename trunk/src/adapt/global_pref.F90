@@ -53,12 +53,15 @@ subroutine global_pref
 !         enddo
 !      endif
 !     -------- end setting subdomain for distributed mesh
+!!!      write(*,*) 'global_pref: CALLING nodmod'
       call nodmod(mdle,nord)
    enddo
 !$OMP END PARALLEL DO
 !
 !..raise order of approximation on non-middle nodes by enforcing minimum rule
+   write(*,*) 'global_pref: CALLING enforce_min_rule'; call pause
    call enforce_min_rule
+   write(*,*) 'global_pref: AFTER CALL TO enforce_min_rule'; call pause
 !
 end subroutine global_pref
 !

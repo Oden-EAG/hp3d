@@ -102,6 +102,9 @@ ENDIF
 
      !  ...testing "neig_face" routine
      call verify_neig
+     
+     !  ...testing "neig_edge" routine
+     call verify_neig_edge
 
      !  ...if last iteration, print
      if (i.eq.Nitr) then
@@ -117,7 +120,7 @@ ENDIF
 
 !    dump to Paraview for visualization
      mode_save = QUIET_MODE
-     call paraview_driver
+!!!     call paraview_driver
      QUIET_MODE = mode_save
 !
   enddo

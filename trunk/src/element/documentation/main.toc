@@ -1,0 +1,243 @@
+\babel@toc {english}{}
+\contentsline {section}{\numberline {1}Preliminaries}{1}{section.1}% 
+\contentsline {subsection}{\numberline {1.1}Introduction}{1}{subsection.1.1}% 
+\contentsline {subsection}{\numberline {1.2}Energy Spaces and Exact Sequences}{2}{subsection.1.2}% 
+\contentsline {paragraph}{1D Exact Sequence.}{2}{section*.3}% 
+\contentsline {paragraph}{2D Exact Sequence.}{3}{section*.4}% 
+\contentsline {paragraph}{3D Exact Sequence.}{3}{section*.5}% 
+\contentsline {subsection}{\numberline {1.3}Shape Functions}{4}{subsection.1.3}% 
+\contentsline {subsection}{\numberline {1.4}Hierarchy in $p$}{4}{subsection.1.4}% 
+\contentsline {subsection}{\numberline {1.5}Traces and Compatibility}{5}{subsection.1.5}% 
+\contentsline {subsection}{\numberline {1.6}Embedded Sequences and Dimensional Hierarchy}{6}{subsection.1.6}% 
+\contentsline {subsection}{\numberline {1.7}Basic Properties of Shape Functions}{7}{subsection.1.7}% 
+\contentsline {subsubsection}{\numberline {1.7.1}1D}{7}{subsubsection.1.7.1}% 
+\contentsline {paragraph}{$H^1$.}{7}{section*.7}% 
+\contentsline {paragraph}{$L^2$.}{8}{section*.10}% 
+\contentsline {subsubsection}{\numberline {1.7.2}2D}{8}{subsubsection.1.7.2}% 
+\contentsline {paragraph}{$H^1$.}{9}{section*.11}% 
+\contentsline {paragraph}{$H(\mathrm {curl})$.}{9}{section*.14}% 
+\contentsline {paragraph}{$L^2$.}{10}{section*.15}% 
+\contentsline {subsubsection}{\numberline {1.7.3}3D}{10}{subsubsection.1.7.3}% 
+\contentsline {paragraph}{$H^1$.}{10}{section*.16}% 
+\contentsline {paragraph}{$H(\mathrm {curl})$.}{11}{section*.17}% 
+\contentsline {paragraph}{$H(\mathrm {div})$.}{11}{section*.18}% 
+\contentsline {paragraph}{$L^2$.}{11}{section*.19}% 
+\contentsline {subsection}{\numberline {1.8}Orientation Embedded Shape Functions}{11}{subsection.1.8}% 
+\contentsline {subsection}{\numberline {1.9}Affine Coordinates}{12}{subsection.1.9}% 
+\contentsline {subsection}{\numberline {1.10}Outline}{13}{subsection.1.10}% 
+\contentsline {subsection}{\numberline {1.11}Previous Work}{14}{subsection.1.11}% 
+\contentsline {section}{\numberline {2}Polynomials Prelude}{15}{section.2}% 
+\contentsline {subsection}{\numberline {2.1}Notation}{15}{subsection.2.1}% 
+\contentsline {subsection}{\numberline {2.2}Scaled Polynomials}{15}{subsection.2.2}% 
+\contentsline {subsection}{\numberline {2.3}Legendre Polynomials}{15}{subsection.2.3}% 
+\contentsline {paragraph}{Shifting.}{16}{section*.22}% 
+\contentsline {paragraph}{Scaling.}{16}{section*.23}% 
+\contentsline {paragraph}{Integrated Legendre Polynomials.}{17}{section*.24}% 
+\contentsline {subsection}{\numberline {2.4}Jacobi Polynomials}{18}{subsection.2.4}% 
+\contentsline {paragraph}{Integrated Jacobi Polynomials.}{18}{section*.25}% 
+\contentsline {subsection}{\numberline {2.5}Homogenization}{19}{subsection.2.5}% 
+\contentsline {section}{\numberline {3}Segment}{21}{section.3}% 
+\contentsline {subsection}{\numberline {3.1}$H^1$ Shape Functions}{21}{subsection.3.1}% 
+\contentsline {subsubsection}{\numberline {3.1.1}$H^1$ Vertices}{21}{subsubsection.3.1.1}% 
+\contentsline {subsubsection}{\numberline {3.1.2}$H^1$ Edge Bubbles}{22}{subsubsection.3.1.2}% 
+\contentsline {subsection}{\numberline {3.2}$L^2$ Shape Functions}{23}{subsection.3.2}% 
+\contentsline {subsubsection}{\numberline {3.2.1}$L^2$ Edges}{24}{subsubsection.3.2.1}% 
+\contentsline {subsection}{\numberline {3.3}Orientations}{24}{subsection.3.3}% 
+\contentsline {subsubsection}{\numberline {3.3.1}Edge Orientations Explained}{24}{subsubsection.3.3.1}% 
+\contentsline {section}{\numberline {4}Quadrilateral}{26}{section.4}% 
+\contentsline {subsection}{\numberline {4.1}$H^1$ Shape Functions}{27}{subsection.4.1}% 
+\contentsline {subsubsection}{\numberline {4.1.1}$H^1$ Vertices}{27}{subsubsection.4.1.1}% 
+\contentsline {subsubsection}{\numberline {4.1.2}$H^1$ Edges}{27}{subsubsection.4.1.2}% 
+\contentsline {subsubsection}{\numberline {4.1.3}$H^1$ Face Bubbles}{29}{subsubsection.4.1.3}% 
+\contentsline {subsection}{\numberline {4.2}$H(\mathrm {curl})$ Shape Functions}{29}{subsection.4.2}% 
+\contentsline {subsubsection}{\numberline {4.2.1}$H(\mathrm {curl})$ Edges}{30}{subsubsection.4.2.1}% 
+\contentsline {subsubsection}{\numberline {4.2.2}$H(\mathrm {curl})$ Face Bubbles}{31}{subsubsection.4.2.2}% 
+\contentsline {subparagraph}{Family I:}{32}{section*.32}% 
+\contentsline {subparagraph}{Family II:}{32}{section*.33}% 
+\contentsline {subsection}{\numberline {4.3}$H(\mathrm {div})$ Shape Functions}{32}{subsection.4.3}% 
+\contentsline {subsection}{\numberline {4.4}$L^2$ Shape Functions}{33}{subsection.4.4}% 
+\contentsline {subsubsection}{\numberline {4.4.1}$L^2$ Face}{33}{subsubsection.4.4.1}% 
+\contentsline {subsection}{\numberline {4.5}Orientations}{33}{subsection.4.5}% 
+\contentsline {subsubsection}{\numberline {4.5.1}Edge Orientations}{33}{subsubsection.4.5.1}% 
+\contentsline {subsubsection}{\numberline {4.5.2}Quadrilateral Face Orientations Explained}{35}{subsubsection.4.5.2}% 
+\contentsline {section}{\numberline {5}Triangle}{37}{section.5}% 
+\contentsline {subsection}{\numberline {5.1}$H^1$ Shape Functions}{38}{subsection.5.1}% 
+\contentsline {subsubsection}{\numberline {5.1.1}$H^1$ Vertices}{38}{subsubsection.5.1.1}% 
+\contentsline {subsubsection}{\numberline {5.1.2}$H^1$ Edges}{38}{subsubsection.5.1.2}% 
+\contentsline {subsubsection}{\numberline {5.1.3}$H^1$ Face Bubbles}{40}{subsubsection.5.1.3}% 
+\contentsline {subsection}{\numberline {5.2}$H(\mathrm {curl})$ Shape Functions}{41}{subsection.5.2}% 
+\contentsline {subsubsection}{\numberline {5.2.1}$H(\mathrm {curl})$ Edges}{42}{subsubsection.5.2.1}% 
+\contentsline {subsubsection}{\numberline {5.2.2}$H(\mathrm {curl})$ Face Bubbles}{43}{subsubsection.5.2.2}% 
+\contentsline {subparagraph}{Family I:}{43}{section*.40}% 
+\contentsline {subparagraph}{Family II:}{44}{section*.41}% 
+\contentsline {subsection}{\numberline {5.3}$H(\mathrm {div})$ Shape Functions}{44}{subsection.5.3}% 
+\contentsline {subsection}{\numberline {5.4}$L^2$ Shape Functions}{44}{subsection.5.4}% 
+\contentsline {subsubsection}{\numberline {5.4.1}$L^2$ Face}{44}{subsubsection.5.4.1}% 
+\contentsline {subsection}{\numberline {5.5}Orientations}{44}{subsection.5.5}% 
+\contentsline {subsubsection}{\numberline {5.5.1}Edge Orientations}{45}{subsubsection.5.5.1}% 
+\contentsline {subsubsection}{\numberline {5.5.2}Triangle Face Orientations Explained}{45}{subsubsection.5.5.2}% 
+\contentsline {section}{\numberline {6}Hexahedron}{48}{section.6}% 
+\contentsline {subsection}{\numberline {6.1}$H^1$ Shape Functions}{49}{subsection.6.1}% 
+\contentsline {subsubsection}{\numberline {6.1.1}$H^1$ Vertices}{49}{subsubsection.6.1.1}% 
+\contentsline {subsubsection}{\numberline {6.1.2}$H^1$ Edges}{49}{subsubsection.6.1.2}% 
+\contentsline {subsubsection}{\numberline {6.1.3}$H^1$ Faces}{50}{subsubsection.6.1.3}% 
+\contentsline {subsubsection}{\numberline {6.1.4}$H^1$ Interior Bubbles}{51}{subsubsection.6.1.4}% 
+\contentsline {subsection}{\numberline {6.2}$H(\mathrm {curl})$ Shape Functions}{51}{subsection.6.2}% 
+\contentsline {subsubsection}{\numberline {6.2.1}$H(\mathrm {curl})$ Edges}{51}{subsubsection.6.2.1}% 
+\contentsline {subsubsection}{\numberline {6.2.2}$H(\mathrm {curl})$ Faces}{52}{subsubsection.6.2.2}% 
+\contentsline {subparagraph}{Family I:}{52}{section*.47}% 
+\contentsline {subparagraph}{Family II:}{52}{section*.48}% 
+\contentsline {subsubsection}{\numberline {6.2.3}$H(\mathrm {curl})$ Interior Bubbles}{52}{subsubsection.6.2.3}% 
+\contentsline {subsection}{\numberline {6.3}$H(\mathrm {div})$ Shape Functions}{52}{subsection.6.3}% 
+\contentsline {subsubsection}{\numberline {6.3.1}$H(\mathrm {div})$ Faces}{53}{subsubsection.6.3.1}% 
+\contentsline {subsubsection}{\numberline {6.3.2}$H(\mathrm {div})$ Interior Bubbles}{54}{subsubsection.6.3.2}% 
+\contentsline {subsection}{\numberline {6.4}$L^2$ Shape Functions}{54}{subsection.6.4}% 
+\contentsline {subsubsection}{\numberline {6.4.1}$L^2$ Interior}{54}{subsubsection.6.4.1}% 
+\contentsline {subsection}{\numberline {6.5}Orientations}{54}{subsection.6.5}% 
+\contentsline {section}{\numberline {7}Tetrahedron}{56}{section.7}% 
+\contentsline {subsection}{\numberline {7.1}$H^1$ Shape Functions}{57}{subsection.7.1}% 
+\contentsline {subsubsection}{\numberline {7.1.1}$H^1$ Vertices}{57}{subsubsection.7.1.1}% 
+\contentsline {subsubsection}{\numberline {7.1.2}$H^1$ Edges}{57}{subsubsection.7.1.2}% 
+\contentsline {subsubsection}{\numberline {7.1.3}$H^1$ Faces}{58}{subsubsection.7.1.3}% 
+\contentsline {subsubsection}{\numberline {7.1.4}$H^1$ Interior Bubbles}{58}{subsubsection.7.1.4}% 
+\contentsline {subsection}{\numberline {7.2}$H(\mathrm {curl})$ Shape Functions}{59}{subsection.7.2}% 
+\contentsline {subsubsection}{\numberline {7.2.1}$H(\mathrm {curl})$ Edges}{59}{subsubsection.7.2.1}% 
+\contentsline {subsubsection}{\numberline {7.2.2}$H(\mathrm {curl})$ Faces}{59}{subsubsection.7.2.2}% 
+\contentsline {subparagraph}{Family I:}{60}{section*.53}% 
+\contentsline {subparagraph}{Family II:}{60}{section*.54}% 
+\contentsline {subsubsection}{\numberline {7.2.3}$H(\mathrm {curl})$ Interior Bubbles}{60}{subsubsection.7.2.3}% 
+\contentsline {subsection}{\numberline {7.3}$H(\mathrm {div})$ Shape Functions}{60}{subsection.7.3}% 
+\contentsline {subsubsection}{\numberline {7.3.1}$H(\mathrm {div})$ Faces}{61}{subsubsection.7.3.1}% 
+\contentsline {subsubsection}{\numberline {7.3.2}$H(\mathrm {div})$ Interior Bubbles}{63}{subsubsection.7.3.2}% 
+\contentsline {subsection}{\numberline {7.4}$L^2$ Shape Functions}{63}{subsection.7.4}% 
+\contentsline {subsubsection}{\numberline {7.4.1}$L^2$ Interior}{63}{subsubsection.7.4.1}% 
+\contentsline {subsection}{\numberline {7.5}Orientations}{64}{subsection.7.5}% 
+\contentsline {section}{\numberline {8}Prism}{65}{section.8}% 
+\contentsline {subsection}{\numberline {8.1}$H^1$ Shape Functions}{66}{subsection.8.1}% 
+\contentsline {subsubsection}{\numberline {8.1.1}$H^1$ Vertices}{66}{subsubsection.8.1.1}% 
+\contentsline {subsubsection}{\numberline {8.1.2}$H^1$ Edges}{67}{subsubsection.8.1.2}% 
+\contentsline {paragraph}{$H^1$ Mixed Edges.}{67}{section*.58}% 
+\contentsline {paragraph}{$H^1$ Quadrilateral Edges.}{68}{section*.60}% 
+\contentsline {subsubsection}{\numberline {8.1.3}$H^1$ Faces}{69}{subsubsection.8.1.3}% 
+\contentsline {paragraph}{$H^1$ Triangle Faces.}{69}{section*.62}% 
+\contentsline {paragraph}{$H^1$ Quadrilateral Faces.}{69}{section*.63}% 
+\contentsline {subsubsection}{\numberline {8.1.4}$H^1$ Interior Bubbles}{69}{subsubsection.8.1.4}% 
+\contentsline {subsection}{\numberline {8.2}$H(\mathrm {curl})$ Shape Functions}{70}{subsection.8.2}% 
+\contentsline {subsubsection}{\numberline {8.2.1}$H(\mathrm {curl})$ Edges}{70}{subsubsection.8.2.1}% 
+\contentsline {paragraph}{$H(\mathrm {curl})$ Mixed Edges.}{70}{section*.64}% 
+\contentsline {paragraph}{$H(\mathrm {curl})$ Quadrilateral Edges.}{71}{section*.65}% 
+\contentsline {subsubsection}{\numberline {8.2.2}$H(\mathrm {curl})$ Faces}{71}{subsubsection.8.2.2}% 
+\contentsline {paragraph}{$H(\mathrm {curl})$ Triangle Faces.}{71}{section*.66}% 
+\contentsline {subparagraph}{Family I:}{72}{section*.67}% 
+\contentsline {subparagraph}{Family II:}{72}{section*.68}% 
+\contentsline {paragraph}{$H(\mathrm {curl})$ Quadrilateral Faces.}{72}{section*.69}% 
+\contentsline {subparagraph}{Family I:}{72}{section*.70}% 
+\contentsline {subparagraph}{Family II:}{72}{section*.71}% 
+\contentsline {subsubsection}{\numberline {8.2.3}$H(\mathrm {curl})$ Interior Bubbles}{73}{subsubsection.8.2.3}% 
+\contentsline {subparagraph}{Family I:}{73}{section*.72}% 
+\contentsline {subparagraph}{Family II:}{73}{section*.73}% 
+\contentsline {subparagraph}{Family III:}{73}{section*.74}% 
+\contentsline {subsection}{\numberline {8.3}$H(\mathrm {div})$ Shape Functions}{73}{subsection.8.3}% 
+\contentsline {subsubsection}{\numberline {8.3.1}$H(\mathrm {div})$ Faces}{74}{subsubsection.8.3.1}% 
+\contentsline {paragraph}{$H(\mathrm {div})$ Triangle Faces.}{74}{section*.75}% 
+\contentsline {paragraph}{$H(\mathrm {div})$ Quadrilateral Faces.}{74}{section*.76}% 
+\contentsline {subsubsection}{\numberline {8.3.2}$H(\mathrm {div})$ Interior Bubbles}{75}{subsubsection.8.3.2}% 
+\contentsline {subparagraph}{Family I:}{75}{section*.77}% 
+\contentsline {subparagraph}{Family II:}{75}{section*.78}% 
+\contentsline {subparagraph}{Family III:}{75}{section*.79}% 
+\contentsline {subsection}{\numberline {8.4}$L^2$ Shape Functions}{75}{subsection.8.4}% 
+\contentsline {subsubsection}{\numberline {8.4.1}$L^2$ Interior}{75}{subsubsection.8.4.1}% 
+\contentsline {subsection}{\numberline {8.5}Orientations}{76}{subsection.8.5}% 
+\contentsline {section}{\numberline {9}Pyramid}{77}{section.9}% 
+\contentsline {subsection}{\numberline {9.1}$H^1$ Shape Functions}{81}{subsection.9.1}% 
+\contentsline {subsubsection}{\numberline {9.1.1}$H^1$ Vertices}{81}{subsubsection.9.1.1}% 
+\contentsline {subsubsection}{\numberline {9.1.2}$H^1$ Edges}{82}{subsubsection.9.1.2}% 
+\contentsline {paragraph}{$H^1$ Mixed Edges.}{82}{section*.83}% 
+\contentsline {paragraph}{$H^1$ Triangle Edges.}{83}{section*.85}% 
+\contentsline {subsubsection}{\numberline {9.1.3}$H^1$ Faces}{84}{subsubsection.9.1.3}% 
+\contentsline {paragraph}{$H^1$ Quadrilateral Face.}{84}{section*.88}% 
+\contentsline {paragraph}{$H^1$ Triangle Faces.}{85}{section*.89}% 
+\contentsline {subsubsection}{\numberline {9.1.4}$H^1$ Interior Bubbles}{85}{subsubsection.9.1.4}% 
+\contentsline {subsection}{\numberline {9.2}$H(\mathrm {curl})$ Shape Functions}{86}{subsection.9.2}% 
+\contentsline {subsubsection}{\numberline {9.2.1}$H(\mathrm {curl})$ Edges}{86}{subsubsection.9.2.1}% 
+\contentsline {paragraph}{$H(\mathrm {curl})$ Mixed Edges.}{86}{section*.90}% 
+\contentsline {paragraph}{$H(\mathrm {curl})$ Triangle Edges.}{86}{section*.91}% 
+\contentsline {subsubsection}{\numberline {9.2.2}$H(\mathrm {curl})$ Faces}{87}{subsubsection.9.2.2}% 
+\contentsline {paragraph}{$H(\mathrm {curl})$ Quadrilateral Face.}{87}{section*.92}% 
+\contentsline {subparagraph}{Family I:}{87}{section*.93}% 
+\contentsline {subparagraph}{Family II:}{88}{section*.94}% 
+\contentsline {paragraph}{$H(\mathrm {curl})$ Triangle Faces.}{88}{section*.95}% 
+\contentsline {subparagraph}{Family I:}{88}{section*.96}% 
+\contentsline {subparagraph}{Family II:}{88}{section*.97}% 
+\contentsline {subsubsection}{\numberline {9.2.3}$H(\mathrm {curl})$ Interior Bubbles}{88}{subsubsection.9.2.3}% 
+\contentsline {subparagraph}{Family I:}{89}{section*.98}% 
+\contentsline {subparagraph}{Family II:}{89}{section*.99}% 
+\contentsline {subparagraph}{Family III:}{89}{section*.100}% 
+\contentsline {subparagraph}{Family IV:}{89}{section*.101}% 
+\contentsline {subsection}{\numberline {9.3}$H(\mathrm {div})$ Shape Functions}{89}{subsection.9.3}% 
+\contentsline {subsubsection}{\numberline {9.3.1}$H(\mathrm {div})$ Faces}{90}{subsubsection.9.3.1}% 
+\contentsline {paragraph}{$H(\mathrm {div})$ Quadrilateral Face.}{90}{section*.102}% 
+\contentsline {paragraph}{$H(\mathrm {div})$ Triangle Faces.}{90}{section*.103}% 
+\contentsline {subsubsection}{\numberline {9.3.2}$H(\mathrm {div})$ Interior Bubbles}{91}{subsubsection.9.3.2}% 
+\contentsline {subparagraph}{Family I:}{91}{section*.104}% 
+\contentsline {subparagraph}{Family II:}{91}{section*.105}% 
+\contentsline {subparagraph}{Family III:}{92}{section*.106}% 
+\contentsline {subparagraph}{Family IV:}{92}{section*.107}% 
+\contentsline {subparagraph}{Family V:}{92}{section*.108}% 
+\contentsline {subparagraph}{Family VI:}{92}{section*.109}% 
+\contentsline {subparagraph}{Family VII:}{93}{section*.110}% 
+\contentsline {subsection}{\numberline {9.4}$L^2$ Shape Functions}{93}{subsection.9.4}% 
+\contentsline {subsubsection}{\numberline {9.4.1}$L^2$ Interior}{93}{subsubsection.9.4.1}% 
+\contentsline {subsection}{\numberline {9.5}Orientations}{93}{subsection.9.5}% 
+\contentsline {section}{\numberline {10}Conclusions}{94}{section.10}% 
+\contentsline {paragraph}{Acknowledgements.}{95}{section*.112}% 
+\contentsline {section}{References}{96}{section*.113}% 
+\contentsline {section}{\numberline {A}Polynomial Families}{A-1}{appendix.A}% 
+\contentsline {section}{\numberline {B}Pyramid Supplement}{B-1}{appendix.B}% 
+\contentsline {subsection}{\numberline {B.1}$H^1$ Shape Functions}{B-6}{subsection.B.1}% 
+\contentsline {subsubsection}{\numberline {B.1.1}$H^1$ Vertices}{B-6}{subsubsection.B.1.1}% 
+\contentsline {subsubsection}{\numberline {B.1.2}$H^1$ Edges}{B-6}{subsubsection.B.1.2}% 
+\contentsline {paragraph}{$H^1$ Mixed Edges.}{B-6}{section*.117}% 
+\contentsline {paragraph}{$H^1$ Triangle Edges.}{B-7}{section*.118}% 
+\contentsline {subsubsection}{\numberline {B.1.3}$H^1$ Faces}{B-7}{subsubsection.B.1.3}% 
+\contentsline {paragraph}{$H^1$ Quadrilateral Face.}{B-7}{section*.119}% 
+\contentsline {paragraph}{$H^1$ Triangle Faces.}{B-8}{section*.120}% 
+\contentsline {subsubsection}{\numberline {B.1.4}$H^1$ Interior Bubbles}{B-8}{subsubsection.B.1.4}% 
+\contentsline {subsection}{\numberline {B.2}$H(\mathrm {curl})$ Shape Functions}{B-8}{subsection.B.2}% 
+\contentsline {subsubsection}{\numberline {B.2.1}$H(\mathrm {curl})$ Edges}{B-8}{subsubsection.B.2.1}% 
+\contentsline {paragraph}{$H(\mathrm {curl})$ Mixed Edges.}{B-8}{section*.121}% 
+\contentsline {paragraph}{$H(\mathrm {curl})$ Triangle Edges.}{B-9}{section*.122}% 
+\contentsline {subsubsection}{\numberline {B.2.2}$H(\mathrm {curl})$ Faces}{B-9}{subsubsection.B.2.2}% 
+\contentsline {paragraph}{$H(\mathrm {curl})$ Quadrilateral Face.}{B-9}{section*.123}% 
+\contentsline {paragraph}{$H(\mathrm {curl})$ Triangle Faces.}{B-10}{section*.124}% 
+\contentsline {subsubsection}{\numberline {B.2.3}$H(\mathrm {curl})$ Interior Bubbles}{B-10}{subsubsection.B.2.3}% 
+\contentsline {subparagraph}{Family I:}{B-10}{section*.125}% 
+\contentsline {subparagraph}{Families II and III:}{B-11}{section*.126}% 
+\contentsline {subparagraph}{Family IV:}{B-11}{section*.127}% 
+\contentsline {subsection}{\numberline {B.3}$H(\mathrm {div})$ Shape Functions}{B-11}{subsection.B.3}% 
+\contentsline {subsubsection}{\numberline {B.3.1}$H(\mathrm {div})$ Faces}{B-12}{subsubsection.B.3.1}% 
+\contentsline {paragraph}{$H(\mathrm {div})$ Quadrilateral Face.}{B-12}{section*.128}% 
+\contentsline {paragraph}{$H(\mathrm {div})$ Triangle Faces.}{B-12}{section*.129}% 
+\contentsline {subsubsection}{\numberline {B.3.2}$H(\mathrm {div})$ Interior Bubbles}{B-15}{subsubsection.B.3.2}% 
+\contentsline {subparagraph}{Families I and II:}{B-15}{section*.130}% 
+\contentsline {subparagraph}{Family III:}{B-16}{section*.131}% 
+\contentsline {subparagraph}{Family IV:}{B-16}{section*.132}% 
+\contentsline {subparagraph}{Family V:}{B-16}{section*.133}% 
+\contentsline {subparagraph}{Families VI and VII:}{B-16}{section*.134}% 
+\contentsline {subsection}{\numberline {B.4}$L^2$ Shape Functions}{B-17}{subsection.B.4}% 
+\contentsline {subsubsection}{\numberline {B.4.1}$L^2$ Interior}{B-17}{subsubsection.B.4.1}% 
+\contentsline {section}{\numberline {C}Integration}{C-1}{appendix.C}% 
+\contentsline {subsection}{\numberline {C.1}Coordinate Changes}{C-1}{subsection.C.1}% 
+\contentsline {subsection}{\numberline {C.2}Fast integration}{C-3}{subsection.C.2}% 
+\contentsline {section}{\numberline {D}Verification}{D-1}{appendix.D}% 
+\contentsline {section}{\numberline {E}Tables}{E-1}{appendix.E}% 
+\contentsline {subsection}{\numberline {E.1}Polynomials}{E-1}{subsection.E.1}% 
+\contentsline {subsection}{\numberline {E.2}Ancillary Operators}{E-3}{subsection.E.2}% 
+\contentsline {subsection}{\numberline {E.3}Segment}{E-5}{subsection.E.3}% 
+\contentsline {subsection}{\numberline {E.4}Quadrilateral}{E-6}{subsection.E.4}% 
+\contentsline {subsection}{\numberline {E.5}Triangle}{E-8}{subsection.E.5}% 
+\contentsline {subsection}{\numberline {E.6}Hexahedron}{E-10}{subsection.E.6}% 
+\contentsline {subsection}{\numberline {E.7}Tetrahedron}{E-14}{subsection.E.7}% 
+\contentsline {subsection}{\numberline {E.8}Prism}{E-18}{subsection.E.8}% 
+\contentsline {subsection}{\numberline {E.9}Pyramid}{E-23}{subsection.E.9}% 
+\contentsline {subsection}{\numberline {E.10}Orientations}{E-29}{subsection.E.10}% 

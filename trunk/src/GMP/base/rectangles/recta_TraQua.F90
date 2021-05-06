@@ -19,6 +19,7 @@ subroutine recta_TraQua(No,Eta, X,Dxdeta)
       real(8),dimension(2  ),intent(in ) :: Eta
       real(8),dimension(3  ),intent(out) :: X
       real(8),dimension(3,2),intent(out) :: Dxdeta
+!      
 !-----------------------------------------------------------------------
 !  ...edges curves numbers and orientations
       integer,dimension(4)   :: noc,norientc
@@ -66,6 +67,8 @@ subroutine recta_TraQua(No,Eta, X,Dxdeta)
       if (iprint.eq.1) then
         write(*,7001) No,Eta(1:2),noc(1:4),norientc(1:4)
  7001   format(' recta_TraQua: No,Eta,noc,norientc = ',i7,2(e12.5,2x),2x,4i4,2x,4i2)
+        write(*,7005) RECTANGLES(No)%VertNo(1:4)
+ 7005   format(' recta_TraQua: RECTANGLE VERTICES = ',4i6)
       endif
 !
 !  ...calculate the blending functions

@@ -184,12 +184,12 @@ ELSE
         write(nin,*)'-- Error Report (L2 only)--'
 ENDIF
         write(nin,9998)
- 9998   format('             H1            //', &
-                           ' H(curl)       //', &
-                           ' H(div)        //', &
-                           ' L2            //', &
-                           ' Total         //', &
-                           ' Rate       //',    &
+ 9998   format('             H1                    //', &
+                           ' H(curl)               //', &
+                           ' H(div)                //', &
+                           ' L2                    //', &
+                           ' Total                 //', &
+                           ' Rate              //',    &
                            ' Case tag')
 !
 !     -- subsequent visits --
@@ -205,7 +205,7 @@ ENDIF
 !
 !     print to file
       write(nin,9999)ivis,errorH,errorE,errorV,errorQ,errorHEVQ,rateHEVQ,Itag
- 9999 format(1x,i6,' ; ',2x,5(e12.5,' ; ',2x),f9.6,' ; ',3x,i8)
+ 9999 format(1x,i6,' ; ',2x,5(e20.13,' ; ',2x),f9.6,' ; ',3x,i8)
 !
 !     print to screen
 IF (.NOT.QUIET_MODE) THEN ; write(*,*)''

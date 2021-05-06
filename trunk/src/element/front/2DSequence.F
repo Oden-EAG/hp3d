@@ -316,14 +316,14 @@ c
 c     arguments:
 c       in:
 c         Xi            - master element coordinates
-c         Nord          - polynomial order of face node (H1 sense)
+c         Norer         - polynomial order of face node (H1 sense)
 c       out:
 c         NrdofQ        - number of dof
 c         ShapQ         - values of the shape functions at the point
 c
 c----------------------------------------------------------------------
 c
-      subroutine shapeQq(Xi,Nord, NrdofQ,ShapQ)
+      subroutine shapeQq(Xi,Norder, NrdofQ,ShapQ)
 c
       use parameters , only : MAXquadQ
 c

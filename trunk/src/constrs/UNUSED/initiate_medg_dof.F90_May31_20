@@ -1,0 +1,91 @@
+#include "typedefs.h"
+!-------------------------------------------------------------------------
+!> Purpose : initiate H1 and H(curl), i.e., L2 dof for the sons of 
+!            a mid-edge node
+!
+!> @date May 20
+!
+!> @param[in]  Nord  - order for a mid-edge node
+!> @param[in]  Xnod  - geometry dof for the edge
+!> @param[in]  DofH  - H1 dof for the edge
+!> @param[in]  DofE  - H(curl) dof for the edge
+!
+!> @param[out] Xnod_edge, Xnod_vert  - geometry dof for the sons
+!> @param[out] DofH_edge, DofH_vert  - H1 dof for the sons
+!> @param[out] DofE_edge             - H(curl) dof for the sons
+!-------------------------------------------------------------------------
+!
+      subroutine initiate_medg_dof(Nord,Xnod,DofH,DofE, &
+                                        Xnod_edge,Xnod_vert &
+                                        DofH_edge,DofH_vert &
+                                        DofE_edge)
+!
+      use constraints
+      implicit none
+!
+      integer,                              intent(in)  :: Nord
+      real*8, dimension(NDIMEN, MAXP+1),    intent(in)  :: Xnod
+      VTYPE,  dimension(MAXEQNH,MAXP+1),    intent(in)  :: DofH
+      VTYPE,  dimension(MAXEQNE,MAXP),      intent(in)  :: DofE
+      real*8, dimension(NDIMEN, MAXP+1,2),  intent(out) :: Xnod_edge
+      real*8, dimension(NDIMEN),            intent(out) :: Xnod_vert
+      VTYPE,  dimension(MAXEQNH, MAXP+1,2), intent(out) :: DofH_edge
+      VTYPE,  dimension(MAXEQNH),           intent(out) :: DofH_vert
+      VTYPE,  dimension(MAXEQNE, MAXP,2),   intent(out) :: DofE_edge
+!
+!  ...locals
+      integer ::  is
+      real*8, dimension(MAXP+1,MAXP-1) :: coeff
+!  
+!  ...geometry and H1 dof..................................................
+!
+!  ...mid-edge sons
+      do is=1,2
+        coeff(1:Nord-1,1:Nord-1) = RRRH(1,1:Nord-1,is,1:Nord-1)
+        call matrix_multiply(Xnod, NDIMEN, Nord-1, &
+                             coeff,MAXP+1,Nord-1, Xnod_edge(1,1,is))
+        call matrix_multiply(DofH, MAXEQNH,Nord-1, &
+                             coeff,MAXP+1,Nord-1, DofH_edge(1,1,is))
+      enddo
+!
+!  ...vertex son
+      coeff(1,1) = RRRH(2,1,3,1)
+      coeff(2,1) = RRRH(3,1,3,1)
+      coeff(3:Nord+1,1) = RRRH(1,1:Nord-1,3,1)
+      call matrix_multiply(Xnod, NDIMEN, Nord+1, &
+                           coeff,MAXP+1,1, Xnod_vert)
+      call matrix_multiply(DofH, MAXEQNH,Nord+1, &
+                           coeff,MAXP+1, 1, DofH_vert)
+!  
+!  ...H(curl), i.e. L2  dof..................................................
+!
+!  ...mid-edge sons
+      do is=1,2
+        coeff(1:Nord,1:Nord) = RRRE(1,1:Nord,is,1:Nord)
+        call matrix_multiply(DofE, MAXEQNE,Nord, &
+                             coeff,MAXP+1, Nord, DofE_edge(1,1,is))
+      enddo
+!
+!
+      end subroutine initiate_medg_dof
+
+
+
+      subroutine matrix_multiply(A,Ia,N, B,Ib,Jb, AB)
+      use parameters, only: ZERO
+      implicit none
+!
+      VTYPE, dimension(Ia,N),  intent(in)  :: A
+      VTYPE, dimension(Ib,Jb), intent(in)  :: B
+      VTYPE, dimension(Ia,Jb), intent(out) :: AB
+!
+      integer :: n
+!
+      AB = ZERO
+      do n=1,N
+        AB(1:Ia,1:Jb) = A(1:Ia,n)*B(n,1:Jb)
+      enddo
+!
+      end subroutine matrix_multiply
+
+

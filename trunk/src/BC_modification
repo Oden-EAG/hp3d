@@ -1,0 +1,46 @@
+
+
+Proposed changes on implementation of Boundary Conditions (BC's)
+----------------------------------------------------------------
+
+
+1. Change the meaning of ELEMS(iel)%bcond(:)
+
+   Present meaning:
+     for physics variable ELEMS(iel)%physics(iphys) supported by element 'iel'
+     ELEMS(iel)%bcond(iphys) stores a (base 10) nickname storing BC's flags
+     for the (up to six) faces of the element for the physics variable.
+     Each flag must be a single digit: 0,1,...,9.
+
+   Proposed change:
+     expand ELEMS(iel)%bcond(:) to contain separate BC's flags for each component
+     of each physics variable supported by the element. This will make the array
+     longer but it will enable setting Dirichlet BC for separate components
+     of e.g. displacement vector.
+
+   Accordingly, all user defined routines `set_initial_mesh' will have to be modified.
+
+2. Eliminate DIRICHLET_LIST from nodule data_structure3D. All Dirichlet BC's will
+   be flagged with `1`. We can keep the case of homogeneous Dirichlet BC's and designate
+   a special flag for it as well, say '2'.
+
+3. Modify routine copyBCflag (in hp3gen.F90) accordingly.
+
+4. Change the meaning of NODES(nod)%bcond that will store now a nickname containing
+   separate BC flag for each component of each physics variable supported by the node
+   according to NODES(nod)%case.
+
+5. Change generation of NODES(nod)%bcond BC's flags in routine hp3gen accrodingly.
+
+6. Change routine set_index  generating the index for each node accordingly.
+
+
+------------------------------------------
+
+The main trouble:
+
+  We have alreday had problems for which we needed to declare NODES(nod)%index as a long integer.
+  With the proposed changes, the length of NODES(nod)%bcond may be equal to that of NODES(nod)%index
+  so, in such situation, we would have to declare NODES(nod)%bcond be a long integer as well.
+  Or, we could use nickanmes with a smaller base. Maybe introduce the possibility of defining the
+  base for the BC nicknames ?

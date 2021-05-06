@@ -1,0 +1,3055 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2019.3.6)  21 MAY 2020 15:59
+entering extended mode
+ restricted \write18 enabled.
+ file:line:error style messages enabled.
+ %&-line parsing enabled.
+**main.tex
+(./main.tex
+LaTeX2e <2018-12-01>
+(/usr/local/texlive/2018/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2018/09/03 v1.4i Standard LaTeX document class
+(/usr/local/texlive/2018/texmf-dist/tex/latex/base/size11.clo
+File: size11.clo 2018/09/03 v1.4i Standard LaTeX file (size option)
+)
+\c@part=\count80
+\c@section=\count81
+\c@subsection=\count82
+\c@subsubsection=\count83
+\c@paragraph=\count84
+\c@subparagraph=\count85
+\c@figure=\count86
+\c@table=\count87
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/geometry/geometry.sty
+Package: geometry 2018/04/16 v5.8 Page Geometry
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks14
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/oberdiek/ifpdf.sty
+Package: ifpdf 2018/09/07 v3.3 Provides the ifpdf switch
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/oberdiek/ifvtex.sty
+Package: ifvtex 2016/05/16 v1.6 Detect VTeX and its facilities (HO)
+Package ifvtex Info: VTeX not detected.
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/ifxetex/ifxetex.sty
+Package: ifxetex 2010/09/12 v0.6 Provides ifxetex conditional
+)
+\Gm@cnth=\count88
+\Gm@cntv=\count89
+\c@Gm@tempcnt=\count90
+\Gm@bindingoffset=\dimen103
+\Gm@wd@mp=\dimen104
+\Gm@odd@mp=\dimen105
+\Gm@even@mp=\dimen106
+\Gm@layoutwidth=\dimen107
+\Gm@layoutheight=\dimen108
+\Gm@layouthoffset=\dimen109
+\Gm@layoutvoffset=\dimen110
+\Gm@dimlist=\toks15
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2018/12/01 v2.17b AMS math features
+\@mathmargin=\skip43
+
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2000/06/29 v2.01 AMS text
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks16
+\ex@=\dimen111
+))
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+\pmbraise@=\dimen112
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsmath/amsopn.sty
+Package: amsopn 2016/03/08 v2.02 operator names
+)
+\inf@bad=\count91
+LaTeX Info: Redefining \frac on input line 223.
+\uproot@=\count92
+\leftroot@=\count93
+LaTeX Info: Redefining \overline on input line 385.
+\classnum@=\count94
+\DOTSCASE@=\count95
+LaTeX Info: Redefining \ldots on input line 482.
+LaTeX Info: Redefining \dots on input line 485.
+LaTeX Info: Redefining \cdots on input line 606.
+\Mathstrutbox@=\box27
+\strutbox@=\box28
+\big@size=\dimen113
+LaTeX Font Info:    Redeclaring font encoding OML on input line 729.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 730.
+\macc@depth=\count96
+\c@MaxMatrixCols=\count97
+\dotsspace@=\muskip10
+\c@parentequation=\count98
+\dspbrk@lvl=\count99
+\tag@help=\toks17
+\row@=\count100
+\column@=\count101
+\maxfields@=\count102
+\andhelp@=\toks18
+\eqnshift@=\dimen114
+\alignsep@=\dimen115
+\tagshift@=\dimen116
+\tagwidth@=\dimen117
+\totwidth@=\dimen118
+\lineht@=\dimen119
+\@envbody=\toks19
+\multlinegap=\skip44
+\multlinetaggap=\skip45
+\mathdisplay@stack=\toks20
+LaTeX Info: Redefining \[ on input line 2844.
+LaTeX Info: Redefining \] on input line 2845.
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+))
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amscls/amsthm.sty
+Package: amsthm 2017/10/31 v2.20.4
+\thm@style=\toks21
+\thm@bodyfont=\toks22
+\thm@headfont=\toks23
+\thm@notefont=\toks24
+\thm@headpunct=\toks25
+\thm@preskip=\skip46
+\thm@postskip=\skip47
+\thm@headsep=\skip48
+\dth@everypar=\toks26
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/jknapltx/mathrsfs.sty
+Package: mathrsfs 1996/01/01 Math RSFS package v1.0 (jk)
+\symrsfs=\mathgroup6
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/babel/babel.sty
+Package: babel 2018/11/13 3.27 The Babel package
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/babel/switch.def
+File: switch.def 2018/11/13 3.27 Babel switching mechanism
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/babel-english/english.ldf
+Language: english 2017/06/06 v3.3r English support from the babel system
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/babel/babel.def
+File: babel.def 2018/11/13 3.27 Babel common definitions
+\babel@savecnt=\count103
+\U@D=\dimen120
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/babel/txtbabel.def)
+\bbl@dirlevel=\count104
+)
+\l@canadian = a dialect from \language\l@american 
+\l@australian = a dialect from \language\l@british 
+\l@newzealand = a dialect from \language\l@british 
+))
+(/usr/local/texlive/2018/texmf-dist/tex/latex/psnfss/times.sty
+Package: times 2005/04/12 PSNFSS-v9.2a (SPQR) 
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2017/06/01 v1.1a Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2017/06/25 v1.2c Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: pdftex.def on input line 99.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/graphics-def/pdftex.def
+File: pdftex.def 2018/01/08 v1.0l Graphics/color driver for pdftex
+))
+\Gin@req@height=\dimen121
+\Gin@req@width=\dimen122
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/caption/caption.sty
+Package: caption 2018/10/06 v3.3-154 Customizing captions (AR)
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/caption/caption3.sty
+Package: caption3 2018/09/12 v1.8c caption3 kernel (AR)
+Package caption3 Info: TeX engine: e-TeX on input line 64.
+\captionmargin=\dimen123
+\captionmargin@=\dimen124
+\captionwidth=\dimen125
+\caption@tempdima=\dimen126
+\caption@indent=\dimen127
+\caption@parindent=\dimen128
+\caption@hangindent=\dimen129
+)
+Package caption Info: We need package `newfloat' on input line 289.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/caption/newfloat.sty
+Package: newfloat 2018/03/04 v1.1a Defining new floating environments (AR)
+)
+\c@caption@flags=\count105
+\c@ContinuedFloat=\count106
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/caption/subcaption.sty
+Package: subcaption 2018/05/01 v1.1-162 Sub-captions (AR)
+\c@subfigure=\count107
+\c@subtable=\count108
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/float/float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count109
+\float@exts=\toks27
+\float@box=\box29
+\@float@everytoks=\toks28
+\@floatcapt=\box30
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/natbib/natbib.sty
+Package: natbib 2010/09/13 8.31b (PWD, AO)
+\bibhang=\skip49
+\bibsep=\skip50
+LaTeX Info: Redefining \cite on input line 694.
+\c@NAT@ctr=\count110
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/hyperref/hyperref.sty
+Package: hyperref 2018/11/30 v6.88e Hypertext links for LaTeX
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/oberdiek/hobsub-hyperref.sty
+Package: hobsub-hyperref 2016/05/16 v1.14 Bundle oberdiek, subset hyperref (HO)
+
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/oberdiek/hobsub-generic.sty
+Package: hobsub-generic 2016/05/16 v1.14 Bundle oberdiek, subset generic (HO)
+Package: hobsub 2016/05/16 v1.14 Construct package bundles (HO)
+Package: infwarerr 2016/05/16 v1.4 Providing info/warning/error messages (HO)
+Package: ltxcmds 2016/05/16 v1.23 LaTeX kernel commands for general use (HO)
+Package: ifluatex 2016/05/16 v1.4 Provides the ifluatex switch (HO)
+Package ifluatex Info: LuaTeX not detected.
+Package hobsub Info: Skipping package `ifvtex' (already loaded).
+Package: intcalc 2016/05/16 v1.2 Expandable calculations with integers (HO)
+Package hobsub Info: Skipping package `ifpdf' (already loaded).
+Package: etexcmds 2016/05/16 v1.6 Avoid name clashes with e-TeX commands (HO)
+Package etexcmds Info: Could not find \expanded.
+(etexcmds)             That can mean that you are not using pdfTeX 1.50 or
+(etexcmds)             that some package has redefined \expanded.
+(etexcmds)             In the latter case, load this package earlier.
+Package: kvsetkeys 2016/05/16 v1.17 Key value parser (HO)
+Package: kvdefinekeys 2016/05/16 v1.4 Define keys (HO)
+Package: pdftexcmds 2018/09/10 v0.29 Utility functions of pdfTeX for LuaTeX (HO
+)
+Package pdftexcmds Info: LuaTeX not detected.
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+Package: pdfescape 2016/05/16 v1.14 Implements pdfTeX's escape features (HO)
+Package: bigintcalc 2016/05/16 v1.4 Expandable calculations on big integers (HO
+)
+Package: bitset 2016/05/16 v1.2 Handle bit-vector datatype (HO)
+Package: uniquecounter 2016/05/16 v1.3 Provide unlimited unique counter (HO)
+)
+Package hobsub Info: Skipping package `hobsub' (already loaded).
+Package: letltxmacro 2016/05/16 v1.5 Let assignment for LaTeX macros (HO)
+Package: hopatch 2016/05/16 v1.3 Wrapper for package hooks (HO)
+Package: xcolor-patch 2016/05/16 xcolor patch
+Package: atveryend 2016/05/16 v1.9 Hooks at the very end of document (HO)
+Package atveryend Info: \enddocument detected (standard20110627).
+Package: atbegshi 2016/06/09 v1.18 At begin shipout hook (HO)
+Package: refcount 2016/05/16 v3.5 Data extraction from label references (HO)
+Package: hycolor 2016/05/16 v1.8 Color options for hyperref/bookmark (HO)
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/oberdiek/auxhook.sty
+Package: auxhook 2016/05/16 v1.4 Hooks for auxiliary files (HO)
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/oberdiek/kvoptions.sty
+Package: kvoptions 2016/05/16 v3.12 Key value format for package options (HO)
+)
+\@linkdim=\dimen130
+\Hy@linkcounter=\count111
+\Hy@pagecounter=\count112
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/hyperref/pd1enc.def
+File: pd1enc.def 2018/11/30 v6.88e Hyperref: PDFDocEncoding definition (HO)
+Now handling font encoding PD1 ...
+... no UTF-8 mapping file for font encoding PD1
+)
+\Hy@SavedSpaceFactor=\count113
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/latexconfig/hyperref.cfg
+File: hyperref.cfg 2002/06/06 v1.2 hyperref configuration of TeXLive
+)
+Package hyperref Info: Hyper figures OFF on input line 4519.
+Package hyperref Info: Link nesting OFF on input line 4524.
+Package hyperref Info: Hyper index ON on input line 4527.
+Package hyperref Info: Plain pages OFF on input line 4534.
+Package hyperref Info: Backreferencing OFF on input line 4539.
+Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
+Package hyperref Info: Bookmarks ON on input line 4772.
+\c@Hy@tempcnt=\count114
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/url/url.sty
+\Urlmuskip=\muskip11
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)
+LaTeX Info: Redefining \url on input line 5125.
+\XeTeXLinkMargin=\dimen131
+\Fld@menulength=\count115
+\Field@Width=\dimen132
+\Fld@charsize=\dimen133
+Package hyperref Info: Hyper figures OFF on input line 6380.
+Package hyperref Info: Link nesting OFF on input line 6385.
+Package hyperref Info: Hyper index ON on input line 6388.
+Package hyperref Info: backreferencing OFF on input line 6395.
+Package hyperref Info: Link coloring OFF on input line 6400.
+Package hyperref Info: Link coloring with OCG OFF on input line 6405.
+Package hyperref Info: PDF/A mode OFF on input line 6410.
+LaTeX Info: Redefining \ref on input line 6450.
+LaTeX Info: Redefining \pageref on input line 6454.
+\Hy@abspage=\count116
+\c@Item=\count117
+\c@Hfootnote=\count118
+)
+Package hyperref Info: Driver (autodetected): hpdftex.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/hyperref/hpdftex.def
+File: hpdftex.def 2018/11/30 v6.88e Hyperref driver for pdfTeX
+\Fld@listcount=\count119
+\c@bookmark@seq@number=\count120
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/oberdiek/rerunfilecheck.sty
+Package: rerunfilecheck 2016/05/16 v1.8 Rerun checks for auxiliary files (HO)
+Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
+82.
+)
+\Hy@SectionHShift=\skip51
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/xypic/xy.sty
+(/usr/local/texlive/2018/texmf-dist/tex/generic/xypic/xy.tex Bootstrap'ing:
+catcodes, docmode,
+(/usr/local/texlive/2018/texmf-dist/tex/generic/xypic/xyrecat.tex)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/xypic/xyidioms.tex)
+
+ Xy-pic version 3.8.9 <2013/10/06>
+ Copyright (c) 1991-2013 by Kristoffer H. Rose <krisrose@tug.org> and others
+ Xy-pic is free software: see the User's Guide for details.
+
+Loading kernel: messages; fonts; allocations: state,
+\X@c=\dimen134
+\Y@c=\dimen135
+\U@c=\dimen136
+\D@c=\dimen137
+\L@c=\dimen138
+\R@c=\dimen139
+\Edge@c=\toks29
+\X@p=\dimen140
+\Y@p=\dimen141
+\U@p=\dimen142
+\D@p=\dimen143
+\L@p=\dimen144
+\R@p=\dimen145
+\Edge@p=\toks30
+\X@origin=\dimen146
+\Y@origin=\dimen147
+\X@xbase=\dimen148
+\Y@xbase=\dimen149
+\X@ybase=\dimen150
+\Y@ybase=\dimen151
+\X@min=\dimen152
+\Y@min=\dimen153
+\X@max=\dimen154
+\Y@max=\dimen155
+\lastobjectbox@=\box31
+\zerodotbox@=\box32
+\almostz@=\dimen156
+ direction,
+\d@X=\dimen157
+\d@Y=\dimen158
+\K@=\count121
+\KK@=\count122
+\Direction=\count123
+\K@dXdY=\dimen159
+\K@dYdX=\dimen160
+\xyread@=\read1
+\xywrite@=\write3
+\csp@=\count124
+\quotPTK@=\dimen161
+
+utility macros; pictures: \xy, positions,
+\swaptoks@@=\toks31
+\connectobjectbox@@=\box33
+ objects,
+\styletoks@=\toks32
+ decorations;
+kernel objects: directionals, circles, text; options; algorithms: directions,
+edges, connections;  Xy-pic loaded)
+Package: xy 2013/10/06 Xy-pic version 3.8.9
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/xypic/xyall.tex
+ Xy-pic option: All features v.3.8
+(/usr/local/texlive/2018/texmf-dist/tex/generic/xypic/xycurve.tex
+ Xy-pic option: Curve and Spline extension v.3.12 curve,
+\crv@cnt@=\count125
+\crvpts@=\toks33
+\splinebox@=\box34
+\splineval@=\dimen162
+\splinedepth@=\dimen163
+\splinetol@=\dimen164
+\splinelength@=\dimen165
+ circles,
+\L@=\dimen166
+ loaded)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/xypic/xyframe.tex
+ Xy-pic option: Frame and Bracket extension v.3.14 loaded)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/xypic/xycmtip.tex
+ Xy-pic option: Computer Modern tip extension v.3.7
+(/usr/local/texlive/2018/texmf-dist/tex/generic/xypic/xytips.tex
+ Xy-pic option: More Tips extension v.3.11 loaded) loaded)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/xypic/xyline.tex
+ Xy-pic option: Line styles extension v.3.10
+\xylinethick@=\dimen167
+ loaded)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/xypic/xyrotate.tex
+ Xy-pic option: Rotate and Scale extension v.3.8 loaded)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/xypic/xycolor.tex
+ Xy-pic option: Colour extension v.3.11 loaded)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/xypic/xymatrix.tex
+ Xy-pic option: Matrix feature v.3.14
+\Row=\count126
+\Col=\count127
+\queue@=\toks34
+\queue@@=\toks35
+\qcount@=\count128
+\qcount@@=\count129
+\matrixsize@=\count130
+ loaded)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/xypic/xyarrow.tex
+ Xy-pic option: Arrow and Path feature v.3.9 path, \ar, loaded)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/xypic/xygraph.tex
+ Xy-pic option: Graph feature v.3.11 loaded) loaded)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/xypic/xypdf.tex
+ Xy-pic option: PDF driver v.1.7 Xy-pic pdf driver: `color' extension support
+(/usr/local/texlive/2018/texmf-dist/tex/generic/xypic/xypdf-co.tex loaded)
+Xy-pic pdf driver: `curve' extension support
+(/usr/local/texlive/2018/texmf-dist/tex/generic/xypic/xypdf-cu.tex loaded)
+Xy-pic pdf driver: `frame' extension support
+(/usr/local/texlive/2018/texmf-dist/tex/generic/xypic/xypdf-fr.tex loaded)
+Xy-pic pdf driver: `line' extension support
+(/usr/local/texlive/2018/texmf-dist/tex/generic/xypic/xypdf-li.tex loaded)
+Xy-pic pdf driver: `rotate' extension support
+(/usr/local/texlive/2018/texmf-dist/tex/generic/xypic/xypdf-ro.tex loaded)
+loaded)) (/usr/local/texlive/2018/texmf-dist/tex/latex/multirow/multirow.sty
+Package: multirow 2019/01/01 v2.4 Span multiple rows of a table
+\multirow@colwidth=\skip52
+\multirow@cntb=\count131
+\multirow@dima=\skip53
+\bigstrutjot=\dimen168
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/tools/array.sty
+Package: array 2018/12/30 v2.4k Tabular extension package (FMi)
+\col@sep=\dimen169
+\ar@mcellbox=\box35
+\extrarowheight=\dimen170
+\NC@list=\toks36
+\extratabsurround=\skip54
+\backup@length=\skip55
+\ar@cellbox=\box36
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/enumitem/enumitem.sty
+Package: enumitem 2019/02/04 v3.8 Customized lists
+\labelindent=\skip56
+\enit@outerparindent=\dimen171
+\enit@toks=\toks37
+\enit@inbox=\box37
+\enit@count@id=\count132
+\enitdp@description=\count133
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/pgf/frontendlayer/tikz.sty
+(/usr/local/texlive/2018/texmf-dist/tex/latex/pgf/basiclayer/pgf.sty
+(/usr/local/texlive/2018/texmf-dist/tex/latex/pgf/utilities/pgfrcs.sty
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/utilities/pgfutil-common.te
+x
+\pgfutil@everybye=\toks38
+\pgfutil@tempdima=\dimen172
+\pgfutil@tempdimb=\dimen173
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/utilities/pgfutil-common-li
+sts.tex))
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/utilities/pgfutil-latex.def
+\pgfutil@abb=\box38
+(/usr/local/texlive/2018/texmf-dist/tex/latex/ms/everyshi.sty
+Package: everyshi 2001/05/15 v3.00 EveryShipout Package (MS)
+))
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/utilities/pgfrcs.code.tex
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/pgf.revision.tex)
+Package: pgfrcs 2019/02/02 v3.1.1 (3.1.1)
+))
+Package: pgf 2019/02/02 v3.1.1 (3.1.1)
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/pgf/basiclayer/pgfcore.sty
+(/usr/local/texlive/2018/texmf-dist/tex/latex/pgf/systemlayer/pgfsys.sty
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/systemlayer/pgfsys.code.tex
+Package: pgfsys 2019/02/02 v3.1.1 (3.1.1)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code.tex
+\pgfkeys@pathtoks=\toks39
+\pgfkeys@temptoks=\toks40
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/utilities/pgfkeysfiltered.c
+ode.tex
+\pgfkeys@tmptoks=\toks41
+))
+\pgf@x=\dimen174
+\pgf@y=\dimen175
+\pgf@xa=\dimen176
+\pgf@ya=\dimen177
+\pgf@xb=\dimen178
+\pgf@yb=\dimen179
+\pgf@xc=\dimen180
+\pgf@yc=\dimen181
+\w@pgf@writea=\write4
+\r@pgf@reada=\read2
+\c@pgf@counta=\count134
+\c@pgf@countb=\count135
+\c@pgf@countc=\count136
+\c@pgf@countd=\count137
+\t@pgf@toka=\toks42
+\t@pgf@tokb=\toks43
+\t@pgf@tokc=\toks44
+\pgf@sys@id@count=\count138
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/systemlayer/pgf.cfg
+File: pgf.cfg 2019/02/02 v3.1.1 (3.1.1)
+)
+Driver file for pgf: pgfsys-pdftex.def
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-pdftex.d
+ef
+File: pgfsys-pdftex.def 2019/02/02 v3.1.1 (3.1.1)
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-common-p
+df.def
+File: pgfsys-common-pdf.def 2019/02/02 v3.1.1 (3.1.1)
+)))
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/systemlayer/pgfsyssoftpath.
+code.tex
+File: pgfsyssoftpath.code.tex 2019/02/02 v3.1.1 (3.1.1)
+\pgfsyssoftpath@smallbuffer@items=\count139
+\pgfsyssoftpath@bigbuffer@items=\count140
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/systemlayer/pgfsysprotocol.
+code.tex
+File: pgfsysprotocol.code.tex 2019/02/02 v3.1.1 (3.1.1)
+)) (/usr/local/texlive/2018/texmf-dist/tex/latex/xcolor/xcolor.sty
+Package: xcolor 2016/05/11 v2.12 LaTeX color extensions (UK)
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package xcolor Info: Driver file: pdftex.def on input line 225.
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1348.
+Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1352.
+Package xcolor Info: Model `RGB' extended on input line 1364.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1366.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1367.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1368.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1369.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1370.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1371.
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/basiclayer/pgfcore.code.tex
+Package: pgfcore 2019/02/02 v3.1.1 (3.1.1)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/math/pgfmathcalc.code.tex
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/math/pgfmathutil.code.tex)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/math/pgfmathparser.code.tex
+\pgfmath@dimen=\dimen182
+\pgfmath@count=\count141
+\pgfmath@box=\box39
+\pgfmath@toks=\toks45
+\pgfmath@stack@operand=\toks46
+\pgfmath@stack@operation=\toks47
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.code.
+tex
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.basic
+.code.tex)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.trigo
+nometric.code.tex)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.rando
+m.code.tex)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.compa
+rison.code.tex)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.base.
+code.tex)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.round
+.code.tex)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.misc.
+code.tex)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.integ
+erarithmetics.code.tex)))
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/math/pgfmathfloat.code.tex
+\c@pgfmathroundto@lastzeros=\count142
+))
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepoints.co
+de.tex
+File: pgfcorepoints.code.tex 2019/02/02 v3.1.1 (3.1.1)
+\pgf@picminx=\dimen183
+\pgf@picmaxx=\dimen184
+\pgf@picminy=\dimen185
+\pgf@picmaxy=\dimen186
+\pgf@pathminx=\dimen187
+\pgf@pathmaxx=\dimen188
+\pgf@pathminy=\dimen189
+\pgf@pathmaxy=\dimen190
+\pgf@xx=\dimen191
+\pgf@xy=\dimen192
+\pgf@yx=\dimen193
+\pgf@yy=\dimen194
+\pgf@zx=\dimen195
+\pgf@zy=\dimen196
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathconst
+ruct.code.tex
+File: pgfcorepathconstruct.code.tex 2019/02/02 v3.1.1 (3.1.1)
+\pgf@path@lastx=\dimen197
+\pgf@path@lasty=\dimen198
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathusage
+.code.tex
+File: pgfcorepathusage.code.tex 2019/02/02 v3.1.1 (3.1.1)
+\pgf@shorten@end@additional=\dimen199
+\pgf@shorten@start@additional=\dimen256
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/basiclayer/pgfcorescopes.co
+de.tex
+File: pgfcorescopes.code.tex 2019/02/02 v3.1.1 (3.1.1)
+\pgfpic=\box40
+\pgf@hbox=\box41
+\pgf@layerbox@main=\box42
+\pgf@picture@serial@count=\count143
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/basiclayer/pgfcoregraphicst
+ate.code.tex
+File: pgfcoregraphicstate.code.tex 2019/02/02 v3.1.1 (3.1.1)
+\pgflinewidth=\dimen257
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretransform
+ations.code.tex
+File: pgfcoretransformations.code.tex 2019/02/02 v3.1.1 (3.1.1)
+\pgf@pt@x=\dimen258
+\pgf@pt@y=\dimen259
+\pgf@pt@temp=\dimen260
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/basiclayer/pgfcorequick.cod
+e.tex
+File: pgfcorequick.code.tex 2019/02/02 v3.1.1 (3.1.1)
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreobjects.c
+ode.tex
+File: pgfcoreobjects.code.tex 2019/02/02 v3.1.1 (3.1.1)
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathproce
+ssing.code.tex
+File: pgfcorepathprocessing.code.tex 2019/02/02 v3.1.1 (3.1.1)
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/basiclayer/pgfcorearrows.co
+de.tex
+File: pgfcorearrows.code.tex 2019/02/02 v3.1.1 (3.1.1)
+\pgfarrowsep=\dimen261
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreshade.cod
+e.tex
+File: pgfcoreshade.code.tex 2019/02/02 v3.1.1 (3.1.1)
+\pgf@max=\dimen262
+\pgf@sys@shading@range@num=\count144
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreimage.cod
+e.tex
+File: pgfcoreimage.code.tex 2019/02/02 v3.1.1 (3.1.1)
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreexternal.
+code.tex
+File: pgfcoreexternal.code.tex 2019/02/02 v3.1.1 (3.1.1)
+\pgfexternal@startupbox=\box43
+))
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/basiclayer/pgfcorelayers.co
+de.tex
+File: pgfcorelayers.code.tex 2019/02/02 v3.1.1 (3.1.1)
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretranspare
+ncy.code.tex
+File: pgfcoretransparency.code.tex 2019/02/02 v3.1.1 (3.1.1)
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepatterns.
+code.tex
+File: pgfcorepatterns.code.tex 2019/02/02 v3.1.1 (3.1.1)
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/basiclayer/pgfcorerdf.code.
+tex
+File: pgfcorerdf.code.tex 2019/02/02 v3.1.1 (3.1.1)
+)))
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/modules/pgfmoduleshapes.cod
+e.tex
+File: pgfmoduleshapes.code.tex 2019/02/02 v3.1.1 (3.1.1)
+\pgfnodeparttextbox=\box44
+)
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/modules/pgfmoduleplot.code.
+tex
+File: pgfmoduleplot.code.tex 2019/02/02 v3.1.1 (3.1.1)
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-version
+-0-65.sty
+Package: pgfcomp-version-0-65 2019/02/02 v3.1.1 (3.1.1)
+\pgf@nodesepstart=\dimen263
+\pgf@nodesepend=\dimen264
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-version
+-1-18.sty
+Package: pgfcomp-version-1-18 2019/02/02 v3.1.1 (3.1.1)
+))
+(/usr/local/texlive/2018/texmf-dist/tex/latex/pgf/utilities/pgffor.sty
+(/usr/local/texlive/2018/texmf-dist/tex/latex/pgf/utilities/pgfkeys.sty
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code.tex)
+) (/usr/local/texlive/2018/texmf-dist/tex/latex/pgf/math/pgfmath.sty
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex))
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/utilities/pgffor.code.tex
+Package: pgffor 2019/02/02 v3.1.1 (3.1.1)
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex)
+\pgffor@iter=\dimen265
+\pgffor@skip=\dimen266
+\pgffor@stack=\toks48
+\pgffor@toks=\toks49
+))
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/frontendlayer/tikz/tikz.cod
+e.tex
+Package: tikz 2019/02/02 v3.1.1 (3.1.1)
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/libraries/pgflibraryplothan
+dlers.code.tex
+File: pgflibraryplothandlers.code.tex 2019/02/02 v3.1.1 (3.1.1)
+\pgf@plot@mark@count=\count145
+\pgfplotmarksize=\dimen267
+)
+\tikz@lastx=\dimen268
+\tikz@lasty=\dimen269
+\tikz@lastxsaved=\dimen270
+\tikz@lastysaved=\dimen271
+\tikzleveldistance=\dimen272
+\tikzsiblingdistance=\dimen273
+\tikz@figbox=\box45
+\tikz@figbox@bg=\box46
+\tikz@tempbox=\box47
+\tikz@tempbox@bg=\box48
+\tikztreelevel=\count146
+\tikznumberofchildren=\count147
+\tikznumberofcurrentchild=\count148
+\tikz@fig@count=\count149
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/modules/pgfmodulematrix.cod
+e.tex
+File: pgfmodulematrix.code.tex 2019/02/02 v3.1.1 (3.1.1)
+\pgfmatrixcurrentrow=\count150
+\pgfmatrixcurrentcolumn=\count151
+\pgf@matrix@numberofcolumns=\count152
+)
+\tikz@expandcount=\count153
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/pgf/frontendlayer/tikz/librarie
+s/tikzlibrarytopaths.code.tex
+File: tikzlibrarytopaths.code.tex 2019/02/02 v3.1.1 (3.1.1)
+)))
+Package hyperref Info: Option `colorlinks' set `true' on input line 42.
+ (./preamble.tex
+\c@lemma=\count154
+\c@corollary=\count155
+)
+No file main.aux.
+\openout1 = `main.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 56.
+LaTeX Font Info:    ... okay on input line 56.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 56.
+LaTeX Font Info:    ... okay on input line 56.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 56.
+LaTeX Font Info:    ... okay on input line 56.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 56.
+LaTeX Font Info:    ... okay on input line 56.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 56.
+LaTeX Font Info:    ... okay on input line 56.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 56.
+LaTeX Font Info:    ... okay on input line 56.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 56.
+LaTeX Font Info:    ... okay on input line 56.
+LaTeX Font Info:    Try loading font information for OT1+ptm on input line 56.
+(/usr/local/texlive/2018/texmf-dist/tex/latex/psnfss/ot1ptm.fd
+File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
+)
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+*geometry* verbose mode - [ preamble ] result:
+* driver: pdftex
+* paper: <default>
+* layout: <same size as paper>
+* layoutoffset:(h,v)=(0.0pt,0.0pt)
+* modes: 
+* h-part:(L,W,R)=(72.26999pt, 469.75502pt, 72.26999pt)
+* v-part:(T,H,B)=(93.95122pt, 614.295pt, 86.72377pt)
+* \paperwidth=614.295pt
+* \paperheight=794.96999pt
+* \textwidth=469.75502pt
+* \textheight=614.295pt
+* \oddsidemargin=0.0pt
+* \evensidemargin=0.0pt
+* \topmargin=-15.31877pt
+* \headheight=12.0pt
+* \headsep=25.0pt
+* \topskip=11.0pt
+* \footskip=30.0pt
+* \marginparwidth=59.0pt
+* \marginparsep=10.0pt
+* \columnsep=10.0pt
+* \skip\footins=10.0pt plus 4.0pt minus 2.0pt
+* \hoffset=0.0pt
+* \voffset=0.0pt
+* \mag=1000
+* \@twocolumnfalse
+* \@twosidefalse
+* \@mparswitchfalse
+* \@reversemarginfalse
+* (1in=72.27pt=25.4mm, 1cm=28.453pt)
+
+(/usr/local/texlive/2018/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count156
+\scratchdimen=\dimen274
+\scratchbox=\box49
+\nofMPsegments=\count157
+\nofMParguments=\count158
+\everyMPshowfont=\toks50
+\MPscratchCnt=\count159
+\MPscratchDim=\dimen275
+\MPnumerator=\count160
+\makeMPintoPDFobject=\count161
+\everyMPtoPDFconversion=\toks51
+) (/usr/local/texlive/2018/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
+Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/oberdiek/grfext.sty
+Package: grfext 2016/05/16 v1.2 Manage graphics extensions (HO)
+)
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
+38.
+Package grfext Info: Graphics extension search list:
+(grfext)             [.pdf,.png,.jpg,.mps,.jpeg,.jbig2,.jb2,.PDF,.PNG,.JPG,.JPE
+G,.JBIG2,.JB2,.eps]
+(grfext)             \AppendGraphicsExtensions on input line 456.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
+))
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: float package is loaded.
+Package caption Info: hyperref package is loaded.
+Package caption Info: End \AtBeginDocument code.
+\AtBeginShipoutBox=\box50
+Package hyperref Info: Link coloring ON on input line 56.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/hyperref/nameref.sty
+Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
+
+(/usr/local/texlive/2018/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
+Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
+)
+\c@section@level=\count162
+)
+LaTeX Info: Redefining \ref on input line 56.
+LaTeX Info: Redefining \pageref on input line 56.
+LaTeX Info: Redefining \nameref on input line 56.
+\@outlinefile=\write5
+\openout5 = `main.out'.
+
+LaTeX Font Info:    Try loading font information for U+msa on input line 56.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Try loading font information for U+msb on input line 56.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+LaTeX Font Info:    Try loading font information for U+rsfs on input line 56.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/jknapltx/ursfs.fd
+File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
+)
+Package xypdf Info: Line width: 0.43799pt on input line 56.
+
+ABD: EveryShipout initializing macros (./title.tex
+<./figures/UTAustinPrimarySignature.pdf, id=7, 254.03708pt x 72.55807pt>
+File: ./figures/UTAustinPrimarySignature.pdf Graphic file (type pdf)
+<use ./figures/UTAustinPrimarySignature.pdf>
+Package pdftex.def Info: ./figures/UTAustinPrimarySignature.pdf  used on input 
+line 8.
+(pdftex.def)             Requested size: 211.38832pt x 60.37708pt.
+<./figures/ICESWordmarkTealBlue.pdf, id=8, 344.7279pt x 54.2025pt>
+File: ./figures/ICESWordmarkTealBlue.pdf Graphic file (type pdf)
+<use ./figures/ICESWordmarkTealBlue.pdf>
+Package pdftex.def Info: ./figures/ICESWordmarkTealBlue.pdf  used on input line
+ 9.
+(pdftex.def)             Requested size: 192.60127pt x 30.2837pt.
+ [1
+
+{/usr/local/texlive/2018/texmf-var/fonts/map/pdftex/updmap/pdftex.map} <./figur
+es/UTAustinPrimarySignature.pdf> <./figures/ICESWordmarkTealBlue.pdf>]) (./abst
+ract.tex
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 3.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 3.
+) [1]
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <14.4> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 67.
+\tf@toc=\write6
+\openout6 = `main.toc'.
+
+ [2]
+(./introduction.tex
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10.95> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 7.
+
+
+Package natbib Warning: Citation `hpbook' on page 1 undefined on input line 7.
+
+
+Package natbib Warning: Citation `hpbook2' on page 1 undefined on input line 7.
+
+
+<./figures/ElementsAllShapes.pdf, id=75, 574.7615pt x 71.81128pt>
+File: ./figures/ElementsAllShapes.pdf Graphic file (type pdf)
+<use ./figures/ElementsAllShapes.pdf>
+Package pdftex.def Info: ./figures/ElementsAllShapes.pdf  used on input line 16
+.
+(pdftex.def)             Requested size: 431.07007pt x 53.85832pt.
+LaTeX Font Info:    Try loading font information for OMS+ptm on input line 35.
+(/usr/local/texlive/2018/texmf-dist/tex/latex/psnfss/omsptm.fd
+File: omsptm.fd 
+)
+LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10.95> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 35.
+
+
+LaTeX Warning: Reference `sec:Pyramid' on page 1 undefined on input line 35.
+
+
+Package natbib Warning: Citation `Nigam_Phillips_11' on page 1 undefined on inp
+ut line 36.
+
+
+Package natbib Warning: Citation `hpbook' on page 1 undefined on input line 48.
+
+
+[1 <./figures/ElementsAllShapes.pdf>]
+
+LaTeX Warning: Reference `app:ShapeFunctionTable' on page 2 undefined on input 
+line 61.
+
+
+Package natbib Warning: Citation `hpbook2' on page 2 undefined on input line 71
+.
+
+
+Package natbib Warning: Citation `DemkowiczGopalakrishnan13_2' on page 2 undefi
+ned on input line 71.
+
+
+Package natbib Warning: Citation `DemkowiczClosedRange' on page 2 undefined on 
+input line 71.
+
+[2]
+LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <9> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 169.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <9> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 169.
+
+
+LaTeX Warning: Reference `sec:Pyramid' on page 3 undefined on input line 169.
+
+
+Package natbib Warning: Citation `Nedelec80' on page 3 undefined on input line 
+182.
+
+
+Package natbib Warning: Citation `Nigam_Phillips_11' on page 3 undefined on inp
+ut line 183.
+
+
+Package natbib Warning: Citation `monk_demkowicz' on page 3 undefined on input 
+line 192.
+
+[3]
+
+LaTeX Warning: Reference `eq:polynomial_exact_sequences' on page 4 undefined on
+ input line 226.
+
+
+Package natbib Warning: Citation `Ciarlet' on page 4 undefined on input line 23
+0.
+
+
+Package natbib Warning: Citation `SzaboBabuska91' on page 4 undefined on input 
+line 237.
+
+
+Package natbib Warning: Citation `hpbook' on page 4 undefined on input line 239
+.
+
+
+Package natbib Warning: Citation `hpbook2' on page 4 undefined on input line 23
+9.
+
+
+Package natbib Warning: Citation `hpbook2' on page 4 undefined on input line 25
+9.
+
+[4]
+
+LaTeX Warning: Reference `fig:compatibilitydefinition' on page 5 undefined on i
+nput line 299.
+
+<./figures/CompatibilityDefinition.pdf, id=138, 538.9134pt x 131.8827pt>
+File: ./figures/CompatibilityDefinition.pdf Graphic file (type pdf)
+<use ./figures/CompatibilityDefinition.pdf>
+Package pdftex.def Info: ./figures/CompatibilityDefinition.pdf  used on input l
+ine 303.
+(pdftex.def)             Requested size: 377.23682pt x 92.31725pt.
+[5] <xymatrix 5x3 501> <xymatrix 2x1 51>
+
+LaTeX Warning: Reference `eq:traceexactsequences' on page 6 undefined on input 
+line 343.
+
+
+LaTeX Warning: Reference `eq:traceexactsequences' on page 6 undefined on input 
+line 353.
+
+
+LaTeX Warning: Reference `fig:2Dvertexcompatibility' on page 6 undefined on inp
+ut line 355.
+
+
+LaTeX Warning: Reference `fig:2Dedgecompatibility' on page 6 undefined on input
+ line 355.
+
+[6 <./figures/CompatibilityDefinition.pdf>]
+
+LaTeX Warning: Reference `sec:introorientations' on page 7 undefined on input l
+ine 388.
+
+
+LaTeX Warning: Reference `fig:vertexcompatibility' on page 7 undefined on input
+ line 417.
+
+[7]
+<./figures/VertexCompatibilityAndBlending.pdf, id=188, 541.82222pt x 104.7092pt
+>
+File: ./figures/VertexCompatibilityAndBlending.pdf Graphic file (type pdf)
+<use ./figures/VertexCompatibilityAndBlending.pdf>
+Package pdftex.def Info: ./figures/VertexCompatibilityAndBlending.pdf  used on 
+input line 430.
+(pdftex.def)             Requested size: 379.27296pt x 73.29593pt.
+<./figures/H1Bubbles.pdf, id=189, 422.57875pt x 64.09647pt>
+File: ./figures/H1Bubbles.pdf Graphic file (type pdf)
+<use ./figures/H1Bubbles.pdf>
+Package pdftex.def Info: ./figures/H1Bubbles.pdf  used on input line 449.
+(pdftex.def)             Requested size: 295.8031pt x 44.8672pt.
+ [8 <./figures/VertexCompatibilityAndBlending.pdf> <./figures/H1Bubbles.pdf>]
+<./figures/2DVertexFunctions.pdf, id=230, 533.59348pt x 115.98633pt>
+File: ./figures/2DVertexFunctions.pdf Graphic file (type pdf)
+<use ./figures/2DVertexFunctions.pdf>
+Package pdftex.def Info: ./figures/2DVertexFunctions.pdf  used on input line 50
+3.
+(pdftex.def)             Requested size: 373.51288pt x 81.18987pt.
+<./figures/EdgeBlendingQuadTri.pdf, id=231, 557.68347pt x 114.12637pt>
+File: ./figures/EdgeBlendingQuadTri.pdf Graphic file (type pdf)
+<use ./figures/EdgeBlendingQuadTri.pdf>
+Package pdftex.def Info: ./figures/EdgeBlendingQuadTri.pdf  used on input line 
+527.
+(pdftex.def)             Requested size: 390.37576pt x 79.88791pt.
+ [9 <./figures/2DVertexFunctions.pdf> <./figures/EdgeBlendingQuadTri.pdf>]
+[10]
+<./figures/OrientationsEdgeMismatch.pdf, id=275, 482.20149pt x 101.24525pt>
+File: ./figures/OrientationsEdgeMismatch.pdf Graphic file (type pdf)
+<use ./figures/OrientationsEdgeMismatch.pdf>
+Package pdftex.def Info: ./figures/OrientationsEdgeMismatch.pdf  used on input 
+line 697.
+(pdftex.def)             Requested size: 337.53873pt x 70.87119pt.
+
+
+Package natbib Warning: Citation `hpbook2' on page 11 undefined on input line 7
+08.
+
+[11 <./figures/OrientationsEdgeMismatch.pdf>]
+
+Package natbib Warning: Citation `GattoDemkowicz10' on page 12 undefined on inp
+ut line 711.
+
+<./figures/AffineSimplices.pdf, id=290, 531.55289pt x 157.94508pt>
+File: ./figures/AffineSimplices.pdf Graphic file (type pdf)
+<use ./figures/AffineSimplices.pdf>
+Package pdftex.def Info: ./figures/AffineSimplices.pdf  used on input line 800.
+
+(pdftex.def)             Requested size: 308.30089pt x 91.6082pt.
+[12]
+
+LaTeX Warning: Reference `sec:Segment' on page 13 undefined on input line 845.
+
+
+LaTeX Warning: Reference `sec:Quad' on page 13 undefined on input line 845.
+
+
+LaTeX Warning: Reference `sec:Tri' on page 13 undefined on input line 845.
+
+
+LaTeX Warning: Reference `sec:Hexa' on page 13 undefined on input line 845.
+
+
+LaTeX Warning: Reference `sec:Tet' on page 13 undefined on input line 845.
+
+
+LaTeX Warning: Reference `sec:Prism' on page 13 undefined on input line 845.
+
+
+LaTeX Warning: Reference `sec:Pyramid' on page 13 undefined on input line 845.
+
+[13 <./figures/AffineSimplices.pdf>]
+
+LaTeX Warning: Reference `app:ShapeFunctionTable' on page 14 undefined on input
+ line 856.
+
+
+Package natbib Warning: Citation `AinsworthCoyle01' on page 14 undefined on inp
+ut line 864.
+
+
+Package natbib Warning: Citation `hpbook2' on page 14 undefined on input line 8
+64.
+
+
+Package natbib Warning: Citation `karniadakisbook' on page 14 undefined on inpu
+t line 866.
+
+
+Package natbib Warning: Citation `Schoeberl_Zaglmayr_05' on page 14 undefined o
+n input line 866.
+
+
+Package natbib Warning: Citation `SabineThesis' on page 14 undefined on input l
+ine 866.
+
+
+Package natbib Warning: Citation `Beuchler_Pillwein_Schoeberl_Zaglmayr_12' on p
+age 14 undefined on input line 866.
+
+
+Package natbib Warning: Citation `Beuchler_Schoeberl_06' on page 14 undefined o
+n input line 868.
+
+
+Package natbib Warning: Citation `Beuchler_Pillwein_07' on page 14 undefined on
+ input line 868.
+
+
+Package natbib Warning: Citation `Beuchler_Pillwein_Zaglmayr_12' on page 14 und
+efined on input line 868.
+
+
+Package natbib Warning: Citation `Beuchler_Pillwein_Zaglmayr_13' on page 14 und
+efined on input line 868.
+
+
+Package natbib Warning: Citation `AinsworthBezier' on page 14 undefined on inpu
+t line 870.
+
+
+Package natbib Warning: Citation `SabineThesis' on page 14 undefined on input l
+ine 870.
+
+
+Package natbib Warning: Citation `Nigam_Phillips_11' on page 14 undefined on in
+put line 875.
+
+
+Package natbib Warning: Citation `Bergot_Durufle_14' on page 14 undefined on in
+put line 876.
+
+
+Package natbib Warning: Citation `Bergot_Gary_Durufle_10' on page 14 undefined 
+on input line 877.
+
+
+Package natbib Warning: Citation `Bergot_Durufle_14' on page 14 undefined on in
+put line 877.
+
+
+Package natbib Warning: Citation `GattoDemkowicz10' on page 14 undefined on inp
+ut line 880.
+
+) [14] (./notation.tex
+
+LaTeX Warning: Reference `app:GeneratingFamilies' on page 15 undefined on input
+ line 57.
+
+[15]
+
+LaTeX Warning: Reference `eq:affinesumtoone' on page 16 undefined on input line
+ 87.
+
+
+LaTeX Warning: Reference `eq:scaledpolyomials' on page 16 undefined on input li
+ne 133.
+
+
+LaTeX Warning: Reference `eq:recursion1' on page 16 undefined on input line 139
+.
+
+
+LaTeX Warning: Reference `eq:Orthogonality1' on page 16 undefined on input line
+ 148.
+
+
+LaTeX Warning: Reference `eq:ZeroAverage1' on page 16 undefined on input line 1
+48.
+
+[16]
+
+LaTeX Warning: Reference `eq:Dervivative1' on page 17 undefined on input line 1
+79.
+
+
+LaTeX Warning: Reference `app:GeneratingFamilies' on page 17 undefined on input
+ line 221.
+
+
+LaTeX Warning: Reference `eq:recursion2' on page 17 undefined on input line 225
+.
+
+
+LaTeX Warning: Reference `eq:shifted_scaled_lobatto' on page 17 undefined on in
+put line 225.
+
+
+LaTeX Warning: Reference `eq:RDef' on page 17 undefined on input line 225.
+
+
+Package natbib Warning: Citation `Beuchler_Schoeberl_06' on page 17 undefined o
+n input line 232.
+
+
+Package natbib Warning: Citation `Beuchler_Pillwein_07' on page 17 undefined on
+ input line 232.
+
+
+Package natbib Warning: Citation `Beuchler_Pillwein_07' on page 17 undefined on
+ input line 235.
+
+[17]
+
+LaTeX Warning: Reference `eq:RecursionJacobi' on page 18 undefined on input lin
+e 276.
+
+
+Package natbib Warning: Citation `Beuchler_Pillwein_07' on page 18 undefined on
+ input line 324.
+
+[18]
+
+LaTeX Warning: Reference `eq:RecursionJacobi' on page 19 undefined on input lin
+e 355.
+
+
+LaTeX Warning: Reference `eq:IntegratedJacobiFormula' on page 19 undefined on i
+nput line 355.
+
+
+LaTeX Warning: Reference `eq:RalphaDef' on page 19 undefined on input line 355.
+
+
+
+Package natbib Warning: Citation `Beuchler_Pillwein_07' on page 19 undefined on
+ input line 355.
+
+
+LaTeX Warning: Reference `eq:affinesumtoone' on page 19 undefined on input line
+ 379.
+
+
+LaTeX Warning: Reference `sec:affinecoordinates' on page 19 undefined on input 
+line 379.
+
+
+LaTeX Warning: Reference `eq:Lvanishatendpoints' on page 19 undefined on input 
+line 398.
+
+[19]
+
+LaTeX Warning: Reference `eq:ScalingProperty' on page 20 undefined on input lin
+e 408.
+
+
+LaTeX Warning: Reference `eq:Lvanishatendpoints' on page 20 undefined on input 
+line 432.
+
+
+LaTeX Warning: Reference `eq:Lalphavanishzero' on page 20 undefined on input li
+ne 432.
+
+) [20] (./segment.tex
+<./figures/MasterSegment.pdf, id=404, 198.57689pt x 22.4308pt>
+File: ./figures/MasterSegment.pdf Graphic file (type pdf)
+<use ./figures/MasterSegment.pdf>
+Package pdftex.def Info: ./figures/MasterSegment.pdf  used on input line 6.
+(pdftex.def)             Requested size: 99.2882pt x 11.21536pt.
+
+
+LaTeX Warning: Reference `fig:masterseg' on page 21 undefined on input line 13.
+
+
+
+LaTeX Warning: Reference `eq:affinerepresentation' on page 21 undefined on inpu
+t line 16.
+
+
+LaTeX Warning: Reference `sec:Exactsequences' on page 21 undefined on input lin
+e 41.
+
+
+LaTeX Warning: Reference `eq:polynomial_exact_sequences' on page 21 undefined o
+n input line 47.
+
+[21 <./figures/MasterSegment.pdf>]
+
+LaTeX Warning: Reference `sec:LegendrePol' on page 22 undefined on input line 9
+0.
+
+
+LaTeX Warning: Reference `eq:Lvanishatendpoints' on page 22 undefined on input 
+line 90.
+
+
+LaTeX Warning: Reference `eq:homogfor1Daffine' on page 22 undefined on input li
+ne 100.
+
+
+LaTeX Warning: Reference `eq:Lhomogvanishatendpoints' on page 22 undefined on i
+nput line 126.
+
+[22]
+
+LaTeX Warning: Reference `sec:LegendrePol' on page 23 undefined on input line 1
+43.
+
+
+LaTeX Warning: Reference `eq:H1_1DAffine' on page 23 undefined on input line 14
+4.
+
+
+LaTeX Warning: Reference `eq:gradH1_1DAffine' on page 23 undefined on input lin
+e 144.
+
+
+LaTeX Warning: Reference `eq:H11Dspecialcase' on page 23 undefined on input lin
+e 148.
+
+
+LaTeX Warning: Reference `eq:Lhomogvanishatendpoints' on page 23 undefined on i
+nput line 168.
+
+
+LaTeX Warning: Reference `eq:phiEvanishing' on page 23 undefined on input line 
+168.
+
+[23]
+
+LaTeX Warning: Reference `sec:compatibility' on page 24 undefined on input line
+ 201.
+
+<./figures/OrientationsEdge.pdf, id=442, 479.8999pt x 283.55536pt>
+File: ./figures/OrientationsEdge.pdf Graphic file (type pdf)
+<use ./figures/OrientationsEdge.pdf>
+Package pdftex.def Info: ./figures/OrientationsEdge.pdf  used on input line 211
+.
+(pdftex.def)             Requested size: 359.92404pt x 212.66599pt.
+
+LaTeX Warning: Reference `fig:edgemismatchintro' on page 24 undefined on input 
+line 220.
+
+
+LaTeX Warning: Reference `fig:orientationsedge' on page 24 undefined on input l
+ine 229.
+
+[24 <./figures/OrientationsEdge.pdf>]
+
+LaTeX Warning: Reference `fig:orientationsedge' on page 25 undefined on input l
+ine 258.
+
+
+LaTeX Warning: Reference `eq:orientEdge' on page 25 undefined on input line 275
+.
+
+
+LaTeX Warning: Reference `fig:orientationsedge' on page 25 undefined on input l
+ine 279.
+
+) [25] (./quad.tex
+<./figures/MasterQuad.pdf, id=476, 205.12434pt x 187.0458pt>
+File: ./figures/MasterQuad.pdf Graphic file (type pdf)
+<use ./figures/MasterQuad.pdf>
+Package pdftex.def Info: ./figures/MasterQuad.pdf  used on input line 6.
+(pdftex.def)             Requested size: 102.5619pt x 93.52266pt.
+
+
+LaTeX Warning: Reference `fig:MasterQuad' on page 26 undefined on input line 12
+.
+
+
+LaTeX Warning: Reference `eq:2DExactSeq' on page 26 undefined on input line 69.
+
+
+
+LaTeX Warning: Reference `eq:2DExactSeqRotated' on page 26 undefined on input l
+ine 69.
+
+
+Package natbib Warning: Citation `Nedelec80' on page 26 undefined on input line
+ 87.
+
+[26 <./figures/MasterQuad.pdf>]
+
+LaTeX Warning: Reference `eq:Lvanishatendpoints' on page 27 undefined on input 
+line 170.
+
+
+LaTeX Warning: Reference `eq:phiEvanishing' on page 27 undefined on input line 
+170.
+
+[27]
+
+LaTeX Warning: Reference `fig:QuadProjection' on page 28 undefined on input lin
+e 214.
+
+<./figures/QuadProjection.pdf, id=503, 488.29828pt x 188.90575pt>
+File: ./figures/QuadProjection.pdf Graphic file (type pdf)
+<use ./figures/QuadProjection.pdf>
+Package pdftex.def Info: ./figures/QuadProjection.pdf  used on input line 218.
+(pdftex.def)             Requested size: 268.56488pt x 103.89847pt.
+
+LaTeX Warning: Reference `fig:QuadProjection' on page 28 undefined on input lin
+e 236.
+
+[28 <./figures/QuadProjection.pdf>]
+
+LaTeX Warning: Reference `eq:phiEvanishing' on page 29 undefined on input line 
+288.
+
+
+LaTeX Warning: Reference `sec:dimensionalhierarchy' on page 29 undefined on inp
+ut line 339.
+
+
+LaTeX Warning: Reference `eq:the1DL2edge' on page 29 undefined on input line 34
+1.
+
+[29]
+
+LaTeX Warning: Reference `eq:2Dcurlandcross' on page 30 undefined on input line
+ 386.
+
+
+LaTeX Warning: Reference `lem:curlformula' on page 30 undefined on input line 3
+89.
+
+
+LaTeX Warning: Reference `eq:curlsEiE' on page 30 undefined on input line 390.
+
+[30] [31]
+
+LaTeX Warning: Reference `eq:phiEvanishing' on page 32 undefined on input line 
+480.
+
+
+LaTeX Warning: Reference `eq:Hdiv2Ddef' on page 32 undefined on input line 506.
+
+
+[32]
+
+LaTeX Warning: Reference `sec:edgeorientations' on page 33 undefined on input l
+ine 536.
+
+<./figures/MasterQuadOrientations.pdf, id=562, 205.12434pt x 189.24402pt>
+File: ./figures/MasterQuadOrientations.pdf Graphic file (type pdf)
+<use ./figures/MasterQuadOrientations.pdf>
+Package pdftex.def Info: ./figures/MasterQuadOrientations.pdf  used on input li
+ne 544.
+(pdftex.def)             Requested size: 102.5619pt x 94.62177pt.
+
+LaTeX Warning: Reference `fig:MasterQuadOrientations' on page 33 undefined on i
+nput line 551.
+
+
+LaTeX Warning: Reference `fig:MasterQuadOrientations' on page 33 undefined on i
+nput line 563.
+
+[33 <./figures/MasterQuadOrientations.pdf>]
+
+LaTeX Warning: Reference `eq:QuadH1Edge' on page 34 undefined on input line 578
+.
+
+
+LaTeX Warning: Reference `eq:QuadHcurlEdge' on page 34 undefined on input line 
+578.
+
+<./figures/QuadEdgeOrientExample.pdf, id=582, 565.61313pt x 211.725pt>
+File: ./figures/QuadEdgeOrientExample.pdf Graphic file (type pdf)
+<use ./figures/QuadEdgeOrientExample.pdf>
+Package pdftex.def Info: ./figures/QuadEdgeOrientExample.pdf  used on input lin
+e 611.
+(pdftex.def)             Requested size: 424.2088pt x 158.79337pt.
+
+LaTeX Warning: Reference `fig:QuadEdgeOrientExample' on page 34 undefined on in
+put line 617.
+
+[34 <./figures/QuadEdgeOrientExample.pdf>]
+<./figures/OrientationsQuad.pdf, id=604, 546.24077pt x 546.9494pt>
+File: ./figures/OrientationsQuad.pdf Graphic file (type pdf)
+<use ./figures/OrientationsQuad.pdf>
+Package pdftex.def Info: ./figures/OrientationsQuad.pdf  used on input line 665
+.
+(pdftex.def)             Requested size: 409.67958pt x 410.21104pt.
+
+
+LaTeX Warning: Reference `fig:orientationsquad' on page 35 undefined on input l
+ine 683.
+
+[35 <./figures/OrientationsQuad.pdf>]
+
+LaTeX Warning: Reference `fig:orientationsquad' on page 36 undefined on input l
+ine 701.
+
+
+LaTeX Warning: Reference `fig:orientationsquad' on page 36 undefined on input l
+ine 702.
+
+) [36] (./triangle.tex
+<./figures/MasterTri.pdf, id=651, 207.79532pt x 184.89075pt>
+File: ./figures/MasterTri.pdf Graphic file (type pdf)
+<use ./figures/MasterTri.pdf>
+Package pdftex.def Info: ./figures/MasterTri.pdf  used on input line 6.
+(pdftex.def)             Requested size: 103.8974pt x 92.44513pt.
+
+
+LaTeX Warning: Reference `fig:MasterTriangle' on page 37 undefined on input lin
+e 14.
+
+
+LaTeX Warning: Reference `sec:affinecoordinates' on page 37 undefined on input 
+line 17.
+
+
+LaTeX Warning: Reference `eq:2DExactSeq' on page 37 undefined on input line 55.
+
+
+
+LaTeX Warning: Reference `eq:2DExactSeqRotated' on page 37 undefined on input l
+ine 55.
+
+[37 <./figures/MasterTri.pdf>] [38]
+
+LaTeX Warning: Reference `eq:ScalingProperty' on page 39 undefined on input lin
+e 183.
+
+
+LaTeX Warning: Reference `eq:phiEvanishing' on page 39 undefined on input line 
+185.
+
+<./figures/TriangleProjection.pdf, id=681, 488.29828pt x 186.89825pt>
+File: ./figures/TriangleProjection.pdf Graphic file (type pdf)
+<use ./figures/TriangleProjection.pdf>
+Package pdftex.def Info: ./figures/TriangleProjection.pdf  used on input line 2
+19.
+(pdftex.def)             Requested size: 268.56488pt x 102.79434pt.
+
+LaTeX Warning: Reference `fig:TriangleProjection' on page 39 undefined on input
+ line 241.
+
+[39 <./figures/TriangleProjection.pdf>]
+
+Package natbib Warning: Citation `Beuchler_Schoeberl_06' on page 40 undefined o
+n input line 370.
+
+
+LaTeX Warning: Reference `eq:homogproduct' on page 40 undefined on input line 3
+75.
+
+
+LaTeX Warning: Reference `eq:LiLjvanishing' on page 40 undefined on input line 
+434.
+
+[40]
+
+LaTeX Warning: Reference `eq:phiTrivanishing' on page 41 undefined on input lin
+e 484.
+
+[41]
+
+LaTeX Warning: Reference `eq:Hcurledgefunctions' on page 42 undefined on input 
+line 622.
+
+
+LaTeX Warning: Reference `lemma:curl' on page 42 undefined on input line 637.
+
+[42]
+
+Package natbib Warning: Citation `Beuchler_Pillwein_Zaglmayr_13' on page 43 und
+efined on input line 722.
+
+
+LaTeX Warning: Reference `eq:DerivativeofLalpha' on page 43 undefined on input 
+line 741.
+
+
+LaTeX Warning: Reference `lemma:curl' on page 43 undefined on input line 764.
+
+[43]
+
+LaTeX Warning: Reference `eq:Hdiv2Ddef' on page 44 undefined on input line 835.
+
+
+
+LaTeX Warning: Reference `sec:QuadEdgeOrientations' on page 44 undefined on inp
+ut line 883.
+
+
+LaTeX Warning: Reference `sec:edgeorientations' on page 44 undefined on input l
+ine 883.
+
+
+LaTeX Warning: Reference `sec:TriaEdgeOrientations' on page 44 undefined on inp
+ut line 885.
+
+
+LaTeX Warning: Reference `sec:TriaFaceOrientations' on page 44 undefined on inp
+ut line 886.
+
+<./figures/MasterTriOrientations.pdf, id=734, 207.79532pt x 187.08896pt>
+File: ./figures/MasterTriOrientations.pdf Graphic file (type pdf)
+<use ./figures/MasterTriOrientations.pdf>
+Package pdftex.def Info: ./figures/MasterTriOrientations.pdf  used on input lin
+e 893.
+(pdftex.def)             Requested size: 103.8974pt x 93.54425pt.
+[44]
+
+LaTeX Warning: Reference `fig:MasterTriOrientations' on page 45 undefined on in
+put line 900.
+
+
+LaTeX Warning: Reference `fig:MasterTriOrientations' on page 45 undefined on in
+put line 905.
+
+
+LaTeX Warning: Reference `sec:QuadEdgeOrientations' on page 45 undefined on inp
+ut line 920.
+
+
+LaTeX Warning: Reference `fig:OrientationsTri' on page 45 undefined on input li
+ne 937.
+
+<./figures/OrientationsTriangle.pdf, id=747, 470.09428pt x 552.27429pt>
+File: ./figures/OrientationsTriangle.pdf Graphic file (type pdf)
+<use ./figures/OrientationsTriangle.pdf>
+Package pdftex.def Info: ./figures/OrientationsTriangle.pdf  used on input line
+ 941.
+(pdftex.def)             Requested size: 352.56984pt x 414.2047pt.
+
+LaTeX Warning: Reference `fig:OrientationsTri' on page 45 undefined on input li
+ne 950.
+
+
+LaTeX Warning: Reference `fig:OrientationsTri' on page 45 undefined on input li
+ne 952.
+
+[45 <./figures/MasterTriOrientations.pdf>] [46 <./figures/OrientationsTriangle.
+pdf>]) [47] (./hexa.tex
+<./figures/MasterHexa.pdf, id=798, 289.48149pt x 293.31583pt>
+File: ./figures/MasterHexa.pdf Graphic file (type pdf)
+<use ./figures/MasterHexa.pdf>
+Package pdftex.def Info: ./figures/MasterHexa.pdf  used on input line 6.
+(pdftex.def)             Requested size: 144.74039pt x 146.65755pt.
+
+
+LaTeX Warning: Reference `fig:MasterHexa' on page 48 undefined on input line 13
+.
+
+
+LaTeX Warning: Reference `eq:3D_exact_sequence' on page 48 undefined on input l
+ine 46.
+
+
+Package natbib Warning: Citation `Nedelec80' on page 48 undefined on input line
+ 51.
+
+[48 <./figures/MasterHexa.pdf>]
+
+LaTeX Warning: Reference `sec:Quad' on page 49 undefined on input line 71.
+
+
+LaTeX Warning: Reference `fig:HexaProjection' on page 49 undefined on input lin
+e 130.
+
+
+LaTeX Warning: Reference `fig:QuadProjection' on page 49 undefined on input lin
+e 134.
+
+[49]
+<./figures/HexaProjection.pdf, id=827, 548.08292pt x 256.05663pt>
+File: ./figures/HexaProjection.pdf Graphic file (type pdf)
+<use ./figures/HexaProjection.pdf>
+Package pdftex.def Info: ./figures/HexaProjection.pdf  used on input line 139.
+(pdftex.def)             Requested size: 328.85228pt x 153.63516pt.
+
+
+LaTeX Warning: Reference `fig:HexaProjection' on page 50 undefined on input lin
+e 185.
+
+[50 <./figures/HexaProjection.pdf>] [51]
+
+LaTeX Warning: Reference `sec:dimensionalhierarchy' on page 52 undefined on inp
+ut line 392.
+
+
+LaTeX Warning: Reference `eq:QuadL2Functions' on page 52 undefined on input lin
+e 395.
+
+[52] [53]
+
+LaTeX Warning: Reference `sec:fulledgeorientations' on page 54 undefined on inp
+ut line 505.
+
+
+LaTeX Warning: Reference `sec:QuadOrientations' on page 54 undefined on input l
+ine 505.
+
+
+LaTeX Warning: Reference `sec:TriaOrientations' on page 54 undefined on input l
+ine 505.
+
+<./figures/MasterHexaOrientations.pdf, id=876, 289.48149pt x 293.31583pt>
+File: ./figures/MasterHexaOrientations.pdf Graphic file (type pdf)
+<use ./figures/MasterHexaOrientations.pdf>
+Package pdftex.def Info: ./figures/MasterHexaOrientations.pdf  used on input li
+ne 516.
+(pdftex.def)             Requested size: 144.74039pt x 146.65755pt.
+
+LaTeX Warning: Reference `fig:MasterHexaOrientations' on page 54 undefined on i
+nput line 522.
+
+[54]) [55 <./figures/MasterHexaOrientations.pdf>] (./tet.tex
+<./figures/MasterTet.pdf, id=901, 289.48149pt x 285.36612pt>
+File: ./figures/MasterTet.pdf Graphic file (type pdf)
+<use ./figures/MasterTet.pdf>
+Package pdftex.def Info: ./figures/MasterTet.pdf  used on input line 6.
+(pdftex.def)             Requested size: 144.74039pt x 142.68271pt.
+
+
+LaTeX Warning: Reference `fig:MasterTet' on page 56 undefined on input line 13.
+
+
+
+LaTeX Warning: Reference `sec:affinecoordinates' on page 56 undefined on input 
+line 26.
+
+
+LaTeX Warning: Reference `eq:3D_exact_sequence' on page 56 undefined on input l
+ine 50.
+
+
+LaTeX Warning: Reference `eq:NedelecSpace' on page 56 undefined on input line 5
+7.
+
+
+LaTeX Warning: Reference `eq:RaviartThomasSpace' on page 56 undefined on input 
+line 57.
+
+[56 <./figures/MasterTet.pdf>]
+
+LaTeX Warning: Reference `sec:Tri' on page 57 undefined on input line 107.
+
+
+LaTeX Warning: Reference `fig:TetProjection' on page 57 undefined on input line
+ 211.
+
+
+LaTeX Warning: Reference `fig:TriangleProjection' on page 57 undefined on input
+ line 214.
+
+<./figures/TetProjection.pdf, id=921, 544.63374pt x 255.86993pt>
+File: ./figures/TetProjection.pdf Graphic file (type pdf)
+<use ./figures/TetProjection.pdf>
+Package pdftex.def Info: ./figures/TetProjection.pdf  used on input line 218.
+(pdftex.def)             Requested size: 326.78276pt x 153.52313pt.
+[57]
+
+LaTeX Warning: Reference `fig:TetProjection' on page 58 undefined on input line
+ 319.
+
+[58 <./figures/TetProjection.pdf>]
+
+LaTeX Warning: Reference `lemma:curl' on page 59 undefined on input line 447.
+
+[59] [60] [61]
+
+LaTeX Warning: Reference `eq:VdeltaDiv' on page 62 undefined on input line 844.
+
+
+
+LaTeX Warning: Reference `lemma:div' on page 62 undefined on input line 864.
+
+[62]
+<./figures/MasterTetOrientations.pdf, id=984, 289.48149pt x 285.36612pt>
+File: ./figures/MasterTetOrientations.pdf Graphic file (type pdf)
+<use ./figures/MasterTetOrientations.pdf>
+Package pdftex.def Info: ./figures/MasterTetOrientations.pdf  used on input lin
+e 1042.
+(pdftex.def)             Requested size: 144.74039pt x 142.68271pt.
+ [63]
+
+LaTeX Warning: Reference `sec:HexaOrientations' on page 64 undefined on input l
+ine 1048.
+
+
+LaTeX Warning: Reference `fig:MasterTetOrientations' on page 64 undefined on in
+put line 1049.
+
+) [64 <./figures/MasterTetOrientations.pdf>] (./prism.tex
+<./figures/MasterPrism.pdf, id=1011, 289.48149pt x 284.36237pt>
+File: ./figures/MasterPrism.pdf Graphic file (type pdf)
+<use ./figures/MasterPrism.pdf>
+Package pdftex.def Info: ./figures/MasterPrism.pdf  used on input line 6.
+(pdftex.def)             Requested size: 144.74039pt x 142.18083pt.
+
+
+LaTeX Warning: Reference `fig:MasterPrism' on page 65 undefined on input line 1
+2.
+
+[65 <./figures/MasterPrism.pdf>]
+
+LaTeX Warning: Reference `eq:3D_exact_sequence' on page 66 undefined on input l
+ine 65.
+
+
+LaTeX Warning: Reference `eq:EStriangle' on page 66 undefined on input line 65.
+
+
+
+LaTeX Warning: Reference `eq:ESsegment' on page 66 undefined on input line 65.
+
+
+LaTeX Warning: Reference `eq:NedelecSpace' on page 66 undefined on input line 8
+4.
+
+
+LaTeX Warning: Reference `eq:RaviartThomasSpace' on page 66 undefined on input 
+line 84.
+
+[66]
+
+LaTeX Warning: Reference `fig:PrismProjectionTriangle' on page 67 undefined on 
+input line 200.
+
+
+LaTeX Warning: Reference `fig:PrismProjectionQuad' on page 67 undefined on inpu
+t line 200.
+
+<./figures/PrismProjectionTriangle.pdf, id=1039, 548.39879pt x 255.75047pt>
+File: ./figures/PrismProjectionTriangle.pdf Graphic file (type pdf)
+<use ./figures/PrismProjectionTriangle.pdf>
+Package pdftex.def Info: ./figures/PrismProjectionTriangle.pdf  used on input l
+ine 204.
+(pdftex.def)             Requested size: 329.04181pt x 153.45146pt.
+[67 <./figures/PrismProjectionTriangle.pdf>]
+
+LaTeX Warning: Reference `fig:PrismProjectionQuad' on page 68 undefined on inpu
+t line 251.
+
+<./figures/PrismProjectionQuad.pdf, id=1057, 550.29485pt x 256.65285pt>
+File: ./figures/PrismProjectionQuad.pdf Graphic file (type pdf)
+<use ./figures/PrismProjectionQuad.pdf>
+Package pdftex.def Info: ./figures/PrismProjectionQuad.pdf  used on input line 
+255.
+(pdftex.def)             Requested size: 330.17944pt x 153.99289pt.
+[68 <./figures/PrismProjectionQuad.pdf>]
+
+LaTeX Warning: Reference `fig:PrismProjectionTriangle' on page 69 undefined on 
+input line 299.
+
+
+LaTeX Warning: Reference `fig:PrismProjectionQuad' on page 69 undefined on inpu
+t line 343.
+
+[69]
+
+LaTeX Warning: Reference `fig:PrismProjectionTriangle' on page 70 undefined on 
+input line 399.
+
+
+LaTeX Warning: Reference `fig:PrismProjectionQuad' on page 70 undefined on inpu
+t line 399.
+
+[70]
+
+LaTeX Warning: Reference `eq:Hcurl1Dspecialcase' on page 71 undefined on input 
+line 514.
+
+[71] [72]
+
+LaTeX Warning: Reference `eq:Hcurl1Dspecialcase' on page 73 undefined on input 
+line 862.
+
+
+LaTeX Warning: Reference `fig:PrismProjectionTriangle' on page 73 undefined on 
+input line 949.
+
+
+LaTeX Warning: Reference `fig:PrismProjectionQuad' on page 73 undefined on inpu
+t line 949.
+
+
+LaTeX Warning: Reference `eq:HdivtriangleRemark' on page 73 undefined on input 
+line 969.
+
+[73]
+
+LaTeX Warning: Reference `eq:HdivtriangleRemark' on page 74 undefined on input 
+line 982.
+
+
+LaTeX Warning: Reference `sec:TriangleHdiv' on page 74 undefined on input line 
+1034.
+
+[74]
+
+LaTeX Warning: Reference `eq:Hcurl1Dspecialcase' on page 75 undefined on input 
+line 1119.
+
+
+LaTeX Warning: Reference `eq:Hcurl1Dspecialcase' on page 75 undefined on input 
+line 1131.
+
+
+LaTeX Warning: Reference `eq:HdivtriangleRemark' on page 75 undefined on input 
+line 1144.
+
+<./figures/MasterPrismOrientations.pdf, id=1137, 289.48149pt x 284.36237pt>
+File: ./figures/MasterPrismOrientations.pdf Graphic file (type pdf)
+<use ./figures/MasterPrismOrientations.pdf>
+Package pdftex.def Info: ./figures/MasterPrismOrientations.pdf  used on input l
+ine 1258.
+(pdftex.def)             Requested size: 144.74039pt x 142.18083pt.
+[75]
+
+LaTeX Warning: Reference `sec:HexaOrientations' on page 76 undefined on input l
+ine 1264.
+
+
+LaTeX Warning: Reference `sec:TetOrientations' on page 76 undefined on input li
+ne 1264.
+
+
+LaTeX Warning: Reference `fig:MasterPrismOrientations' on page 76 undefined on 
+input line 1265.
+
+) [76 <./figures/MasterPrismOrientations.pdf>] (./pyramid.tex
+<./figures/MasterPyramid.pdf, id=1168, 289.48149pt x 291.45589pt>
+File: ./figures/MasterPyramid.pdf Graphic file (type pdf)
+<use ./figures/MasterPyramid.pdf>
+Package pdftex.def Info: ./figures/MasterPyramid.pdf  used on input line 6.
+(pdftex.def)             Requested size: 144.74039pt x 145.72758pt.
+
+
+LaTeX Warning: Reference `fig:MasterPyramid' on page 77 undefined on input line
+ 12.
+
+
+LaTeX Warning: Reference `sec:affinecoordinates' on page 77 undefined on input 
+line 26.
+
+[77 <./figures/MasterPyramid.pdf>] [78]
+
+LaTeX Warning: Reference `sec:affinecoordinates' on page 79 undefined on input 
+line 147.
+
+
+LaTeX Warning: Reference `lem:curlformula' on page 79 undefined on input line 1
+52.
+
+
+LaTeX Warning: Reference `lem:divformula' on page 79 undefined on input line 15
+2.
+
+[79]
+
+LaTeX Warning: Reference `eq:3D_exact_sequence' on page 80 undefined on input l
+ine 170.
+
+
+Package natbib Warning: Citation `Nigam_Phillips_11' on page 80 undefined on in
+put line 180.
+
+
+Package natbib Warning: Citation `Hiptmair99' on page 80 undefined on input lin
+e 180.
+
+
+Package natbib Warning: Citation `Nigam_Phillips_11' on page 80 undefined on in
+put line 182.
+
+
+LaTeX Warning: Reference `eq:3D_exact_sequence' on page 80 undefined on input l
+ine 182.
+
+
+LaTeX Warning: Reference `app:pyrappendix' on page 80 undefined on input line 1
+89.
+
+
+LaTeX Warning: Reference `app:pyrappendix' on page 80 undefined on input line 1
+90.
+
+[80] [81]
+
+LaTeX Warning: Reference `fig:QuadProjection' on page 82 undefined on input lin
+e 299.
+
+
+LaTeX Warning: Reference `fig:TriangleProjection' on page 82 undefined on input
+ line 299.
+
+
+LaTeX Warning: Reference `fig:PyramidProjectionHorizontalTriangle' on page 82 u
+ndefined on input line 301.
+
+
+LaTeX Warning: Reference `fig:PyramidProjectionQuad' on page 82 undefined on in
+put line 303.
+
+<./figures/PyramidProjectionHorizontalTriangle.pdf, id=1216, 550.32701pt x 256.
+44406pt>
+File: ./figures/PyramidProjectionHorizontalTriangle.pdf Graphic file (type pdf)
+
+<use ./figures/PyramidProjectionHorizontalTriangle.pdf>
+Package pdftex.def Info: ./figures/PyramidProjectionHorizontalTriangle.pdf  use
+d on input line 307.
+(pdftex.def)             Requested size: 330.19875pt x 153.86761pt.
+[82]
+
+LaTeX Warning: Reference `fig:PyramidProjectionObliqueTriangle' on page 83 unde
+fined on input line 348.
+
+<./figures/PyramidProjectionObliqueTriangle.pdf, id=1225, 578.89272pt x 256.998
+14pt>
+File: ./figures/PyramidProjectionObliqueTriangle.pdf Graphic file (type pdf)
+<use ./figures/PyramidProjectionObliqueTriangle.pdf>
+Package pdftex.def Info: ./figures/PyramidProjectionObliqueTriangle.pdf  used o
+n input line 353.
+(pdftex.def)             Requested size: 347.3383pt x 154.20006pt.
+<./figures/PyramidProjectionQuad.pdf, id=1226, 550.18451pt x 256.37181pt>
+File: ./figures/PyramidProjectionQuad.pdf Graphic file (type pdf)
+<use ./figures/PyramidProjectionQuad.pdf>
+Package pdftex.def Info: ./figures/PyramidProjectionQuad.pdf  used on input lin
+e 373.
+(pdftex.def)             Requested size: 330.11324pt x 153.82426pt.
+[83 <./figures/PyramidProjectionHorizontalTriangle.pdf>]
+
+LaTeX Warning: Reference `fig:PyramidProjectionQuad' on page 84 undefined on in
+put line 380.
+
+[84 <./figures/PyramidProjectionObliqueTriangle.pdf> <./figures/PyramidProjecti
+onQuad.pdf>]
+
+LaTeX Warning: Reference `fig:PyramidProjectionObliqueTriangle' on page 85 unde
+fined on input line 409.
+
+
+LaTeX Warning: Reference `eq:phiTrivanishing' on page 85 undefined on input lin
+e 410.
+
+
+LaTeX Warning: Reference `fig:PyramidProjectionHorizontalTriangle' on page 85 u
+ndefined on input line 420.
+
+[85]
+
+LaTeX Warning: Reference `fig:PyramidProjectionHorizontalTriangle' on page 86 u
+ndefined on input line 478.
+
+
+LaTeX Warning: Reference `fig:PyramidProjectionQuad' on page 86 undefined on in
+put line 478.
+
+[86]
+
+LaTeX Warning: Reference `fig:PyramidProjectionObliqueTriangle' on page 87 unde
+fined on input line 519.
+
+
+LaTeX Warning: Reference `fig:PyramidProjectionQuad' on page 87 undefined on in
+put line 534.
+
+
+LaTeX Warning: Reference `eq:phiEvanishing' on page 87 undefined on input line 
+536.
+
+
+LaTeX Warning: Reference `eq:Hcurl1Dspecialcase' on page 87 undefined on input 
+line 536.
+
+[87]
+
+LaTeX Warning: Reference `fig:PyramidProjectionHorizontalTriangle' on page 88 u
+ndefined on input line 575.
+
+[88]
+
+LaTeX Warning: Reference `eq:Vijsimplified' on page 89 undefined on input line 
+685.
+
+
+LaTeX Warning: Reference `eq:Vijsimplified' on page 89 undefined on input line 
+686.
+
+
+LaTeX Warning: Reference `fig:PyramidProjectionQuad' on page 89 undefined on in
+put line 687.
+
+[89]
+
+LaTeX Warning: Reference `eq:Vijsimplified' on page 90 undefined on input line 
+689.
+
+
+LaTeX Warning: Reference `app:pyrappendix' on page 90 undefined on input line 7
+08.
+
+
+LaTeX Warning: Reference `lem:divformula' on page 90 undefined on input line 71
+6.
+
+
+Package natbib Warning: Citation `Hiptmair99' on page 90 undefined on input lin
+e 719.
+
+
+Package natbib Warning: Citation `Nigam_Phillips_11' on page 90 undefined on in
+put line 719.
+
+
+LaTeX Warning: Reference `app:pyrappendix' on page 90 undefined on input line 7
+31.
+
+
+LaTeX Warning: Reference `app:pyrappendix' on page 90 undefined on input line 7
+34.
+
+[90]
+
+LaTeX Warning: Reference `eq:HdivtriangleRemark' on page 91 undefined on input 
+line 737.
+
+[91]
+
+LaTeX Warning: Reference `eq:Vijsimplified' on page 92 undefined on input line 
+806.
+
+
+LaTeX Warning: Reference `eq:PyrHdivBubblesAuxII' on page 92 undefined on input
+ line 899.
+
+[92]
+<./figures/MasterPyramidOrientations.pdf, id=1355, 289.48149pt x 291.45589pt>
+File: ./figures/MasterPyramidOrientations.pdf Graphic file (type pdf)
+<use ./figures/MasterPyramidOrientations.pdf>
+Package pdftex.def Info: ./figures/MasterPyramidOrientations.pdf  used on input
+ line 933.
+(pdftex.def)             Requested size: 144.74039pt x 145.72758pt.
+
+
+LaTeX Warning: Reference `fig:MasterPyramidOrientations' on page 93 undefined o
+n input line 939.
+
+
+LaTeX Warning: Reference `sec:HexaOrientations' on page 93 undefined on input l
+ine 943.
+
+
+LaTeX Warning: Reference `sec:TetOrientations' on page 93 undefined on input li
+ne 943.
+
+
+LaTeX Warning: Reference `sec:PrismOrientations' on page 93 undefined on input 
+line 943.
+
+
+LaTeX Warning: Reference `app:pyrappendix' on page 93 undefined on input line 9
+44.
+
+) [93 <./figures/MasterPyramidOrientations.pdf>] (./conclusion.tex
+
+LaTeX Warning: Reference `fig:elementsallshapes' on page 94 undefined on input 
+line 4.
+
+
+LaTeX Warning: Reference `app:Integration' on page 94 undefined on input line 1
+1.
+
+
+Package natbib Warning: Citation `Beuchler_Pillwein_Schoeberl_Zaglmayr_12' on p
+age 94 undefined on input line 20.
+
+
+LaTeX Warning: Reference `app:GeneratingFamilies' on page 94 undefined on input
+ line 21.
+
+
+LaTeX Warning: Reference `app:Integration' on page 94 undefined on input line 4
+2.
+
+[94]
+
+LaTeX Warning: Reference `app:verification' on page 95 undefined on input line 
+55.
+
+
+LaTeX Warning: Reference `app:ShapeFunctionTable' on page 95 undefined on input
+ line 56.
+
+
+Package natbib Warning: Citation `Nigam_Phillips_11' on page 95 undefined on in
+put line 65.
+
+
+Package natbib Warning: Citation `Hiptmair99' on page 95 undefined on input lin
+e 65.
+
+) [95] (./main.bbl [96]) [97] (./genfamilies.tex
+
+LaTeX Warning: Reference `eq:scaledpolyomials' on page A-1 undefined on input l
+ine 48.
+
+[1]) [2] (./pyrappendix.tex
+<./figures/MasterPyramidAppendix.pdf, id=1441, 289.48149pt x 291.45589pt>
+File: ./figures/MasterPyramidAppendix.pdf Graphic file (type pdf)
+<use ./figures/MasterPyramidAppendix.pdf>
+Package pdftex.def Info: ./figures/MasterPyramidAppendix.pdf  used on input lin
+e 6.
+(pdftex.def)             Requested size: 144.74039pt x 145.72758pt.
+
+
+LaTeX Warning: Reference `fig:MasterPyramidAppendix' on page B-1 undefined on i
+nput line 12.
+
+
+LaTeX Warning: Reference `sec:Pyramid' on page B-1 undefined on input line 15.
+
+
+Package natbib Warning: Citation `Nigam_Phillips_11' on page B-1 undefined on i
+nput line 15.
+
+
+LaTeX Warning: Reference `eq:pyramidsequence' on page B-1 undefined on input li
+ne 17.
+
+
+LaTeX Warning: Reference `eq:QuadES' on page B-1 undefined on input line 26.
+
+
+LaTeX Warning: Reference `eq:EStriangle' on page B-1 undefined on input line 26
+.
+
+
+LaTeX Warning: Reference `eq:Pyramidcompatilibityspaces' on page B-1 undefined 
+on input line 29.
+
+[1 <./figures/MasterPyramidAppendix.pdf>]
+<./figures/PyramidSingleTransform.pdf, id=1460, 586.59152pt x 298.02942pt>
+File: ./figures/PyramidSingleTransform.pdf Graphic file (type pdf)
+<use ./figures/PyramidSingleTransform.pdf>
+Package pdftex.def Info: ./figures/PyramidSingleTransform.pdf  used on input li
+ne 65.
+(pdftex.def)             Requested size: 293.29504pt x 149.01433pt.
+
+
+Package natbib Warning: Citation `Nigam_Phillips_11' on page B-2 undefined on i
+nput line 71.
+
+
+LaTeX Warning: Reference `fig:PyramidSingleTransform' on page B-2 undefined on 
+input line 81.
+
+
+Package natbib Warning: Citation `Nigam_Phillips_11' on page B-2 undefined on i
+nput line 98.
+
+
+Package natbib Warning: Citation `Nigam_Phillips_11' on page B-2 undefined on i
+nput line 98.
+
+[2 <./figures/PyramidSingleTransform.pdf>] [3]
+
+LaTeX Warning: Reference `sec:Pyramid' on page B-4 undefined on input line 162.
+
+
+
+LaTeX Warning: Reference `eq:Pyramidpullbacks' on page B-4 undefined on input l
+ine 162.
+
+
+LaTeX Warning: Reference `eq:Pyramidpullbacks' on page B-4 undefined on input l
+ine 166.
+
+
+LaTeX Warning: Reference `eq:Pyramidinversepullbacks' on page B-4 undefined on 
+input line 166.
+
+
+LaTeX Warning: Reference `eq:PyramidTriCoord' on page B-4 undefined on input li
+ne 169.
+
+
+LaTeX Warning: Reference `eq:PyramidTriCoordGrad' on page B-4 undefined on inpu
+t line 176.
+
+
+LaTeX Warning: Reference `eq:PyramidQuadCoord' on page B-4 undefined on input l
+ine 187.
+
+
+LaTeX Warning: Reference `eq:PyramidQuadCoordGrad' on page B-4 undefined on inp
+ut line 194.
+
+
+LaTeX Warning: Reference `eq:PyramidZCoord' on page B-4 undefined on input line
+ 203.
+
+
+LaTeX Warning: Reference `eq:PyramidZCoordGrad' on page B-4 undefined on input 
+line 207.
+
+[4]
+
+LaTeX Warning: Reference `eq:PyramidAffineCoord' on page B-5 undefined on input
+ line 212.
+
+
+LaTeX Warning: Reference `eq:PyramidAffineCoordGrad' on page B-5 undefined on i
+nput line 222.
+
+
+LaTeX Warning: Reference `app:GeneratingFamilies' on page B-5 undefined on inpu
+t line 349.
+
+
+LaTeX Warning: Reference `eq:AppLiLjVanishingProperties' on page B-5 undefined 
+on input line 349.
+
+
+LaTeX Warning: Reference `eq:Lvanishatendpoints' on page B-5 undefined on input
+ line 359.
+
+
+LaTeX Warning: Reference `eq:Lalphavanishzero' on page B-5 undefined on input l
+ine 375.
+
+[5]
+
+LaTeX Warning: Reference `lem:LegendreDecomp' on page B-6 undefined on input li
+ne 396.
+
+
+LaTeX Warning: Reference `eq:PyrH1Vertex' on page B-6 undefined on input line 4
+10.
+
+
+LaTeX Warning: Reference `eq:PyrH1MixedEdge' on page B-6 undefined on input lin
+e 443.
+
+[6]
+
+LaTeX Warning: Reference `eq:ScalingProperty' on page B-7 undefined on input li
+ne 462.
+
+
+LaTeX Warning: Reference `eq:PyrH1TriaEdge' on page B-7 undefined on input line
+ 468.
+
+
+LaTeX Warning: Reference `lem:LegendreDecomp' on page B-7 undefined on input li
+ne 486.
+
+
+LaTeX Warning: Reference `eq:PyrH1QuadFace' on page B-7 undefined on input line
+ 493.
+
+
+LaTeX Warning: Reference `eq:PyrH1TriaFace' on page B-7 undefined on input line
+ 515.
+
+[7]
+
+LaTeX Warning: Reference `eq:LiLjDecomp' on page B-8 undefined on input line 53
+1.
+
+
+LaTeX Warning: Reference `eq:PyrH1Interior' on page B-8 undefined on input line
+ 536.
+
+
+LaTeX Warning: Reference `eq:PyrphikZSpace' on page B-8 undefined on input line
+ 553.
+
+
+LaTeX Warning: Reference `eq:PyrHcurlMixedEdge' on page B-8 undefined on input 
+line 570.
+
+[8]
+
+LaTeX Warning: Reference `eq:PyrHcurlTriaEdge' on page B-9 undefined on input l
+ine 596.
+
+
+LaTeX Warning: Reference `eq:curlsEiE' on page B-9 undefined on input line 599.
+
+
+
+LaTeX Warning: Reference `eq:PyrQuadVertexProof' on page B-9 undefined on input
+ line 599.
+
+
+LaTeX Warning: Reference `eq:PyrTopVertexProof' on page B-9 undefined on input 
+line 599.
+
+
+LaTeX Warning: Reference `eq:PyrHcurlQuadFaceI' on page B-9 undefined on input 
+line 630.
+
+
+LaTeX Warning: Reference `eq:PyrHcurlQuadFaceII' on page B-9 undefined on input
+ line 630.
+
+[9]
+
+LaTeX Warning: Reference `eq:PyrHcurlTriaFaceI' on page B-10 undefined on input
+ line 657.
+
+
+LaTeX Warning: Reference `eq:PyrHcurlTriaFaceII' on page B-10 undefined on inpu
+t line 657.
+
+
+LaTeX Warning: Reference `lem:LegendreDecomp' on page B-10 undefined on input l
+ine 661.
+
+
+LaTeX Warning: Reference `eq:PyrHcurlInteriorI' on page B-10 undefined on input
+ line 686.
+
+
+LaTeX Warning: Reference `eq:PyrH1InteriorProof' on page B-10 undefined on inpu
+t line 690.
+
+[10]
+
+LaTeX Warning: Reference `eq:PyrHcurlInteriorII' on page B-11 undefined on inpu
+t line 706.
+
+
+LaTeX Warning: Reference `eq:PyrHcurlInteriorIII' on page B-11 undefined on inp
+ut line 706.
+
+
+LaTeX Warning: Reference `eq:PyrHcurlQuadFaceProof' on page B-11 undefined on i
+nput line 708.
+
+
+LaTeX Warning: Reference `eq:PyrphikZSpace' on page B-11 undefined on input lin
+e 708.
+
+
+LaTeX Warning: Reference `eq:PyrHcurlInteriorIV' on page B-11 undefined on inpu
+t line 731.
+
+
+LaTeX Warning: Reference `eq:PyrHdivQuadFace' on page B-11 undefined on input l
+ine 764.
+
+[11]
+
+Package natbib Warning: Citation `Nigam_Phillips_11' on page B-12 undefined on 
+input line 810.
+
+
+LaTeX Warning: Reference `lem:divformula' on page B-12 undefined on input line 
+824.
+
+[12]
+
+Package natbib Warning: Citation `Hiptmair99' on page B-13 undefined on input l
+ine 829.
+
+
+Package natbib Warning: Citation `Nigam_Phillips_11' on page B-13 undefined on 
+input line 829.
+
+
+LaTeX Warning: Reference `eq:PyrFailedAttempts' on page B-13 undefined on input
+ line 838.
+
+
+LaTeX Warning: Reference `eq:HdivtriangleRemark' on page B-13 undefined on inpu
+t line 863.
+
+
+LaTeX Warning: Reference `lem:divformula' on page B-13 undefined on input line 
+864.
+
+[13]
+
+LaTeX Warning: Reference `eq:PyrHdivTriaFaceAppen' on page B-14 undefined on in
+put line 903.
+
+[14]
+
+LaTeX Warning: Reference `eq:PyrHdivTriaFace' on page B-15 undefined on input l
+ine 944.
+
+
+LaTeX Warning: Reference `eq:PyrHdivInteriorI' on page B-15 undefined on input 
+line 965.
+
+
+LaTeX Warning: Reference `eq:PyrHdivInteriorII' on page B-15 undefined on input
+ line 965.
+
+
+LaTeX Warning: Reference `eq:PyrHcurlInteriorIIProof' on page B-15 undefined on
+ input line 968.
+
+
+LaTeX Warning: Reference `eq:PyrHdivInteriorIII' on page B-15 undefined on inpu
+t line 984.
+
+
+LaTeX Warning: Reference `eq:PyrHcurlInteriorIVProof' on page B-15 undefined on
+ input line 987.
+
+[15]
+
+LaTeX Warning: Reference `eq:PyrHdivInteriorIV' on page B-16 undefined on input
+ line 1001.
+
+
+LaTeX Warning: Reference `eq:PyrHdivQuadFaceProof' on page B-16 undefined on in
+put line 1003.
+
+
+LaTeX Warning: Reference `eq:PyrphikZSpace' on page B-16 undefined on input lin
+e 1003.
+
+
+LaTeX Warning: Reference `eq:PyrHdivInteriorV' on page B-16 undefined on input 
+line 1022.
+
+
+LaTeX Warning: Reference `eq:PyrHdivBubblesAuxI' on page B-16 undefined on inpu
+t line 1024.
+
+
+LaTeX Warning: Reference `eq:PyrHdivInteriorVI' on page B-16 undefined on input
+ line 1043.
+
+
+LaTeX Warning: Reference `eq:PyrHdivInteriorVII' on page B-16 undefined on inpu
+t line 1043.
+
+
+LaTeX Warning: Reference `eq:PyrHdivBubblesAuxII' on page B-16 undefined on inp
+ut line 1045.
+
+[16]
+
+LaTeX Warning: Reference `eq:PyrL2Interior' on page B-17 undefined on input lin
+e 1072.
+
+) [17] (./integration.tex
+<./figures/CurvilinearTransform.pdf, id=1633, 731.13153pt x 239.26088pt>
+File: ./figures/CurvilinearTransform.pdf Graphic file (type pdf)
+<use ./figures/CurvilinearTransform.pdf>
+Package pdftex.def Info: ./figures/CurvilinearTransform.pdf  used on input line
+ 8.
+(pdftex.def)             Requested size: 329.00615pt x 107.6664pt.
+
+
+LaTeX Warning: Reference `fig:curvilineartransform' on page C-1 undefined on in
+put line 16.
+
+
+LaTeX Warning: Reference `eq:pullbacksgeneral' on page C-1 undefined on input l
+ine 24.
+
+
+LaTeX Warning: Reference `fig:integrationtransforms' on page C-1 undefined on i
+nput line 49.
+
+
+LaTeX Warning: Reference `fig:integrationtransforms' on page C-1 undefined on i
+nput line 51.
+
+[1 <./figures/CurvilinearTransform.pdf>]
+<./figures/IntegrationTransformations.pdf, id=1659, 867.64153pt x 960.50243pt>
+File: ./figures/IntegrationTransformations.pdf Graphic file (type pdf)
+<use ./figures/IntegrationTransformations.pdf>
+Package pdftex.def Info: ./figures/IntegrationTransformations.pdf  used on inpu
+t line 58.
+(pdftex.def)             Requested size: 390.43507pt x 432.22209pt.
+
+
+LaTeX Warning: Reference `eq:integraluptomaster' on page C-2 undefined on input
+ line 70.
+
+[2 <./figures/IntegrationTransformations.pdf>]
+
+LaTeX Warning: Reference `eq:integraluptoQ' on page C-3 undefined on input line
+ 88.
+
+
+Package natbib Warning: Citation `hpbook2' on page C-3 undefined on input line 
+103.
+
+) [3] (./verification.tex
+
+LaTeX Warning: Reference `eq:variationalprojection' on page D-1 undefined on in
+put line 39.
+
+
+LaTeX Warning: Reference `fig:VerificationMesh' on page D-1 undefined on input 
+line 45.
+
+<./figures/VerificationMesh.pdf, id=1683, 242.10449pt x 338.46451pt>
+File: ./figures/VerificationMesh.pdf Graphic file (type pdf)
+<use ./figures/VerificationMesh.pdf>
+Package pdftex.def Info: ./figures/VerificationMesh.pdf  used on input line 51.
+
+(pdftex.def)             Requested size: 121.05194pt x 169.23184pt.
+[1]) [2 <./figures/VerificationMesh.pdf>] (./tables.tex [1] [2]
+Overfull \vbox (5.15315pt too high) detected at line 152
+ []
+
+
+Overfull \vbox (5.15315pt too high) detected at line 163
+ []
+
+
+Overfull \vbox (5.15315pt too high) detected at line 191
+ []
+
+
+Overfull \vbox (5.15315pt too high) detected at line 203
+ []
+
+
+LaTeX Warning: Reference `eq:Hcurl1Dspecialcase' on page E-3 undefined on input
+ line 218.
+
+[3]
+Overfull \vbox (5.15315pt too high) detected at line 248
+ []
+
+
+Overfull \vbox (5.15315pt too high) detected at line 261
+ []
+
+
+LaTeX Warning: Reference `eq:Vijsimplified' on page E-4 undefined on input line
+ 273.
+
+
+LaTeX Warning: Reference `eq:HdivtriangleRemark' on page E-4 undefined on input
+ line 274.
+
+[4]
+File: ./figures/MasterSegment.pdf Graphic file (type pdf)
+<use ./figures/MasterSegment.pdf>
+Package pdftex.def Info: ./figures/MasterSegment.pdf  used on input line 299.
+(pdftex.def)             Requested size: 99.2882pt x 11.21536pt.
+ [5]
+File: ./figures/MasterQuad.pdf Graphic file (type pdf)
+<use ./figures/MasterQuad.pdf>
+Package pdftex.def Info: ./figures/MasterQuad.pdf  used on input line 371.
+(pdftex.def)             Requested size: 102.5619pt x 93.52266pt.
+
+Overfull \vbox (5.15315pt too high) detected at line 405
+ []
+
+[6]
+Overfull \vbox (5.15315pt too high) detected at line 450
+ []
+
+[7]
+File: ./figures/MasterTri.pdf Graphic file (type pdf)
+<use ./figures/MasterTri.pdf>
+Package pdftex.def Info: ./figures/MasterTri.pdf  used on input line 538.
+(pdftex.def)             Requested size: 103.8974pt x 92.44513pt.
+ [8] [9]
+File: ./figures/MasterHexa.pdf Graphic file (type pdf)
+<use ./figures/MasterHexa.pdf>
+Package pdftex.def Info: ./figures/MasterHexa.pdf  used on input line 700.
+(pdftex.def)             Requested size: 144.74039pt x 146.65755pt.
+ [10]
+Overfull \vbox (16.26509pt too high) detected at line 757
+ []
+
+
+Overfull \vbox (31.37703pt too high) detected at line 771
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 783
+ []
+
+[11]
+Overfull \vbox (16.26509pt too high) detected at line 820
+ []
+
+
+Overfull \vbox (31.37703pt too high) detected at line 835
+ []
+
+
+Overfull \vbox (31.37703pt too high) detected at line 850
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 864
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 877
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 890
+ []
+
+[12]
+Overfull \vbox (31.37703pt too high) detected at line 928
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 941
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 953
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 965
+ []
+
+
+Overfull \vbox (5.15315pt too high) detected at line 984
+ []
+
+[13]
+File: ./figures/MasterTet.pdf Graphic file (type pdf)
+<use ./figures/MasterTet.pdf>
+Package pdftex.def Info: ./figures/MasterTet.pdf  used on input line 1015.
+(pdftex.def)             Requested size: 144.74039pt x 142.68271pt.
+ [14]
+Overfull \vbox (5.15315pt too high) detected at line 1075
+ []
+
+[15]
+Overfull \vbox (1.15315pt too high) detected at line 1132
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 1143
+ []
+
+[16]
+Overfull \vbox (1.15315pt too high) detected at line 1214
+ []
+
+[17]
+<./figures/MasterPrismTables.pdf, id=1788, 372.9373pt x 284.36237pt>
+File: ./figures/MasterPrismTables.pdf Graphic file (type pdf)
+<use ./figures/MasterPrismTables.pdf>
+Package pdftex.def Info: ./figures/MasterPrismTables.pdf  used on input line 12
+99.
+(pdftex.def)             Requested size: 186.46819pt x 142.18083pt.
+ [18 <./figures/MasterPrismTables.pdf>]
+Overfull \vbox (1.15315pt too high) detected at line 1354
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 1375
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 1386
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 1397
+ []
+
+[19]
+Overfull \vbox (1.15315pt too high) detected at line 1432
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 1454
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 1466
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 1479
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 1490
+ []
+
+[20]
+Overfull \vbox (1.15315pt too high) detected at line 1525
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 1537
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 1549
+ []
+
+[21]
+Overfull \vbox (1.15315pt too high) detected at line 1583
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 1594
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 1606
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 1617
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 1628
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 1646
+ []
+
+[22]
+<./figures/MasterPyramidTables.pdf, id=1823, 362.30557pt x 291.45589pt>
+File: ./figures/MasterPyramidTables.pdf Graphic file (type pdf)
+<use ./figures/MasterPyramidTables.pdf>
+Package pdftex.def Info: ./figures/MasterPyramidTables.pdf  used on input line 
+1699.
+(pdftex.def)             Requested size: 181.15234pt x 145.72758pt.
+ [23 <./figures/MasterPyramidTables.pdf>]
+Overfull \vbox (1.15315pt too high) detected at line 1779
+ []
+
+
+Overfull \vbox (16.26509pt too high) detected at line 1814
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 1826
+ []
+
+[24]
+Overfull \vbox (1.15315pt too high) detected at line 1863
+ []
+
+
+Overfull \vbox (16.26509pt too high) detected at line 1912
+ []
+
+
+Overfull \vbox (16.26509pt too high) detected at line 1925
+ []
+
+[25]
+Overfull \vbox (1.15315pt too high) detected at line 1962
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 1975
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 1991
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 2007
+ []
+
+[26]
+Overfull \vbox (16.26509pt too high) detected at line 2055
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 2072
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 2087
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 2102
+ []
+
+
+LaTeX Warning: Reference `eq:SingularityAvoidNoOri' on page E-27 undefined on i
+nput line 2112.
+
+
+LaTeX Warning: Reference `eq:SingularityAvoidYesOri' on page E-27 undefined on 
+input line 2112.
+
+[27]
+Overfull \vbox (1.15315pt too high) detected at line 2140
+ []
+
+
+Overfull \vbox (1.15315pt too high) detected at line 2209
+ []
+
+[28]
+<./figures/LocalOrientationsTables.pdf, id=1861, 626.74153pt x 953.93088pt>
+File: ./figures/LocalOrientationsTables.pdf Graphic file (type pdf)
+<use ./figures/LocalOrientationsTables.pdf>
+Package pdftex.def Info: ./figures/LocalOrientationsTables.pdf  used on input l
+ine 2242.
+(pdftex.def)             Requested size: 313.37pt x 476.96426pt.
+ [29 <./figures/LocalOrientationsTables.pdf>])
+
+Package natbib Warning: There were undefined citations.
+
+[30]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 138.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 138.
+ (./main.aux
+
+Package natbib Warning: Citation(s) may have changed.
+(natbib)                Rerun to get citations correct.
+
+)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 138.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 138.
+
+
+Package rerunfilecheck Warning: File `main.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `main.out':
+(rerunfilecheck)             Before: <no file>
+(rerunfilecheck)             After:  4FE674627AD0572B517E70AE2DF5696E;5150.
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 138.
+ ) 
+Here is how much of TeX's memory you used:
+ 23163 strings out of 492616
+ 409177 string characters out of 6128983
+ 534326 words of memory out of 5000000
+ 25789 multiletter control sequences out of 15000+600000
+ 46731 words of font info for 121 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 55i,23n,56p,3247b,599s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/local/texlive/2018/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
+exlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmbsy10.pfb></usr/local/t
+exlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/te
+xlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/tex
+live/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx8.pfb></usr/local/texli
+ve/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texliv
+e/2018/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex8.pfb></usr/local/tex
+live/2018/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex9.pfb></usr/local/
+texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/t
+exlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/local/te
+xlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/local/texl
+ive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/local/texliv
+e/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/texlive/
+2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/20
+18/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></usr/local/texlive/2018
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/local/texlive/2018
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2018/t
+exmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2018/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2018/texmf
+-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/texlive/2018/texmf-di
+st/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texlive/2018/texmf-dist/
+fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2018/texmf-dist/fon
+ts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2018/texmf-dist/fonts/
+type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/2018/texmf-dist/fonts/typ
+e1/public/amsfonts/cm/cmss10.pfb></usr/local/texlive/2018/texmf-dist/fonts/type
+1/public/amsfonts/cm/cmss8.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/p
+ublic/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/pub
+lic/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/publi
+c/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/public/
+amsfonts/cm/cmsy9.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/public/am
+sfonts/cm/cmti12.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/public/ams
+fonts/symbols/msam10.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/public
+/amsfonts/symbols/msam7.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/pub
+lic/amsfonts/symbols/msbm10.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1
+/urw/times/utmb8a.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/urw/times
+/utmr8a.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/urw/times/utmri8a.p
+fb></usr/local/texlive/2018/texmf-dist/fonts/type1/urw/zapfding/uzdr.pfb></usr/
+local/texlive/2018/texmf-dist/fonts/type1/public/xypic/xyatip10.pfb></usr/local
+/texlive/2018/texmf-dist/fonts/type1/public/xypic/xybtip10.pfb>
+Output written on main.pdf (154 pages, 1218616 bytes).
+PDF statistics:
+ 2144 PDF objects out of 2487 (max. 8388607)
+ 1780 compressed objects within 18 object streams
+ 751 named destinations out of 1000 (max. 500000)
+ 233 words of extra memory for PDF output out of 10000 (max. 10000000)
+
