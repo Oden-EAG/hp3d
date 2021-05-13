@@ -77,55 +77,46 @@ gain=1.0d4
 zl=1.2d0; pmlfrac=0.25d0; imax=5; maxnods=8000 #6250
 file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_1_2'
 #gain=3.2d4
-#dir_output='../gain/outputs16/'
 
 #  2_4 (32 wavelengths), 6 refs (16*  64 elems), 12500 nodes
 #zl=2.4d0; pmlfrac=0.125d0; imax=6; maxnods=16000 #12500
 #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_2_4'
 #gain=1.6d4
-#dir_output='../gain/outputs32/'
 
 #  4_8 (64 wavelengths), 7 refs (16*  128 elems), 25000 nodes
 #zl=4.8d0; pmlfrac=0.0625d0; imax=7; maxnods=32000 #25000
 #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_4_8'
 #gain=8.0d3
-#dir_output='../gain/outputs64/'
 
 #  9_6 (128 wavelengths), 8 refs (16*  256 elems), 51000 nodes
 #zl=9.6d0; pmlfrac=0.03125d0; imax=8; maxnods=63000 #51000
 #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_9_6'
 #gain=4.0d3
-#dir_output='../gain/outputs128/'
 
 #  19_2 (256 wavelengths), 9 refs (16*  512 elems), 101000 nodes
 #zl=19.2d0; pmlfrac=0.015625d0; imax=9; maxnods=126000 #101000
 #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_19_2'
 #gain=2.0d3
-#dir_output='../gain/outputs256/'
 
 #  38_4 (512 wavelengths), 10 refs (16*  1024 elems), 201000 nodes
 #zl=38.4d0; pmlfrac=8.0d-3; imax=10; maxnods=251000 #201000
 #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_38_4'
 #gain=1.0d3
-#dir_output='../gain/outputs512/'
 
 #  76_8 (1024 wavelengths), 11 refs (16*  2048 elems), 401000 nodes
 #zl=76.8d0; pmlfrac=4.0d-3; imax=11; maxnods=501000
 #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_76_8'
 #gain=5.0d2
-#dir_output='../gain/outputs1024/'
 
 #  153_6 (2048 wavelengths), 12 refs (16*  4096 elems), 801000 nodes
 #zl=153.6d0; pmlfrac=2.0d-3; imax=12; maxnods=1001000 #801000
 #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_153_6'
 #gain=2.5d2
-#dir_output='../gain/outputs2048/'
 
 #  307_2 (4096 wavelengths), 13 refs (16*  8192 elems), 1601000 nodes
 #zl=307.2d0; pmlfrac=1.0d-3; imax=13; maxnods=2001000 #1601000
 #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_307_2'
 #gain=1.25d2
-#dir_output='../gain/outputs4096/'
 #
 # set job type
 job=1
@@ -137,7 +128,7 @@ job=1
 jmax=0
 #
 # set polynomial order p in (xy,z)
-px=6; py=6; pz=6
+px=5; py=5; pz=5
 #
 # set enriched order (p+dp)
 dp=1
@@ -183,7 +174,15 @@ gamma=1.0d0
 ctrl='../COMMON_FILES/control_0'
 #
 # set output
-dir_output='../outputs/'
+mkdir ${SLURM_JOB_ID}
+cd ${SLURM_JOB_ID}
+mkdir outputs
+cd outputs
+mkdir paraview
+mkdir power
+mkdir temp
+cd ../..
+dir_output="${SLURM_JOB_ID}/outputs/"
 vis_level=3
 
 args=" -geom 5 -isol 13 -gamma ${gamma} -comp 1"
