@@ -3,5 +3,4 @@ find_case.F90
 hp3gen.F90
 min_order.F90
 read_input.F90
-set_index.F90
 0

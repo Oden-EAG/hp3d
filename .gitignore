@@ -8,6 +8,7 @@
 .dummy
 fort.19
 fort.20
+*~
 
 # Prerequisites
 *.d
@@ -17,6 +18,10 @@ fort.20
 *.lo
 *.o
 *.obj
+
+# Binary Applications
+pois
+uwLaser
 
 # Output files
 *.e

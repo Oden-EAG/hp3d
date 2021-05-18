@@ -108,7 +108,7 @@ module data_structure3D
 !         6 - free H(div) component
 !         7 - L2 component with Dirichlet BC flag
 !         8 - free L2 component
-        integer(8)       :: index
+!!!        integer(8)       :: index
 !
 !  .....order of approximation
         integer          :: order
@@ -302,14 +302,14 @@ module data_structure3D
 !
 !-----------------------------------------------------------------------
 !
-!  ...get index for a node
-      subroutine get_index(Nod, Indexd)
-!
-      integer Indexd(NRINDEX)
-!
-      call decodLong(NODES(Nod)%index,10,NRINDEX, Indexd)
-!
-      end subroutine get_index
+!!!!  ...get index for a node
+!!!      subroutine get_index(Nod, Indexd)
+!!!!
+!!!      integer Indexd(NRINDEX)
+!!!!
+!!!      call decodLong(NODES(Nod)%index,10,NRINDEX, Indexd)
+!!!!
+!!!      end subroutine get_index
 !
 !-----------------------------------------------------------------------
 !
@@ -342,7 +342,7 @@ module data_structure3D
       do nod=1,MAXNODS
         NODES(nod)%type = 'none'
         NODES(nod)%case = 0
-        NODES(nod)%index = 0
+!!!        NODES(nod)%index = 0
         NODES(nod)%order = 0
         NODES(nod)%act = .false.
         NODES(nod)%subd = -1
@@ -426,7 +426,7 @@ module data_structure3D
       do nod=MAXNODS+1,MAXNODS_NEW
         NODES_NEW(nod)%type = 'none'
         NODES_NEW(nod)%case = 0
-        NODES_NEW(nod)%index = 0
+!!!        NODES_NEW(nod)%index = 0
         NODES_NEW(nod)%order = 0
         NODES_NEW(nod)%act = .false.
         NODES_NEW(nod)%subd = -1
@@ -511,7 +511,7 @@ module data_structure3D
       do nod=1,NRNODS
         write(ndump,*) NODES(nod)%type
         write(ndump,*) NODES(nod)%case
-        write(ndump,*) NODES(nod)%index
+!!!        write(ndump,*) NODES(nod)%index
         write(ndump,*) NODES(nod)%order
         write(ndump,*) NODES(nod)%bcond
         write(ndump,*) NODES(nod)%ref_kind
@@ -654,7 +654,7 @@ module data_structure3D
       do nod=1,NRNODS
         read(ndump,*) NODES(nod)%type
         read(ndump,*) NODES(nod)%case
-        read(ndump,*) NODES(nod)%index
+!!!        read(ndump,*) NODES(nod)%index
         read(ndump,*) NODES(nod)%order
         read(ndump,*) NODES(nod)%bcond
         read(ndump,*) NODES(nod)%ref_kind
@@ -802,20 +802,13 @@ module data_structure3D
 !-----------------------------------------------------------------------
       function Is_dirichlet(Nod)
       integer Nod
-      integer ibc(NR_PHYSA), loc
+      integer ibc(NRINDEX), icomp
       logical Is_dirichlet
-
-      call decod(NODES(Nod)%bcond,10,NR_PHYSA, ibc)
+!
+      call decod(NODES(Nod)%bcond,2,NRINDEX, ibc)
       Is_dirichlet = .false.
-      do iphys=1,NR_PHYSA
-        if (ibc(iphys).eq.1) then
-          Is_dirichlet = .true.
-        else
-          call locate(ibc(iphys),DIRICHLET_LIST,NR_DIRICHLET_LIST, loc)
-          if (loc.ne.0) then
-            Is_dirichlet = .true.
-          endif
-        endif
+      do icomp=1,NRINDEX
+        if (ibc(icomp).eq.1) Is_dirichlet = .true.
       enddo
 !
       end function

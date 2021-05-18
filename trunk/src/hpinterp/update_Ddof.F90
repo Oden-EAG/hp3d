@@ -54,7 +54,7 @@ subroutine update_Ddof()
 !..auxiliary variables
    integer :: iel,iv,ie,ifc,ind,iflag
    integer :: mdle,no,nod
-   integer :: i,k,loc,nr_elem_nodes,nrnodm,nr_up_elem
+   integer :: i,k,loc,nr_elem_nodes,nrnodm,nr_up_elem,iprint
 !
 !..additional variables for distributed case
    integer :: src,rcv,tag,count,ierr,j_loc,j_glb,j_off,loc_max
@@ -65,6 +65,8 @@ subroutine update_Ddof()
    VTYPE  , dimension(:,:), pointer :: buf
 !
 !-----------------------------------------------------------------------
+!
+   iprint=0
 !
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 !
@@ -145,8 +147,10 @@ subroutine update_Ddof()
                if (is_dirichlet_homogeneous(nod)) then
                   NODES(nod)%dof%zdofH = ZERO
                else
+                  if (iprint.eq.1) write(*,7010) mdle,iv,nod
+ 7010             format('update_Ddof: CALLING dhpvert FOR mdle,iv,nod = ',i6,i2,2x,i5)
                   call dhpvert(mdle,iflag,no,xsub(1:3,iv),NODES(nod)%case, &
-                     NODES(nod)%dof%zdofH)
+                               NODES(nod)%bcond,  NODES(nod)%dof%zdofH)
                endif
                NODES(nod)%geom_interf=1
             endif
@@ -172,9 +176,11 @@ subroutine update_Ddof()
                   if (is_dirichlet_homogeneous(nod)) then
                      NODES(nod)%dof%zdofH = ZERO
                   else
-                     call dhpedgeH(mdle,iflag,no,xsub,                  &
-                                   etype,NODES(nod)%case,               &
-                                   nedge_orient,nface_orient,norder,ie, &
+                     if (iprint.eq.1) write(*,7020) mdle,ie,nod
+ 7020                format('update_Ddof: CALLING dhpedgeH FOR mdle,ie,nod = ',i6,i2,2x,i5)
+                     call dhpedgeH(mdle,iflag,no,xsub,                     &
+                                   etype,NODES(nod)%case,NODES(nod)%bcond, &
+                                   nedge_orient,nface_orient,norder,ie,    &
                                    zdofH, NODES(nod)%dof%zdofH)
                   endif
                endif
@@ -183,9 +189,11 @@ subroutine update_Ddof()
                   if (is_dirichlet_homogeneous(nod)) then
                      NODES(nod)%dof%zdofE = ZERO
                   else
-                     call dhpedgeE(mdle,iflag,no,xsub,                  &
-                                   etype,NODES(nod)%case,               &
-                                   nedge_orient,nface_orient,norder,ie, &
+                     if (iprint.eq.1) write(*,7030) mdle,ie,nod
+ 7030                format('update_Ddof: CALLING dhpedgeE FOR mdle,ie,nod = ',i6,i2,2x,i5)
+                     call dhpedgeE(mdle,iflag,no,xsub,                     &
+                                   etype,NODES(nod)%case,NODES(nod)%bcond, &
+                                   nedge_orient,nface_orient,norder,ie,    &
                                    NODES(nod)%dof%zdofE)
 
                   endif
@@ -208,15 +216,20 @@ subroutine update_Ddof()
             nod = nodesl(ind)
             if (.not.associated(NODES(nod)%dof)) cycle
             if (NODES(nod)%geom_interf.eq.1)     cycle
+!!!            write(*,*) 'HERE'
+!!!            if (iprint.eq.1) write(*,*) 'nod,is_dirichlet(nod) = ',nod,is_dirichlet(nod)! a mystery....
+            
             if (is_dirichlet(nod)) then
 !           ...update H1 Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofH)) then
                   if (is_dirichlet_homogeneous(nod)) then
                      NODES(nod)%dof%zdofH = ZERO
                   else
-                     call dhpfaceH(mdle,iflag,no,xsub,                   &
-                                   etype,NODES(nod)%case,                &
-                                   nedge_orient,nface_orient,norder,ifc, &
+                     if (iprint.eq.1) write(*,7040) mdle,ifc,nod
+ 7040                format('update_Ddof: CALLING dhpfaceH FOR mdle,ifc,nod = ',i6,i2,2x,i5)
+                     call dhpfaceH(mdle,iflag,no,xsub,                     &
+                                   etype,NODES(nod)%case,NODES(nod)%bcond, &
+                                   nedge_orient,nface_orient,norder,ifc,   &
                                    zdofH, NODES(nod)%dof%zdofH)
                   endif
                endif
@@ -225,9 +238,11 @@ subroutine update_Ddof()
                   if (is_dirichlet_homogeneous(nod)) then
                      NODES(nod)%dof%zdofE = ZERO
                   else
-                     call dhpfaceE(mdle,iflag,no,xsub,                   &
-                                   etype,NODES(nod)%case,                &
-                                   nedge_orient,nface_orient,norder,ifc, &
+                     if (iprint.eq.1) write(*,7050) mdle,ifc,nod
+ 7050                format('update_Ddof: CALLING dhpfaceE FOR mdle,ifc,nod = ',i6,i2,2x,i5)
+                     call dhpfaceE(mdle,iflag,no,xsub,                     &
+                                   etype,NODES(nod)%case,NODES(nod)%bcond, &
+                                   nedge_orient,nface_orient,norder,ifc,   &
                                    zdofE, NODES(nod)%dof%zdofE)
 
                   endif
@@ -237,9 +252,11 @@ subroutine update_Ddof()
                   if (is_dirichlet_homogeneous(nod)) then
                      NODES(nod)%dof%zdofV = ZERO
                   else
-                     call dhpfaceV(mdle,iflag,no,xsub,                   &
-                                   etype,NODES(nod)%case,                &
-                                   nedge_orient,nface_orient,norder,ifc, &
+                     if (iprint.eq.1) write(*,7060) mdle,ifc,nod
+ 7060                format('update_Ddof: CALLING dhpfaceV FOR mdle,ifc,nod = ',i6,i2,2x,i5)
+                     call dhpfaceV(mdle,iflag,no,xsub,                     &
+                                   etype,NODES(nod)%case,NODES(nod)%bcond, &
+                                   nedge_orient,nface_orient,norder,ifc,   &
                                    NODES(nod)%dof%zdofV)
                   endif
                endif

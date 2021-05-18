@@ -9,6 +9,7 @@
 !! @param[in]  Etav         - reference coordinates of the element vertices
 !! @param[in]  Type         - element (middle node) type
 !! @param[in]  Icase        - the edge node case
+!! @param[in]  Bcond        - the edge node BC flag
 !! @param[in]  Nedge_orient - edge orientation
 !! @param[in]  Nface_orient - face orientation (not used)
 !! @param[in]  Norder       - element order
@@ -21,7 +22,7 @@
 !-----------------------------------------------------------------------
 !
 #include "typedefs.h"
-  subroutine dhpedgeH(Mdle,Iflag,No,Etav,Type,Icase,&
+  subroutine dhpedgeH(Mdle,Iflag,No,Etav,Type,Icase,Bcond,&
                       Nedge_orient,Nface_orient,Norder,Iedge,&
                       ZdofH, ZnodH)
 !
@@ -35,7 +36,7 @@
 !-----------------------------------------------------------------------
 !
   integer,           intent(in)    :: Iflag,No,Mdle
-  integer,           intent(in)    :: Icase,Iedge
+  integer,           intent(in)    :: Icase,Bcond,Iedge
   real(8),           intent(in)    :: Etav(3,8)
   character(len=4),  intent(in)    :: Type
   integer,           intent(in)    :: Nedge_orient(12)
@@ -76,8 +77,9 @@
 ! derivatives of Dirichlet date wrt reference coordinates
   VTYPE :: zdvalHdeta(MAXEQNH,3)
 !
-! decoded case for the face node
+! decoded case and BC flags for the edge node
   integer, dimension(NR_PHYSA)          :: ncase
+  integer, dimension(NRINDEX)           :: ibcnd
 !
 ! work space for linear solvers
   integer                               :: naH,info
@@ -92,7 +94,7 @@
 !
 ! misc work space
   integer :: iprint,nrv,nre,nrf,i,j,k,ivarH,nvarH,kj,ki,&
-             ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_Edge,iflag1
+             ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_Edge,iflag1,ic
 !
 !----------------------------------------------------------------------
 !
@@ -331,45 +333,53 @@
   endif
 #endif
 !
-! save dof's, skipping irrelevant entries
+!  ...save dof's, skipping irrelevant entries
 !
-! decoded node case, indicating supported variables
-  call decod(Icase,2,NR_PHYSA, ncase)
+!  ...decode the case and the BC flag
+      call decod(Icase,2,NR_PHYSA, ncase)
+      call decod(Bcond,2,NRINDEX,  ibcnd)
 !
-! initialize global variable counter, and node local variable counter
-  ivarH=0 ; nvarH=0
+!  ...initialize global variable counter, and node local variable counter
+      ivarH=0 ; nvarH=0
 !
-! loop through multiple copies of variables
-  do j=1,NRCOMS
+!  ...loop through multiple copies of variables
+      do j=1,NRCOMS
 !
-!   loop through physical attributes
-    do i=1,NR_PHYSA
+!  .....initiate the BC component counter
+        ic=0
 !
-!     loop through components of physical attribute
-      do k=1,NR_COMP(i)
+!  .....loop through physical attributes
+        do i=1,NR_PHYSA
 !
-        select case(DTYPE(i))
+!  .......loop through components of physical attribute
+          do k=1,NR_COMP(i)
 !
-!       H1 component
-        case('contin')
+!  .........if the variable is supported by the node, update the BC component counter
+            if (ncase(i).eq.1) ic=ic+1
 !
-!         update global counter
-          ivarH = ivarH + 1
+!  .........select the discretization type
+            select case(DTYPE(i))
 !
-!         Dirichlet component
-          if (ncase(i).eq.1) then
+!  .........H1 component
+            case('contin')
 !
-!           update node local conter
-            nvarH = nvarH + 1
+!  ...........update global counter
+              ivarH = ivarH + 1
 !
-!           store Dirichlet dof
-            ZnodH(nvarH,1:ndofH_edge) = zuH(1:ndofH_edge,ivarH)
+!  ...........if the variable is supported by the node
+              if (ncase(i).eq.1) then
 !
-          endif
-        endselect
+!  .............update the node local conter
+                nvarH = nvarH + 1
+!
+!  .............store Dirichlet dof
+                if (ibcnd(ic).eq.1) ZnodH(nvarH,1:ndofH_edge) = zuH(1:ndofH_edge,ivarH)
+!
+              endif
+            end select
+          enddo
+        enddo
       enddo
-    enddo
-  enddo
 !
 !
-  end subroutine dhpedgeH
+      end subroutine dhpedgeH

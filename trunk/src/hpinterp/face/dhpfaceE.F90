@@ -11,6 +11,7 @@
 !! @param[in]  Etav         - GMP reference coordinates of the element vertices
 !! @param[in]  Type         - element (middle node) type
 !! @param[in]  Icase        - the face node case
+!! @param[in]  Bcond        - the edge node BC flag
 !! @param[in]  Nedge_orient - edge orientation
 !! @param[in]  Nface_orient - face orientation
 !! @param[in]  Norder       - element order
@@ -19,7 +20,7 @@
 !!
 !! @param[out] ZnodE        - H(curl) dof for the face
 !-----------------------------------------------------------------------
-  subroutine dhpfaceE(Mdle,Iflag,No,Etav, Type,Icase, &
+  subroutine dhpfaceE(Mdle,Iflag,No,Etav, Type,Icase,Bcond, &
                       Nedge_orient,Nface_orient,Norder,Iface, &
                       ZdofE, ZnodE)
   use control
@@ -32,7 +33,7 @@
 ! ** Arguments
 !-----------------------------------------------------------------------
   integer,                                    intent(in)  :: Iflag,No,Mdle
-  integer,                                    intent(in)  :: Icase,Iface
+  integer,                                    intent(in)  :: Icase,Bcond,Iface
   real(8), dimension(3,8),                    intent(in)  :: Etav
   character(len=4),                           intent(in)  :: Type
   integer, dimension(12),                     intent(in)  :: Nedge_orient
@@ -99,13 +100,15 @@
   real(8), dimension(MAXMdlqH+MAXMdlqE,MAXEQNE) :: duE_real, duE_imag
 #endif
 !
-  integer, dimension(NR_PHYSA) :: ncase
+! decoded case and BC flag for the face node
+  integer, dimension(NR_PHYSA)          :: ncase
+  integer, dimension(NRINDEX)           :: ibcnd
 !
 ! misc
   integer :: nrv,nre,nrf,nsign,nflag, &
              i,j,jH,iE,jE,kjE,kiE,kjH,k,kE,&
              ivarE,nvarE,naE,iprint,info, &
-             ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,ndofE_tot
+             ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,ndofE_tot,ic
 !
 !-----------------------------------------------------------------------
 !
@@ -457,39 +460,61 @@
 !
 !------------------------------------------------------
 !
-! save the dof
-  call decod(Icase,2,NR_PHYSA, ncase)
+!  ...save the dof's, skipping irrelevant entries
+!
+!  ...decode the case and the BC flag
+      call decod(Icase,2,NR_PHYSA, ncase)
+      call decod(Bcond,2,NRINDEX,  ibcnd)
 !
 #if DEBUG_MODE
-  if (iprint.eq.1) then
-     write(*,*) 'dhpfaceE: ncase = ', ncase
-  endif
+      if (iprint.eq.1) then
+        write(*,*) 'dhpfaceE: ncase = ', ncase
+      endif
 #endif
 !
-  ivarE=0; nvarE=0
+!  ...initialize global variable counter, and node local variable counter
+      ivarE=0; nvarE=0
 !
-! loop through multiple copies of variables
-  do j=1,NRCOMS
+!  ...loop through multiple copies of variables
+      do j=1,NRCOMS
 !
-!   loop through physical attributes
-    do i=1,NR_PHYSA
+!  .....initiate the BC component counter
+        ic=0
 !
-!     loop through components
-      do k=1,NR_COMP(i)
-        select case(DTYPE(i))
-        case('tangen')
-          ivarE=ivarE+1
-          if (ncase(i).eq.1) then
-            nvarE = nvarE + 1
-            ZnodE(nvarE,1:ndofE_face) = zuE(1:ndofE_face,ivarE)
-          endif
-        end select
+!  .....loop through physical attributes
+        do i=1,NR_PHYSA
+!
+!  .......loop through components
+          do k=1,NR_COMP(i)
+!
+!  .........if the variable is supported by the node, update the BC component counter
+            if (ncase(i).eq.1) ic=ic+1
+!
+!  .........select the discretization type
+            select case(DTYPE(i))
+!
+!  .........H(curl) component
+            case('tangen')
+!
+!  ...........update global counter
+              ivarE=ivarE+1
+!
+!  ...........if the variable is supported by the node
+              if (ncase(i).eq.1) then
+!
+!  .............update node local conter
+                nvarE = nvarE + 1
+!
+!  .............store Dirichlet dof
+                if (ibcnd(ic).eq.1) ZnodE(nvarE,1:ndofE_face) = zuE(1:ndofE_face,ivarE)
+              endif
+            end select
+          enddo
+        enddo
       enddo
-    enddo
-  enddo
 !
 #if DEBUG_MODE
-  if (iprint.eq.1) call result
+      if (iprint.eq.1) call result
 #endif
 !
-  end subroutine dhpfaceE
+      end subroutine dhpfaceE

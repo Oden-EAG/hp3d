@@ -12,6 +12,7 @@
 !! @param[in]  Etav         - reference coordinates of the element vertices
 !! @param[in]  Type         - element (middle node) type
 !! @param[in]  Icase        - the face node case
+!! @param[in]  Bcond        - the face node BC flag
 !! @param[in]  Nedge_orient - edge orientation
 !! @param[in]  Nface_orient - face orientation
 !! @param[in]  Norder       - element order
@@ -20,7 +21,7 @@
 !!
 !! @param[out] ZnodH        - H1 dof for the face
 !-----------------------------------------------------------------------
-  subroutine dhpfaceH(Mdle,Iflag,No,Etav,Type,Icase, &
+  subroutine dhpfaceH(Mdle,Iflag,No,Etav,Type,Icase,Bcond, &
                       Nedge_orient,Nface_orient,Norder,Iface, &
                       ZdofH, ZnodH)
   use control
@@ -32,7 +33,7 @@
 ! ** Arguments
 !-----------------------------------------------------------------------
   integer,                                    intent(in)  :: Iflag,No,Mdle
-  integer,                                    intent(in)  :: Icase,Iface
+  integer,                                    intent(in)  :: Icase,Bcond,Iface
   real(8), dimension(3,8),                    intent(in)  :: Etav
   character(len=4),                           intent(in)  :: Type
   integer, dimension(12),                     intent(in)  :: Nedge_orient
@@ -92,19 +93,20 @@
   real(8), dimension(MAXMdlqH,MAXEQNH)  :: duH_real,duH_imag
 #endif
 !
-! decoded case for the face node
+! decoded case and BC flags for the edge node
   integer, dimension(NR_PHYSA)          :: ncase
+  integer, dimension(NRINDEX)           :: ibcnd
 !
 ! misc work space
   integer :: iprint,nrv,nre,nrf,i,j,k,ie,ivarH,nvarH,kj,ki,&
-             ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,nsign
+             ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,nsign,ic
 !
 !-----------------------------------------------------------------------
 !
   nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
 !
   iprint = 0
-#if DEBUG_MODE
+!#if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Icase,Iface,Type
 7010 format('dhpfaceH: Mdle,Iflag,No,Icase,Iface,Type = ',5i4,a4)
@@ -118,7 +120,7 @@
 7050 format('          Norder = ',19i4)
      call pause
   endif
-#endif
+!#endif
 !
 ! determine # of dof for the face node
   call ndof_nod(face_type(Type,Iface),Norder(nre+Iface), &
@@ -259,7 +261,7 @@
 ! end of loop through integration points
   enddo
 !
-#if DEBUG_MODE
+!#if DEBUG_MODE
   if (iprint.eq.1) then
     write(*,*) 'dhpfaceH: LOAD VECTOR AND STIFFNESS MATRIX FOR ', &
                'ndofH_face = ',ndofH_face
@@ -274,7 +276,7 @@
 # endif
 7016    format(10e12.5)
   endif
-#endif
+!#endif
 !
 !-----------------------------------------------------------------------
 !
@@ -313,7 +315,7 @@
              zuH,naH)
 #endif
 !
-#if DEBUG_MODE
+!#if DEBUG_MODE
   if (iprint.eq.1) then
    write(*,*) 'dhpfaceH: k,zu(k) = '
    do k=1,ndofH_face
@@ -321,39 +323,64 @@
    enddo
    call pause
   endif
-#endif
+!#endif
 !
-! save the dof, skipping irrelevant entries
-  call decod(Icase,2,NR_PHYSA, ncase)
+!  ...save the dof, skipping irrelevant entries
+!
+!  ...decode the case and the BC flag
+      call decod(Icase,2,NR_PHYSA, ncase)
+      call decod(Bcond,2,NRINDEX,  ibcnd)
 !
 #if DEBUG_MODE
-  if (iprint.eq.1) then
-     write(*,*) 'dhpfaceH: ncase = ', ncase
-  endif
+      if (iprint.eq.1) then
+        write(*,*) 'dhpfaceH: ncase = ', ncase
+      endif
 #endif
 !
-!------------------------------------------------------
-  ivarH=0; nvarH=0
+!  ...initialize global variable counter, and node local variable counter
+      ivarH=0 ; nvarH=0
 !
-! loop through multiple copies of variables
-  do j=1,NRCOMS
+!  ...loop through multiple copies of variables
+      do j=1,NRCOMS
 !
-!   loop through physical attributes
-    do i=1,NR_PHYSA
+!  .....initiate the BC component counter
+        ic=0
 !
-!     loop through components
-      do k=1,NR_COMP(i)
-        select case(DTYPE(i))
-        case('contin')
-          ivarH = ivarH + 1
-          if (ncase(i).eq.1) then
-            nvarH = nvarH + 1
-            ZnodH(nvarH,1:ndofH_face) = zuH(1:ndofH_face,ivarH)
-          endif
-        end select
+!  .....loop through physical attributes
+        do i=1,NR_PHYSA
+!
+!  .......loop through components
+          do k=1,NR_COMP(i)
+!
+!  .........if the variable is supported by the node, update the BC component counter
+            if (ncase(i).eq.1) ic=ic+1
+!
+!  .........select the discretization type
+            select case(DTYPE(i))
+!
+!  .........H1 component
+            case('contin')
+!
+!  ...........update global counter
+              ivarH = ivarH + 1
+!
+!  ...........if the variable is supported by the node
+              if (ncase(i).eq.1) then
+!
+!  .............update the node local conter
+                nvarH = nvarH + 1
+!
+!  .............store Dirichlet dof
+                if (ibcnd(ic).eq.1) ZnodH(nvarH,1:ndofH_face) = zuH(1:ndofH_face,ivarH)
+              endif
+            end select
+          enddo
+        enddo
       enddo
-    enddo
-  enddo
 !
-  end subroutine dhpfaceH
+!#if DEBUG_MODE
+      if (iprint.eq.1) call result
+!#endif
+!
+      end subroutine dhpfaceH
 

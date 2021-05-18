@@ -41,8 +41,10 @@ subroutine set_index(Icase,Iflag, Index)
       integer,dimension(NRINDEX)  :: indexd
 !  ...binary version of Icase
       integer,dimension(NR_PHYSA) :: ncase
-!  ...decimal version of the BC flag
-      integer,dimension(NR_PHYSA) :: ibcd
+!!!!  ...decimal version of the BC flag
+!!!      integer,dimension(NR_PHYSA) :: ibcd
+!  ...binary version of the BC flag
+      integer,dimension(NRINDEX) :: ibcd
 !  ...others
       integer :: i,j,ic
 !
@@ -53,8 +55,9 @@ subroutine set_index(Icase,Iflag, Index)
 !-----------------------------------------------------------------------
 !
 !  ...decode the Icase flag, decode the BC flag
-      call decod(Icase, 2,NR_PHYSA, ncase)
-      call decod(Iflag,10,NR_PHYSA, ibcd )
+      call decod(Icase,2,NR_PHYSA, ncase)
+!!!      call decod(Iflag,10,NR_PHYSA, ibcd )
+      call decod(Iflag,2,NRINDEX, ibcd )
 !
 !  ...initiate index counter
       ic=0
@@ -82,32 +85,35 @@ subroutine set_index(Icase,Iflag, Index)
 !  ...........free H1 component
               indexd(ic)=2
 !
-!  ...........Dirichlet BC on ALL components
-              if (ibcd(i).eq.1) indexd(ic)=1
-!
-!  ...........Dirichlet BC on 2nd and 3rd components
-              if ((ibcd(i).eq.3).and.((j.eq.2).or.(j.eq.3))) then
-                indexd(ic)=1
-              endif
-!
-!  ...........Dirichlet BC on 1st and 3rd components
-              if ((ibcd(i).eq.4).and.((j.eq.1).or.(j.eq.3))) then
-                indexd(ic)=1
-              endif
-!
-!  ...........Dirichlet BC on 1st and 2nd components
-              if ((ibcd(i).eq.5).and.((j.eq.1).or.(j.eq.2))) then
-                indexd(ic)=1
-              endif
-!
-!  ...........Dirichlet BC on 1st component
-              if ((ibcd(i).eq.6).and.(j.eq.1)) indexd(ic)=1
-!
-!  ...........Dirichlet BC on 2nd component
-              if ((ibcd(i).eq.7).and.(j.eq.2)) indexd(ic)=1
-!
-!  ...........Dirichlet BC on 3rd component
-              if ((ibcd(i).eq.8).and.(j.eq.3)) indexd(ic)=1
+!  ...........Dirichlet BC
+              if (ibcd(ic).eq.1) indexd(ic)=1
+!!!!
+!!!!  ...........Dirichlet BC on ALL components
+!!!              if (ibcd(i).eq.1) indexd(ic)=1
+!!!!
+!!!!  ...........Dirichlet BC on 2nd and 3rd components
+!!!              if ((ibcd(i).eq.3).and.((j.eq.2).or.(j.eq.3))) then
+!!!                indexd(ic)=1
+!!!              endif
+!!!!
+!!!!  ...........Dirichlet BC on 1st and 3rd components
+!!!              if ((ibcd(i).eq.4).and.((j.eq.1).or.(j.eq.3))) then
+!!!               indexd(ic)=1
+!!!              endif
+!!!!
+!!!!  ...........Dirichlet BC on 1st and 2nd components
+!!!              if ((ibcd(i).eq.5).and.((j.eq.1).or.(j.eq.2))) then
+!!!                indexd(ic)=1
+!!!              endif
+!!!!
+!!!!  ...........Dirichlet BC on 1st component
+!!!              if ((ibcd(i).eq.6).and.(j.eq.1)) indexd(ic)=1
+!!!!
+!!!!  ...........Dirichlet BC on 2nd component
+!!!              if ((ibcd(i).eq.7).and.(j.eq.2)) indexd(ic)=1
+!!!!
+!!!!  ...........Dirichlet BC on 3rd component
+!!!              if ((ibcd(i).eq.8).and.(j.eq.3)) indexd(ic)=1
             enddo
 !
 !  .......H(curl) variable
@@ -121,31 +127,34 @@ subroutine set_index(Icase,Iflag, Index)
               indexd(ic)=4
 !
 !  ...........Dirichlet BC
-              if (ibcd(i).eq.1) indexd(ic)=3
-!
-!  ...........Dirichlet BC on 2nd and 3rd components
-              if ((ibcd(i).eq.3).and.((j.eq.2).or.(j.eq.3))) then
-                indexd(ic)=3
-              endif
-!
-!  ...........Dirichlet BC on 1st and 3rd components
-              if ((ibcd(i).eq.4).and.((j.eq.1).or.(j.eq.3))) then
-                indexd(ic)=3
-              endif
-!
-!  ...........Dirichlet BC on 1st and 2nd components
-              if ((ibcd(i).eq.5).and.((j.eq.1).or.(j.eq.2))) then
-                indexd(ic)=3
-              endif
-!
-!  ...........Dirichlet BC on 1st component
-              if ((ibcd(i).eq.6).and.(j.eq.1)) indexd(ic)=3
-!
-!  ...........Dirichlet BC on 2nd component
-              if ((ibcd(i).eq.7).and.(j.eq.2)) indexd(ic)=3
-!
-!  ...........Dirichlet BC on 3rd component
-              if ((ibcd(i).eq.8).and.(j.eq.3)) indexd(ic)=3
+              if (ibcd(ic).eq.1) indexd(ic)=3
+!!!!
+!!!!  ...........Dirichlet BC
+!!!              if (ibcd(i).eq.1) indexd(ic)=3
+!!!!
+!!!!  ...........Dirichlet BC on 2nd and 3rd components
+!!!              if ((ibcd(i).eq.3).and.((j.eq.2).or.(j.eq.3))) then
+!!!                indexd(ic)=3
+!!!              endif
+!!!!
+!!!!  ...........Dirichlet BC on 1st and 3rd components
+!!!              if ((ibcd(i).eq.4).and.((j.eq.1).or.(j.eq.3))) then
+!!!                indexd(ic)=3
+!!!              endif
+!!!!
+!!!!  ...........Dirichlet BC on 1st and 2nd components
+!!!              if ((ibcd(i).eq.5).and.((j.eq.1).or.(j.eq.2))) then
+!!!                indexd(ic)=3
+!!!              endif
+!!!!
+!!!!  ...........Dirichlet BC on 1st component
+!!!              if ((ibcd(i).eq.6).and.(j.eq.1)) indexd(ic)=3
+!!!!
+!!!!  ...........Dirichlet BC on 2nd component
+!!!              if ((ibcd(i).eq.7).and.(j.eq.2)) indexd(ic)=3
+!!!!
+!!!!  ...........Dirichlet BC on 3rd component
+!!!              if ((ibcd(i).eq.8).and.(j.eq.3)) indexd(ic)=3
 !
 !          ...specific for EM impedance BC
 !  ...........Impedance BC for Primal Maxwell
@@ -165,40 +174,43 @@ subroutine set_index(Icase,Iflag, Index)
               indexd(ic)=6
 !
 !  ...........Dirichlet BC
-              if (ibcd(i).eq.1) then
-                indexd(ic)=5
-              endif
-!
-!  ...........Dirichlet BC on 1st component
-              if ((ibcd(i).eq.3).and.(j.eq.1)) then
-                indexd(ic)=5
-              endif
-!
-!  ...........Dirichlet BC on 2nd component
-              if ((ibcd(i).eq.4).and.(j.eq.2)) then
-                indexd(ic)=5
-              endif
-!
-!  ...........Dirichlet BC on 3rd component
-              if ((ibcd(i).eq.5).and.(j.eq.3)) then
-                indexd(ic)=5
-              endif
-!
-!  ...........Dirichlet BC on 2nd and 3rd components
-              if ((ibcd(i).eq.6).and.((j.eq.2).or.(j.eq.3))) then
-                indexd(ic)=5
-              endif
-!
-!  ...........Dirichlet BC on 1st and 3rd components
-              if ((ibcd(i).eq.7).and.((j.eq.1).or.(j.eq.3))) then
-                indexd(ic)=5
-              endif
-!
-!  ...........Dirichlet BC on 1st and 2nd components
-              if ((ibcd(i).eq.8).and.((j.eq.1).or.(j.eq.2))) then
-                indexd(ic)=5
-              endif
-            enddo
+              if (ibcd(ic).eq.1) indexd(ic)=5
+!!!!
+!!!!  ...........Dirichlet BC
+!!!              if (ibcd(i).eq.1) then
+!!!                indexd(ic)=5
+!!!              endif
+!!!!
+!!!!  ...........Dirichlet BC on 1st component
+!!!              if ((ibcd(i).eq.3).and.(j.eq.1)) then
+!!!                indexd(ic)=5
+!!!              endif
+!!!!
+!!!!  ...........Dirichlet BC on 2nd component
+!!!              if ((ibcd(i).eq.4).and.(j.eq.2)) then
+!!!                indexd(ic)=5
+!!!              endif
+!!!!
+!!!!  ...........Dirichlet BC on 3rd component
+!!!              if ((ibcd(i).eq.5).and.(j.eq.3)) then
+!!!                indexd(ic)=5
+!!!              endif
+!!!!
+!!!!  ...........Dirichlet BC on 2nd and 3rd components
+!!!              if ((ibcd(i).eq.6).and.((j.eq.2).or.(j.eq.3))) then
+!!!                indexd(ic)=5
+!!!              endif
+!!!!
+!!!!  ...........Dirichlet BC on 1st and 3rd components
+!!!              if ((ibcd(i).eq.7).and.((j.eq.1).or.(j.eq.3))) then
+!!!                indexd(ic)=5
+!!!              endif
+!!!!
+!!!!  ...........Dirichlet BC on 1st and 2nd components
+!!!              if ((ibcd(i).eq.8).and.((j.eq.1).or.(j.eq.2))) then
+!!!                indexd(ic)=5
+!!!              endif
+ !!!           enddo
 !
 !  ...........specific for acoustic impedance BC:
               !if (ibcd(i).eq.9) then
@@ -217,7 +229,8 @@ subroutine set_index(Icase,Iflag, Index)
               indexd(ic)=8
 !
 !  ...........Dirichlet BC
-              if (ibcd(i).eq.1) indexd(ic)=7
+!!!              if (ibcd(i).eq.1) indexd(ic)=7
+              if (ibcd(ic).eq.1) indexd(ic)=7
             enddo
           end select
         endif

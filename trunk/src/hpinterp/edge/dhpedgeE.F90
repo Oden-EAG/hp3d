@@ -9,6 +9,7 @@
 !! @param[in]  Etav         - reference coordinates of the element vertices
 !! @param[in]  Type         - element (middle node) type
 !! @param[in]  Icase        - the edge node case
+!! @param[in]  Bcond        - the edge node BC flag
 !! @param[in]  Nedge_orient - edge orientation
 !! @param[in]  Nface_orient - face orientation (not used)
 !! @param[in]  Norder       - element order
@@ -20,7 +21,7 @@
 !-----------------------------------------------------------------------
 !
 #include "typedefs.h"
-  subroutine dhpedgeE(Mdle,Iflag,No,Etav,Type,Icase,&
+  subroutine dhpedgeE(Mdle,Iflag,No,Etav,Type,Icase,Bcond,&
                       Nedge_orient,Nface_orient,Norder,Iedge,&
                       ZnodE)
 !
@@ -34,7 +35,7 @@
 !-----------------------------------------------------------------------
 !
   integer,          intent(in)    :: Iflag,No,Mdle
-  integer,          intent(in)    :: Icase,Iedge
+  integer,          intent(in)    :: Icase,Bcond,Iedge
   real(8),          intent(in)    :: Etav(3,8)
   character(len=4), intent(in)    :: Type
   integer,          intent(in)    :: Nedge_orient(12)
@@ -79,8 +80,9 @@
 ! Dirichlet data in reference coordinates
   VTYPE :: zvalEeta(3,MAXEQNE)
 !
-! decoded case for the face node
+! decoded case and BC flag for the face node
   integer, dimension(NR_PHYSA)          :: ncase
+  integer, dimension(NRINDEX)           :: ibcnd
 !
 ! work space for linear solvers
   integer                               :: naE,info
@@ -95,7 +97,7 @@
 !
 ! misc work space
   integer :: iprint,nrv,nre,nrf,i,j,k,ivarE,nvarE,kj,ki,&
-             ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_Edge,iflag1
+             ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_Edge,iflag1,ic
 !
 !----------------------------------------------------------------------
 !
@@ -318,48 +320,56 @@
   endif
 #endif
 !
-! save dof's, skipping irrelevant entries
+!  ...save dof's, skipping irrelevant entries
 !
-! decoded node case, indicating supported variables
-  call decod(Icase,2,NR_PHYSA, ncase)
+!  ...decode the case and the BC flag
+      call decod(Icase,2,NR_PHYSA, ncase)
+      call decod(Bcond,2,NRINDEX,  ibcnd)
 !
-! initialize global variable counter, and node local variable counter
-  ivarE=0 ; nvarE=0
+!  ...initialize global variable counter, and node local variable counter
+      ivarE=0 ; nvarE=0
+! 
+!  ...loop through multiple copies of variables
+      do j=1,NRCOMS
 !
-! loop through multiple copies of variables
-  do j=1,NRCOMS
+!  .....initiate the BC component counter
+        ic=0
 !
-!   loop through physical attributes
-    do i=1,NR_PHYSA
+!  .....loop through physical attributes
+        do i=1,NR_PHYSA
 !
-!     loop through components of physical attribute
-      do k=1,NR_COMP(i)
+!  .......loop through components of physical attribute
+          do k=1,NR_COMP(i)
 !
-        select case(DTYPE(i))
+!  .........if the variable is supported by the node, update the BC component counter
+            if (ncase(i).eq.1) ic=ic+1
 !
-!       H(curl) component
-        case('tangen')
+!  .........select the discretization type
+            select case(DTYPE(i))
 !
-!         update global counter
-          ivarE = ivarE + 1
+!  .........H(curl) component
+            case('tangen')
 !
-!         Dirichlet component
-          if (ncase(i).eq.1) then
+!  ...........update global counter
+              ivarE = ivarE + 1
 !
-!           update node local conter
-            nvarE = nvarE + 1
+!  ...........if the variable is supported by the node
+              if (ncase(i).eq.1) then
 !
-!           store Dirichlet dof
-            ZnodE(nvarE,1:ndofE_edge) = zuE(1:ndofE_edge,ivarE)
+!  .............update node local conter
+                nvarE = nvarE + 1
 !
-          endif
-        endselect
+!  .............store Dirichlet dof
+                if (ibcnd(ic).eq.1) ZnodE(nvarE,1:ndofE_edge) = zuE(1:ndofE_edge,ivarE)
+!
+              endif
+            end select
+          enddo
+        enddo
       enddo
-    enddo
-  enddo
 !
 #if DEBUG_MODE
-  if (iprint.eq.1) call result
+      if (iprint.eq.1) call result
 #endif
 !
-  end subroutine dhpedgeE
+      end subroutine dhpedgeE

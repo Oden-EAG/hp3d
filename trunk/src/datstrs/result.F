@@ -79,9 +79,17 @@ c
         write(*,7002) ELEMS(nel)%type
  7002   format(' TYPE = ',a4)
         nphys=ELEMS(nel)%nrphysics
-        write(*,7003) (ELEMS(nel)%physics(i),ELEMS(nel)%bcond(i),
-     .                i=1,nphys)
- 7003   format(' PHYSICS ATTRIBUTES WITH BC FLAGS = ',5(a5,2x,i6,2x))
+        ii=0
+        do i=1,nphys
+          call locate(ELEMS(nel)%physics(i),PHYSA,NR_PHYSA, loc)
+          nvar = NR_COMP(loc)
+          do ivar=1,nvar
+            ii=ii+1
+            write(*,7003)ELEMS(nel)%physics(i),ivar,ELEMS(nel)%bcond(ii)
+ 7003       format(' PHYSICS ATTRIBUTE = ',a5,' ivar = ',i2,
+     .             ' BC FLAGS = ',i6)
+          enddo
+        enddo
         nb=0 ; ne=nvert(ELEMS(nel)%type)
         write(*,7004) ELEMS(nel)%nodes(nb+1:ne)
  7004   format(' VERTEX NODES = ',8i10)
@@ -113,7 +121,7 @@ c
  7022   format(' TYPE = ',a4)
         write(*,7023) NODES(nod)%case
  7023   format(' CASE = ',i5)
-        write(*,7024) NODES(nod)%index
+!!!        write(*,7024) NODES(nod)%index
  7024   format(' INDEX = ',i20)
         write(*,7025) NODES(nod)%order
  7025   format(' ORDER = ',i3)

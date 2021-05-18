@@ -47,6 +47,7 @@ subroutine hp3gen(Fp)
   integer :: nel, npri, nh, ntet, npyr, np, iv, is, ifc, ie, mdle
   integer :: nt, nrbl, nbl, nr, lab, nord, nod_new, nbcond, nod, nrfaces
   integer :: nb, nc, i, ib, iii, istat, icase, iphys, num, number, subd
+  integer :: ivar,nvar
   logical :: iact
   !
   ! general
@@ -72,7 +73,9 @@ subroutine hp3gen(Fp)
   !  ...initialize number of H1,H(curl),H(div),L2 dofs
   NRDOFSH=0 ; NRDOFSE=0 ; NRDOFSV=0 ; NRDOFSQ=0
   !
-  allocate(nelem_order(NRELIS),ibc_nod(NR_PHYSA),phys_vect(NR_PHYSA), &
+!!!  allocate(nelem_order(NRELIS),ibc_nod(NR_PHYSA),phys_vect(NR_PHYSA), &
+!!!           stat=istat)
+  allocate(nelem_order(NRELIS),ibc_nod(NRINDEX),phys_vect(NR_PHYSA), &
            stat=istat)
   if (istat.ne.SUCCESS) then
     call logic_error(ERR_ALLOC_FAILURE,__FILE__,__LINE__)
@@ -381,25 +384,34 @@ subroutine hp3gen(Fp)
            endif
         enddo
         !
-        !  .......loop through the element physics attributes
+        !  .......loop through the element physics attributes and their components
+        nvar=0
         do iphys=1,ELEMS(nel)%nrphysics
            phys = ELEMS(nel)%physics(iphys)
            call locate_char(phys,PHYSA,NR_PHYSA, iii)
            !
-           !  .........decode the BC flags for the faces
-           call decodg(ELEMS(nel)%bcond(iphys),10,nface(type), &
-                ibc_elem)
-           !
-           !  .........determine faces adjacent to the vertex
-           call locate(nod_new,ELEMS(nel)%nodes,nvert(type), iv)
-           call vert_to_faces(type,iv, nrfaces,nofaces)
-           !
-           !  .........loop through the faces adjacent to the vertex and
-           !           use element face BC flags to establish BC flag for the
-           !           point
-           do i=1,nrfaces
-              ifc = nofaces(i)
-              call copyBCflag(1,ibc_elem(ifc), ibc_nod(iii))
+           !  .........loop through the variable components
+           do ivar=1,NR_COMP(iii)
+              nvar = nvar+1
+              !
+              !  .........decode the BC flags for the faces
+!!!             call decodg(ELEMS(nel)%bcond(iphys),10,nface(type), &
+!!!                         ibc_elem)
+              call decodg(ELEMS(nel)%bcond(nvar),10,nface(type), &
+                          ibc_elem)
+              !
+              !  .........determine faces adjacent to the vertex
+              call locate(nod_new,ELEMS(nel)%nodes,nvert(type), iv)
+              call vert_to_faces(type,iv, nrfaces,nofaces)
+              !
+              !  .........loop through the faces adjacent to the vertex and
+              !           use element face BC flags to establish BC flag for the
+              !           point
+              do i=1,nrfaces
+                 ifc = nofaces(i)
+!!!                 call copyBCflag(1,ibc_elem(ifc), ibc_nod(iii))
+                 call copyBCflag(1,ibc_elem(ifc), ibc_nod(nvar))
+              enddo
            enddo
         enddo
      enddo
@@ -407,7 +419,8 @@ subroutine hp3gen(Fp)
      call find_case(num,phys_vect, icase)
      !
      !  .....encode BC flags for the node into a single nickname
-     call encod(ibc_nod,10,NR_PHYSA, nbcond)
+!!!     call encod(ibc_nod,10,NR_PHYSA, nbcond)
+     call encod(ibc_nod,2,NRINDEX, nbcond)
      !
      subd = -1; iact = .true.
      call nodgen('vert',icase,nbcond,-nel,1,subd,iact, nod)
@@ -480,20 +493,29 @@ subroutine hp3gen(Fp)
         call edge_to_faces(type,ie, nofaces)
         !
         !  .......loop through the element physics attributes
+        nvar=0
         do iphys=1,ELEMS(nel)%nrphysics
            phys = ELEMS(nel)%physics(iphys)
            call locate_char(phys,PHYSA,NR_PHYSA, iii)
            !
-           !  .........decode the BC flags for the faces
-           call decodg(ELEMS(nel)%bcond(iphys),10,nface(type), &
-                ibc_elem)
-           !
-           !  .........loop through the faces adjacent to the edge and
-           !           use element face BC flags to establish BC flag for the
-           !           mid-edge node
-           do i=1,2
-              ifc = nofaces(i)
-              call copyBCflag(2,ibc_elem(ifc), ibc_nod(iii))
+           !  .........loop through the variable components
+           do ivar=1,NR_COMP(iii)
+              nvar = nvar+1
+              !
+              !  .........decode the BC flags for the faces
+!!!           call decodg(ELEMS(nel)%bcond(iphys),10,nface(type), &
+!!!                ibc_elem)
+              call decodg(ELEMS(nel)%bcond(nvar),10,nface(type), &
+                          ibc_elem)
+              !
+              !  .........loop through the faces adjacent to the edge and
+              !           use element face BC flags to establish BC flag for the
+              !           mid-edge node
+              do i=1,2
+                 ifc = nofaces(i)
+!!!              call copyBCflag(2,ibc_elem(ifc), ibc_nod(iii))
+                 call copyBCflag(2,ibc_elem(ifc), ibc_nod(nvar))
+              enddo
            enddo
         enddo
         !
@@ -505,7 +527,8 @@ subroutine hp3gen(Fp)
      call find_case(num,phys_vect, icase)
      !
      !  .....encode BC flags for the node into a single nickname
-     call encod(ibc_nod,10,NR_PHYSA, nbcond)
+!!!     call encod(ibc_nod,10,NR_PHYSA, nbcond)
+     call encod(ibc_nod,2,NRINDEX, nbcond)
      !
      subd = -1; iact = .true.
      call nodgen('medg',icase,nbcond,-nel,nord,subd,iact, nod)
@@ -570,15 +593,23 @@ subroutine hp3gen(Fp)
              nface(type), ifc)
 
         !  ...loop through neighbor's physical attributes
+        nvar=0
         do iphys=1,ELEMS(nel)%nrphysics
            phys = ELEMS(nel)%physics(iphys)
            call locate_char(phys,PHYSA,NR_PHYSA, iii)
+           !
+           !  .........loop through the variable components
+           do ivar=1,NR_COMP(iii)
+              nvar = nvar+1
 
            !  ...decode the BC flags for the faces
-           call decodg(ELEMS(nel)%bcond(iphys),10,nface(type), ibc_elem)
+!!!           call decodg(ELEMS(nel)%bcond(iphys),10,nface(type), ibc_elem)
+              call decodg(ELEMS(nel)%bcond(nvar),10,nface(type), ibc_elem)
 
-           !  ...copy face BC flag to GLOBAL list associated to the face node
-           call copyBCflag(3,ibc_elem(ifc), ibc_nod(iii))
+              !  ...copy face BC flag to GLOBAL list associated to the face node
+!!!              call copyBCflag(3,ibc_elem(ifc), ibc_nod(iii))
+              call copyBCflag(3,ibc_elem(ifc), ibc_nod(nvar))
+           enddo
         enddo
         !
         mdle = nel
@@ -592,7 +623,8 @@ subroutine hp3gen(Fp)
      call find_case(num,phys_vect, icase)
      !
      !  ...encode BC flags for the node into a single nickname
-     call encod(ibc_nod,10,NR_PHYSA, nbcond)
+!!!     call encod(ibc_nod,10,NR_PHYSA, nbcond)
+     call encod(ibc_nod,2,NRINDEX, nbcond)
      !
      subd = -1; iact = .true.
      call nodgen('mdlq',icase,nbcond,-nel,nord,subd,iact, nod)
@@ -663,14 +695,23 @@ subroutine hp3gen(Fp)
              nface(type), ifc)
         !
         !  .......loop through the element physics attributes
+        nvar=0
         do iphys=1,ELEMS(nel)%nrphysics
            phys = ELEMS(nel)%physics(iphys)
            call locate_char(phys,PHYSA,NR_PHYSA, iii)
            !
-           !  .........decode the BC flags for the faces
-           call decodg(ELEMS(nel)%bcond(iphys),10,nface(type), &
-                ibc_elem)
-           call copyBCflag(3,ibc_elem(ifc), ibc_nod(iii))
+           !  .........loop through the variable components
+           do ivar=1,NR_COMP(iii)
+              nvar = nvar+1
+              !
+              !  .........decode the BC flags for the faces
+!!!           call decodg(ELEMS(nel)%bcond(iphys),10,nface(type), &
+!!!                ibc_elem)
+              call decodg(ELEMS(nel)%bcond(nvar),10,nface(type), &
+                          ibc_elem)
+!!!           call copyBCflag(3,ibc_elem(ifc), ibc_nod(iii))
+              call copyBCflag(3,ibc_elem(ifc), ibc_nod(nvar))
+           enddo
         enddo
         !
         mdle = nel
@@ -682,7 +723,8 @@ subroutine hp3gen(Fp)
      call find_case(num,phys_vect, icase)
      !
      !  .....encode BC flags for the node into a single nickname
-     call encod(ibc_nod,10,NR_PHYSA, nbcond)
+!!!     call encod(ibc_nod,10,NR_PHYSA, nbcond)
+     call encod(ibc_nod,2,NRINDEX, nbcond)
      !
      subd = -1; iact = .true.
      call nodgen('mdlt',icase,nbcond,-nel,nord,subd,iact, nod)
@@ -770,24 +812,24 @@ use data_structure3D
 !
 !  ..copy only if a Dirichlet BC flag
      if (IBCelem.eq.1) IBCnod = IBCelem
-     call locate(IBCelem, DIRICHLET_LIST, NR_DIRICHLET_LIST, loc)
-     if (loc.ne.0) IBCnod = IBCelem
+!!!     call locate(IBCelem, DIRICHLET_LIST, NR_DIRICHLET_LIST, loc)
+!!!     if (loc.ne.0) IBCnod = IBCelem
 !
 !  ...face node
   case(3)
      select case(IBCnod)
 !
-!  .....zero BC flag, just update
+!  .....zero BC flag, update if Dirichlet
      case(0)
-        IBCnod = IBCelem
+        if (IBCelem.eq.1) IBCnod = IBCelem
 !
 !  .....non-zero flag, check compatibility
      case default
-        if (IBCnod.ne.IBCelem) then
+        if ((IBCelem.eq.1).and.(IBCnod.ne.IBCelem)) then
            write(*,7001) Nflag,IBCnod,IBCelem
 7001       format(' copyBCflag: INCOMPATIBLE FACE FLAGS', &
                 ' Nflag, IBCnod,IBCelem = ',3i3)
-           stop
+           stop 1
         endif
      endselect
 !
