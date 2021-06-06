@@ -110,6 +110,8 @@
              ivarE,nvarE,naE,iprint,info, &
              ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,ndofE_tot,ic
 !
+  logical :: is_homD
+!
 !-----------------------------------------------------------------------
 !
   nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
@@ -130,6 +132,13 @@
      call pause
   endif
 #endif
+!
+! check if a homogeneous Dirichlet node
+  call homogenD('tangen',Icase,Bcond, is_homD,ncase,ibcnd)
+  if (is_homD) then
+    zuE = ZERO
+    go to 100
+  endif
 !
 ! determine # of dof for the face node
   call ndof_nod(face_type(Type,Iface),Norder(nre+Iface), &
@@ -461,10 +470,7 @@
 !------------------------------------------------------
 !
 !  ...save the dof's, skipping irrelevant entries
-!
-!  ...decode the case and the BC flag
-      call decod(Icase,2,NR_PHYSA, ncase)
-      call decod(Bcond,2,NRINDEX,  ibcnd)
+  100 continue
 !
 #if DEBUG_MODE
       if (iprint.eq.1) then

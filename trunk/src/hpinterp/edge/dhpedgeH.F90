@@ -96,6 +96,8 @@
   integer :: iprint,nrv,nre,nrf,i,j,k,ivarH,nvarH,kj,ki,&
              ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_Edge,iflag1,ic
 !
+  logical :: is_homD
+!
 !----------------------------------------------------------------------
 !
   nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
@@ -117,6 +119,13 @@
   endif
 #endif
 !
+! check if a homogeneous Dirichlet node
+  call homogenD('contin',Icase,Bcond, is_homD,ncase,ibcnd)
+  if (is_homD) then
+    zuH = ZERO
+    go to 100
+  endif
+    !
 ! # of edge dof
   call ndof_nod('medg',norder(Iedge), &
                 ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_edge)
@@ -334,10 +343,7 @@
 #endif
 !
 !  ...save dof's, skipping irrelevant entries
-!
-!  ...decode the case and the BC flag
-      call decod(Icase,2,NR_PHYSA, ncase)
-      call decod(Bcond,2,NRINDEX,  ibcnd)
+ 100  continue
 !
 !  ...initialize global variable counter, and node local variable counter
       ivarH=0 ; nvarH=0
