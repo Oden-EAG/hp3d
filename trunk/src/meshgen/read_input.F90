@@ -55,6 +55,9 @@ subroutine read_input(Fp)
   !  default setting for each attribute is not an interface variable
      PHYSAi(i) = .false.
   !
+  !  default setting for each attribute is not a homogeneous Dirichlet variable
+     PHYSAd(i) = .false.
+  !
      call locate_char(DTYPE(i),type_array,4, loc(i))
      select case(DTYPE(i))
         !  .....H^1
