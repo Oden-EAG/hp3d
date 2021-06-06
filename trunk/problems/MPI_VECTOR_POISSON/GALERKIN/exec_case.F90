@@ -16,7 +16,7 @@ subroutine exec_case(idec)
 !
    logical :: solved
    integer :: mdle_subd(NRELES)
-   integer :: i,mdle,kref,src,count,ierr
+   integer :: i,mdle,kref,src,count,ierr,iflag
 !
 !----------------------------------------------------------------------
 !
@@ -184,6 +184,14 @@ subroutine exec_case(idec)
          write(*,*) 'updating Dirichlet dof'
          call update_Ddof
 !
+      case(70)
+         write(*,*) 'SET HOMOGENEOUS DIRICHLET BC FLAG (0,1)'
+         read(*,*) iflag
+         select case(iflag)
+         case(0); PHYSAd(1) = .false.
+         case(1); PHYSAd(1) = .true.
+         end select
+         call update_Ddof
       case default
          write(*,*) 'exec_case: unknown case...'
    end select

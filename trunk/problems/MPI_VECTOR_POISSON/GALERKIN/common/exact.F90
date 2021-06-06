@@ -64,7 +64,14 @@
       case(1)
         ValH(1:3) = x**2 + 1.d0
         DvalH(1:3,1) = 2.d0*x
-        D2valH(1:3,1,1) = 2.d0 
+        D2valH(1:3,1,1) = 2.d0
+!
+!  ...a quadratic function with zero Dirichlet BC's 
+      case(2)
+        ValH(1:3) = x*(1.d0-x)
+        DvalH(1:3,1) = -2.d0*x + 1.d0
+        D2valH(1:3,1,1) = -2.d0
+
       end select
 !
       end subroutine exact

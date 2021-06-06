@@ -206,6 +206,7 @@ subroutine master_main()
       write(*,*) '                                         '
       write(*,*) '          ---- TESTING ----              '
       write(*,*) 'Flush dof, update_gdof, update_Ddof....60'
+      write(*,*) 'Reset Homogeneous BC flag..............70'
       write(*,*) '=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='
 !
       read( *,*) idec
@@ -288,6 +289,8 @@ subroutine master_main()
 !
 !     ...TODO testing
          case(60)
+            call exec_case(idec)
+         case(70)
             call exec_case(idec)
 !
       end select
