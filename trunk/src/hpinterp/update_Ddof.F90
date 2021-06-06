@@ -144,14 +144,10 @@ subroutine update_Ddof()
             if (.not.associated(NODES(nod)%dof%zdofH)) cycle
             if (NODES(nod)%geom_interf.eq.1) cycle
             if (is_dirichlet(nod)) then
-               if (is_dirichlet_homogeneous(nod)) then
-                  NODES(nod)%dof%zdofH = ZERO
-               else
-                  if (iprint.eq.1) write(*,7010) mdle,iv,nod
- 7010             format('update_Ddof: CALLING dhpvert FOR mdle,iv,nod = ',i6,i2,2x,i5)
-                  call dhpvert(mdle,iflag,no,xsub(1:3,iv),NODES(nod)%case, &
-                               NODES(nod)%bcond,  NODES(nod)%dof%zdofH)
-               endif
+               if (iprint.eq.1) write(*,7010) mdle,iv,nod
+ 7010          format('update_Ddof: CALLING dhpvert FOR mdle,iv,nod = ',i6,i2,2x,i5)
+               call dhpvert(mdle,iflag,no,xsub(1:3,iv),NODES(nod)%case, &
+                            NODES(nod)%bcond,  NODES(nod)%dof%zdofH)
                NODES(nod)%geom_interf=1
             endif
          enddo
@@ -173,30 +169,22 @@ subroutine update_Ddof()
             if (is_dirichlet(nod)) then
 !           ...update H1 Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofH)) then
-                  if (is_dirichlet_homogeneous(nod)) then
-                     NODES(nod)%dof%zdofH = ZERO
-                  else
-                     if (iprint.eq.1) write(*,7020) mdle,ie,nod
- 7020                format('update_Ddof: CALLING dhpedgeH FOR mdle,ie,nod = ',i6,i2,2x,i5)
-                     call dhpedgeH(mdle,iflag,no,xsub,                     &
-                                   etype,NODES(nod)%case,NODES(nod)%bcond, &
-                                   nedge_orient,nface_orient,norder,ie,    &
-                                   zdofH, NODES(nod)%dof%zdofH)
-                  endif
+                  if (iprint.eq.1) write(*,7020) mdle,ie,nod
+ 7020             format('update_Ddof: CALLING dhpedgeH FOR mdle,ie,nod = ',i6,i2,2x,i5)
+                  call dhpedgeH(mdle,iflag,no,xsub,                     &
+                                etype,NODES(nod)%case,NODES(nod)%bcond, &
+                                nedge_orient,nface_orient,norder,ie,    &
+                                zdofH, NODES(nod)%dof%zdofH)
                endif
 !           ...update H(curl) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofE)) then
-                  if (is_dirichlet_homogeneous(nod)) then
-                     NODES(nod)%dof%zdofE = ZERO
-                  else
-                     if (iprint.eq.1) write(*,7030) mdle,ie,nod
- 7030                format('update_Ddof: CALLING dhpedgeE FOR mdle,ie,nod = ',i6,i2,2x,i5)
-                     call dhpedgeE(mdle,iflag,no,xsub,                     &
-                                   etype,NODES(nod)%case,NODES(nod)%bcond, &
-                                   nedge_orient,nface_orient,norder,ie,    &
-                                   NODES(nod)%dof%zdofE)
+                  if (iprint.eq.1) write(*,7030) mdle,ie,nod
+ 7030             format('update_Ddof: CALLING dhpedgeE FOR mdle,ie,nod = ',i6,i2,2x,i5)
+                  call dhpedgeE(mdle,iflag,no,xsub,                     &
+                                etype,NODES(nod)%case,NODES(nod)%bcond, &
+                                nedge_orient,nface_orient,norder,ie,    &
+                                NODES(nod)%dof%zdofE)
 
-                  endif
                endif
                NODES(nod)%geom_interf=1
             endif
@@ -222,43 +210,30 @@ subroutine update_Ddof()
             if (is_dirichlet(nod)) then
 !           ...update H1 Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofH)) then
-                  if (is_dirichlet_homogeneous(nod)) then
-                     NODES(nod)%dof%zdofH = ZERO
-                  else
-                     if (iprint.eq.1) write(*,7040) mdle,ifc,nod
- 7040                format('update_Ddof: CALLING dhpfaceH FOR mdle,ifc,nod = ',i6,i2,2x,i5)
-                     call dhpfaceH(mdle,iflag,no,xsub,                     &
-                                   etype,NODES(nod)%case,NODES(nod)%bcond, &
-                                   nedge_orient,nface_orient,norder,ifc,   &
-                                   zdofH, NODES(nod)%dof%zdofH)
-                  endif
+                  if (iprint.eq.1) write(*,7040) mdle,ifc,nod
+ 7040             format('update_Ddof: CALLING dhpfaceH FOR mdle,ifc,nod = ',i6,i2,2x,i5)
+                  call dhpfaceH(mdle,iflag,no,xsub,                     &
+                                etype,NODES(nod)%case,NODES(nod)%bcond, &
+                                nedge_orient,nface_orient,norder,ifc,   &
+                                zdofH, NODES(nod)%dof%zdofH)
                endif
 !           ...update H(curl) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofE)) then
-                  if (is_dirichlet_homogeneous(nod)) then
-                     NODES(nod)%dof%zdofE = ZERO
-                  else
-                     if (iprint.eq.1) write(*,7050) mdle,ifc,nod
- 7050                format('update_Ddof: CALLING dhpfaceE FOR mdle,ifc,nod = ',i6,i2,2x,i5)
-                     call dhpfaceE(mdle,iflag,no,xsub,                     &
-                                   etype,NODES(nod)%case,NODES(nod)%bcond, &
-                                   nedge_orient,nface_orient,norder,ifc,   &
-                                   zdofE, NODES(nod)%dof%zdofE)
-
-                  endif
+                  if (iprint.eq.1) write(*,7050) mdle,ifc,nod
+ 7050             format('update_Ddof: CALLING dhpfaceE FOR mdle,ifc,nod = ',i6,i2,2x,i5)
+                  call dhpfaceE(mdle,iflag,no,xsub,                     &
+                                etype,NODES(nod)%case,NODES(nod)%bcond, &
+                                nedge_orient,nface_orient,norder,ifc,   &
+                                zdofE, NODES(nod)%dof%zdofE)
                endif
 !           ...update H(div) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofV)) then
-                  if (is_dirichlet_homogeneous(nod)) then
-                     NODES(nod)%dof%zdofV = ZERO
-                  else
-                     if (iprint.eq.1) write(*,7060) mdle,ifc,nod
- 7060                format('update_Ddof: CALLING dhpfaceV FOR mdle,ifc,nod = ',i6,i2,2x,i5)
-                     call dhpfaceV(mdle,iflag,no,xsub,                     &
-                                   etype,NODES(nod)%case,NODES(nod)%bcond, &
-                                   nedge_orient,nface_orient,norder,ifc,   &
-                                   NODES(nod)%dof%zdofV)
-                  endif
+                  if (iprint.eq.1) write(*,7060) mdle,ifc,nod
+ 7060             format('update_Ddof: CALLING dhpfaceV FOR mdle,ifc,nod = ',i6,i2,2x,i5)
+                  call dhpfaceV(mdle,iflag,no,xsub,                     &
+                                etype,NODES(nod)%case,NODES(nod)%bcond, &
+                                nedge_orient,nface_orient,norder,ifc,   &
+                                NODES(nod)%dof%zdofV)
                endif
                NODES(nod)%geom_interf=1
             endif
