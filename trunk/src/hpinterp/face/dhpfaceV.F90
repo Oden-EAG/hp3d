@@ -130,7 +130,7 @@
 #endif
 !
 ! check if a homogeneous Dirichlet node
-  call homogenD('discon',Icase,Bcond, is_homD,ncase,ibcnd)
+  call homogenD('normal',Icase,Bcond, is_homD,ncase,ibcnd)
   if (is_homD) then
     zuV = ZERO
     go to 100

@@ -126,7 +126,7 @@ subroutine update_Ddof()
             if (loc.eq.0) then
 !
 !           ...check if the node has been updated
-               if (NODES(nod)%geom_interf.eq.0 .and. is_dirichlet(nod)) then
+               if (NODES(nod)%geom_interf.eq.0 .and. is_Dirichlet(nod)) then
                   nod_flg = .true.
                   goto 100
                endif
@@ -143,7 +143,7 @@ subroutine update_Ddof()
             if (.not.associated(NODES(nod)%dof))       cycle
             if (.not.associated(NODES(nod)%dof%zdofH)) cycle
             if (NODES(nod)%geom_interf.eq.1) cycle
-            if (is_dirichlet(nod)) then
+            if (is_Dirichlet_attr(nod,'contin')) then
                if (iprint.eq.1) write(*,7010) mdle,iv,nod
  7010          format('update_Ddof: CALLING dhpvert FOR mdle,iv,nod = ',i6,i2,2x,i5)
                call dhpvert(mdle,iflag,no,xsub(1:3,iv),NODES(nod)%case, &
@@ -166,7 +166,7 @@ subroutine update_Ddof()
             nod = nodesl(ind)
             if (.not.associated(NODES(nod)%dof)) cycle
             if (NODES(nod)%geom_interf.eq.1)     cycle
-            if (is_dirichlet(nod)) then
+            if (is_Dirichlet_attr(nod,'contin')) then
 !           ...update H1 Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofH)) then
                   if (iprint.eq.1) write(*,7020) mdle,ie,nod
@@ -176,6 +176,9 @@ subroutine update_Ddof()
                                 nedge_orient,nface_orient,norder,ie,    &
                                 zdofH, NODES(nod)%dof%zdofH)
                endif
+               NODES(nod)%geom_interf=1
+            endif
+            if (is_Dirichlet_attr(nod,'tangen')) then
 !           ...update H(curl) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofE)) then
                   if (iprint.eq.1) write(*,7030) mdle,ie,nod
@@ -204,10 +207,8 @@ subroutine update_Ddof()
             nod = nodesl(ind)
             if (.not.associated(NODES(nod)%dof)) cycle
             if (NODES(nod)%geom_interf.eq.1)     cycle
-!!!            write(*,*) 'HERE'
-!!!            if (iprint.eq.1) write(*,*) 'nod,is_dirichlet(nod) = ',nod,is_dirichlet(nod)! a mystery....
-            
-            if (is_dirichlet(nod)) then
+!            
+            if (is_Dirichlet_attr(nod,'contin')) then
 !           ...update H1 Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofH)) then
                   if (iprint.eq.1) write(*,7040) mdle,ifc,nod
@@ -217,6 +218,9 @@ subroutine update_Ddof()
                                 nedge_orient,nface_orient,norder,ifc,   &
                                 zdofH, NODES(nod)%dof%zdofH)
                endif
+               NODES(nod)%geom_interf=1
+            endif
+            if (is_Dirichlet_attr(nod,'tangen')) then
 !           ...update H(curl) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofE)) then
                   if (iprint.eq.1) write(*,7050) mdle,ifc,nod
@@ -226,6 +230,9 @@ subroutine update_Ddof()
                                 nedge_orient,nface_orient,norder,ifc,   &
                                 zdofE, NODES(nod)%dof%zdofE)
                endif
+               NODES(nod)%geom_interf=1
+            endif
+            if (is_Dirichlet_attr(nod,'normal')) then
 !           ...update H(div) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofV)) then
                   if (iprint.eq.1) write(*,7060) mdle,ifc,nod
@@ -307,7 +314,7 @@ subroutine update_Ddof()
 !     ...check if the node has been updated
          if (loc.eq.0 .and. NODES(nod)%geom_interf.eq.0  &
                       .and. NODES(nod)%visit      .eq.0  &
-                      .and. is_dirichlet(nod)     ) then
+                      .and. is_Dirichlet(nod)     ) then
             NODES(nod)%visit = 1
             if(j_loc .ge. loc_max) then
                loc_max = loc_max*2

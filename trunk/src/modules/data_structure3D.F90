@@ -800,18 +800,41 @@ module data_structure3D
       end subroutine
 !
 !-----------------------------------------------------------------------
-      function Is_dirichlet(Nod)
+      function Is_Dirichlet(Nod)
       integer Nod
-      integer ibc(NRINDEX), icomp
-      logical Is_dirichlet
+      logical Is_Dirichlet
+      integer ibc(NRINDEX), ic
 !
       call decod(NODES(Nod)%bcond,2,NRINDEX, ibc)
-      Is_dirichlet = .false.
-      do icomp=1,NRINDEX
-        if (ibc(icomp).eq.1) Is_dirichlet = .true.
+      Is_Dirichlet = .false.
+      do ic=1,NRINDEX
+        if (ibc(ic).eq.1) Is_Dirichlet = .true.
       enddo
 !
-      end function
+      end function Is_Dirichlet
+!
+!-----------------------------------------------------------------------
+      function Is_Dirichlet_attr(Nod,D_type)
+      integer Nod
+      character(6) D_type
+      logical Is_Dirichlet_attr
+      integer ibc(NRINDEX), ic, ivar, iphys
+!
+      call decod(NODES(Nod)%bcond,2,NRINDEX, ibc)
+      Is_Dirichlet_attr = .false.
+      ic = 0
+      do iphys=1,NR_PHYSA
+        if (DTYPE(iphys).eq.D_type) then
+          do ivar=1,NR_COMP(iphys)
+            ic = ic + 1
+            if (ibc(ic).eq.1) Is_Dirichlet_attr = .true.
+          enddo
+        else
+          ic = ic + NR_COMP(iphys)
+        endif
+      enddo
+!
+      end function Is_Dirichlet_attr
 !----------------------------------------------------------------------
       function Is_dirichlet_homogeneous(Nod)
       integer Nod
