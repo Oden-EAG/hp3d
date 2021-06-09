@@ -98,17 +98,20 @@
   integer, dimension(NRINDEX)           :: ibcnd
 !
 ! misc work space
-  integer :: iprint,nrv,nre,nrf,i,j,k,ie,ivarH,nvarH,kj,ki,&
+  integer :: nrv,nre,nrf,i,j,k,ie,ivarH,nvarH,kj,ki,&
              ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,nsign,ic
 !
   logical :: is_homD
+!
+#if DEBUG_MODE
+  integer :: iprint = 0
+#endif
 !
 !-----------------------------------------------------------------------
 !
   nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
 !
-  iprint = 0
-!#if DEBUG_MODE
+#if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Icase,Iface,Type
 7010 format('dhpfaceH: Mdle,Iflag,No,Icase,Iface,Type = ',5i4,a4)
@@ -122,7 +125,7 @@
 7050 format('          Norder = ',19i4)
      call pause
   endif
-!#endif
+#endif
 !
 ! check if a homogeneous Dirichlet node
   call homogenD('contin',Icase,Bcond, is_homD,ncase,ibcnd)
@@ -270,7 +273,7 @@
 ! end of loop through integration points
   enddo
 !
-!#if DEBUG_MODE
+#if DEBUG_MODE
   if (iprint.eq.1) then
     write(*,*) 'dhpfaceH: LOAD VECTOR AND STIFFNESS MATRIX FOR ', &
                'ndofH_face = ',ndofH_face
@@ -285,7 +288,7 @@
 # endif
 7016    format(10e12.5)
   endif
-!#endif
+#endif
 !
 !-----------------------------------------------------------------------
 !
@@ -324,7 +327,7 @@
              zuH,naH)
 #endif
 !
-!#if DEBUG_MODE
+#if DEBUG_MODE
   if (iprint.eq.1) then
    write(*,*) 'dhpfaceH: k,zu(k) = '
    do k=1,ndofH_face
@@ -332,7 +335,7 @@
    enddo
    call pause
   endif
-!#endif
+#endif
 !
 !  ...save the dof, skipping irrelevant entries
   100 continue
@@ -384,9 +387,9 @@
         enddo
       enddo
 !
-!#if DEBUG_MODE
+#if DEBUG_MODE
       if (iprint.eq.1) call result
-!#endif
+#endif
 !
       end subroutine dhpfaceH
 

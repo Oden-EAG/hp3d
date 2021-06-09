@@ -45,7 +45,6 @@
 !
 !  ...others
       integer :: ic,iphys,ivar
-!!!      integer :: iprint
 !
 #if DEBUG_MODE
       integer :: iprint = 1

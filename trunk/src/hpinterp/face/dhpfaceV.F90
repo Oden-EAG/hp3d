@@ -102,17 +102,19 @@
   integer, dimension(NRINDEX)           :: ibcnd
 !
 ! misc work space
-  integer :: iprint,nrv,nre,nrf,nsign,nflag, &
-             i,j,k,ivarV,nvarV,kj,ki,&
+  integer :: nrv,nre,nrf,nsign,nflag,i,j,k,ivarV,nvarV,kj,ki,&
              ndofH_face,ndofE_face,ndofV_face,ndofQ_face,ic
 !
   logical :: is_homD
+!
+#if DEBUG_MODE
+  integer :: iprint = 0
+#endif
 !
 !-----------------------------------------------------------------------
 !
   nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
 !
-  iprint = 0
 #if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Icase,Iface,Type

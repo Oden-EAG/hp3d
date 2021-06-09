@@ -44,30 +44,13 @@ module data_structure3D
 !  .....list   of physics attributes supported BY the element
         character(len=5), dimension(:), pointer :: physics
 !
-!  .....boundary conditions nickname (1 BC flag per face) for each
-!       attribute supported BY the element.
-!       Reserved values (see subroutine meshgen/set_index):
-!         H1 :
-!           0 - no BC
-!           1 - Dirichlet BC on all components
-!           3 - Dirichlet BC on 2nd and 3rd component
-!           4 - Dirichlet BC on 1st and 3rd component
-!           5 - Dirichlet BC on 1st and 2nd component
-!           6 - Dirichlet BC on 1st component
-!           7 - Dirichlet BC on 2nd component
-!           8 - Dirichlet BC on 3rd component
-!         H(div) :
-!           0 - no BC
-!           1 - Dirichlet BC on all components
-!           3 - Dirichlet BC on 1st component
-!           4 - Dirichlet BC on 2nd component
-!           5 - Dirichlet BC on 3rd component
-!           6 - Dirichlet BC on 2nd and 3rd component
-!           7 - Dirichlet BC on 1st and 3rd component
-!           8 - Dirichlet BC on 1st and 2nd component
-!         H(curl), L2 :
-!           0 - no BC
-!           1 - Dirichlet BC on all components
+!  .....array of boundary condition nicknames
+!       each entry specifies boundary conditions for one particular component;
+!       each entry is decimal-encoded per element face (1 BC flag per face)
+!       Values (per component and face):
+!         0   - No BC
+!         1   - Dirichlet BC
+!         2-9 - User-customizable BCs
         integer, dimension(:), pointer :: bcond
 !
 !  .....element nodal connectivities: vertices,edges,faces, middle node
@@ -96,24 +79,13 @@ module data_structure3D
         character(4)     :: type
 !
 !  .....case number indicating what physical attributes are supported
+!       (binary-encoded per physics variable)
         integer          :: case
 !
-!  .....nickname storing info about supported variables:
-!         0 - component does not exist
-!         1 - H1 component with Dirichlet BC flag
-!         2 - free H1 component
-!         3 - H(curl) component with Dirichlet BC flag
-!         4 - free H(curl) component
-!         5 - H(div) component with Dirichlet BC flag
-!         6 - free H(div) component
-!         7 - L2 component with Dirichlet BC flag
-!         8 - free L2 component
-!!!        integer(8)       :: index
-!
-!  .....order of approximation
+!  .....order of approximation (decimal-encoded per direction (x,y,z))
         integer          :: order
 !
-!  .....boundary condition flag
+!  .....boundary condition flag (binary-encoded per component)
         integer          :: bcond
 !
 !  .....father node
@@ -123,7 +95,7 @@ module data_structure3D
         integer          :: first_son
         integer          :: nr_sons
 !
-!  .....refinement flag
+!  .....refinement flag (decimal-encoded per direction (x,y,z))
         integer          :: ref_kind
 !
 !  .....interface flag with GMP
@@ -302,17 +274,6 @@ module data_structure3D
 !
 !-----------------------------------------------------------------------
 !
-!!!!  ...get index for a node
-!!!      subroutine get_index(Nod, Indexd)
-!!!!
-!!!      integer Indexd(NRINDEX)
-!!!!
-!!!      call decodLong(NODES(Nod)%index,10,NRINDEX, Indexd)
-!!!!
-!!!      end subroutine get_index
-!
-!-----------------------------------------------------------------------
-!
 !  ...allocate memory for data structure
       subroutine allocds
 !
@@ -342,7 +303,6 @@ module data_structure3D
       do nod=1,MAXNODS
         NODES(nod)%type = 'none'
         NODES(nod)%case = 0
-!!!        NODES(nod)%index = 0
         NODES(nod)%order = 0
         NODES(nod)%act = .false.
         NODES(nod)%subd = -1
@@ -426,7 +386,6 @@ module data_structure3D
       do nod=MAXNODS+1,MAXNODS_NEW
         NODES_NEW(nod)%type = 'none'
         NODES_NEW(nod)%case = 0
-!!!        NODES_NEW(nod)%index = 0
         NODES_NEW(nod)%order = 0
         NODES_NEW(nod)%act = .false.
         NODES_NEW(nod)%subd = -1
@@ -511,7 +470,6 @@ module data_structure3D
       do nod=1,NRNODS
         write(ndump,*) NODES(nod)%type
         write(ndump,*) NODES(nod)%case
-!!!        write(ndump,*) NODES(nod)%index
         write(ndump,*) NODES(nod)%order
         write(ndump,*) NODES(nod)%bcond
         write(ndump,*) NODES(nod)%ref_kind
@@ -654,7 +612,6 @@ module data_structure3D
       do nod=1,NRNODS
         read(ndump,*) NODES(nod)%type
         read(ndump,*) NODES(nod)%case
-!!!        read(ndump,*) NODES(nod)%index
         read(ndump,*) NODES(nod)%order
         read(ndump,*) NODES(nod)%bcond
         read(ndump,*) NODES(nod)%ref_kind

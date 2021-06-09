@@ -96,16 +96,19 @@
 #endif
 !
 ! misc work space
-  integer :: iprint,nrv,nre,nrf,i,j,k,ivarE,nvarE,kj,ki,&
+  integer :: nrv,nre,nrf,i,j,k,ivarE,nvarE,kj,ki,&
              ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_Edge,iflag1,ic
 !
   logical :: is_homD
+!
+#if DEBUG_MODE
+  integer :: iprint = 0
+#endif
 !
 !----------------------------------------------------------------------
 !
   nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
 !
-  iprint = 0
 #if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Icase,Iedge,Type

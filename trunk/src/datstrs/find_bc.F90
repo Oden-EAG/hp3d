@@ -89,7 +89,6 @@ subroutine find_bc(Mdle, Ibc)
 #if DEBUG_MODE
                if (iprint.eq.1) then
                   write(fmt,'("(",I1,"i2)")') nrf_iel
-                  !7030 format('find_bc: BC FOR iel AND ivar=',i2,': ',6i2)
                   7030 format('find_bc: BC FOR iel AND ivar=',i2,': ',fmt)
                   write(*,7030) ivar,ibc_iel(1:nrf_iel)
                endif
@@ -118,9 +117,7 @@ subroutine find_bc(Mdle, Ibc)
 #if DEBUG_MODE
       if (iprint.eq.1) then
          do ivar=1,nvar
-            ! TODO output formatting bad, nrf not always equal to 6
             write(fmt,'("(",I1,"(i1,2x))")') nrf
-       !7100 format('          ivar=',i2,',  Ibc = ',6(i1,2x))
        7100 format('          ivar=',i2,',  Ibc = ',fmt)
             write(*,7100) ivar,Ibc(1:nrf,ivar)
          enddo

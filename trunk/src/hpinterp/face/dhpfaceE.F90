@@ -105,18 +105,19 @@
   integer, dimension(NRINDEX)           :: ibcnd
 !
 ! misc
-  integer :: nrv,nre,nrf,nsign,nflag, &
-             i,j,jH,iE,jE,kjE,kiE,kjH,k,kE,&
-             ivarE,nvarE,naE,iprint,info, &
-             ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,ndofE_tot,ic
+  integer :: nrv,nre,nrf,nsign,nflag,i,j,jH,iE,jE,kjE,kiE,kjH,k,kE,info,ic,naE,&
+             ivarE,nvarE,ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,ndofE_tot
 !
   logical :: is_homD
+!
+#if DEBUG_MODE
+  integer :: iprint = 0
+#endif
 !
 !-----------------------------------------------------------------------
 !
   nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
 !
-  iprint = 0
 #if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Icase,Iface,Type

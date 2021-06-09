@@ -168,7 +168,7 @@ subroutine hp3gen(Fp)
      nedge_orient(1:12)=0
      do ie=1,12
         if (HEXAS(nh)%EdgeNo(ie).lt.0) nedge_orient(ie)=1
-        ELEMS(nel)%nodes(8+ie) = NRELIS+NRPOINT
+        ELEMS(nel)%nodes(8+ie) = NRELIS+NRPOINT &
                                + iabs(HEXAS(nh)%EdgeNo(ie))
      enddo
      do ifc=1,6
@@ -211,7 +211,7 @@ subroutine hp3gen(Fp)
      nedge_orient(1:6)=0
      do ie=1,6
         if (TETRAS(ntet)%EdgeNo(ie).lt.0) nedge_orient(ie)=1
-        ELEMS(nel)%nodes(4+ie) = NRELIS+NRPOINT
+        ELEMS(nel)%nodes(4+ie) = NRELIS+NRPOINT &
                                + iabs(TETRAS(ntet)%EdgeNo(ie))
      enddo
      do ifc=1,4
@@ -815,7 +815,7 @@ end subroutine hp3gen
 !              IBCnod  - BC flag for a node of the element
 !----------------------------------------------------------------------
 !
-subroutine copyBCflag(Nflag, IBCelem, IBCnod)
+subroutine copyBCflag(Nflag,IBCelem, IBCnod)
 !
 use data_structure3D
 !

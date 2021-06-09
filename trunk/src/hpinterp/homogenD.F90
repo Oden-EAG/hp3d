@@ -11,47 +11,51 @@
 !! @param[out] Is_homD = true/false
 !! @param[out] Ncase   - decoded nodal case
 !! @param[out] Ibcnd   - decoded BC flags
-
+!
 !-----------------------------------------------------------------------
 !
-      subroutine homogenD(D_type,Icase,Bcond, Is_homD,Ncase,Ibcnd)
+subroutine homogenD(D_type,Icase,Bcond, Is_homD,Ncase,Ibcnd)
 !
-      use physics
-      implicit none
+   use physics
 !
-!  ...Arguments
-      logical          :: Is_homD
-      character(len=6) :: D_type
-      integer          :: Icase, Bcond
+   implicit none
 !
-!  ...decoded Icase oand Bcond
-      integer, dimension(NR_PHYSA)  :: ncase
-      integer, dimension(NRINDEX)   :: ibcnd
-      integer :: iphys,ic,ivar
-      logical          :: is_Dirichlet
+!..Input arguments
+   character(len=6), intent(in) :: D_type
+   integer         , intent(in) :: Icase, Bcond
 !
+!..Output arguments
+   logical, intent(out) :: Is_homD
+   integer, intent(out) :: Ncase(NR_PHYSA)
+   integer, intent(out) :: Ibcnd(NRINDEX)
 !
-      call decod(Icase,2,NR_PHYSA, Ncase)
-      call decod(Bcond,2,NRINDEX,  Ibcnd)
-      Is_homD = .true.
-      ic=0
-      do iphys = 1,NR_PHYSA
+   logical :: is_Dirichlet
 !
-!  .....skip if the variable is not supported or the wrong type
-        if ((Ncase(iphys).eq.0).or.(DTYPE(iphys).ne.D_type)) then
-          ic = ic + NR_COMP(iphys)
-          cycle
-        endif
+   integer :: iphys,ic,ivar
 !
-!  .....determine if a Dirichlet variable
-        is_Dirichlet = .false.
-        do ivar=1,NR_COMP(iphys)
-          ic = ic+1
-          if (ibcnd(ic).eq.1) is_Dirichlet = .true.
-        enddo
+!-----------------------------------------------------------------------
 !
-!  .....check if a homogeneous Dirichlet BC variable
-        if (is_Dirichlet.and..not.PHYSAd(iphys)) Is_homD = .false.
+   call decod(Icase,2,NR_PHYSA, Ncase)
+   call decod(Bcond,2,NRINDEX,  Ibcnd)
+   Is_homD = .true.
+   ic=0
+   do iphys = 1,NR_PHYSA
+!
+!  ...skip if the variable is not supported or the wrong type
+      if ((Ncase(iphys).eq.0).or.(DTYPE(iphys).ne.D_type)) then
+         ic = ic + NR_COMP(iphys)
+         cycle
+      endif
+!
+!  ...determine if a Dirichlet variable
+      is_Dirichlet = .false.
+      do ivar=1,NR_COMP(iphys)
+         ic = ic+1
+         if (ibcnd(ic).eq.1) is_Dirichlet = .true.
       enddo
 !
-      end subroutine homogenD
+!  ...check if a homogeneous Dirichlet BC variable
+      if (is_Dirichlet.and..not.PHYSAd(iphys)) Is_homD = .false.
+   enddo
+!
+end subroutine homogenD
