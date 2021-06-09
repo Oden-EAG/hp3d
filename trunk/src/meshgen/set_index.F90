@@ -1,3 +1,13 @@
+!
+!
+! REMARK
+! This routine is not needed anymore, after changes to boundary condition
+! implementation were made (May 2021).
+! It is replaced by a routine "src/datstrs/get_index" that computes index
+! on-the-fly, rather than storing it in the data structure.
+! Once all BC changes have been verified, this routine/file can be deleted.
+!
+!
 !---------------------------------------------------------------------
 !   latest revision    - May 2020
 !
