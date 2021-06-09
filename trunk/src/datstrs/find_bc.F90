@@ -1,4 +1,4 @@
-!--------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !> Purpose            - routine determines BC flags for faces of an element
 !!
 !! @param[in]  Mdle   - middle node
@@ -9,115 +9,123 @@
 !!                             = the corresponding flag (1-9) for the element
 !!                               ancestor and its face containing the face
 !!                               of 'Mdle'.
-!--------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
-      subroutine find_bc(Mdle, Ibc)
+subroutine find_bc(Mdle, Ibc)
 !
-      use element_data
-      use data_structure3D
-      implicit none
+   use element_data
+   use data_structure3D
+   implicit none
 !
-!  ...Arguments
-      integer, intent(in)    :: Mdle
-      integer, intent(out)   :: Ibc(6,NRINDEX)
+!..Arguments
+   integer, intent(in)    :: Mdle
+   integer, intent(out)   :: Ibc(6,NRINDEX)
 !
-!  ...Locals
-      integer, dimension(27) :: nodesl,norientl
-      integer, dimension(6)  :: ibc_iel(6)
-      integer :: nrve,nrf
-      integer :: nod,nfath,iel,iface,nrve_iel,nrf_iel,loc,ivar,nvar
+!..Locals
+   integer, dimension(27) :: nodesl,norientl
+   integer, dimension(6)  :: ibc_iel(6)
+   integer :: nrve,nrf
+   integer :: nod,nfath,iel,iface,nrve_iel,nrf_iel,loc,ivar,nvar
 #if DEBUG_MODE
-      integer :: iprint = 1
+   character(16) :: fmt
+   integer      :: iprint = 1
 #endif
-
-!--------------------------------------------------------------------------------
 !
-      Ibc = 0
+!-------------------------------------------------------------------------------
+!
+   Ibc = 0
 !
 #if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7010) Mdle
- 7010   format(' find_bc: Mdle = ',i7)
+   7010 format(' find_bc: Mdle = ',i8)
       endif
 #endif
 !
-!  ...determine the initial mesh element ancestor
-      nod = Mdle
-      do while(nod.gt.0)
-        nod = NODES(nod)%father
-      enddo
-      iel = -nod
+!..determine the initial mesh element ancestor
+   nod = Mdle
+   do while(nod.gt.0)
+     nod = NODES(nod)%father
+   enddo
+   iel = -nod
 #if DEBUG_MODE
-      if (iprint.eq.1) then
-        write(*,7020) iel
- 7020   format('find_bc: iel = ',i5)
-      endif
+   if (iprint.eq.1) then
+      write(*,7020) iel
+ 7020 format('find_bc: iel = ',i5)
+   endif
 #endif
 !
-!  ...total number of components supported by the initial mesh element
-      nvar = ubound(ELEMS(iel)%bcond,1)
+!..total number of components supported by the initial mesh element
+   nvar = ubound(ELEMS(iel)%bcond,1)
 !
-!  ...initial mesh element number of vertices + edges, number of faces  
-      nrve_iel = Nvert(ELEMS(iel)%type) + Nedge(ELEMS(iel)%type)
-      nrf_iel = Nface(ELEMS(iel)%type)
+!..initial mesh element number of vertices + edges, number of faces
+   nrve_iel = Nvert(ELEMS(iel)%type) + Nedge(ELEMS(iel)%type)
+   nrf_iel = Nface(ELEMS(iel)%type)
 !
-!  ...get the element nodes
-      call elem_nodes(Mdle, nodesl,norientl)
+!..get the element nodes
+   call elem_nodes(Mdle, nodesl,norientl)
 !
-!  ...number of the element vertices and edges combined
-      nrve = Nvert(NODES(Mdle)%type) + Nedge(NODES(Mdle)%type)
+!..number of the element vertices and edges combined
+   nrve = Nvert(NODES(Mdle)%type) + Nedge(NODES(Mdle)%type)
 !
-!  ...number of the element faces
-      nrf = Nface(NODES(Mdle)%type)
+!..number of the element faces
+   nrf = Nface(NODES(Mdle)%type)
 !
-!  ...loop through the faces of the element
-      do 10 iface=1,nrf
+!..loop through the faces of the element
+   do iface=1,nrf
 !
-!  .....pick up the face node
-        nod = nodesl(nrve+iface)
+!  ...pick up the face node
+      nod = nodesl(nrve+iface)
 !
-!  .....go up the nodal tree
-        do
-          nfath = NODES(nod)%father
-          if (nfath.lt.0) then
+!  ...go up the nodal tree
+      do
+         nfath = NODES(nod)%father
+         if (nfath.lt.0) then
 !
-!  .........initial mesh element
+!        ...initial mesh element
             call locate(nod,ELEMS(iel)%nodes(nrve_iel+1:nrve_iel+nrf_iel),nrf_iel, loc)
             do ivar=1,nvar
-              call decodg(ELEMS(iel)%bcond(ivar),10,nrf_iel, ibc_iel)
+               call decodg(ELEMS(iel)%bcond(ivar),10,nrf_iel, ibc_iel)
 #if DEBUG_MODE
-              if (iprint.eq.1) then
-                write(*,7030) ivar,ibc_iel(1:nrf_iel)
- 7030           format('find_bc: BC FOR iel AND ivar = ',i2,3x,6i2)
-              endif
+               if (iprint.eq.1) then
+                  write(fmt,'("(",I1,"i2)")') nrf_iel
+                  !7030 format('find_bc: BC FOR iel AND ivar=',i2,': ',6i2)
+                  7030 format('find_bc: BC FOR iel AND ivar=',i2,': ',fmt)
+                  write(*,7030) ivar,ibc_iel(1:nrf_iel)
+               endif
 #endif
-              Ibc(iface,ivar) = ibc_iel(loc)
+               Ibc(iface,ivar) = ibc_iel(loc)
             enddo
-            go to 10
-          else
+            goto 10
+         else
             select case(NODES(nfath)%type)
-            case('mdlt','mdlq')
+               case('mdlt','mdlq')
 !
-!  ...........a mid-face node, continue up the tree
-              nod = nfath
-            case default
+!           ...a mid-face node, continue up the tree
+               nod = nfath
+               case default
 !
-!  ...........a middle node, quit, the face is in the interior of the domain
-              go to 10
+!           ...a middle node, quit, the face is in the interior of the domain
+               goto 10
             end select
-          endif
-        enddo
+         endif
+!  ...end loop through nodal tree
+      enddo
    10 continue
-
+!..end loop through element faces
+   enddo
 !
 #if DEBUG_MODE
       if (iprint.eq.1) then
-        do ivar=1,nvar
-          write(*,7100) ivar,Ibc(1:nrf,ivar)
- 7100     format('          ivar,Ibc = ',i2,4x,6(i1,2x))
-        enddo
+         do ivar=1,nvar
+            ! TODO output formatting bad, nrf not always equal to 6
+            write(fmt,'("(",I1,"(i1,2x))")') nrf
+       !7100 format('          ivar=',i2,',  Ibc = ',6(i1,2x))
+       7100 format('          ivar=',i2,',  Ibc = ',fmt)
+            write(*,7100) ivar,Ibc(1:nrf,ivar)
+         enddo
       endif
 #endif
 !
 !
-      end subroutine find_bc
+end subroutine find_bc
