@@ -21,6 +21,6 @@ neig_edge.F
 neig_face.F90
 neig_show.F90
 nelcon.F90
-result.F
+result.F90
 set_nodal_dof.F90
 0
