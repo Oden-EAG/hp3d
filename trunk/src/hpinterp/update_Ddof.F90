@@ -5,7 +5,7 @@
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision    - Oct 2019
+!    latest revision    - June 2021
 !
 !    purpose            - routine updates values of solution degrees
 !                         of freedom for Dirichlet nodes
@@ -54,7 +54,7 @@ subroutine update_Ddof()
 !..auxiliary variables
    integer :: iel,iv,ie,ifc,ind,iflag
    integer :: mdle,no,nod
-   integer :: i,k,loc,nr_elem_nodes,nrnodm,nr_up_elem,iprint
+   integer :: i,k,loc,nr_elem_nodes,nrnodm,nr_up_elem
 !
 !..additional variables for distributed case
    integer :: src,rcv,tag,count,ierr,j_loc,j_glb,j_off,loc_max
@@ -64,9 +64,11 @@ subroutine update_Ddof()
    integer, allocatable :: nod_loc(:),nod_tmp(:),nod_glb(:),nod_rnk(:)
    VTYPE  , dimension(:,:), pointer :: buf
 !
-!-----------------------------------------------------------------------
+#if DEBUG_MODE
+   integer :: iprint = 0
+#endif
 !
-   iprint=0
+!-----------------------------------------------------------------------
 !
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 !
@@ -144,8 +146,10 @@ subroutine update_Ddof()
             if (.not.associated(NODES(nod)%dof%zdofH)) cycle
             if (NODES(nod)%geom_interf.eq.1) cycle
             if (is_Dirichlet_attr(nod,'contin')) then
+#if DEBUG_MODE
                if (iprint.eq.1) write(*,7010) mdle,iv,nod
- 7010          format('update_Ddof: CALLING dhpvert FOR mdle,iv,nod = ',i6,i2,2x,i5)
+          7010 format('update_Ddof: CALLING dhpvert FOR mdle,iv,nod = ',i8,i2,i8)
+#endif
                call dhpvert(mdle,iflag,no,xsub(1:3,iv),NODES(nod)%case, &
                             NODES(nod)%bcond,  NODES(nod)%dof%zdofH)
                NODES(nod)%geom_interf=1
@@ -169,8 +173,10 @@ subroutine update_Ddof()
             if (is_Dirichlet_attr(nod,'contin')) then
 !           ...update H1 Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofH)) then
+#if DEBUG_MODE
                   if (iprint.eq.1) write(*,7020) mdle,ie,nod
- 7020             format('update_Ddof: CALLING dhpedgeH FOR mdle,ie,nod = ',i6,i2,2x,i5)
+             7020 format('update_Ddof: CALLING dhpedgeH FOR mdle,ie,nod = ',i8,i2,i8)
+#endif
                   call dhpedgeH(mdle,iflag,no,xsub,                     &
                                 etype,NODES(nod)%case,NODES(nod)%bcond, &
                                 nedge_orient,nface_orient,norder,ie,    &
@@ -181,8 +187,10 @@ subroutine update_Ddof()
             if (is_Dirichlet_attr(nod,'tangen')) then
 !           ...update H(curl) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofE)) then
+#if DEBUG_MODE
                   if (iprint.eq.1) write(*,7030) mdle,ie,nod
- 7030             format('update_Ddof: CALLING dhpedgeE FOR mdle,ie,nod = ',i6,i2,2x,i5)
+             7030 format('update_Ddof: CALLING dhpedgeE FOR mdle,ie,nod = ',i8,i2,i8)
+#endif
                   call dhpedgeE(mdle,iflag,no,xsub,                     &
                                 etype,NODES(nod)%case,NODES(nod)%bcond, &
                                 nedge_orient,nface_orient,norder,ie,    &
@@ -211,8 +219,10 @@ subroutine update_Ddof()
             if (is_Dirichlet_attr(nod,'contin')) then
 !           ...update H1 Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofH)) then
+#if DEBUG_MODE
                   if (iprint.eq.1) write(*,7040) mdle,ifc,nod
- 7040             format('update_Ddof: CALLING dhpfaceH FOR mdle,ifc,nod = ',i6,i2,2x,i5)
+             7040 format('update_Ddof: CALLING dhpfaceH FOR mdle,ifc,nod = ',i8,i2,i8)
+#endif
                   call dhpfaceH(mdle,iflag,no,xsub,                     &
                                 etype,NODES(nod)%case,NODES(nod)%bcond, &
                                 nedge_orient,nface_orient,norder,ifc,   &
@@ -223,8 +233,10 @@ subroutine update_Ddof()
             if (is_Dirichlet_attr(nod,'tangen')) then
 !           ...update H(curl) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofE)) then
+#if DEBUG_MODE
                   if (iprint.eq.1) write(*,7050) mdle,ifc,nod
- 7050             format('update_Ddof: CALLING dhpfaceE FOR mdle,ifc,nod = ',i6,i2,2x,i5)
+             7050 format('update_Ddof: CALLING dhpfaceE FOR mdle,ifc,nod = ',i8,i2,i8)
+#endif
                   call dhpfaceE(mdle,iflag,no,xsub,                     &
                                 etype,NODES(nod)%case,NODES(nod)%bcond, &
                                 nedge_orient,nface_orient,norder,ifc,   &
@@ -235,8 +247,10 @@ subroutine update_Ddof()
             if (is_Dirichlet_attr(nod,'normal')) then
 !           ...update H(div) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofV)) then
+#if DEBUG_MODE
                   if (iprint.eq.1) write(*,7060) mdle,ifc,nod
- 7060             format('update_Ddof: CALLING dhpfaceV FOR mdle,ifc,nod = ',i6,i2,2x,i5)
+             7060 format('update_Ddof: CALLING dhpfaceV FOR mdle,ifc,nod = ',i8,i2,i8)
+#endif
                   call dhpfaceV(mdle,iflag,no,xsub,                     &
                                 etype,NODES(nod)%case,NODES(nod)%bcond, &
                                 nedge_orient,nface_orient,norder,ifc,   &
