@@ -6,9 +6,14 @@
 *.blk
 *.mk.old
 .dummy
+
+# Temporary hp3D files
 fort.19
 fort.20
 *~
+
+# Data files
+history
 
 # Prerequisites
 *.d
