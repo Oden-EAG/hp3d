@@ -21,7 +21,8 @@
 !
 #include "typedefs.h"
 !
-subroutine compute_face(Numlev,Mdle,Iface,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,ZdofV,ZdofQ,T, X,Val)
+subroutine compute_face(Numlev,Mdle,Iface,Nedge_orient,Nface_orient,Norder, &
+                        Xnod,ZdofH,ZdofE,ZdofV,ZdofQ,T, X,Val)
 !
       use data_structure3D
 !
