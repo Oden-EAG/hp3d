@@ -39,8 +39,7 @@ subroutine hpvert(Iflag,No,Xi, Xnod)
    real(8) :: void(3,3)
 !
 #if DEBUG_MODE
-   integer :: iprint
-   iprint = 0
+   integer :: iprint = 0
 #endif
 !
 !----------------------------------------------------------------------
@@ -57,7 +56,6 @@ subroutine hpvert(Iflag,No,Xi, Xnod)
    end select
 !
 #if DEBUG_MODE
-!..printing
    if (iprint.eq.1) then
       write(*,7005) Iflag,No,Xi,Xnod
  7005 format('hpvert: Iflag,No = ',2i8,' Xi = ',3f8.3, &
@@ -65,6 +63,5 @@ subroutine hpvert(Iflag,No,Xi, Xnod)
       call pause
    endif
 #endif
-!
 !
 end subroutine hpvert

@@ -1,5 +1,5 @@
 !---------------------------------------------------------------------
-!   latest revision    - May 20
+!   latest revision    - June 2021
 !
 !   purpose            - define index for a node using the nodal case
 !                        and boundary condition flags for the node
