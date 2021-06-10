@@ -8,7 +8,6 @@ SRC_COMMON = \
             ./common/exact_error.F90 \
             ./common/getf.F90 \
             ./common/getg.F90 \
-            ./common/solution.F90 \
             ./common/uniform_href.F90 \
             ./common/set_environment.F90 \
             ./common/initialize.F90 \

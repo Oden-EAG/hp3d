@@ -3,7 +3,7 @@
 !         DUE TO OMP PARALLELIZATION OF UPDATE_DDOF->DIRICHLET->EXACT
 !------------------------------------------------------------------------------
 !> Purpose : exact (manufactured) solution
-!> last mod: May 21
+!> last mod: May 2021
 !
 !> @param[in]  X      - a point in physical space
 !> @param[in]  Mdle   - element (middle node) number
@@ -21,57 +21,57 @@
 !> @param[out] D2valQ - corresponding second derivatives
 !------------------------------------------------------------------------------
 !
-#include "typedefs.h"
+subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
+                          ValV,DvalV,D2valV, ValQ,DvalQ,D2valQ)
 !
-      subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
-                                ValV,DvalV,D2valV, ValQ,DvalQ,D2valQ)
+   use data_structure3D
 !
-      use data_structure3D
+   implicit none
 !
-      implicit none
-      real(8)                       , intent(in)  :: Xp(3)
-      integer                       , intent(in)  :: Mdle
-      VTYPE,dimension(  MAXEQNH    ), intent(out) ::   ValH
-      VTYPE,dimension(  MAXEQNH,3  ), intent(out) ::  DvalH
-      VTYPE,dimension(  MAXEQNH,3,3), intent(out) :: D2valH
-      VTYPE,dimension(3,MAXEQNE    ), intent(out) ::   ValE
-      VTYPE,dimension(3,MAXEQNE,3  ), intent(out) ::  DvalE
-      VTYPE,dimension(3,MAXEQNE,3,3), intent(out) :: D2valE
-      VTYPE,dimension(3,MAXEQNV    ), intent(out) ::   ValV
-      VTYPE,dimension(3,MAXEQNV,3  ), intent(out) ::  DvalV
-      VTYPE,dimension(3,MAXEQNV,3,3), intent(out) :: D2valV
-      VTYPE,dimension(  MAXEQNQ    ), intent(out) ::   ValQ
-      VTYPE,dimension(  MAXEQNQ,3  ), intent(out) ::  DvalQ
-      VTYPE,dimension(  MAXEQNQ,3,3), intent(out) :: D2valQ
+   real(8), intent(in)  :: Xp(3)
+   integer, intent(in)  :: Mdle
 !
-!  ...Locals
-      integer :: nsol
-      real(8) :: x,y,z
+   real(8),dimension(  MAXEQNH    ), intent(out) ::   ValH
+   real(8),dimension(  MAXEQNH,3  ), intent(out) ::  DvalH
+   real(8),dimension(  MAXEQNH,3,3), intent(out) :: D2valH
+   real(8),dimension(3,MAXEQNE    ), intent(out) ::   ValE
+   real(8),dimension(3,MAXEQNE,3  ), intent(out) ::  DvalE
+   real(8),dimension(3,MAXEQNE,3,3), intent(out) :: D2valE
+   real(8),dimension(3,MAXEQNV    ), intent(out) ::   ValV
+   real(8),dimension(3,MAXEQNV,3  ), intent(out) ::  DvalV
+   real(8),dimension(3,MAXEQNV,3,3), intent(out) :: D2valV
+   real(8),dimension(  MAXEQNQ    ), intent(out) ::   ValQ
+   real(8),dimension(  MAXEQNQ,3  ), intent(out) ::  DvalQ
+   real(8),dimension(  MAXEQNQ,3,3), intent(out) :: D2valQ
+!
+!..Locals
+   integer :: nsol
+   real(8) :: x,y,z
 !
 !------------------------------------------------------------------------------
 !
-!  ...initialize exact solution
-      ValH=ZERO ; DvalH=ZERO ; D2valH=ZERO
-      ValE=ZERO ; DvalE=ZERO ; D2valE=ZERO
-      ValV=ZERO ; DvalV=ZERO ; D2valV=ZERO
-      ValQ=ZERO ; DvalQ=ZERO ; D2valQ=ZERO
+!..initialize exact solution
+   ValH=ZERO ; DvalH=ZERO ; D2valH=ZERO
+   ValE=ZERO ; DvalE=ZERO ; D2valE=ZERO
+   ValV=ZERO ; DvalV=ZERO ; D2valV=ZERO
+   ValQ=ZERO ; DvalQ=ZERO ; D2valQ=ZERO
 !
-      x = Xp(1); y = Xp(2); z = Xp(3)
-      nsol=1
-      select case(nsol)
+   x = Xp(1); y = Xp(2); z = Xp(3)
+   nsol=1
+   select case(nsol)
 !
 !  ...a quadratic function
       case(1)
-        ValH(1:3) = x**2 + 1.d0
-        DvalH(1:3,1) = 2.d0*x
-        D2valH(1:3,1,1) = 2.d0
+         ValH(1:3) = x**2 + 1.d0
+         DvalH(1:3,1) = 2.d0*x
+         D2valH(1:3,1,1) = 2.d0
 !
-!  ...a quadratic function with zero Dirichlet BC's 
+!  ...a quadratic function with zero Dirichlet BCs
       case(2)
-        ValH(1:3) = x*(1.d0-x)
-        DvalH(1:3,1) = -2.d0*x + 1.d0
-        D2valH(1:3,1,1) = -2.d0
-
-      end select
+         ValH(1:3) = x*(1.d0-x)
+         DvalH(1:3,1) = -2.d0*x + 1.d0
+         D2valH(1:3,1,1) = -2.d0
 !
-      end subroutine exact
+   end select
+!
+end subroutine exact

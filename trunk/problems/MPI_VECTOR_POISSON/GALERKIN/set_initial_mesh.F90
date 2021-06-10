@@ -17,56 +17,57 @@
 !
 !---------------------------------------------------------------------
 !
-      subroutine set_initial_mesh(Nelem_order)
+subroutine set_initial_mesh(Nelem_order)
 !
-      use GMP
-      use common_prob_data
-      use data_structure3D
+   use GMP
+   use common_prob_data
+   use data_structure3D
 !
-      implicit none
+   implicit none
 !
-!----------------------------------------------------------------------
+!..output argument
+   integer, intent(out) :: Nelem_order(NRELIS)
 !
-      integer,dimension(NRELIS),intent(out) :: Nelem_order
-!  ...BC flags
-      integer, dimension(6,NRINDEX) :: ibc
+!..BC flags
+   integer, dimension(6,NRINDEX) :: ibc
 !
-!  ...miscellaneous
-      integer :: iprint,ifc,iel,neig,ivar
+!..miscellaneous
+   integer :: ifc,iel,neig,ivar
+!
+#if DEBUG_MODE
+   integer :: iprint = 0
+#endif
 !
 !------------------------------------------------------------------------------------
 !
-!  ...initialize
-      iprint=1
+!..check if have not exceeded the maximum order
+   if (IP.gt.MAXP) then
+      write(*,*) 'set_initial_mesh: IP, MAXP = ', IP,MAXP
+      stop 1
+   endif
 !
-!  ...check if have not exceeded the maximum order
-      if (IP.gt.MAXP) then
-        write(*,*) 'set_initial_mesh: IP, MAXP = ', IP,MAXP
-        stop 1
-      endif
+!..set BC
+!..loop over initial mesh elements
+   do iel=1,NRELIS
 !
-!  ...set BC
-!  ...loop over initial mesh elements
-      do iel=1,NRELIS
+!  ...set physics
+      ELEMS(iel)%nrphysics = 1
+      allocate(ELEMS(iel)%physics(1))
+      ELEMS(iel)%physics(1) ='field'
 !
-!  .....set physics
-        ELEMS(iel)%nrphysics = 1
-        allocate(ELEMS(iel)%physics(1))
-        ELEMS(iel)%physics(1) ='field'
+!  ...set order of approximation
+      if (IP.gt.0) then
 !
-!  .....set order of approximation
-        if (IP.gt.0) then
-!
-!  .......uniform order of approximation
-          select case(ELEMS(iel)%Type)
+!     ...uniform order of approximation
+         select case(ELEMS(iel)%Type)
             case('tetr'); Nelem_order(iel) = 1*IP
             case('pyra'); Nelem_order(iel) = 1*IP
             case('pris'); Nelem_order(iel) = 11*IP
             case('bric'); Nelem_order(iel) = 111*IP
-          end select
-        else
+         end select
+      else
 !
-!  ......custom order of approximation (NOT IMPLEMENTED)
+!     ...custom order of approximation (NOT IMPLEMENTED)
          write(*,1003) IP
  1003    format('ERROR in set_initial_mesh: IP = ',i3)
          stop 1
@@ -77,21 +78,19 @@
 !
 !  ...loop through the element faces
       do ifc=1,nface(ELEMS(iel)%Type)
-        neig = ELEMS(iel)%neig(ifc)
-        select case(neig)
+         neig = ELEMS(iel)%neig(ifc)
 !
-!  .....no neighbor, set the BC flags
-        case(0)
-!
-          select case(ifc)
-          case(1)
-            ibc(ifc,1) = 1; ibc(ifc,2) = 1; ibc(ifc,3) = 2
-          case(2)
-            ibc(ifc,1) = 2; ibc(ifc,2) = 2; ibc(ifc,3) = 1 
-          case(3,4,5,6)
-            ibc(ifc,1:3) = 2
-          end select 
-        end select
+!     ...no neighbor, set the BC flags
+         if (neig .eq. 0) then
+            select case(ifc)
+               case(1)
+                  ibc(ifc,1) = 1; ibc(ifc,2) = 1; ibc(ifc,3) = 2
+               case(2)
+                  ibc(ifc,1) = 2; ibc(ifc,2) = 2; ibc(ifc,3) = 1
+               case(3,4,5,6)
+                  ibc(ifc,1:3) = 2
+            end select
+         endif
       enddo
 !
 !  ...allocate BC flags (one per physical attribute component)
@@ -100,11 +99,14 @@
 !  ...encode face BCs into a single BC flag, one component at a time
       do ivar=1,3
         call encodg(ibc(1:6,ivar),10,6, ELEMS(iel)%bcond(ivar))
+#if DEBUG_MODE
         if (iprint.eq.1) then
           write(*,*) 'ivar,ELEMS(iel)%bcond(ivar) = ',ivar,ELEMS(iel)%bcond(ivar)
         endif
+#endif
       enddo
 !
+#if DEBUG_MODE
 !  ...print order of approximation
       if (iprint.eq.1 .and. IP.gt.0) then
          write(*,*) '-- uniform order of approximation --'
@@ -122,9 +124,10 @@
 1001     format(' p, q = ',   2i3)
 1002     format(' p, q, r = ',3i3)
       endif
+#endif
 !
-!  ...end of loop over initial mesh elements
-      enddo
+!..end of loop over initial mesh elements
+   enddo
 !
 !
-      end subroutine set_initial_mesh
+end subroutine set_initial_mesh
