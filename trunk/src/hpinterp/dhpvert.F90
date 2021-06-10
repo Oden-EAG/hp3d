@@ -36,7 +36,7 @@ subroutine dhpvert(Mdle,Iflag,No,Xi,Icase,Bcond, ZdofH)
 !..decimal representation of Bcond
    integer :: ibcnd(NRINDEX)
 !
-   integer :: ivarH, nvarH, iphys,iload,icomp,ic
+   integer :: ivarH,nvarH,iphys,iload,icomp,ic
 !
 #if DEBUG_MODE
    integer :: iprint = 0

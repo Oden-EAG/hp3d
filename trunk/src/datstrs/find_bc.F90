@@ -26,6 +26,7 @@ subroutine find_bc(Mdle, Ibc)
    integer, dimension(6)  :: ibc_iel(6)
    integer :: nrve,nrf
    integer :: nod,nfath,iel,iface,nrve_iel,nrf_iel,loc,ivar,nvar
+!
 #if DEBUG_MODE
    character(16) :: fmt
    integer      :: iprint = 1

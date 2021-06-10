@@ -151,7 +151,7 @@ subroutine update_Ddof()
           7010 format('update_Ddof: CALLING dhpvert FOR mdle,iv,nod = ',i8,i2,i8)
 #endif
                call dhpvert(mdle,iflag,no,xsub(1:3,iv),NODES(nod)%case, &
-                            NODES(nod)%bcond,  NODES(nod)%dof%zdofH)
+                            NODES(nod)%bcond, NODES(nod)%dof%zdofH)
                NODES(nod)%geom_interf=1
             endif
          enddo
