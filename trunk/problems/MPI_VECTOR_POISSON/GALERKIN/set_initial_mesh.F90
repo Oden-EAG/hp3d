@@ -98,11 +98,11 @@ subroutine set_initial_mesh(Nelem_order)
 !
 !  ...encode face BCs into a single BC flag, one component at a time
       do ivar=1,3
-        call encodg(ibc(1:6,ivar),10,6, ELEMS(iel)%bcond(ivar))
+         call encodg(ibc(1:6,ivar),10,6, ELEMS(iel)%bcond(ivar))
 #if DEBUG_MODE
-        if (iprint.eq.1) then
-          write(*,*) 'ivar,ELEMS(iel)%bcond(ivar) = ',ivar,ELEMS(iel)%bcond(ivar)
-        endif
+         if (iprint.eq.1) then
+            write(*,*) 'ivar,ELEMS(iel)%bcond(ivar) = ',ivar,ELEMS(iel)%bcond(ivar)
+         endif
 #endif
       enddo
 !

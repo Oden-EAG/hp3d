@@ -25,128 +25,126 @@
 !                    = 8  free L2 component
 !---------------------------------------------------------------------
 !
-      subroutine get_index(Nod, Indexd)
+subroutine get_index(Nod, Indexd)
 !
-      use data_structure3D
+   use data_structure3D
 !
-      implicit none
+   implicit none
 !
-!  ...Variables
-      integer, intent(in)  :: Nod
-      integer, intent(out), dimension(NRINDEX)  :: Indexd
+!..arguments
+   integer, intent(in)  :: Nod
+   integer, intent(out) :: Indexd(NRINDEX)
 !
-!  ...Locals
+!..decimal version of NODES(Nod)%case
+   integer, dimension(NR_PHYSA) :: ncase
 !
-!  ...decimal version of NODES(Nod)%case
-      integer, dimension(NR_PHYSA) :: ncase
+!..decimal version of NODES(Nod)%bcond
+   integer,dimension(NRINDEX) :: ibcd
 !
-!  ...decimal version of NODES(Nod)%bcond
-      integer,dimension(NRINDEX) :: ibcd
-!
-!  ...others
-      integer :: ic,iphys,ivar
+!..misc
+   integer :: ic,iphys,ivar
 !
 #if DEBUG_MODE
-      integer :: iprint = 1
+   integer :: iprint = 1
 #endif
 !
 !-----------------------------------------------------------------------
 !
-!  ...decode the case and the BC flags
-      call decod(NODES(Nod)%case,2,NR_PHYSA, ncase)
-      call decod(NODES(NOD)%bcond,2,NRINDEX, ibcd )
+!..decode the case and the BC flags
+   call decod(NODES(Nod)%case,2,NR_PHYSA, ncase)
+   call decod(NODES(Nod)%bcond,2,NRINDEX, ibcd )
 !
-!  ...initiate index counter
-      ic=0
+!..initiate index counter
+   ic=0
 !
-!  ...loop through the physics attributes
-      do iphys=1,NR_PHYSA
+!..loop through the physics attributes
+   do iphys=1,NR_PHYSA
 !
-        select case(ncase(iphys))
+      select case(ncase(iphys))
 !
-!  .....physical attribute is absent, skip its components
-        case(0)
-          do ivar=1,NR_COMP(iphys)
-            ic=ic+1 ; Indexd(ic)=0
-          enddo
-!
-!  .....physical attribute is present
-        case(1)
-          select case(DTYPE(iphys))
-!
-!  .......H1 variable
-          case('contin')
-!
-!  .........loop through components
+!     ...physical attribute is absent, skip its components
+         case(0)
             do ivar=1,NR_COMP(iphys)
-              ic=ic+1
-              select case(ibcd(ic))
-!
-!  ...........free H1 component
-              case(0); Indexd(ic)=2
-!
-!  ...........component known from Dirichlet BC
-              case(1); Indexd(ic)=1
-              end select
+               ic=ic+1 ; Indexd(ic)=0
             enddo
 !
-!  .......H(curl) variable
-          case('tangen')
+!     ...physical attribute is present
+         case(1)
+            select case(DTYPE(iphys))
 !
-!  .........loop through components
-            do ivar=1,NR_COMP(iphys)
-              ic=ic+1
-              select case(ibcd(ic))
+!           ...H1 variable
+               case('contin')
 !
-!  ...........free H(curl) component
-              case(0); Indexd(ic)=4
+!              ...loop through components
+                  do ivar=1,NR_COMP(iphys)
+                     ic=ic+1
+                     select case(ibcd(ic))
 !
-!  ...........component known from Dirichlet BC
-              case(1); Indexd(ic)=3
-              end select
-            enddo
+!                    ...free H1 component
+                        case(0); Indexd(ic)=2
 !
-!  .......H(div) variable
-          case('normal')
+!                    ...component known from Dirichlet BC
+                        case(1); Indexd(ic)=1
+                     end select
+                  enddo
 !
-!  .........loop through components
-            do ivar=1,NR_COMP(iphys)
-              ic=ic+1
-              select case(ibcd(ic))
+!           ...H(curl) variable
+               case('tangen')
 !
-!  ...........free H(div) component
-              case(0); Indexd(ic)=6
+!              ...loop through components
+                  do ivar=1,NR_COMP(iphys)
+                  ic=ic+1
+                     select case(ibcd(ic))
 !
-!  ...........component known from Dirichlet BC
-              case(1); Indexd(ic)=5
-              end select
-            enddo
+!                    ...free H(curl) component
+                        case(0); Indexd(ic)=4
 !
-!  .......L2 variable
-          case('discon')
+!                    ...component known from Dirichlet BC
+                        case(1); Indexd(ic)=3
+                     end select
+                  enddo
 !
-!  .........loop through components
-            do ivar=1,NR_COMP(iphys)
-              ic=ic+1
-              select case(ibcd(ic))
+!           ...H(div) variable
+               case('normal')
 !
-!  ...........free H(div) component
-              case(0); Indexd(ic)=8
+!              ...loop through components
+                  do ivar=1,NR_COMP(iphys)
+                     ic=ic+1
+                     select case(ibcd(ic))
 !
-!  ...........component known from Dirichlet BC
-              case(1); Indexd(ic)=7
-              end select
-            enddo
-          end select
-        end select
+!                    ...free H(div) component
+                        case(0); Indexd(ic)=6
 !
-!  ...end of loop through physics attributes
-      enddo
-      if (ic.ne.NRINDEX) then
-        write(*,*) 'get_index: INCONSISTENCY.'
-        stop 1
-      endif
+!                    ...component known from Dirichlet BC
+                        case(1); Indexd(ic)=5
+                     end select
+                  enddo
 !
+!           ...L2 variable
+               case('discon')
+!
+!              ...loop through components
+                  do ivar=1,NR_COMP(iphys)
+                     ic=ic+1
+                     select case(ibcd(ic))
+!
+!                    ...free H(div) component
+                        case(0); Indexd(ic)=8
+!
+!                    ...component known from Dirichlet BC
+                        case(1); Indexd(ic)=7
+                     end select
+                  enddo
+            end select
+      end select
+!
+!..end of loop through physics attributes
+   enddo
+!
+   if (ic.ne.NRINDEX) then
+      write(*,*) 'get_index: INCONSISTENCY.'
+      stop 1
+   endif
 !
 #if DEBUG_MODE
       if (iprint.eq.1) then
@@ -161,4 +159,4 @@
 #endif
 !
 !
-      end subroutine get_index
+end subroutine get_index
