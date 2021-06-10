@@ -4,7 +4,7 @@
 !
 !----------------------------------------------------------------------
 !
-!     latest revision:  - May 21
+!     latest revision:  - May 2021
 !
 !     purpose:          - driver for the element routine
 !
@@ -157,9 +157,11 @@
 !
 !  ...determine BC flags
       call find_bc(Mdle, ibc)
-      do ivar=1,3
-        write(*,7020) ivar, ibc(1:6,ivar)
- 7020   format('elem_vect_poisson: BC flags for ivar = ',i1,2x,6i2)
+      if (iprint.eq.1) then
+         do ivar=1,3
+            write(*,7020) ivar, ibc(1:6,ivar)
+    7020    format('elem_vect_poisson: BC flags for ivar = ',i1,2x,6i2)
+         enddo
       enddo
 !
 !  ...determine nodes coordinates

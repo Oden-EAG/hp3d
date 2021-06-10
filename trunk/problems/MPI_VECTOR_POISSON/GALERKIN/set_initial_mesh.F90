@@ -4,7 +4,7 @@
 !
 !--------------------------------------------------------------------
 !
-!     latest revision:  - May 21
+!     latest revision:  - May 2021
 !
 !     purpose:          - define problem dependent data
 !                         (multiphysics, BC, approximation)
@@ -72,7 +72,7 @@
          stop 1
       endif
 !
-!  ...set BC flags for ecah of 3 components: 0 - no BC ; 1 - Dirichlet ; 2 - Neumann 
+!  ...set BC flags for each of 3 components: 0 - no BC ; 1 - Dirichlet ; 2 - Neumann
       ibc(1:6,1:NRINDEX) = 0
 !
 !  ...loop through the element faces
@@ -80,7 +80,7 @@
         neig = ELEMS(iel)%neig(ifc)
         select case(neig)
 !
-!  .....no neighbor, se the BC flags
+!  .....no neighbor, set the BC flags
         case(0)
 !
           select case(ifc)
@@ -97,7 +97,7 @@
 !  ...allocate BC flags (one per physical attribute component)
       allocate(ELEMS(iel)%bcond(3))
 !
-!  ...encode face BC's into a single BC flag, one component at the time
+!  ...encode face BCs into a single BC flag, one component at a time
       do ivar=1,3
         call encodg(ibc(1:6,ivar),10,6, ELEMS(iel)%bcond(ivar))
         if (iprint.eq.1) then

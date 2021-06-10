@@ -23,7 +23,7 @@
 !             NdofmQ    - the number of L2 dof
 !             Nrnodm    - number of the modified element nodes
 !             Bload     - 1D array containing the modified load vector
-!             Astif     - 1D array containing the modified stiffness matrix!
+!             Astif     - 1D array containing the modified stiffness matrix
 !---------------------------------------------------------------------
 subroutine celem(Mdle,Idec,Nrdofs,Nrdofm,Nrdofc,Nodm, &
                  NdofmH,NdofmE,NdofmV,NdofmQ,Nrnodm,Bload,Astif)

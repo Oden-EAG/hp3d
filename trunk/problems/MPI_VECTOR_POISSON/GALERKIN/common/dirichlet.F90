@@ -1,21 +1,21 @@
 !----------------------------------------------------------------------
 !
-!     routine name      - dirichlet
+!     routine name     - dirichlet
 !
 !----------------------------------------------------------------------
 !
-!     latest revision:  - May 21
+!     latest revision: - May 2021
 !
-!     purpose:          - return dirichlet data at a point
+!     purpose:         - return dirichlet data at a point
 !
 !     arguments:
 !
 !     in:
-!             X         - a point in physical space
-!             Icase     - node case (specifies what variables are supported)
+!             X        - a point in physical space
+!             Icase    - node case (specifies what variables are supported)
 !     out:
-!             ValH      - value of the H1 solution
-!             DvalH     - corresponding first derivatives
+!             ValH     - value of the H1 solution
+!             DvalH    - corresponding first derivatives
 !             valE     - value of the H(curl) solution
 !             dvalE    - corresponding first derivatives
 !             valV     - value of the H(div) solution

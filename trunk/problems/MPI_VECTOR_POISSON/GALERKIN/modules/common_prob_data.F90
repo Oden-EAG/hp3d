@@ -4,10 +4,10 @@
 !
 !----------------------------------------------------------------------
 !
-!     latest revision:  - May 2020
+!     latest revision:  - May 2021
 !
 !     purpose:          - module setting up the parameters for the
-!                         acoustics problem
+!                         vector Poisson problem
 !
 !
 !----------------------------------------------------------------------
