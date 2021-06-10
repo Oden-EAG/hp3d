@@ -195,6 +195,9 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    VTYPE :: zbeta,zdbeta,zd2beta,detJstretch
    VTYPE, dimension(3,3) :: Jstretch,invJstretch,JJstretch
 !
+!..timer
+!   real(8) :: MPI_Wtime,start_time,end_time
+!
 !..for Gram matrix compressed storage format
    integer :: nk
    nk(k1,k2) = (k2-1)*k2/2+k1
@@ -327,6 +330,9 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    call set_3D_int_DPG(etype,norder,norient_face, nint,xiloc,waloc)
    INTEGRATION = 0
 !
+!..start timer
+!   start_time = MPI_Wtime()
+!
 !..loop over integration points
    do l=1,nint
 !
@@ -389,6 +395,11 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !     ...initialize gain polarization, raman polarization
          gain_pol = ZERO; raman_pol = ZERO
+!     ...skip nonlinear gain computation if inside PML region
+         if ( USE_PML .and. ( (x(3).gt.PML_REGION) .or. &
+                              ( (COPUMP.eq.0).and.(x(3).lt.(ZL-PML_REGION)) ) &
+                            ) &
+            ) goto 190
          if (ACTIVE_GAIN .gt. 0.d0) then
             if (dom_flag .eq. 1) then
                call get_activePol(zsolQ_soleval(1:12),Fld_flag,delta_n, gain_pol)
@@ -405,6 +416,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
             endif
 !     ...endif RAMAN_GAIN
          endif
+ 190     continue
 !     ...update auxiliary constant za
          za = (ZI*OMEGA*OMEGA_RATIO_FLD*EPSILON+SIGMA)*IDENTITY+bg_pol+gain_pol+raman_pol
 !  ...endif NONLINEAR_FLAG
@@ -584,6 +596,15 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !..end of loop through integration points
    enddo
+!
+!..end timer
+!   end_time = MPI_Wtime()
+!   !$OMP CRITICAL
+!      !write(*,10) etype, end_time-start_time
+!      write(*,11) end_time-start_time
+!! 10   format(A,' elem : ',f12.5,'  seconds')
+! 11   format(f12.5)
+!   !$OMP END CRITICAL
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------

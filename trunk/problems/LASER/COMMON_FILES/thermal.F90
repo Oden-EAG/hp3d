@@ -24,7 +24,7 @@ subroutine get_avgTemp(NumPts,FileIter)
    use commonParam
    use laserParam
    use mpi_param, only: RANK,ROOT
-   use MPI      , only: MPI_COMM_WORLD,MPI_IN_PLACE,MPI_REAL8,MPI_SUM
+   use MPI      , only: MPI_COMM_WORLD
    use par_mesh , only: DISTRIBUTED,HOST_MESH
 !
    implicit none
@@ -40,7 +40,7 @@ subroutine get_avgTemp(NumPts,FileIter)
    character(8)  :: fmt,suffix
    character(64) :: filename
 !
-   integer :: count,ierr
+   integer :: ierr
 !
 !----------------------------------------------------------------------
 !
@@ -71,17 +71,8 @@ subroutine get_avgTemp(NumPts,FileIter)
    if (RANK .eq. ROOT) write(*,*) ' get_avgTemp: computing core temperature values..'
    call comp_avgTemp(zValues,NumPts, coreTemp)
 !
-!
-!..gather RHS vector information on host
-   if (.not. DISTRIBUTED .or. HOST_MESH) goto 50
-   count = NumPts
-   if (RANK .eq. ROOT) then
-      call MPI_REDUCE(MPI_IN_PLACE,coreTemp,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-   else
-      call MPI_REDUCE(coreTemp,coreTemp,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      goto 90
-   endif
-   50 continue
+!..only ROOT proc has valid coreTemp values
+   if (RANK .ne. ROOT) goto 90
 !
    if (FileIter .eq. -1) then
       write(*,*) ' get_avgTemp: printing core temperature values..'
@@ -136,8 +127,8 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
    use data_structure3D
    use environment, only : QUIET_MODE
    use mpi_param  , only : RANK,ROOT
-   use MPI        , only : MPI_COMM_WORLD
-   use par_mesh   , only : DISTRIBUTED
+   use MPI        , only : MPI_COMM_WORLD,MPI_IN_PLACE,MPI_REAL8,MPI_SUM
+   use par_mesh   , only : DISTRIBUTED,HOST_MESH
 !
    implicit none
 !
@@ -164,7 +155,7 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
 !
 !..timer
    real(8) :: MPI_Wtime,start_time,end_time
-   integer :: ierr
+   integer :: count,ierr
 !
 !----------------------------------------------------------------------
 !
@@ -217,11 +208,28 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
    enddo
 !$OMP END PARALLEL DO
 !
+!..gather information on host
+   if (.not. DISTRIBUTED .or. HOST_MESH) goto 50
+   count = NumPts
+   if (RANK .eq. ROOT) then
+      call MPI_REDUCE(MPI_IN_PLACE,coreTemp,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE,coreVol ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+   else
+      call MPI_REDUCE(coreTemp,coreTemp,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(coreVol ,coreVol ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+   endif
+   50 continue
+!
+   if (RANK .ne. ROOT) goto 90
+!
+!..compute average temperature in fiber core at the sample points
    do i=1,NumPts
       CoreTemp(i) = CoreTemp(i)/coreVol(i)
-!      write(*,3005) 'i = ',i, ', CoreTemp = ',CoreTemp(i),', CoreVol = ',coreVol(i)
-! 3005 format(A,I3,A,F6.2,A,F6.2)
+      !write(*,3005) 'i = ',i, ', CoreTemp = ',CoreTemp(i),', CoreVol = ',coreVol(i)
+ !3005 format(A,I3,A,F6.2,A,F6.2)
    enddo
+!
+   90 continue
 !
 !..end timer
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
@@ -327,6 +335,11 @@ subroutine comp_elem_avgTemp(Mdle, ElemTemp,ElemVol)
 !  ...Jacobian
       call geom(dxdxi, dxidx,rjac,iflag)
       weight = wa*rjac
+#if DEBUG_MODE
+      if (iflag .ne. 0) then
+        write(*,*) 'geom iflag != 0. Mdle,rjac = ',Mdle,rjac
+      endif
+#endif
 !
 !  ...accumulate element volume
       ElemVol = ElemVol + weight
@@ -368,12 +381,7 @@ subroutine get_thermLoad(ZsolQ, Therm_load)
 !
    VTYPE, dimension(3) :: Es,Hs,Ep,Hp,ETimesHs,ETimesHp
 !
-!..modified irradiance experiment (birefringent fiber)
-   VTYPE, dimension(3) :: Es_mod,Hs_mod
-   VTYPE, dimension(3) :: Ep_mod,Hp_mod
-   integer :: modified
-!
-   real(8) :: Ip,Is,gp,gs
+   real(8) :: gs,gp,Is,Ip,Pp
    real(8) :: eta,Nex,Ngd,sum1,sum2
 !
 !---------------------------------------------------------------------
@@ -384,33 +392,20 @@ subroutine get_thermLoad(ZsolQ, Therm_load)
    Ep = ZsolQ(7:9)
    Hp = ZsolQ(10:12)
 !
-   Es_mod(1) = Es(1)+Es(2)
-   Es_mod(2) = ZERO
-   Es_mod(3) = Es(3)
-!
-   Hs_mod(1) = ZERO
-   Hs_mod(2) = Hs(1)+Hs(2)
-   Hs_mod(3) = Hs(3)
-!
-   Ep_mod(1) = Ep(1)+Ep(2)
-   Ep_mod(2) = ZERO
-   Ep_mod(3) = Ep(3)
-!
-   Hp_mod(1) = ZERO
-   Hp_mod(2) = Hp(1)+Hp(2)
-   Hp_mod(3) = Hp(3)
-!
-!..compute irradiance
-   modified = 0
-   if (modified .eq. 1) then
-      call zz_cross_product(Es_mod,conjg(Hs_mod), ETimesHs)
-      call zz_cross_product(Ep_mod,conjg(Hp_mod), ETimesHp)
-   else
-      call zz_cross_product(Es,conjg(Hs), ETimesHs)
-      call zz_cross_product(Ep,conjg(Hp), ETimesHp)
-   endif
+!..compute signal irradiance
+   call zz_cross_product(Es,conjg(Hs), ETimesHs)
    Is = sqrt((real(EtimesHs(1))**2+real(EtimesHs(2))**2+real(EtimesHs(3))**2))
-   Ip = sqrt((real(EtimesHp(1))**2+real(EtimesHp(2))**2+real(EtimesHp(3))**2))
+!
+!..compute pump irradiance
+   Ip = 0.d0
+   if (FAKE_PUMP .eq. 1) then
+!  ...assume pump is a plane wave in fiber core
+      Pp = 100.d0 ! set non-dimensional core pump power (scaled by I_0*L_0*L_0)
+      Ip = Pp / (PI*R_CORE*R_CORE) ! calculate non-dimensional irradiance
+   else
+      call zz_cross_product(Ep,conjg(Hp), ETimesHp)
+      Ip = sqrt((real(EtimesHp(1))**2+real(EtimesHp(2))**2+real(EtimesHp(3))**2))
+   endif
 !
    sum1 = (SIGMA_S_ABS/OMEGA_SIGNAL)*Is+(SIGMA_P_ABS/OMEGA_PUMP)*Ip
    sum2 = ((SIGMA_S_ABS+SIGMA_S_EMS)/OMEGA_SIGNAL)*Is + &

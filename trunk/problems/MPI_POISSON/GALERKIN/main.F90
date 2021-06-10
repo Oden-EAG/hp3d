@@ -206,6 +206,7 @@ subroutine master_main()
       write(*,*) '                                         '
       write(*,*) '          ---- TESTING ----              '
       write(*,*) 'Flush dof, update_gdof, update_Ddof....60'
+      write(*,*) 'P-refine an element....................65'
       write(*,*) '=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='
 !
       read( *,*) idec
@@ -288,6 +289,9 @@ subroutine master_main()
 !
 !     ...TODO testing
          case(60)
+            call exec_case(idec)
+!
+         case(65)
             call exec_case(idec)
 !
       end select
@@ -403,6 +407,9 @@ subroutine worker_main()
 !
 !     ...TODO testing
          case(60)
+            call exec_case(idec)
+!
+         case(65)
             call exec_case(idec)
 !
       end select

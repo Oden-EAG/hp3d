@@ -119,13 +119,15 @@ subroutine set_initial_mesh(Nelem_order)
       select case(GEOM_NO)
 !     ...single cube/brick with Dirichlet
 !        perfect electrical conductor (PEC) BC on all faces
-			case (1)
+         case (1)
             do ifc=1,nface(etype)
                neig = ELEMS(iel)%neig(ifc)
                select case(neig)
                   case(0)
 !                 ...dirichlet on heat
                      ibc(ifc,1) = 1
+!                 ...Neumann on heat (for min z /max z faces)
+!                    TODO (becomes essential BC for normal trace/flux)
 !                 ...BCs on EH-traces signal and pump
                      if((IBCFLAG.eq.3).and.(ifc.eq.2)) then
 !                    ...impedance on z=L face
@@ -151,6 +153,8 @@ subroutine set_initial_mesh(Nelem_order)
                   case(0)
 !                 ...dirichlet on heat
                      ibc(ifc,1) = 1
+!                 ...Neumann on heat (for input/output faces)
+!                    TODO (becomes essential BC for normal trace/flux)
 !                 ...dirichlet on E-trace
                      ibc(ifc,2) = 6 ! signal
                      ibc(ifc,3) = 6 ! pump
@@ -165,6 +169,12 @@ subroutine set_initial_mesh(Nelem_order)
                   case(0)
 !                 ...dirichlet on heat
                      ibc(ifc,1) = 1
+!                 ...dirichlet on heat flux (for input/output faces)
+!                     if((ifc.eq.1) .or. (ifc.eq.2)) then
+!                        ibc(ifc,4) = 1
+!                     else
+!                        ibc(ifc,1) = 1
+!                     endif
 !                 ...dirichlet on E-trace
                      ibc(ifc,2) = 6 ! signal
                      ibc(ifc,3) = 6 ! pump

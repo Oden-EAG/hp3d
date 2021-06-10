@@ -398,25 +398,73 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !
 !  ...LMA fiber
 !  ...LP01 (signal) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
-      ampl =  1.0d0
-      if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.4512d0 .and. CLAD_NX.eq.1.4500d0) .or.   &
-          (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.4512d0 .and. CLAD_NY.eq.1.4500d0)) then
-         k    = 85.6833d0
-         gamm =  1.53131d0
-         beta =  3.12978d0
-      else if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.1520d0 .and. CLAD_NX.eq.1.1500d0) .or.  &
-               (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.1520d0 .and. CLAD_NY.eq.1.1500d0)) then
-         k    = 68.0103d0
-         gamm = 1.57221d0
-         beta = 3.68554d0
-      else if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.6510d0 .and. CLAD_NX.eq.1.6500d0) .or.  &
-               (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.6510d0 .and. CLAD_NY.eq.1.6500d0)) then
-         k    = 97.4838d0
-         gamm =  1.52302d0
-         beta =  3.03177d0
-      else
-         write(*,*) 'mfd_solutions: ISOL 13, unexpected case. stop.'
-         stop
+      if (Fld .eq. 0) then
+         ampl =  1.0d0
+         ! Signal laser frequency (active gain)
+         if (LAMBDA_SIGNAL .eq. 1064.0d-9/L_0) then
+            if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.4512d0 .and. CLAD_NX.eq.1.4500d0) .or.   &
+                (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.4512d0 .and. CLAD_NY.eq.1.4500d0)) then
+               k    = 85.6833d0
+               gamm =  1.53131d0
+               beta =  3.12978d0
+            else if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.1520d0 .and. CLAD_NX.eq.1.1500d0) .or.  &
+                     (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.1520d0 .and. CLAD_NY.eq.1.1500d0)) then
+               k    = 68.0103d0
+               gamm =  1.57221d0
+               beta =  3.68554d0
+            else if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.6510d0 .and. CLAD_NX.eq.1.6500d0) .or.  &
+                     (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.6510d0 .and. CLAD_NY.eq.1.6500d0)) then
+               k    = 97.4838d0
+               gamm =  1.52302d0
+               beta =  3.03177d0
+            else
+               write(*,*) 'mfd_solutions: ISOL 13, unexpected case 1. stop.'
+               stop
+            endif
+         ! Signal Raman frequency
+         else if (LAMBDA_SIGNAL .eq. 1116.0d-9/L_0) then
+            if (ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.4512d0 .and. CLAD_NX.eq.1.4500d0) then
+               k    = 81.6899d0
+               gamm =  1.51632d0
+               beta =  2.95571d0
+            else
+               write(*,*) 'mfd_solutions: ISOL 13, unexpected case 2. stop.'
+               stop
+            endif
+         else
+            write(*,*) 'mfd_solutions: ISOL 13, unexpected case 3. stop.'
+            stop
+         endif
+      endif
+!
+!  ...LP01 (pump) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.0976
+      if (Fld .eq. 1) then
+         ampl =  2.0d0
+         ! Pump frequency (active gain)
+         if (LAMBDA_PUMP .eq. 976.0d-9/L_0) then
+            if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.4512d0 .and. CLAD_NX.eq.1.4500d0) .or.   &
+                (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.4512d0 .and. CLAD_NY.eq.1.4500d0)) then
+               k    = 93.4108d0
+               gamm =  1.55709d0
+               beta =  3.46466d0
+            else
+               write(*,*) 'mfd_solutions: ISOL 13, unexpected case 4. stop.'
+               stop
+            endif
+         ! Pump frequency (Raman gain)
+         else if (LAMBDA_PUMP .eq. 1064.0d-9/L_0) then
+            if (ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.4512d0 .and. CLAD_NX.eq.1.4500d0) then
+               k    = 85.6833d0
+               gamm =  1.53131d0
+               beta =  3.12978d0
+            else
+               write(*,*) 'mfd_solutions: ISOL 13, unexpected case 5. stop.'
+               stop
+            endif
+         else
+            write(*,*) 'mfd_solutions: ISOL 13, unexpected case 6. stop.'
+            stop
+         endif
       endif
 !
       call get_LP01(Xp,ampl,k,gamm,beta, E,dE)

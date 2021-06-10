@@ -42,7 +42,7 @@ contains
 !!
 !! @param[in ] Aopt  - name of BOOLEAN option
 !! @param[in ] Atext - text explanation of option
-!! @param[in ] Ndef  - defaul value of BOOLEAN option
+!! @param[in ] Ndef  - default value of BOOLEAN option
 !! @param[out] Nval  - actual value of BOOLEAN option
 !!
 !> rev@Dec 2012
@@ -104,7 +104,7 @@ contains
 !!
 !! @param[in ] Aopt  - name of INTEGER option
 !! @param[in ] Atext - text explanation of option
-!! @param[in ] Ndef  - defaul value of INTEGER option
+!! @param[in ] Ndef  - default value of INTEGER option
 !! @param[out] Nval  - actual value of INTEGER option
 !!
 !> rev@Dec 2012
@@ -166,7 +166,7 @@ contains
 !!
 !! @param[in ] Aopt  - name of REAL option
 !! @param[in ] Atext - text explanation of option
-!! @param[in ] Def   - defaul value of REAL option
+!! @param[in ] Def   - default value of REAL option
 !! @param[out] Val   - actual value of REAL option
 !!
 !> rev@Dec 2012
@@ -228,7 +228,7 @@ contains
 !!
 !! @param[in ] Aopt  - name of COMPLEX option
 !! @param[in ] Atext - text explanation of option
-!! @param[in ] Def   - defaul value of COMPLEX option
+!! @param[in ] Def   - default value of COMPLEX option
 !! @param[out] Val   - actual value of COMPLEX option
 !!
 !> rev@Mar 2013

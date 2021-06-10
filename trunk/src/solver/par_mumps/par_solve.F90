@@ -32,10 +32,10 @@ subroutine par_solve(mumps)
    integer :: ierr,mRANK,mNUM_PROCS
 !
 !..timer
-   real(8) :: MPI_Wtime,time_stamp
+   real(8) :: MPI_Wtime,time_stamp,start_time
 !
 !..info (verbose output if true)
-   logical :: info = .true.
+   logical :: info = .false.
 !
 ! -----------------------------------------------------------------------
 !
@@ -43,10 +43,11 @@ subroutine par_solve(mumps)
    call MPI_COMM_SIZE(mumps%COMM, mNUM_PROCS,ierr)
 !
    if ((mRANK.eq.ROOT) .and. info) then
-      write(*,*) '[',RANK,'] par_solve:'
-      write(*,*) ' - solving distributed sparse problem: mNUM_PROCS = ',mNUM_PROCS
+      write(*,5010) '[',RANK,'] par_solve: mNUM_PROCS = ', mNUM_PROCS
+      write(*,*) ' - solving distributed sparse problem: mNUM_PROCS = ', mNUM_PROCS
       write(*,*) ' - mumps%icntl(28) = ', mumps%icntl(28)
       write(*,*) ' - mumps%icntl(29) = ', mumps%icntl(29)
+ 5010 format(A,I4,A,I4)
    endif
 !
 !..MUMPS analysis
@@ -55,6 +56,7 @@ subroutine par_solve(mumps)
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(mumps%COMM, ierr)
       time_stamp = MPI_Wtime()
+      start_time = time_stamp
    endif
 !
 #if C_MODE
@@ -67,12 +69,12 @@ subroutine par_solve(mumps)
       if (mRANK.eq.ROOT) write(*,*) 'analysis: mumps%INFOG(1) .ne. 0'
       stop
    endif
-   if (IPRINT_TIME .eq. 1) then
+   if (IPRINT_TIME .eq. 1 .and. info) then
       call MPI_BARRIER(mumps%COMM, ierr)
       time_stamp = MPI_Wtime()-time_stamp
       if (mRANK .eq. ROOT) write(*,3001) time_stamp
  3001 format(' - Analysis : ',f12.5,'  seconds')
-      if (mRANK .eq. ROOT) then
+      if (mRANK .eq. ROOT .and. info) then
          write(*,1100) '   - MAX estimated size in GB = ',mumps%INFOG(16)/1000.d0
          write(*,1100) '   - SUM estimated size in GB = ',mumps%INFOG(17)/1000.d0
          write(*,1200) '   - Seq/parallel analysis    = ',mumps%INFOG(32)
@@ -87,7 +89,7 @@ subroutine par_solve(mumps)
 !..MUMPS factorization
    mumps%JOB = 2
 !
-   if (IPRINT_TIME .eq. 1) then
+   if (IPRINT_TIME .eq. 1 .and. info) then
       call MPI_BARRIER(mumps%COMM, ierr)
       time_stamp = MPI_Wtime()
    endif
@@ -106,12 +108,12 @@ subroutine par_solve(mumps)
       call mumps_destroy(mumps)
       stop
    endif
-   if (IPRINT_TIME .eq. 1) then
+   if (IPRINT_TIME .eq. 1 .and. info) then
       call MPI_BARRIER(mumps%COMM, ierr)
       time_stamp = MPI_Wtime()-time_stamp
       if (mRANK .eq. ROOT) write(*,3002) time_stamp
  3002 format(' - Factorize: ',f12.5,'  seconds')
-      if (mRANK .eq. ROOT) then
+      if (mRANK .eq. ROOT .and. info) then
          write(*,1100) '   - MAX memory used in GB    = ',mumps%INFOG(21)/1000.d0
          write(*,1100) '   - SUM memory used in GB    = ',mumps%INFOG(22)/1000.d0
       endif
@@ -120,7 +122,7 @@ subroutine par_solve(mumps)
 !..MUMPS solve
    mumps%JOB = 3
 !
-  if (IPRINT_TIME .eq. 1) then
+  if (IPRINT_TIME .eq. 1 .and. info) then
       call MPI_BARRIER(mumps%COMM, ierr)
       time_stamp = MPI_Wtime()
    endif
@@ -134,11 +136,18 @@ subroutine par_solve(mumps)
       if (mRANK.eq.ROOT) write(*,*) 'solve: mumps%INFOG(1) .ne. 0'
       stop
    endif
-   if (IPRINT_TIME .eq. 1) then
+   if (IPRINT_TIME .eq. 1 .and. info) then
       call MPI_BARRIER(mumps%COMM, ierr)
       time_stamp = MPI_Wtime()-time_stamp
       if (mRANK .eq. ROOT) write(*,3003) time_stamp
  3003 format(' - Solve    : ',f12.5,'  seconds')
+   endif
+!
+   if (IPRINT_TIME .eq. 1 .and. info) then
+      call MPI_BARRIER(mumps%COMM, ierr)
+      time_stamp = MPI_Wtime()-start_time
+      if (mRANK .eq. ROOT) write(*,3004) '[',RANK,'] par_solve: ',time_stamp,' seconds'
+ 3004 format(A,I4,A,f12.5,A)
    endif
 !
 end subroutine par_solve

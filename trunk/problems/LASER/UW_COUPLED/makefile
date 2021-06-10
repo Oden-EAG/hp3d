@@ -82,5 +82,5 @@ clean :
 clean-pv :
 	@rm -f ../outputs/paraview/*
 	@rm -f ../outputs/power/*
-	@rm -f ../output/temp/*
+	@rm -f ../outputs/temp/*
 

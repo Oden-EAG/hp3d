@@ -26,6 +26,7 @@
 !                                (array of size 'nproc')
 !                       - nproc: number of processors participating in
 !                                the distributed solve of 'mumps' input
+!                       - level: recursion counter (nested level)
 !
 !               note: this routine makes several assumptions about the
 !                     structure (partitioning) of the input problem;
@@ -36,7 +37,7 @@
 !                     eliminated previously (via par_nested subroutine)
 !
 ! -----------------------------------------------------------------------
-recursive subroutine par_fiber(mumps,nrdof,nproc)
+recursive subroutine par_fiber(mumps,nrdof,nproc,level)
 !
    use assembly  , only: NR_RHS
    use MPI       , only: MPI_UNDEFINED,MPI_STATUS_IGNORE,      &
@@ -62,6 +63,7 @@ recursive subroutine par_fiber(mumps,nrdof,nproc)
 !  (owned from the viewpoint of the nested dissection solver)
    integer, intent(in) :: nproc
    integer, intent(in) :: nrdof(nproc)
+   integer, intent(in) :: level
 !
 !..set parameter to indicate the size of each subproblem
    integer, parameter :: mSUB_PROCS = 4
@@ -91,10 +93,10 @@ recursive subroutine par_fiber(mumps,nrdof,nproc)
    VTYPE, allocatable :: Aii(:,:),Bi(:)
 !
 !..timer
-   real(8) :: MPI_Wtime,time_stamp
+   real(8) :: MPI_Wtime,time_stamp,start_time
 !
 !..info (verbose output if true)
-   !logical :: info = .true.
+   logical :: info = .false.
    logical :: dbg  = .false. ! print additional info for debugging purposes
 !
 !..auxiliary storage for reallocation
@@ -120,9 +122,11 @@ recursive subroutine par_fiber(mumps,nrdof,nproc)
    endif
 !
    if (mRANK .eq. ROOT) then
-      write(*,*) '[',RANK,'] par_fiber:'
-      write(*,*) ' - solving distributed sparse problem: mPROCS     = ',mPROCS
-      write(*,*) ' - splitting into subproblems of size: mSUB_PROCS = ',mSUB_PROCS
+      write(*,5010) '[',RANK,'] par_fiber (level ',level,'): mPROCS = ', mPROCS, &
+                                                      ', mSUB_PROCS = ', mSUB_PROCS
+      !write(*,*) ' - solving distributed sparse problem: mPROCS     = ',mPROCS
+      !write(*,*) ' - splitting into subproblems of size: mSUB_PROCS = ',mSUB_PROCS
+ 5010 format(A,I4,A,I2,A,I4,A,I4)
    endif
 !
 !..currently, we assume that we are doing nested dissection on 2^k processors
@@ -131,6 +135,8 @@ recursive subroutine par_fiber(mumps,nrdof,nproc)
       call par_solve(mumps)
       goto 90
    endif
+!
+   call MPI_BARRIER(mumps%COMM, ierr); start_time = MPI_Wtime()
 !
 !..divide into "small enough" subproblems (groups) and solve separately
 !  [Step 1: define communicators for the subproblems]
@@ -223,6 +229,8 @@ recursive subroutine par_fiber(mumps,nrdof,nproc)
 !  [Steps 3-4: Assembling the subproblems and the separator problem]
    if (mSUB_RANK .eq. ROOT) then
 !  ...transfer RHS from to global problem to subproblem
+!     each group rep does this only for their left side (lower indices)
+!     to avoid duplicating already assembled RHS interface contributions
       do j=0,NR_RHS-1
          do i=1,dof_int_L
             ! add to Bi
@@ -232,10 +240,10 @@ recursive subroutine par_fiber(mumps,nrdof,nproc)
             ! add to Bsub
             mumps_sub%RHS(j*dof_sub + i) = mumps%RHS(j*mumps%N + dof_off+i)
          enddo
-         do i=1,dof_int_R
+         !do i=1,dof_int_R
             ! add to Bi
-            Bi(j*dof_int + dof_int_L+i) = mumps%RHS(j*mumps%N + dof_off+dof_sub+i)
-         enddo
+         !   Bi(j*dof_int + dof_int_L+i) = mumps%RHS(j*mumps%N + dof_off+dof_sub+i)
+         !enddo
       enddo
    endif
    kbb = 0; kib = 0 ! nnz counters
@@ -504,9 +512,9 @@ recursive subroutine par_fiber(mumps,nrdof,nproc)
 #endif
 !
    call MPI_BARRIER(mumps_int%COMM, ierr)
-   if (mINT_RANK.eq.ROOT) then
-      write(*,7891) '  INTERFACE ASSEMBLY Sparse MKL: ', MPI_Wtime()-time_stamp
-7891  format(A,F12.5)
+   if (mINT_RANK.eq.ROOT .and. info) then
+      write(*,7891) '[',RANK,'] INTERFACE ASSEMBLY Sparse MKL: ', MPI_Wtime()-time_stamp
+7891  format(A,I4,A,F12.5)
    endif
 !
    mkl_stat = MKL_SPARSE_DESTROY(Aib_sparse)
@@ -561,7 +569,7 @@ recursive subroutine par_fiber(mumps,nrdof,nproc)
 !..solve interface problem
    if (RECURSIVE_NESTED) then
       nrdof_int(1:mINT_PROCS) = nrdof(mSUB_PROCS:mPROCS : mSUB_PROCS)
-      call par_fiber(mumps_int,nrdof_int,mINT_PROCS)
+      call par_fiber(mumps_int,nrdof_int,mINT_PROCS,level+1)
    else
       call par_solve(mumps_int)
    endif
@@ -606,6 +614,13 @@ recursive subroutine par_fiber(mumps,nrdof,nproc)
    call mumps_destroy(mumps_int)
 !
  60 continue
+!
+   call MPI_BARRIER(mumps%COMM, ierr)
+   if (mRANK.eq.ROOT) then
+      time_stamp = MPI_Wtime()-start_time
+      write(*,9090) '[',RANK,'] par_fiber (level ',level,'): ',time_stamp,' seconds'
+ 9090 format(A,I4,A,I2,A,F12.5,A)
+   endif
 !
 !..cleanup
    call mumps_destroy(mumps_sub)

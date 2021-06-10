@@ -236,6 +236,10 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    VTYPE  , dimension(3,3) :: Z_za,Z_zc,Z_aux
    real(8), dimension(MAXPP+1,2) :: shapH1,shapH2,shapH3
    real(8), dimension(MAXPP+1,MAXPP+1) :: sH2p,sH3p,dsH2p,dsH3p
+!
+!..timer
+!   real(8) :: MPI_Wtime,start_time,end_time
+!
    integer, dimension(3,3) :: deltak
 !
 !..for Gram matrix compressed storage format
@@ -247,6 +251,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    do a=1,3
      deltak(a,a)=1
    enddo
+!
 !---------------------------------------------------------------------
 !
 !..Set iverb = 0/1 (Non-/VERBOSE)
@@ -461,6 +466,9 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !
    xip=ZERO
 !
+!..start timer
+!   start_time = MPI_Wtime()
+!
 !..Loop over quadrature points in direction \xi_1
    do px=1,nintx
 !  ...read quadrature point location and weight
@@ -578,6 +586,11 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !
 !           ...initialize gain polarization, raman polarization
                gain_pol = ZERO; raman_pol = ZERO
+!          ...skip nonlinear gain computation if inside PML region
+               if ( USE_PML .and. ( (x(3).gt.PML_REGION) .or. &
+                                    ( (COPUMP.eq.0).and.(x(3).lt.(ZL-PML_REGION)) ) &
+                                  ) &
+                  ) goto 190
                if (ACTIVE_GAIN .gt. 0.d0) then
                   if (dom_flag .eq. 1) then ! .and. x(3).le.PML_REGION) then
                      call get_activePol(zsolQ_soleval(1:12),Fld_flag,delta_n, gain_pol)
@@ -594,6 +607,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                   endif
 !           ...endif RAMAN_GAIN
                endif
+ 190           continue
 !           ...update auxiliary constant za
                za = (ZI*OMEGA*OMEGA_RATIO_FLD*EPSILON+SIGMA)*IDENTITY+bg_pol+gain_pol+raman_pol
 !        ...endif NONLINEAR_FLAG
@@ -1290,6 +1304,14 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !  ...loop over px ends
    enddo
 !
+!..end timer
+!   end_time = MPI_Wtime()
+!   !$OMP CRITICAL
+!      !write(*,10) etype, end_time-start_time
+!      write(*,11) end_time-start_time
+!! 10   format(A,' elem : ',f12.5,'  seconds')
+! 11   format(f12.5)
+!   !$OMP END CRITICAL
 !
    deallocate(AUXEE_A_zb,AUXEE_A_zc)
    deallocate(AUXEE_B_zb,AUXEE_B_zc)

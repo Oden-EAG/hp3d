@@ -809,6 +809,59 @@ module data_structure3D
       enddo
 !
       end function
+!
+!-----------------------------------------------------------------------
+      function Is_dirichlet_attr(Nod,Attr)
+      integer Nod
+      character(6) Attr
+      integer ibc(NR_PHYSA), loc
+      logical Is_dirichlet
+
+!  ...TODO: verify correctness of the following two-step approach
+!     1) Return false if node is marked as Dirichlet node for a physics
+!     variable that is currently not activated. This should prevent
+!     updateDdof from overwriting boundary solution from a variable
+!     that was previously computed but is now deactivated via PHYSAm(:)
+!     This overwriting otherwise happens if the node is marked as
+!     Dirichlet node for the purpose of Dirichlet data in some other
+!     variable which is a problem for coupled formulations.
+!     2) Return false if physics attribute is different from input
+      call decod(NODES(Nod)%bcond,10,NR_PHYSA, ibc)
+      Is_dirichlet_attr = .false.
+      do iphys=1,NR_PHYSA
+        if (.not. PHYSAm(iphys)) cycle
+        if (DTYPE(iphys) .ne. Attr) cycle
+        if (ibc(iphys).eq.1) then
+          Is_dirichlet_attr = .true.
+        else
+          call locate(ibc(iphys),DIRICHLET_LIST,NR_DIRICHLET_LIST, loc)
+          if (loc.ne.0) then
+            Is_dirichlet_attr = .true.
+          endif
+        endif
+      enddo
+!
+      end function
+!----------------------------------------------------------------------
+      function Is_dirichlet_attr_homogeneous(Nod,Attr)
+      integer Nod
+      character(6) Attr
+      integer ibc(NR_PHYSA), loc
+      logical Is_dirichlet_homogeneous
+
+      call decod(NODES(Nod)%bcond,10,NR_PHYSA, ibc)
+      Is_dirichlet_attr_homogeneous = .false.
+      do iphys=1,NR_PHYSA
+        if (.not. PHYSAm(iphys)) cycle
+        if (DTYPE(iphys) .ne. Attr) cycle
+        call locate(ibc(iphys),DIRICHLET_HOMOGENEOUS_LIST,  &
+                    NR_DIRICHLET_HOMOGENEOUS_LIST, loc)
+        if (loc.ne.0) then
+          Is_dirichlet_attr_homogeneous = .true.
+        endif
+      enddo
+!
+      end function
 !----------------------------------------------------------------------
       subroutine check_dirichlet_homogeneous(istat)
       integer :: istat

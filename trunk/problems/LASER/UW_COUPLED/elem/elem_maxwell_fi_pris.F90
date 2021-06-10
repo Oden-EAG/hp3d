@@ -222,6 +222,9 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
    integer, allocatable :: mapEE(:),mapQQ(:)
 !
+!..timer
+!   real(8) :: MPI_Wtime,start_time,end_time
+!
    integer, dimension(3,3) :: deltak
 !
 !..for Gram matrix compressed storage format
@@ -455,6 +458,9 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
    allocate(LOADE(3,(nrdofE12+nrdofH12)))
 !
+!..start timer
+!   start_time = MPI_Wtime()
+!
 !..Loop over quadrature points in direction \xi_1
    do pz=1,nintz
 !  ...read quadrature point location and weight
@@ -566,6 +572,11 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
 !        ...initialize gain polarization, raman polarization
             gain_pol = ZERO; raman_pol = ZERO
+!        ...skip nonlinear gain computation if inside PML region
+            if ( USE_PML .and. ( (x(3).gt.PML_REGION) .or. &
+                                 ( (COPUMP.eq.0).and.(x(3).lt.(ZL-PML_REGION)) ) &
+                               ) &
+               ) goto 190
             if (ACTIVE_GAIN .gt. 0.d0) then
                if (dom_flag .eq. 1) then ! .and. x(3).le.PML_REGION) then
                   call get_activePol(zsolQ_soleval(1:12),Fld_flag,delta_n, gain_pol)
@@ -582,6 +593,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                endif
 !        ...endif RAMAN_GAIN
             endif
+ 190        continue
 !        ...update auxiliary constants for za,zb: this is for
 !        ...Stiffness and Gram matrix that changes with each nonlinear iteration
             za = (ZI*OMEGA*OMEGA_RATIO_FLD*EPSILON+SIGMA)*IDENTITY+bg_pol+gain_pol+raman_pol
@@ -943,6 +955,15 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
       enddo
 !..end loop over z direction quadrature points
    enddo
+!
+!..end timer
+!   end_time = MPI_Wtime()
+!   !$OMP CRITICAL
+!      !write(*,10) etype, end_time-start_time
+!      write(*,11) end_time-start_time
+!! 10   format(A,' elem : ',f12.5,'  seconds')
+! 11   format(f12.5)
+!   !$OMP END CRITICAL
 !
    deallocate(mapEE,mapQQ)
    deallocate(shapeH3,E12,C12,Q12)

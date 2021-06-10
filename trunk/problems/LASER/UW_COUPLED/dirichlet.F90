@@ -83,7 +83,7 @@ subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
                      endif
 !              ...Next check for pump and launch at X(3) = ZL
                   case(4)
-                     if((X(3).ge.(ZL-GEOM_TOL))) then
+                     if((X(3).gt.(ZL-GEOM_TOL))) then
 !                    ...E-trc value
                         call exact(X,Mdle, ValH,DvalH,d2valH,ValE,DvalE,d2valE,  &
                                            ValV,DvalV,d2valV,valQ,dvalQ,d2valQ)
@@ -95,6 +95,7 @@ subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
 !        ...check if we are solving the Heat problem
             case(2)
 !           ...do nothing since for heat loop, we have dirichlet BC = 0.d0 on fiber boundary
+!              (i.e., homogeneous BC either for the temperature or for the heat flux)
 !           ...should not be running linear heat problem NO_PROBLEM = 1 with NEXACT = 0
 !           ...we could but we should then set non-zero BC or IC
             case(1)

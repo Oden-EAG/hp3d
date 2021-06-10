@@ -13,8 +13,6 @@ subroutine initialize
 !
    implicit none
 !
-   integer :: INTEGRATION_tmp
-!
 !-----------------------------------------------------------------------
 !
 !..open history file
@@ -108,10 +106,7 @@ subroutine initialize
    endif
 !
 !..generate mesh and read physics file
-!..keep integration flag value
-   INTEGRATION_tmp = INTEGRATION
    call hp3gen(trim(FILE_PHYS))
-   INTEGRATION = INTEGRATION_tmp
 !
 !..initialize work space for the frontal solver
    call set_frsol_workspace (1000000)

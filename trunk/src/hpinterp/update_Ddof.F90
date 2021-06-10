@@ -145,6 +145,7 @@ subroutine update_Ddof()
             if (.not.associated(NODES(nod)%dof))       cycle
             if (.not.associated(NODES(nod)%dof%zdofH)) cycle
             if (NODES(nod)%geom_interf.eq.1) cycle
+!
             if (is_Dirichlet_attr(nod,'contin')) then
 #if DEBUG_MODE
                if (iprint.eq.1) write(*,7010) mdle,iv,nod
@@ -170,6 +171,7 @@ subroutine update_Ddof()
             nod = nodesl(ind)
             if (.not.associated(NODES(nod)%dof)) cycle
             if (NODES(nod)%geom_interf.eq.1)     cycle
+!
             if (is_Dirichlet_attr(nod,'contin')) then
 !           ...update H1 Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofH)) then
@@ -195,7 +197,6 @@ subroutine update_Ddof()
                                 etype,NODES(nod)%case,NODES(nod)%bcond, &
                                 nedge_orient,nface_orient,norder,ie,    &
                                 NODES(nod)%dof%zdofE)
-
                endif
                NODES(nod)%geom_interf=1
             endif
