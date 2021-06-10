@@ -95,9 +95,6 @@
    real(8), dimension(2,MAXNINT2ADD) :: tloc
    real(8), dimension(  MAXNINT2ADD) :: wtloc
 !
-!..BC's flags
-   integer, dimension(6,NR_PHYSA) :: ibc
-!
 !..for auxiliary computation
    complex(8) :: zaux
 !
@@ -250,9 +247,6 @@
 !
 !..determine nodes coordinates
    call nodcor(Mdle, xnod)
-!
-!..get the element boundary conditions flags
-   call find_bc(Mdle, ibc)
 !
 !..clear space for Gram matrix
    GramP = ZERO

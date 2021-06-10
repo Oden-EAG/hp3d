@@ -106,9 +106,6 @@ subroutine elem_residual_heat(Mdle,                &
    real(8), dimension(2,MAXNINT2ADD)  :: tloc
    real(8), dimension(MAXNINT2ADD)    :: wtloc
 !
-!..BC's flags
-   integer, dimension(6,NR_PHYSA)    :: ibc
-!
 !..approximate solution
    real(8), dimension(3) :: rgradHxi,rgradH
    real(8), dimension(3) :: rsolVxi,rsolV

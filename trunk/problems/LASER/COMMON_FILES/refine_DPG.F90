@@ -428,8 +428,8 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
 !-----------------------------------------------------------------------
 !
    if (IBCFLAG .eq. 3) then
-      call propagate_flag(2,9)
-      call propagate_flag(3,9)
+      call propagate_flag(2,3)
+      call propagate_flag(4,3)
    endif
 !
    90 continue

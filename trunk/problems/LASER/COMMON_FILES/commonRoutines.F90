@@ -7,7 +7,7 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - Oct 2018
+!   latest revision    - June 2021
 !
 !   purpose            - propagate Nflag from element faces to element
 !                        edges and vertices; the flag is passed
@@ -20,7 +20,7 @@
 !
 !   arguments:
 !     in :
-!              Icomp   - physics attribute number
+!              Icomp   - physics attribute component number
 !              Nflag   - BC flag
 !
 !----------------------------------------------------------------------
@@ -40,7 +40,7 @@ subroutine propagate_flag(Icomp,Nflag)
    integer :: nodesl(27),norientl(27),nface_nodes(9)
 !
 !..element face BC flags, decoded BC flag for a node
-   integer :: ibc(6,NR_PHYSA),nodflag(NR_PHYSA)
+   integer :: ibc(6,NRINDEX),nodflag(NRINDEX)
 !
 !----------------------------------------------------------------------
 !
@@ -91,7 +91,7 @@ subroutine propagate_flag(Icomp,Nflag)
 !$OMP DO
    do nod=1,NRNODS
       if (NODES(nod)%visit.eq.0) cycle
-      call decod(NODES(nod)%bcond,10,NR_PHYSA, nodflag)
+      call decod(NODES(nod)%bcond,2,NRINDEX, nodflag)
       if (NODES(nod)%visit.eq.-Nflag) then
          if (nodflag(Icomp).eq.Nflag) then
             nodflag(Icomp)=0
@@ -99,10 +99,8 @@ subroutine propagate_flag(Icomp,Nflag)
       elseif (NODES(nod)%visit.eq.Nflag) then
          nodflag(Icomp)=Nflag
       endif
-      call encod(nodflag,10,NR_PHYSA, NODES(nod)%bcond)
+      call encod(nodflag,2,NRINDEX, NODES(nod)%bcond)
 !
-!     ...reset the node index
-         call set_index(NODES(nod)%case,NODES(nod)%bcond, NODES(nod)%index)
    enddo
 !$OMP END DO
 !$OMP END PARALLEL

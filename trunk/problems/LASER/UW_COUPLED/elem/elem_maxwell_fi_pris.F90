@@ -150,7 +150,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    real(8), dimension(  MAXNINT2ADD)  :: wtloc
 !
 !..BC's flags
-   integer, dimension(6,NR_PHYSA)    :: ibc
+   integer, dimension(6,NRINDEX)      :: ibc
 !
 !..for auxiliary computation
    complex(8) :: zaux
@@ -168,7 +168,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    integer :: i1,j1,i2,j2
    integer :: i12,j12,k12,k1,k2,fa,fb,i3mod,j3mod,kH,kk,i,ik,j,k,l,nint,kE,n,m,p,pe
    integer :: iflag,iprint,itime,iverb
-   integer :: nordP,nsign,ifc,ndom,info,icomp,idec
+   integer :: nordP,nsign,ifc,ndom,info,iphys,icomp,idec
    complex(8) :: zfval
    complex(8) :: za(3,3),zc(3,3)
    complex(8) :: zaJ(3,3),zcJ(3,3)
@@ -342,10 +342,14 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 #if DEBUG_MODE
    if (iprint.eq.1) then
       write(*,7001) Mdle
-7001  format('elem_maxwell_fi_pris: BCFLAGS FOR Mdle = ',i5)
-      do i=1,NR_PHYSA
-         write(*,7002) PHYSA(i), ibc(1:nrf,i)
-7002     format('     ATTRIBUTE = ',a6,' FLAGS = ',6i2)
+ 7001 format('elem_maxwell_fi_pris: BCFLAGS FOR Mdle = ',i5)
+      i=0
+      do iphys=1,NR_PHYSA
+         do icomp=1,NR_COMP(iphys)
+            i=i+1
+            write(*,7002) PHYSA(iphys), icomp, ibc(1:nrf,i)
+ 7002       format('      ATTR = ',a6,', COMP = ',i1,', FLAGS = ',6i2)
+         enddo
       enddo
    endif
 #endif
@@ -1060,8 +1064,8 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !        ...check for impedance BC
 !           (impedance constant is GAMMA for TE10 mode in rectangular waveguide)
 !           ( < n x H , G > = GAMMA*< n x n x E , G > + < zg , G > )
-            if ((ibc(ifc,2).eq.9 .and. Fld_flag .eq. 1) .or. &
-                (ibc(ifc,3).eq.9 .and. Fld_flag .eq. 0)) then
+            if ((ibc(ifc,2).eq.3 .and. Fld_flag .eq. 1) .or. &
+                (ibc(ifc,4).eq.3 .and. Fld_flag .eq. 0)) then
 !           ...get the boundary source
                call get_bdSource(Mdle,x,rn, zImp)
 !           ...accumulate for the load vector
@@ -1078,8 +1082,8 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
                call cross_product(rn,E2, rntimesE)
 !           ...check for impedance bc
-               if ((ibc(ifc,2).eq.9 .and. Fld_flag .eq. 1) .or. &
-                   (ibc(ifc,3).eq.9 .and. Fld_flag .eq. 0)) then
+               if ((ibc(ifc,2).eq.3 .and. Fld_flag .eq. 1) .or. &
+                   (ibc(ifc,4).eq.3 .and. Fld_flag .eq. 0)) then
 !              ...accumulate for the extended stiffness matrix on IBC
                   call cross_product(rn,rntimesE, rn2timesE)
                   stiff_EE_T(2*k2-1,2*k1-1) = stiff_EE_T(2*k2-1,2*k1-1) &
