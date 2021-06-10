@@ -28,8 +28,7 @@ subroutine find_bc(Mdle, Ibc)
    integer :: nod,nfath,iel,iface,nrve_iel,nrf_iel,loc,ivar,nvar
 !
 #if DEBUG_MODE
-   character(16) :: fmt
-   integer      :: iprint = 1
+   integer       :: iprint = 1
 #endif
 !
 !-------------------------------------------------------------------------------
@@ -89,8 +88,7 @@ subroutine find_bc(Mdle, Ibc)
                call decodg(ELEMS(iel)%bcond(ivar),10,nrf_iel, ibc_iel)
 #if DEBUG_MODE
                if (iprint.eq.1) then
-                  write(fmt,'("(",I1,"i2)")') nrf_iel
-                  7030 format('find_bc: BC FOR iel AND ivar=',i2,': ',fmt)
+             7030 format('find_bc: BC FOR iel=',i8,' AND ivar=',i2,': ',6i2)
                   write(*,7030) ivar,ibc_iel(1:nrf_iel)
                endif
 #endif
@@ -118,8 +116,7 @@ subroutine find_bc(Mdle, Ibc)
 #if DEBUG_MODE
       if (iprint.eq.1) then
          do ivar=1,nvar
-            write(fmt,'("(",I1,"(i1,2x))")') nrf
-       7100 format('          ivar=',i2,',  Ibc = ',fmt)
+       7100 format('          ivar=',i2,',  Ibc = ',6(i1,2x))
             write(*,7100) ivar,Ibc(1:nrf,ivar)
          enddo
       endif
