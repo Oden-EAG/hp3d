@@ -36,10 +36,10 @@ subroutine get_index(Nod, Indexd)
    integer, intent(out) :: Indexd(NRINDEX)
 !
 !..decimal version of NODES(Nod)%case
-   integer, dimension(NR_PHYSA) :: ncase
+   integer :: ncase(NR_PHYSA)
 !
 !..decimal version of NODES(Nod)%bcond
-   integer,dimension(NRINDEX) :: ibcd
+   integer :: ibcd(NRINDEX)
 !
 !..misc
    integer :: ic,iphys,ivar
