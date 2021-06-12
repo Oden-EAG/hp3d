@@ -10,6 +10,7 @@ subroutine exec_job_coupled
    use laserParam
    use control
    use data_structure3D
+   !use physics       , only: PHYSAm
    use MPI           , only: MPI_COMM_WORLD
    use mpi_param     , only: RANK,ROOT,NUM_PROCS
    use par_mesh      , only: EXCHANGE_DOF,distr_mesh
@@ -156,6 +157,9 @@ subroutine exec_job_coupled
 !..set components (1: signal, 2: pump)
    No1 = 1; No2 = 2
 !
+!..set max number of nonlinear iterations per time step
+   MAX_ITER = 10
+!
 !..start time stepping
    if (RANK.eq.ROOT) write(*,*) 'Begin time stepping..'
    do time_step = 0,NSTEPS ! initial step has ambient temperature (no solve)
@@ -171,13 +175,16 @@ subroutine exec_job_coupled
          if (RANK.eq.ROOT) write(*,4200) ' Solving the heat equation...'
       endif
       if (RANK.eq.ROOT) write(*,*) ''
+      !PHYSAm = .true.
+      !call update_Ddof ! (update since BCs may be time-dependent)
       NO_PROBLEM = 2
       call set_physAm(NO_PROBLEM, physNick,flag)
-      call update_Ddof
+      call update_Ddof ! update heat Ddof
       if (time_step .gt. 0) then
          if (NUM_PROCS .eq. 1) then
             call pardiso_sc('H')
          else
+            !call par_mumps_sc('H')
             call par_nested('H')
          endif
       endif
@@ -189,14 +196,22 @@ subroutine exec_job_coupled
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
 !
 !  ...activate to compute maxwell problem only in the initial time step
-      !if (time_step .ge. 1 .and. time_step .le. 100) goto 420
+      !if (time_step .ge. 1 .and. time_step .lt. 100) then
+      if (time_step .ge. 1 .and. time_step .lt. 10) then
+         iParAttr = (/1,0,0,0,0,0/)
+         goto 420
+      else
+         iParAttr = (/1,0,0,0,6,0/)
+      endif
 !
 !  ...solve nonlinear Maxwell loop for SIGNAL and PUMP
       L2NormDiff = 1.d0
       FieldNormQ = 1.d0
 !
 !  ...do until stopping criterion is satisfied
-      if (RANK.eq.ROOT) write(*,4200) ' Beginning nonlinear iterations...'
+      if (RANK.eq.ROOT) write(*,4200) '---------------------------------------------'
+      if (RANK.eq.ROOT) write(*,*)    ' Beginning nonlinear iterations...'
+      if (RANK.eq.ROOT) write(*,4201) '---------------------------------------------'
  4200 format(/,A)
  4201 format(A,/)
 !
@@ -238,7 +253,7 @@ subroutine exec_job_coupled
          if (RANK.eq.ROOT) write(*,*) '   Signal solve...'
          NO_PROBLEM = 3
          call set_physAm(NO_PROBLEM, physNick,flag)
-         call update_Ddof
+         call update_Ddof ! update signal Ddof
          if (NUM_PROCS .eq. 1) then
             call pardiso_sc('H')
          else
@@ -262,7 +277,7 @@ subroutine exec_job_coupled
          if (RANK.eq.ROOT) write(*,*) '   Pump solve...'
          NO_PROBLEM = 4
          call set_physAm(NO_PROBLEM, physNick,flag)
-         call update_Ddof
+         call update_Ddof ! update pump Ddof
          if (NUM_PROCS .eq. 1) then
             call pardiso_sc('H')
          else
@@ -305,19 +320,21 @@ subroutine exec_job_coupled
          if (FAKE_PUMP .eq. 1) fld = 1
          call get_power(fld,numPts,time_step)
          !call get_power(2,numPts,-1)
-         write(*,*) ''
+         if (RANK.eq.ROOT) write(*,*) ''
       !endif
 !
  420  continue
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
 !
+      !if (time_step.lt.100 .and. MOD(time_step,10).ne.0) goto 425 ! skip paraview output
 !  ...write paraview output
-      if(RANK .eq. ROOT) write(*,200) ' Writing paraview output...'
-      iParAttr = (/1,0,0,1,6,0/)
+      if(RANK.eq.ROOT) write(*,200) ' Writing paraview output...'
+      if (time_step .eq. 0) iParAttr = (/1,0,0,0,6,0/)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
       call my_paraview_driver(iParAttr)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
-      if(RANK .eq. ROOT) write(*,300) end_time - start_time
+      if(RANK.eq.ROOT) write(*,300) end_time - start_time
+ 425  continue
 !
 !..end time-stepping loop
    enddo

@@ -62,7 +62,7 @@ program main
       write(*,*) '    =========================    '
 !  ...read command
       call get_command(cmd)
-      write(*,*) cmd
+      write(*,*) trim(cmd)
       write(*,*) '    =========================    '
    endif
 !
