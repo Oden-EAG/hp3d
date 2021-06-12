@@ -332,7 +332,7 @@
   endif
 #endif
 !
-!  ...save dof's, skipping irrelevant entries
+!  ...save the DOFs, skipping irrelevant entries
   100 continue
 !
 !  ...initialize global variable counter, and node local variable counter

@@ -36,10 +36,10 @@ subroutine get_index(Nod, Indexd)
    integer, intent(out) :: Indexd(NRINDEX)
 !
 !..decimal version of NODES(Nod)%case
-   integer, dimension(NR_PHYSA) :: ncase
+   integer :: ncase(NR_PHYSA)
 !
 !..decimal version of NODES(Nod)%bcond
-   integer,dimension(NRINDEX) :: ibcd
+   integer :: ibcd(NRINDEX)
 !
 !..misc
    integer :: ic,iphys,ivar
@@ -143,13 +143,13 @@ subroutine get_index(Nod, Indexd)
 !
    if (ic.ne.NRINDEX) then
       write(*,*) 'get_index: INCONSISTENCY.'
-      stop 1
+      stop
    endif
 !
 #if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7010) nod,ncase(1:NR_PHYSA)
- 7010   format('get_index: nod = ',i6,' ncase = ',30i2)
+ 7010   format('get_index: nod = ',i8,' ncase = ',10i2)
         write(*,7020) ibcd(1:NRINDEX)
  7020   format('           ibcd  = ',30i1)
         write(*,7030) Indexd
