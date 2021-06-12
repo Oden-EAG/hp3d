@@ -143,12 +143,17 @@ subroutine set_initial_mesh(Nelem_order)
 !                 ...BCs on EH-traces signal and pump
                      if((IBCFLAG.eq.3).and.(ifc.eq.2)) then
 !                    ...Impedance on z=L face
+!                       REMARK: the routine propagate_flag must be called after
+!                               refining the mesh to correctly propagate the
+!                               impedance flag from faces to edges and vertices
 !                    ...Signal
-                        ibc(ifc,2) = 3 !..sets Impedance flag on E_s trace
-                        ibc(ifc,3) = 1 !..sets Dirichlet flag on H_s trace
+                        !ibc(ifc,2) = 3 !..sets Impedance flag on E_s trace
+                        !ibc(ifc,3) = 1 !..sets Dirichlet flag on H_s trace
+                        ibc(ifc,3) = 3 !..sets Impedance flag on H_s trace
 !                    ...Pump
-                        ibc(ifc,4) = 3 !..sets Impedance flag on E_p trace
-                        ibc(ifc,5) = 1 !..sets Dirichlet flag on H_p trace
+                        !ibc(ifc,4) = 3 !..sets Impedance flag on E_p trace
+                        !ibc(ifc,5) = 1 !..sets Dirichlet flag on H_p trace
+                        ibc(ifc,5) = 3 !..sets Impedance flag on H_p trace
                      else
 !                    ...Dirichlet on E-trace
                         ibc(ifc,2) = 1 ! Signal trace \hat E_s

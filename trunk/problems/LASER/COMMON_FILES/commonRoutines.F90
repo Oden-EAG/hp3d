@@ -1,19 +1,19 @@
 !
 #include "typedefs.h"
 !
-!----------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 !   routine name       - propagate_flag
 !
-!----------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 !   latest revision    - June 2021
 !
-!   purpose            - propagate Nflag from element faces to element
-!                        edges and vertices; the flag is passed
-!                        provided ALL adjacent faces share the flag
-!                        background:
-!                        impedance boundary condition should not be
+!   purpose            - propagate Nflag (customized BC flag 2-9)
+!                        from element faces to element edges and vertices;
+!                        the flag is passed provided ALL adjacent faces
+!                        share the flag background:
+!                        impedance boundary condition (BC) should not be
 !                        inherited by edges and vertices from a face
 !                        during refinement, unless the edge is only
 !                        adjacent to impedance and dirichlet faces.
@@ -21,9 +21,19 @@
 !   arguments:
 !     in :
 !              Icomp   - physics attribute component number
-!              Nflag   - BC flag
+!              Nflag   - A custom BC flag (2-9); e.g., impedance BC flag
 !
-!----------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+!
+! TODO: THE PROPAGATE_FLAG ROUTINE SHOULD BE AUTOMATED -- IT IS TOO
+!       COMPLICATED TO BE SUPPLIED BY THE USER:
+!       With new BC implementation, to propagate impendance flags correctly,
+!       this routine must check for the impedance flag Nflag=3 on faces for
+!       the \hat H component (Icomp).
+!       - For nodes that are not adjacent to ONLY impedance/Dirichlet faces, then
+!         the \hat H component (Icomp) BC flag must be 0 (instead of 1).
+!       - For nodes that are adjacent to ONLY impedance/Dirichlet faces, the BC
+!         flag of \hat H must be set to 1 (DOFs treated like Dirichlet DOFs).
 !
 subroutine propagate_flag(Icomp,Nflag)
 !
@@ -42,7 +52,7 @@ subroutine propagate_flag(Icomp,Nflag)
 !..element face BC flags, decoded BC flag for a node
    integer :: ibc(6,NRINDEX),nodflag(NRINDEX)
 !
-!----------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 !..loop through active elements
 !$OMP PARALLEL                                     &
@@ -63,21 +73,28 @@ subroutine propagate_flag(Icomp,Nflag)
 !  ...loop through element faces
       do ifc=1,nface(etype)
 !
+!     ...if face has a Dirichlet BC flag on this component,
+!        then neither propagate Nflag from this face to its edges/vertices,
+!        nor prohibit another face from passing Nflag to the edges/vertices.
+         if (ibc(ifc,Icomp).eq.1) cycle
+!
 !     ...determine face node numbers
          call face_nodes(etype,ifc, nface_nodes,nrfn)
 !
 !     ...loop through the face nodes
 !$OMP CRITICAL
-         do i=1,nrfn-1
+         do i=1,nrfn !-1
             j = nface_nodes(i)
             nod = nodesl(j)
 !
-!        ...propagate the flag unless prohibited
+!        ...if node belongs to a face that has impedance BC (Nflag),
+!           then propagate the flag unless prohibited by another adjacent face
             if (ibc(ifc,Icomp).eq.Nflag) then
                if (NODES(nod)%visit.ne.-Nflag) then
                   NODES(nod)%visit = Nflag
                endif
 !        ...prohibit the flag to be passed to the node
+!           (if node belongs to a face that has no impedance or Dirichlet BC)
             else
                NODES(nod)%visit = -Nflag
             endif
@@ -93,11 +110,9 @@ subroutine propagate_flag(Icomp,Nflag)
       if (NODES(nod)%visit.eq.0) cycle
       call decod(NODES(nod)%bcond,2,NRINDEX, nodflag)
       if (NODES(nod)%visit.eq.-Nflag) then
-         if (nodflag(Icomp).eq.Nflag) then
-            nodflag(Icomp)=0
-         endif
+         nodflag(Icomp) = 0
       elseif (NODES(nod)%visit.eq.Nflag) then
-         nodflag(Icomp)=Nflag
+         nodflag(Icomp) = 1
       endif
       call encod(nodflag,2,NRINDEX, NODES(nod)%bcond)
 !
@@ -110,10 +125,10 @@ subroutine propagate_flag(Icomp,Nflag)
 end subroutine propagate_flag
 !
 !
-!----------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !..just to display the current size of the
 !  data structure NODES (in bytes)
-!----------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 subroutine my_sizetest
 !
    use data_structure3D
@@ -181,11 +196,11 @@ subroutine my_sizetest
 end subroutine my_sizetest
 !
 !
-!---------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !  routine:          set_PML
 !  purpose:          sets the PML data
 !  last modified:    Jan 2018
-!---------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 subroutine set_PML
    use commonParam
    implicit none
@@ -193,7 +208,7 @@ subroutine set_PML
 end subroutine set_PML
 !
 !
-!---------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !   routine:            get_Beta
 !
 !   last modified:      Oct 2018
@@ -207,7 +222,7 @@ end subroutine set_PML
 !                       Zdbeta   - z-derivative of PML stretch function
 !                       Zd2beta  - second z-derivative of PML stretch function
 !
-!---------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 subroutine get_Beta(Xp,Fld_flag, Zbeta,Zdbeta,Zd2beta)
 !
    use commonParam
@@ -225,7 +240,7 @@ subroutine get_Beta(Xp,Fld_flag, Zbeta,Zdbeta,Zd2beta)
 !..OMEGA_RATIO_SIGNAL or OMEGA_RATIO_PUMP
    real(8) :: OMEGA_RATIO_FLD
 !
-!---------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 !..set OMEGA_RATIO_FLD
    select case(Fld_flag)
@@ -310,7 +325,7 @@ subroutine get_Beta(Xp,Fld_flag, Zbeta,Zdbeta,Zd2beta)
 end subroutine get_Beta
 !
 !
-!------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 !  routine: copy_coms
 !
@@ -321,7 +336,7 @@ end subroutine get_Beta
 !  input:   - No1: component to copy from
 !           - No2: component to copy to
 !
-!------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 subroutine copy_coms(No1,No2)
 !
@@ -334,7 +349,7 @@ subroutine copy_coms(No1,No2)
 !
    integer :: nod, nf, nt, nn2, i
 !
-!------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 !..check consistency
    if ((No1.lt.0).or.(No2.lt.0).or.(No1.gt.NRCOMS).or.(No2.gt.NRCOMS)) then

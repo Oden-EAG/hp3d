@@ -1456,8 +1456,8 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !        ...check for impedance BC
 !           (impedance constant is GAMMA for TE10 mode in rectangular waveguide)
 !           ( < n x H , G > = GAMMA*< n x n x E , G > + < zg , G > )
-            if ((ibc(ifc,2).eq.3 .and. Fld_flag .eq. 1) .or. &
-                (ibc(ifc,4).eq.3 .and. Fld_flag .eq. 0)) then
+            if ((ibc(ifc,3).eq.3 .and. Fld_flag.eq.1) .or. &
+                (ibc(ifc,5).eq.3 .and. Fld_flag.eq.0)) then
 !           ...get the boundary source
                call get_bdSource(Mdle,x,rn, zImp)
 !           ...accumulate for the load vector
@@ -1473,9 +1473,9 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                        + shapE(3,k2)*dxidx(3,1:3)
 !
                call cross_product(rn,E2, rntimesE)
-!           ...check for impedance bc
-               if ((ibc(ifc,2).eq.3 .and. Fld_flag .eq. 1) .or. &
-                   (ibc(ifc,4).eq.3 .and. Fld_flag .eq. 0)) then
+!           ...check for impedance BC
+               if ((ibc(ifc,3).eq.3 .and. Fld_flag.eq.1) .or. &
+                   (ibc(ifc,5).eq.3 .and. Fld_flag.eq.0)) then
 !              ...accumulate for the extended stiffness matrix on IBC
                   call cross_product(rn,rntimesE, rn2timesE)
                   stiff_EE_T(2*k2-1,2*k1-1) = stiff_EE_T(2*k2-1,2*k1-1) &

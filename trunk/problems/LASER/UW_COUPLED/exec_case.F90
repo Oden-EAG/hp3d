@@ -106,12 +106,12 @@ subroutine exec_case(idec)
       case(20)
          write(*,*) 'global h-refinement...'
          call global_href
+         if (IBCFLAG .eq. 3) then
+            call propagate_flag(3,3)
+            call propagate_flag(5,3)
+         endif
          call update_gdof
          call update_Ddof
-         if (IBCFLAG .eq. 3) then
-            call propagate_flag(2,3)
-            call propagate_flag(4,3)
-         endif
 !
 !  ...single uniform p-refinement
       case(21)
@@ -136,8 +136,8 @@ subroutine exec_case(idec)
          do i=1,refs
             call global_href_aniso(0,1)
             if (IBCFLAG .eq. 3) then
-               call propagate_flag(2,3)
-               call propagate_flag(4,3)
+               call propagate_flag(3,3)
+               call propagate_flag(5,3)
             endif
          enddo
          call update_gdof
