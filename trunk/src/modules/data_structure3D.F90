@@ -86,6 +86,8 @@ module data_structure3D
         integer          :: order
 !
 !  .....boundary condition flag (binary-encoded per component)
+!       0: component DOFs treated as unknowns
+!       1: component DOFs treated as Dirichlet DOFs
         integer          :: bcond
 !
 !  .....father node
