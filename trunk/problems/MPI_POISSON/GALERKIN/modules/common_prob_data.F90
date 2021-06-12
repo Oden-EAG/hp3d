@@ -7,7 +7,7 @@
 !     latest revision:  - May 2020
 !
 !     purpose:          - module setting up the parameters for the
-!                         acoustics problem
+!                         Poisson problem
 !
 !
 !----------------------------------------------------------------------

@@ -20,6 +20,9 @@ module physics
 
   !  ...interface variable flag
   logical, save, allocatable :: PHYSAi(:)
+  
+  !  ...homogeneous Dirichlet BC variable flag
+  logical, save, allocatable :: PHYSAd(:)
   !
   !  ...location of the first component for the attribute
   integer, save, allocatable :: ADRES(:)
@@ -65,7 +68,7 @@ contains
   subroutine alloc_physics
     !
     if (allocated(PHYSA)) then
-       deallocate(PHYSA,PHYSAm,NR_COMP,DTYPE,PHYSAi,ADRES, &
+       deallocate(PHYSA,PHYSAm,NR_COMP,DTYPE,PHYSAi,PHYSAd,ADRES, &
                   NREQNH,NREQNE,NREQNV,NREQNQ)
     endif
     !
@@ -74,6 +77,7 @@ contains
     allocate(NR_COMP(NR_PHYSA))
     allocate(DTYPE(NR_PHYSA))
     allocate(PHYSAi(NR_PHYSA))
+    allocate(PHYSAd(NR_PHYSA))
     allocate(ADRES(NR_PHYSA))
     !
     allocate(NREQNH(NRCASES))
@@ -86,7 +90,7 @@ contains
   !> Purpose : deallocate data structure for multiphysics
   subroutine dealloc_physics
     if (allocated(PHYSA)) then
-       deallocate(PHYSA,PHYSAm,NR_COMP,DTYPE,PHYSAi,ADRES, &
+       deallocate(PHYSA,PHYSAm,NR_COMP,DTYPE,PHYSAi,PHYSAd,ADRES, &
                   NREQNH,NREQNE,NREQNV,NREQNQ)
     endif
   end subroutine dealloc_physics
@@ -107,6 +111,7 @@ contains
     write(ndump,*) NR_COMP
     write(ndump,*) (DTYPE(i),'  ',i=1,NR_PHYSA)
     write(ndump,*) (PHYSAi(i),'  ',i=1,NR_PHYSA)
+    write(ndump,*) (PHYSAd(i),'  ',i=1,NR_PHYSA)
     write(ndump,*) ADRES
     write(ndump,*) NRHVAR,NREVAR,NRVVAR,NRQVAR
     write(ndump,*) NRINDEX
@@ -144,6 +149,8 @@ contains
     read(ndump,*) DTYPE
     allocate(PHYSAi(NR_PHYSA))
     read(ndump,*) PHYSAi
+    allocate(PHYSAd(NR_PHYSA))
+    read(ndump,*) PHYSAd
     allocate(ADRES(NR_PHYSA))
     read(ndump,*) ADRES
     read(ndump,*) NRHVAR,NREVAR,NRVVAR,NRQVAR
