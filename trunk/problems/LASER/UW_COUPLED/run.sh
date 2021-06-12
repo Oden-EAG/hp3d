@@ -1,7 +1,7 @@
 #
 # Script to run the laser code
 #
-# last modified: Oct 2019
+# last modified: June 2021
 #
 # =======================
 # I N S T R U C T I O N S
@@ -121,7 +121,8 @@ args+=" -file_geometry ${file_geometry} -zl ${zl}"
 args+=" -file_control ${ctrl} "
 args+=" -maxnods ${maxnods} "
 args+=" -nthreads ${nthreads} "
-./uwLaser ${args}
+
+mpirun -np ${nproc} ./uwLaser ${args}
 #ibrun -n ${nproc} ./uwLaser ${args}
 #ibrun -n ${nproc} xterm -hold -e ./uwLaser ${args}
 
@@ -187,7 +188,8 @@ args+=" -nthreads ${nthreads}"
 if [ "$usepml" = true ] ; then
    args+=" -usepml -pmlfrac ${pmlfrac}"
 fi
-#./uwLaser ${args}
+
+#mpirun -np ${nproc} ./uwLaser ${args}
 #ibrun -n ${nproc} xterm -hold -e ./uwLaser ${args}
 #ibrun -n ${nproc} ./uwLaser ${args}
 #valgrind --tool=memcheck --leak-check=full --tool=memcheck ibrun -n ${nproc} ./uwLaser ${args}
@@ -198,6 +200,8 @@ fi
 #    / -omega sqrt(5.d0)/2.d0*PI -gamma sqrt(1.d0-PI*PI/(w*w))
 #      --> 1 wavelength per 4 unit lengths in z-direction
 #    / can be run with NEXACT=1 or NEXACT=0 (unless PML --use NEXACT=0)
+usepml=false
+ibc=3
 
 # VARYING LENGTH OF WAVEGUIDE
 # set waveguide length, #refs, maxnodes, 4 elems/wavelength
@@ -246,7 +250,30 @@ fi
 # 1024 wavelengths (256.00 waves/unit length)
 #imax=13; maxnods=256050 ; omega=1608.498506596624078797d0
 
-#ibrun -n ${nproc} ./uwLaser -geom 1 -isol 5 -omega ${omega} -comp 2 -job ${job} -file_control ${ctrl} -maxnods ${maxnods} -imax ${imax} -jmax ${jmax} -px ${px} -py ${py} -pz ${pz} -dp ${dp} -ibc ${ibc} -usepml -nlflag 0 -heat 0 -aniso_heat ${aniso_heat} -copump 1 -zl ${zl} -nthreads ${nthreads} -dir_output ${dir_output} -vis_level ${vis_level} -file_geometry ${file_geometry}
+ctrl='../COMMON_FILES/control_1'
+
+args=" -geom 1 -isol 5 -comp 2"
+#args+=" -gamma ${gamma}"
+#args+=" -omega ${omega}"
+args+=" -ref_core ${ref_core} -ref_clad ${ref_clad}"
+args+=" -aniso_ref_index ${aniso_ref_index}"
+args+=" -art_grating ${art_grating}"
+args+=" -job ${job} -imax ${imax} -jmax ${jmax}"
+args+=" -ibc ${ibc}"
+args+=" -px ${px} -py ${py} -pz ${pz} -dp ${dp} -npx 4 -npy 4 -npz 4"
+args+=" -copump 1 -nlflag ${nlflag} -gain ${gain} -raman ${raman}"
+args+=" -heat ${heat} -aniso_heat ${aniso_heat} -nsteps ${nsteps} -dt ${dt}"
+args+=" -dir_output ${dir_output} -vis_level ${vis_level}"
+args+=" -file_geometry ${file_geometry} -zl ${zl}"
+args+=" -file_control ${ctrl}"
+args+=" -maxnods ${maxnods}"
+args+=" -nthreads ${nthreads}"
+if [ "$usepml" = true ] ; then
+   args+=" -usepml -pmlfrac ${pmlfrac}"
+fi
+
+#mpirun -np ${nproc} ./uwLaser ${args}
+#ibrun -n ${nproc} ./uwLaser ${args}
 
 # ============================================================================================
 # ============================================================================================

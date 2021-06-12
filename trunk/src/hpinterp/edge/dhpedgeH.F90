@@ -378,7 +378,7 @@
 !  ...........if the variable is supported by the node
               if (ncase(i).eq.1) then
 !
-!  .............update the node local conter
+!  .............update the node local counter
                 nvarH = nvarH + 1
 !
 !  .............store Dirichlet dof

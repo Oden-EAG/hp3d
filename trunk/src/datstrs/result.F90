@@ -35,6 +35,9 @@ subroutine result
 !..index for a node
    integer :: index(NRINDEX)
 !
+!..boundary flags for a node
+   integer :: ibcnd(NRINDEX)
+!
 !..egde and face orientations decode
    integer :: nedge_orient(12), nface_orient(6)
 !..tetra elem print
@@ -58,7 +61,7 @@ subroutine result
  10  continue
    write(*,*) 'result: SELECT:'
    write(*,*) 'EXIT....................................0'
-   write(*,*) 'GENERAL DATA STRUCTURE PARAMETRS........1'
+   write(*,*) 'GENERAL DATA STRUCTURE PARAMETERS.......1'
    write(*,*) 'ELEMENT DATA............................2'
    write(*,*) 'NODE DATA...............................3'
    write(*,*) 'LIST ELEMENTS CONNECTED TO A NODE.......4'
@@ -131,8 +134,11 @@ subroutine result
  7023    format(' CASE = ',i5)
          write(*,7025) NODES(nod)%order
  7025    format(' ORDER = ',i3)
-         write(*,7026) NODES(nod)%bcond
- 7026    format(' BC FLAG = ',i5)
+ !        write(*,7026) NODES(nod)%bcond
+ !7026    format(' BC FLAG = ',i6)
+         call decod(NODES(nod)%bcond,2,NRINDEX, ibcnd)
+         write(*,7026) ibcnd(1:NRINDEX)
+ 7026    format(' BC FLAG = ',31i1)
          write(*,7027) NODES(nod)%visit
  7027    format(' VISITATION FLAG = ',i5)
          write(*,7028) NODES(nod)%subd

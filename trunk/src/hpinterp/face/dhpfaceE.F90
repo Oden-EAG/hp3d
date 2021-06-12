@@ -20,7 +20,7 @@
 !!
 !! @param[out] ZnodE        - H(curl) dof for the face
 !-----------------------------------------------------------------------
-  subroutine dhpfaceE(Mdle,Iflag,No,Etav, Type,Icase,Bcond, &
+  subroutine dhpfaceE(Mdle,Iflag,No,Etav,Type,Icase,Bcond, &
                       Nedge_orient,Nface_orient,Norder,Iface, &
                       ZdofE, ZnodE)
   use control
@@ -509,7 +509,7 @@
 !  ...........if the variable is supported by the node
               if (ncase(i).eq.1) then
 !
-!  .............update node local conter
+!  .............update node local counter
                 nvarE = nvarE + 1
 !
 !  .............store Dirichlet dof
