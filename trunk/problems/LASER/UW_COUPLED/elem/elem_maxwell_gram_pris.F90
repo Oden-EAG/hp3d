@@ -448,7 +448,6 @@
                   call get_ramanPol(zsolQ_soleval(1:3),zsolQ_soleval(4:6), &
                                  dom_flag,Fld_flag,delta_n, raman_pol)
                endif
-!        ...endif RAMAN_GAIN
             endif
  190        continue
 !        ...update auxiliary constant za
