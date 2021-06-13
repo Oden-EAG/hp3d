@@ -283,11 +283,11 @@ fi
 #
 # 1) testing convergence rates on a cube -- use NEXACT=1
 #file_geometry='../GEOMETRIES/cubes/cube'
-#./uwLaser -geom 1 -isol 2 -omega 1.0d0 -comp 1 -px ${px} -py ${py} -pz ${pz} -dp ${dp} -ibc ${ibc} -npx 3 -npy 3 -npz 3 -usepml -nlflag 0 -heat 0 -aniso_heat ${aniso_heat} -copump 1 -zl ${zl} -nthreads ${nthreads} -dir_output ${dir_output} -vis_level ${vis_level} -file_geometry ${file_geometry}
+#./uwLaser -geom 1 -isol 2 -omega 1.0d0 -comp 1 -px ${px} -py ${py} -pz ${pz} -dp ${dp} -ibc ${ibc} -npx 3 -npy 3 -npz 3 -nlflag 0 -heat 0 -aniso_heat ${aniso_heat} -copump 1 -zl ${zl} -nthreads ${nthreads} -dir_output ${dir_output} -vis_level ${vis_level} -file_geometry ${file_geometry}
 #
 # 2) testing convergence rates on the fiber (core only) -- use NEXACT=1
 #file_geometry='../GEOMETRIES/fiber/fhcor_curv'
-#./uwLaser -geom 4 -isol 2 -omega 0.1d0 -comp 1 -px ${px} -py ${py} -pz ${pz} -dp ${dp} -ibc 0 -usepml -nlflag 0 -heat 0 -aniso_heat ${aniso_heat} -copump 1 -zl ${zl} -nthreads ${nthreads} -dir_output ${dir_output} -vis_level ${vis_level} -file_geometry ${file_geometry}
+#./uwLaser -geom 4 -isol 2 -omega 0.1d0 -comp 1 -px ${px} -py ${py} -pz ${pz} -dp ${dp} -ibc 0 -nlflag 0 -heat 0 -aniso_heat ${aniso_heat} -copump 1 -zl ${zl} -nthreads ${nthreads} -dir_output ${dir_output} -vis_level ${vis_level} -file_geometry ${file_geometry}
 #
 # 3) (non-)linear solve of Maxwell (with heat/gain) (signal+pump fields)
 #file_geometry='../GEOMETRIES/fiber/fiber_hexa9'
