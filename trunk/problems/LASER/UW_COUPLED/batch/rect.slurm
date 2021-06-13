@@ -10,12 +10,12 @@
 #         40 total MPI tasks (lower case n); this is 4 tasks/node
 #         12 OpenMP threads per MPI task (48 threads per node)
 #
-# Last revised: 20 Oct 2017
+# Last revised: June 2021
 #
 # Notes:
 #
 #   -- Launch this script by executing
-#      "sbatch skx.slurm" on Stampede2 login node.
+#      "sbatch rect.slurm" on Stampede2 login node.
 #
 #   -- Check current queue with: "squeue -u sh43394"
 #
