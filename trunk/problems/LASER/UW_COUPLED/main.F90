@@ -35,9 +35,6 @@ program main
 !..auxiliary variables
    integer :: i, iargs, ierr, req, ret, plen
 !
-   !integer :: flag(6)
-   !integer :: physNick
-!
 !..OMP variables
    integer :: num_threads, omp_get_num_threads
 !
@@ -193,10 +190,14 @@ program main
 !..set homogeneous Dirichlet flags
    PHYSAd(1:6) = (/.true.,.false.,.false.,.true.,.false.,.false./)
 !
+!..By default, solve Maxwell for signal field
+   NO_PROBLEM = 3
+   PHYSAm(1:6) = (/.false.,.true.,.false.,.false.,.true.,.false./)
+!
 !..set static condensation flags
-   ISTC_FLAG = .true.
-   STORE_STC = .true.
-   HERM_STC = .true.
+   ISTC_FLAG = .true. ! activate automatic static condensation
+   STORE_STC = .true. ! store Schur complement factors
+   HERM_STC = .true.  ! assume Hermitian element matrix
 !
    if (HERM_STC) then
       arg = 'H'
@@ -216,11 +217,6 @@ program main
 !
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
-!..Maxwell signal solve
-   NO_PROBLEM = 3
-   ! physNick = 1; flag=0; flag(5)=1
-   PHYSAm(1:6) = (/.false.,.true.,.false.,.false.,.true.,.false./)
-!
    if (JOB .ne. 0) then
       if (NONLINEAR_FLAG .eq. 0) then
          if (HEAT_FLAG .eq. 0) then
@@ -236,7 +232,7 @@ program main
          endif
       endif
    else
-      if (RANK .eq. 0) then
+      if (RANK .eq. ROOT) then
          call master_main
       else
          call worker_main
@@ -288,12 +284,6 @@ subroutine master_main()
 !
 !..start user interface, with idec
 !..broadcast user command to workers
-!
-!..test accessing data structures
-   write(6,8020) '[', RANK, '] : ', 'NRELIS,NRELES,NRNODS = ',NRELIS,NRELES,NRNODS
- 8020 format(A,I3,A,A,I4,', ',I4,', ',I4)
-!
-   flush(6)
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 #if DEBUG_MODE
@@ -355,7 +345,7 @@ subroutine master_main()
       write(*,*) 'Read HIST file.........................72'
       write(*,*) '=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='
 !
-      read( *,*) idec
+      read (*,*) idec
       write(6,8010) '[', RANK, '] : ','Broadcast: idec = ', idec
  8010 format(A,I3,A,A,I3)
       count = 1; src = ROOT
@@ -521,13 +511,7 @@ subroutine worker_main()
       stop
    endif
 !
-!..test accessing data structures
-   write(6,9020) '[', RANK, '] : ', 'NRELIS,NRELES,NRNODS = ',NRELIS,NRELES,NRNODS
- 9020 format(A,I3,A,A,I4,', ',I4,', ',I4)
-!
-   flush(6)
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
-!
 !
 !..receive broadcast from master on how to proceed
 !..do that in a loop, using idec
