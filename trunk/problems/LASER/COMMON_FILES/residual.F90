@@ -46,11 +46,13 @@ subroutine residual(res)
 !..fetch active elements
    if (DISTRIBUTED .and. (.not. HOST_MESH)) then
       if (RANK .eq. ROOT) then
-         write(*,*) 'residual: mesh is distributed. computing error in parallel...'
+         write(*,*) 'residual: mesh is distributed. ', &
+                              'computing residual in parallel...'
       endif
    else
       if (RANK .ne. ROOT) goto 90
-      write(*,*) 'residual: mesh is not distributed (or on host). computing error on host...'
+      write(*,*) 'residual: mesh is not distributed (or on host). ', &
+                           'computing residual on host...'
       ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
       NRELES_SUBD = NRELES
    endif

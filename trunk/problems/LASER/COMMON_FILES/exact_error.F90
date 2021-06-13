@@ -36,11 +36,13 @@ subroutine exact_error(Nflag,PhysNick)
 !..fetch active elements
    if ((DISTRIBUTED) .and. (.not. HOST_MESH)) then
       if (RANK .eq. ROOT) then
-         write(*,*) 'exact_error: mesh is distributed. computing error in parallel...'
+         write(*,*) 'exact_error: mesh is distributed. ', &
+                                 'computing error in parallel...'
       endif
    else
       if (RANK .ne. ROOT) goto 90
-      write(*,*) 'exact_error: mesh is not distributed (or on host). computing error on host...'
+      write(*,*) 'exact_error: mesh is not distributed (or on host). ', &
+                              'computing error on host...'
       ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
       NRELES_SUBD = NRELES
    endif
