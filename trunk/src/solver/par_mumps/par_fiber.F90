@@ -228,22 +228,21 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
 !..create matrices and rhs for the subproblems
 !  [Steps 3-4: Assembling the subproblems and the separator problem]
    if (mSUB_RANK .eq. ROOT) then
-!  ...transfer RHS from to global problem to subproblem
-!     each group rep does this only for their left side (lower indices)
-!     to avoid duplicating already assembled RHS interface contributions
+!  ...split global RHS into interface RHS vector and subproblem RHS vector
       do j=0,NR_RHS-1
+!     ...1. assemble RHS vector for interface (separator) problem
+!           each group rep does this only for their left side (lower indices)
+!           to avoid duplicating already assembled RHS interface contributions
+!           coming from the group rep on the right side (higher indices)
          do i=1,dof_int_L
             ! add to Bi
             Bi(j*dof_int + i) = mumps%RHS(j*mumps%N + dof_off-dof_int_L+i)
          enddo
+!     ...2. assemble RHS vector for subproblem
          do i=1,dof_sub
             ! add to Bsub
             mumps_sub%RHS(j*dof_sub + i) = mumps%RHS(j*mumps%N + dof_off+i)
          enddo
-         !do i=1,dof_int_R
-            ! add to Bi
-         !   Bi(j*dof_int + dof_int_L+i) = mumps%RHS(j*mumps%N + dof_off+dof_sub+i)
-         !enddo
       enddo
    endif
    kbb = 0; kib = 0 ! nnz counters
