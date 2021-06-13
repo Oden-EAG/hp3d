@@ -125,16 +125,16 @@
   endif
 #endif
 !
+! # of edge dof
+  call ndof_nod('medg',norder(Iedge), &
+                ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_edge)
+!
 ! check if a homogeneous Dirichlet node
   call homogenD('tangen',Icase,Bcond, is_homD,ncase,ibcnd)
   if (is_homD) then
     zuE = ZERO
     go to 100
   endif
-!
-! # of edge dof
-  call ndof_nod('medg',norder(Iedge), &
-                ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_edge)
 !
 ! # of dof cannot be zero
   if (ndofE_edge.le.0) then

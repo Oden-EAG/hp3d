@@ -131,16 +131,16 @@
   endif
 #endif
 !
+! determine # of dof for the face node
+  call ndof_nod(face_type(Type,Iface),Norder(nre+Iface), &
+                ndofH_face,ndofE_face,ndofV_face,ndofQ_face)
+!
 ! check if a homogeneous Dirichlet node
   call homogenD('normal',Icase,Bcond, is_homD,ncase,ibcnd)
   if (is_homD) then
     zuV = ZERO
     go to 100
   endif
-!
-! determine # of dof for the face node
-  call ndof_nod(face_type(Type,Iface),Norder(nre+Iface), &
-                ndofH_face,ndofE_face,ndofV_face,ndofQ_face)
 !
 ! # of dof has to be positive...
   if (ndofV_face.lt.0) then
