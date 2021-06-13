@@ -190,6 +190,9 @@ program main
 !  (6) - L2 field for Maxwell (pump  , 6 components)
    PHYSAi(1:6) = (/.false.,.true.,.true.,.true.,.false.,.false./)
 !
+!..set homogeneous Dirichlet flags
+   PHYSAd(1:6) = (/.true.,.false.,.false.,.true.,.false.,.false./)
+!
 !..set static condensation flags
    ISTC_FLAG = .true.
    STORE_STC = .true.
@@ -207,6 +210,7 @@ program main
       write(*,*) ' STORE_STC: ', STORE_STC
       write(*,*) ' HERM_STC : ', HERM_STC
       write(*,*) ' PHYSAi   : ', PHYSAi
+      write(*,*) ' PHYSAd   : ', PHYSAd
       write(*,*)
    endif
 !

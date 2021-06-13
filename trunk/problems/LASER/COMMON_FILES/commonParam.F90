@@ -120,7 +120,7 @@ module commonParam
    character(32) :: OUTPUT_DIR
 !
 !..Maximum number of iterations in nonlinear Solve
-   integer, parameter :: MAX_ITER = 30
+   integer :: MAX_ITER = 30
 !
 !..paraview parameters
    !integer                            :: IPARADAP

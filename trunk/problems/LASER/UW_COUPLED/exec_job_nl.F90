@@ -205,7 +205,7 @@ subroutine exec_job_nl
       if (RANK.eq.ROOT) write(*,*) '   Signal solve..'
       NO_PROBLEM = 3
       call set_physAm(NO_PROBLEM, physNick,flag)
-      call update_Ddof
+      !call update_Ddof ! TODO: not needed, unless updateDdof uses PHYSAm
       if (NUM_PROCS .eq. 1) then
          call pardiso_sc('H')
       else
@@ -228,7 +228,7 @@ subroutine exec_job_nl
       if (RANK.eq.ROOT) write(*,*) '   Pump solve..'
       NO_PROBLEM = 4
       call set_physAm(NO_PROBLEM, physNick,flag)
-      call update_Ddof
+      !call update_Ddof ! TODO: not needed, unless updateDdof uses PHYSAm
       if (NUM_PROCS .eq. 1) then
          call pardiso_sc('H')
       else
@@ -276,25 +276,17 @@ subroutine exec_job_nl
    end do
 !
 !..Last step only display (no refinement)
-   !QUIET_MODE = .true.; IPRINT_TIME = 0
-   !if (RANK.eq.ROOT) write(*,*)
-   !if (RANK.eq.ROOT) write(*,*) '   Pump residual:'
-   !NO_PROBLEM = 4
-   !call set_physAm(NO_PROBLEM, physNick,flag)
-   !call residual(PumpRes(i+1))
+   if (RANK.eq.ROOT) write(*,*)
+   if (RANK.eq.ROOT) write(*,*) '   Pump residual:'
+   NO_PROBLEM = 4
+   call set_physAm(NO_PROBLEM, physNick,flag)
+   call residual(PumpRes(i+1))
 !
-   !if (RANK.eq.ROOT) write(*,*)
-   !if (RANK.eq.ROOT) write(*,*) '   Signal residual:'
-   !NO_PROBLEM = 3
-   !call set_physAm(NO_PROBLEM, physNick,flag)
-   !call update_Ddof
-   !if (NUM_PROCS .eq. 1) then
-   !   call pardiso_sc('H')
-   !else
-   !   call par_nested('H')
-   !endif
-   !call residual(SignalRes(i+1))
-   !QUIET_MODE = .false.; IPRINT_TIME = 1
+   if (RANK.eq.ROOT) write(*,*)
+   if (RANK.eq.ROOT) write(*,*) '   Signal residual:'
+   NO_PROBLEM = 3
+   call set_physAm(NO_PROBLEM, physNick,flag)
+   call residual(SignalRes(i+1))
 !
    if (RANK.eq.ROOT) then
       write(*,*) 'L2NormDiff/FieldNormQ:'

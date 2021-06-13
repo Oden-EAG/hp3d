@@ -20,7 +20,7 @@
 !!
 !! @param[out] ZnodE        - H(curl) dof for the face
 !-----------------------------------------------------------------------
-  subroutine dhpfaceE(Mdle,Iflag,No,Etav, Type,Icase,Bcond, &
+  subroutine dhpfaceE(Mdle,Iflag,No,Etav,Type,Icase,Bcond, &
                       Nedge_orient,Nface_orient,Norder,Iface, &
                       ZdofE, ZnodE)
   use control
@@ -134,16 +134,16 @@
   endif
 #endif
 !
+! determine # of dof for the face node
+  call ndof_nod(face_type(Type,Iface),Norder(nre+Iface), &
+                ndofH_face,ndofE_face,ndofV_face,ndofQ_face)
+!
 ! check if a homogeneous Dirichlet node
   call homogenD('tangen',Icase,Bcond, is_homD,ncase,ibcnd)
   if (is_homD) then
     zuE = ZERO
     go to 100
   endif
-!
-! determine # of dof for the face node
-  call ndof_nod(face_type(Type,Iface),Norder(nre+Iface), &
-                ndofH_face,ndofE_face,ndofV_face,ndofQ_face)
 !
 ! if # of dof is zero, return, nothing to do
   if (ndofE_face.eq.0) return
@@ -509,7 +509,7 @@
 !  ...........if the variable is supported by the node
               if (ncase(i).eq.1) then
 !
-!  .............update node local conter
+!  .............update node local counter
                 nvarE = nvarE + 1
 !
 !  .............store Dirichlet dof

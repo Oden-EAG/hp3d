@@ -1,8 +1,8 @@
-!--------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 !     routine name      - set_initial_mesh
 !
-!--------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 !     latest revision:  - May 2021
 !
@@ -10,12 +10,10 @@
 !                         (multiphysics, BC, approximation)
 !
 !     arguments:
-!
-!     in:
-!     out:
+!        out:
 !           Nelem_order - order for initial mesh elements
 !
-!---------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 subroutine set_initial_mesh(Nelem_order)
 !
@@ -29,7 +27,7 @@ subroutine set_initial_mesh(Nelem_order)
    integer, intent(out) :: Nelem_order(NRELIS)
 !
 !..BC flags
-   integer, dimension(6,NRINDEX) :: ibc
+   integer :: ibc(6,NRINDEX)
 !
 !..miscellaneous
    integer :: ifc,iel,neig,ivar
@@ -38,9 +36,11 @@ subroutine set_initial_mesh(Nelem_order)
    integer :: iprint = 0
 #endif
 !
-!------------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
-!..check if have not exceeded the maximum order
+   Nelem_order = 0
+!
+!..check if exceeding maximum order
    if (IP.gt.MAXP) then
       write(*,*) 'set_initial_mesh: IP, MAXP = ', IP,MAXP
       stop 1
@@ -73,7 +73,8 @@ subroutine set_initial_mesh(Nelem_order)
          stop 1
       endif
 !
-!  ...set BC flags for each of 3 components: 0 - no BC ; 1 - Dirichlet ; 2 - Neumann
+!  ...set BC flags for each of 3 components:
+!     0 - no BC ; 1 - Dirichlet ; 2 - Neumann
       ibc(1:6,1:NRINDEX) = 0
 !
 !  ...loop through the element faces
@@ -101,7 +102,8 @@ subroutine set_initial_mesh(Nelem_order)
          call encodg(ibc(1:6,ivar),10,6, ELEMS(iel)%bcond(ivar))
 #if DEBUG_MODE
          if (iprint.eq.1) then
-            write(*,*) 'ivar,ELEMS(iel)%bcond(ivar) = ',ivar,ELEMS(iel)%bcond(ivar)
+            write(*,*) 'ivar, ELEMS(iel)%bcond(ivar) = ', &
+                        ivar,', ',ELEMS(iel)%bcond(ivar)
          endif
 #endif
       enddo

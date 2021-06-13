@@ -175,11 +175,12 @@ subroutine exec_job_coupled
          if (RANK.eq.ROOT) write(*,4200) ' Solving the heat equation...'
       endif
       if (RANK.eq.ROOT) write(*,*) ''
+      ! TODO: call update_Ddof here instead of three times below.
       !PHYSAm = .true.
-      !call update_Ddof ! (update since BCs may be time-dependent)
+      call update_Ddof ! (update since BCs may be time-dependent)
       NO_PROBLEM = 2
       call set_physAm(NO_PROBLEM, physNick,flag)
-      call update_Ddof ! update heat Ddof
+      !call update_Ddof ! update heat Ddof TODO: remove if update_Ddof not using PHYSAm
       if (time_step .gt. 0) then
          if (NUM_PROCS .eq. 1) then
             call pardiso_sc('H')
@@ -197,12 +198,12 @@ subroutine exec_job_coupled
 !
 !  ...activate to compute maxwell problem only in the initial time step
       !if (time_step .ge. 1 .and. time_step .lt. 100) then
-      if (time_step .ge. 1 .and. time_step .lt. 10) then
-         iParAttr = (/1,0,0,0,0,0/)
-         goto 420
-      else
-         iParAttr = (/1,0,0,0,6,0/)
-      endif
+!      if (time_step .ge. 1 .and. time_step .lt. 10) then
+!         iParAttr = (/1,0,0,0,0,0/)
+!         goto 420
+!      else
+!         iParAttr = (/1,0,0,0,6,0/)
+!      endif
 !
 !  ...solve nonlinear Maxwell loop for SIGNAL and PUMP
       L2NormDiff = 1.d0
@@ -253,19 +254,18 @@ subroutine exec_job_coupled
          if (RANK.eq.ROOT) write(*,*) '   Signal solve...'
          NO_PROBLEM = 3
          call set_physAm(NO_PROBLEM, physNick,flag)
-         call update_Ddof ! update signal Ddof
+         !call update_Ddof ! update signal Ddof TODO: remove if update_Ddof not using PHYSAm
          if (NUM_PROCS .eq. 1) then
             call pardiso_sc('H')
          else
             call par_nested('H')
          endif
-!        QUIET_MODE = .true.; IPRINT_TIME = 0
-!        if (RANK.eq.ROOT) write(*,*)
-!        if (RANK.eq.ROOT) write(*,*) '   Signal residual:'
-!        call residual(res)
+        QUIET_MODE = .true.; IPRINT_TIME = 0
+        if (RANK.eq.ROOT) write(*,*)
+        if (RANK.eq.ROOT) write(*,*) '   Signal residual:'
+        call residual(res)
          if (RANK.eq.ROOT) write(*,*)
-!        if (RANK.eq.ROOT) write(*,*)
-!        QUIET_MODE = .false.; IPRINT_TIME = 1
+        QUIET_MODE = .false.; IPRINT_TIME = 1
 !
 !     ...assuming pump plane wave
          if (FAKE_PUMP .eq. 1) then
@@ -277,17 +277,17 @@ subroutine exec_job_coupled
          if (RANK.eq.ROOT) write(*,*) '   Pump solve...'
          NO_PROBLEM = 4
          call set_physAm(NO_PROBLEM, physNick,flag)
-         call update_Ddof ! update pump Ddof
+         !call update_Ddof ! update pump Ddof TODO: remove if update_Ddof not using PHYSAm
          if (NUM_PROCS .eq. 1) then
             call pardiso_sc('H')
          else
             call par_nested('H')
          endif
-!        QUIET_MODE = .true.; IPRINT_TIME = 0
+        QUIET_MODE = .true.; IPRINT_TIME = 0
          if (RANK.eq.ROOT) write(*,*)
-!        if (RANK.eq.ROOT) write(*,*) '   Pump residual:'
-!        call residual(res)
-!        QUIET_MODE = .false.; IPRINT_TIME = 1
+        if (RANK.eq.ROOT) write(*,*) '   Pump residual:'
+        call residual(res)
+        QUIET_MODE = .false.; IPRINT_TIME = 1
 !
    410   continue
 !
@@ -329,7 +329,8 @@ subroutine exec_job_coupled
       !if (time_step.lt.100 .and. MOD(time_step,10).ne.0) goto 425 ! skip paraview output
 !  ...write paraview output
       if(RANK.eq.ROOT) write(*,200) ' Writing paraview output...'
-      if (time_step .eq. 0) iParAttr = (/1,0,0,0,6,0/)
+      iParAttr = (/1,2,2,1,6,6/)
+      !if (time_step .eq. 0) iParAttr = (/1,0,0,0,6,0/)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
       call my_paraview_driver(iParAttr)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
@@ -351,12 +352,6 @@ subroutine exec_job_coupled
 !   if (RANK.eq.ROOT) write(*,*) '   Signal residual:'
 !   NO_PROBLEM = 3
 !   call set_physAm(NO_PROBLEM, physNick,flag)
-!   call update_Ddof
-!   if (NUM_PROCS .eq. 1) then
-!      call pardiso_sc('H')
-!   else
-!      call par_nested('H')
-!   endif
 !   call residual(res)
 !   QUIET_MODE = .false.; IPRINT_TIME = 1
 !!

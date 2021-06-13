@@ -87,28 +87,28 @@ subroutine dhpvert(Mdle,Iflag,No,Xi,Icase,Bcond, ZdofH)
 !        ...if the variable is supported by the node, update the BC component counter
             if (ncase(iphys).eq.1) ic=ic+1
 !
-!           ...select the discretization type
-               select case(DTYPE(iphys))
-                  case('contin')
-                     ivarH=ivarH+1
+!        ...select the discretization type
+            select case(DTYPE(iphys))
+               case('contin')
+                  ivarH=ivarH+1
 !
-!                 ...if the variable is supported by the node
-                     if (ncase(iphys).eq.1) then
+!              ...if the variable is supported by the node
+                  if (ncase(iphys).eq.1) then
 !
-!                    ...update the H1 variable counter and store the dof
-                        nvarH=nvarH+1
-                        if (ibcnd(ic).eq.1) ZdofH(nvarH) = zvalH(ivarH)
-                     endif
-               end select
+!                 ...update the H1 variable counter and store the dof
+                     nvarH=nvarH+1
+                     if (ibcnd(ic).eq.1) ZdofH(nvarH) = zvalH(ivarH)
+                  endif
+            end select
 !
-!        ...loop through components
-            enddo
-!
-!     ...loop through physical attributes
+!     ...loop through components
          enddo
 !
-!  ...loop through multiple copies of variables
+!  ...loop through physical attributes
       enddo
+!
+!..loop through multiple copies of variables
+   enddo
 !
 #if DEBUG_MODE
       if (iprint.eq.1) then

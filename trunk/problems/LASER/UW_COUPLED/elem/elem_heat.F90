@@ -159,7 +159,7 @@ subroutine elem_heat(Mdle,                   &
    integer :: nrv,nre,nrf
 !
 !..various variables for the problem
-   real(8)    :: rjac,bjac,weight,wa,v2n,v1,v2
+   real(8)    :: rjac,bjac,weight,wa,v2n,v1,v2,iphys,icomp
    integer    :: i1,i2,j1,j2,k1,k2,kH,kk,i,j,nint,iflag,kE,k
    integer    :: nordP,nrdof,l,nsign,ifc,info,ndom
    real(8)    :: rfval,therm_Load
@@ -172,7 +172,7 @@ subroutine elem_heat(Mdle,                   &
 !
 #if DEBUG_MODE
 !..BC's flags
-   integer, dimension(6,NR_PHYSA) :: ibc
+   integer :: ibc(6,NRINDEX)
 !..auxiliary
    integer :: iprint
 #endif
@@ -245,10 +245,14 @@ subroutine elem_heat(Mdle,                   &
    call find_bc(Mdle, ibc)
    if (iprint.eq.1) then
       write(*,7001) Mdle
-7001  format('elem_heat: BCFLAGS FOR Mdle = ',i5)
-      do i=1,NR_PHYSA
-         write(*,7002) PHYSA(i), ibc(1:nrf,i)
-7002     format('          ATTRIBUTE = ',a6,' FLAGS = ',6i2)
+ 7001 format('elem_heat: BCFLAGS FOR Mdle = ',i5)
+      i=0
+      do iphys=1,NR_PHYSA
+         do icomp=1,NR_COMP(iphys)
+            i=i+1
+            write(*,7002) PHYSA(iphys), icomp, ibc(1:nrf,i)
+ 7002       format('      ATTR = ',a6,', COMP = ',i1,', FLAGS = ',6i2)
+         enddo
       enddo
    endif
 #endif

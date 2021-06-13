@@ -107,8 +107,8 @@ subroutine exec_case(idec)
          write(*,*) 'global h-refinement...'
          call global_href
          if (IBCFLAG .eq. 3) then
-            call propagate_flag(2,9)
-            call propagate_flag(3,9)
+            call propagate_flag(3,3)
+            call propagate_flag(5,3)
          endif
          call update_gdof
          call update_Ddof
@@ -136,8 +136,8 @@ subroutine exec_case(idec)
          do i=1,refs
             call global_href_aniso(0,1)
             if (IBCFLAG .eq. 3) then
-               call propagate_flag(2,9)
-               call propagate_flag(3,9)
+               call propagate_flag(3,3)
+               call propagate_flag(5,3)
             endif
          enddo
          call update_gdof

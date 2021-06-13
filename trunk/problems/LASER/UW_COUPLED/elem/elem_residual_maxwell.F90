@@ -122,7 +122,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    real(8), dimension(MAXNINT2ADD)   :: wtloc
 !
 !..BC's flags
-   integer, dimension(6,NR_PHYSA)   :: ibc
+   integer, dimension(6,NRINDEX)     :: ibc
 !
 !..Maxwell load and auxiliary variables
    VTYPE  , dimension(3) :: zJ,zImp
@@ -645,7 +645,9 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
             call zcross_product(rn,zflux(1:3,ivar), zflux2(1:3,ivar))
          enddo
 !
-         if(ibc(ifc,2).eq.9) then
+!     ...check for impedance BC
+         if ((ibc(ifc,3).eq.3 .and. Fld_flag.eq.1) .or. &
+             (ibc(ifc,5).eq.3 .and. Fld_flag.eq.0)) then
             call get_bdSource(Mdle,x,rn, zImp)
             zflux2(1:3,1) = GAMMA*zflux2(1:3,1)+zImp
          endif
@@ -657,7 +659,9 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
                     + shapEE(3,k1)*dxidx(3,1:3)
 !
             k=2*k1-1
-            if(ibc(ifc,2).eq.9) then
+!        ...check for impedance BC
+            if ((ibc(ifc,3).eq.3 .and. Fld_flag.eq.1) .or. &
+                (ibc(ifc,5).eq.3 .and. Fld_flag.eq.0)) then
 !           - GAMMA * < n x n x E , G >
                zaux = E1(1)*zflux2(1,1) + E1(2)*zflux2(2,1) + E1(3)*zflux2(3,1)
                bload_E(k) = bload_E(k) - zaux * weight

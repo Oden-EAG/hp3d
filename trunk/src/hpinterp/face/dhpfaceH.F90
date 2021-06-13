@@ -127,16 +127,16 @@
   endif
 #endif
 !
+! determine # of dof for the face node
+  call ndof_nod(face_type(Type,Iface),Norder(nre+Iface), &
+                ndofH_face,ndofE_face,ndofV_face,ndofQ_face)
+!
 ! check if a homogeneous Dirichlet node
   call homogenD('contin',Icase,Bcond, is_homD,ncase,ibcnd)
   if (is_homD) then
     zuH = ZERO
     go to 100
   endif
-!
-! determine # of dof for the face node
-  call ndof_nod(face_type(Type,Iface),Norder(nre+Iface), &
-                ndofH_face,ndofE_face,ndofV_face,ndofQ_face)
 !
 ! if # of dof is zero, return, nothing to do
   if (ndofH_face.eq.0) return
@@ -376,7 +376,7 @@
 !  ...........if the variable is supported by the node
               if (ncase(i).eq.1) then
 !
-!  .............update the node local conter
+!  .............update the node local counter
                 nvarH = nvarH + 1
 !
 !  .............store Dirichlet dof

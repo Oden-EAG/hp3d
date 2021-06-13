@@ -122,16 +122,16 @@
   endif
 #endif
 !
+! # of edge dof
+  call ndof_nod('medg',norder(Iedge), &
+                ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_edge)
+!
 ! check if a homogeneous Dirichlet node
   call homogenD('contin',Icase,Bcond, is_homD,ncase,ibcnd)
   if (is_homD) then
     zuH = ZERO
     go to 100
   endif
-    !
-! # of edge dof
-  call ndof_nod('medg',norder(Iedge), &
-                ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_edge)
 !
 ! if # of dof is zero, return, nothing to do
   if (ndofH_edge.eq.0) return
@@ -378,7 +378,7 @@
 !  ...........if the variable is supported by the node
               if (ncase(i).eq.1) then
 !
-!  .............update the node local conter
+!  .............update the node local counter
                 nvarH = nvarH + 1
 !
 !  .............store Dirichlet dof
