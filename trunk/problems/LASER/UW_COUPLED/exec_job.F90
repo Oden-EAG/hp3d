@@ -67,11 +67,11 @@ subroutine exec_job
 !
       if (NUM_PROCS .eq. 1) goto 30
 !
-      if (i .eq. IMAX-3) then
-         call zoltan_w_set_lb(7)
+!  ...set partitioner for load balancing, redistributes mesh in 'distr_mesh'
+      if (i .eq. IMAX-2) then
+         call zoltan_w_set_lb(7) ! fiber partitioner
       elseif (i .gt. IMAX) then
-!     ...set load balancing to graph partitioner, and redistribute
-         !call zoltan_w_set_lb(6)
+         !call zoltan_w_set_lb(6) ! graph partitioner
          goto 30 ! NO LOAD BALANCING
       else
          goto 30
@@ -145,9 +145,9 @@ subroutine exec_job
 !
 !  ...skip computing power
       !goto 80
+!
       !if (i .lt. IMAX) cycle
       if (i .lt. IMAX+JMAX) cycle
-      cycle
 !
 !  ...compute power in fiber for signal field
       if(RANK .eq. ROOT) write(*,200) '7. computing power...'
@@ -161,9 +161,11 @@ subroutine exec_job
 !
    80 continue
 !
+!  ...skip writing paraview output
+      !goto 90
+!
       !if (i .lt. IMAX) cycle
-      !if (i .lt. IMAX+JMAX) cycle
-      cycle ! (do not write paraview output)
+      if (i .lt. IMAX+JMAX) cycle
 !
 !  ...write paraview output
       if(RANK .eq. ROOT) write(*,200) '8. writing paraview output...'
@@ -172,6 +174,8 @@ subroutine exec_job
       call my_paraview_driver(iParAttr)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
       if(RANK .eq. ROOT) write(*,300) end_time - start_time
+!
+   90 continue
    enddo
 !
 !..compute residual/error on last mesh
@@ -179,10 +183,6 @@ subroutine exec_job
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    call refine_DPG(INOREFINEMENT,1,0.25d0,flag,physNick,ires, nstop)
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()!
-!
-!   iParAttr = (/0,0,0,0,6,0/)
-!   call my_paraview_driver(iParAttr)
-!   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
   100 format(/,'/////////////////////////////////////////////////////////////', &
              /,'             ',A,I2,/)
