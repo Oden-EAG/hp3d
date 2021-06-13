@@ -111,10 +111,10 @@ subroutine dhpvert(Mdle,Iflag,No,Xi,Icase,Bcond, ZdofH)
    enddo
 !
 #if DEBUG_MODE
-      if (iprint.eq.1) then
-        write(*,7030) ZdofH(1:NRCOMS*NREQNH(Icase))
- 7030   format('dhpvert: ZdofH = ',10e12.5)
-      endif
+   if (iprint.eq.1) then
+      write(*,7030) ZdofH(1:NRCOMS*NREQNH(Icase))
+ 7030 format('dhpvert: ZdofH = ',10e12.5)
+   endif
 #endif
 !
 end subroutine dhpvert
