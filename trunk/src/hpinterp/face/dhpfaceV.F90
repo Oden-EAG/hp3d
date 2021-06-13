@@ -337,7 +337,7 @@
   endif
 #endif
 !
-!  ...save the dof's, skipping irrelevant entries
+!  ...save the DOFs, skipping irrelevant entries
   100 continue
 !
 #if DEBUG_MODE

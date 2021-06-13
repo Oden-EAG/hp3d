@@ -22,13 +22,13 @@ subroutine find_bc(Mdle, Ibc)
    integer, intent(out)   :: Ibc(6,NRINDEX)
 !
 !..Locals
-   integer, dimension(27) :: nodesl,norientl
-   integer, dimension(6)  :: ibc_iel(6)
+   integer :: nodesl(27),norientl(27)
+   integer :: ibc_iel(6)
    integer :: nrve,nrf
    integer :: nod,nfath,iel,iface,nrve_iel,nrf_iel,loc,ivar,nvar
 !
 #if DEBUG_MODE
-   integer       :: iprint = 1
+   integer :: iprint = 1
 #endif
 !
 !-------------------------------------------------------------------------------

@@ -4,7 +4,7 @@
 !
 !---------------------------------------------------------------------
 !
-!   latest revision    - Oct 2019
+!   latest revision    - June 2021
 !
 !   purpose            - routine generates a new node
 !
@@ -41,11 +41,11 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
    logical, intent(in)           :: Iact
    integer, intent(out)          :: Nod
 !
-   integer :: ncase(NR_PHYSA)
-!
    integer :: ndofH,ndofE,ndofV,ndofQ,nvar
 !
 #if DEBUG_MODE
+   integer :: ncase(NR_PHYSA)
+   integer :: ibcnd(NRINDEX)
    integer :: iprint = 0
 #endif
 !
@@ -56,10 +56,14 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
       write(*,7000) Type,Icase,Nbcond,Nfath,Norder,Iact
  7000 format(' nodgen: Type,Icase,Nbcond,Nfath,Norder,Iact = ', &
                         a4,2x,i3,2x,i6,2x,i6,2x,i3,2x,i2)
+      call decod(Icase,2,NR_PHYSA, ncase)
+      write(*,7001) ncase(1:NR_PHYSA)
+ 7001 format(' decoded Icase = ',10i1)
+      call decod(Nbcond,2,NRINDEX, ibcnd)
+      write(*,7002) ibcnd(1:NRINDEX)
+ 7002 format(' decoded Nbcond = ',30i1)
    endif
 #endif
-!
-   call decod(Icase,2,NR_PHYSA, ncase)
 !
    if ((NPNODS.eq.0) .or. (NPNODS.gt.MAXNODS)) then
       if (RANK .eq. ROOT) then
@@ -95,8 +99,8 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
 !..printing
 #if DEBUG_MODE
    if (iprint.eq.1) then
-      write(*,7001) Nod,ndofH,ndofE,ndofV,ndofQ
- 7001 format(' nodgen: Nod = ',i10,' ndofH,ndofE,ndofV,ndofQ = ',4i4)
+      write(*,7005) Nod,ndofH,ndofE,ndofV,ndofQ
+ 7005 format(' nodgen: Nod = ',i10,' ndofH,ndofE,ndofV,ndofQ = ',4i4)
    endif
 #endif
 !
