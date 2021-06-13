@@ -208,7 +208,7 @@ subroutine set_initial_mesh(Nelem_order)
 !  ...allocate BC flags (one per attribute component)
       allocate(ELEMS(iel)%bcond(NRINDEX))
 !
-!  ...for each physics variable, encode face BC into a single BC flag
+!  ...for each component, encode face BC into a single BC flag
       do i=1,NRINDEX
          call encodg(ibc(1:6,i),10,6, ELEMS(iel)%bcond(i))
       enddo

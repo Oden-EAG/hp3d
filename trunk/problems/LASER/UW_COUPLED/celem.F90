@@ -53,7 +53,7 @@ subroutine celem(Mdle,Idec, Nrdofs,Nrdofm,Nrdofc,Nodm,NdofmH,NdofmE,NdofmV,Ndofm
 !           (6) - L2 field for Maxwell (pump  , 6 components)
 !
 !..remove bubble DOFs from trace components
-   nbcond = 0; nbcond(2:6)=1
+   nbcond = 0; nbcond(2:6) = 1
    call encod(nbcond,2,NRINDEX, NODES(Mdle)%bcond)
 !
 !..redirect to the system routine
