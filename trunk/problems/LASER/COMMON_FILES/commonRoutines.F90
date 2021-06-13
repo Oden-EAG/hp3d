@@ -9,29 +9,33 @@
 !
 !   latest revision    - June 2021
 !
-!   purpose            - propagate Nflag (customized BC flag 2-9)
-!                        from element faces to element edges and vertices;
-!                        the flag is passed provided ALL adjacent faces
-!                        share the flag background:
-!                        impedance boundary condition (BC) should not be
+!   purpose            - Propagates Nflag (customized BC flag 2-9) from
+!                        element faces to element edges and vertices.
+!                        The flag is passed provided ALL adjacent faces
+!                        share the flag (or have a Dirichlet flag).
+!                        Since a node stores only a 0/1 BC flag per component,
+!                        propagating Nflag corresponds to setting BC flag = 1
+!                        on the corresponding component (Icomp).
+!                        Background:
+!                        Impedance boundary condition (BC) should not be
 !                        inherited by edges and vertices from a face
-!                        during refinement, unless the edge is only
+!                        during refinement, unless the edge/vertex is only
 !                        adjacent to impedance and dirichlet faces.
 !
 !   arguments:
-!     in :
-!              Icomp   - physics attribute component number
+!     in:
+!              Icomp   - Physics attribute component number (1,..,NRINDEX)
 !              Nflag   - A custom BC flag (2-9); e.g., impedance BC flag
 !
 !-------------------------------------------------------------------------------
 !
-! TODO: THE PROPAGATE_FLAG ROUTINE SHOULD BE AUTOMATED -- IT IS TOO
-!       COMPLICATED TO BE SUPPLIED BY THE USER:
+! TODO: IF POSSIBLE, THE PROPAGATE_FLAG ROUTINE SHOULD BE AUTOMATED --
+!       IT IS TOO COMPLICATED TO BE SUPPLIED BY THE USER.
 !       With new BC implementation, to propagate impendance flags correctly,
-!       this routine must check for the impedance flag Nflag=3 on faces for
-!       the \hat H component (Icomp).
-!       - For nodes that are not adjacent to ONLY impedance/Dirichlet faces, then
-!         the \hat H component (Icomp) BC flag must be 0 (instead of 1).
+!       this routine must check faces for the impedance flag (Nflag=3) on the
+!       \hat H component (Icomp=3 [signal], Icomp=5 [pump]).
+!       - For nodes that are not adjacent to ONLY impedance/Dirichlet faces,
+!         the \hat H component (Icomp) BC flag must be set to 0 (instead of 1).
 !       - For nodes that are adjacent to ONLY impedance/Dirichlet faces, the BC
 !         flag of \hat H must be set to 1 (DOFs treated like Dirichlet DOFs).
 !
