@@ -1,16 +1,16 @@
 !
 #include "typedefs.h"
 !
-!--------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 !     routine name      - get_avgTemp
 !
-!--------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
-!     latest revision:  - Mar 2019
+!     latest revision:  - June 2021
 !
-!     purpose:          - routine computes average temperature in
-!                         the fiber at certain z locations
+!     purpose:          - routine sets up computation of average temperature
+!                         in the fiber at certain z-locations
 !
 !     arguments:
 !        inout:
@@ -18,7 +18,7 @@
 !             FileIter  -  -1: print to stdout
 !                         >=0: print to file with suffix=FileIter
 !
-!---------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 subroutine get_avgTemp(NumPts,FileIter)
 !
    use commonParam
@@ -42,7 +42,7 @@ subroutine get_avgTemp(NumPts,FileIter)
 !
    integer :: ierr
 !
-!----------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
    if (NumPts.le.0) NumPts = 4
    if (RANK .eq. ROOT) then
@@ -102,15 +102,16 @@ subroutine get_avgTemp(NumPts,FileIter)
 end subroutine get_avgTemp
 !
 !
-!--------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 !     routine name        - compute_avgTemp
 !
-!--------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
-!     latest revision:    - Mar 2019
+!     latest revision:    - June 2021
 !
-!     purpose:            - routine ...
+!     purpose:            - routine computes average temperature in the
+!                           fiber at certain z-locations (sample points)
 !
 !     arguments:
 !        in:
@@ -120,7 +121,7 @@ end subroutine get_avgTemp
 !              CoreTemp   - average temperature in fiber core
 !                           computed for elements at ZValues
 !
-!---------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
 !
    use commonParam
@@ -157,7 +158,7 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
    real(8) :: MPI_Wtime,start_time,end_time
    integer :: count,ierr
 !
-!----------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
    CoreTemp = rZero
    coreVol  = rZero
@@ -226,7 +227,7 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
    do i=1,NumPts
       CoreTemp(i) = CoreTemp(i)/coreVol(i)
       !write(*,3005) 'i = ',i, ', CoreTemp = ',CoreTemp(i),', CoreVol = ',coreVol(i)
- !3005 format(A,I3,A,F6.2,A,F6.2)
+ 3005 format(A,I4,A,F6.2,A,F6.2)
    enddo
 !
    90 continue
@@ -241,11 +242,11 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
 end subroutine comp_avgTemp
 !
 !
-!--------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 !     routine name        - comp_elem_avgTemp
 !
-!--------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 !     latest revision:    - Mar 2019
 !
@@ -259,7 +260,7 @@ end subroutine comp_avgTemp
 !              ElemTemp   - Average temperature in element
 !              ElemVol    - Volume of element in physical space
 !
-!---------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 subroutine comp_elem_avgTemp(Mdle, ElemTemp,ElemVol)
 !
    use data_structure3D
@@ -303,7 +304,7 @@ subroutine comp_elem_avgTemp(Mdle, ElemTemp,ElemVol)
    integer :: l,nint,iflag,nflag
    real(8) :: rsolH
 !
-!---------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
    nflag=1
 !
@@ -337,7 +338,7 @@ subroutine comp_elem_avgTemp(Mdle, ElemTemp,ElemVol)
       weight = wa*rjac
 #if DEBUG_MODE
       if (iflag .ne. 0) then
-        write(*,*) 'geom iflag != 0. Mdle,rjac = ',Mdle,rjac
+        write(*,*) 'comp_elem_avgTemp: geom iflag != 0. Mdle,rjac = ',Mdle,rjac
       endif
 #endif
 !
@@ -356,7 +357,7 @@ subroutine comp_elem_avgTemp(Mdle, ElemTemp,ElemVol)
 end subroutine comp_elem_avgTemp
 !
 !
-!---------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 !  routine: get_thermLoad
 !
@@ -368,7 +369,7 @@ end subroutine comp_elem_avgTemp
 !
 !  output:  - Therm_load
 !
-!---------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 subroutine get_thermLoad(ZsolQ, Therm_load)
 !
    use commonParam
@@ -384,7 +385,7 @@ subroutine get_thermLoad(ZsolQ, Therm_load)
    real(8) :: gs,gp,Is,Ip,Pp
    real(8) :: eta,Nex,Ngd,sum1,sum2
 !
-!---------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 !..get fields
    Es = ZsolQ(1:3)
@@ -424,5 +425,4 @@ subroutine get_thermLoad(ZsolQ, Therm_load)
    Therm_load = -Q_0*(gs*Is+gp*Ip)
 !
 end subroutine get_thermLoad
-!
-!---------------------------------------------------------------------
+

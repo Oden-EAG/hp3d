@@ -1,10 +1,10 @@
 !
 #include "typedefs.h"
 !
-!-------------------------
+!-------------------------------------------------------------------------------
 ! Routine: get_bgPol
 !
-! last modified: Apr 2019
+! last modified: June 2021
 !
 ! purpose: returns the background polarization
 !
@@ -16,7 +16,7 @@
 ! output:
 !           Bg_pol - value of background polarization
 !
-!-------------------------
+!-------------------------------------------------------------------------------
 subroutine get_bgPol(Dom_flag,Fld_flag,Delta_n,X, Bg_pol)
 !
    use commonParam
@@ -60,6 +60,8 @@ subroutine get_bgPol(Dom_flag,Fld_flag,Delta_n,X, Bg_pol)
    !real(8) :: phaseShift = 0.d0
    !real(8) :: phaseShift = PI / 2.d0
    real(8) :: phaseShift = PI
+!
+!-------------------------------------------------------------------------------
 !
    aux = 0.d0
    if (Dom_flag.eq.1) then
@@ -137,11 +139,11 @@ subroutine get_bgPol(Dom_flag,Fld_flag,Delta_n,X, Bg_pol)
 end subroutine get_bgPol
 !
 !
-!---------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 ! Routine: get_activePol
 !
-! last modified: Apr 2019
+! last modified: June 2021
 !
 ! purpose:  returns the active gain polarization
 !
@@ -154,7 +156,7 @@ end subroutine get_bgPol
 ! output:
 !           active_pol - value of active polarization
 !
-!---------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 subroutine get_activePol(ZsolQ,Fld_flag,Delta_n, Active_pol)
 !
    use commonParam
@@ -172,7 +174,7 @@ subroutine get_activePol(ZsolQ,Fld_flag,Delta_n, Active_pol)
    real(8) :: eta,Nex,Ngd,sum1,sum2,Is,Ip,Pp,g0,gain_ampl
    VTYPE   :: gain
 !
-!---------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 !..get fields
    Es = ZsolQ(1:3)
@@ -182,7 +184,7 @@ subroutine get_activePol(ZsolQ,Fld_flag,Delta_n, Active_pol)
 !
 !..compute signal irradiance
    call zz_cross_product(Es,conjg(Hs), ETimesHs)
-   Is = sqrt((real(EtimesHs(1))**2+real(EtimesHs(2))**2+real(EtimesHs(3))**2))
+   Is = sqrt(real(EtimesHs(1))**2+real(EtimesHs(2))**2+real(EtimesHs(3))**2)
 !
 !..compute pump irradiance
    Ip = 0.d0
@@ -192,7 +194,7 @@ subroutine get_activePol(ZsolQ,Fld_flag,Delta_n, Active_pol)
       Ip = Pp / (PI*R_CORE*R_CORE) ! calculate non-dimensional irradiance
    else
       call zz_cross_product(Ep,conjg(Hp), ETimesHp)
-      Ip = sqrt((real(EtimesHp(1))**2+real(EtimesHp(2))**2+real(EtimesHp(3))**2))
+      Ip = sqrt(real(EtimesHp(1))**2+real(EtimesHp(2))**2+real(EtimesHp(3))**2)
    endif
 !
    if (Is .eq. 0.d0 .or. Ip .eq. 0.d0) then
@@ -223,13 +225,13 @@ subroutine get_activePol(ZsolQ,Fld_flag,Delta_n, Active_pol)
       stop
    endif
 !
-!..Non-dimensional scaling factor for gain function
+!..non-dimensional scaling factor for gain function
    g0 = ACTIVE_GAIN*L_0*SIGMA_0*NU_0
    gain = g0 * gain * N_TOTAL
 !
  1500 format(I2,A,F10.6)
 !
-!..Compute active polarization term from gain function
+!..compute active polarization term from gain function
    active_pol = -(CORE_N+Delta_n*IDENTITY)*gain
 !
   60 continue
@@ -237,7 +239,7 @@ subroutine get_activePol(ZsolQ,Fld_flag,Delta_n, Active_pol)
 end subroutine get_activePol
 !
 !
-!--------------------------------------------------
+!-------------------------------------------------------------------------------
 !  subroutine: get_ramanPol
 !
 !  last modified: Mar 2019
@@ -247,18 +249,18 @@ end subroutine get_activePol
 !  input:      E,H        : electric and magnetic fields (L2 variables)
 !              domain flag: core - 1, cladding - 0
 !              field  flag: signal - 1, pump - 0
-!              Delta_n    : thermally induced refractive index perturbation
+!              Delta_n    : thermally-induced refractive index perturbation
 !
 !  output:
 !              raman_pol - value of Raman polarization
-!--------------------------------------------------
+!-------------------------------------------------------------------------------
 subroutine get_ramanPol(E,H,Dom_flag,Fld_flag,Delta_n, Raman_pol)
 !
    use commonParam
    use laserParam
 !
    implicit none
-!--------------------------------------------------
+!
    VTYPE  , intent(in)  :: E(3), H(3)
    integer, intent(in)  :: Dom_flag, Fld_flag
    real(8), intent(in)  :: Delta_n
@@ -267,11 +269,12 @@ subroutine get_ramanPol(E,H,Dom_flag,Fld_flag,Delta_n, Raman_pol)
    VTYPE :: EtimesH(3)
    VTYPE :: I
    integer :: j,k
-!--------------------------------------------------
 !
-!..Compute irradiance
+!-------------------------------------------------------------------------------
+!
+!..compute irradiance
    call zz_cross_product(E,conjg(H), EtimesH)
-   I = sqrt((real(EtimesH(1))**2+real(EtimesH(2))**2+real(EtimesH(3))**2))
+   I = sqrt(real(EtimesH(1))**2+real(EtimesH(2))**2+real(EtimesH(3))**2)
 !
    select case(Fld_flag)
       case(1)
@@ -285,7 +288,8 @@ subroutine get_ramanPol(E,H,Dom_flag,Fld_flag,Delta_n, Raman_pol)
          endif
          do j = 1,3; do k = 1,3
             if(real(Raman_pol(k,j)).gt.0.d0) then
-               write(*,*) ' get_ramanPol: for signal, Raman polarization must be purely real with negative real part. stop.'
+               write(*,*) ' get_ramanPol: for signal, Raman polarization', &
+                          ' must be purely real with negative real part. stop.'
                stop
             endif
          enddo; enddo
@@ -300,7 +304,8 @@ subroutine get_ramanPol(E,H,Dom_flag,Fld_flag,Delta_n, Raman_pol)
          endif
          do j = 1,3; do k = 1,3
             if(real(Raman_pol(k,j)).lt.0.d0) then
-               write(*,*) ' get_ramanPol: for pump, Raman polarization must be purely real with positive real part. stop.'
+               write(*,*) ' get_ramanPol: for pump, Raman polarization', &
+                          ' must be purely real with positive real part. stop.'
                stop
             endif
          enddo; enddo
