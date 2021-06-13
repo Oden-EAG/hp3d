@@ -187,11 +187,11 @@ subroutine set_initial_mesh(Nelem_order)
 !                 ...Dirichlet on heat
                      ibc(ifc,1) = 1
 !                 ...Dirichlet on heat flux (for input/output faces z=0,z=L)
-!                     if((ifc.eq.1) .or. (ifc.eq.2)) then
-!                        ibc(ifc,6) = 1
-!                     else
-!                        ibc(ifc,1) = 1
-!                     endif
+                     !if((ifc.eq.1) .or. (ifc.eq.2)) then
+                     !   ibc(ifc,6) = 1
+                     !else
+                     !   ibc(ifc,1) = 1
+                     !endif
 !                 ...Dirichlet on E-trace
                      ibc(ifc,2) = 1 ! Signal trace \hat E_s
                      ibc(ifc,4) = 1 ! Pump   trace \hat E_p
