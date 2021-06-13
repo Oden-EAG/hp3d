@@ -5,7 +5,7 @@
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision    - Oct 2019
+!    latest revision    - June 2021
 !
 !    purpose            - routine updates values of solution degrees
 !                         of freedom for Dirichlet nodes
@@ -63,6 +63,10 @@ subroutine update_Ddof()
    integer :: nod_cnt(NUM_PROCS)
    integer, allocatable :: nod_loc(:),nod_tmp(:),nod_glb(:),nod_rnk(:)
    VTYPE  , dimension(:,:), pointer :: buf
+!
+#if DEBUG_MODE
+   integer :: iprint = 0
+#endif
 !
 !-----------------------------------------------------------------------
 !
@@ -124,7 +128,7 @@ subroutine update_Ddof()
             if (loc.eq.0) then
 !
 !           ...check if the node has been updated
-               if (NODES(nod)%geom_interf.eq.0 .and. is_dirichlet(nod)) then
+               if (NODES(nod)%geom_interf.eq.0 .and. is_Dirichlet(nod)) then
                   nod_flg = .true.
                   goto 100
                endif
@@ -141,13 +145,13 @@ subroutine update_Ddof()
             if (.not.associated(NODES(nod)%dof))       cycle
             if (.not.associated(NODES(nod)%dof%zdofH)) cycle
             if (NODES(nod)%geom_interf.eq.1) cycle
-            if (is_dirichlet_attr(nod,'contin')) then
-               if (is_dirichlet_attr_homogeneous(nod,'contin')) then
-                  NODES(nod)%dof%zdofH = ZERO
-               else
-                  call dhpvert(mdle,iflag,no,xsub(1:3,iv),NODES(nod)%case, &
-                     NODES(nod)%dof%zdofH)
-               endif
+            if (is_Dirichlet_attr(nod,'contin')) then
+#if DEBUG_MODE
+               if (iprint.eq.1) write(*,7010) mdle,iv,nod
+          7010 format('update_Ddof: CALLING dhpvert FOR mdle,iv,nod = ',i8,i2,i8)
+#endif
+               call dhpvert(mdle,iflag,no,xsub(1:3,iv),NODES(nod)%case, &
+                            NODES(nod)%bcond, NODES(nod)%dof%zdofH)
                NODES(nod)%geom_interf=1
             endif
          enddo
@@ -166,32 +170,31 @@ subroutine update_Ddof()
             nod = nodesl(ind)
             if (.not.associated(NODES(nod)%dof)) cycle
             if (NODES(nod)%geom_interf.eq.1)     cycle
-            if (is_dirichlet_attr(nod,'contin')) then
+            if (is_Dirichlet_attr(nod,'contin')) then
 !           ...update H1 Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofH)) then
-                  if (is_dirichlet_attr_homogeneous(nod,'contin')) then
-                     NODES(nod)%dof%zdofH = ZERO
-                  else
-                     call dhpedgeH(mdle,iflag,no,xsub,                  &
-                                   etype,NODES(nod)%case,               &
-                                   nedge_orient,nface_orient,norder,ie, &
-                                   zdofH, NODES(nod)%dof%zdofH)
-                  endif
+#if DEBUG_MODE
+                  if (iprint.eq.1) write(*,7020) mdle,ie,nod
+             7020 format('update_Ddof: CALLING dhpedgeH FOR mdle,ie,nod = ',i8,i2,i8)
+#endif
+                  call dhpedgeH(mdle,iflag,no,xsub,                     &
+                                etype,NODES(nod)%case,NODES(nod)%bcond, &
+                                nedge_orient,nface_orient,norder,ie,    &
+                                zdofH, NODES(nod)%dof%zdofH)
                endif
                NODES(nod)%geom_interf=1
             endif
-            if (is_dirichlet_attr(nod,'tangen')) then
+            if (is_Dirichlet_attr(nod,'tangen')) then
 !           ...update H(curl) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofE)) then
-                  if (is_dirichlet_attr_homogeneous(nod,'tangen')) then
-                     NODES(nod)%dof%zdofE = ZERO
-                  else
-                     call dhpedgeE(mdle,iflag,no,xsub,                  &
-                                   etype,NODES(nod)%case,               &
-                                   nedge_orient,nface_orient,norder,ie, &
-                                   NODES(nod)%dof%zdofE)
-
-                  endif
+#if DEBUG_MODE
+                  if (iprint.eq.1) write(*,7030) mdle,ie,nod
+             7030 format('update_Ddof: CALLING dhpedgeE FOR mdle,ie,nod = ',i8,i2,i8)
+#endif
+                  call dhpedgeE(mdle,iflag,no,xsub,                     &
+                                etype,NODES(nod)%case,NODES(nod)%bcond, &
+                                nedge_orient,nface_orient,norder,ie,    &
+                                NODES(nod)%dof%zdofE)
                endif
                NODES(nod)%geom_interf=1
             endif
@@ -211,46 +214,45 @@ subroutine update_Ddof()
             nod = nodesl(ind)
             if (.not.associated(NODES(nod)%dof)) cycle
             if (NODES(nod)%geom_interf.eq.1)     cycle
-            if (is_dirichlet_attr(nod,'contin')) then
+            if (is_Dirichlet_attr(nod,'contin')) then
 !           ...update H1 Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofH)) then
-                  if (is_dirichlet_attr_homogeneous(nod,'contin')) then
-                     NODES(nod)%dof%zdofH = ZERO
-                  else
-                     call dhpfaceH(mdle,iflag,no,xsub,                   &
-                                   etype,NODES(nod)%case,                &
-                                   nedge_orient,nface_orient,norder,ifc, &
-                                   zdofH, NODES(nod)%dof%zdofH)
-                  endif
+#if DEBUG_MODE
+                  if (iprint.eq.1) write(*,7040) mdle,ifc,nod
+             7040 format('update_Ddof: CALLING dhpfaceH FOR mdle,ifc,nod = ',i8,i2,i8)
+#endif
+                  call dhpfaceH(mdle,iflag,no,xsub,                     &
+                                etype,NODES(nod)%case,NODES(nod)%bcond, &
+                                nedge_orient,nface_orient,norder,ifc,   &
+                                zdofH, NODES(nod)%dof%zdofH)
                endif
                NODES(nod)%geom_interf=1
             endif
-            if (is_dirichlet_attr(nod,'tangen')) then
+            if (is_Dirichlet_attr(nod,'tangen')) then
 !           ...update H(curl) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofE)) then
-                  if (is_dirichlet_attr_homogeneous(nod,'tangen')) then
-                     NODES(nod)%dof%zdofE = ZERO
-                  else
-                     call dhpfaceE(mdle,iflag,no,xsub,                   &
-                                   etype,NODES(nod)%case,                &
-                                   nedge_orient,nface_orient,norder,ifc, &
-                                   zdofE, NODES(nod)%dof%zdofE)
-
-                  endif
+#if DEBUG_MODE
+                  if (iprint.eq.1) write(*,7050) mdle,ifc,nod
+             7050 format('update_Ddof: CALLING dhpfaceE FOR mdle,ifc,nod = ',i8,i2,i8)
+#endif
+                  call dhpfaceE(mdle,iflag,no,xsub,                     &
+                                etype,NODES(nod)%case,NODES(nod)%bcond, &
+                                nedge_orient,nface_orient,norder,ifc,   &
+                                zdofE, NODES(nod)%dof%zdofE)
                endif
                NODES(nod)%geom_interf=1
             endif
-            if (is_dirichlet_attr(nod,'normal')) then
+            if (is_Dirichlet_attr(nod,'normal')) then
 !           ...update H(div) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofV)) then
-                  if (is_dirichlet_attr_homogeneous(nod,'normal')) then
-                     NODES(nod)%dof%zdofV = ZERO
-                  else
-                     call dhpfaceV(mdle,iflag,no,xsub,                   &
-                                   etype,NODES(nod)%case,                &
-                                   nedge_orient,nface_orient,norder,ifc, &
-                                   NODES(nod)%dof%zdofV)
-                  endif
+#if DEBUG_MODE
+                  if (iprint.eq.1) write(*,7060) mdle,ifc,nod
+             7060 format('update_Ddof: CALLING dhpfaceV FOR mdle,ifc,nod = ',i8,i2,i8)
+#endif
+                  call dhpfaceV(mdle,iflag,no,xsub,                     &
+                                etype,NODES(nod)%case,NODES(nod)%bcond, &
+                                nedge_orient,nface_orient,norder,ifc,   &
+                                NODES(nod)%dof%zdofV)
                endif
                NODES(nod)%geom_interf=1
             endif
@@ -324,7 +326,7 @@ subroutine update_Ddof()
 !     ...check if the node has been updated
          if (loc.eq.0 .and. NODES(nod)%geom_interf.eq.0  &
                       .and. NODES(nod)%visit      .eq.0  &
-                      .and. is_dirichlet(nod)     ) then
+                      .and. is_Dirichlet(nod)     ) then
             NODES(nod)%visit = 1
             if(j_loc .ge. loc_max) then
                loc_max = loc_max*2

@@ -289,7 +289,7 @@ c  .............substitute new local coordinates
                   enddo
                   call compute_face(Numlev,Mdle,If,
      .                              Nedge_orient,Nface_orient,Norder,
-     .                              Xnod,ZdofH,t,
+     .                              Xnod,ZdofH,ZdofE,ZdofV,ZdofQ,t,
      .                              xcoord(1:3,k),val(k))
 c
 c  ...............transform the coordinates to observer's system

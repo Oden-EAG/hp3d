@@ -147,7 +147,8 @@ c
 
       subroutine matinv(n,na,a,ip,Work)
 #include "syscom.blk"
-      dimension a(na,n),ip(n),Work(n)
+      real a(na,n),Work(n)
+      integer ip(n)
 
       do 10 i=n,2,-1
       a(i,i)=1/a(i,i)

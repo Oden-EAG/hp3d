@@ -46,19 +46,18 @@ subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
    real(8),dimension(  MAXEQNQ,3  ) ::  dvalQ
    real(8),dimension(  MAXEQNQ,3,3) :: d2valQ
 !
-!..printing flag
-   integer :: iprint
+#if DEBUG_MODE
+   integer :: iprint = 0
+#endif
 !
 !--------------------------------------------------------------------
-!
-   iprint = 0
 !
 !..initialize
    ValH = ZERO; DvalH = ZERO
    ValE = ZERO; DvalE = ZERO
    ValV = ZERO; DvalV = ZERO
 !
-! NEXACT:
+!  NEXACT:
 !  0: unknown exact solution
 !  1:   known exact solution
    select case(NEXACT)
