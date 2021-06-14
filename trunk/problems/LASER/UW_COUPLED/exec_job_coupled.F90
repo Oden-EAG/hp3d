@@ -356,34 +356,29 @@ subroutine exec_job_coupled
 !..end time-stepping loop
    enddo
 !
-!!..Last step only display (no refinement)
-!   QUIET_MODE = .true.; IPRINT_TIME = 0
-!   if (RANK.eq.ROOT) write(*,4200) '   Pump residual:'
-!   NO_PROBLEM = 4
-!   call set_physAm(NO_PROBLEM, physNick,flag)
-!   call residual(res)
-!!
-!   if (RANK.eq.ROOT) write(*,4200) '   Signal residual:'
-!   NO_PROBLEM = 3
-!   call set_physAm(NO_PROBLEM, physNick,flag)
-!   call residual(res)
-!   QUIET_MODE = .false.; IPRINT_TIME = 1
-!!
-!   if (RANK.eq.ROOT) then
-!      write(*,*) 'L2NormDiff/FieldNormQ:'
-!      do j=1,i
-!         write(*,4241) L2NormDiffIter(j)
-! 4241    format(es14.5)
-!      enddo
-!   endif
-!!
-!!..compute power in fiber for signal and pump field
-!   if(RANK .eq. ROOT) write(*,200) '7. computing power...'
-!   numPts = 2**IMAX; fld = 2
-!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-!   call get_power(fld,numPts,-1)
-!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
-!   if(RANK .eq. ROOT) write(*,300) end_time - start_time
+!..compute final residual values (if not previously computed)
+   if (.not. ires) then
+      QUIET_MODE = .true.; IPRINT_TIME = 0
+      if (RANK.eq.ROOT) write(*,4200) '   Pump residual:'
+      NO_PROBLEM = 4
+      call set_physAm(NO_PROBLEM, physNick,flag)
+      call residual(res)
+!
+      if (RANK.eq.ROOT) write(*,4200) '   Signal residual:'
+      NO_PROBLEM = 3
+      call set_physAm(NO_PROBLEM, physNick,flag)
+      call residual(res)
+      QUIET_MODE = .false.; IPRINT_TIME = 1
+   endif
+!
+!..display stats
+   if (RANK.eq.ROOT) then
+      write(*,*) 'L2NormDiff/FieldNormQ:'
+      do j=1,i
+         write(*,4241) L2NormDiffIter(j)
+ 4241    format(es14.5)
+      enddo
+   endif
 !
 !
   100 format(/,'/////////////////////////////////////////////////////////////', &

@@ -274,6 +274,7 @@ subroutine exec_job_nl
 !
 !..compute final residual values (if not previously computed)
    if (.not. ires) then
+      QUIET_MODE = .true.; IPRINT_TIME = 0
       if (RANK.eq.ROOT) write(*,4200) '   Pump residual:'
       NO_PROBLEM = 4
       call set_physAm(NO_PROBLEM, physNick,flag)
@@ -283,6 +284,7 @@ subroutine exec_job_nl
       NO_PROBLEM = 3
       call set_physAm(NO_PROBLEM, physNick,flag)
       call residual(SignalRes(i))
+      QUIET_MODE = .false.; IPRINT_TIME = 1
    endif
 !
 !..display stats
