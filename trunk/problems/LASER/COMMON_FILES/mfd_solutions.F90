@@ -2,7 +2,7 @@
 !> Purpose : exact (manufactured) solution
 !
 !> @param[in]  Xp  - a point in physical space
-!> @param[in]  Fld - 0: signal field, 1: pump field
+!> @param[in]  Fld - 0: pump field, 1: signal field
 !> @param[out] E   - value of the solution (one electric field component)
 !> @param[out] dE  - corresponding first derivatives
 !> @param[out] d2E - corresponding second derivatives
@@ -70,6 +70,11 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !--------------------------------------------------------------------------------
 !
    x1 = Xp(1); x2 = Xp(2); x3 = Xp(3)
+!
+   if (Fld.ne.0 .and. Fld.ne.1) then
+      write(*,*) 'mfd_solutions: Fld_flag = ',Fld,'. stop.'
+      return
+   endif
 !
 !--------------- 1st prob -------------------------------------------------------
 !..a polynomial solution
@@ -327,14 +332,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !
       x1 = Xp(1); x2 = Xp(2); x3 = Xp(3);
 !
-      if (NO_PROBLEM .eq. 3) then
-         call get_Beta(Xp,1, zbeta,zdbeta,zd2beta)
-      elseif (NO_PROBLEM .eq. 4) then
-         call get_Beta(Xp,0, zbeta,zdbeta,zd2beta)
-      else
-         write(*,*) 'mfd_solutions: fld_flag unknown. stop.'
-         stop
-      endif
+      call get_Beta(Xp,Fld, zbeta,zdbeta,zd2beta)
 !
       f_x=-ZI*(OMEGA/PI)*sin(PI*x1)
       f_y= 1.d0
@@ -398,7 +396,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !
 !  ...LMA fiber
 !  ...LP01 (signal) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
-      if (Fld .eq. 0) then
+      if (Fld .eq. 1) then
          ampl =  1.0d0
          ! Signal laser frequency (active gain)
          if (LAMBDA_SIGNAL .eq. 1064.0d-9/L_0) then
@@ -438,7 +436,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
       endif
 !
 !  ...LP01 (pump) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.0976
-      if (Fld .eq. 1) then
+      if (Fld .eq. 0) then
          ampl =  2.0d0
          ! Pump frequency (active gain)
          if (LAMBDA_PUMP .eq. 976.0d-9/L_0) then
@@ -473,6 +471,11 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !..LP11 mode in dielectric waveguide
    elseif (ISOL .eq. 14 .or. ISOL .eq. 140) then
 !
+      if (Fld .ne. 1) then
+         write(*,*) 'mfd_solutions: unexpected Fld_flag. stop.'
+         stop
+      endif
+!
 !  ...LMA fiber
 !  ...LP11 (signal) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
       ampl =  1.0d0
@@ -503,6 +506,11 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !--------------- 15th prob -------------------------------------------------------
 !..LP21 mode in dielectric waveguide
    elseif (ISOL .eq. 15 .or. ISOL .eq. 150) then
+!
+      if (Fld .ne. 1) then
+         write(*,*) 'mfd_solutions: unexpected Fld_flag. stop.'
+         stop
+      endif
 !
 !  ...LMA fiber
 !  ...LP21 (signal) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
@@ -535,6 +543,11 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !..LP02 mode in dielectric waveguide
    elseif (ISOL .eq. 16) then
 !
+      if (Fld .ne. 1) then
+         write(*,*) 'mfd_solutions: unexpected Fld_flag. stop.'
+         stop
+      endif
+!
 !  ...LMA fiber
 !  ...LP02 (signal) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
       ampl =  1.0d0
@@ -562,6 +575,11 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !--------------- 17th prob -------------------------------------------------------
 !..Mixed LP01/LP11/LP21/LP02 mode in dielectric waveguide
    elseif (ISOL .eq. 17) then
+!
+      if (Fld .ne. 1) then
+         write(*,*) 'mfd_solutions: unexpected Fld_flag. stop.'
+         stop
+      endif
 !
       E01 = 0.d0; dE01 = 0.d0
       E11 = 0.d0; dE11 = 0.d0
@@ -685,6 +703,11 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !..LP12 mode in dielectric waveguide
    elseif (ISOL .eq. 18) then
 !
+      if (Fld .ne. 1) then
+         write(*,*) 'mfd_solutions: unexpected Fld_flag. stop.'
+         stop
+      endif
+!
 !  ...LMA fiber
 !  ...LP12 (signal) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
       k    = 85.5944d0
@@ -732,7 +755,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !  ...LP01 (signal) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
       select case(Fld)
 !     ...signal field
-         case(0)
+         case(1)
             if (ICOMP_TS .eq. 1) then
 !              with CORE_NX = 1.4512
 !              with CLAD_NX = 1.4500
@@ -765,7 +788,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
             call get_LP01(Xp,ampl,k,gamm,beta, E,dE)
 !
 !     ...pump field (LP01)
-         case(1)
+         case(0)
             if (ICOMP_TS .eq. 1) then
 !              with CORE_NX = 1.4512
 !              with CLAD_NX = 1.4500
@@ -793,7 +816,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
             call get_LP01(Xp,ampl,k,gamm,beta, E,dE)
 !
          case default
-            write(*,*) 'mfd_solutions: fld_flag invalid. stop.'
+            write(*,*) 'mfd_solutions: Fld_flag invalid. stop.'
             stop
       end select
 !
@@ -815,7 +838,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !
       select case(Fld)
 !     ...signal field
-         case(0)
+         case(1)
             ! compute signal power oscillation (1% up/down)
             ! ..if 'modified' activated
             cc = 1.0d0
@@ -864,7 +887,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
             endif
 !
 !     ...pump field LP01 (E_x)
-         case(1)
+         case(0)
             ! compute increasing pump power
             ! ..if 'modified' activated
             cc = 1.0d0
@@ -907,7 +930,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
                !call get_LP11b(Xp,ampl,k,gamm,beta, E,dE)
             endif
          case default
-            write(*,*) 'mfd_solutions: fld_flag invalid. stop.'
+            write(*,*) 'mfd_solutions: Fld_flag invalid. stop.'
             stop
       end select
 !..endif ISOL

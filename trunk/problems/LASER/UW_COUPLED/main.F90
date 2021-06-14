@@ -188,9 +188,13 @@ program main
    PHYSAi(1:6) = (/.false.,.true.,.true.,.true.,.false.,.false./)
 !
 !..set homogeneous Dirichlet flags
-   PHYSAd(1:6) = (/.true.,.false.,.false.,.true.,.false.,.false./)
+   if (NEXACT.eq.0) then
+      PHYSAd(1:6) = (/.true.,.false.,.false.,.true.,.false.,.false./)
+   endif
 !
 !..By default, solve Maxwell for signal field
+!  (note: NO_PROBLEM and PHYSAm(:) flags are used in updating Dirichlet BCs)
+!         NO_PROBLEM: 2 - heat, 3 - signal, 4 - pump
    NO_PROBLEM = 3
    PHYSAm(1:6) = (/.false.,.true.,.false.,.false.,.true.,.false./)
 !

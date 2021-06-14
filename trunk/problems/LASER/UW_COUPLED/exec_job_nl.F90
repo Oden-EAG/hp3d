@@ -145,6 +145,16 @@ subroutine exec_job_nl
 !..update geometry degrees of freedom for current mesh
    call update_gdof
 !
+!..update Dirichlet DOFs for signal field
+   NO_PROBLEM = 3
+   call set_physAm(NO_PROBLEM, physNick,flag)
+   call update_Ddof
+!
+!..update Dirichlet DOFs for pump field
+   NO_PROBLEM = 4
+   call set_physAm(NO_PROBLEM, physNick,flag)
+   call update_Ddof
+!
 !..set stopping criterion for nonlinear iteration
    stopEpsilon = 1.0d-4
    L2NormDiff = 1.d0
@@ -201,7 +211,6 @@ subroutine exec_job_nl
       if (RANK.eq.ROOT) write(*,4200) '   Signal solve..'
       NO_PROBLEM = 3
       call set_physAm(NO_PROBLEM, physNick,flag)
-      !call update_Ddof ! TODO: not needed, unless updateDdof uses PHYSAm
       if (NUM_PROCS .eq. 1) then
          call pardiso_sc('H')
       else
@@ -223,7 +232,6 @@ subroutine exec_job_nl
       if (RANK.eq.ROOT) write(*,4200) '   Pump solve..'
       NO_PROBLEM = 4
       call set_physAm(NO_PROBLEM, physNick,flag)
-      !call update_Ddof ! TODO: not needed, unless updateDdof uses PHYSAm
       if (NUM_PROCS .eq. 1) then
          call pardiso_sc('H')
       else

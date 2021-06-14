@@ -371,7 +371,9 @@ subroutine get_power(Fld,NumPts,FileIter)
 !..Print signal power output values
    if((Fld.eq.2) .and. (COPUMP.eq.0)) then
 !  ...explicitly set signal power on dirichlet face at fiber output to zero
-!     since signal dirichlet dofs are not correct when pump was computed latest
+!     since signal Dirichlet DOFs are not correct when pump field was computed
+!     last with counter-pumped configuration
+!     TODO: this issue should now be resolved (VERIFY)
       sign_power(NumPts) = 0.d0
    endif
    if (Fld .eq. 1 .or. Fld .eq. 2) then

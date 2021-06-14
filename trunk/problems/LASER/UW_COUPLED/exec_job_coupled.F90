@@ -51,6 +51,8 @@ subroutine exec_job_coupled
 !
    NO_PROBLEM = 3
    call set_physAm(NO_PROBLEM, physNick,flag)
+!
+!..set .true. to compute the residual in all steps
    ires = .true.
 !
    if(RANK .eq. ROOT) then
@@ -88,10 +90,11 @@ subroutine exec_job_coupled
 !
       if (NUM_PROCS .eq. 1) cycle
 !
-      if (i .eq. IMAX-3) then
-         call zoltan_w_set_lb(7)
+!  ...set partitioner for load balancing, redistributes mesh in 'distr_mesh'
+      if (i .eq. IMAX-2) then
+         call zoltan_w_set_lb(7) ! fiber partitioner
       else
-         goto 30
+         goto 30 ! no load balancing
       endif
 !
 !  ...distribute mesh
@@ -174,13 +177,11 @@ subroutine exec_job_coupled
       else
          if (RANK.eq.ROOT) write(*,4200) ' Solving the heat equation...'
       endif
-      if (RANK.eq.ROOT) write(*,*) ''
-      ! TODO: call update_Ddof here instead of three times below.
-      !PHYSAm = .true.
-      call update_Ddof ! (update since BCs may be time-dependent)
+!
       NO_PROBLEM = 2
       call set_physAm(NO_PROBLEM, physNick,flag)
-      !call update_Ddof ! update heat Ddof TODO: remove if update_Ddof not using PHYSAm
+      if (RANK.eq.ROOT) write(*,4200) ' Updating heat Dirichlet DOFs...'
+      call update_Ddof
       if (time_step .gt. 0) then
          if (NUM_PROCS .eq. 1) then
             call pardiso_sc('H')
@@ -196,7 +197,7 @@ subroutine exec_job_coupled
 !
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
 !
-!  ...activate to compute maxwell problem only in the initial time step
+!  ...activate to compute Maxwell problem only in the initial time step
       !if (time_step .ge. 1 .and. time_step .lt. 100) then
 !      if (time_step .ge. 1 .and. time_step .lt. 10) then
 !         iParAttr = (/1,0,0,0,0,0/)
@@ -208,6 +209,18 @@ subroutine exec_job_coupled
 !  ...solve nonlinear Maxwell loop for SIGNAL and PUMP
       L2NormDiff = 1.d0
       FieldNormQ = 1.d0
+!
+!  ...update Dirichlet DOFs for signal field
+      if (RANK.eq.ROOT) write(*,4200) ' Updating signal Dirichlet DOFs...'
+      NO_PROBLEM = 3
+      call set_physAm(NO_PROBLEM, physNick,flag)
+      call update_Ddof
+!
+!  ...update Dirichlet DOFs for pump field
+      if (RANK.eq.ROOT) write(*,4200) ' Updating pump Dirichlet DOFs...'
+      NO_PROBLEM = 4
+      call set_physAm(NO_PROBLEM, physNick,flag)
+      call update_Ddof
 !
 !  ...do until stopping criterion is satisfied
       if (RANK.eq.ROOT) write(*,4200) '---------------------------------------------'
@@ -222,8 +235,8 @@ subroutine exec_job_coupled
       do
 !
 !     ...check stopping criterion
-         L2NormDiffIter(i+1) = L2NormDiff/FieldNormQ
          if (i .eq. 0) goto 405
+         L2NormDiffIter(i) = L2NormDiff/FieldNormQ
          if((L2NormDiff/FieldNormQ).lt.(stopEpsilon)) then
             if (RANK .eq. ROOT) then
                write(*,4230) '   ', L2NormDiff/FieldNormQ, ' < ', stopEpsilon
@@ -254,18 +267,19 @@ subroutine exec_job_coupled
          if (RANK.eq.ROOT) write(*,*) '   Signal solve...'
          NO_PROBLEM = 3
          call set_physAm(NO_PROBLEM, physNick,flag)
-         !call update_Ddof ! update signal Ddof TODO: remove if update_Ddof not using PHYSAm
          if (NUM_PROCS .eq. 1) then
             call pardiso_sc('H')
          else
             call par_nested('H')
          endif
-        QUIET_MODE = .true.; IPRINT_TIME = 0
-        if (RANK.eq.ROOT) write(*,*)
-        if (RANK.eq.ROOT) write(*,*) '   Signal residual:'
-        call residual(res)
-         if (RANK.eq.ROOT) write(*,*)
-        QUIET_MODE = .false.; IPRINT_TIME = 1
+!
+!     ...compute signal residual
+         if (ires) then
+            QUIET_MODE = .true.; IPRINT_TIME = 0
+            if (RANK.eq.ROOT) write(*,4200) '   Signal residual:'
+            call residual(res)
+            QUIET_MODE = .false.; IPRINT_TIME = 1
+         endif
 !
 !     ...assuming pump plane wave
          if (FAKE_PUMP .eq. 1) then
@@ -277,17 +291,19 @@ subroutine exec_job_coupled
          if (RANK.eq.ROOT) write(*,*) '   Pump solve...'
          NO_PROBLEM = 4
          call set_physAm(NO_PROBLEM, physNick,flag)
-         !call update_Ddof ! update pump Ddof TODO: remove if update_Ddof not using PHYSAm
          if (NUM_PROCS .eq. 1) then
             call pardiso_sc('H')
          else
             call par_nested('H')
          endif
-        QUIET_MODE = .true.; IPRINT_TIME = 0
-         if (RANK.eq.ROOT) write(*,*)
-        if (RANK.eq.ROOT) write(*,*) '   Pump residual:'
-        call residual(res)
-        QUIET_MODE = .false.; IPRINT_TIME = 1
+!
+!     ...compute pump residual
+         if (ires) then
+            QUIET_MODE = .true.; IPRINT_TIME = 0
+            if (RANK.eq.ROOT) write(*,4200) '   Pump residual:'
+            call residual(res)
+            QUIET_MODE = .false.; IPRINT_TIME = 1
+         endif
 !
    410   continue
 !
@@ -342,14 +358,12 @@ subroutine exec_job_coupled
 !
 !!..Last step only display (no refinement)
 !   QUIET_MODE = .true.; IPRINT_TIME = 0
-!   if (RANK.eq.ROOT) write(*,*)
-!   if (RANK.eq.ROOT) write(*,*) '   Pump residual:'
+!   if (RANK.eq.ROOT) write(*,4200) '   Pump residual:'
 !   NO_PROBLEM = 4
 !   call set_physAm(NO_PROBLEM, physNick,flag)
 !   call residual(res)
 !!
-!   if (RANK.eq.ROOT) write(*,*)
-!   if (RANK.eq.ROOT) write(*,*) '   Signal residual:'
+!   if (RANK.eq.ROOT) write(*,4200) '   Signal residual:'
 !   NO_PROBLEM = 3
 !   call set_physAm(NO_PROBLEM, physNick,flag)
 !   call residual(res)
@@ -357,7 +371,7 @@ subroutine exec_job_coupled
 !!
 !   if (RANK.eq.ROOT) then
 !      write(*,*) 'L2NormDiff/FieldNormQ:'
-!      do j=1,i+1
+!      do j=1,i
 !         write(*,4241) L2NormDiffIter(j)
 ! 4241    format(es14.5)
 !      enddo
