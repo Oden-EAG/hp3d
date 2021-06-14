@@ -379,6 +379,9 @@
 !  .............update node local counter
                 nvarV = nvarV + 1
 !
+!  .............do not write dof if physics attribute is deactivated
+                if (.not. PHYSAm(i)) exit
+!
 !  .............store Dirichlet dof
                 if (ibcnd(ic).eq.1) ZnodV(nvarV,1:ndofV_face) = zuV(1:ndofV_face,ivarV)
               endif

@@ -95,8 +95,13 @@ subroutine dhpvert(Mdle,Iflag,No,Xi,Icase,Bcond, ZdofH)
 !              ...if the variable is supported by the node
                   if (ncase(iphys).eq.1) then
 !
-!                 ...update the H1 variable counter and store the dof
+!                 ...update the H1 variable counter
                      nvarH=nvarH+1
+!
+!                 ...do not write dof if physics attribute is deactivated
+                     if (.not. PHYSAm(iphys)) exit
+!
+!                 ...store Dirichlet dof
                      if (ibcnd(ic).eq.1) ZdofH(nvarH) = zvalH(ivarH)
                   endif
             end select

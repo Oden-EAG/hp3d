@@ -368,6 +368,9 @@
 !  .............update node local counter
                 nvarE = nvarE + 1
 !
+!  .............do not write dof if physics attribute is deactivated
+                if (.not. PHYSAm(i)) exit
+!
 !  .............store Dirichlet dof
                 if (ibcnd(ic).eq.1) ZnodE(nvarE,1:ndofE_edge) = zuE(1:ndofE_edge,ivarE)
 !
