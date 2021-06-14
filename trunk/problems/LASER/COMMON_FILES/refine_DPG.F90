@@ -181,7 +181,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
 !$OMP END PARALLEL DO
 !
    resid_tot = 0.d0; error_tot = 0.d0; rnorm_tot = 0.d0
-   if (DISTRIBUTED .and. (.not. HOST_MESH)) then
+   if (DISTRIBUTED) then
       count = 1
       call MPI_ALLREDUCE(resid_subd,resid_tot,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
       call MPI_ALLREDUCE(error_subd,error_tot,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
