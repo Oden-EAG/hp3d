@@ -84,9 +84,9 @@ subroutine set_initial_mesh(Nelem_order)
 !     ...no neighbor, set the BC flags
          if (neig .eq. 0) then
             select case(ifc)
-               case(1)
+               case(1) ! bottom
                   ibc(ifc,1) = 1; ibc(ifc,2) = 1; ibc(ifc,3) = 2
-               case(2)
+               case(2) ! top
                   ibc(ifc,1) = 2; ibc(ifc,2) = 2; ibc(ifc,3) = 1
                case(3,4,5,6)
                   ibc(ifc,1:3) = 2
