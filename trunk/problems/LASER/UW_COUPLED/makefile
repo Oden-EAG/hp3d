@@ -2,10 +2,14 @@
 
 -include ../../../m_options
 
-COMPLEX    = 1
+COMPLEX   ?= 1
 DEBUG     ?= 0
 
-ifeq ($(DEBUG),YES)
+ifeq ($(COMPLEX),0)
+$(error COMPLEX FLAG MUST BE 1 FOR LASER APPLICATION)
+endif
+
+ifeq ($(DEBUG),1)
 FFLAGS += -gen-interface -warn none -warn interfaces
 endif
 
