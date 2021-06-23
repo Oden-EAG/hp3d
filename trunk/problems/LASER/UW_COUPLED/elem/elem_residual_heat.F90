@@ -119,16 +119,18 @@ subroutine elem_residual_heat(Mdle,                &
 !..various variables for the problem
    real(8) :: rjac,weight,wa
    real(8) :: bjac
-   integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,j,nint,nint3,iflag,kE,k,iprint,l
+   integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,j,nint,nint3,iflag,kE,k,l
    integer :: nordP,nsign,ifc,info,icomp,nrdof
+!
+#if DEBUG_MODE
+   integer :: iprint = 0
+#endif
 !
 !..for Gram matrix compressed storage format
    integer :: nk
    nk(k1,k2) = (k2-1)*k2/2+k1
 !
 !-----------------------------------------------------------------------
-!
-   iprint = 0
 !
 !..element type
    etype = NODES(Mdle)%type
@@ -153,14 +155,16 @@ subroutine elem_residual_heat(Mdle,                &
 !..determine solution dof
    call solelm(Mdle, zdofH,zdofE,zdofV,zdofQ)
 !
-!   if (iprint.eq.1) then
-!      write(*,7020) xnod(1,1:8),xnod(2,1:8),xnod(3,1:8)
-!7020  format('elem_residual_heat: xnod  = ',8(f8.3,2x), &
-!       2(  /,'                            ',8(f8.3,2x)))
-!      write(*,7030) zdofH(1,1:8),zdofV(1,1:6)
-!7030  format('elem_residual_heat: zdofH = ',8(e12.5,2x), &
-!           /,'                    zdofV = ',6(e12.5,2x))
-!   endif
+#if DEBUG_MODE
+   if (iprint.eq.1) then
+      write(*,7020) xnod(1,1:8),xnod(2,1:8),xnod(3,1:8)
+7020  format('elem_residual_heat: xnod  = ',8(f8.3,2x), &
+       2(  /,'                            ',8(f8.3,2x)))
+      write(*,7030) zdofH(1,1:8),zdofV(1,1:6)
+7030  format('elem_residual_heat: zdofH = ',8(e12.5,2x), &
+           /,'                    zdofV = ',6(e12.5,2x))
+   endif
+#endif
 !
 !..allocate space for auxiliary matrices
    allocate(gramP(NrTest*(NrTest+1)/2))
@@ -232,6 +236,10 @@ subroutine elem_residual_heat(Mdle,                &
 !     ...account for short fiber scaling (anisotropic diffusion operator)
          if (ANISO_HEAT .eq. 1) then
             rgradH(3) = ALPHA_Z*ALPHA_Z*rgradH(3)
+         elseif (NO_PROBLEM.eq.2 .and. USE_PML .and. &
+                 x(3).ge.(ZL-2.0*PML_FRAC*ZL)) then
+!        ...reduce artificial cooling from PML
+            rgradH(3) = ALPHA_Z*ALPHA_Z*rgradH(3)
          endif
 !
 !     ...residual for single step of heat equation
@@ -256,6 +264,10 @@ subroutine elem_residual_heat(Mdle,                &
             select case(INNER_PRODUCT)
                case(1)
                   if (ANISO_HEAT .eq. 1) then
+                     dv2(3) = ALPHA_Z*ALPHA_Z*dv2(3)
+                  elseif (NO_PROBLEM.eq.2 .and. USE_PML .and. &
+                          x(3).ge.(ZL-2.0*PML_FRAC*ZL)) then
+!                 ...reduce artificial cooling from PML
                      dv2(3) = ALPHA_Z*ALPHA_Z*dv2(3)
                   endif
                   gramP(k) = gramP(k) &
@@ -354,13 +366,15 @@ subroutine elem_residual_heat(Mdle,                &
             bload_H(k1) = bload_H(k1) - DELTA_T*ALPHA_0*rsolVn*v1*weight
          enddo
       enddo
-      if (iprint.eq.1) call pause
    enddo
+!
+#if DEBUG_MODE
    if (iprint.ge.1) then
       write(*,7015) bload_H(1:NrTest)
 7015  format('elem_residual_heat: FINAL bload_H = ',10(/,10(e12.5,2x)))
       call pause
    endif
+#endif
 !
 !-----------------------------------------------------------------------
 !
@@ -390,11 +404,14 @@ subroutine elem_residual_heat(Mdle,                &
       Resid = Resid + bload_Hc(k)*bload_H(k)
    enddo
    Nref_flag = 111
+!
+#if DEBUG_MODE
    if (iprint.ge.1) then
       write(*,7010) Mdle, Resid
  7010 format('elem_residual_heat: Mdle, Resid = ',i5,3x,e12.5)
       call pause
    endif
+#endif
 !
 end subroutine elem_residual_heat
-!
+

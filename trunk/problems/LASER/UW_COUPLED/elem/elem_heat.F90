@@ -346,16 +346,16 @@ subroutine elem_heat(Mdle,                   &
 !
 !     ...EXTENDED LOAD VECTOR
          select case(NO_PROBLEM)
-            case(1)
+            case(1) ! linear heat problem
                bload_H(k1) = bload_H(k1) + rfval*v1*weight
-            case(2)
+            case(2) ! coupled heat problem
                bload_H(k1) = bload_H(k1) +            &
                              ( rsolH + DELTA_T*therm_Load &
                              )*v1*weight
 !           ...do not solve for heat equation in PML
-               if(COPUMP.eq.1) then
-                  if(x(3).ge.PML_REGION) bload_H(k1) = rZERO
-               elseif(COPUMP.eq.0) then
+               if (COPUMP.eq.1) then
+                  if (USE_PML .and. x(3).ge.PML_REGION) bload_H(k1) = rZERO
+               elseif (COPUMP.eq.0) then
                   write(*,*) 'elem_heat: heat equation not enabled for counter pump configuration. stop.'
                   stop
                endif
@@ -382,6 +382,10 @@ subroutine elem_heat(Mdle,                   &
                case(1)
                   if (ANISO_HEAT .eq. 1) then
                      dv2(3) = ALPHA_Z*ALPHA_Z*dv2(3)
+                  elseif (NO_PROBLEM.eq.2 .and. USE_PML .and. &
+                          x(3).ge.(ZL-2.d0*PML_FRAC*ZL)) then
+!              ...reduce artificial cooling from PML
+                     dv2(3) = ALPHA_Z*ALPHA_Z*dv2(3)
                   endif
                   gramP(k) = gramP(k) &
                            + ( v1*v2 + DELTA_T*ALPHA_0 * &
@@ -407,6 +411,10 @@ subroutine elem_heat(Mdle,                   &
 !
 !        ...account for short fiber scaling (anisotropic diffusion operator)
             if (ANISO_HEAT .eq. 1) then
+               dv2(3) = ALPHA_Z*ALPHA_Z*dv2(3)
+            elseif (NO_PROBLEM.eq.2 .and. USE_PML .and. &
+                    x(3).ge.(ZL-2.d0*PML_FRAC*ZL)) then
+!        ...reduce artificial cooling from PML
                dv2(3) = ALPHA_Z*ALPHA_Z*dv2(3)
             endif
 !
