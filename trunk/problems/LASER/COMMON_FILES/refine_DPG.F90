@@ -181,7 +181,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
 !$OMP END PARALLEL DO
 !
    resid_tot = 0.d0; error_tot = 0.d0; rnorm_tot = 0.d0
-   if (DISTRIBUTED .and. (.not. HOST_MESH)) then
+   if (DISTRIBUTED) then
       count = 1
       call MPI_ALLREDUCE(resid_subd,resid_tot,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
       call MPI_ALLREDUCE(error_subd,error_tot,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
@@ -244,18 +244,18 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
    write(*,*) 'HISTORY OF REFINEMENTS'
    if (NEXACT.eq.0) write(*,7005)
    if (NEXACT.gt.0) write(*,7006)
- 7005  format(' mesh |',' nrdof_tot |',' nrdof_con |','    residual   |','   residual rate  ',/)
- 7006  format(' mesh |',' nrdof_tot |',' nrdof_con |','    residual   |','   residual rate  |', &
+ 7005  format(' mesh |','  nrdof_tot |','  nrdof_con |','    residual   |','   residual rate  ',/)
+ 7006  format(' mesh |','  nrdof_tot |','  nrdof_con |','    residual   |','   residual rate  |', &
               ' field error  |','rel field error|','   error rate ',/)
 !
    do i=1,istep
       if (NEXACT.eq.0) then
          write(*,7003) i,nrdof_tot_mesh(i),nrdof_con_mesh(i),residual_mesh(i),rate_mesh(i)
- 7003    format(2x,i2,'  | ',2(i9,' | '),es12.5,'  |',f7.2)
+ 7003    format(2x,i2,'  | ',2(i10,' | '),es12.5,'  |',f7.2)
       else
          write(*,7004) i,nrdof_tot_mesh(i),nrdof_con_mesh(i),residual_mesh(i),rate_mesh(i), &
                        error_mesh(i),rel_error_mesh(i),rate_error_mesh(i)
- 7004    format(2x,i2,'  | ',2(i9,' | '),es12.5,'  |',f7.2,'          ', &
+ 7004    format(2x,i2,'  | ',2(i10,' | '),es12.5,'  |',f7.2,'          ', &
                 2(' | ',es12.5),'  |',f7.2)
       endif
       if (i .eq. istep) write(*,*)
@@ -428,8 +428,8 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
 !-----------------------------------------------------------------------
 !
    if (IBCFLAG .eq. 3) then
-      call propagate_flag(2,9)
-      call propagate_flag(3,9)
+      call propagate_flag(3,3)
+      call propagate_flag(5,3)
    endif
 !
    90 continue

@@ -207,9 +207,9 @@ subroutine get_bdSource(Mdle,X,Rn, Imp_val)
 !  ...exact solution known manufactured solution
       case(1)
          call exact(X,Mdle, zvalH,zdvalH,zd2valH, &
-                        zvalE,zdvalE,zd2valE, &
-                        zvalV,zdvalV,zd2valV, &
-                        zvalQ,zdvalQ,zd2valQ)
+                            zvalE,zdvalE,zd2valE, &
+                            zvalV,zdvalV,zd2valV, &
+                            zvalQ,zdvalQ,zd2valQ)
 !     ...exact for signal
          if(NO_PROBLEM.eq.3) then
 !        ...n x E
@@ -233,8 +233,8 @@ subroutine get_bdSource(Mdle,X,Rn, Imp_val)
 !
 !     ...g should be zero for exact solution (absorbing BC TE10 mode)
          if (abs(sum(Imp_val(1:3))) .ge. 1.0D-14) then
-            !write(*,*) 'Imp_val is = ', Imp_val
-            !pause
+            write(*,*) 'Imp_val is = ', Imp_val
+            stop
          endif
 !
 !  ...exact solution unknown

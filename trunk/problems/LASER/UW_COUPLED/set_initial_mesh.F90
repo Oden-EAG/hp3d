@@ -1,18 +1,19 @@
-!--------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 !     routine name      - set_initial_mesh
 !
-!--------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
-!     latest revision   - Apr 2019
+!     latest revision   - June 2021
 !
-!     purpose           - TODO
+!     purpose:          - define problem dependent data
+!                         (multiphysics, BC, approximation)
 !
-!     arguments
+!     arguments:
 !            out:       - Nelem_order
-!                       (polynomial order of each initial mesh element)
+!                         (polynomial order of each initial mesh element)
 !
-!--------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 subroutine set_initial_mesh(Nelem_order)
 !
@@ -32,12 +33,14 @@ subroutine set_initial_mesh(Nelem_order)
 !
    integer :: iel,ndom,i,ifc,neig,max_order
 !
-!..dimension = num_faces * num_phys
-   integer, dimension(6,6) :: ibc
+!..BC flags; dimension = num_faces * components
+   integer :: ibc(6,NRINDEX)
 !
-!----------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
-!..check if have not exceeded the maximum order
+   Nelem_order = 0
+!
+!..check if exceeding maximum order
    max_order = max(ORDER_APPROX_X,ORDER_APPROX_Y,ORDER_APPROX_Z)
    if (max_order.gt.MAXP) then
       write(*,1000) 'set_initial_mesh: ',max_order,MAXP
@@ -45,7 +48,7 @@ subroutine set_initial_mesh(Nelem_order)
       stop
    endif
 !
-!..
+!..display fiber-specific geometry number
    if (RANK .eq. ROOT) write(*,1010) GEOM_NO
  1010 format(' GEOM_NO = ',I1,/)
 !
@@ -57,7 +60,7 @@ subroutine set_initial_mesh(Nelem_order)
 !  STEP 1 : set up order of approximation (elements may have different
 !           orders in each direction)
       if (etype .ne. 'bric' .and. etype .ne. 'pris') then
-         write(*,*) 'set_initial mesh: element type not equal bric/pris. stop'
+         write(*,*) 'set_initial mesh: element type not equal bric/pris. stop.'
          stop
       endif
 
@@ -115,28 +118,46 @@ subroutine set_initial_mesh(Nelem_order)
       ELEMS(iel)%physics(6)='EHfd2'
 !
 !  ...initialize BC flags
-      ibc = 0
+!     0 - no BC
+!     1 - Dirichlet BC everywhere
+!     2 - Impedance BC via penalty term
+!     3 - Impedance BC via elimination
+      ibc(1:6,1:NRINDEX) = 0
+!
+!  ...physics attributes components (1+2+2+1+6+6 = 18 components)
+!     phys| comp | description
+!     (1) |  1   | H1 field for heat (1 component)
+!     (2) |  2-3 | Hcurl for Maxwell trace (\hat E,\hat H) (signal, 2 comps)
+!     (3) |  4-5 | Hcurl for Maxwell trace (\hat E,\hat H) (pump  , 2 comps)
+!     (4) |  6   | Hdiv trace for heat (1 component)
+!     (5) |  7-12| L2 field for Maxwell (E,H) (signal, 6 components)
+!     (6) | 13-18| L2 field for Maxwell (E,H) (pump  , 6 components)
+!
       select case(GEOM_NO)
 !     ...single cube/brick with Dirichlet
 !        perfect electrical conductor (PEC) BC on all faces
-			case (1)
+         case (1)
             do ifc=1,nface(etype)
                neig = ELEMS(iel)%neig(ifc)
                select case(neig)
                   case(0)
-!                 ...dirichlet on heat
+!                 ...Dirichlet on heat
                      ibc(ifc,1) = 1
 !                 ...BCs on EH-traces signal and pump
-                     if((IBCFLAG.eq.3).and.(ifc.eq.2)) then
-!                    ...impedance on z=L face
-!                    ...signal
-                        ibc(ifc,2) = 9 !..sets dirichlet flag on H-trace
-!                    ...pump
-                        ibc(ifc,3) = 9
+                     if((IBCFLAG.eq.2..or.IBCFLAG.eq.3).and.(ifc.eq.2)) then
+!                    ...Impedance on z=L face
+!                       REMARK: if IBCFLAG.eq.3 (i.e., using elimination), then
+!                               the routine propagate_flag must be called after
+!                               refining the mesh to correctly propagate the
+!                               impedance flag from faces to edges and vertices
+!                    ...Signal
+                        ibc(ifc,3) = IBCFLAG !..sets Impedance flag on H_s trace
+!                    ...Pump
+                        ibc(ifc,5) = IBCFLAG !..sets Impedance flag on H_p trace
                      else
-!                    ...dirichlet on E-trace
-                        ibc(ifc,2) = 6
-                        ibc(ifc,3) = 6
+!                    ...Dirichlet on E-trace
+                        ibc(ifc,2) = 1 ! Signal trace \hat E_s
+                        ibc(ifc,4) = 1 ! Pump   trace \hat E_p
                      endif
                   case default
 !                 ...do nothing
@@ -149,11 +170,11 @@ subroutine set_initial_mesh(Nelem_order)
                neig = ELEMS(iel)%neig(ifc)
                select case(neig)
                   case(0)
-!                 ...dirichlet on heat
+!                 ...Dirichlet on heat
                      ibc(ifc,1) = 1
-!                 ...dirichlet on E-trace
-                     ibc(ifc,2) = 6 ! signal
-                     ibc(ifc,3) = 6 ! pump
+!                 ...Dirichlet on E-trace
+                     ibc(ifc,2) = 1 ! Signal trace \hat E_s
+                     ibc(ifc,4) = 1 ! Pump   trace \hat E_p
                end select
             enddo
 !
@@ -163,11 +184,17 @@ subroutine set_initial_mesh(Nelem_order)
                neig = ELEMS(iel)%neig(ifc)
                select case(neig)
                   case(0)
-!                 ...dirichlet on heat
+!                 ...Dirichlet on heat
                      ibc(ifc,1) = 1
-!                 ...dirichlet on E-trace
-                     ibc(ifc,2) = 6 ! signal
-                     ibc(ifc,3) = 6 ! pump
+!                 ...Dirichlet on heat flux (for input/output faces z=0,z=L)
+                     !if((ifc.eq.1) .or. (ifc.eq.2)) then
+                     !   ibc(ifc,6) = 1
+                     !else
+                     !   ibc(ifc,1) = 1
+                     !endif
+!                 ...Dirichlet on E-trace
+                     ibc(ifc,2) = 1 ! Signal trace \hat E_s
+                     ibc(ifc,4) = 1 ! Pump   trace \hat E_p
                end select
             enddo
 !
@@ -178,11 +205,11 @@ subroutine set_initial_mesh(Nelem_order)
 !  ...end select GEOM_NO
       end select
 !
-!  ...allocate BC flags (one per attribute)
-      allocate(ELEMS(iel)%bcond(6))
+!  ...allocate BC flags (one per attribute component)
+      allocate(ELEMS(iel)%bcond(NRINDEX))
 !
-!  ...for each physics variable, encode face BC into a single BC flag
-      do i=1,NR_PHYSA
+!  ...for each component, encode face BC into a single BC flag
+      do i=1,NRINDEX
          call encodg(ibc(1:6,i),10,6, ELEMS(iel)%bcond(i))
       enddo
 !

@@ -10,12 +10,12 @@
 #         40 total MPI tasks (lower case n); this is 4 tasks/node
 #         12 OpenMP threads per MPI task (48 threads per node)
 #
-# Last revised: 20 Oct 2017
+# Last revised: June 2021
 #
 # Notes:
 #
 #   -- Launch this script by executing
-#      "sbatch skx.slurm" on Stampede2 login node.
+#      "sbatch rect.slurm" on Stampede2 login node.
 #
 #   -- Check current queue with: "squeue -u sh43394"
 #
@@ -41,7 +41,7 @@
 #SBATCH -N 2               # Total # of nodes
 #SBATCH -n 8               # Total # of mpi tasks
 #SBATCH -t 00:05:00        # Run time (hh:mm:ss)
-#SBATCH --mail-user=stefan@ices.utexas.edu
+#SBATCH --mail-user=stefan@oden.utexas.edu
 #SBATCH --mail-type=all    # Send email at begin and end of job
 #SBATCH -A A-ti2           # Allocation name (req'd if you have more than 1)
 
@@ -66,6 +66,9 @@ nthreads=12
 #export KMP_STACKSIZE=64M    # p=6
 #export KMP_STACKSIZE=80M    # p=7
 #export KMP_STACKSIZE=96M    # p=8
+#
+# Fix Intel18 OMP issue
+export KMP_INIT_AT_FORK=FALSE
 #
 # Rectangular waveguide for linear Maxwell (e.g., pollution study)
 #    / with dirichlet BC (-ibc 0), or impedance BC (-ibc 3), or PML
@@ -163,16 +166,41 @@ px=5; py=5; pz=5
 # set enriched order (p+dp)
 dp=1
 #
-# set BC flag (3 = impedance)
-ibc=3
+# set BC flag
+# 0: Dirichlet
+# 2: impedance via penalty method
+# 3: impedance via elimination
+ibc=2
 #
 # set PML flag
-usepml=0
+usepml=false
+pmlfrac=0.25d0
+#
+# other params
+ctrl='../COMMON_FILES/control_0'
+#
+# set output
+dir_output='../outputs/'
+vis_level=3
+
+args=" -geom 1 -isol 5 -comp 2"
+args+=" -job ${job} -imax ${imax} -jmax 0"
+args+=" -px ${px} -py ${py} -pz ${pz} -dp ${dp}"
+args+=" -ibc ${ibc}"
+args+=" -nlflag 0 -heat 0 -copump 1"
+args+=" -dir_output ${dir_output} -vis_level ${vis_level}"
+args+=" -file_geometry ${file_geometry} -zl ${zl}"
+args+=" -file_control ${ctrl}"
+args+=" -maxnods ${maxnods}"
+args+=" -nthreads ${nthreads}"
+if [ "$usepml" = true ] ; then
+   args+=" -usepml -pmlfrac ${pmlfrac}"
+fi
 
 # ADD optionally -omega ${omega}
 
 # Launch MPI code...
-ibrun ./uwLaser -geom 1 -isol 5 -comp 2 -job ${job} -maxnods ${maxnods} -imax ${imax} -px ${px} -py ${py} -pz ${pz} -dp ${dp} -ibc ${ibc} -usepml ${usepml} -nlflag 0 -heat 0 -copump 1 -zl ${zl} -nthreads ${nthreads} -file_geometry ${file_geometry}
+ibrun ./uwLaser ${args}
 
 date
 # ---------------------------------------------------

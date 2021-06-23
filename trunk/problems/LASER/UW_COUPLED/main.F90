@@ -25,30 +25,45 @@ program main
    use assembly_sc, only: IPRINT_TIME
    use stc        , only: STORE_STC,HERM_STC
 !
-   use MPI        , only: MPI_COMM_WORLD
+   use MPI        , only: MPI_COMM_WORLD,MPI_BARRIER, &
+                          MPI_GET_PROCESSOR_NAME,MPI_MAX_PROCESSOR_NAME
    use mpi_param  , only: ROOT,RANK,NUM_PROCS
    use mpi_wrapper, only: mpi_w_init,mpi_w_finalize
 !
    implicit none
 !
 !..auxiliary variables
-   integer :: i, ierr, req, ret
-!
-   integer :: flag(6)
-   integer :: physNick
+   integer :: i, iargs, ierr, req, ret, plen
 !
 !..OMP variables
    integer :: num_threads, omp_get_num_threads
 !
+!..MPI variables
+   character(MPI_MAX_PROCESSOR_NAME) :: pname
+!
 !..timer
    real(8) :: MPI_Wtime,start_time,end_time
 !
-   character :: arg
+   character       :: arg
+   character(32)   :: args
+   character(1024) :: cmd
 !
 !----------------------------------------------------------------------
 !
 !..Initialize MPI environment
    call mpi_w_init
+!
+   if (RANK .eq. ROOT) then
+      write(*,*) '    =========================    '
+      write(*,*) '    Program command and args     '
+      write(*,*) '    =========================    '
+!  ...read command
+      call get_command(cmd)
+      write(*,*) trim(cmd)
+      write(*,*) '    =========================    '
+   endif
+!
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 !..Set common hp3D environment parameters (reads in options arguments)
    call begin_environment
@@ -82,17 +97,18 @@ program main
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 !..initialize physics, geometry, etc.
+   call MPI_GET_PROCESSOR_NAME (pname,plen,ierr);
    do i = 0, NUM_PROCS-1
       if ((RANK .eq. i) .and. (RANK .eq. ROOT)) then
          write(6,*)
-         write(6,1020) "Master proc [", RANK, "], initialize.."
+         write(6,1020) "Master proc [",RANK,"] on node [",trim(pname),"]: initialize..."
          QUIET_MODE = .FALSE.
       else if ((RANK .eq. i) .and. (RANK .ne. ROOT)) then
-         write(6,1020) "Worker proc [", RANK, "], initialize.."
+         write(6,1020) "Worker proc [",RANK,"] on node [",trim(pname),"]: initialize..."
          QUIET_MODE = .TRUE.
       endif
    enddo
- 1020 format (A,I3,A)
+ 1020 format (A,I4,A,A,A)
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    call initialize
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
@@ -103,10 +119,11 @@ program main
    if (RANK .ne. ROOT) goto 80
 !
 !..print problem parameters
-   if (GEOM_NO .eq. 1) then
+   if ((GEOM_NO .eq. 1) .and. (ZL .gt. 1.d0)) then ! rectangular waveguide
       write(*,9001) ' Wavelengths/Unit length  = ', sqrt(OMEGA*OMEGA-PI*PI)/(2.d0*PI)
+      write(*,9000) ' Waveguide length         = ', ZL
    endif
-   if (GEOM_NO .eq. 5) then
+   if (GEOM_NO .eq. 5) then ! fiber waveguide
       write(*,9000) ' Fiber length             = ', ZL
       write(*,9000) ' Signal frequency         = ', OMEGA_SIGNAL
       write(*,9000) ' Wavelengths/Unit length  = ', 1.d0/(LAMBDA_SIGNAL/REF_INDEX_CORE)
@@ -129,22 +146,27 @@ program main
    if (NONLINEAR_FLAG .eq. 1) then
       write(*,9020) ' Raman gain               = ', RAMAN_GAIN
       write(*,9020) ' Active gain              = ', ACTIVE_GAIN
+      write(*,9010) ' COPUMP                   = ', COPUMP
+      write(*,9010) ' FAKE_PUMP                = ', FAKE_PUMP
    endif
    write(*,9030) ' Polynomial order (x,y,z) = ', ORDER_APPROX_X,ORDER_APPROX_Y,ORDER_APPROX_Z
    write(*,9010) ' ISOL                     = ', ISOL
    write(*,9010) ' NEXACT                   = ', NEXACT
    write(*,9010) ' FAST INTEGRATION         = ', FAST_INT
+   write(*,9010) ' IBCFLAG                  = ', IBCFLAG
+   write(*,9015) ' OUTPUT_DIR               = ', trim(OUTPUT_DIR)
    if (HEAT_FLAG .eq. 1) then
       write(*,9010) ' NSTEPS                   = ', NSTEPS
       write(*,9000) ' DELTA_T                  = ', DELTA_T
+      if (ANISO_HEAT .eq. 1) then
+         write(*,9020) ' ALPHA_Z                  = ', ALPHA_Z
+      endif
    endif
-   if (ANISO_HEAT .eq. 1) then
-      write(*,9020) ' ALPHA_Z                  = ', ALPHA_Z
-   endif
- 9000 format(A,F10.6)
- 9001 format(A,F10.3)
+ 9000 format(A,F11.6)
+ 9001 format(A,F11.3)
  9010 format(A,I3)
- 9020 format(A,ES10.2)
+ 9015 format(A,A)
+ 9020 format(A,ES11.2)
  9030 format(A,' (',I1,',',I1,',',I1,') ')
 !
 !$OMP parallel
@@ -166,10 +188,21 @@ program main
 !  (6) - L2 field for Maxwell (pump  , 6 components)
    PHYSAi(1:6) = (/.false.,.true.,.true.,.true.,.false.,.false./)
 !
+!..set homogeneous Dirichlet flags
+   if (NEXACT.eq.0) then
+      PHYSAd(1:6) = (/.true.,.false.,.false.,.true.,.false.,.false./)
+   endif
+!
+!..By default, solve Maxwell for signal field
+!  (note: NO_PROBLEM and PHYSAm(:) flags are used in updating Dirichlet BCs)
+!         NO_PROBLEM: 2 - heat, 3 - signal, 4 - pump
+   NO_PROBLEM = 3
+   PHYSAm(1:6) = (/.false.,.true.,.false.,.false.,.true.,.false./)
+!
 !..set static condensation flags
-   ISTC_FLAG = .true.
-   STORE_STC = .true.
-   HERM_STC = .true.
+   ISTC_FLAG = .true. ! activate automatic static condensation
+   STORE_STC = .true. ! store Schur complement factors
+   HERM_STC = .true.  ! assume Hermitian element matrix
 !
    if (HERM_STC) then
       arg = 'H'
@@ -183,16 +216,11 @@ program main
       write(*,*) ' STORE_STC: ', STORE_STC
       write(*,*) ' HERM_STC : ', HERM_STC
       write(*,*) ' PHYSAi   : ', PHYSAi
+      write(*,*) ' PHYSAd   : ', PHYSAd
       write(*,*)
    endif
 !
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
-!
-!..Maxwell signal solve
-   NO_PROBLEM = 3
-   physNick = 1
-   flag=0; flag(5)=1
-   PHYSAm(1:6) = (/.false.,.true.,.false.,.false.,.true.,.false./)
 !
    if (JOB .ne. 0) then
       if (NONLINEAR_FLAG .eq. 0) then
@@ -209,12 +237,15 @@ program main
          endif
       endif
    else
-      if (RANK .eq. 0) then
+      if (RANK .eq. ROOT) then
          call master_main
       else
          call worker_main
       endif
    endif
+!
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+   if (RANK.eq.ROOT) write(*,*) 'Back in main. Just finishing up...'
 !
    call finalize
    call mpi_w_finalize
@@ -247,6 +278,7 @@ subroutine master_main()
    integer :: idec, i, r, lb, count, src
    character(len=8) :: filename
    integer :: mdle,nr_elem_ref,kref
+   real(8) :: res
 !
 !----------------------------------------------------------------------
 !
@@ -257,12 +289,6 @@ subroutine master_main()
 !
 !..start user interface, with idec
 !..broadcast user command to workers
-!
-!..test accessing data structures
-   write(6,8020) '[', RANK, '] : ', 'NRELIS,NRELES,NRNODS = ',NRELIS,NRELES,NRNODS
- 8020 format(A,I3,A,A,I4,', ',I4,', ',I4)
-!
-   flush(6)
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 #if DEBUG_MODE
@@ -324,7 +350,7 @@ subroutine master_main()
       write(*,*) 'Read HIST file.........................72'
       write(*,*) '=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='
 !
-      read( *,*) idec
+      read (*,*) idec
       write(6,8010) '[', RANK, '] : ','Broadcast: idec = ', idec
  8010 format(A,I3,A,A,I3)
       count = 1; src = ROOT
@@ -435,7 +461,7 @@ subroutine master_main()
                   write(*,*) 'E. calling pardiso_sc'
                   call pardiso_sc('H')
                   write(*,*) '   computing residual'
-                  call residual()
+                  call residual(res)
                endif
                write(*,*) 'continue?  1 = YES; 0 = NO'
                read(*,*) i
@@ -490,13 +516,7 @@ subroutine worker_main()
       stop
    endif
 !
-!..test accessing data structures
-   write(6,9020) '[', RANK, '] : ', 'NRELIS,NRELES,NRNODS = ',NRELIS,NRELES,NRNODS
- 9020 format(A,I3,A,A,I4,', ',I4,', ',I4)
-!
-   flush(6)
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
-!
 !
 !..receive broadcast from master on how to proceed
 !..do that in a loop, using idec

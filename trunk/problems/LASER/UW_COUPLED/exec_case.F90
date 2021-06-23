@@ -26,6 +26,7 @@ subroutine exec_case(idec)
    character(len=2) :: vis_level
 !
    integer :: fld,numPts,i,mdle,kref,refs
+   real(8) :: res
 !
    integer :: src,count,ierr
 !
@@ -105,12 +106,12 @@ subroutine exec_case(idec)
       case(20)
          write(*,*) 'global h-refinement...'
          call global_href
+         if (IBCFLAG .eq. 3) then
+            call propagate_flag(3,3)
+            call propagate_flag(5,3)
+         endif
          call update_gdof
          call update_Ddof
-         if (IBCFLAG .eq. 3) then
-            call propagate_flag(2,9)
-            call propagate_flag(3,9)
-         endif
 !
 !  ...single uniform p-refinement
       case(21)
@@ -135,8 +136,8 @@ subroutine exec_case(idec)
          do i=1,refs
             call global_href_aniso(0,1)
             if (IBCFLAG .eq. 3) then
-               call propagate_flag(2,9)
-               call propagate_flag(3,9)
+               call propagate_flag(3,3)
+               call propagate_flag(5,3)
             endif
          enddo
          call update_gdof
@@ -209,7 +210,7 @@ subroutine exec_case(idec)
 !  ...compute the residual
       case(51)
          write(*,*) 'computing residual...'
-         call residual()
+         call residual(res)
 !
       case(60)
          if (RANK .eq. ROOT) then

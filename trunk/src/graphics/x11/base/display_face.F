@@ -75,7 +75,7 @@ c     of a subtriangle should be drawn
       dimension mpcol(2),nsid(2)
 c
 c  ...BC's flags
-      dimension ibc(6,NR_PHYSA)
+      dimension ibc(6,NRINDEX)
 c---------------------------------------------------------------------
 c
       data small /1.d-6/
@@ -174,6 +174,8 @@ c         and color flags for the mesh visualization
      .                   mpcol(1),mpcol(2),
      .                   nsid(1),nsid(2))
           if (Iflagn.eq.3) then
+!...TODO: this is not correct after updating BC implementation: NRPHY_DISP
+!         now has to refer to a particular component (not physics attr)
             mpcol(1:2) = ibc(If,NRPHY_DISP)+1
           endif
           if (iprint.eq.1) then

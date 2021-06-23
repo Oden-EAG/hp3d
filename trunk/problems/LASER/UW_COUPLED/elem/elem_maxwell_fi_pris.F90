@@ -5,7 +5,7 @@
 !
 !--------------------------------------------------------------------
 !
-!     latest revision:  - Oct 2019
+!     latest revision:  - June 2021
 !
 !     purpose:          - routine returns unconstrained (ordinary)
 !                         stiffness matrix and load vector for the
@@ -150,7 +150,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    real(8), dimension(  MAXNINT2ADD)  :: wtloc
 !
 !..BC's flags
-   integer, dimension(6,NR_PHYSA)    :: ibc
+   integer, dimension(6,NRINDEX)      :: ibc
 !
 !..for auxiliary computation
    complex(8) :: zaux
@@ -168,7 +168,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    integer :: i1,j1,i2,j2
    integer :: i12,j12,k12,k1,k2,fa,fb,i3mod,j3mod,kH,kk,i,ik,j,k,l,nint,kE,n,m,p,pe
    integer :: iflag,iprint,itime,iverb
-   integer :: nordP,nsign,ifc,ndom,info,icomp,idec
+   integer :: nordP,nsign,ifc,ndom,info,iphys,icomp,idec
    complex(8) :: zfval
    complex(8) :: za(3,3),zc(3,3)
    complex(8) :: zaJ(3,3),zcJ(3,3)
@@ -221,6 +221,9 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    real(8), allocatable :: sH12(:,:),gH12(:,:,:),sE12(:,:,:),cE12(:,:),sQ12(:,:)
 !
    integer, allocatable :: mapEE(:),mapQQ(:)
+!
+!..timer
+!   real(8) :: MPI_Wtime,start_time,end_time
 !
    integer, dimension(3,3) :: deltak
 !
@@ -339,10 +342,14 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 #if DEBUG_MODE
    if (iprint.eq.1) then
       write(*,7001) Mdle
-7001  format('elem_maxwell_fi_pris: BCFLAGS FOR Mdle = ',i5)
-      do i=1,NR_PHYSA
-         write(*,7002) PHYSA(i), ibc(1:nrf,i)
-7002     format('     ATTRIBUTE = ',a6,' FLAGS = ',6i2)
+ 7001 format('elem_maxwell_fi_pris: BCFLAGS FOR Mdle = ',i5)
+      i=0
+      do iphys=1,NR_PHYSA
+         do icomp=1,NR_COMP(iphys)
+            i=i+1
+            write(*,7002) PHYSA(iphys), icomp, ibc(1:nrf,i)
+ 7002       format('      ATTR = ',a6,', COMP = ',i1,', FLAGS = ',6i2)
+         enddo
       enddo
    endif
 #endif
@@ -455,6 +462,9 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
    allocate(LOADE(3,(nrdofE12+nrdofH12)))
 !
+!..start timer
+!   start_time = MPI_Wtime()
+!
 !..Loop over quadrature points in direction \xi_1
    do pz=1,nintz
 !  ...read quadrature point location and weight
@@ -566,6 +576,11 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
 !        ...initialize gain polarization, raman polarization
             gain_pol = ZERO; raman_pol = ZERO
+!        ...skip nonlinear gain computation if inside PML region
+            if ( USE_PML .and. ( (x(3).gt.PML_REGION) .or. &
+                                 ( (COPUMP.eq.0).and.(x(3).lt.(ZL-PML_REGION)) ) &
+                               ) &
+               ) goto 190
             if (ACTIVE_GAIN .gt. 0.d0) then
                if (dom_flag .eq. 1) then ! .and. x(3).le.PML_REGION) then
                   call get_activePol(zsolQ_soleval(1:12),Fld_flag,delta_n, gain_pol)
@@ -580,8 +595,8 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                   call get_ramanPol(zsolQ_soleval(1:3),zsolQ_soleval(4:6), &
                                  dom_flag,Fld_flag,delta_n, raman_pol)
                endif
-!        ...endif RAMAN_GAIN
             endif
+ 190        continue
 !        ...update auxiliary constants for za,zb: this is for
 !        ...Stiffness and Gram matrix that changes with each nonlinear iteration
             za = (ZI*OMEGA*OMEGA_RATIO_FLD*EPSILON+SIGMA)*IDENTITY+bg_pol+gain_pol+raman_pol
@@ -944,6 +959,15 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !..end loop over z direction quadrature points
    enddo
 !
+!..end timer
+!   end_time = MPI_Wtime()
+!   !$OMP CRITICAL
+!      !write(*,10) etype, end_time-start_time
+!      write(*,11) end_time-start_time
+!! 10   format(A,' elem : ',f12.5,'  seconds')
+! 11   format(f12.5)
+!   !$OMP END CRITICAL
+!
    deallocate(mapEE,mapQQ)
    deallocate(shapeH3,E12,C12,Q12)
    deallocate(sH12,gH12,sE12,cE12,sQ12)
@@ -1036,11 +1060,11 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
             E1(1:3) = shapEE(1,k1)*dxidx(1,1:3) &
                     + shapEE(2,k1)*dxidx(2,1:3) &
                     + shapEE(3,k1)*dxidx(3,1:3)
-!        ...check for impedance BC
+!        ...check for impedance BC (elimination strategy)
 !           (impedance constant is GAMMA for TE10 mode in rectangular waveguide)
 !           ( < n x H , G > = GAMMA*< n x n x E , G > + < zg , G > )
-            if ((ibc(ifc,2).eq.9 .and. Fld_flag .eq. 1) .or. &
-                (ibc(ifc,3).eq.9 .and. Fld_flag .eq. 0)) then
+            if ((ibc(ifc,3).eq.3 .and. Fld_flag.eq.1) .or. &
+                (ibc(ifc,5).eq.3 .and. Fld_flag.eq.0)) then
 !           ...get the boundary source
                call get_bdSource(Mdle,x,rn, zImp)
 !           ...accumulate for the load vector
@@ -1056,9 +1080,9 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                        + shapE(3,k2)*dxidx(3,1:3)
 !
                call cross_product(rn,E2, rntimesE)
-!           ...check for impedance bc
-               if ((ibc(ifc,2).eq.9 .and. Fld_flag .eq. 1) .or. &
-                   (ibc(ifc,3).eq.9 .and. Fld_flag .eq. 0)) then
+!           ...check for impedance BC (elimination strategy)
+               if ((ibc(ifc,3).eq.3 .and. Fld_flag.eq.1) .or. &
+                   (ibc(ifc,5).eq.3 .and. Fld_flag.eq.0)) then
 !              ...accumulate for the extended stiffness matrix on IBC
                   call cross_product(rn,rntimesE, rn2timesE)
                   stiff_EE_T(2*k2-1,2*k1-1) = stiff_EE_T(2*k2-1,2*k1-1) &
@@ -1143,6 +1167,14 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    ZalocQQ(1:j2,1:j2) = zaloc(j1+1:j1+j2,j1+1:j1+j2)
 !
    deallocate(zaloc)
+!
+!----------------------------------------------------------------------
+!       I M P E D A N C E   B O U N D A R Y
+!----------------------------------------------------------------------
+!
+!..Implementation of impedance BC via L2 penalty term
+   if (IBCFLAG.eq.2) call imp_penalty(Mdle,Fld_flag,NrdofH,NrdofEi,MdE, &
+                                      norder,norderi, ZblocE,ZalocEE)
 !
 end subroutine elem_maxwell_fi_pris
 !

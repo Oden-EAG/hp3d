@@ -125,16 +125,16 @@
   endif
 #endif
 !
+! # of edge dof
+  call ndof_nod('medg',norder(Iedge), &
+                ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_edge)
+!
 ! check if a homogeneous Dirichlet node
   call homogenD('tangen',Icase,Bcond, is_homD,ncase,ibcnd)
   if (is_homD) then
     zuE = ZERO
     go to 100
   endif
-!
-! # of edge dof
-  call ndof_nod('medg',norder(Iedge), &
-                ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_edge)
 !
 ! # of dof cannot be zero
   if (ndofE_edge.le.0) then
@@ -365,8 +365,11 @@
 !  ...........if the variable is supported by the node
               if (ncase(i).eq.1) then
 !
-!  .............update node local conter
+!  .............update node local counter
                 nvarE = nvarE + 1
+!
+!  .............do not write dof if physics attribute is deactivated
+                if (.not. PHYSAm(i)) exit
 !
 !  .............store Dirichlet dof
                 if (ibcnd(ic).eq.1) ZnodE(nvarE,1:ndofE_edge) = zuE(1:ndofE_edge,ivarE)

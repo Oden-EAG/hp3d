@@ -16,7 +16,10 @@ subroutine exec_case(idec)
 !
    logical :: solved
    integer :: mdle_subd(NRELES)
-   integer :: i,mdle,kref,src,count,ierr
+   integer :: i,mdle,kref,src,count,ierr,nord
+!
+   integer :: mdle_list(1)
+   integer :: mdle_nord(1)
 !
 !----------------------------------------------------------------------
 !
@@ -181,6 +184,31 @@ subroutine exec_case(idec)
          enddo
          call update_gdof
          call update_Ddof
+!
+      case(65)
+         if (RANK.eq.ROOT) then
+            write(*,*) 'Select a mdle node from the list: '
+            do i=1,NRELES
+               write(*,2610) ELEM_ORDER(i)
+            enddo
+            read(*,*) mdle
+         endif
+         if (NUM_PROCS .gt. 1) then
+            count = 1; src = ROOT
+            call MPI_BCAST (mdle,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+         endif
+         if (RANK.eq.ROOT) then
+            write(*,*) 'Select corresponding mdle node refinement:'
+            read(*,*) nord
+         endif
+         if (NUM_PROCS .gt. 1) then
+            count = 1; src = ROOT
+            call MPI_BCAST (nord,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+         endif
+         !mdle_list(1) = mdle
+         !mdle_nord(1) = nord
+         !call perform_pref(mdle_list,mdle_nord,1)
+         call nodmod(mdle,nord)
 !
       case default
          write(*,*) 'exec_case: unknown case...'

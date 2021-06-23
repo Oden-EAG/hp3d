@@ -24,6 +24,8 @@ LZ =   1.2; f = open("fiber_prism_1_2","w+")
 #LZ =  76.8; f = open("fiber_prism_76_8","w+")
 #LZ = 153.6; f = open("fiber_prism_153_6","w+")
 #LZ = 307.2; f = open("fiber_prism_307_2","w+")
+#LZ = 614.4; f = open("fiber_prism_614_4","w+")
+#LZ = 1228.8; f = open("fiber_prism_1228_8","w+")
 
 # Core and cladding size parameters
 core = 0.9

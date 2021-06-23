@@ -86,6 +86,8 @@ module data_structure3D
         integer          :: order
 !
 !  .....boundary condition flag (binary-encoded per component)
+!       0: component DOFs treated as unknowns
+!       1: component DOFs treated as Dirichlet DOFs
         integer          :: bcond
 !
 !  .....father node
@@ -792,45 +794,7 @@ module data_structure3D
       enddo
 !
       end function Is_Dirichlet_attr
-!----------------------------------------------------------------------
-      function Is_dirichlet_homogeneous(Nod)
-      integer Nod
-      integer ibc(NR_PHYSA), loc
-      logical Is_dirichlet_homogeneous
-
-      call decod(NODES(Nod)%bcond,10,NR_PHYSA, ibc)
-      Is_dirichlet_homogeneous = .false.
-      do iphys=1,NR_PHYSA
-        call locate(ibc(iphys),DIRICHLET_HOMOGENEOUS_LIST,  &
-                    NR_DIRICHLET_HOMOGENEOUS_LIST, loc)
-        if (loc.ne.0) then
-          Is_dirichlet_homogeneous = .true.
-        endif
-      enddo
 !
-      end function
-!----------------------------------------------------------------------
-      subroutine check_dirichlet_homogeneous(istat)
-      integer :: istat
-
-!     local variables
-      integer :: ibc_number,ii
-
-!     we check if any flag number in list of homogeneous Dirichlet b.c.
-!     is also in the list
-      istat=0
-      do ii=1,SIZE(DIRICHLET_HOMOGENEOUS_LIST)
-        ibc_number=DIRICHLET_HOMOGENEOUS_LIST(ii)
-          call locate(ibc_number,DIRICHLET_LIST,NR_DIRICHLET_LIST, loc)
-          if (loc.eq.0) then
-            istat = 1
-            write(*,*) 'ERROR check_dirichlet_homogeneous: ',  &
-             'ibc=',ibc_number,'is not in DIRICHLET_LIST array'
-            return
-          endif
-      end do
-
-      end subroutine
 !----------------------------------------------------------------------
       function Is_right_handed(Mdle)
       integer :: Mdle
