@@ -339,14 +339,12 @@ subroutine exec_job_coupled
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
 !
 !  ...calculating power
-      if (time_step.ge.1 .and. time_step.le.nskip) then
-         if (RANK.eq.ROOT) write(*,*) 'Computing power...'
-         numPts = 2**IMAX; fld = 2
-         if (FAKE_PUMP .eq. 1) fld = 1
-         call get_power(fld,numPts,time_step)
-         !call get_power(2,numPts,-1)
-         if (RANK.eq.ROOT) write(*,*) ''
-      endif
+      if (RANK.eq.ROOT) write(*,*) 'Computing power...'
+      numPts = 2**IMAX; fld = 2
+      if (FAKE_PUMP .eq. 1) fld = 1
+      call get_power(fld,numPts,time_step)
+      !call get_power(2,numPts,-1)
+      if (RANK.eq.ROOT) write(*,*) ''
 !
  420  continue
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
