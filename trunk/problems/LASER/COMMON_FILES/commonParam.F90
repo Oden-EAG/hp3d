@@ -4,7 +4,7 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - Oct 2018
+!   latest revision    - June 2021
 !
 !   purpose            - problem dependent data
 !
@@ -30,7 +30,7 @@ module commonParam
 !..Planck's constant (hbar=h/2pi)
    real(8), parameter :: H_BAR = 1.05457266d-34
 !
-!..set FAST_INT=1 to activate fast integration for hexahedra
+!..set FAST_INT=1 to activate fast integration for hexahedra and prisms
    integer :: FAST_INT = 1
 !
 !..material constants
@@ -40,7 +40,11 @@ module commonParam
 !..frequency
    real(8) :: OMEGA
 !
-!..impedance constant and IBCFLAG
+!..impedance BC:
+!  GAMMA  : impedance constant
+!..IBCFLAG: 0 (dirichlet)
+!           2 (impedance via penalty method)
+!           3 (impedance via elimination)
    real(8) :: GAMMA
    integer :: IBCFLAG
 !

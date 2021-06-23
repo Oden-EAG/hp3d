@@ -127,7 +127,8 @@ subroutine set_environment_maxwell
    !call get_option_real('-gamma' , 'GAMMA', sqrt(1.d0-((2.d0*PI)**2)/(OMEGA**2)) , GAMMA)
 !
 !..IBCFLAG: 0 (dirichlet)
-!..         3 (impedance)
+!           2 (impedance via penalty method)
+!           3 (impedance via elimination)
    call get_option_int ( '-ibc', 'IBCFLAG', 0, IBCFLAG )
 !
 ! =============================

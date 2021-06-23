@@ -5,7 +5,7 @@
 !
 !--------------------------------------------------------------------
 !
-!     latest revision:  - Oct 2019
+!     latest revision:  - June 2021
 !
 !     purpose:          - routine returns unconstrained (ordinary)
 !                         stiffness matrix and load vector for the
@@ -1452,7 +1452,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
             E1(1:3) = shapEE(1,k1)*dxidx(1,1:3) &
                     + shapEE(2,k1)*dxidx(2,1:3) &
                     + shapEE(3,k1)*dxidx(3,1:3)
-!        ...check for impedance BC
+!        ...check for impedance BC (elimination strategy)
 !           (impedance constant is GAMMA for TE10 mode in rectangular waveguide)
 !           ( < n x H , G > = GAMMA*< n x n x E , G > + < zg , G > )
             if ((ibc(ifc,3).eq.3 .and. Fld_flag.eq.1) .or. &
@@ -1472,7 +1472,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                        + shapE(3,k2)*dxidx(3,1:3)
 !
                call cross_product(rn,E2, rntimesE)
-!           ...check for impedance BC
+!           ...check for impedance BC (elimination strategy)
                if ((ibc(ifc,3).eq.3 .and. Fld_flag.eq.1) .or. &
                    (ibc(ifc,5).eq.3 .and. Fld_flag.eq.0)) then
 !              ...accumulate for the extended stiffness matrix on IBC
@@ -1561,6 +1561,14 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    ZalocQQ(1:j2,1:j2) = zaloc(j1+1:j1+j2,j1+1:j1+j2)
 !
    deallocate(zaloc)
+!
+!----------------------------------------------------------------------
+!       I M P E D A N C E   B O U N D A R Y
+!----------------------------------------------------------------------
+!
+!..Implementation of impedance BC via L2 penalty term
+   if (IBCFLAG.eq.2) call imp_penalty(Mdle,Fld_flag,NrdofH,NrdofEi,MdE, &
+                                      norder,norderi, ZblocE,ZalocEE)
 !
 end subroutine elem_maxwell_fi_hexa
 

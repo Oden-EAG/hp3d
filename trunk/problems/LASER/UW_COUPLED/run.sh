@@ -69,7 +69,8 @@ export KMP_STACKSIZE=24M   # p=3
 export KMP_INIT_AT_FORK=FALSE
 
 #
-# set BC flag (0 dirichlet, 3 impedance)
+# set BC flag
+# 0: dirichlet, 2: impedance via penalty term, 3: impedance via elimination
 ibc=0
 #
 # set refractive index of the fiber
@@ -196,12 +197,12 @@ fi
 
 # ============================================================================================
 # C. Rectangular waveguide for linear Maxwell (e.g., pollution study)
-#    / with dirichlet BC (-ibc 0), or impedance BC (-ibc 3), or PML
+#    / with dirichlet BC (-ibc 0), or impedance BC (-ibc 2 or -ibc 3), or PML
 #    / -omega sqrt(5.d0)/2.d0*PI -gamma sqrt(1.d0-PI*PI/(w*w))
 #      --> 1 wavelength per 4 unit lengths in z-direction
 #    / can be run with NEXACT=1 or NEXACT=0 (unless PML --use NEXACT=0)
 usepml=false
-ibc=3
+ibc=2
 
 # VARYING LENGTH OF WAVEGUIDE
 # set waveguide length, #refs, maxnodes, 4 elems/wavelength
@@ -297,7 +298,7 @@ fi
 #
 # 4) rectangular waveguide for linear Maxwell (e.g., pollution study)
 #file_geometry='../GEOMETRIES/waveguide/rect_4'
-#    / with dirichlet BC (-ibc 0), or impedance BC (-ibc 3), or PML
+#    / with dirichlet BC (-ibc 0), or impedance BC (-ibc 2 or -ibc 3), or PML
 #    / -omega sqrt(5.d0)/2.d0*PI -gamma sqrt(1.d0-PI*PI/(w*w))
 #      --> 1 wavelength per 4 unit lengths in z-direction
 #    / can be run with NEXACT=1 or NEXACT=0 (unless PML --use NEXACT=0)

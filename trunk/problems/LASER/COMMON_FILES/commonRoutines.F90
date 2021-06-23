@@ -42,6 +42,7 @@
 subroutine propagate_flag(Icomp,Nflag)
 !
    use data_structure3D
+   use commonParam, only: IBCFLAG
 !
    implicit none
 !
@@ -57,6 +58,11 @@ subroutine propagate_flag(Icomp,Nflag)
    integer :: ibc(6,NRINDEX),nodflag(NRINDEX)
 !
 !-------------------------------------------------------------------------------
+!
+   if (IBCFLAG .ne. 3) then
+      write(*,*) 'propagate_flag called for IBCFLAG.ne.3, returning...'
+      return
+   endif
 !
 !..loop through active elements
 !$OMP PARALLEL                                     &

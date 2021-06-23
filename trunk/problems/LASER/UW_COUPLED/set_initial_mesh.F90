@@ -118,7 +118,10 @@ subroutine set_initial_mesh(Nelem_order)
       ELEMS(iel)%physics(6)='EHfd2'
 !
 !  ...initialize BC flags
-!     0 - no BC ; 1 - Dirichlet ; 3 - Impedance
+!     0 - no BC
+!     1 - Dirichlet BC everywhere
+!     2 - Impedance BC via penalty term
+!     3 - Impedance BC via elimination
       ibc(1:6,1:NRINDEX) = 0
 !
 !  ...physics attributes components (1+2+2+1+6+6 = 18 components)
@@ -141,19 +144,16 @@ subroutine set_initial_mesh(Nelem_order)
 !                 ...Dirichlet on heat
                      ibc(ifc,1) = 1
 !                 ...BCs on EH-traces signal and pump
-                     if((IBCFLAG.eq.3).and.(ifc.eq.2)) then
+                     if((IBCFLAG.eq.2..or.IBCFLAG.eq.3).and.(ifc.eq.2)) then
 !                    ...Impedance on z=L face
-!                       REMARK: the routine propagate_flag must be called after
+!                       REMARK: if IBCFLAG.eq.3 (i.e., using elimination), then
+!                               the routine propagate_flag must be called after
 !                               refining the mesh to correctly propagate the
 !                               impedance flag from faces to edges and vertices
 !                    ...Signal
-                        !ibc(ifc,2) = 3 !..sets Impedance flag on E_s trace
-                        !ibc(ifc,3) = 1 !..sets Dirichlet flag on H_s trace
-                        ibc(ifc,3) = 3 !..sets Impedance flag on H_s trace
+                        ibc(ifc,3) = IBCFLAG !..sets Impedance flag on H_s trace
 !                    ...Pump
-                        !ibc(ifc,4) = 3 !..sets Impedance flag on E_p trace
-                        !ibc(ifc,5) = 1 !..sets Dirichlet flag on H_p trace
-                        ibc(ifc,5) = 3 !..sets Impedance flag on H_p trace
+                        ibc(ifc,5) = IBCFLAG !..sets Impedance flag on H_p trace
                      else
 !                    ...Dirichlet on E-trace
                         ibc(ifc,2) = 1 ! Signal trace \hat E_s
