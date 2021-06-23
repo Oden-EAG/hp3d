@@ -87,7 +87,7 @@ subroutine exec_job_nl
 !  ...set partitioner for load balancing, redistributes mesh in 'distr_mesh'
       if (i .eq. IMAX-2) then
          call zoltan_w_set_lb(7) ! fiber partitioner
-      else
+      elseif (i .gt. IMAX-2) then
          goto 30 ! no load balancing
       endif
 !
