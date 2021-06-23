@@ -166,8 +166,11 @@ px=5; py=5; pz=5
 # set enriched order (p+dp)
 dp=1
 #
-# set BC flag (3 = impedance)
-ibc=3
+# set BC flag
+# 0: Dirichlet
+# 2: impedance via penalty method
+# 3: impedance via elimination
+ibc=2
 #
 # set PML flag
 usepml=false
