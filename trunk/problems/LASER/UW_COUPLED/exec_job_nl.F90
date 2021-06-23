@@ -249,7 +249,7 @@ subroutine exec_job_nl
          QUIET_MODE = .false.; IPRINT_TIME = 1
       endif
 !
-!  ...copy components and calculate norm corresponding to signal
+!  ...calculate norm corresponding to signal
       NO_PROBLEM = 3
       call set_physAm(NO_PROBLEM, physNick,flag)
       if (i .gt. 0) then
@@ -259,6 +259,8 @@ subroutine exec_job_nl
       if (RANK.eq.ROOT) write(*,4240) '   L2NormDiff = ', L2NormDiff
       if (RANK.eq.ROOT) write(*,4240) '   FieldNormQ = ', FieldNormQ
   4240 format(A,F10.4)
+!
+!  ...copy current solution components of all fields into previous solution
       if (RANK.eq.ROOT) write(*,4200) 'copy_coms...'
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
       call copy_coms(No1,No2)

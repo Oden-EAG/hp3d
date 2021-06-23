@@ -10,7 +10,6 @@ subroutine exec_job_coupled
    use laserParam
    use control
    use data_structure3D
-   !use physics       , only: PHYSAm
    use MPI           , only: MPI_COMM_WORLD
    use mpi_param     , only: RANK,ROOT,NUM_PROCS
    use par_mesh      , only: EXCHANGE_DOF,distr_mesh
@@ -19,7 +18,7 @@ subroutine exec_job_coupled
    implicit none
 !
    integer :: flag(6),iParAttr(6)
-   integer :: physNick,nstop
+   integer :: physNick,nstop,nskip
    logical :: ires
 !
 !..variables for nonlinear loop
@@ -54,6 +53,11 @@ subroutine exec_job_coupled
 !
 !..set .true. to compute the residual in all steps
    ires = .true.
+!
+!..set number of time steps for which to skip nonlinear Maxwell computation
+!  (e.g., to wait with Maxwell until heat curve nears steady-state)
+!  note: Maxwell solution is always computed in the initial time step
+   nskip = 10
 !
    if(RANK .eq. ROOT) then
       write(*,*) '=========================='
@@ -197,14 +201,16 @@ subroutine exec_job_coupled
 !
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
 !
-!  ...activate to compute Maxwell problem only in the initial time step
-      !if (time_step .ge. 1 .and. time_step .lt. 100) then
-!      if (time_step .ge. 1 .and. time_step .lt. 10) then
-!         iParAttr = (/1,0,0,0,0,0/)
-!         goto 420
-!      else
-!         iParAttr = (/1,0,0,0,6,0/)
-!      endif
+!  ...Set default paraview output; all fields: iParAttr = (/1,2,2,1,6,6/)
+      iParAttr = (/1,0,0,0,6,0/) ! output heat solution and signal laser field
+!
+!  ...Optionally, skip computing Maxwell problem for nskip time steps
+!     (except in the initial time step)
+      if (time_step.ge.1 .and. time_step.le.nskip) then
+         if (RANK.eq.ROOT) write(*,4200) ' Skipping Maxwell solve in this time step...'
+         iParAttr = (/1,0,0,0,0,0/) ! output only the heat solution
+         goto 420
+      endif
 !
 !  ...solve nonlinear Maxwell loop for SIGNAL and PUMP
       L2NormDiff = 1.d0
@@ -281,7 +287,7 @@ subroutine exec_job_coupled
             QUIET_MODE = .false.; IPRINT_TIME = 1
          endif
 !
-!     ...assuming pump plane wave
+!     ...if assuming a pump plane wave, skip the pump field computation
          if (FAKE_PUMP .eq. 1) then
             if (RANK.eq.ROOT) write(*,*) '   Assuming pump plane wave...'
             goto 410
@@ -307,7 +313,7 @@ subroutine exec_job_coupled
 !
    410   continue
 !
-!     ...copy components and calculate norm corresponding to signal
+!     ...calculate norm corresponding to signal
          NO_PROBLEM = 3
          call set_physAm(NO_PROBLEM, physNick,flag)
          if (i .gt. 0 .or. time_step .gt. 0) then
@@ -317,6 +323,8 @@ subroutine exec_job_coupled
          if (RANK.eq.ROOT) write(*,4240) '   L2NormDiff = ', L2NormDiff
          if (RANK.eq.ROOT) write(*,4240) '   FieldNormQ = ', FieldNormQ
   4240   format(A,F10.4)
+!
+!     ...copy current solution components of all fields into previous solution
          if (RANK.eq.ROOT) write(*,*)
          if (RANK.eq.ROOT) write(*,*) 'copy_coms...'
          call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
@@ -329,24 +337,25 @@ subroutine exec_job_coupled
       enddo
 !
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
+!
 !  ...calculating power
-      !if (time_step .eq. 1) then
+      if (time_step.ge.1 .and. time_step.le.nskip) then
          if (RANK.eq.ROOT) write(*,*) 'Computing power...'
          numPts = 2**IMAX; fld = 2
          if (FAKE_PUMP .eq. 1) fld = 1
          call get_power(fld,numPts,time_step)
          !call get_power(2,numPts,-1)
          if (RANK.eq.ROOT) write(*,*) ''
-      !endif
+      endif
 !
  420  continue
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
 !
-      !if (time_step.lt.100 .and. MOD(time_step,10).ne.0) goto 425 ! skip paraview output
+!  ...only write paraview output every X time steps
+      !if (time_step.lt.100 .and. MOD(time_step,10).ne.0) goto 425
+!
 !  ...write paraview output
       if(RANK.eq.ROOT) write(*,200) ' Writing paraview output...'
-      iParAttr = (/1,2,2,1,6,6/)
-      !if (time_step .eq. 0) iParAttr = (/1,0,0,0,6,0/)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
       call my_paraview_driver(iParAttr)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
