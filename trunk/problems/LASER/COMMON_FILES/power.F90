@@ -458,7 +458,7 @@ subroutine get_power(Fld,NumPts,FileIter)
                               /(pump_power(1)-pump_power(i))
             endif
          enddo
-      elseif(COPUMP.eq.0) then
+      elseif (COPUMP.eq.0) then
          ! define efficiency not point-wise but over the whole fiber
          ! compute signal gain and pump loss over amplifier (exclude pml)
          gain = maxval(sign_power) - sign_power(1) ! signal gain
