@@ -42,6 +42,7 @@ c
       integer, intent(out) :: NrdofH
       real(8), intent(out) :: ShapH(MAXP-1),GradH(MAXP-1)
 c
+      NrdofH = 0; ShapH = 0.d0; GradH = 0.d0
       write(*,*) 'shapHbe error: call TraceEshapeH instead'
       stop
 c     call TraceEshapeH(T,Nord,Norient, NrdofH,ShapH,GradH)
@@ -83,6 +84,7 @@ c
       integer, intent(out) :: NrdofE
       real(8), intent(out) :: ShapE(MAXP)
 c
+      NrdofE = 0; ShapE = 0.d0
       write(*,*) 'shapEbe error: call TraceEshapeE instead'
       stop
 c     call TraceEshapeE(T,Nord,Norient, NrdofE,ShapE)

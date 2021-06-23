@@ -41,6 +41,7 @@ c
       integer, intent(out) :: NrdofH
       real(8), intent(out) :: ShapH(MAXP+1),GradH(MAXP+1)
 c
+      NrdofH = 0; ShapH = 0.d0; GradH = 0.d0
       write(*,*) 'shape1H error: call shape1DH instead'
       stop
       !call shape1DH(Xi,Nord, NrdofH,ShapH,GradH)
@@ -78,6 +79,7 @@ c
       integer, intent(out) :: NrdofQ
       real(8), intent(out) :: ShapQ(MAXP)
 c
+      NrdofQ = 0; ShapQ = 0.d0
       write(*,*) 'shape1Q error: call shape1DQ instead'
       stop
       !call shape1DQ(Xi,Nord, NrdofQ,ShapQ)

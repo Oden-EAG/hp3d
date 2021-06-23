@@ -48,6 +48,7 @@ c
       integer, intent(out) :: NrdofH
       real(8), intent(out) :: ShapH(MAXbrickH),GradH(3,MAXbrickH)
 c
+      NrdofH = 0; ShapH = 0.d0; GradH = 0.d0
       write(*,*) 'shape3H error: call shape3DH instead'
       stop
 c     call shape3DH(Type,Xi,Norder,Nedge_orient,Nface_orient,
@@ -95,6 +96,7 @@ c
       integer, intent(out) :: NrdofE
       real(8), intent(out) :: ShapE(3,MAXbrickE),CurlE(3,MAXbrickE)
 c
+      NrdofE = 0; ShapE = 0.d0; CurlE = 0.d0
       write(*,*) 'shape3E error: call shape3DE instead'
       stop
 c     call shape3DE(Type,Xi,Norder,Nedge_orient,Nface_orient,
@@ -140,6 +142,7 @@ c
       integer, intent(out) :: NrdofV
       real(8), intent(out) :: ShapV(3,MAXbrickV),DivV(MAXbrickV)
 c
+      NrdofV = 0; ShapV = 0.d0; DivV = 0.d0
       write(*,*) 'shape3V error: call shape3DV instead'
       stop
 c     call shape3DV(Type,Xi,Norder,Nface_orient,
@@ -181,6 +184,7 @@ c
       integer, intent(out) :: NrdofQ
       real(8), intent(out) :: ShapQ(MAXbrickQ)
 c
+      NrdofQ = 0; ShapQ = 0.d0
       write(*,*) 'shape3Q error: call shape3DQ instead'
       stop
 c     call shape3DQ(Type,Xi,Norder, NrdofQ,ShapQ)

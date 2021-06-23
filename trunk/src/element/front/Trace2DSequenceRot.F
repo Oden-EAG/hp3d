@@ -52,6 +52,7 @@ c
       integer, intent(out) :: NrdofV
       real(8), intent(out) :: ShapV(MAXP)
 c
+      NrdofV = 0; ShapV = 0.d0
       write(*,*) 'shapVbe error: call TraceEshapeV instead'
       stop
 c     call TraceEshapeV(T,Nord,Norient, NrdofV,ShapV)
