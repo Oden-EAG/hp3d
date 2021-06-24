@@ -30,35 +30,34 @@ c
       ncol=npcol(2)
 c
 c  ...loop through curves
-      do 150 nc=1,NRCURVE
+      do nc=1,NRCURVE
 c
-c  ...get first point and transform its coordinates
+c  .....get first point and transform its coordinates
         xi = 0.d0
         call curve(nc,xi, xcoord(1,2),dxdxi)
         call trobs(xcoord(1,2),xobs(1,2))
 c
-c  ...loop through subsegments
-        do 40 i=1,NRSUB
-          do 10 j=1,3
+c  .....loop through subsegments
+        do i=1,NRSUB
+          do j=1,3
             xobs(j,1) = xobs(j,2)
-   10     continue
+          enddo
           xi = xi + DX
           call curve(nc,xi, xcoord(1,2),dxdxi)
           call trobs(xcoord(1,2),xobs(1,2))
 c
 c  .......rescale
-          do 30 k=1,2
-          do 30 ivar=1,2
-            XY(ivar,k) = (xobs(ivar,k)-XCIM(ivar))/DIMIM*SIZE
-     .                   + XCWIN(ivar)
-   30     continue
+          do k=1,2; do ivar=1,2
+            XY(ivar,k)=(xobs(ivar,k)-XCIM(ivar))/DIMIM*SIZE+XCWIN(ivar)
+          enddo; enddo
 c
 c  .......draw the segment of line
           call drawline(xy(1,1),xy(2,1),xy(1,2),xy(2,2),ncol)
 c
-c  ...end of the loop through segments
-   40   continue
-  150 continue
+c  .....end of the loop through segments
+        enddo
+c  ...end of the loop through curves
+      enddo
 c
       return
       end
