@@ -49,12 +49,14 @@ c
       implicit none
       integer, intent(in)  :: NordM
       integer, intent(out) :: NrdofH
-      integer :: nsize(2)
       double precision, intent(in)  :: Xi
       double precision, intent(out) :: ShapH(MAXPP+1)
       double precision, intent(out) :: GradH(MAXPP+1)
 c
-      call checkorder('segm','contin',NordM,MAXPP, nsize)
+      integer :: nsize(2),norder(19)
+      norder = 0; norder(1) = NordM
+c
+      call checkorder('segm','contin',norder,MAXPP, nsize)
       call shape1DHBrokenSeg(Xi,NordM,nsize, NrdofH,ShapH,GradH)
 c
       end subroutine shape1HH
@@ -90,11 +92,13 @@ c
       implicit none
       integer, intent(in)  :: NordM
       integer, intent(out) :: NrdofQ
-      integer :: nsize(2)
       double precision, intent(in)  :: Xi
       double precision, intent(out) :: ShapQ(MAXPP)
 c
-      call checkorder('segm','discon',NordM,MAXPP, nsize)
+      integer :: nsize(2),norder(19)
+      norder = 0; norder(1) = NordM
+c
+      call checkorder('segm','discon',norder,MAXPP, nsize)
       call shape1DQBrokenSeg(Xi,NordM,nsize, NrdofQ,ShapQ)
 c
       end subroutine shape1QQ
@@ -143,10 +147,12 @@ c
       character(len=4), intent(in)  :: Type
       integer, intent(in)  :: NordM
       integer, intent(out) :: NrdofH
-      integer :: nsize(2),norder(5)
       double precision, intent(in)  :: Xi(2)
       double precision, intent(out) :: ShapH(MAXquadHH)
       double precision, intent(out) :: GradH(2,MAXquadHH)
+c
+      integer :: nsize(2),norder(19)
+      norder = 0
 c
       select case(Type)
       case('tria','mdlt')
@@ -201,10 +207,12 @@ c
       character(len=4), intent(in)  :: Type
       integer, intent(in)  :: NordM
       integer, intent(out) :: NrdofE
-      integer :: nsize(2),norder(5)
       double precision, intent(in)  :: Xi(2)
       double precision, intent(out) :: ShapE(2,MAXquadEE)
       double precision, intent(out) :: CurlE(MAXquadEE)
+c
+      integer :: nsize(2),norder(19)
+      norder = 0
 c
       select case(Type)
       case('tria','mdlt')
@@ -260,10 +268,12 @@ c
       character(len=4), intent(in)  :: Type
       integer, intent(in)  :: NordM
       integer, intent(out) :: NrdofV
-      integer :: nsize(2),norder(5)
       double precision, intent(in)  :: Xi(2)
       double precision, intent(out) :: ShapV(2,MAXquadVV)
       double precision, intent(out) :: DivV(MAXquadVV)
+c
+      integer :: nsize(2),norder(19)
+      norder = 0;
 c
       select case(Type)
       case('tria','mdlt')
@@ -317,9 +327,11 @@ c
       character(len=4), intent(in)  :: Type
       integer, intent(in)  :: NordM
       integer, intent(out) :: NrdofQ
-      integer :: nsize(2),norder(5)
       double precision, intent(in)  :: Xi(2)
       double precision, intent(out) :: ShapQ(MAXquadQQ)
+c
+      integer :: nsize(2),norder(19)
+      norder = 0
 c
       select case(Type)
       case('tria','mdlt')
@@ -383,10 +395,12 @@ c
       character(len=4), intent(in)  :: Type
       integer, intent(in)  :: NordM
       integer, intent(out) :: NrdofH
-      integer :: nsize(2),norder(19),nordF
       double precision, intent(in)  :: Xi(3)
       double precision, intent(out) :: ShapH(MAXbrickHH)
       double precision, intent(out) :: GradH(3,MAXbrickHH)
+c
+      integer :: nsize(2),norder(19),nordF
+      norder = 0
 c
       select case(Type)
       case('bric','mdlb')
@@ -459,10 +473,12 @@ c
       character(len=4), intent(in)  :: Type
       integer, intent(in)  :: NordM
       integer, intent(out) :: NrdofE
-      integer :: nsize(2),norder(19),nordF
       double precision, intent(in)  :: Xi(3)
       double precision, intent(out) :: ShapE(3,MAXbrickEE)
       double precision, intent(out) :: CurlE(3,MAXbrickEE)
+c
+      integer :: nsize(2),norder(19),nordF
+      norder = 0
 c
       select case(Type)
       case('bric','mdlb')
@@ -535,10 +551,12 @@ c
       character(len=4), intent(in)  :: Type
       integer, intent(in)  :: NordM
       integer, intent(out) :: NrdofV
-      integer :: nsize(2),norder(19),nordF
       double precision, intent(in)  :: Xi(3)
       double precision, intent(out) :: ShapV(3,MAXbrickVV)
       double precision, intent(out) :: DivV(MAXbrickVV)
+c
+      integer :: nsize(2),norder(19),nordF
+      norder = 0
 c
       select case(Type)
       case('bric','mdlb')
@@ -610,9 +628,11 @@ c
       character(len=4), intent(in)  :: Type
       integer, intent(in)  :: NordM
       integer, intent(out) :: NrdofQ
-      integer :: nsize(2),norder(19),nordF
       double precision, intent(in)  :: Xi(3)
       double precision, intent(out) :: ShapQ(MAXbrickQQ)
+c
+      integer :: nsize(2),norder(19),nordF
+      norder = 0
 c
       select case(Type)
       case('bric','mdlb')

@@ -48,6 +48,7 @@ c
       integer, intent(out) :: NrdofH
       real(8), intent(out) :: ShapH(MAXquadH),GradH(2,MAXquadH)
 c
+      NrdofH = 0; ShapH = 0.d0; GradH = 0.d0
       write(*,*) 'shape2H error: call shape2DH instead'
       stop
 c     call shape2DH(Type,Xi,Norder,Nedge_orient, NrdofH,ShapH,GradH)
@@ -89,6 +90,7 @@ c
       integer, intent(out) :: NrdofH
       real(8), intent(out) :: ShapH(MAXquadH),GradH(2,MAXquadH)
 c
+      NrdofH = 0; ShapH = 0.d0; GradH = 0.d0
       write(*,*) 'shapeHq error: call shape2DH instead'
       stop
 c     call shape2H('quad',Xi,Norder,Nedge_orient, NrdofH,ShapH,GradH)
@@ -130,6 +132,7 @@ c
       integer, intent(out) :: NrdofH
       real(8), intent(out) :: ShapH(MAXtriaH),GradH(2,MAXtriaH)
 c
+      NrdofH = 0; ShapH = 0.d0; GradH = 0.d0
       write(*,*) 'shapeHt error: call shape2DH instead'
       stop
 c     call shape2H('tria',Xi,Norder,Nedge_orient, NrdofH,ShapH,GradH)
@@ -175,6 +178,7 @@ c
       integer, intent(out) :: NrdofE
       real(8), intent(out) :: ShapE(2,MAXquadE),CurlE(MAXquadE)
 c
+      NrdofE = 0; ShapE = 0.d0; CurlE = 0.d0
       write(*,*) 'shape2E error: call shape2DE instead'
       stop
 c     call shape2DE(Type,Xi,Norder,Nedge_orient, NrdofE,ShapE,CurlE)
@@ -215,6 +219,7 @@ c
       integer, intent(out) :: NrdofE
       real(8), intent(out) :: ShapE(2,MAXquadE),CurlE(MAXquadE)
 c
+      NrdofE = 0; ShapE = 0.d0; CurlE = 0.d0
       write(*,*) 'shapeEq error: call shape2DE instead'
       stop
 c     call shape2E('quad',Xi,Norder,Nedge_orient, NrdofE,ShapE,CurlE)
@@ -256,6 +261,7 @@ c
       integer, intent(out) :: NrdofE
       real(8), intent(out) :: ShapE(2,MAXtriaE),CurlE(MAXtriaE)
 c
+      NrdofE = 0; ShapE = 0.d0; CurlE = 0.d0
       write(*,*) 'shapeEt error: call shape2DE instead'
       stop
 c     call shape2E('tria',Xi,Norder,Nedge_orient, NrdofE,ShapE,CurlE)
@@ -296,6 +302,7 @@ c
       integer, intent(out) :: NrdofQ
       real(8), intent(out) :: ShapQ(MAXquadQ)
 c
+      NrdofQ = 0; ShapQ = 0.d0
       write(*,*) 'shape2Q error: call shape2DQ instead'
       stop
 c     call shape2DQ(Type,Xi,Norder, NrdofQ,ShapQ)
@@ -334,6 +341,7 @@ c
       integer, intent(out) :: NrdofQ
       real(8), intent(out) :: ShapQ(MAXquadQ)
 c
+      NrdofQ = 0; ShapQ = 0.d0
       write(*,*) 'shapeQq error: call shape2DQ instead'
       stop
 c     call shape2Q('quad',Xi,Norder, NrdofQ,ShapQ)
@@ -372,6 +380,7 @@ c
       integer, intent(out) :: NrdofQ
       real(8), intent(out) :: ShapQ(MAXtriaQ)
 c
+      NrdofQ = 0; ShapQ = 0.d0
       write(*,*) 'shapeQt error: call shape2DQ instead'
       stop
 c     call shape2Q('tria',Xi,Norder, NrdofQ,ShapQ)

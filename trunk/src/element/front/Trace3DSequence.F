@@ -45,6 +45,7 @@ c
       integer, intent(out) :: NrdofH
       real(8), intent(out) :: ShapH(MAXmdlqH),GradH(2,MAXmdlqH)
 c
+      NrdofH = 0; ShapH = 0.d0; GradH = 0.d0
       write(*,*) 'shapHb2 error: call TraceFshapeH instead'
       stop
 c     call TraceFshapeH(Type,T,Nord,Norient, NrdofH,ShapH,GradH)
@@ -88,6 +89,7 @@ c
       integer, intent(out) :: NrdofE
       real(8), intent(out) :: ShapE(2,MAXmdlqE),CurlE(MAXmdlqE)
 c
+      NrdofE = 0; ShapE = 0.d0; CurlE = 0.d0
       write(*,*) 'shapEb2 error: call TraceFshapeE instead'
       stop
 c     call TraceFshapeE(Type,T,Nord,Norient, NrdofE,ShapE,CurlE)
@@ -131,6 +133,7 @@ c
       integer, intent(out) :: NrdofV
       real(8), intent(out) :: ShapV(MAXmdlqQ)
 c
+      NrdofV = 0; ShapV = 0.d0
       write(*,*) 'shapVb2 error: call TraceFshapeV instead'
       stop
 c     call TraceFshapeV(Type,T,Nord,Norient, NrdofV,ShapV)

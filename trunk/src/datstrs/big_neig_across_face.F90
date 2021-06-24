@@ -1,6 +1,6 @@
-!------------------------------------------------------------------------------
-!> Purpose : for an ACTIVE element Mdle, routine finds a big neighbor Neig
-!!           across face Iface
+!-----------------------------------------------------------------------
+!> Purpose : for an ACTIVE element Mdle, routine finds a big neighbor
+!!           Neig across face Iface
 !!
 !! @param[in]  Mdle  - middle node
 !! @param[in]  Iface - face number
@@ -8,7 +8,7 @@
 !!                     (0 if no such neighbor exists)
 !!
 !! @revision : May 12
-!------------------------------------------------------------------------------
+!-----------------------------------------------------------------------
 subroutine big_neig_across_face(Mdle,Iface, Neig)
   use data_structure3D
   implicit none
@@ -20,7 +20,7 @@ subroutine big_neig_across_face(Mdle,Iface, Neig)
   !  ...Locals
   integer,dimension(2) :: neig_ls,iface_ls,orient_ls
   integer :: mdlf,nrneig,ipos,ifound
-!------------------------------------------------------------------------------
+!-----------------------------------------------------------------------
 
   !  ...initialze to NO neighbor
   Neig=0
@@ -48,6 +48,9 @@ subroutine big_neig_across_face(Mdle,Iface, Neig)
     stop
   case(1) ; ipos=2
   case(2) ; ipos=1
+  case default
+    write(*,*) ' big_neig_across_face: ifound = ', ifound
+    stop
   endselect
   Neig=neig_ls(ipos)
 

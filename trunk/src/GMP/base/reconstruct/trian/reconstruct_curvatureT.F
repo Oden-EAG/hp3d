@@ -204,13 +204,13 @@ c  ...printing
  7000   format(' reconstruct_curvature: Np = ',i7,'; Nrcurves = ',i3)
         write(*,7035) weight(1:Nrcurves)
  7035   format('   weights   = ',10(e12.5,2x)/15x
-     .                           10(e12.5,2x)/15x
-     .                           10(e12.5,2x)/15x
-     .                           10(e12.5,2x)/15x
-     .                           10(e12.5,2x)/15x
-     .                           10(e12.5,2x)/15x
-     .                           10(e12.5,2x)/15x
-     .                           10(e12.5,2x)/15x)
+     .                          ,10(e12.5,2x)/15x
+     .                          ,10(e12.5,2x)/15x
+     .                          ,10(e12.5,2x)/15x
+     .                          ,10(e12.5,2x)/15x
+     .                          ,10(e12.5,2x)/15x
+     .                          ,10(e12.5,2x)/15x
+     .                          ,10(e12.5,2x)/15x)
         write(*,*)''
       endif
 c
