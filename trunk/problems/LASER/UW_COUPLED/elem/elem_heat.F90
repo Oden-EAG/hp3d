@@ -159,9 +159,9 @@ subroutine elem_heat(Mdle,                   &
    integer :: nrv,nre,nrf
 !
 !..various variables for the problem
-   real(8)    :: rjac,bjac,weight,wa,v2n,v1,v2,iphys,icomp
+   real(8)    :: rjac,bjac,weight,wa,v2n,v1,v2
    integer    :: i1,i2,j1,j2,k1,k2,kH,kk,i,j,nint,iflag,kE,k
-   integer    :: nordP,nrdof,l,nsign,ifc,info,ndom
+   integer    :: nordP,nrdof,l,nsign,ifc,info,ndom,iphys,icomp
    real(8)    :: rfval,therm_Load
    complex(8) :: zfval
 !
