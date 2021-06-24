@@ -233,7 +233,7 @@ subroutine refine(Mdle_in,Kref_in)
       if (iflag) then
 !
 !         write(*,1234) 'refine: type,kref,kreff = ',type,kref,kreff
-! 1234    format(a,a,',',i3,',',6(i3,x))
+! 1234    format(a,a,',',i3,',',6(i3,1x))
 !
          if ( is_iso_only() ) then
             call get_isoref(mdle, krefm)
@@ -258,7 +258,7 @@ subroutine refine(Mdle_in,Kref_in)
          else
             write(*,7010) mdle,type,kref,kreff(1:nface(type)),krefm
  7010       format('refine: INCONSISTENCY, mdle,type,kref,kreff,krefm = ', &
-                                           i7,',',a4,',',i3,',',6(i3,x),',',i3)
+                                           i7,',',a4,',',i3,',',6(i3,1x),',',i3)
             call logic_error(ERR_INVALID_VALUE, __FILE__,__LINE__)
             stop
          endif

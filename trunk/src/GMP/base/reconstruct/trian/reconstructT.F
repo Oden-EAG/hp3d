@@ -849,7 +849,7 @@ c  .....loop over subdivision points
 ccc              if ((angle.lt.angle_min).or.(angle.gt.angle_max)) then
                 iflag = 1
 ccc                write(*,6037)nh
- 6037     format(' reconstruct: BAD SOLID ANGLE IN TET = ,'i4)
+ 6037     format(' reconstruct: BAD SOLID ANGLE IN TET = ,',i4)
 ccc                write(*,6038)eta
  6038     format('   Eta         = ',3(e12.5,2x))
 ccc                write(*,6041)void

@@ -247,7 +247,7 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
           write(*,9998)xe(1:3),blend
  9998     format( ' xe,blend = ',3(e12.5,2x),2x,e12.5)
           write(*,9999)ie,Xp(1:3)
- 9999     format(' ie,Xp = 'i1,2x,3(e12.5,2x))
+ 9999     format(' ie,Xp = ',i1,2x,3(e12.5,2x))
         endif
 !
         if (iprint.eq.1) then
@@ -255,7 +255,7 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
  2000     format(' after EDGE = ',i2)
           do i=1,3
             write(*,2001)i,Dxdeta(i,1:3)
- 2001       format(' i,Dxdeta(i,:) = ',i2,2x(3e12.5,2x))
+ 2001       format(' i,Dxdeta(i,:) = ',i2,2x,3(e12.5,2x))
           enddo
         endif
 !
