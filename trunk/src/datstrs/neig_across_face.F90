@@ -1,14 +1,14 @@
-!------------------------------------------------------------------------------
-!> Purpose : routine finds YOUNGEST neighbor Neig across face Iface of element
-!!           middle node Mdle
+!-----------------------------------------------------------------------
+!> Purpose : routine finds YOUNGEST neighbor Neig across face Iface of
+!            element middle node Mdle
 !!
 !! @param[in]  Mdle  - middle node
 !! @param[in]  Iface - face number
-!! @param[out] Neig  - neighbor (0 if no neighbor exists, i.e. element is on
-!!                     the boundary)
+!! @param[out] Neig  - neighbor (0 if no neighbor exists, i.e. element
+!!                     is on the boundary)
 !!
 !! @revision : May 12
-!------------------------------------------------------------------------------
+!-----------------------------------------------------------------------
 subroutine neig_across_face(Mdle,Iface, Neig)
   implicit none
 
@@ -18,9 +18,9 @@ subroutine neig_across_face(Mdle,Iface, Neig)
   integer, intent(out) :: Neig
 
   !  ...Locals
-  integer,dimension(2) ::  nlist,nvoid
+  integer,dimension(2) :: nlist,nvoid
   integer :: mdlf,nrneig,ipos,ifound
-!------------------------------------------------------------------------------
+!-----------------------------------------------------------------------
 
   !  ...initialze to NO neighbor
   Neig=0
@@ -45,6 +45,9 @@ subroutine neig_across_face(Mdle,Iface, Neig)
     stop
   case(1) ; ipos=2
   case(2) ; ipos=1
+  case default
+    write(*,*) ' neig_across_face: ifound = ', ifound
+    stop
   endselect
   Neig=nlist(ipos)
 

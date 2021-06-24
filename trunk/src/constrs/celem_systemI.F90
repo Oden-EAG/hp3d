@@ -922,6 +922,8 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
           write(*,*)'UNSYMMETRIC CASE'
           write(*,*)'ibeg,iend,jbeg,jend (ibeg = 0 - Exit)'
           read(*,*) ibeg,iend,jbeg,jend
+        case default
+          write(*,*) ' celem_systemI: ISYM_FLAG = ',ISYM_FLAG
         end select
         if (ibeg.eq.0) goto 60
         do i=ibeg,iend
@@ -933,6 +935,9 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
 !  .......UNSYMMETRIC CASE
           case(2)
             kbeg=(i-1)*Nrdofc+jbeg; kend=(i-1)*Nrdofc+jend
+          case default
+            kbeg=0; kend = 0;
+            write(*,*) ' celem_systemI: ISYM_FLAG = ',ISYM_FLAG
           endselect
           write(*,8000) Zastif(kbeg:kend)
         enddo
