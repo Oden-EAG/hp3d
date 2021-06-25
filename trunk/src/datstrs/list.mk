@@ -16,8 +16,9 @@ find_nrdof.F90
 find_orient.F90
 find_order.F90
 get_index.F90
+if_pure_BC_edge.F90
 mesh_show.F90
-neig_edge.F
+neig_edge.F90
 neig_face.F90
 neig_show.F90
 nelcon.F90
