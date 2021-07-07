@@ -7,7 +7,7 @@
 !     latest revision:  - May 2021
 !
 !     purpose:          - main driver for MPI Test Program
-!                         Poisson Galerkin implementation
+!                         Vector Poisson Galerkin implementation
 !
 !----------------------------------------------------------------------
 !
@@ -185,6 +185,7 @@ subroutine master_main()
       write(*,*) 'Multiple uniform h-refs + solve........22'
       write(*,*) 'Single anisotropic h-refinement (z)....23'
       write(*,*) 'Refine a single element................26'
+      write(*,*) 'Random refinements.....................27'
       write(*,*) '                                         '
       write(*,*) '        ---- MPI Routines ----           '
       write(*,*) 'Distribute mesh........................30'
@@ -207,6 +208,7 @@ subroutine master_main()
       write(*,*) '          ---- TESTING ----              '
       write(*,*) 'Flush dof, update_gdof, update_Ddof....60'
       write(*,*) 'Reset Homogeneous BC flag..............70'
+      write(*,*) 'Test  find_element_ref.................80'
       write(*,*) '=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='
 !
       read( *,*) idec
@@ -252,7 +254,7 @@ subroutine master_main()
             call exec_case(idec)
 !
 !     ...Refinements
-         case(20,21,22,23,26)
+         case(20,21,22,23,26,27)
             call exec_case(idec)
 !
 !     ...MPI Routines
@@ -291,6 +293,8 @@ subroutine master_main()
          case(60)
             call exec_case(idec)
          case(70)
+            call exec_case(idec)
+         case(80)
             call exec_case(idec)
 !
       end select
@@ -380,7 +384,7 @@ subroutine worker_main()
             call exec_case(idec)
 !
 !     ...Refinements
-         case(20,21,22,23,26)
+         case(20,21,22,23,26,27)
             call exec_case(idec)
 !
 !     ...MPI Routines

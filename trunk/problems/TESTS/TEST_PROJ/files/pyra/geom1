@@ -1,0 +1,258 @@
+3   3     NDIM,MANDIM
+
+0         no surfaces
+
+1         NRDOMAIN
+
+
+10         NRPOINT
+
+Regular         point 1
+.0d0 .0d0 .0d0
+
+Regular         point 2
+1.d0 .0d0 .0d0
+
+Regular         point 3
+1.d0 1.d0 .0d0
+
+Regular         point 4
+.0d0 1.d0 .0d0
+
+Regular         point 5
+.0d0 .0d0 1.d0
+
+Regular         point 6
+.0d0 .0d0 -1.d0
+
+Regular         point 7
+-1.d0 .0d0 0.d0
+
+Regular         point 8
+0.d0 -1.d0 0.d0
+
+Regular         point 9
+0.d0  1.d0 1.d0
+
+Regular         point 10
+1.d0  0.d0 1.d0
+
+
+
+
+
+
+
+24 NRCURVE
+
+Seglin         curve 1
+1 2
+
+Seglin         curve 2
+2 3
+
+Seglin         curve 3
+3 4
+
+Seglin         curve 4
+1 4
+
+Seglin         curve 5
+1 5
+
+Seglin         curve 6
+2 5
+
+Seglin         curve 7
+3 5
+
+Seglin         curve 8
+4 5
+
+Seglin         curve 9
+1 6
+
+Seglin         curve 10
+2 6
+
+Seglin         curve 11
+3 6
+
+Seglin         curve 12
+4 6
+
+Seglin         curve 13
+1 7
+
+Seglin         curve 14
+4 7
+
+Seglin         curve 15
+5 7
+
+Seglin         curve 16
+1 8
+
+Seglin         curve 17
+2 8
+
+Seglin         curve 18
+5 8
+
+Seglin         curve 119
+3 9
+
+Seglin         curve 20
+4 9
+
+Seglin         curve 21
+5 9
+
+Seglin         curve 22
+2 10
+
+Seglin         curve 23
+3 10
+
+Seglin         curve 24
+5 10
+
+
+
+
+
+
+
+
+
+
+20  NRTRIAN
+
+PlaneTri    triangle 1
+1 2 5
+
+PlaneTri    triangle 2
+2 3 5
+
+PlaneTri    triangle 3
+4 3 5  
+
+PlaneTri    triangle 4
+1 4 5
+
+PlaneTri    triangle 5
+1 2 6
+
+PlaneTri    triangle 6
+2 3 6
+
+PlaneTri    triangle 7
+3 4 6
+
+PlaneTri    triangle 8
+1 4 6
+
+PlaneTri    triangle 9
+1 4 7
+
+PlaneTri    triangle 10
+4 7 5
+
+PlaneTri    triangle 11
+1 7 5
+
+PlaneTri    triangle 12
+1 8 2
+
+PlaneTri    triangle 13
+1 5 8
+
+PlaneTri    triangle 14
+8 2 5
+
+PlaneTri    triangle 15
+3 4 9
+
+PlaneTri    triangle 16
+3 9 5
+
+PlaneTri    triangle 17
+4 9 5
+
+PlaneTri    triangle 18
+2 3 10
+
+PlaneTri    triangle 19
+2 5 10
+
+PlaneTri    triangle 20
+10 3 5
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1 NRRECTA
+
+BilQua      rectangle 1
+1 2 3 4
+
+
+0 NRPRISM
+
+0 NRHEXAS 
+
+
+
+4 NRTETRA
+
+Linear
+1     1 4 7 5
+
+Linear
+1     1 8 2 5
+
+Linear
+1     5 3 4 9
+
+Linear
+1     10 2 5 3
+
+
+2 NRPYRAM
+
+Linear     pyramid 1
+1      1 2 3 4 5
+
+Linear     pyramid 2
+1      1 4 3 2 6
+
+
+
+
+
+
+
+8     number of curves to ``rotate''
+
+4     number of triangles to ``rotate''
+
+1     number of rectangles to ``rotate''
+
+
+
+
+
+1 NRTETRA
+
+Linear
+1     1 4 7 5

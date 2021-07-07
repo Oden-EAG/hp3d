@@ -18,6 +18,19 @@ subroutine exec_case(idec)
    integer :: mdle_subd(NRELES)
    integer :: i,mdle,kref,src,count,ierr,iflag
 !
+!  testing neig-edge
+   integer, parameter :: maxn=10
+   integer :: medge,nrneig,nrv,nre,loc,ie,iel
+   integer :: neig(maxn), nedg_list(maxn), norient_list(maxn)
+   integer :: nodesl(27), norientl(27)
+!
+   integer :: nr_ref
+   double precision :: per
+!
+!  work space for find_element_ref
+   character(len=4) :: type
+   integer :: kreff(6),krefm
+!
 !----------------------------------------------------------------------
 !
    solved = .false.
@@ -99,6 +112,13 @@ subroutine exec_case(idec)
          call close_mesh
          call update_gdof
          call update_Ddof
+!
+!  ...random refinements
+      case(27)
+        write(*,*) 'exec_case: SET PERCENTAGE OF ELEMENTS TO BE REFINED AND NUMBER OF REFINEMENTS'
+        read(*,*) per,nr_ref
+        write(*,*) '           per,nr_ref = ',per,nr_ref
+        call random_refine(per, nr_ref)
 !
 !  ...distribute mesh
       case(30)
@@ -192,6 +212,14 @@ subroutine exec_case(idec)
          case(1); PHYSAd(1) = .true.
          end select
          call update_Ddof
+!
+      case(80)
+         type = 'mdln'
+         kref = 32
+         kreff = (/1,0,0,0,0,0/)
+         call find_element_ref(type,kref,kreff, krefm)
+         write(*,*) 'exec_case: krefm = ',krefm
+!                
       case default
          write(*,*) 'exec_case: unknown case...'
    end select

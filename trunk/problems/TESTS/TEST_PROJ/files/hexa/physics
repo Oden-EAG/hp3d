@@ -1,0 +1,6 @@
+1000                MAXNODS  max number of nodes anticipated
+4                   NR_PHYSA number of physics attributes
+projH  contin 1     physics attribute, discretization type, # of variables
+projE  tangen 1     physics attribute, discretization type, # of variables
+projV  normal 1     physics attribute, discretization type, # of variables
+projQ  discon 1     physics attribute, discretization type, # of variables

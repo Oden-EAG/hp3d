@@ -43,7 +43,7 @@ subroutine set_break(Type_nod,Kref,Nord,Nbc,Subd, Nrsons,Type_sons,Norder,Nbcond
 ! PYRAMID
   case('mdld') ; call set_pyra_break(Kref,Nord, Nrsons,Type_sons,Norder)
   case default
-     write(*,*) 'set_break: NOT SUPPORTED TYPE ', Type_nod
+     write(*,*) 'set_break: NOT SUPPORTED TYPE Type_nod = ', Type_nod
      stop
   endselect
 !

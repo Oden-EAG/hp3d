@@ -1,0 +1,177 @@
+3   3     NDIM,MANDIM
+
+0         no surfaces
+
+1         NRDOMAIN
+
+
+8         NRPOINT
+
+Regular
+.0d0 .0d0 .0d0
+
+Regular
+1.d0 .0d0 .0d0
+
+Regular
+.0d0 1.d0 .0d0
+
+Regular
+.0d0 .0d0 1.d0
+
+Regular
+-1.d0 .0d0 0.d0
+
+Regular
+.0d0 -1.d0 0.d0
+
+Regular
+.0d0 .0d0 -1.d0
+
+Regular
+1.d0 1.d0 1.d0
+
+18 NRCURVE
+
+Seglin
+1 2
+
+Seglin
+1 3
+
+Seglin
+1 4
+
+Seglin
+2 3
+
+Seglin
+2 4
+
+Seglin
+3 4
+
+Seglin
+5 1
+
+Seglin
+5 3
+
+Seglin
+5 4
+
+Seglin
+6 1
+
+Seglin
+6 2
+
+Seglin
+6 4
+
+Seglin
+7 1
+
+Seglin
+7 2
+
+Seglin
+7 3
+
+Seglin
+8 2
+
+Seglin
+8 3
+
+Seglin
+8 4
+
+
+
+16  NRTRIAN
+
+PlaneTri
+1 2 3
+
+PlaneTri
+1 2 4
+
+PlaneTri
+2 3 4
+
+PlaneTri
+1 3 4
+
+PlaneTri
+5 1 3
+
+PlaneTri
+5 1 4
+
+PlaneTri
+5 3 4
+
+PlaneTri
+6 1 2
+
+PlaneTri
+6 1 4
+
+PlaneTri
+6 2 4
+
+PlaneTri
+7 1 2
+
+PlaneTri
+7 1 3
+
+PlaneTri
+7 2 3
+
+PlaneTri
+8 2 3
+
+PlaneTri
+8 3 4
+
+PlaneTri
+8 2 4
+
+
+
+
+0 NRRECTA
+
+0 NRPRISM
+
+0 NRHEXAS 
+
+5 NRTETRA
+
+Linear
+1     1 2 3 4
+
+Linear
+1     1 3 5 4
+
+Linear
+1     1 2 4 6
+
+Linear
+1     1 3 2 7
+
+Linear
+1     8 2 4 3
+
+0 NRPYRAM
+
+
+6     number of curves to ``rotate''
+
+4     number of triangles to ``rotate''
+
+0     number of rectangles to ``rotate''
+
+

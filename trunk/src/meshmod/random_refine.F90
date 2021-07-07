@@ -1,9 +1,10 @@
-!> Purpose : randomly refine mesh
+!> Purpose : randomly refine mesh and crosscheck elem_nodes with 
+!>           neig_fae and neig_edge
 !! @param[in] Per   - percentage to refine
 !! @param[in] Niter - number of iteration
 !!
 !! REAMARK : routine does NOT update gdofs, since random refinements
-!! are only meant for testing
+!! are only meant for testing data structure routines
 
 subroutine random_refine(Per, Nitr)
   use data_structure3D
@@ -66,21 +67,25 @@ ENDIF
 !       leaf element
         if (is_leaf(mdle)) then
 !
-!          pick refinement kind
+!          pick a random refinement kind
+!!!!  REMARK: anisotropic refinements of tets and pyramid CANNOT be upgraded to satisy the mesh refinement
+!             rules, hence they should not be used in the random refinements test
+!!         call get_isoref(mdle, kref) 
            select case (NODES(mdle)%type)
-           case ('mdln','mdld','mdlb'); call get_isoref(mdle, kref)
-              ! Testing all cases
-              ! case ('mdlp'); kref = kref_kind(mod(idx,2)+2, 'mdlp')
-
-              ! Testing anisotropic cases
-           case ('mdlp'); kref = kref_kind(mod(idx,3)+1, 'mdlp')
-              ! kyungjoo recover this after I complete aniso hcurl constrained approx
-              kref = 11
+           case ('mdlb')
+             kref = kref_kind(mod(idx,7)+1, 'mdlb')
+           case ('mdln')
+             kref = kref_kind(mod(idx,3)+1, 'mdln')
+           case ('mdlp')
+             kref = kref_kind(mod(idx,3)+1, 'mdlp')
+           case ('mdld')
+             kref=10  !the only supported refinement for the pyramid
            case default
-              write(*,9999)NODES(mdle)%type
-9999          format(' random_refine: Element type not supported! Type = ',a4)
+              write(*,9999) NODES(mdle)%type
+ 9999         format(' random_refine: Element type not supported! Type = ',a4)
               call logic_error(ERR_INVALID_VALUE,__FILE__,__LINE__)
            end select
+!!!           write(*,*) 'random_refine: NODES(mdle)%type,kref = ',NODES(mdle)%type,kref
            call refine(mdle, kref)
            nref = nref - 1
            if (iprint.eq.1) then
@@ -100,7 +105,7 @@ ENDIF
      !     testing)
      call close
 
-     !  ...testing "neig_face" routine
+     !  ...testing 'neig_face' and 'neig_edge' routines
      call verify_neig
 
      !  ...if last iteration, print
@@ -113,7 +118,7 @@ ENDIF
      endif
 !
 !    if number of active elements is large, skip visualization
-     if (NRELES > 50000)  cycle
+     if (NRELES > 50)  cycle
 
 !    dump to Paraview for visualization
      mode_save = QUIET_MODE
@@ -121,6 +126,9 @@ ENDIF
      QUIET_MODE = mode_save
 !
   enddo
+!
+  write(*,*) 'random_refine: CONSISTENCY CHECK PASSED'
+  call pause
 !
 !
 end subroutine random_refine

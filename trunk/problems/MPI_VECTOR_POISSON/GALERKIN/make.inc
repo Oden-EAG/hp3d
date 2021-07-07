@@ -21,6 +21,7 @@ SRC_GALERKIN = \
             exec_job.F90 \
             my_paraview_driver.F90 \
             soldis.F90 \
-            main.F90
+            main.F90 \
+            if_pure_BC_edge.F90
 
 SRC_FILE   += $(SRC_MODULE) $(SRC_COMMON) $(SRC_GALERKIN)
