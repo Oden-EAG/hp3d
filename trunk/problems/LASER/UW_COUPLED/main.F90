@@ -162,6 +162,11 @@ program main
          write(*,9020) ' ALPHA_Z                  = ', ALPHA_Z
       endif
    endif
+   if (ENVELOPE) then
+      write (*,*) ' Solving vectorial envelope formulation:'
+      write (*,9000) ' WAVENUM_SIGNAL          = ', WAVENUM_SIGNAL
+      write (*,9000) ' WAVENUM_PUMP            = ', WAVENUM_PUMP
+   endif
  9000 format(A,F11.6)
  9001 format(A,F11.3)
  9010 format(A,I3)

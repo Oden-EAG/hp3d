@@ -107,24 +107,33 @@ subroutine set_environment_maxwell
 !
 !..Set frequency OMEGA and impedance constant GAMMA
 !..the propagation constant determining number of wavelengths depends on both OMEGA and GAMMA
-   !call get_option_real('-omega' , 'OMEGA', 4.5d0  , OMEGA)
-   !call get_option_real('-gamma' , 'GAMMA', 1.0d0  , GAMMA)
-!..OMEGA, GAMMA for FIBER
-   call get_option_real('-omega' , 'OMEGA', OMEGA_SIGNAL, OMEGA) ! LP01 LMA
-   !call get_option_real('-omega' , 'OMEGA', 25.7d0, OMEGA) ! LP01 single-mode
-   !call get_option_real('-omega' , 'OMEGA', 40.0d0, OMEGA) ! LP11 multi-mode
-   !call get_option_real('-omega' , 'OMEGA', 8.1d0*PI, OMEGA)
-   call get_option_real('-gamma' , 'GAMMA', 1.0d0, GAMMA)
+   select case(GEOM_NO)
+!  ...RECTANGULAR WAVEGUIDE
+      case(1)
+      !..TE10 (0<x<1)
+      !  gamma is related to propagation constant, and is the impedance constant for TE10 mode
+         call get_option_real('-omega' , 'OMEGA', (sqrt(5.d0)/2.d0)*PI          , OMEGA)
+         call get_option_real('-gamma' , 'GAMMA', sqrt(1.d0-(PI**2)/(OMEGA**2)) , GAMMA)
+      !..TE20 (0<x<1)
+         !call get_option_real('-omega' , 'OMEGA', sqrt(5.d0)*PI                        , OMEGA)
+         !call get_option_real('-gamma' , 'GAMMA', sqrt(1.d0-((2.d0*PI)**2)/(OMEGA**2)) , GAMMA)
+!     ...wavenumbers for alternative vectorial envelope formulation
+         call get_option_real('-wavenum_signal' , 'WAVENUM_SIGNAL', 1.0d0*OMEGA*GAMMA, WAVENUM_SIGNAL)
+         call get_option_real('-wavenum_pump  ' , 'WAVENUM_PUMP  ', 1.0d0*OMEGA*GAMMA, WAVENUM_PUMP  )
+!  ...FIBER WAVEGUIDE
+      case(4,5)
+         call get_option_real('-omega' , 'OMEGA', OMEGA_SIGNAL, OMEGA) ! LP01 LMA
+         !call get_option_real('-omega' , 'OMEGA', 25.7d0, OMEGA) ! LP01 single-mode
+         !call get_option_real('-omega' , 'OMEGA', 40.0d0, OMEGA) ! LP11 multi-mode
+         !call get_option_real('-omega' , 'OMEGA', 8.1d0*PI, OMEGA)
+         call get_option_real('-gamma' , 'GAMMA', 1.0d0, GAMMA)
+!     ...wavenumbers for alternative vectorial envelope formulation
+         call get_option_real('-wavenum_signal' , 'WAVENUM' , OMEGA_SIGNAL*REF_INDEX_CORE, WAVENUM_SIGNAL )
+         call get_option_real('-wavenum_pump'   , 'WAVENUM' , OMEGA_PUMP  *REF_INDEX_CORE, WAVENUM_PUMP   )
+   end select
 !
-!..RECTANGULAR WAVEGUIDE
-!..OMEGA, GAMMA for rectangular waveguide,
-!  gamma is related to propagation constant, and is the impedance constant for TE10
-!..TE10 (0<x<1)
-   !call get_option_real('-omega' , 'OMEGA', (sqrt(5.d0)/2.d0)*PI          , OMEGA)
-   !call get_option_real('-gamma' , 'GAMMA', sqrt(1.d0-(PI**2)/(OMEGA**2)) , GAMMA)
-!..TE20 (0<x<1)
-   !call get_option_real('-omega' , 'OMEGA', sqrt(5.d0)*PI                        , OMEGA)
-   !call get_option_real('-gamma' , 'GAMMA', sqrt(1.d0-((2.d0*PI)**2)/(OMEGA**2)) , GAMMA)
+!..Use alternative vectorial envelope formulation
+   !call get_option_bool('-envelope', 'ENVELOPE'      , .false.    , ENVELOPE      )
 !
 !..IBCFLAG: 0 (dirichlet)
 !           2 (impedance via penalty method)

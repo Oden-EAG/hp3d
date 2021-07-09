@@ -49,6 +49,9 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
    real(8) :: Jm,Jm_x,Jm_y,Jm_xx,Jm_xy,Jm_yy
    real(8) :: Km,Km_x,Km_y,Km_xx,Km_xy,Km_yy
 !
+!..WAVENUM_SIGNAL or WAVENUM_PUMP
+   real(8) :: WAVENUM_FLD
+!
    VTYPE :: c2z,uz,uz_x,uz_y,uz_z,uz_xx,uz_xy,uz_xz,uz_yy,uz_yx,uz_yz
    VTYPE :: uz_zz,uz_zy,uz_zx
    VTYPE :: pz,pz_x,pz_y,pz_z,pz_xx,pz_xy,pz_xz,pz_yy,pz_yx,pz_yz
@@ -64,6 +67,15 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
    f_x = ZERO; f_y = ZERO; f_z = ZERO
    df_x = ZERO; df_y = ZERO; df_z = ZERO
    ddf_x = ZERO; ddf_y = ZERO; ddf_z = ZERO
+!
+!..set WAVENUM_FLD
+   select case(Fld)
+      case(0); WAVENUM_FLD = WAVENUM_PUMP
+      case(1); WAVENUM_FLD = WAVENUM_SIGNAL
+      case default
+         write(*,*) 'mfd_solutions: invalid Fld param. stop.'
+         stop
+   end select
 !
 !--------------------------------------------------------------------------------
 !      D E C L A R E    S O L U T I O N    V A R I A B L E S                    |
@@ -86,6 +98,8 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
       f_x = x1**np_x
       f_y = x2**np_y
       f_z = x3**np_z
+!  ...note: the envelope for a non-zero wavenumber will not be polynomial
+      !if (ENVELOPE) f_z = f_z * exp(-ZI*WAVENUM_FLD*x3)
 !
 !  ...derivatives
       select case(int(np_x))
@@ -111,6 +125,10 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
             df_z = np_z * x3**(np_z-1.d0)
             ddf_z = np_z * (np_z-1.d0) * x3**(np_z-2.d0)
       end select
+      !if (ENVELOPE) then
+      !   df_z = df_z * exp(-ZI*WAVENUM_FLD*x3)
+      !   df_z = df_z - ZI*WAVENUM_FLD*f_z
+      !endif
 !
 !--------------- 0th prob -------------------------------------------------------
 !..a polynomial solution with zero boundary values on unit cube
@@ -240,16 +258,19 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          f_x=-ZI*(OMEGA/PI)*sin(PI*x1)
          f_y=1.d0
          f_z=exp(-ZI*OMEGA*x3*gammaTE10)
+         if (ENVELOPE) f_z=1.d0
 !
 !     ...1st order derivatives
          df_x=-ZI*OMEGA*cos(PI*x1)
          df_y=0.d0
          df_z=-(ZI*OMEGA*gammaTE10)*f_z
+         if (ENVELOPE) df_z=0.d0
 !
 !     ...2nd order derivatives
          ddf_x=-PI**2*f_x
          ddf_y=0.d0
          ddf_z=-(ZI*OMEGA*gammaTE10)*df_z
+         if (ENVELOPE) ddf_z=0.d0
 !
          E=f_x*f_y*f_z
 !     ...1st order derivatives

@@ -154,6 +154,8 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !
 !..OMEGA_RATIO_SIGNAL or OMEGA_RATIO_PUMP
    real(8) :: OMEGA_RATIO_FLD
+!..WAVENUM_SIGNAL or WAVENUM_PUMP
+   real(8) :: WAVENUM_FLD
 !
 !..for polarizations function
    VTYPE, dimension(3,3) :: bg_pol,gain_pol,raman_pol,rndotE
@@ -220,12 +222,14 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
       end select
    endif
 !
-!..set OMEGA_RATIO_FLD
+!..set OMEGA_RATIO_FLD and WAVENUM_FLD
    select case(Fld_flag)
       case(0)
          OMEGA_RATIO_FLD = OMEGA_RATIO_PUMP
+         WAVENUM_FLD     = WAVENUM_PUMP
       case(1)
          OMEGA_RATIO_FLD = OMEGA_RATIO_SIGNAL ! 1.0d0
+         WAVENUM_FLD     = WAVENUM_SIGNAL
       case default
          write(*,*) 'elem_residual_maxwell. invalid Fld_flag param. stop.'
          stop
@@ -433,6 +437,12 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
                 zaJ(2,2)*fldF(2)*zsolQ(2) + &
                 zaJ(3,3)*fldF(3)*zsolQ(3)
          bload_E(k) = bload_E(k) - (zaux - zcux)*weight
+!     ...additional stiffness contribution if solving vectorial envelope equation
+         if (ENVELOPE) then
+!     ...-( -ik(e_z x H,F) ), where e_z x H = (-H_y,H_x,0)
+         zaux = -fldF(1)*zsolQ(5) + fldF(2)*zsolQ(4)
+         bload_E(k) = bload_E(k) + ZI*WAVENUM_FLD*zaux*weight
+         endif
 !
 !     ...second eqn
          k = 2*k1
@@ -442,6 +452,12 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
                 zcJ(2,2)*fldG(2)*zsolQ(5) + &
                 zcJ(3,3)*fldG(3)*zsolQ(6)
          bload_E(k) = bload_E(k) - (zaux + zcux)*weight
+!     ...additional stiffness contribution if solving vectorial envelope equation
+         if (ENVELOPE) then
+!     ...-( -ik(e_z x E,G) ), where e_z x E = (-E_y,E_x,0)
+         zaux = -fldG(1)*zsolQ(2) + fldG(2)*zsolQ(1)
+         bload_E(k) = bload_E(k) + ZI*WAVENUM_FLD*zaux*weight
+         endif
 !
 ! ===============================================================================
 !     ...Computation of Gram Matrix (w/o fast integration)
@@ -481,6 +497,9 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
             gramP(k) = gramP(k) &
                      + (zaux + ALPHA_NORM*FF + CC)*weight
 !
+            if (ENVELOPE) then
+            endif
+!
 !           (F_i,G_j) terms
             n = 2*k1-1; m = 2*k2
             k = nk(n,m)
@@ -491,6 +510,9 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
                    conjg(zcJ(2,2))*crlF(2)*fldE(2) + &
                    conjg(zcJ(3,3))*crlF(3)*fldE(3)
             gramP(k) = gramP(k) + (zaux+zcux)*weight
+!
+            if (ENVELOPE) then
+            endif
 !
 !        ...compute lower triangular part of 2x2 G_ij matrix
 !           only if it is not a diagonal element, G_ii
@@ -505,6 +527,9 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
                       zcJ(2,2)*fldF(2)*crlE(2) + &
                       zcJ(3,3)*fldF(3)*crlE(3)
                gramP(k) = gramP(k) + (zaux+zcux)*weight
+!
+               if (ENVELOPE) then
+               endif
             endif
 !
 !           (G_i,G_j) terms
@@ -515,6 +540,9 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
                    (abs(zcJ(3,3))**2)*fldF(3)*fldE(3)
             gramP(k) = gramP(k) &
                      + (zcux + ALPHA_NORM*FF + CC)*weight
+!
+            if (ENVELOPE) then
+            endif
          enddo
       enddo
    enddo

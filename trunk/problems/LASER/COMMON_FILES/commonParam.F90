@@ -31,7 +31,7 @@ module commonParam
    real(8), parameter :: H_BAR = 1.05457266d-34
 !
 !..set FAST_INT=1 to activate fast integration for hexahedra and prisms
-   integer :: FAST_INT = 1
+   integer :: FAST_INT = 0
 !
 !..material constants
    real(8)    :: MU,EPSILON
@@ -49,6 +49,11 @@ module commonParam
    integer :: IBCFLAG
 !
    integer :: TIMESTEP = 0
+!
+!..alternative vectorial envelope formulation
+   logical :: ENVELOPE = .true.
+   real(8) :: WAVENUM_SIGNAL = 0.0d0 ! approximate signal wavenumber
+   real(8) :: WAVENUM_PUMP   = 0.0d0 ! approximate pump wavenumber
 !
 !..weight for l2 term in scaled adjoint graph norm (UW Maxwell)
    real(8) :: ALPHA_NORM = 1.0d0
