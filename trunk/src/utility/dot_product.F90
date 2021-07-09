@@ -9,7 +9,7 @@
 !
 !   latest revision    - May 2020
 !
-!   purpose            - routine evaluates dot product  of two
+!   purpose            - routine evaluates dot product of two
 !                        vectors in R^3
 !
 !   arguments :
