@@ -521,8 +521,8 @@ c
       integer :: N,f
       logical, intent(out) :: IdecF
       double precision, intent(in)  :: Lam(0:3),DLam(1:3,0:3)
-      double precision, intent(out) :: LampF(1:4,0:2),
-     .                                             DLampF(1:4,1:3,0:2)
+      double precision, intent(out) :: LampF(0:2,1:4),
+     .                                             DLampF(1:3,0:2,1:4)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c           V=((0,0,0),(1,0,0),(0,1,0),(0,0,1))=>(v0,v1,v2,v3)
@@ -535,24 +535,24 @@ c     a projection
 c
 c  ...f=1 --> face012 with local orientation v0->v1->v2
       f=1
-      LampF(f,0) = Lam(0); LampF(f,1) = Lam(1); LampF(f,2) = Lam(2)
-      DLampF(f,1:N,0) = DLam(1:N,0); DLampF(f,1:N,1) = DLam(1:N,1);
-                                         DLampF(f,1:N,2) = DLam(1:N,2)
+      LampF(0,f) = Lam(0); LampF(1,f) = Lam(1); LampF(2,f) = Lam(2)
+      DLampF(1:N,0,f) = DLam(1:N,0); DLampF(1:N,1,f) = DLam(1:N,1);
+                                         DLampF(1:N,2,f) = DLam(1:N,2)
 c  ...f=2 --> face013 with local orientation v0->v1->v3
       f=2
-      LampF(f,0) = Lam(0); LampF(f,1) = Lam(1); LampF(f,2) = Lam(3)
-      DLampF(f,1:N,0) = DLam(1:N,0); DLampF(f,1:N,1) = DLam(1:N,1);
-                                         DLampF(f,1:N,2) = DLam(1:N,3)
+      LampF(0,f) = Lam(0); LampF(1,f) = Lam(1); LampF(2,f) = Lam(3)
+      DLampF(1:N,0,f) = DLam(1:N,0); DLampF(1:N,1,f) = DLam(1:N,1);
+                                         DLampF(1:N,2,f) = DLam(1:N,3)
 c  ...f=3 --> face123 with local orientation v1->v2->v3
       f=3
-      LampF(f,0) = Lam(1); LampF(f,1) = Lam(2); LampF(f,2) = Lam(3)
-      DLampF(f,1:N,0) = DLam(1:N,1); DLampF(f,1:N,1) = DLam(1:N,2);
-                                         DLampF(f,1:N,2) = DLam(1:N,3)
+      LampF(0,f) = Lam(1); LampF(1,f) = Lam(2); LampF(2,f) = Lam(3)
+      DLampF(1:N,0,f) = DLam(1:N,1); DLampF(1:N,1,f) = DLam(1:N,2);
+                                         DLampF(1:N,2,f) = DLam(1:N,3)
 c  ...f=4 --> face023 with local orientation v0->v2->v3
       f=4
-      LampF(f,0) = Lam(0); LampF(f,1) = Lam(2); LampF(f,2) = Lam(3)
-      DLampF(f,1:N,0) = DLam(1:N,0); DLampF(f,1:N,1) = DLam(1:N,2);
-                                         DLampF(f,1:N,2) = DLam(1:N,3)
+      LampF(0,f) = Lam(0); LampF(1,f) = Lam(2); LampF(2,f) = Lam(3)
+      DLampF(1:N,0,f) = DLam(1:N,0); DLampF(1:N,1,f) = DLam(1:N,2);
+                                         DLampF(1:N,2,f) = DLam(1:N,3)
 c
 c  ...projected coordinates are Lam, so IdecF=false for all faces
       IdecF = .FALSE.

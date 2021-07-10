@@ -47,7 +47,7 @@ c
       double precision :: LambV(4),DLambV(1:3,4)
       double precision :: LampE(0:1,6),DLampE(3,0:1,6)
       double precision :: GLampE(0:1),GDLampE(3,0:1)
-      double precision :: LampF(4,0:2),DLampF(4,3,0:2)
+      double precision :: LampF(0:2,4),DLampF(3,0:2,4)
       double precision :: GLampF(0:2),GDLampF(3,0:2)
       double precision :: phiE(2:Nsize(1)),DphiE(1:3,2:Nsize(1))
       double precision :: phiTri(2:Nsize(1)-1,1:Nsize(1)-2)
@@ -117,7 +117,7 @@ c      ...local parameters (again)
           maxI = maxIJ-minJ
           maxJ = maxIJ-minI
 c      ...orient first
-          call OrientTri(LampF(f,0:2),DLampF(f,1:N,0:2),NoriF(f),N,
+          call OrientTri(LampF(0:2,f),DLampF(1:N,0:2,f),NoriF(f),N,
      .                                                  GLampF,GDLampF)
 c      ...construct the shape functions
           call AncPhiTri(GLampF,GDLampF,nordF,IdecF,N,
@@ -272,7 +272,7 @@ c
       double precision :: Lam(0:3),DLam(3,0:3)
       double precision :: LampE(0:1,6),DLampE(3,0:1,6)
       double precision :: GLampE(0:1),GDLampE(3,0:1)
-      double precision :: LampF(4,0:2),DLampF(4,3,0:2)
+      double precision :: LampF(0:2,4),DLampF(3,0:2,4)
       double precision :: GLampF(0:2),GDLampF(3,0:2)
       double precision :: EE(3,0:Nsize(1)-1),CurlEE(3,0:Nsize(1)-1)
       double precision :: ETri(3,0:Nsize(1)-2,1:Nsize(1)-1)
@@ -337,7 +337,7 @@ c      ...local parameters (again)
           maxI = maxIJ-minJ
           maxJ = maxIJ-minI
 c      ...orient
-          call OrientTri(LampF(f,0:2),DLampF(f,1:N,0:2),NoriF(f),N,
+          call OrientTri(LampF(0:2,f),DLampF(1:N,0:2,f),NoriF(f),N,
      .                                                   GLampF,GDLampF)
 c      ...loop over families
           famctr=m
@@ -480,7 +480,7 @@ c     routine name      - shape3DVTet
 c
 c--------------------------------------------------------------------
 c
-c     latest revision:  - Oct 14, Apr 17
+c     latest revision:  - Oct 14, Apr 17, Jul 21
 c
 c     purpose:          - routine returns values of 3D tetrahedron element
 c                         H(div) shape functions and their divergences
@@ -513,7 +513,7 @@ c
       double precision, intent(out) :: ShapV(3,Nsize(2))
       double precision, intent(out) :: DivV(Nsize(2))
       double precision :: Lam(0:3),DLam(3,0:3)
-      double precision :: LampF(4,0:2),DLampF(4,3,0:2)
+      double precision :: LampF(0:2,4),DLampF(3,0:2,4)
       double precision :: GLampF(0:2),GDLampF(3,0:2)
       double precision :: VTri(3,0:Nsize(1)-1,0:Nsize(1)-1)
       double precision :: DivVTri(0:Nsize(1)-1,0:Nsize(1)-1)
@@ -548,7 +548,7 @@ c      ...local parameters (again)
           maxI = maxIJ-minJ
           maxJ = maxIJ-minI
 c      ...orient
-          call OrientTri(LampF(f,0:2),DLampF(f,1:N,0:2),NoriF(f),N,
+          call OrientTri(LampF(0:2,f),DLampF(1:N,0:2,f),NoriF(f),N,
      .                                                   GLampF,GDLampF)
 c      ...construct the shape functions
           call AncVTri(GLampF,GDLampF,nordF,IdecF,N,
