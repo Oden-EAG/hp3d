@@ -43,7 +43,7 @@ c
       double precision, intent(in)  :: Xi(2)
       double precision, intent(out) :: ShapH(Nsize(2))
       double precision, intent(out) :: GradH(2,Nsize(2))
-      double precision :: Mu(2,0:1),DMu(2,2,0:1)
+      double precision :: Mu(0:1,2),DMu(2,0:1,2)
       double precision :: MubV(2,4),DMubV(2,2,4)
       double precision :: MubE(4),DMubE(2,4)
       double precision :: MupE(0:1,4),DMupE(2,0:1,4)
@@ -208,7 +208,7 @@ c
       double precision, intent(in)  :: Xi(2)
       double precision, intent(out) :: ShapE(2,Nsize(2))
       double precision, intent(out) :: CurlE(Nsize(2))
-      double precision :: Mu(2,0:1),DMu(2,2,0:1)
+      double precision :: Mu(0:1,2),DMu(2,0:1,2)
       double precision :: MubE(4),DMubE(2,4)
       double precision :: MupE(0:1,4),DMupE(2,0:1,4)
       double precision :: GMupE(0:1),GDMupE(2,0:1)
@@ -273,7 +273,7 @@ c      ...local parameters (again)
           maxF(1) = nordF(a)-1
           maxF(2) = nordF(b)
 c      ...construct the shape functions
-          call AncEQuad(Mu(ab,0:1),DMu(1:N,ab,0:1),
+          call AncEQuad(Mu(0:1,ab),DMu(1:N,0:1,ab),
      .                                       nordF(ab),IdecF(ab),N,
      .                      EQuad(1:N,minF(1):maxF(1),minF(2):maxF(2)),
      .                      curlEQuad(minF(1):maxF(1),minF(2):maxF(2)))
@@ -458,7 +458,7 @@ c
       integer :: minI,minJ,maxI,maxJ
       double precision, intent(in)  :: Xi(2)
       double precision, intent(out) :: ShapQ(Nsize(2))
-      double precision :: Mu(2,0:1),DMu(2,2,0:1)
+      double precision :: Mu(0:1,2),DMu(2,0:1,2)
       double precision :: homP(2,0:Nsize(1)-1)
 c
 c  ...debugging flag
@@ -483,8 +483,8 @@ c    ...local parameters (again)
         maxI = nordF(1)-1
         maxJ = nordF(2)-1
 c    ...construct the shape functions
-        call HomLegendre(Mu(1,0:1),maxI, homP(1,minI:maxI))
-        call HomLegendre(Mu(2,0:1),maxJ, homP(2,minJ:maxJ))
+        call HomLegendre(Mu(0:1,1),maxI, homP(1,minI:maxI))
+        call HomLegendre(Mu(0:1,2),maxJ, homP(2,minJ:maxJ))
         do j=minJ,maxJ
           do i=minI,maxI
             m=m+1

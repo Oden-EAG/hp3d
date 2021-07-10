@@ -173,7 +173,7 @@ c
       implicit none
       logical,          intent(in)  ::                          Idec(2)
       integer,          intent(in)  ::                        Nord(2),N
-      double precision, intent(in)  ::     ST(1:2,0:1),DST(1:N,1:2,0:1)
+      double precision, intent(in)  ::     ST(0:1,1:2),DST(1:N,0:1,1:2)
       double precision, intent(out) ::     PhiQuad(2:Nord(1),2:Nord(2)),
      .                                DPhiQuad(1:N,2:Nord(1),2:Nord(2))
       integer ::                                minI,maxI,minJ,maxJ,i,j
@@ -190,9 +190,9 @@ c
       endif
 c
 c  ...get PhiE for each coordinate pair
-      call AncPhiE(ST(1,0:1),DST(1:N,1,0:1),Nord(1),Idec(1),N,
+      call AncPhiE(ST(0:1,1),DST(1:N,0:1,1),Nord(1),Idec(1),N,
      .          phiES,DphiES)
-      call AncPhiE(ST(2,0:1),DST(1:N,2,0:1),Nord(2),Idec(2),N,
+      call AncPhiE(ST(0:1,2),DST(1:N,0:1,2),Nord(2),Idec(2),N,
      .          phiET,DphiET)
 c
 c  ...the final result is the product of the two phiE
@@ -240,11 +240,11 @@ c
       implicit none
       logical,          intent(in)  ::                          Idec(2)
       integer,          intent(in)  ::                        Nord(2),N
-      double precision, intent(in)  ::     ST(1:2,0:1),DST(1:N,1:2,0:1)
+      double precision, intent(in)  ::     ST(0:1,1:2),DST(1:N,0:1,1:2)
       double precision, intent(out) :: EQuad(1:N,0:Nord(1)-1,2:Nord(2)),
      .                         CurlEQuad(1:2*N-3,0:Nord(1)-1,2:Nord(2))
       integer ::                          minI,maxI,minJ,maxJ,Ncurl,i,j
-      double precision ::         S(0:1),DS(1:N,0:1),T(0:1),DT(1:N,0:1),
+      double precision ::
      .                EES(1:N,0:Nord(1)-1),curlEES(1:2*N-3,0:Nord(1)-1),
      .       phiET(2:Nord(2)),DphiET(1:N,2:Nord(2)),DphiETxEES(1:2*N-3)
 c
@@ -258,11 +258,8 @@ c
  7001   format('AncEQuad: N = ',i2)
       endif
 c
-      S = ST(1,0:1); DS = DST(1:N,1,0:1)
-      T = ST(2,0:1); DT = DST(1:N,2,0:1)
-c
-      call AncEE(S,DS,Nord(1),Idec(1),N, EES,curlEES)
-      call AncphiE(T,DT,Nord(2),Idec(2),N, phiET,DphiET)
+      call AncEE(ST(0:1,1),DST(1:N,0:1,1),Nord(1),Idec(1),N, EES,curlEES)
+      call AncphiE(ST(0:1,2),DST(1:N,0:1,2),Nord(2),Idec(2),N, phiET,DphiET)
 c
       do j=minJ,maxJ
         do i=minI,maxI
@@ -311,12 +308,12 @@ c
       implicit none
       logical,          intent(in)  ::                          Idec(2)
       integer,          intent(in)  ::                        Nord(2),N
-      double precision, intent(in)  ::     ST(1:2,0:1),DST(1:N,1:2,0:1)
+      double precision, intent(in)  ::     ST(0:1,1:2),DST(1:N,0:1,1:2)
       double precision, intent(out) ::
      .                               VQuad(1:N,0:Nord(1)-1,0:Nord(2)-1),
      .                                DivVQuad(0:Nord(1)-1,0:Nord(2)-1)
       integer ::                          minI,maxI,minJ,maxJ,Ncurl,i,j
-      double precision ::         S(0:1),T(0:1),DS(1:N,0:1),DT(1:N,0:1),
+      double precision ::
      .          EES(1:N,0:Nord(1)-1),curlEES(1:2*N-3,0:Nord(1)-1),prod1,
      .          EET(1:N,0:Nord(2)-1),curlEET(1:2*N-3,0:Nord(2)-1),prod2
 c
@@ -330,11 +327,8 @@ c
  7001   format('AncVQuad: N = ',i2)
       endif
 c
-      S = ST(1,0:1); DS = DST(1:N,1,0:1)
-      T = ST(2,0:1); DT = DST(1:N,2,0:1)
-
-      call AncEE(S,DS,Nord(1),Idec(1),N, EES,curlEES)
-      call AncEE(T,DT,Nord(2),Idec(2),N, EET,curlEET)
+      call AncEE(ST(0:1,1),DST(1:N,0:1,1),Nord(1),Idec(1),N, EES,curlEES)
+      call AncEE(ST(0:1,2),DST(1:N,0:1,2),Nord(2),Idec(2),N, EET,curlEET)
 c
 c      ...slight speedup when Idec=(.TRUE.,.TRUE.)
       if (Idec(1).and.Idec(2)) then

@@ -27,15 +27,15 @@ c----------------------------------------------------------------------
 c
       implicit none
       double precision, intent(in)  :: Xi(2)
-      double precision, intent(out) :: Mu(1:2,0:1),DMu(1:2,1:2,0:1)
+      double precision, intent(out) :: Mu(0:1,1:2),DMu(1:2,0:1,1:2)
 c
 c  ...Define affine coordinates
-      Mu(1,0) = 1.d0-Xi(1); Mu(1,1) = Xi(1)
-      Mu(2,0) = 1.d0-Xi(2); Mu(2,1) = Xi(2)
+      Mu(0,1) = 1.d0-Xi(1); Mu(1,1) = Xi(1)
+      Mu(0,2) = 1.d0-Xi(2); Mu(1,2) = Xi(2)
 c  ...and their gradients
-      DMu(1:2,1:2,0:1) = 0.d0
-      DMu(1,1,0) = -1.d0; DMu(1,1,1) = 1.d0
-      DMu(2,2,0) = -1.d0; DMu(2,2,1) = 1.d0
+      DMu(1:2,0:1,1:2) = 0.d0
+      DMu(1,0,1) = -1.d0; DMu(1,1,1) = 1.d0
+      DMu(2,0,2) = -1.d0; DMu(2,1,2) = 1.d0
 c
       end subroutine AffineQuadrilateral
 c----------------------------------------------------------------------
@@ -57,17 +57,17 @@ c----------------------------------------------------------------------
 c
       implicit none
       double precision, intent(in)  :: Xi(3)
-      double precision, intent(out) :: Mu(1:3,0:1),DMu(1:3,1:3,0:1)
+      double precision, intent(out) :: Mu(0:1,1:3),DMu(1:3,0:1,1:3)
 c
 c  ...Define affine coordinates
-      Mu(1,0) = 1.d0-Xi(1); Mu(1,1) = Xi(1)
-      Mu(2,0) = 1.d0-Xi(2); Mu(2,1) = Xi(2)
-      Mu(3,0) = 1.d0-Xi(3); Mu(3,1) = Xi(3)
+      Mu(0,1) = 1.d0-Xi(1); Mu(1,1) = Xi(1)
+      Mu(0,2) = 1.d0-Xi(2); Mu(1,2) = Xi(2)
+      Mu(0,3) = 1.d0-Xi(3); Mu(1,3) = Xi(3)
 c  ...and their gradients
-      DMu(1:3,1:3,0:1) = 0.d0
-      DMu(1,1,0) = -1.d0; DMu(1,1,1) = 1.d0
-      DMu(2,2,0) = -1.d0; DMu(2,2,1) = 1.d0
-      DMu(3,3,0) = -1.d0; DMu(3,3,1) = 1.d0
+      DMu(1:3,0:1,1:3) = 0.d0
+      DMu(1,0,1) = -1.d0; DMu(1,1,1) = 1.d0
+      DMu(2,0,2) = -1.d0; DMu(2,1,2) = 1.d0
+      DMu(3,0,3) = -1.d0; DMu(3,1,3) = 1.d0
 c
       end subroutine AffineHexahedron
 c----------------------------------------------------------------------

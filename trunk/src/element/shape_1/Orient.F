@@ -36,8 +36,8 @@ c
       integer :: OrPa(0:7,1:2),OrGS(0:7,0:1),OrGT(0:7,0:1)
       logical, intent(in)  :: Idec(2)
       logical, intent(out) :: GIdec(2)
-      double precision, intent(in)  :: ST(1:2,0:1),DST(1:N,1:2,0:1)
-      double precision, intent(out) :: GST(1:2,0:1),GDST(1:N,1:2,0:1)
+      double precision, intent(in)  :: ST(0:1,1:2),DST(1:N,0:1,1:2)
+      double precision, intent(out) :: GST(0:1,1:2),GDST(1:N,0:1,1:2)
 c
 c     OrPa - Order of the pairs S and T (swapping)
 c     OrGS(1) - Is the global S axis aligned with the (parallel) local?
@@ -81,15 +81,15 @@ c  ...Nori=7 => ((s0,s1),(t0,t1))->((s0,s1),(t1,t0))
 c
 c     GST=[GST(1,0),GST(1,1); GST(2,0),GST(2,1)]
 c  ...Local-to-global transformation
-      GST(1,0) = ST(OrPa(Nori,1),OrGS(Nori,0))
+      GST(0,1) = ST(OrPa(Nori,1),OrGS(Nori,0))
       GST(1,1) = ST(OrPa(Nori,1),OrGS(Nori,1))
-      GST(2,0) = ST(OrPa(Nori,2),OrGT(Nori,0))
-      GST(2,1) = ST(OrPa(Nori,2),OrGT(Nori,1))
+      GST(0,2) = ST(OrPa(Nori,2),OrGT(Nori,0))
+      GST(1,2) = ST(OrPa(Nori,2),OrGT(Nori,1))
 c
-      GDST(1:N,1,0) = DST(1:N,OrPa(Nori,1),OrGS(Nori,0))
+      GDST(1:N,0,1) = DST(1:N,OrPa(Nori,1),OrGS(Nori,0))
       GDST(1:N,1,1) = DST(1:N,OrPa(Nori,1),OrGS(Nori,1))
-      GDST(1:N,2,0) = DST(1:N,OrPa(Nori,2),OrGT(Nori,0))
-      GDST(1:N,2,1) = DST(1:N,OrPa(Nori,2),OrGT(Nori,1))
+      GDST(1:N,0,2) = DST(1:N,OrPa(Nori,2),OrGT(Nori,0))
+      GDST(1:N,1,2) = DST(1:N,OrPa(Nori,2),OrGT(Nori,1))
 c
       GIdec(1) = Idec(OrPa(Nori,1)); GIdec(2) = Idec(OrPa(Nori,2))
 c

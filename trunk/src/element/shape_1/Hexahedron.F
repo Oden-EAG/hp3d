@@ -44,13 +44,13 @@ c
       double precision, intent(in)  :: Xi(3)
       double precision, intent(out) :: ShapH(Nsize(2))
       double precision, intent(out) :: GradH(1:3,Nsize(2))
-      double precision :: Mu(1:3,0:1),DMu(1:3,1:3,0:1)
+      double precision :: Mu(0:1,1:3),DMu(1:3,0:1,1:3)
       double precision :: MubV(1:3,1:8),DMubV(1:3,1:3,1:8)
       double precision :: MubE(1:2,1:12),DMubE(1:3,1:2,1:12)
       double precision :: MupE(0:1,1:12),DMupE(1:3,0:1,1:12)
       double precision :: GMupE(0:1),GDMupE(1:3,0:1)
       double precision :: MubF(1:6),DMubF(1:3,1:6)
-      double precision :: MupF(1:2,0:1,1:6),DMupF(1:3,1:2,0:1,1:6)
+      double precision :: MupF(0:1,1:2,1:6),DMupF(1:3,0:1,1:2,1:6)
       double precision :: GMupF(1:2,0:1),GDMupF(1:3,1:2,0:1)
       double precision :: phiE(2:Nsize(1)),DphiE(1:3,2:Nsize(1))
       double precision :: phiQuad(2:Nsize(1),2:Nsize(1))
@@ -107,7 +107,7 @@ c  ...call the blending and projections
         ndofF = (nordF(1)-1)*(nordF(2)-1)
         if (ndofF.gt.0) then
 c      ...orient first
-          call OrientQuad(MupF(1:2,0:1,f),DMupF(1:N,1:2,0:1,f),
+          call OrientQuad(MupF(0:1,1:2,f),DMupF(1:N,0:1,1:2,f),
      .                         NoriF(f),IdecF,N, GMupF,GDMupF,GIdecF)
 c      ...orders already take into account the orientations, so
 c      ...no need for swapping nordF
@@ -134,10 +134,10 @@ c  ...find order
 c  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 c    ...call phiQuad and phiE - no need to orient
-        call AncPhiQuad(Mu(1:2,0:1),DMu(1:N,1:2,0:1),nordB(1:2),
+        call AncPhiQuad(Mu(0:1,1:2),DMu(1:N,0:1,1:2),nordB(1:2),
      .                 IdecB(1:2),N, phiQuad(2:nordB(1),2:nordB(2)),
      .                            DphiQuad(1:N,2:nordB(1),2:nordB(2)))
-        call AncPhiE(Mu(3,0:1),DMu(1:N,3,0:1),nordB(3),IdecB(3),N,
+        call AncPhiE(Mu(0:1,3),DMu(1:N,0:1,3),nordB(3),IdecB(3),N,
      .                        phiE(2:nordB(3)),DphiE(1:N,2:nordB(3)))
         do k=2,nordB(3)
           do j=2,nordB(2)
@@ -246,12 +246,12 @@ c
       double precision, intent(in)  :: Xi(3)
       double precision, intent(out) :: ShapE(1:3,Nsize(2))
       double precision, intent(out) :: CurlE(1:3,Nsize(2))
-      double precision :: Mu(1:3,0:1),DMu(1:3,1:3,0:1)
+      double precision :: Mu(0:1,1:3),DMu(1:3,0:1,1:3)
       double precision :: MubE(1:2,1:12),DMubE(1:3,1:2,1:12)
       double precision :: MupE(0:1,1:12),DMupE(1:3,0:1,1:12)
       double precision :: GMupE(0:1),GDMupE(1:3,0:1)
       double precision :: MubF(1:6),DMubF(1:3,1:6)
-      double precision :: MupF(1:2,0:1,1:6),DMupF(1:3,1:2,0:1,1:6)
+      double precision :: MupF(0:1,1:2,1:6),DMupF(1:3,0:1,1:2,1:6)
       double precision :: GMupF(1:2,0:1),GDMupF(1:3,1:2,0:1)
       double precision :: EE(1:3,0:Nsize(1)-1),curlEE(1:3,0:Nsize(1)-1)
       double precision :: EQuad(1:3,0:Nsize(1)-1,2:Nsize(1))
@@ -299,7 +299,7 @@ c    ...find order
 c    ...these already account for orientations
         call decod(Nord(12+f),MODORDER,2, nordF)
 c    ...orient the variables first (except the order)
-        call OrientQuad(MupF(1:2,0:1,f),DMupF(1:N,1:2,0:1,f),
+        call OrientQuad(MupF(0:1,1:2,f),DMupF(1:N,0:1,1:2,f),
      .                         NoriF(f),IdecF,N, GMupF,GDMupF,GIdecF)
 c    ...loop over the two families
         do fam=0,1
@@ -311,7 +311,7 @@ c      ...degrees of freedom (dof) for this family
           ndofF(fam) = nordF(a)*(nordF(b)-1)
 c      ...now construct the shape functions if necessary
           if (ndofF(fam).gt.0) then
-            call AncEQuad(GMupF(ab,0:1),GDMupF(1:N,ab,0:1),
+            call AncEQuad(GMupF(0:1,ab),GDMupF(1:N,0:1,ab),
      .                       nordF(ab),GIdecF(ab),N,
      .                        EQuad(1:N,0:nordF(a)-1,2:nordF(b)),
      .                         curlEQuad(1:N,0:nordF(a)-1,2:nordF(b)))
@@ -350,11 +350,11 @@ c    ...degrees of freedom (dof) for this family
 c    ...create the bubbles for this family if necessary
         if (ndofB(fam).gt.0) then
 c      ...call EQuad and phiE with appropriate indexing
-          call AncEQuad(Mu(ab,0:1),DMu(1:N,ab,0:1),
+          call AncEQuad(Mu(0:1,ab),DMu(1:N,0:1,ab),
      .                                nordB(ab),IdecB(ab),N,
      .                     EQuad(1:N,0:nordB(a)-1,2:nordB(b)),
      .                   curlEQuad(1:N,0:nordB(a)-1,2:nordB(b)))
-          call AncPhiE(Mu(c,0:1),DMu(1:N,c,0:1),nordB(c),IdecB(c),N,
+          call AncPhiE(Mu(0:1,c),DMu(1:N,0:1,c),nordB(c),IdecB(c),N,
      .                        phiE(2:nordB(c)),DphiE(1:N,2:nordB(c)))
 c      ...the following manipulations are necessary due to
 c      ...some conventions in the code: the outer loop always wrt the
@@ -467,9 +467,9 @@ c
       double precision, intent(in)  :: Xi(3)
       double precision, intent(out) :: ShapV(1:3,Nsize(2))
       double precision, intent(out) :: DivV(Nsize(2))
-      double precision :: Mu(1:3,0:1),DMu(1:3,1:3,0:1)
+      double precision :: Mu(0:1,1:3),DMu(1:3,0:1,1:3)
       double precision :: MubF(1:6),DMubF(1:3,1:6)
-      double precision :: MupF(1:2,0:1,1:6),DMupF(1:3,1:2,0:1,1:6)
+      double precision :: MupF(0:1,1:2,1:6),DMupF(1:3,0:1,1:2,1:6)
       double precision :: GMupF(1:2,0:1),GDMupF(1:3,1:2,0:1)
       double precision :: VQuad(1:3,0:Nsize(1)-1,0:Nsize(1)-1)
       double precision :: divVQuad(0:Nsize(1)-1,0:Nsize(1)-1)
@@ -493,7 +493,7 @@ c    ...find order
 c    ...these already account for orientations
         call decod(Nord(12+f),MODORDER,2, nordF)
 c    ...orient the variables first (except the order)
-        call OrientQuad(MupF(1:2,0:1,f),DMupF(1:N,1:2,0:1,f),
+        call OrientQuad(MupF(0:1,1:2,f),DMupF(1:N,0:1,1:2,f),
      .                         NoriF(f),IdecF,N, GMupF,GDMupF,GIdecF)
         ndofF = nordF(1)*nordF(2)
 c    ...now construct the shape functions if necessary
@@ -526,11 +526,11 @@ c    ...degrees of freedom (dof) for this family
 c    ...create the bubbles for this family if necessary
         if (ndofB(fam).gt.0) then
 c      ...call VQuad and phiE with appropriate indexing
-          call AncVQuad(Mu(ab,0:1),DMu(1:N,ab,0:1),
+          call AncVQuad(Mu(0:1,ab),DMu(1:N,0:1,ab),
      .                                nordB(ab),IdecB(ab),N,
      .                   VQuad(1:N,0:nordB(a)-1,0:nordB(b)-1),
      .                         divVQuad(0:nordB(a)-1,0:nordB(b)-1))
-          call AncPhiE(Mu(c,0:1),DMu(1:N,c,0:1),nordB(c),IdecB(c),N,
+          call AncPhiE(Mu(0:1,c),DMu(1:N,0:1,c),nordB(c),IdecB(c),N,
      .                        phiE(2:nordB(c)),DphiE(1:N,2:nordB(c)))
 c      ...the following manipulations are necessary due to
 c      ...some conventions in the code: the outer loop always wrt the
@@ -623,7 +623,7 @@ c
       integer :: i,j,k,m,N,nordB(3),ndofB,iprint
       double precision, intent(in)  :: Xi(3)
       double precision, intent(out) :: ShapQ(Nsize(2))
-      double precision :: Mu(1:3,0:1),DMu(1:3,1:3,0:1)
+      double precision :: Mu(0:1,1:3),DMu(1:3,0:1,1:3)
       double precision :: homP(1:3,0:Nsize(1)-1)
 c
 c  ...debugging flag
@@ -643,9 +643,9 @@ c  ...find order
 c  ...if necessary, create bubbles - always necessary if p,q,r>=1
       if (ndofB.gt.0) then
 c    ...call Legendre polynomials - no need to orient
-        call HomLegendre(Mu(1,0:1),nordB(1)-1, homP(1,0:nordB(1)-1))
-        call HomLegendre(Mu(2,0:1),nordB(2)-1, homP(2,0:nordB(2)-1))
-        call HomLegendre(Mu(3,0:1),nordB(3)-1, homP(3,0:nordB(3)-1))
+        call HomLegendre(Mu(0:1,1),nordB(1)-1, homP(1,0:nordB(1)-1))
+        call HomLegendre(Mu(0:1,2),nordB(2)-1, homP(2,0:nordB(2)-1))
+        call HomLegendre(Mu(0:1,3),nordB(3)-1, homP(3,0:nordB(3)-1))
         do k=0,nordB(3)-1
           do j=0,nordB(2)-1
             do i=0,nordB(1)-1
