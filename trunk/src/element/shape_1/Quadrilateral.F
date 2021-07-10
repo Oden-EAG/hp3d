@@ -10,7 +10,7 @@ c     routine name      - shape2DHQuad
 c
 c----------------------------------------------------------------------
 c
-c     latest revision:  - Nov 14, Apr 17
+c     latest revision:  - Nov 14, Apr 17, Jul 21
 c
 c     purpose:          - evaluate quad H1 shape functions and their
 c                         gradient
@@ -45,8 +45,8 @@ c
       double precision, intent(out) :: GradH(2,Nsize(2))
       double precision :: Mu(2,0:1),DMu(2,2,0:1)
       double precision :: MubV(4,2),DMubV(4,2,2)
-      double precision :: MubE(4),DMubE(4,2)
-      double precision :: MupE(4,0:1),DMupE(4,2,0:1)
+      double precision :: MubE(4),DMubE(2,4)
+      double precision :: MupE(0:1,4),DMupE(2,0:1,4)
       double precision :: GMupE(0:1),GDMupE(2,0:1)
       double precision :: phiE(2:Nsize(1)),DphiE(2,2:Nsize(1))
       double precision :: phiQuad(2:Nsize(1),2:Nsize(1))
@@ -90,7 +90,7 @@ c    ...local parameters
 c      ...local parameters (again)
           maxI = nordE
 c      ...orient
-          call OrientE(MupE(e,0:1),DMupE(e,1:N,0:1),NoriE(e),N,
+          call OrientE(MupE(0:1,e),DMupE(1:N,0:1,e),NoriE(e),N,
      .                                                    GMupE,GDMupE)
 c      ...construct the shape functions
           call AncPhiE(GMupE,GDMupE,nordE,IdecE,N,
@@ -100,7 +100,7 @@ c      ...construct the shape functions
 c
             ShapH(m)     = MubE(e)*phiE(i)
             GradH(1:N,m) = MubE(e)*DphiE(1:N,i)
-     .                   + DMubE(e,1:N)*phiE(i)
+     .                   + DMubE(1:N,e)*phiE(i)
           enddo
         endif
       enddo
@@ -175,7 +175,7 @@ c     routine name      - shape2DEQuad
 c
 c----------------------------------------------------------------------
 c
-c     latest revision:  - Nov 14, Apr 17
+c     latest revision:  - Nov 14, Apr 17, Jul 21
 c
 c     purpose:          - evaluate quad H(curl) shape functions and
 c                         their curls
@@ -209,8 +209,8 @@ c
       double precision, intent(out) :: ShapE(2,Nsize(2))
       double precision, intent(out) :: CurlE(Nsize(2))
       double precision :: Mu(2,0:1),DMu(2,2,0:1)
-      double precision :: MubE(4),DMubE(4,2)
-      double precision :: MupE(4,0:1),DMupE(4,2,0:1)
+      double precision :: MubE(4),DMubE(2,4)
+      double precision :: MupE(0:1,4),DMupE(2,0:1,4)
       double precision :: GMupE(0:1),GDMupE(2,0:1)
       double precision :: EE(2,0:Nsize(1)-1),curlEE(0:Nsize(1)-1)
       double precision :: EQuad(2,0:Nsize(1)-1,2:Nsize(1))
@@ -242,7 +242,7 @@ c    ...local parameters
 c      ...local parameters (again)
           maxI = nordE-1
 c      ...orient
-          call OrientE(MupE(e,0:1),DMupE(e,1:N,0:1),NoriE(e),N,
+          call OrientE(MupE(0:1,e),DMupE(1:N,0:1,e),NoriE(e),N,
      .                                                    GMupE,GDMupE)
 c      ...construct the shape functions (curlEE should evaluate to 0)
           call AncEE(GMupE,GDMupE,nordE,IdecE,N,
@@ -251,7 +251,7 @@ c      ...construct the shape functions (curlEE should evaluate to 0)
             m=m+1
 c
             ShapE(1:N,m) = MubE(e)*EE(1:N,i)
-            call cross(N,DMubE(e,1:N),EE(1:N,i), CurlE(m))
+            call cross(N,DMubE(1:N,e),EE(1:N,i), CurlE(m))
           enddo
         endif
       enddo
