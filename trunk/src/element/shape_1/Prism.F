@@ -48,11 +48,11 @@ c
       double precision :: Mu(0:1),DMu(3,0:1)
       double precision :: Nu(0:2),DNu(3,0:2)
       double precision :: MubV(6),DMubV(3,6),NubV(6),DNubV(3,6)
-      double precision :: MubME(6),DMubME(6,3)
-      double precision :: NupME(6,0:1),DNupME(6,3,0:1)
+      double precision :: MubME(6),DMubME(3,6)
+      double precision :: NupME(0:1,6),DNupME(3,0:1,6)
       double precision :: GNupME(0:1),GDNupME(3,0:1)
       double precision :: NubQE(3),DNubQE(3,3)
-      double precision :: MupQE(3,0:1),DMupQE(3,3,0:1)
+      double precision :: MupQE(0:1,3),DMupQE(3,0:1,3)
       double precision :: GMupQE(0:1),GDMupQE(3,0:1)
       double precision :: MubTF(2),DMubTF(3,2)
       double precision :: NupTF(0:2,2),DNupTF(3,0:2,2)
@@ -100,7 +100,7 @@ c      ...local parameters (again)
           minI = 2
           maxI = nordME
 c      ...orient first
-          call OrientE(NupME(e,0:1),DNupME(e,1:N,0:1),NoriE(e),N,
+          call OrientE(NupME(0:1,e),DNupME(1:N,0:1,e),NoriE(e),N,
      .                                                   GNupME,GDNupME)
 c      ...construct the shape functions
           call AncPhiE(GNupME,GDNupME,nordME,IdecME,N,
@@ -109,7 +109,7 @@ c      ...construct the shape functions
             m=m+1
             ShapH(m) = phiE(i)*MubME(e)
             GradH(1:N,m) = DphiE(1:N,i)*MubME(e)
-     .                   + phiE(i)*DMubME(e,1:N)
+     .                   + phiE(i)*DMubME(1:N,e)
           enddo
         endif
       enddo
@@ -126,7 +126,7 @@ c      ...local parameters (again)
           minI = 2
           maxI = nordQE
 c      ...orient first
-          call OrientE(MupQE(e,0:1),DMupQE(e,1:N,0:1),NoriE(6+e),N,
+          call OrientE(MupQE(0:1,e),DMupQE(1:N,0:1,e),NoriE(6+e),N,
      .                                                   GMupQE,GDMupQE)
 c      ...construct the shape functions
           call AncPhiE(GMupQE,GDMupQE,nordQE,IdecQE,N,
@@ -135,7 +135,7 @@ c      ...construct the shape functions
             m=m+1
             ShapH(m) = phiE(i)*NubQE(e)
             GradH(1:N,m) = DphiE(1:N,i)*NubQE(e)
-     .                   + phiE(i)*DNubQE(e,1:N)
+     .                   + phiE(i)*DNubQE(1:N,e)
           enddo
         endif
       enddo
@@ -367,11 +367,11 @@ c
       double precision, intent(out) :: CurlE(3,Nsize(2))
       double precision :: Mu(0:1),DMu(3,0:1)
       double precision :: Nu(0:2),DNu(3,0:2)
-      double precision :: MubME(6),DMubME(6,3)
-      double precision :: NupME(6,0:1),DNupME(6,3,0:1)
+      double precision :: MubME(6),DMubME(3,6)
+      double precision :: NupME(0:1,6),DNupME(3,0:1,6)
       double precision :: GNupME(0:1),GDNupME(3,0:1)
       double precision :: NubQE(3),DNubQE(3,3)
-      double precision :: MupQE(3,0:1),DMupQE(3,3,0:1)
+      double precision :: MupQE(0:1,3),DMupQE(3,0:1,3)
       double precision :: GMupQE(0:1),GDMupQE(3,0:1)
       double precision :: MubTF(2),DMubTF(3,2)
       double precision :: NupTF(0:2,2),DNupTF(3,0:2,2)
@@ -414,7 +414,7 @@ c      ...local parameters (again)
           minI = 0
           maxI = nordME-1
 c      ...orient first
-          call OrientE(NupME(e,0:1),DNupME(e,1:N,0:1),NoriE(e),N,
+          call OrientE(NupME(0:1,e),DNupME(1:N,0:1,e),NoriE(e),N,
      .                                                   GNupME,GDNupME)
 c      ...construct the shape functions
           call AncEE(GNupME,GDNupME,nordME,IdecME,N,
@@ -423,7 +423,7 @@ c      ...construct the shape functions
             m=m+1
 c
             ShapE(1:N,m) = MubME(e)*EE(1:N,i)
-            call cross(3,DMubME(e,1:N),EE(1:N,i), DMubMExEE)
+            call cross(3,DMubME(1:N,e),EE(1:N,i), DMubMExEE)
             CurlE(1:N,m) = MubME(e)*CurlEE(1:N,i)
      .                   + DMubMExEE
           enddo
@@ -442,7 +442,7 @@ c      ...local parameters (again)
           minI = 0
           maxI = nordQE-1
 c      ...orient first
-          call OrientE(MupQE(e,0:1),DMupQE(e,1:N,0:1),NoriE(6+e),N,
+          call OrientE(MupQE(0:1,e),DMupQE(1:N,0:1,e),NoriE(6+e),N,
      .                                                   GMupQE,GDMupQE)
 c      ...construct the shape functions (CurlEE should be returned as all 0)
           call AncEE(GMupQE,GDMupQE,nordQE,IdecQE,N,
@@ -451,7 +451,7 @@ c      ...construct the shape functions (CurlEE should be returned as all 0)
             m=m+1
 c
             ShapE(1:N,m) = NubQE(e)*EE(1:3,i)
-            call cross(3,DNubQE(e,1:N),EE(1:N,i), CurlE(1:N,m))
+            call cross(3,DNubQE(1:N,e),EE(1:N,i), CurlE(1:N,m))
           enddo
         endif
       enddo
