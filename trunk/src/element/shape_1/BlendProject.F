@@ -808,7 +808,7 @@ c
       implicit none
       integer :: N,v
       double precision, intent(in)  :: Lam(1:5),DLam(1:3,1:5)
-      double precision, intent(out) :: LambV(1:5),DLambV(1:5,1:3)
+      double precision, intent(out) :: LambV(1:5),DLambV(1:3,1:5)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c      V=((0,0,0),(1,0,0),(1,1,0),(0,1,0),(0,0,1))=>(v1,v2,v3,v4,v5)
@@ -819,19 +819,19 @@ c  ...5 vertices, each with one blending function
 c
 c  ...v=1 --> v1=(0,0,0)
       v=1
-      LambV(v) = Lam(1); DLambV(v,1:N) = DLam(1:N,1)
+      LambV(v) = Lam(1); DLambV(1:N,v) = DLam(1:N,1)
 c  ...v=2 --> v2=(1,0,0)
       v=2
-      LambV(v) = Lam(2); DLambV(v,1:N) = DLam(1:N,2)
+      LambV(v) = Lam(2); DLambV(1:N,v) = DLam(1:N,2)
 c  ...v=3 --> v3=(1,1,0)
       v=3
-      LambV(v) = Lam(3); DLambV(v,1:N) = DLam(1:N,3)
+      LambV(v) = Lam(3); DLambV(1:N,v) = DLam(1:N,3)
 c  ...v=4 --> v4=(0,1,0)
       v=4
-      LambV(v) = Lam(4); DLambV(v,1:N) = DLam(1:N,4)
+      LambV(v) = Lam(4); DLambV(1:N,v) = DLam(1:N,4)
 c  ...v=5 --> v5=(0,0,1)
       v=5
-      LambV(v) = Lam(5); DLambV(v,1:N) = DLam(1:N,5)
+      LambV(v) = Lam(5); DLambV(1:N,v) = DLam(1:N,5)
 c
       end subroutine BlendPyraV
 c----------------------------------------------------------------------

@@ -9,7 +9,7 @@ c     routine name      - shape3DHPyra
 c
 c--------------------------------------------------------------------
 c
-c     latest revision:  - Jan 15, Apr 17
+c     latest revision:  - Jan 15, Apr 17, Jul 21
 c
 c     purpose:          - routine returns values of 3D pyramid element
 c                         H1 shape functions and their derivatives
@@ -49,7 +49,7 @@ c
       double precision :: Mu(2,0:1),DMu(3,2,0:1)
       double precision :: Nu(2,0:2),DNu(3,2,0:2)
       double precision :: MuZ(0:1),DMuZ(3,0:1)
-      double precision :: LambV(5),DLambV(5,3)
+      double precision :: LambV(5),DLambV(3,5)
       double precision :: MubME(4),DMubME(4,3)
       double precision :: NupME(4,0:1),DNupME(4,3,0:1)
       double precision :: GNupME(0:1),GDNupME(3,0:1)
@@ -83,7 +83,7 @@ c  ...VERTEX SHAPE FUNCTIONS
       do v=1,5
        m=m+1
        ShapH(m)     = LambV(v)
-       GradH(1:N,m) = DLambV(v,1:N)
+       GradH(1:N,m) = DLambV(1:N,v)
       enddo
 c
 c  ...MIXED EDGE SHAPE FUNCTIONS
