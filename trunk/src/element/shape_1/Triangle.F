@@ -171,7 +171,7 @@ c     routine name      - shape2DETri
 c
 c----------------------------------------------------------------------
 c
-c     latest revision:  - Nov 14, Apr 17
+c     latest revision:  - Nov 14, Apr 17, Jul 21
 c
 c     purpose:          - evaluate triangle H(curl) shape functions and
 c                         their curls
@@ -203,7 +203,7 @@ c
       double precision, intent(out) :: ShapE(2,Nsize(2))
       double precision, intent(out) :: CurlE(Nsize(2))
       double precision :: Nu(0:2),DNu(2,0:2)
-      double precision :: NupE(3,0:1),DNupE(3,2,0:1)
+      double precision :: NupE(0:1,3),DNupE(2,0:1,3)
       double precision :: GNupE(0:1),GDNupE(2,0:1)
       double precision :: EE(2,0:Nsize(1)-1),CurlEE(0:Nsize(1)-1)
       double precision :: ETri(2,0:Nsize(1)-2,1:Nsize(1)-1)
@@ -236,7 +236,7 @@ c    ...local parameters
 c      ...local parameters (again)
           maxI = nordE-1
 c      ...orient first
-          call OrientE(NupE(e,0:1),DNupE(e,1:N,0:1),NoriE(e),N,
+          call OrientE(NupE(0:1,e),DNupE(1:N,0:1,e),NoriE(e),N,
      .                                                    GNupE,GDNupE)
 c      ...construct the shape functions
           call AncEE(GNupE,GDNupE,nordE,IdecE,N,
