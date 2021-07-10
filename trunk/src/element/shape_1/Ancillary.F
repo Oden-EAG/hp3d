@@ -194,7 +194,6 @@ c  ...get PhiE for each coordinate pair
      .          phiES,DphiES)
       call AncPhiE(ST(0:1,2),DST(1:N,0:1,2),Nord(2),Idec(2),N,
      .          phiET,DphiET)
-c
 c  ...the final result is the product of the two phiE
       do j=minJ,maxJ
         do i=minI,maxI
@@ -244,7 +243,7 @@ c
       double precision, intent(out) :: EQuad(1:N,0:Nord(1)-1,2:Nord(2)),
      .                         CurlEQuad(1:2*N-3,0:Nord(1)-1,2:Nord(2))
       integer ::                          minI,maxI,minJ,maxJ,Ncurl,i,j
-      double precision ::
+      double precision ::         S(0:1),DS(1:N,0:1),T(0:1),DT(1:N,0:1),
      .                EES(1:N,0:Nord(1)-1),curlEES(1:2*N-3,0:Nord(1)-1),
      .       phiET(2:Nord(2)),DphiET(1:N,2:Nord(2)),DphiETxEES(1:2*N-3)
 c
@@ -258,8 +257,10 @@ c
  7001   format('AncEQuad: N = ',i2)
       endif
 c
-      call AncEE(ST(0:1,1),DST(1:N,0:1,1),Nord(1),Idec(1),N, EES,curlEES)
-      call AncphiE(ST(0:1,2),DST(1:N,0:1,2),Nord(2),Idec(2),N, phiET,DphiET)
+      call AncEE(ST(0:1,1),DST(1:N,0:1,1),Nord(1),Idec(1),N,
+     .           EES,curlEES)
+      call AncphiE(ST(0:1,2),DST(1:N,0:1,2),Nord(2),Idec(2),N,
+     .           phiET,DphiET)
 c
       do j=minJ,maxJ
         do i=minI,maxI
@@ -313,7 +314,7 @@ c
      .                               VQuad(1:N,0:Nord(1)-1,0:Nord(2)-1),
      .                                DivVQuad(0:Nord(1)-1,0:Nord(2)-1)
       integer ::                          minI,maxI,minJ,maxJ,Ncurl,i,j
-      double precision ::
+      double precision ::         S(0:1),T(0:1),DS(1:N,0:1),DT(1:N,0:1),
      .          EES(1:N,0:Nord(1)-1),curlEES(1:2*N-3,0:Nord(1)-1),prod1,
      .          EET(1:N,0:Nord(2)-1),curlEET(1:2*N-3,0:Nord(2)-1),prod2
 c
@@ -327,8 +328,10 @@ c
  7001   format('AncVQuad: N = ',i2)
       endif
 c
-      call AncEE(ST(0:1,1),DST(1:N,0:1,1),Nord(1),Idec(1),N, EES,curlEES)
-      call AncEE(ST(0:1,2),DST(1:N,0:1,2),Nord(2),Idec(2),N, EET,curlEET)
+      call AncEE(ST(0:1,1),DST(1:N,0:1,1),Nord(1),Idec(1),N,
+     .           EES,curlEES)
+      call AncEE(ST(0:1,2),DST(1:N,0:1,2),Nord(2),Idec(2),N,
+     .           EET,curlEET)
 c
 c      ...slight speedup when Idec=(.TRUE.,.TRUE.)
       if (Idec(1).and.Idec(2)) then

@@ -400,8 +400,8 @@ c  ...f=2 --> face5678 with local orientation v5->v6->v7->v8
       f=2
       MubF(f) = Mu(1,3); DMubF(1:N,f) = DMu(1:N,1,3)
 c     ...locally oriented quadruple representing projection
-      MupF(0,1,f) = Mu(0,1); MupF(1,f)1, = Mu(1,1)
-      MupF(0,2,f) = Mu(0,2); MupF(2,f)2, = Mu(1,2)
+      MupF(0,1,f) = Mu(0,1); MupF(1,1,f) = Mu(1,1)
+      MupF(0,2,f) = Mu(0,2); MupF(1,2,f) = Mu(1,2)
       DMupF(1:N,0,1,f) = DMu(1:N,0,1); DMupF(1:N,1,1,f) = DMu(1:N,1,1)
       DMupF(1:N,0,2,f) = DMu(1:N,0,2); DMupF(1:N,1,2,f) = DMu(1:N,1,2)
 c  ...f=3 --> face1265 with local orientation v1->v2->v6->v5
