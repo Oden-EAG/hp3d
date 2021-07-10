@@ -46,7 +46,7 @@ c
       double precision, intent(out) :: ShapH(Nsize(2))
       double precision, intent(out) :: GradH(1:3,Nsize(2))
       double precision :: Mu(0:1),DMu(3,0:1)
-      double precision :: NU(0:2),DNu(3,0:2)
+      double precision :: Nu(0:2),DNu(3,0:2)
       double precision :: MubV(6),DMubV(3,6),NubV(6),DNubV(3,6)
       double precision :: MubME(6),DMubME(6,3)
       double precision :: NupME(6,0:1),DNupME(6,3,0:1)
@@ -57,7 +57,7 @@ c
       double precision :: MubTF(2),DMubTF(2,3)
       double precision :: NupTF(2,0:2),DNupTF(2,3,0:2)
       double precision :: GNupTF(0:2),GDNupTF(3,0:2)
-      double precision :: STpQF(3,2,0:1),DSTpQF(3,3,2,0:1)
+      double precision :: STpQF(2,0:1,3),DSTpQF(3,2,0:1,3)
       double precision :: GSTpQF(2,0:1),GDSTpQF(3,2,0:1)
       double precision :: phiE(2:Nsize(1)),DphiE(3,2:Nsize(1))
       double precision :: phiTri(2:Nsize(1)-1,1:Nsize(1)-2)
@@ -190,7 +190,7 @@ c      ...local parameters (again)
           maxI = nordQF(1)
           maxJ = nordQF(2)
 c      ...orient
-          call OrientQuad(STpQF(f,1:2,0:1),DSTpQF(f,1:N,1:2,0:1),
+          call OrientQuad(STpQF(1:2,0:1,f),DSTpQF(1:N,1:2,0:1,f),
      .               NoriF(f+2),IdecQF(f,1:2),N, GSTpQF,GDSTpQF,GIdecQF)
 c      ...construct the shape functions
           call AncPhiQuad(GSTpQF,GDSTpQF,nordQF,GIdecQF,N,
@@ -327,7 +327,7 @@ c     routine name      - shape3EPris
 c
 c--------------------------------------------------------------------
 c
-c     latest revision:  - Oct 14, Apr 17
+c     latest revision:  - Oct 14, Apr 17, Jul 21
 c
 c     purpose:          - routine returns values of 3D triangular prism
 c                         element H(curl) shape functions and their
@@ -366,7 +366,7 @@ c
       double precision, intent(out) :: ShapE(3,Nsize(2))
       double precision, intent(out) :: CurlE(3,Nsize(2))
       double precision :: Mu(0:1),DMu(3,0:1)
-      double precision :: NU(0:2),DNu(3,0:2)
+      double precision :: Nu(0:2),DNu(3,0:2)
       double precision :: MubME(6),DMubME(6,3)
       double precision :: NupME(6,0:1),DNupME(6,3,0:1)
       double precision :: GNupME(0:1),GDNupME(3,0:1)
@@ -376,7 +376,7 @@ c
       double precision :: MubTF(2),DMubTF(2,3)
       double precision :: NupTF(2,0:2),DNupTF(2,3,0:2)
       double precision :: GNupTF(0:2),GDNupTF(3,0:2)
-      double precision :: STpQF(3,2,0:1),DSTpQF(3,3,2,0:1)
+      double precision :: STpQF(2,0:1,3),DSTpQF(3,2,0:1,3)
       double precision :: GSTpQF(2,0:1),GDSTpQF(3,2,0:1)
       double precision :: EE(3,0:Nsize(1)-1),CurlEE(3,0:Nsize(1)-1)
       double precision :: ETri(3,0:Nsize(1)-2,1:Nsize(1)-1)
@@ -507,7 +507,7 @@ c  ...loop over faces
 c    ...local parameters
         call decod(Nord(11+f),MODORDER,2, nordQF)
 c    ...orient
-        call OrientQuad(STpQF(f,1:2,0:1),DSTpQF(f,1:N,1:2,0:1),
+        call OrientQuad(STpQF(1:2,0:1,f),DSTpQF(1:N,1:2,0:1,f),
      .               NoriF(2+f),IdecQF(f,1:2),N, GSTpQF,GDSTpQF,GIdecQF)
 c    ...loop over families
         do fam=0,1
@@ -728,7 +728,7 @@ c     routine name      - shape3DVPris
 c
 c-----------------------------------------------------------------------
 c
-c     latest revision:  - Nov 14, Apr 17
+c     latest revision:  - Nov 14, Apr 17, Jul 21
 c
 c     purpose:          - routine returns values of 3D Prism element
 c                         H(div) shape functions and their divergences
@@ -764,11 +764,11 @@ c
       double precision, intent(out) :: ShapV(3,Nsize(2))
       double precision, intent(out) :: DivV(Nsize(2))
       double precision :: Mu(0:1),DMu(3,0:1)
-      double precision :: NU(0:2),DNu(3,0:2)
+      double precision :: Nu(0:2),DNu(3,0:2)
       double precision :: MubTF(2),DMubTF(2,3)
       double precision :: NupTF(2,0:2),DNupTF(2,3,0:2)
       double precision :: GNupTF(0:2),GDNupTF(3,0:2)
-      double precision :: STpQF(3,2,0:1),DSTpQF(3,3,2,0:1)
+      double precision :: STpQF(2,0:1,3),DSTpQF(3,2,0:1,3)
       double precision :: GSTpQF(2,0:1),GDSTpQF(3,2,0:1)
       double precision :: VTri(3,0:Nsize(1)-1,0:Nsize(1)-1)
       double precision :: DivVTri(0:Nsize(1)-1,0:Nsize(1)-1)
@@ -839,7 +839,7 @@ c      ...local parameters (again)
           maxI = nordQF(1)-1
           maxJ = nordQF(2)-1
 c      ...orient
-          call OrientQuad(STpQF(f,1:2,0:1),DSTpQF(f,1:N,1:2,0:1),
+          call OrientQuad(STpQF(1:2,0:1,f),DSTpQF(1:N,1:2,0:1,f),
      .               NoriF(2+f),IdecQF(f,1:2),N, GSTpQF,GDSTpQF,GIdecQF)
 c      ...construct the shape functions
           call AncVQuad(GSTpQF,GDSTpQF,nordQF,GIdecQF,N,

@@ -759,8 +759,8 @@ c
       logical, intent(out) :: IdecQF(1:3,1:2)
       double precision, intent(in)  :: Mu(0:1),DMu(1:3,0:1)
       double precision, intent(in)  :: Nu(0:2),DNu(1:3,0:2)
-      double precision, intent(out) :: STpF(1:3,1:2,0:1),
-     .                                           DSTpF(1:3,1:3,1:2,0:1)
+      double precision, intent(out) :: STpF(1:2,0:1,1:3),
+     .                                           DSTpF(1:3,1:2,0:1,1:3)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c        V=((0,0,0),(1,0,0),(0,1,0),
@@ -776,28 +776,28 @@ c
 c  ...f=1 --> face0143 with local orientation v0->v1->v4->v3
       f=1
 c     ...locally oriented quadruple representing projection
-      STpF(f,1,0) = Nu(0); STpF(f,1,1) = Nu(1)
-      STpF(f,2,0) = Mu(0); STpF(f,2,1) = Mu(1)
-      DSTpF(f,1:N,1,0) = DNu(1:N,0); DSTpF(f,1:N,1,1) = DNu(1:N,1)
-      DSTpF(f,1:N,2,0) = DMu(1:N,0); DSTpF(f,1:N,2,1) = DMu(1:N,1)
+      STpF(1,0,f) = Nu(0); STpF(1,1,f) = Nu(1)
+      STpF(2,0,f) = Mu(0); STpF(2,1,f) = Mu(1)
+      DSTpF(1:N,1,0,f) = DNu(1:N,0); DSTpF(1:N,1,1,f) = DNu(1:N,1)
+      DSTpF(1:N,2,0,f) = DMu(1:N,0); DSTpF(1:N,2,1,f) = DMu(1:N,1)
 c     ...simplification flags: projection (Nu;Mu)=>(false,true)
       IdecQF(f,1) = .FALSE.; IdecQF(f,2) = .TRUE.
 c  ...f=2 --> face1254 with local orientation v1->v2->v5->v4
       f=2
 c     ...locally oriented quadruple representing projection
-      STpF(f,1,0) = Nu(1); STpF(f,1,1) = Nu(2)
-      STpF(f,2,0) = Mu(0); STpF(f,2,1) = Mu(1)
-      DSTpF(f,1:N,1,0) = DNu(1:N,1); DSTpF(f,1:N,1,1) = DNu(1:N,2)
-      DSTpF(f,1:N,2,0) = DMu(1:N,0); DSTpF(f,1:N,2,1) = DMu(1:N,1)
+      STpF(1,0,f) = Nu(1); STpF(1,1,f) = Nu(2)
+      STpF(2,0,f) = Mu(0); STpF(2,1,f) = Mu(1)
+      DSTpF(1:N,1,0,f) = DNu(1:N,1); DSTpF(1:N,1,1,f) = DNu(1:N,2)
+      DSTpF(1:N,2,0,f) = DMu(1:N,0); DSTpF(1:N,2,1,f) = DMu(1:N,1)
 c     ...simplification flags: projection (Nu;Mu)=>(false,true)
       IdecQF(f,1) = .FALSE.; IdecQF(f,2) = .TRUE.
 c  ...f=3 --> face0253 with local orientation v0->v2->v5->v3
       f=3
 c     ...locally oriented quadruple representing projection
-      STpF(f,1,0) = Nu(0); STpF(f,1,1) = Nu(2)
-      STpF(f,2,0) = Mu(0); STpF(f,2,1) = Mu(1)
-      DSTpF(f,1:N,1,0) = DNu(1:N,0); DSTpF(f,1:N,1,1) = DNu(1:N,2)
-      DSTpF(f,1:N,2,0) = DMu(1:N,0); DSTpF(f,1:N,2,1) = DMu(1:N,1)
+      STpF(1,0,f) = Nu(0); STpF(1,1,f) = Nu(2)
+      STpF(2,0,f) = Mu(0); STpF(2,1,f) = Mu(1)
+      DSTpF(1:N,1,0,f) = DNu(1:N,0); DSTpF(1:N,1,1,f) = DNu(1:N,2)
+      DSTpF(1:N,2,0,f) = DMu(1:N,0); DSTpF(1:N,2,1,f) = DMu(1:N,1)
 c     ...simplification flags: projection (Nu;Mu)=>(false,true)
       IdecQF(f,1) = .FALSE.; IdecQF(f,2) = .TRUE.
 c
