@@ -368,9 +368,9 @@ c
       integer :: N,f
       logical, intent(out) :: IdecF(1:2)
       double precision, intent(in)  :: Mu(1:3,0:1),DMu(1:3,1:3,0:1)
-      double precision, intent(out) :: MubF(1:6),DMubF(1:6,1:3)
-      double precision, intent(out) :: MupF(1:6,1:2,0:1),
-     .                                           DMupF(1:6,1:3,1:2,0:1)
+      double precision, intent(out) :: MubF(1:6),DMubF(1:3,1:6)
+      double precision, intent(out) :: MupF(1:2,0:1,1:6),
+     .                                           DMupF(1:3,1:2,0:1,1:6)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c      V=((0,0,0),(1,0,0),(1,1,0),(0,1,0),
@@ -385,52 +385,52 @@ c     and a locally oriented quadruple representing a projection
 c
 c  ...f=1 --> face1234 with local orientation v1->v2->v3->v4
       f=1
-      MubF(f) = Mu(3,0); DMubF(f,1:N) = DMu(1:N,3,0)
+      MubF(f) = Mu(3,0); DMubF(1:N,f) = DMu(1:N,3,0)
 c     ...locally oriented quadruple representing projection
-      MupF(f,1,0) = Mu(1,0); MupF(f,1,1) = Mu(1,1)
-      MupF(f,2,0) = Mu(2,0); MupF(f,2,1) = Mu(2,1)
-      DMupF(f,1:N,1,0) = DMu(1:N,1,0); DMupF(f,1:N,1,1) = DMu(1:N,1,1)
-      DMupF(f,1:N,2,0) = DMu(1:N,2,0); DMupF(f,1:N,2,1) = DMu(1:N,2,1)
+      MupF(1,0,f) = Mu(1,0); MupF(1,1,f) = Mu(1,1)
+      MupF(2,0,f) = Mu(2,0); MupF(2,1,f) = Mu(2,1)
+      DMupF(1:N,1,0,f) = DMu(1:N,1,0); DMupF(1:N,1,1,f) = DMu(1:N,1,1)
+      DMupF(1:N,2,0,f) = DMu(1:N,2,0); DMupF(1:N,2,1,f) = DMu(1:N,2,1)
 c  ...f=2 --> face5678 with local orientation v5->v6->v7->v8
       f=2
-      MubF(f) = Mu(3,1); DMubF(f,1:N) = DMu(1:N,3,1)
+      MubF(f) = Mu(3,1); DMubF(1:N,f) = DMu(1:N,3,1)
 c     ...locally oriented quadruple representing projection
-      MupF(f,1,0) = Mu(1,0); MupF(f,1,1) = Mu(1,1)
-      MupF(f,2,0) = Mu(2,0); MupF(f,2,1) = Mu(2,1)
-      DMupF(f,1:N,1,0) = DMu(1:N,1,0); DMupF(f,1:N,1,1) = DMu(1:N,1,1)
-      DMupF(f,1:N,2,0) = DMu(1:N,2,0); DMupF(f,1:N,2,1) = DMu(1:N,2,1)
+      MupF(1,0,f) = Mu(1,0); MupF(1,1,f) = Mu(1,1)
+      MupF(2,0,f) = Mu(2,0); MupF(2,1,f) = Mu(2,1)
+      DMupF(1:N,1,0,f) = DMu(1:N,1,0); DMupF(1:N,1,1,f) = DMu(1:N,1,1)
+      DMupF(1:N,2,0,f) = DMu(1:N,2,0); DMupF(1:N,2,1,f) = DMu(1:N,2,1)
 c  ...f=3 --> face1265 with local orientation v1->v2->v6->v5
       f=3
-      MubF(f) = Mu(2,0); DMubF(f,1:N) = DMu(1:N,2,0)
+      MubF(f) = Mu(2,0); DMubF(1:N,f) = DMu(1:N,2,0)
 c     ...locally oriented quadruple representing projection
-      MupF(f,1,0) = Mu(1,0); MupF(f,1,1) = Mu(1,1)
-      MupF(f,2,0) = Mu(3,0); MupF(f,2,1) = Mu(3,1)
-      DMupF(f,1:N,1,0) = DMu(1:N,1,0); DMupF(f,1:N,1,1) = DMu(1:N,1,1)
-      DMupF(f,1:N,2,0) = DMu(1:N,3,0); DMupF(f,1:N,2,1) = DMu(1:N,3,1)
+      MupF(1,0,f) = Mu(1,0); MupF(1,1,f) = Mu(1,1)
+      MupF(2,0,f) = Mu(3,0); MupF(2,1,f) = Mu(3,1)
+      DMupF(1:N,1,0,f) = DMu(1:N,1,0); DMupF(1:N,1,1,f) = DMu(1:N,1,1)
+      DMupF(1:N,2,0,f) = DMu(1:N,3,0); DMupF(1:N,2,1,f) = DMu(1:N,3,1)
 c  ...f=4 --> face2376 with local orientation v2->v3->v7->v6
       f=4
-      MubF(f) = Mu(1,1); DMubF(f,1:N) = DMu(1:N,1,1)
+      MubF(f) = Mu(1,1); DMubF(1:N,f) = DMu(1:N,1,1)
 c     ...locally oriented quadruple representing projection
-      MupF(f,1,0) = Mu(2,0); MupF(f,1,1) = Mu(2,1)
-      MupF(f,2,0) = Mu(3,0); MupF(f,2,1) = Mu(3,1)
-      DMupF(f,1:N,1,0) = DMu(1:N,2,0); DMupF(f,1:N,1,1) = DMu(1:N,2,1)
-      DMupF(f,1:N,2,0) = DMu(1:N,3,0); DMupF(f,1:N,2,1) = DMu(1:N,3,1)
+      MupF(1,0,f) = Mu(2,0); MupF(1,1,f) = Mu(2,1)
+      MupF(2,0,f) = Mu(3,0); MupF(2,1,f) = Mu(3,1)
+      DMupF(1:N,1,0,f) = DMu(1:N,2,0); DMupF(1:N,1,1,f) = DMu(1:N,2,1)
+      DMupF(1:N,2,0,f) = DMu(1:N,3,0); DMupF(1:N,2,1,f) = DMu(1:N,3,1)
 c  ...f=5 --> face4378 with local orientation v4->v3->v7->v8
       f=5
-      MubF(f) = Mu(2,1); DMubF(f,1:N) = DMu(1:N,2,1)
+      MubF(f) = Mu(2,1); DMubF(1:N,f) = DMu(1:N,2,1)
 c     ...locally oriented quadruple representing projection
-      MupF(f,1,0) = Mu(1,0); MupF(f,1,1) = Mu(1,1)
-      MupF(f,2,0) = Mu(3,0); MupF(f,2,1) = Mu(3,1)
-      DMupF(f,1:N,1,0) = DMu(1:N,1,0); DMupF(f,1:N,1,1) = DMu(1:N,1,1)
-      DMupF(f,1:N,2,0) = DMu(1:N,3,0); DMupF(f,1:N,2,1) = DMu(1:N,3,1)
+      MupF(1,0,f) = Mu(1,0); MupF(1,1,f) = Mu(1,1)
+      MupF(2,0,f) = Mu(3,0); MupF(2,1,f) = Mu(3,1)
+      DMupF(1:N,1,0,f) = DMu(1:N,1,0); DMupF(1:N,1,1,f) = DMu(1:N,1,1)
+      DMupF(1:N,2,0,f) = DMu(1:N,3,0); DMupF(1:N,2,1,f) = DMu(1:N,3,1)
 c  ...f=6 --> face1485 with local orientation v1->v4->v8->v5
       f=6
-      MubF(f) = Mu(1,0); DMubF(f,1:N) = DMu(1:N,1,0)
+      MubF(f) = Mu(1,0); DMubF(1:N,f) = DMu(1:N,1,0)
 c     ...locally oriented quadruple representing projection
-      MupF(f,1,0) = Mu(2,0); MupF(f,1,1) = Mu(2,1)
-      MupF(f,2,0) = Mu(3,0); MupF(f,2,1) = Mu(3,1)
-      DMupF(f,1:N,1,0) = DMu(1:N,2,0); DMupF(f,1:N,1,1) = DMu(1:N,2,1)
-      DMupF(f,1:N,2,0) = DMu(1:N,3,0); DMupF(f,1:N,2,1) = DMu(1:N,3,1)
+      MupF(1,0,f) = Mu(2,0); MupF(1,1,f) = Mu(2,1)
+      MupF(2,0,f) = Mu(3,0); MupF(2,1,f) = Mu(3,1)
+      DMupF(1:N,1,0,f) = DMu(1:N,2,0); DMupF(1:N,1,1,f) = DMu(1:N,2,1)
+      DMupF(1:N,2,0,f) = DMu(1:N,3,0); DMupF(1:N,2,1,f) = DMu(1:N,3,1)
 c
 c  ...projected coordinates are Mu and Mu, so IdecF=(true,true) for
 c     all faces
