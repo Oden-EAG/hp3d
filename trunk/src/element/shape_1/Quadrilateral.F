@@ -44,7 +44,7 @@ c
       double precision, intent(out) :: ShapH(Nsize(2))
       double precision, intent(out) :: GradH(2,Nsize(2))
       double precision :: Mu(2,0:1),DMu(2,2,0:1)
-      double precision :: MubV(4,2),DMubV(4,2,2)
+      double precision :: MubV(2,4),DMubV(2,2,4)
       double precision :: MubE(4),DMubE(2,4)
       double precision :: MupE(0:1,4),DMupE(2,0:1,4)
       double precision :: GMupE(0:1),GDMupE(2,0:1)
@@ -74,9 +74,9 @@ c  ...loop over vertices
       do v=1,4
         m=m+1
 c
-        ShapH(m)     = MubV(v,1)*MubV(v,2)
-        GradH(1:N,m) = DMubV(v,1:N,1)*MubV(v,2)
-     .               + MubV(v,1)*DMubV(v,1:N,2)
+        ShapH(m)     = MubV(1,v)*MubV(2,v)
+        GradH(1:N,m) = DMubV(1:N,1,v)*MubV(2,v)
+     .               + MubV(1,v)*DMubV(1:N,2,v)
       enddo
 c
 c  ...EDGE SHAPE FUNCTIONS
