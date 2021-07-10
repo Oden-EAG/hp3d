@@ -9,7 +9,7 @@ c     routine name      - shape3DHHexa
 c
 c--------------------------------------------------------------------
 c
-c     latest revision:  - Oct 14, Apr 17
+c     latest revision:  - Oct 14, Apr 17, Jul 21
 c
 c     purpose:          - routine returns values of 3D hexahedron element
 c                         H1 shape functions and their derivatives
@@ -46,8 +46,8 @@ c
       double precision, intent(out) :: GradH(1:3,Nsize(2))
       double precision :: Mu(1:3,0:1),DMu(1:3,1:3,0:1)
       double precision :: MubV(1:8,1:3),DMubV(1:8,1:3,1:3)
-      double precision :: MubE(1:12,1:2),DMubE(1:12,1:3,1:2)
-      double precision :: MupE(1:12,0:1),DMupE(1:12,1:3,0:1)
+      double precision :: MubE(1:2,1:12),DMubE(1:3,1:2,1:12)
+      double precision :: MupE(0:1,1:12),DMupE(1:3,0:1,1:12)
       double precision :: GMupE(0:1),GDMupE(1:3,0:1)
       double precision :: MubF(1:6),DMubF(1:6,1:3)
       double precision :: MupF(1:6,1:2,0:1),DMupF(1:6,1:3,1:2,0:1)
@@ -84,17 +84,17 @@ c  ...call the blending and projections
         ndofE=Nord(e)-1
         if (ndofE.gt.0) then
 c      ...orient first
-          call OrientE(MupE(e,0:1),DMupE(e,1:N,0:1),NoriE(e),N,
+          call OrientE(MupE(0:1,e),DMupE(1:N,0:1,e),NoriE(e),N,
      .                                                 GMupE,GDMupE)
 c      ...construct the shape functions
           call AncPhiE(GMupE,GDMupE,Nord(e),IdecE,N,
      .                         phiE(2:Nord(e)),DphiE(1:N,2:Nord(e)))
           do i=2,Nord(e)
             m=m+1
-            ShapH(m) = MubE(e,1)*MubE(e,2)*phiE(i)
-            GradH(1:N,m) = MubE(e,1)*MubE(e,2)*DphiE(1:N,i)
-     .                   + MubE(e,1)*DMubE(e,1:N,2)*phiE(i)
-     .                   + DMubE(e,1:N,1)*MubE(e,2)*phiE(i)
+            ShapH(m) = MubE(1,e)*MubE(2,e)*phiE(i)
+            GradH(1:N,m) = MubE(1,e)*MubE(2,e)*DphiE(1:N,i)
+     .                   + MubE(1,e)*DMubE(1:N,2,e)*phiE(i)
+     .                   + DMubE(1:N,1,e)*MubE(2,e)*phiE(i)
           enddo
         endif
       enddo
@@ -210,7 +210,7 @@ c     routine name      - shape3DEHexa
 c
 c--------------------------------------------------------------------
 c
-c     latest revision:  - Oct 14, Apr 17
+c     latest revision:  - Oct 14, Apr 17, Jul 21
 c
 c     purpose:          - routine returns values of 3D hexahedron element
 c                         H(curl) shape functions and their derivatives
@@ -247,8 +247,8 @@ c
       double precision, intent(out) :: ShapE(1:3,Nsize(2))
       double precision, intent(out) :: CurlE(1:3,Nsize(2))
       double precision :: Mu(1:3,0:1),DMu(1:3,1:3,0:1)
-      double precision :: MubE(1:12,1:2),DMubE(1:12,1:3,1:2)
-      double precision :: MupE(1:12,0:1),DMupE(1:12,1:3,0:1)
+      double precision :: MubE(1:2,1:12),DMubE(1:3,1:2,1:12)
+      double precision :: MupE(0:1,1:12),DMupE(1:3,0:1,1:12)
       double precision :: GMupE(0:1),GDMupE(1:3,0:1)
       double precision :: MubF(1:6),DMubF(1:6,1:3)
       double precision :: MupF(1:6,1:2,0:1),DMupF(1:6,1:3,1:2,0:1)
@@ -276,16 +276,16 @@ c  ...call the blending and projections
         ndofE=Nord(e)
         if (ndofE.gt.0) then
 c      ...orient first
-          call OrientE(MupE(e,0:1),DMupE(e,1:N,0:1),NoriE(e),N,
+          call OrientE(MupE(0:1,e),DMupE(1:N,0:1,e),NoriE(e),N,
      .                                                 GMupE,GDMupE)
 c      ...construct the shape functions
           call AncEE(GMupE,GDMupE,Nord(e),IdecE,N,
      .                    EE(1:N,0:Nord(e)-1),curlEE(1:N,0:Nord(e)-1))
           do i=0,Nord(e)-1
             m=m+1
-            DTemp = MubE(e,1)*DMubE(e,1:N,2)+DMubE(e,1:N,1)*MubE(e,2)
+            DTemp = MubE(1,e)*DMubE(1:N,2,e)+DMubE(1:N,1,e)*MubE(2,e)
             call cross(N,DTemp,EE(1:N,i), CTemp)
-            ShapE(1:N,m) = MubE(e,1)*MubE(e,2)*EE(1:N,i)
+            ShapE(1:N,m) = MubE(1,e)*MubE(2,e)*EE(1:N,i)
             CurlE(1:N,m) = CTemp
           enddo
         endif
