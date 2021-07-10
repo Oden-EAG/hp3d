@@ -50,10 +50,10 @@ c
       double precision :: Nu(2,0:2),DNu(3,2,0:2)
       double precision :: MuZ(0:1),DMuZ(3,0:1)
       double precision :: LambV(5),DLambV(3,5)
-      double precision :: MubME(4),DMubME(4,3)
-      double precision :: NupME(4,0:1),DNupME(4,3,0:1)
+      double precision :: MubME(4),DMubME(3,4)
+      double precision :: NupME(0:1,4),DNupME(3,0:1,4)
       double precision :: GNupME(0:1),GDNupME(3,0:1)
-      double precision :: LampTE(4,0:1),DLampTE(4,3,0:1)
+      double precision :: LampTE(0:1,4),DLampTE(3,0:1,4)
       double precision :: GLampTE(0:1),GDLampTE(3,0:1)
       double precision :: MupQF(2,0:1),DMupQF(3,2,0:1)
       double precision :: GMupQF(2,0:1),GDMupQF(3,2,0:1)
@@ -99,7 +99,7 @@ c      ...local parameters (again)
           minI = 2
           maxI = nordME
 c      ...orient first
-          call OrientE(NupME(e,0:1),DNupME(e,1:N,0:1),NoriE(e),N,
+          call OrientE(NupME(0:1,e),DNupME(1:N,0:1,e),NoriE(e),N,
      .                                                   GNupME,GDNupME)
 c      ...construct the shape functions
           call AncPhiE(GNupME,GDNupME,nordME,IdecME,N,
@@ -107,7 +107,7 @@ c      ...construct the shape functions
           do i=minI,maxI
             m=m+1
             ShapH(m)     = MubME(e)*phiE(i)
-            GradH(1:N,m) = DMubME(e,1:N)*phiE(i)
+            GradH(1:N,m) = DMubME(1:N,e)*phiE(i)
      .                   + MubME(e)*DphiE(1:N,i)
           enddo
         endif
@@ -125,7 +125,7 @@ c      ...local parameters (again)
           minI = 2
           maxI = nordTE
 c      ...orient first
-          call OrientE(LampTE(e,0:1),DLampTE(e,1:N,0:1),NoriE(e+4),N,
+          call OrientE(LampTE(0:1,e),DLampTE(1:N,0:1,e),NoriE(e+4),N,
      .                                                 GLampTE,GDLampTE)
 c      ...construct the shape functions
           call AncPhiE(GLampTE,GDLampTE,nordTE,IdecTE,N,
@@ -318,7 +318,7 @@ c     routine name      - shape3DEPyra
 c
 c--------------------------------------------------------------------
 c
-c     latest revision:  - Jan 15, Apr 17
+c     latest revision:  - Jan 15, Apr 17, Jul 21
 c
 c     purpose:          - routine returns values of 3D pyramid element
 c                         H(curl) shape functions and their curls
@@ -359,10 +359,10 @@ c
       double precision :: Mu(2,0:1),DMu(3,2,0:1)
       double precision :: Nu(2,0:2),DNu(3,2,0:2)
       double precision :: MuZ(0:1),DMuZ(3,0:1)
-      double precision :: MubME(4),DMubME(4,3)
-      double precision :: NupME(4,0:1),DNupME(4,3,0:1)
+      double precision :: MubME(4),DMubME(3,4)
+      double precision :: NupME(0:1,4),DNupME(3,0:1,4)
       double precision :: GNupME(0:1),GDNupME(3,0:1)
-      double precision :: LampTE(4,0:1),DLampTE(4,3,0:1)
+      double precision :: LampTE(0:1,4),DLampTE(3,0:1,4)
       double precision :: GLampTE(0:1),GDLampTE(3,0:1)
       double precision :: MupQF(2,0:1),DMupQF(3,2,0:1)
       double precision :: GMupQF(2,0:1),GDMupQF(3,2,0:1)
@@ -405,7 +405,7 @@ c      ...local parameters (again)
           minI = 0
           maxI = nordME-1
 c      ...orient first
-          call OrientE(NupME(e,0:1),DNupME(e,1:N,0:1),NoriE(e),N,
+          call OrientE(NupME(0:1,e),DNupME(1:N,0:1,e),NoriE(e),N,
      .                                                   GNupME,GDNupME)
 c      ...construct the shape functions
           call AncEE(GNupME,GDNupME,nordME,IdecME,N,
@@ -414,7 +414,7 @@ c      ...construct the shape functions
             m=m+1
 c
             ShapE(1:N,m) = MubME(e)*EE(1:N,i)
-            call cross(3,DMubME(e,1:N),EE(1:N,i), DMubMExEE)
+            call cross(3,DMubME(1:N,e),EE(1:N,i), DMubMExEE)
             CurlE(1:N,m) = MubME(e)*CurlEE(1:N,i)
      .                   + DMubMExEE
           enddo
@@ -433,7 +433,7 @@ c      ...local parameters (again)
           minI = 0
           maxI = nordTE-1
 c      ...orient first
-          call OrientE(LampTE(e,0:1),DLampTE(e,1:N,0:1),NoriE(e+4),N,
+          call OrientE(LampTE(0:1,e),DLampTE(1:N,0:1,e),NoriE(e+4),N,
      .                                                 GLampTE,GDLampTE)
 c      ...construct the shape functions
           call AncEE(GLampTE,GDLampTE,nordTE,IdecTE,N,
