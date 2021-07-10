@@ -719,8 +719,8 @@ c
       logical, intent(out) :: IdecTF
       double precision, intent(in)  :: Mu(0:1),DMu(1:3,0:1)
       double precision, intent(in)  :: Nu(0:2),DNu(1:3,0:2)
-      double precision, intent(out) :: MubF(1:2),DMubF(1:2,1:3)
-      double precision, intent(out) :: NupF(1:2,0:2),DNupF(1:2,1:3,0:2)
+      double precision, intent(out) :: MubF(1:2),DMubF(1:3,1:2)
+      double precision, intent(out) :: NupF(0:2,1:2),DNupF(1:3,0:2,1:2)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c        V=((0,0,0),(1,0,0),(0,1,0),
@@ -734,18 +734,18 @@ c     oriented triplet (of nu) representing a projection
 c
 c  ...f=1 --> face012 with local orientation v0->v1->v2
       f=1
-      MubF(f) = Mu(0); DMubF(f,1:N) = DMu(1:N,0)
+      MubF(f) = Mu(0); DMubF(1:N,f) = DMu(1:N,0)
 c     ...locally oriented triplet representing projection
-      NupF(f,0) = Nu(0); NupF(f,1) = Nu(1); NupF(f,2) = Nu(2)
-      DNupF(f,1:N,0) = DNu(1:N,0); DNupF(f,1:N,1) = DNu(1:N,1);
-                                         DNupF(f,1:N,2) = DNu(1:N,2)
+      NupF(0,f) = Nu(0); NupF(1,f) = Nu(1); NupF(2,f) = Nu(2)
+      DNupF(1:N,0,f) = DNu(1:N,0); DNupF(1:N,1,f) = DNu(1:N,1);
+                                         DNupF(1:N,2,f) = DNu(1:N,2)
 c  ...f=2 --> face345 with local orientation v3->v4->v5
       f=2
-      MubF(f) = Mu(1); DMubF(f,1:N) = DMu(1:N,1)
+      MubF(f) = Mu(1); DMubF(1:N,f) = DMu(1:N,1)
 c     ...locally oriented triplet representing projection
-      NupF(f,0) = Nu(0); NupF(f,1) = Nu(1); NupF(f,2) = Nu(2)
-      DNupF(f,1:N,0) = DNu(1:N,0); DNupF(f,1:N,1) = DNu(1:N,1);
-                                         DNupF(f,1:N,2) = DNu(1:N,2)
+      NupF(0,f) = Nu(0); NupF(1,f) = Nu(1); NupF(2,f) = Nu(2)
+      DNupF(1:N,0,f) = DNu(1:N,0); DNupF(1:N,1,f) = DNu(1:N,1);
+                                         DNupF(1:N,2,f) = DNu(1:N,2)
 c
 c  ...projected coordinates are Nu, so IdecTF=true for all faces
       IdecTF = .TRUE.
