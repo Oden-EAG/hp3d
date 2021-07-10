@@ -443,7 +443,7 @@ c
       implicit none
       integer :: N,v
       double precision, intent(in)  :: Lam(0:3),DLam(1:3,0:3)
-      double precision, intent(out) :: LambV(1:4),DLambV(1:4,1:3)
+      double precision, intent(out) :: LambV(1:4),DLambV(1:3,1:4)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c           V=((0,0,0),(1,0,0),(0,1,0),(0,0,1))=>(v0,v1,v2,v3)
@@ -454,16 +454,16 @@ c  ...4 vertices, each with one blending function
 c
 c  ...v=1 --> v0=(0,0,0)
       v=1
-      LambV(v) = Lam(0); DLambV(v,1:N) = DLam(1:N,0)
+      LambV(v) = Lam(0); DLambV(1:N,v) = DLam(1:N,0)
 c  ...v=2 --> v1=(1,0,0)
       v=2
-      LambV(v) = Lam(1); DLambV(v,1:N) = DLam(1:N,1)
+      LambV(v) = Lam(1); DLambV(1:N,v) = DLam(1:N,1)
 c  ...v=3 --> v2=(0,1,0)
       v=3
-      LambV(v) = Lam(2); DLambV(v,1:N) = DLam(1:N,2)
+      LambV(v) = Lam(2); DLambV(1:N,v) = DLam(1:N,2)
 c  ...v=4 --> v3=(0,0,1)
       v=4
-      LambV(v) = Lam(3); DLambV(v,1:N) = DLam(1:N,3)
+      LambV(v) = Lam(3); DLambV(1:N,v) = DLam(1:N,3)
 c
       end subroutine BlendTetV
 c----------------------------------------------------------------------
