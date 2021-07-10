@@ -45,7 +45,7 @@ c
       double precision, intent(out) :: GradH(1:3,Nsize(2))
       double precision :: Lam(0:3),DLam(1:3,0:3)
       double precision :: LambV(4),DLambV(1:3,4)
-      double precision :: LampE(6,0:1),DLampE(6,3,0:1)
+      double precision :: LampE(0:1,6),DLampE(3,0:1,6)
       double precision :: GLampE(0:1),GDLampE(3,0:1)
       double precision :: LampF(4,0:2),DLampF(4,3,0:2)
       double precision :: GLampF(0:2),GDLampF(3,0:2)
@@ -91,7 +91,7 @@ c    ...local parameters
 c      ...local parameters (again)
           maxI = nordE
 c      ...orient first
-          call OrientE(LampE(e,0:1),DLampE(e,1:N,0:1),NoriE(e),N,
+          call OrientE(LampE(0:1,e),DLampE(1:N,0:1,e),NoriE(e),N,
      .                                                   GLampE,GDLampE)
 c      ...construct the shape functions
           call AncPhiE(GLampE,GDLampE,nordE,IdecE,N,
@@ -235,7 +235,7 @@ c     routine name      - shape3DETet
 c
 c--------------------------------------------------------------------
 c
-c     latest revision:  - Oct 14, Apr 17
+c     latest revision:  - Oct 14, Apr 17, Jul 21
 c
 c     purpose:          - routine returns values of 3D tetrahedron element
 c                         H(curl) shape functions and their derivatives
@@ -270,7 +270,7 @@ c
       double precision, intent(out) :: ShapE(3,Nsize(2))
       double precision, intent(out) :: CurlE(3,Nsize(2))
       double precision :: Lam(0:3),DLam(3,0:3)
-      double precision :: LampE(6,0:1),DLampE(6,3,0:1)
+      double precision :: LampE(0:1,6),DLampE(3,0:1,6)
       double precision :: GLampE(0:1),GDLampE(3,0:1)
       double precision :: LampF(4,0:2),DLampF(4,3,0:2)
       double precision :: GLampF(0:2),GDLampF(3,0:2)
@@ -309,7 +309,7 @@ c    ...local parameters
 c      ...local parameters (again)
           maxI = nordE-1
 c      ...orient
-          call OrientE(LampE(e,0:1),DLampE(e,1:N,0:1),NoriE(e),N,
+          call OrientE(LampE(0:1,e),DLampE(1:N,0:1,e),NoriE(e),N,
      .                                                   GLampE,GDLampE)
 c      ...construct the shape functions
           call AncEE(GLampE,GDLampE,nordE,IdecE,N, EE(1:N,minI:maxI),

@@ -473,8 +473,8 @@ c
       integer :: N,e
       logical, intent(out) :: IdecE
       double precision, intent(in)  :: Lam(0:3),DLam(1:3,0:3)
-      double precision, intent(out) :: LampE(1:6,0:1),
-     .                                             DLampE(1:6,1:3,0:1)
+      double precision, intent(out) :: LampE(0:1,1:6),
+     .                                             DLampE(1:3,0:1,1:6)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c           V=((0,0,0),(1,0,0),(0,1,0),(0,0,1))=>(v0,v1,v2,v3)
@@ -487,28 +487,28 @@ c     a projection
 c
 c  ...e=1 --> edge01 with local orientation v0->v1
       e=1
-      LampE(e,0) = Lam(0); LampE(e,1) = Lam(1)
-      DLampE(e,1:N,0) = DLam(1:N,0); DLampE(e,1:N,1) = DLam(1:N,1)
+      LampE(0,e) = Lam(0); LampE(1,e) = Lam(1)
+      DLampE(1:N,0,e) = DLam(1:N,0); DLampE(1:N,1,e) = DLam(1:N,1)
 c  ...e=2 --> edge12 with local orientation v1->v2
       e=2
-      LampE(e,0) = Lam(1); LampE(e,1) = Lam(2)
-      DLampE(e,1:N,0) = DLam(1:N,1); DLampE(e,1:N,1) = DLam(1:N,2)
+      LampE(0,e) = Lam(1); LampE(1,e) = Lam(2)
+      DLampE(1:N,0,e) = DLam(1:N,1); DLampE(1:N,1,e) = DLam(1:N,2)
 c  ...e=3 --> edge20 with local orientation v0->v2
       e=3
-      LampE(e,0) = Lam(0); LampE(e,1) = Lam(2)
-      DLampE(e,1:N,0) = DLam(1:N,0); DLampE(e,1:N,1) = DLam(1:N,2)
+      LampE(0,e) = Lam(0); LampE(1,e) = Lam(2)
+      DLampE(1:N,0,e) = DLam(1:N,0); DLampE(1:N,1,e) = DLam(1:N,2)
 c  ...e=4 --> edge03 with local orientation v0->v3
       e=4
-      LampE(e,0) = Lam(0); LampE(e,1) = Lam(3)
-      DLampE(e,1:N,0) = DLam(1:N,0); DLampE(e,1:N,1) = DLam(1:N,3)
+      LampE(0,e) = Lam(0); LampE(1,e) = Lam(3)
+      DLampE(1:N,0,e) = DLam(1:N,0); DLampE(1:N,1,e) = DLam(1:N,3)
 c  ...e=5 --> edge13 with local orientation v1->v3
       e=5
-      LampE(e,0) = Lam(1); LampE(e,1) = Lam(3)
-      DLampE(e,1:N,0) = DLam(1:N,1); DLampE(e,1:N,1) = DLam(1:N,3)
+      LampE(0,e) = Lam(1); LampE(1,e) = Lam(3)
+      DLampE(1:N,0,e) = DLam(1:N,1); DLampE(1:N,1,e) = DLam(1:N,3)
 c  ...e=6 --> edge23 with local orientation v2->v3
       e=6
-      LampE(e,0) = Lam(2); LampE(e,1) = Lam(3)
-      DLampE(e,1:N,0) = DLam(1:N,2); DLampE(e,1:N,1) = DLam(1:N,3)
+      LampE(0,e) = Lam(2); LampE(1,e) = Lam(3)
+      DLampE(1:N,0,e) = DLam(1:N,2); DLampE(1:N,1,e) = DLam(1:N,3)
 c
 c  ...projected coordinates are Lam, so IdecE=false for all edges
       IdecE = .FALSE.
