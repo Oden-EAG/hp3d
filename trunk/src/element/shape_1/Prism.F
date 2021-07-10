@@ -41,7 +41,7 @@ c
       integer :: iprint,N,m,v,e,f,i,j,k,nij,nordME,ndofME,nordQE,ndofQE
       integer :: nordTF,ndofTF,nordQF(2),ndofQF,nordB(2),ndofB
       integer :: minI,minJ,minK,minIJ,maxI,maxJ,maxK,maxIJ
-      logical :: IdecME,IdecQE,IdecTF,IdecQF(3,2),GIdecQF(2),IdecB(2)
+      logical :: IdecME,IdecQE,IdecTF,IdecQF(2,3),GIdecQF(2),IdecB(2)
       double precision, intent(in)  :: X(3)
       double precision, intent(out) :: ShapH(Nsize(2))
       double precision, intent(out) :: GradH(1:3,Nsize(2))
@@ -191,7 +191,7 @@ c      ...local parameters (again)
           maxJ = nordQF(2)
 c      ...orient
           call OrientQuad(STpQF(1:2,0:1,f),DSTpQF(1:N,1:2,0:1,f),
-     .               NoriF(f+2),IdecQF(f,1:2),N, GSTpQF,GDSTpQF,GIdecQF)
+     .               NoriF(f+2),IdecQF(1:2,f),N, GSTpQF,GDSTpQF,GIdecQF)
 c      ...construct the shape functions
           call AncPhiQuad(GSTpQF,GDSTpQF,nordQF,GIdecQF,N,
      .                                     phiQuad(minI:maxI,minJ:maxJ),
@@ -361,7 +361,7 @@ c
       integer :: nordTF,ndofTF,nordQF(2),ndofQF,nordB(2),ndofB
       integer :: minI,minJ,minK,minIJ,maxI,maxJ,maxK,maxIJ
       integer :: famctr,fam,a,b,ab(2),abc(3),ij(2),ig,jg,minF(2),maxF(2)
-      logical :: IdecME,IdecQE,IdecTF,IdecQF(3,2),GIdecQF(2),IdecB(2)
+      logical :: IdecME,IdecQE,IdecTF,IdecQF(2,3),GIdecQF(2),IdecB(2)
       double precision, intent(in)  :: X(3)
       double precision, intent(out) :: ShapE(3,Nsize(2))
       double precision, intent(out) :: CurlE(3,Nsize(2))
@@ -508,7 +508,7 @@ c    ...local parameters
         call decod(Nord(11+f),MODORDER,2, nordQF)
 c    ...orient
         call OrientQuad(STpQF(1:2,0:1,f),DSTpQF(1:N,1:2,0:1,f),
-     .               NoriF(2+f),IdecQF(f,1:2),N, GSTpQF,GDSTpQF,GIdecQF)
+     .               NoriF(2+f),IdecQF(1:2,f),N, GSTpQF,GDSTpQF,GIdecQF)
 c    ...loop over families
         do fam=0,1
           ab = cshift((/1,2/),fam);
@@ -759,7 +759,7 @@ c
       integer :: nordTF,ndofTF,nordQF(2),ndofQF,nordB(2),ndofB
       integer :: minI,minJ,minK,minIJ,maxI,maxJ,maxK,maxIJ
       integer :: famctr,fam,abc(3)
-      logical :: IdecTF,IdecQF(3,2),GIdecQF(2),IdecB(2)
+      logical :: IdecTF,IdecQF(2,3),GIdecQF(2),IdecB(2)
       double precision, intent(in)  :: X(3)
       double precision, intent(out) :: ShapV(3,Nsize(2))
       double precision, intent(out) :: DivV(Nsize(2))
@@ -840,7 +840,7 @@ c      ...local parameters (again)
           maxJ = nordQF(2)-1
 c      ...orient
           call OrientQuad(STpQF(1:2,0:1,f),DSTpQF(1:N,1:2,0:1,f),
-     .               NoriF(2+f),IdecQF(f,1:2),N, GSTpQF,GDSTpQF,GIdecQF)
+     .               NoriF(2+f),IdecQF(1:2,f),N, GSTpQF,GDSTpQF,GIdecQF)
 c      ...construct the shape functions
           call AncVQuad(GSTpQF,GDSTpQF,nordQF,GIdecQF,N,
      .                                   VQuad(1:N,minI:maxI,minJ:maxJ),

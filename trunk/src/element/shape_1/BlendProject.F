@@ -756,7 +756,7 @@ c----------------------------------------------------------------------
 c
       implicit none
       integer :: N,f
-      logical, intent(out) :: IdecQF(1:3,1:2)
+      logical, intent(out) :: IdecQF(1:2,1:3)
       double precision, intent(in)  :: Mu(0:1),DMu(1:3,0:1)
       double precision, intent(in)  :: Nu(0:2),DNu(1:3,0:2)
       double precision, intent(out) :: STpF(1:2,0:1,1:3),
@@ -781,7 +781,7 @@ c     ...locally oriented quadruple representing projection
       DSTpF(1:N,1,0,f) = DNu(1:N,0); DSTpF(1:N,1,1,f) = DNu(1:N,1)
       DSTpF(1:N,2,0,f) = DMu(1:N,0); DSTpF(1:N,2,1,f) = DMu(1:N,1)
 c     ...simplification flags: projection (Nu;Mu)=>(false,true)
-      IdecQF(f,1) = .FALSE.; IdecQF(f,2) = .TRUE.
+      IdecQF(1,f) = .FALSE.; IdecQF(2,f) = .TRUE.
 c  ...f=2 --> face1254 with local orientation v1->v2->v5->v4
       f=2
 c     ...locally oriented quadruple representing projection
@@ -790,7 +790,7 @@ c     ...locally oriented quadruple representing projection
       DSTpF(1:N,1,0,f) = DNu(1:N,1); DSTpF(1:N,1,1,f) = DNu(1:N,2)
       DSTpF(1:N,2,0,f) = DMu(1:N,0); DSTpF(1:N,2,1,f) = DMu(1:N,1)
 c     ...simplification flags: projection (Nu;Mu)=>(false,true)
-      IdecQF(f,1) = .FALSE.; IdecQF(f,2) = .TRUE.
+      IdecQF(1,f) = .FALSE.; IdecQF(2,f) = .TRUE.
 c  ...f=3 --> face0253 with local orientation v0->v2->v5->v3
       f=3
 c     ...locally oriented quadruple representing projection
@@ -799,7 +799,7 @@ c     ...locally oriented quadruple representing projection
       DSTpF(1:N,1,0,f) = DNu(1:N,0); DSTpF(1:N,1,1,f) = DNu(1:N,2)
       DSTpF(1:N,2,0,f) = DMu(1:N,0); DSTpF(1:N,2,1,f) = DMu(1:N,1)
 c     ...simplification flags: projection (Nu;Mu)=>(false,true)
-      IdecQF(f,1) = .FALSE.; IdecQF(f,2) = .TRUE.
+      IdecQF(1,f) = .FALSE.; IdecQF(2,f) = .TRUE.
 c
       end subroutine ProjectPrisQF
 c----------------------------------------------------------------------
