@@ -10,7 +10,7 @@ c     routine name      - shape2DHTri
 c
 c----------------------------------------------------------------------
 c
-c     latest revision:  - Nov 14, Apr 17
+c     latest revision:  - Nov 14, Apr 17, Jul 21
 c
 c     purpose:          - evaluate triangle H1 shape functions and
 c                         their gradient
@@ -43,7 +43,7 @@ c
       double precision, intent(out) :: GradH(2,Nsize(2))
       double precision :: Nu(0:2),DNu(2,0:2)
       double precision :: NubV(3),DNubV(3,2)
-      double precision :: NupE(3,0:1),DNupE(3,2,0:1)
+      double precision :: NupE(0:1,3),DNupE(2,0:1,3)
       double precision :: GNupE(0:1),GDNupE(2,0:1)
       double precision :: phiE(2:Nsize(1)),DphiE(2,2:Nsize(1))
       double precision :: phiTri(2:Nsize(1)-1,1:Nsize(1)-2)
@@ -85,7 +85,7 @@ c    ...local parameters
 c      ...local parameters (again)
           maxI = nordE
 c      ...orient
-          call OrientE(NupE(e,0:1),DNupE(e,1:N,0:1),NoriE(e),N,
+          call OrientE(NupE(0:1,e),DNupE(1:N,0:1,e),NoriE(e),N,
      .                                                    GNupE,GDNupE)
 c      ...construct the shape functions
           call AncPhiE(GNupE,GDNupE,nordE,IdecE,N,

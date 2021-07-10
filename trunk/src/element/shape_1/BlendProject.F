@@ -165,7 +165,7 @@ c
       integer :: N,e
       logical, intent(out) :: IdecE
       double precision, intent(in)  :: Nu(0:2),DNu(1:2,0:2)
-      double precision, intent(out) :: NupE(1:3,0:1),DNupE(1:3,1:2,0:1)
+      double precision, intent(out) :: NupE(0:1,1:3),DNupE(1:2,0:1,1:3)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c                V=((0,0),(1,0),(0,1))=>(v0,v1,v2)
@@ -178,16 +178,16 @@ c     a projection
 c
 c  ...e=1 --> edge01 with local orientation v0->v1
       e=1
-      NupE(e,0) = Nu(0); NupE(e,1) = Nu(1)
-      DNupE(e,1:N,0) = DNu(1:N,0); DNupE(e,1:N,1) = DNu(1:N,1)
+      NupE(0,e) = Nu(0); NupE(1,e) = Nu(1)
+      DNupE(1:N,0,e) = DNu(1:N,0); DNupE(1:N,1,e) = DNu(1:N,1)
 c  ...e=2 --> edge12 with local orientation v1->v2
       e=2
-      NupE(e,0) = Nu(1); NupE(e,1) = Nu(2)
-      DNupE(e,1:N,0) = DNu(1:N,1); DNupE(e,1:N,1) = DNu(1:N,2)
+      NupE(0,e) = Nu(1); NupE(1,e) = Nu(2)
+      DNupE(1:N,0,e) = DNu(1:N,1); DNupE(1:N,1,e) = DNu(1:N,2)
 c  ...e=3 --> edge20 with local orientation v0->v2
       e=3
-      NupE(e,0) = Nu(0); NupE(e,1) = Nu(2)
-      DNupE(e,1:N,0) = DNu(1:N,0); DNupE(e,1:N,1) = DNu(1:N,2)
+      NupE(0,e) = Nu(0); NupE(1,e) = Nu(2)
+      DNupE(1:N,0,e) = DNu(1:N,0); DNupE(1:N,1,e) = DNu(1:N,2)
 c
 c  ...projected coordinates are Nu, so IdecE=false for all edges
       IdecE = .FALSE.
