@@ -565,8 +565,8 @@ c
       integer :: N,v
       double precision, intent(in)  :: Mu(0:1),DMu(1:3,0:1)
       double precision, intent(in)  :: Nu(0:2),DNu(1:3,0:2)
-      double precision, intent(out) :: MubV(1:6),DMubV(1:6,1:3)
-      double precision, intent(out) :: NubV(1:6),DNubV(1:6,1:3)
+      double precision, intent(out) :: MubV(1:6),DMubV(1:3,1:6)
+      double precision, intent(out) :: NubV(1:6),DNubV(1:3,1:6)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c        V=((0,0,0),(1,0,0),(0,1,0),
@@ -578,28 +578,28 @@ c  ...6 vertices, each with two blending functions (one mu, one nu)
 c
 c  ...v=1 --> v0=(0,0,0)
       v=1
-      MubV(v) = Mu(0); DMubV(v,1:N) = DMu(1:N,0)
-      NubV(v) = Nu(0); DNubV(v,1:N) = DNu(1:N,0)
+      MubV(v) = Mu(0); DMubV(1:N,v) = DMu(1:N,0)
+      NubV(v) = Nu(0); DNubV(1:N,v) = DNu(1:N,0)
 c  ...v=2 --> v1=(1,0,0)
       v=2
-      MubV(v) = Mu(0); DMubV(v,1:N) = DMu(1:N,0)
-      NubV(v) = Nu(1); DNubV(v,1:N) = DNu(1:N,1)
+      MubV(v) = Mu(0); DMubV(1:N,v) = DMu(1:N,0)
+      NubV(v) = Nu(1); DNubV(1:N,v) = DNu(1:N,1)
 c  ...v=3 --> v2=(0,1,0)
       v=3
-      MubV(v) = Mu(0); DMubV(v,1:N) = DMu(1:N,0)
-      NubV(v) = Nu(2); DNubV(v,1:N) = DNu(1:N,2)
+      MubV(v) = Mu(0); DMubV(1:N,v) = DMu(1:N,0)
+      NubV(v) = Nu(2); DNubV(1:N,v) = DNu(1:N,2)
 c  ...v=4 --> v3=(0,0,1)
       v=4
-      MubV(v) = Mu(1); DMubV(v,1:N) = DMu(1:N,1)
-      NubV(v) = Nu(0); DNubV(v,1:N) = DNu(1:N,0)
+      MubV(v) = Mu(1); DMubV(1:N,v) = DMu(1:N,1)
+      NubV(v) = Nu(0); DNubV(1:N,v) = DNu(1:N,0)
 c  ...v=5 --> v4=(1,0,1)
       v=5
-      MubV(v) = Mu(1); DMubV(v,1:N) = DMu(1:N,1)
-      NubV(v) = Nu(1); DNubV(v,1:N) = DNu(1:N,1)
+      MubV(v) = Mu(1); DMubV(1:N,v) = DMu(1:N,1)
+      NubV(v) = Nu(1); DNubV(1:N,v) = DNu(1:N,1)
 c  ...v=6 --> v5=(0,1,1)
       v=6
-      MubV(v) = Mu(1); DMubV(v,1:N) = DMu(1:N,1)
-      NubV(v) = Nu(2); DNubV(v,1:N) = DNu(1:N,2)
+      MubV(v) = Mu(1); DMubV(1:N,v) = DMu(1:N,1)
+      NubV(v) = Nu(2); DNubV(1:N,v) = DNu(1:N,2)
 c
       end subroutine BlendPrisV
 c----------------------------------------------------------------------

@@ -9,7 +9,7 @@ c     routine name      - shape3DHPris
 c
 c--------------------------------------------------------------------
 c
-c     latest revision:  - Oct 14, Apr 17
+c     latest revision:  - Oct 14, Apr 17, Jul 21
 c
 c     purpose:          - routine returns values of 3D triangular prism
 c                         element H1 shape functions and their derivatives
@@ -47,7 +47,7 @@ c
       double precision, intent(out) :: GradH(1:3,Nsize(2))
       double precision :: Mu(0:1),DMu(3,0:1)
       double precision :: NU(0:2),DNu(3,0:2)
-      double precision :: MubV(6),DMubV(6,3),NubV(6),DNubV(6,3)
+      double precision :: MubV(6),DMubV(3,6),NubV(6),DNubV(3,6)
       double precision :: MubME(6),DMubME(6,3)
       double precision :: NupME(6,0:1),DNupME(6,3,0:1)
       double precision :: GNupME(0:1),GDNupME(3,0:1)
@@ -82,8 +82,8 @@ c  ...VERTEX SHAPE FUNCTIONS
       do v=1,6
         m=m+1
         ShapH(m) = NubV(v)*MubV(v)
-        GradH(1:N,m) = DNubV(v,1:N)*MubV(v)
-     .               + NubV(v)*DMubV(v,1:N)
+        GradH(1:N,m) = DNubV(1:N,v)*MubV(v)
+     .               + NubV(v)*DMubV(1:N,v)
       enddo
 c
 c  ...EDGE SHAPE FUNCTIONS
