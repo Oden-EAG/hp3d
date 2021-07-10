@@ -42,7 +42,7 @@ c
       double precision, intent(out) :: ShapH(Nsize(2))
       double precision, intent(out) :: GradH(2,Nsize(2))
       double precision :: Nu(0:2),DNu(2,0:2)
-      double precision :: NubV(3),DNubV(3,2)
+      double precision :: NubV(3),DNubV(2,3)
       double precision :: NupE(0:1,3),DNupE(2,0:1,3)
       double precision :: GNupE(0:1),GDNupE(2,0:1)
       double precision :: phiE(2:Nsize(1)),DphiE(2,2:Nsize(1))
@@ -71,7 +71,7 @@ c  ...VERTEX SHAPE FUNCTIONS
         m=m+1
 c
         ShapH(m)     = NubV(v)
-        GradH(1:N,m) = DNubV(v,1:N)
+        GradH(1:N,m) = DNubV(1:N,v)
       enddo
 c
 c  ...EDGE SHAPE FUNCTIONS

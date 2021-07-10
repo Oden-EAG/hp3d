@@ -138,7 +138,7 @@ c
       implicit none
       integer :: N,v
       double precision, intent(in)  :: Nu(0:2),DNu(1:2,0:2)
-      double precision, intent(out) :: NubV(1:3),DNubV(1:3,1:2)
+      double precision, intent(out) :: NubV(1:3),DNubV(1:2,1:3)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c                V=((0,0),(1,0),(0,1))=>(v0,v1,v2)
@@ -149,13 +149,13 @@ c  ...3 vertices, each with one blending function
 c
 c  ...v=1 --> v0=(0,0)
       v=1
-      NubV(v) = Nu(0); DNubV(v,1:N) = DNu(1:N,0)
+      NubV(v) = Nu(0); DNubV(1:N,v) = DNu(1:N,0)
 c  ...v=2 --> v1=(1,0)
       v=2
-      NubV(v) = Nu(1); DNubV(v,1:N) = DNu(1:N,1)
+      NubV(v) = Nu(1); DNubV(1:N,v) = DNu(1:N,1)
 c  ...v=3 --> v2=(0,1)
       v=3
-      NubV(v) = Nu(2); DNubV(v,1:N) = DNu(1:N,2)
+      NubV(v) = Nu(2); DNubV(1:N,v) = DNu(1:N,2)
 c
       end subroutine BlendTriV
 c----------------------------------------------------------------------
