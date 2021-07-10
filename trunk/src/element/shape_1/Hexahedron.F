@@ -45,7 +45,7 @@ c
       double precision, intent(out) :: ShapH(Nsize(2))
       double precision, intent(out) :: GradH(1:3,Nsize(2))
       double precision :: Mu(1:3,0:1),DMu(1:3,1:3,0:1)
-      double precision :: MubV(1:8,1:3),DMubV(1:8,1:3,1:3)
+      double precision :: MubV(1:3,1:8),DMubV(1:3,1:3,1:8)
       double precision :: MubE(1:2,1:12),DMubE(1:3,1:2,1:12)
       double precision :: MupE(0:1,1:12),DMupE(1:3,0:1,1:12)
       double precision :: GMupE(0:1),GDMupE(1:3,0:1)
@@ -71,10 +71,10 @@ c  ...call the blending functions
       call BlendHexaV(Mu,DMu, MubV,DMubV)
       do v=1,8
         m=m+1
-        ShapH(m) = MubV(v,1)*MubV(v,2)*MubV(v,3)
-        GradH(1:N,m) = MubV(v,1)*MubV(v,2)*DMubV(v,1:N,3)
-     .               + MubV(v,1)*DMubV(v,1:N,2)*MubV(v,3)
-     .               + DMubV(v,1:N,1)*MubV(v,2)*MubV(v,3)
+        ShapH(m) = MubV(1,v)*MubV(2,v)*MubV(3,v)
+        GradH(1:N,m) = MubV(1,v)*MubV(2,v)*DMubV(1:N,3,v)
+     .               + MubV(1,v)*DMubV(1:N,2,v)*MubV(3,v)
+     .               + DMubV(1:N,1,v)*MubV(2,v)*MubV(3,v)
       enddo
 c
 c  ...Second the edges

@@ -199,7 +199,7 @@ c
       implicit none
       integer :: N,v
       double precision, intent(in)  :: Mu(1:3,0:1),DMu(1:3,1:3,0:1)
-      double precision, intent(out) :: MubV(1:8,1:3),DMubV(1:8,1:3,1:3)
+      double precision, intent(out) :: MubV(1:3,1:8),DMubV(1:3,1:3,1:8)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c      V=((0,0,0),(1,0,0),(1,1,0),(0,1,0),
@@ -211,44 +211,44 @@ c  ...8 vertices, each with three blending functions
 c
 c  ...v=1 --> v1=(0,0,0)
       v=1
-      MubV(v,1) = Mu(1,0); DMubV(v,1:N,1) = DMu(1:N,1,0)
-      MubV(v,2) = Mu(2,0); DMubV(v,1:N,2) = DMu(1:N,2,0)
-      MubV(v,3) = Mu(3,0); DMubV(v,1:N,3) = DMu(1:N,3,0)
+      MubV(1,v) = Mu(1,0); DMubV(1:N,1,v) = DMu(1:N,1,0)
+      MubV(2,v) = Mu(2,0); DMubV(1:N,2,v) = DMu(1:N,2,0)
+      MubV(3,v) = Mu(3,0); DMubV(1:N,3,v) = DMu(1:N,3,0)
 c  ...v=2 --> v2=(1,0,0)
       v=2
-      MubV(v,1) = Mu(1,1); DMubV(v,1:N,1) = DMu(1:N,1,1)
-      MubV(v,2) = Mu(2,0); DMubV(v,1:N,2) = DMu(1:N,2,0)
-      MubV(v,3) = Mu(3,0); DMubV(v,1:N,3) = DMu(1:N,3,0)
+      MubV(1,v) = Mu(1,1); DMubV(1:N,1,v) = DMu(1:N,1,1)
+      MubV(2,v) = Mu(2,0); DMubV(1:N,2,v) = DMu(1:N,2,0)
+      MubV(3,v) = Mu(3,0); DMubV(1:N,3,v) = DMu(1:N,3,0)
 c  ...v=3 --> v3=(1,1,0)
       v=3
-      MubV(v,1) = Mu(1,1); DMubV(v,1:N,1) = DMu(1:N,1,1)
-      MubV(v,2) = Mu(2,1); DMubV(v,1:N,2) = DMu(1:N,2,1)
-      MubV(v,3) = Mu(3,0); DMubV(v,1:N,3) = DMu(1:N,3,0)
+      MubV(1,v) = Mu(1,1); DMubV(1:N,1,v) = DMu(1:N,1,1)
+      MubV(2,v) = Mu(2,1); DMubV(1:N,2,v) = DMu(1:N,2,1)
+      MubV(3,v) = Mu(3,0); DMubV(1:N,3,v) = DMu(1:N,3,0)
 c  ...v=4 --> v4=(0,1,0)
       v=4
-      MubV(v,1) = Mu(1,0); DMubV(v,1:N,1) = DMu(1:N,1,0)
-      MubV(v,2) = Mu(2,1); DMubV(v,1:N,2) = DMu(1:N,2,1)
-      MubV(v,3) = Mu(3,0); DMubV(v,1:N,3) = DMu(1:N,3,0)
+      MubV(1,v) = Mu(1,0); DMubV(1:N,1,v) = DMu(1:N,1,0)
+      MubV(2,v) = Mu(2,1); DMubV(1:N,2,v) = DMu(1:N,2,1)
+      MubV(3,v) = Mu(3,0); DMubV(1:N,3,v) = DMu(1:N,3,0)
 c  ...v=5 --> v5=(0,0,1)
       v=5
-      MubV(v,1) = Mu(1,0); DMubV(v,1:N,1) = DMu(1:N,1,0)
-      MubV(v,2) = Mu(2,0); DMubV(v,1:N,2) = DMu(1:N,2,0)
-      MubV(v,3) = Mu(3,1); DMubV(v,1:N,3) = DMu(1:N,3,1)
+      MubV(1,v) = Mu(1,0); DMubV(1:N,1,v) = DMu(1:N,1,0)
+      MubV(2,v) = Mu(2,0); DMubV(1:N,2,v) = DMu(1:N,2,0)
+      MubV(3,v) = Mu(3,1); DMubV(1:N,3,v) = DMu(1:N,3,1)
 c  ...v=6 --> v6=(1,0,1)
       v=6
-      MubV(v,1) = Mu(1,1); DMubV(v,1:N,1) = DMu(1:N,1,1)
-      MubV(v,2) = Mu(2,0); DMubV(v,1:N,2) = DMu(1:N,2,0)
-      MubV(v,3) = Mu(3,1); DMubV(v,1:N,3) = DMu(1:N,3,1)
+      MubV(1,v) = Mu(1,1); DMubV(1:N,1,v) = DMu(1:N,1,1)
+      MubV(2,v) = Mu(2,0); DMubV(1:N,2,v) = DMu(1:N,2,0)
+      MubV(3,v) = Mu(3,1); DMubV(1:N,3,v) = DMu(1:N,3,1)
 c  ...v=7 --> v7=(1,1,1)
       v=7
-      MubV(v,1) = Mu(1,1); DMubV(v,1:N,1) = DMu(1:N,1,1)
-      MubV(v,2) = Mu(2,1); DMubV(v,1:N,2) = DMu(1:N,2,1)
-      MubV(v,3) = Mu(3,1); DMubV(v,1:N,3) = DMu(1:N,3,1)
+      MubV(1,v) = Mu(1,1); DMubV(1:N,1,v) = DMu(1:N,1,1)
+      MubV(2,v) = Mu(2,1); DMubV(1:N,2,v) = DMu(1:N,2,1)
+      MubV(3,v) = Mu(3,1); DMubV(1:N,3,v) = DMu(1:N,3,1)
 c  ...v=8 --> v8=(0,1,1)
       v=8
-      MubV(v,1) = Mu(1,0); DMubV(v,1:N,1) = DMu(1:N,1,0)
-      MubV(v,2) = Mu(2,1); DMubV(v,1:N,2) = DMu(1:N,2,1)
-      MubV(v,3) = Mu(3,1); DMubV(v,1:N,3) = DMu(1:N,3,1)
+      MubV(1,v) = Mu(1,0); DMubV(1:N,1,v) = DMu(1:N,1,0)
+      MubV(2,v) = Mu(2,1); DMubV(1:N,2,v) = DMu(1:N,2,1)
+      MubV(3,v) = Mu(3,1); DMubV(1:N,3,v) = DMu(1:N,3,1)
 c
       end subroutine BlendHexaV
 c----------------------------------------------------------------------
