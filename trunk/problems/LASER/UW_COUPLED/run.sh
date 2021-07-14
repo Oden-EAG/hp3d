@@ -100,6 +100,9 @@ raman=0.d0
 nsteps=10
 dt=0.1d0
 #
+# envelope formulation
+envelope=false
+#
 # ==================
 # RUN CONFIGURATIONS
 # ==================
@@ -119,10 +122,13 @@ args+=" -px ${px} -py ${py} -pz ${pz} -dp ${dp} -npx 4 -npy 4 -npz 4"
 args+=" -nlflag 0 -heat ${heat} -aniso_heat ${aniso_heat}"
 args+=" -dir_output ${dir_output} -vis_level ${vis_level}"
 args+=" -file_geometry ${file_geometry} -zl ${zl}"
-args+=" -file_control ${ctrl} "
-args+=" -maxnods ${maxnods} "
-args+=" -nthreads ${nthreads} "
-args+=" -envelope -wavenum_signal 0.1d0 -wavenum_pump 0.1d0"
+args+=" -file_control ${ctrl}"
+args+=" -maxnods ${maxnods}"
+args+=" -nthreads ${nthreads}"
+if [ "$envelope" = true ] ; then
+   args+=" -envelope"
+   args+=" -wavenum_signal 1.0d0 -wavenum_pump 1.0d0"
+fi
 
 mpirun -np ${nproc} ./uwLaser ${args}
 #ibrun -n ${nproc} ./uwLaser ${args}
@@ -189,6 +195,10 @@ args+=" -maxnods ${maxnods}"
 args+=" -nthreads ${nthreads}"
 if [ "$usepml" = true ] ; then
    args+=" -usepml -pmlfrac ${pmlfrac}"
+fi
+if [ "$envelope" = true ] ; then
+   args+=" -envelope"
+   args+=" -wavenum_signal 1.0d0 -wavenum_pump 1.0d0"
 fi
 
 #mpirun -np ${nproc} ./uwLaser ${args}
@@ -273,6 +283,10 @@ args+=" -maxnods ${maxnods}"
 args+=" -nthreads ${nthreads}"
 if [ "$usepml" = true ] ; then
    args+=" -usepml -pmlfrac ${pmlfrac}"
+fi
+if [ "$envelope" = true ] ; then
+   args+=" -envelope"
+   args+=" -wavenum_signal 1.0d0 -wavenum_pump 1.0d0"
 fi
 
 #mpirun -np ${nproc} ./uwLaser ${args}

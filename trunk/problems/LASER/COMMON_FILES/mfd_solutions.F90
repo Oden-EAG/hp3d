@@ -36,6 +36,8 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
    real(8) :: gammaTE10
    real(8) :: gammaTE20
    real(8) :: r
+!..for envelope formulation
+   real(8) :: k_eff,k_env
 !..for LP Modes
    real(8) :: gamm, beta, k, ca, cb, cc, r_x, r_y
    real(8) :: BESSEL_dJ1, BESSEL_K0, BESSEL_dK0, BESSEL_K1, BESSEL_dK1
@@ -258,19 +260,27 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          f_x=-ZI*(OMEGA/PI)*sin(PI*x1)
          f_y=1.d0
          f_z=exp(-ZI*OMEGA*x3*gammaTE10)
-         if (ENVELOPE) f_z=1.d0
+         if (ENVELOPE) then
+            k_eff = OMEGA*gammaTE10        ! effective wavenumber
+            k_env = k_eff - WAVENUM_SIGNAL ! envelope wavenumber
+            f_z=exp(-ZI*k_env*x3)
+         endif
 !
 !     ...1st order derivatives
          df_x=-ZI*OMEGA*cos(PI*x1)
          df_y=0.d0
          df_z=-(ZI*OMEGA*gammaTE10)*f_z
-         if (ENVELOPE) df_z=0.d0
+         if (ENVELOPE) then
+            df_z=-(ZI*k_env)*f_z
+         endif
 !
 !     ...2nd order derivatives
          ddf_x=-PI**2*f_x
          ddf_y=0.d0
          ddf_z=-(ZI*OMEGA*gammaTE10)*df_z
-         if (ENVELOPE) ddf_z=0.d0
+         if (ENVELOPE) then
+            ddf_z=-(ZI*k_env)*df_z
+         endif
 !
          E=f_x*f_y*f_z
 !     ...1st order derivatives
