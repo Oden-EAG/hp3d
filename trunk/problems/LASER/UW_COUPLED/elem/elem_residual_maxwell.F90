@@ -421,7 +421,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
          enddo
          crlF(1:3) = crlF(1:3)/rjac
          fldG = fldF; crlG = crlF
-!     ...e_z x F, e_z x G
+!     ...e_z x F
          rotF = 0.d0; rotF(1) = -fldF(2); rotF(2) = fldF(1)
 !
 !     ...accumulate for the load
