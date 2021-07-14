@@ -143,7 +143,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    !VTYPE :: gramP(NrTest*(NrTest+1)/2)
    VTYPE, allocatable :: gramP(:)
    real(8)  :: FF, CF, FC
-   real(8)  :: fldE(3), fldH(3), crlE(3), crlH(3), rotE(3)
+   real(8)  :: fldE(3), fldH(3), crlE(3), crlH(3), rotE(3), rotH(3)
    real(8)  :: fldF(3), fldG(3), crlF(3), crlG(3), rotF(3)
 !
 !..matrices for transpose filling (swapped loops)
@@ -468,7 +468,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
          enddo
          crlF(1:3) = crlF(1:3)/rjac
          fldG = fldF; crlG = crlF
-!     ...e_z x F
+!     ...e_z x F, e_z x G
          rotF = 0.d0; rotF(1) = -fldF(2); rotF(2) = fldF(1)
 !
 !        RHS:
@@ -484,6 +484,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !        ...Piola transformation
             fldE(1:3) = shapQ(k2)/rjac; fldH = fldE
+            rotE = 0.d0; rotE(1) = -fldE(2); rotE(2) = fldE(1); rotH = rotE
 !
 !        ...testing with F (first H(curl) test function))
             n = 2*k1-1
@@ -506,9 +507,9 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
             if (ENVELOPE) then
 !           ...-ik(e_z x H,F), where e_z x H = (-H_y,H_x,0)
                m = (k2-1)*6+4
-               stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + ZI*WAVENUM_FLD*fldH(2)*fldF(1)*weight
+               stiff_EQ_T(m,n) = stiff_EQ_T(m,n) - ZI*WAVENUM_FLD*rotH(1)*fldF(1)*weight
                m = (k2-1)*6+5
-               stiff_EQ_T(m,n) = stiff_EQ_T(m,n) - ZI*WAVENUM_FLD*fldH(1)*fldF(2)*weight
+               stiff_EQ_T(m,n) = stiff_EQ_T(m,n) - ZI*WAVENUM_FLD*rotH(2)*fldF(2)*weight
             endif
 !
 !        ...testing with G (second H(curl) test function))
@@ -533,9 +534,9 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
             if (ENVELOPE) then
 !           ...-ik(e_z x E,G), where e_z x E = (-E_y,E_x,0)
                m = (k2-1)*6+1
-               stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + ZI*WAVENUM_FLD*fldE(2)*fldG(1)*weight
+               stiff_EQ_T(m,n) = stiff_EQ_T(m,n) - ZI*WAVENUM_FLD*rotE(1)*fldG(1)*weight
                m = (k2-1)*6+2
-               stiff_EQ_T(m,n) = stiff_EQ_T(m,n) - ZI*WAVENUM_FLD*fldE(1)*fldG(2)*weight
+               stiff_EQ_T(m,n) = stiff_EQ_T(m,n) - ZI*WAVENUM_FLD*rotE(2)*fldG(2)*weight
             endif
 !
 !     ...end of loop through L2 trial functions
@@ -607,17 +608,17 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
             gramP(k) = gramP(k) + (zaux+zcux)*weight
 !
             if (ENVELOPE) then
-!              ...ik(iωε F_i, e_z x G_j)
-                  zaux = ZI*WAVENUM_FLD* &
-                         (zaJ(1,1)*fldF(1)*rotE(1) + &
-                          zaJ(2,2)*fldF(2)*rotE(2) + &
-                          zaJ(3,3)*fldF(3)*rotE(3) )
-!              ...ik(e_z x F_i, (iωμ)^* G_j)
-                  zcux = ZI*WAVENUM_FLD* &
-                         (conjg(zcJ(1,1))*rotF(1)*fldE(1) + &
-                          conjg(zcJ(2,2))*rotF(2)*fldE(2) + &
-                          conjg(zcJ(3,3))*rotF(3)*fldE(3) )
-                  gramP(k) = gramP(k) + (zaux+zcux)*weight
+!           ...ik(iωε F_i, e_z x G_j)
+               zaux = ZI*WAVENUM_FLD* &
+                        (zaJ(1,1)*fldF(1)*rotE(1) + &
+                         zaJ(2,2)*fldF(2)*rotE(2) + &
+                         zaJ(3,3)*fldF(3)*rotE(3) )
+!           ...ik(e_z x F_i, (iωμ)^* G_j)
+               zcux = ZI*WAVENUM_FLD* &
+                        (conjg(zcJ(1,1))*rotF(1)*fldE(1) + &
+                         conjg(zcJ(2,2))*rotF(2)*fldE(2) + &
+                         conjg(zcJ(3,3))*rotF(3)*fldE(3) )
+               gramP(k) = gramP(k) + (zaux+zcux)*weight
             endif
 !
 !        ...compute lower triangular part of 2x2 G_ij matrix
@@ -1002,7 +1003,7 @@ subroutine imp_penalty(Mdle,Fld_flag,NrdofH,NrdofEi,MdE,Norder,Norderi, &
    integer, dimension(6,NRINDEX)      :: ibc
 !
 !..Maxwell load and auxiliary variables
-   VTYPE  , dimension(3) :: zJ,zImp
+   VTYPE  , dimension(3) :: zImp
    real(8), dimension(3) :: E2,rntimesE,rn2timesE
    real(8), dimension(3) :: F1,rntimesF,rn2timesF
 !

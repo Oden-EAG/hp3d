@@ -122,8 +122,9 @@ args+=" -file_geometry ${file_geometry} -zl ${zl}"
 args+=" -file_control ${ctrl} "
 args+=" -maxnods ${maxnods} "
 args+=" -nthreads ${nthreads} "
+args+=" -envelope -wavenum_signal 0.1d0 -wavenum_pump 0.1d0"
 
-#mpirun -np ${nproc} ./uwLaser ${args}
+mpirun -np ${nproc} ./uwLaser ${args}
 #ibrun -n ${nproc} ./uwLaser ${args}
 #ibrun -n ${nproc} xterm -hold -e ./uwLaser ${args}
 
@@ -274,7 +275,7 @@ if [ "$usepml" = true ] ; then
    args+=" -usepml -pmlfrac ${pmlfrac}"
 fi
 
-mpirun -np ${nproc} ./uwLaser ${args}
+#mpirun -np ${nproc} ./uwLaser ${args}
 #ibrun -n ${nproc} ./uwLaser ${args}
 
 # ============================================================================================

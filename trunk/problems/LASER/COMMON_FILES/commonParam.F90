@@ -51,9 +51,9 @@ module commonParam
    integer :: TIMESTEP = 0
 !
 !..alternative vectorial envelope formulation
-   logical :: ENVELOPE = .true.
-   real(8) :: WAVENUM_SIGNAL = 0.0d0 ! approximate signal wavenumber
-   real(8) :: WAVENUM_PUMP   = 0.0d0 ! approximate pump wavenumber
+   logical :: ENVELOPE
+   real(8) :: WAVENUM_SIGNAL ! approximate signal wavenumber
+   real(8) :: WAVENUM_PUMP   ! approximate pump wavenumber
 !
 !..weight for l2 term in scaled adjoint graph norm (UW Maxwell)
    real(8) :: ALPHA_NORM = 1.0d0

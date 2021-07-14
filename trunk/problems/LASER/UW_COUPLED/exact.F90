@@ -155,15 +155,15 @@ subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
 !
 !  ...2nd H(curl) ATTRIBUTE = curl of the first attribute/-i omega \mu
 !     H-field value (H-field trace)
-      ValE(1,idx+1)   = DvalE(3,idx,2) - DvalE(2,idx,3)
-      ValE(2,idx+1)   = DvalE(1,idx,3) - DvalE(3,idx,1)
-      ValE(3,idx+1)   = DvalE(2,idx,1) - DvalE(1,idx,2)
+      ValE(1,idx+1) = DvalE(3,idx,2) - DvalE(2,idx,3)
+      ValE(2,idx+1) = DvalE(1,idx,3) - DvalE(3,idx,1)
+      ValE(3,idx+1) = DvalE(2,idx,1) - DvalE(1,idx,2)
 !
 !  ...H-field depends differently on E-field in the vectorial envelope formulation
       if (ENVELOPE) then
 !     ...-ik (e_z x E), where e_z x E = (-E_y,E_x,0)
-         ValE(1,idx+1)   = ValE(1,idx+1) + ZI*WAVENUM_FLD*ValE(2,idx)
-         ValE(2,idx+1)   = ValE(2,idx+1) - ZI*WAVENUM_FLD*ValE(1,idx)
+         ValE(1,idx+1) = ValE(1,idx+1) + ZI*WAVENUM_FLD*ValE(2,idx)
+         ValE(2,idx+1) = ValE(2,idx+1) - ZI*WAVENUM_FLD*ValE(1,idx)
       endif
       ValE(1:3,idx+1) = ValE(1:3,idx+1)/(-ZI*OMEGA*OMEGA_RATIO_FLD*MU)
 !
@@ -204,6 +204,8 @@ subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
 !  ...pump EH fields
       ValQ(7:9) = ValE(1:3,3)
       ValQ(10:12) = ValE(1:3,4)
+!
+      return
 !
    endif
 !
