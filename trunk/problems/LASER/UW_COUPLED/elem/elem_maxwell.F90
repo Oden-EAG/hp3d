@@ -143,8 +143,8 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    !VTYPE :: gramP(NrTest*(NrTest+1)/2)
    VTYPE, allocatable :: gramP(:)
    real(8)  :: FF, CF, FC
-   real(8)  :: fldE(3), fldH(3), crlE(3), crlH(3), rotE(3), rotH(3)
-   real(8)  :: fldF(3), fldG(3), crlF(3), crlG(3), rotF(3)
+   real(8)  :: fldE(3), fldH(3), crlE(3), crlH(3), rotE(3)
+   real(8)  :: fldF(3), fldG(3), crlF(3), crlG(3), rotF(3), rotG(3)
 !
 !..matrices for transpose filling (swapped loops)
 !..stiffness matrices (transposed) for the enriched test space
@@ -468,8 +468,8 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
          enddo
          crlF(1:3) = crlF(1:3)/rjac
          fldG = fldF; crlG = crlF
-!     ...e_z x F
-         rotF = 0.d0; rotF(1) = -fldF(2); rotF(2) = fldF(1)
+!     ...e_z x F, e_z x G
+         rotF = 0.d0; rotF(1) = -fldF(2); rotF(2) = fldF(1); rotG = rotF
 !
 !        RHS:
 !        (J^imp,F) first  equation RHS (with first H(curl) test function F)
@@ -484,7 +484,6 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !        ...Piola transformation
             fldE(1:3) = shapQ(k2)/rjac; fldH = fldE
-            rotE = 0.d0; rotE(1) = -fldE(2); rotE(2) = fldE(1); rotH = rotE
 !
 !        ...testing with F (first H(curl) test function))
             n = 2*k1-1
@@ -505,11 +504,12 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !        ...additional stiffness contribution if solving vectorial envelope equation
             if (ENVELOPE) then
-!           ...-ik(e_z x H,F), where e_z x H = (-H_y,H_x,0)
+!           ...-ik(e_z x H,F), where e_z x H = (-H_y,H_x,0), or
+!           ...+ik(H,e_z x F), where e_z x F = (-F_y,F_x,0)
                m = (k2-1)*6+4
-               stiff_EQ_T(m,n) = stiff_EQ_T(m,n) - ZI*WAVENUM_FLD*rotH(1)*fldF(1)*weight
+               stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + ZI*WAVENUM_FLD*fldH(1)*rotF(1)*weight
                m = (k2-1)*6+5
-               stiff_EQ_T(m,n) = stiff_EQ_T(m,n) - ZI*WAVENUM_FLD*rotH(2)*fldF(2)*weight
+               stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + ZI*WAVENUM_FLD*fldH(2)*rotF(2)*weight
             endif
 !
 !        ...testing with G (second H(curl) test function))
@@ -532,11 +532,12 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !        ...additional stiffness contribution if solving vectorial envelope equation
             if (ENVELOPE) then
-!           ...-ik(e_z x E,G), where e_z x E = (-E_y,E_x,0)
+!           ...-ik(e_z x E,G), where e_z x E = (-E_y,E_x,0), or
+!           ...+ik(E,e_z x G), where e_z x G = (-G_y,G_x,0)
                m = (k2-1)*6+1
-               stiff_EQ_T(m,n) = stiff_EQ_T(m,n) - ZI*WAVENUM_FLD*rotE(1)*fldG(1)*weight
+               stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + ZI*WAVENUM_FLD*fldE(1)*rotG(1)*weight
                m = (k2-1)*6+2
-               stiff_EQ_T(m,n) = stiff_EQ_T(m,n) - ZI*WAVENUM_FLD*rotE(2)*fldG(2)*weight
+               stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + ZI*WAVENUM_FLD*fldE(2)*rotG(2)*weight
             endif
 !
 !     ...end of loop through L2 trial functions

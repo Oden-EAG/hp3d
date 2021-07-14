@@ -442,8 +442,8 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !     ...additional stiffness contribution if solving vectorial envelope equation
          if (ENVELOPE) then
 !        ...-( -ik(e_z x H,F) ), where e_z x H = (-H_y,H_x,0)
-            zaux = -fldF(1)*zsolQ(5) + fldF(2)*zsolQ(4)
-            bload_E(k) = bload_E(k) + ZI*WAVENUM_FLD*zaux*weight
+            zaux = -ZI*WAVENUM_FLD*(-fldF(1)*zsolQ(5) + fldF(2)*zsolQ(4))
+            bload_E(k) = bload_E(k) - zaux*weight
          endif
 !
 !     ...second eqn
@@ -457,8 +457,8 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !     ...additional stiffness contribution if solving vectorial envelope equation
          if (ENVELOPE) then
 !        ...-( -ik(e_z x E,G) ), where e_z x E = (-E_y,E_x,0)
-            zaux = -fldG(1)*zsolQ(2) + fldG(2)*zsolQ(1)
-            bload_E(k) = bload_E(k) + ZI*WAVENUM_FLD*zaux*weight
+            zaux = -ZI*WAVENUM_FLD*(-fldG(1)*zsolQ(2) + fldG(2)*zsolQ(1))
+            bload_E(k) = bload_E(k) - zaux*weight
          endif
 !
 ! ===============================================================================
