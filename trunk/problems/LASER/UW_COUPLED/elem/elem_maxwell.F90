@@ -190,7 +190,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !..OMEGA_RATIO_SIGNAL or OMEGA_RATIO_PUMP
    real(8) :: OMEGA_RATIO_FLD
-!..WAVENUM_SIGNAL or WAVENUM_PUMP (complex for PML)
+!..WAVENUM_SIGNAL or WAVENUM_PUMP
    real(8) :: WAVENUM_FLD
 !
 !..for PML
