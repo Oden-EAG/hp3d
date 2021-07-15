@@ -511,10 +511,10 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
                zaux = ZI*WAVENUM_FLD* &
                      (rotF(1)*crlE(1)+rotF(2)*crlE(2)+rotF(3)*crlE(3))
 !           ...k^2(e_z x F_i, e_z x F_j)
-               zbux = WAVENUM_FLD*WAVENUM_FLD* &
+               zbux = abs(WAVENUM_FLD)**2 * &
                      (rotF(1)*rotE(1)+rotF(2)*rotE(2)+rotF(3)*rotE(3))
 !           ...-ik(curl F_i, e_z x F_j)
-               zcux = -ZI*WAVENUM_FLD* &
+               zcux = -ZI*conjg(WAVENUM_FLD)* &
                      (crlF(1)*rotE(1)+crlF(2)*rotE(2)+crlF(3)*rotE(3))
                gramP(k) = gramP(k) + (zaux+zbux+zcux)*weight
             endif
@@ -532,7 +532,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !
             if (ENVELOPE) then
 !           ...ik(iωε F_i, e_z x G_j)
-               zaux = ZI*WAVENUM_FLD* &
+               zaux = ZI*conjg(WAVENUM_FLD)* &
                         (zaJ(1,1)*fldF(1)*rotE(1) + &
                          zaJ(2,2)*fldF(2)*rotE(2) + &
                          zaJ(3,3)*fldF(3)*rotE(3) )
@@ -565,7 +565,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
                           conjg(zaJ(2,2))*rotF(2)*fldE(2) + &
                           conjg(zaJ(3,3))*rotF(3)*fldE(3) )
 !              ...-ik (iωμ G_i, e_z x F_j)
-                  zcux = -ZI*WAVENUM_FLD* &
+                  zcux = -ZI*conjg(WAVENUM_FLD)* &
                          (zcJ(1,1)*fldF(1)*rotE(1) + &
                           zcJ(2,2)*fldF(2)*rotE(2) + &
                           zcJ(3,3)*fldF(3)*rotE(3) )
@@ -587,10 +587,10 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
                zaux = ZI*WAVENUM_FLD* &
                      (rotF(1)*crlE(1)+rotF(2)*crlE(2)+rotF(3)*crlE(3))
 !           ...k^2(e_z x G_i, e_z x G_j)
-               zbux = WAVENUM_FLD*WAVENUM_FLD* &
+               zbux = abs(WAVENUM_FLD)**2 * &
                      (rotF(1)*rotE(1)+rotF(2)*rotE(2)+rotF(3)*rotE(3))
 !           ...-ik(curl G_i, e_z x G_j)
-               zcux = -ZI*WAVENUM_FLD* &
+               zcux = -ZI*conjg(WAVENUM_FLD)* &
                      (crlF(1)*rotE(1)+crlF(2)*rotE(2)+crlF(3)*rotE(3))
                gramP(k) = gramP(k) + (zaux+zbux+zcux)*weight
             endif
