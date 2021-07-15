@@ -191,7 +191,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !..OMEGA_RATIO_SIGNAL or OMEGA_RATIO_PUMP
    real(8) :: OMEGA_RATIO_FLD
 !..WAVENUM_SIGNAL or WAVENUM_PUMP
-   real(8) :: WAVENUM_FLD
+   real(8) :: WAVENUM_FLD,WAVENUM_AUX
 !
 !..for PML
    VTYPE :: zbeta,zdbeta,zd2beta,detJstretch
@@ -277,6 +277,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
       write(*,*) 'elem_maxwell: invalid Fld_flag param. stop.'
          stop
    end select
+   WAVENUM_AUX = WAVENUM_FLD
 !
 !..initialize PML matrices
    Jstretch = ZERO
@@ -445,6 +446,12 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
                        invJstretch, 3, ZERO, JJstretch, 3)
          detJstretch = zdbeta
          JJstretch = detJstretch*JJstretch
+      endif
+!
+!  ...Modify envelope wavenumber inside PML
+      if (ENVELOPE) then
+         WAVENUM_FLD = WAVENUM_AUX
+         if (x(3).gt.PML_REGION) WAVENUM_FLD = 0.d0
       endif
 !
 !  ...PML stretching
