@@ -154,8 +154,8 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !
 !..OMEGA_RATIO_SIGNAL or OMEGA_RATIO_PUMP
    real(8) :: OMEGA_RATIO_FLD
-!..WAVENUM_SIGNAL or WAVENUM_PUMP
-   real(8) :: WAVENUM_FLD
+!..WAVENUM_SIGNAL or WAVENUM_PUMP (complex for PML)
+   VTYPE   :: WAVENUM_FLD
 !
 !..for polarizations function
    VTYPE, dimension(3,3) :: bg_pol,gain_pol,raman_pol,rndotE
@@ -226,10 +226,10 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    select case(Fld_flag)
       case(0)
          OMEGA_RATIO_FLD = OMEGA_RATIO_PUMP
-         WAVENUM_FLD     = WAVENUM_PUMP
+         WAVENUM_FLD     = CMPLX(WAVENUM_PUMP,0.d0)
       case(1)
          OMEGA_RATIO_FLD = OMEGA_RATIO_SIGNAL ! 1.0d0
-         WAVENUM_FLD     = WAVENUM_SIGNAL
+         WAVENUM_FLD     = CMPLX(WAVENUM_SIGNAL,0.d0)
       case default
          write(*,*) 'elem_residual_maxwell. invalid Fld_flag param. stop.'
          stop
@@ -386,6 +386,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
          JJstretch(1,1) = ZONE
          JJstretch(2,2) = ZONE
          JJstretch(3,3) = ZONE
+         detJstretch    = ZONE
       else
 !     ...get PML function
          call get_Beta(x,Fld_flag, zbeta,zdbeta,zd2beta)
@@ -398,6 +399,10 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
          detJstretch = zdbeta
          JJstretch = detJstretch*JJstretch
       endif
+!
+!  ...Envelope formulation:
+!     PML stretching enters the rotated terms e_z x E, e_z x H only via the determinant
+      WAVENUM_FLD = WAVENUM_FLD * detJstretch
 !
 !  ...PML stretching
       zaJ(1,1) = JJstretch(1,1)*za(1,1)
