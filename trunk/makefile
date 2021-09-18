@@ -8,6 +8,8 @@ COMPLEX    ?= 0
 DEBUG      ?= 0
 J          ?= 1
 
+HP3D_USE_INTEL_MKL ?= 0
+
 ####################################################
 
 HP3D_LIBNAME   = libhp3d.a
@@ -35,7 +37,8 @@ endif
 # Files with ending in .F and .F90 (not .f and .f90)
 # are preprocessed according to certain directives
 CCDEFS    = -D"C_MODE=$(COMPLEX)" \
-            -D"DEBUG_MODE=$(DEBUG)"
+            -D"DEBUG_MODE=$(DEBUG)" \
+            -D"HP3D_USE_INTEL_MKL=$(HP3D_USE_INTEL_MKL)"
 
 # -- Includes --
 CCINCS   += -I./$(SRC_PATH) \

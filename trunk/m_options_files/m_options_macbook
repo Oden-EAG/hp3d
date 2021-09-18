@@ -10,6 +10,9 @@ HP3D_BASE_PATH  = /Users/stefan/hp3D/LIBS/par_hp3d/trunk
 COMPLEX ?= 0
 DEBUG   ?= 0
 
+# Dependencies
+HP3D_USE_INTEL_MKL ?= 0
+
 #------------------------------------------------------------------
 # COMPILER SETTINGS (a 64bit processor architecture is assumed)
 #------------------------------------------------------------------
@@ -24,6 +27,8 @@ FF = mpifort
 CC = mpicc
 FC     =  $(FF)
 FFLAGS = -fPIC -ffree-line-length-none
+# gcc 10 issue mpi: add flag
+FFLAGS += -fallow-argument-mismatch
 
 # OpenMP
 ifeq ($(OPENMP),1)
@@ -132,7 +137,10 @@ else
   OBJ_PATH      = $(OBJ_PATH_REAL)
 endif
 
-HP3D_LIB_EXTRA_INCS = $(MKL_INCS) $(SOLVER_INCS) $(VIS_INCS) $(EXTRA_LINK_INCS)
+ifeq ($(HP3D_USE_INTEL_MKL),1)
+  HP3D_LIB_EXTRA_INCS = $(MKL_INCS)
+endif
+HP3D_LIB_EXTRA_INCS += $(SOLVER_INCS) $(VIS_INCS) $(EXTRA_LINK_INCS)
 
 HP3D_MOD_OPTION_INC = -J./$(MODULE_PATH)
 
@@ -162,8 +170,13 @@ HP3D_LINK_INCS    = -I$(HP3D_PATH)/common/hp3d \
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # SOLVER & MKL LINKING
 
-SOLVER_LINK_LIBS    = $(SOLVER_LIBS) $(MKL_LIBS)
-SOLVER_LINK_INCS    = $(SOLVER_INCS) $(MKL_INCS)
+SOLVER_LINK_LIBS    = $(SOLVER_LIBS)
+SOLVER_LINK_INCS    = $(SOLVER_INCS)
+
+ifeq ($(HP3D_USE_INTEL_MKL),1)
+   SOLVER_LINK_LIBS += $(MKL_LIBS)
+   SOLVER_LINK_INCS += $(MKL_INCS)
+endif
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # PROBLEM LINKING
@@ -184,5 +197,6 @@ PROB_INCS    += $(HP3D_LINK_INCS)   \
 # are preprocessed according to certain directives
 
 PROB_PP_DEFS  = -D"C_MODE=$(COMPLEX)" \
-                -D"DEBUG_MODE=$(DEBUG)"
+                -D"DEBUG_MODE=$(DEBUG)" \
+                -D"HP3D_USE_INTEL_MKL=$(HP3D_USE_INTEL_MKL)"
 
