@@ -252,7 +252,7 @@ c
       double precision :: GMupE(0:1),GDMupE(1:3,0:1)
       double precision :: MubF(1:6),DMubF(1:3,1:6)
       double precision :: MupF(0:1,1:2,1:6),DMupF(1:3,0:1,1:2,1:6)
-      double precision :: GMupF(1:2,0:1),GDMupF(1:3,1:2,0:1)
+      double precision :: GMupF(0:1,1:2),GDMupF(1:3,0:1,1:2)
       double precision :: EE(1:3,0:Nsize(1)-1),curlEE(1:3,0:Nsize(1)-1)
       double precision :: EQuad(1:3,0:Nsize(1)-1,2:Nsize(1))
       double precision :: curlEQuad(1:3,0:Nsize(1)-1,2:Nsize(1))
@@ -624,7 +624,7 @@ c
       double precision, intent(in)  :: Xi(3)
       double precision, intent(out) :: ShapQ(Nsize(2))
       double precision :: Mu(0:1,1:3),DMu(1:3,0:1,1:3)
-      double precision :: homP(1:3,0:Nsize(1)-1)
+      double precision :: homP(0:Nsize(1)-1,1:3)
 c
 c  ...debugging flag
       iprint=0
@@ -643,14 +643,14 @@ c  ...find order
 c  ...if necessary, create bubbles - always necessary if p,q,r>=1
       if (ndofB.gt.0) then
 c    ...call Legendre polynomials - no need to orient
-        call HomLegendre(Mu(0:1,1),nordB(1)-1, homP(1,0:nordB(1)-1))
-        call HomLegendre(Mu(0:1,2),nordB(2)-1, homP(2,0:nordB(2)-1))
-        call HomLegendre(Mu(0:1,3),nordB(3)-1, homP(3,0:nordB(3)-1))
+        call HomLegendre(Mu(0:1,1),nordB(1)-1, homP(0:nordB(1)-1,1))
+        call HomLegendre(Mu(0:1,2),nordB(2)-1, homP(0:nordB(2)-1,2))
+        call HomLegendre(Mu(0:1,3),nordB(3)-1, homP(0:nordB(3)-1,3))
         do k=0,nordB(3)-1
           do j=0,nordB(2)-1
             do i=0,nordB(1)-1
               m=m+1
-              ShapQ(m) = homP(1,i)*homP(2,j)*homP(3,k)
+              ShapQ(m) = homP(i,1)*homP(j,2)*homP(k,3)
             enddo
           enddo
         enddo

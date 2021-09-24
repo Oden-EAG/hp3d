@@ -243,7 +243,7 @@ c
       double precision, intent(out) :: EQuad(1:N,0:Nord(1)-1,2:Nord(2)),
      .                         CurlEQuad(1:2*N-3,0:Nord(1)-1,2:Nord(2))
       integer ::                          minI,maxI,minJ,maxJ,Ncurl,i,j
-      double precision ::         S(0:1),DS(1:N,0:1),T(0:1),DT(1:N,0:1),
+      double precision ::
      .                EES(1:N,0:Nord(1)-1),curlEES(1:2*N-3,0:Nord(1)-1),
      .       phiET(2:Nord(2)),DphiET(1:N,2:Nord(2)),DphiETxEES(1:2*N-3)
 c
@@ -314,7 +314,7 @@ c
      .                               VQuad(1:N,0:Nord(1)-1,0:Nord(2)-1),
      .                                DivVQuad(0:Nord(1)-1,0:Nord(2)-1)
       integer ::                          minI,maxI,minJ,maxJ,Ncurl,i,j
-      double precision ::         S(0:1),T(0:1),DS(1:N,0:1),DT(1:N,0:1),
+      double precision ::
      .          EES(1:N,0:Nord(1)-1),curlEES(1:2*N-3,0:Nord(1)-1),prod1,
      .          EET(1:N,0:Nord(2)-1),curlEET(1:2*N-3,0:Nord(2)-1),prod2
 c
