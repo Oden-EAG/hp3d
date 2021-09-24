@@ -299,6 +299,7 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, &
 !
 !     printing flag
       integer :: iprint
+      integer :: nrdofH,nrdofE,nrdofV,nrdofQ
 !
 !---------------------------------------------------------------------------------------
 !
@@ -315,6 +316,8 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, &
       call find_orient(mdle, nedge_orient,nface_orient)
       call nodcor(     mdle, xnod)
       call solelm(     mdle, zdofH,zdofE,zdofV,zdofQ)
+!!      call celndof(NODES(Mdle)%type,norder,nrdofH,nrdofE,nrdofV,nrdofQ)
+!!      write(*,*) 'zdofH = ',zdofH(1,1:nrdofH)
 !
 !     set up the element quadrature
       INTEGRATION=2
@@ -388,6 +391,7 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, &
                 ENDIF
 !
 !               accumulate L2 norm
+!!!                write(*,*) 'l, zvalH(i),zsolH(i) = ',l, zvalH(i),zsolH(i)
                 errorH = errorH + abs(zvalH(i) - zsolH(i))**2 * weight
                 rnormH = rnormH + abs(zvalH(i)           )**2 * weight
 !

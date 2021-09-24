@@ -1,0 +1,176 @@
+3   3     NDIM,MANDIM
+
+0         no surfaces
+
+1         NRDOMAIN
+
+
+11         NRPOINT
+
+Regular             point 1
+0.0d0  0.0d0 0.0d0
+
+Regular             point 2
+1.0d0  0.0d0 0.0d0
+
+Regular             point 3
+1.0d0  1.0d0 0.0d0
+
+Regular             point 4
+0.0d0  1.0d0 0.0d0
+
+Regular             point 5
+0.0d0  0.0d0 1.0d0
+
+Regular             point 6
+1.0d0  0.0d0 1.0d0
+
+Regular             point 7
+1.0d0  1.0d0 1.0d0
+
+Regular             point 8
+0.0d0  1.0d0 1.0d0
+
+Regular             point 9
+0.0d0  0.0d0 2.0d0
+
+Regular             point 10
+0.0d0 -1.0d0 0.0d0
+
+Regular             point 11
+0.0d0 -1.0d0 1.0d0
+
+
+
+
+
+20 NRCURVE
+
+Seglin              curve 1
+1 2
+
+Seglin              curve 2
+2 3
+
+Seglin              curve 3
+4 3
+
+Seglin              curve 4
+1 4 
+
+Seglin              curve 5
+5 6
+
+Seglin              curve 6
+6 7
+
+Seglin              curve 7
+8 7
+
+Seglin              curve 8
+5 8
+
+Seglin              curve 9
+1 5
+
+Seglin              curve 10
+2 6
+
+Seglin              curve 11
+3 7
+
+Seglin              curve 12
+4 8 
+
+Seglin              curve 13
+5 9
+
+Seglin              curve 14
+6 9
+
+Seglin              curve 15
+1 10
+
+Seglin              curve 16
+10 2 
+
+Seglin              curve 17
+5 11
+
+Seglin              curve 18
+11 6
+
+Seglin              curve 19
+10 11
+
+Seglin              curve 20
+11 9
+
+
+
+
+5  NRTRIAN
+
+PlaneTri            triangle 1
+5 6 9
+
+PlaneTri            triangle 2
+1 10 2
+
+PlaneTri            triangle 3
+5 11 6
+
+PlaneTri            triangle 4
+5 11 9
+
+PlaneTri            triangle 5
+11 6 9
+
+
+
+
+8 NRRECTA
+
+BilQua              rectangle 1
+1 2 3 4
+
+BilQua              rectangle 2
+5 6 7 8
+
+BilQua              rectangle 3
+1 2 6 5  
+
+BilQua              rectangle 4
+4 3 7 8
+
+BilQua              rectangle 5
+1 4 8 5
+
+BilQua              rectangle 6
+2 3 7 6
+
+BilQua              rectangle 7
+1 10 11 5
+
+BilQua              rectangle 8
+10 2 6 11
+
+
+
+
+1 NRPRISM   
+Linear              prism 1    
+1    1 10 2 5 11 6
+
+
+
+1 NRHEXAS  
+Linear              hexa 1      
+1    1 2 3 4 5 6 7 8
+ 
+
+1 NRTETRA   
+Linear              tetra 1     
+1     5 11 6 9
+
+0 NRPYRA

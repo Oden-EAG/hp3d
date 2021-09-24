@@ -57,7 +57,7 @@ c
       implicit none
       integer :: N,v
       double precision, intent(in)  :: Mu(1:2,0:1),DMu(1:2,1:2,0:1)
-      double precision, intent(out) :: MubV(1:4,1:2),DMubV(1:4,1:2,1:2)
+      double precision, intent(out) :: MubV(1:2,1:4),DMubV(1:2,1:2,1:4)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c         V=((0,0),(1,0),(1,1),(0,1))=>(v1,v2,v3,v4)
@@ -68,20 +68,20 @@ c  ...4 vertices, each with two blending functions
 c
 c  ...v=1 --> v1=(0,0)
       v=1
-      MubV(v,1) = Mu(1,0); DMubV(v,1:N,1) = DMu(1:N,1,0)
-      MubV(v,2) = Mu(2,0); DMubV(v,1:N,2) = DMu(1:N,2,0)
+      MubV(1,v) = Mu(1,0); DMubV(1:N,1,v) = DMu(1:N,1,0)
+      MubV(2,v) = Mu(2,0); DMubV(1:N,2,v) = DMu(1:N,2,0)
 c  ...v=2 --> v2=(1,0)
       v=2
-      MubV(v,1) = Mu(1,1); DMubV(v,1:N,1) = DMu(1:N,1,1)
-      MubV(v,2) = Mu(2,0); DMubV(v,1:N,2) = DMu(1:N,2,0)
+      MubV(1,v) = Mu(1,1); DMubV(1:N,1,v) = DMu(1:N,1,1)
+      MubV(2,v) = Mu(2,0); DMubV(1:N,2,v) = DMu(1:N,2,0)
 c  ...v=3 --> v3=(1,1)
       v=3
-      MubV(v,1) = Mu(1,1); DMubV(v,1:N,1) = DMu(1:N,1,1)
-      MubV(v,2) = Mu(2,1); DMubV(v,1:N,2) = DMu(1:N,2,1)
+      MubV(1,v) = Mu(1,1); DMubV(1:N,1,v) = DMu(1:N,1,1)
+      MubV(2,v) = Mu(2,1); DMubV(1:N,2,v) = DMu(1:N,2,1)
 c  ...v=4 --> v4=(0,1)
       v=4
-      MubV(v,1) = Mu(1,0); DMubV(v,1:N,1) = DMu(1:N,1,0)
-      MubV(v,2) = Mu(2,1); DMubV(v,1:N,2) = DMu(1:N,2,1)
+      MubV(1,v) = Mu(1,0); DMubV(1:N,1,v) = DMu(1:N,1,0)
+      MubV(2,v) = Mu(2,1); DMubV(1:N,2,v) = DMu(1:N,2,1)
 c
       end subroutine BlendQuadV
 c----------------------------------------------------------------------
@@ -91,8 +91,8 @@ c
       integer :: N,e
       logical, intent(out) :: IdecE
       double precision, intent(in)  :: Mu(1:2,0:1),DMu(1:2,1:2,0:1)
-      double precision, intent(out) :: MubE(1:4),DMubE(1:4,1:2)
-      double precision, intent(out) :: MupE(1:4,0:1),DMupE(1:4,1:2,0:1)
+      double precision, intent(out) :: MubE(1:4),DMubE(1:2,1:4)
+      double precision, intent(out) :: MupE(0:1,1:4),DMupE(1:2,0:1,1:4)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c         V=((0,0),(1,0),(1,1),(0,1))=>(v1,v2,v3,v4)
@@ -105,28 +105,28 @@ c     pair representing a projection
 c
 c  ...e=1 --> edge12 with local orientation v1->v2
       e=1
-      MubE(e) = Mu(2,0); DMubE(e,1:N) = DMu(1:N,2,0)
+      MubE(e) = Mu(2,0); DMubE(1:N,e) = DMu(1:N,2,0)
 c     ...locally oriented pair representing projection
-      MupE(e,0) = Mu(1,0); MupE(e,1) = Mu(1,1)
-      DMupE(e,1:N,0) = DMu(1:N,1,0); DMupE(e,1:N,1) = DMu(1:N,1,1)
+      MupE(0,e) = Mu(1,0); MupE(1,e) = Mu(1,1)
+      DMupE(1:N,0,e) = DMu(1:N,1,0); DMupE(1:N,1,e) = DMu(1:N,1,1)
 c  ...e=2 --> edge23 with local orientation v2->v3
       e=2
-      MubE(e) = Mu(1,1); DMubE(e,1:N) = DMu(1:N,1,1)
+      MubE(e) = Mu(1,1); DMubE(1:N,e) = DMu(1:N,1,1)
 c     ...locally oriented pair representing projection
-      MupE(e,0) = Mu(2,0); MupE(e,1) = Mu(2,1);
-      DMupE(e,1:N,0) = DMu(1:N,2,0); DMupE(e,1:N,1) = DMu(1:N,2,1);
+      MupE(0,e) = Mu(2,0); MupE(1,e) = Mu(2,1);
+      DMupE(1:N,0,e) = DMu(1:N,2,0); DMupE(1:N,1,e) = DMu(1:N,2,1);
 c  ...e=3 --> edge34 with local orientation v4->v3
       e=3
-      MubE(e) = Mu(2,1); DMubE(e,1:N) = DMu(1:N,2,1)
+      MubE(e) = Mu(2,1); DMubE(1:N,e) = DMu(1:N,2,1)
 c     ...locally oriented pair representing projection
-      MupE(e,0) = Mu(1,0); MupE(e,1) = Mu(1,1)
-      DMupE(e,1:N,0) = DMu(1:N,1,0); DMupE(e,1:N,1) = DMu(1:N,1,1)
+      MupE(0,e) = Mu(1,0); MupE(1,e) = Mu(1,1)
+      DMupE(1:N,0,e) = DMu(1:N,1,0); DMupE(1:N,1,e) = DMu(1:N,1,1)
 c  ...e=4 --> edge41 with local orientation v1->v4
       e=4
-      MubE(e) = Mu(1,0); DMubE(e,1:N) = DMu(1:N,1,0)
+      MubE(e) = Mu(1,0); DMubE(1:N,e) = DMu(1:N,1,0)
 c     ...locally oriented pair representing projection
-      MupE(e,0) = Mu(2,0); MupE(e,1) = Mu(2,1)
-      DMupE(e,1:N,0) = DMu(1:N,2,0); DMupE(e,1:N,1) = DMu(1:N,2,1)
+      MupE(0,e) = Mu(2,0); MupE(1,e) = Mu(2,1)
+      DMupE(1:N,0,e) = DMu(1:N,2,0); DMupE(1:N,1,e) = DMu(1:N,2,1)
 c
 c  ...projected coordinates are Mu, so IdecE=true for all edges
       IdecE = .TRUE.
@@ -138,7 +138,7 @@ c
       implicit none
       integer :: N,v
       double precision, intent(in)  :: Nu(0:2),DNu(1:2,0:2)
-      double precision, intent(out) :: NubV(1:3),DNubV(1:3,1:2)
+      double precision, intent(out) :: NubV(1:3),DNubV(1:2,1:3)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c                V=((0,0),(1,0),(0,1))=>(v0,v1,v2)
@@ -149,13 +149,13 @@ c  ...3 vertices, each with one blending function
 c
 c  ...v=1 --> v0=(0,0)
       v=1
-      NubV(v) = Nu(0); DNubV(v,1:N) = DNu(1:N,0)
+      NubV(v) = Nu(0); DNubV(1:N,v) = DNu(1:N,0)
 c  ...v=2 --> v1=(1,0)
       v=2
-      NubV(v) = Nu(1); DNubV(v,1:N) = DNu(1:N,1)
+      NubV(v) = Nu(1); DNubV(1:N,v) = DNu(1:N,1)
 c  ...v=3 --> v2=(0,1)
       v=3
-      NubV(v) = Nu(2); DNubV(v,1:N) = DNu(1:N,2)
+      NubV(v) = Nu(2); DNubV(1:N,v) = DNu(1:N,2)
 c
       end subroutine BlendTriV
 c----------------------------------------------------------------------
@@ -165,7 +165,7 @@ c
       integer :: N,e
       logical, intent(out) :: IdecE
       double precision, intent(in)  :: Nu(0:2),DNu(1:2,0:2)
-      double precision, intent(out) :: NupE(1:3,0:1),DNupE(1:3,1:2,0:1)
+      double precision, intent(out) :: NupE(0:1,1:3),DNupE(1:2,0:1,1:3)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c                V=((0,0),(1,0),(0,1))=>(v0,v1,v2)
@@ -178,16 +178,16 @@ c     a projection
 c
 c  ...e=1 --> edge01 with local orientation v0->v1
       e=1
-      NupE(e,0) = Nu(0); NupE(e,1) = Nu(1)
-      DNupE(e,1:N,0) = DNu(1:N,0); DNupE(e,1:N,1) = DNu(1:N,1)
+      NupE(0,e) = Nu(0); NupE(1,e) = Nu(1)
+      DNupE(1:N,0,e) = DNu(1:N,0); DNupE(1:N,1,e) = DNu(1:N,1)
 c  ...e=2 --> edge12 with local orientation v1->v2
       e=2
-      NupE(e,0) = Nu(1); NupE(e,1) = Nu(2)
-      DNupE(e,1:N,0) = DNu(1:N,1); DNupE(e,1:N,1) = DNu(1:N,2)
+      NupE(0,e) = Nu(1); NupE(1,e) = Nu(2)
+      DNupE(1:N,0,e) = DNu(1:N,1); DNupE(1:N,1,e) = DNu(1:N,2)
 c  ...e=3 --> edge20 with local orientation v0->v2
       e=3
-      NupE(e,0) = Nu(0); NupE(e,1) = Nu(2)
-      DNupE(e,1:N,0) = DNu(1:N,0); DNupE(e,1:N,1) = DNu(1:N,2)
+      NupE(0,e) = Nu(0); NupE(1,e) = Nu(2)
+      DNupE(1:N,0,e) = DNu(1:N,0); DNupE(1:N,1,e) = DNu(1:N,2)
 c
 c  ...projected coordinates are Nu, so IdecE=false for all edges
       IdecE = .FALSE.
@@ -199,7 +199,7 @@ c
       implicit none
       integer :: N,v
       double precision, intent(in)  :: Mu(1:3,0:1),DMu(1:3,1:3,0:1)
-      double precision, intent(out) :: MubV(1:8,1:3),DMubV(1:8,1:3,1:3)
+      double precision, intent(out) :: MubV(1:3,1:8),DMubV(1:3,1:3,1:8)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c      V=((0,0,0),(1,0,0),(1,1,0),(0,1,0),
@@ -211,44 +211,44 @@ c  ...8 vertices, each with three blending functions
 c
 c  ...v=1 --> v1=(0,0,0)
       v=1
-      MubV(v,1) = Mu(1,0); DMubV(v,1:N,1) = DMu(1:N,1,0)
-      MubV(v,2) = Mu(2,0); DMubV(v,1:N,2) = DMu(1:N,2,0)
-      MubV(v,3) = Mu(3,0); DMubV(v,1:N,3) = DMu(1:N,3,0)
+      MubV(1,v) = Mu(1,0); DMubV(1:N,1,v) = DMu(1:N,1,0)
+      MubV(2,v) = Mu(2,0); DMubV(1:N,2,v) = DMu(1:N,2,0)
+      MubV(3,v) = Mu(3,0); DMubV(1:N,3,v) = DMu(1:N,3,0)
 c  ...v=2 --> v2=(1,0,0)
       v=2
-      MubV(v,1) = Mu(1,1); DMubV(v,1:N,1) = DMu(1:N,1,1)
-      MubV(v,2) = Mu(2,0); DMubV(v,1:N,2) = DMu(1:N,2,0)
-      MubV(v,3) = Mu(3,0); DMubV(v,1:N,3) = DMu(1:N,3,0)
+      MubV(1,v) = Mu(1,1); DMubV(1:N,1,v) = DMu(1:N,1,1)
+      MubV(2,v) = Mu(2,0); DMubV(1:N,2,v) = DMu(1:N,2,0)
+      MubV(3,v) = Mu(3,0); DMubV(1:N,3,v) = DMu(1:N,3,0)
 c  ...v=3 --> v3=(1,1,0)
       v=3
-      MubV(v,1) = Mu(1,1); DMubV(v,1:N,1) = DMu(1:N,1,1)
-      MubV(v,2) = Mu(2,1); DMubV(v,1:N,2) = DMu(1:N,2,1)
-      MubV(v,3) = Mu(3,0); DMubV(v,1:N,3) = DMu(1:N,3,0)
+      MubV(1,v) = Mu(1,1); DMubV(1:N,1,v) = DMu(1:N,1,1)
+      MubV(2,v) = Mu(2,1); DMubV(1:N,2,v) = DMu(1:N,2,1)
+      MubV(3,v) = Mu(3,0); DMubV(1:N,3,v) = DMu(1:N,3,0)
 c  ...v=4 --> v4=(0,1,0)
       v=4
-      MubV(v,1) = Mu(1,0); DMubV(v,1:N,1) = DMu(1:N,1,0)
-      MubV(v,2) = Mu(2,1); DMubV(v,1:N,2) = DMu(1:N,2,1)
-      MubV(v,3) = Mu(3,0); DMubV(v,1:N,3) = DMu(1:N,3,0)
+      MubV(1,v) = Mu(1,0); DMubV(1:N,1,v) = DMu(1:N,1,0)
+      MubV(2,v) = Mu(2,1); DMubV(1:N,2,v) = DMu(1:N,2,1)
+      MubV(3,v) = Mu(3,0); DMubV(1:N,3,v) = DMu(1:N,3,0)
 c  ...v=5 --> v5=(0,0,1)
       v=5
-      MubV(v,1) = Mu(1,0); DMubV(v,1:N,1) = DMu(1:N,1,0)
-      MubV(v,2) = Mu(2,0); DMubV(v,1:N,2) = DMu(1:N,2,0)
-      MubV(v,3) = Mu(3,1); DMubV(v,1:N,3) = DMu(1:N,3,1)
+      MubV(1,v) = Mu(1,0); DMubV(1:N,1,v) = DMu(1:N,1,0)
+      MubV(2,v) = Mu(2,0); DMubV(1:N,2,v) = DMu(1:N,2,0)
+      MubV(3,v) = Mu(3,1); DMubV(1:N,3,v) = DMu(1:N,3,1)
 c  ...v=6 --> v6=(1,0,1)
       v=6
-      MubV(v,1) = Mu(1,1); DMubV(v,1:N,1) = DMu(1:N,1,1)
-      MubV(v,2) = Mu(2,0); DMubV(v,1:N,2) = DMu(1:N,2,0)
-      MubV(v,3) = Mu(3,1); DMubV(v,1:N,3) = DMu(1:N,3,1)
+      MubV(1,v) = Mu(1,1); DMubV(1:N,1,v) = DMu(1:N,1,1)
+      MubV(2,v) = Mu(2,0); DMubV(1:N,2,v) = DMu(1:N,2,0)
+      MubV(3,v) = Mu(3,1); DMubV(1:N,3,v) = DMu(1:N,3,1)
 c  ...v=7 --> v7=(1,1,1)
       v=7
-      MubV(v,1) = Mu(1,1); DMubV(v,1:N,1) = DMu(1:N,1,1)
-      MubV(v,2) = Mu(2,1); DMubV(v,1:N,2) = DMu(1:N,2,1)
-      MubV(v,3) = Mu(3,1); DMubV(v,1:N,3) = DMu(1:N,3,1)
+      MubV(1,v) = Mu(1,1); DMubV(1:N,1,v) = DMu(1:N,1,1)
+      MubV(2,v) = Mu(2,1); DMubV(1:N,2,v) = DMu(1:N,2,1)
+      MubV(3,v) = Mu(3,1); DMubV(1:N,3,v) = DMu(1:N,3,1)
 c  ...v=8 --> v8=(0,1,1)
       v=8
-      MubV(v,1) = Mu(1,0); DMubV(v,1:N,1) = DMu(1:N,1,0)
-      MubV(v,2) = Mu(2,1); DMubV(v,1:N,2) = DMu(1:N,2,1)
-      MubV(v,3) = Mu(3,1); DMubV(v,1:N,3) = DMu(1:N,3,1)
+      MubV(1,v) = Mu(1,0); DMubV(1:N,1,v) = DMu(1:N,1,0)
+      MubV(2,v) = Mu(2,1); DMubV(1:N,2,v) = DMu(1:N,2,1)
+      MubV(3,v) = Mu(3,1); DMubV(1:N,3,v) = DMu(1:N,3,1)
 c
       end subroutine BlendHexaV
 c----------------------------------------------------------------------
@@ -258,8 +258,8 @@ c
       integer :: N,e
       logical, intent(out) :: IdecE
       double precision, intent(in)  :: Mu(1:3,0:1),DMu(1:3,1:3,0:1)
-      double precision, intent(out) :: MubE(1:12,1:2),
-     .          DMubE(1:12,1:3,1:2),MupE(1:12,0:1),DMupE(1:12,1:3,0:1)
+      double precision, intent(out) :: MubE(1:2,1:12),
+     .          DMubE(1:3,1:2,1:12),MupE(0:1,1:12),DMupE(1:3,0:1,1:12)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c      V=((0,0,0),(1,0,0),(1,1,0),(0,1,0),
@@ -274,88 +274,88 @@ c     and a locally oriented pair representing a projection
 c
 c  ...e=1 --> edge12 with local orientation v1->v2
       e=1
-      MubE(e,1) = Mu(2,0); DMubE(e,1:N,1) = DMu(1:N,2,0)
-      MubE(e,2) = Mu(3,0); DMubE(e,1:N,2) = DMu(1:N,3,0)
+      MubE(1,e) = Mu(2,0); DMubE(1:N,1,e) = DMu(1:N,2,0)
+      MubE(2,e) = Mu(3,0); DMubE(1:N,2,e) = DMu(1:N,3,0)
 c     ...locally oriented pair representing projection
-      MupE(e,0) = Mu(1,0); MupE(e,1) = Mu(1,1)
-      DMupE(e,1:N,0) = DMu(1:N,1,0); DMupE(e,1:N,1) = DMu(1:N,1,1)
+      MupE(0,e) = Mu(1,0); MupE(1,e) = Mu(1,1)
+      DMupE(1:N,0,e) = DMu(1:N,1,0); DMupE(1:N,1,e) = DMu(1:N,1,1)
 c  ...e=2 --> edge23 with local orientation v2->v3
       e=2
-      MubE(e,1) = Mu(1,1); DMubE(e,1:N,1) = DMu(1:N,1,1)
-      MubE(e,2) = Mu(3,0); DMubE(e,1:N,2) = DMu(1:N,3,0)
+      MubE(1,e) = Mu(1,1); DMubE(1:N,1,e) = DMu(1:N,1,1)
+      MubE(2,e) = Mu(3,0); DMubE(1:N,2,e) = DMu(1:N,3,0)
 c     ...locally oriented pair representing projection
-      MupE(e,0) = Mu(2,0); MupE(e,1) = Mu(2,1);
-      DMupE(e,1:N,0) = DMu(1:N,2,0); DMupE(e,1:N,1) = DMu(1:N,2,1);
+      MupE(0,e) = Mu(2,0); MupE(1,e) = Mu(2,1);
+      DMupE(1:N,0,e) = DMu(1:N,2,0); DMupE(1:N,1,e) = DMu(1:N,2,1);
 c  ...e=3 --> edge34 with local orientation v4->v3
       e=3
-      MubE(e,1) = Mu(2,1); DMubE(e,1:N,1) = DMu(1:N,2,1)
-      MubE(e,2) = Mu(3,0); DMubE(e,1:N,2) = DMu(1:N,3,0)
+      MubE(1,e) = Mu(2,1); DMubE(1:N,1,e) = DMu(1:N,2,1)
+      MubE(2,e) = Mu(3,0); DMubE(1:N,2,e) = DMu(1:N,3,0)
 c     ...locally oriented pair representing projection
-      MupE(e,0) = Mu(1,0); MupE(e,1) = Mu(1,1)
-      DMupE(e,1:N,0) = DMu(1:N,1,0); DMupE(e,1:N,1) = DMu(1:N,1,1)
+      MupE(0,e) = Mu(1,0); MupE(1,e) = Mu(1,1)
+      DMupE(1:N,0,e) = DMu(1:N,1,0); DMupE(1:N,1,e) = DMu(1:N,1,1)
 c  ...e=4 --> edge41 with local orientation v1->v4
       e=4
-      MubE(e,1) = Mu(1,0); DMubE(e,1:N,1) = DMu(1:N,1,0)
-      MubE(e,2) = Mu(3,0); DMubE(e,1:N,2) = DMu(1:N,3,0)
+      MubE(1,e) = Mu(1,0); DMubE(1:N,1,e) = DMu(1:N,1,0)
+      MubE(2,e) = Mu(3,0); DMubE(1:N,2,e) = DMu(1:N,3,0)
 c     ...locally oriented pair representing projection
-      MupE(e,0) = Mu(2,0); MupE(e,1) = Mu(2,1)
-      DMupE(e,1:N,0) = DMu(1:N,2,0); DMupE(e,1:N,1) = DMu(1:N,2,1)
+      MupE(0,e) = Mu(2,0); MupE(1,e) = Mu(2,1)
+      DMupE(1:N,0,e) = DMu(1:N,2,0); DMupE(1:N,1,e) = DMu(1:N,2,1)
 c  ...e=5 --> edge56 with local orientation v5->v6
       e=5
-      MubE(e,1) = Mu(2,0); DMubE(e,1:N,1) = DMu(1:N,2,0)
-      MubE(e,2) = Mu(3,1); DMubE(e,1:N,2) = DMu(1:N,3,1)
+      MubE(1,e) = Mu(2,0); DMubE(1:N,1,e) = DMu(1:N,2,0)
+      MubE(2,e) = Mu(3,1); DMubE(1:N,2,e) = DMu(1:N,3,1)
 c     ...locally oriented pair representing projection
-      MupE(e,0) = Mu(1,0); MupE(e,1) = Mu(1,1)
-      DMupE(e,1:N,0) = DMu(1:N,1,0); DMupE(e,1:N,1) = DMu(1:N,1,1)
+      MupE(0,e) = Mu(1,0); MupE(1,e) = Mu(1,1)
+      DMupE(1:N,0,e) = DMu(1:N,1,0); DMupE(1:N,1,e) = DMu(1:N,1,1)
 c  ...e=6 --> edge67 with local orientation v6->v7
       e=6
-      MubE(e,1) = Mu(1,1); DMubE(e,1:N,1) = DMu(1:N,1,1)
-      MubE(e,2) = Mu(3,1); DMubE(e,1:N,2) = DMu(1:N,3,1)
+      MubE(1,e) = Mu(1,1); DMubE(1:N,1,e) = DMu(1:N,1,1)
+      MubE(2,e) = Mu(3,1); DMubE(1:N,2,e) = DMu(1:N,3,1)
 c     ...locally oriented pair representing projection
-      MupE(e,0) = Mu(2,0); MupE(e,1) = Mu(2,1);
-      DMupE(e,1:N,0) = DMu(1:N,2,0); DMupE(e,1:N,1) = DMu(1:N,2,1);
+      MupE(0,e) = Mu(2,0); MupE(1,e) = Mu(2,1);
+      DMupE(1:N,0,e) = DMu(1:N,2,0); DMupE(1:N,1,e) = DMu(1:N,2,1);
 c  ...e=7 --> edge78 with local orientation v8->v7
       e=7
-      MubE(e,1) = Mu(2,1); DMubE(e,1:N,1) = DMu(1:N,2,1)
-      MubE(e,2) = Mu(3,1); DMubE(e,1:N,2) = DMu(1:N,3,1)
+      MubE(1,e) = Mu(2,1); DMubE(1:N,1,e) = DMu(1:N,2,1)
+      MubE(2,e) = Mu(3,1); DMubE(1:N,2,e) = DMu(1:N,3,1)
 c     ...locally oriented pair representing projection
-      MupE(e,0) = Mu(1,0); MupE(e,1) = Mu(1,1)
-      DMupE(e,1:N,0) = DMu(1:N,1,0); DMupE(e,1:N,1) = DMu(1:N,1,1)
+      MupE(0,e) = Mu(1,0); MupE(1,e) = Mu(1,1)
+      DMupE(1:N,0,e) = DMu(1:N,1,0); DMupE(1:N,1,e) = DMu(1:N,1,1)
 c  ...e=8 --> edge85 with local orientation v5->v8
       e=8
-      MubE(e,1) = Mu(1,0); DMubE(e,1:N,1) = DMu(1:N,1,0)
-      MubE(e,2) = Mu(3,1); DMubE(e,1:N,2) = DMu(1:N,3,1)
+      MubE(1,e) = Mu(1,0); DMubE(1:N,1,e) = DMu(1:N,1,0)
+      MubE(2,e) = Mu(3,1); DMubE(1:N,2,e) = DMu(1:N,3,1)
 c     ...locally oriented pair representing projection
-      MupE(e,0) = Mu(2,0); MupE(e,1) = Mu(2,1)
-      DMupE(e,1:N,0) = DMu(1:N,2,0); DMupE(e,1:N,1) = DMu(1:N,2,1)
+      MupE(0,e) = Mu(2,0); MupE(1,e) = Mu(2,1)
+      DMupE(1:N,0,e) = DMu(1:N,2,0); DMupE(1:N,1,e) = DMu(1:N,2,1)
 c  ...e=9 --> edge15 with local orientation v1->v5
       e=9
-      MubE(e,1) = Mu(1,0); DMubE(e,1:N,1) = DMu(1:N,1,0)
-      MubE(e,2) = Mu(2,0); DMubE(e,1:N,2) = DMu(1:N,2,0)
+      MubE(1,e) = Mu(1,0); DMubE(1:N,1,e) = DMu(1:N,1,0)
+      MubE(2,e) = Mu(2,0); DMubE(1:N,2,e) = DMu(1:N,2,0)
 c     ...locally oriented pair representing projection
-      MupE(e,0) = Mu(3,0); MupE(e,1) = Mu(3,1)
-      DMupE(e,1:N,0) = DMu(1:N,3,0); DMupE(e,1:N,1) = DMu(1:N,3,1)
+      MupE(0,e) = Mu(3,0); MupE(1,e) = Mu(3,1)
+      DMupE(1:N,0,e) = DMu(1:N,3,0); DMupE(1:N,1,e) = DMu(1:N,3,1)
 c  ...e=10 --> edge26 with local orientation v2->v6
       e=10
-      MubE(e,1) = Mu(1,1); DMubE(e,1:N,1) = DMu(1:N,1,1)
-      MubE(e,2) = Mu(2,0); DMubE(e,1:N,2) = DMu(1:N,2,0)
+      MubE(1,e) = Mu(1,1); DMubE(1:N,1,e) = DMu(1:N,1,1)
+      MubE(2,e) = Mu(2,0); DMubE(1:N,2,e) = DMu(1:N,2,0)
 c     ...locally oriented pair representing projection
-      MupE(e,0) = Mu(3,0); MupE(e,1) = Mu(3,1)
-      DMupE(e,1:N,0) = DMu(1:N,3,0); DMupE(e,1:N,1) = DMu(1:N,3,1)
+      MupE(0,e) = Mu(3,0); MupE(1,e) = Mu(3,1)
+      DMupE(1:N,0,e) = DMu(1:N,3,0); DMupE(1:N,1,e) = DMu(1:N,3,1)
 c  ...e=11 --> edge37 with local orientation v3->v7
       e=11
-      MubE(e,1) = Mu(1,1); DMubE(e,1:N,1) = DMu(1:N,1,1)
-      MubE(e,2) = Mu(2,1); DMubE(e,1:N,2) = DMu(1:N,2,1)
+      MubE(1,e) = Mu(1,1); DMubE(1:N,1,e) = DMu(1:N,1,1)
+      MubE(2,e) = Mu(2,1); DMubE(1:N,2,e) = DMu(1:N,2,1)
 c     ...locally oriented pair representing projection
-      MupE(e,0) = Mu(3,0); MupE(e,1) = Mu(3,1)
-      DMupE(e,1:N,0) = DMu(1:N,3,0); DMupE(e,1:N,1) = DMu(1:N,3,1)
+      MupE(0,e) = Mu(3,0); MupE(1,e) = Mu(3,1)
+      DMupE(1:N,0,e) = DMu(1:N,3,0); DMupE(1:N,1,e) = DMu(1:N,3,1)
 c  ...e=12 --> edge48 with local orientation v4->v8
       e=12
-      MubE(e,1) = Mu(1,0); DMubE(e,1:N,1) = DMu(1:N,1,0)
-      MubE(e,2) = Mu(2,1); DMubE(e,1:N,2) = DMu(1:N,2,1)
+      MubE(1,e) = Mu(1,0); DMubE(1:N,1,e) = DMu(1:N,1,0)
+      MubE(2,e) = Mu(2,1); DMubE(1:N,2,e) = DMu(1:N,2,1)
 c     ...locally oriented pair representing projection
-      MupE(e,0) = Mu(3,0); MupE(e,1) = Mu(3,1)
-      DMupE(e,1:N,0) = DMu(1:N,3,0); DMupE(e,1:N,1) = DMu(1:N,3,1)
+      MupE(0,e) = Mu(3,0); MupE(1,e) = Mu(3,1)
+      DMupE(1:N,0,e) = DMu(1:N,3,0); DMupE(1:N,1,e) = DMu(1:N,3,1)
 c
 c  ...projected coordinates are Mu, so IdecE=true for all edges
       IdecE = .TRUE.
@@ -368,9 +368,9 @@ c
       integer :: N,f
       logical, intent(out) :: IdecF(1:2)
       double precision, intent(in)  :: Mu(1:3,0:1),DMu(1:3,1:3,0:1)
-      double precision, intent(out) :: MubF(1:6),DMubF(1:6,1:3)
-      double precision, intent(out) :: MupF(1:6,1:2,0:1),
-     .                                           DMupF(1:6,1:3,1:2,0:1)
+      double precision, intent(out) :: MubF(1:6),DMubF(1:3,1:6)
+      double precision, intent(out) :: MupF(1:2,0:1,1:6),
+     .                                           DMupF(1:3,1:2,0:1,1:6)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c      V=((0,0,0),(1,0,0),(1,1,0),(0,1,0),
@@ -385,52 +385,52 @@ c     and a locally oriented quadruple representing a projection
 c
 c  ...f=1 --> face1234 with local orientation v1->v2->v3->v4
       f=1
-      MubF(f) = Mu(3,0); DMubF(f,1:N) = DMu(1:N,3,0)
+      MubF(f) = Mu(3,0); DMubF(1:N,f) = DMu(1:N,3,0)
 c     ...locally oriented quadruple representing projection
-      MupF(f,1,0) = Mu(1,0); MupF(f,1,1) = Mu(1,1)
-      MupF(f,2,0) = Mu(2,0); MupF(f,2,1) = Mu(2,1)
-      DMupF(f,1:N,1,0) = DMu(1:N,1,0); DMupF(f,1:N,1,1) = DMu(1:N,1,1)
-      DMupF(f,1:N,2,0) = DMu(1:N,2,0); DMupF(f,1:N,2,1) = DMu(1:N,2,1)
+      MupF(1,0,f) = Mu(1,0); MupF(1,1,f) = Mu(1,1)
+      MupF(2,0,f) = Mu(2,0); MupF(2,1,f) = Mu(2,1)
+      DMupF(1:N,1,0,f) = DMu(1:N,1,0); DMupF(1:N,1,1,f) = DMu(1:N,1,1)
+      DMupF(1:N,2,0,f) = DMu(1:N,2,0); DMupF(1:N,2,1,f) = DMu(1:N,2,1)
 c  ...f=2 --> face5678 with local orientation v5->v6->v7->v8
       f=2
-      MubF(f) = Mu(3,1); DMubF(f,1:N) = DMu(1:N,3,1)
+      MubF(f) = Mu(3,1); DMubF(1:N,f) = DMu(1:N,3,1)
 c     ...locally oriented quadruple representing projection
-      MupF(f,1,0) = Mu(1,0); MupF(f,1,1) = Mu(1,1)
-      MupF(f,2,0) = Mu(2,0); MupF(f,2,1) = Mu(2,1)
-      DMupF(f,1:N,1,0) = DMu(1:N,1,0); DMupF(f,1:N,1,1) = DMu(1:N,1,1)
-      DMupF(f,1:N,2,0) = DMu(1:N,2,0); DMupF(f,1:N,2,1) = DMu(1:N,2,1)
+      MupF(1,0,f) = Mu(1,0); MupF(1,1,f) = Mu(1,1)
+      MupF(2,0,f) = Mu(2,0); MupF(2,1,f) = Mu(2,1)
+      DMupF(1:N,1,0,f) = DMu(1:N,1,0); DMupF(1:N,1,1,f) = DMu(1:N,1,1)
+      DMupF(1:N,2,0,f) = DMu(1:N,2,0); DMupF(1:N,2,1,f) = DMu(1:N,2,1)
 c  ...f=3 --> face1265 with local orientation v1->v2->v6->v5
       f=3
-      MubF(f) = Mu(2,0); DMubF(f,1:N) = DMu(1:N,2,0)
+      MubF(f) = Mu(2,0); DMubF(1:N,f) = DMu(1:N,2,0)
 c     ...locally oriented quadruple representing projection
-      MupF(f,1,0) = Mu(1,0); MupF(f,1,1) = Mu(1,1)
-      MupF(f,2,0) = Mu(3,0); MupF(f,2,1) = Mu(3,1)
-      DMupF(f,1:N,1,0) = DMu(1:N,1,0); DMupF(f,1:N,1,1) = DMu(1:N,1,1)
-      DMupF(f,1:N,2,0) = DMu(1:N,3,0); DMupF(f,1:N,2,1) = DMu(1:N,3,1)
+      MupF(1,0,f) = Mu(1,0); MupF(1,1,f) = Mu(1,1)
+      MupF(2,0,f) = Mu(3,0); MupF(2,1,f) = Mu(3,1)
+      DMupF(1:N,1,0,f) = DMu(1:N,1,0); DMupF(1:N,1,1,f) = DMu(1:N,1,1)
+      DMupF(1:N,2,0,f) = DMu(1:N,3,0); DMupF(1:N,2,1,f) = DMu(1:N,3,1)
 c  ...f=4 --> face2376 with local orientation v2->v3->v7->v6
       f=4
-      MubF(f) = Mu(1,1); DMubF(f,1:N) = DMu(1:N,1,1)
+      MubF(f) = Mu(1,1); DMubF(1:N,f) = DMu(1:N,1,1)
 c     ...locally oriented quadruple representing projection
-      MupF(f,1,0) = Mu(2,0); MupF(f,1,1) = Mu(2,1)
-      MupF(f,2,0) = Mu(3,0); MupF(f,2,1) = Mu(3,1)
-      DMupF(f,1:N,1,0) = DMu(1:N,2,0); DMupF(f,1:N,1,1) = DMu(1:N,2,1)
-      DMupF(f,1:N,2,0) = DMu(1:N,3,0); DMupF(f,1:N,2,1) = DMu(1:N,3,1)
+      MupF(1,0,f) = Mu(2,0); MupF(1,1,f) = Mu(2,1)
+      MupF(2,0,f) = Mu(3,0); MupF(2,1,f) = Mu(3,1)
+      DMupF(1:N,1,0,f) = DMu(1:N,2,0); DMupF(1:N,1,1,f) = DMu(1:N,2,1)
+      DMupF(1:N,2,0,f) = DMu(1:N,3,0); DMupF(1:N,2,1,f) = DMu(1:N,3,1)
 c  ...f=5 --> face4378 with local orientation v4->v3->v7->v8
       f=5
-      MubF(f) = Mu(2,1); DMubF(f,1:N) = DMu(1:N,2,1)
+      MubF(f) = Mu(2,1); DMubF(1:N,f) = DMu(1:N,2,1)
 c     ...locally oriented quadruple representing projection
-      MupF(f,1,0) = Mu(1,0); MupF(f,1,1) = Mu(1,1)
-      MupF(f,2,0) = Mu(3,0); MupF(f,2,1) = Mu(3,1)
-      DMupF(f,1:N,1,0) = DMu(1:N,1,0); DMupF(f,1:N,1,1) = DMu(1:N,1,1)
-      DMupF(f,1:N,2,0) = DMu(1:N,3,0); DMupF(f,1:N,2,1) = DMu(1:N,3,1)
+      MupF(1,0,f) = Mu(1,0); MupF(1,1,f) = Mu(1,1)
+      MupF(2,0,f) = Mu(3,0); MupF(2,1,f) = Mu(3,1)
+      DMupF(1:N,1,0,f) = DMu(1:N,1,0); DMupF(1:N,1,1,f) = DMu(1:N,1,1)
+      DMupF(1:N,2,0,f) = DMu(1:N,3,0); DMupF(1:N,2,1,f) = DMu(1:N,3,1)
 c  ...f=6 --> face1485 with local orientation v1->v4->v8->v5
       f=6
-      MubF(f) = Mu(1,0); DMubF(f,1:N) = DMu(1:N,1,0)
+      MubF(f) = Mu(1,0); DMubF(1:N,f) = DMu(1:N,1,0)
 c     ...locally oriented quadruple representing projection
-      MupF(f,1,0) = Mu(2,0); MupF(f,1,1) = Mu(2,1)
-      MupF(f,2,0) = Mu(3,0); MupF(f,2,1) = Mu(3,1)
-      DMupF(f,1:N,1,0) = DMu(1:N,2,0); DMupF(f,1:N,1,1) = DMu(1:N,2,1)
-      DMupF(f,1:N,2,0) = DMu(1:N,3,0); DMupF(f,1:N,2,1) = DMu(1:N,3,1)
+      MupF(1,0,f) = Mu(2,0); MupF(1,1,f) = Mu(2,1)
+      MupF(2,0,f) = Mu(3,0); MupF(2,1,f) = Mu(3,1)
+      DMupF(1:N,1,0,f) = DMu(1:N,2,0); DMupF(1:N,1,1,f) = DMu(1:N,2,1)
+      DMupF(1:N,2,0,f) = DMu(1:N,3,0); DMupF(1:N,2,1,f) = DMu(1:N,3,1)
 c
 c  ...projected coordinates are Mu and Mu, so IdecF=(true,true) for
 c     all faces
@@ -443,7 +443,7 @@ c
       implicit none
       integer :: N,v
       double precision, intent(in)  :: Lam(0:3),DLam(1:3,0:3)
-      double precision, intent(out) :: LambV(1:4),DLambV(1:4,1:3)
+      double precision, intent(out) :: LambV(1:4),DLambV(1:3,1:4)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c           V=((0,0,0),(1,0,0),(0,1,0),(0,0,1))=>(v0,v1,v2,v3)
@@ -454,16 +454,16 @@ c  ...4 vertices, each with one blending function
 c
 c  ...v=1 --> v0=(0,0,0)
       v=1
-      LambV(v) = Lam(0); DLambV(v,1:N) = DLam(1:N,0)
+      LambV(v) = Lam(0); DLambV(1:N,v) = DLam(1:N,0)
 c  ...v=2 --> v1=(1,0,0)
       v=2
-      LambV(v) = Lam(1); DLambV(v,1:N) = DLam(1:N,1)
+      LambV(v) = Lam(1); DLambV(1:N,v) = DLam(1:N,1)
 c  ...v=3 --> v2=(0,1,0)
       v=3
-      LambV(v) = Lam(2); DLambV(v,1:N) = DLam(1:N,2)
+      LambV(v) = Lam(2); DLambV(1:N,v) = DLam(1:N,2)
 c  ...v=4 --> v3=(0,0,1)
       v=4
-      LambV(v) = Lam(3); DLambV(v,1:N) = DLam(1:N,3)
+      LambV(v) = Lam(3); DLambV(1:N,v) = DLam(1:N,3)
 c
       end subroutine BlendTetV
 c----------------------------------------------------------------------
@@ -473,8 +473,8 @@ c
       integer :: N,e
       logical, intent(out) :: IdecE
       double precision, intent(in)  :: Lam(0:3),DLam(1:3,0:3)
-      double precision, intent(out) :: LampE(1:6,0:1),
-     .                                             DLampE(1:6,1:3,0:1)
+      double precision, intent(out) :: LampE(0:1,1:6),
+     .                                             DLampE(1:3,0:1,1:6)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c           V=((0,0,0),(1,0,0),(0,1,0),(0,0,1))=>(v0,v1,v2,v3)
@@ -487,28 +487,28 @@ c     a projection
 c
 c  ...e=1 --> edge01 with local orientation v0->v1
       e=1
-      LampE(e,0) = Lam(0); LampE(e,1) = Lam(1)
-      DLampE(e,1:N,0) = DLam(1:N,0); DLampE(e,1:N,1) = DLam(1:N,1)
+      LampE(0,e) = Lam(0); LampE(1,e) = Lam(1)
+      DLampE(1:N,0,e) = DLam(1:N,0); DLampE(1:N,1,e) = DLam(1:N,1)
 c  ...e=2 --> edge12 with local orientation v1->v2
       e=2
-      LampE(e,0) = Lam(1); LampE(e,1) = Lam(2)
-      DLampE(e,1:N,0) = DLam(1:N,1); DLampE(e,1:N,1) = DLam(1:N,2)
+      LampE(0,e) = Lam(1); LampE(1,e) = Lam(2)
+      DLampE(1:N,0,e) = DLam(1:N,1); DLampE(1:N,1,e) = DLam(1:N,2)
 c  ...e=3 --> edge20 with local orientation v0->v2
       e=3
-      LampE(e,0) = Lam(0); LampE(e,1) = Lam(2)
-      DLampE(e,1:N,0) = DLam(1:N,0); DLampE(e,1:N,1) = DLam(1:N,2)
+      LampE(0,e) = Lam(0); LampE(1,e) = Lam(2)
+      DLampE(1:N,0,e) = DLam(1:N,0); DLampE(1:N,1,e) = DLam(1:N,2)
 c  ...e=4 --> edge03 with local orientation v0->v3
       e=4
-      LampE(e,0) = Lam(0); LampE(e,1) = Lam(3)
-      DLampE(e,1:N,0) = DLam(1:N,0); DLampE(e,1:N,1) = DLam(1:N,3)
+      LampE(0,e) = Lam(0); LampE(1,e) = Lam(3)
+      DLampE(1:N,0,e) = DLam(1:N,0); DLampE(1:N,1,e) = DLam(1:N,3)
 c  ...e=5 --> edge13 with local orientation v1->v3
       e=5
-      LampE(e,0) = Lam(1); LampE(e,1) = Lam(3)
-      DLampE(e,1:N,0) = DLam(1:N,1); DLampE(e,1:N,1) = DLam(1:N,3)
+      LampE(0,e) = Lam(1); LampE(1,e) = Lam(3)
+      DLampE(1:N,0,e) = DLam(1:N,1); DLampE(1:N,1,e) = DLam(1:N,3)
 c  ...e=6 --> edge23 with local orientation v2->v3
       e=6
-      LampE(e,0) = Lam(2); LampE(e,1) = Lam(3)
-      DLampE(e,1:N,0) = DLam(1:N,2); DLampE(e,1:N,1) = DLam(1:N,3)
+      LampE(0,e) = Lam(2); LampE(1,e) = Lam(3)
+      DLampE(1:N,0,e) = DLam(1:N,2); DLampE(1:N,1,e) = DLam(1:N,3)
 c
 c  ...projected coordinates are Lam, so IdecE=false for all edges
       IdecE = .FALSE.
@@ -521,8 +521,8 @@ c
       integer :: N,f
       logical, intent(out) :: IdecF
       double precision, intent(in)  :: Lam(0:3),DLam(1:3,0:3)
-      double precision, intent(out) :: LampF(1:4,0:2),
-     .                                             DLampF(1:4,1:3,0:2)
+      double precision, intent(out) :: LampF(0:2,1:4),
+     .                                             DLampF(1:3,0:2,1:4)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c           V=((0,0,0),(1,0,0),(0,1,0),(0,0,1))=>(v0,v1,v2,v3)
@@ -535,24 +535,24 @@ c     a projection
 c
 c  ...f=1 --> face012 with local orientation v0->v1->v2
       f=1
-      LampF(f,0) = Lam(0); LampF(f,1) = Lam(1); LampF(f,2) = Lam(2)
-      DLampF(f,1:N,0) = DLam(1:N,0); DLampF(f,1:N,1) = DLam(1:N,1);
-                                         DLampF(f,1:N,2) = DLam(1:N,2)
+      LampF(0,f) = Lam(0); LampF(1,f) = Lam(1); LampF(2,f) = Lam(2)
+      DLampF(1:N,0,f) = DLam(1:N,0); DLampF(1:N,1,f) = DLam(1:N,1);
+                                         DLampF(1:N,2,f) = DLam(1:N,2)
 c  ...f=2 --> face013 with local orientation v0->v1->v3
       f=2
-      LampF(f,0) = Lam(0); LampF(f,1) = Lam(1); LampF(f,2) = Lam(3)
-      DLampF(f,1:N,0) = DLam(1:N,0); DLampF(f,1:N,1) = DLam(1:N,1);
-                                         DLampF(f,1:N,2) = DLam(1:N,3)
+      LampF(0,f) = Lam(0); LampF(1,f) = Lam(1); LampF(2,f) = Lam(3)
+      DLampF(1:N,0,f) = DLam(1:N,0); DLampF(1:N,1,f) = DLam(1:N,1);
+                                         DLampF(1:N,2,f) = DLam(1:N,3)
 c  ...f=3 --> face123 with local orientation v1->v2->v3
       f=3
-      LampF(f,0) = Lam(1); LampF(f,1) = Lam(2); LampF(f,2) = Lam(3)
-      DLampF(f,1:N,0) = DLam(1:N,1); DLampF(f,1:N,1) = DLam(1:N,2);
-                                         DLampF(f,1:N,2) = DLam(1:N,3)
+      LampF(0,f) = Lam(1); LampF(1,f) = Lam(2); LampF(2,f) = Lam(3)
+      DLampF(1:N,0,f) = DLam(1:N,1); DLampF(1:N,1,f) = DLam(1:N,2);
+                                         DLampF(1:N,2,f) = DLam(1:N,3)
 c  ...f=4 --> face023 with local orientation v0->v2->v3
       f=4
-      LampF(f,0) = Lam(0); LampF(f,1) = Lam(2); LampF(f,2) = Lam(3)
-      DLampF(f,1:N,0) = DLam(1:N,0); DLampF(f,1:N,1) = DLam(1:N,2);
-                                         DLampF(f,1:N,2) = DLam(1:N,3)
+      LampF(0,f) = Lam(0); LampF(1,f) = Lam(2); LampF(2,f) = Lam(3)
+      DLampF(1:N,0,f) = DLam(1:N,0); DLampF(1:N,1,f) = DLam(1:N,2);
+                                         DLampF(1:N,2,f) = DLam(1:N,3)
 c
 c  ...projected coordinates are Lam, so IdecF=false for all faces
       IdecF = .FALSE.
@@ -565,8 +565,8 @@ c
       integer :: N,v
       double precision, intent(in)  :: Mu(0:1),DMu(1:3,0:1)
       double precision, intent(in)  :: Nu(0:2),DNu(1:3,0:2)
-      double precision, intent(out) :: MubV(1:6),DMubV(1:6,1:3)
-      double precision, intent(out) :: NubV(1:6),DNubV(1:6,1:3)
+      double precision, intent(out) :: MubV(1:6),DMubV(1:3,1:6)
+      double precision, intent(out) :: NubV(1:6),DNubV(1:3,1:6)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c        V=((0,0,0),(1,0,0),(0,1,0),
@@ -578,28 +578,28 @@ c  ...6 vertices, each with two blending functions (one mu, one nu)
 c
 c  ...v=1 --> v0=(0,0,0)
       v=1
-      MubV(v) = Mu(0); DMubV(v,1:N) = DMu(1:N,0)
-      NubV(v) = Nu(0); DNubV(v,1:N) = DNu(1:N,0)
+      MubV(v) = Mu(0); DMubV(1:N,v) = DMu(1:N,0)
+      NubV(v) = Nu(0); DNubV(1:N,v) = DNu(1:N,0)
 c  ...v=2 --> v1=(1,0,0)
       v=2
-      MubV(v) = Mu(0); DMubV(v,1:N) = DMu(1:N,0)
-      NubV(v) = Nu(1); DNubV(v,1:N) = DNu(1:N,1)
+      MubV(v) = Mu(0); DMubV(1:N,v) = DMu(1:N,0)
+      NubV(v) = Nu(1); DNubV(1:N,v) = DNu(1:N,1)
 c  ...v=3 --> v2=(0,1,0)
       v=3
-      MubV(v) = Mu(0); DMubV(v,1:N) = DMu(1:N,0)
-      NubV(v) = Nu(2); DNubV(v,1:N) = DNu(1:N,2)
+      MubV(v) = Mu(0); DMubV(1:N,v) = DMu(1:N,0)
+      NubV(v) = Nu(2); DNubV(1:N,v) = DNu(1:N,2)
 c  ...v=4 --> v3=(0,0,1)
       v=4
-      MubV(v) = Mu(1); DMubV(v,1:N) = DMu(1:N,1)
-      NubV(v) = Nu(0); DNubV(v,1:N) = DNu(1:N,0)
+      MubV(v) = Mu(1); DMubV(1:N,v) = DMu(1:N,1)
+      NubV(v) = Nu(0); DNubV(1:N,v) = DNu(1:N,0)
 c  ...v=5 --> v4=(1,0,1)
       v=5
-      MubV(v) = Mu(1); DMubV(v,1:N) = DMu(1:N,1)
-      NubV(v) = Nu(1); DNubV(v,1:N) = DNu(1:N,1)
+      MubV(v) = Mu(1); DMubV(1:N,v) = DMu(1:N,1)
+      NubV(v) = Nu(1); DNubV(1:N,v) = DNu(1:N,1)
 c  ...v=6 --> v5=(0,1,1)
       v=6
-      MubV(v) = Mu(1); DMubV(v,1:N) = DMu(1:N,1)
-      NubV(v) = Nu(2); DNubV(v,1:N) = DNu(1:N,2)
+      MubV(v) = Mu(1); DMubV(1:N,v) = DMu(1:N,1)
+      NubV(v) = Nu(2); DNubV(1:N,v) = DNu(1:N,2)
 c
       end subroutine BlendPrisV
 c----------------------------------------------------------------------
@@ -611,8 +611,8 @@ c
       logical, intent(out) :: IdecME
       double precision, intent(in)  :: Mu(0:1),DMu(1:3,0:1)
       double precision, intent(in)  :: Nu(0:2),DNu(1:3,0:2)
-      double precision, intent(out) :: MubE(1:6),DMubE(1:6,1:3)
-      double precision, intent(out) :: NupE(1:6,0:1),DNupE(1:6,1:3,0:1)
+      double precision, intent(out) :: MubE(1:6),DMubE(1:3,1:6)
+      double precision, intent(out) :: NupE(0:1,1:6),DNupE(1:3,0:1,1:6)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c        V=((0,0,0),(1,0,0),(0,1,0),
@@ -626,40 +626,40 @@ c     oriented pair (of nu) representing a projection
 c
 c  ...e=1 --> edge01 with local orientation v0->v1
       e=1
-      MubE(e) = Mu(0); DMubE(e,1:N) = DMu(1:N,0)
+      MubE(e) = Mu(0); DMubE(1:N,e) = DMu(1:N,0)
 c     ...locally oriented pair representing projection
-      NupE(e,0) = Nu(0); NupE(e,1) = Nu(1)
-      DNupE(e,1:N,0) = DNu(1:N,0); DNupE(e,1:N,1) = DNu(1:N,1)
+      NupE(0,e) = Nu(0); NupE(1,e) = Nu(1)
+      DNupE(1:N,0,e) = DNu(1:N,0); DNupE(1:N,1,e) = DNu(1:N,1)
 c  ...e=2 --> edge12 with local orientation v1->v2
       e=2
-      MubE(e) = Mu(0); DMubE(e,1:N) = DMu(1:N,0)
+      MubE(e) = Mu(0); DMubE(1:N,e) = DMu(1:N,0)
 c     ...locally oriented pair representing projection
-      NupE(e,0) = Nu(1); NupE(e,1) = Nu(2)
-      DNupE(e,1:N,0) = DNu(1:N,1); DNupE(e,1:N,1) = DNu(1:N,2)
+      NupE(0,e) = Nu(1); NupE(1,e) = Nu(2)
+      DNupE(1:N,0,e) = DNu(1:N,1); DNupE(1:N,1,e) = DNu(1:N,2)
 c  ...e=3 --> edge20 with local orientation v0->v2
       e=3
-      MubE(e) = Mu(0); DMubE(e,1:N) = DMu(1:N,0)
+      MubE(e) = Mu(0); DMubE(1:N,e) = DMu(1:N,0)
 c     ...locally oriented pair representing projection
-      NupE(e,0) = Nu(0); NupE(e,1) = Nu(2)
-      DNupE(e,1:N,0) = DNu(1:N,0); DNupE(e,1:N,1) = DNu(1:N,2)
+      NupE(0,e) = Nu(0); NupE(1,e) = Nu(2)
+      DNupE(1:N,0,e) = DNu(1:N,0); DNupE(1:N,1,e) = DNu(1:N,2)
 c  ...e=4 --> edge34 with local orientation v3->v4
       e=4
-      MubE(e) = Mu(1); DMubE(e,1:N) = DMu(1:N,1)
+      MubE(e) = Mu(1); DMubE(1:N,e) = DMu(1:N,1)
 c     ...locally oriented pair representing projection
-      NupE(e,0) = Nu(0); NupE(e,1) = Nu(1)
-      DNupE(e,1:N,0) = DNu(1:N,0); DNupE(e,1:N,1) = DNu(1:N,1)
+      NupE(0,e) = Nu(0); NupE(1,e) = Nu(1)
+      DNupE(1:N,0,e) = DNu(1:N,0); DNupE(1:N,1,e) = DNu(1:N,1)
 c  ...e=5 --> edge45 with local orientation v4->v5
       e=5
-      MubE(e) = Mu(1); DMubE(e,1:N) = DMu(1:N,1)
+      MubE(e) = Mu(1); DMubE(1:N,e) = DMu(1:N,1)
 c     ...locally oriented pair representing projection
-      NupE(e,0) = Nu(1); NupE(e,1) = Nu(2)
-      DNupE(e,1:N,0) = DNu(1:N,1); DNupE(e,1:N,1) = DNu(1:N,2)
+      NupE(0,e) = Nu(1); NupE(1,e) = Nu(2)
+      DNupE(1:N,0,e) = DNu(1:N,1); DNupE(1:N,1,e) = DNu(1:N,2)
 c  ...e=6 --> edge53 with local orientation v3->v5
       e=6
-      MubE(e) = Mu(1); DMubE(e,1:N) = DMu(1:N,1)
+      MubE(e) = Mu(1); DMubE(1:N,e) = DMu(1:N,1)
 c     ...locally oriented pair representing projection
-      NupE(e,0) = Nu(0); NupE(e,1) = Nu(2)
-      DNupE(e,1:N,0) = DNu(1:N,0); DNupE(e,1:N,1) = DNu(1:N,2)
+      NupE(0,e) = Nu(0); NupE(1,e) = Nu(2)
+      DNupE(1:N,0,e) = DNu(1:N,0); DNupE(1:N,1,e) = DNu(1:N,2)
 c
 c  ...projected coordinates are Nu, so IdecME=false for all edges
       IdecME = .FALSE.
@@ -675,7 +675,7 @@ c
       double precision, intent(in)  :: Mu(0:1),DMu(1:3,0:1)
       double precision, intent(in)  :: Nu(0:2),DNu(1:3,0:2)
       double precision, intent(out) :: NubE(1:3),DNubE(1:3,1:3)
-      double precision, intent(out) :: MupE(1:3,0:1),DMupE(1:3,1:3,0:1)
+      double precision, intent(out) :: MupE(0:1,1:3),DMupE(1:3,0:1,1:3)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c        V=((0,0,0),(1,0,0),(0,1,0),
@@ -689,22 +689,22 @@ c     oriented pair (of mu) representing a projection
 c
 c  ...e=1 --> edge03 with local orientation v0->v3
       e=1
-      NubE(e) = Nu(0); DNubE(e,1:N) = DNu(1:N,0)
+      NubE(e) = Nu(0); DNubE(1:N,e) = DNu(1:N,0)
 c     ...locally oriented pair representing projection
-      MupE(e,0) = Mu(0); MupE(e,1) = Mu(1)
-      DMupE(e,1:N,0) = DMu(1:N,0); DMupE(e,1:N,1) = DMu(1:N,1)
+      MupE(0,e) = Mu(0); MupE(1,e) = Mu(1)
+      DMupE(1:N,0,e) = DMu(1:N,0); DMupE(1:N,1,e) = DMu(1:N,1)
 c  ...e=2 --> edge14 with local orientation v1->v4
       e=2
-      NubE(e) = Nu(1); DNubE(e,1:N) = DNu(1:N,1)
+      NubE(e) = Nu(1); DNubE(1:N,e) = DNu(1:N,1)
 c     ...locally oriented pair representing projection
-      MupE(e,0) = Mu(0); MupE(e,1) = Mu(1)
-      DMupE(e,1:N,0) = DMu(1:N,0); DMupE(e,1:N,1) = DMu(1:N,1)
+      MupE(0,e) = Mu(0); MupE(1,e) = Mu(1)
+      DMupE(1:N,0,e) = DMu(1:N,0); DMupE(1:N,1,e) = DMu(1:N,1)
 c  ...e=3 --> edge25 with local orientation v2->v5
       e=3
-      NubE(e) = Nu(2); DNubE(e,1:N) = DNu(1:N,2)
+      NubE(e) = Nu(2); DNubE(1:N,e) = DNu(1:N,2)
 c     ...locally oriented pair representing projection
-      MupE(e,0) = Mu(0); MupE(e,1) = Mu(1)
-      DMupE(e,1:N,0) = DMu(1:N,0); DMupE(e,1:N,1) = DMu(1:N,1)
+      MupE(0,e) = Mu(0); MupE(1,e) = Mu(1)
+      DMupE(1:N,0,e) = DMu(1:N,0); DMupE(1:N,1,e) = DMu(1:N,1)
 c
 c  ...projected coordinates are Mu, so IdecQE=true for all edges
       IdecQE = .TRUE.
@@ -719,8 +719,8 @@ c
       logical, intent(out) :: IdecTF
       double precision, intent(in)  :: Mu(0:1),DMu(1:3,0:1)
       double precision, intent(in)  :: Nu(0:2),DNu(1:3,0:2)
-      double precision, intent(out) :: MubF(1:2),DMubF(1:2,1:3)
-      double precision, intent(out) :: NupF(1:2,0:2),DNupF(1:2,1:3,0:2)
+      double precision, intent(out) :: MubF(1:2),DMubF(1:3,1:2)
+      double precision, intent(out) :: NupF(0:2,1:2),DNupF(1:3,0:2,1:2)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c        V=((0,0,0),(1,0,0),(0,1,0),
@@ -734,18 +734,18 @@ c     oriented triplet (of nu) representing a projection
 c
 c  ...f=1 --> face012 with local orientation v0->v1->v2
       f=1
-      MubF(f) = Mu(0); DMubF(f,1:N) = DMu(1:N,0)
+      MubF(f) = Mu(0); DMubF(1:N,f) = DMu(1:N,0)
 c     ...locally oriented triplet representing projection
-      NupF(f,0) = Nu(0); NupF(f,1) = Nu(1); NupF(f,2) = Nu(2)
-      DNupF(f,1:N,0) = DNu(1:N,0); DNupF(f,1:N,1) = DNu(1:N,1);
-                                         DNupF(f,1:N,2) = DNu(1:N,2)
+      NupF(0,f) = Nu(0); NupF(1,f) = Nu(1); NupF(2,f) = Nu(2)
+      DNupF(1:N,0,f) = DNu(1:N,0); DNupF(1:N,1,f) = DNu(1:N,1);
+                                         DNupF(1:N,2,f) = DNu(1:N,2)
 c  ...f=2 --> face345 with local orientation v3->v4->v5
       f=2
-      MubF(f) = Mu(1); DMubF(f,1:N) = DMu(1:N,1)
+      MubF(f) = Mu(1); DMubF(1:N,f) = DMu(1:N,1)
 c     ...locally oriented triplet representing projection
-      NupF(f,0) = Nu(0); NupF(f,1) = Nu(1); NupF(f,2) = Nu(2)
-      DNupF(f,1:N,0) = DNu(1:N,0); DNupF(f,1:N,1) = DNu(1:N,1);
-                                         DNupF(f,1:N,2) = DNu(1:N,2)
+      NupF(0,f) = Nu(0); NupF(1,f) = Nu(1); NupF(2,f) = Nu(2)
+      DNupF(1:N,0,f) = DNu(1:N,0); DNupF(1:N,1,f) = DNu(1:N,1);
+                                         DNupF(1:N,2,f) = DNu(1:N,2)
 c
 c  ...projected coordinates are Nu, so IdecTF=true for all faces
       IdecTF = .TRUE.
@@ -756,11 +756,11 @@ c----------------------------------------------------------------------
 c
       implicit none
       integer :: N,f
-      logical, intent(out) :: IdecQF(1:3,1:2)
+      logical, intent(out) :: IdecQF(1:2,1:3)
       double precision, intent(in)  :: Mu(0:1),DMu(1:3,0:1)
       double precision, intent(in)  :: Nu(0:2),DNu(1:3,0:2)
-      double precision, intent(out) :: STpF(1:3,1:2,0:1),
-     .                                           DSTpF(1:3,1:3,1:2,0:1)
+      double precision, intent(out) :: STpF(1:2,0:1,1:3),
+     .                                           DSTpF(1:3,1:2,0:1,1:3)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c        V=((0,0,0),(1,0,0),(0,1,0),
@@ -776,30 +776,30 @@ c
 c  ...f=1 --> face0143 with local orientation v0->v1->v4->v3
       f=1
 c     ...locally oriented quadruple representing projection
-      STpF(f,1,0) = Nu(0); STpF(f,1,1) = Nu(1)
-      STpF(f,2,0) = Mu(0); STpF(f,2,1) = Mu(1)
-      DSTpF(f,1:N,1,0) = DNu(1:N,0); DSTpF(f,1:N,1,1) = DNu(1:N,1)
-      DSTpF(f,1:N,2,0) = DMu(1:N,0); DSTpF(f,1:N,2,1) = DMu(1:N,1)
+      STpF(1,0,f) = Nu(0); STpF(1,1,f) = Nu(1)
+      STpF(2,0,f) = Mu(0); STpF(2,1,f) = Mu(1)
+      DSTpF(1:N,1,0,f) = DNu(1:N,0); DSTpF(1:N,1,1,f) = DNu(1:N,1)
+      DSTpF(1:N,2,0,f) = DMu(1:N,0); DSTpF(1:N,2,1,f) = DMu(1:N,1)
 c     ...simplification flags: projection (Nu;Mu)=>(false,true)
-      IdecQF(f,1) = .FALSE.; IdecQF(f,2) = .TRUE.
+      IdecQF(1,f) = .FALSE.; IdecQF(2,f) = .TRUE.
 c  ...f=2 --> face1254 with local orientation v1->v2->v5->v4
       f=2
 c     ...locally oriented quadruple representing projection
-      STpF(f,1,0) = Nu(1); STpF(f,1,1) = Nu(2)
-      STpF(f,2,0) = Mu(0); STpF(f,2,1) = Mu(1)
-      DSTpF(f,1:N,1,0) = DNu(1:N,1); DSTpF(f,1:N,1,1) = DNu(1:N,2)
-      DSTpF(f,1:N,2,0) = DMu(1:N,0); DSTpF(f,1:N,2,1) = DMu(1:N,1)
+      STpF(1,0,f) = Nu(1); STpF(1,1,f) = Nu(2)
+      STpF(2,0,f) = Mu(0); STpF(2,1,f) = Mu(1)
+      DSTpF(1:N,1,0,f) = DNu(1:N,1); DSTpF(1:N,1,1,f) = DNu(1:N,2)
+      DSTpF(1:N,2,0,f) = DMu(1:N,0); DSTpF(1:N,2,1,f) = DMu(1:N,1)
 c     ...simplification flags: projection (Nu;Mu)=>(false,true)
-      IdecQF(f,1) = .FALSE.; IdecQF(f,2) = .TRUE.
+      IdecQF(1,f) = .FALSE.; IdecQF(2,f) = .TRUE.
 c  ...f=3 --> face0253 with local orientation v0->v2->v5->v3
       f=3
 c     ...locally oriented quadruple representing projection
-      STpF(f,1,0) = Nu(0); STpF(f,1,1) = Nu(2)
-      STpF(f,2,0) = Mu(0); STpF(f,2,1) = Mu(1)
-      DSTpF(f,1:N,1,0) = DNu(1:N,0); DSTpF(f,1:N,1,1) = DNu(1:N,2)
-      DSTpF(f,1:N,2,0) = DMu(1:N,0); DSTpF(f,1:N,2,1) = DMu(1:N,1)
+      STpF(1,0,f) = Nu(0); STpF(1,1,f) = Nu(2)
+      STpF(2,0,f) = Mu(0); STpF(2,1,f) = Mu(1)
+      DSTpF(1:N,1,0,f) = DNu(1:N,0); DSTpF(1:N,1,1,f) = DNu(1:N,2)
+      DSTpF(1:N,2,0,f) = DMu(1:N,0); DSTpF(1:N,2,1,f) = DMu(1:N,1)
 c     ...simplification flags: projection (Nu;Mu)=>(false,true)
-      IdecQF(f,1) = .FALSE.; IdecQF(f,2) = .TRUE.
+      IdecQF(1,f) = .FALSE.; IdecQF(2,f) = .TRUE.
 c
       end subroutine ProjectPrisQF
 c----------------------------------------------------------------------
@@ -808,7 +808,7 @@ c
       implicit none
       integer :: N,v
       double precision, intent(in)  :: Lam(1:5),DLam(1:3,1:5)
-      double precision, intent(out) :: LambV(1:5),DLambV(1:5,1:3)
+      double precision, intent(out) :: LambV(1:5),DLambV(1:3,1:5)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c      V=((0,0,0),(1,0,0),(1,1,0),(0,1,0),(0,0,1))=>(v1,v2,v3,v4,v5)
@@ -819,19 +819,19 @@ c  ...5 vertices, each with one blending function
 c
 c  ...v=1 --> v1=(0,0,0)
       v=1
-      LambV(v) = Lam(1); DLambV(v,1:N) = DLam(1:N,1)
+      LambV(v) = Lam(1); DLambV(1:N,v) = DLam(1:N,1)
 c  ...v=2 --> v2=(1,0,0)
       v=2
-      LambV(v) = Lam(2); DLambV(v,1:N) = DLam(1:N,2)
+      LambV(v) = Lam(2); DLambV(1:N,v) = DLam(1:N,2)
 c  ...v=3 --> v3=(1,1,0)
       v=3
-      LambV(v) = Lam(3); DLambV(v,1:N) = DLam(1:N,3)
+      LambV(v) = Lam(3); DLambV(1:N,v) = DLam(1:N,3)
 c  ...v=4 --> v4=(0,1,0)
       v=4
-      LambV(v) = Lam(4); DLambV(v,1:N) = DLam(1:N,4)
+      LambV(v) = Lam(4); DLambV(1:N,v) = DLam(1:N,4)
 c  ...v=5 --> v5=(0,0,1)
       v=5
-      LambV(v) = Lam(5); DLambV(v,1:N) = DLam(1:N,5)
+      LambV(v) = Lam(5); DLambV(1:N,v) = DLam(1:N,5)
 c
       end subroutine BlendPyraV
 c----------------------------------------------------------------------
@@ -843,8 +843,8 @@ c
       logical, intent(out) :: IdecME
       double precision, intent(in)  :: Mu(1:2,0:1),DMu(1:3,1:2,0:1)
       double precision, intent(in)  :: Nu(1:2,0:2),DNu(1:3,1:2,0:2)
-      double precision, intent(out) :: MubE(1:4),DMubE(1:4,1:3)
-      double precision, intent(out) :: NupE(1:4,0:1),DNupE(1:4,1:3,0:1)
+      double precision, intent(out) :: MubE(1:4),DMubE(1:3,1:4)
+      double precision, intent(out) :: NupE(0:1,1:4),DNupE(1:3,0:1,1:4)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c      V=((0,0,0),(1,0,0),(1,1,0),(0,1,0),(0,0,1))=>(v1,v2,v3,v4,v5)
@@ -857,28 +857,28 @@ c     oriented pair (nu) representing a projection
 c
 c  ...e=1 --> edge12 with local orientation v1->v2
       e=1
-      MubE(e) = Mu(2,0); DMubE(e,1:N) = DMu(1:N,2,0)
+      MubE(e) = Mu(2,0); DMubE(1:N,e) = DMu(1:N,2,0)
 c     ...locally oriented pair representing projection
-      NupE(e,0) = Nu(1,0); NupE(e,1) = Nu(1,1)
-      DNupE(e,1:N,0) = DNu(1:N,1,0); DNupE(e,1:N,1) = DNu(1:N,1,1)
+      NupE(0,e) = Nu(1,0); NupE(1,e) = Nu(1,1)
+      DNupE(1:N,0,e) = DNu(1:N,1,0); DNupE(1:N,1,e) = DNu(1:N,1,1)
 c  ...e=2 --> edge23 with local orientation v2->v3
       e=2
-      MubE(e) = Mu(1,1); DMubE(e,1:N) = DMu(1:N,1,1)
+      MubE(e) = Mu(1,1); DMubE(1:N,e) = DMu(1:N,1,1)
 c     ...locally oriented pair representing projection
-      NupE(e,0) = Nu(2,0); NupE(e,1) = Nu(2,1)
-      DNupE(e,1:N,0) = DNu(1:N,2,0); DNupE(e,1:N,1) = DNu(1:N,2,1)
+      NupE(0,e) = Nu(2,0); NupE(1,e) = Nu(2,1)
+      DNupE(1:N,0,e) = DNu(1:N,2,0); DNupE(1:N,1,e) = DNu(1:N,2,1)
 c  ...e=3 --> edge34 with local orientation v4->v3
       e=3
-      MubE(e) = Mu(2,1); DMubE(e,1:N) = DMu(1:N,2,1)
+      MubE(e) = Mu(2,1); DMubE(1:N,e) = DMu(1:N,2,1)
 c     ...locally oriented pair representing projection
-      NupE(e,0) = Nu(1,0); NupE(e,1) = Nu(1,1)
-      DNupE(e,1:N,0) = DNu(1:N,1,0); DNupE(e,1:N,1) = DNu(1:N,1,1)
+      NupE(0,e) = Nu(1,0); NupE(1,e) = Nu(1,1)
+      DNupE(1:N,0,e) = DNu(1:N,1,0); DNupE(1:N,1,e) = DNu(1:N,1,1)
 c  ...e=4 --> edge41 with local orientation v1->v4
       e=4
-      MubE(e) = Mu(1,0); DMubE(e,1:N) = DMu(1:N,1,0)
+      MubE(e) = Mu(1,0); DMubE(1:N,e) = DMu(1:N,1,0)
 c     ...locally oriented pair representing projection
-      NupE(e,0) = Nu(2,0); NupE(e,1) = Nu(2,1)
-      DNupE(e,1:N,0) = DNu(1:N,2,0); DNupE(e,1:N,1) = DNu(1:N,2,1)
+      NupE(0,e) = Nu(2,0); NupE(1,e) = Nu(2,1)
+      DNupE(1:N,0,e) = DNu(1:N,2,0); DNupE(1:N,1,e) = DNu(1:N,2,1)
 c
 c  ...projected coordinates are Nu, so IdecME=false for all edges
       IdecME = .FALSE.
@@ -891,8 +891,8 @@ c
       integer :: N,e
       logical, intent(out) :: IdecTE
       double precision, intent(in)  :: Lam(1:5),DLam(1:3,1:5)
-      double precision, intent(out) :: LampE(1:4,0:1),
-     .                                             DLampE(1:4,1:3,0:1)
+      double precision, intent(out) :: LampE(0:1,1:4),
+     .                                             DLampE(1:3,0:1,1:4)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c      V=((0,0,0),(1,0,0),(1,1,0),(0,1,0),(0,0,1))=>(v1,v2,v3,v4,v5)
@@ -905,20 +905,20 @@ c     a projection
 c
 c  ...e=1 --> edge15 with local orientation v1->v5
       e=1
-      LampE(e,0) = Lam(1); LampE(e,1) = Lam(5)
-      DLampE(e,1:N,0) = DLam(1:N,1); DLampE(e,1:N,1) = DLam(1:N,5)
+      LampE(0,e) = Lam(1); LampE(1,e) = Lam(5)
+      DLampE(1:N,0,e) = DLam(1:N,1); DLampE(1:N,1,e) = DLam(1:N,5)
 c  ...e=2 --> edge25 with local orientation v2->v5
       e=2
-      LampE(e,0) = Lam(2); LampE(e,1) = Lam(5)
-      DLampE(e,1:N,0) = DLam(1:N,2); DLampE(e,1:N,1) = DLam(1:N,5)
+      LampE(0,e) = Lam(2); LampE(1,e) = Lam(5)
+      DLampE(1:N,0,e) = DLam(1:N,2); DLampE(1:N,1,e) = DLam(1:N,5)
 c  ...e=3 --> edge35 with local orientation v3->v5
       e=3
-      LampE(e,0) = Lam(3); LampE(e,1) = Lam(5)
-      DLampE(e,1:N,0) = DLam(1:N,3); DLampE(e,1:N,1) = DLam(1:N,5)
+      LampE(0,e) = Lam(3); LampE(1,e) = Lam(5)
+      DLampE(1:N,0,e) = DLam(1:N,3); DLampE(1:N,1,e) = DLam(1:N,5)
 c  ...e=4 --> edge45 with local orientation v4->v5
       e=4
-      LampE(e,0) = Lam(4); LampE(e,1) = Lam(5)
-      DLampE(e,1:N,0) = DLam(1:N,4); DLampE(e,1:N,1) = DLam(1:N,5)
+      LampE(0,e) = Lam(4); LampE(1,e) = Lam(5)
+      DLampE(1:N,0,e) = DLam(1:N,4); DLampE(1:N,1,e) = DLam(1:N,5)
 c
 c  ...projected coordinates are Lam, so IdecTE=false for all edges
       IdecTE = .FALSE.
@@ -963,8 +963,8 @@ c
       logical, intent(out) :: IdecTF
       double precision, intent(in)  :: Mu(1:2,0:1),DMu(1:3,1:2,0:1)
       double precision, intent(in)  :: Nu(1:2,0:2),DNu(1:3,1:2,0:2)
-      double precision, intent(out) :: MubF(1:4),DMubF(1:4,1:3)
-      double precision, intent(out) :: NupF(1:4,0:2),DNupF(1:4,1:3,0:2)
+      double precision, intent(out) :: MubF(1:4),DMubF(1:3,1:4)
+      double precision, intent(out) :: NupF(0:2,1:4),DNupF(1:3,0:2,1:4)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c      V=((0,0,0),(1,0,0),(1,1,0),(0,1,0),(0,0,1))=>(v1,v2,v3,v4,v5)
@@ -977,32 +977,32 @@ c      locally oriented triplet (nu) representing a projection
 c
 c  ...f=1 --> face125 with local orientation v1->v2->v5
       f=1
-      MubF(f) = Mu(2,0); DMubF(f,1:N) = DMu(1:N,2,0)
+      MubF(f) = Mu(2,0); DMubF(1:N,f) = DMu(1:N,2,0)
 c     ...locally oriented pair representing projection
-      NupF(f,0) = Nu(1,0); NupF(f,1) = Nu(1,1); NupF(f,2) = Nu(1,2)
-      DNupF(f,1:N,0) = DNu(1:N,1,0); DNupF(f,1:N,1) = DNu(1:N,1,1);
-                                          DNupF(f,1:N,2) = DNu(1:N,1,2)
+      NupF(0,f) = Nu(1,0); NupF(1,f) = Nu(1,1); NupF(2,f) = Nu(1,2)
+      DNupF(1:N,0,f) = DNu(1:N,1,0); DNupF(1:N,1,f) = DNu(1:N,1,1);
+                                          DNupF(1:N,2,f) = DNu(1:N,1,2)
 c  ...f=2 --> face235 with local orientation v2->v3->v5
       f=2
-      MubF(f) = Mu(1,1); DMubF(f,1:N) = DMu(1:N,1,1)
+      MubF(f) = Mu(1,1); DMubF(1:N,f) = DMu(1:N,1,1)
 c     ...locally oriented pair representing projection
-      NupF(f,0) = Nu(2,0); NupF(f,1) = Nu(2,1); NupF(f,2) = Nu(2,2)
-      DNupF(f,1:N,0) = DNu(1:N,2,0); DNupF(f,1:N,1) = DNu(1:N,2,1);
-                                          DNupF(f,1:N,2) = DNu(1:N,2,2)
+      NupF(0,f) = Nu(2,0); NupF(1,f) = Nu(2,1); NupF(2,f) = Nu(2,2)
+      DNupF(1:N,0,f) = DNu(1:N,2,0); DNupF(1:N,1,f) = DNu(1:N,2,1);
+                                          DNupF(1:N,2,f) = DNu(1:N,2,2)
 c  ...f=3 --> face345 with local orientation v4->v3->v5
       f=3
-      MubF(f) = Mu(2,1); DMubF(f,1:N) = DMu(1:N,2,1)
+      MubF(f) = Mu(2,1); DMubF(1:N,f) = DMu(1:N,2,1)
 c     ...locally oriented pair representing projection
-      NupF(f,0) = Nu(1,0); NupF(f,1) = Nu(1,1); NupF(f,2) = Nu(1,2)
-      DNupF(f,1:N,0) = DNu(1:N,1,0); DNupF(f,1:N,1) = DNu(1:N,1,1);
-                                          DNupF(f,1:N,2) = DNu(1:N,1,2)
+      NupF(0,f) = Nu(1,0); NupF(1,f) = Nu(1,1); NupF(2,f) = Nu(1,2)
+      DNupF(1:N,0,f) = DNu(1:N,1,0); DNupF(1:N,1,f) = DNu(1:N,1,1);
+                                          DNupF(1:N,2,f) = DNu(1:N,1,2)
 c  ...f=4 --> face415 with local orientation v1->v4->v5
       f=4
-      MubF(f) = Mu(1,0); DMubF(f,1:N) = DMu(1:N,1,0)
+      MubF(f) = Mu(1,0); DMubF(1:N,f) = DMu(1:N,1,0)
 c     ...locally oriented pair representing projection
-      NupF(f,0) = Nu(2,0); NupF(f,1) = Nu(2,1); NupF(f,2) = Nu(2,2)
-      DNupF(f,1:N,0) = DNu(1:N,2,0); DNupF(f,1:N,1) = DNu(1:N,2,1);
-                                          DNupF(f,1:N,2) = DNu(1:N,2,2)
+      NupF(0,f) = Nu(2,0); NupF(1,f) = Nu(2,1); NupF(2,f) = Nu(2,2)
+      DNupF(1:N,0,f) = DNu(1:N,2,0); DNupF(1:N,1,f) = DNu(1:N,2,1);
+                                          DNupF(1:N,2,f) = DNu(1:N,2,2)
 c
 c  ...projected coordinates are Nu, so IdecTF=true for all faces
       IdecTF = .TRUE.
@@ -1016,7 +1016,7 @@ c
       integer :: N,f
       logical, intent(out) :: IdecTF
       double precision, intent(in)  :: Lam(5),DLam(1:3,5)
-      double precision, intent(out) :: LampF(4,0:2),DLampF(4,3,0:2)
+      double precision, intent(out) :: LampF(0:2,4),DLampF(3,0:2,4)
 c
 c  ...Info from module element_data - coordinates,connectivities:
 c      V=((0,0,0),(1,0,0),(1,1,0),(0,1,0),(0,0,1))=>(v1,v2,v3,v4,v5)
@@ -1027,27 +1027,27 @@ c
 c  ...f=1 --> face125 with local orientation v1->v2->v5
       f=1
 c     ...locally oriented pair representing projection
-      LampF(f,0) = Lam(1); LampF(f,1) = Lam(2); LampF(f,2) = Lam(5)
-      DLampF(f,1:N,0) = DLam(1:N,1); DLampF(f,1:N,1) = DLam(1:N,2);
-                                          DLampF(f,1:N,2) = DLam(1:N,5)
+      LampF(0,f) = Lam(1); LampF(1,f) = Lam(2); LampF(2,f) = Lam(5)
+      DLampF(1:N,0,f) = DLam(1:N,1); DLampF(1:N,1,f) = DLam(1:N,2);
+                                          DLampF(1:N,2,f) = DLam(1:N,5)
 c  ...f=2 --> face235 with local orientation v2->v3->v5
       f=2
 c     ...locally oriented pair representing projection
-      LampF(f,0) = Lam(2); LampF(f,1) = Lam(3); LampF(f,2) = Lam(5)
-      DLampF(f,1:N,0) = DLam(1:N,2); DLampF(f,1:N,1) = DLam(1:N,3);
-                                          DLampF(f,1:N,2) = DLam(1:N,5)
+      LampF(0,f) = Lam(2); LampF(1,f) = Lam(3); LampF(2,f) = Lam(5)
+      DLampF(1:N,0,f) = DLam(1:N,2); DLampF(1:N,1,f) = DLam(1:N,3);
+                                          DLampF(1:N,2,f) = DLam(1:N,5)
 c  ...f=3 --> face345 with local orientation v4->v3->v5
       f=3
 c     ...locally oriented pair representing projection
-      LampF(f,0) = Lam(4); LampF(f,1) = Lam(3); LampF(f,2) = Lam(5)
-      DLampF(f,1:N,0) = DLam(1:N,4); DLampF(f,1:N,1) = DLam(1:N,3);
-                                          DLampF(f,1:N,2) = DLam(1:N,5)
+      LampF(0,f) = Lam(4); LampF(1,f) = Lam(3); LampF(2,f) = Lam(5)
+      DLampF(1:N,0,f) = DLam(1:N,4); DLampF(1:N,1,f) = DLam(1:N,3);
+                                          DLampF(1:N,2,f) = DLam(1:N,5)
 c  ...f=4 --> face415 with local orientation v1->v4->v5
       f=4
 c     ...locally oriented pair representing projection
-      LampF(f,0) = Lam(1); LampF(f,1) = Lam(4); LampF(f,2) = Lam(5)
-      DLampF(f,1:N,0) = DLam(1:N,1); DLampF(f,1:N,1) = DLam(1:N,4);
-                                          DLampF(f,1:N,2) = DLam(1:N,5)
+      LampF(0,f) = Lam(1); LampF(1,f) = Lam(4); LampF(2,f) = Lam(5)
+      DLampF(1:N,0,f) = DLam(1:N,1); DLampF(1:N,1,f) = DLam(1:N,4);
+                                          DLampF(1:N,2,f) = DLam(1:N,5)
 c
 c  ...projected coordinates are Lam, so IdecTF=false for all faces
       IdecTF = .FALSE.

@@ -64,6 +64,10 @@ subroutine break(Mdle,Kref)
       if ((krefe(i).ne.0) .and. (is_leaf(nod))) then
 !     ...break edge
          kref_edge = 1; iact = .false.
+         if (nod.eq.0) then
+           write(*,*) 'break: Mdle,nod = ',Mdle,nod
+           call result
+         endif
          call nodbreak(nod,kref_edge,iact)
       endif
    enddo
@@ -113,6 +117,10 @@ subroutine break(Mdle,Kref)
 !
 !        ...triangular face
             case('mdlt')
+              if (nod.eq.0) then
+                write(*,*) 'break: Mdle,nod = ',Mdle,nod
+                call result
+               endif
                call nodbreak(nod,kref_face,iact)
 !
 !        ...quadrilateral face
@@ -120,6 +128,10 @@ subroutine break(Mdle,Kref)
                select case(NODES(nod)%ref_kind)
 !           ...UNREFINED face : just break
                case(0)
+                  if (nod.eq.0) then
+                    write(*,*) 'break: Mdle,nod = ',Mdle,nod
+                    call result
+                  endif
                   call nodbreak(nod,kref_face,iact)
 !           ...ANISOTROPICALLY REFINED face : break son quads and son edge
                case(10,01)
@@ -128,9 +140,17 @@ subroutine break(Mdle,Kref)
                   call activate_sons(nod)
 !              ...loop over son quads and generate INACTIVE son nodes
                   do is=1,2
-                     call nodbreak(Son(nod,is),kref_face,iact)
+                    if (Son(nod,is).eq.0) then
+                      write(*,*) 'break: Mdle,nod,is,Son(nod,is) = ',Mdle,nod,is,Son(nod,is)
+                      call result
+                    endif
+                    call nodbreak(Son(nod,is),kref_face,iact)
                   enddo
 !              ...break edge node
+                  if (Son(nod,3).eq.0) then
+                    write(*,*) 'break: Mdle,nod,Son(nod,3) = ',Mdle,nod,Son(nod,3)
+                    call result
+                  endif
                   call nodbreak(Son(nod,3),kref_edge,iact)
                end select
             end select
@@ -145,6 +165,11 @@ subroutine break(Mdle,Kref)
 !
 !..break middle node
    iact = .false.
+
+   if (Mdle.eq.0) then
+     write(*,*) 'break: Mdle = ',Mdle
+     call result
+   endif
    call nodbreak(Mdle,Kref,iact)
 !
    call activate_sons(Mdle)

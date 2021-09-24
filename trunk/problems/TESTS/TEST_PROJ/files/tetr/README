@@ -1,3 +1,0 @@
-geom   -->  master tet
-geom1  -->  master tet surronded by 4 tets (one across each face)
-geom2  -->  2 tets sharing the "slanted" face

@@ -9,7 +9,7 @@ c     routine name      - shape3DHHexa
 c
 c--------------------------------------------------------------------
 c
-c     latest revision:  - Oct 14, Apr 17
+c     latest revision:  - Oct 14, Apr 17, Jul 21
 c
 c     purpose:          - routine returns values of 3D hexahedron element
 c                         H1 shape functions and their derivatives
@@ -45,12 +45,12 @@ c
       double precision, intent(out) :: ShapH(Nsize(2))
       double precision, intent(out) :: GradH(1:3,Nsize(2))
       double precision :: Mu(1:3,0:1),DMu(1:3,1:3,0:1)
-      double precision :: MubV(1:8,1:3),DMubV(1:8,1:3,1:3)
-      double precision :: MubE(1:12,1:2),DMubE(1:12,1:3,1:2)
-      double precision :: MupE(1:12,0:1),DMupE(1:12,1:3,0:1)
+      double precision :: MubV(1:3,1:8),DMubV(1:3,1:3,1:8)
+      double precision :: MubE(1:2,1:12),DMubE(1:3,1:2,1:12)
+      double precision :: MupE(0:1,1:12),DMupE(1:3,0:1,1:12)
       double precision :: GMupE(0:1),GDMupE(1:3,0:1)
-      double precision :: MubF(1:6),DMubF(1:6,1:3)
-      double precision :: MupF(1:6,1:2,0:1),DMupF(1:6,1:3,1:2,0:1)
+      double precision :: MubF(1:6),DMubF(1:3,1:6)
+      double precision :: MupF(1:2,0:1,1:6),DMupF(1:3,1:2,0:1,1:6)
       double precision :: GMupF(1:2,0:1),GDMupF(1:3,1:2,0:1)
       double precision :: phiE(2:Nsize(1)),DphiE(1:3,2:Nsize(1))
       double precision :: phiQuad(2:Nsize(1),2:Nsize(1))
@@ -71,10 +71,10 @@ c  ...call the blending functions
       call BlendHexaV(Mu,DMu, MubV,DMubV)
       do v=1,8
         m=m+1
-        ShapH(m) = MubV(v,1)*MubV(v,2)*MubV(v,3)
-        GradH(1:N,m) = MubV(v,1)*MubV(v,2)*DMubV(v,1:N,3)
-     .               + MubV(v,1)*DMubV(v,1:N,2)*MubV(v,3)
-     .               + DMubV(v,1:N,1)*MubV(v,2)*MubV(v,3)
+        ShapH(m) = MubV(1,v)*MubV(2,v)*MubV(3,v)
+        GradH(1:N,m) = MubV(1,v)*MubV(2,v)*DMubV(1:N,3,v)
+     .               + MubV(1,v)*DMubV(1:N,2,v)*MubV(3,v)
+     .               + DMubV(1:N,1,v)*MubV(2,v)*MubV(3,v)
       enddo
 c
 c  ...Second the edges
@@ -84,17 +84,17 @@ c  ...call the blending and projections
         ndofE=Nord(e)-1
         if (ndofE.gt.0) then
 c      ...orient first
-          call OrientE(MupE(e,0:1),DMupE(e,1:N,0:1),NoriE(e),N,
+          call OrientE(MupE(0:1,e),DMupE(1:N,0:1,e),NoriE(e),N,
      .                                                 GMupE,GDMupE)
 c      ...construct the shape functions
           call AncPhiE(GMupE,GDMupE,Nord(e),IdecE,N,
      .                         phiE(2:Nord(e)),DphiE(1:N,2:Nord(e)))
           do i=2,Nord(e)
             m=m+1
-            ShapH(m) = MubE(e,1)*MubE(e,2)*phiE(i)
-            GradH(1:N,m) = MubE(e,1)*MubE(e,2)*DphiE(1:N,i)
-     .                   + MubE(e,1)*DMubE(e,1:N,2)*phiE(i)
-     .                   + DMubE(e,1:N,1)*MubE(e,2)*phiE(i)
+            ShapH(m) = MubE(1,e)*MubE(2,e)*phiE(i)
+            GradH(1:N,m) = MubE(1,e)*MubE(2,e)*DphiE(1:N,i)
+     .                   + MubE(1,e)*DMubE(1:N,2,e)*phiE(i)
+     .                   + DMubE(1:N,1,e)*MubE(2,e)*phiE(i)
           enddo
         endif
       enddo
@@ -107,7 +107,7 @@ c  ...call the blending and projections
         ndofF = (nordF(1)-1)*(nordF(2)-1)
         if (ndofF.gt.0) then
 c      ...orient first
-          call OrientQuad(MupF(f,1:2,0:1),DMupF(f,1:N,1:2,0:1),
+          call OrientQuad(MupF(1:2,0:1,f),DMupF(1:N,1:2,0:1,f),
      .                         NoriF(f),IdecF,N, GMupF,GDMupF,GIdecF)
 c      ...orders already take into account the orientations, so
 c      ...no need for swapping nordF
@@ -120,7 +120,7 @@ c      ...now construct the shape functions
               m=m+1
               ShapH(m) = MubF(f)*phiQuad(i,j)
               GradH(1:N,m) = MubF(f)*DphiQuad(1:N,i,j)
-     .                     + DMubF(f,1:N)*phiQuad(i,j)
+     .                     + DMubF(1:N,f)*phiQuad(i,j)
             enddo
           enddo
         endif
@@ -210,7 +210,7 @@ c     routine name      - shape3DEHexa
 c
 c--------------------------------------------------------------------
 c
-c     latest revision:  - Oct 14, Apr 17
+c     latest revision:  - Oct 14, Apr 17, Jul 21
 c
 c     purpose:          - routine returns values of 3D hexahedron element
 c                         H(curl) shape functions and their derivatives
@@ -247,11 +247,11 @@ c
       double precision, intent(out) :: ShapE(1:3,Nsize(2))
       double precision, intent(out) :: CurlE(1:3,Nsize(2))
       double precision :: Mu(1:3,0:1),DMu(1:3,1:3,0:1)
-      double precision :: MubE(1:12,1:2),DMubE(1:12,1:3,1:2)
-      double precision :: MupE(1:12,0:1),DMupE(1:12,1:3,0:1)
+      double precision :: MubE(1:2,1:12),DMubE(1:3,1:2,1:12)
+      double precision :: MupE(0:1,1:12),DMupE(1:3,0:1,1:12)
       double precision :: GMupE(0:1),GDMupE(1:3,0:1)
-      double precision :: MubF(1:6),DMubF(1:6,1:3)
-      double precision :: MupF(1:6,1:2,0:1),DMupF(1:6,1:3,1:2,0:1)
+      double precision :: MubF(1:6),DMubF(1:3,1:6)
+      double precision :: MupF(1:2,0:1,1:6),DMupF(1:3,1:2,0:1,1:6)
       double precision :: GMupF(1:2,0:1),GDMupF(1:3,1:2,0:1)
       double precision :: EE(1:3,0:Nsize(1)-1),curlEE(1:3,0:Nsize(1)-1)
       double precision :: EQuad(1:3,0:Nsize(1)-1,2:Nsize(1))
@@ -276,16 +276,16 @@ c  ...call the blending and projections
         ndofE=Nord(e)
         if (ndofE.gt.0) then
 c      ...orient first
-          call OrientE(MupE(e,0:1),DMupE(e,1:N,0:1),NoriE(e),N,
+          call OrientE(MupE(0:1,e),DMupE(1:N,0:1,e),NoriE(e),N,
      .                                                 GMupE,GDMupE)
 c      ...construct the shape functions
           call AncEE(GMupE,GDMupE,Nord(e),IdecE,N,
      .                    EE(1:N,0:Nord(e)-1),curlEE(1:N,0:Nord(e)-1))
           do i=0,Nord(e)-1
             m=m+1
-            DTemp = MubE(e,1)*DMubE(e,1:N,2)+DMubE(e,1:N,1)*MubE(e,2)
+            DTemp = MubE(1,e)*DMubE(1:N,2,e)+DMubE(1:N,1,e)*MubE(2,e)
             call cross(N,DTemp,EE(1:N,i), CTemp)
-            ShapE(1:N,m) = MubE(e,1)*MubE(e,2)*EE(1:N,i)
+            ShapE(1:N,m) = MubE(1,e)*MubE(2,e)*EE(1:N,i)
             CurlE(1:N,m) = CTemp
           enddo
         endif
@@ -299,7 +299,7 @@ c    ...find order
 c    ...these already account for orientations
         call decod(Nord(12+f),MODORDER,2, nordF)
 c    ...orient the variables first (except the order)
-        call OrientQuad(MupF(f,1:2,0:1),DMupF(f,1:N,1:2,0:1),
+        call OrientQuad(MupF(1:2,0:1,f),DMupF(1:N,1:2,0:1,f),
      .                         NoriF(f),IdecF,N, GMupF,GDMupF,GIdecF)
 c    ...loop over the two families
         do fam=0,1
@@ -326,7 +326,7 @@ c        ...numbered wrt the second global face axis
                 ij = cshift((/ig,jg/),fam);
                 i = ij(1); j = ij(2)
                 m=m+1
-                call cross(N,DMubF(f,1:N),EQuad(1:N,i,j), CTemp)
+                call cross(N,DMubF(1:N,f),EQuad(1:N,i,j), CTemp)
                 ShapE(1:N,m) = MubF(f)*EQuad(1:N,i,j)
                 CurlE(1:N,m) = MubF(f)*curlEQuad(1:N,i,j)+CTemp
               enddo
@@ -433,7 +433,7 @@ c     routine name      - shape3DVHexa
 c
 c--------------------------------------------------------------------
 c
-c     latest revision:  - Oct 14, Apr 17
+c     latest revision:  - Oct 14, Apr 17, Jul 21
 c
 c     purpose:          - routine returns values of 3D hexahedron element
 c                         H(div) shape functions and their divergences
@@ -468,8 +468,8 @@ c
       double precision, intent(out) :: ShapV(1:3,Nsize(2))
       double precision, intent(out) :: DivV(Nsize(2))
       double precision :: Mu(1:3,0:1),DMu(1:3,1:3,0:1)
-      double precision :: MubF(1:6),DMubF(1:6,1:3)
-      double precision :: MupF(1:6,1:2,0:1),DMupF(1:6,1:3,1:2,0:1)
+      double precision :: MubF(1:6),DMubF(1:3,1:6)
+      double precision :: MupF(1:2,0:1,1:6),DMupF(1:3,1:2,0:1,1:6)
       double precision :: GMupF(1:2,0:1),GDMupF(1:3,1:2,0:1)
       double precision :: VQuad(1:3,0:Nsize(1)-1,0:Nsize(1)-1)
       double precision :: divVQuad(0:Nsize(1)-1,0:Nsize(1)-1)
@@ -493,7 +493,7 @@ c    ...find order
 c    ...these already account for orientations
         call decod(Nord(12+f),MODORDER,2, nordF)
 c    ...orient the variables first (except the order)
-        call OrientQuad(MupF(f,1:2,0:1),DMupF(f,1:N,1:2,0:1),
+        call OrientQuad(MupF(1:2,0:1,f),DMupF(1:N,1:2,0:1,f),
      .                         NoriF(f),IdecF,N, GMupF,GDMupF,GIdecF)
         ndofF = nordF(1)*nordF(2)
 c    ...now construct the shape functions if necessary
@@ -505,7 +505,7 @@ c    ...now construct the shape functions if necessary
             do i=0,nordF(1)-1
               m=m+1
               ShapV(1:N,m) = MubF(f)*VQuad(1:N,i,j)
-              call dot_product(DMubF(f,1:N),VQuad(1:N,i,j), DivV(m))
+              call dot_product(DMubF(1:N,f),VQuad(1:N,i,j), DivV(m))
             enddo
           enddo
         endif

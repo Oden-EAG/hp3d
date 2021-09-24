@@ -1,0 +1,39 @@
+
+
+NOTES ON VERIFICATION OF SHAPE FUNCTIONS
+----------------------------------------
+
+1. The option of static condensation does not work with the L2-projection
+
+2. Verification with condition
+ 
+       error/norm  <  1.d-12
+
+   fails for some H(curl) functions with p=6. 
+   It passes the test though with 1.d-11. This means that we are loosing up to 4 digits.
+
+3. Frontal solver fails for p=5, it asks for a bigger temporary memory? I have switched
+   to MUMPS.
+
+4. To test orientations, I have written routine 
+         
+       problems/MPI_TESTS/GALERKIN/change_orientations
+
+   that has to be called from input_DEFAULT (I have placed it in the right place
+   and tested `by hand', then commented out).
+
+   This routine has to be fed with input parameters somehow from the script. The range
+   of parameters should correspond to geometry file `tet_hexa_prism_pyram'
+
+   Idec = 1  No = 1,...,22   Nor = 0,1
+   Idec = 2  No = 1,...8     Nor = 0,...,5
+   Idec = 3  No = 1,...,8    Nor = 0,...,7
+
+   After changing an orientation, one should call the projection routines, looping through
+   polynomial orders IP=1,...,MAXP. This will be a total of
+
+                22*2 + 8*6  + 8*8  =  156
+
+   calls. Depending upon a platform, the verification can easily take a night.
+
+

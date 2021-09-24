@@ -28,7 +28,7 @@ subroutine find_bc(Mdle, Ibc)
    integer :: nod,nfath,iel,iface,nrve_iel,nrf_iel,loc,ivar,nvar
 !
 #if DEBUG_MODE
-   integer :: iprint = 1
+   integer :: iprint = 0
 #endif
 !
 !-------------------------------------------------------------------------------

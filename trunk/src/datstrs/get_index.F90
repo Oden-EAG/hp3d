@@ -45,7 +45,7 @@ subroutine get_index(Nod, Indexd)
    integer :: ic,iphys,ivar
 !
 #if DEBUG_MODE
-   integer :: iprint = 1
+   integer :: iprint = 0
 #endif
 !
 !-----------------------------------------------------------------------

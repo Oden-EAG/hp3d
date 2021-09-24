@@ -22,7 +22,6 @@
       common /c_neig_edge/ iprint
       common /c_neig_initial_mesh_edge/ iprint_neig_initial_mesh_edge
       common /c_neig_mface_edge/ iprint_neig_mface_edge
-      common /c_neig_middle_edge/ iprint_neig_middle_edge
 !
 !  ...Arguments
       integer, intent(in)  :: Medge
@@ -40,21 +39,11 @@
       integer, parameter :: maxnl=100
       integer :: nrneigl,nrgenl(maxnl),neigl(maxnl),neig_nodesl(27,maxnl),neig_orientl(27,maxnl)
       integer :: nr_msons
+      logical :: found
 !
 !  ...printing flags
-      integer :: iprint_neig_initial_mesh_edge,iprint_neig_mface_edge,iprint_neig_middle_edge
+      integer :: iprint_neig_initial_mesh_edge,iprint_neig_mface_edge
 !
-!
-!========================================================================
-!  REMARK: 3 types of edges:                                            |
-!    1. edges laying on an INITIAL mesh edge, they result from          |
-!       refinements of the initial mesh edge                            |
-!    2. edges laying on an INITIAL mesh face (they result from          |
-!       refinements of the inital mesh face node)                       |
-!    2. faces laying inside AN element, not necessarily from the        |
-!       initial mesh (they resulted from the refinement of a middle     |
-!       node)                                                           |
-!========================================================================
 ! 
       select case(Medge)
       case(254)
@@ -65,7 +54,6 @@
    10 continue
       iprint_neig_initial_mesh_edge = iprint
       iprint_neig_mface_edge = iprint
-      iprint_neig_middle_edge = iprint
 !
       select case(NODES(Medge)%type)
       case('medg')
@@ -80,9 +68,18 @@
         write(*,7100) Medge,NODES(Medge)%type
       endif
 !
-!------------------------------------------------------------------------
-!  Step 1 : go UP the tree and record edge refinement history.         |
-!------------------------------------------------------------------------
+!--------------------------------------------------------------------------|
+!  Step 1 : go UP the tree and record the edge ancestors of 'Medge'        |
+!                                                                          |
+!  We can encounter three situations:                                      |
+!    1. ALL ancestors of the edge are edges only, all the way to an        |
+!       INITIAL MESH edge;                                                 |
+!    2. we arrive at a FACE ancestor of the edge;                          |
+!    3. we arrive at a MIDDLE NODE ancestor of the edge.                   |  
+!  The result of Step 1 is a temporary list of elements which either       |
+!  themselves or their middle sons descendants may be neighbors of 'Medge'.|
+!--------------------------------------------------------------------------|   
+!
       nod=Medge ; igen=0
       do
         igen=igen+1
@@ -95,7 +92,7 @@
 !  .......determine initial mesh element neighbors of the edge
           call neig_initial_mesh_edge(nod,maxnl, nrneigl, &
                                       neigl,neig_nodesl,neig_orientl)
-          go to 200
+          exit
 !
         else
           select case(NODES(nfath)%type)
@@ -103,28 +100,32 @@
 !  .......father is an edge, proceed up the tree
           case('medg')
             nod = nfath
-            go to 100
+            cycle
 !
 !  .......father is a mid-face node
           case('mdlt','mdlq')
             call neig_mface_edge(nod,maxnl, nrneigl, &
                                  neigl,neig_nodesl,neig_orientl)
-            go to 200
+            exit
 !
-!  .......father is a middle node, determine the edge neighbors
-!         from the list of its sons
+!  .......father is a middle node, just add him to the temporary list
           case('mdlb','mdln','mdlp','mdld')
-            call neig_middle_edge(nod,maxnl, nrneigl, &
-                                  neigl,neig_nodesl,neig_orientl)
-            go to 200
+!
+!  .........just add the element to the temporary list of neighbors
+            nrneigl=1
+            neigl(1) = nfath
+            call elem_nodes(nfath, neig_nodesl,neig_orientl)
+            exit
           end select
-
-  100   continue
         endif
       enddo
 !
+!------------------------------------------------------------------------
+!
 !  ...Step 2: Go down the tree...
-  200 continue
+!
+!  ...initiate the generation level for each elements on the temporary list
+!     with the common generation number
       nrgen = igen
       nrgenl(1:nrneigl) = nrgen
       if (iprint.eq.1) then
@@ -137,7 +138,8 @@
         call pause
       endif
 !
-!  ...loop through the neighbors of the ancestor edge
+!  ...loop through the neighbors on the temporary list; notice that the
+!     list may grow as we move through it
       i=0
       do 
         i=i+1
@@ -156,6 +158,9 @@
           nrv = nvert(NODES(nfath)%type)
           nre = nedge(NODES(nfath)%type)
           call locate(Medge,nodesl_fath(nrv+1:nrv+nre),nre, loc)
+!
+!  .......the element is a neighbor of 'Medge', record it on the ultimate
+!         list of element neighbors
           if (loc.gt.0) then
             Nrneig = Nrneig+1
             if (Nrneig.gt.Maxn) then
@@ -172,6 +177,7 @@
 !
 !  .......loop through the middle node sons of the mdle node
           call nr_mdle_sons(NODES(nfath)%type,NODES(nfath)%ref_kind, nr_msons)
+          found = .false.
           do j=1,nr_msons
 !
 !  .........determine nodal connectivities for the son
@@ -185,8 +191,13 @@
               nod = nedg_ancestors(igen) 
               call locate(nod,nodesl_son(nrv+1:nrv+nre),nre, loc)
 !
-!  ...........if you have found the current node on the list, add the element to the list
+!  ...........if you have found 'Medge' or any of its edge ancestors, add the element 
+!             to the temporary list, recording the updated generation level
               if (loc.gt.0) then
+                if (iprint.eq.1) then
+                  write(*,*) 'neig_edge: ADDING TO THE TEMPORARY LIST nson = ',nson
+                endif
+                found = .true.
                 nrneigl = nrneigl+1
                 neigl(nrneigl) = nson
                 neig_nodesl(1:27,nrneigl) = nodesl_son(1:27)
@@ -200,6 +211,24 @@
 !
 !  .......end of loop through middle sons
           enddo
+!
+!  .......if none of the element sons contains 'Medge' or its ancestors, double check 
+!         if the father is a neighbor
+          if (.not.found) then
+            nrv = nvert(NODES(nfath)%type)
+            nre = nedge(NODES(nfath)%type)
+            call locate(Medge,nodesl_fath(nrv+1:nrv+nre),nre, loc)
+            if (loc.gt.0) then
+              Nrneig = Nrneig+1
+              if (Nrneig.gt.Maxn) then
+                write(*,*) 'neig_edge: INCREASE Maxn = ',Maxn
+                stop 1
+              endif
+              Neig(Nrneig) = nfath
+              Nedg_list(Nrneig) = loc
+              Norient_list(Nrneig) = norientl_fath(nrv+loc)
+            endif
+          endif
         endif
 !
 !  ...end of loop through the neighbors
@@ -238,8 +267,6 @@
 !         Neig         - list of neighbors of the edge
 !         Neig_nodesl,Neig_orientl - nodal connectivities for the
 !                        neighbors
-!
-!   required  routines -
 !
 !----------------------------------------------------------------------
 !   
@@ -338,117 +365,6 @@
 !
       end subroutine neig_initial_mesh_edge
 
-!----------------------------------------------------------------------
-!
-!   routine name       - neig_middle_edge
-!
-!----------------------------------------------------------------------
-!
-!   latest revision    - Jun 21
-!
-!   purpose            - find midle node neigbors for an edge son
-!                        of a middle node
-!
-!   arguments :
-!     in:
-!         Medg         - a mid-edge node
-!         Maxn         - dimension of the arrays below
-!                        (max number of neighbors)
-!     out:
-!         Nrneig       - number of adjacent elements
-!         Neig         - list of neighbors of the edge
-!         Nedg_list    - local edge numbers
-!         Norient_list - orientations of the mid-edge node
-!
-!----------------------------------------------------------------------
-!   
-      subroutine neig_middle_edge(Medg,Maxn, Nrneig, &
-                                  Neig,Neig_nodesl,Neig_orientl)
-!
-      use GMP
-      use data_structure3D
-      use element_data
-      use refinements
-      implicit none
-      common /c_neig_middle_edge/ iprint
-!
-!  ...Arguments
-      integer, intent(in)  :: Medg
-      integer, intent(in)  :: Maxn
-      integer, intent(out) :: Nrneig
-      integer, intent(out) :: Neig(Maxn)
-      integer, intent(out) :: Neig_nodesl(27,Maxn),Neig_orientl(27,Maxn)
-!
-!  ...element nodes and orientation
-      integer :: nodesl_fath(27),norientl_fath(27)
-      integer :: nodesl_son(27), norientl_son(27)
-!
-      integer :: nr_msons
-      integer :: mdle,nrsons,is,nod,nrv,nre,loc,i,iprint,nson
-!
-!----------------------------------------------------------------------
-!
-!!!      iprint=0
-!
-      mdle = NODES(Medg)%father
-      select case(NODES(mdle)%type)
-      case('mdlb','mdln','mdlp','mdld')
-      case default
-        write(*,7100) Medg
- 7100   format('neig_middle_edge: WRONG FATHER OF Medg = ',i10)
-        stop 1
-      end select 
-      Neig = 0
-!
-!  ...determine nodes for the middle node element
-      call elem_nodes(mdle, nodesl_fath,norientl_fath) 
-!
-!  ...initiate number of neighbors
-      i=0
-!
-!  ...loop through the middle node sons
-      call nr_mdle_sons(NODES(mdle)%type,NODES(mdle)%ref_kind, nr_msons)
-      if (nr_msons.eq.0) then
-        write(*,*) 'neig_middle_edge: INCONSISTENCY, Medg,mdle,NODES(mdle)%type,NODES(mdle)%ref_kind = ',&
-                                      Medg,mdle,NODES(mdle)%type,NODES(mdle)%ref_kind
-        call pause
-      endif
-      do is=1,nr_msons
-        nson = Son(Mdle,is)
-!
-!  .....determine nodes for the son using the nodes of the father
-        call elem_nodes_one(mdle,nodesl_fath,norientl_fath,is, &
-                            nod,nodesl_son,norientl_son)
-        nrv = nvert(NODES(nod)%type)
-        nre = nedge(NODES(nod)%type)
-        call locate(Medg,nodesl_son(nrv+1:nrv+nre),nre, loc)
-        if (loc.gt.0) then
-          i=i+1
-          if (i.gt.Maxn) then
-            write(*,*) 'neig_middle_edge: INSUFFIOCIENT Maxn = ',Maxn
-            stop 1
-          endif
-          Neig(i) = nod
-          Neig_nodesl(1:27,i)  = nodesl_son(1:27)
-          Neig_orientl(1:27,i) = norientl_son(1:27)
-        endif
-!
-!  ...end of loop through the middle node sons
-      enddo
-      Nrneig = i
-!
-
-      if (iprint.eq.1) then
-        write(*,7110) Medg
- 7110   format('neig_middle_edge: NEIGHBORS OF Medg = ',i5)
-        write(*,7120) Neig(1:Nrneig)
- 7120   format(10i8)
-        call pause
-      endif
-!
-!
-      end subroutine neig_middle_edge
-
 
 !----------------------------------------------------------------------
 !
@@ -509,6 +425,7 @@
  7100   format('neig_mface_edge: WRONG FATHER OF Medg = ',i10)
         stop 1
       end select 
+!
       Nrneig=0
       Neig = 0
       if (iprint.eq.1) then
@@ -523,12 +440,12 @@
 !
 !  .....determine element-to-nodes connectivities for the element neighbor
         mdle = neigf(i)
-        call nr_mdle_sons(NODES(mdle)%type,NODES(mdle)%ref_kind, nr_msons)
 !
 !  .....the neighbor has not been refined, skip it
-        if (nr_msons.eq.0) cycle
+        if (NODES(mdle)%ref_kind.eq.0) cycle
 !
-!  .....determine element-to-nodes connectivities
+!  .....put the neighbor on the list of potential neighbors of the edge ancestors and determine 
+!       element-to-nodes connectivities
         Nrneig = Nrneig+1
         Neig(Nrneig) = mdle
         call elem_nodes(mdle, Neig_nodesl(1:27,Nrneig),Neig_orientl(1:27,Nrneig))
@@ -538,7 +455,7 @@
 !
       if (iprint.eq.1) then
         write(*,7110) Medg
- 7110   format('neig_mface_edge: NEIGHBORS OF Medg = ',i5)
+ 7110   format('neig_mface_edge: NEIGHBORS OF FACE ANCESTOR OF Medg = ',i5)
         write(*,7120) Neig(1:Nrneig)
  7120   format(10i8)
         call pause

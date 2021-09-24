@@ -1,0 +1,310 @@
+!----------------------------------------------------------------------
+! exec_case
+!----------------------------------------------------------------------
+subroutine exec_case(idec)
+!
+   use data_structure3D
+   use par_mesh
+   use mpi_param
+   use mpi
+   use common_prob_data
+   use zoltan_wrapper, only: zoltan_w_partition,zoltan_w_eval
+!
+   implicit none
+   common /cexact/ NP1,NP2,NP3,ICOMP
+   integer :: NP1,NP2,NP3,ICOMP
+!
+   integer, intent(in) :: idec
+!
+   logical :: solved
+   integer :: mdle_subd(NRELES)
+   integer :: i,mdle,kref,src,count,ierr,iflag
+!
+!  testing neig-edge
+   integer, parameter :: maxn=10
+   integer :: medge,nrneig,nrv,nre,loc,ie,iel
+   integer :: neig(maxn), nedg_list(maxn), norient_list(maxn)
+   integer :: nodesl(27), norientl(27)
+!
+   integer :: nr_ref
+   double precision :: per
+!
+!  work space for find_element_ref
+   character(len=4) :: type
+   integer :: kreff(6),krefm
+!
+!  work space for exact_error_mod
+   integer :: isolflag(1:4), nrcomp,ptot
+   real(8) :: err,rnorm
+   
+!
+!----------------------------------------------------------------------
+!
+   solved = .false.
+!
+   select case(idec)
+!
+!  ...paraview graphics
+      case(3)
+         call my_paraview_driver(1)
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+!
+!  ...print data structure (interactive)
+      case(10); call result
+!
+!  ...print general data structure info
+      case(11)
+         write(*,110) NRELIS,NRELES,NRNODS
+ 110     format(' NRELIS,NRELES,NRNODS            = ',3I10)
+         write(*,111) NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ
+ 111     format(' NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ = ',4I10)
+         write(*,112) MAXNODS,NPNODS
+ 112     format(' MAXNODS,NPNODS                  = ',2I10)
+!
+!  ...print current partition (elems)
+      case(15)
+         write(*,*) 'printing current partition (elems)...'
+         call print_partition
+!
+!  ...print current subdomains (nodes)
+      case(16)
+         write(*,*) 'printing current subdomains (nodes)...'
+         call print_subd
+!
+!  ...print current partition coordinates
+      case(17)
+         write(*,*) 'printing current partition coordinates...'
+         call print_coord
+!
+!  ...single uniform h-refinement
+      case(20)
+         write(*,*) 'global h-refinement...'
+         call global_href
+         call update_gdof
+         call update_Ddof
+!
+!  ...single uniform p-refinement
+      case(21)
+         write(*,*) 'global p-refinement...'
+         call global_pref
+         call update_gdof
+         call update_Ddof
+!
+!  ...Multi-step uniform h refinement
+      case(22)
+         call href_solve
+!
+!  ...single anisotropic h-refinement (in z)
+      case(23)
+         write(*,*) 'global anisotropic h-refinement...'
+         call global_href_aniso(0,1)
+         call update_gdof
+         call update_Ddof
+!
+      case(26)
+         if (RANK.eq.ROOT) then
+            write(*,*) 'Select on mdle node from the list: '
+            do i=1,NRELES
+               write(*,2610) ELEM_ORDER(i)
+          2610 format(I6)
+            enddo
+            read(*,*) mdle
+         endif
+         if (NUM_PROCS .gt. 1) then
+            count = 1; src = ROOT
+            call MPI_BCAST (mdle,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+         endif
+         kref = 111
+         call refine(mdle,kref)
+         call close_mesh
+         call update_gdof
+         call update_Ddof
+!
+!  ...random refinements
+      case(27)
+        write(*,*) 'exec_case: SET PERCENTAGE OF ELEMENTS TO BE REFINED AND NUMBER OF REFINEMENTS'
+        read(*,*) per,nr_ref
+        write(*,*) '           per,nr_ref = ',per,nr_ref
+        call random_refine(per, nr_ref)
+!
+!  ...distribute mesh
+      case(30)
+         write(*,*) 'distribute mesh...'
+         call distr_mesh
+!
+!  ...collect dofs on ROOT processor
+      case(31)
+         write(*,*) 'collecting dofs on ROOT...'
+         call collect_dofs
+!
+!  ...suggest new mesh partition (Zoltan)
+      case(32)
+         if (DISTRIBUTED) then
+            write(*,*) 'computing new mesh partition (Zoltan)...'
+            call zoltan_w_partition(mdle_subd)
+         else
+            write(*,*) 'distribute mesh first to use Zoltan...'
+         endif
+!
+!  ...evaluate current partition
+      case(33)
+         if (DISTRIBUTED) then
+            write(*,*) 'evaluating current partition...'
+            call zoltan_w_eval
+         else
+            write(*,*) 'distribute mesh first to use Zoltan...'
+         endif
+!
+!  ...run mesh verification routines
+      case(35)
+         write(*,*) 'verify distributed mesh consistency...'
+         call par_verify
+!
+!  ...solve problem with omp_mumps (OpenMP MUMPS)
+      case(40)
+         write(*,*) 'calling MUMPS (MPI) solver...'
+         call par_mumps_sc('G')
+!
+!  ...solve problem with par_mumps (MPI MUMPS)
+      case(41)
+         write(*,*) 'calling MUMPS (OpenMP) solver...'
+         call mumps_sc('G')
+!
+!  ...solve problem with pardiso (OpenMP)
+      case(42)
+         write(*,*) 'calling Pardiso (OpenMP) solver...'
+         call pardiso_sc('G')
+!
+!  ...solve problem with Frontal solver (sequential)
+      case(43)
+         write(*,*) 'calling Frontal (Seq) solver...'
+         call solve1(1)
+!
+!  ...solve problem with omp_mumps (OpenMP MUMPS)
+      case(44)
+         write(*,*) 'calling MUMPS (MPI) nested dissection solver...'
+         call par_nested('G')
+!
+!  ...solve problem with PETSc solver (MPI)
+      case(45)
+         write(*,*) 'calling PETSc (MPI) solver...'
+         call petsc_solve('G')
+!
+      case(50)
+         write(*,*) 'computing error and residual...'
+         call exact_error
+!
+      case(60)
+         write(*,*) 'flushing dof'
+         do i=1,NRNODS
+            if(associated(NODES(i)%dof)) then
+               if(associated(NODES(i)%dof%coord)) then
+                  NODES(i)%dof%coord = 0.d0
+               endif
+               if(associated(NODES(i)%dof%zdofH)) then
+                  NODES(i)%dof%zdofH = 0.d0
+               endif
+            endif
+         enddo
+         write(*,*) 'updating geometry dof'
+         call update_gdof
+         write(*,*) 'updating Dirichlet dof'
+         call update_Ddof
+!
+      case(70)
+         write(*,*) 'SET HOMOGENEOUS DIRICHLET BC FLAG (0,1)'
+         read(*,*) iflag
+         select case(iflag)
+         case(0); PHYSAd(1) = .false.
+         case(1); PHYSAd(1) = .true.
+         end select
+         call update_Ddof
+!
+      case(80)
+         type = 'mdln'
+         kref = 32
+         kreff = (/1,0,0,0,0,0/)
+         call find_element_ref(type,kref,kreff, krefm)
+         write(*,*) 'exec_case: krefm = ',krefm
+!
+!  ...energy projections
+      case(110)
+!
+!  .....polynomial order
+        write(*,*) 'exec_case: IP = ',IP
+!
+!  .....loop through energy spaces
+        do i=1,4
+          select case(i)
+!
+!  .......H1 projection
+          case(1)
+            PHYSAm(1:4) = (/.true.,.false.,.false.,.false./)
+            isolflag = (/1,0,0,0/)
+            nrcomp=1; ptot = IP
+            write(*,*) 'H1 PROJECTIONS........................'
+!
+!  .......H(curl) projection
+          case(2)
+            PHYSAm(1:4) = (/.false.,.true.,.false.,.false./)
+            isolflag = (/0,1,0,0/)
+            nrcomp=3; ptot = IP-1
+            write(*,*) 'H(curl) PROJECTIONS...................'
+!
+!  .......H(div) projection
+          case(3)
+            PHYSAm(1:4) = (/.false.,.false.,.true.,.false./)
+            isolflag = (/0,0,1,0/)
+            nrcomp=3; ptot = IP-1
+            write(*,*) 'H(div) PROJECTIONS....................'
+!
+!  .......L2 projection
+          case(4)
+            PHYSAm(1:4) = (/.false.,.false.,.false.,.true./)
+            isolflag = (/0,0,0,1/)
+            nrcomp=1; ptot = IP-1
+            write(*,*) 'L2 PROJECTIONS........................'
+          end select
+!
+!  .......loop through components
+          do ICOMP = 1,nrcomp
+!
+!  .........loop through orders
+            do NP1=0,ptot
+              do NP2=0,ptot
+                do NP3=0,ptot
+                  if (NP1+NP2+NP3.ne.ptot) cycle
+                  select case(i)
+                  case(1)
+                    write(*,*) '     H1-PROJECTION: NP1,NP2,NP3       = ',NP1,NP2,NP3
+                  case(2)
+                    write(*,*) 'H(curl)-PROJECTION: NP1,NP2,NP3,ICOMP = ',NP1,NP2,NP3,ICOMP
+                  case(3)
+                    write(*,*) ' H(div)-PROJECTION: NP1,NP2,NP3,ICOMP = ',NP1,NP2,NP3,ICOMP
+                  case(4)
+                    write(*,*) '     L2-PROJECTION: NP1,NP2,NP3       = ',NP1,NP2,NP3
+                  end select
+
+!  ...............project
+                  call par_mumps_sc('G') !solve1(1)
+!
+!  ...............compute the error
+                  call exact_error_mod(isolflag, err,rnorm)
+                  if (sqrt(err/rnorm).gt.1.d-12) then
+                    write(*,*) 'exec_case: VERIFICATION OF SHAPE FUNCTIONS HAS FAILED'
+                    write(*,*) '           i,ICOMP,NP1,NP2,NP3 = ',i,ICOMP,NP1,NP2,NP3
+                    write(*,*) '           sqrt(err),sqrt(rnorm) = ',sqrt(err),sqrt(rnorm)
+                    call pause
+                  endif
+                enddo
+              enddo
+            enddo
+          enddo
+        enddo
+!                
+      case default
+         write(*,*) 'exec_case: unknown case...'
+   end select
+!
+end subroutine exec_case
+

@@ -1,3 +1,0 @@
-geom   --> master prism
-geom1  --> master prism surronded by 3 prisms (across rectangular faces)
-           and 2 tets (across triangular faces)

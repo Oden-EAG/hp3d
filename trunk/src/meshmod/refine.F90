@@ -260,7 +260,7 @@ subroutine refine(Mdle_in,Kref_in)
  7010       format('refine: INCONSISTENCY, mdle,type,kref,kreff,krefm = ', &
                                            i7,',',a4,',',i3,',',6(i3,1x),',',i3)
             call logic_error(ERR_INVALID_VALUE, __FILE__,__LINE__)
-            stop
+            stop 1
          endif
       endif
 !..end loop over queue

@@ -1,5 +1,6 @@
 add_layer2plane.F90
 add_prism_layer.F
+change_orientations.F90
 surf_cone.F90
 connect.F90
 curve.F90
@@ -12,6 +13,7 @@ input_geometry.F
 input_GMPdata.F
 input_NETGEN.F
 input_DEFAULT.F90
+change_orientations.F90
 input_RECONSTRUCT.F
 mnewt.F
 surf_plane.F90

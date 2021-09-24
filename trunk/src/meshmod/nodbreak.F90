@@ -30,6 +30,12 @@ subroutine nodbreak(Nod,Kref,Iact)
  7001 format('nodbreak: Nod,Kref,Iact = ',i6,2x,i4,2x,l2)
    endif
 #endif
+   select case(NODES(Nod)%type)
+   case('medg','mdlt','mdlq','mdlb','mdlp','mdln','mdld')
+   case default
+     write(*,*) 'Nodbreak: Nod,NODES(Nod)%type = ',Nod,NODES(Nod)%type
+     call result
+   end select
 !
 !..record refinement kind
    NODES(Nod)%ref_kind=Kref

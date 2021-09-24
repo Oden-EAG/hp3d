@@ -83,6 +83,8 @@ c  ...copy dof's into the local arrays
       do j=1,nrnodm
         call dof_out(nodm(j), kH,kE,kV,kQ,zvalH,zvalE,zvalV,zdofQ)
       enddo
+cc      write(*,*) 'solelm: zvalH = '
+cc      write(*,*) zvalH(1,1:nrdoflH)
 c
 c  ...initiate the dof
       ZdofH(1:MAXEQNH,1:nrdoflH) = ZERO

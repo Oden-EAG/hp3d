@@ -599,6 +599,9 @@ IF (.NOT. QUIET_MODE) write(*,*)''
 !  ...if needed, a geometry customization routine could be called HERE
 !     call customize_geometry
 !///////////////////////////////////////////////////////////////////////
+!  ...the following routine is used to test orientations
+      call change_orientations
+!///////////////////////////////////////////////////////////////////////
 !
 !  ...complete full connectivities
       call connect
