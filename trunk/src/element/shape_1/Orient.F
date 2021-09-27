@@ -25,6 +25,9 @@ c     ...Nori=0 => (s0,s1)->(s0,s1)
 c     ...Nori=1 => (s0,s1)->(s1,s0)
          case(1)
             Or(0) = 1; Or(1) = 0
+         case default
+            write(*,*) "Error: invalid orientation in OrientE"
+            stop 1
       end select
 c
 c  ...Local-to-global transformation
@@ -142,6 +145,9 @@ c     ...Nori=4 => (s0,s1,s2)->(s1,s0,s2)
 c     ...Nori=5 => (s0,s1,s2)->(s2,s1,s0)
          case(5)
             Or(0) = 2; Or(1) = 1; Or(2) = 0
+         case default
+            write(*,*) "Error: invalid orientation in OrientTri"
+            stop 1
       end select
 c
 c  ...Local-to-global transformation
