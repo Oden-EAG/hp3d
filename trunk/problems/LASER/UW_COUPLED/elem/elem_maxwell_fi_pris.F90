@@ -138,8 +138,8 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !..load vector for the enriched space
    complex(8) :: bload_E(NrTest)
 !
-!..Gram matrix in packed format
-   complex(8), allocatable :: gramP(:)
+!..Gram matrix in full format
+   complex(8), allocatable :: gramT(:,:)
 !
 !..matrices for transpose filling (swapped loops)
    complex(8), allocatable :: stiff_EE_T(:,:),stiff_EQ_T(:,:)
@@ -180,6 +180,8 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
 !..OMEGA_RATIO_SIGNAL or OMEGA_RATIO_PUMP
    real(8) :: OMEGA_RATIO_FLD
+!..WAVENUM_SIGNAL or WAVENUM_PUMP
+   real(8) :: WAVENUM_FLD,WAVENUM_AUX
 !
 !..for PML
    complex(8) :: zbeta,zdbeta,zd2beta,detJstretch
@@ -223,7 +225,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    integer, allocatable :: mapEE(:),mapQQ(:)
 !
 !..timer
-!   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: MPI_Wtime,start_time,end_time
 !
    integer, dimension(3,3) :: deltak
 !
@@ -250,7 +252,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 #endif
 !
 !..allocate matrices
-   allocate(gramP(NrTest*(NrTest+1)/2))
+   allocate(gramT(NrTest,NrTest))
    allocate(stiff_EE_T(2*NrdofEi,NrTest))
    allocate(stiff_EQ_T(6*NrdofQ ,NrTest))
 !
@@ -361,25 +363,29 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
 !..clear space for auxiliary matrices
    bload_E    = ZERO
-   gramP      = ZERO
+   gramT      = ZERO
    stiff_EE_T = ZERO
    stiff_EQ_T = ZERO
 !
-!..set OMEGA_RATIO_FLD
+!..set OMEGA_RATIO_FLD and WAVENUM_FLD
    select case(Fld_flag)
       case(0)
          OMEGA_RATIO_FLD = OMEGA_RATIO_PUMP
+         WAVENUM_FLD     = WAVENUM_PUMP
       case(1)
          OMEGA_RATIO_FLD = OMEGA_RATIO_SIGNAL ! 1.0d0
+         WAVENUM_FLD     = WAVENUM_SIGNAL
       case default
-      write(*,*) 'elem_maxwell_fi_pris: invalid Fld_flag param. stop.'
+      write(*,*) 'elem_maxwell: invalid Fld_flag param. stop.'
          stop
    end select
+   WAVENUM_AUX = WAVENUM_FLD
 !
 !..initialize PML matrices
    Jstretch = ZERO
    Jstretch(1,1) = ZONE
    Jstretch(2,2) = ZONE
+   detJstretch = ZONE
 !
    invJstretch = ZERO
    invJstretch(1,1) = ZONE
@@ -463,7 +469,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    allocate(LOADE(3,(nrdofE12+nrdofH12)))
 !
 !..start timer
-!   start_time = MPI_Wtime()
+   start_time = MPI_Wtime()
 !
 !..Loop over quadrature points in direction \xi_1
    do pz=1,nintz
@@ -624,6 +630,13 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
             JJstretch = detJstretch*JJstretch
          endif
 !
+!     ...Modify envelope wavenumber inside PML
+         if (ENVELOPE) then
+            WAVENUM_FLD = WAVENUM_AUX
+            if (x(3).gt.PML_REGION) WAVENUM_FLD = 0.d0
+         endif
+!
+!
 !     ...PML stretching
          zaJ(1,1) = JJstretch(1,1)*za(1,1)
          zaJ(2,2) = JJstretch(2,2)*za(2,2)
@@ -729,7 +742,6 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                do b=1,3
                   do a=1,3
 !
-! Note E terms have a lot of 0s so we only compute if non-zero
 !                 ...Accumulate for EE terms
 !                    ...For EE11
                         AUXEE_zb(a,b,k12) = AUXEE_zb(a,b,k12)     &
@@ -767,6 +779,29 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                   enddo
 !           ...loop b ends
                enddo
+!
+!        ...Assemble addtional terms for vectorial envelope model
+            if (ENVELOPE) then
+!           ...ik(e_z x F_i, curl F_j)
+
+!           ...k^2(e_z x F_i, e_z x F_j)
+
+!           ...-ik(curl F_i, e_z x F_j)
+
+
+!           ...ik(iωε F_i, e_z x G_j)
+
+!           ...ik(e_z x F_i, (iωμ)^* G_j)
+
+
+!              ...-ik (e_z x G_i, (iωε)^* F_j)
+
+!              ...-ik (iωμ G_i, e_z x F_j)
+
+
+            endif
+
+
 !        ...loop over 2D test function ends
             enddo
 !
@@ -787,6 +822,26 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !                 ...Curl
                      STIFQC(a,b,k12) = STIFQC(a,b,k12)                     &
                            + Q12(j12)*dxdxi(b,a)*C12(a,i12)
+
+!!...additional stiffness contribution if solving vectorial envelope equation
+!      if (ENVELOPE) then
+!!           ...-ik(e_z x H,F), where e_z x H = (-H_y,H_x,0), or
+!!           ...+ik(H,e_z x F), where e_z x F = (-F_y,F_x,0)
+!         m = (k2-1)*6+4
+!         stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + ZI*WAVENUM_FLD*detJstretch*fldH(1)*rotF(1)*weight
+!         m = (k2-1)*6+5
+!         stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + ZI*WAVENUM_FLD*detJstretch*fldH(2)*rotF(2)*weight
+!      endif
+
+!!        ...additional stiffness contribution if solving vectorial envelope equation
+!            if (ENVELOPE) then
+!!           ...-ik(e_z x E,G), where e_z x E = (-E_y,E_x,0), or
+!!           ...+ik(E,e_z x G), where e_z x G = (-G_y,G_x,0)
+!               m = (k2-1)*6+1
+!               stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + ZI*WAVENUM_FLD*detJstretch*fldE(1)*rotG(1)*weight
+!               m = (k2-1)*6+2
+!               stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + ZI*WAVENUM_FLD*detJstretch*fldE(2)*rotG(2)*weight
+!            endif
                   enddo
                enddo
 !
@@ -847,14 +902,14 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                         m2 = mapEE(j3 + (j12-nrdofE12-1)*(nrdofH3-1) + nrdofE12*nrdofH3)
                      endif
 !
+! If m1 > m2, switch, later do a post-processing that conjugates all the fliped ones
                      if (m1.le.m2) then
                         if (j3mod.le.nrdofH3) then
                            do b=1,3
                               do a=1,3
 !                             ...Sum EE_11 and CC_11 terms
-                                 kk = nk(2*m1-1,2*m2-1)
-!
-                                 gramP(kk) = gramP(kk)                    &
+                                 k1 = 2*m1-1; k2 = 2*m2-1;
+                                 gramT(k2,k1) = gramT(k2,k1)              &
                                     + AUXEE_zb(a,b,k12)                   &
                                        * shapeH3(sa,i3mod)                &
                                        * shapeH3(sb,j3mod)                &
@@ -863,8 +918,8 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                                        * shapeH3(2-deltak(b,3)*fb,j3mod)
 !
 !                             ...Sum CE and EC terms
-                                 kk = nk(2*m1-1,2*m2)
-                                 gramP(kk) = gramP(kk)                    &
+                                 k1 = 2*m1-1; k2 = 2*m2;
+                                 gramT(k2,k1) = gramT(k2,k1)              &
                                     + AUXCE_zc(a,b,k12)                   &
                                        * shapeH3(2-deltak(a,3)*fa,i3mod)  &
                                        * shapeH3(sb,j3mod)                &
@@ -874,8 +929,8 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
 !                             ...Sum other CE and EC terms
                                  if (m1.ne.m2) then
-                                    kk = nk(2*m1  ,2*m2-1)
-                                    gramP(kk) = gramP(kk)                    &
+                                    k1 = 2*m1; k2 = 2*m2-1;
+                                    gramT(k2,k1) = gramT(k2,k1)              &
                                        + AUXCE_zb(a,b,k12)                   &
                                           * shapeH3(2-deltak(a,3)*fa,i3mod)  &
                                           * shapeH3(sb,j3mod)                &
@@ -885,8 +940,8 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                                  endif
 !
 !                             ...Sum EE_22 and CC_22 terms
-                                 kk = nk(2*m1  ,2*m2  )
-                                 gramP(kk) = gramP(kk)                    &
+                                 k1 = 2*m1; k2 = 2*m2;
+                                 gramT(k2,k1) = gramT(k2,k1)              &
                                     + AUXEE_zc(a,b,k12)                   &
                                        * shapeH3(sa,i3mod)                &
                                        * shapeH3(sb,j3mod)                &
@@ -959,14 +1014,13 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !..end loop over z direction quadrature points
    enddo
 !
+write(*,*) 'Interior:'
 !..end timer
-!   end_time = MPI_Wtime()
-!   !$OMP CRITICAL
-!      !write(*,10) etype, end_time-start_time
-!      write(*,11) end_time-start_time
-!! 10   format(A,' elem : ',f12.5,'  seconds')
-! 11   format(f12.5)
-!   !$OMP END CRITICAL
+   end_time = MPI_Wtime()
+   !$OMP CRITICAL
+      write(*,11) end_time-start_time
+   !$OMP END CRITICAL
+11   format(f12.5)
 !
    deallocate(mapEE,mapQQ)
    deallocate(shapeH3,E12,C12,Q12)
@@ -989,6 +1043,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
+start_time = MPI_Wtime()
 !..loop through element faces
    do ifc=1,nrf
 !
@@ -1113,6 +1168,12 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
       enddo
 !..end loop through faces
    enddo
+write(*,*) 'Boundary:'
+end_time = MPI_Wtime()
+!$OMP CRITICAL
+   write(*,11) end_time-start_time
+!$OMP END CRITICAL
+start_time = MPI_Wtime()
 !
 !----------------------------------------------------------------------
 !      Construction of the DPG system
@@ -1130,26 +1191,31 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    deallocate(stiff_EE_T,stiff_EQ_T)
 !
 !..A. Compute Cholesky factorization of Gram Matrix, G=U^*U (=LL^*)
-   call ZPPTRF('U',NrTest,gramP,info)
+   call ZPPTRF('U',NrTest,gramT,info)
    if (info.ne.0) then
       write(*,*) 'elem_maxwell_fi_pris: ZPPTRF: Mdle,info = ',Mdle,info,'. stop.'
       stop
    endif
 !
 !..B. Solve triangular system to obtain B~, (LX=) U^*X = [B|l]
-   call ZTPTRS('U','C','N',NrTest,NrTrial+1,gramP,stiff_ALL,NrTest,info)
+   call ZTRTRS('U','C','N',NrTest,NrTrial+1,gramT,NrTest,stiff_ALL,NrTest,info)
    if (info.ne.0) then
-      write(*,*) 'elem_maxwell_fi_pris: ZTPTRS: Mdle,info = ',Mdle,info,'. stop.'
+      write(*,*) 'elem_maxwell_fi_pris: ZTRTRS: Mdle,info = ',Mdle,info,'. stop.'
       stop
    endif
 !
-   deallocate(gramP)
+   deallocate(gramT)
    allocate(zaloc(NrTrial+1,NrTrial+1)); zaloc = ZERO
 !
 !..C. Matrix multiply: B^* G^-1 B (=B~^* B~)
    call ZHERK('U','C',NrTrial+1,NrTest,ZONE,stiff_ALL,NrTest,ZERO,zaloc,NrTrial+1)
 !
    deallocate(stiff_ALL)
+write(*,*) 'LA:'
+end_time = MPI_Wtime()
+!$OMP CRITICAL
+   write(*,11) end_time-start_time
+!$OMP END CRITICAL
 !
 !..D. Fill lower triangular part of Hermitian matrix
    do i=1,NrTrial

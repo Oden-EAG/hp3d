@@ -238,7 +238,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    real(8), dimension(MAXPP+1,MAXPP+1) :: sH2p,sH3p,dsH2p,dsH3p
 !
 !..timer
-!   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: MPI_Wtime,start_time,end_time
 !
    integer, dimension(3,3) :: deltak
 !
@@ -471,7 +471,8 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    xip=ZERO
 !
 !..start timer
-!   start_time = MPI_Wtime()
+write(*,*) 'Hexa:'
+   start_time = MPI_Wtime()
 !
 !..Loop over quadrature points in direction \xi_1
    do px=1,nintx
@@ -1308,13 +1309,13 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    enddo
 !
 !..end timer
-!   end_time = MPI_Wtime()
-!   !$OMP CRITICAL
-!      !write(*,10) etype, end_time-start_time
-!      write(*,11) end_time-start_time
-!! 10   format(A,' elem : ',f12.5,'  seconds')
-! 11   format(f12.5)
-!   !$OMP END CRITICAL
+write(*,*) 'Interior:'
+   end_time = MPI_Wtime()
+   !$OMP CRITICAL
+      write(*,11) end_time-start_time
+   !$OMP END CRITICAL
+11   format(f12.5)
+start_time = MPI_Wtime()
 !
    deallocate(AUXEE_A_zb,AUXEE_A_zc)
    deallocate(AUXEE_B_zb,AUXEE_B_zc)
@@ -1505,6 +1506,12 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
       enddo
 !..end loop through faces
    enddo
+write(*,*) 'Boundary:'
+end_time = MPI_Wtime()
+!$OMP CRITICAL
+   write(*,11) end_time-start_time
+!$OMP END CRITICAL
+start_time = MPI_Wtime()
 !
    deallocate(idxEE)
 !
@@ -1549,6 +1556,12 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    do i=1,NrTrial
       zaloc(i+1:NrTrial+1,i) = conjg(zaloc(i,i+1:NrTrial+1))
    enddo
+!
+write(*,*) 'LA:'
+end_time = MPI_Wtime()
+!$OMP CRITICAL
+   write(*,11) end_time-start_time
+!$OMP END CRITICAL
 !
 !..E. Fill ALOC and BLOC matrices
    ZblocE(1:j1) = zaloc(1:j1,j1+j2+1)
