@@ -133,7 +133,10 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    real(8) , dimension(3,MAXbrickEE) :: curlEE
 !
 !..nrdof for interface only (without bubbles)
-   !integer :: nrdofEEi
+   integer :: nrdofEEi
+!
+!..element mdle node dof
+   integer :: ndofHHmdl,ndofEEmdl,ndofVVmdl,ndofQQmdl
 !
 !..load vector for the enriched space
    complex(8) :: bload_E(NrTest)
@@ -215,6 +218,10 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    real(8) :: wloc_xy(MAXNINT2ADD), wloc_z(MAXPP+1)
    real(8), dimension(3,MAXNINT3ADD) :: wloc3
    real(8), dimension(3) :: xip,dHdx,dHHdx
+   integer(8) :: ifam,jfam
+   integer(8) :: aE(2),bE(2),aC(2),bC(2)
+   integer(8) :: iOffset,jOffset
+   integer(8) :: famE(2,2),famC(2,2),famOffset(2),Nfam(2)
 !
    real(8)   , dimension(3,3) :: D_za,D_zc,D_aux,C,D
    complex(8), dimension(3,3) :: Z_za,Z_zc,Z_aux
@@ -331,6 +338,21 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
          write(*,*) 'elem_maxwell_fi_pris: unexpected element type:', etype
             stop
    end select
+!
+!
+
+
+
+
+   famE(:,1) = (/1,2/)
+   famE(:,2) = (/3,3/)
+   famC(:,1) = (/1,3/)
+   famC(:,2) = (/1,2/)
+   famOffset = (/0,nrdofE12/)
+   Nfam = (/nrdofE12,nrdofH12/)
+
+
+
 !
 !..determine edge and face orientations
    call find_orient(Mdle, norient_edge,norient_face)
@@ -729,56 +751,75 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !        ... For stiffness matrix:
 !        ... L2    TRIAL functions will be identified by indices j12,j3,b
 !--------------------------------------------------------------------------
-!
-!     ...Integration of innermost integrals for Gram matrix
-!     ...loop over 2D tri test function, Hcurl
-         do i12=1,(nrdofE12+nrdofH12)
-!        ...loop over 2D DOFs, coord. 12, test shape func Hcurl
-            do j12=1,(nrdofE12+nrdofH12)
-!           ...combine indices i12 and j12 into k12
-               k12 = (i12-1)*(nrdofE12+nrdofH12) + j12
-!
-!           ...loop over vector components
-               do b=1,3
-                  do a=1,3
-!
-!                 ...Accumulate for EE terms
-!                    ...For EE11
+!     ...loop over 2D tri test function families, Hcurl
+         do ifam=1,2
+            do i12=1,Nfam(ifam)
+               aE(1:2) = famE(1:2,ifam)
+               aC(1:2) = famC(1:2,ifam)
+               do jfam=ifam,2
+                  do j12=1,Nfam(ifam)
+                     bE(1:2) = famE(1:2,jfam)
+                     bC(1:2) = famC(1:2,jfam)
+                     k12 = (i12+iOffset-1)*(nrdofE12+nrdofH12) + j12 + jOffset
+!!
+!!        ...loop over 2D DOFs, coord. 12, test shape func Hcurl
+!            do j12=i12,(nrdofE12+nrdofH12)
+!!           ...combine indices i12 and j12 into k12
+!               k12 = (i12-1)*(nrdofE12+nrdofH12) + j12
+
+!           ...Accumulate for EE terms
+!              ...For EE11
+                  do b=bE(1),bE(2)
+                     do a=aE(1),aE(2)
                         AUXEE_zb(a,b,k12) = AUXEE_zb(a,b,k12)     &
                               + (ALPHA_NORM*D(a,b) + D_za(a,b))   &
                               * E12(a,i12)*E12(b,j12)
-!                    ...For EE22
-                        AUXEE_zc(a,b,k12) = AUXEE_zc(a,b,k12)     &
-                              + (ALPHA_NORM*D(a,b) + D_zc(a,b))   &
-                              * E12(a,i12)*E12(b,j12)
+                     enddo
+                  enddo
+!              ...For EE22
+                  do b=bE(1),bE(2)
+                     do a=aE(1),aE(2)
+                           AUXEE_zc(a,b,k12) = AUXEE_zc(a,b,k12)     &
+                                 + (ALPHA_NORM*D(a,b) + D_zc(a,b))   &
+                                 * E12(a,i12)*E12(b,j12)
+                     enddo
+                  enddo
 !
-!                 ...Accumulate for EC terms
-                     AUXEC_zb(a,b,k12) = AUXEC_zb(a,b,k12)        &
-                           - Z_za(a,b)                            &
-                           * E12(a,i12)*C12(b,j12)*wt123
+!           ...Accumulate for EC terms
+!              ...For za terms (epsilon)
+                  do b=bC(1),bC(2)
+                     do a=aE(1),aE(2)
+                        AUXEC_zb(a,b,k12) = AUXEC_zb(a,b,k12)        &
+                              - Z_za(a,b)                            &
+                              * E12(a,i12)*C12(b,j12)*wt123
+                     enddo
+                  enddo
+!              ...For zc terms (mu)
+                  do b=bC(1),bC(2)
+                     do a=aE(1),aE(2)
+                        AUXEC_zc(a,b,k12) = AUXEC_zc(a,b,k12)        &
+                              + Z_zc(a,b)                            &
+                              * E12(a,i12)*C12(b,j12)*wt123
+                     enddo
+                  enddo
 !
-                     AUXEC_zc(a,b,k12) = AUXEC_zc(a,b,k12)        &
-                           + Z_zc(a,b)                            &
-                           * E12(a,i12)*C12(b,j12)*wt123
-!
-!                 ...Accumulate for CC terms
+!           ...Accumulate for CC terms
+               do b=bC(1),bC(2)
+                  do a=aC(1),aC(2)
                      AUXCC(a,b,k12) = AUXCC(a,b,k12)                 &
                            + C12(a,i12)*C12(b,j12)*C(a,b)
+                  enddo
+               enddo
 !
 !                 ...Accumulate for CE terms
-!                    (Z_za and Z_zc indices are switched here b/c we need the transpose)
-                     AUXCE_zb(a,b,k12) = AUXCE_zb(a,b,k12)        &
-                           - conjg(Z_za(b,a))                     &
-                           * C12(a,i12)*E12(b,j12)*wt123
+!!                    (Z_za and Z_zc indices are switched here b/c we need the transpose)
+!                     AUXCE_zb(a,b,k12) = AUXCE_zb(a,b,k12)        &
+!                           - conjg(Z_za(b,a))                     &
+!                           * C12(a,i12)*E12(b,j12)*wt123
 !
-                     AUXCE_zc(a,b,k12) = AUXCE_zc(a,b,k12)        &
-                           + conjg(Z_zc(b,a))                     &
-                           * C12(a,i12)*E12(b,j12)*wt123
-!
-!              ...loop a ends
-                  enddo
-!           ...loop b ends
-               enddo
+!                     AUXCE_zc(a,b,k12) = AUXCE_zc(a,b,k12)        &
+!                           + conjg(Z_zc(b,a))                     &
+!                           * C12(a,i12)*E12(b,j12)*wt123
 !
 !        ...Assemble addtional terms for vectorial envelope model
             if (ENVELOPE) then
@@ -804,24 +845,37 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 
 !        ...loop over 2D test function ends
             enddo
+         enddo
 !
 ! ------------ Assemble Aux Stiffness Matrix --------------
 !        ...Loop over 2D trial function
             do j12=1,nrdofQ12
-               k12 = (i12-1)*nrdofQ12 + j12
+               k12 = (i12+iOffset-1)*nrdofQ12 + j12
                do b=1,3
                   do a=1,3
                      STIFQE(a,b,k12) = STIFQE(a,b,k12)                  &
                            + (dxidx(a,b)*Q12(j12))                      &
                            * zcJ(b,b)                                   &
                            * E12(a,i12)
+                  enddo
+               enddo
+
+               do b=1,3
+                  do a=1,3
                      STIFQE_ALPHA(a,b,k12) = STIFQE_ALPHA(a,b,k12)      &
                            - (dxidx(a,b)*Q12(j12))                      &
                            * zaJ(b,b)                                   &
                            * E12(a,i12)
-!                 ...Curl
-                     STIFQC(a,b,k12) = STIFQC(a,b,k12)                     &
+                  enddo
+               enddo
+
+!           ...Curl
+               do b=1,3
+                  do a=1,3
+                     STIFQC(a,b,k12) = STIFQC(a,b,k12)                  &
                            + Q12(j12)*dxdxi(b,a)*C12(a,i12)
+                  enddo
+               enddo
 
 !!...additional stiffness contribution if solving vectorial envelope equation
 !      if (ENVELOPE) then
@@ -842,20 +896,19 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !               m = (k2-1)*6+2
 !               stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + ZI*WAVENUM_FLD*detJstretch*fldE(2)*rotG(2)*weight
 !            endif
-                  enddo
-               enddo
 !
 !        ...loop over 2D trial function ends
             enddo
 !
 ! ------------ Assemble Aux Load Vector --------------
             do a=1,3
-               LOADE(a,i12) = LOADE(a,i12)                              &
+               LOADE(a,i12+iOffset) = LOADE(a,i12+iOffset)              &
                      + ( dxidx(a,1)*zJ(1)+                              &
                          dxidx(a,2)*zJ(2)+                              &
                          dxidx(a,3)*zJ(3) )                             &
                      * E12(a,i12)*rjac
             enddo
+         enddo
 !
 !     ...loop over 2D test function ends
          enddo
@@ -886,9 +939,9 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
             if (i3mod.le.nrdofH3) then
 !
 !           ...Loop 2 over 1D test functions
-               do j3=1,nrdofH3
+               do j3=i3,nrdofH3
 !              ...Loop 2 over 2D test functions
-                  do j12=1,(nrdofE12+nrdofH12)
+                  do j12=i12,(nrdofE12+nrdofH12)
                      k12 = (i12-1)*(nrdofE12+nrdofH12) + j12
 !
 !                 ...Switch between shape functions families
@@ -903,63 +956,100 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                      endif
 !
 ! If m1 > m2, switch, later do a post-processing that conjugates all the fliped ones
-                     if (m1.le.m2) then
-                        if (j3mod.le.nrdofH3) then
+                     if (m1.gt.m2) call swap(m1,m2)
+
+
+                     if (j3mod.le.nrdofH3) then
+!                    ...Sum EE_11 and CC_11 terms
+                        k1 = 2*m1-1; k2 = 2*m2-1;
+                        do b=1,3
+                           do a=1,3
+                              gramT(k2,k1) = gramT(k2,k1)              &
+                                 + AUXEE_zb(a,b,k12)                   &
+                                    * shapeH3(sa,i3mod)                &
+                                    * shapeH3(sb,j3mod)                &
+                                 + AUXCC(a,b,k12)                      &
+                                    * shapeH3(2-deltak(a,3)*fa,i3mod)  &
+                                    * shapeH3(2-deltak(b,3)*fb,j3mod)
+                           enddo
+                        enddo
+!
+!                    ...Sum EC and CE terms (note CE is conj of EC)
+                        k1 = 2*m1-1; k2 = 2*m2;
+                        do b=1,3
+                           do a=1,3
+                              gramT(k2,k1) = gramT(k2,k1)              &
+                                 + conjg(AUXEC_zc(a,b,k12))            &
+                                    * shapeH3(2-deltak(a,3)*fa,i3mod)  &
+                                    * shapeH3(sb,j3mod)                &
+                                 + AUXEC_zb(a,b,k12)                   &
+                                    * shapeH3(sa,i3mod)                &
+                                    * shapeH3(2-deltak(b,3)*fb,j3mod)
+                           enddo
+                        enddo
+!
+!                    ...Sum other CE and EC terms (note CE is conj of EC)
+                        if (m1.ne.m2) then
+                           k1 = 2*m1; k2 = 2*m2-1;
                            do b=1,3
                               do a=1,3
-!                             ...Sum EE_11 and CC_11 terms
-                                 k1 = 2*m1-1; k2 = 2*m2-1;
                                  gramT(k2,k1) = gramT(k2,k1)              &
-                                    + AUXEE_zb(a,b,k12)                   &
-                                       * shapeH3(sa,i3mod)                &
-                                       * shapeH3(sb,j3mod)                &
-                                    + AUXCC(a,b,k12)                      &
-                                       * shapeH3(2-deltak(a,3)*fa,i3mod)  &
-                                       * shapeH3(2-deltak(b,3)*fb,j3mod)
-!
-!                             ...Sum CE and EC terms
-                                 k1 = 2*m1-1; k2 = 2*m2;
-                                 gramT(k2,k1) = gramT(k2,k1)              &
-                                    + AUXCE_zc(a,b,k12)                   &
-                                       * shapeH3(2-deltak(a,3)*fa,i3mod)  &
-                                       * shapeH3(sb,j3mod)                &
                                     + AUXEC_zb(a,b,k12)                   &
-                                       * shapeH3(sa,i3mod)                &
-                                       * shapeH3(2-deltak(b,3)*fb,j3mod)
-!
-!                             ...Sum other CE and EC terms
-                                 if (m1.ne.m2) then
-                                    k1 = 2*m1; k2 = 2*m2-1;
-                                    gramT(k2,k1) = gramT(k2,k1)              &
-                                       + AUXCE_zb(a,b,k12)                   &
-                                          * shapeH3(2-deltak(a,3)*fa,i3mod)  &
-                                          * shapeH3(sb,j3mod)                &
-                                       + AUXEC_zc(a,b,k12)                   &
-                                          * shapeH3(sa,i3mod)                &
-                                          * shapeH3(2-deltak(b,3)*fb,j3mod)
-                                 endif
-!
-!                             ...Sum EE_22 and CC_22 terms
-                                 k1 = 2*m1; k2 = 2*m2;
-                                 gramT(k2,k1) = gramT(k2,k1)              &
-                                    + AUXEE_zc(a,b,k12)                   &
-                                       * shapeH3(sa,i3mod)                &
-                                       * shapeH3(sb,j3mod)                &
-                                    + AUXCC(a,b,k12)                      &
                                        * shapeH3(2-deltak(a,3)*fa,i3mod)  &
+                                       * shapeH3(sb,j3mod)                &
+                                    + conjg(AUXEC_zc(a,b,k12))            &
+                                       * shapeH3(sa,i3mod)                &
                                        * shapeH3(2-deltak(b,3)*fb,j3mod)
-!                          ...end loop a
                               enddo
-!                       ...end loop b
                            enddo
                         endif
+!
+!                    ...Sum EE_22 and CC_22 terms
+                        k1 = 2*m1; k2 = 2*m2;
+                        do b=1,3
+                           do a=1,3
+                              gramT(k2,k1) = gramT(k2,k1)              &
+                                 + AUXEE_zc(a,b,k12)                   &
+                                    * shapeH3(sa,i3mod)                &
+                                    * shapeH3(sb,j3mod)                &
+                                 + AUXCC(a,b,k12)                      &
+                                    * shapeH3(2-deltak(a,3)*fa,i3mod)  &
+                                    * shapeH3(2-deltak(b,3)*fb,j3mod)
+                           enddo
+                        enddo
+
                      endif
 !              ...end loop 2 over 2D test functions
                   enddo
 !           ...end loop 2 over 1D test functions
                enddo
+            endif
+!     ...end loop 1 over 2D test functions
+         enddo
+!  ...end loop 1 over 1D test functions
+      enddo
 !
-!           ...Assemble Stiffness Matrix
+!
+!  ...Assemble Stiffness Matrix
+!     (note we restart test loop here since we may have swapped m1 and m2 above)
+!  ...Loop 1 over 1D test functions
+      do i3=1,nrdofH3
+!     ...Loop 1 over 2D test functions
+         do i12=1,(nrdofE12+nrdofH12)
+
+!        ...Switch between shape functions families
+            if (i12 .le. nrdofE12) then
+!           ...Parameters i3,sa,fa, switch between fn value or deriv
+               i3mod = i3; sa = 1; fa = 1
+               m1 = mapEE(i3 + (i12-1)*nrdofH3)
+            else
+               if (i3 .eq. nrdofH3) exit
+               i3mod = i3 + 1; sa = 2; fa = 0
+               m1 = mapEE(i3 + (i12-nrdofE12-1)*(nrdofH3-1) + nrdofE12*nrdofH3)
+            endif
+!
+            if (i3mod.le.nrdofH3) then
+!
 !           ...Loop over 1D trial functions
                do j3=1,nrdofQ3
 !              ...Loop over 2D trial functions
@@ -967,35 +1057,47 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                      k12 = (i12-1)*nrdofQ12 + j12
                      m2 = mapQQ(j3 + (j12-1)*nrdofQ3)
                      j3mod = j3 + 1
+                     
+!                 ...accumulate QC terms
                      do b=1,3
+                        k = (m2-1)*6 + 3 + b
                         do a=1,3
-!                       ...accumulate QC terms
-                           k = (m2-1)*6 + 3 + b
                            stiff_EQ_T(k,2*m1-1) = stiff_EQ_T(k,2*m1-1)     &
                                  + STIFQC(a,b,k12)*shapeH3(2,j3mod)           &
                                  * shapeH3(2-deltak(a,3)*fa,i3mod)
+                        enddo
+                     enddo
 !
-!                       ...accumulate QE terms
-                           k = (m2-1)*6 + b
+!                 ...accumulate QE terms
+                     do b=1,3
+                        k = (m2-1)*6 + b
+                        do a=1,3
                            stiff_EQ_T(k,2*m1-1) = stiff_EQ_T(k,2*m1-1)     &
                                  + STIFQE_ALPHA(a,b,k12)                   &
                                  * shapeH3(sa,i3mod)*shapeH3(2,j3mod)
+                        enddo
+                     enddo
 !
-!                       ...accumulate QE terms
-                           k = (m2-1)*6 + 3 + b
+!                 ...accumulate QE terms
+                     do b=1,3
+                        k = (m2-1)*6 + 3 + b
+                        do a=1,3
                            stiff_EQ_T(k,2*m1) = stiff_EQ_T(k,2*m1)         &
                                  + STIFQE(a,b,k12)                         &
                                  * shapeH3(sa,i3mod)*shapeH3(2,j3mod)
+                        enddo
+                     enddo
 !
-!                       ...accumulate QC terms
-                           k = (m2-1)*6 + b
+!                 ...accumulate QC terms
+                     do b=1,3
+                        k = (m2-1)*6 + b
+                        do a=1,3
                            stiff_EQ_T(k,2*m1) = stiff_EQ_T(k,2*m1)         &
                                  + STIFQC(a,b,k12)*shapeH3(2,j3mod)        &
                                  * shapeH3(2-deltak(a,3)*fa,i3mod)
-!                    ...end loop a
                         enddo
-!                 ...end loop b
                      enddo
+!
 !              ...end loop over 2D trial functions
                   enddo
 !           ...end loop over 1D trial functions
@@ -1006,6 +1108,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                   bload_E(2*m1-1) = bload_E(2*m1-1)                     &
                                   + LOADE(a,i12)*shapeH3(sa,i3mod)
                enddo
+!
             endif
 !     ...end loop 1 over 2D test functions
          enddo
@@ -1022,7 +1125,22 @@ write(*,*) 'Interior:'
    !$OMP END CRITICAL
 11   format(f12.5)
 !
-   deallocate(mapEE,mapQQ)
+! Post process Gram to get conjugates correct
+   do i = 1,NrdofEE
+      m1 = mapEE(i)
+      do j = i,NrdofEE
+         m2 = mapEE(j)
+         if (m1.gt.m2) then
+            k1 = 2*m1-1; k2 = 2*m2-1;
+            GramT(k2,k1) = conjg(GramT(k2,k1));
+            GramT(k2+1,k1) = conjg(GramT(k2+1,k1));
+            GramT(k2,k1+1) = conjg(GramT(k2,k1+1));
+            GramT(k2+1,k1+1) = conjg(GramT(k2+1,k1+1));
+         endif
+      enddo
+   enddo
+!
+   deallocate(mapQQ)
    deallocate(shapeH3,E12,C12,Q12)
    deallocate(sH12,gH12,sE12,cE12,sQ12)
 !
@@ -1044,6 +1162,11 @@ write(*,*) 'Interior:'
 !-----------------------------------------------------------------------
 !
 start_time = MPI_Wtime()
+!
+   call ndof_nod(etype,nordP, ndofHHmdl,ndofEEmdl,ndofVVmdl,ndofQQmdl)
+!
+   nrdofEEi = NrdofEE-ndofEEmdl
+!
 !..loop through element faces
    do ifc=1,nrf
 !
@@ -1109,9 +1232,9 @@ start_time = MPI_Wtime()
          weight = bjac*wtloc(l)
 
 !     ...loop through Hcurl enriched test functions
-         !do ik=1,nrdofEEi
-         do k1=1,nrdofEE
-            !k1 = idxEE(ik)
+         do ik=1,nrdofEEi
+!         do k1=1,nrdofEE
+            k1 = mapEE(ik)
             E1(1:3) = shapEE(1,k1)*dxidx(1,1:3) &
                     + shapEE(2,k1)*dxidx(2,1:3) &
                     + shapEE(3,k1)*dxidx(3,1:3)
@@ -1168,6 +1291,9 @@ start_time = MPI_Wtime()
       enddo
 !..end loop through faces
    enddo
+
+   deallocate(mapEE)
+
 write(*,*) 'Boundary:'
 end_time = MPI_Wtime()
 !$OMP CRITICAL
@@ -1191,7 +1317,7 @@ start_time = MPI_Wtime()
    deallocate(stiff_EE_T,stiff_EQ_T)
 !
 !..A. Compute Cholesky factorization of Gram Matrix, G=U^*U (=LL^*)
-   call ZPPTRF('U',NrTest,gramT,info)
+   call ZPOTRF('U',NrTest,gramT,NrTest,info)
    if (info.ne.0) then
       write(*,*) 'elem_maxwell_fi_pris: ZPPTRF: Mdle,info = ',Mdle,info,'. stop.'
       stop
@@ -1396,3 +1522,18 @@ subroutine tens_hexa_ordQQ(p,q, mapQQ)
       mapQQ(i) = k
    enddo
 end subroutine tens_hexa_ordQQ
+!
+!----------------------------------------------------------------------
+! routine: swap integers
+!----------------------------------------------------------------------
+! TODO
+subroutine swap(i,j)
+
+   integer, intent(inout) :: i,j
+   integer :: temp
+
+   temp = i
+   i = j
+   j = temp
+
+end subroutine
