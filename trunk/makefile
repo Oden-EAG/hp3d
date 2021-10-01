@@ -6,7 +6,6 @@
 # Set variables if not set by m_options
 COMPLEX    ?= 0
 DEBUG      ?= 0
-J          ?= 1
 
 HP3D_USE_INTEL_MKL ?= 0
 
@@ -105,13 +104,13 @@ MK_ALL_HP3D_OBJS := $(MK_COMMON_OBJS) \
 .PHONY : lib
 
 lib :
-	@make depend;make depend;make fastlib;make install
+	@$(MAKE) depend;$(MAKE) depend;$(MAKE) fastlib;$(MAKE) install
 
 #-------------------------------------------------
 .PHONY : fast
 
 fast :
-	@make fastlib;make install
+	@$(MAKE) fastlib;$(MAKE) install
 
 #-------------------------------------------------
 .PHONY : fastlib
@@ -119,13 +118,14 @@ fast :
 fastlib :
 	@echo " - Building HP3D Library " $(LIB_PATH)/$(HP3D_LIBNAME)
 	@echo "------------------------------------------"
-	@make -j $(J) $(HP3D_LIBNAME)
+	@$(MAKE) $(HP3D_LIBNAME)
 	@echo "------------------------------------------"
 	@echo " - Building Frontal Solver " $(FRONTAL_PATH)/$(FRONTAL_NAME)
-	@(cd $(FRONTAL_PATH) ; make -j $(J) lib); \
+	@(cd $(FRONTAL_PATH) ; $(MAKE) lib); \
 	(cp -f $(FRONTAL_PATH)/$(FRONTAL_NAME) $(LIB_PATH));
 	@echo "------------------------------------------"
 	@echo " - COMPLEX, DEBUG         :" $(COMPLEX) $(DEBUG)
+	@echo " - HP3D_USE_INTEL_MKL     :" $(HP3D_USE_INTEL_MKL)
 	@echo " - Preprocessor options   :" $(CCDEFS)
 	@echo " - HP3D Library           :" $(LIB_PATH)/$(HP3D_LIBNAME)
 	@echo " - Frontal Solver Library :" $(LIB_PATH)/$(FRONTAL_NAME)
@@ -212,8 +212,8 @@ print:
 
 clean:
 	@echo "Clean frontal solver, object files, libraries, modules and mk files"
-	@( cd ./$(SRC_PATH)/solver/frontal/base/real ; make clean )
-	@( cd ./$(SRC_PATH)/solver/frontal/base/complex ; make clean )
+	@( cd ./$(SRC_PATH)/solver/frontal/base/real ; $(MAKE) clean )
+	@( cd ./$(SRC_PATH)/solver/frontal/base/complex ; $(MAKE) clean )
 	@rm -rf $(OBJ_PATH)
 	@rm -rf $(OBJ_PATH_COMPLX) $(OBJ_PATH_REAL)
 	@rm -rf $(HP3D_PATH)

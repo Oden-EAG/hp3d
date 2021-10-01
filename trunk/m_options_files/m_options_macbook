@@ -18,10 +18,7 @@ HP3D_USE_INTEL_MKL ?= 0
 #------------------------------------------------------------------
 
 # Enable OpenMP threading
-OPENMP  ?= 0
-
-# Use parallel threads to compile libraries and problems
-J ?= 4
+OPENMP ?= 0
 
 FF = mpifort
 CC = mpicc
