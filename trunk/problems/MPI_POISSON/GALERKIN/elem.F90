@@ -177,7 +177,7 @@ subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
    do l=1,nint
 !
 !  ...coordinates and weight of this integration point
-      xi(1:3)=xiloc(1:3,l);
+      xi(1:3)=xiloc(1:3,l)
       wa=waloc(l)
 !
 ! H1 shape functions (for geometry)
