@@ -25,9 +25,6 @@ module common_prob_data
 !..User can specify parameter MAXNODS via argument list instead of input file
    integer :: MAXNODS_USER
 !
-!..MISCELLANEOUS
-   integer :: NR_RHS_PROB = 1
-!
 !..INITIAL ORDER OF APPROXIMATION
    integer :: IP
 !
@@ -35,10 +32,6 @@ module common_prob_data
    integer :: IBC_PROB
    integer, parameter :: BC_NONE        = 0
    integer, parameter :: BC_DIRICHLET   = 1
-   integer, parameter :: BC_IMPEDANCE   = 3
-   integer, parameter :: BC_CAVITY      = 4
-   integer, parameter :: BC_CAVITY_SCAT = 5
-   integer, parameter :: BC_SPHERE_SCAT = 6
 !
 !..EXACT SOLUTION
    integer :: ISOL

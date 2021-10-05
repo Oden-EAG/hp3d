@@ -72,7 +72,7 @@ subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
 !
 !..ALOC: holds local element stiffness matrices
 !..BLOC: holds local element load vectors
-   use assembly, only: ALOC,BLOC, NR_RHS
+   use assembly, only: ALOC,BLOC
    use control , only: INTEGRATION
    use physics , only: NR_PHYSA
    use data_structure3D
@@ -86,20 +86,17 @@ subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
    integer, intent(in)  :: Nrdof
    real(8), intent(out) :: Zaloc(Nrdof,Nrdof), Zbloc(Nrdof)
 !
+!-------------------------------------------------------------------------
+!
 !..aux variables
    real(8) :: rjac, fval, wa, weight, q, p
    integer :: iflag, nrv, nre, nrf
-   integer :: nrdofH, nrdofE, nrdofV, nrdofQ, nint, k1, k2, l
+   integer :: nrdofH, nint, k1, k2, l
 !
-!----------------------------------------------------------------------
-!
-   character(len=4) :: etype,ftype
+   character(len=4) :: etype
 !
 !..element order, orientation for edges and faces
    integer :: norder(19), norient_edge(12), norient_face(6)
-!
-!..face order
-   integer :: norderf(5)
 !
 !..geometry dof
    real(8) :: xnod(3,MAXbrickH)
@@ -107,17 +104,11 @@ subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
 !..geometry
 ! [
 !  xi     coordinates in reference element
-!  dxidt  d(xi) / dt
 !  x      coordinates in physical domain
 !  dxdxi  d(x) / dxi  Jacobian
 !  dxidx  d(xi) / dx  Inverse Jacobian
-!  dxdt   d(x) / dt
-!  rt     .
-!  rn     normal vec
-!  t      .
 ! ]
-   real(8) :: xi(3), dxidt(3,2), x(3), dxdxi(3,3), dxidx(3,3), dxdt(3,2)
-   real(8) :: rt(3,2), rn(3), t(2)
+   real(8) :: xi(3), x(3), dxdxi(3,3), dxidx(3,3)
 !
 !..H1 shape functions
    real(8) :: shapH(MAXbrickH), gradH(3,MAXbrickH)
@@ -127,13 +118,10 @@ subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
 !  [waloc: integration weights per integration point]
    real(8) :: xiloc(3,MAX_NINT3), waloc(MAX_NINT3)
 !
-!..2D quadrature data
-   real(8) :: tloc(2,MAX_NINT2), wtloc(MAX_NINT2)
-!
 !..workspace for trial and test variables
-   real(8) :: dq(3), u(3), dp(1:3), v(3), vec(3)
+   real(8) :: dq(3), u(3), dp(1:3)
 !
-!----------------------------------------------------------------------
+!-------------------------------------------------------------------------
 !
    Zaloc = ZERO; Zbloc = ZERO
 !
@@ -144,12 +132,12 @@ subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
    nre = nedge(etype)
    nrf = nface(etype)
 !
-   !write(*,2050) '[', RANK, '] FIND ORDER'; call pause
 !..determine order of approximation
+   !write(*,2050) '[', RANK, '] FIND ORDER'; call pause
    call find_order(Mdle, norder)
 !
-   !write(*,2050) '[', RANK, '] FIND ORIENT'; call pause
 !..determine edge and face orientations
+   !write(*,2050) '[', RANK, '] FIND ORIENT'; call pause
    call find_orient(Mdle, norient_edge,norient_face)
 !
 !..determine nodes coordinates
@@ -160,7 +148,7 @@ subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
 !     E L E M E N T    I N T E G R A L S                              |
 !----------------------------------------------------------------------
 !
-!..use the enriched order to set the quadrature
+!..set quadrature points and weights
 !  [
 !  in:
 !   Type      - element type
@@ -221,7 +209,7 @@ subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
       weight = rjac*wa
 !
 !  ...get the RHS
-      call getf(Mdle, x,fval)
+      call getf(Mdle,x, fval)
 !
 !  ...loop through H1 test functions
       do k1=1,nrdofH
@@ -235,7 +223,7 @@ subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
 !     ...accumulate for the load vector
          Zbloc(k1) = Zbloc(k1) + q*fval*weight
 !
-!     ...second loop through H1 trial functions
+!     ...loop through H1 trial functions
          do k2=1,nrdofH
 !        ...Piola transformation
             p = shapH(k2)

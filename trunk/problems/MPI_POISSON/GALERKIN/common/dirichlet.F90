@@ -16,10 +16,10 @@
 !     out:
 !             ValH      - value of the H1 solution
 !             DvalH     - corresponding first derivatives
-!             valE     - value of the H(curl) solution
-!             dvalE    - corresponding first derivatives
-!             valV     - value of the H(div) solution
-!             dvalV    - corresponding first derivatives
+!             ValE      - value of the H(curl) solution
+!             DvalE     - corresponding first derivatives
+!             ValV      - value of the H(div) solution
+!             DvalV     - corresponding first derivatives
 !
 !----------------------------------------------------------------------
 subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)

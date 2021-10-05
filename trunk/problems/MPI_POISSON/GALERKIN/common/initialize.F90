@@ -70,7 +70,7 @@ subroutine initialize
    QUIET_MODE = qtmp
 !
 !..setup equation settings based on physics data and common problem data
-   MAXNRHS_PROB = NR_RHS_PROB !from common_prob_data
+   MAXNRHS_PROB = 1
    MAXEQNH_PROB = max(1,NRHVAR) !from physics - after quietly reading physics
    MAXEQNE_PROB = max(1,NREVAR) !from physics - after quietly reading physics
    MAXEQNV_PROB = max(1,NRVVAR) !from physics - after quietly reading physics
