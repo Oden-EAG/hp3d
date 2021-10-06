@@ -1,0 +1,108 @@
+!--------------------------------------------------------------------
+!
+!     routine name      - set_initial_mesh
+!
+!--------------------------------------------------------------------
+!
+!     latest revision:  - Oct 2021
+!
+!     purpose:          - define problem dependent data
+!                         (multiphysics, BC, approximation)
+!
+!     arguments:
+!
+!     in:
+!     out:
+!           Nelem_order - order for initial mesh elements
+!
+!---------------------------------------------------------------------
+!
+   subroutine set_initial_mesh(Nelem_order)
+!
+   use GMP
+   use common_prob_data
+   use data_structure3D
+!
+   implicit none
+!
+!----------------------------------------------------------------------
+!
+   integer, intent(out) :: Nelem_order(NRELIS)
+!..BC flags
+   integer :: ibc(6,NRINDEX)
+!..miscellaneous
+   integer :: iprint,ifc,iel,neig
+!
+!------------------------------------------------------------------------------------
+!..initialize
+   iprint=1
+!
+!..check if have not exceeded the maximum order
+   if (IP.gt.MAXP) then
+      write(*,*) 'set_initial_mesh: IP, MAXP = ', IP,MAXP
+      stop
+   endif
+!
+!..set BC
+!..loop over initial mesh elements
+   do iel=1,NRELIS
+!
+!  ...set physics
+      ELEMS(iel)%nrphysics = 1
+      allocate(ELEMS(iel)%physics(1))
+      ELEMS(iel)%physics(1) ='field'
+!
+!  ...set order of approximation
+      if (IP.gt.0) then
+!     ...uniform order of approximation
+         select case(ELEMS(iel)%Type)
+            case('tetr'); Nelem_order(iel) = 1*IP
+            case('pyra'); Nelem_order(iel) = 1*IP
+            case('pris'); Nelem_order(iel) = 11*IP
+            case('bric'); Nelem_order(iel) = 111*IP
+         end select
+      else
+!     ...custom order of approximation (NOT IMPLEMENTED)
+         write(*,1003) IP
+1003     format('ERROR in set_initial_mesh: IP = ',i3)
+         stop
+      endif
+!
+!  ...set BC flags: 0 - no BC ; 1 - Dirichlet
+      ibc(1:6,1:NRINDEX) = 0
+!
+      do ifc=1,nface(ELEMS(iel)%Type)
+         neig = ELEMS(iel)%neig(ifc)
+         select case(neig)
+            case(0); ibc(ifc,1) = 1
+         end select
+      enddo
+!
+!  ...allocate BC flags (one per attribute)
+      allocate(ELEMS(iel)%bcond(1))
+!  ...encode face BC into a single BC flag
+      call encodg(ibc(1:6,1),10,6, ELEMS(iel)%bcond(1))
+!
+!  ...print order of approximation
+      if (iprint.eq.1 .and. IP.gt.0) then
+         write(*,*) '-- uniform order of approximation --'
+         write(*,999) NRELIS
+         select case(ELEMS(iel)%Type)
+            case('tetr'); write(*,1000) IP
+            case('pyra'); write(*,1000) IP
+            case('pris'); write(*,1001) IP,IP
+            case('bric'); write(*,1002) IP,IP,IP
+         end select
+         write(*,*)
+!
+ 999     format('Element# : ',i4)
+1000     format(' p = ',       i3)
+1001     format(' p, q = ',   2i3)
+1002     format(' p, q, r = ',3i3)
+      endif
+!
+!..end of loop over initial mesh elements
+   enddo
+!
+!
+end subroutine set_initial_mesh
