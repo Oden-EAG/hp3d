@@ -47,8 +47,8 @@
 
 # Other commands must follow all #SBATCH directives...
 
-# export PROFILEDIR=/work/05246/sh43394/stampede2/par_hp3d/trunk/problems/MPI_POISSON/GALERKIN/tau/profiles
-# export TRACEDIR=/work/05246/sh43394/stampede2/par_hp3d/trunk/problems/MPI_POISSON/GALERKIN/tau/traces
+# export PROFILEDIR=/work/05246/sh43394/stampede2/hp3d/trunk/problems/MAXWELL/GALERKIN/tau/profiles
+# export TRACEDIR=/work/05246/sh43394/stampede2/hp3d/trunk/problems/MAXWELL/GALERKIN/tau/traces
 # export TAU_PROFILE=1
 # export TAU_TRACE=1
 
@@ -61,10 +61,10 @@ date
 nthreads=12
 
 # Set OpenMP stack size per thread
-export KMP_STACKSIZE=64M # p=5
+export KMP_STACKSIZE=64M
 
 # Launch MPI code...
-ibrun ./maxw -job 1 -p 5 -isol 0 -imax 12 -maxnods 1025000 -nthreads ${nthreads}
+ibrun ./maxw -job 1 -p 5 -isol 0 -imax 3 -maxnods 1025000 -nthreads ${nthreads}
 
 date
 # ---------------------------------------------------
