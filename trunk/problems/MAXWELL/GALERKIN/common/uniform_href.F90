@@ -222,15 +222,12 @@ subroutine href_solve()
 !
    integer :: nsteps,count,src,ierr,i
 !
-   if (RANK .eq. ROOT) then
+   if (RANK.eq.ROOT) then
       nsteps=0
       do while (nsteps.le.0)
          write(*,*) 'Provide: number of uniform h-refinements'
          read(*,*) nsteps
       enddo
-   else
-      write(6,405) '[', RANK, '] : ','Waiting for broadcast from master...'
- 405  format(A,I4,A,A)
    endif
    count = 1; src = ROOT
    call MPI_BCAST (nsteps,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)

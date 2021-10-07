@@ -34,10 +34,8 @@
    integer :: iprint,ifc,iel,neig
 !
 !------------------------------------------------------------------------------------
-!..initialize
-   iprint=1
 !
-!..check if have not exceeded the maximum order
+!..check if exceeding the maximum order
    if (IP.gt.MAXP) then
       write(*,*) 'set_initial_mesh: IP, MAXP = ', IP,MAXP
       stop
@@ -82,24 +80,6 @@
       allocate(ELEMS(iel)%bcond(1))
 !  ...encode face BC into a single BC flag
       call encodg(ibc(1:6,1),10,6, ELEMS(iel)%bcond(1))
-!
-!  ...print order of approximation
-      if (iprint.eq.1 .and. IP.gt.0) then
-         write(*,*) '-- uniform order of approximation --'
-         write(*,999) NRELIS
-         select case(ELEMS(iel)%Type)
-            case('tetr'); write(*,1000) IP
-            case('pyra'); write(*,1000) IP
-            case('pris'); write(*,1001) IP,IP
-            case('bric'); write(*,1002) IP,IP,IP
-         end select
-         write(*,*)
-!
- 999     format('Element# : ',i4)
-1000     format(' p = ',       i3)
-1001     format(' p, q = ',   2i3)
-1002     format(' p, q, r = ',3i3)
-      endif
 !
 !..end of loop over initial mesh elements
    enddo

@@ -47,7 +47,7 @@ subroutine set_environment
    call get_option_string  &
         ('-file-refinement','Refinement files location','../../../files/ref'        ,FILE_REFINE)
 !
-!
+!..Variables relevant to this particular application
    call get_option_int     &
         ('-isol'   ,'Exact manufactured solution'         ,0,ISOL)
 !

@@ -2,7 +2,7 @@
 
 -include ../../../m_options
 
-COMPLEX         = 1
+COMPLEX        ?= 1
 DEBUG_MODE     ?= 0
 
 ifeq ($(COMPLEX),0)

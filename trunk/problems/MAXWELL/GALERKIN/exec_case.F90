@@ -46,29 +46,29 @@ subroutine exec_case(idec)
 !
 !  ...print current partition (elems)
       case(15)
-         write(*,*) 'printing current partition (elems)...'
+         if (RANK.eq.ROOT) write(*,*) 'printing current partition (elems)...'
          call print_partition
 !
 !  ...print current subdomains (nodes)
       case(16)
-         write(*,*) 'printing current subdomains (nodes)...'
+         if (RANK.eq.ROOT) write(*,*) 'printing current subdomains (nodes)...'
          call print_subd
 !
 !  ...print current partition coordinates
       case(17)
-         write(*,*) 'printing current partition coordinates...'
+         if (RANK.eq.ROOT) write(*,*) 'printing current partition coordinates...'
          call print_coord
 !
 !  ...single uniform h-refinement
       case(20)
-         write(*,*) 'global h-refinement...'
+         if (RANK.eq.ROOT) write(*,*) 'global h-refinement...'
          call global_href
          call update_gdof
          call update_Ddof
 !
 !  ...single uniform p-refinement
       case(21)
-         write(*,*) 'global p-refinement...'
+         if (RANK.eq.ROOT) write(*,*) 'global p-refinement...'
          call global_pref
          call update_gdof
          call update_Ddof
@@ -79,7 +79,7 @@ subroutine exec_case(idec)
 !
 !  ...single anisotropic h-refinement (in z)
       case(23)
-         write(*,*) 'global anisotropic h-refinement...'
+         if (RANK.eq.ROOT) write(*,*) 'global anisotropic h-refinement...'
          call global_href_aniso(0,1)
          call update_gdof
          call update_Ddof
@@ -105,73 +105,73 @@ subroutine exec_case(idec)
 !
 !  ...distribute mesh
       case(30)
-         write(*,*) 'distribute mesh...'
+         if (RANK.eq.ROOT) write(*,*) 'distribute mesh...'
          call distr_mesh
 !
 !  ...collect dofs on ROOT processor
       case(31)
-         write(*,*) 'collecting dofs on ROOT...'
+         if (RANK.eq.ROOT) write(*,*) 'collecting dofs on ROOT...'
          call collect_dofs
 !
 !  ...suggest new mesh partition (Zoltan)
       case(32)
          if (DISTRIBUTED) then
-            write(*,*) 'computing new mesh partition (Zoltan)...'
+            if (RANK.eq.ROOT) write(*,*) 'computing new mesh partition (Zoltan)...'
             call zoltan_w_partition(mdle_subd)
          else
-            write(*,*) 'distribute mesh first to use Zoltan...'
+            if (RANK.eq.ROOT) write(*,*) 'distribute mesh first to use Zoltan...'
          endif
 !
 !  ...evaluate current partition
       case(33)
          if (DISTRIBUTED) then
-            write(*,*) 'evaluating current partition...'
+            if (RANK.eq.ROOT) write(*,*) 'evaluating current partition...'
             call zoltan_w_eval
          else
-            write(*,*) 'distribute mesh first to use Zoltan...'
+            if (RANK.eq.ROOT) write(*,*) 'distribute mesh first to use Zoltan...'
          endif
 !
 !  ...run mesh verification routines
       case(35)
-         write(*,*) 'verify distributed mesh consistency...'
+         if (RANK.eq.ROOT) write(*,*) 'verify distributed mesh consistency...'
          call par_verify
 !
 !  ...solve problem with omp_mumps (OpenMP MUMPS)
       case(40)
-         write(*,*) 'calling MUMPS (MPI) solver...'
+         if (RANK.eq.ROOT) write(*,*) 'calling MUMPS (MPI) solver...'
          call par_mumps_sc('G')
 !
 !  ...solve problem with par_mumps (MPI MUMPS)
       case(41)
-         write(*,*) 'calling MUMPS (OpenMP) solver...'
+         if (RANK.eq.ROOT) write(*,*) 'calling MUMPS (OpenMP) solver...'
          call mumps_sc('G')
 !
 !  ...solve problem with pardiso (OpenMP)
       case(42)
-         write(*,*) 'calling Pardiso (OpenMP) solver...'
+         if (RANK.eq.ROOT) write(*,*) 'calling Pardiso (OpenMP) solver...'
          call pardiso_sc('G')
 !
 !  ...solve problem with Frontal solver (sequential)
       case(43)
-         write(*,*) 'calling Frontal (Seq) solver...'
+         if (RANK.eq.ROOT) write(*,*) 'calling Frontal (Seq) solver...'
          call solve1(1)
 !
 !  ...solve problem with omp_mumps (OpenMP MUMPS)
       case(44)
-         write(*,*) 'calling MUMPS (MPI) nested dissection solver...'
+         if (RANK.eq.ROOT) write(*,*) 'calling MUMPS (MPI) nested dissection solver...'
          call par_nested('G')
 !
 !  ...solve problem with PETSc solver (MPI)
       case(45)
-         write(*,*) 'calling PETSc (MPI) solver...'
+         if (RANK.eq.ROOT) write(*,*) 'calling PETSc (MPI) solver...'
          call petsc_solve('G')
 !
       case(50)
-         write(*,*) 'computing error and residual...'
+         if (RANK.eq.ROOT) write(*,*) 'computing error and residual...'
          call exact_error
 !
       case(60)
-         write(*,*) 'flushing dof'
+         if (RANK.eq.ROOT) write(*,*) 'flushing dof'
          do i=1,NRNODS
             if(associated(NODES(i)%dof)) then
                if(associated(NODES(i)%dof%coord)) then
@@ -211,7 +211,7 @@ subroutine exec_case(idec)
          call nodmod(mdle,nord)
 !
       case default
-         write(*,*) 'exec_case: unknown case...'
+         if (RANK.eq.ROOT) write(*,*) 'exec_case: unknown case...'
    end select
 !
 end subroutine exec_case

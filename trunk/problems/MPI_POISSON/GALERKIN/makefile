@@ -2,8 +2,12 @@
 
 -include ../../../m_options
 
-COMPLEX         = 0
+COMPLEX        ?= 0
 DEBUG_MODE     ?= 0
+
+ifeq ($(COMPLEX),1)
+$(error COMPLEX FLAG MUST BE 0 FOR POISSON APPLICATION)
+endif
 
 SRC_PATH        = .
 OBJ_ROOT        = _obj_

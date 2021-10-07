@@ -33,7 +33,7 @@ program main
    implicit none
 !
 !..auxiliary variables
-   integer :: i, iargs, ierr, req, ret, plen
+   integer :: i, ierr, req, ret, plen
 !
 !..OMP variables
    integer :: num_threads, omp_get_num_threads
@@ -42,10 +42,9 @@ program main
    character(MPI_MAX_PROCESSOR_NAME) :: pname
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: MPI_Wtime, start_time, end_time
 !
    character       :: arg
-   character(32)   :: args
    character(1024) :: cmd
 !
 !----------------------------------------------------------------------
@@ -69,11 +68,6 @@ program main
    call begin_environment
    call set_environment_laser
    call end_environment
-!
-!..add flags 6,7,8 to Dirichlet flag list
-   call add_dirichlet_to_list(6)
-   call add_dirichlet_to_list(7)
-   call add_dirichlet_to_list(8)
 !
 !..PML
    call set_PML

@@ -22,25 +22,43 @@ program main
    use assembly_sc, only: IPRINT_TIME
    use stc        , only: STORE_STC,HERM_STC
 !
-   use MPI        , only: MPI_COMM_WORLD
+   use MPI        , only: MPI_COMM_WORLD,MPI_BARRIER, &
+                          MPI_GET_PROCESSOR_NAME,MPI_MAX_PROCESSOR_NAME
    use mpi_param  , only: ROOT,RANK,NUM_PROCS
    use mpi_wrapper, only: mpi_w_init,mpi_w_finalize
 !
    implicit none
 !
 !..auxiliary variables
-   integer :: i, ierr, req, ret
+   integer :: i, ierr, req, ret, plen
 !
 !..OMP variables
    integer :: num_threads, omp_get_num_threads
 !
+!..MPI variables
+   character(MPI_MAX_PROCESSOR_NAME) :: pname
+!
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: MPI_Wtime, start_time, end_time
+!
+   character(1024) :: cmd
 !
 !----------------------------------------------------------------------
 !
 !..Initialize MPI environment
    call mpi_w_init
+!
+   if (RANK .eq. ROOT) then
+      write(*,*) '    =========================    '
+      write(*,*) '    Program command and args     '
+      write(*,*) '    =========================    '
+!  ...read command
+      call get_command(cmd)
+      write(*,*) trim(cmd)
+      write(*,*) '    =========================    '
+   endif
+!
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 !..Set common hp3D environment parameters (reads in options arguments)
    call begin_environment
@@ -54,6 +72,11 @@ program main
       write(6,*) '// --  MPI MAXWELL GALERKIN  -- //'
       write(6,*) '//                              //'
       write(6,*)
+#if DEBUG_MODE
+      write(*,*) '    =========================    '
+      write(*,*) '      RUNNING in DEBUG_MODE      '
+      write(*,*) '    =========================    '
+#endif
    endif
    flush(6)
 !
@@ -61,17 +84,18 @@ program main
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 !..initialize physics, geometry, etc.
+   call MPI_GET_PROCESSOR_NAME (pname,plen,ierr);
    do i = 0, NUM_PROCS-1
       if ((RANK .eq. i) .and. (RANK .eq. ROOT)) then
          write(6,*)
-         write(6,1020) "Master proc [", RANK, "], initialize.."
+         write(6,1020) "Master proc [",RANK,"] on node [",trim(pname),"]: initialize..."
          QUIET_MODE = .FALSE.
       else if ((RANK .eq. i) .and. (RANK .ne. ROOT)) then
-         write(6,1020) "Worker proc [", RANK, "], initialize.."
+         write(6,1020) "Worker proc [",RANK,"] on node [",trim(pname),"]: initialize..."
          QUIET_MODE = .TRUE.
       endif
    enddo
- 1020 format (A,I3,A)
+ 1020 format (A,I4,A,A,A)
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    call initialize
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
@@ -82,6 +106,14 @@ program main
    ISTC_FLAG = .true.
    STORE_STC = .true.
    HERM_STC  = .false.
+!
+   if (RANK .eq. ROOT) then
+      write(*,*) 'FLAGS:'
+      write(*,*) ' ISTC_FLAG: ', ISTC_FLAG
+      write(*,*) ' STORE_STC: ', STORE_STC
+      write(*,*) ' HERM_STC : ', HERM_STC
+      write(*,*)
+   endif
 !
 !..determine number of omp threads running
    if (RANK .eq. ROOT) then
@@ -142,13 +174,6 @@ subroutine master_main()
       stop
    endif
 !
-!..start user interface, with idec
-!..broadcast user command to workers
-!
-!..test accessing data structures
-   write(6,8020) '[', RANK, '] : ', 'NRELIS,NRELES,NRNODS = ',NRELIS,NRELES,NRNODS
- 8020 format(A,I3,A,A,I4,', ',I4,', ',I4)
-!
    flush(6)
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
@@ -158,6 +183,9 @@ subroutine master_main()
    write(*,*) '========================='
 #endif
 !
+!
+!..start user interface, with idec
+!..broadcast user command to workers
 !..display menu in infinite loop
    idec = 1
    do while(idec /= 0)
@@ -210,8 +238,8 @@ subroutine master_main()
       write(*,*) '=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='
 !
       read( *,*) idec
-      write(6,8010) '[', RANK, '] : ','Broadcast: idec = ', idec
- 8010 format(A,I3,A,A,I3)
+!
+!  ...broadcasting to worker procs
       count = 1; src = ROOT
       call MPI_BCAST (idec,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
 !
@@ -304,8 +332,6 @@ subroutine master_main()
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 89 continue
-   write(6,8030) '[', RANK, '] : ','master_main end.'
- 8030 format(A,I3,A,A)
 !
 end subroutine master_main
 !
@@ -340,10 +366,6 @@ subroutine worker_main()
       stop
    endif
 !
-!..test accessing data structures
-   write(6,9020) '[', RANK, '] : ', 'NRELIS,NRELES,NRNODS = ',NRELIS,NRELES,NRNODS
- 9020 format(A,I3,A,A,I4,', ',I4,', ',I4)
-!
    flush(6)
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
@@ -354,11 +376,9 @@ subroutine worker_main()
    idec = 1
    do while(idec /= 0)
 !
-      write(6,9030) '[', RANK, '] : ','Waiting for broadcast from master...'
+!  ...receiving from master proc
       count = 1; src = ROOT
       call MPI_BCAST (idec,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
-      write(6,9010) '[', RANK, '] : ','Broadcast: idec = ', idec
- 9010 format(A,I3,A,A,I3)
 !
       select case(idec)
 !     ...QUIT
@@ -422,7 +442,5 @@ subroutine worker_main()
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 99 continue
-   write(6,9030) '[', RANK, '] : ','worker_main end.'
- 9030 format(A,I4,A,A)
 !
 end subroutine worker_main

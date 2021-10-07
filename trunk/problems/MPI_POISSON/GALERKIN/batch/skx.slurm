@@ -41,7 +41,7 @@
 #SBATCH -N 2               # Total # of nodes
 #SBATCH -n 8               # Total # of mpi tasks
 #SBATCH -t 00:05:00        # Run time (hh:mm:ss)
-#SBATCH --mail-user=stefan@ices.utexas.edu
+#SBATCH --mail-user=stefan@oden.utexas.edu
 #SBATCH --mail-type=all    # Send email at begin and end of job
 #SBATCH -A A-ti2           # Allocation name (req'd if you have more than 1)
 

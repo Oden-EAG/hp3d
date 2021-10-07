@@ -30,24 +30,24 @@ subroutine set_environment
 !..Variables relevant to src/modules/environment
 !         option label // explanation // default value // parameter
    call get_option_string  &
-        ('-file-control'   ,'Control file'             ,'./control/control'         ,FILE_CONTROL)
+        ('-file-control'   ,'Control file'    ,'./control/control'         ,FILE_CONTROL)
 
    call get_option_string  &
-        ('-file-geometry'  ,'Geometry file'            ,'./geometries/hexa_orient0' ,FILE_GEOM)
+        ('-file-geometry'  ,'Geometry file'   ,'./geometries/hexa_orient0' ,FILE_GEOM)
 !
    call get_option_string  &
-        ('-file-phys'      ,'Physics file'             ,'./input/physics'           ,FILE_PHYS)
+        ('-file-phys'      ,'Physics file'    ,'./input/physics'           ,FILE_PHYS)
 !
    call get_option_string  &
-        ('-file-history'   ,'History file'             ,'./input/history'           ,FILE_HISTORY)
+        ('-file-history'   ,'History file'    ,'./input/history'           ,FILE_HISTORY)
 !
    call get_option_string  &
-        ('-file-err'       ,'Error file'               ,'./output/errorlogs/log.txt',FILE_ERR)
+        ('-file-err'       ,'Error file'      ,'./output/errorlogs/log.txt',FILE_ERR)
 !
    call get_option_string  &
-        ('-file-refinement','Refinement files location','../../../files/ref'        ,FILE_REFINE)
+        ('-file-refinement','Refinement files','../../../files/ref'        ,FILE_REFINE)
 !
-!
+!..Variables relevant to this particular application
    call get_option_int     &
         ('-isol'   ,'Exact manufactured solution'         ,0,ISOL)
 !
@@ -68,20 +68,20 @@ subroutine set_environment
 ! =============================
 !
    call get_option_string  &
-        ('-prefix'          ,'Prefix paraview file'               ,'maxw_'             ,PREFIX  )
+        ('-prefix'          ,'Prefix paraview file'             ,'maxw_'             ,PREFIX  )
    call get_option_string  &
-        ('-file_vis_upscale','Visualization upscale file location','../../../files/vis',FILE_VIS)
+        ('-file_vis_upscale','Visualization upscale files'      ,'../../../files/vis',FILE_VIS)
    call get_option_string  &
-        ('-vis_level'       ,'Visualization upscale level (0-3)'  ,'2'                 ,VLEVEL  )
+        ('-vis_level'       ,'Visualization upscale level (0-3)','2'                 ,VLEVEL  )
 !
    call get_option_string  &
-        ('-dir_output'      ,'Paraview root directory'            ,'../outputs/'       ,OUTPUT_DIR)
+        ('-dir_output'      ,'Paraview root directory'          ,'../outputs/'       ,OUTPUT_DIR)
    PARAVIEW_DIR = trim(OUTPUT_DIR)//'paraview/'
 !
    call get_option_bool    &
-        ('-paraview_geom'   ,'Dump geom at every Paraview call'   ,.false.             ,PARAVIEW_DUMP_GEOM)
+        ('-paraview_geom'   ,'Dump geom at every Paraview call' ,.false.             ,PARAVIEW_DUMP_GEOM)
    call get_option_bool    &
-        ('-paraview_attr'   ,'Dump solution to Paraview'          ,.true.              ,PARAVIEW_DUMP_ATTR)
+        ('-paraview_attr'   ,'Dump solution to Paraview'        ,.true.              ,PARAVIEW_DUMP_ATTR)
 !
 !..OpenMP threading
    call get_option_int('-nthreads','Number of OpenMP threads',1,nthreads)
