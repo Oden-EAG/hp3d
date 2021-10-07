@@ -22,6 +22,7 @@
 !             DvalV     - corresponding first derivatives
 !
 !----------------------------------------------------------------------
+#include "typedefs.h"
 subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
 !
    use control    , only : NEXACT, GEOM_TOL
@@ -33,18 +34,18 @@ subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
    real(8), intent(in)  :: X(3)
    integer, intent(in)  :: Icase,Mdle
 !..exact solution
-   real(8),dimension(  MAXEQNH    ) ::   ValH
-   real(8),dimension(  MAXEQNH,3  ) ::  DvalH
-   real(8),dimension(  MAXEQNH,3,3) :: d2valH
-   real(8),dimension(3,MAXEQNE    ) ::   ValE
-   real(8),dimension(3,MAXEQNE,3  ) ::  DvalE
-   real(8),dimension(3,MAXEQNE,3,3) :: d2valE
-   real(8),dimension(3,MAXEQNV    ) ::   ValV
-   real(8),dimension(3,MAXEQNV,3  ) ::  DvalV
-   real(8),dimension(3,MAXEQNV,3,3) :: d2valV
-   real(8),dimension(  MAXEQNQ    ) ::   valQ
-   real(8),dimension(  MAXEQNQ,3  ) ::  dvalQ
-   real(8),dimension(  MAXEQNQ,3,3) :: d2valQ
+   VTYPE,dimension(  MAXEQNH    ),intent(out) ::   ValH
+   VTYPE,dimension(  MAXEQNH,3  ),intent(out) ::  DvalH
+   VTYPE,dimension(  MAXEQNH,3,3)             :: d2valH
+   VTYPE,dimension(3,MAXEQNE    ),intent(out) ::   ValE
+   VTYPE,dimension(3,MAXEQNE,3  ),intent(out) ::  DvalE
+   VTYPE,dimension(3,MAXEQNE,3,3)             :: d2valE
+   VTYPE,dimension(3,MAXEQNV    ),intent(out) ::   ValV
+   VTYPE,dimension(3,MAXEQNV,3  ),intent(out) ::  DvalV
+   VTYPE,dimension(3,MAXEQNV,3,3)             :: d2valV
+   VTYPE,dimension(  MAXEQNQ    )             ::   valQ
+   VTYPE,dimension(  MAXEQNQ,3  )             ::  dvalQ
+   VTYPE,dimension(  MAXEQNQ,3,3)             :: d2valQ
 !
 #if DEBUG_MODE
    integer :: iprint = 0
@@ -69,7 +70,7 @@ subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
          call exact(X,Icase, ValH,DvalH,d2valH,ValE,DvalE,d2valE, &
                              ValV,DvalV,d2valV,valQ,dvalQ,d2valQ)
       case default
-         write(*,*)'dirichlet: unknown exact solution flag. stop.'
+         write(*,*) 'dirichlet: unknown exact solution flag. stop.'
          stop
    end select
 !

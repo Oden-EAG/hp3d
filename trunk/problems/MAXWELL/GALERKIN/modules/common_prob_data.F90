@@ -4,11 +4,10 @@
 !
 !----------------------------------------------------------------------
 !
-!     latest revision:  - May 2020
+!     latest revision:  - Oct 2021
 !
 !     purpose:          - module setting up the parameters for the
-!                         Poisson problem
-!
+!                         Maxwell problem
 !
 !----------------------------------------------------------------------
 !
@@ -19,7 +18,7 @@ module common_prob_data
 !
 !..TYPE OF JOB SUBMISSION
 !  0: interactive (usual main file)
-!  1: stampede2 skx slurm job batch script
+!  1: execute pre-defined job script
    integer :: JOB
 !
 !..User can specify parameter MAXNODS via argument list instead of input file
@@ -27,11 +26,6 @@ module common_prob_data
 !
 !..INITIAL ORDER OF APPROXIMATION
    integer :: IP
-!
-!..BOUNDARY CONDITION
-   integer :: IBC_PROB
-   integer, parameter :: BC_NONE        = 0
-   integer, parameter :: BC_DIRICHLET   = 1
 !
 !..EXACT SOLUTION
    integer :: ISOL
@@ -44,8 +38,21 @@ module common_prob_data
 !..order of the polynomial exact solution
    integer :: NPX, NPY, NPZ
 !
+!..imaginary unit
+   complex(8), parameter :: ZI = (0.d0,1.d0)
+!
 !..pi for sinusoidal solution
    real(8), parameter :: PI = 4.d0*datan(1.d0)
+!
+!..PHYSICAL PARAMETERS
+!   Angular frequency: OMEGA
+!   Permittivity     : EPSILON
+!   Permeability     : MU
+!   Conductivity     : SIGMA
+   real(8) :: OMEGA   = 1.d0 * PI
+   real(8) :: EPSILON = 1.d0
+   real(8) :: MU      = 1.d0
+   real(8) :: SIGMA   = 0.d0
 !
 !..REFINEMENT TYPE (refine_DPG.F90)
    integer, parameter :: INOREFINEMENT  = 0

@@ -12,7 +12,7 @@ c                        coordinates and the jacobian for a 3D element
 c
 c   arguments :
 c     in:
-c               Dxdxi  - derivatives of the physical coordinnates wrt
+c               Dxdxi  - derivatives of the physical coordinates wrt
 c                        master element coordinates
 c                             first index is the physical coord
 c                             second index is the master coord
