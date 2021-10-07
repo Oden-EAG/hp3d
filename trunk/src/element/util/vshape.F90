@@ -19,7 +19,7 @@ subroutine vshape2(Type,Xi, Rlam,Drlam)
    real(8),dimension(2,4), intent(out) :: Drlam
 !
    integer, dimension(5)            :: norder
-   integer, dimension(4)            :: nedge_orient
+   integer, dimension(4)            :: nedge_orient = (/0,0,0,0/)
    integer                          :: nrdof
    real(8), dimension(  MAXquadH)   :: vshape
    real(8), dimension(2,MAXquadH)   :: dvshape
@@ -28,7 +28,6 @@ subroutine vshape2(Type,Xi, Rlam,Drlam)
 !----------------------------------------------------------------------
 !
    iprint=0
-   nedge_orient=0
 !
 !..compute vertex shape functions
    select case(Type)
@@ -82,15 +81,14 @@ subroutine vshape3(Type,Xi, Rlam,Drlam)
    real(8), dimension(3,8), intent(out) :: Drlam
 !
    integer,dimension(19)                :: norder
-   integer,dimension(12)                :: nedge_orient
-   integer,dimension( 6)                :: nface_orient
+   integer,dimension(12)                :: nedge_orient = (/0,0,0,0, 0,0,0,0, 0,0,0,0/)
+   integer,dimension( 6)                :: nface_orient = (/0,0,0,0, 0,0/)
    integer :: nrdof
    real(8) :: vshape(MAXbrickH)
    real(8) :: dvshape(3,MAXbrickH)
 !
 !----------------------------------------------------------------------
 !
-   nedge_orient = 0; nface_orient = 0
 !..set up order of approximation
    call initiate_order(Type, norder)
 !
