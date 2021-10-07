@@ -41,14 +41,14 @@
 #SBATCH -N 2               # Total # of nodes
 #SBATCH -n 8               # Total # of mpi tasks
 #SBATCH -t 00:05:00        # Run time (hh:mm:ss)
-#SBATCH --mail-user=stefan@ices.utexas.edu
+#SBATCH --mail-user=stefan@oden.utexas.edu
 #SBATCH --mail-type=all    # Send email at begin and end of job
 #SBATCH -A A-ti2           # Allocation name (req'd if you have more than 1)
 
 # Other commands must follow all #SBATCH directives...
 
-# export PROFILEDIR=/work/05246/sh43394/stampede2/par_hp3d/trunk/problems/MPI_POISSON/GALERKIN/tau/profiles
-# export TRACEDIR=/work/05246/sh43394/stampede2/par_hp3d/trunk/problems/MPI_POISSON/GALERKIN/tau/traces
+# export PROFILEDIR=/work/05246/sh43394/stampede2/hp3d/trunk/problems/MPI_POISSON/GALERKIN/tau/profiles
+# export TRACEDIR=/work/05246/sh43394/stampede2/hp3d/trunk/problems/MPI_POISSON/GALERKIN/tau/traces
 # export TAU_PROFILE=1
 # export TAU_TRACE=1
 

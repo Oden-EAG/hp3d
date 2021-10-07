@@ -2,7 +2,7 @@
 # SET HP3D AND LIBRARY PATH
 #------------------------------------------------------------------
 COMPILER        = INTEL
-HP3D_BASE_PATH  = ${WORK}/par_hp3d/trunk
+HP3D_BASE_PATH  = ${WORK}/hp3d/trunk
 
 #------------------------------------------------------------------
 # PREPROCESSOR VARIABLES

@@ -2,11 +2,11 @@
 
 -include ../../../m_options
 
-COMPLEX        ?= 0
+COMPLEX        ?= 1
 DEBUG_MODE     ?= 0
 
-ifeq ($(COMPLEX),1)
-$(error COMPLEX FLAG MUST BE 0 FOR POISSON APPLICATION)
+ifeq ($(COMPLEX),0)
+$(error COMPLEX FLAG MUST BE 1 FOR MAXWELL APPLICATION)
 endif
 
 SRC_PATH        = .
@@ -16,8 +16,8 @@ MODULE_PATH     = $(OBJ_PATH)
 
 
 # Executable name
-EXEC            = pois
-EXECS           = pois
+EXEC            = maxw
+EXECS           = maxw
 
 # Includes and defs
 CCDEFS          = $(PROB_PP_DEFS)
