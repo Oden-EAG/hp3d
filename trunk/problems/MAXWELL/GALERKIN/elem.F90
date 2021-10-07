@@ -1,10 +1,10 @@
-!----------------------------------------------------------------------
+!-------------------------------------------------------------------------
 !
 !     routine name      - elem
 !
-!----------------------------------------------------------------------
+!-------------------------------------------------------------------------
 !
-!     latest revision:  - Aug 2019
+!     latest revision:  - Oct 2021
 !
 !     purpose:          - driver for the element routine
 !
@@ -16,7 +16,7 @@
 !             Itest     - index for assembly
 !             Itrial    - index for assembly
 !
-!----------------------------------------------------------------------
+!-------------------------------------------------------------------------
 subroutine elem(Mdle, Itest,Itrial)
 !
    use data_structure3D
@@ -31,9 +31,9 @@ subroutine elem(Mdle, Itest,Itrial)
    integer :: norder(19)
    integer :: nrdofH,nrdofE,nrdofV,nrdofQ
 !
-!----------------------------------------------------------------------
+!-------------------------------------------------------------------------
 !
-!..activate one physics variable (H1) for assembly
+!..activate one physics variable (H(curl)) for assembly
    Itest(1) = 1; Itrial(1) = 1
 !
 !..determine order of approximation
@@ -43,17 +43,17 @@ subroutine elem(Mdle, Itest,Itrial)
    call celndof(NODES(Mdle)%type,norder, nrdofH,nrdofE,nrdofV,nrdofQ)
 !
 !..call element integration routine
-   call elem_poisson(Mdle,nrdofH, ALOC(1,1)%array,BLOC(1)%array)
+   call elem_maxwell(Mdle,nrdofE, ALOC(1,1)%array,BLOC(1)%array)
 !
 end subroutine elem
 !
 !-------------------------------------------------------------------------
 !
-!     routine name      - elem_poisson
+!     routine name      - elem_maxwell
 !
 !-------------------------------------------------------------------------
 !
-!     latest revision:  - July 2019
+!     latest revision:  - Oct 2021
 !
 !     purpose:          - compute element stiffness and load
 !
@@ -68,13 +68,14 @@ end subroutine elem
 !
 !-------------------------------------------------------------------------
 !
-subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
+subroutine elem_maxwell(Mdle,Nrdof, Zaloc,Zbloc)
 !
 !..ALOC: holds local element stiffness matrices
 !..BLOC: holds local element load vectors
    use assembly, only: ALOC,BLOC
    use control , only: INTEGRATION
    use physics , only: NR_PHYSA
+   use common_prob_data
    use data_structure3D
    use element_data
    use parameters
@@ -82,16 +83,17 @@ subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
 !
    implicit none
 !
-   integer, intent(in)  :: Mdle
-   integer, intent(in)  :: Nrdof
-   real(8), intent(out) :: Zaloc(Nrdof,Nrdof), Zbloc(Nrdof)
+   integer   , intent(in)  :: Mdle
+   integer   , intent(in)  :: Nrdof
+   complex(8), intent(out) :: Zaloc(Nrdof,Nrdof), Zbloc(Nrdof)
 !
 !-------------------------------------------------------------------------
 !
 !..aux variables
-   real(8) :: rjac, fval, wa, weight, q, p
-   integer :: iflag, nrv, nre, nrf
-   integer :: nrdofH, nint, k1, k2, l
+   complex(8) :: zJ(3), za, zb
+!
+   real(8) :: rjac, wa, weight
+   integer :: iflag, nrdofH, nrdofE, nint, k1, k2, l
 !
    character(len=4) :: etype
 !
@@ -113,35 +115,31 @@ subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
 !..H1 shape functions
    real(8) :: shapH(MAXbrickH), gradH(3,MAXbrickH)
 !
+!..H(curl) shape functions
+   real(8) :: shapE(3,MAXbrickE), curlE(3,MAXbrickE)
+!
 !..3D quadrature data
 !  [xiloc: integration points (local coordinates)]
 !  [waloc: integration weights per integration point]
    real(8) :: xiloc(3,MAX_NINT3), waloc(MAX_NINT3)
 !
 !..workspace for trial and test variables
-   real(8) :: dq(3), u(3), dp(1:3)
+   real(8) :: E(3), CE(3), F(3), CF(3)
 !
-!-------------------------------------------------------------------------
+!----------------------------------------------------------------------
 !
    Zaloc = ZERO; Zbloc = ZERO
 !
 !..element type
    etype = NODES(Mdle)%type
-!  [number of vertices, edges, and faces of this element (type)]
-   nrv = nvert(etype)
-   nre = nedge(etype)
-   nrf = nface(etype)
 !
 !..determine order of approximation
-   !write(*,2050) '[', RANK, '] FIND ORDER'; call pause
    call find_order(Mdle, norder)
 !
 !..determine edge and face orientations
-   !write(*,2050) '[', RANK, '] FIND ORIENT'; call pause
    call find_orient(Mdle, norient_edge,norient_face)
 !
 !..determine nodes coordinates
-   !write(*,2050) '[', RANK, '] FIND NODCOR'; call pause
    call nodcor(Mdle, xnod)
 !
 !----------------------------------------------------------------------
@@ -149,16 +147,6 @@ subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
 !----------------------------------------------------------------------
 !
 !..set quadrature points and weights
-!  [
-!  in:
-!   Type      - element type
-!   Norder    - order of approximation
-!
-!  out:
-!   Nint      - number of integration points
-!   Xiloc     - integration points
-!   Waloc     - weights
-!  ]
    call set_3D_int(etype,norder,norient_face, nint,xiloc,waloc)
 !
 !..loop over integration points
@@ -168,81 +156,62 @@ subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
       xi(1:3)=xiloc(1:3,l)
       wa=waloc(l)
 !
-! H1 shape functions (for geometry)
-! [
-!     in:
-!       Type           - element type
-!       Xi             - master element coordinates
-!       Norder         - polynomial order for the nodes (H1 sense)
-!       Nedge_orient   - edge orientations
-!       Nface_orient   - face orientations
-!     out:
-!       NrdofH         - number of the element shape functions
-!       ShapH          - values of shape functions
-!       GradH          - values of derivatives of the shape functions
-!                        wrt to master element coordinates
-!
-! ]
+!  ...H1 shape functions (for geometry)
       call shape3DH(etype,xi,norder,norient_edge,norient_face, nrdofH,shapH,gradH)
 !
-! geometry map
-! [
-!     in:
-!             Mdle     - element middle node
-!             Xi       - master element coordinates of a point
-!             Xnod     - element geometry dof
-!             ShapH    - values of shape functions at a point
-!             GradH    - derivatives of the shape functions wrt
-!                        master coordinates at the point
-!             NrdofH   - number of element H1 dof
-!     out:
-!             X        - physical coordinates of the point
-!             Dxdxi    - Jacobian matrix
-!             Dxidx    - inverse Jacobian matrix
-!             Rjac     - jacobian (determinant of the Jacobian matrix)
-!             Iflag    = 0 OK
-!                        1 negative jacobian
-! ]
+!  ...H(curl) shape functions
+      call shape3DE(etype,xi,norder,norient_edge,norient_face, nrdofE,shapE,curlE)
+!
+!  ...geometry map
       call geom3D(Mdle,xi,xnod,shapH,gradH,nrdofH, x,dxdxi,dxidx,rjac,iflag)
 !
 !  ...integration weight
       weight = rjac*wa
 !
 !  ...get the RHS
-      call getf(Mdle,x, fval)
+      call getf(Mdle,x, zJ)
 !
-!  ...loop through H1 test functions
-      do k1=1,nrdofH
+!  ...loop through H(curl) test functions
+      do k1=1,nrdofE
 !
 !     ...Piola transformation
-         q = shapH(k1)
-         dq(1:3) = gradH(1,k1)*dxidx(1,1:3) &
-                 + gradH(2,k1)*dxidx(2,1:3) &
-                 + gradH(3,k1)*dxidx(3,1:3)
+         F(1:3) = shapE(1,k1)*dxidx(1,1:3) &
+                + shapE(2,k1)*dxidx(2,1:3) &
+                + shapE(3,k1)*dxidx(3,1:3)
+         CF(1:3) = dxdxi(1:3,1)*curlE(1,k1) &
+                 + dxdxi(1:3,2)*curlE(2,k1) &
+                 + dxdxi(1:3,3)*curlE(3,k1)
+         CF(1:3) = CF(1:3)/rjac
 !
-!     ...accumulate for the load vector
-         Zbloc(k1) = Zbloc(k1) + q*fval*weight
+!     ...accumulate for the load vector: (-iωJ,F)
+         za = F(1)*zJ(1) + F(2)*zJ(2) + F(3)*zJ(3)
+         Zbloc(k1) = Zbloc(k1) - ZI*OMEGA*za*weight
 !
-!     ...loop through H1 trial functions
-         do k2=1,nrdofH
+!     ...loop through H(curl) trial functions
+         do k2=1,nrdofE
+!
 !        ...Piola transformation
-            p = shapH(k2)
-            dp(1:3) = gradH(1,k2)*dxidx(1,1:3) &
-                    + gradH(2,k2)*dxidx(2,1:3) &
-                    + gradH(3,k2)*dxidx(3,1:3)
+            E(1:3) = shapE(1,k2)*dxidx(1,1:3) &
+                   + shapE(2,k2)*dxidx(2,1:3) &
+                   + shapE(3,k2)*dxidx(3,1:3)
+            CE(1:3) = dxdxi(1:3,1)*curlE(1,k2) &
+                    + dxdxi(1:3,2)*curlE(2,k2) &
+                    + dxdxi(1:3,3)*curlE(3,k2)
+            CE(1:3) = CE(1:3)/rjac
 !
-!        ...accumulate for the stiffness matrix
-            Zaloc(k1,k2) = Zaloc(k1,k2) + weight * ( &
-                           dq(1)*dp(1) + dq(2)*dp(2) + dq(3)*dp(3))
+!        ...accumulate for the stiffness matrix: ((1/μ)curl E, curl F)-((ω^2ε-iωσ)E, F)
+            za = (CE(1)*CF(1) + CE(2)*CF(2) + CE(3)*CF(3)) / MU
+            zb = (OMEGA*OMEGA*EPSILON - ZI*OMEGA*SIGMA)*(E(1)*F(1) + E(2)*F(2) + E(3)*F(3))
+            Zaloc(k1,k2) = Zaloc(k1,k2) + (za-zb)*weight
 !
-!     ...end of loop through H1 trial functions
+!     ...end of loop through H(curl) trial functions
          enddo
-!  ...end of loop through H1 test functions
+!  ...end of loop through H(curl) test functions
       enddo
 !..end of loop through integration points
    enddo
 !
 !
-end subroutine elem_poisson
+end subroutine elem_maxwell
 
 

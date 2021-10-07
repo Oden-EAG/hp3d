@@ -26,6 +26,7 @@ history
 *.obj
 
 # Binary Applications
+maxw
 pois
 uwLaser
 
