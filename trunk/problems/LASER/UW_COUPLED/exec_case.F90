@@ -50,27 +50,37 @@ subroutine exec_case(idec)
 !        - 6 L2 (pump,   E and H Field)
 !
          iParAttr = (/1,2,2,1,6,6/)
-         write(*,300) ' paraview output: select fields...'   , &
-                      '  - 1 H1 (heat)'                      , &
-                      '  - 2 H(curl) (signal, E and H flux)' , &
-                      '  - 2 H(curl) (pump,   E and H flux)' , &
-                      '  - 1 H(div) (heat flux)'             , &
-                      '  - 6 L2 (signal, E and H field)'     , &
-                      '  - 6 L2 (pump,   E and H Field)'
-         read (*,*) iParAttr(1),iParAttr(2),iParAttr(3), &
-                    iParAttr(4),iParAttr(5),iParAttr(6)
-     300 format(A,/,A,/,A,/,A,/,A,/,A,/,A)
-
-         write(*,*) 'paraview output: select VLEVEL (0-4)...'
-         read (*,*) vis_level
-         select case(vis_level)
-            case('0','1','2','3','4')
-               VLEVEL = vis_level
-            case default
-               write(*,*) ' invalid VLEVEL. setting VLEVEL=3 (default).'
-               VLEVEL = '3'
-         end select
-
+         if (RANK .eq. ROOT) then
+            write(*,300) ' paraview output: select fields...'   , &
+                         '  - 1 H1 (heat)'                      , &
+                         '  - 2 H(curl) (signal, E and H flux)' , &
+                         '  - 2 H(curl) (pump,   E and H flux)' , &
+                         '  - 1 H(div) (heat flux)'             , &
+                         '  - 6 L2 (signal, E and H field)'     , &
+                         '  - 6 L2 (pump,   E and H Field)'
+            read (*,*) iParAttr(1),iParAttr(2),iParAttr(3), &
+                       iParAttr(4),iParAttr(5),iParAttr(6)
+        300 format(A,/,A,/,A,/,A,/,A,/,A,/,A)
+         endif
+!
+         count = 6; src = ROOT
+         call MPI_BCAST (iParAttr,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+!
+         if (RANK .eq. ROOT) then
+            write(*,*) 'paraview output: select VLEVEL (0-4)...'
+            read (*,*) vis_level
+            select case(vis_level)
+               case('0','1','2','3','4')
+                  VLEVEL = vis_level
+               case default
+                  write(*,*) ' invalid VLEVEL. setting VLEVEL=3 (default).'
+                  VLEVEL = '3'
+            end select
+         endif
+!
+         count = 1; src = ROOT
+         call MPI_BCAST (VLEVEL,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+!
 !         iParAttr = (/0,0,0,0,2,0/)
          call my_paraview_driver(iParAttr)
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)

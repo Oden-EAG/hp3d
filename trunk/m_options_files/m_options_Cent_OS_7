@@ -2,7 +2,7 @@
 # SET HP3D AND LIBRARY PATH
 #------------------------------------------------------------------
 COMPILER        = GNU
-HP3D_BASE_PATH  = /home/stefan/hp3D/LIBS/par_hp3d/trunk
+HP3D_BASE_PATH  = /home/stefan/hp3D/LIBS/hp3d/trunk
 
 #------------------------------------------------------------------
 # PREPROCESSOR VARIABLES

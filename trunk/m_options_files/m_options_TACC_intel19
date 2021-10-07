@@ -2,7 +2,7 @@
 # SET HP3D AND LIBRARY PATH
 #------------------------------------------------------------------
 COMPILER        = INTEL
-HP3D_BASE_PATH  = ${WORK}/hp3d/trunk
+HP3D_BASE_PATH  = ${WORK2}/hp3d/trunk
 
 #------------------------------------------------------------------
 # PREPROCESSOR VARIABLES
@@ -21,7 +21,7 @@ OPENMP   ?= 1
 TAU_PERF ?= 0
 
 # Use parallel threads to compile libraries and problems
-J ?= 24
+J ?= 28
 
 # Compiler
 # Tau performance tool
@@ -87,22 +87,21 @@ MKL_INCS = -I${MKLROOT}/include/intel64/lp64 -I${MKLROOT}/include
 #------------------------------------------------------------------
 #
 # TACC MUMPS
-# module load mumps/5.1
 # needs PT-SCOTCH and parMETIS (64bit versions for large problems)
-# (module petsc/3.11-i64)
+# (module petsc/3.15-i64)
 # also adding Zoltan library dependence
 # also adding PETSC library dependence (petsc needs phdf5)
 
 ifeq ($(COMPLEX),1)
-  TACC_PETSC32_LIB = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-complex/lib
-  TACC_PETSC32_INC = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-complex/include
-  TACC_PETSC64_LIB = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-complexi64/lib
-  TACC_PETSC64_INC = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-complexi64/include
+  TACC_PETSC32_LIB = /home1/apps/intel19/impi19_0/petsc/3.15/clx-complex/lib
+  TACC_PETSC32_INC = /home1/apps/intel19/impi19_0/petsc/3.15/clx-complex/include
+  TACC_PETSC64_LIB = /home1/apps/intel19/impi19_0/petsc/3.15/clx-complexi64/lib
+  TACC_PETSC64_INC = /home1/apps/intel19/impi19_0/petsc/3.15/clx-complexi64/include
 else
-  TACC_PETSC32_LIB = /home1/apps/intel18/impi18_0/petsc/3.11/skylake/lib
-  TACC_PETSC32_INC = /home1/apps/intel18/impi18_0/petsc/3.11/skylake/include
-  TACC_PETSC64_LIB = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-i64/lib
-  TACC_PETSC64_INC = /home1/apps/intel18/impi18_0/petsc/3.11/skylake-i64/include
+  TACC_PETSC32_LIB = /home1/apps/intel19/impi19_0/petsc/3.15/clx/lib
+  TACC_PETSC32_INC = /home1/apps/intel19/impi19_0/petsc/3.15/clx/include
+  TACC_PETSC64_LIB = /home1/apps/intel19/impi19_0/petsc/3.15/clx-i64/lib
+  TACC_PETSC64_INC = /home1/apps/intel19/impi19_0/petsc/3.15/clx-i64/include
 endif
 
 MUMPS_LIBS = -L$(TACC_PETSC32_LIB) -ldmumps -lzmumps \
@@ -114,7 +113,7 @@ MUMPS_LIBS += -L$(TACC_PETSC64_LIB) -lesmumps -lzoltan \
                                     -lptscotch -lptscotcherr
 
 MUMPS_INCS = -I$(TACC_PETSC32_INC) -I$(TACC_PETSC64_INC) \
-             -I/home1/apps/intel18/impi18_0/petsc/3.11/include
+             -I/home1/apps/intel19/impi19_0/petsc/3.15/include
 
 #------------------------------------------------------------------
 # VIS LIBRARY
