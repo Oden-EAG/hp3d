@@ -57,8 +57,8 @@ c
       double precision :: MubTF(2),DMubTF(3,2)
       double precision :: NupTF(0:2,2),DNupTF(3,0:2,2)
       double precision :: GNupTF(0:2),GDNupTF(3,0:2)
-      double precision :: STpQF(2,0:1,3),DSTpQF(3,2,0:1,3)
-      double precision :: GSTpQF(2,0:1),GDSTpQF(3,2,0:1)
+      double precision :: STpQF(0:1,2,3),DSTpQF(3,0:1,2,3)
+      double precision :: GSTpQF(0:1,2),GDSTpQF(3,0:1,2)
       double precision :: phiE(2:Nsize(1)),DphiE(3,2:Nsize(1))
       double precision :: phiTri(2:Nsize(1)-1,1:Nsize(1)-2)
       double precision :: DphiTri(3,2:Nsize(1)-1,1:Nsize(1)-2)
@@ -190,7 +190,7 @@ c      ...local parameters (again)
           maxI = nordQF(1)
           maxJ = nordQF(2)
 c      ...orient
-          call OrientQuad(STpQF(1:2,0:1,f),DSTpQF(1:N,1:2,0:1,f),
+          call OrientQuad(STpQF(0:1,1:2,f),DSTpQF(1:N,0:1,1:2,f),
      .               NoriF(f+2),IdecQF(1:2,f),N, GSTpQF,GDSTpQF,GIdecQF)
 c      ...construct the shape functions
           call AncPhiQuad(GSTpQF,GDSTpQF,nordQF,GIdecQF,N,
@@ -376,8 +376,8 @@ c
       double precision :: MubTF(2),DMubTF(3,2)
       double precision :: NupTF(0:2,2),DNupTF(3,0:2,2)
       double precision :: GNupTF(0:2),GDNupTF(3,0:2)
-      double precision :: STpQF(2,0:1,3),DSTpQF(3,2,0:1,3)
-      double precision :: GSTpQF(2,0:1),GDSTpQF(3,2,0:1)
+      double precision :: STpQF(0:1,2,3),DSTpQF(3,0:1,2,3)
+      double precision :: GSTpQF(0:1,2),GDSTpQF(3,0:1,2)
       double precision :: EE(3,0:Nsize(1)-1),CurlEE(3,0:Nsize(1)-1)
       double precision :: ETri(3,0:Nsize(1)-2,1:Nsize(1)-1)
       double precision :: CurlETri(3,0:Nsize(1)-2,1:Nsize(1)-1)
@@ -507,7 +507,7 @@ c  ...loop over faces
 c    ...local parameters
         call decod(Nord(11+f),MODORDER,2, nordQF)
 c    ...orient
-        call OrientQuad(STpQF(1:2,0:1,f),DSTpQF(1:N,1:2,0:1,f),
+        call OrientQuad(STpQF(0:1,1:2,f),DSTpQF(1:N,0:1,1:2,f),
      .               NoriF(2+f),IdecQF(1:2,f),N, GSTpQF,GDSTpQF,GIdecQF)
 c    ...loop over families
         do fam=0,1
@@ -521,7 +521,7 @@ c        ...local parameters (again)
             maxF(1) = nordQF(a)-1
             maxF(2) = nordQF(b)
 c        ...construct the shape functions
-            call AncEQuad(GSTpQF(ab,0:1),GDSTpQF(1:N,ab,0:1),
+            call AncEQuad(GSTpQF(0:1,ab),GDSTpQF(1:N,0:1,ab),
      .                    nordQF(ab),GIdecQF(ab),N,
      .                       EQuad(1:N,minF(1):maxF(1),minF(2):maxF(2)),
      .                   CurlEQuad(1:N,minF(1):maxF(1),minF(2):maxF(2)))
@@ -768,8 +768,8 @@ c
       double precision :: MubTF(2),DMubTF(3,2)
       double precision :: NupTF(0:2,2),DNupTF(3,0:2,2)
       double precision :: GNupTF(0:2),GDNupTF(3,0:2)
-      double precision :: STpQF(2,0:1,3),DSTpQF(3,2,0:1,3)
-      double precision :: GSTpQF(2,0:1),GDSTpQF(3,2,0:1)
+      double precision :: STpQF(0:1,2,3),DSTpQF(3,0:1,2,3)
+      double precision :: GSTpQF(0:1,2),GDSTpQF(3,0:1,2)
       double precision :: VTri(3,0:Nsize(1)-1,0:Nsize(1)-1)
       double precision :: DivVTri(0:Nsize(1)-1,0:Nsize(1)-1)
       double precision :: VQuad(3,0:Nsize(1)-1,0:Nsize(1)-1)
@@ -839,7 +839,7 @@ c      ...local parameters (again)
           maxI = nordQF(1)-1
           maxJ = nordQF(2)-1
 c      ...orient
-          call OrientQuad(STpQF(1:2,0:1,f),DSTpQF(1:N,1:2,0:1,f),
+          call OrientQuad(STpQF(0:1,1:2,f),DSTpQF(1:N,0:1,1:2,f),
      .               NoriF(2+f),IdecQF(1:2,f),N, GSTpQF,GDSTpQF,GIdecQF)
 c      ...construct the shape functions
           call AncVQuad(GSTpQF,GDSTpQF,nordQF,GIdecQF,N,

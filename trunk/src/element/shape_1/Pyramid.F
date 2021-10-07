@@ -46,8 +46,8 @@ c
       double precision, intent(out) :: ShapH(Nsize(2))
       double precision, intent(out) :: GradH(3,Nsize(2))
       double precision :: Lam(5),DLam(3,5)
-      double precision :: Mu(2,0:1),DMu(3,2,0:1)
-      double precision :: Nu(2,0:2),DNu(3,2,0:2)
+      double precision :: Mu(0:1,2),DMu(3,0:1,2)
+      double precision :: Nu(0:2,2),DNu(3,0:2,2)
       double precision :: MuZ(0:1),DMuZ(3,0:1)
       double precision :: LambV(5),DLambV(3,5)
       double precision :: MubME(4),DMubME(3,4)
@@ -55,8 +55,8 @@ c
       double precision :: GNupME(0:1),GDNupME(3,0:1)
       double precision :: LampTE(0:1,4),DLampTE(3,0:1,4)
       double precision :: GLampTE(0:1),GDLampTE(3,0:1)
-      double precision :: MupQF(2,0:1),DMupQF(3,2,0:1)
-      double precision :: GMupQF(2,0:1),GDMupQF(3,2,0:1)
+      double precision :: MupQF(0:1,2),DMupQF(3,0:1,2)
+      double precision :: GMupQF(0:1,2),GDMupQF(3,0:1,2)
       double precision :: MubTF(4),DMubTF(3,4)
       double precision :: NupTF(0:2,4),DNupTF(3,0:2,4)
       double precision :: GNupTF(0:2),GDNupTF(3,0:2)
@@ -356,16 +356,16 @@ c
       double precision, intent(out) :: ShapE(3,Nsize(2))
       double precision, intent(out) :: CurlE(3,Nsize(2))
       double precision :: Lam(5),DLam(3,5)
-      double precision :: Mu(2,0:1),DMu(3,2,0:1)
-      double precision :: Nu(2,0:2),DNu(3,2,0:2)
+      double precision :: Mu(0:1,2),DMu(3,0:1,2)
+      double precision :: Nu(0:2,2),DNu(3,0:2,2)
       double precision :: MuZ(0:1),DMuZ(3,0:1)
       double precision :: MubME(4),DMubME(3,4)
       double precision :: NupME(0:1,4),DNupME(3,0:1,4)
       double precision :: GNupME(0:1),GDNupME(3,0:1)
       double precision :: LampTE(0:1,4),DLampTE(3,0:1,4)
       double precision :: GLampTE(0:1),GDLampTE(3,0:1)
-      double precision :: MupQF(2,0:1),DMupQF(3,2,0:1)
-      double precision :: GMupQF(2,0:1),GDMupQF(3,2,0:1)
+      double precision :: MupQF(0:1,2),DMupQF(3,0:1,2)
+      double precision :: GMupQF(0:1,2),GDMupQF(3,0:1,2)
       double precision :: MubTF(4),DMubTF(3,4)
       double precision :: NupTF(0:2,4),DNupTF(3,0:2,4)
       double precision :: GNupTF(0:2),GDNupTF(3,0:2)
@@ -466,7 +466,7 @@ c      ...local parameters (again)
           maxF(1) = nordQF(a)-1
           maxF(2) = nordQF(b)
 c      ...construct the shape functions
-          call AncEQuad(GMupQF(ab,0:1),GDMupQF(1:N,ab,0:1),nordQF(ab),
+          call AncEQuad(GMupQF(0:1,ab),GDMupQF(1:N,0:1,ab),nordQF(ab),
      .                                                  GIdecQF(ab),N,
      .                       EQuad(1:N,minF(1):maxF(1),minF(2):maxF(2)),
      .                   CurlEQuad(1:N,minF(1):maxF(1),minF(2):maxF(2)))
@@ -581,7 +581,7 @@ c    ...loop over families
           ab = cshift((/1,2/),fam);
           a = ab(1); b = ab(2)
 c    ...construct shape functions, no need to orient
-          call AncEQuad(Mu(ab,0:1),DMu(1:N,ab,0:1),(/nordB,nordB/),
+          call AncEQuad(Mu(0:1,ab),DMu(1:N,0:1,ab),(/nordB,nordB/),
      .                                                    IdecB(ab),N,
      .                       EQuad(1:N,minF(1):maxF(1),minF(2):maxF(2)),
      .                   CurlEQuad(1:N,minF(1):maxF(1),minF(2):maxF(2)))
@@ -781,11 +781,11 @@ c
       double precision, intent(out) :: ShapV(3,Nsize(2))
       double precision, intent(out) :: DivV(Nsize(2))
       double precision :: Lam(5),DLam(3,5)
-      double precision :: Mu(2,0:1),DMu(3,2,0:1)
-      double precision :: Nu(2,0:2),DNu(3,2,0:2)
+      double precision :: Mu(0:1,2),DMu(3,0:1,2)
+      double precision :: Nu(0:2,2),DNu(3,0:2,2)
       double precision :: MuZ(0:1),DMuZ(3,0:1)
-      double precision :: MupQF(2,0:1),DMupQF(3,2,0:1)
-      double precision :: GMupQF(2,0:1),GDMupQF(3,2,0:1)
+      double precision :: MupQF(0:1,2),DMupQF(3,0:1,2)
+      double precision :: GMupQF(0:1,2),GDMupQF(3,0:1,2)
       double precision :: MubTF(4),DMubTF(3,4)
       double precision :: NupTF(0:2,4),DNupTF(3,0:2,4)
       double precision :: LampTF(0:2,4),DLampTF(3,0:2,4)
@@ -915,7 +915,7 @@ c    ...loop over families
           ab = cshift((/1,2/),fam);
           a = ab(1); b = ab(2)
 c    ...construct shape functions, no need to orient
-          call AncEQuad(Mu(ab,0:1),DMu(1:N,ab,0:1),(/nordB,nordB/),
+          call AncEQuad(Mu(0:1,ab),DMu(1:N,0:1,ab),(/nordB,nordB/),
      .                                                    IdecB(ab),N,
      .                       EQuad(1:N,minF(1):maxF(1),minF(2):maxF(2)),
      .                   CurlEQuad(1:N,minF(1):maxF(1),minF(2):maxF(2)))
@@ -1009,9 +1009,9 @@ c    ...local parameters (again)
         maxI = nordB
         maxJ = nordB
 c    ...construct shape functions, no need to orient
-        call AncPhiE(Mu(1,0:1),DMu(1:N,1,0:1),nordB,IdecB(1),N,
+        call AncPhiE(Mu(0:1,1),DMu(1:N,0:1,1),nordB,IdecB(1),N,
      .                             phiE(minI:maxI),DphiE(1:N,minI:maxI))
-        call AncPhiE(Mu(2,0:1),DMu(1:N,2,0:1),nordB,IdecB(2),N,
+        call AncPhiE(Mu(0:1,2),DMu(1:N,0:1,2),nordB,IdecB(2),N,
      .                           phiE2(minJ:maxJ),DphiE2(1:N,minJ:maxJ))
         do j=minJ,maxJ
           do i=minI,maxI
@@ -1039,7 +1039,7 @@ c    ...local parameters (again)
           ab = cshift((/1,2/),fam)
           a = ab(1); b = ab(2)
 c      ...construct shape functions, no need to orient
-          call AncPhiE(Mu(a,0:1),DMu(1:N,a,0:1),nordB,IdecB(a),N,
+          call AncPhiE(Mu(0:1,a),DMu(1:N,0:1,a),nordB,IdecB(a),N,
      .                             phiE(minI:maxI),DphiE(1:N,minI:maxI))
           do i=minI,maxI
             m=m+1
@@ -1174,10 +1174,10 @@ c
       double precision, intent(in)  :: Xi(3)
       double precision, intent(out) :: ShapQ(Nsize(2))
       double precision :: Lam(5),DLam(3,5)
-      double precision :: Mu(2,0:1),DMu(3,2,0:1)
-      double precision :: Nu(2,0:2),DNu(3,2,0:2)
+      double precision :: Mu(0:1,2),DMu(3,0:1,2)
+      double precision :: Nu(0:2,2),DNu(3,0:2,2)
       double precision :: MuZ(0:1),DMuZ(3,0:1)
-      double precision :: homP(3,0:Nsize(1)-1)
+      double precision :: homP(0:Nsize(1)-1,3)
 c
 c  ...debugging flag
       iprint=0
@@ -1202,9 +1202,9 @@ c  ...local parameters
       maxK = Nord(14)-1
 c
 c  ...get homogenized Legendre polynomials, homP
-      call HomLegendre(Mu(1,0:1),maxI, homP(1,minI:maxI))
-      call HomLegendre(Mu(2,0:1),maxJ, homP(2,minJ:maxJ))
-      call HomLegendre(MuZ,maxK, homP(3,minK:maxK))
+      call HomLegendre(Mu(0:1,1),maxI, homP(minI:maxI,1))
+      call HomLegendre(Mu(0:1,2),maxJ, homP(minJ:maxJ,2))
+      call HomLegendre(MuZ,maxK, homP(minK:maxK,3))
 c
 c  ...construct shape functions
       do k=minK,maxK
@@ -1212,7 +1212,7 @@ c  ...construct shape functions
           do i=minI,maxI
             m=m+1
 c
-            ShapQ(m) = homP(1,i)*homP(2,j)*homP(3,k)
+            ShapQ(m) = homP(i,1)*homP(j,2)*homP(k,3)
           enddo
         enddo
       enddo
