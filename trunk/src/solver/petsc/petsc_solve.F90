@@ -50,27 +50,7 @@ subroutine petsc_solve(mtype)
                            MPI_INTEGER,MPI_INTEGER8,              &
                            MPI_REAL8,MPI_COMPLEX16,               &
                            MPI_COMM_WORLD,MPI_STATUS_SIZE
-   use petscksp   , only:  VecCreateMPI,VecDuplicate,VecSet,      &
-                           VecDestroy,MatCreate,MatDestroy,       &
-                           VecSet,MatSetValues,MatSetSizes,       &
-                           MatSetFromOptions,MatSetUp,            &
-                           MatAssemblyBegin,MatAssemblyEnd,       &
-                           VecAssemblyBegin,VecAssemblyEnd,       &
-                           PETSC_VIEWER_STDOUT_WORLD,             &
-                           PETSC_DECIDE,KSPSolve,KSPView,         &
-                           MAT_FINAL_ASSEMBLY,ADD_VALUES,         &
-                           VecScatterCreateToAll,VecScatterBegin, &
-                           VecScatterEnd,VecScatterDestroy,       &
-                           SCATTER_FORWARD,VecGetArrayReadF90,    &
-                           VecRestoreArrayReadF90,tVec,           &
-                           tVecScatter,KSPGetIterationNumber,     &
-                           PetscPrintf,MatMPIAIJSetPreallocation, &
-                           MAT_NEW_NONZERO_ALLOCATION_ERR,        &
-                           PETSC_FALSE,VecGetOwnershipRange,      &
-                           MatStashGetInfo,MatGetInfo,MAT_LOCAL,  &
-                           MAT_INFO_MALLOCS,MAT_INFO_NZ_USED,     &
-                           MAT_INFO_NZ_ALLOCATED,MAT_INFO_SIZE,   &
-                           INSERT_VALUES !,PETSC_NULL_INTEGER
+   use petscksp
    use petsc_w_ksp, only:  petsc_ksp_start,petsc_ksp_destroy,     &
                            petsc_ksp,petsc_A,petsc_rhs,petsc_sol
 !
@@ -136,7 +116,8 @@ subroutine petsc_solve(mtype)
    integer :: nrdof_subd(NUM_PROCS)
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time,time_stamp
+!   real(8) :: MPI_Wtime,start_time,end_time,time_stamp
+   real(8) :: start_time,end_time,time_stamp
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
