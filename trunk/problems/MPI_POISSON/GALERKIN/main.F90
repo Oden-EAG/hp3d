@@ -29,7 +29,7 @@ program main
    implicit none
 !
 !..auxiliary variables
-   integer :: i, ierr, req, ret
+   integer :: i, ierr
 !
 !..OMP variables
    integer :: num_threads, omp_get_num_threads
@@ -133,7 +133,7 @@ subroutine master_main()
    integer :: ierr
 !
 !..auxiliary variables
-   integer :: idec, i, r, lb, count, src
+   integer :: idec, r, lb, count, src
 !
 !----------------------------------------------------------------------
 !
@@ -321,7 +321,7 @@ subroutine worker_main()
    use GMP
 !
    use MPI           , only: MPI_COMM_WORLD,MPI_INTEGER
-   use mpi_param     , only: ROOT,RANK,NUM_PROCS
+   use mpi_param     , only: ROOT,RANK
    use par_mesh      , only: DISTRIBUTED
    use zoltan_wrapper, only: zoltan_w_set_lb
 !
@@ -331,7 +331,7 @@ subroutine worker_main()
    integer :: ierr
 !
 !..auxiliary variables
-   integer :: idec, i, r, lb, count, src
+   integer :: idec, r, lb, count, src
 !
 !----------------------------------------------------------------------
 !

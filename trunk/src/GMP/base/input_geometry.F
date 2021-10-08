@@ -24,7 +24,7 @@ c
 c
       character(9) type
       integer label, Nrcurv
-      integer  tem(8),ttem(12),tttem(6)
+      integer  tem(8)
 c
 c----------------------------------------------------------------------
 c
@@ -927,9 +927,6 @@ c
 c  ...for each face nsid=1,6 and its edge j=1,4 in face loacl numbering
 c        naxes(j,nsid) = edge number in face RECTANGLE coordinates
       dimension naxes(4,6)
-c
-c  ...face orientations
-      dimension norient(6)
 c
 c  ...for each vertex point i=1,4 of a rectangle,
 c        nvert_to_edge(1:2,i) contains numbesr of adjacent edges

@@ -68,7 +68,7 @@
          stop
       endif
 !
-!  ...set BC flags: 0 - no BC ; 1 - Dirichlet ; 2 - Neumann ; 3 - Robin ; >3 - Mixed
+!  ...set BC flags: 0 - no BC ; 1 - Dirichlet
       ibc(1:6,1:NRINDEX) = 0
 !
       select case(IBC_PROB)

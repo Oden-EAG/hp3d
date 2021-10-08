@@ -17,8 +17,6 @@ subroutine recta_PTIRec(No,Eta, X,Dxdeta)
 #include "syscom.blk"
 !
       dimension Eta(2),X(3),Dxdeta(3,2)
-      dimension noc(4),norientc(4)
-      dimension xp(NDIM),dxp(NDIM),val(8),dval(2,8),detac(2)
 !
 !-----------------------------------------------------------------------
 !
@@ -815,9 +813,6 @@ subroutine recta_cone(No,Eta, X,Dxdeta)
 !
 !  ...linear shape functions in the parametric space
       dimension shapH(4),dshapH(2,4)
-!
-!  ...derivative of cone coordinate wrt Cartesian coordinates
-      dimension dzetdx(3),dr2dx(3)
 !
 !  ...point on an edge
       dimension dsedeta(2),                                 &

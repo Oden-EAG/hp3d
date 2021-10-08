@@ -29,7 +29,7 @@ subroutine pyram(No,Eta, X,Dxdeta)
       real(8),dimension(8)   :: vshap
       real(8),dimension(3,8) :: dvshap
 !
-      integer :: i,np,k,ivar,nrdof
+      integer :: i,np,k,ivar
 !------------------------------------------------------------------------------
 !
       select case(PYRAMIDS(No)%Type)

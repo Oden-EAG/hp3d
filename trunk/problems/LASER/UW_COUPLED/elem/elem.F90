@@ -33,7 +33,6 @@ subroutine elem(Mdle, Itest,Itrial)
    use commonParam
    use data_structure3D
    use parametersDPG
-   use control, only: INTEGRATION
    use physics, only: NR_PHYSA
 !
    implicit none

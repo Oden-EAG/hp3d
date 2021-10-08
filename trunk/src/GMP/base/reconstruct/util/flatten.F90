@@ -47,7 +47,6 @@ subroutine flatten_trian(Nt)
   !
   implicit none
   integer,intent(in)   :: Nt
-  real(8),dimension(2) :: eta
   real(8),dimension(3) :: temp,v1,v2,v3
   integer              :: i,nc,ie,neig,j
   real(8)              :: x,y

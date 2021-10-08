@@ -22,7 +22,7 @@ subroutine hexa(No,Eta, X,Dxdeta)
       real(8),dimension(  8) :: vshape
       real(8),dimension(3,8) :: dvshape
 !
-      integer :: i,nc,nr,lab,nrdof,np,j
+      integer :: i,nc,nr,lab,np,j
       integer :: iprint
 !------------------------------------------------------------------------------------
 !
@@ -95,7 +95,7 @@ end subroutine hexa
 !
 subroutine hexa_TraHex(No,Eta, X,Dxdeta)
 !
-      use GMP          , only : HEXAS,POINTS,CURVES,RECTANGLES
+      use GMP          , only : HEXAS,POINTS
       use element_data , only : BRICK_EDGE_TO_VERT,BRICK_FACE_TO_VERT
       implicit none
       integer               ,intent(in ) :: No
@@ -125,7 +125,7 @@ subroutine hexa_TraHex(No,Eta, X,Dxdeta)
       real(8),dimension(3)    :: xf
       real(8),dimension(3,2)  :: dxfdtf
 !
-      integer                 :: nrdof,i,j,np,nc,norient,nr,iv1,iv2,iv4
+      integer                 :: i,j,np,nc,norient,nr,iv1,iv2,iv4
       integer                 :: iprint
 !------------------------------------------------------------------------------------
 !

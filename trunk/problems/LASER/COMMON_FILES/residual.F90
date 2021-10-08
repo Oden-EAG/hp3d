@@ -25,7 +25,6 @@ subroutine residual(res)
 !..computed total residual
    real(8), intent(out) :: res
 !
-!..workspace for element_error routine
    real(8) :: resid_subd,resid_tot
    integer :: iel,mdle,count,ierr
 !
