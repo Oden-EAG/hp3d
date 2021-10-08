@@ -47,8 +47,8 @@
 
 # Other commands must follow all #SBATCH directives...
 
-# export PROFILEDIR=/work/05246/sh43394/stampede2/hp3d/trunk/problems/MPI_POISSON/GALERKIN/tau/profiles
-# export TRACEDIR=/work/05246/sh43394/stampede2/hp3d/trunk/problems/MPI_POISSON/GALERKIN/tau/traces
+# export PROFILEDIR=/work/05246/sh43394/stampede2/hp3d/trunk/problems/MPI_POISSON/PRIMAL_DPG/tau/profiles
+# export TRACEDIR=/work/05246/sh43394/stampede2/hp3d/trunk/problems/MPI_POISSON/PRIMAL_DPG/tau/traces
 # export TAU_PROFILE=1
 # export TAU_TRACE=1
 

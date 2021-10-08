@@ -14,7 +14,7 @@ SRC_COMMON = \
             ./common/set_environment.F90 \
             ./common/uniform_href.F90
 
-SRC_GALERKIN = \
+SRC_PRIMAL = \
             celem.F90 \
             exec_case.F90 \
             exec_job.F90 \
@@ -25,4 +25,4 @@ SRC_GALERKIN = \
             set_initial_mesh.F90 \
             soldis.F90
 
-SRC_FILE   += $(SRC_MODULE) $(SRC_COMMON) $(SRC_GALERKIN)
+SRC_FILE   += $(SRC_MODULE) $(SRC_COMMON) $(SRC_PRIMAL)
