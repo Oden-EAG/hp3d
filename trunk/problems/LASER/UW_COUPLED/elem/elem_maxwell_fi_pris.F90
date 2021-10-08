@@ -49,7 +49,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                                 NrdofEi,                      &
                                 MdE,MdQ,                      &
                                 ZblocE,ZalocEE,ZalocEQ,       &
-                                ZblocQ,ZalocQE,ZalocQQ,G,stiffEE,stiffQE)
+                                ZblocQ,ZalocQE,ZalocQQ)
 !..modules used
    use control
    use parametersDPG
@@ -76,9 +76,6 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    complex(8), dimension(MdQ),     intent(out) :: ZblocQ
    complex(8), dimension(MdQ,MdE), intent(out) :: ZalocQE
    complex(8), dimension(MdQ,MdQ), intent(out) :: ZalocQQ
-complex(8), dimension(NrTest,NrTest), intent(out) :: G
-complex(8), dimension(2*NrdofEi,NrTest), intent(out) :: stiffEE
-complex(8), dimension(6*NrdofQ ,NrTest), intent(out) :: stiffQE
 !
    real(8), parameter :: rZero = 0.d0
 !
@@ -1461,9 +1458,6 @@ start_time = MPI_Wtime()
 !      Construction of the DPG system
 !----------------------------------------------------------------------
 !
-G = GramT
-stiffEE = stiff_EE_T
-stiffQE = stiff_EQ_T
    allocate(stiff_ALL(NrTest,NrTrial+1))
 !
 !..Total test/trial DOFs of the element
