@@ -45,7 +45,8 @@ c  ...matrices for a system of linear equations
       dimension aa(6,6),bb(6,3),cc(3,6),dd(3,3),uu(6),aux(6,3),ipiv(6)
 c
 c  ...work space
-      dimension eigen(3),work(37),iwork(18),rnw(3),aGauss(3,3),temp(3)
+      dimension eigen(3),work(37),iwork(18),rnw(3),temp(3)
+c     dimension aGauss(3,3)
 c
       dimension itrian(10)
 

@@ -374,7 +374,6 @@
       subroutine copy_dofH(Ntype,Nordo,Nordn,NdofHo,NdofHn, &
                            NvarH,ZdofHo,ZdofHn)
 !
-      use parameters, only: MAXEQNH
       implicit none
 !
 #if DEBUG_MODE
@@ -460,7 +459,6 @@
       subroutine copy_dofE(Ntype,Nordo,Nordn,NdofEo,NdofEn, &
                            NvarE,ZdofEo,ZdofEn)
 !
-      use parameters, only: MAXEQNE
       implicit none
 !
 #if DEBUG_MODE
@@ -655,7 +653,6 @@
       subroutine copy_dofV(Ntype,Nordo,Nordn,NdofVo,NdofVn, &
                            NvarV,ZdofVo,ZdofVn)
 !
-      use parameters, only: MAXEQNV
       implicit none
 !
 #if DEBUG_MODE
@@ -844,7 +841,6 @@
       subroutine copy_dofQ(Ntype,Nordo,Nordn,NdofQo,NdofQn, &
                            NvarQ,ZdofQo,ZdofQn)
 !
-      use parameters, only: MAXEQNQ
       implicit none
 !
 #if DEBUG_MODE

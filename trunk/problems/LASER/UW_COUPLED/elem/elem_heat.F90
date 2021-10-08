@@ -361,7 +361,7 @@ subroutine elem_heat(Mdle,                   &
                endif
          end select
 !
-!     ...2nd loop through enriched H1 trial functions
+!     ...2nd loop through enriched H1 test functions
 !     ...for Gram matrix
          do k2=k1,NrdofHH
 !
@@ -398,7 +398,7 @@ subroutine elem_heat(Mdle,                   &
                   stop
             end select
 !
-!     ...enddo 2nd loop through enriched H1 trial functions
+!     ...enddo 2nd loop through enriched H1 test functions
          enddo
 !
 !     ...loop through H1 trial functions

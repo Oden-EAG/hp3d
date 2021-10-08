@@ -32,17 +32,14 @@ c
 c
       dimension List_curves(Nrcurves),Rn(3)
 c
-c  ...the reconstructed hesjan
-      dimension acoeff(3,3)
-c
 c  ...points to fit
       dimension xp(3,20),weight(20)
 c
 c  ...matrices for a system of linear equations
-      dimension aa(6,6),bb(6,3),cc(3,6),dd(3,3),uu(6),aux(6,3)
+      dimension aa(6,6),bb(6,3),cc(3,6),dd(3,3),aux(6,3)
 
 c  ...work space
-      dimension eigen(3),work(37),iwork(18),rnw(3),aGauss(3,3),temp(3)
+      dimension eigen(3),work(37),iwork(18),rnw(3)
 c
 c
 c**********************************************************************
