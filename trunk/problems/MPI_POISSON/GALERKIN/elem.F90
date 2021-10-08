@@ -72,9 +72,6 @@ subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
 !
 !..ALOC: holds local element stiffness matrices
 !..BLOC: holds local element load vectors
-   use assembly, only: ALOC,BLOC
-   use control , only: INTEGRATION
-   use physics , only: NR_PHYSA
    use data_structure3D
    use element_data
    use parameters
@@ -119,7 +116,7 @@ subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
    real(8) :: xiloc(3,MAX_NINT3), waloc(MAX_NINT3)
 !
 !..workspace for trial and test variables
-   real(8) :: dq(3), u(3), dp(1:3)
+   real(8) :: dq(3), dp(1:3)
 !
 !-------------------------------------------------------------------------
 !

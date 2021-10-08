@@ -6,11 +6,10 @@ subroutine my_paraview_driver(IParAttr)
 !
    use upscale
    use physics,            only: DTYPE,NR_COMP,NR_PHYSA,PHYSA
-   use data_structure3D,   only: NRCOMS
-   use environment,        only: PREFIX,QUIET_MODE
+   !use data_structure3D,   only: NRCOMS
+   use environment,        only: QUIET_MODE
    use paraview,           only: PARAVIEW_DUMP_ATTR,FILE_VIS, &
-                                 PARAVIEW_DOMAIN,VLEVEL, &
-                                 PARAVIEW_DUMP_GEOM
+                                 VLEVEL,PARAVIEW_DUMP_GEOM
    use mpi_param,          only: RANK,ROOT
 !
    implicit none
@@ -22,8 +21,6 @@ subroutine my_paraview_driver(IParAttr)
 !
    integer, save :: id = -1
    logical, save :: initialized = .false.
-!
-   character(len=2) :: vis_level
 !
 !-------------------------------------------------------------------------------------------
 !

@@ -40,8 +40,7 @@ subroutine initialize
    integer :: MAXEQNV_PROB                    ! MAX Hdiv var
    integer :: MAXEQNQ_PROB                    ! MAX L2 var
 !--------------------------------------------------------------------------
-   integer :: iflag,i,INTEGRATION_tmp
-   character(len=1024) :: argv
+   integer :: INTEGRATION_tmp
    logical :: qtmp
 !--------------------------------------------------------------------------
 !..output file open for the history of refinements (not for MPI)
