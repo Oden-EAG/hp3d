@@ -49,7 +49,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                                 NrdofEi,                      &
                                 MdE,MdQ,                      &
                                 ZblocE,ZalocEE,ZalocEQ,       &
-                                ZblocQ,ZalocQE,ZalocQQ)
+                                ZblocQ,ZalocQE,ZalocQQ,G,stiffEE,stiffQE)
 !..modules used
    use control
    use parametersDPG
@@ -76,6 +76,9 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    complex(8), dimension(MdQ),     intent(out) :: ZblocQ
    complex(8), dimension(MdQ,MdE), intent(out) :: ZalocQE
    complex(8), dimension(MdQ,MdQ), intent(out) :: ZalocQQ
+complex(8), dimension(NrTest,NrTest), intent(out) :: G
+complex(8), dimension(2*NrdofEi,NrTest), intent(out) :: stiffEE
+complex(8), dimension(6*NrdofQ ,NrTest), intent(out) :: stiffQE
 !
    real(8), parameter :: rZero = 0.d0
 !
@@ -990,10 +993,12 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
             if (i12 .le. nrdofE12) then
 !           ...Parameters i3,sa,fa, switch between fn value or deriv
                i3mod = i3; sa = 1; fa = 1
+!               mm1 = mapEE(i12 + (i3-1)*nrdofE12)
                mm1 = mapEE(i3 + (i12-1)*nrdofH3)
             else
                if (i3 .eq. nrdofH3) exit
                i3mod = i3 + 1; sa = 2; fa = 0
+!               mm1 = mapEE(i12-nrdofE12 + (i3-1)*(nrdofH12) + nrdofE12*nrdofH3)
                mm1 = mapEE(i3 + (i12-nrdofE12-1)*(nrdofH3-1) + nrdofE12*nrdofH3)
             endif
 !
@@ -1010,10 +1015,12 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                      if (j12.le.nrdofE12) then
 !                    ...Parameters j3,sb,fb, switch between fn value or deriv
                         j3mod = j3; sb = 1; fb = 1
+!                        mm2 = mapEE(j12 + (j3-1)*nrdofE12)
                         mm2 = mapEE(j3 + (j12-1)*nrdofH3)
                      else
                         if (j3 .eq. nrdofH3) exit
                         j3mod = j3 + 1; sb = 2; fb = 0
+!                        mm2 = mapEE(j12-nrdofE12 + (j3-1)*(nrdofH12) + nrdofE12*nrdofH3)
                         mm2 = mapEE(j3 + (j12-nrdofE12-1)*(nrdofH3-1) + nrdofE12*nrdofH3)
                      endif
 !
@@ -1161,6 +1168,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                   enddo
 !           ...end loop 2 over 1D test functions
                enddo
+
 !
 !        ...Assemble Stiffness matrix
 !           ...Loop over 1D trial functions
@@ -1391,7 +1399,7 @@ start_time = MPI_Wtime()
 !           ( < n x H , G > = GAMMA*< n x n x E , G > + < zg , G > )
             if ((ibc(ifc,3).eq.3 .and. Fld_flag.eq.1) .or. &
                 (ibc(ifc,5).eq.3 .and. Fld_flag.eq.0)) then
-!           ...get the boundary source
+!           ...get the boundary source [zImp should be zero here]
                call get_bdSource(Mdle,x,rn, zImp)
 !           ...accumulate for the load vector
                k = 2*k1-1
@@ -1453,6 +1461,9 @@ start_time = MPI_Wtime()
 !      Construction of the DPG system
 !----------------------------------------------------------------------
 !
+G = GramT
+stiffEE = stiff_EE_T
+stiffQE = stiff_EQ_T
    allocate(stiff_ALL(NrTest,NrTrial+1))
 !
 !..Total test/trial DOFs of the element
@@ -1635,11 +1646,102 @@ subroutine tens_prism_ordEE(p,q, mapEE)
 !
 end subroutine tens_prism_ordEE
 !
+!
+! Note this routine was for use with continuous 2D shape functions
+! and mapped to continuous 3D. Since shape3EE on hexa (only) returns
+! shape functions in (full) tensor product order we instead need to map our
+! shape functions to this broken ordering. Another version is implemented
+! below with this ordering
+!!
+!!----------------------------------------------------------------------
+!! routine: tens_hexa_ordEE
+!!----------------------------------------------------------------------
+!subroutine tens_hexa_ordEE(p,q, mapEE)
+!   use parametersDPG
+!   integer, intent(in)  :: p
+!   integer, intent(in)  :: q
+!   integer, intent(out) :: mapEE(2*(p+1)*p*(q+1) + (p+1)*(p+1)*q)
+!   integer :: i,j,k,l
+!   integer :: NdofE2,NdofH2,NdofH1,NdofQ1
+!!
+!   mapEE = 0
+!   k = 0
+!
+!   NdofE2 = 2*p*(p+1);
+!   NdofH2 = (p+1)*(p+1);
+!   NdofQ1 = q;
+!   NdofH1 = q+1;
+!!
+!!..Mixed edge functions (3D Edges x 1D Verts)    [8*p + 4*q]
+!!..Have edges from both T(curl) [p] and T(H1) [p-2] to account for
+!   do i=1,4*p
+!      k = k+1
+!      mapEE((i-1)*NdofH1 + 1) = k
+!   enddo
+!   do i=1,4*p
+!      k = k+1
+!      mapEE((i-1)*NdofH1 + 2) = k
+!   enddo
+!
+!   do i=1,4*q
+!      k = k+1
+!      mapEE(NdofE2*NdofH1 + i) = k
+!   enddo
+!!
+!!..Top and bottom face functions (Quad Hcurl Bub. x Unit Edges)        [4*p*(p-1)]
+!   do i=1,2*p*(p-1)
+!      k = k+1
+!      mapEE((i+4*p-1)*NdofH1 + 1) = k
+!   enddo
+!   do i=1,2*p*(p-1)
+!      k = k+1
+!      mapEE((i+4*p-1)*NdofH1 + 2) = k
+!   enddo
+!!
+!!.. Quad face functions (Tri Hcurl Edges x Unit H1 Edges
+!!                       and Tri H1 Edges x Unit L2 Edges)    [4*(p)*(q-1) + 4*q*(p-1)]
+!   do l=1,4
+!      do j=3,NdofH1
+!         do i=1,p
+!            k = k+1
+!            mapEE((i+(l-1)*p-1)*NdofH1 + j) = k
+!         enddo
+!      enddo
+!      do j=1,NdofQ1
+!         do i=1,p-1
+!            k = k+1
+!            mapEE(NdofE2*NdofH1 + (i+4+(l-1)*(p-1)-1)*q + j) = k
+!         enddo
+!      enddo
+!   enddo
+!!
+!!..Bubble functions (Quad Bub. x Unit edges)  [p*(p-1)*(q-1) + (p-1)*(p-1)*q]
+!!..Quad Hcurl Bub. x H1 Edges
+!   do j=3,NdofH1
+!      do i=1,2*p*(p-1)
+!         k = k+1
+!         mapEE((i+4*p-1)*NdofH1 + j) = k
+!      enddo
+!   enddo
+!!
+!!..Quad H1 Bub. x L2 edges
+!   do j = 1,NdofQ1
+!      do i=1,(p-1)*(p-1)
+!         k = k+1
+!         mapEE(NdofE2*NdofH1 + (i+4*p-1)*NdofQ1 + j) = k
+!      enddo
+!   enddo
+!!
+!!
+!end subroutine tens_hexa_ordEE
 !----------------------------------------------------------------------
 ! routine: tens_hexa_ordEE
 !----------------------------------------------------------------------
 subroutine tens_hexa_ordEE(p,q, mapEE)
    use parametersDPG
+!
+   implicit none
+!
    integer, intent(in)  :: p
    integer, intent(in)  :: q
    integer, intent(out) :: mapEE(2*(p+1)*p*(q+1) + (p+1)*(p+1)*q)
@@ -1654,67 +1756,59 @@ subroutine tens_hexa_ordEE(p,q, mapEE)
    NdofQ1 = q;
    NdofH1 = q+1;
 !
-!..Mixed edge functions (3D Edges x 1D Verts)    [8*p + 4*q]
-!..Have edges from both T(curl) [p] and T(H1) [p-2] to account for
-   do i=1,4*p
-      k = k+1
-      mapEE((i-1)*NdofH1 + 1) = k
-   enddo
-   do i=1,4*p
-      k = k+1
-      mapEE((i-1)*NdofH1 + 2) = k
-   enddo
-
-   do i=1,4*q
-      k = k+1
-      mapEE(NdofE2*NdofH1 + i) = k
-   enddo
+!!..H1 z shape functions with 2D Hcurl with x-component
+!   do i=1,NdofH1
+!      do j=1,p*(p+1)
+!         k=k+1
+!         mapEE(j + (i-1)*NdofE2) = k
+!      enddo
+!   enddo
+!!
+!!..H1 z functions with 2D Hcurl with y-component
+!   do i=1,NdofH1
+!      do j=1,p*(p+1)
+!         k=k+1
+!         mapEE(j + p*(p+1) + (i-1)*NdofE2) = k
+!      enddo
+!   enddo
+!!
+!!..L2 z functions with 2D H1
+!   do i=1,NdofQ1
+!      do j=1,NdofH2
+!         k=k+1
+!         mapEE(j + (i-1)*NdofH2 + NdofH1*NdofE2) = k
+!      enddo
+!   enddo
 !
-!..Top and bottom face functions (Quad Hcurl Bub. x Unit Edges)        [4*p*(p-1)]
-   do i=1,2*p*(p-1)
-      k = k+1
-      mapEE((i+4*p-1)*NdofH1 + 1) = k
-   enddo
-   do i=1,2*p*(p-1)
-      k = k+1
-      mapEE((i+4*p-1)*NdofH1 + 2) = k
-   enddo
-!
-!.. Quad face functions (Tri Hcurl Edges x Unit H1 Edges
-!                       and Tri H1 Edges x Unit L2 Edges)    [4*(p)*(q-1) + 4*q*(p-1)]
-   do l=1,4
-      do j=3,NdofH1
-         do i=1,p
-            k = k+1
-            mapEE((i+(l-1)*p-1)*NdofH1 + j) = k
-         enddo
-      enddo
-      do j=1,NdofQ1
-         do i=1,p-1
-            k = k+1
-            mapEE(NdofE2*NdofH1 + (i+4+(l-1)*(p-1)-1)*q + j) = k
-         enddo
+!..H1 z shape functions with 2D Hcurl with x-component
+   do i=1,NdofH1
+      do j=1,p*(p+1)
+         k=k+1
+         mapEE(i + (j-1)*NdofH1) = k
       enddo
    enddo
 !
-!..Bubble functions (Quad Bub. x Unit edges)  [p*(p-1)*(q-1) + (p-1)*(p-1)*q]
-!..Quad Hcurl Bub. x H1 Edges
-   do j=3,NdofH1
-      do i=1,2*p*(p-1)
-         k = k+1
-         mapEE((i+4*p-1)*NdofH1 + j) = k
+!..H1 z functions with 2D Hcurl with y-component
+   do i=1,NdofH1
+      do j=1,p*(p+1)
+         k=k+1
+         mapEE(i + (j+p*(p+1)-1)*NdofH1) = k
       enddo
    enddo
 !
-!..Quad H1 Bub. x L2 edges
-   do j = 1,NdofQ1
-      do i=1,(p-1)*(p-1)
-         k = k+1
-         mapEE(NdofE2*NdofH1 + (i+4*p-1)*NdofQ1 + j) = k
+!..L2 z functions with 2D H1
+   do i=1,NdofQ1
+      do j=1,NdofH2
+         k=k+1
+         mapEE(i + (j-1)*NdofQ1 + NdofH1*NdofE2) = k
       enddo
    enddo
 !
-!
+!!
+!   do i=1,2*(p+1)*p*(q+1) + (p+1)*(p+1)*q
+!      write(*,*) mapEE(i)
+!   enddo
+!!
 end subroutine tens_hexa_ordEE
 !
 !----------------------------------------------------------------------
@@ -1780,7 +1874,7 @@ subroutine hexa_mapEEi(px,py,pz,nrdofEEi, mapEEi)
    enddo
    do i3 = 1,pz
       do i2 = 1,py+1
-         do i1 = 1,px
+         do i1 = 1,px+1
             if (i1 .lt. 3 .or. i2 .lt. 3) then
                ik = ik + 1
                m1 = (px+1)*py*(pz+1) + px*(py+1)*(pz+1)   &
