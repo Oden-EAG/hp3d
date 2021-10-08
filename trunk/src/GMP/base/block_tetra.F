@@ -151,7 +151,7 @@ c
       common /ctetra_TraTet/ iprint
 c
       dimension Eta(3),X(3),Dxdeta(3,3)
-      dimension xold(3),dxolddeta(3,3)
+c     dimension xold(3),dxolddeta(3,3)
 c
 c  ...vertex shape functions
       dimension shapH(8),dshapH(3,8)

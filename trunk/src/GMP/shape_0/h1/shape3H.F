@@ -101,9 +101,6 @@ c
 c  ...derivatives of edge coordinate
       dimension dtedxi(3)
 c
-c  ...face coordinates
-      dimension tf(2),dtfdxi(2,3)
-c
 c  ...edge bubble shape functions
       dimension shapHb(MAXP-1),dshapHb(MAXP-1)
 c

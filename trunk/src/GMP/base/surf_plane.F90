@@ -187,7 +187,7 @@ subroutine determine_plane2(X,Y, Rn)
       real(8),dimension(3,2) :: rna
 
 !  ...auxiliary matrices
-      real(8),dimension(2)   :: x0,x1
+      real(8),dimension(2)   :: x1
       real(8),dimension(3)   :: x12,y12,c,d
       real(8),dimension(2,2) :: a,b
 !

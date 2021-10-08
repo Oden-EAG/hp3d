@@ -64,7 +64,7 @@ subroutine add_layer2plane(N_plane,Nr_bound,Ns_bound,N_layers,Thickness,N_domain
   real(8), dimension(3,2)            :: aux
   real(8)                            :: prod,dr,fval
   integer, dimension(3)              :: nverts,nvert
-  real(8), dimension(3)              :: void,temp,NORMAL
+  real(8), dimension(3)              :: void,NORMAL
   integer, dimension(0:max_layers)   :: n_planes
   real(8), dimension(max_layers)     :: tlayer
   integer                            :: i,idec,jv,np,np1,np2,np3,nt,nc,newp1,newp2

@@ -44,8 +44,6 @@ c     or
 c       list(1,i) = block connected to a face
 c       list(2,i) = the corresponding face number
 c
-      character(10) type
-c
 c---------------------------------------------------------------------
 c
       iprint=1
@@ -747,12 +745,6 @@ c  ...for i-th face
 c     face_to_vert(1:4,i) are the face vertex numbers
       integer face_to_vert(4,6)
       dimension xnod(3,8)
-c
-c  ...vertex points of an edge
-      dimension xedge_points(3,2)
-c
-c  ...two remaining points on a face containing the edge
-      dimension yedge_points(3,2)
 c
 c  ...auxiliary vectors
       dimension aux1(3),aux2(3),aux3(3),aux4(3)
