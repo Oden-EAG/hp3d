@@ -51,7 +51,7 @@ program main
 !  ...print header
       write(6,*)
       write(6,*) '//                              //'
-      write(6,*) '// --  MPI POISSON GALERKIN  -- //'
+      write(6,*) '// -- MPI POISSON PRIMAL DPG -- //'
       write(6,*) '//                              //'
       write(6,*)
    endif
@@ -82,6 +82,11 @@ program main
    ISTC_FLAG = .true.
    STORE_STC = .true.
    HERM_STC  = .false.
+!
+!..set interface variables
+!  (1) - H1 field (1 scalar-valued component)
+!  (2) - H(div) trace (1 vector-valued component)
+   PHYSAi(1:2) = (/.false.,.true./)
 !
 !..determine number of omp threads running
    if (RANK .eq. ROOT) then
@@ -203,6 +208,7 @@ subroutine master_main()
       write(*,*) '                                         '
       write(*,*) '     ---- Error and Residual ----        '
       write(*,*) 'Compute exact error....................50'
+      write(*,*) 'Compute residual.......................51'
       write(*,*) '                                         '
       write(*,*) '          ---- TESTING ----              '
       write(*,*) 'Flush dof, update_gdof, update_Ddof....60'
@@ -284,7 +290,7 @@ subroutine master_main()
             call exec_case(idec)
 !
 !     ...Error and Residual
-         case(50)
+         case(50,51)
             call exec_case(idec)
 !
 !     ...TODO testing
@@ -402,7 +408,7 @@ subroutine worker_main()
             call exec_case(idec)
 !
 !     ...Error and Residual
-         case(50)
+         case(50,51)
             call exec_case(idec)
 !
 !     ...TODO testing

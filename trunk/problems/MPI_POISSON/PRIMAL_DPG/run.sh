@@ -25,9 +25,7 @@ imax=2
 # - MAXNODS
 maxnods=525000
 
-export KMP_STACKSIZE=64M # p=5
-
-
+export KMP_STACKSIZE=64M
 
 args=" -job ${job} -maxnods ${maxnods} -p ${p}"
 args+=" -isol ${isol} -imax ${imax} -nthreads ${nthreads}"
