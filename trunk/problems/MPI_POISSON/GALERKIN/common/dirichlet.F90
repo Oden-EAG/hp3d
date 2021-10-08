@@ -24,7 +24,7 @@
 !----------------------------------------------------------------------
 subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
 !
-   use control    , only : NEXACT, GEOM_TOL
+   use control    , only : NEXACT
    use parameters , only : MAXEQNH,MAXEQNE,MAXEQNV,MAXEQNQ, ZERO
    use common_prob_data
 !
@@ -45,10 +45,6 @@ subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
    real(8),dimension(  MAXEQNQ    ) ::   valQ
    real(8),dimension(  MAXEQNQ,3  ) ::  dvalQ
    real(8),dimension(  MAXEQNQ,3,3) :: d2valQ
-!
-#if DEBUG_MODE
-   integer :: iprint = 0
-#endif
 !
 !--------------------------------------------------------------------
 !

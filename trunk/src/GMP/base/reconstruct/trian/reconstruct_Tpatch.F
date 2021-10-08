@@ -51,9 +51,6 @@ c
 c  ...hesjan of the reconstructed surface at the point
       dimension acoeff(3,3)
 c
-c  ...derivatives of normal vectors
-      dimension dnorm1(1:3),dnorm2(1:3)
-c
 c  ...work space
       dimension temp(3)
 c

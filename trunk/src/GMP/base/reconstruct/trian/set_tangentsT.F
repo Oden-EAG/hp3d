@@ -53,7 +53,8 @@ c
       dimension Rn1(3),Rn2(3)
 c
 c  ...work lists containing adjacent surface triangles data
-      dimension list(10),list_rloc(3,10),list_tets(20)
+      dimension list(10),list_tets(20)
+c     dimension list_rloc(3,10)
 c
 c  ...work space
       dimension temp(3),void(3,3),list_aux(Nrcurves),

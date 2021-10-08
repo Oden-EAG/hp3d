@@ -63,14 +63,13 @@ c       list(1,i) = block connected to a face
 c       list(2,i) = the corresponding face number
 c
 c     nvert_aux - vertices for a surface triangle
-      character(10) type
       character(10) surfstype(10), surfrtype(10)
 c
 c  ...list of surfaces containing a curve
       integer lists(10)
 c
 c  ...workspace
-      dimension vect(1:3,3),void(3),rdata_save(3),rpos(3)
+      dimension rdata_save(3),rpos(3)
 c---------------------------------------------------------------------
 c
       iprint=0

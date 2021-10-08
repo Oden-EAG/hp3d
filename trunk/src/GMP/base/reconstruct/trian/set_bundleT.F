@@ -42,18 +42,11 @@ c
 c
       dimension Newlist_curves(Nrcurves),
      .          List_trian(3,Nrcurves)
-      dimension Rn(3),Rn1(3),Rn2(3)
-c
-c  ...work list containing adjacent surface triangles
-      dimension list(10)
+      dimension Rn(3)
 c
 c  ...normal components for hexahedra edges "orthogonal" to the
 c     plane and adjacent to the point
       dimension edge_comp(10)
-c
-c  ...the following matrix specifies for each edge in the cube
-c     the corresponding vertex endpoints numbers
-      dimension nedg_to_vert(2,12)
 c
 c  ...transformation matrix to patch coordinates
       dimension transf(3,3)
@@ -66,9 +59,6 @@ c  ...work space
 c
 c  ...patch coordinates
       dimension xy(2,10),r(10),theta(10),dtheta(10),theta_new(10)
-c
-c  ...secant vectors components
-      dimension xyz(3,10)
 c
 c  ...second derivatives of the implicit reconstruction of surface
       dimension acoeff(3,3)

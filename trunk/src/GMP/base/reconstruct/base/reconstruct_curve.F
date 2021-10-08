@@ -49,7 +49,7 @@ c     optimization parameters
       dimension dr(3), drdl(3, 4),d2drdl(3, 4,4)
 c
 c  ...work space
-      dimension temp(3),eigen(4),work(9),aacopy(4,4),dx(3)
+      dimension temp(3),eigen(4),work(9),aacopy(4,4)
 c
 c
 c**********************************************************************

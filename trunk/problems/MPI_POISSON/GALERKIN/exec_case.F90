@@ -18,9 +18,6 @@ subroutine exec_case(idec)
    integer :: mdle_subd(NRELES)
    integer :: i,mdle,kref,src,count,ierr,nord
 !
-   integer :: mdle_list(1)
-   integer :: mdle_nord(1)
-!
 !----------------------------------------------------------------------
 !
    solved = .false.
@@ -205,9 +202,6 @@ subroutine exec_case(idec)
             count = 1; src = ROOT
             call MPI_BCAST (nord,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
          endif
-         !mdle_list(1) = mdle
-         !mdle_nord(1) = nord
-         !call perform_pref(mdle_list,mdle_nord,1)
          call nodmod(mdle,nord)
 !
       case default

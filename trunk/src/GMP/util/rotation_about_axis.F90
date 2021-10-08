@@ -19,7 +19,7 @@ subroutine rotation_about_axis(Ax,Pt,Alpha, R,dR_dAlpha)
       real(8),dimension(3),intent(inout) :: R
       real(8),dimension(3),intent(out)   :: dR_dAlpha
 !
-      real(8) :: u,v,w,a,b,c,x,y,rz,d,s1,s2,s3,s4
+      real(8) :: u,v,w,a,b,c,x,y,rz
 !
       u=Ax(1)  ;  v=Ax(2)  ;  w=Ax(3)
       a=Pt(1)  ;  b=Pt(2)  ;  c=Pt(3)

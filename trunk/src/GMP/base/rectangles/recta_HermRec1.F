@@ -51,7 +51,7 @@ c  ...dof for the curve normal tangents in local coordinates
       dimension gdof(1:3,4)
 c
 c  ...normal vector and its derivative, same for the unit normal vector
-      dimension rn(1:3),drn(1:3),rnmod(1:3),drnmod(1:3),en(1:3),den(1:3)
+      dimension rn(1:3),drn(1:3),en(1:3),den(1:3)
 c
 c  ...dof for vector g along an edge
       dimension gendf_dof(4),gdf_dof(4)

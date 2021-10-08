@@ -35,13 +35,10 @@ c  ...lists of curves adjacent to a point
       dimension ncurve_list1(maxc), ncurve_list2(maxc)
 c
 c  ...corresponding list of triangles, vertex number, orientation
-      dimension ntria_list(1:3,maxc), ntria_list2(1:3,maxc)
-c
-c  ...curvatures at a point
-      dimension acoeff(3,3)
+      dimension ntria_list(1:3,maxc)
 c
 c  ...work space
-      dimension temp(1:3),rn1(3),rn2(3),dnorm(1:3,2),xp(3),rnorm(3)
+      dimension temp(1:3),rn1(3),rn2(3),dnorm(1:3,2),rnorm(3)
       integer, dimension(200) :: curve_fail
 c
 c  ...tangent vectors and their derivatives at endpoints of a curve
