@@ -824,8 +824,6 @@ use data_structure3D
   integer, intent(in)    :: NFlag, IBCelem
   integer, intent(inout) :: IBCnod
 !
-  integer :: loc
-!
   select case(Nflag)
 !
 !  ...vertex or edge node

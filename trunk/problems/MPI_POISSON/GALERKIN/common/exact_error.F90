@@ -14,7 +14,7 @@ subroutine exact_error
    use data_structure3D
    use common_prob_data
    use environment
-   use assembly_sc, only: NRDOF_TOT,NRDOF_CON
+   use assembly_sc, only: NRDOF_TOT
    use par_mesh   , only: DISTRIBUTED,HOST_MESH
    use mpi_param  , only: ROOT,RANK
    use MPI        , only: MPI_SUM,MPI_COMM_WORLD,MPI_REAL8
@@ -27,7 +27,7 @@ subroutine exact_error
    real(8) :: errorH,rnormH,errorE,rnormE
    real(8) :: errorV,rnormV,errorQ,rnormQ
    real(8) :: err,rnorm,error_subd,rnorm_subd
-   integer :: iel,mdle,subd,count,ierr
+   integer :: iel,count,ierr
 !
 !----------------------------------------------------------------------
 !
