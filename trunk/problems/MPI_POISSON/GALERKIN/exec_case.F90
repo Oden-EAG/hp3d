@@ -164,7 +164,7 @@ subroutine exec_case(idec)
          call petsc_solve('G')
 !
       case(50)
-         write(*,*) 'computing error and residual...'
+         write(*,*) 'computing error...'
          call exact_error
 !
       case(60)
