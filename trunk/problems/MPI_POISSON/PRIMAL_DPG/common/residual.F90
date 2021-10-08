@@ -4,7 +4,7 @@
 !
 !----------------------------------------------------------------------
 !
-!     latest revision:  - Oct 2019
+!     latest revision:  - Oct 2021
 !
 !     purpose:          - compute and print residual
 !
@@ -12,7 +12,6 @@
 subroutine residual(res)
 !
    use data_structure3D
-   use commonParam
    use control
    use environment
    use assembly_sc, only: NRDOF_TOT,NRDOF_CON
@@ -33,9 +32,6 @@ subroutine residual(res)
 !
 !..timer
    real(8) :: MPI_Wtime,start_time,end_time
-!
-!..printing flag
-   integer :: iprint = 0
 !
 !-----------------------------------------------------------------------
 !
@@ -68,12 +64,7 @@ subroutine residual(res)
    do iel=1,NRELES_SUBD
       mdle = ELEM_SUBD(iel)
       call elem_residual(mdle, elem_resid,elem_ref_flag)
-      if (USE_PML .and. Is_pml(mdle)) then
-      !  treat PML differently if needed
-         resid_subd = resid_subd + elem_resid
-      else
-         resid_subd = resid_subd + elem_resid
-      endif
+      resid_subd = resid_subd + elem_resid
    enddo
 !$OMP END PARALLEL DO
 !

@@ -17,6 +17,7 @@ subroutine exec_case(idec)
    logical :: solved
    integer :: mdle_subd(NRELES)
    integer :: i,mdle,kref,src,count,ierr,nord
+   integer :: iParAttr(2) = (/1,0/)
 !
 !----------------------------------------------------------------------
 !
@@ -26,7 +27,8 @@ subroutine exec_case(idec)
 !
 !  ...paraview graphics
       case(3)
-         call my_paraview_driver(1)
+         iParAttr(1:2) = (/1,0/) ! write field output only
+         call my_paraview_driver(iParAttr)
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 !  ...print data structure (interactive)
@@ -166,6 +168,10 @@ subroutine exec_case(idec)
       case(50)
          write(*,*) 'computing error...'
          call exact_error
+!
+      case(51)
+         write(*,*) 'computing residual...'
+         call residual
 !
       case(60)
          write(*,*) 'flushing dof'
