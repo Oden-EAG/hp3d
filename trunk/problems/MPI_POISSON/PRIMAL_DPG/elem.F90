@@ -164,8 +164,8 @@ subroutine elem_poisson(Mdle,                   &
 !..aux variables
    real(8) :: rjac, bjac, fval, wa, weight
    integer :: iflag, nrv, nre, nrf, nint
-   integer :: i1, i2, j1, j2, k1, k2, kH, kk, i, j, kE, k, l
-   integer :: nordP, nrdof, nsign, ifc, info, ndom, iphys, icomp
+   integer :: j1, j2, k1, k2, i, k, l
+   integer :: nordP, nrdof, nsign, ifc, info
 !
    character(len=4) :: etype,ftype
 !
@@ -183,7 +183,7 @@ subroutine elem_poisson(Mdle,                   &
 !
 !..geometry
    real(8) :: xi(3), x(3), dxdxi(3,3), dxidx(3,3), rn(3)
-   real(8) :: dxidt(3,2), dxdt(3,2), rt(3,2), t(2)
+   real(8) :: dxidt(3,2), dxdt(3,2), t(2)
 !
 !..H1 shape functions
    real(8) :: shapH(MAXbrickH), gradH(3,MAXbrickH)
@@ -192,7 +192,7 @@ subroutine elem_poisson(Mdle,                   &
    real(8) :: shapV(3,MAXbrickV), divV(MAXbrickV)
 !
 !..Enriched H1 shape functions
-   real(8)    :: shapHH(MAXbrickHH), gradHH(3,MAXbrickHH)
+   real(8) :: shapHH(MAXbrickHH), gradHH(3,MAXbrickHH)
 !
 !..load vector for the enriched space
    real(8) :: bload_H(NrTest)
@@ -210,7 +210,7 @@ subroutine elem_poisson(Mdle,                   &
    real(8) :: tloc(2,MAXNINT2ADD), wtloc(MAXNINT2ADD)
 !
 !..workspace for trial and test variables
-   real(8) :: p, q, v, sn, aux
+   real(8) :: q, v, sn, aux
    real(8) :: dq(3), dp(3), dv(3), s(3)
 !
 !..for Gram matrix compressed storage format
@@ -327,7 +327,6 @@ subroutine elem_poisson(Mdle,                   &
 !
 !     ...2nd loop through enriched H1 test functions for Gram matrix
          do k2=k1,NrdofHH
-!
 !        ...Piola transformation
             q = shapHH(k2)
             dq(1:3) = gradHH(1,k2)*dxidx(1,1:3) &
@@ -429,11 +428,11 @@ subroutine elem_poisson(Mdle,                   &
    allocate(stiff_ALL(NrTest,NrTrial+1))
 !
 !..Total test/trial DOFs of the element
-   i1 = NrTest ; j1 = NrdofH ; j2 = NrdofVi
+   i = NrTest ; j1 = NrdofH ; j2 = NrdofVi
 !
-   stiff_ALL(1:i1,1:j1)       = stiff_HH(1:i1,1:j1)
-   stiff_ALL(1:i1,j1+1:j1+j2) = stiff_HV(1:i1,1:j2)
-   stiff_ALL(1:i1,j1+j2+1)    = bload_H(1:i1)
+   stiff_ALL(1:i,1:j1)       = stiff_HH(1:i,1:j1)
+   stiff_ALL(1:i,j1+1:j1+j2) = stiff_HV(1:i,1:j2)
+   stiff_ALL(1:i,j1+j2+1)    = bload_H(1:i)
 !
    deallocate(stiff_HH,stiff_HV)
 !
