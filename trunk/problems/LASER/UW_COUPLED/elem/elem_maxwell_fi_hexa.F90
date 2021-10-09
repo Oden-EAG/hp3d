@@ -143,7 +143,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !
 !..Gram matrix in packed format
    !complex(8) :: gramP(NrTest*(NrTest+1)/2)
-   complex(8), allocatable :: gramP(:)
+   complex(8), allocatable :: gramP(:), Gfull(:,:), Grfp(:)
    real(8) :: FF, CF, FC
    real(8) :: fldE(3), fldH(3), crlE(3), crlH(3)
    real(8) :: fldF(3), fldG(3), crlF(3), crlG(3)
@@ -1529,13 +1529,56 @@ start_time = MPI_Wtime()
    stiff_ALL(1:i1,j1+j2+1)    = bload_E(1:i1)
 !
    deallocate(stiff_EE_T,stiff_EQ_T)
+
+allocate(Gfull(NrTest,Nrtest))
+allocate(Grfp(NrTest*(Nrtest+1)/2))
+
+start_time = MPI_Wtime()
+call ZTPTTR('U',NrTest,gramP,Gfull,NrTest,info)
+write(*,*) 'Copy full: ', MPI_Wtime() - start_time
+start_time = MPI_Wtime()
+call ZTPTTF('N','U',NrTest,gramP,Grfp,info)
+write(*,*) 'Copy RFP: ', MPI_Wtime() - start_time
+
+start_time = MPI_Wtime()
+call ZPPTRF('U',NrTest,gramP,info)
+if (info.ne.0) then
+   write(*,*) 'elem_maxwell_fi_hexa: ZPPTRF: Mdle,info = ',Mdle,info,'. stop.'
+   stop
+endif
+write(*,*) 'Cholesky Packed: ', MPI_Wtime() - start_time
+
+start_time = MPI_Wtime()
+call ZPOTRF('U',NrTest,Gfull,NrTest,info)
+if (info.ne.0) then
+   write(*,*) 'elem_maxwell_fi_hexa: ZPPTRF: Mdle,info = ',Mdle,info,'. stop.'
+   stop
+endif
+write(*,*) 'Cholesky full: ', MPI_Wtime() - start_time
+
+start_time = MPI_Wtime()
+call ZPFTRF('N','U',NrTest,Grfp,info)
+if (info.ne.0) then
+   write(*,*) 'elem_maxwell_fi_hexa: ZPPTRF: Mdle,info = ',Mdle,info,'. stop.'
+   stop
+endif
+write(*,*) 'Cholesky RFP: ', MPI_Wtime() - start_time
+
+
+
+
+
+
+
+
+
 !
 !..A. Compute Cholesky factorization of Gram Matrix, G=U^*U (=LL^*)
-   call ZPPTRF('U',NrTest,gramP,info)
-   if (info.ne.0) then
-      write(*,*) 'elem_maxwell_fi_hexa: ZPPTRF: Mdle,info = ',Mdle,info,'. stop.'
-      stop
-   endif
+!   call ZPPTRF('U',NrTest,gramP,info)
+!   if (info.ne.0) then
+!      write(*,*) 'elem_maxwell_fi_hexa: ZPPTRF: Mdle,info = ',Mdle,info,'. stop.'
+!      stop
+!   endif
 !
 !..B. Solve triangular system to obtain B~, (LX=) U^*X = [B|l]
    call ZTPTRS('U','C','N',NrTest,NrTrial+1,gramP,stiff_ALL,NrTest,info)
@@ -1544,7 +1587,7 @@ start_time = MPI_Wtime()
       stop
    endif
 !
-   deallocate(gramP)
+   deallocate(gramP,Gfull,Grfp)
    allocate(zaloc(NrTrial+1,NrTrial+1)); zaloc = ZERO
 !
 !..C. Matrix multiply: B^* G^-1 B (=B~^* B~)
