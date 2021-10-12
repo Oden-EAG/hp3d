@@ -247,7 +247,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    integer, dimension(3) :: ndofx,ndofy,ndofz
    integer, dimension(2,2,6) :: xran,yran,zran
    integer, dimension(2,6) :: fam
-   integer, dimension(6) :: NdofEEFc
+   integer, dimension(6) :: NrdofEEFc
    real(8), dimension(3,6) :: nfce
 
 !
@@ -1065,127 +1065,144 @@ write(*,*) 'Hexa:'
 !
 !  ...loop over Hcurl trial shape function identified by indices j1,j2,j3,b
       do b=1,3
-         do j3=1,NrdofH3
-            do j2=1,NrdofH2
-               do j1=1,NrdofH1
+         do j3=1,nrdofH3
+            do j2=1,nrdofH2
+               do j1=1,nrdofH1
                   sb=1+deltak(b,1)
                   idxb=j1+deltak(b,1)
                   idxb2=j2+deltak(b,2)
                   idxb3=j3+deltak(b,3)
-if (idxb.le.NrdofH1 .and. idxb2.le.NrdofH2 .and. idxb3.le.NrdofH3) then
 !              ...determine index of 3D Hcurl trial shape function using j1,j2,j3,b
-                  m2 = offset(b) + j1 + ndofx(b)*(j2-1) + ndofx(b)*ndofy(b)*(j3-1)
-
-!              ...loop over Hcurl test shape function identified by indices i1,i2,i3,a
-                  do a=1,3
-                     do i3=1,ndofz(a)
-                        do i2=1,ndofy(a)
-                           do i1=1,ndofx(a)
-                              sa=1+deltak(a,1)
-                              idxa=i1+deltak(a,1)
-                              idxa2=i2+deltak(a,2)
-                              idxa3=i3+deltak(a,3)
-if (idxa.le.NrdofH1 .and. idxa2.le.NrdofH2 .and. idxa3.le.NrdofH3) then
-!                          ...combine indices i3, j3 into k3
-                              k3=(i3-1)*nrdofH3+j3
-!                          ...combine indices i2, j2 into k2
-                              k2=(i2-1)*nrdofH2+j2
-!                          ...determine index of 3D Hcurl trial shape function
-                              m1 = offset(a) + i1 + ndofx(a)*(i2-1) + ndofx(a)*ndofy(a)*(i3-1)
-
-!                          ...accumulate integrals only if m1<=m2
-                              if (m1.le.m2) then
+                  if ((idxb.le.nrdofH1).and.(idxb2.le.nrdofH2).and.(idxb3.le.nrdofH3)) then
+                     select case(b)
+                        case(1)
+                        m2=j1+nord1*(j2-1)+nord1*nrdofH2*(j3-1)
+                        case(2)
+                        m2=nord1*nrdofH2*nrdofH3 &
+                           +j1+nrdofH1*(j2-1)+nrdofH1*nord2*(j3-1)
+                        case(3)
+                        m2=nord1*nrdofH2*nrdofH3 &
+                           +nrdofH1*nord2*nrdofH3 &
+                           +j1+nrdofH1*(j2-1)+nrdofH1*nrdofH2*(j3-1)
+                     end select
+!                 ...loop over Hcurl test shape function identified by indices i1,i2,i3,a
+                     do a=1,3
+                        do i3=1,nrdofH3
+                           do i2=1,nrdofH2
+                              do i1=1,nrdofH1
                                  sa=1+deltak(a,1)
-                                 sb=1+deltak(b,1)
-                                 kk = nk(2*m1-1,2*m2-1)
-!                             ...sum EE terms
-                                 gramP(kk) = gramP(kk)         &
-                                           + shapH1(idxa,sa)   &
-                                           * shapH1(idxb,sb)   &
-                                           * AUXEE_B_zb(b,a,k2,k3)
-!                             ...sum CC terms
-                                 do beta=1,2; do alph=1,2
-                                    idxbeta=mod(b+beta-1,3)+1
-                                    idxalph=mod(a+alph-1,3)+1
-                                    sb=1+1-deltak(idxbeta,1)
-                                    sa=1+1-deltak(idxalph,1)
-                                    gramP(kk) = gramP(kk)          &
-                                              + shapH1(idxa,sa)    &
-                                              * shapH1(idxb,sb)    &
-                                              * AUXCC_B(alph,beta,b,a,k2,k3)
-
-                                 enddo; enddo
-
-                                 kk = nk(2*m1-1,2*m2)
-!                             ...sum CE terms
-                                 do alph=1,2
-                                    idxalph=mod(a+alph-1,3)+1
-                                    sb=1+deltak(b,1)
-                                    sa=1+1-deltak(idxalph,1)
-                                    gramP(kk) = gramP(kk)                   &
-                                              + AUXCE_B_zc(alph,b,a,k2,k3)  &
-                                              * shapH1(idxa,sa)*shapH1(idxb,sb)
-                                 enddo
-!                             ...sum EC terms
-                                 do beta=1,2
-                                    idxbeta=mod(b+beta-1,3)+1
-                                    sb=1+1-deltak(idxbeta,1)
-                                    sa=1+deltak(a,1)
-                                    gramP(kk) = gramP(kk)                     &
-                                              + AUXEC_B_zb(beta,b,a,k2,k3)    &
-                                              * shapH1(idxa,sa)*shapH1(idxb,sb)
-                                 enddo
-
-                                 if (m1.ne.m2) then
-
-                                    kk = nk(2*m1  ,2*m2-1)
-!                                ...sum CE terms
-                                    do alph=1,2
-                                       idxalph=mod(a+alph-1,3)+1
-                                       sb=1+deltak(b,1)
-                                       sa=1+1-deltak(idxalph,1)
-                                       gramP(kk) = gramP(kk)                     &
-                                                 + AUXCE_B_zb(alph,b,a,k2,k3)    &
-                                                 * shapH1(idxa,sa)*shapH1(idxb,sb)
-                                    enddo
-!                                ...sum EC terms
-                                    do beta=1,2
-                                       idxbeta=mod(b+beta-1,3)+1
-                                       sb=1+1-deltak(idxbeta,1)
+                                 idxa=i1+deltak(a,1)
+                                 idxa2=i2+deltak(a,2)
+                                 idxa3=i3+deltak(a,3)
+                                 if ((idxa.le.nrdofH1).and.(idxa2.le.nrdofH2).and.(idxa3.le.nrdofH3)) then
+!                                ...combine indices i3, j3 into k3
+                                    k3=(i3-1)*nrdofH3+j3
+!                                ...combine indices i2, j2 into k2
+                                    k2=(i2-1)*nrdofH2+j2
+!                                ...determine index of 3D Hcurl trial shape function
+                                    select case(a)
+                                       case(1)
+                                       m1=i1+nord1*(i2-1)+nord1*nrdofH2*(i3-1)
+                                       case(2)
+                                       m1=nord1*nrdofH2*nrdofH3 &
+                                         +i1+nrdofH1*(i2-1)+nrdofH1*nord2*(i3-1)
+                                       case(3)
+                                       m1=nord1*nrdofH2*nrdofH3+nrdofH1*nord2*nrdofH3 &
+                                         +i1+nrdofH1*(i2-1)+nrdofH1*nrdofH2*(i3-1)
+                                    end select
+!                                ...accumulate integrals only if m1<=m2
+                                    if (m1.le.m2) then
                                        sa=1+deltak(a,1)
-                                       gramP(kk) = gramP(kk)                   &
-                                                 + AUXEC_B_zc(beta,b,a,k2,k3)  &
-                                                 * shapH1(idxa,sa)*shapH1(idxb,sb)
-                                    enddo
+                                       sb=1+deltak(b,1)
+                                       kk = nk(2*m1-1,2*m2-1)
+!                                   ...sum EE terms
+                                       gramP(kk) = gramP(kk)         &
+                                                 + shapH1(idxa,sa)   &
+                                                 * shapH1(idxb,sb)   &
+                                                 * AUXEE_B_zb(b,a,k2,k3)
+!                                   ...sum CC terms
+                                       do beta=1,2; do alph=1,2
+                                          idxbeta=mod(b+beta-1,3)+1
+                                          idxalph=mod(a+alph-1,3)+1
+                                          sb=1+1-deltak(idxbeta,1)
+                                          sa=1+1-deltak(idxalph,1)
+                                          gramP(kk) = gramP(kk)          &
+                                                    + shapH1(idxa,sa)    &
+                                                    * shapH1(idxb,sb)    &
+                                                    * AUXCC_B(alph,beta,b,a,k2,k3)
 
+                                       enddo; enddo
+
+                                       kk = nk(2*m1-1,2*m2)
+!                                   ...sum CE terms
+                                       do alph=1,2
+                                          idxalph=mod(a+alph-1,3)+1
+                                          sb=1+deltak(b,1)
+                                          sa=1+1-deltak(idxalph,1)
+                                          gramP(kk) = gramP(kk)                   &
+                                                    + AUXCE_B_zc(alph,b,a,k2,k3)  &
+                                                    * shapH1(idxa,sa)*shapH1(idxb,sb)
+                                       enddo
+!                                   ...sum EC terms
+                                       do beta=1,2
+                                          idxbeta=mod(b+beta-1,3)+1
+                                          sb=1+1-deltak(idxbeta,1)
+                                          sa=1+deltak(a,1)
+                                          gramP(kk) = gramP(kk)                     &
+                                                    + AUXEC_B_zb(beta,b,a,k2,k3)    &
+                                                    * shapH1(idxa,sa)*shapH1(idxb,sb)
+                                       enddo
+
+                                       if (m1.ne.m2) then
+
+                                          kk = nk(2*m1  ,2*m2-1)
+!                                      ...sum CE terms
+                                          do alph=1,2
+                                             idxalph=mod(a+alph-1,3)+1
+                                             sb=1+deltak(b,1)
+                                             sa=1+1-deltak(idxalph,1)
+                                             gramP(kk) = gramP(kk)                     &
+                                                       + AUXCE_B_zb(alph,b,a,k2,k3)    &
+                                                       * shapH1(idxa,sa)*shapH1(idxb,sb)
+                                          enddo
+!                                      ...sum EC terms
+                                          do beta=1,2
+                                             idxbeta=mod(b+beta-1,3)+1
+                                             sb=1+1-deltak(idxbeta,1)
+                                             sa=1+deltak(a,1)
+                                             gramP(kk) = gramP(kk)                   &
+                                                       + AUXEC_B_zc(beta,b,a,k2,k3)  &
+                                                       * shapH1(idxa,sa)*shapH1(idxb,sb)
+                                          enddo
+
+                                       endif
+
+                                       kk = nk(2*m1  ,2*m2  )
+!                                   ...sum EE terms
+                                       sb=1+deltak(b,1)
+                                       sa=1+deltak(a,1)
+                                       gramP(kk) = gramP(kk)         &
+                                                 + shapH1(idxa,sa)   &
+                                                 * shapH1(idxb,sb)   &
+                                                 * AUXEE_B_zc(b,a,k2,k3)
+!                                   ...sum CC terms
+                                       do beta=1,2; do alph=1,2
+                                          idxbeta=mod(b+beta-1,3)+1
+                                          idxalph=mod(a+alph-1,3)+1
+                                          sb=1+1-deltak(idxbeta,1)
+                                          sa=1+1-deltak(idxalph,1)
+                                          gramP(kk) = gramP(kk)         &
+                                                    + shapH1(idxa,sa)   &
+                                                    * shapH1(idxb,sb)   &
+                                                    * AUXCC_B(alph,beta,b,a,k2,k3)
+
+                                       enddo; enddo
+                                     endif
                                  endif
-
-                                 kk = nk(2*m1  ,2*m2  )
-!                             ...sum EE terms
-                                 sb=1+deltak(b,1)
-                                 sa=1+deltak(a,1)
-                                 gramP(kk) = gramP(kk)         &
-                                           + shapH1(idxa,sa)   &
-                                           * shapH1(idxb,sb)   &
-                                           * AUXEE_B_zc(b,a,k2,k3)
-!                             ...sum CC terms
-                                 do beta=1,2; do alph=1,2
-                                    idxbeta=mod(b+beta-1,3)+1
-                                    idxalph=mod(a+alph-1,3)+1
-                                    sb=1+1-deltak(idxbeta,1)
-                                    sa=1+1-deltak(idxalph,1)
-                                    gramP(kk) = gramP(kk)         &
-                                              + shapH1(idxa,sa)   &
-                                              * shapH1(idxb,sb)   &
-                                              * AUXCC_B(alph,beta,b,a,k2,k3)
-
-                                 enddo; enddo
-                              endif
-                              endif
+                              enddo
                            enddo
                         enddo
                      enddo
-                  enddo
                   endif
                enddo
             enddo
@@ -1202,56 +1219,63 @@ if (idxa.le.NrdofH1 .and. idxa2.le.NrdofH2 .and. idxa3.le.NrdofH3) then
                m2=j1+(j2-1)*nrdofQ1_tr+(j3-1)*nrdofQ1_tr*nrdofQ2_tr
 !           ...loop over Hcurl test shape function identified by indices i1,i2,i3,a
                do a=1,3
-                  do i3=1,NrdofH3
-                     do i2=1,NrdofH2
-                        do i1=1,NrdofH1
+                  do i3=1,nrdofH3-deltak(a,3)
+                     do i2=1,nrdofH2-deltak(a,2)
+                        do i1=1,nrdofH1-deltak(a,1)
                            sa=1+deltak(a,1)
                            idxa=i1+deltak(a,1)
                            idxa2=i2+deltak(a,2)
                            idxa3=i3+deltak(a,3)
-                           if (idxa.le.NrdofH1 .and. idxa2.le.NrdofH2 .and. idxa3.le.NrdofH3) then
-!
-!                       ...combine indices i3, j3 into k3
-                           k3=(i3-1)*nrdofQ3_tr+j3
-!                       ...combine indices i2, j2 into k2
-                           k2=(i2-1)*nrdofQ2_tr+j2
-!                       ...determine index for 3D Hcurl test function
-                           m1 = offset(a) + i1 + ndofx(a)*(i2-1) + ndofx(a)*ndofy(a)*(i3-1)
-!
-!                       ...loop over vector components of L2 trial functions
-                           do b=1,3
-                              k = (m2-1)*6 + 3+ b
-!                          ...accumulate QC term
-                              do alph=1,2
-                                 idxalph=mod(a+alph-1,3)+1
-                                 sa=1+1-deltak(idxalph,1)
+                           if ((idxa.le.nrdofH1).and.(idxa2.le.nrdofH2).and.(idxa3.le.nrdofH3)) then
+!                          ...combine indices i3, j3 into k3
+                              k3=(i3-1)*nrdofQ3_tr+j3
+!                          ...combine indices i2, j2 into k2
+                              k2=(i2-1)*nrdofQ2_tr+j2
+!                          ...determine index for 3D Hcurl test function
+                              select case(a)
+                                 case(1)
+                                 m1=i1+nord1*(i2-1)+nord1*nrdofH2*(i3-1)
+                                 case(2)
+                                 m1=nord1*nrdofH2*nrdofH3 &
+                                   +i1+nrdofH1*(i2-1)+nrdofH1*nord2*(i3-1)
+                                 case(3)
+                                 m1=nord1*nrdofH2*nrdofH3+nrdofH1*nord2*nrdofH3 &
+                                   +i1+nrdofH1*(i2-1)+nrdofH1*nrdofH2*(i3-1)
+                              end select
+!                          ...loop over vector components of L2 trial functions
+                              do b=1,3
+                                 k = (m2-1)*6 + 3+ b
+!                             ...accumulate QC term
+                                 do alph=1,2
+                                    idxalph=mod(a+alph-1,3)+1
+                                    sa=1+1-deltak(idxalph,1)
+                                    stiff_EQ_T(k,2*m1-1) = stiff_EQ_T(k,2*m1-1) &
+                                                      + shapH1(idxa,sa)*shapH1(j1+1,2) &
+                                                      * STIFQC_B(alph,a,b,k2,k3)
+                                 enddo
+
+                                 sa=1+deltak(a,1)
+
+                                 k = (m2-1)*6 + b
+!                             ...accumulate QE term
                                  stiff_EQ_T(k,2*m1-1) = stiff_EQ_T(k,2*m1-1) &
-                                                   + shapH1(idxa,sa)*shapH1(j1+1,2) &
-                                                   * STIFQC_B(alph,a,b,k2,k3)
-                              enddo
-
-                              sa=1+deltak(a,1)
-
-                              k = (m2-1)*6 + b
-!                          ...accumulate QE term
-                              stiff_EQ_T(k,2*m1-1) = stiff_EQ_T(k,2*m1-1) &
-                                                +shapH1(idxa,sa)*shapH1(j1+1,2) &
-                                                *STIFQE_ALPHA_B(a,b,k2,k3)
-                              k = (m2-1)*6 + 3+ b
-!                          ...accumulate QE term
-                              stiff_EQ_T(k,2*m1) = stiff_EQ_T(k,2*m1) &
-                                                +shapH1(idxa,sa)*shapH1(j1+1,2) &
-                                                *STIFQE_B(a,b,k2,k3)
-                              k = (m2-1)*6 + b
-!                          ...accumulate QC term
-                              do alph=1,2
-                                 idxalph=mod(a+alph-1,3)+1
-                                 sa=1+1-deltak(idxalph,1)
+                                                   +shapH1(idxa,sa)*shapH1(j1+1,2) &
+                                                   *STIFQE_ALPHA_B(a,b,k2,k3)
+                                 k = (m2-1)*6 + 3+ b
+!                             ...accumulate QE term
                                  stiff_EQ_T(k,2*m1) = stiff_EQ_T(k,2*m1) &
-                                                   + shapH1(idxa,sa)*shapH1(j1+1,2) &
-                                                   * STIFQC_B(alph,a,b,k2,k3)
+                                                   +shapH1(idxa,sa)*shapH1(j1+1,2) &
+                                                   *STIFQE_B(a,b,k2,k3)
+                                 k = (m2-1)*6 + b
+!                             ...accumulate QC term
+                                 do alph=1,2
+                                    idxalph=mod(a+alph-1,3)+1
+                                    sa=1+1-deltak(idxalph,1)
+                                    stiff_EQ_T(k,2*m1) = stiff_EQ_T(k,2*m1) &
+                                                      + shapH1(idxa,sa)*shapH1(j1+1,2) &
+                                                      * STIFQC_B(alph,a,b,k2,k3)
+                                 enddo
                               enddo
-                           enddo
                            endif
                         enddo
                      enddo
@@ -1270,11 +1294,27 @@ if (idxa.le.NrdofH1 .and. idxa2.le.NrdofH2 .and. idxa3.le.NrdofH3) then
                do i1=1,nrdofH1
                   sa=1+deltak(a,1)
                   idxa=i1+deltak(a,1)
-!
-!              ...determine index for 3D Hcurl test function
-                  m1 = offset(a) + i1 + ndofx(a)*(i2-1) + ndofx(a)*ndofy(a)*(i3-1)
-!              ...accumulate outermost integral
-                  bload_E(2*m1-1)=bload_E(2*m1-1)+shapH1(idxa,sa)*LOADE_B(a,i2,i3)
+                  idxa2=i2+deltak(a,2)
+                  idxa3=i3+deltak(a,3)
+                  if ((idxa.le.nrdofH1).and.(idxa2.le.nrdofH2).and.(idxa3.le.nrdofH3)) then
+!                 ...combine indices i3, j3 into k3
+                     k3=(i3-1)*nrdofQ3_tr+j3
+!                 ...combine indices i2, j2 into k2
+                     k2=(i2-1)*nrdofQ2_tr+j2
+!                 ...determine index for 3D Hcurl test function
+                     select case(a)
+                        case(1)
+                        m1=i1+nord1*(i2-1)+nord1*nrdofH2*(i3-1)
+                        case(2)
+                        m1=nord1*nrdofH2*nrdofH3 &
+                          +i1+nrdofH1*(i2-1)+nrdofH1*nord2*(i3-1)
+                        case(3)
+                        m1=nord1*nrdofH2*nrdofH3+nrdofH1*nord2*nrdofH3 &
+                          +i1+nrdofH1*(i2-1)+nrdofH1*nrdofH2*(i3-1)
+                     end select
+!                 ...accumulate outermost integral
+                     bload_E(2*m1-1)=bload_E(2*m1-1)+shapH1(idxa,sa)*LOADE_B(a,i2,i3)
+                  endif
                enddo
             enddo
          enddo
@@ -1317,7 +1357,7 @@ start_time = MPI_Wtime()
 !
 !..Get families that contribute to each face (two families per face)
 !              face:  1    2    3    4    5    6
-   fam  = reshape((/ 1,2, 1,2, 1,3, 1,3, 2,3, 2,3 /), (/2,6/))
+   fam  = reshape((/ 1,2, 1,2, 1,3, 2,3, 1,3, 2,3 /), (/2,6/))
 !
 !..Range of x component for each family and face
 !                    family 1       family 2
@@ -1351,7 +1391,7 @@ start_time = MPI_Wtime()
 !
 !..Get number of dofs on each face
 !              family 1        family 2
-   NdofEEFc = (/  nord1*nrdofH2 + nrdofH1*nord2,   & ! face 1
+   NrdofEEFc = (/ nord1*nrdofH2 + nrdofH1*nord2,   & ! face 1
                   nord1*nrdofH2 + nrdofH1*nord2,   & ! face 2
                   nord1*nrdofH3 + nrdofH1*nord3,   & ! face 3
                   nord2*nrdofH3 + nrdofH2*nord3,   & ! face 4
@@ -1385,7 +1425,7 @@ start_time = MPI_Wtime()
       INTEGRATION = 0
 !
 !  ...Get index of (broken) face degrees of freedom in global array
-      allocate(idxEE(NdofEEFc(ifc)))
+      allocate(idxEE(NrdofEEFc(ifc)))
       ik = 0
       do aa=1,2
          a = fam(aa,ifc)
@@ -1464,7 +1504,7 @@ start_time = MPI_Wtime()
          weight = bjac*wtloc(l)
 
 !     ...loop through Hcurl enriched test functions
-         do ik=1,NdofEEfc(ifc)
+         do ik=1,NrdofEEfc(ifc)
          !do k1=1,nrdofEE
             k1 = idxEE(ik)
             E1(1:3) = shapEE(1,k1)*dxidx(1,1:3) &
@@ -1522,7 +1562,7 @@ start_time = MPI_Wtime()
          enddo
 !  ...end loop through integration points
       enddo
-deallocate(idxEE,idxE)
+      deallocate(idxEE,idxE)
 
 !..end loop through faces
    enddo
