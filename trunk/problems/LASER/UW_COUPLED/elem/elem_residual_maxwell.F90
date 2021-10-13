@@ -81,11 +81,10 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    real(8) :: rsolH
 !
 !..variables for geometry
-   real(8), dimension(3)   :: xi,x,rn
+   real(8), dimension(3)   :: xi,x,rn,daux
    real(8), dimension(3,2) :: dxidt,dxdt,rt
    real(8), dimension(3,3) :: dxdxi,dxidx
    real(8), dimension(2)   :: t
-   real(8), dimension(3)   :: daux
 !
 !..H1 shape functions
    real(8), dimension(MAXbrickH)   :: shapH
