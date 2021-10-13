@@ -62,7 +62,7 @@ subroutine geom_error(Err,Rnorm)
       real(8), intent(out) ::  Err, Rnorm
 !
       real(8) :: derr, dnorm, err_rate
-      integer :: iprint, mdle, iel, ierr, i, nrgdof, nvoid , ic
+      integer :: iprint, mdle, iel, i, nrgdof, nvoid , ic
 !
       integer,parameter :: nin=13
       integer,parameter :: maxvis=2000

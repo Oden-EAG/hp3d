@@ -446,8 +446,8 @@ c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 c
         integer :: iprint,N,m,i,j,nordF(2),ndofF,minI,minJ,maxI,maxJ
         logical :: IdecF(2),GIdecF(2)
-        double precision :: Mu(2,0:1),DMu(2,2,0:1)
-        double precision :: GMu(2,0:1),GDMu(2,2,0:1)
+        double precision :: Mu(0:1,2),DMu(2,0:1,2)
+        double precision :: GMu(0:1,2),GDMu(2,0:1,2)
         double precision :: phiQuad(2:MAXP,2:MAXP)
         double precision :: DphiQuad(2,2:MAXP,2:MAXP)
 c
@@ -676,8 +676,8 @@ c
         integer :: iprint,N,m,i,j,ij(2),ig,jg,a,b,ab(2),fam
         integer :: nordF(2),ndofF(0:1),minF(2),maxF(2)
         logical :: IdecF(2),GIdecF(2)
-        double precision :: Mu(2,0:1),DMu(2,2,0:1)
-        double precision :: GMu(2,0:1),GDMu(2,2,0:1)
+        double precision :: Mu(0:1,2),DMu(2,0:1,2)
+        double precision :: GMu(0:1,2),GDMu(2,0:1,2)
         double precision :: EQuad(2,0:MAXP-1,2:MAXP)
         double precision :: curlEQuad(0:MAXP-1,2:MAXP)
 c
@@ -712,7 +712,7 @@ c        ...local parameters
             maxF(1) = nordF(a)-1
             maxF(2) = nordF(b)
 c        ...construct the shape functions
-            call AncEQuad(GMu(ab,0:1),GDMu(1:N,ab,0:1),
+            call AncEQuad(GMu(0:1,ab),GDMu(1:N,0:1,ab),
      .                                       nordF(ab),GIdecF(ab),N,
      .                      EQuad(1:N,minF(1):maxF(1),minF(2):maxF(2)),
      .                      curlEQuad(minF(1):maxF(1),minF(2):maxF(2)))
@@ -911,9 +911,9 @@ c
         integer :: iprint,i,j,m,N,nordF(2),ndofF
         integer :: minI,minJ,maxI,maxJ
         logical :: IdecF(2),GIdecF(2)
-        double precision :: Mu(2,0:1),DMu(2,2,0:1)
-        double precision :: GMu(2,0:1),GDMu(2,2,0:1)
-        double precision :: homP(2,0:MAXP-1)
+        double precision :: Mu(0:1,2),DMu(2,0:1,2)
+        double precision :: GMu(0:1,2),GDMu(2,0:1,2)
+        double precision :: homP(0:MAXP-1,2)
         double precision :: jac
 c
 c    ...debugging flag
@@ -943,14 +943,14 @@ c      ...local parameters (again)
 c      ...orient
           call OrientQuad(Mu,DMu,Nori,IdecF,N, GMu,GDMu,GIdecF)
 c      ...construct the shape functions
-          call HomLegendre(GMu(1,0:1),maxI, homP(1,minI:maxI))
-          call HomLegendre(GMu(2,0:1),maxJ, homP(2,minJ:maxJ))
+          call HomLegendre(GMu(0:1,1),maxI, homP(minI:maxI,1))
+          call HomLegendre(GMu(0:1,2),maxJ, homP(minJ:maxJ,2))
           do j=minJ,maxJ
             do i=minI,maxI
               m=m+1
 c
-              call cross(N,GDMu(1:N,1,1),GDMu(1:N,2,1), jac)
-              ShapV(m) = homP(1,i)*homP(2,j)*jac
+              call cross(N,GDMu(1:N,1,1),GDMu(1:N,1,2), jac)
+              ShapV(m) = homP(i,1)*homP(j,2)*jac
             enddo
           enddo
         endif
