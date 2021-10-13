@@ -33,9 +33,9 @@ nthreads=1
 #
 # set polynomial order p in (xy,z)
 #px=1; py=1; pz=1
-#px=2; py=2; pz=2
-#px=3; py=3; pz=3
-px=4; py=4; pz=4
+# px=2; py=2; pz=2
+px=3; py=3; pz=3
+#px=4; py=4; pz=4
 #px=5; py=5; pz=5
 #px=6; py=6; pz=6
 #px=7; py=7; pz=7
@@ -213,7 +213,7 @@ fi
 #      --> 1 wavelength per 4 unit lengths in z-direction
 #    / can be run with NEXACT=1 or NEXACT=0 (with PML: --use NEXACT=0)
 usepml=false
-ibc=0
+ibc=2
 
 # VARYING LENGTH OF WAVEGUIDE
 # set waveguide length, #refs, maxnodes, 4 elems/wavelength
