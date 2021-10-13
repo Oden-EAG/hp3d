@@ -4,10 +4,10 @@
 !
 !----------------------------------------------------------------------
 !
-!     latest revision:  - July 2019
+!     latest revision:  - Oct 2021
 !
-!     purpose:          - main driver for MPI Test Program
-!                         Poisson Galerkin implementation
+!     purpose:          - main driver for MPI LASER Application
+!                         Coupled Ultraweak Maxwell/Primal Heat
 !
 !----------------------------------------------------------------------
 !
@@ -25,7 +25,7 @@ program main
    use assembly_sc, only: IPRINT_TIME
    use stc        , only: STORE_STC,HERM_STC
 !
-   use MPI        , only: MPI_COMM_WORLD,MPI_BARRIER, &
+   use MPI        , only: MPI_COMM_WORLD,MPI_BARRIER,MPI_ABORT, &
                           MPI_GET_PROCESSOR_NAME,MPI_MAX_PROCESSOR_NAME
    use mpi_param  , only: ROOT,RANK,NUM_PROCS
    use mpi_wrapper, only: mpi_w_init,mpi_w_finalize
@@ -157,6 +157,10 @@ program main
       endif
    endif
    if (ENVELOPE) then
+      if (FAST_INT .eq. 1) then
+         write (*,*) ' Fast integration not yet implemented for envelope formulation.'
+         call MPI_ABORT (MPI_COMM_WORLD,1, ierr)
+      endif
       write (*,*) ' Solving vectorial envelope formulation:'
       write (*,9000) ' WAVENUM_SIGNAL          = ', WAVENUM_SIGNAL
       write (*,9000) ' WAVENUM_PUMP            = ', WAVENUM_PUMP
