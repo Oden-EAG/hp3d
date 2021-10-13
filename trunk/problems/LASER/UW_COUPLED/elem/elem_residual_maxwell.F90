@@ -155,7 +155,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !..OMEGA_RATIO_SIGNAL or OMEGA_RATIO_PUMP
    real(8) :: OMEGA_RATIO_FLD
 !..WAVENUM_SIGNAL or WAVENUM_PUMP
-   real(8) :: WAVENUM_FLD,WAVENUM_AUX
+   real(8) :: WAVENUM_FLD
 !
 !..for polarizations function
    VTYPE, dimension(3,3) :: bg_pol,gain_pol,raman_pol,rndotE
@@ -234,7 +234,6 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
          write(*,*) 'elem_residual_maxwell. invalid Fld_flag param. stop.'
          stop
    end select
-   WAVENUM_AUX = WAVENUM_FLD
 !
 !..initialize PML matrices
    Jstretch = ZERO
@@ -399,12 +398,6 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
                        invJstretch, 3, ZERO, JJstretch, 3)
          detJstretch = zdbeta
          JJstretch = detJstretch*JJstretch
-      endif
-!
-!  ...Modify envelope wavenumber inside PML
-      if (ENVELOPE) then
-         WAVENUM_FLD = WAVENUM_AUX
-         if (x(3).gt.PML_REGION) WAVENUM_FLD = 0.d0
       endif
 !
 !  ...PML stretching
