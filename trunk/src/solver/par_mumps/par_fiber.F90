@@ -1,6 +1,8 @@
 !
 #include "typedefs.h"
 !
+#if HP3D_USE_INTEL_MKL
+!
 ! -----------------------------------------------------------------------
 !
 !    routine name       - par_fiber
@@ -628,4 +630,23 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
 !
 end subroutine par_fiber
 
+#else
 
+subroutine par_fiber(mumps,nrdof,nproc,level)
+   use mpi_param , only: RANK,ROOT
+   use par_mumps
+   implicit none
+#if C_MODE
+   type (ZMUMPS_STRUC), intent(inout) :: mumps
+#else
+   type (DMUMPS_STRUC), intent(inout) :: mumps
+#endif
+   integer, intent(in) :: nproc
+   integer, intent(in) :: nrdof(nproc)
+   integer, intent(in) :: level
+   if (RANK .eq. ROOT) then
+      write(*,*) 'par_fiber: HP3D_USE_INTEL_MKL = 0. Dependency is required.'
+   endif
+end subroutine par_fiber
+
+#endif

@@ -1,6 +1,8 @@
 !
 #include "typedefs.h"
 !
+#if HP3D_USE_INTEL_MKL
+!
 ! -----------------------------------------------------------------------
 !
 !    routine name       - par_nested
@@ -968,3 +970,16 @@ subroutine par_nested(mtype)
 !
 !
 end subroutine par_nested
+
+#else
+
+subroutine par_nested(mtype)
+   use mpi_param , only: RANK,ROOT
+   implicit none
+   character, intent(in) :: mtype
+   if (RANK .eq. ROOT) then
+      write(*,*) 'par_nested: HP3D_USE_INTEL_MKL = 0. Dependency is required.'
+   endif
+end subroutine par_nested
+
+#endif
