@@ -85,6 +85,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    real(8), dimension(3,2) :: dxidt,dxdt,rt
    real(8), dimension(3,3) :: dxdxi,dxidx
    real(8), dimension(2)   :: t
+   real(8), dimension(3)   :: daux
 !
 !..H1 shape functions
    real(8), dimension(MAXbrickH)   :: shapH
@@ -417,8 +418,9 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !
 !     ...Piola transformation
          do i = 1,3
+            daux = dxdxi(i,1:3)
             call dot_product(shapEE(1:3,k1),dxidx(1:3,i), fldF(i))
-            call dot_product(curlEE(1:3,k1),dxdxi(i,1:3), crlF(i))
+            call dot_product(curlEE(1:3,k1),daux        , crlF(i))
          enddo
          crlF(1:3) = crlF(1:3)/rjac
          fldG = fldF; crlG = crlF
@@ -470,8 +472,9 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
          do k2=k1,NrdofEE
 !        ...Piola transformation
             do i = 1,3
+               daux = dxdxi(i,1:3)
                call dot_product(shapEE(1:3,k2),dxidx(1:3,i), fldE(i))
-               call dot_product(curlEE(1:3,k2),dxdxi(i,1:3), crlE(i))
+               call dot_product(curlEE(1:3,k2),daux        , crlE(i))
             enddo
             crlE(1:3) = crlE(1:3)/rjac
 !        ...e_z x E
