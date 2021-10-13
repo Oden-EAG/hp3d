@@ -47,11 +47,6 @@
 
 # Other commands must follow all #SBATCH directives...
 
-# export PROFILEDIR=/work/05246/sh43394/stampede2/par_hp3d/trunk/problems/MPI_POISSON/GALERKIN/tau/profiles
-# export TRACEDIR=/work/05246/sh43394/stampede2/par_hp3d/trunk/problems/MPI_POISSON/GALERKIN/tau/traces
-# export TAU_PROFILE=1
-# export TAU_TRACE=1
-
 module list
 pwd
 date

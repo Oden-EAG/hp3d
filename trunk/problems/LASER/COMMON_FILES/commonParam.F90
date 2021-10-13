@@ -31,7 +31,7 @@ module commonParam
    real(8), parameter :: H_BAR = 1.05457266d-34
 !
 !..set FAST_INT=1 to activate fast integration for hexahedra and prisms
-   integer :: FAST_INT = 0
+   integer :: FAST_INT = 1
 !
 !..material constants
    real(8)    :: MU,EPSILON

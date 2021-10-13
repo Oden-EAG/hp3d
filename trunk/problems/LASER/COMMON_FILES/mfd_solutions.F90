@@ -100,8 +100,6 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
       f_x = x1**np_x
       f_y = x2**np_y
       f_z = x3**np_z
-!  ...note: the envelope for a non-zero wavenumber will not be polynomial
-      !if (ENVELOPE) f_z = f_z * exp(-ZI*WAVENUM_FLD*x3)
 !
 !  ...derivatives
       select case(int(np_x))
@@ -127,10 +125,6 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
             df_z = np_z * x3**(np_z-1.d0)
             ddf_z = np_z * (np_z-1.d0) * x3**(np_z-2.d0)
       end select
-      !if (ENVELOPE) then
-      !   df_z = df_z * exp(-ZI*WAVENUM_FLD*x3)
-      !   df_z = df_z - ZI*WAVENUM_FLD*f_z
-      !endif
 !
 !--------------- 0th prob -------------------------------------------------------
 !..a polynomial solution with zero boundary values on unit cube
