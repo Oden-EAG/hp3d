@@ -17,8 +17,8 @@ Set the `HP3D_BASE_PATH` to the path of the `hp3d/trunk/`
 3. To compile the library, type `make` in `hp3d/trunk/`. **Before compiling**, you **must** link to the external libraries and set compiler options by modifying the `m_options` file as described below.
 
 ## Linking to external libraries
-The `m_options` file must link to the correct paths for external libraries. The following external libraries are required:
-- Intel MKL
+The `m_options` file must link to the correct paths for external libraries. The following external libraries are used:
+- Intel MKL [optional]
 - X11
 - PETSc (all following packages can be installed with PETSc)
 - HDF5/pHDF5
@@ -29,13 +29,17 @@ The `m_options` file must link to the correct paths for external libraries. The 
 - Zoltan
 
 ## Compiler options
-Compilation is governed by preprocessing flags `COMPLEX`, `SHAPE`, and `DEBUG`.
-- `COMPLEX = 0` , stiffness matrix, load vector(s) and solution dofs are real-valued
-- `COMPLEX = 1` , stiffness matrix, load vector(s) and solution dofs are complex-valued
+Compilation is governed by preprocessing flags `COMPLEX` and `DEBUG`.
+- `COMPLEX = 0` , stiffness matrix, load vector(s) and solution DOFs are real-valued
+- `COMPLEX = 1` , stiffness matrix, load vector(s) and solution DOFs are complex-valued
 - `DEBUG   = 0` , compiler uses optimization flags and the library performs only minimal checks during the computation
 - `DEBUG   = 1` , compiler uses debug flags, and the library performs additional checks during the computation
 
 Library will be created under either `hp3d/complex/` or `hp3d/real/`.
+
+Additional preprocessing flags for enabling/disabling third-party libraries:
+- `HP3D_USE_INTEL_MKL = 0` , dependency on Intel MKL package is disabled
+- `HP3D_USE_INTEL_MKL = 1` , additional solver options are available to the user (e.g., Intel MKL PARDISO)
 
 ## Compiling a problem
 Projects are implemented in `hp3d/trunk/problems/`. A few projects have been implemented and can serve as an example. For example, `/problems/MPI_POISSON/GALERKIN/` is a Galerkin implementation for the classical variational Poisson problem. To compile and run the problem, type `make`  in the project folder, i.e., `cd problems/MPI_POISSON/GALERKIN; make; ./run.sh`.
