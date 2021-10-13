@@ -1,3 +1,8 @@
+!
+#include "typedefs.h"
+!
+#if HP3D_USE_INTEL_MKL
+!
 ! -----------------------------------------------------------------------
 !
 !    routine name       - pardiso_sc
@@ -20,7 +25,6 @@
 !                                'G': General case for Lapack routines
 !
 ! ----------------------------------------------------------------------
-#include "typedefs.h"
 subroutine pardiso_sc(mtype)
 !
    use data_structure3D, only: NRNODS, NRELES, ELEM_ORDER
@@ -496,3 +500,16 @@ subroutine pardiso_sc(mtype)
 !
 !
 end subroutine pardiso_sc
+
+#else
+
+subroutine pardiso_sc(mtype)
+   use mpi_param , only: RANK,ROOT
+   implicit none
+   character, intent(in) :: mtype
+   if (RANK .eq. ROOT) then
+      write(*,*) 'pardiso_sc: HP3D_USE_INTEL_MKL = 0. Dependency is required.'
+   endif
+end subroutine pardiso_sc
+
+#endif
