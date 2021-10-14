@@ -33,7 +33,7 @@ nthreads=1
 #
 # set polynomial order p in (xy,z)
 #px=1; py=1; pz=1
-# px=2; py=2; pz=2
+#px=2; py=2; pz=2
 px=3; py=3; pz=3
 #px=4; py=4; pz=4
 #px=5; py=5; pz=5
