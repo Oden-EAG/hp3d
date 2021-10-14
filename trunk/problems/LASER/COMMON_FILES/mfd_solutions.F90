@@ -36,6 +36,8 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
    real(8) :: gammaTE10
    real(8) :: gammaTE20
    real(8) :: r
+!..for envelope formulation
+   real(8) :: k_eff,k_env
 !..for LP Modes
    real(8) :: gamm, beta, k, ca, cb, cc, r_x, r_y
    real(8) :: BESSEL_dJ1, BESSEL_K0, BESSEL_dK0, BESSEL_K1, BESSEL_dK1
@@ -48,6 +50,9 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
    real(8) :: angular,angular_x,angular_y,angular_xx,angular_xy,angular_yy
    real(8) :: Jm,Jm_x,Jm_y,Jm_xx,Jm_xy,Jm_yy
    real(8) :: Km,Km_x,Km_y,Km_xx,Km_xy,Km_yy
+!
+!..WAVENUM_SIGNAL or WAVENUM_PUMP
+   real(8) :: WAVENUM_FLD
 !
    VTYPE :: c2z,uz,uz_x,uz_y,uz_z,uz_xx,uz_xy,uz_xz,uz_yy,uz_yx,uz_yz
    VTYPE :: uz_zz,uz_zy,uz_zx
@@ -64,6 +69,15 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
    f_x = ZERO; f_y = ZERO; f_z = ZERO
    df_x = ZERO; df_y = ZERO; df_z = ZERO
    ddf_x = ZERO; ddf_y = ZERO; ddf_z = ZERO
+!
+!..set WAVENUM_FLD
+   select case(Fld)
+      case(0); WAVENUM_FLD = WAVENUM_PUMP
+      case(1); WAVENUM_FLD = WAVENUM_SIGNAL
+      case default
+         write(*,*) 'mfd_solutions: invalid Fld param. stop.'
+         stop
+   end select
 !
 !--------------------------------------------------------------------------------
 !      D E C L A R E    S O L U T I O N    V A R I A B L E S                    |
@@ -240,16 +254,27 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          f_x=-ZI*(OMEGA/PI)*sin(PI*x1)
          f_y=1.d0
          f_z=exp(-ZI*OMEGA*x3*gammaTE10)
+         if (ENVELOPE) then
+            k_eff = OMEGA*gammaTE10     ! effective wavenumber
+            k_env = k_eff - WAVENUM_FLD ! envelope wavenumber
+            f_z=exp(-ZI*k_env*x3)
+         endif
 !
 !     ...1st order derivatives
          df_x=-ZI*OMEGA*cos(PI*x1)
          df_y=0.d0
          df_z=-(ZI*OMEGA*gammaTE10)*f_z
+         if (ENVELOPE) then
+            df_z=-(ZI*k_env)*f_z
+         endif
 !
 !     ...2nd order derivatives
          ddf_x=-PI**2*f_x
          ddf_y=0.d0
          ddf_z=-(ZI*OMEGA*gammaTE10)*df_z
+         if (ENVELOPE) then
+            ddf_z=-(ZI*k_env)*df_z
+         endif
 !
          E=f_x*f_y*f_z
 !     ...1st order derivatives
@@ -465,6 +490,9 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          endif
       endif
 !
+!  ...Adjust wavenumber if solving envelope formulation
+      if (ENVELOPE) k = k - WAVENUM_FLD
+!
       call get_LP01(Xp,ampl,k,gamm,beta, E,dE)
 !
 !--------------- 14th prob -------------------------------------------------------
@@ -498,6 +526,10 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          write(*,*) 'mfd_solutions: ISOL 14, unexpected case. stop.'
          stop
       endif
+!
+!  ...Adjust wavenumber if solving envelope formulation
+      if (ENVELOPE) k = k - WAVENUM_FLD
+!
       select case(ISOL)
          case(14) ; call get_LP11a(Xp,ampl,k,gamm,beta, E,dE)
          case(140); call get_LP11b(Xp,ampl,k,gamm,beta, E,dE) ! rotated by 90 degrees
@@ -534,6 +566,10 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          write(*,*) 'mfd_solutions: ISOL 15, unexpected case. stop.'
          stop
       endif
+!
+!  ...Adjust wavenumber if solving envelope formulation
+      if (ENVELOPE) k = k - WAVENUM_FLD
+!
       select case(ISOL)
          case(15) ; call get_LP21a(Xp,ampl,k,gamm,beta, E,dE)
          case(150); call get_LP21b(Xp,ampl,k,gamm,beta, E,dE) ! rotated by 45 degrees
@@ -570,6 +606,10 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          write(*,*) 'mfd_solutions: ISOL 16, unexpected case. stop.'
          stop
       endif
+!
+!  ...Adjust wavenumber if solving envelope formulation
+      if (ENVELOPE) k = k - WAVENUM_FLD
+!
       call get_LP02(Xp,ampl,k,gamm,beta, E,dE)
 !
 !--------------- 17th prob -------------------------------------------------------
@@ -605,6 +645,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          !ampl = ampl * sqrt(0.7d0) ! 70% LP01
          !ampl = ampl * sqrt(0.6d0) ! 60% LP01
          !ampl = ampl * sqrt(0.5d0) ! 50% LP01
+         if (ENVELOPE) k = k - WAVENUM_FLD
          call get_LP01(Xp,ampl,k,gamm,beta, E01,dE01)
 !
 !     ...LP11 (signal)
@@ -622,6 +663,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          !ampl = ampl * sqrt(0.3d0) ! 30% LP11
          !ampl = ampl * sqrt(0.4d0) ! 40% LP11
          !ampl = ampl * sqrt(0.5d0) ! 50% LP11
+         if (ENVELOPE) k = k - WAVENUM_FLD
          call get_LP11a(Xp,ampl,k,gamm,beta, E11,dE11)
          !call get_LP11b(Xp,ampl,k,gamm,beta, E11,dE11)
 !
@@ -640,6 +682,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          !ampl = ampl * sqrt(0.3d0) ! 30% LP21
          !ampl = ampl * sqrt(0.4d0) ! 40% LP21
          !ampl = ampl * sqrt(0.5d0) ! 50% LP21
+         if (ENVELOPE) k = k - WAVENUM_FLD
          !call get_LP21a(Xp,ampl,k,gamm,beta, E21,dE21)
          !call get_LP21b(Xp,ampl,k,gamm,beta, E21,dE21)
 !
@@ -658,6 +701,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          !ampl = ampl * sqrt(0.3d0) ! 30% LP02
          !ampl = ampl * sqrt(0.4d0) ! 40% LP02
          !ampl = ampl * sqrt(0.5d0) ! 50% LP02
+         if (ENVELOPE) k = k - WAVENUM_FLD
          !call get_LP02(Xp,ampl,k,gamm,beta, E02,dE02)
 !
       else if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.1520d0 .and. CLAD_NX.eq.1.1500d0) .or.   &

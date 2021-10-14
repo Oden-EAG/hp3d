@@ -81,7 +81,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    real(8) :: rsolH
 !
 !..variables for geometry
-   real(8), dimension(3)   :: xi,x,rn
+   real(8), dimension(3)   :: xi,x,rn,daux
    real(8), dimension(3,2) :: dxidt,dxdt,rt
    real(8), dimension(3,3) :: dxdxi,dxidx
    real(8), dimension(2)   :: t
@@ -105,8 +105,8 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    !VTYPE, dimension(NrTest*(NrTest+1)/2) :: gramTest
    VTYPE, allocatable :: gramP(:)
    real(8) :: FF, CF, FC
-   real(8) :: fldE(3), fldH(3), crlE(3), crlH(3)
-   real(8) :: fldF(3), fldG(3), crlF(3), crlG(3)
+   real(8) :: fldE(3), fldH(3), crlE(3), crlH(3), rotE(3)
+   real(8) :: fldF(3), fldG(3), crlF(3), crlG(3), rotF(3)
 !
    real(8) :: D_aux(3,3),D_za(3,3),D_zc(3,3)
 !
@@ -135,7 +135,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    VTYPE, dimension(6)   :: zsolQ
 !
 !..auxiliary
-   VTYPE :: zresid, zaux, zcux
+   VTYPE :: zresid, zaux, zbux, zcux
 !
 !..number of faces per element type
    integer :: nrf
@@ -154,6 +154,8 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !
 !..OMEGA_RATIO_SIGNAL or OMEGA_RATIO_PUMP
    real(8) :: OMEGA_RATIO_FLD
+!..WAVENUM_SIGNAL or WAVENUM_PUMP
+   real(8) :: WAVENUM_FLD
 !
 !..for polarizations function
    VTYPE, dimension(3,3) :: bg_pol,gain_pol,raman_pol,rndotE
@@ -220,12 +222,14 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
       end select
    endif
 !
-!..set OMEGA_RATIO_FLD
+!..set OMEGA_RATIO_FLD and WAVENUM_FLD
    select case(Fld_flag)
       case(0)
          OMEGA_RATIO_FLD = OMEGA_RATIO_PUMP
+         WAVENUM_FLD     = WAVENUM_PUMP
       case(1)
          OMEGA_RATIO_FLD = OMEGA_RATIO_SIGNAL ! 1.0d0
+         WAVENUM_FLD     = WAVENUM_SIGNAL
       case default
          write(*,*) 'elem_residual_maxwell. invalid Fld_flag param. stop.'
          stop
@@ -382,6 +386,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
          JJstretch(1,1) = ZONE
          JJstretch(2,2) = ZONE
          JJstretch(3,3) = ZONE
+         detJstretch    = ZONE
       else
 !     ...get PML function
          call get_Beta(x,Fld_flag, zbeta,zdbeta,zd2beta)
@@ -412,11 +417,14 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !
 !     ...Piola transformation
          do i = 1,3
+            daux = dxdxi(i,1:3)
             call dot_product(shapEE(1:3,k1),dxidx(1:3,i), fldF(i))
-            call dot_product(curlEE(1:3,k1),dxdxi(i,1:3), crlF(i))
+            call dot_product(curlEE(1:3,k1),daux        , crlF(i))
          enddo
          crlF(1:3) = crlF(1:3)/rjac
          fldG = fldF; crlG = crlF
+!     ...e_z x F
+         rotF = 0.d0; rotF(1) = -fldF(2); rotF(2) = fldF(1)
 !
 !     ...accumulate for the load
 !     ...first eqn
@@ -433,6 +441,12 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
                 zaJ(2,2)*fldF(2)*zsolQ(2) + &
                 zaJ(3,3)*fldF(3)*zsolQ(3)
          bload_E(k) = bload_E(k) - (zaux - zcux)*weight
+!     ...additional stiffness contribution if solving vectorial envelope equation
+         if (ENVELOPE) then
+!        ...-( -ik(e_z x H,F) ), where e_z x H = (-H_y,H_x,0)
+            zaux = -ZI*WAVENUM_FLD*detJstretch*(-fldF(1)*zsolQ(5) + fldF(2)*zsolQ(4))
+            bload_E(k) = bload_E(k) - zaux*weight
+         endif
 !
 !     ...second eqn
          k = 2*k1
@@ -442,6 +456,12 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
                 zcJ(2,2)*fldG(2)*zsolQ(5) + &
                 zcJ(3,3)*fldG(3)*zsolQ(6)
          bload_E(k) = bload_E(k) - (zaux + zcux)*weight
+!     ...additional stiffness contribution if solving vectorial envelope equation
+         if (ENVELOPE) then
+!        ...-( -ik(e_z x E,G) ), where e_z x E = (-E_y,E_x,0)
+            zaux = -ZI*WAVENUM_FLD*detJstretch*(-fldG(1)*zsolQ(2) + fldG(2)*zsolQ(1))
+            bload_E(k) = bload_E(k) - zaux*weight
+         endif
 !
 ! ===============================================================================
 !     ...Computation of Gram Matrix (w/o fast integration)
@@ -451,10 +471,13 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
          do k2=k1,NrdofEE
 !        ...Piola transformation
             do i = 1,3
+               daux = dxdxi(i,1:3)
                call dot_product(shapEE(1:3,k2),dxidx(1:3,i), fldE(i))
-               call dot_product(curlEE(1:3,k2),dxdxi(i,1:3), crlE(i))
+               call dot_product(curlEE(1:3,k2),daux        , crlE(i))
             enddo
             crlE(1:3) = crlE(1:3)/rjac
+!        ...e_z x E
+            rotE = 0.d0; rotE(1) = -fldE(2); rotE(2) = fldE(1)
 !
             call dot_product(fldF,fldE, FF)
             call dot_product(fldF,crlE, FC)
@@ -481,6 +504,19 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
             gramP(k) = gramP(k) &
                      + (zaux + ALPHA_NORM*FF + CC)*weight
 !
+            if (ENVELOPE) then
+!           ...ik(e_z x F_i, curl F_j)
+               zaux = ZI*WAVENUM_FLD*detJstretch* &
+                     (rotF(1)*crlE(1)+rotF(2)*crlE(2)+rotF(3)*crlE(3))
+!           ...k^2(e_z x F_i, e_z x F_j)
+               zbux = (WAVENUM_FLD*abs(detJstretch))**2 * &
+                     (rotF(1)*rotE(1)+rotF(2)*rotE(2)+rotF(3)*rotE(3))
+!           ...-ik(curl F_i, e_z x F_j)
+               zcux = -ZI*WAVENUM_FLD*conjg(detJstretch)* &
+                     (crlF(1)*rotE(1)+crlF(2)*rotE(2)+crlF(3)*rotE(3))
+               gramP(k) = gramP(k) + (zaux+zbux+zcux)*weight
+            endif
+!
 !           (F_i,G_j) terms
             n = 2*k1-1; m = 2*k2
             k = nk(n,m)
@@ -491,6 +527,20 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
                    conjg(zcJ(2,2))*crlF(2)*fldE(2) + &
                    conjg(zcJ(3,3))*crlF(3)*fldE(3)
             gramP(k) = gramP(k) + (zaux+zcux)*weight
+!
+            if (ENVELOPE) then
+!           ...ik(iωε F_i, e_z x G_j)
+               zaux = ZI*WAVENUM_FLD*conjg(detJstretch)* &
+                        (zaJ(1,1)*fldF(1)*rotE(1) + &
+                         zaJ(2,2)*fldF(2)*rotE(2) + &
+                         zaJ(3,3)*fldF(3)*rotE(3) )
+!           ...ik(e_z x F_i, (iωμ)^* G_j)
+               zcux = ZI*WAVENUM_FLD*detJstretch* &
+                        (conjg(zcJ(1,1))*rotF(1)*fldE(1) + &
+                         conjg(zcJ(2,2))*rotF(2)*fldE(2) + &
+                         conjg(zcJ(3,3))*rotF(3)*fldE(3) )
+               gramP(k) = gramP(k) + (zaux+zcux)*weight
+            endif
 !
 !        ...compute lower triangular part of 2x2 G_ij matrix
 !           only if it is not a diagonal element, G_ii
@@ -505,6 +555,20 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
                       zcJ(2,2)*fldF(2)*crlE(2) + &
                       zcJ(3,3)*fldF(3)*crlE(3)
                gramP(k) = gramP(k) + (zaux+zcux)*weight
+!
+               if (ENVELOPE) then
+!              ...-ik (e_z x G_i, (iωε)^* F_j)
+                  zaux = -ZI*WAVENUM_FLD*detJstretch* &
+                         (conjg(zaJ(1,1))*rotF(1)*fldE(1) + &
+                          conjg(zaJ(2,2))*rotF(2)*fldE(2) + &
+                          conjg(zaJ(3,3))*rotF(3)*fldE(3) )
+!              ...-ik (iωμ G_i, e_z x F_j)
+                  zcux = -ZI*WAVENUM_FLD*conjg(detJstretch)* &
+                         (zcJ(1,1)*fldF(1)*rotE(1) + &
+                          zcJ(2,2)*fldF(2)*rotE(2) + &
+                          zcJ(3,3)*fldF(3)*rotE(3) )
+                  gramP(k) = gramP(k) + (zaux+zcux)*weight
+               endif
             endif
 !
 !           (G_i,G_j) terms
@@ -515,6 +579,19 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
                    (abs(zcJ(3,3))**2)*fldF(3)*fldE(3)
             gramP(k) = gramP(k) &
                      + (zcux + ALPHA_NORM*FF + CC)*weight
+!
+            if (ENVELOPE) then
+!           ...ik(e_z x G_i, curl G_j)
+               zaux = ZI*WAVENUM_FLD*detJstretch* &
+                     (rotF(1)*crlE(1)+rotF(2)*crlE(2)+rotF(3)*crlE(3))
+!           ...k^2(e_z x G_i, e_z x G_j)
+               zbux = (WAVENUM_FLD*abs(detJstretch))**2 * &
+                     (rotF(1)*rotE(1)+rotF(2)*rotE(2)+rotF(3)*rotE(3))
+!           ...-ik(curl G_i, e_z x G_j)
+               zcux = -ZI*WAVENUM_FLD*conjg(detJstretch)* &
+                     (crlF(1)*rotE(1)+crlF(2)*rotE(2)+crlF(3)*rotE(3))
+               gramP(k) = gramP(k) + (zaux+zbux+zcux)*weight
+            endif
          enddo
       enddo
    enddo

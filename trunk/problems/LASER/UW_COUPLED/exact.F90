@@ -61,7 +61,7 @@ subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
    VTYPE,dimension(3)   :: dE
    VTYPE,dimension(3,3) :: d2E
    integer              :: icomp,fld,idx
-   real(8)              :: OMEGA_RATIO_FLD
+   real(8)              :: OMEGA_RATIO_FLD,WAVENUM_FLD
 !
 !..auxiliary variables
    real(8) :: k,r,n
@@ -81,12 +81,14 @@ subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
          fld = 1 ! signal field
          idx = 1 ! signal E-trace component
          OMEGA_RATIO_FLD = OMEGA_RATIO_SIGNAL
+         WAVENUM_FLD     = WAVENUM_SIGNAL
       case(4)
          fld = 0 ! pump field
          idx = 3 ! pump E-trace component
          OMEGA_RATIO_FLD = OMEGA_RATIO_PUMP
+         WAVENUM_FLD     = WAVENUM_PUMP
       case default
-         fld = 1; idx = 1; OMEGA_RATIO_FLD = 1.d0 ! dummy values
+         fld = 1; idx = 1; OMEGA_RATIO_FLD = 1.d0; WAVENUM_FLD = 1.d0 ! dummy values
    end select
 !
 !..heat variables
@@ -153,9 +155,16 @@ subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
 !
 !  ...2nd H(curl) ATTRIBUTE = curl of the first attribute/-i omega \mu
 !     H-field value (H-field trace)
-      ValE(1,idx+1)   = DvalE(3,idx,2) - DvalE(2,idx,3)
-      ValE(2,idx+1)   = DvalE(1,idx,3) - DvalE(3,idx,1)
-      ValE(3,idx+1)   = DvalE(2,idx,1) - DvalE(1,idx,2)
+      ValE(1,idx+1) = DvalE(3,idx,2) - DvalE(2,idx,3)
+      ValE(2,idx+1) = DvalE(1,idx,3) - DvalE(3,idx,1)
+      ValE(3,idx+1) = DvalE(2,idx,1) - DvalE(1,idx,2)
+!
+!  ...H-field depends differently on E-field in the vectorial envelope formulation
+      if (ENVELOPE) then
+!     ...-ik (e_z x E), where e_z x E = (-E_y,E_x,0)
+         ValE(1,idx+1) = ValE(1,idx+1) + ZI*WAVENUM_FLD*ValE(2,idx)
+         ValE(2,idx+1) = ValE(2,idx+1) - ZI*WAVENUM_FLD*ValE(1,idx)
+      endif
       ValE(1:3,idx+1) = ValE(1:3,idx+1)/(-ZI*OMEGA*OMEGA_RATIO_FLD*MU)
 !
 !  ...H-field 1st order derivatives
@@ -171,6 +180,19 @@ subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
       DvalE(3,idx+1,2) = D2valE(2,idx,1,2) - D2valE(1,idx,2,2)
       DvalE(3,idx+1,3) = D2valE(2,idx,1,3) - D2valE(1,idx,2,3)
 !
+!  ...H-field depends differently on E-field in the vectorial envelope formulation
+      if (ENVELOPE) then
+!     ...-ik grad(e_z x E), where e_z x E = (-E_y,E_x,0)
+!     ...1st comp: ik ( E_y,x , E_y,y , E_y,z )
+         DvalE(1,idx+1,1) = DvalE(1,idx+1,1) + ZI*WAVENUM_FLD*DvalE(2,idx,1)
+         DvalE(1,idx+1,2) = DvalE(1,idx+1,2) + ZI*WAVENUM_FLD*DvalE(2,idx,2)
+         DvalE(1,idx+1,3) = DvalE(1,idx+1,3) + ZI*WAVENUM_FLD*DvalE(2,idx,3)
+!     ...2nd comp: -ik ( E_x,x , E_x,y , E_x,z )
+         DvalE(2,idx+1,1) = DvalE(2,idx+1,1) - ZI*WAVENUM_FLD*DvalE(1,idx,1)
+         DvalE(2,idx+1,2) = DvalE(2,idx+1,2) - ZI*WAVENUM_FLD*DvalE(1,idx,2)
+         DvalE(2,idx+1,3) = DvalE(2,idx+1,3) - ZI*WAVENUM_FLD*DvalE(1,idx,3)
+!     ...3rd comp: -ik (0,0,0)
+      endif
       DvalE(1:3,idx+1,1:3) = DvalE(1:3,idx+1,1:3)/(-ZI*OMEGA*OMEGA_RATIO_FLD*MU)
 !
 !  ...2nd order derivatives (not needed)
@@ -183,13 +205,22 @@ subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
       ValQ(7:9) = ValE(1:3,3)
       ValQ(10:12) = ValE(1:3,4)
 !
+      return
+!
    endif
 !
-!  ...2nd H(curl) ATTRIBUTE = curl of the first attribute/-i omega \mu
-!     H-field value (H-trace)
-   ValE(1,idx+1)   = DvalE(3,idx,2) - DvalE(2,idx,3)
-   ValE(2,idx+1)   = DvalE(1,idx,3) - DvalE(3,idx,1)
-   ValE(3,idx+1)   = DvalE(2,idx,1) - DvalE(1,idx,2)
+!..2nd H(curl) ATTRIBUTE = curl of the first attribute / (-i omega \mu)
+!  H-field value (H-trace)
+   ValE(1,idx+1) = DvalE(3,idx,2) - DvalE(2,idx,3)
+   ValE(2,idx+1) = DvalE(1,idx,3) - DvalE(3,idx,1)
+   ValE(3,idx+1) = DvalE(2,idx,1) - DvalE(1,idx,2)
+!
+!..H-field depends differently on E-field in the vectorial envelope formulation
+   if (ENVELOPE) then
+!  ...-ik (e_z x E), where e_z x E = (-E_y,E_x,0)
+      ValE(1,idx+1) = ValE(1,idx+1) + ZI*WAVENUM_FLD*ValE(2,idx)
+      ValE(2,idx+1) = ValE(2,idx+1) - ZI*WAVENUM_FLD*ValE(1,idx)
+   endif
    ValE(1:3,idx+1) = ValE(1:3,idx+1)/(-ZI*OMEGA*OMEGA_RATIO_FLD*MU)
 !
    end select

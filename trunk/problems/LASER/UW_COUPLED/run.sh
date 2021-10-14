@@ -26,10 +26,10 @@ dir_output='../outputs/'
 vis_level=3
 #
 # MPI Procs
-nproc=4
+nproc=1
 #
 # OMP THREADS
-nthreads=12
+nthreads=1
 #
 # set polynomial order p in (xy,z)
 #px=1; py=1; pz=1
@@ -100,6 +100,9 @@ raman=0.d0
 nsteps=10
 dt=0.1d0
 #
+# envelope formulation
+envelope=false
+#
 # ==================
 # RUN CONFIGURATIONS
 # ==================
@@ -112,16 +115,20 @@ file_geometry='../GEOMETRIES/cubes/cube'
 #file_geometry='../GEOMETRIES/prisms/prism_curv1'
 ctrl='../COMMON_FILES/control_1'
 #
-args=" -geom 1 -isol 1 -omega 1.0d0 -comp 1"
+args=" -geom 1 -isol 1 -omega 1.0d0 -gamma 1.0d0 -comp 1"
 args+=" -job ${job} -imax ${imax} -jmax ${jmax}"
 args+=" -ibc ${ibc}"
 args+=" -px ${px} -py ${py} -pz ${pz} -dp ${dp} -npx 4 -npy 4 -npz 4"
 args+=" -nlflag 0 -heat ${heat} -aniso_heat ${aniso_heat}"
 args+=" -dir_output ${dir_output} -vis_level ${vis_level}"
 args+=" -file_geometry ${file_geometry} -zl ${zl}"
-args+=" -file_control ${ctrl} "
-args+=" -maxnods ${maxnods} "
-args+=" -nthreads ${nthreads} "
+args+=" -file_control ${ctrl}"
+args+=" -maxnods ${maxnods}"
+args+=" -nthreads ${nthreads}"
+if [ "$envelope" = true ] ; then
+   args+=" -envelope"
+   args+=" -wavenum_signal 1.0d0 -wavenum_pump 1.0d0"
+fi
 
 mpirun -np ${nproc} ./uwLaser ${args}
 #ibrun -n ${nproc} ./uwLaser ${args}
@@ -189,6 +196,10 @@ args+=" -nthreads ${nthreads}"
 if [ "$usepml" = true ] ; then
    args+=" -usepml -pmlfrac ${pmlfrac}"
 fi
+if [ "$envelope" = true ] ; then
+   args+=" -envelope"
+   args+=" -wavenum_signal 1.0d0 -wavenum_pump 1.0d0"
+fi
 
 #mpirun -np ${nproc} ./uwLaser ${args}
 #ibrun -n ${nproc} xterm -hold -e ./uwLaser ${args}
@@ -200,14 +211,14 @@ fi
 #    / with dirichlet BC (-ibc 0), or impedance BC (-ibc 2 or -ibc 3), or PML
 #    / -omega sqrt(5.d0)/2.d0*PI -gamma sqrt(1.d0-PI*PI/(w*w))
 #      --> 1 wavelength per 4 unit lengths in z-direction
-#    / can be run with NEXACT=1 or NEXACT=0 (unless PML --use NEXACT=0)
+#    / can be run with NEXACT=1 or NEXACT=0 (with PML: --use NEXACT=0)
 usepml=false
 ibc=2
 
 # VARYING LENGTH OF WAVEGUIDE
 # set waveguide length, #refs, maxnodes, 4 elems/wavelength
 # L=4       (1 wavelength ), 3  refs (1 aniso x,  2 aniso z --> 2 *    4  elems),    250 nodes
-#zl=4.0d0   ; imax=3 ; maxnods=250   ; file_geometry='../GEOMETRIES/waveguide/rect_4'
+zl=4.0d0   ; imax=3 ; maxnods=250   ; file_geometry='../GEOMETRIES/waveguide/rect_4'
 # L=8       (2 wavelengths), 4  refs (1 aniso x,  3 aniso z --> 2 *    8  elems),    550 nodes
 #zl=8.0d0   ; imax=4 ; maxnods=550   ; file_geometry='../GEOMETRIES/waveguide/rect_8'
 # L=16      (4 wavelengths), 5  refs (1 aniso x,  4 aniso z --> 2 *   16  elems),   1050 nodes
@@ -252,6 +263,7 @@ ibc=2
 #imax=13; maxnods=256050 ; omega=1608.498506596624078797d0
 
 ctrl='../COMMON_FILES/control_1'
+maxnods=10000
 
 args=" -geom 1 -isol 5 -comp 2"
 #args+=" -gamma ${gamma}"
@@ -271,6 +283,10 @@ args+=" -maxnods ${maxnods}"
 args+=" -nthreads ${nthreads}"
 if [ "$usepml" = true ] ; then
    args+=" -usepml -pmlfrac ${pmlfrac}"
+fi
+if [ "$envelope" = true ] ; then
+   args+=" -envelope"
+   args+=" -wavenum_signal 1.0d0 -wavenum_pump 1.0d0"
 fi
 
 #mpirun -np ${nproc} ./uwLaser ${args}
