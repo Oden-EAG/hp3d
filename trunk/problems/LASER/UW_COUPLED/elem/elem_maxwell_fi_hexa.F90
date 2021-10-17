@@ -132,7 +132,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !..nrdof for interface only (without bubbles)
    integer :: nrdofEEi
 !
-!..H(curl) bubble index
+!..H(curl) face dof maps
    integer, allocatable :: idxEE(:), idxE(:)
 !
 !..element mdle node dof
@@ -143,7 +143,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !
 !..Gram matrix in packed format
    !complex(8) :: gramP(NrTest*(NrTest+1)/2)
-   complex(8), allocatable :: gramP(:), Gfull(:,:), Grfp(:)
+   complex(8), allocatable :: gramP(:), Grfp(:)
    real(8) :: FF, CF, FC
    real(8) :: fldE(3), fldH(3), crlE(3), crlH(3)
    real(8) :: fldF(3), fldG(3), crlF(3), crlG(3)
@@ -1441,7 +1441,7 @@ start_time = MPI_Wtime()
 !
 !  ...Get index of (continuous) face degrees of freedom in global array
 !     here we just sample to find DoFs on face, could do this above as well
-      t(1:2) = (/0.42069, 0.42069/)
+      t(1:2) = (/0.42069, 0.31249/)
       call face_param(etype,ifc,t, xi,dxidt)
 !
       call shape3DE(etype,xi,norderi,norient_edge,norient_face, nrdof,shapE,curlE)
@@ -1458,7 +1458,6 @@ start_time = MPI_Wtime()
          endif
       enddo
       NrdofEfc = ik
-!
 !
 !  ...loop through integration points
       do l=1,nint
@@ -1562,8 +1561,9 @@ start_time = MPI_Wtime()
          enddo
 !  ...end loop through integration points
       enddo
+!
       deallocate(idxEE,idxE)
-
+!
 !..end loop through faces
    enddo
 !deallocate(idxEE)
@@ -1590,50 +1590,12 @@ start_time = MPI_Wtime()
    stiff_ALL(1:i1,j1+j2+1)    = bload_E(1:i1)
 !
    deallocate(stiff_EE_T,stiff_EQ_T)
-
-!allocate(Gfull(NrTest,Nrtest))
-allocate(Grfp(NrTest*(Nrtest+1)/2))
 !
-!start_time = MPI_Wtime()
-!call ZTPTTR('U',NrTest,gramP,Gfull,NrTest,info)
-!write(*,*) 'Copy full: ', MPI_Wtime() - start_time
-start_time = MPI_Wtime()
-call ZTPTTF('N','U',NrTest,gramP,Grfp,info)
-deallocate(gramP)
-write(*,*) 'Copy RFP: ', MPI_Wtime() - start_time
-!
-!start_time = MPI_Wtime()
-!call ZPPTRF('U',NrTest,gramP,info)
-!if (info.ne.0) then
-!   write(*,*) 'elem_maxwell_fi_hexa: ZPPTRF: Mdle,info = ',Mdle,info,'. stop.'
-!   stop
-!endif
-!write(*,*) 'Cholesky Packed: ', MPI_Wtime() - start_time
-!
-!start_time = MPI_Wtime()
-!call ZPOTRF('U',NrTest,Gfull,NrTest,info)
-!if (info.ne.0) then
-!   write(*,*) 'elem_maxwell_fi_hexa: ZPPTRF: Mdle,info = ',Mdle,info,'. stop.'
-!   stop
-!endif
-!write(*,*) 'Cholesky full: ', MPI_Wtime() - start_time
-!
-!start_time = MPI_Wtime()
-!call ZPFTRF('N','U',NrTest,Grfp,info)
-!if (info.ne.0) then
-!   write(*,*) 'elem_maxwell_fi_hexa: ZPPTRF: Mdle,info = ',Mdle,info,'. stop.'
-!   stop
-!endif
-!write(*,*) 'Cholesky RFP: ', MPI_Wtime() - start_time
-
-
-
-
-
-
-
-
-
+!..Convert Gram matrix from packed to RFP format (same storage cost
+!  but RFP can use BLAS3 so is faster)
+   allocate(Grfp(NrTest*(Nrtest+1)/2))
+   call ZTPTTF('N','U',NrTest,gramP,Grfp,info)
+   deallocate(gramP)
 !
 !..A. Compute Cholesky factorization of Gram Matrix, G=U^*U (=LL^*)
 !   call ZPPTRF('U',NrTest,gramP,info)
@@ -1668,11 +1630,11 @@ write(*,*) 'Copy RFP: ', MPI_Wtime() - start_time
       zaloc(i+1:NrTrial+1,i) = conjg(zaloc(i,i+1:NrTrial+1))
    enddo
 !
-write(*,*) 'LA:'
-end_time = MPI_Wtime()
-!$OMP CRITICAL
-   write(*,11) end_time-start_time
-!$OMP END CRITICAL
+!write(*,*) 'LA:'
+!end_time = MPI_Wtime()
+!!$OMP CRITICAL
+!   write(*,11) end_time-start_time
+!!$OMP END CRITICAL
 !
 !..E. Fill ALOC and BLOC matrices
    ZblocE(1:j1) = zaloc(1:j1,j1+j2+1)
@@ -1695,49 +1657,3 @@ end_time = MPI_Wtime()
                                       norder,norderi, ZblocE,ZalocEE)
 !
 end subroutine elem_maxwell_fi_hexa
-
-!fam(:,1) = (/1,2/)
-!fam(:,2) = (/1,2/)
-!fam(:,3) = (/1,3/)
-!fam(:,4) = (/1,3/)
-!fam(:,5) = (/2,3/)
-!fam(:,6) = (/2,3/)
-!
-!zran(:,1,1) = (/1,1/)
-!zran(:,2,1) = (/1,1/)
-!zran(:,1,2) = (/2,2/)
-!zran(:,2,2) = (/2,2/)
-!zran(:,1,3) = (/1,nrdofH3/)
-!zran(:,2,3) = (/1,nord3/)
-!zran(:,1,4) = (/1,nrdofH3/)
-!zran(:,2,4) = (/1,nord3/)
-!zran(:,1,5) = (/1,nrdofH3/)
-!zran(:,2,5) = (/1,nord3/)
-!zran(:,1,6) = (/1,nrdofH3/)
-!zran(:,2,6) = (/1,nord3/)
-!
-!yran(:,1,1) = (/1,nrdofH2/)
-!yran(:,2,1) = (/1,nord2/)
-!yran(:,1,2) = (/1,nrdofH2/)
-!yran(:,2,2) = (/1,nord2/)
-!yran(:,1,3) = (/1,1/)
-!yran(:,2,3) = (/1,1/)
-!yran(:,1,4) = (/1,nord2/)
-!yran(:,2,4) = (/1,nrdofH2/)
-!yran(:,1,5) = (/2,2/)
-!yran(:,2,5) = (/2,2/)
-!yran(:,1,6) = (/1,nord2/)
-!yran(:,2,6) = (/1,nrdofH2/)
-!
-!xran(:,1,1) = (/1,nord1/)
-!xran(:,2,1) = (/1,nrdofH1/)
-!xran(:,1,2) = (/1,nord1/)
-!xran(:,2,2) = (/1,nrdofH1/)
-!xran(:,1,3) = (/1,nord1/)
-!xran(:,2,3) = (/1,nrdofH1/)
-!xran(:,1,4) = (/2,2/)
-!xran(:,2,4) = (/2,2/)
-!xran(:,1,5) = (/1,nord1/)
-!xran(:,2,5) = (/1,nrdofH1/)
-!xran(:,1,6) = (/1,1/)
-!xran(:,2,6) = (/1,1/)
