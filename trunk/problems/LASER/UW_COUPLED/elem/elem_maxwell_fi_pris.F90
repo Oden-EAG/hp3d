@@ -183,7 +183,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !..OMEGA_RATIO_SIGNAL or OMEGA_RATIO_PUMP
    real(8) :: OMEGA_RATIO_FLD
 !..WAVENUM_SIGNAL or WAVENUM_PUMP
-   real(8) :: WAVENUM_FLD,WAVENUM_AUX
+   real(8) :: WAVENUM_FLD
 !
 !..for PML
    complex(8) :: zbeta,zdbeta,zd2beta,detJstretch,temp
@@ -394,7 +394,6 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
       write(*,*) 'elem_maxwell: invalid Fld_flag param. stop.'
          stop
    end select
-   WAVENUM_AUX = WAVENUM_FLD
 !
 !..initialize PML matrices
    Jstretch = ZERO
@@ -496,7 +495,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    endif
 !
 !..start timer
-   start_time = MPI_Wtime()
+!   start_time = MPI_Wtime()
 !
 !..Loop over quadrature points in direction \xi_1
    do pz=1,nintz
@@ -749,27 +748,29 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !           (note we have 2 instead of 3 below, only using first 2 cols)
             call DGEMM('N','T',3,3,2,1.0d0,dxidx,3,dxidx,3,0.0d0,D_aux,3)
             D_RR = D_aux * (WAVENUM_FLD*abs(detJstretch))**2 * weighthh
-         
+!
+!        ...Note for C_CR, and both D_ER we don't multiply by conj yet
+!           this way it's easier to take conjugate of Jacobian factor
 !        ...J^T e_z x J^-T = -(e_z x J)^T J^-T
             D_aux(1,1:3) = -dxdxi(2,1:3)
             D_aux(2,1:3) = dxdxi(1,1:3)
             D_aux(3,1:3) = rZero
-            call DGEMM('T','T',3,3,3,1.0d0,D_aux,3,dxidx,3,0.0d0,D_aux2,3)
-            C_CR = D_aux2 * ZI*WAVENUM_FLD*detJstretch * wt123
+            call DGEMM('T','T',3,3,3,-1.0d0,D_aux,3,dxidx,3,0.0d0,D_aux2,3)
+            C_CR = D_aux2 * WAVENUM_FLD*detJstretch * wt123
 !
 !        ...D_ER_za = J^-1 e_z x zaJ J^-T
             Z_aux(1:3,1) = zaJ(1,1) * dxidx(1:3,2)
             Z_aux(1:3,2) = -zaJ(2,2) * dxidx(1:3,1)
             Z_aux(1:3,3) = ZERO
             call ZGEMM('N','T',3,3,3,ZONE,Z_aux,3,ZONE*dxidx,3,ZERO,D_ER_za,3)
-            D_ER_za = D_ER_za * ZI*WAVENUM_FLD*conjg(detJstretch) * weighthh
-
+            D_ER_za = D_ER_za * WAVENUM_FLD*conjg(detJstretch) * weighthh
+!
 !        ...D_ER_zc = J^-1 e_z x zcJ J^-T
             Z_aux(1:3,1) = zcJ(1,1) * dxidx(1:3,2)
             Z_aux(1:3,2) = -zcJ(2,2) * dxidx(1:3,1)
             Z_aux(1:3,3) = ZERO
             call ZGEMM('N','T',3,3,3,ZONE,Z_aux,3,ZONE*dxidx,3,ZERO,D_ER_zc,3)
-            D_ER_zc = D_ER_zc * ZI*WAVENUM_FLD*conjg(detJstretch) * weighthh
+            D_ER_zc = D_ER_zc * WAVENUM_FLD*conjg(detJstretch) * weighthh
 !
 !        ...e_z x J^-T
             invJrot(1,1:3) = -ZONE*dxidx(1:3,2)
@@ -800,25 +801,20 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !        ...loop over 2D Hcurl DoFs (note loop starts at i12)
             do j12=1,(nrdofE12+nrdofH12)
 !
-!
 !           ...Accumulate for EE terms
-!              ...For EE11
-                  do b=1,3
-                     do a=1,3
-                        AUXEE_zb(a,b,j12,i12) = AUXEE_zb(a,b,j12,i12)      &
-                              + (ALPHA_NORM*D(a,b) + D_za(a,b))            &
-                              * E12(a,i12)*E12(b,j12)
-                     enddo
+               do b=1,3
+                  do a=1,3
+!                 ...For EE11
+                     AUXEE_zb(a,b,j12,i12) = AUXEE_zb(a,b,j12,i12)     &
+                           + (ALPHA_NORM*D(a,b) + D_za(a,b))   &
+                           * E12(a,i12)*E12(b,j12)
+!                 ...For EE22
+                     AUXEE_zc(a,b,j12,i12) = AUXEE_zc(a,b,j12,i12)     &
+                           + (ALPHA_NORM*D(a,b) + D_zc(a,b))   &
+                           * E12(a,i12)*E12(b,j12)
                   enddo
-!              ...For EE22
-                  do b=1,3
-                     do a=1,3
-                           AUXEE_zc(a,b,j12,i12) = AUXEE_zc(a,b,j12,i12)   &
-                                 + (ALPHA_NORM*D(a,b) + D_zc(a,b))         &
-                                 * E12(a,i12)*E12(b,j12)
-                     enddo
-                  enddo
-
+               enddo
+!
 !           ...Accumulate for CC terms
                do b=1,3
                   do a=1,3
@@ -840,8 +836,9 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                            * E12(a,i12)*C12(b,j12)*wt123
                   enddo
                enddo
-
+!
 !           ...Accumulate for CE terms
+!              (Z_za and Z_zc indices are switched here b/c we need the transpose)
                do b=1,3
                   do a=1,3
 !                    ...For za terms (ε)
@@ -854,7 +851,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                            * C12(a,i12)*E12(b,j12)*wt123
                   enddo
                enddo
-
+!
                if (ENVELOPE) then
 !              ...k^2(e_z x F_i, e_z x F_j)
                   do b=1,3
@@ -864,45 +861,43 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                               * E12(a,i12)*E12(b,j12)
                      enddo
                   enddo
-
+!
                   do b=1,3
                      do a=1,3
 !                    ...-ik(curl F_i, e_z x F_j)
                         AUXCR(a,b,j12,i12) = AUXCR(a,b,j12,i12)          &
-                              + C_CR(a,b)                                &
+                              - ZI*C_CR(a,b)                             &
                               * E12(b,j12)*C12(a,i12)
 !                    ...ik(e_z x F_i, curl F_j)
                         AUXRC(a,b,j12,i12) = AUXRC(a,b,j12,i12)          &
-                              - C_CR(b,a)                                &
+                              + ZI*C_CR(b,a)                      &
                               * E12(a,i12)*C12(b,j12)
                      enddo
                   enddo
-
-
+!
                   do b=1,3
                      do a=1,3
 !                    ...ik(iωε F_i, e_z x G_j)
                         AUXER_zb(a,b,j12,i12) = AUXER_zb(a,b,j12,i12)    &
-                              - D_ER_za(b,a)                             &
+                              + ZI*D_ER_za(a,b)                          &
                               * E12(a,i12)*E12(b,j12)
 !                    ...-ik (iωμ G_i, e_z x F_j)
                         AUXER_zc(a,b,j12,i12) = AUXER_zc(a,b,j12,i12)    &
-                              - D_ER_zc(a,b)                             &
+                              - ZI*D_ER_zc(a,b)                          &
                               * E12(a,i12)*E12(b,j12)
                      enddo
                   enddo
-
-
+!
                   do b=1,3
                      do a=1,3
 !                    ...-ik (e_z x G_i, (iωε)^* F_j)
                         AUXRE_zb(a,b,j12,i12) = AUXRE_zb(a,b,j12,i12)    &
-                              - D_ER_za(a,b)                      &
-                              * E12(b,j12)*E12(a,i12)
+                              - ZI*conjg(D_ER_za(b,a))                   &
+                              * E12(a,i12)*E12(b,j12)
 !                    ...ik(e_z x F_i, (iωμ)^* G_j)
                         AUXRE_zc(a,b,j12,i12) = AUXRE_zc(a,b,j12,i12)    &
-                              - D_ER_zc(b,a)                     &
-                              * E12(b,j12)*E12(a,i12)
+                              + ZI*conjg(D_ER_zc(b,a))                   &
+                              * E12(a,i12)*E12(b,j12)
                      enddo
                   enddo
                endif
@@ -1239,13 +1234,13 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !..end loop over z direction quadrature points
    enddo
 !
-write(*,*) 'Interior:'
-!..end timer
-   end_time = MPI_Wtime()
-   !$OMP CRITICAL
-      write(*,11) end_time-start_time
-   !$OMP END CRITICAL
-11   format(f12.5)
+!write(*,*) 'Interior:'
+!!..end timer
+!   end_time = MPI_Wtime()
+!   !$OMP CRITICAL
+!      write(*,11) end_time-start_time
+!   !$OMP END CRITICAL
+!11   format(f12.5)
 !
    deallocate(shapeH3,E12,C12,Q12)
    deallocate(sH12,gH12,sE12,cE12,sQ12)
@@ -1299,7 +1294,7 @@ write(*,*) 'Interior:'
          stop
    end select
 !
-start_time = MPI_Wtime()
+!start_time = MPI_Wtime()
 !
    call ndof_nod(etype,nordP, ndofHHmdl,ndofEEmdl,ndofVVmdl,ndofQQmdl)
 !
@@ -1506,12 +1501,12 @@ start_time = MPI_Wtime()
 !..end loop through faces
    enddo
 
-write(*,*) 'Boundary:'
-end_time = MPI_Wtime()
-!$OMP CRITICAL
-   write(*,11) end_time-start_time
-!$OMP END CRITICAL
-start_time = MPI_Wtime()
+!   write(*,*) 'Boundary:'
+!   end_time = MPI_Wtime()
+!   !$OMP CRITICAL
+!      write(*,11) end_time-start_time
+!   !$OMP END CRITICAL
+!   start_time = MPI_Wtime()
 !
 !----------------------------------------------------------------------
 !      Construction of the DPG system
@@ -1551,11 +1546,11 @@ start_time = MPI_Wtime()
    call ZHERK('U','C',NrTrial+1,NrTest,ZONE,stiff_ALL,NrTest,ZERO,zaloc,NrTrial+1)
 !
    deallocate(stiff_ALL)
-write(*,*) 'LA:'
-end_time = MPI_Wtime()
-!$OMP CRITICAL
-   write(*,11) end_time-start_time
-!$OMP END CRITICAL
+!write(*,*) 'LA:'
+!end_time = MPI_Wtime()
+!!$OMP CRITICAL
+!   write(*,11) end_time-start_time
+!!$OMP END CRITICAL
 !
 !..D. Fill lower triangular part of Hermitian matrix
    do i=1,NrTrial
