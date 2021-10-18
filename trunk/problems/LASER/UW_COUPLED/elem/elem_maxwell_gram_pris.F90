@@ -267,7 +267,7 @@
          OMEGA_RATIO_FLD = OMEGA_RATIO_SIGNAL ! 1.0d0
          WAVENUM_FLD     = WAVENUM_SIGNAL
       case default
-      write(*,*) 'elem_maxwell: invalid Fld_flag param. stop.'
+      write(*,*) 'elem_maxwell_gram_pris: invalid Fld_flag param. stop.'
          stop
    end select
 !

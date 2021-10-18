@@ -195,12 +195,15 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !
 !..OMEGA_RATIO_SIGNAL or OMEGA_RATIO_PUMP
    real(8) :: OMEGA_RATIO_FLD
+!..WAVENUM_SIGNAL or WAVENUM_PUMP
+   real(8) :: WAVENUM_FLD
 !
 !..for PML
    VTYPE :: zbeta,zdbeta,zd2beta,detJstretch
    VTYPE, dimension(3,3) :: Jstretch,invJstretch,JJstretch
 !
 !..added to use fast integration
+!..Gram matrix aux arrays
    VTYPE, allocatable :: AUXEE_A_zb(:,:,:)    , AUXEE_A_zc(:,:,:)
    VTYPE, allocatable :: AUXEE_B_zb(:,:,:,:)  , AUXEE_B_zc(:,:,:,:)
    VTYPE, allocatable :: AUXCC_A(:,:,:,:,:)
@@ -209,14 +212,28 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    VTYPE, allocatable :: AUXCE_A_zb(:,:,:,:)  , AUXCE_A_zc(:,:,:,:)
    VTYPE, allocatable :: AUXEC_B_zb(:,:,:,:,:), AUXEC_B_zc(:,:,:,:,:)
    VTYPE, allocatable :: AUXCE_B_zb(:,:,:,:,:), AUXCE_B_zc(:,:,:,:,:)
-!
+!..Vectorial envelope Gram auxiliary arrays
+   VTYPE, allocatable :: AUXRR_A(:,:,:)
+   VTYPE, allocatable :: AUXRC_A(:,:,:,:)   , AUXCR_A(:,:,:,:)
+   VTYPE, allocatable :: AUXER_A_zb(:,:,:), AUXER_A_zc(:,:,:)
+   VTYPE, allocatable :: AUXRE_A_zb(:,:,:), AUXRE_A_zc(:,:,:)
+   VTYPE, allocatable :: AUXRR_B(:,:,:,:)
+   VTYPE, allocatable :: AUXRC_B(:,:,:,:,:)   , AUXCR_B(:,:,:,:,:)
+   VTYPE, allocatable :: AUXER_B_zb(:,:,:,:), AUXER_B_zc(:,:,:,:)
+   VTYPE, allocatable :: AUXRE_B_zb(:,:,:,:), AUXRE_B_zc(:,:,:,:)
+!..Stiffness matrix aux arrays
    VTYPE, allocatable :: STIFQE_A(:,:,:)
    VTYPE, allocatable :: STIFQE_B(:,:,:,:)
    VTYPE, allocatable :: STIFQE_ALPHA_A(:,:,:)
    VTYPE, allocatable :: STIFQE_ALPHA_B(:,:,:,:)
    VTYPE, allocatable :: STIFQC_A(:,:,:,:)
    VTYPE, allocatable :: STIFQC_B(:,:,:,:,:)
+!..Vectorial envelope Stiffness auxiliary arrays
+   VTYPE, allocatable :: STIFRE_A(:,:,:)
+   VTYPE, allocatable :: STIFRE_B(:,:,:,:)
+!
    VTYPE, allocatable :: LOADE_A(:,:)
+!..Forcing aux array
    VTYPE, allocatable :: LOADE_B(:,:,:)
 !
    integer :: a,b,sa,sb,sc,alph,beta
@@ -232,8 +249,10 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    real(8), dimension(MAXPP+1) :: wlocx,wlocy,wlocz
    real(8), dimension(3,MAXNINT3ADD) :: wloc3
    real(8), dimension(3) :: xip,dHdx,dHHdx
-   real(8), dimension(3,3) :: D_za,D_zc,D_aux,C,D
-   VTYPE  , dimension(3,3) :: Z_za,Z_zc,Z_aux
+!
+   real(8), dimension(3,3) :: D_za,D_zc,D_aux,D_aux2,C,D,D_RR
+   VTYPE,   dimension(3,3) :: Z_za,Z_zc,Z_aux,C_CR,D_ER_za,D_ER_zc,invJrot
+!
    real(8), dimension(MAXPP+1,2) :: shapH1,shapH2,shapH3
    real(8), dimension(MAXPP+1,MAXPP+1) :: sH2p,sH3p,dsH2p,dsH3p
 !
@@ -331,12 +350,14 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    stiff_EE_T = ZERO
    stiff_EQ_T = ZERO
 !
-!..set OMEGA_RATIO_FLD
+!..set OMEGA_RATIO_FLD and WAVENUM_FLD
    select case(Fld_flag)
       case(0)
          OMEGA_RATIO_FLD = OMEGA_RATIO_PUMP
+         WAVENUM_FLD     = WAVENUM_PUMP
       case(1)
          OMEGA_RATIO_FLD = OMEGA_RATIO_SIGNAL ! 1.0d0
+         WAVENUM_FLD     = WAVENUM_SIGNAL
       case default
       write(*,*) 'elem_maxwell_fi_hexa: invalid Fld_flag param. stop.'
          stop
@@ -345,6 +366,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    Jstretch = ZERO
    Jstretch(1,1) = ZONE
    Jstretch(2,2) = ZONE
+   detJstretch = ZONE
 !
    invJstretch = ZERO
    invJstretch(1,1) = ZONE
@@ -363,8 +385,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
       case(1)
          bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
       case(2,3)
-         write(*,*) 'elem_maxwell_fi_hexa: cannot have prism core geometry with fast integration. stop.'
-         stop
+         bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
       case(4)
          bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
       case(5)
@@ -436,8 +457,32 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    allocate(STIFQE_ALPHA_B(3,3,nrdofQ2_tr*nrdofH2,nrdofQ3_tr*nrdofH3))
    allocate(STIFQC_A(2,3,3,nrdofQ3_tr*nrdofH3))
    allocate(STIFQC_B(2,3,3,nrdofQ2_tr*nrdofH2,nrdofQ3_tr*nrdofH3))
+!
    allocate(LOADE_A(3,nrdofH3))
    allocate(LOADE_B(3,nrdofH2,nrdofH3))
+!
+!
+   if (ENVELOPE) then
+      allocate(AUXRR_A(3,3,nrdofH3**2))
+      allocate(AUXRC_A(2,3,3,nrdofH3**2))
+      allocate(AUXCR_A(2,3,3,nrdofH3**2))
+      allocate(AUXER_A_zb(3,3,nrdofH3**2))
+      allocate(AUXER_A_zc(3,3,nrdofH3**2))
+      allocate(AUXRE_A_zb(3,3,nrdofH3**2))
+      allocate(AUXRE_A_zc(3,3,nrdofH3**2))
+!
+      allocate(AUXRR_B(3,3,nrdofH2**2,nrdofH3**2))
+      allocate(AUXRC_B(2,3,3,nrdofH2**2,nrdofH3**2))
+      allocate(AUXCR_B(2,3,3,nrdofH2**2,nrdofH3**2))
+      allocate(AUXER_B_zb(3,3,nrdofH2**2,nrdofH3**2))
+      allocate(AUXER_B_zc(3,3,nrdofH2**2,nrdofH3**2))
+      allocate(AUXRE_B_zb(3,3,nrdofH2**2,nrdofH3**2))
+      allocate(AUXRE_B_zc(3,3,nrdofH2**2,nrdofH3**2))
+!
+      allocate(STIFRE_A(3,3,nrdofQ3_tr*nrdofH3))
+      allocate(STIFRE_B(3,3,nrdofQ2_tr*nrdofH2,nrdofQ3_tr*nrdofH3))
+   endif
+!
 
    offset = (/0, nord1*nrdofH2*nrdofH3, nord1*nrdofH2*nrdofH3 + nrdofH1*nord2*nrdofH3/)
    ndofx = (/nord1,nrdofH1,nrdofH1/)
@@ -508,6 +553,16 @@ write(*,*) 'Hexa:'
       STIFQC_B       = ZERO
       LOADE_B        = ZERO
 !
+!  ...Initialize auxiliary matrices B: Vectorial Envelope
+      if (ENVELOPE) then
+         AUXRR_B    = ZERO;
+         AUXRC_B    = ZERO; AUXCR_B    = ZERO;
+         AUXER_B_zb = ZERO; AUXER_B_zc = ZERO;
+         AUXRE_B_zb = ZERO; AUXRE_B_zc = ZERO;
+!
+         STIFRE_B = ZERO;
+      endif
+!
 !  ...loop over quadrature points in direction \xi_2
       do py=1,ninty
 !     ...read quadrature point location and weight
@@ -533,6 +588,16 @@ write(*,*) 'Hexa:'
          STIFQE_ALPHA_A = ZERO
          STIFQC_A       = ZERO
          LOADE_A        = ZERO
+!
+!     ...Initialize auxiliary matrices B: Vectorial Envelope
+         if (ENVELOPE) then
+            AUXRR_A    = ZERO;
+            AUXRC_A    = ZERO; AUXCR_A    = ZERO;
+            AUXER_A_zb = ZERO; AUXER_A_zc = ZERO;
+            AUXRE_A_zb = ZERO; AUXRE_A_zc = ZERO;
+!
+            STIFRE_A = ZERO;
+         endif
 !
 !     ...loop over quadrature points in direction \xi_3
          do pz=1,nintz
@@ -639,6 +704,7 @@ write(*,*) 'Hexa:'
                JJstretch(1,1) = ZONE
                JJstretch(2,2) = ZONE
                JJstretch(3,3) = ZONE
+               detJstretch    = ZONE
             else
 !           ...get PML function
                call get_Beta(x,Fld_flag, zbeta,zdbeta,zd2beta)
@@ -726,6 +792,42 @@ write(*,*) 'Hexa:'
             call ZGEMM('N','N',3,3,3,ZONE,ZONE*dxidx ,3,     Z_aux,3,ZERO,Z_zc ,3)
 !        ...Z_zb = conjg(transpose(Z_za)) = J^T * zaJ * J^-T
 !        ...Z_zd = conjg(transpose(Z_zc)) = J^T * zcJ * J^-T
+!
+            if (ENVELOPE) then
+!           ...(e_z x J^-T)^* (e_z x J^-T) = J^-1 (I - e_z) J^-T
+!              (note we have 2 instead of 3 below, only using first 2 cols)
+               call DGEMM('N','T',3,3,2,1.0d0,dxidx,3,dxidx,3,0.0d0,D_aux,3)
+               D_RR = D_aux * (WAVENUM_FLD*abs(detJstretch))**2 * weighthh
+!
+!           ...Note for C_CR, and both D_ER we don't multiply by conj yet
+!              this way it's easier to take conjugate of Jacobian factor
+!           ...J^T e_z x J^-T = -(e_z x J)^T J^-T
+               D_aux(1,1:3) = -dxdxi(2,1:3)
+               D_aux(2,1:3) = dxdxi(1,1:3)
+               D_aux(3,1:3) = 0.d0
+               call DGEMM('T','T',3,3,3,-1.0d0,D_aux,3,dxidx,3,0.0d0,D_aux2,3)
+               C_CR = D_aux2 * WAVENUM_FLD*detJstretch * wt123
+!
+!           ...D_ER_za = J^-1 e_z x zaJ J^-T
+               Z_aux(1:3,1) = zaJ(1,1) * dxidx(1:3,2)
+               Z_aux(1:3,2) = -zaJ(2,2) * dxidx(1:3,1)
+               Z_aux(1:3,3) = ZERO
+               call ZGEMM('N','T',3,3,3,ZONE,Z_aux,3,ZONE*dxidx,3,ZERO,D_ER_za,3)
+               D_ER_za = D_ER_za * WAVENUM_FLD*conjg(detJstretch) * weighthh
+!
+!           ...D_ER_zc = J^-1 e_z x zcJ J^-T
+               Z_aux(1:3,1) = zcJ(1,1) * dxidx(1:3,2)
+               Z_aux(1:3,2) = -zcJ(2,2) * dxidx(1:3,1)
+               Z_aux(1:3,3) = ZERO
+               call ZGEMM('N','T',3,3,3,ZONE,Z_aux,3,ZONE*dxidx,3,ZERO,D_ER_zc,3)
+               D_ER_zc = D_ER_zc * WAVENUM_FLD*conjg(detJstretch) * weighthh
+!
+!           ...e_z x J^-T
+               invJrot(1,1:3) = -ZONE*dxidx(1:3,2)
+               invJrot(2,1:3) = ZONE*dxidx(1:3,1)
+               invJrot(3,1:3) = ZERO
+               invJrot = invJrot * ZI*WAVENUM_FLD*detJstretch * wt123
+            endif
 !
 !        ...put appropriate quadrature weight on Jacobian and its inverse
             dxdxi = dxdxi * weightvv
@@ -845,6 +947,81 @@ write(*,*) 'Hexa:'
                      enddo
 !                 ...loop over a ends
                   enddo
+!
+                  if (ENVELOPE) then
+                  do a=1,3
+                     do b=a,3
+                        sb=1+deltak(b,3)
+                        sa=1+deltak(a,3)
+                        idxb=j3+deltak(b,3)
+                        idxa=i3+deltak(a,3)
+!
+!                    ...we need to check that idxb, idxa don't exceed dimension of
+!                       1D H1 enriched test space
+                        if ((idxb.le.nrdofH3).and.(idxa.le.nrdofH3)) then
+
+!                       ...k^2(e_z x F_i, e_z x F_j)
+                           AUXRR_A(b,a,k3) = AUXRR_A(b,a,k3)            &
+                                             + D_RR(a,b)                &
+                                             * shapH3(idxa,sa)          &
+                                             * shapH3(idxb,sb)
+!
+!                       ...ik(iωε F_i, e_z x G_j)
+                           AUXER_A_zb(b,a,k3) = AUXER_A_zb(b,a,k3)      &
+                                             + ZI*D_ER_za(a,b)          &
+                                             * shapH3(idxa,sa)          &
+                                             * shapH3(idxb,sb)
+!
+!                       ...-ik (iωμ G_i, e_z x F_j)
+                           AUXER_A_zc(b,a,k3) = AUXER_A_zc(b,a,k3)      &
+                                             - ZI*D_ER_zc(a,b)          &
+                                             * shapH3(idxa,sa)          &
+                                             * shapH3(idxb,sb)
+!
+!                       ...-ik (e_z x G_i, (iωε)^* F_j)
+                           AUXRE_A_zb(b,a,k3) = AUXRE_A_zb(b,a,k3)      &
+                                             - ZI*conjg(D_ER_za(b,a))   &
+                                             * shapH3(idxa,sa)          &
+                                             * shapH3(idxb,sb)
+!
+!                       ...ik(e_z x F_i, (iωμ)^* G_j)
+                           AUXRE_A_zc(b,a,k3) = AUXRE_A_zc(b,a,k3)      &
+                                             + ZI*conjg(D_ER_zc(b,a))   &
+                                             * shapH3(idxa,sa)          &
+                                             * shapH3(idxb,sb)
+!
+!                       ...ik(e_z x F_i, curl F_j)
+                           do alph=1,2
+                              idxalph=mod(a+alph-1,3)+1
+                              sb=1+deltak(b,3)
+                              sa=1+1-deltak(idxalph,3)
+!
+                              AUXRC_A(alph,b,a,k3) = AUXRC_A(alph,b,a,k3)  &
+                                                   + ZI*C_CR(b,idxalph)    &
+                                                   * shapH3(idxa,sa)       &
+                                                   * shapH3(idxb,sb)       &
+                                                   * (-1)**(alph-1)
+                           enddo
+!
+!                       ...-ik(curl F_i, e_z x F_j)
+                           do beta=1,2
+                              idxbeta=mod(b+beta-1,3)+1
+                              sb=1+1-deltak(idxbeta,3)
+                              sa=1+deltak(a,3)
+!
+                              AUXCR_A(beta,b,a,k3) = AUXCR_A(beta,b,a,k3)  &
+                                                   - ZI*C_CR(a,idxbeta)    &
+                                                   * shapH3(idxa,sa)       &
+                                                   * shapH3(idxb,sb)       &
+                                                   * (-1)**(beta-1)
+                           enddo
+                        endif
+!                    ...loop over b ends
+                     enddo
+!                 ...loop over a ends
+                  enddo
+!              ...Envelope terms
+                  endif
 !              ...loop over j3 ends
                enddo
 !           ...loop over i3 ends
@@ -888,6 +1065,16 @@ write(*,*) 'Hexa:'
                                                     + shapH3(j3+1,2)*dxdxi(b,idxalph) &
                                                     * (-1)**(alph-1)*shapH3(idxa,sa)
                            enddo
+!
+!                       ...Vectorial Envelope Terms
+                           if (ENVELOPE) then
+                              sa=1+deltak(a,3)
+!                          ...-ik(e_z x H,F), where e_z x H = (-H_y,H_x,0), or
+!                          ...+ik(H,e_z x F), where e_z x F = (-F_y,F_x,0)
+                              STIFRE_A(a,b,k3) = STIFRE_A(a,b,k3)                &
+                                               + invJrot(b,a)                    &
+                                               * shapH3(j3+1,2)*shapH3(idxa,sa)
+                           endif
                         endif
 !                    ...loop over a ends
                      enddo
@@ -996,6 +1183,72 @@ write(*,*) 'Hexa:'
                         enddo
 !                    ...loop over a ends
                      enddo
+
+                     if (ENVELOPE) then
+                     do a=1,3
+                        do b=a,3
+!                       ...determine indices for shape functions
+                           sb=1+deltak(b,2)
+                           sa=1+deltak(a,2)
+                           idxb=j2+deltak(b,2)
+                           idxa=i2+deltak(a,2)
+!                       ...check that dimensions are not surpassed by idxa,idxb
+                           if((idxb.le.nrdofH2).and.(idxa.le.nrdofH2)) then
+!                          ...k^2(e_z x F_i, e_z x F_j)
+                              AUXRR_B(b,a,k2,k3) = AUXRR_B(b,a,k2,k3)       &
+                                                    + shapH2(idxa,sa)       &
+                                                    * shapH2(idxb,sb)       &
+                                                    * AUXRR_A(b,a,k3)
+!
+!                          ...ik(iωε F_i, e_z x G_j)
+                              AUXER_B_zb(b,a,k2,k3) = AUXER_B_zb(b,a,k2,k3) &
+                                                    + shapH2(idxa,sa)       &
+                                                    * shapH2(idxb,sb)       &
+                                                    * AUXER_A_zb(b,a,k3)
+!                          ...-ik (iωμ G_i, e_z x F_j)
+                              AUXER_B_zc(b,a,k2,k3) = AUXER_B_zc(b,a,k2,k3) &
+                                                    + shapH2(idxa,sa)       &
+                                                    * shapH2(idxb,sb)       &
+                                                    * AUXER_A_zc(b,a,k3)
+!
+!                          ...-ik (e_z x G_i, (iωε)^* F_j)
+                              AUXRE_B_zb(b,a,k2,k3) = AUXRE_B_zb(b,a,k2,k3) &
+                                                    + shapH2(idxa,sa)       &
+                                                    * shapH2(idxb,sb)       &
+                                                    * AUXRE_A_zb(b,a,k3)
+!                          ...ik(e_z x F_i, (iωμ)^* G_j)
+                              AUXRE_B_zc(b,a,k2,k3) = AUXRE_B_zc(b,a,k2,k3) &
+                                                    + shapH2(idxa,sa)       &
+                                                    * shapH2(idxb,sb)       &
+                                                    * AUXRE_A_zc(b,a,k3)
+!
+!                          ...ik(e_z x F_i, curl F_j)
+                              do alph=1,2
+                                 idxalph=mod(a+alph-1,3)+1
+                                 sb=1+deltak(b,2)
+                                 sa=1+1-deltak(idxalph,2)
+                                 AUXRC_B(alph,b,a,k2,k3) =                 &
+                                        AUXRC_B(alph,b,a,k2,k3)            &
+                                      + shapH2(idxa,sa)*shapH2(idxb,sb)    &
+                                      * AUXRC_A(alph,b,a,k3)
+                              enddo
+!                          ...-ik(curl F_i, e_z x F_j)
+                              do beta=1,2
+                                 idxbeta=mod(b+beta-1,3)+1
+                                 sb=1+1-deltak(idxbeta,2)
+                                 sa=1+deltak(a,2)
+                                 AUXCR_B(beta,b,a,k2,k3) =                 &
+                                        AUXCR_B(beta,b,a,k2,k3)            &
+                                      + shapH2(idxa,sa)*shapH2(idxb,sb)    &
+                                      * AUXCR_A(beta,b,a,k3)
+                              enddo
+                           endif
+!                       ...loop over b ends
+                        enddo
+!                    ...loop over a ends
+                     enddo
+!                    ...Envelope terms
+                     endif
 !                 ...loop over j2 ends
                   enddo
 !              ...loop over i2 ends
@@ -1037,6 +1290,16 @@ write(*,*) 'Hexa:'
                                                           * shapH2(idxa,sa)            &
                                                           * STIFQC_A(alph,a,b,k3)
                               enddo
+!
+                              if (ENVELOPE) then
+                                 sa=1+deltak(a,2)
+!                             ...-ik(e_z x H,F), where e_z x H = (-H_y,H_x,0), or
+!                             ...+ik(H,e_z x F), where e_z x F = (-F_y,F_x,0)
+                                 STIFRE_B(a,b,k2,k3) = STIFRE_B(a,b,k2,k3)    &
+                                                     + shapH2(j2+1,2)         &
+                                                     * shapH2(idxa,sa)        &
+                                                     * STIFRE_A(a,b,k3)
+                              endif
                            endif
                         enddo
                      enddo
@@ -1130,8 +1393,32 @@ write(*,*) 'Hexa:'
                                                     + shapH1(idxa,sa)    &
                                                     * shapH1(idxb,sb)    &
                                                     * AUXCC_B(alph,beta,b,a,k2,k3)
-
                                        enddo; enddo
+                                       if (ENVELOPE) then
+!                                      ...k^2(e_z x F_i, e_z x F_j)
+                                          gramP(kk) = gramP(kk)         &
+                                                    + shapH1(idxa,sa)   &
+                                                    * shapH1(idxb,sb)   &
+                                                    * AUXRR_B(b,a,k2,k3)
+!                                      ...-ik(curl F_i, e_z x F_j)
+                                          do alph=1,2
+                                             idxalph=mod(a+alph-1,3)+1
+                                             sb=1+deltak(b,1)
+                                             sa=1+1-deltak(idxalph,1)
+                                             gramP(kk) = gramP(kk)                   &
+                                                       + AUXRC_B(alph,b,a,k2,k3)  &
+                                                       * shapH1(idxa,sa)*shapH1(idxb,sb)
+                                          enddo
+!                                      ...ik(e_z x F_i, curl F_j)
+                                          do beta=1,2
+                                             idxbeta=mod(b+beta-1,3)+1
+                                             sb=1+1-deltak(idxbeta,1)
+                                             sa=1+deltak(a,1)
+                                             gramP(kk) = gramP(kk)                     &
+                                                       + AUXCR_B(beta,b,a,k2,k3)    &
+                                                       * shapH1(idxa,sa)*shapH1(idxb,sb)
+                                          enddo
+                                       endif
 
                                        kk = nk(2*m1-1,2*m2)
 !                                   ...sum CE terms
@@ -1152,6 +1439,19 @@ write(*,*) 'Hexa:'
                                                     + AUXEC_B_zb(beta,b,a,k2,k3)    &
                                                     * shapH1(idxa,sa)*shapH1(idxb,sb)
                                        enddo
+                                       if (ENVELOPE) then
+!                                      ...ik(iωε F_i, e_z x G_j)
+                                          gramP(kk) = gramP(kk)         &
+                                                    + shapH1(idxa,sa)   &
+                                                    * shapH1(idxb,sb)   &
+                                                    * AUXER_B_zb(b,a,k2,k3)
+!                                      ...ik(e_z x F_i, (iωμ)^* G_j)
+                                          gramP(kk) = gramP(kk)         &
+                                                    + shapH1(idxa,sa)   &
+                                                    * shapH1(idxb,sb)   &
+                                                    * AUXRE_B_zc(b,a,k2,k3)
+                                       endif
+
 
                                        if (m1.ne.m2) then
 
@@ -1174,7 +1474,18 @@ write(*,*) 'Hexa:'
                                                        + AUXEC_B_zc(beta,b,a,k2,k3)  &
                                                        * shapH1(idxa,sa)*shapH1(idxb,sb)
                                           enddo
-
+                                          if (ENVELOPE) then
+!                                         ...-ik (e_z x G_i, (iωε)^* F_j)
+                                             gramP(kk) = gramP(kk)         &
+                                                       + shapH1(idxa,sa)   &
+                                                       * shapH1(idxb,sb)   &
+                                                       * AUXRE_B_zb(b,a,k2,k3)
+!                                         ...-ik (iωμ G_i, e_z x F_j)
+                                             gramP(kk) = gramP(kk)         &
+                                                       + shapH1(idxa,sa)   &
+                                                       * shapH1(idxb,sb)   &
+                                                       * AUXER_B_zc(b,a,k2,k3)
+                                          endif
                                        endif
 
                                        kk = nk(2*m1  ,2*m2  )
@@ -1197,6 +1508,31 @@ write(*,*) 'Hexa:'
                                                     * AUXCC_B(alph,beta,b,a,k2,k3)
 
                                        enddo; enddo
+                                       if (ENVELOPE) then
+!                                      ...k^2(e_z x G_i, e_z x G_j)
+                                          gramP(kk) = gramP(kk)         &
+                                                    + shapH1(idxa,sa)   &
+                                                    * shapH1(idxb,sb)   &
+                                                    * AUXRR_B(b,a,k2,k3)
+!                                      ...-ik(curl G_i, e_z x G_j)
+                                          do alph=1,2
+                                             idxalph=mod(a+alph-1,3)+1
+                                             sb=1+deltak(b,1)
+                                             sa=1+1-deltak(idxalph,1)
+                                             gramP(kk) = gramP(kk)                   &
+                                                       + AUXRC_B(alph,b,a,k2,k3)  &
+                                                       * shapH1(idxa,sa)*shapH1(idxb,sb)
+                                          enddo
+!                                      ...ik(e_z x G_i, curl G_j)
+                                          do beta=1,2
+                                             idxbeta=mod(b+beta-1,3)+1
+                                             sb=1+1-deltak(idxbeta,1)
+                                             sa=1+deltak(a,1)
+                                             gramP(kk) = gramP(kk)                     &
+                                                       + AUXCR_B(beta,b,a,k2,k3)    &
+                                                       * shapH1(idxa,sa)*shapH1(idxb,sb)
+                                          enddo
+                                       endif
                                      endif
                                  endif
                               enddo
@@ -1244,7 +1580,7 @@ write(*,*) 'Hexa:'
                               end select
 !                          ...loop over vector components of L2 trial functions
                               do b=1,3
-                                 k = (m2-1)*6 + 3+ b
+                                 k = (m2-1)*6 + 3 + b
 !                             ...accumulate QC term
                                  do alph=1,2
                                     idxalph=mod(a+alph-1,3)+1
@@ -1261,7 +1597,7 @@ write(*,*) 'Hexa:'
                                  stiff_EQ_T(k,2*m1-1) = stiff_EQ_T(k,2*m1-1) &
                                                    +shapH1(idxa,sa)*shapH1(j1+1,2) &
                                                    *STIFQE_ALPHA_B(a,b,k2,k3)
-                                 k = (m2-1)*6 + 3+ b
+                                 k = (m2-1)*6 + 3 + b
 !                             ...accumulate QE term
                                  stiff_EQ_T(k,2*m1) = stiff_EQ_T(k,2*m1) &
                                                    +shapH1(idxa,sa)*shapH1(j1+1,2) &
@@ -1275,6 +1611,22 @@ write(*,*) 'Hexa:'
                                                       + shapH1(idxa,sa)*shapH1(j1+1,2) &
                                                       * STIFQC_B(alph,a,b,k2,k3)
                                  enddo
+!
+                                 if (ENVELOPE) then
+                                    sa=1+deltak(a,1)
+!                                ...-ik(e_z x H,F), where e_z x H = (-H_y,H_x,0), or
+!                                ...+ik(H,e_z x F), where e_z x F = (-F_y,F_x,0)
+                                    k = (m2-1)*6 + 3 + b
+                                    stiff_EQ_T(k,2*m1-1) = stiff_EQ_T(k,2*m1-1) &
+                                                      +shapH1(idxa,sa)*shapH1(j1+1,2) &
+                                                      *STIFRE_B(a,b,k2,k3)
+!                                ...-ik(e_z x E,G), where e_z x E = (-E_y,E_x,0), or
+!                                ...+ik(E,e_z x G), where e_z x G = (-G_y,G_x,0)
+                                    k = (m2-1)*6 + b
+                                    stiff_EQ_T(k,2*m1) = stiff_EQ_T(k,2*m1) &
+                                                      +shapH1(idxa,sa)*shapH1(j1+1,2) &
+                                                      *STIFRE_B(a,b,k2,k3)
+                                 endif
                               enddo
                            endif
                         enddo
@@ -1339,6 +1691,20 @@ start_time = MPI_Wtime()
    deallocate(AUXEC_B_zb,AUXEC_B_zc)
    deallocate(AUXCE_A_zb,AUXCE_A_zc)
    deallocate(AUXCE_B_zb,AUXCE_B_zc)
+!
+   if (ENVELOPE) then
+      deallocate(AUXRR_A)
+      deallocate(AUXRC_A,AUXCR_A)
+      deallocate(AUXER_A_zb,AUXER_A_zc)
+      deallocate(AUXRE_A_zb,AUXRE_A_zc)
+!
+      deallocate(AUXRR_B)
+      deallocate(AUXRC_B,AUXCR_B)
+      deallocate(AUXER_B_zb,AUXER_B_zc)
+      deallocate(AUXRE_B_zb,AUXRE_B_zc)
+!
+      deallocate(STIFRE_A,STIFRE_B)
+   endif
 !
    deallocate(STIFQE_A)
    deallocate(STIFQE_B)

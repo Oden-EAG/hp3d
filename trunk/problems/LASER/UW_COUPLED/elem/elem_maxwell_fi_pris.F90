@@ -391,7 +391,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
          OMEGA_RATIO_FLD = OMEGA_RATIO_SIGNAL ! 1.0d0
          WAVENUM_FLD     = WAVENUM_SIGNAL
       case default
-      write(*,*) 'elem_maxwell: invalid Fld_flag param. stop.'
+      write(*,*) 'elem_maxwell_fi_pris: invalid Fld_flag param. stop.'
          stop
    end select
 !
@@ -938,8 +938,8 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                if (ENVELOPE) then
 !              ...-ik(e_z x H,F), where e_z x H = (-H_y,H_x,0), or
 !              ...+ik(H,e_z x F), where e_z x F = (-F_y,F_x,0)
-                  do b=1,2
-                     do a=1,3
+                  do a=1,3
+                     do b=1,2
                         STIFRE(a,b,j12,i12) = STIFRE(a,b,j12,i12)       &
                               + invJrot(b,a)                            &
                               * Q12(j12)*E12(a,i12)
@@ -1251,8 +1251,10 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !   deallocate(AUXCE_zb,AUXCE_zc)
 !
    if (ENVELOPE) then
-      deallocate(AUXRC   ,AUXRR)
+      deallocate(AUXRR)
+      deallocate(AUXRC, AUXCR)
       deallocate(AUXER_zb,AUXER_zc)
+      deallocate(AUXRE_zb,AUXRE_zc)
 !
       deallocate(STIFRE)
    endif
