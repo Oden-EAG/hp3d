@@ -275,7 +275,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    nk(k1,k2) = (k2-1)*k2/2+k1
 !
 !..Identity/Kronecker delta tensor
-   deltak=ZERO
+   deltak=0
    do a=1,3
      deltak(a,a)=1
    enddo
@@ -529,9 +529,9 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !
    xip=ZERO
 !
-!..start timer
-write(*,*) 'Hexa:'
-   start_time = MPI_Wtime()
+!!..start timer
+!write(*,*) 'Hexa:'
+!   start_time = MPI_Wtime()
 !
 !..Loop over quadrature points in direction \xi_1
    do px=1,nintx
@@ -589,7 +589,7 @@ write(*,*) 'Hexa:'
          STIFQC_A       = ZERO
          LOADE_A        = ZERO
 !
-!     ...Initialize auxiliary matrices B: Vectorial Envelope
+!     ...Initialize auxiliary matrices A: Vectorial Envelope
          if (ENVELOPE) then
             AUXRR_A    = ZERO;
             AUXRC_A    = ZERO; AUXCR_A    = ZERO;
@@ -1183,7 +1183,7 @@ write(*,*) 'Hexa:'
                         enddo
 !                    ...loop over a ends
                      enddo
-
+!
                      if (ENVELOPE) then
                      do a=1,3
                         do b=a,3
@@ -1487,7 +1487,7 @@ write(*,*) 'Hexa:'
                                                        * AUXER_B_zc(b,a,k2,k3)
                                           endif
                                        endif
-
+!
                                        kk = nk(2*m1  ,2*m2  )
 !                                   ...sum EE terms
                                        sb=1+deltak(b,1)
@@ -1508,6 +1508,7 @@ write(*,*) 'Hexa:'
                                                     * AUXCC_B(alph,beta,b,a,k2,k3)
 
                                        enddo; enddo
+!
                                        if (ENVELOPE) then
 !                                      ...k^2(e_z x G_i, e_z x G_j)
                                           gramP(kk) = gramP(kk)         &
@@ -1674,14 +1675,14 @@ write(*,*) 'Hexa:'
 !  ...loop over px ends
    enddo
 !
-!..end timer
-write(*,*) 'Interior:'
-   end_time = MPI_Wtime()
-   !$OMP CRITICAL
-      write(*,11) end_time-start_time
-   !$OMP END CRITICAL
-11   format(f12.5)
-start_time = MPI_Wtime()
+!!..end timer
+!write(*,*) 'Interior:'
+!   end_time = MPI_Wtime()
+!   !$OMP CRITICAL
+!      write(*,11) end_time-start_time
+!   !$OMP END CRITICAL
+!11   format(f12.5)
+!start_time = MPI_Wtime()
 !
    deallocate(AUXEE_A_zb,AUXEE_A_zc)
    deallocate(AUXEE_B_zb,AUXEE_B_zc)
@@ -1932,14 +1933,13 @@ start_time = MPI_Wtime()
 !
 !..end loop through faces
    enddo
-!deallocate(idxEE)
-
-write(*,*) 'Boundary:'
-end_time = MPI_Wtime()
-!$OMP CRITICAL
-   write(*,11) end_time-start_time
-!$OMP END CRITICAL
-start_time = MPI_Wtime()
+!
+!write(*,*) 'Boundary:'
+!end_time = MPI_Wtime()
+!!$OMP CRITICAL
+!   write(*,11) end_time-start_time
+!!$OMP END CRITICAL
+!start_time = MPI_Wtime()
 !
 !
 !----------------------------------------------------------------------
