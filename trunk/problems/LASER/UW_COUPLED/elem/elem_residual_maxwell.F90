@@ -103,7 +103,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !
 !..Gram matrix in packed format
    !VTYPE, dimension(NrTest*(NrTest+1)/2) :: gramTest
-   VTYPE, allocatable :: gramP(:)
+   VTYPE, allocatable :: gramP(:), Grfp(:)
    real(8) :: FF, CF, FC
    real(8) :: fldE(3), fldH(3), crlE(3), crlH(3), rotE(3)
    real(8) :: fldF(3), fldG(3), crlF(3), crlG(3), rotF(3)
@@ -823,10 +823,17 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !
 !--------------------------------------------------------------------------
 !
+!..Convert Gram matrix from packed to RFP format (same storage cost
+!  but RFP can use BLAS3 so is faster)
+   allocate(Grfp(NrTest*(Nrtest+1)/2))
+   call ZTPTTF('N','U',NrTest,gramP,Grfp,info)
+   deallocate(gramP)
+!
 !..factorize the test Gram matrix
-   call ZPPTRF('U', NrTest, gramP, info)
+   call ZPFTRF('N','U',NrTest,Grfp,info)
+!   call ZPPTRF('U', NrTest, gramP, info)
    if (info.ne.0) then
-      write(*,*) 'elem_residual_maxwell: ZPPTRF: Mdle,info = ',Mdle,info,'. stop.'
+      write(*,*) 'elem_residual_maxwell: ZPFTRF: Mdle,info = ',Mdle,info,'. stop.'
       stop
    endif
 !
@@ -835,13 +842,14 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !
 !..compute the product of inverted test Gram matrix with RHS,
 !..bload_E is overwritten with the solution
-   call ZPPTRS('U', NrTest, 1, gramP, bload_E, NrTest, info)
-   if (info.ne.0) then
-      write(*,*) 'elem_residual_maxwell: ZPPTRS: Mdle,info = ',Mdle,info,'. stop.'
-      stop
-   endif
+   call ZTFSM('N','L','U','C','N',NrTest,1,ZONE,Grfp,bload_E,NrTest)
+!   call ZPPTRS('U', NrTest, 1, gramP, bload_E, NrTest, info)
+!   if (info.ne.0) then
+!      write(*,*) 'elem_residual_maxwell: ZPPTRS: Mdle,info = ',Mdle,info,'. stop.'
+!      stop
+!   endif
 !
-   deallocate(gramP)
+   deallocate(Grfp)
 !
 !..compute the residual
    zresid = ZERO
