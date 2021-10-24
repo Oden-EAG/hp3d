@@ -148,7 +148,7 @@
    real(8), dimension(3) :: xip,dHdx,dHHdx
 !
    real(8), dimension(3,3) :: D_za,D_zc,D_aux,D_aux2,C,D,D_RR
-   VTYPE,   dimension(3,3) :: Z_za,Z_zc,Z_aux,C_CR,D_ER_za,D_ER_zc
+   VTYPE,   dimension(3,3) :: Z_za,Z_zc,Z_aux,C_RC,D_ER_za,D_ER_zc
 !
    real(8), dimension(MAXPP+1,2) :: shapH1,shapH2,shapH3
    real(8), dimension(MAXPP+1,MAXPP+1) :: sH2p,sH3p,dsH2p,dsH3p
@@ -560,19 +560,19 @@
 !        ...Z_zd = conjg(transpose(Z_zc)) = J^T * zcJ * J^-T
 !
             if (ENVELOPE) then
-!           ...(e_z x J^-T)^* (e_z x J^-T) = J^-1 (I - e_z) J^-T
+!           ...(e_z x J^-T)^* (e_z x J^-T) = J^-1 (I - e_z x e_z) J^-T
 !              (note we have 2 instead of 3 below, only using first 2 cols)
                call DGEMM('N','T',3,3,2,1.0d0,dxidx,3,dxidx,3,0.0d0,D_aux,3)
                D_RR = D_aux * (WAVENUM_FLD*abs(detJstretch))**2 * weighthh
 !
-!           ...Note for C_CR, and both D_ER we don't multiply by conj yet
+!           ...Note for C_RC, and both D_ER we don't multiply by ZI yet
 !              this way it's easier to take conjugate of Jacobian factor
 !           ...J^T e_z x J^-T = -(e_z x J)^T J^-T
                D_aux(1,1:3) = -dxdxi(2,1:3)
                D_aux(2,1:3) = dxdxi(1,1:3)
                D_aux(3,1:3) = 0.d0
-               call DGEMM('T','T',3,3,3,-1.0d0,D_aux,3,dxidx,3,0.0d0,D_aux2,3)
-               C_CR = D_aux2 * WAVENUM_FLD*detJstretch * wt123
+               call DGEMM('T','T',3,3,3,1.0d0,D_aux,3,dxidx,3,0.0d0,D_aux2,3)
+               C_RC = D_aux2 * WAVENUM_FLD*conjg(detJstretch) * wt123
 !
 !           ...D_ER_za = J^-1 e_z x zaJ J^-T
                Z_aux(1:3,1) = zaJ(1,1) * dxidx(1:3,2)
@@ -751,7 +751,7 @@
                               sa=1+1-deltak(idxalph,3)
 !
                               AUXRC_A(alph,b,a,k3) = AUXRC_A(alph,b,a,k3)  &
-                                                   + ZI*C_CR(b,idxalph)    &
+                                                   + ZI*C_RC(idxalph,b)    &
                                                    * shapH3(idxa,sa)       &
                                                    * shapH3(idxb,sb)       &
                                                    * (-1)**(alph-1)
@@ -763,10 +763,10 @@
                               sb=1+1-deltak(idxbeta,3)
                               sa=1+deltak(a,3)
 !
-                              AUXCR_A(beta,b,a,k3) = AUXCR_A(beta,b,a,k3)  &
-                                                   - ZI*C_CR(a,idxbeta)    &
-                                                   * shapH3(idxa,sa)       &
-                                                   * shapH3(idxb,sb)       &
+                              AUXCR_A(beta,b,a,k3) = AUXCR_A(beta,b,a,k3)     &
+                                                   - ZI*conjg(C_RC(idxbeta,a))&
+                                                   * shapH3(idxa,sa)          &
+                                                   * shapH3(idxb,sb)          &
                                                    * (-1)**(beta-1)
                            enddo
                         endif

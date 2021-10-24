@@ -157,7 +157,7 @@
    real(8), dimension(3) :: xip
 !
    real(8)   , dimension(3,3) :: D_za,D_zc,D_aux,D_aux2,C,D,D_RR
-   complex(8), dimension(3,3) :: Z_za,Z_zc,Z_aux,C_CR,D_ER_za,D_ER_zc
+   complex(8), dimension(3,3) :: Z_za,Z_zc,Z_aux,C_RC,D_ER_za,D_ER_zc
 !
    real(8), allocatable :: shapeH3(:,:),E12(:,:),C12(:,:)
    real(8), allocatable :: sH12(:,:),gH12(:,:,:),sE12(:,:,:),cE12(:,:)
@@ -584,27 +584,29 @@
 !           (note we have 2 instead of 3 below, only using first 2 cols)
             call DGEMM('N','T',3,3,2,1.0d0,dxidx,3,dxidx,3,0.0d0,D_aux,3)
             D_RR = D_aux * (WAVENUM_FLD*abs(detJstretch))**2 * weighthh
-
+!
+!        ...Note for C_RC, and both D_ER we don't multiply by ZI yet
+!           this way it's easier to take conjugate of Jacobian factor
 !        ...J^T e_z x J^-T = -(e_z x J)^T J^-T
             D_aux(1,1:3) = -dxdxi(2,1:3)
             D_aux(2,1:3) = dxdxi(1,1:3)
             D_aux(3,1:3) = rZero
-            call DGEMM('T','T',3,3,3,1.0d0,D_aux,3,dxidx,3,0.0d0,D_aux2,3)
-            C_CR = D_aux2 * ZI*WAVENUM_FLD*detJstretch * wt123
+            call DGEMM('T','T',3,3,3,-1.0d0,D_aux,3,dxidx,3,0.0d0,D_aux2,3)
+            C_RC = D_aux2 * WAVENUM_FLD*detJstretch * wt123
 !
 !        ...D_ER_za = J^-1 e_z x zaJ J^-T
             Z_aux(1:3,1) = zaJ(1,1) * dxidx(1:3,2)
             Z_aux(1:3,2) = -zaJ(2,2) * dxidx(1:3,1)
             Z_aux(1:3,3) = ZERO
             call ZGEMM('N','T',3,3,3,ZONE,Z_aux,3,ZONE*dxidx,3,ZERO,D_ER_za,3)
-            D_ER_za = D_ER_za * ZI*WAVENUM_FLD*conjg(detJstretch) * weighthh
-
+            D_ER_za = D_ER_za * WAVENUM_FLD*conjg(detJstretch) * weighthh
+!
 !        ...D_ER_zc = J^-1 e_z x zcJ J^-T
             Z_aux(1:3,1) = zcJ(1,1) * dxidx(1:3,2)
             Z_aux(1:3,2) = -zcJ(2,2) * dxidx(1:3,1)
             Z_aux(1:3,3) = ZERO
             call ZGEMM('N','T',3,3,3,ZONE,Z_aux,3,ZONE*dxidx,3,ZERO,D_ER_zc,3)
-            D_ER_zc = D_ER_zc * ZI*WAVENUM_FLD*conjg(detJstretch) * weighthh
+            D_ER_zc = D_ER_zc * WAVENUM_FLD*conjg(detJstretch) * weighthh
          endif
 !
 !     ...put appropriate quadrature weight on Jacobian and its inverse
@@ -694,11 +696,11 @@
                      do a=1,3
 !                    ...-ik(curl F_i, e_z x F_j)
                         AUXCR(a,b,j12,i12) = AUXCR(a,b,j12,i12)          &
-                              - ZI*C_CR(a,b)                             &
+                              - ZI*conjg(C_RC(a,b))                             &
                               * E12(b,j12)*C12(a,i12)
 !                    ...ik(e_z x F_i, curl F_j)
                         AUXRC(a,b,j12,i12) = AUXRC(a,b,j12,i12)          &
-                              + ZI*C_CR(b,a)                      &
+                              + ZI*C_RC(b,a)                      &
                               * E12(a,i12)*C12(b,j12)
                      enddo
                   enddo
