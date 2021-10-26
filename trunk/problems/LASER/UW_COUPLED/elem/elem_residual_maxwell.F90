@@ -827,6 +827,10 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !  but RFP can use BLAS3 so is faster)
    allocate(Grfp(NrTest*(Nrtest+1)/2))
    call ZTPTTF('N','U',NrTest,gramP,Grfp,info)
+   if (info.ne.0) then
+      write(*,*) 'elem_residual_maxwell: ZTPTTF: Mdle,info = ',Mdle,info,'. stop.'
+      stop
+   endif
    deallocate(gramP)
 !
 !..factorize the test Gram matrix
@@ -840,14 +844,15 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !..save copies of the RHS to compute later the residual
    bload_Ec = bload_E
 !
+!
 !..compute the product of inverted test Gram matrix with RHS,
 !..bload_E is overwritten with the solution
-   call ZTFSM('N','L','U','C','N',NrTest,1,ZONE,Grfp,bload_E,NrTest)
+   call ZPFTRS('N','U',NrTest,1,Grfp,bload_E,NrTest,info)
 !   call ZPPTRS('U', NrTest, 1, gramP, bload_E, NrTest, info)
-!   if (info.ne.0) then
-!      write(*,*) 'elem_residual_maxwell: ZPPTRS: Mdle,info = ',Mdle,info,'. stop.'
-!      stop
-!   endif
+   if (info.ne.0) then
+      write(*,*) 'elem_residual_maxwell: ZPFTRS: Mdle,info = ',Mdle,info,'. stop.'
+      stop
+   endif
 !
    deallocate(Grfp)
 !
