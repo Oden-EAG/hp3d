@@ -98,7 +98,7 @@ program main
    if (JOB .ne. 0) then
       call exec_job
    else
-      if (RANK .eq. 0) then
+      if (RANK .eq. ROOT) then
          call master_main
       else
          call worker_main
