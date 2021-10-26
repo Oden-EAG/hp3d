@@ -292,8 +292,6 @@
    select case(GEOM_NO)
       case(1)
          bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
-      case(2,3)
-         bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
       case(4)
          bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
       case(5)
@@ -310,6 +308,9 @@
                write(*,*) 'elem_maxwell_gram_pris: unexpected ndom param. stop.'
                stop
          end select
+      case default
+         write(*,*) 'elem_maxwell_gram_pris: unexpected GEOM_NO: ', GEOM_NO, '. stop.'
+         stop
 !..end select case of GEOM_NO
    end select
 !
@@ -931,6 +932,13 @@
    deallocate(AUXCC)
    deallocate(AUXEC_zb,AUXEC_zc)
    deallocate(AUXCE_zb,AUXCE_zc)
+!
+   if (ENVELOPE) then
+      deallocate(AUXRR)
+      deallocate(AUXRC, AUXCR)
+      deallocate(AUXER_zb,AUXER_zc)
+      deallocate(AUXRE_zb,AUXRE_zc)
+   endif
 !
 end subroutine elem_maxwell_gram_pris
 

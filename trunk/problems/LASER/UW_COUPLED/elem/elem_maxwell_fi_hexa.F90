@@ -384,8 +384,6 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    select case(GEOM_NO)
       case(1)
          bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
-      case(2,3)
-         bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
       case(4)
          bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
       case(5)
@@ -402,6 +400,9 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                write(*,*) 'elem_maxwell_fi_hexa: unexpected ndom param. stop.'
                stop
          end select
+      case default
+         write(*,*) 'elem_maxwell_fi_hexa: unexpected GEOM_NO: ', GEOM_NO, '. stop.'
+         stop
 !..end select case of GEOM_NO
    end select
 !

@@ -199,7 +199,7 @@
          OMEGA_RATIO_FLD = OMEGA_RATIO_SIGNAL ! 1.0d0
          WAVENUM_FLD     = WAVENUM_SIGNAL
       case default
-      write(*,*) 'elem_maxwell_gram_hexa: invalid Fld_flag param. stop.'
+         write(*,*) 'elem_maxwell_gram_hexa: invalid Fld_flag param. stop.'
          stop
    end select
 !
@@ -225,8 +225,6 @@
    select case(GEOM_NO)
       case(1)
          bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
-      case(2,3)
-         bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
       case(4)
          bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
       case(5)
@@ -243,6 +241,9 @@
                write(*,*) 'elem_maxwell_gram_hexa: unexpected ndom param. stop.'
                stop
          end select
+      case default
+         write(*,*) 'elem_maxwell_gram_hexa: unexpected GEOM_NO: ', GEOM_NO, '. stop.'
+         stop
 !..end select case of GEOM_NO
    end select
 !
@@ -1163,7 +1164,6 @@
 !..loop over px ends
    enddo
 !
-!
    deallocate(AUXEE_A_zb,AUXEE_A_zc)
    deallocate(AUXEE_B_zb,AUXEE_B_zc)
    deallocate(AUXCC_A)
@@ -1172,6 +1172,18 @@
    deallocate(AUXEC_B_zb,AUXEC_B_zc)
    deallocate(AUXCE_A_zb,AUXCE_A_zc)
    deallocate(AUXCE_B_zb,AUXCE_B_zc)
+!
+   if (ENVELOPE) then
+      deallocate(AUXRR_A)
+      deallocate(AUXRC_A,AUXCR_A)
+      deallocate(AUXER_A_zb,AUXER_A_zc)
+      deallocate(AUXRE_A_zb,AUXRE_A_zc)
+!
+      deallocate(AUXRR_B)
+      deallocate(AUXRC_B,AUXCR_B)
+      deallocate(AUXER_B_zb,AUXER_B_zc)
+      deallocate(AUXRE_B_zb,AUXRE_B_zc)
+   endif
 !
 !
 end subroutine elem_maxwell_gram_hexa
