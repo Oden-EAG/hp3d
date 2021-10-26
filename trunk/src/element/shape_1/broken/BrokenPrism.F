@@ -63,7 +63,7 @@ c
 c  ...initiate counter for shape functions
       m = 0
 c
-c  ...Shape functions are tensor product of H1 tringles and segments
+c  ...Shape functions are tensor product of H1 triangles and segments
       call decod(NordM,MODORDER,2, nordB)
       call shape2HH('mdlt',Xi(1:2),nordB(1), ndofH12,shapH12,dshapH12)
       call shape1HH(Xi(3),nordB(2), ndofH3,shapH3,dshapH3)
