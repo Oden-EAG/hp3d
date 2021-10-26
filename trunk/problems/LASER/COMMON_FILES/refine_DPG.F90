@@ -479,8 +479,11 @@ subroutine href_solve(Nflag,PhysNick, Nstop)
    if (DISTRIBUTED .and. (.not. HOST_MESH)) then
       call par_mumps_sc('H')
    else
-      !call mumps_sc('G')
+   #if HP3D_USE_INTEL_MKL
       call pardiso_sc('H')
+   #else
+      call mumps_sc('H')
+   #endif
    endif
 !
 !..do refinements and solve
@@ -495,8 +498,11 @@ subroutine href_solve(Nflag,PhysNick, Nstop)
             !call print_partition
             call par_mumps_sc('H')
          else
-            !call mumps_sc('H')
+         #if HP3D_USE_INTEL_MKL
             call pardiso_sc('H')
+         #else
+            call mumps_sc('H')
+         #endif
          endif
       else
 !     ...Last step only display (no refinement)
