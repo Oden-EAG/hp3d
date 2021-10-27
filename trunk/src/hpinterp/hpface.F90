@@ -242,13 +242,15 @@
     call logic_error(FAILURE,__FILE__,__LINE__)
   endif
 !
-! back substitute  why double calls ?????????
+! copy load vector
   uu(1:ndofH_face,:) = bb(1:ndofH_face,:)
-  call dlaswp(3,uu(1:ndofH_face,:),naH,1,ndofH_face,ipivH,1)
-  call dtrsm('L','L','N','U',ndofH_face,3,1.d0,aaH,naH, &
-             uu,naH)
-  call dtrsm('L','U','N','N',ndofH_face,3,1.d0,aaH,naH, &
-             uu,naH)
+!
+! apply pivots to load vector
+  call dlaswp(3,uu,naH,1,ndofH_face,ipivH,1)
+!
+! triangular solves
+  call dtrsm('L','L','N','U',ndofH_face,3,1.d0,aaH,naH, uu,naH)
+  call dtrsm('L','U','N','N',ndofH_face,3,1.d0,aaH,naH, uu,naH)
 !
   if (iprint.eq.1) then
    write(*,*) 'hpface: k,uu(k) = '
