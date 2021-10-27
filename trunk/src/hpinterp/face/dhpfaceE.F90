@@ -91,13 +91,13 @@
   VTYPE :: zvalEeta(3,MAXEQNE),zcurlEeta(3,MAXEQNE)
 !
 ! linear systems
-  real(8), dimension(MAXMdlqH+MAXMdlqE,MAXMdlqH+MAXMdlqE) :: aaE
-  integer, dimension(MAXMdlqH+MAXMdlqE) :: ipivE
+  real(8), dimension(MAXmdlqH+MAXmdlqE,MAXmdlqH+MAXmdlqE) :: aaE
+  integer, dimension(MAXmdlqH+MAXmdlqE) :: ipivE
 !
 ! load vector and solution
-  VTYPE,   dimension(MAXMdlqH+MAXMdlqE,MAXEQNE) :: zbE,zuE
+  VTYPE,   dimension(MAXmdlqH+MAXmdlqE,MAXEQNE) :: zbE,zuE
 #if C_MODE
-  real(8), dimension(MAXMdlqH+MAXMdlqE,MAXEQNE) :: duE_real, duE_imag
+  real(8), dimension(MAXmdlqH+MAXmdlqE,MAXEQNE) :: duE_real, duE_imag
 #endif
 !
 ! decoded case and BC flag for the face node
@@ -429,33 +429,30 @@
      call logic_error(FAILURE,__FILE__,__LINE__)
   endif
 !
-! back substitute
-! apply pivots
-     zuE(1:ndofE_tot,:) = zbE(1:ndofE_tot,:)
+! copy load vector
+  zuE(1:ndofE_tot,:) = zbE(1:ndofE_tot,:)
 !
 #if C_MODE
-     call zlaswp(MAXEQNE,zuE,naE,1,ndofE_tot,ipivE,1)
-     duE_real(1:ndofE_tot,:) = real(zuE(1:ndofE_tot,:))
-     duE_imag(1:ndofE_tot,:) = aimag(zuE(1:ndofE_tot,:))
+! apply pivots to load vector
+  call zlaswp(MAXEQNE,zuE,naE,1,ndofE_tot,ipivE,1)
 !
-     call dtrsm('L','L','N','U',ndofE_tot,MAXEQNE,1.d0,   &
-                aaE,naE,duE_real,naE)
-     call dtrsm('L','U','N','N',ndofE_tot,MAXEQNE,1.d0,aaE,naE, &
-          duE_real,naE)
+  duE_real(1:ndofE_tot,:) = real(zuE(1:ndofE_tot,:))
+  duE_imag(1:ndofE_tot,:) = aimag(zuE(1:ndofE_tot,:))
 !
-     call dtrsm('L','L','N','U',ndofE_tot,MAXEQNE,1.d0,aaE,naE, &
-          duE_imag,naE)
-     call dtrsm('L','U','N','N',ndofE_tot,MAXEQNE,1.d0,aaE,naE, &
-          duE_imag,naE)
+! triangular solves
+  call dtrsm('L','L','N','U',ndofE_tot,MAXEQNE,1.d0,aaE,naE, duE_real,naE)
+  call dtrsm('L','U','N','N',ndofE_tot,MAXEQNE,1.d0,aaE,naE, duE_real,naE)
 !
-     zuE(1:ndofE_tot,:) &
-          = dcmplx(duE_real(1:ndofE_tot,:), duE_imag(1:ndofE_tot,:))
+  call dtrsm('L','L','N','U',ndofE_tot,MAXEQNE,1.d0,aaE,naE, duE_imag,naE)
+  call dtrsm('L','U','N','N',ndofE_tot,MAXEQNE,1.d0,aaE,naE, duE_imag,naE)
+!
+  zuE(1:ndofE_tot,:) = dcmplx(duE_real(1:ndofE_tot,:), duE_imag(1:ndofE_tot,:))
 #else
-     call dlaswp(MAXEQNE,zuE,naE,1,ndofE_tot,ipivE,1)
-     call dtrsm('L','L','N','U',ndofE_tot,MAXEQNE,1.d0,aaE,naE, &
-          zuE,naE)
-     call dtrsm('L','U','N','N',ndofE_tot,MAXEQNE,1.d0,aaE,naE, &
-          zuE,naE)
+! apply pivots to load vector
+  call dlaswp(MAXEQNE,zuE,naE,1,ndofE_tot,ipivE,1)
+! triangular solves
+  call dtrsm('L','L','N','U',ndofE_tot,MAXEQNE,1.d0,aaE,naE, zuE,naE)
+  call dtrsm('L','U','N','N',ndofE_tot,MAXEQNE,1.d0,aaE,naE, zuE,naE)
 #endif
 !
 #if DEBUG_MODE
@@ -527,4 +524,4 @@
       if (iprint.eq.1) call result
 #endif
 !
-      end subroutine dhpfaceE
+  end subroutine dhpfaceE
