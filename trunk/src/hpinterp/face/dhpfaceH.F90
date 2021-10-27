@@ -84,13 +84,13 @@
 !
 ! work space for linear solvers
   integer                               :: naH,info
-  real(8), dimension(MAXMdlqH,MAXMdlqH) :: aaH
-  integer, dimension(MAXMdlqH)          :: ipivH
+  real(8), dimension(MAXmdlqH,MAXmdlqH) :: aaH
+  integer, dimension(MAXmdlqH)          :: ipivH
 !
 ! load vector and solution
-  VTYPE,   dimension(MAXMdlqH,MAXEQNH)  :: zbH,zuH
+  VTYPE,   dimension(MAXmdlqH,MAXEQNH)  :: zbH,zuH
 #if C_MODE
-  real(8), dimension(MAXMdlqH,MAXEQNH)  :: duH_real,duH_imag
+  real(8), dimension(MAXmdlqH,MAXEQNH)  :: duH_real,duH_imag
 #endif
 !
 ! decoded case and BC flags for the edge node
@@ -300,31 +300,30 @@
     call logic_error(FAILURE,__FILE__,__LINE__)
   endif
 !
-! back substitute  why double calls ?????????
+! copy load vector
   zuH(1:ndofH_face,:) = zbH(1:ndofH_face,:)
+!
 #if C_MODE
+! apply pivots to load vector
   call zlaswp(MAXEQNH,zuH,naH,1,ndofH_face,ipivH,1)
+!
   duH_real(1:ndofH_face,:) = real(zuH(1:ndofH_face,:))
   duH_imag(1:ndofH_face,:) = aimag(zuH(1:ndofH_face,:))
 !
-  call dtrsm('L','L','N','U',ndofH_face,MAXEQNH,1.d0,aaH,naH, &
-             duH_real,naH)
-  call dtrsm('L','U','N','N',ndofH_face,MAXEQNH,1.d0,aaH,naH, &
-             duH_real,naH)
+! triangular solves
+  call dtrsm('L','L','N','U',ndofH_face,MAXEQNH,1.d0,aaH,naH, duH_real,naH)
+  call dtrsm('L','U','N','N',ndofH_face,MAXEQNH,1.d0,aaH,naH, duH_real,naH)
 !
-  call dtrsm('L','L','N','U',ndofH_face,MAXEQNH,1.d0,aaH,naH, &
-             duH_imag,naH)
-  call dtrsm('L','U','N','N',ndofH_face,MAXEQNH,1.d0,aaH,naH, &
-             duH_imag,naH)
+  call dtrsm('L','L','N','U',ndofH_face,MAXEQNH,1.d0,aaH,naH, duH_imag,naH)
+  call dtrsm('L','U','N','N',ndofH_face,MAXEQNH,1.d0,aaH,naH, duH_imag,naH)
 !
-  zuH(1:ndofH_face,:) &
-          = dcmplx(duH_real(1:ndofH_face,:), duH_imag(1:ndofH_face,:))
+  zuH(1:ndofH_face,:) = dcmplx(duH_real(1:ndofH_face,:), duH_imag(1:ndofH_face,:))
 #else
+! apply pivots to load vector
   call dlaswp(MAXEQNH,zuH,naH,1,ndofH_face,ipivH,1)
-  call dtrsm('L','L','N','U',ndofH_face,MAXEQNH,1.d0,aaH,naH, &
-             zuH,naH)
-  call dtrsm('L','U','N','N',ndofH_face,MAXEQNH,1.d0,aaH,naH, &
-             zuH,naH)
+! triangular solves
+  call dtrsm('L','L','N','U',ndofH_face,MAXEQNH,1.d0,aaH,naH, zuH,naH)
+  call dtrsm('L','U','N','N',ndofH_face,MAXEQNH,1.d0,aaH,naH, zuH,naH)
 #endif
 !
 #if DEBUG_MODE
@@ -394,5 +393,5 @@
       if (iprint.eq.1) call result
 #endif
 !
-      end subroutine dhpfaceH
+  end subroutine dhpfaceH
 

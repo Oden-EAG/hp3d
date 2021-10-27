@@ -72,11 +72,11 @@
 !
 ! work space for linear solvers
   integer                               :: naH,info
-  real(8), dimension(MAXMdlqH,MAXMdlqH) :: aaH
-  integer, dimension(MAXMdlqH)          :: ipivH
+  real(8), dimension(MAXmdlqH,MAXmdlqH) :: aaH
+  integer, dimension(MAXmdlqH)          :: ipivH
 !
 ! load vector and solution
-  real(8), dimension(MAXMdlqH,3)        :: bb,uu
+  real(8), dimension(MAXmdlqH,3)        :: bb,uu
 !
 ! misc work space
   integer :: iprint,nrv,nre,nrf,i,j,k,ie,kj,ki,&
@@ -265,5 +265,5 @@
     Xdof(i,1:ndofH_face) = uu(1:ndofH_face,i)
   enddo
 !
-end subroutine hpface
+  end subroutine hpface
 
