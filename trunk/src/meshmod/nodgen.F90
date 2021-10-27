@@ -55,7 +55,7 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
    if (iprint.eq.1) then
       write(*,7000) Type,Icase,Nbcond,Nfath,Norder,Iact
  7000 format(' nodgen: Type,Icase,Nbcond,Nfath,Norder,Iact = ', &
-                        a4,2x,i3,2x,i6,2x,i6,2x,i3,2x,i2)
+                        a4,2x,i3,2x,i6,2x,i6,2x,i3,2x,l2)
       call decod(Icase,2,NR_PHYSA, ncase)
       write(*,7001) ncase(1:NR_PHYSA)
  7001 format(' decoded Icase = ',10i1)

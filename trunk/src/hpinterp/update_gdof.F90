@@ -408,6 +408,8 @@ subroutine update_gdof()
 !$OMP SCHEDULE(DYNAMIC)
    do iel=1,NRELES_SUBD
       mdle = ELEM_SUBD(iel)
+!  ...cycle if middle node does not have H1 DOFs (low order)
+      if (.not.associated(NODES(mdle)%dof%coord)) cycle
       call find_elem_type(mdle, mdltype)
       if (mdltype .ne. 'Linear') then
          ntype = NODES(mdle)%type

@@ -72,11 +72,11 @@
 !
 ! work space for linear solvers
   integer                               :: naH,info
-  real(8), dimension(MAXMdlqH,MAXMdlqH) :: aaH
-  integer, dimension(MAXMdlqH)          :: ipivH
+  real(8), dimension(MAXmdlqH,MAXmdlqH) :: aaH
+  integer, dimension(MAXmdlqH)          :: ipivH
 !
 ! load vector and solution
-  real(8), dimension(MAXMdlqH,3)        :: bb,uu
+  real(8), dimension(MAXmdlqH,3)        :: bb,uu
 !
 ! misc work space
   integer :: iprint,nrv,nre,nrf,i,j,k,ie,kj,ki,&
@@ -242,13 +242,15 @@
     call logic_error(FAILURE,__FILE__,__LINE__)
   endif
 !
-! back substitute  why double calls ?????????
+! copy load vector
   uu(1:ndofH_face,:) = bb(1:ndofH_face,:)
-  call dlaswp(3,uu(1:ndofH_face,:),naH,1,ndofH_face,ipivH,1)
-  call dtrsm('L','L','N','U',ndofH_face,3,1.d0,aaH,naH, &
-             uu,naH)
-  call dtrsm('L','U','N','N',ndofH_face,3,1.d0,aaH,naH, &
-             uu,naH)
+!
+! apply pivots to load vector
+  call dlaswp(3,uu,naH,1,ndofH_face,ipivH,1)
+!
+! triangular solves
+  call dtrsm('L','L','N','U',ndofH_face,3,1.d0,aaH,naH, uu,naH)
+  call dtrsm('L','U','N','N',ndofH_face,3,1.d0,aaH,naH, uu,naH)
 !
   if (iprint.eq.1) then
    write(*,*) 'hpface: k,uu(k) = '
@@ -263,5 +265,5 @@
     Xdof(i,1:ndofH_face) = uu(1:ndofH_face,i)
   enddo
 !
-end subroutine hpface
+  end subroutine hpface
 

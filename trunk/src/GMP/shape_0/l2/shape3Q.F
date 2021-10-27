@@ -31,7 +31,7 @@ c  ...subroutine arguments
       double precision, dimension(3)       , intent(in)  :: Xi
       integer , dimension(19)              , intent(in)  :: Norder
       integer ,                              intent(out) :: Nrdof
-      double precision, dimension(MAXBrickQ),intent(out) :: ShapQ
+      double precision, dimension(MAXbrickQ),intent(out) :: ShapQ
 c
 c  ...local variables
       integer :: iprint
