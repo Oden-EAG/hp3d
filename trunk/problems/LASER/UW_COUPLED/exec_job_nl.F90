@@ -40,6 +40,10 @@ subroutine exec_job_nl
       write(*,*) 'NEXACT must be 0 for nonlinear Maxwell problem. stop.'
       stop
    endif
+   if(FAKE_PUMP.eq.1) then
+      write(*,*) 'exec_job_nl script not yet set up for FAKE_PUMP=1. stop.'
+      stop
+   endif
 !
    EXCHANGE_DOF = .false.
 !
