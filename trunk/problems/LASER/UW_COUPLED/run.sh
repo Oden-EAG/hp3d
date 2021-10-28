@@ -130,7 +130,7 @@ if [ "$envelope" = true ] ; then
    args+=" -wavenum_signal 1.0d0 -wavenum_pump 1.0d0"
 fi
 
-#mpirun -np ${nproc} ./uwLaser ${args}
+mpirun -np ${nproc} ./uwLaser ${args}
 #ibrun -n ${nproc} ./uwLaser ${args}
 #ibrun -n ${nproc} xterm -hold -e ./uwLaser ${args}
 
