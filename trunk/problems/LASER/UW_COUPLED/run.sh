@@ -53,7 +53,7 @@ usepml=false
 # EXEC JOB options
 job=0
 imax=0
-jmax=0
+jmax=1
 
 # max NODES
 maxnods=105000
@@ -138,8 +138,8 @@ mpirun -np ${nproc} ./uwLaser ${args}
 # B. FULL FIBER (non-)linear solve of Maxwell (with heat/gain) (signal+pump fields) -- use NEXACT=0
 # set fiber length, length of PML, #refs, maxnodes
 #  1_2 (16 wavelengths), 5 refs (16*  32 elems), 6250 nodes
-zl=1.2d0; pmlfrac=0.25d0; imax=5; maxnods=8000 #6250
-file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_1_2'
+#zl=1.2d0; pmlfrac=0.25d0; imax=5; maxnods=8000 #6250
+#file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_1_2'
 #gain=3.2d4
 #dir_output='../gain/outputs16/'
 
@@ -173,6 +173,17 @@ file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_1_2'
 #gain=1.0d3
 #dir_output='../gain/outputs512/'
 
+### BEGIN TEST SETUP FOR ENVELOPE FORMULATION ###
+# WITH WAVENUM_SIGNAL = 85.0,
+# THE ENVELOPE OF LP01 BEATS AT 125.40 WAVELENGTHS
+# THUS 1024 WAVELENGTHS IS APPROXIMATELY 8 ENVELOPE OSCILLATIONS
+#  TRY TO DISCRETIZE WITH AT LEAST 16 ELEMENTS IN Z
+#  PML NEEDS 2-4 OSCILLATIONS (QUARTER-HALF THE DOMAIN)
+#  76_8 (1024 wavelengths), 5 refs (16*  32 elems), 8000 nodes
+zl=76.8d0; pmlfrac=0.5d0; imax=5; maxnods=8000
+file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_76_8'
+### END TEST SETUP FOR ENVELOPE FORMULATION ###
+
 #omega=59.05249348852994809140307d0
 gamma=1.0d0
 ctrl='../COMMON_FILES/control_0'
@@ -198,7 +209,8 @@ if [ "$usepml" = true ] ; then
 fi
 if [ "$envelope" = true ] ; then
    args+=" -envelope"
-   args+=" -wavenum_signal 1.0d0 -wavenum_pump 1.0d0"
+   #args+=" -wavenum_signal 85.6833d0 -wavenum_pump 1.0d0"
+   args+=" -wavenum_signal 85.0d0 -wavenum_pump 1.0d0"
 fi
 
 #mpirun -np ${nproc} ./uwLaser ${args}

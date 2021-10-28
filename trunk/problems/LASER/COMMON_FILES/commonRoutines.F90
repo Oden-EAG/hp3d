@@ -263,6 +263,8 @@ subroutine get_Beta(Xp,Fld_flag, Zbeta,Zdbeta,Zd2beta)
          stop
    end select
 !
+   if (ENVELOPE) OMEGA_RATIO_FLD = OMEGA_RATIO_FLD / 100.d0
+!
    z = Xp(3)
    b = PML_REGION
    L = ZL
