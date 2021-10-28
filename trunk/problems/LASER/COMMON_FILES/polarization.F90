@@ -42,8 +42,8 @@ subroutine get_bgPol(Dom_flag,Fld_flag,Delta_n,X, Bg_pol)
    real(8), parameter :: gratingClad = 0.0d0
 !
 !..Grating frequency depends on beatLength
-!   real(8), parameter :: beatLength =  0.0511d0 ! LP01 (x), LP02 (x); nx = 1.45
-    real(8), parameter :: beatLength =  0.0203d0 ! LP01 (x), LP11 (x); nx = 1.45
+   real(8), parameter :: beatLength =  0.0511d0 ! LP01 (x), LP02 (x); nx = 1.45
+!   real(8), parameter :: beatLength =  0.0203d0 ! LP01 (x), LP11 (x); nx = 1.45
 !   real(8), parameter :: beatLength =  0.0453d0 ! LP01 (x), LP21 (x); nx = 1.45
 !
    !real(8), parameter :: beatLength =  0.0719d0 ! LP01 (x), LP02 (x); nx = 1.15
@@ -58,8 +58,11 @@ subroutine get_bgPol(Dom_flag,Fld_flag,Delta_n,X, Bg_pol)
 !
 !..define a phase shift for the sin(z) perturbation function
    !real(8) :: phaseShift = 0.d0
-   !real(8) :: phaseShift = PI / 2.d0
-   real(8) :: phaseShift = PI
+   !real(8) :: phaseShift = -PI / 4.d0
+   !real(8) :: phaseShift = -PI / 2.d0
+   !real(8) :: phaseShift = -PI * 0.75d0
+   !real(8) :: phaseShift = -PI
+   real(8) :: phaseShift = -PI * 0.67d0
 !
 !-------------------------------------------------------------------------------
 !
@@ -69,15 +72,15 @@ subroutine get_bgPol(Dom_flag,Fld_flag,Delta_n,X, Bg_pol)
       if (ART_GRATING .eq. 1) then
       !  symmetric grating
       !..EXP 0 (LP01 to LP02)
-!         x_perturb = 0.0d0; y_perturb = 0.0d0
-!         r_perturb = 0.5d0*R_CORE
+         x_perturb = 0.0d0; y_perturb = 0.0d0
+         r_perturb = 0.5d0*R_CORE
       !  asymmetric grating
       !..EXP 1 (LP01 to LP02)
 !         x_perturb = 0.3d0*R_CORE; y_perturb = 0.0d0
 !         r_perturb = 0.7d0*R_CORE
       !..EXP 2 (LP01 to LP11a)
-         x_perturb = -0.4d0*R_CORE; y_perturb = 0.0d0
-         r_perturb =  0.6d0*R_CORE
+!         x_perturb = -0.4d0*R_CORE; y_perturb = 0.0d0
+!         r_perturb =  0.6d0*R_CORE
       !..EXP 3 (LP01 to LP21a (and LP11b))
 !         x_perturb = 0.0d0; y_perturb = 0.5d0*R_CORE
 !         r_perturb = 0.5d0*R_CORE
@@ -189,9 +192,13 @@ subroutine get_activePol(ZsolQ,Fld_flag,Delta_n, Active_pol)
 !..compute pump irradiance
    Ip = 0.d0
    if (FAKE_PUMP .eq. 1) then
-!  ...assume pump is a plane wave in fiber core
+!     set fake pump power the same here and in thermal polarization computation
+!  ...either assume pump is a plane wave in fiber core (core-pumped)
       Pp = 100.d0 ! set non-dimensional core pump power (scaled by I_0*L_0*L_0)
       Ip = Pp / (PI*R_CORE*R_CORE) ! calculate non-dimensional irradiance
+!  ...or assume pump is a plane wave in fiber cladding (cladding-pumped)
+      !Pp = 1000.d0 ! set non-dimensional clad pump power (scaled by I_0*L_0*L_0)
+      !Ip = Pp / (PI*R_CLAD*R_CLAD) ! calculate non-dimensional irradiance
    else
       call zz_cross_product(Ep,conjg(Hp), ETimesHp)
       Ip = sqrt(real(EtimesHp(1))**2+real(EtimesHp(2))**2+real(EtimesHp(3))**2)

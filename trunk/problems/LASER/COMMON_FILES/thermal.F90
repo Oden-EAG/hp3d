@@ -196,7 +196,7 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
             maxz = maxval(xnod(3,1:6))
             minz = minval(xnod(3,1:6))
          case default
-            write(*,*) 'comp_avgTemp: invalid etype param. stop.'
+            write(*,*) 'comp_avgTemp: invalid etype=',etype,'. stop.'
             stop
       end select
       do i=1,NumPts
@@ -400,9 +400,13 @@ subroutine get_thermLoad(ZsolQ, Therm_load)
 !..compute pump irradiance
    Ip = 0.d0
    if (FAKE_PUMP .eq. 1) then
-!  ...assume pump is a plane wave in fiber core
+!     set fake pump power the same here and in active gain computation
+!  ...either assume pump is a plane wave in fiber core (core-pumped)
       Pp = 100.d0 ! set non-dimensional core pump power (scaled by I_0*L_0*L_0)
       Ip = Pp / (PI*R_CORE*R_CORE) ! calculate non-dimensional irradiance
+!  ...or assume pump is a plane wave in fiber cladding (cladding-pumped)
+      !Pp = 1000.d0 ! set non-dimensional clad pump power (scaled by I_0*L_0*L_0)
+      !Ip = Pp / (PI*R_CLAD*R_CLAD) ! calculate non-dimensional irradiance
    else
       call zz_cross_product(Ep,conjg(Hp), ETimesHp)
       Ip = sqrt((real(EtimesHp(1))**2+real(EtimesHp(2))**2+real(EtimesHp(3))**2))

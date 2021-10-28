@@ -411,7 +411,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !
 !--------------- 13th prob -------------------------------------------------------
 !..Fundamental mode LP01 in dielectric waveguide
-   elseif (ISOL .eq. 13) then
+   elseif (ISOL .eq. 13 .or. Fld .eq. 0) then ! pump field uses LP01 if ISOL > 13
 !
 !  ...LP01 in dielectric waveguide, a = sqrt(2), omega=25.7
 !      k    = 37.2854d0

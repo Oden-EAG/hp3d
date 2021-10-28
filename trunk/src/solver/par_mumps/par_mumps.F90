@@ -143,18 +143,17 @@ subroutine mumps_start(mumps,mpi_comm)
 !     0: automatic choice
 !     1: sequential computation
 !     2: parallel computation
-   mumps%icntl(28) = 0
-!if (NUM_PROCS < 16)
-!   mumps_par%icntl(28) = 1
-!else
-!   mumps_par%icntl(28) = 2
-!endif
+   if (NUM_PROCS < 16) then
+      mumps_par%icntl(28) = 1
+   else
+      mumps_par%icntl(28) = 2
+   endif
 !
 !..icntl(29): choice of parallel pivot ordering tool (not used if icntl(28)=1)
 !     0: automatic choice
 !     1: PT-Scotch
 !     2: ParMetis
-   mumps%icntl(29) = 0
+   mumps%icntl(29) = 1
    ! parmetis appears to cause 'integer divide by zero error'
    ! when using partitions for small problem
    ! (e.g., try 32 mpi ranks on 64 cubes)

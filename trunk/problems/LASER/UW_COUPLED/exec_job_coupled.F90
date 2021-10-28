@@ -223,10 +223,12 @@ subroutine exec_job_coupled
       call update_Ddof
 !
 !  ...update Dirichlet DOFs for pump field
-      if (RANK.eq.ROOT) write(*,4200) ' Updating pump Dirichlet DOFs...'
-      NO_PROBLEM = 4
-      call set_physAm(NO_PROBLEM, physNick,flag)
-      call update_Ddof
+      if (FAKE_PUMP .ne. 1) then
+         if (RANK.eq.ROOT) write(*,4200) ' Updating pump Dirichlet DOFs...'
+         NO_PROBLEM = 4
+         call set_physAm(NO_PROBLEM, physNick,flag)
+         call update_Ddof
+      endif
 !
 !  ...do until stopping criterion is satisfied
       if (RANK.eq.ROOT) write(*,4200) '---------------------------------------------'
@@ -350,7 +352,7 @@ subroutine exec_job_coupled
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
 !
 !  ...only write paraview output every X time steps
-      !if (time_step.lt.100 .and. MOD(time_step,10).ne.0) goto 425
+      if (time_step.le.nskip .and. MOD(time_step,10).ne.0) goto 425
 !
 !  ...write paraview output
       if(RANK.eq.ROOT) write(*,200) ' Writing paraview output...'
@@ -365,11 +367,13 @@ subroutine exec_job_coupled
 !
 !..compute final residual values (if not previously computed)
    if (.not. ires) then
-      QUIET_MODE = .true.; IPRINT_TIME = 0
-      if (RANK.eq.ROOT) write(*,4200) '   Pump residual:'
-      NO_PROBLEM = 4
-      call set_physAm(NO_PROBLEM, physNick,flag)
-      call residual(res)
+      if (FAKE_PUMP .ne. 1) then
+         QUIET_MODE = .true.; IPRINT_TIME = 0
+         if (RANK.eq.ROOT) write(*,4200) '   Pump residual:'
+         NO_PROBLEM = 4
+         call set_physAm(NO_PROBLEM, physNick,flag)
+         call residual(res)
+      endif
 !
       if (RANK.eq.ROOT) write(*,4200) '   Signal residual:'
       NO_PROBLEM = 3

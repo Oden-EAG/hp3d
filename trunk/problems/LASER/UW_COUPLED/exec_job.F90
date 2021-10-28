@@ -86,7 +86,8 @@ subroutine exec_job
       if(RANK .eq. ROOT) write(*,300) end_time - start_time
 !
    30 continue
-      if (i .le. IMAX .and. JMAX .gt. 0) cycle
+      if (i .lt. IMAX) cycle
+      if (i .eq. IMAX .and. JMAX .gt. 0) cycle
       if (NUM_PROCS .eq. 1) goto 60
 !
 !  ...skip printing partition
