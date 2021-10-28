@@ -276,6 +276,8 @@
    Jstretch(1,1) = ZONE
    Jstretch(2,2) = ZONE
 !
+   detJstretch = ZONE
+!
    invJstretch = ZERO
    invJstretch(1,1) = ZONE
    invJstretch(2,2) = ZONE
