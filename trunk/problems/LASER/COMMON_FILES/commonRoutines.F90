@@ -263,7 +263,10 @@ subroutine get_Beta(Xp,Fld_flag, Zbeta,Zdbeta,Zd2beta)
          stop
    end select
 !
-   if (ENVELOPE) OMEGA_RATIO_FLD = OMEGA_RATIO_FLD / 100.d0
+!..TODO: automatically tune PML for envelope wavenumber
+   !if (ENVELOPE) OMEGA_RATIO_FLD = OMEGA_RATIO_FLD / 100.d0
+   !if (ENVELOPE) OMEGA_RATIO_FLD = OMEGA_RATIO_FLD / 400.d0
+   if (ENVELOPE) OMEGA_RATIO_FLD = OMEGA_RATIO_FLD / 800.d0
 !
    z = Xp(3)
    b = PML_REGION

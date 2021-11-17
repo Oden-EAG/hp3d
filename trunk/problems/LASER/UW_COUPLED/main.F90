@@ -142,6 +142,9 @@ program main
       write(*,9020) ' Active gain              = ', ACTIVE_GAIN
       write(*,9010) ' COPUMP                   = ', COPUMP
       write(*,9010) ' FAKE_PUMP                = ', FAKE_PUMP
+      if (FAKE_PUMP .eq. 1) then
+         write(*,9020) ' FAKE_PUMP_POWER          = ', FAKE_PUMP_POWER
+      endif
    endif
    write(*,9030) ' Polynomial order (x,y,z) = ', ORDER_APPROX_X,ORDER_APPROX_Y,ORDER_APPROX_Z
    write(*,9010) ' ISOL                     = ', ISOL
@@ -158,14 +161,14 @@ program main
    endif
    if (ENVELOPE) then
       write (*,*) ' Solving vectorial envelope formulation:'
-      write (*,9000) ' WAVENUM_SIGNAL          = ', WAVENUM_SIGNAL
-      write (*,9000) ' WAVENUM_PUMP            = ', WAVENUM_PUMP
+      write (*,9000) ' WAVENUM_SIGNAL           = ', WAVENUM_SIGNAL
+      write (*,9000) ' WAVENUM_PUMP             = ', WAVENUM_PUMP
    endif
- 9000 format(A,F11.6)
- 9001 format(A,F11.3)
+ 9000 format(A,F13.6)
+ 9001 format(A,F13.3)
  9010 format(A,I3)
  9015 format(A,A)
- 9020 format(A,ES11.2)
+ 9020 format(A,ES13.2)
  9030 format(A,' (',I1,',',I1,',',I1,') ')
 !
 !$OMP parallel

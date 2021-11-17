@@ -174,7 +174,7 @@ subroutine get_activePol(ZsolQ,Fld_flag,Delta_n, Active_pol)
 !
    VTYPE, dimension(3) :: Es,Hs,Ep,Hp,ETimesHs,ETimesHp
 !
-   real(8) :: eta,Nex,Ngd,sum1,sum2,Is,Ip,Pp,g0,gain_ampl
+   real(8) :: eta,Nex,Ngd,sum1,sum2,Is,Ip,g0,gain_ampl
    VTYPE   :: gain
 !
 !-------------------------------------------------------------------------------
@@ -193,12 +193,8 @@ subroutine get_activePol(ZsolQ,Fld_flag,Delta_n, Active_pol)
    Ip = 0.d0
    if (FAKE_PUMP .eq. 1) then
 !     set fake pump power the same here and in thermal polarization computation
-!  ...either assume pump is a plane wave in fiber core (core-pumped)
-      Pp = 100.d0 ! set non-dimensional core pump power (scaled by I_0*L_0*L_0)
-      Ip = Pp / (PI*R_CORE*R_CORE) ! calculate non-dimensional irradiance
-!  ...or assume pump is a plane wave in fiber cladding (cladding-pumped)
-      !Pp = 1000.d0 ! set non-dimensional clad pump power (scaled by I_0*L_0*L_0)
-      !Ip = Pp / (PI*R_CLAD*R_CLAD) ! calculate non-dimensional irradiance
+!  ...assume pump is a plane wave in fiber cladding (cladding-pumped)
+      Ip = FAKE_PUMP_POWER / (PI*R_CLAD*R_CLAD) ! calculate non-dimensional irradiance
    else
       call zz_cross_product(Ep,conjg(Hp), ETimesHp)
       Ip = sqrt(real(EtimesHp(1))**2+real(EtimesHp(2))**2+real(EtimesHp(3))**2)

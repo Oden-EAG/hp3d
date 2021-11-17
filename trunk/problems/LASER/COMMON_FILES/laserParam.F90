@@ -19,6 +19,9 @@ module laserParam
 !..toggle heat flag, nonlinear problem, co/counter pumping, plane pump
    integer :: HEAT_FLAG, ANISO_HEAT, NONLINEAR_FLAG, COPUMP, FAKE_PUMP
 !
+!..pump power if using plane wave pump with no depletion or ODE model
+   real(8) :: FAKE_PUMP_POWER
+!
 !..HEAT FLAG = 0
 !  ...NONLINEAR_FLAG = 0, Linear Maxwell
 !  ...               = 1, Nonlinear Maxwell (gain)

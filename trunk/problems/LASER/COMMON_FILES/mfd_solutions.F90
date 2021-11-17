@@ -59,8 +59,8 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
    VTYPE :: pz,pz_x,pz_y,pz_z,pz_xx,pz_xy,pz_xz,pz_yy,pz_yx,pz_yz
    VTYPE :: pz_zz,pz_zy,pz_zx, zbeta,zdbeta,zd2beta
 !
-   VTYPE :: E01,E11,E21,E02
-   VTYPE :: dE01(3),dE11(3),dE21(3),dE02(3)
+   VTYPE :: E01,E11a,E11b,E21a,E21b,E02
+   VTYPE :: dE01(3),dE11a(3),dE11b(3),dE21a(3),dE21b(3),dE02(3)
 !
 !--------------------------------------------------------------------------------
 !
@@ -621,10 +621,12 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          stop
       endif
 !
-      E01 = 0.d0; dE01 = 0.d0
-      E11 = 0.d0; dE11 = 0.d0
-      E21 = 0.d0; dE21 = 0.d0
-      E02 = 0.d0; dE02 = 0.d0
+      E01  = 0.d0; dE01  = 0.d0
+      E11a = 0.d0; dE11a = 0.d0
+      E11b = 0.d0; dE11b = 0.d0
+      E21a = 0.d0; dE21a = 0.d0
+      E21b = 0.d0; dE21b = 0.d0
+      E02  = 0.d0; dE02  = 0.d0
 !
       if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.4512d0 .and. CLAD_NX.eq.1.4500d0) .or.   &
           (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.4512d0 .and. CLAD_NY.eq.1.4500d0)) then
@@ -640,7 +642,8 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          !ampl = ampl * sqrt(4.0d0) ! 100 W
          !ampl = ampl * sqrt(8.0d0) ! 200 W
 !     ...seed ratio
-         ampl = ampl * sqrt(0.9d0) ! 90% LP01
+         ampl = ampl * sqrt(0.96d0) ! 96% LP01
+         !ampl = ampl * sqrt(0.9d0) ! 90% LP01
          !ampl = ampl * sqrt(0.8d0) ! 80% LP01
          !ampl = ampl * sqrt(0.7d0) ! 70% LP01
          !ampl = ampl * sqrt(0.6d0) ! 60% LP01
@@ -658,14 +661,15 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          !ampl = ampl * sqrt(4.0d0) ! 100 W
          !ampl = ampl * sqrt(8.0d0) ! 200 W
 !     ...seed ratio
-         ampl = ampl * sqrt(0.1d0) ! 10% LP11
+         ampl = ampl * sqrt(.02d0) !   2% LP11
+         !ampl = ampl * sqrt(0.1d0) ! 10% LP11
          !ampl = ampl * sqrt(0.2d0) ! 20% LP11
          !ampl = ampl * sqrt(0.3d0) ! 30% LP11
          !ampl = ampl * sqrt(0.4d0) ! 40% LP11
          !ampl = ampl * sqrt(0.5d0) ! 50% LP11
          if (ENVELOPE) k = k - WAVENUM_FLD
-         call get_LP11a(Xp,ampl,k,gamm,beta, E11,dE11)
-         !call get_LP11b(Xp,ampl,k,gamm,beta, E11,dE11)
+         call get_LP11a(Xp,ampl,k,gamm,beta, E11a,dE11a)
+         call get_LP11b(Xp,ampl,k,gamm,beta, E11b,dE11b)
 !
 !     ...LP21 (signal)
          k    = 85.6380d0
@@ -683,8 +687,8 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          !ampl = ampl * sqrt(0.4d0) ! 40% LP21
          !ampl = ampl * sqrt(0.5d0) ! 50% LP21
          if (ENVELOPE) k = k - WAVENUM_FLD
-         !call get_LP21a(Xp,ampl,k,gamm,beta, E21,dE21)
-         !call get_LP21b(Xp,ampl,k,gamm,beta, E21,dE21)
+         !call get_LP21a(Xp,ampl,k,gamm,beta, E21a,dE21a)
+         !call get_LP21b(Xp,ampl,k,gamm,beta, E21b,dE21b)
 !
 !     ...LP02 (signal)
          k    = 85.6322d0
@@ -720,16 +724,16 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          gamm = 2.48683d0
          beta = 3.14177d0
          ampl =  1.0d0
-!        call get_LP11a(Xp,ampl,k,gamm,beta, E11,dE11)
-!        call get_LP11b(Xp,ampl,k,gamm,beta, E11,dE11)
+!        call get_LP11a(Xp,ampl,k,gamm,beta, E11a,dE11a)
+!        call get_LP11b(Xp,ampl,k,gamm,beta, E11b,dE11b)
 !
 !     ...LP21 (signal)
          k    = 67.9484d0
          gamm = 3.29870d0
          beta = 2.27456d0
          ampl =  1.0d0
-!        call get_LP21a(Xp,ampl,k,gamm,beta, E21,dE21)
-!        call get_LP21a(Xp,ampl,k,gamm,beta, E21,dE21)
+!        call get_LP21a(Xp,ampl,k,gamm,beta, E21a,dE21a)
+!        call get_LP21b(Xp,ampl,k,gamm,beta, E21b,dE21b)
 !
 !     ...LP02 (signal)
          k    = 67.9384d0
@@ -740,8 +744,8 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !
       endif
 !
-      E  =  E01+ E11+ E21+ E02
-      dE = dE01+dE11+dE21+dE02
+      E  =  E01+ E11a+ E11b+ E21a+ E21b+ E02
+      dE = dE01+dE11a+dE11b+dE21a+dE21b+dE02
 !
 !--------------- 18th prob -------------------------------------------------------
 !..LP12 mode in dielectric waveguide
