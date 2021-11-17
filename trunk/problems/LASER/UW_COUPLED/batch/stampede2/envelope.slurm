@@ -129,7 +129,8 @@ nlflag=0
 heat=0
 #
 # set pump field
-fake_pump=0
+plane_pump=0
+plane_pump_power=1.d3
 #
 # set pump direction
 copump=1
@@ -172,7 +173,8 @@ args+=" -art_grating ${art_grating}"
 args+=" -job ${job} -imax ${imax} -jmax ${jmax}"
 args+=" -ibc ${ibc}"
 args+=" -px ${px} -py ${py} -pz ${pz} -dp ${dp}"
-args+=" -copump ${copump} -nlflag ${nlflag} -gain ${gain} -raman ${raman} -fake_pump ${fake_pump}"
+args+=" -copump ${copump} -nlflag ${nlflag} -gain ${gain} -raman ${raman}"
+args+=" -plane_pump ${plane_pump} -plane_pump_power ${plane_pump_power}"
 args+=" -heat ${heat} -aniso_heat ${aniso_heat} -nsteps ${nsteps} -dt ${dt}"
 args+=" -dir_output ${dir_output} -vis_level ${vis_level}"
 args+=" -file_geometry ${file_geometry} -zl ${zl}"

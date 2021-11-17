@@ -141,9 +141,9 @@ program main
       write(*,9020) ' Raman gain               = ', RAMAN_GAIN
       write(*,9020) ' Active gain              = ', ACTIVE_GAIN
       write(*,9010) ' COPUMP                   = ', COPUMP
-      write(*,9010) ' FAKE_PUMP                = ', FAKE_PUMP
-      if (FAKE_PUMP .eq. 1) then
-         write(*,9020) ' FAKE_PUMP_POWER          = ', FAKE_PUMP_POWER
+      write(*,9010) ' PLANE_PUMP               = ', PLANE_PUMP
+      if (PLANE_PUMP .ne. 0) then
+         write(*,9020) ' PLANE_PUMP_POWER         = ', PLANE_PUMP_POWER
       endif
    endif
    write(*,9030) ' Polynomial order (x,y,z) = ', ORDER_APPROX_X,ORDER_APPROX_Y,ORDER_APPROX_Z

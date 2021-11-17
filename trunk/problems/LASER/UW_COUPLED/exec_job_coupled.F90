@@ -223,7 +223,7 @@ subroutine exec_job_coupled
       call update_Ddof
 !
 !  ...update Dirichlet DOFs for pump field
-      if (FAKE_PUMP .ne. 1) then
+      if (PLANE_PUMP .eq. 0) then
          if (RANK.eq.ROOT) write(*,4200) ' Updating pump Dirichlet DOFs...'
          NO_PROBLEM = 4
          call set_physAm(NO_PROBLEM, physNick,flag)
@@ -290,7 +290,7 @@ subroutine exec_job_coupled
          endif
 !
 !     ...if assuming a pump plane wave, skip the pump field computation
-         if (FAKE_PUMP .eq. 1) then
+         if (PLANE_PUMP .eq. 1) then
             if (RANK.eq.ROOT) write(*,*) '   Assuming pump plane wave...'
             goto 410
          endif
@@ -343,7 +343,7 @@ subroutine exec_job_coupled
 !  ...calculating power
       if (RANK.eq.ROOT) write(*,*) 'Computing power...'
       numPts = 2**IMAX; fld = 2
-      if (FAKE_PUMP .eq. 1) fld = 1
+      if (PLANE_PUMP .eq. 1) fld = 1
       call get_power(fld,numPts,time_step)
       !call get_power(2,numPts,-1)
       if (RANK.eq.ROOT) write(*,*) ''
@@ -367,7 +367,7 @@ subroutine exec_job_coupled
 !
 !..compute final residual values (if not previously computed)
    if (.not. ires) then
-      if (FAKE_PUMP .ne. 1) then
+      if (PLANE_PUMP .eq. 0) then
          QUIET_MODE = .true.; IPRINT_TIME = 0
          if (RANK.eq.ROOT) write(*,4200) '   Pump residual:'
          NO_PROBLEM = 4
