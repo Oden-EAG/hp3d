@@ -87,7 +87,7 @@ else
   PETSC_INC = /g/g92/keith10/Work/quartz/petsc/arch-linux-c-opt/include
 endif
 
-SOLVER_LIBS = -Wl,-rpath, -L$(PETSC_LIB) -lpetsc -ldmumps -lzmumps \
+SOLVER_LIBS = -Wl,-rpath,$(PETSC_LIB) -L$(PETSC_LIB) -lpetsc -ldmumps -lzmumps \
                              -lmumps_common -lpord -lscalapack \
                              -lflapack -lfblas -lzoltan \
                              -lptscotchparmetis -lptscotch \
@@ -101,7 +101,7 @@ SOLVER_INCS = -I$(PETSC_INC) -I/g/g92/keith10/Work/quartz/petsc/include
 #------------------------------------------------------------------
 #
 
-VIS_LIBS   = -Wl,-rpath, -L$(PETSC_LIB) -lhdf5 -lhdf5_hl -lhdf5_fortran -lhdf5hl_fortran
+VIS_LIBS   = -Wl,-rpath,$(PETSC_LIB) -L$(PETSC_LIB) -lhdf5 -lhdf5_hl -lhdf5_fortran -lhdf5hl_fortran
 VIS_INCS   = -I${PETSC_INC}
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
