@@ -67,11 +67,11 @@ subroutine exec_job
 !
       if (NUM_PROCS .eq. 1) goto 30
 !
+!  ...set partitioner for load balancing, redistributes mesh in 'distr_mesh'
       if (i .eq. IMAX-2) then
-         call zoltan_w_set_lb(7)
+         call zoltan_w_set_lb(7) ! fiber partitioner
       elseif (i .gt. IMAX) then
-!     ...set load balancing to graph partitioner, and redistribute
-         !call zoltan_w_set_lb(6)
+         !call zoltan_w_set_lb(6) ! graph partitioner
          goto 30 ! NO LOAD BALANCING
       else
          goto 30
@@ -86,8 +86,12 @@ subroutine exec_job
       if(RANK .eq. ROOT) write(*,300) end_time - start_time
 !
    30 continue
-      if (i .le. IMAX) cycle
+      if (i .lt. IMAX) cycle
+      if (i .eq. IMAX .and. JMAX .gt. 0) cycle
       if (NUM_PROCS .eq. 1) goto 60
+!
+!  ...skip printing partition
+      goto 40
 !
 !  ...print current partition (elems)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
@@ -97,6 +101,8 @@ subroutine exec_job
       else
          if(RANK .eq. ROOT) write(*,*) '   ... skipping for a large number of elements.'
       endif
+!
+   40 continue
 !
 !  ...skip evaluating partition
       goto 50
@@ -126,7 +132,8 @@ subroutine exec_job
       if(RANK .eq. ROOT) write(*,200) '6. calling MUMPS/PARDISO solver...'
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
       if (NUM_PROCS .eq. 1) then
-         call pardiso_sc('H')
+         !call pardiso_sc('H')
+         call par_mumps_sc('H')
       else
          !call par_mumps_sc('H')
          call par_nested('H')
@@ -139,6 +146,7 @@ subroutine exec_job
 !
 !  ...skip computing power
       !goto 80
+!
       !if (i .lt. IMAX) cycle
       if (i .lt. IMAX+JMAX) cycle
 !
@@ -154,9 +162,11 @@ subroutine exec_job
 !
    80 continue
 !
+!  ...skip writing paraview output
+      !goto 90
+!
       !if (i .lt. IMAX) cycle
-      !if (i .lt. IMAX+JMAX) cycle
-      cycle ! (do not write paraview output)
+      if (i .lt. IMAX+JMAX) cycle
 !
 !  ...write paraview output
       if(RANK .eq. ROOT) write(*,200) '8. writing paraview output...'
@@ -165,17 +175,15 @@ subroutine exec_job
       call my_paraview_driver(iParAttr)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
       if(RANK .eq. ROOT) write(*,300) end_time - start_time
+!
+   90 continue
    enddo
 !
-!..compute error on last mesh
+!..compute residual/error on last mesh
    if(RANK .eq. ROOT) write(*,200) 'Compute error/residual on last mesh...'
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    call refine_DPG(INOREFINEMENT,1,0.25d0,flag,physNick,ires, nstop)
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()!
-!
-!   iParAttr = (/0,0,0,0,6,0/)
-!   call my_paraview_driver(iParAttr)
-!   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
   100 format(/,'/////////////////////////////////////////////////////////////', &
              /,'             ',A,I2,/)

@@ -9,7 +9,7 @@
 !     purpose:          - compute and print residual
 !
 !----------------------------------------------------------------------
-subroutine residual()
+subroutine residual(res)
 !
    use data_structure3D
    use commonParam
@@ -22,7 +22,9 @@ subroutine residual()
 !
    implicit none
 !
-!..workspace for element_error routine
+!..computed total residual
+   real(8), intent(out) :: res
+!
    real(8) :: resid_subd,resid_tot
    integer :: iel,mdle,count,ierr
 !
@@ -43,11 +45,13 @@ subroutine residual()
 !..fetch active elements
    if (DISTRIBUTED .and. (.not. HOST_MESH)) then
       if (RANK .eq. ROOT) then
-         write(*,*) 'residual: mesh is distributed. computing error in parallel...'
+         write(*,*) 'residual: mesh is distributed. ', &
+                              'computing residual in parallel...'
       endif
    else
       if (RANK .ne. ROOT) goto 90
-      write(*,*) 'residual: mesh is not distributed (or on host). computing error on host...'
+      write(*,*) 'residual: mesh is not distributed (or on host). ', &
+                           'computing residual on host...'
       ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
       NRELES_SUBD = NRELES
    endif
@@ -90,8 +94,10 @@ subroutine residual()
  1010 format(' elem_residual  : ',f12.5,'  seconds')
    endif
 !
+   res = 0.d0
    if (RANK .eq. ROOT) then
-      write(*,7020) NRDOF_TOT,NRDOF_CON,sqrt(resid_tot)
+      res = sqrt(resid_tot)
+      write(*,7020) NRDOF_TOT,NRDOF_CON,res
  7020 format(' residual: NRDOF_TOT, NRDOF_CON, RESIDUAL = ',i9,',  ',i9,',  ',es12.5)
    endif
 !

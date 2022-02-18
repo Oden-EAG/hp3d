@@ -31,18 +31,16 @@
       real(8),dimension(3,2,3)   :: vel,acc,dac,dda
       real(8),dimension(3,3)     :: nor,dx_deta
       integer                    :: i,j,k,k1,k2,k3,k4,l
-      integer                    :: i1,i2,i3,i4,j1,j2,j3,j4,ie,nc,nv,np,np1,np2
+      integer                    :: i1,i2,i4,j1,ie,nc,nv,np,np1,np2
       real(8), dimension(3,2)    :: dual
-      real(8)                    :: poly,s1,s2,s3,s4,rbeta,rdbeta,rddbeta,dddbeta
-      real(8),dimension(2)       :: dpoly
+      real(8)                    :: s1,s2,rbeta,rdbeta,rddbeta,dddbeta
       real(8),dimension(3)       :: void,der,ddpsi,x,dx,ddx,dddx,temp,rpsi,rdpsi,dder, &
-                                    rddpsi,ddder, der_save1,der_save2,dddpsi
+                                    rddpsi,ddder,dddpsi
       real(8),dimension(3)       :: r_der,r_dder,r_ddder,temp1
       real(8),dimension(4)       :: shapef,dshapef,ddshapef
-      real(8),dimension(0:1,0:2) :: coeff
       integer                    :: iprint,iprint0,iprint1,iprint2,iprint3,iprint4,iprint5,nsub
       real(8)                    :: ddbeta,c,t,s
-      integer                    :: nv0,nv1,nv2,nv3,it,lab,n,iflag
+      integer                    :: it,lab,n,iflag
       real(8),dimension(-3:23)   :: Rdata_save,Rdata_aux
 !----------------------------------------------------------------------
 !     EXTERNAL PROCEDURES

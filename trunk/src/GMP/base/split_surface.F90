@@ -263,7 +263,7 @@ subroutine allocate_FIGS_SPLIT
   implicit none
 !----------------------------------------------------------------------------------
 ! VARIABLES
-  integer :: i,iter,ifig,nt,ion,iout,iv,np,nr
+  integer :: iter,ifig,nt,ion,iout,iv,np,nr
   integer :: status
 !----------------------------------------------------------------------------------
 ! ..printing flag (0,1,2)
@@ -500,7 +500,7 @@ subroutine duplicate_POINTS_AND_CURVES
   use U2D
 !---------------------------------------------------------------------------
 ! VARIABLES
-  integer :: i,ifig,nt,nr,nvrt,iv,np
+  integer :: ifig,nt,nr,nvrt,iv,np
 !---------------------------------------------------------------------------
 ! printing flag (0,1)
 #define I_PRINT 0

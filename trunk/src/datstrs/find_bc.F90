@@ -1,49 +1,126 @@
-!--------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !> Purpose            - routine determines BC flags for faces of an element
 !!
 !! @param[in]  Mdle   - middle node
-!! @param[out] Ibc    - BC
-!--------------------------------------------------------------------------------
+!! @param[out] Ibc    - BC flags; for each variable component ivar supported
+!!                      by the element (and its initial mesh ancestor), and
+!!                      face 'iface', 
+!!             Ibc(iface,ivar) = 0 if the face is interior to the domain,
+!!                             = the corresponding flag (1-9) for the element
+!!                               ancestor and its face containing the face
+!!                               of 'Mdle'.
+!-------------------------------------------------------------------------------
 !
 subroutine find_bc(Mdle, Ibc)
 !
-  use element_data
-  use data_structure3D
-!--------------------------------------------------------------------------------
-  implicit none
-  ! ** Arguments
-  integer, intent(in)    :: Mdle
-  integer, intent(out)   :: Ibc(6,NR_PHYSA)
-  ! ** Locals
-  integer, dimension(27) :: nodesl,norientl
-  integer :: i,nve,iprint
-!--------------------------------------------------------------------------------
+   use element_data
+   use data_structure3D
+   implicit none
 !
-  iprint=0
-  Ibc(6,NR_PHYSA) = 0
-
-  call elem_nodes(Mdle, nodesl,norientl)
+!..Arguments
+   integer, intent(in)    :: Mdle
+   integer, intent(out)   :: Ibc(6,NRINDEX)
 !
-  nve = nvert(NODES(Mdle)%type) + nedge(NODES(Mdle)%type)
+!..Locals
+   integer :: nodesl(27),norientl(27)
+   integer :: ibc_iel(6)
+   integer :: nrve,nrf
+   integer :: nod,nfath,iel,iface,nrve_iel,nrf_iel,loc,ivar,nvar
 !
-! printing
-  if (iprint.eq.1) then
-    write(*,9999)Mdle
-9999  format(' find_bc: Mdle = ',i7)
-  endif
+#if DEBUG_MODE
+   integer :: iprint = 0
+#endif
 !
-! loop over faces of Mdle and copy BC from face nodes
-  do i=1,nface(NODES(Mdle)%type)
-    call decod(NODES(nodesl(nve+i))%bcond,10,NR_PHYSA, Ibc(i,1:NR_PHYSA))
-!!!     Ibc(i) = NODES(nodesl(nve+i))%bcond
+!-------------------------------------------------------------------------------
 !
-!   printing
-    if (iprint.eq.1) then
-    write(*,9998)i,Ibc(i,1:NR_PHYSA)
-9998  format('   i,Ibc = ',i1,4x,5(i1,2x))
-    endif
+   Ibc = 0
 !
-  enddo
+#if DEBUG_MODE
+      if (iprint.eq.1) then
+        write(*,7010) Mdle
+   7010 format(' find_bc: Mdle = ',i8)
+      endif
+#endif
+!
+!..determine the initial mesh element ancestor
+   nod = Mdle
+   do while(nod.gt.0)
+     nod = NODES(nod)%father
+   enddo
+   iel = -nod
+#if DEBUG_MODE
+   if (iprint.eq.1) then
+      write(*,7020) iel
+ 7020 format('find_bc: iel = ',i5)
+   endif
+#endif
+!
+!..total number of components supported by the initial mesh element
+   nvar = ubound(ELEMS(iel)%bcond,1)
+!
+!..initial mesh element number of vertices + edges, number of faces
+   nrve_iel = Nvert(ELEMS(iel)%type) + Nedge(ELEMS(iel)%type)
+   nrf_iel = Nface(ELEMS(iel)%type)
+!
+!..get the element nodes
+   call elem_nodes(Mdle, nodesl,norientl)
+!
+!..number of the element vertices and edges combined
+   nrve = Nvert(NODES(Mdle)%type) + Nedge(NODES(Mdle)%type)
+!
+!..number of the element faces
+   nrf = Nface(NODES(Mdle)%type)
+!
+!..loop through the faces of the element
+   do iface=1,nrf
+!
+!  ...pick up the face node
+      nod = nodesl(nrve+iface)
+!
+!  ...go up the nodal tree
+      do
+         nfath = NODES(nod)%father
+         if (nfath.lt.0) then
+!
+!        ...initial mesh element
+            call locate(nod,ELEMS(iel)%nodes(nrve_iel+1:nrve_iel+nrf_iel),nrf_iel, loc)
+            do ivar=1,nvar
+               call decodg(ELEMS(iel)%bcond(ivar),10,nrf_iel, ibc_iel)
+#if DEBUG_MODE
+               if (iprint.eq.1) then
+             7030 format('find_bc: BC FOR iel=',i8,' AND ivar=',i2,': ',6i2)
+                  write(*,7030) ivar,ibc_iel(1:nrf_iel)
+               endif
+#endif
+               Ibc(iface,ivar) = ibc_iel(loc)
+            enddo
+            goto 10
+         else
+            select case(NODES(nfath)%type)
+               case('mdlt','mdlq')
+!
+!           ...a mid-face node, continue up the tree
+               nod = nfath
+               case default
+!
+!           ...a middle node, quit, the face is in the interior of the domain
+               goto 10
+            end select
+         endif
+!  ...end loop through nodal tree
+      enddo
+   10 continue
+!..end loop through element faces
+   enddo
+!
+#if DEBUG_MODE
+      if (iprint.eq.1) then
+         do ivar=1,nvar
+       7100 format('          ivar=',i2,',  Ibc = ',6(i1,2x))
+            write(*,7100) ivar,Ibc(1:nrf,ivar)
+         enddo
+      endif
+#endif
 !
 !
 end subroutine find_bc

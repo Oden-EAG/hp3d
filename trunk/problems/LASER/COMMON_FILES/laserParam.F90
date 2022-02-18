@@ -16,8 +16,8 @@ module laserParam
    use commonParam
 !
 !
-!..toggle heat flag, nonlinear problem, co/counter pumping, line search scaling
-   integer :: HEAT_FLAG, ANISO_HEAT, NONLINEAR_FLAG, COPUMP
+!..toggle heat flag, nonlinear problem, co/counter pumping, plane pump
+   integer :: HEAT_FLAG, ANISO_HEAT, NONLINEAR_FLAG, COPUMP, FAKE_PUMP
 !
 !..HEAT FLAG = 0
 !  ...NONLINEAR_FLAG = 0, Linear Maxwell
@@ -36,7 +36,7 @@ module laserParam
    real(8), parameter :: FIBER_LENGTH_0 = 10.d0
 !
 !..Dimensionalization constants (Maxwell)
-!  ...l_0    : length scale [m]
+!  ...L_0    : length scale [m]
 !  ...omega_0: frequency scale [rad/s]
 !  ...I_0    : irradiance scale [W/m^2]
 !  ...nu_0   : Yb population concentration scale [ion/m^3]
@@ -80,7 +80,7 @@ module laserParam
 !
 !..Non-dimensional real fiber length
    real(8), parameter :: FIBER_LENGTH = FIBER_LENGTH_0/L_0
-
+!
 !..refractive index of core (n1) and cladding (n2)
    !real(8) :: REF_INDEX_CORE = 1.4515d0
    real(8) :: REF_INDEX_CORE = 1.4512d0
@@ -101,8 +101,8 @@ module laserParam
    real(8), parameter :: LAMBDA_PUMP   =  976.0d-9 / L_0
 !
 !..Raman gain wavelengths [m] (Signal=Stokes, Pump)
-   !real(8), parameter :: LAMBDA_SIGNAL = 1116.0d-9 / l_0
-   !real(8), parameter :: LAMBDA_PUMP   = 1064.0d-9 / l_0
+   !real(8), parameter :: LAMBDA_SIGNAL = 1116.0d-9 / L_0
+   !real(8), parameter :: LAMBDA_PUMP   = 1064.0d-9 / L_0
 !
 !..Signal and Pump angular frequency
    real(8), parameter :: OMEGA_SIGNAL = 2.d0*PI/LAMBDA_SIGNAL
@@ -111,11 +111,11 @@ module laserParam
 !
 !..Active Yb gain population dynamics parameters
 !  ...N_TOTAL    : Total population concentration [ion/m^3]
-!  ...SIGMA_S_ABS: Signal absorption crossection [m^2/ion]
-!  ...SIGMA_S_EMS: Signal emission crossection [m^2/ion]
-!  ...SIGMA_P_ABS: Pump absorption crossection [m^2/ion]
-!  ...SIGMA_P_EMS: Pump emission crossection [m^2/ion]
-!  ...SIGMA_P_EMS: Pump emission crossection [m^2/ion]
+!  ...SIGMA_S_ABS: Signal absorption cross-section [m^2/ion]
+!  ...SIGMA_S_EMS: Signal emission cross-section [m^2/ion]
+!  ...SIGMA_P_ABS: Pump absorption cross-section [m^2/ion]
+!  ...SIGMA_P_EMS: Pump emission cross-section [m^2/ion]
+!  ...SIGMA_P_EMS: Pump emission cross-section [m^2/ion]
 !  ...TAU_0      : Non-dimensional value in gain expression
 !  ...ACTIVE_GAIN: Non-dimensional amplifier for active gain
    real(8), parameter :: N_TOTAL = 6.0d25 / NU_0

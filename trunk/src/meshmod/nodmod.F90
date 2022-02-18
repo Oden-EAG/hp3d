@@ -317,28 +317,28 @@
 !
 !  ...edge, triangle, tet, pyramid
       case('medg','mdlt','mdln','mdld')
-         call copy_1array(NDIMEN,Xnodo,NdofGo, Xnodn,NdofGn)
+         call copy_1array_r(NDIMEN,Xnodo,NdofGo, Xnodn,NdofGn)
 !
 !  ...quad
       case('mdlq')
          call decode(Nordo, nord1o,nord2o)
          call decode(Nordn, nord1n,nord2n)
-         call copy_2array(NDIMEN,Xnodo,nord1o-1,nord2o-1, &
-                                 Xnodn,nord1n-1,nord2n-1)
+         call copy_2array_r(NDIMEN,Xnodo,nord1o-1,nord2o-1, &
+                                   Xnodn,nord1n-1,nord2n-1)
 !
 !  ...prism
       case('mdlp')
          call decode(Nordo, nord1o,nord2o)
          call decode(Nordn, nord1n,nord2n)
-         call copy_2array(NDIMEN,Xnodo,(nord1o-2)*(nord1o-1)/2,nord2o-1, &
-                                 Xnodn,(nord1n-2)*(nord1n-1)/2,nord2n-1)
+         call copy_2array_r(NDIMEN,Xnodo,(nord1o-2)*(nord1o-1)/2,nord2o-1, &
+                                   Xnodn,(nord1n-2)*(nord1n-1)/2,nord2n-1)
 !
 !  ...hexa
       case('mdlb')
          call ddecode(Nordo, nord1o,nord2o,nord3o)
          call ddecode(Nordn, nord1n,nord2n,nord3n)
-         call copy_3array(NDIMEN,Xnodo,nord1o-1,nord2o-1,nord3o-1, &
-                                 Xnodn,nord1n-1,nord2n-1,nord3n-1)
+         call copy_3array_r(NDIMEN,Xnodo,nord1o-1,nord2o-1,nord3o-1, &
+                                   Xnodn,nord1n-1,nord2n-1,nord3n-1)
 !
       end select
 !
@@ -374,7 +374,6 @@
       subroutine copy_dofH(Ntype,Nordo,Nordn,NdofHo,NdofHn, &
                            NvarH,ZdofHo,ZdofHn)
 !
-      use parameters, only: MAXEQNH
       implicit none
 !
 #if DEBUG_MODE
@@ -460,7 +459,6 @@
       subroutine copy_dofE(Ntype,Nordo,Nordn,NdofEo,NdofEn, &
                            NvarE,ZdofEo,ZdofEn)
 !
-      use parameters, only: MAXEQNE
       implicit none
 !
 #if DEBUG_MODE
@@ -655,7 +653,6 @@
       subroutine copy_dofV(Ntype,Nordo,Nordn,NdofVo,NdofVn, &
                            NvarV,ZdofVo,ZdofVn)
 !
-      use parameters, only: MAXEQNV
       implicit none
 !
 #if DEBUG_MODE
@@ -844,7 +841,6 @@
       subroutine copy_dofQ(Ntype,Nordo,Nordn,NdofQo,NdofQn, &
                            NvarQ,ZdofQo,ZdofQn)
 !
-      use parameters, only: MAXEQNQ
       implicit none
 !
 #if DEBUG_MODE
@@ -958,4 +954,52 @@
       B(1:M,1:i,1:j,1:k) = A(1:M,1:i,1:j,1:k)
 !
       end subroutine copy_3array
+
+!-----------------------------------------------------------------------
+!
+      subroutine copy_1array_r(M,A,Ia, B,Ib)
+!
+      implicit none
+      integer :: M,Ia,Ib,i
+      real(8) :: A(M,Ia)
+      real(8) :: B(M,Ib)
+!
+      B = 0.d0
+      i = min(Ia,Ib)
+      B(1:M,1:i) = A(1:M,1:i)
+!
+      end subroutine copy_1array_r
+!
+!-----------------------------------------------------------------------
+!
+      subroutine copy_2array_r(M,A,Ia,Ja, B,Ib,Jb)
+!
+      implicit none
+      integer :: M,Ia,Ja,Ib,Jb,i,j
+      real(8) :: A(M,Ia,Ja)
+      real(8) :: B(M,Ib,Jb)
+!
+      B = 0.d0
+      i = min(Ia,Ib)
+      j = min(Ja,Jb)
+      B(1:M,1:i,1:j) = A(1:M,1:i,1:j)
+!
+      end subroutine copy_2array_r
+!
+!-----------------------------------------------------------------------
+!
+      subroutine copy_3array_r(M,A,Ia,Ja,Ka, B,Ib,Jb,Kb)
+!
+      implicit none
+      integer :: M,Ia,Ja,Ka,Ib,Jb,Kb,i,j,k
+      real(8) :: A(M,Ia,Ja,Ka)
+      real(8) :: B(M,Ib,Jb,Kb)
+!
+      B = 0.d0
+      i = min(Ia,Ib)
+      j = min(Ja,Jb)
+      k = min(Ka,Kb)
+      B(1:M,1:i,1:j,1:k) = A(1:M,1:i,1:j,1:k)
+!
+      end subroutine copy_3array_r
 

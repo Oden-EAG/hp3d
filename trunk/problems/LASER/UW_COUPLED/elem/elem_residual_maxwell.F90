@@ -4,7 +4,7 @@
 !
 !-------------------------------------------------------------------------
 !
-!     latest revision:     - Apr 2019
+!     latest revision:     - June 2021
 !
 !     purpose:             - routine returns element residual (squared)
 !                            for UW time-harmonic Maxwell equation
@@ -81,7 +81,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    real(8) :: rsolH
 !
 !..variables for geometry
-   real(8), dimension(3)   :: xi,x,rn
+   real(8), dimension(3)   :: xi,x,rn,daux
    real(8), dimension(3,2) :: dxidt,dxdt,rt
    real(8), dimension(3,3) :: dxdxi,dxidx
    real(8), dimension(2)   :: t
@@ -105,13 +105,14 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    !VTYPE, dimension(NrTest*(NrTest+1)/2) :: gramTest
    VTYPE, allocatable :: gramP(:)
    real(8) :: FF, CF, FC
-   real(8) :: fldE(3), fldH(3), crlE(3), crlH(3)
-   real(8) :: fldF(3), fldG(3), crlF(3), crlG(3)
+   real(8) :: fldE(3), fldH(3), crlE(3), crlH(3), rotE(3)
+   real(8) :: fldF(3), fldG(3), crlF(3), crlG(3), rotF(3)
 !
    real(8) :: D_aux(3,3),D_za(3,3),D_zc(3,3)
 !
 !..load vector for the enriched space
-   VTYPE, dimension(NrTest) :: bload_E,bload_Ec
+   VTYPE, dimension(NrTest)   :: bload_E,bload_Ec
+   VTYPE, dimension(2*NrdofE) :: bload_Imp
 !
 !..3D quadrature data
    real(8), dimension(3,MAXNINT3ADD) :: xiloc
@@ -122,25 +123,26 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    real(8), dimension(MAXNINT2ADD)   :: wtloc
 !
 !..BC's flags
-   integer, dimension(6,NR_PHYSA)   :: ibc
+   integer, dimension(6,NRINDEX)     :: ibc
 !
 !..Maxwell load and auxiliary variables
    VTYPE  , dimension(3) :: zJ,zImp
-   real(8), dimension(3) :: E1,E2,rntimesE
+   real(8), dimension(3) :: E1,rntimesE,rn2timesE
+   real(8)               :: eps
 !
 !..approximate solution
    VTYPE, dimension(3,2) :: zsolExi,zsolE,zflux,zflux2
    VTYPE, dimension(6)   :: zsolQ
 !
 !..auxiliary
-   VTYPE :: zresid, zaux, zcux
+   VTYPE :: zresid, zaux, zbux, zcux
 !
 !..number of faces per element type
    integer :: nrf
 !
 !..various variables for the problem
    real(8) :: rjac,bjac,weight,wa,CC,EE,CE,E,EC,q,h,tol,diff_r,diff_i,max_r,max_i
-   integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,j,m,n,nint,kE,k,iprint,l,ivar,iflag
+   integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,j,m,n,nint,kE,k,l,ivar,iflag
    integer :: nordP,nsign,ifc,ndom,info,icomp,nrdof,nrdof_eig,idec
    VTYPE   :: zfval
    VTYPE   :: za(3,3),zc(3,3)
@@ -152,6 +154,8 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !
 !..OMEGA_RATIO_SIGNAL or OMEGA_RATIO_PUMP
    real(8) :: OMEGA_RATIO_FLD
+!..WAVENUM_SIGNAL or WAVENUM_PUMP
+   real(8) :: WAVENUM_FLD
 !
 !..for polarizations function
    VTYPE, dimension(3,3) :: bg_pol,gain_pol,raman_pol,rndotE
@@ -160,13 +164,16 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !..timer
    real(8) :: MPI_Wtime,start_time,end_time
 !
+!..debug variables
+#if DEBUG_MODE
+   integer :: iprint = 0
+#endif
+!
 !..for Gram matrix compressed storage format
    integer :: nk
    nk(k1,k2) = (k2-1)*k2/2+k1
 !
 !--------------------------------------------------------------------------
-!
-   iprint = 0
 !
    allocate(gramP(NrTest*(NrTest+1)/2))
 !
@@ -192,7 +199,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    call solelm(Mdle, zdofH,zdofE,zdofV,zdofQ)
 !
 !..clear space for auxiliary matrices
-   bload_E = ZERO; gramP = ZERO; bload_Ec = ZERO
+   bload_E = ZERO; gramP = ZERO; bload_Ec = ZERO; bload_Imp = ZERO
 !
 !..initialize the background polarization
    call find_domain(Mdle, ndom)
@@ -215,12 +222,14 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
       end select
    endif
 !
-!..set OMEGA_RATIO_FLD
+!..set OMEGA_RATIO_FLD and WAVENUM_FLD
    select case(Fld_flag)
       case(0)
          OMEGA_RATIO_FLD = OMEGA_RATIO_PUMP
+         WAVENUM_FLD     = WAVENUM_PUMP
       case(1)
          OMEGA_RATIO_FLD = OMEGA_RATIO_SIGNAL ! 1.0d0
+         WAVENUM_FLD     = WAVENUM_SIGNAL
       case default
          write(*,*) 'elem_residual_maxwell. invalid Fld_flag param. stop.'
          stop
@@ -343,8 +352,13 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !
 !     ...initialize gain polarization, raman polarization
          gain_pol = ZERO; raman_pol = ZERO
+!     ...skip nonlinear gain computation if inside PML region
+         if ( USE_PML .and. ( (x(3).gt.PML_REGION) .or. &
+                              ( (COPUMP.eq.0).and.(x(3).lt.(ZL-PML_REGION)) ) &
+                            ) &
+            ) goto 190
          if (ACTIVE_GAIN .gt. 0.d0) then
-            if (dom_flag .eq. 1) then ! .and. x(3).le.PML_REGION) then
+            if (dom_flag .eq. 1) then
                call get_activePol(zsolQ_soleval(1:12),Fld_flag,delta_n, gain_pol)
             endif
          endif
@@ -357,8 +371,8 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
                call get_ramanPol(zsolQ_soleval(1:3),zsolQ_soleval(4:6), &
                               dom_flag,Fld_flag,delta_n, raman_pol)
             endif
-!     ...endif RAMAN_GAIN
          endif
+ 190     continue
 !     ...update auxiliary constant za
          za = (ZI*OMEGA*OMEGA_RATIO_FLD*EPSILON+SIGMA)*IDENTITY+bg_pol+gain_pol+raman_pol
 !  ...endif NONLINEAR_FLAG
@@ -372,6 +386,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
          JJstretch(1,1) = ZONE
          JJstretch(2,2) = ZONE
          JJstretch(3,3) = ZONE
+         detJstretch    = ZONE
       else
 !     ...get PML function
          call get_Beta(x,Fld_flag, zbeta,zdbeta,zd2beta)
@@ -402,11 +417,14 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !
 !     ...Piola transformation
          do i = 1,3
+            daux = dxdxi(i,1:3)
             call dot_product(shapEE(1:3,k1),dxidx(1:3,i), fldF(i))
-            call dot_product(curlEE(1:3,k1),dxdxi(i,1:3), crlF(i))
+            call dot_product(curlEE(1:3,k1),daux        , crlF(i))
          enddo
          crlF(1:3) = crlF(1:3)/rjac
          fldG = fldF; crlG = crlF
+!     ...e_z x F
+         rotF = 0.d0; rotF(1) = -fldF(2); rotF(2) = fldF(1)
 !
 !     ...accumulate for the load
 !     ...first eqn
@@ -423,6 +441,12 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
                 zaJ(2,2)*fldF(2)*zsolQ(2) + &
                 zaJ(3,3)*fldF(3)*zsolQ(3)
          bload_E(k) = bload_E(k) - (zaux - zcux)*weight
+!     ...additional stiffness contribution if solving vectorial envelope equation
+         if (ENVELOPE) then
+!        ...-( -ik(e_z x H,F) ), where e_z x H = (-H_y,H_x,0)
+            zaux = -ZI*WAVENUM_FLD*detJstretch*(-fldF(1)*zsolQ(5) + fldF(2)*zsolQ(4))
+            bload_E(k) = bload_E(k) - zaux*weight
+         endif
 !
 !     ...second eqn
          k = 2*k1
@@ -432,6 +456,12 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
                 zcJ(2,2)*fldG(2)*zsolQ(5) + &
                 zcJ(3,3)*fldG(3)*zsolQ(6)
          bload_E(k) = bload_E(k) - (zaux + zcux)*weight
+!     ...additional stiffness contribution if solving vectorial envelope equation
+         if (ENVELOPE) then
+!        ...-( -ik(e_z x E,G) ), where e_z x E = (-E_y,E_x,0)
+            zaux = -ZI*WAVENUM_FLD*detJstretch*(-fldG(1)*zsolQ(2) + fldG(2)*zsolQ(1))
+            bload_E(k) = bload_E(k) - zaux*weight
+         endif
 !
 ! ===============================================================================
 !     ...Computation of Gram Matrix (w/o fast integration)
@@ -441,10 +471,13 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
          do k2=k1,NrdofEE
 !        ...Piola transformation
             do i = 1,3
+               daux = dxdxi(i,1:3)
                call dot_product(shapEE(1:3,k2),dxidx(1:3,i), fldE(i))
-               call dot_product(curlEE(1:3,k2),dxdxi(i,1:3), crlE(i))
+               call dot_product(curlEE(1:3,k2),daux        , crlE(i))
             enddo
             crlE(1:3) = crlE(1:3)/rjac
+!        ...e_z x E
+            rotE = 0.d0; rotE(1) = -fldE(2); rotE(2) = fldE(1)
 !
             call dot_product(fldF,fldE, FF)
             call dot_product(fldF,crlE, FC)
@@ -471,6 +504,19 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
             gramP(k) = gramP(k) &
                      + (zaux + ALPHA_NORM*FF + CC)*weight
 !
+            if (ENVELOPE) then
+!           ...ik(e_z x F_i, curl F_j)
+               zaux = ZI*WAVENUM_FLD*detJstretch* &
+                     (rotF(1)*crlE(1)+rotF(2)*crlE(2)+rotF(3)*crlE(3))
+!           ...k^2(e_z x F_i, e_z x F_j)
+               zbux = (WAVENUM_FLD*abs(detJstretch))**2 * &
+                     (rotF(1)*rotE(1)+rotF(2)*rotE(2)+rotF(3)*rotE(3))
+!           ...-ik(curl F_i, e_z x F_j)
+               zcux = -ZI*WAVENUM_FLD*conjg(detJstretch)* &
+                     (crlF(1)*rotE(1)+crlF(2)*rotE(2)+crlF(3)*rotE(3))
+               gramP(k) = gramP(k) + (zaux+zbux+zcux)*weight
+            endif
+!
 !           (F_i,G_j) terms
             n = 2*k1-1; m = 2*k2
             k = nk(n,m)
@@ -481,6 +527,20 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
                    conjg(zcJ(2,2))*crlF(2)*fldE(2) + &
                    conjg(zcJ(3,3))*crlF(3)*fldE(3)
             gramP(k) = gramP(k) + (zaux+zcux)*weight
+!
+            if (ENVELOPE) then
+!           ...ik(iωε F_i, e_z x G_j)
+               zaux = ZI*WAVENUM_FLD*conjg(detJstretch)* &
+                        (zaJ(1,1)*fldF(1)*rotE(1) + &
+                         zaJ(2,2)*fldF(2)*rotE(2) + &
+                         zaJ(3,3)*fldF(3)*rotE(3) )
+!           ...ik(e_z x F_i, (iωμ)^* G_j)
+               zcux = ZI*WAVENUM_FLD*detJstretch* &
+                        (conjg(zcJ(1,1))*rotF(1)*fldE(1) + &
+                         conjg(zcJ(2,2))*rotF(2)*fldE(2) + &
+                         conjg(zcJ(3,3))*rotF(3)*fldE(3) )
+               gramP(k) = gramP(k) + (zaux+zcux)*weight
+            endif
 !
 !        ...compute lower triangular part of 2x2 G_ij matrix
 !           only if it is not a diagonal element, G_ii
@@ -495,6 +555,20 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
                       zcJ(2,2)*fldF(2)*crlE(2) + &
                       zcJ(3,3)*fldF(3)*crlE(3)
                gramP(k) = gramP(k) + (zaux+zcux)*weight
+!
+               if (ENVELOPE) then
+!              ...-ik (e_z x G_i, (iωε)^* F_j)
+                  zaux = -ZI*WAVENUM_FLD*detJstretch* &
+                         (conjg(zaJ(1,1))*rotF(1)*fldE(1) + &
+                          conjg(zaJ(2,2))*rotF(2)*fldE(2) + &
+                          conjg(zaJ(3,3))*rotF(3)*fldE(3) )
+!              ...-ik (iωμ G_i, e_z x F_j)
+                  zcux = -ZI*WAVENUM_FLD*conjg(detJstretch)* &
+                         (zcJ(1,1)*fldF(1)*rotE(1) + &
+                          zcJ(2,2)*fldF(2)*rotE(2) + &
+                          zcJ(3,3)*fldF(3)*rotE(3) )
+                  gramP(k) = gramP(k) + (zaux+zcux)*weight
+               endif
             endif
 !
 !           (G_i,G_j) terms
@@ -505,6 +579,19 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
                    (abs(zcJ(3,3))**2)*fldF(3)*fldE(3)
             gramP(k) = gramP(k) &
                      + (zcux + ALPHA_NORM*FF + CC)*weight
+!
+            if (ENVELOPE) then
+!           ...ik(e_z x G_i, curl G_j)
+               zaux = ZI*WAVENUM_FLD*detJstretch* &
+                     (rotF(1)*crlE(1)+rotF(2)*crlE(2)+rotF(3)*crlE(3))
+!           ...k^2(e_z x G_i, e_z x G_j)
+               zbux = (WAVENUM_FLD*abs(detJstretch))**2 * &
+                     (rotF(1)*rotE(1)+rotF(2)*rotE(2)+rotF(3)*rotE(3))
+!           ...-ik(curl G_i, e_z x G_j)
+               zcux = -ZI*WAVENUM_FLD*conjg(detJstretch)* &
+                     (crlF(1)*rotE(1)+crlF(2)*rotE(2)+crlF(3)*rotE(3))
+               gramP(k) = gramP(k) + (zaux+zbux+zcux)*weight
+            endif
          enddo
       enddo
    enddo
@@ -639,7 +726,10 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
             call zcross_product(rn,zflux(1:3,ivar), zflux2(1:3,ivar))
          enddo
 !
-         if(ibc(ifc,2).eq.9) then
+!     ...check for impedance BC (elimination strategy)
+         if ((ibc(ifc,3).eq.3 .and. Fld_flag.eq.1) .or. &
+             (ibc(ifc,5).eq.3 .and. Fld_flag.eq.0)) then
+!        ...impedance surface load [zImp should be zero here]
             call get_bdSource(Mdle,x,rn, zImp)
             zflux2(1:3,1) = GAMMA*zflux2(1:3,1)+zImp
          endif
@@ -651,7 +741,9 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
                     + shapEE(3,k1)*dxidx(3,1:3)
 !
             k=2*k1-1
-            if(ibc(ifc,2).eq.9) then
+!        ...check for impedance BC (elimination strategy)
+            if ((ibc(ifc,3).eq.3 .and. Fld_flag.eq.1) .or. &
+                (ibc(ifc,5).eq.3 .and. Fld_flag.eq.0)) then
 !           - GAMMA * < n x n x E , G >
                zaux = E1(1)*zflux2(1,1) + E1(2)*zflux2(2,1) + E1(3)*zflux2(3,1)
                bload_E(k) = bload_E(k) - zaux * weight
@@ -665,14 +757,69 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
             zaux = E1(1)*zflux(1,1) + E1(2)*zflux(2,1) + E1(3)*zflux(3,1)
             bload_E(k) = bload_E(k) - zaux * weight
          enddo
+!
+!     ...check for impedance BC (L2 penalty method)
+         if ((ibc(ifc,3).ne.2 .or. Fld_flag.ne.1) .and. &
+             (ibc(ifc,5).ne.2 .or. Fld_flag.ne.0)) cycle
+!     ...impedance surface load [zImp should be zero here]
+         call get_bdSource(Mdle,x,rn, zImp)
+!     ...define the weight of the penalty term
+         eps = 1.d0
+!     ...compute residual contribution from impedance boundary
+         do k1=1,NrdofE
+            E1(1:3) = shapE(1,k1)*dxidx(1,1:3) &
+                    + shapE(2,k1)*dxidx(2,1:3) &
+                    + shapE(3,k1)*dxidx(3,1:3)
+!
+            call cross_product(rn,E1, rntimesE)
+            call cross_product(rn,rntimesE, rn2timesE)
+!
+!        ...1st test function
+            k = 2*k1-1
+!           + GAMMA^2 * < n x n x E , n x n x F >
+            bload_Imp(k) = bload_Imp(k) + (rn2timesE(1)*zflux2(1,1)  &
+                                        +  rn2timesE(2)*zflux2(2,1)  &
+                                        +  rn2timesE(3)*zflux2(3,1)  &
+                                          )*GAMMA*GAMMA*weight/eps
+!           - GAMMA * < n x H, n x n x F >
+            bload_Imp(k) = bload_Imp(k) - (rn2timesE(1)*zflux(1,2)   &
+                                        +  rn2timesE(2)*zflux(2,2)   &
+                                        +  rn2timesE(3)*zflux(3,2)   &
+                                          )*GAMMA*weight/eps
+!           + GAMMA * < zImp , n x n x F >
+            bload_Imp(k) = bload_Imp(k) + (rn2timesE(1)*zImp(1)  &
+                                        +  rn2timesE(2)*zImp(2)  &
+                                        +  rn2timesE(3)*zImp(3)  &
+                                          )*GAMMA*weight/eps
+!        ...2nd test function
+            k = 2*k
+!           - GAMMA * < n x n x E , n x G >
+            bload_Imp(k) = bload_Imp(k) - (rntimesE(1)*zflux2(1,1)  &
+                                        +  rntimesE(2)*zflux2(2,1)  &
+                                        +  rntimesE(3)*zflux2(3,1)  &
+                                          )*GAMMA*weight/eps
+!           + < n x H , n x G >
+            bload_Imp(k) = bload_Imp(k) + (rntimesE(1)*zflux(1,2)   &
+                                        +  rntimesE(2)*zflux(2,2)   &
+                                        +  rntimesE(3)*zflux(3,2)   &
+                                          )*weight/eps
+!           - < zImp , n x G >
+            bload_Imp(k) = bload_Imp(k) - (rntimesE(1)*zImp(1)  &
+                                        +  rntimesE(2)*zImp(2)  &
+                                        +  rntimesE(3)*zImp(3)  &
+                                          )*weight/eps
+         enddo
+!
       enddo
    enddo
 !
+#if DEBUG_MODE
    if (iprint.gt.0) then
       write(*,7015) bload_E(1:2*NrdofEE)
  7015 format('elem_residual_maxwell: FINAL bload_E = ',10(/,6(2e12.5,2x)))
       call pause
    endif
+#endif
 !
 !--------------------------------------------------------------------------
 !
@@ -701,6 +848,17 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    do k=1,NrTest
       zresid = zresid + bload_Ec(k)*conjg(bload_E(k))
    enddo
+!
+!..account for impedance BC penalty term (L2 penalty method)
+!  test norm for the residual has then two separate contributions:
+!  1) Usual DPG residual measured in adjoint test norm ||\psi||_V
+!  2) Additional Impedance BC residual measured in L2 norm ||\phi||
+   if (IBCFLAG.eq.2) then
+      do k=1,2*NrdofE
+         zresid = zresid + bload_Imp(k)*conjg(bload_Imp(k))
+      enddo
+   endif
+!
    Resid = real(zresid,8)
 !
 !..set suggested refinement flag
@@ -711,11 +869,13 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
       case('mdln','mdld'); Nref_flag = 1
    end select
 !
+#if DEBUG_MODE
    if (iprint.eq.1) then
       write(*,7010) Mdle, Resid
  7010 format('elem_residual_maxwell: Mdle, Resid = ',i5,3x,e12.5)
       call pause
    endif
+#endif
 !
 end subroutine elem_residual_maxwell
 

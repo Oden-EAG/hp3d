@@ -4,7 +4,7 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - Oct 2018
+!   latest revision    - June 2021
 !
 !   purpose            - problem dependent data
 !
@@ -30,7 +30,7 @@ module commonParam
 !..Planck's constant (hbar=h/2pi)
    real(8), parameter :: H_BAR = 1.05457266d-34
 !
-!..set FAST_INT=1 to activate fast integration for hexahedra
+!..set FAST_INT=1 to activate fast integration for hexahedra and prisms
    integer :: FAST_INT = 1
 !
 !..material constants
@@ -40,11 +40,20 @@ module commonParam
 !..frequency
    real(8) :: OMEGA
 !
-!..impedance constant and IBCFLAG
+!..impedance BC:
+!  GAMMA  : impedance constant
+!..IBCFLAG: 0 (dirichlet)
+!           2 (impedance via penalty method)
+!           3 (impedance via elimination)
    real(8) :: GAMMA
    integer :: IBCFLAG
 !
    integer :: TIMESTEP = 0
+!
+!..alternative vectorial envelope formulation
+   logical :: ENVELOPE
+   real(8) :: WAVENUM_SIGNAL ! approximate signal wavenumber
+   real(8) :: WAVENUM_PUMP   ! approximate pump wavenumber
 !
 !..weight for l2 term in scaled adjoint graph norm (UW Maxwell)
    real(8) :: ALPHA_NORM = 1.0d0
@@ -57,7 +66,6 @@ module commonParam
    integer :: ORDER_APPROX_X,ORDER_APPROX_Y,ORDER_APPROX_Z
    integer :: NPX, NPY, NPZ
    integer :: ICOMP_EXACT
-!..TODO: check if thread safe ICOMP is still needed (delete otherwise)
    integer :: ICOMP_TS
 !$OMP THREADPRIVATE (ICOMP_TS)
    integer :: ICHOOSE_DISP, ICHOOSE_COMP, ICHOOSE_SIGPUMP
@@ -121,7 +129,7 @@ module commonParam
    character(32) :: OUTPUT_DIR
 !
 !..Maximum number of iterations in nonlinear Solve
-   integer, parameter :: MAX_ITER = 30
+   integer :: MAX_ITER = 30
 !
 !..paraview parameters
    !integer                            :: IPARADAP

@@ -1,6 +1,8 @@
 !
 #include "typedefs.h"
 !
+#if HP3D_USE_INTEL_MKL
+!
 ! -----------------------------------------------------------------------
 !
 !    routine name       - par_nested
@@ -112,7 +114,7 @@ subroutine par_nested(mtype)
    real(8) :: MPI_Wtime,start_time,end_time,time_stamp
 !
 !..info (verbose output if true)
-   logical :: info = .true.
+   logical :: info = .false.
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -617,6 +619,8 @@ subroutine par_nested(mtype)
    deallocate(MAXDOFS,NFIRST_DOF,NFIRST_SUBD,NOD_SUM)
 !
    if (IPRINT_TIME .eq. 1) then
+      !write(*,2101) RANK,MPI_Wtime()-start_time
+ 2101 format('[',I4,'] - Subdomain Assembly: ',f12.5,'  seconds')
       call MPI_BARRIER(mumps_par%COMM, ierr)
       end_time = MPI_Wtime()
       Mtime(2) =  end_time-start_time
@@ -657,7 +661,7 @@ subroutine par_nested(mtype)
  3101 format('[',I4,'] - Analysis : ',f12.5,'  seconds',/,A,F11.3,/,A,I1)
    endif
 !
-   call MPI_BARRIER(mumps_par%COMM, ierr)
+   if (info) call MPI_BARRIER(mumps_par%COMM, ierr)
 !
   35 continue
 !
@@ -671,7 +675,7 @@ subroutine par_nested(mtype)
    call dmumps(mumps_bub)
 #endif
    if (mumps_bub%INFO(1) .ne. 0) then
-      if (info) write(*,*) '[',RANK,'] factorization: mumps_bub%INFO(1) .ne. 0'
+      write(*,*) '[',RANK,'] factorization: mumps_bub%INFO(1) .ne. 0'
       if (mumps_bub%INFO(1) .eq. -9) then
          write(*,*) '[',RANK,'] Increasing workspace, trying factorization again...'
          mumps_bub%icntl(14) = mumps_bub%icntl(14) + 10 ! increase workspace by 10 percent
@@ -687,7 +691,7 @@ subroutine par_nested(mtype)
  3102 format('[',I4,'] - Factorize: ',f12.5,'  seconds',/,A,F11.3)
    endif
 !
-   call MPI_BARRIER(mumps_par%COMM, ierr)
+   if (info) call MPI_BARRIER(mumps_par%COMM, ierr)
 !
 !..MUMPS solve
    mumps_bub%JOB = 3
@@ -710,6 +714,8 @@ subroutine par_nested(mtype)
    endif
 !
    if (IPRINT_TIME .eq. 1) then
+      !write(*,3104) RANK,MPI_Wtime()-start_time
+ 3104 format('[',I4,'] - Local Solve: ',f12.5,'  seconds')
       call MPI_BARRIER(mumps_par%COMM, ierr)
       end_time = MPI_Wtime()
       Mtime(3) = end_time-start_time
@@ -844,7 +850,7 @@ subroutine par_nested(mtype)
    endif
 !
    call par_solve(mumps_par)
-   !call par_fiber(mumps_par,nrdof_subd,NUM_PROCS)
+   !call par_fiber(mumps_par,nrdof_subd,NUM_PROCS,1)
 !
   if (IPRINT_TIME .eq. 1) then
      call MPI_BARRIER(mumps_par%COMM, ierr)
@@ -968,3 +974,16 @@ subroutine par_nested(mtype)
 !
 !
 end subroutine par_nested
+
+#else
+
+subroutine par_nested(mtype)
+   use mpi_param , only: RANK,ROOT
+   implicit none
+   character, intent(in) :: mtype
+   if (RANK .eq. ROOT) then
+      write(*,*) 'par_nested: HP3D_USE_INTEL_MKL = 0. Dependency is required.'
+   endif
+end subroutine par_nested
+
+#endif

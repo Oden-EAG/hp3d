@@ -100,34 +100,44 @@ subroutine set_environment_maxwell
 !
 !..PML VARIABLES
 !..exp_coeff is only used for manufactured solution tests
-   call get_option_bool('-usepml' , 'USE_PML'  , .true. , USE_PML  )
-   call get_option_real('-expA'   , 'EXP_COEFF', 0.2d0  , EXP_COEFF)
-   call get_option_real('-pmlfrac', 'PML_FRAC' , 0.25d0 , PML_FRAC )
-   call get_option_real('-zl'     , 'ZL'       , 0.40d0 , ZL       )
+   call get_option_bool('-usepml' , 'USE_PML'  , .false. , USE_PML  )
+   call get_option_real('-expA'   , 'EXP_COEFF', 0.2d0   , EXP_COEFF)
+   call get_option_real('-pmlfrac', 'PML_FRAC' , 0.25d0  , PML_FRAC )
+   call get_option_real('-zl'     , 'ZL'       , 0.40d0  , ZL       )
 !
 !..Set frequency OMEGA and impedance constant GAMMA
 !..the propagation constant determining number of wavelengths depends on both OMEGA and GAMMA
-   !call get_option_real('-omega' , 'OMEGA', 4.5d0  , OMEGA)
-   !call get_option_real('-gamma' , 'GAMMA', 1.0d0  , GAMMA)
-!..OMEGA, GAMMA for FIBER
-   call get_option_real('-omega' , 'OMEGA', OMEGA_SIGNAL, OMEGA) ! LP01 LMA
-   !call get_option_real('-omega' , 'OMEGA', 25.7d0, OMEGA) ! LP01 single-mode
-   !call get_option_real('-omega' , 'OMEGA', 40.0d0, OMEGA) ! LP11 multi-mode
-   !call get_option_real('-omega' , 'OMEGA', 8.1d0*PI, OMEGA)
-   call get_option_real('-gamma' , 'GAMMA', 1.0d0, GAMMA)
+   select case(GEOM_NO)
+!  ...RECTANGULAR WAVEGUIDE
+      case(1)
+      !..TE10 (0<x<1)
+      !  gamma is related to propagation constant, and is the impedance constant for TE10 mode
+         call get_option_real('-omega' , 'OMEGA', (sqrt(5.d0)/2.d0)*PI          , OMEGA)
+         call get_option_real('-gamma' , 'GAMMA', sqrt(1.d0-(PI**2)/(OMEGA**2)) , GAMMA)
+      !..TE20 (0<x<1)
+         !call get_option_real('-omega' , 'OMEGA', sqrt(5.d0)*PI                        , OMEGA)
+         !call get_option_real('-gamma' , 'GAMMA', sqrt(1.d0-((2.d0*PI)**2)/(OMEGA**2)) , GAMMA)
+!     ...wavenumbers for alternative vectorial envelope formulation
+         call get_option_real('-wavenum_signal' , 'WAVENUM_SIGNAL', 1.0d0*OMEGA*GAMMA, WAVENUM_SIGNAL)
+         call get_option_real('-wavenum_pump  ' , 'WAVENUM_PUMP'  , 1.0d0*OMEGA*GAMMA, WAVENUM_PUMP  )
+!  ...FIBER WAVEGUIDE
+      case(4,5)
+         call get_option_real('-omega' , 'OMEGA', OMEGA_SIGNAL, OMEGA) ! LP01 LMA
+         !call get_option_real('-omega' , 'OMEGA', 25.7d0, OMEGA) ! LP01 single-mode
+         !call get_option_real('-omega' , 'OMEGA', 40.0d0, OMEGA) ! LP11 multi-mode
+         !call get_option_real('-omega' , 'OMEGA', 8.1d0*PI, OMEGA)
+         call get_option_real('-gamma' , 'GAMMA', 1.0d0, GAMMA)
+!     ...wavenumbers for alternative vectorial envelope formulation
+         call get_option_real('-wavenum_signal' , 'WAVENUM_SIGNAL' , OMEGA_SIGNAL*REF_INDEX_CORE, WAVENUM_SIGNAL )
+         call get_option_real('-wavenum_pump'   , 'WAVENUM_PUMP'   , OMEGA_PUMP  *REF_INDEX_CORE, WAVENUM_PUMP   )
+   end select
 !
-!..RECTANGULAR WAVEGUIDE
-!..OMEGA, GAMMA for rectangular waveguide,
-!  gamma is related to propagation constant, and is the impedance constant for TE10
-!..TE10 (0<x<1)
-   !call get_option_real('-omega' , 'OMEGA', (sqrt(5.d0)/2.d0)*PI          , OMEGA)
-   !call get_option_real('-gamma' , 'GAMMA', sqrt(1.d0-(PI**2)/(OMEGA**2)) , GAMMA)
-!..TE20 (0<x<1)
-   !call get_option_real('-omega' , 'OMEGA', sqrt(5.d0)*PI                        , OMEGA)
-   !call get_option_real('-gamma' , 'GAMMA', sqrt(1.d0-((2.d0*PI)**2)/(OMEGA**2)) , GAMMA)
+!..Use alternative vectorial envelope formulation
+   call get_option_bool('-envelope', 'ENVELOPE', .false.    , ENVELOPE      )
 !
 !..IBCFLAG: 0 (dirichlet)
-!..         3 (impedance)
+!           2 (impedance via penalty method)
+!           3 (impedance via elimination)
    call get_option_int ( '-ibc', 'IBCFLAG', 0, IBCFLAG )
 !
 ! =============================
@@ -189,6 +199,7 @@ subroutine set_environment_laser
    call get_option_int ('-aniso_ref_index', 'ANISO_REF_INDEX', 0       , ANISO_REF_INDEX)
    call get_option_int ('-art_grating'    , 'ART_GRATING'    , 0       , ART_GRATING    )
    call get_option_int ('-copump'         , 'COPUMP'         , 1       , COPUMP         )
+   call get_option_int ('-fake_pump'      , 'FAKE_PUMP'      , 0       , FAKE_PUMP      )
    call get_option_real('-raman'          , 'RAMAN_GAIN'     , 1.d-3   , RAMAN_GAIN     )
    call get_option_real('-gain'           , 'ACTIVE_GAIN'    , 1.d3    , ACTIVE_GAIN    )
 !

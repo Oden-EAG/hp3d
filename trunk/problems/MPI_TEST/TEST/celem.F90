@@ -44,7 +44,7 @@
    integer, dimension(MAXNODM),  intent(out) :: NdofmH,NdofmE,NdofmV,NdofmQ
    integer,                      intent(out) :: Nrnodm
    VTYPE  ,                      intent(out) :: Bload(*),Astif(*)
-   integer, dimension(NR_PHYSA)              :: nbcond
+   integer, dimension(NRINDEX)               :: nbcond
 !
 !--------------------------------------------------------------------------
 !
@@ -53,9 +53,8 @@
 !  This is done by saying that the value is known (to be zero) for the
 !  bubble (middle/interior) dof by using the BC flag (1 if known, 0 if unknown)
 !  The 'known' dof are eliminated by static condensation locally
-   nbcond = (/1,0/) ! removes the bubbles
-   call encod(nbcond,10,NR_PHYSA, NODES(Mdle)%bcond)
-   call set_index(NODES(Mdle)%case,NODES(Mdle)%bcond, NODES(Mdle)%index)
+   nbcond = (/1,1,0,0,0,0,0,0/) ! removes the bubbles
+   call encod(nbcond,2,NRINDEX, NODES(Mdle)%bcond)
 !
 !..redirect to the system routine
    call celem_system(Mdle,Idec, &
@@ -65,7 +64,6 @@
 !
 !..reset the BC flags back to zero (unknown)
    NODES(Mdle)%bcond = 0
-   call set_index(NODES(Mdle)%case,NODES(Mdle)%bcond, NODES(Mdle)%index)
 !
 !
    end subroutine celem

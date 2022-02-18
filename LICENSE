@@ -1,9 +1,9 @@
 *****************************************************************************
 
-par_hp3d - A Scalable MPI/OpenMP hp-Adaptive Finite Element Software Library
-           for Complex Multiphysics Applications
+hp3d - A Scalable MPI/OpenMP hp-Adaptive Finite Element Software Library
+       for Complex Multiphysics Applications
 
-Copyright (c) 2019 Oden Institute for Computational Engineering and Sciences,
+Copyright (c) 2021 Oden Institute for Computational Engineering and Sciences,
                    The University of Texas at Austin
 
 Redistribution and use in source and binary forms, with or without

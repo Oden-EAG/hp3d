@@ -13,8 +13,6 @@ subroutine initialize
 !
    implicit none
 !
-   integer :: INTEGRATION_tmp
-!
 !-----------------------------------------------------------------------
 !
 !..open history file
@@ -58,9 +56,9 @@ subroutine initialize
 !                                MAXSU //     MAXNP //     MAXNC //
                                     30 ,      500 ,     600 , &
 !                                MAXTR //     MAXRE //     MAXBT //
-                                   100 ,      100 ,     100 , &
+                                   100 ,      100 ,      10 , &
 !                                MAXHE //     MAXTE //     MAXPY //
-                                    50 ,      165 ,       10)
+                                    40 ,        1 ,       1)
 !
 !
 !     set HP3D parameters
@@ -97,7 +95,7 @@ subroutine initialize
 !
 !..initialize parameters for X11 graphics [OPTIONAL]
 !                           MXIGTR  //  MXIGSTR  //  MXRGTRZ
-   call set_x11_workspace( 200000000 ,  200000000 ,  400000000 )
+   !call set_x11_workspace( 200000000 ,  200000000 ,  400000000 )
 !
 !..Overwrite MAXNODS if specified by user input via argument list
    if (MAXNODS_USER .gt. 0) MAXNODS = MAXNODS_USER
@@ -108,12 +106,9 @@ subroutine initialize
    endif
 !
 !..generate mesh and read physics file
-!..keep integration flag value
-   INTEGRATION_tmp = INTEGRATION
    call hp3gen(trim(FILE_PHYS))
-   INTEGRATION = INTEGRATION_tmp
 !
 !..initialize work space for the frontal solver
-   call set_frsol_workspace (1000000)
+   !call set_frsol_workspace (1000000)
 !
  end subroutine initialize

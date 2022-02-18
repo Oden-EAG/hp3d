@@ -1,5 +1,6 @@
 computeBC_interp_error.F
 elemBCIerror.F90
+homogenD.F90
 hpedge.F90
 hpface.F90
 hpmdle.F90
@@ -8,5 +9,4 @@ dhpvert.F90
 initiate_order.F90
 update_Ddof.F90
 update_gdof.F90
-update_homogeneous_Ddof.F
 0

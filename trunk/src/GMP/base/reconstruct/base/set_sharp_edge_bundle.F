@@ -51,7 +51,7 @@ c     to edge vector
       dimension evect(3),dual1(3),dual2(3)
 c
 c  ...work space
-      dimension temp(3),list(10),Rn1_save(3),Rn2_save(3)
+      dimension temp(3),list(10)
 c
 c  ...second derivatives of the implicit reconstruction of surfaces
       dimension acoeff1(3,3),acoeff2(3,3)

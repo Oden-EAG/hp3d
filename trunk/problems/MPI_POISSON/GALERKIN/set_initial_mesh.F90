@@ -29,7 +29,7 @@
 !
    integer,dimension(NRELIS),intent(out) :: Nelem_order
 !..BC flags
-   integer, dimension(6,NR_PHYSA) :: ibc
+   integer, dimension(6,NRINDEX) :: ibc
 !..miscellaneous
    integer :: iprint,ifc,iel,neig
 !
@@ -68,8 +68,8 @@
          stop
       endif
 !
-!  ...set BC flags: 0 - no BC ; 1 - Dirichlet ; 2 - Neumann ; 3 - Robin ; >3 - Mixed
-      ibc(1:6,1:NR_PHYSA) = 0
+!  ...set BC flags: 0 - no BC ; 1 - Dirichlet
+      ibc(1:6,1:NRINDEX) = 0
 !
       select case(IBC_PROB)
 !

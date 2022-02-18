@@ -390,7 +390,7 @@ subroutine cylinder_geodesic(No,Eta, X,Dxdeta)
       if (iprint.eq.1) then
         do iv=1,2
           write(*,7031) iv,xparv(1:2,iv)
- 7031     format(' i,xparv(1:2,i)  = 'i1,2x,2(e12.5,2x))
+ 7031     format(' i,xparv(1:2,i)  = ',i1,2x,2(e12.5,2x))
         enddo
       endif
 !

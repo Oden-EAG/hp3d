@@ -2,11 +2,17 @@
 
 -include ../../../m_options
 
-COMPLEX         = 1
-DEBUG_MODE     ?= 0
+COMPLEX   ?= 1
+DEBUG     ?= 0
 
-ifeq ($(DEBUG),YES)
+ifeq ($(COMPLEX),0)
+$(error COMPLEX FLAG MUST BE 1 FOR LASER APPLICATION)
+endif
+
+ifeq ($(COMPILER),INTEL)
+ifeq ($(DEBUG),1)
 FFLAGS += -gen-interface -warn none -warn interfaces
+endif
 endif
 
 SRC_PATH        = .
@@ -47,8 +53,8 @@ FC_WORK     = $(FC) $(CCDEFS) $(CCINCS) $(FFLAGS) $(EXTRA_FFLAGS)
 one : $(OBJ_PATH)/.dummy $(OBJ)
 	@echo " "
 	@echo "- Linking , " $(EXEC)
-	@echo "- COMPLEX    = " $(COMPLEX)
-	@echo "- DEBUG_MODE = " $(DEBUG_MODE)
+	@echo "- COMPLEX = " $(COMPLEX)
+	@echo "- DEBUG   = " $(DEBUG)
 	@echo "------------------------------ "
 	$(FC_WORK) -o $(EXEC) $(OBJ) $(LIBS) $(LDFLAGS)
 
@@ -82,5 +88,5 @@ clean :
 clean-pv :
 	@rm -f ../outputs/paraview/*
 	@rm -f ../outputs/power/*
-	@rm -f ../output/temp/*
+	@rm -f ../outputs/temp/*
 

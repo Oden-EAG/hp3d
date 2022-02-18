@@ -29,7 +29,7 @@ program main
    implicit none
 !
 !..auxiliary variables
-   integer :: i, ierr, req, ret
+   integer :: i, ierr
 !
 !..OMP variables
    integer :: num_threads, omp_get_num_threads
@@ -98,7 +98,7 @@ program main
    if (JOB .ne. 0) then
       call exec_job
    else
-      if (RANK .eq. 0) then
+      if (RANK .eq. ROOT) then
          call master_main
       else
          call worker_main
@@ -133,7 +133,7 @@ subroutine master_main()
    integer :: ierr
 !
 !..auxiliary variables
-   integer :: idec, i, r, lb, count, src
+   integer :: idec, r, lb, count, src
 !
 !----------------------------------------------------------------------
 !
@@ -206,6 +206,7 @@ subroutine master_main()
       write(*,*) '                                         '
       write(*,*) '          ---- TESTING ----              '
       write(*,*) 'Flush dof, update_gdof, update_Ddof....60'
+      write(*,*) 'P-refine an element....................65'
       write(*,*) '=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='
 !
       read( *,*) idec
@@ -290,6 +291,9 @@ subroutine master_main()
          case(60)
             call exec_case(idec)
 !
+         case(65)
+            call exec_case(idec)
+!
       end select
 !
       call MPI_BARRIER (MPI_COMM_WORLD, ierr)
@@ -317,7 +321,7 @@ subroutine worker_main()
    use GMP
 !
    use MPI           , only: MPI_COMM_WORLD,MPI_INTEGER
-   use mpi_param     , only: ROOT,RANK,NUM_PROCS
+   use mpi_param     , only: ROOT,RANK
    use par_mesh      , only: DISTRIBUTED
    use zoltan_wrapper, only: zoltan_w_set_lb
 !
@@ -327,7 +331,7 @@ subroutine worker_main()
    integer :: ierr
 !
 !..auxiliary variables
-   integer :: idec, i, r, lb, count, src
+   integer :: idec, r, lb, count, src
 !
 !----------------------------------------------------------------------
 !
@@ -403,6 +407,9 @@ subroutine worker_main()
 !
 !     ...TODO testing
          case(60)
+            call exec_case(idec)
+!
+         case(65)
             call exec_case(idec)
 !
       end select

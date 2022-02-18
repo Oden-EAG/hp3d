@@ -1,10 +1,11 @@
 *****************************************************************************
 
-par_hp3d - A Scalable MPI/OpenMP hp-Adaptive Finite Element Software Library
-           for Complex Multiphysics Applications
+hp3d - A Scalable MPI/OpenMP hp-Adaptive Finite Element Software Library
+       for Complex Multiphysics Applications
 
 Contributors:
 
+Jacob Badger
 Leszek Demkowicz
 Federico Fuentes
 Paolo Gatto

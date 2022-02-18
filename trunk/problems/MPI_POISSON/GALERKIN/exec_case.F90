@@ -16,7 +16,7 @@ subroutine exec_case(idec)
 !
    logical :: solved
    integer :: mdle_subd(NRELES)
-   integer :: i,mdle,kref,src,count,ierr
+   integer :: i,mdle,kref,src,count,ierr,nord
 !
 !----------------------------------------------------------------------
 !
@@ -164,7 +164,7 @@ subroutine exec_case(idec)
          call petsc_solve('G')
 !
       case(50)
-         write(*,*) 'computing error and residual...'
+         write(*,*) 'computing error...'
          call exact_error
 !
       case(60)
@@ -181,6 +181,28 @@ subroutine exec_case(idec)
          enddo
          call update_gdof
          call update_Ddof
+!
+      case(65)
+         if (RANK.eq.ROOT) then
+            write(*,*) 'Select a mdle node from the list: '
+            do i=1,NRELES
+               write(*,2610) ELEM_ORDER(i)
+            enddo
+            read(*,*) mdle
+         endif
+         if (NUM_PROCS .gt. 1) then
+            count = 1; src = ROOT
+            call MPI_BCAST (mdle,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+         endif
+         if (RANK.eq.ROOT) then
+            write(*,*) 'Select corresponding mdle node refinement:'
+            read(*,*) nord
+         endif
+         if (NUM_PROCS .gt. 1) then
+            count = 1; src = ROOT
+            call MPI_BCAST (nord,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+         endif
+         call nodmod(mdle,nord)
 !
       case default
          write(*,*) 'exec_case: unknown case...'

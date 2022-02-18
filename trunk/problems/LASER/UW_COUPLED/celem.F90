@@ -39,7 +39,7 @@ subroutine celem(Mdle,Idec, Nrdofs,Nrdofm,Nrdofc,Nodm,NdofmH,NdofmE,NdofmV,Ndofm
       integer,                      intent(out) :: Nrnodm
       VTYPE  ,                      intent(out) :: Bload(*),Astif(*)
 !
-      integer, dimension(NR_PHYSA) :: nbcond
+      integer, dimension(NRINDEX) :: nbcond
 !
 !---------------------------------------------------------------------------------------------------------------
 !
@@ -52,9 +52,9 @@ subroutine celem(Mdle,Idec, Nrdofs,Nrdofm,Nrdofc,Nodm,NdofmH,NdofmE,NdofmV,Ndofm
 !           (5) - L2 field for Maxwell (signal, 6 components)
 !           (6) - L2 field for Maxwell (pump  , 6 components)
 !
-   nbcond = 0; nbcond(2:4)=1; ! removes the bubbles (instead of hack solver)
-   call encod(nbcond,10,NR_PHYSA, NODES(Mdle)%bcond)
-   call set_index(NODES(Mdle)%case,NODES(Mdle)%bcond, NODES(Mdle)%index)
+!..remove bubble DOFs from trace components
+   nbcond = 0; nbcond(2:6) = 1
+   call encod(nbcond,2,NRINDEX, NODES(Mdle)%bcond)
 !
 !..redirect to the system routine
    call celem_system(Mdle,Idec,                            &
@@ -62,8 +62,7 @@ subroutine celem(Mdle,Idec, Nrdofs,Nrdofm,Nrdofc,Nodm,NdofmH,NdofmE,NdofmV,Ndofm
                      NdofmH,NdofmE,NdofmV,NdofmQ,Nrnodm,   &
                      Bload,Astif)
 !
-!..reset the BC flags back to zero (unknown) (instead of unhack solver)
+!..reset the BC flags back to zero (unknown)
    NODES(Mdle)%bcond = 0
-   call set_index(NODES(Mdle)%case,NODES(Mdle)%bcond, NODES(Mdle)%index)
 !
 end subroutine celem

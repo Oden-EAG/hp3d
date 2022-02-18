@@ -6,8 +6,15 @@
 *.blk
 *.mk.old
 .dummy
+
+# Temporary hp3D files
 fort.19
 fort.20
+*~
+m_options
+
+# Data files
+history
 
 # Prerequisites
 *.d
@@ -17,6 +24,11 @@ fort.20
 *.lo
 *.o
 *.obj
+
+# Binary Applications
+maxw
+pois
+uwLaser
 
 # Output files
 *.e

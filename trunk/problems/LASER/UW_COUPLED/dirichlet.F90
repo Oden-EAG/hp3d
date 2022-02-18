@@ -1,5 +1,17 @@
-!----------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+! REMARK 1: THIS ROUTINE MUST BE OMP THREAD-SAFE
+!           DUE TO OMP PARALLELIZATION OF UPDATE_DDOF->DIRICHLET
+!
+! REMARK 2: In LASER problem, this dirichlet routine computes valid Dirichlet
+!           values only for one particular field, depending on NO_PROBLEM:
+!           NO_PROBLEM = 2 --> HEAT DOFS
+!           NO_PROBLEM = 3 --> SIGNAL DOFS
+!           NO_PROBLEM = 4 --> PUMP DOFS
+!           The remaining fields are assumed not to be written by update_Ddof,
+!           since the corresponding attributes are deactivated via PHYSAm.
+!-------------------------------------------------------------------------------
 !> Purpose : calculate dirichlet boundary condition
+!> last mod: June 2021
 !!
 !! @param[in]  Mdle  - an element (middle node) number
 !! @param[in]  X     - physical coordinates of a point
@@ -11,7 +23,7 @@
 !! @param[out] DvalE - H(curl) corresponding first derivatives
 !! @param[out] ValV  - value of the H(div) solution
 !! @param[out] DvalV - H(div) corresponding first derivatives
-!----------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 #include "typedefs.h"
 !
@@ -46,7 +58,7 @@ subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
    integer :: iprint = 0
 #endif
 !
-!----------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 !..initialize
    ValH = ZERO; DvalH = ZERO
@@ -83,7 +95,7 @@ subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
                      endif
 !              ...Next check for pump and launch at X(3) = ZL
                   case(4)
-                     if((X(3).ge.(ZL-GEOM_TOL))) then
+                     if((X(3).gt.(ZL-GEOM_TOL))) then
 !                    ...E-trc value
                         call exact(X,Mdle, ValH,DvalH,d2valH,ValE,DvalE,d2valE,  &
                                            ValV,DvalV,d2valV,valQ,dvalQ,d2valQ)
@@ -95,10 +107,12 @@ subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
 !        ...check if we are solving the Heat problem
             case(2)
 !           ...do nothing since for heat loop, we have dirichlet BC = 0.d0 on fiber boundary
+!              (i.e., homogeneous BC either for the temperature or for the heat flux)
 !           ...should not be running linear heat problem NO_PROBLEM = 1 with NEXACT = 0
-!           ...we could but we should then set non-zero BC or IC
+!           ...we could but we should then set non-zero BC, IC, or source term
             case(1)
-               write(*,*) 'dirichlet: cannot run NEXACT = 0 with linear heat problem (NO_PROBLEM = 1). stop.'
+               write(*,*) 'dirichlet: cannot run NEXACT = 0 with linear ', &
+                                     'heat problem (NO_PROBLEM = 1). stop.'
                stop
 !     ...end select NO_PROBLEM
          end select

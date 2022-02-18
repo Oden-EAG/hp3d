@@ -9,6 +9,7 @@
 !! @param[in]  Etav         - reference coordinates of the element vertices
 !! @param[in]  Type         - element (middle node) type
 !! @param[in]  Icase        - the edge node case
+!! @param[in]  Bcond        - the edge node BC flag
 !! @param[in]  Nedge_orient - edge orientation
 !! @param[in]  Nface_orient - face orientation (not used)
 !! @param[in]  Norder       - element order
@@ -20,7 +21,7 @@
 !-----------------------------------------------------------------------
 !
 #include "typedefs.h"
-  subroutine dhpedgeE(Mdle,Iflag,No,Etav,Type,Icase,&
+  subroutine dhpedgeE(Mdle,Iflag,No,Etav,Type,Icase,Bcond,&
                       Nedge_orient,Nface_orient,Norder,Iedge,&
                       ZnodE)
 !
@@ -34,7 +35,7 @@
 !-----------------------------------------------------------------------
 !
   integer,          intent(in)    :: Iflag,No,Mdle
-  integer,          intent(in)    :: Icase,Iedge
+  integer,          intent(in)    :: Icase,Bcond,Iedge
   real(8),          intent(in)    :: Etav(3,8)
   character(len=4), intent(in)    :: Type
   integer,          intent(in)    :: Nedge_orient(12)
@@ -51,13 +52,13 @@
   real(8), dimension(MAX_NINT1)         :: wa_list
   real(8)                               :: wa, weight
 !
-! work space for shape3H
+! work space for shape3DH
   integer                               :: nrdofH
   integer, dimension(19)                :: norder_1
   real(8), dimension(MAXbrickH)         :: shapH
   real(8), dimension(3,MAXbrickH)       :: gradH
 !
-! work space for shape3E
+! work space for shape3DE
   integer                               :: nrdofE
   real(8), dimension(3,MAXbrickE)       :: shapE
   real(8), dimension(3,MAXbrickE)       :: curlE
@@ -79,8 +80,9 @@
 ! Dirichlet data in reference coordinates
   VTYPE :: zvalEeta(3,MAXEQNE)
 !
-! decoded case for the face node
+! decoded case and BC flag for the face node
   integer, dimension(NR_PHYSA)          :: ncase
+  integer, dimension(NRINDEX)           :: ibcnd
 !
 ! work space for linear solvers
   integer                               :: naE,info
@@ -94,14 +96,19 @@
 #endif
 !
 ! misc work space
-  integer :: iprint,nrv,nre,nrf,i,j,k,ivarE,nvarE,kj,ki,&
-             ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_Edge,iflag1
+  integer :: nrv,nre,nrf,i,j,k,ivarE,nvarE,kj,ki,&
+             ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_Edge,iflag1,ic
+!
+  logical :: is_homD
+!
+#if DEBUG_MODE
+  integer :: iprint = 0
+#endif
 !
 !----------------------------------------------------------------------
 !
   nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
 !
-  iprint = 0
 #if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Icase,Iedge,Type
@@ -121,6 +128,13 @@
 ! # of edge dof
   call ndof_nod('medg',norder(Iedge), &
                 ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_edge)
+!
+! check if a homogeneous Dirichlet node
+  call homogenD('tangen',Icase,Bcond, is_homD,ncase,ibcnd)
+  if (is_homD) then
+    zuE = ZERO
+    go to 100
+  endif
 !
 ! # of dof cannot be zero
   if (ndofE_edge.le.0) then
@@ -318,48 +332,56 @@
   endif
 #endif
 !
-! save dof's, skipping irrelevant entries
+!  ...save the DOFs, skipping irrelevant entries
+  100 continue
 !
-! decoded node case, indicating supported variables
-  call decod(Icase,2,NR_PHYSA, ncase)
+!  ...initialize global variable counter, and node local variable counter
+      ivarE=0 ; nvarE=0
+! 
+!  ...loop through multiple copies of variables
+      do j=1,NRCOMS
 !
-! initialize global variable counter, and node local variable counter
-  ivarE=0 ; nvarE=0
+!  .....initiate the BC component counter
+        ic=0
 !
-! loop through multiple copies of variables
-  do j=1,NRCOMS
+!  .....loop through physical attributes
+        do i=1,NR_PHYSA
 !
-!   loop through physical attributes
-    do i=1,NR_PHYSA
+!  .......loop through components of physical attribute
+          do k=1,NR_COMP(i)
 !
-!     loop through components of physical attribute
-      do k=1,NR_COMP(i)
+!  .........if the variable is supported by the node, update the BC component counter
+            if (ncase(i).eq.1) ic=ic+1
 !
-        select case(DTYPE(i))
+!  .........select the discretization type
+            select case(DTYPE(i))
 !
-!       H(curl) component
-        case('tangen')
+!  .........H(curl) component
+            case('tangen')
 !
-!         update global counter
-          ivarE = ivarE + 1
+!  ...........update global counter
+              ivarE = ivarE + 1
 !
-!         Dirichlet component
-          if (ncase(i).eq.1) then
+!  ...........if the variable is supported by the node
+              if (ncase(i).eq.1) then
 !
-!           update node local conter
-            nvarE = nvarE + 1
+!  .............update node local counter
+                nvarE = nvarE + 1
 !
-!           store Dirichlet dof
-            ZnodE(nvarE,1:ndofE_edge) = zuE(1:ndofE_edge,ivarE)
+!  .............do not write dof if physics attribute is deactivated
+                if (.not. PHYSAm(i)) exit
 !
-          endif
-        endselect
+!  .............store Dirichlet dof
+                if (ibcnd(ic).eq.1) ZnodE(nvarE,1:ndofE_edge) = zuE(1:ndofE_edge,ivarE)
+!
+              endif
+            end select
+          enddo
+        enddo
       enddo
-    enddo
-  enddo
 !
 #if DEBUG_MODE
-  if (iprint.eq.1) call result
+      if (iprint.eq.1) call result
 #endif
 !
-  end subroutine dhpedgeE
+      end subroutine dhpedgeE
