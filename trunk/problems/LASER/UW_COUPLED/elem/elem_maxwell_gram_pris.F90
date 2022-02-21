@@ -122,6 +122,8 @@
 !
 !..OMEGA_RATIO_SIGNAL or OMEGA_RATIO_PUMP
    real(8) :: OMEGA_RATIO_FLD
+!..WAVENUM_SIGNAL or WAVENUM_PUMP
+   real(8) :: WAVENUM_FLD
 !
 !..for PML
    complex(8) :: zbeta,zdbeta,zd2beta,detJstretch
@@ -129,10 +131,15 @@
 !
 !..added to use fast integration
 !..Gram matrix aux arrays
-   complex(8), allocatable :: AUXEE_zb(:,:,:)  , AUXEE_zc(:,:,:)
-   complex(8), allocatable :: AUXCC(:,:,:)
-   complex(8), allocatable :: AUXEC_zb(:,:,:)  , AUXEC_zc(:,:,:)
-   complex(8), allocatable :: AUXCE_zb(:,:,:)  , AUXCE_zc(:,:,:)
+   complex(8), allocatable :: AUXEE_zb(:,:,:,:)  , AUXEE_zc(:,:,:,:)
+   complex(8), allocatable :: AUXCC(:,:,:,:)
+   complex(8), allocatable :: AUXEC_zb(:,:,:,:)  , AUXEC_zc(:,:,:,:)
+   complex(8), allocatable :: AUXCE_zb(:,:,:,:)  , AUXCE_zc(:,:,:,:)
+!..Vectorial envelope Gram auxiliary arrays
+   complex(8), allocatable :: AUXRR(:,:,:,:)
+   complex(8), allocatable :: AUXRC(:,:,:,:)   , AUXCR(:,:,:,:)
+   complex(8), allocatable :: AUXER_zb(:,:,:,:), AUXER_zc(:,:,:,:)
+   complex(8), allocatable :: AUXRE_zb(:,:,:,:), AUXRE_zc(:,:,:,:)
 !
    integer :: a,b,sa,sb,sc,alph,beta
    integer :: pxy,pz
@@ -149,8 +156,8 @@
    real(8), dimension(3,MAXNINT3ADD) :: wloc3
    real(8), dimension(3) :: xip
 !
-   real(8)   , dimension(3,3) :: D_za,D_zc,D_aux,C,D
-   complex(8), dimension(3,3) :: Z_za,Z_zc,Z_aux
+   real(8)   , dimension(3,3) :: D_za,D_zc,D_aux,D_aux2,C,D,D_RR
+   complex(8), dimension(3,3) :: Z_za,Z_zc,Z_aux,C_RC,D_ER_za,D_ER_zc
 !
    real(8), allocatable :: shapeH3(:,:),E12(:,:),C12(:,:)
    real(8), allocatable :: sH12(:,:),gH12(:,:,:),sE12(:,:,:),cE12(:,:)
@@ -235,7 +242,7 @@
          nrdofE12 = 2*(pe+1)*(pe)
 !
          allocate(mapEE(nrdofE12*(nord3+1) + nrdofH12*nord3)) ! test  dof ordering
-         call tens_hexa_ordEE(pe,nord3         , mapEE)
+         call tens_hexa_ordEE(pe,nord3, mapEE)
 !
       case default
          write(*,*) 'elem_maxwell_gram_pris: unexpected element type:', etype
@@ -251,12 +258,14 @@
 !..clear space for Gram matrix
    GramP = ZERO
 !
-!..set OMEGA_RATIO_FLD
+!..set OMEGA_RATIO_FLD and WAVENUM_FLD
    select case(Fld_flag)
       case(0)
          OMEGA_RATIO_FLD = OMEGA_RATIO_PUMP
+         WAVENUM_FLD     = WAVENUM_PUMP
       case(1)
          OMEGA_RATIO_FLD = OMEGA_RATIO_SIGNAL ! 1.0d0
+         WAVENUM_FLD     = WAVENUM_SIGNAL
       case default
       write(*,*) 'elem_maxwell_gram_pris: invalid Fld_flag param. stop.'
          stop
@@ -266,6 +275,8 @@
    Jstretch = ZERO
    Jstretch(1,1) = ZONE
    Jstretch(2,2) = ZONE
+!
+   detJstretch = ZONE
 !
    invJstretch = ZERO
    invJstretch(1,1) = ZONE
@@ -283,8 +294,6 @@
    select case(GEOM_NO)
       case(1)
          bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
-      case(2,3)
-         bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
       case(4)
          bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
       case(5)
@@ -301,6 +310,9 @@
                write(*,*) 'elem_maxwell_gram_pris: unexpected ndom param. stop.'
                stop
          end select
+      case default
+         write(*,*) 'elem_maxwell_gram_pris: unexpected GEOM_NO: ', GEOM_NO, '. stop.'
+         stop
 !..end select case of GEOM_NO
    end select
 !
@@ -332,13 +344,23 @@
    allocate(sE12(2,nrdofE12,nintxy))
    allocate(cE12(  nrdofE12,nintxy))
 !
-   allocate(AUXEE_zb(3,3,(nrdofE12+nrdofH12)**2))
-   allocate(AUXEE_zc(3,3,(nrdofE12+nrdofH12)**2))
-   allocate(AUXCC   (3,3,(nrdofE12+nrdofH12)**2))
-   allocate(AUXEC_zb(3,3,(nrdofE12+nrdofH12)**2))
-   allocate(AUXEC_zc(3,3,(nrdofE12+nrdofH12)**2))
-   allocate(AUXCE_zb(3,3,(nrdofE12+nrdofH12)**2))
-   allocate(AUXCE_zc(3,3,(nrdofE12+nrdofH12)**2))
+   allocate(AUXEE_zb(3,3,nrdofE12+nrdofH12,nrdofE12+nrdofH12))
+   allocate(AUXEE_zc(3,3,nrdofE12+nrdofH12,nrdofE12+nrdofH12))
+   allocate(AUXCC   (3,3,nrdofE12+nrdofH12,nrdofE12+nrdofH12))
+   allocate(AUXEC_zb(3,3,nrdofE12+nrdofH12,nrdofE12+nrdofH12))
+   allocate(AUXEC_zc(3,3,nrdofE12+nrdofH12,nrdofE12+nrdofH12))
+   allocate(AUXCE_zb(3,3,nrdofE12+nrdofH12,nrdofE12+nrdofH12))
+   allocate(AUXCE_zc(3,3,nrdofE12+nrdofH12,nrdofE12+nrdofH12))
+!
+   if (ENVELOPE) then
+      allocate(AUXRR(3,3,nrdofE12+nrdofH12,nrdofE12+nrdofH12))
+      allocate(AUXRC(3,3,nrdofE12+nrdofH12,nrdofE12+nrdofH12))
+      allocate(AUXCR(3,3,nrdofE12+nrdofH12,nrdofE12+nrdofH12))
+      allocate(AUXER_zb(3,3,nrdofE12+nrdofH12,nrdofE12+nrdofH12))
+      allocate(AUXER_zc(3,3,nrdofE12+nrdofH12,nrdofE12+nrdofH12))
+      allocate(AUXRE_zb(3,3,nrdofE12+nrdofH12,nrdofE12+nrdofH12))
+      allocate(AUXRE_zc(3,3,nrdofE12+nrdofH12,nrdofE12+nrdofH12))
+   endif
 !
 !..Loop over quadrature points in direction \xi_3
    do pz=1,nintz
@@ -355,6 +377,14 @@
       AUXCC    = ZERO
       AUXEC_zb = ZERO; AUXEC_zc = ZERO
       AUXCE_zb = ZERO; AUXCE_zc = ZERO
+!
+!  ...Initialize auxiliary matrices: Vectorial Envelope
+      if (ENVELOPE) then
+         AUXRR    = ZERO;
+         AUXRC    = ZERO; AUXCR    = ZERO;
+         AUXER_zb = ZERO; AUXER_zc = ZERO;
+         AUXRE_zb = ZERO; AUXRE_zc = ZERO;
+      endif
 !
 !  ...loop over xy quadrature points
       do pxy=1,nintxy
@@ -552,6 +582,36 @@
 !     ...Z_zb = conjg(transpose(Z_za)) = J^T * zaJ * J^-T
 !     ...Z_zd = conjg(transpose(Z_zc)) = J^T * zcJ * J^-T
 !
+         if (ENVELOPE) then
+!        ...(e_z x J^-T)^* (e_z x J^-T) = J^-1 (I - e_z) J^-T
+!           (note we have 2 instead of 3 below, only using first 2 cols)
+            call DGEMM('N','T',3,3,2,1.0d0,dxidx,3,dxidx,3,0.0d0,D_aux,3)
+            D_RR = D_aux * (WAVENUM_FLD*abs(detJstretch))**2 * weighthh
+!
+!        ...Note for C_RC, and both D_ER we don't multiply by ZI yet
+!           this way it's easier to take conjugate of Jacobian factor
+!        ...J^T e_z x J^-T = -(e_z x J)^T J^-T
+            D_aux(1,1:3) = -dxdxi(2,1:3)
+            D_aux(2,1:3) = dxdxi(1,1:3)
+            D_aux(3,1:3) = rZero
+            call DGEMM('T','T',3,3,3,-1.0d0,D_aux,3,dxidx,3,0.0d0,D_aux2,3)
+            C_RC = D_aux2 * WAVENUM_FLD*detJstretch * wt123
+!
+!        ...D_ER_za = J^-1 e_z x zaJ J^-T
+            Z_aux(1:3,1) = zaJ(1,1) * dxidx(1:3,2)
+            Z_aux(1:3,2) = -zaJ(2,2) * dxidx(1:3,1)
+            Z_aux(1:3,3) = ZERO
+            call ZGEMM('N','T',3,3,3,ZONE,Z_aux,3,ZONE*dxidx,3,ZERO,D_ER_za,3)
+            D_ER_za = D_ER_za * WAVENUM_FLD*conjg(detJstretch) * weighthh
+!
+!        ...D_ER_zc = J^-1 e_z x zcJ J^-T
+            Z_aux(1:3,1) = zcJ(1,1) * dxidx(1:3,2)
+            Z_aux(1:3,2) = -zcJ(2,2) * dxidx(1:3,1)
+            Z_aux(1:3,3) = ZERO
+            call ZGEMM('N','T',3,3,3,ZONE,Z_aux,3,ZONE*dxidx,3,ZERO,D_ER_zc,3)
+            D_ER_zc = D_ER_zc * WAVENUM_FLD*conjg(detJstretch) * weighthh
+         endif
+!
 !     ...put appropriate quadrature weight on Jacobian and its inverse
          dxdxi = dxdxi * weightvv
          dxidx = dxidx * wt123
@@ -574,48 +634,107 @@
 !           ...combine indices i12 and j12 into k12
                k12 = (i12-1)*(nrdofE12+nrdofH12) + j12
 !
-!           ...loop over vector components
+!           ...Accumulate for EE terms
                do b=1,3
                   do a=1,3
-!
-! Note E terms have a lot of 0s so we only compute if non-zero
-!                 ...Accumulate for EE terms
-!                    ...For EE11
-                        AUXEE_zb(a,b,k12) = AUXEE_zb(a,b,k12)     &
-                              + (ALPHA_NORM*D(a,b) + D_za(a,b))   &
-                              * E12(a,i12)*E12(b,j12)
-!                    ...For EE22
-                        AUXEE_zc(a,b,k12) = AUXEE_zc(a,b,k12)     &
-                              + (ALPHA_NORM*D(a,b) + D_zc(a,b))   &
-                              * E12(a,i12)*E12(b,j12)
-!
-!                 ...Accumulate for EC terms
-                     AUXEC_zb(a,b,k12) = AUXEC_zb(a,b,k12)        &
-                           - Z_za(a,b)                            &
-                           * E12(a,i12)*C12(b,j12)*wt123
-!
-                     AUXEC_zc(a,b,k12) = AUXEC_zc(a,b,k12)        &
-                           + Z_zc(a,b)                            &
-                           * E12(a,i12)*C12(b,j12)*wt123
-!
-!                 ...Accumulate for CC terms
-                     AUXCC(a,b,k12) = AUXCC(a,b,k12)                 &
-                           + C12(a,i12)*C12(b,j12)*C(a,b)
-!
-!                 ...Accumulate for CE terms
-!                    (Z_za and Z_zc indices are switched here b/c we need the transpose)
-                     AUXCE_zb(a,b,k12) = AUXCE_zb(a,b,k12)        &
-                           - conjg(Z_za(b,a))                     &
-                           * C12(a,i12)*E12(b,j12)*wt123
-!
-                     AUXCE_zc(a,b,k12) = AUXCE_zc(a,b,k12)        &
-                           + conjg(Z_zc(b,a))                     &
-                           * C12(a,i12)*E12(b,j12)*wt123
-!
-!              ...loop a ends
+!                 ...For EE11
+                     AUXEE_zb(a,b,j12,i12) = AUXEE_zb(a,b,j12,i12)     &
+                           + (ALPHA_NORM*D(a,b) + D_za(a,b))   &
+                           * E12(a,i12)*E12(b,j12)
+!                 ...For EE22
+                     AUXEE_zc(a,b,j12,i12) = AUXEE_zc(a,b,j12,i12)     &
+                           + (ALPHA_NORM*D(a,b) + D_zc(a,b))   &
+                           * E12(a,i12)*E12(b,j12)
                   enddo
-!           ...loop b ends
                enddo
+!
+!           ...Accumulate for CC terms
+               do b=1,3
+                  do a=1,3
+                     AUXCC(a,b,j12,i12) = AUXCC(a,b,j12,i12)            &
+                           + C12(a,i12)*C12(b,j12)*C(a,b)
+                  enddo
+               enddo
+!
+!           ...Accumulate for EC terms
+               do b=1,3
+                  do a=1,3
+!                    ...For za terms (ε)
+                     AUXEC_zb(a,b,j12,i12) = AUXEC_zb(a,b,j12,i12)      &
+                           - Z_za(a,b)                                  &
+                           * E12(a,i12)*C12(b,j12)*wt123
+!                    ...For zc terms (μ)
+                     AUXEC_zc(a,b,j12,i12) = AUXEC_zc(a,b,j12,i12)      &
+                           + Z_zc(a,b)                                  &
+                           * E12(a,i12)*C12(b,j12)*wt123
+                  enddo
+               enddo
+!
+!           ...Accumulate for CE terms
+!              (Z_za and Z_zc indices are switched here b/c we need the transpose)
+               do b=1,3
+                  do a=1,3
+!                    ...For za terms (ε)
+                     AUXCE_zb(a,b,j12,i12) = AUXCE_zb(a,b,j12,i12)      &
+                           - conjg(Z_za(b,a))                           &
+                           * C12(a,i12)*E12(b,j12)*wt123
+!                    ...For zc terms (μ)
+                     AUXCE_zc(a,b,j12,i12) = AUXCE_zc(a,b,j12,i12)      &
+                           + conjg(Z_zc(b,a))                           &
+                           * C12(a,i12)*E12(b,j12)*wt123
+                  enddo
+               enddo
+!
+               if (ENVELOPE) then
+!              ...k^2(e_z x F_i, e_z x F_j)
+                  do b=1,3
+                     do a=1,3
+                        AUXRR(a,b,j12,i12) = AUXRR(a,b,j12,i12)          &
+                              + D_RR(a,b)                                &
+                              * E12(a,i12)*E12(b,j12)
+                     enddo
+                  enddo
+!
+                  do b=1,3
+                     do a=1,3
+!                    ...-ik(curl F_i, e_z x F_j)
+                        AUXCR(a,b,j12,i12) = AUXCR(a,b,j12,i12)          &
+                              - ZI*conjg(C_RC(a,b))                             &
+                              * E12(b,j12)*C12(a,i12)
+!                    ...ik(e_z x F_i, curl F_j)
+                        AUXRC(a,b,j12,i12) = AUXRC(a,b,j12,i12)          &
+                              + ZI*C_RC(b,a)                      &
+                              * E12(a,i12)*C12(b,j12)
+                     enddo
+                  enddo
+!
+                  do b=1,3
+                     do a=1,3
+!                    ...ik(iωε F_i, e_z x G_j)
+                        AUXER_zb(a,b,j12,i12) = AUXER_zb(a,b,j12,i12)    &
+                              + ZI*D_ER_za(a,b)                          &
+                              * E12(a,i12)*E12(b,j12)
+!                    ...-ik (iωμ G_i, e_z x F_j)
+                        AUXER_zc(a,b,j12,i12) = AUXER_zc(a,b,j12,i12)    &
+                              - ZI*D_ER_zc(a,b)                          &
+                              * E12(a,i12)*E12(b,j12)
+                     enddo
+                  enddo
+!
+                  do b=1,3
+                     do a=1,3
+!                    ...-ik (e_z x G_i, (iωε)^* F_j)
+                        AUXRE_zb(a,b,j12,i12) = AUXRE_zb(a,b,j12,i12)    &
+                              - ZI*conjg(D_ER_za(b,a))                   &
+                              * E12(a,i12)*E12(b,j12)
+!                    ...ik(e_z x F_i, (iωμ)^* G_j)
+                        AUXRE_zc(a,b,j12,i12) = AUXRE_zc(a,b,j12,i12)    &
+                              + ZI*conjg(D_ER_zc(b,a))                   &
+                              * E12(a,i12)*E12(b,j12)
+                     enddo
+                  enddo
+               endif
+!
 !        ...loop over 2D test function ends
             enddo
 !
@@ -638,82 +757,161 @@
             if (i12 .le. nrdofE12) then
 !           ...Parameters i3,sa,fa, switch between fn value or deriv
                i3mod = i3; sa = 1; fa = 1
-               m1 = mapEE(i3 + (i12-1)*nrdofH3)
+               m1 = mapEE(i12 + (i3-1)*nrdofE12)
             else
                if (i3 .eq. nrdofH3) exit
                i3mod = i3 + 1; sa = 2; fa = 0
-               m1 = mapEE(i3 + (i12-nrdofE12-1)*(nrdofH3-1) + nrdofE12*nrdofH3)
+               m1 = mapEE(i12-nrdofE12 + (i3-1)*(nrdofH12) + nrdofE12*nrdofH3)
             endif
 !
             if (i3mod.le.nrdofH3) then
-!
 !           ...Loop 2 over 1D test functions
                do j3=1,nrdofH3
 !              ...Loop 2 over 2D test functions
                   do j12=1,(nrdofE12+nrdofH12)
-                     k12 = (i12-1)*(nrdofE12+nrdofH12) + j12
 !
 !                 ...Switch between shape functions families
                      if (j12.le.nrdofE12) then
 !                    ...Parameters j3,sb,fb, switch between fn value or deriv
                         j3mod = j3; sb = 1; fb = 1
-                        m2 = mapEE(j3 + (j12-1)*nrdofH3)
+                        m2 = mapEE(j12 + (j3-1)*nrdofE12)
                      else
                         if (j3 .eq. nrdofH3) exit
                         j3mod = j3 + 1; sb = 2; fb = 0
-                        m2 = mapEE(j3 + (j12-nrdofE12-1)*(nrdofH3-1) + nrdofE12*nrdofH3)
+                        m2 = mapEE(j12-nrdofE12 + (j3-1)*nrdofH12 + nrdofE12*nrdofH3)
                      endif
 !
-                     if (m1.le.m2) then
-                        if (j3mod.le.nrdofH3) then
+                     if (j3mod.le.nrdofH3 .and. m1.le.m2) then
+!                    ...Sum EE_11 and CC_11 terms
+                        kk = nk(2*m1-1,2*m2-1)
+                        do b=1,3
+                           do a=1,3
+                              gramP(kk) = gramP(kk)                        &
+                                 + AUXEE_zb(a,b,j12,i12)                   &
+                                    * shapeH3(sa,i3mod)                    &
+                                    * shapeH3(sb,j3mod)                    &
+                                 + AUXCC(a,b,j12,i12)                      &
+                                    * shapeH3(2-deltak(a,3)*fa,i3mod)      &
+                                    * shapeH3(2-deltak(b,3)*fb,j3mod)
+                           enddo
+                        enddo
+!                    ...Vectorial Envelope terms
+                        if (ENVELOPE) then
                            do b=1,3
                               do a=1,3
-!                             ...Sum EE_11 and CC_11 terms
-                                 kk = nk(2*m1-1,2*m2-1)
-                                 GramP(kk) = GramP(kk)                    &
-                                    + AUXEE_zb(a,b,k12)                   &
-                                       * shapeH3(sa,i3mod)                &
-                                       * shapeH3(sb,j3mod)                &
-                                    + AUXCC(a,b,k12)                      &
-                                       * shapeH3(2-deltak(a,3)*fa,i3mod)  &
-                                       * shapeH3(2-deltak(b,3)*fb,j3mod)
-!
-!                             ...Sum CE and EC terms
-                                 kk = nk(2*m1-1,2*m2)
-                                 GramP(kk) = GramP(kk)                    &
-                                    + AUXCE_zc(a,b,k12)                   &
-                                       * shapeH3(2-deltak(a,3)*fa,i3mod)  &
-                                       * shapeH3(sb,j3mod)                &
-                                    + AUXEC_zb(a,b,k12)                   &
-                                       * shapeH3(sa,i3mod)                &
-                                       * shapeH3(2-deltak(b,3)*fb,j3mod)
-!
-!                             ...Sum other CE and EC terms
-                                 if (m1.ne.m2) then
-                                    kk = nk(2*m1  ,2*m2-1)
-                                    GramP(kk) = GramP(kk)                    &
-                                       + AUXCE_zb(a,b,k12)                   &
-                                          * shapeH3(2-deltak(a,3)*fa,i3mod)  &
-                                          * shapeH3(sb,j3mod)                &
-                                       + AUXEC_zc(a,b,k12)                   &
-                                          * shapeH3(sa,i3mod)                &
-                                          * shapeH3(2-deltak(b,3)*fb,j3mod)
-                                 endif
-!
-!                             ...Sum EE_22 and CC_22 terms
-                                 kk = nk(2*m1  ,2*m2  )
-                                 GramP(kk) = GramP(kk)                    &
-                                    + AUXEE_zc(a,b,k12)                   &
-                                       * shapeH3(sa,i3mod)                &
-                                       * shapeH3(sb,j3mod)                &
-                                    + AUXCC(a,b,k12)                      &
-                                       * shapeH3(2-deltak(a,3)*fa,i3mod)  &
-                                       * shapeH3(2-deltak(b,3)*fb,j3mod)
-!                          ...end loop a
+!                             ...ik(e_z x F_i, curl F_j)
+!                             ...-ik(curl F_i, e_z x F_j)
+!                             ...k^2(e_z x F_i, e_z x F_j)
+                                 gramP(kk) = gramP(kk)                     &
+                                    + AUXCR(a,b,j12,i12)                   &
+                                       * shapeH3(2-deltak(a,3)*fa,i3mod)   &
+                                       * shapeH3(sb,j3mod)                 &
+                                    + AUXRC(a,b,j12,i12)                   &
+                                       * shapeH3(sa,i3mod)                 &
+                                       * shapeH3(2-deltak(b,3)*fb,j3mod)   &
+                                    + AUXRR(a,b,j12,i12)                   &
+                                       * shapeH3(sa,i3mod)                 &
+                                       * shapeH3(sb,j3mod)
                               enddo
-!                       ...end loop b
                            enddo
                         endif
+!
+!                    ...Sum EC and CE terms
+                        kk = nk(2*m1-1,2*m2)
+                        do b=1,3
+                           do a=1,3
+                              gramP(kk) = gramP(kk)                        &
+                                 + AUXCE_zc(a,b,j12,i12)                   &
+                                    * shapeH3(2-deltak(a,3)*fa,i3mod)      &
+                                    * shapeH3(sb,j3mod)                    &
+                                 + AUXEC_zb(a,b,j12,i12)                   &
+                                    * shapeH3(sa,i3mod)                    &
+                                    * shapeH3(2-deltak(b,3)*fb,j3mod)
+                           enddo
+                        enddo
+!                    ...Vectorial Envelope terms
+                        if (ENVELOPE) then
+                           do b=1,3
+                              do a=1,3
+!                             ...ik(iωε F_i, e_z x G_j)
+!                             ...ik(e_z x F_i, (iωμ)^* G_j)
+                                 gramP(kk) = gramP(kk)                     &
+                                    + AUXER_zb(a,b,j12,i12)                &
+                                       * shapeH3(sa,i3mod)                 &
+                                       * shapeH3(sb,j3mod)                 &
+                                    + AUXRE_zc(a,b,j12,i12)                &
+                                       * shapeH3(sa,i3mod)                 &
+                                       * shapeH3(sb,j3mod)
+                              enddo
+                           enddo
+                        endif
+!
+!                    ...Sum other CE and EC terms
+                        if (m1.ne.m2) then
+                           kk = nk(2*m1  ,2*m2-1)
+                           do b=1,3
+                              do a=1,3
+                                 gramP(kk) = gramP(kk)                     &
+                                    + AUXCE_zb(a,b,j12,i12)                &
+                                       * shapeH3(2-deltak(a,3)*fa,i3mod)   &
+                                       * shapeH3(sb,j3mod)                 &
+                                    + AUXEC_zc(a,b,j12,i12)                &
+                                       * shapeH3(sa,i3mod)                 &
+                                       * shapeH3(2-deltak(b,3)*fb,j3mod)
+                              enddo
+                           enddo
+!                       ...Vectorial Envelope terms
+                           if (ENVELOPE) then
+                              do b=1,3
+                                 do a=1,3
+!                                ...-ik (e_z x G_i, (iωε)^* F_j)
+!                                ...-ik (iωμ G_i, e_z x F_j)
+                                    gramP(kk) = gramP(kk)                  &
+                                       + AUXRE_zb(a,b,j12,i12)             &
+                                          * shapeH3(sa,i3mod)              &
+                                          * shapeH3(sb,j3mod)              &
+                                       + AUXER_zc(a,b,j12,i12)             &
+                                          * shapeH3(sa,i3mod)              &
+                                          * shapeH3(sb,j3mod)
+                                 enddo
+                              enddo
+                           endif
+                        endif
+!
+!                    ...Sum EE_22 and CC_22 terms
+                        kk = nk(2*m1  ,2*m2  )
+                        do b=1,3
+                           do a=1,3
+                              gramP(kk) = gramP(kk)                        &
+                                 + AUXEE_zc(a,b,j12,i12)                   &
+                                    * shapeH3(sa,i3mod)                    &
+                                    * shapeH3(sb,j3mod)                    &
+                                 + AUXCC(a,b,j12,i12)                      &
+                                    * shapeH3(2-deltak(a,3)*fa,i3mod)      &
+                                    * shapeH3(2-deltak(b,3)*fb,j3mod)
+                           enddo
+                        enddo
+!                    ...Vectorial Envelope terms
+                        if (ENVELOPE) then
+                           do b=1,3
+                              do a=1,3
+!                             ...ik(e_z x G_i, curl G_j)
+!                             ...-ik(curl G_i, e_z x G_j)
+!                             ...k^2(e_z x G_i, e_z x G_j)
+                                 gramP(kk) = gramP(kk)                     &
+                                    + AUXCR(a,b,j12,i12)                   &
+                                       * shapeH3(2-deltak(a,3)*fa,i3mod)   &
+                                       * shapeH3(sb,j3mod)                 &
+                                    + AUXRC(a,b,j12,i12)                   &
+                                       * shapeH3(sa,i3mod)                 &
+                                       * shapeH3(2-deltak(b,3)*fb,j3mod)   &
+                                    + AUXRR(a,b,j12,i12)                   &
+                                       * shapeH3(sa,i3mod)                 &
+                                       * shapeH3(sb,j3mod)
+                              enddo
+                           enddo
+                        endif
+!
                      endif
 !              ...end loop 2 over 2D test functions
                   enddo
@@ -736,6 +934,13 @@
    deallocate(AUXCC)
    deallocate(AUXEC_zb,AUXEC_zc)
    deallocate(AUXCE_zb,AUXCE_zc)
+!
+   if (ENVELOPE) then
+      deallocate(AUXRR)
+      deallocate(AUXRC, AUXCR)
+      deallocate(AUXER_zb,AUXER_zc)
+      deallocate(AUXRE_zb,AUXRE_zc)
+   endif
 !
 end subroutine elem_maxwell_gram_pris
 

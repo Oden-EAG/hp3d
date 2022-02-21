@@ -132,8 +132,8 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !..nrdof for interface only (without bubbles)
    integer :: nrdofEEi
 !
-!..H(curl) bubble index
-   integer, allocatable :: idxEE(:)
+!..H(curl) face dof maps
+   integer, allocatable :: idxEE(:), idxE(:)
 !
 !..element mdle node dof
    integer :: ndofHHmdl,ndofEEmdl,ndofVVmdl,ndofQQmdl
@@ -143,7 +143,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !
 !..Gram matrix in packed format
    !complex(8) :: gramP(NrTest*(NrTest+1)/2)
-   complex(8), allocatable :: gramP(:)
+   complex(8), allocatable :: gramP(:), Grfp(:)
    real(8) :: FF, CF, FC
    real(8) :: fldE(3), fldH(3), crlE(3), crlH(3)
    real(8) :: fldF(3), fldG(3), crlF(3), crlG(3)
@@ -195,12 +195,15 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !
 !..OMEGA_RATIO_SIGNAL or OMEGA_RATIO_PUMP
    real(8) :: OMEGA_RATIO_FLD
+!..WAVENUM_SIGNAL or WAVENUM_PUMP
+   real(8) :: WAVENUM_FLD
 !
 !..for PML
    VTYPE :: zbeta,zdbeta,zd2beta,detJstretch
    VTYPE, dimension(3,3) :: Jstretch,invJstretch,JJstretch
 !
 !..added to use fast integration
+!..Gram matrix aux arrays
    VTYPE, allocatable :: AUXEE_A_zb(:,:,:)    , AUXEE_A_zc(:,:,:)
    VTYPE, allocatable :: AUXEE_B_zb(:,:,:,:)  , AUXEE_B_zc(:,:,:,:)
    VTYPE, allocatable :: AUXCC_A(:,:,:,:,:)
@@ -209,14 +212,28 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    VTYPE, allocatable :: AUXCE_A_zb(:,:,:,:)  , AUXCE_A_zc(:,:,:,:)
    VTYPE, allocatable :: AUXEC_B_zb(:,:,:,:,:), AUXEC_B_zc(:,:,:,:,:)
    VTYPE, allocatable :: AUXCE_B_zb(:,:,:,:,:), AUXCE_B_zc(:,:,:,:,:)
-!
+!..Vectorial envelope Gram auxiliary arrays
+   VTYPE, allocatable :: AUXRR_A(:,:,:)
+   VTYPE, allocatable :: AUXRC_A(:,:,:,:)   , AUXCR_A(:,:,:,:)
+   VTYPE, allocatable :: AUXER_A_zb(:,:,:), AUXER_A_zc(:,:,:)
+   VTYPE, allocatable :: AUXRE_A_zb(:,:,:), AUXRE_A_zc(:,:,:)
+   VTYPE, allocatable :: AUXRR_B(:,:,:,:)
+   VTYPE, allocatable :: AUXRC_B(:,:,:,:,:)   , AUXCR_B(:,:,:,:,:)
+   VTYPE, allocatable :: AUXER_B_zb(:,:,:,:), AUXER_B_zc(:,:,:,:)
+   VTYPE, allocatable :: AUXRE_B_zb(:,:,:,:), AUXRE_B_zc(:,:,:,:)
+!..Stiffness matrix aux arrays
    VTYPE, allocatable :: STIFQE_A(:,:,:)
    VTYPE, allocatable :: STIFQE_B(:,:,:,:)
    VTYPE, allocatable :: STIFQE_ALPHA_A(:,:,:)
    VTYPE, allocatable :: STIFQE_ALPHA_B(:,:,:,:)
    VTYPE, allocatable :: STIFQC_A(:,:,:,:)
    VTYPE, allocatable :: STIFQC_B(:,:,:,:,:)
+!..Vectorial envelope Stiffness auxiliary arrays
+   VTYPE, allocatable :: STIFRE_A(:,:,:)
+   VTYPE, allocatable :: STIFRE_B(:,:,:,:)
+!
    VTYPE, allocatable :: LOADE_A(:,:)
+!..Forcing aux array
    VTYPE, allocatable :: LOADE_B(:,:,:)
 !
    integer :: a,b,sa,sb,sc,alph,beta
@@ -232,22 +249,33 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    real(8), dimension(MAXPP+1) :: wlocx,wlocy,wlocz
    real(8), dimension(3,MAXNINT3ADD) :: wloc3
    real(8), dimension(3) :: xip,dHdx,dHHdx
-   real(8), dimension(3,3) :: D_za,D_zc,D_aux,C,D
-   VTYPE  , dimension(3,3) :: Z_za,Z_zc,Z_aux
+!
+   real(8), dimension(3,3) :: D_za,D_zc,D_aux,D_aux2,C,D,D_RR
+   VTYPE,   dimension(3,3) :: Z_za,Z_zc,Z_aux,C_RC,D_ER_za,D_ER_zc,invJrot
+!
    real(8), dimension(MAXPP+1,2) :: shapH1,shapH2,shapH3
    real(8), dimension(MAXPP+1,MAXPP+1) :: sH2p,sH3p,dsH2p,dsH3p
 !
 !..timer
-!   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: MPI_Wtime,start_time,end_time
 !
    integer, dimension(3,3) :: deltak
+!
+   integer :: aa,NrdofEfc,jk
+   integer, dimension(3) :: offset
+   integer, dimension(3) :: ndofx,ndofy,ndofz
+   integer, dimension(2,2,6) :: xran,yran,zran
+   integer, dimension(2,6) :: fam
+   integer, dimension(6) :: NrdofEEFc
+   real(8), dimension(3,6) :: nfce
+
 !
 !..for Gram matrix compressed storage format
    integer :: nk
    nk(k1,k2) = (k2-1)*k2/2+k1
 !
 !..Identity/Kronecker delta tensor
-   deltak=ZERO
+   deltak=0
    do a=1,3
      deltak(a,a)=1
    enddo
@@ -322,12 +350,14 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    stiff_EE_T = ZERO
    stiff_EQ_T = ZERO
 !
-!..set OMEGA_RATIO_FLD
+!..set OMEGA_RATIO_FLD and WAVENUM_FLD
    select case(Fld_flag)
       case(0)
          OMEGA_RATIO_FLD = OMEGA_RATIO_PUMP
+         WAVENUM_FLD     = WAVENUM_PUMP
       case(1)
          OMEGA_RATIO_FLD = OMEGA_RATIO_SIGNAL ! 1.0d0
+         WAVENUM_FLD     = WAVENUM_SIGNAL
       case default
       write(*,*) 'elem_maxwell_fi_hexa: invalid Fld_flag param. stop.'
          stop
@@ -336,6 +366,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    Jstretch = ZERO
    Jstretch(1,1) = ZONE
    Jstretch(2,2) = ZONE
+   detJstretch = ZONE
 !
    invJstretch = ZERO
    invJstretch(1,1) = ZONE
@@ -353,9 +384,6 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    select case(GEOM_NO)
       case(1)
          bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
-      case(2,3)
-         write(*,*) 'elem_maxwell_fi_hexa: cannot have prism core geometry with fast integration. stop.'
-         stop
       case(4)
          bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
       case(5)
@@ -372,6 +400,9 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                write(*,*) 'elem_maxwell_fi_hexa: unexpected ndom param. stop.'
                stop
          end select
+      case default
+         write(*,*) 'elem_maxwell_fi_hexa: unexpected GEOM_NO: ', GEOM_NO, '. stop.'
+         stop
 !..end select case of GEOM_NO
    end select
 !
@@ -427,8 +458,37 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    allocate(STIFQE_ALPHA_B(3,3,nrdofQ2_tr*nrdofH2,nrdofQ3_tr*nrdofH3))
    allocate(STIFQC_A(2,3,3,nrdofQ3_tr*nrdofH3))
    allocate(STIFQC_B(2,3,3,nrdofQ2_tr*nrdofH2,nrdofQ3_tr*nrdofH3))
+!
    allocate(LOADE_A(3,nrdofH3))
    allocate(LOADE_B(3,nrdofH2,nrdofH3))
+!
+!
+   if (ENVELOPE) then
+      allocate(AUXRR_A(3,3,nrdofH3**2))
+      allocate(AUXRC_A(2,3,3,nrdofH3**2))
+      allocate(AUXCR_A(2,3,3,nrdofH3**2))
+      allocate(AUXER_A_zb(3,3,nrdofH3**2))
+      allocate(AUXER_A_zc(3,3,nrdofH3**2))
+      allocate(AUXRE_A_zb(3,3,nrdofH3**2))
+      allocate(AUXRE_A_zc(3,3,nrdofH3**2))
+!
+      allocate(AUXRR_B(3,3,nrdofH2**2,nrdofH3**2))
+      allocate(AUXRC_B(2,3,3,nrdofH2**2,nrdofH3**2))
+      allocate(AUXCR_B(2,3,3,nrdofH2**2,nrdofH3**2))
+      allocate(AUXER_B_zb(3,3,nrdofH2**2,nrdofH3**2))
+      allocate(AUXER_B_zc(3,3,nrdofH2**2,nrdofH3**2))
+      allocate(AUXRE_B_zb(3,3,nrdofH2**2,nrdofH3**2))
+      allocate(AUXRE_B_zc(3,3,nrdofH2**2,nrdofH3**2))
+!
+      allocate(STIFRE_A(3,3,nrdofQ3_tr*nrdofH3))
+      allocate(STIFRE_B(3,3,nrdofQ2_tr*nrdofH2,nrdofQ3_tr*nrdofH3))
+   endif
+!
+
+   offset = (/0, nord1*nrdofH2*nrdofH3, nord1*nrdofH2*nrdofH3 + nrdofH1*nord2*nrdofH3/)
+   ndofx = (/nord1,nrdofH1,nrdofH1/)
+   ndofy = (/nrdofH2,nord2,nrdofH2/)
+   ndofz = (/nrdofH3,nrdofH3,nord3/)
 !
 !............consistency check
 !-----------------------------------------------------------------------
@@ -470,7 +530,8 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !
    xip=ZERO
 !
-!..start timer
+!!..start timer
+!write(*,*) 'Hexa:'
 !   start_time = MPI_Wtime()
 !
 !..Loop over quadrature points in direction \xi_1
@@ -492,6 +553,16 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
       STIFQE_ALPHA_B = ZERO
       STIFQC_B       = ZERO
       LOADE_B        = ZERO
+!
+!  ...Initialize auxiliary matrices B: Vectorial Envelope
+      if (ENVELOPE) then
+         AUXRR_B    = ZERO;
+         AUXRC_B    = ZERO; AUXCR_B    = ZERO;
+         AUXER_B_zb = ZERO; AUXER_B_zc = ZERO;
+         AUXRE_B_zb = ZERO; AUXRE_B_zc = ZERO;
+!
+         STIFRE_B = ZERO;
+      endif
 !
 !  ...loop over quadrature points in direction \xi_2
       do py=1,ninty
@@ -518,6 +589,16 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
          STIFQE_ALPHA_A = ZERO
          STIFQC_A       = ZERO
          LOADE_A        = ZERO
+!
+!     ...Initialize auxiliary matrices A: Vectorial Envelope
+         if (ENVELOPE) then
+            AUXRR_A    = ZERO;
+            AUXRC_A    = ZERO; AUXCR_A    = ZERO;
+            AUXER_A_zb = ZERO; AUXER_A_zc = ZERO;
+            AUXRE_A_zb = ZERO; AUXRE_A_zc = ZERO;
+!
+            STIFRE_A = ZERO;
+         endif
 !
 !     ...loop over quadrature points in direction \xi_3
          do pz=1,nintz
@@ -624,6 +705,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                JJstretch(1,1) = ZONE
                JJstretch(2,2) = ZONE
                JJstretch(3,3) = ZONE
+               detJstretch    = ZONE
             else
 !           ...get PML function
                call get_Beta(x,Fld_flag, zbeta,zdbeta,zd2beta)
@@ -711,6 +793,42 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
             call ZGEMM('N','N',3,3,3,ZONE,ZONE*dxidx ,3,     Z_aux,3,ZERO,Z_zc ,3)
 !        ...Z_zb = conjg(transpose(Z_za)) = J^T * zaJ * J^-T
 !        ...Z_zd = conjg(transpose(Z_zc)) = J^T * zcJ * J^-T
+!
+            if (ENVELOPE) then
+!           ...(e_z x J^-T)^* (e_z x J^-T) = J^-1 (I - e_z x e_z) J^-T
+!              (note we have 2 instead of 3 below, only using first 2 cols)
+               call DGEMM('N','T',3,3,2,1.0d0,dxidx,3,dxidx,3,0.0d0,D_aux,3)
+               D_RR = D_aux * (WAVENUM_FLD*abs(detJstretch))**2 * weighthh
+!
+!           ...Note for C_RC, and both D_ER we don't multiply by ZI yet
+!              this way it's easier to take conjugate of Jacobian factor
+!           ...J^T e_z x J^-T = -(e_z x J)^T J^-T
+               D_aux(1,1:3) = -dxdxi(2,1:3)
+               D_aux(2,1:3) = dxdxi(1,1:3)
+               D_aux(3,1:3) = 0.d0
+               call DGEMM('T','T',3,3,3,1.0d0,D_aux,3,dxidx,3,0.0d0,D_aux2,3)
+               C_RC = D_aux2 * WAVENUM_FLD*conjg(detJstretch) * wt123
+!
+!           ...D_ER_za = J^-1 e_z x zaJ J^-T
+               Z_aux(1:3,1) = zaJ(1,1) * dxidx(1:3,2)
+               Z_aux(1:3,2) = -zaJ(2,2) * dxidx(1:3,1)
+               Z_aux(1:3,3) = ZERO
+               call ZGEMM('N','T',3,3,3,ZONE,Z_aux,3,ZONE*dxidx,3,ZERO,D_ER_za,3)
+               D_ER_za = D_ER_za * WAVENUM_FLD*conjg(detJstretch) * weighthh
+!
+!           ...D_ER_zc = J^-1 e_z x zcJ J^-T
+               Z_aux(1:3,1) = zcJ(1,1) * dxidx(1:3,2)
+               Z_aux(1:3,2) = -zcJ(2,2) * dxidx(1:3,1)
+               Z_aux(1:3,3) = ZERO
+               call ZGEMM('N','T',3,3,3,ZONE,Z_aux,3,ZONE*dxidx,3,ZERO,D_ER_zc,3)
+               D_ER_zc = D_ER_zc * WAVENUM_FLD*conjg(detJstretch) * weighthh
+!
+!           ...e_z x J^-T
+               invJrot(1,1:3) = -ZONE*dxidx(1:3,2)
+               invJrot(2,1:3) = ZONE*dxidx(1:3,1)
+               invJrot(3,1:3) = ZERO
+               invJrot = invJrot * ZI*WAVENUM_FLD*detJstretch * wt123
+            endif
 !
 !        ...put appropriate quadrature weight on Jacobian and its inverse
             dxdxi = dxdxi * weightvv
@@ -830,6 +948,81 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                      enddo
 !                 ...loop over a ends
                   enddo
+!
+                  if (ENVELOPE) then
+                  do a=1,3
+                     do b=a,3
+                        sb=1+deltak(b,3)
+                        sa=1+deltak(a,3)
+                        idxb=j3+deltak(b,3)
+                        idxa=i3+deltak(a,3)
+!
+!                    ...we need to check that idxb, idxa don't exceed dimension of
+!                       1D H1 enriched test space
+                        if ((idxb.le.nrdofH3).and.(idxa.le.nrdofH3)) then
+
+!                       ...k^2(e_z x F_i, e_z x F_j)
+                           AUXRR_A(b,a,k3) = AUXRR_A(b,a,k3)            &
+                                             + D_RR(a,b)                &
+                                             * shapH3(idxa,sa)          &
+                                             * shapH3(idxb,sb)
+!
+!                       ...ik(iωε F_i, e_z x G_j)
+                           AUXER_A_zb(b,a,k3) = AUXER_A_zb(b,a,k3)      &
+                                             + ZI*D_ER_za(a,b)          &
+                                             * shapH3(idxa,sa)          &
+                                             * shapH3(idxb,sb)
+!
+!                       ...-ik (iωμ G_i, e_z x F_j)
+                           AUXER_A_zc(b,a,k3) = AUXER_A_zc(b,a,k3)      &
+                                             - ZI*D_ER_zc(a,b)          &
+                                             * shapH3(idxa,sa)          &
+                                             * shapH3(idxb,sb)
+!
+!                       ...-ik (e_z x G_i, (iωε)^* F_j)
+                           AUXRE_A_zb(b,a,k3) = AUXRE_A_zb(b,a,k3)      &
+                                             - ZI*conjg(D_ER_za(b,a))   &
+                                             * shapH3(idxa,sa)          &
+                                             * shapH3(idxb,sb)
+!
+!                       ...ik(e_z x F_i, (iωμ)^* G_j)
+                           AUXRE_A_zc(b,a,k3) = AUXRE_A_zc(b,a,k3)      &
+                                             + ZI*conjg(D_ER_zc(b,a))   &
+                                             * shapH3(idxa,sa)          &
+                                             * shapH3(idxb,sb)
+!
+!                       ...ik(e_z x F_i, curl F_j)
+                           do alph=1,2
+                              idxalph=mod(a+alph-1,3)+1
+                              sb=1+deltak(b,3)
+                              sa=1+1-deltak(idxalph,3)
+!
+                              AUXRC_A(alph,b,a,k3) = AUXRC_A(alph,b,a,k3)  &
+                                                   + ZI*C_RC(idxalph,b)    &
+                                                   * shapH3(idxa,sa)       &
+                                                   * shapH3(idxb,sb)       &
+                                                   * (-1)**(alph-1)
+                           enddo
+!
+!                       ...-ik(curl F_i, e_z x F_j)
+                           do beta=1,2
+                              idxbeta=mod(b+beta-1,3)+1
+                              sb=1+1-deltak(idxbeta,3)
+                              sa=1+deltak(a,3)
+!
+                              AUXCR_A(beta,b,a,k3) = AUXCR_A(beta,b,a,k3)     &
+                                                   - ZI*conjg(C_RC(idxbeta,a))&
+                                                   * shapH3(idxa,sa)          &
+                                                   * shapH3(idxb,sb)          &
+                                                   * (-1)**(beta-1)
+                           enddo
+                        endif
+!                    ...loop over b ends
+                     enddo
+!                 ...loop over a ends
+                  enddo
+!              ...Envelope terms
+                  endif
 !              ...loop over j3 ends
                enddo
 !           ...loop over i3 ends
@@ -873,6 +1066,16 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                                                     + shapH3(j3+1,2)*dxdxi(b,idxalph) &
                                                     * (-1)**(alph-1)*shapH3(idxa,sa)
                            enddo
+!
+!                       ...Vectorial Envelope Terms
+                           if (ENVELOPE) then
+                              sa=1+deltak(a,3)
+!                          ...-ik(e_z x H,F), where e_z x H = (-H_y,H_x,0), or
+!                          ...+ik(H,e_z x F), where e_z x F = (-F_y,F_x,0)
+                              STIFRE_A(a,b,k3) = STIFRE_A(a,b,k3)                &
+                                               + invJrot(b,a)                    &
+                                               * shapH3(j3+1,2)*shapH3(idxa,sa)
+                           endif
                         endif
 !                    ...loop over a ends
                      enddo
@@ -981,6 +1184,72 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                         enddo
 !                    ...loop over a ends
                      enddo
+!
+                     if (ENVELOPE) then
+                     do a=1,3
+                        do b=a,3
+!                       ...determine indices for shape functions
+                           sb=1+deltak(b,2)
+                           sa=1+deltak(a,2)
+                           idxb=j2+deltak(b,2)
+                           idxa=i2+deltak(a,2)
+!                       ...check that dimensions are not surpassed by idxa,idxb
+                           if((idxb.le.nrdofH2).and.(idxa.le.nrdofH2)) then
+!                          ...k^2(e_z x F_i, e_z x F_j)
+                              AUXRR_B(b,a,k2,k3) = AUXRR_B(b,a,k2,k3)       &
+                                                    + shapH2(idxa,sa)       &
+                                                    * shapH2(idxb,sb)       &
+                                                    * AUXRR_A(b,a,k3)
+!
+!                          ...ik(iωε F_i, e_z x G_j)
+                              AUXER_B_zb(b,a,k2,k3) = AUXER_B_zb(b,a,k2,k3) &
+                                                    + shapH2(idxa,sa)       &
+                                                    * shapH2(idxb,sb)       &
+                                                    * AUXER_A_zb(b,a,k3)
+!                          ...-ik (iωμ G_i, e_z x F_j)
+                              AUXER_B_zc(b,a,k2,k3) = AUXER_B_zc(b,a,k2,k3) &
+                                                    + shapH2(idxa,sa)       &
+                                                    * shapH2(idxb,sb)       &
+                                                    * AUXER_A_zc(b,a,k3)
+!
+!                          ...-ik (e_z x G_i, (iωε)^* F_j)
+                              AUXRE_B_zb(b,a,k2,k3) = AUXRE_B_zb(b,a,k2,k3) &
+                                                    + shapH2(idxa,sa)       &
+                                                    * shapH2(idxb,sb)       &
+                                                    * AUXRE_A_zb(b,a,k3)
+!                          ...ik(e_z x F_i, (iωμ)^* G_j)
+                              AUXRE_B_zc(b,a,k2,k3) = AUXRE_B_zc(b,a,k2,k3) &
+                                                    + shapH2(idxa,sa)       &
+                                                    * shapH2(idxb,sb)       &
+                                                    * AUXRE_A_zc(b,a,k3)
+!
+!                          ...ik(e_z x F_i, curl F_j)
+                              do alph=1,2
+                                 idxalph=mod(a+alph-1,3)+1
+                                 sb=1+deltak(b,2)
+                                 sa=1+1-deltak(idxalph,2)
+                                 AUXRC_B(alph,b,a,k2,k3) =                 &
+                                        AUXRC_B(alph,b,a,k2,k3)            &
+                                      + shapH2(idxa,sa)*shapH2(idxb,sb)    &
+                                      * AUXRC_A(alph,b,a,k3)
+                              enddo
+!                          ...-ik(curl F_i, e_z x F_j)
+                              do beta=1,2
+                                 idxbeta=mod(b+beta-1,3)+1
+                                 sb=1+1-deltak(idxbeta,2)
+                                 sa=1+deltak(a,2)
+                                 AUXCR_B(beta,b,a,k2,k3) =                 &
+                                        AUXCR_B(beta,b,a,k2,k3)            &
+                                      + shapH2(idxa,sa)*shapH2(idxb,sb)    &
+                                      * AUXCR_A(beta,b,a,k3)
+                              enddo
+                           endif
+!                       ...loop over b ends
+                        enddo
+!                    ...loop over a ends
+                     enddo
+!                    ...Envelope terms
+                     endif
 !                 ...loop over j2 ends
                   enddo
 !              ...loop over i2 ends
@@ -1022,6 +1291,16 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                                                           * shapH2(idxa,sa)            &
                                                           * STIFQC_A(alph,a,b,k3)
                               enddo
+!
+                              if (ENVELOPE) then
+                                 sa=1+deltak(a,2)
+!                             ...-ik(e_z x H,F), where e_z x H = (-H_y,H_x,0), or
+!                             ...+ik(H,e_z x F), where e_z x F = (-F_y,F_x,0)
+                                 STIFRE_B(a,b,k2,k3) = STIFRE_B(a,b,k2,k3)    &
+                                                     + shapH2(j2+1,2)         &
+                                                     * shapH2(idxa,sa)        &
+                                                     * STIFRE_A(a,b,k3)
+                              endif
                            endif
                         enddo
                      enddo
@@ -1115,8 +1394,34 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                                                     + shapH1(idxa,sa)    &
                                                     * shapH1(idxb,sb)    &
                                                     * AUXCC_B(alph,beta,b,a,k2,k3)
-
                                        enddo; enddo
+                                       if (ENVELOPE) then
+                                          sa=1+deltak(a,1)
+                                          sb=1+deltak(b,1)
+!                                      ...k^2(e_z x F_i, e_z x F_j)
+                                          gramP(kk) = gramP(kk)         &
+                                                    + shapH1(idxa,sa)   &
+                                                    * shapH1(idxb,sb)   &
+                                                    * AUXRR_B(b,a,k2,k3)
+!                                      ...-ik(curl F_i, e_z x F_j)
+                                          do alph=1,2
+                                             idxalph=mod(a+alph-1,3)+1
+                                             sb=1+deltak(b,1)
+                                             sa=1+1-deltak(idxalph,1)
+                                             gramP(kk) = gramP(kk)                   &
+                                                       + AUXRC_B(alph,b,a,k2,k3)  &
+                                                       * shapH1(idxa,sa)*shapH1(idxb,sb)
+                                          enddo
+!                                      ...ik(e_z x F_i, curl F_j)
+                                          do beta=1,2
+                                             idxbeta=mod(b+beta-1,3)+1
+                                             sb=1+1-deltak(idxbeta,1)
+                                             sa=1+deltak(a,1)
+                                             gramP(kk) = gramP(kk)                     &
+                                                       + AUXCR_B(beta,b,a,k2,k3)    &
+                                                       * shapH1(idxa,sa)*shapH1(idxb,sb)
+                                          enddo
+                                       endif
 
                                        kk = nk(2*m1-1,2*m2)
 !                                   ...sum CE terms
@@ -1137,6 +1442,21 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                                                     + AUXEC_B_zb(beta,b,a,k2,k3)    &
                                                     * shapH1(idxa,sa)*shapH1(idxb,sb)
                                        enddo
+                                       if (ENVELOPE) then
+                                          sa=1+deltak(a,1)
+                                          sb=1+deltak(b,1)
+!                                      ...ik(iωε F_i, e_z x G_j)
+                                          gramP(kk) = gramP(kk)         &
+                                                    + shapH1(idxa,sa)   &
+                                                    * shapH1(idxb,sb)   &
+                                                    * AUXER_B_zb(b,a,k2,k3)
+!                                      ...ik(e_z x F_i, (iωμ)^* G_j)
+                                          gramP(kk) = gramP(kk)         &
+                                                    + shapH1(idxa,sa)   &
+                                                    * shapH1(idxb,sb)   &
+                                                    * AUXRE_B_zc(b,a,k2,k3)
+                                       endif
+
 
                                        if (m1.ne.m2) then
 
@@ -1159,9 +1479,22 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                                                        + AUXEC_B_zc(beta,b,a,k2,k3)  &
                                                        * shapH1(idxa,sa)*shapH1(idxb,sb)
                                           enddo
-
+                                          if (ENVELOPE) then
+                                             sa=1+deltak(a,1)
+                                             sb=1+deltak(b,1)
+!                                         ...-ik (e_z x G_i, (iωε)^* F_j)
+                                             gramP(kk) = gramP(kk)         &
+                                                       + shapH1(idxa,sa)   &
+                                                       * shapH1(idxb,sb)   &
+                                                       * AUXRE_B_zb(b,a,k2,k3)
+!                                         ...-ik (iωμ G_i, e_z x F_j)
+                                             gramP(kk) = gramP(kk)         &
+                                                       + shapH1(idxa,sa)   &
+                                                       * shapH1(idxb,sb)   &
+                                                       * AUXER_B_zc(b,a,k2,k3)
+                                          endif
                                        endif
-
+!
                                        kk = nk(2*m1  ,2*m2  )
 !                                   ...sum EE terms
                                        sb=1+deltak(b,1)
@@ -1182,6 +1515,34 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                                                     * AUXCC_B(alph,beta,b,a,k2,k3)
 
                                        enddo; enddo
+!
+                                       if (ENVELOPE) then
+                                          sa=1+deltak(a,1)
+                                          sb=1+deltak(b,1)
+!                                      ...k^2(e_z x G_i, e_z x G_j)
+                                          gramP(kk) = gramP(kk)         &
+                                                    + shapH1(idxa,sa)   &
+                                                    * shapH1(idxb,sb)   &
+                                                    * AUXRR_B(b,a,k2,k3)
+!                                      ...-ik(curl G_i, e_z x G_j)
+                                          do alph=1,2
+                                             idxalph=mod(a+alph-1,3)+1
+                                             sb=1+deltak(b,1)
+                                             sa=1+1-deltak(idxalph,1)
+                                             gramP(kk) = gramP(kk)                   &
+                                                       + AUXRC_B(alph,b,a,k2,k3)  &
+                                                       * shapH1(idxa,sa)*shapH1(idxb,sb)
+                                          enddo
+!                                      ...ik(e_z x G_i, curl G_j)
+                                          do beta=1,2
+                                             idxbeta=mod(b+beta-1,3)+1
+                                             sb=1+1-deltak(idxbeta,1)
+                                             sa=1+deltak(a,1)
+                                             gramP(kk) = gramP(kk)                     &
+                                                       + AUXCR_B(beta,b,a,k2,k3)    &
+                                                       * shapH1(idxa,sa)*shapH1(idxb,sb)
+                                          enddo
+                                       endif
                                      endif
                                  endif
                               enddo
@@ -1229,7 +1590,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                               end select
 !                          ...loop over vector components of L2 trial functions
                               do b=1,3
-                                 k = (m2-1)*6 + 3+ b
+                                 k = (m2-1)*6 + 3 + b
 !                             ...accumulate QC term
                                  do alph=1,2
                                     idxalph=mod(a+alph-1,3)+1
@@ -1246,7 +1607,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                                  stiff_EQ_T(k,2*m1-1) = stiff_EQ_T(k,2*m1-1) &
                                                    +shapH1(idxa,sa)*shapH1(j1+1,2) &
                                                    *STIFQE_ALPHA_B(a,b,k2,k3)
-                                 k = (m2-1)*6 + 3+ b
+                                 k = (m2-1)*6 + 3 + b
 !                             ...accumulate QE term
                                  stiff_EQ_T(k,2*m1) = stiff_EQ_T(k,2*m1) &
                                                    +shapH1(idxa,sa)*shapH1(j1+1,2) &
@@ -1260,6 +1621,22 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                                                       + shapH1(idxa,sa)*shapH1(j1+1,2) &
                                                       * STIFQC_B(alph,a,b,k2,k3)
                                  enddo
+!
+                                 if (ENVELOPE) then
+                                    sa=1+deltak(a,1)
+!                                ...-ik(e_z x H,F), where e_z x H = (-H_y,H_x,0), or
+!                                ...+ik(H,e_z x F), where e_z x F = (-F_y,F_x,0)
+                                    k = (m2-1)*6 + 3 + b
+                                    stiff_EQ_T(k,2*m1-1) = stiff_EQ_T(k,2*m1-1) &
+                                                      +shapH1(idxa,sa)*shapH1(j1+1,2) &
+                                                      *STIFRE_B(a,b,k2,k3)
+!                                ...-ik(e_z x E,G), where e_z x E = (-E_y,E_x,0), or
+!                                ...+ik(E,e_z x G), where e_z x G = (-G_y,G_x,0)
+                                    k = (m2-1)*6 + b
+                                    stiff_EQ_T(k,2*m1) = stiff_EQ_T(k,2*m1) &
+                                                      +shapH1(idxa,sa)*shapH1(j1+1,2) &
+                                                      *STIFRE_B(a,b,k2,k3)
+                                 endif
                               enddo
                            endif
                         enddo
@@ -1307,14 +1684,14 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !  ...loop over px ends
    enddo
 !
-!..end timer
+!!..end timer
+!write(*,*) 'Interior:'
 !   end_time = MPI_Wtime()
 !   !$OMP CRITICAL
-!      !write(*,10) etype, end_time-start_time
 !      write(*,11) end_time-start_time
-!! 10   format(A,' elem : ',f12.5,'  seconds')
-! 11   format(f12.5)
 !   !$OMP END CRITICAL
+!11   format(f12.5)
+!start_time = MPI_Wtime()
 !
    deallocate(AUXEE_A_zb,AUXEE_A_zc)
    deallocate(AUXEE_B_zb,AUXEE_B_zc)
@@ -1324,6 +1701,20 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    deallocate(AUXEC_B_zb,AUXEC_B_zc)
    deallocate(AUXCE_A_zb,AUXCE_A_zc)
    deallocate(AUXCE_B_zb,AUXCE_B_zc)
+!
+   if (ENVELOPE) then
+      deallocate(AUXRR_A)
+      deallocate(AUXRC_A,AUXCR_A)
+      deallocate(AUXER_A_zb,AUXER_A_zc)
+      deallocate(AUXRE_A_zb,AUXRE_A_zc)
+!
+      deallocate(AUXRR_B)
+      deallocate(AUXRC_B,AUXCR_B)
+      deallocate(AUXER_B_zb,AUXER_B_zc)
+      deallocate(AUXRE_B_zb,AUXRE_B_zc)
+!
+      deallocate(STIFRE_A,STIFRE_B)
+   endif
 !
    deallocate(STIFQE_A)
    deallocate(STIFQE_B)
@@ -1340,49 +1731,57 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-!..compute index array to skip bubble shape functions in interface variable
-!..find ndof associated with the mdle node of the element
+!..Get families that contribute to each face (two families per face)
+!              face:  1    2    3    4    5    6
+   fam  = reshape((/ 1,2, 1,2, 1,3, 2,3, 1,3, 2,3 /), (/2,6/))
 !
-   call ndof_nod(etype,nordP, ndofHHmdl,ndofEEmdl,ndofVVmdl,ndofQQmdl)
+!..Range of x component for each family and face
+!                    family 1       family 2
+   xran = reshape((/ 1,nord1,       1,nrdofH1,     & ! face 1
+                     1,nord1,       1,nrdofH1,     & ! face 2
+                     1,nord1,       1,nrdofH1,     & ! face 3
+                     2,2,           2,2,           & ! face 4
+                     1,nord1,       1,nrdofH1,     & ! face 5
+                     1,1,           1,1 /),        & ! face 6
+                  (/2,2,6/))
 !
-   nrdofEEi = NrdofEE-ndofEEmdl
+!..Range of y component for each family and face
+!                    family 1       family 2
+   yran = reshape((/ 1,nrdofH2,     1,nord2,       & ! face 1
+                     1,nrdofH2,     1,nord2,       & ! face 2
+                     1,1,           1,1,           & ! face 3
+                     1,nord2,       1,nrdofH2,     & ! face 4
+                     2,2,           2,2,           & ! face 5
+                     1,nord2,       1,nrdofH2 /),  & ! face 6
+                  (/2,2,6/))
 !
-   allocate(idxEE(nrdofEEi))
-   ik = 0
-   do i3 = 1,nrdofH3
-      do i2 = 1,nrdofH2
-         do i1 = 1,nord1
-            if (i2 .lt.3 .or. i3 .lt.3) then
-               ik = ik + 1
-               m1 = i1+nord1*(i2-1) + nord1*nrdofH2*(i3-1)
-               idxEE(ik) = m1
-            endif
-         enddo
-      enddo
-   enddo
-   do i3 = 1,nrdofH3
-      do i2 = 1,nord2
-         do i1 = 1,nrdofH1
-            if (i1 .lt.3 .or. i3 .lt.3) then
-               ik = ik + 1
-               m1 = nord1*nrdofH2*nrdofH3 + i1 + nrdofH1*(i2-1) + nrdofH1*nord2*(i3-1)
-               idxEE(ik) = m1
-            endif
-         enddo
-      enddo
-   enddo
-   do i3 = 1,nord3
-      do i2 = 1,nrdofH2
-         do i1 = 1,nrdofH1
-            if (i1 .lt.3 .or. i2 .lt.3) then
-               ik = ik + 1
-               m1 = nrdofH1*nord2*nrdofH3 + nord1*nrdofH2*nrdofH3   &
-                  + i1+nrdofH1*(i2-1)+nrdofH1*nrdofH2*(i3-1)
-               idxEE(ik) = m1
-            endif
-         enddo
-      enddo
-   enddo
+!..Range of z component for each family and face
+!                    family 1       family 2
+   zran = reshape((/ 1,1,           1,1,           & ! face 1
+                     2,2,           2,2,           & ! face 2
+                     1,nrdofH3,     1,nord3,       & ! face 3
+                     1,nrdofH3,     1,nord3,       & ! face 4
+                     1,nrdofH3,     1,nord3,       & ! face 5
+                     1,nrdofH3,     1,nord3 /),    & ! face 6
+                  (/2,2,6/))
+!
+!..Get number of dofs on each face
+!              family 1        family 2
+   NrdofEEFc = (/ nord1*nrdofH2 + nrdofH1*nord2,   & ! face 1
+                  nord1*nrdofH2 + nrdofH1*nord2,   & ! face 2
+                  nord1*nrdofH3 + nrdofH1*nord3,   & ! face 3
+                  nord2*nrdofH3 + nrdofH2*nord3,   & ! face 4
+                  nord1*nrdofH3 + nrdofH1*nord3,   & ! face 5
+                  nord2*nrdofH3 + nrdofH2*nord3 /)   ! face 6
+!
+!..Face normals
+   nfce = reshape((/  0.d0,  0.d0, -1.d0,          & ! face 1
+                      0.d0,  0.d0,  1.d0,          & ! face 2
+                      0.d0, -1.d0,  0.d0,          & ! face 3
+                      1.d0,  0.d0,  0.d0,          & ! face 4
+                      0.d0,  1.d0,  0.d0,          & ! face 5
+                     -1.d0,  0.d0,  0.d0  /),      & ! face 6
+                  (/3,6/))
 !
 !..loop through element faces
    do ifc=1,nrf
@@ -1401,6 +1800,41 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
       call set_2D_int_DPG(ftype,norderf,norient_face(ifc), nint,tloc,wtloc)
       INTEGRATION = 0
 !
+!  ...Get index of (broken) face degrees of freedom in global array
+      allocate(idxEE(NrdofEEFc(ifc)))
+      ik = 0
+      do aa=1,2
+         a = fam(aa,ifc)
+         do i3=zran(1,aa,ifc),zran(2,aa,ifc)
+            do i2=yran(1,aa,ifc),yran(2,aa,ifc)
+               do i1=xran(1,aa,ifc),xran(2,aa,ifc)
+                  ik = ik + 1
+                  idxEE(ik) = offset(a) + i1 + ndofx(a)*(i2-1) + ndofx(a)*ndofy(a)*(i3-1)
+               enddo
+            enddo
+         enddo
+      enddo
+!
+!  ...Get index of (continuous) face degrees of freedom in global array
+!     here we just sample to find DoFs on face, could do this above as well
+      t(1:2) = (/0.42069, 0.31249/)
+      call face_param(etype,ifc,t, xi,dxidt)
+!
+      call shape3DE(etype,xi,norderi,norient_edge,norient_face, nrdof,shapE,curlE)
+!
+      allocate(idxE(NrdofEi))
+      ik = 0
+      do i=1,NrdofEi
+         call cross_product(nfce(:,ifc),shapE(:,i), rntimesE)
+         if (    rntimesE(1)*rntimesE(1)    &
+               + rntimesE(2)*rntimesE(2)    &
+               + rntimesE(3)*rntimesE(3) .ge. 1e-14) then
+            ik = ik+1
+            idxE(ik) = i
+         endif
+      enddo
+      NrdofEfc = ik
+!
 !  ...loop through integration points
       do l=1,nint
 !
@@ -1410,7 +1844,6 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !     ...face parametrization
          call face_param(etype,ifc,t, xi,dxidt)
 !
-!     ...determine discontinuous Hcurl shape functions
          call shape3EE(etype,xi,nordP, nrdof,shapEE,curlEE)
 #if DEBUG_MODE
          if (nrdof .ne. NrdofEE) then
@@ -1446,7 +1879,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
          weight = bjac*wtloc(l)
 
 !     ...loop through Hcurl enriched test functions
-         do ik=1,nrdofEEi
+         do ik=1,NrdofEEfc(ifc)
          !do k1=1,nrdofEE
             k1 = idxEE(ik)
             E1(1:3) = shapEE(1,k1)*dxidx(1,1:3) &
@@ -1466,7 +1899,8 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !        ...end if for impedance BC
             endif
 !        ...loop through H(curl) trial functions
-            do k2=1,NrdofEi
+            do jk=1,NrdofEfc
+               k2 = idxE(jk)
                E2(1:3) = shapE(1,k2)*dxidx(1,1:3) &
                        + shapE(2,k2)*dxidx(2,1:3) &
                        + shapE(3,k2)*dxidx(3,1:3)
@@ -1503,10 +1937,19 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
          enddo
 !  ...end loop through integration points
       enddo
+!
+      deallocate(idxEE,idxE)
+!
 !..end loop through faces
    enddo
 !
-   deallocate(idxEE)
+!write(*,*) 'Boundary:'
+!end_time = MPI_Wtime()
+!!$OMP CRITICAL
+!   write(*,11) end_time-start_time
+!!$OMP END CRITICAL
+!start_time = MPI_Wtime()
+!
 !
 !----------------------------------------------------------------------
 !      Construction of the DPG system
@@ -1523,21 +1966,33 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !
    deallocate(stiff_EE_T,stiff_EQ_T)
 !
+!..Convert Gram matrix from packed to RFP format (same storage cost
+!  but RFP can use BLAS3 so is faster)
+   allocate(Grfp(NrTest*(Nrtest+1)/2))
+   call ZTPTTF('N','U',NrTest,gramP,Grfp,info)
+   deallocate(gramP)
+!
 !..A. Compute Cholesky factorization of Gram Matrix, G=U^*U (=LL^*)
-   call ZPPTRF('U',NrTest,gramP,info)
+!   call ZPPTRF('U',NrTest,gramP,info)
+!   if (info.ne.0) then
+!      write(*,*) 'elem_maxwell_fi_hexa: ZPPTRF: Mdle,info = ',Mdle,info,'. stop.'
+!      stop
+!   endif
+   call ZPFTRF('N','U',NrTest,Grfp,info)
    if (info.ne.0) then
-      write(*,*) 'elem_maxwell_fi_hexa: ZPPTRF: Mdle,info = ',Mdle,info,'. stop.'
+      write(*,*) 'elem_maxwell_fi_hexa: ZPFTRF: Mdle,info = ',Mdle,info,'. stop.'
       stop
    endif
 !
 !..B. Solve triangular system to obtain B~, (LX=) U^*X = [B|l]
-   call ZTPTRS('U','C','N',NrTest,NrTrial+1,gramP,stiff_ALL,NrTest,info)
-   if (info.ne.0) then
-      write(*,*) 'elem_maxwell_fi_hexa: ZTPTRS: Mdle,info = ',Mdle,info,'. stop.'
-      stop
-   endif
+!   call ZTPTRS('U','C','N',NrTest,NrTrial+1,gramP,stiff_ALL,NrTest,info)
+!   if (info.ne.0) then
+!      write(*,*) 'elem_maxwell_fi_hexa: ZTPTRS: Mdle,info = ',Mdle,info,'. stop.'
+!      stop
+!   endif
+   call ZTFSM('N','L','U','C','N',NrTest,NrTrial+1,ZONE,Grfp,stiff_ALL,NrTest)
 !
-   deallocate(gramP)
+   deallocate(Grfp)
    allocate(zaloc(NrTrial+1,NrTrial+1)); zaloc = ZERO
 !
 !..C. Matrix multiply: B^* G^-1 B (=B~^* B~)
@@ -1549,6 +2004,12 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    do i=1,NrTrial
       zaloc(i+1:NrTrial+1,i) = conjg(zaloc(i,i+1:NrTrial+1))
    enddo
+!
+!write(*,*) 'LA:'
+!end_time = MPI_Wtime()
+!!$OMP CRITICAL
+!   write(*,11) end_time-start_time
+!!$OMP END CRITICAL
 !
 !..E. Fill ALOC and BLOC matrices
    ZblocE(1:j1) = zaloc(1:j1,j1+j2+1)
@@ -1571,4 +2032,3 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                                       norder,norderi, ZblocE,ZalocEE)
 !
 end subroutine elem_maxwell_fi_hexa
-
