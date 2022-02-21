@@ -131,7 +131,7 @@ subroutine break(Mdle,Kref)
                      call nodbreak(Son(nod,is),kref_face,iact)
                   enddo
 !              ...break edge node
-                  call nodbreak(Son(nod,3),kref_edge,iact)
+                  call nodbreak(Son(nod,3),1,iact)
                end select
             end select
          endif
