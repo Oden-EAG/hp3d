@@ -347,7 +347,10 @@ subroutine update_gdof()
       enddo
       nod = nod_glb(i)
       call find_ndof(nod, ndofH,ndofE,ndofV,ndofQ)
-      if (ndofH .eq. 0) cycle
+      if (ndofH .eq. 0) then
+         NODES(nod)%geom_interf = 1
+         cycle
+      endif
       count = 3*ndofH
 !  ...check whether supplier
       if (src .eq. RANK) then
