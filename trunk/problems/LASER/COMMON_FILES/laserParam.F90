@@ -21,6 +21,7 @@ module laserParam
 !
 !..pump power if using plane wave pump with no depletion or ODE model
    real(8) :: PLANE_PUMP_POWER
+   real(8), allocatable :: PUMP_VAL(:)
 !
 !..HEAT FLAG = 0
 !  ...NONLINEAR_FLAG = 0, Linear Maxwell
@@ -28,6 +29,10 @@ module laserParam
 !..HEAT_FLAG = 1
 !  ...NONLINEAR_FLAG = 0, Linear Heat
 !  ...               = 1, Coupled Heat/Maxwell
+!
+!..PLANE_PUMP = 0: Solve for vectorial pump field
+!             = 1: Assume pump field is constant plane wave
+!             = 2: Model pump plane wave by ODE in z-direction
 !
 !..number of heat steps, step size, and max time
    integer :: NSTEPS
