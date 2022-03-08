@@ -1013,6 +1013,8 @@
                                                     * AUXCC_B(alph,beta,b,a,k2,k3)
                                        enddo; enddo
                                        if (ENVELOPE) then
+                                          sa=1+deltak(a,1)
+                                          sb=1+deltak(b,1)
 !                                      ...k^2(e_z x F_i, e_z x F_j)
                                           gramP(kk) = gramP(kk)         &
                                                     + shapH1(idxa,sa)   &
@@ -1058,6 +1060,8 @@
                                                     * shapH1(idxa,sa)*shapH1(idxb,sb)
                                        enddo
                                        if (ENVELOPE) then
+                                          sa=1+deltak(a,1)
+                                          sb=1+deltak(b,1)
 !                                      ...ik(iωε F_i, e_z x G_j)
                                           gramP(kk) = gramP(kk)         &
                                                     + shapH1(idxa,sa)   &
@@ -1092,6 +1096,8 @@
                                                        * shapH1(idxa,sa)*shapH1(idxb,sb)
                                           enddo
                                           if (ENVELOPE) then
+                                             sa=1+deltak(a,1)
+                                             sb=1+deltak(b,1)
 !                                         ...-ik (e_z x G_i, (iωε)^* F_j)
                                              gramP(kk) = gramP(kk)         &
                                                        + shapH1(idxa,sa)   &
@@ -1126,6 +1132,8 @@
 
                                        enddo; enddo
                                        if (ENVELOPE) then
+                                          sa=1+deltak(a,1)
+                                          sb=1+deltak(b,1)
 !                                      ...k^2(e_z x G_i, e_z x G_j)
                                           gramP(kk) = gramP(kk)         &
                                                     + shapH1(idxa,sa)   &
