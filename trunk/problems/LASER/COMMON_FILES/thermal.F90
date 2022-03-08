@@ -365,12 +365,13 @@ end subroutine comp_elem_avgTemp
 !
 !  purpose: returns the thermal load (heat deposition)
 !
-!  input:   - ZsolQ: EH fields (6 EH - for signal, 6 EH - for pump)
+!  input:   - ZsolQ  : EH fields (6 EH - for signal, 6 EH - for pump)
+!           - Coord_z: Element z-coordinate in physical coordinates
 !
 !  output:  - Therm_load
 !
 !-------------------------------------------------------------------------------
-subroutine get_thermLoad(ZsolQ, Therm_load)
+subroutine get_thermLoad(ZsolQ,Coord_z, Therm_load)
 !
    use commonParam
    use laserParam
@@ -378,12 +379,14 @@ subroutine get_thermLoad(ZsolQ, Therm_load)
    implicit none
 !
    VTYPE  , intent(in)  :: ZsolQ(12)
+   real(8), intent(in)  :: Coord_z
    real(8), intent(out) :: Therm_load
 !
    VTYPE, dimension(3) :: Es,Hs,Ep,Hp,ETimesHs,ETimesHp
 !
+   integer :: jz,numPts
    real(8) :: gs,gp,Is,Ip
-   real(8) :: eta,Nex,Ngd,sum1,sum2
+   real(8) :: eta,Nex,Ngd,sum1,sum2,dz
 !
 !-------------------------------------------------------------------------------
 !
@@ -400,9 +403,14 @@ subroutine get_thermLoad(ZsolQ, Therm_load)
 !..compute pump irradiance
    Ip = 0.d0
    if (PLANE_PUMP .eq. 1) then
-!     set fake pump power the same here and in active gain computation
+!     set plane pump power the same here and in active gain computation
 !  ...assume pump is a plane wave in fiber cladding (cladding-pumped)
       Ip = PLANE_PUMP_POWER / (PI*R_CLAD*R_CLAD) ! calculate non-dimensional irradiance
+   elseif (PLANE_PUMP .eq. 2) then
+      numPts = size(PUMP_VAL)
+      dz = ZL / numPts
+      jz = min(INT(Coord_z/dz), numPts-1) + 1
+      Ip = PUMP_VAL(jz) / (PI*R_CLAD*R_CLAD) ! calculate non-dimensional irradiance
    else
       call zz_cross_product(Ep,conjg(Hp), ETimesHp)
       Ip = sqrt((real(EtimesHp(1))**2+real(EtimesHp(2))**2+real(EtimesHp(3))**2))

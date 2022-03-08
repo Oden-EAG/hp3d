@@ -46,6 +46,12 @@ subroutine exec_job_coupled
       stop
    endif
 !
+!..Initiate pump field ODE solution
+   if(PLANE_PUMP.eq.2) then
+      numPts = 2**IMAX
+      call pump_ode_alloc(numPts)
+   endif
+!
    EXCHANGE_DOF = .false.
 !
    NO_PROBLEM = 3
@@ -291,7 +297,11 @@ subroutine exec_job_coupled
 !
 !     ...if assuming a pump plane wave, skip the pump field computation
          if (PLANE_PUMP .eq. 1) then
-            if (RANK.eq.ROOT) write(*,*) '   Assuming pump plane wave...'
+            if (RANK.eq.ROOT) write(*,*) '   Assuming constant pump plane wave...'
+            goto 410
+         elseif (PLANE_PUMP .eq. 2) then
+            if (RANK.eq.ROOT) write(*,*) '   Computing pump plane wave solution by ODE model...'
+            call pump_ode_solve
             goto 410
          endif
 !
@@ -391,6 +401,7 @@ subroutine exec_job_coupled
       enddo
    endif
 !
+   if(PLANE_PUMP.eq.2) call pump_ode_dealloc
 !
   100 format(/,'/////////////////////////////////////////////////////////////', &
              /,'             ',A,I2,/)
