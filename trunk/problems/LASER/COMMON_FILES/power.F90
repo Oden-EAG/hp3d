@@ -7,7 +7,7 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision - Apr 2020
+!   latest revision - Mar 2022
 !
 !   purpose         - Driver routine for computing power in UW
 !                     Maxwell, i.e. the Poynting vector at certain
@@ -170,8 +170,11 @@ subroutine get_power(Fld,NumPts,FileIter)
    ISOL = i; ICOMP_EXACT = j
    endif
 !
-!..gather RHS vector information on host
+!..gather all values on host
    if (.not. DISTRIBUTED .or. HOST_MESH) goto 50
+   if (PLANE_PUMP.ne.0 .and. RANK.ne.ROOT) then
+      pump_power = 0.d0
+   endif
    count = NumPts
    if (RANK .eq. ROOT) then
       call MPI_REDUCE(MPI_IN_PLACE,sign_power,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
@@ -737,7 +740,7 @@ end subroutine get_power
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - Oct 2019
+!   latest revision    - Mar 2022
 !
 !   purpose            - Evaluates the electric field power of UW
 !                        Maxwell along the cross sections specified by
@@ -760,6 +763,7 @@ end subroutine get_power
 subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPower)
 !
    use commonParam
+   use laserParam
    use data_structure3D
    use control    , only : GEOM_TOL
    use environment, only : QUIET_MODE
@@ -820,6 +824,19 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
 !..start timer
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 !
+!..return pre-computed pump values if using constant pump or pump ODE model
+   if (Fld.eq.0 .and. PLANE_PUMP.eq.1) then
+      Power(1:Num_zpts) = PLANE_PUMP_POWER
+      goto 90
+   elseif (Fld.eq.0 .and. PLANE_PUMP.eq.2) then
+      if (size(PUMP_VAL) .ne. Num_zpts) then
+         write(*,*) 'compute_power: size(PUMP_VAL) .ne. Num_zpts. skipping.'
+         goto 90
+      endif
+      Power(1:Num_zpts) = PUMP_VAL(1:Num_zpts)
+      goto 90
+   endif
+!
    if (.not. DISTRIBUTED) then
       ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
       NRELES_SUBD = NRELES
@@ -864,13 +881,14 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
                DiffPower(i) = DiffPower(i) + modeNorm       ! false name (calc norm)
                CorePower(i) = CorePower(i) + real(modeCoef) ! false name (calc coef_r)
                CladPower(i) = CladPower(i) + imag(modeCoef) ! false name (calc coef_r)
-
             endif
             Power(i) = Power(i) + abs(facePower)
          endif
       enddo
    enddo
 !$OMP END PARALLEL DO
+!
+   90 continue
 !
 !..end timer
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()

@@ -7,10 +7,11 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision - Nov 2021
+!   latest revision - Mar 2022
 !
 !   purpose         - Driver routine for computing pump power with
-!                     pump ODE model
+!                     pump ODE model, assumes pump is a plane wave
+!                     over the entire core/cladding region
 !
 !   arguments
 !                   - NumPts
@@ -21,20 +22,102 @@ subroutine pump_ode_solve
 !
    use commonParam
    use laserParam
+   use MPI, only: MPI_COMM_WORLD,MPI_IN_PLACE,MPI_REAL8,MPI_SUM
 !
    implicit none
 !
-   integer :: numPts
+!..transverse-averaged irradiance values along the fiber
+   real(8), allocatable :: pump_irr(:), sign_irr(:)
+!..excited-state population density along the fiber
+   real(8), allocatable :: n_ex(:)
+!..auxiliary arrays
+   real(8), allocatable :: zValues(:), dummy(:)
+!
+!..auxiliary variables
+   integer :: numPts, i, ierr, fld
+   real(8) :: a, eta, sum1, sum2, Is, Ip, dz, g0, gain
 !
    if (.not. allocated(PUMP_VAL)) then
       write(*,*) 'pump_ode: PUMP_VAL has not been initiated yet. stop.'
       stop
    endif
 !
+!..numPts is expected to be the number of elements in z-direction
    numPts = size(PUMP_VAL)
+!..dz is then the (average) element size in z-direction
+   dz = ZL / numPts
 !
-!..Solve the pump ODE
-   PUMP_VAL(1:numPts) = PLANE_PUMP_POWER
+!..allocate arrays
+   allocate(pump_irr(numPts), sign_irr(numPts), n_ex(numPts))
+   allocate(zValues(numPts), dummy(numPts))
+!
+!..fill irradiance and population density arrays
+!
+!  a) signal irradiance
+!  a.i) compute signal power within subdomain (fiber partitioning assumed)
+   a = dz/2.d0
+   do i=1,numPts
+      zValues(i) = (i-1)*dz+a
+   enddo
+!..irrationalize z values to avoid points on element interfaces
+   zValues = zValues*PI*(7.d0/22.d0)
+!..compute power (note: only sign_irr is filled with valid entries in compute_power)
+   fld = 1 ! signal field index
+   call compute_power(zValues,numPts,fld, sign_irr,pump_irr,n_ex,dummy)
+!
+!  a.ii) collect signal power values on each MPI proc
+   call MPI_ALLREDUCE(MPI_IN_PLACE,sign_irr,numPts,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD, ierr)
+!
+!  a.iii) compute transverse-averaged signal irradiance from signal power
+   do i=1,numPts
+      sign_irr(i) = sign_irr(i) / (PI*R_CLAD*R_CLAD)
+   enddo
+!
+!  b) pump irradiance
+   do i=1,numPts
+      pump_irr(i) = PUMP_VAL(i) / (PI*R_CLAD*R_CLAD)
+   enddo
+!
+!  c) excited-state population density
+   do i=1,numPts
+      Is = sign_irr(i)
+      Ip = pump_irr(i)
+      sum1 = (SIGMA_S_ABS/OMEGA_SIGNAL)*Is+(SIGMA_P_ABS/OMEGA_PUMP)*Ip
+      sum2 = ((SIGMA_S_ABS+SIGMA_S_EMS)/OMEGA_SIGNAL)*Is + &
+             ((SIGMA_P_ABS+SIGMA_P_EMS)/OMEGA_PUMP)*Ip
+      n_ex(i) = sum1/(TAU_0+sum2)
+   enddo
+!
+!..non-dimensional scaling factor for gain function
+   g0 = ACTIVE_GAIN*L_0*SIGMA_0*NU_0
+!
+!..TODO: add option for counter-pumping, gain tailoring
+!..solve the pump ODE by explicit stepping in z-direction
+!  (pos. z-direction: co-pumped; neg. z-direction: counter-pumped)
+   if (COPUMP.eq.1) then
+      do i=1,numPts-1
+         gain = -SIGMA_P_ABS + (SIGMA_P_ABS+SIGMA_P_EMS)*n_ex(i)
+         pump_irr(i+1) = pump_irr(i) + (R_CORE*R_CORE/(R_CLAD*R_CLAD)) * &
+                                     dz * g0 * gain * N_TOTAL * pump_irr(i)
+      enddo
+   elseif (COPUMP.eq.0) then
+      do i=numPts,2
+       gain = -SIGMA_P_ABS + (SIGMA_P_ABS+SIGMA_P_EMS)*n_ex(i)
+       pump_irr(i-1) = pump_irr(i) + (R_CORE*R_CORE/(R_CLAD*R_CLAD)) * &
+                                  dz * g0 * gain * N_TOTAL * pump_irr(i)
+      enddo
+   else
+      write(*,*) ' pump_ode_solve: COPUMP must be 1 or 0. stop.'
+      stop
+   endif
+!
+!..update global pump power array based on irradiance solution
+   do i=1,numPts
+      PUMP_VAL(i) = pump_irr(i) * (PI*R_CLAD*R_CLAD)
+   enddo
+!
+!..deallocate auxiliary arrays
+   deallocate(pump_irr, sign_irr, n_ex, zValues, dummy)
 !
 end subroutine pump_ode_solve
 !
