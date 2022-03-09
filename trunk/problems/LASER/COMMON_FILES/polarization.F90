@@ -177,7 +177,7 @@ subroutine get_activePol(ZsolQ,Fld_flag,Delta_n,Coord_z, Active_pol)
    VTYPE, dimension(3) :: Es,Hs,Ep,Hp,ETimesHs,ETimesHp
 !
    integer :: jz,numPts
-   real(8) :: eta,Nex,Ngd,sum1,sum2,Is,Ip,g0,gain_ampl,dz
+   real(8) :: eta,sum1,sum2,Is,Ip,g0,dz
    VTYPE   :: gain
 !
 !-------------------------------------------------------------------------------
