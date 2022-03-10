@@ -34,7 +34,7 @@ subroutine pump_ode_solve
    real(8), allocatable :: zValues(:), dummy(:)
 !
 !..auxiliary variables
-   integer :: numPts, i, ierr, fld
+   integer :: numPts, i, j, ierr, fld
    real(8) :: a, eta, sum1, sum2, Is, Ip, dz, g0, gain
 !
    if (.not. allocated(PUMP_VAL)) then
@@ -78,38 +78,42 @@ subroutine pump_ode_solve
       pump_irr(i) = PUMP_VAL(i) / (PI*R_CLAD*R_CLAD)
    enddo
 !
-!  c) excited-state population density
-   do i=1,numPts
-      Is = sign_irr(i)
-      Ip = pump_irr(i)
-      sum1 = (SIGMA_S_ABS/OMEGA_SIGNAL)*Is+(SIGMA_P_ABS/OMEGA_PUMP)*Ip
-      sum2 = ((SIGMA_S_ABS+SIGMA_S_EMS)/OMEGA_SIGNAL)*Is + &
-             ((SIGMA_P_ABS+SIGMA_P_EMS)/OMEGA_PUMP)*Ip
-      n_ex(i) = sum1/(TAU_0+sum2)
-   enddo
+!..iterate multiple times (fixed-point iteration)
+!  since n_ex(i) on the RHS depends on pump_irr(i)
+   do j=1,10
+!     c) excited-state population density
+      do i=1,numPts
+         Is = sign_irr(i)
+         Ip = pump_irr(i)
+         sum1 = (SIGMA_S_ABS/OMEGA_SIGNAL)*Is+(SIGMA_P_ABS/OMEGA_PUMP)*Ip
+         sum2 = ((SIGMA_S_ABS+SIGMA_S_EMS)/OMEGA_SIGNAL)*Is + &
+                ((SIGMA_P_ABS+SIGMA_P_EMS)/OMEGA_PUMP)*Ip
+         n_ex(i) = sum1/(TAU_0+sum2)
+      enddo
 !
-!..non-dimensional scaling factor for gain function
-   g0 = ACTIVE_GAIN*L_0*SIGMA_0*NU_0
+!  ...non-dimensional scaling factor for gain function
+      g0 = ACTIVE_GAIN*L_0*SIGMA_0*NU_0
 !
-!..TODO: add option for counter-pumping, gain tailoring
-!..solve the pump ODE by explicit stepping in z-direction
-!  (pos. z-direction: co-pumped; neg. z-direction: counter-pumped)
-   if (COPUMP.eq.1) then
-      do i=1,numPts-1
-         gain = -SIGMA_P_ABS + (SIGMA_P_ABS+SIGMA_P_EMS)*n_ex(i)
-         pump_irr(i+1) = pump_irr(i) + (R_CORE*R_CORE/(R_CLAD*R_CLAD)) * &
+!  ...TODO: add option for counter-pumping, gain tailoring
+!  ...solve the pump ODE by explicit stepping in z-direction
+!     (pos. z-direction: co-pumped; neg. z-direction: counter-pumped)
+      if (COPUMP.eq.1) then
+         do i=1,numPts-1
+            gain = -SIGMA_P_ABS + (SIGMA_P_ABS+SIGMA_P_EMS)*n_ex(i)
+            pump_irr(i+1) = pump_irr(i) + (R_CORE*R_CORE/(R_CLAD*R_CLAD)) * &
+                                        dz * g0 * gain * N_TOTAL * pump_irr(i)
+         enddo
+      elseif (COPUMP.eq.0) then
+         do i=numPts,2
+          gain = -SIGMA_P_ABS + (SIGMA_P_ABS+SIGMA_P_EMS)*n_ex(i)
+          pump_irr(i-1) = pump_irr(i) + (R_CORE*R_CORE/(R_CLAD*R_CLAD)) * &
                                      dz * g0 * gain * N_TOTAL * pump_irr(i)
-      enddo
-   elseif (COPUMP.eq.0) then
-      do i=numPts,2
-       gain = -SIGMA_P_ABS + (SIGMA_P_ABS+SIGMA_P_EMS)*n_ex(i)
-       pump_irr(i-1) = pump_irr(i) + (R_CORE*R_CORE/(R_CLAD*R_CLAD)) * &
-                                  dz * g0 * gain * N_TOTAL * pump_irr(i)
-      enddo
-   else
-      write(*,*) ' pump_ode_solve: COPUMP must be 1 or 0. stop.'
-      stop
-   endif
+         enddo
+      else
+         write(*,*) ' pump_ode_solve: COPUMP must be 1 or 0. stop.'
+         stop
+      endif
+   enddo
 !
 !..update global pump power array based on irradiance solution
    do i=1,numPts
