@@ -61,16 +61,18 @@ subroutine pump_ode_solve
    enddo
 !..irrationalize z values to avoid points on element interfaces
    zValues = zValues*PI*(7.d0/22.d0)
-!..compute power (note: only sign_irr is filled with valid entries in compute_power)
+!..compute signal power in fiber core
+!  (note: only sign_irr is filled with valid entries in compute_power)
    fld = 1 ! signal field index
-   call compute_power(zValues,numPts,fld, sign_irr,pump_irr,n_ex,dummy)
+   call compute_power(zValues,numPts,fld, dummy,pump_irr,sign_irr,n_ex)
 !
-!  a.ii) collect signal power values on each MPI proc
+!  a.ii) collect signal power values (in fiber core) on each MPI proc
    call MPI_ALLREDUCE(MPI_IN_PLACE,sign_irr,numPts,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD, ierr)
 !
-!  a.iii) compute transverse-averaged signal irradiance from signal power
+!  a.iii) compute transverse-averaged signal irradiance over the core area
+!         from signal optical power in the core area
    do i=1,numPts
-      sign_irr(i) = sign_irr(i) / (PI*R_CLAD*R_CLAD)
+      sign_irr(i) = sign_irr(i) / (PI*R_CORE*R_CORE)
    enddo
 !
 !  b) pump irradiance
@@ -78,9 +80,9 @@ subroutine pump_ode_solve
       pump_irr(i) = PUMP_VAL(i) / (PI*R_CLAD*R_CLAD)
    enddo
 !
-!..iterate multiple times (fixed-point iteration)
+!..iterate a few times (fixed-point iteration)
 !  since n_ex(i) on the RHS depends on pump_irr(i)
-   do j=1,10
+   do j=1,5
 !     c) excited-state population density
       do i=1,numPts
          Is = sign_irr(i)
