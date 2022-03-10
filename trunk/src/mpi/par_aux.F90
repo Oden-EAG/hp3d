@@ -163,17 +163,19 @@ subroutine repartition_fiber(Subd_next)
       endif
    enddo
 !
+#if DEBUG_MODE
    if (RANK.eq.ROOT) then
       do i=1,NUM_PROCS
          write(*,130) 'rank, x3_subd = ', i-1,x3_subd(i)
       enddo
-  130 format(A,I4,F10.4)
+  130 format(A,I4,F12.4)
       !do i=1,NRELES
       !   iel = iel_array(i)
       !   write(*,140) 'i,iel,x3_mdle(i),iel_load(iel) = ',i,iel,x3_mdle(i),iel_load(iel)
       !enddo
   140 format(A,I6,',',I6,',',F10.4,',',I6)
    endif
+#endif
 !
 end subroutine repartition_fiber
 !
