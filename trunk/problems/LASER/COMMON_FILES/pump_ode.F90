@@ -60,7 +60,7 @@ subroutine pump_ode_solve
       zValues(i) = (i-1)*dz+a
    enddo
 !..irrationalize z values to avoid points on element interfaces
-   zValues = zValues*PI*(7.d0/22.d0)
+   zValues = zValues*PI*(113.d0/315.d0)
 !..compute power (note: only sign_irr is filled with valid entries in compute_power)
    fld = 1 ! signal field index
    call compute_power(zValues,numPts,fld, sign_irr,pump_irr,n_ex,dummy)
@@ -105,9 +105,9 @@ subroutine pump_ode_solve
          enddo
       elseif (COPUMP.eq.0) then
          do i=numPts,2,-1
-          gain = -SIGMA_P_ABS + (SIGMA_P_ABS+SIGMA_P_EMS)*n_ex(i)
-          pump_irr(i-1) = pump_irr(i) + (R_CORE*R_CORE/(R_CLAD*R_CLAD)) * &
-                                     dz * g0 * gain * N_TOTAL * pump_irr(i)
+            gain = -SIGMA_P_ABS + (SIGMA_P_ABS+SIGMA_P_EMS)*n_ex(i)
+            pump_irr(i-1) = pump_irr(i) + (R_CORE*R_CORE/(R_CLAD*R_CLAD)) * &
+                                        dz * g0 * gain * N_TOTAL * pump_irr(i)
          enddo
       else
          write(*,*) ' pump_ode_solve: COPUMP must be 1 or 0. stop.'
