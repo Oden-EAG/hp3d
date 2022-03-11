@@ -22,7 +22,8 @@ subroutine pump_ode_solve
 !
    use commonParam
    use laserParam
-   use MPI, only: MPI_COMM_WORLD,MPI_IN_PLACE,MPI_REAL8,MPI_SUM
+   use mpi_param, only: RANK,ROOT
+   use MPI      , only: MPI_COMM_WORLD,MPI_IN_PLACE,MPI_REAL8,MPI_SUM
 !
    implicit none
 !
@@ -34,8 +35,8 @@ subroutine pump_ode_solve
    real(8), allocatable :: zValues(:), dummy(:)
 !
 !..auxiliary variables
-   integer :: numPts, i, j, ierr, fld
-   real(8) :: a, eta, sum1, sum2, Is, Ip, dz, g0, gain
+   integer :: numPts, i, j, max_it, ierr, fld
+   real(8) :: a, eta, sum1, sum2, Is, Ip, dz, g0, gain, l2norm, l2diff, eps
 !
    if (.not. allocated(PUMP_VAL)) then
       write(*,*) 'pump_ode: PUMP_VAL has not been initiated yet. stop.'
@@ -82,8 +83,10 @@ subroutine pump_ode_solve
 !
 !..iterate a few times (fixed-point iteration)
 !  since n_ex(i) on the RHS depends on pump_irr(i)
-   do j=1,5
+   max_it = 10; eps = 1.d-6
+   do j=1,max_it
 !     c) excited-state population density
+      l2norm = 0.d0
       do i=1,numPts
          Is = sign_irr(i)
          Ip = pump_irr(i)
@@ -91,29 +94,48 @@ subroutine pump_ode_solve
          sum2 = ((SIGMA_S_ABS+SIGMA_S_EMS)/OMEGA_SIGNAL)*Is + &
                 ((SIGMA_P_ABS+SIGMA_P_EMS)/OMEGA_PUMP)*Ip
          n_ex(i) = sum1/(TAU_0+sum2)
+         l2norm = l2norm + Ip*Ip
       enddo
+      l2norm = sqrt(l2norm)
 !
 !  ...non-dimensional scaling factor for gain function
       g0 = ACTIVE_GAIN*L_0*SIGMA_0*NU_0
 !
-!  ...TODO: add option for counter-pumping, gain tailoring
 !  ...solve the pump ODE by explicit stepping in z-direction
 !     (pos. z-direction: co-pumped; neg. z-direction: counter-pumped)
+      l2diff = 0.d0
       if (COPUMP.eq.1) then
          do i=1,numPts-1
+            Ip = pump_irr(i+1)
             gain = -SIGMA_P_ABS + (SIGMA_P_ABS+SIGMA_P_EMS)*n_ex(i)
             pump_irr(i+1) = pump_irr(i) + (R_CORE*R_CORE/(R_CLAD*R_CLAD)) * &
                                         dz * g0 * gain * N_TOTAL * pump_irr(i)
+            l2diff = l2diff + (Ip-pump_irr(i+1))**2.d0
          enddo
       elseif (COPUMP.eq.0) then
          do i=numPts,2,-1
+            Ip = pump_irr(i-1)
             gain = -SIGMA_P_ABS + (SIGMA_P_ABS+SIGMA_P_EMS)*n_ex(i)
             pump_irr(i-1) = pump_irr(i) + (R_CORE*R_CORE/(R_CLAD*R_CLAD)) * &
                                         dz * g0 * gain * N_TOTAL * pump_irr(i)
+            l2diff = l2diff + (Ip-pump_irr(i-1))**2.d0
          enddo
       else
          write(*,*) ' pump_ode_solve: COPUMP must be 1 or 0. stop.'
          stop
+      endif
+      l2diff = sqrt(l2diff)
+!
+!  ...check convergence of fixed-point iteration
+      if (l2diff / l2norm < eps) then
+         if (RANK.eq.ROOT) then
+            write(*,*) 'pump_ode_solve: fixed-point iteration converged, #iter = ', j
+         endif
+         exit
+      endif
+      if ((j.eq.max_it) .and. (RANK.eq.ROOT)) then
+         write(*,*) 'pump_ode_solve: fixed-point iteration not converged, max_it = ', max_it
+         write(*,*) 'l2diff, l2norm = ', l2diff, l2norm
       endif
    enddo
 !
@@ -131,18 +153,14 @@ end subroutine pump_ode_solve
 !
 subroutine pump_ode_alloc(NumPts)
 !
-   use commonParam
    use laserParam
-   use mpi_param, only: RANK,ROOT
-   use MPI      , only: MPI_COMM_WORLD,MPI_IN_PLACE,MPI_REAL8,MPI_SUM
-   use par_mesh , only: DISTRIBUTED,HOST_MESH
 !
    implicit none
 !
    integer, intent(in) :: NumPts
 !
    if (allocated(PUMP_VAL)) then
-      write(*,*) 'pump_ode: PUMP_VAL has already been initiated.'
+      write(*,*) 'pump_ode: PUMP_VAL has already been allocated.'
    else
       allocate(PUMP_VAL(NumPts))
    endif
@@ -156,13 +174,12 @@ end subroutine pump_ode_alloc
 !
 subroutine pump_ode_dealloc
 !
-   use commonParam
    use laserParam
 !
    implicit none
 !
    if (.not. allocated(PUMP_VAL)) then
-      write(*,*) 'pump_ode_dealloc: PUMP_VAL had not been initiated.'
+      write(*,*) 'pump_ode_dealloc: PUMP_VAL had not been allocated.'
    else
       deallocate(PUMP_VAL)
    endif
