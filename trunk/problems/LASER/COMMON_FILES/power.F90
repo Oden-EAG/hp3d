@@ -782,7 +782,7 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
    real(8), intent(out) :: CladPower(Num_zpts)
 !
 !..auxiliary variables
-   real(8)    :: facePower, faceDiffPower, elemPower
+   real(8)    :: facePower, faceDiffPower
    real(8)    :: modeNorm
    complex(8) :: modeCoef
 !
