@@ -104,7 +104,7 @@ subroutine pump_ode_solve
                                         dz * g0 * gain * N_TOTAL * pump_irr(i)
          enddo
       elseif (COPUMP.eq.0) then
-         do i=numPts,2
+         do i=numPts,2,-1
           gain = -SIGMA_P_ABS + (SIGMA_P_ABS+SIGMA_P_EMS)*n_ex(i)
           pump_irr(i-1) = pump_irr(i) + (R_CORE*R_CORE/(R_CLAD*R_CLAD)) * &
                                      dz * g0 * gain * N_TOTAL * pump_irr(i)
