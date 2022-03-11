@@ -66,7 +66,7 @@ subroutine get_avgTemp(NumPts,FileIter)
       zValues(i) = (i-1)*b+a
    enddo
 !..irrationalize z values to avoid points on element interfaces
-   zValues = zValues*PI*(113.d0/315.d0)
+   zValues = zValues*PI*(113.d0/355.d0)
 !
    if (RANK .eq. ROOT) write(*,*) ' get_avgTemp: computing core temperature values..'
    call comp_avgTemp(zValues,NumPts, coreTemp)

@@ -118,7 +118,7 @@ subroutine get_power(Fld,NumPts,FileIter)
       zValues(i) = (i-1)*b+a
    enddo
 !..irrationalize z values to avoid points on element interfaces
-   zValues = zValues*PI*(113.d0/315.d0)
+   zValues = zValues*PI*(113.d0/355.d0)
 !
 !..get power
    select case (Fld)

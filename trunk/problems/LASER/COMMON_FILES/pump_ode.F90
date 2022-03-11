@@ -60,7 +60,7 @@ subroutine pump_ode_solve
       zValues(i) = (i-1)*dz+a
    enddo
 !..irrationalize z values to avoid points on element interfaces
-   zValues = zValues*PI*(113.d0/315.d0)
+   zValues = zValues*PI*(113.d0/355.d0)
 !..compute signal power in fiber core
 !  (note: only sign_irr is filled with valid entries in compute_power)
    fld = 1 ! signal field index
