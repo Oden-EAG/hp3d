@@ -138,6 +138,12 @@ subroutine pump_ode_solve
       endif
       l2diff = sqrt(l2diff)
 !
+!  ...update global pump power array based on irradiance update
+!     (needed in each iteration since compute_gain uses PUMP_VAL array)
+      do i=1,numPts
+         PUMP_VAL(i) = pump_irr(i) * (PI*R_CLAD*R_CLAD)
+      enddo
+!
 !  ...check convergence of fixed-point iteration
       if (l2diff / l2norm < eps) then
          if (RANK.eq.ROOT) then
@@ -149,12 +155,6 @@ subroutine pump_ode_solve
          write(*,*) 'pump_ode_solve: fixed-point iteration not converged, max_it = ', max_it
          write(*,*) 'l2diff, l2norm = ', l2diff, l2norm
       endif
-!
-!  ...update global pump power array based on irradiance solution
-!     (needed here since compute_gain uses PUMP_VAL array)
-      do i=1,numPts
-         PUMP_VAL(i) = pump_irr(i) * (PI*R_CLAD*R_CLAD)
-      enddo
    enddo
 !
 !..deallocate auxiliary arrays
@@ -293,9 +293,7 @@ subroutine compute_gain(ZValues,Num_zpts,Fld, Gain)
       if (GEOM_NO.eq.5) then
 !     ...skip elements outside the fiber core (gain region)
          call find_domain(mdle, ndom)
-         if (ndom.ne.1 .and. ndom.ne.2) then
-            continue
-         endif
+         if (ndom.ne.1 .and. ndom.ne.2) cycle
       endif
       call nodcor_vert(mdle, xnod)
       etype = NODES(Mdle)%type
