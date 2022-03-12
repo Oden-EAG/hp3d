@@ -27,10 +27,8 @@ subroutine pump_ode_solve
 !
    implicit none
 !
-!..transverse-averaged irradiance values along the fiber
+!..transverse-averaged irradiance values and pump gain along the fiber
    real(8), allocatable :: pump_irr(:), sign_irr(:), gain_p(:)
-!..excited-state population density along the fiber
-   real(8), allocatable :: n_ex(:)
 !..auxiliary arrays
    real(8), allocatable :: zValues(:), dummy(:)
 !
@@ -38,98 +36,106 @@ subroutine pump_ode_solve
    integer :: numPts, i, j, max_it, ierr, fld
    real(8) :: a, eta, sum1, sum2, Is, Ip, dz, g0, gain, l2norm, l2diff, eps
 !
+!..pump gain
+!   = 1: computing pump gain from transverse-averaged signal irradiance
+!   = 2: computing pump gain by integrating over transverse slices
+   integer :: pump_gain
+!
+!----------------------------------------------------------------------
+!
+   pump_gain = 2
+!
    if (.not. allocated(PUMP_VAL)) then
       write(*,*) 'pump_ode: PUMP_VAL has not been initiated yet. stop.'
       stop
    endif
 !
-!..numPts is expected to be the number of elements in z-direction
+!..compute auxiliary variables:
+!  - numPts is expected to be the number of elements in z-direction
    numPts = size(PUMP_VAL)
-!..dz is then the (average) element size in z-direction
-   dz = ZL / numPts
-!
-!..allocate arrays
-   allocate(pump_irr(numPts), sign_irr(numPts), n_ex(numPts), gain_p(numPts))
-   allocate(zValues(numPts), dummy(numPts))
-!
-!..fill irradiance and population density arrays
-!
-!  a) signal irradiance
-!  a.i) compute signal power within subdomain (fiber partitioning assumed)
+!  - dz is then the (average) element size in z-direction
+   dz = ZL/numPts
    a = dz/2.d0
+!  - zValues (one z-coordinate per element)
    do i=1,numPts
       zValues(i) = (i-1)*dz+a
    enddo
-!..irrationalize z values to avoid points on element interfaces
+!  - irrationalize z values to avoid points on element interfaces
    zValues = zValues*PI*(113.d0/355.d0)
-!..compute signal power in fiber core
-!  (note: only sign_irr is filled with valid entries in compute_power)
-   fld = 1 ! signal field index
-   call compute_power(zValues,numPts,fld, dummy,pump_irr,sign_irr,n_ex)
 !
-!  a.ii) collect signal power values (in fiber core) on each MPI proc
-   call MPI_ALLREDUCE(MPI_IN_PLACE,sign_irr,numPts,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD, ierr)
+!..allocate arrays:
+   allocate(zValues(numPts), pump_irr(numPts), gain_p(numPts))
+   select case(pump_gain)
+      case(1) ; allocate(sign_irr(numPts), dummy(numPts))
+      case(2) ;
+      case default ; write(*,*) 'pump_ode: invalid pump_gain param.'
+   end select
 !
-!  a.iii) compute transverse-averaged signal irradiance over the core area
-!         from signal optical power in the core area
-   do i=1,numPts
-      sign_irr(i) = sign_irr(i) / (PI*R_CORE*R_CORE)
-   enddo
+!..compute auxiliary array (signal irradiance)
+   if (pump_gain .eq. 1) then
+!  ...i) compute signal power in fiber core
+!        (note: only sign_irr is filled with valid entries in compute_power)
+      fld = 1 ! signal field index
+      call compute_power(zValues,numPts,fld, dummy,pump_irr,sign_irr,gain_p)
+!     ii) collect signal power values (in fiber core) on each MPI proc
+      call MPI_ALLREDUCE(MPI_IN_PLACE,sign_irr,numPts,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD, ierr)
+!     iii) compute transverse-averaged signal irradiance over the core area
+!          from signal optical power in the core area
+      sign_irr(:) = sign_irr(:) / (PI*R_CORE*R_CORE)
+   endif
 !
-!  b) pump irradiance
-   do i=1,numPts
-      pump_irr(i) = PUMP_VAL(i) / (PI*R_CLAD*R_CLAD)
-   enddo
+!..compute pump irradiance
+   pump_irr(:) = PUMP_VAL(:) / (PI*R_CLAD*R_CLAD)
 !
-!..iterate a few times (fixed-point iteration)
-!  since n_ex(i) resp. gain_p(i) on the RHS depends on pump_irr(i)
+!..update pump irradiance
+!  iterate a few times (fixed-point iteration) since the pump gain "gain_p(i)"
+!  on the RHS depends on the pump irradiance "pump_irr(i)"
    max_it = 10; eps = 1.d-6
    do j=1,max_it
 !
-!  ...compute pump gain across transverse core area
-!     (depends on pump irradiance pump_irr(i))
-      fld = 0
-      gain_p = 0.d0
-      call compute_gain(zValues,numPts,fld, gain_p)
-      call MPI_ALLREDUCE(MPI_IN_PLACE,gain_p,numPts,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD, ierr)
+!  ...compute l2 norm of pump irradiance
+      l2norm = NORM2(pump_irr)
 !
-!     c) excited-state population density (not needed if compute_gain function is used)
-      l2norm = 0.d0
-      do i=1,numPts
-         Is = sign_irr(i) ! using transverse-average signal irradiance, different from compute_gain
-         Ip = pump_irr(i)
-         sum1 = (SIGMA_S_ABS/OMEGA_SIGNAL)*Is+(SIGMA_P_ABS/OMEGA_PUMP)*Ip
-         sum2 = ((SIGMA_S_ABS+SIGMA_S_EMS)/OMEGA_SIGNAL)*Is + &
-                ((SIGMA_P_ABS+SIGMA_P_EMS)/OMEGA_PUMP)*Ip
-         n_ex(i) = sum1/(TAU_0+sum2)
-         l2norm = l2norm + Ip*Ip
-      enddo
-      l2norm = sqrt(l2norm)
+!  ...compute pump gain
+      select case(pump_gain)
+      case(1)
+         do i=1,numPts
+            Is = sign_irr(i)
+            Ip = pump_irr(i)
+            sum1 = (SIGMA_S_ABS/OMEGA_SIGNAL)*Is+(SIGMA_P_ABS/OMEGA_PUMP)*Ip
+            sum2 = ((SIGMA_S_ABS+SIGMA_S_EMS)/OMEGA_SIGNAL)*Is + &
+                   ((SIGMA_P_ABS+SIGMA_P_EMS)/OMEGA_PUMP)*Ip
+            eta = sum1/(TAU_0+sum2)
+            gain_p(i) = -SIGMA_P_ABS + (SIGMA_P_ABS+SIGMA_P_EMS)*eta
+         enddo
+      case(2)
+         fld = 0 ! pump field index
+         call compute_gain(zValues,numPts,fld, gain_p)
+         call MPI_ALLREDUCE(MPI_IN_PLACE,gain_p,numPts,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD, ierr)
+      case default ;
+      end select
 !
 !  ...non-dimensional scaling factor for gain function
-      g0 = ACTIVE_GAIN*L_0*SIGMA_0*NU_0
+      g0 = ACTIVE_GAIN*L_0*SIGMA_0*NU_0*N_TOTAL
+      gain_p(:) = g0 * gain_p(:) / (PI*R_CORE*R_CORE)
 !
 !  ...solve the pump ODE by explicit stepping in z-direction
 !     (pos. z-direction: co-pumped; neg. z-direction: counter-pumped)
+ 2002 format(F10.3," | ", F10.3)
       l2diff = 0.d0
-   2002 format(F10.3," | ", F10.3)
       if (COPUMP.eq.1) then
          do i=1,numPts-1
+            if (RANK.eq.ROOT) write(*,2002) gain_p(i)
             Ip = pump_irr(i+1)
-            a = -SIGMA_P_ABS + (SIGMA_P_ABS+SIGMA_P_EMS)*n_ex(i) ! gain from transverse-averaged signal irr
-            gain = gain_p(i) / (PI*R_CORE*R_CORE) ! transverse-integrated gain function
-            if (RANK.eq.ROOT) write(*,2002) a, gain
             pump_irr(i+1) = pump_irr(i) + (R_CORE*R_CORE/(R_CLAD*R_CLAD)) * &
-                                        dz * g0 * gain * N_TOTAL * pump_irr(i)
+                                        dz * gain_p(i) * pump_irr(i)
             l2diff = l2diff + (Ip-pump_irr(i+1))**2.d0
          enddo
       elseif (COPUMP.eq.0) then
          do i=numPts,2,-1
             Ip = pump_irr(i-1)
-            gain = -SIGMA_P_ABS + (SIGMA_P_ABS+SIGMA_P_EMS)*n_ex(i)
-            !gain = gain_p(i) / (PI*R_CORE*R_CORE)
             pump_irr(i-1) = pump_irr(i) + (R_CORE*R_CORE/(R_CLAD*R_CLAD)) * &
-                                        dz * g0 * gain * N_TOTAL * pump_irr(i)
+                                        dz * gain_p(i) * pump_irr(i)
             l2diff = l2diff + (Ip-pump_irr(i-1))**2.d0
          enddo
       else
@@ -140,9 +146,7 @@ subroutine pump_ode_solve
 !
 !  ...update global pump power array based on irradiance update
 !     (needed in each iteration since compute_gain uses PUMP_VAL array)
-      do i=1,numPts
-         PUMP_VAL(i) = pump_irr(i) * (PI*R_CLAD*R_CLAD)
-      enddo
+      PUMP_VAL(:) = pump_irr(:) * (PI*R_CLAD*R_CLAD)
 !
 !  ...check convergence of fixed-point iteration
       if (l2diff / l2norm < eps) then
@@ -158,7 +162,11 @@ subroutine pump_ode_solve
    enddo
 !
 !..deallocate auxiliary arrays
-   deallocate(pump_irr, sign_irr, n_ex, zValues, dummy, gain_p)
+   deallocate(zValues, pump_irr, gain_p)
+   select case(pump_gain)
+      case(1) ; deallocate(sign_irr, dummy)
+      case default ;
+   end select
 !
 end subroutine pump_ode_solve
 !
