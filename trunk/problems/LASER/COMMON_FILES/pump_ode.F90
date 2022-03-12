@@ -122,11 +122,11 @@ subroutine pump_ode_solve
 !
 !  ...solve the pump ODE by explicit stepping in z-direction
 !     (pos. z-direction: co-pumped; neg. z-direction: counter-pumped)
- 2002 format(F10.3," | ", F10.3)
+ 2002 format(F10.3)
       l2diff = 0.d0
       if (COPUMP.eq.1) then
          do i=1,numPts-1
-            if (RANK.eq.ROOT) write(*,2002) gain_p(i)
+            !if (RANK.eq.ROOT) write(*,2002) gain_p(i)
             Ip = pump_irr(i+1)
             pump_irr(i+1) = pump_irr(i) + (R_CORE*R_CORE/(R_CLAD*R_CLAD)) * &
                                         dz * gain_p(i) * pump_irr(i)
