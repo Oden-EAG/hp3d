@@ -56,12 +56,6 @@ subroutine pump_ode_solve
 !  - dz is then the (average) element size in z-direction
    dz = ZL/numPts
    a = dz/2.d0
-!  - zValues (one z-coordinate per element)
-   do i=1,numPts
-      zValues(i) = (i-1)*dz+a
-   enddo
-!  - irrationalize z values to avoid points on element interfaces
-   zValues = zValues*PI*(113.d0/355.d0)
 !
 !..allocate arrays:
    allocate(zValues(numPts), pump_irr(numPts), gain_p(numPts))
@@ -70,6 +64,13 @@ subroutine pump_ode_solve
       case(2) ;
       case default ; write(*,*) 'pump_ode: invalid pump_gain param.'
    end select
+!
+!  - zValues (one z-coordinate per element)
+   do i=1,numPts
+      zValues(i) = (i-1)*dz+a
+   enddo
+!  - irrationalize z values to avoid points on element interfaces
+   zValues = zValues*PI*(113.d0/355.d0)
 !
 !..compute auxiliary array (signal irradiance)
    if (pump_gain .eq. 1) then
