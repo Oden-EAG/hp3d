@@ -67,10 +67,6 @@ subroutine pump_ode_solve
    fld = 1 ! signal field index
    call compute_power(zValues,numPts,fld, dummy,pump_irr,sign_irr,n_ex)
 !
-   fld = 0 ! compute pump gain
-   call compute_gain(zValues,numPts,fld, gain_p)
-   call MPI_ALLREDUCE(MPI_IN_PLACE,gain_p,numPts,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD, ierr)
-!
 !  a.ii) collect signal power values (in fiber core) on each MPI proc
    call MPI_ALLREDUCE(MPI_IN_PLACE,sign_irr,numPts,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD, ierr)
 !
@@ -86,13 +82,21 @@ subroutine pump_ode_solve
    enddo
 !
 !..iterate a few times (fixed-point iteration)
-!  since n_ex(i) on the RHS depends on pump_irr(i)
-   max_it = 1; eps = 1.d-6
+!  since n_ex(i) resp. gain_p(i) on the RHS depends on pump_irr(i)
+   max_it = 10; eps = 1.d-6
    do j=1,max_it
-!     c) excited-state population density
+!
+!  ...compute pump gain across transverse core area
+!     (depends on pump irradiance pump_irr(i))
+      fld = 0
+      gain_p = 0.d0
+      call compute_gain(zValues,numPts,fld, gain_p)
+      call MPI_ALLREDUCE(MPI_IN_PLACE,gain_p,numPts,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD, ierr)
+!
+!     c) excited-state population density (not needed if compute_gain function is used)
       l2norm = 0.d0
       do i=1,numPts
-         Is = sign_irr(i)
+         Is = sign_irr(i) ! using transverse-average signal irradiance, different from compute_gain
          Ip = pump_irr(i)
          sum1 = (SIGMA_S_ABS/OMEGA_SIGNAL)*Is+(SIGMA_P_ABS/OMEGA_PUMP)*Ip
          sum2 = ((SIGMA_S_ABS+SIGMA_S_EMS)/OMEGA_SIGNAL)*Is + &
@@ -112,8 +116,8 @@ subroutine pump_ode_solve
       if (COPUMP.eq.1) then
          do i=1,numPts-1
             Ip = pump_irr(i+1)
-            a = -SIGMA_P_ABS + (SIGMA_P_ABS+SIGMA_P_EMS)*n_ex(i)
-            gain = gain_p(i) / (PI*R_CORE*R_CORE)
+            a = -SIGMA_P_ABS + (SIGMA_P_ABS+SIGMA_P_EMS)*n_ex(i) ! gain from transverse-averaged signal irr
+            gain = gain_p(i) / (PI*R_CORE*R_CORE) ! transverse-integrated gain function
             if (RANK.eq.ROOT) write(*,2002) a, gain
             pump_irr(i+1) = pump_irr(i) + (R_CORE*R_CORE/(R_CLAD*R_CLAD)) * &
                                         dz * g0 * gain * N_TOTAL * pump_irr(i)
@@ -145,11 +149,12 @@ subroutine pump_ode_solve
          write(*,*) 'pump_ode_solve: fixed-point iteration not converged, max_it = ', max_it
          write(*,*) 'l2diff, l2norm = ', l2diff, l2norm
       endif
-   enddo
 !
-!..update global pump power array based on irradiance solution
-   do i=1,numPts
-      PUMP_VAL(i) = pump_irr(i) * (PI*R_CLAD*R_CLAD)
+!  ...update global pump power array based on irradiance solution
+!     (needed here since compute_gain uses PUMP_VAL array)
+      do i=1,numPts
+         PUMP_VAL(i) = pump_irr(i) * (PI*R_CLAD*R_CLAD)
+      enddo
    enddo
 !
 !..deallocate auxiliary arrays
@@ -285,7 +290,13 @@ subroutine compute_gain(ZValues,Num_zpts,Fld, Gain)
 !$OMP SCHEDULE(DYNAMIC)
    do iel=1,NRELES_SUBD
       mdle = ELEM_SUBD(iel)
-      if (GEOM_NO .eq. 5) call find_domain(mdle, ndom)
+      if (GEOM_NO.eq.5) then
+!     ...skip elements outside the fiber core (gain region)
+         call find_domain(mdle, ndom)
+         if (ndom.ne.1 .and. ndom.ne.2) then
+            continue
+         endif
+      endif
       call nodcor_vert(mdle, xnod)
       etype = NODES(Mdle)%type
       select case(etype)
@@ -296,17 +307,13 @@ subroutine compute_gain(ZValues,Num_zpts,Fld, Gain)
             maxz = maxval(xnod(3,1:6))
             minz = minval(xnod(3,1:6))
          case default
-            write(*,*) 'compute_power: invalid etype param. stop.'
+            write(*,*) 'compute_gain: invalid etype param. stop.'
             stop
       end select
       do i=1,Num_zpts
          if((ZValues(i).le.maxz).and.(ZValues(i).gt.minz)) then
             call compute_faceGain(mdle,faceNum,Fld, faceGain)
-            if (GEOM_NO .eq. 5) then
-               select case(ndom)
-                  case(1,2); Gain(i) = Gain(i) + faceGain
-               end select
-            endif
+            Gain(i) = Gain(i) + faceGain
          endif
       enddo
    enddo
@@ -475,10 +482,12 @@ subroutine compute_faceGain(Mdle,Facenumber,Fld, FaceGain)
    call set_2D_int(ftype,norderf,nface_orient(Facenumber), nint,tloc,wtloc)
    INTEGRATION = 0
 !
+!..Fld=1: compute signal gain
    if(Fld.eq.1) then
       sigma_abs = SIGMA_S_ABS
       sigma_ems = SIGMA_S_EMS
    endif
+!..Fld=0: compute pump gain
    if(Fld.eq.0) then
       sigma_abs = SIGMA_P_ABS
       sigma_ems = SIGMA_P_EMS
@@ -512,7 +521,6 @@ subroutine compute_faceGain(Mdle,Facenumber,Fld, FaceGain)
 !
 !  ...compute pump irradiance
       if (PLANE_PUMP .eq. 1) then
-!        set plane pump power the same here and in thermal polarization computation
 !     ...assume pump is a plane wave in fiber cladding (cladding-pumped)
          Ip = PLANE_PUMP_POWER / (PI*R_CLAD*R_CLAD) ! calculate non-dimensional irradiance
       elseif (PLANE_PUMP .eq. 2) then
