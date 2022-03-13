@@ -337,8 +337,7 @@ subroutine exec_job_coupled
   4240   format(A,F10.4)
 !
 !     ...copy current solution components of all fields into previous solution
-         if (RANK.eq.ROOT) write(*,*)
-         if (RANK.eq.ROOT) write(*,*) 'copy_coms...'
+         if (RANK.eq.ROOT) write(*,4200) 'copy_coms...'
          call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
          call copy_coms(No1,No2)
          call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
@@ -353,7 +352,7 @@ subroutine exec_job_coupled
 !  ...calculating power
       if (RANK.eq.ROOT) write(*,*) 'Computing power...'
       numPts = 2**IMAX; fld = 2
-      if (PLANE_PUMP .eq. 1) fld = 1
+      if (PLANE_PUMP.eq.1) fld = 1
       call get_power(fld,numPts,time_step)
       !call get_power(2,numPts,-1)
       if (RANK.eq.ROOT) write(*,*) ''
@@ -377,7 +376,7 @@ subroutine exec_job_coupled
 !
 !..compute final residual values (if not previously computed)
    if (.not. ires) then
-      if (PLANE_PUMP .eq. 0) then
+      if (PLANE_PUMP.eq.0) then
          QUIET_MODE = .true.; IPRINT_TIME = 0
          if (RANK.eq.ROOT) write(*,4200) '   Pump residual:'
          NO_PROBLEM = 4
@@ -401,7 +400,7 @@ subroutine exec_job_coupled
       enddo
    endif
 !
-   if(PLANE_PUMP.eq.2) call pump_ode_dealloc
+   if (PLANE_PUMP.eq.2) call pump_ode_dealloc
 !
   100 format(/,'/////////////////////////////////////////////////////////////', &
              /,'             ',A,I2,/)
