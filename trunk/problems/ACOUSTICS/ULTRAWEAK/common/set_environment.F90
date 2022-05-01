@@ -87,7 +87,7 @@ subroutine set_environment
 !
 
    call get_option_int     &
-        ('-bc','1)Dirichlet, 2)Neumann, 3)Impedance' ,BC_IMPEDANCE,IBC_PROB)
+        ('-bc','1)Dirichlet, 2)Neumann, 3)Impedance' ,BC_DIRICHLET,IBC_PROB)
 !        
    call get_option_int     &
         ('-exact','Manufactured solution (integer: 1-5)',IEXACT_GAUSSIANBEAM,ISOL)

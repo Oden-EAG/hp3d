@@ -406,7 +406,7 @@
             shapH3(:,1)=sH3p(:,pz)
             shapH3(:,2)=dsH3p(:,pz)
 !        ...Compute shape functions needed for geometry - 3D H1 shape functions        
-            call shape3H(etype,xip,norder,norient_edge,norient_face, nvoid,shapH,gradH)
+            call shape3DH(etype,xip,norder,norient_edge,norient_face, nvoid,shapH,gradH)
 !        ...Geometry map
             call geom3D(Mdle,xip,xnod,shapH,gradH,nrdofH,x,dxdxi,dxidx,rjac,iflag)
             if (iflag.ne.0) then
@@ -1170,10 +1170,10 @@
          call face_param(etype,if,t, xi,dxidt)
 ! 
 !     ...determine element H1 shape functions (for geometry)
-         call shape3H(etype,xi,norder,norient_edge,norient_face, nvoid,shapH,gradH)
+         call shape3DH(etype,xi,norder,norient_edge,norient_face, nvoid,shapH,gradH)
 ! 
 !     ...determine element Hdiv shape functions (for fluxes)
-         call shape3V(etype,xi,norder,norient_face, nvoid,shapV,divV)
+         call shape3DV(etype,xi,norder,norient_face, nvoid,shapV,divV)
 !  
 !     ...determine discontinuous H1 shape functions
          call shape3HH(etype,xi,nordP, nvoid,shapHH,gradHH)

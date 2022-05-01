@@ -83,6 +83,14 @@ program main
    STORE_STC = .true.
    HERM_STC  = .false.
 !
+!..set interface variables
+!  (1) - H1 trace (1 scalar-valued component)
+!  (2) - H(div) trace (1 vector-valued component)
+!  (3) - L2 field (1 vector-valued component)
+   PHYSAi(1:3) = (/.true.,.true.,.false./)
+
+
+
 !..determine number of omp threads running
    if (RANK .eq. ROOT) then
       write(6,1025) ' Initial polynomial order: ',IP

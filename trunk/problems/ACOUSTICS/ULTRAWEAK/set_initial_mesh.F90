@@ -29,26 +29,23 @@ subroutine set_initial_mesh(Nelem_order)
    !  
       integer,dimension(NRELIS),intent(out) :: Nelem_order
    !..BC flags
-      integer, dimension(6,NR_PHYSA) :: ibc
+      integer, dimension(6,NRINDEX) :: ibc
    !..miscellaneous
-      integer :: iprint,ifc,iel,neig,iat,iDisplacement
-      ! integer, parameter :: adj_elems(1:6) = (/5,11,13,14,16,22/)
-      ! integer, parameter :: adj_elems(1:6) = (/38,58,62,63,67,87/)
+      integer :: iprint,i,ifc,iel,neig, iat
+   ! integer, parameter :: adj_elems(1:6) = (/5,11,13,14,16,22/)
+   ! integer, parameter :: adj_elems(1:6) = (/38,58,62,63,67,87/)
       integer, parameter :: adj_elems(1:6) = (/123,165,171,172,178,220/)
-   
    !
    !------------------------------------------------------------------------------------
    !..initialize
       iprint=0
+
    !
    !..check if have not exceeded the maximum order
       if (IP.gt.MAXP) then
          write(*,*) 'set_initial_mesh: IP, MAXP = ', IP,MAXP
          stop 1
       endif
-   !
-   !..add flag `8' to the list of Dirichlet flags
-      call add_dirichlet_to_list(8)
    !
    !..set BC
    !..loop over initial mesh elements
@@ -77,9 +74,8 @@ subroutine set_initial_mesh(Nelem_order)
             stop 2
          endif
    !
-   !  ...set BC flags: 0 - no BC ; 1 - Dirichlet ; 2 - Neumann ; 3 - Robin ; >3 - Mixed
-         ibc(1:6,1:NR_PHYSA) = 0
-   
+   !  ...set BC flags: 0 - no BC ; 1 
+         ibc(1:6,1:NRINDEX) = 0
    
          select case(IBC_PROB)
    !
@@ -92,10 +88,6 @@ subroutine set_initial_mesh(Nelem_order)
                case(0)
    !              ibcflag      -> physics variable
                   ibc(ifc,1) = 1  ! trace (H1)
-                  ibc(ifc,2) = 0  ! fluxv (H(div))
-                  ibc(ifc,3) = 0  ! field (L2)
-   !              Note that L2 variables should not take values at the boundary,
-   !              so their ibc should always be 0 (no BC).
                end select
             enddo
          case(BC_NEUMANN)
@@ -104,9 +96,7 @@ subroutine set_initial_mesh(Nelem_order)
                neig = ELEMS(iel)%neig(ifc)
                select case(neig)
                case(0)
-                  ibc(ifc,1) = 0  ! trace (H1)
                   ibc(ifc,2) = 1  ! fluxv (H(div))
-                  ibc(ifc,3) = 0  ! field (L2)
                end select
             enddo
          case(BC_IMPEDANCE)
@@ -115,9 +105,7 @@ subroutine set_initial_mesh(Nelem_order)
                neig = ELEMS(iel)%neig(ifc)
                select case(neig)
                case(0)
-                  ibc(ifc,1) = 0  ! trace (H1)
                   ibc(ifc,2) = 9  ! fluxv (H(div))
-                  ibc(ifc,3) = 0  ! field (L2)
                end select
             enddo
    !     ...scattering by a thin plate
@@ -199,9 +187,7 @@ subroutine set_initial_mesh(Nelem_order)
                   neig = ELEMS(iel)%neig(ifc)
                   select case(neig)
                   case(0)
-                     ibc(ifc,1) = 0  ! trace (H1)
                      ibc(ifc,2) = 9  ! fluxv (H(div))
-                     ibc(ifc,3) = 0  ! field (L2)
                   end select
                enddo
             end select
@@ -231,9 +217,7 @@ subroutine set_initial_mesh(Nelem_order)
                   neig = ELEMS(iel)%neig(ifc)
                   select case(neig)
                   case(0)
-                     ibc(ifc,1) = 0  ! trace (H1)
                      ibc(ifc,2) = 9  ! fluxv (H(div))
-                     ibc(ifc,3) = 0  ! field (L2)
                   end select
                enddo
             endif
@@ -241,10 +225,10 @@ subroutine set_initial_mesh(Nelem_order)
    
          end select   
    !
-   !  ...allocate BC flags (one per attribute)
-         allocate(ELEMS(iel)%bcond(NR_PHYSA))
+   !  ...allocate BC flags (one per attribute component)
+         allocate(ELEMS(iel)%bcond(NRINDEX))
    !  ...for each attribute, encode face BC into a single BC flag
-         do iat=1,NR_PHYSA
+         do iat=1,NRINDEX
             call encodg(ibc(1:6,iat),10,6, ELEMS(iel)%bcond(iat))
          enddo
    !
