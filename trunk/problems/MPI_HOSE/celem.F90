@@ -50,7 +50,7 @@ subroutine celem( &
 
     nbcond = (/0,1,0,0,0/)
     call encod(nbcond,10,NR_PHYSA, NODES(Mdle)%bcond)
-    call set_index(NODES(Mdle)%case,NODES(Mdle)%bcond, NODES(Mdle)%index)
+    ! call set_index(NODES(Mdle)%case,NODES(Mdle)%bcond, NODES(Mdle)%index)
 
 ! ULTRA-WEAK
   case(31)  ! 2^4+2^3+2^2+2^1+2^0
@@ -60,7 +60,7 @@ subroutine celem( &
     ! eliminate middle node H^1 and H(div) dof in celem_system by using BC flag
     nbcond = (/1,1,0,0,0/)
     call encod(nbcond,10,NR_PHYSA, NODES(Mdle)%bcond)
-    call set_index(NODES(Mdle)%case,NODES(Mdle)%bcond, NODES(Mdle)%index)
+    ! call set_index(NODES(Mdle)%case,NODES(Mdle)%bcond, NODES(Mdle)%index)
 
   case default
 
@@ -80,7 +80,7 @@ subroutine celem( &
   select case(NODES(Mdle)%case)
   case(24,31)
     NODES(Mdle)%bcond = 0
-    call set_index(NODES(Mdle)%case,NODES(Mdle)%bcond, NODES(Mdle)%index)
+    ! call set_index(NODES(Mdle)%case,NODES(Mdle)%bcond, NODES(Mdle)%index)
   end select
 
 end subroutine celem

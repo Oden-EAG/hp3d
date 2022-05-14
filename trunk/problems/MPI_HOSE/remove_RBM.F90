@@ -31,7 +31,7 @@ subroutine remove_RBM
   nbcond = (/1,0,0,0,0/)
   ! nbcondtmp = NODES(NRELIS+pt)%bcond
   call encod(nbcond,10,NR_PHYSA, NODES(NRELIS+pt)%bcond)
-  call set_index(NODES(NRELIS+pt)%case,NODES(NRELIS+pt)%bcond, NODES(NRELIS+pt)%index)
+  ! call set_index(NODES(NRELIS+pt)%case,NODES(NRELIS+pt)%bcond, NODES(NRELIS+pt)%index)
   ! NODES(NRELIS+pt)%bcond = nbcondtmp
 !
 !  B
@@ -39,7 +39,7 @@ subroutine remove_RBM
   nbcond = (/6,6,0,0,0/)
   ! nbcondtmp = NODES(NRELIS+pt)%bcond
   call encod(nbcond,10,NR_PHYSA, NODES(NRELIS+pt)%bcond)
-  call set_index(NODES(NRELIS+pt)%case,NODES(NRELIS+pt)%bcond, NODES(NRELIS+pt)%index)
+  ! call set_index(NODES(NRELIS+pt)%case,NODES(NRELIS+pt)%bcond, NODES(NRELIS+pt)%index)
   ! NODES(NRELIS+pt)%bcond = nbcondtmp
 !
 !  C
@@ -47,7 +47,7 @@ subroutine remove_RBM
   nbcond = (/5,5,0,0,0/)
   ! nbcondtmp = NODES(NRELIS+pt)%bcond
   call encod(nbcond,10,NR_PHYSA, NODES(NRELIS+pt)%bcond)
-  call set_index(NODES(NRELIS+pt)%case,NODES(NRELIS+pt)%bcond, NODES(NRELIS+pt)%index)
+  ! call set_index(NODES(NRELIS+pt)%case,NODES(NRELIS+pt)%bcond, NODES(NRELIS+pt)%index)
   ! NODES(NRELIS+pt)%bcond = nbcondtmp
 
 

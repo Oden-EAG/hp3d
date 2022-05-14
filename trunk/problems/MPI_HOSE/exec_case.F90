@@ -153,7 +153,7 @@ subroutine exec_case(idec)
 !  ...solve problem with Frontal solver (sequential)
       case(43)
          write(*,*) 'calling Frontal (Seq) solver...'
-         call solve1(1)
+         ! call solve1(1)
 !
 !  ...solve problem with omp_mumps (OpenMP MUMPS)
       case(44)

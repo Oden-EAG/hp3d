@@ -1,23 +1,25 @@
 SRC_MODULE  = \
             ./module/common_prob_data.F90 \
-            ./module/geometry_transformations.F90 \
             ./module/sheathed_isotropic_materials.F90 \
             ./module/primal_module.F90 \
             ./module/uweak_module.F90
 
 SRC_COMMON = \
-            ./common/routines/customize_geometry.F90 \
+            ./common/customize_geometry.F90 \
             ./common/dirichlet.F90 \
-            ./common/routines/set_environment.F90 \
-            ./common/routines/initialize.F90 \
-            ./common/routines/finalize.F90 \
+            ./common/set_environment.F90 \
+            ./common/initialize.F90 \
+            ./common/finalize.F90 \
             ./common/solutions.F90 \
-            ./common/routines/getf.F90
+            ./common/residual.F90 \
+            ./common/uniform_href.F90 \
+            ./common/getf.F90
 
 SRC_ELAST  = \
             elem.F90 \
             elem_residual.F90 \
-            refine_DPG.F90 \
+            exec_case.F90 \
+            exec_job.F90 \
             celem.F90 \
             exact.F90 \
             exact_error.F90 \
