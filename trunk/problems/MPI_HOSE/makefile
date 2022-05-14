@@ -1,12 +1,13 @@
 #####-----------------------------------------
 
-COMPLEX         = 0
-PARALLEL        = 0
+-include ../../m_options
 
--include ../../../m_options
+COMPLEX        ?= 0
+DEBUG_MODE     ?= 0
 
-FORM            ?= PRIMAL
-# FORM            = STRONG
+ifeq ($(COMPLEX),1)
+$(error COMPLEX FLAG MUST BE 0 FOR LINEAR ELASTICITY APPLICATION)
+endif
 
 SRC_PATH        = .
 OBJ_ROOT        = _obj_
@@ -14,50 +15,28 @@ OBJ_PATH        = $(OBJ_ROOT)/maindir
 MODULE_PATH     = $(OBJ_PATH)
 
 
-# executable name
-ifeq ($(FORM),WEAK)
-EXEC            = DPG_uweak
-else ifeq ($(FORM),STRONG)
-EXEC            = DPG_uweak_symm
-else ifeq ($(FORM),PRIMAL)
-EXEC            = DPG_incomp_primal
-else ifeq ($(FORM),HYBRID)
-EXEC            = DPG_hybrid
-else ifeq ($(FORM),PRIMALIMPROVED)
-EXEC            = DPG_impr_primal
-else ifeq ($(FORM),PROJ)
-EXEC            = proj
-endif
-EXECS           = DPG_uweak DPG_uweak_symm DPG_primal DPG_impr_primal DPG_hybrid proj
+# Executable name
+EXEC            = hose
+EXECS           = hose
 
 # Includes and defs
 CCDEFS          = $(PROB_PP_DEFS)
-
 CCINCS          = $(PROB_INCS)
 
-
 ###### User defined libraries
-LIBS            = $(PROB_LIBS)
+# LIBS            = $(PROB_LIBS)
 
 # Defines SRC_FILE
-ifeq ($(EXEC),DPG_uweak)
--include ./WEAK_SYMMETRY/make.inc
-else ifeq ($(EXEC),DPG_uweak_symm)
--include ./STRONG_SYMMETRY/make.inc
-else ifeq ($(EXEC),DPG_incomp_primal)
--include ./INCOMP_PRIMAL/make.inc
-else ifeq ($(EXEC),DPG_hybrid)
--include ./HYBRID/make.inc
-else ifeq ($(EXEC),DPG_impr_primal)
--include ./IMPROVED_PRIMAL/make.inc
-else ifeq ($(EXEC),proj)
--include ./PROJECTION/make.inc
-endif
+-include ./make.inc
 
 SRC         = $(addprefix $(SRC_PATH)/,$(SRC_FILE))
 OBJ         = $(addprefix $(OBJ_PATH)/,$(SRC_FILE:.F90=.o))
 # OBJ	    += $(OBJ_PATH)/main.o
 
+ifeq ($(DEBUG),YES)
+FFLAGS += -gen-interface -warn none -warn interfaces
+endif
+#
 FC_WORK     = $(FC) $(CCDEFS) $(CCINCS) $(FFLAGS) $(EXTRA_FFLAGS)
 
 #	( cd ../.. ; make )
@@ -68,7 +47,7 @@ one : $(OBJ_PATH)/.dummy $(OBJ)
 	@echo "- Linking - ", $(EXEC)
 	@echo "- COMPLEX, PARALLEL ", $(COMPLEX) $(PARALLEL)
 	@echo "------------------------------ "
-	$(FC_WORK) -o $(EXEC) $(OBJ) $(LIBS)
+	$(FC_WORK) -o $(EXEC) $(OBJ) $(PROB_LIBS)
 
 all :
 	@for e in $(EXECS) ; do \
@@ -94,3 +73,7 @@ clean :
 	@rm -rf $(OBJ_ROOT)
 	@rm -f $(EXECS)
 	@rm -f *~
+
+clean-pv :
+	@rm -f ../outputs/paraview/*.xmf
+	@rm -f ../outputs/paraview/*.h5

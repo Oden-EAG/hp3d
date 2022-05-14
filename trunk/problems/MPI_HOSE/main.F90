@@ -1,59 +1,323 @@
-!-----------------------------------------------------------------------
-!> Purpose : a code for elasticity
-!-----------------------------------------------------------------------
+!----------------------------------------------------------------------
+!
+!     program name      - main
+!
+!----------------------------------------------------------------------
+!
+!     latest revision:  - April 2022
+!
+!     purpose:          - main driver for MPI test program
+!                         sheathed hose
+!
+!----------------------------------------------------------------------
 !
 program main
 !
   use environment
   use common_prob_data
-  use parameters,       only : NSTD_OUT
-  use data_structure3D, only : NRELES, NRDOFSH
-  use uhm2
-  use m_assembly,       only : MTime
-  use paraview,         only : PARAVIEW_DOMAIN
-  ! use environment,      only : PREFIX
+  use data_structure3D
+  use GMP
+  use control
+  use assembly
+  use assembly_sc, only: IPRINT_TIME
+  use stc        , only: STORE_STC,HERM_STC
 !
-!-----------------------------------------------------------------------
+  use MPI        , only: MPI_COMM_WORLD
+  use mpi_param  , only: ROOT,RANK,NUM_PROCS
+  use mpi_wrapper, only: mpi_w_init,mpi_w_finalize
+!
   implicit none
-  real*8  :: t,greedy,err,rnorm,rvoid,factor
-  integer :: i,ic,idec,iter,nvoid,istep,nsteps,nreflag,nstop,idec_solve
-  logical :: solved
-  character(len=128) :: PREFIX_tmp
+!
+!..auxiliary variables
+   integer :: i, ierr
+!
+!..OMP variables
+   integer :: num_threads, omp_get_num_threads
+!
+!..timer
+   real(8) :: MPI_Wtime,start_time,end_time
+!
 !-----------------------------------------------------------------------
-!                             INITIALIZATION
 !
-! Set common hp3d environment parameters (reads in options arguments)
-  call begin_environment  ! <---- found inside src/modules/environment.F90
+!..Initialize MPI environment
+   call mpi_w_init
 !
-! Set environment parameters specific to LINEAR_ELASTICITY
-! This sets default values for: FILE_REFINE,FILE_VIS,VLEVEL,FILE_CONTROL,FILE_GEOM,
-!                               FILE_ERR,FILE_HISTORY,FILE_PHYS
-  call set_environment  ! <---- found inside ../common/set_environment.F90
+!..Set common hp3D environment parameters (reads in options arguments)
+   call begin_environment
+   call set_environment
+   call end_environment
 !
-! Exit if this is a "dry run".
-  call end_environment  ! <---- found inside src/modules/environment.F90
+   if (RANK .eq. ROOT) then
+!  ...print header
+      write(6,*)'                                                        '
+      write(6,*)'//                                                    //'
+      write(6,*)'// --            HYBRID DPG FORMULATION            -- //'
+      write(6,*)'//                                                    //'
+      write(6,*)'// -- SHEATHED HOSE PROBLEM FOR LINEAR ELASTICITY  -- //'
+      write(6,*)'//                                                    //'
+      write(6,*)'                                                        '
+   endif
+   flush(6)
 !
-!     print fancy header
-      write(*,*)'                      '
-      write(*,*)'//                                             //'
-      write(*,*)'// --         HYBRID DPG FORMULATION        -- //'
-      write(*,*)'//                                             //'
-      write(*,*)'// -- SHEATHE PROBLEM FOR LINEAR ELASTICITY -- //'
-      write(*,*)'//                                             //'
-      write(*,*)'                                                 '
-! Initialize common library (set common parameters, load solvers, and create initial mesh)
-  call initialize  ! <---- found inside ../common/initialize.F90
+   IPRINT_TIME = 1
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
-! Mod out by infinitesimal rigid body motions
-! IBC_PROB : 0 - uniform traction ; 1 - clamped ends ; 2 - free ends ; 3 - periodic ends
-  if ((IBC_PROB.eq.2).or.(IBC_PROB.eq.3)) then
-  ! if ((IBC_PROB.eq.2)) then
-    call remove_RBM(IBC_PROB)
-    ! call update_gdof
-    call update_Ddof
-  endif
-!-----------------------------------------------------------------------
-!                            INTERACTIVE MODE
+!..initialize physics, geometry, etc.
+   do i = 0, NUM_PROCS-1
+      if ((RANK .eq. i) .and. (RANK .eq. ROOT)) then
+         write(6,*)
+         write(6,1020) "Master proc [", RANK, "], initialize.."
+         QUIET_MODE = .FALSE.
+      else if ((RANK .eq. i) .and. (RANK .ne. ROOT)) then
+         write(6,1020) "Worker proc [", RANK, "], initialize.."
+         QUIET_MODE = .TRUE.
+      endif
+   enddo
+ 1020 format (A,I3,A)
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+   call initialize
+!
+!   IBC_PROB : 0 - uniform traction ; 1 - clamped ends ; 2 - free ends ; 3 - periodic ends
+    if ((IBC_PROB.eq.2).or.(IBC_PROB.eq.3)) then
+      call remove_RBM(IBC_PROB)
+      call update_Ddof
+    endif
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
+   if (RANK .eq. ROOT) write(6,1015) end_time-start_time
+ 1015 format(' initialize : ',f12.5,' seconds',/)
+!
+!..FLAGS
+ ISTC_FLAG = .true.
+ STORE_STC = .true.
+ HERM_STC  = .false.
+!
+!..determine number of omp threads running
+ if (RANK .eq. ROOT) then
+    write(6,1025) ' Initial polynomial order: ',IP
+!$OMP parallel
+!$OMP single
+    num_threads = omp_get_num_threads()
+    write(6,1025) ' Number of OpenMP threads: ',num_threads
+1025 format(A,I2)
+!$OMP end single
+!$OMP end parallel
+ endif
+!
+ if (JOB .ne. 0) then
+    call exec_job
+ else
+    if (RANK .eq. ROOT) then
+       call master_main
+    else
+       call worker_main
+    endif
+ endif
+!
+ call finalize
+ call mpi_w_finalize
+!..END MPI
+!
+end program main
+!
+!
+!----------------------------------------------------------------------
+! master_main
+!----------------------------------------------------------------------
+subroutine master_main()
+  !
+     use environment
+     use common_prob_data
+     use data_structure3D
+     use GMP
+  !
+     use MPI           , only: MPI_COMM_WORLD,MPI_INTEGER
+     use mpi_param     , only: ROOT,RANK,NUM_PROCS
+     use par_mesh      , only: DISTRIBUTED,HOST_MESH
+     use zoltan_wrapper, only: zoltan_w_set_lb
+  !
+     implicit none
+  !
+  !..MPI variables
+     integer :: ierr
+  !
+  !..auxiliary variables
+     integer :: idec, r, lb, count, src
+  !
+  !----------------------------------------------------------------------
+  !
+     if (RANK .ne. ROOT) then
+        write(*,*) 'master_main: RANK .ne. ROOT'
+        stop
+     endif
+  !
+  !..start user interface, with idec
+  !..broadcast user command to workers
+  !
+  !..test accessing data structures
+     write(6,8020) '[', RANK, '] : ', 'NRELIS,NRELES,NRNODS = ',NRELIS,NRELES,NRNODS
+   8020 format(A,I3,A,A,I4,', ',I4,', ',I4)
+  !
+     flush(6)
+     call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+  !
+  #if DEBUG_MODE
+     write(*,*) '========================='
+     write(*,*) '  RUNNING in DEBUG_MODE  '
+     write(*,*) '========================='
+  #endif
+  !
+  !..display menu in infinite loop
+     idec = 1
+     do while(idec /= 0)
+  !
+        write(*,*)
+        write(*,*) '=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='
+        write(*,*) 'SELECT'
+        write(*,*) 'QUIT....................................0'
+        write(*,*) '                                         '
+        write(*,*) '     ---- Visualization, I/O ----        '
+        write(*,*) 'HP3D graphics (graphb)..................1'
+        write(*,*) 'HP3D graphics (graphg)..................2'
+        write(*,*) 'Paraview................................3'
+        write(*,*) '                                         '
+        write(*,*) '    ---- Print Data Structure ----       '
+        write(*,*) 'Print arrays (interactive).............10'
+        write(*,*) 'Print data structure arrays............11'
+        write(*,*) 'Print current partition (elems)........15'
+        write(*,*) 'Print current subdomains (nodes).......16'
+        write(*,*) 'Print partition coordinates............17'
+        write(*,*) '                                         '
+        write(*,*) '        ---- Refinements ----            '
+        write(*,*) 'Single uniform h-refinement............20'
+        write(*,*) 'Single uniform p-refinement............21'
+        write(*,*) 'Multiple uniform h-refs + solve........22'
+        write(*,*) 'Single anisotropic h-refinement (z)....23'
+        write(*,*) 'Refine a single element................26'
+        write(*,*) '                                         '
+        write(*,*) '        ---- MPI Routines ----           '
+        write(*,*) 'Distribute mesh........................30'
+        write(*,*) 'Collect dofs on ROOT...................31'
+        write(*,*) 'Suggest mesh partition (Zoltan)........32'
+        write(*,*) 'Evaluate mesh partition (Zoltan).......33'
+        write(*,*) 'Run verification routines..............35'
+        write(*,*) '                                         '
+        write(*,*) '          ---- Solvers ----              '
+        write(*,*) 'MUMPS (MPI)............................40'
+        write(*,*) 'MUMPS (OpenMP).........................41'
+        write(*,*) 'Pardiso (OpenMP).......................42'
+        write(*,*) 'Frontal (Seq)..........................43'
+        write(*,*) 'MUMPS (Nested Dissection)..............44'
+        write(*,*) 'PETSc (MPI)............................45'
+        write(*,*) '                                         '
+        write(*,*) '     ---- Error and Residual ----        '
+        write(*,*) 'Compute exact error....................50'
+        write(*,*) '                                         '
+        write(*,*) '          ---- TESTING ----              '
+        write(*,*) 'Flush dof, update_gdof, update_Ddof....60'
+        write(*,*) 'P-refine an element....................65'
+        write(*,*) '=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='
+  !
+        read( *,*) idec
+        write(6,8010) '[', RANK, '] : ','Broadcast: idec = ', idec
+   8010 format(A,I3,A,A,I3)
+        count = 1; src = ROOT
+        call MPI_BCAST (idec,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+  !
+        select case(idec)
+  !     ...QUIT
+           case(0) ; goto 89
+  !
+  !     ...HP3D graphics
+           case(1)
+              if (DISTRIBUTED .and. (.not. HOST_MESH)) then
+                 write(*,*) 'Cannot use HP3D graphics with distributed mesh!'
+              else
+                 call graphb
+              endif
+           case(2)
+              if (DISTRIBUTED .and. (.not. HOST_MESH)) then
+                 write(*,*) 'Cannot use HP3D graphics with distributed mesh!'
+              else
+                 call graphg
+              endif
+  !
+  !     ...Paraview graphics
+           case(3) ; call exec_case(idec)
+  !
+  !     ...Print data structure
+           case(10,11)
+              r = ROOT
+              if (NUM_PROCS .gt. 1) then
+                 write(*,*) 'Select processor RANK: '
+                 read (*,*) r
+                 count = 1; src = ROOT
+                 call MPI_BCAST (r,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+              endif
+              if (r .eq. RANK) then
+                 call exec_case(idec)
+              endif
+           case(15,16,17)
+              call exec_case(idec)
+  !
+  !     ...Refinements
+           case(20,21,22,23,26)
+              call exec_case(idec)
+  !
+  !     ...MPI Routines
+           case(31,33,35)
+              call exec_case(idec)
+  !
+  !     ...MPI Routines (partitioner)
+           case(30,32)
+  !        ...Load balancing strategy
+              if (DISTRIBUTED) then
+                 write(*,*) 'Select load balancing strategy:'
+                 write(*,*) '  0: nelcon'
+                 write(*,*) '  1: BLOCK'
+                 write(*,*) '  2: RANDOM'
+                 write(*,*) '  3: RCB'
+                 write(*,*) '  4: RIB'
+                 write(*,*) '  5: HSFC'
+                 write(*,*) '  6: GRAPH'
+                 write(*,*) '  7: FIBER'
+                 read (*,*) lb
+                 count = 1; src = ROOT
+                 call MPI_BCAST (lb,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+                 call zoltan_w_set_lb(lb)
+              endif
+              call exec_case(idec)
+  !
+  !     ...Solvers
+           case(40,41,42,43,44,45)
+              call exec_case(idec)
+  !
+  !     ...Error and Residual
+           case(50)
+              call exec_case(idec)
+  !
+  !     ...TODO testing
+           case(60)
+              call exec_case(idec)
+  !
+           case(65)
+              call exec_case(idec)
+  !
+        end select
+  !
+        call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+  !
+  !..end infinite loop
+     enddo
+  !
+     call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+  !
+  89 continue
+     write(6,8030) '[', RANK, '] : ','master_main end.'
+   8030 format(A,I3,A,A)
+  !
+  end subroutine master_main
+  !
+  !
 !   display menu
   solved = .FALSE.
   idec=1
