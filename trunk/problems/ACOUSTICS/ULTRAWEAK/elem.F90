@@ -113,16 +113,16 @@
             go to 10
          endif   
    
-         call elem_acoustics(Mdle,nord_add_local,nrTest,nrTrial,      &
+         call elem_acoustics_fi(Mdle,nord_add_local,nrTest,nrTrial,      &
                                           nrdofHH,nrdofVV,nrdofH,nrdofV,nrdofQ,    &
                                           nrdofHi, nrdofVi,                        &   
                                           nrdofHx,    nrdofHy,    nrdofHz,         &
                                           nrdofQx_tr, nrdofQy_tr, nrdofQz_tr)    
    
    
-   
-         ! call elem_DPG_UWEAK_ACOUSTICS(mdle,nord_add_local,nrTest,nrTrial,                     &
-         !                               nrdofHH,nrdofVV,nrdofH,nrdofV,nrdofQ)
+         ! nrTrial = nrdofH + nrdofV + 4*nrdofQ 
+         ! call elem_acoustics(mdle,nord_add_local,nrTest,nrTrial,                     &
+         !                     nrdofHH,nrdofVV,nrdofH,nrdofV,nrdofQ)
    
       case default
          write(*,*) 'elem: Mdle,NODES(Mdle)%case = ',  &
@@ -151,7 +151,7 @@
 !
 !----------------------------------------------------------------------
 !    
-   subroutine elem_acoustics(Mdle,Nord_add_local,NrTest,NrTrial,      &
+   subroutine elem_acoustics_fi(Mdle,Nord_add_local,NrTest,NrTrial,      &
                              NrdofHH,NrdofVV,NrdofH,NrdofV,NrdofQ,    &
                              NrdofHi, NrdofVi,                        &   
                              NrdofH1,    NrdofH2,    NrdofH3,         &
@@ -1283,6 +1283,13 @@
    uplo = 'U'
 ! 
 !..factorize the test Stiffness matrix
+   write(*,*)'nrTest=',nrTest
+   call pause
+   do i=1,NrTEST
+      do ii=1,NrTest
+      write(*,*) Gram(i,ii)
+      enddo
+   enddo
 
    call ZPOTRF(uplo,NrTEST,gram,NrTEST,info)
    if (info.ne.0) then
@@ -1326,7 +1333,498 @@
    ALOC(3,3)%array(1:j3,1:j3) = zaloc(j1+j2+1:j1+j2+j3,j1+j2+1:j1+j2+j3)
 !
 !   
-end subroutine elem_acoustics
+end subroutine elem_acoustics_fi
+
+
+subroutine elem_acoustics(Mdle,nord_add_local,nrTest,nrTrial,     &
+                          nrdofHH,nrdofVV,nrdofH,nrdofV,nrdofQ)
+!
+   use data_structure3D
+   use parametersDPG
+   use control,       only: INTEGRATION
+   use assembly,      only: ALOC,BLOC,NR_RHS
+   use common_prob_data
+!
+#include "syscom.blk"
+!
+!----------------------------------------------------------------------
+!
+   character(len=4) :: etype,ftype
+!
+!..element order, orientation for edges and faces
+   dimension norder(19),norient_edge(12),norient_face(6)
+!
+!..face order
+   dimension norderf(5)
+!
+!..geometry dof
+   dimension xnod(3,MAXbrickH)
+! 
+!..geometry
+   dimension xi(3),dxidt(3,2),x(3),dxdxi(3,3),dxidx(3,3), dxdt(3,2)
+   dimension rt(3,2),rn(3),t(2)
+!
+!..3D quadrature data
+   dimension xiloc(3,MAXNINT3ADD),waloc(MAXNINT3ADD)
+!
+!..2D quadrature data
+   dimension tloc(2,MAXNINT2ADD),wtloc(MAXNINT2ADD)
+!
+!..BC's flags
+   dimension ibc(6,NR_PHYSA)
+!..workspace for trial and test variables
+   dimension dq(3) , u(3), dp(1:3), v(3), vec(3)
+!
+!..source
+   dimension zf(4)
+!
+!..enriched order
+!  
+   integer :: nord_add_local
+!   
+!
+!..H1 shape functions
+   real*8  :: shapH (MAXbrickH)  , gradH(3,MAXbrickH)
+   real*8  :: shapHH(MAXbrickHH) , gradHH(3,MAXbrickHH)
+!..Hdiv shape functions
+   real*8  :: shapV (3,MAXbrickV) , divV(MAXbrickV) 
+   real*8  :: shapVV(3,MAXbrickVV), divVV(MAXbrickVV)
+!..L2 shape functions
+   real*8  :: shapQ(MAXbrickQ)
+!
+!..load vector for the enriched space
+   complex*16 :: BloadHV(nrTest), Gram(nrTest,nrTest)
+!
+!..Stiffness matrices for the enriched test space
+   complex*16 :: StiffHV_H(nrdofH,nrTest)
+   complex*16 :: StiffHV_V(nrdofV,nrTest)
+   complex*16 :: StiffHV_Q(4*nrdofQ,nrTest)
+   complex*16 :: Stiff_ALL(nrTest,nrTRIAL+1)
+   complex*16 :: Zaloc(nrTRIAL+1,nrTRIAL+1)
+! 
+!..lapack
+   character*1 uplo
+!
+!----------------------------------------------------------------------
+!
+   iprint = 0
+!..element type
+   etype = NODES(Mdle)%type
+   nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
+!
+!..determine order of approximation
+   call find_order(Mdle, norder)
+!
+!..set the enriched order of approximation
+   select case(etype)
+      case('mdlb')        ; nordP = NODES(Mdle)%order + nord_add_local*111
+      case('mdln','mdld') ; nordP = NODES(Mdle)%order + nord_add_local*1
+      case('mdlp')        ; nordP = NODES(Mdle)%order + nord_add_local*11
+   end select
+
+
+   write(*,*) 'nrTest = ', nrTest
+   write(*,*) 'nrTrial = ', nrTrial
+
+
+!..determine edge and face orientations
+   call find_orient(Mdle, norient_edge,norient_face)
+!                                                                     
+!..determine nodes coordinates 
+   call nodcor(Mdle, xnod)
+!
+!..determine element size and scale correction
+   call find_hmin(Mdle,h_elem)
+! 
+!..get the element boundary conditions flags
+   call find_bc(Mdle, ibc)
+!                                                                    
+!..adjusted frequency for the test space 
+   ! omeg = min(OMEGA,6.d0/h_elem)
+   omeg = OMEGA
+
+!
+   BloadHV=ZERO; Gram=ZERO; Zaloc = ZERO
+   StiffHV_H=ZERO; StiffHV_V = ZERO; StiffHV_Q = ZERO ; Stiff_ALL = ZERO
+!
+!----------------------------------------------------------------------
+!     E L E M E N T    I N T E G R A L S                             
+!----------------------------------------------------------------------
+!
+!..use the enriched order to set the quadrature
+   INTEGRATION = nord_add_local
+   call set_3Dint_DPG(etype,norder, nint,xiloc,waloc)
+   INTEGRATION = 0
+!      
+!..loop over integration points      
+   do l=1,nint
+!      
+      xi(1:3)=xiloc(1:3,l) ; wa=waloc(l)
+!
+!  ...H1 shape functions (for geometry)
+      call shape3DH(etype,xi,norder,norient_edge,norient_face,nrdofH,shapH,gradH)
+!
+!  ...L2 shape functions for the trial space
+      call shape3DQ(etype,xi,norder, nrdofQ,shapQ)
+!
+!  ...discontinuous H1 shape functions for the enriched test space
+      call shape3HH(etype,xi,nordP, nrdofHH,shapHH,gradHH)
+!
+!  ...discontinuous H(div) shape functions for the enriched test space
+      call shape3VV(etype,xi,nordP, nrdofVV,shapVV,divVV)      
+!
+!  ...geometry map
+      call geom3D(Mdle,xi,xnod,shapH,gradH,nrdofH,x,dxdxi,dxidx,rjac,iflag)
+!
+!  ...integration weight 
+      weight = rjac*wa
+!
+!  ...get the RHS
+      call getf(Mdle,x, zf)
+!
+!  ...loop through enriched H1 test functions in the enriched space
+      do k1=1,nrdofHH
+!
+!     ...Piola transformation
+         q = shapHH(k1)
+         dq(1:3) = gradHH(1,k1)*dxidx(1,1:3) &
+                 + gradHH(2,k1)*dxidx(2,1:3) & 
+                 + gradHH(3,k1)*dxidx(3,1:3) 
+!
+!     ...accumulate for the load vector        
+         BloadHV(k1) = BloadHV(k1) + q*zf(1)*weight
+!          
+!     ...loop through L2 trial shape functions
+         do k2=1,nrdofQ
+!          
+!        ...Piola transformation
+            p = shapQ(k2)/rjac ; u(1:3) = p
+!           
+            m = (k2-1)*4+1
+            StiffHV_Q(m,k1) = StiffHV_Q(m,k1) + ZIMG*OMEGA*q*p*weight
+!
+            m = (k2-1)*4+2           
+            StiffHV_Q(m,k1) = StiffHV_Q(m,k1) - dq(1)*u(1)*weight         
+!
+            m = (k2-1)*4+3
+            StiffHV_Q(m,k1) = StiffHV_Q(m,k1) - dq(2)*u(2)*weight
+!
+            m = (k2-1)*4+4
+            StiffHV_Q(m,k1) = StiffHV_Q(m,k1) - dq(3)*u(3)*weight
+
+         enddo   
+!
+!     ...second loop through enriched test functions
+         select case(TEST_NORM)
+!     ...standard norm
+         case(MATHEMATICIANS)    
+!        ...H1 test functions
+            do k2=1,k1
+!           ...Piola transformation
+               p = shapHH(k2)
+               dp(1:3) = gradHH(1,k2)*dxidx(1,1:3) &
+                       + gradHH(2,k2)*dxidx(2,1:3) & 
+                       + gradHH(3,k2)*dxidx(3,1:3) 
+! 
+!           ...determine index in triangular format
+               Gram(k2,k1) = Gram(k2,k1)     &
+                           + (q*p + dq(1)*dp(1)+dq(2)*dp(2)+dq(3)*dp(3))*weight                     
+            enddo         
+!                     
+         case default      
+!        ...H1 test functions
+            do k2=1,k1
+!           ...Piola transformation
+               p = shapHH(k2)
+               dp(1:3) = gradHH(1,k2)*dxidx(1,1:3) &
+                       + gradHH(2,k2)*dxidx(2,1:3) & 
+                       + gradHH(3,k2)*dxidx(3,1:3) 
+! 
+!           ...accumulate for the gram matrix
+               Gram(k2,k1) = Gram(k2,k1)                              &
+                           + (dq(1)*dp(1)+dq(2)*dp(2)+dq(3)*dp(3)   &
+                           + (omeg**2+ALPHA)*q*p)*weight      
+            enddo
+         end select   
+!     ...end of loop through H1 test functions         
+      enddo
+!      
+!  ...loop through enriched H(div) test functions in the enriched space
+      do k1 = 1,nrdofVV
+         n1 = nrdofHH+k1
+!     ...Piola transformation
+         v(1:3) = (dxdxi(1:3,1)*shapVV(1,k1)                 &
+                +  dxdxi(1:3,2)*shapVV(2,k1)                 &
+                +  dxdxi(1:3,3)*shapVV(3,k1))/rjac
+         div_v  =  divVV(k1)/rjac
+!         
+!     ...accumulate for the load vector        
+!
+         BloadHV(n1) = BloadHV(n1) + (v(1)*zf(2)+v(2)*zf(3)+v(3)*zf(4))*weight
+
+!     ...loop through L2 trial shape functions
+         do k2=1,nrdofQ
+!
+!        ...Piola transformation
+            p = shapQ(k2)/rjac; u(1:3)=p
+!
+            m = (k2-1)*4+1
+            StiffHV_Q(m,n1) = StiffHV_Q(m,n1) - div_v*p*weight
+!            
+            m = (k2-1)*4+2
+            StiffHV_Q(m,n1) = StiffHV_Q(m,n1) + ZIMG*OMEGA*v(1)*u(1)*weight
+!            
+            m = (k2-1)*4+3
+            StiffHV_Q(m,n1) = StiffHV_Q(m,n1) + ZIMG*OMEGA*v(2)*u(2)*weight
+!
+            m = (k2-1)*4+4
+            StiffHV_Q(m,n1) = StiffHV_Q(m,n1) + ZIMG*OMEGA*v(3)*u(3)*weight
+!            
+         enddo
+!         
+!     ...second loop through enriched test functions
+         select case(TEST_NORM)
+!     ...standard norm
+         case(MATHEMATICIANS)    
+            do k2 = 1,k1
+               n2 = nrdofHH+k2
+!           ...Piola transformation
+               u(1:3) = (dxdxi(1:3,1)*shapVV(1,k2)             &
+                      +  dxdxi(1:3,2)*shapVV(2,k2)             &
+                      +  dxdxi(1:3,3)*shapVV(3,k2))/rjac
+               div_u  =  divVV(k2)/rjac
+
+               Gram(n2,n1) = Gram(n2,n1)        &
+                           + (v(1)*u(1)+v(2)*u(2)+v(3)*u(3) +div_v*div_u)*weight      
+            enddo         
+!                     
+         case default 
+!        ...H1 test functions
+            do k2=1,nrdofHH
+!           ...Piola transformation
+               p = shapHH(k2)
+               dp(1:3) = gradHH(1,k2)*dxidx(1,1:3) &
+                       + gradHH(2,k2)*dxidx(2,1:3) & 
+                       + gradHH(3,k2)*dxidx(3,1:3) 
+! 
+!           ...accumulate for the gram matrix
+               Gram(k2,n1) = Gram(k2,n1)                            &
+                           + ZIMG*omeg*(dp(1)*v(1)+dp(2)*v(2)+dp(3)*v(3) - p*div_v)*weight
+            enddo
+            do k2 = 1,k1
+               n2 = nrdofHH+k2
+!
+!           ...Piola transformation
+               u(1:3) = (dxdxi(1:3,1)*shapVV(1,k2)             &
+                      +  dxdxi(1:3,2)*shapVV(2,k2)             &
+                      +  dxdxi(1:3,3)*shapVV(3,k2))/rjac
+               div_u  =  divVV(k2)/rjac
+
+               Gram(n2,n1) = Gram(n2,n1)        &
+                           + ((omeg**2+ALPHA)*(v(1)*u(1)+v(2)*u(2)+v(3)*u(3))  &
+                           + (div_v*div_u))*weight      
+            enddo
+         end select   
+!     ...end of loop through H(div) test functions      
+      enddo
+!  ...end of loop through integration points      
+   enddo
+
+!
+!----------------------------------------------------------------------
+!     B O U N D A R Y    I N T E G R A L S                           
+!----------------------------------------------------------------------
+!
+!..loop through element faces
+   do if=1,nrf
+!
+!  ...sign factor to determine the OUTWARD normal unit vector
+      nsign = nsign_param(etype,if)
+!
+!  ...face type
+      ftype = face_type(etype,if)
+!
+!  ...face order of approximation
+      call face_order(etype,if,norder, norderf)
+!
+!  ...set 2D quadrature
+      INTEGRATION = nord_add_local
+      call set_2Dint_DPG(ftype,norderf, nint,tloc,wtloc)
+      INTEGRATION = 0
+!
+!  ...loop through integration points
+      do l=1,nint
+!
+!     ...face coordinates
+         t(1:2) = tloc(1:2,l)
+!
+!     ...face parametrization
+         call face_param(etype,if,t, xi,dxidt)
+! 
+!     ...determine element H1 shape functions (for geometry)
+         call shape3DH(etype,xi,norder,norient_edge,norient_face, nrdofH,shapH,gradH)
+! 
+!     ...determine element Hdiv shape functions (for fluxes)
+         call shape3DV(etype,xi,norder,norient_face, nrdofV,shapV,divV)
+!
+!     ...determine discontinuous H1 shape functions
+         call shape3HH(etype,xi,nordP, nrdofHH,shapHH,gradHH)
+!         
+!     ...determine discontinuous H(div) shape functions
+         call shape3VV(etype,xi,nordP, nrdofVV,shapVV,divVV)
+!
+!     ...geometry
+         call bgeom3D(Mdle,xi,xnod,shapH,gradH,nrdofH,dxidt,nsign,x,dxdxi,dxidx,rjac,dxdt,rn,bjac)
+         weight = bjac*wtloc(l)
+!
+!     ...check if on impedance boundary
+         if (ibc(if,2) .eq. 9) then
+!        ...get boundary data
+            call getg(mdle,x,rn,ibc(if,2),zg)   
+!
+!        ...loop through H1 test functions
+            do k1 = 1,nrdofHH
+!           ...value of the shape function at the point
+               q = shapHH(k1)
+!           ...accumulate for the load vector
+               BloadHV(k1) = BloadHV(k1) + q*zg*weight
+!           ...loop through H1 trial functions
+               do k2 = 1,nrdofH
+!              ...value of the shape function at the point
+                  p = shapH(k2)
+!              ...accumulate for the Stiffness matrix
+                  StiffHV_H(k2,k1) = StiffHV_H(k2,k1) + q*p*weight
+               enddo
+            enddo                                                
+!        ...regular boundary
+         else
+! 
+!        ...loop through enriched H1 test functions
+            do k1 = 1,nrdofHH
+               q  = shapHH(k1)
+!
+!           ...loop through H(div) trial functions
+               do k2=1,nrdofV
+! 
+!              ...normal component (Piola transformation)
+                  vec(1:3) = dxdxi(1:3,1)*shapV(1,k2)   &
+                           + dxdxi(1:3,2)*shapV(2,k2)   & 
+                           + dxdxi(1:3,3)*shapV(3,k2)
+                  vec(1:3) = vec(1:3)/rjac
+                  un = vec(1)*rn(1)+vec(2)*rn(2)+vec(3)*rn(3)
+!
+!              ...accumulate for the Stiffness matrix
+                  StiffHV_V(k2,k1) = StiffHV_V(k2,k1) + q*un*weight
+!
+!              ...end of loop through H(div) trial functions
+               enddo
+!           ...end of loop through H1 test functions
+            enddo
+         endif   
+!         
+!     ...loop through H(div) enriched test functions
+         do k1 = 1,nrdofVV
+            n1 = nrdofHH+k1
+!
+!        ...normal component of the test function (Piola transformation at work!)
+            vec(1:3) = dxdxi(1:3,1)*shapVV(1,k1)   &
+                     + dxdxi(1:3,2)*shapVV(2,k1)   & 
+                     + dxdxi(1:3,3)*shapVV(3,k1)
+            vec(1:3) = vec(1:3)/rjac
+            vn = vec(1)*rn(1)+vec(2)*rn(2)+vec(3)*rn(3)
+!
+!        ...loop through H1 trial functions
+            do k2=1,nrdofH
+!
+!           ...value of the shape function at the point
+               p = shapH(k2)
+!
+!           ...accumulate for the rectangular Stiffness matrix
+               StiffHV_H(k2,n1) = StiffHV_H(k2,n1) + vn*p*weight
+!           ...end of loop through H1 trial functions
+            enddo
+!        ...end of loop through H(div) test functions                 
+         enddo
+!     ...end of loop through integration points
+      enddo
+!  ...end of loop through faces  
+   enddo
+!
+
+
+
+
+!----------------------------------------------------------------------
+!      Alternative construction of normal matrix
+!----------------------------------------------------------------------
+! 
+   call celndof(NODES(Mdle)%type,norder, nrdofH,nrdofE,nrdofV,nrdofQ)
+! 
+   nrTRIAL = nrdofH + nrdofV + 4*nrdofQ
+   i1 = nrTEST ; j1 = nrdofH ; j2 = nrdofV ; j3 = 4*nrdofQ
+
+
+   write(*,*) "i1 = ", i1
+   write(*,*) "nrTrial 2= ", nrTrial
+
+!
+   Stiff_ALL(1:i1,1:j1)             = transpose(StiffHV_H(1:j1,1:i1))
+   Stiff_ALL(1:i1,j1+1:j1+j2)       = transpose(StiffHV_V(1:j2,1:i1))
+   Stiff_ALL(1:i1,j1+j2+1:j1+j2+j3) = transpose(StiffHV_Q(1:j3,1:i1))
+   Stiff_ALL(1:i1,j1+j2+j3+1)       = BloadHV(1:i1)
+!
+   N     = nrTEST
+   NRHS  = nrdofH + nrdofV + 4*nrdofQ + 1
+
+   call diag_scaling(N,NRHS,Gram,Stiff_ALL)
+!
+!..diagonal scaling of the gram matrix
+   uplo = 'U'
+! 
+!..factorize the test Stiffness matrix
+!
+   call ZPOTRF(uplo,N,Gram,N,info)
+!
+   if (info.ne.0) then
+      write(*,*) 'elem: Gram ZPOTRF: Mdle,info = ',Mdle,info
+      write(*,*) 'elem: nrTest, nrTrial = ',nrTest, nrTrial
+      call graphb
+      stop 1
+   endif
+!
+   call ZTRSM('L',uplo,'C','N',N,NRHS,ZONE,Gram,N,Stiff_ALL,N)
+! 
+   call ZHERK('U','C',NRHS,N,1.0d0,Stiff_ALL,N,0.0d0,Zaloc,NRHS)
+!
+   do i=1,NRHS-1
+      Zaloc(i+1:NRHS,i) = conjg(Zaloc(i,i+1:NRHS))
+   enddo
+!
+
+
+   N = NRHS-1
+
+
+   BLOC(1)%array(1:j1,1) = Zaloc(1:j1,j1+j2+j3+1)
+   BLOC(2)%array(1:j2,1) = Zaloc(j1+1:j1+j2,j1+j2+j3+1) 
+   BLOC(3)%array(1:j3,1) = Zaloc(j1+j2+1:j1+j2+j3,j1+j2+j3+1) 
+!
+   ALOC(1,1)%array(1:j1,1:j1) = Zaloc(1:j1,1:j1)
+   ALOC(1,2)%array(1:j1,1:j2) = Zaloc(1:j1,j1+1:j1+j2)
+   ALOC(1,3)%array(1:j1,1:j3) = Zaloc(1:j1,j1+j2+1:j1+j2+j3)
+!
+   ALOC(2,1)%array(1:j2,1:j1) = Zaloc(j1+1:j1+j2,1:j1)
+   ALOC(2,2)%array(1:j2,1:j2) = Zaloc(j1+1:j1+j2,j1+1:j1+j2)
+   ALOC(2,3)%array(1:j2,1:j3) = Zaloc(j1+1:j1+j2,j1+j2+1:j1+j2+j3)
+!
+   ALOC(3,1)%array(1:j3,1:j1) = Zaloc(j1+j2+1:j1+j2+j3,1:j1)
+   ALOC(3,2)%array(1:j3,1:j2) = Zaloc(j1+j2+1:j1+j2+j3,j1+1:j1+j2)
+   ALOC(3,3)%array(1:j3,1:j3) = Zaloc(j1+j2+1:j1+j2+j3,j1+j2+1:j1+j2+j3)
+!
+!   
+   end subroutine elem_acoustics
+
+
 
 
 subroutine compute_enriched_order(Nord,Norder)
