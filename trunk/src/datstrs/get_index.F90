@@ -85,49 +85,6 @@ subroutine get_index(Nod, Indexd)
 !
 !                    ...component known from Dirichlet BC
                         case(1); Indexd(ic)=1
-
-!                    ...component known from Dirichlet BC on 2nd and 3rd components
-                        case(3)
-                        if ((ivar.eq.2).or.(ivar.eq.3)) then
-                           Indexd(ic)=1
-                        else
-                           Indexd(ic)=2
-                        end if
-!                    ...component known from Dirichlet BC on 1st and 3rd components
-                        case(4)
-                        if ((ivar.eq.1).or.(ivar.eq.3)) then
-                           Indexd(ic)=1
-                        else
-                           Indexd(ic)=2
-                        end if
-!                    ...component known from Dirichlet BC on 1st and 2nd components
-                        case(5)
-                        if ((ivar.eq.1).or.(ivar.eq.2)) then
-                           Indexd(ic)=1
-                        else
-                           Indexd(ic)=2
-                        end if
-!                    ...component known from Dirichlet BC on 1st component
-                        case(6)
-                        if (ivar.eq.1) then
-                           Indexd(ic)=1
-                        else
-                           Indexd(ic)=2
-                        end if
-!                    ...component known from Dirichlet BC on 2nd component
-                        case(7)
-                        if (ivar.eq.2) then
-                           Indexd(ic)=1
-                        else
-                           Indexd(ic)=2
-                        end if
-!                    ...component known from Dirichlet BC on 3rd component
-                        case(8)
-                        if (ivar.eq.3) then
-                           Indexd(ic)=1
-                        else
-                           Indexd(ic)=2
-                        end if
                      end select
                   enddo
 !
@@ -160,51 +117,6 @@ subroutine get_index(Nod, Indexd)
 !
 !                    ...component known from Dirichlet BC
                         case(1); Indexd(ic)=5
-
-!                    ...component known from Dirichlet BC on 1st component
-                        case(3)
-                        if (ivar.eq.1) then
-                           Indexd(ic)=5
-                        else
-                           Indexd(ic)=6
-                        end if
-
-!                    ...component known from Dirichlet BC on 2nd component
-                        case(4)
-                        if (ivar.eq.2) then
-                           Indexd(ic)=5
-                        else
-                           Indexd(ic)=6
-                        end if
-
-!                    ...component known from Dirichlet BC on 3rd component
-                        case(5)
-                        if (ivar.eq.3) then
-                           Indexd(ic)=5
-                        else
-                           Indexd(ic)=6
-                        end if
-!                    ...component known from Dirichlet BC on 2nd and 3rd components
-                        case(6)
-                        if ((ivar.eq.2).or.(ivar.eq.3)) then
-                           Indexd(ic)=5
-                        else
-                           Indexd(ic)=6
-                        end if
-!                    ...component known from Dirichlet BC on 1st and 3rd components
-                        case(7)
-                        if ((ivar.eq.1).or.(ivar.eq.3)) then
-                           Indexd(ic)=5
-                        else
-                           Indexd(ic)=6
-                        end if
-!                    ...component known from Dirichlet BC on 1st and 2nd components
-                        case(8)
-                        if ((ivar.eq.1).or.(ivar.eq.2)) then
-                           Indexd(ic)=5
-                        else
-                           Indexd(ic)=6
-                        end if
                      end select
                   enddo
 !
