@@ -157,10 +157,6 @@ program main
       endif
    endif
    if (ENVELOPE) then
-      if (FAST_INT .eq. 1) then
-         write (*,*) ' Fast integration not yet implemented for envelope formulation.'
-         call MPI_ABORT (MPI_COMM_WORLD,1, ierr)
-      endif
       write (*,*) ' Solving vectorial envelope formulation:'
       write (*,9000) ' WAVENUM_SIGNAL          = ', WAVENUM_SIGNAL
       write (*,9000) ' WAVENUM_PUMP            = ', WAVENUM_PUMP
