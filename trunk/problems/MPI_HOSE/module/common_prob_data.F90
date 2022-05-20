@@ -28,7 +28,7 @@ module common_prob_data
 !------------------------------------------------------------------------------
 ! BOUNDARY CONDITION     (set_initial_mesh.F90)
   integer :: IBC_PROB
-  integer, parameter :: BC_NONE      = 0
+  integer, parameter :: BC_NONE      = 0 ! To be removed
   integer, parameter :: BC_DIRICHLET = 1
   integer, parameter :: BC_NEUMANN   = 2
   integer, parameter :: BC_MIXED     = 8

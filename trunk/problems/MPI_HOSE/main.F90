@@ -190,7 +190,7 @@ subroutine master_main()
       write(*,*) '        ---- Refinements ----            '
       write(*,*) 'Single uniform h-refinement............20'
       write(*,*) 'Single uniform p-refinement............21'
-      write(*,*) 'Multiple uniform h-refs + solve........22'
+      write(*,*) 'Multiple uniform h-refs + solve........22   <--- fails'
       write(*,*) 'Single anisotropic h-refinement (z)....23'
       write(*,*) 'Refine a single element................26'
       write(*,*) '                                         '

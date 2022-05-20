@@ -97,7 +97,7 @@ subroutine set_initial_mesh(Nelem_order)
 !
 !   SET BC FLAGS: 0 - no BC ; 1 - Dirchlet ; 2 - Neumann ; 3 - Robin ; >3 - Mixed
 !
-   ibc(1:6,1:NR_PHYSA) = 0
+   ibc(1:6,1:NRINDEX) = 0
 !
 !   IBC_PROB : 0 - uniform traction ; 1 - clamped ends ; 2 - free ends ; 3 - periodic ends
 !       ___ ___ _____________________________
@@ -137,29 +137,27 @@ subroutine set_initial_mesh(Nelem_order)
 !   Pressure BCs at exterior faces of pipe
     case(1)
 
-      ! exterior faces
+      ! free exterior faces
       select case(iel)
       case(1,3,5,7); ifc=1
       case(2,4,6,8); ifc=2
       end select
 
-      ibc(ifc,1) = 0  ! TrDis (H1)
-      ibc(ifc,2) = 1  ! TrStr (H(div))
-      ibc(ifc,3) = 0  ! Displ (L2)
-      ibc(ifc,4) = 0  ! Stres (L2)
-      ibc(ifc,5) = 0  ! Omega (L2)
+      ibc(ifc,4) = 1  ! 1st H(div) component
+      ibc(ifc,5) = 1  ! 2nd H(div) component
+      ibc(ifc,6) = 1  ! 3rd H(div) component
 
-      ! fixed ends
+      ! ibc(ifc,1) = 0  ! TrDis (H1)
+      ! ibc(ifc,2) = 1  ! TrStr (H(div))
+      ! ibc(ifc,3) = 0  ! Displ (L2)
+      ! ibc(ifc,4) = 0  ! Stres (L2)
+      ! ibc(ifc,5) = 0  ! Omega (L2)
+
+      ! clamped ends
       do ifc=3,6
-        neig = ELEMS(iel)%neig(ifc)
-        select case(neig)
-        case(0)
-          ibc(ifc,1) = 1  ! TrDis (H1)
-          ibc(ifc,2) = 0  ! TrStr (H(div))
-          ibc(ifc,3) = 0  ! Displ (L2)
-          ibc(ifc,4) = 0  ! Stres (L2)
-          ibc(ifc,5) = 0  ! Omega (L2)
-        end select
+         ibc(ifc,1) = 1  ! 1st H1 component
+         ibc(ifc,2) = 1  ! 2nd H1 component
+         ibc(ifc,3) = 1  ! 3rd H1 component
       enddo
 !
 !   Pressure BCs at exterior faces of pipe
