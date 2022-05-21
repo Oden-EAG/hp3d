@@ -38,28 +38,33 @@ subroutine celem( &
   integer,                      intent(out) :: Nrnodm
   real*8,                       intent(out) :: Bload(*),Astif(*)
 !--------------------------------------------------------------------------
-  integer, dimension(NR_PHYSA) :: nbcond
+  integer, dimension(NRINDEX) :: nbcond
 !--------------------------------------------------------------------------
+
+! Physics attributes:               Components:
+! 1 TrDis  contin  (3 components)    1-3
+! 2 TrStr  normal  (3 components)    4-6
+! 3 Displ  discon  (3 components)    7-9
+! 4 Stres  discon  (6 components)   10-15
+! 5 Omega  discon  (3 components)   16-18
 
   select case(NODES(Mdle)%case)
 ! PRIMAL
   case(24)  ! 2^4+2^3
+
     ! eliminate middle node H(div) dof in celem_system by using BC flag
-
-    ! write(*,*) 'PRIMAL BEING USED'
-
-    nbcond = (/0,1,0,0,0/)
-    call encod(nbcond,10,NR_PHYSA, NODES(Mdle)%bcond)
+    nbcond(1:18) = 0;
+    nbcond(4: 6) = 1
+    call encod(nbcond,2,NRINDEX, NODES(Mdle)%bcond)
     ! call set_index(NODES(Mdle)%case,NODES(Mdle)%bcond, NODES(Mdle)%index)
 
 ! ULTRA-WEAK
   case(31)  ! 2^4+2^3+2^2+2^1+2^0
 
-    ! write(*,*) 'UW BEING USED'
-
     ! eliminate middle node H^1 and H(div) dof in celem_system by using BC flag
-    nbcond = (/1,1,0,0,0/)
-    call encod(nbcond,10,NR_PHYSA, NODES(Mdle)%bcond)
+    nbcond(1:18) = 0
+    nbcond(1: 6) = 1
+    call encod(nbcond,2,NRINDEX, NODES(Mdle)%bcond)
     ! call set_index(NODES(Mdle)%case,NODES(Mdle)%bcond, NODES(Mdle)%index)
 
   case default
