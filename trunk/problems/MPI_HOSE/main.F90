@@ -87,9 +87,9 @@ program main
  1015 format(' initialize : ',f12.5,' seconds',/)
 !
 !..FLAGS
- ISTC_FLAG = .true.
- STORE_STC = .true.
- HERM_STC  = .false.
+   ISTC_FLAG = .false.
+   STORE_STC = .true.
+   HERM_STC  = .false.
 !
 !..determine number of omp threads running
  if (RANK .eq. ROOT) then
