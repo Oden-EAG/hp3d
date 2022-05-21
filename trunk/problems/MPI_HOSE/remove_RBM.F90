@@ -27,19 +27,19 @@ subroutine remove_RBM
 !  A
   pt=1
   nbcond = (/1,1,1, 0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0/) ! 3 H1 + 3 H(div) + 12 L2
-  call encod(nbcond,10,NR_PHYSA, NODES(NRELIS+pt)%bcond)
+  call encod(nbcond,2,NRINDEX, NODES(NRELIS+pt)%bcond)
   ! call set_index(NODES(NRELIS+pt)%case,NODES(NRELIS+pt)%bcond, NODES(NRELIS+pt)%index)
 !
 !  B
   pt=2
   nbcond = (/1,0,0, 0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0/)
-  call encod(nbcond,10,NR_PHYSA, NODES(NRELIS+pt)%bcond)
+  call encod(nbcond,2,NRINDEX, NODES(NRELIS+pt)%bcond)
   ! call set_index(NODES(NRELIS+pt)%case,NODES(NRELIS+pt)%bcond, NODES(NRELIS+pt)%index)
 !
 !  C
   pt=12
   nbcond = (/1,1,0, 0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0/)
-  call encod(nbcond,10,NR_PHYSA, NODES(NRELIS+pt)%bcond)
+  call encod(nbcond,2,NRINDEX, NODES(NRELIS+pt)%bcond)
   ! call set_index(NODES(NRELIS+pt)%case,NODES(NRELIS+pt)%bcond, NODES(NRELIS+pt)%index)
 
 end subroutine remove_RBM
