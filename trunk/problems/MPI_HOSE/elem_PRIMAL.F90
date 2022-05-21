@@ -143,8 +143,8 @@ subroutine elem_DPG_PRIMAL(Mdle)
 !
 !  .....Compute shape functions needed for test/trial field variables
 !       H1 (trial/geometry)
-        call shape3H(etype,xi,norder,nedge_orient,nface_orient,  &
-                     nrdofH,shapH,gradH)
+        call shape3DH(etype,xi,norder,nedge_orient,nface_orient,  &
+                      nrdofH,shapH,gradH)
 !       H1 (test)
         call shape3HH(etype,xi,nordP, nrdofHH,shapHH,gradHH)
 !
@@ -334,11 +334,11 @@ subroutine elem_DPG_PRIMAL(Mdle)
 !
 !  .......Compute shape functions needed for test/trial field variables and geometry
 !         H1 (geometry)
-          call shape3H(etype,xi,norder,nedge_orient,nface_orient,  &
-                       nrdofH,shapH,gradH)
+          call shape3DH(etype,xi,norder,nedge_orient,nface_orient,  &
+                        nrdofH,shapH,gradH)
 !         H(div) (trial)
-          call shape3V(etype,xi,norder,nface_orient,  &
-                       nrdofV,shapV,divV)
+          call shape3DV(etype,xi,norder,nface_orient,  &
+                        nrdofV,shapV,divV)
 !         H1 (test)
           call shape3HH(etype,xi,nordP, nrdofHH,shapHH,gradHH)
 !

@@ -161,10 +161,10 @@ subroutine elem_DPG_UWEAK(Mdle)
 !
 !  .....Compute shape functions needed for test/trial field variables and geometry
 !       H1 (geometry)
-        call shape3H(etype,xi,norder,nedge_orient,nface_orient,  &
-                     nrdofH,shapH,gradH)
+        call shape3DH(etype,xi,norder,nedge_orient,nface_orient,  &
+                      nrdofH,shapH,gradH)
 !       L2 (field trial)
-        call shape3Q(etype,xi,norder, nrdofQ,shapQ)
+        call shape3DQ(etype,xi,norder, nrdofQ,shapQ)
 !       H1 (test)
         call shape3HH(etype,xi,nordP, nrdofHH,shapHH,gradHH)
 !       H(div) (test)
@@ -592,11 +592,11 @@ subroutine elem_DPG_UWEAK(Mdle)
 !
 !  .......Compute shape functions needed for test/trial field variables and geometry
 !         H1 (geometry and bdry trial)
-          call shape3H(etype,xi,norder,nedge_orient,nface_orient,  &
-                       nrdofH,shapH,gradH)
+          call shape3DH(etype,xi,norder,nedge_orient,nface_orient,  &
+                        nrdofH,shapH,gradH)
 !         H(div) (bdry trial)
-          call shape3V(etype,xi,norder,nface_orient,  &
-                       nrdofV,shapV,divV)
+          call shape3DV(etype,xi,norder,nface_orient,  &
+                        nrdofV,shapV,divV)
 !         H1 (test)
           call shape3HH(etype,xi,nordP, nrdofHH,shapHH,gradHH)
 !         H(div) (test)

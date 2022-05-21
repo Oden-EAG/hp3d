@@ -188,8 +188,8 @@
 !
 !  .....Compute shape functions needed for test/trial field variables and geometry
 !       H1 (geometry)
-        call shape3H(etype,xi,norder,nedge_orient,nface_orient,  &
-                     nrdofH,shapH,gradH)
+        call shape3DH(etype,xi,norder,nedge_orient,nface_orient,  &
+                      nrdofH,shapH,gradH)
 !       H1 (test)
         call shape3HH(etype,xi,nordP, nrdofHH,shapHH,gradHH)
 !       H(div) (test)
@@ -459,8 +459,8 @@
 !
 !  .......Compute shape functions needed for test variables and geometry
 !         H1 (geometry)
-          call shape3H(etype,xi,norder,nedge_orient,nface_orient,  &
-                     nrdofH,shapH,gradH)
+          call shape3DH(etype,xi,norder,nedge_orient,nface_orient,  &
+                        nrdofH,shapH,gradH)
 !
 !         H1 (test)
           call shape3HH(etype,xi,nordP, nrdofHH,shapHH,gradHH)

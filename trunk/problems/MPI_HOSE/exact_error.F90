@@ -53,7 +53,7 @@ subroutine exact_error
 !
 ! check that exact solution is indeed known
   if (NEXACT == 0) then
-    write(*,*) 'compute_error: UNKNOW exact solution!'
+    write(*,*) 'compute_error: UNKNOWN exact solution!'
     return
   endif
 !
