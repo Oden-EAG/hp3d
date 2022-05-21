@@ -77,39 +77,39 @@
          end select
    !
          call compute_enriched_order(nordP, norderP)
-   !     
+   !
          INTEGRATION = nord_add_local
          call compute_1D_ord(etype,norder(19),nordx,nordy,nordz) 
          INTEGRATION=0
    !  ...# dof for 1D H1 test functions with order p+dp
          nrdofHx=nordx+1; nrdofHy=nordy+1; nrdofHz=nordz+1
-   !      
+   !
    !  ...# dof for 1D H1 trial functions with order p
          nrdofHx_tr=nrdofHx-nord_add_local
          nrdofHy_tr=nrdofHy-nord_add_local
          nrdofHz_tr=nrdofHz-nord_add_local
-   !      
+   !
    !  ...# dof 1D L2 trial functions with order p
          nrdofQx_tr=nrdofHx_tr-1; nrdofQy_tr=nrdofHy_tr-1; nrdofQz_tr=nrdofHz_tr-1
    
    !  ...total number of trial dof associated with the element
          call celndof(etype,norder, nrdofH,nrdofE,nrdofV,nrdofQ)
    !  ...total number of test dof associated with the element
-         call celndof(etype,norderP,nrdofHH,nrdofEE,nrdofVV,nrdofQQ)  
+         call celndof(etype,norderP,nrdofHH,nrdofEE,nrdofVV,nrdofQQ)
    !
          call ndof_nod(etype,norder(nre+nrf+1),ndofHmdl,ndofEmdl,ndofVmdl,ndofQmdl)
          nrTest = nrdofHH+nrdofVV
          nrdofHi = nrdofH - ndofHmdl
          nrdofVi = nrdofV - ndofVmdl
-         nrTrial = nrdofHi + nrdofVi + 4*nrdofQ 
-   !      
+         nrTrial = nrdofHi + nrdofVi + 4*nrdofQ
+   !
          if (nrTest .le. nrTrial-ndofHmdl-ndofVmdl) then
             nord_add_local = nord_add_local + 1
-   ! !$omp critical         
+   ! !$omp critical
    !          write(*,*) 'elem: WARNING mdle =  ', mdle
    !          write(*,*) 'elem: nrTest, nrTrial = ', nrTest, nrTrial-ndofHmdl-ndofVmdl
    !          write(*,*) 'elem: nord_add_local  = ', nord_add_local
-   ! !$omp end critical                  
+   ! !$omp end critical
             go to 10
          endif   
    
@@ -212,7 +212,7 @@
    real*8  :: bjac, rjac, weight, wa
 !
 !..BC's flags
-   integer :: ibc(6,NR_PHYSA)
+   integer :: ibc(6,NRINDEX)
 !..workspace for trial and test variables
    real*8  :: dq(3) , u(3), dp(1:3), v(3), vec(3), p, q, un, vn
 !
@@ -1283,13 +1283,13 @@
    uplo = 'U'
 ! 
 !..factorize the test Stiffness matrix
-   write(*,*)'nrTest=',nrTest
-   call pause
-   do i=1,NrTEST
-      do ii=1,NrTest
-      write(*,*) Gram(i,ii)
-      enddo
-   enddo
+!   write(*,*)'nrTest=',nrTest
+!   call pause
+!   do i=1,NrTEST
+!      do ii=1,NrTest
+!      write(*,*) Gram(i,ii)
+!      enddo
+!   enddo
 
    call ZPOTRF(uplo,NrTEST,gram,NrTEST,info)
    if (info.ne.0) then
@@ -1371,7 +1371,7 @@ subroutine elem_acoustics(Mdle,nord_add_local,nrTest,nrTrial,     &
    dimension tloc(2,MAXNINT2ADD),wtloc(MAXNINT2ADD)
 !
 !..BC's flags
-   dimension ibc(6,NR_PHYSA)
+   dimension ibc(6,NRINDEX)
 !..workspace for trial and test variables
    dimension dq(3) , u(3), dp(1:3), v(3), vec(3)
 !
@@ -1680,7 +1680,7 @@ subroutine elem_acoustics(Mdle,nord_add_local,nrTest,nrTrial,     &
 !     ...check if on impedance boundary
          if (ibc(if,2) .eq. 9) then
 !        ...get boundary data
-            call getg(mdle,x,rn,ibc(if,2),zg)   
+            call getg(mdle,x,rn,ibc(if,2),zg)
 !
 !        ...loop through H1 test functions
             do k1 = 1,nrdofHH

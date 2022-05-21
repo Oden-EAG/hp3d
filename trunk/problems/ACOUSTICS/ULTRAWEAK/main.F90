@@ -86,7 +86,7 @@ program main
 !..set interface variables
 !  (1) - H1 trace (1 scalar-valued component)
 !  (2) - H(div) trace (1 vector-valued component)
-!  (3) - L2 field (1 vector-valued component)
+!  (3) - L2 field (4 scalar-valued components)
    PHYSAi(1:3) = (/.true.,.true.,.false./)
 
 
