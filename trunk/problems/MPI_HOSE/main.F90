@@ -86,11 +86,6 @@ program main
    if (RANK .eq. ROOT) write(6,1015) end_time-start_time
  1015 format(' initialize : ',f12.5,' seconds',/)
 !
-!..FLAGS
-   ISTC_FLAG = .false.
-   STORE_STC = .true.
-   HERM_STC  = .false.
-!
 !..determine number of omp threads running
  if (RANK .eq. ROOT) then
     write(6,1025) ' Initial polynomial order: ',IP
