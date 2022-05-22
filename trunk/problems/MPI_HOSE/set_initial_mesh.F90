@@ -53,6 +53,12 @@ subroutine set_initial_mesh(Nelem_order)
 !------------------------------------------------------------------------------------
 !     S E T    B C s
 !------------------------------------------------------------------------------------
+!  Physics attr         Components
+!  1 TrDis  contin  3   1-3
+!  2 TrStr  normal  3   4-6
+!  3 Displ  discon  3   7-9
+!  4 Stres  discon  6   10-15
+!  5 Omega  discon  3   16-18
 !
 ! loop over initial mesh elements
    do iel=1,NRELIS
@@ -123,11 +129,11 @@ subroutine set_initial_mesh(Nelem_order)
             ibc(ifc,2) = 1  ! 2nd H1 component
             ibc(ifc,3) = 1  ! 3rd H1 component
             ! ! ibcflag      -> physics variable
-            ! ibc(ifc,1) = 1  ! TrDis (H1)
-            ! ibc(ifc,2) = 0  ! TrStr (H(div))
-            ! ibc(ifc,3) = 0  ! Displ (L2)
-            ! ibc(ifc,4) = 0  ! Stres (L2)
-            ! ibc(ifc,5) = 0  ! Omega (L2)
+            ! ibc(ifc,1:3)   = 1  ! TrDis (H1)
+            ! ibc(ifc,4:6)   = 0  ! TrStr (H(div))
+            ! ibc(ifc,7:9)   = 0  ! Displ (L2)
+            ! ibc(ifc,10:15) = 0  ! Stres (L2)
+            ! ibc(ifc,16:18) = 0  ! Omega (L2)
             ! ! Note that L2 variables should not take values at the boundary,
             ! ! so their ibc should always be 0 (no BC).
          end select
@@ -147,11 +153,11 @@ subroutine set_initial_mesh(Nelem_order)
       ibc(ifc,5) = 1  ! 2nd H(div) component
       ibc(ifc,6) = 1  ! 3rd H(div) component
 
-      ! ibc(ifc,1) = 0  ! TrDis (H1)
-      ! ibc(ifc,2) = 1  ! TrStr (H(div))
-      ! ibc(ifc,3) = 0  ! Displ (L2)
-      ! ibc(ifc,4) = 0  ! Stres (L2)
-      ! ibc(ifc,5) = 0  ! Omega (L2)
+      ! ibc(ifc,1:3)   = 0  ! TrDis (H1)
+      ! ibc(ifc,4:6)   = 1  ! TrStr (H(div))
+      ! ibc(ifc,7:9)   = 0  ! Displ (L2)
+      ! ibc(ifc,10:15) = 0  ! Stres (L2)
+      ! ibc(ifc,16:18) = 0  ! Omega (L2)
 
       ! clamped ends
       do ifc=3,6
@@ -167,11 +173,7 @@ subroutine set_initial_mesh(Nelem_order)
           select case(neig)
           case(0)
             ! ibcflag      -> physics variable
-            ibc(ifc,1) = 0  ! TrDis (H1)
-            ibc(ifc,2) = 1  ! TrStr (H(div))
-            ibc(ifc,3) = 0  ! Displ (L2)
-            ibc(ifc,4) = 0  ! Stres (L2)
-            ibc(ifc,5) = 0  ! Omega (L2)
+            ibc(ifc,4:6) = 1  ! TrStr (H(div))
             ! Note that L2 variables should not take values at the boundary,
             ! so their ibc should always be 0 (no BC).
           end select
