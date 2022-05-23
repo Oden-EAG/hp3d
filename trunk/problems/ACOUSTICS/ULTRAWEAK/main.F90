@@ -81,7 +81,7 @@ program main
 !..FLAGS
    ISTC_FLAG = .true.
    STORE_STC = .true.
-   HERM_STC  = .false.
+   HERM_STC  = .true.
 !
 !..set interface variables
 !  (1) - H1 trace (1 scalar-valued component)

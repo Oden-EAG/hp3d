@@ -50,8 +50,6 @@ subroutine set_environment
         ('-file-refinement','Refinement files location','../../../files/ref'        ,FILE_REFINE)
 !
 !..Variables relevant to this particular application
-   call get_option_int     &
-        ('-isol'   ,'Exact manufactured solution'         ,0,ISOL)
 !
    call get_option_int     &
         ('-imax'   ,'Number of refinements for job script',3,IMAX)
