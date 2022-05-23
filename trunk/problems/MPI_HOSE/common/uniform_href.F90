@@ -46,7 +46,7 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
    integer, save :: istep = 0
    integer, save :: irefineold = 0
 !
-   integer :: iflag(1)
+   integer :: iflag(NR_PHYSA)
    real(8) :: errorH,errorE,errorV,errorQ
    real(8) :: rnormH,rnormE,rnormV,rnormQ
    real(8) :: error_tot,rnorm_tot,error_subd,rnorm_subd
@@ -74,8 +74,8 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
       goto 90
    endif
 !
-!..field variables flag
-   iflag(1) = 1
+!..field variables flag: compute error only for displacement
+   iflag(1:NR_PHYSA) = (/0,0,1,0,0/)
 !
 !..fetch active elements
    if (.not. DISTRIBUTED) then

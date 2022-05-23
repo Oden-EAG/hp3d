@@ -17,7 +17,7 @@ subroutine exec_case(idec)
    logical :: solved
    integer :: mdle_subd(NRELES)
    integer :: i,mdle,kref,src,count,ierr,nord
-   integer :: iParAttr(2) = (/1,0/)
+   integer :: iParAttr(NR_PHYSA) ! iParAttr = (/3,3,3,6,3/)
 !
 !----------------------------------------------------------------------
 !
@@ -27,7 +27,7 @@ subroutine exec_case(idec)
 !
 !  ...paraview graphics
       case(3)
-         iParAttr(1:2) = (/1,0/) ! write field output only
+         iParAttr(1:NR_PHYSA) = (/0,0,3,0,0/) ! write displacement components only
          call my_paraview_driver(iParAttr)
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
