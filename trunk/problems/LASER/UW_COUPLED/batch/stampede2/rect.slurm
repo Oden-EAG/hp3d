@@ -180,7 +180,15 @@ pmlfrac=0.25d0
 ctrl='../COMMON_FILES/control_0'
 #
 # set output
-dir_output='../outputs/'
+mkdir ${SLURM_JOB_ID}
+cd ${SLURM_JOB_ID}
+mkdir outputs
+cd outputs
+mkdir paraview
+mkdir power
+mkdir temp
+cd ../..
+dir_output="${SLURM_JOB_ID}/outputs/"
 vis_level=3
 
 args=" -geom 1 -isol 5 -comp 2"
