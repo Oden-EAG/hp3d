@@ -162,11 +162,11 @@ program main
       write (*,9000) ' WAVENUM_SIGNAL          = ', WAVENUM_SIGNAL
       write (*,9000) ' WAVENUM_PUMP            = ', WAVENUM_PUMP
    endif
- 9000 format(A,F11.6)
- 9001 format(A,F11.3)
+ 9000 format(A,F13.6)
+ 9001 format(A,F13.3)
  9010 format(A,I3)
  9015 format(A,A)
- 9020 format(A,ES11.2)
+ 9020 format(A,ES13.2)
  9030 format(A,' (',I1,',',I1,',',I1,') ')
 !
 !$OMP parallel
