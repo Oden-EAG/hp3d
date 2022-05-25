@@ -148,6 +148,7 @@ program main
    write(*,9010) ' NEXACT                   = ', NEXACT
    write(*,9010) ' FAST INTEGRATION         = ', FAST_INT
    write(*,9010) ' IBCFLAG                  = ', IBCFLAG
+   write(*,9020) ' ALPHA_NORM               = ', ALPHA_NORM
    write(*,9015) ' OUTPUT_DIR               = ', trim(OUTPUT_DIR)
    if (HEAT_FLAG .eq. 1) then
       write(*,9010) ' NSTEPS                   = ', NSTEPS
