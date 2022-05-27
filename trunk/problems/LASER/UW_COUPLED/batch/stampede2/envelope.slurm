@@ -64,9 +64,11 @@ export KMP_STACKSIZE=24M   # p=3
 #
 # Fix Intel18 OMP issue
 export KMP_INIT_AT_FORK=FALSE
-#
-gain=1.0d4
 
+# weight for l2 term in test norm
+alpha=1.0d-4
+
+gain=1.0d4
 envelope=true
 
 # config assuming wavenum_signal=85.0d0
@@ -164,7 +166,7 @@ cd ../..
 dir_output="${SLURM_JOB_ID}/outputs/"
 vis_level=3
 
-args=" -geom 5 -isol 17 -gamma ${gamma} -comp 1"
+args=" -geom 5 -isol 17 -alpha ${alpha} -gamma ${gamma} -comp 1"
 #args+=" -omega ${omega}"
 args+=" -ref_core ${ref_core} -ref_clad ${ref_clad}"
 args+=" -aniso_ref_index ${aniso_ref_index}"

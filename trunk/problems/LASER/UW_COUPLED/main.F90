@@ -144,6 +144,7 @@ program main
       write(*,9010) ' FAKE_PUMP                = ', FAKE_PUMP
    endif
    write(*,9030) ' Polynomial order (x,y,z) = ', ORDER_APPROX_X,ORDER_APPROX_Y,ORDER_APPROX_Z
+   write(*,9010) ' NORD_ADD (Delta p)       = ', NORD_ADD
    write(*,9010) ' ISOL                     = ', ISOL
    write(*,9010) ' NEXACT                   = ', NEXACT
    write(*,9010) ' FAST INTEGRATION         = ', FAST_INT
