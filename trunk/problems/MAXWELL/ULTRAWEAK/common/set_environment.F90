@@ -1,0 +1,117 @@
+!
+!----------------------------------------------------------------------
+!
+!     routine name      - set environment
+!
+!----------------------------------------------------------------------
+!
+!     latest revision:  - May 2022
+!
+!     purpose:          - define options for main file specific to the problem.
+!                         These can be consulted with the -help option when running
+!                         the executable. It is especially important to define
+!                         the global environment variables in module/environment.
+!                         The other options are problem specific.
+!
+!----------------------------------------------------------------------
+!
+subroutine set_environment
+!
+   use environment
+   use common_prob_data
+   use paraview
+   use parametersDPG, only: MAXNORD_ADD
+   use testvars
+!
+   implicit none
+!
+   integer :: nthreads
+!
+!..Variables relevant to src/modules/environment
+!         option label // explanation // default value // parameter
+   call get_option_string  &
+        ('-file-control'   ,'Control file'             ,'./control/control'         ,FILE_CONTROL)
+   call get_option_int     &
+        ('-prob','0)Free space, 1)Cavity' ,PROB_FREESPACE, PROB_KIND)
+   call get_option_string  &
+        ('-file-geometry'  ,'Geometry file'            ,'./geometries/hexa_orient0' ,FILE_GEOM)
+!
+   call get_option_string  &
+        ('-file-phys'      ,'Physics file'             ,'./input/physics'           ,FILE_PHYS)
+!
+   call get_option_string  &
+        ('-file-history'   ,'History file'             ,'./input/history'           ,FILE_HISTORY)
+!
+   call get_option_string  &
+        ('-file-err'       ,'Error file'               ,'./output/errorlogs/log.txt',FILE_ERR)
+!
+   call get_option_string  &
+        ('-file-refinement','Refinement files location','../../../files/ref'        ,FILE_REFINE)
+!
+!..Variables relevant to this particular application
+!
+   call get_option_int     &
+        ('-imax'   ,'Number of refinements for job script',3,IMAX)
+!
+   call get_option_int     &
+        ('-p'      ,'Uniform order initial mesh'          ,3,IP)
+!
+   call get_option_int     &
+        ('-job'    ,'Type of job submission'              ,0,JOB)
+!
+   call get_option_int     &
+        ('-maxnods','Maximum expected number of nodes'    ,0,MAXNODS_USER)
+!
+! =============================
+! ========= PARAVIEW ==========
+! =============================
+!
+   call get_option_string  &
+        ('-prefix'          ,'Prefix paraview file'               ,'uwmaxwell_'             ,PREFIX  )
+   call get_option_string  &
+        ('-file_vis_upscale','Visualization upscale file location','../../../files/vis',FILE_VIS)
+   call get_option_string  &
+        ('-vis_level'       ,'Visualization upscale level (0-3)'  ,'3'                 ,VLEVEL  )
+!
+   call get_option_string  &
+        ('-dir_output'      ,'Paraview root directory'            ,'../outputs/'       ,OUTPUT_DIR)
+   PARAVIEW_DIR = trim(OUTPUT_DIR)//'paraview/'
+!
+   call get_option_bool    &
+        ('-paraview_geom'   ,'Dump geom at every Paraview call'   ,.false.             ,PARAVIEW_DUMP_GEOM)
+   call get_option_bool    &
+        ('-paraview_attr'   ,'Dump solution to Paraview'          ,.true.              ,PARAVIEW_DUMP_ATTR)
+!
+
+   call get_option_int     &
+        ('-bc','1)Dirichlet, 2)Neumann, 3)Impedance' ,BC_DIRICHLET,IBC_PROB)
+!        
+   call get_option_int     &
+        ('-exact','Manufactured solution (integer: 1-5)',IEXACT_GAUSS,ISOL)
+!        
+   call get_option_int     &
+        ('-npx','Exact solution polynomial order in x',1,NPX)
+   call get_option_int     &
+        ('-npy','Exact solution polynomial order in y',1,NPY)
+   call get_option_int     &
+        ('-npz','Exact solution polynomial order in z',1,NPZ)
+        
+   call get_option_int     &
+        ('-norm-test','1) Adj Graph, 2)Mathematicians'  ,ADJOINT_GRAPH,TEST_NORM)
+
+   call get_option_real( '-rnum', 'Number of wavelengths' , 2.d0, RNUM)
+
+   call get_option_real( '-epsilon', 'permittivity' , 1.d0, EPS)
+
+   call get_option_real( '-mu', 'permeability' , 1.d0, MU)
+
+!..angular frequency   
+   OMEGA = 2.0d0*dacos(-1.d0)*RNUM
+
+!..OpenMP threading
+   call get_option_int('-nthreads','Number of OpenMP threads',1,nthreads)
+   call omp_set_num_threads(nthreads)
+!
+!
+end subroutine set_environment
+

@@ -1,0 +1,4 @@
+1025000             MAXNODS  max number of nodes anticipated
+2                   NR_PHYSA number of physics attributes
+EHtrc  tangen  2    tangential trace of electric and magnetic field, H(curl) 1+1 components
+EHfld  discon  6    electric and magnetic fields, L2, 3+3 components

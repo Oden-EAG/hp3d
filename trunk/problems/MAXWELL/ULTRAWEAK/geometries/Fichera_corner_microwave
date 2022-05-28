@@ -1,0 +1,379 @@
+3    3    NDIM,MANDIM
+
+0         no surfaces
+
+3        NRDOMAIN
+
+30       NRPOINT
+
+Regular                
+0.d0   0.d0   0.d0     point 1
+
+Regular
+1.d0   0.d0   0.d0     point 2
+
+Regular                
+2.d0   0.d0   0.d0     point 3
+
+Regular                
+0.d0   1.d0   0.d0     point 4
+
+Regular
+1.d0   1.d0   0.d0     point 5
+
+Regular                
+2.d0   1.d0   0.d0     point 6
+
+Regular                
+0.d0   2.d0   0.d0     point 7
+
+Regular
+1.d0   2.d0   0.d0     point 8
+
+Regular                
+2.d0   2.d0   0.d0     point 9
+
+
+Regular                
+0.d0   0.d0   1.d0     point 10
+
+Regular
+1.d0   0.d0   1.d0     point 11
+
+Regular                
+2.d0   0.d0   1.d0     point 12
+
+Regular                
+0.d0   1.d0   1.d0     point 13
+
+Regular
+1.d0   1.d0   1.d0     point 14
+
+Regular                
+2.d0   1.d0   1.d0     point 15
+
+Regular                
+0.d0   2.d0   1.d0     point 16
+
+Regular
+1.d0   2.d0   1.d0     point 17
+
+Regular                
+2.d0   2.d0   1.d0     point 18
+
+
+Regular                
+0.d0   0.d0   2.d0     point 19
+
+Regular
+1.d0   0.d0   2.d0     point 20
+
+Regular                
+2.d0   0.d0   2.d0     point 21
+
+Regular                
+0.d0   1.d0   2.d0     point 22
+
+Regular
+1.d0   1.d0   2.d0     point 23
+
+Regular                
+2.d0   1.d0   2.d0     point 24
+
+Regular                
+0.d0   2.d0   2.d0     point 25
+
+Regular
+1.d0   2.d0   2.d0     point 26
+
+Regular
+0.d0   0.d0   3.d0     point 27
+
+Regular
+1.d0   0.d0   3.d0     point 28
+
+
+Regular
+0.d0   1.d0   3.d0     point 29
+
+Regular
+1.d0   1.d0   3.d0     point 30
+
+
+
+
+
+
+59  NRCURVE
+
+Seglin  segments parallel to the x axis
+1 2
+Seglin
+2 3 
+Seglin
+4 5
+Seglin
+5 6
+Seglin
+7 8
+Seglin
+8 9
+ 
+Seglin
+10 11 
+Seglin
+11 12
+Seglin
+13 14
+Seglin
+14 15
+Seglin
+16 17
+Seglin
+17 18
+
+Seglin
+19 20 
+Seglin
+20 21
+Seglin
+22 23
+Seglin
+23 24
+Seglin
+25 26
+
+
+
+Seglin  segments parallel to the y axis
+1 4
+Seglin
+4 7 
+Seglin
+2 5
+Seglin
+5 8
+Seglin
+3 6
+Seglin
+6 9
+ 
+Seglin
+10 13 
+Seglin
+13 16
+Seglin
+11 14
+Seglin
+14 17
+Seglin
+12 15
+Seglin
+15 18
+
+Seglin
+19 22 
+Seglin
+22 25
+Seglin
+20 23
+Seglin
+23 26
+Seglin
+21 24
+
+
+Seglin  segments parallel to the z axis
+1 10
+Seglin
+2 11 
+Seglin
+3 12
+Seglin
+10 19
+Seglin
+11 20
+Seglin
+12 21
+ 
+Seglin
+4 13 
+Seglin
+5 14
+Seglin
+6 15
+Seglin
+13 22
+Seglin
+14 23
+Seglin
+15 24
+
+Seglin
+7 16
+Seglin
+8 17
+Seglin
+9 18
+Seglin
+16 25
+Seglin
+17 26
+
+Seglin   inlet
+27 28
+Seglin
+29 30
+Seglin
+27 29
+Seglin
+28 30
+Seglin
+19 27
+Seglin
+20 28
+Seglin
+22 29
+Seglin
+23 30
+
+
+
+
+
+0 NRTRIAN
+
+
+
+
+
+38 NRRECTA
+
+BilQua     xy rectangles
+1 2 5 4
+BilQua
+2 3 6 5
+BilQua
+4 5 8 7 
+BilQua
+5 6 9 8
+
+BilQua     
+10 11 14 13
+BilQua
+11 12 15 14
+BilQua
+13 14 17 16 
+BilQua
+14 15 18 17
+
+
+BilQua     
+19 20 23 22
+BilQua
+20 21 24 23
+BilQua
+22 23 26 25 
+
+
+BilQua     xz rectangles
+1 2 11 10
+BilQua
+2 3 12 11
+BilQua
+10 11 20 19 
+BilQua
+11 12 21 20
+
+BilQua     
+4 5 14 13
+BilQua
+5 6 15 14
+BilQua
+13 14 23 22
+BilQua
+14 15 24 23
+
+
+BilQua     
+7 8 17 16
+BilQua
+8 9 18 17
+BilQua
+16 17 26 25 
+
+BilQua     yz rectangles
+1 4 13 10
+BilQua
+4 7 16 13
+BilQua
+10 13 22 19
+BilQua
+13 16 25 22
+
+BilQua     
+2 5 14 11
+BilQua
+5 8 17 14
+BilQua
+11 14 23 20
+BilQua
+14 17 26 23
+
+
+BilQua     
+3 6 15 12
+BilQua
+6 9 18 15
+BilQua
+12 15 24 21
+
+BilQua       inlet
+27 28 30 29
+BilQua
+19 20 28 27
+BilQua
+22 23 30 29
+BilQua
+19 22 29 27
+BilQua
+20 23 30 28
+
+
+
+0 NRPRISM
+
+8 NRHEXAS 
+
+Linear
+1  1 2 5 4 10 11 14 13  hexa 1  first layer
+
+Linear
+1  2 3 6 5 11 12 15 14  hexa 2
+
+Linear
+1  4 5 8 7 13 14 17 16  hexa 3
+
+Linear
+1  5 6 9 8 14 15 18 17  hexa 4
+
+Linear
+2  10 11 14 13 19 20 23 22  hexa 5  second layer
+
+Linear
+2  11 12 15 14 20 21 24 23  hexa 6
+
+Linear
+2  13 14 17 16 22 23 26 25  hexa 7
+
+Linear
+3  19 20 23 22 27 28 30 29     hexa 8   inlet
+
+
+
+
+
+
+0 NRTETRA
+
+0 NRPYRAM
