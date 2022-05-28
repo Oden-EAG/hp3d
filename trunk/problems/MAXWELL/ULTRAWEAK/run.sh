@@ -2,14 +2,14 @@
 
 #
 # MPI Procs
-nproc=2
+nproc=6
 #
 # OMP THREADS
 nthreads=1
 
 # Configure problem params
 # - initial polynomial order of approximation
-p=3
+p=2
 # - manufactured solution
 #   0: polynomial solution
 #   1: smooth sin*sinh solution, uniform in z
@@ -31,4 +31,4 @@ export KMP_STACKSIZE=64M # p=5
 args=" -job ${job} -maxnods ${maxnods} -p ${p}"
 args+=" -exact ${exact} -imax ${imax} -nthreads ${nthreads}"
 
-mpirun -np ${nproc} ./uw_acoustics ${args}
+mpirun -np ${nproc} ./uw_maxwell ${args}

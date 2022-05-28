@@ -1308,7 +1308,7 @@
 !
 !..A. Compute Cholesky factorization of Gram Matrix
 !
-
+   uplo = 'U'
 
    call ZPPTRF(uplo,NrTest,gramP,info)
    if (info.ne.0) then
