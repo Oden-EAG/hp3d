@@ -56,7 +56,8 @@ module commonParam
    real(8) :: WAVENUM_PUMP   ! approximate pump wavenumber
 !
 !..weight for l2 term in scaled adjoint graph norm (UW Maxwell)
-   real(8) :: ALPHA_NORM = 1.0d0
+!  ||v||_V^2 := ||A^* v||^2 + ALPHA * ||v||^2
+   real(8) :: ALPHA_NORM
 !
 !..for PML: length of Z region and PML_REGION, PML_FRACTION
    logical :: USE_PML

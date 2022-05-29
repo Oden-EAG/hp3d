@@ -91,7 +91,10 @@ subroutine set_environment_maxwell
 !
    call get_option_int('-maxnods','MAXNODS_USER',0 ,MAXNODS_USER)
 !
-   call get_option_int('-iproduct' , 'INNER_PRODUCT', 1, INNER_PRODUCT)
+   call get_option_int('-iproduct', 'INNER_PRODUCT', 1, INNER_PRODUCT)
+!
+!..ALPHA (scaling coefficient in UW test norm)
+   call get_option_real('-alpha'  , 'ALPHA_NORM', 1.d0, ALPHA_NORM)
 !
 !..MU, EPSILON, SIGMA
    call get_option_real('-mu'     , 'MU'     , 1.d0, MU     )
