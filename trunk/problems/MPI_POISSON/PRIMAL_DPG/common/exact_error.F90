@@ -21,7 +21,7 @@ subroutine exact_error
 !
    implicit none
 !
-   integer :: iflag(1)
+   integer :: iflag(NR_PHYSA)
 !
 !..workspace for element_error routine
    real(8) :: errorH,rnormH,errorE,rnormE
@@ -31,7 +31,8 @@ subroutine exact_error
 !
 !----------------------------------------------------------------------
 !
-   iflag(1) = 1
+!..compute the error only for H1 field
+   iflag(1:NR_PHYSA) = (/1,0/)
 !
 !..fetch active elements
    if (DISTRIBUTED .and. (.not. HOST_MESH)) then
