@@ -1,4 +1,4 @@
-# hp3d
+# hp3D
 A Scalable MPI/OpenMP hp-Adaptive Finite Element Software Library
 for Complex Multiphysics Applications
 
@@ -44,8 +44,23 @@ Additional preprocessing flags for enabling/disabling third-party libraries:
 ## Compiling a problem
 Projects are implemented in `hp3d/trunk/problems/`. A few projects have been implemented and can serve as an example. For example, `/problems/MPI_POISSON/GALERKIN/` is a Galerkin implementation for the classical variational Poisson problem. To compile and run the problem, type `make`  in the project folder, i.e., `cd problems/MPI_POISSON/GALERKIN; make; ./run.sh`.
 
-## Citing hp3d
-Please add the following citation to any paper, technical report, or article that incorporated the `hp3d` library:
+## Citing hp3D
+Please add the following citation to any paper, technical report, or article that incorporated the `hp3D` library:
+```bibtex
+@book{hpbook3,
+	Author = {Henneking, Stefan and Demkowicz, Leszek},
+	Publisher = {In preparation},
+	Title = {{Computing with $hp$ Finite Elements. III. Parallel $hp$3D Code}},
+	Year = {2022}}
+```
+And, optionally,
+```bibtex
+@book{hpUserManual,
+	Author = {Henneking, Stefan and Demkowicz, Leszek},
+	Publisher = {In preparation},
+	Title = {{$hp$3D User Manual}},
+	Year = {2022}}
+```
 ```bibtex
 @book{hpbook2,
       Author = {Demkowicz, L. and Kurtz, J. and Pardo, D. and Paszy\'{n}ski, M. and Rachowicz, W. and Zdunek, A.},
@@ -53,7 +68,6 @@ Please add the following citation to any paper, technical report, or article tha
       Title = {Computing with $hp$ Finite Elements. II. Frontiers: Three-Dimensional Elliptic and Maxwell Problems with Applications},
       Year = {2007}}
 ```
-And, optionally,
 ```bibtex
 @book{hpbook,
       Author = {Demkowicz, L.},
@@ -74,7 +88,10 @@ And, optionally,
 ```
 
 ## User Guide
-... in development
+The user manual is continuously updated and maintained here:
+https://github.com/Oden-EAG/hp3d_user_guide (LaTeX source)
+
+A PDF version of the user manual is available on arXiv: TBD
 
 ## Support
 Contact: ``stefan@oden.utexas.edu``, ``leszek@oden.utexas.edu``
