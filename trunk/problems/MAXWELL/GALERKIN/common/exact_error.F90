@@ -74,9 +74,9 @@ subroutine exact_error
 !
    if (RANK .eq. ROOT) then
       write(*,7020) NRDOF_TOT,sqrt(err),sqrt(rnorm)
- 7020 format('exact_error: NRDOF_TOT, L2 ERROR AND NORM = ',i8,3x,2es12.5)
+ 7020 format('exact_error: NRDOF_TOT, H(CURL) ERROR AND NORM = ',i8,3x,2es12.5)
       write(*,7030) NRDOF_TOT,sqrt(err/rnorm)
- 7030 format('exact_error: NRDOF_TOT, RELATIVE L2 ERROR = ',i8,3x,es12.5)
+ 7030 format('exact_error: NRDOF_TOT, RELATIVE H(CURL) ERROR = ',i8,3x,es12.5)
    endif
 !
    90 continue
