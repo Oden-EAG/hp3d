@@ -144,10 +144,12 @@ program main
       write(*,9010) ' FAKE_PUMP                = ', FAKE_PUMP
    endif
    write(*,9030) ' Polynomial order (x,y,z) = ', ORDER_APPROX_X,ORDER_APPROX_Y,ORDER_APPROX_Z
+   write(*,9010) ' NORD_ADD (Delta p)       = ', NORD_ADD
    write(*,9010) ' ISOL                     = ', ISOL
    write(*,9010) ' NEXACT                   = ', NEXACT
    write(*,9010) ' FAST INTEGRATION         = ', FAST_INT
    write(*,9010) ' IBCFLAG                  = ', IBCFLAG
+   write(*,9020) ' ALPHA_NORM               = ', ALPHA_NORM
    write(*,9015) ' OUTPUT_DIR               = ', trim(OUTPUT_DIR)
    if (HEAT_FLAG .eq. 1) then
       write(*,9010) ' NSTEPS                   = ', NSTEPS
@@ -161,11 +163,11 @@ program main
       write (*,9000) ' WAVENUM_SIGNAL          = ', WAVENUM_SIGNAL
       write (*,9000) ' WAVENUM_PUMP            = ', WAVENUM_PUMP
    endif
- 9000 format(A,F11.6)
- 9001 format(A,F11.3)
+ 9000 format(A,F13.6)
+ 9001 format(A,F13.3)
  9010 format(A,I3)
  9015 format(A,A)
- 9020 format(A,ES11.2)
+ 9020 format(A,ES13.2)
  9030 format(A,' (',I1,',',I1,',',I1,') ')
 !
 !$OMP parallel
