@@ -11,6 +11,7 @@
 !     arguments:
 !
 !     in:
+!             Mdle      - middle node number
 !             X         - a point in physical space
 !             Icase     - node case (specifies what variables are supported)
 !     out:
