@@ -197,7 +197,7 @@ subroutine master_main()
       write(*,*) 'MUMPS (MPI)............................40'
       write(*,*) 'MUMPS (OpenMP).........................41'
       write(*,*) 'Pardiso (OpenMP).......................42'
-      write(*,*) 'Frontal (Seq)..........................43'
+      ! write(*,*) 'Frontal (Seq)..........................43'
       write(*,*) 'MUMPS (Nested Dissection)..............44'
       write(*,*) 'PETSc (MPI)............................45'
       write(*,*) '                                         '
@@ -398,7 +398,8 @@ subroutine worker_main()
             call exec_case(idec)
 !
 !     ...Solvers
-         case(40,41,42,43,44,45)
+         case(40,41,42,44,45)
+         ! case(40,41,42,43,44,45)
             call exec_case(idec)
 !
 !     ...Error and Residual

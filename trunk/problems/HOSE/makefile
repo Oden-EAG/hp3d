@@ -1,12 +1,12 @@
 #####-----------------------------------------
 
--include ../../../m_options
+-include ../../m_options
 
-COMPLEX   ?= 1
+COMPLEX   ?= 0
 DEBUG     ?= 0
 
 ifeq ($(COMPLEX),1)
-$(error COMPLEX FLAG MUST BE 0 FOR POISSON APPLICATION)
+$(error COMPLEX FLAG MUST BE 0 FOR LINEAR ELASTICITY APPLICATION)
 endif
 
 SRC_PATH        = .
@@ -16,7 +16,7 @@ MODULE_PATH     = $(OBJ_PATH)
 
 
 # Executable name
-EXEC            = pois
+EXEC            = hose
 
 # Includes and defs
 CCDEFS          = $(PROB_PP_DEFS)
@@ -42,7 +42,7 @@ FC_WORK     = $(FC) $(CCDEFS) $(CCINCS) $(FFLAGS) $(EXTRA_FFLAGS)
 
 one : $(OBJ_PATH)/.dummy $(OBJ)
 	@echo " "
-	@echo "- Linking , " $(EXEC)
+	@echo "- Linking - " $(EXEC)
 	@echo "- COMPLEX = " $(COMPLEX)
 	@echo "- DEBUG   = " $(DEBUG)
 	@echo "------------------------------ "
@@ -51,6 +51,7 @@ one : $(OBJ_PATH)/.dummy $(OBJ)
 all :
 	@for e in $(EXECS) ; do \
 		make one EXEC=$$e ;\
+	done
 
 $(OBJ_PATH)/.dummy :
 	@echo "Creating directory " $(OBJ_PATH)

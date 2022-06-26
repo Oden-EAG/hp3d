@@ -17,6 +17,7 @@ subroutine exec_case(idec)
    logical :: solved
    integer :: mdle_subd(NRELES)
    integer :: i,mdle,kref,src,count,ierr,nord
+   integer :: iParAttr(NR_PHYSA) ! iParAttr = (/3,3,3,6,3/)
 !
 !----------------------------------------------------------------------
 !
@@ -26,7 +27,8 @@ subroutine exec_case(idec)
 !
 !  ...paraview graphics
       case(3)
-         call my_paraview_driver(1)
+         iParAttr(1:NR_PHYSA) = (/0,0,3,0,0/) ! write displacement components only
+         call my_paraview_driver(iParAttr)
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 !  ...print data structure (interactive)
@@ -149,9 +151,9 @@ subroutine exec_case(idec)
          call pardiso_sc('G')
 !
 !  ...solve problem with Frontal solver (sequential)
-      ! case(43)
-      !    write(*,*) 'calling Frontal (Seq) solver...'
-      !    call solve1(1)
+      case(43)
+         write(*,*) 'calling Frontal (Seq) solver...'
+         ! call solve1(1)
 !
 !  ...solve problem with omp_mumps (OpenMP MUMPS)
       case(44)
@@ -166,6 +168,10 @@ subroutine exec_case(idec)
       case(50)
          write(*,*) 'computing error...'
          call exact_error
+!
+      case(51)
+         write(*,*) 'computing residual...'
+         call residual
 !
       case(60)
          write(*,*) 'flushing dof'
