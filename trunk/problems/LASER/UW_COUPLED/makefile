@@ -30,11 +30,6 @@ CCINCS          = $(PROB_INCS)
 # User defined libraries
 LIBS            = $(PROB_LIBS)
 
-ifdef CUDA_PATH
-LIBS           += $(CUDA_LIB)
-endif
-
-
 include make.inc
 
 SRC         = $(addprefix $(SRC_PATH)/,$(SRC_FILE))

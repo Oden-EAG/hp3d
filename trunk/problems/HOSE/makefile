@@ -2,8 +2,8 @@
 
 -include ../../m_options
 
-COMPLEX        ?= 0
-DEBUG_MODE     ?= 0
+COMPLEX   ?= 0
+DEBUG     ?= 0
 
 ifeq ($(COMPLEX),1)
 $(error COMPLEX FLAG MUST BE 0 FOR LINEAR ELASTICITY APPLICATION)
@@ -17,14 +17,13 @@ MODULE_PATH     = $(OBJ_PATH)
 
 # Executable name
 EXEC            = hose
-EXECS           = hose
 
 # Includes and defs
 CCDEFS          = $(PROB_PP_DEFS)
 CCINCS          = $(PROB_INCS)
 
 ###### User defined libraries
-# LIBS            = $(PROB_LIBS)
+LIBS            = $(PROB_LIBS)
 
 # Defines SRC_FILE
 -include ./make.inc
@@ -42,12 +41,12 @@ FC_WORK     = $(FC) $(CCDEFS) $(CCINCS) $(FFLAGS) $(EXTRA_FFLAGS)
 #	( cd ../.. ; make )
 
 one : $(OBJ_PATH)/.dummy $(OBJ)
-
 	@echo " "
-	@echo "- Linking - ", $(EXEC)
-	@echo "- COMPLEX, PARALLEL ", $(COMPLEX) $(PARALLEL)
+	@echo "- Linking - " $(EXEC)
+	@echo "- COMPLEX = " $(COMPLEX)
+	@echo "- DEBUG   = " $(DEBUG)
 	@echo "------------------------------ "
-	$(FC_WORK) -o $(EXEC) $(OBJ) $(PROB_LIBS)
+	$(FC_WORK) -o $(EXEC) $(OBJ) $(LIBS)
 
 all :
 	@for e in $(EXECS) ; do \
