@@ -111,15 +111,15 @@ end subroutine elem
 !              NrdofH   - number of H1 trial dof
 !              NrdofV   - number of H(div) trial dof
 !              NrdofVi  - number of H(div) trial interface dof
-!              MdH      - num rows of ZalocHH,ZalocHV
-!              MdV      - num rows of ZalocVH,ZalocVV
+!              MdH      - num rows of AlocHH,AlocHV
+!              MdV      - num rows of AlocVH,AlocVV
 !        out:
-!              ZblocH   - load vectors
-!              ZblocV
-!              ZalocHH  - stiffness matrices
-!              ZalocHV
-!              ZalocVH
-!              ZalocVV
+!              BlocH    - load vectors
+!              BlocV
+!              AlocHH   - stiffness matrices
+!              AlocHV
+!              AlocVH
+!              AlocVV
 !
 !-------------------------------------------------------------------------
 !
@@ -129,8 +129,8 @@ subroutine elem_poisson(Mdle,                   &
                         NrdofH,NrdofV,          &
                         NrdofVi,                &
                         MdH,MdV,                &
-                        ZblocH,ZalocHH,ZalocHV, &
-                        ZblocV,ZalocVH,ZalocVV)
+                        BlocH,AlocHH,AlocHV,    &
+                        BlocV,AlocVH,AlocVV)
 !
 !..ALOC: holds local element stiffness matrices
 !..BLOC: holds local element load vectors
@@ -152,12 +152,12 @@ subroutine elem_poisson(Mdle,                   &
    integer,                       intent(in)  :: NrdofVi
    integer,                       intent(in)  :: MdH
    integer,                       intent(in)  :: MdV
-   real(8), dimension(MdH),       intent(out) :: ZblocH
-   real(8), dimension(MdH,MdH),   intent(out) :: ZalocHH
-   real(8), dimension(MdH,MdV),   intent(out) :: ZalocHV
-   real(8), dimension(MdV),       intent(out) :: ZblocV
-   real(8), dimension(MdV,MdH),   intent(out) :: ZalocVH
-   real(8), dimension(MdV,MdV),   intent(out) :: ZalocVV
+   real(8), dimension(MdH),       intent(out) :: BlocH
+   real(8), dimension(MdH,MdH),   intent(out) :: AlocHH
+   real(8), dimension(MdH,MdV),   intent(out) :: AlocHV
+   real(8), dimension(MdV),       intent(out) :: BlocV
+   real(8), dimension(MdV,MdH),   intent(out) :: AlocVH
+   real(8), dimension(MdV,MdV),   intent(out) :: AlocVV
 !
 !-------------------------------------------------------------------------
 !
@@ -224,8 +224,8 @@ subroutine elem_poisson(Mdle,                   &
 !
 !..allocate auxiliary matrices
    allocate(gramP(NrTest*(NrTest+1)/2))
-   allocate(stiff_HH (NrTest   ,NrdofH))
-   allocate(stiff_HV (NrTest   ,NrdofVi))
+   allocate(stiff_HH(NrTest,NrdofH))
+   allocate(stiff_HV(NrTest,NrdofVi))
 !
 !..element type
    etype = NODES(Mdle)%type
@@ -260,8 +260,8 @@ subroutine elem_poisson(Mdle,                   &
    call nodcor(Mdle, xnod)
 !
 !..clear space for stiffness matrix and load vector:
-   ZblocH = ZERO; ZalocHH = ZERO; ZalocHV = ZERO
-   ZblocV = ZERO; ZalocVH = ZERO; ZalocVV = ZERO
+   BlocH = ZERO; AlocHH = ZERO; AlocHV = ZERO
+   BlocV = ZERO; AlocVH = ZERO; AlocVV = ZERO
 !
 !..clear space for auxiliary matrices
    bload_H   = ZERO
@@ -463,14 +463,14 @@ subroutine elem_poisson(Mdle,                   &
    enddo
 !
 !..E. Fill ALOC and BLOC matrices
-   ZblocH(1:j1) = raloc(1:j1,j1+j2+1)
-   ZblocV(1:j2) = raloc(j1+1:j1+j2,j1+j2+1)
+   BlocH(1:j1) = raloc(1:j1,j1+j2+1)
+   BlocV(1:j2) = raloc(j1+1:j1+j2,j1+j2+1)
 !
-   ZalocHH(1:j1,1:j1) = raloc(1:j1,1:j1)
-   ZalocHV(1:j1,1:j2) = raloc(1:j1,j1+1:j1+j2)
+   AlocHH(1:j1,1:j1) = raloc(1:j1,1:j1)
+   AlocHV(1:j1,1:j2) = raloc(1:j1,j1+1:j1+j2)
 !
-   ZalocVH(1:j2,1:j1) = raloc(j1+1:j1+j2,1:j1)
-   ZalocVV(1:j2,1:j2) = raloc(j1+1:j1+j2,j1+1:j1+j2)
+   AlocVH(1:j2,1:j1) = raloc(j1+1:j1+j2,1:j1)
+   AlocVV(1:j2,1:j2) = raloc(j1+1:j1+j2,j1+1:j1+j2)
 !
    deallocate(raloc)
 !

@@ -21,7 +21,7 @@ subroutine exact_error
 !
    implicit none
 !
-   integer :: iflag(NR_PHYSA)
+   integer :: iflag(1)
 !
 !..workspace for element_error routine
    real(8) :: errorH,rnormH,errorE,rnormE
@@ -31,8 +31,7 @@ subroutine exact_error
 !
 !----------------------------------------------------------------------
 !
-!..compute the error only for H1 field
-   iflag(1:NR_PHYSA) = (/1,0/)
+   iflag(1) = 1
 !
 !..fetch active elements
    if (DISTRIBUTED .and. (.not. HOST_MESH)) then
@@ -75,9 +74,9 @@ subroutine exact_error
 !
    if (RANK .eq. ROOT) then
       write(*,7020) NRDOF_TOT,sqrt(err),sqrt(rnorm)
- 7020 format('exact_error: NRDOF_TOT, L2 ERROR AND NORM = ',i8,3x,2es12.5)
+ 7020 format('exact_error: NRDOF_TOT, H1 ERROR AND NORM = ',i8,3x,2es12.5)
       write(*,7030) NRDOF_TOT,sqrt(err/rnorm)
- 7030 format('exact_error: NRDOF_TOT, RELATIVE L2 ERROR = ',i8,3x,es12.5)
+ 7030 format('exact_error: NRDOF_TOT, RELATIVE H1 ERROR = ',i8,3x,es12.5)
    endif
 !
    90 continue

@@ -78,10 +78,10 @@ program main
    if (RANK .eq. ROOT) write(6,1015) end_time-start_time
  1015 format(' initialize : ',f12.5,' seconds',/)
 !
-!..FLAGS
+!..Static Condensation Module (stc) flags
    ISTC_FLAG = .true.
    STORE_STC = .true.
-   HERM_STC  = .false.
+   HERM_STC  = .true.
 !
 !..set interface variables
 !  (1) - H1 field (1 scalar-valued component)
