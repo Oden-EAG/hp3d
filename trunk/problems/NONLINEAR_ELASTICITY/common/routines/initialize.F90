@@ -25,13 +25,13 @@ subroutine initialize
   integer, parameter :: MANDIM_PROB  = 3    ! Manifold dimension
                                             ! EXPECTED MAX NUMBER OF:
   integer, parameter :: MAXSU_PROB   = 50    ! surfaces
-  integer, parameter :: MAXNP_PROB   = 2012  ! points
-  integer, parameter :: MAXNC_PROB   = 30000  ! curves
-  integer, parameter :: MAXTR_PROB   = 20000  ! triangles
+  integer, parameter :: MAXNP_PROB   = 3589  ! points
+  integer, parameter :: MAXNC_PROB   = 60000  ! curves
+  integer, parameter :: MAXTR_PROB   = 40000  ! triangles
   integer, parameter :: MAXRE_PROB   = 100  ! rectangles
   integer, parameter :: MAXBT_PROB   = 1    ! prismsm
   integer, parameter :: MAXHE_PROB   = 10  ! hexas
-  integer, parameter :: MAXTE_PROB   = 7453  ! tetras
+  integer, parameter :: MAXTE_PROB   = 15647  ! tetras
   integer, parameter :: MAXPY_PROB   = 1    ! pyramids
   !--------------------------------------------------------------------------
   ! E Q U A T I O N    S E T T I N G

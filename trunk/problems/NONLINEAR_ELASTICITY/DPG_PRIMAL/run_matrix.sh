@@ -5,12 +5,12 @@
 nproc=1
 #
 # OMP THREADS
-nthreads=48
+nthreads=4
 
 # Configure problem params
 # - initial polynomial order of approximation
-# p=1
-p=2
+p=1
+# p=2
 # p=3
 # - manufactured solution
 
@@ -34,7 +34,7 @@ material='../common/materials/ogden3'
 # - boundary condition
 bc=15
 
-prefix='UW_m7453_p2_bc15_ogden3_'
+prefix='NEW_PR_m7453_p1_bc15_ogden3_'
 
 vislevel=1
 

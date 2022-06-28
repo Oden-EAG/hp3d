@@ -43,8 +43,8 @@ subroutine exact(X,Mdle,Icase,ValH,DvalH,D2valH, &
 !------------------------------------------------------------------------------
   real*8, dimension(3)   :: u
   real*8, dimension(3,3) :: gradu
-  real*8, dimension(3,3) :: sigma
-  real*8, dimension(3)   :: divsigma
+  real*8, dimension(3,3) :: stress
+  real*8, dimension(3)   :: divstress
 !------------------------------------------------------------------------------
 ! initialize exact solution
   ValH = 0.d0 ; DvalH = 0.d0 ; D2valH = 0.d0
@@ -53,10 +53,10 @@ subroutine exact(X,Mdle,Icase,ValH,DvalH,D2valH, &
   ValQ = 0.d0 ; DvalQ = 0.d0 ; D2valQ = 0.d0
 !------------------------------------------------------------------------------
 
- call hyperelast_solution(Mdle,LOAD_FACTOR,X, u,gradu,sigma,divsigma)
+ call hyperelast_solution(Mdle,LOAD_FACTOR,X, u,gradu,stress,divstress)
 
  ValH(4:6)  = u(1:3)
  DvalH(4:6,:) = gradu(1:3,:)
- ValV(:,4:6)  = sigma(:,:)
+ ValV(:,4:6)  = transpose(stress(:,:))
 
 end subroutine exact

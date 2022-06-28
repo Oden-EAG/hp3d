@@ -131,9 +131,9 @@ subroutine set_initial_mesh(Nelem_order)
     case(15)! assume all elements are tetrahedra
 
       ! if exterior face, set boundary condition
-      do ifc=1,4
+      do i=1,4
         ! get triangle number
-        itri = TETRAS(iel)%Figno(ifc)
+        itri = TETRAS(iel)%Figno(i)
         itri = itri/10
         ! check that triangle is the face of a single block
         if (TRIANGLES(itri)%BlockNo(1).ne.0 .and. TRIANGLES(itri)%BlockNo(2).ne.0) cycle
@@ -143,11 +143,9 @@ subroutine set_initial_mesh(Nelem_order)
 ! CUBE
         select case(Nsurf)
         case(1,5) !normal pointing in direction +/-Z
-          ibc(ifc,1) = 1
-          ! ibc(ifc,2) = 0
+          ibc(i) = 1
         case default !remaining surfaces have a zero traction b.c.
-          ibc(ifc,1) = 2
-          ! ibc(ifc,2) = 1
+          ibc(i) = 2
         end select
 
       enddo       

@@ -1,7 +1,7 @@
 100000              MAXNODS  max number of nodes anticipated
 5                   NR_PHYSA number of physics attributes
-Displ  contin  3    physics attribute, discretization type, # of variables
-Tract  normal  3    physics attribute, discretization type, # of variables
-u_fld  discon  3
-PK1st  discon  9
-Gradu  discon  9
+Displ  contin  3    Displacement on mesh skeleton, interface H1, 3 components
+Tract  normal  3    Traction on mesh skeleton, interface H(div), 3 components
+u_fld  discon  3	Displacement field, L2, 3 components
+PK1st  discon  9	PK1 stress field, L2, 3x3 components
+Gradu  discon  9	Displacement gradient field, L2, 3x3 components

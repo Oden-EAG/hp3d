@@ -80,3 +80,9 @@ subroutine exact_error
    90 continue
 !
 end subroutine exact_error
+
+subroutine residual
+
+write (*,*) 'residual for Bubnov-Galerkin is empty!'
+
+end subroutine
