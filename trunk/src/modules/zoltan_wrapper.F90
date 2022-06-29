@@ -562,11 +562,15 @@ module zoltan_wrapper
          write(*,301) '   nrImp    = ', nrImp
          write(*,301) '   nrExp    = ', nrExp
 !
-         write(fmt,'("(A,",I0,"I5)")') nrImp
-         write(6,fmt) '   impProcs = ', impProcs
+         if (nrImp > 0) then
+            write(fmt,'("(A,",I0,"I5)")') nrImp
+            write(6,fmt) '   impProcs = ', impProcs
+         endif
 !
-         write(fmt,'("(A,",I0,"I5)")') nrExp
-         write(6,fmt) '   expProcs = ', expProcs
+         if (nrExp > 0) then
+            write(fmt,'("(A,",I0,"I5)")') nrExp
+            write(6,fmt) '   expProcs = ', expProcs
+         endif
 !
   300    format(A,L5)
   301    format(A,I5)
