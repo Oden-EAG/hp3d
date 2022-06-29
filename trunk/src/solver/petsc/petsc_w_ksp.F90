@@ -17,10 +17,7 @@ module petsc_w_ksp
 !
    use MPI      , only: MPI_COMM_WORLD,MPI_COMM_SELF
    use mpi_param, only: RANK,NUM_PROCS
-   use petscksp , only: PetscInitialize,PetscFinalize,   &
-                        KSPCreate,KSPDestroy,            &
-                        tKSP,tMat,tVec,tPC,              &
-                        PETSC_NULL_CHARACTER
+   use petscksp
 !
    implicit none
 !
@@ -28,7 +25,6 @@ module petsc_w_ksp
    Mat petsc_A
    Vec petsc_rhs
    Vec petsc_sol
-   PC  prec
 !
    contains
 !

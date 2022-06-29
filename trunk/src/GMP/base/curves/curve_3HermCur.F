@@ -31,7 +31,7 @@ c  ...curve dof
       dimension gdof(1:3,6)
 c
 c  ...fifth order C^2-conforming shape functions
-      dimension vshap(MAXP+1),dvshap(MAXP+1),ddvshap(MAXP+1)
+      dimension vshap(MAXP+1),dvshap(MAXP+1)
 c
       iprint=0
 c

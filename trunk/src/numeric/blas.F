@@ -88,15 +88,17 @@ c
 c
       inc=1
 c
-      do 10 k=1,n-1
-      c=b(ip(k))
-      b(ip(k))=b(k)
-      b(k)=c
- 10   call daxpy(n-k,-b(k),a(k+1,k),inc,b(k+1),inc)
+      do k=1,n-1
+        c=b(ip(k))
+        b(ip(k))=b(k)
+        b(k)=c
+        call daxpy(n-k,-b(k),a(k+1,k),inc,b(k+1),inc)
+      enddo
 
-      do 20 j=n,1,-1
-      x(j)=b(j)/a(j,j)
- 20   call daxpy(j-1,-x(j),a(1,j),inc,b,inc)
+      do j=n,1,-1
+        x(j)=b(j)/a(j,j)
+        call daxpy(j-1,-x(j),a(1,j),inc,b,inc)
+      enddo
 c
 c
       end subroutine
@@ -141,42 +143,41 @@ c
       call tri(gk,igk,n)
       call rhsub(gk,u,gf,igk,n)
 c
-      return
-      end
+      end subroutine
 
 
       subroutine matinv(n,na,a,ip,Work)
 #include "syscom.blk"
-      dimension a(na,n),ip(n),Work(n)
+      real a(na,n),Work(n)
+      integer ip(n)
 
-      do 10 i=n,2,-1
-      a(i,i)=1/a(i,i)
-      call sscal (i-1, -a(i,i), a(1,i), 1)
-      a(i-1,i)=a(i-1,i)/a(i-1,i-1)
+      do i=n,2,-1
+        a(i,i)=1/a(i,i)
+        call sscal (i-1, -a(i,i), a(1,i), 1)
+        a(i-1,i)=a(i-1,i)/a(i-1,i-1)
 
-      do 30 k=i-1,2,-1
-      call saxpy (k-1, -a(k,i), a(1,k), 1, a(1,i), 1)
- 30   a(k-1,i)=a(k-1,i)/a(k-1,k-1)
-
- 10   continue
+        do k=i-1,2,-1
+          call saxpy (k-1, -a(k,i), a(1,k), 1, a(1,i), 1)
+          a(k-1,i)=a(k-1,i)/a(k-1,k-1)
+        enddo
+      enddo
 
       a(1,1)=1/a(1,1)
 
 
-      do 50 i=n-1,1,-1
-      call scopy(   i, a(1,i), 1, Work     , 1)
-      call scopy( n-i, 0.    , 0, Work(i+1), 1)
+      do i=n-1,1,-1
+        call scopy(   i, a(1,i), 1, Work     , 1)
+        call scopy( n-i, 0.    , 0, Work(i+1), 1)
 
-      do 70 k=i+1,n
- 70   call saxpy( n, -a(k,i), a(1,k), 1, Work, 1)
+        do k=i+1,n
+          call saxpy( n, -a(k,i), a(1,k), 1, Work, 1)
+        enddo
 
-      call scopy( n, Work, 1, a(1,i), 1)
-      call sswap( n, a(1,i), 1, a(1,ip(i)), 1)
+        call scopy( n, Work, 1, a(1,i), 1)
+        call sswap( n, a(1,i), 1, a(1,ip(i)), 1)
+      enddo
 
- 50   continue
-
-      return
-      end
+      end subroutine
 
 
       function sdot1(n,sx,Incx,sy,Incy)
@@ -191,14 +192,13 @@ c
       jy=1
       if(Incy.lt.0) jy=1+(n-1)*(-Incy)
 
-      do 10 i=1,n
-      sdot1 = sdot1+sx(jx)*sy(jy)
-      jx=jx+Incx
-      jy=jy+Incy
- 10   continue
+      do i=1,n
+        sdot1 = sdot1+sx(jx)*sy(jy)
+        jx=jx+Incx
+        jy=jy+Incy
+      enddo
 
-      return
-      end
+      end function
 
 
 
@@ -210,13 +210,12 @@ c
       jx=1
       if(Incx.lt.0) jx=1+(n-1)*(-Incx)
 
-      do 10 i=1,n
-      sn   =sn   +sx(jx)*sx(jx)
-      jx=jx+Incx
- 10   continue
+      do i=1,n
+        sn = sn + sx(jx)*sx(jx)
+        jx=jx+Incx
+      enddo
 
-      snrm21=sqrt(sn   )
+      snrm21=sqrt(sn)
 
-      return
-      end
+      end function
 

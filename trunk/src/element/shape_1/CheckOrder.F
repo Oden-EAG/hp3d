@@ -44,6 +44,9 @@ c
 c  ...intialize printing flag
       iprint = 0
 c
+c  ...initialize output variable
+      Nsize = 0
+c
 c  ...The flag confident determines whether you are confident enough to
 c     NOT make a check to Norder. In that case, it is assumed all orders
 c     are less than MaxOrd, and the size of the arrays assume the worst

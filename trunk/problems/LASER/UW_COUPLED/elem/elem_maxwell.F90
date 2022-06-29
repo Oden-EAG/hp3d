@@ -1,11 +1,10 @@
-!
-!-------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 !    routine name      - elem_maxwell
 !
-!--------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
-!     latest revision:  - Apr 2019
+!     latest revision:  - June 2021
 !
 !     purpose:          - routine returns unconstrained (ordinary)
 !                         stiffness matrix and load vector for the
@@ -34,7 +33,7 @@
 !           ZalocQE
 !           ZalocQQ
 !
-!---------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 #include "typedefs.h"
 !
@@ -108,7 +107,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    real(8) :: rsolH
 !
 !..variables for geometry
-   real(8), dimension(3)    :: xi,x,rn
+   real(8), dimension(3)    :: xi,x,rn,daux
    real(8), dimension(3,2)  :: dxidt,dxdt,rt
    real(8), dimension(3,3)  :: dxdxi,dxidx
    real(8), dimension(2)    :: t
@@ -144,8 +143,8 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    !VTYPE :: gramP(NrTest*(NrTest+1)/2)
    VTYPE, allocatable :: gramP(:)
    real(8)  :: FF, CF, FC
-   real(8)  :: fldE(3), fldH(3), crlE(3), crlH(3)
-   real(8)  :: fldF(3), fldG(3), crlF(3), crlG(3)
+   real(8)  :: fldE(3), fldH(3), crlE(3), crlH(3), rotE(3)
+   real(8)  :: fldF(3), fldG(3), crlF(3), crlG(3), rotF(3), rotG(3)
 !
 !..matrices for transpose filling (swapped loops)
 !..stiffness matrices (transposed) for the enriched test space
@@ -161,20 +160,21 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    real(8), dimension(MAXNINT2ADD)    :: wtloc
 !
 !..BC's flags
-   integer, dimension(6,NR_PHYSA)     :: ibc
+   integer, dimension(6,NRINDEX)      :: ibc
 !
 !..for auxiliary computation
-   VTYPE :: zaux,zcux
+   VTYPE :: zaux,zbux,zcux
 !
 !..Maxwell load and auxiliary variables
    VTYPE  , dimension(3) :: zJ,zImp
    real(8), dimension(3) :: E1,E2,rntimesE,rn2timesE
+   real(8), dimension(3) :: F1,rntimesF,rn2timesF
 !
 !..number of edge,faces per element type
    integer :: nre, nrf
 !
 !..various variables for the problem
-   real(8) :: h_elem,rjac,weight,wa,v2n,CC,EE,CE,E,EC,q,h,omeg
+   real(8) :: h_elem,rjac,weight,wa,v2n,CC,EE,CE,E,EC,q,h,omeg,eps
    real(8) :: bjac
    integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,ik,j,k,l,nint,kE,n,m
    integer :: iflag,iprint,itime,iverb
@@ -190,16 +190,21 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !..OMEGA_RATIO_SIGNAL or OMEGA_RATIO_PUMP
    real(8) :: OMEGA_RATIO_FLD
+!..WAVENUM_SIGNAL or WAVENUM_PUMP
+   real(8) :: WAVENUM_FLD
 !
 !..for PML
    VTYPE :: zbeta,zdbeta,zd2beta,detJstretch
    VTYPE, dimension(3,3) :: Jstretch,invJstretch,JJstretch
 !
+!..timer
+!   real(8) :: MPI_Wtime,start_time,end_time
+!
 !..for Gram matrix compressed storage format
    integer :: nk
    nk(k1,k2) = (k2-1)*k2/2+k1
 !
-!---------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 !..Set iverb = 0/1 (Non-/VERBOSE)
    iverb = 0
@@ -260,12 +265,14 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    stiff_EE_T = ZERO
    stiff_EQ_T = ZERO
 !
-!..set OMEGA_RATIO_FLD
+!..set OMEGA_RATIO_FLD and WAVENUM_FLD
    select case(Fld_flag)
       case(0)
          OMEGA_RATIO_FLD = OMEGA_RATIO_PUMP
+         WAVENUM_FLD     = WAVENUM_PUMP
       case(1)
          OMEGA_RATIO_FLD = OMEGA_RATIO_SIGNAL ! 1.0d0
+         WAVENUM_FLD     = WAVENUM_SIGNAL
       case default
       write(*,*) 'elem_maxwell: invalid Fld_flag param. stop.'
          stop
@@ -292,9 +299,6 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    select case(GEOM_NO)
       case(1)
          bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
-      case(2,3)
-         write(*,*) 'elem_maxwell: cannot have prism core geometry with fast integration. stop.'
-         stop
       case(4)
          bg_pol = ZERO; gain_pol = ZERO; raman_pol = ZERO
       case(5)
@@ -311,6 +315,9 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
                write(*,*) 'elem_maxwell: unexpected ndom param. stop.'
                stop
          end select
+      case default
+         write(*,*) 'elem_maxwell: unexpected GEOM_NO: ', GEOM_NO, '. stop.'
+         stop
 !..end select case of GEOM_NO
    end select
 !
@@ -326,6 +333,9 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    INTEGRATION = NORD_ADD
    call set_3D_int_DPG(etype,norder,norient_face, nint,xiloc,waloc)
    INTEGRATION = 0
+!
+!..start timer
+!   start_time = MPI_Wtime()
 !
 !..loop over integration points
    do l=1,nint
@@ -389,6 +399,11 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !     ...initialize gain polarization, raman polarization
          gain_pol = ZERO; raman_pol = ZERO
+!     ...skip nonlinear gain computation if inside PML region
+         if ( USE_PML .and. ( (x(3).gt.PML_REGION) .or. &
+                              ( (COPUMP.eq.0).and.(x(3).lt.(ZL-PML_REGION)) ) &
+                            ) &
+            ) goto 190
          if (ACTIVE_GAIN .gt. 0.d0) then
             if (dom_flag .eq. 1) then
                call get_activePol(zsolQ_soleval(1:12),Fld_flag,delta_n, gain_pol)
@@ -403,8 +418,8 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
                call get_ramanPol(zsolQ_soleval(1:3),zsolQ_soleval(4:6), &
                               dom_flag,Fld_flag,delta_n, raman_pol)
             endif
-!     ...endif RAMAN_GAIN
          endif
+ 190     continue
 !     ...update auxiliary constant za
          za = (ZI*OMEGA*OMEGA_RATIO_FLD*EPSILON+SIGMA)*IDENTITY+bg_pol+gain_pol+raman_pol
 !  ...endif NONLINEAR_FLAG
@@ -418,6 +433,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
          JJstretch(1,1) = ZONE
          JJstretch(2,2) = ZONE
          JJstretch(3,3) = ZONE
+         detJstretch    = ZONE
       else
 !     ...get PML function
          call get_Beta(x,Fld_flag, zbeta,zdbeta,zd2beta)
@@ -448,11 +464,14 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !     ...Piola transformation
          do i = 1,3
+            daux = dxdxi(i,1:3)
             call dot_product(shapEE(1:3,k1),dxidx(1:3,i), fldF(i))
-            call dot_product(curlEE(1:3,k1),dxdxi(i,1:3), crlF(i))
+            call dot_product(curlEE(1:3,k1),daux        , crlF(i))
          enddo
          crlF(1:3) = crlF(1:3)/rjac
          fldG = fldF; crlG = crlF
+!     ...e_z x F, e_z x G
+         rotF = 0.d0; rotF(1) = -fldF(2); rotF(2) = fldF(1); rotG = rotF
 !
 !        RHS:
 !        (J^imp,F) first  equation RHS (with first H(curl) test function F)
@@ -485,6 +504,16 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
             m = (k2-1)*6+6
             stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + fldH(3)*crlF(3)*weight
 !
+!        ...additional stiffness contribution if solving vectorial envelope equation
+            if (ENVELOPE) then
+!           ...-ik(e_z x H,F), where e_z x H = (-H_y,H_x,0), or
+!           ...+ik(H,e_z x F), where e_z x F = (-F_y,F_x,0)
+               m = (k2-1)*6+4
+               stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + ZI*WAVENUM_FLD*detJstretch*fldH(1)*rotF(1)*weight
+               m = (k2-1)*6+5
+               stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + ZI*WAVENUM_FLD*detJstretch*fldH(2)*rotF(2)*weight
+            endif
+!
 !        ...testing with G (second H(curl) test function))
             n = 2*k1
 !        ...(E,curl(G))
@@ -503,6 +532,16 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
             m = (k2-1)*6+6
             stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + zcJ(3,3)*fldH(3)*fldG(3)*weight
 !
+!        ...additional stiffness contribution if solving vectorial envelope equation
+            if (ENVELOPE) then
+!           ...-ik(e_z x E,G), where e_z x E = (-E_y,E_x,0), or
+!           ...+ik(E,e_z x G), where e_z x G = (-G_y,G_x,0)
+               m = (k2-1)*6+1
+               stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + ZI*WAVENUM_FLD*detJstretch*fldE(1)*rotG(1)*weight
+               m = (k2-1)*6+2
+               stiff_EQ_T(m,n) = stiff_EQ_T(m,n) + ZI*WAVENUM_FLD*detJstretch*fldE(2)*rotG(2)*weight
+            endif
+!
 !     ...end of loop through L2 trial functions
          enddo
 !
@@ -511,10 +550,13 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !        ...Piola transformation
             do i = 1,3
+               daux = dxdxi(i,1:3)
                call dot_product(shapEE(1:3,k2),dxidx(1:3,i), fldE(i))
-               call dot_product(curlEE(1:3,k2),dxdxi(i,1:3), crlE(i))
+               call dot_product(curlEE(1:3,k2),daux        , crlE(i))
             enddo
             crlE(1:3) = crlE(1:3)/rjac
+!        ...e_z x E
+            rotE = 0.d0; rotE(1) = -fldE(2); rotE(2) = fldE(1)
 !
             call dot_product(fldF,fldE, FF)
             call dot_product(fldF,crlE, FC)
@@ -528,11 +570,15 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !           (first eqn multiplied by F, second eqn by G)
 !           G_ij=(phi_j,phi_i)_testNorm is 2x2 matrix
 !           where (phi_j,phi_i)_l2Norm = Int[phi_i^* phi_j]
+!           and phi_i = (F_i,G_i), phi_j = (F_j,G_j).
 !           -------------------------
 !           | (F_i,F_j)   (F_i,G_j) |
 !           | (G_i,F_j)   (G_i,G_j) |
 !           -------------------------
-!           (F_i,F_j) terms
+!           F_i/G_i are outer loop shape functions (fldF)
+!           F_j/G_j are inner loop shape functions (fldE)
+!
+!           (F_j,F_i) terms = Int[F_^*i F_j] terms (G_11)
             n = 2*k1-1; m = 2*k2-1
             k = nk(n,m)
             zaux = abs(zaJ(1,1))**2*fldF(1)*fldE(1) + &
@@ -541,7 +587,20 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
             gramP(k) = gramP(k) &
                      + (zaux + ALPHA_NORM*FF + CC)*weight
 !
-!           (F_i,G_j) terms
+            if (ENVELOPE) then
+!           ...ik(e_z x F_i, curl F_j)
+               zaux = ZI*WAVENUM_FLD*detJstretch* &
+                     (rotF(1)*crlE(1)+rotF(2)*crlE(2)+rotF(3)*crlE(3))
+!           ...k^2(e_z x F_i, e_z x F_j)
+               zbux = (WAVENUM_FLD*abs(detJstretch))**2 * &
+                     (rotF(1)*rotE(1)+rotF(2)*rotE(2)+rotF(3)*rotE(3))
+!           ...-ik(curl F_i, e_z x F_j)
+               zcux = -ZI*WAVENUM_FLD*conjg(detJstretch)* &
+                     (crlF(1)*rotE(1)+crlF(2)*rotE(2)+crlF(3)*rotE(3))
+               gramP(k) = gramP(k) + (zaux+zbux+zcux)*weight
+            endif
+!
+!           (G_j,F_i) terms = Int[F_^*i G_j] terms (G_12)
             n = 2*k1-1; m = 2*k2
             k = nk(n,m)
             zaux = - (zaJ(1,1)*fldF(1)*crlE(1) + &
@@ -552,10 +611,24 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
                    conjg(zcJ(3,3))*crlF(3)*fldE(3)
             gramP(k) = gramP(k) + (zaux+zcux)*weight
 !
+            if (ENVELOPE) then
+!           ...ik(iωε F_i, e_z x G_j)
+               zaux = ZI*WAVENUM_FLD*conjg(detJstretch)* &
+                        (zaJ(1,1)*fldF(1)*rotE(1) + &
+                         zaJ(2,2)*fldF(2)*rotE(2) + &
+                         zaJ(3,3)*fldF(3)*rotE(3) )
+!           ...ik(e_z x F_i, (iωμ)^* G_j)
+               zcux = ZI*WAVENUM_FLD*detJstretch* &
+                        (conjg(zcJ(1,1))*rotF(1)*fldE(1) + &
+                         conjg(zcJ(2,2))*rotF(2)*fldE(2) + &
+                         conjg(zcJ(3,3))*rotF(3)*fldE(3) )
+               gramP(k) = gramP(k) + (zaux+zcux)*weight
+            endif
+!
 !        ...compute lower triangular part of 2x2 G_ij matrix
 !           only if it is not a diagonal element, G_ii
             if (k1 .ne. k2) then
-!              (G_i,F_j) terms
+!              (F_j,G_i) terms = Int[G_^*i F_j] terms (G_21)
                n = 2*k1; m = 2*k2-1
                k = nk(n,m)
                zaux = - (conjg(zaJ(1,1))*crlF(1)*fldE(1) + &
@@ -565,9 +638,23 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
                       zcJ(2,2)*fldF(2)*crlE(2) + &
                       zcJ(3,3)*fldF(3)*crlE(3)
                gramP(k) = gramP(k) + (zaux+zcux)*weight
+!
+               if (ENVELOPE) then
+!              ...-ik (e_z x G_i, (iωε)^* F_j)
+                  zaux = -ZI*WAVENUM_FLD*detJstretch* &
+                         (conjg(zaJ(1,1))*rotF(1)*fldE(1) + &
+                          conjg(zaJ(2,2))*rotF(2)*fldE(2) + &
+                          conjg(zaJ(3,3))*rotF(3)*fldE(3) )
+!              ...-ik (iωμ G_i, e_z x F_j)
+                  zcux = -ZI*WAVENUM_FLD*conjg(detJstretch)* &
+                         (zcJ(1,1)*fldF(1)*rotE(1) + &
+                          zcJ(2,2)*fldF(2)*rotE(2) + &
+                          zcJ(3,3)*fldF(3)*rotE(3) )
+                  gramP(k) = gramP(k) + (zaux+zcux)*weight
+               endif
             endif
 !
-!           (G_i,G_j) terms
+!           (G_j,G_i) terms = Int[G_^*i G_j] terms (G_22)
             n = 2*k1; m = 2*k2
             k = nk(n,m)
             zcux = abs(zcJ(1,1))**2*fldF(1)*fldE(1) + &
@@ -575,6 +662,19 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
                    abs(zcJ(3,3))**2*fldF(3)*fldE(3)
             gramP(k) = gramP(k) &
                      + (zcux + ALPHA_NORM*FF + CC)*weight
+!
+            if (ENVELOPE) then
+!           ...ik(e_z x G_i, curl G_j)
+               zaux = ZI*WAVENUM_FLD*detJstretch* &
+                     (rotF(1)*crlE(1)+rotF(2)*crlE(2)+rotF(3)*crlE(3))
+!           ...k^2(e_z x G_i, e_z x G_j)
+               zbux = (WAVENUM_FLD*abs(detJstretch))**2 * &
+                     (rotF(1)*rotE(1)+rotF(2)*rotE(2)+rotF(3)*rotE(3))
+!           ...-ik(curl G_i, e_z x G_j)
+               zcux = -ZI*WAVENUM_FLD*conjg(detJstretch)* &
+                     (crlF(1)*rotE(1)+crlF(2)*rotE(2)+crlF(3)*rotE(3))
+               gramP(k) = gramP(k) + (zaux+zbux+zcux)*weight
+            endif
 !
 !     ...end of loop through enriched H(curl) test functions
          enddo
@@ -584,6 +684,15 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !..end of loop through integration points
    enddo
+!
+!..end timer
+!   end_time = MPI_Wtime()
+!   !$OMP CRITICAL
+!      !write(*,10) etype, end_time-start_time
+!      write(*,11) end_time-start_time
+!! 10   format(A,' elem : ',f12.5,'  seconds')
+! 11   format(f12.5)
+!   !$OMP END CRITICAL
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
@@ -659,12 +768,12 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
             E1(1:3) = shapEE(1,k1)*dxidx(1,1:3) &
                     + shapEE(2,k1)*dxidx(2,1:3) &
                     + shapEE(3,k1)*dxidx(3,1:3)
-!        ...check for impedance BC
+!        ...check for impedance BC (elimination strategy)
 !           (impedance constant is GAMMA for TE10 mode in rectangular waveguide)
 !           ( < n x H , G > = GAMMA*< n x n x E , G > + < zg , G > )
-            if ((ibc(ifc,2).eq.9 .and. Fld_flag .eq. 1) .or. &
-                (ibc(ifc,3).eq.9 .and. Fld_flag .eq. 0)) then
-!           ...get the boundary source
+            if ((ibc(ifc,3).eq.3 .and. Fld_flag.eq.1) .or. &
+                (ibc(ifc,5).eq.3 .and. Fld_flag.eq.0)) then
+!           ...get the boundary source [zImp should be zero here]
                call get_bdSource(Mdle,x,rn, zImp)
 !           ...accumulate for the load vector
                k = 2*k1-1
@@ -679,9 +788,9 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
                        + shapE(3,k2)*dxidx(3,1:3)
 !
                call cross_product(rn,E2, rntimesE)
-!           ...check for impedance bc
-               if ((ibc(ifc,2).eq.9 .and. Fld_flag .eq. 1) .or. &
-                   (ibc(ifc,3).eq.9 .and. Fld_flag .eq. 0)) then
+!           ...check for impedance BC (elimination strategy)
+               if ((ibc(ifc,3).eq.3 .and. Fld_flag.eq.1) .or. &
+                   (ibc(ifc,5).eq.3 .and. Fld_flag.eq.0)) then
 !              ...accumulate for the extended stiffness matrix on IBC
                   call cross_product(rn,rntimesE, rn2timesE)
                   stiff_EE_T(2*k2-1,2*k1-1) = stiff_EE_T(2*k2-1,2*k1-1) &
@@ -713,9 +822,9 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !..end loop through faces
    enddo
 !
-!----------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !      Construction of the DPG system
-!----------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
    allocate(stiff_ALL(NrTest,NrTrial+1))
 !
@@ -767,6 +876,17 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
    deallocate(zaloc)
 !
+!-------------------------------------------------------------------------------
+!       I M P E D A N C E   B O U N D A R Y
+!-------------------------------------------------------------------------------
+!
+!..Implementation of impedance BC via L2 penalty term
+   if (IBCFLAG.eq.2) call imp_penalty(Mdle,Fld_flag,NrdofH,NrdofEi,MdE, &
+                                      norder,norderi, ZblocE,ZalocEE)
+!
+!-------------------------------------------------------------------------------
+!       D E B U G   T E S T S
+!-------------------------------------------------------------------------------
 #if DEBUG_MODE
    iprint = 0
    if (iprint.ge.1) then
@@ -800,3 +920,242 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 end subroutine elem_maxwell
 !
+!
+!-------------------------------------------------------------------------------
+!
+!    routine name      - imp_penalty
+!
+!-------------------------------------------------------------------------------
+!
+!     latest revision:  - June 2021
+!
+!     purpose:          - routine adds impedance L2 penalty terms to the
+!                         stiffness matrix and load vector for the
+!                         UW DPG formulation for Maxwell equations
+!
+!     arguments:
+!        in:
+!           Mdle        - element middle node number
+!           Fld_flag    - field flag (0: pump, 1: signal)
+!           NrdofH      - number of H1 trial dof
+!           NrdofEi     - number of H(curl) trial interface dof
+!           MdE         - num rows of ZalocEE
+!           Norder      - element nodes order (trial)
+!           Norderi     - element nodes order (trial) for interfaces
+!        inout:
+!           ZblocE      - load vector
+!           ZalocEE     - stiffness matrix
+!
+!-------------------------------------------------------------------------------
+!
+#include "typedefs.h"
+!
+subroutine imp_penalty(Mdle,Fld_flag,NrdofH,NrdofEi,MdE,Norder,Norderi, &
+                       ZblocE,ZalocEE)
+!
+!..modules used
+   use control
+   use parametersDPG
+   use data_structure3D
+   use laserParam
+   use commonParam
+!..no implicit statements
+   implicit none
+!..declare input/output variables
+   integer, intent(in)    :: Mdle
+   integer, intent(in)    :: Fld_flag
+   integer, intent(in)    :: NrdofH
+   integer, intent(in)    :: NrdofEi
+   integer, intent(in)    :: MdE
+   integer, intent(in)    :: Norder(19)
+   integer, intent(in)    :: Norderi(19)
+   VTYPE,   intent(inout) :: ZblocE(MdE)
+   VTYPE,   intent(inout) :: ZalocEE(MdE,MdE)
+!
+!..declare edge/face type variables
+   character(len=4) :: etype,ftype
+!
+!..declare orientation for edges and faces
+   integer, dimension(12)    :: norient_edge
+   integer, dimension(6)     :: norient_face
+!
+!..face order
+   integer, dimension(5)     :: norderf
+!
+!..geometry dof (work space for nodcor)
+   real(8), dimension(3,MAXbrickH) :: xnod
+!
+!..variables for geometry
+   real(8), dimension(3)    :: xi,x,rn
+   real(8), dimension(3,2)  :: dxidt,dxdt,rt
+   real(8), dimension(3,3)  :: dxdxi,dxidx
+   real(8), dimension(2)    :: t
+!
+!..H1 shape functions
+   real(8), dimension(MAXbrickH)    :: shapH
+   real(8), dimension(3,MAXbrickH)  :: gradH
+!
+!..H(curl) shape functions
+   real(8), dimension(3,MAXbrickE)  :: shapE
+   real(8), dimension(3,MAXbrickE)  :: curlE
+!
+!..2D quadrature data
+   real(8), dimension(2,MAXNINT2ADD)  :: tloc
+   real(8), dimension(MAXNINT2ADD)    :: wtloc
+!
+!..BC's flags
+   integer, dimension(6,NRINDEX)      :: ibc
+!
+!..Maxwell load and auxiliary variables
+   VTYPE  , dimension(3) :: zImp
+   real(8), dimension(3) :: E2,rntimesE,rn2timesE
+   real(8), dimension(3) :: F1,rntimesF,rn2timesF
+!
+!..various variables for the problem
+   real(8) :: rjac,weight,wa,eps,bjac
+   integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,ik,j,k,l,nint,kE,n,m
+   integer :: nrdof,nsign,ifc,nrf
+!
+!-------------------------------------------------------------------------------
+!
+   if (IBCFLAG .ne. 2) then
+      write(*,*) 'imp_penalty called for IBCFLAG.ne.2, returning...'
+      return
+   endif
+!
+!..define the weight of the penalty term
+   eps = 1.d0
+!
+!..no need for overintegration in penalty term
+   INTEGRATION = 0
+!
+!..determine element type and number of faces
+   etype = NODES(Mdle)%type
+   nrf = nface(etype)
+!
+!..determine edge and face orientations
+   call find_orient(Mdle, norient_edge,norient_face)
+!
+!..determine nodes coordinates
+   call nodcor(Mdle, xnod)
+!
+!..get the element boundary conditions flags
+   call find_bc(Mdle, ibc)
+!
+!..loop through element faces
+   do ifc=1,nrf
+!
+!  ...skip the face if it is not on the impedance boundary
+      if ((ibc(ifc,3).ne.2 .or. Fld_flag.ne.1) .and. &
+          (ibc(ifc,5).ne.2 .or. Fld_flag.ne.0)) cycle
+!
+!  ...sign factor to determine the OUTWARD normal unit vector
+      nsign = nsign_param(etype,ifc)
+!
+!  ...face type
+      ftype = face_type(etype,ifc)
+!
+!  ...face order of approximation
+      call face_order(etype,ifc,Norder, norderf)
+!
+!  ...set 2D quadrature
+      call set_2D_int(ftype,norderf,norient_face(ifc), nint,tloc,wtloc)
+!
+!  ...loop through integration points
+      do l=1,nint
+!
+!     ...face coordinates
+         t(1:2) = tloc(1:2,l)
+!
+!     ...face parametrization
+         call face_param(etype,ifc,t, xi,dxidt)
+!
+!     ...determine element H1 shape functions (for geometry)
+         call shape3DH(etype,xi,Norder,norient_edge,norient_face, &
+                       nrdof,shapH,gradH)
+!
+!     ...determine element H(curl) shape functions (for fluxes)
+!     ...for interfaces only (no bubbles)
+         call shape3DE(etype,xi,Norderi,norient_edge,norient_face, &
+                       nrdof,shapE,curlE)
+!
+!     ...geometry
+         call bgeom3D(Mdle,xi,xnod,shapH,gradH,NrdofH,dxidt,nsign, &
+                      x,dxdxi,dxidx,rjac,dxdt,rn,bjac)
+         weight = bjac*wtloc(l)
+!
+!     ...get the boundary source [zImp should be zero here]
+         call get_bdSource(Mdle,x,rn, zImp)
+!
+!     ...loop through H(curl) test functions
+         do k1=1,NrdofEi
+            F1(1:3) = shapE(1,k1)*dxidx(1,1:3) &
+                    + shapE(2,k1)*dxidx(2,1:3) &
+                    + shapE(3,k1)*dxidx(3,1:3)
+!
+            call cross_product(rn,F1, rntimesF)
+            call cross_product(rn,rntimesF, rn2timesF)
+!
+!        ...compute impedance BC equation for the load
+!           (impedance constant is GAMMA for TE10 mode in rectangular waveguide)
+!           ( < n x H , G > = GAMMA*< n x n x E , G > + < zg , G > )
+!
+!        ...accumulate directly into load vector ZblocE(1:2*NrdofEi)
+!           (zImp,F): -gamma * (zImp , n x n x F)
+            k = 2*k1-1
+            ZblocE(k) = ZblocE(k) - (rn2timesF(1)*zImp(1)  &
+                                  +  rn2timesF(2)*zImp(2)  &
+                                  +  rn2timesF(3)*zImp(3)  &
+                                    )*GAMMA*weight/eps
+!           (zImp,G): (zImp , n x G)
+            k = 2*k1
+            ZblocE(k) = ZblocE(k) + (rntimesF(1)*zImp(1)  &
+                                  +  rntimesF(2)*zImp(2)  &
+                                  +  rntimesF(3)*zImp(3)  &
+                                    )*weight/eps
+!
+!        ...loop through H(curl) trial functions
+            do k2=1,NrdofEi
+               E2(1:3) = shapE(1,k2)*dxidx(1,1:3) &
+                       + shapE(2,k2)*dxidx(2,1:3) &
+                       + shapE(3,k2)*dxidx(3,1:3)
+!
+               call cross_product(rn,E2, rntimesE)
+               call cross_product(rn,rntimesE, rn2timesE)
+!           ...accumulate directly into stiffness ZalocEE(1:2*NrdofEi,1:2*NrdofEi)
+!              4 contributions: trial (E,H), test (F,G)
+!              (E,F):  gamma^2 * (n x n x E , n x n x F)
+               ZalocEE(2*k1-1,2*k2-1) = ZalocEE(2*k1-1,2*k2-1) &
+                                        + (rn2timesF(1)*rn2timesE(1)  &
+                                        +  rn2timesF(2)*rn2timesE(2)  &
+                                        +  rn2timesF(3)*rn2timesE(3)  &
+                                          )*GAMMA*GAMMA*weight/eps
+!              (H,F): -gamma   * (n x H , n x n x F)
+               ZalocEE(2*k1-1,2*k2  ) = ZalocEE(2*k1-1,2*k2  ) &
+                                        - (rn2timesF(1)*rntimesE(1)   &
+                                        +  rn2timesF(2)*rntimesE(2)   &
+                                        +  rn2timesF(3)*rntimesE(3)   &
+                                          )*GAMMA*weight/eps
+!              (E,G): -gamma   * (n x n x E , n x G)
+               ZalocEE(2*k1  ,2*k2-1) = ZalocEE(2*k1  ,2*k2-1) &
+                                        - (rntimesF(1)*rn2timesE(1)  &
+                                        +  rntimesF(2)*rn2timesE(2)  &
+                                        +  rntimesF(3)*rn2timesE(3)  &
+                                          )*GAMMA*weight/eps
+!              (H,G):            (n x H , n x G)
+               ZalocEE(2*k1  ,2*k2  ) = ZalocEE(2*k1  ,2*k2  ) &
+                                        + (rntimesF(1)*rntimesE(1)   &
+                                        +  rntimesF(2)*rntimesE(2)   &
+                                        +  rntimesF(3)*rntimesE(3)   &
+                                          )*weight/eps
+!        ...end loop through H(curl) trial functions
+            enddo
+!     ...end loop through the H(curl) test functions
+         enddo
+!  ...end loop through integration points
+      enddo
+!..end loop through faces
+   enddo
+!
+!
+end subroutine imp_penalty

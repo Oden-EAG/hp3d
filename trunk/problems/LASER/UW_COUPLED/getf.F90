@@ -111,17 +111,31 @@ subroutine getf(Mdle,X, Zfval,ZJval)
 !
 !        ...time harmonic Maxwell - signal
             case(3)
+!           ...RHS = curl H - iωεE
                zaux = ZI*OMEGA*OMEGA_RATIO_SIGNAL*EPSILON + SIGMA
                ZJval(1) = dvalE(3,2,2) - dvalE(2,2,3) - zaux*valE(1,1)
                ZJval(2) = dvalE(1,2,3) - dvalE(3,2,1) - zaux*valE(2,1)
                ZJval(3) = dvalE(2,2,1) - dvalE(1,2,2) - zaux*valE(3,1)
+!           ...account for extra term when solving envelope formulation
+               if (ENVELOPE) then
+!              ...-ik (e_z x H), where e_z x H = (-H_y, H_x, 0)
+                  ZJval(1) = ZJval(1) + ZI*WAVENUM_SIGNAL*valE(2,2)
+                  ZJval(2) = ZJval(2) - ZI*WAVENUM_SIGNAL*valE(1,2)
+               endif
 !
 !        ...time harmonic Maxwell - pump
             case(4)
+!           ...RHS = curl H - iωεE
                zaux = ZI*OMEGA*OMEGA_RATIO_PUMP*EPSILON + SIGMA
                ZJval(1) = dvalE(3,4,2) - dvalE(2,4,3) - zaux*valE(1,3)
                ZJval(2) = dvalE(1,4,3) - dvalE(3,4,1) - zaux*valE(2,3)
                ZJval(3) = dvalE(2,4,1) - dvalE(1,4,2) - zaux*valE(3,3)
+!           ...account for extra term when solving envelope formulation
+               if (ENVELOPE) then
+!              ...-ik (e_z x H), where e_z x H = (-H_y, H_x, 0)
+                  ZJval(1) = ZJval(1) + ZI*WAVENUM_PUMP*valE(2,4)
+                  ZJval(2) = ZJval(2) - ZI*WAVENUM_PUMP*valE(1,4)
+               endif
          end select
 !
 !  ...........................................
@@ -207,9 +221,9 @@ subroutine get_bdSource(Mdle,X,Rn, Imp_val)
 !  ...exact solution known manufactured solution
       case(1)
          call exact(X,Mdle, zvalH,zdvalH,zd2valH, &
-                        zvalE,zdvalE,zd2valE, &
-                        zvalV,zdvalV,zd2valV, &
-                        zvalQ,zdvalQ,zd2valQ)
+                            zvalE,zdvalE,zd2valE, &
+                            zvalV,zdvalV,zd2valV, &
+                            zvalQ,zdvalQ,zd2valQ)
 !     ...exact for signal
          if(NO_PROBLEM.eq.3) then
 !        ...n x E
@@ -233,8 +247,8 @@ subroutine get_bdSource(Mdle,X,Rn, Imp_val)
 !
 !     ...g should be zero for exact solution (absorbing BC TE10 mode)
          if (abs(sum(Imp_val(1:3))) .ge. 1.0D-14) then
-            !write(*,*) 'Imp_val is = ', Imp_val
-            !pause
+            write(*,*) 'Imp_val is = ', Imp_val
+            stop
          endif
 !
 !  ...exact solution unknown

@@ -28,7 +28,6 @@ c
 c
 c
       dimension xcl(3),igv(20),im(2),xxy(2)
-      dimension eta(2),x(1:3),dxeta(1:3,1:2)
 c
       data bigp,bign,small /1.d30,-1.d30,1.d-14/
       data pi /3.14159265358979312d0/

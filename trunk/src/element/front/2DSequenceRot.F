@@ -57,6 +57,7 @@ c
       integer, intent(out) :: NrdofV
       real(8), intent(out) :: ShapV(2,MAXquadV),DivV(MAXquadV)
 c
+      NrdofV = 0; ShapV = 0.d0; DivV = 0.d0
       write(*,*) 'shape2V error: call shape2DV instead'
       stop
 c     call shape2DV(Type,Xi,Norder,Nedge_orient, NrdofV,ShapV,DivV)
@@ -99,6 +100,7 @@ c
       integer, intent(out) :: NrdofV
       real(8), intent(out) :: ShapV(2,MAXquadV),DivV(MAXquadV)
 c
+      NrdofV = 0; ShapV = 0.d0; DivV = 0.d0
       write(*,*) 'shapeVq error: call shape2DV instead'
       stop
 c     call shape2V('quad',Xi,Norder,Nedge_orient, NrdofV,ShapV,DivV)
@@ -141,6 +143,7 @@ c
       integer, intent(out) :: NrdofV
       real(8), intent(out) :: ShapV(2,MAXtriaV),DivV(MAXtriaV)
 c
+      NrdofV = 0; ShapV = 0.d0; DivV = 0.d0
       write(*,*) 'shapeVt error: call shape2DV instead'
       stop
 c     call shape2V('tria',Xi,Norder,Nedge_orient, NrdofV,ShapV,DivV)

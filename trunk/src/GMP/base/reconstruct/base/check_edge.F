@@ -25,7 +25,7 @@ c
 #include "syscom.blk"
 c
 c  ...list of attached triangles
-      dimension itrian(2),aux1(3),aux2(3),aux3(3),aux4(3),ntest(200)
+      dimension itrian(2),aux1(3),aux2(3),aux3(3),aux4(3)
 c
 c  ...list of sharp edges
       dimension nsharp(1000)

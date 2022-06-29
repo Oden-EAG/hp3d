@@ -2,7 +2,7 @@
 !> Purpose : exact (manufactured) solution
 !
 !> @param[in]  Xp  - a point in physical space
-!> @param[in]  Fld - 0: signal field, 1: pump field
+!> @param[in]  Fld - 0: pump field, 1: signal field
 !> @param[out] E   - value of the solution (one electric field component)
 !> @param[out] dE  - corresponding first derivatives
 !> @param[out] d2E - corresponding second derivatives
@@ -36,6 +36,8 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
    real(8) :: gammaTE10
    real(8) :: gammaTE20
    real(8) :: r
+!..for envelope formulation
+   real(8) :: k_eff,k_env
 !..for LP Modes
    real(8) :: gamm, beta, k, ca, cb, cc, r_x, r_y
    real(8) :: BESSEL_dJ1, BESSEL_K0, BESSEL_dK0, BESSEL_K1, BESSEL_dK1
@@ -48,6 +50,9 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
    real(8) :: angular,angular_x,angular_y,angular_xx,angular_xy,angular_yy
    real(8) :: Jm,Jm_x,Jm_y,Jm_xx,Jm_xy,Jm_yy
    real(8) :: Km,Km_x,Km_y,Km_xx,Km_xy,Km_yy
+!
+!..WAVENUM_SIGNAL or WAVENUM_PUMP
+   real(8) :: WAVENUM_FLD
 !
    VTYPE :: c2z,uz,uz_x,uz_y,uz_z,uz_xx,uz_xy,uz_xz,uz_yy,uz_yx,uz_yz
    VTYPE :: uz_zz,uz_zy,uz_zx
@@ -65,11 +70,25 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
    df_x = ZERO; df_y = ZERO; df_z = ZERO
    ddf_x = ZERO; ddf_y = ZERO; ddf_z = ZERO
 !
+!..set WAVENUM_FLD
+   select case(Fld)
+      case(0); WAVENUM_FLD = WAVENUM_PUMP
+      case(1); WAVENUM_FLD = WAVENUM_SIGNAL
+      case default
+         write(*,*) 'mfd_solutions: invalid Fld param. stop.'
+         stop
+   end select
+!
 !--------------------------------------------------------------------------------
 !      D E C L A R E    S O L U T I O N    V A R I A B L E S                    |
 !--------------------------------------------------------------------------------
 !
    x1 = Xp(1); x2 = Xp(2); x3 = Xp(3)
+!
+   if (Fld.ne.0 .and. Fld.ne.1) then
+      write(*,*) 'mfd_solutions: Fld_flag = ',Fld,'. stop.'
+      return
+   endif
 !
 !--------------- 1st prob -------------------------------------------------------
 !..a polynomial solution
@@ -235,16 +254,27 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          f_x=-ZI*(OMEGA/PI)*sin(PI*x1)
          f_y=1.d0
          f_z=exp(-ZI*OMEGA*x3*gammaTE10)
+         if (ENVELOPE) then
+            k_eff = OMEGA*gammaTE10     ! effective wavenumber
+            k_env = k_eff - WAVENUM_FLD ! envelope wavenumber
+            f_z=exp(-ZI*k_env*x3)
+         endif
 !
 !     ...1st order derivatives
          df_x=-ZI*OMEGA*cos(PI*x1)
          df_y=0.d0
          df_z=-(ZI*OMEGA*gammaTE10)*f_z
+         if (ENVELOPE) then
+            df_z=-(ZI*k_env)*f_z
+         endif
 !
 !     ...2nd order derivatives
          ddf_x=-PI**2*f_x
          ddf_y=0.d0
          ddf_z=-(ZI*OMEGA*gammaTE10)*df_z
+         if (ENVELOPE) then
+            ddf_z=-(ZI*k_env)*df_z
+         endif
 !
          E=f_x*f_y*f_z
 !     ...1st order derivatives
@@ -327,14 +357,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !
       x1 = Xp(1); x2 = Xp(2); x3 = Xp(3);
 !
-      if (NO_PROBLEM .eq. 3) then
-         call get_Beta(Xp,1, zbeta,zdbeta,zd2beta)
-      elseif (NO_PROBLEM .eq. 4) then
-         call get_Beta(Xp,0, zbeta,zdbeta,zd2beta)
-      else
-         write(*,*) 'mfd_solutions: fld_flag unknown. stop.'
-         stop
-      endif
+      call get_Beta(Xp,Fld, zbeta,zdbeta,zd2beta)
 !
       f_x=-ZI*(OMEGA/PI)*sin(PI*x1)
       f_y= 1.d0
@@ -388,7 +411,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !
 !--------------- 13th prob -------------------------------------------------------
 !..Fundamental mode LP01 in dielectric waveguide
-   elseif (ISOL .eq. 13) then
+   elseif (ISOL .eq. 13 .or. Fld .eq. 0) then ! pump field uses LP01 if ISOL > 13
 !
 !  ...LP01 in dielectric waveguide, a = sqrt(2), omega=25.7
 !      k    = 37.2854d0
@@ -398,32 +421,88 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !
 !  ...LMA fiber
 !  ...LP01 (signal) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
-      ampl =  1.0d0
-      if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.4512d0 .and. CLAD_NX.eq.1.4500d0) .or.   &
-          (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.4512d0 .and. CLAD_NY.eq.1.4500d0)) then
-         k    = 85.6833d0
-         gamm =  1.53131d0
-         beta =  3.12978d0
-      else if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.1520d0 .and. CLAD_NX.eq.1.1500d0) .or.  &
-               (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.1520d0 .and. CLAD_NY.eq.1.1500d0)) then
-         k    = 68.0103d0
-         gamm = 1.57221d0
-         beta = 3.68554d0
-      else if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.6510d0 .and. CLAD_NX.eq.1.6500d0) .or.  &
-               (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.6510d0 .and. CLAD_NY.eq.1.6500d0)) then
-         k    = 97.4838d0
-         gamm =  1.52302d0
-         beta =  3.03177d0
-      else
-         write(*,*) 'mfd_solutions: ISOL 13, unexpected case. stop.'
-         stop
+      if (Fld .eq. 1) then
+         ampl =  1.0d0
+         ! Signal laser frequency (active gain)
+         if (LAMBDA_SIGNAL .eq. 1064.0d-9/L_0) then
+            if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.4512d0 .and. CLAD_NX.eq.1.4500d0) .or.   &
+                (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.4512d0 .and. CLAD_NY.eq.1.4500d0)) then
+               k    = 85.6833d0
+               gamm =  1.53131d0
+               beta =  3.12978d0
+            else if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.1520d0 .and. CLAD_NX.eq.1.1500d0) .or.  &
+                     (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.1520d0 .and. CLAD_NY.eq.1.1500d0)) then
+               k    = 68.0103d0
+               gamm =  1.57221d0
+               beta =  3.68554d0
+            else if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.6510d0 .and. CLAD_NX.eq.1.6500d0) .or.  &
+                     (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.6510d0 .and. CLAD_NY.eq.1.6500d0)) then
+               k    = 97.4838d0
+               gamm =  1.52302d0
+               beta =  3.03177d0
+            else
+               write(*,*) 'mfd_solutions: ISOL 13, unexpected case 1. stop.'
+               stop
+            endif
+         ! Signal Raman frequency
+         else if (LAMBDA_SIGNAL .eq. 1116.0d-9/L_0) then
+            if (ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.4512d0 .and. CLAD_NX.eq.1.4500d0) then
+               k    = 81.6899d0
+               gamm =  1.51632d0
+               beta =  2.95571d0
+            else
+               write(*,*) 'mfd_solutions: ISOL 13, unexpected case 2. stop.'
+               stop
+            endif
+         else
+            write(*,*) 'mfd_solutions: ISOL 13, unexpected case 3. stop.'
+            stop
+         endif
       endif
+!
+!  ...LP01 (pump) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.0976
+      if (Fld .eq. 0) then
+         ampl =  2.0d0
+         ! Pump frequency (active gain)
+         if (LAMBDA_PUMP .eq. 976.0d-9/L_0) then
+            if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.4512d0 .and. CLAD_NX.eq.1.4500d0) .or.   &
+                (ICOMP_EXACT.eq.2 .and. CORE_NY.eq.1.4512d0 .and. CLAD_NY.eq.1.4500d0)) then
+               k    = 93.4108d0
+               gamm =  1.55709d0
+               beta =  3.46466d0
+            else
+               write(*,*) 'mfd_solutions: ISOL 13, unexpected case 4. stop.'
+               stop
+            endif
+         ! Pump frequency (Raman gain)
+         else if (LAMBDA_PUMP .eq. 1064.0d-9/L_0) then
+            if (ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.4512d0 .and. CLAD_NX.eq.1.4500d0) then
+               k    = 85.6833d0
+               gamm =  1.53131d0
+               beta =  3.12978d0
+            else
+               write(*,*) 'mfd_solutions: ISOL 13, unexpected case 5. stop.'
+               stop
+            endif
+         else
+            write(*,*) 'mfd_solutions: ISOL 13, unexpected case 6. stop.'
+            stop
+         endif
+      endif
+!
+!  ...Adjust wavenumber if solving envelope formulation
+      if (ENVELOPE) k = k - WAVENUM_FLD
 !
       call get_LP01(Xp,ampl,k,gamm,beta, E,dE)
 !
 !--------------- 14th prob -------------------------------------------------------
 !..LP11 mode in dielectric waveguide
    elseif (ISOL .eq. 14 .or. ISOL .eq. 140) then
+!
+      if (Fld .ne. 1) then
+         write(*,*) 'mfd_solutions: unexpected Fld_flag. stop.'
+         stop
+      endif
 !
 !  ...LMA fiber
 !  ...LP11 (signal) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
@@ -447,6 +526,10 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          write(*,*) 'mfd_solutions: ISOL 14, unexpected case. stop.'
          stop
       endif
+!
+!  ...Adjust wavenumber if solving envelope formulation
+      if (ENVELOPE) k = k - WAVENUM_FLD
+!
       select case(ISOL)
          case(14) ; call get_LP11a(Xp,ampl,k,gamm,beta, E,dE)
          case(140); call get_LP11b(Xp,ampl,k,gamm,beta, E,dE) ! rotated by 90 degrees
@@ -455,6 +538,11 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !--------------- 15th prob -------------------------------------------------------
 !..LP21 mode in dielectric waveguide
    elseif (ISOL .eq. 15 .or. ISOL .eq. 150) then
+!
+      if (Fld .ne. 1) then
+         write(*,*) 'mfd_solutions: unexpected Fld_flag. stop.'
+         stop
+      endif
 !
 !  ...LMA fiber
 !  ...LP21 (signal) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
@@ -478,6 +566,10 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          write(*,*) 'mfd_solutions: ISOL 15, unexpected case. stop.'
          stop
       endif
+!
+!  ...Adjust wavenumber if solving envelope formulation
+      if (ENVELOPE) k = k - WAVENUM_FLD
+!
       select case(ISOL)
          case(15) ; call get_LP21a(Xp,ampl,k,gamm,beta, E,dE)
          case(150); call get_LP21b(Xp,ampl,k,gamm,beta, E,dE) ! rotated by 45 degrees
@@ -486,6 +578,11 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !--------------- 16th prob -------------------------------------------------------
 !..LP02 mode in dielectric waveguide
    elseif (ISOL .eq. 16) then
+!
+      if (Fld .ne. 1) then
+         write(*,*) 'mfd_solutions: unexpected Fld_flag. stop.'
+         stop
+      endif
 !
 !  ...LMA fiber
 !  ...LP02 (signal) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
@@ -509,11 +606,20 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          write(*,*) 'mfd_solutions: ISOL 16, unexpected case. stop.'
          stop
       endif
+!
+!  ...Adjust wavenumber if solving envelope formulation
+      if (ENVELOPE) k = k - WAVENUM_FLD
+!
       call get_LP02(Xp,ampl,k,gamm,beta, E,dE)
 !
 !--------------- 17th prob -------------------------------------------------------
 !..Mixed LP01/LP11/LP21/LP02 mode in dielectric waveguide
    elseif (ISOL .eq. 17) then
+!
+      if (Fld .ne. 1) then
+         write(*,*) 'mfd_solutions: unexpected Fld_flag. stop.'
+         stop
+      endif
 !
       E01 = 0.d0; dE01 = 0.d0
       E11 = 0.d0; dE11 = 0.d0
@@ -539,6 +645,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          !ampl = ampl * sqrt(0.7d0) ! 70% LP01
          !ampl = ampl * sqrt(0.6d0) ! 60% LP01
          !ampl = ampl * sqrt(0.5d0) ! 50% LP01
+         if (ENVELOPE) k = k - WAVENUM_FLD
          call get_LP01(Xp,ampl,k,gamm,beta, E01,dE01)
 !
 !     ...LP11 (signal)
@@ -556,6 +663,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          !ampl = ampl * sqrt(0.3d0) ! 30% LP11
          !ampl = ampl * sqrt(0.4d0) ! 40% LP11
          !ampl = ampl * sqrt(0.5d0) ! 50% LP11
+         if (ENVELOPE) k = k - WAVENUM_FLD
          call get_LP11a(Xp,ampl,k,gamm,beta, E11,dE11)
          !call get_LP11b(Xp,ampl,k,gamm,beta, E11,dE11)
 !
@@ -574,6 +682,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          !ampl = ampl * sqrt(0.3d0) ! 30% LP21
          !ampl = ampl * sqrt(0.4d0) ! 40% LP21
          !ampl = ampl * sqrt(0.5d0) ! 50% LP21
+         if (ENVELOPE) k = k - WAVENUM_FLD
          !call get_LP21a(Xp,ampl,k,gamm,beta, E21,dE21)
          !call get_LP21b(Xp,ampl,k,gamm,beta, E21,dE21)
 !
@@ -592,6 +701,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
          !ampl = ampl * sqrt(0.3d0) ! 30% LP02
          !ampl = ampl * sqrt(0.4d0) ! 40% LP02
          !ampl = ampl * sqrt(0.5d0) ! 50% LP02
+         if (ENVELOPE) k = k - WAVENUM_FLD
          !call get_LP02(Xp,ampl,k,gamm,beta, E02,dE02)
 !
       else if ((ICOMP_EXACT.eq.1 .and. CORE_NX.eq.1.1520d0 .and. CLAD_NX.eq.1.1500d0) .or.   &
@@ -636,6 +746,11 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !--------------- 18th prob -------------------------------------------------------
 !..LP12 mode in dielectric waveguide
    elseif (ISOL .eq. 18) then
+!
+      if (Fld .ne. 1) then
+         write(*,*) 'mfd_solutions: unexpected Fld_flag. stop.'
+         stop
+      endif
 !
 !  ...LMA fiber
 !  ...LP12 (signal) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
@@ -684,7 +799,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !  ...LP01 (signal) in dielectric waveguide, a = 0.9*sqrt(2), omega=2*pi/0.1064=59.0525
       select case(Fld)
 !     ...signal field
-         case(0)
+         case(1)
             if (ICOMP_TS .eq. 1) then
 !              with CORE_NX = 1.4512
 !              with CLAD_NX = 1.4500
@@ -717,7 +832,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
             call get_LP01(Xp,ampl,k,gamm,beta, E,dE)
 !
 !     ...pump field (LP01)
-         case(1)
+         case(0)
             if (ICOMP_TS .eq. 1) then
 !              with CORE_NX = 1.4512
 !              with CLAD_NX = 1.4500
@@ -745,7 +860,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
             call get_LP01(Xp,ampl,k,gamm,beta, E,dE)
 !
          case default
-            write(*,*) 'mfd_solutions: fld_flag invalid. stop.'
+            write(*,*) 'mfd_solutions: Fld_flag invalid. stop.'
             stop
       end select
 !
@@ -767,7 +882,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
 !
       select case(Fld)
 !     ...signal field
-         case(0)
+         case(1)
             ! compute signal power oscillation (1% up/down)
             ! ..if 'modified' activated
             cc = 1.0d0
@@ -816,7 +931,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
             endif
 !
 !     ...pump field LP01 (E_x)
-         case(1)
+         case(0)
             ! compute increasing pump power
             ! ..if 'modified' activated
             cc = 1.0d0
@@ -859,7 +974,7 @@ subroutine mfd_solutions(Xp,Fld, E,dE,d2E)
                !call get_LP11b(Xp,ampl,k,gamm,beta, E,dE)
             endif
          case default
-            write(*,*) 'mfd_solutions: fld_flag invalid. stop.'
+            write(*,*) 'mfd_solutions: Fld_flag invalid. stop.'
             stop
       end select
 !..endif ISOL

@@ -1,9 +1,17 @@
+!-------------------------------------------------------------------------------
+! REMARK 1: THIS ROUTINE MUST BE OMP THREAD-SAFE
+!           DUE TO OMP PARALLELIZATION OF UPDATE_DDOF->DIRICHLET->EXACT
 !
-! REMARK: THIS ROUTINE MUST BE OMP THREAD-SAFE
-!         DUE TO OMP PARALLELIZATION OF UPDATE_DDOF->DIRICHLET->EXACT
-!------------------------------------------------------------------------------
+! REMARK 2: In LASER problem, this routine evaluates solutions
+!           only for one particular field, depending on NO_PROBLEM:
+!           NO_PROBLEM = 2 --> HEAT DOFS
+!           NO_PROBLEM = 3 --> SIGNAL DOFS
+!           NO_PROBLEM = 4 --> PUMP DOFS
+!           The remaining fields are assumed not to be used,
+!           since the corresponding attributes are deactivated via PHYSAm.
+!-------------------------------------------------------------------------------
 !> Purpose : exact (manufactured) solution
-!> last mod: Oct 2019
+!> last mod: June 2021
 !
 !> @param[in]  X      - a point in physical space
 !> @param[in]  Mdle   - element (middle node) number
@@ -19,7 +27,7 @@
 !> @param[out] ValQ   - value of the H(div) solution
 !> @param[out] DvalQ  - corresponding first derivatives
 !> @param[out] D2valQ - corresponding second derivatives
-!------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !
 #include "typedefs.h"
 !
@@ -52,10 +60,8 @@ subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
    VTYPE                :: E
    VTYPE,dimension(3)   :: dE
    VTYPE,dimension(3,3) :: d2E
-   integer              :: icomp, fld
-!
-!..index: signal, pump (E-trace)
-   integer, parameter :: s = 1, p = 3
+   integer              :: icomp,fld,idx
+   real(8)              :: OMEGA_RATIO_FLD,WAVENUM_FLD
 !
 !..auxiliary variables
    real(8) :: k,r,n
@@ -67,8 +73,23 @@ subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
    ValE=ZERO ; DvalE=ZERO ; D2valE=ZERO
    ValV=ZERO ; DvalV=ZERO ; D2valV=ZERO
    ValQ=ZERO ; DvalQ=ZERO ; D2valQ=ZERO
-!..set default field to signal
-   fld = 0
+!
+!..set Maxwell field: signal (1) or pump (0)
+!  (only relevant for Maxwell cases)
+   select case (NO_PROBLEM)
+      case(3)
+         fld = 1 ! signal field
+         idx = 1 ! signal E-trace component
+         OMEGA_RATIO_FLD = OMEGA_RATIO_SIGNAL
+         WAVENUM_FLD     = WAVENUM_SIGNAL
+      case(4)
+         fld = 0 ! pump field
+         idx = 3 ! pump E-trace component
+         OMEGA_RATIO_FLD = OMEGA_RATIO_PUMP
+         WAVENUM_FLD     = WAVENUM_PUMP
+      case default
+         fld = 1; idx = 1; OMEGA_RATIO_FLD = 1.d0; WAVENUM_FLD = 1.d0 ! dummy values
+   end select
 !
 !..heat variables
    select case (NO_PROBLEM)
@@ -85,43 +106,28 @@ subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
    case(3,4)
 !..ISOL=12 has radial and azimuthal transverse fields (needs both Ex and Ey)
    if (ISOL .eq. 12) then
-
+!  ...x component
       ICOMP_TS = 1; icomp = ICOMP_TS
-!  ...signal E-field trace
-      call mfd_solutions(Xp,fld, ValE(icomp,s),DvalE(icomp,s,1:3),D2valE(icomp,s,1:3,1:3))
+      call mfd_solutions(Xp,fld, ValE(icomp,idx),DvalE(icomp,idx,1:3),D2valE(icomp,idx,1:3,1:3))
 !  ...y component
       ICOMP_TS = 2; icomp = ICOMP_TS
-!  ...signal E-field trace
-      call mfd_solutions(Xp,fld, ValE(icomp,s),DvalE(icomp,s,1:3),D2valE(icomp,s,1:3,1:3))
+      call mfd_solutions(Xp,fld, ValE(icomp,idx),DvalE(icomp,idx,1:3),D2valE(icomp,idx,1:3,1:3))
 !
 !..LP modes (polarized in x or y)
    elseif ((ISOL .ge. 13 .and. ISOL .le. 19) .or. (ISOL .eq. 140 .or. ISOL .eq. 150)) then
       icomp = ICOMP_EXACT
-!  ...signal E-field trace
-      fld = 0
-      call mfd_solutions(Xp,fld, ValE(icomp,s),DvalE(icomp,s,1:3),D2valE(icomp,s,1:3,1:3))
-!  ...pump E-field trace
-      fld = 1
-      call mfd_solutions(Xp,fld, ValE(icomp,p),DvalE(icomp,p,1:3),D2valE(icomp,p,1:3,1:3))
+      call mfd_solutions(Xp,fld, ValE(icomp,idx),DvalE(icomp,idx,1:3),D2valE(icomp,idx,1:3,1:3))
 !
 !..LP modes birefringent fiber (using both, polarized in x and y)
    elseif (ISOL .eq. 20 .or. ISOL .eq. 21) then
 !     ICOMP_TS IS THREAD_SAFE (declared threadprivate)
       ICOMP_TS = 1; icomp = 1
-!  ...signal E-field trace (E_x)
-      fld = 0
-      call mfd_solutions(Xp,fld, ValE(icomp,s),DvalE(icomp,s,1:3),D2valE(icomp,s,1:3,1:3))
-!  ...pump E-field trace (E_x)
-      fld = 1
-      call mfd_solutions(Xp,fld, ValE(icomp,p),DvalE(icomp,p,1:3),D2valE(icomp,p,1:3,1:3))
+!  ...x component
+      call mfd_solutions(Xp,fld, ValE(icomp,idx),DvalE(icomp,idx,1:3),D2valE(icomp,idx,1:3,1:3))
 !
       ICOMP_TS = 2; icomp = 2
-!  ...signal E-field trace (E_y)
-      fld = 0
-      call mfd_solutions(Xp,fld, ValE(icomp,s),DvalE(icomp,s,1:3),D2valE(icomp,s,1:3,1:3))
-!  ...pump E-field trace (E_y)
-      fld = 1
-      call mfd_solutions(Xp,fld, ValE(icomp,p),DvalE(icomp,p,1:3),D2valE(icomp,p,1:3,1:3))
+!  ...y component
+      call mfd_solutions(Xp,fld, ValE(icomp,idx),DvalE(icomp,idx,1:3),D2valE(icomp,idx,1:3,1:3))
 !
 !..normal procedure (computing one component only)
    else
@@ -134,16 +140,13 @@ subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
       call mfd_solutions(Xp,fld, E,dE,d2E)
 !
 !  ...E-field value
-      ValE(icomp,s) = E ! signal E-field trace; (icomp,2) is signal H-field trace
-      ValE(icomp,p) = E ! pump   E-field trace; (icomp,4) is pump   H-field trace
+      ValE(icomp,idx) = E ! E-field trace; (icomp,idx+1) is H-field trace
 !
 !  ...E-field 1st order derivatives
-      DvalE(icomp,s,1:3) = dE(1:3) ! signal
-      DvalE(icomp,p,1:3) = dE(1:3) ! pump
+      DvalE(icomp,idx,1:3) = dE(1:3)
 !
 !  ...E-field 2nd order derivatives
-      D2valE(icomp,s,1:3,1:3) = d2E(1:3,1:3) ! signal
-      D2valE(icomp,p,1:3,1:3) = d2E(1:3,1:3) ! pump
+      D2valE(icomp,idx,1:3,1:3) = d2E(1:3,1:3)
 !
 !  ...Experiment: setting both transverse components non-zero (E_x, E_y)
 !      ValE(icomp+1,1:MAXEQNE)           = ValE(icomp,1:MAXEQNE)
@@ -151,47 +154,46 @@ subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
 !      D2valE(icomp+1,1:MAXEQNE,1:3,1:3) = D2valE(icomp,1:MAXEQNE,1:3,1:3)
 !
 !  ...2nd H(curl) ATTRIBUTE = curl of the first attribute/-i omega \mu
-!     signal H-field value (H-field trace)
-      ValE(1,2)   = DvalE(3,1,2) - DvalE(2,1,3)
-      ValE(2,2)   = DvalE(1,1,3) - DvalE(3,1,1)
-      ValE(3,2)   = DvalE(2,1,1) - DvalE(1,1,2)
-      ValE(1:3,2) = ValE(1:3,2)/(-ZI*OMEGA*OMEGA_RATIO_SIGNAL*MU)
+!     H-field value (H-field trace)
+      ValE(1,idx+1) = DvalE(3,idx,2) - DvalE(2,idx,3)
+      ValE(2,idx+1) = DvalE(1,idx,3) - DvalE(3,idx,1)
+      ValE(3,idx+1) = DvalE(2,idx,1) - DvalE(1,idx,2)
 !
-!  ...pump H-field value (H-field trace)
-      ValE(1,4)   = DvalE(3,3,2) - DvalE(2,3,3)
-      ValE(2,4)   = DvalE(1,3,3) - DvalE(3,3,1)
-      ValE(3,4)   = DvalE(2,3,1) - DvalE(1,3,2)
-      ValE(1:3,4) = ValE(1:3,4)/(-ZI*OMEGA*OMEGA_RATIO_PUMP*MU)
+!  ...H-field depends differently on E-field in the vectorial envelope formulation
+      if (ENVELOPE) then
+!     ...-ik (e_z x E), where e_z x E = (-E_y,E_x,0)
+         ValE(1,idx+1) = ValE(1,idx+1) + ZI*WAVENUM_FLD*ValE(2,idx)
+         ValE(2,idx+1) = ValE(2,idx+1) - ZI*WAVENUM_FLD*ValE(1,idx)
+      endif
+      ValE(1:3,idx+1) = ValE(1:3,idx+1)/(-ZI*OMEGA*OMEGA_RATIO_FLD*MU)
 !
-!  ...signal H-field 1st order derivatives
-      DvalE(1,2,1) = D2valE(3,1,2,1) - D2valE(2,1,3,1)
-      DvalE(1,2,2) = D2valE(3,1,2,2) - D2valE(2,1,3,2)
-      DvalE(1,2,3) = D2valE(3,1,2,3) - D2valE(2,1,3,3)
+!  ...H-field 1st order derivatives
+      DvalE(1,idx+1,1) = D2valE(3,idx,2,1) - D2valE(2,idx,3,1)
+      DvalE(1,idx+1,2) = D2valE(3,idx,2,2) - D2valE(2,idx,3,2)
+      DvalE(1,idx+1,3) = D2valE(3,idx,2,3) - D2valE(2,idx,3,3)
 !
-      DvalE(2,2,1) = D2valE(1,1,3,1) - D2valE(3,1,1,1)
-      DvalE(2,2,2) = D2valE(1,1,3,2) - D2valE(3,1,1,2)
-      DvalE(2,2,3) = D2valE(1,1,3,3) - D2valE(3,1,1,3)
+      DvalE(2,idx+1,1) = D2valE(1,idx,3,1) - D2valE(3,idx,1,1)
+      DvalE(2,idx+1,2) = D2valE(1,idx,3,2) - D2valE(3,idx,1,2)
+      DvalE(2,idx+1,3) = D2valE(1,idx,3,3) - D2valE(3,idx,1,3)
 !
-      DvalE(3,2,1) = D2valE(2,1,1,1) - D2valE(1,1,2,1)
-      DvalE(3,2,2) = D2valE(2,1,1,2) - D2valE(1,1,2,2)
-      DvalE(3,2,3) = D2valE(2,1,1,3) - D2valE(1,1,2,3)
+      DvalE(3,idx+1,1) = D2valE(2,idx,1,1) - D2valE(1,idx,2,1)
+      DvalE(3,idx+1,2) = D2valE(2,idx,1,2) - D2valE(1,idx,2,2)
+      DvalE(3,idx+1,3) = D2valE(2,idx,1,3) - D2valE(1,idx,2,3)
 !
-      DvalE(1:3,2,1:3) = DvalE(1:3,2,1:3)/(-ZI*OMEGA*OMEGA_RATIO_SIGNAL*MU)
-
-!  ...pump H-field 1st order derivatives
-      DvalE(1,4,1) = D2valE(3,3,2,1) - D2valE(2,3,3,1)
-      DvalE(1,4,2) = D2valE(3,3,2,2) - D2valE(2,3,3,2)
-      DvalE(1,4,3) = D2valE(3,3,2,3) - D2valE(2,3,3,3)
-!
-      DvalE(2,4,1) = D2valE(1,3,3,1) - D2valE(3,3,1,1)
-      DvalE(2,4,2) = D2valE(1,3,3,2) - D2valE(3,3,1,2)
-      DvalE(2,4,3) = D2valE(1,3,3,3) - D2valE(3,3,1,3)
-!
-      DvalE(3,4,1) = D2valE(2,3,1,1) - D2valE(1,3,2,1)
-      DvalE(3,4,2) = D2valE(2,3,1,2) - D2valE(1,3,2,2)
-      DvalE(3,4,3) = D2valE(2,3,1,3) - D2valE(1,3,2,3)
-!
-      DvalE(1:3,4,1:3) = DvalE(1:3,4,1:3)/(-ZI*OMEGA*OMEGA_RATIO_PUMP*MU)
+!  ...H-field depends differently on E-field in the vectorial envelope formulation
+      if (ENVELOPE) then
+!     ...-ik grad(e_z x E), where e_z x E = (-E_y,E_x,0)
+!     ...1st comp: ik ( E_y,x , E_y,y , E_y,z )
+         DvalE(1,idx+1,1) = DvalE(1,idx+1,1) + ZI*WAVENUM_FLD*DvalE(2,idx,1)
+         DvalE(1,idx+1,2) = DvalE(1,idx+1,2) + ZI*WAVENUM_FLD*DvalE(2,idx,2)
+         DvalE(1,idx+1,3) = DvalE(1,idx+1,3) + ZI*WAVENUM_FLD*DvalE(2,idx,3)
+!     ...2nd comp: -ik ( E_x,x , E_x,y , E_x,z )
+         DvalE(2,idx+1,1) = DvalE(2,idx+1,1) - ZI*WAVENUM_FLD*DvalE(1,idx,1)
+         DvalE(2,idx+1,2) = DvalE(2,idx+1,2) - ZI*WAVENUM_FLD*DvalE(1,idx,2)
+         DvalE(2,idx+1,3) = DvalE(2,idx+1,3) - ZI*WAVENUM_FLD*DvalE(1,idx,3)
+!     ...3rd comp: -ik (0,0,0)
+      endif
+      DvalE(1:3,idx+1,1:3) = DvalE(1:3,idx+1,1:3)/(-ZI*OMEGA*OMEGA_RATIO_FLD*MU)
 !
 !  ...2nd order derivatives (not needed)
 !
@@ -203,20 +205,24 @@ subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
       ValQ(7:9) = ValE(1:3,3)
       ValQ(10:12) = ValE(1:3,4)
 !
+      return
+!
    endif
 !
-!  ...2nd H(curl) ATTRIBUTE = curl of the first attribute/-i omega \mu
-!     signal H-field value (H-field trace)
-   ValE(1,2)   = DvalE(3,1,2) - DvalE(2,1,3)
-   ValE(2,2)   = DvalE(1,1,3) - DvalE(3,1,1)
-   ValE(3,2)   = DvalE(2,1,1) - DvalE(1,1,2)
-   ValE(1:3,2) = ValE(1:3,2)/(-ZI*OMEGA*OMEGA_RATIO_SIGNAL*MU)
+!..2nd H(curl) ATTRIBUTE = curl of the first attribute / (-i omega \mu)
+!  H-field value (H-trace)
+   ValE(1,idx+1) = DvalE(3,idx,2) - DvalE(2,idx,3)
+   ValE(2,idx+1) = DvalE(1,idx,3) - DvalE(3,idx,1)
+   ValE(3,idx+1) = DvalE(2,idx,1) - DvalE(1,idx,2)
 !
-!  ...pump H-field value (H-field trace)
-   ValE(1,4)   = DvalE(3,3,2) - DvalE(2,3,3)
-   ValE(2,4)   = DvalE(1,3,3) - DvalE(3,3,1)
-   ValE(3,4)   = DvalE(2,3,1) - DvalE(1,3,2)
-   ValE(1:3,4) = ValE(1:3,4)/(-ZI*OMEGA*OMEGA_RATIO_PUMP*MU)
+!..H-field depends differently on E-field in the vectorial envelope formulation
+   if (ENVELOPE) then
+!  ...-ik (e_z x E), where e_z x E = (-E_y,E_x,0)
+      ValE(1,idx+1) = ValE(1,idx+1) + ZI*WAVENUM_FLD*ValE(2,idx)
+      ValE(2,idx+1) = ValE(2,idx+1) - ZI*WAVENUM_FLD*ValE(1,idx)
+   endif
+   ValE(1:3,idx+1) = ValE(1:3,idx+1)/(-ZI*OMEGA*OMEGA_RATIO_FLD*MU)
+!
    end select
 !
 end subroutine exact

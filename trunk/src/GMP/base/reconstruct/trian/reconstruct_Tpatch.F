@@ -51,9 +51,6 @@ c
 c  ...hesjan of the reconstructed surface at the point
       dimension acoeff(3,3)
 c
-c  ...derivatives of normal vectors
-      dimension dnorm1(1:3),dnorm2(1:3)
-c
 c  ...work space
       dimension temp(3)
 c
@@ -80,7 +77,7 @@ c
       if (iprint.eq.1) then
         do i = 1,3
           write(*,1000)i,acoeff(i,1:3)
- 1000     format(' Hessian('i1',1:3) = ',3(e12.5,2x))
+ 1000     format(' Hessian(',i1,',1:3) = ',3(e12.5,2x))
         enddo
       endif
 c

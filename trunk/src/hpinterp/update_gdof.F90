@@ -347,7 +347,10 @@ subroutine update_gdof()
       enddo
       nod = nod_glb(i)
       call find_ndof(nod, ndofH,ndofE,ndofV,ndofQ)
-      if (ndofH .eq. 0) cycle
+      if (ndofH .eq. 0) then
+         NODES(nod)%geom_interf = 1
+         cycle
+      endif
       count = 3*ndofH
 !  ...check whether supplier
       if (src .eq. RANK) then
@@ -408,6 +411,8 @@ subroutine update_gdof()
 !$OMP SCHEDULE(DYNAMIC)
    do iel=1,NRELES_SUBD
       mdle = ELEM_SUBD(iel)
+!  ...cycle if middle node does not have H1 DOFs (low order)
+      if (.not.associated(NODES(mdle)%dof%coord)) cycle
       call find_elem_type(mdle, mdltype)
       if (mdltype .ne. 'Linear') then
          ntype = NODES(mdle)%type

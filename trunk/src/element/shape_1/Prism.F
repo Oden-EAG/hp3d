@@ -9,7 +9,7 @@ c     routine name      - shape3DHPris
 c
 c--------------------------------------------------------------------
 c
-c     latest revision:  - Oct 14, Apr 17
+c     latest revision:  - Oct 14, Apr 17, Jul 21
 c
 c     purpose:          - routine returns values of 3D triangular prism
 c                         element H1 shape functions and their derivatives
@@ -41,24 +41,24 @@ c
       integer :: iprint,N,m,v,e,f,i,j,k,nij,nordME,ndofME,nordQE,ndofQE
       integer :: nordTF,ndofTF,nordQF(2),ndofQF,nordB(2),ndofB
       integer :: minI,minJ,minK,minIJ,maxI,maxJ,maxK,maxIJ
-      logical :: IdecME,IdecQE,IdecTF,IdecQF(3,2),GIdecQF(2),IdecB(2)
+      logical :: IdecME,IdecQE,IdecTF,IdecQF(2,3),GIdecQF(2),IdecB(2)
       double precision, intent(in)  :: X(3)
       double precision, intent(out) :: ShapH(Nsize(2))
       double precision, intent(out) :: GradH(1:3,Nsize(2))
       double precision :: Mu(0:1),DMu(3,0:1)
-      double precision :: NU(0:2),DNu(3,0:2)
-      double precision :: MubV(6),DMubV(6,3),NubV(6),DNubV(6,3)
-      double precision :: MubME(6),DMubME(6,3)
-      double precision :: NupME(6,0:1),DNupME(6,3,0:1)
+      double precision :: Nu(0:2),DNu(3,0:2)
+      double precision :: MubV(6),DMubV(3,6),NubV(6),DNubV(3,6)
+      double precision :: MubME(6),DMubME(3,6)
+      double precision :: NupME(0:1,6),DNupME(3,0:1,6)
       double precision :: GNupME(0:1),GDNupME(3,0:1)
       double precision :: NubQE(3),DNubQE(3,3)
-      double precision :: MupQE(3,0:1),DMupQE(3,3,0:1)
+      double precision :: MupQE(0:1,3),DMupQE(3,0:1,3)
       double precision :: GMupQE(0:1),GDMupQE(3,0:1)
-      double precision :: MubTF(2),DMubTF(2,3)
-      double precision :: NupTF(2,0:2),DNupTF(2,3,0:2)
+      double precision :: MubTF(2),DMubTF(3,2)
+      double precision :: NupTF(0:2,2),DNupTF(3,0:2,2)
       double precision :: GNupTF(0:2),GDNupTF(3,0:2)
-      double precision :: STpQF(3,2,0:1),DSTpQF(3,3,2,0:1)
-      double precision :: GSTpQF(2,0:1),GDSTpQF(3,2,0:1)
+      double precision :: STpQF(0:1,2,3),DSTpQF(3,0:1,2,3)
+      double precision :: GSTpQF(0:1,2),GDSTpQF(3,0:1,2)
       double precision :: phiE(2:Nsize(1)),DphiE(3,2:Nsize(1))
       double precision :: phiTri(2:Nsize(1)-1,1:Nsize(1)-2)
       double precision :: DphiTri(3,2:Nsize(1)-1,1:Nsize(1)-2)
@@ -82,8 +82,8 @@ c  ...VERTEX SHAPE FUNCTIONS
       do v=1,6
         m=m+1
         ShapH(m) = NubV(v)*MubV(v)
-        GradH(1:N,m) = DNubV(v,1:N)*MubV(v)
-     .               + NubV(v)*DMubV(v,1:N)
+        GradH(1:N,m) = DNubV(1:N,v)*MubV(v)
+     .               + NubV(v)*DMubV(1:N,v)
       enddo
 c
 c  ...EDGE SHAPE FUNCTIONS
@@ -100,7 +100,7 @@ c      ...local parameters (again)
           minI = 2
           maxI = nordME
 c      ...orient first
-          call OrientE(NupME(e,0:1),DNupME(e,1:N,0:1),NoriE(e),N,
+          call OrientE(NupME(0:1,e),DNupME(1:N,0:1,e),NoriE(e),N,
      .                                                   GNupME,GDNupME)
 c      ...construct the shape functions
           call AncPhiE(GNupME,GDNupME,nordME,IdecME,N,
@@ -109,7 +109,7 @@ c      ...construct the shape functions
             m=m+1
             ShapH(m) = phiE(i)*MubME(e)
             GradH(1:N,m) = DphiE(1:N,i)*MubME(e)
-     .                   + phiE(i)*DMubME(e,1:N)
+     .                   + phiE(i)*DMubME(1:N,e)
           enddo
         endif
       enddo
@@ -126,7 +126,7 @@ c      ...local parameters (again)
           minI = 2
           maxI = nordQE
 c      ...orient first
-          call OrientE(MupQE(e,0:1),DMupQE(e,1:N,0:1),NoriE(6+e),N,
+          call OrientE(MupQE(0:1,e),DMupQE(1:N,0:1,e),NoriE(6+e),N,
      .                                                   GMupQE,GDMupQE)
 c      ...construct the shape functions
           call AncPhiE(GMupQE,GDMupQE,nordQE,IdecQE,N,
@@ -135,7 +135,7 @@ c      ...construct the shape functions
             m=m+1
             ShapH(m) = phiE(i)*NubQE(e)
             GradH(1:N,m) = DphiE(1:N,i)*NubQE(e)
-     .                   + phiE(i)*DNubQE(e,1:N)
+     .                   + phiE(i)*DNubQE(1:N,e)
           enddo
         endif
       enddo
@@ -158,7 +158,7 @@ c      ...local parameters (again)
           maxI = maxIJ-minJ
           maxJ = maxIJ-minI
 c      ...orient
-          call OrientTri(NupTF(f,0:2),DNupTF(f,1:N,0:2),NoriF(f),N,
+          call OrientTri(NupTF(0:2,f),DNupTF(1:N,0:2,f),NoriF(f),N,
      .                                                   GNupTF,GDNupTF)
 c      ...construct the shape functions
           call AncPhiTri(GNupTF,GDNupTF,NordTF,IdecTF,N,
@@ -171,7 +171,7 @@ c      ...construct the shape functions
 c
               ShapH(m) = phiTri(i,j)*MubTF(f)
               GradH(1:N,m) = DphiTri(1:N,i,j)*MubTF(f)
-     .                     + phiTri(i,j)*DMubTF(f,1:N)
+     .                     + phiTri(i,j)*DMubTF(1:N,f)
             enddo
           enddo
         endif
@@ -190,8 +190,8 @@ c      ...local parameters (again)
           maxI = nordQF(1)
           maxJ = nordQF(2)
 c      ...orient
-          call OrientQuad(STpQF(f,1:2,0:1),DSTpQF(f,1:N,1:2,0:1),
-     .               NoriF(f+2),IdecQF(f,1:2),N, GSTpQF,GDSTpQF,GIdecQF)
+          call OrientQuad(STpQF(0:1,1:2,f),DSTpQF(1:N,0:1,1:2,f),
+     .               NoriF(f+2),IdecQF(1:2,f),N, GSTpQF,GDSTpQF,GIdecQF)
 c      ...construct the shape functions
           call AncPhiQuad(GSTpQF,GDSTpQF,nordQF,GIdecQF,N,
      .                                     phiQuad(minI:maxI,minJ:maxJ),
@@ -327,7 +327,7 @@ c     routine name      - shape3EPris
 c
 c--------------------------------------------------------------------
 c
-c     latest revision:  - Oct 14, Apr 17
+c     latest revision:  - Oct 14, Apr 17, Jul 21
 c
 c     purpose:          - routine returns values of 3D triangular prism
 c                         element H(curl) shape functions and their
@@ -361,23 +361,23 @@ c
       integer :: nordTF,ndofTF,nordQF(2),ndofQF,nordB(2),ndofB
       integer :: minI,minJ,minK,minIJ,maxI,maxJ,maxK,maxIJ
       integer :: famctr,fam,a,b,ab(2),abc(3),ij(2),ig,jg,minF(2),maxF(2)
-      logical :: IdecME,IdecQE,IdecTF,IdecQF(3,2),GIdecQF(2),IdecB(2)
+      logical :: IdecME,IdecQE,IdecTF,IdecQF(2,3),GIdecQF(2),IdecB(2)
       double precision, intent(in)  :: X(3)
       double precision, intent(out) :: ShapE(3,Nsize(2))
       double precision, intent(out) :: CurlE(3,Nsize(2))
       double precision :: Mu(0:1),DMu(3,0:1)
-      double precision :: NU(0:2),DNu(3,0:2)
-      double precision :: MubME(6),DMubME(6,3)
-      double precision :: NupME(6,0:1),DNupME(6,3,0:1)
+      double precision :: Nu(0:2),DNu(3,0:2)
+      double precision :: MubME(6),DMubME(3,6)
+      double precision :: NupME(0:1,6),DNupME(3,0:1,6)
       double precision :: GNupME(0:1),GDNupME(3,0:1)
       double precision :: NubQE(3),DNubQE(3,3)
-      double precision :: MupQE(3,0:1),DMupQE(3,3,0:1)
+      double precision :: MupQE(0:1,3),DMupQE(3,0:1,3)
       double precision :: GMupQE(0:1),GDMupQE(3,0:1)
-      double precision :: MubTF(2),DMubTF(2,3)
-      double precision :: NupTF(2,0:2),DNupTF(2,3,0:2)
+      double precision :: MubTF(2),DMubTF(3,2)
+      double precision :: NupTF(0:2,2),DNupTF(3,0:2,2)
       double precision :: GNupTF(0:2),GDNupTF(3,0:2)
-      double precision :: STpQF(3,2,0:1),DSTpQF(3,3,2,0:1)
-      double precision :: GSTpQF(2,0:1),GDSTpQF(3,2,0:1)
+      double precision :: STpQF(0:1,2,3),DSTpQF(3,0:1,2,3)
+      double precision :: GSTpQF(0:1,2),GDSTpQF(3,0:1,2)
       double precision :: EE(3,0:Nsize(1)-1),CurlEE(3,0:Nsize(1)-1)
       double precision :: ETri(3,0:Nsize(1)-2,1:Nsize(1)-1)
       double precision :: CurlETri(3,0:Nsize(1)-2,1:Nsize(1)-1)
@@ -414,7 +414,7 @@ c      ...local parameters (again)
           minI = 0
           maxI = nordME-1
 c      ...orient first
-          call OrientE(NupME(e,0:1),DNupME(e,1:N,0:1),NoriE(e),N,
+          call OrientE(NupME(0:1,e),DNupME(1:N,0:1,e),NoriE(e),N,
      .                                                   GNupME,GDNupME)
 c      ...construct the shape functions
           call AncEE(GNupME,GDNupME,nordME,IdecME,N,
@@ -423,7 +423,7 @@ c      ...construct the shape functions
             m=m+1
 c
             ShapE(1:N,m) = MubME(e)*EE(1:N,i)
-            call cross(3,DMubME(e,1:N),EE(1:N,i), DMubMExEE)
+            call cross(3,DMubME(1:N,e),EE(1:N,i), DMubMExEE)
             CurlE(1:N,m) = MubME(e)*CurlEE(1:N,i)
      .                   + DMubMExEE
           enddo
@@ -442,7 +442,7 @@ c      ...local parameters (again)
           minI = 0
           maxI = nordQE-1
 c      ...orient first
-          call OrientE(MupQE(e,0:1),DMupQE(e,1:N,0:1),NoriE(6+e),N,
+          call OrientE(MupQE(0:1,e),DMupQE(1:N,0:1,e),NoriE(6+e),N,
      .                                                   GMupQE,GDMupQE)
 c      ...construct the shape functions (CurlEE should be returned as all 0)
           call AncEE(GMupQE,GDMupQE,nordQE,IdecQE,N,
@@ -451,7 +451,7 @@ c      ...construct the shape functions (CurlEE should be returned as all 0)
             m=m+1
 c
             ShapE(1:N,m) = NubQE(e)*EE(1:3,i)
-            call cross(3,DNubQE(e,1:N),EE(1:N,i), CurlE(1:N,m))
+            call cross(3,DNubQE(1:N,e),EE(1:N,i), CurlE(1:N,m))
           enddo
         endif
       enddo
@@ -474,7 +474,7 @@ c      ...local parameters (again)
           maxI  = maxIJ-minJ
           maxJ  = maxIJ-minI
 c      ...orient
-          call OrientTri(NupTF(f,0:2),DNupTF(f,1:N,0:2),NoriF(f),N,
+          call OrientTri(NupTF(0:2,f),DNupTF(1:N,0:2,f),NoriF(f),N,
      .                                                   GNupTF,GDNupTF)
 c      ...loop over families
           famctr=m
@@ -492,7 +492,7 @@ c        ...construct the shape functions
 c
                 ShapE(1:N,m) = ETri(1:N,i,j)*MubTF(f)
 c
-                call cross(3,DMubTF(f,1:N),ETri(1:N,i,j), DMubTFxETri)
+                call cross(3,DMubTF(1:N,f),ETri(1:N,i,j), DMubTFxETri)
                 CurlE(1:N,m) = MubTF(f)*CurlETri(1:N,i,j)
      .                       + DMubTFxETri
               enddo
@@ -507,8 +507,8 @@ c  ...loop over faces
 c    ...local parameters
         call decod(Nord(11+f),MODORDER,2, nordQF)
 c    ...orient
-        call OrientQuad(STpQF(f,1:2,0:1),DSTpQF(f,1:N,1:2,0:1),
-     .               NoriF(2+f),IdecQF(f,1:2),N, GSTpQF,GDSTpQF,GIdecQF)
+        call OrientQuad(STpQF(0:1,1:2,f),DSTpQF(1:N,0:1,1:2,f),
+     .               NoriF(2+f),IdecQF(1:2,f),N, GSTpQF,GDSTpQF,GIdecQF)
 c    ...loop over families
         do fam=0,1
           ab = cshift((/1,2/),fam);
@@ -521,7 +521,7 @@ c        ...local parameters (again)
             maxF(1) = nordQF(a)-1
             maxF(2) = nordQF(b)
 c        ...construct the shape functions
-            call AncEQuad(GSTpQF(ab,0:1),GDSTpQF(1:N,ab,0:1),
+            call AncEQuad(GSTpQF(0:1,ab),GDSTpQF(1:N,0:1,ab),
      .                    nordQF(ab),GIdecQF(ab),N,
      .                       EQuad(1:N,minF(1):maxF(1),minF(2):maxF(2)),
      .                   CurlEQuad(1:N,minF(1):maxF(1),minF(2):maxF(2)))
@@ -728,7 +728,7 @@ c     routine name      - shape3DVPris
 c
 c-----------------------------------------------------------------------
 c
-c     latest revision:  - Nov 14, Apr 17
+c     latest revision:  - Nov 14, Apr 17, Jul 21
 c
 c     purpose:          - routine returns values of 3D Prism element
 c                         H(div) shape functions and their divergences
@@ -759,17 +759,17 @@ c
       integer :: nordTF,ndofTF,nordQF(2),ndofQF,nordB(2),ndofB
       integer :: minI,minJ,minK,minIJ,maxI,maxJ,maxK,maxIJ
       integer :: famctr,fam,abc(3)
-      logical :: IdecTF,IdecQF(3,2),GIdecQF(2),IdecB(2)
+      logical :: IdecTF,IdecQF(2,3),GIdecQF(2),IdecB(2)
       double precision, intent(in)  :: X(3)
       double precision, intent(out) :: ShapV(3,Nsize(2))
       double precision, intent(out) :: DivV(Nsize(2))
       double precision :: Mu(0:1),DMu(3,0:1)
-      double precision :: NU(0:2),DNu(3,0:2)
-      double precision :: MubTF(2),DMubTF(2,3)
-      double precision :: NupTF(2,0:2),DNupTF(2,3,0:2)
+      double precision :: Nu(0:2),DNu(3,0:2)
+      double precision :: MubTF(2),DMubTF(3,2)
+      double precision :: NupTF(0:2,2),DNupTF(3,0:2,2)
       double precision :: GNupTF(0:2),GDNupTF(3,0:2)
-      double precision :: STpQF(3,2,0:1),DSTpQF(3,3,2,0:1)
-      double precision :: GSTpQF(2,0:1),GDSTpQF(3,2,0:1)
+      double precision :: STpQF(0:1,2,3),DSTpQF(3,0:1,2,3)
+      double precision :: GSTpQF(0:1,2),GDSTpQF(3,0:1,2)
       double precision :: VTri(3,0:Nsize(1)-1,0:Nsize(1)-1)
       double precision :: DivVTri(0:Nsize(1)-1,0:Nsize(1)-1)
       double precision :: VQuad(3,0:Nsize(1)-1,0:Nsize(1)-1)
@@ -808,7 +808,7 @@ c      ...local parameters (again)
           maxI  = maxIJ-minJ
           maxJ  = maxIJ-minI
 c      ...orient
-          call OrientTri(NupTF(f,0:2),DNupTF(f,1:N,0:2),NoriF(f),N,
+          call OrientTri(NupTF(0:2,f),DNupTF(1:N,0:2,f),NoriF(f),N,
      .                                                   GNupTF,GDNupTF)
 c      ...construct the shape functions (DivVTri should be 0)
           call AncVTri(GNupTF,GDNupTF,nordTF,IdecTF,N,
@@ -820,7 +820,7 @@ c      ...construct the shape functions (DivVTri should be 0)
               m=m+1
 c
               ShapV(1:N,m) = MubTF(f)*VTri(1:N,i,j)
-              call dot_product(DMubTF(f,1:N),VTri(1:N,i,j), DivV(m))
+              call dot_product(DMubTF(1:N,f),VTri(1:N,i,j), DivV(m))
             enddo
           enddo
         endif
@@ -839,8 +839,8 @@ c      ...local parameters (again)
           maxI = nordQF(1)-1
           maxJ = nordQF(2)-1
 c      ...orient
-          call OrientQuad(STpQF(f,1:2,0:1),DSTpQF(f,1:N,1:2,0:1),
-     .               NoriF(2+f),IdecQF(f,1:2),N, GSTpQF,GDSTpQF,GIdecQF)
+          call OrientQuad(STpQF(0:1,1:2,f),DSTpQF(1:N,0:1,1:2,f),
+     .               NoriF(2+f),IdecQF(1:2,f),N, GSTpQF,GDSTpQF,GIdecQF)
 c      ...construct the shape functions
           call AncVQuad(GSTpQF,GDSTpQF,nordQF,GIdecQF,N,
      .                                   VQuad(1:N,minI:maxI,minJ:maxJ),

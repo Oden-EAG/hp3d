@@ -11,6 +11,7 @@
 !! @param[in]  Etav         - GMP reference coordinates of the element vertices
 !! @param[in]  Type         - element (middle node) type
 !! @param[in]  Icase        - the face node case
+!! @param[in]  Bcond        - the edge node BC flag
 !! @param[in]  Nedge_orient - edge orientation
 !! @param[in]  Nface_orient - face orientation
 !! @param[in]  Norder       - element order
@@ -19,7 +20,7 @@
 !!
 !! @param[out] ZnodE        - H(curl) dof for the face
 !-----------------------------------------------------------------------
-  subroutine dhpfaceE(Mdle,Iflag,No,Etav, Type,Icase, &
+  subroutine dhpfaceE(Mdle,Iflag,No,Etav,Type,Icase,Bcond, &
                       Nedge_orient,Nface_orient,Norder,Iface, &
                       ZdofE, ZnodE)
   use control
@@ -32,7 +33,7 @@
 ! ** Arguments
 !-----------------------------------------------------------------------
   integer,                                    intent(in)  :: Iflag,No,Mdle
-  integer,                                    intent(in)  :: Icase,Iface
+  integer,                                    intent(in)  :: Icase,Bcond,Iface
   real(8), dimension(3,8),                    intent(in)  :: Etav
   character(len=4),                           intent(in)  :: Type
   integer, dimension(12),                     intent(in)  :: Nedge_orient
@@ -54,7 +55,7 @@
   real(8), dimension(   MAXquadH)       :: wa_list
   real(8)                               :: wa, weight
 !
-! work space for shape3H
+! work space for shape3DH
   integer                               :: nrdofH
   integer, dimension(19)                :: norder_1
   real(8), dimension(MAXbrickH)         :: shapH
@@ -63,7 +64,7 @@
 ! derivatives of a H1 shape function wrt reference coordinates
   real(8), dimension(3)                 :: dvHdeta
 !
-! work space for shape3E
+! work space for shape3DE
   integer                               :: nrdofE
   real(8), dimension(3,MAXbrickE)       :: shapE
   real(8), dimension(3,MAXbrickE)       :: curlE
@@ -90,30 +91,33 @@
   VTYPE :: zvalEeta(3,MAXEQNE),zcurlEeta(3,MAXEQNE)
 !
 ! linear systems
-  real(8), dimension(MAXMdlqH+MAXMdlqE,MAXMdlqH+MAXMdlqE) :: aaE
-  integer, dimension(MAXMdlqH+MAXMdlqE) :: ipivE
+  real(8), dimension(MAXmdlqH+MAXmdlqE,MAXmdlqH+MAXmdlqE) :: aaE
+  integer, dimension(MAXmdlqH+MAXmdlqE) :: ipivE
 !
 ! load vector and solution
-  VTYPE,   dimension(MAXMdlqH+MAXMdlqE,MAXEQNE) :: zbE,zuE
+  VTYPE,   dimension(MAXmdlqH+MAXmdlqE,MAXEQNE) :: zbE,zuE
 #if C_MODE
-  real(8), dimension(MAXMdlqH+MAXMdlqE,MAXEQNE) :: duE_real, duE_imag
+  real(8), dimension(MAXmdlqH+MAXmdlqE,MAXEQNE) :: duE_real, duE_imag
 #endif
 !
-  integer, dimension(NR_PHYSA) :: ncase
+! decoded case and BC flag for the face node
+  integer, dimension(NR_PHYSA)          :: ncase
+  integer, dimension(NRINDEX)           :: ibcnd
 !
 ! misc
-  integer :: nrv,nre,nrf,nsign,nflag, &
-             i,j,jH,iE,jE,kjE,kiE,kjH,k,kE,&
-             ivarE,nvarE,naE,iprint,info, &
-             ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,ndofE_tot
-! 
-  logical :: Dflag(NR_PHYSA)
+  integer :: nrv,nre,nrf,nsign,nflag,i,j,jH,iE,jE,kjE,kiE,kjH,k,kE,info,ic,naE,&
+             ivarE,nvarE,ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,ndofE_tot
+!
+  logical :: is_homD
+!
+#if DEBUG_MODE
+  integer :: iprint = 0
+#endif
 !
 !-----------------------------------------------------------------------
 !
   nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
 !
-  iprint = 0
 #if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Icase,Iface,Type
@@ -133,6 +137,13 @@
 ! determine # of dof for the face node
   call ndof_nod(face_type(Type,Iface),Norder(nre+Iface), &
                 ndofH_face,ndofE_face,ndofV_face,ndofQ_face)
+!
+! check if a homogeneous Dirichlet node
+  call homogenD('tangen',Icase,Bcond, is_homD,ncase,ibcnd)
+  if (is_homD) then
+    zuE = ZERO
+    go to 100
+  endif
 !
 ! if # of dof is zero, return, nothing to do
   if (ndofE_face.eq.0) return
@@ -418,33 +429,30 @@
      call logic_error(FAILURE,__FILE__,__LINE__)
   endif
 !
-! back substitute
-! apply pivots
-     zuE(1:ndofE_tot,:) = zbE(1:ndofE_tot,:)
+! copy load vector
+  zuE(1:ndofE_tot,:) = zbE(1:ndofE_tot,:)
 !
 #if C_MODE
-     call zlaswp(MAXEQNE,zuE,naE,1,ndofE_tot,ipivE,1)
-     duE_real(1:ndofE_tot,:) = real(zuE(1:ndofE_tot,:))
-     duE_imag(1:ndofE_tot,:) = aimag(zuE(1:ndofE_tot,:))
+! apply pivots to load vector
+  call zlaswp(MAXEQNE,zuE,naE,1,ndofE_tot,ipivE,1)
 !
-     call dtrsm('L','L','N','U',ndofE_tot,MAXEQNE,1.d0,   &
-                aaE,naE,duE_real,naE)
-     call dtrsm('L','U','N','N',ndofE_tot,MAXEQNE,1.d0,aaE,naE, &
-          duE_real,naE)
+  duE_real(1:ndofE_tot,:) = real(zuE(1:ndofE_tot,:))
+  duE_imag(1:ndofE_tot,:) = aimag(zuE(1:ndofE_tot,:))
 !
-     call dtrsm('L','L','N','U',ndofE_tot,MAXEQNE,1.d0,aaE,naE, &
-          duE_imag,naE)
-     call dtrsm('L','U','N','N',ndofE_tot,MAXEQNE,1.d0,aaE,naE, &
-          duE_imag,naE)
+! triangular solves
+  call dtrsm('L','L','N','U',ndofE_tot,MAXEQNE,1.d0,aaE,naE, duE_real,naE)
+  call dtrsm('L','U','N','N',ndofE_tot,MAXEQNE,1.d0,aaE,naE, duE_real,naE)
 !
-     zuE(1:ndofE_tot,:) &
-          = dcmplx(duE_real(1:ndofE_tot,:), duE_imag(1:ndofE_tot,:))
+  call dtrsm('L','L','N','U',ndofE_tot,MAXEQNE,1.d0,aaE,naE, duE_imag,naE)
+  call dtrsm('L','U','N','N',ndofE_tot,MAXEQNE,1.d0,aaE,naE, duE_imag,naE)
+!
+  zuE(1:ndofE_tot,:) = dcmplx(duE_real(1:ndofE_tot,:), duE_imag(1:ndofE_tot,:))
 #else
-     call dlaswp(MAXEQNE,zuE,naE,1,ndofE_tot,ipivE,1)
-     call dtrsm('L','L','N','U',ndofE_tot,MAXEQNE,1.d0,aaE,naE, &
-          zuE,naE)
-     call dtrsm('L','U','N','N',ndofE_tot,MAXEQNE,1.d0,aaE,naE, &
-          zuE,naE)
+! apply pivots to load vector
+  call dlaswp(MAXEQNE,zuE,naE,1,ndofE_tot,ipivE,1)
+! triangular solves
+  call dtrsm('L','L','N','U',ndofE_tot,MAXEQNE,1.d0,aaE,naE, zuE,naE)
+  call dtrsm('L','U','N','N',ndofE_tot,MAXEQNE,1.d0,aaE,naE, zuE,naE)
 #endif
 !
 #if DEBUG_MODE
@@ -459,42 +467,61 @@
 !
 !------------------------------------------------------
 !
-! save the dof
-  call decod(Icase,2,NR_PHYSA, ncase)
+!  ...save the DOFs, skipping irrelevant entries
+  100 continue
 !
 #if DEBUG_MODE
-  if (iprint.eq.1) then
-     write(*,*) 'dhpfaceE: ncase = ', ncase
-  endif
+      if (iprint.eq.1) then
+        write(*,*) 'dhpfaceE: ncase = ', ncase
+      endif
 #endif
-! use this subroutine to flag the phys. attr. that do require Dirichlet dof update
-! Jaime, Aug. 2020
-  call node_physics_dirichlet(Mdle,nrv+nre+Iface,Dflag)
 !
-  ivarE=0; nvarE=0
+!  ...initialize global variable counter, and node local variable counter
+      ivarE=0; nvarE=0
 !
-! loop through multiple copies of variables
-  do j=1,NRCOMS
+!  ...loop through multiple copies of variables
+      do j=1,NRCOMS
 !
-!   loop through physical attributes
-    do i=1,NR_PHYSA
+!  .....initiate the BC component counter
+        ic=0
 !
-!     loop through components
-      do k=1,NR_COMP(i)
-        select case(DTYPE(i))
-        case('tangen')
-          ivarE=ivarE+1
-          if (ncase(i).eq.1) then
-            nvarE = nvarE + 1
-            if (Dflag(i)) ZnodE(nvarE,1:ndofE_face) = zuE(1:ndofE_face,ivarE)
-          endif
-        end select
+!  .....loop through physical attributes
+        do i=1,NR_PHYSA
+!
+!  .......loop through components
+          do k=1,NR_COMP(i)
+!
+!  .........if the variable is supported by the node, update the BC component counter
+            if (ncase(i).eq.1) ic=ic+1
+!
+!  .........select the discretization type
+            select case(DTYPE(i))
+!
+!  .........H(curl) component
+            case('tangen')
+!
+!  ...........update global counter
+              ivarE=ivarE+1
+!
+!  ...........if the variable is supported by the node
+              if (ncase(i).eq.1) then
+!
+!  .............update node local counter
+                nvarE = nvarE + 1
+!
+!  .............do not write dof if physics attribute is deactivated
+                if (.not. PHYSAm(i)) exit
+!
+!  .............store Dirichlet dof
+                if (ibcnd(ic).eq.1) ZnodE(nvarE,1:ndofE_face) = zuE(1:ndofE_face,ivarE)
+              endif
+            end select
+          enddo
+        enddo
       enddo
-    enddo
-  enddo
 !
 #if DEBUG_MODE
-  if (iprint.eq.1) call result
+      if (iprint.eq.1) call result
 #endif
 !
   end subroutine dhpfaceE

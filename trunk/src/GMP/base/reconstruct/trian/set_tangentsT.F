@@ -53,7 +53,8 @@ c
       dimension Rn1(3),Rn2(3)
 c
 c  ...work lists containing adjacent surface triangles data
-      dimension list(10),list_rloc(3,10),list_tets(20)
+      dimension list(10),list_tets(20)
+c     dimension list_rloc(3,10)
 c
 c  ...work space
       dimension temp(3),void(3,3),list_aux(Nrcurves),
@@ -86,7 +87,7 @@ c  ...printing statement
  7046   format(' set_tangents: Np = ',i6)
         write(*,7047) List_curves(1:Nrcurves)
  7047   format(' set_tangents: ORIGINAL CURVE LIST = ',10(i8,2x)/30x
-     .                                                 10(i8,2x))
+     .                                                ,10(i8,2x))
       endif
 c
 c  ...there must be at least three curves...
@@ -304,7 +305,7 @@ c
       if (iprint.ge.1) then
         write(*,9000)Newlist_curves(1:Nrcurves)
  9000   format(' set_tangents: curves reorganized: ',10(i8,2x)/30x
-     .                                               10(i8,2x))
+     .                                              ,10(i8,2x))
       endif
 c  ...check
       if (iprint.ge.1) then

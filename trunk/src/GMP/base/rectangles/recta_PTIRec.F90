@@ -17,8 +17,6 @@ subroutine recta_PTIRec(No,Eta, X,Dxdeta)
 #include "syscom.blk"
 !
       dimension Eta(2),X(3),Dxdeta(3,2)
-      dimension noc(4),norientc(4)
-      dimension xp(NDIM),dxp(NDIM),val(8),dval(2,8),detac(2)
 !
 !-----------------------------------------------------------------------
 !
@@ -161,7 +159,7 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
           call norm(POINTS(np)%Rdata(1:3), r_aux)
           write(*,9000) SURFACES(ns)%Rdata(4),r_aux
  9000     format(' recta_sphere: actual rad, computed rad = ',    &
-                                                       e12.5,2x e12.5)
+                                                       e12.5,2x,e12.5)
           call pause
           call print_GMP
         endif
@@ -815,9 +813,6 @@ subroutine recta_cone(No,Eta, X,Dxdeta)
 !
 !  ...linear shape functions in the parametric space
       dimension shapH(4),dshapH(2,4)
-!
-!  ...derivative of cone coordinate wrt Cartesian coordinates
-      dimension dzetdx(3),dr2dx(3)
 !
 !  ...point on an edge
       dimension dsedeta(2),                                 &

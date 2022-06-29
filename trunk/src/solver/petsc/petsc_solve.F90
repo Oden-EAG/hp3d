@@ -50,33 +50,9 @@ subroutine petsc_solve(mtype)
                            MPI_INTEGER,MPI_INTEGER8,              &
                            MPI_REAL8,MPI_COMPLEX16,               &
                            MPI_COMM_WORLD,MPI_STATUS_SIZE
-   use petscksp   , only:  VecCreateMPI,VecDuplicate,VecSet,      &
-                           VecDestroy,MatCreate,MatDestroy,       &
-                           VecSet,MatSetValues,MatSetSizes,       &
-                           MatSetFromOptions,MatSetUp,            &
-                           MatAssemblyBegin,MatAssemblyEnd,       &
-                           VecAssemblyBegin,VecAssemblyEnd,       &
-                           PETSC_VIEWER_STDOUT_WORLD,             &
-                           PETSC_DECIDE,KSPSolve,KSPView,         &
-                           MAT_FINAL_ASSEMBLY,ADD_VALUES,         &
-                           VecScatterCreateToAll,VecScatterBegin, &
-                           VecScatterEnd,VecScatterDestroy,       &
-                           SCATTER_FORWARD,VecGetArrayReadF90,    &
-                           VecRestoreArrayReadF90,tVec,           &
-                           tVecScatter,KSPGetIterationNumber,     &
-                           PetscPrintf,MatMPIAIJSetPreallocation, &
-                           MAT_NEW_NONZERO_ALLOCATION_ERR,        &
-                           PETSC_FALSE,VecGetOwnershipRange,      &
-                           MatStashGetInfo,MatGetInfo,MAT_LOCAL,  &
-                           MAT_INFO_MALLOCS,MAT_INFO_NZ_USED,     &
-                           MAT_INFO_NZ_ALLOCATED,MAT_INFO_SIZE,   &
-                           INSERT_VALUES,PETSC_DEFAULT_REAL
-                            !,PETSC_NULL_INTEGER
+   use petscksp
    use petsc_w_ksp, only:  petsc_ksp_start,petsc_ksp_destroy,     &
-                           petsc_ksp,petsc_A,petsc_rhs,petsc_sol, &
-                           prec
-   ! use petscpc    , only:  PCType
-   !,PCASM,PCICC,PCGAMG
+                           petsc_ksp,petsc_A,petsc_rhs,petsc_sol
 !
    implicit none
 !
@@ -106,14 +82,10 @@ subroutine petsc_solve(mtype)
    VecScatter petsc_ctx
    PetscScalar, pointer :: petsc_vec_ptr(:)
    KSPType petsc_method
-   PetscReal res_norm,rel_tol
-   
-   character(80) :: prectype
-! 
    real(8) :: petsc_info(MAT_INFO_SIZE)
    real(8) :: petsc_mallocs,petsc_nz_alloc,petsc_nz_used
    character(64) :: info_string
-   character(8)  :: fmt,val_string,val_string2
+   character(8)  :: fmt,val_string
 !
 !..Non-zero computation
    integer :: my_dnz, my_onz, NR_NOD_LIST, NRNODS_SUBD
@@ -144,7 +116,8 @@ subroutine petsc_solve(mtype)
    integer :: nrdof_subd(NUM_PROCS)
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time,time_stamp
+!   real(8) :: MPI_Wtime,start_time,end_time,time_stamp
+   real(8) :: start_time,end_time,time_stamp
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -835,19 +808,7 @@ subroutine petsc_solve(mtype)
       case default
          petsc_method = KSPGMRES
    end select
-   call KSPSetType(petsc_ksp,petsc_method, petsc_ierr); CHKERRQ(petsc_ierr)
-
-!..Get preconditioner from KSP
-   call KSPGetPC(petsc_ksp,prec, petsc_ierr); CHKERRQ(petsc_ierr)
-!
-!..Set preconditioner type: 'none','asm','gamg','jacobi',...
-   prectype = 'asm'
-   call PCSetType(prec, prectype, petsc_ierr); CHKERRQ(petsc_ierr)
-!..Set relative tolerance and maximum iteration number
-   rel_tol = 1.e-12
-   call KSPSetTolerances( petsc_ksp,rel_tol,                                      &
-      PETSC_DEFAULT_REAL,PETSC_DEFAULT_REAL,1000,petsc_ierr); CHKERRQ(petsc_ierr)
-
+   call KSPSetType(petsc_ksp,petsc_method, petsc_ierr)
 !
 !..Perform global sparse solve
    call KSPSolve(petsc_ksp,petsc_rhs, petsc_sol,petsc_ierr); CHKERRQ(petsc_ierr)
@@ -857,15 +818,6 @@ subroutine petsc_solve(mtype)
    fmt = '(I5)'
    write (val_string,fmt) petsc_its
    info_string='KSPSolve: number of iterations = '//trim(val_string)
-   call PetscPrintf(MPI_COMM_WORLD,info_string, petsc_ierr); CHKERRQ(petsc_ierr);
-   if (RANK .eq. ROOT) write(*,*)
-   if (RANK .eq. ROOT) write(*,*)
-!
-!..print final residual norm
-   call KSPGetResidualNorm(petsc_ksp, res_norm,petsc_ierr); CHKERRQ(petsc_ierr);
-   fmt = '(e8.1)'
-   write (val_string2,fmt) res_norm
-   info_string='KSPSolve: final residual norm = '//trim(val_string2)
    call PetscPrintf(MPI_COMM_WORLD,info_string, petsc_ierr); CHKERRQ(petsc_ierr);
    if (RANK .eq. ROOT) write(*,*)
    if (RANK .eq. ROOT) write(*,*)

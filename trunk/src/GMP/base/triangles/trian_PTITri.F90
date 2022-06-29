@@ -137,7 +137,7 @@ subroutine spherical_triangle(No,Eta, X,Dxdeta)
           call norm(POINTS(np)%Rdata(1:3), r_aux)
           write(*,9000) SURFACES(ns)%Rdata(4),r_aux
  9000     format('spherical_triangle: actual rad, computed rad = ',   &
-                                                       e12.5,2x e12.5)
+                                                       e12.5,2x,e12.5)
           call pause
           call print_GMP
         endif
@@ -767,9 +767,6 @@ subroutine conic_triangle(No,Eta, X,Dxdeta)
 !
 !  ...linear shape functions in the parametric space
       dimension shapH(3),dshapH(2,3)
-!
-!  ...derivative of cone coordinate wrt Cartesian coordinates
-      dimension dzetdx(3),dr2dx(3)
 !
 !  ...point on an edge
       dimension dsedeta(2),  &

@@ -12,6 +12,7 @@
 !! @param[in]  Etav         - reference coordinates of the element vertices
 !! @param[in]  Type         - element (middle node) type
 !! @param[in]  Icase        - the face node case
+!! @param[in]  Bcond        - the edge node BC flag
 !! @param[in]  Nedge_orient - edge orientation, never used
 !! @param[in]  Nface_orient - face orientation
 !! @param[in]  Norder       - element order
@@ -19,7 +20,7 @@
 !!
 !! @param[out] ZnodV        - H(div) dof for the face
 !-----------------------------------------------------------------------
-  subroutine dhpfaceV(Mdle,Iflag,No,Etav,Type,Icase, &
+  subroutine dhpfaceV(Mdle,Iflag,No,Etav,Type,Icase,Bcond, &
                       Nedge_orient,Nface_orient,Norder,Iface, &
                       ZnodV)
   use control
@@ -31,14 +32,14 @@
 ! ** Arguments
 !-----------------------------------------------------------------------
   integer,                                    intent(in)  :: Iflag,No,Mdle
-  integer,                                    intent(in)  :: Icase,Iface
+  integer,                                    intent(in)  :: Icase,Bcond,Iface
   real(8), dimension(3,8),                    intent(in)  :: Etav
   character(len=4),                           intent(in)  :: Type
   integer, dimension(12),                     intent(in)  :: Nedge_orient
   integer, dimension(6),                      intent(in)  :: Nface_orient
   integer, dimension(19),                     intent(in)  :: Norder
 !
-  VTYPE,   dimension(NRCOMS*NREQNV(Icase),*), intent(inout) :: ZnodV
+  VTYPE,   dimension(NRCOMS*NREQNH(Icase),*), intent(inout) :: ZnodV
 !
 ! ** Locals
 !-----------------------------------------------------------------------
@@ -52,13 +53,14 @@
   real(8), dimension(   MAXquadH)       :: wa_list
   real(8)                               :: wa, weight
 !
-! work space for shape3H
+! work space for shape3DH
   integer                               :: nrdofH
   integer, dimension(19)                :: norder_1
+!
   real(8), dimension(MAXbrickH)         :: shapH
   real(8), dimension(3,MAXbrickH)       :: gradH
 !
-! work space for shape3V
+! work space for shape3DV
   integer                               :: nrdofV
   real(8), dimension(3,MAXbrickV)       :: shapV
   real(8), dimension(MAXbrickV)         :: divV
@@ -86,30 +88,33 @@
 !
 ! work space for linear solvers
   integer                               :: naV,info
-  real(8), dimension(MAXMdlqV,MAXMdlqV) :: aaV
-  integer, dimension(MAXMdlqV)          :: ipivV
+  real(8), dimension(MAXmdlqV,MAXmdlqV) :: aaV
+  integer, dimension(MAXmdlqV)          :: ipivV
 !
 ! load vector and solution
-  VTYPE,   dimension(MAXMdlqV,MAXEQNV)  :: zbV,zuV
+  VTYPE,   dimension(MAXmdlqV,MAXEQNV)  :: zbV,zuV
 #if C_MODE
-  real(8), dimension(MAXMdlqV,MAXEQNV)  :: uV_real,uV_imag
+  real(8), dimension(MAXmdlqV,MAXEQNV)  :: uV_real,uV_imag
 #endif
 !
-! decoded case for the face node
+! decoded case and BC flag for the face node
   integer, dimension(NR_PHYSA)          :: ncase
+  integer, dimension(NRINDEX)           :: ibcnd
 !
 ! misc work space
-  integer :: iprint,nrv,nre,nrf,nsign,nflag, &
-             i,j,k,ivarV,nvarV,kj,ki,&
-             ndofH_face,ndofE_face,ndofV_face,ndofQ_face
-
-  logical :: Dflag(NR_PHYSA)
+  integer :: nrv,nre,nrf,nsign,nflag,i,j,k,ivarV,nvarV,kj,ki,&
+             ndofH_face,ndofE_face,ndofV_face,ndofQ_face,ic
+!
+  logical :: is_homD
+!
+#if DEBUG_MODE
+  integer :: iprint = 0
+#endif
 !
 !-----------------------------------------------------------------------
 !
   nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
 !
-  iprint = 0
 #if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Icase,Iface,Type
@@ -129,6 +134,13 @@
 ! determine # of dof for the face node
   call ndof_nod(face_type(Type,Iface),Norder(nre+Iface), &
                 ndofH_face,ndofE_face,ndofV_face,ndofQ_face)
+!
+! check if a homogeneous Dirichlet node
+  call homogenD('normal',Icase,Bcond, is_homD,ncase,ibcnd)
+  if (is_homD) then
+    zuV = ZERO
+    go to 100
+  endif
 !
 ! # of dof has to be positive...
   if (ndofV_face.lt.0) then
@@ -196,7 +208,7 @@
 !   compute inverse jacobian (for Piola transform)
     call geom(dxdeta, detadx, rjacdxdeta, nflag)
     if (nflag.ne.0) then
-      write(*,*) 'dhpfaceV: rjacdxdeta = ',rjacdxdeta ; write(*,*) 'Mdle,Iflag,No,Iface=',Mdle,Iflag,No,Iface
+      write(*,*) 'dhpfaceV: rjacdxdeta = ',rjacdxdeta
       stop 1
     endif
 !
@@ -288,31 +300,30 @@
     call logic_error(FAILURE,__FILE__,__LINE__)
   endif
 !
-! back substitute  why double calls ?????????
+! copy load vector
   zuV(1:ndofV_face,:) = zbV(1:ndofV_face,:)
+!
 #if C_MODE
+! apply pivots to load vector
   call zlaswp(MAXEQNV,zuV,naV,1,ndofV_face,ipivV,1)
+!
   uV_real(1:ndofV_face,:) =  real(zuV(1:ndofV_face,:))
   uV_imag(1:ndofV_face,:) = aimag(zuV(1:ndofV_face,:))
 !
-  call dtrsm('L','L','N','U',ndofV_face,MAXEQNV,1.d0,aaV,naV, &
-             uV_real,naV)
-  call dtrsm('L','U','N','N',ndofV_face,MAXEQNV,1.d0,aaV,naV, &
-             uV_real,naV)
+! triangular solves
+  call dtrsm('L','L','N','U',ndofV_face,MAXEQNV,1.d0,aaV,naV, uV_real,naV)
+  call dtrsm('L','U','N','N',ndofV_face,MAXEQNV,1.d0,aaV,naV, uV_real,naV)
 !
-  call dtrsm('L','L','N','U',ndofV_face,MAXEQNV,1.d0,aaV,naV, &
-             uV_imag,naV)
-  call dtrsm('L','U','N','N',ndofV_face,MAXEQNV,1.d0,aaV,naV, &
-             uV_imag,naV)
+  call dtrsm('L','L','N','U',ndofV_face,MAXEQNV,1.d0,aaV,naV, uV_imag,naV)
+  call dtrsm('L','U','N','N',ndofV_face,MAXEQNV,1.d0,aaV,naV, uV_imag,naV)
 !
-  zuV(1:ndofV_face,:) &
-          = dcmplx(uV_real(1:ndofV_face,:), uV_imag(1:ndofV_face,:))
+  zuV(1:ndofV_face,:) = dcmplx(uV_real(1:ndofV_face,:), uV_imag(1:ndofV_face,:))
 #else
+! apply pivots to load vector
   call dlaswp(MAXEQNV,zuV,naV,1,ndofV_face,ipivV,1)
-  call dtrsm('L','L','N','U',ndofV_face,MAXEQNV,1.d0,aaV,naV, &
-             zuV,naV)
-  call dtrsm('L','U','N','N',ndofV_face,MAXEQNV,1.d0,aaV,naV, &
-             zuV,naV)
+! triangular solves
+  call dtrsm('L','L','N','U',ndofV_face,MAXEQNV,1.d0,aaV,naV, zuV,naV)
+  call dtrsm('L','U','N','N',ndofV_face,MAXEQNV,1.d0,aaV,naV, zuV,naV)
 #endif
 !
 #if DEBUG_MODE
@@ -325,42 +336,62 @@
   endif
 #endif
 !
-! save the dof, skipping irrelevant entries
-  call decod(Icase,2,NR_PHYSA, ncase)
+!  ...save the DOFs, skipping irrelevant entries
+  100 continue
 !
 #if DEBUG_MODE
-  if (iprint.eq.1) then
-     write(*,*) 'dhpfaceV: ncase = ', ncase
-  endif
+      if (iprint.eq.1) then
+        write(*,*) 'dhpfaceV: ncase = ', ncase
+      endif
 #endif
 !
-!------------------------------------------------------
-! 
-! use this subroutine to flag the phys. attr. that do require Dirichlet dof update
-! Jaime, Aug. 2020
-  call node_physics_dirichlet(Mdle,nrv+nre+Iface,Dflag)
-! 
-  ivarV=0; nvarV=0
+!  ...initialize global variable counter, and node local variable counter
+      ivarV=0; nvarV=0
 !
-! loop through multiple copies of variables
-  do j=1,NRCOMS
+!  ...loop through multiple copies of variables
+      do j=1,NRCOMS
 !
-!   loop through physical attributes
-    do i=1,NR_PHYSA
+!  .....initiate the BC component counter
+        ic=0
 !
-!     loop through components
-      do k=1,NR_COMP(i)
-        select case(DTYPE(i))
-        case('normal')
-          ivarV = ivarV + 1
-          if (ncase(i).eq.1) then
-            nvarV = nvarV + 1
-            if (Dflag(i)) ZnodV(nvarV,1:ndofV_face) = zuV(1:ndofV_face,ivarV)
-          endif
-        end select
+!  .....loop through physical attributes
+        do i=1,NR_PHYSA
+!
+!  .......loop through components
+          do k=1,NR_COMP(i)
+!
+!  .........if the variable is supported by the node, update the BC component counter
+            if (ncase(i).eq.1) ic=ic+1
+!
+!  .........select the discretization type
+            select case(DTYPE(i))
+!
+!  .........H(div) component
+            case('normal')
+!
+!  ...........update global counter
+              ivarV = ivarV + 1
+!
+!  ...........if the variable is supported by the node
+              if (ncase(i).eq.1) then
+!
+!  .............update node local counter
+                nvarV = nvarV + 1
+!
+!  .............do not write dof if physics attribute is deactivated
+                if (.not. PHYSAm(i)) exit
+!
+!  .............store Dirichlet dof
+                if (ibcnd(ic).eq.1) ZnodV(nvarV,1:ndofV_face) = zuV(1:ndofV_face,ivarV)
+              endif
+            end select
+          enddo
+        enddo
       enddo
-    enddo
-  enddo
 !
-end subroutine dhpfaceV
+#if DEBUG_MODE
+      if (iprint.eq.1) call result
+#endif
+!
+  end subroutine dhpfaceV
 

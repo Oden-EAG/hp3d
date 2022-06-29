@@ -9,6 +9,7 @@
 !! @param[in]  Etav         - reference coordinates of the element vertices
 !! @param[in]  Type         - element (middle node) type
 !! @param[in]  Icase        - the edge node case
+!! @param[in]  Bcond        - the edge node BC flag
 !! @param[in]  Nedge_orient - edge orientation
 !! @param[in]  Nface_orient - face orientation (not used)
 !! @param[in]  Norder       - element order
@@ -21,7 +22,7 @@
 !-----------------------------------------------------------------------
 !
 #include "typedefs.h"
-  subroutine dhpedgeH(Mdle,Iflag,No,Etav,Type,Icase,&
+  subroutine dhpedgeH(Mdle,Iflag,No,Etav,Type,Icase,Bcond,&
                       Nedge_orient,Nface_orient,Norder,Iedge,&
                       ZdofH, ZnodH)
 !
@@ -35,7 +36,7 @@
 !-----------------------------------------------------------------------
 !
   integer,           intent(in)    :: Iflag,No,Mdle
-  integer,           intent(in)    :: Icase,Iedge
+  integer,           intent(in)    :: Icase,Bcond,Iedge
   real(8),           intent(in)    :: Etav(3,8)
   character(len=4),  intent(in)    :: Type
   integer,           intent(in)    :: Nedge_orient(12)
@@ -53,7 +54,7 @@
   real(8), dimension(MAX_NINT1)         :: wa_list
   real(8)                               :: wa, weight
 !
-! work space for shape3H
+! work space for shape3DH
   integer                               :: nrdofH
   integer, dimension(19)                :: norder_1
   real(8), dimension(MAXbrickH)         :: shapH
@@ -76,8 +77,9 @@
 ! derivatives of Dirichlet date wrt reference coordinates
   VTYPE :: zdvalHdeta(MAXEQNH,3)
 !
-! decoded case for the face node
+! decoded case and BC flags for the edge node
   integer, dimension(NR_PHYSA)          :: ncase
+  integer, dimension(NRINDEX)           :: ibcnd
 !
 ! work space for linear solvers
   integer                               :: naH,info
@@ -91,16 +93,19 @@
 #endif
 !
 ! misc work space
-  integer :: iprint,nrv,nre,nrf,i,j,k,ivarH,nvarH,kj,ki,&
-             ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_Edge,iflag1
-! 
-  logical :: Dflag(NR_PHYSA)
+  integer :: nrv,nre,nrf,i,j,k,ivarH,nvarH,kj,ki,&
+             ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_Edge,iflag1,ic
+!
+  logical :: is_homD
+!
+#if DEBUG_MODE
+  integer :: iprint = 0
+#endif
 !
 !----------------------------------------------------------------------
 !
   nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
 !
-  iprint = 0
 #if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Icase,Iedge,Type
@@ -120,6 +125,13 @@
 ! # of edge dof
   call ndof_nod('medg',norder(Iedge), &
                 ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_edge)
+!
+! check if a homogeneous Dirichlet node
+  call homogenD('contin',Icase,Bcond, is_homD,ncase,ibcnd)
+  if (is_homD) then
+    zuH = ZERO
+    go to 100
+  endif
 !
 ! if # of dof is zero, return, nothing to do
   if (ndofH_edge.eq.0) return
@@ -333,50 +345,53 @@
   endif
 #endif
 !
-! save dof's, skipping irrelevant entries
-! 
-! use this subroutine to flag the phys. attr. that do require Dirichlet dof update
-! Jaime, Aug. 2020
-  call node_physics_dirichlet(Mdle,nrv+Iedge,Dflag)
-! 
+!  ...save the DOFs, skipping irrelevant entries
+ 100  continue
 !
-! decoded node case, indicating supported variables
-  call decod(Icase,2,NR_PHYSA, ncase)
+!  ...initialize global variable counter, and node local variable counter
+      ivarH=0 ; nvarH=0
 !
-! initialize global variable counter, and node local variable counter
-  ivarH=0 ; nvarH=0
+!  ...loop through multiple copies of variables
+      do j=1,NRCOMS
 !
-! loop through multiple copies of variables
-  do j=1,NRCOMS
+!  .....initiate the BC component counter
+        ic=0
 !
-!   loop through physical attributes
-    do i=1,NR_PHYSA
+!  .....loop through physical attributes
+        do i=1,NR_PHYSA
 !
-!     loop through components of physical attribute
-      do k=1,NR_COMP(i)
+!  .......loop through components of physical attribute
+          do k=1,NR_COMP(i)
 !
-        select case(DTYPE(i))
+!  .........if the variable is supported by the node, update the BC component counter
+            if (ncase(i).eq.1) ic=ic+1
 !
-!       H1 component
-        case('contin')
+!  .........select the discretization type
+            select case(DTYPE(i))
 !
-!         update global counter
-          ivarH = ivarH + 1
+!  .........H1 component
+            case('contin')
 !
-!         Dirichlet component
-          if (ncase(i).eq.1) then
+!  ...........update global counter
+              ivarH = ivarH + 1
 !
-!           update node local conter
-            nvarH = nvarH + 1
+!  ...........if the variable is supported by the node
+              if (ncase(i).eq.1) then
 !
-!           store Dirichlet dof
-            if (Dflag(i)) ZnodH(nvarH,1:ndofH_edge) = zuH(1:ndofH_edge,ivarH)
+!  .............update the node local counter
+                nvarH = nvarH + 1
 !
-          endif
-        endselect
+!  .............do not write dof if physics attribute is deactivated
+                if (.not. PHYSAm(i)) exit
+!
+!  .............store Dirichlet dof
+                if (ibcnd(ic).eq.1) ZnodH(nvarH,1:ndofH_edge) = zuH(1:ndofH_edge,ivarH)
+!
+              endif
+            end select
+          enddo
+        enddo
       enddo
-    enddo
-  enddo
 !
 !
-  end subroutine dhpedgeH
+      end subroutine dhpedgeH

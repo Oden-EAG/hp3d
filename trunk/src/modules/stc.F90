@@ -795,10 +795,10 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
 #if DEBUG_MODE
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Xb(nn,load)
- 7006                   format('stc_solout: nn,load,Xb(nn,load) = ',i4,i2,x,2e13.5)
+ 7006                   format('stc_solout: nn,load,Xb(nn,load) = ',i4,i2,1x,2e13.5)
                         write(*,7007) nod,j,ivar,NODES(nod)%dof%zdofH(ivar,j)
  7007                   format('stc_solout: nod,j,ivar,NODES(nod)%dof%zdofH(ivar,j)', &
-                               ' = ',i5,i3,i3,x,2e13.5)
+                               ' = ',i5,i3,i3,1x,2e13.5)
                      endif
 #endif
                   case default
@@ -849,7 +849,7 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
                         write(*,7006) nn,load,Xb(nn,load)
                         write(*,7009) nod,j,ivar,NODES(nod)%dof%zdofE(ivar,j)
  7009                   format('stc_solout: nod,j,ivar,NODES(nod)%dof%zdofE(ivar,j)', &
-                               ' = ',i5,i3,i3,x,2e13.5)
+                               ' = ',i5,i3,i3,1x,2e13.5)
                      endif
 #endif
                   case default
@@ -900,7 +900,7 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
                         write(*,7006) nn,load,Xb(nn,load)
                         write(*,7010) nod,j,ivar,NODES(nod)%dof%zdofV(ivar,j)
  7010                   format('stc_solout: nod,j,ivar,NODES(nod)%dof%zdofV(ivar,j)', &
-                               ' = ',i5,i3,i3,x,2e13.5)
+                               ' = ',i5,i3,i3,1x,2e13.5)
                      endif
 #endif
                   case default
@@ -956,7 +956,7 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
                         write(*,7006) nn,load,Xb(nn,load)
                         write(*,7011) nod,j,ivar,NODES(nod)%dof%zdofQ(ivar,j)
  7011                   format('stc_solout: nod,j,ivar,NODES(nod)%dof%zdofQ(ivar,j)', &
-                               ' = ',i5,i3,i3,x,2e13.5)
+                               ' = ',i5,i3,i3,1x,2e13.5)
                      endif
 #endif
                   case default

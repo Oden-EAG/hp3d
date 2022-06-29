@@ -54,10 +54,10 @@ c
       double precision, intent(out) :: ShapH(MAXP+1)
       double precision, intent(out) :: GradH(MAXP+1)
 c
-      integer :: nsize(2), Norder(19)
-      Norder = 0; Norder(1) = Nord
+      integer :: nsize(2),norder(19)
+      norder = 0; norder(1) = Nord
 c
-      call checkorder('segm','contin',Norder,MAXP, nsize)
+      call checkorder('segm','contin',norder,MAXP, nsize)
       call shape1DHSeg(Xi,Nord,nsize, NrdofH,ShapH,GradH)
 c
       end subroutine shape1DH
@@ -96,10 +96,10 @@ c
       integer         , intent(out) :: NrdofQ
       double precision, intent(out) :: ShapQ(MAXP)
 c
-      integer :: nsize(2), Norder(19)
-      Norder = 0; Norder(1) = Nord
+      integer :: nsize(2),norder(19)
+      norder = 0; norder(1) = Nord
 c
-      call checkorder('segm','discon',Norder,MAXP, nsize)
+      call checkorder('segm','discon',norder,MAXP, nsize)
       call shape1DQSeg(Xi,Nord,nsize, NrdofQ,ShapQ)
 c
       end subroutine shape1DQ
@@ -154,12 +154,12 @@ c
       double precision, intent(out) :: ShapH(MAXquadH)
       double precision, intent(out) :: GradH(2,MAXquadH)
 c
-      integer :: nsize(2), Norder3D(19)
-      Norder3D = 0; Norder3D(1:5) = Norder
+      integer :: nsize(2),norder3D(19)
+      norder3D = 0; norder3D(1:5) = Norder
 c
       ShapH = 0.d0; GradH = 0.d0
 c
-      call checkorder(Type,'contin',Norder3D,MAXP, nsize)
+      call checkorder(Type,'contin',norder3D,MAXP, nsize)
       select case(Type)
       case('tria','mdlt')
         call shape2DHTri(Xi,Norder,NoriE,nsize, NrdofH,ShapH,GradH)
@@ -212,12 +212,12 @@ c
       double precision, intent(out) :: ShapE(2,MAXquadE)
       double precision, intent(out) :: CurlE(MAXquadE)
 c
-      integer :: nsize(2), Norder3D(19)
-      Norder3D = 0; Norder3D(1:5) = Norder
+      integer :: nsize(2),norder3D(19)
+      norder3D = 0; norder3D(1:5) = Norder
 c
       ShapE = 0.d0; CurlE = 0.d0
 c
-      call checkorder(Type,'tangen',Norder3D,MAXP, nsize)
+      call checkorder(Type,'tangen',norder3D,MAXP, nsize)
       select case(Type)
       case('tria','mdlt')
         call shape2DETri(Xi,Norder,NoriE,nsize, NrdofE,ShapE,CurlE)
@@ -272,12 +272,12 @@ c
       double precision, intent(out) :: ShapV(2,MAXquadV)
       double precision, intent(out) :: DivV(MAXquadV)
 c
-      integer :: nsize(2), Norder3D(19)
-      Norder3D = 0; Norder3D(1:5) = Norder
+      integer :: nsize(2),norder3D(19)
+      norder3D = 0; norder3D(1:5) = Norder
 c
       ShapV = 0.d0; DivV = 0.d0
 c
-      call checkorder(Type,'normal',Norder3D,MAXP, nsize)
+      call checkorder(Type,'normal',norder3D,MAXP, nsize)
       select case(Type)
       case('tria','mdlt')
         call shape2DVTri(Xi,Norder,NoriE,nsize, NrdofV,ShapV,DivV)
@@ -327,12 +327,12 @@ c
       integer         , intent(out) :: NrdofQ
       double precision, intent(out) :: ShapQ(MAXquadQ)
 c
-      integer :: nsize(2), Norder3D(19)
-      Norder3D = 0; Norder3D(1:5) = Norder
+      integer :: nsize(2),norder3D(19)
+      norder3D = 0; norder3D(1:5) = Norder
 c
       ShapQ = 0.d0
 c
-      call checkorder(Type,'discon',Norder3D,MAXP, nsize)
+      call checkorder(Type,'discon',norder3D,MAXP, nsize)
       select case(Type)
       case('tria','mdlt')
         call shape2DQTri(Xi,Norder,nsize, NrdofQ,ShapQ)

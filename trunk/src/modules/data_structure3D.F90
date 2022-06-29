@@ -44,30 +44,13 @@ module data_structure3D
 !  .....list   of physics attributes supported BY the element
         character(len=5), dimension(:), pointer :: physics
 !
-!  .....boundary conditions nickname (1 BC flag per face) for each
-!       attribute supported BY the element.
-!       Reserved values (see subroutine meshgen/set_index):
-!         H1 :
-!           0 - no BC
-!           1 - Dirichlet BC on all components
-!           3 - Dirichlet BC on 2nd and 3rd component
-!           4 - Dirichlet BC on 1st and 3rd component
-!           5 - Dirichlet BC on 1st and 2nd component
-!           6 - Dirichlet BC on 1st component
-!           7 - Dirichlet BC on 2nd component
-!           8 - Dirichlet BC on 3rd component
-!         H(div) :
-!           0 - no BC
-!           1 - Dirichlet BC on all components
-!           3 - Dirichlet BC on 1st component
-!           4 - Dirichlet BC on 2nd component
-!           5 - Dirichlet BC on 3rd component
-!           6 - Dirichlet BC on 2nd and 3rd component
-!           7 - Dirichlet BC on 1st and 3rd component
-!           8 - Dirichlet BC on 1st and 2nd component
-!         H(curl), L2 :
-!           0 - no BC
-!           1 - Dirichlet BC on all components
+!  .....array of boundary condition nicknames
+!       each entry specifies boundary conditions for one particular component;
+!       each entry is decimal-encoded per element face (1 BC flag per face)
+!       Values (per component and face):
+!         0   - No BC
+!         1   - Dirichlet BC
+!         2-9 - User-customizable BCs
         integer, dimension(:), pointer :: bcond
 !
 !  .....element nodal connectivities: vertices,edges,faces, middle node
@@ -96,24 +79,15 @@ module data_structure3D
         character(4)     :: type
 !
 !  .....case number indicating what physical attributes are supported
+!       (binary-encoded per physics variable)
         integer          :: case
 !
-!  .....nickname storing info about supported variables:
-!         0 - component does not exist
-!         1 - H1 component with Dirichlet BC flag
-!         2 - free H1 component
-!         3 - H(curl) component with Dirichlet BC flag
-!         4 - free H(curl) component
-!         5 - H(div) component with Dirichlet BC flag
-!         6 - free H(div) component
-!         7 - L2 component with Dirichlet BC flag
-!         8 - free L2 component
-        integer(1),dimension(:),pointer :: index
-!
-!  .....order of approximation
+!  .....order of approximation (decimal-encoded per direction (x,y,z))
         integer          :: order
 !
-!  .....boundary condition flag
+!  .....boundary condition flag (binary-encoded per component)
+!       0: component DOFs treated as unknowns
+!       1: component DOFs treated as Dirichlet DOFs
         integer          :: bcond
 !
 !  .....father node
@@ -123,7 +97,7 @@ module data_structure3D
         integer          :: first_son
         integer          :: nr_sons
 !
-!  .....refinement flag
+!  .....refinement flag (decimal-encoded per direction (x,y,z))
         integer          :: ref_kind
 !
 !  .....interface flag with GMP
@@ -302,20 +276,6 @@ module data_structure3D
 !
 !-----------------------------------------------------------------------
 !
-!  ...get index for a node
-      subroutine get_index(Nod, Indexd)
-!
-      integer Indexd(NRINDEX),i
-!
-      do i=1,NRINDEX
-        Indexd(i) = INT(NODES(Nod)%index(i),4)
-      enddo
-      ! call decodLonger(NODES(Nod)%index,10,NRINDEX, Indexd)
-!
-      end subroutine get_index
-!
-!-----------------------------------------------------------------------
-!
 !  ...allocate memory for data structure
       subroutine allocds
 !
@@ -345,7 +305,6 @@ module data_structure3D
       do nod=1,MAXNODS
         NODES(nod)%type = 'none'
         NODES(nod)%case = 0
-        nullify (NODES(nod)%index)
         NODES(nod)%order = 0
         NODES(nod)%act = .false.
         NODES(nod)%subd = -1
@@ -383,7 +342,6 @@ module data_structure3D
       deallocate(ELEMS)
 !
       do nod=1,MAXNODS
-        if (associated(NODES(nod)%index)) deallocate(NODES(nod)%index)
         if (associated(NODES(nod)%dof)) then
           if (associated(NODES(nod)%dof%coord)) deallocate(NODES(nod)%dof%coord)
           if (associated(NODES(nod)%dof%zdofH)) deallocate(NODES(nod)%dof%zdofH)
@@ -430,7 +388,6 @@ module data_structure3D
       do nod=MAXNODS+1,MAXNODS_NEW
         NODES_NEW(nod)%type = 'none'
         NODES_NEW(nod)%case = 0
-        NODES_NEW(nod)%index = 0
         NODES_NEW(nod)%order = 0
         NODES_NEW(nod)%act = .false.
         NODES_NEW(nod)%subd = -1
@@ -515,7 +472,6 @@ module data_structure3D
       do nod=1,NRNODS
         write(ndump,*) NODES(nod)%type
         write(ndump,*) NODES(nod)%case
-        write(ndump,*) NODES(nod)%index
         write(ndump,*) NODES(nod)%order
         write(ndump,*) NODES(nod)%bcond
         write(ndump,*) NODES(nod)%ref_kind
@@ -658,7 +614,6 @@ module data_structure3D
       do nod=1,NRNODS
         read(ndump,*) NODES(nod)%type
         read(ndump,*) NODES(nod)%case
-        read(ndump,*) NODES(nod)%index
         read(ndump,*) NODES(nod)%order
         read(ndump,*) NODES(nod)%bcond
         read(ndump,*) NODES(nod)%ref_kind
@@ -804,64 +759,42 @@ module data_structure3D
       end subroutine
 !
 !-----------------------------------------------------------------------
-      function Is_dirichlet(Nod)
+      function Is_Dirichlet(Nod)
       integer Nod
-      integer ibc(NR_PHYSA), loc
-      logical Is_dirichlet
-
-      call decod(NODES(Nod)%bcond,10,NR_PHYSA, ibc)
-      Is_dirichlet = .false.
+      logical Is_Dirichlet
+      integer ibc(NRINDEX), ic
+!
+      call decod(NODES(Nod)%bcond,2,NRINDEX, ibc)
+      Is_Dirichlet = .false.
+      do ic=1,NRINDEX
+        if (ibc(ic).eq.1) Is_Dirichlet = .true.
+      enddo
+!
+      end function Is_Dirichlet
+!
+!-----------------------------------------------------------------------
+      function Is_Dirichlet_attr(Nod,D_type)
+      integer Nod
+      character(6) D_type
+      logical Is_Dirichlet_attr
+      integer ibc(NRINDEX), ic, ivar, iphys
+!
+      call decod(NODES(Nod)%bcond,2,NRINDEX, ibc)
+      Is_Dirichlet_attr = .false.
+      ic = 0
       do iphys=1,NR_PHYSA
-        if (ibc(iphys).eq.1) then
-          Is_dirichlet = .true.
+        if (DTYPE(iphys).eq.D_type) then
+          do ivar=1,NR_COMP(iphys)
+            ic = ic + 1
+            if (ibc(ic).eq.1) Is_Dirichlet_attr = .true.
+          enddo
         else
-          call locate(ibc(iphys),DIRICHLET_LIST,NR_DIRICHLET_LIST, loc)
-          if (loc.ne.0) then
-            Is_dirichlet = .true.
-          endif
+          ic = ic + NR_COMP(iphys)
         endif
       enddo
 !
-      end function
-!----------------------------------------------------------------------
-      function Is_dirichlet_homogeneous(Nod)
-      integer Nod
-      integer ibc(NR_PHYSA), loc
-      logical Is_dirichlet_homogeneous
-
-      call decod(NODES(Nod)%bcond,10,NR_PHYSA, ibc)
-      Is_dirichlet_homogeneous = .false.
-      do iphys=1,NR_PHYSA
-        call locate(ibc(iphys),DIRICHLET_HOMOGENEOUS_LIST,  &
-                    NR_DIRICHLET_HOMOGENEOUS_LIST, loc)
-        if (loc.ne.0) then
-          Is_dirichlet_homogeneous = .true.
-        endif
-      enddo
+      end function Is_Dirichlet_attr
 !
-      end function
-!----------------------------------------------------------------------
-      subroutine check_dirichlet_homogeneous(istat)
-      integer :: istat
-
-!     local variables
-      integer :: ibc_number,ii
-
-!     we check if any flag number in list of homogeneous Dirichlet b.c.
-!     is also in the list
-      istat=0
-      do ii=1,SIZE(DIRICHLET_HOMOGENEOUS_LIST)
-        ibc_number=DIRICHLET_HOMOGENEOUS_LIST(ii)
-          call locate(ibc_number,DIRICHLET_LIST,NR_DIRICHLET_LIST, loc)
-          if (loc.eq.0) then
-            istat = 1
-            write(*,*) 'ERROR check_dirichlet_homogeneous: ',  &
-             'ibc=',ibc_number,'is not in DIRICHLET_LIST array'
-            return
-          endif
-      end do
-
-      end subroutine
 !----------------------------------------------------------------------
       function Is_right_handed(Mdle)
       integer :: Mdle
