@@ -28,26 +28,14 @@ module common_prob_data
 !------------------------------------------------------------------------------
 ! BOUNDARY CONDITION     (set_initial_mesh.F90)
   integer :: IBC_PROB
-  integer, parameter :: BC_NONE      = 0 ! To be removed
   integer, parameter :: BC_DIRICHLET = 1
   integer, parameter :: BC_NEUMANN   = 2
   integer, parameter :: BC_MIXED     = 8
-
-!------------------------------------------------------------------------------
-! EXACT SOLUTION (exact.F90)
-  integer :: IEXACT_PROB
-  integer, parameter :: IEXACT_TRILINEAR   = 1
-  integer, parameter :: IEXACT_POLYNOMIAL  = 2
-  integer, parameter :: IEXACT_EXPONENTIAL = 3
-  integer, parameter :: IEXACT_SINUSOIDAL  = 4
-  integer, parameter :: IEXACT_SINGULAR    = 5
 
 !
 !..NUMBER OF REFINEMENTS (JOB SCRIPT)
   integer :: IMAX
 
-! exponents defining exact polynomial solution (IEXACT_PROB = IEXACT_POLYNOMIAL)
-  integer :: NP1 = 3, NP2 = 2, NP3 = 2
 ! pi for sinusoidal solution
   real*8,  parameter :: PI = 4.d0*datan(1.d0)
 ! tolerance for singular solution

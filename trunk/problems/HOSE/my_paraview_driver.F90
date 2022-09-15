@@ -6,7 +6,6 @@ subroutine my_paraview_driver(IParAttr)
 !
    use upscale
    use physics,            only: DTYPE,NR_COMP,NR_PHYSA,PHYSA
-   !use data_structure3D,   only: NRCOMS
    use environment,        only: QUIET_MODE
    use paraview,           only: PARAVIEW_DUMP_ATTR,FILE_VIS, &
                                  VLEVEL,PARAVIEW_DUMP_GEOM

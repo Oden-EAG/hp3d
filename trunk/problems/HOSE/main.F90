@@ -91,8 +91,8 @@ program main
     write(6,1025) ' Initial polynomial order: ',IP
 !$OMP parallel
 !$OMP single
-    num_threads = omp_get_num_threads()
-    write(6,1025) ' Number of OpenMP threads: ',num_threads
+!     num_threads = omp_get_num_threads()
+!     write(6,1025) ' Number of OpenMP threads: ',num_threads
 1025 format(A,I2)
 !$OMP end single
 !$OMP end parallel
@@ -173,7 +173,8 @@ subroutine master_main()
       write(*,*) '     ---- Visualization, I/O ----        '
       write(*,*) 'HP3D graphics (graphb)..................1'
       write(*,*) 'HP3D graphics (graphg)..................2'
-      write(*,*) 'Paraview................................3'
+      write(*,*) 'Paraview (displacement).................3'
+      write(*,*) 'Paraview (stress).......................4'
       write(*,*) '                                         '
       write(*,*) '    ---- Print Data Structure ----       '
       write(*,*) 'Print arrays (interactive).............10'
@@ -185,7 +186,7 @@ subroutine master_main()
       write(*,*) '        ---- Refinements ----            '
       write(*,*) 'Single uniform h-refinement............20'
       write(*,*) 'Single uniform p-refinement............21'
-      write(*,*) 'Multiple uniform h-refs + solve........22   <--- fails'
+      write(*,*) 'Multiple uniform h-refs + solve........22'
       write(*,*) 'Single anisotropic h-refinement (z)....23'
       write(*,*) 'Refine a single element................26'
       write(*,*) '                                         '
@@ -238,6 +239,9 @@ subroutine master_main()
 !
 !     ...Paraview graphics
           case(3) ; call exec_case(idec)
+!
+!     ...Paraview graphics
+          case(4) ; call exec_case(idec)
 !
 !     ...Print data structure
           case(10,11)

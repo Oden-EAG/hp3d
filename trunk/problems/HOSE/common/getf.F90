@@ -88,7 +88,7 @@ subroutine getg(Mdle,Ibc,X,Rn, Gval)
 !
 ! initialize source terms
   Gval(1:3,1:NR_RHS) = 0.d0
-  !
+!
   select case(NEXACT)
 !==============================================================================
 !  UNKNOWN EXACT SOLUTION                                                      |

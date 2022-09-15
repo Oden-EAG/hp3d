@@ -53,7 +53,7 @@ subroutine exact_error
 !
 ! check that exact solution is indeed known
   if (NEXACT == 0) then
-    write(*,*) 'compute_error: UNKNOWN exact solution!'
+    write(*,*) 'exact_error: UNKNOWN exact solution!'
     return
   endif
 !
@@ -176,7 +176,7 @@ IF (.NOT. QUIET_MODE) THEN
 !
 !     check
       if (ivis > maxvis) then
-        write(*,*) 'compute_error: increase maxvis!'
+        write(*,*) 'exact_error: increase maxvis!'
         stop
       endif
 !
@@ -199,7 +199,7 @@ ENDIF
 !       open file
         open(unit=nin,file=trim(FILE_ERR),form='formatted',access='sequential',status='unknown',iostat=ic)
         if (ic /= 0) then
-          write(*,*)'compute_error: COULD NOT OPEN FILE! [0]'
+          write(*,*)'exact_error: COULD NOT OPEN FILE! [0]'
           stop
         endif
 !
@@ -224,7 +224,7 @@ ENDIF
 !       append to file
         open(unit=nin,file=trim(FILE_ERR),form='formatted',access='sequential',status='old',position='append',iostat=ic)
         if (ic /= 0) then
-          write(*,*)'compute_error: COULD NOT OPEN FILE! [1]'
+          write(*,*)'exact_error: COULD NOT OPEN FILE! [1]'
           stop
         endif
       endif
@@ -247,7 +247,7 @@ ENDIF
 !     close file
       close(unit=nin,iostat=ic)
       if (ic /= 0) then
-        write(*,*)'compute_error: COULD NOT CLOSE FILE!'
+        write(*,*)'exact_error: COULD NOT CLOSE FILE!'
         stop
       endif
 !

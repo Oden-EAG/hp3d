@@ -24,8 +24,6 @@ module near_incomp_module
 !$OMP THREADPRIVATE (EnrStiffness)
       real*8, dimension(3*MAXbrickHH+MAXbrickQQ,3*MAXbrickH+3*MAXbrickV+MAXbrickQ+MAXNRHS_MOD) :: EnrEverything
 !$OMP THREADPRIVATE (EnrEverything)
-!       real*8, dimension(3*MAXbrickH+3*MAXbrickV+MAXbrickQ,3*MAXbrickH+3*MAXbrickV+MAXbrickQ+MAXNRHS_MOD) :: FullDPG
-! !$OMP THREADPRIVATE (FullDPG)
 !     Gram matrix for the local Riesz matrix in LAPACK format
      real*8, dimension((3*MAXbrickHH+MAXbrickQQ)*(3*MAXbrickHH+MAXbrickQQ+1)/2) :: Gram
 !$OMP THREADPRIVATE (Gram)
