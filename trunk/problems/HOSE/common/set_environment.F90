@@ -38,14 +38,12 @@ subroutine set_environment
 !                        option label     // explanation                                   // default       // parameter
   call get_option_int(   '-p'               ,'Uniform order p of initial mesh approximation'  ,2               ,IP         )
   call get_option_int(   '-bc'              ,'Bound. Cond.: 1)Dirichlet, 2)Neumann, 8)Mixed'  ,BC_DIRICHLET    ,IBC_PROB   )
-  call get_option_int(   '-exact'           ,'Manufactured solution (integer: 1-5)'           ,IEXACT_TRILINEAR,IEXACT_PROB)
-  ! call get_option_int(   '-error-attribute' ,'1)Displacement, 2)Stress, 3)Combined, 4)Custom' ,DISPLACEMENT    ,IERROR_ATTR)
   call get_option_int(   '-norm-trial'      ,'1)L2, 2)Natural, 3)Custom'                      ,IERROR_NATURAL  ,IERROR_PROB)
   call get_option_int(   '-norm-test'       ,'1) Adj Graph, 2)Natural, 3)Custom'              ,MATHEMATICIANS  ,TEST_NORM  )
 !
 !..OpenMP threading
-  call get_option_int('-nthreads','Number of OpenMP threads',1,nthreads)
-  call omp_set_num_threads(nthreads)
+  ! call get_option_int('-nthreads','Number of OpenMP threads',1,nthreads)
+  ! call omp_set_num_threads(nthreads)
 !
 ! The variable dp defining enrichment in DPG problems - src/modules/parametersDPG
 !                        option label // explanation               // default  // parameter

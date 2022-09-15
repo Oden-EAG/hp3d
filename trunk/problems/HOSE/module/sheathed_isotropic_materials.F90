@@ -6,22 +6,18 @@ module sheathed_isotropic_materials
 !
 !  G E O M E T R Y
   real*8, parameter :: R_inside  = 0.5d0
-  ! real*8, parameter :: R_middle  = R_inside
   real*8, parameter :: R_middle  = 0.99d0
   real*8, parameter :: R_outside = 1.0d0
-  ! real*8, parameter :: R_middle  = R_outside
   real*8, parameter :: X_1       = 0.0d0
   real*8, parameter :: X_2       = 1.0d0
 !
 !  M A T E R I A L   D A T A
   real*8, parameter :: E_steel   = 2.0d4
-  ! real*8, parameter :: E_steel   = 2.0d0
   real*8, parameter :: E_rubber  = 1.0d0
   real*8, parameter :: NU_steel  = 0.285d0
-  real*8, parameter :: NU_rubber = 0.5d0 ! check division by zero in C
+  real*8, parameter :: NU_rubber = 0.5d0
 !
   real*8, parameter :: LAMBDA_steel  = E_steel*NU_steel/((1+NU_steel)*(1-2*NU_steel))
-  ! real*8, parameter :: LAMBDA_rubber = E_rubber*NU_rubber/((1+NU_rubber)*(1-2*NU_rubber))
   real*8, parameter :: MU_steel      = 0.5d0*E_steel/(1+NU_steel)
   real*8, parameter :: MU_rubber     = 0.5d0*E_rubber/(1+NU_rubber)
 !
@@ -29,9 +25,8 @@ module sheathed_isotropic_materials
   real*8, parameter :: OMEG  = 0.d0
 !
 !  Pressure
-  real*8, parameter :: P_inner =-1.d-1  !  -1.d1 for exact, -1.d-1 for challenge
-  ! real*8, parameter :: P_inner =-1.d2  !  -1.d1 for exact, -1.d-1 for challenge
-  real*8, parameter :: P_outer = 0.d0  !  -1.d1 for exact, 1.d0 for challenge
+  real*8, parameter :: P_inner =-1.d-1
+  real*8, parameter :: P_outer = 0.d0
 
 !  Kronecker's delta
   real*8, parameter, dimension(3,3) :: del =  &
@@ -65,7 +60,6 @@ contains
   elseif (Dom.eq.2) then
     !  RUBBER
     mu     = MU_rubber
-    ! lambda = LAMBDA_rubber
     if (NU_rubber.eq.0.5d0) then
       write(*,*) 'Error: cannot define C in this way for an incompressible material'
       stop 1
@@ -244,7 +238,7 @@ contains
   !
   mag = X(2)**2+X(3)**2
   mag = dsqrt(mag)
-  !  define the tensor
+
   if (mag.gt.R_middle) then
     E = E_steel
   elseif (mag.le.R_middle) then

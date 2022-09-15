@@ -25,10 +25,14 @@ subroutine exec_case(idec)
 !
    select case(idec)
 !
-!  ...paraview graphics
+!  ...paraview graphics (displacement components only)
       case(3)
-         iParAttr(1:NR_PHYSA) = (/0,0,3,0,0/) ! write displacement components only
+         iParAttr(1:NR_PHYSA) = (/0,0,3,0,0/)
          call my_paraview_driver(iParAttr)
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+!  ...paraview graphics (stresses)
+      case(4)
+         call paraview_custom_driver
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 !  ...print data structure (interactive)

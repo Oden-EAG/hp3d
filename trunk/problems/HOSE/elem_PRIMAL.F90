@@ -408,7 +408,7 @@ subroutine elem_DPG_PRIMAL(Mdle)
         write(*,*) 'EnrField = '
         do i=1,3*nrdofHH+1
           write(*,6002) i,EnrField(i,1:3*nrdofH)
- 6002     format('i = ',i4,'  ',15(/,10e12.5))
+ 6002     format('i = ',i4,'  ',15( / ,10e12.5))
         enddo
 
         call pause
@@ -497,77 +497,5 @@ subroutine elem_DPG_PRIMAL(Mdle)
         BLOC(i)%array(1:n,1:NR_RHS) = FullDPG(n1+1:n2,m1+1:m2)
         n1=n2
       enddo
-!
-!-----------------------------------------------------------------------------------
-!     T E S T S    A N D    P R I N T    S T A T E M E N T S                       |
-!-----------------------------------------------------------------------------------
-!
-!       if (iprint.ge.2) then
-!   !  ...check symmetry
-!         if (iprint.ge.2) then
-!           diffmax = ZERO; dmax = ZERO
-!           do k1=1,3*nrdofH
-!             do k2=k1,3*nrdofH
-!               diffmax = max(diffmax,abs(Aloc11(k1,k2)-Aloc11(k2,k1)))
-!               dmax = max(dmax,abs(Aloc11(k1,k2)))
-!             enddo
-!           enddo
-!           if (diffmax/dmax.gt.SYMMETRY_TOL) then
-!             write(*,7021) diffmax, dmax
-!      7021   format('elem_DPG_PRIMAL: diffmax,dmax FOR Aloc11 = ',2e12.5)
-!             call pause
-!           endif
-!           diffmax = ZERO; dmax = ZERO
-!           do k1=1,nrdofV
-!             do k2=k1,nrdofV
-!               diffmax = max(diffmax,abs(Aloc22(k1,k2)-Aloc22(k2,k1)))
-!               dmax = max(dmax,abs(Aloc22(k1,k2)))
-!             enddo
-!           enddo
-!           if (diffmax/dmax.gt.SYMMETRY_TOL) then
-!             write(*,7022) diffmax, dmax
-!      7022   format('elem_DPG_PRIMAL: diffmax,dmax FOR Aloc22 = ',2e12.5)
-!             call pause
-!           endif
-!           diffmax = ZERO; dmax = ZERO
-!           do k1=1,nrdofH
-!             do k2=1,nrdofv
-!               diffmax = max(diffmax,abs(Aloc12(k1,k2)-Aloc21(k2,k1)))
-!               dmax = max(dmax,abs(Aloc12(k1,k2)))
-!             enddo
-!           enddo
-!           if (diffmax/dmax.gt.SYMMETRY_TOL) then
-!             write(*,7023) diffmax, dmax
-!      7023   format('elem_DPG_PRIMAL: diffmax,dmax FOR Aloc12 = ',2e12.5)
-!             call pause
-!           endif
-!         endif
-!       endif
-! !
-! !  ...print statments
-!       if (iprint.ge.1) then
-!         write(*,7010)
-!  7010   format('elem_DPG_PRIMAL: Bloc1,Bloc2 = ')
-!         write(*,7011) Bloc1(1:3*NrdofH,1)
-!         write(*,7011) Bloc2(1:3*NrdofV,1)
-!  7011   format(10e12.5)
-!         write(*,7012)
-!  7012   format('elem_DPG_PRIMAL: Aloc11 = ')
-!         do i=1,3*NrdofH
-!           write(*,7013) i,Aloc11(i,1:3*NrdofH)
-!  7013     format('i = ',i3,10(/,10e12.5))
-!         enddo
-!         write(*,7014)
-!  7014   format('elem_DPG_PRIMAL: Aloc12 = ')
-!         do i=1,3*NrdofH
-!           write(*,7013) i,Aloc12(i,1:3*NrdofV)
-!         enddo
-!         write(*,7015)
-!  7015   format('elem_DPG_PRIMAL: Aloc22 = ')
-!         do i=1,3*NrdofV
-!           write(*,7013) i,Aloc22(i,1:3*NrdofV)
-!         enddo
-!       endif
-! !
 !
 end subroutine elem_DPG_PRIMAL

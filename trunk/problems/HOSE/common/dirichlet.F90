@@ -67,8 +67,6 @@ subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
       !  INNER FACE
       ! if (r.lt.R_middle) then
       if (r.lt.0.75d0) then
-        ! ValV = P_inner*ValV
-        ! ValV = P_inner*(0.495d0*dsin(1.d0*theta)+0.505d0)*ValV
         ValV = P_inner*dcos(1.d0*theta)**2*ValV
       !  OUTER FACE
       else
@@ -78,8 +76,6 @@ subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
       ! ENDS
       if ((abs(X(1)-X_1).le.tol).or.(abs(X(1)-X_2).le.tol)) then
         ValV=0.d0
-        ! ValV = P_inner*dcos(1.d0*theta)**2  &
-        !      * (R_outside-r)/(R_outside-R_inside)*ValV
       endif
 
 !==============================================================================
@@ -91,26 +87,6 @@ subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
                           ValV,DvalV,d2valV, valQ,dvalQ,d2valQ)
     case(2)
       call find_domain(Mdle, ndom)
-
-      ! ValV(1,1)=1.0d0
-      ! ValV(2,2)=1.0d0
-      ! ValV(3,3)=1.0d0
-
-      ! tol=1.0d-10
-
-      ! !  exterior faces
-      ! r = dsqrt(X(2)**2+X(3)**2)
-      ! if (r.lt.0.75d0) then
-      ! ! if (r.lt.R_middle) then
-      !   ValV = P_inner*ValV
-      ! else
-      !   ValV = P_outer*ValV
-      ! endif
-
-      ! !  ends of rod
-      ! if ((abs(X(1)-X_1).le.tol).or.(abs(X(1)-X_2).le.tol)) then
-      !   ValV=0.d0
-      ! endif
 
       !  add value of U (for RBM points)
       call exact_solution(X,ndom, u,gradU,epsilon,sigma)

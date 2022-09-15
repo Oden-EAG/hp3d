@@ -2,7 +2,10 @@ SRC_MODULE  = \
             ./module/common_prob_data.F90 \
             ./module/sheathed_isotropic_materials.F90 \
             ./module/primal_module.F90 \
-            ./module/uweak_module.F90
+            ./module/uweak_module.F90 \
+            ./paraview/paraview_attr_custom.F90 \
+            ./paraview/paraview_custom_driver.F90 \
+            ./paraview/soln2vtk.F90 \
 
 SRC_COMMON = \
             ./common/customize_geometry.F90 \
@@ -10,7 +13,7 @@ SRC_COMMON = \
             ./common/set_environment.F90 \
             ./common/initialize.F90 \
             ./common/finalize.F90 \
-            ./common/solutions.F90 \
+            ./common/solution.F90 \
             ./common/residual.F90 \
             ./common/uniform_href.F90 \
             ./common/getf.F90

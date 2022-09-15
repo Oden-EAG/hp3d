@@ -561,14 +561,7 @@
 !
 !  ...compute the residual
       Resid = DDOT(3*nrdofVV+3*nrdofHH,EnrResidc,1,EnrResid,1)
-! !  ...compute the residual
-!       Resid = 0.d0
-!       ! do k=3*nrdofVV+1,3*nrdofVV+6*nrdofQQ
-!       do k=1,3*nrdofVV+3*nrdofHH
-!         Resid = Resid  &
-!               + EnrResidc(k)*EnrResid(k)
-!       enddo
-! !
+!
 !-----------------------------------------------------------------------------------
 !             R E F I N E M E N T  F L A G S                                       |
 !-----------------------------------------------------------------------------------

@@ -64,7 +64,7 @@ nthreads=12
 export KMP_STACKSIZE=64M # p=5
 
 # Launch MPI code...
-ibrun ./pois -job 1 -p 5 -isol 0 -imax 12 -maxnods 1025000 -nthreads ${nthreads}
+ibrun ./hose -job 1 -p 5 -isol 0 -imax 12 -maxnods 1025000 -nthreads ${nthreads}
 
 date
 # ---------------------------------------------------
