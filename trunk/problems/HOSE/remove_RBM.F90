@@ -14,15 +14,17 @@ subroutine remove_RBM
 !
 ! This is a hack to eliminate vertex DOF in the trace variables.
 ! The 'known' dof are eliminated by static condensation locally
-!       ___ ___ _______________
-!      /8__C__6\               \
+!       ___C___ _______________
+!      /8__ __6\               \
 !     / /7_|_5\ \               \
-!    / /_/   \_\B\ _ _ _ _ _ _ _ \      x--->
+!    / /_/   \_\ \B_ _ _ _ _ _ _ \      x--->
 !    \ \4\_ _/2/ /               /
 !     \3\__|__/1/               /
-!      \___A___/_______________/
-!
-!  Vertex DOF are introduced at A,B,C
+!      \___ ___/_______________/
+!          A
+!  Elements 1,3,6,8 : Steel
+!  Elements 2,4,5,7 : Rubber
+!  Vertex dofs are removed at A,B,C
 !
 !  A
   pt=1
