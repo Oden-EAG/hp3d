@@ -95,7 +95,7 @@ echo
 # L-shape domain problem
 # gdb --args \
 ./$elast \
-    -file-geometry ../common/geometries/other/sheathed_tube_cyl \
+    -file-geometry ../common/geometries/other/hose \
     -file-control $control \
     -file-phys $physics \
     -file-history $history \

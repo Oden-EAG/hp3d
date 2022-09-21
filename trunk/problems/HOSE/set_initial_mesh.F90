@@ -84,13 +84,13 @@ subroutine set_initial_mesh(Nelem_order)
 !   SET PHYSICS
 !
     select case(iel)
-!   Primal
+!   Primal (steel)
     case(1,3,6,8)    
       ELEMS(iel)%nrphysics = 2
       allocate(ELEMS(iel)%physics(2))
       ELEMS(iel)%physics(1) = 'TrDis'
       ELEMS(iel)%physics(2) = 'TrStr'
-!   Ultra-weak
+!   Ultra-weak (rubber)
     case(2,4,5,7)
       ELEMS(iel)%nrphysics = 5
       allocate(ELEMS(iel)%physics(5))
@@ -101,46 +101,26 @@ subroutine set_initial_mesh(Nelem_order)
       ELEMS(iel)%physics(5) = 'Omega'
     end select
 !
-!   SET BC FLAGS: 0 - no BC ; 1 - Dirchlet ; 2 - Neumann ; 3 - Robin ; >3 - Mixed
+!   SET BC FLAGS: 0 - Neumann ; 1 - Dirchlet
 !
    ibc(1:6,1:NRINDEX) = 0
 !
-!   IBC_PROB : 0 - uniform traction ; 1 - clamped ends ; 2 - free ends ; 3 - periodic ends
-!       ___ ___ _____________________________
-!      /8__|__6\                             \
-!     / /7_|_5\ \                             \
-!    /_/_/   \_\_\  _  _  _  _  _  _  _  _  _  \
-!    \ \4\_ _/2/ /                             /
-!     \3\__|__/1/                             /
-!      \___|___/_____________________________/
+!   IBC_PROB : 1 - clamped ends ; 2 - free ends ; 3 - non-penetration at ends
+!         ___ ___ _______________
+!        /8__|__6\               \
+!       / /7_|_5\ \               \
+!      /_/_/   \_\_\ _ _ _ _ _ _ _ \      x--->
+!      \ \4\_ _/2/ /               /
+!       \3\__|__/1/               /
+!        \___|___/_______________/
 !
-!        elements 1,3,6,8 : E = 1000, nu = 0.2
-!        elements 2,4,5,7 : E = 1, nu = 0.5
+!        elements 1,3,6,8 : Steel
+!        elements 2,4,5,7 : Rubber
 !
     select case(IBC_PROB)
 !
-!   Prescribed displacement over entire boundary
-    case(0)
-      do ifc=1,nface(etype)
-         neig = ELEMS(iel)%neig(ifc)
-         select case(neig)
-         case(0)
-            ibc(ifc,1) = 1  ! 1st H1 component
-            ibc(ifc,2) = 1  ! 2nd H1 component
-            ibc(ifc,3) = 1  ! 3rd H1 component
-            ! ! ibcflag      -> physics variable
-            ! ibc(ifc,1:3)   = 1  ! TrDis (H1)
-            ! ibc(ifc,4:6)   = 0  ! TrStr (H(div))
-            ! ibc(ifc,7:9)   = 0  ! Displ (L2)
-            ! ibc(ifc,10:15) = 0  ! Stres (L2)
-            ! ibc(ifc,16:18) = 0  ! Omega (L2)
-            ! ! Note that L2 variables should not take values at the boundary,
-            ! ! so their ibc should always be 0 (no BC).
-         end select
-      enddo
-!
-!   Prescribed displacement at ends of pipe
-!   Pressure BCs at exterior faces of pipe
+!   Prescribed displacement at ends of hose
+!   Pressure BCs at exterior faces of hose
     case(1)
 
       ! free exterior faces
@@ -153,62 +133,51 @@ subroutine set_initial_mesh(Nelem_order)
       ibc(ifc,5) = 1  ! 2nd H(div) component
       ibc(ifc,6) = 1  ! 3rd H(div) component
 
-      ! ibc(ifc,1:3)   = 0  ! TrDis (H1)
-      ! ibc(ifc,4:6)   = 1  ! TrStr (H(div))
-      ! ibc(ifc,7:9)   = 0  ! Displ (L2)
-      ! ibc(ifc,10:15) = 0  ! Stres (L2)
-      ! ibc(ifc,16:18) = 0  ! Omega (L2)
-
       ! clamped ends
       do ifc=3,6
          ibc(ifc,1) = 1  ! 1st H1 component
          ibc(ifc,2) = 1  ! 2nd H1 component
          ibc(ifc,3) = 1  ! 3rd H1 component
       enddo
+
+      ! Note that L2 variables should not take values at the boundary,
+      ! so their ibc should always be 0 (no BC).
 !
-!   Pressure BCs at exterior faces of pipe
+!   Free ends and pressure BCs at exterior faces of hose
     case(2)
       do ifc=1,nface(etype)
           neig = ELEMS(iel)%neig(ifc)
           select case(neig)
           case(0)
-            ! ibcflag      -> physics variable
-            ibc(ifc,4:6) = 1  ! TrStr (H(div))
-            ! Note that L2 variables should not take values at the boundary,
-            ! so their ibc should always be 0 (no BC).
+            ibc(ifc,4) = 1  ! 1st H(div) component
+            ibc(ifc,5) = 1  ! 2nd H(div) component
+            ibc(ifc,6) = 1  ! 3rd H(div) component
           end select
         enddo
-
 !
-!   Pressure BCs at exterior faces of pipe
+!   Ends of hose cannot move in the x-direction
+!   Pressure BCs at exterior faces of hose
 !   In this case, it is enough to incorporate zero displacement conditions in the x-direction
-!   so long as the pressure is symmetric in x
-   !  case(3)
+    case(3)
 
-   !    ! exterior faces
-   !    select case(iel)
-   !    case(1,3,5,7); ifc=1
-   !    case(2,4,6,8); ifc=2
-   !    end select
+      ! exterior faces
+      select case(iel)
+      case(1,3,5,7); ifc=1
+      case(2,4,6,8); ifc=2
+      end select
 
-   !    ibc(ifc,1) = 0  ! TrDis (H1)
-   !    ibc(ifc,2) = 1  ! TrStr (H(div))
-   !    ibc(ifc,3) = 0  ! Displ (L2)
-   !    ibc(ifc,4) = 0  ! Stres (L2)
-   !    ibc(ifc,5) = 0  ! Omega (L2)
+      ibc(ifc,4) = 1  ! 1st H(div) component
+      ibc(ifc,5) = 1  ! 2nd H(div) component
+      ibc(ifc,6) = 1  ! 3rd H(div) component
 
-   !    ! periodic ends
-   !    do ifc=3,6
-   !      neig = ELEMS(iel)%neig(ifc)
-   !      select case(neig)
-   !      case(0)
-   !        ibc(ifc,1) = 6  ! TrDis (H1)
-   !        ibc(ifc,2) = 6  ! TrStr (H(div))
-   !        ibc(ifc,3) = 0  ! Displ (L2)
-   !        ibc(ifc,4) = 0  ! Stres (L2)
-   !        ibc(ifc,5) = 0  ! Omega (L2)
-   !      end select
-   !    enddo
+      ! ends of hose
+      do ifc=3,6
+        neig = ELEMS(iel)%neig(ifc)
+        select case(neig)
+        case(0)
+         ibc(ifc,1) = 1  ! 1st H1 component
+        end select
+      enddo
 
       end select
 !
