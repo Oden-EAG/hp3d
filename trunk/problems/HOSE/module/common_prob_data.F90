@@ -30,7 +30,7 @@ module common_prob_data
   integer :: IBC_PROB
   integer, parameter :: BC_DIRICHLET = 1
   integer, parameter :: BC_NEUMANN   = 2
-  integer, parameter :: BC_MIXED     = 8
+  integer, parameter :: BC_MIXED     = 3
 
 !
 !..NUMBER OF REFINEMENTS (JOB SCRIPT)
