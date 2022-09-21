@@ -77,7 +77,7 @@ program main
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    call initialize
 !
-!   IBC_PROB : 0 - uniform traction ; 1 - clamped ends ; 2 - free ends ; 3 - periodic ends
+!   IBC_PROB : 1 - clamped ends ; 2 - free ends ; 3 - non-penetration ends
     if ((IBC_PROB.eq.2).or.(IBC_PROB.eq.3)) then
       call remove_RBM(IBC_PROB)
       call update_Ddof
