@@ -93,8 +93,8 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
       call element_error(ELEM_SUBD(iel),iflag,           &
                          errorH,errorE,errorV,errorQ,    &
                          rnormH,rnormE,rnormV,rnormQ)
-      error_subd = error_subd + errorH
-      rnorm_subd = rnorm_subd + rnormH
+      error_subd = error_subd + errorQ
+      rnorm_subd = rnorm_subd + rnormQ
    enddo
 !$OMP END DO
 !$OMP END PARALLEL
@@ -136,7 +136,7 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
       write(*,*) 'HISTORY OF REFINEMENTS'
       write(*,110)
   110 format(' mesh |',' nrdof_tot |',' nrdof_con | ',' |',   &
-             ' field error  |','rel field error|','   rate ')
+             '   L2 error   |',' rel L2 error  |','   rate ')
       write(*,*)
 !
       do i=1,istep
