@@ -38,9 +38,8 @@ subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
   real*8, dimension(3,3) :: gradU,epsilon,sigma
 !--------------------------------------------------------------------
 ! miscellaneous
-  integer :: i,j,ndom
-  real*8 :: r,theta,tol
-  ! real*8,dimension(3) :: nHat
+  integer :: ndom
+  real(8) :: r,theta,tol
 !--------------------------------------------------------------------
 !
 ! printing flag : 0 - silent ; 1 - verbose

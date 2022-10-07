@@ -63,7 +63,7 @@ subroutine exact_error
   errorV=0.d0 ; rnormV=0.d0
   errorQ=0.d0 ; rnormQ=0.d0
 !
-  333  write(*,7000)
+  write(*,7000)
   7000 format('Declare the attribute to calculate the error of: ',  &
               '   1)Displacement, 2)Stress, 3)Combined, 4)Lagrange Multiplier')
   read(*,*) IERROR_ATTR
