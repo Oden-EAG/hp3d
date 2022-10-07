@@ -63,6 +63,7 @@ nthreads=12
 # Set OpenMP stack size per thread
 export KMP_STACKSIZE=64M # p=5
 
+# TODO: not tested yet
 # Launch MPI code...
 ibrun ./hose -job 1 -p 5 -isol 0 -imax 12 -maxnods 1025000 -nthreads ${nthreads}
 
