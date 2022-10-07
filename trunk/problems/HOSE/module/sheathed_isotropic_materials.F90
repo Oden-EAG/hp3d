@@ -101,6 +101,9 @@ contains
     !  RUBBER
     nu = NU_rubber
     e  = E_rubber
+  else
+    write(*,*) 'getA: invalid Dom = ', Dom
+    stop
   endif
 
   !  define the compliance tensor
@@ -232,7 +235,6 @@ contains
     real*8,dimension(3), intent(in)  :: X
     real*8,              intent(out) :: E
   !------------------------------------------------------------------------------
-    integer :: i,j,k,l
     real*8 :: mag
   !------------------------------------------------------------------------------
   !

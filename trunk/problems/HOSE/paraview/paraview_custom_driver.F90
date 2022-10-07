@@ -5,16 +5,14 @@
 subroutine paraview_custom_driver
 !
       use upscale
-      use physics          , only : DTYPE,NR_COMP,NR_PHYSA,PHYSA
-      use data_structure3D , only : NRCOMS
-      use environment      , only : PREFIX,QUIET_MODE
-      use paraview         , only : PARAVIEW_DUMP_ATTR,VLEVEL,FILE_VIS,PARAVIEW_DOMAIN
+      use environment      , only : QUIET_MODE
+      use paraview         , only : VLEVEL,FILE_VIS
       use mpi_param        , only : RANK,ROOT
       !
       implicit none
       character*8, parameter, dimension(3) :: sAttr = (/'sigma_rr','sigma_rt','sigma_tt'/)
       real*8 :: time
-      integer :: idx,iattr,iload,icomp,scomp
+      integer :: scomp
 !
       integer,save :: id = -1
       logical,save :: initialized = .FALSE.
