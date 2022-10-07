@@ -7,6 +7,7 @@
 COMPLEX    ?= 0
 DEBUG      ?= 0
 
+HP3D_USE_OPENMP    ?= 0
 HP3D_USE_INTEL_MKL ?= 0
 
 ####################################################
@@ -37,6 +38,7 @@ endif
 # are preprocessed according to certain directives
 CCDEFS    = -D"C_MODE=$(COMPLEX)" \
             -D"DEBUG_MODE=$(DEBUG)" \
+            -D"HP3D_USE_OPENMP=$(HP3D_USE_OPENMP)" \
             -D"HP3D_USE_INTEL_MKL=$(HP3D_USE_INTEL_MKL)"
 
 # -- Includes --
@@ -125,6 +127,7 @@ fastlib :
 	(cp -f $(FRONTAL_PATH)/$(FRONTAL_NAME) $(LIB_PATH));
 	@echo "------------------------------------------"
 	@echo " - COMPLEX, DEBUG         :" $(COMPLEX) $(DEBUG)
+	@echo " - HP3D_USE_OPENMP        :" $(HP3D_USE_OPENMP)
 	@echo " - HP3D_USE_INTEL_MKL     :" $(HP3D_USE_INTEL_MKL)
 	@echo " - Preprocessor options   :" $(CCDEFS)
 	@echo " - HP3D Library           :" $(LIB_PATH)/$(HP3D_LIBNAME)

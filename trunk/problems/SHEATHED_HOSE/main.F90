@@ -31,7 +31,9 @@ program main
    integer :: i, ierr
 !
 !..OMP variables
+#if HP3D_USE_OPENMP
    integer :: num_threads,omp_get_num_threads
+#endif
 !
 !..timer
    real(8) :: MPI_Wtime,start_time,end_time
@@ -76,26 +78,30 @@ program main
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    call initialize
 !
-!   IBC_PROB : 1 - clamped ends ; 2 - free ends ; 3 - non-penetration ends
-    if ((IBC_PROB.eq.2).or.(IBC_PROB.eq.3)) then
+!  IBC_PROB : 1 - clamped ends ; 2 - free ends ; 3 - non-penetration ends
+   if ((IBC_PROB.eq.2).or.(IBC_PROB.eq.3)) then
       call remove_RBM
       call update_Ddof
-    endif
+   endif
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
    if (RANK .eq. ROOT) write(6,1015) end_time-start_time
  1015 format(' initialize : ',f12.5,' seconds',/)
 !
 !..determine number of omp threads running
- if (RANK .eq. ROOT) then
-    write(6,1025) ' Initial polynomial order: ',IP
-!$OMP parallel
-!$OMP single
-!     num_threads = omp_get_num_threads()
-!     write(6,1025) ' Number of OpenMP threads: ',num_threads
-1025 format(A,I2)
-!$OMP end single
-!$OMP end parallel
- endif
+ 1025 format(A,I2)
+   if (RANK .eq. ROOT) then
+      write(6,1025) ' Initial polynomial order: ',IP
+   endif
+#if HP3D_USE_OPENMP
+   if (RANK .eq. ROOT) then
+   !$OMP parallel
+   !$OMP single
+      num_threads = omp_get_num_threads()
+      write(6,1025) ' Number of OpenMP threads: ',num_threads
+   !$OMP end single
+   !$OMP end parallel
+   endif
+#endif
 !
  if (JOB .ne. 0) then
     call exec_job
