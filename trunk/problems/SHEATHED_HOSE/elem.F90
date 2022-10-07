@@ -10,7 +10,6 @@
 subroutine elem(Mdle, Itest,Itrial)
   use parameters, only : ZERO
   use physics   , only : NR_PHYSA
-  use assembly  , only : ALOC,BLOC,NR_RHS
   use data_structure3D
 !------------------------------------------------------------------------------------
   implicit none

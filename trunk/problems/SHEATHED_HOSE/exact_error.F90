@@ -17,7 +17,7 @@ subroutine exact_error
   real*8 :: errorH,errorE,errorV,errorQ,errorHEVQ,derrorH,derrorE,derrorV,derrorQ
   real*8 :: rnormH,rnormE,rnormV,rnormQ,rnormHEVQ,drnormH,drnormE,drnormV,drnormQ
   real*8 :: errorH_rel,errorE_rel,errorV_rel,errorQ_rel,errorHEVQ_rel
-  real*8 :: rateH,rateE,rateV,rateQ,rateHEVQ
+  real*8 :: rateH,rateE,rateQ,rateHEVQ
 !
   integer, parameter :: nin = 13
   integer, parameter :: maxvis =2000
@@ -31,7 +31,7 @@ subroutine exact_error
   integer, dimension(maxvis,10), save :: iwork
 !
 ! miscellaneous
-  integer :: mdle,i,nint,iattr,nrdof_tot,ic
+  integer :: mdle,i,iattr,nrdof_tot,ic
 !
 ! printing flag
   integer :: iprint

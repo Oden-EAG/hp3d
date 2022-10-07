@@ -33,7 +33,7 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
 !
    integer, intent(in)  :: Irefine
    integer, intent(in)  :: Nreflag
-   real(8),  intent(in) :: Factor
+   real(8), intent(in)  :: Factor
 !
    integer, parameter :: max_step = 20
    integer, dimension(max_step), save :: nrdof_tot_mesh
@@ -153,7 +153,6 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
 !                         REFINE AND UPDATE MESH
 !-----------------------------------------------------------------------
 !
-  2010 format(A,I3,A)
    select case(Irefine)
 !  ...uniform refinements
       case(IUNIFORM)

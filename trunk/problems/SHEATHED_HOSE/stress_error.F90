@@ -17,24 +17,17 @@ subroutine stress_error(Mdle, Err,SolNorm)
       real*8 , intent(out) :: SolNorm
 !------------------------------------------------------------------------------------------
 !  ...element and face type
-      character(len=4) :: etype,ftype
+      character(len=4) :: etype
 !
 !  ...number of topological entities (vertices,edges,faces)
       integer :: nrv,nre,nrf
 !
 !  ...element and face order, enriched order
       integer, dimension(19) :: norder
-      integer, dimension(5)  :: nordf
 !
 !  ...node edge and face orientations
       integer, dimension(12) :: nedge_orient
       integer, dimension(6)  :: nface_orient
-!
-!  ...SHAPE FUNCTIONS
-!     H1 (geometry)
-      real*8, dimension(  MAXbrickH)    :: shapH
-      real*8, dimension(3,MAXbrickH)    :: gradH
-      integer                           :: nrdofH
 !
 !  ...geometry
       real*8, dimension(3,MAXbrickH) :: xnod
@@ -63,9 +56,6 @@ subroutine stress_error(Mdle, Err,SolNorm)
       real*8, dimension(3,MAXEQNV  )       :: solV
       real*8, dimension(  MAXEQNV  )       :: divV
       real*8, dimension(  MAXEQNQ  )       :: solQ
-!     displacement
-      real*8, dimension(3)                 :: u
-      real*8, dimension(6)                 :: epsApp
 !
 !  ...solution variables
       real*8, dimension(  MAXEQNH    ) ::   valH
@@ -80,13 +70,10 @@ subroutine stress_error(Mdle, Err,SolNorm)
       real*8, dimension(  MAXEQNQ    ) ::   valQ
       real*8, dimension(  MAXEQNQ,3  ) ::  dvalQ
       real*8, dimension(  MAXEQNQ,3,3) :: d2valQ
-      real*8, dimension(6)             :: epsSol
-!
-      real*8, dimension(6)             :: epsDiff
 !
 !  ...miscellaneous
-      integer :: i,k,l,m,n,nint,ipt,ifc,iprint,iload,iflag,ndom
-      real*8  :: weight,wa,rjac,MU
+      integer :: k,l,m,n,nint,ipt,iprint,iload,iflag,ndom
+      real*8  :: weight,wa,rjac
 !
 !-----------------------------------------------------------------------------------
 !      I N I T I A L I Z A T I O N                                                 |

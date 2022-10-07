@@ -14,7 +14,7 @@
       use element_data
       use data_structure3D
       use sheathed_isotropic_materials
-      use common_prob_data, only: SYMMETRY_TOL, TEST_NORM, IP
+      use common_prob_data, only: SYMMETRY_TOL, TEST_NORM
 !------------------------------------------------------------------------------------------
       implicit none
       integer, intent(in)  :: Mdle
@@ -59,7 +59,7 @@
       real*8, dimension(3)           :: xi,x,rn
       real*8, dimension(3,3)         :: dxdxi,dxidx
       real*8, dimension(2)           :: t
-      real*8, dimension(3,2)         :: dxidt,dxdt,rt
+      real*8, dimension(3,2)         :: dxidt,dxdt
       integer                        :: nsign
 !
 !  ...Resid vector for the enriched space
@@ -101,10 +101,10 @@
       real*8, dimension(3,3)               :: omega
 !
 !  ...miscellaneous
-      integer :: i,j,k,l,m,n,mm,nn,k1,k2,k3,m1,m2,n1,n2,ipt,kcomp,lcomp,  &
-                 nint,ifc,iprint,iload,iflag,info,info1,info2,info3,nordtmp,  &
+      integer :: i,j,k,m,n,k1,k2,m1,m2,ipt,kcomp,lcomp,  &
+                 nint,ifc,iprint,iload,iflag,info,info1,nordtmp,  &
                  weightedWeakSymmetryConstraint
-      real*8  :: weight,wa,rjac,brjac,tmp,tmp2,diff,DDOT,omegaWeight,l2Weight,l2StressWeight
+      real*8  :: weight,wa,rjac,brjac,tmp,tmp2,DDOT,omegaWeight,l2Weight,l2StressWeight
 !
 !  ...LAPACK stuff
       character uplo
