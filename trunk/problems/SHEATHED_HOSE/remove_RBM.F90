@@ -3,13 +3,12 @@
 subroutine remove_RBM
   use physics
   use data_structure3D
-  ! use parameters
+!
 !--------------------------------------------------------------------------
   implicit none
 !--------------------------------------------------------------------------
   integer :: pt
-  integer :: nbcondtmp
-  integer, dimension(NRINDEX) :: nbcond
+  integer :: nbcond(NRINDEX)
 !--------------------------------------------------------------------------
 !
 ! This is a hack to eliminate vertex DOF in the trace variables.
