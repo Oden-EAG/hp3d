@@ -60,12 +60,11 @@ subroutine soln2vtk(Sname, Sfile, Snick, Scenter, Scomp, Ic)
 !
 !  ...stress and displacement
    real*8, dimension(3,3) :: sigma
-   real*8, dimension(3)   :: u
 !
 !  ...miscellaneous
    real*8  :: val
    real*8  :: r2
-   integer :: ibeg,iattr,icomp,isol,iload,ireal,i,j,m,n
+   integer :: i,j,m,n
 !
 !..OpenMP parallelization: auxiliary variables
    integer, dimension(NRELES) :: n_vert_offset, n_elem_vert
@@ -103,7 +102,7 @@ subroutine soln2vtk(Sname, Sfile, Snick, Scenter, Scomp, Ic)
 !$OMP         xnod,zdofH,zdofE,zdofV,zdofQ,           &
 !$OMP         norder,nedge_orient,nface_orient,       &
 !$OMP         x,dxdxi,zsolH,zgradH,zsolE,zcurlE,      &
-!$OMP         zsolV,zdivV,zsolQ,isol,val,subd)        &
+!$OMP         zsolV,zdivV,zsolQ,val,subd)             &
 !$OMP SCHEDULE(DYNAMIC)
    do iel=1,NRELES
       mdle = ELEM_ORDER(iel)
