@@ -77,7 +77,7 @@ subroutine elem_DPG_UWEAK(Mdle)
       real*8, dimension(3)           :: xi,x,rn
       real*8, dimension(3,3)         :: dxdxi,dxidx
       real*8, dimension(2)           :: t
-      real*8, dimension(3,2)         :: dxidt,dxdt,rt
+      real*8, dimension(3,2)         :: dxidt,dxdt
       integer                        :: nsign
 !
 !  ...tensors in physical coordinates
@@ -95,9 +95,9 @@ subroutine elem_DPG_UWEAK(Mdle)
       real*8, dimension(MAXNINT2ADD)   :: wt
 !
 !  ...miscellaneous
-      integer :: i,j,k,l,m,n,k1,k2,k3,k4,k5,m1,m2,m3,m4,m5,n1,n2,n3,ipt,ifc,  &
-                 icomp,jcomp,nint,iprint,iflag,info,info1,info2,info3,  &
-                 kH,kV,kQ,lH,lV,lQ,kmin,kmax,enrdof,weightedWeakSymmetryConstraint
+      integer :: i,j,k,l,m,n,k1,k2,k3,k4,k5,m1,m2,m3,m4,m5,n1,n2,ipt,ifc,  &
+                 icomp,jcomp,nint,iprint,iflag,info,info1,  &
+                 kH,lH,kmin,kmax,enrdof,weightedWeakSymmetryConstraint
       integer, dimension(NR_PHYSA) :: ndofphysics
       real*8  :: weight,wa,rjac,brjac,tmp,diffmax,dmax,omegaWeight,l2Weight,l2StressWeight
 !

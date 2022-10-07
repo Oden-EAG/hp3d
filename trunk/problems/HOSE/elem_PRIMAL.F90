@@ -70,7 +70,7 @@ subroutine elem_DPG_PRIMAL(Mdle)
       real*8, dimension(3)           :: xi,x,rn
       real*8, dimension(3,3)         :: dxdxi,dxidx
       real*8, dimension(2)           :: t
-      real*8, dimension(3,2)         :: dxidt,dxdt,rt
+      real*8, dimension(3,2)         :: dxidt,dxdt
 !
 !  ...stiffness tensors in master coordinates and physical coordinates
       real*8, dimension(3,3,3,3) :: C,Symm,CC
@@ -87,11 +87,11 @@ subroutine elem_DPG_PRIMAL(Mdle)
       real*8, dimension(MAXNINT2ADD)   :: wt
 !
 !  ...miscellaneous
-      integer :: i,j,k,l,m,n,mm,nn,k1,k2,k3,m1,m2,m3,n1,n2,ipt,icomp,jcomp,  &
-                 nint,ifc,nsign,iprint,iflag,info,info1,info2,info3,   &
-                 kH,kV,lH,lV,iel,enrdof,kmin,kmax
+      integer :: i,j,k,l,m,n,k1,k2,k3,m1,m2,m3,n1,n2,ipt,icomp,jcomp,  &
+                 nint,ifc,nsign,iprint,iflag,info,info1,   &
+                 enrdof,kmin,kmax
       integer, dimension(2) :: ndofphysics
-      real*8  :: weight,wa,rjac,brjac,tmp,diffmax,dmax
+      real*8  :: weight,wa,rjac,brjac,tmp
 !
 !  ...LAPACK stuff
       character uplo,transa,transb
@@ -104,6 +104,7 @@ subroutine elem_DPG_PRIMAL(Mdle)
 !-----------------------------------------------------------------------------------
 !
       iprint=0
+      tmp = 0.d0
 !
 !  ...element type
       etype = NODES(Mdle)%type
@@ -285,7 +286,7 @@ subroutine elem_DPG_PRIMAL(Mdle)
             do k3=1,nrdofH
               do jcomp=1,3
                 m3 = (k3-1)*3+jcomp
-                tmp = ZERO
+                tmp = 0.d0
                 do m=1,3; do n=1,3
                   tmp = tmp  &
                       + C(jcomp,n,icomp,m)*gradH(n,k3)*gradHH(m,k1)
