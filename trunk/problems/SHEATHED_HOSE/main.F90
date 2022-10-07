@@ -4,10 +4,9 @@
 !
 !----------------------------------------------------------------------
 !
-!     latest revision:  - April 2022
+!     latest revision:  - Oct 2022
 !
-!     purpose:          - main driver for MPI test program
-!                         sheathed hose
+!     purpose:          - main driver for sheathed hose application
 !
 !----------------------------------------------------------------------
 !
