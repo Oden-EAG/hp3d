@@ -79,7 +79,7 @@ program main
 !
 !   IBC_PROB : 1 - clamped ends ; 2 - free ends ; 3 - non-penetration ends
     if ((IBC_PROB.eq.2).or.(IBC_PROB.eq.3)) then
-      call remove_RBM(IBC_PROB)
+      call remove_RBM
       call update_Ddof
     endif
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
