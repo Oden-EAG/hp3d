@@ -41,9 +41,10 @@ subroutine set_environment
   call get_option_int(   '-norm-trial'      ,'1)L2, 2)Natural, 3)Custom'                     ,IERROR_NATURAL ,IERROR_PROB)
   call get_option_int(   '-norm-test'       ,'1) Adj Graph, 2)Natural, 3)Custom'             ,MATHEMATICIANS ,TEST_NORM  )
 !
-!..OpenMP threading
-  ! call get_option_int('-nthreads','Number of OpenMP threads',1,nthreads)
-  ! call omp_set_num_threads(nthreads)
+!..number of OpenMP threads
+   call get_option_int( '-nthreads', 'Number of OpenMP threads', 1, nthreads)
+!  TODO: If OMP environment is active, call omp_set_num_threads
+!   call omp_set_num_threads(nthreads)
 !
 ! The variable dp defining enrichment in DPG problems - src/modules/parametersDPG
 !                        option label     // explanation                // default  // parameter
