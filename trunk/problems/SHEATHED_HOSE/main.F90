@@ -43,6 +43,14 @@ program main
 !..Initialize MPI environment
    call mpi_w_init
 !
+   if (NUM_PROCS > 1) then
+      if (RANK .eq. ROOT) then
+         write(*,*) 'SHEATHED_HOSE application is currently not ', &
+                    'supporting MPI-distributed computation.'
+      endif
+      goto 99
+   endif
+!
 !..Set common hp3D environment parameters (reads in options arguments)
    call begin_environment
    call set_environment
@@ -114,6 +122,8 @@ program main
  endif
 !
  call finalize
+!
+99 continue
  call mpi_w_finalize
 !..END MPI
 !
