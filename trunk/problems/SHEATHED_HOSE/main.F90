@@ -20,7 +20,6 @@ program main
   use control
   use assembly
   use assembly_sc, only: IPRINT_TIME
-  use stc        , only: STORE_STC,HERM_STC
 !
   use MPI        , only: MPI_COMM_WORLD
   use mpi_param  , only: ROOT,RANK,NUM_PROCS
@@ -32,7 +31,7 @@ program main
    integer :: i, ierr
 !
 !..OMP variables
-   integer :: num_threads, omp_get_num_threads
+   integer :: num_threads,omp_get_num_threads
 !
 !..timer
    real(8) :: MPI_Wtime,start_time,end_time

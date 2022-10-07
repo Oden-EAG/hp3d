@@ -33,7 +33,7 @@ subroutine set_initial_mesh(Nelem_order)
    integer :: ibc(6,NRINDEX)
 !
 !..miscellaneous
-   integer :: ifc,iel,neig,i,max_order
+   integer :: ifc,iel,neig,i
 !
 !------------------------------------------------------------------------------------
 !     I N I T I A L I Z E
