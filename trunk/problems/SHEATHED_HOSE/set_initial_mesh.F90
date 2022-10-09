@@ -106,17 +106,17 @@ subroutine set_initial_mesh(Nelem_order)
    ibc(1:6,1:NRINDEX) = 0
 !
 !   IBC_PROB : 1 - clamped ends ; 2 - free ends ; 3 - non-penetration at ends
-!       ___C___ _______________
+!       ___ ___ _______________
 !      /8__ __6\               \
 !     / /7_|_5\ \               \
-!    / /_/   \_\ \B_ _ _ _ _ _ _ \      x--->
+!   C/ /_/   \_\ \B_ _ _ _ _ _ _ \      x--->
 !    \ \4\_ _/2/ /               /
 !     \3\__|__/1/               /
 !      \___ ___/_______________/
 !          A
 !  Elements 1,3,6,8 : Steel
 !  Elements 2,4,5,7 : Rubber
-!  Vertex dofs are removed at A,B,C
+!  Vertex DOFs are removed at A,B,C
 !
     select case(IBC_PROB)
 !
