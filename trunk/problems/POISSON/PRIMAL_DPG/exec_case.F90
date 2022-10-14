@@ -18,6 +18,7 @@ subroutine exec_case(idec)
    integer :: mdle_subd(NRELES)
    integer :: i,mdle,kref,src,count,ierr,nord
    integer :: iParAttr(2) = (/1,0/)
+   real(8) :: res
 !
 !----------------------------------------------------------------------
 !
@@ -171,7 +172,7 @@ subroutine exec_case(idec)
 !
       case(51)
          write(*,*) 'computing residual...'
-         call residual
+         call residual(res)
 !
       case(60)
          write(*,*) 'flushing dof'
