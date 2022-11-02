@@ -44,8 +44,8 @@ subroutine elem(Mdle, Itest,Itrial)
 !
 !-------------------------------------------------------------------------
 !
-!..activate four physics variables (L2 field + L2 gradient + H1 trace + H(div) trace) for assembly
-   Itest(1:4) = 1; Itrial(1:4) = 1
+!..activate four physics variables (H1 trace + H(div) trace +L2 field + L2 gradient ) for assembly
+   Itest(1:NR_PHYSA) = 1; Itrial(1:NR_PHYSA) = 1
 !
    norder (1:19) = 0
    norderP(1:19) = 0
@@ -83,8 +83,13 @@ subroutine elem(Mdle, Itest,Itrial)
 !..calculate total number of trial and test DOFs
    nrTest  = nrdofHH +  nrdofVV
    nrTrial = nrdofQ + 3 * nrdofQ + nrdofVi_a + nrdofVi_b
-!
+!    write(*,*) nrdofVi_a,"    ",BLOC(1)%nrow
+!    write(*,*) nrdofVi_b,"    ",BLOC(2)%nrow
+!    write(*,*) nrdofQ,"    ",BLOC(3)%nrow
+!    write(*,*) nrdofQ*3,"    ",BLOC(4)%nrow
+! !
 !..call element integration routine
+   !  write(*,*) Mdle,nrTest,nrdofHH,nrdofVV,nrdofQ,nrdofH,nrdofV,NORD_ADD
    call elem_poisson_UW(Mdle,nrTest,nrTrial,                                                             &
             nrdofHH,nrdofVV,nrdofH,nrdofQ,nrdofQ,3*nrdofQ,nrdofVi_a,nrdofVi_b,                           &
             BLOC(1)%nrow,BLOC(2)%nrow,BLOC(3)%nrow,BLOC(4)%nrow,                                         &
@@ -237,7 +242,7 @@ subroutine elem_poisson_UW(Mdle,                                          &
 !
 !..H1 shape functions
    real(8) :: shapH(MAXbrickH), gradH(3,MAXbrickH)
-   real(8) :: shapHB(MAXbrickH), gradHB(3,MAXbrickH)
+   ! real(8) :: shapHB(MAXbrickH), gradHB(3,MAXbrickH)
 !
 !..H(div) shape functions
    real(8) :: shapV(3,MAXbrickV), divV(MAXbrickV)
@@ -253,6 +258,7 @@ subroutine elem_poisson_UW(Mdle,                                          &
 
 !..load vector for the enriched space
    real(8) :: bload_V(NrTest)
+   real(8) :: dummy_check
 !
 !..Gram matrix in packed format
    ! real(8), allocatable :: gramPV(:)
@@ -274,13 +280,6 @@ subroutine elem_poisson_UW(Mdle,                                          &
    real(8) :: u, v, q, divtau_a, divtau_b, tn, sn, lambda, aux
    real(8) :: sig(3), dv(3), dq(3), tau_a(3), tau_b(3), s(3)
 !
-!..for Gram matrix compressed storage format
-   ! integer :: nk_V
-   ! nk_V(k1,k2) = (k2-1)*k2/2+k1
-
-   ! integer :: nk_T
-   ! nk_T(k1,k2) = (k2-1)*k2/2+k1
-
    integer :: nk
    nk(k1,k2) = (k2-1)*k2/2 + k1
 !
@@ -290,8 +289,6 @@ subroutine elem_poisson_UW(Mdle,                                          &
 !
 !
 !..allocate auxiliary matrices
-   ! allocate(gramPV(NrdofHH*(NrdofHH+1)/2))
-   ! allocate(gramPT(NrdofVV*(NrdofVV+1)/2))
    allocate(gramP((NrTest)*(NrTest+1)/2))
    allocate(stiff_UV(NrdofHH,NrdofU))
    allocate(stiff_SV(NrdofHH,NrdofS))
@@ -343,8 +340,6 @@ subroutine elem_poisson_UW(Mdle,                                          &
 !
 !..clear space for auxiliary matrices
    bload_V   = ZERO
-   ! gramPV    = ZERO
-   ! gramPT    = ZERO
    gramP     = ZERO
    stiff_UV  = ZERO
    stiff_SV  = ZERO
@@ -354,6 +349,7 @@ subroutine elem_poisson_UW(Mdle,                                          &
    stiff_ST = ZERO
    stiff_Vi_aT = ZERO
    stiff_Vi_bT = ZERO
+
 !
 !----------------------------------------------------------------------
 !     E L E M E N T    I N T E G R A L S                              |
@@ -372,15 +368,15 @@ subroutine elem_poisson_UW(Mdle,                                          &
       wa=waloc(l)
 !
 !  ...H1 shape functions (for geometry)
-      call shape3DH(etype,xi,norder,norient_edge,norient_face, nrdofH,shapH,gradH)
+      call shape3DH(etype,xi,norder,norient_edge,norient_face, nrdof,shapH,gradH)
 
 !  ...L2 shape function calls
-      call shape3DQ(etype,xi,norder, nrdofQ,shapQ)
+      call shape3DQ(etype,xi,norder, nrdof,shapQ)
 !
 !  ...discontinuous H1 shape functions
-      call shape3HH(etype,xi,nordP, nrdofHH,shapHH,gradHH)
+      call shape3HH(etype,xi,nordP, nrdof,shapHH,gradHH)
 !  ...discontinuous H(div) shape functions
-      call shape3VV(etype,xi,nordP, nrdofVV,shapVV,divVV)
+      call shape3VV(etype,xi,nordP, nrdof,shapVV,divVV)
 
 !  ...geometry map
       call geom3D(Mdle,xi,xnod,shapH,gradH,NrdofH, x,dxdxi,dxidx,rjac,iflag)
@@ -407,7 +403,8 @@ subroutine elem_poisson_UW(Mdle,                                          &
 
             do ivar = 1,3
                n1 = k1
-               n2 = (ivar - 1)*NrdofQ + k2
+               ! n2 = (ivar - 1)*NrdofQ + k2
+               n2 = (k2 - 1)*3 + ivar
                sig = ZERO
 !        ...Piola Transform for L2 fields i.e for the ivar th component of sigma
                sig(ivar) = shapQ(k2)/rjac 
@@ -433,7 +430,21 @@ subroutine elem_poisson_UW(Mdle,                                          &
 !           
 !     ...enddo 2nd loop through enriched H1 test functions
          enddo
-!
+
+      ! cross terms for  graph norm
+         do k2 = 1,NrdofVV
+            divtau_a = divVV(k2)/rjac
+            tau_a(1:3) =     dxdxi(1:3,1) * shapVV(1,k2)      &
+                           + dxdxi(1:3,2) * shapVV(2,k2)       &
+                           + dxdxi(1:3,3) * shapVV(3,k2)
+            
+            tau_a(1:3) = tau_a(1:3)/rjac
+            k = nk(k1,NrdofHH+k2)
+
+            aux = dv(1) * tau_a(1) + dv(2) * tau_a(2) + dv(3) * tau_a(3)
+            gramP(k) = gramP(k) + aux * weight
+         enddo
+
 !  ...end of 1st loop through enriched H1 test functions
       enddo
 
@@ -445,7 +456,7 @@ subroutine elem_poisson_UW(Mdle,                                          &
                         + dxdxi(1:3,2) * shapVV(2,k1)       &
                         + dxdxi(1:3,3) * shapVV(3,k1)
 
-         tau_a(1:3) = tau_a(1:3)/rjac               
+         tau_a(1:3) = tau_a(1:3)/rjac   
          
          do k2=1,NrdofQ
             ! Piola transform of L2 variable
@@ -456,7 +467,8 @@ subroutine elem_poisson_UW(Mdle,                                          &
                sig = ZERO
                sig(ivar) = shapQ(k2)/rjac  !Piola Transform for the ivar th comp
                n1 = k1
-               n2  = (ivar-1) * NrdofQ + k2
+               ! n2  = (ivar-1) * NrdofQ + k2
+               n2 = (k2 - 1)*3 + ivar
                stiff_ST(n1,n2) = stiff_ST(n1,n2) + weight*(tau_a(1)*sig(1) + tau_a(2) * sig(2) &
                                                           + tau_a(3)*sig(3))
 
@@ -474,7 +486,7 @@ subroutine elem_poisson_UW(Mdle,                                          &
             tau_b(1:3) = tau_b(1:3)/rjac
 
             k = nk(k1 + NrdofHH,k2 + NrdofHH)
-            aux = divtau_a * divtau_b + tau_a(1)*tau_b(1) + tau_a(2)*tau_b(2) + tau_a(3)*tau_b(3)
+            aux = divtau_a * divtau_b + 2.d0 * (tau_a(1)*tau_b(1) + tau_a(2)*tau_b(2) + tau_a(3)*tau_b(3))
             gramP(k) = gramP(k) +  weight * aux
 
          enddo   
@@ -483,6 +495,20 @@ subroutine elem_poisson_UW(Mdle,                                          &
 
 !..end of loop through integration points
    enddo
+  
+
+
+   open(1, file = 'data2.dat', status='replace')  
+   do k1=1,NrTest  
+      do k2=k1,NrTest
+       write(1,*) k1,",",k2,",",gramP(nk(k1,k2))  
+      enddo     
+   enddo  
+   
+   ! write(*,*) NrTest,",",NrdofHH,",",NrdofVV
+   close(1) 
+
+
 !
 !---------------------------------------------------------------------
 !    B O U N D A R Y    I N T E G R A L S                            |
@@ -585,24 +611,23 @@ subroutine elem_poisson_UW(Mdle,                                          &
    stiff_ALL = ZERO
 
 !  Total test/trial DOFs of the element
-   i1 = NrdofHH; i2 = NrdofVV; j1 = NrdofU; j2 = NrdofS; j3 = NrdofVi_a; j4 = NrdofVi_b
-   stiff_ALL(1:i1,1:j1) = stiff_UV
-   stiff_ALL(1:i1,j1+1:j1+j2) = stiff_SV
-   stiff_ALL(1:i1,j1+j2+1:j1+j2+j3) = stiff_Vi_aV
-   stiff_ALL(1:i1,j1+j2+j3+1:j1+j2+j3+j4) = stiff_Vi_bV
+   i1 = NrdofHH; i2 = NrdofVV; j1 = NrdofVi_a; j2 = NrdofVi_b; j3 = NrdofU; j4 = NrdofS
+   stiff_ALL(1:i1,1:j1) = stiff_Vi_aV
+   stiff_ALL(1:i1,j1+1:j1+j2) = stiff_Vi_bV
+   stiff_ALL(1:i1,j1+j2+1:j1+j2+j3) = stiff_UV
+   stiff_ALL(1:i1,j1+j2+j3+1:j1+j2+j3+j4) = stiff_SV
 
-   stiff_ALL(i1+1:i1+i2,1:j1) = stiff_UT
-   stiff_ALL(i1+1:i1+i2,j1+1:j1+j2) = stiff_ST
-   stiff_ALL(i1+1:i1+i2,j1+j2+1:j1+j2+j3) = stiff_Vi_aT
-   stiff_ALL(i1+1:i1+i2,j1+j2+j3+1:j1+j2+j3+j4) = stiff_Vi_bT
+   stiff_ALL(i1+1:i1+i2,1:j1) = stiff_Vi_aT
+   stiff_ALL(i1+1:i1+i2,j1+1:j1+j2) = stiff_Vi_bT
+   stiff_ALL(i1+1:i1+i2,j1+j2+1:j1+j2+j3) = stiff_UT
+   stiff_ALL(i1+1:i1+i2,j1+j2+j3+1:j1+j2+j3+j4) = stiff_ST
 
-   stiff_ALL(1:i1,j1+j2+j3+j4+1) = bload_V(1:i1)
-
+   stiff_ALL(1:i1+i2,j1+j2+j3+j4+1) = bload_V
+   
 
 
    deallocate(stiff_UV,stiff_SV,stiff_Vi_aV,stiff_Vi_bV)
    deallocate(stiff_UT,stiff_ST,stiff_Vi_aT,stiff_Vi_bT)
-
 
 !..A. Compute Cholesky factorization of Gram Matrix, G=U^T U (=LL^T)
 
@@ -633,30 +658,39 @@ subroutine elem_poisson_UW(Mdle,                                          &
    enddo
 
 !  Fill the Aloc and Bloc matrices
-   BlocU(1:j1) = raloc(1:j1,j1+j2+j3+j4+1)
-   BlocS(1:j2) = raloc(j1+1:j1+j2,j1+j2+j3+j4+1)
-   BlocVi_a(1:j3) = raloc(j1+j2+1:j1+j2+j3,j1+j2+j3+j4+1)
-   BlocVi_b(1:j4) = raloc(j1+j2+j3+1:j1+j2+j3+j4,j1+j2+j3+j4+1)
+   BlocVi_a(1:j1) = raloc(1:j1,j1+j2+j3+j4+1)
+   BlocVi_b(1:j2) = raloc(j1+1:j1+j2,j1+j2+j3+j4+1)
+   BlocU(1:j3) = raloc(j1+j2+1:j1+j2+j3,j1+j2+j3+j4+1)
+   BlocS(1:j4) = raloc(j1+j2+j3+1:j1+j2+j3+j4,j1+j2+j3+j4+1)
 
-   AlocUU(1:j1,1:j1) = raloc(1:j1,1:j1)
-   AlocUS(1:j1,1:j2) = raloc(1:j1,j1+1:j1+j2)
-   AlocUVi_a(1:j1,1:j3) = raloc(1:j1,j1+j2+1:j1+j2+j3)
-   AlocUVi_b(1:j1,1:j4)= raloc(1:j1,j1+j2+j3+1:j1+j2+j3+j4)
 
-   AlocSU(1:j2,1:j1) = raloc(j1+1:j1+j2,1:j1)
-   AlocSS(1:j2,1:j2) = raloc(j1+1:j1+j2,j1+1:j1+j2)
-   AlocSVi_a(1:j2,1:j3) = raloc(j1+1:j1+j2,j1+j2+1:j1+j2+j3)
-   AlocSVi_b(1:j2,1:j4) = raloc(j1+1:j1+j2,j1+j2+j3+1:j1+j2+j3+j4)
+   AlocVi_aa(1:j1,1:j1) = raloc(1:j1,1:j1)
+   AlocVi_ab(1:j1,1:j2) = raloc(1:j1,j1+1:j1+j2)
+   AlocVi_aU(1:j1,1:j3) = raloc(1:j1,j1+j2+1:j1+j2+j3)
+   AlocVi_aS(1:j1,1:j4) = raloc(1:j1,j1+j2+j3+1:j1+j2+j3+j4)
 
-   AlocVi_aU(1:j3,1:j1) = raloc(j1+j2+1:j1+j2+j3,1:j1)
-   AlocVi_aS(1:j3,1:j2) = raloc(j1+j2+1:j1+j2+j3,j1+1:j1+j2)
-   AlocVi_aa(1:j3,1:j3) = raloc(j1+j2+1:j1+j2+j3,j1+j2+1:j1+j2+j3)
-   AlocVi_ab(1:j3,1:j4) = raloc(j1+j2+1:j1+j2+j3,j1+j2+j3+1:j1+j2+j3+j4)
+   
+   AlocVi_ba(1:j2,1:j1) = raloc(j1+1:j1+j2,1:j1)
+   AlocVi_bb(1:j2,1:j2) = raloc(j1+1:j1+j2,j1+1:j1+j2)
+   AlocVi_bU(1:j2,1:j3) = raloc(j1+1:j1+j2,j1+j2+1:j1+j2+j3)
+   AlocVi_bS(1:j2,1:j4) = raloc(j1+1:j1+j2,j1+j2+j3+1:j1+j2+j3+j4)
 
-   AlocVi_bU(1:j4,1:j1) = raloc(j1+j2+j3+1:j1+j2+j3+j4,1:j1)
-   AlocVi_bS(1:j4,1:j2) = raloc(j1+j2+j3+1:j1+j2+j3+j4,j1+1:j1+j2)
-   AlocVi_ba(1:j4,1:j3) = raloc(j1+j2+j3+1:j1+j2+j3+j4,j1+j2+1:j1+j2+j3)
-   AlocVi_bb(1:j4,1:j4) = raloc(j1+j2+j3+1:j1+j2+j3+j4,j1+j2+j3+1:j1+j2+j3+j4)
+
+   AlocUVi_a(1:j3,1:j1) = raloc(j1+j2+1:j1+j2+j3,1:j1)
+   AlocUVi_b(1:j3,1:j2) = raloc(j1+j2+1:j1+j2+j3,j1+1:j1+j2)
+   AlocUU(1:j3,1:j3) =    raloc(j1+j2+1:j1+j2+j3,j1+j2+1:j1+j2+j3)
+   AlocUS(1:j3,1:j4) =    raloc(j1+j2+1:j1+j2+j3,j1+j2+j3+1:j1+j2+j3+j4)
+
+
+   AlocSVi_a(1:j4,1:j1) = raloc(j1+j2+j3+1:j1+j2+j3+j4,1:j1)
+   AlocSVi_b(1:j4,1:j2) = raloc(j1+j2+j3+1:j1+j2+j3+j4,j1+1:j1+j2)
+   AlocSU(1:j4,1:j3) =    raloc(j1+j2+j3+1:j1+j2+j3+j4,j1+j2+1:j1+j2+j3)
+   AlocSS(1:j4,1:j4) =    raloc(j1+j2+j3+1:j1+j2+j3+j4,j1+j2+j3+1:j1+j2+j3+j4)
+
+
+
+
+
 
    deallocate(raloc)
 

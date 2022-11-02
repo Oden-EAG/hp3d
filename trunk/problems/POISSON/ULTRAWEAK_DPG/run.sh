@@ -10,6 +10,10 @@ nthreads=1
 # Configure problem params
 # - initial polynomial order of approximation
 p=3
+
+# set enriched order (p+dp)
+dp=1
+
 # - manufactured solution
 #   0: polynomial solution
 #   1: smooth sin*sinh solution, uniform in z
@@ -20,7 +24,7 @@ isol=0
 #   pre-configured run (job=1)
 job=0
 # - number of refinements (if job=1)
-imax=2
+imax=10
 
 # - MAXNODS
 maxnods=525000

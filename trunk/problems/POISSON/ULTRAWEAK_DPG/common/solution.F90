@@ -34,6 +34,7 @@ subroutine solution(X, u,gradu,gradgradu)
    real(8) :: x1,x2,x3,f_x,f_y,f_z,df_x,df_y,df_z,ddf_x,ddf_y,ddf_z
    real(8) :: np_x,np_y,np_z
    integer :: isol_p
+   real(8) :: epn, t1,t2,t3,t4,t5
 !
 !--------------------------------------------------------------------------------
 !
@@ -47,7 +48,7 @@ subroutine solution(X, u,gradu,gradgradu)
 !  ...polynomial solution
       case(0)
 !     ...set polynomial order of manufactured solution
-         isol_p = 5
+         isol_p = 3
          np_x = real(isol_p,8)
          np_y = real(isol_p,8)
          np_z = real(isol_p,8)
@@ -128,7 +129,7 @@ subroutine solution(X, u,gradu,gradgradu)
          gradgradu(3,1) =  2.*PI*dcos(x1*PI)*dsinh(x2*PI)*x3
          gradgradu(3,2) =  2.*PI*dsin(x1*PI)*dcosh(x2*PI)*x3
          gradgradu(3,3) =  2.*   dsin(x1*PI)*dsinh(x2*PI)
-!
+    
       case default
          write(*,*) 'solution: unknown exact solution (ISOL).'
    end select

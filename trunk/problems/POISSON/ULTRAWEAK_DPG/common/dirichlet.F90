@@ -53,14 +53,18 @@ subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
    ValH = ZERO; DvalH = ZERO
    ValE = ZERO; DvalE = ZERO
    ValV = ZERO; DvalV = ZERO
+   valQ = ZERO
 !
 !  NEXACT:
 !  0: unknown exact solution
 !  1:   known exact solution
    select case(NEXACT)
       case(0)
-         write(*,*) 'dirichlet: missing data; unknown exact solution. stop.'
-         stop
+         ! Write a new boundary function for this option
+         ! write(*,*) 'dirichlet: missing data; unknown exact solution. stop.'
+         ! stop
+         call FicheraCornerDirichlet(X,Icase, ValH,DvalH,d2valH,ValE,DvalE,d2valE, &
+                                       ValV,DvalV,d2valV,valQ,dvalQ,d2valQ)
       case(1,2)
 !     ...use the exact solution to determine Dirichlet data
          call exact(X,Icase, ValH,DvalH,d2valH,ValE,DvalE,d2valE, &

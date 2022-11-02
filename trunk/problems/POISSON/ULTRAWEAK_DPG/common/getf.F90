@@ -50,10 +50,18 @@ subroutine getf(Mdle,X, Fval)
 !
 !..make sure exact solution is available
    if (NEXACT==0) then
-      write(*,*) 'getf: source term cannot be computed;', &
-                     '  exact solution is unknown. stop.'
-      stop
-   endif
+      ! write(*,*) 'getf: source term cannot be computed;', &
+      !                '  exact solution is unknown. stop.'
+      ! stop
+      ! Fval = 0.d0
+
+      call exact(X,icase, ValH,DvalH,d2valH,ValE,DvalE,d2valE, &
+      ValV,DvalV,d2valV,valQ,dvalQ,d2valQ)
+!
+!..f = -L(u)
+      Fval = -(D2valH(1,1,1)+D2valH(1,2,2)+D2valH(1,3,3))
+   
+   else
 !
 !..compute exact solution
    call exact(X,icase, ValH,DvalH,d2valH,ValE,DvalE,d2valE, &
@@ -61,5 +69,7 @@ subroutine getf(Mdle,X, Fval)
 !
 !..f = -L(u)
    Fval = -(D2valH(1,1,1)+D2valH(1,2,2)+D2valH(1,3,3))
+   
+   endif
 !
 end subroutine getf

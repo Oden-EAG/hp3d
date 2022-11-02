@@ -73,6 +73,7 @@ subroutine elem_residual(Mdle, Resid,Nref_flag)
    call celndof(etype,norderP, nrdofHH,nrdofEE,nrdofVV,nrdofQQ)
 !
    nrTest = nrdofHH + nrdofVV
+   ! write(*,*) Mdle,nrTest,nrdofHH,nrdofVV,nrdofQ,nrdofH,nrdofV,NORD_ADD
    call elem_residual_poisson_UW(        &
       Mdle,nrTest,nrdofHH,nrdofVV,nrdofQ,nrdofH,nrdofV, &
       Resid,Nref_flag)
@@ -145,12 +146,13 @@ subroutine elem_residual_poisson_UW(Mdle,                                  &
    real(8) :: dofV(MAXEQNV,MAXbrickV)
    real(8) :: dofQ(MAXEQNQ,MAXbrickQ)
 !
-!..variables for geometry
+!..geometry
    real(8) :: xi(3), x(3), dxdxi(3,3), dxidx(3,3), rn(3)
    real(8) :: dxidt(3,2), dxdt(3,2), t(2)
 !
 !..H1 shape functions
    real(8) :: shapH(MAXbrickH), gradH(3,MAXbrickH)
+   ! real(8) :: shapHB(MAXbrickH), gradHB(3,MAXbrickH)
 !
 !..H(div) shape functions
    real(8) :: shapV(3,MAXbrickV), divV(MAXbrickV)
@@ -160,14 +162,16 @@ subroutine elem_residual_poisson_UW(Mdle,                                  &
 !
 !..Enriched H1 shape functions
    real(8) :: shapHH(MAXbrickHH), gradHH(3,MAXbrickHH)
+
 !..Enriched H(div) shape functions
-   real(8) :: shapVV(3,MAXbrickVV),divVV(MAXbrickV)
+   real(8) :: shapVV(3,MAXbrickVV), divVV(MAXbrickVV)
 !
 !..Gram matrix in packed format
    real(8), allocatable :: gramP(:)
 !
 !..load vector for the enriched space
-   real(8) :: bload_V(NrTest),bload_Vc(NrTest)
+   real(8) :: bload_V(NrTest), bload_Vc(NrTest)
+   real(8) :: dummy_check
 !
 !..3D quadrature data
    real(8) :: xiloc(3,MAXNINT3ADD), waloc(MAXNINT3ADD)
@@ -180,9 +184,8 @@ subroutine elem_residual_poisson_UW(Mdle,                                  &
    real(8) :: dq(3), dv(3), tau_a(3),tau_b(3)
 !
 !..approximate solution
-   real(8) :: sigma(3),solU
-   real(8) :: rgradHxi(3), rgradH(3)
-   real(8) :: solVxi(3), solV(3)
+   real(8) :: solU
+   real(8) :: solVxi(3), solV(3), sigma(3)
    real(8) :: solVn
    real(8) :: solLmb
 
@@ -194,12 +197,14 @@ subroutine elem_residual_poisson_UW(Mdle,                                  &
    integer :: nordP, nrdof, nsign, ifc, info
 !
 #if DEBUG_MODE
-   integer :: iprint = 0
+   integer :: iprint = 1
 #endif
 !
 !..for Gram matrix compressed storage format
    integer :: nk
    nk(k1,k2) = (k2-1)*k2/2+k1
+
+   dofQ = ZERO; dofV = ZERO; dofE = ZERO; dofH = ZERO
 !
 !-----------------------------------------------------------------------
 !
@@ -225,17 +230,38 @@ subroutine elem_residual_poisson_UW(Mdle,                                  &
 !
 !..determine solution dof
    call solelm(Mdle, dofH,dofE,dofV,dofQ)
+   ! open(1, file = 'data1.dat', status='replace')  
+   ! do k1=1,NrdofH
+   !    ! do k2=k1,NrTest
+   !    !  write(1,*) dofQ(1,k1),dofQ(2,k1),dofQ(3,k1),dofQ(4,k1)
+   !    write(1,*) dofH(1,k1)  
+   !    ! enddo     
+   ! enddo  
+   
+   ! ! write(*,*) NrTest,",",NrdofHH,",",NrdofVV
+   ! close(1) 
+
 !
 !..allocate space for auxiliary matrices
    allocate(gramP(NrTest*(NrTest+1)/2))
 !
 !..clear space for auxiliary matrices
-   bload_V = ZERO; gramP = ZERO
+   bload_V = ZERO; gramP = ZERO; bload_Vc = ZERO  
+   dummy_check = 0.d0
 !
 !-----------------------------------------------------------------------
 !.......... element integrals
 !-----------------------------------------------------------------------
 !
+   ! write(*,*) '1'
+   ! write(*,*) dofQ(1,1:nrdofQ)
+   ! write(*,*) '2'
+   ! write(*,*) dofQ(2,1:nrdofQ)
+   ! write(*,*) '3'
+   ! write(*,*) dofQ(3,1:nrdofQ)
+   ! write(*,*) '4'
+   ! write(*,*) dofQ(4,1:nrdofQ)
+
 !..use the enriched order to set the quadrature
    INTEGRATION = NORD_ADD
    call set_3D_int_DPG(etype,norder,norient_face, nint,xiloc,waloc)
@@ -243,26 +269,23 @@ subroutine elem_residual_poisson_UW(Mdle,                                  &
 !
 !..loop over integration points
    do l=1,nint
-      xi(1:3) = xiloc(1:3,l)
-      wa = waloc(l)
+!  ...coordinates and weight of this integration point
+      xi(1:3)=xiloc(1:3,l)
+      wa=waloc(l)
 !
-!  ...determine element H1 shape functions
-      call shape3DH(etype,xi,norder,norient_edge,norient_face, &
-                    nrdof,shapH,gradH)
+!  ...H1 shape functions (for geometry)
+      call shape3DH(etype,xi,norder,norient_edge,norient_face, nrdof,shapH,gradH)
 
-!  ...determine element L2 shape functions
+!  ...L2 shape function calls
       call shape3DQ(etype,xi,norder, nrdof,shapQ)
-
 !
-!  ...determine discontinuous H1 shape functions
+!  ...discontinuous H1 shape functions
       call shape3HH(etype,xi,nordP, nrdof,shapHH,gradHH)
-!  ...determine discontinuous H(div) shape functions
+!  ...discontinuous H(div) shape functions
       call shape3VV(etype,xi,nordP, nrdof,shapVV,divVV)
 
-!
-!  ...geometry
-      call geom3D(Mdle,xi,xnod,shapH,gradH,NrdofH, &
-                  x,dxdxi,dxidx,rjac,iflag)
+!  ...geometry map
+      call geom3D(Mdle,xi,xnod,shapH,gradH,NrdofH, x,dxdxi,dxidx,rjac,iflag)
 !
 !  ...integration weight
       weight = rjac*wa
@@ -274,16 +297,20 @@ subroutine elem_residual_poisson_UW(Mdle,                                  &
       do k=1,NrdofQ
          solU = solU + dofQ(1,k)*shapQ(k)
       enddo
+      ! dummy_check = dummy_check + weight * solU
 !  Piola Transformation for L2 variable u
       solU = solU/rjac
 
 !  reconstruction of sigma which is a L2 variable  f
-      do i = 1,3
-         do k = 1,NrdofQ
-            sigma(i) = sigma(i) + dofQ(1+i,k)*shapQ(k)
-         enddo
-         sigma(i) = sigma(i)/rjac !piola transform
+      ! do i = 1,3
+      do k = 1,NrdofQ
+            sigma(1) = sigma(1) + dofQ(2,k)*shapQ(k)
+            sigma(2) = sigma(2) + dofQ(3,k)*shapQ(k)
+            sigma(3) = sigma(3) + dofQ(4,k)*shapQ(k)
       enddo
+      sigma = sigma/rjac !piola transform
+      dummy_check = dummy_check + (sigma(1)+sigma(2)+sigma(3)) * weight
+      ! enddo
 
 !
 !  ...get the RHS
@@ -318,6 +345,20 @@ subroutine elem_residual_poisson_UW(Mdle,                                  &
 !
 !     ...end 1st loop through enriched H1 test functions
          enddo
+         ! cross terms for  graph norm
+         do k2 = 1,NrdofVV
+            divtau_a = divVV(k2)/rjac
+            tau_a(1:3) =     dxdxi(1:3,1) * shapVV(1,k2)      &
+                           + dxdxi(1:3,2) * shapVV(2,k2)       &
+                           + dxdxi(1:3,3) * shapVV(3,k2)
+            
+            tau_a(1:3) = tau_a(1:3)/rjac
+
+            k = nk(k1,NrdofHH+k2)
+            aux = dv(1) * tau_a(1) + dv(2) * tau_a(2) + dv(3) * tau_a(3)
+            gramP(k) = gramP(k) + aux * weight
+         enddo
+
 !  ...end 2nd loop through enriched H1 test functions
       enddo
 
@@ -331,19 +372,20 @@ subroutine elem_residual_poisson_UW(Mdle,                                  &
          
          tau_a(1:3) = tau_a(1:3)/rjac
 
-         aux = tau_a(1)*sigma(1) + tau_a(2)*sigma(2) + tau_b(3)*sigma(3) + divtau_a * solU
+         aux = tau_a(1)*sigma(1) + tau_a(2)*sigma(2) + tau_a(3)*sigma(3) + divtau_a * solU
 
          bload_V(NrdofHH + k1) = bload_V(NrdofHH + k1) + aux*weight
 
+
          do k2 = k1,NrdofVV
             divtau_b = divVV(k2)/rjac
-            tau_b(1:3) =     dxdxi(1:3,1) * shapVV(1,k2)      &
+            tau_b(1:3) =     dxdxi(1:3,1) * shapVV(1,k2)       &
                            + dxdxi(1:3,2) * shapVV(2,k2)       &
                            + dxdxi(1:3,3) * shapVV(3,k2)
    
             tau_b(1:3) = tau_b(1:3)/rjac
             
-            aux = divtau_a * divtau_b + tau_a(1)*tau_b(1) + tau_a(2)*tau_b(2) + tau_a(3)*tau_b(3)
+            aux = divtau_a * divtau_b + 2.d0* (tau_a(1)*tau_b(1) + tau_a(2)*tau_b(2) + tau_a(3)*tau_b(3))
 
             k = nk(k1 + NrdofHH,k2 + NrdofHH)
             gramP(k) = gramP(k) +  weight * aux
@@ -354,7 +396,21 @@ subroutine elem_residual_poisson_UW(Mdle,                                  &
 
 !..end loop through integration points
    enddo
-!
+   ! write(*,*) 'elem'
+   ! do k1=1,NrTest
+   !    write(*,*) k1, bload_V(k1)
+   ! enddo
+
+   open(1, file = 'data1.dat', status='replace')  
+   do k1=1,NrTest  
+      do k2=k1,NrTest
+       write(1,*) k1,",",k2,",",gramP(nk(k1,k2))  
+      enddo     
+   enddo  
+   
+   ! write(*,*) NrTest,",",NrdofHH,",",NrdofVV
+   close(1) 
+   ! write(*,*) "dummy_check = ", dummy_check
 !
 !-----------------------------------------------------------------------
 !.......... boundary integrals
@@ -388,23 +444,23 @@ subroutine elem_residual_poisson_UW(Mdle,                                  &
 !
 !     ...determine discontinuous H1 shape functions
          call shape3HH(etype,xi,nordP, nrdof,shapHH,gradHH)
-
-!     ...determine discontinuous H(div) shape functions
+!     ...discontinuous H(div) shape functions
          call shape3VV(etype,xi,nordP, nrdof,shapVV,divVV)
 !
 !     ...determine element H1 shape functions (for geometry)
          call shape3DH(etype,xi,norder,norient_edge,norient_face, &
                        nrdof,shapH,gradH)
 !
-!     ...determine element Hdiv shape functions (for fluxes)
+!     ...determine element H(div) shape functions (for fluxes)
+!     ...for interfaces only (no bubbles)
          call shape3DV(etype,xi,norder,norient_face, &
                        nrdof,shapV,divV)
-!
+
 !     ...geometry
          call bgeom3D(Mdle,xi,xnod,shapH,gradH,NrdofH,dxidt,nsign, &
-                      x,dxdxi,dxidx,rjac,dxdt,rn,bjac)
-
+                  x,dxdxi,dxidx,rjac,dxdt,rn,bjac)
          weight = bjac*wtloc(l)
+!
 !
 !     ...compute approximate flux at the point
          solVxi(1:3) = 0.d0
@@ -434,11 +490,13 @@ subroutine elem_residual_poisson_UW(Mdle,                                  &
 
 !     ...loop through discont H(div) test functions
          do k1=1,NrdofVV
+            ! Piola transform for H(div)
             tau_a(1:3) = dxdxi(1:3,1) * shapVV(1,k1)       &
                        + dxdxi(1:3,2) * shapVV(2,k1)       &
                        + dxdxi(1:3,3) * shapVV(3,k1)
 
             tau_a(1:3) = tau_a(1:3)/rjac
+
             tn = tau_a(1)*rn(1) + tau_a(2)*rn(2) + tau_a(3)*rn(3)
             aux = tn * solLmb
 
@@ -450,9 +508,13 @@ subroutine elem_residual_poisson_UW(Mdle,                                  &
       enddo
 !     ... end of loop over the faces
    enddo
+
+   ! write(*,*) 'interface', nrdofHH, nrdofVV
+   ! do k1=1,NrTest
+   !    write(*,*) k1, bload_V(k1)
+   ! enddo
 !
-!-----------------------------------------------------------------------
-!
+!----------------------------------------------------------------------- 
 !..factorize the test stiffness matrix
    call DPPTRF('U', NrTest, gramP, info)
    if (info.ne.0) then
@@ -470,12 +532,17 @@ subroutine elem_residual_poisson_UW(Mdle,                                  &
       write(*,*) 'elem_residual_poisson: info = ',info
       stop
    endif
+
+   ! write(*,*) 'G-1'
+   ! do k1=1,NrTest
+   !    write(*,*) k1, bload_V(k1)
+   ! enddo
 !
    deallocate(gramP)
 !
 !..compute the residual
    Resid = 0.d0
-   do k=1,NrdofHH
+   do k=1,NrTest
       Resid = Resid + bload_Vc(k)*bload_V(k)
    enddo
 !

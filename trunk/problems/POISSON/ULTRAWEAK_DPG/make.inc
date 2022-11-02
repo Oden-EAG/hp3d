@@ -12,7 +12,9 @@ SRC_COMMON = \
             ./common/residual.F90 \
             ./common/solution.F90 \
             ./common/set_environment.F90 \
-            ./common/uniform_href.F90
+            ./common/uniform_href.F90 \
+            ./common/ficheracornerdirichlet.F90 \
+            ./common/refine_DPG.F90
 
 SRC_PRIMAL = \
             celem.F90 \

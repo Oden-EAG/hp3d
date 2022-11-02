@@ -74,7 +74,9 @@ subroutine exact(X,Icase, ValH,DvalH,D2valH, &
    D2valH(1,1:3,1:3) = gradgradu ! 2nd derivative [Hessian]
 
    ValQ(1) = u
-
+   ValQ(2) = gradu(1)
+   ValQ(3) = gradu(2)
+   ValQ(4) = gradu(3)
 !
 !
 end subroutine exact

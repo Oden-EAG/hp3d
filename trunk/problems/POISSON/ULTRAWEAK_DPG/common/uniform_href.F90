@@ -42,6 +42,9 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
    real(8), dimension(max_step), save :: error_mesh
    real(8), dimension(max_step), save :: rel_error_mesh
    real(8), dimension(max_step), save :: rate_error_mesh
+
+   real(8), dimension(max_step), save :: residual_mesh
+   real(8), dimension(max_step), save :: rate_residual_mesh
 !
    integer, save :: istep = 0
    integer, save :: irefineold = 0
@@ -52,6 +55,11 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
    real(8) :: error_tot,rnorm_tot,error_subd,rnorm_subd
    integer :: i,iel,mdle,count,ierr,nrelem_ref,kref
    integer :: iprint
+
+   real(8) :: res
+   real(8) :: resid_subd,resid_tot
+   real(8) :: elem_resid
+   integer :: elem_ref_flag
 !
    real(8) :: MPI_Wtime,start_time,end_time
 !
@@ -75,7 +83,7 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
    endif
 !
 !..compute the error only for L2 field
-   iflag(1:NR_PHYSA) = (/0,0,1,0/)
+   iflag(1:NR_PHYSA) = (/0,0,1,1/)
 !
 !..fetch active elements
    if (.not. DISTRIBUTED) then
@@ -84,10 +92,11 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
    endif
 !
    error_subd = 0.d0; rnorm_subd = 0.d0
+   resid_subd = 0.d0
 !
 !$OMP PARALLEL DEFAULT(PRIVATE)              &
 !$OMP SHARED(NRELES_SUBD,ELEM_SUBD,iflag)    &
-!$OMP REDUCTION(+:error_subd,rnorm_subd)
+!$OMP REDUCTION(+:error_subd,resid_subd,rnorm_subd)
 !$OMP DO
    do iel=1,NRELES_SUBD
       call element_error(ELEM_SUBD(iel),iflag,           &
@@ -95,19 +104,27 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
                          rnormH,rnormE,rnormV,rnormQ)
       error_subd = error_subd + errorQ
       rnorm_subd = rnorm_subd + rnormQ
+
+      call elem_residual(ELEM_SUBD(iel), elem_resid,elem_ref_flag)
+      resid_subd = resid_subd + elem_resid
    enddo
 !$OMP END DO
 !$OMP END PARALLEL
 !
-   error_tot = 0.d0; rnorm_tot = 0.d0
+   ! write(*,*) " I am here",resid_subd
+   error_tot = 0.d0; rnorm_tot = 0.d0;resid_tot = 0.d0
    if (DISTRIBUTED .and. (.not. HOST_MESH)) then
       count = 1
       call MPI_REDUCE(error_subd,error_tot,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE(rnorm_subd,rnorm_tot,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(resid_subd,resid_tot,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+
    else
       error_tot = error_subd
       rnorm_tot = rnorm_subd
+      resid_tot = resid_subd
    endif
+   ! write(*,*) " I am here",resid_subd
 !
    if (RANK .ne. ROOT) goto 90
 !
@@ -115,17 +132,27 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
    if (NEXACT.ge.1) then
       error_mesh(istep) = sqrt(error_tot)
       rel_error_mesh(istep) = sqrt(error_tot/rnorm_tot)
+      residual_mesh(istep) = sqrt(resid_tot)
    endif
 !
 !..compute decrease rate for the residual and error
    select case(istep)
    case(1)
+      
       rate_mesh(istep) = 0.d0
       if (NEXACT.ge.1) rate_error_mesh(istep) = 0.d0
+
+      rate_residual_mesh(istep) = 0.d0
+      if (NEXACT.ge.1) rate_residual_mesh(istep) = 0.d0
+   
    case default
       if (NEXACT.ge.1) then
          rate_error_mesh(istep) = &
          log(rel_error_mesh(istep-1)/rel_error_mesh(istep))/  &
+         log(float(nrdof_tot_mesh(istep-1))/float(nrdof_tot_mesh(istep)))
+
+         rate_residual_mesh(istep) = &
+         log(residual_mesh(istep-1)/residual_mesh(istep))/  &
          log(float(nrdof_tot_mesh(istep-1))/float(nrdof_tot_mesh(istep)))
       endif
    end select
@@ -136,13 +163,13 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
       write(*,*) 'HISTORY OF REFINEMENTS'
       write(*,110)
   110 format(' mesh |',' nrdof_tot |',' nrdof_con | ',' |',   &
-             ' field error  |','rel field error|','   rate ')
+             ' field error  |','rel field error|','   rate  |','   residual   |','   residual rate')
       write(*,*)
 !
       do i=1,istep
          write(*,120) i, nrdof_tot_mesh(i), nrdof_con_mesh(i), &
-            error_mesh(i),rel_error_mesh(i),rate_error_mesh(i)
-  120    format(2x,i2,'  | ',2(i9,' | '), 2(' | ',es12.5),'  |',f7.2)
+            error_mesh(i),rel_error_mesh(i),rate_error_mesh(i),residual_mesh(i),rate_residual_mesh(i)
+  120    format(2x,i2,'  | ',2(i9,' | '), 2(' | ',es12.5),'  |',f7.2,'  |',es12.5,'  |',f7.2)
          if (i .eq. istep) write(*,*)
       enddo
    endif

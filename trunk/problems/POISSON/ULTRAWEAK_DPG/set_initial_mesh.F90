@@ -32,6 +32,12 @@
    integer, dimension(6,NRINDEX) :: ibc
 !..miscellaneous
    integer :: i,ifc,iel,neig
+   integer :: nod,ibegin,iend
+   integer :: nodesl(27),norientl(27)
+   character(len=4) :: type
+   integer :: geomtype ! 0 for cube and 1 for fischera corner (make sure to change default
+   ! file-geometry in common/set_enviroment.F90)
+   geomtype = 0
 !
 !------------------------------------------------------------------------------------
 !
@@ -52,7 +58,7 @@
       ELEMS(iel)%physics(2) ='trace_b'
       ELEMS(iel)%physics(3) ='field'
       ELEMS(iel)%physics(4) ='grad'
-!
+      
 !  ...set order of approximation
       if (IP.gt.0) then
 !     ...uniform order of approximation
@@ -77,13 +83,59 @@
 !     ...uniform BC
          case(BC_DIRICHLET)
 !        ...if exterior face, set boundary condition to IBC_PROB
-            do ifc=1,nface(ELEMS(iel)%Type)
+            if(geomtype .eq. 0) then 
+               do ifc=1,nface(ELEMS(iel)%Type)
                neig = ELEMS(iel)%neig(ifc)
-               select case(neig)
-                  case(0); ibc(ifc,1) = 1 ! Dirichlet BC (H1 trace variable)
-               end select
-            enddo
-!
+                  select case(neig)
+                     case(0); ibc(ifc,1) = 1 ! Dirichlet BC (H1 trace variable)
+                  end select
+               enddo
+            else ! Fischera Croner boundary conditions (Neuman conditions as Dirichlet for normal flux)
+               if(iel .eq. 4) then
+                  do ifc=1,nface(ELEMS(iel)%Type)
+                     neig = ELEMS(iel)%neig(ifc)
+                     select case(neig)
+                        case(0)
+                           if(ifc .eq. 2) then
+                               ibc(ifc,1) = 1 ! Dirichlet BC (H1 trace variable)
+                           else
+                               ibc(ifc,2) = 1 ! Dirichlet BC (Hdiv trace variable)
+                           endif
+                     end select
+                  enddo
+               elseif (iel .eq. 6) then
+                  do ifc=1,nface(ELEMS(iel)%Type)
+                     neig = ELEMS(iel)%neig(ifc)
+                     select case(neig)
+                        case(0)
+                           if(ifc .eq. 5) then
+                               ibc(ifc,1) = 1 ! Dirichlet BC (H1 trace variable)
+                           else
+                               ibc(ifc,2) = 1 ! Dirichlet BC (Hdiv trace variable)
+                           endif
+                     end select
+                  enddo
+               elseif (iel .eq. 7) then
+                  do ifc=1,nface(ELEMS(iel)%Type)
+                     neig = ELEMS(iel)%neig(ifc)
+                     select case(neig)
+                        case(0)
+                           if(ifc .eq. 4) then
+                               ibc(ifc,1) = 1 ! Dirichlet BC (H1 trace variable)
+                           else
+                               ibc(ifc,2) = 1 ! Dirichlet BC (Hdiv trace variable)
+                           endif
+                     end select
+                  enddo
+               else 
+                  do ifc=1,nface(ELEMS(iel)%Type)
+                     neig = ELEMS(iel)%neig(ifc)
+                        select case(neig)
+                           case(0); ibc(ifc,2) = 1 ! Dirichlet BC (Hdiv trace variable)
+                        end select
+                  enddo
+               endif
+            endif    
          case default
             write(*,*) 'set_initial_mesh: problem currently supports Dirichlet BC only. stop.'
             stop

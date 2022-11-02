@@ -7,7 +7,7 @@
 !     latest revision:  - May 2020
 !
 !     purpose:          - main driver for MPI Test Program
-!                         Poisson Primal DPG implementation
+!                         Poisson ULTRAWEAK DPG implementation
 !
 !----------------------------------------------------------------------
 !
@@ -84,8 +84,10 @@ program main
    HERM_STC  = .true.
 !
 !..set interface variables
-!  (1) - H1 field (1 scalar-valued component)
+!  (1) - H1 trace (1 scalar-valued component)
 !  (2) - H(div) trace (1 vector-valued component)
+!  (3) - L2 scalar  (u)
+!  (4) - L2 vector valued (sigma = grad(u))
    PHYSAi(1:4) = (/.true.,.true.,.false.,.false./)
 !
 !..determine number of omp threads running
@@ -190,6 +192,8 @@ subroutine master_main()
       write(*,*) 'Multiple uniform h-refs + solve........22'
       write(*,*) 'Single anisotropic h-refinement (z)....23'
       write(*,*) 'Refine a single element................26'
+      write(*,*) 'Adaptive Refinement....................27'
+      write(*,*) 'Multiple Adaptive Refinement + solve...28'
       write(*,*) '                                         '
       write(*,*) '        ---- MPI Routines ----           '
       write(*,*) 'Distribute mesh........................30'
@@ -258,7 +262,7 @@ subroutine master_main()
             call exec_case(idec)
 !
 !     ...Refinements
-         case(20,21,22,23,26)
+         case(20,21,22,23,26,27,28)
             call exec_case(idec)
 !
 !     ...MPI Routines

@@ -54,6 +54,7 @@ module common_prob_data
 !
 !..DISPLAY SETTINGS (soldis.F90 ...)
 !..DISPLAY SETTINGS (paraview   ...)
+   integer :: ICHOOSE_COMP
    integer :: IEXACT_DISP, ITANGENT_DISP, ICHOOSE_DISP
    integer :: IDOMAIN_SMOOTHE = 0
 !

@@ -20,7 +20,8 @@ subroutine set_environment
    use environment
    use common_prob_data
    use paraview
-   use parametersDPG, only: MAXNORD_ADD
+   ! use parametersDPG, only: MAXNORD_ADD
+   use parametersDPG
    use testvars
 !
    implicit none
@@ -34,7 +35,9 @@ subroutine set_environment
 
    call get_option_string  &
         ('-file-geometry'  ,'Geometry file'            ,'./geometries/hexa_orient0' ,FILE_GEOM)
-!
+   ! call get_option_string  &
+   !      ('-file-geometry'  ,'Geometry file'            ,'./geometries/Fichera_corner' ,FILE_GEOM)
+! 
    call get_option_string  &
         ('-file-phys'      ,'Physics file'             ,'./input/physics'           ,FILE_PHYS)
 !
@@ -62,6 +65,8 @@ subroutine set_environment
 !
    call get_option_int     &
         ('-maxnods','Maximum expected number of nodes'    ,0,MAXNODS_USER)
+   
+   call get_option_int('-dp' , 'NORD_ADD'    , 1, NORD_ADD)
 !
 ! =============================
 ! ========= PARAVIEW ==========
