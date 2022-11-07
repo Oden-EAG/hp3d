@@ -9,16 +9,16 @@ nthreads=1
 
 # Configure problem params
 # - initial polynomial order of approximation
-p=3
+p=2
 
 # set enriched order (p+dp)
 dp=1
-
 # - manufactured solution
 #   0: polynomial solution
 #   1: smooth sin*sinh solution, uniform in z
 #   2: smooth sin*sinh solution
-isol=0
+#   3: arc tan solution
+isol=3
 # - user mode
 #   interactive run    (job=0)
 #   pre-configured run (job=1)

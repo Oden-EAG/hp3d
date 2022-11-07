@@ -5,7 +5,7 @@
 !
 !----------------------------------------------------------------------
 !
-!     latest revision:  - May 2020
+!     latest revision:  - october 2022
 !
 !     purpose:          - define options for main file specific to the problem.
 !                         These can be consulted with the -help option when running
@@ -35,8 +35,9 @@ subroutine set_environment
 
    call get_option_string  &
         ('-file-geometry'  ,'Geometry file'            ,'./geometries/hexa_orient0' ,FILE_GEOM)
+
    ! call get_option_string  &
-   !      ('-file-geometry'  ,'Geometry file'            ,'./geometries/Fichera_corner' ,FILE_GEOM)
+   !      ('-file-geometry'  ,'Geometry file'            ,'./geometries/Fichera_corner_b' ,FILE_GEOM)
 ! 
    call get_option_string  &
         ('-file-phys'      ,'Physics file'             ,'./input/physics'           ,FILE_PHYS)

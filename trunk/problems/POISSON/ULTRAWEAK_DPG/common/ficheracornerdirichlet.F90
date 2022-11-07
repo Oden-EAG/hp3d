@@ -6,7 +6,7 @@
 !
 !     latest revision:  -  October 2022
 !
-!     purpose:          - returns Boundary conditions for Fischera Corner Problem
+!     purpose:          - returns Boundary conditions for Fichera Corner Problem
 !
 !     arguments:
 !        in:
@@ -57,7 +57,7 @@ subroutine FicheraCornerDirichlet(X,Icase, ValH,DvalH,D2valH, &
         real(8) :: t12,t13,t14,t15,t16,t17,t18,t19,t20,t21
         real(8) :: u,divq
         real(8), dimension(3) :: q,gradu
-        real(8), dimension(3,1,3) :: Dq
+        real(8),dimension(3,MAXEQNV,3) :: Dq
 
         integer :: isol_p
         real(8) :: np_x,np_y,np_z
@@ -76,69 +76,88 @@ subroutine FicheraCornerDirichlet(X,Icase, ValH,DvalH,D2valH, &
         x2 = X(2)
         x3 = X(3)
 
-        ! if((x1 .eq. -1.d0) .or. (x1 .eq. 1.d0) .or. (x2 .eq. -1.d0) .or. (x2 .eq. 1.d0) &
-        !     .or. (x3 .eq. -1.d0) .or. (x3 .eq. 1.d0)) then
-        
-        !     ! x1 = x1 - 1.0
-        !     ! x2 = x2 - 1.0
-        !     ! x3 = x3 - 1.0
             
-        !     q(1) = (-1.d0/3.d0)*((x1**2 + x2**2)**(-7.d0/6.d0)*x1*x2 + x1*x3 *(x1**2+x3**2)**(-7.d0/6.d0))
+            q(1) = (-1.d0/3.d0)*((x1**2 + x2**2)**(-7.d0/6.d0)*x1*x2 + x1*x3 *(x1**2+x3**2)**(-7.d0/6.d0))
 
 
-        !     q(2) = (x1**2+x2**2)**(-1.d0/6.d0) - (1.d0/3.d0)*(x1**2 + x2**2)**(-7.d0/6.d0)*x2**2 &
-        !             - (1.d0/3.d0) * x2*x3 * (x2**2 + x3**2)**(-7.d0/6.d0)
+            q(2) = (x1**2+x2**2)**(-1.d0/6.d0) - (1.d0/3.d0)*(x1**2 + x2**2)**(-7.d0/6.d0)*x2**2 &
+                    - (1.d0/3.d0) * x2*x3 * (x2**2 + x3**2)**(-7.d0/6.d0)
 
 
-        !     q(3) = -(1.d0/3.d0)*(((x2**2+x3**2)**(-7.d0/6.d0) + (x1**2+x3**2)**(-7.d0/6.d0))*x3**2) &
-        !             + (x1**2 + x3**2)**(-1.d0/6.d0) + (x2**2 + x3**2)**(-1.d0/6.d0)
+            q(3) = -(1.d0/3.d0)*(((x2**2+x3**2)**(-7.d0/6.d0) + (x1**2+x3**2)**(-7.d0/6.d0))*x3**2) &
+                    + (x1**2 + x3**2)**(-1.d0/6.d0) + (x2**2 + x3**2)**(-1.d0/6.d0)
 
 
-        !     Dq(1,1,1) = (7.d0/9.d0)*((x1**2 + x2**2)**(-13.d0/6.d0)*x1**2*x2 + &
-        !                               (x1**2+x3**2)**(-13.d0/6.d0)*x1**2*x3) - &
-        !                             (1.d0/3.d0)*((x1**2 + x2**2)**(-7.d0/6.d0)*x2 + &
-        !                               (x1**2 + x3**2)**(-7.d0/6.d0)*x3)
+            t2 = x1**2
+            t3 = x2**2
+            t4 = x3**2
+            t5 = t2+t3
+            t6 = t2+t4
+
+            Dq(1,1,1) = 1.0d0/t5**(7.0d0/6.0d0)*x2*(-1.0d0/3.0d0)-(1.0d0/t6**(7.0d0/6.0d0 &
+            )*x3)/3.0d0+t2*1.0d0/t5**(1.3D+1/6.0d0)*x2*(7.0d0/9.0d0)+t2*1.0d0 &
+            /t6**(1.3D+1/6.0d0)*x3*(7.0d0/9.0d0)
 
 
-        !     Dq(1,1,2) = (7.d0/9.d0)*(x1**2 + x2**2)**(-13.d0/6.d0)*x1*x2**2 - (1.d0/3.d0) * &
-        !                 (x1**2 + x2**2)**(-7.d0/6.d0)*x1
+            t2 = x1**2
+            t3 = x2**2
+            t4 = t2+t3
+            Dq(1,1,2) = 1.0d0/t4**(7.0d0/6.0d0)*x1*(-1.0d0/3.0d0)+t3*1.0d0/t4**(1.3d+1 &
+            /6.0d0)*x1*(7.0d0/9.0d0)
+      
 
-
-        !     Dq(1,1,3) = (7.d0/9.d0)*(x1**2+x3**2)**(-13.d0/6.d0)*x1*x3**2 - &
-        !                 (1.d0/3.d0)*(x1**2 + x3**2)**(-7.d0/6.d0)*x1
+            t2 = x1**2
+            t3 = x3**2
+            t4 = t2+t3
+            Dq(1,1,3) = 1.0d0/t4**(7.0d0/6.0d0)*x1*(-1.0d0/3.0d0)+t3*1.0d0/t4**(1.3d+1 &
+            /6.0d0)*x1*(7.0d0/9.0D0)
+      
 
   
-        !     Dq(2,1,1) = (7.d0/9.d0)*(x1**2+x2**2)**(-13.d0/6.d0)*x1*x2**2  & 
-        !                 - (1.0/3.d0)*(x1**2 + x2**2)**(-7.d0/6.d0)*x1
+            Dq(2,1,1) = Dq(1,1,2)
 
 
-        !     Dq(2,1,2) = (7.d0/9.d0)*((x1**2 + x2 **2)**(-13.d0/6.d0)*x2**3 + (x2**2 + x3**2)**(-13.d0/6.d0)*x3*x2**2) &
-        !                 - (1.d0/3.d0) * x3 * (x2**2 + x3**2)**(-7.d0/6.d0) &
-        !                 - x2 * (x1**2 + x2**2)**(-7.d0/6.d0)
+            t2 = x1**2
+            t3 = x2**2
+            t4 = x3**2
+            t5 = t2+t3
+            t6 = t3+t4
+            Dq(2,1,2) = 1.0d0/t5**(1.3d+1/6.0d0)*x2**3*(7.0d0/9.0d0)-1.0d0/t5**(7.0d0 &
+            /6.0d0)*x2-(1.0d0/t6**(7.0d0/6.0d0)*x3)/3.0d0+t3*1.0d0/t6**(1.3d+1  &
+            /6.0d0)*x3*(7.0d0/9.0d0)
 
-        !     Dq(2,1,3) = (7.d0/9.d0)*x2*x3**2*(x2**2 + x3**2)**(-13.d0/6.d0) - &
-        !                 (1.d0/3.d0) *(x2**2 + x3**2)**(-7.d0/6.d0) * x2
+            t2 = x2**2
+            t3 = x3**2
+            t4 = t2+t3
+            Dq(2,1,3) = 1.0d0/t4**(7.0d0/6.0d0)*x2*(-1.0d0/3.0d0)+t3*1.0d0/t4**(1.3d+1 &
+            /6.0d0)*x2*(7.0d0/9.0d0)
 
 
-        !     Dq(3,1,1) = (7.d0/9.d0) * x3**2 * x1 * (x1**2+x3**2)**(-13.d0/6.d0) - &
-        !                 (1.d0/3.d0) * (x1**2 +x3**2)**(-7.d0/6.d0) * x1
+            Dq(3,1,1) = Dq(1,1,3)
                 
 
 
-        !     Dq(3,1,2) = (7.d0/9.d0) * x3**2 * x2 * (x2**2 + x3**2)**(-13.d0/6.d0) + &
-        !                     - (1.d0/3.d0) * (x2**2 + x3**2)**(-7.d0/6.d0) * x2
+            Dq(3,1,2) = Dq(2,1,3)
                 
                 
-        !     Dq(3,1,3) = (7.d0/9.d0) * ((x1**2 + x3**2)**(-13.d0/6.d0)*x3**3 + (x2**2 + x3**2)**(-13.d0/6.d0)*x3**3) - &
-        !                  ((x1**2 + x3**2)**(-7.d0/6.d0) + (x2**2 + x3**2)**(-7.d0/6.d0)) * x3
+            t2 = x1**2
+            t3 = x2**2
+            t4 = x3**2
+            t5 = x3**3
+            t6 = t2+t4
+            t7 = t3+t4
+            Dq(3,1,3) = t5*1.0d0/t6**(1.3d+1/6.0d0)*(7.0d0/9.0d0)+t5*1.0d0/t7**(1.3d+1 &
+            /6.0d0)*(7.0d0/9.0d0)-1.0d0/t6**(7.0d0/6.0d0)*x3-1.0d0/t7**(7.0d0 &
+            /6.0d0)*x3
+      
 
 
         
 
         ! else if(x1 .eq. 0.d0) then
         
-        !     u = 0.d0
-        !     gradu(1:3) = ZERO 
+            u = 0.d0
+            gradu(1:3) = ZERO 
 
         ! else if (x2 .eq. 0.d0) then
         !     u = 0.d0
@@ -150,48 +169,48 @@ subroutine FicheraCornerDirichlet(X,Icase, ValH,DvalH,D2valH, &
         
         ! endif
 
-        isol_p = 3
+        
 
-        if((x1 .eq. 0.d0) .or. (x1 .eq. 2.d0) .or. (x2 .eq. 0.d0) .or. (x2 .eq. 2.d0) &
-            .or. (x3 .eq. 0.d0) .or. (x3 .eq. 2.d0)) then
+        ! if((x1 .eq. 0.d0) .or. (x1 .eq. 2.d0) .or. (x2 .eq. 0.d0) .or. (x2 .eq. 2.d0) &
+        !     .or. (x3 .eq. 0.d0) .or. (x3 .eq. 2.d0)) then
 
-                
-                ! isol_p = 3
-                np_x = real(isol_p,8)
-                np_y = real(isol_p,8)
-                np_z = real(isol_p,8)
+        !    isol_p = 3
+        ! if((x3 .eq. 1.d0)) then
 
-                q(1) = np_x * x1**(np_x-1.d0) * x2**np_y * x3**np_z
-                q(2) = np_y * x2**(np_y-1.d0) * x1**np_x * x3**np_z
-                q(3) = np_z * x3**(np_z-1.d0) * x1**np_x * x2**np_y
+                ! np_x = real(isol_p,8)
+                ! np_y = real(isol_p,8)
+                ! np_z = real(isol_p,8)
+
+                ! q(1) = np_x * x1**(np_x-1.d0) * x2**np_y * x3**np_z
+                ! q(2) = np_y * x2**(np_y-1.d0) * x1**np_x * x3**np_z
+                ! q(3) = np_z * x3**(np_z-1.d0) * x1**np_x * x2**np_y
 
 
-                Dq(1,1,1) =   np_x * (np_x - 1.d0) * x1**(np_x - 2.d0) * x2**np_y * x3**np_z
-                Dq(1,1,2) =   np_x * x1**(np_x-1.d0) * np_y * x2**(np_y-1.d0) *  x3**np_z
-                Dq(1,1,3) =   np_x * x1**(np_x-1.d0) * x2**np_y * np_z * x3**(np_z - 1.d0)
+                ! Dq(1,1,1) =   np_x * (np_x - 1.d0) * x1**(np_x - 2.d0) * x2**np_y * x3**np_z
+                ! Dq(1,1,2) =   np_x * x1**(np_x-1.d0) * np_y * x2**(np_y-1.d0) *  x3**np_z
+                ! Dq(1,1,3) =   np_x * x1**(np_x-1.d0) * x2**np_y * np_z * x3**(np_z - 1.d0)
 
-                Dq(2,1,1) =   np_y * x2**(np_y-1.d0) * np_x * x1**(np_x-1.d0) *  x3**np_z
-                Dq(2,1,2) =   np_y * (np_y-1.d0) * x2**(np_y-2.d0) * x1**np_x * x3**np_z
-                Dq(2,1,3) =   np_y * x2**(np_y-1.d0) * x1**np_x * np_z * x3**(np_z - 1.d0) 
+                ! Dq(2,1,1) =   Dq(1,1,1)
+                ! Dq(2,1,2) =   np_y * (np_y-1.d0) * x2**(np_y-2.d0) * x1**np_x * x3**np_z
+                ! Dq(2,1,3) =   np_y * x2**(np_y-1.d0) * x1**np_x * np_z * x3**(np_z - 1.d0) 
 
-                Dq(3,1,1) =   np_z * x3**(np_z-1.d0) * np_x * x1**(np_x-1.d0) * x2**np_y
-                Dq(3,1,2) =   np_z * x3**(np_z-1.d0) * x1**np_x * np_y * x2**(np_y - 1.d0)
-                Dq(3,1,3) =   np_z * (np_z - 1.d0) * x3**(np_z-2.d0) * x1**np_x * x2**np_y
+                ! Dq(3,1,1) =   Dq(1,1,3)
+                ! Dq(3,1,2) =   Dq(2,1,3)
+                ! Dq(3,1,3) =   np_z * (np_z - 1.d0) * x3**(np_z-2.d0) * x1**np_x * x2**np_y
 
     
-        else
-            ! isol_p = 3
-                np_x = real(isol_p,8)
-                np_y = real(isol_p,8)
-                np_z = real(isol_p,8)
+        ! ! else
+                ! np_x = real(isol_p,8)
+                ! np_y = real(isol_p,8)
+                ! np_z = real(isol_p,8)
 
-                u = x1**np_x * x2**np_y * x3**np_z
+                ! u = x1**np_x * x2**np_y * x3**np_z
 
-                gradu(1) = np_x * x1**(np_x-1.d0) * x2**np_y * x3**np_z
-                gradu(2) = np_y * x2**(np_y-1.d0) * x1**np_x * x3**np_z
-                gradu(3) = np_z * x3**(np_z-1.d0) * x1**np_x * x2**np_y
+                ! gradu(1) = np_x * x1**(np_x-1.d0) * x2**np_y * x3**np_z
+                ! gradu(2) = np_y * x2**(np_y-1.d0) * x1**np_x * x3**np_z
+                ! gradu(3) = np_z * x3**(np_z-1.d0) * x1**np_x * x2**np_y
             
-        endif
+        ! endif
 
         ValV(1:3,1) = q(1:3)  !Hdiv values
         DvalV(1:3,1,1:3) = Dq(1:3,1,1:3)

@@ -4,7 +4,7 @@
 !
 !--------------------------------------------------------------------
 !
-!     last revision:    - Oct 2019
+!     last revision:    - Oct 2022
 !
 !     purpose:          - refines elements assuming problem has
 !                         already been solved. If uniform refinements
@@ -58,7 +58,7 @@ subroutine refine_DPG
    !  logical, intent(in)  :: Ires
    !  integer, intent(out) :: Nstop
     
-    integer, parameter :: adap_strat = 0 !0 is for greedy strat and 1 is for doefeler
+    integer, parameter :: adap_strat = 1 !0 is for greedy strat and 1 is for doefeler
     ! parameters below were input to the function before but currently used as finxed parameters for debug
     integer, parameter :: physNick = 1 !if exact then adapting to reduce in error L2 solution u
     integer, parameter :: max_step = 20
@@ -117,7 +117,7 @@ subroutine refine_DPG
    mdle_ref(1:NRELES)      = 0
 
 
-   Nflag(1:NR_PHYSA) = (/0,0,1,0/) 
+   Nflag(1:NR_PHYSA) = (/0,0,1,1/) 
 
 !..increase step if necessary
 !..irefineold=0 means no refinement was made in the previous step
@@ -231,14 +231,14 @@ write(*,*)
 write(*,*) 'HISTORY OF REFINEMENTS'
 if (NEXACT.eq.0) write(*,7005)
 if (NEXACT.gt.0) write(*,7006)
-7005  format(' mesh |','  nrdof_tot |','  nrdof_con |','    residual   |','   residual rate  ',/)
+7005  format(' mesh |','     NE     |','  nrdof_tot |','  nrdof_con |','    residual   |','   residual rate  ',/)
 7006  format(' mesh |','     NE     |','  nrdof_tot |','  nrdof_con |','    residual   |','   residual rate  |', &
            ' field error  |','rel field error|','   error rate ',/)
 !
 do i=1,istep
    if (NEXACT.eq.0) then
-      write(*,7003) i,nrdof_tot_mesh(i),nrdof_con_mesh(i),residual_mesh(i),rate_mesh(i)
-7003    format(2x,i2,'  | ',2(i10,' | '),es12.5,'  |',f7.2)
+      write(*,7003) i,nelem_mesh(i),nrdof_tot_mesh(i),nrdof_con_mesh(i),residual_mesh(i),rate_mesh(i)
+7003    format(2x,i2,'  | ',3(i10,' | '),es12.5,'  |',f7.2)
    else
       write(*,7004) i,nelem_mesh(i),nrdof_tot_mesh(i),nrdof_con_mesh(i),residual_mesh(i),rate_mesh(i), &
                     error_mesh(i),rel_error_mesh(i),rate_error_mesh(i)
@@ -455,7 +455,9 @@ recursive subroutine qsort_duplet(Iel_array,Residuals,N,First,Last)
 end subroutine qsort_duplet
 
 
-
+!-----------------------------------------------------------------------
+! subroutine: adap_solve (adaptive refinements and solve)
+!-----------------------------------------------------------------------
 subroutine adap_solve()
    !
       use common_prob_data

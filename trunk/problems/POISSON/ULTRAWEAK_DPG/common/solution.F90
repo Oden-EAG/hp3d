@@ -4,7 +4,7 @@
 !
 !-----------------------------------------------------------------------------------
 !
-!     latest revision:  - July 2019
+!     latest revision:  - october 2022
 !
 !     purpose:          - compute all relevant quantities of the exact solutions
 !
@@ -34,7 +34,9 @@ subroutine solution(X, u,gradu,gradgradu)
    real(8) :: x1,x2,x3,f_x,f_y,f_z,df_x,df_y,df_z,ddf_x,ddf_y,ddf_z
    real(8) :: np_x,np_y,np_z
    integer :: isol_p
-   real(8) :: epn, t1,t2,t3,t4,t5
+   real(8) :: x1c,x2c,x3c,alpha,ro
+   real(8) :: t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20
+   real(8) :: t21,t22,t23,t24,t25,t26
 !
 !--------------------------------------------------------------------------------
 !
@@ -129,7 +131,199 @@ subroutine solution(X, u,gradu,gradgradu)
          gradgradu(3,1) =  2.*PI*dcos(x1*PI)*dsinh(x2*PI)*x3
          gradgradu(3,2) =  2.*PI*dsin(x1*PI)*dcosh(x2*PI)*x3
          gradgradu(3,3) =  2.*   dsin(x1*PI)*dsinh(x2*PI)
-    
+      
+!  ...arc tan shock like solution
+      case(3)
+         x1c = -2.5d-1
+         x2c = -2.5d-1
+         x3c = -2.5d-1
+         ro = 3.d0**(5.d-1)
+         alpha = 20.d0
+         u = -atan(alpha*(ro-sqrt((x1-x1c)**2+(x2-x2c)**2+(x3-x3c)**2)))
+         t2 = -x1c
+         t3 = -x2c
+         t4 = -x3c
+         t5 = t2+x1
+         t6 = t3+x2
+         t7 = t4+x3
+         t8 = t5**2
+         t9 = t6**2
+         t10 = t7**2
+         t11 = t8+t9+t10
+         gradu(1) = (alpha*1.0D0/sqrt(t11)*(x1*2.0D0-x1c*2.0D0))/(alpha**2*(ro-sqrt(t11))**2*2.0D0+2.0D0)
+
+         t2 = -x1c
+         t3 = -x2c
+         t4 = -x3c
+         t5 = t2+x1
+         t6 = t3+x2
+         t7 = t4+x3
+         t8 = t5**2
+         t9 = t6**2
+         t10 = t7**2
+         t11 = t8+t9+t10
+         gradu(2) = (alpha*1.0D0/sqrt(t11)*(x2*2.0D0-x2c*2.0D0))/(alpha**2*(ro-sqrt(t11))**2*2.0D0+2.0D0)
+
+         t2 = -x1c
+         t3 = -x2c
+         t4 = -x3c
+         t5 = t2+x1
+         t6 = t3+x2
+         t7 = t4+x3
+         t8 = t5**2
+         t9 = t6**2
+         t10 = t7**2
+         t11 = t8+t9+t10
+         gradu(3) = (alpha*1.0D0/sqrt(t11)*(x3*2.0D0-x3c*2.0D0))/(alpha**2*(ro-sqrt(t11))**2*2.0D0+2.0D0)
+
+         t2 = alpha**2
+         t3 = -x1c
+         t4 = -x2c
+         t5 = -x3c
+         t6 = t3+x1
+         t7 = t4+x2
+         t8 = t5+x3
+         t9 = t6**2
+         t10 = t7**2
+         t11 = t8**2
+         t12 = t9+t10+t11
+         t13 = sqrt(t12)
+         t14 = -t13
+         t15 = ro+t14
+         t16 = t15**2
+         t17 = t2*t16
+         t18 = t17+1.0D0
+         t19 = 1.0D0/t18
+         gradgradu(1,1) = (alpha*t19)/t13-alpha*t9*1.0D0/t13**3*t19+alpha**3*t9*1.0D0/t13**2*t15*t19**2*2.0D0
+   
+         t2 = alpha**2
+         t3 = x1*2.0D0
+         t4 = x2*2.0D0
+         t5 = x1c*2.0D0
+         t6 = x2c*2.0D0
+         t7 = -x1c
+         t9 = -x2c
+         t11 = -x3c
+         t8 = -t5
+         t10 = -t6
+         t12 = t7+x1
+         t13 = t9+x2
+         t14 = t11+x3
+         t15 = t3+t8
+         t16 = t4+t10
+         t17 = t12**2
+         t18 = t13**2
+         t19 = t14**2
+         t20 = t17+t18+t19
+         t21 = sqrt(t20)
+         t22 = -t21
+         t23 = ro+t22
+         t24 = t23**2
+         t25 = t2*t24
+         t26 = t25+1.0D0
+         gradgradu(1,2) = (alpha*t15*t16*1.0D0/t21**3*(-1.0D0/4.0D0))/t26+(alpha**3*t15*t16*1.0D0/t21**2*t23*1.0D0/t26**2)/2.0D0
+
+         t2 = alpha**2
+         t3 = x1*2.0D0
+         t4 = x3*2.0D0
+         t5 = x1c*2.0D0
+         t6 = x3c*2.0D0
+         t7 = -x1c
+         t9 = -x2c
+         t10 = -x3c
+         t8 = -t5
+         t11 = -t6
+         t12 = t7+x1
+         t13 = t9+x2
+         t14 = t10+x3
+         t15 = t3+t8
+         t16 = t4+t11
+         t17 = t12**2
+         t18 = t13**2
+         t19 = t14**2
+         t20 = t17+t18+t19
+         t21 = sqrt(t20)
+         t22 = -t21
+         t23 = ro+t22
+         t24 = t23**2
+         t25 = t2*t24
+         t26 = t25+1.0D0
+         gradgradu(1,3) = (alpha*t15*t16*1.0D0/t21**3*(-1.0D0/4.0D0))/t26+(alpha**3*t15*t16*1.0D0/t21**2*t23*1.0D0/t26**2)/2.0D0
+
+         gradgradu(2,1) = gradgradu(1,2)
+
+         t2 = alpha**2
+         t3 = -x1c
+         t4 = -x2c
+         t5 = -x3c
+         t6 = t3+x1
+         t7 = t4+x2
+         t8 = t5+x3
+         t9 = t6**2
+         t10 = t7**2
+         t11 = t8**2
+         t12 = t9+t10+t11
+         t13 = sqrt(t12)
+         t14 = -t13
+         t15 = ro+t14
+         t16 = t15**2
+         t17 = t2*t16
+         t18 = t17+1.0D0
+         t19 = 1.0D0/t18
+         gradgradu(2,2) = (alpha*t19)/t13-alpha*t10*1.0D0/t13**3*t19+alpha**3*t10*1.0D0/t13**2*t15*t19**2*2.0D0
+   
+
+         t2 = alpha**2
+         t3 = x2*2.0D0
+         t4 = x3*2.0D0
+         t5 = x2c*2.0D0
+         t6 = x3c*2.0D0
+         t7 = -x1c
+         t8 = -x2c
+         t10 = -x3c
+         t9 = -t5
+         t11 = -t6
+         t12 = t7+x1
+         t13 = t8+x2
+         t14 = t10+x3
+         t15 = t3+t9
+         t16 = t4+t11
+         t17 = t12**2
+         t18 = t13**2
+         t19 = t14**2
+         t20 = t17+t18+t19
+         t21 = sqrt(t20)
+         t22 = -t21
+         t23 = ro+t22
+         t24 = t23**2
+         t25 = t2*t24
+         t26 = t25+1.0D0
+         gradgradu(2,3) = (alpha*t15*t16*1.0D0/t21**3*(-1.0D0/4.0D0))/t26+(alpha**3*t15*t16*1.0D0/t21**2*t23*1.0D0/t26**2)/2.0D0
+
+         gradgradu(3,1) = gradgradu(1,3)
+         gradgradu(3,2) = gradgradu(2,3)
+
+         t2 = alpha**2
+         t3 = -x1c
+         t4 = -x2c
+         t5 = -x3c
+         t6 = t3+x1
+         t7 = t4+x2
+         t8 = t5+x3
+         t9 = t6**2
+         t10 = t7**2
+         t11 = t8**2
+         t12 = t9+t10+t11
+         t13 = sqrt(t12)
+         t14 = -t13
+         t15 = ro+t14
+         t16 = t15**2
+         t17 = t2*t16
+         t18 = t17+1.0D0
+         t19 = 1.0D0/t18
+         gradgradu(3,3) = (alpha*t19)/t13-alpha*t11*1.0D0/t13**3*t19+alpha**3*t11*1.0D0/t13**2*t15*t19**2*2.0D0
+
+
       case default
          write(*,*) 'solution: unknown exact solution (ISOL).'
    end select

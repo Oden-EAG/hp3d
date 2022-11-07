@@ -4,7 +4,7 @@
 !
 !------------------------------------------------------------------------------------
 !
-!     latest revision:  - Oct 2021
+!     latest revision:  - Oct 2022
 !
 !     purpose:          - define problem dependent data
 !                         (multiphysics, BC, approximation)
@@ -35,9 +35,9 @@
    integer :: nod,ibegin,iend
    integer :: nodesl(27),norientl(27)
    character(len=4) :: type
-   integer :: geomtype ! 0 for cube and 1 for fischera corner (make sure to change default
-   ! file-geometry in common/set_enviroment.F90)
-   geomtype = 0
+   integer :: geomtype ! 0 for cube with dirichlet boundary condition,1 for fischera corner (make sure to change default
+   ! file-geometry in common/set_enviroment.F90), 2 for the cube but arc tan test case
+   geomtype = 2
 !
 !------------------------------------------------------------------------------------
 !
@@ -83,14 +83,23 @@
 !     ...uniform BC
          case(BC_DIRICHLET)
 !        ...if exterior face, set boundary condition to IBC_PROB
-            if(geomtype .eq. 0) then 
+            if(geomtype .eq. 0) then  !all external faces have dirichlet boundary condition on H1 trace
                do ifc=1,nface(ELEMS(iel)%Type)
                neig = ELEMS(iel)%neig(ifc)
                   select case(neig)
                      case(0); ibc(ifc,1) = 1 ! Dirichlet BC (H1 trace variable)
                   end select
                enddo
-            else ! Fischera Croner boundary conditions (Neuman conditions as Dirichlet for normal flux)
+
+            else if (geomtype .eq. 2) then ! three faces on co-ordinate planes have H1 trace dirichlet BC and other Three have H-div trace dirichlet BC
+               ibc(1,1) = 1
+               ibc(2,2) = 1
+               ibc(3,1) = 1
+               ibc(4,2) = 1
+               ibc(5,2) = 1
+               ibc(6,1) = 1
+
+            else if (geomtype .eq. 1) then ! Fischera Croner boundary conditions (Neuman conditions as Dirichlet for normal flux)
                if(iel .eq. 4) then
                   do ifc=1,nface(ELEMS(iel)%Type)
                      neig = ELEMS(iel)%neig(ifc)

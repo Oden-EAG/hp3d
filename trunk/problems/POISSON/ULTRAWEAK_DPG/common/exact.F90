@@ -4,7 +4,7 @@
 !
 !----------------------------------------------------------------------
 !
-!     latest revision:  - July 2019
+!     latest revision:  - october 2022
 !
 !     purpose:          - return exact solution value at a point X
 !
@@ -73,10 +73,15 @@ subroutine exact(X,Icase, ValH,DvalH,D2valH, &
    DvalH(1,1:3)      = gradu     ! 1st derivative [gradient]
    D2valH(1,1:3,1:3) = gradgradu ! 2nd derivative [Hessian]
 
+   ! for error computation in field variable u and sigma = grad u 
    ValQ(1) = u
    ValQ(2) = gradu(1)
    ValQ(3) = gradu(2)
    ValQ(4) = gradu(3)
+
+   ! for boundary condition of H-div trace when analytical solution is given.
+   ValV(1:3,1) = gradu
+   DvalV(1:3,1,1:3) = gradgradu 
 !
 !
 end subroutine exact

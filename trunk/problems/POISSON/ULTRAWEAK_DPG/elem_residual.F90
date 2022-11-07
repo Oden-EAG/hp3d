@@ -4,11 +4,11 @@
 !
 !--------------------------------------------------------------------
 !
-!     latest revision:  - Oct 2021
+!     latest revision:  - Oct 2022
 !
 !     purpose:          - routine returns element residual (squared)
-!                         for the Primal Poisson and UW Time Harmonic
-!                         Maxwell equation
+!                         for the Ultraweak Poisson.
+!
 !
 !     arguments:
 !        in:
@@ -86,10 +86,10 @@ end subroutine elem_residual
 !
 !--------------------------------------------------------------------
 !
-!     latest revision:  - Oct 2021
+!     latest revision:  - Oct 2022
 !
 !     purpose:          - routine returns element residual (squared)
-!                         for the UltraWeak DPG Poisson equation
+!                         for the UltraWeak formulation
 !
 !     arguments:
 !        in:

@@ -4,7 +4,7 @@
 !
 !----------------------------------------------------------------------
 !
-!     latest revision:  - July 2019
+!     latest revision:  - october 2022
 !
 !     purpose:          - return dirichlet data at a point
 !
@@ -69,6 +69,8 @@ subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
 !     ...use the exact solution to determine Dirichlet data
          call exact(X,Icase, ValH,DvalH,d2valH,ValE,DvalE,d2valE, &
                              ValV,DvalV,d2valV,valQ,dvalQ,d2valQ)
+         ! call FicheraCornerDirichlet(X,Icase, ValH,DvalH,d2valH,ValE,DvalE,d2valE, &
+         ! ValV,DvalV,d2valV,valQ,dvalQ,d2valQ)
       case default
          write(*,*)'dirichlet: unknown exact solution flag. stop.'
          stop

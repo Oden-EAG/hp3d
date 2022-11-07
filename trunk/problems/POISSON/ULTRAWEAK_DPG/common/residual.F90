@@ -4,7 +4,7 @@
 !
 !----------------------------------------------------------------------
 !
-!     latest revision:  - Oct 2021
+!     latest revision:  - Oct 2022
 !
 !     purpose:          - compute and print residual
 !
