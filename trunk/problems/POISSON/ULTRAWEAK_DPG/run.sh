@@ -18,7 +18,7 @@ dp=1
 #   1: smooth sin*sinh solution, uniform in z
 #   2: smooth sin*sinh solution
 #   3: arc tan solution
-isol=3
+isol=0
 # - user mode
 #   interactive run    (job=0)
 #   pre-configured run (job=1)

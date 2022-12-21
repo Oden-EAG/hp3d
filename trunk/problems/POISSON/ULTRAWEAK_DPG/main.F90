@@ -194,6 +194,7 @@ subroutine master_main()
       write(*,*) 'Refine a single element................26'
       write(*,*) 'Adaptive Refinement....................27'
       write(*,*) 'Multiple Adaptive Refinement + solve...28'
+      write(*,*) 'Multiple Hp refinement + solve (work in progress) ... 29'
       write(*,*) '                                         '
       write(*,*) '        ---- MPI Routines ----           '
       write(*,*) 'Distribute mesh........................30'
@@ -262,7 +263,7 @@ subroutine master_main()
             call exec_case(idec)
 !
 !     ...Refinements
-         case(20,21,22,23,26,27,28)
+         case(20,21,22,23,26,27,28,29)
             call exec_case(idec)
 !
 !     ...MPI Routines
@@ -391,7 +392,7 @@ subroutine worker_main()
             call exec_case(idec)
 !
 !     ...Refinements
-         case(20,21,22,23,26)
+         case(20,21,22,23,26,27,28,29)
             call exec_case(idec)
 !
 !     ...MPI Routines

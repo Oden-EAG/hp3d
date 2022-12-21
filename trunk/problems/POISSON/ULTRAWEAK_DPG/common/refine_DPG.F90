@@ -50,6 +50,7 @@ subroutine refine_DPG
     use MPI          , only: MPI_COMM_WORLD,MPI_SUM,MPI_COMM_WORLD,   &
                              MPI_REAL8,MPI_INTEGER,MPI_IN_PLACE,MPI_MAX
     
+   implicit none
    !  integer, intent(in)  :: Irefine
    !  integer, intent(in)  :: Nreflag
    !  real(8), intent(in)  :: Factor
@@ -58,7 +59,7 @@ subroutine refine_DPG
    !  logical, intent(in)  :: Ires
    !  integer, intent(out) :: Nstop
     
-    integer, parameter :: adap_strat = 1 !0 is for greedy strat and 1 is for doefeler
+    integer, parameter :: adap_strat = 1 !0 is for greedy strat and 1 is for Doerfler 
     ! parameters below were input to the function before but currently used as finxed parameters for debug
     integer, parameter :: physNick = 1 !if exact then adapting to reduce in error L2 solution u
     integer, parameter :: max_step = 20
@@ -93,7 +94,7 @@ subroutine refine_DPG
    integer, save :: istep = 0
    integer, save :: irefineold = 0
    real(8) :: resid_subd,resid_tot,elem_resid_max
-   real(8) :: errorQ,rnormQ 
+   real(8) :: errorH,errorE,errorV,errorQ,rnormH,rnormE,rnormV,rnormQ
    real(8) :: error_tot,rnorm_tot,error_subd,rnorm_subd
 
 
@@ -181,8 +182,8 @@ resid_tot = 0.d0; error_tot = 0.d0; rnorm_tot = 0.d0
 if(DISTRIBUTED) then !MPI reduction op to ollect the error and residual
    count = 1
    call MPI_ALLREDUCE(resid_subd,resid_tot,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
-   call MPI_ALLREDUCE(error_subd,resid_tot,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
-   call MPI_ALLREDUCE(rnorm_subd,resid_tot,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
+   call MPI_ALLREDUCE(error_subd,error_tot,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
+   call MPI_ALLREDUCE(rnorm_subd,rnorm_tot,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
    call MPI_ALLREDUCE(MPI_IN_PLACE,elem_resid_max,count,MPI_REAL8,MPI_MAX,MPI_COMM_WORLD,ierr) !max over all elements
    count = NRELES
    call MPI_ALLREDUCE(MPI_IN_PLACE,elem_resid,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
@@ -262,7 +263,7 @@ if (Irefine .eq. IADAPTIVE) then
          do iel = 1,NRELES
             mdle = ELEM_ORDER(iel)
             call find_domain(mdle,i)
-            if(elem_resid(iel) > 0.8d0 * elem_resid_max) then
+            if(elem_resid(iel) > Factor * elem_resid_max) then
                nr_elem_ref = nr_elem_ref + 1
                mdle_ref(nr_elem_ref) = mdle
                if (RANK.eq.ROOT) write(*,1020) 'ndom=',i,', mdle=',mdle,', r =',elem_resid(iel)
@@ -297,7 +298,7 @@ if (Irefine .eq. IADAPTIVE) then
 
             nr_elem_ref = nr_elem_ref + 1
             res_sum = res_sum + elem_resid(iel)
-            if(res_sum > 0.5d0*resid_tot) exit
+            if(res_sum > Factor*resid_tot) exit
 
          enddo
          if (RANK.eq.ROOT) write(*,1023) 'nr_elem_ref = ', nr_elem_ref
@@ -383,10 +384,10 @@ end select
 !                              FINALIZE
 !-----------------------------------------------------------------------
 !
-if (IBCFLAG .eq. 3) then
-   call propagate_flag(3,3)
-   call propagate_flag(5,3)
-endif
+! if (IBCFLAG .eq. 3) then
+!    call propagate_flag(3,3)
+!    call propagate_flag(5,3)
+! endif
 !
 90 continue
 
@@ -458,7 +459,7 @@ end subroutine qsort_duplet
 !-----------------------------------------------------------------------
 ! subroutine: adap_solve (adaptive refinements and solve)
 !-----------------------------------------------------------------------
-subroutine adap_solve()
+subroutine adap_solve
    !
       use common_prob_data
       use MPI           , only: MPI_COMM_WORLD,MPI_INTEGER
@@ -484,13 +485,15 @@ subroutine adap_solve()
       call MPI_BCAST (nsteps,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
    !
    !..initial solve
+      Print *, HOST_MESH, RANK
       if (DISTRIBUTED .and. (.not. HOST_MESH)) then
          call par_mumps_sc('G')
       else
          call mumps_sc('G')
       endif
+      ! call refine_DPG
    !
-   !..do refinements and solve
+   ! ..do refinements and solve
       do i=0,nsteps
    !  ...display error and refine if necessary
          if (i.ne.nsteps) then

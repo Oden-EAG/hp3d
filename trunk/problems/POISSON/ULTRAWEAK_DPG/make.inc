@@ -14,7 +14,16 @@ SRC_COMMON = \
             ./common/set_environment.F90 \
             ./common/uniform_href.F90 \
             ./common/ficheracornerdirichlet.F90 \
-            ./common/refine_DPG.F90
+            ./common/refine_DPG.F90 \
+            ./common/HpAdapt.F90 \
+            ./common/project_p.F90  \
+            ./common/extraction_vector.F90  \
+            ./common/pbisolver3.F90 \
+            ./common/Finegrid_padap.F90 \
+            ./common/fine_to_coarse_gp_map.F90  \
+            ./common/fine_to_coarse_projection_error.F90 \
+            ./common/project_h.F90  \
+            ./common/elem_proj_h.F90
 
 SRC_PRIMAL = \
             celem.F90 \
