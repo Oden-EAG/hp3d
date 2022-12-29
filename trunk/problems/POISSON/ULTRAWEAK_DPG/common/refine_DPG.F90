@@ -63,7 +63,7 @@ subroutine refine_DPG
     ! parameters below were input to the function before but currently used as finxed parameters for debug
     integer, parameter :: physNick = 1 !if exact then adapting to reduce in error L2 solution u
     integer, parameter :: max_step = 20
-    integer, parameter :: Factor = 0.75
+    real(8), parameter :: Factor = 0.75
     logical :: Ires = .true.
     integer, parameter :: Irefine = 2
     
