@@ -31,7 +31,7 @@ subroutine solution(X, u,gradu,gradgradu)
    real(8), dimension(3),   intent(out) :: gradu     ! 1st derivative - gradient
    real(8), dimension(3,3), intent(out) :: gradgradu ! 2nd derivative - Hessian
 !
-   real(8) :: x1,x2,x3,f_x,f_y,f_z,df_x,df_y,df_z,ddf_x,ddf_y,ddf_z
+   real(8) :: x1,x2,x3,f_x,f_y,f_z,df_x,df_y,df_z,ddf_x,ddf_y,ddf_z,eps
    real(8) :: np_x,np_y,np_z
    integer :: isol_p
    real(8) :: x1c,x2c,x3c,alpha,ro
@@ -50,10 +50,10 @@ subroutine solution(X, u,gradu,gradgradu)
 !  ...polynomial solution
       case(0)
 !     ...set polynomial order of manufactured solution
-         isol_p = 3
+         isol_p = 4
          np_x = real(isol_p,8)
-         np_y = real(isol_p,8)
-         np_z = real(isol_p,8)
+         np_y = real(isol_p-4,8)
+         np_z = real(isol_p-4,8)
 !     ...value
          f_x = x1**np_x
          f_y = x2**np_y
@@ -323,6 +323,18 @@ subroutine solution(X, u,gradu,gradgradu)
          t19 = 1.0D0/t18
          gradgradu(3,3) = (alpha*t19)/t13-alpha*t11*1.0D0/t13**3*t19+alpha**3*t11*1.0D0/t13**2*t15*t19**2*2.0D0
 
+
+      case(4)
+
+         eps = 5.d-2
+         u = x1 + (exp(x1/eps) - 1.d0)/(1.d0 - exp(1.d0/eps))
+
+         gradu = ZERO
+         gradu(1) = 1.d0 + (1.d0/eps) * (exp(x1/eps)/(1.d0 - exp(1.d0/eps)))
+
+         gradgradu = ZERO
+
+         gradgradu(1,1) = (1.d0/eps**2) * (exp(x1/eps)/(1.d0 - exp(1.d0/eps)))
 
       case default
          write(*,*) 'solution: unknown exact solution (ISOL).'

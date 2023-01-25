@@ -2,7 +2,7 @@
 
 #
 # MPI Procs
-nproc=1
+nproc=2
 #
 # OMP THREADS
 nthreads=1
@@ -18,7 +18,8 @@ dp=1
 #   1: smooth sin*sinh solution, uniform in z
 #   2: smooth sin*sinh solution
 #   3: arc tan solution
-isol=0
+#   4: x boundary layer eps = 0.1
+isol=4
 # - user mode
 #   interactive run    (job=0)
 #   pre-configured run (job=1)

@@ -20,7 +20,7 @@
 
 
 
-subroutine elem_proj_h(Mdle,kref_loc,error_org,error_opt,g_rate_ref)
+subroutine elem_proj_h(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_rate_max,rate_hcomp,Nord_href)
 
     use control
     use data_structure3D
@@ -31,11 +31,13 @@ subroutine elem_proj_h(Mdle,kref_loc,error_org,error_opt,g_rate_ref)
     implicit none
 
     integer,    intent(in)  :: Mdle
+    integer,    intent(in)  :: flag_pref_loc
     integer,    intent(in)  :: kref_loc
     real(8),    intent(in)  :: error_org
-    real(8),    intent(out) :: g_rate_ref
+    real(8),    intent(out) :: g_rate_max
+    real(8),    intent(out) :: rate_hcomp
     real(8),    intent(out) :: error_opt
-
+    integer,    dimension(8), intent(out)   :: Nord_href
     character(len=4) :: etype
 !..element order, orientation for edges and faces of the original element
     
@@ -82,11 +84,13 @@ subroutine elem_proj_h(Mdle,kref_loc,error_org,error_opt,g_rate_ref)
     integer :: Ldglob,Ldwork,Nrhs 
     real(8) :: proj_error_subson, proj_error
     integer,dimension(50)  :: Mblock
+    integer,dimension(50)  :: dof_diff
+    real(8),dimension(50)  :: error_rate
 
 
     integer :: nrdofgQ,nrdofmQ,mstep, nrdof_org
     integer :: nr_mdle_sons,mdle_fine,first_son
-    integer :: nint_pp,nrdof,Nord_glob, Nord_org
+    integer :: nint_pp,nrdof,Nord_glob, Nord_org, Polyflag
     integer, allocatable    :: ipi(:),Nord_mep(:,:),Nord_old(:)
     real(8), allocatable    :: error_subsons(:) 
     
@@ -100,8 +104,10 @@ subroutine elem_proj_h(Mdle,kref_loc,error_org,error_opt,g_rate_ref)
 
     !Auxiliary variable
     integer :: j,iss,is,l,k,iflag,k1,k2,iso_p,iss_max,nrdof_tmp
-    integer :: Nref
+    integer :: Nref, local_order_check
+    integer :: pxc,pyc,pzc, pxg,pyg,pzg
     real(8) :: wa, weight,rjac,g_rate_tmp
+    real(8) :: var_a, var_b, var_c !multipurpose temporary variable
     integer,    allocatable :: subsons_Nextract_prev(:,:)
 
     etype = NODES(Mdle)%type
@@ -113,17 +119,25 @@ subroutine elem_proj_h(Mdle,kref_loc,error_org,error_opt,g_rate_ref)
     if(etype .eq. 'mdlb') then
 
         !dofs on the coarse element before hp refinement
-        Nord_org = norder(19) - 111
+
+        ! call ddecode(norder(19),pxm,pym,pzm)
+ 
+        if(flag_pref_loc .eq. 1) then
+            Nord_org = Nord_glob - 111
+        else
+            Nord_org = Nord_glob
+        endif
+    
         call ddecode(Nord_org,pxm,pym,pzm)
         nrdof_org = pxm * pym * pzm
 
-        nr_mdle_sons = 8
+        nr_mdle_sons = 8 !number of fine childs
 
         allocate(Mdle_sons(nr_mdle_sons))
 
-        call ddecode(Nord_glob,pxm,pym,pzm)
-        nrdofgQ = pxm * pym *pzm
-        iso_p = pxm
+        call ddecode(Nord_glob,pxg,pyg,pzg)
+        nrdofgQ = pxg * pyg *pzg
+        iso_p = MAX(pxg,pyg,pzg)
 
         call ddecode(kref_loc,hx,hy,hz)
         nr_subsons = 2**(hx+hy+hz)
@@ -134,7 +148,7 @@ subroutine elem_proj_h(Mdle,kref_loc,error_org,error_opt,g_rate_ref)
         allocate(subsons_zbload(nrdofgQ,nr_subsons))
         subsons_zbload = ZERO
 
-        write(*,*) "number of subsons = ",nr_subsons,kref_loc
+        ! write(*,*) "number of subsons = ",nr_subsons,kref_loc
 
         allocate(subsons_overlap(nr_subsons,8/nr_subsons))
 
@@ -229,6 +243,7 @@ subroutine elem_proj_h(Mdle,kref_loc,error_org,error_opt,g_rate_ref)
 
                     zvalQpp = ZERO
 
+                    !modify this by adding a loop over all L2 variables for cumlative adaptation
                     do k = 1,nrdofQ_pp
                         q = shapQ(k)/rjac
                         zvalQpp(1) = zvalQpp(1) + zdofQ_pp(1,k) * q
@@ -292,14 +307,14 @@ subroutine elem_proj_h(Mdle,kref_loc,error_org,error_opt,g_rate_ref)
         Nord_mep = ZERO
         Nord_mep(1:nr_subsons,1) = 222
 
-        allocate(error_subsons(nr_subsons))
-        error_subsons   = ZERO
-
         allocate(Nord_old(nr_subsons))
         Nord_old = ZERO
 
         allocate(Nord_max(nr_subsons))
         Nord_max = ZERO
+
+        allocate(error_subsons(nr_subsons))
+        error_subsons   = ZERO
 
         allocate(subsons_Mblock(50,nr_subsons))
         subsons_Mblock  = ZERO
@@ -316,20 +331,24 @@ subroutine elem_proj_h(Mdle,kref_loc,error_org,error_opt,g_rate_ref)
         allocate(subsons_Bwork(nrdofgQ,nr_subsons))
         subsons_Bwork = ZERO
         
-        
-        
+        dof_diff = ZERO
+        error_rate = ZERO
+        ! write(*,*) " I am here too "
  
             
         Nref = 1
-        ratio_mep = 0.7d0
-        g_rate_ref = 0.d0
-        
+        ratio_mep = 0.7d0 !ratio for selecting subsons to p-refine  
+        g_rate_max = 0.d0 !maximum guranteed rate
+
+        ! call ddecode(Nord_glob,pxg,pyg,pzg)
+
         do
 
-            if(sum(Nord_mep(1:nr_subsons,Nref)) .gt. nr_subsons * Nord_glob) then
-                exit
-            endif
+            ! if(sum(Nord_mep(1:nr_subsons,Nref)) .gt. nr_subsons * Nord_glob) then
+            !     exit
+            ! endif
 
+            ! write(*,*) "sum = ",sum(Nord_mep(1:nr_subsons,Nref)),nr_subsons * Nord_glob,nr_subsons, Nord_mep(1:nr_subsons,Nref)
             !solve over all subsons
             do iss = 1,nr_subsons
                 if(Nord_old(iss) .ne. Nord_mep(iss,Nref)) then !only solve if the subson has order changed
@@ -340,11 +359,14 @@ subroutine elem_proj_h(Mdle,kref_loc,error_org,error_opt,g_rate_ref)
                     Awork = ZERO
                     Bwork = ZERO
 
+                    !copying the projection matrix
                     Awork(1:nrdofgQ,1:nrdofgQ) = subsons_Awork(1:nrdofgQ,1:nrdofgQ,iss)
                     Bwork(1:nrdofgQ)           = subsons_Bwork(1:nrdofgQ,iss)
 
         
                     Nord_org_subsons(iss) = Nord_mep(iss,Nref)
+
+                    
                     call ddecode(Nord_org_subsons(iss),pxm,pym,pzm)
                     nrdofmQ = pxm * pym * pzm
 
@@ -359,9 +381,6 @@ subroutine elem_proj_h(Mdle,kref_loc,error_org,error_opt,g_rate_ref)
                     
                     Mblock(1:50) = subsons_Mblock(1:50,iss)
 
-                    ! if(Nref .eq. 3) then
-                    !     write(*,*) Nord_mep(iss,Nref),Nref
-                    ! endif
 
                     allocate(Nextract(nrdofmQ))
                     Nextract = ZERO
@@ -405,19 +424,21 @@ subroutine elem_proj_h(Mdle,kref_loc,error_org,error_opt,g_rate_ref)
             Nord_old(1:nr_subsons) = Nord_mep(1:nr_subsons,Nref)
             
 
-            nrdof_tmp = 0.d0
+            nrdof_tmp = 0
             do iss = 1,nr_subsons
 
                 if((error_subsons(iss) .ge. max_error_subson)   .and. (Nord_mep(iss,Nref) .lt. Nord_glob)) then
 
                     max_error_subson = error_subsons(iss)
-                    iss_max = iss
+
                 endif
                 
                 call ddecode(Nord_old(iss),pxm,pym,pzm)
                 nrdof_tmp = nrdof_tmp + pxm*pym*pzm
 
             enddo
+
+            dof_diff(Nref) = nrdofgQ - nrdof_tmp
 
             !increasing the order for max error in subsons with order  .le. Nord_glob
 
@@ -426,17 +447,53 @@ subroutine elem_proj_h(Mdle,kref_loc,error_org,error_opt,g_rate_ref)
                 Nord_mep(iss,Nref + 1) = Nord_mep(iss,Nref)
                 if((error_subsons(iss) .ge. ratio_mep * max_error_subson) .and. (Nord_mep(iss,Nref) .lt. Nord_glob)) then
 
-                    Nord_mep(iss, Nref + 1) = Nord_mep(iss,Nref) + 111
+                    ! Nord_mep(iss, Nref + 1) = Nord_mep(iss,Nref) + 111
+
+                    call ddecode(Nord_mep(iss,Nref),pxc,pyc,pzc)
+                    if(((pxg - pxc) .ge. 1) .and. ((pyg - pyc) .ge. 1) .and. ((pzg - pzc) .ge. 1)) then
+
+                        allocate(Awork(nrdofgQ,nrdofgQ))
+                        allocate(Bwork(nrdofgQ))
+                        nrdofmQ = pxc * pyc * pzc
+
+                        Awork = ZERO
+                        Bwork = ZERO
+
+                        Awork(1:nrdofgQ,1:nrdofgQ) = subsons_Awork(1:nrdofgQ,1:nrdofgQ,iss)
+                        Bwork(1:nrdofgQ)           = subsons_Bwork(1:nrdofgQ,iss)
+
+                        Ap(1:nrdofgQ,1:nrdofgQ) = subsons_Ap(1:nrdofgQ,1:nrdofgQ,iss)
+                        zbload(1:nrdofgQ) = subsons_zbload(1:nrdofgQ,iss)
+
+                        call poly_adap_subson(kref_loc,Mdle,nrdofgQ,nrdof_org,Nord_mep(iss,Nref),Nord_glob,subsons_overlap(iss,:),error_org, &
+                                              Ap,zbload,Awork,Bwork,subsons_Nextract_prev(iss,1:nrdofmQ),Polyflag)
+                                              
+                        Nord_mep(iss, Nref + 1) = Polyflag
+
+                        deallocate(Awork)
+                        deallocate(Bwork)
+
+                    else
+                        
+                        Nord_mep(iss, Nref + 1) = Nord_glob
+                    
+                    endif
 
                 endif
 
             enddo
 
-            g_rate_tmp = (error_org**2 - proj_error)/(real(nrdof_tmp,8) - real(nrdof_org,8))
+            ! g_rate_tmp = (log(error_org**2) - log(proj_error))/(log(real(nrdof_tmp,8)) - log(real(nrdof_org,8)))
+            if(nrdof_tmp .ne. nrdof_org) then
+                g_rate_tmp = (error_org - proj_error)/abs(real(nrdof_tmp,8) - real(nrdof_org,8))
+                error_rate(Nref) = g_rate_tmp         
+                ! write(*,*) " The rate is ",g_rate_tmp,Nref,Mdle,real(nrdof_tmp,8),real(nrdof_org,8),error_org,proj_error
+                ! write(*,*) Nord_old(1:nr_subsons)
+            endif
 
-            if(g_rate_tmp .ge. g_rate_ref) then
+            if(g_rate_tmp .ge. g_rate_max) then
 
-                g_rate_ref = g_rate_tmp
+                g_rate_max = g_rate_tmp
                 error_opt = proj_error
                 Nord_max(1:nr_subsons) = Nord_old(1:nr_subsons) 
 
@@ -444,10 +501,47 @@ subroutine elem_proj_h(Mdle,kref_loc,error_org,error_opt,g_rate_ref)
 
             ! error_opt = proj_error
             ! g_rate_ref = g_rate_tmp
+            local_order_check = 0
 
-            if(sum(Nord_mep(1:nr_subsons,Nref)) .eq. nr_subsons * Nord_glob) then !exit at the last step when every one reaches at the highest polynomial order
+            do iss = 1,nr_subsons
+
+                call ddecode(Nord_mep(iss,Nref+1),pxc,pyc,pzc)
+                
+                if((pxc .gt. pxg) .or. (pyc .gt. pyg) .or. (pzc .gt. pzg)) then
+                    local_order_check = local_order_check + 1
+                endif
+
+            enddo
+
+            ! write(*,*) "local_order_check", local_order_check
+
+            if(local_order_check .gt. 0) then
                 exit
             endif
+
+
+            local_order_check = 0
+
+            do iss = 1,nr_subsons
+                call ddecode(Nord_mep(iss,Nref),pxc,pyc,pzc)
+                
+                if((pxc .eq. pxg) .and. (pyc .eq. pyg) .and. (pzc .eq. pzg)) then
+                    local_order_check = local_order_check + 1
+                endif
+
+            enddo
+
+            ! write(*,*) "local_order_check", local_order_check
+
+            if(local_order_check .eq. nr_subsons) then
+                exit
+            endif
+
+
+
+            ! if(sum(Nord_mep(1:nr_subsons,Nref)) .eq. nr_subsons * Nord_glob) then !exit at the last step when every one reaches at the highest polynomial order
+            !     exit
+            ! endif
 
            
 
@@ -456,12 +550,22 @@ subroutine elem_proj_h(Mdle,kref_loc,error_org,error_opt,g_rate_ref)
 
         enddo
 
-        write(*,*) Nord_max
-        ! write(*,*) dof_diff(1:Nref)
+        ! write(*,*) Nord_max
 
-        ! write(*,*) Nref, (error_org**2 - proj_error)/(nrdofgQ*nr_subsons - nrdof_org)
-        ! write(*,*)  sqrt(proj_error)
-        ! write(*,*) error_subsons
+        Nord_href(1:nr_subsons) = Nord_max(1:nr_subsons)
+
+        rate_hcomp = 0.d0
+
+        do k = 1,Nref
+
+            if((dof_diff(k)) .ge. 0) then
+
+                    if(rate_hcomp .le. error_rate(k)) then
+                        rate_hcomp = error_rate(k)
+                    endif
+            
+            endif
+        enddo
 
     endif
 

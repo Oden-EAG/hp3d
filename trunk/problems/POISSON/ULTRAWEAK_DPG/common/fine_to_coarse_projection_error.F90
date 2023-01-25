@@ -161,7 +161,7 @@ subroutine fine_to_coarse_projection_error(nr_mdle_sons,coeff,Nextract,nrdofmQ,n
 
     enddo
 
-    proj_error = sqrt(proj_error)
+    ! proj_error = sqrt(proj_error)
 
     
 end subroutine fine_to_coarse_projection_error

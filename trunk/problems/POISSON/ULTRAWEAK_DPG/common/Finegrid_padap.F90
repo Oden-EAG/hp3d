@@ -11,7 +11,7 @@
 
 
 
-subroutine Finegrid_padap(nr_elem_ref,mdle_ref,xnod_ref)
+subroutine Finegrid_padap(nr_elem_ref,mdle_ref,xnod_ref,flag_pref)
 
     use common_prob_data
     use control
@@ -27,9 +27,10 @@ subroutine Finegrid_padap(nr_elem_ref,mdle_ref,xnod_ref)
     implicit none
     integer, parameter :: Irefine = 2
     integer, parameter :: adap_strat = 1
-    integer, parameter :: Factor = 0.75
-    logical :: Ires = .true.
+    ! integer, parameter :: Factor = 0.75
+    ! logical :: Ires = .true.
     integer, intent(in) :: nr_elem_ref
+    integer, intent(out) :: flag_pref(nr_elem_ref)
 
     integer, dimension(nr_elem_ref),    intent(in)  :: mdle_ref
     real(8), dimension(nr_elem_ref,3,MAXbrickH),    intent(out)  ::  xnod_ref
@@ -81,6 +82,59 @@ subroutine Finegrid_padap(nr_elem_ref,mdle_ref,xnod_ref)
                !  call break(mdle,kref)
             enddo
         elseif(adap_strat .eq. 1) then
+            ! p refinement of marked elements
+            do iel = 1,nr_elem_ref
+                mdle = mdle_ref(iel)
+                etype = NODES(mdle)%type
+                nord = NODES(mdle)%order
+                select case(etype)
+                   case('mdlb')
+                    !   kref = 111 ! iso
+                      nord_new = nord + 111
+                    !   write(*,*) "the elem is = ", mdle,nord_new
+                      call decode(nord_new,naux,nordz)
+                      call decode(naux,nordx,nordy)
+                      pord = MAX(nordx,nordy,nordz)
+                     !  write(*,*) mdle,pord,MAXP
+                      if (pord .gt. MAXP) then
+                          write(*,1002) 'local pref: mdle,p,MAXP = ',mdle,pord,MAXP,'. stop.'
+                          go to 700
+                          1002 format(A,I7,I3,I3,A)
+                      endif 
+                    
+
+                   case default
+                      write(*,*) 'refine_DPG: READING UNEXPECTED ELEMENT TYPE: ',etype
+                      call pause
+                end select
+                !p refine only if pord is less than MAXP : thats why we have a goto above in if statement
+                call nodmod(mdle,nord_new)  
+                flag_pref(iel) = 1
+                700 continue !not performing p-ref to any element which are already at the highest polynomial order.
+
+            enddo
+
+            call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+            ! end_time = MPI_Wtime()
+            ! if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2020) end_time-start_time
+            ! call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+            ! start_time = MPI_Wtime()
+            call enforce_min_rule
+            call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+            ! end_time = MPI_Wtime()
+            ! if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2025) end_time-start_time
+            !..raise order of approximation on non-middle nodes by enforcing minimum rule
+            
+            call par_verify
+            call update_gdof
+            call update_Ddof
+
+            ! write(*,*)  "here 2 = ",MAXNODS,NRNODS,NPNODS
+            call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+            ! start_time = MPI_Wtime()
+            
+            !h-refinement of marked elements
+
             do iel = 1,nr_elem_ref
                 mdle = mdle_ref(iel)
                 etype = NODES(mdle)%type
@@ -88,44 +142,39 @@ subroutine Finegrid_padap(nr_elem_ref,mdle_ref,xnod_ref)
                 select case(etype)
                    case('mdlb')
                       kref = 111 ! iso
-                      nord_new = nord + 111
-                
-                      call decode(nord_new,naux,nordz)
-                      call decode(naux,nordx,nordy)
-                      pord = MAX(nordx,nordy,nordz)
-                     !  write(*,*) mdle,pord,MAXP
-                      if (pord .gt. MAXP) then
-                          write(*,1002) 'local pref: mdle,p,MAXP = ',mdle,pord,MAXP,'. stop.'
-                          stop
-                          1002 format(A,I7,I3,I3,A)
-                      endif   
+                    !   nord_new = nord + 111
+                    !   write(*,*) "the elem is = ", mdle,nord_new
+                    !   call decode(nord_new,naux,nordz)
+                    !   call decode(naux,nordx,nordy)
+                    !   pord = MAX(nordx,nordy,nordz)  
                    case default
                       write(*,*) 'refine_DPG: READING UNEXPECTED ELEMENT TYPE: ',etype
                       call pause
                 end select
                 
-                !p refine and then h-refine
-                call nodmod(mdle,nord_new)
                 call refine(mdle,kref)
-               !  call break(mdle,kref)
             enddo
+
+            ! call enforce_min_rule
+            call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+            if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2020) end_time-start_time
+            call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+            call close_mesh
+            ! call enforce_min_rule
+            call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+            if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2025) end_time-start_time
+            !..raise order of approximation on non-middle nodes by enforcing minimum rule
+            
+            call par_verify
+            call update_gdof
+            call update_Ddof
+            call MPI_BARRIER(MPI_COMM_WORLD, ierr)
+
         endif
-      !   call enforce_min_rule
-        call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
-        if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2020) end_time-start_time
-        call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-        call close_mesh
-        ! call enforce_min_rule
-        call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
-        if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) write(*,2025) end_time-start_time
-        !..raise order of approximation on non-middle nodes by enforcing minimum rule
-        
-        call par_verify
-        call update_gdof
-        call update_Ddof
+
 
         ! if (RANK .eq. ROOT) write(*,*) 'NRELES = ', NRELES
-        if (RANK .eq. ROOT) write(*,*) 'Finished p refining selected elements'
+        ! if (RANK .eq. ROOT) write(*,*) 'Finished hp refining selected elements'
 
 
     case default; Nstop = 1

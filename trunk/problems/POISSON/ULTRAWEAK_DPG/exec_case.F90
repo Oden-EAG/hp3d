@@ -114,7 +114,8 @@ subroutine exec_case(idec)
 
       case(29)
          write(*,*) " adaptive Hp refinements"
-         call HpAdapt
+         ! call HpAdapt
+         call Hp_adapt_solve
 !
 !  ...distribute mesh
       case(30)

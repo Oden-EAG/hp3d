@@ -23,7 +23,10 @@ SRC_COMMON = \
             ./common/fine_to_coarse_gp_map.F90  \
             ./common/fine_to_coarse_projection_error.F90 \
             ./common/project_h.F90  \
-            ./common/elem_proj_h.F90
+            ./common/elem_proj_h.F90 \
+            ./common/mesh_copy.F90  \
+            ./common/poly_adap_subson.F90   \
+            ./common/coeff_polynomial_aniso.F90
 
 SRC_PRIMAL = \
             celem.F90 \
