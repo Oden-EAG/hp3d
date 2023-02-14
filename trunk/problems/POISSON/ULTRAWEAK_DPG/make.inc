@@ -26,7 +26,8 @@ SRC_COMMON = \
             ./common/elem_proj_h.F90 \
             ./common/mesh_copy.F90  \
             ./common/poly_adap_subson.F90   \
-            ./common/coeff_polynomial_aniso.F90
+            ./common/coeff_polynomial_aniso.F90 \
+            ./common/Adaptationtest_routines.F90
 
 SRC_PRIMAL = \
             celem.F90 \
