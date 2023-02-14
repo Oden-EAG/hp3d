@@ -78,6 +78,7 @@ end subroutine fine_to_coarse_gp_map
 
 subroutine  fine_to_subson_gp_map(etype,kref,sel,xi,xis)
 
+implicit none
 integer,    intent(in)  :: kref
 integer,    intent(in)  :: sel
 character(len=4), intent(in) :: etype
@@ -196,6 +197,7 @@ end subroutine fine_to_subson_gp_map
 
 subroutine singlefineson_to_subson_gp_map(ofx,ofy,ofz,fx,fy,fz,xi,xis)
 
+    implicit none
     real(8), intent(in) :: ofx
     real(8), intent(in) :: ofy
     real(8), intent(in) :: ofz
@@ -213,3 +215,97 @@ subroutine singlefineson_to_subson_gp_map(ofx,ofy,ofz,fx,fy,fz,xi,xis)
 
 
 end subroutine singlefineson_to_subson_gp_map
+
+
+subroutine subson_one_irregularity_map_isoref(etype,kref_intent,subson_impl,father_subson)
+
+
+    implicit none
+
+    character(len=4), intent(in) :: etype
+    integer,    intent(in)  :: kref_intent !intented h-ref
+    integer,    intent(in)  :: subson_impl  !isoref subson index when iso ref is implemented in place of intended h-refinement
+    integer,    intent(out) :: father_subson ! subson which contains the isoref subson
+
+    integer :: i,j
+
+    if(etype .eq. "mdlb") then
+
+        select  case(kref_intent)
+
+            case(100)
+                if((subson_impl .eq. 1) .or. (subson_impl .eq. 4) .or. (subson_impl .eq. 5) .or. (subson_impl .eq. 8)) then
+                    father_subson = 1
+                else
+                    father_subson = 2
+                endif
+
+            case(010)
+                if((subson_impl .eq. 1) .or. (subson_impl .eq. 2) .or. (subson_impl .eq. 5) .or. (subson_impl .eq. 6)) then
+                    father_subson = 1
+                else
+                    father_subson = 2
+                endif 
+
+            case(001)
+                if((subson_impl .eq. 1) .or. (subson_impl .eq. 2) .or. (subson_impl .eq. 3) .or. (subson_impl .eq. 4)) then
+                    father_subson = 1
+                else
+                    father_subson = 2
+                endif 
+
+            case(110)
+                if((subson_impl .eq. 1) .or. (subson_impl .eq. 5)) then
+                    father_subson = 1
+                else if((subson_impl .eq. 2) .or. (subson_impl .eq. 6)) then
+                    father_subson = 2
+                else if((subson_impl .eq. 3) .or. (subson_impl .eq. 7)) then
+                    father_subson = 3
+                else if((subson_impl .eq. 4) .or. (subson_impl .eq. 8)) then
+                    father_subson = 4
+                endif
+
+            case(101)
+                if((subson_impl .eq. 1) .or. (subson_impl .eq. 4)) then
+                    father_subson = 1
+                else if((subson_impl .eq. 2) .or. (subson_impl .eq. 3)) then
+                    father_subson = 2
+                else if((subson_impl .eq. 5) .or. (subson_impl .eq. 8)) then
+                    father_subson = 3
+                else if((subson_impl .eq. 6) .or. (subson_impl .eq. 7)) then
+                    father_subson = 4
+                endif
+            
+            case(011)
+                if((subson_impl .eq. 1) .or. (subson_impl .eq. 2)) then
+                    father_subson = 1
+                else if((subson_impl .eq. 3) .or. (subson_impl .eq. 4)) then
+                    father_subson = 2
+                else if((subson_impl .eq. 5) .or. (subson_impl .eq. 6)) then
+                    father_subson = 3
+                else if((subson_impl .eq. 7) .or. (subson_impl .eq. 8)) then
+                    father_subson = 4
+                endif
+            
+            case(111)
+
+                do i = 1,8
+
+                    if(subson_impl .eq. i) then
+
+                        father_subson = i
+                    endif
+                enddo
+
+            case default
+                write(*,*) " not a valid kref"
+        end select
+
+
+
+    endif
+
+
+
+
+end subroutine subson_one_irregularity_map_isoref

@@ -85,7 +85,7 @@ subroutine HpAdapt
 
 
     integer :: i,ic,mdle,iel,kref,subd,count,ierr,inod
-    real(8) :: x(3), xnod(3,8)
+    real(8) :: x(3), xnod(3,MAXbrickH)
     integer :: nord_new,is,nord,nordx,nordy,nordz,naux,pord
     !for the time being for Hex only
     integer :: nr_sons,kref_out
@@ -105,7 +105,8 @@ subroutine HpAdapt
     integer,    allocatable :: ELEM_SUBD_cp(:)
     integer :: NRELES_old,NRNODS_old,NRDOFSH_old,NRDOFSE_old,NRDOFSV_old,NRDOFSQ_old
     integer :: NPNODS_old,MAXNODS_old,NRELIS_old
-    integer :: Kref_close, kref_intent
+    integer :: Kref_close, kref_intent,href_count
+    integer,   allocatable :: write_kref(:,:),write_pref(:,:)
 !
     real(8) :: MPI_Wtime,start_time,end_time
 !
@@ -120,7 +121,7 @@ subroutine HpAdapt
     mdle_ref(1:NRELES)      = 0
 
 
-    Nflag(1:NR_PHYSA) = (/0,0,1,1/) 
+    Nflag(1:NR_PHYSA) = (/0,0,1,0/) 
 
 
 !..increase step if necessary
@@ -328,9 +329,10 @@ NRDOFSQ_old = NRDOFSQ
 NPNODS_old = NPNODS
 MAXNODS_old = MAXNODS
 NRELIS_old = NRELIS
-! write(*,*)  "here 1 = ",MAXNODS,NRNODS,NPNODS
+
 !----------------------------------------------------------------------------
-! call dumpout_hp3d(mesh_filename)
+! call dumpout_hp3d("befor_mesh_copy")
+
 call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 
 allocate(flag_pref(nr_elem_ref)) !flag_pref contains the flags if element has been hp refined
@@ -353,7 +355,7 @@ call exact_error
 
 call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !--------------------------------------------------------------------------
-if(NUM_PROCS .lt. 10) then
+! if(NUM_PROCS .lt. 10) then
    allocate(Ref_indicator_flags(nr_elem_ref * 10))
    Ref_indicator_flags = ZERO
    !first column will contain indicator flag for
@@ -397,9 +399,14 @@ if(NUM_PROCS .lt. 10) then
    if (RANK .eq. ROOT) write(*,*) "The guranteed rate = ",grate_mesh
    !---------------------------------------------------------------------------------------------
    ! copying back the old NODES Array 
-   call Nodes_replace
+   call Nodes_replace(NODES_cp)
+   ! deallocate(NODES_cp)
+!   allocate(NODES(MAXNODS))
    call move_alloc(NODES_cp, NODES)
    if(allocated(NODES_cp)) deallocate(NODES_cp)
+
+   ! call dumpin_hp3d('befor_mesh_copy')
+   NRELIS = NRELIS_old
    NRELES = NRELES_old
    NRNODS = NRNODS_old
    NRDOFSH = NRDOFSH_old
@@ -408,16 +415,16 @@ if(NUM_PROCS .lt. 10) then
    NRDOFSQ = NRDOFSQ_old
    NPNODS = NPNODS_old
    MAXNODS = MAXNODS_old
-   NRELIS = NRELIS_old
+
 
    call update_ELEM_ORDER
    call enforce_min_rule
-   call par_verify
    call close_mesh
+   call par_verify
    call update_gdof
    call update_Ddof
-   ! call distr_mesh
-   ! write(*,*) NRELES,NRNODS,NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ,NPNODS,RANK
+
+
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
    !----------------------------------------------------------------------------------------------
 
@@ -434,6 +441,8 @@ if(NUM_PROCS .lt. 10) then
       
          call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
          !sets up p-refined flags for just p-refined elements
+         allocate(write_pref(nr_elem_ref,2))
+         write_pref = ZERO
          do iel = 1,nr_elem_ref
 
             mdle = mdle_ref(iel)
@@ -449,7 +458,8 @@ if(NUM_PROCS .lt. 10) then
                      nord_new = Ref_indicator_flags((iel-1)*10 + 3)
                      write(*,*) "p-ref", mdle, nord_new
                      call nodmod(mdle,nord_new)
-
+                     ! write_pref(iel,1) = mdle
+                     ! write_pref(iel,2) = nord_new
 
                   endif
                endif
@@ -461,6 +471,14 @@ if(NUM_PROCS .lt. 10) then
 
 
          enddo
+
+
+         ! open(4,file="p_ref_lst",status='replace')
+         ! write(4,*) nr_elem_ref
+         ! do iel = 1,nr_elem_ref
+         !    write(4,*) write_pref(iel,:)
+         ! enddo
+         ! close(4)
 
          call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
          call enforce_min_rule
@@ -473,98 +491,114 @@ if(NUM_PROCS .lt. 10) then
 
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 
-         !setting up the order in child of h-refined element
+         ! putting h-refinement flags
          if (RANK .eq. ROOT)  write(*,*) 'Starting to put  h-refined flags'
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+         allocate(write_kref(nr_elem_ref,2))
+         write_kref = ZERO
 
-         do iel = 1,nr_elem_ref
+            do iel = 1,nr_elem_ref
 
-            mdle = mdle_ref(iel)
-            etype = NODES(mdle)%type
-            nord = NODES(mdle)%order
-            select case(etype)
+               mdle = mdle_ref(iel)
+               etype = NODES(mdle)%type
+               nord = NODES(mdle)%order
+               select case(etype)
 
-            case('mdlb')
+               case('mdlb')
 
-               if(Nref_grate(iel) .gt. 0.25 * grate_mesh) then
-                  if(Ref_indicator_flags((iel-1)*10 + 1) .eq. 1) then   !h-ref
+                  if(Nref_grate(iel) .gt. 0.25 * grate_mesh) then
+                     if(Ref_indicator_flags((iel-1)*10 + 1) .eq. 1) then   !h-ref
 
-                     kref = Ref_indicator_flags((iel-1)*10 + 2)
-                     write(*,*) "href = ",mdle,kref,NODES(mdle)%ref_kind
-                     call refine(mdle,kref)
+                        kref = Ref_indicator_flags((iel-1)*10 + 2)
+                        if(RANK .eq. ROOT) write(*,*) "href = ",mdle,kref,NODES(mdle)%ref_kind
+                        call refine(mdle,kref)
+                        write_kref(iel,1) = mdle
+                        write_kref(iel,2) = kref
+
+                     endif
                   endif
-               endif
-            
-            case default
-               write(*,*) "Element type not recognized"
+               
+               case default
+                  write(*,*) "Element type not recognized"
 
-            end select
+               end select
 
 
-         enddo
+            enddo
+
+
 
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
          call close_mesh
-         ! call enforce_min_rule
+         call enforce_min_rule
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
          call par_verify
          call update_gdof
          call update_Ddof
          call MPI_BARRIER (MPI_COMM_WORLD, ierr);end_time = MPI_Wtime()
+
+         ! open(3,file="h_ref_lst",status='replace')
+         ! write(3,*) nr_elem_ref
+         ! do iel = 1,nr_elem_ref
+         !    write(3,*) write_kref(iel,:)
+         ! enddo
+         ! close(3)
+
          if (RANK .eq. ROOT)  write(*,*) 'end to redfinement'
 
-         !putting p-ref flags to the h-refined subchilds
-         do iel = 1,nr_elem_ref
+      
+         ! !putting p-ref flags to the h-refined subchilds
+         ! do iel = 1,nr_elem_ref
 
-            mdle = mdle_ref(iel)
-            etype = NODES(mdle)%type
-            nord = NODES(mdle)%order
-            first_son = NODES(mdle)%first_son
+         !    mdle = mdle_ref(iel)
+         !    etype = NODES(mdle)%type
+         !    nord = NODES(mdle)%order
+         !    first_son = NODES(mdle)%first_son
 
-            select case(etype)
+         !    select case(etype)
 
-            case('mdlb')
+         !    case('mdlb')
 
-               if(Nref_grate(iel) .gt. 0.25 * grate_mesh) then
-                  if(Ref_indicator_flags((iel-1)*10 + 1) .eq. 1) then   !h-ref
+         !       if(Nref_grate(iel) .gt. 0.25 * grate_mesh) then
+         !          if(Ref_indicator_flags((iel-1)*10 + 1) .eq. 1) then   !h-ref
 
-                     kref_intent = Ref_indicator_flags((iel-1)*10 + 2)
-                     Kref_close  = NODES(mdle)%ref_kind
+         !             kref_intent = Ref_indicator_flags((iel-1)*10 + 2)
+         !             Kref_close  = NODES(mdle)%ref_kind
                  
-                     if(Kref_close .eq. kref_intent) then
+         !             if(Kref_close .eq. kref_intent) then
 
-                        call ddecode(kref_intent,hx,hy,hz)
-                        nr_sons = 2**(hx+hy+hz)
+         !                call ddecode(kref_intent,hx,hy,hz)
+         !                nr_sons = 2**(hx+hy+hz)
                         
-                        do ic = 1,nr_sons
-                           nord_new = Ref_indicator_flags((iel-1)*10 + 2 + ic)
-                           mdle_child = first_son + ic-1
-                           call nodmod(mdle_child,nord_new)  
-                        enddo
+         !                do ic = 1,nr_sons
+         !                   nord_new = Ref_indicator_flags((iel-1)*10 + 2 + ic)
+         !                   mdle_child = first_son + ic-1
+         !                   call nodmod(mdle_child,nord_new)  
+         !                enddo
 
-                     else if(kref_close .eq. 111) then
+         !             else if(kref_close .eq. 111) then
 
-                        !there is a iso_ref
-                        do ic = 1,8
+         !                !there is a iso_ref
+         !                do ic = 1,8
 
-                           mdle_child = first_son + ic - 1
-                           call subson_one_irregularity_map_isoref(etype,kref_intent,ic,father_subson)
-                           nord_new = Ref_indicator_flags((iel-1)*10 + 2 + father_subson)                           
-                           call nodmod(mdle_child,nord_new)
+         !                   mdle_child = first_son + ic - 1
+         !                   call subson_one_irregularity_map_isoref(etype,kref_intent,ic,father_subson)
+         !                   nord_new = Ref_indicator_flags((iel-1)*10 + 2 + father_subson)                           
+         !                   call nodmod(mdle_child,nord_new)
 
-                        enddo
+         !                enddo
 
-                     endif
+         !             endif
 
-                  endif
-               endif
+         !          endif
+         !       endif
             
-            case default
-               write(*,*) "Element type not recognized"
+         !    case default
+         !       write(*,*) "Element type not recognized"
 
-            end select
+         !    end select
 
-         enddo
+         ! enddo
 
 
          ! some printing of fnal flags for refined elements
@@ -599,7 +633,7 @@ if(NUM_PROCS .lt. 10) then
 
       case default; Nstop = 1
    end select  
-endif
+! endif
 end subroutine HpAdapt
 
 

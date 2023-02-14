@@ -495,19 +495,6 @@ subroutine elem_poisson_UW(Mdle,                                          &
 
 !..end of loop through integration points
    enddo
-  
-
-
-   open(1, file = 'data2.dat', status='replace')  
-   do k1=1,NrTest  
-      do k2=k1,NrTest
-       write(1,*) k1,",",k2,",",gramP(nk(k1,k2))  
-      enddo     
-   enddo  
-   
-   ! write(*,*) NrTest,",",NrdofHH,",",NrdofVV
-   close(1) 
-
 
 !
 !---------------------------------------------------------------------

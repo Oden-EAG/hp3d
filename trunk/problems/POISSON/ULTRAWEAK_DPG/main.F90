@@ -195,6 +195,9 @@ subroutine master_main()
       write(*,*) 'Adaptive Refinement....................27'
       write(*,*) 'Multiple Adaptive Refinement + solve...28'
       write(*,*) 'Multiple Hp refinement + solve (work in progress) ... 29'
+      write(*,*) 'Single Hp refinement ..................70'
+      write(*,*) 'Restart from a new mesh(Experimental)................71'
+      write(*,*) 'refinement from h and p-list starting from a mesh (Experimental)................72'
       ! write(*,*) 'Multiple '
       write(*,*) '                                         '
       write(*,*) '        ---- MPI Routines ----           '
@@ -264,7 +267,7 @@ subroutine master_main()
             call exec_case(idec)
 !
 !     ...Refinements
-         case(20,21,22,23,26,27,28,29)
+         case(20,21,22,23,26,27,28,29,70,71,72)
             call exec_case(idec)
 !
 !     ...MPI Routines
@@ -393,7 +396,7 @@ subroutine worker_main()
             call exec_case(idec)
 !
 !     ...Refinements
-         case(20,21,22,23,26,27,28,29)
+         case(20,21,22,23,26,27,28,29,70,71,72)
             call exec_case(idec)
 !
 !     ...MPI Routines

@@ -78,7 +78,7 @@ subroutine set_environment
    call get_option_string  &
         ('-file_vis_upscale','Visualization upscale file location','../../../files/vis',FILE_VIS)
    call get_option_string  &
-        ('-vis_level'       ,'Visualization upscale level (0-3)'  ,'3'                 ,VLEVEL  )
+        ('-vis_level'       ,'Visualization upscale level (0-3)'  ,'0'                 ,VLEVEL  )
 !
    call get_option_string  &
         ('-dir_output'      ,'Paraview root directory'            ,'../outputs/'       ,OUTPUT_DIR)

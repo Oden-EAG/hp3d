@@ -230,17 +230,6 @@ subroutine elem_residual_poisson_UW(Mdle,                                  &
 !
 !..determine solution dof
    call solelm(Mdle, dofH,dofE,dofV,dofQ)
-   ! open(1, file = 'data1.dat', status='replace')  
-   ! do k1=1,NrdofH
-   !    ! do k2=k1,NrTest
-   !    !  write(1,*) dofQ(1,k1),dofQ(2,k1),dofQ(3,k1),dofQ(4,k1)
-   !    write(1,*) dofH(1,k1)  
-   !    ! enddo     
-   ! enddo  
-   
-   ! ! write(*,*) NrTest,",",NrdofHH,",",NrdofVV
-   ! close(1) 
-
 !
 !..allocate space for auxiliary matrices
    allocate(gramP(NrTest*(NrTest+1)/2))
@@ -396,21 +385,7 @@ subroutine elem_residual_poisson_UW(Mdle,                                  &
 
 !..end loop through integration points
    enddo
-   ! write(*,*) 'elem'
-   ! do k1=1,NrTest
-   !    write(*,*) k1, bload_V(k1)
-   ! enddo
 
-   open(1, file = 'data1.dat', status='replace')  
-   do k1=1,NrTest  
-      do k2=k1,NrTest
-       write(1,*) k1,",",k2,",",gramP(nk(k1,k2))  
-      enddo     
-   enddo  
-   
-   ! write(*,*) NrTest,",",NrdofHH,",",NrdofVV
-   close(1) 
-   ! write(*,*) "dummy_check = ", dummy_check
 !
 !-----------------------------------------------------------------------
 !.......... boundary integrals
@@ -509,10 +484,6 @@ subroutine elem_residual_poisson_UW(Mdle,                                  &
 !     ... end of loop over the faces
    enddo
 
-   ! write(*,*) 'interface', nrdofHH, nrdofVV
-   ! do k1=1,NrTest
-   !    write(*,*) k1, bload_V(k1)
-   ! enddo
 !
 !----------------------------------------------------------------------- 
 !..factorize the test stiffness matrix
@@ -533,10 +504,6 @@ subroutine elem_residual_poisson_UW(Mdle,                                  &
       stop
    endif
 
-   ! write(*,*) 'G-1'
-   ! do k1=1,NrTest
-   !    write(*,*) k1, bload_V(k1)
-   ! enddo
 !
    deallocate(gramP)
 !

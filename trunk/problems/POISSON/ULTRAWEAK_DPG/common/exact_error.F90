@@ -32,7 +32,7 @@ subroutine exact_error
 !----------------------------------------------------------------------
 !
 !..compute the error only for L2 field
-   iflag(1:NR_PHYSA) = (/0,0,1,1/) 
+   iflag(1:NR_PHYSA) = (/0,0,1,0/) 
 !
 !..fetch active elements
    if (DISTRIBUTED .and. (.not. HOST_MESH)) then

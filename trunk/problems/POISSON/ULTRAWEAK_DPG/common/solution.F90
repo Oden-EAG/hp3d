@@ -326,7 +326,7 @@ subroutine solution(X, u,gradu,gradgradu)
 
       case(4)
 
-         eps = 5.d-2
+         eps = 7.5d-3
          u = x1 + (exp(x1/eps) - 1.d0)/(1.d0 - exp(1.d0/eps))
 
          gradu = ZERO

@@ -116,14 +116,6 @@ real(8), dimension(Ldwork * Ldwork) :: Awc
       enddo
 
 
-      open(1, file = 'data2.dat', status = 'replace')  
-        do k1 = 1,Ldwork
-            do k2 = 1,Ldwork
-                write(1,*) k1, k2, Awork(k1,k2)
-            enddo
-        enddo
-      close(1)
-
     
 ! !     loop through equations
       do ivar=1,Nrhs
@@ -141,12 +133,6 @@ real(8), dimension(Ldwork * Ldwork) :: Awc
         enddo
       enddo
 
-
-      open(1, file = 'data3.dat', status = 'replace')  
-        do k1  = 1,Ldwork
-          write(1,*) k1, Bwork(k1)
-        enddo
-      close(1)
 
 
 !       !-----------------------------------------------------------------------
@@ -296,21 +282,6 @@ real(8), dimension(Ldwork * Ldwork) :: Awc
                           enddo
                   
                 endif
-              
-                open(1, file = 'data4.dat', status = 'replace')  
-                do k1 = 1,Ldwork
-                    do k2 = 1,Ldwork
-                        write(1,*) k1, k2, Awork(k1,k2)  
-                    enddo
-                enddo
-
-                close(1)
-
-                open(1, file = 'data5.dat', status = 'replace')  
-                  do k1  = 1,Ldwork
-                    write(1,*) k1, Bwork(k1)
-                  enddo
-                  
-                close(1)
+            
 
 end subroutine pbisolver3
