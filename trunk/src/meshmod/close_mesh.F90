@@ -38,6 +38,7 @@ subroutine close_mesh()
 !
 !-----------------------------------------------------------------------------
 !
+
    do
 !---------------------------------------------------------
 !     Step 0 : activate nodes
@@ -71,7 +72,7 @@ subroutine close_mesh()
       do i=1,NRELES
          mdle = ELEM_ORDER(i)
          call get_connect_info(mdle, nodesl,norientl) ! setting internal arrays
-         call flag_constr_parents(mdle)
+         call flag_constr_parents(mdle,nodesl)
       enddo
 !$OMP END DO
 !

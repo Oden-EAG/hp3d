@@ -762,13 +762,77 @@ module data_structure3D
       function Is_Dirichlet(Nod)
       integer Nod
       logical Is_Dirichlet
-      integer ibc(NRINDEX), ic
+      integer ibc(NRINDEX), ic,iphys,ivar
 !
       call decod(NODES(Nod)%bcond,2,NRINDEX, ibc)
       Is_Dirichlet = .false.
-      do ic=1,NRINDEX
-        if (ibc(ic).eq.1) Is_Dirichlet = .true.
+ 
+ !
+
+      ic = 0
+
+!  ...check Dirichlet flags for all variable types
+
+      do iphys=1,NR_PHYSA
+
+         select case(DTYPE(iphys))
+
+!     ...H1 checks all
+
+         case('contin')
+
+            continue
+
+!     ...skip checking vertices of H(curl) variables
+
+         case('tangen')
+
+            if (NODES(nod)%type .eq. 'vert') then
+
+               ic = ic + NR_COMP(iphys)
+
+               cycle
+
+            endif
+
+!     ...skip checking vertices and edges of H(div) variables
+
+         case('normal')
+
+            if (     NODES(nod)%type .eq. 'vert'   &
+
+                .or. NODES(nod)%type .eq. 'medg' ) then
+
+               ic = ic + NR_COMP(iphys)
+
+               cycle
+
+            endif
+
+!     ...skip checking all on L2
+
+         case('discon')
+
+            ic = ic + NR_COMP(iphys)
+
+            cycle
+
+         end select
+
+!
+
+         do ivar=1,NR_COMP(iphys)
+
+            ic = ic + 1
+
+            if (ibc(ic).eq.1) Is_Dirichlet = .true.
+
+         enddo
       enddo
+ 
+      ! do ic=1,NRINDEX
+      !   if (ibc(ic).eq.1) Is_Dirichlet = .true.
+      ! enddo
 !
       end function Is_Dirichlet
 !

@@ -17,18 +17,19 @@ subroutine exec_case(idec)
    logical :: solved
    integer :: mdle_subd(NRELES)
    integer :: i,mdle,kref,src,count,ierr,nord
-   integer :: iParAttr(2) = (/1,0/)
+   integer :: iParAttr(4) = (/0,0,0,1/)
    real(8) :: res
 !
 !----------------------------------------------------------------------
 !
    solved = .false.
+   res = 0.d0
 !
    select case(idec)
 !
 !  ...paraview graphics
       case(3)
-         iParAttr(1:2) = (/1,0/) ! write field output only
+         iParAttr(1:4) = (/1,1,1,3/) ! write field output only
          call my_paraview_driver(iParAttr)
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
@@ -92,16 +93,41 @@ subroutine exec_case(idec)
           2610 format(I6)
             enddo
             read(*,*) mdle
+            write(*,*) 'Provide the refine tag for the chosen element: '
+            read(*,*) kref
          endif
          if (NUM_PROCS .gt. 1) then
             count = 1; src = ROOT
             call MPI_BCAST (mdle,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+            call MPI_BCAST (kref,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
          endif
-         kref = 111
          call refine(mdle,kref)
          call close_mesh
          call update_gdof
          call update_Ddof
+
+      case(27)
+         write(*,*) 'adaptive h-refinement...'
+         call refine_DPG     
+
+      case(28)
+         write(*,*) "solve  and adaptive refinement"
+         call adap_solve
+
+      case(29)
+         write(*,*) " adaptive Hp refinements"
+         ! call HpAdapt
+         call Hp_adapt_solve
+      case(70)
+         write(*,*) " Single adaptive Hp refinements"
+         call HpAdapt
+      case(71)
+         write(*,*) "Restarting adaptation from a mesh but need to save a mesh before hand"
+         call restart_adaptation
+      case(72)
+         write(*,*) "Reads in a mesh and a h- and p-refinement list and only adapts mesh wrt. list"
+         call restart_adaptation_read_ref
+         ! call Hp_adapt_solve
 !
 !  ...distribute mesh
       case(30)

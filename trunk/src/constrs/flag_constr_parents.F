@@ -18,19 +18,19 @@ c                        number
 c
 c----------------------------------------------------------------------
 c
-      subroutine flag_constr_parents(Mdle)
+      subroutine flag_constr_parents(Mdle,Nodesl)
 c
       use element_data
       use data_structure3D
       use constrained_nodes
 #include "syscom.blk"
+      dimension Nodesl(27)
 c
 c  ...element type
       character(len=4) :: type
 c
 c----------------------------------------------------------------------
 c
-      iprint = 0
 c
       type = NODES(Mdle)%type
 c
@@ -39,7 +39,19 @@ c  ...number of (local) nodes for the element (- middle node)
 c
 c  ...loop through element constrained nodes
       do j=1,nrnodl
-        if (NODES_CONSTR(j).eq.0) cycle
+ccc        if (NODES_CONSTR(j).eq.0) cycle
+        if (NODES_CONSTR(j).eq.0) then
+c
+c  .......check if an active node
+          nod = nodesl(j)
+          if (.not.NODES(nod)%act) then
+c
+c  .........flag the node and its ancestors
+c ...........            NODES(nod)%visit=1
+            call flag(nod)
+          endif
+          cycle
+        endif
 c
 c  .....identify the constraint case
         call decode2(NODES_CONSTR(j), nc,icase)
