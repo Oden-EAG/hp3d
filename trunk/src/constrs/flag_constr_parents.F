@@ -31,10 +31,6 @@ c  ...element type
 c
 c----------------------------------------------------------------------
 c
-      ! select case(Mdle)
-      ! case(1075); iprint=1
-      ! case default; iprint=0
-      ! end select
 c
       type = NODES(Mdle)%type
 c
