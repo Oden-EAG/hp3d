@@ -41,14 +41,14 @@ module par_mesh
 subroutine distr_mesh()
 !
 !..MPI variables
-   integer :: ierr
+   integer :: ierr, base, remainder
    integer :: tag, count, src, dest
    VTYPE, allocatable :: buf(:)
 !
 !..auxiliary variables
    integer :: subd_next(NRELES), nodm(MAXNODM), nodesl(27)
    integer :: iel, inod, iproc, mdle, nod, subd, subd_size
-   integer :: nrnodm, nrdof_nod
+   integer :: nrnodm, nrdof_nod, proc, el
    integer :: iprint = 0
 !
    real(8) :: MPI_Wtime,start_time,end_time
@@ -58,15 +58,27 @@ subroutine distr_mesh()
    endif
    100 format(A,L2)
 !
+   if (NUM_PROCS.eq.1) return
+!
 !..1. Determine new partition
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    if ((ZOLTAN_LB .eq. 0) .or. (.not. DISTRIBUTED)) then
-      subd_size = (NRELES+NUM_PROCS-1)/NUM_PROCS
-      iproc=0
-      do iel=1,NRELES
-!     ...decide subdomain for iel
-         subd_next(iel) = iproc
-         iproc = iel/subd_size
+!
+      base = NRELES/NUM_PROCS
+      remainder = mod(NRELES,NUM_PROCS)
+!
+!  ...element offset
+      el=0
+!
+!  ...first remainder procs get base+1, rest get base
+      do proc = 0,NUM_PROCS-1
+         if (proc .lt. remainder) then
+            subd_size = base + 1
+         else
+            subd_size = base
+         endif
+         subd_next(el+1:el+subd_size) = proc
+         el = el + subd_size
       enddo
    elseif (ZOLTAN_LB .eq. 7) then
       if (RANK .eq. ROOT) write(*,*) 'calling (re-)partition_fiber...'
@@ -116,7 +128,7 @@ subroutine distr_mesh()
                write(6,130) '[', RANK, ']: ', &
                   'Sending data to [',subd_next(iel),'], nod = ',nod
             endif
-            count = nrdof_nod; dest = subd_next(iel); tag = nod
+            count = nrdof_nod; dest = subd_next(iel); tag = mod(nod,200000)
             call MPI_SEND(buf,count,MPI_VTYPE,dest,tag,MPI_COMM_WORLD,ierr)
             if (ierr .ne. MPI_SUCCESS) then
                write(6,*) 'MPI_SEND failed. stop.'
@@ -129,7 +141,7 @@ subroutine distr_mesh()
                write(6,130) '[', RANK, ']: ',   &
                   'Receiving data from [',subd,'], nod = ',nod
             endif
-            count = nrdof_nod; src = subd; tag = nod
+            count = nrdof_nod; src = subd; tag = mod(nod,200000)
             call MPI_RECV(buf,count,MPI_VTYPE,src,tag,MPI_COMM_WORLD,MPI_STATUS_IGNORE,ierr)
             if (ierr .ne. MPI_SUCCESS) then
                write(6,*) 'MPI_RECV failed. stop.'
