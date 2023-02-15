@@ -86,8 +86,8 @@
                nodp = NFACEC(nc)
                call save_min_order(nodp,nord*10+MAXP)
                do k=1,3,2
-                 nodp = iabs(NFACE_CONS(k,nc))
-                 call save_min_order(nodp,nord)
+                  nodp = iabs(NFACE_CONS(k,nc))
+                  call save_min_order(nodp,nord)
                enddo
 !
 !        ...vertical edge constrained by a rectangular face
@@ -95,8 +95,8 @@
                nodp = NFACEC(nc)
                call save_min_order(nodp,MAXP*10+nord)
                do k=2,4,2
-                 nodp = iabs(NFACE_CONS(k,nc))
-                 call save_min_order(nodp,nord)
+                  nodp = iabs(NFACE_CONS(k,nc))
+                  call save_min_order(nodp,nord)
                enddo
 !
 !        ...edge constrained by a triangular face
@@ -104,8 +104,8 @@
                nodp = NFACEC(nc)
                call save_min_order(nodp,nord)
                do k=1,3
-                 nodp = iabs(NFACE_CONS(k,nc))
-                 call save_min_order(nodp,nord)
+                  nodp = iabs(NFACE_CONS(k,nc))
+                  call save_min_order(nodp,nord)
                enddo
 !
 !        ...face node constrained by a face

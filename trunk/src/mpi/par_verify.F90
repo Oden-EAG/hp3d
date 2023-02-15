@@ -78,6 +78,7 @@ subroutine mesh_consistency(ipass)
 !
 !..auxiliary variables
    integer :: i,iel,mdle,nod,nrnodm,count,src,ierr
+   integer :: nods,nrsons,is
    integer, allocatable :: val(:),buf(:)
 !
 !..element nodes
@@ -222,6 +223,30 @@ subroutine mesh_consistency(ipass)
                            'dof not associated, nod = ', nod
             ipass = 0
             call result
+         endif
+!     ...check that children of modified (constraining) edge and face nodes
+!        have order at least as high as parent (necessary for constraints)
+         if (NODES(nod)%ref_kind.ne.0) then
+            select case(NODES(nod)%type)
+            case('medg','mdlt','mdlq')
+               call nr_sons(NODES(nod)%type,NODES(nod)%ref_kind, nrsons)
+!           ...loop sons of constraining node
+               do is=1,nrsons
+                  nods = Son(nod,is)
+!              ...only check order of edge and face sons
+                  select case(NODES(nods)%type)
+                  case('medg','mdlt','mdlq')
+                     if (NODES(nods)%order.lt.NODES(nod)%order) then
+                        write(6,1241) '[', rank, ']: mesh inconsistency (4): ',     &
+                                      'son of constraining node has lower order; ', &
+                                      'nod,son = ', nod, nods
+                        ipass = 0
+                        call result
+                     endif
+                  end select
+!           ...end loop sons
+               enddo
+            end select
          endif
       enddo
    enddo
