@@ -20,13 +20,13 @@ module upscale
      integer :: NR_VERT
 !
 !    list of vertices' coordinates
-     real(8), allocatable :: VERT(:,:)
+     real(8), pointer :: VERT(:,:)
 !
 !    number of elements required by visualization level (0 - 3)
      integer :: NR_ELEM
 !
 !    list of elements' vertices (indexing starts at 0)
-     integer, allocatable :: ELEM(:,:)
+     integer, pointer :: ELEM(:,:)
   endtype vis
 !
   type(vis) :: TETR_VIS, PRIS_VIS, HEXA_VIS
@@ -71,12 +71,12 @@ contains
     implicit none
     type(vis), intent(inout) :: V
     V%NR_VERT = 0
-    if (allocated(V%VERT)) then
+    if (associated(V%VERT)) then
        deallocate(V%VERT)
     end if
 
     V%NR_ELEM = 0
-    if (allocated(V%ELEM)) then
+    if (associated(V%ELEM)) then
        deallocate(V%ELEM)
     end if
   end subroutine clear_vis
@@ -91,7 +91,8 @@ contains
     integer            :: i, istat, ierr
 
     ierr = 0
-
+!
+!   clear_vis nullifies vis%elem and vis%vert pointers
     call clear_vis(V)
 
     open(unit=nin, file=Fp,form='formatted', &
