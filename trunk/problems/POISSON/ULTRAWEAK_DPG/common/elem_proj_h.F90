@@ -26,7 +26,7 @@ subroutine elem_proj_h(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_rate_ma
     use data_structure3D
     use element_data
     use parametersDPG
-    
+    use MPI 
     !
     implicit none
 
@@ -106,7 +106,7 @@ subroutine elem_proj_h(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_rate_ma
     integer :: j,iss,is,l,k,iflag,k1,k2,iso_p,iss_max,nrdof_tmp
     integer :: Nref, local_order_check
     integer :: pxc,pyc,pzc, pxg,pyg,pzg
-    real(8) :: wa, weight,rjac,g_rate_tmp
+    real(8) :: wa, weight,rjac,g_rate_tmp, timer_a,timer_b,timer_c
     real(8) :: var_a, var_b, var_c !multipurpose temporary variable
     integer,    allocatable :: subsons_Nextract_prev(:,:)
 
@@ -121,7 +121,7 @@ subroutine elem_proj_h(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_rate_ma
         !dofs on the coarse element before hp refinement
 
         ! call ddecode(norder(19),pxm,pym,pzm)
- 
+        timer_a = MPI_Wtime()
         if(flag_pref_loc .eq. 1) then
             Nord_org = Nord_glob - 111
         else
@@ -226,7 +226,8 @@ subroutine elem_proj_h(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_rate_ma
                 ! waloc = ZERO
                 call set_3D_int_DPG(etype,norder_pp,norient_face_pp, nint_pp,xiloc,waloc)
                 !extract the coefficeints of the fine grid solution for the is^th son
-                call solelm(mdle_fine,zdofH_pp,zdofE_pp,zdofV_pp,zdofQ_pp)
+                ! call solelm(mdle_fine,zdofH_pp,zdofE_pp,zdofV_pp,zdofQ_pp)
+                call solelm_L2(mdle_fine,zdofQ_pp)
             
                 do l = 1,nint_pp
 
@@ -287,7 +288,7 @@ subroutine elem_proj_h(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_rate_ma
 
         enddo
 
-
+        timer_b = MPI_Wtime()
         !now solving the projection problem starting from base order on each subson by looping over them and calling
         ! calling telescopic solver.
         Nrhs = 1
@@ -549,7 +550,7 @@ subroutine elem_proj_h(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_rate_ma
             Nref = Nref + 1
 
         enddo
-
+        timer_c = MPI_Wtime()
         ! write(*,*) Nord_max
 
         Nord_href(1:nr_subsons) = Nord_max(1:nr_subsons)
@@ -566,6 +567,11 @@ subroutine elem_proj_h(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_rate_ma
             
             endif
         enddo
+
+    endif
+
+    if(kref_loc .eq. 111) then
+        write(*,*) timer_b - timer_a,timer_c-timer_a
 
     endif
 

@@ -108,7 +108,8 @@ subroutine HpAdapt
     integer :: Kref_close, kref_intent,href_count
     integer,   allocatable :: write_kref(:,:),write_pref(:,:)
 !
-    real(8) :: MPI_Wtime,start_time,end_time
+    real(8) :: MPI_Wtime,start_time,end_time, timer_a, timer_b,timer_c, net_time_a, net_time_b
+    real(8), dimension(max_step,2), save :: timer_save
 !
 !..printing flag
     integer :: iprint = 0
@@ -353,7 +354,7 @@ else
 endif
 call exact_error
 
-call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 !--------------------------------------------------------------------------
 ! if(NUM_PROCS .lt. 10) then
    allocate(Ref_indicator_flags(nr_elem_ref * 10))
@@ -367,7 +368,8 @@ call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 
    allocate(Nref_grate(nr_elem_ref))
    Nref_grate = ZERO
-
+   net_time_a = 0.0
+   net_time_b = 0.0
    do iel = 1,nr_elem_ref  
       mdle = mdle_ref(iel)
       etype = NODES(mdle)%type        
@@ -376,25 +378,48 @@ call MPI_BARRIER (MPI_COMM_WORLD, ierr)
       select case(etype)
 
          case('mdlb')
+            timer_a = MPI_Wtime()
             call project_p(mdle,flag_pref(iel),error_org,rate_p,Poly_flag)
+            timer_b = MPI_Wtime()
             call project_h(mdle,flag_pref(iel),error_org,rate_p,Poly_flag,Nref_grate(iel),Ref_indicator_flags((iel-1) * 10 + 1:iel*10))    
+            timer_c = MPI_Wtime()
          case default
             write(*,*) "Element type not recognized"
 
       end select
 
-
+      net_time_a = net_time_a + timer_b - timer_a
+      net_time_b = net_time_b + timer_c - timer_b
 
    enddo
 
+   timer_save(istep,1) = net_time_a
+   timer_save(istep,2) = net_time_b
    !MPI_REDUCTIONS
    count = nr_elem_ref
    call MPI_ALLREDUCE(MPI_IN_PLACE,Nref_grate,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
    count = nr_elem_ref * 10
    call MPI_ALLREDUCE(MPI_IN_PLACE,Ref_indicator_flags,count,MPI_INTEGER,MPI_SUM,MPI_COMM_WORLD,ierr)
 
+   write(*,*) "RANK = ",RANK," time for h and p projection = ",net_time_b,net_time_a
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+   ! if(RANK .eq. ROOT) write(*,*) " time for h and p projection = ", end_time-start_time,net_time_a,net_time_b
    grate_mesh = maxval(Nref_grate)
 
+   if(istep .eq. 11) then
+
+      if(RANK .eq. ROOT) then
+
+          open(1,file="time_projection",status='replace')
+         ! write(4,*) nr_elem_ref
+         do iel = 1,nr_elem_ref
+            write(1,*) timer_save(iel,:)
+         enddo
+         close(1)
+
+      endif
+
+   endif
    !---------------------------------------------------------------------
    if (RANK .eq. ROOT) write(*,*) "The guranteed rate = ",grate_mesh
    !---------------------------------------------------------------------------------------------

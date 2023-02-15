@@ -103,7 +103,8 @@ program main
    endif
 !
    if (JOB .ne. 0) then
-      call exec_job
+      ! call exec_job
+      call exec_job_new
    else
       if (RANK .eq. ROOT) then
          call master_main

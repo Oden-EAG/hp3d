@@ -117,7 +117,8 @@ subroutine fine_to_coarse_projection_error(nr_mdle_sons,coeff,Nextract,nrdofmQ,n
         INTEGRATION = 1
         call set_3D_int_DPG(etype,norder_pp,norient_face_pp, nint_pp,xiloc,waloc)
         !extract the coefficeints of the fine grid solution for the is^th son
-        call solelm(mdle_fine,zdofH_pp,zdofE_pp,zdofV_pp,zdofQ_pp)
+        ! call solelm(mdle_fine,zdofH_pp,zdofE_pp,zdofV_pp,zdofQ_pp)
+        call solelm_L2(mdle_fine,zdofQ_pp)
 
         do l = 1,nint_pp
             !..coordinates and weight of this integration point
@@ -288,7 +289,8 @@ subroutine fine_to_subson_projection_error(kref,coeff,Nextract,overlap,nrdofmQ,n
 
             call set_3D_int_DPG(etype,norder_pp,norient_face_pp, nint_pp,xiloc,waloc)
             !extract the coefficeints of the fine grid solution for the is^th son
-            call solelm(mdle_fine,zdofH_pp,zdofE_pp,zdofV_pp,zdofQ_pp)
+            ! call solelm(mdle_fine,zdofH_pp,zdofE_pp,zdofV_pp,zdofQ_pp)
+            call solelm_L2(mdle_fine,zdofQ_pp)
 
             do l = 1,nint_pp
 

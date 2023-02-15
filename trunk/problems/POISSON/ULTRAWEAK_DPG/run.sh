@@ -2,7 +2,7 @@
 
 #
 # MPI Procs
-nproc=4
+nproc=6
 #
 # OMP THREADS
 nthreads=1
@@ -23,9 +23,9 @@ isol=4
 # - user mode
 #   interactive run    (job=0)
 #   pre-configured run (job=1)
-job=0
+job=1
 # - number of refinements (if job=1)
-imax=10
+imax=12
 
 # - MAXNODS
 maxnods=525000

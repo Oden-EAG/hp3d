@@ -155,7 +155,8 @@ subroutine project_p(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
         ! waloc = ZERO
         call set_3D_int_DPG(etype,norder_pp,norient_face_pp, nint_pp,xiloc,waloc)
         !extract the coefficeints of the fine grid solution for the is^th son
-        call solelm(mdle_fine,zdofH_pp,zdofE_pp,zdofV_pp,zdofQ_pp)
+        ! call solelm(mdle_fine,zdofH_pp,zdofE_pp,zdofV_pp,zdofQ_pp)
+        call solelm_L2(mdle_fine,zdofQ_pp)
 
         do l = 1,nint_pp
             !..coordinates and weight of this integration point
@@ -209,17 +210,6 @@ subroutine project_p(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
         enddo
 
     enddo
-
-
-    open(1, file = 'data1.dat', status = 'replace')  
-    do k1 = 1,nrdofQ_pp
-        do k2 = 1,nrdofQ_pp
-            ! k = nk(k1,k2,nrdofQ_pp)
-            write(1,*) k1, k2, Ap(k1,k2)  
-        enddo
-    enddo
-
-    close(1)
 
     ! ! telescopic solver over various choices of order in x,y,z
     ! !first choice of ord = p_x p_y p_z

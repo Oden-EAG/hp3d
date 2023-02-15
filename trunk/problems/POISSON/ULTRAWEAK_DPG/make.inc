@@ -27,7 +27,8 @@ SRC_COMMON = \
             ./common/mesh_copy.F90  \
             ./common/poly_adap_subson.F90   \
             ./common/coeff_polynomial_aniso.F90 \
-            ./common/Adaptationtest_routines.F90
+            ./common/Adaptationtest_routines.F90 \
+            ./common/solelmL2.F90
 
 SRC_PRIMAL = \
             celem.F90 \
@@ -38,6 +39,7 @@ SRC_PRIMAL = \
             main.F90 \
             my_paraview_driver.F90 \
             set_initial_mesh.F90 \
-            soldis.F90
+            soldis.F90 \
+            exec_job_new.F90
 
 SRC_FILE   += $(SRC_MODULE) $(SRC_COMMON) $(SRC_PRIMAL)
