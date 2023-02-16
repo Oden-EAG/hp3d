@@ -26,7 +26,7 @@ subroutine set_environment
    implicit none
 !
 #if HP3D_USE_OPENMP
-  integer :: nthreads
+   integer :: nthreads
 #endif
 !
 !..Variables relevant to src/modules/environment
