@@ -4,6 +4,8 @@
 
 COMPLEX   ?= 1
 DEBUG     ?= 0
+HP3D_USE_OPENMP    ?= 0
+HP3D_USE_INTEL_MKL ?= 0
 
 ifeq ($(COMPLEX),0)
 $(error COMPLEX FLAG MUST BE 1 FOR LASER APPLICATION)
@@ -30,7 +32,8 @@ CCINCS          = $(PROB_INCS)
 # User defined libraries
 LIBS            = $(PROB_LIBS)
 
-include make.inc
+# Defines SRC_FILE
+-include make.inc
 
 SRC         = $(addprefix $(SRC_PATH)/,$(SRC_FILE))
 
@@ -41,7 +44,6 @@ OBJ_F90     = $(addprefix $(OBJ_PATH)/, $(SRC_FILE_F90:.F90=.F90.o))
 OBJ_F       = $(addprefix $(OBJ_PATH)/, $(SRC_FILE_F:.F=.F.o))
 
 OBJ         = $(OBJ_F) $(OBJ_F90)
-
 
 FC_WORK     = $(FC) $(CCDEFS) $(CCINCS) $(FFLAGS) $(EXTRA_FFLAGS)
 
@@ -60,18 +62,15 @@ $(OBJ_PATH)/.dummy :
 	else mkdir $(OBJ_PATH); touch $@; \
 	fi
 
-
 $(OBJ_PATH)/%.F.o : $(SRC_PATH)/%.F
 	@mkdir -p $(dir $@)
 	@echo "Compiling $<"
 	$(FC_WORK) -o $@ -c $<
 
-
 $(OBJ_PATH)/%.F90.o : $(SRC_PATH)/%.F90
 	@mkdir -p $(dir $@)
 	@echo "Compiling $<"
 	$(FC_WORK) -o $@ -c $<
-
 
 clean :
 	@rm -rf $(OBJ_PATH)

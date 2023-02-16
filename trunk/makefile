@@ -223,4 +223,4 @@ clean:
 	@rm -f $(LIB_PATH)/*.a
 	@rm -f *~
 	@rm -f $(MODULE_PATH)/*.mod
-	@rm -f *.mk *.old
+	@rm -f *.mk *.old *.mod
