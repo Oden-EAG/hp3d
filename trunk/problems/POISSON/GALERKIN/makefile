@@ -2,18 +2,25 @@
 
 -include ../../../m_options
 
-COMPLEX   ?= 1
+COMPLEX   ?= 0
 DEBUG     ?= 0
+HP3D_USE_OPENMP    ?= 0
+HP3D_USE_INTEL_MKL ?= 0
 
 ifeq ($(COMPLEX),1)
 $(error COMPLEX FLAG MUST BE 0 FOR POISSON APPLICATION)
+endif
+
+ifeq ($(COMPILER),INTEL)
+ifeq ($(DEBUG),1)
+FFLAGS += -gen-interface -warn none -warn interfaces
+endif
 endif
 
 SRC_PATH        = .
 OBJ_ROOT        = _obj_
 OBJ_PATH        = $(OBJ_ROOT)/maindir
 MODULE_PATH     = $(OBJ_PATH)
-
 
 # Executable name
 EXEC            = pois
@@ -29,16 +36,16 @@ LIBS            = $(PROB_LIBS)
 -include ./make.inc
 
 SRC         = $(addprefix $(SRC_PATH)/,$(SRC_FILE))
-OBJ         = $(addprefix $(OBJ_PATH)/,$(SRC_FILE:.F90=.o))
-# OBJ	    += $(OBJ_PATH)/main.o
 
-ifeq ($(DEBUG),YES)
-FFLAGS += -gen-interface -warn none -warn interfaces
-endif
-#
+SRC_FILE_F  = $(filter %.F, $(SRC_FILE))
+SRC_FILE_F90= $(filter %.F90, $(SRC_FILE))
+
+OBJ_F90     = $(addprefix $(OBJ_PATH)/, $(SRC_FILE_F90:.F90=.F90.o))
+OBJ_F       = $(addprefix $(OBJ_PATH)/, $(SRC_FILE_F:.F=.F.o))
+
+OBJ         = $(OBJ_F) $(OBJ_F90)
+
 FC_WORK     = $(FC) $(CCDEFS) $(CCINCS) $(FFLAGS) $(EXTRA_FFLAGS)
-
-#	( cd ../.. ; make )
 
 one : $(OBJ_PATH)/.dummy $(OBJ)
 	@echo " "
@@ -46,11 +53,7 @@ one : $(OBJ_PATH)/.dummy $(OBJ)
 	@echo "- COMPLEX = " $(COMPLEX)
 	@echo "- DEBUG   = " $(DEBUG)
 	@echo "------------------------------ "
-	$(FC_WORK) -o $(EXEC) $(OBJ) $(LIBS)
-
-all :
-	@for e in $(EXECS) ; do \
-		make one EXEC=$$e ;\
+	$(FC_WORK) -o $(EXEC) $(OBJ) $(LIBS) $(LDFLAGS)
 
 $(OBJ_PATH)/.dummy :
 	@echo "Creating directory " $(OBJ_PATH)
@@ -59,7 +62,12 @@ $(OBJ_PATH)/.dummy :
 	else mkdir $(OBJ_ROOT); mkdir $(OBJ_PATH); touch $@; \
 	fi
 
-$(OBJ_PATH)/%.o : $(SRC_PATH)/%.F90
+$(OBJ_PATH)/%.F.o : $(SRC_PATH)/%.F
+	@mkdir -p $(dir $@)
+	@echo "Compiling $<"
+	$(FC_WORK) -o $@ -c $<
+
+$(OBJ_PATH)/%.F90.o : $(SRC_PATH)/%.F90
 	@mkdir -p $(dir $@)
 	@echo "Compiling $<"
 	$(FC_WORK) -o $@ -c $<
@@ -69,8 +77,9 @@ print :
 
 clean :
 	@rm -rf $(OBJ_ROOT)
-	@rm -f $(EXECS)
+	@rm -f $(EXEC)
 	@rm -f *~
+	@rm -f *.mod
 
 clean-pv :
 	@rm -f ../outputs/paraview/*.xmf
