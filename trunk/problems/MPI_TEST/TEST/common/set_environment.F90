@@ -25,7 +25,9 @@ subroutine set_environment
 !
    implicit none
 !
+#if HP3D_USE_OPENMP
    integer :: nthreads
+#endif
 !
 !..Variables relevant to src/modules/environment
 !                  option label     // explanation // default value // parameter
@@ -59,8 +61,11 @@ subroutine set_environment
       stop
    endif
 !
+#if HP3D_USE_OPENMP
+!..number of OpenMP threads
    call get_option_int( '-nthreads', 'Number of OpenMP threads', 1, nthreads)
    call omp_set_num_threads(nthreads)
+#endif
 !
    IBC_PROB = BC_DIRICHLET
    !IP = 3

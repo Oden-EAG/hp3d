@@ -192,7 +192,9 @@ subroutine set_environment_laser
 !
    implicit none
 !
+#if HP3D_USE_OPENMP
    integer :: nthreads
+#endif
 !
    call set_environment_maxwell
 !
@@ -245,8 +247,10 @@ subroutine set_environment_laser
    CORE_N(2,2) = CORE_NY; CLAD_N(2,2) = CLAD_NY
    CORE_N(3,3) = CORE_NZ; CLAD_N(3,3) = CLAD_NZ
 !
+#if HP3D_USE_OPENMP
 !..number of OpenMP threads
    call get_option_int( '-nthreads', 'Number of OpenMP threads', 1, nthreads)
    call omp_set_num_threads(nthreads)
+#endif
 !
 end subroutine set_environment_laser

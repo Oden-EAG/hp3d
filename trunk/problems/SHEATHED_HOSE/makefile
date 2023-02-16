@@ -11,6 +11,12 @@ ifeq ($(COMPLEX),1)
 $(error COMPLEX FLAG MUST BE 0 FOR LINEAR ELASTICITY APPLICATION)
 endif
 
+ifeq ($(COMPILER),INTEL)
+ifeq ($(DEBUG),1)
+FFLAGS += -gen-interface -warn none -warn interfaces
+endif
+endif
+
 SRC_PATH        = .
 OBJ_ROOT        = _obj_
 OBJ_PATH        = $(OBJ_ROOT)/maindir
@@ -34,13 +40,7 @@ SRC         = $(addprefix $(SRC_PATH)/,$(SRC_FILE))
 OBJ         = $(addprefix $(OBJ_PATH)/,$(SRC_FILE:.F90=.o))
 # OBJ	    += $(OBJ_PATH)/main.o
 
-ifeq ($(DEBUG),YES)
-FFLAGS += -gen-interface -warn none -warn interfaces
-endif
-#
 FC_WORK     = $(FC) $(CCDEFS) $(CCINCS) $(FFLAGS) $(EXTRA_FFLAGS)
-
-#	( cd ../.. ; make )
 
 one : $(OBJ_PATH)/.dummy $(OBJ)
 	@echo " "
@@ -48,12 +48,7 @@ one : $(OBJ_PATH)/.dummy $(OBJ)
 	@echo "- COMPLEX = " $(COMPLEX)
 	@echo "- DEBUG   = " $(DEBUG)
 	@echo "------------------------------ "
-	$(FC_WORK) -o $(EXEC) $(OBJ) $(LIBS)
-
-all :
-	@for e in $(EXECS) ; do \
-		make one EXEC=$$e ;\
-	done
+	$(FC_WORK) -o $(EXEC) $(OBJ) $(LIBS) $(LDFLAGS)
 
 $(OBJ_PATH)/.dummy :
 	@echo "Creating directory " $(OBJ_PATH)
@@ -72,9 +67,10 @@ print :
 
 clean :
 	@rm -rf $(OBJ_ROOT)
-	@rm -f $(EXECS)
+	@rm -f $(EXEC)
 	@rm -f *~
+	@rm -f *.mod
 
 clean-pv :
-	@rm -f ../outputs/paraview/*.xmf
-	@rm -f ../outputs/paraview/*.h5
+	@rm -f output/figures/*.xmf
+	@rm -f output/figures/*.h5
