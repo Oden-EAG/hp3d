@@ -4,7 +4,7 @@ c   routine name       - flag_constr_parents
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - May 10
+c   latest revision    - feb 23
 c
 c   purpose            - routine flags ancestors of parents of
 c                        constrained nodes of an element that
@@ -18,12 +18,13 @@ c                        number
 c
 c----------------------------------------------------------------------
 c
-      subroutine flag_constr_parents(Mdle)
+      subroutine flag_constr_parents(Mdle,Nodesl)
 c
       use element_data
       use data_structure3D
       use constrained_nodes
 #include "syscom.blk"
+      dimension Nodesl(27)
 c
 c  ...element type
       character(len=4) :: type
@@ -39,7 +40,18 @@ c  ...number of (local) nodes for the element (- middle node)
 c
 c  ...loop through element constrained nodes
       do j=1,nrnodl
-        if (NODES_CONSTR(j).eq.0) cycle
+
+         if (NODES_CONSTR(j).eq.0) then
+c
+c  .......check if an active node
+            nod = Nodesl(j)
+            if (.not.NODES(nod)%act) then
+c
+c  .........flag the node and its ancestors
+              call flag(nod)
+            endif
+            cycle
+          endif
 c
 c  .....identify the constraint case
         call decode2(NODES_CONSTR(j), nc,icase)
