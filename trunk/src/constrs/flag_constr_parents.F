@@ -4,7 +4,7 @@ c   routine name       - flag_constr_parents
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - May 10
+c   latest revision    - feb 23
 c
 c   purpose            - routine flags ancestors of parents of
 c                        constrained nodes of an element that
