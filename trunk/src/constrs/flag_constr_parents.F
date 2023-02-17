@@ -40,11 +40,11 @@ c  ...number of (local) nodes for the element (- middle node)
 c
 c  ...loop through element constrained nodes
       do j=1,nrnodl
-c        if (NODES_CONSTR(j).eq.0) cycle
+
          if (NODES_CONSTR(j).eq.0) then
 c
 c  .......check if an active node
-            nod = nodesl(j)
+            nod = Nodesl(j)
             if (.not.NODES(nod)%act) then
 c
 c  .........flag the node and its ancestors
