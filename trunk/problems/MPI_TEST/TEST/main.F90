@@ -250,7 +250,9 @@ subroutine worker_main()
    integer :: ierr
 !
 !..OMP variables
+#if HP3D_USE_OPENMP
    integer :: num_threads, omp_get_num_threads
+#endif
 !
 !..auxiliary variables
    integer :: idec, i, r, count, src
@@ -263,13 +265,15 @@ subroutine worker_main()
    endif
 !
 !..determine number of omp threads running
-!$OMP parallel
-!$OMP single
-      num_threads = omp_get_num_threads()
-      write(6,9010) '[', RANK, '] : ','Number of OpenMP threads: ',num_threads
+#if HP3D_USE_OPENMP
+   !$OMP parallel
+   !$OMP single
+   num_threads = omp_get_num_threads()
+   write(6,9010) '[', RANK, '] : ','Number of OpenMP threads: ',num_threads
+   !$OMP end single
+   !$OMP end parallel
+#endif
  9010 format(A,I3,A,A,I3)
-!$OMP end single
-!$OMP end parallel
 !
 !..test accessing data structures
    write(6,9020) '[', RANK, '] : ', 'NRELIS,NRELES,NRNODS = ',NRELIS,NRELES,NRNODS
