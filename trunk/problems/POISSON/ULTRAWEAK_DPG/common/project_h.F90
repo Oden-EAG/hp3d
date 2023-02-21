@@ -107,7 +107,8 @@ if(etype .eq. 'mdlb') then
     ! j should start from 2 as firts eleent of Kref_opt is 000 which means no refinement which is useless.
     do j = 2,m
         
-        call elem_proj_h(Mdle,flag_pref_loc,kref_opts(j),error_org,error_opt(j),g_rate_ref(j),rate_hcomp(j),Nord_max_href(j,1:8))
+        ! call elem_proj_h(Mdle,flag_pref_loc,kref_opts(j),error_org,error_opt(j),g_rate_ref(j),rate_hcomp(j),Nord_max_href(j,1:8))
+        call elem_proj_h_linear(Mdle,flag_pref_loc,kref_opts(j),error_org,error_opt(j),g_rate_ref(j),rate_hcomp(j),Nord_max_href(j,1:8))
         ! write(*,*) Nord_max_href(j,1:8)
         ! write(*,*) kref_opts(j),error_opt(j),g_rate_ref(j)
     enddo

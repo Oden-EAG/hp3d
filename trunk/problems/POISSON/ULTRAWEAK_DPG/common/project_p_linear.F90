@@ -19,7 +19,7 @@
 !------------------------------------------------------------------------------------
 
 
-subroutine project_p(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
+subroutine project_p_linear(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
 
     use control
     use data_structure3D
@@ -36,7 +36,7 @@ subroutine project_p(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
     integer,    intent(out) :: Poly_flag !will store the flag for suggested p-refinement
 
 
-    real(8), allocatable    :: Ap(:,:)
+    real(8), allocatable    :: Ap(:)
     real(8), allocatable    :: zbload(:)
     integer, allocatable    :: Mdle_sons(:)
     ! real(8), dimension(MAXbrickQQ*(MAXbrickQQ+1)/2) :: Ap_copy
@@ -112,7 +112,11 @@ subroutine project_p(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
     integer :: nr_mdle_sons ! number of sons of a refined element
     real(8) :: q1,q2 !shape functions values at gauss points
     real(8) :: q !shape functions while computing load vector
-!..function for vector storage for symmertic L2 gram matrix in lower triangular format
+    real(8) :: MPI_Wtime,start_time,end_time, timer_a, timer_b,timer_c,timer_d,timer_e,timer_f, net_time_a, net_time_b,net_time_c
+    real(8), allocatable :: weights_fine_store(:,:,:), quad_point_store(:,:,:)
+    real(8), allocatable :: shap3DQ_fine_store(:,:,:),shap3DQ_coarse_store(:,:,:)
+    integer, allocatable :: nint_pp_store(:)
+    !..function for vector storage for symmertic L2 gram matrix in lower triangular format
     integer :: nk
     nk(k1,k2,nrdofQ) = nrdofQ * (k2-1) + k1 - k2*(k2-1)/2
 
@@ -121,7 +125,7 @@ subroutine project_p(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
     call find_order(Mdle, norder)
     call celndof(etype,norder, nrdofH,nrdofE,nrdofV,nrdofQ)
 
-    allocate(Ap(nrdofQ,nrdofQ))
+    allocate(Ap(nrdofQ))
     allocate(zbload(nrdofQ))
 
     if(etype .eq. 'mdlb') then
@@ -140,6 +144,14 @@ subroutine project_p(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
     Ap = ZERO
     zbload = ZERO
 
+    allocate(weights_fine_store(MAXNINT3ADD,2,nr_mdle_sons))
+    allocate(quad_point_store(3,MAXNINT3ADD,nr_mdle_sons))
+    allocate(nint_pp_store(nr_mdle_sons))
+    allocate(shap3DQ_fine_store(MAXbrickQQ,MAXNINT3ADD,nr_mdle_sons))
+    allocate(shap3DQ_coarse_store(MAXbrickQQ,MAXNINT3ADD,nr_mdle_sons))
+
+    timer_e = MPI_Wtime()
+
     do is = 1,nr_mdle_sons
         mdle_fine = Mdle_sons(is)
         etype = NODES(mdle_fine)%type
@@ -154,6 +166,10 @@ subroutine project_p(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
         ! xiloc = ZERO
         ! waloc = ZERO
         call set_3D_int_DPG(etype,norder_pp,norient_face_pp, nint_pp,xiloc,waloc)
+        nint_pp_store(is) = nint_pp
+        ! weights_fine_store(1:nint_pp,is) = waloc
+        ! quad_point_store(1:3,1:nint_pp,is) = xiloc(1:3,1:nint_pp)
+
         !extract the coefficeints of the fine grid solution for the is^th son
         ! call solelm(mdle_fine,zdofH_pp,zdofE_pp,zdofV_pp,zdofQ_pp)
         call solelm_L2(mdle_fine,zdofQ_pp)
@@ -161,15 +177,20 @@ subroutine project_p(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
         do l = 1,nint_pp
             !..coordinates and weight of this integration point
             xi(1:3)=xiloc(1:3,l)
+            quad_point_store(1:3,l,is) = xi(1:3)
             wa=waloc(l)
             !  ...H1 shape functions (for geometry)
             call shape3DH(etype,xi,norder_pp,norient_edge_pp,norient_face_pp, nrdof,shapH,gradH)
             !  ...L2 shape function calls
             call shape3DQ(etype,xi,norder_pp, nrdof,shapQ)
+
+            shap3DQ_fine_store(1:nrdofQ_pp,l,is) = shapQ(1:nrdofQ_pp)
             !  ...geometry map
             call geom3D(mdle_fine,xi,xnod_pp,shapH,gradH,nrdofH_pp, x,dxdxi,dxidx,rjac,iflag)
  
             weight = rjac*wa
+            weights_fine_store(l,1,is) = weight
+            weights_fine_store(l,2,is) = rjac
             ! check = check + weight
             zvalQpp = ZERO
 
@@ -185,20 +206,17 @@ subroutine project_p(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
             shapQ = ZERO
             call shape3DQ(etype,xis,norder_pp, nrdof,shapQ)
 
+            shap3DQ_coarse_store(1:nrdofQ_pp,l,is) = shapQ(1:nrdofQ_pp)
             !scaling the jacobian for isotropic refinement of coarse element
             rjac = rjac * real(nr_mdle_sons,8)
 
             !contribution to p+1 coarse projection matrix using subelement integration
             do k1 = 1,nrdofQ_pp
                 q1 = shapQ(k1)/rjac
-
-                do k2 = 1,nrdofQ_pp
-                    q2 = shapQ(k2)/rjac
+                q2 = shapQ(k1)/rjac
                     ! k = nk(k1,k2,nrdofQ_pp)
-                    Ap(k1,k2) = Ap(k1,k2) + weight * q1 * q2 
-                enddo
-
-
+                Ap(k1) = Ap(k1) + weight * q1 * q2 
+            
             enddo
 
             !computing the load vector contributions for each son
@@ -210,49 +228,25 @@ subroutine project_p(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
         enddo
 
     enddo
+    timer_f = MPI_Wtime()
 
-    ! check whether the projection matrix ins linear
-    if(mdle .eq. 124) then
-        open(1,file="proj_matrix.dat",status="replace")
-        do k1 = 1,nrdofQ_pp
-            do k2 = 1,nrdofQ_pp
-                write(1,*) k1,k2,Ap(k1,k2)
-            enddo
-        enddo
-        close(1)
-    endif
-        ! ! telescopic solver over various choices of order in x,y,z
-    ! !first choice of ord = p_x p_y p_z
-    Mblock = ZERO
 
+    ! dont need telescopic solver in case of linear element
+    net_time_a = 0.d0
+    net_time_b = 0.d0
+    net_time_c = 0.d0
+    
     Nord_glob = norder_pp(19)
     call ddecode(Nord_glob,px,py,pz)
-
-    ! write(*,*) "The elem = ", NODES(Mdle_sons(5))%order, Mdle_sons(5)
 
     if(etype .eq. 'mdlb') then
         nrdofgQ = px * py * pz
     endif
 
-    Ldglob = nrdofgQ    
 
-    allocate(Awork(nrdofgQ,nrdofgQ))
-    allocate(Bwork(nrdofgQ))
     allocate(Nextract_prev(nrdofgQ))
-    Awork = ZERO
+    allocate(Bwork(nrdofgQ))
     Bwork = ZERO
-
-    ! allocate(A_prev(nrdofgQ,nrdofgQ))  !copy of Awork
-    ! allocate(B_prev(nrdofgQ))
-    ! allocate(proj_coeff(nrdofgQ,7))
-    ! allocate(Nextract_save(nrdofgQ,7))
-    ! allocate(proj_error_lvl(7))
-    ! allocate(Nord_lvl(7))
-    ! A_prev = ZERO
-    ! B_prev = ZERO
-    ! proj_coeff = ZERO
-    ! Nextract_save = ZERO
-
     Nrhs = 1
 
     if(flag_pref_loc .eq. 1) then !if p-refinement done during hp-fine mesh generation
@@ -261,10 +255,7 @@ subroutine project_p(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
         Nord_org = Nord_glob
     endif
 
-    ! write(*,*) "I am here 1 = ", Nord_org
-    mstep = 1
-    Mblock(mstep) = 0
-    
+
     call ddecode(Nord_org,px,py,pz)
     ! write(*,*) "p selec = ",px,py,pz
 
@@ -272,54 +263,52 @@ subroutine project_p(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
         nrdofmQ = px * py * pz
     endif
 
-    nrdof_org = nrdofmQ
-    Mblock(mstep + 1) = nrdofmQ
-    
-    Ldwork = nrdofmQ
+    nrdof_org = nrdofmQ ! number of dofs for original order before iso hp-refinement
     allocate(Nextract(nrdofmQ))
 
     Nextract = ZERO
     Nextract_prev = ZERO
+
+    timer_a = MPI_Wtime()
     ! call extraction_vector(Nord_org,Nord_glob,nrdofmQ,nrdofgQ,Nextract)
     call extraction_vector_new(0,Nord_org,Nord_glob,nrdofmQ,nrdofgQ,Nextract_prev,Nextract)
-    call pbisolver3(mstep,Mblock,Ap,Ldglob,Awork,Ldwork,Nextract,zbload,Bwork,Nrhs)
+    
+    timer_b = MPI_Wtime()
+    !diagonal solve due to L2 orthogonality of basis functions on linear elements
+    do l = 1,nrdofmQ
+        
+        Bwork(l) = zbload(Nextract(l))/Ap(Nextract(l))
 
+    enddo
+ 
+
+    
     Nextract_prev(1:nrdofmQ) = Nextract(1:nrdofmQ)
-    ! proj_coeff(1:nrdofmQ,1) = Bwork(1:nrdofmQ)
-    ! Nextract_save(1:nrdofmQ,1) = Nextract(1:nrdofmQ)
 
-    call fine_to_coarse_projection_error(nr_mdle_sons,Bwork(1:nrdofmQ),Nextract,nrdofmQ,nrdofgQ,Mdle, &
-                                        Mdle_sons,proj_error)
+    timer_c = MPI_Wtime()
+    ! call fine_to_coarse_projection_error(nr_mdle_sons,Bwork(1:nrdofmQ),Nextract,nrdofmQ,nrdofgQ,Mdle,Mdle_sons,proj_error)
+    call fine_to_coarse_projection_error_new(nr_mdle_sons,Bwork(1:nrdofmQ),Nextract,nrdofmQ, &
+                                                nrdofgQ,Mdle,Mdle_sons,proj_error,&
+                                                weights_fine_store,quad_point_store,nint_pp_store,&
+                                                shap3DQ_fine_store,shap3DQ_coarse_store)
+
+    timer_d = MPI_Wtime()
+    ! write(*,*) "time is  = ", timer_b - timer_a, timer_c - timer_b,timer_d - timer_c
+    net_time_a = net_time_a + timer_b - timer_a
+    net_time_b = net_time_b + timer_c - timer_b
+    net_time_c = net_time_c + timer_d - timer_c
+
 
     deallocate(Nextract)
-    ! write(*,*) "error = ",proj_error
-
     Error_org = proj_error
-
     ! storing the coefficients of polynomial along x,y, and z
 
     coeff_sum = ZERO
     call coeff_polynomial_aniso(Nord_org,Nextract_prev(1:nrdofmQ),etype,Bwork(1:nrdofmQ),coeff_sum)
-    ! do k = 2,px
-
-    !     coeff_sum(1) =  coeff_sum(1) + abs(Bwork(k))
-
-    ! enddo
-
-    ! do k = 1,py-1
-
-    !     coeff_sum(2) = coeff_sum(2) + abs(Bwork(k*px + 1))
-
-    ! enddo
-
-    ! do k = 1,pz-1
-
-    !     coeff_sum(3) = coeff_sum(3) + abs(Bwork(k * px * py + 1))
-
-    ! enddo
     
-    ! write(*,*) " I am here in project_p 2"
-    !Anisotropic polynomial order increase
+    
+    !Anisotropic polynomial order increase for linear element
+
     if(etype .eq. 'mdlb') then
 
         error_rate_aniso = ZERO
@@ -330,7 +319,6 @@ subroutine project_p(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
         Nord_mod = Nord_org
         mstep = 2
         poly_flag_store = ZERO
-
 
         if(flag_pref_loc .eq. 1) then
 
@@ -351,18 +339,36 @@ subroutine project_p(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
                 call ddecode(Nord_mod,px,py,pz)
 
                 nrdofmQ = px * py * pz
-                Mblock(mstep + 1) = nrdofmQ
-                Ldwork = nrdofmQ
-                
                 allocate(Nextract(nrdofmQ))
                 Nextract = ZERO
+
+                timer_a = MPI_Wtime()
                 call extraction_vector_new(Nord_prev,Nord_mod,Nord_glob,nrdofmQ,nrdofgQ,Nextract_prev,Nextract)
-                call pbisolver3(mstep,Mblock,Ap,Ldglob,Awork,Ldwork,Nextract,zbload,Bwork,Nrhs)
-                call fine_to_coarse_projection_error(nr_mdle_sons,Bwork(1:nrdofmQ),Nextract,nrdofmQ,nrdofgQ,Mdle,Mdle_sons,proj_error)
-                
+
+                !diagonal solve
+                timer_b = MPI_Wtime()
+                do l = 1,nrdofmQ
+        
+                    Bwork(l) = zbload(Nextract(l))/Ap(Nextract(l))
+            
+                enddo
+                timer_c = MPI_Wtime()
+
+                ! call fine_to_coarse_projection_error(nr_mdle_sons,Bwork(1:nrdofmQ),Nextract,nrdofmQ,nrdofgQ,Mdle,Mdle_sons,proj_error)
+                call fine_to_coarse_projection_error_new(nr_mdle_sons,Bwork(1:nrdofmQ),Nextract,nrdofmQ, &
+                                                            nrdofgQ,Mdle,Mdle_sons,proj_error,&
+                                                            weights_fine_store,quad_point_store,nint_pp_store,&
+                                                            shap3DQ_fine_store,shap3DQ_coarse_store)
+
+                timer_d = MPI_Wtime()
+
+                net_time_a = net_time_a + timer_b - timer_a
+                net_time_b = net_time_b + timer_c - timer_b
+                net_time_c = net_time_c + timer_d - timer_c
+
                 Nextract_prev = ZERO
                 Nextract_prev(1:nrdofmQ) = Nextract(1:nrdofmQ)
-                
+
                 deallocate(Nextract)
 
                 error_rate_aniso(k) = (Error_org - proj_error)/abs(real(nrdofmQ,8) - real(nrdof_org,8))
@@ -374,143 +380,26 @@ subroutine project_p(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
                 coeff_sum = ZERO
                 call coeff_polynomial_aniso(Nord_mod,Nextract_prev(1:nrdofmQ),etype,Bwork,coeff_sum)
                 coeff_max = ZERO
-                ! do j = 2,px
 
-                !     coeff_sum(1) = coeff_sum(1) + abs(Bwork(j))
-            
-                ! enddo
-            
-                ! do j = 1,py-1
-            
-                !     coeff_sum(2) = coeff_sum(2) + abs(Bwork(j*px + 1))
-            
-                ! enddo
-            
-                ! do j = 1,pz-1
-            
-                !     coeff_sum(3) = coeff_sum(3) + abs(Bwork(j * px * py + 1))
-            
-                ! enddo
-
-                ! coeff_max = ZERO
-
-            enddo
+            enddo    
 
             rate_p = maxval(error_rate_aniso)
             max_loc = maxloc(error_rate_aniso)
             Poly_flag = poly_flag_store(max_loc(1))
-
+        
         else
 
             rate_p = 0.0
             Poly_flag = Nord_org
 
         endif
-
     endif
-
-    ! write(*,*) " I am here in project_p"
-
-    ! write(*,*) "p selec = ",Mdle, coeff_x,coeff_y,coeff_z,px,py,pz
-    !computing projection array from the subelements to p+1,p+1,p+1 order on coarse elements
-    !comment this out if we need to go through all the samples of polynomial order on 
-    !coarse element
-! {
-!     mstep = 2
-
-!     if(etype .eq. 'mdlb') then
-!         order_add = 111
-!     endif
-
-!     Nord_mod =  Nord_org + order_add
-!     call ddecode(Nord_mod,px,py,pz)
-!     nrdofmQ = px * py * pz
-
-!     Mblock(mstep + 1) = nrdofmQ
-!     Ldwork = nrdofmQ
-
-!     allocate(Nextract(nrdofmQ))
-!     Nextract = ZERO
-!     ! call extraction_vector(Nord_mod,Nord_glob,nrdofmQ,nrdofgQ,Nextract)
-!     call extraction_vector_new(Nord_org,Nord_mod,Nord_glob,nrdofmQ,nrdofgQ,Nextract_prev,Nextract)
-!     ! write(*,*) "New order is = ",Nord_mod, nrdofmQ
-!     ! write(*,*) "Nextract = ",Nextract
-
-!     call pbisolver3(mstep,Mblock,Ap,Ldglob,Awork,Ldwork,Nextract,zbload,Bwork,Nrhs)
-
-
-!     call fine_to_coarse_projection_error(nr_mdle_sons,Bwork(1:nrdofmQ),Nextract,nrdofmQ,nrdofgQ,Mdle,Mdle_sons,proj_error)
-!     ! write(*,*) "error = ",proj_error
-
-!     Error_p = proj_error
-! }
-
-    ! write(*,*) (Error_org**2 - proj_error**2)/(real(nrdofmQ,8) - real(nrdof_org,8))
-
-    !uncomment this if we need to go through all the polynomial order samples
+        write(*,*) "time is  = ",net_time_a,net_time_b,net_time_c,timer_f - timer_e
     
-    ! proj_error_base = proj_error
-    ! nrdofmQ_base = nrdofmQ
-    ! error_tmp = 0.d0
-    ! do  mstep = 2,2 !loop for going down to p refiement stairs.
-    !     A_prev = Awork
-    !     B_prev = Bwork
+    deallocate(weights_fine_store)
+    deallocate(quad_point_store)
+    deallocate(nint_pp_store)
+    deallocate(shap3DQ_fine_store)
+    deallocate(shap3DQ_coarse_store)
 
-    !     allocate(proj_error_lvl(5-mstep))
-    !     allocate(Nord_lvl(5-mstep))
-        
-    !     do j = 1,1 ! loop for various options at a given p refinement stairs.
-    !         ! order_add = 10**(5-mstep-j)
-    !         order_add = 111
-    !         Nord_mod = Nord_org + order_add
-
-    !         call ddecode(Nord_mod,px,py,pz)
-    !         nrdofmQ = px * py * pz
-
-    !         Mblock(mstep + 1) = nrdofmQ
-    !         Ldwork = nrdofmQ
-
-    !         allocate(Nextract(nrdofmQ))
-    !         call extraction_vector(Nord_mod,Nord_glob,nrdofmQ,nrdofgQ,Nextract)
-    !         write(*,*) "New order is = ",Nord_mod, nrdofmQ
-    !         ! write(*,*) "Nextract = ",Nextract
-
-    !         call pbisolver3(mstep,Mblock,Ap,Ldglob,Awork,Ldwork,Nextract,zbload,Bwork,Nrhs)
-
-    !         proj_coeff(1:nrdofmQ,1) = Bwork(1:nrdofmQ)
-    !         Nextract_save(1:nrdofmQ,1) = Nextract(1:nrdofmQ)
-
-    !         Awork = ZERO
-    !         Bwork = ZERO
-
-    !         Awork = A_prev
-    !         Bwork = B_prev
-    !         call fine_to_coarse_projection_error(nr_mdle_sons,proj_coeff(1:nrdofmQ,1),Nextract,nrdofmQ,nrdofgQ,Mdle,Mdle_sons,proj_error)
-    !         write(*,*) "error = ",proj_error
-
-    !         proj_error_lvl(j) = (proj_error_base  - proj_error)/(nrdofmQ - nrdofmQ_base)
-    !         Nord_lvl(j) = Nord_mod
-    !         deallocate(Nextract)
-            
-    !     enddo
-
-    !     Nord_mod = Nord_org
-    !     do j  = 1,(5-mstep)
-    !         if(error_tmp .le. proj_error_lvl(j)) then
-    !             error_tmp = proj_error_lvl(j)
-    !             Nord_mod = Nord_lvl(j)
-    !         endif
-
-    !     enddo
-
-    !     deallocate(Nord_lvl)
-    !     deallocate(proj_error_lvl)
-        
-    !     ! write(*,*) "chosen order = ",Nord_mod
-        
-    ! enddo
-
-
-
-
-end subroutine project_p
+end subroutine project_p_linear

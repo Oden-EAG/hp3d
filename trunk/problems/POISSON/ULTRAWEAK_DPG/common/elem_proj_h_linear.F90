@@ -20,7 +20,7 @@
 
 
 
-subroutine elem_proj_h(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_rate_max,rate_hcomp,Nord_href)
+subroutine elem_proj_h_linear(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_rate_max,rate_hcomp,Nord_href)
 
     use control
     use data_structure3D
@@ -102,6 +102,9 @@ subroutine elem_proj_h(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_rate_ma
     real(8) :: q !shape functions for the load vector computation in the projection problem
     real(8) :: max_error_subson, ratio_mep
 
+    real(8), allocatable :: weights_fine_store(:,:,:,:),quad_point_store(:,:,:,:)
+    real(8), allocatable :: shap3DQ_fine_store(:,:,:,:),shap3DQ_coarse_store(:,:,:,:)
+    integer, allocatable :: nint_pp_store(:,:) 
     !Auxiliary variable
     integer :: j,iss,is,l,k,iflag,k1,k2,iso_p,iss_max,nrdof_tmp
     integer :: Nref, local_order_check
@@ -208,6 +211,12 @@ subroutine elem_proj_h(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_rate_ma
            Mdle_sons(is) = first_son + is - 1
         enddo
         
+        allocate(weights_fine_store(MAXNINT3ADD,2,8/nr_subsons,nr_subsons))
+        allocate(quad_point_store(3,MAXNINT3ADD,8/nr_subsons,nr_subsons))
+        allocate(nint_pp_store(8/nr_subsons,nr_subsons))
+        allocate(shap3DQ_coarse_store(MAXbrickQQ,MAXNINT3ADD,8/nr_subsons,nr_subsons))
+        allocate(shap3DQ_fine_store(MAXbrickQQ,MAXNINT3ADD,8/nr_subsons,nr_subsons))
+
         do iss = 1,nr_subsons
             
             do is = 1,8/nr_subsons
@@ -225,6 +234,7 @@ subroutine elem_proj_h(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_rate_ma
                 ! xiloc = ZERO
                 ! waloc = ZERO
                 call set_3D_int_DPG(etype,norder_pp,norient_face_pp, nint_pp,xiloc,waloc)
+                nint_pp_store(is,iss) = nint_pp
                 !extract the coefficeints of the fine grid solution for the is^th son
                 ! call solelm(mdle_fine,zdofH_pp,zdofE_pp,zdofV_pp,zdofQ_pp)
                 call solelm_L2(mdle_fine,zdofQ_pp)
@@ -232,16 +242,19 @@ subroutine elem_proj_h(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_rate_ma
                 do l = 1,nint_pp
 
                     xi(1:3) = xiloc(1:3,l)
+                    quad_point_store(1:3,l,is,iss) = xi(1:3)
                     wa = waloc(l)
                                 !  ...H1 shape functions (for geometry)
                     call shape3DH(etype,xi,norder_pp,norient_edge_pp,norient_face_pp, nrdof,shapH,gradH)
                     !  ...L2 shape function calls
                     call shape3DQ(etype,xi,norder_pp, nrdof,shapQ)
+                    shap3DQ_fine_store(1:nrdofQ_pp,l,is,iss) = shapQ(1:nrdofQ_pp)
                     !  ...geometry map
                     call geom3D(mdle_fine,xi,xnod_pp,shapH,gradH,nrdofH_pp, x,dxdxi,dxidx,rjac,iflag)
  
                     weight = rjac*wa
-
+                    weights_fine_store(l,1,is,iss) = weight
+                    weights_fine_store(l,2,is,iss) = rjac
                     zvalQpp = ZERO
 
                     !modify this by adding a loop over all L2 variables for cumlative adaptation
@@ -258,7 +271,7 @@ subroutine elem_proj_h(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_rate_ma
 
                     call shape3DQ(etype,xis,norder_pp,nrdof,shapQ)
 
-
+                    shap3DQ_coarse_store(1:nrdofQ_pp,l,is,iss) = shapQ(1:nrdofQ_pp)
                     !scaling the jacobian for isotropic refinement of coarse element
                     rjac = rjac * real(nr_mdle_sons/nr_subsons,8)
                     
@@ -392,15 +405,26 @@ subroutine elem_proj_h(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_rate_ma
                     ! call extraction_vector(Nord_org_subsons(iss),Nord_glob,nrdofmQ,nrdofgQ,Nextract)
                     call extraction_vector_new(Nord_old(iss),Nord_org_subsons(iss),Nord_glob,nrdofmQ,nrdofgQ,subsons_Nextract_prev(iss,:),Nextract)
 
-                    call pbisolver3(mstep,Mblock,Ap,Ldglob,Awork,Ldwork,Nextract,zbload,Bwork,Nrhs)
+                    ! call pbisolver3(mstep,Mblock,Ap,Ldglob,Awork,Ldwork,Nextract,zbload,Bwork,Nrhs)
+
+                    do l = 1,nrdofmQ
+        
+                        Bwork(l) = zbload(Nextract(l))/Ap(Nextract(l),Nextract(l))
+                
+                    enddo
 
                     subsons_Nextract_prev(iss,1:nrdofmQ) = Nextract(1:nrdofmQ)
 
                     proj_error_subson = 0.d0
 
-                    call fine_to_subson_projection_error(kref_loc,Bwork(1:nrdofmQ),Nextract,subsons_overlap(iss,:), &
-                                                        nrdofmQ,nrdofgQ,Mdle,proj_error_subson)
+                    ! call fine_to_subson_projection_error(kref_loc,Bwork(1:nrdofmQ),Nextract,subsons_overlap(iss,:), &
+                                                        ! nrdofmQ,nrdofgQ,Mdle,proj_error_subson)
+                    call fine_to_subson_projection_error_new(kref_loc,Bwork(1:nrdofmQ),Nextract,subsons_overlap(iss,:),&
+                                                                nrdofmQ,nrdofgQ,Mdle,proj_error_subson,&
+                                                                weights_fine_store(:,:,:,iss),quad_point_store(:,:,:,iss),nint_pp_store(:,iss),&
+                                                                shap3DQ_fine_store(:,:,:,iss),shap3DQ_coarse_store(:,:,:,iss))
         
+                   
                     ! proj_error =  proj_error + proj_error_subson
 
                     error_subsons(iss) = proj_error_subson
@@ -466,8 +490,13 @@ subroutine elem_proj_h(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_rate_ma
                         Ap(1:nrdofgQ,1:nrdofgQ) = subsons_Ap(1:nrdofgQ,1:nrdofgQ,iss)
                         zbload(1:nrdofgQ) = subsons_zbload(1:nrdofgQ,iss)
 
-                        call poly_adap_subson(kref_loc,Mdle,nrdofgQ,nrdof_org,Nord_mep(iss,Nref),Nord_glob,subsons_overlap(iss,:),error_org, &
-                                              Ap,zbload,Awork,Bwork,subsons_Nextract_prev(iss,1:nrdofmQ),Polyflag)
+                        ! call poly_adap_subson(kref_loc,Mdle,nrdofgQ,nrdof_org,Nord_mep(iss,Nref),Nord_glob,subsons_overlap(iss,:),error_org, &
+                        !                       Ap,zbload,Awork,Bwork,subsons_Nextract_prev(iss,1:nrdofmQ),Polyflag)
+
+                        call poly_adap_subson_new(kref_loc,Mdle,nrdofgQ,nrdof_org,Nord_mep(iss,Nref),Nord_glob,subsons_overlap(iss,:),error_org, &
+                                                    Ap,zbload,Awork,Bwork,subsons_Nextract_prev(iss,1:nrdofmQ),Polyflag,&
+                                                    weights_fine_store(:,:,:,iss),quad_point_store(:,:,:,iss),nint_pp_store(:,iss),&
+                                                    shap3DQ_fine_store(:,:,:,iss),shap3DQ_coarse_store(:,:,:,iss))
                                               
                         Nord_mep(iss, Nref + 1) = Polyflag
 
@@ -577,4 +606,4 @@ subroutine elem_proj_h(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_rate_ma
 
 
 
-end subroutine elem_proj_h
+end subroutine elem_proj_h_linear

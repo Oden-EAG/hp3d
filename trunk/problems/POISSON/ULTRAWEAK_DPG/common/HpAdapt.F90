@@ -70,10 +70,10 @@ subroutine HpAdapt
     integer :: count_deact_ref
     integer, allocatable   :: deact_ref_index(:)
     integer :: count_add(4)
-    integer :: nchild,hx,hy,hz,mdle_child,father_subson
     integer :: Poly_flag
     integer,   allocatable :: flag_pref(:)
-
+    integer :: hx,hy,hz, nr_sons_intent,nr_sons_close,mdle_child
+    integer, allocatable :: pref_intent(:), pref_close(:)  
  !
 
     integer, save :: istep = 0
@@ -105,7 +105,7 @@ subroutine HpAdapt
     integer,    allocatable :: ELEM_SUBD_cp(:)
     integer :: NRELES_old,NRNODS_old,NRDOFSH_old,NRDOFSE_old,NRDOFSV_old,NRDOFSQ_old
     integer :: NPNODS_old,MAXNODS_old,NRELIS_old
-    integer :: Kref_close, kref_intent,href_count
+    integer :: kref_close, kref_intent,href_count
     integer,   allocatable :: write_kref(:,:),write_pref(:,:)
 !
     real(8) :: MPI_Wtime,start_time,end_time, timer_a, timer_b,timer_c, net_time_a, net_time_b
@@ -139,6 +139,7 @@ subroutine HpAdapt
        goto 70
     endif
 
+   !  write(*,*) "istep = ",istep
 
 !..initialize residual and error
     resid_subd = 0.d0
@@ -184,7 +185,7 @@ subroutine HpAdapt
 !$OMP END PARALLEL DO    
 
 resid_tot = 0.d0; error_tot = 0.d0; rnorm_tot = 0.d0
-if(DISTRIBUTED) then !MPI reduction op to ollect the error and residual
+if(DISTRIBUTED) then !MPI reduction op to collect the error and residual
    count = 1
    call MPI_ALLREDUCE(resid_subd,resid_tot,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
    call MPI_ALLREDUCE(error_subd,error_tot,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
@@ -255,7 +256,15 @@ enddo
 
 70 continue
 
+open(22,file="error.dat",status='replace')
+! write(4,*) nr_elem_ref
+   do i  = 1,istep
 
+      write(22,*) i,nelem_mesh(i),nrdof_tot_mesh(i),nrdof_con_mesh(i),residual_mesh(i),rate_mesh(i), &
+                 error_mesh(i),rel_error_mesh(i),rate_error_mesh(i)
+
+   enddo
+close(22)
 
 !-----------------------------------------------------------------------
 !                         REFINE AND UPDATE MESH
@@ -370,33 +379,43 @@ call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    Nref_grate = ZERO
    net_time_a = 0.0
    net_time_b = 0.0
-   do iel = 1,nr_elem_ref  
-      mdle = mdle_ref(iel)
-      etype = NODES(mdle)%type        
-      call get_subd(mdle, subd) ! get the owner process or subdomain of the element.
-      if (DISTRIBUTED .and. (RANK .ne. subd)) cycle 
-      select case(etype)
 
-         case('mdlb')
-            timer_a = MPI_Wtime()
-            call project_p(mdle,flag_pref(iel),error_org,rate_p,Poly_flag)
-            timer_b = MPI_Wtime()
-            call project_h(mdle,flag_pref(iel),error_org,rate_p,Poly_flag,Nref_grate(iel),Ref_indicator_flags((iel-1) * 10 + 1:iel*10))    
-            timer_c = MPI_Wtime()
-         case default
-            write(*,*) "Element type not recognized"
+   !$OMP PARALLEL DO                                          &
+   !$OMP PRIVATE(mdle,etype,subd,error_org,rate_p,poly_flag) &
+   !$OMP SCHEDULE(DYNAMIC)
+      do iel = 1,nr_elem_ref  
+         mdle = mdle_ref(iel)
+         etype = NODES(mdle)%type        
+         call get_subd(mdle, subd) ! get the owner process or subdomain of the element.
+         if (DISTRIBUTED .and. (RANK .ne. subd)) cycle 
+         select case(etype)
 
-      end select
+            case('mdlb')
+               ! timer_a = MPI_Wtime()
+               ! call project_p(mdle,flag_pref(iel),error_org,rate_p,Poly_flag)
+               call project_p_linear(mdle,flag_pref(iel),error_org,rate_p,Poly_flag)
+               ! timer_b = MPI_Wtime()
+               call project_h(mdle,flag_pref(iel),error_org,rate_p,Poly_flag,Nref_grate(iel),Ref_indicator_flags((iel-1) * 10 + 1:iel*10))    
+               ! timer_c = MPI_Wtime()
+            case default
+               write(*,*) "Element type not recognized"
 
-      net_time_a = net_time_a + timer_b - timer_a
-      net_time_b = net_time_b + timer_c - timer_b
+         end select
 
-   enddo
+         ! net_time_a = net_time_a + timer_b - timer_a
+         ! net_time_b = net_time_b + timer_c - timer_b
 
+      enddo
+   !$OMP END PARALLEL DO 
+
+   
    timer_save(istep,1) = net_time_a
    timer_save(istep,2) = net_time_b
    !MPI_REDUCTIONS
    count = nr_elem_ref
+
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr);
+
    call MPI_ALLREDUCE(MPI_IN_PLACE,Nref_grate,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
    count = nr_elem_ref * 10
    call MPI_ALLREDUCE(MPI_IN_PLACE,Ref_indicator_flags,count,MPI_INTEGER,MPI_SUM,MPI_COMM_WORLD,ierr)
@@ -406,7 +425,7 @@ call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    ! if(RANK .eq. ROOT) write(*,*) " time for h and p projection = ", end_time-start_time,net_time_a,net_time_b
    grate_mesh = maxval(Nref_grate)
 
-   if(istep .eq. 11) then
+   if(istep .eq. 200) then
 
       if(RANK .eq. ROOT) then
 
@@ -573,6 +592,7 @@ call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 
       
          ! !putting p-ref flags to the h-refined subchilds
+
          ! do iel = 1,nr_elem_ref
 
          !    mdle = mdle_ref(iel)
@@ -587,32 +607,45 @@ call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
          !       if(Nref_grate(iel) .gt. 0.25 * grate_mesh) then
          !          if(Ref_indicator_flags((iel-1)*10 + 1) .eq. 1) then   !h-ref
 
-         !             kref_intent = Ref_indicator_flags((iel-1)*10 + 2)
-         !             Kref_close  = NODES(mdle)%ref_kind
-                 
-         !             if(Kref_close .eq. kref_intent) then
+         !             kref_intent = Ref_indicator_flags((iel-1)*10+2)
+         !             kref_close  = NODES(mdle)%ref_kind
+
+         !             if(kref_intent .eq. kref_close) then
 
          !                call ddecode(kref_intent,hx,hy,hz)
-         !                nr_sons = 2**(hx+hy+hz)
-                        
-         !                do ic = 1,nr_sons
+         !                nr_sons_intent = 2**(hx+hy+hz)
+
+         !                do ic = 1,nr_sons_intent
+
          !                   nord_new = Ref_indicator_flags((iel-1)*10 + 2 + ic)
-         !                   mdle_child = first_son + ic-1
-         !                   call nodmod(mdle_child,nord_new)  
-         !                enddo
-
-         !             else if(kref_close .eq. 111) then
-
-         !                !there is a iso_ref
-         !                do ic = 1,8
-
          !                   mdle_child = first_son + ic - 1
-         !                   call subson_one_irregularity_map_isoref(etype,kref_intent,ic,father_subson)
-         !                   nord_new = Ref_indicator_flags((iel-1)*10 + 2 + father_subson)                           
          !                   call nodmod(mdle_child,nord_new)
 
          !                enddo
+                     
+         !             else 
 
+         !                call ddecode(kref_intent,hx,hy,hz)
+         !                nr_sons_intent = 2**(hx+hy+hz)
+
+                    
+         !                call ddecode(kref_close,hx,hy,hz)
+         !                nr_sons_close = 2**(hx+hy+hz)
+
+         !                allocate(pref_intent(nr_sons_intent))
+         !                allocate(pref_close(nr_sons_close))
+
+         !                pref_intent(1:nr_sons_intent) = Ref_indicator_flags((iel-1)*10+3:(iel-1)*10+3+nr_sons_intent)
+                     
+         !                call subson_one_irregularity_map(etype,kref_intent,kref_close,nr_sons_intent,pref_intent,nr_sons_close,pref_close)
+
+         !                do ic = 1,nr_sons_close
+
+         !                   nord_new = pref_close(ic)
+         !                   mdle_child = first_son + ic - 1
+         !                   call nodmod(mdle_child,nord_new)
+
+         !                enddo
          !             endif
 
          !          endif
@@ -622,6 +655,8 @@ call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
          !       write(*,*) "Element type not recognized"
 
          !    end select
+
+
 
          ! enddo
 

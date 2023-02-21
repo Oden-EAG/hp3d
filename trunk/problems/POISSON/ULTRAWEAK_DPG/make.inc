@@ -17,6 +17,7 @@ SRC_COMMON = \
             ./common/refine_DPG.F90 \
             ./common/HpAdapt.F90 \
             ./common/project_p.F90  \
+            ./common/project_p_linear.F90 \
             ./common/extraction_vector.F90  \
             ./common/pbisolver3.F90 \
             ./common/Finegrid_padap.F90 \
@@ -24,11 +25,13 @@ SRC_COMMON = \
             ./common/fine_to_coarse_projection_error.F90 \
             ./common/project_h.F90  \
             ./common/elem_proj_h.F90 \
+            ./common/elem_proj_h_linear.F90 \
             ./common/mesh_copy.F90  \
             ./common/poly_adap_subson.F90   \
             ./common/coeff_polynomial_aniso.F90 \
             ./common/Adaptationtest_routines.F90 \
-            ./common/solelmL2.F90
+            ./common/solelmL2.F90   \
+            
 
 SRC_PRIMAL = \
             celem.F90 \
@@ -40,6 +43,7 @@ SRC_PRIMAL = \
             my_paraview_driver.F90 \
             set_initial_mesh.F90 \
             soldis.F90 \
-            exec_job_new.F90
+            exec_job_new.F90 \
+            HOV.F90
 
 SRC_FILE   += $(SRC_MODULE) $(SRC_COMMON) $(SRC_PRIMAL)
