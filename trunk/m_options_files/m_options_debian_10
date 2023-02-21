@@ -2,7 +2,7 @@
 # SET HP3D AND LIBRARY PATH
 #------------------------------------------------------------------
 COMPILER        = GNU
-HP3D_BASE_PATH  = /Users/stefan/hp3D/LIBS/hp3d/trunk
+HP3D_BASE_PATH  = /home/stefan/hp3D/LIBS/hp3d/trunk
 
 #------------------------------------------------------------------
 # PREPROCESSOR VARIABLES
@@ -20,12 +20,10 @@ HP3D_USE_INTEL_MKL ?= 0
 # Enable OpenMP threading
 OPENMP ?= 0
 
-FF = mpifort
+FF = mpif90
 CC = mpicc
 FC     =  $(FF)
 FFLAGS = -fPIC -ffree-line-length-none
-# gcc 10 issue mpi: add flag
-FFLAGS += -fallow-argument-mismatch
 
 # OpenMP
 ifeq ($(OPENMP),1)
@@ -63,13 +61,18 @@ CDEFS   = -DAdd_
 #
 # See https://software.intel.com/en-us/articles/intel-mkl-link-line-advisor
 #
-MKL_LIBS = /opt/intel/mkl/lib/libmkl_intel_lp64.a \
-           /opt/intel/mkl/lib/libmkl_intel_thread.a \
-           /opt/intel/mkl/lib/libmkl_core.a \
-           /opt/intel/compilers_and_libraries_2020.1.216/mac/compiler/lib/libiomp5.a \
-           -lpthread -lm -ldl
+MKL_LIBS = -Wl,--start-group \
+           /opt/intel/mkl/lib/intel64/libmkl_gf_lp64.a \
+           /opt/intel/mkl/lib/intel64/libmkl_core.a
+ifeq ($(OPENMP),1)
+  MKL_LIBS += /opt/intel/mkl/lib/intel64/libmkl_intel_thread.a \
+              /opt/intel/compilers_and_libraries_2020.2.254/linux/compiler/lib/intel64/libiomp5.a
+  #MKL_LIBS += /opt/intel/mkl/lib/intel64/libmkl_gnu_thread.a
+else
+  MKL_LIBS += /opt/intel/mkl/lib/intel64/libmkl_sequential.a
+endif
+MKL_LIBS += -Wl,--end-group
 MKL_INCS = -I/opt/intel/mkl/include
-# -i8 (default 64-bit integer)
 
 #------------------------------------------------------------------
 # SOLVER LIBRARY
@@ -80,34 +83,40 @@ MKL_INCS = -I/opt/intel/mkl/include
 # also adding PETSC library dependence (petsc needs phdf5)
 
 ifeq ($(COMPLEX),1)
-  PETSC_LIB = /Users/stefan/hp3D/LIBS/petsc-3.13.1/arch-darwin-c-complex/lib
-  PETSC_INC = /Users/stefan/hp3D/LIBS/petsc-3.13.1/arch-darwin-c-complex/include
+  PETSC_LIB = /home/stefan/hp3D/LIBS/petsc-3.13.5/arch-debian-complex/lib
+  PETSC_INC = /home/stefan/hp3D/LIBS/petsc-3.13.5/arch-debian-complex/include
 else
-  PETSC_LIB = /Users/stefan/hp3D/LIBS/petsc-3.13.1/arch-darwin-c/lib
-  PETSC_INC = /Users/stefan/hp3D/LIBS/petsc-3.13.1/arch-darwin-c/include
+  PETSC_LIB = /home/stefan/hp3D/LIBS/petsc-3.13.5/arch-debian-real/lib
+  PETSC_INC = /home/stefan/hp3D/LIBS/petsc-3.13.5/arch-debian-real/include
 endif
 
 SOLVER_LIBS = -L$(PETSC_LIB) -lpetsc -ldmumps -lzmumps \
                              -lmumps_common -lpord -lscalapack \
-                             -lflapack -lfblas -lzoltan \
-                             -lptscotchparmetis -lptscotch \
+                             -lflapack -lfblas -lzoltan -lptesmumps \
+                             -lptscotchparmetisv3 -lptscotch \
                              -lptscotcherr -lesmumps -lscotch \
                              -lscotcherr -lparmetis -lmetis
 
-SOLVER_INCS = -I$(PETSC_INC) -I/Users/stefan/hp3D/LIBS/petsc-3.13.1/include
+SOLVER_INCS = -I$(PETSC_INC) -I/home/stefan/hp3D/LIBS/petsc-3.13.5/include
 
 #------------------------------------------------------------------
 # VIS LIBRARY
 #------------------------------------------------------------------
 #
 
-VIS_LIBS   = -L$(PETSC_LIB) -lhdf5 -lhdf5_hl -lhdf5_fortran -lhdf5hl_fortran
+VIS_LIBS   = -Wl,--start-group \
+             $(PETSC_LIB)/libhdf5.a \
+             $(PETSC_LIB)/libhdf5_hl.a \
+             $(PETSC_LIB)/libhdf5_fortran.a \
+             $(PETSC_LIB)/libhdf5hl_fortran.a \
+             -Wl,--end-group
+# -L$(PETSC_LIB) -lhdf5 -lhdf5_hl -lhdf5_fortran -lhdf5hl_fortran
 VIS_INCS   = -I${PETSC_INC}
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # EXTRA LIBS LINKING
-EXTRA_LINK_LIBS    = -L/opt/X11/lib -lX11
-EXTRA_LINK_INCS    = -I/opt/X11/include
+EXTRA_LINK_LIBS    = -L/usr/lib64 -lX11
+EXTRA_LINK_INCS    = -I/usr/include/X11
 
 #------------------------------------------------------------------
 # HP3D PATHS
@@ -154,12 +163,12 @@ HP3D_GMP        = $(HP3D_PATH)/lib/libhp3d_gmp.a
 # HP3D LINKING (includes frontal solver)
 
 # Cyclic dependencies force to compile as a group.
-#HP3D_LINK_LIBS    = -Wl,--start-group \
-#                    $(HP3D_LIB) $(HP3D_FRONTAL) \
+HP3D_LINK_LIBS    = -Wl,--start-group \
+                    $(HP3D_LIB) $(HP3D_FRONTAL) \
 #HP3D_LINK_LIBS   += $(HP3D_COMMON) $(HP3D_GMP)
-#HP3D_LINK_LIBS   += -Wl,--end-group
+HP3D_LINK_LIBS   += -Wl,--end-group
 
-HP3D_LINK_LIBS    = $(HP3D_LIB) $(HP3D_FRONTAL)
+#HP3D_LINK_LIBS    = $(HP3D_LIB) $(HP3D_FRONTAL)
 HP3D_LINK_INCS    = -I$(HP3D_PATH)/common/hp3d \
                     -I$(HP3D_PATH)/common/graphics \
                     -I$(HP3D_PATH)/module
@@ -167,13 +176,15 @@ HP3D_LINK_INCS    = -I$(HP3D_PATH)/common/hp3d \
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # SOLVER & MKL LINKING
 
-SOLVER_LINK_LIBS    = $(SOLVER_LIBS)
-SOLVER_LINK_INCS    = $(SOLVER_INCS)
+SOLVER_LINK_LIBS = $(SOLVER_LIBS)
+SOLVER_LINK_INCS = $(SOLVER_INCS)
 
 ifeq ($(HP3D_USE_INTEL_MKL),1)
    SOLVER_LINK_LIBS += $(MKL_LIBS)
    SOLVER_LINK_INCS += $(MKL_INCS)
 endif
+
+SOLVER_LINK_LIBS += -lpthread -lm -lstdc++ -ldl
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # PROBLEM LINKING
