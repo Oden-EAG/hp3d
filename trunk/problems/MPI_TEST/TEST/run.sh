@@ -12,5 +12,6 @@ nthreads=2
 
 #
 # 1)
+mpirun -np ${nproc} ./test -nthreads ${nthreads}
 #ibrun -n ${nproc} ./test -nthreads ${nthreads}
-ibrun -n ${nproc} xterm -hold -e ./test -nthreads ${nthreads}
+#ibrun -n ${nproc} xterm -hold -e ./test -nthreads ${nthreads}
