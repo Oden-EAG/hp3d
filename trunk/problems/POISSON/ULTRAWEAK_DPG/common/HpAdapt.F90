@@ -32,7 +32,7 @@ subroutine HpAdapt
     integer, parameter :: adap_strat = 1 !0 is for greedy strat and 1 is for Doerfler 
     ! parameters below were input to the function before but currently used as finxed parameters for debug
     integer, parameter :: physNick = 1 !if exact then adapting to reduce in error L2 solution u
-    integer, parameter :: max_step = 20
+    integer, parameter :: max_step = 40
     real(8), parameter :: Factor = 0.75
     logical :: Ires = .true.
     integer, parameter :: Irefine = 2
@@ -593,73 +593,85 @@ call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
       
          ! !putting p-ref flags to the h-refined subchilds
 
-         ! do iel = 1,nr_elem_ref
+         do iel = 1,nr_elem_ref
 
-         !    mdle = mdle_ref(iel)
-         !    etype = NODES(mdle)%type
-         !    nord = NODES(mdle)%order
-         !    first_son = NODES(mdle)%first_son
+            mdle = mdle_ref(iel)
+            etype = NODES(mdle)%type
+            nord = NODES(mdle)%order
+            first_son = NODES(mdle)%first_son
 
-         !    select case(etype)
+            select case(etype)
 
-         !    case('mdlb')
+            case('mdlb')
 
-         !       if(Nref_grate(iel) .gt. 0.25 * grate_mesh) then
-         !          if(Ref_indicator_flags((iel-1)*10 + 1) .eq. 1) then   !h-ref
+               if(Nref_grate(iel) .gt. 0.25 * grate_mesh) then
+                  if(Ref_indicator_flags((iel-1)*10 + 1) .eq. 1) then   !h-ref
 
-         !             kref_intent = Ref_indicator_flags((iel-1)*10+2)
-         !             kref_close  = NODES(mdle)%ref_kind
+                     kref_intent = Ref_indicator_flags((iel-1)*10+2)
+                     kref_close  = NODES(mdle)%ref_kind
 
-         !             if(kref_intent .eq. kref_close) then
+                     if(kref_intent .eq. kref_close) then
 
-         !                call ddecode(kref_intent,hx,hy,hz)
-         !                nr_sons_intent = 2**(hx+hy+hz)
+                        call ddecode(kref_intent,hx,hy,hz)
+                        nr_sons_intent = 2**(hx+hy+hz)
 
-         !                do ic = 1,nr_sons_intent
+                        do ic = 1,nr_sons_intent
 
-         !                   nord_new = Ref_indicator_flags((iel-1)*10 + 2 + ic)
-         !                   mdle_child = first_son + ic - 1
-         !                   call nodmod(mdle_child,nord_new)
+                           nord_new = Ref_indicator_flags((iel-1)*10 + 2 + ic)
+                           mdle_child = first_son + ic - 1
+                           call nodmod(mdle_child,nord_new)
 
-         !                enddo
+                        enddo
                      
-         !             else 
+                     else 
 
-         !                call ddecode(kref_intent,hx,hy,hz)
-         !                nr_sons_intent = 2**(hx+hy+hz)
+                        call ddecode(kref_intent,hx,hy,hz)
+                        nr_sons_intent = 2**(hx+hy+hz)
 
                     
-         !                call ddecode(kref_close,hx,hy,hz)
-         !                nr_sons_close = 2**(hx+hy+hz)
+                        call ddecode(kref_close,hx,hy,hz)
+                        nr_sons_close = 2**(hx+hy+hz)
 
-         !                allocate(pref_intent(nr_sons_intent))
-         !                allocate(pref_close(nr_sons_close))
-
-         !                pref_intent(1:nr_sons_intent) = Ref_indicator_flags((iel-1)*10+3:(iel-1)*10+3+nr_sons_intent)
+                        allocate(pref_intent(nr_sons_intent))
+                        allocate(pref_close(nr_sons_close))
+                        ! write(*,*) nr_sons_intent, Ref_indicator_flags((iel-1)*10+3:(iel-1)*10+3+nr_sons_intent-1)
+                        pref_intent(1:nr_sons_intent) = Ref_indicator_flags((iel-1)*10+3:(iel-1)*10+3+nr_sons_intent-1)
                      
-         !                call subson_one_irregularity_map(etype,kref_intent,kref_close,nr_sons_intent,pref_intent,nr_sons_close,pref_close)
+                        call subson_one_irregularity_map(etype,kref_intent,kref_close,nr_sons_intent,pref_intent,nr_sons_close,pref_close)
 
-         !                do ic = 1,nr_sons_close
+                        do ic = 1,nr_sons_close
 
-         !                   nord_new = pref_close(ic)
-         !                   mdle_child = first_son + ic - 1
-         !                   call nodmod(mdle_child,nord_new)
+                           nord_new = pref_close(ic)
+                           mdle_child = first_son + ic - 1
+                           call nodmod(mdle_child,nord_new)
 
-         !                enddo
-         !             endif
+                        enddo
 
-         !          endif
-         !       endif
+                        deallocate(pref_intent)
+                        deallocate(pref_close)
+
+
+                     endif
+
+                  endif
+               endif
             
-         !    case default
-         !       write(*,*) "Element type not recognized"
+            case default
+               write(*,*) "Element type not recognized"
 
-         !    end select
+            end select
 
 
 
-         ! enddo
+         enddo
 
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+         call enforce_min_rule
+         call close_mesh
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+         call par_verify
+         call update_gdof
+         call update_Ddof
 
          ! some printing of fnal flags for refined elements
          if (RANK .eq. ROOT) then

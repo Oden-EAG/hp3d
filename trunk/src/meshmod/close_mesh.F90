@@ -148,10 +148,10 @@ subroutine close_mesh()
             else
 !           ...-------------------------------------------------------------------
 !           ...Option 1: do minimum refinement that is necessary
-               !call find_element_closing_ref(type,kreff,krefe, kref)
+               call find_element_closing_ref(type,kreff,krefe, kref)
 !           ...-------------------------------------------------------------------
 !           ...Option 2: always ask for isotropic refinement
-               call get_isoref(mdle, kref)
+               ! call get_isoref(mdle, kref)
 !           ...-------------------------------------------------------------------
 !           ...Option 3: always ask for radial (xy) refinement (FIBER LASER)
                !select case (NODES(mdle)%type)

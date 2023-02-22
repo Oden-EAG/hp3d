@@ -37,6 +37,7 @@ subroutine solution(X, u,gradu,gradgradu)
    real(8) :: x1c,x2c,x3c,alpha,ro
    real(8) :: t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20
    real(8) :: t21,t22,t23,t24,t25,t26
+   real(8) :: u1,u2,u3,u1x,u2x,u3x,u1xx,u2xx,u3xx
 !
 !--------------------------------------------------------------------------------
 !
@@ -335,6 +336,44 @@ subroutine solution(X, u,gradu,gradgradu)
          gradgradu = ZERO
 
          gradgradu(1,1) = (1.d0/eps**2) * (exp(x1/eps)/(1.d0 - exp(1.d0/eps)))
+
+
+
+      case(5)
+
+         eps = 5.0d-3
+         u1 = x1 + (exp(x1/eps) - 1.d0)/(1.d0 - exp(1.d0/eps))
+         u2 = x2 + (exp(x2/eps) - 1.d0)/(1.d0 - exp(1.d0/eps))
+         u3 = x3 + (exp(x3/eps) - 1.d0)/(1.d0 - exp(1.d0/eps))
+
+         u = u1 * u2 * u3
+
+         u1x = 1.d0 + (1.d0/eps) * (exp(x1/eps)/(1.d0 - exp(1.d0/eps)))
+         u2x = 1.d0 + (1.d0/eps) * (exp(x2/eps)/(1.d0 - exp(1.d0/eps)))
+         u3x = 1.d0 + (1.d0/eps) * (exp(x3/eps)/(1.d0 - exp(1.d0/eps)))
+
+
+         u1xx = (1.d0/eps**2) * (exp(x1/eps)/(1.d0 - exp(1.d0/eps)))   
+         u2xx = (1.d0/eps**2) * (exp(x2/eps)/(1.d0 - exp(1.d0/eps)))   
+         u3xx = (1.d0/eps**2) * (exp(x3/eps)/(1.d0 - exp(1.d0/eps)))   
+
+         gradu = ZERO
+         gradu(1) = (1.d0 + (1.d0/eps) * (exp(x1/eps)/(1.d0 - exp(1.d0/eps)))) * u2 * u3
+         gradu(2) = u1 * (1.d0 + (1.d0/eps) * (exp(x2/eps)/(1.d0 - exp(1.d0/eps)))) * u3
+         gradu(3) = u1 * u2 * (1.d0 + (1.d0/eps) * (exp(x3/eps)/(1.d0 - exp(1.d0/eps)))) 
+
+
+         gradgradu = ZERO
+
+         gradgradu(1,1) = u1xx * u2 * u3
+         gradgradu(1,2) = u1x * u2x * u3
+         gradgradu(1,3) = u1x * u2 * u3x
+         gradgradu(2,1) = gradgradu(1,2)
+         gradgradu(2,2) = u1 * u2xx * u3
+         gradgradu(2,3) = u1 * u2x * u3x
+         gradgradu(3,1) = gradgradu(1,3)
+         gradgradu(3,2) = gradgradu(2,3)
+         gradgradu(3,3) = u1 * u2 * u3xx
 
       case default
          write(*,*) 'solution: unknown exact solution (ISOL).'
