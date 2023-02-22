@@ -100,6 +100,12 @@ MK_ALL_HP3D_OBJS := $(MK_COMMON_OBJS) \
 		    $(MK_GMP_OBJS) \
 		    $(MK_HP3D_OBJS)
 
+# Introduce ranlib flag to suppress warnings on Mac OS
+ARFLAG :=
+ifeq ($(shell uname -s),Darwin)
+	ARFLAG += -no_warning_for_no_symbols
+endif
+
 #-------------------------------------------------
 # - Make -
 
@@ -137,11 +143,6 @@ fastlib :
 	@echo "    "
 
 #-------------------------------------------------
-ARFLAG =
-ifeq ($(shell uname -s),Darwin)
-	ARFLAG += -no_warning_for_no_symbols
-endif
-
 $(HP3D_LIBNAME) : all
 	@echo "Creating directory "$(LIB_PATH)
 	@mkdir -p $(LIB_PATH)

@@ -27,7 +27,7 @@ lib : libfrontal.a
 
 libfrontal.a : $(OBJ_PATH)/.dummy $(OBJ)
 	@ar crS $@ $(OBJ)
-	@ranlib $@ -no_warning_for_no_symbols
+	@ranlib $@ $(ARFLAG)
 
 $(OBJ_PATH)/.dummy :
 	@echo "Creating directory " $(OBJ_PATH)
