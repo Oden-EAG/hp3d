@@ -23,11 +23,11 @@ OBJ      = $(addprefix $(OBJ_PATH)/,$(SRC_FILE:.F=.o))
 .PHONY : lib
 
 lib : libfrontal.a
-	@echo "Creating library "$@
+	@echo "Creating library "$@/$^
 
 libfrontal.a : $(OBJ_PATH)/.dummy $(OBJ)
-	@ar cr $@ $(OBJ)
-	@ranlib $@
+	@ar crS $@ $(OBJ)
+	@ranlib $@ -no_warning_for_no_symbols
 
 $(OBJ_PATH)/.dummy :
 	@echo "Creating directory " $(OBJ_PATH)

@@ -138,11 +138,11 @@ fastlib :
 
 #-------------------------------------------------
 $(HP3D_LIBNAME) : all
-	@echo "Creating directory " $(LIB_PATH)
+	@echo "Creating directory "$(LIB_PATH)
 	@mkdir -p $(LIB_PATH)
-	@ar cr $(LIB_PATH)/$@ $(MK_ALL_HP3D_OBJS)
-	@echo "Archiving object files "
-	@ranlib $(LIB_PATH)/$@
+	@echo "Creating library   "$(LIB_PATH)/$@
+	@ar crS $(LIB_PATH)/$@ $(MK_ALL_HP3D_OBJS)
+	@ranlib $(LIB_PATH)/$@ -no_warning_for_no_symbols
 
 all : $(OBJ_PATH)/.dummy $(MK_ALL_HP3D_OBJS)
 
@@ -178,7 +178,7 @@ source:
 
 depend: source
 	@echo "Creating sources.mk and depend_mod.mk"
-	@./build/sfmakedepend_mod.pl $(subst -I,-I ,$(CCINCS)) \
+	@./build/sfmakedepend_mod.pl --silent $(subst -I,-I ,$(CCINCS)) \
 	--moddir $(MODULE_PATH) \
 	--objdir $(OBJ_PATH) \
 	--srcprefix $(SRC_PATH) \
