@@ -137,12 +137,17 @@ fastlib :
 	@echo "    "
 
 #-------------------------------------------------
+ARFLAG =
+ifeq ($(shell uname -s),Darwin)
+	ARFLAG += -no_warning_for_no_symbols
+endif
+
 $(HP3D_LIBNAME) : all
 	@echo "Creating directory "$(LIB_PATH)
 	@mkdir -p $(LIB_PATH)
 	@echo "Creating library   "$(LIB_PATH)/$@
 	@ar crS $(LIB_PATH)/$@ $(MK_ALL_HP3D_OBJS)
-	@ranlib $(LIB_PATH)/$@ -no_warning_for_no_symbols
+	@ranlib $(LIB_PATH)/$@ $(ARFLAG)
 
 all : $(OBJ_PATH)/.dummy $(MK_ALL_HP3D_OBJS)
 
