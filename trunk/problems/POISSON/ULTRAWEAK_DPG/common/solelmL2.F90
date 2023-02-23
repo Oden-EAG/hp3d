@@ -35,9 +35,9 @@
       integer :: nodm  (MAXNODM),ndofmH(MAXNODM),ndofmE(MAXNODM),ndofmV(MAXNODM)
 !
       integer :: nrconH(MAXbrickH),nrconE(MAXbrickE),nrconV(MAXbrickV), &
-               nacH(NACDIM,MAXbrickH),constrH(NACDIM,MAXbrickH), &
-               nacE(NACDIM,MAXbrickE),constrE(NACDIM,MAXbrickE), &  
-               nacV(NACDIM,MAXbrickV),constrV(NACDIM,MAXbrickV)
+               nacH(NACDIM,MAXbrickH), nacE(NACDIM,MAXbrickE), nacV(NACDIM,MAXbrickV)
+
+      real(8) :: constrH(NACDIM,MAXbrickH), constrE(NACDIM,MAXbrickE), constrV(NACDIM,MAXbrickV)
       
       integer :: kH,kE,kV,kQ,j
       integer :: nrdoflH,nrdoflE,nrdoflV,nrdoflQ,nrnodm

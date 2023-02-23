@@ -43,7 +43,6 @@ SRC_PRIMAL = \
             my_paraview_driver.F90 \
             set_initial_mesh.F90 \
             soldis.F90 \
-            exec_job_new.F90 \
-            HOV.F90
+            exec_job_new.F90
 
 SRC_FILE   += $(SRC_MODULE) $(SRC_COMMON) $(SRC_PRIMAL)
