@@ -351,15 +351,15 @@ c  .........store the mid-face node
 c
 c  .........store relevant edges only
             do ie=ie1+1,4,2
-              medg = iabs(NFACE_CONS(ie,ifc))
+              medge = iabs(NFACE_CONS(ie,ifc))
               if (NFACE_CONS(ie,ifc).gt.0) then
                 ise = Is
               else
                 ise = imod(Is+1,2)
               endif
               NFACE_CONS(ie,NR_FACES) =
-     .        sign(Son(medg,ise),NFACE_CONS(ie,ifc))
-c     .        sign(NODES(medg)%sons(ise),NFACE_CONS(ie,ifc))
+     .        sign(Son(medge,ise),NFACE_CONS(ie,ifc))
+c     .        sign(NODES(medge)%sons(ise),NFACE_CONS(ie,ifc))
             enddo
             loc = NR_FACES
           endif
@@ -376,16 +376,16 @@ c  .......set up a new constraining edge
             NEDGC(iec) = nson
             do iv=1,2
               ie = ie_no(iv,ie1)
-              medg = iabs(NFACE_CONS(ie,ifc))
-c              nvt = NODES(medg)%sons(3)
-              nvt = Son(medg,3)
+              medge = iabs(NFACE_CONS(ie,ifc))
+c              nvt = NODES(medge)%sons(3)
+              nvt = Son(medge,3)
 c
 c  ...........inactive vertex node, add the edge to the data base
               if (Is_inactive(nvt)) then
-                call locate(medg, NEDGC,NR_EDGES,loc1)
+                call locate(medge, NEDGC,NR_EDGES,loc1)
                 if (loc1.eq.0) then
                   NR_EDGES = NR_EDGES+1
-                  NEDGC(NR_EDGES) = medg
+                  NEDGC(NR_EDGES) = medge
                   do i=1,2
                     jv = QUADR_EDGE_TO_VERT(i,ie)
                     NEDG_CONS(i,NR_EDGES) = NFACE_CONS(4+jv,ifc)

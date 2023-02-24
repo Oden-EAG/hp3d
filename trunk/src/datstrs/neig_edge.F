@@ -12,7 +12,7 @@ c   purpose            - find neigbors for an element edge
 c
 c   arguments :
 c     in:
-c         Medg         - a mid-edge node
+c         Medge        - a mid-edge node
 c         Maxn         - dimension of the arrays below
 c                        (max number of neighbors)
 c     out:
@@ -25,7 +25,7 @@ c   required  routines -
 c
 c----------------------------------------------------------------------
 c
-      subroutine neig_edge(Medg,Maxn,
+      subroutine neig_edge(Medge,Maxn,
      .                     Neig,Nedg_list,Norient_list,Nrneig)
 c
       use GMP
@@ -49,21 +49,21 @@ c----------------------------------------------------------------------
 c
       iprint=0
 c
-      if (NODES(Medg)%type.ne.'medg') then
-        write(*,7001) Medg,NODES(Medg)%type
- 7001   format('neig_edge: Medg,NODES(Medg)%type = ',i6,2x,a5)
+      if (NODES(Medge)%type.ne.'medg') then
+        write(*,7001) Medge,NODES(Medge)%type
+ 7001   format('neig_edge: Medge,NODES(Medge)%type = ',i6,2x,a5)
         stop 1
       endif
 c
 c  ...a temporary version for the initial mesh only...
-      if (NODES(Medg)%father.gt.0) then
-        write(*,7002) Medg,NODES(Medg)%father
- 7002   format('neig_edge: Medg,NODES(Medg)%father = ',i6,2x,i6)
+      if (NODES(Medge)%father.gt.0) then
+        write(*,7002) Medge,NODES(Medge)%father
+ 7002   format('neig_edge: Medge,NODES(Medge)%father = ',i6,2x,i6)
         stop 1
       endif
 c
 c  ...the number of the GMP curve is (see hp3gen)
-      nod = Medg
+      nod = Medge
       nc = nod-(NRELIS+NRPOINT)
 c
 c  ...use GMP utility to find the adjacent GMP blocks
@@ -113,8 +113,8 @@ c
 c  ...end of loop through adjacent blocks
       enddo
       if (iprint.eq.1) then
-        write(*,7011) Medg
- 7011   format('neig_edge: FIRST NEIGHBORS OF Medg = ',i5)
+        write(*,7011) Medge
+ 7011   format('neig_edge: FIRST NEIGHBORS OF Medge = ',i5)
         write(*,7012) Neig(1,1:Nrneig)
  7012   format(10i8)
         write(*,7012) Nedg_list(1:Nrneig)

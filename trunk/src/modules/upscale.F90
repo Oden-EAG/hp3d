@@ -20,7 +20,7 @@ module upscale
      integer :: NR_VERT
 !
 !    list of vertices' coordinates
-     real(8), allocatable :: VERT(:,:)
+     real(8), allocatable :: VERTC(:,:)
 !
 !    number of elements required by visualization level (0 - 3)
      integer :: NR_ELEM
@@ -71,8 +71,8 @@ contains
     implicit none
     type(vis), intent(inout) :: V
     V%NR_VERT = 0
-    if (allocated(V%VERT)) then
-       deallocate(V%VERT)
+    if (allocated(V%VERTC)) then
+       deallocate(V%VERTC)
     end if
 
     V%NR_ELEM = 0
@@ -98,12 +98,12 @@ contains
          access='sequential',status='unknown')
 
     read(nin,*) V%NR_VERT
-    allocate(V%VERT(0:V%NR_VERT, 3), STAT=istat)
-    V%VERT = 0.d0
+    allocate(V%VERTC(0:V%NR_VERT, 3), STAT=istat)
+    V%VERTC = 0.d0
     ierr = ierr + istat
 
     do i=0,(V%NR_VERT-1)
-       read(nin,*) V%VERT(i,1), V%VERT(i,2), V%VERT(i,3)
+       read(nin,*) V%VERTC(i,1), V%VERTC(i,2), V%VERTC(i,3)
     end do
 
     read(nin,*) V%NR_ELEM
@@ -143,7 +143,7 @@ contains
     type(vis), intent(in) :: V
     integer  , intent(in) :: Idx
     real(8)  , intent(out):: Pt(3)
-    Pt(1:3) = V%VERT(Idx,1:3)
+    Pt(1:3) = V%VERTC(Idx,1:3)
   end subroutine get_vis_point
 !
 ! return list of vertices for vis object
@@ -181,7 +181,7 @@ contains
 
     write(Nout,*) Type, ' NR_VERT = ', V%NR_VERT
     do i=0,(V%NR_VERT-1)
-       write(Nout,*) V%VERT(i,1:3)
+       write(Nout,*) V%VERTC(i,1:3)
     end do
 
     write(Nout,*) Type, ' NR_ELEM = ', V%NR_ELEM

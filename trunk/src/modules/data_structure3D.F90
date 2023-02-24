@@ -14,6 +14,21 @@ module data_structure3D
 !  ...parameters
       integer, parameter :: NHIST = 20
 !
+!  ...node types
+      integer, parameter :: MDLB = 1
+      integer, parameter :: MDLN = 2
+      integer, parameter :: MDLP = 3
+      integer, parameter :: MDLD = 4
+      integer, parameter :: MDLQ = 5
+      integer, parameter :: MDLT = 6
+      integer, parameter :: MEDG = 7
+      integer, parameter :: VERT = 8
+!  ...element types
+      integer, parameter :: BRIC = 9
+      integer, parameter :: TETR = 10
+      integer, parameter :: PRIS = 11
+      integer, parameter :: PYRA = 12
+!
 !  ...dirichlet data set up
       integer, save :: NR_DIRICHLET_LIST = 0
       integer, save, dimension(20) :: DIRICHLET_LIST
@@ -273,6 +288,58 @@ module data_structure3D
       Son = NODES(Nod)%first_son+I-1
 !
       end function
+!
+!-----------------------------------------------------------------------
+!
+!  ...return string representation of a type
+      function S_Type(Itype)
+         Integer Itype
+         character(4) S_Type
+         select case(Itype)
+            ! node types
+            case(MDLB); S_Type = 'mdlb'
+            case(MDLN); S_Type = 'mdln'
+            case(MDLP); S_Type = 'mdlp'
+            case(MDLD); S_Type = 'mdld'
+            case(MDLQ); S_Type = 'mdlq'
+            case(MDLT); S_Type = 'mdlt'
+            case(MEDG); S_Type = 'medg'
+            case(VERT); S_Type = 'vert'
+            ! element types
+            case(BRIC); S_Type = 'bric'
+            case(TETR); S_Type = 'tetr'
+            case(PRIS); S_Type = 'pris'
+            case(PYRA); S_Type = 'pyra'
+            case default
+               write(*,*) 'S_Type: Itype = ', Itype
+               stop
+         end select
+      end function S_Type
+!
+!  ...return integer representation of a type
+      function I_Type(Stype)
+         character(4) Stype
+         integer I_Type
+         select case(Stype)
+            ! node types
+            case('mdlb'); I_Type = MDLB
+            case('mdln'); I_Type = MDLN
+            case('mdlp'); I_Type = MDLP
+            case('mdld'); I_Type = MDLD
+            case('mdlq'); I_Type = MDLQ
+            case('mdlt'); I_Type = MDLT
+            case('medg'); I_Type = MEDG
+            case('vert'); I_Type = VERT
+            ! element types
+            case('bric'); I_Type = BRIC
+            case('tetr'); I_Type = TETR
+            case('pris'); I_Type = PRIS
+            case('pyra'); I_Type = PYRA
+            case default
+               write(*,*) 'I_Type: Stype = ', Stype
+               stop
+         end select
+      end function I_Type
 !
 !-----------------------------------------------------------------------
 !

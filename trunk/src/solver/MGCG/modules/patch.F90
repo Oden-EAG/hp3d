@@ -235,7 +235,7 @@
    integer              :: nodesl(27),norientl(27)
 !
    integer              :: nrv, nre, nrf, ie, iedge(2), if, nrvf, iface(4)
-   integer              :: listv(16), nc, icase, medg, mface
+   integer              :: listv(16), nc, icase, medge, mface
    integer              :: i, j , iv, nodv, jjv, nodvp
    integer              :: jmax, loc, loc1, l
 !
@@ -255,12 +255,12 @@
 !
 !  ...local face nod number
       i = nrv + ie
-      medg = nodesl(i)
+      medge = nodesl(i)
 !
 !  ...pick up the edge vertex nodes
       call edge_to_vert(type,ie, iedge(1),iedge(2))
 !
-!  ...establish vertex patches to which `medg' contributes
+!  ...establish vertex patches to which `medge' contributes
       j=0
       do iv = 1,2
          nodv = nodesl(iedge(iv))
@@ -287,7 +287,7 @@
          endif
       enddo
 !
-!  ...add 'medg' to the vertex patches
+!  ...add 'medge' to the vertex patches
       jmax=j
       do j=1,jmax
 !
@@ -295,7 +295,7 @@
 !     ...this visit flag is raised while solving the coarse grid system
          loc = NODES_MG(listv(j))%visit
 !
-         call locate(medg,GRID(Igrid)%PTCH(loc)%nedgel,GRID(Igrid)%PTCH(loc)%nredges,loc1)
+         call locate(medge,GRID(Igrid)%PTCH(loc)%nedgel,GRID(Igrid)%PTCH(loc)%nredges,loc1)
          if (loc1.eq.0) then
 ! $omp critical
             GRID(Igrid)%PTCH(loc)%nredges = GRID(Igrid)%PTCH(loc)%nredges+1
@@ -305,7 +305,7 @@
                write(*,*) 'patch_contr: increase MAX_NREDGES'
                stop 1
             endif
-            GRID(Igrid)%PTCH(loc)%nedgel(l) = medg
+            GRID(Igrid)%PTCH(loc)%nedgel(l) = medge
          endif
 !
 !  ...end of loop through patches
