@@ -16,7 +16,7 @@ subroutine close_mesh()
    use refinements
    use data_structure3D
    use mpi_param  , only: ROOT,RANK
-   use MPI        , only: MPI_COMM_WORLD
+   use MPI        , only: MPI_COMM_WORLD,MPI_Wtime
 !
    implicit none
 !
@@ -28,7 +28,7 @@ subroutine close_mesh()
    integer :: i, j, ic, mdle, nod, kref
    integer :: nreles_aux
    logical :: nflag
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
    integer :: ierr
 !
 #if DEBUG_MODE

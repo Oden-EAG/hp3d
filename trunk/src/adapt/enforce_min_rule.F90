@@ -17,7 +17,7 @@
    use refinements
    use constrained_nodes
    use mpi_param  , only: ROOT,RANK
-   use MPI        , only: MPI_COMM_WORLD,MPI_COMM_WORLD
+   use MPI        , only: MPI_COMM_WORLD,MPI_COMM_WORLD,MPI_Wtime
 !
    implicit none
 !
@@ -34,7 +34,7 @@
    integer :: je,jf,ne1,ne2,ne3,ne4,is,nods
    integer :: nrsons,nordhs,nordvs
 !
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
    integer :: ierr
 !
 #if DEBUG_MODE

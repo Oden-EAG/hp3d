@@ -34,6 +34,7 @@ subroutine elem(Mdle, Itest,Itrial)
    use data_structure3D
    use parametersDPG
    use physics, only: NR_PHYSA
+   use MPI, only: MPI_Wtime
 !
    implicit none
 !
@@ -61,7 +62,7 @@ subroutine elem(Mdle, Itest,Itrial)
    integer :: fld_flag
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 !----------------------------------------------------------------------
 !

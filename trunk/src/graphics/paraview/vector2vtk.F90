@@ -19,7 +19,7 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
    use physics          , only: DTYPE,ADRES
    use upscale
    use paraview
-   use MPI              , only: MPI_COMM_WORLD,MPI_SUM,MPI_INTEGER
+   use MPI              , only: MPI_COMM_WORLD,MPI_SUM,MPI_INTEGER,MPI_Wtime
    use mpi_param        , only: RANK,ROOT,NUM_PROCS
    use par_mesh         , only: DISTRIBUTED,HOST_MESH
 !

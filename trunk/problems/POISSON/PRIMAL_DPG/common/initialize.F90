@@ -90,7 +90,7 @@ subroutine initialize
 !
 !..optionally, choose partitioning algorithm for the initial mesh
 !              if using MPI parallelism
-   if (NUM_PROCS > 1) call zoltan_w_set_lb(0)
+   if (NUM_PROCS > 1) call zoltan_w_set_lb(ZOLTAN_LB_DEFAULT)
 !
 !..generate mesh and read physics file
 !..keep integration flag value

@@ -22,7 +22,7 @@ program main
    use assembly_sc, only: IPRINT_TIME
    use stc        , only: STORE_STC,HERM_STC
 !
-   use MPI        , only: MPI_COMM_WORLD
+   use MPI        , only: MPI_COMM_WORLD,MPI_Wtime
    use mpi_param  , only: ROOT,RANK,NUM_PROCS
    use mpi_wrapper, only: mpi_w_init,mpi_w_finalize
 !
@@ -37,7 +37,7 @@ program main
 #endif
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 !----------------------------------------------------------------------
 !

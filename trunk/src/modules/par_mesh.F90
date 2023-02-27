@@ -17,7 +17,7 @@ module par_mesh
    use parameters,     only: NRCOMS
    use mpi_param,      only: RANK,ROOT,NUM_PROCS
    use MPI,            only: MPI_COMM_WORLD,MPI_STATUS_IGNORE, &
-                             MPI_SUCCESS,MPI_COMPLEX16,MPI_REAL8
+                             MPI_SUCCESS,MPI_COMPLEX16,MPI_REAL8,MPI_Wtime
    use zoltan_wrapper, only: ZOLTAN_LB,zoltan_w_partition
 !
    implicit none
@@ -51,7 +51,7 @@ subroutine distr_mesh()
    integer :: nrnodm, nrdof_nod
    integer :: iprint = 0
 !
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
    if (iprint .eq. 1) then
       write(6,100) 'start distr_mesh, DISTRIBUTED = ', DISTRIBUTED
