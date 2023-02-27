@@ -31,13 +31,14 @@ subroutine set_3Dint_fi(EType,Norder, nordx,nordy,nordz,nintx,ninty, &
    use parametersDPG    , only : MAXNINT3ADD, MAXPP
    use control          , only : INTEGRATION
    use gauss_quadrature , only : INITIALIZED, XIGAUS1, WAGAUS1
+   use node_types
 !
    implicit none
 !
-   character(len=4), intent(in)  :: EType
-   integer         , intent(in)  :: Norder(19)
-   real(8)         , intent(out) :: Xiloc(3,MAXNINT3ADD)
-   real(8)         , intent(out) :: Waloc(3,MAXNINT3ADD)
+   integer, intent(in)  :: EType
+   integer, intent(in)  :: Norder(19)
+   real(8), intent(out) :: Xiloc(3,MAXNINT3ADD)
+   real(8), intent(out) :: Waloc(3,MAXNINT3ADD)
    integer, intent(out) :: nordx,nordy,nordz,nintx,ninty,nintz
 !
    integer :: i,l,l1,l2,l3,nordh,nordv,nord1,nord2,nord3
@@ -54,13 +55,13 @@ subroutine set_3Dint_fi(EType,Norder, nordx,nordy,nordz,nintx,ninty, &
 #if DEBUG_MODE
    iprint=0
    if (iprint.eq.1) then
-      write(*,7001) EType,Norder
+      write(*,7001) S_Type(etype),Norder
  7001 format('set_3Dint_fi: Type, Norder = ',a4,2x,19i4)
    endif
 #endif
 !
    select case(EType)
-   case('mdlb','bric')
+   case(MDLB,BRIC)
 !
 !  ...determine order of approximation
       call decode(Norder(19), nordh,nord3)
@@ -96,7 +97,7 @@ subroutine set_3Dint_fi(EType,Norder, nordx,nordy,nordz,nintx,ninty, &
       enddo
 !
    case default
-      write(*,*) 'set_3Dint_fi: Type = ', EType
+      write(*,*) 'set_3Dint_fi: Type = ', S_Type(Etype)
       stop
    endselect
 !

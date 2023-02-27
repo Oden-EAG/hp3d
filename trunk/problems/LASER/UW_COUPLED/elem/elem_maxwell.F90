@@ -73,7 +73,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    VTYPE, dimension(MdQ,MdQ), intent(out) :: ZalocQQ
 !
 !..declare edge/face type variables
-   character(len=4) :: etype,ftype
+   integer :: etype,ftype
 !
 !..declare element order, orientation for edges and faces
    integer, dimension(19)    :: norder
@@ -222,7 +222,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    allocate(stiff_EQ_T(6*NrdofQ ,NrTest))
 !
 !..element type
-   etype = NODES(Mdle)%type
+   etype = NODES(Mdle)%ntype
    nre = nedge(etype); nrf = nface(etype)
 !
 !..determine order of approximation
@@ -231,15 +231,15 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !..set the enriched order of approximation
    select case(etype)
-      case('mdlb')
+      case(MDLB)
          nordP = NODES(Mdle)%order+NORD_ADD*111
          norderi(nre+nrf+1) = 111
-      case('mdln','mdld')
-         nordP = NODES(Mdle)%order+NORD_ADD
-         norderi(nre+nrf+1) = 1
-      case('mdlp')
+      case(MDLP)
          nordP = NODES(Mdle)%order+NORD_ADD*11
          norderi(nre+nrf+1) = 11
+      case(MDLN,MDLD)
+         nordP = NODES(Mdle)%order+NORD_ADD
+         norderi(nre+nrf+1) = 1
       case default
          write(*,*) 'elem_maxwell: invalid etype param. stop.'
          stop
@@ -688,7 +688,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !..end timer
 !   end_time = MPI_Wtime()
 !   !$OMP CRITICAL
-!      !write(*,10) etype, end_time-start_time
+!      !write(*,10) S_Type(etype), end_time-start_time
 !      write(*,11) end_time-start_time
 !! 10   format(A,' elem : ',f12.5,'  seconds')
 ! 11   format(f12.5)
@@ -973,7 +973,7 @@ subroutine imp_penalty(Mdle,Fld_flag,NrdofH,NrdofEi,MdE,Norder,Norderi, &
    VTYPE,   intent(inout) :: ZalocEE(MdE,MdE)
 !
 !..declare edge/face type variables
-   character(len=4) :: etype,ftype
+   integer :: etype,ftype
 !
 !..declare orientation for edges and faces
    integer, dimension(12)    :: norient_edge
@@ -1030,7 +1030,7 @@ subroutine imp_penalty(Mdle,Fld_flag,NrdofH,NrdofEi,MdE,Norder,Norderi, &
    INTEGRATION = 0
 !
 !..determine element type and number of faces
-   etype = NODES(Mdle)%type
+   etype = NODES(Mdle)%ntype
    nrf = nface(etype)
 !
 !..determine edge and face orientations

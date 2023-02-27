@@ -47,7 +47,7 @@
    real(8), parameter :: rZero = 0.d0
 !
 !..declare edge/face type variables
-   character(len=4) :: etype, etype1, ftype
+   integer :: etype, etype1, ftype
 !
 !..declare element order, orientation for edges and faces
    integer, dimension(19)    :: norder
@@ -184,7 +184,7 @@
    iprint = 0
 !
 !..element type
-   etype = NODES(Mdle)%type
+   etype = NODES(Mdle)%ntype
    nre = nedge(etype); nrf = nface(etype)
 !
 !..determine order of approximation
@@ -192,14 +192,14 @@
 !
 !..set the enriched order of approximation
    select case(etype)
-      case('mdlp')
+      case(MDLP)
          nord3 = 0
          nord3 = max(nord3,norder(7))
          nord3 = max(nord3,norder(8))
          nord3 = max(nord3,norder(9))
          nord3 = nord3+NORD_ADD
          nordP = NODES(Mdle)%order+NORD_ADD*11
-      case('mdlb')
+      case(MDLB)
          nord3 = 0
          nord3 = max(nord3,norder(9))
          nord3 = max(nord3,norder(10))
@@ -213,8 +213,8 @@
    end select
 !
    select case(etype)
-      case('mdlp') ! prism
-         etype1 = 'mdlt'
+      case(MDLP) ! prism
+         etype1 = MDLT
 !     ...calc face order and enriched face order
          norder_f(1:3) = norder(1:3); norder_fe(1:3) = norder(1:3) + NORD_ADD
          norder_f(4) = max(norder(10),norder(11)); norder_fe(4) = norder_f(4) + NORD_ADD
@@ -229,8 +229,8 @@
          allocate(mapEE(nrdofE12*(nord3+1) + nrdofH12*nord3)) ! test  dof ordering
          call tens_prism_ordEE(pe,nord3, mapEE)
 !
-      case('mdlb') ! hexa
-         etype1 = 'mdlq'
+      case(MDLB) ! hexa
+         etype1 = MDLQ
  !    ...calc face order and enriched face order
          norder_f(1:4) = norder(1:4); norder_fe(1:4) = norder(1:4) + NORD_ADD
 !     ...take max order of this face (13) and the opposite face (14)
@@ -245,7 +245,7 @@
          call tens_hexa_ordEE(pe,nord3, mapEE)
 !
       case default
-         write(*,*) 'elem_maxwell_gram_pris: unexpected element type:', etype
+         write(*,*) 'elem_maxwell_gram_pris: unexpected element type:',S_Type(etype)
             stop
    end select
 !
