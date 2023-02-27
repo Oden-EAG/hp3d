@@ -22,7 +22,7 @@
       integer, intent(out) :: Nref_flag
 !------------------------------------------------------------------------------------------
 !  ...element and face type
-      character(len=4) :: etype,ftype
+      integer :: etype,ftype
 !
 !  ...number of topological entities (vertices,edges,faces)
       integer :: nrv,nre,nrf
@@ -131,7 +131,7 @@
       end select
 !
 !  ...element type
-      etype = NODES(Mdle)%type
+      etype = NODES(Mdle)%ntype
       nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
 !
 !  ...order of approximation, orientations, geometry dof's (don't need bc flags)
@@ -145,9 +145,9 @@
       nordtmp = NORD_ADD
       ! nordtmp = 4 - IP !max(NORD_ADD,2)
       select case(etype)
-      case('mdlb')        ; nordP = NODES(Mdle)%order + nordtmp*111
-      case('mdln','mdld') ; nordP = NODES(Mdle)%order + nordtmp*1
-      case('mdlp')        ; nordP = NODES(Mdle)%order + nordtmp*11
+      case(MDLB)      ; nordP = NODES(Mdle)%order + nordtmp*111
+      case(MDLP)      ; nordP = NODES(Mdle)%order + nordtmp*11
+      case(MDLN,MDLD) ; nordP = NODES(Mdle)%order + nordtmp*1
       end select
 !
 !  ...determine solution dof

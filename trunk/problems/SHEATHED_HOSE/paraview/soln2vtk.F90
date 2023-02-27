@@ -34,19 +34,19 @@ subroutine soln2vtk(Sname, Sfile, Snick, Scenter, Scomp, Ic)
    integer,          intent(in ) :: Scomp
    integer,          intent(out) :: Ic
 !
-   type(vis)      :: vis_obj
-   character(len=4) :: etype
-   integer                             :: mdle, nflag, iel, iv, ndom, nV
-   real*8,  dimension(3)               :: xi,x
-   integer, dimension(12)              :: nedge_orient
-   integer, dimension(6)               :: nface_orient
-   integer, dimension(19)              :: norder
-   real*8,  dimension(3,MAXbrickH)     :: xnod
+   type(vis) :: vis_obj
+   integer   :: etype
+   integer                              :: mdle, nflag, iel, iv, ndom, nV
+   real*8,  dimension(3)                :: xi,x
+   integer, dimension(12)               :: nedge_orient
+   integer, dimension(6)                :: nface_orient
+   integer, dimension(19)               :: norder
+   real*8,  dimension(3,MAXbrickH)      :: xnod
    real*8, dimension(MAXEQNH,MAXbrickH) :: zdofH
    real*8, dimension(MAXEQNE,MAXbrickE) :: zdofE
    real*8, dimension(MAXEQNV,MAXbrickV) :: zdofV
    real*8, dimension(MAXEQNQ,MAXbrickQ) :: zdofQ
-   real*8, dimension(3,3)              :: dxdxi
+   real*8, dimension(3,3)               :: dxdxi
    real*8, dimension(  MAXEQNH  )       :: zsolH
    real*8, dimension(  MAXEQNH,3)       :: zgradH
    real*8, dimension(3,MAXEQNE  )       :: zsolE
@@ -84,7 +84,7 @@ subroutine soln2vtk(Sname, Sfile, Snick, Scenter, Scomp, Ic)
          call find_domain(mdle, ndom)
          if (ndom.ne.PARAVIEW_DOMAIN) cycle
       endif
-      etype = NODES(mdle)%type
+      etype = NODES(mdle)%ntype
       vis_obj = vis_on_type(etype)
       n_vert_offset(iel) = Ic
       n_elem_vert(iel) = vis_obj%nr_vert
@@ -124,7 +124,7 @@ subroutine soln2vtk(Sname, Sfile, Snick, Scenter, Scomp, Ic)
       call find_elem_nodes(mdle, norder,nedge_orient,nface_orient)
 !
 !  ...select appropriate visualization object
-      etype = NODES(mdle)%type
+      etype = NODES(mdle)%ntype
       nV = n_elem_vert(iel)
 !
 !  ...loop over vertices of visualization object
