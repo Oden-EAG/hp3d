@@ -1,14 +1,8 @@
+! @brief  module defines node type parameters
+! @date   Feb 2023
 module node_types
    implicit none
-!  integer, parameter :: NODE_TYPE_EMPTY = -1, &
-!                        NODE_TYPE_VERTEX = 0, &
-!                        NODE_TYPE_EDGE = 1, &
-!                        NODE_TYPE_TRI = 2, &
-!                        NODE_TYPE_QUAD = 3, &
-!                        NODE_TYPE_TETRA = 4, &
-!                        NODE_TYPE_PRISM = 5, &
-!                        NODE_TYPE_PYRAMID = 6, &
-!                        NODE_TYPE_HEXA = 7
+!
 !  ...node types
       integer, parameter :: MDLB = 1
       integer, parameter :: MDLN = 2
