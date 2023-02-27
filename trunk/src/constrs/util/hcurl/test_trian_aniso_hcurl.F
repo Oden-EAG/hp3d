@@ -118,5 +118,4 @@ c
       read(*,*) ians
       if (ians.eq.1) go to 777
 c
-      return
-      end
+      end subroutine test_trian_aniso_h1

@@ -47,8 +47,7 @@ c  ...history information: father, its type, refinement kind, son number
 c
       integer :: nson,nfath,nrgen,nel
       integer :: i,j,ie,is,iv,ifc,igen,jp,kref1,kref2,kref3
-      integer :: iprint,nrsons,nv1,nv2,nv3,nv4
-      real(8) :: lab
+      integer :: iprint,nrsons,nv1,nv2,nv3,nv4,lab
 c
 c----------------------------------------------------------------------
 c

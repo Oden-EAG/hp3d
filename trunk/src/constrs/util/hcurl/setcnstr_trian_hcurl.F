@@ -17,7 +17,9 @@ c
 c
       use parameters
       use constraints
-#include "syscom.blk"
+      implicit none
+c
+ccc   integer :: i
 c
       RRTE = 0.d0; RRQE = 0.d0
 c

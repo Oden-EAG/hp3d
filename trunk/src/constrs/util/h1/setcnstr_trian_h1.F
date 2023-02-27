@@ -17,7 +17,9 @@ c
 c
       use parameters
       use constraints
-#include "syscom.blk"
+c
+      implicit none
+      integer :: i
 c
       RRTH = 0.d0; RRQH = 0.d0
 c

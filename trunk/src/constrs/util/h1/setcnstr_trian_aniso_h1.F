@@ -267,7 +267,4 @@ ccc              if (abs(get_rrqh(Iref, n, ipp,jp,j)).gt.1.d-12) then
 c
 ccc      call test_trian_aniso(Iref)
 c
-      end
-
-
-
+      end subroutine setcnstr_trian_aniso_h1
