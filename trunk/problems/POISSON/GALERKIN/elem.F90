@@ -40,7 +40,7 @@ subroutine elem(Mdle, Itest,Itrial)
    call find_order(Mdle, norder)
 !
 !..find number of dof for each energy space supported by the element
-   call celndof(NODES(Mdle)%type,norder, nrdofH,nrdofE,nrdofV,nrdofQ)
+   call celndof(NODES(Mdle)%ntype,norder, nrdofH,nrdofE,nrdofV,nrdofQ)
 !
 !..call element integration routine
    call elem_poisson(Mdle,nrdofH, ALOC(1,1)%array,BLOC(1)%array)
@@ -90,7 +90,7 @@ subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
    integer :: iflag, nrv, nre, nrf
    integer :: nrdofH, nint, k1, k2, l
 !
-   character(len=4) :: etype
+   integer :: etype
 !
 !..element order, orientation for edges and faces
    integer :: norder(19), norient_edge(12), norient_face(6)
@@ -123,7 +123,7 @@ subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
    Zaloc = ZERO; Zbloc = ZERO
 !
 !..element type
-   etype = NODES(Mdle)%type
+   etype = NODES(Mdle)%ntype
 !  [number of vertices, edges, and faces of this element (type)]
    nrv = nvert(etype)
    nre = nedge(etype)
