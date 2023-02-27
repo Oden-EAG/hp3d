@@ -21,7 +21,8 @@ c
 c
 ccc   integer :: i
 c
-      RRTE = 0.d0; RRQE = 0.d0
+      RRTE = 0.d0
+c      RRQE = 0.d0
 c
       call setcnstr_trian_iso_hcurl
 ccc      do i=2,4
