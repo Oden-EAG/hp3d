@@ -7,7 +7,7 @@
 !! @param[in]  Ison          - son number of this node
 !! @param[out] Nod           - node number
 !! @param[out] Nodesl        - nodal connectivity of node
-!! @param[out] Norinetl      - orientation of node
+!! @param[out] Norientl      - orientation of node
 !
 !> @date Feb 2023
 !----------------------------------------------------------------------------
@@ -26,12 +26,15 @@ subroutine elem_nodes_one( &
 !
    type(node) :: fath, cur
    integer, dimension(6) :: kref_face
-   integer :: iprint, iref, ireff, iref1, iref2, iref3, nort
+   integer :: iref, ireff, iref1, iref2, iref3, nort
    integer :: j, jp, nodp, nodpp, is, is1, n_nodes
+!
+#if DEBUG_MODE
+   integer :: iprint = 0
+#endif
 !
 !----------------------------------------------------------------------------
 !
-   iprint = 0
 #if DEBUG_MODE
    if (iprint.eq.1) then
       write(*,*) '------------------------------------------------'
@@ -42,7 +45,7 @@ subroutine elem_nodes_one( &
  7001 format('elem_nodes_one: Nfath ', a5, ' = ',27(i6))
    endif
 #endif
-
+!
 !-----------------------------------------------------------
 !..initialize output
    Nodesl   = 0
@@ -72,9 +75,6 @@ subroutine elem_nodes_one( &
       else
          nodp = Nodesl_fath(jp)
          select case (Type_nod(fath%ntype, jp))
-         case (VERT)
-            write(*,*) 'elem_nodes_one; VERTEX CANNOT BE PARENT'
-            stop
          case (MEDG)
             call rotate_edge(Norientl_fath(jp),is,nort)
             Nodesl(j) = Son(nodp,is)
@@ -94,6 +94,9 @@ subroutine elem_nodes_one( &
                nodpp     = Nodesl(j)
                Nodesl(j) = Son(nodpp,is1)
             endif
+         case (VERT)
+            write(*,*) 'elem_nodes_one; VERTEX CANNOT BE PARENT'
+            stop
          case default
             Nodesl(j) = Son(nodp,is)
          end select
