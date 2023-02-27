@@ -40,7 +40,7 @@ subroutine elem(Mdle, Itest,Itrial)
    integer :: nrv,nre,nrf
 !
 !..element type
-   character(len=4) :: etype
+   integer :: etype
 !
 !-------------------------------------------------------------------------
 !
@@ -50,18 +50,18 @@ subroutine elem(Mdle, Itest,Itrial)
    norder (1:19) = 0
    norderP(1:19) = 0
 !
-   etype = NODES(Mdle)%type
+   etype = NODES(Mdle)%ntype
    nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
 !..determine order of approximation
    call find_order(Mdle, norder)
 !
 !..set the enriched order of approximation
    select case(etype)
-      case('mdlb')
+      case(MDLB)
          nordP = NODES(Mdle)%order+NORD_ADD*111
-      case('mdlp')
+      case(MDLP)
          nordP = NODES(Mdle)%order+NORD_ADD*11
-      case('mdln','mdld')
+      case(MDLN,MDLD)
          nordP = NODES(Mdle)%order+NORD_ADD
       case default
          write(*,*) 'elem: invalid etype param. stop.'
@@ -167,7 +167,7 @@ subroutine elem_poisson(Mdle,                   &
    integer :: j1, j2, k1, k2, i, k, l
    integer :: nordP, nrdof, nsign, ifc, info
 !
-   character(len=4) :: etype,ftype
+   integer :: etype,ftype
 !
 !..element order, orientation for edges and faces
    integer :: norder(19), norient_edge(12), norient_face(6)
@@ -228,7 +228,7 @@ subroutine elem_poisson(Mdle,                   &
    allocate(stiff_HV(NrTest,NrdofVi))
 !
 !..element type
-   etype = NODES(Mdle)%type
+   etype = NODES(Mdle)%ntype
    nrv = nvert(etype)
    nre = nedge(etype)
    nrf = nface(etype)
@@ -239,13 +239,13 @@ subroutine elem_poisson(Mdle,                   &
 !
 !..set the enriched order of approximation
    select case(etype)
-      case('mdlb')
+      case(MDLB)
          nordP = NODES(Mdle)%order+NORD_ADD*111
          norderi(nre+nrf+1) = 111
-      case('mdlp')
+      case(MDLP)
          nordP = NODES(Mdle)%order+NORD_ADD*11
          norderi(nre+nrf+1) = 11
-      case('mdln','mdld')
+      case(MDLN,MDLD)
          nordP = NODES(Mdle)%order+NORD_ADD
          norderi(nre+nrf+1) = 1
       case default
@@ -485,12 +485,13 @@ end subroutine elem_poisson
 subroutine compute_enriched_order(EType,Nord, Norder)
 !
    use parameters, only : MODORDER
+   use node_types, only : MDLB
 !
    implicit none
 !
-   character(len=4), intent(in)  :: Etype
-   integer         , intent(in)  :: Nord
-   integer         , intent(out) :: Norder(19)
+   integer, intent(in)  :: Etype
+   integer, intent(in)  :: Nord
+   integer, intent(out) :: Norder(19)
 !
    integer :: temp(2)
    integer :: nordF(3),nordB(3)
@@ -499,7 +500,7 @@ subroutine compute_enriched_order(EType,Nord, Norder)
 !
 !..see implementation of BrokenExactSequence in shape functions
    select case(Etype)
-      case('mdlb')
+      case(MDLB)
          call decod(Nord,MODORDER,2, temp) !xy face, z edge
          nordF(1) = temp(1); nordB(3) = temp(2)
          call decod(nordF(1),MODORDER,2, nordB(1:2)) !x edge, y edge

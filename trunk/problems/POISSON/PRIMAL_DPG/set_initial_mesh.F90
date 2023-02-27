@@ -54,11 +54,11 @@
 !  ...set order of approximation
       if (IP.gt.0) then
 !     ...uniform order of approximation
-         select case(ELEMS(iel)%Type)
-            case('tetr'); Nelem_order(iel) = 1*IP
-            case('pyra'); Nelem_order(iel) = 1*IP
-            case('pris'); Nelem_order(iel) = 11*IP
-            case('bric'); Nelem_order(iel) = 111*IP
+         select case(ELEMS(iel)%etype)
+            case(BRIC); Nelem_order(iel) = 111*IP
+            case(PRIS); Nelem_order(iel) = 11*IP
+            case(TETR); Nelem_order(iel) = 1*IP
+            case(PYRA); Nelem_order(iel) = 1*IP
          end select
       else
 !     ...custom order of approximation (NOT IMPLEMENTED)
@@ -75,7 +75,7 @@
 !     ...uniform BC
          case(BC_DIRICHLET)
 !        ...if exterior face, set boundary condition to IBC_PROB
-            do ifc=1,nface(ELEMS(iel)%Type)
+            do ifc=1,nface(ELEMS(iel)%etype)
                neig = ELEMS(iel)%neig(ifc)
                select case(neig)
                   case(0); ibc(ifc,1) = 1 ! Dirichlet BC (H1 field variable)

@@ -179,9 +179,9 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
             nrelem_ref = NRELES
             do iel=1,nrelem_ref
                mdle = ELEM_ORDER(iel)
-               select case(NODES(mdle)%type)
-                  case('mdlb'); kref = 1 ! refine in z
-                  case('mdlp'); kref = 1 ! refine in z
+               select case(NODES(mdle)%ntype)
+                  case(MDLB); kref = 1 ! refine in z
+                  case(MDLP); kref = 1 ! refine in z
                   case default
                      write(*,*) 'href WARNING: anisoref for unexpected type. stop.'
                      stop 1
