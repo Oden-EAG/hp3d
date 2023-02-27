@@ -1,7 +1,7 @@
 !----------------------------------------------------------------------------
-!> Purpose : initialize problem dependent environments, solvers, graphics and
-!!           create initial mesh.
-!! @date July 2019
+!> @brief   initialize problem dependent environments, solvers, graphics and
+!!          create initial mesh.
+!> @date    Feb 2023
 !----------------------------------------------------------------------------
 subroutine initialize
    use environment
