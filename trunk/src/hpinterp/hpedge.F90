@@ -2,15 +2,14 @@
 #include "typedefs.h"
 !
 !-----------------------------------------------------------------------
-!
-!> Purpose : update H1 geometry dof interpolating GMP reference map using
-!            PB interpolation
+!> @brief      update H1 geometry dof interpolating GMP reference map
+!              using PB interpolation
 !!
 !! @param[in]  Iflag        - a flag specifying which of the objects the
 !!                            edge is on: 5 pris, 6 hexa, 7 tetr, 8 pyra
 !! @param[in]  No           - number of a specific object
 !! @param[in]  Etav         - reference coordinates of the element vertices
-!! @param[in]  Type         - element (middle node) type
+!! @param[in]  Ntype        - element (middle node) type
 !! @param[in]  Nedge_orient - edge orientation
 !! @param[in]  Nface_orient - face orientation (not used)
 !! @param[in]  Norder       - element order
@@ -19,9 +18,9 @@
 !!
 !! @param[out] Xdof         - geometry dof for the edge
 !!
-!> @date Mar 17
+!> @date       Feb 2023
 !-----------------------------------------------------------------------
-  subroutine hpedge(Mdle,Iflag,No,Etav,Type, &
+  subroutine hpedge(Mdle,Iflag,No,Etav,Ntype, &
                     Nedge_orient,Nface_orient,Norder,Iedge,&
                     Xnod, Xdof)
 !
@@ -35,7 +34,7 @@
   integer,                         intent(in)  :: Iflag,No,Mdle
   integer,                         intent(in)  :: Iedge
   real(8), dimension(3,8),         intent(in)  :: Etav
-  character(len=4),                intent(in)  :: Type
+  integer,                         intent(in)  :: Ntype
   integer, dimension(12),          intent(in)  :: Nedge_orient
   integer, dimension(6),           intent(in)  :: Nface_orient
   integer, dimension(19),          intent(in)  :: Norder
@@ -83,10 +82,10 @@
 ! debug printing flag
   iprint=0
 !
-  nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
+  nrv = nvert(Ntype); nre = nedge(Ntype); nrf = nface(Ntype)
   if (iprint.eq.1) then
-     write(*,7010) Mdle,Iflag,No,Iedge, Type
-7010 format('hpedge: Mdle,Iflag,No,Iedge, Type = ',4i4,2x,a4)
+     write(*,7010) Mdle,Iflag,No,Iedge,S_Type(Ntype)
+7010 format('hpedge: Mdle,Iflag,No,Iedge,Type = ',4i4,2x,a4)
      write(*,7020) Etav(1:3,1:nrv)
 7020 format('        Etav = ',8(3f6.2,1x))
      write(*,7030) Nedge_orient(1:nre)
@@ -99,14 +98,14 @@
   endif
 !
 ! # of edge dof
-  call ndof_nod('medg',norder(Iedge), &
+  call ndof_nod(MEDG,norder(Iedge), &
                 ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_edge)
 !
 ! if # of dof is zero, return, nothing to do
   if (ndofH_edge.eq.0) return
 !
 ! set order and orientation for the edge node
-  call initiate_order(Type, norder_1)
+  call initiate_order(Ntype, norder_1)
   norder_1(Iedge) = Norder(Iedge)
 !
 ! 1D integration rule
@@ -123,10 +122,10 @@
     wa = wa_list(l)
 !
 !   determine edge parameterization for line integral
-    call edge_param(Type,Iedge,t, xi,dxidt)
+    call edge_param(Ntype,Iedge,t, xi,dxidt)
 !
 !   compute element H1 shape functions
-    call shape3DH(Type,xi,norder_1,Nedge_orient,Nface_orient, &
+    call shape3DH(Ntype,xi,norder_1,Nedge_orient,Nface_orient, &
                   nrdofH,shapH,gradH)
 !
 !   compute reference geometry
@@ -149,7 +148,7 @@
     case(7) ; call tetra(No,eta, x,dxdeta)
     case(8) ; call pyram(No,eta, x,dxdeta)
     case default
-      write(*,*) 'hpedge: Type,Iflag = ', Type,Iflag
+      write(*,*) 'hpedge: Type,Iflag = ', S_Type(Ntype),Iflag
       call logic_error(ERR_INVALID_VALUE,__FILE__,__LINE__)
     endselect
 !

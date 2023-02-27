@@ -49,7 +49,7 @@ subroutine elem_nodes(Mdle, Nodesl,Norientl)
   do while(nfath.gt.0)
      igen=igen+1
      nfathl(igen) = nfath
-     call nr_mdle_sons(NODES(nfath)%type,NODES(nfath)%ref_kind, nrsons)
+     call nr_mdle_sons(NODES(nfath)%ntype,NODES(nfath)%ref_kind, nrsons)
 !     call locate(nson,NODES(nfath)%sons,nrsons, isonl(igen))
      isonl(igen) = nson - NODES(nfath)%first_son + 1
 !     if (isonl(igen)<0 .or. isonl(igen)>nrsons) call pause
@@ -83,14 +83,14 @@ subroutine elem_nodes(Mdle, Nodesl,Norientl)
      if ((igen.eq.1).and.(INFO_CONSTRAINTS.eq.1)) then
         FATH_NODES  = nodesl_fath
         FATH_ORIENT = norientl_fath
-        FATH_TYPE   = NODES(nfathl(1))%type
+        FATH_TYPE   = NODES(nfathl(1))%ntype
         SON_NUM     = isonl(1)
      endif
      nodesl_fath = Nodesl; norientl_fath = Norientl
 !
      if (iprint.eq.1) then
         write(*,*) 'igen = ', igen
-        call elem_show(nod,NODES(nod)%type,Nodesl,Norientl)
+        call elem_show(nod,NODES(nod)%ntype,Nodesl,Norientl)
      endif
   enddo
 !
@@ -103,7 +103,7 @@ subroutine elem_nodes(Mdle, Nodesl,Norientl)
 7201 format('FATHER NODES = ',27i6)
      write(*,7202) FATH_ORIENT(1:n_nodes)
 7202 format('NODES ORIENT = ',27i6)
-     write(*,7203) FATH_TYPE,SON_NUM
+     write(*,7203) S_Type(FATH_TYPE),SON_NUM
 7203 format('FATH_TYPE = ',a5,' SON_NUM = ',i1)
      call pause
   endif

@@ -4,7 +4,7 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - Dec 07
+!   latest revision    - Feb 2023
 !
 !   purpose            - routine enables the natural order of elements
 !
@@ -22,7 +22,16 @@ subroutine nelcon(Mdle0, Mdle1)
       use data_structure3D
       use refinements
 !
-      iprint=0
+      implicit none
+!
+      integer, intent(in)  :: Mdle0
+      integer, intent(out) :: Mdle1
+!
+      integer :: mdle,nfath,nrbros,noson
+!
+#if DEBUG_MODE
+      integer :: iprint = 0
+#endif
 !
       mdle = Mdle0
 !
@@ -45,14 +54,17 @@ subroutine nelcon(Mdle0, Mdle1)
       else
 !
 !  .....find the son number in the family
-        call nr_mdle_sons(NODES(nfath)%type,NODES(nfath)%ref_kind,nrbros)
+        call nr_mdle_sons(NODES(nfath)%ntype,NODES(nfath)%ref_kind,nrbros)
 !        call locate(mdle,NODES(nfath)%sons,nrbros, noson)
         noson = mdle - NODES(nfath)%first_son + 1
 !        if (noson<0 .or. noson>nrbros) call pause
+!
+#if DEBUG_MODE
         if (iprint.eq.1) then
           write(*,7002) mdle,nfath,nrbros,noson
  7002     format('nelcon: mdle,nfath,nrbros,noson = ',2i7,2i3)
         endif
+#endif
 !
 !  .....if mdle is not the last son in the family, go to the next brother
         if (noson.lt.nrbros) then
@@ -76,10 +88,12 @@ subroutine nelcon(Mdle0, Mdle1)
       Mdle1 = mdle
 !
 !
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7010) Mdle0,Mdle1
  7010   format('nelcon: Mdle0,Mdle1 = ',2i7)
       endif
+#endif
 !
 end subroutine nelcon
 

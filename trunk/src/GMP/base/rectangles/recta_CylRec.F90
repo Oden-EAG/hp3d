@@ -31,6 +31,7 @@
 !
       use control
       use GMP          , only : RECTANGLES,POINTS,NDIM
+      use node_types   , only : QUAD
       implicit none
 !----------------------------------------------------------------------
       integer,                 intent(in)  :: No
@@ -77,7 +78,7 @@
       twopi = pi*2.d0
 !
 !  ...vertex shape functions
-      call vshape2('quad',Eta, vshape,dvshape)
+      call vshape2(QUAD,Eta, vshape,dvshape)
 !
 !  ...compute the cylindrical coordinates of the endpoints
       do iv=1,4

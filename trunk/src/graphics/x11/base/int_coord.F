@@ -4,7 +4,7 @@ c   routine name       - int_coord
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Jan 08
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine determines integer coordinates of
 c                        vertices for a subtriangle of a 2D element,
@@ -13,10 +13,10 @@ c                        indicating adjacency to element sides
 c
 c   arguments :
 c     in:
-c             Numlev   - a flag = 0 for mesh display, >0 for contour
-c                        maps
+c             Numlev   - a flag = 0 for mesh display,
+c                               > 0 for contour maps
 c             Nsub     - (even,.ge.4) number of subdivisions
-c             Type     - type of element
+c             Ntype    - type of element
 c             Norder   - order of approximation (4 edges + 1 middle)
 c             I,J      - integer indices of the field
 c     out:
@@ -27,16 +27,26 @@ c             Np2      - color code for the upper triangle
 c             Nsid1    - adjacency info for the lower triangle
 c             Nsid2    - adjacency info for the upper triangle
 c
-c
 c----------------------------------------------------------------------
 c
-      subroutine int_coord(Numlev,Nsub,Type,Norder,I,J,
+      subroutine int_coord(Numlev,Nsub,Ntype,Norder,I,J,
      .                     Ixi1,Ixi2,Np1,Np2,Nsid1,Nsid2)
 c
-      character(len=4) Type
-      dimension Norder(5),Ixi1(2,3),Ixi2(2,3)
+      use node_types
 c
-      iprint=0
+      implicit none
+c
+      integer, intent(in)  :: Numlev,Nsub,Ntype
+      integer, intent(in)  :: Norder(5)
+      integer, intent(in)  :: I,J
+      integer, intent(out) :: Ixi1(2,3),Ixi2(2,3)
+      integer, intent(out) :: Np1,Np2,Nsid1,Nsid2
+c
+      integer :: nhalf,nordh,nordv,k
+      integer :: iprint=0
+c
+c  ...initialize
+      Ixi1 = 0; Ixi2 = 0
 c
 c  ...check input
       nhalf = Nsub/2
@@ -44,27 +54,27 @@ c  ...check input
         write(*,*) 'int_coord:  WRONG INPUT !! Nsub = ',Nsub
         stop 1
       endif
-      select case(Type)
-      case('tria')
-        if ((i.le.0).or.(i.gt.Nsub).or.(j.le.0).or.(j.gt.Nsub).or.
-     .      (i+j.gt.nsub+1)) then
-          write(*,*)  'int_coord:  WRONG INPUT (T) !! i,j = ', i,j
+      select case(Ntype)
+      case(TRIA)
+        if ((I.le.0).or.(I.gt.Nsub).or.(J.le.0).or.(J.gt.Nsub).or.
+     .      (I+J.gt.nsub+1)) then
+          write(*,*)  'int_coord:  WRONG INPUT (T) !! I,J = ', I,J
           stop 1
         endif
-      case('rect','quad')
-        if ((i.le.0).or.(i.gt.Nsub).or.(j.le.0).or.(j.gt.Nsub)) then
-          write(*,*)  'int_coord:  WRONG INPUT (Q) !! i,j = ', i,j
+      case(RECT,QUAD)
+        if ((I.le.0).or.(I.gt.Nsub).or.(J.le.0).or.(J.gt.Nsub)) then
+          write(*,*)  'int_coord:  WRONG INPUT (Q) !! I,J = ', I,J
           stop 1
         endif
       case default
-        write(*,*) 'int_coord:  WRONG INPUT !! Type = ',Type
+        write(*,*) 'int_coord:  WRONG INPUT !! Type = ',S_Type(Ntype)
         stop 1
       end select
 c
       Nsid1=0
       Nsid2=0
-      select case(Type)
-      case('tria','mdlt')
+      select case(Ntype)
+      case(TRIA,MDLT)
         if (I.eq.1) then
           if (J.eq.1) then
             if (Numlev.eq.0) then
@@ -208,7 +218,7 @@ c
           endif
         endif
 c
-      case('quad','rect','mdlq')
+      case(QUAD,RECT,MDLQ)
 c
 c   ....determine the coordinates
         if ( (I.le.nhalf .and. J.le.nhalf)
@@ -325,20 +335,18 @@ c  .....determine the adjacency flags
         endif
 c
       case default
-        write(*,*) 'int_coord: Type = ',Type
+        write(*,*) 'int_coord: Type = ',S_Type(Ntype)
         stop 1
       end select
 c
       if (iprint.eq.1) then
         write(*,7001) I,J
  7001   format('int_coord: I,J = ',2i3)
-        write(*,7002) (Ixi1(1:2,j),j=1,3),Nsid1
+        write(*,7002) (Ixi1(1:2,k),k=1,3),Nsid1
  7002   format('Ixi1,Nsid1 = ',3(2i3,2x),3x,i3)
-        write(*,7003) (Ixi2(1:2,j),j=1,3),Nsid2
+        write(*,7003) (Ixi2(1:2,k),k=1,3),Nsid2
  7003   format('Ixi2,Nsid2 = ',3(2i3,2x),3x,i3)
         call pause
       endif
-ccc      Nsid1=0 ; Nsid2=0
 c
-c
-      end
+      end subroutine int_coord

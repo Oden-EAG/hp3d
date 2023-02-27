@@ -55,7 +55,7 @@ subroutine geom_hp(Mdle,Xi, X,Dxdxi)
 !////////  LOOP OVER INTEGRATION POINTS  ////////
 !
 !  ...compute H1 shape functions
-      call shape3DH(NODES(Mdle)%Type,Xi,norder,nedge_orient,  &
+      call shape3DH(NODES(Mdle)%ntype,Xi,norder,nedge_orient,  &
                     nface_orient, nrdofH,shapeH,dshapeH)
 !
 !  ...geometry map

@@ -39,7 +39,7 @@ subroutine volume_hp_mdle(Mdle, Vol)
    integer :: norder(19),nedge_orient(12),nface_orient(6)
    real(8) :: xnod(3,MAXbrickH),shapH(MAXbrickH),gradH(3,MAXbrickH)
 !
-   character(len=4) :: type
+   integer :: ntype
    real(8) :: xiloc(3,MAX_NINT3),wxi(MAX_NINT3)
 !
 !..geometry
@@ -57,15 +57,15 @@ subroutine volume_hp_mdle(Mdle, Vol)
    call nodcor(mdle,xnod)
 !
 !..set integration points
-   type = NODES(mdle)%type
-   call set_3Dint(type,norder, nint,xiloc,wxi)
+   ntype = NODES(mdle)%ntype
+   call set_3Dint(ntype,norder, nint,xiloc,wxi)
 !
 !..loop over integration points
    do l=1,nint
       xi(1:3) = xiloc(1:3,l); wa = wxi(l)
 !
 !  ...evaluate appropriate shape functions at the point
-      call shape3DH(type,xi,norder,nedge_orient,nface_orient, &
+      call shape3DH(ntype,xi,norder,nedge_orient,nface_orient, &
                     nrdofH,shapH,gradH)
 !
 !  ...geometry mapping

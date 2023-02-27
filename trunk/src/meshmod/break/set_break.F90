@@ -1,59 +1,56 @@
 !---------------------------------------------------------------------------------------------
-!> Purpose : determine the infos necessary for node breaking
+!> @brief determine the infos necessary for node breaking
 !!
-!! @param[in ] Type_nod  - node type
-!! @param[in ] Kref      - refinement kind
-!! @param[in ] Nord      - order of approximation for the node
-!! @param[in ] Nbc       - BC flags
-!! @param[in ] Nbc       - BC flags
-!! @param[in ] Subd      - subdomain of node
-!! @param[out] Nrsons    - number of sons
-!! @param[out] Type_sons - son type
-!! @param[out] Norder    - order of approximation for sons
-!! @param[out] Nbcond    - BC flags for sons
-!! @param[out] Nsubd     - subdomain for sons
+!! @param[in ] Ntype      - node type
+!! @param[in ] Kref       - refinement kind
+!! @param[in ] Nord       - order of approximation for the node
+!! @param[in ] Nbc        - BC flags
+!! @param[in ] Nbc        - BC flags
+!! @param[in ] Subd       - subdomain of node
+!! @param[out] Nrsons     - number of sons
+!! @param[out] Ntype_sons - son type
+!! @param[out] Norder     - order of approximation for sons
+!! @param[out] Nbcond     - BC flags for sons
+!! @param[out] Nsubd      - subdomain for sons
 !!
-!! rev@Dec 12
+!> @date Feb 2023
 !---------------------------------------------------------------------------------------------
-subroutine set_break(Type_nod,Kref,Nord,Nbc,Subd, Nrsons,Type_sons,Norder,Nbcond,Nsubd)
+subroutine set_break(Ntype,Kref,Nord,Nbc,Subd, Nrsons,Ntype_sons,Norder,Nbcond,Nsubd)
+  use node_types
   implicit none
-!
-  character(len=4),                intent(in)  :: Type_nod
-  integer,                         intent(in)  :: Kref, Nord, Nbc, Subd
-!
-  integer,          dimension(27), intent(out) :: Norder, Nbcond, Nsubd
-  integer,                         intent(out) :: Nrsons
-  character(len=4), dimension(27), intent(out) :: Type_sons
+  integer,                intent(in)  :: Ntype, Kref, Nord, Nbc, Subd
+  integer,                intent(out) :: Nrsons
+  integer, dimension(27), intent(out) :: Ntype_sons, Norder, Nbcond, Nsubd
 !
 ! initialize
-  Norder = 0; Nbcond = 0; Type_sons(1:27) = 'none'
-  select case (Type_nod)
+  Norder = 0; Nbcond = 0; Ntype_sons(1:27) = 0
+  select case (Ntype)
 ! EDGE
-  case('medg') ; call set_edge_break(Kref,Nord, Nrsons,Type_sons,Norder)
+  case(MEDG) ; call set_edge_break(Kref,Nord, Nrsons,Ntype_sons,Norder)
 ! TRIANGLE
-  case('mdlt') ; call set_tria_break(Kref,Nord, Nrsons,Type_sons,Norder)
+  case(MDLT) ; call set_tria_break(Kref,Nord, Nrsons,Ntype_sons,Norder)
 ! QUAD
-  case('mdlq') ; call set_quad_break(Kref,Nord, Nrsons,Type_sons,Norder)
+  case(MDLQ) ; call set_quad_break(Kref,Nord, Nrsons,Ntype_sons,Norder)
 ! BRICK
-  case('mdlb') ; call set_bric_break(Kref,Nord, Nrsons,Type_sons,Norder)
+  case(MDLB) ; call set_bric_break(Kref,Nord, Nrsons,Ntype_sons,Norder)
 ! TET
-  case('mdln') ; call set_tetr_break(Kref,Nord, Nrsons,Type_sons,Norder)
+  case(MDLN) ; call set_tetr_break(Kref,Nord, Nrsons,Ntype_sons,Norder)
 ! PRISM
-  case('mdlp') ; call set_pris_break(Kref,Nord, Nrsons,Type_sons,Norder)
+  case(MDLP) ; call set_pris_break(Kref,Nord, Nrsons,Ntype_sons,Norder)
 ! PYRAMID
-  case('mdld') ; call set_pyra_break(Kref,Nord, Nrsons,Type_sons,Norder)
+  case(MDLD) ; call set_pyra_break(Kref,Nord, Nrsons,Ntype_sons,Norder)
   case default
-     write(*,*) 'set_break: NOT SUPPORTED TYPE ', Type_nod
+     write(*,*) 'set_break: NOT SUPPORTED TYPE ', S_Type(Ntype)
      stop
   endselect
 !
 ! BC flags are inherited directly from the father node
-  Nbcond(1:Nrsons)=Nbc
+  Nbcond(1:Nrsons) = Nbc
 !
 ! inherit subdomain from middle node father
   Nsubd(1:27) = -1
-  select case (Type_nod)
-  case('mdlb','mdln','mdlp','mdld') ; Nsubd(1:Nrsons) = Subd
-  endselect
+  select case (Ntype)
+    case(MDLB,MDLN,MDLP,MDLD) ; Nsubd(1:Nrsons) = Subd
+  end select
 !
 endsubroutine set_break

@@ -1,31 +1,25 @@
-!> Purpose : randomly refine mesh
+!> @brief randomly refine mesh, only meant for testing;
+!!        routine does NOT update gdofs, since random refinements
 !! @param[in] Per   - percentage to refine
 !! @param[in] Niter - number of iteration
-!!
-!! REAMARK : routine does NOT update gdofs, since random refinements
-!! are only meant for testing
-
+!> @date Feb 2023
 subroutine random_refine(Per, Nitr)
   use data_structure3D
   use refinements
   use environment , only : QUIET_MODE
   implicit none
   !
-  ! ** Arguments
-  !-----------------------------------------------------
   real(8), intent(in) :: Per
   integer, intent(in) :: Nitr
   !
-  ! ** Locals
-  !-----------------------------------------------------
   real(8) :: x
   integer :: iprint, iseed, iel, i, istat
   integer :: nsize_list, kref, mdle, nref, idx
   integer, allocatable ::  mdle_list(:)
   logical :: mode_save
-  !-----------------------------------------------------
+  !
   iprint=0
-
+  !
   !  ...loop over iteration
   do i=1,Nitr
 
@@ -67,24 +61,24 @@ ENDIF
         if (is_leaf(mdle)) then
 !
 !          pick refinement kind
-           select case (NODES(mdle)%type)
-           case ('mdln','mdld','mdlb'); call get_isoref(mdle, kref)
+           select case (NODES(mdle)%ntype)
+           case (MDLB,MDLN,MDLD); call get_isoref(mdle, kref)
               ! Testing all cases
-              ! case ('mdlp'); kref = kref_kind(mod(idx,2)+2, 'mdlp')
+              ! case (MDLP); kref = kref_kind(mod(idx,2)+2, MDLP)
 
               ! Testing anisotropic cases
-           case ('mdlp'); kref = kref_kind(mod(idx,3)+1, 'mdlp')
+           case (MDLP); kref = kref_kind(mod(idx,3)+1, MDLP)
               ! kyungjoo recover this after I complete aniso hcurl constrained approx
               kref = 11
            case default
-              write(*,9999)NODES(mdle)%type
+              write(*,9999) S_Type(NODES(mdle)%ntype)
 9999          format(' random_refine: Element type not supported! Type = ',a4)
               call logic_error(ERR_INVALID_VALUE,__FILE__,__LINE__)
            end select
            call refine(mdle, kref)
            nref = nref - 1
            if (iprint.eq.1) then
-              write(*,7000) mdle, NODES(mdle)%type, kref
+              write(*,7000) mdle, S_Type(NODES(mdle)%ntype), kref
 7000          format('mdle =',i6,' ', a5, '  kref=', i3)
            endif
         endif
@@ -121,6 +115,5 @@ ENDIF
      QUIET_MODE = mode_save
 !
   enddo
-!
 !
 end subroutine random_refine

@@ -3,26 +3,20 @@
 !   routine name       - hpvert
 !
 !----------------------------------------------------------------------
-!
-!   latest revision    - Aug 2019
-!
-!   purpose            - routine determines geometry dof for a vertex
-!                        node
-!
-!   arguments :
-!     in:
-!            Iflag     - a flag specifying which of the objects the
-!                        vertex node is generated on
-!                        = 5  for a prism
-!                        = 6  for a hexahedron
-!                        = 7  for a tetrahedron
-!                        = 8  for a pyramid
-!            No        - number of a specific object
-!                        (point,curve,triangle,rectangle...)
-!            Xi        - reference coordinates of the point
-!     out:
-!            Xnod      - geometry dof
-!
+!> @brief      routine determines geometry dof for a vertex node
+!!
+!> @param[in]  Iflag  - a flag specifying which of the objects the
+!!                      vertex node is generated on
+!!                       = 5  for a prism
+!!                       = 6  for a hexahedron
+!!                       = 7  for a tetrahedron
+!!                       = 8  for a pyramid
+!> @param[in]  No     - number of a specific object
+!!                     (point,curve,triangle,rectangle...)
+!> @param[in]  Xi     - reference coordinates of the point
+!> @param[out] Xnod   - geometry dof
+!!
+!> @date       Aug 2019
 !----------------------------------------------------------------------
 !
 subroutine hpvert(Iflag,No,Xi, Xnod)
@@ -51,7 +45,7 @@ subroutine hpvert(Iflag,No,Xi, Xnod)
       case(7); call tetra(No,Xi, Xnod,void)
       case(8); call pyram(No,Xi, Xnod,void)
       case default
-         print *, "hpvert: unknown node type =", iflag
+         write(*,*) 'hpvert: unknown node type =', Iflag
          stop 1
    end select
 !

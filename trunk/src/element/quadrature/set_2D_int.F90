@@ -5,25 +5,25 @@
 !     DEPRECATED, kept for backward compatibility (Oct 2019)
 !                 use set_2D_int instead
 !----------------------------------------------------------------------
-subroutine set_2Dint(Type,Norder, Nint,Xiloc,Waloc)
+subroutine set_2Dint(Ntype,Norder, Nint,Xiloc,Waloc)
 !
       use parameters, only : MAX_NINT2, MAXP
       implicit none
 !
-      character(len=4)               , intent(in)  :: Type
+      integer                        , intent(in)  :: Ntype
       integer, dimension(5)          , intent(in)  :: Norder
       integer                        , intent(out) :: Nint
       real(8), dimension(2,MAX_NINT2), intent(out) :: Xiloc
       real(8), dimension(  MAX_NINT2), intent(out) :: Waloc
 !
-      call set_2Dint_aux(Type,Norder,MAXP,MAX_NINT2, Nint,Xiloc,Waloc)
+      call set_2Dint_aux(Ntype,Norder,MAXP,MAX_NINT2, Nint,Xiloc,Waloc)
 !
 end subroutine set_2Dint
 !
 !----------------------------------------------------------------------
 !     routine name: set_2D_int
 !
-!     latest rev  : Oct 2019
+!     latest rev  : Feb 2023
 !
 !     purpose     : routine sets up quadrature data for a standard
 !                   2D element, accounting for different element
@@ -33,7 +33,7 @@ end subroutine set_2Dint
 !     arguments:
 !
 !     in:
-!          Type         - element type
+!          Ntype        - element type
 !          Norder       - order of approximation
 !          Norient_face - face orientation
 !
@@ -43,13 +43,14 @@ end subroutine set_2Dint
 !          Waloc        - weights
 !
 !----------------------------------------------------------------------
-subroutine set_2D_int(Type,Norder,Norient_face, Nint,Xiloc,Waloc)
+subroutine set_2D_int(Ntype,Norder,Norient_face, Nint,Xiloc,Waloc)
 !
       use element_data, only : NFAXES
       use parameters  , only : MAX_NINT2
+      use node_types
       implicit none
 !
-      character(len=4)               , intent(in)  :: Type
+      integer                        , intent(in)  :: Ntype
       integer, dimension(5)          , intent(in)  :: Norder
       integer                        , intent(in)  :: Norient_face
       integer                        , intent(out) :: Nint
@@ -60,15 +61,15 @@ subroutine set_2D_int(Type,Norder,Norient_face, Nint,Xiloc,Waloc)
       integer               :: nordh,nordv
 !
       norder_loc = Norder
-      select case(Type)
-      case('rect','mdlq','quad')
+      select case(Ntype)
+      case(RECT,MDLQ,QUAD)
         if (NFAXES(3,Norient_face).eq.1) then
           call decode(Norder(5), nordh,nordv)
           norder_loc(5) = nordv*10+nordh
         endif
       end select
 !
-      call set_2Dint(Type,norder_loc, Nint,Xiloc,Waloc)
+      call set_2Dint(Ntype,norder_loc, Nint,Xiloc,Waloc)
 !
 end subroutine set_2D_int
 !
@@ -79,25 +80,25 @@ end subroutine set_2D_int
 !     DEPRECATED, kept for backward compatibility (Oct 2019)
 !                 use set_2D_int_DPG instead
 !----------------------------------------------------------------------
-subroutine set_2Dint_DPG(Type,Norder, Nint,Xiloc,Waloc)
+subroutine set_2Dint_DPG(Ntype,Norder, Nint,Xiloc,Waloc)
 !
       use parametersDPG, only : MAXNINT2ADD, MAXPP
       implicit none
 !
-      character(len=4)                 , intent(in)  :: Type
+      integer                          , intent(in)  :: Ntype
       integer, dimension(5)            , intent(in)  :: Norder
       integer                          , intent(out) :: Nint
       real(8), dimension(2,MAXNINT2ADD), intent(out) :: Xiloc
       real(8), dimension(  MAXNINT2ADD), intent(out) :: Waloc
 !
-      call set_2Dint_aux(Type,Norder,MAXPP,MAXNINT2ADD, Nint,Xiloc,Waloc)
+      call set_2Dint_aux(Ntype,Norder,MAXPP,MAXNINT2ADD, Nint,Xiloc,Waloc)
 !
 end subroutine set_2Dint_DPG
 !
 !----------------------------------------------------------------------
 !     routine name: set_2D_int_DPG
 !
-!     latest rev  : Oct 2019
+!     latest rev  : Feb 2023
 !
 !     purpose     : routine sets up quadrature data for a DPG
 !                   2D element, accounting for different element
@@ -107,7 +108,7 @@ end subroutine set_2Dint_DPG
 !     arguments:
 !
 !     in:
-!          Type         - element type
+!          Ntype        - element type
 !          Norder       - order of approximation
 !          Norient_face - face orientation
 !
@@ -117,13 +118,14 @@ end subroutine set_2Dint_DPG
 !          Waloc        - weights
 !
 !----------------------------------------------------------------------
-subroutine set_2D_int_DPG(Type,Norder,Norient_face, Nint,Xiloc,Waloc)
+subroutine set_2D_int_DPG(Ntype,Norder,Norient_face, Nint,Xiloc,Waloc)
 !
       use element_data , only : NFAXES
       use parametersDPG, only : MAXNINT2ADD
+      use node_types
       implicit none
 !
-      character(len=4)                 , intent(in)  :: Type
+      integer                          , intent(in)  :: Ntype
       integer, dimension(5)            , intent(in)  :: Norder
       integer                          , intent(in)  :: Norient_face
       integer                          , intent(out) :: Nint
@@ -134,15 +136,15 @@ subroutine set_2D_int_DPG(Type,Norder,Norient_face, Nint,Xiloc,Waloc)
       integer               :: nordh,nordv
 !
       norder_loc = Norder
-      select case(Type)
-      case('rect','mdlq','quad')
+      select case(Ntype)
+      case(RECT,MDLQ,QUAD)
         if (NFAXES(3,Norient_face).eq.1) then
           call decode(Norder(5), nordh,nordv)
           norder_loc(5) = nordv*10+nordh
         endif
       end select
 !
-      call set_2Dint_DPG(Type,norder_loc, Nint,Xiloc,Waloc)
+      call set_2Dint_DPG(Ntype,norder_loc, Nint,Xiloc,Waloc)
 !
 end subroutine set_2D_int_DPG
 !
@@ -152,7 +154,7 @@ end subroutine set_2D_int_DPG
 !
 !----------------------------------------------------------------------
 !
-!     latest revision:  - Oct 2019
+!     latest revision:  - Feb 2023
 !
 !     purpose:          - routine sets up quadrature data for a 2D
 !                         element, accounting for different element
@@ -161,7 +163,7 @@ end subroutine set_2D_int_DPG
 !     arguments:
 !
 !     in:
-!             Type      - element type
+!             Ntype     - element type
 !             Norder    - order of approximation
 !             Maxp      - maximum p
 !             Max_int2  - maximum number of integration points
@@ -172,15 +174,16 @@ end subroutine set_2D_int_DPG
 !             Waloc     - weights
 !
 !----------------------------------------------------------------------
-subroutine set_2Dint_aux(Type,Norder,Maxp,Max_nint2, Nint,Xiloc,Waloc)
+subroutine set_2Dint_aux(Ntype,Norder,Maxp,Max_nint2, Nint,Xiloc,Waloc)
 !
       use parameters       , only : MODORDER
       use control          , only : INTEGRATION
       use gauss_quadrature , only : INITIALIZED,NSELECT,NRGAUPO,    &
                                     XIGAUSS,WAGAUSS,XIGAUS1,WAGAUS1
+      use node_types
       implicit none
 !
-      character(len=4)               , intent(in)  :: Type
+      integer                        , intent(in)  :: Ntype
       integer, dimension(5)          , intent(in)  :: Norder
       integer                        , intent(in)  :: Maxp,Max_nint2
       integer                        , intent(out) :: Nint
@@ -193,10 +196,10 @@ subroutine set_2Dint_aux(Type,Norder,Maxp,Max_nint2, Nint,Xiloc,Waloc)
 !  ...initialize if needed
       if (.not. INITIALIZED) call init_gauss_quadrature
 !
-      select case(Type)
+      select case(Ntype)
 !
 !  ...triangle
-      case('mdlt','tria')
+      case(MDLT,TRIA)
         nord = max(Norder(1),Norder(2),Norder(3),Norder(4))
 !
 !  .....set the quadrature
@@ -212,7 +215,7 @@ subroutine set_2Dint_aux(Type,Norder,Maxp,Max_nint2, Nint,Xiloc,Waloc)
 !
       nordx = 0; nordy = 0
 !  ...quad
-      case('mdlq','quad','rect')
+      case(MDLQ,QUAD,RECT)
         call decod(Norder(5),MODORDER,2, nordxy)
         nordx = max(Norder(1),Norder(3),nordxy(1))
         nordy = max(Norder(2),Norder(4),nordxy(2))
@@ -237,7 +240,7 @@ subroutine set_2Dint_aux(Type,Norder,Maxp,Max_nint2, Nint,Xiloc,Waloc)
         enddo
 !
       case default
-        write(*,*) 'set_2Dint: Type = ',Type
+        write(*,*) 'set_2Dint: Type = ',S_Type(Ntype)
         stop
       end select
 !

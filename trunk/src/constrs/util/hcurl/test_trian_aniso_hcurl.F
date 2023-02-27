@@ -63,7 +63,7 @@ c
 c  ...shape functions of big element
 c      call shapeHt(xibig,norder,norient,
 c     .             nrdof,shapbig(1:MAXtriaH,1),void)
-      call shape2DH('tria',xibig,norder,norient,
+      call shape2DH(TRIA,xibig,norder,norient,
      .              nrdof,shapbig(:,1),void)
       write(*,*) 'shapbig = '
       do k=1,nrdof
@@ -73,7 +73,7 @@ c
 c  ...find small shape functions at this point:
 c      call shapeHq(xisma,norder,norient,
 c     .             nrdof,shapsma(1:MAXquadH,1),void)
-      call shape2DH('quad',xisma,norder,norient,
+      call shape2DH(QUAD,xisma,norder,norient,
      .              nrdof,shapsma(:,1),void)
 c
 c*********************************************************************

@@ -1,5 +1,5 @@
 !-------------------------------------------------------------------------------
-!> Purpose : routine evaluates physical coordinates and solution at a point
+!> @brief      routine evaluates physical coordinates and solution at a point
 !!
 !> @param[in]  Mdle         - element (middle node) number
 !> @param[in]  Xi           - master element coordinates of a point
@@ -21,7 +21,7 @@
 !> @param[out] ZsolV,ZdiV   - H(div) solution
 !> @param[out] ZsolQ        - L2 solution
 !!
-!> @date May 2020
+!> @date       Feb 2023
 !-------------------------------------------------------------------------------
 !
 #include "typedefs.h"
@@ -54,8 +54,6 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
       VTYPE, dimension(  MAXEQNV  ),       intent(out) :: ZdivV
       VTYPE, dimension(  MAXEQNQ  ),       intent(out) :: ZsolQ
 !
-      character(len=4) :: etype
-!
       real(8),dimension(3,3)         :: dxidx
       real(8),dimension(  MAXbrickH) :: shapH
       real(8),dimension(3,MAXbrickH) :: gradH,gradHx
@@ -64,7 +62,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
       real(8),dimension(  MAXbrickV) :: divV,divVx
       real(8),dimension(  MAXbrickQ) :: shapQ
 !
-      integer :: iflag,i,j,k,n,ivar,nrdofH,nrdofE,nrdofV,nrdofQ
+      integer :: iflag,i,j,k,n,ivar,nrdofH,nrdofE,nrdofV,nrdofQ,ntype
       real(8) :: rjac
 !
 #if DEBUG_MODE
@@ -74,8 +72,8 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
 !-------------------------------------------------------------------------------
 !
 !     evaluate H1 shape functions
-      etype=NODES(Mdle)%type
-      call shape3DH(etype,Xi,Norder,Nedge_orient,Nface_orient, nrdofH,shapH,gradH)
+      ntype=NODES(Mdle)%ntype
+      call shape3DH(ntype,Xi,Norder,Nedge_orient,Nface_orient, nrdofH,shapH,gradH)
 !
 !     geometry map
       call geom3D(Mdle,Xi,Xnod,shapH,gradH,nrdofH, &
@@ -135,7 +133,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
 !===============================================================================
 !
 !     H(curl) shape functions
-      call shape3DE(etype,Xi,Norder,Nedge_orient,Nface_orient, nrdofE,shapE,curlE)
+      call shape3DE(ntype,Xi,Norder,Nedge_orient,Nface_orient, nrdofE,shapE,curlE)
 !
 !     Piola transform
       shapEx=ZERO ; curlEx=ZERO
@@ -179,7 +177,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
 !===============================================================================
 !
 !     H(div) shape functions
-      call shape3DV(etype,Xi,Norder,Nface_orient, nrdofV,shapV,divV)
+      call shape3DV(ntype,Xi,Norder,Nface_orient, nrdofV,shapV,divV)
 !
 !     Piola transform (H(div) shape functions are transformed as H(curl) curls)
       shapVx=ZERO ; divVx=ZERO
@@ -224,7 +222,7 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
 !===============================================================================
 !
 !     L2 shape functions
-      call shape3DQ(etype,Xi,Norder, nrdofQ,shapQ)
+      call shape3DQ(ntype,Xi,Norder, nrdofQ,shapQ)
 !
 !     Piola transform
       shapQ(1:nrdofQ)=shapQ(1:nrdofQ)/rjac

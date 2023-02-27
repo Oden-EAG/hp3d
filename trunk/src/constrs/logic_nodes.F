@@ -4,8 +4,7 @@ c   routine name       - logic_nodes
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Mar 16
-c                    (S.P. & B.K. removed visitation flags for OMP)
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine establishes list of nodes
 c                        for a modified element
@@ -31,26 +30,30 @@ c
       use constrained_nodes
 #include "syscom.blk"
 c
-      dimension Nodesl(27),Nodm(MAXNODM)
+      integer, intent(in)  :: Mdle
+      integer, intent(in)  :: Nodesl(27)
+      integer, intent(out) :: Nodm(MAXNODM)
+      integer, intent(out) :: Nrnodm
 c
 c  ...element type
-      character(len=4) :: type
+      integer :: ntype
 c
 c  ...local lists of nodes
-      dimension list_v(16),list_e(24),list_f(12)
+      integer :: list_v(16),list_e(24),list_f(12)
+c
+c  ...miscellanea
+      integer :: iv,icv,ice,icf,nod,nodp,nc,nce,icase,j,nrnodl
+      integer :: iprint
 c
 c----------------------------------------------------------------------
 c
-      if (Mdle.eq.354) then
-        iprint=0
-      else
-        iprint=0
-      endif
+      iprint = 0
+c      if (Mdle.eq.354) iprint=0
 c
-      type = NODES(Mdle)%type
+      ntype = NODES(Mdle)%ntype
 c
 c  ...number of (local) nodes for the element (- middle node)
-      nrnodl = Nvert(type)+Nedge(type)+Nface(type)
+      nrnodl = Nvert(ntype)+Nedge(ntype)+Nface(ntype)
 c
 c  ...establish lists of modified element vertex, edge, and face
 c     nodes
@@ -59,13 +62,12 @@ c     nodes
         nod = Nodesl(j)
 c
 c  .....if nod is active
-C         if (Is_active(nod)) then
-         if ((Is_active(nod)).or.(Is_inactive(nod) .and.
-     .                            NODES(nod)%ref_kind.ne.0)) then
+        if ((Is_active(nod)).or.
+     .      (Is_inactive(nod) .and. NODES(nod)%ref_kind.ne.0)) then
 c
-          if (j.le.Nvert(type)) then
+          if (j.le.Nvert(ntype)) then
             call add_to_list(list_v,16,icv,nod)
-          elseif (j.le.Nvert(type)+Nedge(type)) then
+          elseif (j.le.Nvert(ntype)+Nedge(ntype)) then
             call add_to_list(list_e,24,ice,nod)
           else
             call add_to_list(list_f,12,icf,nod)
@@ -265,6 +267,7 @@ cccc  ...clean the visitation flag
 ccc      do j=1,Nrnodm-1
 ccc        NODES(Nodm(j))%visit = 0
 ccc      enddo
+c
       if (iprint.eq.1) then
         write(*,7002) Mdle
  7002   format('logic_nodes: Mdle = ',i6,' MODIFIED ELEMENT NODES = ')
@@ -282,8 +285,7 @@ c   routine name       - add_to_list
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Mar 16
-c                     (S.P. & B.K. removed visitation flags for OMP)
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine adds a node but NO LONGER with
 c                        visitation flags
@@ -302,9 +304,15 @@ c
       subroutine add_to_list(List,Nlist,Ic,Nod)
 c
       use data_structure3D
-#include "syscom.blk"
 c
-      dimension List(Nlist)
+      implicit none
+c
+      integer, intent(in)    :: Nlist
+      integer, intent(inout) :: List(Nlist)
+      integer, intent(inout) :: Ic
+      integer, intent(in)    :: Nod
+c
+      integer :: number
 cccc
 ccc      if (NODES(Nod)%visit.eq.0) then
 ccc        Ic=Ic+1
@@ -319,8 +327,8 @@ cccc  .....raise the visitation flag
 ccc        NODES(Nod)%visit=1
 ccc      endif
       call locate(Nod,List,Ic, number)
-      if (number.eq.0) then
 c
+      if (number.eq.0) then
 c  .....add the node to the list
         Ic=Ic+1
         if (Ic.gt.Nlist) then
@@ -331,5 +339,4 @@ c  .....add the node to the list
         List(Ic) = Nod
       endif
 c
-c
-      end subroutine
+      end subroutine add_to_list

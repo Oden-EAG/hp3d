@@ -31,6 +31,7 @@ c
       subroutine shape3DHBrokenPris(Xi,NordM,Nsize, NrdofH,ShapH,GradH)
 c
       use parameters , only : MODORDER
+      use node_types
 c
       implicit none
       integer, intent(in)  :: NordM,Nsize(2)
@@ -65,7 +66,7 @@ c  ...initiate counter for shape functions
 c
 c  ...Shape functions are tensor product of H1 triangles and segments
       call decod(NordM,MODORDER,2, nordB)
-      call shape2HH('mdlt',Xi(1:2),nordB(1), ndofH12,shapH12,dshapH12)
+      call shape2HH(MDLT,Xi(1:2),nordB(1), ndofH12,shapH12,dshapH12)
       call shape1HH(Xi(3),nordB(2), ndofH3,shapH3,dshapH3)
 c
       do i3=1,ndofH3
@@ -112,6 +113,7 @@ c
       subroutine shape3DEBrokenPris(Xi,NordM,Nsize, NrdofE,ShapE,CurlE)
 c
       use parameters , only : MODORDER
+      use node_types
 c
       implicit none
       integer, intent(in)  :: NordM,Nsize(2)
@@ -154,11 +156,11 @@ c  ...Decode order
 c
 c  ...Shape functions split into 2 families
 c     Family 1: E12 x H3
-      call shape2EE('mdlt',Xi(1:2),nordB(1), ndofE12,shapE12,curlE12)
+      call shape2EE(MDLT,Xi(1:2),nordB(1), ndofE12,shapE12,curlE12)
       call shape1HH(Xi(3),nordB(2), ndofH3,shapH3,dshapH3)
 c
 c     Family 2: H12 x Q3
-      call shape2HH('mdlt',Xi(1:2),nordB(1), ndofH12,shapH12,dshapH12)
+      call shape2HH(MDLT,Xi(1:2),nordB(1), ndofH12,shapH12,dshapH12)
       call shape1QQ(Xi(3),nordB(2), ndofQ3,shapQ3)
 c
 c  ...Evaluate Family 1
@@ -225,6 +227,7 @@ c
       subroutine shape3DVBrokenPris(Xi,NordM,Nsize, NrdofV,ShapV,DivV)
 c
       use parameters , only : MODORDER
+      use node_types
 c
       implicit none
       integer, intent(in)  :: NordM,Nsize(2)
@@ -256,11 +259,11 @@ c  ...Option 2: Write more efficient routine for enriched functions
 c
 c  ...Shape functions split into 2 families
 c     Family 1: V12 x Q3
-      call shape2VV('mdlt',Xi(1:2),nordB(1), ndofV12,shapV12,divV12)
+      call shape2VV(MDLT,Xi(1:2),nordB(1), ndofV12,shapV12,divV12)
       call shape1QQ(Xi(3),nordB(2), ndofQ3,shapQ3)
 c
 c     Family 2: Q12 x H3
-      call shape2QQ('mdlt',Xi(1:2),nordB(1), ndofQ12,shapQ12)
+      call shape2QQ(MDLT,Xi(1:2),nordB(1), ndofQ12,shapQ12)
       call shape1HH(Xi(3),nordB(2), ndofH3,shapH3,dshapH3)
 c
 c  ...Evaluate Family 1

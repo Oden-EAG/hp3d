@@ -11,6 +11,7 @@
 subroutine prism(No,Eta, X,Dxdeta)
 !
       use GMP
+      use node_types, only: PRIS
 !
       implicit none
       integer,               intent(in ) :: No
@@ -48,7 +49,7 @@ subroutine prism(No,Eta, X,Dxdeta)
           np=PRISMS(No)%VertNo(iv) ; call pointr(np, xv(1:3,iv))
         enddo
 !  .....evaluate vertex shape functions
-        call vshape3('pris',Eta, vshape,dvshape)
+        call vshape3(PRIS,Eta, vshape,dvshape)
 !  .....accumulate
         X(1:3)=0.d0; Dxdeta(1:3,1:3) = 0.d0
         do k=1,6
@@ -91,6 +92,7 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
       use control
       use GMP
       use element_data
+      use node_types, only: PRIS
 #include "syscom.blk"
       common /cprism_TI/ iprint
 !

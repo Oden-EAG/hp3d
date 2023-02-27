@@ -4,7 +4,7 @@ c   routine name       - invmap
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Jan 09
+c   latest revision    - Feb 2023
 c
 c   purpose            - given physical coordinates Xp of a point in
 c                        space and geometry dof for an element,
@@ -14,7 +14,7 @@ c                        coordinates
 c
 c   arguments :
 c     in:
-c             Type     - element type
+c             Ntype    - element type
 c             Xp       - physical coordinates of a point
 c             Norder   - element order
 c             Nedge_orient, Nface_orient - edge and face orientations
@@ -26,7 +26,7 @@ c             Xi       - master element coordinates of Xp
 c
 c----------------------------------------------------------------------
 c
-      subroutine invmap(Type,Xp,Norder,Nedge_orient,Nface_orient,
+      subroutine invmap(Ntype,Xp,Norder,Nedge_orient,Nface_orient,
      .                  Xnod, Idec,Xi)
 c
       use data_structure3D
@@ -35,22 +35,29 @@ c
 #include "syscom.blk"
       common /cinvmap/ iprint_invmap
 c
-      character(len=4) :: Type
-      dimension Norder(19),Nedge_orient(12),Nface_orient(6)
-      dimension Xp(3),Xnod(3,MAXbrickH)
+      integer, intent(in)  :: Ntype,Norder(19)
+      integer, intent(in)  :: Nedge_orient(12),Nface_orient(6)
+      real(8), intent(in)  :: Xnod(3,MAXbrickH)
+      integer, intent(out) :: Idec
+      real(8), intent(out) :: Xi(3)
+c
+      real(8) :: Xp(3)
 c
 c  ...shape functions and their derivatives wrt master coordinates
-      dimension shapH(MAXbrickH),gradH(3,MAXbrickH)
+      real(8) :: shapH(MAXbrickH),gradH(3,MAXbrickH)
+      integer :: nrdofH
 c
 c  ...geometry
-      dimension xi(3),dxdxi(3,3),dxidx(3,3)
+      real(8) :: dxdxi(3,3),dxidx(3,3)
 c
 c  ...increment in xi
-      dimension dxi(3)
+      real(8) :: dxi(3)
 c
-      dimension x(3)
-      parameter (eps = 1.d-8)
+      real(8) :: x(3)
+      integer :: i,iter,k
+      integer :: iflag,iprint
 c
+      real(8), parameter :: eps = 1.d-8
 c
 c-----------------------------------------------------------------------
 c
@@ -64,19 +71,19 @@ c  ...initiate the NR iterations
       endif
 c
 c  ...use element centroid as initial guess
-      xi(1:3)=0.d0
-      do i=1,nvert(Type)
-        select case(Type)
-        case('mdln','tetr') ; xi(1:3) = xi(1:3) + TETRA_COORD(1:3,i)
-        case('mdlb','bric') ; xi(1:3) = xi(1:3) + BRICK_COORD(1:3,i)
-        case('mdlp','pris') ; xi(1:3) = xi(1:3) + PRISM_COORD(1:3,i)
-        case('mdld','pyra') ; xi(1:3) = xi(1:3) + PYRAM_COORD(1:3,i)
+      Xi(1:3)=0.d0
+      do i=1,nvert(Ntype)
+        select case(Ntype)
+        case(MDLB,BRIC) ; Xi(1:3) = Xi(1:3) + BRICK_COORD(1:3,i)
+        case(MDLN,TETR) ; Xi(1:3) = Xi(1:3) + TETRA_COORD(1:3,i)
+        case(MDLP,PRIS) ; Xi(1:3) = Xi(1:3) + PRISM_COORD(1:3,i)
+        case(MDLD,PYRA) ; Xi(1:3) = Xi(1:3) + PYRAM_COORD(1:3,i)
         endselect
       enddo
-      xi(1:3)=xi(1:3)/nvert(Type)
+      Xi(1:3)=Xi(1:3)/nvert(Ntype)
 
       do iter=1,15
-        call shape3DH(Type,xi,Norder, Nedge_orient,Nface_orient,
+        call shape3DH(Ntype,Xi,Norder, Nedge_orient,Nface_orient,
      .                nrdofH,shapH,gradH)
 c
 c  .....determine physical coordinates and the derivatives of
@@ -90,8 +97,8 @@ c       the physical coordinates wrt master element coordinates
         enddo
         if (iprint.eq.1) then
           write(*,*)'----------------------------'
-          write(*,7001) iter,xi(1:3),x(1:3)
- 7001     format('invmap: iter,xi,x = ',i4,3(e12.5,2x),2x,3(e12.5,2x))
+          write(*,7001) iter,Xi(1:3),x(1:3)
+ 7001     format('invmap: iter,Xi,x = ',i4,3(e12.5,2x),2x,3(e12.5,2x))
         endif
 c
 c  .....evaluate the inverse derivatives and jacobian
@@ -112,7 +119,7 @@ c  .....update xi
           write(*,7002) eps,dxi(1:3)
  7002     format('invmap: eps, dxi = ',e12.5,4x,3(e12.5,2x))
         endif
-        xi(1:3) = xi(1:3) + dxi(1:3)
+        Xi(1:3) = Xi(1:3) + dxi(1:3)
 c
 c  .....check convergence
         dmax = max(abs(dxi(1)),abs(dxi(2)),abs(dxi(3)))
@@ -125,36 +132,35 @@ c  .....check convergence
         write(*,*) '***************************'
         call pause
       endif
-
 c
 c  ...check if the point lies within the element
       Idec=1
-      select case(Type)
-      case('mdlp')
-        if ( (xi(1).lt.-GEOM_TOL).or.
-     .       (xi(2).lt.-GEOM_TOL).or.
-     .       (xi(1)+xi(2).gt.1.d0+GEOM_TOL).or.
-     .       (xi(3).lt.-GEOM_TOL).or.
-     .       (xi(3).gt.1.d0+GEOM_TOL)) then
+      select case(Ntype)
+      case(MDLP)
+        if ( (Xi(1).lt.-GEOM_TOL).or.
+     .       (Xi(2).lt.-GEOM_TOL).or.
+     .       (Xi(1)+Xi(2).gt.1.d0+GEOM_TOL).or.
+     .       (Xi(3).lt.-GEOM_TOL).or.
+     .       (Xi(3).gt.1.d0+GEOM_TOL)) then
           Idec=0;
         endif
-      case('mdlb')
-        if ((xi(1).lt.-GEOM_TOL).or.(xi(1).gt.1.d0+GEOM_TOL).or.
-     .      (xi(2).lt.-GEOM_TOL).or.(xi(2).gt.1.d0+GEOM_TOL).or.
-     .      (xi(3).lt.-GEOM_TOL).or.(xi(3).gt.1.d0+GEOM_TOL)) then
+      case(MDLB)
+        if ((Xi(1).lt.-GEOM_TOL).or.(Xi(1).gt.1.d0+GEOM_TOL).or.
+     .      (Xi(2).lt.-GEOM_TOL).or.(Xi(2).gt.1.d0+GEOM_TOL).or.
+     .      (Xi(3).lt.-GEOM_TOL).or.(Xi(3).gt.1.d0+GEOM_TOL)) then
           Idec=0;
         endif
-      case('mdln')
-        if ((xi(1).lt.-GEOM_TOL).or.(xi(2).lt.-GEOM_TOL).or.
-     .      (xi(3).lt.-GEOM_TOL).or.
-     .      ((xi(1)+xi(2)+xi(3)).gt.1.d0+GEOM_TOL)) then
+      case(MDLN)
+        if ((Xi(1).lt.-GEOM_TOL).or.(Xi(2).lt.-GEOM_TOL).or.
+     .      (Xi(3).lt.-GEOM_TOL).or.
+     .      ((Xi(1)+Xi(2)+Xi(3)).gt.1.d0+GEOM_TOL)) then
           Idec=0;
         endif
-      case('mdld')
-        if ((xi(1).lt.-GEOM_TOL).or.
-     .      (xi(2).lt.-GEOM_TOL).or.
-     .      (xi(3).lt.-GEOM_TOL).or.((xi(1)+xi(3)).gt.1.d0+GEOM_TOL).or.
-     .      ((xi(2)+xi(3)).gt.1.d0+GEOM_TOL)) then
+      case(MDLD)
+        if ((Xi(1).lt.-GEOM_TOL).or.
+     .      (Xi(2).lt.-GEOM_TOL).or.
+     .      (Xi(3).lt.-GEOM_TOL).or.((Xi(1)+Xi(3)).gt.1.d0+GEOM_TOL).or.
+     .      ((Xi(2)+Xi(3)).gt.1.d0+GEOM_TOL)) then
           Idec=0;
         endif
       end select
@@ -163,4 +169,4 @@ c
         write(*,*)'Exiting invmap with Idec=',Idec
       endif
 c
-      end
+      end subroutine invmap

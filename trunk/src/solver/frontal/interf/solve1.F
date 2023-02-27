@@ -4,7 +4,7 @@ c   routine name       - solve1
 c
 c------------------------------------------------------------------
 c
-c   latest revision    - Sept 2018
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine solves a user defined system
 c                        of equations interfacing with the
@@ -194,10 +194,10 @@ c  .......reorder the elements in order to minimize the bandwidth...
             mdle = ELEM_ORDER(iel)
             call nodcor(mdle, xnod)
             xc(1:3) = 0.d0
-            do iv=1,nvert(NODES(mdle)%type)
+            do iv=1,nvert(NODES(mdle)%ntype)
               xc(1:3) = xc(1:3) + xnod(1:3,iv)
             enddo
-            xc(1:3) = xc(1:3)/nvert(NODES(mdle)%type)
+            xc(1:3) = xc(1:3)/nvert(NODES(mdle)%ntype)
             call scalar_product(xc,direction, ELEM_CENTER(iel))
           enddo
           call sortm(NRELES,NEW_ELEM_ORDER,ELEM_CENTER)
@@ -340,7 +340,7 @@ c
         do iel=1,iel1-1
           kk = kk + IN(iel)
         enddo
-        write(*,7003) iel1,mdle,NODES(mdle)%type
+        write(*,7003) iel1,mdle,S_Type(NODES(mdle)%ntype)
  7003   format('        NICKNAMES FOR iel1,mdle',i8,i10,' TYPE = ',a5)
         do i=1,IN(iel1)
           kk=kk+1

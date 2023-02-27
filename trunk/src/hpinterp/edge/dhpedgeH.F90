@@ -1,13 +1,13 @@
 !-----------------------------------------------------------------------
 !
-!> Purpose : update H1 edge dof interpolating H1 Dirichlet data using
+!> @brief    update H1 edge dof interpolating H1 Dirichlet data using
 !            PB interpolation
 !!
 !! @param[in]  Iflag        - a flag specifying which of the objects the
 !!                            edge is on: 5 pris, 6 hexa, 7 tetr, 8 pyra
 !! @param[in]  No           - number of a specific object
 !! @param[in]  Etav         - reference coordinates of the element vertices
-!! @param[in]  Type         - element (middle node) type
+!! @param[in]  Ntype        - element (middle node) type
 !! @param[in]  Icase        - the edge node case
 !! @param[in]  Bcond        - the edge node BC flag
 !! @param[in]  Nedge_orient - edge orientation
@@ -16,13 +16,13 @@
 !! @param[in]  Iedge        - edge number
 !! @param[in]  ZdofH        - H1 dof for the element (vertex values)
 !!
-!! @param[out] ZnodH        - H1 dof for the edge
+!! @param[in,out] ZnodH     - H1 dof for the edge
 !!
-!> @date Mar 17
+!> @date Feb 2023
 !-----------------------------------------------------------------------
 !
 #include "typedefs.h"
-  subroutine dhpedgeH(Mdle,Iflag,No,Etav,Type,Icase,Bcond,&
+  subroutine dhpedgeH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,&
                       Nedge_orient,Nface_orient,Norder,Iedge,&
                       ZdofH, ZnodH)
 !
@@ -35,15 +35,15 @@
 ! ** Arguments
 !-----------------------------------------------------------------------
 !
-  integer,           intent(in)    :: Iflag,No,Mdle
-  integer,           intent(in)    :: Icase,Bcond,Iedge
-  real(8),           intent(in)    :: Etav(3,8)
-  character(len=4),  intent(in)    :: Type
-  integer,           intent(in)    :: Nedge_orient(12)
-  integer,           intent(in)    :: Nface_orient(6)
-  integer,           intent(in)    :: Norder(19)
-  VTYPE,             intent(in)    :: ZdofH(MAXEQNH,MAXbrickH)
-  VTYPE,             intent(inout) :: ZnodH(NRCOMS*NREQNH(Icase),*)
+  integer, intent(in)    :: Iflag,No,Mdle
+  integer, intent(in)    :: Icase,Bcond,Iedge
+  real(8), intent(in)    :: Etav(3,8)
+  integer, intent(in)    :: Ntype
+  integer, intent(in)    :: Nedge_orient(12)
+  integer, intent(in)    :: Nface_orient(6)
+  integer, intent(in)    :: Norder(19)
+  VTYPE,   intent(in)    :: ZdofH(MAXEQNH,MAXbrickH)
+  VTYPE,   intent(inout) :: ZnodH(NRCOMS*NREQNH(Icase),*)
 !
 ! ** Locals
 !-----------------------------------------------------------------------
@@ -104,11 +104,11 @@
 !
 !----------------------------------------------------------------------
 !
-  nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
+  nrv = nvert(Ntype); nre = nedge(Ntype); nrf = nface(Ntype)
 !
 #if DEBUG_MODE
   if (iprint.eq.1) then
-     write(*,7010) Mdle,Iflag,No,Icase,Iedge,Type
+     write(*,7010) Mdle,Iflag,No,Icase,Iedge,S_Type(Ntype)
 7010 format('dhpedgeH: Mdle,Iflag,No,Icase,Iedge,Type = ',5i4,2x,a4)
      write(*,7020) Etav(1:3,1:nrv)
 7020 format('          Etav = ',8(3f6.2,1x))
@@ -123,7 +123,7 @@
 #endif
 !
 ! # of edge dof
-  call ndof_nod('medg',norder(Iedge), &
+  call ndof_nod(MEDG,norder(Iedge), &
                 ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_edge)
 !
 ! check if a homogeneous Dirichlet node
@@ -137,7 +137,7 @@
   if (ndofH_edge.eq.0) return
 !
 ! set order and orientation for the edge node
-  call initiate_order(Type, norder_1)
+  call initiate_order(Ntype, norder_1)
   norder_1(Iedge) = Norder(Iedge)
 !
 ! 1D integration rule
@@ -156,10 +156,10 @@
     wa = wa_list(l)
 !
 !   determine edge parameterization for line integral
-    call edge_param(Type,Iedge,t, xi,dxidt)
+    call edge_param(Ntype,Iedge,t, xi,dxidt)
 !
 !   compute element H1 shape functions
-    call shape3DH(Type,xi,norder_1,Nedge_orient,Nface_orient, &
+    call shape3DH(Ntype,xi,norder_1,Nedge_orient,Nface_orient, &
                   nrdofH,shapH,gradH)
 !
 !   compute reference geometry
@@ -182,7 +182,7 @@
     case(7) ; call tetra(No,eta, x,dxdeta)
     case(8) ; call pyram(No,eta, x,dxdeta)
     case default
-      write(*,*) 'dhpedgeH: Type,Iflag = ', Type,Iflag
+      write(*,*) 'dhpedgeH: Type,Iflag = ', S_Type(Ntype),Iflag
       call logic_error(ERR_INVALID_VALUE,__FILE__,__LINE__)
     endselect
 !

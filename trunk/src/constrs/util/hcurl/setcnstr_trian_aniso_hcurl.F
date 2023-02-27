@@ -124,13 +124,13 @@ c
 c  .......find small shape functions at this point:
 c          call shapeHq(xisma,norder(1:5),norient(1:4),
 c     .                 nrdof,shapsma(1:MAXquadH,icl),void)
-          call shape2DH('quad',xisma,norder,norient,
+          call shape2DH(QUAD,xisma,norder,norient,
      .                  nrdof,shapsma(:,icl),void)
 c
 c  .......find big shape functions at this point:
 c          call shapeHt(xibig,norder(1:4),norient(1:3),
 c     .                 nrdof,shapbig(1:MAXtriaH,icl),void)
-          call shape2DH('tria',xibig,norder,norient,
+          call shape2DH(TRIA,xibig,norder,norient,
      .                  nrdof,shapbig(:,icl),void)
         enddo
       enddo

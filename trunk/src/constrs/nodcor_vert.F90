@@ -76,7 +76,7 @@ subroutine nodcor_vert(Mdle, Xnod)
    enddo
 !
 !..#vertices = #local vertex dofs
-   nrv = nvert(NODES(Mdle)%type)
+   nrv = nvert(NODES(Mdle)%ntype)
 !
 !..loop through the local vertex dof
    do k=1,nrv

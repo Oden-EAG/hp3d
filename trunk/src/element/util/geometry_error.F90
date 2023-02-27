@@ -252,7 +252,7 @@ subroutine geometry_error_elem(Mdle, Derr,Dnorm)
 !     quadrature
       real(8) :: xiloc(3,MAX_NINT3),wxi(MAX_NINT3),wa,weight
 !
-      character(len=4) :: etype
+      integer :: ntype
 7001  format(' geometry_error_elem: Mdle,type = ',i10,2x,a4)
 !
       integer :: nrv,i,j,k,l,nint,nrdofH,iprint
@@ -262,7 +262,7 @@ subroutine geometry_error_elem(Mdle, Derr,Dnorm)
       iprint=0
 !
       if (iprint.eq.1) then
-         write(*,7001) Mdle,NODES(Mdle)%type
+         write(*,7001) Mdle,S_Type(NODES(Mdle)%ntype)
       endif
 !
 !     order of approximation, orientations, geometry dofs
@@ -278,9 +278,9 @@ subroutine geometry_error_elem(Mdle, Derr,Dnorm)
       Derr=0.d0 ; Dnorm=0.d0
 
 !     set up the element quadrature (use overintegration for the exact geometry map)
-      etype=NODES(Mdle)%type
+      ntype=NODES(Mdle)%ntype
       INTEGRATION=1
-      call set_3Dint(etype,norder, nint,xiloc,wxi)
+      call set_3Dint(ntype,norder, nint,xiloc,wxi)
       INTEGRATION=0
 !
 !     loop over integration points
@@ -288,7 +288,7 @@ subroutine geometry_error_elem(Mdle, Derr,Dnorm)
         xi(1:3)=xiloc(1:3,l) ; wa=wxi(l)
 !
 !       evaluate appropriate shape functions at the point
-        call shape3DH(etype,xi,norder,nedge_orient,nface_orient, nrdofH,shapH,gradH)
+        call shape3DH(ntype,xi,norder,nedge_orient,nface_orient, nrdofH,shapH,gradH)
 !
 !       ISOPARAMETRIC MAP : x_hp = x_hp(xi)
         xhp(1:3)=0.d0 ; dxhpdxi(1:3,1:3)=0.d0
@@ -300,7 +300,7 @@ subroutine geometry_error_elem(Mdle, Derr,Dnorm)
         enddo
 !
 !       evaluate the reference geometry
-        nrv = nvert(etype)
+        nrv = nvert(ntype)
         call refgeom3D(Mdle,xi,etav,shapH,gradH,nrv, &
                        eta,detadxi,dxideta,rjac,error_flag)
 !
@@ -318,7 +318,7 @@ subroutine geometry_error_elem(Mdle, Derr,Dnorm)
         case(7) ; call tetra(no,eta, xex,dxexdeta)
         case(8) ; call pyram(no,eta, xex,dxexdeta)
         case default
-          write(*,*) 'geometry_error_elem: Mdle,etype,iflag = ',Mdle,etype,iflag
+          write(*,*) 'geometry_error_elem: Mdle,type,iflag = ',Mdle,ntype,iflag
           call logic_error(ERR_INVALID_VALUE,__FILE__,__LINE__)
         endselect
 !

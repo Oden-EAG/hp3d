@@ -20,10 +20,9 @@ subroutine check_jacobian
   real(8), dimension(  MAXquadH ) :: wt
   ! miscellanea
   real(8) :: rjac
-  integer :: mdle, i, nint, l, iflag, ndom, nrdofH, k, j, ifig, &
-       iprint,nv,icheck
-  character(len=4) :: ftype
-
+  integer :: mdle,i,j,k,l,nint,nv,ndom,nrdofH
+  integer :: iprint,iflag,ifig,icheck
+  integer :: ftype
   ! shape function
   real(8), dimension(  MAXbrickH) :: vshapH
   real(8), dimension(3,MAXbrickH) :: dvshapH
@@ -40,7 +39,7 @@ subroutine check_jacobian
      mdle = ELEM_ORDER(i)
 !
      if (iprint.eq.1) then
-        write(*,9999)mdle,NODES(mdle)%type
+        write(*,9999)mdle,S_Type(NODES(mdle)%ntype)
 9999    format(' mdle,type = ',i7,2x,a4)
      endif
 
@@ -54,10 +53,10 @@ subroutine check_jacobian
      !-------------------------------------------------------------------------
 
      !  ...integration points
-     call set_3Dint(NODES(mdle)%type,norder, nint,xiloc,wxi)
+     call set_3Dint(NODES(mdle)%ntype,norder, nint,xiloc,wxi)
 
      !  ...number of element vertices, neeed to perfrom incremental check
-     nv=nvert(NODES(mdle)%type)
+     nv=nvert(NODES(mdle)%ntype)
 
      !  ...loop over integration points
      do l=1,nint
@@ -74,7 +73,7 @@ subroutine check_jacobian
            !  ...parametric element
         case(0)
            !  ...shape functions
-           call shape3DH(NODES(Mdle)%type,xi,norder,nedge_orient, &
+           call shape3DH(NODES(Mdle)%ntype,xi,norder,nedge_orient, &
                          nface_orient, nrdofH,vshapH,dvshapH)
            !  ...accumulate
            x(1:3)=0.d0 ; dxdxi(1:3,1:3)=0.d0
@@ -106,7 +105,7 @@ subroutine check_jacobian
            icheck=1
            call find_domain(mdle, ndom)
            write(*,*)'Interior point FAIL'
-           write(*,7000) mdle,NODES(mdle)%type,ndom,xi,rjac
+           write(*,7000) mdle,S_Type(NODES(mdle)%ntype),ndom,xi,rjac
 7000       format(' mdle,type,ndom,xi,rjac = ',i8,2x,a4,2x,i2,2x, &
                 3(e12.5,1x),2x,e12.5)
            goto 1000
@@ -120,11 +119,11 @@ subroutine check_jacobian
      !-------------------------------------------------------------------------
 
      !  ...loop over element faces
-     do ifig=1,nface(NODES(mdle)%type)
+     do ifig=1,nface(NODES(mdle)%ntype)
 
         !  ...face integration points
-        ftype=face_type(NODES(mdle)%type,ifig)
-        call face_order(NODES(mdle)%type,ifig,norder, nordf)
+        ftype=face_type(NODES(mdle)%ntype,ifig)
+        call face_order(NODES(mdle)%ntype,ifig,norder, nordf)
         call set_2Dint(ftype,nordf, nint,tloc,wt)
 
         !  ...loop through face integration points
@@ -134,13 +133,13 @@ subroutine check_jacobian
            t(1:2)=tloc(1:2,l)
 
            !  ...determine the master element coordinates
-           call face_param(NODES(mdle)%type,ifig,t, xi,dxidt)
+           call face_param(NODES(mdle)%ntype,ifig,t, xi,dxidt)
 
            select case(EXGEOM)
               !  ...parametric element
            case(0)
               !  ...derivatives and values of the shape functions
-              call shape3DH(NODES(mdle)%type,xi,norder,nedge_orient, &
+              call shape3DH(NODES(mdle)%ntype,xi,norder,nedge_orient, &
                             nface_orient, nrdofH,vshapH,dvshapH)
               !  ...accumulate
               x(1:3)=0.d0 ; dxdxi(1:3,1:3)=0.d0
@@ -161,7 +160,7 @@ subroutine check_jacobian
               call find_domain(mdle, ndom)
               write(*,7001)ifig
 7001          format(' Face point FAIL, ifig = ',i1)
-              write(*,7000) mdle,NODES(mdle)%type,ndom,xi,rjac
+              write(*,7000) mdle,S_Type(NODES(mdle)%ntype),ndom,xi,rjac
            endif
 
            !  ...end of loop over integration points

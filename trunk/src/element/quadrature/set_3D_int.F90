@@ -5,18 +5,18 @@
 !     DEPRECATED, kept for backward compatibility (Oct 2019)
 !                 use set_3D_int instead
 !----------------------------------------------------------------------
-subroutine set_3Dint(Type,Norder, Nint,Xiloc,Waloc)
+subroutine set_3Dint(Ntype,Norder, Nint,Xiloc,Waloc)
 !
       use parameters, only : MAXP,MAX_NINT3
       implicit none
 !
-      character(len=4)               , intent(in)  :: Type
+      integer                        , intent(in)  :: Ntype
       integer, dimension(19)         , intent(in)  :: Norder
       integer                        , intent(out) :: Nint
       real(8), dimension(3,MAX_NINT3), intent(out) :: Xiloc
       real(8), dimension(  MAX_NINT3), intent(out) :: Waloc
 !
-      call set_3Dint_aux(Type,Norder,MAXP,MAX_NINT3, Nint,Xiloc,Waloc)
+      call set_3Dint_aux(Ntype,Norder,MAXP,MAX_NINT3, Nint,Xiloc,Waloc)
 !
 end subroutine set_3Dint
 !
@@ -24,7 +24,7 @@ end subroutine set_3Dint
 !
 !     routine name: set_3D_int
 !
-!     latest rev  : Oct 2019
+!     latest rev  : Feb 2023
 !
 !     purpose     : routine sets up quadrature data for a standard
 !                   3D element, accounting for different element
@@ -34,7 +34,7 @@ end subroutine set_3Dint
 !     arguments:
 !
 !     in:
-!          Type         - element type
+!          Ntype        - element type
 !          Norder       - order of approximation
 !          Norient_face - face orientations of the element
 !
@@ -44,12 +44,12 @@ end subroutine set_3Dint
 !          Waloc        - weights
 !
 !----------------------------------------------------------------------
-subroutine set_3D_int(Type,Norder,Norient_face, Nint,Xiloc,Waloc)
+subroutine set_3D_int(Ntype,Norder,Norient_face, Nint,Xiloc,Waloc)
 !
       use parameters, only : MAX_NINT3
       implicit none
 !
-      character(len=4)               , intent(in)  :: Type
+      integer                        , intent(in)  :: Ntype
       integer, dimension(19)         , intent(in)  :: Norder
       integer, dimension(6)          , intent(in)  :: Norient_face
       integer                        , intent(out) :: Nint
@@ -58,8 +58,8 @@ subroutine set_3D_int(Type,Norder,Norient_face, Nint,Xiloc,Waloc)
 !
       integer, dimension(19) :: norder_loc
 !
-      call find_order_loc(Type,Norder,Norient_face, norder_loc)
-      call set_3Dint(Type,norder_loc, Nint,Xiloc,Waloc)
+      call find_order_loc(Ntype,Norder,Norient_face, norder_loc)
+      call set_3Dint(Ntype,norder_loc, Nint,Xiloc,Waloc)
 !
 end subroutine set_3D_int
 !
@@ -70,18 +70,18 @@ end subroutine set_3D_int
 !     DEPRECATED, kept for backward compatibility (Oct 2019)
 !                 use set_3D_int instead
 !----------------------------------------------------------------------
-subroutine set_3Dint_DPG(Type,Norder, Nint,Xiloc,Waloc)
+subroutine set_3Dint_DPG(Ntype,Norder, Nint,Xiloc,Waloc)
 !
       use parametersDPG, only : MAXPP,MAXNINT3ADD
       implicit none
 !
-      character(len=4)                 , intent(in)  :: Type
+      integer                          , intent(in)  :: Ntype
       integer, dimension(19)           , intent(in)  :: Norder
       integer                          , intent(out) :: Nint
       real(8), dimension(3,MAXNINT3ADD), intent(out) :: Xiloc
       real(8), dimension(  MAXNINT3ADD), intent(out) :: Waloc
 !
-      call set_3Dint_aux(Type,Norder,MAXPP,MAXNINT3ADD, Nint,Xiloc,Waloc)
+      call set_3Dint_aux(Ntype,Norder,MAXPP,MAXNINT3ADD, Nint,Xiloc,Waloc)
 !
 end subroutine set_3Dint_DPG
 !
@@ -89,7 +89,7 @@ end subroutine set_3Dint_DPG
 !
 !     routine name: set_3D_int_DPG
 !
-!     latest rev  : Oct 2019
+!     latest rev  : Feb 2023
 !
 !     purpose     : routine sets up quadrature data for a DPG
 !                   3D element, accounting for different element
@@ -99,7 +99,7 @@ end subroutine set_3Dint_DPG
 !     arguments:
 !
 !     in:
-!          Type         - element type
+!          Ntype        - element type
 !          Norder       - order of approximation
 !          Norient_face - face orientations of the element
 !
@@ -109,12 +109,12 @@ end subroutine set_3Dint_DPG
 !          Waloc        - weights
 !
 !----------------------------------------------------------------------
-subroutine set_3D_int_DPG(Type,Norder,Norient_face, Nint,Xiloc,Waloc)
+subroutine set_3D_int_DPG(Ntype,Norder,Norient_face, Nint,Xiloc,Waloc)
 !
       use parametersDPG, only : MAXNINT3ADD
       implicit none
 !
-      character(len=4)                 , intent(in)  :: Type
+      integer                          , intent(in)  :: Ntype
       integer, dimension(19)           , intent(in)  :: Norder
       integer, dimension(6)            , intent(in)  :: Norient_face
       integer                          , intent(out) :: Nint
@@ -123,8 +123,8 @@ subroutine set_3D_int_DPG(Type,Norder,Norient_face, Nint,Xiloc,Waloc)
 !
       integer, dimension(19) :: norder_loc
 !
-      call find_order_loc(Type,Norder,Norient_face, norder_loc)
-      call set_3Dint_DPG(Type,norder_loc, Nint,Xiloc,Waloc)
+      call find_order_loc(Ntype,Norder,Norient_face, norder_loc)
+      call set_3Dint_DPG(Ntype,norder_loc, Nint,Xiloc,Waloc)
 !
 end subroutine set_3D_int_DPG
 !
@@ -132,7 +132,7 @@ end subroutine set_3D_int_DPG
 !
 !     routine name      - set_3Dint_aux
 !
-!     latest revision:  - Oct 2019
+!     latest revision:  - Feb 2023
 !
 !     purpose:          - routine sets up quadrature data for a 3D
 !                         element, accouting for different element
@@ -141,7 +141,7 @@ end subroutine set_3D_int_DPG
 !     arguments:
 !
 !     in:
-!             Type      - element type
+!             Ntype     - element type
 !             Norder    - order of approximation
 !             Maxp      - maximum p
 !             Max_nint3 - maximum number of integration points
@@ -152,7 +152,7 @@ end subroutine set_3D_int_DPG
 !             Waloc     - weights
 !
 !----------------------------------------------------------------------
-subroutine set_3Dint_aux(Type,Norder,Maxp,Max_nint3, Nint,Xiloc,Waloc)
+subroutine set_3Dint_aux(Ntype,Norder,Maxp,Max_nint3, Nint,Xiloc,Waloc)
 !
       use parameters,        only : MODORDER
       use control,           only : INTEGRATION
@@ -162,9 +162,10 @@ subroutine set_3Dint_aux(Type,Norder,Maxp,Max_nint3, Nint,Xiloc,Waloc)
                                     XIGAUSS     ,WAGAUSS,       &
                                     XIGAUS1     ,WAGAUS1,       &
                                     XIGAUSS_TETS,WAGAUSS_TETS
+      use node_types
       implicit none
 !
-      character(len=4)               , intent(in)  :: Type
+      integer                        , intent(in)  :: Ntype
       integer, dimension(19)         , intent(in)  :: Norder
       integer                        , intent(in)  :: Maxp,Max_nint3
       integer                        , intent(out) :: Nint
@@ -185,58 +186,17 @@ subroutine set_3Dint_aux(Type,Norder,Maxp,Max_nint3, Nint,Xiloc,Waloc)
       iprint=0
 #if DEBUG_MODE
       if (iprint.eq.1) then
-        write(*,7001) Type,Norder
+        write(*,7001) S_Type(Ntype),Norder
  7001   format('set_3Dint_aux: Type, Norder = ',a4,2x,19i4)
       endif
 #endif
 !
-      select case(Type)
-!
-!======================================================================
-!  PRISM                                                              |
-!======================================================================
-      case('mdlp','pris')
-!
-!  .....determine order of approximation
-        nordh=0 ; nordz=0
-        do i=1,15
-          select case(i)
-!         horizontal edges & faces
-          case(1,2,3,4,5,6, 10,11) ; nordh=max(nordh,Norder(i))
-!         vertical edges
-          case(7,8,9)              ; nordz=max(nordz,Norder(i))
-!         vertical faces & interior
-          case(12,13,14, 15)
-            call decod(Norder(i),MODORDER,2, nordhv)
-            nordh=max(nordh,nordhv(1)) ; nordz=max(nordz,nordhv(2))
-          endselect
-        enddo
-!
-!  .....account for over-integration
-        nordh=min(nordh+INTEGRATION,Maxp)
-        nordz=min(nordz+INTEGRATION,Maxp)
-!
-!  .....compute number of integration points
-        kint =NSELECT(nordh)
-        nintx=NRGAUPO(kint)
-        nintz=nordz+1
-        Nint =nintx*nintz
-!
-!  .....compute integration points and weights
-        l=0
-        do l2=1,nintz
-          do l1=1,nintx
-            l=l+1
-            Xiloc(1:2,l)=XIGAUSS(2:3,l1,kint)
-            Xiloc(  3,l)=XIGAUS1(l2,nintz)
-            Waloc(    l)=WAGAUSS(l1,kint)/2.d0*WAGAUS1(l2,nintz)
-          enddo
-        enddo
+      select case(Ntype)
 !
 !======================================================================
 !  BRICK                                                              |
 !======================================================================
-      case('mdlb','bric')
+      case(MDLB,BRIC)
 !
 !  .....determine order of approximation
         nordx=0 ; nordy=0 ; nordz=0
@@ -295,9 +255,50 @@ subroutine set_3Dint_aux(Type,Norder,Maxp,Max_nint3, Nint,Xiloc,Waloc)
         enddo
 !
 !======================================================================
+!  PRISM                                                              |
+!======================================================================
+      case(MDLP,PRIS)
+!
+!  .....determine order of approximation
+        nordh=0 ; nordz=0
+        do i=1,15
+          select case(i)
+!         horizontal edges & faces
+          case(1,2,3,4,5,6, 10,11) ; nordh=max(nordh,Norder(i))
+!         vertical edges
+          case(7,8,9)              ; nordz=max(nordz,Norder(i))
+!         vertical faces & interior
+          case(12,13,14, 15)
+            call decod(Norder(i),MODORDER,2, nordhv)
+            nordh=max(nordh,nordhv(1)) ; nordz=max(nordz,nordhv(2))
+          endselect
+        enddo
+!
+!  .....account for over-integration
+        nordh=min(nordh+INTEGRATION,Maxp)
+        nordz=min(nordz+INTEGRATION,Maxp)
+!
+!  .....compute number of integration points
+        kint =NSELECT(nordh)
+        nintx=NRGAUPO(kint)
+        nintz=nordz+1
+        Nint =nintx*nintz
+!
+!  .....compute integration points and weights
+        l=0
+        do l2=1,nintz
+          do l1=1,nintx
+            l=l+1
+            Xiloc(1:2,l)=XIGAUSS(2:3,l1,kint)
+            Xiloc(  3,l)=XIGAUS1(l2,nintz)
+            Waloc(    l)=WAGAUSS(l1,kint)/2.d0*WAGAUS1(l2,nintz)
+          enddo
+        enddo
+!
+!======================================================================
 !  TETRAHEDRON                                                        |
 !======================================================================
-      case('mdln','tetr')
+      case(MDLN,TETR)
 !
 !  .....determine order of approximation
         nord=0
@@ -319,7 +320,7 @@ subroutine set_3Dint_aux(Type,Norder,Maxp,Max_nint3, Nint,Xiloc,Waloc)
 !======================================================================
 !  PYRAMID                                                            |
 !======================================================================
-      case('mdld','pyra')
+      case(MDLD,PYRA)
 !
 !  .....determine order of approximation
         nordx=0 ; nordy=0 ; nordz=0
@@ -376,7 +377,7 @@ subroutine set_3Dint_aux(Type,Norder,Maxp,Max_nint3, Nint,Xiloc,Waloc)
         enddo
 !
       case default
-        write(*,*) 'set_3Dint: Type = ',Type
+        write(*,*) 'set_3Dint: Type = ',S_Type(Ntype)
         stop
       endselect
 !
@@ -388,7 +389,7 @@ end subroutine set_3Dint_aux
 !
 !----------------------------------------------------------------------
 !
-!     latest revision:  - Oct 2019
+!     latest revision:  - Feb 2023
 !
 !     purpose:          - routine tests quadrature data for a 3D
 !                         standard element
@@ -398,13 +399,12 @@ end subroutine set_3Dint_aux
 !----------------------------------------------------------------------
 subroutine test_set_3Dint
 !
+      use node_types
       use parameters
       use parametersDPG
       implicit none
 !
-      character(len=4) :: type
-!
-      integer :: norder(19)
+      integer :: ntype,norder(19)
       real(8) :: xiloc(3,MAX_NINT3), waloc(MAX_NINT3)
 !
       real(8) :: s,sexact,x,y,z,wa
@@ -412,7 +412,7 @@ subroutine test_set_3Dint
 !
 !-----------------------------------------------------------------------
 !
-      type = 'mdld'
+      ntype = MDLD
 !
       iprint=1
 !
@@ -420,10 +420,10 @@ subroutine test_set_3Dint
       do np=1,8
         norder(1:14)=np; norder(9)=np*10+np
         if (iprint.eq.1) then
-          write(*,7001) type,norder
+          write(*,7001) S_Type(ntype),norder
  7001     format('test_set_3Dint: type, norder = ',a4,2x,19i4)
         endif
-        call set_3Dint(type,norder, nint,xiloc,waloc)
+        call set_3Dint(ntype,norder, nint,xiloc,waloc)
 !
 !  .....loop through monomials
         do iz=0,2*np

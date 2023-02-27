@@ -7,7 +7,7 @@
 !
 !---------------------------------------------------------------------
 !
-!   latest revision    - June 2020
+!   latest revision    - Feb 2023
 !
 !   purpose            - routine modifies the order of approximation
 !                        for a node
@@ -49,12 +49,11 @@
 !  ...set whether current dofxs should be copied to modified node
       logical, parameter :: COPY_DOFS = .false.
 !
-      character(4) :: ntype
-      logical      :: act_dof
-      integer      :: iprint,icase,nordo,subd,     &
-                      nvarH ,nvarE ,nvarV ,nvarQ , &
-                      ndofH ,ndofE ,ndofV ,ndofQ , &
-                      ndofHo,ndofEo,ndofVo,ndofQo
+      logical :: act_dof
+      integer :: ntype,iprint,icase,nordo,subd, &
+                 nvarH ,nvarE ,nvarV ,nvarQ,    &
+                 ndofH ,ndofE ,ndofV ,ndofQ,    &
+                 ndofHo,ndofEo,ndofVo,ndofQo
 !
 #if DEBUG_MODE
       iprint=0
@@ -65,12 +64,12 @@
 !
 !  ...node case
       icase = NODES(Nod)%case
-      ntype = NODES(Nod)%type
+      ntype = NODES(Nod)%ntype
       nordo = NODES(Nod)%order
 !
 #if DEBUG_MODE
       if (iprint.eq.1) then
-         write(*,7010) Nod,ntype,nordo,icase
+         write(*,7010) Nod,S_Type(ntype),nordo,icase
  7010    format('nodmod: Nod,type,order,icase = ',i6,2x,a5,2x,2i3)
          write(*,7013) NREQNH(icase),NREQNE(icase),NREQNV(icase),NREQNQ(icase)
  7013    format('nodmod: NREQNH,NREQNE,NREQNV,NREQNQ(icase) = ',4i2)
@@ -289,6 +288,7 @@
       subroutine copy_dofG(Ntype,Nordo,Nordn,NdofGo,NdofGn, &
                            Xnodo,Xnodn)
 !
+      use node_types
       use parameters, only: NDIMEN
       implicit none
 !
@@ -297,17 +297,16 @@
       integer :: iprint
 #endif
 !
-      character(4) :: Ntype
-      integer      :: Nordo,Nordn,NdofGo,NdofGn
-      real(8)      :: Xnodo(NDIMEN,NdofGo)
-      real(8)      :: Xnodn(NDIMEN,NdofGn)
+      integer :: Ntype,Nordo,Nordn,NdofGo,NdofGn
+      real(8) :: Xnodo(NDIMEN,NdofGo)
+      real(8) :: Xnodn(NDIMEN,NdofGn)
 !
       integer :: nord1o,nord2o,nord3o, &
                  nord1n,nord2n,nord3n
 !
 #if DEBUG_MODE
       if (iprint.eq.1) then
-         write(*,7010) Ntype,Nordo,Nordn,NdofGo,NdofGn
+         write(*,7010) S_Type(Ntype),Nordo,Nordn,NdofGo,NdofGn
  7010    format(' copy_dofG: Ntype,Nordo,Nordn,NdofGo,NdofGn = ', &
                              a4,2i4,2i6)
       endif
@@ -316,25 +315,25 @@
       select case(Ntype)
 !
 !  ...edge, triangle, tet, pyramid
-      case('medg','mdlt','mdln','mdld')
+      case(MEDG,MDLT,MDLN,MDLD)
          call copy_1array_r(NDIMEN,Xnodo,NdofGo, Xnodn,NdofGn)
 !
 !  ...quad
-      case('mdlq')
+      case(MDLQ)
          call decode(Nordo, nord1o,nord2o)
          call decode(Nordn, nord1n,nord2n)
          call copy_2array_r(NDIMEN,Xnodo,nord1o-1,nord2o-1, &
                                    Xnodn,nord1n-1,nord2n-1)
 !
 !  ...prism
-      case('mdlp')
+      case(MDLP)
          call decode(Nordo, nord1o,nord2o)
          call decode(Nordn, nord1n,nord2n)
          call copy_2array_r(NDIMEN,Xnodo,(nord1o-2)*(nord1o-1)/2,nord2o-1, &
                                    Xnodn,(nord1n-2)*(nord1n-1)/2,nord2n-1)
 !
 !  ...hexa
-      case('mdlb')
+      case(MDLB)
          call ddecode(Nordo, nord1o,nord2o,nord3o)
          call ddecode(Nordn, nord1n,nord2n,nord3n)
          call copy_3array_r(NDIMEN,Xnodo,nord1o-1,nord2o-1,nord3o-1, &
@@ -374,6 +373,7 @@
       subroutine copy_dofH(Ntype,Nordo,Nordn,NdofHo,NdofHn, &
                            NvarH,ZdofHo,ZdofHn)
 !
+      use node_types
       implicit none
 !
 #if DEBUG_MODE
@@ -381,17 +381,16 @@
       integer :: iprint
 #endif
 !
-      character(4) :: Ntype
-      integer      :: Nordo,Nordn,NdofHo,NdofHn,NvarH
-      VTYPE        :: ZdofHo(NvarH,NdofHo)
-      VTYPE        :: ZdofHn(NvarH,NdofHn)
+      integer :: Ntype,Nordo,Nordn,NdofHo,NdofHn,NvarH
+      VTYPE   :: ZdofHo(NvarH,NdofHo)
+      VTYPE   :: ZdofHn(NvarH,NdofHn)
 !
       integer :: nord1o,nord2o,nord3o, &
                  nord1n,nord2n,nord3n
 !
 #if DEBUG_MODE
       if (iprint.eq.1) then
-         write(*,7010) Ntype,Nordo,Nordn,NdofHo,NdofHn
+         write(*,7010) S_Type(Ntype),Nordo,Nordn,NdofHo,NdofHn
  7010    format(' copy_dofH: Ntype,Nordo,Nordn,NdofHo,NdofHn = ', &
                              a4,2i4,2i6)
       endif
@@ -400,18 +399,18 @@
       select case(Ntype)
 !
 !  ...edge, triangle, tet, pyramid
-      case('medg','mdlt','mdln','mdld')
+      case(MEDG,MDLT,MDLN,MDLD)
          call copy_1array(NvarH,ZdofHo,NdofHo, ZdofHn,NdofHn)
 !
 !  ...quad
-      case('mdlq')
+      case(MDLQ)
          call decode(Nordo, nord1o,nord2o)
          call decode(Nordn, nord1n,nord2n)
          call copy_2array(NvarH,ZdofHo,nord1o-1,nord2o-1, &
                                 ZdofHn,nord1n-1,nord2n-1)
 !
 !  ...prism
-      case('mdlp')
+      case(MDLP)
          call decode(Nordo, nord1o,nord2o)
          call decode(Nordn, nord1n,nord2n)
          call copy_2array(NvarH,                                   &
@@ -419,7 +418,7 @@
                           ZdofHn,(nord1n-2)*(nord1n-1)/2,nord2n-1)
 !
 !  ...hexa
-      case('mdlb')
+      case(MDLB)
          call ddecode(Nordo, nord1o,nord2o,nord3o)
          call ddecode(Nordn, nord1n,nord2n,nord3n)
          call copy_3array(NvarH,ZdofHo,nord1o-1,nord2o-1,nord3o-1, &
@@ -459,6 +458,7 @@
       subroutine copy_dofE(Ntype,Nordo,Nordn,NdofEo,NdofEn, &
                            NvarE,ZdofEo,ZdofEn)
 !
+      use node_types
       implicit none
 !
 #if DEBUG_MODE
@@ -466,10 +466,10 @@
       integer :: iprint
 #endif
 !
-      character(4) :: Ntype
-      integer      :: Nordo,Nordn,NdofEo,NdofEn,NvarE
-      VTYPE        :: ZdofEo(NvarE,NdofEo)
-      VTYPE        :: ZdofEn(NvarE,NdofEn)
+      integer :: Ntype
+      integer :: Nordo,Nordn,NdofEo,NdofEn,NvarE
+      VTYPE   :: ZdofEo(NvarE,NdofEo)
+      VTYPE   :: ZdofEn(NvarE,NdofEn)
 !
       integer :: nord1o,nord2o,nord3o, &
                  nord1n,nord2n,nord3n, &
@@ -486,17 +486,17 @@
       select case(Ntype)
 !
 !  ...segment
-      case('medg')
+      case(MEDG)
          call copy_1array(NvarE,ZdofEo,NdofEo, ZdofEn,NdofEn)
 !
 !  ...triangle
-      case('mdlt')
+      case(MDLT)
 !
 !     ...the 2 families are intertwined to form a hierarchy
          call copy_1array(NvarE,ZdofEo,NdofEo, ZdofEn,NdofEn)
 !
 !  ...quadrilateral
-      case('mdlq')
+      case(MDLQ)
          call decode(Nordo, nord1o,nord2o)
          call decode(Nordn, nord1n,nord2n)
          ibego=1; ibegn=1
@@ -519,13 +519,13 @@
          endif
 !
 !  ...tetrahedron
-      case('mdln')
+      case(MDLN)
 !
 !     ...the 3 families are intertwined to form a hierarchy
          call copy_1array(NvarE,ZdofEo,NdofEo, ZdofEn,NdofEn)
 !
 !  ...prism
-      case('mdlp')
+      case(MDLP)
          call decode(Nordo, nord1o,nord2o)
          call decode(Nordn, nord1n,nord2n)
          ibego=1; ibegn=1
@@ -553,7 +553,7 @@
          endif
 !
 !  ...hexahedron
-      case('mdlb')
+      case(MDLB)
          call ddecode(Nordo, nord1o,nord2o,nord3o)
          call ddecode(Nordn, nord1n,nord2n,nord3n)
          ibego=1; ibegn=1
@@ -587,7 +587,7 @@
          endif
 !
 !     ...pyramid
-         case('mdld')
+         case(MDLD)
          ibego=1; ibegn=1
 !
 !     ...FAMILY 1 (gradients of H1 bubbles)
@@ -653,6 +653,7 @@
       subroutine copy_dofV(Ntype,Nordo,Nordn,NdofVo,NdofVn, &
                            NvarV,ZdofVo,ZdofVn)
 !
+      use node_types
       implicit none
 !
 #if DEBUG_MODE
@@ -660,10 +661,9 @@
       integer :: iprint
 #endif
 !
-      character(4) :: Ntype
-      integer      :: Nordo,Nordn,NdofVo,NdofVn,NvarV
-      VTYPE        :: ZdofVo(NvarV,NdofVo)
-      VTYPE        :: ZdofVn(NvarV,NdofVn)
+      integer :: Ntype,Nordo,Nordn,NdofVo,NdofVn,NvarV
+      VTYPE   :: ZdofVo(NvarV,NdofVo)
+      VTYPE   :: ZdofVn(NvarV,NdofVn)
 !
       integer :: nord1o,nord2o,nord3o, &
                  nord1n,nord2n,nord3n, &
@@ -671,7 +671,7 @@
 !
 #if DEBUG_MODE
       if (iprint.eq.1) then
-         write(*,7010) Ntype,Nordo,Nordn,NdofVo,NdofVn
+         write(*,7010) S_Type(Ntype),Nordo,Nordn,NdofVo,NdofVn
  7010    format(' copy_dofV: Ntype,Nordo,Nordn,NdofVo,NdofVn = ', &
                              a4,2i4,2i6)
       endif
@@ -680,13 +680,13 @@
       select case(Ntype)
 !
 !  ...triangle
-      case('mdlt')
+      case(MDLT)
 !
 !     ...a hierarchical family
          call copy_1array(NvarV,ZdofVo,NdofVo, ZdofVn,NdofVn)
 !
 !  ...quadrilateral
-      case('mdlq')
+      case(MDLQ)
          call decode(Nordo, nord1o,nord2o)
          call decode(Nordn, nord1n,nord2n)
 !
@@ -695,13 +695,13 @@
                                 ZdofVn,nord1n,nord2n)
 !
 !  ...tetrahedron
-      case('mdln')
+      case(MDLN)
 !
 !     ...3 intertwined hierarchical families form a hierarchical family
          call copy_1array(NvarV,ZdofVo,NdofVo, ZdofVn,NdofVn)
 !
 !  ...prism
-      case('mdlp')
+      case(MDLP)
          call decode(Nordo, nord1o,nord2o)
          call decode(Nordn, nord1n,nord2n)
          ibego=1; ibegn=1
@@ -728,7 +728,7 @@
          endif
 !
 !  ...hexahedron
-      case('mdlb')
+      case(MDLB)
          call ddecode(Nordo, nord1o,nord2o,nord3o)
          call ddecode(Nordn, nord1n,nord2n,nord3n)
          ibego=1; ibegn=1
@@ -759,7 +759,7 @@
          endif
 !
 !  ...pyramid
-      case('mdld')
+      case(MDLD)
          ibego=1; ibegn=1
 !
 !     ...FAMILY 1 AND 2 (curl of families 2 and 3 from H(curl))
@@ -841,6 +841,7 @@
       subroutine copy_dofQ(Ntype,Nordo,Nordn,NdofQo,NdofQn, &
                            NvarQ,ZdofQo,ZdofQn)
 !
+      use node_types
       implicit none
 !
 #if DEBUG_MODE
@@ -848,17 +849,16 @@
       integer :: iprint
 #endif
 !
-      character(4) :: Ntype
-      integer      :: Nordo,Nordn,NdofQo,NdofQn,NvarQ
-      VTYPE        :: ZdofQo(NvarQ,NdofQo)
-      VTYPE        :: ZdofQn(NvarQ,NdofQn)
+      integer :: Ntype,Nordo,Nordn,NdofQo,NdofQn,NvarQ
+      VTYPE   :: ZdofQo(NvarQ,NdofQo)
+      VTYPE   :: ZdofQn(NvarQ,NdofQn)
 !
       integer :: nord1o,nord2o,nord3o, &
                  nord1n,nord2n,nord3n
 !
 #if DEBUG_MODE
       if (iprint.eq.1) then
-         write(*,7010) Ntype,Nordo,Nordn,NdofQo,NdofQn
+         write(*,7010) S_Type(Ntype),Nordo,Nordn,NdofQo,NdofQn
  7010    format(' copy_dofQ: Ntype,Nordo,Nordn,NdofQo,NdofQn = ', &
                              a4,2i4,2i6)
       endif
@@ -867,20 +867,20 @@
       select case(Ntype)
 !
 !  ...tet
-      case('mdln')
+      case(MDLN)
 !
 !     ...a hierarchical family
          call copy_1array(NvarQ,ZdofQo,NdofQo, ZdofQn,NdofQn)
 !
 !  ...prism
-      case('mdlp')
+      case(MDLP)
          call decode(Nordo, nord1o,nord2o)
          call decode(Nordn, nord1n,nord2n)
          call copy_2array(NvarQ,ZdofQo,nord1o*(nord1o+1)/2,nord2o, &
                                 ZdofQn,nord1n*(nord1n+1)/2,nord2n)
 !
 !  ...hexa
-      case('mdlb')
+      case(MDLB)
 !
 !     ...tensor products of 1D hierarchical families
          call ddecode(Nordo, nord1o,nord2o,nord3o)
@@ -889,7 +889,7 @@
                                 ZdofQn,nord1n,nord2n,nord3n)
 !
 !  ...pyramid
-      case('mdld')
+      case(MDLD)
 !
 !     ...tensor products of 1D hierarchical families
          call copy_3array(NvarQ,ZdofQo,Nordo,Nordo,Nordo, &

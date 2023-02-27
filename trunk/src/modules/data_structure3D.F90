@@ -14,21 +14,6 @@ module data_structure3D
 !  ...parameters
       integer, parameter :: NHIST = 20
 !
-!  ...node types
-      integer, parameter :: MDLB = 1
-      integer, parameter :: MDLN = 2
-      integer, parameter :: MDLP = 3
-      integer, parameter :: MDLD = 4
-      integer, parameter :: MDLQ = 5
-      integer, parameter :: MDLT = 6
-      integer, parameter :: MEDG = 7
-      integer, parameter :: VERT = 8
-!  ...element types
-      integer, parameter :: BRIC = 9
-      integer, parameter :: TETR = 10
-      integer, parameter :: PRIS = 11
-      integer, parameter :: PYRA = 12
-!
 !  ...dirichlet data set up
       integer, save :: NR_DIRICHLET_LIST = 0
       integer, save, dimension(20) :: DIRICHLET_LIST
@@ -50,11 +35,11 @@ module data_structure3D
 !----------------------------------------------------------------------
       type element
 !
-!  .....type - 'bric','tetr','pris','pyra'
-        character(len=4) :: type
+!  .....etype - BRIC, TETR, PRIS, PYRA
+        integer :: etype
 !
 !  .....number of physics attributes supported BY the element
-        integer          :: nrphysics
+        integer :: nrphysics
 !
 !  .....list   of physics attributes supported BY the element
         character(len=5), dimension(:), pointer :: physics
@@ -72,10 +57,10 @@ module data_structure3D
         integer, dimension(:), pointer :: nodes
 !
 !  .....corresponding orientations for edges
-        integer          :: edge_orient
+        integer :: edge_orient
 !
 !  .....corresponding orientations for faces
-        integer          :: face_orient
+        integer :: face_orient
 !
 !  .....neighbors across faces
         integer, dimension(:), pointer :: neig
@@ -90,11 +75,12 @@ module data_structure3D
 !----------------------------------------------------------------------
       type node
 !
-!  .....type - 'vert','medg','mdlt','mdlq','mdlb','mdln','mdlp','mdld'
-        character(4)     :: type
+!  .....ntype - VERT, MEDG, MDLT, MDLQ, MDLB, MDLN, MDLP, MDLD
+        integer          :: ntype
 !
 !  .....case number indicating what physical attributes are supported
 !       (binary-encoded per physics variable)
+!  TODO: change to ncase
         integer          :: case
 !
 !  .....order of approximation (decimal-encoded per direction (x,y,z))
@@ -239,7 +225,7 @@ module data_structure3D
 !
       integer Nod,NdofH,NdofE,NdofV,NdofQ
 !
-      call ndof_nod(NODES(Nod)%type,NODES(Nod)%order, NdofH,NdofE,NdofV,NdofQ)
+      call ndof_nod(NODES(Nod)%ntype,NODES(Nod)%order, NdofH,NdofE,NdofV,NdofQ)
 !
       end subroutine find_ndof
 !
@@ -289,60 +275,6 @@ module data_structure3D
 !
       end function
 !
-!-----------------------------------------------------------------------
-!
-!  ...return string representation of a type
-      function S_Type(Itype)
-         Integer Itype
-         character(4) S_Type
-         select case(Itype)
-            ! node types
-            case(MDLB); S_Type = 'mdlb'
-            case(MDLN); S_Type = 'mdln'
-            case(MDLP); S_Type = 'mdlp'
-            case(MDLD); S_Type = 'mdld'
-            case(MDLQ); S_Type = 'mdlq'
-            case(MDLT); S_Type = 'mdlt'
-            case(MEDG); S_Type = 'medg'
-            case(VERT); S_Type = 'vert'
-            ! element types
-            case(BRIC); S_Type = 'bric'
-            case(TETR); S_Type = 'tetr'
-            case(PRIS); S_Type = 'pris'
-            case(PYRA); S_Type = 'pyra'
-            case default
-               write(*,*) 'S_Type: Itype = ', Itype
-               stop
-         end select
-      end function S_Type
-!
-!  ...return integer representation of a type
-      function I_Type(Stype)
-         character(4) Stype
-         integer I_Type
-         select case(Stype)
-            ! node types
-            case('mdlb'); I_Type = MDLB
-            case('mdln'); I_Type = MDLN
-            case('mdlp'); I_Type = MDLP
-            case('mdld'); I_Type = MDLD
-            case('mdlq'); I_Type = MDLQ
-            case('mdlt'); I_Type = MDLT
-            case('medg'); I_Type = MEDG
-            case('vert'); I_Type = VERT
-            ! element types
-            case('bric'); I_Type = BRIC
-            case('tetr'); I_Type = TETR
-            case('pris'); I_Type = PRIS
-            case('pyra'); I_Type = PYRA
-            case default
-               write(*,*) 'I_Type: Stype = ', Stype
-               stop
-         end select
-      end function I_Type
-!
-!-----------------------------------------------------------------------
-!
 !  ...allocate memory for data structure
       subroutine allocds
 !
@@ -356,7 +288,7 @@ module data_structure3D
 !
       allocate(ELEMS(NRELIS))
       do nel=1,NRELIS
-        ELEMS(nel)%type = 'none'
+        ELEMS(nel)%etype = 0
         ELEMS(nel)%nrphysics = 0
         nullify (ELEMS(nel)%physics)
         nullify (ELEMS(nel)%bcond)
@@ -370,7 +302,7 @@ module data_structure3D
       allocate(NODES(MAXNODS))
 !$OMP PARALLEL DO
       do nod=1,MAXNODS
-        NODES(nod)%type = 'none'
+        NODES(nod)%ntype = 0
         NODES(nod)%case = 0
         NODES(nod)%order = 0
         NODES(nod)%act = .false.
@@ -453,7 +385,7 @@ module data_structure3D
 !
       !$OMP PARALLEL DO
       do nod=MAXNODS+1,MAXNODS_NEW
-        NODES_NEW(nod)%type = 'none'
+        NODES_NEW(nod)%ntype = 0
         NODES_NEW(nod)%case = 0
         NODES_NEW(nod)%order = 0
         NODES_NEW(nod)%act = .false.
@@ -500,7 +432,7 @@ module data_structure3D
       write(ndump,*) MAXNODS,NPNODS
 !
       do nel=1,NRELIS
-        write(ndump,*) ELEMS(nel)%type
+        write(ndump,*) ELEMS(nel)%etype
         write(ndump,*) ELEMS(nel)%nrphysics
         if (associated(ELEMS(nel)%physics)) then
           nn = ubound(ELEMS(nel)%physics,1)
@@ -537,7 +469,7 @@ module data_structure3D
       enddo
 !
       do nod=1,NRNODS
-        write(ndump,*) NODES(nod)%type
+        write(ndump,*) NODES(nod)%ntype
         write(ndump,*) NODES(nod)%case
         write(ndump,*) NODES(nod)%order
         write(ndump,*) NODES(nod)%bcond
@@ -643,7 +575,7 @@ module data_structure3D
       NPNODS = npnods_loc
 !
       do nel=1,NRELIS
-        read(ndump,*) ELEMS(nel)%type
+        read(ndump,*) ELEMS(nel)%etype
         read(ndump,*) ELEMS(nel)%nrphysics
         read(ndump,*) nn
         if (nn.gt.0) then
@@ -679,7 +611,7 @@ module data_structure3D
       enddo
 !
       do nod=1,NRNODS
-        read(ndump,*) NODES(nod)%type
+        read(ndump,*) NODES(nod)%ntype
         read(ndump,*) NODES(nod)%case
         read(ndump,*) NODES(nod)%order
         read(ndump,*) NODES(nod)%bcond
@@ -827,8 +759,8 @@ module data_structure3D
 !
 !-----------------------------------------------------------------------
       function Is_Dirichlet(Nod)
-      integer Nod
       logical Is_Dirichlet
+      integer Nod
       integer ibc(NRINDEX), ic
 !
       call decod(NODES(Nod)%bcond,2,NRINDEX, ibc)
@@ -841,9 +773,9 @@ module data_structure3D
 !
 !-----------------------------------------------------------------------
       function Is_Dirichlet_attr(Nod,D_type)
+      logical Is_Dirichlet_attr
       integer Nod
       character(6) D_type
-      logical Is_Dirichlet_attr
       integer ibc(NRINDEX), ic, ivar, iphys
 !
       call decod(NODES(Nod)%bcond,2,NRINDEX, ibc)
@@ -864,71 +796,65 @@ module data_structure3D
 !
 !----------------------------------------------------------------------
       function Is_right_handed(Mdle)
-      integer :: Mdle
       logical :: Is_right_handed
+      integer :: Mdle
       integer :: i, nod
       real(8) :: v(3,4), a(3,3), val
-      select case(ELEMS(Mdle)%type)
-      case('bric','pris','pyra')
-        Is_right_handed = .true.
-      case('tetr')
 !
-        do i=1,4
-          nod = ELEMS(Mdle)%nodes(i)
-          v(1:3,i) = NODES(nod)%dof%coord(1:3,1)
-        enddo
-!
-        do i=1,3
-          a(1:3,i) = v(1:3,i+1) - v(1:3,1)
-        enddo
-!
-        call mixed_product(a(1:3,1), a(1:3,2), a(1:3,3), val)
-        Is_right_handed = (val > 0.d0)
+      select case(ELEMS(Mdle)%etype)
+      case(BRIC,PRIS,PYRA)
+         Is_right_handed = .true.
+      case(TETR)
+         do i=1,4
+            nod = ELEMS(Mdle)%nodes(i)
+            v(1:3,i) = NODES(nod)%dof%coord(1:3,1)
+         enddo
+         do i=1,3
+            a(1:3,i) = v(1:3,i+1) - v(1:3,1)
+         enddo
+         call mixed_product(a(1:3,1), a(1:3,2), a(1:3,3), val)
+         Is_right_handed = (val > 0.d0)
       end select
-      end function
+      end function Is_right_handed
 !-----------------------------------------------------------------------
       function Is_active(Nod)
-      integer Nod
       logical Is_active
+      integer Nod
       Is_active = NODES(Nod)%act
-      end function
+      end function Is_active
 !-----------------------------------------------------------------------
       function Is_inactive(Nod)
-      integer Nod
       logical Is_inactive
+      integer Nod
       Is_inactive = .not. NODES(Nod)%act
-      end function
+      end function Is_inactive
 !-----------------------------------------------------------------------
       function Is_leaf(Nod)
-      integer Nod
       logical Is_leaf
-      select case (NODES(Nod)%ref_kind)
-      case (0)
-         Is_leaf = .TRUE.
-      case default
-         Is_leaf = .FALSE.
+      integer Nod
+      select case(NODES(Nod)%ref_kind)
+         case(0);       Is_leaf = .TRUE.
+         case default;  Is_leaf = .FALSE.
       end select
-      end function
+      end function Is_leaf
 !-----------------------------------------------------------------------
       function Is_root(Nod)
-      integer Nod
       logical Is_root
+      integer Nod
       if (NODES(Nod)%father.lt.0) then
-        Is_root = .TRUE.
+         Is_root = .TRUE.
       else
-        Is_root = .FALSE.
+         Is_root = .FALSE.
       endif
-      end function
+      end function Is_root
 !-----------------------------------------------------------------------
       function Is_middle(Nod)
-      integer Nod
       logical Is_middle
-      select case(NODES(Nod)%type)
-      case('mdlb','mdlp','mdln','mdld')
-        Is_middle = .TRUE.
-      case default
-        Is_middle = .FALSE.
+      integer Nod
+      select case(NODES(Nod)%ntype)
+         case(MDLB,MDLP,MDLN,MDLD); Is_middle = .TRUE.
+         case default;              Is_middle = .FALSE.
       end select
-      end function
+      end function Is_middle
 !
 end module data_structure3D

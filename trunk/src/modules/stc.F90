@@ -98,7 +98,7 @@ subroutine stc_get_nrdof(Mdle, Nrdofi,Nrdofb)
    integer, intent(out) :: Nrdofi(NR_PHYSA),Nrdofb(NR_PHYSA)
 !
 !..element type
-   character(len=4) :: etype
+   integer :: ntype
 !
 !..element order
    integer :: nord,norderi(19)
@@ -120,15 +120,15 @@ subroutine stc_get_nrdof(Mdle, Nrdofi,Nrdofb)
 !
 !..number of dofs for a SINGLE H1,H(curl),H(div),L2 component
    call find_order(Mdle, norderi)
-   etype = NODES(Mdle)%type
-   select case(etype)
-      case('mdlb'); nord = norderi(19); norderi(19) = 111
-      case('mdlp'); nord = norderi(15); norderi(15) = 11
-      case('mdln'); nord = norderi(11); norderi(11) = 1
-      case('mdld'); nord = norderi(14); norderi(14) = 1
+   ntype = NODES(Mdle)%ntype
+   select case(ntype)
+      case(MDLB); nord = norderi(19); norderi(19) = 111
+      case(MDLP); nord = norderi(15); norderi(15) = 11
+      case(MDLN); nord = norderi(11); norderi(11) = 1
+      case(MDLD); nord = norderi(14); norderi(14) = 1
    end select
-   call celndof(etype,norderi, nrdoflHi,nrdoflEi,nrdoflVi,nvoid)
-   call ndof_nod(etype,nord, nrdofHmdl,nrdofEmdl,nrdofVmdl,nrdofQmdl)
+   call celndof(ntype,norderi, nrdoflHi,nrdoflEi,nrdoflVi,nvoid)
+   call ndof_nod(ntype,nord, nrdofHmdl,nrdofEmdl,nrdofVmdl,nrdofQmdl)
 !
 !..number of dofs for ALL H1,H(curl),H(div),L2 components
    do i=1,NR_PHYSA

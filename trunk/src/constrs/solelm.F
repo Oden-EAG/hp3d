@@ -4,10 +4,11 @@ c   routine name       - solelm
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Apr 14
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine calculates unconstrained solution dof
 c                        for a 3D element
+c   remark: this routine must be OMP thread-safe
 c
 c   arguments :
 c     in:
@@ -19,33 +20,43 @@ c           ZdofV      - the element unconstrained H(div) dof
 c           ZdofQ      - the element unconstrained L2 dof
 c
 c----------------------------------------------------------------------
+#include "typedefs.h"
 c
       subroutine solelm(Mdle, ZdofH,ZdofE,ZdofV,ZdofQ)
 c
       use data_structure3D
 #include "syscom.blk"
 c
-      dimension ZdofH(MAXEQNH,MAXbrickH)
-      dimension ZdofE(MAXEQNE,MAXbrickE)
-      dimension ZdofV(MAXEQNV,MAXbrickV)
-      dimension ZdofQ(MAXEQNQ,MAXbrickQ)
+      integer, intent(in)  :: Mdle
+      VTYPE  , intent(out) :: ZdofH(MAXEQNH,MAXbrickH)
+      VTYPE  , intent(out) :: ZdofE(MAXEQNE,MAXbrickE)
+      VTYPE  , intent(out) :: ZdofV(MAXEQNV,MAXbrickV)
+      VTYPE  , intent(out) :: ZdofQ(MAXEQNQ,MAXbrickQ)
 c
 c  ...element order of approximation
-      dimension norder(19)
+      integer :: norder(19)
 c
 c  ...modified element nodes and corresponding number of dof
-      dimension nodm  (MAXNODM),ndofmH(MAXNODM),
-     .          ndofmE(MAXNODM),ndofmV(MAXNODM)
+      integer :: nodm  (MAXNODM),ndofmH(MAXNODM),
+     .           ndofmE(MAXNODM),ndofmV(MAXNODM)
 c
-      dimension nrconH(MAXbrickH),nrconE(MAXbrickE),nrconV(MAXbrickV),
-     .          nacH(NACDIM,MAXbrickH),constrH(NACDIM,MAXbrickH),
-     .          nacE(NACDIM,MAXbrickE),constrE(NACDIM,MAXbrickE),
-     .          nacV(NACDIM,MAXbrickV),constrV(NACDIM,MAXbrickV)
+      integer :: nrconH(MAXbrickH),nacH(NACDIM,MAXbrickH),
+     .           nrconE(MAXbrickE),nacE(NACDIM,MAXbrickE),
+     .           nrconV(MAXbrickV),nacV(NACDIM,MAXbrickV)
+c
+      real(8) :: constrH(NACDIM,MAXbrickH),
+     .           constrE(NACDIM,MAXbrickE),
+     .           constrV(NACDIM,MAXbrickV)
 c
 c  ...modified element dof
-      dimension zvalH(MAXEQNH,2*MAXbrickH)
-      dimension zvalE(MAXEQNE,2*MAXbrickE)
-      dimension zvalV(MAXEQNV,2*MAXbrickV)
+      VTYPE :: zvalH(MAXEQNH,2*MAXbrickH)
+      VTYPE :: zvalE(MAXEQNE,2*MAXbrickE)
+      VTYPE :: zvalV(MAXEQNV,2*MAXbrickV)
+c
+c  ...miscellanea
+      integer :: nrdoflH,nrdoflE,nrdoflV,nrdoflQ
+      integer :: kH,kE,kV,kQ,j,k,l,kp,ibeg,iend,icomp,ivar,nrnodm
+      integer :: iprint
 c
 c---------------------------------------------------------------------
 c
@@ -57,11 +68,11 @@ c
       if (iprint.ge.1) then
         write(*,7000) Mdle
  7000   format('solelm: Mdle   = ',i6)
-        call print_order(NODES(Mdle)%type,norder)
+        call print_order(NODES(Mdle)%ntype,norder)
       endif
 c
 c  ...determine number of local dof
-      call celndof(NODES(Mdle)%type,norder,
+      call celndof(NODES(Mdle)%ntype,norder,
      .             nrdoflH,nrdoflE,nrdoflV,nrdoflQ)
 c
 c  ...determine constraints' coefficients

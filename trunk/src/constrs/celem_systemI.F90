@@ -71,7 +71,7 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
    VTYPE,                       intent(out) :: Zastif(MAXDOFM**2)
 !
 !..element type
-   character(len=4) :: type
+   integer :: ntype
 !
 !..element order
    integer :: norder(19),norderi(19)
@@ -123,20 +123,20 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
 !  ...number of dofs for a SINGLE H1,H(curl),H(div),L2 component
       call find_order(Mdle, norder)
       norderi = norder
-      type = NODES(Mdle)%type
-      select case(type)
-        case('mdlb'); norderi(19) = 111
-        case('mdlp'); norderi(15) = 11
-        case('mdln'); norderi(11) = 1
-        case('mdld'); norderi(14) = 1
+      ntype = NODES(Mdle)%ntype
+      select case(ntype)
+        case(MDLB); norderi(19) = 111
+        case(MDLP); norderi(15) = 11
+        case(MDLN); norderi(11) = 1
+        case(MDLD); norderi(14) = 1
       end select
-      call celndof(type,norder, nrdoflH,nrdoflE,nrdoflV,nrdoflQ)
-      call celndof(type,norderi, nrdoflHi,nrdoflEi,nrdoflVi,nvoid)
+      call celndof(ntype,norder, nrdoflH,nrdoflE,nrdoflV,nrdoflQ)
+      call celndof(ntype,norderi, nrdoflHi,nrdoflEi,nrdoflVi,nvoid)
 #if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,5001) Mdle
  5001   format(' celem_systemI: DEBUGGING for Mdle = ',i8)
-        call print_order(type,norder)
+        call print_order(ntype,norder)
       endif
 #endif
 !
