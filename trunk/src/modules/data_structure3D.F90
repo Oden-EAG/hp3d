@@ -10,6 +10,7 @@ module data_structure3D
       use parameters
       use element_data
       use mpi_param, only: RANK
+      implicit none
 !
 !  ...parameters
       integer, parameter :: NHIST = 20
@@ -186,7 +187,7 @@ module data_structure3D
 !
 !-----------------------------------------------------------------------
 !
-      subroutine update_ELEM_ORDER()
+      subroutine update_ELEM_ORDER
          integer :: iel,mdle
          if (allocated(ELEM_ORDER)) deallocate(ELEM_ORDER)
          if (allocated(ELEM_SUBD))  deallocate(ELEM_SUBD)
@@ -201,7 +202,7 @@ module data_structure3D
                ELEM_SUBD(NRELES_SUBD) = mdle
             endif
          enddo
-      end subroutine
+      end subroutine update_ELEM_ORDER
 !
 !-----------------------------------------------------------------------
 !
@@ -209,21 +210,22 @@ module data_structure3D
       character(len=*) :: fp
       open(unit=NHIST,file=fp,   &
            form='formatted',access='sequential',status='unknown')
-      end subroutine
+      end subroutine open_history_file
 !
 !-----------------------------------------------------------------------
 !
       subroutine close_history_file
       write(NHIST,*) '0 0'
       close(NHIST)
-      end subroutine
+      end subroutine close_history_file
 !
 !-----------------------------------------------------------------------
 !
 !  ...determine number of dof for a higher order node
       subroutine find_ndof(Nod, NdofH,NdofE,NdofV,NdofQ)
 !
-      integer Nod,NdofH,NdofE,NdofV,NdofQ
+      integer, intent(in)  :: Nod
+      integer, intent(out) :: NdofH,NdofE,NdofV,NdofQ
 !
       call ndof_nod(NODES(Nod)%ntype,NODES(Nod)%order, NdofH,NdofE,NdofV,NdofQ)
 !
@@ -234,8 +236,9 @@ module data_structure3D
 !  ...find number of H1,H(curl),H(div),L2 variables supported by a node
       subroutine find_nvar(Nod, NvarH,NvarE,NvarV,NvarQ)
 !
-      integer :: Nod,NvarH,NvarE,NvarV,NvarQ
-      integer, dimension(NRINDEX) :: idx
+      integer, intent(in)  :: Nod
+      integer, intent(out) :: NvarH,NvarE,NvarV,NvarQ
+      integer :: idx(NRINDEX)
       integer :: k
 !
       NvarH=0 ; NvarE=0 ; NvarV=0 ; NvarQ=0
@@ -257,7 +260,8 @@ module data_structure3D
 !  ...determine number of sons for a higher order node
       subroutine find_nsons(Nod, Nrsons)
 !
-      integer Nod,Nrsons
+      integer, intent(in)  :: Nod
+      integer, intent(out) :: Nrsons
 !
       Nrsons = NODES(Nod)%nr_sons
 !
@@ -273,7 +277,9 @@ module data_structure3D
 !
       Son = NODES(Nod)%first_son+I-1
 !
-      end function
+      end function Son
+!
+!-----------------------------------------------------------------------
 !
 !  ...allocate memory for data structure
       subroutine allocds
@@ -322,7 +328,6 @@ module data_structure3D
       NODES(MAXNODS)%bcond = 0
       NPNODS=1
 !
-!
       end subroutine allocds
 !
 !-----------------------------------------------------------------------
@@ -359,7 +364,7 @@ module data_structure3D
 !-----------------------------------------------------------------------
 !
 !  ...increase MAXNODS
-      subroutine increase_MAXNODS()
+      subroutine increase_MAXNODS
 !
       type(node), allocatable :: NODES_NEW(:)
       integer :: MAXNODS_NEW,nod
@@ -418,14 +423,12 @@ module data_structure3D
       subroutine dumpout_hp3d(Dump_file)
 !
       character(len=15) :: Dump_file
+      integer :: nel,nod,nn,nn1,nn2
+      integer :: ndump
       ndump=31
-!!    kyungjoo
-!!      open(unit=ndump,file=Dump_file,
-!!     .     buffered='yes',blocksize = 65536,
-!!     .     form='formatted',access='sequential',status='unknown')
+!
       open(unit=ndump,file=Dump_file,  &
            form='formatted',access='sequential',status='unknown')
-
 !
       write(ndump,*) NRELIS,NRELES,NRNODS
       write(ndump,*) NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ
@@ -559,7 +562,8 @@ module data_structure3D
       subroutine dumpin_hp3d(Dump_file)
 !
       character(len=15) :: Dump_file
-      integer           :: npnods_loc
+      integer :: npnods_loc,nel,nod,nn,nn1,nn2,i
+      integer :: ndump
 !
       if (allocated(ELEMS).or.allocated(NODES)) call deallocds
 !
@@ -674,19 +678,23 @@ module data_structure3D
       end subroutine dumpin_hp3d
 !
 !-----------------------------------------------------------------------
+!
       subroutine add_dirichlet_to_list(Iboundary)
-      integer loc
+      integer, intent(in) :: Iboundary
+      integer :: loc
       loc = 0
       call locate(Iboundary, DIRICHLET_LIST, NR_DIRICHLET_LIST, loc)
       if (loc.eq.0) then
         NR_DIRICHLET_LIST = NR_DIRICHLET_LIST + 1
         DIRICHLET_LIST(NR_DIRICHLET_LIST) = Iboundary
       end if
-      end subroutine
-
+      end subroutine add_dirichlet_to_list
+!
 !-----------------------------------------------------------------------
+!
       subroutine add_dirichlet_homogeneous_to_list(Iboundary)
-      integer loc1,loc2
+      integer, intent(in) :: Iboundary
+      integer :: loc1,loc2
       loc1 = 0
       loc2 = 0
       call locate(Iboundary,DIRICHLET_LIST,NR_DIRICHLET_LIST, loc1)
@@ -701,12 +709,13 @@ module data_structure3D
           DIRICHLET_LIST(NR_DIRICHLET_LIST) = Iboundary
         end if ! loc1
       end if !loc2
-      end subroutine
+      end subroutine add_dirichlet_homogeneous_to_list
 !
-
 !-----------------------------------------------------------------------
+!
 !  ...reset visitation flags for all nodes
       subroutine reset_visit
+      integer :: i
 !
 !$OMP PARALLEL DO
       do i=1,NRNODS
@@ -725,7 +734,7 @@ module data_structure3D
 !
       Vis = NODES(Nod)%visit
 !
-      end subroutine
+      end subroutine get_visit
 
 !  ...set visitation flag of a node
       subroutine set_visit(Nod)
@@ -734,7 +743,7 @@ module data_structure3D
 !
       NODES(Nod)%visit = 1
 !
-      end subroutine
+      end subroutine set_visit
 !
 !-----------------------------------------------------------------------
 !
@@ -746,7 +755,7 @@ module data_structure3D
 !
       Subd = NODES(Nod)%subd
 !
-      end subroutine
+      end subroutine get_subd
 !
 !  ...set new subdomain of a node
       subroutine set_subd(Nod,Subd)
@@ -755,9 +764,10 @@ module data_structure3D
 !
       NODES(Nod)%subd = Subd
 !
-      end subroutine
+      end subroutine set_subd
 !
 !-----------------------------------------------------------------------
+!
       function Is_Dirichlet(Nod)
       logical Is_Dirichlet
       integer Nod
@@ -772,6 +782,7 @@ module data_structure3D
       end function Is_Dirichlet
 !
 !-----------------------------------------------------------------------
+!
       function Is_Dirichlet_attr(Nod,D_type)
       logical Is_Dirichlet_attr
       integer Nod
@@ -795,6 +806,7 @@ module data_structure3D
       end function Is_Dirichlet_attr
 !
 !----------------------------------------------------------------------
+!
       function Is_right_handed(Mdle)
       logical :: Is_right_handed
       integer :: Mdle
@@ -816,19 +828,25 @@ module data_structure3D
          Is_right_handed = (val > 0.d0)
       end select
       end function Is_right_handed
+!
 !-----------------------------------------------------------------------
+!
       function Is_active(Nod)
       logical Is_active
       integer Nod
       Is_active = NODES(Nod)%act
       end function Is_active
+!
 !-----------------------------------------------------------------------
+!
       function Is_inactive(Nod)
       logical Is_inactive
       integer Nod
       Is_inactive = .not. NODES(Nod)%act
       end function Is_inactive
+!
 !-----------------------------------------------------------------------
+!
       function Is_leaf(Nod)
       logical Is_leaf
       integer Nod
@@ -837,7 +855,9 @@ module data_structure3D
          case default;  Is_leaf = .FALSE.
       end select
       end function Is_leaf
+!
 !-----------------------------------------------------------------------
+!
       function Is_root(Nod)
       logical Is_root
       integer Nod
@@ -847,7 +867,9 @@ module data_structure3D
          Is_root = .FALSE.
       endif
       end function Is_root
+!
 !-----------------------------------------------------------------------
+!
       function Is_middle(Nod)
       logical Is_middle
       integer Nod
