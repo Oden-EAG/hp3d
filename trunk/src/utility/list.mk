@@ -1,6 +1,4 @@
 cross_product.F90
-cross_product2D.F90
-cross.F
 decod.F
 decode.F90
 decode_order.F
