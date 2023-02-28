@@ -7,24 +7,25 @@ module adaptivity
   use environment, only : IVERBOSE_
   use error
   use data_structure3D
+  implicit none
+  !
   save
-
+  !
   integer, parameter :: ADAPT_FILE_OUT = 35
-
+  !
   integer :: N_LIST, IPARA =0
   integer, allocatable :: NODES_LIST(:)
   real(8), allocatable :: ERROR_LIST(:)
-
+  !
   real(8) :: GREEDY
-
+  !
   real(8) :: ERR_MAX =0.d0, ERR_MIN =0.d0
   !
-
 contains
   !-------------------------------------------------------------------------
   subroutine h_greedy_adaptivity(Element_Error)
     use data_structure3D
-    implicit none
+    
     integer :: iel, mdle, kref, istat
     real(8) :: eta
 
@@ -33,7 +34,7 @@ contains
     real(8), dimension(4) :: dnorm
 
      interface
-        subroutine Element_Error(Mdle, Derr, Dnorm)
+        subroutine Element_Error(Mdle, Derr,Dnorm)
           integer,             intent(in)  :: Mdle
           real(8),dimension(:),intent(out) :: Derr
           real(8),dimension(:),intent(out) :: Dnorm

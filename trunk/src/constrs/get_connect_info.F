@@ -4,7 +4,7 @@ c   routine name       - get_connect_info
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Jul 10
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine returns element to nodes connectivities
 c                        for an element, including info on constrained
@@ -32,15 +32,24 @@ c
      .     rotate_edge_nodes,rotate_trian_nodes,rotate_quadr_nodes
 #include "syscom.blk"
 c
-      dimension Nodesl(27),Norientl(27)
+      integer, intent(in)  :: Mdle
+      integer, intent(out) :: Nodesl(27),Norientl(27)
 c
 c  ...face edge and vertex numbers etc
-      integer :: ntype,ftype,stype
+      integer :: ntype,ftype,stype,nfath
       integer :: if, ireff, is1, jef(4), jvf(4), kref_face(6)
+c
+#if DEBUG_MODE
+      integer :: iprint
+#endif
+c
+c  ...initialize output
+      Nodesl(1:27) = 0; Norientl(1:27) = 0
 c
 c  ...initialize variables like this or OpenMP will not work!
       ireff=0; is1=0;
 c
+#if DEBUG_MODE
       select case(Mdle)
       case(135)
         iprint=0
@@ -52,13 +61,17 @@ c
  7000   format('get_connect_info: Mdle = ',i6)
         call pause
       endif
-c
+#endif DEBUG_MODE
 c
       INFO_CONSTRAINTS=1
       call elem_nodes(Mdle, Nodesl,Norientl)
+c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         call elem_show(Mdle, NODES(Mdle)%ntype,Nodesl,Norientl)
       endif
+#endif
+c
       INFO_CONSTRAINTS=0
 c
 c  ...store the element father
@@ -94,23 +107,29 @@ c  .....parent node
 c
 c  .......parent edge node
           if (jp.le.nvf+nef) then
+#if DEBUG_MODE
             if (iprint.eq.1) then
               write(*,7021) j,jp,is
  7021         format('get_connect_info: 1: j,jp,is = ',3i5)
             endif
+#endif
             call rotate_edge(FATH_ORIENT(jp),is,nort)
+#if DEBUG_MODE
             if (iprint.eq.1) then
               write(*,7022) j,jp,is
  7022         format('get_connect_info: 2: j,jp,is = ',3i5)
             endif
+#endif
 c            nod = NODES(nodp)%sons(is)
             nod = Son(nodp,is)
+#if DEBUG_MODE
             if (iprint.eq.1) then
               write(*,7023) nodp,nod,NODES(nod)%act
  7023         format('get_connect_info: nodp,nod,NODES(nod)%act = ',
      .               2i6,l2)
               call pause
             endif
+#endif
 c
 c  .........if the node is constrained (inactive)
 ccc            if (Is_inactive(nod)) then
@@ -142,10 +161,12 @@ c
 c  .........face edge and vertex nodes numbers
             call face_to_edge(ftype,if, jef(1),jef(2),jef(3),jef(4))
             call face_to_vert(ftype,if, jvf(1),jvf(2),jvf(3),jvf(4))
+#if DEBUG_MODE
             if (iprint.eq.1) then
               write(*,7100) j,jp,if,iref,ireff
  7100         format('get_connect_info: j,jp,if,iref,ireff = ',5i4)
             endif
+#endif
 c
             select case(type_nod(ftype,jp))
 c
@@ -154,11 +175,13 @@ c  .........triangular parent face
               call rotate_trian(iref,ireff,FATH_ORIENT(jp),is,nort)
 c              nod = NODES(nodp)%sons(is)
               nod = Son(nodp,is)
+#if DEBUG_MODE
               if (iprint.eq.1) then
                 write(*,7101) nodp,is,nod,NODES(nod)%act
  7101           format('get_connect_info: nodp,is,nod,NODES(nod)%act =',
      .                                    3i5,l2)
               endif
+#endif
               if (Is_inactive(nod).and.NODES(nod)%ref_kind.eq.0) then
 ccc              if (Is_inactive(nod)) then
                 call locate(nodp, NFACEC,NR_FACES,loc)
@@ -248,6 +271,7 @@ c
         endif
       enddo
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7011) Mdle
  7011   format('get_connect_info: CONSTRAINED NODES FOR Mdle = ',i6)
@@ -270,8 +294,9 @@ c
         call pause
         call result
       endif
+#endif
 c
-      end subroutine
+      end subroutine get_connect_info
 c
 c----------------------------------------------------------------------
 c
@@ -410,6 +435,4 @@ c  ...any other option illegal
       end select
 c
 c
-      end subroutine
-
-
+      end subroutine modify_face_info

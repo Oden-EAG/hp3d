@@ -43,12 +43,20 @@ c  ...local lists of nodes
 c
 c  ...miscellanea
       integer :: iv,icv,ice,icf,nod,nodp,nc,nce,icase,j,nrnodl
+c
+#if DEBUG_MODE
       integer :: iprint
+#endif
 c
 c----------------------------------------------------------------------
 c
+c  ...initialize output
+      Nodm(1:MAXNODM) = 0
+c
+#if DEBUG_MODE
       iprint = 0
 c      if (Mdle.eq.354) iprint=0
+#endif
 c
       ntype = NODES(Mdle)%ntype
 c
@@ -268,6 +276,7 @@ ccc      do j=1,Nrnodm-1
 ccc        NODES(Nodm(j))%visit = 0
 ccc      enddo
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7002) Mdle
  7002   format('logic_nodes: Mdle = ',i6,' MODIFIED ELEMENT NODES = ')
@@ -275,9 +284,9 @@ c
  7003   format(20i6)
         call pause
       endif
+#endif
 c
-c
-      end subroutine
+      end subroutine logic_nodes
 c
 c----------------------------------------------------------------------
 c
