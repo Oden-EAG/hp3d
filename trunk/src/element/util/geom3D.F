@@ -4,7 +4,7 @@ c   routine name       - geom3D
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - May 2020
+c   latest revision    - Feb 2023
 c
 c   purpose            - element geometry routine
 c
@@ -32,17 +32,26 @@ c
 c
       use control
       use data_structure3D
-#include "syscom.blk"
+      implicit none
 c
-      dimension Xi(3),Xnod(3,MAXbrickH),
-     .          ShapH(MAXbrickH),GradH(3,MAXbrickH),
-     .          X(3),Dxdxi(3,3),Dxidx(3,3)
+      integer, intent(in)  :: Mdle,NrdofH
+      real(8), intent(out) :: Rjac
+      integer, intent(out) :: Iflag
 c
+      real(8) :: Xi(3),Xnod(3,MAXbrickH),
+     .           ShapH(MAXbrickH),GradH(3,MAXbrickH),
+     .           X(3),Dxdxi(3,3),Dxidx(3,3)
+c
+      integer :: i,k
+c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
       if (iprint.eq.1) then
         write(*,7001) Mdle,Xi(1:3),EXGEOM
  7001   format('geom3D: Mdle,Xi = ',i6,3x,3f8.3,' EXGEOM = ',i3)
       endif
+#endif
 c
 c  ...determine physical coordinates and the derivatives of
 c     the physical coordinates wrt master element ccordinates
@@ -50,6 +59,7 @@ c     the physical coordinates wrt master element ccordinates
 c
 c  ...isoparametric element
       case(0)
+#if DEBUG_MODE
         if (iprint.eq.1) then
           write(*,*) 'geom3D: Xnod  = '
           do i=1,3
@@ -63,8 +73,9 @@ c  ...isoparametric element
             write(*,7010) GradH(i,1:NrdofH)
           enddo
         endif
+#endif
         X(1:3)=0.d0 ; Dxdxi(1:3,1:3)=0.d0
-        do k=1,nrdofH
+        do k=1,NrdofH
           X(1:3) = X(1:3) + Xnod(1:3,k)*ShapH(k)
           do i=1,3
             Dxdxi(1:3,i) = Dxdxi(1:3,i) + Xnod(1:3,k)*GradH(i,k)
@@ -106,7 +117,7 @@ c   routine name       - bgeom3D
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Apr 14
+c   latest revision    - Feb 2023
 c
 c   purpose            - element boundary geometry routine
 c
@@ -139,14 +150,22 @@ c
      .                   X,Dxdxi,Dxidx,Rjac,Dxdt,Rn,Bjac)
 c
       use data_structure3D
-#include "syscom.blk"
+      implicit none
 c
-      dimension Xi(3),Xnod(3,MAXbrickH),
-     .          ShapH(MAXbrickH),GradH(3,MAXbrickH),Dxidt(3,2),
-     .          Dxdxi(3,3),Dxidx(3,3),
-     .          X(3),Dxdt(3,2),Rn(3)
+      integer, intent(in)  :: Mdle,NrdofH,Nsign
+      real(8), intent(out) :: Rjac,Bjac
 c
+      real(8) :: Xi(3),Xnod(3,MAXbrickH),
+     .           ShapH(MAXbrickH),GradH(3,MAXbrickH),Dxidt(3,2),
+     .           Dxdxi(3,3),Dxidx(3,3),
+     .           X(3),Dxdt(3,2),Rn(3)
+c
+      integer :: i,j,iflag
+c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
+#endif
 c
       call geom3D(Mdle,Xi,Xnod,ShapH,GradH,NrdofH,
      .            X,Dxdxi,Dxidx,Rjac,iflag)
@@ -173,13 +192,13 @@ c
 c  ...unit normal vector
       Rn(1:3) = Rn(1:3)*Nsign/Bjac
 c
-c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7001) X,Rn,Rjac,Bjac
  7001   format('bgeom3D: X,Rn,Rjac,Bjac = ',4(3f8.3,2x))
         call pause
       endif
-c
+#endif
 c
       end subroutine bgeom3D
 c
@@ -190,7 +209,7 @@ c   routine name       - refgeom3D
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Mar 17
+c   latest revision    - Feb 2023
 c
 c   purpose            - element reference geometry routine
 c
@@ -218,20 +237,30 @@ c
 c
       use control
       use data_structure3D
-#include "syscom.blk"
+      implicit none
 c
-      dimension Xi(3),Etav(3,8),
-     .          ShapH(8),GradH(3,8),
-     .          Eta(3),Detadxi(3,3),Dxideta(3,3)
+      integer, intent(in)  :: Mdle,NrdofH
+      real(8), intent(out) :: Rjac
+      integer, intent(out) :: Iflag
 c
+      real(8) :: Xi(3),Etav(3,8),
+     .           ShapH(8),GradH(3,8),
+     .           Eta(3),Detadxi(3,3),Dxideta(3,3)
+c
+      integer :: i,k,imas
+c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
       if (iprint.eq.1) then
         write(*,7001) Mdle,Xi(1:3)
  7001   format('refgeom3D: Mdle,Xi = ',i6,3x,3f8.3)
       endif
+#endif
 c
 c  ...determine reference coordinates and the derivatives of
 c     the reference coordinates wrt master element ccordinates
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,*) 'refgeom3D: Etav,ShapH = '
         do i=1,3
@@ -243,6 +272,7 @@ c     the reference coordinates wrt master element ccordinates
           write(*,7010) GradH(i,1:NrdofH)
         enddo
       endif
+#endif
       Eta(1:3) = 0.d0
       do k=1,NrdofH
         Eta(1:3) = Eta(1:3) + Etav(1:3,k)*ShapH(k)
@@ -258,6 +288,7 @@ c
 c  ...evaluate the inverse Jacobian of the geometry map
       call geom(Detadxi, Dxideta,Rjac,Iflag)
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,*) 'Eta,Detadxi = '
         do i=1,3
@@ -271,6 +302,7 @@ c
         enddo
         call pause
       endif
+#endif
 c
       end subroutine refgeom3D
 c
@@ -281,7 +313,7 @@ c   routine name       - brefgeom3D
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Mar 17
+c   latest revision    - Feb 2023
 c
 c   purpose            - element boundary reference geometry routine
 c
@@ -313,14 +345,22 @@ c
      .                      Eta,Detadxi,Dxideta,Rjac,Detadt,Rn,Bjac)
 c
       use data_structure3D
-#include "syscom.blk"
+      implicit none
 c
-      dimension Xi(3),Etav(3,8),
-     .          ShapH(8),GradH(3,8),Dxidt(3,2),
-     .          Detadxi(3,3),Dxideta(3,3),
-     .          Eta(3),Detadt(3,2),Rn(3)
+      integer, intent(in)  :: Mdle,NrdofH,Nsign
+      real(8), intent(out) :: Rjac,Bjac
 c
+      real(8) :: Xi(3),Etav(3,8),
+     .           ShapH(8),GradH(3,8),Dxidt(3,2),
+     .           Detadxi(3,3),Dxideta(3,3),
+     .           Eta(3),Detadt(3,2),Rn(3)
+c
+      integer :: i,j,iflag
+c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
+#endif
 c
       call refgeom3D(Mdle,Xi,Etav,ShapH,GradH,NrdofH,
      .               Eta,Detadxi,Dxideta,Rjac,iflag)
@@ -345,12 +385,12 @@ c
 c  ...unit normal vector
       Rn(1:3) = Rn(1:3)*Nsign/Bjac
 c
-c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7001) Eta,Rn,Rjac,Bjac
  7001   format('brefgeom3D: Eta,Rn,Rjac,Bjac = ',4(3f8.3,2x))
         call pause
       endif
-c
+#endif
 c
       end subroutine brefgeom3D
