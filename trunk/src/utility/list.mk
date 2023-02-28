@@ -12,7 +12,7 @@ encodg.F
 encode_order.F
 fact.F90
 int2str.F90
-keep_time.F
+keep_time.F90
 locate.F90
 locate_char.F
 pause.F90
