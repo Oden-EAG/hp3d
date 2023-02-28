@@ -1,9 +1,7 @@
 !----------------------------------------------------------------------
-!   latest revision    - Aug 2019
-!
-!   purpose            - module defines date structure arrays
+!> @brief   module defines date structure arrays
+!> @date    Feb 2023
 !----------------------------------------------------------------------
-!
 module data_structure3D
 !
       use physics
