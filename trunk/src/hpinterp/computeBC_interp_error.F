@@ -4,7 +4,7 @@ c     routine name      - compute_BC_interp_error
 c
 c--------------------------------------------------------------------
 c
-c     latest revision:  - Mar 17
+c     latest revision:  - Feb 2023
 c
 c     purpose:          - routine returns global BC interpolation
 c                         error for traces of BC data
@@ -17,7 +17,8 @@ c
 c
       use data_structure3D
       use environment      , only : QUIET_MODE
-#include "syscom.blk"
+c
+      implicit none
 c
 c  ...visitation flag
       integer, save :: ivis = 0
@@ -28,21 +29,31 @@ c
 c  ...residuals and rates to display
       real(8), save :: rwork(6,10)
 c
-      iprint=0
+      integer :: mdle,iel,i
+      real(8) :: errorH, derrorH, rateH
+      real(8) :: errorE, derrorE, rateE
+      real(8) :: errorV, derrorV, rateV
+c
+#if DEBUG_MODE
+      integer :: iprint
+      iprint = 0
+#endif
 c
 c  ...compute total errors and number of dof
-      errorH =  0.d0; errorE = 0.d0; errorV = 0.d0
+      errorH = 0.d0; errorE = 0.d0; errorV = 0.d0
       mdle = 0
       do iel=1,NRELES
         call nelcon(mdle, mdle)
         call elemBCIerror(mdle, derrorH,derrorE,derrorV)
         if ((derrorH.eq.0.d0).and.(derrorE.eq.0.d0).and.
      .      (derrorV.eq.0.d0)) cycle
+#if DEBUG_MODE
         if (iprint.eq.1) then
           write(*,7010) iel, mdle, derrorH,derrorE,derrorV
  7010     format('compute_interp_error: iel, mdle = ',2i5,
      .           ' element traces errors = ',3e12.5)
         endif
+#endif
         errorH = errorH + derrorH
         errorE = errorE + derrorE
         errorV = errorV + derrorV
@@ -93,8 +104,3 @@ c  ...display the convergence history
 c
 c
       end subroutine computeBC_interp_error
-
-
-
-
-
