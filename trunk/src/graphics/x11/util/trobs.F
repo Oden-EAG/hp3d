@@ -3,10 +3,9 @@ c
 c   routine name       - trobs
 c
 c-----------------------------------------------------------------------
+c-----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Sep 07
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine transforms cartesian coordinates
 c                        of a point into observer's coordinates; the
@@ -21,16 +20,19 @@ c              Xcart   - 3D cartesian coordinates of a point
 c     out:
 c              Xobs    - 2D observer's coordinates of a point
 c
-c   required  routines - none
-c
 c-----------------------------------------------------------------------
 c
       subroutine trobs(Xcart, Xobs)
-      use graphmod
 c
-#include "syscom.blk"
+      use graphmod, only: RMTR
 c
-      dimension Xcart(3),Xobs(3)
+      implicit none
+c
+      real(8), intent(in)  :: Xcart(3)
+      real(8), intent(out) :: Xobs(3)
+c
+      real(8) :: s
+      integer :: i,j
 c
       do i=1,3
         s = 0.d0
@@ -39,6 +41,5 @@ c
         enddo
         Xobs(i) = s
       enddo
-c
 c
       end subroutine trobs

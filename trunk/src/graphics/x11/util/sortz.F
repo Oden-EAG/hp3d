@@ -4,18 +4,12 @@ c   routine name       - sortz
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Jul 04
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine sorts all visible triangles in order
 c                        back-to-front according to z-coordinate
 c                        of their mid-points (array RGTRZ) and stores
 c                        sorted numbers in the array IGTR
-c
-c   arguments          - none
-c
-c   required  routines - none
 c
 c----------------------------------------------------------------------
 c
@@ -23,9 +17,16 @@ c
 c
       use graphmod
 c
-#include "syscom.blk"
+      implicit none
 c
+      integer :: i,ii,index,ir,j,l
+      real(8) :: q
+c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
+#endif
+c
       if (NRVISTR.eq.0) return
 c
 c  ...initialize index array
@@ -48,11 +49,13 @@ c  ...start sorting (heapsort algorithm)
         ir = ir - 1
         if (ir.eq.1) then
           IGTR(1) = index
+#if DEBUG_MODE
           if (iprint.eq.1) then
             write(*,7001) (IGTR(ii),ii=1,NRVISTR)
  7001       format(20i6)
             call pause
           endif
+#endif
           return
         endif
       endif
@@ -75,12 +78,4 @@ c  ...start sorting (heapsort algorithm)
       IGTR(i) = index
       go to 20
 c
-      end
-
-
-
-
-
-
-
-
+      end subroutine sortz

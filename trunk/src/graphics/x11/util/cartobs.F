@@ -4,36 +4,34 @@ c   routine name       - cartobs
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Sep 07
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine computes matrix of transformation
 c                        from cartesian coordinates to coordinates
 c                        in an observer's system
-c
-c   arguments          - none
-c
-c   required  routines - none
 c
 c----------------------------------------------------------------------
 c
       subroutine cartobs
 c
       use graphmod
-#include "syscom.blk"
+c
+      implicit none
 c
 c  ...ortogonal projections of Cartesian unit vectors on the projection
 c     plane
-      dimension eproj(3,3)
+      real(8) :: eproj(3,3)
 c
 c  ...unit vectors of the 3D Cartesian system with the first two axes
 c     on the projection plane and the third in the dircetion of the
 c     projection vector
-      dimension uvect(3,3)
+      real(8) :: uvect(3,3)
 c
 c  ...versor of the projection vector
-      dimension rnu(3)
+      real(8) :: rnu(3)
+c
+      integer :: i,j
+      real(8) :: s
 c
 c-----------------------------------------------------------------------
 c

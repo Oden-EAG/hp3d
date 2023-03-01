@@ -4,37 +4,39 @@ c   routine name       - dpborder
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Mar 02
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine displays the border of the window
 c                        and the color table
-c
-c   usage              - call dpborder(Ibf)
 c
 c   arguments
 c     in:
 c                  Ibf - a flag whether to display color table
 c
-c   required  routines - none
-c
 c----------------------------------------------------------------------
-c
       subroutine dpborder(Ibf)
 c
       use graphmod
-#include "syscom.blk"
+c
+      implicit none
+c
+      integer, intent(in) :: Ibf
 c
 c  ...screen coordinates of up to four points, components of
 c     a 3D unit vector, components of the same vector after
 c     transformation to screen coordinates
-      dimension xgr(2,4),coord(3),cgr(3)
+      real(8) :: xgr(2,4),coord(3),cgr(3)
 c
+      real(8) :: angle,c0,c1x,c1y,c2,c3,c4,c5,height,vbox
+      integer :: i,j,nacol,nscol,nblack,ncol
+c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
       if (iprint.eq.1) then
         write(*,*) 'dpborder: Ibf = ',Ibf
       endif
+#endif
 c
       nblack=NPCOL(2)
 c
@@ -181,5 +183,4 @@ c  .....loop through the color boxes of isolines
         enddo
       endif
 c
-      return
-      end
+      end subroutine dpborder
