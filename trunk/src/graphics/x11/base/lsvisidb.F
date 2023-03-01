@@ -4,7 +4,7 @@ c   routine name       - lsvisidb
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Feb 10
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine makes a list of all visible
 c                        triangles and stores rescaled coordinates
@@ -14,57 +14,64 @@ c
 c   arguments :
 c     in:
 c               Numlev = 0 display graphical image of the mesh
-c                      > 0 - number of levels to plot solution values
+c                      > 0 number of levels to plot solution values
 c               Iflagn = 1 encode element (middle node) numbers
 c                      = 2 encode face nodes numbers
 c
-c
 c----------------------------------------------------------------------
-c
+#include "typedefs.h"
       subroutine lsvisidb(Numlev,Iflagn)
 c
       use element_data
       use data_structure3D
       use graphmod
 c
-#include "syscom.blk"
+      implicit none
 c
+      integer, intent(in) :: Numlev,Iflagn
 c
 c  ...geometry and solution dof
-      dimension xnod(3,MAXbrickH),
-     .          zdofH(MAXEQNH,MAXbrickH),zdofE(MAXEQNE,MAXbrickE),
-     .          zdofV(MAXEQNV,MAXbrickV),zdofQ(MAXEQNQ,MAXbrickQ)
+      real(8) :: xnod(3,MAXbrickH)
+      VTYPE   :: zdofH(MAXEQNH,MAXbrickH),zdofE(MAXEQNE,MAXbrickE),
+     .           zdofV(MAXEQNV,MAXbrickV),zdofQ(MAXEQNQ,MAXbrickQ)
 c
-      dimension xmax(3),xmin(3)
-      dimension nedge_orient(12),nface_orient(6),norder(19)
+      real(8) :: xmax(3),xmin(3)
+      integer :: nedge_orient(12),nface_orient(6),norder(19)
 c
 c  ...element neighbors through faces
-      dimension neig(4,6)
+      integer :: neig(4,6)
 c
 c  ...element nodes and their orientation
-      dimension nodesl(27),norientl(27)
-      dimension solev(NR_COLORS-10)
+      integer :: nodesl(27),norientl(27)
+      real(8) :: solev(NR_COLORS-10)
 
-      dimension nrinter(8)
-      dimension xlocinter(3,500)
-      dimension xcenter(3)
+      integer :: nrinter(8)
+      real(8) :: xlocinter(3,500)
+      real(8) :: xcenter(3)
+c
+      real(8) :: cl,daux,daux1
+      integer :: icut,iel,ifc,iloc,ineig,iv,ivar,ivis
+      integer :: loc,mdle,ndom,nrintertot
+c
+      real(8) :: bigp  =  1.d30
+      real(8) :: bign  = -1.d30
+      real(8) :: small =  1.d-6
+      real(8) :: one   =  1.d0
+c
+#if DEBUG_MODE
+      integer :: iprint
+      iprint=0
+#endif
 c
 c---------------------------------------------------------------
 c
-      data bigp,bign,small,one /1.d30,-1.d30,1.d-6,1.d0/
-c
-      iprint=0
-c
-c  ...prints vertex coordinates
-      iprint1=0
-c
 c  ...find limiting values for contour plot
-      if (Numlev.gt.0) call finlimb(numlev,solev)
+      if (Numlev.gt.0) call finlimb(Numlev,solev)
 c
 c  ...set default bounds for the picture
       do ivar=1,3
         XEX(2*ivar-1)=bigp
-        XEX(2*ivar)=bign
+        XEX(2*ivar)  =bign
         xmin(ivar) = bigp
         xmax(ivar) = bign
       enddo
@@ -74,9 +81,11 @@ c  ...loop through elements
       mdle=0
       do 20 iel=1,NRELES
         call nelcon(mdle, mdle)
+#if DEBUG_MODE
         if (iprint.eq.1) then
           write(*,*) 'lsvisidb: mdle = ',mdle
         endif
+#endif
 c
 c  .....check visibility (elements)
 
@@ -98,16 +107,19 @@ c
         call locate(mdle,IGINV,NRINVBL, loc)
         if (loc.gt.0) go to 20
         call find_domain(mdle, ndom)
+#if DEBUG_MODE
         if (iprint.eq.1) then
           write(*,7056) mdle,ndom,NDOMAIN(ndom)
  7056     format('lsvisidb: mdle,ndom,NDOMAIN(ndom) = ',i6,i3,i2)
         endif
+#endif
         if (NDOMAIN(ndom).eq.0) go to 20
 c
         call find_orient(mdle, nedge_orient,nface_orient)
         call find_order(mdle, norder)
 c
         call nodcor(mdle,xnod)
+#if DEBUG_MODE
         if (iprint.eq.1) then
           write(*,*)'lsvisidb: VERTEX COORDINATES = '
           do ivar=1,3
@@ -116,14 +128,17 @@ c
           enddo
           call pause
         endif
+#endif
 c
 c  .....get neighbors
         call find_neig(mdle, neig)
+#if DEBUG_MODE
         if (iprint.eq.1) then
           write(*,8002) neig(1,1:nface(NODES(mdle)%ntype))
  8002     format('lsvisidb: neig = ',6(i8,2x))
           call pause
         endif
+#endif
 c
 c  .....get node numbers
         call elem_nodes(mdle, nodesl,norientl)
@@ -154,11 +169,13 @@ c
         nrintertot=0
 c
 c  .....loop through element faces
-        do 10 if=1,nface(NODES(mdle)%ntype)
+        do 10 ifc=1,nface(NODES(mdle)%ntype)
+#if DEBUG_MODE
           if (iprint.eq.1) then
-            write(*,7003) if
- 7003       format('lsvisidb: if = ',i2)
+            write(*,7003) ifc
+ 7003       format('lsvisidb: ifc = ',i2)
           endif
+#endif
 c
 c  .......for not sliced elements
           if (icut.eq.0) then
@@ -169,19 +186,19 @@ c
 c  .........flag : invisible
 ccc            ivis=1
             ivis=0
-            if (neig(1,if).lt.0) then
-              call locate(-neig(1,if),IGINV,NRINVBL, iloc)
+            if (neig(1,ifc).lt.0) then
+              call locate(-neig(1,ifc),IGINV,NRINVBL, iloc)
               if (iloc.gt.0) ivis=0
-              call find_domain(-neig(1,if), ndom)
+              call find_domain(-neig(1,ifc), ndom)
               if (NDOMAIN(ndom).eq.0) ivis=0
-            elseif (neig(1,if).eq.0) then
+            elseif (neig(1,ifc).eq.0) then
               ivis=0
             else
 ccc              do ineig=1,4
               do ineig=1,1
-                call locate(neig(ineig,if),IGINV,NRINVBL, iloc)
+                call locate(neig(ineig,ifc),IGINV,NRINVBL, iloc)
                 if (iloc.gt.0) ivis=0
-                call find_domain(neig(ineig,if), ndom)
+                call find_domain(neig(ineig,ifc), ndom)
                 if (NDOMAIN(ndom).eq.0) ivis=0
               enddo
             endif
@@ -191,11 +208,11 @@ c  .......end for uncut elements
           endif
 c
 c  .......prepare the list of triangles for the face
-          call display_face(Numlev,mdle,if,nodesl,
+          call display_face(Numlev,mdle,ifc,nodesl,
      .                      nedge_orient,nface_orient,norder,Iflagn,
      .                      xnod,zdofH,zdofE,zdofV,zdofQ,
      .                      solev,xmin,xmax,
-     .                      nrintertot,nrinter(if),xlocinter)
+     .                      nrintertot,nrinter(ifc),xlocinter)
 c
    10   continue
 c
@@ -229,11 +246,12 @@ c  ...sort according to z-coordinate in order back-to-front
  7002   format('lsvisidb: NO TRIANGLES TO BE DRAWN...')
       endif
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,*) 'lsvisidb: EXITING...'
         call pause
       endif
+#endif
 c
 c
-      return
-      end
+      end subroutine lsvisidb
