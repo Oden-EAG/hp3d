@@ -36,16 +36,18 @@ module refinements
   !
   logical :: ISO_ONLY = .FALSE.
   !
+#if DEBUG_MODE
   interface elem_show
      subroutine elem_show_var1(Mdle)
        integer, intent(in) :: Mdle
      end subroutine elem_show_var1
-
+     !
      subroutine elem_show_var2(Mdle, Ntype, Nodesl, Norientl)
        integer, intent(in) :: Mdle, Ntype
        integer, intent(in) :: Nodesl(27), Norientl(27)
      end subroutine elem_show_var2
   end interface
+#endif
   !
 contains
   !

@@ -24,8 +24,7 @@ c
 c
       use element_data
       use data_structure3D
-      use refinements, only : decode_ref, npar_ref, nson_ref,
-     .    nort_ref, rotate_edge, rotate_trian, rotate_quad, elem_show
+      use refinements
       use constrained_nodes, only: INFO_CONSTRAINTS,NODES_CONSTR,
      .     NR_EDGES,NEDGC,NEDG_CONS,NR_FACES,NFACEC,NFACE_CONS,
      .     SON_NUM,FATH_TYPE,FATH_ORIENT,FATH_NODES,
