@@ -28,7 +28,8 @@ c
       subroutine find_element_ref_flag(Ntype,Kref,Kreff, Krefm)
 c
       use element_data
-#include "syscom.blk"
+c
+      implicit none
 c
       integer, intent(in)  :: Ntype,Kref
       integer, intent(in)  :: Kreff(6)
@@ -44,8 +45,12 @@ c  ...possible element refinement flags
       integer :: mdld_ref_flags(1:2) = (/10,01/)
       integer :: mdlb_ref_flags(1:7) = (/111,110,101,011,100,010,001/)
 c
+      integer :: i,ifc,ipass,kref_loc
+c
+#if DEBUG_MODE
       integer :: iprint
       iprint=0
+#endif
 c
       Krefm=-1
       select case(Ntype)
@@ -56,8 +61,8 @@ c  .....loop through possible refinements
           call check_ref(Ntype,Kref,kref_loc, ipass)
           if (ipass.eq.0) cycle
           call find_face_ref_flags(Ntype,kref_loc, kreff_loc)
-          do if=1,6
-            call check_ref(MDLQ,Kreff(if),kreff_loc(if), ipass)
+          do ifc=1,6
+            call check_ref(MDLQ,Kreff(ifc),kreff_loc(ifc), ipass)
           enddo
           if (ipass.eq.1) then
             Krefm = kref_loc; exit
@@ -69,8 +74,8 @@ c  .....loop through possible refinements
           call check_ref(Ntype,Kref,kref_loc, ipass)
           if (ipass.eq.0) cycle
           call find_face_ref_flags(Ntype,kref_loc, kreff_loc)
-          do if=1,4
-            call check_ref(MDLT,Kreff(if),kreff_loc(if), ipass)
+          do ifc=1,4
+            call check_ref(MDLT,Kreff(ifc),kreff_loc(ifc), ipass)
           enddo
           if (ipass.eq.1) then
             Krefm = kref_loc; exit
@@ -82,18 +87,22 @@ c  .....loop through possible refinements
           call check_ref(Ntype,Kref,kref_loc, ipass)
           if (ipass.eq.0) cycle
           call find_face_ref_flags(Ntype,kref_loc, kreff_loc)
-          do if=1,2
-            call check_ref(MDLT,Kreff(if),kreff_loc(if), ipass)
+          do ifc=1,2
+            call check_ref(MDLT,Kreff(ifc),kreff_loc(ifc), ipass)
+#if DEBUG_MODE
             if (iprint.eq.1) then
-              write(*,8001) if,Kreff(if),kreff_loc(if),ipass
- 8001         format('if,Kreff(if),kreff_loc(if),ipass = ',4i4)
+              write(*,8001) ifc,Kreff(ifc),kreff_loc(ifc),ipass
+ 8001         format('ifc,Kreff(ifc),kreff_loc(ifc),ipass = ',4i4)
             endif
+#endif
           enddo
-          do if=3,5
-            call check_ref(MDLQ,Kreff(if),kreff_loc(if), ipass)
+          do ifc=3,5
+            call check_ref(MDLQ,Kreff(ifc),kreff_loc(ifc), ipass)
+#if DEBUG_MODE
             if (iprint.eq.1) then
-              write(*,8001) if,Kreff(if),kreff_loc(if),ipass
+              write(*,8001) ifc,Kreff(ifc),kreff_loc(ifc),ipass
             endif
+#endif
           enddo
           if (ipass.eq.1) then
             Krefm = kref_loc; exit
@@ -106,8 +115,8 @@ c  .....loop through possible refinements
           if (ipass.eq.0) cycle
           call find_face_ref_flags(Ntype,kref_loc, kreff_loc)
           call check_ref(MDLQ,Kreff(1),kreff_loc(1), ipass)
-          do if=2,5
-            call check_ref(MDLT,Kreff(if),kreff_loc(if), ipass)
+          do ifc=2,5
+            call check_ref(MDLT,Kreff(ifc),kreff_loc(ifc), ipass)
           enddo
           if (ipass.eq.1) then
             Krefm = kref_loc; exit
@@ -115,13 +124,14 @@ c  .....loop through possible refinements
         enddo
       end select
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7001) S_Type(Ntype),Kref,Krefm,Kreff(1:nface(Ntype))
  7001   format('find_element_ref_flag: Type,Kref,Krefm,Kreff = ',
      .          a5,2x,i2,2x,i2,6x,6(2x,i2))
         call pause
       endif
-c
+#endif
 c
       end subroutine find_element_ref_flag
 c
@@ -154,7 +164,8 @@ c
       subroutine find_element_ref_flag2(Ntype,Kreff,Krefe, Kref)
 c
       use element_data
-#include "syscom.blk"
+c
+      implicit none
 c
       integer, intent(in)  :: Ntype
       integer, intent(in)  :: Kreff(6),Krefe(12)
@@ -170,31 +181,35 @@ c  ...possible element refinement flags
       integer :: mdld_ref_flags(1:2) = (/10,01/)
       integer :: mdlb_ref_flags(1:7) = (/111,110,101,011,100,010,001/)
 c
+      integer :: i,ifc,ipass,kref_loc,nr_ref
+c
+#if DEBUG_MODE
       integer :: iprint
       iprint=0
+#endif
 c
 c  ...determine number of refinements to check
       select case(Ntype)
-      case(MDLB); nr_ref=7
-      case(MDLN); nr_ref=13
-      case(MDLP); nr_ref=3
-      case(MDLD); nr_ref=2
+        case(MDLB); nr_ref=7
+        case(MDLN); nr_ref=13
+        case(MDLP); nr_ref=3
+        case(MDLD); nr_ref=2
       end select
 c
 c  ...loop through possible refinements
       do i=nr_ref,1,-1
         ipass=1
         select case(Ntype)
-        case(MDLB); kref_loc = mdlb_ref_flags(i)
-        case(MDLN); kref_loc = mdln_ref_flags(i)
-        case(MDLP); kref_loc = mdlp_ref_flags(i)
-        case(MDLD); kref_loc = mdld_ref_flags(i)
+          case(MDLB); kref_loc = mdlb_ref_flags(i)
+          case(MDLN); kref_loc = mdln_ref_flags(i)
+          case(MDLP); kref_loc = mdlp_ref_flags(i)
+          case(MDLD); kref_loc = mdld_ref_flags(i)
         end select
 c
         call find_face_ref_flags(Ntype,kref_loc, kreff_loc)
         call find_edge_ref_flags(Ntype,kref_loc, krefe_loc)
-        do if=1,nface(Ntype)
-          call check_ref(MDLT,Kreff(if),kreff_loc(if), ipass)
+        do ifc=1,nface(Ntype)
+          call check_ref(MDLT,Kreff(ifc),kreff_loc(ifc), ipass)
         enddo
         do ie=1,nedge(Ntype)
           if (krefe_loc(ie).lt.Krefe(ie)) ipass=0
@@ -204,6 +219,7 @@ c
         endif
       enddo
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7001) S_Type(Ntype)
  7001   format('find_element_ref_flag2: Type = ',a5)
@@ -214,6 +230,6 @@ c
         write(*,7004) Kref
  7004   format('                        Element flag = ',i3)
       endif
-c
+#endif
 c
       end subroutine find_element_ref_flag2
