@@ -137,7 +137,7 @@ c
  7010 format('min_a,min_n = ',2(i2))
       call pause
 
-      end
+      end subroutine test_rJacobi
 c
 c
 c
@@ -184,7 +184,7 @@ c  ...build blocks
         Dpoly(n) = drJacobi_W_I(A,X,n)
       enddo
 c
-      end subroutine
+      end subroutine build_Jacobi_W_I
 c
 c
 c
@@ -319,7 +319,7 @@ ccc        stop
 ccc      end select
 c
 c
-      end function
+      end function rJacobi_W
 c
 c
 c
@@ -420,7 +420,7 @@ ccc        stop
 ccc      endselect
 c
 c
-      end function
+      end function drJacobi_W
 c
 c
 c
@@ -566,7 +566,7 @@ c
      .                c3*rJacobi_W(A,0.d0,X,Nord-2)
       end select
 c
-      end function
+      end function rJacobi_W_I
 c
 c
 c
@@ -691,4 +691,4 @@ c
      .                c3*drJacobi_W(A,0.d0,X,Nord-2)
       end select
 c
-      end function
+      end function drJacobi_W_I

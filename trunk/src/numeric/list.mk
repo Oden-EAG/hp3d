@@ -6,7 +6,6 @@ cross_product_module.F90
 gausse.F
 invert.F90
 isgn.F
-jacobi.F
 legendre.F90
 rhsub.F
 tri.F
