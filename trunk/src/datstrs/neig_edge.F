@@ -48,11 +48,13 @@ c  ...element type
 c
 c  ...miscellanea
       integer :: nod,nc,nrbl,nb,lab,ib,ie,nel,ibeg
+c
+#if DEBUG_MODE
       integer :: iprint
+      iprint = 0
+#endif
 c
 c----------------------------------------------------------------------
-c
-      iprint=0
 c
 c  ...initialize
       Neig = 0; Nedg_list = 0; Norient_list = 0; Nrneig = 0
@@ -101,6 +103,8 @@ c  .....tetrahedron
 c
 c  .....pyramid
         case(4); nel = NRPRISM+NRHEXAS+NRTETRA+nb
+        
+        case default; write(*,*) 'neig_edge'; stop
         end select
 c
 c  .....store the neighbor, for the initial mesh
@@ -121,6 +125,7 @@ c
 c  ...end of loop through adjacent blocks
       enddo
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7011) Medge
  7011   format('neig_edge: FIRST NEIGHBORS OF Medge = ',i5)
@@ -130,5 +135,6 @@ c
         write(*,7012) Norient_list(1:Nrneig)
         call pause
       endif
+#endif
 c
       end subroutine neig_edge
