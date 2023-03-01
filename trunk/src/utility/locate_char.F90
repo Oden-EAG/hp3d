@@ -1,23 +1,23 @@
-c----------------------------------------------------------------------
-c
-c   routine name       - locate_char
-c
-c----------------------------------------------------------------------
-c
-c   latest revision    - Feb 2023
-c
-c   purpose            - routine locates first instance of a
-c                        character on a list of characters
-c
-c   arguments :
-c     in:
-c              Nel     - character to search for
-c              List    - a list of characters
-c              Nlist   - length of the list
-c     out:
-c              Number  - the character location
-c
-c----------------------------------------------------------------------
+!----------------------------------------------------------------------
+!
+!   routine name       - locate_char
+!
+!----------------------------------------------------------------------
+!
+!   latest revision    - Feb 2023
+!
+!   purpose            - routine locates first instance of a
+!                        string on a list of characters
+!
+!   arguments :
+!     in:
+!              Nel     - string to search for
+!              List    - a list of strings
+!              Nlist   - length of the list
+!     out:
+!              Number  - the string location
+!
+!----------------------------------------------------------------------
 subroutine locate_char(Nel,List,Nlist, Number)
 !
    implicit none
