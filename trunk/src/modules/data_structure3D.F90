@@ -1,5 +1,5 @@
 !----------------------------------------------------------------------
-!> @brief   module defines date structure arrays
+!> @brief   Defines data structure arrays
 !> @date    Feb 2023
 !----------------------------------------------------------------------
 module data_structure3D
