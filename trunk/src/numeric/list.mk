@@ -2,7 +2,6 @@ bernstein_poly.F90
 biv_bernstein_poly.F90
 blas.F
 convert.F90
-cross_product_module.F90
 gausse.F
 invert.F90
 isgn.F90
