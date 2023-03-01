@@ -24,7 +24,8 @@ c
       use data_structure3D
       use element_data
       use constrained_nodes
-#include "syscom.blk"
+c
+      implicit none
 c
       integer, intent(in) :: Nlist
       integer, intent(in) :: List(Nlist)
@@ -36,17 +37,19 @@ c  ...order for element nodes implied by the order of the middle node
       integer :: norder(19)
 c
 c  ...miscellanea
-      integer :: iel,ip,is,j,mdle,nc,nrs
-      integer :: nod,nodp,nods,nrv,nre,nrf,ntype
-      integer :: iprint
+      integer :: icase,iel,ie,ip,is,j,mdle,nc,nrs
+      integer :: nod,newp,nodp,nods,nrv,nre,nrf,ntype
 c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
       if (iprint.eq.1) then
         write(*,7010) List(1:Nlist)
  7010   format('execute_pref: List = ',20(/,10i6))
         call pause
       endif
-
+#endif
+c
       call reset_visit
 c
 c  ...Step 1: loop over elements from the list and record
@@ -248,10 +251,12 @@ c  .........if nod is active
 c
         if (NODES(mdle)%visit.eq.1) then
           call find_new_order(mdle, newp)
+#if DEBUG_MODE
           if (iprint.eq.1) then
             write(*,7050) mdle,newp
  7050       format('execute_pref: REFINING mdle = ',i6,' new p = ',i3)
           endif
+#endif
           call nodmod(mdle, newp)
         endif
       enddo
