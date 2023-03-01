@@ -4,14 +4,12 @@ c   routine name       - setcnstr_edge_hcurl
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - May 2020
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine sets coefficients for the constrained
 c                        approximation on the master edge
 c
 c   arguments          - none
-c
-c   required  routines -
 c
 c----------------------------------------------------------------------
 c
@@ -33,24 +31,36 @@ c
 c
       use parameters
       use constraints
-#include "syscom.blk"
+c
+      implicit none
 c
 c  ...values of small elements shape functions, big element
 c     shape functions, derivatives (not used)
-      dimension shapsma(MAXP,MAXP),shapbig(MAXP,MAXP)
+      real(8) :: shapsma(MAXP,MAXP),shapbig(MAXP,MAXP)
 c
 c  ...pivoting array, work array
-      dimension ip(MAXP),r(MAXP,MAXP)
+      integer :: ip(MAXP)
+      real(8) :: r(MAXP,MAXP)
 c
-      iprint=0
+      real(8) :: aux,val,xibig,xisma
+      integer :: i,j,icl,is,ians,info
+      integer :: nel,nord,nvoid
+c
+#if DEBUG_MODE
+      integer :: iprint
+      iprint = 0
+#endif
 c
 c  ...clear:
       RRRE = 0.d0
 c
       nord = MAXP
+c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,*) 'Compute constraints wrt p = ', nord
       end if
+#endif
 c
 c---------------------------------------------------------------------
 c
@@ -93,19 +103,21 @@ c  ...solve the collocation system to determine the constrained
 c     approximation coefficients
 c
 c  ...invert the collocation matrix
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7010)
- 7010   format('setcnstr_edge: COLLOCATION MATRIX = ')
+ 7010   format('setcnstr_edge_hcurl: COLLOCATION MATRIX = ')
         do i=1,nord
           write(*,7011) i,shapsma(i,1:nord)
  7011     format('i = ',i3,10e12.5)
         enddo
         call pause
       endif
-
+#endif
       call dgesv(nord,nord,shapsma,MAXP,ip,shapbig,MAXP,info)
       if (info.ne.0) then
-        write(*,*)'setcnstr_edge: HCURL DGESV RETURNED INFO =',info
+        write(*,*)'setcnstr_edge_hcurl: HCURL DGESV RETURNED INFO =',
+     .             info
         call logic_error(FAILURE,
      .    __FILE__,__LINE__)
       endif
@@ -162,7 +174,8 @@ c
 c  ...solve the collocation system
       call dgesv(nord,nord,shapsma,MAXP,ip,shapbig,MAXP,info)
       if (info.ne.0) then
-        write(*,*)'setcnstr_edge: HCURL DGESV RETURNED INFO =',info
+        write(*,*)'setcnstr_edge_hcurl: HCURL DGESV RETURNED INFO =',
+     .             info
         call logic_error(FAILURE,
      .    __FILE__,__LINE__)
       endif
@@ -201,7 +214,7 @@ c
 c  ...this is a test which should be run when installing the code
 c     on a new machine
 c
-   10 write(*,*) 'setcnstr_edge: SET BIG ELEMENT COORDINATE'
+   10 write(*,*) 'setcnstr_edge_hcurl: SET BIG ELEMENT COORDINATE'
       read(*,*) xibig
 c
 c  ...shape functions of the big element
@@ -238,13 +251,13 @@ c  .......tricky part... need to think more about this piola transforms
         enddo
 c
         write(*,7004) i,shapbig(i,1),abs(val-shapbig(i,1))
- 7004   format('setcnstr_edge: MIDDLE NODE SHAPE FUNCTION i = ',i2,
-     .         ' VALUE = ',e12.5, ' DIFFERENCE = ',e12.5)
+ 7004   format('setcnstr_edge_hcurl: MIDDLE NODE SHAPE FUNCTION i = ',
+     .          i2,' VALUE = ',e12.5, ' DIFFERENCE = ',e12.5)
 c
 c  ...end of loop through middle node big shape functions
       enddo
 c
-      write(*,*) 'setcnstr: CONTINUE ?(1/0)'
+      write(*,*) 'setcnstr_edge_hcurl: CONTINUE ?(1/0)'
       read(*,*) ians
       if (ians.eq.1) go to 10
 c

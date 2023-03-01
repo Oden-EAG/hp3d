@@ -4,14 +4,12 @@ c   routine name       - setcnstr_edge_h1
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - May 2020
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine sets coefficients for the constrained
 c                        approximation on the master edge
 c
 c   arguments          - none
-c
-c   required  routines -
 c
 c----------------------------------------------------------------------
 c
@@ -33,17 +31,26 @@ c
 c
       use parameters
       use constraints
-#include "syscom.blk"
+c
+      implicit none
 c
 c  ...values of small elements shape functions, big element
 c     shape functions, derivatives (not used)
-      dimension shapsma(MAXP+1,MAXP+1),shapbig(MAXP+1,MAXP+1),
-     .          void(MAXP+1)
+      real(8) :: shapsma(MAXP+1,MAXP+1),shapbig(MAXP+1,MAXP+1),
+     .           void(MAXP+1)
 c
 c  ...pivoting array, work array
-      dimension ip(MAXP+1),r(MAXP+1,MAXP+1)
+      integer :: ip(MAXP+1)
+      real(8) :: r(MAXP+1,MAXP+1)
 c
+      real(8) :: aux,val,xibig,xisma
+      integer :: i,j,ians,icl,info,jbeg,jp,jpbeg,jpend
+      integer :: n,nord,ndofh,nel,nrb,nrs
+c
+#if DEBUG_MODE
+      integer :: iprint
       iprint = 0
+#endif
 c
 c  ...clear:
       RRRH = 0.d0
@@ -94,19 +101,20 @@ c  ...number of unknowns
       n = nord+1
 c
 c  ...invert the collocation matrix
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7010)
- 7010   format('setcnstr_edge: COLLOCATION MATRIX = ')
+ 7010   format('setcnstr_edge_h1: COLLOCATION MATRIX = ')
         do i=1,n
           write(*,7011) i,shapsma(i,1:n)
  7011     format('i = ',i3,10e12.5)
         enddo
         call pause
       endif
-
+#endif
       call dgesv(n,MAXP+1,shapsma,MAXP+1,ip,shapbig,MAXP+1,info)
       if (info.ne.0) then
-        write(*,*)'setcnstr_edge: H1 DGETRS RETURNED INFO =',info
+        write(*,*)'setcnstr_edge_h1: H1 DGETRS RETURNED INFO =',info
         call logic_error(FAILURE,
      .    __FILE__,__LINE__)
       endif
@@ -180,7 +188,7 @@ c  ...solve the collocation system
       n = nord+1
       call dgesv(n,MAXP+1,shapsma,MAXP+1,ip,shapbig,MAXP+1,info)
       if (info.ne.0) then
-        write(*,*)'setcnstr_edge: H1 DGETRS RETURNED INFO =',info
+        write(*,*)'setcnstr_edge_h1: H1 DGETRS RETURNED INFO =',info
         call logic_error(FAILURE,
      .    __FILE__,__LINE__)
       endif
@@ -219,8 +227,8 @@ c
 c  .........loop through the constrained node dof
             do j=jbeg,nord-1
               if (abs(RRRH(1,jp,i,j)).gt.1.d-12) then
-                write(*,7001) n,jp,i,j,RRRH(ipp,jp,i,j)
- 7001           format('setcnstr_edge: n,jp,i,j,RRTH = ',
+                write(*,7001) n,jp,i,j,RRRH(1,jp,i,j)
+ 7001           format('setcnstr_edge_h1: n,jp,i,j,RRTH = ',
      .                  4i3,2x,e12.5)
                 stop 1
               endif
@@ -237,7 +245,7 @@ c
 c  ...this is a test which should be run when installing the code
 c     on a new machine
 c
-   10 write(*,*) 'setcnstr_edge: SET BIG ELEMENT COORDINATE'
+   10 write(*,*) 'setcnstr_edge_h1: SET BIG ELEMENT COORDINATE'
       read(*,*) xibig
 c
 c  ...shape functions of the big element
@@ -300,7 +308,7 @@ c  .......small node 2:
         end select
 c
         write(*,7004) i,shapbig(nrb+i,1),abs(val-shapbig(nrb+i,1))
- 7004   format('setcnstr_edge: MIDDLE NODE SHAPE FUNCTION i = ',i2,
+ 7004   format('setcnstr_edge_h1: MIDDLE NODE SHAPE FUNCTION i = ',i2,
      .         ' VALUE = ',e12.5, ' DIFFERENCE = ',e12.5)
 c
 c  ...end of loop through middle node big shape functions
@@ -315,7 +323,7 @@ c  ...left big vertex node
         val = RRRH(2,1, 3,1)*shapsma(1,1)
       end select
       write(*,7005) shapbig(1,1),abs(val-shapbig(1,1))
- 7005 format('setcnstr_edge: LEFT VERTEX NODE SHAPE FUNCTION ',
+ 7005 format('setcnstr_edge_h1: LEFT VERTEX NODE SHAPE FUNCTION ',
      .       ' VALUE = ',e12.5, ' DIFFERENCE = ',e12.5)
 c
 c  ...right big vertex node
@@ -327,10 +335,10 @@ c  ...right big vertex node
      .      + 1.0d0        *shapsma(2,1)
       end select
       write(*,7006) shapbig(2,1),abs(val-shapbig(2,1))
- 7006 format('setcnstr_edge: RIGHT VERTEX NODE SHAPE FUNCTION ',
+ 7006 format('setcnstr_edge_h1: RIGHT VERTEX NODE SHAPE FUNCTION ',
      .       ' VALUE = ',e12.5, ' DIFFERENCE = ',e12.5)
 c
-      write(*,*) 'setcnstr: CONTINUE ?(1/0)'
+      write(*,*) 'setcnstr_edge_h1: CONTINUE ?(1/0)'
       read(*,*) ians
       if (ians.eq.1) go to 10
 c

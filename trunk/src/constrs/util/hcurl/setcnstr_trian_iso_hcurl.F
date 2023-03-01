@@ -1,21 +1,17 @@
 c----------------------------------------------------------------------
 c
-c   routine name       - setcnstr_trian_iso
+c   routine name       - setcnstr_trian_iso_hcurl
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - May 2020
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine evaluates constraint coefficients for
 c                        the triangular master element
 c
-c   usage              - call setcnstrt
-c
 c   arguments          - none
 c
 c----------------------------------------------------------------------
-c
-      subroutine setcnstr_trian_iso_hcurl
 c
 c    'big' parent nodes
 c
@@ -51,22 +47,36 @@ c      *************************
 c
 c--------------------------------------------------------------------
 c
+      subroutine setcnstr_trian_iso_hcurl
+c
       use parameters
       use constraints
       use element_data
-#include "syscom.blk"
+c
+      implicit none
+c
 c  ...use collocation points for lagrange shape functions h1
-      integer, parameter :: npts = 4*(MAXtriaE)
+      integer, parameter :: npts  = 4*MAXtriaE
       integer, parameter :: lwork = MAXtriaE**2
-      dimension shapsma(2,MAXtriaE),curl(MAXtriaE),
-     .          shapbig(2,MAXtriaE),
-     .          evalsma(npts,MAXtriaE),evalbig(npts,MAXtriaE),
-     .          work(lwork),r(MAXtriaE,MAXtriaE),xibig(2),xisma(2)
+c
+      real(8) :: shapsma(2,MAXtriaE),curl(MAXtriaE),
+     .           shapbig(2,MAXtriaE),
+     .           evalsma(npts,MAXtriaE),evalbig(npts,MAXtriaE),
+     .           work(lwork),r(MAXtriaE,MAXtriaE),xibig(2),xisma(2)
 c
 c  ...order and edge orientations
-      dimension norder(4),norient(3),nsize(2),val(2),dbds(2,2)
+      integer :: norder(4),norient(3),nsize(2)
 c
-      iprint=0
+      real(8) :: val(2),dbds(2,2)
+c
+      integer :: icl,i,ians,ib,ic,ibcase,info,is,iscase,ivoid
+      integer :: j,k,nord,nc,nel,nrb,nrdof,nrs,nspan
+      integer :: ndof_i,ndof_j,ndof_mdlt,ndof_medg
+c
+#if DEBUG_MODE
+      integer :: iprint
+      iprint = 0
+#endif
 c
 c  ...set up order and orientation
       nord = MAXP
@@ -134,35 +144,38 @@ c
         enddo
       enddo
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,*) 'ic, nrdof = ', ic, nrdof
         call pause
       endif
 c
       if (iprint.eq.1) then
-        write(*,*) 'setcnstr_trian: COLUMNWISE ....'
+        write(*,*) 'setcnstr_trian_iso_hcurl: COLUMNWISE ....'
         do i=1,nc
           write(*,7003) evalsma(1:nc,i)
  7003     format(15(e12.5,2x))
         enddo
         call pause
       endif
+#endif
 c
       nc = ic;
       call dgels('N', nc, nrdof, nrdof,
      .           evalsma, npts, evalbig, npts, work, lwork, info)
       if (info.ne.0) then
-        write(*,*)'setcnstr_trian_iso: HCURL DGELS INFO =',info
+        write(*,*)'setcnstr_trian_iso_hcurl: HCURL DGELS INFO =',info
         call logic_error(FAILURE,
      .  __FILE__,__LINE__)
       endif
 ccc      r = 2.d0*evalbig(1:nrdof,1:nrdof)
       r = evalbig(1:nrdof,1:nrdof)
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7002) r(1:nrdof,1:nrdof)
  7002   format('r=', 10e12.5)
       endif
-
+#endif
 c
 c  ...degrees of freedom of small node 5:
 c****************************************
@@ -259,33 +272,37 @@ c
         enddo
       enddo
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,*) 'ic, nrdof = ', ic, nrdof
         call pause
       endif
 c
       if (iprint.eq.1) then
-        write(*,*) 'setcnstr_trian: COLUMNWISE ....'
+        write(*,*) 'setcnstr_trian_iso_hcurl: COLUMNWISE ....'
         do i=1,nc
           write(*,7003) evalsma(1:nc,i)
         enddo
         call pause
       endif
+#endif
 c
       nc = ic;
       call dgels('N', nc, nrdof, nrdof,
      .           evalsma, npts, evalbig, npts, work, lwork, info)
       if (info.ne.0) then
-        write(*,*)'setcnstr_trian_iso: HCURL DGELS INFO =',info
+        write(*,*)'setcnstr_trian_iso_hcurl: HCURL DGELS INFO =',info
         call logic_error(FAILURE,
      .  __FILE__,__LINE__)
       endif
 ccc      r = 2.d0*evalbig(1:nrdof,1:nrdof)
       r = evalbig(1:nrdof,1:nrdof)
+c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7002) r(1:nrdof,1:nrdof)
       endif
-
+#endif
 c
 c  ...degrees of freedom of small node 6:
 c****************************************
@@ -383,6 +400,7 @@ c
         enddo
       enddo
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,*) 'ic, nrdof = ', ic, nrdof
         call pause
@@ -395,21 +413,24 @@ c
         enddo
         call pause
       endif
+#endif
 c
       nc = ic;
       call dgels('N', nc, nrdof, nrdof,
      .           evalsma, npts, evalbig, npts, work, lwork, info)
       if (info.ne.0) then
-        write(*,*)'setcnstr_trian_iso: HCURL DGELS INFO =',info
+        write(*,*)'setcnstr_trian_iso_hcurl: HCURL DGELS INFO =',info
         call logic_error(FAILURE,
      .  __FILE__,__LINE__)
       endif
 ccc      r = 2.d0*evalbig(1:nrdof,1:nrdof)
       r = evalbig(1:nrdof,1:nrdof)
+c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7002) r(1:nrdof,1:nrdof)
       endif
-
+#endif
 c
 c  ...degrees of freedom of small node 7:
 c****************************************
@@ -507,33 +528,36 @@ c
         enddo
       enddo
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,*) 'ic, nrdof = ', ic, nrdof
         call pause
       endif
 c
       if (iprint.eq.1) then
-        write(*,*) 'setcnstr_trian: COLUMNWISE ....'
+        write(*,*) 'setcnstr_trian_iso_hcurl: COLUMNWISE ....'
         do i=1,nc
           write(*,7003) evalsma(1:nc,i)
         enddo
         call pause
       endif
+#endif
 c
       nc = ic;
       call dgels('N', nc, nrdof, nrdof,
      .           evalsma, npts, evalbig, npts, work, lwork, info)
       if (info.ne.0) then
-        write(*,*)'setcnstr_trian_iso: HCURL DGELS INFO =',info
+        write(*,*)'setcnstr_trian_iso_hcurl: HCURL DGELS INFO =',info
         call logic_error(FAILURE,
      .  __FILE__,__LINE__)
       endif
 ccc      r = -2.d0*evalbig(1:nrdof,1:nrdof)
       r = evalbig(1:nrdof,1:nrdof)
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7002) r(1:nrdof,1:nrdof)
       endif
-
+#endif
 c
 c  ...degrees of freedom of small node 4:
 c*****************************************
@@ -589,7 +613,7 @@ c
 c  ...begin testing
   777 continue
 c
-      write(*,*) 'setcnstr_trian: SET xibig '
+      write(*,*) 'setcnstr_trian_iso_hcurl: SET xibig '
       read(*,*) xibig(1:2)
 c
 c  ...shape functions of big element
@@ -639,7 +663,7 @@ c  .....element 4:
         dbds(1:2,1:2) = -1.d0*dbds(1:2,1:2)
       endif
 
-      write(*,*) 'setcnstr_trian: nel = ', nel
+      write(*,*) 'setcnstr_trian_iso_hcurl: nel = ', nel
 c
 c  ...find small shape functions at this point:
 c      call shapeEt(
@@ -740,15 +764,15 @@ c
 c
          write(*,8002) i,shapbig(1:2,nrb+i),
      .     abs(val(1:2)-shapbig(1:2,nrb+i))
- 8002    format('setcnstr_trian: i,shapebig,difference = ',
+ 8002    format('setcnstr_trian_iso_hcurl: i,shapebig,difference = ',
      .     i3,2(2e12.5,2x))
 c
-c   ...end of loop through shape functions of big element
-       enddo
+c  ...end of loop through shape functions of big element
+      enddo
 c
-       write(*,*) 'setcnstr_trian: CONTINUE ?(1/0)'
-       read(*,*) ians
+      write(*,*) 'setcnstr_trian_iso_hcurl: CONTINUE ?(1/0)'
+      read(*,*) ians
 c
-       if (ians.eq.1) go to 777
+      if (ians.eq.1) go to 777
 c
-       end subroutine setcnstr_trian_iso_hcurl
+      end subroutine setcnstr_trian_iso_hcurl

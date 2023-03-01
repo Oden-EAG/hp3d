@@ -1,10 +1,10 @@
 c----------------------------------------------------------------------
 c
-c   routine name       - setcnstr_trian_iso_div
+c   routine name       - setcnstr_trian_iso_hdiv
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - May 2020
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine evaluates constraint coefficients for
 c                        the triangular master element and H(div) (L2)
@@ -13,8 +13,6 @@ c
 c   arguments          - none
 c
 c----------------------------------------------------------------------
-c
-      subroutine setcnstr_trian_iso_hdiv
 c
 c    'big' parent node (just one)
 c
@@ -50,19 +48,25 @@ c      *************************
 c
 c--------------------------------------------------------------------
 c
+      subroutine setcnstr_trian_iso_hdiv
+c
       use parameters
       use constraints
       use element_data
-#include "syscom.blk"
+c
+      implicit none
 c
 c  ...big(parent) and small element shape functions, collocation points
-      dimension shapsma(MAXtriaQ,MAXtriaQ),
-     .          shapbig(MAXtriaQ,MAXtriaQ),
-     .          ip(MAXtriaQ),xibig(2),xisma(2)
+      real(8) :: shapsma(MAXtriaQ,MAXtriaQ),
+     .           shapbig(MAXtriaQ,MAXtriaQ),
+     .           xibig(2),xisma(2)
+      integer :: ip(MAXtriaQ)
 c
-      dimension norder(4),nsize(2)
+      integer :: norder(4),nsize(2)
 c
-      iprint=0
+      real(8) :: aux,diff,val
+      integer :: i,j,icl,i1,i2,ians,info
+      integer :: mp,np,n,nord,nel,nrdofQ
 c
 c  ...set up order
       nord   = MAXP
@@ -124,7 +128,7 @@ c     .                        nrdofQ,shapbig(1:MAXtriaQ,icl))
           enddo
         enddo
         if (icl.ne.nrdofQ) then
-          write(*,*) ' setcnstr_trian_iso_div: icl,nrdofQ = ',icl,nrdofQ
+          write(*,*) 'setcnstr_trian_iso_hdiv: icl,nrdofQ = ',icl,nrdofQ
           stop 1
         endif
 c
@@ -219,7 +223,7 @@ c  .....element 4:
         xisma(2) = (0.5d0-xibig(2))*2
       endif
 
-      write(*,*) 'setcnstr_trian: nel = ', nel
+      write(*,*) 'setcnstr_trian_iso_hdiv: nel = ', nel
 c
 c  ...find small shape functions at this point:
 c     call shapeQt(xisma,(/1,1,1,nord/), nrdofQ,shapsma(1:MAXtriaQ,1))
@@ -267,9 +271,9 @@ c  .....initiate value of the linear combination:
       enddo
       enddo
 c
-       write(*,*) 'setcnstr_trian: CONTINUE ?(1/0)'
-       read(*,*) ians
+      write(*,*) 'setcnstr_trian_iso_hdiv: CONTINUE ?(1/0)'
+      read(*,*) ians
 c
-       if (ians.eq.1) go to 777
+      if (ians.eq.1) go to 777
 c
-       end subroutine setcnstr_trian_iso_hdiv
+      end subroutine setcnstr_trian_iso_hdiv
