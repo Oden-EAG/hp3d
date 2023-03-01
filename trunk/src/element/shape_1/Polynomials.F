@@ -37,11 +37,11 @@ c
       integer,          intent(in)  ::                             Nord
       double precision, intent(in)  ::                              X,T
       double precision, intent(out) ::                        P(0:Nord)
-      integer ::                                               i,iprint
+      integer ::                                                      i
       double precision ::                                          tt,y
 c
 #if DEBUG_MODE
-      iprint=0
+      integer :: iprint=0
 #endif
 c
 c  ...i stands for the order of the polynomial, stored in P(i)
@@ -116,8 +116,7 @@ c
       double precision ::                              ptemp(0:Nord),tt
 c
 #if DEBUG_MODE
-      integer :: iprint
-      iprint=0
+      integer :: iprint=0
 #endif
 c
 c  ...calling Legendre for required information
@@ -199,7 +198,7 @@ c
       integer,          intent(in)  ::                    Nord,Minalpha
       double precision, intent(in)  ::                              X,T
       double precision, intent(out) ::                 P(0:Nord,0:Nord)
-      integer :: minI,maxI,i,ni,a,aa,al,ai,bi,ci,di,iprint,alpha(0:Nord)
+      integer ::       minI,maxI,i,ni,a,aa,al,ai,bi,ci,di,alpha(0:Nord)
       double precision ::                                          y,tt
 c
 c  ...clearly (minI,maxI)=(0,Nord), but the syntax is written as it is
@@ -207,7 +206,7 @@ c     because it reflects how the indexing is called from outside
       minI = 0; maxI = minI+Nord
 c
 #if DEBUG_MODE
-      iprint = 0
+      integer :: iprint=0
 #endif
 c  ...in our work Minalpha>=1
       if (Minalpha.lt.1) then
@@ -305,12 +304,12 @@ c
       double precision, intent(in)  ::                              X,T
       double precision, intent(out) ::                 L(1:Nord,1:Nord),
      .                            P(1:Nord,0:Nord-1),R(1:Nord,0:Nord-1)
-      integer ::             minI,maxI,i,ni,a,al,tia,tiam1,tiam2,iprint,
+      integer ::                    minI,maxI,i,ni,a,al,tia,tiam1,tiam2,
      .                                                    alpha(1:Nord)
       double precision ::            ai,bi,ci,tt,ptemp(1:Nord+1,0:Nord)
 c
 #if DEBUG_MODE
-      iprint=0
+      integer :: iprint=0
 #endif
 c
 c  ...clearly (minI,maxI)=(1,Nord), but the syntax is written as it is

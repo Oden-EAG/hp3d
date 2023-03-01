@@ -37,7 +37,7 @@ c
       implicit none
       integer, intent(in)  :: Nord(5),NoriE(4),Nsize(2)
       integer, intent(out) :: NrdofH
-      integer :: iprint,N,m,v,e,i,j,nordE,ndofE,nordF(2),ndofF
+      integer :: N,m,v,e,i,j,nordE,ndofE,nordF(2),ndofF
       integer :: minI,minJ,maxI,maxJ
       logical :: IdecE,IdecF(2)
       double precision, intent(in)  :: Xi(2)
@@ -52,8 +52,10 @@ c
       double precision :: phiQuad(2:Nsize(1),2:Nsize(1))
       double precision :: DphiQuad(2,2:Nsize(1),2:Nsize(1))
 c
+#if DEBUG_MODE
 c  ...debugging flag
-      iprint=0
+      integer :: iprint=0
+#endif
 c
 c  ...spatial dimensions
       N=2
@@ -131,6 +133,7 @@ c
 c  ...give total degrees of freedom
       NrdofH = m
 c
+#if DEBUG_MODE
 c  ...print this when debugging
       if (iprint.eq.1) then
         write(*,7001) Xi(1:2),Nord(1:5),NoriE(1:4)
@@ -165,6 +168,7 @@ c  ...print this when debugging
         endif
         call pause
       endif
+#endif
 c
       end subroutine shape2DHQuad
 c
@@ -202,7 +206,7 @@ c
       implicit none
       integer, intent(in)  :: Nord(5),NoriE(4),Nsize(2)
       integer, intent(out) :: NrdofE
-      integer :: iprint,N,m,e,i,j,ij(2),ig,jg,nordE,ndofE,a,b,ab(2),fam
+      integer :: N,m,e,i,j,ij(2),ig,jg,nordE,ndofE,a,b,ab(2),fam
       integer :: nordF(2),ndofF(0:1),minI,maxI,minF(2),maxF(2)
       logical :: IdecE,IdecF(2)
       double precision, intent(in)  :: Xi(2)
@@ -216,8 +220,10 @@ c
       double precision :: EQuad(2,0:Nsize(1)-1,2:Nsize(1))
       double precision :: curlEQuad(0:Nsize(1)-1,2:Nsize(1))
 c
+#if DEBUG_MODE
 c  ...debugging flag
-      iprint=0
+      integer :: iprint=0
+#endif
 c
 c  ...spatial dimensions
       N=2
@@ -296,6 +302,7 @@ c
 c  ...give total degrees of freedom
       NrdofE = m
 c
+#if DEBUG_MODE
 c  ...print this when debugging
       if (iprint.eq.1) then
         write(*,7001) Xi(1:2),Nord(1:5),NoriE(1:4)
@@ -331,6 +338,7 @@ c  ...print this when debugging
         endif
         call pause
       endif
+#endif
 c
       end subroutine shape2DEQuad
 c
@@ -368,15 +376,16 @@ c
       implicit none
       integer, intent(in)  :: Nord(5),NoriE(4),Nsize(2)
       integer, intent(out) :: NrdofV
-      integer :: iprint,m,j,e,ndofE,nordF(2),ndofF(0:1)
+      integer :: m,j,e,ndofE,nordF(2),ndofF(0:1)
       double precision, intent(in)  :: Xi(2)
       double precision, intent(out) :: ShapV(2,Nsize(2))
       double precision, intent(out) :: DivV(Nsize(2))
       double precision :: shapE(2,Nsize(2))
-
 c
+#if DEBUG_MODE
 c  ...debugging flag
-      iprint=0
+      integer :: iprint=0
+#endif
 c
 c  ...compute H(curl) shape functions
 c  ...remember that NrdofE = NrdofV, div(V) = curl(E)
@@ -388,6 +397,7 @@ c  ...'rotate' shape functions
         ShapV(2,m) = -shapE(1,m)
       end do
 c
+#if DEBUG_MODE
 c  ...print this when debugging
       if (iprint.eq.1) then
         write(*,7001) Xi(1:2),Nord(1:5),NoriE(1:4)
@@ -420,6 +430,7 @@ c  ...print this when debugging
         endif
         call pause
       endif
+#endif
 c
       end subroutine shape2DVQuad
 c
@@ -454,15 +465,17 @@ c
       implicit none
       integer, intent(in)  :: Nord(5),Nsize(2)
       integer, intent(out) :: NrdofQ
-      integer :: iprint,i,j,m,N,nordF(2),ndofF
+      integer :: i,j,m,N,nordF(2),ndofF
       integer :: minI,minJ,maxI,maxJ
       double precision, intent(in)  :: Xi(2)
       double precision, intent(out) :: ShapQ(Nsize(2))
       double precision :: Mu(0:1,2),DMu(2,0:1,2)
       double precision :: homP(2,0:Nsize(1)-1)
 c
+#if DEBUG_MODE
 c  ...debugging flag
-      iprint=0
+      integer :: iprint=0
+#endif
 c
 c  ...spatial dimensions
       N=2
@@ -497,6 +510,7 @@ c
 c  ...give total degrees of freedom
       NrdofQ = m
 c
+#if DEBUG_MODE
 c  ...print this when debugging
       if (iprint.eq.1) then
         write(*,7001) Xi(1:2),Nord(5)
@@ -512,6 +526,7 @@ c  ...print this when debugging
         endif
         call pause
       endif
+#endif
 c
       end subroutine shape2DQQuad
 c
