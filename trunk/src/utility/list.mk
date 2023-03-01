@@ -4,7 +4,6 @@ decode.F90
 decode_order.F
 decode2.F
 decodg.F
-display_act_elem.F90
 dot_product.F90
 dumpout.F90
 encod.F
@@ -12,13 +11,10 @@ encodg.F
 encode_order.F
 fact.F90
 int2str.F90
-keep_time.F90
 locate.F90
 locate_char.F
 pause.F90
-print.F
 real_imag.F90
 sort.F
 sortm.F
-str2int.F90
 0
