@@ -185,6 +185,8 @@ contains
       case(MDLN); kref_kind = TETRA_REF(I)
       case(MDLP); kref_kind = PRISM_REF(I)
       case(MDLD); kref_kind = PYRAM_REF(I)
+      case default
+        write(*,*) 'kref_kind'; stop
     end select
   end function kref_kind
 !
@@ -210,6 +212,8 @@ contains
     case(MDLN); npar_ref = TETRA_PAR(J,Nson,Iref1,Iref2)
     case(MDLP); npar_ref = PRISM_PAR(J,Nson,Iref1,Iref2)
     case(MDLD); npar_ref = PYRAM_PAR(J,Nson,Iref1,Iref2)
+    case default
+      write(*,*) 'npar_ref'; stop
     end select
     !
   end function npar_ref
@@ -223,6 +227,8 @@ contains
     case(MDLN); nson_ref = TETRA_SON(J,Nson,Iref1,Iref2)
     case(MDLP); nson_ref = PRISM_SON(J,Nson,Iref1,Iref2)
     case(MDLD); nson_ref = PYRAM_SON(J,Nson,Iref1,Iref2)
+    case default
+      write(*,*) 'nson_ref'; stop
     end select
     !
   end function nson_ref
@@ -237,6 +243,8 @@ contains
     case(MDLN); nort_ref = TETRA_ORT(J,Nson,Iref1,Iref2)
     case(MDLP); nort_ref = PRISM_ORT(J,Nson,Iref1,Iref2)
     case(MDLD); nort_ref = PYRAM_ORT(J,Nson,Iref1,Iref2)
+    case default
+      write(*,*) 'nort_ref'; stop
     end select
     !
   end function nort_ref

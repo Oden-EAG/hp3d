@@ -314,6 +314,8 @@ c
       case (MDLB); Ivtk_type = 12
       case (MDLP); Ivtk_type = 13
       case (MDLD); Ivtk_type = 14
+      case default
+          write(*,*) 'Ivtk_type'; stop
       end select
 c
       end function Ivtk_type
@@ -334,6 +336,8 @@ c
       case (MDLB); Ixdmf_type = 9
       case (MDLP); Ixdmf_type = 8
       case (MDLD); Ixdmf_type = 7
+      case default
+          write(*,*) 'Ixdmf_type'; stop
       end select
 c
       end function Ixdmf_type
@@ -352,6 +356,8 @@ c
         case (5,6,7, 8,9,10); Type_nod = MEDG
         case (11,12,13,14);   Type_nod = MDLT
         case (15);            Type_nod = MDLN
+        case default
+          write(*,*) 'Type_nod'; stop
         end select
       case (MDLP)
         select case(J)
@@ -360,6 +366,8 @@ c
         case (16,17);                      Type_nod = MDLT
         case (18,19,20);                   Type_nod = MDLQ
         case (21);                         Type_nod = MDLP
+        case default
+          write(*,*) 'Type_nod'; stop
         end select
       case (MDLB)
         select case(J)
@@ -368,6 +376,8 @@ c
           Type_nod = MEDG
         case (21,22,23,24,25,26);          Type_nod = MDLQ
         case (27);                         Type_nod = MDLB
+        case default
+          write(*,*) 'Type_nod'; stop
         end select
       case (MDLD)
         select case(J)
@@ -376,10 +386,12 @@ c
         case (14);                   Type_nod = MDLQ
         case (15,16,17,18);          Type_nod = MDLT
         case (19);                   Type_nod = MDLD
+        case default
+          write(*,*) 'Type_nod'; stop
         end select
       case default
         write(*,*) 'Type_nod: wrong input type [',S_Type(Ntype),']'
-        stop 1
+        stop
       end select
 c
       end function Type_nod
@@ -393,13 +405,15 @@ c
       integer Nvert
 c
       select case(Ntype)
-      case(MEDG); Nvert=2
-      case(MDLT,TRIA); Nvert=3
-      case(MDLQ,QUAD); Nvert=4
-      case(MDLB,BRIC); Nvert=8
-      case(MDLP,PRIS); Nvert=6
-      case(MDLN,TETR); Nvert=4
-      case(MDLD,PYRA); Nvert=5
+        case(MEDG)     ; Nvert=2
+        case(MDLT,TRIA); Nvert=3
+        case(MDLQ,QUAD); Nvert=4
+        case(MDLB,BRIC); Nvert=8
+        case(MDLP,PRIS); Nvert=6
+        case(MDLN,TETR); Nvert=4
+        case(MDLD,PYRA); Nvert=5
+        case default
+          write(*,*) 'Nvert'; stop
       end select
 c
       end function Nvert
@@ -413,13 +427,15 @@ c
       integer Nedge
 c
       select case(Ntype)
-      case(MEDG); Nedge=0
-      case(MDLT,TRIA); Nedge=3
-      case(MDLQ,QUAD); Nedge=4
-      case(MDLB,BRIC); Nedge=12
-      case(MDLP,PRIS); Nedge=9
-      case(MDLN,TETR); Nedge=6
-      case(MDLD,PYRA); Nedge=8
+        case(MEDG)     ; Nedge=0
+        case(MDLT,TRIA); Nedge=3
+        case(MDLQ,QUAD); Nedge=4
+        case(MDLB,BRIC); Nedge=12
+        case(MDLP,PRIS); Nedge=9
+        case(MDLN,TETR); Nedge=6
+        case(MDLD,PYRA); Nedge=8
+        case default
+          write(*,*) 'Nedge'; stop
       end select
 c
       end function Nedge
@@ -433,10 +449,12 @@ c
       integer Nface
 c
       select case(Ntype)
-      case(MDLB,BRIC); Nface=6
-      case(MDLP,PRIS); Nface=5
-      case(MDLN,TETR); Nface=4
-      case(MDLD,PYRA); Nface=5
+        case(MDLB,BRIC); Nface=6
+        case(MDLP,PRIS); Nface=5
+        case(MDLN,TETR); Nface=4
+        case(MDLD,PYRA); Nface=5
+        case default
+          write(*,*) 'Nface'; stop
       end select
 c
       end function Nface
@@ -638,6 +656,8 @@ c
         n1 = PYRAM_EDGE_TO_VERT(1,Ie);  n2 = PYRAM_EDGE_TO_VERT(2,Ie)
         xi1(1:3) = PYRAM_COORD(1:3,n1); xi2(1:3) = PYRAM_COORD(1:3,n2)
         nvar=3
+      case default
+        write(*,*) 'edge_param'; stop
       end select
 c
       Dxidt(1:nvar) = xi2(1:nvar) - xi1(1:nvar)
@@ -722,6 +742,8 @@ c
           Nsign_param=-1
         case(2,3,4)
           Nsign_param= 1
+        case default
+          write(*,*) 'Nsign_param'; stop
         end select
       case(MDLB,BRIC)
         select case(Iface)
@@ -729,6 +751,8 @@ c
           Nsign_param=-1
         case(2,3,4)
           Nsign_param= 1
+        case default
+          write(*,*) 'Nsign_param'; stop
         end select
       case(MDLN,TETR)
         select case(Iface)
@@ -736,6 +760,8 @@ c
           Nsign_param=-1
         case(2,3)
           Nsign_param= 1
+        case default
+          write(*,*) 'Nsign_param'; stop
         end select
       case(MDLD,PYRA)
         select case(Iface)
@@ -743,7 +769,11 @@ c
           Nsign_param=-1
         case(2,3)
           Nsign_param= 1
+        case default
+          write(*,*) 'Nsign_param'; stop
         end select
+      case default
+        write(*,*) 'Nsign_param'; stop
       end select
 c
       end function Nsign_param
@@ -757,20 +787,26 @@ c
       integer :: Ntype,Iface
 c
       select case(Ntype)
-      case(MDLP,PRIS)
-        select case(Iface)
-          case(1,2);   Face_type = TRIA
-          case(3,4,5); Face_type = RECT
-        end select
-      case(MDLB,BRIC)
-        Face_type = RECT
-      case(MDLN,TETR)
-        Face_type = TRIA
-      case(MDLD,PYRA)
-        select case(Iface)
-          case(1); Face_type = RECT
-          case(2,3,4,5); Face_type = TRIA
-        end select
+        case(MDLP,PRIS)
+          select case(Iface)
+            case(1,2)  ; Face_type = TRIA
+            case(3,4,5); Face_type = RECT
+            case default
+               write(*,*) 'Face_type'; stop
+          end select
+        case(MDLB,BRIC)
+          Face_type = RECT
+        case(MDLN,TETR)
+          Face_type = TRIA
+        case(MDLD,PYRA)
+          select case(Iface)
+            case(1)      ; Face_type = RECT
+            case(2,3,4,5); Face_type = TRIA
+            case default
+               write(*,*) 'Face_type'; stop
+          end select
+        case default
+          write(*,*) 'Face_type'; stop
       end select
 c
       end function Face_type

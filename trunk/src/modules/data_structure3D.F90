@@ -824,6 +824,8 @@ module data_structure3D
          enddo
          call mixed_product(a(1:3,1), a(1:3,2), a(1:3,3), val)
          Is_right_handed = (val > 0.d0)
+      case default
+         write(*,*) 'Is_right_handed'; stop
       end select
       end function Is_right_handed
 !
