@@ -1,3 +1,5 @@
+#if DEBUG_MODE
+
 subroutine check_invmap
 !
 !--------------------------------------------------------------------------
@@ -172,3 +174,5 @@ subroutine check_invmap
 !
 !
 end subroutine check_invmap
+
+#endif
