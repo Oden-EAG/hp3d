@@ -30,14 +30,18 @@ c
      .     NR_EDGES,NEDGC,NEDG_CONS,NR_FACES,NFACEC,NFACE_CONS,
      .     SON_NUM,FATH_TYPE,FATH_ORIENT,FATH_NODES,
      .     rotate_edge_nodes,rotate_trian_nodes,rotate_quadr_nodes
-#include "syscom.blk"
+c
+      implicit none
 c
       integer, intent(in)  :: Mdle
       integer, intent(out) :: Nodesl(27),Norientl(27)
 c
-c  ...face edge and vertex numbers etc
+c  ...miscellanea
+      integer :: jef(4),jvf(4),kref_face(6)
       integer :: ntype,ftype,stype,nfath
-      integer :: if, ireff, is1, jef(4), jvf(4), kref_face(6)
+      integer :: i,ie,ifc,is,is1,j,je,jp,jv,jv1,jv2,loc
+      integer :: iref,ireff,iref1,iref2,iref3,iref_fath
+      integer :: nef,nff,nvf,nod,nodp,nort,nrn,nson
 c
 #if DEBUG_MODE
       integer :: iprint
@@ -152,19 +156,19 @@ c  .......parent face node
           elseif (jp.le.nvf+nef+nff) then
 c
 c  .........local refinement flag for the face
-            if = jp-nvf-nef
-            iref = kref_face(if)
+            ifc = jp-nvf-nef
+            iref = kref_face(ifc)
 c
 c  .........global refinement flag for the face
             ireff = NODES(nodp)%ref_kind
 c
 c  .........face edge and vertex nodes numbers
-            call face_to_edge(ftype,if, jef(1),jef(2),jef(3),jef(4))
-            call face_to_vert(ftype,if, jvf(1),jvf(2),jvf(3),jvf(4))
+            call face_to_edge(ftype,ifc, jef(1),jef(2),jef(3),jef(4))
+            call face_to_vert(ftype,ifc, jvf(1),jvf(2),jvf(3),jvf(4))
 #if DEBUG_MODE
             if (iprint.eq.1) then
-              write(*,7100) j,jp,if,iref,ireff
- 7100         format('get_connect_info: j,jp,if,iref,ireff = ',5i4)
+              write(*,7100) j,jp,ifc,iref,ireff
+ 7100         format('get_connect_info: j,jp,ifc,iref,ireff = ',5i4)
             endif
 #endif
 c
@@ -304,7 +308,7 @@ c   routine name       - modify_face_info
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - May 10
+c   latest revision    - Feb 2023
 c
 c   purpose            - a subsidiary of get_connect_info, routine
 c                        modifies the data base for a constraining
@@ -329,19 +333,29 @@ c
       use data_structure3D
       use refinements
       use constrained_nodes
-#include "syscom.blk"
 c
-      integer, parameter, dimension(1:2,0:1) :: ie_no
+      implicit none
+c
+      integer, intent(in)  :: Nodp,Is,Is1
+      integer, intent(out) :: Nodc
+c
+      integer :: ifc,i,ie,ie1,iec,ise,iv,jv,loc,loc1
+      integer :: medge,nson,nvoid,nvt
+c
+      integer, parameter :: ie_no(1:2,0:1)
      .  = reshape( (/1,3, 4,2/) , (/2,2/) )
 c
       integer, external :: imod
 ccc      imod(j,mod) = j-(j-1)/mod*mod
 c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
       if (iprint.eq.1) then
         write(*,7001) Nodp,Is,Is1
  7001   format('modify_face_info: Nodp,Is,Is1 = ',i5,2i3)
       endif
+#endif
 c
       call locate(Nodp, NFACEC,NR_FACES,ifc)
       if (ifc.eq.0) then

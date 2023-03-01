@@ -24,7 +24,8 @@ c
       use element_data
       use data_structure3D
       use constrained_nodes
-#include "syscom.blk"
+c
+      implicit none
 c
       integer, intent(in) :: Mdle
       integer, intent(in) :: Nodesl(27)
@@ -33,12 +34,10 @@ c  ...element type
       integer :: ntype
 c
 c  ...miscellanea
-      integer :: j,nrnodl,nod,nc,icase
-      integer :: iprint
+      integer :: icase,ie,ip,iv,j,jv
+      integer :: nrnodl,nod,nodp,nc,nce,nvoid
 c
 c----------------------------------------------------------------------
-c
-      iprint = 0
 c
       ntype = NODES(Mdle)%ntype
 c
@@ -284,14 +283,17 @@ c
       integer, intent(in) :: Nod
 c
       integer :: nfath
-      integer :: iprint
 c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
+c
       if (iprint.eq.1) then
         write(*,7001) Nod
  7001   format('flag: Nod = ',i7)
         call pause
       endif
+#endif
 c
       nfath = NODES(nod)%father
       do while(nfath.gt.0)

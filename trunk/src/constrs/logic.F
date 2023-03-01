@@ -10,7 +10,6 @@ c   purpose            - routine establishes list of nodes
 c                        for a modified element, and the corresponding
 c                        constraints coefficients
 c   remark: this routine must be OMP thread-safe
-c   TODO: convert to F90, use DEBUG_MODE flag for iprint statements
 c
 c   arguments :
 c     in:
@@ -49,7 +48,8 @@ c
       use data_structure3D
       use constrained_nodes
       use refinements
-#include "syscom.blk"
+c
+      implicit none
 c
       integer, intent(in)  :: Mdle,Idec
 c
@@ -58,6 +58,8 @@ c
       integer, intent(out) :: NdofmH(MAXNODM),
      .                        NdofmE(MAXNODM),
      .                        NdofmV(MAXNODM)
+c
+      integer, intent(out) :: Nrnodm
 c
       integer, intent(out) :: NrconH(MAXbrickH),
      .                        NrconE(MAXbrickE),
@@ -111,7 +113,15 @@ c  ...H(div) constrained approximation flag
       logical :: CONSTRAINED_HDIV = .TRUE.
 c
 c  ...miscellanea
-      integer :: icH,icE,icV,nod,im,kH,kE,kV,j,nc,icase
+      integer :: i,ie,ip,iref,is,ish,isv,iv,ivp,jp,k,kp
+      integer :: icH,icE,icV,im,kH,kE,kV,j,icase
+      integer :: kEtot,l,lh,loc,lp,lph,lpv,lv
+      integer :: nc,nce,nfath,nod,nodp,nordh,nordv,np,nrnodes,nvoid
+      integer :: ndofE,ndofEh,ndofEv
+      integer :: ndofH,ndofHh,ndofHv
+      integer :: ndofV,ndofQ,ndofHpp
+      integer :: nrdofH,nrdofE,nrdofV,nrdofQ
+      integer :: nrdofH_loc,nrdofE_loc,nrdofV_loc
 c
 #if DEBUG_MODE
       integer :: iprint

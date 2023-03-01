@@ -28,7 +28,8 @@ c
       use element_data
       use data_structure3D
       use constrained_nodes
-#include "syscom.blk"
+c
+      implicit none
 c
       integer, intent(in)  :: Mdle
       integer, intent(in)  :: Nodesl(27)
@@ -42,7 +43,8 @@ c  ...local lists of nodes
       integer :: list_v(16),list_e(24),list_f(12)
 c
 c  ...miscellanea
-      integer :: iv,icv,ice,icf,nod,nodp,nc,nce,icase,j,nrnodl
+      integer :: ie,ip,iv,jv,icv,ice,icf,icase,j
+      integer :: nvoid,nrnodl,nod,nodp,nc,nce
 c
 #if DEBUG_MODE
       integer :: iprint
