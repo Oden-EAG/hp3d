@@ -14,6 +14,6 @@ locate_char.F90
 locate.F90
 pause.F90
 real_imag.F90
-sort.F
-sortm.F
+sort.F90
+sortm.F90
 0
