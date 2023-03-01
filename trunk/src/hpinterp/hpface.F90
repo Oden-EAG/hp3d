@@ -81,13 +81,19 @@
   real(8), dimension(MAXmdlqH,3)        :: bb,uu
 !
 ! misc work space
-  integer :: iprint,nrv,nre,nrf,i,j,k,ie,kj,ki,&
+  integer :: nrv,nre,nrf,i,j,k,ie,kj,ki,&
              ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,nsign
 !
+#if DEBUG_MODE
+! debug printing flag
+  integer :: iprint = 0
+#endif
+!
 !-----------------------------------------------------------------------
-  iprint=0
 !
   nrv = nvert(Ntype); nre = nedge(Ntype); nrf = nface(Ntype)
+!
+#if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Iface,S_Type(Ntype)
 7010 format('hpface: Mdle,Iflag,No,Iface,Type = ',4i4,2x,a4)
@@ -101,6 +107,7 @@
 7050 format('        Norder = ',19i4)
      call pause
   endif
+#endif
 !
 ! determine # of dof for the face node
   call ndof_nod(face_type(Ntype,Iface),Norder(nre+Iface), &
@@ -115,10 +122,13 @@
     norder_1(ie) = Norder(ie)
   enddo
   norder_1(nre+Iface) = Norder(nre+Iface)
+!
+#if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,7060) norder_1; call pause
 7060 format('hpface: norder_1 = ',20i4)
   endif
+#endif
 !
 ! get face order to find out quadrature information
   call face_order(Ntype,Iface,Norder, norder_face)
@@ -223,6 +233,7 @@
 ! end of loop through integration points
   enddo
 !
+#if DEBUG_MODE
   if (iprint.eq.1) then
     write(*,*) 'hpface: LOAD VECTOR AND STIFFNESS MATRIX FOR ', &
                'ndofH_face = ',ndofH_face
@@ -233,6 +244,7 @@
 7015    format(i5, 10e12.5)
 7016    format(10e12.5)
   endif
+#endif
 !
 !-----------------------------------------------------------------------
 !
@@ -254,6 +266,7 @@
   call dtrsm('L','L','N','U',ndofH_face,3,1.d0,aaH,naH, uu,naH)
   call dtrsm('L','U','N','N',ndofH_face,3,1.d0,aaH,naH, uu,naH)
 !
+#if DEBUG_MODE
   if (iprint.eq.1) then
    write(*,*) 'hpface: k,uu(k) = '
    do k=1,ndofH_face
@@ -261,6 +274,7 @@
    enddo
    call pause
   endif
+#endif
 !
 ! save the dof
   do i=1,3

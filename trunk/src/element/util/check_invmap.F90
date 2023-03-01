@@ -33,8 +33,7 @@ subroutine check_invmap
       real(8),dimension(  MAXquadH)  :: wt
 !
       real(8), parameter :: eps=1.d-10
-      integer :: iprint_invmap,iprint
-      common /cinvmap/ iprint_invmap
+      integer :: iprint
 !
 !--------------------------------------------------------------------------
 !

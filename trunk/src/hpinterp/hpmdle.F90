@@ -71,13 +71,19 @@
   real(8), dimension(MAXmdlbH,3)        :: bb,uu
 !
 ! misc work space
-  integer :: iprint,nrv,nre,nrf,i,j,k,kj,ki,&
+  integer :: nrv,nre,nrf,i,j,k,kj,ki,&
              ndofH_mdle,ndofE_mdle,ndofV_mdle,ndofQ_Mdle,iflag1
 !
+#if DEBUG_MODE
+! debug printing flag
+  integer :: iprint = 0
+#endif
+!
 !-----------------------------------------------------------------------
-  iprint=0
 !
   nrv = nvert(Ntype); nre = nedge(Ntype); nrf = nface(Ntype)
+!
+#if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,S_Type(Ntype)
 7010 format('hpmdle: Mdle,Iflag,No,Type = ',3i4,2x,a4)
@@ -91,6 +97,7 @@
 7050 format('        Norder = ',19i4)
      call pause
   endif
+#endif
 !
 ! determine # of dof for the mdle node
   call ndof_nod(Ntype,Norder(nre+nrf+1), &
@@ -190,6 +197,7 @@
 ! end of loop through integration points
   enddo
 !
+#if DEBUG_MODE
   if (iprint.eq.1) then
     write(*,*) 'hpmdle: LOAD VECTOR AND STIFFNESS MATRIX FOR ', &
                'ndofH_mdle = ',ndofH_mdle
@@ -200,6 +208,7 @@
 7015    format(i5, 10e12.5)
 7016    format(10e12.5)
   endif
+#endif
 !
 !-----------------------------------------------------------------------
 !
@@ -219,6 +228,7 @@
   call dtrsm('L','L','N','U',ndofH_mdle,3,1.d0,aaH,naH, uu,naH)
   call dtrsm('L','U','N','N',ndofH_mdle,3,1.d0,aaH,naH, uu,naH)
 !
+#if DEBUG_MODE
   if (iprint.eq.1) then
    write(*,*) 'hpmdle: k,uu(k) = '
    do k=1,ndofH_mdle
@@ -226,6 +236,7 @@
    enddo
    call pause
   endif
+#endif
 !
 ! save the dof
   do i=1,3
