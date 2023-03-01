@@ -1,8 +1,10 @@
+#if DEBUG_MODE
+
 !-----------------------------------------------------------------------
 !> Purpose : routine employs the greedy strategy to performe adaptive
 !!           h-refinements
 !!
-!> @param[in] Idom  - target domain, if 0, exmaine all elements
+!> @param[in] Idom  - target domain, if 0, examine all elements
 !> @param[in] H     - control element size
 !> rev@Dec 13
 !-----------------------------------------------------------------------
@@ -57,3 +59,5 @@ subroutine adapt_mesh_size(Idom,Hmax)
   end do
   !
 end subroutine adapt_mesh_size
+
+#endif
