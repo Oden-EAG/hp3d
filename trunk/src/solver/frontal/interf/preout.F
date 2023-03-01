@@ -4,7 +4,7 @@ c   routine name       - preout
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - May 10
+c   latest revision    - Feb 2023
 c
 c   purpose            - an interface routine with frontal solver,
 c                        for an element "nel" routine stores the
@@ -19,26 +19,30 @@ c             Ib       - the element destination vectors
 c
 c----------------------------------------------------------------------
 c
-      subroutine preout(Iel, N,Ia,Ib)
+      subroutine preout(Iel,N,Ia,Ib)
 c
       use frsolmod , ONLY: IDESVE, NDESVE, NPDESV
 c
-#include "syscom.blk"
+      implicit none
 c
-      dimension Ib(*),Ia(*)
-      save iel_last
+      integer, intent(in) :: Iel,N
+      integer, intent(in) :: Ib(*),Ia(*)
 c
-      if (Iel.eq.12986) then
-        iprint=0
-      else
-        iprint=0
-      endif
+      integer, save :: iel_last
+c
+      integer :: i,np
+c
+#if DEBUG_MODE
+      integer :: iprint
+      iprint = 0
+c
       if (iprint.eq.1) then
         write(*,*) 'preout: Iel, N, iel_last',
-     .              Iel,N,Iel_last
+     .                      Iel, N, iel_last
       endif
+#endif
 c
-c  ...check if no element has been skipped (may occur with wierd
+c  ...check if no element has been skipped (may occur with weird
 c     geometry and/or BC's)
       if ((Iel.gt.1).and.(Iel.ne.iel_last+1)) then
         write(*,7002) Iel
@@ -55,14 +59,16 @@ c
         IDESVE(NPDESV)=Ib(i)
         NPDESV = NPDESV + 1
       enddo
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7001) Iel, (Ib(i),i=1,N)
  7001   format('preout: DEST VECTORS FOR iel = ',i8,
      .         10(/,10i10))
         call pause
       endif
+#endif
 c
       iel_last = Iel
 c
 c
-      end
+      end subroutine preout

@@ -4,7 +4,7 @@ c   routine name       - solin2
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Aug 2018
+c   latest revision    - Feb 2023
 c
 c   purpose            - an interface routine for the frontal solver
 c                        returning for an element its stiffness matrix
@@ -13,33 +13,43 @@ c
 c   arguments :
 c     in:
 c             Iel      - sequential element number
+c             Mdum
+c             Ifg
+c             Nrhs0
+c             Mdest
 c     out:
 c             Zalhs    - stiffness matrix
 c             Zarhs    - load vector
 c
 c----------------------------------------------------------------------
-c
+#include "typedefs.h"
       subroutine solin2(Iel,Mdum,Ifg,Nrhs0,Mdest, Zalhs,Zarhs)
 c
-      use control, only: ISTC_FLAG
-      use physics , only: NR_PHYSA
-      use data_structure3D , only: MAXNODM
+      use control         , only: ISTC_FLAG
+      use physics         , only: NR_PHYSA
+      use data_structure3D, only: MAXNODM
       use frsolmod
-#include "syscom.blk"
+      implicit none
 c
-      dimension Zalhs(*),Zarhs(*)
+      integer, intent(in)  :: Iel,Mdum,Ifg,Nrhs0,Mdest
+      VTYPE  , intent(out) :: Zalhs(*),Zarhs(*)
 c
 c  ...nodes for a modified element and the corresponding number
 c     of H1,H(curl),H(div) and L2 dof
-      dimension nodm(MAXNODM),ndofmH(MAXNODM),ndofmE(MAXNODM),
-     .                        ndofmV(MAXNODM),ndofmQ(MAXNODM)
+      integer :: nodm(MAXNODM),ndofmH(MAXNODM),ndofmE(MAXNODM),
+     .                         ndofmV(MAXNODM),ndofmQ(MAXNODM)
 c
 c  ...number of variables for each physics attribute for an element
-      dimension nrdofs(NR_PHYSA)
+      integer :: nrdofs(NR_PHYSA)
+c
+      integer :: mdle,i,nrdofm,nrdofc,nrnodm
+c
+#if DEBUG_MODE
+      integer :: iprint
+      iprint=0
+#endif
 c
 c---------------------------------------------------------------------
-c
-      iprint=0
 c
       if (REORDER) then
 c
@@ -54,10 +64,12 @@ c  .....find the element number using the standard ordering of elements
         enddo
       endif
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7001) Iel,mdle
  7001   format('solin2: Iel,mdle = ',i8,i10)
       endif
+#endif
 c
 c  ...evaluate the element load vector and stiffness matrix
       if (ISTC_FLAG) then
@@ -71,12 +83,14 @@ c  ...evaluate the element load vector and stiffness matrix
      .           nodm,ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,
      .           Zarhs,Zalhs)
       endif
-
 c
-ccc      write(*,*)'Element',mdle,'RHS'
-ccc      do ii=1,nrdofc
-ccc        if(abs(Zarhs(ii)).gt.1.d-8)then
-ccc        endif
-ccc      enddo
-c
-      end
+#if DEBUG_MODE
+      if (iprint.eq.1) then
+         write(*,*)'Element',mdle,'RHS'
+         do i=1,nrdofc
+           if(abs(Zarhs(i)).gt.1.d-8)then
+           endif
+         enddo
+      endif
+#endif
+      end subroutine solin2
