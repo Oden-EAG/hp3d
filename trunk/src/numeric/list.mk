@@ -5,7 +5,7 @@ convert.F90
 cross_product_module.F90
 gausse.F
 invert.F90
-isgn.F
+isgn.F90
 legendre.F90
 rhsub.F
 tri.F
