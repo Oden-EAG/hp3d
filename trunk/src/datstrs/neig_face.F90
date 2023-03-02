@@ -46,8 +46,11 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
   integer, dimension(27)     :: nodesl, norientl, nodesl_is, norientl_is
   integer, dimension(MAXGEN) :: nface_list
   integer, dimension(6)      :: nface_ort
-  integer :: iprint, igen, nrgen, nve, nrf, nod, mdle, mdle_is
+  integer :: igen, nrgen, nve, nrf, nod, mdle, mdle_is
   integer :: kref, i, is, nrsons, iface, iflag
+#if DEBUG_MODE
+  integer :: iprint=0
+#endif
 !------------------------------------------------------------------
 !
 !
@@ -71,7 +74,6 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
 !    2. we look for neighbors among the sons of mdle                    |
 !========================================================================
 !
-  iprint=0
   select case(NODES(Mface)%ntype)
   case(MDLT,MDLQ)
   case default
@@ -81,9 +83,12 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
   end select
 !
   Nrneig=0 ; Neig=0 ; Nsid_list=0 ; Norient_list=0
+!
+#if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,1)Mface,S_Type(NODES(Mface)%ntype)
   endif
+#endif
 !
 !------------------------------------------------------------------------
 !  Step 1 : go UP the tree and record FACE refienement history.         |
@@ -99,21 +104,26 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
 !
 !  ...record number of generations
   nrgen=igen
+!
+#if DEBUG_MODE
   if (iprint.eq.1) then
     do i=1,nrgen
       write(*,9)i,nface_list(i)
 9     format(' neig_face: i,nfather(i) = ',i2,2x,i10)
     enddo
   endif
+#endif
 !
   ! CASE 1 : initial mesh middle node // initial mesh face node
   ! CASE 2 : middle father node       // face node (namely Mface)
              mdle=nod                 ;  nod=nface_list(nrgen)
 !
+#if DEBUG_MODE
    if (iprint.eq.1) then
      write(*,3)nrgen,mdle,nod
 3    format(' neig_face: nrgen,mdle,nod = ',i2,2x,2(i10,2x))
    endif
+#endif
 !
 !..CASE 1 : initial mesh (element) middle node
    if (mdle.lt.0) then
@@ -187,17 +197,21 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
        call result
        stop
      endif
+#if DEBUG_MODE
      if (iprint.eq.1) then
        write(*,4)Nrneig,Neig(1:2)
 4      format(' neig_face: Nrneig,Neig(:) = ',i1,2x,2(i10,2x))
      endif
+#endif
 !
   endif
 !
+#if DEBUG_MODE
   if (iprint.eq.1) then
     write(*,7) Nrneig,Neig(1:Nrneig)
 7   format(' neig_face: neighbors at top level: Nrneig,Neig = ',i1,4x,2(i10,2x))
   endif
+#endif
 !
 !------------------------------------------------------------------------
 !  Step 2: Go down the tree, sticking to the face                       |
@@ -240,12 +254,13 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
         ntype=NODES(Neig(i))%ntype
         kref=NODES(Neig(i))%ref_kind
         call nr_mdle_sons(ntype,kref, nrsons)
-
+#if DEBUG_MODE
         if (iprint.eq.1) then
            write(*,13)i,igen,nod,Neig(i),kref,nrsons
 13         format(' neig_face: i,igen,nod,Neig,kref,nrsons = ',2(i2),2x,2i10,2i3)
            call result
         endif
+#endif
 !
 !    ...loop over sons of Neig(i)
         iflag=0
@@ -268,10 +283,12 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
               nodesl_neig(i,:)  =nodesl_is
               norientl_neig(i,:)=norientl_is
 !
+#if DEBUG_MODE
               if (iprint.eq.1) then
                  write(*,8) i,igen,Neig(i)
 8                format(' neig_face: i,igen,Neig(i) = ',i1,2x,i3,2x,i10)
               endif
+#endif
               exit
            endif
 !    ...end of loop over sons of Neig(i)

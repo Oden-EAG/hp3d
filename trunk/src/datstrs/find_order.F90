@@ -10,21 +10,24 @@ subroutine find_order(Mdle, Norder)
   integer, intent(out), dimension(19) :: Norder
 !
   integer, dimension(27) :: nodesl, norientl
-  integer :: iprint
 !
-  iprint = 0
+#if DEBUG_MODE
+  integer :: iprint = 0
+#endif
 !
   Norder(1:19) = 0
   call elem_nodes(Mdle, nodesl,norientl)
   call find_order_from_list(NODES(Mdle)%Ntype,nodesl, Norder)
 !
+#if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,7001) Mdle,S_Type(NODES(Mdle)%Ntype)
 7001 format('find_order: Mdle = ',i8,' Mdle type = ',a5)
      write(*,7002) Norder(1:19)
 7002 format('find_order: Norder = ',19i4)
   endif
-
+#endif
+!
 end subroutine find_order
 !
 !--------------------------------------------------------------------------
