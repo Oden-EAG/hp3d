@@ -45,8 +45,6 @@ subroutine elem_residual_heat(Mdle,                &
    integer, intent(in)  :: NrdofV
    real(8), intent(out) :: Resid
    integer, intent(out) :: Nref_flag
-!..auxiliary parameter
-   real(8), parameter :: rZERO = 0.d0
 !
 !..declare edge/face type variables
    integer :: etype,ftype

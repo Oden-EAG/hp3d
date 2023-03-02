@@ -69,10 +69,6 @@ subroutine elem_heat(Mdle,                   &
    VTYPE, dimension(MdV,MdH),   intent(out) :: ZalocVH
    VTYPE, dimension(MdV,MdV),   intent(out) :: ZalocVV
 !
-!..auxiliary parameters
-   real(8), parameter :: rZERO = 0.d0
-   real(8), parameter :: rONE  = 1.d0
-!
 !..declare edge/face type variables
    integer :: etype,ftype
 !
@@ -314,7 +310,7 @@ subroutine elem_heat(Mdle,                   &
       rsolH = real(zsolH_soleval(1))
 !
 !  ...coupled Maxwell/Heat problem
-      therm_Load = rZero
+      therm_Load = rZERO
       if(NONLINEAR_FLAG .eq. 1) then
          if (GEOM_NO .ne. 5) then
             write(*,*) 'elem_heat: HEAT coupling GEOM_NO .ne. 5'
