@@ -1601,7 +1601,6 @@ c
 c  UNCONSTRAINED VERSION FOR H(div)
 c
       if (.not.CONSTRAINED_HDIV) then
-        write(*,*) 'executing Paolo'
         call find_order(Mdle, norder)
         call celndof(NODES(Mdle)%ntype,norder,
      .               nrdofH,nrdofE,nrdofV,nrdofQ)

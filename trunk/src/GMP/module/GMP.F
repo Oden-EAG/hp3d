@@ -324,7 +324,7 @@ c
 c     CylRec    : image of a linear rectangle through a global
 c                 system of cylindrical coordinates
 c
-c     CylRec (other) : LEGACY (this also exists as a routine written by Paolo)
+c     CylRec (other) : LEGACY
 c       Idata,Rdata - UNKNOWN
 c
 c     ConfRec : LEGACY
