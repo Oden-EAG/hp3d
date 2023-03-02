@@ -27,14 +27,22 @@
          zdofQ(MAXEQNQ,MAXbrickQ)
 
     real(8) :: dsol, dxi, solmax, solmin, val
-    integer :: iprint, i, j, ivar, loc, iel, idec, iface, nsub
+    integer :: i, j, ivar, loc, iel, idec, iface, nsub
+    !
+#if DEBUG_MODE
+    integer :: iprint=0
+#endif
+    !
     !----------------------------------------
-    iprint=0
+    !
     t = 0.d0; xp = 0.d0; val = 0.d0
+    !
+#if DEBUG_MODE
     if (iprint.eq.1) then
        write(*,*) 'finlimb: Numlev = ',Numlev
        call pause
     endif
+#endif
     ! increment in master element coordinates
     dxi = DX
 
@@ -62,6 +70,7 @@
        call find_orient(mdle, nedge_orient,nface_orient)
        call find_order(mdle, norder)
        call nodcor(mdle, xnod)
+#if DEBUG_MODE
        if (iprint.eq.1) then
           write(*,7002) mdle
 7002      format('finlimb: VERTEX COORDINATES FOR mdle = ',i5)
@@ -71,7 +80,7 @@
           enddo
           call pause
        endif
-
+#endif
        call solelm(mdle, zdofH,zdofE,zdofV,zdofQ)
        call celndof(ntype,norder, &
                     nrdofH,nrdofE,nrdofV,nrdofQ)
@@ -94,13 +103,14 @@
                      xnod, &
                      zdofH,zdofE,zdofV,zdofQ, &
                      t, xp,val)
+#if DEBUG_MODE
                 if (iprint.eq.1) then
                    write(*,7001) mdle,iface,i,j,xp,val
 7001               format('finlimb: mdle,iface,i,j,xp,val = ', &
                         i5,3i2,3f8.3,2x,e12.5)
                    call pause
                 endif
-
+#endif
                 ! update extremes
                 solmax = max(solmax,val)
                 solmin = min(solmin,val)

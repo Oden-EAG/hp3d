@@ -21,17 +21,12 @@ subroutine elem_nodes(Mdle, Nodesl,Norientl)
    integer :: igen,nfath,nod,nson,nrgen,n_nodes,nrsons
 !
 #if DEBUG_MODE
-   integer :: iprint
+   integer :: iprint=0
 #endif
 !
 !-----------------------------------------------------------------------
 !
 #if DEBUG_MODE
-   select case(Mdle)
-      case(196)    ; iprint=0
-      case default ; iprint=0
-   endselect
-!
    if (iprint.eq.1) then
       write(*,*) '------------------------------------------------'
       write(*,*) 'elem_nodes: Collecting ancestors FOR Mdle = ', Mdle

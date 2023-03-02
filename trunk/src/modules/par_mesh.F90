@@ -49,14 +49,15 @@ subroutine distr_mesh()
    integer :: subd_next(NRELES), nodm(MAXNODM), nodesl(27)
    integer :: iel, inod, iproc, mdle, nod, subd, subd_size
    integer :: nrnodm, nrdof_nod
-   integer :: iprint = 0
-!
    real(8) :: MPI_Wtime,start_time,end_time
 !
+#if DEBUG_MODE
+   integer :: iprint = 0
    if (iprint .eq. 1) then
       write(6,100) 'start distr_mesh, DISTRIBUTED = ', DISTRIBUTED
    endif
    100 format(A,L2)
+#endif
 !
 !..1. Determine new partition
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
@@ -112,10 +113,12 @@ subroutine distr_mesh()
 !        ...3e. pack buffer with DOF data
             call pack_dof_buf(nod,nrdof_nod, buf)
 !        ...3f. send buffer to new subdomain
+#if DEBUG_MODE
             if (iprint .eq. 1) then
                write(6,130) '[', RANK, ']: ', &
                   'Sending data to [',subd_next(iel),'], nod = ',nod
             endif
+#endif
             count = nrdof_nod; dest = subd_next(iel); tag = nod
             call MPI_SEND(buf,count,MPI_VTYPE,dest,tag,MPI_COMM_WORLD,ierr)
             if (ierr .ne. MPI_SUCCESS) then
@@ -125,10 +128,12 @@ subroutine distr_mesh()
 !     ...3d. if new subdomain is my subdomain, receive data
          else if (subd_next(iel) .eq. RANK) then
 !        ...3e. receive buffer from old subdomain
+#if DEBUG_MODE
             if (iprint .eq. 1) then
                write(6,130) '[', RANK, ']: ',   &
                   'Receiving data from [',subd,'], nod = ',nod
             endif
+#endif
             count = nrdof_nod; src = subd; tag = nod
             call MPI_RECV(buf,count,MPI_VTYPE,src,tag,MPI_COMM_WORLD,MPI_STATUS_IGNORE,ierr)
             if (ierr .ne. MPI_SUCCESS) then
@@ -198,9 +203,11 @@ subroutine distr_mesh()
       call update_Ddof
    endif
 !
+#if DEBUG_MODE
    if (iprint .eq. 1) then
       write(6,100) 'end   distr_mesh, DISTRIBUTED = .true.'
    endif
+#endif
 !
 end subroutine distr_mesh
 !

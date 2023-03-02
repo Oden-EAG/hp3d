@@ -43,7 +43,9 @@ c
       integer, intent(out) :: Np1,Np2,Nsid1,Nsid2
 c
       integer :: nhalf,nordh,nordv,k
+#if DEBUG_MODE
       integer :: iprint=0
+#endif
 c
 c  ...initialize
       Ixi1 = 0; Ixi2 = 0
@@ -339,6 +341,7 @@ c
         stop 1
       end select
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7001) I,J
  7001   format('int_coord: I,J = ',2i3)
@@ -348,5 +351,6 @@ c
  7003   format('Ixi2,Nsid2 = ',3(2i3,2x),3x,i3)
         call pause
       endif
+#endif
 c
       end subroutine int_coord

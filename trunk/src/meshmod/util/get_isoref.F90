@@ -8,25 +8,28 @@
 !---------------------------------------------------------------------------------
 subroutine get_isoref(Nod, Kref)
 !
-       use data_structure3D
+      use data_structure3D
 !
-       implicit none
-       integer, intent(in)     :: Nod
-       integer, intent(out)    :: Kref
+      implicit none
+      integer, intent(in)     :: Nod
+      integer, intent(out)    :: Kref
 !
-       real(8), dimension(3,8) :: xsub
-       real(8), dimension(3)   :: dist, xi
-       real(8), dimension(3,2) :: x
-
-       integer, dimension(27)  :: nodesl,norientl
-       integer, dimension(2)   :: iv
-       integer, dimension(2,3), parameter :: ie = &
+      real(8), dimension(3,8) :: xsub
+      real(8), dimension(3)   :: dist, xi
+      real(8), dimension(3,2) :: x
+!
+      integer, dimension(27)  :: nodesl,norientl
+      integer, dimension(2)   :: iv
+      integer, dimension(2,3), parameter :: ie = &
             reshape( (/1,6, 3,5, 4,2/), (/2,3/) )
-       integer :: iprint, iflag, no, i,j,k, loc
+      integer :: iflag, no, i,j,k, loc
+!
+#if DEBUG_MODE
+      integer :: iprint = 0
+#endif
 !---------------------------------------------------------------------------------
 !
       Kref = 0
-      iprint = 0
 !
 !  ...select refinement based on node type
       select case(NODES(Nod)%ntype)
@@ -81,11 +84,13 @@ subroutine get_isoref(Nod, Kref)
 !
 !  .....selec appropriate refinement kind
         Kref = 10 + loc
-
+!
+#if DEBUG_MODE
         if (iprint.eq.1) then
           write(*,7000) Kref, dist
 7000      format(' get_isoref : Kref = ',i3,' dist = ',3f8.3)
         endif
+#endif
 !
       case(MDLD)
         write(*,*) 'get_isoref: no isotropic refinement for pyramid.'

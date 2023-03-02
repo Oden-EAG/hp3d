@@ -30,12 +30,7 @@ c
       integer :: i,iaux,naux,np
 c
 #if DEBUG_MODE
-      integer :: iprint
-      if (Iel.ge.1) then
-        iprint=0
-      else
-        iprint=0
-      endif
+      integer :: iprint=0
 #endif
 c
       Numdes = NDESVE(1,Iel)
