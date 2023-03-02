@@ -175,15 +175,18 @@ subroutine set_3Dint_aux(Ntype,Norder,Maxp,Max_nint3, Nint,Xiloc,Waloc)
       integer :: nordhv(2), nordxyz(3)
       integer :: nord,nordh,nordx,nordy,nordz
       integer :: kint,nintx,ninty,nintz
-      integer :: i,iprint,l,l1,l2,l3
+      integer :: i,l,l1,l2,l3
       real(8) :: factor
+!
+#if DEBUG_MODE
+      integer :: iprint = 0
+#endif
 !
 !----------------------------------------------------------------------
 !
 !  ...initialize if needed
       if (.not. INITIALIZED) call init_gauss_quadrature
 !
-      iprint=0
 #if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7001) S_Type(Ntype),Norder
@@ -383,6 +386,9 @@ subroutine set_3Dint_aux(Ntype,Norder,Maxp,Max_nint3, Nint,Xiloc,Waloc)
 !
 end subroutine set_3Dint_aux
 !
+!
+#if DEBUG_MODE
+!
 !----------------------------------------------------------------------
 !
 !     routine name      - test_set_3Dint
@@ -448,3 +454,5 @@ subroutine test_set_3Dint
       enddo
 !
 end subroutine test_set_3Dint
+
+#endif

@@ -201,13 +201,14 @@ c
       integer ::       minI,maxI,i,ni,a,aa,al,ai,bi,ci,di,alpha(0:Nord)
       double precision ::                                          y,tt
 c
+#if DEBUG_MODE
+      integer :: iprint=0
+#endif
+c
 c  ...clearly (minI,maxI)=(0,Nord), but the syntax is written as it is
 c     because it reflects how the indexing is called from outside
       minI = 0; maxI = minI+Nord
 c
-#if DEBUG_MODE
-      integer :: iprint=0
-#endif
 c  ...in our work Minalpha>=1
       if (Minalpha.lt.1) then
         write(*,7001) Minalpha

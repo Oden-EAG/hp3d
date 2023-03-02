@@ -713,7 +713,7 @@ c
 c
 #if DEBUG_MODE
 c  ...debugging flag
-      iprint=0
+      integer :: iprint=0
 #endif
 c
 c  ...spatial dimensions
