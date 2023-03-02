@@ -117,11 +117,6 @@ module data_structure3D
 !
 #if DEBUG_MODE
 !
-        integer          :: iback
-!
-!  .....locker number
-        integer          :: lock
-!
 !  .....error
 !       0   - scalar error
 !       1-3 - gradient of any vector component-wise error
