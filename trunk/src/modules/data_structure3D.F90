@@ -79,7 +79,6 @@ module data_structure3D
 !
 !  .....case number indicating what physical attributes are supported
 !       (binary-encoded per physics variable)
-!  TODO: change to ncase
         integer          :: case
 !
 !  .....order of approximation (decimal-encoded per direction (x,y,z))
