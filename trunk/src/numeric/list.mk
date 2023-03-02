@@ -1,8 +1,4 @@
-bernstein_poly.F90
-biv_bernstein_poly.F90
 blas.F
-convert.F90
-gausse.F90
 invert.F90
 isgn.F90
 rhsub.F

@@ -1,4 +1,6 @@
 add_void_curve.F90
+bernstein_poly.F90
+biv_bernstein_poly.F90
 check_orientation.F90
 combination.F90
 coord_cart2polar.F90

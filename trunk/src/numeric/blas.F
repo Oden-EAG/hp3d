@@ -136,15 +136,14 @@ c   purpose            - solution of a full matrix linear system
 c                        of equations using gauss elimination
 c                        without pivoting
 c
-c   usage              - call gausse(gk,igk,gf,u,n)
-c
-c   arguments in: gk   - n by n matrix
-c                 igk  - row dimension of matrix gk exactly as
-c                        specified in the dimension statement in the
-c                        calling program
-c                 gf   - vector of length n (the right-hand side)
-c                 n    - number of equations
-c             out:u    - vector of length n containing the solution
+c   arguments
+!        in:      gk   - n by n matrix
+!                 igk  - row dimension of matrix gk exactly as
+!                        specified in the dimension statement in the
+!                        calling program
+!                 gf   - vector of length n (the right-hand side)
+!                 n    - number of equations
+!       out:      u    - vector of length n containing the solution
 c
 c   required routines  - rhsub,tri
 c

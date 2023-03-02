@@ -15,7 +15,7 @@
 !                        calling program
 !                 gf   - vector of length n (the right-hand side)
 !                 n    - number of equations
-!      out:       u    - vector of length n containing the solution
+!       out:      u    - vector of length n containing the solution
 !
 !   required routines  - rhsub,tri
 !
@@ -29,7 +29,8 @@ subroutine gausse(gk,igk,gf,u,n)
    integer :: igk,n
    real(8) :: gk(igk,*),gf(*),u(*)
 !
-   call tri(gk,igk,n)
-   call rhsub(gk,u,gf,igk,n)
+!   call tri(gk,igk,n)
+!   call rhsub(gk,u,gf,igk,n)
+   write(*,*) 'hello'
 !
 end subroutine gausse
