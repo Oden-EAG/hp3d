@@ -43,12 +43,9 @@ c  ...test......test......test......test......test......test......test...
 c  ...test......test......test......test......test......test......test...
 c
 
-
-
 ccccc iprint=1
       iprint=0
 c
-
 
 c
       IFU = 0

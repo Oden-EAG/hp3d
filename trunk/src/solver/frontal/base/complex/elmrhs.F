@@ -35,30 +35,13 @@ c
 #include "surfsc2.blk"
 c
       dimension Frhs(*), Ubuf(*), Bbuf(*)
-cwb >
-
-cwb <
-
-
 
       data sml2 /1.e-15/
-
-
-
-
-
-
-
 
       id = Aid
       idm = id - 1
       idp = id + 1
       im = 0
-
-
-
-
-
 
 c
 c perform the rhs elimination:
@@ -110,13 +93,10 @@ c$doit VBEST
 c
 c
 
-
-
          do 20 ii = ii1,ii2
             Frhs(ii) = Frhs(ii) - s*Ubuf(iuu)
             iuu = iuu + Inc
    20    continue
-
 
 c
    25    if (ISYM.eq.1 .or. ISYM.eq.4) iuu = iuu + 1
@@ -144,7 +124,6 @@ cvd$ select (vector)
 c ARDENT directives
 c$doit VBEST
 
-
 c
 c
                do 27 ii = ii1,ii2
@@ -158,7 +137,6 @@ c ALLIANT directives
 cvd$ select (vector)
 c ARDENT directives
 c$doit VBEST
-
 
 c
 c

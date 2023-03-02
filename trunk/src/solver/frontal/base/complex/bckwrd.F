@@ -53,9 +53,6 @@ c  ...test......test......test......test......test......test......test...
       dimension ndest1(100)
 c  ...test......test......test......test......test......test......test...
 
-
-
-
 c
       iprint=0
 c
@@ -69,15 +66,12 @@ c
       IFU = IFU + 1
       IFB = IFB + 1
 
-
-
 c
 c loop over the Elements (we are actually looping thru them backwards)
 c **********************
       do 200 iel = 1,NUMELM
 c     *******************
 c set to loop backwards thru the Elems
-
 
 c
          jel = jel - 1
@@ -95,8 +89,6 @@ c        ----------------------------------
            write(NFSOUT,*) 'jel,numdes = ',jel,numdes
            write(NFSOUT,*) 'Aldest = ',(Aldest(ii),ii=1,numdes)
          endif
-
-
 
 c  ...test......test......test......test......test......test......test...
 c  ...test......test......test......test......test......test......test...
