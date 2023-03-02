@@ -252,8 +252,10 @@
         call global_href
         call update_gdof
         call update_ddof
+#if DEBUG_MODE
         call verify_orient
         call verify_neig
+#endif
         nr_elem_to_refine = NRELES
 !
 !  ...adaptive refinements
