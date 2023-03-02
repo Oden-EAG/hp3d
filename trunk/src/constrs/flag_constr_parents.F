@@ -285,8 +285,7 @@ c
       integer :: nfath
 c
 #if DEBUG_MODE
-      integer :: iprint
-      iprint=0
+      integer :: iprint = 0
 c
       if (iprint.eq.1) then
         write(*,7001) Nod

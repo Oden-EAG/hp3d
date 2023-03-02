@@ -47,18 +47,13 @@ c  ...miscellanea
       integer :: nvoid,nrnodl,nod,nodp,nc,nce
 c
 #if DEBUG_MODE
-      integer :: iprint
+      integer :: iprint = 0
 #endif
 c
 c----------------------------------------------------------------------
 c
 c  ...initialize output
       Nodm(1:MAXNODM) = 0
-c
-#if DEBUG_MODE
-      iprint = 0
-c      if (Mdle.eq.354) iprint=0
-#endif
 c
       ntype = NODES(Mdle)%ntype
 c

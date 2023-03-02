@@ -43,7 +43,7 @@ c  ...miscellanea
       integer :: nef,nff,nvf,nod,nodp,nort,nrn,nson
 c
 #if DEBUG_MODE
-      integer :: iprint
+      integer :: iprint = 0
 #endif
 c
 c  ...initialize output
@@ -53,18 +53,12 @@ c  ...initialize variables like this or OpenMP will not work!
       ireff=0; is1=0;
 c
 #if DEBUG_MODE
-      select case(Mdle)
-      case(135)
-        iprint=0
-      case default
-        iprint=0
-      end select
       if (iprint.eq.1) then
         write(*,7000) Mdle
  7000   format('get_connect_info: Mdle = ',i6)
         call pause
       endif
-#endif DEBUG_MODE
+#endif
 c
       INFO_CONSTRAINTS=1
       call elem_nodes(Mdle, Nodesl,Norientl)
@@ -348,8 +342,8 @@ c
 ccc      imod(j,mod) = j-(j-1)/mod*mod
 c
 #if DEBUG_MODE
-      integer :: iprint
-      iprint=0
+      integer :: iprint = 0
+c
       if (iprint.eq.1) then
         write(*,7001) Nodp,Is,Is1
  7001   format('modify_face_info: Nodp,Is,Is1 = ',i5,2i3)

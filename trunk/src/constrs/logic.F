@@ -124,7 +124,7 @@ c  ...miscellanea
       integer :: nrdofH_loc,nrdofE_loc,nrdofV_loc
 c
 #if DEBUG_MODE
-      integer :: iprint
+      integer :: iprint = 0
 #endif
 c
 c----------------------------------------------------------------------
@@ -138,17 +138,6 @@ c     initialize constraints arrays
       if (.NOT. INITIALIZED_CONSTR) call init_cnstr
 c
 #if DEBUG_MODE
-      select case(Mdle)
-      case(234)
-        if (Idec.eq.2) then
-          iprint=0
-        else
-          iprint=0
-        endif
-      case default
-        iprint=0
-      endselect
-c
       if (iprint.ge.1) then
         write(*,7000) Mdle
  7000   format(' -- logic: Mdle = ',i6,' --')

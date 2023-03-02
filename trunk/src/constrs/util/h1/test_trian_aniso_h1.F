@@ -1,3 +1,5 @@
+#if DEBUG_MODE
+
 c----------------------------------------------------------------------
 c
 c   routine name       - test_trian_aniso_h1
@@ -115,3 +117,5 @@ c
       return
 c
       end subroutine test_trian_aniso_h1
+
+#endif
