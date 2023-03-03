@@ -1,4 +1,4 @@
-# hp3d
+# hp3D
 A Scalable MPI/OpenMP hp-Adaptive Finite Element Software Library
 for Complex Multiphysics Applications
 
@@ -28,6 +28,27 @@ The `m_options` file must link to the correct paths for external libraries. The 
 - PORD
 - Zoltan
 
+For example, assuming MPI libraries are installed,
+PETSc configure may look like this:
+```
+./configure --with-cc=mpicc --with-cxx=mpicxx --with-fc=mpif90 --with-mpiexec=mpirun \
+            --download-fblaslapack=yes \
+            --download-scalapack=yes \
+            --download-mumps=yes \
+            --download-metis=yes \
+            --download-parmetis=yes \
+            --download-ptscotch=yes \
+            --download-zoltan=yes \
+            --download-hdf5=yes \
+            --with-hdf5-fortran-bindings=1 \
+            --with-shared-libraries=0 \
+            --with-debugging=0 \
+            --with-scalar-type=real \
+            --PETSC_ARCH=arch-debian-real
+```
+Note: PETSc can also install MPI libraries if needed,
+e.g. `--download-openmpi=yes` or `--download-mpich=yes`.
+
 ## Compiler options
 Compilation is governed by preprocessing flags `COMPLEX` and `DEBUG`.
 - `COMPLEX = 0` , stiffness matrix, load vector(s) and solution DOFs are real-valued
@@ -40,41 +61,60 @@ Library will be created under either `hp3d/complex/` or `hp3d/real/`.
 Additional preprocessing flags for enabling/disabling third-party libraries:
 - `HP3D_USE_INTEL_MKL = 0` , dependency on Intel MKL package is disabled
 - `HP3D_USE_INTEL_MKL = 1` , additional solver options are available to the user (e.g., Intel MKL PARDISO)
+- `HP3D_USE_OPENMP = 0` , OpenMP threading is disabled
+- `HP3D_USE_OPENMP = 1` , OpenMP threading is enabled
 
 ## Compiling a problem
 Projects are implemented in `hp3d/trunk/problems/`. A few projects have been implemented and can serve as an example. For example, `/problems/MPI_POISSON/GALERKIN/` is a Galerkin implementation for the classical variational Poisson problem. To compile and run the problem, type `make`  in the project folder, i.e., `cd problems/MPI_POISSON/GALERKIN; make; ./run.sh`.
 
-## Citing hp3d
-Please add the following citation to any paper, technical report, or article that incorporated the `hp3d` library:
+## Citing hp3D
+Please add the following citation to any paper, technical report, or article that incorporated the `hp3D` library:
+```bibtex
+@article{hpUserManual,
+         Author = {Henneking, Stefan and Demkowicz, Leszek},
+         Title = {{$hp$3D User Manual}},
+         Year = {2022},
+         Journal={arXiv preprint arXiv:2207.12211}}
+```
+And, optionally,
+```bibtex
+@book{hpbook3,
+      Author = {Henneking, Stefan and Demkowicz, Leszek},
+      Publisher = {In preparation},
+      Title = {{Computing with $hp$ Finite Elements. III. Parallel $hp$3D Code}},
+      Year = {2023}}
+```
 ```bibtex
 @book{hpbook2,
-      Author = {Demkowicz, L. and Kurtz, J. and Pardo, D. and Paszy\'{n}ski, M. and Rachowicz, W. and Zdunek, A.},
+      Author = {Demkowicz, Leszek and Kurtz, Jason and Pardo, David and Paszy\'{n}ski, Maciej and Rachowicz, Waldemar and Zdunek, Adam},
       Publisher = {Chapman \& Hall/CRC},
       Title = {Computing with $hp$ Finite Elements. II. Frontiers: Three-Dimensional Elliptic and Maxwell Problems with Applications},
       Year = {2007}}
 ```
-And, optionally,
 ```bibtex
 @book{hpbook,
-      Author = {Demkowicz, L.},
+      Author = {Demkowicz, Leszek},
       Publisher = {Chapman \& Hall/CRC Press, Taylor and Francis},
       Title = {Computing with $hp$ Finite Elements. I. One- and Two-Dimensional Elliptic and Maxwell Problems},
       Year = {2006}}
 ```
 ```bibtex
 @article{fuentes2015shape,
-    Author = {Fuentes, F. and Keith, B. and Demkowicz, L. and Nagaraj, S.},
-    Journal = {Comput. Math. Appl.},
-    Number = {4},
-    Pages = {353--458},
-    Publisher = {Elsevier},
-    Title = {Orientation embedded high order shape functions for the exact sequence elements of all shapes},
-    Volume = {70},
-    Year = {2015}}
+         Author = {Fuentes, Federico and Keith, Brendan and Demkowicz, Leszek and Nagaraj, Sriram},
+         Journal = {Comput. Math. Appl.},
+         Number = {4},
+         Pages = {353--458},
+         Publisher = {Elsevier},
+         Title = {Orientation embedded high order shape functions for the exact sequence elements of all shapes},
+         Volume = {70},
+         Year = {2015}}
 ```
 
 ## User Guide
-... in development
+The user manual is continuously updated and maintained here:
+https://github.com/Oden-EAG/hp3d_user_guide (LaTeX source)
+
+A PDF version of the user manual is available on arXiv: https://arxiv.org/abs/2207.12211
 
 ## Support
 Contact: ``stefan@oden.utexas.edu``, ``leszek@oden.utexas.edu``

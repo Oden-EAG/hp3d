@@ -69,6 +69,10 @@ nthreads=12
 #
 # Fix Intel18 OMP issue
 export KMP_INIT_AT_FORK=FALSE
+
+# weight for l2 term in test norm
+alpha=1.0d-4
+
 #
 # Rectangular waveguide for linear Maxwell (e.g., pollution study)
 #    / with dirichlet BC (-ibc 0), or impedance BC (-ibc 3), or PML
@@ -180,10 +184,18 @@ pmlfrac=0.25d0
 ctrl='../COMMON_FILES/control_0'
 #
 # set output
-dir_output='../outputs/'
+mkdir ${SLURM_JOB_ID}
+cd ${SLURM_JOB_ID}
+mkdir outputs
+cd outputs
+mkdir paraview
+mkdir power
+mkdir temp
+cd ../..
+dir_output="${SLURM_JOB_ID}/outputs/"
 vis_level=3
 
-args=" -geom 1 -isol 5 -comp 2"
+args=" -geom 1 -isol 5 -comp 2 -alpha ${alpha}"
 args+=" -job ${job} -imax ${imax} -jmax 0"
 args+=" -px ${px} -py ${py} -pz ${pz} -dp ${dp}"
 args+=" -ibc ${ibc}"

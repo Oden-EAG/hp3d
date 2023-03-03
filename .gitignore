@@ -12,6 +12,7 @@ fort.19
 fort.20
 *~
 m_options
+log.txt
 
 # Data files
 history
@@ -29,6 +30,7 @@ history
 maxw
 pois
 uwLaser
+hose
 
 # Output files
 *.e

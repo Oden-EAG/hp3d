@@ -808,7 +808,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
                                         +  rn2timesE(3)*zImp(3)  &
                                           )*GAMMA*weight/eps
 !        ...2nd test function
-            k = 2*k
+            k = 2*k1
 !           - GAMMA * < n x n x E , n x G >
             bload_Imp(k) = bload_Imp(k) - (rntimesE(1)*zflux2(1,1)  &
                                         +  rntimesE(2)*zflux2(2,1)  &

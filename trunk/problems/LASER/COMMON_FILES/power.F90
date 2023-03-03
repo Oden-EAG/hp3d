@@ -110,7 +110,7 @@ subroutine get_power(Fld,NumPts,FileIter)
    if (RANK .eq. ROOT) then
       write(*,*) ' get_power: Distributing sample points uniformly along waveguide.'
       write(*,2002) ' ZL = ', ZL
- 2002 format(A,F10.2,/)
+ 2002 format(A,F11.2,/)
    endif
    b = ZL/NumPts
    a = b/2.d0

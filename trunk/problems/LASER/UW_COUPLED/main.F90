@@ -36,7 +36,9 @@ program main
    integer :: i, ierr, req, ret, plen
 !
 !..OMP variables
+#if HP3D_USE_OPENMP
    integer :: num_threads, omp_get_num_threads
+#endif
 !
 !..MPI variables
    character(MPI_MAX_PROCESSOR_NAME) :: pname
@@ -147,10 +149,12 @@ program main
       endif
    endif
    write(*,9030) ' Polynomial order (x,y,z) = ', ORDER_APPROX_X,ORDER_APPROX_Y,ORDER_APPROX_Z
+   write(*,9010) ' NORD_ADD (Delta p)       = ', NORD_ADD
    write(*,9010) ' ISOL                     = ', ISOL
    write(*,9010) ' NEXACT                   = ', NEXACT
    write(*,9010) ' FAST INTEGRATION         = ', FAST_INT
    write(*,9010) ' IBCFLAG                  = ', IBCFLAG
+   write(*,9020) ' ALPHA_NORM               = ', ALPHA_NORM
    write(*,9015) ' OUTPUT_DIR               = ', trim(OUTPUT_DIR)
    if (HEAT_FLAG .eq. 1) then
       write(*,9010) ' NSTEPS                   = ', NSTEPS
@@ -171,6 +175,7 @@ program main
  9020 format(A,ES13.2)
  9030 format(A,' (',I1,',',I1,',',I1,') ')
 !
+#if HP3D_USE_OPENMP
 !$OMP parallel
 !$OMP single
    num_threads = omp_get_num_threads()
@@ -178,6 +183,7 @@ program main
  1025 format(A,I2)
 !$OMP end single
 !$OMP end parallel
+#endif
 !
    80 continue
 !

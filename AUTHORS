@@ -3,7 +3,7 @@
 hp3d - A Scalable MPI/OpenMP hp-Adaptive Finite Element Software Library
        for Complex Multiphysics Applications
 
-Contributors:
+Contributors (in alphabetical order):
 
 Jacob Badger
 Leszek Demkowicz
@@ -12,7 +12,7 @@ Paolo Gatto
 Stefan Henneking
 Brendan Keith
 Kyungjoo Kim
-Jaime Mora-Paz
+Jaime D. Mora
 Sriram Nagaraj
 Socratis Petrides
 

@@ -72,6 +72,9 @@ export KMP_INIT_AT_FORK=FALSE
 #
 gain=1.0d4
 
+# weight for l2 term in test norm
+alpha=1.0d-4
+
 # set fiber length, length of PML, #refs, maxnodes
 #  1_2 (16 wavelengths), 5 refs (16*  32 elems), 6250 nodes
 zl=1.2d0; pmlfrac=0.25d0; imax=5; maxnods=8000 #6250
@@ -186,7 +189,7 @@ cd ../..
 dir_output="${SLURM_JOB_ID}/outputs/"
 vis_level=3
 
-args=" -geom 5 -isol 13 -gamma ${gamma} -comp 1"
+args=" -geom 5 -isol 13 -alpha ${alpha} -gamma ${gamma} -comp 1"
 #args+=" -omega ${omega}"
 args+=" -ref_core ${ref_core} -ref_clad ${ref_clad}"
 args+=" -aniso_ref_index ${aniso_ref_index}"
