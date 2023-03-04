@@ -181,6 +181,7 @@ fastlib :
 
 problems: lib
 	@echo "Compiling examples in 'problems' directory."
+	@(cd problems/MPI_TEST/TEST ; $(MAKE) ; cd ../..);
 ifeq ($(COMPLEX),1)
 	@echo "Compiling Maxwell Galerkin..."
 	@(cd problems/MAXWELL/GALERKIN ; $(MAKE) ; cd ../..);
@@ -322,6 +323,7 @@ clean:
 
 clean-problems:
 	@echo "Clean 'problems' directory."
+	@(cd problems/MPI_TEST/TEST ; $(MAKE) clean; cd ../..);
 ifeq ($(COMPLEX),1)
 	@(cd problems/MAXWELL/GALERKIN ; $(MAKE) clean; cd ../..);
 	@(cd problems/LASER/UW_COUPLED ; $(MAKE) clean; cd ../..);
