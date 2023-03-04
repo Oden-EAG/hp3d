@@ -28,6 +28,27 @@ The `m_options` file must link to the correct paths for external libraries. The 
 - PORD
 - Zoltan
 
+For example, assuming MPI libraries are installed,
+PETSc configure may look like this:
+```
+./configure --with-cc=mpicc --with-cxx=mpicxx --with-fc=mpif90 --with-mpiexec=mpirun \
+            --download-fblaslapack=yes \
+            --download-scalapack=yes \
+            --download-mumps=yes \
+            --download-metis=yes \
+            --download-parmetis=yes \
+            --download-ptscotch=yes \
+            --download-zoltan=yes \
+            --download-hdf5=yes \
+            --with-hdf5-fortran-bindings=1 \
+            --with-shared-libraries=0 \
+            --with-debugging=0 \
+            --with-scalar-type=real \
+            --PETSC_ARCH=arch-debian-real
+```
+Note: PETSc can also install MPI libraries if needed,
+e.g. `--download-openmpi=yes` or `--download-mpich=yes`.
+
 ## Compiler options
 Compilation is governed by preprocessing flags `COMPLEX` and `DEBUG`.
 - `COMPLEX = 0` , stiffness matrix, load vector(s) and solution DOFs are real-valued
