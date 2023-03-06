@@ -60,7 +60,7 @@ Library will be created under either `hp3d/complex/` or `hp3d/real/`.
 
 Additional preprocessing flags for enabling/disabling third-party libraries:
 - `HP3D_USE_OPENMP    = 0/1` , enable/disable OpenMP threading
-- `HP3D_USE_INTEL_MKL = 0/1` , enable/disable dependency on Intel MKL package is disabled
+- `HP3D_USE_INTEL_MKL = 0/1` , enable/disable dependency on Intel MKL package
 
 ## Compiling a problem
 Projects are implemented in `hp3d/trunk/problems/`. A few projects have been implemented and can serve as an example. For example, `/problems/MPI_POISSON/GALERKIN/` is a Galerkin implementation for the classical variational Poisson problem. To compile and run the problem, type `make`  in the project folder, i.e., `cd problems/MPI_POISSON/GALERKIN; make; ./run.sh`.
