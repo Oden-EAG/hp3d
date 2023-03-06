@@ -18,7 +18,7 @@ HP3D makefile targets:
   make all
     Build/install the library and compile problems
   make clean-problems
-    Clean problem directory
+    Clean problems directory
   make clean-all
     Clean object/library files and problems directory
 
