@@ -20,6 +20,12 @@ SRC_FILE = bckwrdR.F compltR.F destR.F desvecR.F elmrhsR.F elmsolR.F \
 SRC      = $(addprefix $(SRC_PATH)/.$(SRC_FILE))
 OBJ      = $(addprefix $(OBJ_PATH)/,$(SRC_FILE:.F=.o))
 
+# Introduce ranlib flag to suppress warnings on Mac OS
+ARFLAG :=
+ifeq ($(shell uname -s),Darwin)
+	ARFLAG += -no_warning_for_no_symbols
+endif
+
 .PHONY : lib
 
 lib : libfrontal.a
