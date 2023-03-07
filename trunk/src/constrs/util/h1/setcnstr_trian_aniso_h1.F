@@ -81,7 +81,7 @@ c
 c
       implicit none
 c
-      integer :: Iref
+      integer, intent(in) :: Iref
 c
       real(8) :: shapsma(MAXquadH,MAXquadH),
      .           shapbig(MAXquadH,MAXquadH),
