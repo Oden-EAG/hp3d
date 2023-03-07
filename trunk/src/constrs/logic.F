@@ -185,8 +185,8 @@ c       update H1,H(curl),H(div) dofs counters
         icH=icH+NdofmH(im) ; icE=icE+NdofmE(im) ; icV=icV+NdofmV(im)
       enddo
 c
-c     printing
 #if DEBUG_MODE
+c     printing
       if (iprint.eq.1) then
         write(*,*) 'MODIFIED ELEMENT NODES:'
         do im=1,Nrnodm
@@ -264,8 +264,8 @@ c         H(div)-loop through the nodal dof
             ConstrV(1,kV)=1.d0
           enddo
 c
-c         printing
 #if DEBUG_MODE
+c         printing
           if (iprint.eq.1) then
             write(*,7030) i,nod,S_Type(NODES(nod)%ntype),
      .                    NODES(nod)%order
