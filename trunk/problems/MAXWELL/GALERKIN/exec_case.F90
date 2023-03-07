@@ -20,6 +20,7 @@ subroutine exec_case(idec)
 !
    integer :: mdle_list(1)
    integer :: mdle_nord(1)
+   integer :: iParAttr(1)
 !
 !----------------------------------------------------------------------
 !
@@ -29,7 +30,8 @@ subroutine exec_case(idec)
 !
 !  ...paraview graphics
       case(3)
-         call my_paraview_driver(1)
+         iParAttr = (/1/)
+         call my_paraview_driver(iParAttr)
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 !  ...print data structure (interactive)
