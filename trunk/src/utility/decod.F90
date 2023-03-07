@@ -22,8 +22,8 @@ subroutine decod(Nick,Mod,N, Narray)
 !
    implicit none
 !
-   integer, intent(in)    :: Nick,Mod,N
-   integer, intent(inout) :: Narray(N)
+   integer, intent(in)  :: Nick,Mod,N
+   integer, intent(out) :: Narray(N)
 !
 !  ...local variables
    integer :: i,nick1,nick2
