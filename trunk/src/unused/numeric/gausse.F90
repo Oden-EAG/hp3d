@@ -29,8 +29,7 @@ subroutine gausse(gk,igk,gf,u,n)
    integer :: igk,n
    real(8) :: gk(igk,*),gf(*),u(*)
 !
-!   call tri(gk,igk,n)
-!   call rhsub(gk,u,gf,igk,n)
-   write(*,*) 'hello'
+   call tri(gk,igk,n)
+   call rhsub(gk,u,gf,igk,n)
 !
 end subroutine gausse
