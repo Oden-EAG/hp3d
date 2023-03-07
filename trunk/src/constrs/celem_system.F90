@@ -117,12 +117,12 @@ subroutine celem_system(Mdle,Idec,                                &
 !
 !..number of dofs for a SINGLE H1,H(curl),H(div),L2 component
    call find_order(Mdle, norder)
-   call celndof(NODES(Mdle)%type,norder, nrdoflH,nrdoflE,nrdoflV,nrdoflQ)
+   call celndof(NODES(Mdle)%ntype,norder, nrdoflH,nrdoflE,nrdoflV,nrdoflQ)
 #if DEBUG_MODE
    if (iprint.eq.1) then
       write(*,5001) Mdle
  5001 format(' celem_system: DEBUGGING for Mdle = ',i8)
-      call print_order(NODES(Mdle)%type,norder)
+      call print_order(NODES(Mdle)%ntype,norder)
    endif
 #endif
 !

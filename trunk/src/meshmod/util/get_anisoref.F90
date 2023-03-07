@@ -1,9 +1,9 @@
-subroutine get_anisoref(Mdle, Derr, Kref)
+subroutine get_anisoref(Mdle,Derr, Kref)
   use data_structure3D
   implicit none
-  integer,              intent(in)  :: Mdle
-  real(8), dimension(3), intent(in) :: Derr
-  integer,              intent(out) :: Kref
+  integer, intent(in)  :: Mdle
+  real(8), intent(in)  :: Derr(3)
+  integer, intent(out) :: Kref
   real(8) :: derr_xy, derr_yz, derr_xz
   real(8), parameter :: ratio = 0.01d0
 
@@ -12,15 +12,15 @@ subroutine get_anisoref(Mdle, Derr, Kref)
   derr_yz = sqrt(Derr(2)**2 + Derr(3)**2)
 
   Kref = 0
-  select case(NODES(Mdle)%type)
-  case('mdlp')
+  select case(NODES(Mdle)%ntype)
+  case(MDLP)
      if ((Derr(3)*ratio).gt.derr_xy) then
         Kref = Kref + 1
      end if
      if ((derr_xy*ratio).gt.Derr(3)) then
         Kref = Kref + 10
      end if
-  case('mdlb')
+  case(MDLB)
      if ((Derr(3)*ratio).gt.derr_xy) then
         Kref = Kref + 1
      end if

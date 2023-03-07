@@ -4,7 +4,7 @@ c   routine name       - tetra
 c
 c-----------------------------------------------------------------------
 c
-c   latest revision    - Jan 06
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine evaluates physical coordinates
 c                        and its derivatives wrt to reference
@@ -26,21 +26,28 @@ c
       subroutine tetra(No,Eta, X,Dxdeta)
 c
       use GMP
-#include "syscom.blk"
+      use node_types, only: TETR
+      implicit none
 c
-      dimension Eta(3),X(3),Dxdeta(3,3)
+      integer, intent(in)  :: No
+      real(8), intent(in)  :: Eta(3)
+      real(8), intent(out) :: X(3),Dxdeta(3,3)
 c
 c  ...vertex coordinates, edge curves
-      dimension xv(3,4)
+      real(8) :: xv(3,4)
 c
 c  ...linear shape functions for a tetrahedron
-      dimension vshap(8),dvshap(3,8)
+      real(8) :: vshap(8),dvshap(3,8)
 c
-      if (No.eq.7) then
-        iprint=0
-      else
-        iprint=0
-      endif
+      integer :: i,ie,ifc,ivar,k,lab,np,nc,nt
+c
+      integer :: iprint = 0
+c
+c-----------------------------------------------------------------------
+c  ...initialize
+      X = 0; Dxdeta = 0
+c
+      if (No.eq.7) iprint = 0
 c
       if (iprint.eq.1) then
         write(*,7001) No,Eta,TETRAS(No)%Type
@@ -69,18 +76,18 @@ c  .....check compatibility
             stop
           endif
         enddo
-        do if=1,4
-          if (TETRAS(No)%FigNo(if).eq.0) cycle
-          call decode(TETRAS(No)%FigNo(if), nt,lab)
+        do ifc=1,4
+          if (TETRAS(No)%FigNo(ifc).eq.0) cycle
+          call decode(TETRAS(No)%FigNo(ifc), nt,lab)
           if (TRIANGLES(nt)%Type.ne.'PlaneTri') then
-            write(*,7003) No,if,nt,TRIANGLES(nt)%Type
- 7003       format('tetra: INCOMPATIBLE DEFINITIONS: No,if,nt=',
+            write(*,7003) No,ifc,nt,TRIANGLES(nt)%Type
+ 7003       format('tetra: INCOMPATIBLE DEFINITIONS: No,ifc,nt=',
      .              i4,2x,i2,i4,' type = ',a10)
             stop
           endif
         enddo
 c  .....get linear shape functions
-        call vshape3('tetr',Eta, vshap,dvshap)
+        call vshape3(TETR,Eta, vshap,dvshap)
 c
         X(1:3)=0.d0; Dxdeta(1:3,1:3) = 0.d0
         do k=1,4
@@ -122,7 +129,7 @@ c   routine name       - tetra_TraTet
 c
 c-----------------------------------------------------------------------
 c
-c   latest revision    - Dec 08
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine evaluates physical coordinates
 c                        and its derivatives wrt to reference
@@ -146,32 +153,43 @@ c
       use control
       use GMP
       use element_data
-#include "syscom.blk"
-      common /ctrianK/ iprint_trianK
-      common /ctetra_TraTet/ iprint
+      use node_types, only: TETR
+      implicit none
+c      common /ctrianK/ iprint_trianK
+c      common /ctetra_TraTet/ iprint
 c
-      dimension Eta(3),X(3),Dxdeta(3,3)
-c     dimension xold(3),dxolddeta(3,3)
+      integer, intent(in)  :: No
+      real(8), intent(in)  :: Eta(3)
+      real(8), intent(out) :: X(3),Dxdeta(3,3)
+c     real(8) :: xold(3),dxolddeta(3,3)
 c
 c  ...vertex shape functions
-      dimension shapH(8),dshapH(3,8)
+      real(8) :: shapH(8),dshapH(3,8)
 c
 c  ...derivatives of edge coordinate
-      dimension dtedeta(3)
+      real(8) :: dtedeta(3)
 c
 c  ...face coordinates
-      dimension tf(2),dtfdeta(2,3)
+      real(8) :: tf(2),dtfdeta(2,3)
 c
 c  ...edge kernels
-      dimension xe(3),dxedt(3)
+      real(8) :: xe(3),dxedt(3)
 c
 c  ...face kernels
-      dimension xf(3),dxfdtf(3,2)
+      real(8) :: xf(3),dxfdtf(3,2)
 c
 c  ...blending function
-      dimension dblend(1:3)
+      real(8) :: dblend(1:3)
+c
+      real(8) :: blend,te
+      integer :: ie,ifc,iv,iv1,iv2,iv3,ivar,nc,nt,norient,np
+c
+      integer :: iprint = 0
+      integer :: iprint_trianK = 0
 c
 c------------------------------------------------------------------------
+c  ...initialize
+      X = 0; Dxdeta = 0
 c
 ccc      iprint=0
  10   continue
@@ -193,7 +211,7 @@ c  ...check Eta
       endif
 c
 c  ...vertex shape functions (affine coordinates)
-      call vshape3('tetr',Eta, shapH,dshapH)
+      call vshape3(TETR,Eta, shapH,dshapH)
 c
 ccc      k=1
 ccc      shapH(k) = 1.d0 - Eta(1) - Eta(2) - Eta(3)
@@ -278,15 +296,15 @@ c
 c------------------------------------------------------------------------
 c  ...add face bubbles
 c------------------------------------------------------------------------
-      do if=1,4
-        call decode(TETRAS(No)%FigNo(if), nt,norient)
+      do ifc=1,4
+        call decode(TETRAS(No)%FigNo(ifc), nt,norient)
         if ((TRIANGLES(nt)%Type.eq.'TransTri').or.
      .      (TRIANGLES(nt)%Type.eq.'PlaneTri')) cycle
 c
 c  .....get the vertices for the face defining its local orientation
-        iv1=TETRA_FACE_TO_VERT(1,if)
-        iv2=TETRA_FACE_TO_VERT(2,if)
-        iv3=TETRA_FACE_TO_VERT(3,if)
+        iv1=TETRA_FACE_TO_VERT(1,ifc)
+        iv2=TETRA_FACE_TO_VERT(2,ifc)
+        iv3=TETRA_FACE_TO_VERT(3,ifc)
 c
 c  .....project Eta onto the face
         call proj_n2f(iv1,iv2,iv3,shapH,dshapH, tf,dtfdeta)
@@ -295,8 +313,8 @@ c  .....if point is on the edge, then the bubble contribution is zero
         if ((abs(tf(2)).lt.GEOM_TOL).or.(abs(tf(1)).lt.GEOM_TOL).or.
      .      (abs(1.d0-tf(1)-tf(2)).lt.GEOM_TOL)) cycle
         if (iprint.eq.1) then
-          write(*,7013) if,nt,TRIANGLES(nt)%Type
- 7013     format('tetra_TraTet: if,nt,Type = ',i2,i8,2x,a5)
+          write(*,7013) ifc,nt,TRIANGLES(nt)%Type
+ 7013     format('tetra_TraTet: ifc,nt,Type = ',i2,i8,2x,a5)
         endif
 c
 c  .....compute the face kernel
@@ -357,7 +375,7 @@ c   routine name       - tetra_CylTet
 c
 c-----------------------------------------------------------------------
 c
-c   latest revision    - Dec 15
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine evaluates physical coordinates
 c                        and its derivatives wrt to reference
@@ -384,15 +402,27 @@ c
 c
       use control
       use GMP
-#include "syscom.blk"
-      common /ctetra_CylTet/ iprint
+      use node_types, only: TETR
+      implicit none
+c      common /ctetra_CylTet/ iprint
 c
-      dimension Eta(3),X(3),Dxdeta(3,3)
+      integer, intent(in)  :: No
+      real(8), intent(in)  :: Eta(3)
+      real(8), intent(out) :: X(3),Dxdeta(3,3)
 c
 c  ...cylindrical coordinates of the endpoints of the triangle
-      dimension xp(3,4)
+      real(8) :: xp(3,4)
 c
-      iprint=0
+c  ...miscellanea
+      real(8) :: pi,twopi,r,dr_deta1,dr_deta2,dr_deta3
+      real(8) :: theta,sinthet,costhet
+      real(8) :: dthet_deta1,dthet_deta2,dthet_deta3
+      integer :: np,iv
+      integer :: iprint = 0
+c
+c-----------------------------------------------------------------------
+c  ...initialize
+      X = 0; Dxdeta = 0
 c
       if ((TETRAS(No)%Type.ne.'CylTet'.or.(NDIM.ne.3))) then
         write(*,7001) TETRAS(No)%Type
@@ -418,7 +448,7 @@ c
 c  .....adjust the angle, if necessary
         select case(iv)
         case(2,3,4)
-          if (theta-xp(3,1).gt.pi) theta = theta - twopi
+          if (theta-xp(3,1).gt. pi) theta = theta - twopi
           if (theta-xp(3,1).lt.-pi) theta = theta + twopi
         end select
         xp(3,iv) = theta

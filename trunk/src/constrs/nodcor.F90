@@ -4,7 +4,7 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - Oct 2019
+!   latest revision    - Feb 2023
 !
 !   purpose            - routine calculates unconstrained geometry dof
 !                        for a 3D element - need revision for TETRA
@@ -67,12 +67,12 @@ subroutine nodcor(Mdle, Xnod)
       if (iprint.eq.1) then
         write(*,7006) Mdle
  7006   format('nodcor: Mdle   = ',i6)
-        call print_order(NODES(Mdle)%type,norder)
+        call print_order(NODES(Mdle)%ntype,norder)
       endif
 #endif
 !
 !..determine number of local dof
-   call celndof(NODES(Mdle)%type,norder, nrdoflH,nrdoflE,nrdoflV,nrdoflQ)
+   call celndof(NODES(Mdle)%ntype,norder, nrdoflH,nrdoflE,nrdoflV,nrdoflQ)
 !
 !..determine constraints' coefficients
    call logic(Mdle,2,                           &
@@ -154,14 +154,14 @@ subroutine nodcor(Mdle, Xnod)
       call elem_nodes(Mdle, nodesl,norientl)
       write(*,*) 'nodcor: VERTEX dof'
       inod=0; k=0
-      do i=1,nvert(NODES(Mdle)%Type)
+      do i=1,nvert(NODES(Mdle)%ntype)
          inod=inod+1; k=k+1
          write(*,7003) (Xnod(ivar,k),ivar=1,NDIMEN)
       enddo
       write(*,*) 'nodcor: EDGE dof'
-      do i=1,nedge(NODES(Mdle)%Type)
+      do i=1,nedge(NODES(Mdle)%ntype)
          inod=inod+1; nod = nodesl(inod)
-         call ndof_nod(NODES(nod)%Type,NODES(nod)%order, &
+         call ndof_nod(NODES(nod)%ntype,NODES(nod)%order, &
                        ndofH,ndofE,ndofV,ndofQ)
          write(*,*) 'EDGE = ',i
          do j=1,ndofH
@@ -170,9 +170,9 @@ subroutine nodcor(Mdle, Xnod)
          enddo
       enddo
       write(*,*) 'nodcor: FACE dof'
-      do i=1,nface(NODES(Mdle)%Type)
+      do i=1,nface(NODES(Mdle)%ntype)
          inod=inod+1; nod = nodesl(inod)
-         call ndof_nod(NODES(nod)%Type,NODES(nod)%order, &
+         call ndof_nod(NODES(nod)%ntype,NODES(nod)%order, &
                        ndofH,ndofE,ndofV,ndofQ)
          write(*,*) 'FACE = ',i
          do j=1,ndofH
@@ -181,7 +181,7 @@ subroutine nodcor(Mdle, Xnod)
          enddo
       enddo
       write(*,*) 'nodcor: MIDDLE NODE dof'
-      call ndof_nod(NODES(Mdle)%Type,NODES(nod)%order, &
+      call ndof_nod(NODES(Mdle)%ntype,NODES(nod)%order, &
                     ndofH,ndofE,ndofV,ndofQ)
       do j=1,ndofH
          k=k+1
@@ -232,7 +232,7 @@ subroutine test_nodcor(Mdle)
    endif
 !
    call find_domain(Mdle, ndom)
-   write(*,7000) Mdle,NODES(mdle)%type,ndom
+   write(*,7000) Mdle,NODES(mdle)%ntype,ndom
 7000 format(' test_nodcor: Mdle,type,ndom = ',i8,2x,a4,2x,i2)
 !
 !..order, orientations, geometry dof
@@ -241,10 +241,10 @@ subroutine test_nodcor(Mdle)
    call nodcor(     Mdle, xnod)
 !
 !..integration points
-   call set_3Dint(NODES(Mdle)%type,norder, nint,xiloc,wxi)
+   call set_3Dint(NODES(Mdle)%ntype,norder, nint,xiloc,wxi)
 !
 !..number of element vertices, need to perform incremental check
-   nv=nvert(NODES(Mdle)%type)
+   nv=nvert(NODES(Mdle)%ntype)
 !
 !..loop over integration points
    do l=1,nint
@@ -255,7 +255,7 @@ subroutine test_nodcor(Mdle)
  7001 format(' xi = ',3(e12.5,2x))
 !
 !  ...shape functions
-      call shape3DH(NODES(Mdle)%type,xi,norder,nedge_orient, &
+      call shape3DH(NODES(Mdle)%ntype,xi,norder,nedge_orient, &
                     nface_orient, nrdofH,vshapH,dvshapH)
 !
 !  ...accumulate

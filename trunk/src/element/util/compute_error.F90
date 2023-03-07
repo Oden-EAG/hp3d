@@ -318,7 +318,7 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, &
 !
 !     set up the element quadrature
       INTEGRATION=2
-      call set_3Dint(NODES(mdle)%type,norder, nint,xiloc,wxi)
+      call set_3Dint(NODES(mdle)%ntype,norder, nint,xiloc,wxi)
       INTEGRATION=0
 !
 !     supported physical attributes

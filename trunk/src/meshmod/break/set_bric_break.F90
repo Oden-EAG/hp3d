@@ -1,11 +1,22 @@
-!> Purpose : prepare the necessary information for breaking a brick middle node
-subroutine set_bric_break(Kref,Nord, Nrsons,Type,Norder)
+!----------------------------------------------------------------------------
+!> @brief determines info for breaking a brick middle node
+!!
+!> @param[in ] Kref    - node refinement kind
+!> @param[in ] Nord    - node order of approximation
+!> @param[out] Nrsons  - number of sons
+!> @param[out] Ntype   - sons' types
+!> @param[out] Norder  - sons' orders of approximation
+!!
+!> @date Feb 2023
+!----------------------------------------------------------------------------
+subroutine set_bric_break(Kref,Nord, Nrsons,Ntype,Norder)
+  use node_types
   implicit none
-  integer,                         intent(in)  :: Kref,Nord
-  integer,          dimension(27), intent(out) :: Norder
-  integer,                         intent(out) :: Nrsons
-  character(len=4), dimension(27), intent(out) :: Type
+  integer, intent(in)  :: Kref,Nord
+  integer, intent(out) :: Nrsons
+  integer, intent(out) :: Ntype(27),Norder(27)
   integer :: nordxy, nordyz, nordxz, nordx, nordy, nordz
+!----------------------------------------------------------------------------
 !
   call decode(nord,   nordxy,nordz)
   call decode(nordxy, nordx, nordy)
@@ -13,13 +24,13 @@ subroutine set_bric_break(Kref,Nord, Nrsons,Type,Norder)
   nordxz = nordx*10 + nordz
   nordyz = nordy*10 + nordz
 !
-  Norder = 0; Type(1:27) = 'none'
+  Norder = 0; Ntype(1:27) = 0
 !
   select case (Kref)
   case (001,010,100)
-     Nrsons = 3
-     Type(1:2) = 'mdlb'
-     Type(3)   = 'mdlq'
+     Nrsons     = 3
+     Ntype(1:2) = MDLB
+     Ntype(3)   = MDLQ
      select case (Kref)
      case(001)
         Norder(1:3) = (/nord,nord,nordxy/)
@@ -29,10 +40,10 @@ subroutine set_bric_break(Kref,Nord, Nrsons,Type,Norder)
         Norder(1:3) = (/nord,nord,nordyz/)
      end select
   case (011,101,110)
-     Nrsons      = 9
-     Type(1:4)  = 'mdlb'
-     Type(5:8)  = 'mdlq'
-     Type(9)    = 'medg'
+     Nrsons     = 9
+     Ntype(1:4) = MDLB
+     Ntype(5:8) = MDLQ
+     Ntype(9)   = MEDG
      select case (Kref)
      case(011)
         Norder(1:9) = (/&
@@ -48,11 +59,11 @@ subroutine set_bric_break(Kref,Nord, Nrsons,Type,Norder)
             nordyz,nordxz,nordyz,nordxz,nordz/)
      end select
   case (111)
-     Nrsons = 27
-     Type(1:8)   = 'mdlb'
-     Type(9:20)  = 'mdlq'
-     Type(21:26) = 'medg'
-     Type(27)    = 'vert'
+     Nrsons       = 27
+     Ntype(1:8)   = MDLB
+     Ntype(9:20)  = MDLQ
+     Ntype(21:26) = MEDG
+     Ntype(27)    = VERT
      ! should be as follows (according to hp book)
      ! Norder(1:27) = (/ &
      !      nord,nord,nord,nord,nord,nord,nord,nord, &

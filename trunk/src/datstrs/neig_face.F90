@@ -41,7 +41,7 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
   integer,               intent(out) :: Nrneig
   integer, dimension(2), intent(out) :: Neig, Nsid_list, Norient_list
 ! ** Locals
-  character(len=4)           :: type
+  integer                    :: ntype
   integer, dimension(2, 27)  :: nodesl_neig, norientl_neig
   integer, dimension(27)     :: nodesl, norientl, nodesl_is, norientl_is
   integer, dimension(MAXGEN) :: nface_list
@@ -72,17 +72,17 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
 !========================================================================
 !
   iprint=0
-  select case(NODES(Mface)%type)
-  case('mdlt','mdlq')
+  select case(NODES(Mface)%ntype)
+  case(MDLT,MDLQ)
   case default
-     write(*,1)Mface,NODES(Mface)%type
+     write(*,1)Mface,S_Type(NODES(Mface)%ntype)
 1    format(' neig_face: Mface,type = ',i10,',',a4)
      call logic_error(ERR_INVALID_VALUE,__FILE__,__LINE__)
   end select
 !
   Nrneig=0 ; Neig=0 ; Nsid_list=0 ; Norient_list=0
   if (iprint.eq.1) then
-     write(*,1)Mface,NODES(Mface)%type
+     write(*,1)Mface,S_Type(NODES(Mface)%ntype)
   endif
 !
 !------------------------------------------------------------------------
@@ -117,10 +117,10 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
 !
 !..CASE 1 : initial mesh (element) middle node
    if (mdle.lt.0) then
-     mdle=abs(mdle)
-     type=ELEMS(mdle)%type
-     nve =nvert(type)+nedge(type)
-     nrf =nface(type)
+     mdle = abs(mdle)
+     ntype = ELEMS(mdle)%etype
+     nve = nvert(ntype)+nedge(ntype)
+     nrf = nface(ntype)
 !
 ! ...locate face node on list of element nodes
      call locate(nod,ELEMS(mdle)%nodes(nve+1:nve+nrf),nrf, iface)
@@ -137,9 +137,9 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
 !
 ! ...if present, record neighbor of "mdle"
      if (mdle.ne.0) then
-        type=ELEMS(mdle)%type
-        nve =nvert(type)+nedge(type)
-        nrf =nface(type)
+        ntype = ELEMS(mdle)%etype
+        nve = nvert(ntype)+nedge(ntype)
+        nrf = nface(ntype)
 !
 !    ...locate face node on list of element nodes
         call locate(nod,ELEMS(mdle)%nodes(nve+1:nve+nrf),nrf, iface)
@@ -153,19 +153,19 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
 !
 !..CASE 2 : internal face
    else
-     type = NODES(mdle)%type
+     ntype = NODES(mdle)%ntype
      kref = NODES(mdle)%ref_kind
      call elem_nodes(mdle, nodesl,norientl)
-     call nr_mdle_sons(type, kref, nrsons)
+     call nr_mdle_sons(ntype, kref, nrsons)
      Nrneig = 0
 !
 ! ...search for the sons
      do is=1,nrsons
         call elem_nodes_one( mdle, nodesl, norientl, is, &
                              mdle_is, nodesl_is, norientl_is )
-        type = NODES(mdle_is)%type
-        nve  = nvert(type)+nedge(type)
-        nrf  = nface(type)
+        ntype = NODES(mdle_is)%ntype
+        nve  = nvert(ntype)+nedge(ntype)
+        nrf  = nface(ntype)
 
         call locate(nod, nodesl_is(nve+1:nve+nrf),nrf, iface)
         if (iface.gt.0) then
@@ -237,9 +237,9 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
 !
 !    ...pick face node
         nod =nface_list(igen)
-        type=NODES(Neig(i))%type
+        ntype=NODES(Neig(i))%ntype
         kref=NODES(Neig(i))%ref_kind
-        call nr_mdle_sons(type, kref, nrsons)
+        call nr_mdle_sons(ntype,kref, nrsons)
 
         if (iprint.eq.1) then
            write(*,13)i,igen,nod,Neig(i),kref,nrsons
@@ -253,9 +253,9 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
            call elem_nodes_one( Neig(i), &
                 nodesl_neig(i,:), norientl_neig(i,:), is, &
                 mdle_is, nodesl_is, norientl_is )
-           type=NODES(mdle_is)%type
-           nve =nvert(type)+nedge(type)
-           nrf =nface(type)
+           ntype = NODES(mdle_is)%ntype
+           nve = nvert(ntype)+nedge(ntype)
+           nrf = nface(ntype)
 !
 !       ...if face is found, update
            call locate(nod, nodesl_is(nve+1:nve+nrf),nrf, iface)

@@ -74,7 +74,7 @@ subroutine elem_heat(Mdle,                   &
    real(8), parameter :: rONE  = 1.d0
 !
 !..declare edge/face type variables
-   character(len=4) :: etype,ftype
+   integer :: etype,ftype
 !
 !..declare element order, orientation for edges and faces
    integer, dimension(19)    :: norder
@@ -199,7 +199,7 @@ subroutine elem_heat(Mdle,                   &
    allocate(stiff_HV (NrTest   ,NrdofVi))
 !
 !..element type
-   etype = NODES(Mdle)%type
+   etype = NODES(Mdle)%ntype
    nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
 !
 !..determine order of approximation
@@ -208,15 +208,15 @@ subroutine elem_heat(Mdle,                   &
 !
 !..set the enriched order of approximation
    select case(etype)
-      case('mdlb')
+      case(MDLB)
          nordP = NODES(Mdle)%order+NORD_ADD*111
          norderi(nre+nrf+1) = 111
-      case('mdln','mdld')
-         nordP = NODES(Mdle)%order+NORD_ADD
-         norderi(nre+nrf+1) = 1
-      case('mdlp')
+      case(MDLP)
          nordP = NODES(Mdle)%order+NORD_ADD*11
          norderi(nre+nrf+1) = 11
+      case(MDLN,MDLD)
+         nordP = NODES(Mdle)%order+NORD_ADD
+         norderi(nre+nrf+1) = 1
       case default
          write(*,*) 'elem_heat: invalid etype param. stop.'
          stop

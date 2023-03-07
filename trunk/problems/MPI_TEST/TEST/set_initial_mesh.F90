@@ -59,11 +59,11 @@
 !  ...set order of approximation
       if (IP.gt.0) then
 !     ...uniform order of approximation
-         select case(ELEMS(iel)%Type)
-            case('tetr'); Nelem_order(iel) = 1*IP
-            case('pyra'); Nelem_order(iel) = 1*IP
-            case('pris'); Nelem_order(iel) = 11*IP
-            case('bric'); Nelem_order(iel) = 111*IP
+         select case(ELEMS(iel)%etype)
+            case(BRIC); Nelem_order(iel) = 111*IP
+            case(PRIS); Nelem_order(iel) = 11*IP
+            case(TETR); Nelem_order(iel) = 1*IP
+            case(PYRA); Nelem_order(iel) = 1*IP
          end select
       else
 !     ...custom order of approximation (NOT IMPLEMENTED)
@@ -80,7 +80,7 @@
 !  ...uniform BC
       case(BC_DIRICHLET)
 !     ...if exterior face, set boundary condition to IBC_PROB
-         do ifc=1,nface(ELEMS(iel)%Type)
+         do ifc=1,nface(ELEMS(iel)%etype)
             neig = ELEMS(iel)%neig(ifc)
             select case(neig)
             case(0)
@@ -90,7 +90,7 @@
          enddo
 !
       case default
-         do ifc=1,nface(ELEMS(iel)%Type)
+         do ifc=1,nface(ELEMS(iel)%etype)
             neig = ELEMS(iel)%neig(ifc)
             select case(neig)
             case(0)
@@ -110,11 +110,11 @@
       if (iprint.eq.1 .and. IP.gt.0) then
          write(*,*) '-- uniform order of approximation --'
          write(*,999) NRELIS
-         select case(ELEMS(iel)%Type)
-            case('tetr'); write(*,1000) IP
-            case('pyra'); write(*,1000) IP
-            case('pris'); write(*,1001) IP,IP
-            case('bric'); write(*,1002) IP,IP,IP
+         select case(ELEMS(iel)%etype)
+            case(BRIC); write(*,1002) IP,IP,IP
+            case(PRIS); write(*,1001) IP,IP
+            case(TETR); write(*,1000) IP
+            case(PYRA); write(*,1000) IP
          end select
          write(*,*)
 !

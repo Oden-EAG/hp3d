@@ -1,5 +1,5 @@
 !----------------------------------------------------------------------------------------
-!> Purpose : write vector attribute to .h5 file
+!> @brief      write vector attribute to .h5 file
 !!
 !> @param[in ] Sname   - name/description (e.g., 'Vector')
 !> @param[in ] Sfile   - attribute file name (e.g., ../output/paraview/vector_00000.h5)
@@ -7,7 +7,7 @@
 !> @param[in ] Idx     - index identifying vector attribute
 !> @param[out] Ic      - number of vertices of visualization object
 !!
-!> @date Oct 2019
+!> @date       Feb 2023
 !----------------------------------------------------------------------------------------
 !
 #include "typedefs.h"
@@ -32,7 +32,7 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
    integer,          intent(out) :: Ic
 !
    type(vis)                           :: vis_obj
-   character(len=4)                    :: etype
+   integer                             :: ntype
    integer                             :: mdle, nflag, iel, iv, nV
    real(8), dimension(3)               :: xi,x,val
    integer, dimension(12)              :: nedge_orient
@@ -90,8 +90,8 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
          call find_domain(mdle, ndom)
          if (ndom.ne.PARAVIEW_DOMAIN) cycle
       endif
-      etype = NODES(mdle)%type
-      vis_obj = vis_on_type(etype)
+      ntype = NODES(mdle)%ntype
+      vis_obj = vis_on_type(ntype)
       n_vert_offset(iel) = Ic
       n_elem_vert(iel) = vis_obj%nr_vert
       Ic = Ic + vis_obj%nr_vert
@@ -109,7 +109,7 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
 !
    nflag=1
 !$OMP PARALLEL DO                                     &
-!$OMP PRIVATE(mdle,ndom,etype,iv,nV,xi,               &
+!$OMP PRIVATE(mdle,ndom,ntype,iv,nV,xi,               &
 !$OMP         xnod,zdofH,zdofE,zdofV,zdofQ,           &
 !$OMP         norder,nedge_orient,nface_orient,       &
 !$OMP         x,dxdxi,zsolH,zgradH,zsolE,zcurlE,      &
@@ -135,14 +135,14 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
       call find_elem_nodes(mdle, norder,nedge_orient,nface_orient)
 !
 !  ...select appropriate visualization object
-      etype = NODES(mdle)%type
+      ntype = NODES(mdle)%ntype
       nV = n_elem_vert(iel)
 !
 !  ...loop over nodes of visualization object
       do iv=1,nV
 !
 !     ...visualization point accounting for VLEVEL
-         call get_vis_point(vis_on_type(etype),iv-1, xi)
+         call get_vis_point(vis_on_type(ntype),iv-1, xi)
 !
 !     ...compute element solution
          call soleval(mdle,xi,nedge_orient,nface_orient,norder,xnod, &

@@ -1,12 +1,12 @@
 !-------------------------------------------------------------------------
-!> Purpose : routine breaks an element middle node according to a given
-!!           refinement flag. Compatibility is assumed across the faces
-!!           and the edges.
+!> @brief     routine breaks an element middle node according to a given
+!!            refinement flag. Compatibility is assumed across the faces
+!!            and the edges.
 !!
 !> @param[in] Mdle - middle node
 !> @param[in] Kref - refinement flag
 !!
-!> rev@Oct 2019
+!> @date      Feb 2023
 !-------------------------------------------------------------------------
 subroutine break(Mdle,Kref)
 !
@@ -18,10 +18,10 @@ subroutine break(Mdle,Kref)
 !
    integer, intent(in) :: Mdle, Kref
 !
-   character(len=4)        :: type
-   integer, dimension(27)  :: nodesl,norientl
-   integer, dimension(6)   :: kreff
-   integer, dimension(12)  :: krefe
+   integer :: ntype
+   integer :: nodesl(27),norientl(27)
+   integer :: kreff(6)
+   integer :: krefe(12)
    integer :: i, is, iprint, iface, ipass
    integer :: kref_face, kref_edge, nod, nrsons
    logical :: iact
@@ -34,19 +34,19 @@ subroutine break(Mdle,Kref)
    call elem_nodes(Mdle, nodesl,norientl)
 !
 !..determine refinements for the element faces and edges
-   type = NODES(Mdle)%type
-   call find_face_ref_flags(type,Kref, kreff)
-   call find_edge_ref_flags(type,Kref, krefe)
+   ntype = NODES(Mdle)%ntype
+   call find_face_ref_flags(ntype,Kref, kreff)
+   call find_edge_ref_flags(ntype,Kref, krefe)
 !
 #if DEBUG_MODE
    if (iprint.eq.2) then
-      call elem_show(Mdle,type,nodesl,norientl)
+      call elem_show(Mdle,ntype,nodesl,norientl)
  7000 format('break: Mdle = ',i7)
       write(*,7011) Kref
  7011 format('       Kref  = ',i3)
-      write(*,7012) kreff(1:nface(type))
+      write(*,7012) kreff(1:nface(ntype))
  7012 format('       kreff = ',6i3)
-      write(*,7013) krefe(1:nedge(type))
+      write(*,7013) krefe(1:nedge(ntype))
  7013 format('       krefe = ',12i2)
       call pause
    endif
@@ -57,8 +57,8 @@ subroutine break(Mdle,Kref)
 !=========================================================================
 !
 !..loop over edges and generate INACTIVE son nodes
-   do i=1,nedge(type)
-      nod=nodesl(nvert(type)+i)
+   do i=1,nedge(ntype)
+      nod=nodesl(nvert(ntype)+i)
       if (iprint .eq. 2) write(*,*) 'edge nod = ', nod
 !  ...check if edge is unrefined and needs to be refined
       if ((krefe(i).ne.0) .and. (is_leaf(nod))) then
@@ -73,8 +73,8 @@ subroutine break(Mdle,Kref)
 !=========================================================================
 !
 !..loop over faces and generate ACTIVE/INACTIVE son nodes
-   do i=1,nface(type)
-      iface=nvert(type)+nedge(type)+i
+   do i=1,nface(ntype)
+      iface=nvert(ntype)+nedge(ntype)+i
       nod=nodesl(iface)
       if (iprint .eq. 2) write(*,*) 'face nod = ', nod
 !
@@ -82,11 +82,11 @@ subroutine break(Mdle,Kref)
       if (kreff(i).ne.0) then
 !
 !     ...modify refinement according to orientation
-         call change_ref_flag('l2g',NODES(nod)%type,kreff(i), &
+         call change_ref_flag('l2g',NODES(nod)%ntype,kreff(i), &
                               norientl(iface), kref_face)
 !
 !     ...check
-         call check_ref(NODES(nod)%type,NODES(nod)%ref_kind, &
+         call check_ref(NODES(nod)%ntype,NODES(nod)%ref_kind, &
                         kref_face, ipass)
          if (ipass.eq.0) then
             write(*,7002) mdle,i,NODES(nod)%ref_kind,kref_face
@@ -109,14 +109,14 @@ subroutine break(Mdle,Kref)
 !
 !     ...existing refinement does NOT coincide with desired refinement
          else
-            select case(NODES(nod)%type)
+            select case(NODES(nod)%ntype)
 !
 !        ...triangular face
-            case('mdlt')
+            case(MDLT)
                call nodbreak(nod,kref_face,iact)
 !
 !        ...quadrilateral face
-            case('mdlq')
+            case(MDLQ)
                select case(NODES(nod)%ref_kind)
 !           ...UNREFINED face : just break
                case(0)
@@ -150,12 +150,12 @@ subroutine break(Mdle,Kref)
    call activate_sons(Mdle)
 !
 !..update the number of active elements
-   call nr_mdle_sons(type,Kref, nrsons)
+   call nr_mdle_sons(ntype,Kref, nrsons)
    NRELES=NRELES+nrsons-1
 !
 #if DEBUG_MODE
    if (iprint.ge.1) then
-      write(*,7100) Mdle, NODES(Mdle)%type, Kref
+      write(*,7100) Mdle, S_Type(NODES(Mdle)%ntype), Kref
  7100 format('break: Mdle ',i7,' ',a4, ' HAS BEEN BROKEN WITH Kref = ', i3)
    endif
 #endif
@@ -164,12 +164,12 @@ end subroutine break
 !
 !
 !------------------------------------------------------------------------
-!> Purpose : activate son nodes
-!!
-!! Remark  : in distributed mesh, this routines relies upon that the
-!!           Nod's subdomain was set correctly previously
+!> @brief     activate son nodes
+!!            remark: in distributed mesh, this routines relies upon that
+!!                    the Nod's subdomain was set correctly previously
 !!
 !> @param[in] Nod - node number
+!> @date      Feb 2023
 !------------------------------------------------------------------------
 subroutine activate_sons(Nod)
    use data_structure3D

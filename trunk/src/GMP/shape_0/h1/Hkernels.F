@@ -322,7 +322,7 @@ c
       endif
 c
 c  ...local to global coordinates
-      call local2global('tria',T,Norient, s,dsdt)
+      call local2global(TRIA,T,Norient, s,dsdt)
 ccc      select case(Norient)
 ccc      case (0); s(1:2) = T(1:2)
 ccc      case (1); s(1) = T(2); s(2) = 1.d0 - T(1) - T(2)

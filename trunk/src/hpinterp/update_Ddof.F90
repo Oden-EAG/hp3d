@@ -26,7 +26,7 @@ subroutine update_Ddof()
 !
    implicit none
 !
-   character(4) :: etype
+   integer :: ntype
 !
 !..orientation of element nodes
    integer, dimension(12)      :: nedge_orient
@@ -118,8 +118,8 @@ subroutine update_Ddof()
          call logic_nodes(mdle,nodesl, nodm,nrnodm)
 !
 !     ...check if all parent nodes have been updated
-         etype = NODES(mdle)%type
-         nr_elem_nodes = nvert(etype)+nedge(etype)+nface(etype)+1
+         ntype = NODES(mdle)%ntype
+         nr_elem_nodes = nvert(ntype)+nedge(ntype)+nface(ntype)+1
          do i=1,nrnodm
             nod = nodm(i)
             call locate(nod,nodesl,nr_elem_nodes, loc)
@@ -140,7 +140,7 @@ subroutine update_Ddof()
 !
 !-----------------------------------------------------------------------
 !     ...Step 1: Update   V E R T   dof for Dirichlet nodes
-         do iv=1,nvert(etype)
+         do iv=1,nvert(ntype)
             nod = nodesl(iv)
             if (.not.associated(NODES(nod)%dof))       cycle
             if (.not.associated(NODES(nod)%dof%zdofH)) cycle
@@ -165,8 +165,8 @@ subroutine update_Ddof()
 !     ...compute solution dofs (need for H1 update)
          call solelm(mdle, zdofH,zdofE,zdofV,zdofQ)
 !
-         do ie=1,nedge(etype)
-            ind = nvert(etype)+ie
+         do ie=1,nedge(ntype)
+            ind = nvert(ntype)+ie
             nod = nodesl(ind)
             if (.not.associated(NODES(nod)%dof)) cycle
             if (NODES(nod)%geom_interf.eq.1)     cycle
@@ -178,7 +178,7 @@ subroutine update_Ddof()
              7020 format('update_Ddof: CALLING dhpedgeH FOR mdle,ie,nod = ',i8,i2,i8)
 #endif
                   call dhpedgeH(mdle,iflag,no,xsub,                     &
-                                etype,NODES(nod)%case,NODES(nod)%bcond, &
+                                ntype,NODES(nod)%case,NODES(nod)%bcond, &
                                 nedge_orient,nface_orient,norder,ie,    &
                                 zdofH, NODES(nod)%dof%zdofH)
                endif
@@ -192,7 +192,7 @@ subroutine update_Ddof()
              7030 format('update_Ddof: CALLING dhpedgeE FOR mdle,ie,nod = ',i8,i2,i8)
 #endif
                   call dhpedgeE(mdle,iflag,no,xsub,                     &
-                                etype,NODES(nod)%case,NODES(nod)%bcond, &
+                                ntype,NODES(nod)%case,NODES(nod)%bcond, &
                                 nedge_orient,nface_orient,norder,ie,    &
                                 NODES(nod)%dof%zdofE)
                endif
@@ -207,9 +207,9 @@ subroutine update_Ddof()
          call solelm(mdle, zdofH,zdofE,zdofV,zdofQ)
 !
 !     ...loop over faces
-         do ifc=1,nface(etype)
+         do ifc=1,nface(ntype)
 !        ...get local node number
-            ind = nvert(etype)+nedge(etype)+ifc
+            ind = nvert(ntype)+nedge(ntype)+ifc
 !        ...get global node number
             nod = nodesl(ind)
             if (.not.associated(NODES(nod)%dof)) cycle
@@ -222,7 +222,7 @@ subroutine update_Ddof()
              7040 format('update_Ddof: CALLING dhpfaceH FOR mdle,ifc,nod = ',i8,i2,i8)
 #endif
                   call dhpfaceH(mdle,iflag,no,xsub,                     &
-                                etype,NODES(nod)%case,NODES(nod)%bcond, &
+                                ntype,NODES(nod)%case,NODES(nod)%bcond, &
                                 nedge_orient,nface_orient,norder,ifc,   &
                                 zdofH, NODES(nod)%dof%zdofH)
                endif
@@ -236,7 +236,7 @@ subroutine update_Ddof()
              7050 format('update_Ddof: CALLING dhpfaceE FOR mdle,ifc,nod = ',i8,i2,i8)
 #endif
                   call dhpfaceE(mdle,iflag,no,xsub,                     &
-                                etype,NODES(nod)%case,NODES(nod)%bcond, &
+                                ntype,NODES(nod)%case,NODES(nod)%bcond, &
                                 nedge_orient,nface_orient,norder,ifc,   &
                                 zdofE, NODES(nod)%dof%zdofE)
                endif
@@ -250,7 +250,7 @@ subroutine update_Ddof()
              7060 format('update_Ddof: CALLING dhpfaceV FOR mdle,ifc,nod = ',i8,i2,i8)
 #endif
                   call dhpfaceV(mdle,iflag,no,xsub,                     &
-                                etype,NODES(nod)%case,NODES(nod)%bcond, &
+                                ntype,NODES(nod)%case,NODES(nod)%bcond, &
                                 nedge_orient,nface_orient,norder,ifc,   &
                                 NODES(nod)%dof%zdofV)
                endif
@@ -318,7 +318,7 @@ subroutine update_Ddof()
 !  ...determine nodes for the modified element
       call get_connect_info(mdle, nodesl,norientl)
       call logic_nodes(mdle,nodesl, nodm,nrnodm)
-      nr_elem_nodes = nvert(etype)+nedge(etype)+nface(etype)+1
+      nr_elem_nodes = nvert(ntype)+nedge(ntype)+nface(ntype)+1
 !  ...iterate through the nodes of the modified element
       do i=1,nrnodm
          nod = nodm(i)
@@ -406,7 +406,7 @@ subroutine update_Ddof()
       nvarV = NREQNV(icase)*NRCOMS
 !  ...check whether supplier
       if (src .eq. RANK) then
-         !write(*,6010) RANK,'SENDING  ',nod,NODES(nod)%type
+         !write(*,6010) RANK,'SENDING  ',nod,S_Type(NODES(nod)%ntype)
          if (nvarH > 0 .and. ndofH > 0) then
             count = ndofH*nvarH; buf => NODES(nod)%dof%zdofH
             call MPI_SEND(buf,count,MPI_VTYPE,rcv,tag,MPI_COMM_WORLD,ierr)
@@ -421,7 +421,7 @@ subroutine update_Ddof()
          endif
 !  ...check whether receiver
       elseif (rcv .eq. RANK) then
-         !write(*,6010) RANK,'RECEIVING',nod,NODES(nod)%type
+         !write(*,6010) RANK,'RECEIVING',nod,S_Type(NODES(nod)%ntype)
          if (nvarH > 0 .and. ndofH > 0) then
             count = ndofH*nvarH; buf => NODES(nod)%dof%zdofH
             call MPI_RECV(buf,count,MPI_VTYPE,src,tag,MPI_COMM_WORLD,MPI_STATUS_IGNORE,ierr)

@@ -27,7 +27,7 @@ subroutine set_initial_mesh(Nelem_order)
    integer, intent(out) :: Nelem_order(NRELIS)
 !
 !..element type
-   character(len=4) :: etype
+   integer :: etype
 !
 !..BC flags; dimension = num_faces * components
    integer :: ibc(6,NRINDEX)
@@ -63,17 +63,17 @@ subroutine set_initial_mesh(Nelem_order)
 ! loop over initial mesh elements
    do iel=1,NRELIS
 
-      etype = ELEMS(iel)%type
+      etype = ELEMS(iel)%etype
 !
 !   SET ORDER OF APPROXIMATION
 !
 !  ...uniform order of approximation
       if (IP.gt.0) then
          select case(etype)
-         case('tetr'); Nelem_order(iel) = 1*IP
-         case('pyra'); Nelem_order(iel) = 1*IP
-         case('pris'); Nelem_order(iel) = 11*IP
-         case('bric'); Nelem_order(iel) = 111*IP
+         case(BRIC); Nelem_order(iel) = 111*IP
+         case(PRIS); Nelem_order(iel) = 11*IP
+         case(TETR); Nelem_order(iel) = 1*IP
+         case(PYRA); Nelem_order(iel) = 1*IP
          end select
       else
          write(*,1003) IP

@@ -4,42 +4,37 @@
 !
 !---------------------------------------------------------------------
 !
-!   latest revision    - June 2021
 !
-!   purpose            - routine generates a new node
-!
-!   arguments :
-!
-!     in:
-!              Type    - type of a new node
-!              Icase   - node case
-!              Nbcond  - boundary condition flag
-!              Nfath   - father of the node
-!              Norder  - order of approximation for the new node
-!              Subd    - subdomain of node
-!              Iact    = T  active node, allocate dof
-!                      = F  inactive node, DO NOT allocate dof
-!              X       = coord for vertex
-!     out:
-!              Nod     - number of the new node
-!
+!> @brief      routine generates a new node
+!!
+!> @param[in]  Ntype   - type of a new node
+!> @param[in]  Icase   - node case
+!> @param[in]  Nbcond  - boundary condition flag
+!> @param[in]  Nfath   - father of the node
+!> @param[in]  Norder  - order of approximation for the new node
+!> @param[in]  Subd    - subdomain of node
+!> @param[in]  Iact    = T  active node, allocate dof
+!!                     = F  inactive node, DO NOT allocate dof
+!> @param[out] Nod     - number of the new node
+!!
+!> @date       Feb 2023
 !-----------------------------------------------------------------------
 !
-subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
+subroutine nodgen(Ntype,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
 !
    use data_structure3D
    use mpi_param, only: RANK,ROOT
 !
    implicit none
 !
-   character(len=4), intent(in)  :: Type
-   integer, intent(in)           :: Icase
-   integer, intent(in)           :: Nbcond
-   integer, intent(in)           :: Nfath
-   integer, intent(in)           :: Norder
-   integer, intent(in)           :: Subd
-   logical, intent(in)           :: Iact
-   integer, intent(out)          :: Nod
+   integer, intent(in)  :: Ntype
+   integer, intent(in)  :: Icase
+   integer, intent(in)  :: Nbcond
+   integer, intent(in)  :: Nfath
+   integer, intent(in)  :: Norder
+   integer, intent(in)  :: Subd
+   logical, intent(in)  :: Iact
+   integer, intent(out) :: Nod
 !
    integer :: ndofH,ndofE,ndofV,ndofQ,nvar
 !
@@ -53,7 +48,7 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
 !
 #if DEBUG_MODE
    if (iprint.eq.1) then
-      write(*,7000) Type,Icase,Nbcond,Nfath,Norder,Iact
+      write(*,7000) S_Type(Ntype),Icase,Nbcond,Nfath,Norder,Iact
  7000 format(' nodgen: Type,Icase,Nbcond,Nfath,Norder,Iact = ', &
                         a4,2x,i3,2x,i6,2x,i6,2x,i3,2x,l2)
       call decod(Icase,2,NR_PHYSA, ncase)
@@ -80,7 +75,7 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
    NPNODS=NODES(Nod)%bcond
 !
 !..store node information
-   NODES(Nod)%type  = Type
+   NODES(Nod)%ntype = Ntype
    NODES(Nod)%case  = Icase
    NODES(Nod)%order = Norder
    NODES(Nod)%bcond = Nbcond
@@ -154,7 +149,7 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
 #if DEBUG_MODE
    if (iprint.eq.1) then
       write(*,*) 'nodgen: Nod ',Nod,'HAS BEEN GENERATED'
-      write(*,*) '        Type ',Type, ', Norder = ',Norder
+      write(*,*) '        Type ',S_Type(Ntype), ', Norder = ',Norder
       call pause
    endif
 #endif

@@ -21,7 +21,7 @@ endsubroutine geom_ex
 !! @param[out] X     - coordinates of the corresponding physical point
 !! @param[out] Dxdxi - derivatives wrt master element coordinates
 !!
-!! @revision Nov 12
+!! @revision Feb 2023
 !------------------------------------------------------------------------
 subroutine exact_geom(Mdle,Xi, X,Dxdxi)
 !
@@ -37,23 +37,23 @@ subroutine exact_geom(Mdle,Xi, X,Dxdxi)
       real(8), dimension(  8) ::  shapH
       real(8), dimension(3,8) :: dshapH
 
-      real(8)          :: eta(3),dxdeta(3,3),detadxi(3,3),etav(3,8)
-      integer          :: iflag, i, j, k, no
-      character(len=4) :: type
+      real(8) :: eta(3),dxdeta(3,3),detadxi(3,3),etav(3,8)
+      integer :: iflag, i, j, k, no
+      integer :: ntype
 !------------------------------------------------------------------------
 !
       iprint=0
-      type=NODES(Mdle)%type
+      ntype=NODES(Mdle)%ntype
 !
 !  ...element vertices in the reference space
       call refel(Mdle, iflag,no,etav)
 !
 !  ...vertex shape functions
-      call vshape3(type,Xi, shapH,dshapH)
+      call vshape3(ntype,Xi, shapH,dshapH)
 !
 !  ...determine refinement map : Eta = Eta(Xi)
       eta(1:3)=0.d0 ; detadxi(1:3,1:3)=0.d0
-      do k=1,nvert(type)
+      do k=1,nvert(ntype)
         eta(1:3) = eta(1:3) + etav(1:3,k)*shapH(k)
         do i=1,3
           detadxi(1:3,i) = detadxi(1:3,i) + etav(1:3,k)*dshapH(i,k)
@@ -78,7 +78,7 @@ subroutine exact_geom(Mdle,Xi, X,Dxdxi)
       case(7) ; call tetra(no,eta, x,dxdeta)
       case(8) ; call pyram(no,eta, x,dxdeta)
       case default
-         write(*,*) 'exact_geom: Mdle, type, iflag = ',Mdle, type, iflag
+         write(*,*) 'exact_geom: Mdle, type, iflag = ',Mdle,S_Type(ntype),iflag
          call logic_error(ERR_INVALID_VALUE,__FILE__,__LINE__)
       endselect
 !

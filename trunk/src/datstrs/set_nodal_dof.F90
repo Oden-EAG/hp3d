@@ -1,16 +1,15 @@
 !----------------------------------------------------------------------
-!> Purpose - routine sets interactively dof for nodes
-!!
-!> @data Oct 14
+!> @brief   routine sets interactively dof for nodes
+!> @date    Feb 2023
 !----------------------------------------------------------------------
 ! REMARK : routine should eventually be moved to TEST_PROJ, since it is
 !          merely a debugging routine
 !----------------------------------------------------------------------
-!
 subroutine set_nodal_dof
 !
       use data_structure3D , only : NODES,NRNODS,Is_inactive,find_ndof
       use parameters       , only : ZERO,ZONE
+      use node_types
 !
       implicit none
       integer :: inod,ndofH,ndofE,ndofV,ndofQ,ispace,nod,idof
@@ -31,7 +30,7 @@ subroutine set_nodal_dof
         call find_ndof(inod, ndofH,ndofE,ndofV,ndofQ)
 !
 !       print
-        write(*,1000) inod,NODES(inod)%type,ndofH,ndofE,ndofV,ndofQ
+        write(*,1000) inod,S_Type(NODES(inod)%ntype),ndofH,ndofE,ndofV,ndofQ
  1000   format(' node = ',i3,' ; type = ',a4,' ; dof H,E,V,Q = ',4(i3,' ; '))
 !
       enddo
@@ -77,5 +76,4 @@ subroutine set_nodal_dof
 !
       enddo
 !
-!
-endsubroutine set_nodal_dof
+end subroutine set_nodal_dof

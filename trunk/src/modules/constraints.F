@@ -16,6 +16,7 @@ c----------------------------------------------------------------------
 
       module constraints
 c
+      use node_types
       use parameters
 c
       save

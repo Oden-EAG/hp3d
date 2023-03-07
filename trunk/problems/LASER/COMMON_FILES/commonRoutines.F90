@@ -48,7 +48,7 @@ subroutine propagate_flag(Icomp,Nflag)
 !
    integer, intent(in) :: Icomp,Nflag
 !
-   character(len=4) :: etype
+   integer :: etype
    integer :: iel,mdle,ifc,nrfn,i,j,nod
 !
 !..element nodes and orientations, face nodes
@@ -72,7 +72,7 @@ subroutine propagate_flag(Icomp,Nflag)
 !$OMP DO
    do iel=1,NRELES
       mdle = ELEM_ORDER(iel)
-      etype = NODES(mdle)%type
+      etype = NODES(mdle)%ntype
 !
 !  ...determine element nodes
       call elem_nodes(mdle, nodesl,norientl)
@@ -181,17 +181,17 @@ subroutine my_sizetest
                                   NRHVAR, NREVAR, NRVVAR, NRQVAR
    do nod = 1, NRNODS
       if (Is_inactive(nod)) cycle
-      select case(NODES(nod)%type)
-         case('vert')
+      select case(NODES(nod)%ntype)
+         case(VERT)
             nH = nH + 1
-         case('medg')
+         case(MEDG)
             nH = nH + MAXP-1
             nE = nE + NREVAR*MAXP
-         case('mdlq')
+         case(MDLQ)
             nH = nH + NRHVAR*MAXmdlqH
             nE = nE + NREVAR*MAXmdlqE
             nV = nV + NRVVAR*MAXmdlqV
-         case('mdlb')
+         case(MDLB)
             nH = nH + NRHVAR*MAXmdlbH
             nE = nE + NREVAR*MAXmdlbE
             nV = nV + NRVVAR*MAXmdlbV

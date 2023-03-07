@@ -159,10 +159,10 @@ subroutine ref_core()
       mdle = n_elem(iel)
       write(*,2400) mdle
 !  ...refine element mdle
-      select case(NODES(mdle)%type)
-         case('mdlb')
+      select case(NODES(mdle)%ntype)
+         case(MDLB)
             call refine(mdle,kref_mdlb)
-         case('mdlp')
+         case(MDLP)
             call refine(mdle,kref_mdlp)
          case default
          write(*,*) 'ref_core: unsupported node type. stop.'

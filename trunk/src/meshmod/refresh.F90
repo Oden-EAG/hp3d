@@ -1,10 +1,8 @@
 !--------------------------------------------------------------------
-!> Purpose : activate inactive nodes which are not constrained
-!            but in the current mesh
-!!
+!> @brief activate inactive nodes which are not constrained
+!          but in the current mesh
 !> @date Oct 2019
 !--------------------------------------------------------------------
-!
 subroutine refresh
 !
    use data_structure3D
@@ -13,7 +11,7 @@ subroutine refresh
 !
    implicit none
 !
-   character(4) :: type
+   integer :: ntype
    integer :: nodesl(27),norientl(27)
    integer :: i,iel,nod,nfath,mdle,subd
    integer :: nrdofH,nrdofE,nrdofV,nrdofQ
@@ -47,13 +45,13 @@ subroutine refresh
 ! Step 1 : raise visitation flag for vertex, edge and face nodes of |
 !          all active elements                                      |
 !--------------------------------------------------------------------
-!$OMP DO PRIVATE(mdle,subd,nodesl,norientl,type,i)
+!$OMP DO PRIVATE(mdle,subd,nodesl,norientl,ntype,i)
    do iel=1,NRELES
       mdle = ELEM_ORDER(iel)
       call get_subd(mdle, subd)
       call elem_nodes(mdle, nodesl,norientl)
-      type=NODES(mdle)%type
-      do i=1,nvert(type)+nedge(type)+nface(type)
+      ntype=NODES(mdle)%ntype
+      do i=1,nvert(ntype)+nedge(ntype)+nface(ntype)
          NODES(nodesl(i))%visit=1
 !     ...if node is visited by an element within my subdomain,
 !        add node to my subdomain (need its dofs). this flag will
@@ -78,8 +76,8 @@ subroutine refresh
    do nod=1,NRNODS
 !
 !  ...skip if a middle node
-      select case(NODES(nod)%type)
-         case('mdlb','mdln','mdlp','mdld') ; cycle
+      select case(NODES(nod)%ntype)
+         case(MDLB,MDLN,MDLP,MDLD) ; cycle
       end select
 !
 !  ...skip if the node has not been marked,

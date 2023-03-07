@@ -4,13 +4,13 @@ c   routine name       - logic
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Mar 16
-c                        (S.P. & B.K. removed %visit method for OMP)
-c
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine establishes list of nodes
 c                        for a modified element, and the corresponding
 c                        constraints coefficients
+c   remark: this routine must be OMP thread-safe
+c   TODO: convert to F90, use DEBUG_MODE flag for iprint statements
 c
 c   arguments :
 c     in:
@@ -22,8 +22,9 @@ c     out:
 c            Nodm      - actual (unconstrained) nodes returned in the
 c                        standard order: vertex, mid-edge, mid-face
 c                        and middle nodes
-c            NdofmH,NdofmE,NdofmV - the corresponding number of
-c                        H1, H(curl) and H(div) dof
+c            NdofmH    - the corresponding number of H1 dof
+c            NdofmE    - the corresponding number of H(curl) dof
+c            NdofmV    - the corresponding number of H(div) dof
 c            Nrnodm    - number of modified element nodes
 c
 c            NrconH    - number of parent dof's for an i-th local H1 dof
@@ -50,16 +51,32 @@ c
       use refinements
 #include "syscom.blk"
 c
-      dimension Nodm(MAXNODM),NdofmH(MAXNODM),NdofmE(MAXNODM),
-     .                        NdofmV(MAXNODM),NdofmQ(MAXNODM)
+      integer, intent(in)  :: Mdle,Idec
 c
-      dimension NrconH(MAXbrickH),NrconE(MAXbrickE),NrconV(MAXbrickV),
-     .          NacH(NACDIM,MAXbrickH),ConstrH(NACDIM,MAXbrickH),
-     .          NacE(NACDIM,MAXbrickE),ConstrE(NACDIM,MAXbrickE),
-     .          NacV(NACDIM,MAXbrickV),ConstrV(NACDIM,MAXbrickV)
+      integer, intent(out) :: Nodm(MAXNODM)
+c
+      integer, intent(out) :: NdofmH(MAXNODM),
+     .                        NdofmE(MAXNODM),
+     .                        NdofmV(MAXNODM)
+c
+      integer, intent(out) :: NrconH(MAXbrickH),
+     .                        NrconE(MAXbrickE),
+     .                        NrconV(MAXbrickV)
+c
+      integer, intent(out) :: NacH(NACDIM,MAXbrickH),
+     .                        NacE(NACDIM,MAXbrickE),
+     .                        NacV(NACDIM,MAXbrickV)
+c
+      real(8), intent(out) :: ConstrH(NACDIM,MAXbrickH),
+     .                        ConstrE(NACDIM,MAXbrickE),
+     .                        ConstrV(NACDIM,MAXbrickV)
+c
+c  ...dummy argument for ndof_nod
+      integer :: NdofmQ(MAXNODM)
 c
 c  ...middle node type
-      character(len=4) :: etype
+      integer :: ntype
+c
  7002     format('im = ',i3,' nod = ',i6,' TYPE = ',a6,' ORDER = ',i3,
      .      ' naH = ',i3,' NdofmH = ',i3,
      .      ' naE = ',i3,' NdofmE = ',i3,
@@ -74,26 +91,35 @@ c  ...middle node type
      .             ' FACE NODES = ',i5,2x,4i5,2x,4i5)
 c
 c  ...element local nodes, orientations
-      dimension nodesl(27),norientl(27)
+      integer :: nodesl(27),norientl(27)
 c
 c  ...offsets for first dof for modified element nodes
-      dimension naH(MAXNODM),naE(MAXNODM),naV(MAXNODM)
+      integer :: naH(MAXNODM),naE(MAXNODM),naV(MAXNODM)
 c
 c  ...order for the element
-      dimension norder(19)
+      integer :: norder(19)
 c
 c  ...addresses and number of dof for parent mid-edge and vertex nodes
-      dimension locp(8),ndofHp(8),ndofEp(8)
+      integer :: locp(8),ndofHp(8),ndofEp(8)
 c
 c  ...unconstrained/constrained edge flags
 c     = 0          if edge is unconstrained (active)
 c     = son number if edge is constrained (inactive)
-      dimension ncflag(4)
+      integer :: ncflag(4)
 c
-c     H(div) constrained approximation flag
+c  ...H(div) constrained approximation flag
       logical :: CONSTRAINED_HDIV = .TRUE.
 c
+c  ...miscellanea
+      integer :: icH,icE,icV,nod,im,kH,kE,kV,j,nc,icase
+      integer :: iprint
+c
 c----------------------------------------------------------------------
+c
+      Nodm   = 0
+      NdofmH = 0; NrconH = 0; NacH = 0; ConstrH = 0.d0
+      NdofmE = 0; NrconE = 0; NacE = 0; ConstrE = 0.d0
+      NdofmV = 0; NrconV = 0; NacV = 0; ConstrV = 0.d0
 c
 c     initialize constraints arrays
       if (.NOT. INITIALIZED_CONSTR) call init_cnstr
@@ -118,7 +144,7 @@ c     get element nodes and build the local data base on constrained
 c     nodes for the element
       call get_connect_info(Mdle, nodesl,norientl)
       if (iprint.eq.1) then
-        call elem_show(Mdle, NODES(Mdle)%type,nodesl,norientl)
+        call elem_show(Mdle, NODES(Mdle)%ntype,nodesl,norientl)
       endif
 c
 c     get nodes of the modified element
@@ -143,10 +169,10 @@ c       number of H1, H(curl), H(div) dofs stored so far
 c
 c       number of H1, H(curl), H(div) dofs associated to node
         nod=Nodm(im)
-        call ndof_nod(NODES(nod)%type,NODES(nod)%order, NdofmH(im),
-     .                                                  NdofmE(im),
-     .                                                  NdofmV(im),
-     .                                                  NdofmQ(im) )
+        call ndof_nod(NODES(nod)%ntype,NODES(nod)%order, NdofmH(im),
+     .                                                   NdofmE(im),
+     .                                                   NdofmV(im),
+     .                                                   NdofmQ(im))
 c
 c       update H1,H(curl),H(div) dofs counters
         icH=icH+NdofmH(im) ; icE=icE+NdofmE(im) ; icV=icV+NdofmV(im)
@@ -157,7 +183,8 @@ c     printing
         write(*,*) 'MODIFIED ELEMENT NODES:'
         do im=1,Nrnodm
           nod=Nodm(im)
-          write(*,7002) im,nod,NODES(nod)%type,NODES(nod)%order,
+          write(*,7002) im,nod,S_Type(NODES(nod)%ntype),
+     .                  NODES(nod)%order,
      .                  naH(im),NdofmH(im),
      .                  naE(im),NdofmE(im),
      .                  naV(im),NdofmV(im)
@@ -178,8 +205,8 @@ c     initialize local H1, H(curl), H(div) dof counters
       kH=0 ; kE=0 ; kV=0
 c
 c     number of element's nodes
-      etype=NODES(Mdle)%type
-      nrnodes=nvert(etype)+nedge(etype)+nface(etype)+1
+      ntype=NODES(Mdle)%ntype
+      nrnodes=nvert(ntype)+nedge(ntype)+nface(ntype)+1
 c
 c     loop over element nodes
       do i=1,nrnodes
@@ -230,7 +257,8 @@ c         H(div)-loop through the nodal dof
 c
 c         printing
           if (iprint.eq.1) then
-            write(*,7030) i,nod,NODES(nod)%type,NODES(nod)%order
+            write(*,7030) i,nod,S_Type(NODES(nod)%ntype),
+     .                    NODES(nod)%order
           endif
 c
 c======================================================================
@@ -239,7 +267,7 @@ c======================================================================
         else
 c
 c         compute number of dof for the node
-          call ndof_nod(NODES(nod)%type,NODES(nod)%order,
+          call ndof_nod(NODES(nod)%ntype,NODES(nod)%order,
      .                  ndofH,ndofE,ndofV,ndofQ)
 c
 c         identify the node case
@@ -251,12 +279,12 @@ c         printing
 c
 c           node constrained by an edge
             case(11,12,13,37,38,39,47,48,49)
-            write(*,7031) i,nod,NODES(nod)%type,NODES(nod)%order,icase,
+            write(*,7031) i,nod,NODES(nod)%ntype,NODES(nod)%order,icase,
      .                    NEDGC(nc),NEDG_CONS(1:2,nc)
 c
 c           node constrained by a face
             case default
-            write(*,7032) i,nod,NODES(nod)%type,NODES(nod)%order,icase,
+            write(*,7032) i,nod,NODES(nod)%ntype,NODES(nod)%order,icase,
      .                    NFACEC(nc),NFACE_CONS(1:8,nc)
             end select
           endif
@@ -1547,7 +1575,7 @@ c
       if (.not.CONSTRAINED_HDIV) then
         write(*,*) 'executing Paolo'
         call find_order(Mdle, norder)
-        call celndof(NODES(Mdle)%type,norder,
+        call celndof(NODES(Mdle)%ntype,norder,
      .               nrdofH,nrdofE,nrdofV,nrdofQ)
 c
         NrconV=0 ; NacV=0 ; ConstrV=0.d0

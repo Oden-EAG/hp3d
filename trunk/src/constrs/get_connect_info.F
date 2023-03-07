@@ -35,7 +35,7 @@ c
       dimension Nodesl(27),Norientl(27)
 c
 c  ...face edge and vertex numbers etc
-      character(len=4) :: type,ftype,stype
+      integer :: ntype,ftype,stype
       integer :: if, ireff, is1, jef(4), jvf(4), kref_face(6)
 c
 c  ...initialize variables like this or OpenMP will not work!
@@ -57,7 +57,7 @@ c
       INFO_CONSTRAINTS=1
       call elem_nodes(Mdle, Nodesl,Norientl)
       if (iprint.eq.1) then
-        call elem_show(Mdle, NODES(Mdle)%type,Nodesl,Norientl)
+        call elem_show(Mdle, NODES(Mdle)%ntype,Nodesl,Norientl)
       endif
       INFO_CONSTRAINTS=0
 c
@@ -74,7 +74,7 @@ c  ...quit if an initial mesh element
 c
       nson = SON_NUM
       ftype = FATH_TYPE
-      stype = NODES(Mdle)%type
+      stype = NODES(Mdle)%ntype
       iref_fath = NODES(nfath)%ref_kind
       call find_face_ref_flags(ftype,iref_fath, kref_face)
       call decode_ref(ftype, iref_fath, iref1, iref2, iref3)
@@ -150,7 +150,7 @@ c
             select case(type_nod(ftype,jp))
 c
 c  .........triangular parent face
-            case('mdlt')
+            case(MDLT)
               call rotate_trian(iref,ireff,FATH_ORIENT(jp),is,nort)
 c              nod = NODES(nodp)%sons(is)
               nod = Son(nodp,is)
@@ -195,7 +195,7 @@ ccc              if (Is_inactive(nod)) then
               endif
 c
 c  .........quadrilateral parent face
-            case('mdlq')
+            case(MDLQ)
               call rotate_quad(iref,ireff,FATH_ORIENT(jp),
      .                         is,is1,nort)
 c              nod = NODES(nodp)%sons(is)
@@ -251,8 +251,8 @@ c
       if (iprint.eq.1) then
         write(*,7011) Mdle
  7011   format('get_connect_info: CONSTRAINED NODES FOR Mdle = ',i6)
-        type = NODES(Mdle)%type
-        nrn = nvert(type)+nedge(type)+nface(type)+1
+        ntype = NODES(Mdle)%ntype
+        nrn = nvert(ntype)+nedge(ntype)+nface(ntype)+1
         write(*,7012) NODES_CONSTR(1:nrn)
  7012   format(27i5)
         write(*,7013)
@@ -351,15 +351,15 @@ c  .........store the mid-face node
 c
 c  .........store relevant edges only
             do ie=ie1+1,4,2
-              medg = iabs(NFACE_CONS(ie,ifc))
+              medge = iabs(NFACE_CONS(ie,ifc))
               if (NFACE_CONS(ie,ifc).gt.0) then
                 ise = Is
               else
                 ise = imod(Is+1,2)
               endif
               NFACE_CONS(ie,NR_FACES) =
-     .        sign(Son(medg,ise),NFACE_CONS(ie,ifc))
-c     .        sign(NODES(medg)%sons(ise),NFACE_CONS(ie,ifc))
+     .        sign(Son(medge,ise),NFACE_CONS(ie,ifc))
+c     .        sign(NODES(medge)%sons(ise),NFACE_CONS(ie,ifc))
             enddo
             loc = NR_FACES
           endif
@@ -376,16 +376,16 @@ c  .......set up a new constraining edge
             NEDGC(iec) = nson
             do iv=1,2
               ie = ie_no(iv,ie1)
-              medg = iabs(NFACE_CONS(ie,ifc))
-c              nvt = NODES(medg)%sons(3)
-              nvt = Son(medg,3)
+              medge = iabs(NFACE_CONS(ie,ifc))
+c              nvt = NODES(medge)%sons(3)
+              nvt = Son(medge,3)
 c
 c  ...........inactive vertex node, add the edge to the data base
               if (Is_inactive(nvt)) then
-                call locate(medg, NEDGC,NR_EDGES,loc1)
+                call locate(medge, NEDGC,NR_EDGES,loc1)
                 if (loc1.eq.0) then
                   NR_EDGES = NR_EDGES+1
-                  NEDGC(NR_EDGES) = medg
+                  NEDGC(NR_EDGES) = medge
                   do i=1,2
                     jv = QUADR_EDGE_TO_VERT(i,ie)
                     NEDG_CONS(i,NR_EDGES) = NFACE_CONS(4+jv,ifc)

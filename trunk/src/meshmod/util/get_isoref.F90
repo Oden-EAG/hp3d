@@ -1,10 +1,10 @@
 !---------------------------------------------------------------------------------
-!> Purpose : return isotropic refinement flag
+!> @brief return isotropic refinement flag
 !!
 !! @param[in ] Nod  - a node number
 !! @param[out] Kref - isotropic refinement flag
 !!
-!> rev@Dec 12
+!> @date Feb 2023
 !---------------------------------------------------------------------------------
 subroutine get_isoref(Nod, Kref)
 !
@@ -29,26 +29,26 @@ subroutine get_isoref(Nod, Kref)
       iprint = 0
 !
 !  ...select refinement based on node type
-      select case(NODES(Nod)%type)
+      select case(NODES(Nod)%ntype)
 !
 !     EDGE
-      case('medg') ; Kref=1
+      case(MEDG) ; Kref=1
 !
 !     TRIANGLE
-      case('mdlt') ; Kref=1
+      case(MDLT) ; Kref=1
 !
 !     QUAD
-      case('mdlq') ; Kref=11
+      case(MDLQ) ; Kref=11
 !
 !     PRISM
-      case('mdlp') ; Kref=11
+      case(MDLP) ; Kref=11
 !
 !     BRICK
-      case('mdlb') ; Kref=111
+      case(MDLB) ; Kref=111
 !
 !     TET
-      case('mdln')
-        call refel(     Nod, iflag,no,xsub)
+      case(MDLN)
+        call refel     (Nod, iflag,no,xsub)
         call elem_nodes(Nod, nodesl,norientl)
 !
 !  .....measure 3 diagonals
@@ -86,11 +86,10 @@ subroutine get_isoref(Nod, Kref)
           write(*,7000) Kref, dist
 7000      format(' get_isoref : Kref = ',i3,' dist = ',3f8.3)
         endif
-
-      case('mdld')
+!
+      case(MDLD)
         write(*,*) 'get_isoref: no isotropic refinement for pyramid.'
         stop
       endselect
 !
-!
-endsubroutine get_isoref
+end subroutine get_isoref

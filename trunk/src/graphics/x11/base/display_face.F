@@ -4,13 +4,12 @@ c   routine name       - display_face
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Feb 11
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine makes a list of all visible
 c                        triangles and stores rescaled coordinates
 c                        of their end-points (vertices) in an array
 c                        RGTR for an element face
-c
 c
 c   arguments :
 c     in:
@@ -48,47 +47,50 @@ c
 c
 #include "syscom.blk"
 c
-      character(len=4) :: type
-      dimension Nedge_orient(12),Nface_orient(6),Norder(19),Nodesl(27)
+      integer :: ntype
+      integer :: Nedge_orient(12),Nface_orient(6),Norder(19),Nodesl(27)
       dimension Xnod(3,MAXbrickH),
      .          ZdofH(MAXEQNH,MAXbrickH),ZdofE(MAXEQNE,MAXbrickE),
      .          ZdofV(MAXEQNV,MAXbrickV),ZdofQ(MAXEQNQ,MAXbrickQ),
      .          Solev(*),Xmin(3),Xmax(3)
 c
 c  ...local face nodes numbers
-      dimension nface_nodes(9)
+      integer :: nface_nodes(9)
 c
 c  ...global face nodes numbers
-      dimension nface_nodes_global(9)
+      integer :: nface_nodes_global(9)
 c
 c  ...local order of approximation (4 edges + 1 middle)
-      dimension norder_face(5)
+      integer :: norder_face(5)
 c
 c  ...master face and element coordinates
-      dimension it(2,3,2),t(2),xi(3,3),id_flag(2)
-      dimension pm(2),pn(2),xtro(3,3),xcoord(3,3),val(3),costr(2,3,3)
-      dimension utemp(3),cotriancut(2,3,3)
-      dimension Xlocinter(3,500)
+      integer :: it(2,3,2),id_flag(2)
+      real(8) :: t(2),xi(3,3)
+      real(8) :: pm(2),pn(2),xtro(3,3),xcoord(3,3),val(3),costr(2,3,3)
+      real(8) :: utemp(3),cotriancut(2,3,3)
+      real(8) :: Xlocinter(3,500)
 c
 c  ...color code for subtriangles, nicknames encoding which edges
 c     of a subtriangle should be drawn
-      dimension mpcol(2),nsid(2)
+      integer :: mpcol(2),nsid(2)
 c
 c  ...BC's flags
-      dimension ibc(6,NRINDEX)
+      integer :: ibc(6,NRINDEX)
+c
+      integer :: iprint
 c---------------------------------------------------------------------
 c
       data small /1.d-6/
 c
       iprint = 0
-      type = NODES(Mdle)%type
+      ntype = NODES(Mdle)%ntype
 c
       if (iprint.eq.1) then
-        write(*,*) 'display_face: type,Mdle,If = ',type,Mdle,If
-        write(*,*) '              face_type(type,If) = ',
-     .                            face_type(type,If)
+        write(*,*) 'display_face: type,Mdle,If = ',S_Type(ntype),Mdle,If
+        write(*,*) '              face_type(ntype,If) = ',
+     .                            face_type(ntype,If)
         write(*,*) '              Xnod = '
-        call celndof(type,Norder, nrdofH,nrdofE,nrdofV,nrdofQ)
+        call celndof(ntype,Norder, nrdofH,nrdofE,nrdofV,nrdofQ)
         do k=1,nrdofH
           write(*,7003) k,Xnod(1:3,k)
  7003     format('k = ',i4,3e12.5)
@@ -101,7 +103,7 @@ c  ...get the element boundary conditions flags
 c
 c  ...determine the local number of the nodes on the face
 c     [vertices ; edges ; middle ]
-      call face_nodes(type,If, nface_nodes,nrfn)
+      call face_nodes(ntype,If, nface_nodes,nrfn)
       if (iprint.eq.1) then
         write(*,7010) If, nface_nodes(1:nrfn)
  7010   format('display_face: FACE = ',i2,' FACE NODES = ',9i3)
@@ -115,7 +117,7 @@ c      - mid-face node order of approximation according to face
 c        LOCAL system of coordinates
       j=0
       do i=1,nrfn
-        k=nface_nodes(i)-nvert(type)
+        k=nface_nodes(i)-nvert(ntype)
 c
 c  .....record global node number
         l=nface_nodes(i)
@@ -128,10 +130,10 @@ c
 c  .......record order of approximation accounting for orientation
 ccccc          nod=nface_nodes(j)
           nod = nface_nodes_global(i)
-          select case(NODES(nod)%type)
+          select case(NODES(nod)%ntype)
 c
 c  .......rectangular face node
-          case('mdlq','rect')
+          case(MDLQ,RECT)
             select case(NFAXES(3,Nface_orient(If)))
 c  .........the face axes have NOT been reversed
             case(0) ; norder_face(j)=Norder(k)
@@ -159,9 +161,9 @@ c
 c  ...loop through subtriangles...
       do i=1,nsub1
 c
-        select case(face_type(type,If))
-        case('tria'); nsub2=NRSUB+1-i
-        case('rect'); nsub2=NRSUB
+        select case(face_type(ntype,If))
+        case(TRIA); nsub2=NRSUB+1-i
+        case(RECT); nsub2=NRSUB
         end select
 c
         do j=1,nsub2
@@ -169,7 +171,7 @@ c
 c  .......determine integer coordinates for the subtriangles
 c         and color flags for the mesh visualization
 
-          call int_coord(Numlev,NRSUB,face_type(type,If),norder_face,
+          call int_coord(Numlev,NRSUB,face_type(ntype,If),norder_face,
      .                   i,j,it(1:2,1:3,1),it(1:2,1:3,2),
      .                   mpcol(1),mpcol(2),
      .                   nsid(1),nsid(2))
@@ -442,8 +444,8 @@ c  ...........encode nodes numbers
 c
 c  .............encode element (middle node) numbers
                 if (Iflagn.eq.1) then
-                  select case(face_type(type,If))
-                  case('tria')
+                  select case(face_type(ntype,If))
+                  case(TRIA)
 c
 c  .................encode mid-face node number
                     nick = Mdle
@@ -452,7 +454,7 @@ c  .................encode mid-face node number
                         IGTRCU(NRVISTR) = IGTRCU(NRVISTR)+1000*nick
                       endif
                     endif
-                 case('rect')
+                 case(RECT)
 c
 c  .................encode mid-face node number
                     nick = Mdle
@@ -465,8 +467,8 @@ c  .................encode mid-face node number
 c
 c  .............encode face nodes numbers
                 elseif (Iflagn.eq.2) then
-                  select case(face_type(type,If))
-                  case('tria')
+                  select case(face_type(ntype,If))
+                  case(TRIA)
 c
 c  .................encode mid-face node number
                     nick = nface_nodes_global(7)
@@ -498,7 +500,7 @@ c  .................encode nodes numbers
                       endif
                       IGTRNO(NRVISTR) = IGTRNO(NRVISTR)+nick
                     endif
-                 case('rect')
+                 case(RECT)
 c
 c  .................encode mid-face node number
                     nick = nface_nodes_global(9)

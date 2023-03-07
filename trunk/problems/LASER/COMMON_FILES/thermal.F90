@@ -133,7 +133,7 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
 !
    implicit none
 !
-   integer, intent(in)  :: NumPts
+   integer , intent(in)  :: NumPts
    real(8) , intent(in)  :: ZValues(NumPts)
    real(8) , intent(out) :: CoreTemp(NumPts)
 !
@@ -143,16 +143,16 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
    integer :: mdle
 !
 !..element, face order, geometry dof
-   real(8) :: xnod (3,MAXbrickH)
+   real(8) :: xnod(3,MAXbrickH)
    real(8) :: maxz,minz
 !
 !..miscellanea
-   integer :: iel, i, ndom
+   integer :: iel,i,ndom
    real(8) :: elemTemp,elemVol
    real(8) :: coreVol(NumPts)
 !
 !..element type
-   character(len=4) :: etype
+   integer :: etype
 !
 !..timer
    real(8) :: MPI_Wtime,start_time,end_time
@@ -187,16 +187,16 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
          end select
       endif
       call nodcor(mdle, xnod)
-      etype = NODES(mdle)%type
+      etype = NODES(mdle)%ntype
       select case(etype)
-         case('mdlb')
+         case(MDLB)
             maxz = maxval(xnod(3,1:8))
             minz = minval(xnod(3,1:8))
-         case('mdlp')
+         case(MDLP)
             maxz = maxval(xnod(3,1:6))
             minz = minval(xnod(3,1:6))
          case default
-            write(*,*) 'comp_avgTemp: invalid etype=',etype,'. stop.'
+            write(*,*) 'comp_avgTemp: invalid etype=',S_Type(etype),'. stop.'
             stop
       end select
       do i=1,NumPts
@@ -316,7 +316,7 @@ subroutine comp_elem_avgTemp(Mdle, ElemTemp,ElemVol)
 !
 !..set up the element quadrature
    INTEGRATION=0
-   call set_3D_int_DPG(NODES(mdle)%type,norder,nface_orient, nint,xiloc,wxi)
+   call set_3D_int_DPG(NODES(mdle)%ntype,norder,nface_orient, nint,xiloc,wxi)
    INTEGRATION=0
 !
    ElemVol  = 0.d0

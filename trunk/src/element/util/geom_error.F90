@@ -219,13 +219,14 @@ end subroutine geom_error
 !> @param[inout] Derr  - error
 !> @param[inout] Dnorm - norm of solution
 !!
-!> @date Dec 14
+!> @date Feb 2023
 !-------------------------------------------------------------------------
 subroutine geom_error_elem(Mdle, Derr,Dnorm)
 !
       use data_structure3D , only : NODES,MAXbrickH,MAX_NINT3
       use control          , only : INTEGRATION
       use environment      , only : L2GEOM
+      use node_types
 !
       implicit none
       integer, intent(in   ) :: Mdle
@@ -246,7 +247,7 @@ subroutine geom_error_elem(Mdle, Derr,Dnorm)
 !     quadrature
       real(8) :: xiloc(3,MAX_NINT3),wxi(MAX_NINT3)
 !
-      character(len=4) :: etype
+      integer :: ntype
 7001  format(' geom_error_elem: Mdle,type = ',i10,2x,a4)
 !
       real(8),dimension(3,3),parameter :: del = &
@@ -259,7 +260,7 @@ subroutine geom_error_elem(Mdle, Derr,Dnorm)
       iprint=0
 !
       if (iprint.eq.1) then
-         write(*,7001) Mdle,NODES(Mdle)%type
+         write(*,7001) Mdle,S_Type(NODES(Mdle)%ntype)
       endif
 !
 !     order of approximation, orientations, geometry dofs
@@ -271,9 +272,9 @@ subroutine geom_error_elem(Mdle, Derr,Dnorm)
       Derr=0.d0 ; Dnorm=0.d0
 
 !     set up the element quadrature (use overintegration for the exact geometry map)
-      etype=NODES(Mdle)%type
+      ntype=NODES(Mdle)%ntype
       INTEGRATION=1
-      call set_3Dint(etype,norder, nint,xiloc,wxi)
+      call set_3Dint(ntype,norder, nint,xiloc,wxi)
       INTEGRATION=0
 !
 !     loop over integration points
@@ -281,7 +282,7 @@ subroutine geom_error_elem(Mdle, Derr,Dnorm)
         xi(1:3)=xiloc(1:3,l) ; wa=wxi(l)
 !
 !       evaluate appropriate shape functions at the point
-        call shape3DH(etype,xi,norder,nedge_orient,nface_orient, nrdofH,shapH,dshapH)
+        call shape3DH(ntype,xi,norder,nedge_orient,nface_orient, nrdofH,shapH,dshapH)
 !
 !       ISOPARAMETRIC MAP : x_hp = x_hp(xi)
         x_hp(1:3)=0.d0 ; dx_hpdxi(1:3,1:3)=0.d0
@@ -355,9 +356,7 @@ subroutine geom_error_elem(Mdle, Derr,Dnorm)
 !     store error in data structure
       NODES(Mdle)%error(:,0)=0.d0 ; NODES(Mdle)%error(0,0)=Derr
 !
-!
 end subroutine geom_error_elem
-!
 !
 !
 !------------------------------------------------------------------------
@@ -391,8 +390,8 @@ subroutine check_geom_error
 !          ns=NODES(nfath)%sons(j)
           ns=Son(nfath,j)
 !
-          select case(NODES(ns)%type)
-          case('mdlp','mdln','mdlb','mdld')
+          select case(NODES(ns)%ntype)
+          case(MDLB,MDLP,MDLN,MDLD)
             err_sons=err_sons+NODES(ns)%error(0,0)
           endselect
         enddo
@@ -410,11 +409,11 @@ subroutine check_geom_error
 !            ns=NODES(nfath)%sons(j)
             ns=Son(nfath,j)
 !
-            select case(NODES(ns)%type)
-            case('mdlp','mdln','mdlb','mdld')
+            select case(NODES(ns)%ntype)
+            case(MDLB,MDLP,MDLN,MDLD)
 9001          format('   ns,type,err,err_sons = ',i7,2x,a4,2x,2(e12.5,2x))
               err_sons=err_sons+NODES(ns)%error(0,0)
-              write(*,9001)ns,NODES(ns)%type,NODES(ns)%error(0,0),err_sons
+              write(*,9001)ns,S_Type(NODES(ns)%ntype),NODES(ns)%error(0,0),err_sons
             endselect
           enddo
         endif
@@ -428,10 +427,7 @@ subroutine check_geom_error
 !  ...lower visitation flag
       call reset_visit
 !
-!
 end subroutine check_geom_error
-!
-!
 !
 !------------------------------------------------------------------------
 subroutine display_geom_error(Nfath)
@@ -440,7 +436,6 @@ subroutine display_geom_error(Nfath)
       integer,intent(in) :: Nfath
       real(8) :: err_sons
       integer :: j,nrsons,ns
-!
 !
       write(*,5000)Nfath,NODES(Nfath)%error(0,0)
 5000  format(' nfath,err_fath = ',i7,2x,e12.5)
@@ -453,8 +448,8 @@ subroutine display_geom_error(Nfath)
 !        ns=NODES(nfath)%sons(j)
         ns=Son(nfath,j)
 !
-        select case(NODES(ns)%type)
-        case('mdlp','mdln','mdlb','mdld')
+        select case(NODES(ns)%ntype)
+        case(MDLB,MDLP,MDLN,MDLD)
           err_sons=err_sons+NODES(ns)%error(0,0)
           write(*,5001)ns,NODES(ns)%error(0,0),err_sons
 5001      format('   ns,err,err_sons = ',i7,2x,2(e12.5))

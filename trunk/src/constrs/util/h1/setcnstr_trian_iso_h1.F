@@ -823,5 +823,4 @@ c
       read(*,*) ians
       if (ians.eq.1) go to 777
 c
-      return
-      end
+      end subroutine setcnstr_trian_iso_h1

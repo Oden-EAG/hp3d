@@ -324,7 +324,7 @@ c     routine name      - TraceFshapeH
 c
 c----------------------------------------------------------------------
 c
-c     latest revision:  - Nov 14
+c     latest revision:  - Feb 2023
 c
 c     purpose:          - 2D face trace of 3D H1 face functions
 c                         (these happen to be oriented 2D H1 'bubbles')
@@ -332,7 +332,7 @@ c
 c     arguments:
 c
 c     in:
-c          Type         - face type (quad or triangle)
+c          Ftype        - face type (quad or triangle)
 c          T            - local face coordinate
 c          Nord         - polynomial face order (H1 sense)
 c          Nori         - face orientation
@@ -344,25 +344,25 @@ c          GradH        - local gradients of trace shape functions
 c
 c----------------------------------------------------------------------
 c
-      subroutine TraceFshapeH(Type,T,Nord,Nori, NrdofH,ShapH,GradH)
+      subroutine TraceFshapeH(Ftype,T,Nord,Nori, NrdofH,ShapH,GradH)
 c
       use parameters , only : MODORDER,MAXP,MAXmdlqH
+      use node_types
 c
       implicit none
-      character(len=4), intent(in)  :: Type
-      integer, intent(in)  :: Nord,Nori
+      integer, intent(in)  :: Ftype,Nord,Nori
       integer, intent(out) :: NrdofH
       double precision, intent(in)  :: T(2)
       double precision, intent(out) :: ShapH(MAXmdlqH)
       double precision, intent(out) :: GradH(2,MAXmdlqH)
 c
-      select case(Type)
-      case('tria','mdlt')
+      select case(Ftype)
+      case(TRIA,MDLT)
         call traceTriFshapeH
-      case('quad','mdlq','rect')
+      case(QUAD,MDLQ,RECT)
         call traceQuadFshapeH
       case default
-        write(*,*)'TraceFshapeH: Type = ', Type
+        write(*,*)'TraceFshapeH: Type = ', S_Type(Ftype)
         stop 1
       end select
 c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -538,7 +538,7 @@ c     routine name      - TraceFshapeE
 c
 c----------------------------------------------------------------------
 c
-c     latest revision:  - Nov 14
+c     latest revision:  - Feb 2023
 c
 c     purpose:          - 2D face trace of 3D H(curl) face functions
 c                         (these happen to be oriented 2D H(curl)
@@ -547,7 +547,7 @@ c
 c     arguments:
 c
 c     in:
-c          Type         - face type (quad or triangle)
+c          Ftype        - face type (quad or triangle)
 c          T            - local face coordinate
 c          Nord         - polynomial face order (H1 sense)
 c          Nori         - face orientation
@@ -559,25 +559,25 @@ c          CurlE        - local curls of trace shape functions
 c
 c----------------------------------------------------------------------
 c
-      subroutine TraceFshapeE(Type,T,Nord,Nori, NrdofE,ShapE,CurlE)
+      subroutine TraceFshapeE(Ftype,T,Nord,Nori, NrdofE,ShapE,CurlE)
 c
       use parameters , only : MODORDER,MAXP,MAXmdlqE
+      use node_types
 c
       implicit none
-      character(len=4), intent(in)  :: Type
-      integer, intent(in)  :: Nord,Nori
+      integer, intent(in)  :: Ftype,Nord,Nori
       integer, intent(out) :: NrdofE
       double precision, intent(in)  :: T(2)
       double precision, intent(out) :: ShapE(2,MAXmdlqE)
       double precision, intent(out) :: CurlE(MAXmdlqE)
 c
-      select case(Type)
-      case('tria','mdlt')
+      select case(Ftype)
+      case(TRIA,MDLT)
         call traceTriFshapeE
-      case('quad','mdlq','rect')
+      case(QUAD,MDLQ,RECT)
         call traceQuadFshapeE
       case default
-        write(*,*)'TraceFshapeE: Type = ', Type
+        write(*,*)'TraceFshapeE: Type = ', S_Type(Ftype)
         stop 1
       end select
 c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -787,7 +787,7 @@ c     routine name      - TraceFshapeV
 c
 c----------------------------------------------------------------------
 c
-c     latest revision:  - Nov 14
+c     latest revision:  - Feb 2023
 c
 c     purpose:          - 2D face trace of 3D H(div) face functions
 c                         these are oriented 2D L2 face funtions
@@ -795,7 +795,7 @@ c
 c     arguments:
 c
 c     in:
-c          Type         - face type (quad or triangle)
+c          Ftype        - face type (quad or triangle)
 c          T            - local face coordinate
 c          Nord         - polynomial face order (H1 sense)
 c          Nori         - face orientation
@@ -806,24 +806,24 @@ c          ShapV        - values of trace shape functions
 c
 c----------------------------------------------------------------------
 c
-      subroutine TraceFshapeV(Type,T,Nord,Nori, NrdofV,ShapV)
+      subroutine TraceFshapeV(Ftype,T,Nord,Nori, NrdofV,ShapV)
 c
       use parameters , only : MODORDER,MAXP,MAXmdlqV
+      use node_types
 c
       implicit none
-      character(len=4), intent(in)  :: Type
-      integer, intent(in)  :: Nord,Nori
+      integer, intent(in)  :: Ftype,Nord,Nori
       integer, intent(out) :: NrdofV
       double precision, intent(in)  :: T(2)
       double precision, intent(out) :: ShapV(MAXmdlqV)
 c
-      select case(Type)
-      case('tria','mdlt')
+      select case(Ftype)
+      case(TRIA,MDLT)
         call traceTriFshapeV
-      case('quad','mdlq','rect')
+      case(QUAD,MDLQ,RECT)
         call traceQuadFshapeV
       case default
-        write(*,*)'TraceFshapeV: Type = ', Type
+        write(*,*)'TraceFshapeV: Type = ', S_Type(Ftype)
         stop 1
       end select
 c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

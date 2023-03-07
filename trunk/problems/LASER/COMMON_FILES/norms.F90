@@ -181,7 +181,7 @@ subroutine get_elem_L2NormCOMS(mdle,Flag,No1,No2, FieldNormQ)
 !
 !..set up the element quadrature
    INTEGRATION=0
-   call set_3D_int_DPG(NODES(mdle)%type,norder,nface_orient, nint,xiloc,wxi)
+   call set_3D_int_DPG(NODES(mdle)%ntype,norder,nface_orient, nint,xiloc,wxi)
    INTEGRATION=0
 !
 !..supported physical attributes
@@ -464,7 +464,7 @@ subroutine get_elem_Norm(Mdle,Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNor
 !
 !..set up the element quadrature
    INTEGRATION=0
-   call set_3D_int_DPG(NODES(mdle)%type,norder,nface_orient, nint,xiloc,wxi)
+   call set_3D_int_DPG(NODES(mdle)%ntype,norder,nface_orient, nint,xiloc,wxi)
    INTEGRATION=0
 !
 !..supported physical attributes
@@ -724,7 +724,7 @@ end subroutine get_elem_Norm
 !! .... number of vertices,edge,faces per element type
 !      integer :: nrv, nre, nrf
 !!.......declare edge/face type varibles
-!      character(len=4) :: etype,ftype
+!      integer :: etype,ftype
 !!
 !!     geometry
 !! ... variables for geometry
@@ -785,7 +785,7 @@ end subroutine get_elem_Norm
 !      face_diff_norm = 0.0d0
 !      nflag = 1
 !! ...element type
-!      etype = NODES(mdle)%type
+!      etype = NODES(mdle)%ntype
 !      nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
 !      call find_order(mdle, norder)
 !      call find_orient(mdle, nedge_orient,nface_orient)

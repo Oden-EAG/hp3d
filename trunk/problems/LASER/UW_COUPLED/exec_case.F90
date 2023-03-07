@@ -260,9 +260,9 @@ subroutine exec_case(idec)
             count = 1; src = ROOT
             call MPI_BCAST (mdle,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
          endif
-         select case(NODES(mdle)%type)
-            case('mdlb'); kref = 110
-            case('mdlp'); kref = 10
+         select case(NODES(mdle)%ntype)
+            case(MDLB); kref = 110
+            case(MDLP); kref = 10
          end select
          call refine(mdle,kref)
          call close_mesh
@@ -272,9 +272,9 @@ subroutine exec_case(idec)
          do i = 1,13
             write(*,100) 'Iteration ', i
             mdle = ELEM_ORDER(NRELES/2)
-            select case(NODES(mdle)%type)
-               case('mdlb'); kref = 110
-               case('mdlp'); kref = 10
+            select case(NODES(mdle)%ntype)
+               case(MDLB); kref = 110
+               case(MDLP); kref = 10
             end select
             call refine(mdle,kref)
             call close_mesh

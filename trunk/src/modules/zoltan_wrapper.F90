@@ -227,7 +227,7 @@ module zoltan_wrapper
       real(8) :: x(3), xnod(3,8)
       mdle = GID(1)
       call nodcor_vert(mdle, xnod)
-      nrv = nvert(NODES(mdle)%type)
+      nrv = nvert(NODES(mdle)%ntype)
       x(1:3) = 0.d0
       do i = 1,nrv
          x(1:3) = x(1:3) + xnod(1:3,i)
@@ -261,7 +261,7 @@ module zoltan_wrapper
       do k = 1,NumObj
          mdle = GIDs(k)
          call nodcor_vert(mdle, xnod)
-         nrv = nvert(NODES(mdle)%type)
+         nrv = nvert(NODES(mdle)%ntype)
          x(1:3) = 0.d0
          do i = 1,nrv
             x(1:3) = x(1:3) + xnod(1:3,i)
@@ -412,7 +412,7 @@ module zoltan_wrapper
                Neig_GIDs(num_neig) = neig
                Neig_subd(num_neig) = subd
                if (Wgt_dim > 0) then
-                  call ndof_nod(NODES(neig)%type,NODES(neig)%order, ndofH,ndofE,ndofV,ndofQ)
+                  call ndof_nod(NODES(neig)%ntype,NODES(neig)%order, ndofH,ndofE,ndofV,ndofQ)
                   Wgts(num_neig) = 0.0_Zoltan_float
                   do k=1,NR_PHYSA
                      if (.not. PHYSAm(k)) cycle
@@ -492,7 +492,7 @@ module zoltan_wrapper
                   Neig_GIDs(n) = neig
                   Neig_subd(n) = subd
                   if (Wgt_dim > 0) then
-                     call ndof_nod(NODES(neig)%type,NODES(neig)%order, ndofH,ndofE,ndofV,ndofQ)
+                     call ndof_nod(NODES(neig)%ntype,NODES(neig)%order, ndofH,ndofE,ndofV,ndofQ)
                      Wgts(n) = 0.0_Zoltan_float
                      do l=1,NR_PHYSA
                         if (.not. PHYSAm(l)) cycle
@@ -647,10 +647,9 @@ module zoltan_wrapper
       integer,                 intent(in)  :: Mdle
       integer, dimension(4,6), intent(out) :: Neig_list
 !
-      character(len=4) :: etype
       integer, dimension(27) :: nodesl,norientl
       integer, dimension(2)  :: neig,nsid_list,norient_list
-      integer :: i,j,k,l,nod,nodson,nrneig,mdle_neig
+      integer :: i,j,k,l,nod,nodson,nrneig,mdle_neig,ntype
 !
 !  ...initialize
       Neig_list(1:4,1:6)=0
@@ -658,9 +657,9 @@ module zoltan_wrapper
 !---------------------------------------------------
 ! Step 0: short cut for initial mesh elements only
 !---------------------------------------------------
-      etype=NODES(Mdle)%type
+      ntype=NODES(Mdle)%ntype
       if (is_root(Mdle)) then
-         do i=1,nface(etype)
+         do i=1,nface(ntype)
             Neig_list(1,i) = ELEMS(Mdle)%neig(i)
          enddo
          return
@@ -670,8 +669,8 @@ module zoltan_wrapper
 ! Step 1: use neig_face
 !---------------------------------------------------
       call elem_nodes(Mdle, nodesl,norientl)
-      do i=1,nface(etype)
-         nod = nodesl(nvert(etype)+nedge(etype)+i)
+      do i=1,nface(ntype)
+         nod = nodesl(nvert(ntype)+nedge(ntype)+i)
          call neig_face(nod, nrneig,neig,nsid_list,norient_list)
          select case (nrneig)
             case(2)
@@ -689,8 +688,8 @@ module zoltan_wrapper
             l = 0
             do j=1,NODES(nod)%nr_sons
                nodson = NODES(nod)%first_son + j - 1
-               if (NODES(nodson)%type .ne. 'mdlt' .and. &
-                   NODES(nodson)%type .ne. 'mdlq') cycle
+               if (NODES(nodson)%ntype .ne. MDLT .and. &
+                   NODES(nodson)%ntype .ne. MDLQ) cycle
                l = l+1
                call neig_face(nodson, nrneig,neig,nsid_list,norient_list)
                do k=1,nrneig

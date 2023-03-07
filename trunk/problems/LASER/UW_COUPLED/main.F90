@@ -442,11 +442,12 @@ subroutine master_main()
                write(*,*) '   nr_elem_ref = ', nr_elem_ref
                do i=1,nr_elem_ref
                   read(UNIT=9, FMT="(I6)") mdle
-                  select case (NODES(mdle)%type)
-                     case('mdlb'); kref = 110
-                     case('mdlp'); kref = 10
+                  select case (NODES(mdle)%ntype)
+                     case(MDLB); kref = 110
+                     case(MDLP); kref = 10
                      case default
-                        write(*,*) 'READING UNEXPECTED ELEMENT TYPE (mdle): ',NODES(mdle)%type,' (',mdle,')'
+                        write(*,*) 'READING UNEXPECTED ELEMENT TYPE (mdle): ', &
+                                    S_Type(NODES(mdle)%ntype),' (',mdle,')'
                         call pause
                   end select
                   call refine(mdle,kref)

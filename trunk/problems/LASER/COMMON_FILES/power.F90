@@ -793,7 +793,7 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
    integer :: iel, i, ndom
 !
 !..element type
-   character(len=4) :: etype
+   integer :: etype
 !
 !..face number over which power is computed
 !  (in brick and prism, face 2 is face normal to xi3, at xi3=1)
@@ -836,12 +836,12 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
       mdle = ELEM_SUBD(iel)
       if (GEOM_NO .eq. 5) call find_domain(mdle, ndom)
       call nodcor_vert(mdle, xnod)
-      etype = NODES(Mdle)%type
+      etype = NODES(Mdle)%ntype
       select case(etype)
-         case('mdlb')
+         case(MDLB)
             maxz = maxval(xnod(3,1:8))
             minz = minval(xnod(3,1:8))
-         case('mdlp')
+         case(MDLP)
             maxz = maxval(xnod(3,1:6))
             minz = minval(xnod(3,1:6))
          case default
@@ -935,7 +935,7 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
    integer :: nrv, nre, nrf
 !
 !..declare edge/face type varibles
-   character(len=4) :: etype,ftype
+   integer :: etype,ftype
 !
 !..variables for geometry
    real(8), dimension(3)   :: xi,x,rn,x_new
@@ -999,7 +999,7 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
    FaceDiffPower = 0.0d0
    nflag = 1
 !..element type
-   etype = NODES(Mdle)%type
+   etype = NODES(Mdle)%ntype
    nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
    call find_order(Mdle, norder)
    call find_orient(Mdle, nedge_orient,nface_orient)
@@ -1144,7 +1144,7 @@ subroutine compute_mode_power(Mdle,Facenumber,Fld, ModePower,ModeNorm,ModeCoef)
    integer :: nrv, nre, nrf
 !
 !..declare edge/face type varibles
-   character(len=4) :: etype,ftype
+   integer :: etype,ftype
 !
 !..variables for geometry
    real(8), dimension(3)   :: xi,x,rn,x_new
@@ -1207,7 +1207,7 @@ subroutine compute_mode_power(Mdle,Facenumber,Fld, ModePower,ModeNorm,ModeCoef)
    ModePower = 0.d0
    nflag = 1
 !..element type
-   etype = NODES(Mdle)%type
+   etype = NODES(Mdle)%ntype
    nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
    call find_order(Mdle, norder)
    call find_orient(Mdle, nedge_orient,nface_orient)

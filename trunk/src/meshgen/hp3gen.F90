@@ -1,4 +1,8 @@
-!> Purpose : routine generates an initial FE mesh interfacing with GMP
+!> @brief routine generates an initial FE mesh interfacing with GMP
+!!
+!! @param[in]  Fp - Path to input file (physics attributes)
+!!
+!> @date Feb 2023
 subroutine hp3gen(Fp)
   !
   use error
@@ -12,13 +16,13 @@ subroutine hp3gen(Fp)
   character(len=*) :: Fp
   !
   ! element order (temporary)
-  integer, dimension(:), allocatable :: nelem_order
+  integer, allocatable :: nelem_order(:)
   !
   ! node BC flags
-  integer, dimension(:), allocatable :: ibc_nod
+  integer, allocatable :: ibc_nod(:)
   !
   ! physical attributes of a node
-  character(len=5), dimension(:), allocatable :: phys_vect
+  character(len=5), allocatable :: phys_vect(:)
   !
   ! edge, face orientations
   integer :: nedge_orient(12),nface_orient(6)
@@ -38,10 +42,10 @@ subroutine hp3gen(Fp)
   character(len=5) :: phys
   !
   !  ...element type
-  character(len=4) :: type
+  integer :: etype
   !
   !  ...node type
-  character(len=4) :: nod_type
+  integer :: ntype
   !
   !  ...auxiliary
   integer :: nel, npri, nh, ntet, npyr, np, iv, is, ifc, ie, mdle
@@ -99,7 +103,7 @@ subroutine hp3gen(Fp)
   !  ...loop through prisms
   do npri=1,NRPRISM
      nel=nel+1
-     ELEMS(nel)%type = 'pris'
+     ELEMS(nel)%etype = PRIS
      allocate(ELEMS(nel)%nodes(21))
      allocate(ELEMS(nel)%neig(5)); ELEMS(nel)%neig(1:5)=0
      do iv=1,6
@@ -159,7 +163,7 @@ subroutine hp3gen(Fp)
   !  ...loop through hexas
   do nh=1,NRHEXAS
      nel=nel+1
-     ELEMS(nel)%type = 'bric'
+     ELEMS(nel)%etype = BRIC
      allocate(ELEMS(nel)%nodes(27))
      allocate(ELEMS(nel)%neig(6)); ELEMS(nel)%neig(1:6)=0
      do iv=1,8
@@ -202,7 +206,7 @@ subroutine hp3gen(Fp)
   !  ...loop through tets
   do ntet=1,NRTETRA
      nel=nel+1
-     ELEMS(nel)%type = 'tetr'
+     ELEMS(nel)%etype = TETR
      allocate(ELEMS(nel)%nodes(15))
      allocate(ELEMS(nel)%neig(4)); ELEMS(nel)%neig(1:4)=0
      do iv=1,4
@@ -245,7 +249,7 @@ subroutine hp3gen(Fp)
   !  ...loop through pyramids
   do npyr=1,NRPYRAM
      nel=nel+1
-     ELEMS(nel)%type = 'pyra'
+     ELEMS(nel)%etype = PYRA
      allocate(ELEMS(nel)%nodes(19))
      allocate(ELEMS(nel)%neig(5)); ELEMS(nel)%neig(1:5)=0
      do iv=1,5
@@ -327,15 +331,15 @@ subroutine hp3gen(Fp)
      nbcond=0
      nord = nelem_order(nel)
      !
-     select case(ELEMS(nel)%type)
-     case('bric'); nod_type='mdlb'
-     case('tetr'); nod_type='mdln'
-     case('pris'); nod_type='mdlp'
-     case('pyra'); nod_type='mdld'
+     select case(ELEMS(nel)%etype)
+     case(BRIC); ntype=MDLB
+     case(TETR); ntype=MDLN
+     case(PRIS); ntype=MDLP
+     case(PYRA); ntype=MDLD
      end select
      !
      subd = -1; iact = .true.
-     call nodgen(nod_type,icase,nbcond,-nel,nord,subd,iact, nod)
+     call nodgen(ntype,icase,nbcond,-nel,nord,subd,iact, nod)
      if (nod_new.ne.nod) then
         write(*,*) 'hp3gen: nod_new,nod = ',nod_new,nod
         stop 1
@@ -378,16 +382,16 @@ subroutine hp3gen(Fp)
         select case(lab)
            !
            !  .......prism
-        case(1); nel= nb; type='pris'
+        case(1); nel= nb; etype=PRIS
            !
            !  .......hexahedron
-        case(2); nel= NRPRISM+nb; type='bric'
+        case(2); nel= NRPRISM+nb; etype=BRIC
            !
            !  .......tetrahedron
-        case(3); nel= NRPRISM+NRHEXAS+nb; type='tetr'
+        case(3); nel= NRPRISM+NRHEXAS+nb; etype=TETR
            !
            !  .......pyramid
-        case(4); nel= NRPRISM+NRHEXAS+NRTETRA+nb; type='pyra'
+        case(4); nel= NRPRISM+NRHEXAS+NRTETRA+nb; etype=PYRA
         end select
         !
         do iphys=1,ELEMS(nel)%nrphysics
@@ -412,11 +416,11 @@ subroutine hp3gen(Fp)
               nvar = nvar+1
               !
               !  .........decode the BC flags for the faces
-              call decodg(ELEMS(nel)%bcond(nvar),10,nface(type), ibc_elem)
+              call decodg(ELEMS(nel)%bcond(nvar),10,nface(etype), ibc_elem)
               !
               !  .........determine faces adjacent to the vertex
-              call locate(nod_new,ELEMS(nel)%nodes(1),nvert(type), iv)
-              call vert_to_faces(type,iv, nrfaces,nofaces)
+              call locate(nod_new,ELEMS(nel)%nodes(1),nvert(etype), iv)
+              call vert_to_faces(etype,iv, nrfaces,nofaces)
               !
               !  .........loop through the faces adjacent to the vertex and
               !           use element face BC flags to establish BC flag for the
@@ -435,7 +439,7 @@ subroutine hp3gen(Fp)
      call encod(ibc_nod,2,NRINDEX, nbcond)
      !
      subd = -1; iact = .true.
-     call nodgen('vert',icase,nbcond,-nel,1,subd,iact, nod)
+     call nodgen(VERT,icase,nbcond,-nel,1,subd,iact, nod)
      if (nod_new.ne.nod) then
         write(*,*) 'hp3gen: nod_new,nod = ',nod_new,nod
         stop 1
@@ -472,16 +476,16 @@ subroutine hp3gen(Fp)
         select case(lab)
 !
 !       prism
-        case(1); nel=                         nb; type='pris'
+        case(1); nel=                         nb; etype=PRIS
 !
 !       hexahedron
-        case(2); nel= NRPRISM                +nb; type='bric'
+        case(2); nel= NRPRISM                +nb; etype=BRIC
 !
 !       tetrahedron
-        case(3); nel= NRPRISM+NRHEXAS        +nb; type='tetr'
+        case(3); nel= NRPRISM+NRHEXAS        +nb; etype=TETR
 !
 !       pyramid
-        case(4); nel= NRPRISM+NRHEXAS+NRTETRA+nb; type='pyra'
+        case(4); nel= NRPRISM+NRHEXAS+NRTETRA+nb; etype=PYRA
         endselect
 !
 !       loop through physical attributes
@@ -505,8 +509,8 @@ subroutine hp3gen(Fp)
         enddo
         !
 !       determine faces adjacent to the edge
-        call locate(nod_new,ELEMS(nel)%nodes(nvert(type)+1),nedge(type), ie)
-        call edge_to_faces(type,ie, nofaces)
+        call locate(nod_new,ELEMS(nel)%nodes(nvert(etype)+1),nedge(etype), ie)
+        call edge_to_faces(etype,ie, nofaces)
         !
         !  .......loop through the element physics attributes
         nvar=0
@@ -519,7 +523,7 @@ subroutine hp3gen(Fp)
               nvar = nvar+1
               !
               !  .........decode the BC flags for the faces
-              call decodg(ELEMS(nel)%bcond(nvar),10,nface(type), ibc_elem)
+              call decodg(ELEMS(nel)%bcond(nvar),10,nface(etype), ibc_elem)
               !
               !  .........loop through the faces adjacent to the edge and
               !           use element face BC flags to establish BC flag for the
@@ -532,7 +536,7 @@ subroutine hp3gen(Fp)
         enddo
         !
         mdle = nel
-        call min_order(type,2,ie,0,NODES(mdle)%order, nord)
+        call min_order(etype,2,ie,0,NODES(mdle)%order, nord)
      enddo
      !
      !  .....determine the case number
@@ -542,7 +546,7 @@ subroutine hp3gen(Fp)
      call encod(ibc_nod,2,NRINDEX, nbcond)
      !
      subd = -1; iact = .true.
-     call nodgen('medg',icase,nbcond,-nel,nord,subd,iact, nod)
+     call nodgen(MEDG,icase,nbcond,-nel,nord,subd,iact, nod)
      if (nod_new.ne.nod) then
         write(*,*) 'hp3gen: nod_new,nod = ',nod_new,nod
         stop 1
@@ -584,9 +588,9 @@ subroutine hp3gen(Fp)
 
         !  ...determine element number
         select case(lab)
-        case(1); nel=nb                         ; type='pris'
-        case(2); nel=NRPRISM+nb                 ; type='bric'
-        case(4); nel=NRPRISM+NRHEXAS+NRTETRA+nb ; type='pyra'
+        case(1); nel=nb                         ; etype=PRIS
+        case(2); nel=NRPRISM+nb                 ; etype=BRIC
+        case(4); nel=NRPRISM+NRHEXAS+NRTETRA+nb ; etype=PYRA
         end select
 
         !  ...loop through neighbor's physical attributes
@@ -604,8 +608,8 @@ subroutine hp3gen(Fp)
 
         !  ...determine face local number
         call locate(nod_new, &
-             ELEMS(nel)%nodes(nvert(type)+nedge(type)+1), &
-             nface(type), ifc)
+             ELEMS(nel)%nodes(nvert(etype)+nedge(etype)+1), &
+             nface(etype), ifc)
 
         !  ...loop through neighbor's physical attributes
         nvar=0
@@ -618,7 +622,7 @@ subroutine hp3gen(Fp)
               nvar = nvar+1
 
            !  ...decode the BC flags for the faces
-              call decodg(ELEMS(nel)%bcond(nvar),10,nface(type), ibc_elem)
+              call decodg(ELEMS(nel)%bcond(nvar),10,nface(etype), ibc_elem)
 
               !  ...copy face BC flag to GLOBAL list associated to the face node
               call copyBCflag(3,ibc_elem(ifc), ibc_nod(nvar))
@@ -626,8 +630,8 @@ subroutine hp3gen(Fp)
         enddo
         !
         mdle = nel
-        call decodg(ELEMS(nel)%face_orient,8,nface(type),nface_orient)
-        call min_order(type,3,ifc,nface_orient(ifc),NODES(mdle)%order, nord)
+        call decodg(ELEMS(nel)%face_orient,8,nface(etype),nface_orient)
+        call min_order(etype,3,ifc,nface_orient(ifc),NODES(mdle)%order, nord)
 
      !  ...end of loop through neighboring blocks
      enddo
@@ -638,7 +642,7 @@ subroutine hp3gen(Fp)
      call encod(ibc_nod,2,NRINDEX, nbcond)
      !
      subd = -1; iact = .true.
-     call nodgen('mdlq',icase,nbcond,-nel,nord,subd,iact, nod)
+     call nodgen(MDLQ,icase,nbcond,-nel,nord,subd,iact, nod)
      if (nod_new.ne.nod) then
         write(*,*) 'hp3gen: nod_new,nod = ',nod_new,nod
         stop 1
@@ -682,13 +686,13 @@ subroutine hp3gen(Fp)
         select case(lab)
            !
            !  .......prism
-        case(1); nel= nb; type='pris'
+        case(1); nel= nb; etype=PRIS
            !
            !  .......tetrahedron
-        case(3); nel= NRPRISM+NRHEXAS+nb; type='tetr'
+        case(3); nel= NRPRISM+NRHEXAS+nb; etype=TETR
            !
            !  .......pyramid
-        case(4); nel= NRPRISM+NRHEXAS+NRTETRA+nb; type='pyra'
+        case(4); nel= NRPRISM+NRHEXAS+NRTETRA+nb; etype=PYRA
         end select
         !
         ! loop over element physics attributes
@@ -706,8 +710,7 @@ subroutine hp3gen(Fp)
         !
         !  .......determine adjacent face
         call locate(nod_new, &
-             ELEMS(nel)%nodes(nvert(type)+nedge(type)+1), &
-             nface(type), ifc)
+             ELEMS(nel)%nodes(nvert(etype)+nedge(etype)+1),nface(etype), ifc)
         !
         !  .......loop through the element physics attributes
         nvar=0
@@ -720,14 +723,14 @@ subroutine hp3gen(Fp)
               nvar = nvar+1
               !
               !  .........decode the BC flags for the faces
-              call decodg(ELEMS(nel)%bcond(nvar),10,nface(type), ibc_elem)
+              call decodg(ELEMS(nel)%bcond(nvar),10,nface(etype), ibc_elem)
               call copyBCflag(3,ibc_elem(ifc), ibc_nod(nvar))
            enddo
         enddo
         !
         mdle = nel
-        call decodg(ELEMS(nel)%face_orient,8,nface(type), nface_orient)
-        call min_order(type,3,ifc,nface_orient(ifc),NODES(mdle)%order, nord)
+        call decodg(ELEMS(nel)%face_orient,8,nface(etype), nface_orient)
+        call min_order(etype,3,ifc,nface_orient(ifc),NODES(mdle)%order, nord)
      enddo
      !
      call find_case(num,phys_vect, icase)
@@ -736,7 +739,7 @@ subroutine hp3gen(Fp)
      call encod(ibc_nod,2,NRINDEX, nbcond)
      !
      subd = -1; iact = .true.
-     call nodgen('mdlt',icase,nbcond,-nel,nord,subd,iact, nod)
+     call nodgen(MDLT,icase,nbcond,-nel,nord,subd,iact, nod)
      !
      if (nod_new.ne.nod) then
         write(*,*) 'hp3gen: nod_new,nod = ',nod_new,nod

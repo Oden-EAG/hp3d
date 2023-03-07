@@ -228,12 +228,11 @@ end subroutine get_elem_nodes
 subroutine set_subd_elem(Mdle)
    integer, intent(in) :: Mdle
    integer :: nodm(MAXNODM),nodesl(27)
-   integer :: i,nrnodm,subd
-   character(len=4) :: type
+   integer :: i,nrnodm,subd,ntype
    call get_elem_nodes(Mdle, nodesl,nodm,nrnodm)
    call get_subd(Mdle, subd)
-   type = NODES(Mdle)%type
-   do i=1,nvert(type)+nedge(type)+nface(type)
+   ntype = NODES(Mdle)%ntype
+   do i=1,nvert(ntype)+nedge(ntype)+nface(ntype)
       call set_subd(nodesl(i),subd)
    enddo
    do i=1,nrnodm

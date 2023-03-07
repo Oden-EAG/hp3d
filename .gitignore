@@ -16,6 +16,7 @@ log.txt
 
 # Data files
 history
+*.dat
 
 # Prerequisites
 *.d

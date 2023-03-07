@@ -41,7 +41,7 @@ subroutine partition_fiber(subd_next)
    do iel = 1,NRELES_SUBD
       mdle = ELEM_SUBD(iel)
       call nodcor_vert(mdle, xnod)
-      nrv = nvert(NODES(mdle)%type)
+      nrv = nvert(NODES(mdle)%ntype)
       do i = 1,nrv
          x3 = xnod(3,i)
          if (x3 .lt. x3_lo) x3_lo = x3
@@ -70,7 +70,7 @@ subroutine partition_fiber(subd_next)
       call get_subd(mdle, subd)
       if (subd .ne. RANK) cycle
       call nodcor_vert(mdle, xnod)
-      nrv = nvert(NODES(mdle)%type)
+      nrv = nvert(NODES(mdle)%ntype)
       x3 = 0.d0
       do i = 1,nrv
          x3 = x3 + xnod(3,i)
@@ -132,7 +132,7 @@ subroutine repartition_fiber(Subd_next)
       call get_subd(mdle, subd)
       if (subd .ne. RANK) cycle
       call nodcor_vert(mdle, xnod)
-      nrv = nvert(NODES(mdle)%type)
+      nrv = nvert(NODES(mdle)%ntype)
       x3_mdle(iel) = maxval(xnod(3,1:nrv))
       call stc_get_nrdof(mdle, nrdofi,nrdofb)
       iel_load(iel) = sum(nrdofi) + sum(nrdofb)
@@ -482,7 +482,7 @@ subroutine print_coord()
    do iel=1,NRELES_SUBD
       mdle = ELEM_SUBD(iel)
       call nodcor_vert(mdle, xnod)
-      nrv = nvert(NODES(mdle)%type)
+      nrv = nvert(NODES(mdle)%ntype)
       x(1:3) = 0.d0
       do i = 1,nrv
          x(1:3) = x(1:3) + xnod(1:3,i)

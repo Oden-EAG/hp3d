@@ -90,7 +90,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
    real(8) :: x(3), xnod(3,8)
 !
 !..element type
-   character(len=4) :: etype
+   integer :: etype
 !
    real(8) :: MPI_Wtime,start_time,end_time
 !
@@ -384,18 +384,18 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
          if (RANK .eq. ROOT)  write(*,*) 'NRELES = ', NRELES
          do iel = 1,nr_elem_ref
             mdle = mdle_ref(iel)
-            etype = NODES(mdle)%type
+            etype = NODES(mdle)%ntype
             select case(etype)
-               case('mdlb')
+               case(MDLB)
                   !kref = 111 ! iso
                   !kref = 110  ! radial
                   kref = 10 ! refining in r
                   !kref = 100 ! refining in theta
-               case('mdlp')
+               case(MDLP)
                   !kref = 11  ! iso
                   kref = 10   ! radial
                case default
-                  write(*,*) 'refine_DPG: READING UNEXPECTED ELEMENT TYPE: ',etype
+                  write(*,*) 'refine_DPG: READING UNEXPECTED ELEMENT TYPE: ',S_Type(etype)
                   call pause
             end select
             call refine(mdle,kref)
