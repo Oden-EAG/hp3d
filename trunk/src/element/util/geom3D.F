@@ -54,7 +54,7 @@ c
 #endif
 c
 c  ...determine physical coordinates and the derivatives of
-c     the physical coordinates wrt master element ccordinates
+c     the physical coordinates wrt master element coordinates
       select case(EXGEOM)
 c
 c  ...isoparametric element
