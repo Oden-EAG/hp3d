@@ -15,7 +15,7 @@ DEBUG    ?= 0
 #------------------------------------------------------------------
 
 # Enable OpenMP threading
-OPENMP   ?= 1
+HP3D_USE_OPENMP ?= 1
 
 # Enable performance profiling with TAU
 TAU_PERF ?= 0
@@ -39,7 +39,7 @@ FFLAGS = -fPIC
 #FFLAGS += -stand
 
 # OpenMP
-ifeq ($(OPENMP),1)
+ifeq ($(HP3D_USE_OPENMP),1)
   FFLAGS += -qopenmp
 endif
 
@@ -220,5 +220,5 @@ PROB_INCS    += $(HP3D_LINK_INCS)   \
 HP3D_USE_INTEL_MKL = 1
 PROB_PP_DEFS  = -D"C_MODE=$(COMPLEX)" \
                 -D"DEBUG_MODE=$(DEBUG)" \
-                -D"HP3D_USE_OPENMP=$(OPENMP)" \
+                -D"HP3D_USE_OPENMP=$(HP3D_USE_OPENMP)" \
                 -D"HP3D_USE_INTEL_MKL=$(HP3D_USE_INTEL_MKL)"

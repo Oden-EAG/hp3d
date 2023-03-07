@@ -1,6 +1,9 @@
-SRC_FILE    = \
-        ../COMMON_FILES/commonParam.F90 \
-        ../COMMON_FILES/laserParam.F90 \
+# Module dependencies specified directly in makefile
+#SRC_MODULE = \
+#        ../COMMON_FILES/commonParam.F90 \
+#        ../COMMON_FILES/laserParam.F90
+
+SRC_COMMON = \
         ../COMMON_FILES/bessel_fn.F90 \
         ../COMMON_FILES/commonRoutines.F90 \
         ../COMMON_FILES/exact_error.F90 \
@@ -11,8 +14,9 @@ SRC_FILE    = \
         ../COMMON_FILES/refine_DPG.F90 \
         ../COMMON_FILES/residual.F90 \
         ../COMMON_FILES/set_environment.F90 \
-        ../COMMON_FILES/thermal.F90 \
-        set_3Dint_fi.F90 \
+        ../COMMON_FILES/thermal.F90
+
+SRC_LASER = \
         celem.F90 \
         dirichlet.F90 \
         elem/elem.F90 \
@@ -39,4 +43,5 @@ SRC_FILE    = \
         main_aux.F90 \
         my_paraview_driver.F90 \
         set_initial_mesh.F90 \
+        set_3Dint_fi.F90 \
         soldis.F90
