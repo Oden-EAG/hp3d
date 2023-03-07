@@ -35,7 +35,7 @@ c
       implicit none
       integer, intent(in)  :: NordM,Nsize(2)
       integer, intent(out) :: NrdofH
-      !integer :: noriE(12),noriF(6),norder(19),nordF(3)
+c      integer :: noriE(12),noriF(6),norder(19),nordF(3)
       integer :: i,j,k,m
       integer :: nordB(3),ndofH(3)
       double precision, intent(in)  :: Xi(3)
@@ -142,7 +142,7 @@ c
       implicit none
       integer, intent(in)  :: NordM,Nsize(2)
       integer, intent(out) :: NrdofE
-      !integer :: noriE(12),noriF(6),norder(19),nordF(3)
+c      integer :: noriE(12),noriF(6),norder(19),nordF(3)
       integer :: i,j,k,m
       integer :: nordB(3),ndofH(3),ndofQ(3)
       double precision, intent(in)  :: Xi(3)
@@ -288,7 +288,7 @@ c
       implicit none
       integer, intent(in)  :: NordM,Nsize(2)
       integer, intent(out) :: NrdofV
-      !integer :: noriF(6),norder(19),nordF(3)
+c      integer :: noriF(6),norder(19),nordF(3)
       integer :: i,j,k,m
       integer :: nordB(3),ndofH(3),ndofQ(3)
       double precision, intent(in)  :: Xi(3)
