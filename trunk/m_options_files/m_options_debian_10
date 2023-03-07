@@ -18,7 +18,7 @@ HP3D_USE_INTEL_MKL ?= 0
 #------------------------------------------------------------------
 
 # Enable OpenMP threading
-OPENMP ?= 0
+HP3D_USE_OPENMP ?= 0
 
 FF = mpif90
 CC = mpicc
@@ -26,7 +26,7 @@ FC     =  $(FF)
 FFLAGS = -fPIC -ffree-line-length-none
 
 # OpenMP
-ifeq ($(OPENMP),1)
+ifeq ($(HP3D_USE_OPENMP),1)
   FFLAGS += -fopenmp
 endif
 
@@ -64,7 +64,7 @@ CDEFS   = -DAdd_
 MKL_LIBS = -Wl,--start-group \
            /opt/intel/mkl/lib/intel64/libmkl_gf_lp64.a \
            /opt/intel/mkl/lib/intel64/libmkl_core.a
-ifeq ($(OPENMP),1)
+ifeq ($(HP3D_USE_OPENMP),1)
   MKL_LIBS += /opt/intel/mkl/lib/intel64/libmkl_intel_thread.a \
               /opt/intel/compilers_and_libraries_2020.2.254/linux/compiler/lib/intel64/libiomp5.a
   #MKL_LIBS += /opt/intel/mkl/lib/intel64/libmkl_gnu_thread.a
@@ -206,5 +206,5 @@ PROB_INCS    += $(HP3D_LINK_INCS)   \
 
 PROB_PP_DEFS  = -D"C_MODE=$(COMPLEX)" \
                 -D"DEBUG_MODE=$(DEBUG)" \
-                -D"HP3D_USE_OPENMP=$(OPENMP)" \
+                -D"HP3D_USE_OPENMP=$(HP3D_USE_OPENMP)" \
                 -D"HP3D_USE_INTEL_MKL=$(HP3D_USE_INTEL_MKL)"
