@@ -4,7 +4,7 @@ c   routine name       - flag_constr_parents
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - feb 23
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine flags ancestors of parents of
 c                        constrained nodes of an element that
@@ -15,6 +15,7 @@ c   arguments :
 c     in:
 c            Mdle      - an element number, same as the middle node
 c                        number
+c            Nodesl    - list of element nodes
 c
 c----------------------------------------------------------------------
 c
@@ -24,19 +25,25 @@ c
       use data_structure3D
       use constrained_nodes
 #include "syscom.blk"
-      dimension Nodesl(27)
+c
+      integer, intent(in) :: Mdle
+      integer, intent(in) :: Nodesl(27)
 c
 c  ...element type
-      character(len=4) :: type
+      integer :: ntype
+c
+c  ...miscellanea
+      integer :: j,nrnodl,nod,nc,icase
+      integer :: iprint
 c
 c----------------------------------------------------------------------
 c
       iprint = 0
 c
-      type = NODES(Mdle)%type
+      ntype = NODES(Mdle)%ntype
 c
 c  ...number of (local) nodes for the element (- middle node)
-      nrnodl = Nvert(type)+Nedge(type)+Nface(type)
+      nrnodl = Nvert(ntype)+Nedge(ntype)+Nface(ntype)
 c
 c  ...loop through element constrained nodes
       do j=1,nrnodl
@@ -180,12 +187,12 @@ c  .......parent mid-edge nodes (south,north)
             if (Is_inactive(nodp)) then
 c
 c  ...........a constraining edge is allowed
-              if (NODES(nodp)%type.eq.'medg') nodp = NODES(nodp)%father
+              if (NODES(nodp)%ntype.eq.MEDG) nodp = NODES(nodp)%father
             endif
 ccc            if (Is_inactive(nodp)) nodp = NODES(nodp)%father
 cccc
 cccc  .........check: father MUST be a medg node
-ccc            if (NODES(nodp)%type.ne.'medg') then
+ccc            if (NODES(nodp)%ntype.ne.MEDG) then
 ccc              write(*,8001) 5; stop 1
 ccc            endif
             if (Is_inactive(nodp)) call flag(nodp)
@@ -216,13 +223,13 @@ c  .......parent mid-edge nodes (east,west)
             if (Is_inactive(nodp)) then
 c
 c  ...........a constraining edge is allowed
-              if (NODES(nodp)%type.eq.'medg') nodp = NODES(nodp)%father
+              if (NODES(nodp)%ntype.eq.MEDG) nodp = NODES(nodp)%father
             endif
 c
 ccc  .........check: father MUST be a medg node
-ccc            if (NODES(nodp)%type.ne.'medg') then
-ccc              write(*,*) 'Mdle,NODES(nodp)%type = ',
-ccc     .                    Mdle,NODES(nodp)%type
+ccc            if (NODES(nodp)%ntype.ne.MEDG) then
+ccc              write(*,*) 'Mdle,S_Type(NODES(nodp)%ntype) = ',
+ccc     .                    Mdle,S_Type(NODES(nodp)%ntype)
 ccc              write(*,8001) 8
 ccc            endif
             if (Is_inactive(nodp)) call flag(nodp)
@@ -248,7 +255,6 @@ c
 c  ...end of loop through constrained nodes
       enddo
 c
-c
       end subroutine flag_constr_parents
 c
 c----------------------------------------------------------------------
@@ -257,7 +263,7 @@ c   routine name       - flag
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - May 10
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine flags all ancestors of a node
 c
@@ -272,7 +278,13 @@ c
       use element_data
       use data_structure3D
       use constrained_nodes
-#include "syscom.blk"
+c
+      implicit none
+c
+      integer, intent(in) :: Nod
+c
+      integer :: nfath
+      integer :: iprint
 c
       iprint=0
       if (iprint.eq.1) then
@@ -287,6 +299,4 @@ c
         nfath = NODES(nfath)%father
       enddo
 c
-c
-      end subroutine
-
+      end subroutine flag

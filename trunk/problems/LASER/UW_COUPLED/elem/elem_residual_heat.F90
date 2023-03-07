@@ -49,7 +49,7 @@ subroutine elem_residual_heat(Mdle,                &
    real(8), parameter :: rZERO = 0.d0
 !
 !..declare edge/face type variables
-   character(len=4) :: etype,ftype
+   integer :: etype,ftype
 !
 !..declare element order, orientation for edges and faces
    integer, dimension(19)  :: norder
@@ -133,7 +133,7 @@ subroutine elem_residual_heat(Mdle,                &
 !-----------------------------------------------------------------------
 !
 !..element type
-   etype = NODES(Mdle)%type
+   etype = NODES(Mdle)%ntype
    nrf = nface(etype)
 !
 !..determine order of approximation
@@ -141,9 +141,9 @@ subroutine elem_residual_heat(Mdle,                &
 !
 !  ...set the enriched order of approximation
    select case(etype)
-      case('mdlb'); nordP = NODES(Mdle)%order+NORD_ADD*111
-      case('mdln','mdld'); nordP = NODES(Mdle)%order+NORD_ADD
-      case('mdlp'); nordP = NODES(Mdle)%order+NORD_ADD*11
+      case(MDLB)     ; nordP = NODES(Mdle)%order+NORD_ADD*111
+      case(MDLP)     ; nordP = NODES(Mdle)%order+NORD_ADD*11
+      case(MDLN,MDLD); nordP = NODES(Mdle)%order+NORD_ADD
    end select
 !
 !..determine edge and face orientations

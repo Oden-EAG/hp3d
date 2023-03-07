@@ -9,8 +9,8 @@ subroutine close()
 end subroutine close
 !
 !-----------------------------------------------------------------------------
-!
-!> Purpose : enforce one-irregular mesh
+!> @brief enforce one-irregular mesh
+!> @date Feb 2023
 subroutine close_mesh()
    use error
    use refinements
@@ -20,7 +20,7 @@ subroutine close_mesh()
 !
    implicit none
 !
-   character(4)           :: type
+   integer                :: ntype
    integer, allocatable   :: list(:,:)
    integer, dimension(27) :: nodesl,norientl
    integer, dimension(6)  :: kreff
@@ -87,22 +87,22 @@ subroutine close_mesh()
 !     Step 2 : pick the middle nodes to be refined
 !---------------------------------------------------------
 !
-!$OMP DO                                     &
-!$OMP PRIVATE(mdle,nodesl,norientl,nod,type, &
-!$OMP         nflag,krefe,kreff,kref,j)      &
+!$OMP DO                                      &
+!$OMP PRIVATE(mdle,nodesl,norientl,nod,ntype, &
+!$OMP         nflag,krefe,kreff,kref,j)       &
 !$OMP REDUCTION (+:ic)
       do i=1,NRELES
          mdle=ELEM_ORDER(i)
          call elem_nodes(mdle, nodesl,norientl)
 !
-         type  = NODES(mdle)%type
+         ntype = NODES(mdle)%ntype
          nflag = .FALSE.
 !
 !        check edges
 !        ~~~~~~~~~~~~
          krefe = 0
-         do j=1, nedge(type)
-            nod = nodesl(nvert(type)+j)
+         do j=1,nedge(ntype)
+            nod = nodesl(nvert(ntype)+j)
             if (NODES(nod)%visit.eq.1) then
                krefe(j)=1
                nflag=.TRUE.
@@ -112,8 +112,8 @@ subroutine close_mesh()
 !        check faces
 !        ~~~~~~~~~~~~
          kreff = 0
-         do j=1, nface(type)
-            nod = nodesl(nvert(type)+nedge(type)+j)
+         do j=1,nface(ntype)
+            nod = nodesl(nvert(ntype)+nedge(ntype)+j)
             if (NODES(nod)%visit.eq.1) then
                call get_isoref(nod, kreff(j))
                nflag=.TRUE.
@@ -127,8 +127,8 @@ subroutine close_mesh()
 #if DEBUG_MODE
             if ((RANK.eq.ROOT) .and. (iprint.eq.1)) then
                !$OMP CRITICAL
-               nre = nedge(NODES(mdle)%type)
-               nrf = nface(NODES(mdle)%type)
+               nre = nedge(NODES(mdle)%ntype)
+               nrf = nface(NODES(mdle)%ntype)
                write(*,*) 'close_mesh: mdle = ', mdle
                write(*,7003) krefe(1:12)
    7003        format('krefe = ',12i2)
@@ -147,15 +147,15 @@ subroutine close_mesh()
             else
 !           ...-------------------------------------------------------------------
 !           ...Option 1: do minimum refinement that is necessary
-               !call find_element_closing_ref(type,kreff,krefe, kref)
+               !call find_element_closing_ref(ntype,kreff,krefe, kref)
 !           ...-------------------------------------------------------------------
 !           ...Option 2: always ask for isotropic refinement
                call get_isoref(mdle, kref)
 !           ...-------------------------------------------------------------------
 !           ...Option 3: always ask for radial (xy) refinement (FIBER LASER)
-               !select case (NODES(mdle)%type)
-               !   case('mdlb'); kref = 110
-               !   case('mdlp'); kref = 10
+               !select case (NODES(mdle)%ntype)
+               !   case(MDLB); kref = 110
+               !   case(MDLP); kref = 10
                !end select
 !           ...-------------------------------------------------------------------
             endif
@@ -188,7 +188,7 @@ subroutine close_mesh()
          if (is_leaf(mdle)) then
 #if DEBUG_MODE
             if ((RANK.eq.ROOT) .and. (iprint.eq.1)) then
-               write(*,7001) i, mdle, NODES(mdle)%type, kref
+               write(*,7001) i, mdle, S_Type(NODES(mdle)%ntype), kref
     7001       format('close_mesh: i= ',i6,' mdle= ', i6,' ', a4, ' ref_kind = ',i5)
             endif
 #endif

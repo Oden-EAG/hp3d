@@ -137,7 +137,6 @@ c
       stop
 c     call shape2H('tria',Xi,Norder,Nedge_orient, NrdofH,ShapH,GradH)
 c
-c
       end subroutine shapeHt
 c
 c

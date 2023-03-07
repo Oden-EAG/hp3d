@@ -15,6 +15,7 @@
 !
 subroutine trian_local(No,T,Norient, X,Dxdt)
 !
+      use node_types, only: TRIA
       implicit none
       integer,               intent(in ) :: No,Norient
       real(8),dimension(2  ),intent(in ) :: T
@@ -35,7 +36,7 @@ subroutine trian_local(No,T,Norient, X,Dxdt)
       endif
 !
 !  ...GIVEN -> GLOBAL REFERENCE
-      call local2global('tria',T,Norient, eta,detadt)
+      call local2global(TRIA,T,Norient, eta,detadt)
 !
 !  ...GLOBAL REFERENCE -> PHYSICAL
       call trian(No,eta, X,dxdeta)

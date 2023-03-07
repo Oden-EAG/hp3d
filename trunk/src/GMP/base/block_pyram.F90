@@ -14,6 +14,7 @@
 subroutine pyram(No,Eta, X,Dxdeta)
 !
       use GMP
+      use node_types, only: PYRA
 !
 !------------------------------------------------------------------------------
       implicit none
@@ -39,7 +40,7 @@ subroutine pyram(No,Eta, X,Dxdeta)
 !------------------------------------------------------------------------------
       case('Linear')
 !  .....get linear shape functions
-        call vshape3('pyra',Eta, vshap,dvshap)
+        call vshape3(PYRA,Eta, vshap,dvshap)
 !  .....determine vertex points coordinates
         do i=1,5
           np = PYRAMIDS(No)%VertNo(i)
@@ -86,6 +87,7 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
       use control
       use GMP
       use element_data
+      use node_types, only: PYRA
 !
 #include"syscom.blk"
 !-----------------------------------------------------------------------
@@ -147,7 +149,7 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
       z1 = 1.d0-z
 !
 !  ...compute vertex shape functions
-      call vshape3('pyra',Eta, shapH,dshapH)
+      call vshape3(PYRA,Eta, shapH,dshapH)
 !
 !-----------------------------------------------------------------------
 !     V E R T E X    C O N T R I B U T I O N S

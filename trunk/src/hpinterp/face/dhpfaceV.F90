@@ -2,15 +2,15 @@
 #include "typedefs.h"
 !
 !-----------------------------------------------------------------------
-!> Purpose : determine H(div) face dof interpolating H(div) Dirichlet data
-!            using PB interpolation
-!  NOTE:     the interpolation (projection) is done in the reference space
+!> @brief    determine H(div) face dof interpolating H(div) Dirichlet data
+!!           using PB interpolation; NOTE: the interpolation (projection)
+!!           is done in the reference space
 !!
 !! @param[in]  Iflag        - a flag specifying which of the objects the
 !!                            face is on: 5 pris, 6 hexa, 7 tetr, 8 pyra
 !! @param[in]  No           - number of a specific object
 !! @param[in]  Etav         - reference coordinates of the element vertices
-!! @param[in]  Type         - element (middle node) type
+!! @param[in]  Ntype        - element (middle node) type
 !! @param[in]  Icase        - the face node case
 !! @param[in]  Bcond        - the edge node BC flag
 !! @param[in]  Nedge_orient - edge orientation, never used
@@ -18,9 +18,11 @@
 !! @param[in]  Norder       - element order
 !! @param[in]  Iface        - face number
 !!
-!! @param[out] ZnodV        - H(div) dof for the face
+!! @param[in,out] ZnodV     - H(div) dof for the face
+!!
+!> @date Feb 2023
 !-----------------------------------------------------------------------
-  subroutine dhpfaceV(Mdle,Iflag,No,Etav,Type,Icase,Bcond, &
+  subroutine dhpfaceV(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond, &
                       Nedge_orient,Nface_orient,Norder,Iface, &
                       ZnodV)
   use control
@@ -31,13 +33,13 @@
 !
 ! ** Arguments
 !-----------------------------------------------------------------------
-  integer,                                    intent(in)  :: Iflag,No,Mdle
-  integer,                                    intent(in)  :: Icase,Bcond,Iface
-  real(8), dimension(3,8),                    intent(in)  :: Etav
-  character(len=4),                           intent(in)  :: Type
-  integer, dimension(12),                     intent(in)  :: Nedge_orient
-  integer, dimension(6),                      intent(in)  :: Nface_orient
-  integer, dimension(19),                     intent(in)  :: Norder
+  integer,                 intent(in)  :: Iflag,No,Mdle
+  integer,                 intent(in)  :: Icase,Bcond,Iface
+  real(8), dimension(3,8), intent(in)  :: Etav
+  integer,                 intent(in)  :: Ntype
+  integer, dimension(12),  intent(in)  :: Nedge_orient
+  integer, dimension(6),   intent(in)  :: Nface_orient
+  integer, dimension(19),  intent(in)  :: Norder
 !
   VTYPE,   dimension(NRCOMS*NREQNH(Icase),*), intent(inout) :: ZnodV
 !
@@ -113,11 +115,11 @@
 !
 !-----------------------------------------------------------------------
 !
-  nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
+  nrv = nvert(Ntype); nre = nedge(Ntype); nrf = nface(Ntype)
 !
 #if DEBUG_MODE
   if (iprint.eq.1) then
-     write(*,7010) Mdle,Iflag,No,Icase,Iface,Type
+     write(*,7010) Mdle,Iflag,No,Icase,Iface,S_Type(Ntype)
 7010 format('dhpfaceV: Mdle,Iflag,No,Icase,Iface,Type = ',5i4,2x,a4)
      write(*,7020) Etav(1:3,1:nrv)
 7020 format('          Etav = ',8(3f6.2,1x))
@@ -132,7 +134,7 @@
 #endif
 !
 ! determine # of dof for the face node
-  call ndof_nod(face_type(Type,Iface),Norder(nre+Iface), &
+  call ndof_nod(face_type(Ntype,Iface),Norder(nre+Iface), &
                 ndofH_face,ndofE_face,ndofV_face,ndofQ_face)
 !
 ! check if a homogeneous Dirichlet node
@@ -149,7 +151,7 @@
   endif
 !
 ! set order and orientation for all element edge nodes and the face node
-  call initiate_order(Type, norder_1)
+  call initiate_order(Ntype, norder_1)
   norder_1(nre+Iface) = Norder(nre+Iface)
 !
 #if DEBUG_MODE
@@ -160,9 +162,9 @@
 #endif
 !
 ! get face order to find out quadrature information
-  call face_order(Type,Iface,Norder, norder_face)
+  call face_order(Ntype,Iface,Norder, norder_face)
   INTEGRATION=1   ! overintegrate
-  call set_2Dint(face_type(Type,Iface),norder_face, &
+  call set_2Dint(face_type(Ntype,Iface),norder_face, &
                  nint,xi_list,wa_list)
   INTEGRATION=0   ! reset
 !
@@ -177,18 +179,18 @@
     wa     = wa_list(l)
 !
 !   get the corresponding master element coordinates and Jacobian
-    call face_param(Type,Iface,t, xi,dxidt)
+    call face_param(Ntype,Iface,t, xi,dxidt)
 !
 !   compute element H1 shape functions (for geometry)
-    call shape3DH(Type,xi,norder_1,Nedge_orient,Nface_orient, &
+    call shape3DH(Ntype,xi,norder_1,Nedge_orient,Nface_orient, &
                   nrdofH,shapH,gradH)
 !
 !   compute element H(div) shape functions
-    call shape3DV(Type,xi,norder_1,Nface_orient, &
+    call shape3DV(Ntype,xi,norder_1,Nface_orient, &
                   nrdofV,shapV,divV)
 
 !   evaluate reference coordinates of the point as needed by GMP
-    nsign = nsign_param(Type,Iface)
+    nsign = nsign_param(Ntype,Iface)
     call brefgeom3D(Mdle,xi,Etav,shapH,gradH,nrv,dxidt,nsign, &
                     eta,detadxi,dxideta,rjac,detadt,rn,bjac)
     weight = wa*bjac
@@ -201,7 +203,7 @@
     case(7);        call tetra(No,eta, x,dxdeta)
     case(8);        call pyram(No,eta, x,dxdeta)
     case default
-      write(*,*) 'dhpfaceV: Type = ', Type
+      write(*,*) 'dhpfaceV: Type = ', S_Type(Ntype)
       call logic_error(ERR_INVALID_VALUE,__FILE__,__LINE__)
     end select
 !

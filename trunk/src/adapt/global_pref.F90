@@ -1,7 +1,6 @@
 !--------------------------------------------------------------------
-!> Purpose : routine performs a global p-enrichment
-!!
-!> @date Aug 2019
+!> @brief   routine performs a global p-enrichment
+!> @date    Feb 2023
 !--------------------------------------------------------------------
 subroutine global_pref
 !
@@ -10,6 +9,7 @@ subroutine global_pref
                                ELEM_ORDER,get_subd,set_subd
    use par_mesh        , only: get_elem_nodes!,DISTRIBUTED
    !use mpi_param       , only: RANK
+   use node_types
 !
    implicit none
 !
@@ -23,19 +23,19 @@ subroutine global_pref
    do iel=1,NRELES
       mdle = ELEM_ORDER(iel)
       nord = NODES(mdle)%order
-      select case(NODES(mdle)%type)
-         case('mdln','mdld')
-            nord = nord+1
-            p = nord
-         case('mdlp')
-            nord = nord+11
-            call decode(nord, nordx,nordz)
-            p = MAX(nordx,nordz)
-         case('mdlb')
+      select case(NODES(mdle)%ntype)
+         case(MDLB)
             nord = nord+111
             call decode(nord, naux ,nordz)
             call decode(naux, nordx,nordy)
             p = MAX(nordx,nordy,nordz)
+         case(MDLP)
+            nord = nord+11
+            call decode(nord, nordx,nordz)
+            p = MAX(nordx,nordz)
+         case(MDLN,MDLD)
+            nord = nord+1
+            p = nord
       end select
       if (p .gt. MAXP) then
          write(*,100) 'global_pref: mdle,p,MAXP = ',mdle,p,MAXP,'. stop.'
@@ -65,10 +65,14 @@ end subroutine global_pref
 !
 !
 !--------------------------------------------------------------------
+!> @brief   routine performs a global p-unrefinement
+!> @date    Feb 2023
+!--------------------------------------------------------------------
 subroutine global_punref
 !
    use data_structure3D, only: NRELES,NODES,ELEM_ORDER
    use par_mesh        , only: DISTRIBUTED
+   use node_types
 !
    implicit none
 !
@@ -83,10 +87,10 @@ subroutine global_punref
    do iel=1,NRELES
       mdle = ELEM_ORDER(iel)
       nord = NODES(mdle)%order
-      select case(NODES(mdle)%type)
-         case('mdln','mdld'); nord = nord-1
-         case('mdlp'); nord = nord-11
-         case('mdlb'); nord = nord-111
+      select case(NODES(mdle)%ntype)
+         case(MDLB); nord = nord-111
+         case(MDLP); nord = nord-11
+         case(MDLN,MDLD); nord = nord-1
       end select
       call nodmod(mdle, nord)
    enddo

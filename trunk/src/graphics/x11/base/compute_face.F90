@@ -1,5 +1,5 @@
 !-------------------------------------------------------------------------------------
-!> Purpose : routine computes physical coordinates and quantity to display
+!> @brief      routine computes physical coordinates and quantity to display
 !!
 !> @param[in]  Numlev       - 0:coordinate only, >0 compute quantity to display
 !> @param[in]  Mdle         - element middle node
@@ -16,7 +16,7 @@
 !> @param[out] X            - physical coordinates
 !> @param[out] Val          - value of the quantity to display
 !!
-!> rev@Mar 13
+!> @date       Feb 2023
 !-------------------------------------------------------------------------------------
 !
 #include "typedefs.h"
@@ -53,14 +53,14 @@ subroutine compute_face(Numlev,Mdle,Iface,Nedge_orient,Nface_orient,Norder, &
       real(8), dimension(3,3) :: dxdxi
       real(8), dimension(3,2) :: dxdt
       real(8), dimension(3) :: rn
-      character(len=4) :: etype
-      integer :: iprint, i, j
+!
+      integer :: iprint, i, j, ntype
 !--------------------------------------------------------------------------------------------------
 !
       iprint=0
 !
-      etype=NODES(Mdle)%type
-      call face_param(etype,Iface,T, xi,dxidt)
+      ntype=NODES(Mdle)%ntype
+      call face_param(ntype,Iface,T, xi,dxidt)
 !
 !     evaluate the physical coordinates of the point and the value of the solution
       call soleval(Mdle,xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,ZdofV,ZdofQ, &
@@ -98,7 +98,7 @@ subroutine compute_face(Numlev,Mdle,Iface,Nedge_orient,Nface_orient,Norder, &
 !     normal vector
       call cross_product(dxdt(1:3,1),dxdt(1:3,2), rn)
       call normalize(rn)
-      rn(1:3) = rn(1:3)*Nsign_param(etype,Iface)
+      rn(1:3) = rn(1:3)*Nsign_param(ntype,Iface)
 !
 !     select the quantity to display
       Val=0.d0

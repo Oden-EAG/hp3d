@@ -1,14 +1,14 @@
 !-------------------------------------------------------------------------------
-!> Purpose            - routine determines BC flags for faces of an element
+!> @brief      routine determines BC flags for faces of an element
 !!
-!! @param[in]  Mdle   - middle node
-!! @param[out] Ibc    - BC flags; for each variable component ivar supported
-!!                      by the element (and its initial mesh ancestor), and
-!!                      face 'iface', 
+!! @param[in]  Mdle - middle node
+!! @param[out] Ibc  - BC flags; for each variable component ivar supported by
+!!                    the element (and its initial mesh ancestor), and iface;
 !!             Ibc(iface,ivar) = 0 if the face is interior to the domain,
 !!                             = the corresponding flag (1-9) for the element
 !!                               ancestor and its face containing the face
 !!                               of 'Mdle'.
+!> @date       Feb 2023
 !-------------------------------------------------------------------------------
 !
 subroutine find_bc(Mdle, Ibc)
@@ -18,8 +18,8 @@ subroutine find_bc(Mdle, Ibc)
    implicit none
 !
 !..Arguments
-   integer, intent(in)    :: Mdle
-   integer, intent(out)   :: Ibc(6,NRINDEX)
+   integer, intent(in)  :: Mdle
+   integer, intent(out) :: Ibc(6,NRINDEX)
 !
 !..Locals
    integer :: nodesl(27),norientl(27)
@@ -59,17 +59,17 @@ subroutine find_bc(Mdle, Ibc)
    nvar = ubound(ELEMS(iel)%bcond,1)
 !
 !..initial mesh element number of vertices + edges, number of faces
-   nrve_iel = Nvert(ELEMS(iel)%type) + Nedge(ELEMS(iel)%type)
-   nrf_iel = Nface(ELEMS(iel)%type)
+   nrve_iel = Nvert(ELEMS(iel)%etype) + Nedge(ELEMS(iel)%etype)
+   nrf_iel = Nface(ELEMS(iel)%etype)
 !
 !..get the element nodes
    call elem_nodes(Mdle, nodesl,norientl)
 !
 !..number of the element vertices and edges combined
-   nrve = Nvert(NODES(Mdle)%type) + Nedge(NODES(Mdle)%type)
+   nrve = Nvert(NODES(Mdle)%ntype) + Nedge(NODES(Mdle)%ntype)
 !
 !..number of the element faces
-   nrf = Nface(NODES(Mdle)%type)
+   nrf = Nface(NODES(Mdle)%ntype)
 !
 !..loop through the faces of the element
    do iface=1,nrf
@@ -96,8 +96,8 @@ subroutine find_bc(Mdle, Ibc)
             enddo
             goto 10
          else
-            select case(NODES(nfath)%type)
-               case('mdlt','mdlq')
+            select case(NODES(nfath)%ntype)
+               case(MDLT,MDLQ)
 !
 !           ...a mid-face node, continue up the tree
                nod = nfath

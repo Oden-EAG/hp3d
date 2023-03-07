@@ -14,6 +14,7 @@
 !-----------------------------------------------------------------------
 subroutine recta_local(No,Norient,T, X,Dxdt)
 !
+      use node_types, only: QUAD
       implicit none
       integer,               intent(in ) :: No,Norient
       real(8),dimension(2  ),intent(in ) :: T
@@ -34,7 +35,7 @@ subroutine recta_local(No,Norient,T, X,Dxdt)
       endif
 !
 !  ...GIVEN -> GLOBAL REFERENCE
-      call local2global('quad',T,Norient, eta,detadt)
+      call local2global(QUAD,T,Norient, eta,detadt)
 !
 !  ...GLOBAL REFERENCE -> PHYSICAL
       call recta(No,eta(1:2), X(1:3),dxdeta(1:3,1:2))

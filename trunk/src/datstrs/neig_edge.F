@@ -4,15 +4,13 @@ c   routine name       - neig_edge
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Jan 09
+c   latest revision    - Feb 2023
 c
 c   purpose            - find neigbors for an element edge
 c
 c   arguments :
 c     in:
-c         Medg         - a mid-edge node
+c         Medge        - a mid-edge node
 c         Maxn         - dimension of the arrays below
 c                        (max number of neighbors)
 c     out:
@@ -21,49 +19,59 @@ c         Nedg_list    - local edge numbers
 c         Norient_list - orientations of the mid-edge node
 c         Nrneig       - number of adjacent elements
 c
-c   required  routines -
-c
 c----------------------------------------------------------------------
 c
-      subroutine neig_edge(Medg,Maxn,
+      subroutine neig_edge(Medge,Maxn,
      .                     Neig,Nedg_list,Norient_list,Nrneig)
 c
       use GMP
       use data_structure3D
       use element_data
 c
-#include "syscom.blk"
+      implicit none
 c
-      dimension Neig(2,Maxn),Nedg_list(Maxn),Norient_list(Maxn)
+      integer, intent(in)  :: Medge
+      integer, intent(in)  :: Maxn
+      integer, intent(out) :: Neig(2,Maxn)
+      integer, intent(out) :: Nedg_list(Maxn)
+      integer, intent(out) :: Norient_list(Maxn)
+      integer, intent(out) :: Nrneig
 c
 c  ...neighbors of a curve
-      dimension neigbl(100)
+      integer :: neigbl(100)
 c
 c  ...decoded orientations for edges
-      dimension nedge_orient(12)
+      integer :: nedge_orient(12)
 c
-c  ...element/node type
-      character(len=4) :: type
+c  ...element type
+      integer :: etype
+c
+c  ...miscellanea
+      integer :: nod,nc,nrbl,nb,lab,ib,ie,nel,ibeg
+      integer :: iprint
 c
 c----------------------------------------------------------------------
 c
       iprint=0
 c
-      if (NODES(Medg)%type.ne.'medg') then
-        write(*,7001) Medg,NODES(Medg)%type
- 7001   format('neig_edge: Medg,NODES(Medg)%type = ',i6,2x,a5)
+c  ...initialize
+      Neig = 0; Nedg_list = 0; Norient_list = 0; Nrneig = 0
+c
+      if (NODES(Medge)%ntype.ne.MEDG) then
+        write(*,7001) Medge,S_Type(NODES(Medge)%ntype)
+ 7001   format('neig_edge: Medge,NODES(Medge)%type = ',i6,2x,a5)
         stop 1
       endif
 c
 c  ...a temporary version for the initial mesh only...
-      if (NODES(Medg)%father.gt.0) then
-        write(*,7002) Medg,NODES(Medg)%father
- 7002   format('neig_edge: Medg,NODES(Medg)%father = ',i6,2x,i6)
+      if (NODES(Medge)%father.gt.0) then
+        write(*,7002) Medge,NODES(Medge)%father
+ 7002   format('neig_edge: Medge,NODES(Medge)%father = ',i6,2x,i6)
         stop 1
       endif
 c
 c  ...the number of the GMP curve is (see hp3gen)
-      nod = Medg
+      nod = Medge
       nc = nod-(NRELIS+NRPOINT)
 c
 c  ...use GMP utility to find the adjacent GMP blocks
@@ -83,24 +91,24 @@ c  .....determine element number
         select case(lab)
 c
 c  .....prism
-        case(1); nel= nb
+        case(1); nel = nb
 c
 c  .....hexahedron
-        case(2); nel= NRPRISM+nb
+        case(2); nel = NRPRISM+nb
 c
 c  .....tetrahedron
-        case(3); nel= NRPRISM+NRHEXAS+nb
+        case(3); nel = NRPRISM+NRHEXAS+nb
 c
 c  .....pyramid
-        case(4); nel= NRPRISM+NRHEXAS+NRTETRA+nb
+        case(4); nel = NRPRISM+NRHEXAS+NRTETRA+nb
         end select
 c
 c  .....store the neighbor, for the initial mesh
 c       middle node numbers coincide with element numbers...
         Neig(1,ib) = nel; Neig(2,ib) = 0
-        type = ELEMS(nel)%type
-        ibeg = nvert(type)+1
-        call locate(nod, ELEMS(nel)%nodes(ibeg),nedge(type), ie)
+        etype = ELEMS(nel)%etype
+        ibeg = nvert(etype)+1
+        call locate(nod, ELEMS(nel)%nodes(ibeg),nedge(etype), ie)
         if (ie.eq.0) then
           write(*,7004)
  7004     format('neig_edge: INCONSISTENCY')
@@ -112,9 +120,10 @@ c       middle node numbers coincide with element numbers...
 c
 c  ...end of loop through adjacent blocks
       enddo
+c
       if (iprint.eq.1) then
-        write(*,7011) Medg
- 7011   format('neig_edge: FIRST NEIGHBORS OF Medg = ',i5)
+        write(*,7011) Medge
+ 7011   format('neig_edge: FIRST NEIGHBORS OF Medge = ',i5)
         write(*,7012) Neig(1,1:Nrneig)
  7012   format(10i8)
         write(*,7012) Nedg_list(1:Nrneig)
@@ -122,7 +131,4 @@ c  ...end of loop through adjacent blocks
         call pause
       endif
 c
-c
-      end
-
-
+      end subroutine neig_edge

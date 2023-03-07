@@ -17,7 +17,7 @@ subroutine stress_error(Mdle, Err,SolNorm)
       real*8 , intent(out) :: SolNorm
 !------------------------------------------------------------------------------------------
 !  ...element and face type
-      character(len=4) :: etype
+      integer :: etype
 !
 !  ...number of topological entities (vertices,edges,faces)
       integer :: nrv,nre,nrf
@@ -90,7 +90,7 @@ subroutine stress_error(Mdle, Err,SolNorm)
       end select
 !
 !  ...element type
-      etype = NODES(Mdle)%type
+      etype = NODES(Mdle)%ntype
       nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
 !
 !  ...order of approximation, orientations, geometry dof's (don't need bc flags)

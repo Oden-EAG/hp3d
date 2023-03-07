@@ -50,7 +50,7 @@
 !          write(*,*)'dx1 = ',dx1_dzeta
 !
 !  .......2ND TERM OF COMPARISON
-          call edge_param('trian',ie,zeta, eta,deta_dzeta)
+          call edge_param(TRIA,ie,zeta, eta,deta_dzeta)
           call trian(Nt,eta, x2,dx2_deta)
           dx2_dzeta = dx2_deta(1:3,1)*deta_dzeta(1) +  &
                       dx2_deta(1:3,2)*deta_dzeta(2)

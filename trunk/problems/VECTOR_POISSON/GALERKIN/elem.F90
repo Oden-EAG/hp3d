@@ -86,7 +86,7 @@ subroutine elem_vect_poisson(Mdle,Nn, Zaloc,Zbloc)
 !
 !----------------------------------------------------------------------
 !
-   character(len=4) :: etype,ftype
+   integer :: etype,ftype
 !
 !..element order, orientation for edges and faces
    integer :: norder(19), norient_edge(12), norient_face(6)
@@ -127,7 +127,7 @@ subroutine elem_vect_poisson(Mdle,Nn, Zaloc,Zbloc)
    Zaloc = ZERO; Zbloc = ZERO
 !
 !..element type
-   etype = NODES(Mdle)%type
+   etype = NODES(Mdle)%ntype
 !..[number of vertices, edges, and faces of this element (type)]
    nrv = nvert(etype)
    nre = nedge(etype)

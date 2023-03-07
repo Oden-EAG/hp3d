@@ -2,24 +2,25 @@
 #include "typedefs.h"
 !
 !-----------------------------------------------------------------------
-!> Purpose : determine middle node geometry dof interpolating GMP map using
-!            PB interpolation
-!  NOTE:     the interpolation (projection) is done in the reference space
+!> @brief      determine middle node geometry dof interpolating GMP map
+!!             using PB interpolation; NOTE: the interpolation
+!!             (projection) is done in the reference space
 !!
 !! @param[in]  Iflag        - a flag specifying which of the objects the
 !!                            face is on: 5 pris, 6 hexa, 7 tetr, 8 pyra
 !! @param[in]  No           - number of a specific object
 !! @param[in]  Etav         - reference coordinates of the element vertices
-!! @param[in]  Type         - element (middle node) type
+!! @param[in]  Ntype        - element (middle node) type
 !! @param[in]  Nedge_orient - edge orientation
 !! @param[in]  Nface_orient - face orientation
 !! @param[in]  Norder       - element order
 !! @param[in]  Xnod         - geometry dof for the element (vertex,edge
 !!                            and face  values)
-!!
 !! @param[out] Xdof         - geometry dof for the middle node
+!!
+!> @date       Feb 2023
 !-----------------------------------------------------------------------
-  subroutine hpmdle(Mdle,Iflag,No,Etav,Type, &
+  subroutine hpmdle(Mdle,Iflag,No,Etav,Ntype, &
                     Nedge_orient,Nface_orient,Norder, &
                     Xnod, Xdof)
   use parameters
@@ -30,8 +31,8 @@
 ! ** Arguments
 !-----------------------------------------------------------------------
   integer,                         intent(in)  :: Iflag,No,Mdle
-  real(8),  dimension(3,8),        intent(in)  :: Etav
-  character(len=4),                intent(in)  :: Type
+  real(8), dimension(3,8),         intent(in)  :: Etav
+  integer,                         intent(in)  :: Ntype
   integer, dimension(12),          intent(in)  :: Nedge_orient
   integer, dimension(6),           intent(in)  :: Nface_orient
   integer, dimension(19),          intent(in)  :: Norder
@@ -76,10 +77,10 @@
 !-----------------------------------------------------------------------
   iprint=0
 !
-  nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
+  nrv = nvert(Ntype); nre = nedge(Ntype); nrf = nface(Ntype)
   if (iprint.eq.1) then
-     write(*,7010) Mdle,Iflag,No, Type
-7010 format('hpmdle: Mdle,Iflag,No, Type = ',3i4,2x,a4)
+     write(*,7010) Mdle,Iflag,No,S_Type(Ntype)
+7010 format('hpmdle: Mdle,Iflag,No,Type = ',3i4,2x,a4)
      write(*,7020) Etav(1:3,1:nrv)
 7020 format('        Etav = ',8(3f6.2,1x))
      write(*,7030) Nedge_orient(1:nre)
@@ -92,14 +93,14 @@
   endif
 !
 ! determine # of dof for the mdle node
-  call ndof_nod(Type,Norder(nre+nrf+1), &
+  call ndof_nod(Ntype,Norder(nre+nrf+1), &
                 ndofH_mdle,ndofE_mdle,ndofV_mdle,ndofQ_mdle)
 !
 ! if # of dof is zero, return, nothing to do
   if (ndofH_mdle.eq.0) return
 !
 ! get quadrature
-  call set_3Dint(Type,Norder, nint,xi_list,wa_list)
+  call set_3Dint(Ntype,Norder, nint,xi_list,wa_list)
 !
 ! initiate stiffness matrix and load vector
   bb = ZERO; aaH = 0.d0
@@ -112,7 +113,7 @@
     wa      = wa_list(l)
 !
 !   compute element H1 shape functions
-    call shape3DH(Type,xi,Norder,Nedge_orient,Nface_orient, &
+    call shape3DH(Ntype,xi,Norder,Nedge_orient,Nface_orient, &
                   nrdofH,shapH,gradH)
 !
 !   compute reference geometry
@@ -128,7 +129,7 @@
     case(7);        call tetra(No,eta, x,dxdeta)
     case(8);        call pyram(No,eta, x,dxdeta)
     case default
-      write(*,*) 'hpmdle: Type = ', Type
+      write(*,*) 'hpmdle: Type = ', S_Type(Ntype)
       call logic_error(ERR_INVALID_VALUE,__FILE__,__LINE__)
     end select
 !

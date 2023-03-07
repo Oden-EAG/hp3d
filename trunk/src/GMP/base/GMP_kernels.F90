@@ -181,6 +181,7 @@ subroutine trianB(No,T,Norient, X,Dxdt)
       use control , only : GEOM_TOL
       use GMP
       use element_data
+      use node_types, only : TRIA
 !
       implicit none
       integer,               intent(in ) :: No,Norient
@@ -229,8 +230,8 @@ subroutine trianB(No,T,Norient, X,Dxdt)
       endif
 !
 !  ...master element, baricentric, and physical coordinates
-      call local2global('tria',T,Norient, eta,detadt)
-      call vshape2('tria',eta, shapH,dshapH)
+      call local2global(TRIA,T,Norient, eta,detadt)
+      call vshape2(TRIA,eta, shapH,dshapH)
       call trian(No,eta, X,dxdeta)
 !
 !----------------------------------------------------------------------
@@ -307,7 +308,7 @@ subroutine trianB(No,T,Norient, X,Dxdt)
           call curveB(nc,te,norientc, xc,dxcdte)
 !
 !  .......(2) curve bubble from triangle parameterization
-          call edge_param('tria',i,te, eta_aux,detadte)
+          call edge_param(TRIA,i,te, eta_aux,detadte)
           call trian(No,eta_aux, x_aux,dxdeta_aux)
           dxdte(1:3)=dxdeta_aux(1:3,1)*detadte(1) + &
                      dxdeta_aux(1:3,2)*detadte(2)
@@ -395,6 +396,7 @@ subroutine rectaB(No,T,Norient, X,Dxdt)
       use control , only : GEOM_TOL
       use GMP
       use element_data
+      use node_types, only : QUAD
 !
       implicit none
       integer,               intent(in ) :: No,Norient
@@ -440,8 +442,8 @@ subroutine rectaB(No,T,Norient, X,Dxdt)
       endif
 !
 !  ...master element, baricentric, and physical coordinates
-      call local2global('quad',T,Norient, eta,detadt)
-      call vshape2('quad',eta, shapH,dshapH)
+      call local2global(QUAD,T,Norient, eta,detadt)
+      call vshape2(QUAD,eta, shapH,dshapH)
       call recta(No,eta, X,dxdeta)
 !
 !----------------------------------------------------------------------
@@ -518,7 +520,7 @@ subroutine rectaB(No,T,Norient, X,Dxdt)
           call curveB(nc,te,norientc, xc,dxcdte)
 !
 !  .......(2) curve bubble from triangle parameterization
-          call edge_param('quad',i,te, eta_aux,detadte)
+          call edge_param(QUAD,i,te, eta_aux,detadte)
           call recta(No,eta_aux, x_aux,dxdeta_aux)
           dxdte(1:3)=dxdeta_aux(1:3,1)*detadte(1) + &
                      dxdeta_aux(1:3,2)*detadte(2)
@@ -797,7 +799,7 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
 !----------------------------------------------------------------------
 !       2nd TERM OF COMPARISON: xw, dxwdse                            !
 !  .....evaluate local edge parameterization of master triangle       !
-        call edge_param('quad',ie,se, sw,dswdse)                      !
+        call edge_param(QUAD,ie,se, sw,dswdse)                      !
 !  .....evaluate rectangle parameterization                           !
         call recta(No,sw, xw,dxwds)                                   !
 !  .....compute derivative wrt edge parameter                         !

@@ -26,7 +26,7 @@ c     routine name      - shape1DH
 c
 c----------------------------------------------------------------------
 c
-c     latest revision:  - Nov 14, Apr 17
+c     latest revision:  - Feb 2023
 c
 c     purpose:          - evaluate 1D H1 shape functions
 c
@@ -46,6 +46,7 @@ c
       subroutine shape1DH(Xi,Nord, NrdofH,ShapH,GradH)
 c
       use parameters , only : MAXP
+      use node_types
 c
       implicit none
       integer, intent(in)  :: Nord
@@ -57,7 +58,7 @@ c
       integer :: nsize(2),norder(19)
       norder = 0; norder(1) = Nord
 c
-      call checkorder('segm','contin',norder,MAXP, nsize)
+      call checkorder(SEGM,'contin',norder,MAXP, nsize)
       call shape1DHSeg(Xi,Nord,nsize, NrdofH,ShapH,GradH)
 c
       end subroutine shape1DH
@@ -70,7 +71,7 @@ c     routine name      - shape1DQ
 c
 c----------------------------------------------------------------------
 c
-c     latest revision:  - Nov 14, Apr 17
+c     latest revision:  - Feb 2023
 c
 c     purpose:          - evaluate 1D L2 shape functions
 c
@@ -89,6 +90,7 @@ c
       subroutine shape1DQ(Xi,Nord, NrdofQ,ShapQ)
 c
       use parameters , only : MAXP
+      use node_types
 c
       implicit none
       double precision, intent(in)  :: Xi
@@ -99,7 +101,7 @@ c
       integer :: nsize(2),norder(19)
       norder = 0; norder(1) = Nord
 c
-      call checkorder('segm','discon',norder,MAXP, nsize)
+      call checkorder(SEGM,'discon',norder,MAXP, nsize)
       call shape1DQSeg(Xi,Nord,nsize, NrdofQ,ShapQ)
 c
       end subroutine shape1DQ
@@ -121,7 +123,7 @@ c     routine name      - shape2DH
 c
 c----------------------------------------------------------------------
 c
-c     latest revision:  - Nov 14, Apr 17
+c     latest revision:  - Feb 2023
 c
 c     purpose:          - routine returns values of a 2D element
 c                         H1 shape functions and their derivatives
@@ -129,7 +131,7 @@ c
 c     arguments:
 c
 c     in:
-c       Type            - element type
+c       NType           - element type
 c       Xi              - master element coordinates
 c       Norder          - polynomial order for the nodes (H1 sense)
 c       NoriE           - edge orientations
@@ -141,12 +143,13 @@ c       GradH           - gradients of the shape functions
 c
 c-----------------------------------------------------------------------
 c
-      subroutine shape2DH(Type,Xi,Norder,NoriE, NrdofH,ShapH,GradH)
+      subroutine shape2DH(NType,Xi,Norder,NoriE, NrdofH,ShapH,GradH)
 c
       use parameters , only : MAXP,MAXquadH
+      use node_types
 c
       implicit none
-      character(len=4), intent(in)  :: Type
+      integer         , intent(in)  :: Ntype
       double precision, intent(in)  :: Xi(2)
       integer         , intent(in)  :: Norder(5)
       integer         , intent(in)  :: NoriE(4)
@@ -159,14 +162,14 @@ c
 c
       ShapH = 0.d0; GradH = 0.d0
 c
-      call checkorder(Type,'contin',norder3D,MAXP, nsize)
-      select case(Type)
-      case('tria','mdlt')
+      call checkorder(NType,'contin',norder3D,MAXP, nsize)
+      select case(NType)
+      case(TRIA,MDLT)
         call shape2DHTri(Xi,Norder,NoriE,nsize, NrdofH,ShapH,GradH)
-      case('quad','mdlq','rect')
+      case(QUAD,MDLQ,RECT)
         call shape2DHQuad(Xi,Norder,NoriE,nsize, NrdofH,ShapH,GradH)
       case default
-        write(*,*)'shape2DH: Type = ', Type
+        write(*,*)'shape2DH: Type = ', S_Type(Ntype)
         stop 1
       end select
 c
@@ -180,7 +183,7 @@ c     routine name      - shape2DE
 c
 c----------------------------------------------------------------------
 c
-c     latest revision:  - Nov 14, Apr 17
+c     latest revision:  - Feb 2023
 c
 c     purpose:          - routine returns values of a 2D element
 c                         H(curl) shape functions and their curl
@@ -188,7 +191,7 @@ c
 c     arguments:
 c
 c     in:
-c       Type            - element type
+c       NType           - element type
 c       Xi              - master element coordinates
 c       Norder          - polynomial order for the nodes (H1 sense)
 c       NoriE           - edge orientations
@@ -199,12 +202,13 @@ c       CurlE           - curl of the shape functions
 c
 c----------------------------------------------------------------------
 c
-      subroutine shape2DE(Type,Xi,Norder,NoriE, NrdofE,ShapE,CurlE)
+      subroutine shape2DE(NType,Xi,Norder,NoriE, NrdofE,ShapE,CurlE)
 c
       use parameters , only : MAXP,MAXquadE
+      use node_types
 c
       implicit none
-      character(len=4), intent(in)  :: Type
+      integer         , intent(in)  :: Ntype
       double precision, intent(in)  :: Xi(2)
       integer         , intent(in)  :: Norder(5)
       integer         , intent(in)  :: NoriE(4)
@@ -217,14 +221,14 @@ c
 c
       ShapE = 0.d0; CurlE = 0.d0
 c
-      call checkorder(Type,'tangen',norder3D,MAXP, nsize)
-      select case(Type)
-      case('tria','mdlt')
+      call checkorder(NType,'tangen',norder3D,MAXP, nsize)
+      select case(NType)
+      case(TRIA,MDLT)
         call shape2DETri(Xi,Norder,NoriE,nsize, NrdofE,ShapE,CurlE)
-      case('quad','mdlq','rect')
+      case(QUAD,MDLQ,RECT)
         call shape2DEQuad(Xi,Norder,NoriE,nsize, NrdofE,ShapE,CurlE)
       case default
-        write(*,*)'shape2DE: Type = ', Type
+        write(*,*)'shape2DE: Type = ', S_Type(Ntype)
         stop 1
       end select
 c
@@ -238,7 +242,7 @@ c     routine name      - shape2DV
 c
 c----------------------------------------------------------------------
 c
-c     latest revision:  - Nov 14, Apr 17
+c     latest revision:  - Feb 2023
 c
 c     purpose:          - routine returns values of a 2D element
 c                         H(div) shape functions and their divergence
@@ -247,7 +251,7 @@ c
 c     arguments:
 c
 c     in:
-c       Type            - element type
+c       NType           - element type
 c       Xi              - master element coordinates
 c       Norder          - polynomial order for the nodes (H1 sense)
 c       NoriE           - edge orientations
@@ -259,12 +263,13 @@ c       DivV            - divergences of the shape functions
 c
 c----------------------------------------------------------------------
 c
-      subroutine shape2DV(Type,Xi,Norder,NoriE, NrdofV,ShapV,DivV)
+      subroutine shape2DV(NType,Xi,Norder,NoriE, NrdofV,ShapV,DivV)
 c
       use parameters , only : MAXP,MAXquadV
+      use node_types
 c
       implicit none
-      character(len=4), intent(in)  :: Type
+      integer         , intent(in)  :: Ntype
       double precision, intent(in)  :: Xi(2)
       integer         , intent(in)  :: Norder(5)
       integer         , intent(in)  :: NoriE(4)
@@ -277,14 +282,14 @@ c
 c
       ShapV = 0.d0; DivV = 0.d0
 c
-      call checkorder(Type,'normal',norder3D,MAXP, nsize)
-      select case(Type)
-      case('tria','mdlt')
+      call checkorder(NType,'normal',norder3D,MAXP, nsize)
+      select case(NType)
+      case(TRIA,MDLT)
         call shape2DVTri(Xi,Norder,NoriE,nsize, NrdofV,ShapV,DivV)
-      case('quad','mdlq','rect')
+      case(QUAD,MDLQ,RECT)
         call shape2DVQuad(Xi,Norder,NoriE,nsize, NrdofV,ShapV,DivV)
       case default
-        write(*,*)'shape2DV: Type = ', Type
+        write(*,*)'shape2DV: Type = ', S_Type(Ntype)
         stop 1
       end select
 c
@@ -298,7 +303,7 @@ c     routine name      - shape2DQ
 c
 c----------------------------------------------------------------------
 c
-c     latest revision:  - Nov 14, Apr 17
+c     latest revision:  - Feb 2023
 c
 c     purpose:          - routine returns values of a 2D element
 c                         L2 shape functions
@@ -306,7 +311,7 @@ c
 c     arguments:
 c
 c     in:
-c       Type            - element type
+c       NType           - element type
 c       Xi              - master element coordinates
 c       Norder          - polynomial order for the nodes (H1 sense)
 c
@@ -316,12 +321,13 @@ c       ShapQ           - values of the shape functions at the point
 c
 c----------------------------------------------------------------------
 c
-      subroutine shape2DQ(Type,Xi,Norder, NrdofQ,ShapQ)
+      subroutine shape2DQ(NType,Xi,Norder, NrdofQ,ShapQ)
 c
       use parameters , only : MAXP,MAXquadQ
+      use node_types
 c
       implicit none
-      character(len=4), intent(in) :: Type
+      integer         , intent(in)  :: Ntype
       double precision, intent(in)  :: Xi(2)
       integer         , intent(in)  :: Norder(5)
       integer         , intent(out) :: NrdofQ
@@ -332,14 +338,14 @@ c
 c
       ShapQ = 0.d0
 c
-      call checkorder(Type,'discon',norder3D,MAXP, nsize)
-      select case(Type)
-      case('tria','mdlt')
+      call checkorder(NType,'discon',norder3D,MAXP, nsize)
+      select case(NType)
+      case(TRIA,MDLT)
         call shape2DQTri(Xi,Norder,nsize, NrdofQ,ShapQ)
-      case('quad','mdlq','rect')
+      case(QUAD,MDLQ,RECT)
         call shape2DQQuad(Xi,Norder,nsize, NrdofQ,ShapQ)
       case default
-        write(*,*)'shape2DQ: Type = ', Type
+        write(*,*)'shape2DQ: Type = ', S_Type(Ntype)
         stop 1
       end select
 c
@@ -361,7 +367,7 @@ c     routine name      - shape3DH
 c
 c----------------------------------------------------------------------
 c
-c     latest revision:  - Nov 14, Apr 17
+c     latest revision:  - Feb 2023
 c
 c     purpose:          - routine evaluates H1 shape functions for 3D
 c                         elements of various types
@@ -369,7 +375,7 @@ c
 c     arguments:
 c
 c     in:
-c       Type            - element type
+c       NType           - element type
 c       Xi              - master element coordinates
 c       Norder          - polynomial order for the nodes (H1 sense)
 c       NoriE           - edge orientations
@@ -382,13 +388,14 @@ c       GradH           - gradients of the shape functions
 c
 c----------------------------------------------------------------------
 c
-      subroutine shape3DH(Type,Xi,Norder,NoriE,NoriF,
+      subroutine shape3DH(NType,Xi,Norder,NoriE,NoriF,
      .                    NrdofH,ShapH,GradH)
 c
       use parameters , only : MAXP,MAXbrickH
+      use node_types
 c
       implicit none
-      character(len=4), intent(in)  :: Type
+      integer         , intent(in)  :: Ntype
       double precision, intent(in)  :: Xi(3)
       integer         , intent(in)  :: Norder(19)
       integer         , intent(in)  :: NoriE(12)
@@ -401,22 +408,22 @@ c
 c
       ShapH = 0.d0; GradH = 0.d0
 c
-      call checkorder(Type,'contin',Norder,MAXP, nsize)
-      select case(Type)
-      case('bric','mdlb')
+      call checkorder(NType,'contin',Norder,MAXP, nsize)
+      select case(NType)
+      case(BRIC,MDLB)
         call shape3DHHexa(Xi,Norder,NoriE,NoriF,nsize,
      .                                  NrdofH,ShapH,GradH)
-      case('tetr','mdln')
+      case(TETR,MDLN)
         call shape3DHTet(Xi,Norder,NoriE,NoriF,nsize,
      .                                  NrdofH,ShapH,GradH)
-      case('pris','mdlp')
+      case(PRIS,MDLP)
         call shape3DHPris(Xi,Norder,NoriE,NoriF,nsize,
      .                                  NrdofH,ShapH,GradH)
-      case('pyra','mdld')
+      case(PYRA,MDLD)
         call shape3DHPyra(Xi,Norder,NoriE,NoriF,nsize,
      .                                  NrdofH,ShapH,GradH)
       case default
-        write(*,*)'shape3DH: Type = ', Type
+        write(*,*)'shape3DH: Type = ', S_Type(Ntype)
         stop
       end select
 c
@@ -430,7 +437,7 @@ c     routine name      - shape3DE
 c
 c----------------------------------------------------------------------
 c
-c     latest revision:  - Oct 14, Apr 17
+c     latest revision:  - Feb 2023
 c
 c     purpose:          - routine evaluates H(curl) shape functions for
 c                         3D elements of various types
@@ -438,7 +445,7 @@ c
 c     arguments:
 c
 c     in:
-c       Type            - element type
+c       NType           - element type
 c       Xi              - master element coordinates
 c       Norder          - polynomial order for the nodes (H1 sense)
 c       NoriE           - edge orientations
@@ -451,13 +458,14 @@ c       CurlE           - curls of shape functions
 c
 c----------------------------------------------------------------------
 c
-      subroutine shape3DE(Type,Xi,Norder,NoriE,NoriF,
+      subroutine shape3DE(NType,Xi,Norder,NoriE,NoriF,
      .                    NrdofE,ShapE,CurlE)
 c
       use parameters , only : MAXP,MAXbrickE
+      use node_types
 c
       implicit none
-      character(len=4), intent(in)  :: Type
+      integer         , intent(in)  :: Ntype
       double precision, intent(in)  :: Xi(3)
       integer         , intent(in)  :: Norder(19)
       integer         , intent(in)  :: NoriE(12)
@@ -470,22 +478,22 @@ c
 c
       ShapE = 0.d0; CurlE = 0.d0
 c
-      call checkorder(Type,'tangen',Norder,MAXP, nsize)
-      select case(Type)
-      case('bric','mdlb')
+      call checkorder(NType,'tangen',Norder,MAXP, nsize)
+      select case(NType)
+      case(BRIC,MDLB)
         call shape3DEHexa(Xi,Norder,NoriE,NoriF,nsize,
      .                                  NrdofE,ShapE,CurlE)
-      case('tetr','mdln')
+      case(TETR,MDLN)
         call shape3DETet(Xi,Norder,NoriE,NoriF,nsize,
      .                                  NrdofE,ShapE,CurlE)
-      case('pris','mdlp')
+      case(PRIS,MDLP)
         call shape3DEPris(Xi,Norder,NoriE,NoriF,nsize,
      .                                  NrdofE,ShapE,CurlE)
-      case('pyra','mdld')
+      case(PYRA,MDLD)
         call shape3DEPyra(Xi,Norder,NoriE,NoriF,nsize,
      .                                  NrdofE,ShapE,CurlE)
       case default
-        write(*,*)'shape3DE: Type = ', Type
+        write(*,*)'shape3DE: Type = ', S_Type(Ntype)
         stop 1
       end select
 c
@@ -499,7 +507,7 @@ c     routine name      - shape3DV
 c
 c----------------------------------------------------------------------
 c
-c     latest revision:  - Oct 14, Apr 17
+c     latest revision:  - Feb 2023
 c
 c     purpose:          - routine evaluates H(div) shape functions for
 c                         3D elements of various types
@@ -507,7 +515,7 @@ c
 c     arguments:
 c
 c     in:
-c       Type            - element type
+c       NType           - element type
 c       Xi              - master element coordinates
 c       Norder          - polynomial order for the nodes (H1 sense)
 c       NoriF           - face orientations
@@ -519,12 +527,13 @@ c       DivV            - divergence of shape functions
 c
 c----------------------------------------------------------------------
 c
-      subroutine shape3DV(Type,Xi,Norder,NoriF, NrdofV,ShapV,DivV)
+      subroutine shape3DV(NType,Xi,Norder,NoriF, NrdofV,ShapV,DivV)
 c
       use parameters , only : MAXP,MAXbrickV
+      use node_types
 c
       implicit none
-      character(len=4), intent(in)  :: Type
+      integer         , intent(in)  :: Ntype
       double precision, intent(in)  :: Xi(3)
       integer         , intent(in)  :: Norder(19)
       integer         , intent(in)  :: NoriF(6)
@@ -536,18 +545,18 @@ c
 c
       ShapV = 0.d0; DivV = 0.d0
 c
-      call checkorder(Type,'normal',Norder,MAXP, nsize)
-      select case(Type)
-      case('bric','mdlb')
+      call checkorder(NType,'normal',Norder,MAXP, nsize)
+      select case(NType)
+      case(BRIC,MDLB)
         call shape3DVHexa(Xi,Norder,NoriF,nsize, NrdofV,ShapV,DivV)
-      case('tetr','mdln')
+      case(TETR,MDLN)
         call shape3DVTet(Xi,Norder,NoriF,nsize, NrdofV,ShapV,DivV)
-      case('pris','mdlp')
+      case(PRIS,MDLP)
         call shape3DVPris(Xi,Norder,NoriF,nsize, NrdofV,ShapV,DivV)
-      case('pyra','mdld')
+      case(PYRA,MDLD)
         call shape3DVPyra(Xi,Norder,NoriF,nsize, NrdofV,ShapV,DivV)
       case default
-        write(*,*)'shape3DV: Type = ', Type
+        write(*,*)'shape3DV: Type = ', S_Type(Ntype)
         stop 1
       end select
 c
@@ -561,7 +570,7 @@ c     routine name      - shape3DQ
 c
 c----------------------------------------------------------------------
 c
-c     latest revision:  - Oct 14, Apr 17
+c     latest revision:  - Feb 2023
 c
 c     purpose:          - routine evaluates L2 shape functions for 3D
 c                         elements of various types
@@ -569,7 +578,7 @@ c
 c     arguments:
 c
 c     in:
-c       Type            - element type
+c       NType           - element type
 c       Xi              - master element coordinates
 c       Norder          - polynomial order of interior node (H1 sense)
 c
@@ -579,12 +588,13 @@ c       ShapQ           - values of shape functions
 c
 c----------------------------------------------------------------------
 c
-      subroutine shape3DQ(Type,Xi,Norder, NrdofQ,ShapQ)
+      subroutine shape3DQ(NType,Xi,Norder, NrdofQ,ShapQ)
 c
       use parameters , only : MAXP,MAXbrickQ
+      use node_types
 c
       implicit none
-      character(len=4), intent(in)  :: Type
+      integer         , intent(in)  :: Ntype
       double precision, intent(in)  :: Xi(3)
       integer         , intent(in)  :: Norder(19)
       integer         , intent(out) :: NrdofQ
@@ -594,19 +604,19 @@ c
 c
       ShapQ = 0.d0
 c
-      call checkorder(Type,'discon',Norder,MAXP, nsize)
-      select case(Type)
-      case('bric','mdlb')
+      call checkorder(NType,'discon',Norder,MAXP, nsize)
+      select case(NType)
+      case(BRIC,MDLB)
         Nsize=(/MAXP,MAXbrickQ/)
         call shape3DQHexa(Xi,Norder,nsize, NrdofQ,ShapQ)
-      case('tetr','mdln')
+      case(TETR,MDLN)
         call shape3DQTet(Xi,Norder,nsize, NrdofQ,ShapQ)
-      case('pris','mdlp')
+      case(PRIS,MDLP)
         call shape3DQPris(Xi,Norder,nsize, NrdofQ,ShapQ)
-      case('pyra','mdld')
+      case(PYRA,MDLD)
         call shape3DQPyra(Xi,Norder,nsize, NrdofQ,ShapQ)
       case default
-        write(*,*)'shape3DQ: Type = ', Type
+        write(*,*)'shape3DQ: Type = ', S_Type(Ntype)
         stop 1
       end select
 c

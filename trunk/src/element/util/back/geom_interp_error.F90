@@ -4,7 +4,7 @@
 !!
 !! @param[out] Err
 !!
-!! @revision Nov 12
+!! @revision Feb 2023
 !------------------------------------------------------------------------
 subroutine geom_interp_error(Err)
 !
@@ -97,18 +97,19 @@ end subroutine geom_interp_error
 !! @param[in ] Mdle - an element middle node number
 !! @param[out] Derr - the square of the error
 !!
-!! @revision Nov 12
+!! @revision Feb 2023
 !----------------------------------------------------------------------
-subroutine  geom_interp_error_elem(Mdle, Derr)
+subroutine geom_interp_error_elem(Mdle, Derr)
 !
       use data_structure3D , only : NODES
       use parameters       , only : MAXbrickH, MAX_NINT3
 !
       implicit none
-      integer,intent(in ) :: Mdle
-      real*8, intent(out) :: Derr
 !
-      character(len=4) :: etype
+      integer, intent(in)  :: Mdle
+      real(8), intent(out) :: Derr
+!
+      integer :: ntype
       integer,dimension(12) :: nedge_orient
       integer,dimension( 6) :: nface_orient
       integer,dimension(19) :: norder
@@ -121,14 +122,14 @@ subroutine  geom_interp_error_elem(Mdle, Derr)
       real*8,dimension(  MAX_NINT3) :: wxi
       real*8,dimension(3,3),parameter :: del = &
       reshape((/1.d0,0.d0,0.d0, 0.d0,1.d0,0.d0, 0.d0,0.d0,1.d0/),(/3,3/))
-      real*8  :: s,rjac,weight,wa
+      real(8) :: s,rjac,weight,wa
       integer :: nrdof,nint,i,j,k,l,iflag
       integer :: iprint
 !----------------------------------------------------------------------
 !
       iprint=0
 !
-      etype=NODES(Mdle)%type
+      ntype=NODES(Mdle)%ntype
 !
 !  ...element order of approximation, orientations, gdof's
       call find_order( Mdle, norder)
@@ -136,7 +137,7 @@ subroutine  geom_interp_error_elem(Mdle, Derr)
       call nodcor(     Mdle, xnod)
 !
 !  ...Gauss integration points and weights
-      call set_3Dint(etype,norder, nint,xiloc,wxi)
+      call set_3Dint(ntype,norder, nint,xiloc,wxi)
 !
 !  ...initialize
       Derr=0.d0
@@ -148,7 +149,7 @@ subroutine  geom_interp_error_elem(Mdle, Derr)
         xi(1:3)=xiloc(1:3,l) ; wa=wxi(l)
 !
 !  .....shape functions
-        call shape3H(etype,xi,norder,nedge_orient,nface_orient, nrdof,shapH,dshapH)
+        call shape3H(ntype,xi,norder,nedge_orient,nface_orient, nrdof,shapH,dshapH)
 !
 !  .....ISOPARAMETRIC MAP : x_hp = x_hp(xi)
         x_hp(1:3)=0.d0 ; dx_hpdxi(1:3,1:3)=0.d0
@@ -188,9 +189,9 @@ subroutine  geom_interp_error_elem(Mdle, Derr)
 !
 !  ...printing
       if (iprint.eq.1) then
-        write(*,7000)Mdle,etype
- 7000   format(' Mdle,etype,Derr = ',i8,2x,a4,2x,e12.5)
+        write(*,7000)Mdle,S_Type(ntype)
+ 7000   format(' Mdle,type,Derr = ',i8,2x,a4,2x,e12.5)
       endif
 !
 !
-endsubroutine geom_interp_error_elem
+end subroutine geom_interp_error_elem

@@ -75,8 +75,8 @@ c  ...set up order and orientation
       nsize   = (/MAXP,MAXtriaE/)
 c
       ivoid = 0
-      call ndof_nod('medg',nord, ivoid, ndof_medg, ivoid, ivoid)
-      call ndof_nod('mdlt',nord, ivoid, ndof_mdlt, ivoid, ivoid)
+      call ndof_nod(MEDG,nord, ivoid, ndof_medg, ivoid, ivoid)
+      call ndof_nod(MDLT,nord, ivoid, ndof_mdlt, ivoid, ivoid)
       nrdof = 3*ndof_medg + ndof_mdlt
 c
 c*********************************************************************
@@ -751,4 +751,4 @@ c
 c
        if (ians.eq.1) go to 777
 c
-       end subroutine
+       end subroutine setcnstr_trian_iso_hcurl

@@ -117,9 +117,9 @@ subroutine global_href_aniso_omp(Krefxy,Krefz)
    do i=1,nr_elem
       mdle = ELEM_ORDER(i)
       if (is_leaf(mdle)) then
-         select case(NODES(mdle)%type)
-            case('mdlb'); call break(mdle,kref_mdlb)
-            case('mdlp'); call break(mdle,kref_mdlp)
+         select case(NODES(mdle)%ntype)
+            case(MDLB); call break(mdle,kref_mdlb)
+            case(MDLP); call break(mdle,kref_mdlp)
             case default
                write(*,*) 'global_href_aniso: unexpected node type. stop.'
                stop 1

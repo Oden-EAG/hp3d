@@ -29,7 +29,7 @@ c
       dimension ZdofV(MAXEQNV,MAXbrickV-MAXmdlbV)
 c
 c  ...element type
-      character(len=4) :: etype
+      integer :: ntype
 c
 c  ...element order of approximation
       dimension norder(19)
@@ -52,16 +52,16 @@ c---------------------------------------------------------------------
 c
 c  ...determine element order of approximation
       call find_order(Mdle, norder)
-      etype = NODES(Mdle)%type
-      select case(etype)
-        case('mdlb'); norder(19) = 111
-        case('mdlp'); norder(15) = 11
-        case('mdln'); norder(11) = 1
-        case('mdld'); norder(14) = 1
+      ntype = NODES(Mdle)%ntype
+      select case(ntype)
+        case(MDLB); norder(19) = 111
+        case(MDLP); norder(15) = 11
+        case(MDLN); norder(11) = 1
+        case(MDLD); norder(14) = 1
       end select
 c
 c  ...determine number of local dof
-      call celndof(etype,norder,
+      call celndof(ntype,norder,
      .             nrdoflH,nrdoflE,nrdoflV,nrdoflQ)
 c
 c  ...determine constraints' coefficients

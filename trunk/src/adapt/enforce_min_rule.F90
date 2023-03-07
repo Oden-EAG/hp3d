@@ -4,7 +4,7 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - Aug 2019
+!   latest revision    - Feb 2023
 !
 !   purpose            - routine enforces the min rule for a FE mesh
 !
@@ -27,7 +27,7 @@
 !..order for element nodes implied by the order of the middle node
    integer :: norder(19)
 !
-   character(len=4) :: etype
+   integer :: ntype
 !
    integer :: iel,mdle,nod,nrv,nre,nrf,nord
    integer :: i,j,nc,icase,nodp,nordh,nordv
@@ -56,8 +56,8 @@
 !..loop through elements in the current mesh
    do iel=1,NRELES
       mdle = ELEM_ORDER(iel)
-      etype = NODES(Mdle)%type
-      nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
+      ntype = NODES(Mdle)%ntype
+      nrv = nvert(ntype); nre = nedge(ntype); nrf = nface(ntype)
       call get_connect_info(mdle, nodesl,norientl)
       call element_order(mdle,norientl, norder)
 !
@@ -110,8 +110,8 @@
    do iel=1,NRELES
       mdle = ELEM_ORDER(iel)
       call elem_nodes(mdle, nodesl,norientl)
-      etype = NODES(Mdle)%type
-      nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
+      ntype = NODES(Mdle)%ntype
+      nrv = nvert(ntype); nre = nedge(ntype); nrf = nface(ntype)
 !
 !  ...collect the order for nodes determined so far in the ELEMENT coordinates
       do j=1,nre+nrf
@@ -121,8 +121,8 @@
          norder(j) = NODES(nod)%visit
 !
 !     ...determine the face order in element coordinates
-         select case(NODES(nod)%type)
-         case('mdlq')
+         select case(NODES(nod)%ntype)
+         case(MDLQ)
             call decode(norder(j), nordh,nordv)
             select case(norientl(nrv+j))
             case(1,3,4,6); norder(j) = nordv*10+nordh
@@ -136,14 +136,14 @@
       do jf=1,nrf
 !
 !     ...determine element edge numbers for the face
-         call face_to_edge(etype,jf, ne1,ne2,ne3,ne4)
+         call face_to_edge(ntype,jf, ne1,ne2,ne3,ne4)
          nod = nodesl(nrv+nre+jf)
-         select case(face_type(etype,jf))
-         case('tria')
+         select case(face_type(ntype,jf))
+         case(TRIA)
             norder(ne1) = min(norder(ne1),norder(nre+jf))
             norder(ne2) = min(norder(ne2),norder(nre+jf))
             norder(ne3) = min(norder(ne3),norder(nre+jf))
-         case('rect')
+         case(RECT)
             call decode(norder(nre+jf), nordh,nordv)
             norder(ne1) = min(norder(ne1),nordh)
             norder(ne2) = min(norder(ne2),nordv)
@@ -171,10 +171,10 @@
 !
 !     ...refined node, check order of its sons
          if (NODES(nod)%ref_kind.ne.0) then
-            select case(NODES(nod)%type)
+            select case(NODES(nod)%ntype)
 !
 !        ...edge node
-            case('medg')
+            case(MEDG)
                do is=1,2
                   !nods = NODES(nod)%sons(is)
                   nods = Son(nod,is)
@@ -192,15 +192,15 @@
             enddo
 !
 !        ...triangular face node
-            case('mdlt')
-               call nr_face_sons('mdlt',NODES(nod)%ref_kind, nrsons)
+            case(MDLT)
+               call nr_face_sons(MDLT,NODES(nod)%ref_kind, nrsons)
                do is=1,nrsons
                   !nods = NODES(nod)%sons(is)
                   nods = Son(nod,is)
-                  select case(NODES(nods)%type)
-                  case('mdlt')
+                  select case(NODES(nods)%ntype)
+                  case(MDLT)
                      nord = min(nord,NODES(nods)%visit)
-                  case('mdlq')
+                  case(MDLQ)
                      call decode(NODES(nods)%visit, nordh,nordv)
                      nord = min(nord,nordv)
                   end select
@@ -210,20 +210,20 @@
                call nodmod(nod, nord)
 !
 !           ...communicate the new order to the (inactive) sons
-               call nr_sons('mdlt',NODES(nod)%ref_kind, nrsons)
+               call nr_sons(MDLT,NODES(nod)%ref_kind, nrsons)
                do is=1,nrsons
                   !nods = NODES(nod)%sons(is)
                   nods = Son(nod,is)
-                  select case(NODES(nods)%type)
-                  case('mdlt'); NODES(nods)%order = nord
-                  case('mdlq'); NODES(nods)%order = nord*10+nord
+                  select case(NODES(nods)%ntype)
+                  case(MDLT); NODES(nods)%order = nord
+                  case(MDLQ); NODES(nods)%order = nord*10+nord
                   end select
                enddo
 !
 !        ...rectangular face node
-            case('mdlq')
+            case(MDLQ)
                call decode(nord, nordh,nordv)
-               call nr_face_sons('mdlq',NODES(nod)%ref_kind, nrsons)
+               call nr_face_sons(MDLQ,NODES(nod)%ref_kind, nrsons)
                do is=1,nrsons
                   !nods = NODES(nod)%sons(is)
                   nods = Son(nod,is)
@@ -306,10 +306,10 @@ subroutine save_min_order(Nod,Nord)
    if (NODES(Nod)%visit.eq.0) then
       NODES(nod)%visit= Nord
    else
-      select case(NODES(Nod)%type)
-      case('medg','mdlt')
+      select case(NODES(Nod)%ntype)
+      case(MEDG,MDLT)
          NODES(nod)%visit = min(NODES(nod)%visit,Nord)
-      case('mdlq')
+      case(MDLQ)
          call decode(Nord, nordh1,nordv1)
          call decode(NODES(nod)%visit, nordh2,nordv2)
          nordh = min(nordh1,nordh2); nordv = min(nordv1,nordv2)

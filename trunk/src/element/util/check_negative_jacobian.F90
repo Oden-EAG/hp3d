@@ -23,7 +23,7 @@ subroutine check_negative_jacobian(Nodesl, Nsize)
   ! miscellanea
   real(8) :: rjac
   integer :: mdle, iel, i, k, nint, int_back, l, iflag, ic, nrdofH
-  character(len=4) :: type
+  integer :: ntype
   !-------------------------------------------------------------------
 
   write(*,*) 'checking elements negative Jacobians...', NRELES
@@ -37,11 +37,11 @@ subroutine check_negative_jacobian(Nodesl, Nsize)
      call find_elem_nodes(mdle, norder, nedge_orient,nface_orient)
      call nodcor(mdle, xnod)
 
-     type = NODES(mdle)%type
+     ntype = NODES(mdle)%ntype
      ! over integration to detect negative Jacobian when refined
      !
      INTEGRATION = 2
-     call set_3Dint(type,norder, nint,xiloc,wxi)
+     call set_3Dint(ntype,norder, nint,xiloc,wxi)
      INTEGRATION = 0
      !
      ! loop over integration points
@@ -49,7 +49,7 @@ subroutine check_negative_jacobian(Nodesl, Nsize)
         xi(1:3) = xiloc(1:3,l)
         select case(EXGEOM)
         case(0)
-           call shape3DH(type,xi,norder, &
+           call shape3DH(ntype,xi,norder, &
                          nedge_orient,nface_orient, &
                          nrdofH,shapH,dshapH)
            x    (1:3)    =0.d0
@@ -69,7 +69,7 @@ subroutine check_negative_jacobian(Nodesl, Nsize)
         if (iflag.ne.0) then
            ic = ic + 1
            Nodesl(ic) = mdle
-           write(*,*) 'mdle, type, rjac = ', mdle, NODES(mdle)%type, rjac
+           write(*,*) 'mdle, type, rjac = ',mdle,S_Type(NODES(mdle)%ntype),rjac
            exit
         endif
      enddo

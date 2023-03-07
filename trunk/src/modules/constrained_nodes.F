@@ -15,16 +15,13 @@ c
       module constrained_nodes
 !      save
 c
-c  ...a flag indicating whether the info on constraints is to be
-c     collected
+c  ...flag indicating whether the info on constraints is to be collected
       integer :: INFO_CONSTRAINTS
 !$OMP THREADPRIVATE (INFO_CONSTRAINTS)
 c
 c  ...information saved from routine elem_nodes
-      integer :: FATH_NODES(27), FATH_ORIENT(27), SON_NUM
-!$OMP THREADPRIVATE (FATH_NODES, FATH_ORIENT, SON_NUM)
-      character(len=4) :: FATH_TYPE
-!$OMP THREADPRIVATE (FATH_TYPE)
+      integer :: FATH_NODES(27), FATH_ORIENT(27), FATH_TYPE, SON_NUM
+!$OMP THREADPRIVATE (FATH_NODES, FATH_ORIENT    , FATH_TYPE, SON_NUM)
 c
 c  ...information on constrained nodes
       integer :: NODES_CONSTR(27)

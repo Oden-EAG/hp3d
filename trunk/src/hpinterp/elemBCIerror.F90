@@ -2,12 +2,14 @@
 #include "typedefs.h"
 !
 !-----------------------------------------------------------------------
-!> Purpose : compute PB interpolation error for Dirichlet data
-!
-!! @param[in]  Mdle                 - element (middle node) number
+!> @brief      compute PB interpolation error for Dirichlet data
 !!
-!! @param[out] ErrorH,ErrorE,ErrorV - element interpolaion error
-!                                     for H1,H(curl) and H(div) BC data
+!> @param[in]  Mdle   - element (middle node) number
+!> @param[out] ErrorH - element interpolation error for H1      BC data
+!> @param[out] ErrorE - element interpolation error for H(curl) BC data
+!> @param[out] ErrorV - element interpolation error for H(div)  BC data
+!!
+!> @date       Feb 2023
 !-----------------------------------------------------------------------
 subroutine elemBCIerror(Mdle, ErrorH,ErrorE,ErrorV)
 !
@@ -26,7 +28,7 @@ subroutine elemBCIerror(Mdle, ErrorH,ErrorE,ErrorV)
 !-----------------------------------------------------------------------
 !
 ! element type
-  character(len=4)                      :: type
+  integer                               :: ntype
 !
 ! GMP block type and number
   integer                               :: iflag,no
@@ -125,26 +127,32 @@ subroutine elemBCIerror(Mdle, ErrorH,ErrorE,ErrorV)
   real(8) :: derrorH(MAXEQNH),derrorE(MAXEQNE),derrorV(MAXEQNV)
 !
 ! misc
-  integer :: iprint,nrv,nre,nrf,if,nod,nflag,kH,kE,kV,i,j,nsign,&
-             ivarH,ivarE,ivarV
+  integer :: nrv,nre,nrf,ifc,nod,nflag,kH,kE,kV,i,j,nsign
+  integer :: ivarH,ivarE,ivarV
+!
+#if DEBUG_MODE
+  integer :: iprint
+#endif
 !
 !-----------------------------------------------------------------------
 !
+#if DEBUG_MODE
   select case(Mdle)
-  case(355)
-    iprint=0
-  case default
-    iprint=0
+    case(355)   ; iprint=0
+    case default; iprint=0
   end select
+#endif
 !
-  type = NODES(Mdle)%type
-  nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
+  ntype = NODES(Mdle)%ntype
+  nrv = nvert(ntype); nre = nedge(ntype); nrf = nface(ntype)
   call refel(Mdle, iflag,no,etav)
   call elem_nodes(Mdle, nodesl, norientl)
   call find_orient(mdle, nedge_orient,nface_orient)
   call find_order(mdle, norder)
+!
+#if DEBUG_MODE
   if (iprint.eq.1) then
-     write(*,7010) Mdle,type
+     write(*,7010) Mdle,S_Type(ntype)
 7010 format('elemBCIerror: Mdle,type = ',i4,2x,a4)
      write(*,7020) etav(1:3,1:nrv)
 7020 format('          etav = ',8(3f6.2,1x))
@@ -156,6 +164,7 @@ subroutine elemBCIerror(Mdle, ErrorH,ErrorE,ErrorV)
 7050 format('          norder = ',19i4)
      call pause
   endif
+#endif
 !
 ! get solution dof
   call solelm(Mdle, zdofH,zdofE,zdofV,zdofQ)
@@ -165,10 +174,10 @@ subroutine elemBCIerror(Mdle, ErrorH,ErrorE,ErrorV)
   ivarH=0; ivarE=0; ivarV=0
 !
 ! loop through element faces
-  do if=1,nrf
+  do ifc=1,nrf
 !
 !   face node
-    nod = nodesl(nrv+nre+if)
+    nod = nodesl(nrv+nre+ifc)
 !
 !   determine if there are any variables are flagged with Dirichlet flags
     Dirichlet_node = .false.
@@ -181,9 +190,9 @@ subroutine elemBCIerror(Mdle, ErrorH,ErrorE,ErrorV)
     if (.not.Dirichlet_node) cycle
 !
 !   get face order to find out quadrature information
-    call face_order(type,if,norder, norder_face)
+    call face_order(ntype,ifc,norder, norder_face)
     INTEGRATION=1   ! overintegrate
-    call set_2Dint(face_type(type,if),norder_face, &
+    call set_2Dint(face_type(ntype,ifc),norder_face, &
                    nint,xi_list,wa_list)
     INTEGRATION=0   ! reset
 !
@@ -193,31 +202,34 @@ subroutine elemBCIerror(Mdle, ErrorH,ErrorE,ErrorV)
       wa     = wa_list(l)
 !
 !     get the corresponding master element coordinates and Jacobian
-      call face_param(type,if,t, xi,dxidt)
+      call face_param(ntype,ifc,t, xi,dxidt)
 !
 !     compute element H1 shape functions
-      call shape3DH(type,xi,norder,nedge_orient,nface_orient, &
+      call shape3DH(ntype,xi,norder,nedge_orient,nface_orient, &
                     nrdofH,shapH,gradH)
 !
 !     compute element Hcurl shape functions
-      call shape3DE(type,xi,norder,nedge_orient,nface_orient, &
+      call shape3DE(ntype,xi,norder,nedge_orient,nface_orient, &
                     nrdofE,shapE,curlE)
 !
 !     compute element H(div) shape functions
-      call shape3DV(type,xi,norder,nface_orient, &
+      call shape3DV(ntype,xi,norder,nface_orient, &
                     nrdofV,shapV,divV)
 !
 !     evaluate reference coordinates of the point as needed by GMP
-      nsign = nsign_param(type,if)
+      nsign = nsign_param(ntype,ifc)
       call brefgeom3D(Mdle,xi,etav,shapH,gradH,nrv,dxidt,nsign, &
                       eta,detadxi,dxideta,rjac,detadt,rn,bjac)
       weight = wa*bjac
+!
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7100) xi(1:2),eta(1:3),detadxi(1:3,1:3),rn(1:3),bjac
 7100    format('elemBCIerror: xi,eta  = ',2f8.3,3x,3f8.3,/, &
                '              detadxi = ',3(3f8.3,2x),/, &
                '              rn,bjac = ',3f8.3,3x,f8.3)
       endif
+#endif
 !
 !     call GMP routines to evaluate physical coordinates and their
 !     derivatives wrt reference coordinates
@@ -227,7 +239,7 @@ subroutine elemBCIerror(Mdle, ErrorH,ErrorE,ErrorV)
       case(7);        call tetra(no,eta, x,dxdeta)
       case(8);        call pyram(no,eta, x,dxdeta)
       case default
-        write(*,*) 'dhpfaceH: Type = ', Type
+        write(*,*) 'dhpfaceH: Type = ', S_Type(ntype)
         call logic_error(ERR_INVALID_VALUE,__FILE__,__LINE__)
       end select
 !
@@ -377,6 +389,8 @@ subroutine elemBCIerror(Mdle, ErrorH,ErrorE,ErrorV)
 !
 ! end of loop through faces
   enddo
+!
+#if DEBUG_MODE
   if (iprint.ge.1) then
      write(*,*) 'ivarH,ivarE,ivarV = ',ivarH,ivarE,ivarV
      write(*,7210) derrorH(1:ivarH)
@@ -387,6 +401,7 @@ subroutine elemBCIerror(Mdle, ErrorH,ErrorE,ErrorV)
 7230 format('elemBCIerror: derrorV = ',10e12.5)
      call pause
   endif
+#endif
 !
 ! sum up the errors componentwise
   ErrorH = 0.d0; ErrorE = 0.d0; ErrorV = 0.d0

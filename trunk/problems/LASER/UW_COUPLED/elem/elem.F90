@@ -55,7 +55,7 @@ subroutine elem(Mdle, Itest,Itrial)
    integer :: norder(19),norderP(19),nordP
 !
 !..element type
-   character(len=4) :: etype
+   integer :: etype
 !
 !..fld_flag refers to either pump (0) or signal (1) field
    integer :: fld_flag
@@ -73,19 +73,19 @@ subroutine elem(Mdle, Itest,Itrial)
    norder (1:19) = 0
    norderP(1:19) = 0
 !
-   etype = NODES(Mdle)%type
+   etype = NODES(Mdle)%ntype
    nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
 !..determine order of approximation
    call find_order(Mdle, norder)
 !
 !..set the enriched order of approximation
    select case(etype)
-      case('mdlb')
+      case(MDLB)
          nordP = NODES(Mdle)%order+NORD_ADD*111
-      case('mdln','mdld')
-         nordP = NODES(Mdle)%order+NORD_ADD
-      case('mdlp')
+      case(MDLP)
          nordP = NODES(Mdle)%order+NORD_ADD*11
+      case(MDLN,MDLD)
+         nordP = NODES(Mdle)%order+NORD_ADD
       case default
          write(*,*) 'elem: invalid etype param. stop.'
          stop
@@ -142,13 +142,13 @@ subroutine elem(Mdle, Itest,Itrial)
             Itest(5)=1; Itrial(5)=1
             fld_flag = 1;
 !
-            if (FAST_INT .eq. 1 .and. etype .eq. 'mdlb') then
+            if (FAST_INT .eq. 1 .and. etype .eq. MDLB) then
                call elem_maxwell_fi_hexa(Mdle,fld_flag,nrTest,nrTrial,  &
                   nrdofEE,nrdofH,nrdofE,nrdofQ,nrdofEi,                 &
                   BLOC(2)%nrow,BLOC(5)%nrow,                            &
                   BLOC(2)%array,ALOC(2,2)%array,ALOC(2,5)%array,        &
                   BLOC(5)%array,ALOC(5,2)%array,ALOC(5,5)%array)
-            elseif (FAST_INT .eq. 1 .and. etype .eq. 'mdlp') then
+            elseif (FAST_INT .eq. 1 .and. etype .eq. MDLP) then
                call elem_maxwell_fi_pris(Mdle,fld_flag,nrTest,nrTrial,  &
                   nrdofEE,nrdofH,nrdofE,nrdofQ,nrdofEi,                 &
                   BLOC(2)%nrow,BLOC(5)%nrow,                            &
@@ -167,13 +167,13 @@ subroutine elem(Mdle, Itest,Itrial)
             Itest(3)=1; Itrial(3)=1
             Itest(6)=1; Itrial(6)=1
             fld_flag = 0;
-            if (FAST_INT .eq. 1 .and. etype .eq. 'mdlb') then
+            if (FAST_INT .eq. 1 .and. etype .eq. MDLB) then
                call elem_maxwell_fi_hexa(Mdle,fld_flag,nrTest,nrTrial,  &
                   nrdofEE,nrdofH,nrdofE,nrdofQ,nrdofEi,                 &
                   BLOC(3)%nrow,BLOC(6)%nrow,                            &
                   BLOC(3)%array,ALOC(3,3)%array,ALOC(3,6)%array,        &
                   BLOC(6)%array,ALOC(6,3)%array,ALOC(6,6)%array)
-            elseif (FAST_INT .eq. 1 .and. etype .eq. 'mdlp') then
+            elseif (FAST_INT .eq. 1 .and. etype .eq. MDLP) then
                call elem_maxwell_fi_pris(Mdle,fld_flag,nrTest,nrTrial,  &
                   nrdofEE,nrdofH,nrdofE,nrdofQ,nrdofEi,                 &
                   BLOC(3)%nrow,BLOC(6)%nrow,                            &
@@ -193,7 +193,7 @@ subroutine elem(Mdle, Itest,Itrial)
 !..end timer
 !   end_time = MPI_Wtime()
 !      !$OMP CRITICAL
-!      write(*,10) etype, end_time-start_time
+!      write(*,10) S_Type(etype), end_time-start_time
 !      !write(*,11) end_time-start_time
 ! 10   format(A,' elem : ',f12.5,'  seconds')
 ! 11   format(f12.5)
@@ -210,13 +210,14 @@ end subroutine elem
 !----------------------------------------------------------------------
 subroutine compute_enriched_order(EType,Nord, Norder)
 !
+   use node_types, only : MDLB,MDLP
    use parameters, only : MODORDER
 !
    implicit none
 !
-   character(len=4), intent(in)  :: Etype
-   integer         , intent(in)  :: Nord
-   integer         , intent(out) :: Norder(19)
+   integer, intent(in)  :: Etype
+   integer, intent(in)  :: Nord
+   integer, intent(out) :: Norder(19)
 !
    integer :: temp(2)
    integer :: nordF(3),nordB(3)
@@ -225,7 +226,7 @@ subroutine compute_enriched_order(EType,Nord, Norder)
 !
 !..see implementation of BrokenExactSequence in shape functions
    select case(Etype)
-      case('mdlb')
+      case(MDLB)
          call decod(Nord,MODORDER,2, temp) !xy face, z edge
          nordF(1) = temp(1); nordB(3) = temp(2)
          call decod(nordF(1),MODORDER,2, nordB(1:2)) !x edge, y edge
@@ -240,7 +241,7 @@ subroutine compute_enriched_order(EType,Nord, Norder)
          Norder(15:18) = (/nordF(2),nordF(3),nordF(2),nordF(3)/) !xz,yz,xz,yz faces
 !     ...element interior
          Norder(19)    = Nord
-      case('mdlp')
+      case(MDLP)
          call decod(Nord,MODORDER,2, nordB(1:2))
 !     ...edges (xy)
          norder(1:6)   = nordB(1)

@@ -27,7 +27,7 @@ subroutine update_gdof()
 !
    implicit none
 !
-   character(len=4) :: ntype
+   integer :: ntype
    character(len=6) :: mdltype
 !
 !..orientation of element nodes
@@ -114,7 +114,7 @@ subroutine update_gdof()
          call logic_nodes(mdle,nodesl, nodm,nrnodm)
 !
 !     ...check if all parent nodes have been updated
-         ntype = NODES(mdle)%type
+         ntype = NODES(mdle)%ntype
          nr_elem_nodes = nvert(ntype)+nedge(ntype)+nface(ntype)+1
          do i=1,nrnodm
             nod = nodm(i)
@@ -355,27 +355,27 @@ subroutine update_gdof()
 !  ...check whether supplier
       if (src .eq. RANK) then
          if (.not. associated(NODES(nod)%dof)) then
-            write(*,6010) RANK,'SRC: DOF NOT ASSOCIATED  ',nod,NODES(nod)%type
+            write(*,6010) RANK,'SRC: DOF NOT ASSOCIATED  ',nod,S_Type(NODES(nod)%ntype)
             stop
          endif
          if (.not. associated(NODES(nod)%dof%coord)) then
-            write(*,6010) RANK,'SRC: COORD NOT ASSOCIATED  ',nod,NODES(nod)%type
+            write(*,6010) RANK,'SRC: COORD NOT ASSOCIATED  ',nod,S_Type(NODES(nod)%ntype)
             stop
          endif
-         !write(*,6010) RANK,'SENDING  ',nod,NODES(nod)%type
+         !write(*,6010) RANK,'SENDING  ',nod,S_Type(NODES(nod)%ntype)
          buf => NODES(nod)%dof%coord
          call MPI_SEND(buf,count,MPI_REAL8,rcv,tag,MPI_COMM_WORLD,ierr)
 !  ...check whether receiver
       elseif (rcv .eq. RANK) then
          if (.not. associated(NODES(nod)%dof)) then
-            write(*,6010) RANK,'RCV: DOF NOT ASSOCIATED  ',nod,NODES(nod)%type
+            write(*,6010) RANK,'RCV: DOF NOT ASSOCIATED  ',nod,S_Type(NODES(nod)%ntype)
             stop
          endif
          if (.not. associated(NODES(nod)%dof%coord)) then
-            write(*,6010) RANK,'RCV: COORD NOT ASSOCIATED  ',nod,NODES(nod)%type
+            write(*,6010) RANK,'RCV: COORD NOT ASSOCIATED  ',nod,S_Type(NODES(nod)%ntype)
             stop
          endif
-         !write(*,6010) RANK,'RECEIVING',nod,NODES(nod)%type
+         !write(*,6010) RANK,'RECEIVING',nod,S_Type(NODES(nod)%ntype)
          buf => NODES(nod)%dof%coord
          call MPI_RECV(buf,count,MPI_REAL8,src,tag,MPI_COMM_WORLD,MPI_STATUS_IGNORE,ierr)
          NODES(nod)%geom_interf = 1
@@ -415,7 +415,7 @@ subroutine update_gdof()
       if (.not.associated(NODES(mdle)%dof%coord)) cycle
       call find_elem_type(mdle, mdltype)
       if (mdltype .ne. 'Linear') then
-         ntype = NODES(mdle)%type
+         ntype = NODES(mdle)%ntype
          call refel(mdle, iflag,no,xsub)
          call find_orient(mdle, nedge_orient,nface_orient)
          call find_order(mdle, norder)

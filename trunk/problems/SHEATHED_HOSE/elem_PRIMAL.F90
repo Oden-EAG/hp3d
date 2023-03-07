@@ -32,7 +32,7 @@ subroutine elem_DPG_PRIMAL(Mdle)
 !------------------------------------------------------------------------------------------
 !
 !  ...element and face type
-      character(len=4) :: etype,ftype
+      integer :: etype,ftype
 !
 !  ...element and face order, enriched order
       integer, dimension(19) :: norder
@@ -107,7 +107,7 @@ subroutine elem_DPG_PRIMAL(Mdle)
       tmp = 0.d0
 !
 !  ...element type
-      etype = NODES(Mdle)%type
+      etype = NODES(Mdle)%ntype
 !
 !  ...order of approximation, orientations, geometry dof's, domain number
       call find_order (Mdle, norder)
@@ -117,9 +117,9 @@ subroutine elem_DPG_PRIMAL(Mdle)
 !
 !  ...set the enriched order of appoximation
       select case(etype)
-      case('mdlb')        ; nordP = NODES(Mdle)%order + NORD_ADD*111
-      case('mdln','mdld') ; nordP = NODES(Mdle)%order + NORD_ADD*1
-      case('mdlp')        ; nordP = NODES(Mdle)%order + NORD_ADD*11
+      case(MDLB)      ; nordP = NODES(Mdle)%order + NORD_ADD*111
+      case(MDLP)      ; nordP = NODES(Mdle)%order + NORD_ADD*11
+      case(MDLN,MDLD) ; nordP = NODES(Mdle)%order + NORD_ADD*1
       end select
 !
 !  ...initialize the enriched local element stiffness matrices and load vectors

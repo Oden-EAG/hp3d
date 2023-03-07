@@ -4,7 +4,7 @@ c   routine name       - refel
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Mar 11
+c   latest revision    - Feb 2023
 c
 c   purpose            - for an element, routine returns reference
 c                        coordinates of its vertices wrt particular
@@ -31,22 +31,26 @@ c
       use refinements
       use element_data
       use data_structure3D
-#include "syscom.blk"
 c
-ccc      common /comm_refel/iprint_refel
+      implicit none
 c
-      dimension Xsubel(3,8)
+      integer, intent(in)  :: Mdle
+      integer, intent(out) :: Iflag,No
+      real(8), intent(out) :: Xsubel(3,8)
 c
-      dimension x(3,8), x_new(3,8)
+      real(8) :: x(3,8),x_new(3,8)
 c
 c  ...history information: father, its type, refinement kind, son number
-      character(len=4) :: father_type,son_type,ftype
-      dimension nfather(MAXGEN),father_type(MAXGEN),son_type(MAXGEN),
-     .          nfather_ref_kind(MAXGEN),noson(MAXGEN)
+      integer :: ftype
+      integer :: nfather(MAXGEN),father_type(MAXGEN),son_type(MAXGEN),
+     .           nfather_ref_kind(MAXGEN),noson(MAXGEN)
+c
+      integer :: nson,nfath,nrgen,nel
+      integer :: i,j,ie,is,iv,ifc,igen,jp,kref1,kref2,kref3
+      integer :: iprint,nrsons,nv1,nv2,nv3,nv4,lab
 c
 c----------------------------------------------------------------------
 c
-ccc      iprint=iprint_refel
       iprint=0
       Xsubel = 0.d0
 c
@@ -60,10 +64,10 @@ c  ...go up the tree to find the initial mesh ancestor
       do while(nfath.gt.0)
         igen = igen + 1
         nfather(igen) = nfath
-        father_type(igen) = NODES(nfath)%type
-        son_type(igen) = NODES(nson)%type
+        father_type(igen) = NODES(nfath)%ntype
+        son_type(igen) = NODES(nson)%ntype
         nfather_ref_kind(igen) = NODES(nfath)%ref_kind
-        call nr_mdle_sons(NODES(nfath)%type, NODES(nfath)%ref_kind,
+        call nr_mdle_sons(NODES(nfath)%ntype, NODES(nfath)%ref_kind,
      .                    nrsons)
 c        call locate(nson,NODES(nfath)%sons,nrsons, noson(igen))
         noson(igen) = nson - NODES(nfath)%first_son + 1
@@ -71,7 +75,8 @@ c        if (noson(igen)<0 .or. noson(igen)>nrsons) call pause
 c
 c  .....extensive printing
         if (iprint.ge.2) then
-          write(*,7002)igen,nfath,nson,father_type(igen),son_type(igen),
+          write(*,7002)igen,nfath,nson,S_Type(father_type(igen)),
+     .                 S_Type(son_type(igen)),
      .                 nfather_ref_kind(igen),noson(igen)
 7002      format(' igen,nfath,nson,nfath_type,nson_type,nfath_refk,
      .ison = ',i2,4x,i8,2x,i8,2x,a4,2x,a4,2x,i2,2x,i2)
@@ -87,16 +92,16 @@ c  ...initial mesh ancestor is
       nel = abs(nfath)
 c
 c  ...reference coordinates of ancestor
-      select case(NODES(nel)%type)
-      case('mdlp'); x(1:3,1:6) = PRISM_COORD(1:3,1:6)
-      case('mdlb'); x(1:3,1:8) = BRICK_COORD(1:3,1:8)
-      case('mdln'); x(1:3,1:4) = TETRA_COORD(1:3,1:4)
-      case('mdld'); x(1:3,1:5) = PYRAM_COORD(1:3,1:5)
+      select case(NODES(nel)%ntype)
+      case(MDLB); x(1:3,1:8) = BRICK_COORD(1:3,1:8)
+      case(MDLP); x(1:3,1:6) = PRISM_COORD(1:3,1:6)
+      case(MDLN); x(1:3,1:4) = TETRA_COORD(1:3,1:4)
+      case(MDLD); x(1:3,1:5) = PYRAM_COORD(1:3,1:5)
       end select
 c
 c  ...printing
       if (iprint.ge.2) then
-        do i=1,Nvert(NODES(nel)%type)
+        do i=1,Nvert(NODES(nel)%ntype)
           write(*,8005)i,x(1:3,i)
         enddo
 8005    format( 'i,x(1:3,i) = ',i2,2x,3(e12.5,2x))
@@ -111,17 +116,17 @@ c  ...go down the tree reconstructing reference coordinates
         ftype = father_type(igen)
 c
 c  .....loop through son's vertex nodes
-        do j=1,Nvert(son_type(igen))
+        do j=1,nvert(son_type(igen))
 c
 c  .......decode father refinement flag
           call decode_ref(ftype,nfather_ref_kind(igen),
      .                    kref1,kref2,kref3)
 c
 c  .......find the parent node of the vertex
-          jp = Npar_ref(ftype,j,noson(igen),kref1,kref2,kref3)
+          jp = npar_ref(ftype,j,noson(igen),kref1,kref2,kref3)
 c
 c  .......find the son number of the vertex
-          is = Nson_ref(ftype,j,noson(igen),kref1,kref2,kref3)
+          is = nson_ref(ftype,j,noson(igen),kref1,kref2,kref3)
 c
 c  .......node shared with the father
           if (is.eq.0) then
@@ -150,8 +155,8 @@ c
 c  .........parent rectangular face node
             elseif (jp.le.nvert(ftype)+nedge(ftype)+nface(ftype))
      .        then
-              if = jp-nvert(ftype)-nedge(ftype)
-              call face_to_vert(ftype,if, nv1,nv2,nv3,nv4)
+              ifc = jp-nvert(ftype)-nedge(ftype)
+              call face_to_vert(ftype,ifc, nv1,nv2,nv3,nv4)
               x_new(1:3,j) = (x(1:3,nv1) + x(1:3,nv2)
      .                      + x(1:3,nv3) + x(1:3,nv4))/4.d0
 c
@@ -198,13 +203,13 @@ c
 c  ...end of loop through generations
       enddo
 c
-      Xsubel(1:3,1:nvert(NODES(Mdle)%type)) =
-     .     x(1:3,1:nvert(NODES(Mdle)%type))
+      Xsubel(1:3,1:nvert(NODES(Mdle)%ntype)) =
+     .     x(1:3,1:nvert(NODES(Mdle)%ntype))
       if (iprint.eq.1) then
-        write(*,7001) Mdle,Xsubel(1:3,1:nvert(NODES(Mdle)%type))
+        write(*,7001) Mdle,Xsubel(1:3,1:nvert(NODES(Mdle)%ntype))
  7001   format('refel: Mdle = ',i6,' Xsubel = ',8(/,3(f8.3,2x)))
         call pause
       endif
 c
 c
-      end
+      end subroutine refel
