@@ -680,6 +680,8 @@ c
 c
 c*********************************************************************
 c
+#if DEBUG_MODE
+c
 c  ...begin testing
   777 continue
 c
@@ -830,5 +832,7 @@ c
       write(*,*) 'setcnstr_trian_iso_h1: CONTINUE ?(1/0)'
       read(*,*) ians
       if (ians.eq.1) go to 777
+c
+#endif
 c
       end subroutine setcnstr_trian_iso_h1

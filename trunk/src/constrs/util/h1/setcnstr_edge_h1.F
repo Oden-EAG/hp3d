@@ -242,6 +242,8 @@ c
 c
 c---------------------------------------------------------------------
 c
+#if DEBUG_MODE
+c
 c  ...this is a test which should be run when installing the code
 c     on a new machine
 c
@@ -342,5 +344,6 @@ c
       read(*,*) ians
       if (ians.eq.1) go to 10
 c
+#endif
 c
       end subroutine setcnstr_edge_h1
