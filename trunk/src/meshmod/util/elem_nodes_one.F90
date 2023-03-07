@@ -1,5 +1,5 @@
 !----------------------------------------------------------------------------
-!> @brief reconstruct nodal connectivity with given parent connectivity
+!> @brief Reconstruct nodal connectivity with given parent connectivity
 !!
 !! @param[in]  Nfath         - father node
 !! @param[in]  Nodesl_fath   - nodal connectivity of father

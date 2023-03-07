@@ -5,7 +5,7 @@ SRC_MODULE  = \
             ./module/uweak_module.F90 \
             ./paraview/paraview_attr_custom.F90 \
             ./paraview/paraview_custom_driver.F90 \
-            ./paraview/soln2vtk.F90 \
+            ./paraview/soln2vtk.F90
 
 SRC_COMMON = \
             ./common/customize_geometry.F90 \
@@ -34,5 +34,3 @@ SRC_ELAST  = \
             elem_UW.F90 \
             elem_PRIMAL.F90 \
             my_paraview_driver.F90
-
-SRC_FILE   = $(SRC_MODULE) $(SRC_COMMON) $(SRC_ELAST)
