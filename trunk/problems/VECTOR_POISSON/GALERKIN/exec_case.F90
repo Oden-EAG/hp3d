@@ -17,6 +17,7 @@ subroutine exec_case(idec)
    logical :: solved
    integer :: mdle_subd(NRELES)
    integer :: i,mdle,kref,src,count,ierr,iflag
+   integer :: iParAttr(1)
 !
 !----------------------------------------------------------------------
 !
@@ -26,7 +27,8 @@ subroutine exec_case(idec)
 !
 !  ...paraview graphics
       case(3)
-         call my_paraview_driver(1)
+         iParAttr = (/1/)
+         call my_paraview_driver(iParAttr)
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 !  ...print data structure (interactive)
