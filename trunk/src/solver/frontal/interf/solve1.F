@@ -474,13 +474,13 @@ c
       if (IERR.ne.0) then
         write(*,*) 'ERROR IN SURFSS'
         stop 1
-#if DEBUG_MODE
-      else
-        if (iprint.eq.1) then
-          write(*,*) 'solve1: SURFSS COMPLETED'
-        endif
-#endif
       endif
+c
+#if DEBUG_MODE
+      if (iprint.eq.1) then
+        write(*,*) 'solve1: SURFSS COMPLETED'
+      endif
+#endif
 c
 c  ...deallocate static condensation data structures
       if (ISTC_FLAG) call stc_dealloc
