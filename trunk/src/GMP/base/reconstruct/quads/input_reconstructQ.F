@@ -40,11 +40,10 @@ c
       use control
       use GMP
 #include "syscom.blk"
-#include "cinout.blk"
 c
-      integer, dimension(:), pointer:: vpoint_to_spoint
+      integer, dimension(:)  , pointer:: vpoint_to_spoint
       integer, dimension(:,:), pointer:: point_to_blocks
-      integer, dimension(:),   pointer:: point_nrbl
+      integer, dimension(:)  , pointer:: point_nrbl
 c
 c  ...work space
       dimension rdata(6)
@@ -713,7 +712,6 @@ c
       use control
       use GMP
 #include "syscom.blk"
-#include "cinout.blk"
 c
 c  ...vertex coordinates, normals, surface flags
       dimension xv(3,8),rn(3,8),nflag(8)

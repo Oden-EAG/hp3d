@@ -20,7 +20,6 @@ subroutine find_GMPtriangle(Nvert, Ntfound)
 !
       use GMP
 #include "syscom.blk"
-#include "cinout.blk"
 !
       dimension Nvert(3)
 !

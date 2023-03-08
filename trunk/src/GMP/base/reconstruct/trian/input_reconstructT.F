@@ -36,7 +36,6 @@ c
       use element_data
 c
 #include "syscom.blk"
-#include "cinout.blk"
 c
 c  ...temporary connectivities workspaces
       integer, dimension(:),   pointer :: vpoint_to_spoint

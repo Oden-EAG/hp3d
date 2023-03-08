@@ -879,7 +879,7 @@ c
  80   format(8I6,5a)
 c
       return
-      end
+      end subroutine input_geometry
 c
 c
 c
@@ -1213,4 +1213,4 @@ c  ...end of loop through the hexahedra
       enddo
 c
       return
-      end
+      end subroutine orientations

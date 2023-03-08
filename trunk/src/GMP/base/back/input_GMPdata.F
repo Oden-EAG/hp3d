@@ -28,7 +28,6 @@ c
       use GMP
       use element_data
 #include "syscom.blk"
-#include "cinout.blk"
 c
       integer, dimension(:,:), pointer:: point_to_blocks
       integer, dimension(:),   pointer:: point_nrbl
@@ -1308,7 +1307,7 @@ c  ...end of loop through hexas
       enddo
 c
 c
-      end
+      end subroutine def_impl
 c
 c
 c
@@ -1441,4 +1440,4 @@ c
       endif
 c
 c
-      end
+      end subroutine gen_Cyl_Geod

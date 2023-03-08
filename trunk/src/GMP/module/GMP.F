@@ -653,10 +653,10 @@ c----------------------------------------------------------------------
 c
 c  ...dump out GMP data structure
       subroutine dumpout_GMP
-      integer :: iprint
-      iprint=0
 c
-      ndump=31
+      integer, parameter :: ndump=31
+      integer :: iprint=0
+c
       open(unit=ndump,file='files/dumpGMP',
      .     form='formatted',access='sequential',status='unknown')
 c
@@ -916,9 +916,9 @@ c
       subroutine dumpin_GMP_LEGACY(Fp)
 c
       character(len=*) :: Fp
-      iprint=0
+      integer, parameter :: ndump=31
+      integer :: iprint=0
 c
-      ndump=31
       open(unit=ndump,file=Fp,
      .     form='formatted',access='sequential',status='unknown')
 c
@@ -1158,8 +1158,8 @@ c  ...dump in GMP data structure
       subroutine dumpin_GMP(Fp)
 c
       character(len=*), intent(in)  :: Fp
-      integer, parameter :: ndump = 31
-      iprint=0
+      integer, parameter :: ndump=31
+      integer :: iprint=0
 c
       open(unit=ndump,file=Fp,
      .     form='formatted',access='sequential',status='unknown')
