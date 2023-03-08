@@ -781,7 +781,10 @@ c----------------------------------------------------------------------
 c  STEP 9: add prisms, split surfaces and complete the GMP
 c          connectivities
 c
-      call customize_geometry("./files/customize_geo")
+c///////////////////////////////////////////////////////////////////////
+c  ...if needed, a geometry customization routine could be called HERE
+c     call customize_geometry("./files/customize_geo")
+c///////////////////////////////////////////////////////////////////////
 !
 !=======================================================================
 ! GEOMETRY INFO SO FAR:                                                |

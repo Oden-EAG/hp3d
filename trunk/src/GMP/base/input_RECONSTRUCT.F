@@ -715,8 +715,11 @@ c
 !  IF NEEDED, GEOMETRY CUSTOMIZATION MUST BE DONE HERE                 |
 !=======================================================================
 c
-      call customize_geometry
-      write(*,*) 'GMP: customization'
+c///////////////////////////////////////////////////////////////////////
+c  ...if needed, a geometry customization routine could be called HERE
+c     call customize_geometry
+c     write(*,*) 'GMP: customization'
+c///////////////////////////////////////////////////////////////////////
 c-----------------------------------------------------------------------
 c
 c  STEP 9: complete GMP connectivities
@@ -947,14 +950,6 @@ c
       write(*,*) 'GMP: Reconstruction done'
 c
       return
-
-
-
-
-
-
-
-
 
 
 c

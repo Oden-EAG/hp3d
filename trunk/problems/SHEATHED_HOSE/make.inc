@@ -8,7 +8,6 @@ SRC_MODULE  = \
             ./paraview/soln2vtk.F90
 
 SRC_COMMON = \
-            ./common/customize_geometry.F90 \
             ./common/dirichlet.F90 \
             ./common/set_environment.F90 \
             ./common/initialize.F90 \
