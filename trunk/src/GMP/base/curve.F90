@@ -143,11 +143,6 @@ subroutine curve(No,Eta, X,Dxdeta)
 !  ...part of spherical arc (NOT WORKING!)
 !!!   case('SegCir') ; call curve_SegCir(No,Eta, X,Dxdeta)
 !
-#ifdef _PYGMP
-      case('FourSurCur')
-         call curve_fourier_surf(no, eta, x, dxdeta)
-#endif
-!
 !  ...image of a straight line segment through a global system of
 !     cylindrical coordinates
       case('CylCoord')

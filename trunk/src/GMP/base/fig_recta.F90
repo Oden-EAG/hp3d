@@ -142,11 +142,6 @@ subroutine recta(No,Eta, X,Dxdeta)
 ! ...cylindrical coordinates rectangle...................................
       case('CylRec' ) ; call recta_CylRec( No,Eta, X,Dxdeta)
 !
-#ifdef _PYGMP
-!  ...fourier surface rectangle
-      case('FourSurRec')
-         call recta_fourier_surf(no, eta, x, dxdeta)
-#endif
       case default
       write(*,7003) RECTANGLES(No)%Type
  7003 format(' recta: unknown Type = ',a10)

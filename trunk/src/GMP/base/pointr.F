@@ -57,10 +57,6 @@ c
 c  .....call Newton solver to determine the point coordinates
         call mnewt(1,nsurf,void1,void2,xs,void3, X)
 c
-#ifdef _PYGMP
-      case('FourSurPt')
-         X(1:NDIM) = POINTS(No)%Rdata(1:NDIM)
-#endif
       case default
         write(*,*) 'pointr: type = ',type
         stop
