@@ -92,5 +92,4 @@ c
       endif
 c
 c
-      return
-      end
+      end subroutine curve_CylGeod

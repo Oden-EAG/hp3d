@@ -8,7 +8,7 @@ c----------------------------------------------------------------------
 c
 c   latest revision    - Dec 07
 c
-c   purpose            - routine support parametrization of a curve
+c   purpose            - routine supports parametrization of a curve
 c                        lying on intersection of two reconstructed
 c                        surfaces
 c
@@ -47,4 +47,4 @@ c  ...use segment of straight line for now...
       enddo
 c
 c
-      end
+      end subroutine curve_2SurfrCur

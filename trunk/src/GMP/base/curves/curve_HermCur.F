@@ -78,4 +78,4 @@ c
       endif
 c
 c
-      end
+      end subroutine curve_HermCur

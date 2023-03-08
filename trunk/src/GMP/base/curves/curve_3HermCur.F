@@ -77,7 +77,7 @@ c
       endif
 c
 c
-      end
+      end subroutine curve_3HermCur
 c
 c
 c----------------------------------------------------------------------
@@ -101,4 +101,4 @@ c
       Dvshap(4) = 3.d0*Eta**2 - 2.d0*Eta
 c
 c
-      end
+      end subroutine cubic_Hermite

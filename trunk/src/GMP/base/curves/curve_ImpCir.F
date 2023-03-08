@@ -138,4 +138,4 @@ c  ...solve for derivatives
       endif
 c
 c
-      end
+      end subroutine curve_ImpCir

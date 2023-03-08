@@ -177,4 +177,4 @@ c  ...delete the two temporary planes
       enddo
 c
 c
-      end
+      end subroutine curve_2SurfsCur

@@ -1,6 +1,6 @@
-      module bezier
-
-      contains
+module bezier
+!
+   contains
 !--------------------------------------------------------------------------------------
 !
       subroutine curve_bezier(Nc,Eta, X,dXdEta,ddXddEta,dddXdddEta,ddddXddddEta)
@@ -8,7 +8,6 @@
 !--------------------------------------------------------------------------------------
 !     recursive relation for derivative of Berstein polynomials:
 !       (B_i^n)' = n(B_(i-1)^(n-1) - B_i^n)
-!
 !
 !--------------------------------------------------------------------------------------
       use GMP
@@ -24,27 +23,24 @@
       real(8),dimension(3), optional, intent(out)  :: ddddXddddEta
 !--------------------------------------------------------------------------------------
       real(8) :: poly0,poly1,poly2,poly3,poly4,dpoly
-      integer :: i,iprint,deg
+      integer :: i,deg
 !--------------------------------------------------------------------------------------
 !
-      iprint = 0
-!!      if (nc.eq.5) iprint=1
-!
+#if DEBUG_MODE
+      integer :: iprint = 0
       if (iprint.eq.1) then
         write(*,1000)Nc,Eta,CURVES(abs(Nc))%Type
  1000   format(' curve_Bezier: Nc = ',i4,'; Eta = ',e12.5,'; type = ',a12)
       endif
+#endif
 !
       select case(CURVES(abs(Nc))%Type)
-!  ...quintic Bezier curve
-      case('5Bezier')
-        deg = 5
-!  ...sextic Bezier curve
-      case('6Bezier')
-        deg = 6
-!  ...septic Bezier curve
-      case('7Bezier')
-        deg = 7
+!  .....quintic Bezier curve
+        case('5Bezier'); deg = 5
+!  .....sextic Bezier curve
+        case('6Bezier'); deg = 6
+!  .....septic Bezier curve
+        case('7Bezier'); deg = 7
       case default
         write(*,1005)CURVES(abs(Nc))%Type
  1005   format('curve_Bezier: type not supported, type = ',a12)
@@ -97,6 +93,7 @@
 !
       enddo
 !
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,1001)X
  1001   format(' curve_Bezier: X          = ',3(e12.5,2x))
@@ -107,8 +104,8 @@
         if (present(dddXdddEta))  write(*,1004)dddXdddEta
  1004   format(' curve_Bezier: dddXdddEta = ',3(e12.5,2x))
       endif
-!
+#endif
 !
       end subroutine curve_bezier
 
-      end module bezier
+end module bezier
