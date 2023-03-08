@@ -1,5 +1,3 @@
-      subroutine desvec (In, Ia, Ibb, Ic, Ntot)
-c
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c calculation of nodal destination vectors from nicknames
@@ -23,7 +21,7 @@ c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
 c ARGUMENTS:  (I : input, O : output, IO : input & output, W : workspace
 c
 c Typ Name      Function
-c I   In    array (length numel) containing the number of nodes+multipli
+c I   In    array (length NUMELM) containing the number of nodes+multipli
 c             essentially the number of nicknames/element
 c             **note: this must be pre-built by the calling program
 c
@@ -55,16 +53,20 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
+      subroutine desvec (In, Ia, Ibb, Ic, Ntot)
 c
       use surfsc1
       use surfsc2
 c
-#include "syscom.blk"
+      implicit none
 c
       integer :: In(*), Ia(*), Ibb(*), Ic(*)
+      integer :: Ntot
 c
-c internal function: modr
+      integer :: i,j,id,ides,iel,ifrst,inic,ip,ipc,ips
+      integer :: jd,jdes,jdn,jjd,jp,n,ne,nt,ntt
 c
+      integer :: modr
       modr(i,j) = i - (i/j)*j
 c
 c initialize

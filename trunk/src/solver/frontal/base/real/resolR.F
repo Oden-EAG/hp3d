@@ -1,5 +1,3 @@
-      subroutine resol (Awrk)
-c
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c initiate forward elimination of rhs only,  followed by backsubstitutio
@@ -19,21 +17,27 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
+      subroutine resol (Awrk)
+c
       use surfsc1
       use surfsc2
 c
-#include "syscom.blk"
+      implicit none
 c
       real(8) :: Awrk(*)
 c
+      real(8) :: dt,t0,tb,tf
+      integer :: ia1,iabf,iabr,iae,iaf,ial,iam,ian
+      integer :: machk,minn,n
+c
       call zecond(t0)
-cwb >
+c
       NNEGP = -1
       NPOSP = -1
 c
       IFU = -1
       IFL = -1
-cwb <
+c
       IERR = 0
       IFB = 0
 c

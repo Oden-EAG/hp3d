@@ -1,5 +1,3 @@
-      subroutine surfsp (In, Ia, Ms, Mu, Mr)
-c
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: Primary driver routine for the frontal solver prefront modul
 c --------------------------------------------------------------
@@ -9,7 +7,7 @@ c ARGUMENTS:  (I : input, O : output, IO : input & output, W : workspace
 c
 c Typ Name      Function
 c
-c I   In : array (length numel) containing the number of nicknames/eleme
+c I   In : array (length NUMELM) containing the number of nicknames/eleme
 c          where the number of nicknames = nodes + multipliers (in gener
 c          **note: this must be pre-built by the calling program
 c
@@ -38,12 +36,18 @@ c     aaaaaaaa    LOCAL Variables
 c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+      subroutine surfsp (In, Ia, Ms, Mu, Mr)
 c
       use surfsc1
       use surfsc2
 c
-#include "syscom.blk"
+      implicit none
+c
       integer :: In(*), Ia(*)
+      integer :: Ms, Mu, Mr
+c
+      real(8) :: dt,t0,t1
+      integer :: i,maxia,ntot
 c
 #if DEBUG_MODE
       integer :: iprint=0

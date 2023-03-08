@@ -1,4 +1,4 @@
-      subroutine zdirio (Unname, Commnd, Irec, Len, Sbuf, Jerr)
+      
 c
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: This routine performs direct access I/O for scratch tapes
@@ -31,21 +31,28 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
+      subroutine zdirio (Unname, Commnd, Irec, Len, Sbuf, Jerr)
+c
       use surfsc1
-#include "syscom.blk"
+c
+      implicit none
+c
       character*(*) Unname, Commnd
-cwb >
-cwb       dimension Sbuf(*), nbuf(20), lenf(20)
+c
+      integer :: Irec, Len, Jerr
       real(8) :: Sbuf(*)
+c
       integer :: nbuf(9), lenf(9)
       integer :: lbuf(9), irsave(9)
 c
-
-
-
-cwb       save nbuf,lenf
+      integer :: slen
+      integer :: i,iend,inow,ioffst,iostat,iunit
+      integer :: irecp,irecp0,irecpmax,irecsv
+      integer :: lenop,lenop19,lenr,lenw,lenwrd
+      integer :: maxrec,ntape,ntape0,ntape0_old
+      integer :: numfile,numfile_new,numfile_old
+c
       save nbuf, lenf, irsave
-cwb <
 c
 
 c  ...new !!!

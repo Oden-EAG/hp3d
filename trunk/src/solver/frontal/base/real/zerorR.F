@@ -1,5 +1,3 @@
-       subroutine zeror (Frhs)
-c
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: If necessary, zero out for new rhs equations in the front
 c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
@@ -18,16 +16,21 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
+      subroutine zeror (Frhs)
+c
       use surfsc1
       use surfsc2
 c
-#include "syscom.blk"
+      implicit none
+c
       real(8) :: Frhs(*)
 c
-      data dzero /0.0d0/
+      integer :: i,ia,in,m
 c
-c if the new frontwidth is equal to the old frontwidth
-c   then there is nothing to zero
+      real(8), parameter :: dzero = 0.0d0
+c
+c  ...if the new frontwidth is equal to the old frontwidth
+c     then there is nothing to zero
 c
       if (LFW .eq. NFW) return
 c

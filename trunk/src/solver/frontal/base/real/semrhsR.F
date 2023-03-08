@@ -1,5 +1,3 @@
-      subroutine semrhs (Amdest, Elrhs, Frhs)
-c
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: Assembles the rhs's into the front
 c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
@@ -20,11 +18,16 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
+      subroutine semrhs (Amdest, Elrhs, Frhs)
+c
       use surfsc1
       use surfsc2
 c
-#include "syscom.blk"
+      implicit none
+c
       real(8) :: Amdest(*),Elrhs(*),Frhs(*)
+c
+      integer :: n,in,i,j,md
 c
       n = 1
 c

@@ -1,5 +1,3 @@
-      subroutine symasm (Amdest, Ellhs, Flhs)
-c
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: Assembles the lhs into the front for symmetric matrices
 c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
@@ -25,18 +23,20 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
+      subroutine symasm (Amdest, Ellhs, Flhs)
+c
       use surfsc1
       use surfsc2
 c
-#include "syscom.blk"
+      implicit none
 c
       real(8) :: Amdest(*), Ellhs(*), Flhs(*)
       integer :: ntemp(10000)
 c
+      integer :: n,i,j,k,l,mi,mj,mk
+c
       n = 1
 c
-ctim      if (NDOFM .gt. 100) then
-cccc      if (NDOFM .gt. 324) then
       if (NDOFM .gt. 10000) then
          write(NFSOUT,7771)
 7771      format(1x,'THE TEMP ARRAY: ntemp MUST ',
@@ -44,8 +44,6 @@ cccc      if (NDOFM .gt. 324) then
          IERR = 1
          return
       endif
-
-
 
 c      write(*,*) 'in symasm ellhs = '
 c      kk=0
@@ -56,8 +54,6 @@ c          write(*,*) Ellhs(kk)
 c   43   continue
 c        pause
 c   44 continue
-
-
 
 c
 c loop thru the dof in the element

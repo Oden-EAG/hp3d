@@ -1,5 +1,3 @@
-      subroutine zerou (Flhs)
-c
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: If necessary, zero out for new unsymmetric lhs equations
 c            in the front
@@ -25,11 +23,17 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
+      subroutine zerou (Flhs)
+c
       use surfsc2
-#include "syscom.blk"
+c
+      implicit none
+c
       real(8) :: Flhs(*)
 c
-      data dzero /0.0d0/
+      integer :: i,j,mi,mj,mk
+c
+      real(8), parameter :: dzero = 0.0d0
 c
 c
 c if the new frontwidth is equal to the old frontwidth

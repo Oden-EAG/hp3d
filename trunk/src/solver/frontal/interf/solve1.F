@@ -32,8 +32,9 @@ c  ...frontal solver common blocks
       use surfsc1
       use surfsc2
 c
-c  ...system common blocks
-#include "syscom.blk"
+      implicit none
+c
+      integer, intent(in) :: Number_of_RHS
 c
 c  ...nodes for a modified element and the corresponding number
 c     of H1,H(curl),H(div) and L2 dof
@@ -49,8 +50,9 @@ c
 c  ...number of local element dof for each physics variable
       integer :: nrdofi(NR_PHYSA),nrdofb(NR_PHYSA)
 c
-      integer :: max_active_node_no,nrnick,nrdof,nrdofm,nrdofc
-      integer :: inick,iel,iel1,i,j,iv,kk,kel,nrnod1,nrdof_mdl
+      integer :: inick,iel,iel1,i,j,iv,kk,kel
+      integer :: max_active_node_no,mdle,mr,ms,mu,nod,nrnodm
+      integer :: nrnick,nrdof,nrdofm,nrdofc,nrnod1,nrdof_mdl
       VTYPE   :: zvoid
 c
 #if DEBUG_MODE
@@ -68,8 +70,6 @@ c
 #if C_MODE
       IDUMPWR = 0
 #endif
-c
-      IFRSOLV = 0
 c
 #if DEBUG_MODE
       if (iprint.eq.1) then
@@ -376,9 +376,6 @@ c  ...hardwire ISYM to symmetry flag from control file
       ISYM   = ISYM_FLAG
       IRESOL = 0
       NRHS   = NR_RHS
-      NTAPEB = 0
-      NTAPEU = 21
-      NTAPEL = 0
       IWRT   = 0
       IASSEM = 1
       IPRSTR = 0
@@ -399,10 +396,9 @@ c     for debugging forward elimination
       IPFSLF = 0
       IPFSRF = 0
 c
-      NICMUL=1000
+      NICMUL = 1000
 c
-      NUMEL=   NRELES
-      NUMELM=  NRELES
+      NUMELM = NRELES
 c
       NPDESV = 1
       allocate(IDESVE(nrnick))

@@ -1,5 +1,3 @@
-      subroutine elmrhs (Aid, Inc, Frhs, Ubuf, Bbuf)
-c
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c Elimination of rhs's for equation (id)
@@ -30,14 +28,22 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
+      subroutine elmrhs (Aid, Inc, Frhs, Ubuf, Bbuf)
+c
       use surfsc1
       use surfsc2
-#include "syscom.blk"
+c
+      implicit none
+c
+      real(8) :: Aid
+      integer :: Inc
       real(8) :: Frhs(*), Ubuf(*), Bbuf(*)
-cwb >
-      data sml2 /1.e-15/
-cwb <
-
+c
+      real(8) :: s
+      integer :: in,id,idm,idp,ii,ii1,ii2,im,iuu
+c
+      real(8), parameter :: sml2 = 1.d-15
+c
       id = Aid
       idm = id - 1
       idp = id + 1

@@ -1,6 +1,3 @@
-      subroutine frwrs (Alelm, Aldest, Amdest, Andest,
-     .                  Elem, Frnt, Bbuf, Buf)
-c
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:  Forward elimination of rhs's only
 c  calls solin1 for dest. vectors
@@ -30,13 +27,19 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
+      subroutine frwrs (Alelm, Aldest, Amdest, Andest,
+     .                  Elem, Frnt, Bbuf, Buf)
+c
       use surfsc1
       use surfsc2
 c
-#include "syscom.blk"
+      implicit none
 c
-      real(8) :: Aldest(*),Amdest(*),Andest(*),Elem(*),Frnt(*),Bbuf(*),
-     .           Buf(*),Alelm(*)
+      real(8) :: Alelm(*),Aldest(*),Amdest(*),Andest(*)
+      real(8) :: Elem(*),Frnt(*),Bbuf(*),Buf(*)
+c
+      integer :: i,id,ie,iel,ifg,igot,ill,inc,is,j,jerr
+      integer :: n,ne,negiel,numdes
 c
       IB = 1
 cwb >

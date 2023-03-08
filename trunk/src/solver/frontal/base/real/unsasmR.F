@@ -1,5 +1,3 @@
-      subroutine unsasm (Amdest, Ellhs, Flhs)
-c
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: Assembles lhs into the front for unsymmetric matrices
 c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
@@ -26,17 +24,20 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
+      subroutine unsasm (Amdest, Ellhs, Flhs)
+c
       use surfsc1
       use surfsc2
 c
-#include "syscom.blk"
+      implicit none
 c
       real(8) :: Amdest(*), Ellhs(*), Flhs(*)
       integer :: ntemp(324)
 c
+      integer :: n,i,j,mdi,mdj,ml
+c
       n = 1
-cwb >
-ctim      if (NDOFM .gt. 100) then
+c
       if (NDOFM .gt. 324) then
          write(NFSOUT,7771)
 7771      format(1x,'THE TEMP ARRAY: ntemp MUST ',
@@ -44,7 +45,6 @@ ctim      if (NDOFM .gt. 100) then
          IERR = 1
          return
       endif
-cwb <
 c
 c loop thru the dof in the element
 c

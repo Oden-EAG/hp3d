@@ -1,5 +1,3 @@
-      subroutine dest (Nd, Aldest ,Nee, Amdest, Andest)
-c
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c converts nodal dest. vectors to dof dest. vectors
@@ -28,22 +26,27 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
+      subroutine dest (Nd, Aldest, Nee, Amdest, Andest)
+c
       use surfsc1
       use surfsc2
 c
-#include "syscom.blk"
+      implicit none
+c
+      integer :: Nd, Nee
       real(8) :: Aldest(*), Amdest(*), Andest(*)
 c
+      integer :: i,j,km,kn,l,ldest,m,n,ndi,ndl,ne
+c
 #if DEBUG_MODE
-      integer :: iprint=0
+      integer :: iprint
 #endif
 c
-c internal function : modr
-c ------------------------
-c
+      integer :: modr
       modr(i,j) = i - (i/j)*j
 c
 #if DEBUG_MODE
+      iprint = 0
       if (iprint.eq.1) then
         write(*,*) 'DEST: Nd, Aldest = ',Nd
         write(*,7001) (Aldest(iii),iii=1,Nd)

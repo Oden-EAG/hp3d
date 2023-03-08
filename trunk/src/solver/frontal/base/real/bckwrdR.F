@@ -1,6 +1,3 @@
-      subroutine bckwrd (Alelm, Aldest, Amdest,
-     .                   Andest, Elem, Frnt, Bbuf, Ubuf)
-c
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c     Backsubstitution
@@ -39,13 +36,19 @@ c     aaaaaaaa    LOCAL Variables
 c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
-c-
+      subroutine bckwrd (Alelm, Aldest, Amdest,
+     .                   Andest, Elem, Frnt, Bbuf, Ubuf)
+c
       use surfsc1
       use surfsc2
 c
-#include "syscom.blk"
+      implicit none
+c
       real(8) :: Aldest(*), Amdest(*), Andest(*), Elem(*), Frnt(*),
      .           Bbuf(*), Ubuf(*), Alelm(*)
+c
+      integer :: i,ie,iel,ifbi,ifui,ill,iuu,iuuold
+      integer :: j,jel,jerr,k,l,lenx,md,n,ne,negiel,numdes
 c
 #if DEBUG_MODE
       integer :: iprint=0

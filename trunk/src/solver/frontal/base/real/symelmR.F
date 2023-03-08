@@ -1,4 +1,4 @@
-      subroutine symelm (Iel, Aidx, Flhs, Ubuf)
+      
 c
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: Elimination of one equation (id) for symmetric matricies
@@ -10,7 +10,7 @@ c
 c I   Iel   : element number
 c
 c I   Aidx  : transfer loc for active dof in the front after eliminating
-c          this is the equation to be eliminated
+c             this is the equation to be eliminated
 c
 c IO  Flhs  : the assembled front lhs
 c             note: for symmetric, lhs is stored as:  *** by column ***
@@ -31,11 +31,19 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
+      subroutine symelm (Iel, Aidx, Flhs, Ubuf)
+c
       use surfsc1
       use surfsc2
 c
-#include "syscom.blk"
+      implicit none
+c
+      integer :: Iel
+      real(8) :: Aidx
       real(8) :: Flhs(*), Ubuf(*)
+c
+      real(8) :: pivot,s
+      integer :: i,id,idm,idp,j,k,m,mp,n,nn
 c
       real(8), parameter :: sml   = 1.d-30
       real(8), parameter :: dzero = 0.0d0
