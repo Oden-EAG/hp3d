@@ -1,6 +1,5 @@
       subroutine semrhs (Amdest, Elrhs, Frhs)
 c
-#include "syscomz.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: Assembles the rhs's into the front
 c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
@@ -21,9 +20,9 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
-c
+      use surfsc1
+      use surfsc2
+#include "syscomz.blk"
       dimension Amdest(*),Elrhs(*),Frhs(*)
 c
       n = 1

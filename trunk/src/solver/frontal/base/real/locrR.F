@@ -22,7 +22,7 @@ c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
       function locr (Nrh,Iin)
 c
-#include "surfsc2.blk"
+      use surfsc2
 c
       integer :: locr
       integer :: Nrh,Iin

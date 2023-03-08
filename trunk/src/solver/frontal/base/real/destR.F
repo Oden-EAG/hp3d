@@ -1,6 +1,5 @@
       subroutine dest (Nd, Aldest ,Nee, Amdest, Andest)
 c
-#include "syscom.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c converts nodal dest. vectors to dof dest. vectors
@@ -29,9 +28,10 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      use surfsc1
+      use surfsc2
 c
+#include "syscom.blk"
       real(8) :: Aldest(*), Amdest(*), Andest(*)
 c
 #if DEBUG_MODE

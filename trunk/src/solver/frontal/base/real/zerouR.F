@@ -1,6 +1,5 @@
       subroutine zerou (Flhs)
 c
-#include "syscom.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: If necessary, zero out for new unsymmetric lhs equations
 c            in the front
@@ -26,8 +25,8 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc2.blk"
-c
+      use surfsc2
+#include "syscom.blk"
       real(8) :: Flhs(*)
 c
       data dzero /0.0d0/

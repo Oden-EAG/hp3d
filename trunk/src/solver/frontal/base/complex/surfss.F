@@ -23,7 +23,7 @@ c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 #include "typedefs.h"
       subroutine surfss (Awrk)
 c
-#include "surfsc1.blk"
+      use surfsc1
 c
       VTYPE :: Awrk(*)
 c

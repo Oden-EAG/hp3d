@@ -22,7 +22,7 @@ c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
       function loclu (Iin,Jin)
 c
-#include "surfsc2.blk"
+      use surfsc2
 c
       integer :: loclu
       integer :: Iin,Jin

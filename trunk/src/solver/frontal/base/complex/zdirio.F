@@ -1,6 +1,5 @@
       subroutine zdirio (Unname, Commnd, Irec, Len, Sbuf, Jerr)
 c
-#include "syscomz.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: This routine performs direct access I/O for scratch tapes
 c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
@@ -32,20 +31,15 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfscwr.blk"
-c
+      use surfsc1
+#include "syscomz.blk"
       character*(*) Unname, Commnd
-cwb >
-cwb       dimension Sbuf(*), nbuf(20), lenf(20)
+c
       dimension Sbuf(*), nbuf(9), lenf(9)
       dimension lbuf(9), irsave(9)
 c
-cwb       save nbuf,lenf
-ccccc save nbuf, lenf, irsave
       common /czdirio1/  nbuf, lenf, irsave
       common /czdirio2/ storage(100)
-
 
 c  ...test......test......test......test......test......test......test...
 c      allocatable sbuf1(:)

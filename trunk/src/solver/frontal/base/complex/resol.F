@@ -1,6 +1,5 @@
       subroutine resol (Awrk)
 c
-#include "syscomz.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c initiate forward elimination of rhs only,  followed by backsubstitutio
@@ -20,10 +19,9 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
-#include "surfscwr.blk"
-c
+      use surfsc1
+      use surfsc2
+#include "syscomz.blk"
       dimension Awrk(*)
 
 

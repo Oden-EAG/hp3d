@@ -1,7 +1,6 @@
       subroutine bckwrd (Alelm, Aldest, Amdest,
      .                   Andest, Elem, Frnt, Bbuf, Ubuf)
 c
-#include "syscomz.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c     Backsubstitution
@@ -40,11 +39,10 @@ c     aaaaaaaa    LOCAL Variables
 c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
-c-
-#include "surfsc1.blk"
-#include "surfsc2.blk"
-#include "surfscwr.blk"
 c
+      use surfsc1
+      use surfsc2
+#include "syscomz.blk"
       dimension Aldest(*), Amdest(*), Andest(*), Elem(*), Frnt(*),
      .          Bbuf(*), Ubuf(*), Alelm(*)
 
@@ -184,7 +182,6 @@ cwb <
                      call zdirio    ('U', 'READ', IFU, ill, Ubuf, jerr)
                  endif
 
-
 cwb >
 c for unsymmetric during resolution we didnt know IFU apriori
 c  and it is sent back from zdirio
@@ -248,8 +245,6 @@ c
                if (IB .le. 0) then
                   IFB = IFB - 1
 
-
-
               if(IDUMPWR.eq.1)then
                 if(irout5.ne.100)then
                   write(NFSOUT,*)'BCKWRD: PRETEND READ B'
@@ -259,8 +254,6 @@ c
               else
                   call zdirio   ('B', 'READ', IFB, ill, Bbuf, jerr)
               endif
-
-
 
 c error out
 c

@@ -1,6 +1,5 @@
       subroutine elmrhs (Aid, Inc, Frhs, Ubuf, Bbuf)
 c
-#include "syscomz.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c Elimination of rhs's for equation (id)
@@ -31,9 +30,9 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
-c
+      use surfsc1
+      use surfsc2
+#include "syscomz.blk"
       dimension Frhs(*), Ubuf(*), Bbuf(*)
 
       data sml2 /1.e-15/

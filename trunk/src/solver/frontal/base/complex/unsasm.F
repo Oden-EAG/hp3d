@@ -1,6 +1,5 @@
       subroutine unsasm (Amdest, Ellhs, Flhs)
 c
-#include "syscomz.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: Assembles lhs into the front for unsymmetric matrices
 c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
@@ -27,10 +26,10 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
-c
-       parameter (ntim=660)
+      use surfsc1
+      use surfsc2
+#include "syscomz.blk"
+      integer, parameter :: ntim=660
       dimension Amdest(*), Ellhs(*) ,Flhs(*), ntemp(ntim)
 c
       n = 1

@@ -1,6 +1,5 @@
       subroutine surfsp (In, Ia, Ms, Mu, Mr)
 c
-#include "syscom.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: Primary driver routine for the frontal solver prefront modul
 c --------------------------------------------------------------
@@ -40,9 +39,10 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      use surfsc1
+      use surfsc2
 c
+#include "syscom.blk"
       integer :: In(*), Ia(*)
 c
 #if DEBUG_MODE

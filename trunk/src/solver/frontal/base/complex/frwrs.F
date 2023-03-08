@@ -1,7 +1,6 @@
       subroutine frwrs (Alelm, Aldest, Amdest, Andest,
      .                  Elem, Frnt, Bbuf, Buf)
 c
-#include "syscomz.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:  Forward elimination of rhs's only
 c  calls solin1 for dest. vectors
@@ -31,10 +30,9 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
-#include "surfscwr.blk"
-c
+      use surfsc1
+      use surfsc2
+#include "syscomz.blk"
       dimension Aldest(*),Amdest(*),Andest(*),Elem(*),Frnt(*),Bbuf(*),
      .          Buf(*),Alelm(*)
 

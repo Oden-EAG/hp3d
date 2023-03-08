@@ -1,6 +1,5 @@
       subroutine elmsol (Aidx, Ubuf, Bbuf, Xfrnt)
 c
-#include "syscomz.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c Calculates the solution for one dof specified by (id)
@@ -49,9 +48,9 @@ c        some equations remain till the next element, some are 'forgotte
 c        they have already been passed to permanent storage, and the 'fo
 c        ones become new destinations in Xfrnt() based on Aidx
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
-c
+      use surfsc1
+      use surfsc2
+#include "syscomz.blk"
       dimension Ubuf(*), Bbuf(*), Xfrnt(*)
 c
       real(8) :: one = 1.0d0
@@ -163,8 +162,6 @@ cvd$ select (vector)
 c ARDENT directives
 c$doit VBEST
 c
-
-
 
          do 30 i = 1,idm
             s = s - Ubuf(iuu)*Xfrnt(ia)

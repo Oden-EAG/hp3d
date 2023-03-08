@@ -1,6 +1,5 @@
       subroutine complt (Awrk)
 c
-#include "syscom.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c Initiate forward elimination of lhs and rhs followed by backsubstituti
@@ -22,9 +21,9 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
-c
+      use surfsc1
+      use surfsc2
+#include "syscom.blk"
       real(8) :: Awrk(*)
 c
       call zecond(t0)

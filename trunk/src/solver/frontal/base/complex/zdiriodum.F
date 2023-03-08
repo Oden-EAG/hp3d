@@ -1,6 +1,5 @@
       subroutine zdiriodum (Unname, Commnd, Irec, Len, Sbuf, Jerr)
 c
-#include "syscomz.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: This routine preforms direct access I/O for scratch tapes
 c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
@@ -32,15 +31,12 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-c
+      use surfsc1
+#include "syscomz.blk"
       character*(*) Unname, Commnd
-cwb       dimension Sbuf(*), nbuf(20), lenf(20)
       dimension Sbuf(*), nbuf(9), lenf(9)
       dimension lbuf(9), irsave(9)
 c
-cwb       save nbuf,lenf
-ccccc save nbuf, lenf, irsave
       common /czdirio1/  nbuf, lenf, irsave
       common /czdirio2/ storage(100)
 c

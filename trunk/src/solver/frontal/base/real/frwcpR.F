@@ -1,6 +1,5 @@
       subroutine frwcp (Alelm, Aldest, Amdest, Andest, Elem, Frnt, Buf)
 c
-#include "syscom.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c Forward elimination of both lhs and rhs
@@ -31,9 +30,10 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      use surfsc1
+      use surfsc2
 c
+#include "syscom.blk"
       real(8) :: Aldest(*),Amdest(*),Andest(*),Elem(*),Frnt(*),Buf(*)
      .          ,Alelm(*)
 c

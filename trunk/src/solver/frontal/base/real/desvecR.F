@@ -1,6 +1,5 @@
       subroutine desvec (In, Ia, Ibb, Ic, Ntot)
 c
-#include "syscom.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c calculation of nodal destination vectors from nicknames
@@ -57,8 +56,10 @@ c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      use surfsc1
+      use surfsc2
+c
+#include "syscom.blk"
 c
       integer :: In(*), Ia(*), Ibb(*), Ic(*)
 c

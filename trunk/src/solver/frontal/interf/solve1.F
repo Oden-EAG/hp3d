@@ -28,12 +28,12 @@ c
       use par_mesh,    only: DISTRIBUTED,HOST_MESH
       use mpi_param,   only: RANK,ROOT
 c
+c  ...frontal solver common blocks
+      use surfsc1
+      use surfsc2
+c
 c  ...system common blocks
 #include "syscom.blk"
-c
-c  ...frontal solver common blocks
-#include "surfsc1.blk"
-#include "surfsc2.blk"
 c
 c  ...nodes for a modified element and the corresponding number
 c     of H1,H(curl),H(div) and L2 dof
@@ -65,7 +65,9 @@ c
         return
       endif
 c
+#if C_MODE
       IDUMPWR = 0
+#endif
 c
       IFRSOLV = 0
 c

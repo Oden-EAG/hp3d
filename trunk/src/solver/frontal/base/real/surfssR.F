@@ -22,7 +22,7 @@ c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
       subroutine surfss (Awrk)
 c
-#include "surfsc1.blk"
+      use surfsc1
 c
       real(8) :: Awrk(*)
 c
