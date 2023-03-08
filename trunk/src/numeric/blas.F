@@ -178,11 +178,11 @@ c
 c
       do i=n,2,-1
         a(i,i)=1/a(i,i)
-        call sscal (i-1, -a(i,i), a(1,i), 1)
+        call dscal (i-1, -a(i,i), a(1,i), 1)
         a(i-1,i)=a(i-1,i)/a(i-1,i-1)
 
         do k=i-1,2,-1
-          call saxpy (k-1, -a(k,i), a(1,k), 1, a(1,i), 1)
+          call daxpy (k-1, -a(k,i), a(1,k), 1, a(1,i), 1)
           a(k-1,i)=a(k-1,i)/a(k-1,k-1)
         enddo
       enddo
@@ -190,15 +190,15 @@ c
       a(1,1)=1/a(1,1)
 c
       do i=n-1,1,-1
-        call scopy(   i, a(1,i), 1, Work     , 1)
-        call scopy( n-i, 0.d0  , 0, Work(i+1), 1)
+        call dcopy(   i, a(1,i), 1, Work     , 1)
+        call dcopy( n-i, 0.d0  , 0, Work(i+1), 1)
 c
         do k=i+1,n
-          call saxpy( n, -a(k,i), a(1,k), 1, Work, 1)
+          call daxpy( n, -a(k,i), a(1,k), 1, Work, 1)
         enddo
 c
-        call scopy( n, Work, 1, a(1,i), 1)
-        call sswap( n, a(1,i), 1, a(1,ip(i)), 1)
+        call dcopy( n, Work, 1, a(1,i), 1)
+        call dswap( n, a(1,i), 1, a(1,ip(i)), 1)
       enddo
 c
       end subroutine matinv

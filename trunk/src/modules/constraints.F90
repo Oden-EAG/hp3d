@@ -39,7 +39,7 @@ contains
 !
 !----------------------------------------------------------------------
 !> @date  Feb 2023
-   subroutine map_quad(Iref, Xi,X)
+   subroutine map_quad(Iref,Xi, X)
 !
       integer, intent(in)  :: Iref
       real(8), intent(in)  :: Xi(1:2)
@@ -69,8 +69,9 @@ contains
 !> @date  Feb 2023
    function Get_rrqh(Iref, Np, Ip, J, I)
 !
-      integer Iref, Np, Ip, J, I, i1, i2, ii
+      integer Iref, Np, Ip, J, I
       real(8) Get_rrqh
+      integer i1, i2, ii
 !
       i2 = (I-1)/(Np-1)+1
       i1 = I - (i2-1)*(Np-1)

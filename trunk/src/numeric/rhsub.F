@@ -29,8 +29,7 @@ c
       integer :: i,j,j1,m1,ib
 c
 #if DEBUG_MODE
-      integer :: iprint
-      iprint = 0
+      integer :: iprint=0
 #endif
 c
       m1=m-1

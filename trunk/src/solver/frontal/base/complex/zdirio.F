@@ -2,7 +2,7 @@
 c
 #include "syscomz.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
-c FUNCTION: This routine preforms direct access I/O for scratch tapes
+c FUNCTION: This routine performs direct access I/O for scratch tapes
 c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
 c ARGUMENTS:  (I : input, O : output, IO : input & output, W : workspace
 c
@@ -62,7 +62,7 @@ c  ...test......test......test......test......test......test......test...
 
 cwb <
 c
-c the following data statement is machine dependant
+c the following data statement is machine dependent
 c ...................................................
 c within zdirio1.blk is contained the data statement:
 c
@@ -403,4 +403,4 @@ c
      . 'UNNAME,COMMND,IREC,LEN,NTAPE ',a1,2x,a8,2x,a1,a8,3i6)
       return
 c
-      end
+      end subroutine zdirio
