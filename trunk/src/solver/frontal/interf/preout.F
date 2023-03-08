@@ -33,8 +33,7 @@ c
       integer :: i,np
 c
 #if DEBUG_MODE
-      integer :: iprint
-      iprint = 0
+      integer :: iprint=0
 c
       if (iprint.eq.1) then
         write(*,*) 'preout: Iel, N, iel_last',

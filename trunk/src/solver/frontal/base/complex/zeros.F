@@ -50,5 +50,5 @@ c
         Flhs(i) = zero
       enddo
 c
-      return
-      end
+c
+      end subroutine zeros

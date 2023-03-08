@@ -82,5 +82,5 @@ c
 c
    50 continue
 c
-      return
-      end
+c
+      end subroutine zerou

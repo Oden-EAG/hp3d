@@ -338,6 +338,6 @@ c
       write(NFSOUT,7000) Unname,Commnd,Irec,Len,ntape
  7000  format(2(/),5x,
      . 'UNNAME,COMMND,IREC,LEN,NTAPE ',a1,2x,a8,2x,a1,a8,3i6)
-      return
 c
-      end
+c
+      end subroutine zdiriodum

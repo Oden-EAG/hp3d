@@ -123,8 +123,8 @@ c
 c
 c set the current frontwidth number
 cwb >
-         l = iabs(nint(Amdest(km-1)))
-cwb           l = iabs(idnint(Amdest(km-1)))
+         l = abs(nint(Amdest(km-1)))
+cwb           l = abs(idnint(Amdest(km-1)))
 cwb <
          if (l .gt. NFW) NFW = l
 c
@@ -185,5 +185,5 @@ cwb <
 7010    format(11x,'DOF DESTINATION VECTORS',10i7,10(/,35x,10i7))
 7020    format(9x,'ELIM. DESTINATION VECTORS',10i7,10(/,35x,10i7))
 c
-      return
-      end
+c
+      end subroutine dest

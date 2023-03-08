@@ -351,5 +351,5 @@ c
      .                     (10x,1p,10e12.5))
       endif
 c
-      return
-      end
+c
+      end subroutine frwrs

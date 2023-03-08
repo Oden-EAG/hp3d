@@ -130,5 +130,5 @@ c
      .            ' + ',i4,'*NRHS'   )
  7050 format(10x,'TIME IN PREFRONT =   ',f6.3,/)
 c
-      return
-      end
+c
+      end subroutine surfsp

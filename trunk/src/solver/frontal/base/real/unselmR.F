@@ -229,5 +229,5 @@ c
 c
    70 continue
 c
-      return
-      end
+c
+      end subroutine unselm

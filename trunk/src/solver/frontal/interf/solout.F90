@@ -457,4 +457,3 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
    endif
 !
 end subroutine solout
-

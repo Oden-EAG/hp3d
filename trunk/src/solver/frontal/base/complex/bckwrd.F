@@ -309,7 +309,7 @@ c$doit VBEST
 c
                do 160 i = 1,NDOFM
                   md = Amdest(i)
-                  md = iabs(md)
+                  md = abs(md)
                   l = (j-1)*MFW + md
                   Elem(k) = Frnt(l)
                   k = k + 1
@@ -354,6 +354,5 @@ c
       IFU = ifui
       IFB = ifbi
 c
-      return
-      end
-
+c
+      end subroutine bckwrd

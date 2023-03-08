@@ -41,9 +41,7 @@ c
          IERR = 1
          return
       endif
-
-
-
+c
 c
 c loop thru the dof in the element
 c
@@ -106,5 +104,5 @@ cwb <
 c
 100   continue
 c
-      return
-      end
+c
+      end subroutine symasm

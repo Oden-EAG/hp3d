@@ -12,7 +12,7 @@ LIBS     =
 FC_WORK  =  $(FC) $(CCINCS) $(FFLAGS)
 
 SRC_FILE = bckwrd.F complt.F dest.F desvec.F elmrhs.F elmsol.F \
-	   frwcp.F frwrs.F frwsr.F locls.F loclu.F locr.F \
+	   frwcp.F frwrs.F locls.F loclu.F locr.F \
 	   resol.F semrhs.F surfsp.F surfss.F symasm.F \
 	   symelm.F unsasm.F unselm.F zdirio.F zdiriodum.F \
 	   zecond.F zeror.F zeros.F zerou.F

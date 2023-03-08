@@ -222,5 +222,5 @@ c error exit
 c ----------
  9100 continue
 c
-      return
-      end
+c
+      end subroutine resol

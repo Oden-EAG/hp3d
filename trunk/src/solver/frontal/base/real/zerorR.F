@@ -47,5 +47,5 @@ c
 c
 120   continue
 c
-      return
-      end
+c
+      end subroutine zeror

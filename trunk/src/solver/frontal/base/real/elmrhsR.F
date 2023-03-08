@@ -141,5 +141,5 @@ c
          im = im + MFW
    60 continue
 c
-      return
-      end
+c
+      end subroutine elmrhs

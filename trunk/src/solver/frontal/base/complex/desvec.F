@@ -1,4 +1,4 @@
-      Subroutine desvec (In, Ia, Ibb, Ic, Ntot)
+      subroutine desvec (In, Ia, Ibb, Ic, Ntot)
 c
 #include "syscomz.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
@@ -292,5 +292,5 @@ c
 c
   100 continue
 c
-      return
-      end
+c
+      end subroutine desvec

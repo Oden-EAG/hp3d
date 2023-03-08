@@ -183,6 +183,5 @@ c
 c
    40 continue
 c
-      return
-      end
-
+c
+      end subroutine elmsol

@@ -43,8 +43,7 @@ cwb >
 cwb <
 
       iprint=0
-
-
+c
 c
 c set up pointers into Flhs
 c
@@ -254,5 +253,5 @@ c
 c
    70 continue
 c
-      return
-      end
+c
+      end subroutine unselm

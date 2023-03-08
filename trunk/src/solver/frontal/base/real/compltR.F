@@ -226,5 +226,5 @@ c ==========
 c
  9100 continue
 c
-      return
-      end
+c
+      end subroutine complt

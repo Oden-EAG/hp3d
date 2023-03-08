@@ -218,5 +218,5 @@ c
 c
    80 continue
 c  ------------
-      return
-      end
+c
+      end subroutine symelm

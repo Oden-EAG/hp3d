@@ -45,8 +45,7 @@ c
       integer :: mdle,i,nrdofm,nrdofc,nrnodm
 c
 #if DEBUG_MODE
-      integer :: iprint
-      iprint=0
+      integer :: iprint=0
 #endif
 c
 c---------------------------------------------------------------------

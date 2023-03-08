@@ -24,13 +24,13 @@ c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
 c
-      ii = iabs(Iin)
-      jj = iabs(Jin)
+      ii = abs(Iin)
+      jj = abs(Jin)
 c
       k = max0(ii,jj)
       l = min0(ii,jj)
 c
       locls = k*(k-1)/2 + l
 c
-      return
-      end
+c
+      end function locls
