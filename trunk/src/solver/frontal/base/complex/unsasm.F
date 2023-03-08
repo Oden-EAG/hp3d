@@ -29,18 +29,17 @@ c
       use surfsc1
       use surfsc2
 c
-#include "syscomz.blk"
+      implicit none
 c
       complex(8) :: Amdest(*), Ellhs(*) ,Flhs(*)
 c
+      integer, parameter :: ntim=660
       integer :: ntemp(ntim)
 c
-      integer :: n
-c
-      integer, parameter :: ntim=660
+      integer :: i,j,mdi,mdj,ml,n
 c
       n = 1
-cwb >
+c
       if (NDOFM .gt. ntim) then
          write(NFSOUT,7771)
 7771      format(1x,'THE TEMP ARRAY: ntemp MUST ',
@@ -48,7 +47,6 @@ cwb >
          IERR = 1
          return
       endif
-cwb <
 c
 c loop thru the dof in the element
 c
@@ -57,7 +55,7 @@ c     ------------------
 c pull the dof destination vector (for this row)
 c
          mdi = Amdest(i)
-cwb >
+c
 c ALLIANT directives
 cvd$ select (vector)
 cvd$ nodepchk

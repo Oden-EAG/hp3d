@@ -21,17 +21,17 @@ c
       use surfsc1
       use surfsc2
 c
-#include "syscomz.blk"
+      implicit none
 c
       complex(8) :: Frhs(*)
 c
-      integer :: ia,in,m
+      integer :: i,ia,in,m
+c
+      complex(8), parameter :: zero = (0.d0, 0.d0)
 c
 #if DEBUG_MODE
       integer :: iprint=0
 #endif
-c
-      data zero /0.0d0/
 c
 c if the new frontwidth is equal to the old frontwidth
 c   then there is nothing to zero

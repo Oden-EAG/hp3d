@@ -27,13 +27,13 @@ c
 c
       use surfsc2
 c
-#include "syscomz.blk"
+      implicit none
 c
       complex(8) :: Flhs(*)
 c
-      integer :: mi,mj,mk
+      integer :: i,j,mi,mj,mk
 c
-      data zero /0.0d0/
+      complex(8), parameter :: zero = (0.d0, 0.d0)
 c
 c
 c if the new frontwidth is equal to the old frontwidth

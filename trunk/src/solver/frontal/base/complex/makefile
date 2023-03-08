@@ -5,7 +5,6 @@ SRC_PATH = .
 OBJ_PATH = _obj_
 
 CCINCS   = -I../../../../common/hp3d  \
-	        -I../../../../common/frontal/complex \
 	        -I../../../../../module
 
 LIBS     =

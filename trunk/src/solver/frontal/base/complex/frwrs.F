@@ -33,11 +33,13 @@ c
       use surfsc1
       use surfsc2
 c
-#include "syscomz.blk"
+      implicit none
 c
       complex(8) :: Aldest(*),Amdest(*),Andest(*),Elem(*),Frnt(*),
      .              Bbuf(*),Buf(*),Alelm(*)
 c
+      integer :: i,id,ie,iel,ifg,igot,ill,inc
+      integer :: irout4,irout5,is,j,jerr,n,ne,negiel,numdes
 c
       IB = 1
 cwb >

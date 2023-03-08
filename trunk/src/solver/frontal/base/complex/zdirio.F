@@ -33,19 +33,23 @@ c
 c
       use surfsc1
 c
-#include "syscomz.blk"
+      implicit none
 c
       character*(*) Unname, Commnd
 c
+      integer    :: Irec,Len,Jerr
       complex(8) :: Sbuf(*)
 c
-      integer :: nbuf(9), lenf(9)
-      integer :: lbuf(9), irsave(9)
+      integer    :: i,inow,iend,ioffst,iostat,irecp,irecsv,iunit
+      integer    :: lenop,lenr,lenw,ntape
+      complex(8) :: slen
 c
-      integer :: irecp
+      integer    :: nbuf(9), lenf(9)
+      integer    :: lbuf(9), irsave(9)
+      complex(8) :: storage(100)
 c
       common /czdirio1/ nbuf, lenf, irsave
-      common /czdirio2/ storage(100)
+      common /czdirio2/ storage
 
 c  ...test......test......test......test......test......test......test...
 c      allocatable sbuf1(:)
@@ -64,7 +68,8 @@ c
 c the following data statement is machine dependent
 c ...................................................
 c
-      data maxrec,lenwrd /10000, 16/
+      integer, parameter :: maxrec = 10000
+      integer, parameter :: lenwrd = 16
 c where:
 c   maxrec = the maximum record length for a direct access file
 c     **Note: on most machines this is bytes

@@ -23,6 +23,7 @@ c
       function loclu (Iin,Jin)
 c
       use surfsc2
+      implicit none
 c
       integer :: loclu
       integer :: Iin,Jin

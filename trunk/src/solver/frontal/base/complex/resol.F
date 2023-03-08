@@ -21,9 +21,14 @@ c
 c
       use surfsc1
       use surfsc2
-#include "syscomz.blk"
+c
+      implicit none
+c
       complex(8) :: Awrk(*)
 c
+      real(8) :: dt,t0,tb,tf
+      integer :: ia1,iabf,iabr,iae,iaf,ial,iam,ian,irout4
+      integer :: machk,minn,n
 c
       call zecond(t0)
 cwb >

@@ -56,7 +56,7 @@ HP3D_GMPNAME   = libhp3d_gmp.a
 # Complex version of library
 ifeq ($(COMPLEX),1)
 INSTALL_PATH   = ./complex
-CCINCS         = -I./$(SRC_PATH)/common/frontal/complex
+CCINCS         =
 FRONTAL_PATH   = ./$(SRC_PATH)/solver/frontal/base/complex
 endif
 #-------------------------------------------------

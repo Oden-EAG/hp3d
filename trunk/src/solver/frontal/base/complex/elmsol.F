@@ -51,12 +51,16 @@ c
 c
       use surfsc1
       use surfsc2
-#include "syscomz.blk"
+c
+      implicit none
 c
       complex(8) :: Aidx
       complex(8) :: Ubuf(*), Bbuf(*), Xfrnt(*)
 c
-      real(8) :: one = 1.0d0
+      complex(8) :: s,f1,f2
+      integer    :: i,ia,id,idm,idp,in,iuu,ja
+c
+      complex(8) :: one = (1.d0,0.d0)
 c
 #if DEBUG_MODE
       integer :: iprint=0
@@ -132,8 +136,6 @@ c
 c loop thru the dof beyond this one in the solution front
 c --------------------------------------------------------
          do 10 i = idp,NFW
-
-
 
 c
 c suffle the solution forward 1 slot to make room for this solution

@@ -23,8 +23,13 @@ c
 c
       use surfsc1
       use surfsc2
-#include "syscomz.blk"
+c
+      implicit none
+c
       complex(8) :: Awrk(*)
+c
+      real(8) :: dt,t0,tb,tf
+      integer :: n,ia1,iab,iae,iaf,ial,iam,ian,iful,minn
 c
       call zecond(t0)
 c
@@ -97,8 +102,6 @@ c
          MBUFSV(2,1) = MBUF
          MBUFSV(2,2) = MW
       endif
-
-
 
 cwb <
 c
@@ -199,8 +202,6 @@ c
      .           /,10x,10i10)
       endif
 
-
-
 c
 c forward elimination of all elements  (lhs and rhs)
 c ====================================
@@ -223,7 +224,6 @@ c
       if (IERR .ne. 0) go to 9100
 c
       if (NRHS .ne. 0) then
-
 
 c
 c

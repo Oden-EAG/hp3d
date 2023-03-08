@@ -23,9 +23,11 @@ c
       use surfsc1
       use surfsc2
 c
-#include "syscomz.blk"
+      implicit none
 c
       complex(8) :: Amdest(*),Elrhs(*),Frhs(*)
+c
+      integer :: n,in,i,j,md
 c
       n = 1
 c

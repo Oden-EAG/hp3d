@@ -20,12 +20,13 @@ c     aaaaaaaa    LOCAL Variables
 c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
-#include "typedefs.h"
       subroutine surfss (Awrk)
 c
       use surfsc1
 c
-      VTYPE :: Awrk(*)
+      implicit none
+c
+      complex(8) :: Awrk(*)
 c
 c debug print
 c

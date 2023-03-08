@@ -57,15 +57,20 @@ c
 c
       use surfsc1
       use surfsc2
-#include "syscomz.blk"
+c
+      implicit none
+c
       integer :: In(*), Ia(*), Ibb(*), Ic(*)
+      integer :: Ntot
+c
+      integer :: i,id,ides,iel,ifrst,inic,ip,ipc,ips
+      integer :: j,jd,jdes,jdn,jjd,jp,n,ne,nt,ntt
 c
 #if DEBUG_MODE
-      integer :: iprint=0
+      integer :: iprint
 #endif
 c
-c internal function: modr
-c
+      integer :: modr
       modr(i,j) = i - (i/j)*j
 c
 c initialize
@@ -83,6 +88,7 @@ c
          Ibb(i) = 0
    10 continue
 #if DEBUG_MODE
+      iprint = 0
       if (iprint.eq.1) write(NFSOUT,*) 'in desvec.f, numelm=',numelm
 #endif
 c

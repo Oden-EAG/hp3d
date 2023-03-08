@@ -42,11 +42,16 @@ c
 c
       use surfsc1
       use surfsc2
-#include "syscomz.blk"
+c
+      implicit none
+c
       complex(8) :: Aldest(*), Amdest(*), Andest(*), Elem(*),
      .              Frnt(*), Bbuf(*), Ubuf(*), Alelm(*)
-
-
+c
+      integer :: iuu,jel,i,ie,iel,ifbi,ifui,ill
+      integer :: irout4,irout5,iuuold,j,jerr,k,l,lenx
+      integer :: md,n,ne,negiel,numdes
+c
 c  ...test......test......test......test......test......test......test...
 ccc      integer :: ndest1(100)
 c  ...test......test......test......test......test......test......test...

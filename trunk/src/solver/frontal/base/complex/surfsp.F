@@ -42,12 +42,13 @@ c
       use surfsc1
       use surfsc2
 c
-#include "syscomz.blk"
+      implicit none
 c
       integer :: In(*), Ia(*)
       integer :: Ms,Mu,Mr
 c
-      real(8) :: t0,t1
+      real(8) :: dt,t0,t1
+      integer :: i,maxia,ntot
 c
 #if DEBUG_MODE
       integer :: iprint=0

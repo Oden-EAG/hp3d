@@ -28,15 +28,14 @@ c
       use surfsc1
       use surfsc2
 c
-#include "syscomz.blk"
+      implicit none
 c
       complex(8) :: Amdest(*), Ellhs(*), Flhs(*)
 c
+      integer, parameter :: ntim=324
       integer :: ntemp(ntim)
 c
-      integer :: n
-c
-      integer, parameter :: ntim=324
+      integer :: i,j,k,l,mi,mj,mk,n
 c
       n = 1
 c

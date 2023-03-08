@@ -6,7 +6,7 @@ c ARGUMENTS:  (I : input, O : output, IO : input & output, W : workspace
 c
 c Typ Name      Function
 c
-c I   Aidx   transfer loc for active dof in the front after eliminating
+c I   Aid    transfer loc for active dof in the front after eliminating
 c             this is the equation to be eliminated
 c
 c I   Inc    for unsymmetric this is the Increment to shift for picking
@@ -32,16 +32,22 @@ c
 c
       use surfsc1
       use surfsc2
-#include "syscomz.blk"
+c
+      implicit none
+c
+      complex(8) :: Aid
+      integer    :: Inc
       complex(8) :: Frhs(*), Ubuf(*), Bbuf(*)
-
-      data sml2 /1.e-15/
-
-      id = Aid
+c
+      complex(8) :: s
+      integer    :: ii,ii1,ii2,id,idm,idp,im,iuu,in
+c
+      real(8), parameter :: sml2 = 1.d-15
+c
+      id = INT(Aid)
       idm = id - 1
       idp = id + 1
       im = 0
-
 c
 c perform the rhs elimination:
 c-----------------------------
@@ -60,7 +66,6 @@ c
 c pull f(m)
 c
          s = Frhs(im+id)
-
 
 c
 c ***note: we load the rhs elimination buffer with the last  f(i)'

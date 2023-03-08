@@ -33,20 +33,22 @@ c
       use surfsc1
       use surfsc2
 c
-#include "syscomz.blk"
+      implicit none
 c
       integer    :: Iel
       complex(8) :: Aidx
       complex(8) :: Flhs(*), Ubuf(*)
 c
+      integer    :: id,idm,idp,i,j,k,kk,m,mp
+      complex(8) :: pivot,s
+c
+      real(8), parameter :: zero = 0.d0
+      real(8), parameter :: sml  = 1.d-30
+      real(8), parameter :: sml2 = 1.d-15
+c
 #if DEBUG_MODE
       integer :: iprint=0
 #endif
-c
-      integer :: id,idm,idp,k,mp
-c
-      data sml,zero /1.e-30, 0.0/
-      data sml2 /1.e-15/
 c
 c set up pointers into Flhs
 c

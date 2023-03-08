@@ -23,6 +23,7 @@ c
       function locr (Nrh,Iin)
 c
       use surfsc2
+      implicit none
 c
       integer :: locr
       integer :: Nrh,Iin
