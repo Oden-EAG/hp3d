@@ -1,5 +1,3 @@
-       subroutine zeror (Frhs)
-c
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: If necessary, zero out for new rhs equations in the front
 c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
@@ -18,10 +16,16 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
+      subroutine zeror (Frhs)
+c
       use surfsc1
       use surfsc2
+c
 #include "syscomz.blk"
-      dimension Frhs(*)
+c
+      complex(8) :: Frhs(*)
+c
+      integer :: ia,in,m
 c
 #if DEBUG_MODE
       integer :: iprint=0

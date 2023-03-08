@@ -1,6 +1,3 @@
-      subroutine bckwrd (Alelm, Aldest, Amdest,
-     .                   Andest, Elem, Frnt, Bbuf, Ubuf)
-c
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c     Backsubstitution
@@ -40,11 +37,14 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
+      subroutine bckwrd (Alelm, Aldest, Amdest,
+     .                   Andest, Elem, Frnt, Bbuf, Ubuf)
+c
       use surfsc1
       use surfsc2
 #include "syscomz.blk"
-      dimension Aldest(*), Amdest(*), Andest(*), Elem(*), Frnt(*),
-     .          Bbuf(*), Ubuf(*), Alelm(*)
+      complex(8) :: Aldest(*), Amdest(*), Andest(*), Elem(*),
+     .              Frnt(*), Bbuf(*), Ubuf(*), Alelm(*)
 
 
 c  ...test......test......test......test......test......test......test...

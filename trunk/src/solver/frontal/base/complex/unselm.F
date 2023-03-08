@@ -1,5 +1,3 @@
-      subroutine unselm (Iel, Aidx, Flhs ,Ubuf)
-c
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: Elimination of one equation (id) for unsymmetric matrices
 c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
@@ -30,15 +28,22 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
+      subroutine unselm (Iel, Aidx, Flhs ,Ubuf)
+c
       use surfsc1
       use surfsc2
+c
 #include "syscomz.blk"
 c
-      dimension Flhs(*), Ubuf(*)
+      integer    :: Iel
+      complex(8) :: Aidx
+      complex(8) :: Flhs(*), Ubuf(*)
 c
 #if DEBUG_MODE
       integer :: iprint=0
 #endif
+c
+      integer :: id,idm,idp,k,mp
 c
       data sml,zero /1.e-30, 0.0/
       data sml2 /1.e-15/

@@ -1,5 +1,3 @@
-      subroutine elmsol (Aidx, Ubuf, Bbuf, Xfrnt)
-c
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c Calculates the solution for one dof specified by (id)
@@ -47,11 +45,16 @@ c note: that it doesnt look like this forever,( ie: this is really a fro
 c        some equations remain till the next element, some are 'forgotte
 c        they have already been passed to permanent storage, and the 'fo
 c        ones become new destinations in Xfrnt() based on Aidx
+c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+c
+      subroutine elmsol (Aidx, Ubuf, Bbuf, Xfrnt)
 c
       use surfsc1
       use surfsc2
 #include "syscomz.blk"
-      dimension Ubuf(*), Bbuf(*), Xfrnt(*)
+c
+      complex(8) :: Aidx
+      complex(8) :: Ubuf(*), Bbuf(*), Xfrnt(*)
 c
       real(8) :: one = 1.0d0
 c

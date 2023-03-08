@@ -63,7 +63,7 @@ endif
 # Real version of library
 ifeq ($(COMPLEX),0)
 INSTALL_PATH   = ./real
-CCINCS         = -I./$(SRC_PATH)/common/frontal/real
+CCINCS         =
 FRONTAL_PATH   = ./$(SRC_PATH)/solver/frontal/base/real
 endif
 #-------------------------------------------------

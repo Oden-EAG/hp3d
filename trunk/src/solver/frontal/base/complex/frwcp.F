@@ -1,5 +1,3 @@
-      subroutine frwcp (Alelm, Aldest, Amdest, Andest, Elem, Frnt, Buf)
-c
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c Forward elimination of both lhs and rhs
@@ -30,11 +28,13 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
+      subroutine frwcp (Alelm, Aldest, Amdest, Andest, Elem, Frnt, Buf)
+c
       use surfsc1
       use surfsc2
 #include "syscomz.blk"
-      dimension Aldest(*),Amdest(*),Andest(*),Elem(*),Frnt(*),Buf(*)
-     .         ,Alelm(*)
+      complex(8) :: Aldest(*),Amdest(*),Andest(*),Elem(*),Frnt(*),
+     .              Buf(*),Alelm(*)
 
 c  ...test......test......test......test......test......test......test...
 ccc      integer :: ndest1(100)

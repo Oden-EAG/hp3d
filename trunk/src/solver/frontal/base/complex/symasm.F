@@ -1,5 +1,3 @@
-      subroutine symasm (Amdest, Ellhs, Flhs)
-c
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: Assembles the lhs into the front for symmetric matrices
 c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
@@ -25,11 +23,20 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
+      subroutine symasm (Amdest, Ellhs, Flhs)
+c
       use surfsc1
       use surfsc2
+c
 #include "syscomz.blk"
+c
+      complex(8) :: Amdest(*), Ellhs(*), Flhs(*)
+c
+      integer :: ntemp(ntim)
+c
+      integer :: n
+c
       integer, parameter :: ntim=324
-      dimension Amdest(*), Ellhs(*), Flhs(*), ntemp(ntim)
 c
       n = 1
 c

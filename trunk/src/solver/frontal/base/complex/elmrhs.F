@@ -1,5 +1,3 @@
-      subroutine elmrhs (Aid, Inc, Frhs, Ubuf, Bbuf)
-c
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c Elimination of rhs's for equation (id)
@@ -30,10 +28,12 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
+      subroutine elmrhs (Aid, Inc, Frhs, Ubuf, Bbuf)
+c
       use surfsc1
       use surfsc2
 #include "syscomz.blk"
-      dimension Frhs(*), Ubuf(*), Bbuf(*)
+      complex(8) :: Frhs(*), Ubuf(*), Bbuf(*)
 
       data sml2 /1.e-15/
 

@@ -1,5 +1,3 @@
-      subroutine symelm (Iel, Aidx, Flhs, Ubuf)
-c
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: Elimination of one equation (id) for symmetric matricies
 c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
@@ -31,13 +29,18 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
+      subroutine symelm (Iel, Aidx, Flhs, Ubuf)
+c
       use surfsc1
       use surfsc2
-#include "syscomz.blk"
-      dimension Flhs(*), Ubuf(*)
 c
-      real(8) dreal
-      external dreal
+#include "syscomz.blk"
+c
+      integer    :: Iel
+      complex(8) :: Aidx
+      complex(8) :: Flhs(*), Ubuf(*)
+c
+      real(8), external :: dreal
 c
 #if DEBUG_MODE
       integer :: iprint=0

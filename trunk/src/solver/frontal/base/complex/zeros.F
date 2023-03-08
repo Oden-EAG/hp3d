@@ -1,5 +1,3 @@
-      subroutine zeros (Flhs)
-c
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: If necessary, zero out for new symmetric lhs equations
 c            in the front
@@ -24,9 +22,15 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
+      subroutine zeros (Flhs)
+c
       use surfsc2
+c
 #include "syscomz.blk"
-      dimension Flhs(*)
+c
+      complex(8) :: Flhs(*)
+c
+      integer :: mi,mj
 c
       data zero /0.0d0/
 c

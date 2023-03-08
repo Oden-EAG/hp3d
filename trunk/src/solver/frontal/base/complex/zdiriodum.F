@@ -1,5 +1,3 @@
-      subroutine zdiriodum (Unname, Commnd, Irec, Len, Sbuf, Jerr)
-c
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: This routine preforms direct access I/O for scratch tapes
 c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
@@ -31,13 +29,22 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-      use surfsc1
-#include "syscomz.blk"
-      character*(*) Unname, Commnd
-      dimension Sbuf(*), nbuf(9), lenf(9)
-      dimension lbuf(9), irsave(9)
+      subroutine zdiriodum (Unname, Commnd, Irec, Len, Sbuf, Jerr)
 c
-      common /czdirio1/  nbuf, lenf, irsave
+      use surfsc1
+c
+#include "syscomz.blk"
+c
+      character*(*) Unname, Commnd
+c
+      complex(8) :: Sbuf(*)
+c
+      integer :: nbuf(9), lenf(9)
+      integer :: lbuf(9), irsave(9)
+c
+      integer :: irecp
+c
+      common /czdirio1/ nbuf, lenf, irsave
       common /czdirio2/ storage(100)
 c
 c the following data statement is machine dependant
