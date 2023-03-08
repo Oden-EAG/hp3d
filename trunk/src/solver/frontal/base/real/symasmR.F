@@ -16,7 +16,7 @@ c                   a22 a23 ...      ==>   [a11, a12,a22, a13,a23,a33, .
 c                       a33 ...
 c                            :
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -31,7 +31,8 @@ c
 c
 ctim      dimension Amdest(*), Ellhs(*), Flhs(*), ntemp(100)
 ccccc dimension Amdest(*), Ellhs(*), Flhs(*), ntemp(324)
-      dimension Amdest(*), Ellhs(*), Flhs(*), ntemp(10000)
+      real(8) :: Amdest(*), Ellhs(*), Flhs(*)
+      integer :: ntemp(10000)
 c
       n = 1
 c

@@ -22,7 +22,7 @@ c                            :
 c
 c IO  Ubuf     : the buffer to hold eliminated lhs equations
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -35,14 +35,14 @@ c
 #include "surfsc1.blk"
 #include "surfsc2.blk"
 c
-      dimension Flhs(*), Ubuf(*)
+      real(8) :: Flhs(*), Ubuf(*)
 c
-      data sml,dzero /1.e-30, 0.0/
-cwb >
-      data sml2 /1.e-15/
-cwb <
+      real(8), parameter :: sml   = 1.d-30
+      real(8), parameter :: dzero = 0.0d0
+      real(8), parameter :: sml2  = 1.d-15
 c
-      iprint=0
+#if DEBUG_MODE
+      integer :: iprint=0
       if (iprint.eq.1) then
         write(*,*) 'SYMELM: Iel,Aidx,Flhs,Ubuf = ',Iel,Aidx
         write(*,7001) (Flhs(iii),iii=1,10)
@@ -50,6 +50,7 @@ c
  7001   format(1x,5e12.5)
         call pause
       endif
+#endif
 c
 c set up pointers into Flhs
 c
@@ -64,10 +65,12 @@ c pull the diagonal entry
 c
       pivot = Flhs(mp)
 c
-      if(IPRPIV .eq. 1 .and. iprint  .eq. 1) then
+#if DEBUG_MODE
+      if(IPRPIV .eq. 1 .and. iprint .eq. 1) then
          write(NFSOUT,1000) Iel,nfw,id,pivot
  1000    format(5x,'IEL,NFW,ID,PIVOT',3i5,1pe11.3)
       endif
+#endif
 c
       Ubuf(id) = pivot
 c

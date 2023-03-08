@@ -21,7 +21,7 @@ c IO  Ubuf   the buffer to hold eliminated lhs equations
 c IO  Bbuf   the buffer to hold eliminated rhs equations
 c
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -34,7 +34,7 @@ c
 #include "surfsc1.blk"
 #include "surfsc2.blk"
 c
-      dimension Frhs(*), Ubuf(*), Bbuf(*)
+      real(8) :: Frhs(*), Ubuf(*), Bbuf(*)
 cwb >
       data sml2 /1.e-15/
 cwb <

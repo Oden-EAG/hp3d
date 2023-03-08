@@ -46,7 +46,7 @@ c
 c W   Ic     temporary workspace for calculating the front elimination
 c..........................................................
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -60,7 +60,7 @@ c
 #include "surfsc1.blk"
 #include "surfsc2.blk"
 c
-      dimension In(*), Ia(*), Ibb(*), Ic(*)
+      integer :: In(*), Ia(*), Ibb(*), Ic(*)
 c
 c internal function: modr
 c

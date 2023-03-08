@@ -17,7 +17,7 @@ c               a21 a22 a23 ...   ==>  [a11,a12,a13,..., a21,a22,a23, ..
 c               a31 a32 a33 ...
 c                :   :   :
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -30,8 +30,9 @@ c
 #include "surfsc1.blk"
 #include "surfsc2.blk"
 c
-ctim      dimension Amdest(*), Ellhs(*) ,Flhs(*), ntemp(100)
-      dimension Amdest(*), Ellhs(*) ,Flhs(*), ntemp(324)
+ctim      dimension Amdest(*), Ellhs(*), Flhs(*), ntemp(100)
+      real(8) :: Amdest(*), Ellhs(*), Flhs(*)
+      integer :: ntemp(324)
 c
       n = 1
 cwb >

@@ -16,7 +16,7 @@ c               a21 a22 a23 ...  ==>  [a11,a12,a13,..., a21,a22,a23,...]
 c               a31 a32 a33 ...
 c                :   :   :
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -28,7 +28,7 @@ c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
 #include "surfsc2.blk"
 c
-      dimension Flhs(*)
+      real(8) :: Flhs(*)
 c
       data dzero /0.0d0/
 c

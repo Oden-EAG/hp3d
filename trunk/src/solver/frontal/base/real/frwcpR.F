@@ -21,7 +21,7 @@ c W   Frnt    equations in the front
 c W   Buf     eliminated equations
 c
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -34,8 +34,8 @@ c
 #include "surfsc1.blk"
 #include "surfsc2.blk"
 c
-      dimension Aldest(*),Amdest(*),Andest(*),Elem(*),Frnt(*),Buf(*)
-     .         ,Alelm(*)
+      real(8) :: Aldest(*),Amdest(*),Andest(*),Elem(*),Frnt(*),Buf(*)
+     .          ,Alelm(*)
 c
       IFU = 0
       IFL = 0

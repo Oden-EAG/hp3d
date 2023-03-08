@@ -9,7 +9,7 @@ c
 c Typ Name      Function
 c IO  Frhs  : the space which holds the rhs equations in the front
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -24,18 +24,22 @@ c
 c
       dimension Frhs(*)
 c
-      data zero /0.0d0/
+#if DEBUG_MODE
+      integer :: iprint=0
+#endif
 c
-      iprint=0
+      data zero /0.0d0/
 c
 c if the new frontwidth is equal to the old frontwidth
 c   then there is nothing to zero
 c
       if (LFW .eq. NFW) return
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(nfsout,*) 'ZEROR: NRHS,MFW,NFW,LFW = ',NRHS,MFW,NFW,LFW
       endif
+#endif
       do 120 in  =1,NRHS
 c
          ia = (in-1) * MFW

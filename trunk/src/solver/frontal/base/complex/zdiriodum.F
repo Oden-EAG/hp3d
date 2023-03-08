@@ -22,7 +22,7 @@ c O   Sbuf   - for read:  array for reading into
 c
 c O   Jerr   - error flag set to 0 for no error
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -35,7 +35,6 @@ c
 #include "surfsc1.blk"
 c
       character*(*) Unname, Commnd
-cwb >
 cwb       dimension Sbuf(*), nbuf(20), lenf(20)
       dimension Sbuf(*), nbuf(9), lenf(9)
       dimension lbuf(9), irsave(9)
@@ -44,11 +43,9 @@ cwb       save nbuf,lenf
 ccccc save nbuf, lenf, irsave
       common /czdirio1/  nbuf, lenf, irsave
       common /czdirio2/ storage(100)
-cwb <
 c
 c the following data statement is machine dependant
 c ...................................................
-c within zdirio1.blk is contained the data statement:
 c
       data maxrec,lenwrd /10000, 16/
 c for complex(8), lenwrd = 16
@@ -64,17 +61,12 @@ c            vax,ibm,apollo,etc (most other machines) = 8
 c            cray,cdc = 1
 c            ardent = 2
 c
-cccccccc       include '../newcomm/zdirio1.blk'
 c ..................................................
 c set the logical unit numbers used herein
 c =========================================
-cwb >
       data lbuf / 19,18,20, 21,22,23, 24,25,26 /
-cwb       data lubufu, lubufb, lubufl / 19, 18, 20 /
-cwb <
       irecp = 0
 c
-cwb >
 c No resolution
 c --------------
       ioffst = 0
@@ -153,12 +145,10 @@ c
 c
 c the following open statement is machine dependant
 c .................................................
-c within zdirio2.blk is contained the apollo open statement:
 c
          open (ntape,access='direct',form='unformatted',
      .         status='unknown',recl=lenop,err=9000)
 c
-ccccccccc       include '../newcomm/zdirio2.blk'
 c..................................................
 c
 c normal return

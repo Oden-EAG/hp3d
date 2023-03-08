@@ -30,7 +30,7 @@ c O   Ms : minimum storage required for symmetric problem
 c O   Mr : minimum stroage required per right hand side
 c O   Mu : minimum storage required for unsymmetric problem
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -43,12 +43,14 @@ c
 #include "surfsc1.blk"
 #include "surfsc2.blk"
 c
-      dimension In(*), Ia(*)
+      integer :: In(*), Ia(*)
 c
-      iprint=0
+#if DEBUG_MODE
+      integer :: iprint=0
       if (iprint.eq.1) then
         write(*,*) 'surfsp: DEBUGGING...'
       endif
+#endif
 c
 c initialize the timers
 c
@@ -89,9 +91,12 @@ c
 c calculate the destination vectors
 c =================================
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,*) 'surfsp: NFN,MLDEST = ',NFN,MLDEST
       endif
+#endif
+c
       call desvec (In, Ia, Ia(NFN+1), Ia(2*NFN+1), ntot)
 c     --------------------------------------------------
 c
@@ -111,6 +116,7 @@ c
 c print the prefront summary
 c----------------------------
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write (NFSOUT,7020) MFW,MDOF,MLDEST
 c
@@ -130,5 +136,6 @@ c
      .            ' + ',i4,'*NRHS'   )
  7050 format(10x,'TIME IN PREFRONT =   ',f6.3,/)
 c
+#endif
 c
       end subroutine surfsp

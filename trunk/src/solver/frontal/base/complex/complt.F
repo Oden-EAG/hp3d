@@ -12,7 +12,7 @@ c
 c W   Awrk    Workspace used by the solver (it is cut and passed below)
 c
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -27,9 +27,6 @@ c
 #include "surfscwr.blk"
 c
       dimension Awrk(*)
-
-
-
 c
       call zecond(t0)
 c
@@ -37,7 +34,9 @@ c
       NPOSP = 0
       IERR = 0
 c
-      iprint = 0
+#if DEBUG_MODE
+      integer :: iprint=0
+#endif
 c
 c set up the storage cut lengths
 c--------------------------------
@@ -47,10 +46,13 @@ c      the workspace
 c
       n = NUMELM + MLDEST + 2*MDOF
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
          write(NFSOUT,*) 'in complt.f'
          write(NFSOUT,*) 'mdof,numelm,mldest,n',mdof,numelm,mldest,n
       endif
+#endif
+c
 c MELEM = space required to hold the maximum elem lhs + rhs, during asse
 c MKF = space required to hold the lhs equations for the max frontwidth
 c

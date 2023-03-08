@@ -12,7 +12,7 @@ c
 c W   Awrk    Workspace used by the solver (it is cut and passed below)
 c
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -25,7 +25,7 @@ c
 #include "surfsc1.blk"
 #include "surfsc2.blk"
 c
-      dimension Awrk(*)
+      real(8) :: Awrk(*)
 c
       call zecond(t0)
 c

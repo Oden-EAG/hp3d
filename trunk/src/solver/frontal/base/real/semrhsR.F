@@ -11,7 +11,7 @@ c I   Amdest:  dof destination vectors
 c I   Elrhs :  element rhs
 c IO  Frhs  :  front assembled rhs
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -24,7 +24,7 @@ c
 #include "surfsc1.blk"
 #include "surfsc2.blk"
 c
-      dimension Amdest(*),Elrhs(*),Frhs(*)
+      real(8) :: Amdest(*),Elrhs(*),Frhs(*)
 c
       n = 1
 c

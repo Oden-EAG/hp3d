@@ -20,7 +20,7 @@ c O   Andest  destination in the front where the remaining values
 c             in the front will transfer to, as each exiting dof is
 c             eliminated
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -35,17 +35,22 @@ c
 c
       dimension Aldest(*), Amdest(*), Andest(*)
 c
+#if DEBUG_MODE
+      integer :: iprint=0
+#endif
+c
 c internal function : modr
 c ------------------------
 c
       modr(i,j) = i - (i/j)*j
 c
-      iprint=0
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(NFSOUT,*) 'DEST: Nd, Aldest = ',Nd
         write(NFSOUT,7001) (Aldest(iii),iii=1,Nd)
  7001   format(1x,6f10.1)
       endif
+#endif
 c
 c initialize
 c

@@ -9,7 +9,7 @@ c
 c Typ Name      Function
 c IO  Frhs  : the space which holds the rhs equations in the front
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -22,7 +22,7 @@ c
 #include "surfsc1.blk"
 #include "surfsc2.blk"
 c
-      dimension Frhs(*)
+      real(8) :: Frhs(*)
 c
       data dzero /0.0d0/
 c

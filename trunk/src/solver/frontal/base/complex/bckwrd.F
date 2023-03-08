@@ -31,7 +31,7 @@ c W  Ubuf    The eliminated lhs buffered equations
 c W  Bbuf    The eliminated rhs buffered equations
 c
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -50,11 +50,13 @@ c
 
 
 c  ...test......test......test......test......test......test......test...
-      dimension ndest1(100)
+ccc      integer :: ndest1(100)
 c  ...test......test......test......test......test......test......test...
 
 c
-      iprint=0
+#if DEBUG_MODE
+      integer :: iprint=0
+#endif
 c
       iuu = 1
       jel = NUMELM + 1
@@ -81,14 +83,15 @@ c
 c pull up the Elements nodal destination vectors (Aldest)
 c
 
-
          call solin1 (jel, numdes, Aldest)
 c        ----------------------------------
+#if DEBUG_MODE
          if (iprint.eq.1) then
            write(NFSOUT,*) 'IN BCKWRD BEFORE CALL TO dest= '
            write(NFSOUT,*) 'jel,numdes = ',jel,numdes
            write(NFSOUT,*) 'Aldest = ',(Aldest(ii),ii=1,numdes)
          endif
+#endif
 
 c  ...test......test......test......test......test......test......test...
 c  ...test......test......test......test......test......test......test...
@@ -119,9 +122,11 @@ c  and the transfer loc for active dof in the front after eliminating (A
 c
          call dest (numdes, Aldest, ne ,Amdest, Andest)
 c        -----------------------------------------------
+#if DEBUG_MODE
          if (iprint.eq.1) then
            write(NFSOUT,*) 'IN BCKWRD NDOFM AFTER CALL TO dest= ',NDOFM
          endif
+#endif
 c
 c pick up final frontwidth (after elim) for the next Element
 c
@@ -332,9 +337,11 @@ cwb c
 cwb   180       continue
 cwb <
 c
+#if DEBUG_MODE
             if (iprint.eq.1) then
               write(NFSOUT,*) 'IN BCKWRD jel,NDOFM = ',jel,NDOFM
             endif
+#endif
             call solout (jel, NDOFM, NRHS, Amdest, Elem)
 c           ---------------------------------------------
 c debug print

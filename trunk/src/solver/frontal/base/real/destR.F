@@ -19,7 +19,7 @@ c O   Amdest  dof destination vectors
 c O   Andest  destination in the front where the remaining values
 c              in the front will transfer to as each exiting dof is elim
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -32,20 +32,25 @@ c
 #include "surfsc1.blk"
 #include "surfsc2.blk"
 c
-      dimension Aldest(*), Amdest(*), Andest(*)
+      real(8) :: Aldest(*), Amdest(*), Andest(*)
+c
+#if DEBUG_MODE
+      integer :: iprint=0
+#endif
 c
 c internal function : modr
 c ------------------------
 c
       modr(i,j) = i - (i/j)*j
 c
-      iprint=0
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,*) 'DEST: Nd, Aldest = ',Nd
         write(*,7001) (Aldest(iii),iii=1,Nd)
  7001   format(1x,6f10.1)
         call pause
       endif
+#endif
 c
 c initialize
 c
