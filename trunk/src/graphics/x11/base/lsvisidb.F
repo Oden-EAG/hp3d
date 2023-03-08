@@ -53,14 +53,11 @@ c
       integer :: icut,iel,ifc,iloc,ineig,iv,ivar,ivis
       integer :: loc,mdle,ndom,nrintertot
 c
-      real(8) :: bigp  =  1.d30
-      real(8) :: bign  = -1.d30
-      real(8) :: small =  1.d-6
-      real(8) :: one   =  1.d0
+      real(8), parameter :: bigp  =  1.d30
+      real(8), parameter :: bign  = -1.d30
 c
 #if DEBUG_MODE
-      integer :: iprint
-      iprint=0
+      integer :: iprint=0
 #endif
 c
 c---------------------------------------------------------------
@@ -70,10 +67,10 @@ c  ...find limiting values for contour plot
 c
 c  ...set default bounds for the picture
       do ivar=1,3
-        XEX(2*ivar-1)=bigp
-        XEX(2*ivar)  =bign
-        xmin(ivar) = bigp
-        xmax(ivar) = bign
+        XEX(2*ivar-1) = bigp
+        XEX(2*ivar)   = bign
+        xmin(ivar)    = bigp
+        xmax(ivar)    = bign
       enddo
 c
 c  ...loop through elements

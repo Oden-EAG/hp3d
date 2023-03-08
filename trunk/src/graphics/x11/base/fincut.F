@@ -56,7 +56,7 @@ c  ...perform multistage checking
             Isflag=1
           endif
         else
-          if( U3.gt.slev) then
+          if (U3.gt.slev) then
             Nstrl=1
             do icart=1,3
               Costr(1,icart,2) = Xtro(icart,1) +
@@ -83,8 +83,8 @@ c  ...perform multistage checking
           endif
         endif
       else
-        if(U2.gt.slev) then
-          if(U3.gt.slev) then
+        if (U2.gt.slev) then
+          if (U3.gt.slev) then
             Nstrl=1
             do icart=1,3
               Costr(1,icart,3) = Xtro(icart,1)

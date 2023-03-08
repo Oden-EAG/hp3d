@@ -13,8 +13,6 @@ c                          NPCOL(1)-white,NPCOL(2)-black,
 c                          NPCOL(3-10)-low-order-to-high-order-p-approx
 c                          NPCOL(11-200) - spectrum of colors
 c
-c   usage              - call colorset(Iwind)
-c
 c   arguments :
 c     in:
 c               Iwind  = 1  white/black monitor

@@ -18,13 +18,12 @@ c
 c
       integer, intent(in) :: Iwind
 c
-      integer :: iwindtype
+      integer :: iwindtype = 0
 c
       IWINDNUM = 1
-      iwindtype = 0
 c
-c  ...these parameter are hardiwired in the interface with the
-c     X-windows, if you want to change them you will have to change them
+c  ...these parameters are hardwired in the interface with X-windows;
+c     if you want to change them, you will have to change them
 c     in the interface as well !!
 ccc      iwindl = 750
 ccc      iwindl = 1000

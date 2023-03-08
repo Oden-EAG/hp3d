@@ -32,10 +32,8 @@ c
       integer :: input_mode,ivis,mdle,mdlep,nrelem,nrsub1,numlev
       real(8) :: psi,q,q1,rnsc,theta
 c
-      real(8) :: pi = 3.14159265358979312d0
-      real(8) :: bigp  =  1.d30
-      real(8) :: bign  = -1.d30
-      real(8) :: small =  1.d-14
+      real(8), parameter :: pi = 3.14159265358979312d0
+      real(8), parameter :: bigp  =  1.d30
 c
 c  ...set initial coordinates of section plane
       CLPL(1)=1.d0

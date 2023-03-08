@@ -9,8 +9,6 @@ c
 c   purpose            - routine computes the angle whose tangent
 c                        is Yc/Xc
 c
-c   usage              - call arctan(Xc,Yc,Ang)
-c
 c   arguments
 c           in : Xc,Yc - usually the cartesian coordinates
 c                        of given point
@@ -25,8 +23,8 @@ c
       real(8), intent(in)  :: Xc,Yc
       real(8), intent(out) :: Ang
 c
-      real(8) :: small = 1.d-10
-      real(8) :: pi    = 3.14159265358979d0
+      real(8), parameter :: small = 1.d-10
+      real(8), parameter :: pi    = 3.14159265358979d0
 c
       if (dabs(Xc).le.small) then
          if (dabs(Yc).le.small) then

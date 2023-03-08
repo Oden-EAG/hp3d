@@ -14,7 +14,7 @@ c            in :  Trc - triangle's vertices coordinates
 c           out : Imod - clipping indicator
 c
 c----------------------------------------------------------------------
-      subroutine clip2(Trc,Imod)
+      subroutine clip2(Trc, Imod)
 c
       use graphmod, only: XY,DIMIM,XCIM
 c
