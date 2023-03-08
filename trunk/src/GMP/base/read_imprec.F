@@ -69,7 +69,7 @@ c  ...read surfaces defining the rectangle
       read(NIN,*) nsurf(1:5)
 c
 c  ...ignore the sign
-      nsurf(1:5) = iabs(nsurf(1:5))
+      nsurf(1:5) = abs(nsurf(1:5))
 c
 c  ...store the first surface on which the rectangle is located,
 c     this must be a correct information
@@ -79,9 +79,9 @@ c  ...loop through the curves defining the rectangle edges
       do i=1,4
 c
 c  .....use the connectivity info
-        nc = iabs(RECTANGLES(Irec)%EdgeNo(i))
+        nc = abs(RECTANGLES(Irec)%EdgeNo(i))
         if (CURVES(nc)%type.eq.'ImpCir') then
-          nsurfc(1:2) = iabs(CURVES(nc)%Idata(1:2))
+          nsurfc(1:2) = abs(CURVES(nc)%Idata(1:2))
 c
 c  .......check if the surfaces defining the curve
 c         coincide with the surfaces defining the rectangle
@@ -180,9 +180,9 @@ c  ...loop through the curves defining the rectangle edges
       do i=1,4
 c
 c  .....use the connectivity info
-        nc = iabs(RECTANGLES(Irec)%EdgeNo(i))
+        nc = abs(RECTANGLES(Irec)%EdgeNo(i))
         if (CURVES(nc)%type.eq.'ImpCir') then
-          nsurfc(1:2) = iabs(CURVES(nc)%Idata(1:2))
+          nsurfc(1:2) = abs(CURVES(nc)%Idata(1:2))
 c
 c  .......check if the surfaces defining the curve
 c         coincides= with the surfaces defining the rectangle

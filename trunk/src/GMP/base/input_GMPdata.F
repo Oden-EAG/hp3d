@@ -854,7 +854,7 @@ c  .........endpoints vertex numbers
             else
               iv1 = edge_to_vert(2,ie); iv2 = edge_to_vert(1,ie)
             endif
-            nc = iabs(nc)
+            nc = abs(nc)
             if (CURVES(nc)%Type.ne.'Seglin') cycle
             if (iprint.eq.1) then
               write(*,7004) nh,ie
@@ -1217,7 +1217,7 @@ c           adjacent hexa! )
             if (no.eq.0) then
               if (iprint.eq.2) then
                 write(*,7025) nh,jf,ns,nr,
-     .          (CURVES(iabs(RECTANGLES(nr)%EdgeNo(ie)))%type, ie=1,4)
+     .          (CURVES(abs(RECTANGLES(nr)%EdgeNo(ie)))%type, ie=1,4)
  7025           format('def_impl: nh,jf,ns,nr, CURVES TYPES = ',
      .                  i4,2x,i2,i5,i5,2x,4a10)
                 call pause
@@ -1228,7 +1228,7 @@ c  ...........decide on the type of rectangle
 c
 c  ...........loop through the edge curves of the rectangle
               do ie=1,4
-                nc = iabs(RECTANGLES(nr)%EdgeNo(ie))
+                nc = abs(RECTANGLES(nr)%EdgeNo(ie))
 c
 c  .............check if the curve is implicit
                 if (CURVES(nc)%Type.ne.'ImpCir') then
@@ -1253,7 +1253,7 @@ c  ...........implicit rectangle
                 allocate(RECTANGLES(nr)%Idata(5), STAT = ic)
                 RECTANGLES(nr)%Idata(1) = ns
                 do ie=1,4
-                  nc = iabs(RECTANGLES(nr)%EdgeNo(ie))
+                  nc = abs(RECTANGLES(nr)%EdgeNo(ie))
 c
 c  ...............recycle surface used to defined the implicit curve
 c                 to define the implicit rectangle..................

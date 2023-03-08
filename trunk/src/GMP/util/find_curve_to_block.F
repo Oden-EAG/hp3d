@@ -38,7 +38,7 @@ c  ...initiate number of neighboring blocks
 c
 c  ...loop through figures adjacent to the curve
       do if=1,CURVES(Nc)%NrFig
-        call decode(iabs(CURVES(Nc)%FigNo(if)), nf,lab)
+        call decode(abs(CURVES(Nc)%FigNo(if)), nf,lab)
         if (iprint.eq.1) then
           write(*,7002) if,CURVES(Nc)%FigNo(if),nf,lab
  7002     format('if,CURVES(Nc)%FigNo(if),nf,lab = ',i2,i8,2x,i8,i2)

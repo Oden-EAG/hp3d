@@ -49,7 +49,7 @@ c
 c  .....get the bases, next edges and then the vertices
           iv=0
           do 30 i=1,2
-            nt1 = iabs(PRISMS(ntb)%FigNo(i)/10)
+            nt1 = abs(PRISMS(ntb)%FigNo(i)/10)
             do 20 k=1,3
               nc = TRIANGLES(nt1)%EdgeNo(k)
               if (nc.gt.0) then
@@ -79,7 +79,7 @@ c  .....get the bases, next its central points
           xi(1) = 0.33333333333333d0
           xi(2) = 0.33333333333333d0
           do 230 i=1,2
-            nt1 = iabs(PRISMS(ntb)%FigNo(i)/10)
+            nt1 = abs(PRISMS(ntb)%FigNo(i)/10)
             call trian(nt1,xi,xcoord(1,i),dxdxi)
   230     continue
           do 280 i = 1,3
@@ -118,7 +118,7 @@ c
 c  .....get the bases, next edges and then the vertices
         iv=0
         do 130 i=1,2
-          nt1 = iabs(HEXAS(ntb)%FigNo(i)/10)
+          nt1 = abs(HEXAS(ntb)%FigNo(i)/10)
           do 120 k=1,4
             nc = RECTANGLES(nt1)%EdgeNo(k)
             if (nc.gt.0) then

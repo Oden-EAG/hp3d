@@ -54,10 +54,10 @@ c  .....check visibility of the hexahedron
 c
 c  .....loop through the hexahedron faces
         do if = 1,6
-          call decode(iabs(HEXAS(nh)%FigNo(if)), nr,norient)
+          call decode(abs(HEXAS(nh)%FigNo(if)), nr,norient)
 c
 c  .......adjacent blocks
-          nbla(1:2)=iabs(RECTANGLES(nr)%BlockNo(1:2))
+          nbla(1:2)=abs(RECTANGLES(nr)%BlockNo(1:2))
           ivis=0
           do is=1,2
 c

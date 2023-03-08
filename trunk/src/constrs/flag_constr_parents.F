@@ -121,7 +121,7 @@ c  .......check: parent mid-face node MUST be active
 c
 c  .......parent mid-edge nodes (south,north)
           do ip=1,3,2
-            nodp = iabs(NFACE_CONS(ip,nc))
+            nodp = abs(NFACE_CONS(ip,nc))
             if (Is_inactive(nodp)) call flag(nodp)
           enddo
 c
@@ -136,7 +136,7 @@ c  .......check: parent mid-face node MUST be active
 c
 c  .......parent mid-edge nodes (east,west)
           do ip=2,4,2
-            nodp = iabs(NFACE_CONS(ip,nc))
+            nodp = abs(NFACE_CONS(ip,nc))
             if (Is_inactive(nodp)) call flag(nodp)
           enddo
 c
@@ -151,7 +151,7 @@ c  .......check: parent mid-face node MUST be active
 c
 c  .......parent mid-edge nodes (south,east,north,west)
           do ip=1,4
-            nodp = iabs(NFACE_CONS(ip,nc))
+            nodp = abs(NFACE_CONS(ip,nc))
             if (Is_inactive(nodp)) call flag(nodp)
           enddo
 c
@@ -182,7 +182,7 @@ c  .......parent mid-face node
 c
 c  .......parent mid-edge nodes (south,north)
           do ip=1,3,2
-            nodp = iabs(NFACE_CONS(ip,nc))
+            nodp = abs(NFACE_CONS(ip,nc))
             if (Is_inactive(nodp)) then
 c
 c  ...........a constraining edge is allowed
@@ -218,7 +218,7 @@ c  .......parent mid-face node
 c
 c  .......parent mid-edge nodes (east,west)
           do ip=2,4,2
-            nodp = iabs(NFACE_CONS(ip,nc))
+            nodp = abs(NFACE_CONS(ip,nc))
             if (Is_inactive(nodp)) then
 c
 c  ...........a constraining edge is allowed
@@ -245,7 +245,7 @@ c  .......parent mid-face node
 c
 c  .......parent medg nodes
           do ie=1,3
-            nodp = iabs(NFACE_CONS(ie,nc))
+            nodp = abs(NFACE_CONS(ie,nc))
             if (Is_inactive(nodp)) call flag(nodp)
           enddo
 c

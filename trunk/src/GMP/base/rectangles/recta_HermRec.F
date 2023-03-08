@@ -118,7 +118,7 @@ c  ...collect the data for the edge curves
         case(3,4)
           norient =-1
         end select
-        nc = iabs(RECTANGLES(No)%EdgeNo(i))
+        nc = abs(RECTANGLES(No)%EdgeNo(i))
         call check_edge(nc, nsharp_edge(i))
         if (iprint.eq.1) then
           write(*,*) 'i,nsharp_edge(i) = ',i,nsharp_edge(i)

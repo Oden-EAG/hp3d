@@ -108,7 +108,7 @@ c  .....find attached tet
         call decode(TRIANGLES(nr)%BlockNo(1), nh,lab)
 c  .....loop over the edges
         do ie = 1,6
-        nc = iabs(TETRAS(nh)%EdgeNo(ie))
+        nc = abs(TETRAS(nh)%EdgeNo(ie))
 c  .......loop over endpoints
           do ive = 1,2
             iv = TETRA_EDGE_TO_VERT(ive,ie)

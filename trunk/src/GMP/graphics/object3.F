@@ -50,7 +50,7 @@ ccc        if (RECTANGLES(nr)%BlockNo(2).eq.0) then
 ccc          call recta_linear(nr,eta, x,dxdeta)
 ccc          if (x(3).gt.-29.d0) then
 ccc            NRCURVBL = NRCURVBL + 1
-ccc            NLINBLOCKS(NRCURVBL) = iabs(RECTANGLES(nr)%BlockNo(1))
+ccc            NLINBLOCKS(NRCURVBL) = abs(RECTANGLES(nr)%BlockNo(1))
 ccc          endif
 ccc        endif
 ccc      enddo
@@ -239,7 +239,7 @@ c
           xxy(1) = (im(1) - XCWIN(1))/SIZE*DIMIM + XCIM(1)
           xxy(2) = (im(2) - XCWIN(2))/SIZE*DIMIM + XCIM(2)
           call findno(xxy, nel)
-          nel = iabs(nel)
+          nel = abs(nel)
           if (nel.gt.0) then
             icount = icount +1
             igv(icount) = nel

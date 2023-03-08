@@ -71,7 +71,7 @@ c  ...get the edges and then the vertices
 c
 c  ...check compatibility
       do i=1,3
-        nc = iabs(ncurv(i))
+        nc = abs(ncurv(i))
         select case(i)
         case(1,3)
         if (CURVES(nc)%Type.ne.'SegCir') then
@@ -85,7 +85,7 @@ c  ...check compatibility
           write(*,7004) No,i,nc,CURVES(nc)%Type
           stop 1
         endif
-        centers(1:3,i) = CURVES(iabs(nc))%Rdata(1:3)
+        centers(1:3,i) = CURVES(abs(nc))%Rdata(1:3)
         end select
       enddo
       d = 0.d0

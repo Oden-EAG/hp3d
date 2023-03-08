@@ -130,7 +130,7 @@ c
               ncol_line=npcol(2)
 c
 c  ...........decode the edge number to draw
-              nsid = iabs(ncol)
+              nsid = abs(ncol)
               nsid1 = i3(nsid+1)
 ccc              write(*,*) 'dpvisid: ncol = ',ncol
               if (ncol.ne.0)

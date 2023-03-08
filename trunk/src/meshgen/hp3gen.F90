@@ -113,7 +113,7 @@ subroutine hp3gen(Fp)
      do ie=1,9
         if (PRISMS(npri)%EdgeNo(ie).lt.0) nedge_orient(ie)=1
         ELEMS(nel)%nodes(6+ie) = NRELIS+NRPOINT &
-                               + iabs(PRISMS(npri)%EdgeNo(ie))
+                               + abs(PRISMS(npri)%EdgeNo(ie))
      enddo
      do ifc=1,2
         call decode(PRISMS(npri)%FigNo(ifc), nt,nface_orient(ifc))
@@ -173,7 +173,7 @@ subroutine hp3gen(Fp)
      do ie=1,12
         if (HEXAS(nh)%EdgeNo(ie).lt.0) nedge_orient(ie)=1
         ELEMS(nel)%nodes(8+ie) = NRELIS+NRPOINT &
-                               + iabs(HEXAS(nh)%EdgeNo(ie))
+                               + abs(HEXAS(nh)%EdgeNo(ie))
      enddo
      do ifc=1,6
         call decode(HEXAS(nh)%FigNo(ifc), nr,nface_orient(ifc))
@@ -216,7 +216,7 @@ subroutine hp3gen(Fp)
      do ie=1,6
         if (TETRAS(ntet)%EdgeNo(ie).lt.0) nedge_orient(ie)=1
         ELEMS(nel)%nodes(4+ie) = NRELIS+NRPOINT &
-                               + iabs(TETRAS(ntet)%EdgeNo(ie))
+                               + abs(TETRAS(ntet)%EdgeNo(ie))
      enddo
      do ifc=1,4
         call decode(TETRAS(ntet)%FigNo(ifc), nt,nface_orient(ifc))
@@ -259,7 +259,7 @@ subroutine hp3gen(Fp)
      do ie=1,8
         if (PYRAMIDS(npyr)%EdgeNo(ie).lt.0) nedge_orient(ie)=1
         ELEMS(nel)%nodes(5+ie) = NRELIS+NRPOINT &
-                               + iabs(PYRAMIDS(npyr)%EdgeNo(ie))
+                               + abs(PYRAMIDS(npyr)%EdgeNo(ie))
      enddo
      call decode(PYRAMIDS(npyr)%FigNo(1), nr,nface_orient(1))
      ELEMS(nel)%nodes(14) = NRELIS+NRPOINT+NRCURVE+nr

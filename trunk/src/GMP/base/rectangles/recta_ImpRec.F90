@@ -163,13 +163,13 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
       iv1=QUADR_EDGE_TO_VERT(1,1) ; iv2=QUADR_EDGE_TO_VERT(2,1)
       call proj_r2e(iv1,iv2,shapH,dshapH, t,dtdeta)
       norient=0 ; if (ncurv(1).lt.0) norient=1
-      call curve_local(iabs(ncurv(1)),norient,t, xc,dxcdt)
+      call curve_local(abs(ncurv(1)),norient,t, xc,dxcdt)
 !
 !  ...check
       call surf(nsurf(1),xc, fval1,der1)
       call surf(nsurf(2),xc, fval2,der2)
       if ((fval1.gt.GEOM_TOL).or.(fval2.gt.GEOM_TOL)) then
-        write(*,7007) iabs(ncurv(1)),nsurf(1),nsurf(2),No,fval1,fval2
+        write(*,7007) abs(ncurv(1)),nsurf(1),nsurf(2),No,fval1,fval2
  7007   format(' recta_ImpRec: INCONSISTENCY: POINT ON CURVE ',i5, &
                ' DOES NOT LIE ON SURFACES ',2i6,                   &
                ' DEFINING IMPLICIT RECTANGLE', i5,2e12.5)
@@ -196,13 +196,13 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
       iv1=QUADR_EDGE_TO_VERT(1,2) ; iv2=QUADR_EDGE_TO_VERT(2,2)
       call proj_r2e(iv1,iv2,shapH,dshapH, t,dtdeta)
       norient=0 ; if (ncurv(2).lt.0) norient=1
-      call curve_local(iabs(ncurv(2)),norient,t, xc,dxcdt)
+      call curve_local(abs(ncurv(2)),norient,t, xc,dxcdt)
 !
 !  ...check
       call surf(nsurf(1),xc, fval1,der1)
       call surf(nsurf(3),xc, fval2,der2)
       if ((fval1.gt.GEOM_TOL).or.(fval2.gt.GEOM_TOL)) then
-        write(*,7007) iabs(ncurv(2)),nsurf(1),nsurf(3),No,fval1,fval2
+        write(*,7007) abs(ncurv(2)),nsurf(1),nsurf(3),No,fval1,fval2
         stop
       endif
 !
@@ -227,13 +227,13 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
       iv1=QUADR_EDGE_TO_VERT(1,3) ; iv2=QUADR_EDGE_TO_VERT(2,3)
       call proj_r2e(iv1,iv2,shapH,dshapH, t,dtdeta)
       norient=0 ; if (ncurv(3).lt.0) norient=1
-      call curve_local(iabs(ncurv(3)),norient,t, xc,dxcdt)
+      call curve_local(abs(ncurv(3)),norient,t, xc,dxcdt)
 !
 !  ...check
       call surf(nsurf(1),xc, fval1,der1)
       call surf(nsurf(4),xc, fval2,der2)
       if ((fval1.gt.GEOM_TOL).or.(fval2.gt.GEOM_TOL)) then
-        write(*,7007) iabs(ncurv(3)),nsurf(1),nsurf(4),No,fval1,fval2
+        write(*,7007) abs(ncurv(3)),nsurf(1),nsurf(4),No,fval1,fval2
         stop
       endif
 !
@@ -257,13 +257,13 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
       iv1=QUADR_EDGE_TO_VERT(1,4) ; iv2=QUADR_EDGE_TO_VERT(2,4)
       call proj_r2e(iv1,iv2,shapH,dshapH, t,dtdeta)
       norient=0 ; if (ncurv(4).lt.0) norient=1
-      call curve_local(iabs(ncurv(4)),norient,t, xc,dxcdt)
+      call curve_local(abs(ncurv(4)),norient,t, xc,dxcdt)
 !
 !  ...check consistency
       call surf(nsurf(1),xc, fval1,der1)
       call surf(nsurf(5),xc, fval2,der2)
       if ((fval1.gt.GEOM_TOL).or.(fval2.gt.GEOM_TOL)) then
-        write(*,7007)iabs(ncurv(4)),nsurf(1),nsurf(5),No,fval1,fval2
+        write(*,7007)abs(ncurv(4)),nsurf(1),nsurf(5),No,fval1,fval2
         stop
       endif
 !

@@ -94,7 +94,7 @@ subroutine recta(No,Eta, X,Dxdeta)
 !
 !  .....check curve compatibility
         do i=1,4
-          nc=iabs(RECTANGLES(No)%EdgeNo(i))
+          nc=abs(RECTANGLES(No)%EdgeNo(i))
           if (CURVES(nc)%Type.ne.'Seglin') then
             write(*,*)'recta: INCOMPATIBLE curve definition!'
             write(*,7002) No,i,nc,CURVES(nc)%Type

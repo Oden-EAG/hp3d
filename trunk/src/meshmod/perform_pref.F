@@ -130,7 +130,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent mid-edge nodes (south,north)
               do ip=1,3,2
-                nodp = iabs(NFACE_CONS(ip,nc))
+                nodp = abs(NFACE_CONS(ip,nc))
                 call enforce_order(nodp, newp)
               enddo
 c
@@ -144,7 +144,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent mid-edge nodes (east,west)
               do ip=2,4,2
-                nodp = iabs(NFACE_CONS(ip,nc))
+                nodp = abs(NFACE_CONS(ip,nc))
                 call enforce_order(nodp, newp)
               enddo
 c
@@ -166,7 +166,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent mid-edge nodes (south,north)
               do ip=1,3,2
-                nodp = iabs(NFACE_CONS(ip,nc))
+                nodp = abs(NFACE_CONS(ip,nc))
                 call enforce_order(nodp, newp)
                 if (Is_inactive(nodp)) then
                   nodp = NODES(nodp)%father
@@ -192,7 +192,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent mid-edge nodes (east,west)
               do ip=2,4,2
-                nodp = iabs(NFACE_CONS(ip,nc))
+                nodp = abs(NFACE_CONS(ip,nc))
                 call enforce_order(nodp, newp)
                 if (Is_inactive(nodp)) then
                   nodp = NODES(nodp)%father
@@ -209,7 +209,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent medg nodes
               do ie=1,3
-                nodp = iabs(NFACE_CONS(ie,nc))
+                nodp = abs(NFACE_CONS(ie,nc))
                 call enforce_order(nodp, newp)
               enddo
 c
@@ -222,7 +222,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent medg nodes
               do ie=1,3
-                nodp = iabs(NFACE_CONS(ie,nc))
+                nodp = abs(NFACE_CONS(ie,nc))
                call enforce_order(nodp, newp)
               enddo
 c

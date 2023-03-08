@@ -100,7 +100,7 @@ c  ...collect the data for the curves
         case(3,4)
           norient =-1
         end select
-        nc = iabs(RECTANGLES(No)%EdgeNo(i))
+        nc = abs(RECTANGLES(No)%EdgeNo(i))
 c
 c  .....consistent orientations
         if (norient*RECTANGLES(No)%EdgeNo(i).gt.0) then

@@ -92,7 +92,7 @@ c  ...1st EDGE : SURFS sph -> 3.........................................
       iv1=TRIAN_EDGE_TO_VERT(1,1) ; iv2=TRIAN_EDGE_TO_VERT(2,1)
       call proj_t2e(iv1,iv2,shapH,dshapH, t,dtdeta)
       norient=0 ; if (ncurv(1).lt.0) norient=1
-      call curve_local(iabs(ncurv(1)),norient,t, xc,dxcdt)
+      call curve_local(abs(ncurv(1)),norient,t, xc,dxcdt)
 c
 c
 ccc      if (ncurv(1).gt.0) then
@@ -101,7 +101,7 @@ ccc      else
 ccc        xic = 1.d0 - Xi(1)-Xi(2)
 ccc        sign= -1.d0
 ccc      endif
-ccc      call curve(iabs(ncurv(1)),xic, xc,dxcdt)
+ccc      call curve(abs(ncurv(1)),xic, xc,dxcdt)
 ccc      dxcdt(1:3) = sign*dxcdt(1:3)
 c
 c
@@ -120,7 +120,7 @@ c  ...2nd EDGE : SURFS 2 -> 4...........................................
       iv1=TRIAN_EDGE_TO_VERT(1,2) ; iv2=TRIAN_EDGE_TO_VERT(2,2)
       call proj_t2e(iv1,iv2,shapH,dshapH, t,dtdeta)
       norient=0 ; if (ncurv(2).lt.0) norient=1
-      call curve_local(iabs(ncurv(2)),norient,t, xc,dxcdt)
+      call curve_local(abs(ncurv(2)),norient,t, xc,dxcdt)
 c
 c
 ccc      if ((Xi(1)+Xi(2)).ne.0) then
@@ -135,7 +135,7 @@ ccc      else
 ccc        xic = 1.d0 - xih
 ccc        sign=-1.d0
 ccc      endif
-ccc      call curve(iabs(ncurv(2)),xic, xc,dxcdt)
+ccc      call curve(abs(ncurv(2)),xic, xc,dxcdt)
 ccc      dxcdt(1:3) = sign*dxcdt(1:3)
 c
 c
@@ -156,7 +156,7 @@ c  ...3rd EDGE : SURFS sph -> 3.........................................
       iv1=TRIAN_EDGE_TO_VERT(1,3) ; iv2=TRIAN_EDGE_TO_VERT(2,3)
       call proj_t2e(iv1,iv2,shapH,dshapH, t,dtdeta)
       norient=0 ; if (ncurv(3).lt.0) norient=1
-      call curve_local(iabs(ncurv(3)),norient,t, xc,dxcdt)
+      call curve_local(abs(ncurv(3)),norient,t, xc,dxcdt)
 c
 c
 ccc      if (ncurv(3).lt.0) then
@@ -166,7 +166,7 @@ ccc      else
 ccc        xic = 1.d0 - Xi(2)-Xi(1)
 ccc        sign=-1.d0
 ccc      endif
-ccc      call curve(iabs(ncurv(3)),xic, xc,dxcdt)
+ccc      call curve(abs(ncurv(3)),xic, xc,dxcdt)
 ccc      dxcdt(1:3) = sign*dxcdt(1:3)
 c
 c

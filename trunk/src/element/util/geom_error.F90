@@ -377,10 +377,10 @@ subroutine check_geom_error
 !  .....if no father, skip
         nfath=NODES(mdle)%father
         if (nfath.lt.0) cycle
-        nfath=iabs(nfath)
+!
 !  .....if father has already been visited, skip
         if (NODES(nfath)%visit.ne.0) cycle
-
+!
         err_fath = NODES(nfath)%error(0,0)
         call find_nsons(nfath, nrsons)
 !

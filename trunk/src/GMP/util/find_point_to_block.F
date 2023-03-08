@@ -39,7 +39,7 @@ c  ...loop through curves connected to the point
 c
 c  .....loop through figures adjacent to the curve
         do if=1,CURVES(nc)%NrFig
-          call decode(iabs(CURVES(nc)%FigNo(if)), nf,lab)
+          call decode(abs(CURVES(nc)%FigNo(if)), nf,lab)
 c
           select case(lab)
 c

@@ -115,7 +115,7 @@ subroutine smooth_domain(Ndom)
 !
 !  .....update edges...........................................................
         do k=1,3
-          nc=iabs(TRIANGLES(nt)%EdgeNo(k))
+          nc=abs(TRIANGLES(nt)%EdgeNo(k))
           CURVES(nc)%Type='HermCur'
         enddo
 !
@@ -167,7 +167,7 @@ subroutine smooth_domain(Ndom)
     if (TRIANGLES(i)%Type.eq.'PlaneTri') then
       iflag=0
       do j=1,3
-        nc=iabs(TRIANGLES(i)%EdgeNo(j))
+        nc=abs(TRIANGLES(i)%EdgeNo(j))
         if (CURVES(nc)%Type.ne.'Seglin') iflag=1
       enddo
       if (iflag.eq.1) TRIANGLES(i)%Type = 'TransTri'
@@ -178,7 +178,7 @@ subroutine smooth_domain(Ndom)
     if (RECTANGLES(i)%Type.eq.'BilQua') then
       iflag=0
       do j=1,4
-        nc=iabs(RECTANGLES(i)%EdgeNo(j))
+        nc=abs(RECTANGLES(i)%EdgeNo(j))
         if (CURVES(nc)%Type.ne.'Seglin') iflag=1
       enddo
       if (iflag.eq.1) RECTANGLES(i)%Type = 'TraQua'
@@ -191,7 +191,7 @@ subroutine smooth_domain(Ndom)
   do ntet=1,NRTETRA
     nflag=0
     do ie=1,6
-      nc = iabs(TETRAS(ntet)%EdgeNo(ie))
+      nc = abs(TETRAS(ntet)%EdgeNo(ie))
       if (CURVES(nc)%Type.ne.'Seglin') nflag=1
     enddo
     do ifig=1,4
@@ -210,7 +210,7 @@ subroutine smooth_domain(Ndom)
   do npri=1,NRPRISM
     nflag=0
     do ie=1,9
-      nc = iabs(PRISMS(npri)%EdgeNo(ie))
+      nc = abs(PRISMS(npri)%EdgeNo(ie))
       if (CURVES(nc)%Type.ne.'Seglin') nflag=1
     enddo
     do ifig=1,2
@@ -234,7 +234,7 @@ subroutine smooth_domain(Ndom)
   do npyr=1,NRPYRAM
     nflag=0
     do ie=1,8
-      nc = iabs(PYRAMIDS(npyr)%EdgeNo(ie))
+      nc = abs(PYRAMIDS(npyr)%EdgeNo(ie))
       if (CURVES(nc)%Type.ne.'Seglin') nflag=1
     enddo
     do ifig=1,1

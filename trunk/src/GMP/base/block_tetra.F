@@ -68,7 +68,7 @@ c  ...linear (affine) tetrahedron
 c
 c  .....check compatibility
         do ie=1,6
-          nc = iabs(TETRAS(No)%EdgeNo(ie))
+          nc = abs(TETRAS(No)%EdgeNo(ie))
           if (CURVES(nc)%Type.ne.'Seglin') then
             write(*,7002) No,ie,nc,CURVES(nc)%Type
  7002       format('tetra: INCOMPATIBLE DEFINITIONS: No,ie,nc=',

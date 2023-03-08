@@ -136,7 +136,7 @@ c  .........parent mid-face node
 c
 c  .........parent mid-edge nodes (south,north)
             do ip=1,3,2
-              nodp = iabs(NFACE_CONS(ip,nc))
+              nodp = abs(NFACE_CONS(ip,nc))
               call add_to_list(list_e,24,ice,nodp)
             enddo
 c
@@ -149,7 +149,7 @@ c  .........parent mid-face node
 c
 c  .........parent mid-edge nodes (east,west)
             do ip=2,4,2
-              nodp = iabs(NFACE_CONS(ip,nc))
+              nodp = abs(NFACE_CONS(ip,nc))
               call add_to_list(list_e,24,ice,nodp)
             enddo
 c
@@ -162,7 +162,7 @@ c  .........parent mid-face node
 c
 c  .........parent mid-edge nodes (south,east,north,west)
             do ip=1,4
-              nodp = iabs(NFACE_CONS(ip,nc))
+              nodp = abs(NFACE_CONS(ip,nc))
               call add_to_list(list_e,24,ice,nodp)
             enddo
 c
@@ -189,7 +189,7 @@ c  .........parent mid-face node
 c
 c  .........parent mid-edge nodes (south,north)
             do ip=1,3,2
-              nodp = iabs(NFACE_CONS(ip,nc))
+              nodp = abs(NFACE_CONS(ip,nc))
 C               if (Is_inactive(nodp)) nodp = NODES(nodp)%father
               if (Is_inactive(nodp) .and. NODES(nodp)%ref_kind.eq.0)
      .            nodp = NODES(nodp)%father
@@ -213,7 +213,7 @@ c  .........parent mid-face node
 c
 c  .........parent mid-edge nodes (east,west)
             do ip=2,4,2
-              nodp = iabs(NFACE_CONS(ip,nc))
+              nodp = abs(NFACE_CONS(ip,nc))
 C               if (Is_inactive(nodp)) nodp = NODES(nodp)%father
               if (Is_inactive(nodp) .and. NODES(nodp)%ref_kind.eq.0)
      .            nodp = NODES(nodp)%father
@@ -229,7 +229,7 @@ c  .........parent mid-face node
 c
 c  .........parent medg nodes
             do ie=1,3
-              nodp = iabs(NFACE_CONS(ie,nc))
+              nodp = abs(NFACE_CONS(ie,nc))
               call add_to_list(list_e,24,ice,nodp)
             enddo
 c
@@ -242,7 +242,7 @@ c  .........parent mid-face node
 c
 c  .........parent medg nodes
             do ie=1,3
-              nodp = iabs(NFACE_CONS(ie,nc))
+              nodp = abs(NFACE_CONS(ie,nc))
               call add_to_list(list_e,24,ice,nodp)
             enddo
 c

@@ -150,7 +150,7 @@ module constrained_nodes
          data nvrt/ 1,2,3, 2,3,1, 3,1,2, 1,3,2, 2,1,3, 3,2,1 /
          nloc(1:8) = NFACE_CONS(1:8,J)
          do i=1,3
-           i1 = iabs(nedg(i,Norient))
+           i1 = abs(nedg(i,Norient))
            NFACE_CONS(i,J) = nloc(i1)*isgn(nedg(i,Norient))
            i1 = nvrt(i,Norient)
            NFACE_CONS(4+i,J) = nloc(4+i1)
@@ -172,7 +172,7 @@ module constrained_nodes
                     1,4,3,2, 2,1,4,3, 3,2,1,4, 4,3,2,1 /
          nloc(1:8) = NFACE_CONS(1:8,J)
          do i=1,4
-           i1 = iabs(nedg(i,Norient))
+           i1 = abs(nedg(i,Norient))
            NFACE_CONS(i,J) = nloc(i1)*isgn(nedg(i,Norient))
            i1 = nvrq(i,Norient)
            NFACE_CONS(4+i,J) = nloc(4+i1)

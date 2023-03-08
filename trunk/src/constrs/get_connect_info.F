@@ -383,7 +383,7 @@ c  .........store the mid-face node
 c
 c  .........store relevant edges only
             do ie=ie1+1,4,2
-              medge = iabs(NFACE_CONS(ie,ifc))
+              medge = abs(NFACE_CONS(ie,ifc))
               if (NFACE_CONS(ie,ifc).gt.0) then
                 ise = Is
               else
@@ -408,7 +408,7 @@ c  .......set up a new constraining edge
             NEDGC(iec) = nson
             do iv=1,2
               ie = ie_no(iv,ie1)
-              medge = iabs(NFACE_CONS(ie,ifc))
+              medge = abs(NFACE_CONS(ie,ifc))
 c              nvt = NODES(medge)%sons(3)
               nvt = Son(medge,3)
 c

@@ -214,7 +214,7 @@ c  .....end of loop over endpoints
         enddo
 c  .....loop over connected figures
         do i = 1,CURVES(nc)%NrFig
-          call decode(iabs(CURVES(nc)%FigNo(i)), nr,lab)
+          call decode(abs(CURVES(nc)%FigNo(i)), nr,lab)
 c  .......if attached figure is a triangle
           if (lab.eq.1) then
             if (TRIANGLES(nr)%Type.eq.'G1RecTri') nflag = nflag + 1
@@ -349,7 +349,7 @@ c  .....check error flag
           write(*,7039) nc
  7039     format('reconstruct: REVERSED TANGENT FOR nc = ',i6)
           nrfig = CURVES(nc)%NrFig
-          write(*,7040) iabs(CURVES(nc)%FigNo(1:nrfig))/10
+          write(*,7040) abs(CURVES(nc)%FigNo(1:nrfig))/10
  7040     format('             ADJACENT TRIANGLES = ',10i6)
           call pause
         endif
@@ -677,7 +677,7 @@ c  .......cycle if not a G1RecTri
           if (TRIANGLES(nr)%Type.ne.'G1RecTri') cycle
 c  .......loop through edges of the triangle
           do ie = 1,3
-            nc1 = iabs(TRIANGLES(nr)%EdgeNo(ie))
+            nc1 = abs(TRIANGLES(nr)%EdgeNo(ie))
             if (nc1.ne.nc) cycle
             ifound = ifound + 1
             nr_save(ifound) = nr; nedg_save(ifound) = ie

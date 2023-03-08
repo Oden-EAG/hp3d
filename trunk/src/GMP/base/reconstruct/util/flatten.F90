@@ -19,12 +19,12 @@ subroutine flatten_tet(Ntet)
   !
   ! loop over edges
   do i=1,6
-     nc=iabs(TETRAS(Ntet)%EdgeNo(i))
+     nc=abs(TETRAS(Ntet)%EdgeNo(i))
      if (CURVES(nc)%Type.eq.'5Bezier') then
         call straighten_curve(nc)
         !  ...loop over connected figures
         do j=1,CURVES(nc)%NrFig
-           call decode(iabs(CURVES(nc)%FigNo(i)), nt,lab)
+           call decode(abs(CURVES(nc)%FigNo(i)), nt,lab)
            !  ...if connected figure is a reconstructed triangle
            if (lab.eq.1) then
               if (TRIANGLES(nt)%Type.eq.'G1RecTri') then
@@ -58,7 +58,7 @@ subroutine flatten_trian(Nt)
   !--------------------------------------------------------------------------
   !
   do i=1,3
-     nc=iabs(TRIANGLES(Nt)%EdgeNo(i))
+     nc=abs(TRIANGLES(Nt)%EdgeNo(i))
      call straighten_curve(nc)
   enddo
   !
@@ -67,7 +67,7 @@ subroutine flatten_trian(Nt)
   !--------------------------------------------------------------------------
   !
   do i=1,3
-     nc=iabs(TRIANGLES(Nt)%EdgeNo(i))
+     nc=abs(TRIANGLES(Nt)%EdgeNo(i))
      call curve2trian(nc,Nt, neig,ie)
      call modify_G1trian(neig,ie)
   enddo
@@ -151,7 +151,7 @@ subroutine curve2trian(Nc,Nt, Neig,Ie)
   !  ...loop over connected figures
   icount=0
   do i=1,CURVES(Nc)%NrFig
-     call decode(iabs(CURVES(Nc)%FigNo(i)), Neig,lab)
+     call decode(abs(CURVES(Nc)%FigNo(i)), Neig,lab)
      !  ...if attached figure is a triangle
      if (lab.eq.1) then
         !  ...increment counter if a neighbor was found
@@ -171,7 +171,7 @@ subroutine curve2trian(Nc,Nt, Neig,Ie)
   !  ...determine local number for the edge
   icount=0
   do i=1,3
-     if (iabs(TRIANGLES(Neig)%EdgeNo(i)).eq.Nc) then
+     if (abs(TRIANGLES(Neig)%EdgeNo(i)).eq.Nc) then
         Ie=i ; icount=1 ; exit
      endif
   enddo

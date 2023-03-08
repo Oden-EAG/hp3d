@@ -139,7 +139,7 @@ c  .....collect the data for the curve
           endif
         enddo
         do i=1,CURVES(nc)%NrFig
-          call decode(iabs(CURVES(nc)%FigNo(i)), nr,lab)
+          call decode(abs(CURVES(nc)%FigNo(i)), nr,lab)
           if (lab.eq.2) then
             if (RECTANGLES(nr)%Type.eq.'HermRec') nflag=nflag+1
           endif
@@ -251,7 +251,7 @@ c  .....store the second derivatives
           write(*,7039) nc
  7039     format('reconstruct: REVERSED TANGENT FOR nc = ',i6)
           nrfig = CURVES(nc)%NrFig
-          write(*,7040) iabs(CURVES(nc)%FigNo(1:nrfig))/10
+          write(*,7040) abs(CURVES(nc)%FigNo(1:nrfig))/10
  7040     format('             ADJACENT RECTANGLES = ',10i6)
           call pause
         endif
@@ -369,7 +369,7 @@ c  .....loop through connected rectangles
 c
 c  .......loop through edges of the rectangle
           do ie=1,4
-            nc1 = iabs(RECTANGLES(nr)%EdgeNo(ie))
+            nc1 = abs(RECTANGLES(nr)%EdgeNo(ie))
             if (nc1.ne.nc) cycle
             ifound = ifound+1
             nr_save(ifound) = nr; nedg_save(ifound) = ie

@@ -510,7 +510,7 @@ c
 c  .......ignore the signs that might be present in some old
 c         input files
           do k=1,4
-            CURVES(icur)%Idata(k) = iabs(CURVES(icur)%Idata(k))
+            CURVES(icur)%Idata(k) = abs(CURVES(icur)%Idata(k))
           enddo
           write(NWE,40) (CURVES(icur)%Idata(k),k=1,4),
      .         '              ...SURFACE NUMBERS CONSTITUTING THE CURVE'
@@ -953,7 +953,7 @@ c  ...loop through rectangles in the GMP model
 c
 c  .....determine the rectangle edges
         do i=1,4
-          noedg(i) = iabs(RECTANGLES(irec)%EdgeNo(i))
+          noedg(i) = abs(RECTANGLES(irec)%EdgeNo(i))
         enddo
         if (iprint.eq.1) then
           write(*,7004) irec,(noedg(i),i=1,4)
@@ -1015,7 +1015,7 @@ c       second and third edge
 c
 c  .....determine the vertices
         do i=1,4
-          nc = iabs(RECTANGLES(irec)%EdgeNo(i))
+          nc = abs(RECTANGLES(irec)%EdgeNo(i))
           if (RECTANGLES(irec)%EdgeNo(i).gt.0) then
             RECTANGLES(irec)%VertNo(i) = CURVES(nc)%EndPoNo(1)
           else
@@ -1042,7 +1042,7 @@ c  ...loop through hexahedra in the GMP model
 c
 c  .....determine the hexahedron face rectangles numbers
         do is=1,6
-          call decode(iabs(HEXAS(ihex)%FigNo(is)), nof(is),ivoid)
+          call decode(abs(HEXAS(ihex)%FigNo(is)), nof(is),ivoid)
         enddo
 c
 c  .....determine naxes (see above)
@@ -1054,9 +1054,9 @@ c  .....determine naxes (see above)
 c
 c  .......find the edge common to both face rectangles
           do i1=1,4
-            nc1 = iabs(RECTANGLES(nrect1)%EdgeNo(i1))
+            nc1 = abs(RECTANGLES(nrect1)%EdgeNo(i1))
             do i2=1,4
-              nc2 = iabs(RECTANGLES(nrect2)%EdgeNo(i2))
+              nc2 = abs(RECTANGLES(nrect2)%EdgeNo(i2))
               if (nc1.eq.nc2) go to 10
             enddo
           enddo
@@ -1104,7 +1104,7 @@ c  .....loop through the edges
 c
 c  .......loop through the sides of the rectangle
           do j=1,4
-            if (iabs(RECTANGLES(nrect)%EdgeNo(j)).eq.Noedg(i)) then
+            if (abs(RECTANGLES(nrect)%EdgeNo(j)).eq.Noedg(i)) then
               nsign = RECTANGLES(nrect)%EdgeNo(j)/Noedg(i)
               if (i.gt.2) nsign = -nsign
               HEXAS(ihex)%EdgeNo(i) = Noedg(i)*nsign*nfact
@@ -1122,7 +1122,7 @@ c  .....loop through the edges
 c
 c  .......loop through the sides of the rectangle
           do j=1,4
-            if (iabs(RECTANGLES(nrect)%EdgeNo(j)).eq.Noedg(i)) then
+            if (abs(RECTANGLES(nrect)%EdgeNo(j)).eq.Noedg(i)) then
               nsign = RECTANGLES(nrect)%EdgeNo(j)/Noedg(i)
               if (i.gt.6) nsign = -nsign
               HEXAS(ihex)%EdgeNo(i) = Noedg(i)*nsign*nfact
@@ -1140,7 +1140,7 @@ c  .....loop through the edges
 c
 c  .......loop through the sides of the rectangle
           do j=1,4
-            if (iabs(RECTANGLES(nrect)%EdgeNo(j)).eq.Noedg(i)) then
+            if (abs(RECTANGLES(nrect)%EdgeNo(j)).eq.Noedg(i)) then
               nsign = RECTANGLES(nrect)%EdgeNo(j)/Noedg(i)
               if (i.eq.9) nsign = -nsign
               HEXAS(ihex)%EdgeNo(i) = Noedg(i)*nsign*nfact
@@ -1158,7 +1158,7 @@ c  .....loop through the edges
 c
 c  .......loop through the sides of the rectangle
           do j=1,4
-            if (iabs(RECTANGLES(nrect)%EdgeNo(j)).eq.Noedg(i)) then
+            if (abs(RECTANGLES(nrect)%EdgeNo(j)).eq.Noedg(i)) then
               nsign = RECTANGLES(nrect)%EdgeNo(j)/Noedg(i)
               if (i.eq.12) nsign = -nsign
               HEXAS(ihex)%EdgeNo(i) = Noedg(i)*nsign*nfact
@@ -1167,7 +1167,7 @@ c  .......loop through the sides of the rectangle
         enddo
 c
 c  .....determine the vertex points
-        nc = iabs(HEXAS(ihex)%EdgeNo(1))
+        nc = abs(HEXAS(ihex)%EdgeNo(1))
         if (HEXAS(ihex)%EdgeNo(1).gt.0) then
           HEXAS(ihex)%VertNo(1) = CURVES(nc)%EndPoNo(1)
           HEXAS(ihex)%VertNo(2) = CURVES(nc)%EndPoNo(2)
@@ -1175,7 +1175,7 @@ c  .....determine the vertex points
           HEXAS(ihex)%VertNo(2) = CURVES(nc)%EndPoNo(1)
           HEXAS(ihex)%VertNo(1) = CURVES(nc)%EndPoNo(2)
         endif
-        nc = iabs(HEXAS(ihex)%EdgeNo(3))
+        nc = abs(HEXAS(ihex)%EdgeNo(3))
         if (HEXAS(ihex)%EdgeNo(3).gt.0) then
           HEXAS(ihex)%VertNo(4) = CURVES(nc)%EndPoNo(1)
           HEXAS(ihex)%VertNo(3) = CURVES(nc)%EndPoNo(2)
@@ -1183,7 +1183,7 @@ c  .....determine the vertex points
           HEXAS(ihex)%VertNo(3) = CURVES(nc)%EndPoNo(1)
           HEXAS(ihex)%VertNo(4) = CURVES(nc)%EndPoNo(2)
         endif
-        nc = iabs(HEXAS(ihex)%EdgeNo(5))
+        nc = abs(HEXAS(ihex)%EdgeNo(5))
         if (HEXAS(ihex)%EdgeNo(5).gt.0) then
           HEXAS(ihex)%VertNo(5) = CURVES(nc)%EndPoNo(1)
           HEXAS(ihex)%VertNo(6) = CURVES(nc)%EndPoNo(2)
@@ -1191,7 +1191,7 @@ c  .....determine the vertex points
           HEXAS(ihex)%VertNo(6) = CURVES(nc)%EndPoNo(1)
           HEXAS(ihex)%VertNo(5) = CURVES(nc)%EndPoNo(2)
         endif
-        nc = iabs(HEXAS(ihex)%EdgeNo(7))
+        nc = abs(HEXAS(ihex)%EdgeNo(7))
         if (HEXAS(ihex)%EdgeNo(7).gt.0) then
           HEXAS(ihex)%VertNo(8) = CURVES(nc)%EndPoNo(1)
           HEXAS(ihex)%VertNo(7) = CURVES(nc)%EndPoNo(2)

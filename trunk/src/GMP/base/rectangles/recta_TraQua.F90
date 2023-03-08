@@ -55,7 +55,7 @@ subroutine recta_TraQua(No,Eta, X,Dxdeta)
       endselect
 !
 !  ...get the edge curves and orientations
-      noc(1:4)=iabs(RECTANGLES(No)%EdgeNo(1:4))
+      noc(1:4)=abs(RECTANGLES(No)%EdgeNo(1:4))
       norientc(1:4)=0
       if (RECTANGLES(No)%EdgeNo(1).lt.0) norientc(1)=1
       if (RECTANGLES(No)%EdgeNo(2).lt.0) norientc(2)=1

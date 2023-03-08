@@ -53,7 +53,7 @@ c  .......cycle if not a G1RecTri
           if (TRIANGLES(nt)%Type.ne.'G1RecTri') cycle
 c  .......loop through edges of the triangle
           do ie = 1,3
-            nc1 = iabs(TRIANGLES(nt)%EdgeNo(ie))
+            nc1 = abs(TRIANGLES(nt)%EdgeNo(ie))
             if (nc1.ne.nc) cycle
             ifound = ifound + 1
             nt_save(ifound) = nt; nedg_save(ifound) = ie

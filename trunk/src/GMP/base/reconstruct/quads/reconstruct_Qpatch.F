@@ -235,10 +235,10 @@ c  .....store the derivatives of the normal for the vertex
         dnorm2(1:3) = dnorm2(1:3)*sign(ione,nvar2(iv,io))
         jj=12+(iv-1)*3
         RECTANGLES(nr)%Rdata(jj+1:jj+3) = Rnorm(1:3)*rsign(io)
-        jj=24+(iabs(nvar1(iv,io))-1)*12+(iv-1)*3
+        jj=24+(abs(nvar1(iv,io))-1)*12+(iv-1)*3
         RECTANGLES(nr)%Rdata(jj+1:jj+3) =
      .    dnorm1(1:3)*rsign(io)
-        jj=24+(iabs(nvar2(iv,io))-1)*12+(iv-1)*3
+        jj=24+(abs(nvar2(iv,io))-1)*12+(iv-1)*3
         RECTANGLES(nr)%Rdata(jj+1:jj+3) =
      .    dnorm2(1:3)*rsign(io)
 c

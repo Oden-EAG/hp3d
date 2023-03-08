@@ -622,7 +622,7 @@ c           number of parent node horizontal and vertical dof's
 c
 c           parent mid-edge nodes (south,north)
             do ip=1,3,2
-              nodp = iabs(NFACE_CONS(ip,nc))
+              nodp = abs(NFACE_CONS(ip,nc))
 ccc           locp(ip) = NODES(nodp)%visit
               call locate(nodp,Nodm,Nrnodm, locp(ip))
               ndofHp(ip) = NODES(nodp)%order-1
@@ -710,7 +710,7 @@ ccc         loc = NODES(nodp)%visit
 c
 c           parent mid-edge nodes (east,west)
             do ip=2,4,2
-              nodp = iabs(NFACE_CONS(ip,nc))
+              nodp = abs(NFACE_CONS(ip,nc))
 ccc           locp(ip) = NODES(nodp)%visit
               call locate(nodp,Nodm,Nrnodm, locp(ip))
               ndofHp(ip) = NODES(nodp)%order-1
@@ -793,7 +793,7 @@ ccc         loc = NODES(nodp)%visit
 c
 c           parent mid-edge nodes (south,east,north,west)
             do ip=1,4
-              nodp = iabs(NFACE_CONS(ip,nc))
+              nodp = abs(NFACE_CONS(ip,nc))
 ccc           locp(ip) = NODES(nodp)%visit
               call locate(nodp,Nodm,Nrnodm, locp(ip))
               ndofHp(ip) = NODES(nodp)%order-1
@@ -936,7 +936,7 @@ ccc         loc = NODES(nodp)%visit
 c
 c           parent mid-edge nodes (south,north)
             do ip=1,3,2
-              nodp = iabs(NFACE_CONS(ip,nc))
+              nodp = abs(NFACE_CONS(ip,nc))
               if (Is_active(nodp)) then
                 ncflag(ip)=0
                 call locate(nodp,Nodm,Nrnodm, locp(ip))
@@ -1147,7 +1147,7 @@ c           parent mid-face node
 c
 c           parent mid-edge nodes (east,west)
             do ip=2,4,2
-              nodp = iabs(NFACE_CONS(ip,nc))
+              nodp = abs(NFACE_CONS(ip,nc))
               if (Is_active(nodp)) then
                 ncflag(ip)=0
                 call locate(nodp,Nodm,Nrnodm, locp(ip))
@@ -1294,7 +1294,7 @@ c             loop through parent node dof
 c
 c             loop through parent medg nodes
               do ie=1,3
-                nodp = iabs(NFACE_CONS(ie,nc))
+                nodp = abs(NFACE_CONS(ie,nc))
 ccc             loc = NODES(nodp)%visit
                 call locate(nodp,Nodm,Nrnodm, loc)
 c
@@ -1336,7 +1336,7 @@ c           ..loop through parent node dof
 c
 c           ..loop through parent medg nodes
               do ie=1,3
-                nodp = iabs(NFACE_CONS(ie,nc))
+                nodp = abs(NFACE_CONS(ie,nc))
 ccc             loc = NODES(nodp)%visit
                 call locate(nodp,Nodm,Nrnodm, loc)
 c
@@ -1407,7 +1407,7 @@ c             loop through parent mdlt node dof
 c
 c             loop through parent medg nodes
               do ie=1,3
-                nodp = iabs(NFACE_CONS(ie,nc))
+                nodp = abs(NFACE_CONS(ie,nc))
 ccc             loc = NODES(nodp)%visit
                 call locate(nodp,Nodm,Nrnodm, loc)
 c
@@ -1461,7 +1461,7 @@ c             loop through parent mdlt node dof
 c
 c             loop through parent medg nodes
               do ie=1,3
-                nodp = iabs(NFACE_CONS(ie,nc))
+                nodp = abs(NFACE_CONS(ie,nc))
 ccc             loc = NODES(nodp)%visit
                 call locate(nodp,Nodm,Nrnodm, loc)
 #if DEBUG_MODE
@@ -1525,7 +1525,7 @@ c             loop through parent mdlt node dof
 c
 c             loop through parent medg nodes
               do ie=1,3
-                nodp = iabs(NFACE_CONS(ie,nc))
+                nodp = abs(NFACE_CONS(ie,nc))
 ccc             loc = NODES(nodp)%visit
                 call locate(nodp,Nodm,Nrnodm, loc)
 #if DEBUG_MODE

@@ -828,7 +828,7 @@ c       surface triangles adjacent to the curve segment
 c
 c  .....loop through figures connected to the curve
         do if=1,CURVES(nc)%NrFig
-          nick = iabs(CURVES(nc)%FigNo(if))
+          nick = abs(CURVES(nc)%FigNo(if))
           call decode(nick, nf,lab)
           select case(lab)
 c
@@ -930,7 +930,7 @@ c
         if (TRIANGLES(nt)%Type.eq.'PlaneTri') then
           nflag=0
           do ie=1,3
-            nc = iabs(TRIANGLES(nt)%EdgeNo(ie))
+            nc = abs(TRIANGLES(nt)%EdgeNo(ie))
             if (CURVES(nc)%Type.ne.'Seglin') nflag=1
           enddo
           if (nflag.eq.1) TRIANGLES(nt)%Type = 'TransTri'
@@ -941,7 +941,7 @@ c
         if (RECTANGLES(nr)%Type.eq.'BilQua') then
           nflag=0
           do ie=1,4
-            nc = iabs(RECTANGLES(nr)%EdgeNo(ie))
+            nc = abs(RECTANGLES(nr)%EdgeNo(ie))
             if (CURVES(nc)%Type.ne.'Seglin') nflag=1
           enddo
           if (nflag.eq.1) RECTANGLES(nr)%Type = 'TraQua'
@@ -954,7 +954,7 @@ c
       do ntet=1,NRTETRA
         nflag=0
         do ie=1,6
-          nc = iabs(TETRAS(ntet)%EdgeNo(ie))
+          nc = abs(TETRAS(ntet)%EdgeNo(ie))
           if (CURVES(nc)%Type.ne.'Seglin') nflag=1
        enddo
         do if=1,4
@@ -973,7 +973,7 @@ c
       do npri=1,NRPRISM
         nflag=0
         do ie=1,9
-          nc = iabs(PRISMS(npri)%EdgeNo(ie))
+          nc = abs(PRISMS(npri)%EdgeNo(ie))
           if (CURVES(nc)%Type.ne.'Seglin') nflag=1
         enddo
         do if=1,2
@@ -997,7 +997,7 @@ c
       do npyr=1,NRPYRAM
         nflag=0
         do ie=1,8
-          nc = iabs(PYRAMIDS(npyr)%EdgeNo(ie))
+          nc = abs(PYRAMIDS(npyr)%EdgeNo(ie))
           if (CURVES(nc)%Type.ne.'Seglin') nflag=1
         enddo
         do if=1,1

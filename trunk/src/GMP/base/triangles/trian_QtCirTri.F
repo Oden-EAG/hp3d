@@ -64,7 +64,7 @@ c  ...get edge curves and vertex coordinates
 c
 c  ...check compatibility
       do i=1,3
-        nc = iabs(ncurv(i))
+        nc = abs(ncurv(i))
         select case(i)
         case(1,3)
         if (CURVES(nc)%Type.ne.'Seglin') then
