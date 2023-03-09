@@ -41,22 +41,30 @@ $(OBJ_PATH)/.dummy :
 	@echo "Creating directory " $(OBJ_PATH)
 	@mkdir -p $(OBJ_PATH); touch $@;
 
+#-------------------------------------------------
+.PHONY : one
 one : $(OBJ_PATH)/.dummy $(OBJ_PATH)/$(TEST).o
 	@echo ""
 	@echo "- Linking - " $(TEST)
 	$(FC_WORK) -o $(TEST) $(OBJ_PATH)/$(TEST).o $(LIBS) $(LDFLAGS)
 	@echo $(CCINCS)
 
+#-------------------------------------------------
+.PHONY : all
 all :
 	for e in $(TESTS) ; do \
 		make one run TEST=$$e ;\
 	done
 
+#-------------------------------------------------
+.PHONY : run
 run : one
 	@echo ""
 	@echo "Running test: "$(TEST)
 	./$(TEST)
 
+#-------------------------------------------------
+.PHONY : clean
 clean :
 	@/bin/rm -f *.o *~
 	@/bin/rm -rf $(OBJ_PATH)

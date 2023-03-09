@@ -17,6 +17,8 @@ HP3D makefile targets:
     Compile examples in problems directory
   make all
     Build/install the library and compile problems
+  make clean-test
+    Clean test directory
   make clean-problems
     Clean problems directory
   make clean-all
@@ -320,6 +322,13 @@ clean:
 	@rm -f *.mk *.old *.mod
 
 #-------------------------------------------------
+.PHONY : clean-test
+
+clean-test:
+	@echo "Clean 'test' directory."
+	@(cd test ; $(MAKE) clean; cd ..);
+
+#-------------------------------------------------
 .PHONY : clean-problems
 
 clean-problems:
@@ -338,4 +347,4 @@ endif
 #-------------------------------------------------
 .PHONY : clean-all
 
-clean-all: clean clean-problems
+clean-all: clean clean-test clean-problems
