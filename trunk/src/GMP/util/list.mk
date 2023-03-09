@@ -13,7 +13,6 @@ find_point_to_block.F
 give_surf.F90
 if_bound.F90
 imod.F90
-locate_curve.F90
 mixed_product.F90
 norm.F90
 normalize.F90

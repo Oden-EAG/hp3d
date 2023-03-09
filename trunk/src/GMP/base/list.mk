@@ -16,7 +16,6 @@ mnewt.F
 pointr.F
 read_geometry.F90
 saruss.F
-split_surface.F90
 surf_cone.F90
 surf_cylinder.F90
 surf_ellipsoid.F90
