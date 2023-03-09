@@ -134,12 +134,12 @@ subroutine recta(No,Eta, X,Dxdeta)
       case('ImpRec' ) ; call recta_ImpRec( No,Eta, X,Dxdeta)
 !
 !  ...conforming rectangle (LEGACY)......................................
-      case('ConfRec') ; call recta_ConfRec(No,Eta, X,Dxdeta)
+      !case('ConfRec') ; call recta_ConfRec(No,Eta, X,Dxdeta)
 !
-!  ...C^1 transfite interpolation/geometry reconstruction rectangle (GOOD LUCK!)
-      case('HermRec') ; call recta_HermRec(No,Eta, X,Dxdeta)
+!  ...C^1 transfinite interpolation/geometry reconstruction rectangle (GOOD LUCK!)
+      !case('HermRec') ; call recta_HermRec(No,Eta, X,Dxdeta)
 !
-! ...cylindrical coordinates rectangle...................................
+!  ...cylindrical coordinates rectangle..................................
       case('CylRec' ) ; call recta_CylRec( No,Eta, X,Dxdeta)
 !
       case default

@@ -36,39 +36,39 @@ c
 #include "syscom.blk"
       common /crecta_HermRec1/ iprint
 c
-      dimension Eta(2),X(3),Dxdeta(3,2)
+      real(8) :: Eta(2),X(3),Dxdeta(3,2)
 c
 c  ...vertex coordinates, first and second mixed derivatives at vertices
-      dimension xv(3,2,2),av(3,2,2),bv(3,2,2),dv(3,2,2)
+      real(8) :: xv(3,2,2),av(3,2,2),bv(3,2,2),dv(3,2,2)
 c
 c  ...dof for curves in local coordinates
-      dimension xedof(1:3,6,4)
+      real(8) :: xedof(1:3,6,4)
 c
 c  ...dof for curve normals in local coordinates
-      dimension rndof(1:3,4,4)
+      real(8) :: rndof(1:3,4,4)
 c
 c  ...dof for the curve normal tangents in local coordinates
-      dimension gdof(1:3,4)
+      real(8) :: gdof(1:3,4)
 c
 c  ...normal vector and its derivative, same for the unit normal vector
-      dimension rn(1:3),drn(1:3),en(1:3),den(1:3)
+      real(8) :: rn(1:3),drn(1:3),en(1:3),den(1:3)
 c
 c  ...dof for vector g along an edge
-      dimension gendf_dof(4),gdf_dof(4)
+      real(8) :: gendf_dof(4),gdf_dof(4)
 c
 c  ...values of edge parametrizations and their derivatives
-      dimension f(1:3),df(1:3),ddf(1:3),ef(1:3),def(1:3),
-     .          g(1:3),dg(1:3),gmod(1:3),dgmod(1:3)
+      real(8) :: f(1:3),df(1:3),ddf(1:3),ef(1:3),def(1:3),
+     .           g(1:3),dg(1:3),gmod(1:3),dgmod(1:3)
 c
 c  ...Hermite shape functions and their derivatives at a point
-      dimension vHshap1(MAXP+1), dvHshap1(MAXP+1), void(MAXP+1)
-      dimension vHshap2(MAXP+1), dvHshap2(MAXP+1)
+      real(8) :: vHshap1(MAXP+1), dvHshap1(MAXP+1), void(MAXP+1)
+      real(8) :: vHshap2(MAXP+1), dvHshap2(MAXP+1)
 c
 c  ...fifth order C^2-conforming shape functions
-      dimension vshap(MAXP+1),dvshap(MAXP+1),ddvshap(MAXP+1)
+      real(8) :: vshap(MAXP+1),dvshap(MAXP+1),ddvshap(MAXP+1)
 c
 c  ...work space
-      dimension temp(1:3)
+      real(8) :: temp(1:3)
 c
       integer, external :: imod
 ccc      imod(j,mod) = j-(j-1)/mod*mod

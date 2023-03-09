@@ -1,6 +1,6 @@
 !-----------------------------------------------------------------------
-!> Purpose : physical coordinates for a curve parametrization, and
-!!           their derivative wrt to a GIVEN coordinate
+!> @brief Physical coordinates for a curve parametrization,
+!!        and their derivative wrt to a GIVEN coordinate
 !!
 !! @param[in ] No      - curve number
 !! @param[in ] Norient - orientation of GLOBAL REFERENCE coordinate
@@ -10,7 +10,7 @@
 !! @param[out] X       - physical coordinates
 !! @param[out] Dxdt    - derivatives of physical coordinate
 !!
-!! @revision Nov 12
+!> @date Mar 2023
 !-----------------------------------------------------------------------
 !
 subroutine curve_local(No,Norient,T, X,Dxdt)
@@ -132,16 +132,16 @@ subroutine curve(No,Eta, X,Dxdeta)
       case('5Bezier','7Bezier') ; call curve_bezier(No,Eta, X=X,dXdEta=Dxdeta)
 !
 !  ...curve on reconstructed surface (NOT DEVELOPED).......................
-      case('1SurfrCur') ; call curve_1SurfrCur(No,Eta, X,Dxdeta)
+      !case('1SurfrCur') ; call curve_1SurfrCur(No,Eta, X,Dxdeta)
 !
 !  ...intersection of 2 reconstructed surfaces (NOT DEVELOPED).............
-      case('2SurfrCur') ; call curve_2SurfrCur(No,Eta, X,Dxdeta)
+      !case('2SurfrCur') ; call curve_2SurfrCur(No,Eta, X,Dxdeta)
 !
 !  ...cylinder geodesic (Cynthia's LEGACY version).........................
-      case('CylGeod')   ; call curve_CylGeod(No,Eta, X,Dxdeta)
+      !case('CylGeod')   ; call curve_CylGeod(No,Eta, X,Dxdeta)
 !
 !  ...part of spherical arc (NOT WORKING!)
-!!!   case('SegCir') ; call curve_SegCir(No,Eta, X,Dxdeta)
+      !case('SegCir') ; call curve_SegCir(No,Eta, X,Dxdeta)
 !
 !  ...image of a straight line segment through a global system of
 !     cylindrical coordinates

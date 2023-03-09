@@ -1,6 +1,6 @@
 !-----------------------------------------------------------------------
-!> Purpose : physical coordinates for a triangle parametrization, and
-!!           their derivatives wrt to a GIVEN system of coordinates
+!> @brief Physical coordinates for a triangle parametrization, and
+!!        their derivatives wrt to a GIVEN system of coordinates
 !!
 !! @param[in ] No      - triangle number
 !! @param[in ] T       - coordinates of a point in the triangle
@@ -10,7 +10,7 @@
 !! @param[out] X       - physical coordinates
 !! @param[out] Dxdt    - derivatives of physical coordinates
 !!
-!! @revision Nov 12
+!> @date Nov 2012
 !-----------------------------------------------------------------------
 !
 subroutine trian_local(No,T,Norient, X,Dxdt)
@@ -60,15 +60,15 @@ end subroutine trian_local
 !
 !
 !-----------------------------------------------------------------------
-!> Purpose : routine evaluates physical coordinates and its derivatives
-!!           wrt to reference coordinates
+!> @brief Evaluates physical coordinates and its derivatives
+!!        wrt to reference coordinates
 !!
 !! @param[in]  No     - a GMP triangle number
 !! @param[in]  Eta    - reference coordinates of a point
 !! @param[out] X      - physical coordinates of the point
 !! @param[out] Dxdeta - derivatives of the physical coordinates
 !!
-!! @revision Mar 11
+!> @date Mar 2023
 !-----------------------------------------------------------------------
 !
 subroutine trian(No,Eta, X,Dxdeta)
@@ -130,16 +130,16 @@ subroutine trian(No,Eta, X,Dxdeta)
       case('PTITri')   ; call trian_PTITri(  No,Eta, X,Dxdeta)
 !
 !  ...implicit triangle (CURRENTLY NOT WORKING!)........................
-      case('ImpliTri') ; call trian_ImpliTri(No,Eta, X,Dxdeta)
+      !case('ImpliTri') ; call trian_ImpliTri(No,Eta, X,Dxdeta)
 !
 !  ...spherical octant (LEGACY).........................................
-      case('SpherTri') ; call trian_SpherTri(No,Eta, X,Dxdeta)
+      !case('SpherTri') ; call trian_SpherTri(No,Eta, X,Dxdeta)
 !
 !  ...quarter of a circle (LEGACY)......................................
-      case('QtCirTri') ; call trian_QtCirTri(No,Eta, X,Dxdeta)
+      !case('QtCirTri') ; call trian_QtCirTri(No,Eta, X,Dxdeta)
 !
 !  ...a part of spherical octant (LEGACY)...............................
-      case('PaSphTri') ; call trian_PaSphTri(No,Eta, X,Dxdeta)
+      !case('PaSphTri') ; call trian_PaSphTri(No,Eta, X,Dxdeta)
 !
 !  ...G1 reconstructed surface triangle.................................
       case('G1RecTri') ; call trian_G1RecTri(No,Eta, X,Dxdeta)

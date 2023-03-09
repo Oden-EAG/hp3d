@@ -1,12 +1,8 @@
 bezier.F90
-curve_1SurfrCur.F
 curve_1SurfsCur.F90
-curve_2SurfrCur.F
 curve_2SurfsCur.F
 curve_3HermCur.F
 curve_3SurfsCur.F90
-curve_cBezier.F
-curve_CylGeod.F
 curve_HermCur.F
 curve_ImpCir.F
 curve_QuaCir.F
