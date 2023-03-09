@@ -2,7 +2,7 @@
 program test_random_refine
 !
    real(8) :: per
-   integer :: nitr
+   integer :: nitr,npass
 !
 !..percentage of elements to refine per iteration
    per  = 0.1
@@ -10,7 +10,16 @@ program test_random_refine
    nitr = 5
 !
    write(*,*) 'test not working at the moment (needs revision)'
-   !call random_refine_test(per,nitr)
+   goto 99
+!
+   call random_refine_test(per,nitr,npass)
+   if (npass .eq. 1) then
+      write(*,*) 'test_random_refine PASSED.'
+   else
+      write(*,*) 'test_random_refine FAILED.'
+   endif
+!
+   99 continue
 !
 end program test_random_refine
 !
@@ -18,14 +27,15 @@ end program test_random_refine
 ! !> @brief Refines mesh randomly
 ! !> @date Mar 2023
 !----------------------------------------------------------------------
-   subroutine random_refine_test(Per,Nitr)
+   subroutine test_random_refine_aux(Per,Nitr, Npass)
 !
       use data_structure3D
 !
       implicit none
 !
-      real(8), intent(in) :: Per
-      integer, intent(in) :: Nitr
+      real(8), intent(in)  :: Per
+      integer, intent(in)  :: Nitr
+      integer, intent(out) :: Npass
 !
       integer :: kref_prism(3) = (/11,10,1/)
       integer :: mdle_list(NRELES)
@@ -35,6 +45,8 @@ end program test_random_refine
       real(8) :: x
 !
       integer :: iprint = 0
+!
+      Npass = 1
 !
       do i=1,Nitr
 !
@@ -53,7 +65,7 @@ end program test_random_refine
 !
         if (iprint.eq.1) then
            write(*,7010) i, nelts, nref 
- 7010      format('random_refine_test: i=',i3,' nelts=',i6,' nref=',i6) 
+ 7010      format('test_random_refine_aux: i=',i3,' nelts=',i6,' nref=',i6)
         endif
 
         do while (nref.gt.0)
@@ -74,7 +86,7 @@ end program test_random_refine
               kref = kref_prism(mod(int(x*100),3)+1)
               call refine(mdle, kref)
             case default
-              write(*,*) 'random_refine_test : MDLE IS NOT MDLE'
+              write(*,*) 'test_random_refine_aux: MDLE type'
               stop
             end select
             nref = nref - 1
@@ -91,14 +103,11 @@ end program test_random_refine
           endif
         enddo
 !
-        if (.false.) then
-          write(*,*) 'random_refine_test : TEST FAILED'
-          stop
-        endif
+        if (.false.) Npass = 0
 !
       enddo
 !
-   end subroutine random_refine_test
+   end subroutine test_random_refine_aux
 !
 !----------------------------------------------------------------------
 !> @brief dummy routine
