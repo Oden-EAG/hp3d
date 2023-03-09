@@ -10,11 +10,11 @@ include ../m_options
 OBJ_PATH     = _obj_
 MODULE_PATH  = $(OBJ_PATH)
 
-SRC_FILE     = locate.F \
-               parameters.F \
-               random_refine.F
+SRC_FILE     = locate.F90 \
+               parameters.F90 \
+               random_refine.F90
 
-OBJ          = $(addprefix $(OBJ_PATH)/, $(SRC_FILE:.F=.o))
+OBJ          = $(addprefix $(OBJ_PATH)/, $(SRC_FILE:.F90=.o))
 
 # Tests
 TEST  = locate
@@ -32,7 +32,7 @@ FC_WORK = $(FC) $(CCDEFS) $(CCINCS) $(FFLAGS) $(EXTRA_FFLAGS)
 
 #-------------------------------------------------
 
-$(OBJ) : $(OBJ_PATH)/%.o : %.F
+$(OBJ) : $(OBJ_PATH)/%.o : %.F90
 	@echo ""
 	@echo "Compiling $<"
 	$(FC_WORK) -o $@ -c $<
