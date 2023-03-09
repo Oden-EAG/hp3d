@@ -6,11 +6,6 @@ combination.F90
 coord_cart2polar.F90
 coord_cart2spher.F90
 coord_spher2cart.F90
-export_gmp2vtk.F
-export_gmps2vtk.F
-export_mesh2stl.F
-export_surf2vtk.F
-export_vol2vtk.F
 factorial.F90
 find_GMPtriangle.F90
 find_curve_to_block.F

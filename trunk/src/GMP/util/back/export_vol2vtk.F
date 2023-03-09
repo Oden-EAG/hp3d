@@ -4,7 +4,7 @@ c   routine name       - export_vol2vtk
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Jan 11
+c   latest revision    - Mar 2023
 c
 c   purpose            - export domains to vtk format
 c
@@ -19,15 +19,19 @@ c
 c
       use error
       use GMP
-#include "syscom.blk"
+      implicit none
+c
+      character(len=64) :: Fname
+      integer :: Nrd
+      integer :: Nlist(Nrd)
 c
 c  ...vertices of surface triangle in the new enumeration
-      dimension nvert(8)
-      character(len=4),dimension(100000) :: ctype
-      character(len=64) :: Fname
-      dimension Nlist(Nrd)
+      integer :: nvert(8)
+      character(len=4) :: ctype(100000)
 c
-      nfile = 31
+      integer :: i,iflag,istat,n,ncell,ncoun,ndom,nloc,npoin,nv
+c
+      integer :: nfile = 31
 c
 c  ...open file for writing
       open(unit=nfile, file=Fname, form='formatted')
@@ -313,9 +317,12 @@ c     Iflag=1   iniside
 c     Iflag=0   outside
 c
       use GMP
-#include "syscom.blk"
+      implicit none
 c
-      dimension temp(3)
+      integer :: Nt,Iflag
+c
+      real(8) :: r,temp(3)
+      integer :: i,nv
 c
       Iflag=0 ; temp=0.d0
       do i=1,4

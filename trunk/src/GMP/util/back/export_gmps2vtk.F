@@ -4,7 +4,7 @@ c   routine name       - export_gmps2vtk
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Feb 11
+c   latest revision    - Mar 2023
 c
 c   purpose            - export GMP outer surface to vtk legacy format
 c
@@ -16,13 +16,16 @@ c
 c
       use GMP
       use error
-#include "syscom.blk"
+      implicit none
 c
-c  ...element nodes and their orientations
-      dimension nvert(3)
       character(len=64) :: Fname
 c
-      nfile = 31
+c  ...element nodes and their orientations
+      integer :: nvert(3)
+c
+      integer :: i,j,istat,lab,n,nt,nv,ntria
+c
+      integer :: nfile = 31
 c
 c  ...open file for writing
       open(unit=nfile, file=Fname, form='formatted')

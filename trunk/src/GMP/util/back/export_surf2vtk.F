@@ -4,7 +4,7 @@ c   routine name       - export_surf2vtk
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Jan 11
+c   latest revision    - Mar 2023
 c
 c   purpose            - export surface mesh to vtk format
 c
@@ -19,20 +19,24 @@ c
 c
       use error
       use GMP
-#include "syscom.blk"
+      implicit none
 c
 c  ...file name
       character(len=64) :: Fname
 c  ...list of surfaces to be exported
-      dimension Nlist(Nrs)
+      integer :: Nrs
+      integer :: Nlist(Nrs)
 c  ...vertices of surface triangle in the new enumeration
-      dimension nvert(3)
+      integer :: nvert(3)
 c  ...shift factor
-      dimension rshift(3)
+      real(8) :: rshift(3)
 c  ...triangle surface number
-      dimension nsurf(NRTRIAN)
+      integer :: nsurf(NRTRIAN)
 c
-      nfile = 31
+      integer :: i,icust,iflag,istat,j,n,nloc,ns,nv
+      real(8) :: rstret
+c
+      integer :: nfile = 31
 c
 c     customiziation flag
 c     0 - no customization
@@ -229,7 +233,7 @@ c
       close(nfile)
 c
 c
-      end subroutine
+      end subroutine export_surf2vtk
 c
 c
 c----------------------------------------------------------------------
@@ -237,7 +241,11 @@ c
       subroutine locate_trian(Nt, Iflag)
 c
       use GMP
-#include "syscom.blk"
+      implicit none
+c
+      integer :: Nt,Iflag
+      integer :: i,nv
+      real(8) :: r
 c
       Iflag=0
       do i=1,3
@@ -248,4 +256,4 @@ c
       enddo
 c
 c
-      end subroutine
+      end subroutine locate_trian

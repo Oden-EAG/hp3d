@@ -4,11 +4,9 @@ c   routine name       - export_gmp2vtk
 c
 c---------------------------------------------------------------------
 c
-c   latest revision    - Feb 2011
+c   latest revision    - Mar 2023
 c
 c   purpose            - export phantom to vtk legacy format
-c
-c   arguments :
 c
 c-----------------------------------------------------------------------
 c
