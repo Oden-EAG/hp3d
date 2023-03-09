@@ -9,7 +9,7 @@ subroutine my_paraview_driver(IParAttr)
    !use data_structure3D,   only: NRCOMS
    use environment,        only: QUIET_MODE
    use paraview,           only: PARAVIEW_DUMP_ATTR,FILE_VIS, &
-                                 VLEVEL,PARAVIEW_DUMP_GEOM
+                                 VLEVEL,PARAVIEW_DUMP_GEOM, VIS_FORMAT,SECOND_ORDER_VIS
    use mpi_param,          only: RANK,ROOT
 !
    implicit none
@@ -28,9 +28,15 @@ subroutine my_paraview_driver(IParAttr)
 !
 !..load files for visualization upscale
    if (.not. initialized) then
-      call load_vis(TETR_VIS,trim(FILE_VIS)//'/tetra_'//trim(VLEVEL),'tetr')
-      call load_vis(PRIS_VIS,trim(FILE_VIS)//'/prism_'//trim(VLEVEL),'pris')
-      call load_vis(HEXA_VIS,trim(FILE_VIS)//'/hexa_'//trim(VLEVEL),'hexa')
+      if(SECOND_ORDER_VIS .eq. 0) then
+         call load_vis(TETR_VIS,trim(FILE_VIS)//'/tetra_'//trim(VLEVEL),'tetr')
+         call load_vis(PRIS_VIS,trim(FILE_VIS)//'/prism_'//trim(VLEVEL),'pris')
+         call load_vis(HEXA_VIS,trim(FILE_VIS)//'/hexa_'//trim(VLEVEL),'hexa')
+      else
+         call load_vis(TETR_VIS,trim(FILE_VIS)//'/tetra_10','tetr')
+         call load_vis(PRIS_VIS,trim(FILE_VIS)//'/prism_18','pris')
+         call load_vis(HEXA_VIS,trim(FILE_VIS)//'/hexa_27','hexa')
+      endif
       initialized = .true.
    endif
 !
@@ -45,13 +51,14 @@ subroutine my_paraview_driver(IParAttr)
 !
 !  -- GEOMETRY --
    call paraview_geom
+
 !
 !  -- PHYSICAL ATTRIBUTES --
    if (.not. PARAVIEW_DUMP_ATTR) goto 90
 !
 !..loop over rhs's
    do iload=1,1 !NRCOMS
-!
+
 !  ...loop over physics variables
       do iphys=1,NR_PHYSA
 
@@ -66,18 +73,18 @@ subroutine my_paraview_driver(IParAttr)
 !
                select case(DTYPE(iphys))
 !
-!                 -- H1 --
+               !  -- H1 --
                   case('contin')
                      call paraview_attr_scalar(id,idx)
 !
 !                 -- H(curl) --
                   case('tangen')
                      call paraview_attr_vector(id,idx)
-!
+! !
 !                 -- H(div) --
                   case('normal')
                      call paraview_attr_vector(id,idx)
-!
+! !
 !                 -- L2 --
                   case('discon')
                      call paraview_attr_scalar(id,idx)
@@ -96,9 +103,9 @@ subroutine my_paraview_driver(IParAttr)
       enddo
 !..end loop over rhs's
    enddo
-!
+! !
   90 continue
-!
+! !
    if (RANK .eq. ROOT) then
       call paraview_end ! [CLOSES THE XMF FILE, WRITES FOOTER]
    endif

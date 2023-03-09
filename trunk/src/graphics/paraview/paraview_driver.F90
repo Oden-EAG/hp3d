@@ -119,7 +119,7 @@ end subroutine paraview_driver
 !-------------------------------------------------------------------------------------------
 subroutine paraview_begin(Id,Time)
 !
-   use paraview    , only : PARAVIEW_IO,PARAVIEW_DIR,paraview_init
+   use paraview    , only : PARAVIEW_IO,PARAVIEW_DIR,paraview_init, VIS_FORMAT
    use environment , only : PREFIX
 !
    implicit none
@@ -131,6 +131,8 @@ subroutine paraview_begin(Id,Time)
 !
 !-------------------------------------------------------------------------------------------
 !
+if(VIS_FORMAT .eq. 0) then
+
    call paraview_init
 !
 !..convert integer to string
@@ -149,10 +151,17 @@ subroutine paraview_begin(Id,Time)
    end if
 !
 !..HEADER of .xmf file
+
+
  1001 format("<Xdmf xmlns:xi='http://www.w3.org/2003/XInclude' Version='2.1'>")
  1002 format("  <Domain>")
  1003 format("    <Grid Name='Geometry' GridType='Uniform'>")
  1004 format("    <Time Value='", f14.10, "' />")
+
+else
+   write(postfix,"(I5.5)") Id
+   open(unit=PARAVIEW_IO , file=trim(PARAVIEW_DIR)//trim(PREFIX)//"_"//trim(postfix)//'.vtu')
+endif
 !
 end subroutine paraview_begin
 !
@@ -164,17 +173,28 @@ end subroutine paraview_begin
 !-------------------------------------------------------------------------------------------
 subroutine paraview_end
 !
-   use paraview , only : PARAVIEW_IO, paraview_finalize
+   use paraview , only : PARAVIEW_IO, paraview_finalize, VIS_FORMAT
 !
    implicit none
 !
 !..FOOTER of .xmf file
+   if(VIS_FORMAT .eq. 0) then
    write(PARAVIEW_IO, 1004)
    write(PARAVIEW_IO, 1005)
    write(PARAVIEW_IO, 1006)
  1004 format("    </Grid>")
  1005 format("  </Domain>")
  1006 format("</Xdmf>")
+   else
+      write(PARAVIEW_IO, 1007)
+      write(PARAVIEW_IO, 1008)
+      write(PARAVIEW_IO, 1009)
+      write(PARAVIEW_IO, 1010)
+      1007 format("</PointData>")
+      1008 format("</Piece>")
+      1009 format("</UnstructuredGrid>")
+      1010 format("</VTKFile>")
+   endif
 !
    close(PARAVIEW_IO)
 !

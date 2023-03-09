@@ -71,7 +71,7 @@ subroutine elem_proj_h_linear(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_
     integer :: pxm,pym,pzm ! max poly order in each direction
     real(8),    allocatable :: subsons_Ap(:,:,:) !projection matrix for the child of the coarse elements 
                                                !produced by anisotropic h ref
-    real(8),    allocatable :: subsons_zbload(:,:) !load vector for the projection problem for the child of the coarse element
+    real(8),    allocatable :: subsons_zbload(:,:,:) !load vector for the projection problem for the child of the coarse element
                                                     !produced by anisotropic h ref
     integer,    allocatable :: subsons_overlap(:,:)! stores the overlap of the fine grid with subsons
     integer,    allocatable :: Mdle_sons(:)
@@ -79,10 +79,10 @@ subroutine elem_proj_h_linear(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_
     integer,    allocatable :: Nextract(:)
 
 
-    real(8),    allocatable :: Awork(:,:),Bwork(:),Ap(:,:),zbload(:)
-    real(8),    allocatable :: subsons_Awork(:,:,:),subsons_Bwork(:,:)
+    real(8),    allocatable :: Awork(:,:),Bwork(:,:),Ap(:,:),zbload(:,:)
+    real(8),    allocatable :: subsons_Awork(:,:,:),subsons_Bwork(:,:,:)
     integer :: Ldglob,Ldwork,Nrhs 
-    real(8) :: proj_error_subson, proj_error
+    real(8) :: proj_error_subson, proj_error, proj_error_net_subson
     integer,dimension(50)  :: Mblock
     integer,dimension(50)  :: dof_diff
     real(8),dimension(50)  :: error_rate
@@ -109,6 +109,8 @@ subroutine elem_proj_h_linear(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_
     integer :: j,iss,is,l,k,iflag,k1,k2,iso_p,iss_max,nrdof_tmp
     integer :: Nref, local_order_check
     integer :: pxc,pyc,pzc, pxg,pyg,pzg
+    integer :: iattr,icomp,ibeg
+    integer :: var_loc !location of L2 variable in L2 solution array
     real(8) :: wa, weight,rjac,g_rate_tmp, timer_a,timer_b,timer_c
     real(8) :: var_a, var_b, var_c !multipurpose temporary variable
     integer,    allocatable :: subsons_Nextract_prev(:,:)
@@ -148,7 +150,7 @@ subroutine elem_proj_h_linear(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_
         allocate(subsons_Ap(nrdofgQ,nrdofgQ,nr_subsons))
         subsons_Ap = ZERO
 
-        allocate(subsons_zbload(nrdofgQ,nr_subsons))
+        allocate(subsons_zbload(nrdofgQ,MAXEQNQ,nr_subsons))
         subsons_zbload = ZERO
 
         ! write(*,*) "number of subsons = ",nr_subsons,kref_loc
@@ -184,15 +186,15 @@ subroutine elem_proj_h_linear(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_
 
                 subsons_overlap(1,:) = (/1,4/)
                 subsons_overlap(2,:) = (/2,3/)
-                subsons_overlap(3,:) = (/5,8/)
-                subsons_overlap(4,:) = (/6,7/) 
+                subsons_overlap(3,:) = (/6,7/)
+                subsons_overlap(4,:) = (/5,8/) 
 
             case(011)
 
                 subsons_overlap(1,:) = (/1,2/)
                 subsons_overlap(2,:) = (/3,4/)
-                subsons_overlap(3,:) = (/5,6/)
-                subsons_overlap(4,:) = (/7,8/) 
+                subsons_overlap(3,:) = (/7,8/)
+                subsons_overlap(4,:) = (/5,6/) 
             
             case(111)
                 do j = 1,nr_subsons
@@ -216,6 +218,12 @@ subroutine elem_proj_h_linear(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_
         allocate(nint_pp_store(8/nr_subsons,nr_subsons))
         allocate(shap3DQ_coarse_store(MAXbrickQQ,MAXNINT3ADD,8/nr_subsons,nr_subsons))
         allocate(shap3DQ_fine_store(MAXbrickQQ,MAXNINT3ADD,8/nr_subsons,nr_subsons))
+
+        weights_fine_store = ZERO
+        quad_point_store = ZERO
+        nint_pp_store  =ZERO
+        shap3DQ_coarse_store = ZERO
+        shap3DQ_fine_store = ZERO
 
         do iss = 1,nr_subsons
             
@@ -258,11 +266,20 @@ subroutine elem_proj_h_linear(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_
                     zvalQpp = ZERO
 
                     !modify this by adding a loop over all L2 variables for cumlative adaptation
-                    do k = 1,nrdofQ_pp
-                        q = shapQ(k)/rjac
-                        zvalQpp(1) = zvalQpp(1) + zdofQ_pp(1,k) * q
-                    enddo
+                    do iattr = 1,NR_PHYSA
 
+                        if(DTYPE(iattr) .eq. 'discon') then
+                            ibeg = ADRES(iattr)
+                            do icomp = 1, NR_COMP(iattr)
+                                var_loc = ibeg + icomp
+                                do k = 1,nrdofQ_pp
+                                    q = shapQ(k)/rjac
+                                    zvalQpp(var_loc) = zvalQpp(var_loc) + zdofQ_pp(var_loc,k) * q
+                    
+                                enddo
+                            enddo
+                        endif
+                    enddo
                     !calling the map between son's master element and coarse element master element
                     ! call fine_to_coarse_gp_map(subsons_overlap(iss,is),xi,xis,etype)
                     call fine_to_subson_gp_map(etype,kref_loc,subsons_overlap(iss,is),xi,xis)
@@ -286,13 +303,20 @@ subroutine elem_proj_h_linear(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_
                         enddo
                     enddo
 
-                    do k = 1,nrdofQ_pp
+                    do iattr = 1,NR_PHYSA
+                        if(DTYPE(iattr).eq. 'discon') then
+                            ibeg = ADRES(iattr)
+                            do icomp = 1,NR_COMP(iattr)
+                                var_loc = ibeg + icomp
 
-                        q = shapQ(k)/rjac
-                        subsons_zbload(k,iss) = subsons_zbload(k,iss) + weight * q * zvalQpp(1)
+                                do k = 1,nrdofQ_pp
 
+                                    q = shapQ(k)/rjac
+                                    subsons_zbload(k,var_loc,iss) = subsons_zbload(k,var_loc,iss) + weight * q * zvalQpp(var_loc)
+                                enddo
+                            enddo
+                        endif
                     enddo
-
 
                 enddo
 
@@ -308,7 +332,7 @@ subroutine elem_proj_h_linear(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_
         Ldglob = nrdofgQ  
 
         allocate(Ap(nrdofgQ,nrdofgQ))
-        allocate(zbload(nrdofgQ))
+        allocate(zbload(nrdofgQ,MAXEQNQ))
 
 
         proj_error = 0.d0
@@ -342,7 +366,7 @@ subroutine elem_proj_h_linear(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_
         allocate(subsons_Awork(nrdofgQ,nrdofgQ,nr_subsons))
         subsons_Awork = ZERO
 
-        allocate(subsons_Bwork(nrdofgQ,nr_subsons))
+        allocate(subsons_Bwork(nrdofgQ,MAXEQNQ,nr_subsons))
         subsons_Bwork = ZERO
         
         dof_diff = ZERO
@@ -368,14 +392,14 @@ subroutine elem_proj_h_linear(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_
                 if(Nord_old(iss) .ne. Nord_mep(iss,Nref)) then !only solve if the subson has order changed
 
                     allocate(Awork(nrdofgQ,nrdofgQ))
-                    allocate(Bwork(nrdofgQ))
+                    allocate(Bwork(nrdofgQ,MAXEQNQ))
         
                     Awork = ZERO
                     Bwork = ZERO
 
                     !copying the projection matrix
-                    Awork(1:nrdofgQ,1:nrdofgQ) = subsons_Awork(1:nrdofgQ,1:nrdofgQ,iss)
-                    Bwork(1:nrdofgQ)           = subsons_Bwork(1:nrdofgQ,iss)
+                    Awork(1:nrdofgQ,1:nrdofgQ)           = subsons_Awork(1:nrdofgQ,1:nrdofgQ,iss)
+                    Bwork(1:nrdofgQ,1:MAXEQNQ)           = subsons_Bwork(1:nrdofgQ,1:MAXEQNQ,iss)
 
         
                     Nord_org_subsons(iss) = Nord_mep(iss,Nref)
@@ -400,17 +424,18 @@ subroutine elem_proj_h_linear(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_
                     Nextract = ZERO
         
                     Ap(1:nrdofgQ,1:nrdofgQ) = subsons_Ap(1:nrdofgQ,1:nrdofgQ,iss)
-                    zbload(1:nrdofgQ) = subsons_zbload(1:nrdofgQ,iss)
+                    zbload(1:nrdofgQ,1:MAXEQNQ) = subsons_zbload(1:nrdofgQ,1:MAXEQNQ,iss)
         
                     ! call extraction_vector(Nord_org_subsons(iss),Nord_glob,nrdofmQ,nrdofgQ,Nextract)
                     call extraction_vector_new(Nord_old(iss),Nord_org_subsons(iss),Nord_glob,nrdofmQ,nrdofgQ,subsons_Nextract_prev(iss,:),Nextract)
 
                     ! call pbisolver3(mstep,Mblock,Ap,Ldglob,Awork,Ldwork,Nextract,zbload,Bwork,Nrhs)
-
-                    do l = 1,nrdofmQ
+                    do iattr = 1,NRQVAR
+                        do l = 1,nrdofmQ
         
-                        Bwork(l) = zbload(Nextract(l))/Ap(Nextract(l),Nextract(l))
+                            Bwork(l,iattr) = zbload(Nextract(l),iattr)/Ap(Nextract(l),Nextract(l))
                 
+                        enddo
                     enddo
 
                     subsons_Nextract_prev(iss,1:nrdofmQ) = Nextract(1:nrdofmQ)
@@ -419,18 +444,22 @@ subroutine elem_proj_h_linear(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_
 
                     ! call fine_to_subson_projection_error(kref_loc,Bwork(1:nrdofmQ),Nextract,subsons_overlap(iss,:), &
                                                         ! nrdofmQ,nrdofgQ,Mdle,proj_error_subson)
-                    call fine_to_subson_projection_error_new(kref_loc,Bwork(1:nrdofmQ),Nextract,subsons_overlap(iss,:),&
-                                                                nrdofmQ,nrdofgQ,Mdle,proj_error_subson,&
+                    proj_error_net_subson = 0.d0
+                    do iattr = 1,NRQVAR
+
+                        call fine_to_subson_projection_error_new(kref_loc,Bwork(1:nrdofmQ,iattr),Nextract,subsons_overlap(iss,:),&
+                                                                nrdofmQ,nrdofgQ,iattr,Mdle,proj_error_subson,&
                                                                 weights_fine_store(:,:,:,iss),quad_point_store(:,:,:,iss),nint_pp_store(:,iss),&
                                                                 shap3DQ_fine_store(:,:,:,iss),shap3DQ_coarse_store(:,:,:,iss))
-        
-                   
+                        
+                        proj_error_net_subson = proj_error_net_subson + proj_error_subson
+                    enddo
                     ! proj_error =  proj_error + proj_error_subson
 
-                    error_subsons(iss) = proj_error_subson
+                    error_subsons(iss) = proj_error_net_subson
                     
                     subsons_Awork(1:nrdofgQ,1:nrdofgQ,iss) = Awork(1:nrdofgQ,1:nrdofgQ)
-                    subsons_Bwork(1:nrdofgQ,iss) = Bwork(1:nrdofgQ)
+                    subsons_Bwork(1:nrdofgQ,1:MAXEQNQ,iss) = Bwork(1:nrdofgQ,1:MAXEQNQ)
 
                     deallocate(Awork)
                     deallocate(Bwork)
@@ -478,22 +507,23 @@ subroutine elem_proj_h_linear(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_
                     if(((pxg - pxc) .ge. 1) .and. ((pyg - pyc) .ge. 1) .and. ((pzg - pzc) .ge. 1)) then
 
                         allocate(Awork(nrdofgQ,nrdofgQ))
-                        allocate(Bwork(nrdofgQ))
+                        allocate(Bwork(nrdofgQ,MAXEQNQ))
+
                         nrdofmQ = pxc * pyc * pzc
 
                         Awork = ZERO
                         Bwork = ZERO
 
-                        Awork(1:nrdofgQ,1:nrdofgQ) = subsons_Awork(1:nrdofgQ,1:nrdofgQ,iss)
-                        Bwork(1:nrdofgQ)           = subsons_Bwork(1:nrdofgQ,iss)
+                        Awork(1:nrdofgQ,1:nrdofgQ)           = subsons_Awork(1:nrdofgQ,1:nrdofgQ,iss)
+                        Bwork(1:nrdofgQ,1:MAXEQNQ)           = subsons_Bwork(1:nrdofgQ,1:MAXEQNQ,iss)
 
                         Ap(1:nrdofgQ,1:nrdofgQ) = subsons_Ap(1:nrdofgQ,1:nrdofgQ,iss)
-                        zbload(1:nrdofgQ) = subsons_zbload(1:nrdofgQ,iss)
+                        zbload(1:nrdofgQ,1:MAXEQNQ) = subsons_zbload(1:nrdofgQ,1:MAXEQNQ,iss)
 
                         ! call poly_adap_subson(kref_loc,Mdle,nrdofgQ,nrdof_org,Nord_mep(iss,Nref),Nord_glob,subsons_overlap(iss,:),error_org, &
                         !                       Ap,zbload,Awork,Bwork,subsons_Nextract_prev(iss,1:nrdofmQ),Polyflag)
 
-                        call poly_adap_subson_new(kref_loc,Mdle,nrdofgQ,nrdof_org,Nord_mep(iss,Nref),Nord_glob,subsons_overlap(iss,:),error_org, &
+                        call poly_adap_subson_new(kref_loc,Mdle,nrdofgQ,Nord_mep(iss,Nref),Nord_glob,subsons_overlap(iss,:), error_subsons(iss), &
                                                     Ap,zbload,Awork,Bwork,subsons_Nextract_prev(iss,1:nrdofmQ),Polyflag,&
                                                     weights_fine_store(:,:,:,iss),quad_point_store(:,:,:,iss),nint_pp_store(:,iss),&
                                                     shap3DQ_fine_store(:,:,:,iss),shap3DQ_coarse_store(:,:,:,iss))
@@ -515,7 +545,7 @@ subroutine elem_proj_h_linear(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_
 
             ! g_rate_tmp = (log(error_org**2) - log(proj_error))/(log(real(nrdof_tmp,8)) - log(real(nrdof_org,8)))
             if(nrdof_tmp .ne. nrdof_org) then
-                g_rate_tmp = (error_org - proj_error)/abs(real(nrdof_tmp,8) - real(nrdof_org,8))
+                g_rate_tmp = (error_org - proj_error)/abs(real(nrdof_tmp*NRQVAR,8) - real(nrdof_org*NRQVAR,8))
                 error_rate(Nref) = g_rate_tmp         
                 ! write(*,*) " The rate is ",g_rate_tmp,Nref,Mdle,real(nrdof_tmp,8),real(nrdof_org,8),error_org,proj_error
                 ! write(*,*) Nord_old(1:nr_subsons)
@@ -604,6 +634,10 @@ subroutine elem_proj_h_linear(Mdle,flag_pref_loc,kref_loc,error_org,error_opt,g_
 
     ! endif
 
-
+    deallocate(weights_fine_store)
+    deallocate(quad_point_store)
+    deallocate(nint_pp_store)
+    deallocate(shap3DQ_coarse_store)
+    deallocate(shap3DQ_fine_store)
 
 end subroutine elem_proj_h_linear

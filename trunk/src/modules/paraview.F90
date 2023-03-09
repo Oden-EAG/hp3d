@@ -14,6 +14,8 @@ module paraview
    integer,parameter  :: PARAVIEW_IO = 22
    logical            :: PARAVIEW_DUMP_GEOM = .FALSE.
    logical            :: PARAVIEW_DUMP_ATTR = .FALSE.
+   integer,parameter  :: VIS_FORMAT = 1 !parameter for selecting xdmf or vtu
+   integer,parameter  :: SECOND_ORDER_VIS = 1 ! for second order visualization
 !
 !  this is matching EXGEOM flag in "control" module
    integer,parameter  :: PARAVIEW_ISOGEOM = 0

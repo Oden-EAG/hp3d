@@ -32,13 +32,16 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
    real(8),dimension(3,MAXbrickH) :: gradH
    character(len=4) :: etype
    integer :: iv, nV, ico, iel, mdle, nrdofH, i, j, k, l, ivis, ndom
-   integer :: nodesl(27), norder(19), nverl(8)
+   integer :: nodesl(27), norder(19), nverl(27)
    integer :: norientl(27), nedge_orient(12), nface_orient(6)
 !
    real(8) :: xi(3), x(3), xnod(3,MAXbrickH), dxdxi(3,3)
 !
 !..OpenMP parallelization: auxiliary variables
    integer, dimension(NRELES) :: n_vert_offset,n_obj_offset,n_elem_vert
+   integer, dimension((MAXP+1)**3) :: elem_connectivity
+   integer, allocatable :: offsets_connectivity(:)
+   integer, allocatable :: elem_types(:)
 !
 !..timer
    !real(8) :: start_time,end_time
@@ -70,6 +73,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
       IcP = IcP + vis_obj%NR_VERT
       ico = ico + vis_obj%NR_ELEM*(nobj_conf(etype)+1)
    enddo
+   ! write(*,*) " I am here"
 !
 !   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
 !   if (RANK .eq. ROOT) write(*,300) end_time - start_time
@@ -215,7 +219,100 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !..Step 5 : Write to file with HDF5
 !
 !   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-   if (RANK .eq. ROOT) call geometry_write(Sname,len(Sname),Sfile,len(Sfile))
+   if(VIS_FORMAT .eq. 0) then
+      if (RANK .eq. ROOT) call geometry_write(Sname,len(Sname),Sfile,len(Sfile))
+   else
+      nV = size(GEOM_PTS,dim=2)
+      write(PARAVIEW_IO,1032)
+      write(PARAVIEW_IO,1033)
+      write(PARAVIEW_IO,1034)nV,ice
+      write(PARAVIEW_IO,1035)
+      write(PARAVIEW_IO,1036)
+
+      1032 format("<VTKFile type=","""UnstructuredGrid""",">")
+      1033 format("<UnstructuredGrid>")
+      1034 format("<Piece NumberOfPoints=""",i0,""""," NumberOfCells=""",i0,""">")
+      1035 format("<Points>")
+      1036 format("<DataArray type=""","Float32"" Name=""Points"" NumberOfComponents=""3"" format=""ascii"">")
+
+      !writting ascii format data for the coordinates
+      
+      do count = 1,nV
+         write(PARAVIEW_IO,*) GEOM_PTS(1,count),GEOM_PTS(2,count),GEOM_PTS(3,count)
+         ! Encode(PARAVIEW_IO,*) GEOM_PTS(1,count),GEOM_PTS(2,count),GEOM_PTS(3,count)
+
+      enddo
+
+      write(PARAVIEW_IO,1037)
+      write(PARAVIEW_IO,1038)
+
+      1037 format("</DataArray>")
+      1038 format("</Points>")
+
+      write(PARAVIEW_IO,1039)
+      write(PARAVIEW_IO,1040)
+
+      1039 format("<Cells>")
+      1040 format("<DataArray type=""","Int64"" IdType=""1""  Name=""connectivity"" format=""ascii"">")
+
+      k = 0
+      l = 0
+      elem_connectivity = ZERO
+      allocate(offsets_connectivity(IcE))
+      allocate(elem_types(IcE))
+      offsets_connectivity = ZERO
+      elem_types = ZERO
+      do count  = 1,IcE
+
+         k = k + 1
+         l = GEOM_OBJ(k)
+         elem_types(count) = l
+         j = nobj_conf_reverse(l)
+
+         do iv = 1,j
+            elem_connectivity(iv) = GEOM_OBJ(k+iv) 
+         enddo
+         write(PARAVIEW_IO,*) elem_connectivity(1:j)
+
+         k = k + j
+         if(count .eq. 1) then
+          offsets_connectivity(count) = k - 1
+         else
+           offsets_connectivity(count) = k - count
+         endif
+      enddo
+
+      write(PARAVIEW_IO,1041)
+      write(PARAVIEW_IO,1042)
+      
+
+      1041 format("</DataArray>")
+      1042 format("<DataArray type=""","Int64"" IdType=""1""  Name=""offsets"" format=""ascii"">")
+      
+      write(PARAVIEW_IO,*) offsets_connectivity
+
+      write(PARAVIEW_IO,1043)
+      write(PARAVIEW_IO,1044)
+
+      1043 format("</DataArray>")
+      1044 format("<DataArray type=""","UInt8"" Name=""types"" format=""ascii"">")
+
+      write(PARAVIEW_IO,*) elem_types
+
+      write(PARAVIEW_IO,1045)
+      write(PARAVIEW_IO,1046)
+      ! write(PARAVIEW_IO,1047)
+      ! write(PARAVIEW_IO,1048)
+      ! write(PARAVIEW_IO,1049)
+
+      1045 format("</DataArray>")
+      1046 format("</Cells>")
+      write(PARAVIEW_IO,*) "<PointData Scalars=""","scalars"">"
+
+      deallocate(offsets_connectivity)
+      deallocate(elem_types)
+      ! close(PARAVIEW_IO)
+   endif
 !   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
 !   if (RANK .eq. ROOT) write(*,300) end_time - start_time
 !

@@ -420,25 +420,11 @@ call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    count = nr_elem_ref * 10
    call MPI_ALLREDUCE(MPI_IN_PLACE,Ref_indicator_flags,count,MPI_INTEGER,MPI_SUM,MPI_COMM_WORLD,ierr)
 
-   write(*,*) "RANK = ",RANK," time for h and p projection = ",net_time_b,net_time_a
+   ! write(*,*) "RANK = ",RANK," time for h and p projection = ",net_time_b,net_time_a
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
    ! if(RANK .eq. ROOT) write(*,*) " time for h and p projection = ", end_time-start_time,net_time_a,net_time_b
    grate_mesh = maxval(Nref_grate)
 
-   if(istep .eq. 200) then
-
-      if(RANK .eq. ROOT) then
-
-          open(1,file="time_projection",status='replace')
-         ! write(4,*) nr_elem_ref
-         do iel = 1,nr_elem_ref
-            write(1,*) timer_save(iel,:)
-         enddo
-         close(1)
-
-      endif
-
-   endif
    !---------------------------------------------------------------------
    if (RANK .eq. ROOT) write(*,*) "The guranteed rate = ",grate_mesh
    !---------------------------------------------------------------------------------------------
@@ -485,13 +471,14 @@ call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
       
          call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
          !sets up p-refined flags for just p-refined elements
-         allocate(write_pref(nr_elem_ref,2))
-         write_pref = ZERO
+         ! allocate(write_pref(nr_elem_ref,2))
+         ! write_pref = ZERO
+
          do iel = 1,nr_elem_ref
 
             mdle = mdle_ref(iel)
             etype = NODES(mdle)%type
-            nord = NODES(mdle)%order
+            ! nord = NODES(mdle)%order
             select case(etype)
 
             case('mdlb')
@@ -536,10 +523,10 @@ call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 
          ! putting h-refinement flags
+         ! call MPI_BARRIER (MPI_COMM_WORLD, ierr)
          if (RANK .eq. ROOT)  write(*,*) 'Starting to put  h-refined flags'
-         call MPI_BARRIER (MPI_COMM_WORLD, ierr)
-         allocate(write_kref(nr_elem_ref,2))
-         write_kref = ZERO
+         ! allocate(write_kref(nr_elem_ref,2))
+         ! write_kref = ZERO
 
             do iel = 1,nr_elem_ref
 
@@ -556,8 +543,8 @@ call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
                         kref = Ref_indicator_flags((iel-1)*10 + 2)
                         if(RANK .eq. ROOT) write(*,*) "href = ",mdle,kref,NODES(mdle)%ref_kind
                         call refine(mdle,kref)
-                        write_kref(iel,1) = mdle
-                        write_kref(iel,2) = kref
+                        ! write_kref(iel,1) = mdle
+                        ! write_kref(iel,2) = kref
 
                      endif
                   endif
@@ -574,7 +561,7 @@ call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
          call close_mesh
-         call enforce_min_rule
+         ! call enforce_min_rule
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
          call par_verify
          call update_gdof
@@ -588,7 +575,7 @@ call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
          ! enddo
          ! close(3)
 
-         if (RANK .eq. ROOT)  write(*,*) 'end to redfinement'
+         if (RANK .eq. ROOT)  write(*,*) 'putting p-flags to the h-refined childs'
 
       
          ! !putting p-ref flags to the h-refined subchilds
@@ -634,6 +621,8 @@ call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 
                         allocate(pref_intent(nr_sons_intent))
                         allocate(pref_close(nr_sons_close))
+                        pref_intent = ZERO
+                        pref_close  = ZERO
                         ! write(*,*) nr_sons_intent, Ref_indicator_flags((iel-1)*10+3:(iel-1)*10+3+nr_sons_intent-1)
                         pref_intent(1:nr_sons_intent) = Ref_indicator_flags((iel-1)*10+3:(iel-1)*10+3+nr_sons_intent-1)
                      
@@ -672,7 +661,7 @@ call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
          call par_verify
          call update_gdof
          call update_Ddof
-
+         if (RANK .eq. ROOT)  write(*,*) 'end to redfinement'
          ! some printing of fnal flags for refined elements
          if (RANK .eq. ROOT) then
             do iel = 1,nr_elem_ref

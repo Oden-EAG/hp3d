@@ -25,6 +25,7 @@ subroutine project_p_linear(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
     use data_structure3D
     use element_data
     use parametersDPG
+    use physics
     use mpi_param, only: RANK
  !
     implicit none
@@ -37,13 +38,13 @@ subroutine project_p_linear(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
 
 
     real(8), allocatable    :: Ap(:)
-    real(8), allocatable    :: zbload(:)
+    real(8), allocatable    :: zbload(:,:)
     integer, allocatable    :: Mdle_sons(:)
     ! real(8), dimension(MAXbrickQQ*(MAXbrickQQ+1)/2) :: Ap_copy
 
     
 !..to store the coefficients of the basis functions of interpolant on original element after projection from fine to coarse element.
-    real(8) :: zdofQ(MAXbrickQQ)
+    real(8) :: zdofQ(MAXEQNQ,MAXbrickQQ)
 !..to store extracted coefficeints from 
     real(8) :: zdofQ_pp(MAXEQNQ,MAXbrickQQ), zdofH_pp(MAXEQNH,MAXbrickHH),zdofE_pp(MAXEQNE,MAXbrickEE), &
                zdofV_pp(MAXEQNV,MAXbrickVV)
@@ -89,7 +90,7 @@ subroutine project_p_linear(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
     integer :: Nord_org,Nord_glob,Nord_prev !ndof corresponding to nrdofmQ and nrdofgQ respectively
     integer,dimension(50)  :: Mblock
     integer :: mstep
-    real(8), allocatable    :: Awork(:,:), Bwork(:), A_prev(:,:),B_prev(:)
+    real(8), allocatable    :: Awork(:,:), Bwork(:,:)
     real(8), allocatable    :: proj_error_lvl(:) 
     real(8), allocatable    :: proj_coeff(:,:)
     integer, allocatable    :: Nextract(:),Nord_lvl(:)
@@ -98,17 +99,18 @@ subroutine project_p_linear(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
     integer :: Ldglob,Ldwork,Nrhs
     real ::  check 
 !.. variables needed for polynomial anisotropy computations
-    real(8) :: coeff_sum(3)
+    real(8) :: coeff_sum(3),coeff_sum_net(3)
     real(8) :: coeff_max
     real(8) :: error_rate_aniso(3)
     integer :: poly_order_added(3)
     integer :: poly_flag_store(3)
     integer :: max_loc(1)
 !..auxiliary variables
-    real(8) :: wa,weight,rjac,bjac,fval,proj_error, proj_error_base
+    real(8) :: wa,weight,rjac,bjac,fval,proj_error, proj_error_base,proj_error_net
     real(8) :: ordselect,error_tmp,error_tmp_prev
-    integer :: k1,k2,l,iflag,k,is,mdle_fine,j,order_add,Nord_mod, first_son,nrdofmQ_base,nrdof_org    
-    integer :: idec
+    integer :: k1,k2,l,iflag,k,is,mdle_fine,j,order_add,Nord_mod, first_son,nrdofmQ_base,nrdof_org 
+    integer :: idec,iattr,icomp,ibeg
+    integer :: var_loc !location of L2 variable in L2 solution array
     integer :: nr_mdle_sons ! number of sons of a refined element
     real(8) :: q1,q2 !shape functions values at gauss points
     real(8) :: q !shape functions while computing load vector
@@ -126,7 +128,8 @@ subroutine project_p_linear(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
     call celndof(etype,norder, nrdofH,nrdofE,nrdofV,nrdofQ)
 
     allocate(Ap(nrdofQ))
-    allocate(zbload(nrdofQ))
+    allocate(zbload(nrdofQ,MAXEQNQ))
+
 
     if(etype .eq. 'mdlb') then
         nr_mdle_sons = 8
@@ -149,6 +152,12 @@ subroutine project_p_linear(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
     allocate(nint_pp_store(nr_mdle_sons))
     allocate(shap3DQ_fine_store(MAXbrickQQ,MAXNINT3ADD,nr_mdle_sons))
     allocate(shap3DQ_coarse_store(MAXbrickQQ,MAXNINT3ADD,nr_mdle_sons))
+
+    weights_fine_store = ZERO
+    quad_point_store = ZERO
+    nint_pp_store  =ZERO
+    shap3DQ_coarse_store = ZERO
+    shap3DQ_fine_store = ZERO
 
     timer_e = MPI_Wtime()
 
@@ -195,9 +204,18 @@ subroutine project_p_linear(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
             zvalQpp = ZERO
 
             !modify this by adding a loop over all L2 variables for cumlative adaptation
-            do k = 1,nrdofQ_pp
-                q = shapQ(k)/rjac
-                zvalQpp(1) = zvalQpp(1) + zdofQ_pp(1,k) * q
+
+            do iattr = 1,NR_PHYSA
+                if(DTYPE(iattr) .eq. 'discon') then
+                    ibeg = ADRES(iattr)
+                    do icomp = 1, NR_COMP(iattr)
+                        var_loc = ibeg + icomp
+                        do k = 1,nrdofQ_pp
+                            q = shapQ(k)/rjac
+                            zvalQpp(var_loc) = zvalQpp(var_loc) + zdofQ_pp(var_loc,k) * q
+                        enddo
+                    enddo
+                endif
             enddo
 
             !calling the map between son's master element and coarse element master element
@@ -220,10 +238,21 @@ subroutine project_p_linear(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
             enddo
 
             !computing the load vector contributions for each son
-            do k = 1,nrdofQ_pp
-                q = shapQ(k)/rjac
-                zbload(k) = zbload(k) + weight *  q * zvalQpp(1)
+            do iattr = 1,NR_PHYSA
+                if(DTYPE(iattr) .eq. 'discon') then
+                    ibeg = ADRES(iattr)
+                    do icomp = 1,NR_COMP(iattr)
+                        var_loc = ibeg + icomp
+                        
+                        do k = 1,nrdofQ_pp
+                            q = shapQ(k)/rjac
+                            zbload(k,var_loc) = zbload(k,var_loc) + weight *  q * zvalQpp(var_loc)
+                        enddo
+                        
+                    enddo
+                endif
             enddo
+            
 
         enddo
 
@@ -235,7 +264,7 @@ subroutine project_p_linear(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
     net_time_a = 0.d0
     net_time_b = 0.d0
     net_time_c = 0.d0
-    
+
     Nord_glob = norder_pp(19)
     call ddecode(Nord_glob,px,py,pz)
 
@@ -245,7 +274,7 @@ subroutine project_p_linear(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
 
 
     allocate(Nextract_prev(nrdofgQ))
-    allocate(Bwork(nrdofgQ))
+    allocate(Bwork(nrdofgQ,MAXEQNQ))
     Bwork = ZERO
     Nrhs = 1
 
@@ -275,22 +304,32 @@ subroutine project_p_linear(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
     
     timer_b = MPI_Wtime()
     !diagonal solve due to L2 orthogonality of basis functions on linear elements
-    do l = 1,nrdofmQ
-        
-        Bwork(l) = zbload(Nextract(l))/Ap(Nextract(l))
+    do iattr = 1,NRQVAR
+        do l = 1,nrdofmQ
+            
+            Bwork(l,iattr) = zbload(Nextract(l),iattr)/Ap(Nextract(l))
 
+        enddo
+    
     enddo
- 
 
     
     Nextract_prev(1:nrdofmQ) = Nextract(1:nrdofmQ)
 
     timer_c = MPI_Wtime()
     ! call fine_to_coarse_projection_error(nr_mdle_sons,Bwork(1:nrdofmQ),Nextract,nrdofmQ,nrdofgQ,Mdle,Mdle_sons,proj_error)
-    call fine_to_coarse_projection_error_new(nr_mdle_sons,Bwork(1:nrdofmQ),Nextract,nrdofmQ, &
-                                                nrdofgQ,Mdle,Mdle_sons,proj_error,&
+    
+    proj_error_net = 0.d0
+    do iattr = 1,NRQVAR
+        
+        call fine_to_coarse_projection_error_new(nr_mdle_sons,Bwork(1:nrdofmQ,iattr),Nextract,nrdofmQ, &
+                                                nrdofgQ,Mdle,iattr,Mdle_sons,proj_error,&
                                                 weights_fine_store,quad_point_store,nint_pp_store,&
                                                 shap3DQ_fine_store,shap3DQ_coarse_store)
+       
+        proj_error_net = proj_error_net + proj_error
+
+    enddo
 
     timer_d = MPI_Wtime()
     ! write(*,*) "time is  = ", timer_b - timer_a, timer_c - timer_b,timer_d - timer_c
@@ -300,13 +339,21 @@ subroutine project_p_linear(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
 
 
     deallocate(Nextract)
-    Error_org = proj_error
+    Error_org = proj_error_net
     ! storing the coefficients of polynomial along x,y, and z
 
-    coeff_sum = ZERO
-    call coeff_polynomial_aniso(Nord_org,Nextract_prev(1:nrdofmQ),etype,Bwork(1:nrdofmQ),coeff_sum)
-    
-    
+
+    coeff_sum_net = ZERO
+
+    do iattr = 1,NRQVAR
+
+        coeff_sum = ZERO
+
+        call coeff_polynomial_aniso(Nord_org,Nextract_prev(1:nrdofmQ),etype,Bwork(1:nrdofmQ,iattr),coeff_sum)
+
+        coeff_sum_net(1:3) = coeff_sum_net(1:3) + coeff_sum(1:3)
+    enddo
+
     !Anisotropic polynomial order increase for linear element
 
     if(etype .eq. 'mdlb') then
@@ -325,8 +372,8 @@ subroutine project_p_linear(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
             do k = 1,3
 
                 do k1 = 1,3
-                    if((coeff_max .le. coeff_sum(k1)) .and. (poly_order_added(k1) .eq. 0)) then
-                        coeff_max = coeff_sum(k1)
+                    if((coeff_max .le. coeff_sum_net(k1)) .and. (poly_order_added(k1) .eq. 0)) then
+                        coeff_max = coeff_sum_net(k1)
                         k2 = k1
                     endif
                 enddo
@@ -347,18 +394,29 @@ subroutine project_p_linear(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
 
                 !diagonal solve
                 timer_b = MPI_Wtime()
-                do l = 1,nrdofmQ
-        
-                    Bwork(l) = zbload(Nextract(l))/Ap(Nextract(l))
+
+                do iattr = 1,NRQVAR
+                    do l = 1,nrdofmQ
+                        
+                        Bwork(l,iattr) = zbload(Nextract(l),iattr)/Ap(Nextract(l))
             
+                    enddo
+                
                 enddo
                 timer_c = MPI_Wtime()
 
                 ! call fine_to_coarse_projection_error(nr_mdle_sons,Bwork(1:nrdofmQ),Nextract,nrdofmQ,nrdofgQ,Mdle,Mdle_sons,proj_error)
-                call fine_to_coarse_projection_error_new(nr_mdle_sons,Bwork(1:nrdofmQ),Nextract,nrdofmQ, &
-                                                            nrdofgQ,Mdle,Mdle_sons,proj_error,&
+                proj_error_net = 0.d0
+                do iattr = 1,NRQVAR
+                    
+                    call fine_to_coarse_projection_error_new(nr_mdle_sons,Bwork(1:nrdofmQ,iattr),Nextract,nrdofmQ, &
+                                                            nrdofgQ,Mdle,iattr,Mdle_sons,proj_error,&
                                                             weights_fine_store,quad_point_store,nint_pp_store,&
                                                             shap3DQ_fine_store,shap3DQ_coarse_store)
+                   
+                    proj_error_net = proj_error_net + proj_error
+            
+                enddo
 
                 timer_d = MPI_Wtime()
 
@@ -371,14 +429,25 @@ subroutine project_p_linear(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
 
                 deallocate(Nextract)
 
-                error_rate_aniso(k) = (Error_org - proj_error)/abs(real(nrdofmQ,8) - real(nrdof_org,8))
+                error_rate_aniso(k) = (Error_org - proj_error_net)/abs(real(NRQVAR * nrdofmQ,8) - real(NRQVAR * nrdof_org,8))
 
                 poly_flag_store(k) = Nord_mod
 
                 mstep = mstep + 1
 
-                coeff_sum = ZERO
-                call coeff_polynomial_aniso(Nord_mod,Nextract_prev(1:nrdofmQ),etype,Bwork,coeff_sum)
+
+                coeff_sum_net = ZERO
+                do iattr = 1,NRQVAR
+            
+                    coeff_sum = ZERO
+            
+                    call coeff_polynomial_aniso(Nord_org,Nextract_prev(1:nrdofmQ),etype,Bwork(1:nrdofmQ,iattr),coeff_sum)
+            
+                    coeff_sum_net(1:3) = coeff_sum_net(1:3) + coeff_sum(1:3)
+                enddo
+
+
+
                 coeff_max = ZERO
 
             enddo    

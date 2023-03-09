@@ -349,7 +349,7 @@ end subroutine fine_to_subson_projection_error
 
 !-----------------------------new_error_comp_function_---------------
 
-subroutine fine_to_coarse_projection_error_new(nr_mdle_sons,coeff,Nextract,nrdofmQ,nrdofgQ,Mdle,&
+subroutine fine_to_coarse_projection_error_new(nr_mdle_sons,coeff,Nextract,nrdofmQ,nrdofgQ,Mdle,iattr,&
                                                 Mdle_sons,proj_error,&
                                                 weights_fine_store,quad_point_store,nint_pp_store,&
                                                 shap3DQ_fine_store,shap3DQ_coarse_store)
@@ -365,6 +365,7 @@ subroutine fine_to_coarse_projection_error_new(nr_mdle_sons,coeff,Nextract,nrdof
     integer,    intent(in)  :: nrdofgQ
     integer,    intent(in)  :: nr_mdle_sons
     integer,    intent(in)  :: Mdle
+    integer,    intent(in)  ::  iattr
     integer, dimension(nr_mdle_sons),       intent(in) :: Mdle_sons
     real(8), dimension(nrdofmQ), intent(in) :: coeff
     integer, dimension(nrdofmQ), intent(in) :: Nextract
@@ -469,7 +470,7 @@ subroutine fine_to_coarse_projection_error_new(nr_mdle_sons,coeff,Nextract,nrdof
 
             do k = 1,nrdofQ_pp
                 q = shapQ(k)/rjac
-                zvalQpp(1) = zvalQpp(1) + zdofQ_pp(1,k) * q
+                zvalQpp(iattr) = zvalQpp(iattr) + zdofQ_pp(iattr,k) * q
             enddo
 
                         !calling the map between son's master element and coarse element master element
@@ -486,10 +487,10 @@ subroutine fine_to_coarse_projection_error_new(nr_mdle_sons,coeff,Nextract,nrdof
             zvalQ = ZERO
             do k = 1,nrdofmQ
                 q = shapQ(Nextract(k))/rjac
-                zvalQ(1) = zvalQ(1) + coeff(k) * q
+                zvalQ(iattr) = zvalQ(iattr) + coeff(k) * q
             enddo
 
-            proj_error = proj_error + weight * (zvalQ(1) - zvalQpp(1))**2
+            proj_error = proj_error + weight * (zvalQ(iattr) - zvalQpp(iattr))**2
 
         enddo
 
@@ -504,7 +505,7 @@ end subroutine fine_to_coarse_projection_error_new
 
 
 
-subroutine fine_to_subson_projection_error_new(kref,coeff,Nextract,overlap,nrdofmQ,nrdofgQ, &
+subroutine fine_to_subson_projection_error_new(kref,coeff,Nextract,overlap,nrdofmQ,nrdofgQ,iattr, &
                                                 Mdle,proj_error,&
                                                 weights_fine_store,quad_point_store,nint_pp_store,&
                                                 shap3DQ_fine_store,shap3DQ_coarse_store)
@@ -518,6 +519,7 @@ implicit none
 integer,    intent(in)  ::  kref
 integer,    intent(in)  ::  nrdofmQ
 integer,    intent(in)  ::  nrdofgQ
+integer,    intent(in)  ::  iattr
 real(8), dimension(nrdofmQ), intent(in) :: coeff
 integer, dimension(nrdofmQ), intent(in) :: Nextract
 
@@ -633,7 +635,7 @@ if(etype_coarse .eq. 'mdlb') then
 
             do k = 1,nrdofQ_pp
                 q = shapQ(k)/rjac
-                zvalQpp(1) = zvalQpp(1) + zdofQ_pp(1,k) * q
+                zvalQpp(iattr) = zvalQpp(iattr) + zdofQ_pp(iattr,k) * q
             enddo
 
             ! call fine_to_subson_gp_map(etype_coarse,kref,overlap(is),xi,xis)
@@ -652,10 +654,10 @@ if(etype_coarse .eq. 'mdlb') then
             zvalQ = ZERO
             do k = 1,nrdofmQ
                 q = shapQ(Nextract(k))/rjac
-                zvalQ(1) = zvalQ(1) + coeff(k) * q
+                zvalQ(iattr) = zvalQ(iattr) + coeff(k) * q
             enddo
 
-            proj_error = proj_error + weight * (zvalQ(1) - zvalQpp(1))**2
+            proj_error = proj_error + weight * (zvalQ(iattr) - zvalQpp(iattr))**2
             ! proj_error = proj_error + weight * (1.d0)**2
             ! check = check + weight * (1.d0)**2
 

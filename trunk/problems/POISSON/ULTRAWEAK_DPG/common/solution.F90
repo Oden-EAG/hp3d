@@ -327,7 +327,7 @@ subroutine solution(X, u,gradu,gradgradu)
 
       case(4)
 
-         eps = 7.5d-3
+         eps = 5.0d-3
          u = x1 + (exp(x1/eps) - 1.d0)/(1.d0 - exp(1.d0/eps))
 
          gradu = ZERO
@@ -341,7 +341,7 @@ subroutine solution(X, u,gradu,gradgradu)
 
       case(5)
 
-         eps = 5.0d-3
+         eps = 5.d-3
          u1 = x1 + (exp(x1/eps) - 1.d0)/(1.d0 - exp(1.d0/eps))
          u2 = x2 + (exp(x2/eps) - 1.d0)/(1.d0 - exp(1.d0/eps))
          u3 = x3 + (exp(x3/eps) - 1.d0)/(1.d0 - exp(1.d0/eps))

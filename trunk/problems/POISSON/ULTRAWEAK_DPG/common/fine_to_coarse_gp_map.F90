@@ -1,17 +1,17 @@
 
 !-----------------------------------------------------------------------
-! routine name - fine_to_coarse_gp_map
+!> routine name - fine_to_coarse_gp_map
 !---------------------------------------------------------------------
 
-! last revision: 7 Dec 2022
+!> last revision: 7 Dec 2022
 
-! arguments:
+!> arguments:
 
-!in :
-!   iel: index of the son
-!   xi: gauss point correspoding to the son
-!   xis: gauss point corresponding to the coarse element.
-!   etype: element type
+!>in :
+!>   iel: index of the son
+!>   xi: gauss point correspoding to the son
+!>   xis: gauss point corresponding to the coarse element.
+!>   etype: element type
 
 !-----------------------------------------------------------------------------
 
@@ -216,7 +216,22 @@ subroutine singlefineson_to_subson_gp_map(ofx,ofy,ofz,fx,fy,fz,xi,xis)
 
 end subroutine singlefineson_to_subson_gp_map
 
+!---------------------------------------------------------------------------------------------------------------
+!>  routine name : subson_one_irregularity_map
+!>  purpose: interpolates polynomial order for the children elements if the ref applied is different
+!>           from the one intented (Generally happens due to 1-irregularity enforcement).
+!>  @param[in] etype : Type of the element
+!>  @param[in] kref_intent  : Intented refinement obtained through projections
+!>  @param[in] kref_appl    : the refinement applied by the code while preserving 1-irreguarity
+!>  @param[in] nr_sons_intent   : number of sons for the intented refinement
+!>  @param[in] nr_sons_appl : number of sons produced due to applied refinement
+!>  @param[in] pref_intent  : p-ref that is compatible with kref_intent
+!>  @param[in] pref_appl    : p-ref that should be applied for the applied h-refinement
 
+!!
+!> @date Feb 2023
+!---------------------------------------------------------------------------------------------------------------
+!
 subroutine subson_one_irregularity_map(etype,kref_intent,kref_appl,nr_sons_intent,pref_intent,nr_sons_appl,pref_appl)
 
 
@@ -308,9 +323,9 @@ subroutine subson_one_irregularity_map(etype,kref_intent,kref_appl,nr_sons_inten
                                 el_pmap(i) = pref_intent(1)
                             case(2,3)
                                 el_pmap(i) = pref_intent(2)
-                            case(5,8)
-                                el_pmap(i) = pref_intent(3)
                             case(6,7)
+                                el_pmap(i) = pref_intent(3)
+                            case(5,8)
                                 el_pmap(i) = pref_intent(4)
 
                         end select
@@ -328,9 +343,9 @@ subroutine subson_one_irregularity_map(etype,kref_intent,kref_appl,nr_sons_inten
                                 el_pmap(i) = pref_intent(1)
                             case(3,4)
                                 el_pmap(i) = pref_intent(2)
-                            case(5,6)
-                                el_pmap(i) = pref_intent(3)
                             case(7,8)
+                                el_pmap(i) = pref_intent(3)
+                            case(5,6)
                                 el_pmap(i) = pref_intent(4)
 
                         end select
@@ -382,16 +397,16 @@ subroutine subson_one_irregularity_map(etype,kref_intent,kref_appl,nr_sons_inten
 
                     pref_appl(1) = (el_pmap(1) + el_pmap(4))/2
                     pref_appl(2) = (el_pmap(2) + el_pmap(3))/2
-                    pref_appl(3) = (el_pmap(5) + el_pmap(8))/2
-                    pref_appl(4) = (el_pmap(6) + el_pmap(7))/2
+                    pref_appl(3) = (el_pmap(6) + el_pmap(7))/2
+                    pref_appl(4) = (el_pmap(5) + el_pmap(8))/2
 
                 case(011)
 
 
                     pref_appl(1) = (el_pmap(1) + el_pmap(2))/2
                     pref_appl(2) = (el_pmap(3) + el_pmap(4))/2
-                    pref_appl(3) = (el_pmap(5) + el_pmap(6))/2
-                    pref_appl(4) = (el_pmap(7) + el_pmap(8))/2
+                    pref_appl(3) = (el_pmap(7) + el_pmap(8))/2
+                    pref_appl(4) = (el_pmap(5) + el_pmap(6))/2
 
 
                 case(111)

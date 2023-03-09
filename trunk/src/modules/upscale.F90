@@ -11,6 +11,7 @@
 !----------------------------------------------------------------------
 module upscale
 
+  use paraview,     only : VIS_FORMAT, SECOND_ORDER_VIS
   save
 !
 ! define generic type for a visualization object
@@ -33,27 +34,63 @@ module upscale
 !
 contains
 !
-! return cell type (XDMF 2) for vis object
+! return cell type (XDMF 2 or vtu depending upon VIS_FORMAT) for vis object
   integer function ivis_type(Type)
     character(len=4) :: Type
-    select case(Type)
-    case('tetr','mdln'); ivis_type = 6
-    case('pris','mdlp'); ivis_type = 8
-    case('hexa','mdlb'); ivis_type = 9
-    end select
+    if(VIS_FORMAT .eq. 0) then
+      if(SECOND_ORDER_VIS .eq. 0) then
+        select case(Type)
+          case('tetr','mdln'); ivis_type = 6
+          case('pris','mdlp'); ivis_type = 8
+          case('hexa','mdlb'); ivis_type = 9
+        end select
+      else
+        select case(Type)
+          case('tetr','mdln'); ivis_type = 38
+          case('pris','mdlp'); ivis_type = 41
+          case('hexa','mdlb'); ivis_type = 50
+        end select
+      endif
+    else  
+      if(SECOND_ORDER_VIS .eq. 0) then
+          select case(Type)
+            case('tetr','mdln'); ivis_type = 10
+            case('pris','mdlp'); ivis_type = 13
+            case('hexa','mdlb'); ivis_type = 12
+          end select
+      else
+        select case(Type)
+          case('tetr','mdln'); ivis_type = 24
+          case('pris','mdlp'); ivis_type = 32
+          case('hexa','mdlb'); ivis_type = 29
+        end select
+      endif
+    endif
+
   end function ivis_type
 !
 ! return num points to describe vis object
   integer function nobj_conf(Type)
      character(len=4) :: Type
-     select case(Type)
-        case('tetr','mdln'); nobj_conf = 4
-        case('pris','mdlp'); nobj_conf = 6
-        case('hexa','mdlb'); nobj_conf = 8
-        case default
-           write(*,*) 'nobj_conf: unexpected type. stop.'
-           stop
-     end select
+     if(SECOND_ORDER_VIS .eq. 0) then
+      select case(Type)
+            case('tetr','mdln'); nobj_conf = 4
+            case('pris','mdlp'); nobj_conf = 6
+            case('hexa','mdlb'); nobj_conf = 8
+            case default
+              write(*,*) 'nobj_conf: unexpected type. stop.'
+              stop
+      end select
+    else
+        select case(Type)
+          case('tetr','mdln'); nobj_conf = 10
+          case('pris','mdlp'); nobj_conf = 18
+          case('hexa','mdlb'); nobj_conf = 27
+          case default
+            write(*,*) 'nobj_conf: unexpected type. stop.'
+            stop
+        end select
+    endif
   end function nobj_conf
 !
 ! return preloaded vis element configuration
@@ -107,28 +144,40 @@ contains
     end do
 
     read(nin,*) V%NR_ELEM
-    allocate(V%ELEM(1:V%NR_ELEM, 0:8), STAT=istat)
-    V%ELEM = 0
-    ierr = ierr + istat
 
-    do i=1,V%NR_ELEM
-       select case (Type)
-       case('tetr','mdln')
-          read(nin,*) &
-               V%ELEM(i,0), &
-               V%ELEM(i,1), V%ELEM(i,2), V%ELEM(i,3), V%ELEM(i,4)
-       case('pris','mdlp')
-          read(nin,*) &
-               V%ELEM(i,0), &
-               V%ELEM(i,1), V%ELEM(i,2), V%ELEM(i,3),&
-               V%ELEM(i,4), V%ELEM(i,5), V%ELEM(i,6)
-       case('hexa','mdlb')
-          read(nin,*) &
-               V%ELEM(i,0), &
-               V%ELEM(i,1), V%ELEM(i,2), V%ELEM(i,3), V%ELEM(i,4), &
-               V%ELEM(i,5), V%ELEM(i,6), V%ELEM(i,7), V%ELEM(i,8)
-       end select
-    end do
+
+    if(SECOND_ORDER_VIS .eq. 0) then
+
+      allocate(V%ELEM(1:V%NR_ELEM, 0:8), STAT=istat)
+      V%ELEM = 0
+      ierr = ierr + istat
+      do i=1,V%NR_ELEM
+        select case (Type)
+        case('tetr','mdln')
+            read(nin,*) &
+                V%ELEM(i,0), &
+                V%ELEM(i,1), V%ELEM(i,2), V%ELEM(i,3), V%ELEM(i,4)
+        case('pris','mdlp')
+            read(nin,*) &
+                V%ELEM(i,0), &
+                V%ELEM(i,1), V%ELEM(i,2), V%ELEM(i,3),&
+                V%ELEM(i,4), V%ELEM(i,5), V%ELEM(i,6)
+        case('hexa','mdlb')
+            read(nin,*) &
+                V%ELEM(i,0), &
+                V%ELEM(i,1), V%ELEM(i,2), V%ELEM(i,3), V%ELEM(i,4), &
+                V%ELEM(i,5), V%ELEM(i,6), V%ELEM(i,7), V%ELEM(i,8)
+        end select
+      end do
+    else
+      allocate(V%ELEM(1:V%NR_ELEM, 0:27), STAT=istat)
+      V%ELEM = 0
+      ierr = ierr + istat
+      read(nin,*) V%ELEM(1,0)
+      do i=1,V%NR_VERT
+         read(nin,*) V%ELEM(1,i)
+      enddo
+    endif
 
     close(nin)
     ierr = ierr + istat
@@ -151,8 +200,12 @@ contains
     implicit none
     type(vis), intent(in)  :: V
     integer  , intent(in)  :: Idx, Ioffs
-    integer  , intent(out) :: Iverl(8)
-    Iverl(1:8) = V%ELEM(Idx,1:8) + Ioffs
+    integer  , intent(out) :: Iverl(27)
+    if(SECOND_ORDER_VIS .eq. 0) then
+      Iverl(1:8) = V%ELEM(Idx,1:8) + Ioffs
+    else
+      Iverl(1:27) = V%ELEM(Idx,1:27) + Ioffs
+    endif
   end subroutine get_vis_elem
 !
 ! return number of vis elements of the vis object
@@ -204,6 +257,32 @@ contains
        end select
     end do
   end subroutine disp_vis
+
+  integer function nobj_conf_reverse(indx)
+
+    integer :: indx
+    if(VIS_FORMAT .eq. 1) then
+      if(SECOND_ORDER_VIS .eq. 0) then
+        select case(indx)
+          case(10); nobj_conf_reverse = 4
+          case(13); nobj_conf_reverse = 6
+          case(12); nobj_conf_reverse = 8
+          case default
+              write(*,*) 'nobj_conf_reverse: unexpected type. stop.'
+              stop
+        end select
+      else
+        select case(indx)
+          case(24); nobj_conf_reverse = 10
+          case(32); nobj_conf_reverse = 18
+          case(29); nobj_conf_reverse = 27
+          case default
+              write(*,*) 'nobj_conf_reverse: unexpected type. stop.'
+              stop
+        end select
+      endif
+    endif
+  end function nobj_conf_reverse
 !
 !
 end module upscale

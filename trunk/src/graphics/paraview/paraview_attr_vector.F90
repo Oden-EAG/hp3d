@@ -10,7 +10,7 @@
 subroutine paraview_attr_vector(Id, Idx)
 !
    use environment , only : PREFIX
-   use paraview    , only : PARAVIEW_IO,PARAVIEW_DIR
+   use paraview    , only : PARAVIEW_IO,PARAVIEW_DIR,VIS_FORMAT
    use physics     , only : PHYSA
    use mpi_param   , only : RANK,ROOT
 !
@@ -53,11 +53,13 @@ subroutine paraview_attr_vector(Id, Idx)
    if (RANK .ne. ROOT) goto 50
 !
 !..write to .xmf file
+   if(VIS_FORMAT .eq. 0 ) then
    write(PARAVIEW_IO, 1101) trim(nick)
    write(PARAVIEW_IO, 1102) ic
    write(PARAVIEW_IO, 1103) trim(PREFIX), trim(fname), trim(postfix), trim(nick)
    write(PARAVIEW_IO, 1104)
    write(PARAVIEW_IO, 1105)
+   endif
 !
    50 continue
 !
@@ -77,21 +79,25 @@ subroutine paraview_attr_vector(Id, Idx)
    if (RANK .ne. ROOT) goto 70
 !
 !..write to .xmf file
+   if(VIS_FORMAT .eq. 0 ) then
    write(PARAVIEW_IO, 1101) trim(nick)
    write(PARAVIEW_IO, 1102) ic
    write(PARAVIEW_IO, 1103) trim(PREFIX), trim(fname), trim(postfix), trim(nick)
    write(PARAVIEW_IO, 1104)
    write(PARAVIEW_IO, 1105)
+   endif
 !
    70 continue
 !
 #endif
 !
+if(VIS_FORMAT .eq. 0 ) then
  1101 format("      <Attribute Name='",a,"' AttributeType='Vector' Center='Node'>")
  1102 format("        <DataItem Dimensions='",i14, " 3' NumberType='Float' Precision='4' Format='HDF'>")
  1103 format("        ",a,"vector_",a,a,".h5:",a)
  1104 format("        </DataItem>")
  1105 format("      </Attribute>")
+endif
 !
    90 continue
 !

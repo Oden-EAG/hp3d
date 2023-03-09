@@ -7,13 +7,14 @@
 subroutine paraview_geom
 !
    use environment , only : PREFIX
-   use paraview    , only : PARAVIEW_IO,PARAVIEW_DUMP_GEOM,PARAVIEW_DIR
+   use paraview    , only : PARAVIEW_IO,PARAVIEW_DUMP_GEOM,PARAVIEW_DIR, VIS_FORMAT
    use mpi_param   , only : RANK,ROOT
 !
    implicit none
    integer,         save :: id=-1
    character(len=5),save :: postfix
    integer,         save :: ice, icn, icp
+   integer               :: vtu_vis_flag
 !
 !-------------------------------------------------------------------------------------------
 !
@@ -30,9 +31,11 @@ subroutine paraview_geom
       call geom2vtk("Geometry",trim(PARAVIEW_DIR)//trim(PREFIX)//"geom_"//trim(postfix)//".h5", ice,icn,icp)
 !
    endif
+   vtu_vis_flag = 1
 !
    if (RANK .ne. ROOT) goto 90
 !
+   if(VIS_FORMAT .eq. 0) then
 !..write to .xmf file
    write(PARAVIEW_IO,1012) ice
    write(PARAVIEW_IO,1013) (ice+icn)
@@ -45,16 +48,17 @@ subroutine paraview_geom
    write(PARAVIEW_IO,1020)
    write(PARAVIEW_IO,1021)
 !
- 1012 format("      <Topology TopologyType='Mixed' NumberOfElements='",i8,"'>")
- 1013 format("        <DataItem Dimensions='",i12,"' NumberType='Int' Precision='4' Format='HDF'>")
- 1014 format("        ",a,"geom_",a,".h5:/Objects")
- 1015 format("        </DataItem>")
- 1016 format("      </Topology>")
- 1017 format("      <Geometry GeometryType='XYZ'>")
- 1018 format("        <DataItem Dimensions='",i10, " 3' NumberType='Float' Precision='4' Format='HDF'>")
- 1019 format("        ",a,"geom_",a,".h5:/Coords")
- 1020 format("        </DataItem>")
- 1021 format("      </Geometry>")
+   1012 format("      <Topology TopologyType='Mixed' NumberOfElements='",i8,"'>")
+   1013 format("        <DataItem Dimensions='",i12,"' NumberType='Int' Precision='4' Format='HDF'>")
+   1014 format("        ",a,"geom_",a,".h5:/Objects")
+   1015 format("        </DataItem>")
+   1016 format("      </Topology>")
+   1017 format("      <Geometry GeometryType='XYZ'>")
+   1018 format("        <DataItem Dimensions='",i10, " 3' NumberType='Float' Precision='4' Format='HDF'>")
+   1019 format("        ",a,"geom_",a,".h5:/Coords")
+   1020 format("        </DataItem>")
+   1021 format("      </Geometry>")
+ endif
 !
    90 continue
 !
