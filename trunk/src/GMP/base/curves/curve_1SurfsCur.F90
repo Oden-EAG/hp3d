@@ -54,25 +54,34 @@ end subroutine curve_1SurfsCur
 !! @param[out] X      - physical coordinates of the point
 !! @param[out] Dxdeta - derivatives wrt reference coordinates
 !!
-!! @revision Dec 15
+!! @date Mar 2023
 !----------------------------------------------------------------------
 subroutine diag_segment(Nc,Eta, X,dX_dEta)
 !
       use control
       use GMP
-#include "syscom.blk"
 !
-      dimension X(3),dX_dEta(3)
+      implicit none
+!
+      integer :: Nc
+      real(8) :: Eta,X(3),dX_dEta(3)
 !
 !  ...x coordinate, min and max radius
 !      x0,rmin,rmax
 !
 !  ...endpoints, point in the parametric domain,
-      dimension eta_v(2,2), etap(2)
+      real(8) :: eta_v(2,2),etap(2)
+!
+      integer :: i,iv,ivar,ns,nv
+      real(8) :: dr,dr_deta,dtheta_deta
+      real(8) :: r,r2,rmax,rmin,theta,theta1,x0
+!
+      real(8) :: pi
+      integer :: iprint=0
+!----------------------------------------------------------------------
 !
       pi = acos(-1.d0)
 !
-      iprint=0
       if (iprint.eq.1) then
         write(*,7000)Nc,Eta
  7000   format(' diag_segment: Nc,Eta = ',i5,2x,e12.5)
@@ -176,18 +185,24 @@ end subroutine diag_segment
 !! @param[out] X      - physical coordinates of the point
 !! @param[out] Dxdeta - derivatives wrt reference coordinates
 !!
-!! @revision Mar 13
+!! @date Mar 2023
 !----------------------------------------------------------------------
 subroutine circular_segment(Nc,Eta, X,dX_dEta)
 !
       use control
       use GMP
-#include "syscom.blk"
 !
-      dimension X(3),dX_dEta(3)
-      dimension cen(3),r1(3),r2(3),ax(3),dX_dalpha(3)
+      implicit none
 !
-      iprint=0
+      integer :: Nc
+      real(8) :: Eta,X(3),dX_dEta(3)
+      real(8) :: cen(3),r1(3),r2(3),ax(3),dX_dalpha(3)
+!
+      integer :: i,ns,nv1,nv2
+      real(8) :: alpha,dalpha_dEta,rad,rnorm1,rnorm2,sp,theta
+!
+      integer :: iprint=0
+!----------------------------------------------------------------------
       if (iprint.eq.1) then
         write(*,7000)Nc,Eta
  7000   format(' circular_segment: Nc,Eta = ',i5,2x,e12.5)
@@ -253,47 +268,50 @@ end subroutine circular_segment
 !! @param[out] X      - physical coordinates of the point
 !! @param[out] Dxdeta - derivatives wrt reference coordinates
 !!
-!! @revision Mar 11
+!! @date Mar 2023
 !----------------------------------------------------------------------
 subroutine cylinder_geodesic(No,Eta, X,Dxdeta)
 !
       use control
       use GMP
       use element_data
-#include "syscom.blk"
 !
-      dimension X(3),Dxdeta(3)
+      implicit none
+!
+      integer :: No
+      real(8) :: Eta,X(3),Dxdeta(3)
 !
 !  ...cylinder center and direction vector
-      dimension center(3), direction(3)
+      real(8) :: center(3),direction(3)
 !
 !  ...relative position vectors for curve endpoints in the global
 !     cartesian system
-      dimension xrelv(3,2)
+      real(8) :: xrelv(3,2)
 !
 !  ...endpoint coordinates in the cylinder Cartesian system and in the
 !     cylinder reference coordinates
-      dimension xrelsv(3,2),xparv(2,2)
+      real(8) :: xrelsv(3,2),xparv(2,2)
 !
 !  ...transformation matrix from global Cartesian to cylinder Cartesian
 !     coordinates; rows of the transformation matrix are unit
 !     vectors of the cylinder system computed in the global system
-      dimension transf(3,3)
+      real(8) :: transf(3,3)
 !
 !  ...point in the parameter space, derivatives
-      dimension xpar(2),dxpardeta(2)
+      real(8) :: xpar(2),dxpardeta(2)
 !
 !  ...local cartesian coordinates, derivatives
-      dimension xrels(3),dxrelsdeta(3)
+      real(8) :: xrels(3),dxrelsdeta(3)
 !
 !  ...work space
-      dimension void(3)
-
-      common /ccylgeo /iprint_cyl_geo
+      real(8) :: void(3)
 !
+      integer :: i,iv,ivar,j,np,ns
+      real(8) :: fval,rad,r,s
+!
+      integer :: iprint=0
 !-----------------------------------------------------------------------
 !
-      iprint=iprint_cyl_geo
       if (iprint.eq.1) then
         write(*,*) '-----------------------------------'
         write(*,7001) No,Eta
@@ -521,43 +539,49 @@ end subroutine cylinder_geodesic
 !! @param[out] X      - physical coordinates of the point
 !! @param[out] Dxdeta - derivatives wrt reference coordinates
 !!
-!! @revision Mar 11
+!! @date Mar 2023
 !----------------------------------------------------------------------
 subroutine cone_geodesic(No,Eta, X,Dxdeta)
 !
       use control
       use GMP
-#include "syscom.blk"
-!----------------------------------------------------------------------
-      dimension X(3),Dxdeta(3)
+!
+      implicit none
+!
+      integer :: No
+      real(8) :: Eta,X(3),Dxdeta(3)
 !
 !  ...cone vertex and direction vector
-      dimension vertex(3), direction(3)
+      real(8) :: vertex(3),direction(3)
 !
 !  ...relative position vectors for curve endpoints in the global
 !     cartesian system
-      dimension xrelv(3,2)
+      real(8) :: xrelv(3,2)
 !
 !  ...endpoint coordinates in the cone Cartesian system and in the
 !     cone reference coordinates
-      dimension xrelsv(3,2),xparv(2,2)
+      real(8) :: xrelsv(3,2),xparv(2,2)
 !
 !  ...transformation matrix from global Cartesian to cone Cartesian
 !     coordinates; rows of the transformation matrix are unit
 !     vectors of the cone system computed in the global system
-      dimension transf(3,3)
+      real(8) :: transf(3,3)
 !
 !  ...point in the parameter space, derivatives
-      dimension xpar(2),dxpardeta(2)
+      real(8) :: xpar(2),dxpardeta(2)
 !
 !  ...local cartesian coordinates, derivatives
-      dimension xrels(3),dxrelsdeta(3)
+      real(8) :: xrels(3),dxrelsdeta(3)
 !
 !  ...work space
-      dimension void(3)
+      real(8) :: void(3)
+!
+      integer :: i,iv,ivar,j,np,ns
+      real(8) :: ap,fval,r,s
+!
+      integer :: iprint=0
 !-----------------------------------------------------------------------
 !
-      iprint=0
       if (iprint.eq.1) then
         write(*,*) '-----------------------------------'
         write(*,7001) No,Eta

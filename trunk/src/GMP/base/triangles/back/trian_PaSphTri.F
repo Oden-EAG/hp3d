@@ -4,9 +4,7 @@ c   routine name       - trian_PaSphTri
 c
 c-----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Jan 06
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine evaluates physical coordinates
 c                        and its derivatives wrt to reference
@@ -24,28 +22,38 @@ c               X      - physical coordinates of the point
 c               Dxdeta - derivatives of the physical coordinates wrt
 c                        to the parameters
 c
-c
 c-----------------------------------------------------------------------
 c
       subroutine trian_PaSphTri(No,Eta, X,Dxdeta)
 c
       use GMP
       use control
-#include "syscom.blk"
 c
-      dimension Eta(2),X(3),Dxdeta(3,2)
+      implicit none
+c
+      integer :: No
+      real(8) :: Eta(2),X(3),Dxdeta(3,2)
 c
 c  ...vertex coordinates, edge curves
-      dimension xv(3,3),ncurv(3)
+      real(8) :: xv(3,3)
+      integer :: ncurv(3)
 c
 c  ...transformation matrix
-      dimension aij(3,3)
+      real(8) :: aij(3,3)
 c
 c  ...centers for the three circular segments
-      dimension centers(3,3)
+      real(8) :: centers(3,3)
 c
 c  ...auxiliary quantities
-      dimension dthdeta(2),xprim(3),dpsdeta(2),dxprdeta(3,2),aux(3)
+      real(8) :: dthdeta(2),xprim(3),dpsdeta(2),dxprdeta(3,2),aux(3)
+c
+      real(8) :: aa,aa2,beta,cobeta,cosps,costh,d
+      real(8) :: psi,radc,rads,s,s1,s2,sinps,sinth,skpr,theta
+      integer :: i,j,nc,np
+c
+      real(8) :: pihalf
+c
+      integer :: iprint
 c
 c-----------------------------------------------------------------------
 c
@@ -181,6 +189,4 @@ c     parameters
       enddo
 c
 c
-      end
-
-
+      end subroutine trian_PaSphTri

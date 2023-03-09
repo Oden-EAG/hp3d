@@ -146,10 +146,7 @@ end subroutine recta_TraQua
 !
 !-----------------------------------------------------------------------
 !
-!
-!   computer           - machine independent
-!
-!   latest revision    - Jan 06
+!   latest revision    - Mar 2023
 !
 !   purpose            - routine evaluates bilinear and linear
 !                        blending functions for the transfinite
@@ -164,15 +161,15 @@ end subroutine recta_TraQua
 !               Val    - value of the blending functions
 !               Dval   - derivatives
 !
-!   required  routines -
-!
 !-----------------------------------------------------------------------
 !
       subroutine recta_blend(Eta, Val,Dval)
 !
-#include "syscom.blk"
+      implicit none
 !
-      dimension Eta(2),Val(8),Dval(2,8)
+      real(8) :: Eta(2),Val(8),Dval(2,8)
+!
+      integer :: k
 !
 !-----------------------------------------------------------------------
 !

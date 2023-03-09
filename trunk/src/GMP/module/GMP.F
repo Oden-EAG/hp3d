@@ -1,7 +1,7 @@
 c----------------------------------------------------------------------
-c> Purporse : data structure arrays for Geometry Modeling Package
+c> @brief Data structure arrays for Geometry Modeling Package (GMP)
 c
-c  @revision Nov 12
+c> @date Mar 2023
 c----------------------------------------------------------------------
 c
       module GMP
@@ -911,6 +911,8 @@ c
 c
 c----------------------------------------------------------------------
 c
+#if 0
+c
 c  ...dump in GMP datastructure in LEGACY format (before Feb '11)
 c
       subroutine dumpin_GMP_LEGACY(Fp)
@@ -1150,6 +1152,8 @@ c
       close(ndump)
 c
       end subroutine dumpin_GMP_LEGACY
+c
+#endif
 c
 c
 c----------------------------------------------------------------------

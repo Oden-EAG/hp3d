@@ -10,7 +10,7 @@ c   routine name       - recta_ConfRec
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Jan 06
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine evaluates physical coordinates
 c                        and its derivatives wrt to reference
@@ -34,40 +34,38 @@ c
       use GMP
       use control
 #include "syscom.blk"
-      common /cCylGeod/ iprint_CylGeod
-      common /ccurve/ iprint_curve
 c
-      dimension Xi(2), X(3),Dxdxi(3,2)
+      integer :: No
+      real(8) :: Xi(2),X(3),Dxdxi(3,2)
 c
 c  ...transformation matrix from global to local system of coordinates
-      dimension transf(3,3)
+      real(8) :: transf(3,3)
 c
 c  ...cylinder origin and axis, auxiliary space
-      dimension xcenter(3),xaxis(3),xvert(3,4),aux(3)
+      real(8) :: xcenter(3),xaxis(3),xvert(3,4),aux(3)
 c
 c  ...global coordinates of a point on a curve and their derivatives
-      dimension xc(3),dxcdxi(3)
+      real(8) :: xc(3),dxcdxi(3)
 c
 c  ...coordinates of a point and their derivatives in the local
 c     Cartesian system
-      dimension xp(3),dxpdxi(3,2)
+      real(8) :: xp(3),dxpdxi(3,2)
 c
 c  ...u coordinates of the rectangle vertices
-      dimension uv(2,4)
+      real(8) :: uv(2,4)
 c
 c  ...parametrizations of the edges of the rectangle in terms
 c     of the rectangle explicit parametrization parameters
-      dimension ue(2,4),duedxi(2,4)
+      real(8) :: ue(2,4),duedxi(2,4)
 c
 c  ...coordinates of a point and its derivatives in the surface
 c     curvilinear coordinates
-      dimension u(2),dudxi(2,2)
+      real(8) :: u(2),dudxi(2,2)
 c
+      integer :: iprint
 c
       iprint=0
  10   continue
-      iprint_CylGeod = iprint
-      iprint_curve = iprint
       if (iprint.eq.1) then
         write(*,7000) No, Xi
  7000   format('recta_conf: DEBUGGING for No, Xi = ',i4,2f8.3)
@@ -293,4 +291,4 @@ c
       endif
 c
 c
-      end
+      end subroutine recta_ConfRec

@@ -28,11 +28,13 @@ c
       use GMP
 #include "syscom.blk"
 c
-      dimension X(NDIM),Dxdeta(NDIM)
+      integer :: No
+      real(8) :: X(NDIM),Dxdeta(NDIM)
 c
 c  ...endpoints coordinates
-      dimension xv(NDIM,2)
+      real(8) :: xv(NDIM,2)
 c
+      integer :: i
 c
 c  ...get the curve endpoints
       do i=1,2

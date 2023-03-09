@@ -4,12 +4,10 @@ c   routine name       - reconstruct
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Apr 10
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine performs G^1 reconstruction of
 c                        geometry for a triangulated surface
-c
-c   arguments          - none
 c
 c----------------------------------------------------------------------
 c
@@ -18,45 +16,52 @@ c
       use GMP
       use control
 c
-#include "syscom.blk"
+      implicit none
 c
-      integer,parameter :: nin = 15
+      integer, parameter :: nin = 15
 c
-      common /crhsub/ iprint_rhsub
-      common /ctri/ iprint_tri
-      common /creconstruct_curve/ iprint_reconstruct_curve
-      logical lexist
+      logical :: lexist
 c
 c  ...data for curve reconstruction, points and normals
-      dimension x(3,2)
+      real(8) :: x(3,2)
 c
 c  ...lists of curves adjacent to a point
-      parameter(maxc=15)
-      dimension ncurve_list1(maxc), ncurve_list2(maxc)
+      integer, parameter ::  maxc=15
+      integer :: ncurve_list1(maxc), ncurve_list2(maxc)
 c
 c  ...corresponding list of triangles, vertex number, orientation
-      dimension ntria_list(1:3,maxc)
+      integer :: ntria_list(1:3,maxc)
 c
 c  ...work space
-      dimension temp(1:3),rn1(3),rn2(3),dnorm(1:3,2),rnorm(3)
-      integer, dimension(200) :: curve_fail
+      real(8) :: temp(1:3),rn1(3),rn2(3),dnorm(1:3,2),rnorm(3)
+      integer :: curve_fail(200)
 c
 c  ...tangent vectors and their derivatives at endpoints of a curve
-      dimension e(3,2), eprim(3,2)
+      real(8) :: e(3,2), eprim(3,2)
 c
 c  ...for checking continuity of derivatives
-      dimension rnorm1(1:3,0:10),rnorm2(1:3,0:10),
-     .          eta(3),dxdeta(3,3),void(3)
+      real(8) :: rnorm1(1:3,0:10),rnorm2(1:3,0:10),
+     .           eta(3),dxdeta(3,3),void(3)
 c
 c  ...data for checking continuity of normals
-      dimension nr_save(2),nedg_save(2),nblock_save(2)
+      integer :: nr_save(2),nedg_save(2),nblock_save(2)
+
+      real(8) :: angle_min,angle_max
 c
 c  ...minimum admissible solid angle
-      data pi /3.14159265358979312d0/
+      real(8), parameter :: pi = 3.14159265358979312d0
+c
+      real(8) :: angle,factor,fmin,rsign,s,xi
+      integer :: i,icheck,idec,ie,ifine_grid,ifirst,isecond,iflag
+      integer :: ii,ir,is,ifound,ivar,j,k,lab
+      integer :: n,nc,nc1,nfail,nflag,nh,np,np1,np2,np3,nr,nt,nt1
+      integer :: nr_connected_curves,nr_curv,nrfig,nsub,ntri
+c
+      integer :: iprint
+c----------------------------------------------------------------------
+c
       angle_min = 1.d0/9.d0*pi/2.d0
       angle_max = pi - angle_min
-c
-c----------------------------------------------------------------------
 c
       iprint=0
 c
@@ -841,7 +846,7 @@ c  .....loop over subdivision points
               enddo
               call mixed_product(dxdeta(1:3,1),dxdeta(1:3,2),
      .                           dxdeta(1:3,3), angle)
-              if (angle.lt.GEOM_TOLL) then
+              if (angle.lt.GEOM_TOL) then
                 fmin = min(angle,fmin)
 ccc              if ((angle.lt.angle_min).or.(angle.gt.angle_max)) then
                 iflag = 1
@@ -883,4 +888,4 @@ c
  90   continue
 c
 c
-      end
+      end subroutine reconstruct

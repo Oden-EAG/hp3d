@@ -16,26 +16,28 @@ c> @param[in ]  Xs      - a starting point
 c> @param[in ]  Sfact   - renormalization factors for the surfaces
 c> @param[out]  X       - physical coordinates of the point
 c
-c> @revision Nov 12
+c> @revision Mar 2023
 c-----------------------------------------------------------------------
 c
       subroutine mnewt(Nusf,Nsurf,Eta,Feta,Xs,Sfact, X)
 c
-#include "syscom.blk"
-      common /cmnewt/ iprint
-      common /cusrfun/ iprint_usrfun
+      implicit none
 c
-      dimension Nsurf(6),Eta(*),Feta(4),Xs(3),Sfact(4),X(3)
+      integer :: Nusf,Nsurf(6)
+      real(8) :: Eta(*),Feta(4),Xs(3),Sfact(4),X(3)
 c
 c  ...stiffness matrix and load vector for NR iterations
-      dimension alpha(3,3),beta(3)
-      dimension aux(3)
-      data eps /1.d-12/
+      real(8) :: alpha(3,3),beta(3)
+      real(8) :: aux(3)
+      real(8), parameter :: eps = 1.d-12
+c
+      integer :: i,ifl,j,k,ntrial
+      real(8) :: errf,errx
+c
+      integer :: iprint=0
 c-----------------------------------------------------------------------
 c
-      iprint=0
  10   continue
-      iprint_usrfun = iprint
 c
 c  ...maximum number of iterations
       ntrial = 10
@@ -167,26 +169,28 @@ c> @param[in ]  Sfact   - renormalization factors for the surfaces
 c> @param[out]  Alpha   - 3 x 3 stiffness matrix
 c> @param[out]  Beta    - load vector
 c
-c> @revision Nov 12
+c> @date Mar 2023
 c-----------------------------------------------------------------------
 c
       subroutine usrfun(Nusf,Nsurf,Eta,Feta,X,Sfact, Alpha,Beta)
 c
-#include "syscom.blk"
-      common /cusrfun/ iprint
+      implicit none
 c
-      common /sphepoint/ ctr50(3)
+      real(8) :: ctr50(3)
+      common /sphepoint/ ctr50
 c
-      dimension Nsurf(6)
-c
-      dimension Alpha(3,3),Beta(3),X(3),Eta(*),Feta(4),Sfact(4)
+      integer :: Nusf,Nsurf(6)
+      real(8) :: Eta(*),Feta(4),X(3),Sfact(4)
+      real(8) :: Alpha(3,3),Beta(3)
 c
 c  ...surface gradients for different surfaces
-      dimension der1(3),der2(3),der3(3),der4(3),der5(3)
-      dimension dtt(3),dtt2(3)
+      real(8) :: der1(3),der2(3),der3(3),der4(3),der5(3)
+      real(8) :: dtt(3),dtt2(3)
 c
-      iprint=0
+      integer :: i
+      real(8) :: fval,fval1,fval2,fval3,fval4,fval5,tt,tt2,xf1,xf2
 c
+      integer :: iprint=0
 c
 c  ...select geometry entity
       select case(Nusf)

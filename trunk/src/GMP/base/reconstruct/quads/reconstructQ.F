@@ -4,14 +4,10 @@ c   routine name       - reconstructQ
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Feb 07
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine performs G^1 reconstruction of
 c                        geometry for quads
-c
-c   arguments          - none
 c
 c----------------------------------------------------------------------
 c

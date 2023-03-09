@@ -4,7 +4,7 @@ c   routine name       - curve_3HermCur
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - May 10
+c   latest revision    - Mar 2023
 c
 c   purpose            - cubic Hermite curve
 c
@@ -23,17 +23,21 @@ c
 c
       use GMP
       use parameters , only : MAXP
-#include "syscom.blk"
 c
-      dimension X(3),Dxdeta(3)
+      implicit none
+c
+      integer :: No
+      real(8) :: Eta,X(3),Dxdeta(3)
 c
 c  ...curve dof
-      dimension gdof(1:3,6)
+      real(8) :: gdof(1:3,6)
 c
 c  ...fifth order C^2-conforming shape functions
-      dimension vshap(MAXP+1),dvshap(MAXP+1)
+      real(8) :: vshap(MAXP+1),dvshap(MAXP+1)
 c
-      iprint=0
+      integer :: i,k,np
+c
+      integer :: iprint=0
 c
       if ((CURVES(No)%Type.ne.'3HermCur').or.(NDIM.ne.3)) then
         write(*,7001)
@@ -86,9 +90,10 @@ c
 c
 c----------------------------------------------------------------------
 c
-#include "syscom.blk"
+      implicit none
 c
-      dimension Vshap(4),Dvshap(4)
+      real(8) :: Eta
+      real(8) :: Vshap(4),Dvshap(4)
 c
       Vshap(1) = 2.d0*Eta**3 - 3.d0*Eta**2 + 1.d0
       Vshap(2) = -2.d0*Eta**3 + 3.d0*Eta**2

@@ -4,7 +4,7 @@ c   routine name       - set_tangents_Tsurf
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Mar 10
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine defines tangent versors for curves
 c                        connected to a point on a reconstructed
@@ -46,38 +46,38 @@ c
       use control
       use GMP
 c
-#include "syscom.blk"
+      implicit none
 c
-      dimension List_curves(Nrcurves),Newlist_curves(Nrcurves),
-     .          List_trian(3,Nrcurves)
-      dimension Rn1(3),Rn2(3)
+      integer :: Np,Nrcurves,Idec,Ifirst,Isecond
+      integer :: List_curves(Nrcurves),Newlist_curves(Nrcurves),
+     .           List_trian(3,Nrcurves)
+      real(8) :: Rn1(3),Rn2(3)
 c
 c  ...work lists containing adjacent surface triangles data
-      dimension list(10),list_tets(20)
-c     dimension list_rloc(3,10)
+      integer :: list(10),list_tets(20)
+c     integer :: list_rloc(3,10)
 c
 c  ...work space
-      dimension temp(3),void(3,3),list_aux(Nrcurves),
-     .                            list_aux1(3,Nrcurves)
+      real(8) :: temp(3),void(3,3)
+      integer :: list_aux(Nrcurves),list_aux1(3,Nrcurves)
 c
 c  ...secant vectors components
-      dimension xyz(3,10)
-      dimension vec(3,Nrcurves)
+      real(8) :: xyz(3,10)
+      real(8) :: vec(3,Nrcurves)
 c
       integer, external :: imod
 ccc      imod(j,mod) = j-(j-1)/mod*mod
 c
+      integer :: i,ipass,ic,ic1,id,ie1,ierror,if,ifig,ile_edge_curves
+      integer :: ii,ir,is,iv,iv3,j,lab,labt,loc,nc,nc1,next,nh,no1
+      integer :: nor,norient,np1,np2,nr,nr1,nr_trian,nrtet,ntet
+      real(8) :: s,s1,s2
+c
+      integer :: iprint
 c-----------------------------------------------------------------------
 c
       ipass=0
       iprint=0
-
-      if (Np.eq.3) then
-        iprint=0
-      else
-        iprint=0
-      endif
-
 c
  5    continue
 c  ...printing statement

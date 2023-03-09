@@ -10,9 +10,7 @@ c   routine name       - recta_HermRec
 c
 c------------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Oct 07
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine evaluates physical coordinates
 c                        and its derivatives wrt to reference
@@ -36,53 +34,56 @@ c
       use parameters , only : MAXP
 c
 #include "syscom.blk"
-      common /crecta_HermRec/ iprint
 c
-      dimension Eta(2),X(3),Dxdeta(3,2)
+      integer :: No
+      real(8) :: Eta(2),X(3),Dxdeta(3,2)
 c
 c  ...vertex coordinates, first and second derivatives at vertices
-      dimension xv(3,2,2),
-     .          av(3,2,2),aav(3,2,2),
-     .          bv(3,2,2),bbv(3,2,2),
-     .          dv(3,2,2)
+      real(8) :: xv(3,2,2),
+     .           av(3,2,2),aav(3,2,2),
+     .           bv(3,2,2),bbv(3,2,2),
+     .           dv(3,2,2)
 c
 c  ...dof for curves in local coordinates
-      dimension xedof(1:3,6,4)
+      real(8) :: xedof(1:3,6,4)
 c
 c  ...normals at vertices
-      dimension rnvert(1:3,2,2)
+      real(8) :: rnvert(1:3,2,2)
 c
 c  ...dof for functions psi
-      dimension psidof(1:3,4,4)
+      real(8) :: psidof(1:3,4,4)
 c
 c  ...coefficients alpha,beta,gamma for edges
-      dimension alpha(2,2),beta(2,2),deldof(2,4),gamdof(4,4)
+      real(8) :: alpha(2,2),beta(2,2),deldof(2,4),gamdof(4,4)
 c
 c  ...dual basis vectors at a vertex
-      dimension adual(3),bdual(3)
+      real(8) :: adual(3),bdual(3)
 c
 c  ...values of edge parametrizations and their derivatives
-      dimension f(3),df(3),ddf(3),g(3),dg(3),psi(3),dpsi(3)
+      real(8) :: f(3),df(3),ddf(3),g(3),dg(3),psi(3),dpsi(3)
 c
 c  ...Hermite shape functions and their derivatives at a point
-      dimension vHshap1(MAXP+1), dvHshap1(MAXP+1), void(MAXP+1)
-      dimension vHshap2(MAXP+1), dvHshap2(MAXP+1)
+      real(8) :: vHshap1(MAXP+1), dvHshap1(MAXP+1), void(MAXP+1)
+      real(8) :: vHshap2(MAXP+1), dvHshap2(MAXP+1)
 c
 c  ...fifth order C^2-conforming shape functions
-      dimension vshap(MAXP+1),dvshap(MAXP+1),ddvshap(MAXP+1)
+      real(8) :: vshap(MAXP+1),dvshap(MAXP+1),ddvshap(MAXP+1)
 c
 c  ...work space
-      dimension temp(1:3)
+      real(8) :: temp(1:3)
 c
 c  ...sharp edge flags for the rectangle edges
-      dimension nsharp_edge(4)
+      integer :: nsharp_edge(4)
 c
 c  ...integer endpoint coordinates for edges
-      dimension iedge_vert(2,2,4)
+      integer :: iedge_vert(2,2,4)
+c
+      integer :: i
 c
       integer, external :: imod
 ccc      imod(j,mod) = j-(j-1)/mod*mod
-      data iprint/0/
+c
+      integer :: iprint =0
 c
       data iedge_vert/ 1,1,2,1, 2,1,2,2, 1,2,2,2, 1,1,1,2/
 c

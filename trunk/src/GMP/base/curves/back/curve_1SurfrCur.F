@@ -6,7 +6,7 @@ c   routine name       - curve_1SurfrCur
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Dec 07
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine supports parametrization of a curve
 c                        lying on a single reconstructed surface
@@ -25,12 +25,15 @@ c
       subroutine curve_1SurfrCur(No,Eta, X,Dxdeta)
 c
       use GMP
-#include "syscom.blk"
+      implicit none
 c
-      dimension X(NDIM),Dxdeta(NDIM)
+      integer :: No
+      real(8) :: Eta,X(NDIM),Dxdeta(NDIM)
 c
 c  ...endpoints coordinates
-      dimension xv(NDIM,2)
+      real(8) :: xv(NDIM,2)
+c
+      integer :: i,j,np
 c
 c
 c  ...get the curve endpoints

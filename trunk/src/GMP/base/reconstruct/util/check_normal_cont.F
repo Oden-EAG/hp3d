@@ -4,12 +4,10 @@ c   routine name       - check_normal_cont
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Apr 10
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine performs G^1 reconstruction of
 c                        geometry for a triangulated surface
-c
-c   arguments          - none
 c
 c----------------------------------------------------------------------
 c
@@ -18,17 +16,20 @@ c
       use GMP
       use control
 c
-#include "syscom.blk"
+      implicit none
 
       integer, parameter :: nsub = 3
 c
-      dimension eta(2),void(3),dxdeta(3,2)
-      dimension rnorm1(1:3,0:nsub),rnorm2(1:3,0:nsub)
-      dimension nt_save(2),nedg_save(2),nblock_save(2)
-      dimension ncurve_fail(100)
+      real(8) :: eta(2),void(3),dxdeta(3,2)
+      real(8) :: rnorm1(1:3,0:nsub),rnorm2(1:3,0:nsub)
+      integer :: nt_save(2),nedg_save(2),nblock_save(2)
+      integer :: ncurve_fail(100)
 c
+      real(8) :: factor,rsign,s,xi
+      integer :: i,idec,ie,iflag,is,ifound,it,j,lab
+      integer :: n,nc,nc1,np,nt,nfail
 c
-      iprint=0
+      integer :: iprint=0
 c
       nfail = 0
 c
@@ -219,4 +220,4 @@ c
       endif
 c
 c
-      end
+      end subroutine check_normal_cont

@@ -4,7 +4,7 @@ c   routine name       - trian_ImpliTri
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Jan 06
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine evaluates physical coordinates
 c                        and its derivatives wrt to reference
@@ -27,21 +27,31 @@ c
       use element_data , only : TRIAN_EDGE_TO_VERT
       use GMP
       use control
-#include "syscom.blk"
 c
-      common /sphepoint/ ctr50(3)
+      implicit none
 c
-      dimension Xi(2),X(3),Dxdxi(3,2),xv(3,3)
-      dimension xs(3),nsutr(6),xif(4),xifdxi(2,2),der1(3),der2(3),
-     .          dxcdt(3),ncurv(3),aux1(3),aux2(3),xc(3),aux(3,3),
-     .          sfact(4),de(3),xmid(3),dtdeta(2)
+      integer :: No
+      real(8) :: Xi(2),X(3),Dxdxi(3,2)
 c
-      real(8), dimension(3)   :: shapH
-      real(8), dimension(2,3) :: dshapH
+      real(8) :: ctr50(3)
+      common /sphepoint/ ctr50
 c
-      iprint=0
-
-
+      real(8) :: xs(3),xif(4),xifdxi(2,2),der1(3),der2(3),
+     .           dxcdt(3),aux1(3),aux2(3),xc(3),aux(3,3),
+     .           sfact(4),de(3),xmid(3),dtdeta(2),xv(3,3)
+      integer :: nsutr(6),ncurv(3)
+c
+      real(8) :: shapH(3)
+      real(8) :: dshapH(2,3)
+c
+      integer :: i,ifl1,ifl2,iv1,iv2,nc,norient,np
+      real(8) :: fval,fval1,fval2,t
+c
+c     function dip(A,B)
+      real(8) :: dip
+c
+      integer :: iprint=0
+c
  5    continue
 c
       shapH(1)=1.d0-Xi(1)-Xi(2) ; dshapH(1:2,1)=(/-1.d0,-1.d0/)
@@ -234,41 +244,22 @@ c
         go to 5
       endif
 c
+      end subroutine trian_ImpliTri
 c
-      end
-c
-c
-        function dip(A,B)
-c----------------------------------------------------------------------
-c
-c   routine name       -
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - June,1992
+c   latest revision    - Mar 2023
 c
 c   purpose            - compute inner product
 c
-c   usage              - x = dip(A,B)
-c
-c   arguments :
-c     in:              -A(3),B(3)
-c     out:             -
-c
-c   required  routines -
-c
 c----------------------------------------------------------------------
+      function dip(A,B)
+      implicit none
 c
-#include "syscom.blk"
-      dimension A(3),B(3)
-      dip =  A(1)*B(1)+A(2)*B(2)+A(3)*B(3)
-        return
-        end
-
-
-
-
-
-
+      real(8) :: dip
+      real(8) :: A(3),B(3)
+c
+      dip = A(1)*B(1) + A(2)*B(2) + A(3)*B(3)
+c
+      end function dip

@@ -4,7 +4,7 @@ c   routine name       - input_RECONSTRUCT
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Feb 11
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine reads in geometry in the RECONSTRUCT
 c                        format:
@@ -42,7 +42,7 @@ c
       use element_data
       use pml
 c
-#include "syscom.blk"
+      implicit none
 c
       integer, parameter          :: nin = 15
       character(len=*),intent(in) :: Fp
@@ -53,8 +53,8 @@ c
 c  ...number of tets connected to a point (temporary)
       integer, dimension(:),   pointer :: point_nrtets
 c
-      integer, dimension(2,20) :: list
-      integer, dimension(3)    :: nvert_aux
+      integer :: list(2,20)
+      integer :: nvert_aux(3)
 c     for i-th block on the list
 c       list(1,i) = block connected to an edge
 c       list(2,i) = the corresponding edge number
@@ -63,16 +63,23 @@ c       list(1,i) = block connected to a face
 c       list(2,i) = the corresponding face number
 c
 c     nvert_aux - vertices for a surface triangle
-      character(10) surfstype(10), surfrtype(10)
+      character :: surfstype(10), surfrtype(10)
 c
 c  ...list of surfaces containing a curve
-      integer lists(10)
+      integer :: lists(10)
 c
 c  ...workspace
-      dimension rdata_save(3),rpos(3)
+      real(8) :: rdata_save(3),rpos(3)
+c
+      integer :: i,ibl,ie,if,iflag,ihead_flag,ii,is,itr,its,itsurf
+      integer :: iv,iv1,iv2,iv3,ive,ivf,je,jf,jj,jv,k,kv1,l,lab
+      integer :: mptet,nbl,nc,nf,nflag,nick,nn,no_surface_triangles
+      integer :: nos,np,np1,np2,np3
+      integer :: npri,npyr,nr,nrbl,nrtets,ns,nt,ntet,ntet1,num
+      real(8) :: r1,r2,r3,rsum
 c---------------------------------------------------------------------
 c
-      iprint=0
+      integer :: iprint=0
 c
 c  ...check user defined parameters NDIM and MANDIM
       if (NDIM.ne.3) then

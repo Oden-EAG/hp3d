@@ -4,7 +4,7 @@ c   routine name       - trian_SpherTri
 c
 c-----------------------------------------------------------------------
 c
-c   latest revision    - Jan 06
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine evaluates physical coordinates
 c                        and its derivatives wrt to reference
@@ -21,27 +21,34 @@ c               X      - physical coordinates of the point
 c               Dxdeta - derivatives of the physical coordinates wrt
 c                        to the parameters
 c
-c
 c-----------------------------------------------------------------------
 c
       subroutine trian_SpherTri(No,Eta, X,Dxdeta)
 c
       use GMP
-#include "syscom.blk"
 c
-      dimension Eta(2),X(NDIM),Dxdeta(NDIM,2)
+      implicit none
+c
+      integer :: No
+      real(8) :: Eta(2),X(NDIM),Dxdeta(NDIM,2)
 c
 c  ...vertex coordinates and edge curves
-      dimension xv(3,3),ncurv(3)
+      real(8) :: xv(3,3)
+      integer :: ncurv(3)
 c
 c  ...transformation matrix
-      dimension aij(3,3)
+      real(8) ::  aij(3,3)
 c
 c  ...auxiliary quantities
-      dimension xprim(3),dxprdxi(3,2),dthdxi(2),dpsdxi(2),
-     .          aux(3,3),center(3)
+      real(8) :: xprim(3),dxprdxi(3,2),dthdxi(2),dpsdxi(2),
+     .           aux(3,3),center(3)
 c
-      iprint=0
+      real(8) :: aa,aa2,cosps,costh,psi,rad,s,s1,s2,sinps,sinth,theta
+      integer :: i,j,np
+c
+      real(8) :: pihalf
+c
+      integer :: iprint=0
 c
       if ((TRIANGLES(No)%Type.ne.'SpherTri'.or.(NDIM.ne.3))) then
         write(*,7001) TRIANGLES(No)%Type
@@ -141,4 +148,4 @@ c     reference coordinates
       enddo
 c
 c
-      end
+      end subroutine trian_SpherTri

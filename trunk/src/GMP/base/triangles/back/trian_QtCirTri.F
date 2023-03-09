@@ -4,7 +4,7 @@ c   routine name       - trian_QtCirTri
 c
 c-----------------------------------------------------------------------
 c
-c   latest revision    - Jan 06
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine evaluates physical coordinates
 c                        and its derivatives wrt to reference
@@ -22,27 +22,33 @@ c               X      - physical coordinates of the point
 c               Dxdeta - derivatives of the physical coordinates wrt
 c                        to the parameters
 c
-c
 c-----------------------------------------------------------------------
 c
       subroutine trian_QtCirTri(No,Eta, X,Dxdeta)
 c
       use GMP
-#include "syscom.blk"
 c
-      dimension Eta(2),X(NDIM),Dxdeta(NDIM,2)
+      implicit none
+c
+      integer :: No
+      real(8) :: Eta(2),X(NDIM),Dxdeta(NDIM,2)
 c
 c  ...vertex coordinates, edge curves numbers
-      dimension xv(3,3),ncurv(3)
+      real(8) :: xv(3,3)
+      integer :: ncurv(3)
 c
 c  ...transformatiom matrix
-      dimension aij(1:NDIM,3)
+      real(8) :: aij(1:NDIM,3)
 c
 c  ...auxiliary quantities
-      dimension drdeta(2),center(3),dthdeta(2),xprim(3),dxprdeta(3,2)
+      real(8) :: drdeta(2),center(3),dthdeta(2),xprim(3),dxprdeta(3,2)
 c
-      data one /1.d0/
-      iprint=0
+      real(8) :: aa,aa2,costh,pihalf,r,rad,s,s1,s2,sinth,theta
+      integer :: i,j,nc,np
+c
+      real(8), parameter :: one = 1.d0
+c
+      integer :: iprint=0
 c
       if (TRIANGLES(No)%Type.ne.'QtCirTr') then
         write(*,7001) TRIANGLES(No)%Type
@@ -142,6 +148,4 @@ c     parameters
         Dxdeta(i,2) = s2
       enddo
 c
-      end
-
-
+      end subroutine trian_QtCirTri

@@ -4,7 +4,7 @@ c   routine name       - curve_QuaCir
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Jan 06
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine defines a parametrization for
 c                        a quarter of circle
@@ -12,7 +12,7 @@ c
 c   arguments :
 c     in:
 c               No     - the curve number
-c               Eta     - reference coordinate  (between 0 and 1)
+c               Eta    - reference coordinate (between 0 and 1)
 c     out:
 c               X      - physical coordinates of the point
 c               Dxdeta - derivatives of the physical coordinates wrt
@@ -23,23 +23,28 @@ c
       subroutine curve_QuaCir(No,Eta, X,Dxdeta)
 c
       use GMP
-#include "syscom.blk"
 c
-      dimension X(3),Dxdeta(3)
+      implicit none
+c
+      integer :: No
+      real(8) :: Eta,X(3),Dxdeta(3)
 c
 c  ...coordinates of the endpoints
-      dimension xv(3,2)
+      real(8) :: xv(3,2)
 c
 c  ...center coordinates
-      dimension center(3)
+      real(8) :: center(3)
 c
 c  ...transformation matrix
-      dimension aij(3,3)
+      real(8) :: aij(3,3)
 c
 c  ...local coordinates and their derivatives
-      dimension xprim(3),dxprdeta(3)
+      real(8) :: xprim(3),dxprdeta(3)
 c
-      iprint=0
+      integer :: i,j,np
+      real(8) :: alpha,pihalf,rad,s,s1
+c
+      integer :: iprint=0
 c
       if (CURVES(No)%Type.ne.'QuaCir') then
         write(*,7001)

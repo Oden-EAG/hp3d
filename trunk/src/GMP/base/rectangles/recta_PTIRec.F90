@@ -7,20 +7,24 @@
 !! @param[out] X      - physical coordinates of the point
 !! @param[out] Dxdeta - derivatives of the physical coordinates
 !!
-!! @revision Mar 11
+!! @revision Mar 2023
 !-----------------------------------------------------------------------
 !
 subroutine recta_PTIRec(No,Eta, X,Dxdeta)
 !
       use GMP
       use error
-#include "syscom.blk"
 !
-      dimension Eta(2),X(3),Dxdeta(3,2)
+      implicit none
+!
+      integer :: No
+      real(8) :: Eta(2),X(3),Dxdeta(3,2)
+!
+      integer :: i,ns
 !
 !-----------------------------------------------------------------------
 !
-      iprint=0
+      integer :: iprint=0
 !
       if (RECTANGLES(No)%Type.ne.'PTIRec') then
         write(*,7000)RECTANGLES(No)%Type
@@ -84,7 +88,7 @@ end subroutine recta_PTIRec
 !! @param[out] X      - physical coordinates of the point
 !! @param[out] Dxdeta - derivatives wrt reference coordinates
 !!
-!! @revision Mar 13
+!! @revision Mar 2023
 !----------------------------------------------------------------------
 !
 subroutine recta_sphere(No,Eta, X,Dxdeta)
@@ -92,36 +96,45 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
       use control
       use GMP
       use element_data
-#include "syscom.blk"
 !
-      dimension Eta(2), X(3),Dxdeta(3,2)
+      implicit none
+!
+      integer :: No
+      real(8) :: Eta(2), X(3),Dxdeta(3,2)
 !
 !  ...relative position vectors wrt sphere origin
-      dimension xrels(3),xpar(2),dxrels(3,2),dxpardeta(2,2)
+      real(8) :: xrels(3),xpar(2),dxrels(3,2),dxpardeta(2,2)
 !
 !  ...relative position vectors for rectangle vertices in the global
 !     cartesian system
-      dimension xrelv(3,4)
+      real(8) :: xrelv(3,4)
 !
 !  ...vertex coordinates in the sphere Cartesian system and in the
 !     sphere reference coordinates
-      dimension xrelsv(3,4),xparv(2,4)
+      real(8) :: xrelsv(3,4),xparv(2,4)
 !
 !  ...transformation matrix from global Cartesian to sphere Cartesian
 !     coordinates; rows of the transformation matrix are unit
 !     vectors of the sphere system computed in the global system
-      dimension transf(3,3)
+      real(8) :: transf(3,3)
 !
 !  ...linear shape functions in the parametric space (psi,theta)
-      dimension shapH(4),dshapH(2,4)
+      real(8) :: shapH(4),dshapH(2,4)
 !
 !  ...point on an edge
-      dimension dsedeta(2),                                  &
-                xe(3),dxedeta(3),xerels(3),dxerelsdeta(3),   &
-                xepar(2),dxepardeta(2)
+      real(8) :: dsedeta(2),                                  &
+                 xe(3),dxedeta(3),xerels(3),dxerelsdeta(3),   &
+                 xepar(2),dxepardeta(2)
 !
 !  ...workspace
-      dimension void(3),dblend(2)
+      real(8) :: void(3),dblend(2)
+!
+      integer :: i,icheck,ie,ieta,ile,iv,iv1,iv2,ivar,j
+      integer :: nc,norient,np,ns
+      real(8) :: blend,dsdse,fval,r,r_aux,rad,radnew,rsinpsi
+      real(8) :: s,s1,s2,se
+!
+      integer :: iprint
 !
 !-----------------------------------------------------------------------
 !
@@ -458,7 +471,7 @@ end subroutine recta_sphere
 !! @param[out] X      - physical coordinates of the point
 !! @param[out] Dxdeta - derivatives wrt reference coordinates
 !!
-!! @revision Mar 11
+!! @revision Mar 2023
 !----------------------------------------------------------------------
 !
 subroutine recta_cylinder(No,Eta, X,Dxdeta)
@@ -466,40 +479,47 @@ subroutine recta_cylinder(No,Eta, X,Dxdeta)
       use control
       use GMP
       use element_data
-#include "syscom.blk"
 !
-      dimension Eta(2), X(3),Dxdeta(3,2)
+      implicit none
+!
+      integer :: No
+      real(8) :: Eta(2),X(3),Dxdeta(3,2)
 !
 !  ...cylinder center and direction vector
-      dimension center(3), direction(3)
+      real(8) :: center(3),direction(3)
 !
 !  ...relative position vectors wrt center of the cylinder, cylinder
 !     parameters (\theta,z), derivatives
-      dimension xrels(3),xpar(2),dxrels(3,2),dxpardeta(2,2)
+      real(8) :: xrels(3),xpar(2),dxrels(3,2),dxpardeta(2,2)
 !
 !  ...relative position vectors for triangle vertices in the global
 !     cartesian system
-      dimension xrelv(3,4)
+      real(8) :: xrelv(3,4)
 !
 !  ...vertex coordinates in the cylinder Cartesian system and in the
 !     cylinder reference coordinates
-      dimension xrelsv(3,4),xparv(2,4)
+      real(8) :: xrelsv(3,4),xparv(2,4)
 !
 !  ...transformation matrix from global Cartesian to cylinder Cartesian
 !     coordinates; rows of the transformation matrix are unit
 !     vectors of the cylinder system computed in the global system
-      dimension transf(3,3)
+      real(8) :: transf(3,3)
 !
 !  ...linear shape functions in the parametric space (psi,theta)
-      dimension shapH(4),dshapH(2,4)
+      real(8) :: shapH(4),dshapH(2,4)
 !
 !  ...point on an edge
-      dimension dsedeta(2),                                    &
-                xe(3),dxedeta(3),xerels(3),dxerelsdeta(3),     &
-                xepar(2),dxepardeta(2)
+      real(8) :: dsedeta(2),                                    &
+                 xe(3),dxedeta(3),xerels(3),dxerelsdeta(3),     &
+                 xepar(2),dxepardeta(2)
 !
 !  ...work space
-      dimension void(3),dblend(2)
+      real(8) :: void(3),dblend(2)
+!
+      integer :: i,ie,ile,iv,iv1,iv2,ivar,j,nc,np,ns,norient
+      real(8) :: blend,dsdse,fval,r,rad,s,s1,s2,se
+!
+      integer :: iprint
 !
 !-----------------------------------------------------------------------
 !
@@ -780,7 +800,7 @@ end subroutine recta_cylinder
 !! @param[out] X         - physical coordinates of the point
 !! @param[out] Dxdeta    - derivatives wrt reference coordinates
 !!
-!! @revision
+!! @date Mar 2023
 !----------------------------------------------------------------------
 !
 subroutine recta_cone(No,Eta, X,Dxdeta)
@@ -788,39 +808,46 @@ subroutine recta_cone(No,Eta, X,Dxdeta)
       use control
       use GMP
       use element_data
-#include "syscom.blk"
 !
-      dimension Eta(2), X(3),Dxdeta(3,2)
+      implicit none
+!
+      integer :: No
+      real(8) :: Eta(2),X(3),Dxdeta(3,2)
 !
 !  ...cone axis vector normalized
-      dimension cvec(3)
+      real(8) :: cvec(3)
 !
 !  ...relative position vectors wrt cone origin
-      dimension xrelc(3),xpar(2),dxrelc(3,2),dxpardeta(2,2)
+      real(8) :: xrelc(3),xpar(2),dxrelc(3,2),dxpardeta(2,2)
 !
 !  ...relative position vectors for rectangle vertices in the global
 !     cartesian system
-      dimension xrelv(3,4)
+      real(8) :: xrelv(3,4)
 !
 !  ...vertex coordinates in the cone Cartesian system and in the
 !     cone reference coordinates
-      dimension xrelcv(3,4),xparv(2,4)
+      real(8) :: xrelcv(3,4),xparv(2,4)
 !
 !  ...transformation matrix from global Cartesian to cone Cartesian
 !     coordinates; rows of the transformation matrix are unit
 !     vectors of the cone system computed in the global system
-      dimension transf(3,3)
+      real(8) :: transf(3,3)
 !
 !  ...linear shape functions in the parametric space
-      dimension shapH(4),dshapH(2,4)
+      real(8) :: shapH(4),dshapH(2,4)
 !
 !  ...point on an edge
-      dimension dsedeta(2),                                 &
-                xe(3),dxedeta(3),xerelc(3),dxerelcdeta(3),  &
-                xepar(2),dxepardeta(2)
+      real(8) :: dsedeta(2),                                 &
+                 xe(3),dxedeta(3),xerelc(3),dxerelcdeta(3),  &
+                 xepar(2),dxepardeta(2)
 !
 !  ...work space
-      dimension void(3),dblend(2)
+      real(8) :: void(3),dblend(2)
+!
+      integer :: i,ie,ile,iv,iv1,iv2,ivar,j,nc,norient,np,ns
+      real(8) :: blend,c,dsdse,fval,r,rnorm,s,s1,s2,se
+!
+      integer :: iprint
 !
 !-----------------------------------------------------------------------
 !

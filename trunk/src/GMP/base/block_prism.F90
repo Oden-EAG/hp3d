@@ -1,12 +1,12 @@
 !------------------------------------------------------------------------------------
-!> Purpose : controls parametrization of prisms
+!> @brief Controls parametrization of prisms
 !!
 !! @param[in ] No     - prism number
 !! @param[in ] Eta    - reference coordinates of a point in the reference prism
 !! @param[out] X      - physical coordinates of the point
 !! @param[out] Dxdeta - derivatives of the physical coordinates
 !!
-!! @revision Nov 12
+!> @date Mar 2023
 !------------------------------------------------------------------------------------
 subroutine prism(No,Eta, X,Dxdeta)
 !
@@ -77,14 +77,14 @@ subroutine prism(No,Eta, X,Dxdeta)
 !
 !
 !------------------------------------------------------------------------------------
-!> Purpose : transfinite interpolation prism
+!> @brief Transfinite interpolation prism
 !!
 !! @param[in] No     - prism number
 !! @param[in] Eta    - reference coordinates of a point in the reference prism
 !! @param[in] X      - physical coordinates of the point
 !! @param[in] Dxdeta - derivatives of the physical coordinates
 !!
-!! @revision Mar 11
+!! @date Mar 2023
 !------------------------------------------------------------------------------------
 !
 subroutine prism_TI(No,Eta, X,Dxdeta)
@@ -93,39 +93,39 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
       use GMP
       use element_data
       use node_types, only: PRIS
-#include "syscom.blk"
-      common /cprism_TI/ iprint
 !
-      dimension Eta(3),X(3),Dxdeta(3,3)
+      implicit none
+!
+      integer :: No
+      real(8) :: Eta(3),X(3),Dxdeta(3,3)
 !
 !  ...vertex shape functions
-      dimension shapH(6),dshapH(3,6)
+      real(8) :: shapH(6),dshapH(3,6)
 !  ...2D and 1D barycentric coordinates
-      dimension vshapt(3),dvshapt(2,3), vshap(2),dvshap(2)
+      real(8) :: vshapt(3),dvshapt(2,3),vshap(2),dvshap(2)
 !
 !  ...derivatives of edge coordinate
-      dimension dtedeta(3)
+      real(8) :: dtedeta(3)
 !
 !  ...face coordinates
-      dimension tf(2),dtfdeta(2,3)
+      real(8) :: tf(2),dtfdeta(2,3)
 !
 !  ...edge kernels
-      dimension xe(3),dxedt(3)
+      real(8) :: xe(3),dxedt(3)
 !
 !  ...face kernels
-      dimension xf(3),dxfdtf(3,2)
+      real(8) :: xf(3),dxfdtf(3,2)
 !
 !  ...blending function
-      dimension dblend(3),dfact(2)
+      real(8) :: blend,dblend(3),fact,dfact(2)
+!
+      integer :: i,j,k,ie,ifig,iv,iv1,iv2,ivar
+      integer :: nc,norient,np,nr,nt
+      real(8) :: te
+!
+      integer :: iprint=0
 !
 !------------------------------------------------------------------------
-!
-      select case(No)
-      case(3153)
-        iprint=0
-      case default
-       iprint=0
-      end select
 !
  10   continue
       if (iprint.eq.1) then

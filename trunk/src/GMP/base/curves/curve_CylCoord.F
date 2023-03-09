@@ -4,7 +4,7 @@ c   routine name       - curve_CylCoord
 c
 c-----------------------------------------------------------------------
 c
-c   latest revision    - Dec 15
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine evaluates physical coordinates
 c                        for a point on the image of a straight line
@@ -16,10 +16,10 @@ c
 c   arguments :
 c     in:
 c               No     - the curve number
-c               Eta     - reference coordinate  (between 0 and 1)
+c               Eta    - reference coordinate  (between 0 and 1)
 c     out:
 c               X      - physical coordinates of the point
-c               Dxdeta  - derivatives of the physical coordinates wrt
+c               Dxdeta - derivatives of the physical coordinates wrt
 c                        reference coordinate
 c
 c-----------------------------------------------------------------------
@@ -27,19 +27,25 @@ c
       subroutine curve_CylCoord(No,Eta, X,Dxdeta)
 c
       use GMP
-#include "syscom.blk"
-      common /cCylCoord/ iprint
 c
-      dimension X(3),Dxdeta(3)
+      implicit none
+c
+      integer :: No
+      real(8) :: Eta,X(3),Dxdeta(3)
 c
 c  ...cylindrical coordinates of the endpoints of the curve
-      dimension xp(3,2)
+      real(8) :: xp(3,2)
 c
-ccc      iprint=0
+      integer :: i,iv,np
+      real(8) :: costhet,dr_deta,dthet_deta,pi,r,sinthet,theta,twopi
+c
+      integer :: iprint=0
+c
       if (iprint.eq.1) then
         write(*,7000) No,Eta
  7000   format('curve_CylCoord: DEBUGGING FOR No,Eta = ',i4,2x,f8.3)
       endif
+c
       pi = acos(-1.d0)
       twopi = pi*2.d0
 c
