@@ -206,7 +206,8 @@ endif
 .PHONY : check
 
 check: lib
-	@echo "TODO: Checking the hp3D library."
+	@echo "Checking the hp3D library."
+	@(cd test ; $(MAKE) one run ; cd ..);
 	@(cd problems/MPI_TEST/TEST ; $(MAKE) ; cd ../..);
 
 #-------------------------------------------------

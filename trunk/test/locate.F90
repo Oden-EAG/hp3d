@@ -4,9 +4,14 @@ program test_locate
 !
    integer :: a(10), loc
 !
-   a(7) = 5
+   a = 0; a(7) = 5
 !
    call locate(5, a, 10, loc)
-   write(*,*) 'loc ',loc
+!
+   if (loc .ne. 7) then
+      write(*,*) 'test_locate FAILED.'
+      stop
+   endif
+   write(*,*) 'test_locate PASSED.'
 !
 end program test_locate

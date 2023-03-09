@@ -9,7 +9,8 @@ program test_random_refine
 !..number of refinements (iterations)
    nitr = 5
 !
-   call random_refine_test(per,nitr)
+   write(*,*) 'test not working at the moment (needs revision)'
+   !call random_refine_test(per,nitr)
 !
 end program test_random_refine
 !
@@ -20,7 +21,6 @@ end program test_random_refine
    subroutine random_refine_test(Per,Nitr)
 !
       use data_structure3D
-      use element_data
 !
       implicit none
 !
@@ -31,13 +31,10 @@ end program test_random_refine
       integer :: mdle_list(NRELES)
 !
       integer :: i,iel,icnt,idx,kref
-      integer :: mdle,nelts,nref,npx,npy,npz
-      real(8) :: x,error_norm,resid_norm
+      integer :: mdle,nelts,nref
+      real(8) :: x
 !
       integer :: iprint = 0
-!
-      write(*,*) 'test not working at the moment (needs revision)'
-      goto 99
 !
       do i=1,Nitr
 !
@@ -93,22 +90,24 @@ end program test_random_refine
             exit
           endif
         enddo
-
-!  .....close mesh and solve the problem
-        call close
-        call solve1(1)
-
-!        call exact_error(error_norm,resid_norm)
- 7001   format('random_refine_test: npx,npy,npz=',3i2, &
-               ' error_norm,resid_norm = ',2e12.5)
-        write(*,7001) npx,npy,npz,error_norm,resid_norm
-        if ((error_norm/resid_norm).gt.1.d-6) then
+!
+        if (.false.) then
           write(*,*) 'random_refine_test : TEST FAILED'
-          return
+          stop
         endif
 !
       enddo
-      
-      99 continue
 !
    end subroutine random_refine_test
+!
+!----------------------------------------------------------------------
+!> @brief dummy routine
+subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
+!
+end subroutine
+!----------------------------------------------------------------------
+!> @brief dummy routine
+subroutine celem(Mdle,Idec,Nrdofs,Nrdofm,Nrdofc,Nodm, &
+                 NdofmH,NdofmE,NdofmV,NdofmQ,Nrnodm,Bload,Astif)
+!
+end subroutine

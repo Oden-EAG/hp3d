@@ -3,13 +3,17 @@ program test_parameters
    use parameters
    implicit none
 !
-   integer :: sum
+   integer :: nsum
 !
    call set_parameters(1,2,3,4,5,6)
 !
-   sum = NRCOMS + MAXNRHS + &
-         MAXEQNH + MAXEQNE + MAXEQNV + MAXEQNQ
+   nsum = NRCOMS + MAXNRHS + &
+          MAXEQNH + MAXEQNE + MAXEQNV + MAXEQNQ
 !
-   write(*,*) 'sum (21) = ', sum
+   if (nsum .ne. 21) then
+      write(*,*) 'test_parameters FAILED.'
+      stop
+   endif
+   write(*,*) 'test_parameters PASSED.'
 !
 end program test_parameters
