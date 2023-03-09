@@ -2,9 +2,7 @@ c----------------------------------------------------------------------
 c
 c   routine name       - findno
 c
-c   computer           - machine independent
-c
-c   latest revision    - Jun 07
+c   latest revision    - Mar 2023
 c
 c   purpose            - given a point on the projected plane,
 c                        routine identifies a GMP block
@@ -13,7 +11,7 @@ c                        closest to the point of view
 c
 c   arguments :
 c     in:
-c              Xy_in     - coordinates of a projected point
+c              Xy_in   - coordinates of a projected point
 c     out:
 c              Number  = Number of the figure, if the search
 c                        was successful
@@ -25,22 +23,27 @@ c
       use GMP
       use graphmod
 c
-#include "syscom.blk"
+      implicit none
 c
-      dimension Xy_in(2)
+      real(8) :: Xy_in(2)
+      integer :: Number
 c
 c  ...reference and physical coordinates
-      dimension eta(2),x(3)
+      real(8) :: eta(2),x(3)
 c
 c  ...list of figures
-      parameter(maxfig=10)
-      dimension list_figs(maxfig), xyz_list(1:3,maxfig), xyz_min(1:3)
+      integer, parameter :: maxfig=10
+      integer :: list_figs(maxfig)
+      real(8) :: xyz_list(1:3,maxfig), xyz_min(1:3)
 c
 c  ...blocks adjacent to a figure
-      dimension nbla(2)
+      integer :: nbla(2)
 c
+      real(8) :: d,d_min,fact
+      integer :: i,i_min,if,ifg,ii,is,ivis,j,lab
+      integer :: nbl,nfl,norient,nr,nr_fig,nh,nick,nvoid
 c
-      iprint=0
+      integer :: iprint=0
 c
       nr_fig=0
 c
@@ -140,4 +143,4 @@ c  ...........visible block
 c
       write(*,*)'findno: NUMBER = ',NUMBER
 c
-      end
+      end subroutine findno

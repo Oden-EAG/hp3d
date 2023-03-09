@@ -4,9 +4,7 @@ c   routine name       - find_point_to_block
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Jan 08
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine finds blocks adjacent to a point
 c
@@ -24,11 +22,14 @@ c
       subroutine find_point_to_block(Np,Maxbl, Nrbl,Neigbl)
 c
       use GMP
-#include "syscom.blk"
+      implicit none
 c
-      dimension Neigbl(Maxbl)
+      integer :: Np,Maxbl,Nrbl
+      integer :: Neigbl(Maxbl)
 c
-      iprint=0
+      integer :: ic,if,is,nc,nf,num,lab
+c
+      integer :: iprint=0
 c
 c  ...initiate number of neighboring blocks
       Nrbl=0
@@ -89,4 +90,4 @@ c
       endif
 c
 c
-      end
+      end subroutine find_point_to_block

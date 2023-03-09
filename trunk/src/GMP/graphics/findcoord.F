@@ -2,9 +2,7 @@ c----------------------------------------------------------------------
 c
 c   routine name       - findcoord
 c
-c   computer           - machine independent
-c
-c   latest revision    - Jun 07
+c   latest revision    - Mar 2023
 c
 c   purpose            - given a triangle or rectangle number and a point
 c                        both  projected onto a plane, find the correspon-
@@ -25,7 +23,6 @@ c                        the projection)
 c                Nfl   = 0, if the procedure has converged
 c                        1  otherwise
 c
-c
 c----------------------------------------------------------------------
 c
       subroutine findcoord(No,Lab,Xp, Eta,X,Nfl)
@@ -33,17 +30,21 @@ c
       use control
       use GMP
 c
-#include "syscom.blk"
+      implicit none
 c
-      dimension Xp(2),Eta(2),X(3)
+      integer :: No,Lab,Nfl
+      real(8) :: Xp(2),Eta(2),X(3)
 c
 c  ...derivatives of the physical coordinates wrt reference coordinates
-      dimension dxdeta(3,2)
+      real(8) :: dxdeta(3,2)
 c
 c  ...work space for NR iterations
-      dimension xy(2),aa(2,2), bb(2), deta(2)
+      real(8) :: xy(2),aa(2,2),bb(2),deta(2)
 c
-      iprint=0
+      real(8) :: d
+      integer :: iter
+c
+      integer :: iprint=0
 c
 c-----------------------------------------------------------------------
 c
@@ -91,5 +92,4 @@ c
 c
       end select
 c
-      end
-
+      end subroutine findcoord

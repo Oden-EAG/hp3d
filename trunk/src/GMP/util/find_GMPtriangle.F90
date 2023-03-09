@@ -1,7 +1,7 @@
 !----------------------------------------------------------------------
 !   routine name       - find_GMPtriangle
 !----------------------------------------------------------------------
-!   latest revision    - Dec 07
+!   latest revision    - Mar 2023
 !
 !   purpose            - For given three points, routine finds
 !                        the corresponding GMP triangle
@@ -19,11 +19,14 @@
 subroutine find_GMPtriangle(Nvert, Ntfound)
 !
       use GMP
-#include "syscom.blk"
+      implicit none
 !
-      dimension Nvert(3)
+      integer :: Nvert(3)
+      integer :: Ntfound
 !
-      iprint = 0
+      integer :: iflag,iv,ii,nt,ntet
+!
+      integer :: iprint = 0
  10   continue
       if (iprint .eq. 1) then
         write(*,7001) Nvert(1:3)

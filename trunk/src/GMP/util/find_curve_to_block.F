@@ -4,9 +4,7 @@ c   routine name       - find_curve_to_block
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Jan 08
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine finds blocks adjacent to a curve
 c
@@ -24,12 +22,14 @@ c
       subroutine find_curve_to_block(Nc,Maxbl, Nrbl,Neigbl)
 c
       use GMP
+      implicit none
 c
-#include "syscom.blk"
+      integer :: Nc,Maxbl,Nrbl
+      integer :: Neigbl(Maxbl)
 c
-      dimension Neigbl(Maxbl)
+      integer :: if,is,lab,nf,num
 c
-      iprint=0
+      integer :: iprint=0
       if (iprint.eq.1) write(*,7001) Nc
  7001 format('find_curve_to_block: Nc = ',i8)
 c

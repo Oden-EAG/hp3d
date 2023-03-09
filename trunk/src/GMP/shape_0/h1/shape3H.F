@@ -12,14 +12,14 @@ c  @param[out] ShapH        - values of shape functions
 c  @param[out] DshapH       - values of derivatives of shape functions
 c                             wrt to master element coordinates
 c
-c  rev@Sep 14
+c  @date Mar 2023
 c----------------------------------------------------------------------
 c
       subroutine shape3H_0(Type,Xi,Norder,Nedge_orient,Nface_orient,
      .                     Nrdof,ShapH,DshapH)
 c
       use parameters
-#include "syscom.blk"
+      implicit none
 c
       character(len=4)                 , intent(in)  :: Type
       integer , dimension(12)          , intent(in)  :: Nedge_orient
@@ -32,7 +32,7 @@ c
 c
 c----------------------------------------------------------------------
 c
-      iprint=0
+      integer :: iprint=0
 c
       if (iprint.eq.1) then
         write(*,7001)Type,Xi(1:3)
@@ -59,7 +59,7 @@ c
       endselect
 c
 c
-      endsubroutine shape3H_0
+      end subroutine shape3H_0
 c
 c
 c
@@ -69,7 +69,7 @@ c   routine name       - shapeHp
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Nov 08
+c   latest revision    - Mar 2023
 c
 c   purpose            - evaluate H1 shape functions for a prismatic
 c                        element
@@ -93,31 +93,35 @@ c
 c
       use parameters
       use element_data
-#include "syscom.blk"
+      implicit none
 c
-      dimension Nedge_orient(9), Nface_orient(5),Norder(15)
-      dimension Xi(3),ShapH(MAXprismH),DshapH(3,MAXprismH)
+      integer :: Nedge_orient(9),Nface_orient(5),Norder(15),Nrdof
+      real(8) :: Xi(3),ShapH(MAXprismH),DshapH(3,MAXprismH)
 c
 c  ...derivatives of edge coordinate
-      dimension dtedxi(3)
+      real(8) :: dtedxi(3)
 c
 c  ...edge bubble shape functions
-      dimension shapHb(MAXP-1),dshapHb(MAXP-1)
+      real(8) :: shapHb(MAXP-1),dshapHb(MAXP-1)
 c
 c  ...edge kernel shape functions
-      dimension shapHk(MAXP-1),dshapHk(MAXP-1)
+      real(8) :: shapHk(MAXP-1),dshapHk(MAXP-1)
 c
 c  ...triangular mid-face node bubble shape functions
-      dimension shapHt(MAXmdltH),dshapHt(2,MAXmdltH)
+      real(8) :: shapHt(MAXmdltH),dshapHt(2,MAXmdltH)
 c
 c  ...affine coordinates for triangular faces
-      dimension vshapt(3),dvshapt(2,3)
+      real(8) :: vshapt(3),dvshapt(2,3)
 c
 c  ...1D vertex shape functions in the xi_3 direction
-      dimension vshap(2),dvshap(2)
+      real(8) :: vshap(2),dvshap(2)
+c
+      real(8) :: te
+      integer :: i,ie,if,ii,iv1,iv2,j,k,l
+      integer :: nordh,nordv,nrdofHb,nrdofHe,nrdofHk,nrdofHt
 c-----------------------------------------------------------------------
 c
-      iprint=0
+      integer :: iprint=0
 c
 c  ...affine coordinates for the triangular faces
       vshapt(1) = 1.d0 - (Xi(1) + Xi(2))
@@ -299,7 +303,7 @@ c
       endif
 c
 c
-      end
+      end subroutine shapeHp
 c
 c----------------------------------------------------------------------
 c
@@ -307,7 +311,7 @@ c   routine name       - shapeHb
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Nov 08
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine evaluates shape functions for master
 c                        brick
@@ -332,20 +336,23 @@ c
       use element_data , only : NFAXES,IJKV,IXIEDGE,IBLENDE,NBLENDE,
      .                                      IXIFACE,IBLENDF,NBLENDF
       use parameters   , only : MAXP,MAXbrickH
-#include "syscom.blk"
+      implicit none
 c
-      dimension Nedge_orient(12),Nface_orient(6),Norder(19)
-      dimension Xi(3),ShapH(MAXbrickH),DshapH(3,MAXbrickH)
-c
+      integer :: Nedge_orient(12),Nface_orient(6),Norder(19),Nrdof
+      real(8) :: Xi(3),ShapH(MAXbrickH),DshapH(3,MAXbrickH)
 c
 c  ...1D linear shape functions, first index indicates the function
 c     number, second index the direction
-      dimension vshap(2,3),dvshap(2,3)
+      real(8) :: vshap(2,3),dvshap(2,3)
 c
 c  ...1D bubble shape functions
-      dimension shapH1(MAXP-1),dshapH1(MAXP-1),
-     .          shapH2(MAXP-1),dshapH2(MAXP-1),
-     .          shapH3(MAXP-1),dshapH3(MAXP-1)
+      real(8) :: shapH1(MAXP-1),dshapH1(MAXP-1),
+     .           shapH2(MAXP-1),dshapH2(MAXP-1),
+     .           shapH3(MAXP-1),dshapH3(MAXP-1)
+c
+      integer :: i,ibl,ibl1,ibl2,ie,if,iv,ixi,ixi1,ixi2,j,k,kk
+      integer :: nord1,nord2,nord3,nordh,nordv,nv,nv1,nv2
+      integer :: nrdofH1,nrdofH2,nrdofH3,nrdofHe
 c----------------------------------------------------------------------
 c
 c  ...calculate 1D linear shape functions
@@ -452,7 +459,7 @@ c  ...total number of dofs
       Nrdof=k
 c
 c
-      end
+      end subroutine shapeHb
 c
 c----------------------------------------------------------------------
 c
@@ -460,7 +467,7 @@ c   routine name       - shapeHn
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Nov 08
+c   latest revision    - Mar 2023
 c
 c   purpose            - evaluate H1 shape functions for a tetrahedral
 c                        element
@@ -484,33 +491,33 @@ c
 c
       use parameters
       use element_data
-#include "syscom.blk"
-      common /cshapeHn/ iprint
+      implicit none
 c
-      real(8) , dimension(3), intent(in) :: Xi
-      dimension Nedge_orient(6), Nface_orient(4),Norder(11)
-ccc      dimension Xi(3),ShapH(MAXbrickH),DshapH(3,MAXbrickH)
-      dimension ShapH(MAXbrickH),DshapH(3,MAXbrickH)
+      integer :: Norder(11),Nedge_orient(6),Nface_orient(4),Nrdof
+      real(8) :: Xi(3),ShapH(MAXbrickH),DshapH(3,MAXbrickH)
 c
 c  ...derivatives of edge coordinate
-      dimension dtedxi(3)
+      real(8) :: dtedxi(3)
 c
 c  ...face coordinates
-      dimension tf(2),dtfdxi(2,3)
+      real(8) :: tf(2),dtfdxi(2,3)
 c
 c  ...edge kernel shape functions
-      dimension shapHek(MAXP-1),dshapHek(MAXP-1)
+      real(8) :: shapHek(MAXP-1),dshapHek(MAXP-1)
 c
 c  ...mid-face node kernel shape functions
-      dimension shapHtk(MAXmdltH),dshapHtk(2,MAXmdltH)
+      real(8) :: shapHtk(MAXmdltH),dshapHtk(2,MAXmdltH)
 c
 c  ...middle node kernel shape functions
-      dimension shapHnk(MAXmdlnH),dshapHnk(3,MAXmdlnH)
+      real(8) :: shapHnk(MAXmdlnH),dshapHnk(3,MAXmdlnH)
 c
 c  ...blending function
-      dimension dblend(1:3)
+      real(8) :: te,blend,dblend(1:3)
 c
-      iprint=0
+      integer :: i,ie,if,iv1,iv2,iv3,ivar,j,k
+      integer :: nrdofHe,nrdofHn,nrdofHt
+c
+      integer :: iprint=0
 c
 c
       k=0
@@ -629,7 +636,7 @@ c
       endif
 c
 c
-      end
+      end subroutine shapeHn
 c
 c----------------------------------------------------------------------
 c
@@ -637,7 +644,7 @@ c   routine name       - shapeHd
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Nov 08
+c   latest revision    - Mar 2023
 c
 c   purpose            - a  3-D pyramid element routine
 c                        evaluating shape functions and their derivati-
@@ -663,31 +670,33 @@ c
       use element_data , only : NFAXES
       use control , only : GEOM_TOL
       use parameters
-#include "syscom.blk"
-      common /cshapeHd/ iprint
-      common /cshapke/ iprint_shapke
+      implicit none
 c
-      dimension Nedge_orient(8),Nface_orient(5),Norder(14)
-      dimension Xi(3),ShapH(MAXpyramH),DshapH(3,MAXpyramH)
+      integer :: Norder(14),Nedge_orient(8),Nface_orient(5),Nrdof
+      real(8) :: Xi(3),ShapH(MAXpyramH),DshapH(3,MAXpyramH)
 c
 c  ...blending functions
-      dimension dblend(3),blend_edge(4),dblend_edge(3,4)
+      real(8) :: blend,dblend(3),blend_edge(4),dblend_edge(3,4)
 c
 c  ...projections
-      dimension dtedxi(3),tf(2),dtfdxi(2,3)
+      real(8) :: dtedxi(3),tf(2),dtfdxi(2,3)
 c
 c  ...1D bubble/kernel shape functions
-      dimension shapH1(MAXP-1),dshapH1(MAXP-1),
-     .          shapH2(MAXP-1),dshapH2(MAXP-1)
+      real(8) :: shapH1(MAXP-1),dshapH1(MAXP-1),
+     .           shapH2(MAXP-1),dshapH2(MAXP-1)
 c
 c  ...mid-face node kernel shape functions
-      dimension shapHtk(MAXmdltH),dshapHtk(2,MAXmdltH)
+      real(8) :: shapHtk(MAXmdltH),dshapHtk(2,MAXmdltH)
 c
-      double precision z,z1
+      real(8) :: z,z1
+c
+      real(8) :: fact,dfact,te,x,xz,xz1,y,yz,yz1
+      integer :: i,ie,if,iv,ivar,j,k,kk
+      integer :: nexp,nord,nordh,nordv,nrdofH1,nrdofH2
+      integer :: nrdofHe,nrdofHt
+c
+      integer :: iprint=0
 c----------------------------------------------------------------------
-c
-ccc      iprint=1
-ccc      iprint_shapke = iprint
 c
 c  ...check that coordinates are inside reference pyramid
       if ((Xi(1)      .lt.-GEOM_TOL    ).or.
@@ -979,4 +988,4 @@ c
       endif
 c
 c
-      end
+      end subroutine shapeHd

@@ -4,7 +4,7 @@ c   routine name       - dpvistr
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Jan 08
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine displays triangles from the RGTR
 c                        list in order stored in IGTR list
@@ -13,22 +13,25 @@ c   argument
 c     in :
 c                  Nof - flag whether to display block numbers or not
 c
-c   required  routines - none
-c
 c----------------------------------------------------------------------
 c
       subroutine dpvistr(Nof)
 c
       use graphmod
 c
-#include "syscom.blk"
+      implicit none
 c
+      integer :: Nof
 c
 c  ...flags for drawing boundary segments
-      dimension nplotb(3)
-      character(5) text
+      integer :: nplotb(3)
+      character(5) :: text
 c
-      iprint=0
+      real(8) :: angle,height,shiftx,shifty,xtext,ytext
+      integer :: i,iblno,icolor,itr,ivar,k,ncar,ncol,nickb,nvoid
+      integer :: nblack,ngreen,norange,nred,nyellow
+c
+      integer :: iprint=0
 c
 c  ...define colors
       nblack  = npcol(2)
@@ -106,5 +109,5 @@ c
 c  ...end of loop through small triangles
       enddo
 c
-      return
-      end
+c
+      end subroutine dpvistr

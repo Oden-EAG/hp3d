@@ -1436,10 +1436,15 @@ c
 c
       end subroutine dumpin_GMP
 c
+c----------------------------------------------------------------------
+c
       subroutine print_GMP
 c
       use control
-#include "syscom.blk"
+      implicit none
+c
+      integer :: i,idec,nc,nh,np,nr,ns,nt
+      integer :: npri,npyr,ntet,nrcurv,nrfig
 c
  10   continue
       write(*,*) 'print_GMP: SELECT:'
@@ -1645,6 +1650,7 @@ c
 c
       end subroutine print_GMP
 c
+c----------------------------------------------------------------------
 c
       subroutine set_gmp_parameters(NDIM_loc,
      .                              MANDIM_loc,
@@ -1722,6 +1728,7 @@ c
 c
       end subroutine set_gmp_parameters
 c
+c----------------------------------------------------------------------
 c
       subroutine print_GMP_parameters
       use environment , only : QUIET_MODE
@@ -1755,6 +1762,7 @@ ccc 8061   format(' NRPO_FG  = ',i12)
 c
       end subroutine print_GMP_parameters
 c
+c----------------------------------------------------------------------
 c
       integer function Ndomain_gmp(IGMP_block)
 c

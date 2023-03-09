@@ -4,18 +4,10 @@ c   routine name       - dptrno
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Dec, 01
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine displays the nicknames of
-c                        all 2D blocks
-c
-c   usage              - call dptrno
-c
-c   arguments          - none
-c
-c   required  routines -
+c                        all 2D blocksc
 c
 c----------------------------------------------------------------------
 c
@@ -24,11 +16,14 @@ c
       use graphmod
       use GMP
 c
-#include "syscom.blk"
+      implicit none
 c
-      dimension xcoord(3,8), dxdxi(3,2)
-      dimension xav(3),xavob(3), xi(2)
-      character(3) text
+      real(8) :: xcoord(3,8), dxdxi(3,2)
+      real(8) :: xav(3),xavob(3), xi(2)
+      character(3) :: text
+c
+      real(8) :: angle,height,xtext,ytext
+      integer :: i,inv,iv,ivar,j,k,nc,ncol,nick,np,nt1,ntb,ntv
 c
 c  ...set colour
       ncol=npcol(2)
@@ -44,7 +39,6 @@ c  ...check if not invisible
 c
 c  .....bilinear blocks
         if (PRISMS(ntb)%Type.eq.'LiLiPrism') then
-
 c
 c  .....get the bases, next edges and then the vertices
           iv=0
@@ -158,9 +152,4 @@ c  .....write the block nickname
         call symbol(xtext,ytext,height,text,angle,3,ncol)
   190 continue
 c
-      return
-      end
-
-
-
-
+      end subroutine dptrno

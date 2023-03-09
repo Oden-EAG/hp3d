@@ -4,7 +4,7 @@ c   routine name       - shapHke
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Feb 13
+c   latest revision    - Mar 2023
 c
 c   purpose            - evaluate edge kernel H^1 shape functions
 c
@@ -141,7 +141,7 @@ c  ...printing
       endif
 c
 c
-      endsubroutine shapHke
+      end subroutine shapHke
 c
 c
 c
@@ -151,7 +151,7 @@ c   routine name       - shapHbe_0
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Feb 13
+c   latest revision    - Mar 2023
 c
 c   purpose            - evaluate edge bubble H^1 shape functions
 c
@@ -263,7 +263,7 @@ c
       enddo
 c
 c
-      endsubroutine shapHbe_Jason
+      end subroutine shapHbe_Jason
 c
 c
 c
@@ -273,7 +273,7 @@ c   routine name       - shapHkt
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Nov 08
+c   latest revision    - Mar 2023
 c
 c   purpose            - evaluate triangle kernel H^1 shape functions
 c
@@ -295,18 +295,21 @@ c
       use control
       use parameters
       use element_data
-#include "syscom.blk"
+      implicit none
 c
-      dimension T(2),ShapH(MAXmdltH),DshapH(2,MAXmdltH)
+      integer :: Nord,Norient,Nrdof
+      real(8) :: T(2),ShapH(MAXmdltH),DshapH(2,MAXmdltH)
 c
 c  ...global triangle coordinates
-      dimension s(2),dsdt(2,2)
+      real(8) :: s(2),dsdt(2,2)
 c
 c  ...work space
-      dimension dshapHds(2)
+      real(8) :: dshapHds(2)
+c
+      integer :: i,is,j,k,l,lsave
 c----------------------------------------------------------------------
 c
-      iprint=0
+      integer :: iprint=0
       if (iprint.eq.1) then
         write(*,7005) T(1:2),Nord,Norient
  7005   format('shapHkt: T,Nord,Norient = ',2f8.3,2x,2i3)
@@ -397,7 +400,7 @@ c  ...account for the orientation
       endif
 c
 c
-      end
+      end subroutine shapHkt
 c
 c----------------------------------------------------------------------
 c
@@ -405,7 +408,7 @@ c   routine name       - shapHbt
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Nov 08
+c   latest revision    - Mar 2023
 c
 c   purpose            - evaluate triangle bubble H^1 shape functions
 c
@@ -425,12 +428,15 @@ c
       subroutine shapHbt(T,Nord,Norient, Nrdof,ShapH,DshapH)
 c
       use parameters
-#include "syscom.blk"
+      implicit none
 c
-      dimension T(2),ShapH(MAXmdltH),DshapH(2,MAXmdltH)
+      integer :: Nord,Norient,Nrdof
+      real(8) :: T(2),ShapH(MAXmdltH),DshapH(2,MAXmdltH)
+c
+      integer :: k
 c
 c  ...bubble
-      dimension dv(2)
+      real(8) :: v,dv(2)
 c
       if (Nord.lt.3) then
         Nrdof=0; return
@@ -454,7 +460,7 @@ c  ...evaluate bubble shape functions
       enddo
 c
 c
-      end
+      end subroutine shapHbt
 c
 c----------------------------------------------------------------------
 c
@@ -462,7 +468,7 @@ c   routine name       - shapHb2_0
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Nov 08
+c   latest revision    - Mar 2023
 c
 c   purpose            - evaluate 2D bubble H^1 shape functions
 c
@@ -484,19 +490,23 @@ c
 c
       use element_data , only : NFAXES
       use parameters
-#include "syscom.blk"
-      common /cshapHb2/ iprint
+      implicit none
 c
-      dimension T(2),ShapH(MAXmdlqH),DshapH(2,MAXmdlqH)
+      integer :: Nord,Norient,Nrdof
+      real(8) :: T(2),ShapH(MAXmdlqH),DshapH(2,MAXmdlqH)
 c
 c  ...1D bubble shape functions
-      dimension shapH1(MAXP-1),dshapH1(MAXP-1),
-     .          shapH2(MAXP-1),dshapH2(MAXP-1)
-
+      real(8) :: shapH1(MAXP-1),dshapH1(MAXP-1),
+     .           shapH2(MAXP-1),dshapH2(MAXP-1)
+c
       character (len=4) :: Type
+c
+      integer :: i,j,k,nordh,nordv,nrdofH1,nrdofH2
 c
 c  ...bubble
 c      dimension dv(2)
+c
+      integer :: iprint
 c
 c----------------------------------------------------------------------
 c
@@ -561,7 +571,7 @@ c
       endif
 c
 c
-      end
+      end subroutine shapHb2_0
 c
 c----------------------------------------------------------------------
 c
@@ -569,7 +579,7 @@ c   routine name       - shapHkn
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Nov 08
+c   latest revision    - Mar 2023
 c
 c   purpose            - evaluate tetrahedroN kernel H^1 shape functions
 c
@@ -589,12 +599,14 @@ c
 c
       use control
       use parameters
-#include "syscom.blk"
+      implicit none
 c
-      dimension T(3),ShapH(MAXmdlnH),DshapH(3,MAXmdlnH)
+      integer :: Nord,Nrdof
+      real(8) :: T(3),ShapH(MAXmdlnH),DshapH(3,MAXmdlnH)
 c
+      integer :: i,j,k,l,lsave
 c
-      iprint=1
+      integer :: iprint=1
 c
       if (Nord.lt.4) then
         Nrdof=0; return
@@ -657,7 +669,7 @@ c  ...save the number of dof
       Nrdof=k
 c
 c
-      end
+      end subroutine shapHkn
 c
 c----------------------------------------------------------------------
 c
@@ -665,7 +677,7 @@ c   routine name       - shapHbn
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Nov 08
+c   latest revision    - Mar 2023
 c
 c   purpose            - evaluate tetrahedroN bubble H^1 shape functions
 c
@@ -685,14 +697,17 @@ c
 c
       use control
       use parameters
-#include "syscom.blk"
+      implicit none
 c
-      dimension T(3),ShapH(MAXmdlnH),DshapH(3,MAXmdlnH)
+      integer :: Nord,Nrdof
+      real(8) :: T(3),ShapH(MAXmdlnH),DshapH(3,MAXmdlnH)
 c
 c  ...bubble
-      dimension dv(3)
+      real(8) :: v,dv(3)
 c
-      iprint=1
+      integer :: k
+c
+      integer :: iprint=1
 c
       if (Nord.lt.4) then
         Nrdof=0; return
@@ -717,4 +732,4 @@ c  ...evaluate bubble shape functions
       enddo
 c
 c
-      end
+      end subroutine shapHbn

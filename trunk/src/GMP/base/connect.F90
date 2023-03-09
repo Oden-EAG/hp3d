@@ -1,26 +1,29 @@
 !----------------------------------------------------------------------
-!> Purpose : reconstruction of complete connectivities from partial
-!!           connectivities used in the new format
-!!
-!! @revision Nov 12
+!> @brief Reconstruction of complete connectivities from partial
+!!        connectivities used in the new format
+!> @date Mar 2023
 !----------------------------------------------------------------------
-!
 subroutine connect
 !
       use GMP
       use element_data
-#include "syscom.blk"
+      implicit none
 !
       integer, dimension(:,:), pointer :: iwork
 !
 !  ...maximum anticipated number of curves attached to a point
-      parameter (maxnrcurv=100)
+      integer, parameter :: maxnrcurv=100
 !  ...maximum anticipated number of figures attached to a point
-      parameter (maxnrfig=100)
+      integer, parameter :: maxnrfig=100
+!
+      integer :: i1,i2,i3,i4,ic,ii,j,j1,j2,j3,j4,k,k1,k2,lab
+      integer :: nc,nc1,nc2,nc3,nc4,nh,nick,nick1,nick2,np,np1,np2
+      integer :: nr,nt,npyr,ntet,nrcurv,nrfig,nrfig3,nrfig4,nvoid
 !
 !  ...an auxiliary list
-      dimension listaux(20)
-      iprint=0
+      integer :: listaux(20)
+!
+      integer :: iprint=0
       if (iprint.eq.1) then
         write(*,*) 'connect: DEBUGGING...'
       endif
@@ -1039,15 +1042,15 @@ end subroutine connect
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : deletes connectivity info for GMP objects
-!!
-!! @revision Nov 12
+!> @brief Deletes connectivity info for GMP objects
+!> @date Mar 2023
 !----------------------------------------------------------------------
-!
 subroutine clean_GMP
 !
       use GMP
-#include "syscom.blk"
+      implicit none
+!
+      integer :: np,nc,nt,nr,nh,ntet,npri,npyr
 !
       do np=1,NRPOINT
         POINTS(np)%NrCurv=0

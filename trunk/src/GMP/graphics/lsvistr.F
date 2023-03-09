@@ -4,16 +4,12 @@ c   routine name       - lsvistr
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Jun 07
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine makes the list of all visible
 c                        triangles and stores rescaled coordinates
 c                        of their end-points (vertices) in an array
 c                        RGTR
-c
-c   arguments          - none
 c
 c   required  routines - trian,recta,sortz,clip2,trobs
 c
@@ -24,24 +20,31 @@ c
       use GMP
       use graphmod
 c
-#include "syscom.blk"
+      implicit none
 c
-      dimension xmax(3),xmin(3)
-      dimension xi(2),xcoord(3,3),dxdxi(NDIM,2)
-      dimension pm(2),pn(2),xtro(3,3)
+      real(8) :: xmax(3),xmin(3)
+      real(8) :: xi(2),xcoord(3,3),dxdxi(NDIM,2)
+      real(8) :: pm(2),pn(2),xtro(3,3)
 c
 c  ...integer coordinates of points on a rectangular face
-      dimension ixi(2,3)
+      integer :: ixi(2,3)
 c
 c  ...face rectangles numbers and their orientation for a block
-      dimension nsid_rect(6),nsid_orient(6),nsid_tria(4)
+      integer :: nsid_rect(6),nsid_orient(6),nsid_tria(4)
 c
 c  ...visibility flags for two sides of a figure
-      dimension nvis_flag(2)
+      integer :: nvis_flag(2)
 c
 c  ...binary flags for plotting boundary of a triangle
-      dimension nplotb(3)
+      integer :: nplotb(3)
 c
+      real(8) :: cl,sign,vis
+      integer :: i,iclip,iflag,ii,iloc,inv2,is,isub,ivar,j,k,l,lab
+      integer :: nb,nbb,nbl,ndom,nhalf,nick,nickb,nnn,nr,nsub1,nsub2,nt
+c
+      integer :: iprint
+c
+      real(8) :: bigp,bign,small,one
       data bigp,bign,small,one /1.d30,-1.d30,1.d-6,1.d0/
 c
 c-----------------------------------------------------------------------
@@ -847,26 +850,4 @@ c
 c  ...sort according to z-coordinate in order back-to-front
       call sortz
 c
-      return
-      end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      end subroutine lsvistr
