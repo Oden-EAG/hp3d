@@ -1,4 +1,4 @@
-! !> @date Mar 2023
+!> @date Mar 2023
 program test_random_refine
 !
    real(8) :: per
