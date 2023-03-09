@@ -177,7 +177,7 @@ c
       implicit none
 c
       real(8) :: ctr50(3)
-      common /sphepoint/ ctr50
+c      common /sphepoint/ ctr50
 c
       integer :: Nusf,Nsurf(6)
       real(8) :: Eta(*),Feta(4),X(3),Sfact(4)

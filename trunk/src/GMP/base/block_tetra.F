@@ -155,8 +155,6 @@ c
       use element_data
       use node_types, only: TETR
       implicit none
-c      common /ctrianK/ iprint_trianK
-c      common /ctetra_TraTet/ iprint
 c
       integer, intent(in)  :: No
       real(8), intent(in)  :: Eta(3)
@@ -185,16 +183,12 @@ c
       integer :: ie,ifc,iv,iv1,iv2,iv3,ivar,nc,nt,norient,np
 c
       integer :: iprint = 0
-      integer :: iprint_trianK = 0
 c
 c------------------------------------------------------------------------
 c  ...initialize
       X = 0; Dxdeta = 0
 c
-ccc      iprint=0
  10   continue
-      iprint_trianK=iprint
-ccc      iprint_TraTet_OLD = iprint
       if (iprint.eq.1) then
         write(*,*) '************************************************'
         write(*,7001) No,Eta(1:3)
@@ -404,7 +398,6 @@ c
       use GMP
       use node_types, only: TETR
       implicit none
-c      common /ctetra_CylTet/ iprint
 c
       integer, intent(in)  :: No
       real(8), intent(in)  :: Eta(3)
@@ -418,6 +411,7 @@ c  ...miscellanea
       real(8) :: theta,sinthet,costhet
       real(8) :: dthet_deta1,dthet_deta2,dthet_deta3
       integer :: np,iv
+c
       integer :: iprint = 0
 c
 c-----------------------------------------------------------------------
