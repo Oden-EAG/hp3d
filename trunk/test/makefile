@@ -52,7 +52,7 @@ all :
 		make one run TEST=$$e ;\
 	done
 
-run :
+run : one
 	@echo ""
 	@echo "Running test: "$(TEST)
 	./$(TEST)

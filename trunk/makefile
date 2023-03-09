@@ -212,6 +212,7 @@ check: lib
 
 test: lib
 	@echo "TODO: Testing the hp3D library."
+	@(cd test ; $(MAKE) all ; cd ..);
 
 #-------------------------------------------------
 .PHONY : all
