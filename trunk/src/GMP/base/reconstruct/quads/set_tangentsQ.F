@@ -46,7 +46,8 @@ c
       use control
       use GMP
 c
-#include "syscom.blk"
+c  ...removed syscom (declare variables)
+      implicit none
 c
       dimension List_curves(Nrcurves),Newlist_curves(Nrcurves),
      .          List_recta(3,Nrcurves)

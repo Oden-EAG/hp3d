@@ -16,10 +16,8 @@ c
       use GMP
       use control
 c
-#include "syscom.blk"
-      common /crhsub/ iprint_rhsub
-      common /ctri/ iprint_tri
-      common /creconstruct_curve/ iprint_reconstruct_curve
+c     ... removed syscom (declare variables)
+      implicit none
 c
 c  ...data for curve reconstruction, points and normals
       dimension x(3,2)
@@ -215,11 +213,6 @@ c             vectors and local curvatures
 c
 c  ...loop through all curves
       do nc=1,NRCURVE
-        if (nc.eq.3214) then
-          iprint_reconstruct_curve=1
-        else
-          iprint_reconstruct_curve=0
-        endif
 c
 c  .....skip if not a Hermitian curve
         if (CURVES(nc)%Type.ne.'HermCur') cycle
@@ -505,7 +498,8 @@ ccc      subroutine collect_tangent(Nc,Np, Tangent,Dtangent)
 cccc
 ccc      use GMP
 cccc
-ccc#include "syscom.blk"
+cccc     ... removed syscom (declare variables)
+ccc          implicit none
 ccc#include "cpmax.blk"
 cccc
 ccc      dimension Tangent(1:3), Dtangent(1:3)
@@ -557,7 +551,8 @@ ccc      subroutine check_edge(Nc, Idec)
 cccc
 ccc      use GMP
 cccc
-ccc#include "syscom.blk"
+ccc      ... removed syscom (declare variables)
+ccc      implicit none
 ccc#include "cpmax.blk"
 cccc
 ccc      dimension x(3),nedg_points(100),nface_points(1000)

@@ -463,7 +463,8 @@ end subroutine cylinder_geodesic
 !!!      use control
 !!!      use GMP
 !!!      use element_data
-!!!#include "syscom.blk"
+!!!   ...removed syscom (declare variables)
+!!!      implicit none
 !!!c
 !!!      dimension center(1:3),axis(3),x(3),dxdeta(3),void(3)
 !!!      dimension xrel(3)

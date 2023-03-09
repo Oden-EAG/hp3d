@@ -39,9 +39,8 @@ c
       use GMP
       use control
 c
-#include "syscom.blk"
-      common /crhsub/ iprint_rhsub
-      common /ctri/ iprint_tri
+c  ...removed syscom (declare variables)
+      implicit none
 c
       dimension List_curves(Nrcurves),List_recta(1:3,Nrcurves),
      .          Rnorm(3)
