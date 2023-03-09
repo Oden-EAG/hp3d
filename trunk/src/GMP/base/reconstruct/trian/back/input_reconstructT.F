@@ -4,7 +4,7 @@ c   routine name       - input_reconstrucT
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - May 10
+c   latest revision    - May 2023
 c
 c   purpose: routine performs G1 reconstruction of a triangulated
 c            surface
@@ -35,7 +35,7 @@ c
       use GMP
       use element_data
 c
-#include "syscom.blk"
+      implicit none
 c
 c  ...temporary connectivities workspaces
       integer, dimension(:),   pointer :: vpoint_to_spoint
@@ -50,7 +50,7 @@ c  ...maximum anticipated number of tets attached to a point
       integer, parameter :: mphex = 100
 c
 c  ...work space
-      integer list(2,20)
+      integer :: list(2,20)
 c     for i-th block on the list
 c       list(1,i) = block connected to an edge
 c       list(2,i) = the corresponding edge number
@@ -58,7 +58,9 @@ c     or
 c       list(1,i) = block connected to a face
 c       list(2,i) = the corresponding face number
 c
-      character(10) type
+      character(10) :: type
+c
+      integer :: iprint
 c
 c----------------------------------------------------------------------
 c
@@ -729,4 +731,4 @@ ccc      call check_jacobian_prism
         write(*,*)'input_reconstruct: RECONSTRUCTION SUCCESSFUL!'
       endif
 c
-      end
+      end subroutine input_reconstruct
