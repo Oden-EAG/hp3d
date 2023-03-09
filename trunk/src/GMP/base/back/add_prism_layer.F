@@ -402,6 +402,4 @@ c
       endif
 c
 c
-      end
-
-
+      end subroutine add_prism_layer

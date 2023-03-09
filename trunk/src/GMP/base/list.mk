@@ -1,5 +1,3 @@
-add_layer2plane.F90
-add_prism_layer.F
 block_hexa.F90
 block_prism.F90
 block_pyram.F90
