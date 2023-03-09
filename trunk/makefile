@@ -8,7 +8,7 @@ HP3D makefile targets:
   make -j
     Build and install the library in parallel
   make clean
-    Clean all object and library files
+    Clean object and library files
   make check
     Compile and run one test problem (TODO)
   make test
@@ -16,13 +16,13 @@ HP3D makefile targets:
   make problems
     Compile examples in problems directory
   make all
-    Build/install the library and compile problems
+    Build/install the library, compile problems, and run tests
   make clean-test
     Clean test directory
   make clean-problems
     Clean problems directory
   make clean-all
-    Clean object/library files and problems directory
+    Clean object/library files, problems and test directory
 
   Advanced usage:
     make lib
@@ -219,7 +219,7 @@ test: lib
 #-------------------------------------------------
 .PHONY : all
 
-all: problems
+all: test problems
 
 #-------------------------------------------------
 .PHONY : dummy
