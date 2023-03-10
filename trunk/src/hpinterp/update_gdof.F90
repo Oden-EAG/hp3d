@@ -3,15 +3,10 @@
 !    routine name       - update_gdof
 !
 !-----------------------------------------------------------------------
-!
-!    latest revision    - Oct 2019
-!
-!    purpose            - routine updates values of geometry degrees
-!                         of freedom, using the GMP parametrizations
-!
-!    arguments          - none
-!
-!------------------------------------------------------------------------
+!> @brief Routine updates values of geometry degrees of freedom,
+!!        using the GMP parametrizations
+!> @date Mar 2023
+!-----------------------------------------------------------------------
 !
 subroutine update_gdof()
 !
@@ -64,8 +59,7 @@ subroutine update_gdof()
 !
 !-----------------------------------------------------------------------
 !
-   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
-   start_time = MPI_Wtime()
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 !
 !..lower the visitation flag for all nodes
    call reset_visit
@@ -431,9 +425,8 @@ subroutine update_gdof()
 !
 !-----------------------------------------------------------------------
 !
-   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
    if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
-      end_time = MPI_Wtime()
       write(*,8004) end_time-start_time
  8004 format(' update_gdof: ',f12.5,'  seconds')
    endif
