@@ -67,12 +67,8 @@ subroutine update_gdof()
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
    start_time = MPI_Wtime()
 !
-!$OMP PARALLEL DO
-!..lower the GMP interface flag for all nodes
-   do nod=1,NRNODS
-      NODES(nod)%geom_interf=0
-   enddo
-!$OMP END PARALLEL DO
+!..lower the visitation flag for all nodes
+   call reset_visit
 !
 !-----------------------------------------------------------------------
 !
@@ -102,7 +98,7 @@ subroutine update_gdof()
          call find_elem_type(mdle, mdltype)
 !
 !     ...skip if the element has already been processed
-         if (NODES(mdle)%geom_interf.eq.1) cycle
+         if (NODES(mdle)%visit.eq.1) cycle
          call refel(mdle, iflag,no,xsub)
 !
 !     ...determine nodes for the element (active and constrained)
@@ -124,7 +120,7 @@ subroutine update_gdof()
             if (loc.eq.0) then
 !
 !           ...check if the node has been updated
-               if (NODES(nod)%geom_interf.eq.0) then
+               if (NODES(nod)%visit.eq.0) then
                   nod_flg = .true.
                   goto 100
                endif
@@ -140,11 +136,11 @@ subroutine update_gdof()
          do iv=1,nvert(ntype)
             nod = nodesl(iv)
             if (.not.associated(NODES(nod)%dof)) then
-               NODES(nod)%geom_interf=1
+               NODES(nod)%visit=1
             endif
-            if (NODES(nod)%geom_interf.eq.1) cycle
+            if (NODES(nod)%visit.eq.1) cycle
             call hpvert(iflag,no,xsub(1:3,iv), NODES(nod)%dof%coord)
-            NODES(nod)%geom_interf=1
+            NODES(nod)%visit=1
 !
 !     ...end of loop through element vertices
          enddo
@@ -162,11 +158,11 @@ subroutine update_gdof()
 !
 !        ...if no gdof, mark as processed
             if (.not.associated(NODES(nod)%dof)) then
-               NODES(nod)%geom_interf=1
+               NODES(nod)%visit=1
             elseif (.not.associated(NODES(nod)%dof%coord)) then
-               NODES(nod)%geom_interf=1
+               NODES(nod)%visit=1
             endif
-            if (NODES(nod)%geom_interf.eq.1) cycle
+            if (NODES(nod)%visit.eq.1) cycle
             if (Is_inactive(nod))            cycle
 !
             if (mdltype .ne. 'Linear') then
@@ -175,7 +171,7 @@ subroutine update_gdof()
                            xnod,NODES(nod)%dof%coord)
             endif
 !
-            NODES(nod)%geom_interf=1
+            NODES(nod)%visit=1
 !
 !     ...end of loop through element edges
          enddo
@@ -190,11 +186,11 @@ subroutine update_gdof()
             nod = nodesl(ind)
 !        ...if no gdof, mark as processed
             if (.not.associated(NODES(nod)%dof)) then
-               NODES(nod)%geom_interf=1
+               NODES(nod)%visit=1
             elseif (.not.associated(NODES(nod)%dof%coord)) then
-               NODES(nod)%geom_interf=1
+               NODES(nod)%visit=1
             endif
-            if (NODES(nod)%geom_interf.eq.1) cycle
+            if (NODES(nod)%visit.eq.1) cycle
             if (Is_inactive(nod))            cycle
 !
             if (mdltype .ne. 'Linear') then
@@ -202,12 +198,12 @@ subroutine update_gdof()
                            nedge_orient,nface_orient,norder,ifc, &
                            xnod,NODES(nod)%dof%coord)
             endif
-            NODES(nod)%geom_interf=1
+            NODES(nod)%visit=1
 !
 !     ...end of loop through element faces
          enddo
 !
-         NODES(mdle)%geom_interf=1
+         NODES(mdle)%visit=1
 !
 !  ...end of loop through elements
  100  continue
@@ -254,15 +250,12 @@ subroutine update_gdof()
    j_loc = 0
    if (.not. nod_flg) goto 60
 !
-!..lower the visitation flag for all nodes
-   call reset_visit
-!
 !..fill local node list
    loc_max = 1000; allocate(nod_loc(loc_max))
    do iel=1,NRELES_SUBD
       mdle = ELEM_SUBD(iel)
 !  ...skip if the element has already been processed
-      if (NODES(mdle)%geom_interf.eq.1) cycle
+      if (NODES(mdle)%visit.eq.1) cycle
 !  ...determine nodes for the modified element
       call get_connect_info(mdle, nodesl,norientl)
       call logic_nodes(mdle,nodesl, nodm,nrnodm)
@@ -272,9 +265,8 @@ subroutine update_gdof()
          nod = nodm(i)
          call locate(nod,nodesl,nr_elem_nodes, loc)
 !     ...check if the node has been updated
-         if (loc.eq.0 .and. NODES(nod)%geom_interf.eq.0  &
-                      .and. NODES(nod)%visit      .eq.0  ) then
-            NODES(nod)%visit = 1
+         if (loc.eq.0 .and. NODES(nod)%visit.eq.0) then
+            NODES(nod)%visit = -1
             if(j_loc .ge. loc_max) then
                loc_max = loc_max*2
                allocate(nod_tmp(loc_max))
@@ -326,7 +318,7 @@ subroutine update_gdof()
    allocate(nod_rnk(j_glb)); nod_rnk = NUM_PROCS
    do i=1,j_glb
       nod = nod_glb(i)
-      if (NODES(nod)%geom_interf .eq. 1) nod_rnk(i) = RANK
+      if (NODES(nod)%visit.eq.1) nod_rnk(i) = RANK
    enddo
 !
 !..collect node supplier list
@@ -348,7 +340,7 @@ subroutine update_gdof()
       nod = nod_glb(i)
       call find_ndof(nod, ndofH,ndofE,ndofV,ndofQ)
       if (ndofH .eq. 0) then
-         NODES(nod)%geom_interf = 1
+         NODES(nod)%visit = 1
          cycle
       endif
       count = 3*ndofH
@@ -378,10 +370,20 @@ subroutine update_gdof()
          !write(*,6010) RANK,'RECEIVING',nod,S_Type(NODES(nod)%ntype)
          buf => NODES(nod)%dof%coord
          call MPI_RECV(buf,count,MPI_REAL8,src,tag,MPI_COMM_WORLD,MPI_STATUS_IGNORE,ierr)
-         NODES(nod)%geom_interf = 1
+         NODES(nod)%visit = 1
       endif
  6010 format('update_gdof: [',I4,'] ',A,' nod=',I6,', type=',A)
    enddo
+!
+   if (nod_flg) then
+      do i=1,j_loc
+         nod = nod_glb(j_off+i)
+!     ...reset visitation flag if node was not supplied
+         if (NODES(nod)%visit.eq.-1) then
+            NODES(nod)%visit = 0
+         endif
+      enddo
+   endif
 !
    deallocate(nod_rnk,nod_glb)
 !
