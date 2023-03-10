@@ -100,9 +100,6 @@ module data_structure3D
 !  .....refinement flag (decimal-encoded per direction (x,y,z))
         integer          :: ref_kind
 !
-!  .....interface flag with GMP
-        integer          :: geom_interf
-!
 !  .....visitation flag
         integer          :: visit
 !
@@ -316,7 +313,6 @@ module data_structure3D
         NODES(nod)%father = 0
         NODES(nod)%first_son = 0
         NODES(nod)%nr_sons = 0
-        NODES(nod)%geom_interf = 0
         nullify (NODES(nod)%dof)
 #if DEBUG_MODE
         NODES(nod)%error = 0.d0
@@ -398,7 +394,6 @@ module data_structure3D
         NODES_NEW(nod)%father = 0
         NODES_NEW(nod)%first_son = 0
         NODES_NEW(nod)%nr_sons = 0
-        NODES_NEW(nod)%geom_interf = 0
         nullify (NODES_NEW(nod)%dof)
 #if DEBUG_MODE
         NODES_NEW(nod)%error = 0.d0
@@ -478,7 +473,6 @@ module data_structure3D
         write(ndump,*) NODES(nod)%father
         write(ndump,*) NODES(nod)%first_son
         write(ndump,*) NODES(nod)%nr_sons
-        write(ndump,*) NODES(nod)%geom_interf
         write(ndump,*) NODES(nod)%visit
         write(ndump,*) NODES(nod)%act
         if (associated(NODES(nod)%dof)) then
@@ -621,7 +615,6 @@ module data_structure3D
         read(ndump,*) NODES(nod)%father
         read(ndump,*) NODES(nod)%first_son
         read(ndump,*) NODES(nod)%nr_sons
-        read(ndump,*) NODES(nod)%geom_interf
         read(ndump,*) NODES(nod)%visit
         read(ndump,*) NODES(nod)%act
         read(ndump,*) nn1
