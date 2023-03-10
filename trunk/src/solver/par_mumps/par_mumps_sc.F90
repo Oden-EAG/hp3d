@@ -352,13 +352,17 @@ subroutine par_mumps_sc(mtype)
       do i = nrnodm,1,-1
          nod = nodm(i)
 #if DEBUG_MODE
-         if (NFIRST_DOF(nod).lt.0) write(*,*) 'par_mumps_sc: NFIRST_DOF(nod).lt.0'; stop
+         if (NFIRST_DOF(nod).lt.0) then
+            write(*,*) 'par_mumps_sc: NFIRST_DOF(nod).lt.0'; stop
+         endif
 #endif
          do j=1,ndofmH(i)
             l=l+1
             LCON(l) = NFIRST_DOF(nod)+j
 #if DEBUG_MODE
-            if (LCON(l).le.0) write(*,*) 'par_mumps_sc: H1 LCON(l).le.0'; stop
+            if (LCON(l).le.0) then
+               write(*,*) 'par_mumps_sc: H1 LCON(l).le.0'; stop
+            endif
 #endif
          enddo
       enddo
@@ -369,7 +373,9 @@ subroutine par_mumps_sc(mtype)
             l=l+1
             LCON(l) = NFIRST_DOF(nod)+ndofmH(i)+j
 #if DEBUG_MODE
-            if (LCON(l).le.0) write(*,*) 'par_mumps_sc: HCurl LCON(l).le.0'; stop
+            if (LCON(l).le.0) then
+               write(*,*) 'par_mumps_sc: HCurl LCON(l).le.0'; stop
+            endif
 #endif
          enddo
       enddo
@@ -380,7 +386,9 @@ subroutine par_mumps_sc(mtype)
             l=l+1
             LCON(l) = NFIRST_DOF(nod)+ndofmH(i)+ndofmE(i)+j
 #if DEBUG_MODE
-            if (LCON(l).le.0) write(*,*) 'par_mumps_sc: HDiv LCON(l).le.0'; stop
+            if (LCON(l).le.0) then
+               write(*,*) 'par_mumps_sc: HDiv LCON(l).le.0'; stop
+            endif
 #endif
          enddo
       enddo
@@ -391,7 +399,9 @@ subroutine par_mumps_sc(mtype)
             l=l+1
             LCON(l) = NFIRST_DOF(nod)+ndofmH(nrnodm)+ndofmE(nrnodm)+ndofmV(nrnodm)+j
 #if DEBUG_MODE
-            if (LCON(l).le.0) write(*,*) 'par_mumps_sc: L2 LCON(l).le.0'; stop
+            if (LCON(l).le.0) then
+               write(*,*) 'par_mumps_sc: L2 LCON(l).le.0'; stop
+            endif
 #endif
          enddo
       endif
