@@ -47,7 +47,6 @@ one : $(OBJ_PATH)/.dummy $(OBJ_PATH)/$(TEST).o
 	@echo ""
 	@echo "- Linking - " $(TEST)
 	$(FC_WORK) -o $(TEST) $(OBJ_PATH)/$(TEST).o $(LIBS) $(LDFLAGS)
-	@echo $(CCINCS)
 
 #-------------------------------------------------
 .PHONY : all
