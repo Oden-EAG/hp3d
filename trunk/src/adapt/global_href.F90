@@ -18,14 +18,21 @@ subroutine global_href
 !..collect elements
    nr_elem = NRELES
 !
+! TODO: make this routine safe to use
+!       calling break directly can result in 2-irregular mesh temporarily
+!       calling refine fixes the issue but is much more expensive
+!       if breaking elements in the right order, it should be safe to do
+!
 !..break the elements
    do i=1,nr_elem
       mdle = ELEM_ORDER(i)
       if (is_leaf(mdle)) then
          call get_isoref(mdle, kref)
          call break(mdle,kref)
+!         call refine(mdle,kref)
       endif
    enddo
+!   call close_mesh
 !
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    call refresh
@@ -76,6 +83,11 @@ subroutine global_href_aniso(Krefxy,Krefz)
 !
 !..collect elements
    nr_elem = NRELES
+!
+! TODO: make this routine safe to use
+!       calling break directly can result in 2-irregular mesh temporarily
+!       calling refine fixes the issue but is much more expensive
+!       if breaking elements in the right order, it should be safe to do
 !
 !..break the elements
    do i=1,nr_elem
