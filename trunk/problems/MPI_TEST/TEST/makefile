@@ -7,12 +7,6 @@ DEBUG     ?= 0
 HP3D_USE_OPENMP    ?= 0
 HP3D_USE_INTEL_MKL ?= 0
 
-ifeq ($(COMPILER),INTEL)
-ifeq ($(DEBUG),1)
-FFLAGS += -gen-interface -warn none -warn interfaces
-endif
-endif
-
 SRC_PATH        = .
 OBJ_ROOT        = _obj_
 OBJ_PATH        = $(OBJ_ROOT)/maindir

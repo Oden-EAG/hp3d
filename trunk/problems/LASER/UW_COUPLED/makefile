@@ -11,12 +11,6 @@ ifeq ($(COMPLEX),0)
 $(error COMPLEX FLAG MUST BE 1 FOR LASER APPLICATION)
 endif
 
-ifeq ($(COMPILER),INTEL)
-ifeq ($(DEBUG),1)
-FFLAGS += -gen-interface -warn none -warn interfaces
-endif
-endif
-
 SRC_PATH        = .
 OBJ_ROOT        = _obj_
 OBJ_PATH        = $(OBJ_ROOT)/maindir
