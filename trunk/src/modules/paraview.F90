@@ -14,6 +14,7 @@ module paraview
    integer,parameter  :: PARAVIEW_IO = 22
    logical            :: PARAVIEW_DUMP_GEOM = .FALSE.
    logical            :: PARAVIEW_DUMP_ATTR = .FALSE.
+   logical            :: SECOND_ORDER_VIS   = .FALSE.
 !
 !  this is matching EXGEOM flag in "control" module
    integer,parameter  :: PARAVIEW_ISOGEOM = 0
@@ -32,42 +33,72 @@ module paraview
 !
    contains
 !
-!  -----------------------------------------------------------------------------
-!
+!-----------------------------------------------------------------------------
+!> Purpose : initialize paraview output (open hdf5 file)
+!!
+!> @date Feb 2023
+!-----------------------------------------------------------------------------
    subroutine paraview_init()
       call hdf5_w_init()
    end subroutine paraview_init
-!
-!  -----------------------------------------------------------------------------
-!
+
+
+
+!-----------------------------------------------------------------------------
+!> Purpose : finalize paraview output (close hdf5; deallocate data arrays)
+!!
+!> @date Feb 2023
+!-----------------------------------------------------------------------------
    subroutine paraview_finalize()
       call hdf5_w_finalize()
       if (allocated(GEOM_OBJ)) deallocate(GEOM_OBJ)
       if (allocated(GEOM_PTS)) deallocate(GEOM_PTS)
       if (allocated(GEOM_PTS)) deallocate(ATTR_VAL)
    end subroutine paraview_finalize
-!
-!  -----------------------------------------------------------------------------
-!
+
+
+
+!-----------------------------------------------------------------------------
+!> Purpose : initialize data arrays for outputting paraview mesh
+!!
+!> @date Feb 2023
+!-----------------------------------------------------------------------------
    subroutine geometry_init(Nobj,Npts)
+!
       integer, intent(in) :: Nobj,Npts
+!
       if (allocated(GEOM_OBJ)) deallocate(GEOM_OBJ)
       if (allocated(GEOM_PTS)) deallocate(GEOM_PTS)
       allocate(GEOM_OBJ(Nobj))
       allocate(GEOM_PTS(3,Npts))
+!
    end subroutine geometry_init
-!
-!  -----------------------------------------------------------------------------
-!
+
+
+
+!-----------------------------------------------------------------------------
+!> Purpose : finalize geometry data arrays
+!!
+!> @date Feb 2023
+!-----------------------------------------------------------------------------
    subroutine geometry_close()
       if (allocated(GEOM_OBJ)) deallocate(GEOM_OBJ)
       if (allocated(GEOM_PTS)) deallocate(GEOM_PTS)
    end subroutine geometry_close
-!
-!  -----------------------------------------------------------------------------
-!
+
+
+
+!-----------------------------------------------------------------------------
+!> Purpose : write mesh to paraview (xdmf)
+!!
+!> @date Feb 2023
+!-----------------------------------------------------------------------------
    subroutine geometry_write(Sname,LSname,Sfile,LSfile)
+!
+      implicit none
+!
       integer, intent(in)   :: LSname,LSfile
+!
       character(len=LSname) :: Sname
       character(len=LSfile) :: Sfile
 !
@@ -153,24 +184,45 @@ module paraview
       call hdf5_w_handle_err(ierr,'geometry_write: h5fclose_f')
 !
    end subroutine geometry_write
-!
-!  -----------------------------------------------------------------------------
-!
+
+
+
+!-----------------------------------------------------------------------------
+!> Purpose : initialize data arrays for outputting attribute fields
+!!
+!> @date Feb 2023
+!-----------------------------------------------------------------------------
    subroutine attr_init(Ndim,Nval)
+!
       integer, intent(in) :: Ndim,Nval
+!
       if (allocated(ATTR_VAL)) deallocate(ATTR_VAL)
       allocate(ATTR_VAL(Ndim,Nval))
+!
    end subroutine attr_init
-!
-!  -----------------------------------------------------------------------------
-!
+
+
+
+!-----------------------------------------------------------------------------
+!> Purpose : deallocate attribute arrays
+!!
+!> @date Feb 2023
+!-----------------------------------------------------------------------------
    subroutine attr_close()
       if (allocated(ATTR_VAL)) deallocate(ATTR_VAL)
    end subroutine attr_close
-!
-!  -----------------------------------------------------------------------------
-!
+
+
+
+!-----------------------------------------------------------------------------
+!> Purpose : write attribute field data to paraview (xdmf)
+!!
+!> @date Feb 2023
+!-----------------------------------------------------------------------------
    subroutine attr_write(Sname,LSname,Sfile,LSfile,Snick,LSnick)
+!
+      implicit none
+!
       integer, intent(in)   :: LSname,LSfile,LSnick
       character(len=LSname) :: Sname
       character(len=LSfile) :: Sfile

@@ -6,14 +6,17 @@
 !
 subroutine paraview_geom
 !
-   use environment , only : PREFIX
-   use paraview    , only : PARAVIEW_IO,PARAVIEW_DUMP_GEOM,PARAVIEW_DIR
-   use mpi_param   , only : RANK,ROOT
+   use environment     , only : PREFIX
+   use paraview        , only : PARAVIEW_IO, PARAVIEW_DUMP_GEOM,   &
+                                PARAVIEW_DIR, SECOND_ORDER_VIS
+   use mpi_param       , only : RANK, ROOT
+   use data_structure3D, only : NODES, ELEM_ORDER
+   use node_types
 !
    implicit none
    integer,         save :: id=-1
    character(len=5),save :: postfix
-   integer,         save :: ice, icn, icp
+   integer,         save :: ntype, ice, icn, icp, ico, mdle
 !
 !-------------------------------------------------------------------------------------------
 !
@@ -33,9 +36,30 @@ subroutine paraview_geom
 !
    if (RANK .ne. ROOT) goto 90
 !
+   if (SECOND_ORDER_VIS) then
+      ico = icn
+!
+      mdle = ELEM_ORDER(1)
+      ntype = NODES(mdle)%ntype
+!
+      select case(ntype)
+      case(MDLB)
+         write(PARAVIEW_IO,1011) "'HEXAHEDRON_27'", ice, 27
+      case(MDLP)
+         write(PARAVIEW_IO,1011) "'WEDGE_18'", ice, 18
+      case(MDLN)
+         write(PARAVIEW_IO,1011) "'TETRAHEDRON_10'", ice, 10
+      case default
+         write(*,*) 'paraview_geom: unrecongnized element type', S_Type(ntype)
+         stop 1
+      end select
+   else
+      ico = (ice+icn)
+      write(PARAVIEW_IO,1012) "'Mixed'", ice
+   endif
+!
 !..write to .xmf file
-   write(PARAVIEW_IO,1012) ice
-   write(PARAVIEW_IO,1013) (ice+icn)
+   write(PARAVIEW_IO,1013) ico
    write(PARAVIEW_IO,1014) trim(PREFIX), trim(postfix)
    write(PARAVIEW_IO,1015)
    write(PARAVIEW_IO,1016)
@@ -45,7 +69,8 @@ subroutine paraview_geom
    write(PARAVIEW_IO,1020)
    write(PARAVIEW_IO,1021)
 !
- 1012 format("      <Topology TopologyType='Mixed' NumberOfElements='",i8,"'>")
+ 1011 format("      <Topology TopologyType=",a," NumberOfElements='",i8,"' NodesPerElement='",i8,"'>")
+ 1012 format("      <Topology TopologyType=",a," NumberOfElements='",i8,"'>")
  1013 format("        <DataItem Dimensions='",i12,"' NumberType='Int' Precision='4' Format='HDF'>")
  1014 format("        ",a,"geom_",a,".h5:/Objects")
  1015 format("        </DataItem>")
