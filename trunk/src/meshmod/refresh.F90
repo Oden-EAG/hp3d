@@ -134,7 +134,7 @@ subroutine refresh
 !                                      any modified element nor local
 !                                      element node list of subd 0.
 !
-!                edge0                          edge0
+!                edge0                           edge0
 !                  |            href ->            |
 !                  |                               |
 !                  v                               v
