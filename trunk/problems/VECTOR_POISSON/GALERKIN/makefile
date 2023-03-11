@@ -42,7 +42,9 @@ OBJ           = $(MODULE_OBJ) $(COMMON_OBJ) $(GALERKIN_OBJ)
 FC_WORK       = $(FC) $(CCDEFS) $(CCINCS) $(FFLAGS) $(EXTRA_FFLAGS)
 
 #-------------------------------------------------
-$(EXEC) : $(OBJ_PATH)/.dummy $(OBJ)
+.PHONY : one
+
+one : $(OBJ_PATH)/.dummy $(OBJ)
 	@echo " "
 	@echo "- Linking - " $(EXEC)
 	@echo "- COMPLEX = " $(COMPLEX)
