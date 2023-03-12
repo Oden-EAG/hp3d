@@ -22,6 +22,7 @@ module data_structure3D
 !
 !  ...number of initial mesh elements, active elements (global,local), nodes
       integer, save :: NRELIS,NRELES,NRELES_SUBD,NRNODS
+      integer, save :: NRELES_GHOST,NRELES_INTERF
 !
 !  ...total number of active H1,H(curl),H(div),L2 dofs
       integer, save :: NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ
@@ -178,6 +179,13 @@ module data_structure3D
 !  ...global and local (subdomain) order of elements
       integer      , allocatable, save  :: ELEM_ORDER(:)
       integer      , allocatable, save  :: ELEM_SUBD(:)
+!
+!  ...all elements sharing nodes with subdomain (including ELEM_SUBD)
+      integer      , allocatable, save  :: ELEM_GHOST(:)
+!
+!  ...all elements touching the interface of subdomain
+!     (includes one layer of ELEM_SUBD but not all)
+      integer      , allocatable, save  :: ELEM_INTERF(:)
 !
 !-----------------------------------------------------------------------
 !
