@@ -160,9 +160,10 @@ c
       integer :: nsize(2),norder3D(19)
       norder3D = 0; norder3D(1:5) = Norder
 c
-      ShapH = 0.d0; GradH = 0.d0
+      call checkorder(Ntype,'contin',norder3D,MAXP, nsize)
 c
-      call checkorder(NType,'contin',norder3D,MAXP, nsize)
+      ShapH(1:nsize(2)) = 0.d0; GradH(1:2,1:nsize(2)) = 0.d0
+c
       select case(NType)
       case(TRIA,MDLT)
         call shape2DHTri(Xi,Norder,NoriE,nsize, NrdofH,ShapH,GradH)
@@ -219,9 +220,10 @@ c
       integer :: nsize(2),norder3D(19)
       norder3D = 0; norder3D(1:5) = Norder
 c
-      ShapE = 0.d0; CurlE = 0.d0
+      call checkorder(Ntype,'tangen',norder3D,MAXP, nsize)
 c
-      call checkorder(NType,'tangen',norder3D,MAXP, nsize)
+      ShapE(1:2,1:nsize(2)) = 0.d0; CurlE(1:nsize(2)) = 0.d0
+c
       select case(NType)
       case(TRIA,MDLT)
         call shape2DETri(Xi,Norder,NoriE,nsize, NrdofE,ShapE,CurlE)
@@ -280,9 +282,10 @@ c
       integer :: nsize(2),norder3D(19)
       norder3D = 0; norder3D(1:5) = Norder
 c
-      ShapV = 0.d0; DivV = 0.d0
+      call checkorder(Ntype,'normal',norder3D,MAXP, nsize)
 c
-      call checkorder(NType,'normal',norder3D,MAXP, nsize)
+      ShapV(1:2,1:nsize(2)) = 0.d0; DivV(1:nsize(2)) = 0.d0
+c
       select case(NType)
       case(TRIA,MDLT)
         call shape2DVTri(Xi,Norder,NoriE,nsize, NrdofV,ShapV,DivV)
@@ -336,9 +339,10 @@ c
       integer :: nsize(2),norder3D(19)
       norder3D = 0; norder3D(1:5) = Norder
 c
-      ShapQ = 0.d0
+      call checkorder(Ntype,'discon',norder3D,MAXP, nsize)
 c
-      call checkorder(NType,'discon',norder3D,MAXP, nsize)
+      ShapQ(1:nsize(2)) = 0.d0
+c
       select case(NType)
       case(TRIA,MDLT)
         call shape2DQTri(Xi,Norder,nsize, NrdofQ,ShapQ)
@@ -406,9 +410,10 @@ c
 c
       integer :: nsize(2)
 c
-      ShapH = 0.d0; GradH = 0.d0
-c
       call checkorder(NType,'contin',Norder,MAXP, nsize)
+c
+      ShapH(1:nsize(2)) = 0.d0; GradH(1:3,1:nsize(2)) = 0.d0
+c
       select case(NType)
       case(BRIC,MDLB)
         call shape3DHHexa(Xi,Norder,NoriE,NoriF,nsize,
@@ -476,9 +481,10 @@ c
 c
       integer :: nsize(2)
 c
-      ShapE = 0.d0; CurlE = 0.d0
+      call checkorder(Ntype,'tangen',Norder,MAXP, nsize)
 c
-      call checkorder(NType,'tangen',Norder,MAXP, nsize)
+      ShapE(1:3,1:nsize(2)) = 0.d0; CurlE(1:3,1:nsize(2)) = 0.d0
+c
       select case(NType)
       case(BRIC,MDLB)
         call shape3DEHexa(Xi,Norder,NoriE,NoriF,nsize,
@@ -543,9 +549,10 @@ c
 c
       integer :: nsize(2)
 c
-      ShapV = 0.d0; DivV = 0.d0
-c
       call checkorder(NType,'normal',Norder,MAXP, nsize)
+c
+      ShapV(1:3,1:nsize(2)) = 0.d0; DivV(1:nsize(2)) = 0.d0
+c
       select case(NType)
       case(BRIC,MDLB)
         call shape3DVHexa(Xi,Norder,NoriF,nsize, NrdofV,ShapV,DivV)
@@ -602,7 +609,9 @@ c
 c
       integer :: nsize(2)
 c
-      ShapQ = 0.d0
+      call checkorder(Ntype,'discon',Norder,MAXP, nsize)
+c
+      ShapQ(1:nsize(2)) = 0.d0
 c
       call checkorder(NType,'discon',Norder,MAXP, nsize)
       select case(NType)
