@@ -9,6 +9,8 @@ subroutine hp3gen(Fp)
   use GMP
   use element_data
   use data_structure3D
+  use mpi_param, only: NUM_PROCS
+  use par_mesh
   !
   implicit none
   !
@@ -51,8 +53,8 @@ subroutine hp3gen(Fp)
   integer :: nel, npri, nh, ntet, npyr, np, iv, is, ifc, ie, mdle
   integer :: nt, nrbl, nbl, nr, lab, nord, nod_new, nbcond, nod, nrfaces
   integer :: nb, nc, i, ib, iii, istat, icase, iphys, num, number, subd
-  integer :: ivar,nvar
-  logical :: iact
+  integer :: ivar, nvar
+  logical :: iact, lflag
   !
 #if DEBUG_MODE
   integer :: iprint = -1
@@ -762,7 +764,7 @@ subroutine hp3gen(Fp)
     call logic_error(ERR_ALLOC_FAILURE,__FILE__,__LINE__)
   endif
   !
-!----------------------------------------------------------------------
+  !----------------------------------------------------------------------
   !
   !  ...filling ELEM_ORDER array
   !
@@ -772,6 +774,17 @@ subroutine hp3gen(Fp)
   endif
 #endif
   call update_ELEM_ORDER
+  !
+  !----------------------------------------------------------------------
+  !
+  !  ...distribute mesh if using MPI parallelism
+  !
+  lflag = EXCHANGE_DOF
+  EXCHANGE_DOF = .true. ! no update_gdof/Ddof in distr_mesh
+  if (NUM_PROCS > 1) call distr_mesh
+  EXCHANGE_DOF = lflag
+  !
+  !----------------------------------------------------------------------
   !
   !  ...generate geometry and Dirichlet dof
   !

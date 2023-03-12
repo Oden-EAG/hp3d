@@ -22,6 +22,9 @@ job=0
 # - number of refinements (if job=1)
 imax=2
 
+# Initial mesh
+geom='./geometries/hexa_orient0'
+
 # - MAXNODS
 maxnods=525000
 
@@ -30,6 +33,7 @@ export KMP_STACKSIZE=64M # p=5
 
 
 args=" -job ${job} -maxnods ${maxnods} -p ${p}"
+args+=" -file-geometry ${geom}"
 args+=" -isol ${isol} -imax ${imax} -nthreads ${nthreads}"
 
 mpirun -np ${nproc} ./pois ${args}

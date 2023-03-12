@@ -1,7 +1,7 @@
 !----------------------------------------------------------------------------
-!> Purpose : initialize problem dependent environments, solvers, graphics and
-!!           create initial mesh.
-!! @date Jun 15
+!> @brief   initialize problem dependent environments, solvers, graphics and
+!!          create initial mesh.
+!> @date    Feb 2023
 !----------------------------------------------------------------------------
 subroutine initialize
   use environment
@@ -14,6 +14,9 @@ subroutine initialize
   use frsolmod
   use upscale
   use paraview
+  use zoltan_wrapper
+  use mpi_param, only: NUM_PROCS
+  !
   implicit none
   !--------------------------------------------------------------------------
   ! G E O M E T R Y    S E T T I N G
@@ -83,6 +86,10 @@ subroutine initialize
   !
   !..read geometry
      call read_geometry(trim(FILE_GEOM))
+  !
+  !..optionally, choose partitioning algorithm for the initial mesh
+  !              if using MPI parallelism
+     if (NUM_PROCS > 1) call zoltan_w_set_lb(0)
   !
   !..generate mesh and read physics file
   !..keep integration flag value
