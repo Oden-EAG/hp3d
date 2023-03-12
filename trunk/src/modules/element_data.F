@@ -385,66 +385,6 @@ c
       end function Type_nod
 c
 c----------------------------------------------------------------------
-c   remark: see parameterized array NVERT in module node_types
-c
-cc  ...determine number of vertices for a middle node or element type
-c      function Nvert(Ntype)
-cc
-c      integer Ntype
-c      integer Nvert
-cc
-c      select case(Ntype)
-c        case(MEDG)     ; Nvert=2
-c        case(MDLT,TRIA); Nvert=3
-c        case(MDLQ,QUAD); Nvert=4
-c        case(MDLB,BRIC); Nvert=8
-c        case(MDLP,PRIS); Nvert=6
-c        case(MDLN,TETR); Nvert=4
-c        case(MDLD,PYRA); Nvert=5
-c      end select
-cc
-c      end function Nvert
-c
-c----------------------------------------------------------------------
-c   remark: see parameterized array NEDGE in module node_types
-c
-cc  ...determine number of edges for a middle node or element type
-c      function Nedge(Ntype)
-cc
-c      integer Ntype
-c      integer Nedge
-cc
-c      select case(Ntype)
-c        case(MEDG)     ; Nedge=0
-c        case(MDLT,TRIA); Nedge=3
-c        case(MDLQ,QUAD); Nedge=4
-c        case(MDLB,BRIC); Nedge=12
-c        case(MDLP,PRIS); Nedge=9
-c        case(MDLN,TETR); Nedge=6
-c        case(MDLD,PYRA); Nedge=8
-c      end select
-cc
-c      end function Nedge
-c
-c----------------------------------------------------------------------
-c   remark: see parameterized array NFACE in module node_types
-c
-cc  ...determine number of faces for a middle node or element type
-c      function Nface(Ntype)
-cc
-c      integer Ntype
-c      integer Nface
-cc
-c      select case(Ntype)
-c        case(MDLB,BRIC); Nface=6
-c        case(MDLP,PRIS); Nface=5
-c        case(MDLN,TETR); Nface=4
-c        case(MDLD,PYRA); Nface=5
-c      end select
-cc
-c      end function Nface
-c
-c----------------------------------------------------------------------
 c
 c  ...return vertex numbers endpoints of an edge......
       subroutine edge_to_vert(Ntype,Ie, Nv1,Nv2)
