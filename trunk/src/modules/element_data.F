@@ -306,14 +306,14 @@ c
       integer :: Ntype
 c
       select case(Ntype)
-      case (VERT); Ivtk_type = 1
-      case (MEDG); Ivtk_type = 2
-      case (MDLT); Ivtk_type = 5
-      case (MDLQ); Ivtk_type = 9
-      case (MDLN); Ivtk_type = 10
-      case (MDLB); Ivtk_type = 12
-      case (MDLP); Ivtk_type = 13
-      case (MDLD); Ivtk_type = 14
+        case (VERT); Ivtk_type = 1
+        case (MEDG); Ivtk_type = 2
+        case (MDLT); Ivtk_type = 5
+        case (MDLQ); Ivtk_type = 9
+        case (MDLN); Ivtk_type = 10
+        case (MDLB); Ivtk_type = 12
+        case (MDLP); Ivtk_type = 13
+        case (MDLD); Ivtk_type = 14
       end select
 c
       end function Ivtk_type
@@ -326,14 +326,14 @@ c
       integer :: Ntype
 c
       select case(Ntype)
-      case (VERT); Ixdmf_type = 0
-      case (MEDG); Ixdmf_type = 0
-      case (MDLT); Ixdmf_type = 4
-      case (MDLQ); Ixdmf_type = 5
-      case (MDLN); Ixdmf_type = 6
-      case (MDLB); Ixdmf_type = 9
-      case (MDLP); Ixdmf_type = 8
-      case (MDLD); Ixdmf_type = 7
+        case (VERT); Ixdmf_type = 0
+        case (MEDG); Ixdmf_type = 0
+        case (MDLT); Ixdmf_type = 4
+        case (MDLQ); Ixdmf_type = 5
+        case (MDLN); Ixdmf_type = 6
+        case (MDLB); Ixdmf_type = 9
+        case (MDLP); Ixdmf_type = 8
+        case (MDLD); Ixdmf_type = 7
       end select
 c
       end function Ixdmf_type
@@ -348,34 +348,34 @@ c
       select case(Ntype)
       case (MDLN)
         select case(J)
-        case (1,2,3,4);       Type_nod = VERT
-        case (5,6,7, 8,9,10); Type_nod = MEDG
-        case (11,12,13,14);   Type_nod = MDLT
-        case (15);            Type_nod = MDLN
+          case (1,2,3,4);       Type_nod = VERT
+          case (5,6,7, 8,9,10); Type_nod = MEDG
+          case (11,12,13,14);   Type_nod = MDLT
+          case (15);            Type_nod = MDLN
         end select
       case (MDLP)
         select case(J)
-        case (1,2,3, 4,5,6);               Type_nod = VERT
-        case (7,8,9, 10,11,12, 13,14,15);  Type_nod = MEDG
-        case (16,17);                      Type_nod = MDLT
-        case (18,19,20);                   Type_nod = MDLQ
-        case (21);                         Type_nod = MDLP
+          case (1,2,3, 4,5,6);              Type_nod = VERT
+          case (7,8,9, 10,11,12, 13,14,15); Type_nod = MEDG
+          case (16,17);                     Type_nod = MDLT
+          case (18,19,20);                  Type_nod = MDLQ
+          case (21);                        Type_nod = MDLP
         end select
       case (MDLB)
         select case(J)
-        case (1,2,3,4, 5,6,7,8);           Type_nod = VERT
-        case (9,10,11,12, 13,14,15,16, 17,18,19,20)
-          Type_nod = MEDG
-        case (21,22,23,24,25,26);          Type_nod = MDLQ
-        case (27);                         Type_nod = MDLB
+          case (1,2,3,4, 5,6,7,8);          Type_nod = VERT
+          case (9,10,11,12, 13,14,15,16, 17,18,19,20)
+                                            Type_nod = MEDG
+          case (21,22,23,24,25,26);         Type_nod = MDLQ
+          case (27);                        Type_nod = MDLB
         end select
       case (MDLD)
         select case(J)
-        case (1,2,3,4,5);            Type_nod = VERT
-        case (6,7,8,9, 10,11,12,13); Type_nod = MEDG
-        case (14);                   Type_nod = MDLQ
-        case (15,16,17,18);          Type_nod = MDLT
-        case (19);                   Type_nod = MDLD
+          case (1,2,3,4,5);            Type_nod = VERT
+          case (6,7,8,9, 10,11,12,13); Type_nod = MEDG
+          case (14);                   Type_nod = MDLQ
+          case (15,16,17,18);          Type_nod = MDLT
+          case (19);                   Type_nod = MDLD
         end select
       case default
         write(*,*) 'Type_nod: wrong input type [',S_Type(Ntype),']'
@@ -383,63 +383,6 @@ c
       end select
 c
       end function Type_nod
-c
-c----------------------------------------------------------------------
-c
-c  ...determine number of vertices for a middle node or element type
-      function Nvert(Ntype)
-c
-      integer Ntype
-      integer Nvert
-c
-      select case(Ntype)
-      case(MEDG); Nvert=2
-      case(MDLT,TRIA); Nvert=3
-      case(MDLQ,QUAD); Nvert=4
-      case(MDLB,BRIC); Nvert=8
-      case(MDLP,PRIS); Nvert=6
-      case(MDLN,TETR); Nvert=4
-      case(MDLD,PYRA); Nvert=5
-      end select
-c
-      end function Nvert
-c
-c----------------------------------------------------------------------
-c
-c  ...determine number of edges for a middle node or element type
-      function Nedge(Ntype)
-c
-      integer Ntype
-      integer Nedge
-c
-      select case(Ntype)
-      case(MEDG); Nedge=0
-      case(MDLT,TRIA); Nedge=3
-      case(MDLQ,QUAD); Nedge=4
-      case(MDLB,BRIC); Nedge=12
-      case(MDLP,PRIS); Nedge=9
-      case(MDLN,TETR); Nedge=6
-      case(MDLD,PYRA); Nedge=8
-      end select
-c
-      end function Nedge
-c
-c----------------------------------------------------------------------
-c
-c  ...determine number of faces for a middle node or element type
-      function Nface(Ntype)
-c
-      integer Ntype
-      integer Nface
-c
-      select case(Ntype)
-      case(MDLB,BRIC); Nface=6
-      case(MDLP,PRIS); Nface=5
-      case(MDLN,TETR); Nface=4
-      case(MDLD,PYRA); Nface=5
-      end select
-c
-      end function Nface
 c
 c----------------------------------------------------------------------
 c
