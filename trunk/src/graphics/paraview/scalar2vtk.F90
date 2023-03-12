@@ -16,7 +16,7 @@ subroutine scalar2vtk(Sname,Sfile,Snick,Idx, Ic)
 !
    use data_structure3D
    use element_data
-   use physics          , only: DTYPE,ADRES
+   use physics
    use upscale
    use paraview
    use MPI              , only: MPI_COMM_WORLD,MPI_SUM,MPI_INTEGER
@@ -152,10 +152,10 @@ subroutine scalar2vtk(Sname,Sfile,Snick,Idx, Ic)
                       zsolH,zgradH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
 !
 !     ...approximation space
-         select case(DTYPE(iattr))
+         select case(D_TYPE(iattr))
 !
 !        -- H1 --
-         case('contin')
+         case(CONTIN)
             isol = (iload-1)*NRHVAR + ibeg + icomp
 !
 !        ...REAL part
@@ -167,7 +167,7 @@ subroutine scalar2vtk(Sname,Sfile,Snick,Idx, Ic)
             endif
 !
 !        -- L2 --
-         case('discon')
+         case(DISCON)
             isol = (iload-1)*NRQVAR + ibeg + icomp
 !
 !        ...REAL part

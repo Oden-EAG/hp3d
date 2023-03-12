@@ -138,7 +138,7 @@
                 ndofH_face,ndofE_face,ndofV_face,ndofQ_face)
 !
 ! check if a homogeneous Dirichlet node
-  call homogenD('normal',Icase,Bcond, is_homD,ncase,ibcnd)
+  call homogenD(NORMAL,Icase,Bcond, is_homD,ncase,ibcnd)
   if (is_homD) then
     zuV = ZERO
     go to 100
@@ -366,10 +366,10 @@
             if (ncase(i).eq.1) ic=ic+1
 !
 !  .........select the discretization type
-            select case(DTYPE(i))
+            select case(D_TYPE(i))
 !
 !  .........H(div) component
-            case('normal')
+            case(NORMAL)
 !
 !  ...........update global counter
               ivarV = ivarV + 1

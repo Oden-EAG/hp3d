@@ -9,7 +9,7 @@
 !
 subroutine soldis_select_system
 !
-      use physics          , only : NR_PHYSA, NR_COMP, DTYPE, PHYSA
+      use physics
       use data_structure3D , only : NRCOMS
       use graphmod         , only : ISELECT
 !
@@ -22,7 +22,7 @@ subroutine soldis_select_system
       write(*,*)'     ATTRIBUTE | DISC. SPACE | COMPONENTS'
       do iattr=1,NR_PHYSA
 !
-        write(*,1000) iattr, PHYSA(iattr), DTYPE(iattr), NR_COMP(iattr)
+        write(*,1000) iattr, PHYSA(iattr), S_DType(D_TYPE(iattr)), NR_COMP(iattr)
  1000   format(i2,' - ',a6,7x,a6,8x,i10)
 !
       enddo
@@ -55,9 +55,9 @@ subroutine soldis_select_system
       if ((iload < 1) .OR. (iload > NRCOMS))  goto 13
 !
 !     trace
-      select case(DTYPE(iattr))
-      case('tangen') ; write(*,*) 'Displaying magnitude of tangential trace...'
-      case('normal') ; write(*,*) 'Displaying magnitude of normal trace...'
+      select case(D_TYPE(iattr))
+      case(TANGEN) ; write(*,*) 'Displaying magnitude of tangential trace...'
+      case(NORMAL) ; write(*,*) 'Displaying magnitude of normal trace...'
       endselect
 !
 !     store selection
@@ -142,10 +142,10 @@ subroutine soldis_system(Mdle,Xi,X,Rn,SolH,GradH,SolE,CurlE,SolV,DivV,SolQ, Val)
       ibeg=ADRES(iattr)
 !
 !     discretization type
-      select case(DTYPE(iattr))
+      select case(D_TYPE(iattr))
 !
 !     -- H1 --
-      case('contin')
+      case(CONTIN)
 !
         isol = (iload-1)*NRHVAR + ibeg + icomp
 !
@@ -154,7 +154,7 @@ subroutine soldis_system(Mdle,Xi,X,Rn,SolH,GradH,SolE,CurlE,SolV,DivV,SolQ, Val)
         endif
 !
 !     -- H(curl) --
-      case('tangen')
+      case(TANGEN)
 !
         isol = (iload-1)*NREVAR + ibeg + icomp
 !
@@ -175,7 +175,7 @@ subroutine soldis_system(Mdle,Xi,X,Rn,SolH,GradH,SolE,CurlE,SolV,DivV,SolQ, Val)
         call norm(aux, Val)
 !
 !     -- H(div) --
-      case('normal')
+      case(NORMAL)
 !
         isol = (iload-1)*NRVVAR + ibeg + icomp
 !
@@ -191,7 +191,7 @@ subroutine soldis_system(Mdle,Xi,X,Rn,SolH,GradH,SolE,CurlE,SolV,DivV,SolQ, Val)
         Val = abs(s)
 !
 !     -- L2 --
-      case('discon')
+      case(DISCON)
 !
         isol = (iload-1)*NRQVAR + ibeg + icomp
 !

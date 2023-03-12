@@ -781,17 +781,16 @@ module data_structure3D
 !
 !-----------------------------------------------------------------------
 !
-      function Is_Dirichlet_attr(Nod,D_type)
+      function Is_Dirichlet_attr(Nod,Dtype)
       logical Is_Dirichlet_attr
-      integer Nod
-      character(6) D_type
+      integer Nod,Dtype
       integer ibc(NRINDEX), ic, ivar, iphys
 !
       call decod(NODES(Nod)%bcond,2,NRINDEX, ibc)
       Is_Dirichlet_attr = .false.
       ic = 0
       do iphys=1,NR_PHYSA
-        if (DTYPE(iphys).eq.D_type) then
+        if (D_TYPE(iphys).eq.Dtype) then
           do ivar=1,NR_COMP(iphys)
             ic = ic + 1
             if (ibc(ic).eq.1) Is_Dirichlet_attr = .true.

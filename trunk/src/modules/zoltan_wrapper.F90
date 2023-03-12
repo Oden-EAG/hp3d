@@ -416,10 +416,10 @@ module zoltan_wrapper
                   Wgts(num_neig) = 0.0_Zoltan_float
                   do k=1,NR_PHYSA
                      if (.not. PHYSAm(k)) cycle
-                     select case(DTYPE(k))
-                        case('contin') ; Wgts(num_neig) = Wgts(num_neig) + ndofH*NR_COMP(k)
-                        case('tangen') ; Wgts(num_neig) = Wgts(num_neig) + ndofE*NR_COMP(k)
-                        case('normal') ; Wgts(num_neig) = Wgts(num_neig) + ndofV*NR_COMP(k)
+                     select case(D_TYPE(k))
+                        case(CONTIN) ; Wgts(num_neig) = Wgts(num_neig) + ndofH*NR_COMP(k)
+                        case(TANGEN) ; Wgts(num_neig) = Wgts(num_neig) + ndofE*NR_COMP(k)
+                        case(NORMAL) ; Wgts(num_neig) = Wgts(num_neig) + ndofV*NR_COMP(k)
                      end select
                   enddo
                   Wgts(num_neig) = 1.0_Zoltan_float
@@ -496,10 +496,10 @@ module zoltan_wrapper
                      Wgts(n) = 0.0_Zoltan_float
                      do l=1,NR_PHYSA
                         if (.not. PHYSAm(l)) cycle
-                        select case(DTYPE(l))
-                           case('contin') ; Wgts(n) = Wgts(n) + ndofH*NR_COMP(l)
-                           case('tangen') ; Wgts(n) = Wgts(n) + ndofE*NR_COMP(l)
-                           case('normal') ; Wgts(n) = Wgts(n) + ndofV*NR_COMP(l)
+                        select case(D_TYPE(l))
+                           case(CONTIN) ; Wgts(n) = Wgts(n) + ndofH*NR_COMP(l)
+                           case(TANGEN) ; Wgts(n) = Wgts(n) + ndofE*NR_COMP(l)
+                           case(NORMAL) ; Wgts(n) = Wgts(n) + ndofV*NR_COMP(l)
                         end select
                      enddo
                      Wgts(n) = 1.0_Zoltan_float

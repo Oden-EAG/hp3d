@@ -88,8 +88,8 @@ subroutine dhpvert(Mdle,Iflag,No,Xi,Icase,Bcond, ZdofH)
             if (ncase(iphys).eq.1) ic=ic+1
 !
 !        ...select the discretization type
-            select case(DTYPE(iphys))
-               case('contin')
+            select case(D_TYPE(iphys))
+               case(CONTIN)
                   ivarH=ivarH+1
 !
 !              ...if the variable is supported by the node
