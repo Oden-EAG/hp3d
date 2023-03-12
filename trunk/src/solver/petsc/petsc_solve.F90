@@ -663,9 +663,19 @@ subroutine petsc_solve(mtype)
 !  ...H1 dof
       do i = nrnodm,1,-1
          nod = nodm(i)
+#if DEBUG_MODE
+         if (NFIRST_DOF(nod).lt.0) then
+            write(*,*) 'petsc_solve: NFIRST_DOF(nod).lt.0'; stop
+         endif
+#endif
          do j=1,ndofmH(i)
             l=l+1
             LCON(l) = NFIRST_DOF(nod)+j
+#if DEBUG_MODE
+            if (LCON(l).le.0) then
+               write(*,*) 'petsc_solve: H1 LCON(l).le.0'; stop
+            endif
+#endif
          enddo
       enddo
 !  ...H(curl) dof
@@ -674,6 +684,11 @@ subroutine petsc_solve(mtype)
          do j=1,ndofmE(i)
             l=l+1
             LCON(l) = NFIRST_DOF(nod)+ndofmH(i)+j
+#if DEBUG_MODE
+            if (LCON(l).le.0) then
+               write(*,*) 'petsc_solve: HCurl LCON(l).le.0'; stop
+            endif
+#endif
          enddo
       enddo
 !  ...H(div) dof
@@ -682,6 +697,11 @@ subroutine petsc_solve(mtype)
          do j=1,ndofmV(i)
             l=l+1
             LCON(l) = NFIRST_DOF(nod)+ndofmH(i)+ndofmE(i)+j
+#if DEBUG_MODE
+            if (LCON(l).le.0) then
+               write(*,*) 'petsc_solve: HDiv LCON(l).le.0'; stop
+            endif
+#endif
          enddo
       enddo
 !  ...L2 dof
@@ -690,6 +710,11 @@ subroutine petsc_solve(mtype)
          do j=1,ndofmQ(nrnodm)
             l=l+1
             LCON(l) = NFIRST_DOF(nod)+ndofmH(nrnodm)+ndofmE(nrnodm)+ndofmV(nrnodm)+j
+#if DEBUG_MODE
+            if (LCON(l).le.0) then
+               write(*,*) 'petsc_solve: L2 LCON(l).le.0'; stop
+            endif
+#endif
          enddo
       endif
 !
