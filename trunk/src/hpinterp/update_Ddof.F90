@@ -4,14 +4,9 @@
 !    routine name       - update_Ddof
 !
 !-----------------------------------------------------------------------
-!
-!    latest revision    - June 2021
-!
-!    purpose            - routine updates values of solution degrees
-!                         of freedom for Dirichlet nodes
-!
-!    arguments          - none
-!
+!> @brief Routine updates values of solution degrees of freedom
+!!        for Dirichlet nodes
+!> @date Mar 2023
 !-----------------------------------------------------------------------
 !
 subroutine update_Ddof()
@@ -72,12 +67,8 @@ subroutine update_Ddof()
 !
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 !
-!$OMP PARALLEL DO
-!..lower the GMP interface flag for all nodes
-   do nod=1,NRNODS
-      NODES(nod)%geom_interf=0
-   enddo
-!$OMP END PARALLEL DO
+!..lower the visitation flag for all nodes
+   call reset_visit
 !
 !-----------------------------------------------------------------------
 !
@@ -106,7 +97,7 @@ subroutine update_Ddof()
          mdle = ELEM_SUBD(iel)
 !
 !     ...skip if the element has already been processed
-         if (NODES(mdle)%geom_interf.eq.1) cycle
+         if (NODES(mdle)%visit.eq.1) cycle
          call refel(mdle, iflag,no,xsub)
 !
 !     ...determine nodes for the element (active and constrained)
@@ -128,7 +119,7 @@ subroutine update_Ddof()
             if (loc.eq.0) then
 !
 !           ...check if the node has been updated
-               if (NODES(nod)%geom_interf.eq.0 .and. is_Dirichlet(nod)) then
+               if (NODES(nod)%visit.eq.0 .and. is_Dirichlet(nod)) then
                   nod_flg = .true.
                   goto 100
                endif
@@ -144,7 +135,7 @@ subroutine update_Ddof()
             nod = nodesl(iv)
             if (.not.associated(NODES(nod)%dof))       cycle
             if (.not.associated(NODES(nod)%dof%zdofH)) cycle
-            if (NODES(nod)%geom_interf.eq.1) cycle
+            if (NODES(nod)%visit.eq.1)                 cycle
             if (is_Dirichlet_attr(nod,'contin')) then
 #if DEBUG_MODE
                if (iprint.eq.1) write(*,7010) mdle,iv,nod
@@ -152,7 +143,7 @@ subroutine update_Ddof()
 #endif
                call dhpvert(mdle,iflag,no,xsub(1:3,iv),NODES(nod)%case, &
                             NODES(nod)%bcond, NODES(nod)%dof%zdofH)
-               NODES(nod)%geom_interf=1
+               NODES(nod)%visit=1
             endif
          enddo
 !
@@ -169,7 +160,7 @@ subroutine update_Ddof()
             ind = nvert(ntype)+ie
             nod = nodesl(ind)
             if (.not.associated(NODES(nod)%dof)) cycle
-            if (NODES(nod)%geom_interf.eq.1)     cycle
+            if (NODES(nod)%visit.eq.1)           cycle
             if (is_Dirichlet_attr(nod,'contin')) then
 !           ...update H1 Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofH)) then
@@ -182,7 +173,7 @@ subroutine update_Ddof()
                                 nedge_orient,nface_orient,norder,ie,    &
                                 zdofH, NODES(nod)%dof%zdofH)
                endif
-               NODES(nod)%geom_interf=1
+               NODES(nod)%visit=1
             endif
             if (is_Dirichlet_attr(nod,'tangen')) then
 !           ...update H(curl) Dirichlet dofs
@@ -196,7 +187,7 @@ subroutine update_Ddof()
                                 nedge_orient,nface_orient,norder,ie,    &
                                 NODES(nod)%dof%zdofE)
                endif
-               NODES(nod)%geom_interf=1
+               NODES(nod)%visit=1
             endif
          enddo
 !
@@ -213,7 +204,7 @@ subroutine update_Ddof()
 !        ...get global node number
             nod = nodesl(ind)
             if (.not.associated(NODES(nod)%dof)) cycle
-            if (NODES(nod)%geom_interf.eq.1)     cycle
+            if (NODES(nod)%visit.eq.1) cycle
             if (is_Dirichlet_attr(nod,'contin')) then
 !           ...update H1 Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofH)) then
@@ -226,7 +217,7 @@ subroutine update_Ddof()
                                 nedge_orient,nface_orient,norder,ifc,   &
                                 zdofH, NODES(nod)%dof%zdofH)
                endif
-               NODES(nod)%geom_interf=1
+               NODES(nod)%visit=1
             endif
             if (is_Dirichlet_attr(nod,'tangen')) then
 !           ...update H(curl) Dirichlet dofs
@@ -240,7 +231,7 @@ subroutine update_Ddof()
                                 nedge_orient,nface_orient,norder,ifc,   &
                                 zdofE, NODES(nod)%dof%zdofE)
                endif
-               NODES(nod)%geom_interf=1
+               NODES(nod)%visit=1
             endif
             if (is_Dirichlet_attr(nod,'normal')) then
 !           ...update H(div) Dirichlet dofs
@@ -254,12 +245,12 @@ subroutine update_Ddof()
                                 nedge_orient,nface_orient,norder,ifc,   &
                                 NODES(nod)%dof%zdofV)
                endif
-               NODES(nod)%geom_interf=1
+               NODES(nod)%visit=1
             endif
 !     ...end of loop over faces
          enddo
 !
-         NODES(mdle)%geom_interf=1
+         NODES(mdle)%visit=1
 !
 !  ...end of loop through elements
  100  continue
@@ -306,15 +297,12 @@ subroutine update_Ddof()
    j_loc = 0
    if (.not. nod_flg) goto 60
 !
-!..lower the visitation flag for all nodes
-   call reset_visit
-!
 !..fill local node list
    loc_max = 1000; allocate(nod_loc(loc_max))
    do iel=1,NRELES_SUBD
       mdle = ELEM_SUBD(iel)
 !  ...skip if the element has already been processed
-      if (NODES(mdle)%geom_interf.eq.1) cycle
+      if (NODES(mdle)%visit.eq.1) cycle
 !  ...determine nodes for the modified element
       call get_connect_info(mdle, nodesl,norientl)
       call logic_nodes(mdle,nodesl, nodm,nrnodm)
@@ -324,10 +312,9 @@ subroutine update_Ddof()
          nod = nodm(i)
          call locate(nod,nodesl,nr_elem_nodes, loc)
 !     ...check if the node has been updated
-         if (loc.eq.0 .and. NODES(nod)%geom_interf.eq.0  &
-                      .and. NODES(nod)%visit      .eq.0  &
-                      .and. is_Dirichlet(nod)     ) then
-            NODES(nod)%visit = 1
+         if (loc.eq.0 .and. NODES(nod)%visit.eq.0  &
+                      .and. is_Dirichlet(nod) ) then
+            NODES(nod)%visit = -1
             if(j_loc .ge. loc_max) then
                loc_max = loc_max*2
                allocate(nod_tmp(loc_max))
@@ -379,7 +366,7 @@ subroutine update_Ddof()
    allocate(nod_rnk(j_glb)); nod_rnk = NUM_PROCS
    do i=1,j_glb
       nod = nod_glb(i)
-      if (NODES(nod)%geom_interf .eq. 1) nod_rnk(i) = RANK
+      if (NODES(nod)%visit.eq.1) nod_rnk(i) = RANK
    enddo
 !
 !..collect node supplier list
@@ -434,10 +421,20 @@ subroutine update_Ddof()
             count = ndofV*nvarV; buf => NODES(nod)%dof%zdofV
             call MPI_RECV(buf,count,MPI_VTYPE,src,tag,MPI_COMM_WORLD,MPI_STATUS_IGNORE,ierr)
          endif
-         NODES(nod)%geom_interf = 1
+         NODES(nod)%visit = 1
       endif
  6010 format('update_Ddof: [',I4,'] ',A,' nod=',I6,', type=',A)
    enddo
+!
+   if (nod_flg) then
+      do i=1,j_loc
+         nod = nod_glb(j_off+i)
+!     ...reset visitation flag if node was not supplied
+         if (NODES(nod)%visit.eq.-1) then
+            NODES(nod)%visit = 0
+         endif
+      enddo
+   endif
 !
    deallocate(nod_rnk,nod_glb)
 !
