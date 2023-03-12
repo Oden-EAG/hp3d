@@ -1144,9 +1144,12 @@ c
       integer,intent(out) :: Iedge
 c
       integer,save,dimension(4,4) :: AUX
+c$omp threadprivate(AUX)
       logical,save                :: INITIALIZED=.FALSE.
-      integer,     dimension(2)   :: iedge1,iedge2,list
+c$omp threadprivate(INITIALIZED)
+      integer,       dimension(2) :: iedge1,iedge2,list
       integer                     :: i,j,i1,i2,ifound
+c----------------------------------------------------------------------
 c
       if (.NOT.INITIALIZED) then
 c
@@ -1240,7 +1243,9 @@ c
       integer,intent(out) :: Iface
 c
       integer,save,dimension(8,8) :: AUX
+c$omp threadprivate(AUX)
       logical,save                :: INITIALIZED=.FALSE.
+c$omp threadprivate(INITIALIZED)
       integer,       dimension(3) :: iface1,iface2,list
       integer                     :: i,i1,i2,ifound
 c
