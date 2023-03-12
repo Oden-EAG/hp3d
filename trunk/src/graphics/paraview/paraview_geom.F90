@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------------------
 !> Purpose : driver for writing geometry to .h5 file
 !!
-!> @date Oct 2019
+!> @date Mar 2023
 !-------------------------------------------------------------------------------------------
 !
 subroutine paraview_geom
@@ -50,7 +50,7 @@ subroutine paraview_geom
       case(MDLN)
          write(PARAVIEW_IO,1011) "'TETRAHEDRON_10'", ice, 10
       case default
-         write(*,*) 'paraview_geom: unrecongnized element type', S_Type(ntype)
+         write(*,*) 'paraview_geom: unrecognized element type: ', S_Type(ntype)
          stop 1
       end select
    else

@@ -20,13 +20,13 @@ module upscale
       integer :: NR_VERT
 !
 !  ...list of vertices' coordinates
-      real(8), pointer :: VERTC(:,:)
+      real(8), pointer :: VERTC(:,:) => null()
 !
 !  ...number of elements required by visualization level (0 - 3)
       integer :: NR_ELEM
 !
 !  ...list of elements' vertices (indexing starts at 0)
-      integer, pointer :: ELEM(:,:)
+      integer, pointer :: ELEM(:,:) => null()
 !
    endtype vis
 !

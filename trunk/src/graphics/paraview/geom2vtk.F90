@@ -79,7 +79,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !$OMP DO                                        &
 !$OMP PRIVATE(mdle,ndom,ntype,iv,xi,nV,subd,    &
 !$OMP         norder,nedge_orient,nface_orient, &
-!$OMP         xnod,x,u,dxdxi,nrdofH,shapH,gradH)  &
+!$OMP         xnod,x,dxdxi,nrdofH,shapH,gradH)  &
 !$OMP SCHEDULE(DYNAMIC)
    do iel=1,NRELES
       mdle = ELEM_ORDER(iel)
