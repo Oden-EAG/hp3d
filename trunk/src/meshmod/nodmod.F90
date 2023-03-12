@@ -112,6 +112,7 @@
                deallocate(NODES(Nod)%dof%zdofH)
             endif
          endif
+!$omp atomic
          NRDOFSH = NRDOFSH - ndofH*NREQNH(icase)
       endif
       if ((NREQNE(icase).gt.0).and.(ndofE.gt.0)) then
@@ -124,6 +125,7 @@
                deallocate(NODES(Nod)%dof%zdofE)
             endif
          endif
+!$omp atomic
          NRDOFSE = NRDOFSE - ndofE*NREQNE(icase)
       endif
       if ((NREQNV(icase).gt.0).and.(ndofV.gt.0)) then
@@ -136,6 +138,7 @@
                deallocate(NODES(Nod)%dof%zdofV)
             endif
          endif
+!$omp atomic
          NRDOFSV = NRDOFSV - ndofV*NREQNV(icase)
       endif
       if ((NREQNQ(icase).gt.0).and.(ndofQ.gt.0)) then
@@ -148,6 +151,7 @@
                deallocate(NODES(Nod)%dof%zdofQ)
             endif
          endif
+!$omp atomic
          NRDOFSQ = NRDOFSQ - ndofQ*NREQNQ(icase)
       endif
       if (associated(NODES(Nod)%dof)) then
@@ -210,6 +214,7 @@
                               nvarH,zdofH,NODES(Nod)%dof%zdofH)
             endif
          endif
+!$omp atomic
          NRDOFSH = NRDOFSH + ndofH*NREQNH(icase)
       endif
       if ((NREQNE(icase).gt.0).and.(ndofE.gt.0)) then
@@ -221,6 +226,7 @@
                               nvarE,zdofE,NODES(Nod)%dof%zdofE)
             endif
          endif
+!$omp atomic
          NRDOFSE = NRDOFSE + ndofE*NREQNE(icase)
       endif
       if ((NREQNV(icase).gt.0).and.(ndofV.gt.0)) then
@@ -232,6 +238,7 @@
                               nvarV,zdofV,NODES(Nod)%dof%zdofV)
             endif
          endif
+!$omp atomic
          NRDOFSV = NRDOFSV + ndofV*NREQNV(icase)
       endif
       if ((NREQNQ(icase).gt.0).and.(ndofQ.gt.0)) then
@@ -243,6 +250,7 @@
                               nvarQ,zdofQ,NODES(Nod)%dof%zdofQ)
             endif
          endif
+!$omp atomic
          NRDOFSQ = NRDOFSQ + ndofQ*NREQNQ(icase)
       endif
 !
