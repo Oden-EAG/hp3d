@@ -99,13 +99,14 @@ subroutine distr_mesh()
 !  ...3b. iterate over list of nodes
       do inod=1,nrnodm
          nod = nodm(inod)
-         if (.not. EXCHANGE_DOF) then
+!     ...Calculate nodal degrees of freedom
+         call get_dof_buf_size(nod, nrdof_nod)
+         if ((.not.EXCHANGE_DOF) .or. (nrdof_nod.eq.0)) then
+!        ...even if nrdof_nod=0, the node%dof pointer must be associated
             if (subd_next(iel) .eq. RANK) call alloc_nod_dof(nod)
             cycle
          endif
-!     ...3c. Calculate nodal degrees of freedom, and allocate buffer
-         call get_dof_buf_size(nod, nrdof_nod)
-         if (nrdof_nod .eq. 0) cycle
+!     ...3c. Allocate exchange buffer
          allocate(buf(nrdof_nod))
          buf = ZERO
 !     ...3d. if current subdomain is my subdomain, send data
@@ -186,7 +187,7 @@ subroutine distr_mesh()
 !$OMP DO
    do nod=1,NRNODS
       call get_subd(nod, subd)
-      if (subd .ne. RANK .and. Is_active(nod)) then
+      if ((subd.ne.RANK) .and. Is_active(nod)) then
 !     ...delete solution degrees of freedom
          call dealloc_nod_dof(nod)
       endif
@@ -239,6 +240,8 @@ subroutine set_subd_elem(Mdle)
    call get_elem_nodes(Mdle, nodesl,nodm,nrnodm)
    call get_subd(Mdle, subd)
    ntype = NODES(Mdle)%ntype
+!..marking local node list is necessary so that activate_sons works
+!  correctly when breaking the element
    do i=1,nvert(ntype)+nedge(ntype)+nface(ntype)
       call set_subd(nodesl(i),subd)
    enddo
@@ -320,7 +323,7 @@ end subroutine dealloc_nod_dof
 !     purpose:    calculate buffer size for message passing of nodal dofs
 !----------------------------------------------------------------------
 subroutine get_dof_buf_size(Nod, Nrdof_nod)
-   integer, intent(in) :: Nod
+   integer, intent(in)  :: Nod
    integer, intent(out) :: Nrdof_nod
    integer :: ndofH,ndofE,ndofV,ndofQ
    integer :: nvarH,nvarE,nvarV,nvarQ
