@@ -270,10 +270,19 @@ subroutine zoltan_lb_param_graph(Ierr_out)
    call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
    if (ierr > Ierr_out) Ierr_out = ierr
 !
-!..PARMETIS_OUTPUT_LEVEL
-!     0: no output
-!     1: print timing info
-   ierr = Zoltan_Set_Param(zz,'PARMETIS_OUTPUT_LEVEL','0')
+   ierr = Zoltan_Set_Param(zz,'PARMETIS_ITR','1')
+   call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
+   if (ierr > Ierr_out) Ierr_out = ierr
+!
+   ierr = Zoltan_Set_Param(zz,'CHECK_GRAPH','1')
+   call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
+   if (ierr > Ierr_out) Ierr_out = ierr
+!
+   ierr = Zoltan_Set_Param(zz,'SCATTER_GRAPH','2')
+   call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
+   if (ierr > Ierr_out) Ierr_out = ierr
+!
+   ierr = Zoltan_Set_Param(zz,'IMBALANCE_TOL','1.02')
    call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
    if (ierr > Ierr_out) Ierr_out = ierr
 !

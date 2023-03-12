@@ -14,8 +14,6 @@ module zoltan_wrapper
    use MPI
    use mpi_param
    use zoltan
-   !use stc, only: stc_get_nrdof
-   ! TODO: cannot load stc module here (circular reference)
 !
    implicit none
 !
@@ -66,7 +64,7 @@ module zoltan_wrapper
 !
       integer(Zoltan_int)   :: ierr
       real   (Zoltan_float) :: ver
-      !character(len=4)      :: str
+!      character(len=4)      :: str
 !
       if (ZOLTAN_IS_INIT) then
          write(*,*) 'zoltan_w_init: Zoltan has already been initialized.'
@@ -117,8 +115,8 @@ module zoltan_wrapper
       call zoltan_w_handle_err(ierr,'Zoltan_Set_Fn')
 !     Return lists of neighbors, their owners, and optionally face weights
 !     for elements sharing a face with a given element
-!      ierr = Zoltan_Set_Fn(zz,ZOLTAN_EDGE_LIST_FN_TYPE,zoltan_w_query_neig_list)
-      ierr = Zoltan_Set_Fn(zz,ZOLTAN_EDGE_LIST_MULTI_FN_TYPE,zoltan_w_query_neig_list_omp)
+      ierr = Zoltan_Set_Fn(zz,ZOLTAN_EDGE_LIST_FN_TYPE,zoltan_w_query_neig_list)
+!      ierr = Zoltan_Set_Fn(zz,ZOLTAN_EDGE_LIST_MULTI_FN_TYPE,zoltan_w_query_neig_list_omp)
       call zoltan_w_handle_err(ierr,'Zoltan_Set_Fn')
 !
 !  ...set global IDs to one integer each (mdle)
@@ -134,11 +132,11 @@ module zoltan_wrapper
       call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
 !
 !  ...set object weights to one floating point value per element
-      ierr = Zoltan_Set_Param(zz,'OBJ_WEIGHT_DIM','0')
+      ierr = Zoltan_Set_Param(zz,'OBJ_WEIGHT_DIM','1')
       call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
 !
 !  ...set edge weights to one floating point value per neighbor
-      ierr = Zoltan_Set_Param(zz,'EDGE_WEIGHT_DIM','0')
+      ierr = Zoltan_Set_Param(zz,'EDGE_WEIGHT_DIM','1')
       call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
 !
 !  ...set default timer to MPI_Wtime
@@ -400,6 +398,10 @@ module zoltan_wrapper
       integer :: mdle,i,j,k,num_neig,neig,subd
       integer :: ndofH,ndofE,ndofV,ndofQ
       integer :: neig_list(4,6)
+      integer :: iprint = 0
+!
+!----------------------------------------------------------------------
+!
       mdle = GID(1)
       call zoltan_w_find_neig(mdle, neig_list)
       num_neig = 0
@@ -440,12 +442,14 @@ module zoltan_wrapper
          enddo
       enddo
 #if DEBUG_MODE
-      write(*,500) 'Neighbors of mdle = ', mdle
-      do i=1,num_neig
-         write(*,510) '  neig, subd = ', Neig_GIDs(i), Neig_subd(i)
-      enddo
-  500 format(A,I10)
-  510 format(A,I10,I4)
+      if (iprint .eq. 1) then
+         write(*,500) 'Neighbors of mdle = ', mdle
+         do i=1,num_neig
+            write(*,510) '  neig, subd = ', Neig_GIDs(i), Neig_subd(i)
+         enddo
+500      format(A,I10)
+510      format(A,I10,I4)
+      endif
 #endif
       Ierr = ZOLTAN_OK
    end subroutine zoltan_w_query_neig_list
@@ -535,12 +539,16 @@ module zoltan_wrapper
 !$OMP END PARALLEL DO
       Ierr = ZOLTAN_OK
    end subroutine zoltan_w_query_neig_list_omp
-!
+
+
 !----------------------------------------------------------------------
 !     routine:    zoltan_w_partition
 !     purpose:    perform partitioning of current domain
 !----------------------------------------------------------------------
    subroutine zoltan_w_partition(Mdle_subd)
+!
+      implicit none
+!
       integer, intent(out) :: Mdle_subd(NRELES)
       logical :: changes,print_stats
       integer(Zoltan_int) :: ierr,nrGIDs,nrLIDs,nrImp,nrExp
@@ -549,13 +557,15 @@ module zoltan_wrapper
       integer :: iel,i,mdle,subd,src,count,ierr_mpi
       character(16) :: fmt
 !
+!----------------------------------------------------------------------
+!
 !  ...find new partition
       ierr = Zoltan_LB_Partition(zz, changes,nrGIDs,nrLIDs,                   &
                                      nrImp,impGIDs,impLIDs,impProcs,impParts, &
                                      nrExp,expGIDs,expLIDs,expProcs,expParts )
       call zoltan_w_handle_err(ierr,'Zoltan_LB_Partition')
 !
-      print_stats = .true.
+      print_stats = .false.
       if (print_stats) then
          write(*,*) 'zoltan_w_partition:'
          write(*,300) '   changes  = ', changes
@@ -640,7 +650,6 @@ module zoltan_wrapper
 !!
 !! @revision Aug 2019
 !
-!  TODO: verify this routine
 !--------------------------------------------------------------------------
    subroutine zoltan_w_find_neig(Mdle, Neig_list)
 !
@@ -655,12 +664,37 @@ module zoltan_wrapper
       Neig_list(1:4,1:6)=0
 !
 !---------------------------------------------------
-! Step 0: short cut for initial mesh elements only
+! Step 0: initial mesh elements
 !---------------------------------------------------
       ntype=NODES(Mdle)%ntype
       if (is_root(Mdle)) then
          do i=1,nface(ntype)
-            Neig_list(1,i) = ELEMS(Mdle)%neig(i)
+            mdle_neig = ELEMS(Mdle)%neig(i)
+!
+            if (mdle_neig .eq. 0) then
+               cycle
+            elseif (NODES(mdle_neig)%ref_kind .eq. 0) then
+               Neig_list(1,i) = ELEMS(Mdle)%neig(i)
+            else
+               nod = ELEMS(Mdle)%nodes(nvert(ntype)+nedge(ntype)+i)
+!
+               l = 0
+               do j=1,NODES(nod)%nr_sons
+                  nodson = Son(nod,j)
+!
+                  select case(NODES(nodson)%ntype)
+                  case(MDLQ,MDLT)
+                     l = l+1
+                  case default
+                     cycle
+                  end select
+!
+                  call neig_face(nodson, nrneig,neig,nsid_list,norient_list)
+                  do k=1,nrneig
+                     if (NODES(neig(k))%father .eq. mdle_neig) Neig_list(l,i) = neig(k)
+                  enddo
+               enddo
+            endif
          enddo
          return
       endif
@@ -680,17 +714,25 @@ module zoltan_wrapper
                else
                   mdle_neig = neig(1)
                endif
-            case default; cycle
+            case default
+               cycle
          end select
+!
          if (NODES(nod)%ref_kind .eq. 0) then
             Neig_list(1,i) = mdle_neig
          else
             l = 0
             do j=1,NODES(nod)%nr_sons
-               nodson = NODES(nod)%first_son + j - 1
-               if (NODES(nodson)%ntype .ne. MDLT .and. &
-                   NODES(nodson)%ntype .ne. MDLQ) cycle
-               l = l+1
+!
+               nodson = Son(nod,j)
+!
+               select case(NODES(nodson)%ntype)
+               case(MDLQ,MDLT)
+                  l = l+1
+               case default
+                  cycle
+               end select
+!
                call neig_face(nodson, nrneig,neig,nsid_list,norient_list)
                do k=1,nrneig
                   if (NODES(neig(k))%father .eq. mdle_neig) Neig_list(l,i) = neig(k)
