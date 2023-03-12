@@ -10,7 +10,8 @@ module mpi_wrapper
    use mpi_param
    use MPI, only: MPI_THREAD_FUNNELED,MPI_INIT_THREAD,         &
                   MPI_COMM_RANK,MPI_COMM_WORLD,MPI_COMM_SIZE,  &
-                  MPI_BARRIER,MPI_FINALIZE,MPI_SUCCESS
+                  MPI_BARRIER,MPI_FINALIZE,MPI_SUCCESS,        &
+                  MPI_ERRORS_RETURN
    use zoltan_wrapper
 !
    implicit none
@@ -59,6 +60,9 @@ module mpi_wrapper
 !  ...set initialization flag
       MPI_IS_INIT = .true.
 !
+!      call MPI_Errhandler_set(MPI_COMM_WORLD,MPI_ERRORS_RETURN,ierr);
+!      call mpi_w_handle_err(ierr,'MPI_ERR_HANDLER')
+!
    end subroutine mpi_w_init
 !
 !
@@ -92,8 +96,11 @@ module mpi_wrapper
    subroutine mpi_w_handle_err(Ierr,Str)
       integer         , intent(in) :: Ierr
       character(len=*), intent(in) :: Str
+      character(len=64) :: errStr
+      integer :: ierr1,len
       if (Ierr .ne. MPI_SUCCESS) then
-         write(*,*) str,': Ierr = ', Ierr
+         call MPI_Error_string(Ierr, errStr, len, ierr1)
+         write(*,*) str,': Ierr = ', ierr, errStr(1:len)
       endif
    end subroutine mpi_w_handle_err
 !
