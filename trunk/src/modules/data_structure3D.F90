@@ -99,9 +99,6 @@ module data_structure3D
 !  .....refinement flag (decimal-encoded per direction (x,y,z))
         integer          :: ref_kind
 !
-!  .....interface flag with GMP
-        integer          :: geom_interf
-!
 !  .....visitation flag
         integer          :: visit
 !
@@ -310,7 +307,6 @@ module data_structure3D
         NODES(nod)%father = 0
         NODES(nod)%first_son = 0
         NODES(nod)%nr_sons = 0
-        NODES(nod)%geom_interf = 0
         nullify (NODES(nod)%dof)
 #if DEBUG_MODE
         NODES(nod)%error = 0.d0
@@ -392,7 +388,6 @@ module data_structure3D
         NODES_NEW(nod)%father = 0
         NODES_NEW(nod)%first_son = 0
         NODES_NEW(nod)%nr_sons = 0
-        NODES_NEW(nod)%geom_interf = 0
         nullify (NODES_NEW(nod)%dof)
 #if DEBUG_MODE
         NODES_NEW(nod)%error = 0.d0
@@ -472,7 +467,6 @@ module data_structure3D
         write(ndump,*) NODES(nod)%father
         write(ndump,*) NODES(nod)%first_son
         write(ndump,*) NODES(nod)%nr_sons
-        write(ndump,*) NODES(nod)%geom_interf
         write(ndump,*) NODES(nod)%visit
         write(ndump,*) NODES(nod)%act
         if (associated(NODES(nod)%dof)) then
@@ -615,7 +609,6 @@ module data_structure3D
         read(ndump,*) NODES(nod)%father
         read(ndump,*) NODES(nod)%first_son
         read(ndump,*) NODES(nod)%nr_sons
-        read(ndump,*) NODES(nod)%geom_interf
         read(ndump,*) NODES(nod)%visit
         read(ndump,*) NODES(nod)%act
         read(ndump,*) nn1
@@ -763,12 +756,43 @@ module data_structure3D
       function Is_Dirichlet(Nod)
       logical Is_Dirichlet
       integer Nod
-      integer ibc(NRINDEX), ic
+      integer ibc(NRINDEX), ic, iphys, ivar
 !
       call decod(NODES(Nod)%bcond,2,NRINDEX, ibc)
       Is_Dirichlet = .false.
-      do ic=1,NRINDEX
-        if (ibc(ic).eq.1) Is_Dirichlet = .true.
+!
+      ic = 0
+!
+!  ...check Dirichlet flags for all variable types
+      do iphys=1,NR_PHYSA
+         select case(DTYPE(iphys))
+!     ...H1 checks all
+         case('contin')
+            continue
+!     ...skip checking vertices of H(curl) variables
+         case('tangen')
+            if (NODES(nod)%ntype .eq. VERT) then
+               ic = ic + NR_COMP(iphys)
+               cycle
+            endif
+!     ...skip checking vertices and edges of H(div) variables
+         case('normal')
+            if (     NODES(nod)%ntype .eq. VERT   &
+                .or. NODES(nod)%ntype .eq. MEDG ) then
+               ic = ic + NR_COMP(iphys)
+               cycle
+            endif
+!     ...skip checking all on L2
+         case('discon')
+            ic = ic + NR_COMP(iphys)
+            cycle
+         end select
+!
+         do ivar=1,NR_COMP(iphys)
+            ic = ic + 1
+            if (ibc(ic).eq.1) Is_Dirichlet = .true.
+         enddo
+!
       enddo
 !
       end function Is_Dirichlet
@@ -779,7 +803,7 @@ module data_structure3D
       logical Is_Dirichlet_attr
       integer Nod
       character(6) D_type
-      integer ibc(NRINDEX), ic, ivar, iphys
+      integer ibc(NRINDEX), ic, iphys, ivar
 !
       call decod(NODES(Nod)%bcond,2,NRINDEX, ibc)
       Is_Dirichlet_attr = .false.

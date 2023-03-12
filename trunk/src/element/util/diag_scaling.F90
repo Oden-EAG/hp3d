@@ -35,12 +35,12 @@
 #if C_MODE
       complex(8), intent(inout) :: GP(m*(m+1)/2)
       complex(8), intent(inout) :: B(m,n)
-      complex(8)                :: D(m)
 #else
       real(8), intent(inout)    :: GP(m*(m+1)/2)
       real(8), intent(inout)    :: B(m,n)
-      real(8)                   :: D(m)
 #endif
+      real(8)                   :: D(m),diag
+      integer                   :: ip
 !  ...function for vector storage of Hermitian Gram matrix
       nk(n1,n2) = (n2-1)*n2/2+n1
 !
@@ -50,13 +50,15 @@
 !  ...extract the diagonal of the matrix
       do i=1,m
          k = nk(i,i)
-         D(i) = GP(k)
+         diag = dsqrt(real(GP(k),8))
+         ip = floor(log(diag)/log(2.d0))
+         D(i) = 0.5d0**ip
       enddo
 !  ...apply the scaling to the Gram matrix
-      do i=1,m
-         do j=i,m
+      do j=1,m
+         do i=1,j
             k = nk(i,j)
-            GP(k) = GP(k)/sqrt(D(i)*D(j))
+            GP(k) = GP(k)*D(i)*D(j)
          enddo
       enddo
 !
@@ -64,7 +66,7 @@
 !  ...apply the scaling to the Stiffness matrix
       do j=1,n
          do i=1,m
-            B(i,j) = B(i,j)/sqrt(D(i))
+            B(i,j) = B(i,j)*D(i)
          enddo
       enddo
 !
@@ -106,24 +108,26 @@
 #if C_MODE
       complex(8), intent(inout) :: GP(m,m)
       complex(8), intent(inout) :: B(m,n)
-      complex(8)                :: D(m)
 #else
       real(8), intent(inout)    :: GP(m,m)
       real(8), intent(inout)    :: B(m,n)
-      real(8)                   :: D(m)
 #endif
+      real(8)                   :: D(m),diag
+      integer                   :: ip
 !
 !-----------------------------------------------------------------------
 !
 !  ...preconditioning: GP ---> D^-1/2 * GP * D^-1/2
 !  ...extract the diagonal of the matrix
       do i=1,m
-         D(i) = GP(i,i)
+         diag = dsqrt(real(GP(i,i),8))
+         ip = floor(log(diag)/log(2.d0))
+         D(i) = 0.5d0**ip
       enddo
 !  ...apply the scaling to the Gram matrix
       do j=1,m
          do i=1,j
-            GP(i,j) = GP(i,j)/sqrt(D(i)*D(j))
+            GP(i,j) = GP(i,j)*D(i)*D(j)
          enddo
       enddo
 !
@@ -131,7 +135,7 @@
 !  ...apply the scaling to the Stiffness matrix
       do j=1,n
          do i=1,m
-            B(i,j) = B(i,j)/sqrt(D(i))
+            B(i,j) = B(i,j)*D(i)
          enddo
       enddo
 !

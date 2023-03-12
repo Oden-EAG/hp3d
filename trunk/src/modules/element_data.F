@@ -397,66 +397,6 @@ c
       end function Type_nod
 c
 c----------------------------------------------------------------------
-c   remark: see parameterized array NVERT in module node_types
-c
-cc  ...determine number of vertices for a middle node or element type
-c      function Nvert(Ntype)
-cc
-c      integer Ntype
-c      integer Nvert
-cc
-c      select case(Ntype)
-c        case(MEDG)     ; Nvert=2
-c        case(MDLT,TRIA); Nvert=3
-c        case(MDLQ,QUAD); Nvert=4
-c        case(MDLB,BRIC); Nvert=8
-c        case(MDLP,PRIS); Nvert=6
-c        case(MDLN,TETR); Nvert=4
-c        case(MDLD,PYRA); Nvert=5
-c      end select
-cc
-c      end function Nvert
-c
-c----------------------------------------------------------------------
-c   remark: see parameterized array NEDGE in module node_types
-c
-cc  ...determine number of edges for a middle node or element type
-c      function Nedge(Ntype)
-cc
-c      integer Ntype
-c      integer Nedge
-cc
-c      select case(Ntype)
-c        case(MEDG)     ; Nedge=0
-c        case(MDLT,TRIA); Nedge=3
-c        case(MDLQ,QUAD); Nedge=4
-c        case(MDLB,BRIC); Nedge=12
-c        case(MDLP,PRIS); Nedge=9
-c        case(MDLN,TETR); Nedge=6
-c        case(MDLD,PYRA); Nedge=8
-c      end select
-cc
-c      end function Nedge
-c
-c----------------------------------------------------------------------
-c   remark: see parameterized array NFACE in module node_types
-c
-cc  ...determine number of faces for a middle node or element type
-c      function Nface(Ntype)
-cc
-c      integer Ntype
-c      integer Nface
-cc
-c      select case(Ntype)
-c        case(MDLB,BRIC); Nface=6
-c        case(MDLP,PRIS); Nface=5
-c        case(MDLN,TETR); Nface=4
-c        case(MDLD,PYRA); Nface=5
-c      end select
-cc
-c      end function Nface
-c
-c----------------------------------------------------------------------
 c
 c  ...return vertex numbers endpoints of an edge......
       subroutine edge_to_vert(Ntype,Ie, Nv1,Nv2)
@@ -1276,6 +1216,9 @@ c
       logical,save                :: INITIALIZED=.FALSE.
       integer,       dimension(3) :: iface1,iface2,list
       integer                     :: i,i1,i2,ifound
+#if DEBUG_FLAG
+      integer :: j,iprint=0
+#endif
 c
       if (.NOT.INITIALIZED) then
 c
@@ -1307,13 +1250,15 @@ c
         AUX(i2,i1)=list(1)
       enddo
 c
-cccc  ...printing
-ccc      do i=1,8 ; do j=1,8
-cccc  .....print only relevant entries
-ccc        if (AUX(i,j).eq.0) cycle
-ccc        write(*,1000) i,j,AUX(i,j)
-ccc 1000   format(' iv1,2, face = '2(i1,2x),2x,i1)
-ccc      enddo    ; enddo
+#if DEBUG_FLAG
+c  ...printing
+      do i=1,8 ; do j=1,8
+c  .....print only relevant entries
+        if (AUX(i,j).eq.0) cycle
+        write(*,1000) i,j,AUX(i,j)
+ 1000   format(' iv1,2, face = '2(i1,2x),2x,i1)
+      enddo    ; enddo
+#endif
 c
 c  ...update initialization flag
       INITIALIZED=.TRUE.
