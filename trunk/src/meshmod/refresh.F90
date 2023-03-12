@@ -6,15 +6,17 @@
 subroutine refresh
 !
    use data_structure3D
-   use par_mesh  , only: DISTRIBUTED,set_subd_elem
-   use mpi_param , only: RANK
+   use par_mesh,        only: DISTRIBUTED,set_subd_elem
+   use mpi_param,       only: RANK,ROOT
+   use bitvisit
 !
    implicit none
 !
    integer :: ntype
    integer :: nodesl(27),norientl(27)
-   integer :: i,iel,nod,nfath,mdle,subd
+   integer :: i,iel,nod,nfath,mdle,subd,ierr
    integer :: nrdofH,nrdofE,nrdofV,nrdofQ
+   integer :: nvef
 !
 #if DEBUG_MODE
    integer :: iprint = 0
@@ -29,40 +31,51 @@ subroutine refresh
 #endif
 !
    call update_ELEM_ORDER
+   call bitvisit_init(NRNODS)
+!
+   if (.not. DISTRIBUTED) then
+      ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
+      NRELES_SUBD = NRELES
+   endif
 !
 !..set thread local dof counters
    nrdofH=0; nrdofE=0; nrdofV=0; nrdofQ=0
-!
-!..reset visitation flags for all nodes
-!$OMP PARALLEL
-!$OMP DO
-   do i=1,NRNODS
-      NODES(i)%visit = 0
-   enddo
-!$OMP END DO
 !
 !--------------------------------------------------------------------
 ! Step 1 : raise visitation flag for vertex, edge and face nodes of |
 !          all active elements                                      |
 !--------------------------------------------------------------------
-!$OMP DO PRIVATE(mdle,subd,nodesl,norientl,ntype,i)
-   do iel=1,NRELES
-      mdle = ELEM_ORDER(iel)
-      call get_subd(mdle, subd)
+!$omp parallel default(shared)
+!$omp do private(iel,mdle,subd,type,i,nodesl,norientl) schedule(guided)
+   do iel=1,NRELES_SUBD
+!
+      mdle = ELEM_SUBD(iel)
+!
       call elem_nodes(mdle, nodesl,norientl)
-      ntype=NODES(mdle)%ntype
-      do i=1,nvert(ntype)+nedge(ntype)+nface(ntype)
-         NODES(nodesl(i))%visit=1
+!
+      ntype = NODES(mdle)%ntype
+      nvef = nvert(ntype)+nedge(ntype)+nface(ntype)
+!
+      do i=1,nvef
+!     ...bitflag stores visit in bit collection (better for MPI)
+         call visit(nodesl(i))
+!
 !     ...if node is visited by an element within my subdomain,
 !        add node to my subdomain (need its dofs). this flag will
 !        indicate that dofs must be allocated in activation.
-         if (DISTRIBUTED .and. (subd.eq.RANK)) then
-            call set_subd(nodesl(i),subd)
+         if (DISTRIBUTED) then
+            call set_subd(nodesl(i),RANK)
          endif
       enddo
 !
    enddo
-!$OMP END DO
+!$omp end do
+!$omp end parallel
+!
+!..Reduce over node flag
+   if (DISTRIBUTED) then
+      call reduce_visit
+   endif
 !
 !--------------------------------------------------------------------
 ! Step 2: activate all inactive edge and face nodes whose father    |
@@ -71,8 +84,9 @@ subroutine refresh
 !--------------------------------------------------------------------
 !
 !..loop over all nodes
-!$OMP DO PRIVATE(nfath) SCHEDULE(DYNAMIC) &
-!$OMP REDUCTION(+:nrdofH,nrdofE,nrdofV,nrdofQ)
+!$omp parallel
+!$omp do private(nfath) schedule(guided) &
+!$omp reduction(+:nrdofH,nrdofE,nrdofV,nrdofQ)
    do nod=1,NRNODS
 !
 !  ...skip if a middle node
@@ -82,7 +96,7 @@ subroutine refresh
 !
 !  ...skip if the node has not been marked,
 !     and deactivate if it is still active
-      if (NODES(nod)%visit.eq.0) then
+      if (.not. visited(nod)) then
          if (Is_active(nod)) call deactivate(nod, nrdofH,nrdofE,nrdofV,nrdofQ)
          cycle
       endif
@@ -94,14 +108,16 @@ subroutine refresh
 !
 !  ...if father node has not been visited, then the node is unconstrained
 !     thus activate the node
-      if (NODES(nfath)%visit.eq.0) then
+      if (.not. visited(nfath)) then
          call activate(nod, nrdofH,nrdofE,nrdofV,nrdofQ)
       endif
 !
 !..end of loop over nodes
    enddo
-!$OMP END DO
-!$OMP END PARALLEL
+!$omp end do
+!$omp end parallel
+!
+   call bitvisit_finalize
 !
 !..update global dof counters
    NRDOFSH = NRDOFSH + nrdofH
