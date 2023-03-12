@@ -1,0 +1,4012 @@
+3  3 NDIM,MANDIM 
+
+0     no surfaces 
+
+1         NRDOMAIN 
+
+216        NRPOINT  
+
+Regular             point 1 
+ 0.0000000000000000d0 0.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 2 
+ 1.0000000000000000d0 0.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 3 
+ 1.0000000000000000d0 1.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 4 
+ 0.0000000000000000d0 1.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 5 
+ 0.0000000000000000d0 0.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 6 
+ 1.0000000000000000d0 0.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 7 
+ 1.0000000000000000d0 1.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 8 
+ 0.0000000000000000d0 1.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 9 
+ 2.0000000000000000d0 0.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 10 
+ 2.0000000000000000d0 1.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 11 
+ 2.0000000000000000d0 0.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 12 
+ 2.0000000000000000d0 1.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 13 
+ 3.0000000000000000d0 0.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 14 
+ 3.0000000000000000d0 1.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 15 
+ 3.0000000000000000d0 0.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 16 
+ 3.0000000000000000d0 1.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 17 
+ 4.0000000000000000d0 0.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 18 
+ 4.0000000000000000d0 1.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 19 
+ 4.0000000000000000d0 0.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 20 
+ 4.0000000000000000d0 1.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 21 
+ 5.0000000000000000d0 0.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 22 
+ 5.0000000000000000d0 1.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 23 
+ 5.0000000000000000d0 0.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 24 
+ 5.0000000000000000d0 1.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 25 
+ 1.0000000000000000d0 2.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 26 
+ 0.0000000000000000d0 2.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 27 
+ 1.0000000000000000d0 2.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 28 
+ 0.0000000000000000d0 2.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 29 
+ 2.0000000000000000d0 2.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 30 
+ 2.0000000000000000d0 2.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 31 
+ 3.0000000000000000d0 2.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 32 
+ 3.0000000000000000d0 2.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 33 
+ 4.0000000000000000d0 2.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 34 
+ 4.0000000000000000d0 2.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 35 
+ 5.0000000000000000d0 2.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 36 
+ 5.0000000000000000d0 2.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 37 
+ 1.0000000000000000d0 3.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 38 
+ 0.0000000000000000d0 3.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 39 
+ 1.0000000000000000d0 3.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 40 
+ 0.0000000000000000d0 3.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 41 
+ 2.0000000000000000d0 3.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 42 
+ 2.0000000000000000d0 3.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 43 
+ 3.0000000000000000d0 3.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 44 
+ 3.0000000000000000d0 3.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 45 
+ 4.0000000000000000d0 3.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 46 
+ 4.0000000000000000d0 3.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 47 
+ 5.0000000000000000d0 3.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 48 
+ 5.0000000000000000d0 3.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 49 
+ 1.0000000000000000d0 4.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 50 
+ 0.0000000000000000d0 4.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 51 
+ 1.0000000000000000d0 4.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 52 
+ 0.0000000000000000d0 4.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 53 
+ 2.0000000000000000d0 4.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 54 
+ 2.0000000000000000d0 4.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 55 
+ 3.0000000000000000d0 4.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 56 
+ 3.0000000000000000d0 4.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 57 
+ 4.0000000000000000d0 4.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 58 
+ 4.0000000000000000d0 4.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 59 
+ 5.0000000000000000d0 4.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 60 
+ 5.0000000000000000d0 4.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 61 
+ 1.0000000000000000d0 5.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 62 
+ 0.0000000000000000d0 5.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 63 
+ 1.0000000000000000d0 5.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 64 
+ 0.0000000000000000d0 5.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 65 
+ 2.0000000000000000d0 5.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 66 
+ 2.0000000000000000d0 5.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 67 
+ 3.0000000000000000d0 5.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 68 
+ 3.0000000000000000d0 5.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 69 
+ 4.0000000000000000d0 5.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 70 
+ 4.0000000000000000d0 5.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 71 
+ 5.0000000000000000d0 5.0000000000000000d0 0.0000000000000000d0  
+
+Regular             point 72 
+ 5.0000000000000000d0 5.0000000000000000d0 1.0000000000000000d0  
+
+Regular             point 73 
+ 0.0000000000000000d0 0.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 74 
+ 1.0000000000000000d0 0.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 75 
+ 1.0000000000000000d0 1.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 76 
+ 0.0000000000000000d0 1.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 77 
+ 2.0000000000000000d0 0.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 78 
+ 2.0000000000000000d0 1.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 79 
+ 3.0000000000000000d0 0.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 80 
+ 3.0000000000000000d0 1.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 81 
+ 4.0000000000000000d0 0.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 82 
+ 4.0000000000000000d0 1.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 83 
+ 5.0000000000000000d0 0.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 84 
+ 5.0000000000000000d0 1.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 85 
+ 1.0000000000000000d0 2.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 86 
+ 0.0000000000000000d0 2.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 87 
+ 2.0000000000000000d0 2.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 88 
+ 3.0000000000000000d0 2.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 89 
+ 4.0000000000000000d0 2.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 90 
+ 5.0000000000000000d0 2.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 91 
+ 1.0000000000000000d0 3.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 92 
+ 0.0000000000000000d0 3.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 93 
+ 2.0000000000000000d0 3.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 94 
+ 3.0000000000000000d0 3.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 95 
+ 4.0000000000000000d0 3.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 96 
+ 5.0000000000000000d0 3.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 97 
+ 1.0000000000000000d0 4.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 98 
+ 0.0000000000000000d0 4.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 99 
+ 2.0000000000000000d0 4.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 100 
+ 3.0000000000000000d0 4.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 101 
+ 4.0000000000000000d0 4.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 102 
+ 5.0000000000000000d0 4.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 103 
+ 1.0000000000000000d0 5.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 104 
+ 0.0000000000000000d0 5.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 105 
+ 2.0000000000000000d0 5.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 106 
+ 3.0000000000000000d0 5.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 107 
+ 4.0000000000000000d0 5.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 108 
+ 5.0000000000000000d0 5.0000000000000000d0 2.0000000000000000d0  
+
+Regular             point 109 
+ 0.0000000000000000d0 0.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 110 
+ 1.0000000000000000d0 0.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 111 
+ 1.0000000000000000d0 1.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 112 
+ 0.0000000000000000d0 1.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 113 
+ 2.0000000000000000d0 0.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 114 
+ 2.0000000000000000d0 1.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 115 
+ 3.0000000000000000d0 0.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 116 
+ 3.0000000000000000d0 1.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 117 
+ 4.0000000000000000d0 0.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 118 
+ 4.0000000000000000d0 1.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 119 
+ 5.0000000000000000d0 0.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 120 
+ 5.0000000000000000d0 1.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 121 
+ 1.0000000000000000d0 2.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 122 
+ 0.0000000000000000d0 2.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 123 
+ 2.0000000000000000d0 2.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 124 
+ 3.0000000000000000d0 2.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 125 
+ 4.0000000000000000d0 2.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 126 
+ 5.0000000000000000d0 2.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 127 
+ 1.0000000000000000d0 3.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 128 
+ 0.0000000000000000d0 3.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 129 
+ 2.0000000000000000d0 3.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 130 
+ 3.0000000000000000d0 3.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 131 
+ 4.0000000000000000d0 3.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 132 
+ 5.0000000000000000d0 3.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 133 
+ 1.0000000000000000d0 4.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 134 
+ 0.0000000000000000d0 4.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 135 
+ 2.0000000000000000d0 4.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 136 
+ 3.0000000000000000d0 4.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 137 
+ 4.0000000000000000d0 4.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 138 
+ 5.0000000000000000d0 4.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 139 
+ 1.0000000000000000d0 5.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 140 
+ 0.0000000000000000d0 5.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 141 
+ 2.0000000000000000d0 5.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 142 
+ 3.0000000000000000d0 5.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 143 
+ 4.0000000000000000d0 5.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 144 
+ 5.0000000000000000d0 5.0000000000000000d0 3.0000000000000000d0  
+
+Regular             point 145 
+ 0.0000000000000000d0 0.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 146 
+ 1.0000000000000000d0 0.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 147 
+ 1.0000000000000000d0 1.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 148 
+ 0.0000000000000000d0 1.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 149 
+ 2.0000000000000000d0 0.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 150 
+ 2.0000000000000000d0 1.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 151 
+ 3.0000000000000000d0 0.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 152 
+ 3.0000000000000000d0 1.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 153 
+ 4.0000000000000000d0 0.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 154 
+ 4.0000000000000000d0 1.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 155 
+ 5.0000000000000000d0 0.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 156 
+ 5.0000000000000000d0 1.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 157 
+ 1.0000000000000000d0 2.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 158 
+ 0.0000000000000000d0 2.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 159 
+ 2.0000000000000000d0 2.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 160 
+ 3.0000000000000000d0 2.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 161 
+ 4.0000000000000000d0 2.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 162 
+ 5.0000000000000000d0 2.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 163 
+ 1.0000000000000000d0 3.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 164 
+ 0.0000000000000000d0 3.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 165 
+ 2.0000000000000000d0 3.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 166 
+ 3.0000000000000000d0 3.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 167 
+ 4.0000000000000000d0 3.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 168 
+ 5.0000000000000000d0 3.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 169 
+ 1.0000000000000000d0 4.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 170 
+ 0.0000000000000000d0 4.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 171 
+ 2.0000000000000000d0 4.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 172 
+ 3.0000000000000000d0 4.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 173 
+ 4.0000000000000000d0 4.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 174 
+ 5.0000000000000000d0 4.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 175 
+ 1.0000000000000000d0 5.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 176 
+ 0.0000000000000000d0 5.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 177 
+ 2.0000000000000000d0 5.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 178 
+ 3.0000000000000000d0 5.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 179 
+ 4.0000000000000000d0 5.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 180 
+ 5.0000000000000000d0 5.0000000000000000d0 4.0000000000000000d0  
+
+Regular             point 181 
+ 0.0000000000000000d0 0.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 182 
+ 1.0000000000000000d0 0.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 183 
+ 1.0000000000000000d0 1.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 184 
+ 0.0000000000000000d0 1.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 185 
+ 2.0000000000000000d0 0.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 186 
+ 2.0000000000000000d0 1.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 187 
+ 3.0000000000000000d0 0.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 188 
+ 3.0000000000000000d0 1.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 189 
+ 4.0000000000000000d0 0.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 190 
+ 4.0000000000000000d0 1.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 191 
+ 5.0000000000000000d0 0.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 192 
+ 5.0000000000000000d0 1.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 193 
+ 1.0000000000000000d0 2.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 194 
+ 0.0000000000000000d0 2.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 195 
+ 2.0000000000000000d0 2.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 196 
+ 3.0000000000000000d0 2.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 197 
+ 4.0000000000000000d0 2.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 198 
+ 5.0000000000000000d0 2.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 199 
+ 1.0000000000000000d0 3.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 200 
+ 0.0000000000000000d0 3.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 201 
+ 2.0000000000000000d0 3.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 202 
+ 3.0000000000000000d0 3.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 203 
+ 4.0000000000000000d0 3.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 204 
+ 5.0000000000000000d0 3.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 205 
+ 1.0000000000000000d0 4.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 206 
+ 0.0000000000000000d0 4.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 207 
+ 2.0000000000000000d0 4.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 208 
+ 3.0000000000000000d0 4.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 209 
+ 4.0000000000000000d0 4.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 210 
+ 5.0000000000000000d0 4.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 211 
+ 1.0000000000000000d0 5.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 212 
+ 0.0000000000000000d0 5.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 213 
+ 2.0000000000000000d0 5.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 214 
+ 3.0000000000000000d0 5.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 215 
+ 4.0000000000000000d0 5.0000000000000000d0 5.0000000000000000d0  
+
+Regular             point 216 
+ 5.0000000000000000d0 5.0000000000000000d0 5.0000000000000000d0  
+
+540        NRCURVE  
+
+Seglin             curve 1 
+ 1 2 
+
+Seglin             curve 2 
+ 2 3 
+
+Seglin             curve 3 
+ 4 3 
+
+Seglin             curve 4 
+ 1 4 
+
+Seglin             curve 5 
+ 5 6 
+
+Seglin             curve 6 
+ 6 7 
+
+Seglin             curve 7 
+ 8 7 
+
+Seglin             curve 8 
+ 5 8 
+
+Seglin             curve 9 
+ 1 5 
+
+Seglin             curve 10 
+ 2 6 
+
+Seglin             curve 11 
+ 3 7 
+
+Seglin             curve 12 
+ 4 8 
+
+Seglin             curve 13 
+ 2 9 
+
+Seglin             curve 14 
+ 9 10 
+
+Seglin             curve 15 
+ 3 10 
+
+Seglin             curve 16 
+ 6 11 
+
+Seglin             curve 17 
+ 11 12 
+
+Seglin             curve 18 
+ 7 12 
+
+Seglin             curve 19 
+ 9 11 
+
+Seglin             curve 20 
+ 10 12 
+
+Seglin             curve 21 
+ 9 13 
+
+Seglin             curve 22 
+ 13 14 
+
+Seglin             curve 23 
+ 10 14 
+
+Seglin             curve 24 
+ 11 15 
+
+Seglin             curve 25 
+ 15 16 
+
+Seglin             curve 26 
+ 12 16 
+
+Seglin             curve 27 
+ 13 15 
+
+Seglin             curve 28 
+ 14 16 
+
+Seglin             curve 29 
+ 13 17 
+
+Seglin             curve 30 
+ 17 18 
+
+Seglin             curve 31 
+ 14 18 
+
+Seglin             curve 32 
+ 15 19 
+
+Seglin             curve 33 
+ 19 20 
+
+Seglin             curve 34 
+ 16 20 
+
+Seglin             curve 35 
+ 17 19 
+
+Seglin             curve 36 
+ 18 20 
+
+Seglin             curve 37 
+ 17 21 
+
+Seglin             curve 38 
+ 21 22 
+
+Seglin             curve 39 
+ 18 22 
+
+Seglin             curve 40 
+ 19 23 
+
+Seglin             curve 41 
+ 23 24 
+
+Seglin             curve 42 
+ 20 24 
+
+Seglin             curve 43 
+ 21 23 
+
+Seglin             curve 44 
+ 22 24 
+
+Seglin             curve 45 
+ 3 25 
+
+Seglin             curve 46 
+ 26 25 
+
+Seglin             curve 47 
+ 4 26 
+
+Seglin             curve 48 
+ 7 27 
+
+Seglin             curve 49 
+ 28 27 
+
+Seglin             curve 50 
+ 8 28 
+
+Seglin             curve 51 
+ 25 27 
+
+Seglin             curve 52 
+ 26 28 
+
+Seglin             curve 53 
+ 10 29 
+
+Seglin             curve 54 
+ 25 29 
+
+Seglin             curve 55 
+ 12 30 
+
+Seglin             curve 56 
+ 27 30 
+
+Seglin             curve 57 
+ 29 30 
+
+Seglin             curve 58 
+ 14 31 
+
+Seglin             curve 59 
+ 29 31 
+
+Seglin             curve 60 
+ 16 32 
+
+Seglin             curve 61 
+ 30 32 
+
+Seglin             curve 62 
+ 31 32 
+
+Seglin             curve 63 
+ 18 33 
+
+Seglin             curve 64 
+ 31 33 
+
+Seglin             curve 65 
+ 20 34 
+
+Seglin             curve 66 
+ 32 34 
+
+Seglin             curve 67 
+ 33 34 
+
+Seglin             curve 68 
+ 22 35 
+
+Seglin             curve 69 
+ 33 35 
+
+Seglin             curve 70 
+ 24 36 
+
+Seglin             curve 71 
+ 34 36 
+
+Seglin             curve 72 
+ 35 36 
+
+Seglin             curve 73 
+ 25 37 
+
+Seglin             curve 74 
+ 38 37 
+
+Seglin             curve 75 
+ 26 38 
+
+Seglin             curve 76 
+ 27 39 
+
+Seglin             curve 77 
+ 40 39 
+
+Seglin             curve 78 
+ 28 40 
+
+Seglin             curve 79 
+ 37 39 
+
+Seglin             curve 80 
+ 38 40 
+
+Seglin             curve 81 
+ 29 41 
+
+Seglin             curve 82 
+ 37 41 
+
+Seglin             curve 83 
+ 30 42 
+
+Seglin             curve 84 
+ 39 42 
+
+Seglin             curve 85 
+ 41 42 
+
+Seglin             curve 86 
+ 31 43 
+
+Seglin             curve 87 
+ 41 43 
+
+Seglin             curve 88 
+ 32 44 
+
+Seglin             curve 89 
+ 42 44 
+
+Seglin             curve 90 
+ 43 44 
+
+Seglin             curve 91 
+ 33 45 
+
+Seglin             curve 92 
+ 43 45 
+
+Seglin             curve 93 
+ 34 46 
+
+Seglin             curve 94 
+ 44 46 
+
+Seglin             curve 95 
+ 45 46 
+
+Seglin             curve 96 
+ 35 47 
+
+Seglin             curve 97 
+ 45 47 
+
+Seglin             curve 98 
+ 36 48 
+
+Seglin             curve 99 
+ 46 48 
+
+Seglin             curve 100 
+ 47 48 
+
+Seglin             curve 101 
+ 37 49 
+
+Seglin             curve 102 
+ 50 49 
+
+Seglin             curve 103 
+ 38 50 
+
+Seglin             curve 104 
+ 39 51 
+
+Seglin             curve 105 
+ 52 51 
+
+Seglin             curve 106 
+ 40 52 
+
+Seglin             curve 107 
+ 49 51 
+
+Seglin             curve 108 
+ 50 52 
+
+Seglin             curve 109 
+ 41 53 
+
+Seglin             curve 110 
+ 49 53 
+
+Seglin             curve 111 
+ 42 54 
+
+Seglin             curve 112 
+ 51 54 
+
+Seglin             curve 113 
+ 53 54 
+
+Seglin             curve 114 
+ 43 55 
+
+Seglin             curve 115 
+ 53 55 
+
+Seglin             curve 116 
+ 44 56 
+
+Seglin             curve 117 
+ 54 56 
+
+Seglin             curve 118 
+ 55 56 
+
+Seglin             curve 119 
+ 45 57 
+
+Seglin             curve 120 
+ 55 57 
+
+Seglin             curve 121 
+ 46 58 
+
+Seglin             curve 122 
+ 56 58 
+
+Seglin             curve 123 
+ 57 58 
+
+Seglin             curve 124 
+ 47 59 
+
+Seglin             curve 125 
+ 57 59 
+
+Seglin             curve 126 
+ 48 60 
+
+Seglin             curve 127 
+ 58 60 
+
+Seglin             curve 128 
+ 59 60 
+
+Seglin             curve 129 
+ 49 61 
+
+Seglin             curve 130 
+ 62 61 
+
+Seglin             curve 131 
+ 50 62 
+
+Seglin             curve 132 
+ 51 63 
+
+Seglin             curve 133 
+ 64 63 
+
+Seglin             curve 134 
+ 52 64 
+
+Seglin             curve 135 
+ 61 63 
+
+Seglin             curve 136 
+ 62 64 
+
+Seglin             curve 137 
+ 53 65 
+
+Seglin             curve 138 
+ 61 65 
+
+Seglin             curve 139 
+ 54 66 
+
+Seglin             curve 140 
+ 63 66 
+
+Seglin             curve 141 
+ 65 66 
+
+Seglin             curve 142 
+ 55 67 
+
+Seglin             curve 143 
+ 65 67 
+
+Seglin             curve 144 
+ 56 68 
+
+Seglin             curve 145 
+ 66 68 
+
+Seglin             curve 146 
+ 67 68 
+
+Seglin             curve 147 
+ 57 69 
+
+Seglin             curve 148 
+ 67 69 
+
+Seglin             curve 149 
+ 58 70 
+
+Seglin             curve 150 
+ 68 70 
+
+Seglin             curve 151 
+ 69 70 
+
+Seglin             curve 152 
+ 59 71 
+
+Seglin             curve 153 
+ 69 71 
+
+Seglin             curve 154 
+ 60 72 
+
+Seglin             curve 155 
+ 70 72 
+
+Seglin             curve 156 
+ 71 72 
+
+Seglin             curve 157 
+ 73 74 
+
+Seglin             curve 158 
+ 74 75 
+
+Seglin             curve 159 
+ 76 75 
+
+Seglin             curve 160 
+ 73 76 
+
+Seglin             curve 161 
+ 5 73 
+
+Seglin             curve 162 
+ 6 74 
+
+Seglin             curve 163 
+ 7 75 
+
+Seglin             curve 164 
+ 8 76 
+
+Seglin             curve 165 
+ 74 77 
+
+Seglin             curve 166 
+ 77 78 
+
+Seglin             curve 167 
+ 75 78 
+
+Seglin             curve 168 
+ 11 77 
+
+Seglin             curve 169 
+ 12 78 
+
+Seglin             curve 170 
+ 77 79 
+
+Seglin             curve 171 
+ 79 80 
+
+Seglin             curve 172 
+ 78 80 
+
+Seglin             curve 173 
+ 15 79 
+
+Seglin             curve 174 
+ 16 80 
+
+Seglin             curve 175 
+ 79 81 
+
+Seglin             curve 176 
+ 81 82 
+
+Seglin             curve 177 
+ 80 82 
+
+Seglin             curve 178 
+ 19 81 
+
+Seglin             curve 179 
+ 20 82 
+
+Seglin             curve 180 
+ 81 83 
+
+Seglin             curve 181 
+ 83 84 
+
+Seglin             curve 182 
+ 82 84 
+
+Seglin             curve 183 
+ 23 83 
+
+Seglin             curve 184 
+ 24 84 
+
+Seglin             curve 185 
+ 75 85 
+
+Seglin             curve 186 
+ 86 85 
+
+Seglin             curve 187 
+ 76 86 
+
+Seglin             curve 188 
+ 27 85 
+
+Seglin             curve 189 
+ 28 86 
+
+Seglin             curve 190 
+ 78 87 
+
+Seglin             curve 191 
+ 85 87 
+
+Seglin             curve 192 
+ 30 87 
+
+Seglin             curve 193 
+ 80 88 
+
+Seglin             curve 194 
+ 87 88 
+
+Seglin             curve 195 
+ 32 88 
+
+Seglin             curve 196 
+ 82 89 
+
+Seglin             curve 197 
+ 88 89 
+
+Seglin             curve 198 
+ 34 89 
+
+Seglin             curve 199 
+ 84 90 
+
+Seglin             curve 200 
+ 89 90 
+
+Seglin             curve 201 
+ 36 90 
+
+Seglin             curve 202 
+ 85 91 
+
+Seglin             curve 203 
+ 92 91 
+
+Seglin             curve 204 
+ 86 92 
+
+Seglin             curve 205 
+ 39 91 
+
+Seglin             curve 206 
+ 40 92 
+
+Seglin             curve 207 
+ 87 93 
+
+Seglin             curve 208 
+ 91 93 
+
+Seglin             curve 209 
+ 42 93 
+
+Seglin             curve 210 
+ 88 94 
+
+Seglin             curve 211 
+ 93 94 
+
+Seglin             curve 212 
+ 44 94 
+
+Seglin             curve 213 
+ 89 95 
+
+Seglin             curve 214 
+ 94 95 
+
+Seglin             curve 215 
+ 46 95 
+
+Seglin             curve 216 
+ 90 96 
+
+Seglin             curve 217 
+ 95 96 
+
+Seglin             curve 218 
+ 48 96 
+
+Seglin             curve 219 
+ 91 97 
+
+Seglin             curve 220 
+ 98 97 
+
+Seglin             curve 221 
+ 92 98 
+
+Seglin             curve 222 
+ 51 97 
+
+Seglin             curve 223 
+ 52 98 
+
+Seglin             curve 224 
+ 93 99 
+
+Seglin             curve 225 
+ 97 99 
+
+Seglin             curve 226 
+ 54 99 
+
+Seglin             curve 227 
+ 94 100 
+
+Seglin             curve 228 
+ 99 100 
+
+Seglin             curve 229 
+ 56 100 
+
+Seglin             curve 230 
+ 95 101 
+
+Seglin             curve 231 
+ 100 101 
+
+Seglin             curve 232 
+ 58 101 
+
+Seglin             curve 233 
+ 96 102 
+
+Seglin             curve 234 
+ 101 102 
+
+Seglin             curve 235 
+ 60 102 
+
+Seglin             curve 236 
+ 97 103 
+
+Seglin             curve 237 
+ 104 103 
+
+Seglin             curve 238 
+ 98 104 
+
+Seglin             curve 239 
+ 63 103 
+
+Seglin             curve 240 
+ 64 104 
+
+Seglin             curve 241 
+ 99 105 
+
+Seglin             curve 242 
+ 103 105 
+
+Seglin             curve 243 
+ 66 105 
+
+Seglin             curve 244 
+ 100 106 
+
+Seglin             curve 245 
+ 105 106 
+
+Seglin             curve 246 
+ 68 106 
+
+Seglin             curve 247 
+ 101 107 
+
+Seglin             curve 248 
+ 106 107 
+
+Seglin             curve 249 
+ 70 107 
+
+Seglin             curve 250 
+ 102 108 
+
+Seglin             curve 251 
+ 107 108 
+
+Seglin             curve 252 
+ 72 108 
+
+Seglin             curve 253 
+ 109 110 
+
+Seglin             curve 254 
+ 110 111 
+
+Seglin             curve 255 
+ 112 111 
+
+Seglin             curve 256 
+ 109 112 
+
+Seglin             curve 257 
+ 73 109 
+
+Seglin             curve 258 
+ 74 110 
+
+Seglin             curve 259 
+ 75 111 
+
+Seglin             curve 260 
+ 76 112 
+
+Seglin             curve 261 
+ 110 113 
+
+Seglin             curve 262 
+ 113 114 
+
+Seglin             curve 263 
+ 111 114 
+
+Seglin             curve 264 
+ 77 113 
+
+Seglin             curve 265 
+ 78 114 
+
+Seglin             curve 266 
+ 113 115 
+
+Seglin             curve 267 
+ 115 116 
+
+Seglin             curve 268 
+ 114 116 
+
+Seglin             curve 269 
+ 79 115 
+
+Seglin             curve 270 
+ 80 116 
+
+Seglin             curve 271 
+ 115 117 
+
+Seglin             curve 272 
+ 117 118 
+
+Seglin             curve 273 
+ 116 118 
+
+Seglin             curve 274 
+ 81 117 
+
+Seglin             curve 275 
+ 82 118 
+
+Seglin             curve 276 
+ 117 119 
+
+Seglin             curve 277 
+ 119 120 
+
+Seglin             curve 278 
+ 118 120 
+
+Seglin             curve 279 
+ 83 119 
+
+Seglin             curve 280 
+ 84 120 
+
+Seglin             curve 281 
+ 111 121 
+
+Seglin             curve 282 
+ 122 121 
+
+Seglin             curve 283 
+ 112 122 
+
+Seglin             curve 284 
+ 85 121 
+
+Seglin             curve 285 
+ 86 122 
+
+Seglin             curve 286 
+ 114 123 
+
+Seglin             curve 287 
+ 121 123 
+
+Seglin             curve 288 
+ 87 123 
+
+Seglin             curve 289 
+ 116 124 
+
+Seglin             curve 290 
+ 123 124 
+
+Seglin             curve 291 
+ 88 124 
+
+Seglin             curve 292 
+ 118 125 
+
+Seglin             curve 293 
+ 124 125 
+
+Seglin             curve 294 
+ 89 125 
+
+Seglin             curve 295 
+ 120 126 
+
+Seglin             curve 296 
+ 125 126 
+
+Seglin             curve 297 
+ 90 126 
+
+Seglin             curve 298 
+ 121 127 
+
+Seglin             curve 299 
+ 128 127 
+
+Seglin             curve 300 
+ 122 128 
+
+Seglin             curve 301 
+ 91 127 
+
+Seglin             curve 302 
+ 92 128 
+
+Seglin             curve 303 
+ 123 129 
+
+Seglin             curve 304 
+ 127 129 
+
+Seglin             curve 305 
+ 93 129 
+
+Seglin             curve 306 
+ 124 130 
+
+Seglin             curve 307 
+ 129 130 
+
+Seglin             curve 308 
+ 94 130 
+
+Seglin             curve 309 
+ 125 131 
+
+Seglin             curve 310 
+ 130 131 
+
+Seglin             curve 311 
+ 95 131 
+
+Seglin             curve 312 
+ 126 132 
+
+Seglin             curve 313 
+ 131 132 
+
+Seglin             curve 314 
+ 96 132 
+
+Seglin             curve 315 
+ 127 133 
+
+Seglin             curve 316 
+ 134 133 
+
+Seglin             curve 317 
+ 128 134 
+
+Seglin             curve 318 
+ 97 133 
+
+Seglin             curve 319 
+ 98 134 
+
+Seglin             curve 320 
+ 129 135 
+
+Seglin             curve 321 
+ 133 135 
+
+Seglin             curve 322 
+ 99 135 
+
+Seglin             curve 323 
+ 130 136 
+
+Seglin             curve 324 
+ 135 136 
+
+Seglin             curve 325 
+ 100 136 
+
+Seglin             curve 326 
+ 131 137 
+
+Seglin             curve 327 
+ 136 137 
+
+Seglin             curve 328 
+ 101 137 
+
+Seglin             curve 329 
+ 132 138 
+
+Seglin             curve 330 
+ 137 138 
+
+Seglin             curve 331 
+ 102 138 
+
+Seglin             curve 332 
+ 133 139 
+
+Seglin             curve 333 
+ 140 139 
+
+Seglin             curve 334 
+ 134 140 
+
+Seglin             curve 335 
+ 103 139 
+
+Seglin             curve 336 
+ 104 140 
+
+Seglin             curve 337 
+ 135 141 
+
+Seglin             curve 338 
+ 139 141 
+
+Seglin             curve 339 
+ 105 141 
+
+Seglin             curve 340 
+ 136 142 
+
+Seglin             curve 341 
+ 141 142 
+
+Seglin             curve 342 
+ 106 142 
+
+Seglin             curve 343 
+ 137 143 
+
+Seglin             curve 344 
+ 142 143 
+
+Seglin             curve 345 
+ 107 143 
+
+Seglin             curve 346 
+ 138 144 
+
+Seglin             curve 347 
+ 143 144 
+
+Seglin             curve 348 
+ 108 144 
+
+Seglin             curve 349 
+ 145 146 
+
+Seglin             curve 350 
+ 146 147 
+
+Seglin             curve 351 
+ 148 147 
+
+Seglin             curve 352 
+ 145 148 
+
+Seglin             curve 353 
+ 109 145 
+
+Seglin             curve 354 
+ 110 146 
+
+Seglin             curve 355 
+ 111 147 
+
+Seglin             curve 356 
+ 112 148 
+
+Seglin             curve 357 
+ 146 149 
+
+Seglin             curve 358 
+ 149 150 
+
+Seglin             curve 359 
+ 147 150 
+
+Seglin             curve 360 
+ 113 149 
+
+Seglin             curve 361 
+ 114 150 
+
+Seglin             curve 362 
+ 149 151 
+
+Seglin             curve 363 
+ 151 152 
+
+Seglin             curve 364 
+ 150 152 
+
+Seglin             curve 365 
+ 115 151 
+
+Seglin             curve 366 
+ 116 152 
+
+Seglin             curve 367 
+ 151 153 
+
+Seglin             curve 368 
+ 153 154 
+
+Seglin             curve 369 
+ 152 154 
+
+Seglin             curve 370 
+ 117 153 
+
+Seglin             curve 371 
+ 118 154 
+
+Seglin             curve 372 
+ 153 155 
+
+Seglin             curve 373 
+ 155 156 
+
+Seglin             curve 374 
+ 154 156 
+
+Seglin             curve 375 
+ 119 155 
+
+Seglin             curve 376 
+ 120 156 
+
+Seglin             curve 377 
+ 147 157 
+
+Seglin             curve 378 
+ 158 157 
+
+Seglin             curve 379 
+ 148 158 
+
+Seglin             curve 380 
+ 121 157 
+
+Seglin             curve 381 
+ 122 158 
+
+Seglin             curve 382 
+ 150 159 
+
+Seglin             curve 383 
+ 157 159 
+
+Seglin             curve 384 
+ 123 159 
+
+Seglin             curve 385 
+ 152 160 
+
+Seglin             curve 386 
+ 159 160 
+
+Seglin             curve 387 
+ 124 160 
+
+Seglin             curve 388 
+ 154 161 
+
+Seglin             curve 389 
+ 160 161 
+
+Seglin             curve 390 
+ 125 161 
+
+Seglin             curve 391 
+ 156 162 
+
+Seglin             curve 392 
+ 161 162 
+
+Seglin             curve 393 
+ 126 162 
+
+Seglin             curve 394 
+ 157 163 
+
+Seglin             curve 395 
+ 164 163 
+
+Seglin             curve 396 
+ 158 164 
+
+Seglin             curve 397 
+ 127 163 
+
+Seglin             curve 398 
+ 128 164 
+
+Seglin             curve 399 
+ 159 165 
+
+Seglin             curve 400 
+ 163 165 
+
+Seglin             curve 401 
+ 129 165 
+
+Seglin             curve 402 
+ 160 166 
+
+Seglin             curve 403 
+ 165 166 
+
+Seglin             curve 404 
+ 130 166 
+
+Seglin             curve 405 
+ 161 167 
+
+Seglin             curve 406 
+ 166 167 
+
+Seglin             curve 407 
+ 131 167 
+
+Seglin             curve 408 
+ 162 168 
+
+Seglin             curve 409 
+ 167 168 
+
+Seglin             curve 410 
+ 132 168 
+
+Seglin             curve 411 
+ 163 169 
+
+Seglin             curve 412 
+ 170 169 
+
+Seglin             curve 413 
+ 164 170 
+
+Seglin             curve 414 
+ 133 169 
+
+Seglin             curve 415 
+ 134 170 
+
+Seglin             curve 416 
+ 165 171 
+
+Seglin             curve 417 
+ 169 171 
+
+Seglin             curve 418 
+ 135 171 
+
+Seglin             curve 419 
+ 166 172 
+
+Seglin             curve 420 
+ 171 172 
+
+Seglin             curve 421 
+ 136 172 
+
+Seglin             curve 422 
+ 167 173 
+
+Seglin             curve 423 
+ 172 173 
+
+Seglin             curve 424 
+ 137 173 
+
+Seglin             curve 425 
+ 168 174 
+
+Seglin             curve 426 
+ 173 174 
+
+Seglin             curve 427 
+ 138 174 
+
+Seglin             curve 428 
+ 169 175 
+
+Seglin             curve 429 
+ 176 175 
+
+Seglin             curve 430 
+ 170 176 
+
+Seglin             curve 431 
+ 139 175 
+
+Seglin             curve 432 
+ 140 176 
+
+Seglin             curve 433 
+ 171 177 
+
+Seglin             curve 434 
+ 175 177 
+
+Seglin             curve 435 
+ 141 177 
+
+Seglin             curve 436 
+ 172 178 
+
+Seglin             curve 437 
+ 177 178 
+
+Seglin             curve 438 
+ 142 178 
+
+Seglin             curve 439 
+ 173 179 
+
+Seglin             curve 440 
+ 178 179 
+
+Seglin             curve 441 
+ 143 179 
+
+Seglin             curve 442 
+ 174 180 
+
+Seglin             curve 443 
+ 179 180 
+
+Seglin             curve 444 
+ 144 180 
+
+Seglin             curve 445 
+ 181 182 
+
+Seglin             curve 446 
+ 182 183 
+
+Seglin             curve 447 
+ 184 183 
+
+Seglin             curve 448 
+ 181 184 
+
+Seglin             curve 449 
+ 145 181 
+
+Seglin             curve 450 
+ 146 182 
+
+Seglin             curve 451 
+ 147 183 
+
+Seglin             curve 452 
+ 148 184 
+
+Seglin             curve 453 
+ 182 185 
+
+Seglin             curve 454 
+ 185 186 
+
+Seglin             curve 455 
+ 183 186 
+
+Seglin             curve 456 
+ 149 185 
+
+Seglin             curve 457 
+ 150 186 
+
+Seglin             curve 458 
+ 185 187 
+
+Seglin             curve 459 
+ 187 188 
+
+Seglin             curve 460 
+ 186 188 
+
+Seglin             curve 461 
+ 151 187 
+
+Seglin             curve 462 
+ 152 188 
+
+Seglin             curve 463 
+ 187 189 
+
+Seglin             curve 464 
+ 189 190 
+
+Seglin             curve 465 
+ 188 190 
+
+Seglin             curve 466 
+ 153 189 
+
+Seglin             curve 467 
+ 154 190 
+
+Seglin             curve 468 
+ 189 191 
+
+Seglin             curve 469 
+ 191 192 
+
+Seglin             curve 470 
+ 190 192 
+
+Seglin             curve 471 
+ 155 191 
+
+Seglin             curve 472 
+ 156 192 
+
+Seglin             curve 473 
+ 183 193 
+
+Seglin             curve 474 
+ 194 193 
+
+Seglin             curve 475 
+ 184 194 
+
+Seglin             curve 476 
+ 157 193 
+
+Seglin             curve 477 
+ 158 194 
+
+Seglin             curve 478 
+ 186 195 
+
+Seglin             curve 479 
+ 193 195 
+
+Seglin             curve 480 
+ 159 195 
+
+Seglin             curve 481 
+ 188 196 
+
+Seglin             curve 482 
+ 195 196 
+
+Seglin             curve 483 
+ 160 196 
+
+Seglin             curve 484 
+ 190 197 
+
+Seglin             curve 485 
+ 196 197 
+
+Seglin             curve 486 
+ 161 197 
+
+Seglin             curve 487 
+ 192 198 
+
+Seglin             curve 488 
+ 197 198 
+
+Seglin             curve 489 
+ 162 198 
+
+Seglin             curve 490 
+ 193 199 
+
+Seglin             curve 491 
+ 200 199 
+
+Seglin             curve 492 
+ 194 200 
+
+Seglin             curve 493 
+ 163 199 
+
+Seglin             curve 494 
+ 164 200 
+
+Seglin             curve 495 
+ 195 201 
+
+Seglin             curve 496 
+ 199 201 
+
+Seglin             curve 497 
+ 165 201 
+
+Seglin             curve 498 
+ 196 202 
+
+Seglin             curve 499 
+ 201 202 
+
+Seglin             curve 500 
+ 166 202 
+
+Seglin             curve 501 
+ 197 203 
+
+Seglin             curve 502 
+ 202 203 
+
+Seglin             curve 503 
+ 167 203 
+
+Seglin             curve 504 
+ 198 204 
+
+Seglin             curve 505 
+ 203 204 
+
+Seglin             curve 506 
+ 168 204 
+
+Seglin             curve 507 
+ 199 205 
+
+Seglin             curve 508 
+ 206 205 
+
+Seglin             curve 509 
+ 200 206 
+
+Seglin             curve 510 
+ 169 205 
+
+Seglin             curve 511 
+ 170 206 
+
+Seglin             curve 512 
+ 201 207 
+
+Seglin             curve 513 
+ 205 207 
+
+Seglin             curve 514 
+ 171 207 
+
+Seglin             curve 515 
+ 202 208 
+
+Seglin             curve 516 
+ 207 208 
+
+Seglin             curve 517 
+ 172 208 
+
+Seglin             curve 518 
+ 203 209 
+
+Seglin             curve 519 
+ 208 209 
+
+Seglin             curve 520 
+ 173 209 
+
+Seglin             curve 521 
+ 204 210 
+
+Seglin             curve 522 
+ 209 210 
+
+Seglin             curve 523 
+ 174 210 
+
+Seglin             curve 524 
+ 205 211 
+
+Seglin             curve 525 
+ 212 211 
+
+Seglin             curve 526 
+ 206 212 
+
+Seglin             curve 527 
+ 175 211 
+
+Seglin             curve 528 
+ 176 212 
+
+Seglin             curve 529 
+ 207 213 
+
+Seglin             curve 530 
+ 211 213 
+
+Seglin             curve 531 
+ 177 213 
+
+Seglin             curve 532 
+ 208 214 
+
+Seglin             curve 533 
+ 213 214 
+
+Seglin             curve 534 
+ 178 214 
+
+Seglin             curve 535 
+ 209 215 
+
+Seglin             curve 536 
+ 214 215 
+
+Seglin             curve 537 
+ 179 215 
+
+Seglin             curve 538 
+ 210 216 
+
+Seglin             curve 539 
+ 215 216 
+
+Seglin             curve 540 
+ 180 216 
+
+0         NRTRIAN  
+
+450        NRRECTA  
+
+BilQua            rectangle 1 
+ 1 2 3 4 
+
+BilQua            rectangle 2 
+ 5 6 7 8 
+
+BilQua            rectangle 3 
+ 1 2 6 5 
+
+BilQua            rectangle 4 
+ 2 3 7 6 
+
+BilQua            rectangle 5 
+ 4 3 7 8 
+
+BilQua            rectangle 6 
+ 1 4 8 5 
+
+BilQua            rectangle 7 
+ 2 9 10 3 
+
+BilQua            rectangle 8 
+ 6 11 12 7 
+
+BilQua            rectangle 9 
+ 2 9 11 6 
+
+BilQua            rectangle 10 
+ 9 10 12 11 
+
+BilQua            rectangle 11 
+ 3 10 12 7 
+
+BilQua            rectangle 12 
+ 9 13 14 10 
+
+BilQua            rectangle 13 
+ 11 15 16 12 
+
+BilQua            rectangle 14 
+ 9 13 15 11 
+
+BilQua            rectangle 15 
+ 13 14 16 15 
+
+BilQua            rectangle 16 
+ 10 14 16 12 
+
+BilQua            rectangle 17 
+ 13 17 18 14 
+
+BilQua            rectangle 18 
+ 15 19 20 16 
+
+BilQua            rectangle 19 
+ 13 17 19 15 
+
+BilQua            rectangle 20 
+ 17 18 20 19 
+
+BilQua            rectangle 21 
+ 14 18 20 16 
+
+BilQua            rectangle 22 
+ 17 21 22 18 
+
+BilQua            rectangle 23 
+ 19 23 24 20 
+
+BilQua            rectangle 24 
+ 17 21 23 19 
+
+BilQua            rectangle 25 
+ 21 22 24 23 
+
+BilQua            rectangle 26 
+ 18 22 24 20 
+
+BilQua            rectangle 27 
+ 4 3 25 26 
+
+BilQua            rectangle 28 
+ 8 7 27 28 
+
+BilQua            rectangle 29 
+ 3 25 27 7 
+
+BilQua            rectangle 30 
+ 26 25 27 28 
+
+BilQua            rectangle 31 
+ 4 26 28 8 
+
+BilQua            rectangle 32 
+ 3 10 29 25 
+
+BilQua            rectangle 33 
+ 7 12 30 27 
+
+BilQua            rectangle 34 
+ 10 29 30 12 
+
+BilQua            rectangle 35 
+ 25 29 30 27 
+
+BilQua            rectangle 36 
+ 10 14 31 29 
+
+BilQua            rectangle 37 
+ 12 16 32 30 
+
+BilQua            rectangle 38 
+ 14 31 32 16 
+
+BilQua            rectangle 39 
+ 29 31 32 30 
+
+BilQua            rectangle 40 
+ 14 18 33 31 
+
+BilQua            rectangle 41 
+ 16 20 34 32 
+
+BilQua            rectangle 42 
+ 18 33 34 20 
+
+BilQua            rectangle 43 
+ 31 33 34 32 
+
+BilQua            rectangle 44 
+ 18 22 35 33 
+
+BilQua            rectangle 45 
+ 20 24 36 34 
+
+BilQua            rectangle 46 
+ 22 35 36 24 
+
+BilQua            rectangle 47 
+ 33 35 36 34 
+
+BilQua            rectangle 48 
+ 26 25 37 38 
+
+BilQua            rectangle 49 
+ 28 27 39 40 
+
+BilQua            rectangle 50 
+ 25 37 39 27 
+
+BilQua            rectangle 51 
+ 38 37 39 40 
+
+BilQua            rectangle 52 
+ 26 38 40 28 
+
+BilQua            rectangle 53 
+ 25 29 41 37 
+
+BilQua            rectangle 54 
+ 27 30 42 39 
+
+BilQua            rectangle 55 
+ 29 41 42 30 
+
+BilQua            rectangle 56 
+ 37 41 42 39 
+
+BilQua            rectangle 57 
+ 29 31 43 41 
+
+BilQua            rectangle 58 
+ 30 32 44 42 
+
+BilQua            rectangle 59 
+ 31 43 44 32 
+
+BilQua            rectangle 60 
+ 41 43 44 42 
+
+BilQua            rectangle 61 
+ 31 33 45 43 
+
+BilQua            rectangle 62 
+ 32 34 46 44 
+
+BilQua            rectangle 63 
+ 33 45 46 34 
+
+BilQua            rectangle 64 
+ 43 45 46 44 
+
+BilQua            rectangle 65 
+ 33 35 47 45 
+
+BilQua            rectangle 66 
+ 34 36 48 46 
+
+BilQua            rectangle 67 
+ 35 47 48 36 
+
+BilQua            rectangle 68 
+ 45 47 48 46 
+
+BilQua            rectangle 69 
+ 38 37 49 50 
+
+BilQua            rectangle 70 
+ 40 39 51 52 
+
+BilQua            rectangle 71 
+ 37 49 51 39 
+
+BilQua            rectangle 72 
+ 50 49 51 52 
+
+BilQua            rectangle 73 
+ 38 50 52 40 
+
+BilQua            rectangle 74 
+ 37 41 53 49 
+
+BilQua            rectangle 75 
+ 39 42 54 51 
+
+BilQua            rectangle 76 
+ 41 53 54 42 
+
+BilQua            rectangle 77 
+ 49 53 54 51 
+
+BilQua            rectangle 78 
+ 41 43 55 53 
+
+BilQua            rectangle 79 
+ 42 44 56 54 
+
+BilQua            rectangle 80 
+ 43 55 56 44 
+
+BilQua            rectangle 81 
+ 53 55 56 54 
+
+BilQua            rectangle 82 
+ 43 45 57 55 
+
+BilQua            rectangle 83 
+ 44 46 58 56 
+
+BilQua            rectangle 84 
+ 45 57 58 46 
+
+BilQua            rectangle 85 
+ 55 57 58 56 
+
+BilQua            rectangle 86 
+ 45 47 59 57 
+
+BilQua            rectangle 87 
+ 46 48 60 58 
+
+BilQua            rectangle 88 
+ 47 59 60 48 
+
+BilQua            rectangle 89 
+ 57 59 60 58 
+
+BilQua            rectangle 90 
+ 50 49 61 62 
+
+BilQua            rectangle 91 
+ 52 51 63 64 
+
+BilQua            rectangle 92 
+ 49 61 63 51 
+
+BilQua            rectangle 93 
+ 62 61 63 64 
+
+BilQua            rectangle 94 
+ 50 62 64 52 
+
+BilQua            rectangle 95 
+ 49 53 65 61 
+
+BilQua            rectangle 96 
+ 51 54 66 63 
+
+BilQua            rectangle 97 
+ 53 65 66 54 
+
+BilQua            rectangle 98 
+ 61 65 66 63 
+
+BilQua            rectangle 99 
+ 53 55 67 65 
+
+BilQua            rectangle 100 
+ 54 56 68 66 
+
+BilQua            rectangle 101 
+ 55 67 68 56 
+
+BilQua            rectangle 102 
+ 65 67 68 66 
+
+BilQua            rectangle 103 
+ 55 57 69 67 
+
+BilQua            rectangle 104 
+ 56 58 70 68 
+
+BilQua            rectangle 105 
+ 57 69 70 58 
+
+BilQua            rectangle 106 
+ 67 69 70 68 
+
+BilQua            rectangle 107 
+ 57 59 71 69 
+
+BilQua            rectangle 108 
+ 58 60 72 70 
+
+BilQua            rectangle 109 
+ 59 71 72 60 
+
+BilQua            rectangle 110 
+ 69 71 72 70 
+
+BilQua            rectangle 111 
+ 73 74 75 76 
+
+BilQua            rectangle 112 
+ 5 6 74 73 
+
+BilQua            rectangle 113 
+ 6 7 75 74 
+
+BilQua            rectangle 114 
+ 8 7 75 76 
+
+BilQua            rectangle 115 
+ 5 8 76 73 
+
+BilQua            rectangle 116 
+ 74 77 78 75 
+
+BilQua            rectangle 117 
+ 6 11 77 74 
+
+BilQua            rectangle 118 
+ 11 12 78 77 
+
+BilQua            rectangle 119 
+ 7 12 78 75 
+
+BilQua            rectangle 120 
+ 77 79 80 78 
+
+BilQua            rectangle 121 
+ 11 15 79 77 
+
+BilQua            rectangle 122 
+ 15 16 80 79 
+
+BilQua            rectangle 123 
+ 12 16 80 78 
+
+BilQua            rectangle 124 
+ 79 81 82 80 
+
+BilQua            rectangle 125 
+ 15 19 81 79 
+
+BilQua            rectangle 126 
+ 19 20 82 81 
+
+BilQua            rectangle 127 
+ 16 20 82 80 
+
+BilQua            rectangle 128 
+ 81 83 84 82 
+
+BilQua            rectangle 129 
+ 19 23 83 81 
+
+BilQua            rectangle 130 
+ 23 24 84 83 
+
+BilQua            rectangle 131 
+ 20 24 84 82 
+
+BilQua            rectangle 132 
+ 76 75 85 86 
+
+BilQua            rectangle 133 
+ 7 27 85 75 
+
+BilQua            rectangle 134 
+ 28 27 85 86 
+
+BilQua            rectangle 135 
+ 8 28 86 76 
+
+BilQua            rectangle 136 
+ 75 78 87 85 
+
+BilQua            rectangle 137 
+ 12 30 87 78 
+
+BilQua            rectangle 138 
+ 27 30 87 85 
+
+BilQua            rectangle 139 
+ 78 80 88 87 
+
+BilQua            rectangle 140 
+ 16 32 88 80 
+
+BilQua            rectangle 141 
+ 30 32 88 87 
+
+BilQua            rectangle 142 
+ 80 82 89 88 
+
+BilQua            rectangle 143 
+ 20 34 89 82 
+
+BilQua            rectangle 144 
+ 32 34 89 88 
+
+BilQua            rectangle 145 
+ 82 84 90 89 
+
+BilQua            rectangle 146 
+ 24 36 90 84 
+
+BilQua            rectangle 147 
+ 34 36 90 89 
+
+BilQua            rectangle 148 
+ 86 85 91 92 
+
+BilQua            rectangle 149 
+ 27 39 91 85 
+
+BilQua            rectangle 150 
+ 40 39 91 92 
+
+BilQua            rectangle 151 
+ 28 40 92 86 
+
+BilQua            rectangle 152 
+ 85 87 93 91 
+
+BilQua            rectangle 153 
+ 30 42 93 87 
+
+BilQua            rectangle 154 
+ 39 42 93 91 
+
+BilQua            rectangle 155 
+ 87 88 94 93 
+
+BilQua            rectangle 156 
+ 32 44 94 88 
+
+BilQua            rectangle 157 
+ 42 44 94 93 
+
+BilQua            rectangle 158 
+ 88 89 95 94 
+
+BilQua            rectangle 159 
+ 34 46 95 89 
+
+BilQua            rectangle 160 
+ 44 46 95 94 
+
+BilQua            rectangle 161 
+ 89 90 96 95 
+
+BilQua            rectangle 162 
+ 36 48 96 90 
+
+BilQua            rectangle 163 
+ 46 48 96 95 
+
+BilQua            rectangle 164 
+ 92 91 97 98 
+
+BilQua            rectangle 165 
+ 39 51 97 91 
+
+BilQua            rectangle 166 
+ 52 51 97 98 
+
+BilQua            rectangle 167 
+ 40 52 98 92 
+
+BilQua            rectangle 168 
+ 91 93 99 97 
+
+BilQua            rectangle 169 
+ 42 54 99 93 
+
+BilQua            rectangle 170 
+ 51 54 99 97 
+
+BilQua            rectangle 171 
+ 93 94 100 99 
+
+BilQua            rectangle 172 
+ 44 56 100 94 
+
+BilQua            rectangle 173 
+ 54 56 100 99 
+
+BilQua            rectangle 174 
+ 94 95 101 100 
+
+BilQua            rectangle 175 
+ 46 58 101 95 
+
+BilQua            rectangle 176 
+ 56 58 101 100 
+
+BilQua            rectangle 177 
+ 95 96 102 101 
+
+BilQua            rectangle 178 
+ 48 60 102 96 
+
+BilQua            rectangle 179 
+ 58 60 102 101 
+
+BilQua            rectangle 180 
+ 98 97 103 104 
+
+BilQua            rectangle 181 
+ 51 63 103 97 
+
+BilQua            rectangle 182 
+ 64 63 103 104 
+
+BilQua            rectangle 183 
+ 52 64 104 98 
+
+BilQua            rectangle 184 
+ 97 99 105 103 
+
+BilQua            rectangle 185 
+ 54 66 105 99 
+
+BilQua            rectangle 186 
+ 63 66 105 103 
+
+BilQua            rectangle 187 
+ 99 100 106 105 
+
+BilQua            rectangle 188 
+ 56 68 106 100 
+
+BilQua            rectangle 189 
+ 66 68 106 105 
+
+BilQua            rectangle 190 
+ 100 101 107 106 
+
+BilQua            rectangle 191 
+ 58 70 107 101 
+
+BilQua            rectangle 192 
+ 68 70 107 106 
+
+BilQua            rectangle 193 
+ 101 102 108 107 
+
+BilQua            rectangle 194 
+ 60 72 108 102 
+
+BilQua            rectangle 195 
+ 70 72 108 107 
+
+BilQua            rectangle 196 
+ 109 110 111 112 
+
+BilQua            rectangle 197 
+ 73 74 110 109 
+
+BilQua            rectangle 198 
+ 74 75 111 110 
+
+BilQua            rectangle 199 
+ 76 75 111 112 
+
+BilQua            rectangle 200 
+ 73 76 112 109 
+
+BilQua            rectangle 201 
+ 110 113 114 111 
+
+BilQua            rectangle 202 
+ 74 77 113 110 
+
+BilQua            rectangle 203 
+ 77 78 114 113 
+
+BilQua            rectangle 204 
+ 75 78 114 111 
+
+BilQua            rectangle 205 
+ 113 115 116 114 
+
+BilQua            rectangle 206 
+ 77 79 115 113 
+
+BilQua            rectangle 207 
+ 79 80 116 115 
+
+BilQua            rectangle 208 
+ 78 80 116 114 
+
+BilQua            rectangle 209 
+ 115 117 118 116 
+
+BilQua            rectangle 210 
+ 79 81 117 115 
+
+BilQua            rectangle 211 
+ 81 82 118 117 
+
+BilQua            rectangle 212 
+ 80 82 118 116 
+
+BilQua            rectangle 213 
+ 117 119 120 118 
+
+BilQua            rectangle 214 
+ 81 83 119 117 
+
+BilQua            rectangle 215 
+ 83 84 120 119 
+
+BilQua            rectangle 216 
+ 82 84 120 118 
+
+BilQua            rectangle 217 
+ 112 111 121 122 
+
+BilQua            rectangle 218 
+ 75 85 121 111 
+
+BilQua            rectangle 219 
+ 86 85 121 122 
+
+BilQua            rectangle 220 
+ 76 86 122 112 
+
+BilQua            rectangle 221 
+ 111 114 123 121 
+
+BilQua            rectangle 222 
+ 78 87 123 114 
+
+BilQua            rectangle 223 
+ 85 87 123 121 
+
+BilQua            rectangle 224 
+ 114 116 124 123 
+
+BilQua            rectangle 225 
+ 80 88 124 116 
+
+BilQua            rectangle 226 
+ 87 88 124 123 
+
+BilQua            rectangle 227 
+ 116 118 125 124 
+
+BilQua            rectangle 228 
+ 82 89 125 118 
+
+BilQua            rectangle 229 
+ 88 89 125 124 
+
+BilQua            rectangle 230 
+ 118 120 126 125 
+
+BilQua            rectangle 231 
+ 84 90 126 120 
+
+BilQua            rectangle 232 
+ 89 90 126 125 
+
+BilQua            rectangle 233 
+ 122 121 127 128 
+
+BilQua            rectangle 234 
+ 85 91 127 121 
+
+BilQua            rectangle 235 
+ 92 91 127 128 
+
+BilQua            rectangle 236 
+ 86 92 128 122 
+
+BilQua            rectangle 237 
+ 121 123 129 127 
+
+BilQua            rectangle 238 
+ 87 93 129 123 
+
+BilQua            rectangle 239 
+ 91 93 129 127 
+
+BilQua            rectangle 240 
+ 123 124 130 129 
+
+BilQua            rectangle 241 
+ 88 94 130 124 
+
+BilQua            rectangle 242 
+ 93 94 130 129 
+
+BilQua            rectangle 243 
+ 124 125 131 130 
+
+BilQua            rectangle 244 
+ 89 95 131 125 
+
+BilQua            rectangle 245 
+ 94 95 131 130 
+
+BilQua            rectangle 246 
+ 125 126 132 131 
+
+BilQua            rectangle 247 
+ 90 96 132 126 
+
+BilQua            rectangle 248 
+ 95 96 132 131 
+
+BilQua            rectangle 249 
+ 128 127 133 134 
+
+BilQua            rectangle 250 
+ 91 97 133 127 
+
+BilQua            rectangle 251 
+ 98 97 133 134 
+
+BilQua            rectangle 252 
+ 92 98 134 128 
+
+BilQua            rectangle 253 
+ 127 129 135 133 
+
+BilQua            rectangle 254 
+ 93 99 135 129 
+
+BilQua            rectangle 255 
+ 97 99 135 133 
+
+BilQua            rectangle 256 
+ 129 130 136 135 
+
+BilQua            rectangle 257 
+ 94 100 136 130 
+
+BilQua            rectangle 258 
+ 99 100 136 135 
+
+BilQua            rectangle 259 
+ 130 131 137 136 
+
+BilQua            rectangle 260 
+ 95 101 137 131 
+
+BilQua            rectangle 261 
+ 100 101 137 136 
+
+BilQua            rectangle 262 
+ 131 132 138 137 
+
+BilQua            rectangle 263 
+ 96 102 138 132 
+
+BilQua            rectangle 264 
+ 101 102 138 137 
+
+BilQua            rectangle 265 
+ 134 133 139 140 
+
+BilQua            rectangle 266 
+ 97 103 139 133 
+
+BilQua            rectangle 267 
+ 104 103 139 140 
+
+BilQua            rectangle 268 
+ 98 104 140 134 
+
+BilQua            rectangle 269 
+ 133 135 141 139 
+
+BilQua            rectangle 270 
+ 99 105 141 135 
+
+BilQua            rectangle 271 
+ 103 105 141 139 
+
+BilQua            rectangle 272 
+ 135 136 142 141 
+
+BilQua            rectangle 273 
+ 100 106 142 136 
+
+BilQua            rectangle 274 
+ 105 106 142 141 
+
+BilQua            rectangle 275 
+ 136 137 143 142 
+
+BilQua            rectangle 276 
+ 101 107 143 137 
+
+BilQua            rectangle 277 
+ 106 107 143 142 
+
+BilQua            rectangle 278 
+ 137 138 144 143 
+
+BilQua            rectangle 279 
+ 102 108 144 138 
+
+BilQua            rectangle 280 
+ 107 108 144 143 
+
+BilQua            rectangle 281 
+ 145 146 147 148 
+
+BilQua            rectangle 282 
+ 109 110 146 145 
+
+BilQua            rectangle 283 
+ 110 111 147 146 
+
+BilQua            rectangle 284 
+ 112 111 147 148 
+
+BilQua            rectangle 285 
+ 109 112 148 145 
+
+BilQua            rectangle 286 
+ 146 149 150 147 
+
+BilQua            rectangle 287 
+ 110 113 149 146 
+
+BilQua            rectangle 288 
+ 113 114 150 149 
+
+BilQua            rectangle 289 
+ 111 114 150 147 
+
+BilQua            rectangle 290 
+ 149 151 152 150 
+
+BilQua            rectangle 291 
+ 113 115 151 149 
+
+BilQua            rectangle 292 
+ 115 116 152 151 
+
+BilQua            rectangle 293 
+ 114 116 152 150 
+
+BilQua            rectangle 294 
+ 151 153 154 152 
+
+BilQua            rectangle 295 
+ 115 117 153 151 
+
+BilQua            rectangle 296 
+ 117 118 154 153 
+
+BilQua            rectangle 297 
+ 116 118 154 152 
+
+BilQua            rectangle 298 
+ 153 155 156 154 
+
+BilQua            rectangle 299 
+ 117 119 155 153 
+
+BilQua            rectangle 300 
+ 119 120 156 155 
+
+BilQua            rectangle 301 
+ 118 120 156 154 
+
+BilQua            rectangle 302 
+ 148 147 157 158 
+
+BilQua            rectangle 303 
+ 111 121 157 147 
+
+BilQua            rectangle 304 
+ 122 121 157 158 
+
+BilQua            rectangle 305 
+ 112 122 158 148 
+
+BilQua            rectangle 306 
+ 147 150 159 157 
+
+BilQua            rectangle 307 
+ 114 123 159 150 
+
+BilQua            rectangle 308 
+ 121 123 159 157 
+
+BilQua            rectangle 309 
+ 150 152 160 159 
+
+BilQua            rectangle 310 
+ 116 124 160 152 
+
+BilQua            rectangle 311 
+ 123 124 160 159 
+
+BilQua            rectangle 312 
+ 152 154 161 160 
+
+BilQua            rectangle 313 
+ 118 125 161 154 
+
+BilQua            rectangle 314 
+ 124 125 161 160 
+
+BilQua            rectangle 315 
+ 154 156 162 161 
+
+BilQua            rectangle 316 
+ 120 126 162 156 
+
+BilQua            rectangle 317 
+ 125 126 162 161 
+
+BilQua            rectangle 318 
+ 158 157 163 164 
+
+BilQua            rectangle 319 
+ 121 127 163 157 
+
+BilQua            rectangle 320 
+ 128 127 163 164 
+
+BilQua            rectangle 321 
+ 122 128 164 158 
+
+BilQua            rectangle 322 
+ 157 159 165 163 
+
+BilQua            rectangle 323 
+ 123 129 165 159 
+
+BilQua            rectangle 324 
+ 127 129 165 163 
+
+BilQua            rectangle 325 
+ 159 160 166 165 
+
+BilQua            rectangle 326 
+ 124 130 166 160 
+
+BilQua            rectangle 327 
+ 129 130 166 165 
+
+BilQua            rectangle 328 
+ 160 161 167 166 
+
+BilQua            rectangle 329 
+ 125 131 167 161 
+
+BilQua            rectangle 330 
+ 130 131 167 166 
+
+BilQua            rectangle 331 
+ 161 162 168 167 
+
+BilQua            rectangle 332 
+ 126 132 168 162 
+
+BilQua            rectangle 333 
+ 131 132 168 167 
+
+BilQua            rectangle 334 
+ 164 163 169 170 
+
+BilQua            rectangle 335 
+ 127 133 169 163 
+
+BilQua            rectangle 336 
+ 134 133 169 170 
+
+BilQua            rectangle 337 
+ 128 134 170 164 
+
+BilQua            rectangle 338 
+ 163 165 171 169 
+
+BilQua            rectangle 339 
+ 129 135 171 165 
+
+BilQua            rectangle 340 
+ 133 135 171 169 
+
+BilQua            rectangle 341 
+ 165 166 172 171 
+
+BilQua            rectangle 342 
+ 130 136 172 166 
+
+BilQua            rectangle 343 
+ 135 136 172 171 
+
+BilQua            rectangle 344 
+ 166 167 173 172 
+
+BilQua            rectangle 345 
+ 131 137 173 167 
+
+BilQua            rectangle 346 
+ 136 137 173 172 
+
+BilQua            rectangle 347 
+ 167 168 174 173 
+
+BilQua            rectangle 348 
+ 132 138 174 168 
+
+BilQua            rectangle 349 
+ 137 138 174 173 
+
+BilQua            rectangle 350 
+ 170 169 175 176 
+
+BilQua            rectangle 351 
+ 133 139 175 169 
+
+BilQua            rectangle 352 
+ 140 139 175 176 
+
+BilQua            rectangle 353 
+ 134 140 176 170 
+
+BilQua            rectangle 354 
+ 169 171 177 175 
+
+BilQua            rectangle 355 
+ 135 141 177 171 
+
+BilQua            rectangle 356 
+ 139 141 177 175 
+
+BilQua            rectangle 357 
+ 171 172 178 177 
+
+BilQua            rectangle 358 
+ 136 142 178 172 
+
+BilQua            rectangle 359 
+ 141 142 178 177 
+
+BilQua            rectangle 360 
+ 172 173 179 178 
+
+BilQua            rectangle 361 
+ 137 143 179 173 
+
+BilQua            rectangle 362 
+ 142 143 179 178 
+
+BilQua            rectangle 363 
+ 173 174 180 179 
+
+BilQua            rectangle 364 
+ 138 144 180 174 
+
+BilQua            rectangle 365 
+ 143 144 180 179 
+
+BilQua            rectangle 366 
+ 181 182 183 184 
+
+BilQua            rectangle 367 
+ 145 146 182 181 
+
+BilQua            rectangle 368 
+ 146 147 183 182 
+
+BilQua            rectangle 369 
+ 148 147 183 184 
+
+BilQua            rectangle 370 
+ 145 148 184 181 
+
+BilQua            rectangle 371 
+ 182 185 186 183 
+
+BilQua            rectangle 372 
+ 146 149 185 182 
+
+BilQua            rectangle 373 
+ 149 150 186 185 
+
+BilQua            rectangle 374 
+ 147 150 186 183 
+
+BilQua            rectangle 375 
+ 185 187 188 186 
+
+BilQua            rectangle 376 
+ 149 151 187 185 
+
+BilQua            rectangle 377 
+ 151 152 188 187 
+
+BilQua            rectangle 378 
+ 150 152 188 186 
+
+BilQua            rectangle 379 
+ 187 189 190 188 
+
+BilQua            rectangle 380 
+ 151 153 189 187 
+
+BilQua            rectangle 381 
+ 153 154 190 189 
+
+BilQua            rectangle 382 
+ 152 154 190 188 
+
+BilQua            rectangle 383 
+ 189 191 192 190 
+
+BilQua            rectangle 384 
+ 153 155 191 189 
+
+BilQua            rectangle 385 
+ 155 156 192 191 
+
+BilQua            rectangle 386 
+ 154 156 192 190 
+
+BilQua            rectangle 387 
+ 184 183 193 194 
+
+BilQua            rectangle 388 
+ 147 157 193 183 
+
+BilQua            rectangle 389 
+ 158 157 193 194 
+
+BilQua            rectangle 390 
+ 148 158 194 184 
+
+BilQua            rectangle 391 
+ 183 186 195 193 
+
+BilQua            rectangle 392 
+ 150 159 195 186 
+
+BilQua            rectangle 393 
+ 157 159 195 193 
+
+BilQua            rectangle 394 
+ 186 188 196 195 
+
+BilQua            rectangle 395 
+ 152 160 196 188 
+
+BilQua            rectangle 396 
+ 159 160 196 195 
+
+BilQua            rectangle 397 
+ 188 190 197 196 
+
+BilQua            rectangle 398 
+ 154 161 197 190 
+
+BilQua            rectangle 399 
+ 160 161 197 196 
+
+BilQua            rectangle 400 
+ 190 192 198 197 
+
+BilQua            rectangle 401 
+ 156 162 198 192 
+
+BilQua            rectangle 402 
+ 161 162 198 197 
+
+BilQua            rectangle 403 
+ 194 193 199 200 
+
+BilQua            rectangle 404 
+ 157 163 199 193 
+
+BilQua            rectangle 405 
+ 164 163 199 200 
+
+BilQua            rectangle 406 
+ 158 164 200 194 
+
+BilQua            rectangle 407 
+ 193 195 201 199 
+
+BilQua            rectangle 408 
+ 159 165 201 195 
+
+BilQua            rectangle 409 
+ 163 165 201 199 
+
+BilQua            rectangle 410 
+ 195 196 202 201 
+
+BilQua            rectangle 411 
+ 160 166 202 196 
+
+BilQua            rectangle 412 
+ 165 166 202 201 
+
+BilQua            rectangle 413 
+ 196 197 203 202 
+
+BilQua            rectangle 414 
+ 161 167 203 197 
+
+BilQua            rectangle 415 
+ 166 167 203 202 
+
+BilQua            rectangle 416 
+ 197 198 204 203 
+
+BilQua            rectangle 417 
+ 162 168 204 198 
+
+BilQua            rectangle 418 
+ 167 168 204 203 
+
+BilQua            rectangle 419 
+ 200 199 205 206 
+
+BilQua            rectangle 420 
+ 163 169 205 199 
+
+BilQua            rectangle 421 
+ 170 169 205 206 
+
+BilQua            rectangle 422 
+ 164 170 206 200 
+
+BilQua            rectangle 423 
+ 199 201 207 205 
+
+BilQua            rectangle 424 
+ 165 171 207 201 
+
+BilQua            rectangle 425 
+ 169 171 207 205 
+
+BilQua            rectangle 426 
+ 201 202 208 207 
+
+BilQua            rectangle 427 
+ 166 172 208 202 
+
+BilQua            rectangle 428 
+ 171 172 208 207 
+
+BilQua            rectangle 429 
+ 202 203 209 208 
+
+BilQua            rectangle 430 
+ 167 173 209 203 
+
+BilQua            rectangle 431 
+ 172 173 209 208 
+
+BilQua            rectangle 432 
+ 203 204 210 209 
+
+BilQua            rectangle 433 
+ 168 174 210 204 
+
+BilQua            rectangle 434 
+ 173 174 210 209 
+
+BilQua            rectangle 435 
+ 206 205 211 212 
+
+BilQua            rectangle 436 
+ 169 175 211 205 
+
+BilQua            rectangle 437 
+ 176 175 211 212 
+
+BilQua            rectangle 438 
+ 170 176 212 206 
+
+BilQua            rectangle 439 
+ 205 207 213 211 
+
+BilQua            rectangle 440 
+ 171 177 213 207 
+
+BilQua            rectangle 441 
+ 175 177 213 211 
+
+BilQua            rectangle 442 
+ 207 208 214 213 
+
+BilQua            rectangle 443 
+ 172 178 214 208 
+
+BilQua            rectangle 444 
+ 177 178 214 213 
+
+BilQua            rectangle 445 
+ 208 209 215 214 
+
+BilQua            rectangle 446 
+ 173 179 215 209 
+
+BilQua            rectangle 447 
+ 178 179 215 214 
+
+BilQua            rectangle 448 
+ 209 210 216 215 
+
+BilQua            rectangle 449 
+ 174 180 216 210 
+
+BilQua            rectangle 450 
+ 179 180 216 215 
+
+0         NRPRISM  
+
+124        NRHEXAS  
+
+Linear            hexa 1 
+ 1   1 2 3 4 5 6 7 8 
+
+Linear            hexa 2 
+ 1   2 9 10 3 6 11 12 7 
+
+Linear            hexa 3 
+ 1   9 13 14 10 11 15 16 12 
+
+Linear            hexa 4 
+ 1   13 17 18 14 15 19 20 16 
+
+Linear            hexa 5 
+ 1   17 21 22 18 19 23 24 20 
+
+Linear            hexa 6 
+ 1   4 3 25 26 8 7 27 28 
+
+Linear            hexa 7 
+ 1   3 10 29 25 7 12 30 27 
+
+Linear            hexa 8 
+ 1   10 14 31 29 12 16 32 30 
+
+Linear            hexa 9 
+ 1   14 18 33 31 16 20 34 32 
+
+Linear            hexa 10 
+ 1   18 22 35 33 20 24 36 34 
+
+Linear            hexa 11 
+ 1   26 25 37 38 28 27 39 40 
+
+Linear            hexa 12 
+ 1   25 29 41 37 27 30 42 39 
+
+Linear            hexa 13 
+ 1   29 31 43 41 30 32 44 42 
+
+Linear            hexa 14 
+ 1   31 33 45 43 32 34 46 44 
+
+Linear            hexa 15 
+ 1   33 35 47 45 34 36 48 46 
+
+Linear            hexa 16 
+ 1   38 37 49 50 40 39 51 52 
+
+Linear            hexa 17 
+ 1   37 41 53 49 39 42 54 51 
+
+Linear            hexa 18 
+ 1   41 43 55 53 42 44 56 54 
+
+Linear            hexa 19 
+ 1   43 45 57 55 44 46 58 56 
+
+Linear            hexa 20 
+ 1   45 47 59 57 46 48 60 58 
+
+Linear            hexa 21 
+ 1   50 49 61 62 52 51 63 64 
+
+Linear            hexa 22 
+ 1   49 53 65 61 51 54 66 63 
+
+Linear            hexa 23 
+ 1   53 55 67 65 54 56 68 66 
+
+Linear            hexa 24 
+ 1   55 57 69 67 56 58 70 68 
+
+Linear            hexa 25 
+ 1   57 59 71 69 58 60 72 70 
+
+Linear            hexa 26 
+ 1   5 6 7 8 73 74 75 76 
+
+Linear            hexa 27 
+ 1   6 11 12 7 74 77 78 75 
+
+Linear            hexa 28 
+ 1   11 15 16 12 77 79 80 78 
+
+Linear            hexa 29 
+ 1   15 19 20 16 79 81 82 80 
+
+Linear            hexa 30 
+ 1   19 23 24 20 81 83 84 82 
+
+Linear            hexa 31 
+ 1   8 7 27 28 76 75 85 86 
+
+Linear            hexa 32 
+ 1   7 12 30 27 75 78 87 85 
+
+Linear            hexa 33 
+ 1   12 16 32 30 78 80 88 87 
+
+Linear            hexa 34 
+ 1   16 20 34 32 80 82 89 88 
+
+Linear            hexa 35 
+ 1   20 24 36 34 82 84 90 89 
+
+Linear            hexa 36 
+ 1   28 27 39 40 86 85 91 92 
+
+Linear            hexa 37 
+ 1   27 30 42 39 85 87 93 91 
+
+Linear            hexa 38 
+ 1   30 32 44 42 87 88 94 93 
+
+Linear            hexa 39 
+ 1   32 34 46 44 88 89 95 94 
+
+Linear            hexa 40 
+ 1   34 36 48 46 89 90 96 95 
+
+Linear            hexa 41 
+ 1   40 39 51 52 92 91 97 98 
+
+Linear            hexa 42 
+ 1   39 42 54 51 91 93 99 97 
+
+Linear            hexa 43 
+ 1   42 44 56 54 93 94 100 99 
+
+Linear            hexa 44 
+ 1   44 46 58 56 94 95 101 100 
+
+Linear            hexa 45 
+ 1   46 48 60 58 95 96 102 101 
+
+Linear            hexa 46 
+ 1   52 51 63 64 98 97 103 104 
+
+Linear            hexa 47 
+ 1   51 54 66 63 97 99 105 103 
+
+Linear            hexa 48 
+ 1   54 56 68 66 99 100 106 105 
+
+Linear            hexa 49 
+ 1   56 58 70 68 100 101 107 106 
+
+Linear            hexa 50 
+ 1   58 60 72 70 101 102 108 107 
+
+Linear            hexa 51 
+ 1   73 74 75 76 109 110 111 112 
+
+Linear            hexa 52 
+ 1   74 77 78 75 110 113 114 111 
+
+Linear            hexa 53 
+ 1   77 79 80 78 113 115 116 114 
+
+Linear            hexa 54 
+ 1   79 81 82 80 115 117 118 116 
+
+Linear            hexa 55 
+ 1   81 83 84 82 117 119 120 118 
+
+Linear            hexa 56 
+ 1   76 75 85 86 112 111 121 122 
+
+Linear            hexa 57 
+ 1   75 78 87 85 111 114 123 121 
+
+Linear            hexa 58 
+ 1   78 80 88 87 114 116 124 123 
+
+Linear            hexa 59 
+ 1   80 82 89 88 116 118 125 124 
+
+Linear            hexa 60 
+ 1   82 84 90 89 118 120 126 125 
+
+Linear            hexa 61 
+ 1   86 85 91 92 122 121 127 128 
+
+Linear            hexa 62 
+ 1   85 87 93 91 121 123 129 127 
+
+Linear            hexa 63 
+ 1   88 89 95 94 124 125 131 130 
+
+Linear            hexa 64 
+ 1   89 90 96 95 125 126 132 131 
+
+Linear            hexa 65 
+ 1   92 91 97 98 128 127 133 134 
+
+Linear            hexa 66 
+ 1   91 93 99 97 127 129 135 133 
+
+Linear            hexa 67 
+ 1   93 94 100 99 129 130 136 135 
+
+Linear            hexa 68 
+ 1   94 95 101 100 130 131 137 136 
+
+Linear            hexa 69 
+ 1   95 96 102 101 131 132 138 137 
+
+Linear            hexa 70 
+ 1   98 97 103 104 134 133 139 140 
+
+Linear            hexa 71 
+ 1   97 99 105 103 133 135 141 139 
+
+Linear            hexa 72 
+ 1   99 100 106 105 135 136 142 141 
+
+Linear            hexa 73 
+ 1   100 101 107 106 136 137 143 142 
+
+Linear            hexa 74 
+ 1   101 102 108 107 137 138 144 143 
+
+Linear            hexa 75 
+ 1   109 110 111 112 145 146 147 148 
+
+Linear            hexa 76 
+ 1   110 113 114 111 146 149 150 147 
+
+Linear            hexa 77 
+ 1   113 115 116 114 149 151 152 150 
+
+Linear            hexa 78 
+ 1   115 117 118 116 151 153 154 152 
+
+Linear            hexa 79 
+ 1   117 119 120 118 153 155 156 154 
+
+Linear            hexa 80 
+ 1   112 111 121 122 148 147 157 158 
+
+Linear            hexa 81 
+ 1   111 114 123 121 147 150 159 157 
+
+Linear            hexa 82 
+ 1   114 116 124 123 150 152 160 159 
+
+Linear            hexa 83 
+ 1   116 118 125 124 152 154 161 160 
+
+Linear            hexa 84 
+ 1   118 120 126 125 154 156 162 161 
+
+Linear            hexa 85 
+ 1   122 121 127 128 158 157 163 164 
+
+Linear            hexa 86 
+ 1   121 123 129 127 157 159 165 163 
+
+Linear            hexa 87 
+ 1   123 124 130 129 159 160 166 165 
+
+Linear            hexa 88 
+ 1   124 125 131 130 160 161 167 166 
+
+Linear            hexa 89 
+ 1   125 126 132 131 161 162 168 167 
+
+Linear            hexa 90 
+ 1   128 127 133 134 164 163 169 170 
+
+Linear            hexa 91 
+ 1   127 129 135 133 163 165 171 169 
+
+Linear            hexa 92 
+ 1   129 130 136 135 165 166 172 171 
+
+Linear            hexa 93 
+ 1   130 131 137 136 166 167 173 172 
+
+Linear            hexa 94 
+ 1   131 132 138 137 167 168 174 173 
+
+Linear            hexa 95 
+ 1   134 133 139 140 170 169 175 176 
+
+Linear            hexa 96 
+ 1   133 135 141 139 169 171 177 175 
+
+Linear            hexa 97 
+ 1   135 136 142 141 171 172 178 177 
+
+Linear            hexa 98 
+ 1   136 137 143 142 172 173 179 178 
+
+Linear            hexa 99 
+ 1   137 138 144 143 173 174 180 179 
+
+Linear            hexa 100 
+ 1   145 146 147 148 181 182 183 184 
+
+Linear            hexa 101 
+ 1   146 149 150 147 182 185 186 183 
+
+Linear            hexa 102 
+ 1   149 151 152 150 185 187 188 186 
+
+Linear            hexa 103 
+ 1   151 153 154 152 187 189 190 188 
+
+Linear            hexa 104 
+ 1   153 155 156 154 189 191 192 190 
+
+Linear            hexa 105 
+ 1   148 147 157 158 184 183 193 194 
+
+Linear            hexa 106 
+ 1   147 150 159 157 183 186 195 193 
+
+Linear            hexa 107 
+ 1   150 152 160 159 186 188 196 195 
+
+Linear            hexa 108 
+ 1   152 154 161 160 188 190 197 196 
+
+Linear            hexa 109 
+ 1   154 156 162 161 190 192 198 197 
+
+Linear            hexa 110 
+ 1   158 157 163 164 194 193 199 200 
+
+Linear            hexa 111 
+ 1   157 159 165 163 193 195 201 199 
+
+Linear            hexa 112 
+ 1   159 160 166 165 195 196 202 201 
+
+Linear            hexa 113 
+ 1   160 161 167 166 196 197 203 202 
+
+Linear            hexa 114 
+ 1   161 162 168 167 197 198 204 203 
+
+Linear            hexa 115 
+ 1   164 163 169 170 200 199 205 206 
+
+Linear            hexa 116 
+ 1   163 165 171 169 199 201 207 205 
+
+Linear            hexa 117 
+ 1   165 166 172 171 201 202 208 207 
+
+Linear            hexa 118 
+ 1   166 167 173 172 202 203 209 208 
+
+Linear            hexa 119 
+ 1   167 168 174 173 203 204 210 209 
+
+Linear            hexa 120 
+ 1   170 169 175 176 206 205 211 212 
+
+Linear            hexa 121 
+ 1   169 171 177 175 205 207 213 211 
+
+Linear            hexa 122 
+ 1   171 172 178 177 207 208 214 213 
+
+Linear            hexa 123 
+ 1   172 173 179 178 208 209 215 214 
+
+Linear            hexa 124 
+ 1   173 174 180 179 209 210 216 215 
+
+0    NRTETRA  
+
+0    NRPYRAM  
+

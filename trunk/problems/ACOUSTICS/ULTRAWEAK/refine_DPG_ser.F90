@@ -1,0 +1,572 @@
+!--------------------------------------------------------------------
+!
+!     routine name      - refine_DPG_ser
+!
+!--------------------------------------------------------------------
+!
+!     latest revision:  - July 17
+!
+!     purpose:          - refines elements assuming problem has
+!                         already been solved. If uniform refinements
+!                         it refines everything. Otherwise it follows
+!                         greedy strategy based on residual to
+!                         determine which elements to refine.
+!                         It also displays dof, residuals and
+!                         relevant errors at each step.
+!
+!     arguments:
+!
+!     in:
+!             Irefine   = 0 if no refinement -> only display
+!                       = 1 if uniform refinements
+!                       = 2 if adaptive refinements
+!             Nreflag   = 1 for h-refinements
+!                       = 2 for p-refinements
+!                       = 3 for h- or p-refinement, depending
+!                           upon the element size
+!             Factor    - if element error \ge Factor*max_error
+!                         then the element is refined
+!     out:
+!             Nstop     = 1 if refinement did not increase dof
+!
+!---------------------------------------------------------------------
+!
+   subroutine refine_DPG_ser(Irefine,Nreflag,Factor, Nstop)
+!
+   use control
+   use data_structure3D
+   use parametersDPG, ONLY : NORD_ADD
+   use common_prob_data_UW
+   use assembly_sc, ONLY: NRDOF_CON, NRDOF_TOT
+   use refinements,       only: enable_iso_only
+
+!
+   implicit none
+!   
+   integer, intent(in)  :: Irefine
+   integer, intent(in)  :: Nreflag
+   real*8,  intent(in)  :: Factor
+   integer, intent(out) :: Nstop
+!
+   integer, parameter :: max_step = 300
+   integer, dimension(max_step), save :: nrdof_tot_mesh
+   integer, dimension(max_step), save :: nrdof_con_mesh
+   real*8,  dimension(max_step), save :: residual_mesh
+   real*8,  dimension(max_step), save :: rate_mesh
+   real*8,  dimension(max_step), save :: error_mesh
+   real*8,  dimension(max_step), save :: rel_error_mesh
+   real*8,  dimension(max_step), save :: rate_error_mesh
+
+!
+   real*8,  allocatable :: elem_resid(:)
+   integer, allocatable :: elem_ref_flag(:)
+   integer, allocatable :: list_elem(:)
+   integer, allocatable :: elem_pref(:), elem_pref_ord(:)
+   integer, allocatable :: list_ref_flags(:)
+!
+   integer, save :: istep = 0
+   integer, save :: irefineold = 0
+   integer :: nrdofField, nrdofDPG
+   integer :: nr_elem_to_refine
+   integer, dimension(NR_PHYSA) :: nflag
+   integer, dimension(NRELES)   :: N_elem
+   real*8 :: residual, elem_resid_max, err, rnorm
+   real*8 :: errorH,errorE,errorV,errorQ,rnormH,rnormE,rnormV,rnormQ
+   integer :: i,iprint,ic,mdle,iel,kref
+   integer, dimension(3) :: vref
+   integer :: jref
+   integer :: nord, nordx, nordy, nordz, nordyz
+   integer :: nordx_new, nordy_new, nordz_new, nord_new
+   integer :: idec_pref,idec_href, iref, enforce_flag, icpref
+
+!
+!-----------------------------------------------------------------------
+!
+
+!..just to make sure...
+   call enable_iso_only
+
+!..initialize
+   iprint = 0
+   allocate (elem_resid(NRELES),elem_ref_flag(NRELES))
+   allocate (list_elem(NRELES),list_ref_flags(NRELES))
+
+!
+!..increase step if necessary
+!..irefineold=0 means no refinement was made in the previous step
+!..if first call or if a refinement was made, increase step
+   if ((istep.eq.0).or.(irefineold.ne.0)) istep=istep+1
+   irefineold=Irefine
+!
+!..get dof count from solver
+! call ndof_DPG !calculates nrdofDPG and nrdofField
+   nrdof_tot_mesh(istep) = NRDOF_TOT
+   nrdof_con_mesh(istep) = NRDOF_CON
+!
+!..field variables flag - used inside ndof_DPG and for error calc.
+   nflag(1:NR_PHYSA)=(/0,0,1/)
+!
+!..create list of mdle nods numbers
+   mdle=0
+   do iel=1,NRELES
+      call nelcon(mdle, mdle)
+      N_elem(iel) = mdle
+   enddo
+!   
+!..initialize global residual and error
+   residual = 0.d0; elem_resid_max = 0.d0
+   err = 0.d0; rnorm = 0.d0
+!
+!$omp parallel default(shared) &
+!$omp private(iel,errorH,errorE, errorV, errorQ, rnormH,rnormE, rnormV, rnormQ)  &
+!$omp reduction(+:residual,err,rnorm)
+!$omp do schedule(guided)
+   do iel=1,NRELES
+      call elem_residual(N_elem(iel), elem_resid(iel),elem_ref_flag(iel))
+      ! call elem_residual_fi(N_elem(iel), elem_resid(iel),elem_ref_flag(iel))
+      residual = residual + elem_resid(iel)
+      if (NEXACT.ge.1) then
+         call element_error(N_elem(iel),nflag,errorH,errorE,errorV,errorQ,  &
+                                        rnormH,rnormE,rnormV,rnormQ)
+         err   = err   + errorQ
+         rnorm = rnorm + rnormQ
+      endif
+   enddo
+!$omp end do        
+!$omp end parallel
+!
+   elem_resid_max = maxval(elem_resid)
+! 
+!..update and display convergence history
+   residual_mesh(istep) = sqrt(residual)
+   if (NEXACT.ge.1) then
+      error_mesh(istep) = sqrt(err)
+      rel_error_mesh(istep) = sqrt(err/rnorm)
+   endif
+!
+!..compute decrease rate for the residual and error
+   select case(istep)
+   case(1)
+      rate_mesh(istep) = 0.d0
+      if (NEXACT.ge.1) rate_error_mesh(istep) = 0.d0
+   case default
+      rate_mesh(istep) =  &
+      log(residual_mesh(istep-1)/residual_mesh(istep))/  &
+      log(float(nrdof_tot_mesh(istep-1))/float(nrdof_tot_mesh(istep)))
+      if (NEXACT.ge.1) then
+         rate_error_mesh(istep) = &
+         log(rel_error_mesh(istep-1)/rel_error_mesh(istep))/  &
+         log(float(nrdof_tot_mesh(istep-1))/float(nrdof_tot_mesh(istep)))
+      endif
+   end select
+!
+!..print out the history of refinements
+   write(*,*)
+   write(*,*)
+   write(*,*) 'HISTORY OF REFINEMENTS'
+   if (NEXACT.eq.0) write(*,7005)
+   if (NEXACT.gt.0) write(*,7006)
+ 7005  format(' mesh |',' nrdof_tot |','nrdof_con|','    residual   |','  rate  ')
+ 7006  format(' mesh |',' nrdof_tot |','nrdof_con|','    residual   |','  rate  |',   &
+              ' field error  |','rel field error|','   rate ')
+   write(*,*)
+    
+   do i=1,istep
+      if (NEXACT.eq.0) then
+         write(*,7003) i,nrdof_tot_mesh(i),nrdof_con_mesh(i), &
+                         residual_mesh(i),rate_mesh(i)
+ 7003 format(2x,i2,'  | ',2(i8,' | '),e12.5,'  | ',f7.2)
+      else
+      write(*,7004) i,nrdof_tot_mesh(i),nrdof_con_mesh(i), &
+                    residual_mesh(i),rate_mesh(i),error_mesh(i), &
+                    rel_error_mesh(i),rate_error_mesh(i)
+ 7004 format(2x,i2,'  | ',2(i8,' | '),e12.5,'  |',f7.2, &
+                 2(' | ',e12.5),'  |',f7.2)
+      endif
+   enddo
+! 
+!-----------------------------------------------------------------------
+!                         REFINE AND UPDATE MESH
+!-----------------------------------------------------------------------
+!
+!..use appropriate strategy depening on refinement type
+!  NOTE: if Irefine=0 nothing is done, so only relevant info (the
+!        code above this line) is displayed.
+   select case(Irefine)
+!..uniform refinements
+   case(IUNIFORM)
+      ! call global_href
+      select case(Nreflag)
+      case default
+        call global_href
+      case(2)
+        mdle=0
+        do iel=1,NRELES
+           call nelcon(mdle, mdle)
+           nord = NODES(mdle)%order
+           select case(NODES(mdle)%ntype)
+              case(MDLN,MDLD); nord = nord+1
+              case(MDLP); nord = nord+11
+              case(MDLB); nord = nord+111
+           end select
+           call nodmod(mdle, nord)
+        enddo
+      end select
+      call enforce_max_rule
+      call update_gdof
+      call update_ddof
+      ! call verify_orient
+      ! call verify_neig
+      nr_elem_to_refine = NRELES
+!
+!..adaptive refinements
+   case(IADAPTIVE)
+!  ...use the greedy strategy to determine which elements to refine
+      ic=0
+      mdle=0
+      do iel=1,NRELES
+         call nelcon(mdle, mdle)
+         if (elem_resid(iel).ge.Factor*elem_resid_max) then
+            ic=ic+1
+            list_elem(ic) = mdle
+            list_ref_flags(ic) = elem_ref_flag(iel)
+            if (iprint.eq.1) then
+               write(*,7037) ic,mdle
+ 7037          format('refine_DPG: ADDING TO THE LIST: ic,mdle = ',2i6)
+            endif
+         endif
+      enddo
+      nr_elem_to_refine = ic
+
+      ! write(*,*) 'nr_elem_to_refine = ', nr_elem_to_refine
+
+!
+      allocate (elem_pref(nr_elem_to_refine))
+      allocate (elem_pref_ord(nr_elem_to_refine))
+      icpref=0
+!
+      if (nr_elem_to_refine.gt.0) then
+!     ...refine the elements from the list
+         do iel=1,nr_elem_to_refine
+            mdle = list_elem(iel)
+!        ...skip if it is already refined
+            if (.not.NODES(mdle)%act) cycle
+            kref = list_ref_flags(iel)
+
+
+            call decode(kref,jref,vref(3))
+            call decode(jref,vref(1),vref(2))
+!
+!        ...restrictions on h-refinements
+            idec_href=1
+            ! call find_gen(mdle,ngen)
+            ! select case(NODES(mdle)%ntype)
+            ! case(MDLB)
+            !    if (ngen(1).eq.MAXGENQ(1)) idec_href=0
+            !    if (ngen(2).eq.MAXGENQ(2)) idec_href=0
+            !    if (ngen(3).eq.MAXGENQ(3)) idec_href=0
+            ! case default 
+            !    write(*,*) 'refine_DPG: UNFINISHED' ; stop 1   
+            ! end select
+!
+!        ...p-refinements limited by the maximum order supported by the code
+            nord = NODES(mdle)%order
+            select case(NODES(mdle)%ntype)
+            case(MDLB)
+               call decode(nord,nordyz,nordz)
+               call decode(nordyz,nordx,nordy)
+               nordx_new = nordx; nordy_new = nordy ; nordz_new = nordz
+               if (vref(1).eq.1) then
+                  nordx_new = min(nordx+1,MAXP)
+               endif
+               if (vref(2).eq.1) then
+                  nordy_new = min(nordy+1,MAXP)
+               endif
+               if (vref(3).eq.1) then
+                  nordz_new = min(nordz+1,MAXP)
+               endif
+               nord_new =nordx_new*100+nordy_new*10+nordz_new
+            case default
+               write(*,*) 'refine_DPG: UNFINISHED' ; stop 1      
+            end select
+            if (nord_new.eq.nord) then
+               idec_pref=0
+            else
+               idec_pref=1
+            endif
+!
+            select case(Nreflag)
+            case(1)
+               if (idec_href.eq.1) then
+                  call refine(mdle,kref)
+               endif
+            case(2)
+               if (idec_pref.eq.1) then
+                  call nodmod(mdle,nord_new)
+               endif   
+            case(3,4)
+               call select_refinement(mdle,iref)
+               select case(iref)
+!           ...h-refinement selected
+               case(1)
+                 if (idec_href.eq.1) then
+                   call refine(mdle,kref)
+                 endif
+!
+!           ...p-refinement selected
+               case(2)
+                 if (idec_pref.eq.1) then
+                     select case(Nreflag)
+                     case(3)
+                        call nodmod(mdle,nord_new)
+                     case(4)   
+                        icpref=icpref+1
+                        elem_pref(icpref) = mdle
+                        elem_pref_ord(icpref) = nord_new
+                     end select   
+                 else
+                   if (idec_href.eq.1) then
+                     call refine(mdle,kref)
+                   endif
+                 endif
+
+               end select
+            end select
+         enddo
+!
+!     ...close the mesh
+         write(*,*) 'Calling close'
+         call close
+        
+         select case(Nreflag)
+         case(2)
+            write(*,*) 'refine_DPG: ENFORCING MAX RULE'
+            call enforce_max_rule
+            
+         case(3)
+            write(*,*) 'refine_DPG: ENFORCING MAX RULE'
+            call enforce_max_rule
+         case(4)   
+            write(*,*) 'refine_DPG: ENFORCING MIN RULE'
+            if (icpref.gt.0) then
+               call execute_pref(elem_pref(1:icpref), icpref)
+               call enforce_min_rule
+            end if
+         end select   
+!
+!      ...update geometry and Dirichlet flux dof after the refinements
+         write(*,*) 'Calling update_gdof'
+         call update_gdof
+
+!     ...if case of impedance condition there is no need to update Dirichlet dof
+         ! if (IBC_PROB .ne. BC_IMPEDANCE) then
+            write(*,*) 'Calling update_ddof'
+            call update_ddof
+         ! endif  
+         write(*,*) 'Done'
+      endif
+      deallocate(elem_pref,elem_pref_ord)
+!
+   end select
+!
+!-----------------------------------------------------------------------
+!                   DETERMINE IF MESH WAS REFINED
+!-----------------------------------------------------------------------
+!..determine if mesh was refined
+   if (Irefine.gt.0) then
+      if (nr_elem_to_refine.eq.0) then
+         Nstop = 1 ! no elements were refined
+      else
+         Nstop = 0 ! as expected, elements were refined
+      endif
+   endif
+!
+!-----------------------------------------------------------------------
+!                              FINALIZE
+!-----------------------------------------------------------------------
+     write(*,*) 'Deallocating'
+     deallocate(elem_resid)
+     deallocate(elem_ref_flag)
+     deallocate(list_elem)
+     deallocate(list_ref_flags)
+     
+!
+!
+   end subroutine refine_DPG_ser
+
+!--------------------------------------------------------------------
+!
+!     routine name      - select_refinement
+!
+!--------------------------------------------------------------------
+!
+!     latest revision:  - Aug 17
+!
+!     purpose:          - criterion set by the user for choosing
+!                         between h and p refinement
+!
+!     arguments:
+!
+!     in:
+!             mdle      - element node number
+!     out:
+!             iref      = 1 for h-refinement
+!                       = 2 for p-refinement
+!
+!---------------------------------------------------------------------
+!
+   subroutine select_refinement(Mdle,Iref)
+!
+   use data_structure3D
+   use common_prob_data_UW
+   use element_data
+!
+   implicit none
+!
+   integer, intent(in)  :: Mdle
+   integer, intent(out) :: Iref
+   integer              :: vert_singular(8), ivert
+   integer              :: edge_singular(12), iedge
+   integer              :: i,j,nod,nodp,iv,ie,nrv,nre
+!  ...work space for elem_nodes
+   integer              :: nodesl(27), norientl(27)
+!..geometry dof
+   real*8  :: hmin, lambda
+
+   logical :: found
+!
+!---------------------------------------------------------------------
+!
+   ! vert_singular(1:8)  = (/83,84,85,86,87,88,89,90/)
+   ! edge_singular(1:12) = (/223,224,225,226,227,228,229,230,231,232,233,234/)
+
+   ! vert_singular(1:8)  = (/211,212,217,218,247,248,254,253/)
+   ! edge_singular(1:12) = (/534,547,550,551,628,630,631,643,645,646,647,648/)
+
+   ivert = 8
+   iedge = 12
+   vert_singular(1:8)  = (/562,563,571,570,634,626,627,635/)
+   edge_singular(1:12) = (/1587,1568,1590,1591,     &
+                           1415,1414,1411,1392,     &
+                           1589,1592,1569,1566/)
+   
+   if (PROB_KIND .eq. PROB_SCAT_PLANE_PML) then
+      ! ivert = 8
+      ! vert_singular(1:8)  = (/157,152,145,120,76,90,100,132/)
+      ! iedge = 8
+      ! edge_singular(1:8) = (/402,388,372,307,236,259,339,404/)
+      ivert = 4
+      vert_singular(1:4)  = (/127,120,76,90/)
+      iedge = 4
+      edge_singular(1:4) = (/323,307,236,325/)
+   endif
+
+   call elem_nodes(Mdle, nodesl,norientl)
+   nrv = NVERT(NODES(Mdle)%ntype)
+   nre = NEDGE(NODES(Mdle)%ntype)
+
+
+
+!..look for a singular vertex
+   found = .false.
+
+
+   select case(PROB_KIND)
+   case(PROB_CAVITY,PROB_SCAT_CAVITY,PROB_SCAT_CUBE_PML,PROB_SCAT_PLANE_PML)
+      do iv=1,nrv
+         do j=1,ivert
+            if (nodesl(iv).eq.vert_singular(j))  then 
+               ! write(*,*) 'singular element found, mdle = ', Mdle
+               found = .true.
+               exit
+            endif   
+         enddo
+      enddo
+
+      if (.not. found) then
+!     ...look for a singular edge or its father
+         do ie = 1, nre
+            nod = nodesl(nrv+ie)
+            call locate_father(nod,nodp)
+            if (NODES(nodp)%ntype .ne. MEDG) cycle
+            do j = 1,iedge
+               if (nodp .eq. edge_singular(j)) then
+                  ! write(*,*) 'singular element found, mdle = ', Mdle
+                  found = .true.
+                  exit
+               endif
+            enddo      
+         enddo   
+      endif   
+   end select
+!
+   call find_hmin(Mdle,hmin)
+!
+   lambda = OMEGA/(2.0d0*PI-1.d-9)
+   if (hmin.gt. 0.5d0/lambda .or. found) then
+      Iref=1
+   else
+      Iref=2
+   endif
+!   
+   end subroutine select_refinement
+   
+
+
+   subroutine locate_father(nod,nodp)
+!
+   use data_structure3D
+!
+   implicit none
+!
+   integer, intent(in) :: nod
+   integer, intent(out):: nodp
+   integer             :: nods
+!
+!-------------------------------------------------------
+!
+
+   nodp = nod
+   nods  = nod
+!
+   do while (NODES(nods)%father .gt. 0)
+      nodp = NODES(nods)%father
+      nods  = nodp
+   enddo   
+!
+!
+   end subroutine locate_father
+
+
+
+   subroutine find_hmin(Mdle,Hmin)
+!
+   use data_structure3D
+
+   implicit none
+!  
+   integer, intent(in)  :: Mdle
+   real*8,  intent(out) :: Hmin
+!
+!..geometry dof
+   real*8  :: xnod(3,MAXbrickH), h1, h2, h3
+   integer :: i
+!
+!..determine min element size
+
+   call nodcor(Mdle,xnod)
+
+   h1 = dsqrt((xnod(1,2)-xnod(1,1))**2 +           &
+              (xnod(2,2)-xnod(2,1))**2 + (xnod(3,2)-xnod(3,1))**2) 
+
+   h2 = dsqrt((xnod(1,4)-xnod(1,1))**2 +           &
+              (xnod(2,4)-xnod(2,1))**2 + (xnod(3,4)-xnod(3,1))**2) 
+
+   h3 = dsqrt((xnod(1,5)-xnod(1,1))**2 +           &
+              (xnod(2,5)-xnod(2,1))**2 + (xnod(3,5)-xnod(3,1))**2) 
+
+
+   Hmin = min(h1,h2,h3)
+
+   end subroutine find_hmin
+!
