@@ -8,7 +8,7 @@ real(8) function dreal_part(Z)
    VTYPE :: Z
 !
 #if C_MODE
-   dreal_part = real(Z)
+   dreal_part = dreal(Z)
 #else
    dreal_part = Z
 #endif
@@ -24,7 +24,7 @@ real(8) function dimag_part(Z)
    VTYPE :: Z
 !
 #if C_MODE
-   dimag_part = aimag(Z)
+   dimag_part = dimag(Z)
 #else
    dimag_part = 0.d0
 #endif
