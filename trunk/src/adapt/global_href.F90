@@ -23,7 +23,7 @@ subroutine global_href
       mdle = ELEM_ORDER(i)
       if (is_leaf(mdle)) then
          call get_isoref(mdle, kref)
-         call break(mdle,kref)
+         call refine(mdle,kref)
       endif
    enddo
 !
@@ -82,8 +82,8 @@ subroutine global_href_aniso(Krefxy,Krefz)
       mdle = ELEM_ORDER(i)
       if (is_leaf(mdle)) then
          select case(NODES(mdle)%ntype)
-            case(MDLB); call break(mdle,kref_mdlb)
-            case(MDLP); call break(mdle,kref_mdlp)
+            case(MDLB); call refine(mdle,kref_mdlb)
+            case(MDLP); call refine(mdle,kref_mdlp)
             case default
                write(*,*) 'global_href_aniso: unexpected node type. stop.'
                stop 1
@@ -145,7 +145,7 @@ subroutine global_href_aniso_bric(Krefx,Krefy,Krefz)
       mdle = ELEM_ORDER(i)
       if (is_leaf(mdle)) then
          select case(NODES(mdle)%ntype)
-            case(MDLB); call break(mdle,kref_mdlb)
+            case(MDLB); call refine(mdle,kref_mdlb)
             case default
                write(*,*) 'global_href_aniso_bric: unexpected node type. stop.'
                stop 1

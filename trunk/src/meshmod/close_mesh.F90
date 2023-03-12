@@ -169,7 +169,8 @@ subroutine close_mesh()
 #if DEBUG_MODE
       iprint = 2
       if ((RANK.eq.ROOT) .and. (iprint.eq.2)) then
-         write(*,*) 'close_mesh: number of elements to refine ', ic
+         write(*,7002) ' close_mesh : number of elements to refine = ', ic
+   7002  format(A,i6)
       endif
       iprint = 0
 #endif
@@ -201,5 +202,5 @@ subroutine close_mesh()
 !
    if (allocated(list)) deallocate(list)
 !
+!
 end subroutine close_mesh
-
