@@ -1,6 +1,8 @@
-!
-!
-!
+!----------------------------------------------------------------------------
+!> @brief   initialize problem dependent environments, solvers, graphics and
+!!          create initial mesh.
+!> @date    Feb 2023
+!----------------------------------------------------------------------------
 subroutine initialize
 !
    use environment
@@ -10,6 +12,8 @@ subroutine initialize
    use data_structure3D
    use refinements
    use frsolmod
+   use zoltan_wrapper
+   use mpi_param, only: NUM_PROCS
 !
    implicit none
 !
@@ -104,6 +108,10 @@ subroutine initialize
       !write(*,9999) MAXNODS
 9999 format(' MAXNODS = ',i12)
    endif
+!
+!..optionally, choose partitioning algorithm for the initial mesh
+!              if using MPI parallelism
+   if (NUM_PROCS > 1) call zoltan_w_set_lb(0)
 !
 !..generate mesh and read physics file
    call hp3gen(trim(FILE_PHYS))
