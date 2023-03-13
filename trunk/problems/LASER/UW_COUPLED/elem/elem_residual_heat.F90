@@ -122,7 +122,6 @@ subroutine elem_residual_heat(Mdle,                &
 !
 #if DEBUG_MODE
    integer :: iprint
-   iprint=0
 #endif
 !
 !..for Gram matrix compressed storage format
@@ -130,6 +129,10 @@ subroutine elem_residual_heat(Mdle,                &
    nk(k1,k2) = (k2-1)*k2/2+k1
 !
 !-----------------------------------------------------------------------
+!
+#if DEBUG_MODE
+   iprint=0
+#endif
 !
 !..element type
    etype = NODES(Mdle)%ntype
