@@ -158,7 +158,11 @@ contains
       end do
 !
       read(nin,*) V%NR_ELEM
-      allocate(V%ELEM(1:V%NR_ELEM, 0:27), STAT=istat)
+      if (SECOND_ORDER_VIS) then
+         allocate(V%ELEM(1:V%NR_ELEM, 0:27), STAT=istat)
+      else
+         allocate(V%ELEM(1:V%NR_ELEM, 0:8), STAT=istat)
+      endif
       V%ELEM = 0
       ierr = ierr + istat
 !
