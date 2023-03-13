@@ -51,7 +51,7 @@ one : $(OBJ_PATH)/.dummy $(OBJ_PATH)/$(TEST).o
 #-------------------------------------------------
 .PHONY : all
 all :
-	for e in $(TESTS) ; do \
+	@for e in $(TESTS) ; do \
 		make one run TEST=$$e ;\
 	done
 
