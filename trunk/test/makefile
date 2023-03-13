@@ -62,7 +62,7 @@ all :
 run : one
 	@echo ""
 	@echo "Running test: "$(TEST)
-	./$(EXEC_PATH)/$(TEST)
+	@./$(EXEC_PATH)/$(TEST)
 
 #-------------------------------------------------
 .PHONY : clean
