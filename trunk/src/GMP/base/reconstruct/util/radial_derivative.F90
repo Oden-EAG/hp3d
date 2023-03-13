@@ -26,4 +26,4 @@
  1000   format(' radial_derivative: k = ',i1,'; j = ',i1,'; --> c = ',e12.5)
       endif
 !
-      end
+      end subroutine radial_derivative

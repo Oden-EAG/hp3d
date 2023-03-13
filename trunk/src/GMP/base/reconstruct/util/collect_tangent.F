@@ -12,10 +12,11 @@ c                        wrt to the curve parameter
 c
 c   arguments
 c     in:
-c              Nc      - a Hermite curve
-c              Np      - a point
+c             Nc       - a Hermite curve
+c             Np       - a point
 c     out:
-c              Tangent - the tangent vector
+c             Tangent  - the tangent vector
+c             Dtangent -
 c
 c----------------------------------------------------------------------
 c
