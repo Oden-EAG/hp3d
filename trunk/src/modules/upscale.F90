@@ -228,7 +228,11 @@ contains
       integer  , intent(in)  :: Idx, Ioffs
       integer  , intent(out) :: Iverl(27)
 
-      Iverl(1:27) = V%ELEM(Idx,1:27) + Ioffs
+      if (SECOND_ORDER_VIS) then
+         Iverl(1:27) = V%ELEM(Idx,1:27) + Ioffs
+      else
+         Iverl(1:8) = V%ELEM(Idx,1:8) + Ioffs
+      endif
 !
    end subroutine get_vis_elem
 
