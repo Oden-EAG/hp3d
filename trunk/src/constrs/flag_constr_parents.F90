@@ -35,7 +35,7 @@
 !
 !  ...misc
       integer :: j,nrnodl,nod,nc,icase
-      integer :: iprint
+      integer :: nrnodl,nod,nodp,nc,nce,nvoid
 !
 !----------------------------------------------------------------------
 !
