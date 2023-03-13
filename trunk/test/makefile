@@ -8,6 +8,7 @@ info :
 include ../m_options
 
 OBJ_PATH     = _obj_
+EXEC_PATH    = _exec_
 MODULE_PATH  = $(OBJ_PATH)
 
 SRC_FILE     = locate.F90 \
@@ -40,13 +41,14 @@ $(OBJ) : $(OBJ_PATH)/%.o : %.F90
 $(OBJ_PATH)/.dummy :
 	@echo "Creating directory " $(OBJ_PATH)
 	@mkdir -p $(OBJ_PATH); touch $@;
+	@mkdir -p $(EXEC_PATH); touch $@;
 
 #-------------------------------------------------
 .PHONY : one
 one : $(OBJ_PATH)/.dummy $(OBJ_PATH)/$(TEST).o
 	@echo ""
 	@echo "- Linking - " $(TEST)
-	$(FC_WORK) -o $(TEST) $(OBJ_PATH)/$(TEST).o $(LIBS) $(LDFLAGS)
+	$(FC_WORK) -o $(EXEC_PATH)/$(TEST) $(OBJ_PATH)/$(TEST).o $(LIBS) $(LDFLAGS)
 
 #-------------------------------------------------
 .PHONY : all
@@ -60,11 +62,12 @@ all :
 run : one
 	@echo ""
 	@echo "Running test: "$(TEST)
-	./$(TEST)
+	./$(EXEC_PATH)/$(TEST)
 
 #-------------------------------------------------
 .PHONY : clean
 clean :
 	@/bin/rm -f *.o *~
 	@/bin/rm -rf $(OBJ_PATH)
+	@/bin/rm -rf $(EXEC_PATH)
 	@for t in $(TESTS) ; do rm -f $$t ; done
