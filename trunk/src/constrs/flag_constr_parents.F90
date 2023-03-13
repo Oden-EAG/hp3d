@@ -25,7 +25,7 @@
       use data_structure3D
       use constrained_nodes
 !
-#include "syscom.blk"
+      implicit none
 !
       integer, intent(in) :: Mdle
       integer, intent(in) :: Nodesl(27)
