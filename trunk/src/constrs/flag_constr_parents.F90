@@ -15,6 +15,7 @@
 !     in:
 !            Mdle      - an element number, same as the middle node
 !                        number
+!            Nodesl    - list of element nodes
 !
 !----------------------------------------------------------------------
 !
