@@ -58,7 +58,8 @@ c  ...test......test......test......test......test......test......test...
 
 c
 #if DEBUG_MODE
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 #endif
 c
       iuu = 1

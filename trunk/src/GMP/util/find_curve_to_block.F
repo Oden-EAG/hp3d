@@ -29,9 +29,13 @@ c
 c
       integer :: if,is,lab,nf,num
 c
-      integer :: iprint=0
+#if DEBUG_MODE
+      integer :: iprint
+      iprint=0
+c
       if (iprint.eq.1) write(*,7001) Nc
  7001 format('find_curve_to_block: Nc = ',i8)
+#endif
 c
 c  ...initiate number of neighboring blocks
       Nrbl=0
@@ -39,11 +43,12 @@ c
 c  ...loop through figures adjacent to the curve
       do if=1,CURVES(Nc)%NrFig
         call decode(abs(CURVES(Nc)%FigNo(if)), nf,lab)
+#if DEBUG_MODE
         if (iprint.eq.1) then
           write(*,7002) if,CURVES(Nc)%FigNo(if),nf,lab
  7002     format('if,CURVES(Nc)%FigNo(if),nf,lab = ',i2,i8,2x,i8,i2)
         endif
-c
+#endif
         select case(lab)
 c
 c  .....triangle
@@ -83,7 +88,9 @@ c  .......loop through blocks adjacent to the rectangle
           enddo
         end select
       enddo
+#if DEBUG_MODE
       if (iprint.eq.1) call pause
+#endif
 c
 c
-      end
+      end subroutine find_curve_to_block

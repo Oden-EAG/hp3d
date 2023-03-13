@@ -57,11 +57,10 @@ subroutine hp3gen(Fp)
   logical :: iact, lflag
   !
 #if DEBUG_MODE
-  integer :: iprint = -1
-  integer :: iprint_vert = 0
-  integer :: iprint_edge = 0
-  integer :: iprint_face = 0
-  integer :: iprint_mdle = 0
+  integer :: iprint
+  integer :: iprint_vert,iprint_edge,iprint_face,iprint_mdle
+  iprint = -1
+  iprint_vert=0; iprint_edge=0; iprint_face=0; iprint_mdle=0
 #endif
   !----------------------------------------------------------------------
   !

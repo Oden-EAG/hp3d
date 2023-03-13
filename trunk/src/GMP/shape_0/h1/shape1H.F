@@ -36,7 +36,8 @@ c
 c
 c----------------------------------------------------------------------
 c
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 c
       NrdofH = Nord+1
 c

@@ -35,12 +35,15 @@ c
       real(8),dimension(MAXP-1),intent(out) :: ShapH,DshapH
 c
       real(8) :: s,dsdt,x,x2,dx
-      integer :: iprint,k,i
+      integer :: k,i
       real(8),dimension(8) :: v,d
 c
 c----------------------------------------------------------------------
 c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
+#endif
 c
 c  ...initialize XLEG0 if needed
       if (.NOT.INITIALIZED) call init_gauss_quadrature
@@ -128,6 +131,7 @@ c
 c  ...account for orientation
       do i=1,Nrdof ; DshapH(i)=DshapH(i)*dsdt ; enddo
 c
+#if DEBUG_MODE
 c  ...printing
       if (iprint.eq.1) then
         write(*,7002) T,Nord,Norient
@@ -139,7 +143,7 @@ c  ...printing
         enddo
         call pause
       endif
-c
+#endif
 c
       end subroutine shapHke
 c
@@ -180,12 +184,17 @@ c
       real(8),dimension(MAXP-1),intent(out) :: ShapH,DshapH
 c
       real(8) :: v,dv
-      integer :: iprint,k
+      integer :: k
       logical :: JASON
 c
 c----------------------------------------------------------------------
 c
-      iprint=0 ; JASON=.TRUE.
+#if DEBUG_MODE
+      integer :: iprint
+      iprint=0
+#endif
+c
+      JASON=.TRUE.
 c
       ShapH(1:MAXP-1)=0.d0 ; DshapH(1:MAXP-1)=0.d0
 c
@@ -214,6 +223,7 @@ c
         enddo
       endif
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7002) T,Nord,Norient
  7002   format(' shapHbe: T,Nord,Norient = ',f8.3,2x,i2,2x,i1,
@@ -224,7 +234,7 @@ c
         enddo
         call pause
       endif
-c
+#endif
 c
       endsubroutine shapHbe_0
 c
@@ -309,11 +319,15 @@ c
       integer :: i,is,j,k,l,lsave
 c----------------------------------------------------------------------
 c
-      integer :: iprint=0
+#if DEBUG_MODE
+      integer :: iprint
+      iprint=0
+c
       if (iprint.eq.1) then
         write(*,7005) T(1:2),Nord,Norient
  7005   format('shapHkt: T,Nord,Norient = ',2f8.3,2x,2i3)
       endif
+#endif
 c
       if (Nord.lt.3) then
         Nrdof=0; return
@@ -389,6 +403,8 @@ c  ...account for the orientation
      .                 + dshapHds(2)*dsdt(2,is)
         enddo
       enddo
+c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7003)
  7003   format('shapHkt: Shap,Dvshap = ')
@@ -398,6 +414,7 @@ c  ...account for the orientation
         enddo
         call pause
       endif
+#endif
 c
 c
       end subroutine shapHkt
@@ -503,20 +520,18 @@ c
 c
       integer :: i,j,k,nordh,nordv,nrdofH1,nrdofH2
 c
-c  ...bubble
-c      dimension dv(2)
-c
-      integer :: iprint
-c
 c----------------------------------------------------------------------
 c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
+c
       if (iprint.eq.1) then
         write(*,7001) Type,Nord,Norient
  7001   format('shapHb2: Type,Nord,Norient = ',a5,2x,2i3)
         call pause
       endif
-
+#endif
       select case(Type)
       case('tria','mdlt')
         call shapHbt(T,Nord,Norient, Nrdof,ShapH,DshapH)
@@ -560,6 +575,7 @@ c  .......the order of loops gets reversed...
         Nrdof=k
       end select
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7002) Nrdof
  7002   format('shapHb2: Nrdof = ',i3)
@@ -569,6 +585,7 @@ c
         enddo
         call pause
       endif
+#endif
 c
 c
       end subroutine shapHb2_0
@@ -606,7 +623,7 @@ c
 c
       integer :: i,j,k,l,lsave
 c
-      integer :: iprint=1
+c----------------------------------------------------------------------
 c
       if (Nord.lt.4) then
         Nrdof=0; return
@@ -706,8 +723,6 @@ c  ...bubble
       real(8) :: v,dv(3)
 c
       integer :: k
-c
-      integer :: iprint=1
 c
       if (Nord.lt.4) then
         Nrdof=0; return

@@ -21,7 +21,8 @@ subroutine elem_nodes(Mdle, Nodesl,Norientl)
    integer :: igen,nfath,nod,nson,nrgen,n_nodes,nrsons
 !
 #if DEBUG_MODE
-   integer :: iprint=0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !-----------------------------------------------------------------------

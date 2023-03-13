@@ -123,7 +123,8 @@ subroutine prism_TI(No,Eta, X,Dxdeta)
       integer :: nc,norient,np,nr,nt
       real(8) :: te
 !
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 !
 !------------------------------------------------------------------------
 !

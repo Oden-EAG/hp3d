@@ -41,7 +41,8 @@ c  ...linear shape functions for a tetrahedron
 c
       integer :: i,ie,ifc,ivar,k,lab,np,nc,nt
 c
-      integer :: iprint = 0
+      integer :: iprint
+      iprint=0
 c
 c-----------------------------------------------------------------------
 c  ...initialize
@@ -182,7 +183,8 @@ c
       real(8) :: blend,te
       integer :: ie,ifc,iv,iv1,iv2,iv3,ivar,nc,nt,norient,np
 c
-      integer :: iprint = 0
+      integer :: iprint
+      iprint=0
 c
 c------------------------------------------------------------------------
 c  ...initialize
@@ -412,7 +414,8 @@ c  ...miscellanea
       real(8) :: dthet_deta1,dthet_deta2,dthet_deta3
       integer :: np,iv
 c
-      integer :: iprint = 0
+      integer :: iprint
+      iprint=0
 c
 c-----------------------------------------------------------------------
 c  ...initialize

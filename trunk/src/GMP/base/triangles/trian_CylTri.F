@@ -42,7 +42,8 @@ c
       real(8) :: costhet,dr_deta1,dr_deta2,dthet_deta1,dthet_deta2
       real(8) :: pi,twopi,r,sinthet,theta
 c
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 c
       if ((TRIANGLES(No)%Type.ne.'CylTri'.or.(NDIM.ne.3))) then
         write(*,7001) TRIANGLES(No)%Type

@@ -63,7 +63,8 @@ c
       complex(8) :: one = (1.d0,0.d0)
 c
 #if DEBUG_MODE
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 #endif
 c
       id = Aidx

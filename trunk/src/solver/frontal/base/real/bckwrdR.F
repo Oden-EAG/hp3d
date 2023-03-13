@@ -51,7 +51,8 @@ c
       integer :: j,jel,jerr,k,l,lenx,md,n,ne,negiel,numdes
 c
 #if DEBUG_MODE
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 #endif
 c
       iuu = 1

@@ -47,7 +47,8 @@ c      integer :: noriE(12),noriF(6),norder(19),nordF(3)
 c
 #if DEBUG_MODE
 c  ...debugging flag
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 #endif
 c
 c  ...Option 1: Simply call the usual shape functions with enrichment
@@ -157,7 +158,8 @@ c      integer :: noriE(12),noriF(6),norder(19),nordF(3)
 c
 #if DEBUG_MODE
 c  ...debugging flag
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 #endif
 c
 c  ...Option 1: Simply call the usual shape functions with enrichment
@@ -303,7 +305,8 @@ c      integer :: noriF(6),norder(19),nordF(3)
 c
 #if DEBUG_MODE
 c  ...debugging flag
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 #endif
 c
 c  ...Option 1: Simply call the usual shape functions with enrichment

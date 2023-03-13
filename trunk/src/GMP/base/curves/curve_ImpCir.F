@@ -46,7 +46,8 @@ c
       real(8) :: fval,fval3,fval4,s1,s2
       integer :: i,ifl,j,np
 c
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 c
  5    continue
       nsurf(1:6)=0 ; void(1:4)=0.d0 ; sfact(1:4)=0.d0

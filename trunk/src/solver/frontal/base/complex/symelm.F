@@ -46,7 +46,8 @@ c
       real(8), external :: dreal
 c
 #if DEBUG_MODE
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 #endif
 c
       real(8), parameter :: zero = 0.d0

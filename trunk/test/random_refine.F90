@@ -44,7 +44,8 @@ end program test_random_refine
       integer :: mdle,nelts,nref
       real(8) :: x
 !
-      integer :: iprint = 0
+      integer :: iprint
+      iprint=0
 !
       Npass = 1
 !

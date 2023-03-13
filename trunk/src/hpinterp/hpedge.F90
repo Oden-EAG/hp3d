@@ -78,8 +78,8 @@
              ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_Edge,iflag1
 !
 #if DEBUG_MODE
-! debug printing flag
-  integer :: iprint = 0
+  integer :: iprint
+  iprint=0
 #endif
 !
 !----------------------------------------------------------------------

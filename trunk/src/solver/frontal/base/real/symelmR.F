@@ -50,7 +50,9 @@ c
       real(8), parameter :: sml2  = 1.d-15
 c
 #if DEBUG_MODE
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
+c
       if (iprint.eq.1) then
         write(*,*) 'SYMELM: Iel,Aidx,Flhs,Ubuf = ',Iel,Aidx
         write(*,7001) (Flhs(iii),iii=1,10)

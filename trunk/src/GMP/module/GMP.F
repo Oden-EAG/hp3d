@@ -655,7 +655,9 @@ c  ...dump out GMP data structure
       subroutine dumpout_GMP
 c
       integer, parameter :: ndump=31
-      integer :: iprint=0
+c
+      integer :: iprint
+      iprint=0
 c
       open(unit=ndump,file='files/dumpGMP',
      .     form='formatted',access='sequential',status='unknown')
@@ -919,7 +921,9 @@ c
 c
       character(len=*) :: Fp
       integer, parameter :: ndump=31
-      integer :: iprint=0
+c
+      integer :: iprint
+      iprint=0
 c
       open(unit=ndump,file=Fp,
      .     form='formatted',access='sequential',status='unknown')
@@ -1163,7 +1167,9 @@ c  ...dump in GMP data structure
 c
       character(len=*), intent(in)  :: Fp
       integer, parameter :: ndump=31
-      integer :: iprint=0
+c
+      integer :: iprint
+      iprint=0
 c
       open(unit=ndump,file=Fp,
      .     form='formatted',access='sequential',status='unknown')

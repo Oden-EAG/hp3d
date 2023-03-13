@@ -119,7 +119,8 @@ subroutine elem_vect_poisson(Mdle,Nn, Zaloc,Zbloc)
    integer :: ivar1,ivar2,ifc,nsign
 !
 #if DEBUG_MODE
-   integer :: iprint = 0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !----------------------------------------------------------------------

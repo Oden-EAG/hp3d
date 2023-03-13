@@ -33,7 +33,8 @@ subroutine close_mesh()
 !
 #if DEBUG_MODE
    integer :: nre, nrf
-   integer :: iprint = 0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !-----------------------------------------------------------------------------

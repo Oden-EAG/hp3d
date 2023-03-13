@@ -32,7 +32,8 @@ subroutine sort(List,Val,N)
    integer :: i,imax,j,laux
 !
 #if DEBUG_MODE
-   integer :: iprint = 0
+   integer :: iprint
+   iprint=0
 !
    if (iprint.eq.1) then
       write(*,*) 'ORIGINAL LISTS, N=', N

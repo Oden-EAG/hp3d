@@ -124,7 +124,8 @@ c  ...miscellanea
       integer :: nrdofH_loc,nrdofE_loc,nrdofV_loc
 c
 #if DEBUG_MODE
-      integer :: iprint = 0
+      integer :: iprint
+      iprint=0
 #endif
 c
 c----------------------------------------------------------------------

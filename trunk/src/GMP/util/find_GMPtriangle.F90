@@ -26,7 +26,9 @@ subroutine find_GMPtriangle(Nvert, Ntfound)
 !
       integer :: iflag,iv,ii,nt,ntet
 !
-      integer :: iprint = 0
+      integer :: iprint
+      iprint=0
+!
  10   continue
       if (iprint .eq. 1) then
         write(*,7001) Nvert(1:3)

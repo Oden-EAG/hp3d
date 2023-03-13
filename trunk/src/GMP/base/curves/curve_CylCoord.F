@@ -39,7 +39,8 @@ c
       integer :: i,iv,np
       real(8) :: costhet,dr_deta,dthet_deta,pi,r,sinthet,theta,twopi
 c
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 c
       if (iprint.eq.1) then
         write(*,7000) No,Eta

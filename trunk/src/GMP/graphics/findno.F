@@ -43,7 +43,8 @@ c
       integer :: i,i_min,if,ifg,ii,is,ivis,j,lab
       integer :: nbl,nfl,norient,nr,nr_fig,nh,nick,nvoid
 c
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 c
       nr_fig=0
 c

@@ -38,8 +38,10 @@ subroutine exact_geom(Mdle,Xi, X,Dxdxi)
       real(8) :: eta(3),dxdeta(3,3),detadxi(3,3),etav(3,8)
       integer :: iflag, i, j, k, no
       integer :: ntype
+!
 #if DEBUG_MODE
-      integer :: iprint = 0
+      integer :: iprint
+      iprint=0
 #endif
 !
 !------------------------------------------------------------------------

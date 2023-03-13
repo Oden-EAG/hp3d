@@ -47,7 +47,8 @@ c  ...miscellanea
       integer :: nvoid,nrnodl,nod,nodp,nc,nce
 c
 #if DEBUG_MODE
-      integer :: iprint = 0
+      integer :: iprint
+      iprint=0
 #endif
 c
 c----------------------------------------------------------------------

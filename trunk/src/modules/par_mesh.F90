@@ -52,7 +52,9 @@ subroutine distr_mesh()
    real(8) :: MPI_Wtime,start_time,end_time
 !
 #if DEBUG_MODE
-   integer :: iprint = 0
+   integer :: iprint
+   iprint=0
+!
    if (iprint .eq. 1) then
       write(6,100) 'start distr_mesh, DISTRIBUTED = ', DISTRIBUTED
    endif

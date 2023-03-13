@@ -32,7 +32,8 @@ c
 c
 c----------------------------------------------------------------------
 c
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 c
       if (iprint.eq.1) then
         write(*,7001)Type,Xi(1:3)
@@ -121,7 +122,8 @@ c
       integer :: nordh,nordv,nrdofHb,nrdofHe,nrdofHk,nrdofHt
 c-----------------------------------------------------------------------
 c
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 c
 c  ...affine coordinates for the triangular faces
       vshapt(1) = 1.d0 - (Xi(1) + Xi(2))
@@ -517,7 +519,8 @@ c
       integer :: i,ie,if,iv1,iv2,iv3,ivar,j,k
       integer :: nrdofHe,nrdofHn,nrdofHt
 c
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 c
 c
       k=0
@@ -695,7 +698,8 @@ c
       integer :: nexp,nord,nordh,nordv,nrdofH1,nrdofH2
       integer :: nrdofHe,nrdofHt
 c
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 c----------------------------------------------------------------------
 c
 c  ...check that coordinates are inside reference pyramid

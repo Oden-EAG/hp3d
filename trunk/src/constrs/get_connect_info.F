@@ -43,7 +43,8 @@ c  ...miscellanea
       integer :: nef,nff,nvf,nod,nodp,nort,nrn,nson
 c
 #if DEBUG_MODE
-      integer :: iprint = 0
+      integer :: iprint
+      iprint=0
 #endif
 c
 c  ...initialize output
@@ -342,7 +343,8 @@ c
 ccc      imod(j,mod) = j-(j-1)/mod*mod
 c
 #if DEBUG_MODE
-      integer :: iprint = 0
+      integer :: iprint
+      iprint=0
 c
       if (iprint.eq.1) then
         write(*,7001) Nodp,Is,Is1

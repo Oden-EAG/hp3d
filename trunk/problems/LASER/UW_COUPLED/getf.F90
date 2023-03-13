@@ -200,15 +200,19 @@ subroutine get_bdSource(Mdle,X,Rn, Imp_val)
    real(8), dimension(3)   :: dE  ! 1st derivative
    real(8), dimension(3,3) :: d2E ! 2nd derivative
 !
-!..printing flag
-   integer :: iprint = 0
+#if DEBUG_MODE
+   integer :: iprint
+   iprint=0
+#endif
 !
 !------------------------------------------------------------------------------
 !
+#if DEBUG_MODE
       if (iprint.eq.1) then
          write(*,7001) Mdle,X
  7001    format(' get_bdSource: Mdle,X = ',i8,2x,3(f8.3,2x))
       endif
+#endif
 !
 !     initialize source terms
       Imp_val = ZERO
@@ -256,10 +260,13 @@ subroutine get_bdSource(Mdle,X,Rn, Imp_val)
          write(*,*) 'get_bdSource: UNSPECIFIED NEXACT'
          stop
    end select
+!
+#if DEBUG_MODE
    if (iprint.eq.1) then
       write(*,7002) Imp_val
  7002 format('get_bsource: Imp_val = ',2e12.5)
    endif
+#endif
 !
 end subroutine get_bdSource
 !

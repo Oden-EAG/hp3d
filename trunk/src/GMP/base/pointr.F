@@ -31,7 +31,9 @@ c
 c  ...point type
       character(len=10) :: type     
 c
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
+c
       if (iprint.eq.1) then
         write(*,7001) No
  7001   format('pointr: No = ',i4)

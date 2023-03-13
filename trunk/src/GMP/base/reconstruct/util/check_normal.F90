@@ -5,15 +5,18 @@
       real(8),dimension(2)   :: eta
       real(8),dimension(3)   :: x,vec
       real(8),dimension(3,2) :: dx,vec_aux
-      real(8) :: nsub = 12.d0
-      integer :: isub = 12
+      
       real(8) :: error,s
       integer :: nt,i,it,iprint
+      
+      real(8), parameter :: nsub = 12.d0
+      integer, parameter :: isub = 12
 
-
+      iprint=0
       if (iprint.eq.1) then
-      write(*,*)'check_normal...'
+        write(*,*)'check_normal...'
       endif
+
       error = 0.d0
 !  ...loop over subdivisions
       do i=0, isub

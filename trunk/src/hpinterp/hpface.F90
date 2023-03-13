@@ -85,8 +85,8 @@
              ndofH_face,ndofE_face,ndofV_face,ndofQ_Face,nsign
 !
 #if DEBUG_MODE
-! debug printing flag
-  integer :: iprint = 0
+  integer :: iprint
+  iprint=0
 #endif
 !
 !-----------------------------------------------------------------------

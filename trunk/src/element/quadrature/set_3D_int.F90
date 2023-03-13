@@ -179,7 +179,8 @@ subroutine set_3Dint_aux(Ntype,Norder,Maxp,Max_nint3, Nint,Xiloc,Waloc)
       real(8) :: factor
 !
 #if DEBUG_MODE
-      integer :: iprint = 0
+      integer :: iprint
+      iprint=0
 #endif
 !
 !----------------------------------------------------------------------

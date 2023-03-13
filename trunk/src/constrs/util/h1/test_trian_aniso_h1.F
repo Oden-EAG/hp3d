@@ -33,7 +33,8 @@ c
       real(8) :: val
       integer :: i,k,nrb,nrs,nrdof
 c
-      integer :: iprint = 0
+      integer :: iprint
+      iprint=0
 c
  777  continue
 c

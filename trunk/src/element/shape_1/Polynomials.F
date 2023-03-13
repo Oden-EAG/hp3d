@@ -41,7 +41,8 @@ c
       double precision ::                                          tt,y
 c
 #if DEBUG_MODE
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 #endif
 c
 c  ...i stands for the order of the polynomial, stored in P(i)
@@ -116,7 +117,8 @@ c
       double precision ::                              ptemp(0:Nord),tt
 c
 #if DEBUG_MODE
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 #endif
 c
 c  ...calling Legendre for required information
@@ -202,7 +204,8 @@ c
       double precision ::                                          y,tt
 c
 #if DEBUG_MODE
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 #endif
 c
 c  ...clearly (minI,maxI)=(0,Nord), but the syntax is written as it is
@@ -310,7 +313,8 @@ c
       double precision ::            ai,bi,ci,tt,ptemp(1:Nord+1,0:Nord)
 c
 #if DEBUG_MODE
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 #endif
 c
 c  ...clearly (minI,maxI)=(1,Nord), but the syntax is written as it is

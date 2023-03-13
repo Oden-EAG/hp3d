@@ -79,7 +79,8 @@ c
       real(8) :: r1,r2,r3,rsum
 c---------------------------------------------------------------------
 c
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 c
 c  ...check user defined parameters NDIM and MANDIM
       if (NDIM.ne.3) then

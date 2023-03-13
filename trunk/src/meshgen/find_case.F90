@@ -37,7 +37,8 @@ subroutine find_case(Number,Phys, Icase)
       integer :: ii, j
 !
 #if DEBUG_MODE
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 #endif
 !
 !----------------------------------------------------------------------

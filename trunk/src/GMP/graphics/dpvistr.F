@@ -31,7 +31,8 @@ c
       integer :: i,iblno,icolor,itr,ivar,k,ncar,ncol,nickb,nvoid
       integer :: nblack,ngreen,norange,nred,nyellow
 c
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 c
 c  ...define colors
       nblack  = npcol(2)

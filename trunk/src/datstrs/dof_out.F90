@@ -25,7 +25,8 @@ subroutine dof_out( Nod,                     &
   integer :: ndofH, ndofE, ndofV, ndofQ, nvar
 
 #if DEBUG_MODE
-  integer :: iprint = 0
+  integer :: iprint
+  iprint=0
 #endif
 
   ! decode the physical attributes of the node

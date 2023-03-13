@@ -44,7 +44,8 @@ c
       integer :: i,j,np
       real(8) :: alpha,pihalf,rad,s,s1
 c
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 c
       if (CURVES(No)%Type.ne.'QuaCir') then
         write(*,7001)

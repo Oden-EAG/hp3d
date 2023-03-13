@@ -63,7 +63,8 @@ c
       real(8), parameter :: one = 1.0
 c
 #if DEBUG_MODE
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 #endif
 c
       id = Aidx

@@ -23,7 +23,9 @@ subroutine connect
 !  ...an auxiliary list
       integer :: listaux(20)
 !
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
+!
       if (iprint.eq.1) then
         write(*,*) 'connect: DEBUGGING...'
       endif

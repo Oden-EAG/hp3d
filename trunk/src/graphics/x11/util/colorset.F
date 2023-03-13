@@ -38,7 +38,8 @@ c.....colors to interpolate between
       integer :: iram(4,nscales)
 c
 #if DEBUG_MODE
-      integer :: iprint = 0
+      integer :: iprint
+      iprint=0
 #endif
 c
 c  ...nscales=6

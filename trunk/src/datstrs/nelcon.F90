@@ -30,7 +30,8 @@ subroutine nelcon(Mdle0, Mdle1)
       integer :: mdle,nfath,nrbros,noson
 !
 #if DEBUG_MODE
-      integer :: iprint = 0
+      integer :: iprint
+      iprint=0
 #endif
 !
       mdle = Mdle0

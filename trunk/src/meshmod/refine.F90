@@ -26,7 +26,8 @@ subroutine refine(Mdle_in,Kref_in)
    logical :: iflag
 !
 #if DEBUG_MODE
-   integer :: iprint = 0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !---------------------------------------------------------------------

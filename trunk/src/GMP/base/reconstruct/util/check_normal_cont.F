@@ -29,7 +29,8 @@ c
       integer :: i,idec,ie,iflag,is,ifound,it,j,lab
       integer :: n,nc,nc1,np,nt,nfail
 c
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 c
       nfail = 0
 c

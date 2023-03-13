@@ -34,7 +34,9 @@ c
       integer :: i,ifl,j,k,ntrial
       real(8) :: errf,errx
 c
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
+c
 c-----------------------------------------------------------------------
 c
  10   continue
@@ -190,7 +192,8 @@ c
       integer :: i
       real(8) :: fval,fval1,fval2,fval3,fval4,fval5,tt,tt2,xf1,xf2
 c
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 c
 c  ...select geometry entity
       select case(Nusf)

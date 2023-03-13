@@ -59,7 +59,8 @@ c  ...miscellanea
 c
 #if DEBUG_MODE
       integer :: nvarE,nvarQ
-      integer :: iprint = 0
+      integer :: iprint
+      iprint=0
 #endif
 c
 c---------------------------------------------------------------------

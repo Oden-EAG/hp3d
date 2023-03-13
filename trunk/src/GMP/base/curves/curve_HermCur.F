@@ -37,7 +37,8 @@ c  ...fifth order C^2-conforming shape functions
 c
       integer :: i,k,np,nord
 c
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 c
       if ((CURVES(No)%Type.ne.'HermCur').or.(NDIM.ne.3)) then
         write(*,7001)

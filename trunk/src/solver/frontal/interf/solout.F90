@@ -65,7 +65,8 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
    VTYPE   :: zvoid
 !
 #if DEBUG_MODE
-   integer :: iprint=0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !----------------------------------------------------------------------

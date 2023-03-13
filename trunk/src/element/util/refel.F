@@ -50,7 +50,8 @@ c
       integer :: nrsons,nv1,nv2,nv3,nv4,lab
 c
 #if DEBUG_MODE
-      integer :: iprint = 0
+      integer :: iprint
+      iprint=0
 #endif
 c
 c----------------------------------------------------------------------

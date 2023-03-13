@@ -50,7 +50,9 @@ c
       integer :: i,maxia,ntot
 c
 #if DEBUG_MODE
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
+c
       if (iprint.eq.1) then
         write(*,*) 'surfsp: DEBUGGING...'
       endif

@@ -24,7 +24,8 @@ subroutine recta_PTIRec(No,Eta, X,Dxdeta)
 !
 !-----------------------------------------------------------------------
 !
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 !
       if (RECTANGLES(No)%Type.ne.'PTIRec') then
         write(*,7000)RECTANGLES(No)%Type

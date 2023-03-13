@@ -29,7 +29,8 @@ c
 c
       integer :: ic,if,is,nc,nf,num,lab
 c
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 c
 c  ...initiate number of neighboring blocks
       Nrbl=0

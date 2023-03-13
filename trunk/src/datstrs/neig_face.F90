@@ -48,8 +48,10 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
   integer, dimension(6)      :: nface_ort
   integer :: igen, nrgen, nve, nrf, nod, mdle, mdle_is
   integer :: kref, i, is, nrsons, iface, iflag
+!
 #if DEBUG_MODE
-  integer :: iprint=0
+  integer :: iprint
+  iprint=0
 #endif
 !------------------------------------------------------------------
 !

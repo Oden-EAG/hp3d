@@ -29,7 +29,8 @@ subroutine change_ref_flag(How,Ntype,Kref,Nort, Krefm)
            (/3,6/) )
 !
 #if DEBUG_MODE
-      integer :: iprint =0
+      integer :: iprint
+      iprint=0
 #endif
 !-----------------------------------------------------------------------------------
 !

@@ -47,7 +47,8 @@ c
       real(8), parameter :: sml2  = 1.d-15
 c
 #if DEBUG_MODE
-      integer :: iprint = 0
+      integer :: iprint
+      iprint=0
 #endif
 c
 c set up pointers into Flhs

@@ -30,7 +30,8 @@ c
       complex(8), parameter :: zero = (0.d0, 0.d0)
 c
 #if DEBUG_MODE
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 #endif
 c
 c if the new frontwidth is equal to the old frontwidth

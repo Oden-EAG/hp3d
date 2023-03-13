@@ -12,7 +12,8 @@ subroutine find_order(Mdle, Norder)
   integer, dimension(27) :: nodesl, norientl
 !
 #if DEBUG_MODE
-  integer :: iprint = 0
+  integer :: iprint
+  iprint=0
 #endif
 !
   Norder(1:19) = 0

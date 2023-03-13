@@ -23,7 +23,8 @@ subroutine find_element_closing_ref(Ntype,Kreff,Krefe, Kref)
   integer :: i, j, isum, ipass, iref, kref_trial
   !
 #if DEBUG_MODE
-  integer :: iprint = 0
+  integer :: iprint
+  iprint=0
 #endif
   !
   !-------------------------------------------------------

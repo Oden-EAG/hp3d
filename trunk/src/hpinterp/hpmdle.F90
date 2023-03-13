@@ -75,8 +75,8 @@
              ndofH_mdle,ndofE_mdle,ndofV_mdle,ndofQ_Mdle,iflag1
 !
 #if DEBUG_MODE
-! debug printing flag
-  integer :: iprint = 0
+  integer :: iprint
+  iprint=0
 #endif
 !
 !-----------------------------------------------------------------------

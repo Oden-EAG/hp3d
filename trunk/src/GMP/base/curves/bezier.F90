@@ -27,7 +27,9 @@ module bezier
 !--------------------------------------------------------------------------------------
 !
 #if DEBUG_MODE
-      integer :: iprint = 0
+      integer :: iprint
+      iprint=0
+!
       if (iprint.eq.1) then
         write(*,1000)Nc,Eta,CURVES(abs(Nc))%Type
  1000   format(' curve_Bezier: Nc = ',i4,'; Eta = ',e12.5,'; type = ',a12)

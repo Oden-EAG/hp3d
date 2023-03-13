@@ -44,7 +44,8 @@ c
       real(8) :: d
       integer :: iter
 c
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 c
 c-----------------------------------------------------------------------
 c

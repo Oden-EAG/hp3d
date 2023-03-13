@@ -45,7 +45,8 @@ c
 c
 c----------------------------------------------------------------------
 c
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 c
 c  ...check data
       if ((Nord.lt.5).or.(Nord.gt.5)) then
@@ -156,7 +157,8 @@ c
 c
 c----------------------------------------------------------------------
 c
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 c
 c  ...check data
       if ((Nord.lt.5).or.(Nord.gt.5)) then

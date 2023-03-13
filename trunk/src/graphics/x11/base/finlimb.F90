@@ -30,7 +30,8 @@
     integer :: i, j, ivar, loc, iel, idec, iface, nsub
     !
 #if DEBUG_MODE
-    integer :: iprint=0
+    integer :: iprint
+    iprint=0
 #endif
     !
     !----------------------------------------

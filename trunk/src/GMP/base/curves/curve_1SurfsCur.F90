@@ -77,7 +77,8 @@ subroutine diag_segment(Nc,Eta, X,dX_dEta)
       real(8) :: r,r2,rmax,rmin,theta,theta1,x0
 !
       real(8) :: pi
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 !----------------------------------------------------------------------
 !
       pi = acos(-1.d0)
@@ -201,7 +202,8 @@ subroutine circular_segment(Nc,Eta, X,dX_dEta)
       integer :: i,ns,nv1,nv2
       real(8) :: alpha,dalpha_dEta,rad,rnorm1,rnorm2,sp,theta
 !
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 !----------------------------------------------------------------------
       if (iprint.eq.1) then
         write(*,7000)Nc,Eta
@@ -309,7 +311,8 @@ subroutine cylinder_geodesic(No,Eta, X,Dxdeta)
       integer :: i,iv,ivar,j,np,ns
       real(8) :: fval,rad,r,s
 !
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 !-----------------------------------------------------------------------
 !
       if (iprint.eq.1) then
@@ -580,7 +583,8 @@ subroutine cone_geodesic(No,Eta, X,Dxdeta)
       integer :: i,iv,ivar,j,np,ns
       real(8) :: ap,fval,r,s
 !
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 !-----------------------------------------------------------------------
 !
       if (iprint.eq.1) then

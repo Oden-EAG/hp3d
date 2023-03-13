@@ -121,7 +121,8 @@ subroutine elem_residual_heat(Mdle,                &
    integer :: nordP,nsign,ifc,info,icomp,nrdof
 !
 #if DEBUG_MODE
-   integer :: iprint = 0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !..for Gram matrix compressed storage format

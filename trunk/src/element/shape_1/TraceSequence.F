@@ -61,7 +61,8 @@ c
 c
 #if DEBUG_MODE
 c  ...debugging flag
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 #endif
 c
 c  ...spatial dimensions
@@ -178,7 +179,8 @@ c
 c
 #if DEBUG_MODE
 c  ...debugging flag
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 #endif
 c
 c  ...spatial dimensions
@@ -291,7 +293,8 @@ c
 c
 #if DEBUG_MODE
 c  ...debugging flag
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 #endif
 c
 c  ...the traces are the same as the H(curl) traces
@@ -394,7 +397,8 @@ c
 c
 #if DEBUG_MODE
 c    ...debugging flag
-        integer :: iprint=0
+        integer :: iprint
+        iprint=0
 #endif
 c
 c    ...spatial dimensions
@@ -469,7 +473,8 @@ c
 c
 #if DEBUG_MODE
 c    ...debugging flag
-        integer :: iprint=0
+        integer :: iprint
+        iprint=0
 #endif
 c
 c    ...spatial dimensions
@@ -617,7 +622,8 @@ c
 c
 #if DEBUG_MODE
 c    ...debugging flag
-        integer :: iprint=0
+        integer :: iprint
+        iprint=0
 #endif
 c
 c    ...spatial dimensions
@@ -707,7 +713,8 @@ c
 c
 #if DEBUG_MODE
 c    ...debugging flag
-        integer :: iprint=0
+        integer :: iprint
+        iprint=0
 #endif
 c
 c    ...spatial dimensions
@@ -870,7 +877,8 @@ c
 c
 #if DEBUG_MODE
 c    ...debugging flag
-        integer :: iprint=0
+        integer :: iprint
+        iprint=0
 #endif
 c
 c    ...spatial dimensions
@@ -950,7 +958,8 @@ c
 c
 #if DEBUG_MODE
 c    ...debugging flag
-        integer :: iprint=0
+        integer :: iprint
+        iprint=0
 #endif
 c
 c    ...spatial dimensions

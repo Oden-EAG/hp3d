@@ -15,7 +15,8 @@ subroutine read_input(Fp)
   integer :: i, j
   integer, parameter :: nin = 103
 #if DEBUG_MODE
-  integer :: iprint=0
+  integer :: iprint
+  iprint=0
 #endif
   !----------------------------------------------------------------------
   !!write(*,*) 'QUIET_MODE = ',QUIET_MODE; call pause

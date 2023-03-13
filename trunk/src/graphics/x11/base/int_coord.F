@@ -42,9 +42,11 @@ c
       integer, intent(out) :: Ixi1(2,3),Ixi2(2,3)
       integer, intent(out) :: Np1,Np2,Nsid1,Nsid2
 c
-      integer :: nhalf,nordh,nordv,k
+      integer :: k,nhalf,nordh,nordv
+c
 #if DEBUG_MODE
-      integer :: iprint=0
+      integer :: iprint
+      iprint=0
 #endif
 c
 c  ...initialize
