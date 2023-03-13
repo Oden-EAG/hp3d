@@ -68,17 +68,17 @@ subroutine distr_mesh()
       remainder = mod(NRELES,NUM_PROCS)
 !
 !  ...element offset
-      el=0
+      iel=0
 !
 !  ...first remainder procs get base+1, rest get base
-      do proc = 0,NUM_PROCS-1
-         if (proc .lt. remainder) then
+      do iproc = 0,NUM_PROCS-1
+         if (iproc .lt. remainder) then
             subd_size = base + 1
          else
             subd_size = base
          endif
-         subd_next(el+1:el+subd_size) = proc
-         el = el + subd_size
+         subd_next(iel+1:iel+subd_size) = iproc
+         iel = iel + subd_size
       enddo
    elseif (ZOLTAN_LB .eq. 7) then
       if (RANK .eq. ROOT) write(*,*) 'calling (re-)partition_fiber...'
