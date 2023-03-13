@@ -95,8 +95,6 @@ module paraview
 !-----------------------------------------------------------------------------
    subroutine geometry_write(Sname,LSname,Sfile,LSfile)
 !
-      implicit none
-!
       integer, intent(in)   :: LSname,LSfile
 !
       character(len=LSname) :: Sname
@@ -220,8 +218,6 @@ module paraview
 !> @date Feb 2023
 !-----------------------------------------------------------------------------
    subroutine attr_write(Sname,LSname,Sfile,LSfile,Snick,LSnick)
-!
-      implicit none
 !
       integer, intent(in)   :: LSname,LSfile,LSnick
       character(len=LSname) :: Sname

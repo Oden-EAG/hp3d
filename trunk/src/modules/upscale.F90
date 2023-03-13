@@ -45,15 +45,15 @@ contains
 !
       if (SECOND_ORDER_VIS) then
          select case(Etype)
-         case(TETR,MDLN); ivis_type = 38
-         case(PRIS,MDLP); ivis_type = 41
-         case(BRIC,MDLB); ivis_type = 50
+            case(TETR,MDLN); ivis_type = 38
+            case(PRIS,MDLP); ivis_type = 41
+            case(BRIC,MDLB); ivis_type = 50
          end select
       else
          select case(Etype)
-         case(TETR,MDLN); ivis_type = 6
-         case(PRIS,MDLP); ivis_type = 8
-         case(BRIC,MDLB); ivis_type = 9
+            case(TETR,MDLN); ivis_type = 6
+            case(PRIS,MDLP); ivis_type = 8
+            case(BRIC,MDLB); ivis_type = 9
          end select
       endif
 !
@@ -133,8 +133,6 @@ contains
 !> @date Feb 2023
    subroutine load_vis(V,Fp,Etype)
 !
-      implicit none
-!
       type(vis)       , intent(inout) :: V
       character(len=*), intent(in)    :: Fp
       integer         , intent(in)    :: Etype
@@ -208,8 +206,6 @@ contains
 !> @date Feb 2023
    subroutine get_vis_point(V,Idx, Pt)
 !
-      implicit none
-!
       type(vis), intent(in) :: V
       integer  , intent(in) :: Idx
       real(8)  , intent(out):: Pt(3)
@@ -228,8 +224,6 @@ contains
 !> @date Feb 2023
    subroutine get_vis_elem(V,Idx,Ioffs, Iverl)
 !
-      implicit none
-!
       type(vis), intent(in)  :: V
       integer  , intent(in)  :: Idx, Ioffs
       integer  , intent(out) :: Iverl(27)
@@ -245,8 +239,6 @@ contains
 !> @param[out] Nrelem - Number of vis elements for the type
 !> @date Feb 2023
    subroutine get_vis_nrelem(Etype, Nrelem)
-!
-      implicit none
 !
       integer, intent(in)  :: Etype
       integer, intent(out) :: Nrelem
