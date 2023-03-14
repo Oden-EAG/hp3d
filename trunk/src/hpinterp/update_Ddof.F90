@@ -552,12 +552,8 @@ subroutine update_Ddof_par
 !
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 !
-!$OMP PARALLEL DO
-!..lower the GMP interface flag for all nodes
-   do nod=1,NRNODS
-      NODES(nod)%visit=0
-   enddo
-!$OMP END PARALLEL DO
+!..lower the visitation flag for all nodes
+   call reset_visit
 !
 !-----------------------------------------------------------------------
 !
