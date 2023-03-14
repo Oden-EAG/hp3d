@@ -63,7 +63,7 @@ subroutine update_gdof()
 !-----------------------------------------------------------------------
 !
    if (USE_THREADED) then
-      call update_Ddof_par
+      call update_gdof_par
       return
    endif
 !
