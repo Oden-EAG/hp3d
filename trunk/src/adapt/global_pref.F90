@@ -6,17 +6,12 @@ subroutine global_pref
 !
    use parameters      , only: MAXP
    use data_structure3D, only: NRELES,NODES,MAXNODM, &
-                               ELEM_ORDER,get_subd,set_subd
-   use par_mesh        , only: get_elem_nodes!,DISTRIBUTED
-   !use mpi_param       , only: RANK
+                               ELEM_ORDER
    use node_types
 !
    implicit none
 !
    integer :: mdle,p,iel,nord,nordx,nordy,nordz,naux
-   !integer :: i,nrnodm,subd
-   !integer :: nodm(MAXNODM)
-!
 !
 !$OMP PARALLEL DO  &
 !$OMP PRIVATE(mdle,nord,nordx,nordy,nordz,naux,p)
@@ -42,18 +37,7 @@ subroutine global_pref
          stop
      100 format(A,I7,I3,I3,A)
       endif
-!     -------- begin setting subdomain for distributed mesh
-      !..should not be necessary anymore after recent changes in distr_mesh,
-      !  because subd values should already be set correctly within subdomain
-      !  so that nodmod will work fine.
-!      call get_subd(mdle, subd)
-!      if ((DISTRIBUTED) .and. (subd .eq. RANK)) then
-!         call get_elem_nodes(mdle, nodm,nrnodm)
-!         do i=1,nrnodm
-!            call set_subd(nodm(i),subd)
-!         enddo
-!      endif
-!     -------- end setting subdomain for distributed mesh
+!
       call nodmod(mdle,nord)
    enddo
 !$OMP END PARALLEL DO
