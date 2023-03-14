@@ -190,10 +190,6 @@ subroutine refresh
 !$OMP END DO
 !$OMP END PARALLEL
 !
-#if DEBUG_MODE
-   call par_verify
-#endif
-!
   99 continue
 !
 end subroutine refresh
