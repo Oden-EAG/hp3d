@@ -201,6 +201,10 @@ subroutine close_mesh()
    enddo
 !
    if (allocated(list)) deallocate(list)
+
+#if DEBUG_MODE
+   call par_verify
+#endif   
 !
 !
 end subroutine close_mesh
