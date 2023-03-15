@@ -47,8 +47,8 @@ subroutine close_mesh()
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
       call refresh
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
-      if (.not. QUIET_MODE) then
-         if (RANK .eq. ROOT) write(*,2020) end_time-start_time
+      if (.not.QUIET_MODE .and. RANK.eq.ROOT) then
+         write(*,2020) end_time-start_time
     2020 format(' refresh    : ',f12.5,'  seconds')
       endif
 !
