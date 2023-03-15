@@ -15,6 +15,7 @@ subroutine close_mesh()
    use error
    use refinements
    use data_structure3D
+   use environment, only: QUIET_MODE
    use mpi_param  , only: ROOT,RANK
    use MPI        , only: MPI_COMM_WORLD
 !
@@ -46,8 +47,10 @@ subroutine close_mesh()
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
       call refresh
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
-      if (RANK .eq. ROOT) write(*,2020) end_time-start_time
- 2020 format(' refresh    : ',f12.5,'  seconds')
+      if (.not. QUIET_MODE) then
+         if (RANK .eq. ROOT) write(*,2020) end_time-start_time
+    2020 format(' refresh    : ',f12.5,'  seconds')
+      endif
 !
 !---------------------------------------------------------
 !     Step 1 : check constrained nodes
@@ -168,7 +171,7 @@ subroutine close_mesh()
 !$OMP END PARALLEL
 !
 #if DEBUG_MODE
-      iprint = 2
+      iprint = 0
       if ((RANK.eq.ROOT) .and. (iprint.eq.2)) then
          write(*,7002) ' close_mesh : number of elements to refine = ', ic
    7002  format(A,i6)
