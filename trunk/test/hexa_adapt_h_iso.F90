@@ -3,7 +3,7 @@
 !!          hexa mesh repeatedly and verifies that mesh
 !!          consistency is maintained after each iteration.
 !> @date Mar 2023
-program test_hexa_adapt_h
+program test_hexa_adapt_h_iso
 !
    use data_structure3D
    use environment
@@ -17,7 +17,7 @@ program test_hexa_adapt_h
    integer :: NPASS
 !
 !..percentage of elements to refine per iteration
-   real(8), parameter :: PERC = 0.1d0
+   real(8), parameter :: PERC = 0.2d0
 !..number of iterations
    integer, parameter :: NITR = 5
 !..max number of randomly refined elements
@@ -43,11 +43,11 @@ program test_hexa_adapt_h
       call distr_mesh
    endif
 !
-   call hexa_adapt_h
+   call hexa_adapt_h_iso
    if (NPASS.eq.1 .and. RANK.eq.ROOT) then
-      write(*,*) 'test_hexa_adapt_h PASSED.'
+      write(*,*) 'test_hexa_adapt_h_iso PASSED.'
    elseif (RANK.eq.ROOT) then
-      write(*,*) 'test_hexa_adapt_h FAILED.'
+      write(*,*) 'test_hexa_adapt_h_iso FAILED.'
    endif
 !
 !..finalize MPI environment
@@ -59,7 +59,7 @@ program test_hexa_adapt_h
 ! !> @brief Refines mesh randomly
 ! !> @date Mar 2023
 !----------------------------------------------------------------------
-   subroutine hexa_adapt_h
+   subroutine hexa_adapt_h_iso
 !
       integer :: idx,icnt,itr,ierr,kref,mdle,nel,nref
       real(8) :: x
@@ -75,7 +75,7 @@ program test_hexa_adapt_h
 !
       if (iprint.ge.1 .and. RANK.eq.ROOT) then
          write(*,110) ' NITR,PERC = ',NITR,PERC
-     110 format(' hexa_adapt_h: ',A,I3,',',F5.2)
+     110 format(' hexa_adapt_h_iso: ',A,I3,',',F5.2)
       endif
 !
       do itr=1,NITR
@@ -83,7 +83,7 @@ program test_hexa_adapt_h
          nref = max(1,int(NRELES*PERC))
          if (iprint.ge.1 .and. RANK.eq.ROOT) then
             write(*,120) '  itr,nref = ',itr,nref
-        120 format(' hexa_adapt_h: ',A,I3,',',I5)
+        120 format(' hexa_adapt_h_iso: ',A,I3,',',I5)
          endif
 !
          ! iterate nref times
@@ -113,14 +113,14 @@ program test_hexa_adapt_h
             else
                if (RANK.eq.ROOT) then
                   write(*,130) '  itr,NITR,NREF_MAX = ',itr,NITR,NREF_MAX
-              130 format(' hexa_adapt_h: ',A,I5,',',I5,',',I5)
+              130 format(' hexa_adapt_h_iso: ',A,I5,',',I5,',',I5)
                endif
                exit
             endif
 !
             if (iprint.gt.1 .and. RANK.eq.ROOT) then
                write(*,140) '       mdle = ',mdle
-           140 format(' hexa_adapt_h: ',A,I6)
+           140 format(' hexa_adapt_h_iso: ',A,I6)
             endif
 !
             call get_isoref(mdle, kref)
@@ -145,7 +145,7 @@ program test_hexa_adapt_h
                   do idx=1,icnt
                      write(*,150) '  mdle_ref = ',mdle_ref(idx)
                   enddo
-              150 format(' hexa_adapt_h: ',A,I6)
+              150 format(' hexa_adapt_h_iso: ',A,I6)
                endif
                return
             endif
@@ -158,10 +158,10 @@ program test_hexa_adapt_h
 !  ...end loop over itr
       enddo
 !
-   end subroutine hexa_adapt_h
+   end subroutine hexa_adapt_h_iso
 !
 !
-end program test_hexa_adapt_h
+end program test_hexa_adapt_h_iso
 !
 !
 !----------------------------------------------------------------------
@@ -177,6 +177,9 @@ subroutine initialize
 !
    implicit none
 !
+   logical :: q
+!
+   q = QUIET_MODE
    QUIET_MODE = .true.
 !
 #if HP3D_USE_OPENMP
@@ -213,6 +216,8 @@ subroutine initialize
 !
 !..read physics file and generate mesh data structures
    call hp3gen('../files/physics/physics_0')
+!
+   QUIET_MODE = q
 !
 end subroutine initialize
 !

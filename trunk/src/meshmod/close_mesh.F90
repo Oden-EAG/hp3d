@@ -171,12 +171,10 @@ subroutine close_mesh()
 !$OMP END PARALLEL
 !
 #if DEBUG_MODE
-      iprint = 0
-      if ((RANK.eq.ROOT) .and. (iprint.eq.2)) then
+      if ((.not.QUIET_MODE.or.iprint.eq.2) .and. (RANK.eq.ROOT)) then
          write(*,7002) ' close_mesh : number of elements to refine = ', ic
    7002  format(A,i6)
       endif
-      iprint = 0
 #endif
 !
 !     loop exit condition
