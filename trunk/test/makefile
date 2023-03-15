@@ -11,15 +11,19 @@ OBJ_PATH     = _obj_
 EXEC_PATH    = _exec_
 MODULE_PATH  = $(OBJ_PATH)
 
-SRC_FILE     = locate.F90 \
-               parameters.F90 \
+SRC_FILE     = locate.F90           \
+               hexa_adapt_h.F90     \
+               parameters.F90       \
                random_refine.F90
 
 OBJ          = $(addprefix $(OBJ_PATH)/, $(SRC_FILE:.F90=.o))
 
 # Tests
-TEST  = locate
-TESTS = locate parameters random_refine
+TEST  = hexa_adapt_h
+TESTS = locate          \
+        hexa_adapt_h    \
+        parameters      \
+        random_refine
 
 # Includes and defs
 CCDEFS = $(PROB_PP_DEFS)
