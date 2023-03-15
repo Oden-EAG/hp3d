@@ -1,3 +1,7 @@
+!> @brief Tests h-adaptive refinements for hexa mesh
+!> @details Randomly isotropically h-refines a distributed
+!!          hexa mesh repeatedly and verifies that mesh
+!!          consistency is maintained after each iteration.
 !> @date Mar 2023
 program test_hexa_adapt_h
 !
@@ -10,16 +14,16 @@ program test_hexa_adapt_h
 !
    implicit none
 !
-   real(8) :: per
-   integer :: nitr,npass,nref
-   
-   integer :: idx,icnt,itr,kref,mdle
-   real(8) :: x
+   integer :: NPASS
 !
-   real(8), parameter :: perc  = 0.1d0
-   integer, parameter :: nritr = 1
+!..percentage of elements to refine per iteration
+   real(8), parameter :: PERC = 0.1d0
+!..number of iterations
+   integer, parameter :: NITR = 5
+!..max number of randomly refined elements
+   integer, parameter :: NREF_MAX = 1000
 !
-   integer :: mdle_ref(1000)
+   QUIET_MODE = .true.
 !
 !..initialize MPI environment
    call mpi_w_init
@@ -27,8 +31,7 @@ program test_hexa_adapt_h
 !..initialize physics, geometry, etc.
    call initialize
 !
-!..
-   QUIET_MODE = .false.
+!..perform one uniform h-refinement
    call global_href
    call update_gdof
    call update_Ddof
@@ -40,158 +43,126 @@ program test_hexa_adapt_h
       call distr_mesh
    endif
 !
-   mdle_ref = 0; icnt = 0
-!
-   do itr=1,nritr
-!
-      nref = int(NRELES*Per)
-!
-      ! iterate nref times
-!
-!  ...random number generate from 0.0 to 1.0
-      if (RANK.eq.ROOT) then
-         call random_seed
-         call random_number(x)
-      endif
-      ! if (num_procs>1) broadcast from root
-
-!  ...pick one mdle from list
-      idx  = min(int(NRELES*x+1),NRELES)
-      mdle = ELEM_ORDER(idx)
-!
-      icnt = icnt+1
-      mdle_ref(icnt) = mdle
-!
-      write(*,*) 'call refine'
-      write(*,*) 'mdle=',mdle
-      call get_isoref(mdle, kref)
-      call refine(mdle, kref)
-!
-      write(*,*) 'call close_mesh'
-      call close_mesh
-      write(*,*) 'returned close_mesh'
-!
-      if (DISTRIBUTED) then
-         call par_verify
-      endif
-!
-      call update_gdof
-      call update_Ddof
-!
-   enddo
-!
-!..
-!
-!..percentage of elements to refine per iteration
-!   per  = 0.1
-!..number of refinements (iterations)
-!   nitr = 5
-!
-!   write(*,*) 'test not working at the moment (needs revision)'
-!   goto 99
-!
-!   call random_refine_test(per,nitr,npass)
-!   if (npass .eq. 1) then
-!      write(*,*) 'test_random_refine PASSED.'
-!   else
-!      write(*,*) 'test_random_refine FAILED.'
-!   endif
-!
-!   99 continue
+   call hexa_adapt_h
+   if (NPASS.eq.1 .and. RANK.eq.ROOT) then
+      write(*,*) 'test_hexa_adapt_h PASSED.'
+   elseif (RANK.eq.ROOT) then
+      write(*,*) 'test_hexa_adapt_h FAILED.'
+   endif
 !
 !..finalize MPI environment
    call mpi_w_finalize
 !
-end program test_hexa_adapt_h
+   contains
 !
 !----------------------------------------------------------------------
 ! !> @brief Refines mesh randomly
 ! !> @date Mar 2023
 !----------------------------------------------------------------------
-   subroutine test_random_refine_aux(Per,Nitr, Npass)
+   subroutine hexa_adapt_h
 !
-      use data_structure3D
-!
-      implicit none
-!
-      real(8), intent(in)  :: Per
-      integer, intent(in)  :: Nitr
-      integer, intent(out) :: Npass
-!
-      integer :: kref_prism(3) = (/11,10,1/)
-      integer :: mdle_list(NRELES)
-!
-      integer :: i,iel,icnt,idx,kref
-      integer :: mdle,nelts,nref
+      integer :: idx,icnt,itr,ierr,kref,mdle,nel,nref
       real(8) :: x
+!
+      integer :: mdle_ref(NREF_MAX)
 !
       integer :: iprint
       iprint=0
 !
-      Npass = 1
+      NPASS = 1
 !
-      do i=1,Nitr
+      mdle_ref = 0; icnt = 0
 !
-!  .....collect all mdle
-        mdle = 0
-        do iel=1, NRELES
-          call nelcon(mdle, mdle)
-          mdle_list(iel) = mdle
-        enddo
+      if (iprint.ge.1 .and. RANK.eq.ROOT) then
+         write(*,110) ' NITR,PERC = ',NITR,PERC
+     110 format(' hexa_adapt_h: ',A,I3,',',F5.2)
+      endif
 !
-!  .....set number of refinements to be done
-        icnt = 0
-        kref = 0
-        x = 0.0
-        nref = int(NRELES*Per)
-        nelts = NRELES
+      do itr=1,NITR
 !
-        if (iprint.eq.1) then
-           write(*,7010) i, nelts, nref 
- 7010      format('test_random_refine_aux: i=',i3,' nelts=',i6,' nref=',i6)
-        endif
-
-        do while (nref.gt.0)
-
-!  .......random number generage from 0.0 to 1.0
-          call random_seed
-          call random_number(x)
-
-!  .......pick one mdle from list
-          idx  = int(nelts*x+1)
-          mdle = mdle_list(idx)
-          if (NODES(mdle)%ref_kind.eq.0) then
-            select case (NODES(mdle)%ntype)
-            case (MDLN)
-              call get_isoref(mdle, kref)
-              call refine(mdle, kref)
-            case (MDLP)
-              kref = kref_prism(mod(int(x*100),3)+1)
-              call refine(mdle, kref)
-            case default
-              write(*,*) 'test_random_refine_aux: MDLE type'
-              stop
-            end select
-            nref = nref - 1
-            if (iprint.eq.1) then
-              write(*,7000) mdle, S_Type(NODES(mdle)%ntype), kref
- 7000         format('mdle =',i6,' ', a5, 'kref=', i3)
+         nref = max(1,int(NRELES*PERC))
+         if (iprint.ge.1 .and. RANK.eq.ROOT) then
+            write(*,120) '  itr,nref = ',itr,nref
+        120 format(' hexa_adapt_h: ',A,I3,',',I5)
+         endif
+!
+         ! iterate nref times
+         nel = NRELES
+         do while (nref.gt.0)
+!
+!        ...random number generate from 0.0 to 1.0
+            if (RANK.eq.ROOT) then
+               mdle = 1
+               do while (.not.Is_leaf(mdle))
+                  call random_seed
+                  call random_number(x)
+!              ...pick one mdle from list
+                  idx  = min(int(nel*x+1),nel)
+                  mdle = ELEM_ORDER(idx)
+               enddo
             endif
-          endif
-
-!  .......loop exit condition to prevent infinite loop
-          icnt = icnt + 1
-          if (icnt.gt.(nelts*1000)) then
-            exit
-          endif
-        enddo
 !
-        if (.false.) Npass = 0
+            if (NUM_PROCS.gt.1) then
+               call MPI_BCAST(mdle,1,MPI_INTEGER,ROOT,MPI_COMM_WORLD, ierr)
+            endif
 !
+!        ...keep track of refinements
+            icnt = icnt+1
+            if (icnt.le.NREF_MAX) then
+               mdle_ref(icnt) = mdle
+            else
+               if (RANK.eq.ROOT) then
+                  write(*,130) '  itr,NITR,NREF_MAX = ',itr,NITR,NREF_MAX
+              130 format(' hexa_adapt_h: ',A,I5,',',I5,',',I5)
+               endif
+               exit
+            endif
+!
+            if (iprint.gt.1 .and. RANK.eq.ROOT) then
+               write(*,140) '       mdle = ',mdle
+           140 format(' hexa_adapt_h: ',A,I6)
+            endif
+!
+            call get_isoref(mdle, kref)
+            call refine(mdle, kref)
+!
+            nref = nref-1
+!
+!     ...end loop over nref
+         enddo
+!
+         call close_mesh
+!
+         if (DISTRIBUTED) then
+!        ...verify mesh consistency
+!           TODO: change par_verify to return flag whether it passed
+!                 (instead of ending computation with error msg)
+            call par_verify
+            if (NPASS.ne.1) then
+               ! TEST FAILS
+               if (RANK.eq.ROOT) then
+                  write(*,150) '      icnt = ',icnt
+                  do idx=1,icnt
+                     write(*,150) '  mdle_ref = ',mdle_ref(idx)
+                  enddo
+              150 format(' hexa_adapt_h: ',A,I6)
+               endif
+               return
+            endif
+!        ...repartition
+            if (itr .le. 2) call distr_mesh
+         endif
+!
+         if (icnt.gt.NREF_MAX) exit
+!
+!  ...end loop over itr
       enddo
 !
-   end subroutine test_random_refine_aux
-
+   end subroutine hexa_adapt_h
+!
+!
+end program test_hexa_adapt_h
+!
 !
 !----------------------------------------------------------------------
 !> @brief initialization
@@ -290,9 +261,9 @@ end subroutine set_initial_mesh
 !----------------------------------------------------------------------
 !> @brief dummy routine
 subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
-   zvalH = 0; zdvalH = 0
-   zvalE = 0; zdvalE = 0
-   zvalV = 0; zdvalV = 0
+   ValH = 0; DvalH = 0
+   ValE = 0; DvalE = 0
+   ValV = 0; DvalV = 0
 !
 end subroutine dirichlet
 !----------------------------------------------------------------------
