@@ -13,8 +13,12 @@ integer function isgn(I)
 !
    integer I
 !
-   if (I.eq.0) isgn=  0; return
-   if (I.gt.0) isgn=  1; return
-   if (I.lt.0) isgn= -1; return
+   if     (I.gt.0) then
+      isgn= 1
+   elseif (I.lt.0) then
+      isgn=-1
+   else
+      isgn= 0
+   endif
 !
 end function isgn
