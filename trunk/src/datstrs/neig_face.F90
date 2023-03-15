@@ -28,7 +28,7 @@
 !! @param[out] Nsid_list    - local face numbers in neighbors' local enumeration
 !! @param[out] Norient_list - orientations of the mid-face node wrt to the neighbors
 !!
-!! @revision May 12
+!! @date Mar 2023
 !-------------------------------------------------------------------------------------
 subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
   use error
@@ -42,7 +42,7 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
   integer, dimension(2), intent(out) :: Neig, Nsid_list, Norient_list
 ! ** Locals
   integer                    :: ntype
-  integer, dimension(2, 27)  :: nodesl_neig, norientl_neig
+  integer, dimension(27, 2)  :: nodesl_neig, norientl_neig
   integer, dimension(27)     :: nodesl, norientl, nodesl_is, norientl_is
   integer, dimension(MAXGEN) :: nface_list
   integer, dimension(6)      :: nface_ort
@@ -142,7 +142,7 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
      Nrneig=1 ; Neig(1)=mdle ; Nsid_list(1)=iface ; Norient_list(1)=nface_ort(iface)
 !
 ! ...nodes and orientations of "mdle"
-     call elem_nodes(mdle, nodesl_neig(1,:),norientl_neig(1,:))
+     call elem_nodes(mdle, nodesl_neig(1:27,1),norientl_neig(1:27,1))
 !
 ! ...look for a neighbor of "mdle" across face
      mdle=ELEMS(mdle)%neig(iface)
@@ -160,7 +160,7 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
         Nrneig=2 ; Neig(2)=mdle ; Nsid_list(2)=iface ; Norient_list(2)=nface_ort(iface)
 !
 !    ...nodes and orientations of neighbor of "mdle"
-        call elem_nodes(mdle, nodesl_neig(2,:),norientl_neig(2,:))
+        call elem_nodes(mdle, nodesl_neig(1:27,2),norientl_neig(1:27,2))
      endif
 !
 !..CASE 2 : internal face
@@ -186,8 +186,8 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
            Nsid_list(Nrneig)    = iface
            Norient_list(Nrneig) = norientl_is(nve+iface)
 
-           nodesl_neig(Nrneig, :)   = nodesl_is
-           norientl_neig(Nrneig, :) = norientl_is
+           nodesl_neig  (1:27, Nrneig) = nodesl_is
+           norientl_neig(1:27, Nrneig) = norientl_is
         endif
         if (Nrneig.eq.2) exit
      enddo
@@ -268,7 +268,7 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
         iflag=0
         do is=1,nrsons
            call elem_nodes_one( Neig(i), &
-                nodesl_neig(i,:), norientl_neig(i,:), is, &
+                nodesl_neig(1:27,i), norientl_neig(1:27,i), is, &
                 mdle_is, nodesl_is, norientl_is )
            ntype = NODES(mdle_is)%ntype
            nve = nvert(ntype)+nedge(ntype)
@@ -279,11 +279,11 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
            if (iface.gt.0) then
               iflag=1
               !  ...update Neig
-              Neig(i)           =mdle_is
-              Nsid_list(i)      =iface
-              Norient_list(i)   =norientl_is(nve+iface)
-              nodesl_neig(i,:)  =nodesl_is
-              norientl_neig(i,:)=norientl_is
+              Neig        (i)       = mdle_is
+              Nsid_list   (i)       = iface
+              Norient_list(i)       = norientl_is(nve+iface)
+              nodesl_neig  (1:27,i) = nodesl_is
+              norientl_neig(1:27,i) = norientl_is
 !
 #if DEBUG_MODE
               if (iprint.eq.1) then
