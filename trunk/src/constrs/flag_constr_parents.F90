@@ -39,8 +39,6 @@
 !
 !----------------------------------------------------------------------
 !
-      iprint = 0
-!
       ntype = NODES(Mdle)%ntype
 !
 !  ...number of (local) nodes for the element (- middle node)
