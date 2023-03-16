@@ -12,6 +12,7 @@ program test_cross_product
    real(8) :: fg
 !
    real(8) :: VEC(3)
+   real(8) :: sVEC(1)
    real(8) :: val
 !
 #if C_MODE
@@ -80,9 +81,9 @@ program test_cross_product
       if (.not. dnear(VEC(i),AB(i))) NPASS = 0
    enddo
 !
-   call cross(2,F,G, val)
+   call cross(2,F,G, sVec)
 !
-   if (.not. dnear(val,fg)) NPASS = 0
+   if (.not. dnear(sVec(1),fg)) NPASS = 0
 !
 !
    if (NPASS .ne. 1) then
