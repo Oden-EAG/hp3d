@@ -14,6 +14,8 @@
 !
 module bitvisit
 !
+   implicit none
+!
 !..number of integers required to store all visitation
    integer :: nword
 !
