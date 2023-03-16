@@ -85,7 +85,7 @@ subroutine elem_nodes_one(Nfath,Nodesl_fath,Norientl_fath,Ison, &
 !
       else
          nodp = Nodesl_fath(jp)
-         select case (Type_nod(ntype_fath,jp))
+         select case (TYPE_NOD(jp,ntype_fath))
          case (MEDG)
             call rotate_edge(Norientl_fath(jp),is,nort)
             Nodesl(j) = Son(nodp,is)
