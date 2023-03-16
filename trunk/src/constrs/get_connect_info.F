@@ -4,7 +4,7 @@ c   routine name       - get_connect_info
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Jul 10
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine returns element to nodes connectivities
 c                        for an element, including info on constrained
@@ -24,8 +24,7 @@ c
 c
       use element_data
       use data_structure3D
-      use refinements, only : decode_ref, npar_ref, nson_ref,
-     .    nort_ref, rotate_edge, rotate_trian, rotate_quad, elem_show
+      use refinements
       use constrained_nodes, only: INFO_CONSTRAINTS,NODES_CONSTR,
      .     NR_EDGES,NEDGC,NEDG_CONS,NR_FACES,NFACEC,NFACE_CONS,
      .     SON_NUM,FATH_TYPE,FATH_ORIENT,FATH_NODES,
@@ -33,10 +32,12 @@ c
 #include "syscom.blk"
 c
       dimension Nodesl(27),Norientl(27)
+      integer :: npar_refs(27),nson_refs(27),nort_refs(27)
 c
 c  ...face edge and vertex numbers etc
-      integer :: ntype,ftype,stype
+      integer :: ntype,ftype
       integer :: if, ireff, is1, jef(4), jvf(4), kref_face(6)
+      integer :: nrnodes
 c
 c  ...initialize variables like this or OpenMP will not work!
       ireff=0; is1=0;
@@ -74,21 +75,28 @@ c  ...quit if an initial mesh element
 c
       nson = SON_NUM
       ftype = FATH_TYPE
-      stype = NODES(Mdle)%ntype
+      ntype = NODES(Mdle)%ntype
       iref_fath = NODES(nfath)%ref_kind
       call find_face_ref_flags(ftype,iref_fath, kref_face)
-      call decode_ref(ftype, iref_fath, iref1, iref2, iref3)
+      call decode_ref(ftype,iref_fath, iref1,iref2,iref3)
 c
 c  ...number of vertices and edges for the father
       nvf = nvert(ftype); nef = nedge(ftype); nff = nface(ftype)
 c
+c  ...pre-compute info for loop
+      call npar_ref_all(ftype,nson,iref1,iref2,iref3, npar_refs)
+      call nson_ref_all(ftype,nson,iref1,iref2,iref3, nson_refs)
+      call nort_ref_all(ftype,nson,iref1,iref2,iref3, nort_refs)
+c
 c  ...loop through nodes of the element son
-      do j=1,nvert(stype)+nedge(stype)+nface(stype)+1
+      nrnodes = nvert(ntype)+nedge(ntype)+nface(ntype)+1
+      do j=1,nrnodes
 c
 c  .....parent node
-        jp   = npar_ref(ftype, j, nson, iref1,iref2,iref3)
-        is   = nson_ref(ftype, j, nson, iref1,iref2,iref3)
-        nort = nort_ref(ftype, j, nson, iref1,iref2,iref3)
+        jp   = npar_refs(j)
+        is   = nson_refs(j)
+        nort = nort_refs(j)
+c
         if (is.ne.0) then
           nodp = FATH_NODES(jp)
 c
@@ -251,9 +259,7 @@ c
       if (iprint.eq.1) then
         write(*,7011) Mdle
  7011   format('get_connect_info: CONSTRAINED NODES FOR Mdle = ',i6)
-        ntype = NODES(Mdle)%ntype
-        nrn = nvert(ntype)+nedge(ntype)+nface(ntype)+1
-        write(*,7012) NODES_CONSTR(1:nrn)
+        write(*,7012) NODES_CONSTR(1:nrnodes)
  7012   format(27i5)
         write(*,7013)
  7013   format('                  CONSTRAINING EDGES = ')
