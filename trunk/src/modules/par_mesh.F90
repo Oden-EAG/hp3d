@@ -14,6 +14,7 @@
 module par_mesh
 !
    use data_structure3D
+   use environment,    only: QUIET_MODE
    use parameters,     only: NRCOMS
    use mpi_param,      only: RANK,ROOT,NUM_PROCS
    use MPI,            only: MPI_COMM_WORLD,MPI_STATUS_IGNORE, &

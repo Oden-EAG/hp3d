@@ -15,6 +15,7 @@ subroutine close_mesh()
    use error
    use refinements
    use data_structure3D
+   use environment, only: QUIET_MODE
    use mpi_param  , only: ROOT,RANK
    use MPI        , only: MPI_COMM_WORLD
 !
