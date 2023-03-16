@@ -76,8 +76,8 @@ subroutine distr_mesh()
       call zoltan_w_partition(subd_next)
    endif
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
-   if(RANK .eq. ROOT) write(*,110) end_time - start_time
-   110 format(' partition time: ',f12.5,' seconds')
+   if(.not.QUIET_MODE .and. RANK.eq.ROOT) write(*,110) end_time - start_time
+   110 format(' partition  : ',f12.5,'  seconds')
 !
 !..2. Reset visit flags for all nodes to 0
    call reset_visit
@@ -145,8 +145,8 @@ subroutine distr_mesh()
       enddo
    enddo
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
-   if(RANK .eq. ROOT) write(*,120) end_time - start_time
-   120 format(' migration time: ',f12.5,' seconds')
+   if(.not.QUIET_MODE .and. RANK.eq.ROOT) write(*,120) end_time - start_time
+   120 format(' migration  : ',f12.5,'  seconds')
    130 format(A,I2,A,A,I4,A,I6)
 !
    50 continue
