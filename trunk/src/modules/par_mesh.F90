@@ -48,7 +48,7 @@ subroutine distr_mesh()
 !..auxiliary variables
    integer :: subd_next(NRELES), nodm(MAXNODM), nodesl(27)
    integer :: iel, inod, iproc, mdle, nod, subd, subd_size
-   integer :: nrnodm, nrdof_nod, proc, el
+   integer :: nrnodm, nrdof_nod
    integer :: iprint = 0
 !
    real(8) :: MPI_Wtime,start_time,end_time
