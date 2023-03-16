@@ -36,9 +36,20 @@ subroutine global_href
       write(*,200) ' # of current elements, nodes = ', NRELES, NRNODS
       write(*,300) end_time-start_time
    endif
+!
+!..ensure that DOFs are allocated correctly within subdomains
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+   call distr_refresh
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+!
+   if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
+      write(*,400) end_time-start_time
+   endif
+!
  100 format(A,I8)
  200 format(A,I8,', ',I9)
  300 format(' refresh    : ',f12.5,'  seconds')
+ 400 format(' distr_refr : ',f12.5,'  seconds')
 !
 end subroutine global_href
 !
@@ -100,9 +111,20 @@ subroutine global_href_aniso(Krefxy,Krefz)
       write(*,200) ' # of current elements, nodes = ', NRELES, NRNODS
       write(*,300) end_time-start_time
    endif
+!
+!..ensure that DOFs are allocated correctly within subdomains
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+   call distr_refresh
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+!
+   if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
+      write(*,400) end_time-start_time
+   endif
+!
  100 format(A,I8)
  200 format(A,I8,', ',I9)
  300 format(' refresh    : ',f12.5,'  seconds')
+ 400 format(' distr_refr : ',f12.5,'  seconds')
 !
 end subroutine global_href_aniso
 
@@ -162,8 +184,19 @@ subroutine global_href_aniso_bric(Krefx,Krefy,Krefz)
       write(*,200) ' # of current elements, nodes = ', NRELES, NRNODS
       write(*,300) end_time-start_time
    endif
+!
+!..ensure that DOFs are allocated correctly within subdomains
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+   call distr_refresh
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+!
+   if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
+      write(*,400) end_time-start_time
+   endif
+!
  100 format(A,I8)
  200 format(A,I8,', ',I9)
  300 format(' refresh    : ',f12.5,'  seconds')
+ 400 format(' distr_refr : ',f12.5,'  seconds')
 !
 end subroutine global_href_aniso_bric

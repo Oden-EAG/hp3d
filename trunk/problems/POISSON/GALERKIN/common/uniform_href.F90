@@ -253,6 +253,7 @@ subroutine href_solve()
             !call zoltan_w_set_lb(ZOLTAN_LB_BLOCK)
             !call distr_mesh
             !call print_partition
+            !call petsc_solve('G')
             call par_mumps_sc('G')
          else
             call mumps_sc('G')

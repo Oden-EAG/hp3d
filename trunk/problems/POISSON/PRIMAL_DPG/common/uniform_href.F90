@@ -238,9 +238,9 @@ subroutine href_solve()
 !
 !..initial solve
    if (DISTRIBUTED .and. (.not. HOST_MESH)) then
-      call par_mumps_sc('G')
+      call par_mumps_sc('H')
    else
-      call mumps_sc('G')
+      call mumps_sc('H')
    endif
 !
 !..do refinements and solve
@@ -253,9 +253,10 @@ subroutine href_solve()
             !call zoltan_w_set_lb(ZOLTAN_LB_BLOCK)
             !call distr_mesh
             !call print_partition
-            call par_mumps_sc('G')
+            !call petsc_solve('P')
+            call par_mumps_sc('H')
          else
-            call mumps_sc('G')
+            call mumps_sc('H')
          endif
       else
 !     ...Last step only display (no refinement)
