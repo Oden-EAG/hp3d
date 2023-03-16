@@ -251,13 +251,13 @@ module sorts
 
 
 !> Purpose - partitions triplet array around a pivot
+!! @param[in]    ip    - first index of current partition
+!! @param[in]    jp    - last index of current partition
+!! @param[in]    n     - list of integers to sort
+!! @param[out]   k     - pivot
 !! @param[inout] ia    - integer array (row indices)
 !! @param[inout] ja    - integer array (colun indices)
 !! @param[inout] xa    - array of values
-!! @param[out]   k     - pivot
-!! @param[in]    n     - list of integers to sort
-!! @param[in]    first - first index of current partition (1 on initial call)
-!! @param[in]    last  - last index of current partition (N on initial call)
    recursive subroutine partition_triplet_omp(ip,jp,n,k,ia,ja,xa)
 !
       implicit none
