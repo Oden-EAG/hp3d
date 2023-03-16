@@ -32,9 +32,9 @@ c
       k=0
       do i=1,nedge(Ntype)+nface(Ntype)+1
         j=nvert(Ntype)+i
-        call ndof_nod(type_nod(Ntype,j),Norder(i),
+        call ndof_nod(TYPE_NOD(j,Ntype),Norder(i),
      .                ndofH,ndofE,ndofV,ndofQ)
-        write(*,7001) j,S_Type(type_nod(Ntype,j)), Norder(i), ndofE
+        write(*,7001) j,S_Type(TYPE_NOD(j,Ntype)), Norder(i), ndofE
  7001   format('NODE = ',i2,' TYPE = ',a4,' NORD = ',i2, ' NDOF = ',i3)
 
         do j=1,ndofE
@@ -80,7 +80,7 @@ c
 c
       k=0
       do i=1,nvert(Ntype)
-        write(*,7001) i, S_Type(type_nod(Ntype,i)), 0, ndofH
+        write(*,7001) i, S_Type(TYPE_NOD(i,Ntype)), 0, ndofH
         do j=1,ndofH
           k=k+1
           write(*,7002) k, ShapH(k), DshapH(1:3,k)
@@ -89,9 +89,9 @@ c
 
       do i=1,nedge(Ntype)+nface(Ntype)+1
         j=nvert(Ntype)+i
-        call ndof_nod(type_nod(Ntype,j),Norder(i),
+        call ndof_nod(TYPE_NOD(j,Ntype),Norder(i),
      .                ndofH,ndofE,ndofV,ndofQ)
-        write(*,7001) j, S_Type(type_nod(Ntype,j)), Norder(i), ndofH
+        write(*,7001) j, S_Type(TYPE_NOD(j,Ntype)), Norder(i), ndofH
  7001   format('NODE = ',i2,' TYPE = ',a4,' NORD = ',i2, ' NDOF = ',i3)
 
         do j=1,ndofH

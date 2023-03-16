@@ -45,6 +45,33 @@ module node_types
             6,   4,   5,   5,   0,   0,   0,   0 /)
 !     (/ BRIC,TETR,PRIS,PYRA,QUAD,TRIA,RECT,SEGM )
 !
+!  ...node types for each element type
+      integer, parameter, dimension(27,4) :: TYPE_NOD = reshape(  &
+      ! MDLB: 8 VERT, 12 MEDG, 6 MDLQ, 1 MDLB (27 nodes)
+      (/ VERT,VERT, VERT,VERT, VERT,VERT, VERT,VERT,                       &
+         MEDG,MEDG, MEDG,MEDG, MEDG,MEDG, MEDG,MEDG, MEDG,MEDG, MEDG,MEDG, &
+         MDLQ,MDLQ, MDLQ,MDLQ, MDLQ,MDLQ,                                  &
+         MDLB,                                                             &
+      ! MDLN: 4 VERT, 6 MEDG, 4 MDLT, 1 MDLN (15 nodes)
+         VERT,VERT, VERT,VERT,                                             &
+         MEDG,MEDG, MEDG,MEDG, MEDG,MEDG,                                  &
+         MDLT,MDLT, MDLT,MDLT,                                             &
+         MDLN,                                                             &
+         0,0,0, 0,0,0, 0,0,0, 0,0,0,                                       &
+      ! MDLP: 6 VERT, 9 MEDG, 2 MDLT, 3 MDLQ, 1 MDLP (21 nodes)
+         VERT,VERT, VERT,VERT, VERT,VERT,                                  &
+         MEDG,MEDG, MEDG,MEDG, MEDG,MEDG, MEDG,MEDG, MEDG,                 &
+         MDLT,MDLT, MDLQ,MDLQ, MDLQ,                                       &
+         MDLP,                                                             &
+         0,0,0, 0,0,0,                                                     &
+      ! MDLD: 5 VERT, 8 MEDG, 1 MDLQ, 4 MDLT, 1 MDLD (19 nodes)
+         VERT,VERT, VERT,VERT, VERT,                                       &
+         MEDG,MEDG, MEDG,MEDG, MEDG,MEDG, MEDG,MEDG,                       &
+         MDLQ,      MDLT,MDLT, MDLT,MDLT,                                  &
+         MDLD,                                                             &
+         0,0,0, 0,0,0, 0,0                                                 &
+      /),(/27,4/))
+!
    contains
 !
 !-----------------------------------------------------------------------

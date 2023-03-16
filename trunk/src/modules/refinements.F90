@@ -4,18 +4,18 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - Feb 2023
+!   latest revision    - Mar 2023
 !
-!   purpose            - module defines an information necessary
-!                        to reconstruct element to nodes connectivities
+!   purpose            - module defines information necessary to
+!                        reconstruct element-to-nodes connectivities
 !
 !----------------------------------------------------------------------
 !
 module refinements
   use node_types
   implicit none
-!  save
-  !     nod / nson / iref1/ iref 2 ...
+
+  !     nod / nson / iref1 / iref2 / ...
   integer, dimension(1:21,1:8,1:3,1:6)    :: TETRA_PAR,TETRA_SON,TETRA_ORT
   integer, dimension(1:21,1:8,0:1,0:1)    :: PRISM_PAR,PRISM_SON,PRISM_ORT
   integer, dimension(1:21,1:4,0:1,0:1)    :: PYRAM_PAR,PYRAM_SON,PYRAM_ORT
@@ -26,13 +26,11 @@ module refinements
   ! Even dummy arguments should be avoided
   !integer, dimension(1:13), parameter :: TETRA_REF = &
   !     (/11,12,13, 21,22,23,24,25,26, 31,32,33,34/)
-  integer, dimension(1:5), parameter :: TETRA_REF = &
-       (/11,12,13, 24,32/)
-  integer, dimension(1:3),  parameter :: PRISM_REF = (/11,10,01/)
-  !integer, dimension(1:2),  parameter :: PYRAM_REF = (/10,01/)
-  integer, dimension(1:1),  parameter :: PYRAM_REF = (/10/)
-  integer, dimension(1:7),  parameter :: BRICK_REF = &
-       (/111,110,101,011,100,010,001/)
+  integer, parameter :: TETRA_REF(5) = (/11,12,13, 24,32/)
+  integer, parameter :: PRISM_REF(3) = (/11,10,01/)
+  !integer, parameter :: PYRAM_REF(2) = (/10,01/)
+  integer, parameter :: PYRAM_REF(1) = (/10/)
+  integer, parameter :: BRICK_REF(7) = (/111,110,101,011,100,010,001/)
   !
   logical :: ISO_ONLY = .FALSE.
   !
@@ -221,6 +219,25 @@ contains
   end function npar_ref
 !
 !-----------------------------------------------------------------------
+!< @date Mar 2023
+  subroutine npar_ref_all(Ntype,Nson,Iref1,Iref2,Iref3, Npar_refs)
+    integer, intent(in)  :: Ntype,Nson,Iref1,Iref2,Iref3
+    integer, intent(out) :: Npar_refs(27)
+    !
+    Npar_refs(1:27) = 0
+    select case(Ntype)
+      case(MDLB); Npar_refs(1:27) = BRICK_PAR(1:27,Nson,Iref1,Iref2,Iref3)
+      case(MDLN); Npar_refs(1:21) = TETRA_PAR(1:21,Nson,Iref1,Iref2)
+      case(MDLP); Npar_refs(1:21) = PRISM_PAR(1:21,Nson,Iref1,Iref2)
+      case(MDLD); Npar_refs(1:21) = PYRAM_PAR(1:21,Nson,Iref1,Iref2)
+      case default
+        write(*,*) 'npar_ref_all: Ntype = ',Ntype
+        stop
+    end select
+    !
+  end subroutine npar_ref_all
+!
+!-----------------------------------------------------------------------
   integer function nson_ref(Ntype,J,Nson,Iref1,Iref2,Iref3)
     integer, intent(in) :: Ntype,J,Nson,Iref1,Iref2,Iref3
     !
@@ -234,6 +251,25 @@ contains
     end select
     !
   end function nson_ref
+!
+!-----------------------------------------------------------------------
+!< @date Mar 2023
+  subroutine nson_ref_all(Ntype,Nson,Iref1,Iref2,Iref3, Nson_refs)
+    integer, intent(in)  :: Ntype,Nson,Iref1,Iref2,Iref3
+    integer, intent(out) :: Nson_refs(27)
+    !
+    Nson_refs(1:27) = 0
+    select case(Ntype)
+      case(MDLB); Nson_refs(1:27) = BRICK_SON(1:27,Nson,Iref1,Iref2,Iref3)
+      case(MDLN); Nson_refs(1:21) = TETRA_SON(1:21,Nson,Iref1,Iref2)
+      case(MDLP); Nson_refs(1:21) = PRISM_SON(1:21,Nson,Iref1,Iref2)
+      case(MDLD); Nson_refs(1:21) = PYRAM_SON(1:21,Nson,Iref1,Iref2)
+      case default
+        write(*,*) 'nson_ref_all: Ntype = ',Ntype
+        stop
+    end select
+    !
+  end subroutine nson_ref_all
 !
 !-----------------------------------------------------------------------
   integer function nort_ref(Ntype, J, Nson, Iref1, Iref2, Iref3)
@@ -250,6 +286,25 @@ contains
     end select
     !
   end function nort_ref
+!
+!-----------------------------------------------------------------------
+!< @date Mar 2023
+  subroutine nort_ref_all(Ntype,Nson,Iref1,Iref2,Iref3, Nort_refs)
+    integer, intent(in)  :: Ntype,Nson,Iref1,Iref2,Iref3
+    integer, intent(out) :: Nort_refs(27)
+    !
+    Nort_refs(1:27) = 0
+    select case(Ntype)
+      case(MDLB); Nort_refs(1:27) = BRICK_ORT(1:27,Nson,Iref1,Iref2,Iref3)
+      case(MDLN); Nort_refs(1:21) = TETRA_ORT(1:21,Nson,Iref1,Iref2)
+      case(MDLP); Nort_refs(1:21) = PRISM_ORT(1:21,Nson,Iref1,Iref2)
+      case(MDLD); Nort_refs(1:21) = PYRAM_ORT(1:21,Nson,Iref1,Iref2)
+      case default
+        write(*,*) 'nort_ref_all: Ntype = ',Ntype
+        stop
+    end select
+    !
+  end subroutine nort_ref_all
 !
 !-----------------------------------------------------------------------
 !> @brief return number of mid-face sons of a mid-face node
