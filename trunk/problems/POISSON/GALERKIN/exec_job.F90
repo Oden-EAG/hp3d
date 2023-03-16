@@ -105,9 +105,8 @@ subroutine exec_job
       call MPI_BARRIER (MPI_COMM_WORLD, ierr)
       if(RANK .eq. ROOT) write(*,200) '6. calling PETSc (MPI) solver...'
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-      !call par_mumps_sc('G')
-      !call par_nested('G')
-      call petsc_solve('G')
+      !call petsc_solve('G')
+      call par_mumps_sc('G')
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
       if(RANK .eq. ROOT) write(*,300) end_time - start_time
 !

@@ -15,6 +15,7 @@ subroutine close_mesh()
    use error
    use refinements
    use data_structure3D
+   use environment, only: QUIET_MODE
    use mpi_param  , only: ROOT,RANK
    use MPI        , only: MPI_COMM_WORLD
 !
@@ -32,8 +33,8 @@ subroutine close_mesh()
    integer :: ierr
 !
 #if DEBUG_MODE
-   integer :: nre, nrf
-   integer :: iprint = 0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !-----------------------------------------------------------------------------
@@ -127,8 +128,6 @@ subroutine close_mesh()
 #if DEBUG_MODE
             if ((RANK.eq.ROOT) .and. (iprint.eq.1)) then
                !$OMP CRITICAL
-               nre = nedge(NODES(mdle)%ntype)
-               nrf = nface(NODES(mdle)%ntype)
                write(*,*) 'close_mesh: mdle = ', mdle
                write(*,7003) krefe(1:12)
    7003        format('krefe = ',12i2)
@@ -201,10 +200,19 @@ subroutine close_mesh()
    enddo
 !
    if (allocated(list)) deallocate(list)
-
+!
+!..ensure that DOFs are allocated correctly within subdomains
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+   call distr_refresh
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+   if (.not.QUIET_MODE .and. RANK.eq.ROOT) then
+      write(*,2030) end_time-start_time
+ 2030 format(' distr_refr : ',f12.5,'  seconds')
+   endif
+!
 #if DEBUG_MODE
    call par_verify
-#endif   
+#endif
 !
 !
 end subroutine close_mesh
