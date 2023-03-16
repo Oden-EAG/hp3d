@@ -19,6 +19,7 @@ SRC_FILE     = cross_product.F90         \
                encodg_decodg.F90         \
                fact.F90                  \
                hexa_adapt_h_aniso.F90    \
+               hexa_adapt_h_case1.F90    \
                hexa_adapt_h_iso.F90      \
                invert.F90                \
                isgn.F90                  \
@@ -47,6 +48,7 @@ TEST_SEQ = cross_product             \
            parameters                \
            real_imag
 TEST_PAR = hexa_adapt_h_aniso        \
+           hexa_adapt_h_case1        \
            hexa_adapt_h_iso
 
 # Includes and defs
