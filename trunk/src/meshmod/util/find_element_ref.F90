@@ -53,7 +53,7 @@ subroutine find_element_ref(Ntype,Kref,Kreff, Krefm)
      isum = 0
      do iface=1,nface(Ntype)
         j = nvert(Ntype) + nedge(Ntype) + iface
-        call check_ref(Type_nod(Ntype,j), Kreff(iface), &
+        call check_ref(TYPE_NOD(j,Ntype), Kreff(iface), &
                        kreff_trial(iface), ipass)
         isum = isum + ipass
      enddo

@@ -21,10 +21,13 @@ module petsc_w_ksp
 !
    implicit none
 !
-   KSP petsc_ksp
-   Mat petsc_A
-   Vec petsc_rhs
-   Vec petsc_sol
+   KSP     petsc_ksp
+   KSPType petsc_ksp_type
+   PC      petsc_pc
+   PCType  petsc_pc_type
+   Mat     petsc_A
+   Vec     petsc_rhs
+   Vec     petsc_sol
 !
    contains
 !
@@ -34,6 +37,7 @@ subroutine petsc_ksp_start
   PetscErrorCode ierr
   call PetscInitialize(PETSC_NULL_CHARACTER, ierr); CHKERRQ(ierr)
   call KSPCreate(MPI_COMM_WORLD, petsc_ksp,ierr); CHKERRQ(ierr)
+  petsc_pc_type=""
 end subroutine petsc_ksp_start
 !
 ! -----------------------------------------------------------------------

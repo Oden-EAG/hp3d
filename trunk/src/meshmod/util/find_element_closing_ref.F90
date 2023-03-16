@@ -45,8 +45,8 @@ subroutine find_element_closing_ref(Ntype,Kreff,Krefe, Kref)
      !~~~~~~~~~~~~~~~~~~~~~
      do i=1,nface(Ntype)
         j = nvert(Ntype) + nedge(Ntype) + i
-        call check_ref(Type_nod(Ntype, j), &
-                            Kreff(i),kreff_trial(i), ipass)
+        call check_ref(TYPE_NOD(j,Ntype), &
+                       Kreff(i),kreff_trial(i), ipass)
         isum = isum + ipass
      enddo
 
