@@ -11,9 +11,11 @@
 !----------------------------------------------------------------------
 !
 module sorts
-
-   CONTAINS
-
+!
+   implicit none
+!
+   contains
+!
 !> Purpose - permute index such that Array(Index) is ascending
 !! @param[in]   n     - size of Array
 !! @param[in]   Array - list of integers to sort
