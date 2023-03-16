@@ -7,7 +7,7 @@
 !   latest revision    - Feb 2023
 !
 !   purpose            - routine decodes an integer into a sequence
-!                        of digits
+!                        of digits from right to left
 !
 !   arguments :
 !     in:

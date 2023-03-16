@@ -7,7 +7,7 @@
 !   latest revision    - Feb 2023
 !
 !   purpose            - routine encodes a sequence of digits
-!                        into a nickname
+!                        into a nickname from right to left
 !
 !   arguments :
 !     in:
