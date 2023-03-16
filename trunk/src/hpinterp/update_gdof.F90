@@ -907,6 +907,16 @@ subroutine update_gdof_par
  6010 format('update_gdof: [',I4,'] ',A,' nod=',I6,', type=',A)
    enddo
 !
+   if (nod_flg) then
+      do i=1,j_loc
+         nod = nod_glb(j_off+i)
+!     ...reset visitation flag if node was not supplied
+         if (NODES(nod)%visit.eq.-1) then
+            NODES(nod)%visit = 0
+         endif
+      enddo
+   endif
+!
    deallocate(nod_rnk,nod_glb)
 !
 !..wait for non-blocking send/recv to finish (use MPI_ISEND/MPI_IRECV)
