@@ -129,8 +129,7 @@ end subroutine refresh
 !          Without this fix, DOFs were also stored unnecessarily for
 !          some active nodes outside of the subdomain.
 !
-!  An example where an edge was marked incorrectly:
-!  (the same issue can happen for a face node)
+!  An example where face sons were marked incorrectly:
 !
 !      The unconstrained, active       In href, face0's kref already
 !      face0 is marked by subd 0       coincides with the desired href
