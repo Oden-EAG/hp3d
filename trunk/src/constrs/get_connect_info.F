@@ -155,7 +155,7 @@ c  .........face edge and vertex nodes numbers
  7100         format('get_connect_info: j,jp,if,iref,ireff = ',5i4)
             endif
 c
-            select case(type_nod(ftype,jp))
+            select case(TYPE_NOD(jp,ftype))
 c
 c  .........triangular parent face
             case(MDLT)

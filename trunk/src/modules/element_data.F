@@ -340,52 +340,6 @@ c
 c
 c----------------------------------------------------------------------
 c
-      function Type_nod(Ntype,J)
-c
-      integer :: Type_nod
-      integer :: Ntype,J
-c
-      select case(Ntype)
-      case (MDLN)
-        select case(J)
-          case (1,2,3,4);       Type_nod = VERT
-          case (5,6,7, 8,9,10); Type_nod = MEDG
-          case (11,12,13,14);   Type_nod = MDLT
-          case (15);            Type_nod = MDLN
-        end select
-      case (MDLP)
-        select case(J)
-          case (1,2,3, 4,5,6);              Type_nod = VERT
-          case (7,8,9, 10,11,12, 13,14,15); Type_nod = MEDG
-          case (16,17);                     Type_nod = MDLT
-          case (18,19,20);                  Type_nod = MDLQ
-          case (21);                        Type_nod = MDLP
-        end select
-      case (MDLB)
-        select case(J)
-          case (1,2,3,4, 5,6,7,8);          Type_nod = VERT
-          case (9,10,11,12, 13,14,15,16, 17,18,19,20)
-                                            Type_nod = MEDG
-          case (21,22,23,24,25,26);         Type_nod = MDLQ
-          case (27);                        Type_nod = MDLB
-        end select
-      case (MDLD)
-        select case(J)
-          case (1,2,3,4,5);            Type_nod = VERT
-          case (6,7,8,9, 10,11,12,13); Type_nod = MEDG
-          case (14);                   Type_nod = MDLQ
-          case (15,16,17,18);          Type_nod = MDLT
-          case (19);                   Type_nod = MDLD
-        end select
-      case default
-        write(*,*) 'Type_nod: wrong input type [',S_Type(Ntype),']'
-        stop 1
-      end select
-c
-      end function Type_nod
-c
-c----------------------------------------------------------------------
-c
 c  ...return vertex numbers endpoints of an edge......
       subroutine edge_to_vert(Ntype,Ie, Nv1,Nv2)
 c
