@@ -10,9 +10,9 @@ HP3D makefile targets:
   make clean
     Clean object and library files
   make check
-    Compile and run one test problem (TODO)
+    Compile and run one test problem
   make test
-    Compile and run test suite (TODO)
+    Compile and run test suite
   make problems
     Compile examples in problems directory
   make all

@@ -14,6 +14,7 @@ invert.F90
 isgn.F90
 locate_char.F90
 locate.F90
+near.F90
 pause.F90
 real_imag.F90
 sort.F90
