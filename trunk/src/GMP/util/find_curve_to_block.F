@@ -80,7 +80,7 @@ c  .......loop through blocks adjacent to the rectangle
             if (num.eq.0) then
               Nrbl=Nrbl+1
               if (Nrbl.gt.Maxbl) then
-                write(*,7001)
+                write(*,7010)
                 stop 1
               endif
               Neigbl(Nrbl) = RECTANGLES(nf)%BlockNo(is)
