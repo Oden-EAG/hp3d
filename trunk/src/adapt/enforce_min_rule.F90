@@ -16,9 +16,9 @@
    use data_structure3D
    use refinements
    use constrained_nodes
-   use mpi_param,   only: ROOT,RANK
-   use MPI,         only: MPI_COMM_WORLD,MPI_COMM_WORLD,MPI_INTEGER, &
-                          MPI_MAX,MPI_IN_PLACE
+   use mpi_param,   only: ROOT, RANK
+   use MPI,         only: MPI_COMM_WORLD, MPI_INTEGER, MPI_MAX, &
+                          MPI_IN_PLACE
    use par_mesh,    only: DISTRIBUTED
    use bitvisit
 !
