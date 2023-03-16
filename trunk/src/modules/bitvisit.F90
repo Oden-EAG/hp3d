@@ -5,7 +5,7 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - Sept 2018
+!   latest revision    - Mar 2023
 !
 !   purpose            - Stores visitation flag in an array (bitpacked
 !                        or not), simplifies reducing visitation
