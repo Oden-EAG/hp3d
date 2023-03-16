@@ -23,6 +23,8 @@ subroutine elem_nodes_one(Nfath,Nodesl_fath,Norientl_fath,Ison, &
    integer, intent(out) :: Nod
    integer, intent(out) :: Nodesl(27),Norientl(27)
 !
+   integer :: npar_refs(27),nson_refs(27),nort_refs(27)
+!
    integer :: ntype_fath,ntype_cur,nref_fath
    integer :: nvert_fath,nedge_fath
 !
@@ -64,12 +66,17 @@ subroutine elem_nodes_one(Nfath,Nodesl_fath,Norientl_fath,Ison, &
    call find_face_ref_flags(ntype_fath,nref_fath, kref_face)
    call decode_ref(ntype_fath,nref_fath, iref1,iref2,iref3)
 !
+!..pre-compute info for loop
+   call npar_ref_all(ntype_fath,Ison,iref1,iref2,iref3, npar_refs)
+   call nson_ref_all(ntype_fath,Ison,iref1,iref2,iref3, nson_refs)
+   call nort_ref_all(ntype_fath,Ison,iref1,iref2,iref3, nort_refs)
+!
    n_nodes = nvert(ntype_cur)+nedge(ntype_cur)+nface(ntype_cur)+1
    do j=1,n_nodes
 !
-      jp   = npar_ref(ntype_fath,j,Ison,iref1,iref2,iref3)
-      is   = nson_ref(ntype_fath,j,Ison,iref1,iref2,iref3)
-      nort = nort_ref(ntype_fath,j,Ison,iref1,iref2,iref3)
+      jp   = npar_refs(j)
+      is   = nson_refs(j)
+      nort = nort_refs(j)
 !
       if (is.eq.0) then
 !
@@ -79,7 +86,7 @@ subroutine elem_nodes_one(Nfath,Nodesl_fath,Norientl_fath,Ison, &
 !
       else
          nodp = Nodesl_fath(jp)
-         select case (Type_nod(ntype_fath,jp))
+         select case (TYPE_NOD(jp,ntype_fath))
          case (MEDG)
             call rotate_edge(Norientl_fath(jp),is,nort)
             Nodesl(j) = Son(nodp,is)
