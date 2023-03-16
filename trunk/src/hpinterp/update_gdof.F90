@@ -517,12 +517,7 @@ subroutine update_gdof_par
    call MPI_BARRIER(MPI_COMM_WORLD, ierr)
    start_time = MPI_Wtime()
 !
-!$OMP PARALLEL DO
-!..lower the GMP interface flag for all nodes
-   do nod=1,NRNODS
-      NODES(nod)%geom_interf=0
-   enddo
-!$OMP END PARALLEL DO
+   call reset_visit
 !
 !-----------------------------------------------------------------------
 !
@@ -540,10 +535,10 @@ subroutine update_gdof_par
 !
 ! Get nodes for each element in subd
 !
-!$omp parallel default(shared)
-!$omp do private(iel,mdle,nodesl,norientl,nodm,nrnodm,   &
-!$omp            nr_elem_nodes,loc,nod,i,j,ntype)        &
-!$omp    schedule(static) reduction(+:nr_up_elem)
+!$OMP PARALLEL DEFAULT(SHARED)
+!$OMP DO PRIVATE(iel,mdle,nodesl,norientl,nodm,nrnodm,   &
+!$OMP            nr_elem_nodes,loc,nod,i,j,ntype)        &
+!$OMP    SCHEDULE(STATIC) REDUCTION(+:nr_up_elem)
 !..loop through active elements
    do iel=1,NRELES_SUBD
 !
@@ -580,8 +575,8 @@ subroutine update_gdof_par
       enddo
       nrnodes_irreg(iel) = j
    enddo
-!$omp end do
-!$omp end parallel
+!$OMP END DO
+!$OMP END PARALLEL
 !
  10 continue
 !
@@ -594,11 +589,11 @@ subroutine update_gdof_par
 !  ...set flag that indicates if an element was skipped
       nod_flg = .false.
 !
-!$omp parallel default(shared)
-!$omp do private(iel,mdle,iflag,no,xsub,nrnodi,nodesi,nodesl,sz, &
-!$omp            nr_elem_nodes,nface_orient,iv,ie,ifc,nod,coord, &
-!$omp            ntype,norder,ind,mdltype,nedge_orient,xnod)     &
-!$omp    schedule(dynamic) reduction(+:nr_up_elem)
+!$OMP PARALLEL DEFAULT(SHARED)
+!$OMP DO PRIVATE(iel,mdle,iflag,no,xsub,nrnodi,nodesi,nodesl,sz, &
+!$OMP            nr_elem_nodes,nface_orient,iv,ie,ifc,nod,coord, &
+!$OMP            ntype,norder,ind,mdltype,nedge_orient,xnod)     &
+!$OMP    SCHEDULE(DYNAMIC) REDUCTION(+:nr_up_elem)
 !  ...loop through active elements
       do iel=1,NRELES_SUBD
 !
@@ -643,12 +638,12 @@ subroutine update_gdof_par
             sz = size(NODES(nod)%dof%coord,2)
 !
             call hpvert(iflag,no,xsub(1:3,iv), coord(1:3,1:sz))
-!$omp critical
+!$OMP CRITICAL
             if (NODES(nod)%visit.eq.0) then
                NODES(nod)%dof%coord = coord(1:3,1:sz)
                NODES(nod)%visit=1
             endif
-!$omp end critical
+!$OMP END CRITICAL
 !
 !     ...end of loop through element vertices
          enddo
@@ -680,12 +675,12 @@ subroutine update_gdof_par
                            nedge_orient,nface_orient,norder,ie,  &
                            xnod,coord(1:3,1:sz))
 !
-!$omp critical
+!$OMP CRITICAL
                if (NODES(nod)%visit.eq.0) then
                   NODES(nod)%dof%coord = coord(1:3,1:sz)
                   NODES(nod)%visit=1
                endif
-!$omp end critical
+!$OMP END CRITICAL
 !
             else
                NODES(nod)%visit=1
@@ -718,12 +713,12 @@ subroutine update_gdof_par
                            nedge_orient,nface_orient,norder,ifc, &
                            xnod,coord(1:3,1:sz))
 !
-!$omp critical
+!$OMP CRITICAL
                if (NODES(nod)%visit.eq.0) then
                   NODES(nod)%dof%coord = coord(1:3,1:sz)
                   NODES(nod)%visit=1
                endif
-!$omp end critical
+!$OMP END CRITICAL
 !
             else
                NODES(nod)%visit=1
@@ -737,8 +732,8 @@ subroutine update_gdof_par
 !  ...end of loop through elements
  100  continue
       enddo
-!$omp end do
-!$omp end parallel
+!$OMP END DO
+!$OMP END PARALLEL
 !
       if (nr_up_elem.eq.0) exit
 !
@@ -855,7 +850,7 @@ subroutine update_gdof_par
    allocate(nod_rnk(j_glb)); nod_rnk = NUM_PROCS
    do i=1,j_glb
       nod = nod_glb(i)
-      if (NODES(nod)%geom_interf .eq. 1) nod_rnk(i) = RANK
+      if (NODES(nod)%visit .eq. 1) nod_rnk(i) = RANK
    enddo
 !
 !..collect node supplier list
@@ -877,7 +872,7 @@ subroutine update_gdof_par
       nod = nod_glb(i)
       call find_ndof(nod, ndofH,ndofE,ndofV,ndofQ)
       if (ndofH .eq. 0) then
-         NODES(nod)%geom_interf = 1
+         NODES(nod)%visit = 1
          cycle
       endif
       count = 3*ndofH
@@ -907,7 +902,7 @@ subroutine update_gdof_par
          !write(*,6010) RANK,'RECEIVING',nod,S_Type(NODES(nod)%ntype)
          buf => NODES(nod)%dof%coord
          call MPI_RECV(buf,count,MPI_REAL8,src,tag,MPI_COMM_WORLD,MPI_STATUS_IGNORE,ierr)
-         NODES(nod)%geom_interf = 1
+         NODES(nod)%visit = 1
       endif
  6010 format('update_gdof: [',I4,'] ',A,' nod=',I6,', type=',A)
    enddo

@@ -571,10 +571,10 @@ subroutine update_Ddof_par
 !
 ! Get nodes for each element in subd
 !
-!$omp parallel default(shared)
-!$omp do private(iel,mdle,nodesl,norientl,nodm,nrnodm,   &
-!$omp            nr_elem_nodes,loc,nod,i,j,ntype)        &
-!$omp    schedule(static) reduction(+:nr_up_elem)
+!$OMP PARALLEL DEFAULT(SHARED)
+!$OMP DO PRIVATE(iel,mdle,nodesl,norientl,nodm,nrnodm,   &
+!$OMP            nr_elem_nodes,loc,nod,i,j,ntype)        &
+!$OMP    SCHEDULE(STATIC) REDUCTION(+:nr_up_elem)
 !..loop through active elements
    do iel=1,NRELES_SUBD
 !
@@ -611,8 +611,8 @@ subroutine update_Ddof_par
       enddo
       nrnodes_irreg(iel) = j
    enddo
-!$omp end do
-!$omp end parallel
+!$OMP END DO
+!$OMP END PARALLEL
 !
  10 continue
 !
@@ -626,11 +626,11 @@ subroutine update_Ddof_par
       nod_flg = .false.
 !
 !  ...loop through active elements
-!$omp parallel default(shared)
-!$omp do private(iel,mdle,iflag,no,xsub,nrnodi,nodesi,nodesl,nvar,ndof, &
-!$omp            nr_elem_nodes,nface_orient,iv,ie,ifc,nod,nedge_orient, &
-!$omp            ntype,norder,zdofH,zdofE,zdofQ,tempH,tempE,tempV,ind)  &
-!$omp    schedule(dynamic) reduction(+:nr_up_elem)
+!$OMP PARALLEL DEFAULT(SHARED)
+!$OMP DO PRIVATE(iel,mdle,iflag,no,xsub,nrnodi,nodesi,nodesl,nvar,ndof, &
+!$OMP            nr_elem_nodes,nface_orient,iv,ie,ifc,nod,nedge_orient, &
+!$OMP            ntype,norder,zdofH,zdofE,zdofQ,tempH,tempE,tempV,ind)  &
+!$OMP    SCHEDULE(DYNAMIC) REDUCTION(+:nr_up_elem)
       do iel=1,NRELES_SUBD
 !
          mdle = ELEM_SUBD(iel)
@@ -679,12 +679,12 @@ subroutine update_Ddof_par
                call dhpvert(mdle,iflag,no,xsub(1:3,iv),NODES(nod)%case, &
                             NODES(nod)%bcond, tempH(1:nvar,1:ndof))
 !
-!$omp critical
+!$OMP CRITICAL
                if (NODES(nod)%visit.eq.0) then
                   NODES(nod)%dof%zdofH = tempH(1:nvar,1:ndof)
                   NODES(nod)%visit = 1
                endif
-!$omp end critical
+!$OMP END CRITICAL
 !
             endif
          enddo
@@ -720,12 +720,12 @@ subroutine update_Ddof_par
                                 nedge_orient,nface_orient,norder,ie,    &
                                 zdofH, tempH(1:nvar,1:ndof))
 !
-!$omp critical
+!$OMP CRITICAL
                   if (NODES(nod)%visit.eq.0) then
                      NODES(nod)%dof%zdofH = tempH(1:nvar,1:ndof)
                      NODES(nod)%visit = 1
                   endif
-!$omp end critical
+!$OMP END CRITICAL
 !
                else
                   NODES(nod)%visit=1
@@ -748,12 +748,12 @@ subroutine update_Ddof_par
                                 nedge_orient,nface_orient,norder,ie,    &
                                 tempE(1:nvar,1:ndof))
 !
-!$omp critical
+!$OMP CRITICAL
                   if (NODES(nod)%visit.lt.2) then
                      NODES(nod)%dof%zdofE = tempE(1:nvar,1:ndof)
                      NODES(nod)%visit = 2
                   endif
-!$omp end critical
+!$OMP END CRITICAL
 !
                else
                   NODES(nod)%visit=1
@@ -791,12 +791,12 @@ subroutine update_Ddof_par
                                 nedge_orient,nface_orient,norder,ifc,   &
                                 zdofH, tempH(1:nvar,1:ndof))
 !
-!$omp critical
+!$OMP CRITICAL
                   if (NODES(nod)%visit.eq.0) then
                      NODES(nod)%dof%zdofH = tempH(1:nvar,1:ndof)
                      NODES(nod)%visit = 1
                   endif
-!$omp end critical
+!$OMP END CRITICAL
 !
                else
                   NODES(nod)%visit=1
@@ -818,12 +818,12 @@ subroutine update_Ddof_par
                                 nedge_orient,nface_orient,norder,ifc,   &
                                 zdofE, tempE(1:nvar,1:ndof))
 !
-!$omp critical
+!$OMP CRITICAL
                   if (NODES(nod)%visit.lt.2) then
                      NODES(nod)%dof%zdofE = tempE(1:nvar,1:ndof)
                      NODES(nod)%visit = 2
                   endif
-!$omp end critical
+!$OMP END CRITICAL
 !
                else
                   NODES(nod)%visit=1
@@ -845,12 +845,12 @@ subroutine update_Ddof_par
                                 nedge_orient,nface_orient,norder,ifc,   &
                                 tempV(1:nvar,1:ndof))
 !
-!$omp critical
+!$OMP CRITICAL
                   if (NODES(nod)%visit.lt.3) then
                      NODES(nod)%dof%zdofV = tempV(1:nvar,1:ndof)
                      NODES(nod)%visit = 3
                   endif
-!$omp end critical
+!$OMP END CRITICAL
 !
                else
                   NODES(nod)%visit=1
@@ -864,8 +864,8 @@ subroutine update_Ddof_par
 !  ...end of loop through elements
  100  continue
       enddo
-!$omp end do
-!$omp end parallel
+!$OMP END DO
+!$OMP END PARALLEL
 !
       if (nr_up_elem.eq.0) exit
 !
