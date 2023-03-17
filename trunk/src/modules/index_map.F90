@@ -12,6 +12,8 @@
 !
    module index_map
 !
+   implicit none
+!
       type Indmap
          integer, allocatable :: sorted_list(:)
          integer, allocatable :: index(:)

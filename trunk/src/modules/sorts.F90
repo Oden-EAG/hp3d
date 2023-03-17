@@ -11,9 +11,11 @@
 !----------------------------------------------------------------------
 !
 module sorts
-
-   CONTAINS
-
+!
+   implicit none
+!
+   contains
+!
 !> Purpose - permute index such that Array(Index) is ascending
 !! @param[in]   n     - size of Array
 !! @param[in]   Array - list of integers to sort
@@ -162,6 +164,7 @@ module sorts
    recursive subroutine qsort_duplet(Iel_array,Residuals,N,First,Last)
 !
       implicit none
+!
 !  ...declare variables
       integer , intent(in)    :: N,First,Last
       integer , intent(inout) :: Iel_array(N)
@@ -212,6 +215,7 @@ module sorts
    recursive subroutine qsort_triplet(ia,ja,xa,n,first,last)
 !
       implicit none
+!
 !..declare variables
       integer     , intent(in)    :: n,first,last
       integer     , intent(inout) :: ia(n), ja(n)
@@ -251,16 +255,17 @@ module sorts
 
 
 !> Purpose - partitions triplet array around a pivot
+!! @param[in]    ip    - first index of current partition
+!! @param[in]    jp    - last index of current partition
+!! @param[in]    n     - list of integers to sort
+!! @param[out]   k     - pivot
 !! @param[inout] ia    - integer array (row indices)
 !! @param[inout] ja    - integer array (colun indices)
 !! @param[inout] xa    - array of values
-!! @param[out]   k     - pivot
-!! @param[in]    n     - list of integers to sort
-!! @param[in]    first - first index of current partition (1 on initial call)
-!! @param[in]    last  - last index of current partition (N on initial call)
    recursive subroutine partition_triplet_omp(ip,jp,n,k,ia,ja,xa)
 !
       implicit none
+!
 !  ...declare variables
       integer    , intent(in)     :: ip,jp,n
       integer    , intent(out)    :: k
@@ -326,6 +331,7 @@ end subroutine partition_triplet_omp
 recursive subroutine qsort_triplet_omp(n,ia,ja,xa)
 !
    implicit none
+!
 !..declare variables
    integer    , intent(in)    :: n
    integer    , intent(inout) :: ia(n), ja(n)
@@ -384,6 +390,7 @@ recursive subroutine qsort_triplet_omp(n,ia,ja,xa)
    recursive subroutine qsort_double(ia,val,n,first, last)
 !
       implicit none
+!
       integer     :: i, j, n, k, l
       integer     :: ia(n)
 #if C_MODE
