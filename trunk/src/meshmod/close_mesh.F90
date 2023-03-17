@@ -266,7 +266,7 @@ subroutine close_mesh_par()
 !---------------------------------------------------------
 #if DEBUG_MODE
       if ((RANK.eq.ROOT) .and. (iprint.eq.2)) then
-         write(*,*) 'close_mesh: CHECK CONSTRAINING NODES'
+         write(*,*) 'close_mesh_par: CHECK CONSTRAINING NODES'
       endif
 #endif
 !
@@ -292,7 +292,7 @@ subroutine close_mesh_par()
 !
 #if DEBUG_MODE
    if ((RANK.eq.ROOT) .and. (iprint.eq.2)) then
-      write(*,*) 'close_mesh: RESOLVE THE NODES MORE THAN ONE IRREGULARITY'
+      write(*,*) 'close_mesh_par: RESOLVE THE NODES MORE THAN ONE IRREGULARITY'
    endif
 #endif
 !
@@ -347,7 +347,7 @@ subroutine close_mesh_par()
             if ((RANK.eq.ROOT) .and. (iprint.eq.1)) then
                ne = nedge(NODES(mdle)%ntype)
                nf = nface(NODES(mdle)%ntype)
-               write(*,*) 'close_mesh: mdle = ', mdle
+               write(*,*) 'close_mesh_par: mdle = ', mdle
                write(*,7003) krefe(1:12)
    7003        format('krefe = ',12i2)
                write(*,7004) kreff(1:6)
@@ -385,7 +385,7 @@ subroutine close_mesh_par()
 !
       call bitvisit_finalize
 !
-      call MPI_Allgather(ic,1,MPI_INTEGER,ic_procs,1, MPI_INTEGER,MPI_COMM_WORLD, ierr)
+      call MPI_Allgather(ic,1,MPI_INTEGER,ic_procs,1,MPI_INTEGER,MPI_COMM_WORLD, ierr)
 !
       displs = 0
       ic_glob = 0
@@ -394,7 +394,11 @@ subroutine close_mesh_par()
          ic_glob = ic_glob + ic_procs(i)
       enddo
 !
-      if (RANK.eq.ROOT) write(*,*) 'close_mesh: number of elements to refine ', ic_glob
+#if DEBUG_MODE
+      if (RANK.eq.ROOT and iprint.eq.2) then
+         write(*,*) 'close_mesh_par: number of elements to refine ', ic_glob
+      endif
+#endif
 !
 !     loop exit condition
       if (ic_glob.eq.0) exit
@@ -413,7 +417,7 @@ subroutine close_mesh_par()
 #if DEBUG_MODE
             if ((RANK.eq.ROOT) .and. (iprint.eq.1)) then
                write(*,7001) i, mdle, S_Type(NODES(mdle)%ntype), kref
-    7001       format('close_mesh: i= ',i6,' mdle= ', i6,' ', a4, ' ref_kind = ',i5)
+    7001       format('close_mesh_par: i= ',i6,' mdle= ', i6,' ', a4, ' ref_kind = ',i5)
             endif
 #endif
             call refine(mdle,kref)
