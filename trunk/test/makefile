@@ -11,18 +11,44 @@ OBJ_PATH     = _obj_
 EXEC_PATH    = _exec_
 MODULE_PATH  = $(OBJ_PATH)
 
-SRC_FILE     = locate.F90                 \
-               hexa_adapt_h_aniso.F90     \
-               hexa_adapt_h_iso.F90       \
-               parameters.F90
+SRC_FILE     = cross_product.F90         \
+               decode.F90                \
+               dot_product.F90           \
+               encod_decod.F90           \
+               encode_decode_order.F90   \
+               encodg_decodg.F90         \
+               fact.F90                  \
+               hexa_adapt_h_aniso.F90    \
+               hexa_adapt_h_case1.F90    \
+               hexa_adapt_h_iso.F90      \
+               invert.F90                \
+               isgn.F90                  \
+               locate_char.F90           \
+               locate.F90                \
+               near.F90                  \
+               parameters.F90            \
+               real_imag.F90
 
 OBJ          = $(addprefix $(OBJ_PATH)/, $(SRC_FILE:.F90=.o))
 
 # Tests
-TEST     = locate
-TEST_SEQ = locate              \
-           parameters
-TEST_PAR = hexa_adapt_h_aniso  \
+TEST     = decode
+TEST_SEQ = cross_product             \
+           decode                    \
+           dot_product               \
+           encod_decod               \
+           encode_decode_order       \
+           encodg_decodg             \
+           fact                      \
+           invert                    \
+           isgn                      \
+           locate_char               \
+           locate                    \
+           near                      \
+           parameters                \
+           real_imag
+TEST_PAR = hexa_adapt_h_aniso        \
+           hexa_adapt_h_case1        \
            hexa_adapt_h_iso
 
 # Includes and defs

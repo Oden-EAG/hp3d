@@ -5,6 +5,11 @@
 !
 !     routine name      - cross_product
 !
+!     latest revision:  - Mar 2023
+!
+!     purpose:          - compute 3D cross product of real-valued
+!                         vectors
+!
 !--------------------------------------------------------------------
 !
    subroutine cross_product(a,b, c)
@@ -20,26 +25,6 @@
 !
    end subroutine cross_product
 !
-!--------------------------------------------------------------------
-!
-!..for backward compatibility
-   subroutine cross_product3D(Vec1,Vec2, Vec)
-      implicit none
-      real(8), intent(in)  :: Vec1(3),Vec2(3)
-      real(8), intent(out) :: Vec(3)
-      call cross_product(Vec1,Vec2, Vec)
-   end subroutine cross_product3D
-!
-!--------------------------------------------------------------------
-!
-!..for more backward compatibility
-   subroutine cross_product3D_int(Vec1,Vec2, Vec)
-      implicit none
-      real(8), intent(in)  :: Vec1(3),Vec2(3)
-      real(8), intent(out) :: Vec(3)
-      call cross_product(Vec1,Vec2, Vec)
-   end subroutine cross_product3D_int
-!
 !
 !--------------------------------------------------------------------
 !
@@ -47,10 +32,10 @@
 !
 !--------------------------------------------------------------------
 !
-!     latest revision:  - Feb 2018
+!     latest revision:  - Mar 2023
 !
-!     purpose:          - compute cross product of real and
-!                         (possibly) complex valued vectors
+!     purpose:          - compute 3D cross product of real and
+!                         (possibly) complex-valued vectors
 !
 !---------------------------------------------------------------------
 !
@@ -74,10 +59,10 @@
 !
 !--------------------------------------------------------------------
 !
-!     latest revision:  - Aug 2018
+!     latest revision:  - Mar 2023
 !
-!     purpose:          - compute cross product of two
-!                         (possibly) complex valued vectors
+!     purpose:          - compute cross product of (possibly)
+!                         complex-valued vectors
 !
 !               in:     - Za, Zb
 !              out:     - Zcross = Za x Zb
@@ -96,6 +81,17 @@
       Zcross(3) =   Za(1)*Zb(2) - Za(2)*Zb(1)
 !
    end subroutine zz_cross_product
+!
+!--------------------------------------------------------------------
+!
+!     routine name      - cross_product2D
+!
+!--------------------------------------------------------------------
+!
+!     latest revision:  - Mar 2023
+!
+!     purpose:          - compute 2D cross product of real-valued
+!                         vectors
 !
 !---------------------------------------------------------------------
 !
@@ -119,7 +115,7 @@
 !   latest revision    - Feb 2023
 !
 !   purpose            - routine evaluates cross product of two
-!                        vectors in R^2 or R^3
+!                        real-valued vectors in R^2 or R^3
 !
 !   arguments :
 !     in:
