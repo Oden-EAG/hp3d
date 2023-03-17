@@ -11,19 +11,15 @@ OBJ_PATH     = _obj_
 EXEC_PATH    = _exec_
 MODULE_PATH  = $(OBJ_PATH)
 
-SRC_FILE     = locate.F90                 \
-               hexa_adapt_h_aniso.F90     \
-               hexa_adapt_h_iso.F90       \
-               parameters.F90
+SRC_FILE     = locate.F90 \
+               parameters.F90 \
+               random_refine.F90
 
 OBJ          = $(addprefix $(OBJ_PATH)/, $(SRC_FILE:.F90=.o))
 
 # Tests
-TEST     = locate
-TEST_SEQ = locate              \
-           parameters
-TEST_PAR = hexa_adapt_h_aniso  \
-           hexa_adapt_h_iso
+TEST  = locate
+TESTS = locate parameters random_refine
 
 # Includes and defs
 CCDEFS = $(PROB_PP_DEFS)
@@ -55,23 +51,11 @@ one : $(OBJ_PATH)/.dummy $(OBJ_PATH)/$(TEST).o
 	$(FC_WORK) -o $(EXEC_PATH)/$(TEST) $(OBJ_PATH)/$(TEST).o $(LIBS) $(LDFLAGS)
 
 #-------------------------------------------------
-.PHONY : seq
-seq :
-	@for e in $(TEST_SEQ) ; do \
+.PHONY : all
+all :
+	@for e in $(TESTS) ; do \
 		make one run TEST=$$e ;\
 	done
-
-#-------------------------------------------------
-.PHONY : par
-par :
-	@for e in $(TEST_PAR) ; do \
-		make one run-par TEST=$$e ;\
-	done
-
-#-------------------------------------------------
-.PHONY : all
-all : seq par
-	@echo ""
 
 #-------------------------------------------------
 .PHONY : run
@@ -81,17 +65,9 @@ run : one
 	@./$(EXEC_PATH)/$(TEST)
 
 #-------------------------------------------------
-.PHONY : run-par
-run-par : one
-	@echo ""
-	@echo "Running test: "$(TEST)
-	@mpirun -np 4 ./$(EXEC_PATH)/$(TEST)
-
-#-------------------------------------------------
 .PHONY : clean
 clean :
 	@/bin/rm -f *.o *~
 	@/bin/rm -rf $(OBJ_PATH)
 	@/bin/rm -rf $(EXEC_PATH)
-	@for t in $(TEST_SEQ) ; do rm -f $$t ; done
-	@for t in $(TEST_PAR) ; do rm -f $$t ; done
+	@for t in $(TESTS) ; do rm -f $$t ; done

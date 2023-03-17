@@ -11,7 +11,6 @@ module zoltan_wrapper
 !
    use data_structure3D
    use element_data
-   use environment, only: QUIET_MODE
    use MPI
    use mpi_param
    use zoltan
@@ -77,7 +76,7 @@ module zoltan_wrapper
 !  ...initialize Zoltan environment
       ierr = Zoltan_Initialize(ver)
       call zoltan_w_handle_err(ierr,'Zoltan_Initialize')
-      if (.not. QUIET_MODE .and. RANK .eq. ROOT) then
+      if (RANK .eq. ROOT) then
          write(*,100) 'Zoltan initialized sucessfully. Version = ', ver
       endif
   100 format(A,F5.2)
