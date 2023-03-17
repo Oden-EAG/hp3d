@@ -1087,9 +1087,9 @@ c
       integer,intent(out) :: Iedge
 c
       integer,save,dimension(4,4) :: AUX
-c$omp threadprivate(AUX)
+c$OMP THREADPRIVATE(AUX)
       logical,save                :: INITIALIZED=.FALSE.
-c$omp threadprivate(INITIALIZED)
+c$OMP THREADPRIVATE(INITIALIZED)
       integer,       dimension(2) :: iedge1,iedge2,list
       integer                     :: i,j,i1,i2,ifound
 c----------------------------------------------------------------------
@@ -1135,7 +1135,7 @@ c  ...update initialization flag
 c
       endif
 c
-c  ...retrive edge number
+c  ...retrieve edge number
       Iedge=AUX(Iv1,Iv2)
 c
       end subroutine quad_aux
@@ -1186,9 +1186,9 @@ c
       integer,intent(out) :: Iface
 c
       integer,save,dimension(8,8) :: AUX
-c$omp threadprivate(AUX)
+c$OMP THREADPRIVATE(AUX)
       logical,save                :: INITIALIZED=.FALSE.
-c$omp threadprivate(INITIALIZED)
+c$OMP THREADPRIVATE(INITIALIZED)
       integer,       dimension(3) :: iface1,iface2,list
       integer                     :: i,i1,i2,ifound
 c

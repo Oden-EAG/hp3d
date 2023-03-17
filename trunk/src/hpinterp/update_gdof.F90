@@ -8,7 +8,7 @@
 !> @date Mar 2023
 !-----------------------------------------------------------------------
 !
-subroutine update_gdof()
+subroutine update_gdof
 !
    use constrained_nodes
    use data_structure3D
@@ -63,7 +63,7 @@ subroutine update_gdof()
 !-----------------------------------------------------------------------
 !
    if (USE_THREADED) then
-      call update_gdof_par
+      call update_gdof_omp
       return
    endif
 !
@@ -440,22 +440,19 @@ subroutine update_gdof()
    endif
 !
 end subroutine update_gdof
-
-
-
-
-
-
+!
+!
+!
 !-----------------------------------------------------------------------
 !
-!    routine name       - update_gdof_par
+!    routine name       - update_gdof_omp
 !
 !-----------------------------------------------------------------------
 !> @brief OpenMP parallel version of update_gdof
 !> @date Mar 2023
 !-----------------------------------------------------------------------
 !
-subroutine update_gdof_par
+subroutine update_gdof_omp
 !
    use constrained_nodes
    use data_structure3D
@@ -974,5 +971,5 @@ subroutine update_gdof_par
  8004 format(' update_gdof: ',f12.5,'  seconds')
    endif
 !
-end subroutine update_gdof_par
+end subroutine update_gdof_omp
 

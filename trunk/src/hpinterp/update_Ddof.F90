@@ -59,7 +59,7 @@ subroutine update_Ddof
    integer, allocatable :: nod_loc(:),nod_tmp(:),nod_glb(:),nod_rnk(:)
    VTYPE  , dimension(:,:), pointer :: buf
 !
-!..WARNING: dirichlet and other user supplied routines must be thread-
+!..WARNING: "dirichlet" and other user-supplied routines must be thread-
 !           safe to use this routine; not recommended without proper
 !           verification
    logical :: USE_THREADED = .false.
@@ -71,7 +71,7 @@ subroutine update_Ddof
 !-----------------------------------------------------------------------
 !
    if (USE_THREADED) then
-      call update_Ddof_par
+      call update_Ddof_omp
       return
    endif
 !
@@ -473,21 +473,22 @@ subroutine update_Ddof
    endif
 !
 end subroutine update_Ddof
-
-
-
-!-----------------------------------------------------------------------
 !
-!    routine name       - update_Ddof_par
+!
 !
 !-----------------------------------------------------------------------
-!> @brief OpenMP parallel version. WARNING: dirichlet and other user-
-!>        supplied routines must be threadsafe ot use this version; not
-!>        recommended without proper verification
+!
+!    routine name       - update_Ddof_omp
+!
+!-----------------------------------------------------------------------
+!> @brief OpenMP parallel version of update_Ddof
+!> @warning  "dirichlet" and other user-supplied routines must be
+!!           threadsafe to use this version; not recommended without
+!!           proper verification.
 !> @date Mar 2023
 !-----------------------------------------------------------------------
 !
-subroutine update_Ddof_par
+subroutine update_Ddof_omp
 !
    use data_structure3D
    use environment, only: QUIET_MODE
@@ -1081,4 +1082,4 @@ subroutine update_Ddof_par
  8010 format(' update_Ddof: ',f12.5,'  seconds',/)
    endif
 !
-end subroutine update_Ddof_par
+end subroutine update_Ddof_omp
