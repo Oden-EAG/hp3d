@@ -270,19 +270,37 @@ subroutine zoltan_lb_param_graph(Ierr_out)
    call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
    if (ierr > Ierr_out) Ierr_out = ierr
 !
-   ierr = Zoltan_Set_Param(zz,'PARMETIS_ITR','1')
+!..PARMETIS_OUTPUT_LEVEL
+!     0: no output
+!     1: print timing info
+      ierr = Zoltan_Set_Param(zz,'PARMETIS_OUTPUT_LEVEL','0')
+!
+!..PARMETIS_ITR
+!     Ratio of interprocessor communication time to redistribution time.
+!     A high value will emphasize reducing the edge cut, while a small value
+!     will try to keep the change in the new partition (distribution) small.
+!     (100 to 1000 recommended)
+   ierr = Zoltan_Set_Param(zz,'PARMETIS_ITR','100')
    call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
    if (ierr > Ierr_out) Ierr_out = ierr
 !
+!..CHECK_GRAPH
+!     Level of error checking for graph input:
+!        0 = no checking
+!        1 = on-processor checking
+!        2 = full checking (very slow)
    ierr = Zoltan_Set_Param(zz,'CHECK_GRAPH','1')
    call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
    if (ierr > Ierr_out) Ierr_out = ierr
 !
+!..SCATTER_GRAPH
+!     Scatter graph data by distributing contiguous chunks of objects
+!     to each processor before calling the partitioner.
+!        0 = don't scatter
+!        1 = scatter only if all objects are on a single processor
+!        2 = scatter if at least one processor owns no objects
+!        3 = always scatter
    ierr = Zoltan_Set_Param(zz,'SCATTER_GRAPH','2')
-   call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
-   if (ierr > Ierr_out) Ierr_out = ierr
-!
-   ierr = Zoltan_Set_Param(zz,'IMBALANCE_TOL','1.02')
    call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
    if (ierr > Ierr_out) Ierr_out = ierr
 !

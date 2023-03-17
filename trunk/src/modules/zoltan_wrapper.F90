@@ -605,10 +605,14 @@ module zoltan_wrapper
       enddo
 !
 !  ...deallocate internal data structures
-      ierr = Zoltan_LB_Free_Part(impGIDs,impLIDs,impProcs,impParts)
-      call zoltan_w_handle_err(ierr,'Zoltan_LB_Free_Part')
-      ierr = Zoltan_LB_Free_Part(expGIDs,expLIDs,expProcs,expParts)
-      call zoltan_w_handle_err(ierr,'Zoltan_LB_Free_Part')
+      if (nrImp .gt. 0) then
+         ierr = Zoltan_LB_Free_Part(impGIDs,impLIDs,impProcs,impParts)
+         call zoltan_w_handle_err(ierr,'Zoltan_LB_Free_Part')
+      endif
+      if (nrExp .gt. 0) then
+         ierr = Zoltan_LB_Free_Part(expGIDs,expLIDs,expProcs,expParts)
+         call zoltan_w_handle_err(ierr,'Zoltan_LB_Free_Part')
+      endif
 !
    end subroutine zoltan_w_partition
 !
