@@ -763,6 +763,7 @@ subroutine zoltan_w_get_nrdofb(Mdle, Nrdofb)
    integer, intent(in)  :: Mdle
    integer, intent(out) :: Nrdofb
    integer :: i,ntype,nord,nrdofH,nrdofE,nrdofV,nrdofQ
+   integer :: norder(19)
    integer :: ncase(NR_PHYSA),nrdof(NR_PHYSA)
 !
    nrdof(1:NR_PHYSA)=0
@@ -772,6 +773,13 @@ subroutine zoltan_w_get_nrdofb(Mdle, Nrdofb)
 !
 !..number of dofs for a SINGLE H1,H(curl),H(div),L2 component
    ntype = NODES(Mdle)%ntype
+   call find_order(Mdle, norder)
+   select case(ntype)
+      case(MDLB); nord = norder(19)
+      case(MDLP); nord = norder(15)
+      case(MDLN); nord = norder(11)
+      case(MDLD); nord = norder(14)
+   end select
    call ndof_nod(ntype,nord, nrdofH,nrdofE,nrdofV,nrdofQ)
 !
 !..number of dofs for ALL H1,H(curl),H(div),L2 components
