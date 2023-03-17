@@ -100,7 +100,7 @@ module mpi_wrapper
       integer :: ierr1,len
       if (Ierr .ne. MPI_SUCCESS) then
          call MPI_Error_string(Ierr, errStr, len, ierr1)
-         write(*,*) str,': Ierr = ', ierr, errStr(1:len)
+         write(*,*) Str,': Ierr = ', Ierr, errStr(1:len)
       endif
    end subroutine mpi_w_handle_err
 !

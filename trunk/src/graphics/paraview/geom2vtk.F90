@@ -30,7 +30,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
    real(8) :: gradH(3,MAXbrickH)
    integer :: ntype
    integer :: iv, nV, ico, iel, mdle, nrdofH, i, j, k, l, ivis, ndom
-   integer :: nodesl(27), norder(19), nverl(8)
+   integer :: nodesl(27), norder(19), nverl(27)
    integer :: norientl(27), nedge_orient(12), nface_orient(6)
 !
    real(8) :: xi(3), x(3), xnod(3,MAXbrickH), dxdxi(3,3)
@@ -38,16 +38,10 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !..OpenMP parallelization: auxiliary variables
    integer, dimension(NRELES) :: n_vert_offset,n_obj_offset,n_elem_vert
 !
-!..timer
-   !real(8) :: start_time,end_time
-!
 !..MPI
    integer :: ierr,count,subd,ice_subd,icn_subd
 !
 !----------------------------------------------------------------------------------------
-!
-!   if (RANK .eq. ROOT) write(*,*) 'geom2vtk:'
-!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 !
 !..Step 1 : Preliminary calculations (offsets, etc.)
 !
@@ -66,17 +60,17 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
       n_obj_offset(iel) = ico
       n_elem_vert(iel) = vis_obj%NR_VERT
       IcP = IcP + vis_obj%NR_VERT
-      ico = ico + vis_obj%NR_ELEM*(nobj_conf(ntype)+1)
-   enddo
 !
-!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
-!   if (RANK .eq. ROOT) write(*,300) end_time - start_time
-!  300 format(' timer: ',f12.5,' seconds')
+!  ...second order vis doesn't yet work with mixed meshes (paraview error)
+      if (SECOND_ORDER_VIS) then
+         ico = ico + vis_obj%NR_ELEM*(nobj_conf(ntype))
+      else
+         ico = ico + vis_obj%NR_ELEM*(nobj_conf(ntype)+1)
+      endif
+   enddo
 !
    call geometry_init(ico,Icp)
    GEOM_PTS(1:3,1:Icp) = 0.d0; GEOM_OBJ(1:ico) = 0
-!
-!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 !
 !$OMP PARALLEL
 !
@@ -169,24 +163,27 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
       j = nobj_conf(ntype)
       l = ivis_type(ntype)
       k = n_obj_offset(iel)
+!
       call get_vis_nrelem(ntype, ivis)
+!
       do i=1,ivis
 !
 !     ...visualization element accounting for VLEVEL
          call get_vis_elem(vis_on_type(ntype),i,n_vert_offset(iel), nverl)
 !
-         GEOM_OBJ(k+1) = l
-         GEOM_OBJ(k+2:k+1+j) = nverl(1:j)
+         if (SECOND_ORDER_VIS) then
+            GEOM_OBJ(k+1:k+j) = nverl(1:j)
+         else
+            GEOM_OBJ(k+1) = l
+            GEOM_OBJ(k+2:k+1+j) = nverl(1:j)
+         endif
          k = k + (1+j)
          ice_subd = ice_subd + 1
-         icn_subd = icn_subd + nvert(ntype)
+         icn_subd = icn_subd + j
       enddo
    enddo
 !$OMP END DO
 !$OMP END PARALLEL
-!
-!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
-!   if (RANK .eq. ROOT) write(*,300) end_time - start_time
 !
 !..Step 4 : Collect on host
 !
@@ -212,10 +209,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !
 !..Step 5 : Write to file with HDF5
 !
-!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    if (RANK .eq. ROOT) call geometry_write(Sname,len(Sname),Sfile,len(Sfile))
-!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
-!   if (RANK .eq. ROOT) write(*,300) end_time - start_time
 !
 !..Step 6 : Deallocate
 !

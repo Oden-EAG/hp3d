@@ -187,8 +187,6 @@ subroutine result
  7310    format(' FACE_NEIG = ',6i6)
  7320    format(' FACE_NEIG = ',6i6)
 !
-         write(*,7030) NODES(nod)%geom_interf
- 7030    format(' GMP INTERFACE FLAG = ',i2)
          call find_ndof(nod, ndofH,ndofE,ndofV,ndofQ)
 !
 !     ...Geometry dof

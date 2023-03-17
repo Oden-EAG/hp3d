@@ -4,7 +4,7 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - May 10
+!   latest revision    - Mar 2023
 !
 !   purpose            - routine flags ancestors of parents of
 !                        constrained nodes of an element that
@@ -15,6 +15,7 @@
 !     in:
 !            Mdle      - an element number, same as the middle node
 !                        number
+!            Nodesl    - list of element nodes
 !
 !----------------------------------------------------------------------
 !
@@ -24,7 +25,7 @@
       use data_structure3D
       use constrained_nodes
 !
-#include "syscom.blk"
+      implicit none
 !
       integer, intent(in) :: Mdle
       integer, intent(in) :: Nodesl(27)
@@ -34,11 +35,9 @@
 !
 !  ...misc
       integer :: j,nrnodl,nod,nc,icase
-      integer :: iprint
+      integer :: nrnodl,nod,nodp,nc,nce,nvoid
 !
 !----------------------------------------------------------------------
-!
-      iprint = 0
 !
       ntype = NODES(Mdle)%ntype
 !
@@ -246,7 +245,7 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - May 10
+!   latest revision    - Mar 2023
 !
 !   purpose            - routine flags all ancestors of a node
 !
@@ -283,4 +282,4 @@
          nfath = NODES(nfath)%father
       enddo
 !
-   end subroutine
+   end subroutine flag
