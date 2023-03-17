@@ -44,7 +44,7 @@ subroutine close_mesh()
 !
    if (DISTRIBUTED) then
       call close_mesh_par
-      return
+      goto 99
    endif
 !
    do
@@ -214,6 +214,8 @@ subroutine close_mesh()
 !
    if (allocated(list)) deallocate(list)
 !
+   99 continue
+!
 !..ensure that DOFs are allocated correctly within subdomains
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    call distr_refresh
@@ -242,7 +244,8 @@ subroutine close_mesh_par()
    use data_structure3D
    use mpi_param
    use bitvisit
-   use MPI, only: MPI_COMM_WORLD, MPI_INTEGER, MPI_BOR, MPI_IN_PLACE
+   use environment, only: QUIET_MODE
+   use MPI        , only: MPI_COMM_WORLD, MPI_INTEGER, MPI_BOR, MPI_IN_PLACE
 !
    implicit none
 !
@@ -273,7 +276,7 @@ subroutine close_mesh_par()
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
       call refresh
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
-      if (RANK .eq. ROOT) write(*,2020) end_time-start_time
+      if (.not.QUIET_MODE .and. RANK.eq.ROOT) write(*,2020) end_time-start_time
  2020 format(' refresh    : ',f12.5,'  seconds')
 !
 !---------------------------------------------------------
