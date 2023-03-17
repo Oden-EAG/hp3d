@@ -747,48 +747,49 @@ module zoltan_wrapper
 !     purpose:    computes number of bubble dofs to be used for vertex
 !                 weights in graph partitioning
 !----------------------------------------------------------------------
-subroutine zoltan_w_get_nrdofb(Mdle, Nrdofb)
-   integer, intent(in)  :: Mdle
-   integer, intent(out) :: Nrdofb
-   integer :: i,ntype,nord,nrdofH,nrdofE,nrdofV,nrdofQ
-   integer :: norder(19)
-   integer :: ncase(NR_PHYSA),nrdof(NR_PHYSA)
+   subroutine zoltan_w_get_nrdofb(Mdle, Nrdofb)
+      integer, intent(in)  :: Mdle
+      integer, intent(out) :: Nrdofb
+      integer :: i,ntype,nord,nrdofH,nrdofE,nrdofV,nrdofQ
+      integer :: norder(19)
+      integer :: ncase(NR_PHYSA),nrdof(NR_PHYSA)
 !
-   nrdof(1:NR_PHYSA)=0
+      nrdof(1:NR_PHYSA)=0
 !
-!..set node to be middle node number (global id in NODES)
-   call decod(NODES(Mdle)%case,2,NR_PHYSA, ncase)
+!  ...set node to be middle node number (global id in NODES)
+      call decod(NODES(Mdle)%case,2,NR_PHYSA, ncase)
 !
-!..number of dofs for a SINGLE H1,H(curl),H(div),L2 component
-   call find_order(Mdle, norder)
-   ntype = NODES(Mdle)%ntype
-   select case(ntype)
-      case(MDLB); nord = norder(19)
-      case(MDLP); nord = norder(15)
-      case(MDLN); nord = norder(11)
-      case(MDLD); nord = norder(14)
-   end select
-   call ndof_nod(ntype,nord, nrdofH,nrdofE,nrdofV,nrdofQ)
-!
-!..number of dofs for ALL H1,H(curl),H(div),L2 components
-   do i=1,NR_PHYSA
-!  ...skip if variable is not supported on middle node
-      if (ncase(i) .eq. 0) cycle
-!  ...skip if variable is deactivated
-      if (.not. PHYSAm(i)) cycle
-!  ...skip interface variables
-      if (PHYSAi(i))       cycle
-!
-      select case(DTYPE(i))
-         case('contin') ; nrdof(i)=nrdofH*NR_COMP(i)
-         case('tangen') ; nrdof(i)=nrdofE*NR_COMP(i)
-         case('normal') ; nrdof(i)=nrdofV*NR_COMP(i)
-         case('discon') ; nrdof(i)=nrdofQ*NR_COMP(i)
+!  ...number of dofs for a SINGLE H1,H(curl),H(div),L2 component
+      call find_order(Mdle, norder)
+      ntype = NODES(Mdle)%ntype
+      select case(ntype)
+         case(MDLB); nord = norder(19)
+         case(MDLP); nord = norder(15)
+         case(MDLN); nord = norder(11)
+         case(MDLD); nord = norder(14)
       end select
-   enddo
-   Nrdofb = max(1,sum(nrdof))
+      call ndof_nod(ntype,nord, nrdofH,nrdofE,nrdofV,nrdofQ)
 !
-end subroutine zoltan_w_get_nrdofb
+!  ...number of dofs for ALL H1,H(curl),H(div),L2 components
+      do i=1,NR_PHYSA
+!     ...skip if variable is not supported on middle node
+         if (ncase(i) .eq. 0) cycle
+!     ...skip if variable is deactivated
+         if (.not. PHYSAm(i)) cycle
+!    ...skip interface variables
+         if (PHYSAi(i))       cycle
+!
+         select case(DTYPE(i))
+            case('contin') ; nrdof(i)=nrdofH*NR_COMP(i)
+            case('tangen') ; nrdof(i)=nrdofE*NR_COMP(i)
+            case('normal') ; nrdof(i)=nrdofV*NR_COMP(i)
+            case('discon') ; nrdof(i)=nrdofQ*NR_COMP(i)
+         end select
+      enddo
+!
+      Nrdofb = max(1,sum(nrdof))
+!
+   end subroutine zoltan_w_get_nrdofb
 !
 !
 end module zoltan_wrapper
