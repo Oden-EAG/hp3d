@@ -46,8 +46,10 @@ subroutine close_mesh()
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
       call refresh
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
-      if (RANK .eq. ROOT) write(*,2020) end_time-start_time
- 2020 format(' refresh    : ',f12.5,'  seconds')
+      if (.not.QUIET_MODE .and. RANK.eq.ROOT) then
+         write(*,2020) end_time-start_time
+    2020 format(' refresh    : ',f12.5,'  seconds')
+      endif
 !
 !---------------------------------------------------------
 !     Step 1 : check constrained nodes
@@ -166,12 +168,10 @@ subroutine close_mesh()
 !$OMP END PARALLEL
 !
 #if DEBUG_MODE
-      iprint = 2
-      if ((RANK.eq.ROOT) .and. (iprint.eq.2)) then
+      if ((.not.QUIET_MODE.or.iprint.eq.2) .and. (RANK.eq.ROOT)) then
          write(*,7002) ' close_mesh : number of elements to refine = ', ic
    7002  format(A,i6)
       endif
-      iprint = 0
 #endif
 !
 !     loop exit condition
