@@ -136,18 +136,16 @@ subroutine close_mesh()
          if (nflag) then
 !
 #if DEBUG_MODE
-            !$OMP CRITICAL
             if ((RANK.eq.ROOT) .and. (iprint.eq.1)) then
-               ne = nedge(NODES(mdle)%ntype)
-               nf = nface(NODES(mdle)%ntype)
+               !$OMP CRITICAL
                write(*,*) 'close_mesh: mdle = ', mdle
                write(*,7003) krefe(1:12)
    7003        format('krefe = ',12i2)
                write(*,7004) kreff(1:6)
    7004        format('kreff = ',6i3)
                call pause
+               !$OMP END CRITICAL
             endif
-            !$OMP END CRITICAL
 #endif
 !           increment counter
             ic=ic+1
@@ -343,21 +341,18 @@ subroutine close_mesh_par()
 !        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          if (nflag) then
 !
-!$OMP CRITICAL
 #if DEBUG_MODE
             if ((RANK.eq.ROOT) .and. (iprint.eq.1)) then
-               ne = nedge(NODES(mdle)%ntype)
-               nf = nface(NODES(mdle)%ntype)
+               !$OMP CRITICAL
                write(*,*) 'close_mesh_par: mdle = ', mdle
                write(*,7003) krefe(1:12)
    7003        format('krefe = ',12i2)
                write(*,7004) kreff(1:6)
    7004        format('kreff = ',6i3)
                call pause
+               !$OMP END CRITICAL
             endif
 #endif
-!           increment counter
-            ic=ic+1
 !
 !           find out proper refinement flag
             if (is_iso_only()) then
@@ -377,6 +372,11 @@ subroutine close_mesh_par()
 !               end select
 !           ...-------------------------------------------------------------------
             endif
+!
+!$OMP CRITICAL
+!           increment counter
+            ic=ic+1
+!
             list(1,ic) = mdle
             list(2,ic) = kref
 !$OMP END CRITICAL
