@@ -21,6 +21,7 @@
                           MPI_IN_PLACE
    use par_mesh,    only: DISTRIBUTED
    use bitvisit
+   use par_ghost
 !
    implicit none
 !
@@ -279,7 +280,7 @@
 2020 format(' enforce_min: ',f12.5,'  seconds')
 !
 
-CONTAINS
+contains
 
 !
 !-----------------------------------------------------------------------
