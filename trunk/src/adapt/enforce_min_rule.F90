@@ -128,6 +128,12 @@
             case(21,22,23,24,31,32,34,35,41,42,44,45,51,52,61,62,71,72,73,74)
                nodp = NFACEC(nc)
                call save_min_order(mdle,nodp,nord)
+!
+            case default
+               !$OMP CRITICAL
+               write(*,*) 'enforce_min_rule: icase = ',icase
+               stop
+               !$OMP END CRITICAL
             end select
          endif
       enddo
@@ -278,44 +284,45 @@
    if (RANK .eq. ROOT) write(*,2020) end_time-start_time
 2020 format(' enforce_min: ',f12.5,'  seconds')
 !
-
-contains
-
 !
+contains
+!
+!
+!> @date Mar 2023
 !-----------------------------------------------------------------------
-   subroutine save_min_order(mdle,Nod,Nord)
+   subroutine save_min_order(Mdle,Nod,Nord)
 !
       use data_structure3D
       use mpi_param
       implicit none
 !
-      integer, intent(in) :: mdle,Nod,Nord
+      integer, intent(in) :: Mdle,Nod,Nord
 !
       integer :: nordh ,nordv
       integer :: nordh1,nordv1
       integer :: nordh2,nordv2
 !
-!-----------------------------------------------------------------------
-!
 !  ...mark nodes connected to subdomain
-      if (NODES(mdle)%subd.eq.RANK) call visit(Nod)
+      if (NODES(Mdle)%subd.eq.RANK) call visit(Nod)
 !
 !$OMP CRITICAL
       if (NODES(Nod)%visit.eq.0) then
-         NODES(nod)%visit= Nord
+         NODES(Nod)%visit = Nord
       else
          select case(NODES(Nod)%ntype)
          case(MEDG,MDLT)
-            NODES(nod)%visit = min(NODES(nod)%visit,Nord)
+            NODES(Nod)%visit = min(NODES(Nod)%visit,Nord)
          case(MDLQ)
             call decode(Nord, nordh1,nordv1)
-            call decode(NODES(nod)%visit, nordh2,nordv2)
-            nordh = min(nordh1,nordh2); nordv = min(nordv1,nordv2)
-            NODES(nod)%visit = nordh*10+nordv
+            call decode(NODES(Nod)%visit, nordh2,nordv2)
+            nordh = min(nordh1,nordh2)
+            nordv = min(nordv1,nordv2)
+            NODES(Nod)%visit = nordh*10+nordv
          end select
       endif
 !$OMP END CRITICAL
 !
    end subroutine save_min_order
+!-----------------------------------------------------------------------
 !
 end subroutine enforce_min_rule
