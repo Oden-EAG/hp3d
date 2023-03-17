@@ -8,7 +8,6 @@
 !
 !   purpose            - routine enforces the min rule for a FE mesh
 !
-!
 !----------------------------------------------------------------------
 !
    subroutine enforce_min_rule
@@ -66,10 +65,10 @@
 !                 STEP 1: Minimum rule for faces
 !----------------------------------------------------------------------
 !
-!$omp parallel default(shared)
-!$omp do private(iel,mdle,ntype,nrv,nre,nrf,nodesl,norientl,   &
-!$omp            norder,j,i,nod,nord,nc,icase,nodp)            & 
-!$omp schedule(static)
+!$OMP PARALLEL DEFAULT(SHARED)
+!$OMP DO PRIVATE(iel,mdle,ntype,nrv,nre,nrf,nodesl,norientl,   &
+!$OMP            norder,j,i,nod,nord,nc,icase,nodp)            &
+!$OMP SCHEDULE(STATIC)
 !..loop through elements in the current mesh
    do iel=1,NRELES_GHOST
       mdle = ELEM_GHOST(iel)
@@ -133,8 +132,8 @@
          endif
       enddo
    enddo
-!$omp end do
-!$omp end parallel
+!$OMP END DO
+!$OMP END PARALLEL
 !
 !..Reduce to get nord of all nodes
 !  (computing elem_nodes in first two stages is most expensive, this
@@ -301,7 +300,7 @@ contains
 !  ...mark nodes connected to subdomain
       if (NODES(mdle)%subd.eq.RANK) call visit(Nod)
 !
-!$omp critical
+!$OMP CRITICAL
       if (NODES(Nod)%visit.eq.0) then
          NODES(nod)%visit= Nord
       else
@@ -315,7 +314,7 @@ contains
             NODES(nod)%visit = nordh*10+nordv
          end select
       endif
-!$omp end critical
+!$OMP END CRITICAL
 !
    end subroutine save_min_order
 !
