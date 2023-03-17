@@ -153,11 +153,12 @@
       enddo
 !
 !  ...max used here to fill 0's; all procs should agree on shared nodes
-      call MPI_Allreduce(MPI_IN_PLACE,buffer,NRNODS,MPI_INTEGER,MPI_MAX, MPI_COMM_WORLD,ierr)
+      call MPI_Allreduce(MPI_IN_PLACE,buffer,NRNODS,MPI_INTEGER,MPI_MAX,MPI_COMM_WORLD,ierr)
 !
       do nod=1,NRNODS
          if (visited(nod) .and. NODES(nod)%visit.ne.buffer(nod)) then
-            write(*,*) 'enforce_min_rule: buffered nod order does not agree with original:', buffer(nod),' vs ', NODES(nod)%visit
+            write(*,*) 'enforce_min_rule: buffered nod order does not agree with original:',&
+                                          buffer(nod),' vs ', NODES(nod)%visit
             stop 2
          endif
          NODES(nod)%visit = buffer(nod)
