@@ -4,7 +4,7 @@ c   routine name       - curve_HermCur
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Apr 07
+c   latest revision    - Mar 2023
 c
 c   purpose            - Hermite parametrization curve
 c
@@ -23,16 +23,21 @@ c
 c
       use GMP
       use parameters , only : MAXP
-#include "syscom.blk"
 c
-      dimension X(3),Dxdeta(3)
+      implicit none
+c
+      integer :: No
+      real(8) :: Eta,X(3),Dxdeta(3)
 c
 c  ...curve dof
-      dimension gdof(1:3,6)
+      real(8) :: gdof(1:3,6)
 c
 c  ...fifth order C^2-conforming shape functions
-      dimension vshap(MAXP+1),dvshap(MAXP+1),ddvshap(MAXP+1)
+      real(8) :: vshap(MAXP+1),dvshap(MAXP+1),ddvshap(MAXP+1)
 c
+      integer :: i,k,np,nord
+c
+      integer :: iprint
       iprint=0
 c
       if ((CURVES(No)%Type.ne.'HermCur').or.(NDIM.ne.3)) then
@@ -78,4 +83,4 @@ c
       endif
 c
 c
-      end
+      end subroutine curve_HermCur

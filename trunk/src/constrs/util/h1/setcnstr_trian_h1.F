@@ -1,10 +1,10 @@
 c----------------------------------------------------------------------
 c
-c   routine name       - setcnstr_trian
+c   routine name       - setcnstr_trian_h1
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Jun 10
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine evaluates constraint coefficients for
 c                        the triangular master element

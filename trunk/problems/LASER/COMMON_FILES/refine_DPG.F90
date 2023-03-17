@@ -94,8 +94,6 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
 !
    real(8) :: MPI_Wtime,start_time,end_time
 !
-!..printing flag
-   integer :: iprint = 0
    !character(len=8) :: filename
 !
 !-----------------------------------------------------------------------

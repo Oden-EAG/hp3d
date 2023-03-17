@@ -28,7 +28,8 @@ c
       use element_data
       use data_structure3D
       use constrained_nodes
-#include "syscom.blk"
+c
+      implicit none
 c
       integer, intent(in)  :: Mdle
       integer, intent(in)  :: Nodesl(27)
@@ -42,13 +43,18 @@ c  ...local lists of nodes
       integer :: list_v(16),list_e(24),list_f(12)
 c
 c  ...miscellanea
-      integer :: iv,icv,ice,icf,nod,nodp,nc,nce,icase,j,nrnodl
+      integer :: ie,ip,iv,jv,icv,ice,icf,icase,j
+      integer :: nvoid,nrnodl,nod,nodp,nc,nce
+c
+#if DEBUG_MODE
       integer :: iprint
+      iprint=0
+#endif
 c
 c----------------------------------------------------------------------
 c
-      iprint = 0
-c      if (Mdle.eq.354) iprint=0
+c  ...initialize output
+      Nodm(1:MAXNODM) = 0
 c
       ntype = NODES(Mdle)%ntype
 c
@@ -131,7 +137,7 @@ c  .........parent mid-face node
 c
 c  .........parent mid-edge nodes (south,north)
             do ip=1,3,2
-              nodp = iabs(NFACE_CONS(ip,nc))
+              nodp = abs(NFACE_CONS(ip,nc))
               call add_to_list(list_e,24,ice,nodp)
             enddo
 c
@@ -144,7 +150,7 @@ c  .........parent mid-face node
 c
 c  .........parent mid-edge nodes (east,west)
             do ip=2,4,2
-              nodp = iabs(NFACE_CONS(ip,nc))
+              nodp = abs(NFACE_CONS(ip,nc))
               call add_to_list(list_e,24,ice,nodp)
             enddo
 c
@@ -157,7 +163,7 @@ c  .........parent mid-face node
 c
 c  .........parent mid-edge nodes (south,east,north,west)
             do ip=1,4
-              nodp = iabs(NFACE_CONS(ip,nc))
+              nodp = abs(NFACE_CONS(ip,nc))
               call add_to_list(list_e,24,ice,nodp)
             enddo
 c
@@ -184,7 +190,7 @@ c  .........parent mid-face node
 c
 c  .........parent mid-edge nodes (south,north)
             do ip=1,3,2
-              nodp = iabs(NFACE_CONS(ip,nc))
+              nodp = abs(NFACE_CONS(ip,nc))
 C               if (Is_inactive(nodp)) nodp = NODES(nodp)%father
               if (Is_inactive(nodp) .and. NODES(nodp)%ref_kind.eq.0)
      .            nodp = NODES(nodp)%father
@@ -208,7 +214,7 @@ c  .........parent mid-face node
 c
 c  .........parent mid-edge nodes (east,west)
             do ip=2,4,2
-              nodp = iabs(NFACE_CONS(ip,nc))
+              nodp = abs(NFACE_CONS(ip,nc))
 C               if (Is_inactive(nodp)) nodp = NODES(nodp)%father
               if (Is_inactive(nodp) .and. NODES(nodp)%ref_kind.eq.0)
      .            nodp = NODES(nodp)%father
@@ -224,7 +230,7 @@ c  .........parent mid-face node
 c
 c  .........parent medg nodes
             do ie=1,3
-              nodp = iabs(NFACE_CONS(ie,nc))
+              nodp = abs(NFACE_CONS(ie,nc))
               call add_to_list(list_e,24,ice,nodp)
             enddo
 c
@@ -237,7 +243,7 @@ c  .........parent mid-face node
 c
 c  .........parent medg nodes
             do ie=1,3
-              nodp = iabs(NFACE_CONS(ie,nc))
+              nodp = abs(NFACE_CONS(ie,nc))
               call add_to_list(list_e,24,ice,nodp)
             enddo
 c
@@ -268,6 +274,7 @@ ccc      do j=1,Nrnodm-1
 ccc        NODES(Nodm(j))%visit = 0
 ccc      enddo
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7002) Mdle
  7002   format('logic_nodes: Mdle = ',i6,' MODIFIED ELEMENT NODES = ')
@@ -275,9 +282,9 @@ c
  7003   format(20i6)
         call pause
       endif
+#endif
 c
-c
-      end subroutine
+      end subroutine logic_nodes
 c
 c----------------------------------------------------------------------
 c

@@ -28,7 +28,7 @@
    subroutine diag_scaling_p(m,n,GP,B)
 !
       implicit none
-
+!
       integer, intent(in)       :: m, n
       integer                   :: i,j,k
       integer                   :: nk, n1, n2
@@ -69,7 +69,7 @@
             B(i,j) = B(i,j)*D(i)
          enddo
       enddo
-
+!
   end subroutine diag_scaling_p
 !
 !
@@ -202,4 +202,3 @@
 !
 !
    end subroutine diag_scaling_s
-

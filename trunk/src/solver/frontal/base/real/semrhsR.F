@@ -1,6 +1,3 @@
-      subroutine semrhs (Amdest, Elrhs, Frhs)
-c
-#include "syscom.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: Assembles the rhs's into the front
 c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
@@ -11,7 +8,7 @@ c I   Amdest:  dof destination vectors
 c I   Elrhs :  element rhs
 c IO  Frhs  :  front assembled rhs
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -21,10 +18,16 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      subroutine semrhs (Amdest, Elrhs, Frhs)
 c
-      dimension Amdest(*),Elrhs(*),Frhs(*)
+      use surfsc1
+      use surfsc2
+c
+      implicit none
+c
+      real(8) :: Amdest(*),Elrhs(*),Frhs(*)
+c
+      integer :: n,in,i,j,md
 c
       n = 1
 c
@@ -60,5 +63,5 @@ c
 c
    70 continue
 c
-      return
-      end
+c
+      end subroutine semrhs

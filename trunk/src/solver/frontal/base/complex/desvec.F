@@ -1,6 +1,3 @@
-      Subroutine desvec (In, Ia, Ibb, Ic, Ntot)
-c
-#include "syscomz.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c calculation of nodal destination vectors from nicknames
@@ -24,7 +21,7 @@ c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
 c ARGUMENTS:  (I : input, O : output, IO : input & output, W : workspace
 c
 c Typ Name      Function
-c I   In    array (length numel) containing the number of nodes+multipli
+c I   In    array (length NUMELM) containing the number of nodes+multipli
 c             essentially the number of nicknames/element
 c             **note: this must be pre-built by the calling program
 c
@@ -46,7 +43,7 @@ c
 c W   Ic     temporary workspace for calculating the front elimination
 c..........................................................
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -56,17 +53,25 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
+      subroutine desvec (In, Ia, Ibb, Ic, Ntot)
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      use surfsc1
+      use surfsc2
 c
-      dimension In(*), Ia(*), Ibb(*), Ic(*)
+      implicit none
 c
-c internal function: modr
+      integer :: In(*), Ia(*), Ibb(*), Ic(*)
+      integer :: Ntot
 c
+      integer :: i,id,ides,iel,ifrst,inic,ip,ipc,ips
+      integer :: j,jd,jdes,jdn,jjd,jp,n,ne,nt,ntt
+c
+#if DEBUG_MODE
+      integer :: iprint
+#endif
+c
+      integer :: modr
       modr(i,j) = i - (i/j)*j
-c
-      iprint=0
 c
 c initialize
 c
@@ -82,7 +87,10 @@ c
       do 10 i = 1,NFN
          Ibb(i) = 0
    10 continue
+#if DEBUG_MODE
+      iprint = 0
       if (iprint.eq.1) write(NFSOUT,*) 'in desvec.f, numelm=',numelm
+#endif
 c
 c loop thru the elements
 c
@@ -91,9 +99,11 @@ c     **********************
 c
 c if the element contains no nodes or multipliers, then skip it
 c
+#if DEBUG_MODE
          if (iprint.eq.1) then
            write(*,*) 'desvec: iel = ',iel
          endif
+#endif
          n = In(iel)
          if (n .eq. 0) go to 100
 c
@@ -110,9 +120,11 @@ c
          do 60 id = 1,n
 c        ***************
 c
+#if DEBUG_MODE
             if (iprint.eq.1) then
               write(*,*) 'desvec: id = ',id
             endif
+#endif
             ifrst = 0
 c
 c pull up the nickname
@@ -122,13 +134,17 @@ c
 c
 c unpack the number of dof associated w/ this nickname
 cwb >
+#if DEBUG_MODE
             if (iprint.eq.1) then
               write(*,*) 'desvec: inic,NICMUL = ',inic,NICMUL
             endif
+#endif
             NDOFM = modr(inic,NICMUL)
+#if DEBUG_MODE
             if (iprint.eq.1) then
               write(*,*) 'desvec: NDOFM = ',NDOFM
             endif
+#endif
 cwb             NDOFM = modr(inic,10)
 cwb <
             nt = nt + NDOFM
@@ -292,5 +308,5 @@ c
 c
   100 continue
 c
-      return
-      end
+c
+      end subroutine desvec

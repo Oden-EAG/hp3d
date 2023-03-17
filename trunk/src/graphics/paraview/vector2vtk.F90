@@ -74,10 +74,10 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
    Ic=0
 !
 !..decode
-   ireal = iabs(Idx)/Idx
-   iload = iabs(Idx)/100
-   iattr = iabs(Idx) - iload*100 ; iattr=iattr/10
-   icomp = iabs(Idx) - iload*100 - iattr*10
+   ireal = abs(Idx)/Idx
+   iload = abs(Idx)/100
+   iattr = abs(Idx) - iload*100 ; iattr=iattr/10
+   icomp = abs(Idx) - iload*100 - iattr*10
 !
 !..address of 1st component for the attribute
    ibeg=ADRES(iattr)

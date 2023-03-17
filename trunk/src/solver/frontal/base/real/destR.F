@@ -1,6 +1,3 @@
-      subroutine dest (Nd, Aldest ,Nee, Amdest, Andest)
-c
-#include "syscom.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c converts nodal dest. vectors to dof dest. vectors
@@ -19,7 +16,7 @@ c O   Amdest  dof destination vectors
 c O   Andest  destination in the front where the remaining values
 c              in the front will transfer to as each exiting dof is elim
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -29,23 +26,34 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      subroutine dest (Nd, Aldest, Nee, Amdest, Andest)
 c
-      dimension Aldest(*), Amdest(*), Andest(*)
+      use surfsc1
+      use surfsc2
 c
-c internal function : modr
-c ------------------------
+      implicit none
 c
+      integer :: Nd, Nee
+      real(8) :: Aldest(*), Amdest(*), Andest(*)
+c
+      integer :: i,j,km,kn,l,ldest,m,n,ndi,ndl,ne
+c
+#if DEBUG_MODE
+      integer :: iprint
+#endif
+c
+      integer :: modr
       modr(i,j) = i - (i/j)*j
 c
-      iprint=0
+#if DEBUG_MODE
+      iprint = 0
       if (iprint.eq.1) then
         write(*,*) 'DEST: Nd, Aldest = ',Nd
         write(*,7001) (Aldest(iii),iii=1,Nd)
  7001   format(1x,6f10.1)
         call pause
       endif
+#endif
 c
 c initialize
 c
@@ -123,8 +131,8 @@ c
 c
 c set the current frontwidth number
 cwb >
-         l = iabs(nint(Amdest(km-1)))
-cwb           l = iabs(idnint(Amdest(km-1)))
+         l = abs(nint(Amdest(km-1)))
+cwb           l = abs(idnint(Amdest(km-1)))
 cwb <
          if (l .gt. NFW) NFW = l
 c
@@ -185,5 +193,5 @@ cwb <
 7010    format(11x,'DOF DESTINATION VECTORS',10i7,10(/,35x,10i7))
 7020    format(9x,'ELIM. DESTINATION VECTORS',10i7,10(/,35x,10i7))
 c
-      return
-      end
+c
+      end subroutine dest

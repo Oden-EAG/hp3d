@@ -1,10 +1,9 @@
-!> @brief     routine refines an element enforcing TWO mesh regularity rules:
-!!                    Rule 1: no element can be broken unless
+!> @brief     Refines an element enforcing TWO mesh regularity rules:
+!> @details           Rule 1: no element can be broken unless
 !!                            ALL its mid-face nodes are active
 !!                    Rule 2: an element refinement flag is
 !!                            always upgraded to accommodate
 !!                            existing refinements of faces
-!!
 !> @param[in] Mdle_in - middle node
 !> @param[in] Kref_in - refinement kind
 !> @date      Feb 2023
@@ -27,7 +26,8 @@ subroutine refine(Mdle_in,Kref_in)
    logical :: iflag
 !
 #if DEBUG_MODE
-   integer :: iprint = 0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !---------------------------------------------------------------------

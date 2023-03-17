@@ -33,7 +33,8 @@ subroutine elem_nodes_one(Nfath,Nodesl_fath,Norientl_fath,Ison, &
    integer :: j, jp, nodp, nodpp, is, is1, n_nodes
 !
 #if DEBUG_MODE
-   integer :: iprint = 0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !----------------------------------------------------------------------------

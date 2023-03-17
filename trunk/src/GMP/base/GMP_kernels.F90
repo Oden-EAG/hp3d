@@ -1,5 +1,5 @@
 !----------------------------------------------------------------------
-!> Purpose : curve kernel parametrization
+!> @brief Curve kernel parametrization
 !!
 !! @param[in ] No      - curve number
 !! @param[in ] T       - local curve coordinate
@@ -8,13 +8,14 @@
 !! @param[out] Dxdt    - derivatives of the physical coordinates wrt
 !!                       to the local curve coordinate
 !!
-!> @revision Nov 12
+!> @date Mar 2023
 !----------------------------------------------------------------------
 subroutine curveK(No,T,Norient, X,Dxdt)
 !
       use control , only : GEOM_TOL
 !
       implicit none
+!
       integer,             intent(in ) :: No,Norient
       real(8),             intent(in ) :: T
       real(8),dimension(3),intent(out) :: X,Dxdt
@@ -138,13 +139,11 @@ subroutine trianK(No,T,Norient, X,Dxdt)
       real(8) :: blend
       real(8) :: dblend(2)
       integer :: i
-      integer :: iprint,iprint_trianB
+      integer :: iprint
 !
-      common /ctrianK/ iprint
-      common /ctrianB/ iprint_trianB
 !----------------------------------------------------------------------
 !
-      iprint_trianB=iprint
+      iprint=0
 !
 !  ...evaluate blending shape functions
       blend = (1.d0 - T(1) - T(2))*T(1)*T(2)
@@ -207,10 +206,7 @@ subroutine trianB(No,T,Norient, X,Dxdt)
 !     1 - checking at vertices
 !     2 - checking at vertices and edges
       integer :: icheck
-      integer :: iprint,iprint_PTITri
-!
-      common /ctrian_PTITri/ iprint_PTITri
-      common /ctrianB/ iprint
+      integer :: iprint
 !-----------------------------------------------------------------------
 !
       iprint=0
@@ -592,33 +588,44 @@ subroutine rectaB(No,T,Norient, X,Dxdt)
 !
 !
 end subroutine rectaB
-
-
+!
+!----------------------------------------------------------------------
+!> @date Mar 2023
+!----------------------------------------------------------------------
 subroutine rectaB_back(No,T,Norient, X,Dxdt)
 !
       use control
       use GMP
       use element_data
-#include "syscom.blk"
-!cc      common /ctrian_PTITri/ iprint_PTITri
-!cc      common /ctrianB/ iprint
 !
-      dimension T(2),X(3),Dxdt(3,2)
+      implicit none
+!
+      integer :: No,Norient
+      real(8) :: T(2),X(3),Dxdt(3,2)
 !
 !  ...derivatives wrt rectangle coordinates
-      dimension dxds(3,2)
+      real(8) :: dxds(3,2)
 !
 !  ...rectangle coordinates
-      dimension s(2),dsdt(2,2,0:7)
+      real(8) :: s(2),dsdt(2,2,0:7)
 !
 !  ...vertex shape functions
-      dimension shapH(4),dshapH(2,4)
+      real(8) :: shapH(4),dshapH(2,4)
 !
 !  ...vertex coordinates
-      dimension sv(2,4), xv(3,4)
+      real(8) :: sv(2,4), xv(3,4)
 !
 !  ...edge projection, blending function
-      dimension dseds(2), dblend(2)
+      real(8) :: dseds(2), dblend(2)
+!
+!  ...work space
+      real(8) :: sw(2),dswdse(2), &
+                 xw(3),dxwds(3,2),dxwdse(3),xc(3),dxcdse(3)
+!
+      real(8) :: blend,dmax,se,smax
+      integer :: ie,is,iv,iv1,iv2,ivar,nc,norientc,nss,nv
+!
+      integer :: iprint
 !
       data dsdt / 1.d0,  0.d0,  0.d0,  1.d0, &
                   0.d0, -1.d0,  1.d0,  0.d0, &
@@ -632,17 +639,8 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
 !  ...coordinates of master triangle vertices
       data sv /0.d0,0.d0, 1.d0,0.d0, 1.d0,1.d0, 0.d0,1.d0/
 !
-!  ...work space
-      dimension sw(2),dswdse(2), &
-                xw(3),dxwds(3,2),dxwdse(3), xc(3),dxcdse(3)
-!
 !-----------------------------------------------------------------------
 !
-!cc      if (No.eq.4755) then
-!cc        iprint=1
-!cc      else
-!cc        iprint=0
-!cc      endif
       iprint=0
 !
  10   continue

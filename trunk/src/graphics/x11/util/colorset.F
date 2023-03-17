@@ -4,9 +4,7 @@ c   routine name       - colorset
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Mar 02
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine takes care of colors by creating
 c                        a new colormap (when necessary) and next
@@ -15,28 +13,34 @@ c                          NPCOL(1)-white,NPCOL(2)-black,
 c                          NPCOL(3-10)-low-order-to-high-order-p-approx
 c                          NPCOL(11-200) - spectrum of colors
 c
-c   usage              - call colorset(Iwind)
-c
 c   arguments :
 c     in:
 c               Iwind  = 1  white/black monitor
 c                      = 2,3 gray scale monitor
 c                      = 4 color monitor with 8 colors
 c                      = 5 color monitors with 256 colors
-c     out:
-c
-c   required  routines -
 c
 c----------------------------------------------------------------------
-c
       subroutine colorset(Iwind)
 c
       use graphmod
-#include "syscom.blk"
+c
+      implicit none
+c
+      integer, intent(in) :: Iwind
+c
+      real(8) :: alpha
+      integer :: i,ib,ig,ir,irgb,j
+      integer :: ncol,ndcol,nrcol,nrrow
 c
 c.....colors to interpolate between
-      parameter(nscales=5)
-      dimension iram(4,nscales)
+      integer, parameter :: nscales = 5
+      integer :: iram(4,nscales)
+c
+#if DEBUG_MODE
+      integer :: iprint
+      iprint=0
+#endif
 c
 c  ...nscales=6
 ccc      data iram /  0,  0,  0,255,   200,  0,255,255,
@@ -60,7 +64,6 @@ ccc     .           500,  0,255,  0,  550,127,255,  0,
 ccc     .           750,255,255,  0,  900,255,127,  0,
 ccc     .          1000,255,  0,  0/
 c
-      iprint=0
 c
 c  ...first clear array of colors
       NPCOL(1:NR_COLORS) = 0
@@ -177,12 +180,14 @@ c  .......loop through the colors to be generated
             ig = alpha*iram(3,nrrow+1)+(1-alpha)*iram(3,nrrow)
             ib = alpha*iram(4,nrrow+1)+(1-alpha)*iram(4,nrrow)
 c
+#if DEBUG_MODE
             if (iprint.eq.1) then
               write(*,7003) nrcol,nrrow,alpha
  7003         format('nrcol,nrrow,alpha = ',2i4,f8.3)
               write(*,7001) i,ir,ig,ib
  7001         format('colorset: i = ',i4,' ir,ig,ib = ',3i4)
             endif
+#endif
 c
             call xgsetcm(10+i,ir,ig,ib)
             call   afill(11+i,ir,ig,ib)
@@ -193,26 +198,27 @@ c
         endif
       endif
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,*) 'COLORSET: NPCOL = '
         write(*,7002) NPCOL
  7002   format(10i4)
         call pause
       endif
+#endif
 c
-      return
-      end
+      end subroutine colorset
+c
+c
 c----------------------------------------------------------------------
 c
 c   routine name       - afill
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
+c   latest revision    - Feb 2023
 c
-c   latest revision    - Feb 98
-c
-c   purpose            - an axiliary routine for colorset
+c   purpose            - an auxiliary routine for colorset
 c
 c----------------------------------------------------------------------
 c
@@ -220,11 +226,13 @@ c
 c
       use graphmod
 c
-      IRED(index1)=ir1
-      IGREEN(index1)=ig1
-      IBLUE(index1)=ib1
+      implicit none
 c
-      return
-      end
-
-
+      integer, intent(in) :: index1,ir1,ig1,ib1
+c
+      IRED  (index1)=ir1
+      IGREEN(index1)=ig1
+      IBLUE (index1)=ib1
+c
+c
+      end subroutine afill

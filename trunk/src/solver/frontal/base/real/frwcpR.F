@@ -1,6 +1,3 @@
-      subroutine frwcp (Alelm, Aldest, Amdest, Andest, Elem, Frnt, Buf)
-c
-#include "syscom.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c Forward elimination of both lhs and rhs
@@ -21,7 +18,7 @@ c W   Frnt    equations in the front
 c W   Buf     eliminated equations
 c
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -30,12 +27,18 @@ c     aaaaaaaa    LOCAL Variables
 c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+      subroutine frwcp (Alelm, Aldest, Amdest, Andest, Elem, Frnt, Buf)
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      use surfsc1
+      use surfsc2
 c
-      dimension Aldest(*),Amdest(*),Andest(*),Elem(*),Frnt(*),Buf(*)
-     .         ,Alelm(*)
+      implicit none
+c
+      real(8) :: Alelm(*), Aldest(*), Amdest(*), Andest(*)
+      real(8) :: Elem(*),Frnt(*),Buf(*)
+c
+      integer :: i,id,ie,iel,ifg,iunsr,j,jerr
+      integer :: lenf,m,mke,n,ne,negiel,newl,newu,numdes
 c
       IFU = 0
       IFL = 0
@@ -437,5 +440,5 @@ c
 c
       endif
 c
-      return
-      end
+c
+      end subroutine frwcp

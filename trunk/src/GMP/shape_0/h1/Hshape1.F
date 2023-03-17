@@ -4,7 +4,7 @@ c   routine name       - Hshape1
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Feb 07
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine evaluates 1D hierarchical C1-conforming
 c                        shape functions, the first four are the standard
@@ -24,9 +24,13 @@ c
       subroutine Hshape1(Nord,Xi, Val,Dval,Ddval)
 c
       use parameters , only : MAXP
-#include "syscom.blk"
+      implicit none
 c
-      dimension Val(MAXP+1), Dval(MAXP+1), Ddval(MAXP+1)
+      integer :: Nord
+      real(8) :: Xi
+      real(8) :: Val(MAXP+1), Dval(MAXP+1), Ddval(MAXP+1)
+c
+      integer :: j
 c
 c  ...check data
       if ((Nord.lt.3).or.(Nord.gt.MAXP)) then
@@ -68,4 +72,4 @@ c
       enddo
 c
 c
-      end
+      end subroutine Hshape1

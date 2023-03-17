@@ -8,7 +8,8 @@ subroutine verify_neig
   integer :: i, j, iface, mdle, nod, nrneig, loc, ntype
 
 #if DEBUG_MODE
-  integer :: iprint = 0
+  integer :: iprint
+  iprint=0
 #endif
 
   !  ...loop over active elements

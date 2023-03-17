@@ -1,3 +1,5 @@
+#if DEBUG_MODE
+
 !----------------------------------------------------------------------
 !> @brief   routine sets interactively dof for nodes
 !> @date    Feb 2023
@@ -77,3 +79,5 @@ subroutine set_nodal_dof
       enddo
 !
 end subroutine set_nodal_dof
+
+#endif

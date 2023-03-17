@@ -72,7 +72,7 @@ subroutine paraview_attr_scalar(Id, Idx)
 !..write to .h5 file (flip sign of "Idx")
    call scalar2vtk("Scalar",  &
       trim(PARAVIEW_DIR)//trim(PREFIX)//"scalar_"//trim(fname)//postfix//".h5", &
-      trim(nick),-iabs(Idx), ic)
+      trim(nick),-abs(Idx), ic)
 !
    if (RANK .ne. ROOT) goto 70
 !

@@ -37,10 +37,13 @@ c
       integer,          intent(in)  ::                             Nord
       double precision, intent(in)  ::                              X,T
       double precision, intent(out) ::                        P(0:Nord)
-      integer ::                                               i,iprint
+      integer ::                                                      i
       double precision ::                                          tt,y
 c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
+#endif
 c
 c  ...i stands for the order of the polynomial, stored in P(i)
 c  ...lowest order case (order 0)
@@ -59,6 +62,7 @@ c  ...higher order if necessary - use recurrence formula
         enddo
       endif
 c
+#if DEBUG_MODE
 c  ...catching problems (debugging)
       if (iprint.eq.1) then
         write(*,7002) Nord, X,T
@@ -69,6 +73,7 @@ c  ...catching problems (debugging)
         enddo
         call pause
       endif
+#endif
 c
       end subroutine PolyLegendre
 c
@@ -108,10 +113,13 @@ c
       integer,          intent(in)  ::                             Nord
       double precision, intent(in)  ::                              X,T
       double precision, intent(out) ::    L(2:Nord),P(Nord-1),R(Nord-1)
-      integer ::                                         i,ifact,iprint
+      integer ::                                                i,ifact
       double precision ::                              ptemp(0:Nord),tt
 c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
+#endif
 c
 c  ...calling Legendre for required information
       call PolyLegendre(X,T,Nord, ptemp)
@@ -136,6 +144,7 @@ c  ...general case: compute R
         enddo
       endif
 c
+#if DEBUG_MODE
 c  ...catching problems (debugging)
       if (iprint.eq.1) then
         write(*,7002) Idec,Nord, X,T
@@ -153,6 +162,7 @@ c  ...catching problems (debugging)
         enddo
         call pause
       endif
+#endif
 c
       end subroutine PolyILegendre
 c
@@ -190,15 +200,19 @@ c
       integer,          intent(in)  ::                    Nord,Minalpha
       double precision, intent(in)  ::                              X,T
       double precision, intent(out) ::                 P(0:Nord,0:Nord)
-      integer :: minI,maxI,i,ni,a,aa,al,ai,bi,ci,di,iprint,alpha(0:Nord)
+      integer ::       minI,maxI,i,ni,a,aa,al,ai,bi,ci,di,alpha(0:Nord)
       double precision ::                                          y,tt
+c
+#if DEBUG_MODE
+      integer :: iprint
+      iprint=0
+#endif
 c
 c  ...clearly (minI,maxI)=(0,Nord), but the syntax is written as it is
 c     because it reflects how the indexing is called from outside
       minI = 0; maxI = minI+Nord
 c
 c  ...in our work Minalpha>=1
-      iprint = 0
       if (Minalpha.lt.1) then
         write(*,7001) Minalpha
  7001   format('PolyJacobi: Minalpha = ',i3)
@@ -238,6 +252,7 @@ c
         enddo
       endif
 c
+#if DEBUG_MODE
 c  ...catching problems (debugging)
       if (iprint.eq.1) then
         write(*,7003) Nord, X,T
@@ -248,6 +263,7 @@ c  ...catching problems (debugging)
         enddo
         call pause
       endif
+#endif
 c
       end subroutine PolyJacobi
 c
@@ -292,11 +308,14 @@ c
       double precision, intent(in)  ::                              X,T
       double precision, intent(out) ::                 L(1:Nord,1:Nord),
      .                            P(1:Nord,0:Nord-1),R(1:Nord,0:Nord-1)
-      integer ::             minI,maxI,i,ni,a,al,tia,tiam1,tiam2,iprint,
+      integer ::                    minI,maxI,i,ni,a,al,tia,tiam1,tiam2,
      .                                                    alpha(1:Nord)
       double precision ::            ai,bi,ci,tt,ptemp(1:Nord+1,0:Nord)
 c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
+#endif
 c
 c  ...clearly (minI,maxI)=(1,Nord), but the syntax is written as it is
 c     because it reflects how the indexing is called from outside
@@ -377,6 +396,7 @@ c              P(a,i-1) =  ptemp(a,i-1)
         endif
       endif
 c
+#if DEBUG_MODE
 c  ...catching problems (debugging)
       if (iprint.eq.1) then
         write(*,7003) minI,Nord, X,T
@@ -406,6 +426,7 @@ c  ...catching problems (debugging)
         endif
         call pause
       endif
+#endif
 c
       end subroutine PolyIJacobi
 c

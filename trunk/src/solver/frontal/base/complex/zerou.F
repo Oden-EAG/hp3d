@@ -1,6 +1,3 @@
-      subroutine zerou (Flhs)
-c
-#include "syscomz.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: If necessary, zero out for new unsymmetric lhs equations
 c            in the front
@@ -16,7 +13,7 @@ c               a21 a22 a23 ...  ==>  [a11,a12,a13,..., a21,a22,a23,...]
 c               a31 a32 a33 ...
 c                :   :   :
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -26,11 +23,17 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc2.blk"
+      subroutine zerou (Flhs)
 c
-      dimension Flhs(*)
+      use surfsc2
 c
-      data zero /0.0d0/
+      implicit none
+c
+      complex(8) :: Flhs(*)
+c
+      integer :: i,j,mi,mj,mk
+c
+      complex(8), parameter :: zero = (0.d0, 0.d0)
 c
 c
 c if the new frontwidth is equal to the old frontwidth
@@ -82,5 +85,5 @@ c
 c
    50 continue
 c
-      return
-      end
+c
+      end subroutine zerou

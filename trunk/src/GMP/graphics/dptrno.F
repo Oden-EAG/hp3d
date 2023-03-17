@@ -4,18 +4,10 @@ c   routine name       - dptrno
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Dec, 01
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine displays the nicknames of
-c                        all 2D blocks
-c
-c   usage              - call dptrno
-c
-c   arguments          - none
-c
-c   required  routines -
+c                        all 2D blocksc
 c
 c----------------------------------------------------------------------
 c
@@ -24,11 +16,14 @@ c
       use graphmod
       use GMP
 c
-#include "syscom.blk"
+      implicit none
 c
-      dimension xcoord(3,8), dxdxi(3,2)
-      dimension xav(3),xavob(3), xi(2)
-      character(3) text
+      real(8) :: xcoord(3,8), dxdxi(3,2)
+      real(8) :: xav(3),xavob(3), xi(2)
+      character(3) :: text
+c
+      real(8) :: angle,height,xtext,ytext
+      integer :: i,inv,iv,ivar,j,k,nc,ncol,nick,np,nt1,ntb,ntv
 c
 c  ...set colour
       ncol=npcol(2)
@@ -44,12 +39,11 @@ c  ...check if not invisible
 c
 c  .....bilinear blocks
         if (PRISMS(ntb)%Type.eq.'LiLiPrism') then
-
 c
 c  .....get the bases, next edges and then the vertices
           iv=0
           do 30 i=1,2
-            nt1 = iabs(PRISMS(ntb)%FigNo(i)/10)
+            nt1 = abs(PRISMS(ntb)%FigNo(i)/10)
             do 20 k=1,3
               nc = TRIANGLES(nt1)%EdgeNo(k)
               if (nc.gt.0) then
@@ -79,7 +73,7 @@ c  .....get the bases, next its central points
           xi(1) = 0.33333333333333d0
           xi(2) = 0.33333333333333d0
           do 230 i=1,2
-            nt1 = iabs(PRISMS(ntb)%FigNo(i)/10)
+            nt1 = abs(PRISMS(ntb)%FigNo(i)/10)
             call trian(nt1,xi,xcoord(1,i),dxdxi)
   230     continue
           do 280 i = 1,3
@@ -118,7 +112,7 @@ c
 c  .....get the bases, next edges and then the vertices
         iv=0
         do 130 i=1,2
-          nt1 = iabs(HEXAS(ntb)%FigNo(i)/10)
+          nt1 = abs(HEXAS(ntb)%FigNo(i)/10)
           do 120 k=1,4
             nc = RECTANGLES(nt1)%EdgeNo(k)
             if (nc.gt.0) then
@@ -158,9 +152,4 @@ c  .....write the block nickname
         call symbol(xtext,ytext,height,text,angle,3,ncol)
   190 continue
 c
-      return
-      end
-
-
-
-
+      end subroutine dptrno

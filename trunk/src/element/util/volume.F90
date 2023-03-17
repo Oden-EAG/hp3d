@@ -1,3 +1,5 @@
+#if DEBUG_MODE
+
 !-----------------------------------------------------------------------
 subroutine volume(Vol)
 !
@@ -63,3 +65,5 @@ subroutine volume(Vol)
 !
 !
 end subroutine volume
+
+#endif

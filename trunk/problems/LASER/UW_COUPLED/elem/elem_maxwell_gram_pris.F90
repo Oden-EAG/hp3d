@@ -44,8 +44,6 @@
 !
    VTYPE  , intent(out) :: GramP(NrTest*(NrTest+1)/2)
 !
-   real(8), parameter :: rZero = 0.d0
-!
 !..declare edge/face type variables
    integer :: etype, etype1, ftype
 !
@@ -395,8 +393,8 @@
 !     ...Shape function subroutine is called only once, when
 !        pz=1 and stored in sH2p(:,py) and dsH2p(:,py)
          if (pz.eq.1) then
-            sH12(:,pxy)   = rZero;  gH12(:,:,pxy) = rZero
-            sE12(:,:,pxy) = rZero;  cE12(:,pxy)   = rZero
+            sH12(:,pxy)   = rZERO;  gH12(:,:,pxy) = rZERO
+            sE12(:,:,pxy) = rZERO;  cE12(:,pxy)   = rZERO
             call shape2HH(etype1,xi12,norder_fe(5), nrdofH12,sH12(:,pxy),gH12(1:2,:,pxy))
             call shape2EE(etype1,xi12,norder_fe(5), nrdofE12,sE12(1:2,:,pxy),cE12(:,pxy))
          endif
@@ -404,8 +402,8 @@
 !     ...Copy shape functions in coord. 2 previously evaluated
 !     ...E12 is for E terms, separated into family 1 and 2 of tri shape fns.
          E12(1:2, 1:NrdofE12 ) = sE12(1:2,1:NrdofE12,pxy)
-         E12(3  , 1:NrdofE12 ) = rZero
-         E12(1:2, (NrdofE12+1):(NrdofE12+NrdofH12) ) = rZero
+         E12(3  , 1:NrdofE12 ) = rZERO
+         E12(1:2, (NrdofE12+1):(NrdofE12+NrdofH12) ) = rZERO
          E12(3  , (NrdofE12+1):(NrdofE12+NrdofH12) ) = sH12(1:NrdofH12,pxy)
 !
 !     ...C12 is for C terms, curl of E terms, same separation as above
@@ -414,7 +412,7 @@
          C12(3 , 1:NrdofE12 ) =  cE12(  1:NrdofE12,pxy)
          C12(1 , (NrdofE12+1):(NrdofE12+NrdofH12) ) =  gH12(2,1:NrdofH12,pxy)
          C12(2 , (NrdofE12+1):(NrdofE12+NrdofH12) ) = -gH12(1,1:NrdofH12,pxy)
-         C12(3 , (NrdofE12+1):(NrdofE12+NrdofH12) ) = rZero
+         C12(3 , (NrdofE12+1):(NrdofE12+NrdofH12) ) = rZERO
 !
 !     ...Condense quad pt into single array
          xip(1:2) = xi12(1:2); xip(3) = xi3
@@ -593,7 +591,7 @@
 !        ...J^T e_z x J^-T = -(e_z x J)^T J^-T
             D_aux(1,1:3) = -dxdxi(2,1:3)
             D_aux(2,1:3) = dxdxi(1,1:3)
-            D_aux(3,1:3) = rZero
+            D_aux(3,1:3) = rZERO
             call DGEMM('T','T',3,3,3,-1.0d0,D_aux,3,dxidx,3,0.0d0,D_aux2,3)
             C_RC = D_aux2 * WAVENUM_FLD*detJstretch * wt123
 !

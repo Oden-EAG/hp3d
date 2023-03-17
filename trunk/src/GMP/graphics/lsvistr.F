@@ -4,16 +4,12 @@ c   routine name       - lsvistr
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Jun 07
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine makes the list of all visible
 c                        triangles and stores rescaled coordinates
 c                        of their end-points (vertices) in an array
 c                        RGTR
-c
-c   arguments          - none
 c
 c   required  routines - trian,recta,sortz,clip2,trobs
 c
@@ -24,24 +20,31 @@ c
       use GMP
       use graphmod
 c
-#include "syscom.blk"
+      implicit none
 c
-      dimension xmax(3),xmin(3)
-      dimension xi(2),xcoord(3,3),dxdxi(NDIM,2)
-      dimension pm(2),pn(2),xtro(3,3)
+      real(8) :: xmax(3),xmin(3)
+      real(8) :: xi(2),xcoord(3,3),dxdxi(NDIM,2)
+      real(8) :: pm(2),pn(2),xtro(3,3)
 c
 c  ...integer coordinates of points on a rectangular face
-      dimension ixi(2,3)
+      integer :: ixi(2,3)
 c
 c  ...face rectangles numbers and their orientation for a block
-      dimension nsid_rect(6),nsid_orient(6),nsid_tria(4)
+      integer :: nsid_rect(6),nsid_orient(6),nsid_tria(4)
 c
 c  ...visibility flags for two sides of a figure
-      dimension nvis_flag(2)
+      integer :: nvis_flag(2)
 c
 c  ...binary flags for plotting boundary of a triangle
-      dimension nplotb(3)
+      integer :: nplotb(3)
 c
+      real(8) :: cl,sign,vis
+      integer :: i,iclip,iflag,ii,iloc,inv2,is,isub,ivar,j,k,l,lab
+      integer :: nb,nbb,nbl,ndom,nhalf,nick,nickb,nnn,nr,nsub1,nsub2,nt
+c
+      integer :: iprint
+c
+      real(8) :: bigp,bign,small,one
       data bigp,bign,small,one /1.d30,-1.d30,1.d-6,1.d0/
 c
 c-----------------------------------------------------------------------
@@ -84,7 +87,7 @@ c  .......loop through the adjacent blocks
           do is=1,2
 c
 c  .........the adjacent block's nickname  is
-            nb = iabs(TRIANGLES(nt)%BlockNo(is))
+            nb = abs(TRIANGLES(nt)%BlockNo(is))
 c
             if (nb.eq.0) then
 c
@@ -167,7 +170,7 @@ c  .......check if on the list of curvilinear blocks
           endif
 c
 c  .......find the orientation of the triangle wrt the adjacent block
-          call decode(iabs(nb), nbl,lab)
+          call decode(abs(nb), nbl,lab)
           select case(lab)
 c
 c  .......prism
@@ -387,15 +390,15 @@ c  ...........update list of visible curves when on boundary
                 nick=0; nplotb(1:3)=0
                 if (i.eq.1) then
                   nplotb(2)=1
-                  if (j.eq.(NRSUB)/2) nick=iabs(TRIANGLES(nt)%EdgeNo(3))
+                  if (j.eq.(NRSUB)/2) nick=abs(TRIANGLES(nt)%EdgeNo(3))
                 endif
                 if (j.eq.1) then
                   nplotb(3)=1
-                  if (i.eq.(NRSUB)/2) nick=iabs(TRIANGLES(nt)%EdgeNo(1))
+                  if (i.eq.(NRSUB)/2) nick=abs(TRIANGLES(nt)%EdgeNo(1))
                 endif
                 if (j.eq.NRSUB-i+1) then
                   nplotb(1)=1
-                  if (i.eq.(NRSUB)/2) nick=iabs(TRIANGLES(nt)%EdgeNo(2))
+                  if (i.eq.(NRSUB)/2) nick=abs(TRIANGLES(nt)%EdgeNo(2))
                 endif
 c======================================================================
 c Activate to make parameterization visible
@@ -505,13 +508,13 @@ c
 c  .........the block on the first side is visible, on the second
 c           side there is no visible block, display the rectangle
 c           as a face of the first block
-            nb = iabs(RECTANGLES(nr)%BlockNo(1))
+            nb = abs(RECTANGLES(nr)%BlockNo(1))
           case(10)
 c
 c  .........the block on the second side is visible, on the first
 c           side there is no visible block, display the rectangle
 c           as a face of the second block
-            nb = iabs(RECTANGLES(nr)%BlockNo(2))
+            nb = abs(RECTANGLES(nr)%BlockNo(2))
           end select
 c
 c  .......check if on the list of curvilinear blocks
@@ -523,7 +526,7 @@ c  .......check if on the list of curvilinear blocks
           endif
 c
 c  .......find the orientation of the rectangle wrt the adjacent block
-          call decode(iabs(nb), nbl,lab)
+          call decode(abs(nb), nbl,lab)
           select case(lab)
 c
 c  .......prism
@@ -606,7 +609,7 @@ c         whether the current rectangle is on the list
           do inv2 = 1,NRINVBL
 c
 c  .........skip if on the list
-            if ((nr*10+iabs(nr)).eq.IGINV(inv2)) go to 160
+            if ((nr*10+abs(nr)).eq.IGINV(inv2)) go to 160
           enddo
           sign = one
 c
@@ -801,17 +804,17 @@ ccc                    IGTRCU(NRVISTR) = IGTRCU(NRVISTR)+2
               nick=0
               if (l.eq.1) then
                 if (j.eq.1) then
-                 if (i.eq.(NRSUB)/2) nick=iabs(RECTANGLES(nr)%EdgeNo(1))
+                 if (i.eq.(NRSUB)/2) nick=abs(RECTANGLES(nr)%EdgeNo(1))
                 endif
                 if (i.eq.NRSUB) then
-                 if (j.eq.(NRSUB)/2) nick=iabs(RECTANGLES(nr)%EdgeNo(2))
+                 if (j.eq.(NRSUB)/2) nick=abs(RECTANGLES(nr)%EdgeNo(2))
                 endif
               else
                 if (i.eq.1) then
-                 if (j.eq.(NRSUB)/2) nick=iabs(RECTANGLES(nr)%EdgeNo(4))
+                 if (j.eq.(NRSUB)/2) nick=abs(RECTANGLES(nr)%EdgeNo(4))
                 endif
                 if (j.eq.NRSUB) then
-                 if (i.eq.(NRSUB)/2) nick=iabs(RECTANGLES(nr)%EdgeNo(3))
+                 if (i.eq.(NRSUB)/2) nick=abs(RECTANGLES(nr)%EdgeNo(3))
                 endif
               endif
               IGTRCU(NRVISTR) = IGTRCU(NRVISTR)+10000*nick
@@ -847,26 +850,4 @@ c
 c  ...sort according to z-coordinate in order back-to-front
       call sortz
 c
-      return
-      end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      end subroutine lsvistr

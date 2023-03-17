@@ -1,25 +1,32 @@
-      real(8) function dreal_part(Z)
+#include "typedefs.h"
+
+!>@brief Returns real part of complex number
+!>@date Feb 2023
+real(8) function dreal_part(Z)
 !
-#include "syscom.blk"
+   implicit none
+   VTYPE :: Z
 !
 #if C_MODE
-      dreal_part = real(Z)
+   dreal_part = dreal(Z)
 #else
-      dreal_part = Z
+   dreal_part = Z
 #endif
 !
-      end function dreal_part
+end function dreal_part
 !
 !
+!>@brief Returns imag part of complex number
+!>@date Feb 2023
+real(8) function dimag_part(Z)
 !
-      real(8) function dimag_part(Z)
-!
-#include "syscom.blk"
+   implicit none
+   VTYPE :: Z
 !
 #if C_MODE
-      dimag_part = aimag(Z)
+   dimag_part = dimag(Z)
 #else
-      dimag_part = 0.d0
+   dimag_part = 0.d0
 #endif
 !
 end function dimag_part

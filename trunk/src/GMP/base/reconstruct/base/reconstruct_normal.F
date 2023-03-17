@@ -4,9 +4,7 @@ c   routine name       - reconstruct_normal
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - May 07
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine reconstructs a normal at a surface
 c                        point by performing the least squares fit
@@ -24,24 +22,29 @@ c----------------------------------------------------------------------
 c
       subroutine reconstruct_normal(Np,List_curves,Nrcurves, Rn)
 c
-c
       use GMP
       use control
 c
-#include "syscom.blk"
+      implicit none
 c
-      dimension List_curves(Nrcurves),Rn(3)
+      integer :: Np,Nrcurves
+      integer :: List_curves(Nrcurves)
+      real(8) :: Rn(3)
 c
 c  ...points to fit
-      dimension xp(3,20),weight(20)
+      real(8) :: xp(3,20),weight(20)
 c
 c  ...matrices for a system of linear equations
-      dimension aa(6,6),bb(6,3),cc(3,6),dd(3,3),aux(6,3)
+      real(8) :: aa(6,6),bb(6,3),cc(3,6),dd(3,3),aux(6,3)
 
 c  ...work space
-      dimension eigen(3),work(37),iwork(18),rnw(3)
+      real(8) :: eigen(3),work(37),rnw(3)
+      integer :: iwork(18)
 c
+      real(8) :: ccc,d1,d2,ddd,diff,dmin,s,scale
+      integer :: i,ic,ii,info,j,jj,k,l,nc,np1
 c
+      integer :: iprint
 c**********************************************************************
 c
       iprint=0
@@ -223,5 +226,4 @@ c  ...pick the eigenvector that minimizes the misfit function
       endif
 c
 c
-      end
-
+      end subroutine reconstruct_normal

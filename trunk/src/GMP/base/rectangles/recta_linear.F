@@ -4,7 +4,7 @@ c   routine name       - recta
 c
 c------------------------------------------------------------------------
 c
-c   latest revision    - Jun 07
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine evaluates physical coordinates
 c                        and its derivatives wrt to reference
@@ -20,19 +20,23 @@ c               X      - physical coordinates of the point
 c               Dxdeta - derivatives of the physical coordinates wrt
 c                        to the reference coordinates
 c
-c  REMARK, Nov 12 : do not remove! needed for graphics
 c------------------------------------------------------------------------
 c
       subroutine recta_linear(No,Eta, X,Dxdeta)
 c
       use GMP
-#include "syscom.blk"
 c
-      dimension Eta(2),X(3),Dxdeta(NDIM,2)
+      implicit none
+c
+      integer :: No
+      real(8) :: Eta(2),X(3),Dxdeta(NDIM,2)
 c
 c  ...vertex coordinates, work space
-      dimension xv(NDIM,4),aux(NDIM,3)
+      real(8) :: xv(NDIM,4),aux(NDIM,3)
 c
+      integer :: i,j,np
+c
+      integer :: iprint
 c------------------------------------------------------------------------
 c
       iprint=0
@@ -59,12 +63,4 @@ c  ...evaluate physical coordinates and their derivatives
       enddo
 c
 c
-      end
-
-
-
-
-
-
-
-
+      end subroutine recta_linear

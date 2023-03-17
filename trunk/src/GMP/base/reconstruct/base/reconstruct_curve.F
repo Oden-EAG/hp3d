@@ -4,9 +4,7 @@ c   routine name       - reconstruct_curve
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Sep 07
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine reconstructs a curve minimizing the
 c                        L2-norm of the second derivative
@@ -33,28 +31,31 @@ c
       use parameters       , only : MAXP
       use gauss_quadrature , only : INITIALIZED,XIGAUS1,WAGAUS1
 c
-#include "syscom.blk"
-      common /creconstruct_curve/ iprint
+      implicit none
 c
-      dimension Xpoint(3,2), Evect(3,2), Eprim(3,2), Rnorm(3,2)
+      integer :: Nerr_flag
+      real(8) :: Xpoint(3,2),Evect(3,2),Eprim(3,2),Rnorm(3,2)
 c
 c  ...matrices for a system of linear equations
-      dimension aa(4,4),bb(4),uu(4),u(4)
+      real(8) :: aa(4,4),bb(4),uu(4),u(4)
 c
 c  ...shape functions and their derivatives
-      dimension vshap(MAXP+1),dvshap(MAXP+1),ddvshap(MAXP+1)
+      real(8) :: vshap(MAXP+1),dvshap(MAXP+1),ddvshap(MAXP+1)
 c
 c  ...dot(r) vector and its first and second derivatives wrt the
 c     optimization parameters
-      dimension dr(3), drdl(3, 4),d2drdl(3, 4,4)
+      real(8) :: dr(3),drdl(3,4),d2drdl(3,4,4)
 c
 c  ...work space
-      dimension temp(3),eigen(4),work(9),aacopy(4,4)
+      real(8) :: temp(3),eigen(4),work(9),aacopy(4,4)
 c
+      integer :: i,info,iter,iwork,j,l,nint
+      real(8) :: dij,res,rjac2,rl,rl_old,s,sij,sj,step,wa,xi
 c
+      integer :: iprint
 c**********************************************************************
 c
-ccc      iprint=0
+      iprint=0
       Nerr_flag=0
 c
 c  ...set up quadrature
@@ -245,5 +246,4 @@ c  ...printing
       endif
 c
 c
-      end
-
+      end subroutine reconstruct_curve

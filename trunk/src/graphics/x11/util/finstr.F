@@ -4,39 +4,40 @@ c   routine name       - finstr
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Dec 05
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine constructs small triangles
 c                        where the solution is greater then Slev
 c                        within the bigger triangle with vertices
 c                        coordinates Xtro and solution values Usol
 c
-c
 c   arguments :
 c     in:
-c              Xtro    - bigger triangle vertices coordinates
-c              Usol    - values of the solution at vertices
-c              Slev    - limiting level of solution
-c              Slevup  - next value on the scale
+c              Xtro      - bigger triangle vertices coordinates
+c              Usol      - values of the solution at vertices
+c              Slev      - limiting level of solution
+c              Slevup    - next value on the scale
 c     out:
-c              Nstrl   - number of small triangles
-c              Costr   - small triangles vertices coordinates
+c              Nstrl     - number of small triangles
+c              Costr     - small triangles vertices coordinates
 c              Nsid_flag - a flag indicating which edge should be
-c                        be drawn (B/W version)
-c
-c   required  routines -
+c                          be drawn (B/W version)
 c
 c----------------------------------------------------------------------
 c
       subroutine finstr(Xtro,Usol,Slev,Slevup, Nstrl,Costr,Nsid_flag)
 c
-#include "syscom.blk"
+      implicit none
 c
-      dimension Nsid_flag(2)
-      dimension Xtro(3,3),Usol(3),Costr(2,3,3)
+      integer :: Nstrl
+      integer :: Nsid_flag(2)
+      real(8) :: Xtro(3,3),Usol(3),Costr(2,3,3)
+      real(8) :: Slev,Slevup
 c
+      integer :: icart
+c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
       if (iprint.eq.1) then
          write(*,*) 'in finstr'
@@ -44,6 +45,8 @@ c
          write(*,*) 'Slev,Slevup',Slev,Slevup
          call pause
       endif
+#endif
+c
       Nsid_flag=0
 c
 c  ...perform multistage checking
@@ -160,6 +163,4 @@ c            endif
         endif
       endif
 c
-      return
-      end
-
+      end subroutine finstr

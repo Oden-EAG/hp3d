@@ -4,9 +4,7 @@ c   routine name       - saruss
 c
 c-----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Jan 06
+c   latest revision    - Mar 2023
 c
 c   purpose            - solve a linear 3 times 3 system of equations
 c                        using determinants (Cramer's rule)
@@ -22,16 +20,19 @@ c                Nfl   - return flag
 c                        = 0 if non-singular system
 c                        = 1 if numerically singular system
 c
-c   required  routines -
-c
 c-----------------------------------------------------------------------
 c
       subroutine saruss(A,B, C,Nfl)
 c
-#include "syscom.blk"
+      implicit none
 c
-      dimension A(3,3),B(3), C(3)
-      data eps/1.0E-18/
+      integer :: Nfl
+      real(8) :: A(3,3),B(3),C(3)
+c
+      real(8) :: detA,detX,detY,detZ
+      integer :: i,j
+c
+      real(8), parameter :: eps = 1.0d-18
 c
       Nfl=0
 c
@@ -77,4 +78,4 @@ c
       C(3) = detZ/detA
 c
 c
-      end
+      end subroutine saruss

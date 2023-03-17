@@ -12,7 +12,7 @@
 !     DUMMY ARGUMENTS
       integer,intent(in)     :: Nt
 !--------------------------------------------------------------------------
-!     LOCAL VARIBLES
+!     LOCAL VARIABLES
 !  ...master edge coordinate
       real(8)                :: zeta
 !  ...master triangle coordiante
@@ -101,4 +101,4 @@
 !  ...end of loop over edges
       enddo
 !
-      end
+      end subroutine check_tri2edgs_compatibility

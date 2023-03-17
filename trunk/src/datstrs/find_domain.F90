@@ -32,6 +32,3 @@ subroutine find_domain(Mdle, Ndom)
 !
 !
 end subroutine find_domain
-
-
-

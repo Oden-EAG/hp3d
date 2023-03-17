@@ -1,7 +1,7 @@
 !----------------------------------------------------------------------
 !   routine name       - give_surf
 !----------------------------------------------------------------------
-!   latest revision    - Dec 08
+!   latest revision    - Mar 2023
 !
 !   purpose            - Given a point and a list surfaces, routine
 !                        identifies the surfaces on which the point
@@ -16,15 +16,18 @@
 !            Nrs       - number of surfaces to which the point belongs
 !            Nos       - surface numbers
 !---------------------------------------------------------------------
+subroutine give_surf(Xp,Nr_confm,Ns_confm, Nrs,Nos)
 !
-      subroutine give_surf(Xp,Nr_confm,Ns_confm, Nrs,Nos)
+   use control
+   use GMP
+   implicit none
 !
-      use control
-      use GMP
-#include "syscom.blk"
+   real(8) :: Xp(3)
+   integer :: Ns_confm(10),Nos(10)
+   integer :: Nr_confm,Nrs
 !
-      dimension Xp(3),Ns_confm(10),Nos(10)
-      dimension dfdx(3)
+   integer :: is,ns
+   real(8) :: fval,dfdx(3)
 !
       Nrs = 0
       do is = 1, Nr_confm
@@ -36,4 +39,4 @@
         endif
       enddo
 !
-      end subroutine give_surf
+end subroutine give_surf

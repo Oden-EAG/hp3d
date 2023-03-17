@@ -97,3 +97,51 @@
 !
    end subroutine zz_cross_product
 !
+!---------------------------------------------------------------------
+!
+   subroutine cross_product2D(Vec1,Vec2, Vec_result)
+!
+      implicit none
+!
+      real(8), intent(in ) :: Vec1(2),Vec2(2)
+      real(8), intent(out) :: Vec_result
+!
+      Vec_result=Vec1(1)*Vec2(2)-Vec1(2)*Vec2(1)
+!
+   end subroutine cross_product2D
+!
+!---------------------------------------------------------------------
+!
+!   routine name       - cross
+!
+!----------------------------------------------------------------------
+!
+!   latest revision    - Feb 2023
+!
+!   purpose            - routine evaluates cross product of two
+!                        vectors in R^2 or R^3
+!
+!   arguments :
+!     in:
+!           N          - space dimension N=2,3
+!           A,B        - vectors in R^N
+!     out:
+!           C          - scalar (R^2) or vector (R^3)
+!
+!----------------------------------------------------------------------
+!
+   subroutine cross(N,A,B, C)
+!
+      implicit none
+!
+      integer, intent(in)  :: N
+      real(8), intent(in)  :: A(N),B(N)
+      real(8), intent(out) :: C(2*N-3)
+!
+      if (N.eq.3) then
+        C(1) =   A(2)*B(3) - A(3)*B(2)
+        C(2) = - A(1)*B(3) + A(3)*B(1)
+      endif
+      C(2*N-3) = A(1)*B(2) - A(2)*B(1)
+!
+   end subroutine cross
