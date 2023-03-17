@@ -421,12 +421,12 @@ module zoltan_wrapper
                         case('normal') ; Wgts(num_neig) = Wgts(num_neig) + ndofV*NR_COMP(k)
                      end select
                   enddo
-#if DEBUG_MODE
                   if (Wgts(num_neig) .lt. 1.0_Zoltan_float) then
-                     write(*,*) 'zoltan_w_query_neig_list: Wgts(num_neig)',Wgts(num_neig)
+#if DEBUG_MODE
+                     write(*,*) 'zoltan_w_query_neig_list: Wgts=',Wgts(num_neig)
+#endif
                      Wgts(num_neig) = 1.0_Zoltan_float
                   endif
-#endif
                endif
 #if DEBUG_MODE
                if (Is_inactive(neig)) then
@@ -509,14 +509,14 @@ module zoltan_wrapper
                            case('normal') ; Wgts(n) = Wgts(n) + ndofV*NR_COMP(l)
                         end select
                      enddo
-#if DEBUG_MODE
                      if (Wgts(n) .lt. 1.0_Zoltan_float) then
+#if DEBUG_MODE
                         !$OMP CRITICAL
-                        write(*,*) 'zoltan_w_query_neig_list_omp: Wgts(n)',Wgts(n)
+                        write(*,*) 'zoltan_w_query_neig_list_omp: Wgts=',Wgts(n)
                         !$OMP END CRITICAL
+#endif
                         Wgts(n) = 1.0_Zoltan_float
                      endif
-#endif
                   endif
 #if DEBUG_MODE
                   if (Is_inactive(neig)) then
@@ -756,16 +756,16 @@ module zoltan_wrapper
 !
 !----------------------------------------------------------------------
 !     routine:    zoltan_w_get_nrdofb
-!     purpose:    computes number of bubble dofs to be used for weights
-!                 in graph partitioning
+!     purpose:    computes number of bubble dofs to be used for vertex
+!                 weights in graph partitioning
 !----------------------------------------------------------------------
 subroutine zoltan_w_get_nrdofb(Mdle, Nrdofb)
    integer, intent(in)  :: Mdle
-   integer, intent(out) :: Nrdofb(NR_PHYSA)
+   integer, intent(out) :: Nrdofb
    integer :: i,ntype,nord,nrdofH,nrdofE,nrdofV,nrdofQ
-   integer :: ncase(NR_PHYSA)
+   integer :: ncase(NR_PHYSA),nrdof(NR_PHYSA)
 !
-   Nrdofb(1:NR_PHYSA)=0
+   nrdof(1:NR_PHYSA)=0
 !
 !..set node to be middle node number (global id in NODES)
    call decod(NODES(Mdle)%case,2,NR_PHYSA, ncase)
@@ -784,19 +784,20 @@ subroutine zoltan_w_get_nrdofb(Mdle, Nrdofb)
       if (PHYSAi(i))       cycle
 !
       select case(DTYPE(i))
-         case('contin') ; Nrdofb(i)=nrdofH*NR_COMP(i)
-         case('tangen') ; Nrdofb(i)=nrdofE*NR_COMP(i)
-         case('normal') ; Nrdofb(i)=nrdofV*NR_COMP(i)
-         case('discon') ; Nrdofb(i)=nrdofQ*NR_COMP(i)
+         case('contin') ; nrdof(i)=nrdofH*NR_COMP(i)
+         case('tangen') ; nrdof(i)=nrdofE*NR_COMP(i)
+         case('normal') ; nrdof(i)=nrdofV*NR_COMP(i)
+         case('discon') ; nrdof(i)=nrdofQ*NR_COMP(i)
       end select
    enddo
+   Nrdofb = sum(nrdof)
 !
+   if (Nrdofb .lt. 1) then
 #if DEBUG_MODE
-   if (sum(Nrdofb) .lt. 1) then
-      write(*,*) 'zoltan_w_get_nrdofb: sum(Nrdofb)=',sum(Nrdofb)
-      Nrdofb(1) = 1
-   endif
+      write(*,*) 'zoltan_w_get_nrdofb: Nrdofb=',Nrdofb
 #endif
+      Nrdofb = 1
+   endif
 !
 end subroutine zoltan_w_get_nrdofb
 !

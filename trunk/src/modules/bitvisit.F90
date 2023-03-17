@@ -28,7 +28,7 @@ module bitvisit
    logical :: is_init
 !
 !..whether to bit pack visitation flags (packed: fast MPI, slow OpenMP)
-   logical :: bitvisit_packed = .false
+   logical :: bitvisit_packed = .false.
 
 
    contains

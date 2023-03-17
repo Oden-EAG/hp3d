@@ -276,7 +276,7 @@
       endif
 #endif
 !
-      nfath = NODES(nod)%father
+      nfath = NODES(Nod)%father
       do while(nfath.gt.0)
          call visit(nfath)
          nfath = NODES(nfath)%father
