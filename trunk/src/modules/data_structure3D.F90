@@ -1,6 +1,6 @@
 !----------------------------------------------------------------------
 !> @brief   module defines date structure arrays
-!> @date    Feb 2023
+!> @date    Mar 2023
 !----------------------------------------------------------------------
 module data_structure3D
 !
@@ -8,6 +8,8 @@ module data_structure3D
       use parameters
       use element_data
       use mpi_param, only: RANK
+      use par_mesh , only: DISTRIBUTED
+!
       implicit none
 !
 !  ...parameters
@@ -205,6 +207,10 @@ module data_structure3D
                ELEM_SUBD(NRELES_SUBD) = mdle
             endif
          enddo
+         if (.not. DISTRIBUTED) then
+            ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
+            NRELES_SUBD = NRELES
+         endif
       end subroutine update_ELEM_ORDER
 !
 !-----------------------------------------------------------------------
