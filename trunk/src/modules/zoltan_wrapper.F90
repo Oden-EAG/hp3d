@@ -600,15 +600,19 @@ module zoltan_wrapper
          Mdle_subd(iel) = subd
       enddo
 !
+#if HP3D_USE_UNIX_DARWIN
+!  ...Zoltan_LB_Free_Part on crashes MacOS
+      goto 399
+#endif
+!
 !  ...deallocate internal data structures
-      if (nrImp .gt. 0) then
-         ierr = Zoltan_LB_Free_Part(impGIDs,impLIDs,impProcs,impParts)
-         call zoltan_w_handle_err(ierr,'Zoltan_LB_Free_Part')
-      endif
-      if (nrExp .gt. 0) then
-         ierr = Zoltan_LB_Free_Part(expGIDs,expLIDs,expProcs,expParts)
-         call zoltan_w_handle_err(ierr,'Zoltan_LB_Free_Part')
-      endif
+      ierr = Zoltan_LB_Free_Part(impGIDs,impLIDs,impProcs,impParts)
+      call zoltan_w_handle_err(ierr,'Zoltan_LB_Free_Part')
+!
+      ierr = Zoltan_LB_Free_Part(expGIDs,expLIDs,expProcs,expParts)
+      call zoltan_w_handle_err(ierr,'Zoltan_LB_Free_Part')
+!
+      399 continue
 !
    end subroutine zoltan_w_partition
 !
