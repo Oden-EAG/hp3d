@@ -23,7 +23,7 @@ subroutine global_href
       mdle = ELEM_ORDER(i)
       if (is_leaf(mdle)) then
          call get_isoref(mdle, kref)
-         call break(mdle,kref)
+         call refine(mdle,kref)
       endif
    enddo
 !
@@ -36,9 +36,20 @@ subroutine global_href
       write(*,200) ' # of current elements, nodes = ', NRELES, NRNODS
       write(*,300) end_time-start_time
    endif
+!
+!..ensure that DOFs are allocated correctly within subdomains
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+   call distr_refresh
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+!
+   if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
+      write(*,400) end_time-start_time
+   endif
+!
  100 format(A,I8)
  200 format(A,I8,', ',I9)
  300 format(' refresh    : ',f12.5,'  seconds')
+ 400 format(' distr_refr : ',f12.5,'  seconds')
 !
 end subroutine global_href
 !
@@ -82,8 +93,8 @@ subroutine global_href_aniso(Krefxy,Krefz)
       mdle = ELEM_ORDER(i)
       if (is_leaf(mdle)) then
          select case(NODES(mdle)%ntype)
-            case(MDLB); call break(mdle,kref_mdlb)
-            case(MDLP); call break(mdle,kref_mdlp)
+            case(MDLB); call refine(mdle,kref_mdlb)
+            case(MDLP); call refine(mdle,kref_mdlp)
             case default
                write(*,*) 'global_href_aniso: unexpected node type. stop.'
                stop 1
@@ -100,9 +111,20 @@ subroutine global_href_aniso(Krefxy,Krefz)
       write(*,200) ' # of current elements, nodes = ', NRELES, NRNODS
       write(*,300) end_time-start_time
    endif
+!
+!..ensure that DOFs are allocated correctly within subdomains
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+   call distr_refresh
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+!
+   if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
+      write(*,400) end_time-start_time
+   endif
+!
  100 format(A,I8)
  200 format(A,I8,', ',I9)
  300 format(' refresh    : ',f12.5,'  seconds')
+ 400 format(' distr_refr : ',f12.5,'  seconds')
 !
 end subroutine global_href_aniso
 
@@ -145,7 +167,7 @@ subroutine global_href_aniso_bric(Krefx,Krefy,Krefz)
       mdle = ELEM_ORDER(i)
       if (is_leaf(mdle)) then
          select case(NODES(mdle)%ntype)
-            case(MDLB); call break(mdle,kref_mdlb)
+            case(MDLB); call refine(mdle,kref_mdlb)
             case default
                write(*,*) 'global_href_aniso_bric: unexpected node type. stop.'
                stop 1
@@ -162,8 +184,19 @@ subroutine global_href_aniso_bric(Krefx,Krefy,Krefz)
       write(*,200) ' # of current elements, nodes = ', NRELES, NRNODS
       write(*,300) end_time-start_time
    endif
+!
+!..ensure that DOFs are allocated correctly within subdomains
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+   call distr_refresh
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+!
+   if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
+      write(*,400) end_time-start_time
+   endif
+!
  100 format(A,I8)
  200 format(A,I8,', ',I9)
  300 format(' refresh    : ',f12.5,'  seconds')
+ 400 format(' distr_refr : ',f12.5,'  seconds')
 !
 end subroutine global_href_aniso_bric
