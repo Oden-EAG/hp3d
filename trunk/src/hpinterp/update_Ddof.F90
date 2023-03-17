@@ -59,7 +59,7 @@ subroutine update_Ddof
    integer, allocatable :: nod_loc(:),nod_tmp(:),nod_glb(:),nod_rnk(:)
    VTYPE  , dimension(:,:), pointer :: buf
 !
-!..WARNING: dirichlet and other user supplied routines must be thread-
+!..WARNING: "dirichlet" and other user-supplied routines must be thread-
 !           safe to use this routine; not recommended without proper
 !           verification
    logical :: USE_THREADED = .false.
@@ -71,18 +71,14 @@ subroutine update_Ddof
 !-----------------------------------------------------------------------
 !
    if (USE_THREADED) then
-      call update_Ddof_par
+      call update_Ddof_omp
       return
    endif
 !
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 !
-!$OMP PARALLEL DO
-!..lower the GMP interface flag for all nodes
-   do nod=1,NRNODS
-      NODES(nod)%geom_interf=0
-   enddo
-!$OMP END PARALLEL DO
+!..lower the visitation flag for all nodes
+   call reset_visit
 !
 !-----------------------------------------------------------------------
 !
@@ -111,7 +107,7 @@ subroutine update_Ddof
          mdle = ELEM_SUBD(iel)
 !
 !     ...skip if the element has already been processed
-         if (NODES(mdle)%geom_interf.eq.1) cycle
+         if (NODES(mdle)%visit.eq.1) cycle
          call refel(mdle, iflag,no,xsub)
 !
 !     ...determine nodes for the element (active and constrained)
@@ -133,7 +129,7 @@ subroutine update_Ddof
             if (loc.eq.0) then
 !
 !           ...check if the node has been updated
-               if (NODES(nod)%geom_interf.eq.0 .and. is_Dirichlet(nod)) then
+               if (NODES(nod)%visit.eq.0 .and. is_Dirichlet(nod)) then
                   nod_flg = .true.
                   goto 100
                endif
@@ -149,7 +145,7 @@ subroutine update_Ddof
             nod = nodesl(iv)
             if (.not.associated(NODES(nod)%dof))       cycle
             if (.not.associated(NODES(nod)%dof%zdofH)) cycle
-            if (NODES(nod)%geom_interf.eq.1) cycle
+            if (NODES(nod)%visit.eq.1)                 cycle
             if (is_Dirichlet_attr(nod,'contin')) then
 #if DEBUG_MODE
                if (iprint.eq.1) write(*,7010) mdle,iv,nod
@@ -157,7 +153,7 @@ subroutine update_Ddof
 #endif
                call dhpvert(mdle,iflag,no,xsub(1:3,iv),NODES(nod)%case, &
                             NODES(nod)%bcond, NODES(nod)%dof%zdofH)
-               NODES(nod)%geom_interf=1
+               NODES(nod)%visit=1
             endif
          enddo
 !
@@ -174,7 +170,7 @@ subroutine update_Ddof
             ind = nvert(ntype)+ie
             nod = nodesl(ind)
             if (.not.associated(NODES(nod)%dof)) cycle
-            if (NODES(nod)%geom_interf.eq.1)     cycle
+            if (NODES(nod)%visit.eq.1)           cycle
             if (is_Dirichlet_attr(nod,'contin')) then
 !           ...update H1 Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofH)) then
@@ -187,7 +183,7 @@ subroutine update_Ddof
                                 nedge_orient,nface_orient,norder,ie,    &
                                 zdofH, NODES(nod)%dof%zdofH)
                endif
-               NODES(nod)%geom_interf=1
+               NODES(nod)%visit=1
             endif
             if (is_Dirichlet_attr(nod,'tangen')) then
 !           ...update H(curl) Dirichlet dofs
@@ -201,7 +197,7 @@ subroutine update_Ddof
                                 nedge_orient,nface_orient,norder,ie,    &
                                 NODES(nod)%dof%zdofE)
                endif
-               NODES(nod)%geom_interf=1
+               NODES(nod)%visit=1
             endif
          enddo
 !
@@ -218,7 +214,7 @@ subroutine update_Ddof
 !        ...get global node number
             nod = nodesl(ind)
             if (.not.associated(NODES(nod)%dof)) cycle
-            if (NODES(nod)%geom_interf.eq.1)     cycle
+            if (NODES(nod)%visit.eq.1) cycle
             if (is_Dirichlet_attr(nod,'contin')) then
 !           ...update H1 Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofH)) then
@@ -231,7 +227,7 @@ subroutine update_Ddof
                                 nedge_orient,nface_orient,norder,ifc,   &
                                 zdofH, NODES(nod)%dof%zdofH)
                endif
-               NODES(nod)%geom_interf=1
+               NODES(nod)%visit=1
             endif
             if (is_Dirichlet_attr(nod,'tangen')) then
 !           ...update H(curl) Dirichlet dofs
@@ -245,7 +241,7 @@ subroutine update_Ddof
                                 nedge_orient,nface_orient,norder,ifc,   &
                                 zdofE, NODES(nod)%dof%zdofE)
                endif
-               NODES(nod)%geom_interf=1
+               NODES(nod)%visit=1
             endif
             if (is_Dirichlet_attr(nod,'normal')) then
 !           ...update H(div) Dirichlet dofs
@@ -259,12 +255,12 @@ subroutine update_Ddof
                                 nedge_orient,nface_orient,norder,ifc,   &
                                 NODES(nod)%dof%zdofV)
                endif
-               NODES(nod)%geom_interf=1
+               NODES(nod)%visit=1
             endif
 !     ...end of loop over faces
          enddo
 !
-         NODES(mdle)%geom_interf=1
+         NODES(mdle)%visit=1
 !
 !  ...end of loop through elements
  100  continue
@@ -311,15 +307,12 @@ subroutine update_Ddof
    j_loc = 0
    if (.not. nod_flg) goto 60
 !
-!..lower the visitation flag for all nodes
-   call reset_visit
-!
 !..fill local node list
    loc_max = 1000; allocate(nod_loc(loc_max))
    do iel=1,NRELES_SUBD
       mdle = ELEM_SUBD(iel)
 !  ...skip if the element has already been processed
-      if (NODES(mdle)%geom_interf.eq.1) cycle
+      if (NODES(mdle)%visit.eq.1) cycle
 !  ...determine nodes for the modified element
       call get_connect_info(mdle, nodesl,norientl)
       call logic_nodes(mdle,nodesl, nodm,nrnodm)
@@ -329,10 +322,9 @@ subroutine update_Ddof
          nod = nodm(i)
          call locate(nod,nodesl,nr_elem_nodes, loc)
 !     ...check if the node has been updated
-         if (loc.eq.0 .and. NODES(nod)%geom_interf.eq.0  &
-                      .and. NODES(nod)%visit      .eq.0  &
-                      .and. is_Dirichlet(nod)     ) then
-            NODES(nod)%visit = 1
+         if (loc.eq.0 .and. NODES(nod)%visit.eq.0  &
+                      .and. is_Dirichlet(nod) ) then
+            NODES(nod)%visit = -1
             if(j_loc .ge. loc_max) then
                loc_max = loc_max*2
                allocate(nod_tmp(loc_max))
@@ -384,7 +376,7 @@ subroutine update_Ddof
    allocate(nod_rnk(j_glb)); nod_rnk = NUM_PROCS
    do i=1,j_glb
       nod = nod_glb(i)
-      if (NODES(nod)%geom_interf .eq. 1) nod_rnk(i) = RANK
+      if (NODES(nod)%visit.eq.1) nod_rnk(i) = RANK
    enddo
 !
 !..collect node supplier list
@@ -439,10 +431,20 @@ subroutine update_Ddof
             count = ndofV*nvarV; buf => NODES(nod)%dof%zdofV
             call MPI_RECV(buf,count,MPI_VTYPE,src,tag,MPI_COMM_WORLD,MPI_STATUS_IGNORE,ierr)
          endif
-         NODES(nod)%geom_interf = 1
+         NODES(nod)%visit = 1
       endif
  6010 format('update_Ddof: [',I4,'] ',A,' nod=',I6,', type=',A)
    enddo
+!
+   if (nod_flg) then
+      do i=1,j_loc
+         nod = nod_glb(j_off+i)
+!     ...reset visitation flag if node was not supplied
+         if (NODES(nod)%visit.eq.-1) then
+            NODES(nod)%visit = 0
+         endif
+      enddo
+   endif
 !
    deallocate(nod_rnk,nod_glb)
 !
@@ -471,21 +473,22 @@ subroutine update_Ddof
    endif
 !
 end subroutine update_Ddof
-
-
-
-!-----------------------------------------------------------------------
 !
-!    routine name       - update_Ddof_par
+!
 !
 !-----------------------------------------------------------------------
-!> @brief OpenMP parallel version. WARNING: dirichlet and other user-
-!>        supplied routines must be threadsafe ot use this version; not
-!>        recommended without proper verification
+!
+!    routine name       - update_Ddof_omp
+!
+!-----------------------------------------------------------------------
+!> @brief OpenMP parallel version of update_Ddof
+!> @warning  "dirichlet" and other user-supplied routines must be
+!!           threadsafe to use this version; not recommended without
+!!           proper verification.
 !> @date Mar 2023
 !-----------------------------------------------------------------------
 !
-subroutine update_Ddof_par
+subroutine update_Ddof_omp
 !
    use data_structure3D
    use environment, only: QUIET_MODE
@@ -552,12 +555,8 @@ subroutine update_Ddof_par
 !
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 !
-!$OMP PARALLEL DO
-!..lower the GMP interface flag for all nodes
-   do nod=1,NRNODS
-      NODES(nod)%visit=0
-   enddo
-!$OMP END PARALLEL DO
+!..lower the visitation flag for all nodes
+   call reset_visit
 !
 !-----------------------------------------------------------------------
 !
@@ -575,10 +574,10 @@ subroutine update_Ddof_par
 !
 ! Get nodes for each element in subd
 !
-!$omp parallel default(shared)
-!$omp do private(iel,mdle,nodesl,norientl,nodm,nrnodm,   &
-!$omp            nr_elem_nodes,loc,nod,i,j,ntype)        &
-!$omp    schedule(static) reduction(+:nr_up_elem)
+!$OMP PARALLEL DEFAULT(SHARED)
+!$OMP DO PRIVATE(iel,mdle,nodesl,norientl,nodm,nrnodm,   &
+!$OMP            nr_elem_nodes,loc,nod,i,j,ntype)        &
+!$OMP    SCHEDULE(STATIC) REDUCTION(+:nr_up_elem)
 !..loop through active elements
    do iel=1,NRELES_SUBD
 !
@@ -615,8 +614,8 @@ subroutine update_Ddof_par
       enddo
       nrnodes_irreg(iel) = j
    enddo
-!$omp end do
-!$omp end parallel
+!$OMP END DO
+!$OMP END PARALLEL
 !
  10 continue
 !
@@ -630,11 +629,11 @@ subroutine update_Ddof_par
       nod_flg = .false.
 !
 !  ...loop through active elements
-!$omp parallel default(shared)
-!$omp do private(iel,mdle,iflag,no,xsub,nrnodi,nodesi,nodesl,nvar,ndof, &
-!$omp            nr_elem_nodes,nface_orient,iv,ie,ifc,nod,nedge_orient, &
-!$omp            ntype,norder,zdofH,zdofE,zdofQ,tempH,tempE,tempV,ind)  &
-!$omp    schedule(dynamic) reduction(+:nr_up_elem)
+!$OMP PARALLEL DEFAULT(SHARED)
+!$OMP DO PRIVATE(iel,mdle,iflag,no,xsub,nrnodi,nodesi,nodesl,nvar,ndof, &
+!$OMP            nr_elem_nodes,nface_orient,iv,ie,ifc,nod,nedge_orient, &
+!$OMP            ntype,norder,zdofH,zdofE,zdofQ,tempH,tempE,tempV,ind)  &
+!$OMP    SCHEDULE(DYNAMIC) REDUCTION(+:nr_up_elem)
       do iel=1,NRELES_SUBD
 !
          mdle = ELEM_SUBD(iel)
@@ -683,12 +682,12 @@ subroutine update_Ddof_par
                call dhpvert(mdle,iflag,no,xsub(1:3,iv),NODES(nod)%case, &
                             NODES(nod)%bcond, tempH(1:nvar,1:ndof))
 !
-!$omp critical
+!$OMP CRITICAL
                if (NODES(nod)%visit.eq.0) then
                   NODES(nod)%dof%zdofH = tempH(1:nvar,1:ndof)
                   NODES(nod)%visit = 1
                endif
-!$omp end critical
+!$OMP END CRITICAL
 !
             endif
          enddo
@@ -724,12 +723,12 @@ subroutine update_Ddof_par
                                 nedge_orient,nface_orient,norder,ie,    &
                                 zdofH, tempH(1:nvar,1:ndof))
 !
-!$omp critical
+!$OMP CRITICAL
                   if (NODES(nod)%visit.eq.0) then
                      NODES(nod)%dof%zdofH = tempH(1:nvar,1:ndof)
                      NODES(nod)%visit = 1
                   endif
-!$omp end critical
+!$OMP END CRITICAL
 !
                else
                   NODES(nod)%visit=1
@@ -752,12 +751,12 @@ subroutine update_Ddof_par
                                 nedge_orient,nface_orient,norder,ie,    &
                                 tempE(1:nvar,1:ndof))
 !
-!$omp critical
+!$OMP CRITICAL
                   if (NODES(nod)%visit.lt.2) then
                      NODES(nod)%dof%zdofE = tempE(1:nvar,1:ndof)
                      NODES(nod)%visit = 2
                   endif
-!$omp end critical
+!$OMP END CRITICAL
 !
                else
                   NODES(nod)%visit=1
@@ -795,12 +794,12 @@ subroutine update_Ddof_par
                                 nedge_orient,nface_orient,norder,ifc,   &
                                 zdofH, tempH(1:nvar,1:ndof))
 !
-!$omp critical
+!$OMP CRITICAL
                   if (NODES(nod)%visit.eq.0) then
                      NODES(nod)%dof%zdofH = tempH(1:nvar,1:ndof)
                      NODES(nod)%visit = 1
                   endif
-!$omp end critical
+!$OMP END CRITICAL
 !
                else
                   NODES(nod)%visit=1
@@ -822,12 +821,12 @@ subroutine update_Ddof_par
                                 nedge_orient,nface_orient,norder,ifc,   &
                                 zdofE, tempE(1:nvar,1:ndof))
 !
-!$omp critical
+!$OMP CRITICAL
                   if (NODES(nod)%visit.lt.2) then
                      NODES(nod)%dof%zdofE = tempE(1:nvar,1:ndof)
                      NODES(nod)%visit = 2
                   endif
-!$omp end critical
+!$OMP END CRITICAL
 !
                else
                   NODES(nod)%visit=1
@@ -849,12 +848,12 @@ subroutine update_Ddof_par
                                 nedge_orient,nface_orient,norder,ifc,   &
                                 tempV(1:nvar,1:ndof))
 !
-!$omp critical
+!$OMP CRITICAL
                   if (NODES(nod)%visit.lt.3) then
                      NODES(nod)%dof%zdofV = tempV(1:nvar,1:ndof)
                      NODES(nod)%visit = 3
                   endif
-!$omp end critical
+!$OMP END CRITICAL
 !
                else
                   NODES(nod)%visit=1
@@ -868,8 +867,8 @@ subroutine update_Ddof_par
 !  ...end of loop through elements
  100  continue
       enddo
-!$omp end do
-!$omp end parallel
+!$OMP END DO
+!$OMP END PARALLEL
 !
       if (nr_up_elem.eq.0) exit
 !
@@ -1083,4 +1082,4 @@ subroutine update_Ddof_par
  8010 format(' update_Ddof: ',f12.5,'  seconds',/)
    endif
 !
-end subroutine update_Ddof_par
+end subroutine update_Ddof_omp
