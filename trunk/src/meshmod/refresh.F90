@@ -41,8 +41,9 @@ subroutine refresh
 ! Step 1 : raise visitation flag for vertex, edge and face nodes of |
 !          all active elements                                      |
 !--------------------------------------------------------------------
-!$omp parallel default(shared)
-!$omp do private(iel,mdle,subd,type,i,nodesl,norientl) schedule(guided)
+!$OMP PARALLEL DEFAULT(SHARED)
+!$OMP DO PRIVATE(iel,mdle,subd,type,i,nodesl,norientl) &
+!$OMP    SCHEDULE(GUIDED)
    do iel=1,NRELES_SUBD
 !
       mdle = ELEM_SUBD(iel)
@@ -65,8 +66,8 @@ subroutine refresh
       enddo
 !
    enddo
-!$omp end do
-!$omp end parallel
+!$OMP END DO
+!$OMP END PARALLEL
 !
 !..Reduce over node flag
    if (DISTRIBUTED) then
@@ -80,9 +81,9 @@ subroutine refresh
 !--------------------------------------------------------------------
 !
 !..loop over all nodes
-!$omp parallel
-!$omp do private(nfath) schedule(guided) &
-!$omp reduction(+:nrdofH,nrdofE,nrdofV,nrdofQ)
+!$OMP PARALLEL
+!$OMP DO PRIVATE(nfath) SCHEDULE(GUIDED) &
+!$OMP    REDUCTION(+:nrdofH,nrdofE,nrdofV,nrdofQ)
    do nod=1,NRNODS
 !
 !  ...skip if a middle node
@@ -110,8 +111,8 @@ subroutine refresh
 !
 !..end of loop over nodes
    enddo
-!$omp end do
-!$omp end parallel
+!$OMP END DO
+!$OMP END PARALLEL
 !
    call bitvisit_finalize
 !
