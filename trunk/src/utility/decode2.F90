@@ -6,7 +6,8 @@
 !
 !   latest revision    - Feb 2023
 !
-!   purpose            - routine decodes a nickname
+!   purpose            - routine decodes a nickname into two parts,
+!                        using mod 100
 !
 !   arguments :
 !     in:       Nick   - a nickname
