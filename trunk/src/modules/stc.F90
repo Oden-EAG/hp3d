@@ -59,7 +59,6 @@ contains
 !
 !
 subroutine stc_alloc
-   if (.not. DISTRIBUTED) NRELES_SUBD = NRELES
    allocate(CLOC(NRELES_SUBD))
 end subroutine stc_alloc
 !

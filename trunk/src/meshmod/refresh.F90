@@ -34,11 +34,6 @@ subroutine refresh
    call update_ELEM_ORDER
    call bitvisit_init(NRNODS)
 !
-   if (.not. DISTRIBUTED) then
-      ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
-      NRELES_SUBD = NRELES
-   endif
-!
 !..set thread local dof counters
    nrdofH=0; nrdofE=0; nrdofV=0; nrdofQ=0
 !

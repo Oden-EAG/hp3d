@@ -82,14 +82,6 @@ subroutine update_Ddof
 !
 !-----------------------------------------------------------------------
 !
-!..fetch active elements
-   if (.not. DISTRIBUTED) then
-      ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
-      NRELES_SUBD = NRELES
-   endif
-!
-!-----------------------------------------------------------------------
-!
  10 continue
 !
 !..multiple passes
@@ -559,12 +551,6 @@ subroutine update_Ddof_omp
    call reset_visit
 !
 !-----------------------------------------------------------------------
-!
-!..fetch active elements
-   if (.not. DISTRIBUTED) then
-      ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
-      NRELES_SUBD = NRELES
-   endif
 !
    allocate(nodes_elem(27,NRELES_SUBD))
    allocate(nodes_irreg(27,NRELES_SUBD))
