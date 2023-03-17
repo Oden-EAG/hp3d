@@ -760,9 +760,6 @@ subroutine update_gdof_omp
    j_loc = 0
    if (.not. nod_flg) goto 60
 !
-!..lower the visitation flag for all nodes
-   call reset_visit
-!
 !..fill local node list
    loc_max = 1000; allocate(nod_loc(loc_max))
    do iel=1,NRELES_SUBD
