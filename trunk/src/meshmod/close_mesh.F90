@@ -10,7 +10,7 @@ end subroutine close
 !
 !-----------------------------------------------------------------------------
 !> @brief enforce one-irregular mesh
-!> @date Feb 2023
+!> @date Mar 2023
 subroutine close_mesh()
    use error
    use refinements
@@ -214,24 +214,24 @@ subroutine close_mesh()
    if (allocated(list)) deallocate(list)
 !
 end subroutine close_mesh
-
-
-
-
-
-!> Purpose : enforce one-irregular mesh
+!
+!
+!
+!-----------------------------------------------------------------------------
+!> @brief enforce one-irregular mesh
+!> @note MPI-distributed version of close_mesh
+!> @date Mar 2023
 subroutine close_mesh_par()
    use error
    use refinements
    use data_structure3D
    use mpi_param
-   use MPI,                only: MPI_COMM_WORLD, MPI_INTEGER, MPI_BOR,  &
-                                 MPI_IN_PLACE
    use bitvisit
+   use MPI, only: MPI_COMM_WORLD, MPI_INTEGER, MPI_BOR, MPI_IN_PLACE
 !
    implicit none
 !
-   integer                 :: ntype
+   integer                :: ntype
    integer, allocatable   :: list(:,:), list_glob(:,:)
    integer, dimension(27) :: nodesl,norientl
    integer, dimension(6)  :: kreff
@@ -245,7 +245,8 @@ subroutine close_mesh_par()
    integer :: displs(NUM_PROCS), ic_procs(NUM_PROCS)
 !
 #if DEBUG_MODE
-   integer :: iprint = 0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !-----------------------------------------------------------------------------
@@ -301,7 +302,7 @@ subroutine close_mesh_par()
 !
 !$OMP PARALLEL DO                                     &
 !$OMP PRIVATE(mdle,nodesl,norientl,nod,ntype,nflag,   &
-!$OMP         nflag,krefe,kreff,kref,j,nv,ne,nf,nve)
+!$OMP         krefe,kreff,kref,j,nv,ne,nf,nve)
       do i=1,NRELES_SUBD
          mdle=ELEM_SUBD(i)
          call elem_nodes(mdle, nodesl,norientl)
