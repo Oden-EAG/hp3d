@@ -18,12 +18,32 @@ module node_types
       integer, parameter :: PRIS = 11
       integer, parameter :: PYRA = 12
 !  ...face types
-      integer, parameter :: TRIA = 13
-      integer, parameter :: QUAD = 14
+      integer, parameter :: QUAD = 13
+      integer, parameter :: TRIA = 14
       integer, parameter :: RECT = 15
 !  ...edge type
       integer, parameter :: SEGM = 16
 !
+!  ...number of vertices for node types
+      integer, parameter, dimension(16) :: NVERT =    &
+       (/   8,   4,   6,   4,   4,   3,   2,   0,     &
+!     (/ MDLB,MDLN,MDLP,MDLD,MDLQ,MDLT,MEDG,VERT )
+            8,   4,   6,   4,   4,   3,   4,   2 /)
+!     (/ BRIC,TETR,PRIS,PYRA,QUAD,TRIA,RECT,SEGM )
+!
+!  ...number of edges for node types
+      integer, parameter, dimension(16) :: NEDGE =    &
+       (/  12,   6,   9,   8,   4,   3,   0,   0,     &
+!     (/ MDLB,MDLN,MDLP,MDLD,MDLQ,MDLT,MEDG,VERT )
+           12,   6,   9,   8,   4,   3,   4,   0 /)
+!     (/ BRIC,TETR,PRIS,PYRA,QUAD,TRIA,RECT,SEGM )
+!
+!  ...number of face for node types
+      integer, parameter, dimension(16) :: NFACE =    &
+       (/   6,   4,   5,   5,   0,   0,   0,   0,     &
+!     (/ MDLB,MDLN,MDLP,MDLD,MDLQ,MDLT,MEDG,VERT )
+            6,   4,   5,   5,   0,   0,   0,   0 /)
+!     (/ BRIC,TETR,PRIS,PYRA,QUAD,TRIA,RECT,SEGM )
 !
    contains
 !
@@ -50,8 +70,8 @@ module node_types
             case(PRIS); S_Type = 'pris'
             case(PYRA); S_Type = 'pyra'
             ! face types
-            case(TRIA); S_Type = 'tria'
             case(QUAD); S_Type = 'quad'
+            case(TRIA); S_Type = 'tria'
             case(RECT); S_Type = 'rect'
             ! edge type
             case(SEGM); S_Type = 'segm'
@@ -84,8 +104,8 @@ module node_types
             case('pris'); I_Type = PRIS
             case('pyra'); I_Type = PYRA
             ! face types
-            case('tria'); I_Type = TRIA
             case('quad'); I_Type = QUAD
+            case('tria'); I_Type = TRIA
             case('rect'); I_Type = RECT
             ! edge type
             case('segm'); I_Type = SEGM

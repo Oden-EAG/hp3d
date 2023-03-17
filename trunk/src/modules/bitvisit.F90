@@ -5,14 +5,16 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - Sept 2018
+!   latest revision    - Mar 2023
 !
 !   purpose            - Stores visitation flag in an array (bitpacked
-!                        or not), simplifies reducing visiataion
+!                        or not), simplifies reducing visitation
 !
 !----------------------------------------------------------------------
 !
 module bitvisit
+!
+   implicit none
 !
 !..number of integers required to store all visitation
    integer :: nword
