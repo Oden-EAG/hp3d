@@ -43,7 +43,7 @@
   integer, dimension(19),  intent(in)  :: Norder
 !
   VTYPE,   dimension(MAXEQNH,MAXbrickH),      intent(in)    :: ZdofH
-  VTYPE,   dimension(NRCOMS*NREQNH(Icase),*), intent(out) :: ZnodH
+  VTYPE,   dimension(NRCOMS*NREQNH(Icase),*), intent(inout) :: ZnodH
 !
 ! ** Locals
 !-----------------------------------------------------------------------
