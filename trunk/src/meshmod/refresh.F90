@@ -1,7 +1,7 @@
 !--------------------------------------------------------------------
 !> @brief activate inactive nodes which are not constrained
-!          but in the current mesh
-!> @date Oct 2019
+!         but in the current mesh
+!> @date Mar 2023
 !--------------------------------------------------------------------
 subroutine refresh
 !
@@ -19,7 +19,8 @@ subroutine refresh
    integer :: nvef
 !
 #if DEBUG_MODE
-   integer :: iprint = 0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !--------------------------------------------------------------------

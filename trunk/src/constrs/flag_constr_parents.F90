@@ -34,7 +34,7 @@
       integer :: ntype
 !
 !  ...misc
-      integer :: j,nrnodl,nod,nc,icase
+      integer :: icase,ie,ip,iv,j,jv
       integer :: nrnodl,nod,nodp,nc,nce,nvoid
 !
 !----------------------------------------------------------------------
