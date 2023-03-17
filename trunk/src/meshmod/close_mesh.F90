@@ -396,7 +396,7 @@ subroutine close_mesh_par()
       enddo
 !
 #if DEBUG_MODE
-      if (RANK.eq.ROOT and iprint.eq.2) then
+      if (RANK.eq.ROOT .and. iprint.eq.2) then
          write(*,*) 'close_mesh_par: number of elements to refine ', ic_glob
       endif
 #endif

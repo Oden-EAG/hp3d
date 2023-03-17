@@ -20,6 +20,7 @@ node_types.F90
 paraview.F90
 parameters.F90
 parametersDPG.F90
+par_ghost.F90
 par_mesh.F90
 physics.F90
 refinements.F90

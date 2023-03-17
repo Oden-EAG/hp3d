@@ -306,7 +306,7 @@ module zoltan_wrapper
       integer(Zoltan_int), intent(in)  :: Wgt_dim
       real(Zoltan_float) , intent(out) :: Wgts(*)
       integer(Zoltan_int), intent(out) :: Ierr
-      integer :: nrdofb(NR_PHYSA)
+      integer :: nrdofb
       integer :: iel,mdle
 !$OMP PARALLEL DO PRIVATE(mdle)
       do iel=1,NRELES_SUBD
@@ -314,7 +314,7 @@ module zoltan_wrapper
          GIDs(iel) = mdle
          if (Wgt_dim > 0) then
             call zoltan_w_get_nrdofb(Mdle, nrdofb)
-            Wgts(iel) = sum(nrdofb)
+            Wgts(iel) = nrdofb
          endif
       enddo
 !$OMP END PARALLEL DO
