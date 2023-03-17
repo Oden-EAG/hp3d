@@ -8,7 +8,6 @@ module data_structure3D
       use parameters
       use element_data
       use mpi_param, only: RANK
-      use par_mesh , only: DISTRIBUTED
 !
       implicit none
 !
@@ -189,29 +188,6 @@ module data_structure3D
 !-----------------------------------------------------------------------
 !
       contains
-!
-!-----------------------------------------------------------------------
-!
-      subroutine update_ELEM_ORDER
-         integer :: iel,mdle
-         if (allocated(ELEM_ORDER)) deallocate(ELEM_ORDER)
-         if (allocated(ELEM_SUBD))  deallocate(ELEM_SUBD)
-         allocate(ELEM_ORDER(NRELES))
-         allocate(ELEM_SUBD(NRELES))
-         mdle = 0; NRELES_SUBD = 0
-         do iel=1,NRELES
-            call nelcon(mdle, mdle)
-            ELEM_ORDER(iel) = mdle
-            if (NODES(mdle)%subd .eq. RANK) then
-               NRELES_SUBD = NRELES_SUBD + 1
-               ELEM_SUBD(NRELES_SUBD) = mdle
-            endif
-         enddo
-         if (.not. DISTRIBUTED) then
-            ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
-            NRELES_SUBD = NRELES
-         endif
-      end subroutine update_ELEM_ORDER
 !
 !-----------------------------------------------------------------------
 !
