@@ -94,7 +94,8 @@ subroutine close_mesh()
 !
 !$OMP DO                                              &
 !$OMP PRIVATE(mdle,nodesl,norientl,nod,ntype,nflag,   &
-!$OMP         krefe,kreff,kref,j,nv,ne,nf,nve)
+!$OMP         krefe,kreff,kref,j,nv,ne,nf,nve)        &
+!$OMP REDUCTION (+:ic)
       do i=1,NRELES
          mdle=ELEM_ORDER(i)
          call elem_nodes(mdle, nodesl,norientl)
@@ -134,8 +135,8 @@ subroutine close_mesh()
 !        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          if (nflag) then
 !
-!$OMP CRITICAL
 #if DEBUG_MODE
+            !$OMP CRITICAL
             if ((RANK.eq.ROOT) .and. (iprint.eq.1)) then
                ne = nedge(NODES(mdle)%ntype)
                nf = nface(NODES(mdle)%ntype)
@@ -146,6 +147,7 @@ subroutine close_mesh()
    7004        format('kreff = ',6i3)
                call pause
             endif
+            !$OMP END CRITICAL
 #endif
 !           increment counter
             ic=ic+1
@@ -170,7 +172,6 @@ subroutine close_mesh()
             endif
             list(1,i) = mdle
             list(2,i) = kref
-!$OMP END CRITICAL
          endif
       enddo
 !$OMP END DO
