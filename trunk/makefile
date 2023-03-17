@@ -310,9 +310,8 @@ clean:
 	@echo "Clean frontal solver, object files, libraries, modules and mk files"
 	@( cd ./$(SRC_PATH)/solver/frontal/base/real ; $(MAKE) clean )
 	@( cd ./$(SRC_PATH)/solver/frontal/base/complex ; $(MAKE) clean )
-	@rm -rf $(OBJ_PATH)
-	@rm -rf $(OBJ_PATH_COMPLX) $(OBJ_PATH_REAL)
-	@rm -rf $(HP3D_PATH)
+	@rm -rf $(OBJ_PATH_COMPLEX) $(OBJ_PATH_REAL)
+	@rm -rf $(HP3D_PATH_COMPLEX) $(HP3D_PATH_REAL)
 	@rm -f $(LIB_PATH)/*.a
 	@rm -f *~
 	@rm -f $(MODULE_PATH)/*.mod
