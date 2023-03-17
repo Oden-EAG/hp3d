@@ -32,8 +32,8 @@ c
       use data_structure3D
       use element_data
       use control
-#include "syscom.blk"
-      common /cinvmap/ iprint_invmap
+c
+      implicit none
 c
       integer, intent(in)  :: Ntype,Norder(19)
       integer, intent(in)  :: Nedge_orient(12),Nface_orient(6)
@@ -53,22 +53,27 @@ c
 c  ...increment in xi
       real(8) :: dxi(3)
 c
-      real(8) :: x(3)
+      real(8) :: x(3),rjac,dmax
       integer :: i,iter,k
-      integer :: iflag,iprint
+      integer :: iflag
+c
+#if DEBUG_MODE
+      integer :: iprint
+#endif
 c
       real(8), parameter :: eps = 1.d-8
 c
 c-----------------------------------------------------------------------
 c
-      iprint=iprint_invmap
-ccc      iprint=0
+#if DEBUG_MODE
+      iprint=0
 c
 c  ...initiate the NR iterations
       if (iprint.eq.1) then
         write(*,*)'***************************'
         write(*,*)'invmap: NEWTON-RAPHSON LOOP'
       endif
+#endif
 c
 c  ...use element centroid as initial guess
       Xi(1:3)=0.d0
@@ -95,11 +100,13 @@ c       the physical coordinates wrt master element coordinates
             dxdxi(1:3,i) = dxdxi(1:3,i) + Xnod(1:3,k)*gradH(i,k)
           enddo
         enddo
+#if DEBUG_MODE
         if (iprint.eq.1) then
           write(*,*)'----------------------------'
           write(*,7001) iter,Xi(1:3),x(1:3)
  7001     format('invmap: iter,Xi,x = ',i4,3(e12.5,2x),2x,3(e12.5,2x))
         endif
+#endif
 c
 c  .....evaluate the inverse derivatives and jacobian
         call geom(dxdxi, dxidx,rjac,iflag)
@@ -115,10 +122,12 @@ c       element
         enddo
 c
 c  .....update xi
+#if DEBUG_MODE
         if (iprint.eq.1) then
           write(*,7002) eps,dxi(1:3)
  7002     format('invmap: eps, dxi = ',e12.5,4x,3(e12.5,2x))
         endif
+#endif
         Xi(1:3) = Xi(1:3) + dxi(1:3)
 c
 c  .....check convergence
@@ -127,11 +136,13 @@ c  .....check convergence
       enddo
       Idec=0; return
  10   continue
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,*) 'invmap: NR LOOP FINISHED'
         write(*,*) '***************************'
         call pause
       endif
+#endif
 c
 c  ...check if the point lies within the element
       Idec=1
@@ -165,8 +176,10 @@ c  ...check if the point lies within the element
         endif
       end select
 c
+#if DEBUG_MODE
       if(iprint.eq.1)then
         write(*,*)'Exiting invmap with Idec=',Idec
       endif
+#endif
 c
       end subroutine invmap

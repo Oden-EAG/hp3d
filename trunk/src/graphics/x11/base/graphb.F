@@ -1,16 +1,16 @@
 c----------------------------------------------------------------------
-c> @Purpose  : routine controls interactively calls to various hp3d
-c               graphics routines
-c
-c> @Revision : May 12
+c> @brief  : interactively controls calls to various hp3d
+cc           graphics routines
+c> @date   : Feb 2023
 c----------------------------------------------------------------------
 c
       subroutine graphb
 c
       use graphmod
-ccc      use data_structure3D
 c
-#include "syscom.blk"
+      implicit none
+c
+      integer :: idec,istat,iwin
 c
 c  ...initialized dimensions for workspaces, if not set by the user
       if (.NOT. INITIALIZED) then
@@ -76,4 +76,4 @@ c
       goto 10
 c
 c
-      end
+      end subroutine graphb

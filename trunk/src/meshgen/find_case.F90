@@ -34,18 +34,23 @@ subroutine find_case(Number,Phys, Icase)
       integer         , intent(out) :: Icase
 !
       integer :: narray(10)
-      integer :: iprint, ii, j
+      integer :: ii, j
+!
+#if DEBUG_MODE
+      integer :: iprint
+      iprint=0
+#endif
 !
 !----------------------------------------------------------------------
 !
-      iprint=0
-!
       narray(1:10)=0
 !
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7001) Number, Phys(1:Number)
  7001   format(' find_case: Phys(1:',i1,') = ',5(a5,' ; '))
       endif
+#endif
 !
 !  ...loop through physics attributes
       do j=1,NR_PHYSA
@@ -55,11 +60,14 @@ subroutine find_case(Number,Phys, Icase)
 !
 !  ...encode the case number
       call encod(narray,2,NR_PHYSA, Icase)
+!
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7002) Icase
  7002   format(' find_case: Icase = ',i2)
         call pause
       endif
+#endif
 !
 !
 end subroutine find_case

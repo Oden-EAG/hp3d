@@ -1,41 +1,73 @@
 info :
-	@echo "make one TEST=test"
-	@echo " - where test is one of $(TESTS)"
 	@echo "make all"
-	@echo "make run"
+	@echo "make one TEST=test"
+	@echo "make run TEST=test"
+	@echo "    test="
+	@for t in $(TESTS); do echo "         "$$t; done
 
 include ../m_options
 
-COMPLEX         = 0
-CCDEFS          = -D C_MODE=0
-CCINCS          = -I../src/common/hp3d \
-                  -I../src/common/graphics \
-                  -I../$(MODULE_PATH)
+OBJ_PATH     = _obj_
+EXEC_PATH    = _exec_
+MODULE_PATH  = $(OBJ_PATH)
 
+SRC_FILE     = locate.F90 \
+               parameters.F90 \
+               random_refine.F90
+
+OBJ          = $(addprefix $(OBJ_PATH)/, $(SRC_FILE:.F90=.o))
+
+# Tests
 TEST  = locate
-TESTS = locate parameters random
+TESTS = locate parameters random_refine
 
-HP3D_LIB     = ../real/lib/libhp3d.a
-#HP3D_LIB     = ../complex/lib/libhp3d.a
+# Includes and defs
+CCDEFS = $(PROB_PP_DEFS)
+CCINCS = $(PROB_INCS)
 
-LIBS         = $(HP3D_LIB)
-#LIBS 	     =
-FC_WORK      = $(FC) $(CCDEFS) $(CCINCS) $(FFLAGS) $(EXTRA_FFLAGS)
+# User defined libraries
+LIBS   = $(PROB_LIBS)
 
-%.o : %.F
-	$(FC_WORK) $(HP3D_LIB) -o $@ -c $<
+# Compiler flags
+FC_WORK = $(FC) $(CCDEFS) $(CCINCS) $(FFLAGS) $(EXTRA_FFLAGS)
 
-one : $(TEST).o
-	$(FC_WORK) -o $(TEST) $(TEST).o $(LIBS)
+#-------------------------------------------------
 
+$(OBJ) : $(OBJ_PATH)/%.o : %.F90
+	@echo ""
+	@echo "Compiling $<"
+	$(FC_WORK) -o $@ -c $<
+	
+$(OBJ_PATH)/.dummy :
+	@echo "Creating directory " $(OBJ_PATH)
+	@mkdir -p $(OBJ_PATH); touch $@;
+	@mkdir -p $(EXEC_PATH); touch $@;
+
+#-------------------------------------------------
+.PHONY : one
+one : $(OBJ_PATH)/.dummy $(OBJ_PATH)/$(TEST).o
+	@echo ""
+	@echo "- Linking - " $(TEST)
+	$(FC_WORK) -o $(EXEC_PATH)/$(TEST) $(OBJ_PATH)/$(TEST).o $(LIBS) $(LDFLAGS)
+
+#-------------------------------------------------
+.PHONY : all
 all :
-	for e in $(TESTS) ; do \
+	@for e in $(TESTS) ; do \
 		make one run TEST=$$e ;\
 	done
 
-run :
-	./$(TEST)
+#-------------------------------------------------
+.PHONY : run
+run : one
+	@echo ""
+	@echo "Running test: "$(TEST)
+	@./$(EXEC_PATH)/$(TEST)
 
+#-------------------------------------------------
+.PHONY : clean
 clean :
 	@/bin/rm -f *.o *~
+	@/bin/rm -rf $(OBJ_PATH)
+	@/bin/rm -rf $(EXEC_PATH)
 	@for t in $(TESTS) ; do rm -f $$t ; done

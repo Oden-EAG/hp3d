@@ -264,7 +264,9 @@ subroutine collect_dofs()
 !..auxiliary variables
    integer :: nodm(MAXNODM), nodesl(27)
    integer :: mdle, nod, inod, iel, subd, vis, nrnodm, nrdof_nod
-   integer :: iprint = 0
+!
+   integer :: iprint
+   iprint=0
 !
 !----------------------------------------------------------------------
 !

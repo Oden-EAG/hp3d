@@ -10,7 +10,6 @@ c   purpose            - routine establishes list of nodes
 c                        for a modified element, and the corresponding
 c                        constraints coefficients
 c   remark: this routine must be OMP thread-safe
-c   TODO: convert to F90, use DEBUG_MODE flag for iprint statements
 c
 c   arguments :
 c     in:
@@ -49,7 +48,8 @@ c
       use data_structure3D
       use constrained_nodes
       use refinements
-#include "syscom.blk"
+c
+      implicit none
 c
       integer, intent(in)  :: Mdle,Idec
 c
@@ -58,6 +58,8 @@ c
       integer, intent(out) :: NdofmH(MAXNODM),
      .                        NdofmE(MAXNODM),
      .                        NdofmV(MAXNODM)
+c
+      integer, intent(out) :: Nrnodm
 c
       integer, intent(out) :: NrconH(MAXbrickH),
      .                        NrconE(MAXbrickE),
@@ -111,8 +113,20 @@ c  ...H(div) constrained approximation flag
       logical :: CONSTRAINED_HDIV = .TRUE.
 c
 c  ...miscellanea
-      integer :: icH,icE,icV,nod,im,kH,kE,kV,j,nc,icase
+      integer :: i,ie,ip,iref,is,ish,isv,iv,ivp,jp,k,kp
+      integer :: icH,icE,icV,im,kH,kE,kV,j,icase
+      integer :: kEtot,l,lh,loc,lp,lph,lpv,lv
+      integer :: nc,nce,nfath,nod,nodp,nordh,nordv,np,nrnodes,nvoid
+      integer :: ndofE,ndofEh,ndofEv
+      integer :: ndofH,ndofHh,ndofHv
+      integer :: ndofV,ndofQ,ndofHpp
+      integer :: nrdofH,nrdofE,nrdofV,nrdofQ
+      integer :: nrdofH_loc,nrdofE_loc,nrdofV_loc
+c
+#if DEBUG_MODE
       integer :: iprint
+      iprint=0
+#endif
 c
 c----------------------------------------------------------------------
 c
@@ -124,28 +138,22 @@ c
 c     initialize constraints arrays
       if (.NOT. INITIALIZED_CONSTR) call init_cnstr
 c
-      select case(Mdle)
-      case(234)
-        if (Idec.eq.2) then
-          iprint=0
-        else
-          iprint=0
-        endif
-      case default
-        iprint=0
-      endselect
-c
+#if DEBUG_MODE
       if (iprint.ge.1) then
         write(*,7000) Mdle
  7000   format(' -- logic: Mdle = ',i6,' --')
       endif
+#endif
 c
 c     get element nodes and build the local data base on constrained
 c     nodes for the element
       call get_connect_info(Mdle, nodesl,norientl)
+c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         call elem_show(Mdle, NODES(Mdle)%ntype,nodesl,norientl)
       endif
+#endif
 c
 c     get nodes of the modified element
       call logic_nodes(Mdle,nodesl, Nodm,Nrnodm)
@@ -178,6 +186,7 @@ c       update H1,H(curl),H(div) dofs counters
         icH=icH+NdofmH(im) ; icE=icE+NdofmE(im) ; icV=icV+NdofmV(im)
       enddo
 c
+#if DEBUG_MODE
 c     printing
       if (iprint.eq.1) then
         write(*,*) 'MODIFIED ELEMENT NODES:'
@@ -190,6 +199,7 @@ c     printing
      .                  naV(im),NdofmV(im)
         enddo
       endif
+#endif
 c
 c----------------------------------------------------------------------
       if (Idec.eq.1) go to 100
@@ -255,11 +265,13 @@ c         H(div)-loop through the nodal dof
             ConstrV(1,kV)=1.d0
           enddo
 c
+#if DEBUG_MODE
 c         printing
           if (iprint.eq.1) then
             write(*,7030) i,nod,S_Type(NODES(nod)%ntype),
      .                    NODES(nod)%order
           endif
+#endif
 c
 c======================================================================
 c       NODE IS CONSTRAINED                                           |
@@ -273,6 +285,7 @@ c
 c         identify the node case
           call decode2(NODES_CONSTR(i), nc,icase)
 c
+#if DEBUG_MODE
 c         printing
           if (iprint.eq.1) then
             select case(icase)
@@ -288,6 +301,7 @@ c           node constrained by a face
      .                    NFACEC(nc),NFACE_CONS(1:8,nc)
             end select
           endif
+#endif
 c
 c
           select case(icase)
@@ -609,7 +623,7 @@ c           number of parent node horizontal and vertical dof's
 c
 c           parent mid-edge nodes (south,north)
             do ip=1,3,2
-              nodp = iabs(NFACE_CONS(ip,nc))
+              nodp = abs(NFACE_CONS(ip,nc))
 ccc           locp(ip) = NODES(nodp)%visit
               call locate(nodp,Nodm,Nrnodm, locp(ip))
               ndofHp(ip) = NODES(nodp)%order-1
@@ -697,7 +711,7 @@ ccc         loc = NODES(nodp)%visit
 c
 c           parent mid-edge nodes (east,west)
             do ip=2,4,2
-              nodp = iabs(NFACE_CONS(ip,nc))
+              nodp = abs(NFACE_CONS(ip,nc))
 ccc           locp(ip) = NODES(nodp)%visit
               call locate(nodp,Nodm,Nrnodm, locp(ip))
               ndofHp(ip) = NODES(nodp)%order-1
@@ -780,7 +794,7 @@ ccc         loc = NODES(nodp)%visit
 c
 c           parent mid-edge nodes (south,east,north,west)
             do ip=1,4
-              nodp = iabs(NFACE_CONS(ip,nc))
+              nodp = abs(NFACE_CONS(ip,nc))
 ccc           locp(ip) = NODES(nodp)%visit
               call locate(nodp,Nodm,Nrnodm, locp(ip))
               ndofHp(ip) = NODES(nodp)%order-1
@@ -923,7 +937,7 @@ ccc         loc = NODES(nodp)%visit
 c
 c           parent mid-edge nodes (south,north)
             do ip=1,3,2
-              nodp = iabs(NFACE_CONS(ip,nc))
+              nodp = abs(NFACE_CONS(ip,nc))
               if (Is_active(nodp)) then
                 ncflag(ip)=0
                 call locate(nodp,Nodm,Nrnodm, locp(ip))
@@ -1134,7 +1148,7 @@ c           parent mid-face node
 c
 c           parent mid-edge nodes (east,west)
             do ip=2,4,2
-              nodp = iabs(NFACE_CONS(ip,nc))
+              nodp = abs(NFACE_CONS(ip,nc))
               if (Is_active(nodp)) then
                 ncflag(ip)=0
                 call locate(nodp,Nodm,Nrnodm, locp(ip))
@@ -1281,7 +1295,7 @@ c             loop through parent node dof
 c
 c             loop through parent medg nodes
               do ie=1,3
-                nodp = iabs(NFACE_CONS(ie,nc))
+                nodp = abs(NFACE_CONS(ie,nc))
 ccc             loc = NODES(nodp)%visit
                 call locate(nodp,Nodm,Nrnodm, loc)
 c
@@ -1323,7 +1337,7 @@ c           ..loop through parent node dof
 c
 c           ..loop through parent medg nodes
               do ie=1,3
-                nodp = iabs(NFACE_CONS(ie,nc))
+                nodp = abs(NFACE_CONS(ie,nc))
 ccc             loc = NODES(nodp)%visit
                 call locate(nodp,Nodm,Nrnodm, loc)
 c
@@ -1394,12 +1408,15 @@ c             loop through parent mdlt node dof
 c
 c             loop through parent medg nodes
               do ie=1,3
-                nodp = iabs(NFACE_CONS(ie,nc))
+                nodp = abs(NFACE_CONS(ie,nc))
 ccc             loc = NODES(nodp)%visit
                 call locate(nodp,Nodm,Nrnodm, loc)
+c
+#if DEBUG_MODE
                 if (iprint.eq.1) then
                   write(*,*) 'logic: ie,nodp,loc = ',ie,nodp,loc
                 endif
+#endif
 c
 c               loop through parent medg node dof
                 do lp=1,NdofmH(loc)
@@ -1412,11 +1429,13 @@ c               loop through parent medg node dof
                   endif
                 enddo
               enddo
+#if DEBUG_MODE
               if (iprint.eq.1) then
                 write(*,*) 'l = ',l
                 write(*,7013) NacH(1:jp,kH)
                 write(*,7014) ConstrH(1:jp,kH)
               endif
+#endif
 c
 c             save the number of constraining dof
               NrconH(kH) = jp
@@ -1443,12 +1462,14 @@ c             loop through parent mdlt node dof
 c
 c             loop through parent medg nodes
               do ie=1,3
-                nodp = iabs(NFACE_CONS(ie,nc))
+                nodp = abs(NFACE_CONS(ie,nc))
 ccc             loc = NODES(nodp)%visit
                 call locate(nodp,Nodm,Nrnodm, loc)
+#if DEBUG_MODE
                 if (iprint.eq.1) then
                   write(*,*) 'logic: ie,nodp,loc = ',ie,nodp,loc
                 endif
+#endif
 c
 c               loop through parent medg node dof
                 do lp=1,NdofmE(loc)
@@ -1461,11 +1482,13 @@ c               loop through parent medg node dof
                   endif
                 enddo
               enddo
+#if DEBUG_MODE
               if ((iprint.eq.1).and.(Idec.gt.1)) then
                 write(*,*) '75,76,77::Mdle,l,jp = ',Mdle,l,jp
                 write(*,7013) NacE(1:jp,kE)
                 write(*,7014) ConstrE(1:jp,kE)
               endif
+#endif
 c
 c             save the number of constraining dof
               NrconE(kE) = jp
@@ -1503,12 +1526,14 @@ c             loop through parent mdlt node dof
 c
 c             loop through parent medg nodes
               do ie=1,3
-                nodp = iabs(NFACE_CONS(ie,nc))
+                nodp = abs(NFACE_CONS(ie,nc))
 ccc             loc = NODES(nodp)%visit
                 call locate(nodp,Nodm,Nrnodm, loc)
+#if DEBUG_MODE
                 if (iprint.eq.1) then
                   write(*,*) 'logic: ie,nodp,loc = ',ie,nodp,loc
                 endif
+#endif
 c
 c               loop through parent medg node dof
                 do lp=1,NdofmH(loc)
@@ -1522,11 +1547,13 @@ c               loop through parent medg node dof
                   endif
                 enddo
               enddo
+#if DEBUG_MODE
               if (iprint.eq.1) then
                 write(*,*) 'l = ',l
                 write(*,7013) NacH(1:jp,kH)
                 write(*,7014) ConstrH(1:jp,kH)
               endif
+#endif
 c
 c             save the number of constraining dof
               NrconH(kH) = jp
@@ -1539,6 +1566,7 @@ c
 c  .....if a constrained node
         endif
 c
+#if DEBUG_MODE
 c  .....printing
         if (iprint.eq.1) then
           write(*,9000) i,nod,kH,kE,kV
@@ -1546,6 +1574,7 @@ c  .....printing
      .                                     ' ; kE = ',i3,
      .                                     ' ; kV = ',i3 )
         endif
+#endif
 c
 c  ...end of loop through local nodes
       enddo
@@ -1573,7 +1602,6 @@ c
 c  UNCONSTRAINED VERSION FOR H(div)
 c
       if (.not.CONSTRAINED_HDIV) then
-        write(*,*) 'executing Paolo'
         call find_order(Mdle, norder)
         call celndof(NODES(Mdle)%ntype,norder,
      .               nrdofH,nrdofE,nrdofV,nrdofQ)
@@ -1586,6 +1614,7 @@ c
 c
 c-----------------------------------------------------------------------
 c
+#if DEBUG_MODE
       if ((iprint.ge.1).and.(Idec.ne.1)) then
         write(*,7011) Mdle
 c
@@ -1621,6 +1650,7 @@ c
  7014   format(20f6.3)
 c
       endif
+#endif
 c
 c
-      endsubroutine logic
+      end subroutine logic

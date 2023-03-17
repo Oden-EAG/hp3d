@@ -1,6 +1,3 @@
-      subroutine symasm (Amdest, Ellhs, Flhs)
-c
-#include "syscomz.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: Assembles the lhs into the front for symmetric matrices
 c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
@@ -16,7 +13,7 @@ c                   a22 a23 ...      ==>   [a11, a12,a22, a13,a23,a33, .
 c                       a33 ...
 c                            :
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -26,11 +23,19 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      subroutine symasm (Amdest, Ellhs, Flhs)
 c
-      parameter (ntim=324)
-      dimension Amdest(*), Ellhs(*), Flhs(*), ntemp(ntim)
+      use surfsc1
+      use surfsc2
+c
+      implicit none
+c
+      complex(8) :: Amdest(*), Ellhs(*), Flhs(*)
+c
+      integer, parameter :: ntim=324
+      integer :: ntemp(ntim)
+c
+      integer :: i,j,k,l,mi,mj,mk,n
 c
       n = 1
 c
@@ -41,9 +46,7 @@ c
          IERR = 1
          return
       endif
-
-
-
+c
 c
 c loop thru the dof in the element
 c
@@ -106,5 +109,5 @@ cwb <
 c
 100   continue
 c
-      return
-      end
+c
+      end subroutine symasm

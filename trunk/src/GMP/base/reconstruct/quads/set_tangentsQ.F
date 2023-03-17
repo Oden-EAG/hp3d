@@ -46,7 +46,8 @@ c
       use control
       use GMP
 c
-#include "syscom.blk"
+c  ...removed syscom (declare variables)
+      implicit none
 c
       dimension List_curves(Nrcurves),Newlist_curves(Nrcurves),
      .          List_recta(3,Nrcurves)
@@ -100,7 +101,7 @@ c  .....loop through connected rectangles
         do ir=1,CURVES(nc)%NrFig
           call decode(abs(CURVES(nc)%FigNo(ir)), nr,lab)
           do kk=1,2
-            call decode(iabs(RECTANGLES(nr)%BlockNo(kk)), nhex,labh)
+            call decode(abs(RECTANGLES(nr)%BlockNo(kk)), nhex,labh)
             if (labh.eq.2) then
               call locate(nhex, list_hexa,nrhex, loc)
               if (loc.eq.0) then
@@ -119,7 +120,7 @@ c  .......skip if not on the surface
 c
 c  .......look for two edge curves on the original list
           do ie1=1,4
-            nc1 = iabs(RECTANGLES(nr)%EdgeNo(ie1))
+            nc1 = abs(RECTANGLES(nr)%EdgeNo(ie1))
             if (iprint.eq.1) then
               write(*,8045) nc,ir,nr,ie1,nc1
  8045         format('nc,ir,nr,ie1,nc1 = ',i5,i2,i5,i2,i5)
@@ -195,13 +196,13 @@ c  ...find the local face number and the corresponding orientation
 c
 c  .....orientation of the rectangle consistent with the normal
         case(0)
-          Newlist_curves(1) = iabs(RECTANGLES(nr)%EdgeNo(iv))
-          Newlist_curves(2) = iabs(RECTANGLES(nr)%EdgeNo(iv3))
+          Newlist_curves(1) = abs(RECTANGLES(nr)%EdgeNo(iv))
+          Newlist_curves(2) = abs(RECTANGLES(nr)%EdgeNo(iv3))
 c
 c  .....orientation of the rectangle opposite to the normal
         case(1)
-          Newlist_curves(1) = iabs(RECTANGLES(nr)%EdgeNo(iv3))
-          Newlist_curves(2) = iabs(RECTANGLES(nr)%EdgeNo(iv))
+          Newlist_curves(1) = abs(RECTANGLES(nr)%EdgeNo(iv3))
+          Newlist_curves(2) = abs(RECTANGLES(nr)%EdgeNo(iv))
       end select
 c
 c  ...complete the list
@@ -209,7 +210,7 @@ c  ...complete the list
         do ir=1,Nrcurves
           nr = list(ir)
           call locate(Newlist_curves(ic),
-     .                iabs(RECTANGLES(nr)%EdgeNo(1:4)),4, ic1)
+     .                abs(RECTANGLES(nr)%EdgeNo(1:4)),4, ic1)
           if ((ic1.ne.0).and.(nr.ne.List_recta(1,ic-1))) then
 c
 c  .........build up the list
@@ -220,12 +221,12 @@ c  .........build up the list
             if (ic1.eq.iv) then
               List_recta(3,ic) = 0
               if (ic.lt.Nrcurves) then
-                Newlist_curves(ic+1) = iabs(RECTANGLES(nr)%EdgeNo(iv3))
+                Newlist_curves(ic+1) = abs(RECTANGLES(nr)%EdgeNo(iv3))
               endif
             elseif (ic1.eq.iv3) then
               List_recta(3,ic) = 1
               if (ic.lt.Nrcurves) then
-                Newlist_curves(ic+1) = iabs(RECTANGLES(nr)%EdgeNo(iv))
+                Newlist_curves(ic+1) = abs(RECTANGLES(nr)%EdgeNo(iv))
               endif
             else
               write(*,*) 'set_tangents: ic1,iv = ',ic1,iv; stop 1

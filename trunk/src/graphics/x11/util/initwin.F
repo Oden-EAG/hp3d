@@ -4,32 +4,35 @@ c   routine name       - initwin
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Feb 98
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine initiates a specific display
-c
-c   usage              - call initwin(Iwind)
 c
 c   argument
 c           in : Iwind - type of display
 c
-c   required  routines  - openwind, closwind, clrwind
+c   required routines  - openwind, closwind, clrwind
 c
 c----------------------------------------------------------------------
-c
       subroutine initwin(Iwind)
+c
       use graphmod
 c
-#include "syscom.blk"
+      implicit none
 c
+      integer, intent(in) :: Iwind
+c
+      integer :: iwindtype
+c
+#if DEBUG_MODE
 c  ...debug print
+      integer :: iprint
       iprint=0
       if (iprint.eq.1) then
         write(*,*) 'initwin: Iwind = ',Iwind
         call pause
       endif
+#endif
 c
 c  ...store the display type
       IDISPLAY_TYPE = Iwind
@@ -68,7 +71,4 @@ c
 c
       call closwind(IWINDNUM)
 c
-c
-      return
-      end
-
+      end subroutine initwin

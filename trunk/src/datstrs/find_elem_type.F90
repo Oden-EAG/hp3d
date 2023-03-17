@@ -1,24 +1,15 @@
-!
 !-----------------------------------------------------------------------
 !
 !   routine name       - find_elem_type
 !
 !-----------------------------------------------------------------------
-!
-!   latest revision:   - June 2018
-!
-!   purpose:           - routine returns the type of the initial mesh
-!                        ancestor for an element
-!                        (i.e. 'Linear', 'TraHex', ...)
-!
-!   arguments:
-!           in         - Mdle: middle node of an element
-!           out        - Type: type of the initial mesh element (ancestor)
-!
+!> @brief Returns the type of the initial mesh ancestor for an element
+!!        (e.g. 'Linear', 'TraHex', ...)
+!> params[in]  Mdle : middle node of an element
+!> params[out] Type : type of the initial mesh element (ancestor)
+!> @date Feb 2023
 !-----------------------------------------------------------------------
-!
-!
-subroutine find_elem_type(Mdle, Type)
+subroutine find_elem_type(Mdle, Etype)
 !
    use GMP
    use data_structure3D
@@ -26,9 +17,9 @@ subroutine find_elem_type(Mdle, Type)
    implicit none
 !
    integer         , intent(in)  :: Mdle
-   character(len=6), intent(out) :: Type
+   character(len=6), intent(out) :: Etype
 !
-   integer :: nfath, nel,no,nick
+   integer :: nfath,nel,no,nick
 !
 !-----------------------------------------------------------------------------
 !
@@ -47,19 +38,22 @@ subroutine find_elem_type(Mdle, Type)
 !
 !  ...prism
       case(1)
-         Type = PRISMS(no)%type
+         Etype = PRISMS(no)%type(1:6)
 !
 !  ...hexahedron
       case(2)
-         Type = HEXAS(no)%type
+         Etype = HEXAS(no)%type(1:6)
 !
 !  ...tetrahedron
       case(3)
-         Type = TETRAS(no)%type
+         Etype = TETRAS(no)%type(1:6)
 !
 !  ...pyramid
       case(4)
-         Type = PYRAMIDS(no)%type
+         Etype = PYRAMIDS(no)%type(1:6)
+!
+      case default
+         write(*,*) 'find_elem_type'; stop
 !
    end select
 !

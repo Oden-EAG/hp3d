@@ -4,7 +4,7 @@ c   routine name       - check_edge
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Feb 11
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine identifies sharp curves
 c
@@ -22,18 +22,27 @@ c
       use GMP
       use control
 c
-#include "syscom.blk"
+      implicit none
+c
+      integer :: Ncu,Idec
 c
 c  ...list of attached triangles
-      dimension itrian(2),aux1(3),aux2(3),aux3(3),aux4(3)
+      integer :: itrian(2)
+      real(8) :: s,aux1(3),aux2(3),aux3(3),aux4(3)
+c
+      integer :: i,ifound,it,j,lab,nc,np,np1,np2,np3,np4
+      integer :: nr_trian,nt1,nt2
 c
 c  ...list of sharp edges
-      dimension nsharp(1000)
+      integer :: nsharp(1000)
 c
-c  ...visitation flag
-      data ivisit /0/
+      integer :: ivisit,nr_sharp
+c
 c  ...save visitation flag and list of sharp edges
       save ivisit,nsharp,nr_sharp
+c
+c  ...visitation flag
+      ivisit = 0
 c
 c-----------------------------------------------------------------------
 c
@@ -404,4 +413,4 @@ c
       if (ifound.ne.0) Idec = 2
 c
 c
-      end
+      end subroutine check_edge

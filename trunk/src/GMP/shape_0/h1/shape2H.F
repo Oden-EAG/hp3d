@@ -4,7 +4,7 @@ c   routine name       - shapeHt_0
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Nov 08
+c   latest revision    - Mar 2023
 c
 c   purpose            - evaluate triangle H^1 shape functions
 c
@@ -19,24 +19,25 @@ c        ShapH         - values of shape functions
 c        DshapH        - values of derivatives of the shape functions
 c                        wrt to master element coordinates
 c
-c   required  routines -
-c
 c----------------------------------------------------------------------
 c
       subroutine shapeHt_0(Xi,Norder,Nedge_orient, Nrdof,ShapH,DshapH)
 c
       use parameters
       use element_data
-#include "syscom.blk"
+      implicit none
 c
-      dimension Xi(2),Norder(4),Nedge_orient(3),
-     .          ShapH(MAXtriaH),DshapH(2,MAXtriaH)
+      integer :: Norder(4),Nedge_orient(3),Nrdof
+      real(8) :: Xi(2),ShapH(MAXtriaH),DshapH(2,MAXtriaH)
 c
 c  ...derivatives of edge coordinate
-      dimension dtdxi(2)
+      real(8) :: dtdxi(2)
 c
 c  ...edge kernel shape functions
-      dimension shapHek(MAXP-1),dshapHek(MAXP-1)
+      real(8) :: shapHek(MAXP-1),dshapHek(MAXP-1)
+c
+      integer :: ie,iv,iv1,iv2,j,k,nrdofHb,nrdofHe
+      real(8) :: t
 c
 c----------------------------------------------------------------------
 c
@@ -91,7 +92,7 @@ c  ...save the number of dof
       Nrdof = k+nrdofHb
 c
 c
-      end
+      end subroutine shapeHt_0
 c
 c----------------------------------------------------------------------
 c
@@ -99,7 +100,7 @@ c   routine name       - shapeHq_0
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Nov 08
+c   latest revision    - Mar 2023
 c
 c   purpose            - evaluate quad H^1 shape functions
 c
@@ -122,28 +123,31 @@ c
 c
       use parameters
       use element_data
-#include "syscom.blk"
+      implicit none
 c
-      dimension Xi(2),Norder(5),Nedge_orient(4),
-     .          ShapH(MAXquadH),DshapH(2,MAXquadH)
+      integer :: Norder(5),Nedge_orient(4),Nrdof
+      real(8) :: Xi(2),ShapH(MAXquadH),DshapH(2,MAXquadH)
 c
 c  ...1D linear shape functions, first index indicates the function
 c     number, second index the direction
-      dimension vshap(2,2),dvshap(2,2)
+      real(8) :: vshap(2,2),dvshap(2,2)
 c
 c  ...defines vertex shape functions; for vertex iv,
 c     ijv(ixi,iv) = number of 1D linear shape function in Xi(ixi)
-      dimension ijv(2,4)
+      integer :: ijv(2,4)
 c
 c  ...defines edge shape functions; for edge ie
 c     ixiedg(ie) = edge coordinate
 c     iblend(ie) = blending direction
 c     nblend(ie) = number of blending linear shape function
-      dimension ixiedg(4),iblend(4),nblend(4)
+      integer :: ixiedg(4),iblend(4),nblend(4)
 c
 c  ...1D bubble functions
-      dimension shapH1(MAXP-1),dshapH1(MAXP-1),
-     .          shapH2(MAXP-1),dshapH2(MAXP-1)
+      real(8) :: shapH1(MAXP-1),dshapH1(MAXP-1),
+     .           shapH2(MAXP-1),dshapH2(MAXP-1)
+c
+      integer :: i,ibl,ie,ixi,iv,j,k,nv
+      integer :: nordh,nordv,nrdofH1,nrdofH2,nrdofHe
 c
       data ijv /1,1, 2,1, 2,2, 1,2/
       data ixiedg /1,2,1,2/
@@ -198,5 +202,4 @@ c  ...save the number of dof
       Nrdof = k
 c
 c
-      end
-
+      end subroutine shapeHq_0

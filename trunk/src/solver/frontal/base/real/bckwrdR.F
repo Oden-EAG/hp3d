@@ -1,7 +1,3 @@
-      subroutine bckwrd (Alelm, Aldest, Amdest,
-     .                   Andest, Elem, Frnt, Bbuf, Ubuf)
-c
-#include "syscom.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c     Backsubstitution
@@ -31,7 +27,7 @@ c W  Ubuf    The eliminated lhs buffered equations
 c W  Bbuf    The eliminated rhs buffered equations
 c
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -40,14 +36,24 @@ c     aaaaaaaa    LOCAL Variables
 c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
-c-
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      subroutine bckwrd (Alelm, Aldest, Amdest,
+     .                   Andest, Elem, Frnt, Bbuf, Ubuf)
 c
-      dimension Aldest(*), Amdest(*), Andest(*), Elem(*), Frnt(*),
-     .          Bbuf(*), Ubuf(*), Alelm(*)
+      use surfsc1
+      use surfsc2
 c
+      implicit none
+c
+      real(8) :: Aldest(*), Amdest(*), Andest(*), Elem(*), Frnt(*),
+     .           Bbuf(*), Ubuf(*), Alelm(*)
+c
+      integer :: i,ie,iel,ifbi,ifui,ill,iuu,iuuold
+      integer :: j,jel,jerr,k,l,lenx,md,n,ne,negiel,numdes
+c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
+#endif
 c
       iuu = 1
       jel = NUMELM + 1
@@ -73,12 +79,14 @@ c pull up the Elements nodal destination vectors (Aldest)
 c
          call solin1 (jel, numdes, Aldest)
 c        ----------------------------------
+#if DEBUG_MODE
          if (iprint.eq.1) then
            write(*,*) 'IN BCKWRD BEFORE CALL TO dest= '
            write(*,*) 'jel,numdes = ',jel,numdes
            write(*,*) 'Aldest = ',(Aldest(ii),ii=1,numdes)
            call pause
          endif
+#endif
 c
          if (numdes .eq. 0) go to 200
 c
@@ -88,10 +96,12 @@ c  and the transfer loc for active dof in the front after eliminating (A
 c
          call dest (numdes, Aldest, ne ,Amdest, Andest)
 c        -----------------------------------------------
+#if DEBUG_MODE
          if (iprint.eq.1) then
            write(*,*) 'IN BCKWRD NDOFM AFTER CALL TO dest= ',NDOFM
            call pause
          endif
+#endif
 c
 c pick up final frontwidth (after elim) for the next Element
 c
@@ -250,7 +260,7 @@ c$doit VBEST
 c
                do 160 i = 1,NDOFM
                   md = Amdest(i)
-                  md = iabs(md)
+                  md = abs(md)
                   l = (j-1)*MFW + md
                   Elem(k) = Frnt(l)
                   k = k + 1
@@ -273,10 +283,12 @@ cwb c
 cwb   180       continue
 cwb <
 c
+#if DEBUG_MODE
             if (iprint.eq.1) then
               write(*,*) 'IN BCKWRD jel,NDOFM = ',jel,NDOFM
               call pause
             endif
+#endif
             call solout (jel, NDOFM, NRHS, Amdest, Elem)
 c           ---------------------------------------------
 c debug print
@@ -296,5 +308,5 @@ c
       IFU = ifui
       IFB = ifbi
 c
-      return
-      end
+c
+      end subroutine bckwrd

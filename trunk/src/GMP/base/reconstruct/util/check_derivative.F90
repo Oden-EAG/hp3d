@@ -42,7 +42,7 @@
  1000 format(' nt = ',i3,', ie = ',i1,'; Der = ',3(e12.5,2x))
 
 !
-      end
+      end subroutine check_derivative
 !
 !
 !
@@ -54,6 +54,10 @@
 !---------------------------------------------------------------------------
       integer, intent(in) :: i,j
       integer :: deg,n,m
+#if DEBUG_MODE
+      integer :: iprint
+      iprint=0
+#endif
 !---------------------------------------------------------------------------
 !
       deg = 7
@@ -68,11 +72,14 @@
         bijec = bijec + 3
       enddo
 !
-!  ...debugging
-!      write(*,1000)i,j,bijec
- 1000 format(' bijec: i = ',i1,', j = ',i1,' --> k = ',i2)
+#if DEBUG_MODE
+      if (iprint .eq. 1) then
+         write(*,1000)i,j,bijec
+    1000 format(' bijec: i = ',i1,', j = ',i1,' --> k = ',i2)
+      endif
+#endif
 !
-      end
+      end function bijec
 !
 !
 !
@@ -101,4 +108,4 @@
 !!!!      write(*,1000)i,j,bijec
 !!! 1000 format(' bijec: i = ',i1,', j = ',i1,' --> k = ',i2)
 !!!!
-!!!      end
+!!!      end function bijec7

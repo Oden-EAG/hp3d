@@ -4,7 +4,7 @@ c   routine name       - curve_ImpCir
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Jan 06
+c   latest revision    - Mar 2023
 c
 c   purpose            - implicit curve parametrization routine
 c
@@ -23,13 +23,15 @@ c
 c
       use GMP
       use control
-#include "syscom.blk"
 c
-      dimension X(3),Dxdeta(3)
+      implicit none
 c
-      dimension nsurf(6)
-      dimension xv(3,2),dxv(3),fgrad(3),f3grad(3),f4grad(3),
-     .          xs(3),sfact(4),void(4),aij(3,3),aux(3)
+      integer :: No
+      real(8) :: Eta,X(3),Dxdeta(3)
+c
+      integer :: nsurf(6)
+      real(8) :: xv(3,2),dxv(3),fgrad(3),f3grad(3),f4grad(3),
+     .           xs(3),sfact(4),void(4),aij(3,3),aux(3)
 c
 c  ...local variables:
 c     nsurf     - surfaces defining the curve
@@ -41,8 +43,12 @@ c     sfact     - renormalization factor to adjust the definition
 c                 of surfaces cutting of the segment
 c     aij,aux   - matrices to determine derivatives
 c
+      real(8) :: fval,fval3,fval4,s1,s2
+      integer :: i,ifl,j,np
 c
+      integer :: iprint
       iprint=0
+c
  5    continue
       nsurf(1:6)=0 ; void(1:4)=0.d0 ; sfact(1:4)=0.d0
 c
@@ -138,4 +144,4 @@ c  ...solve for derivatives
       endif
 c
 c
-      end
+      end subroutine curve_ImpCir

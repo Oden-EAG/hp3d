@@ -4,7 +4,7 @@ c   routine name       - set_bundle
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Mar 10
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine sets tangent and normal directions
 c                        for curves connected to a point on a surface
@@ -38,35 +38,44 @@ c
       use GMP
       use element_data
 c
-#include "syscom.blk"
+      implicit none
 c
-      dimension Newlist_curves(Nrcurves),
-     .          List_trian(3,Nrcurves)
-      dimension Rn(3)
+      integer :: Np,Nrcurves
+      integer :: Newlist_curves(Nrcurves),
+     .           List_trian(3,Nrcurves)
+      real(8) :: Rn(3)
 c
 c  ...normal components for hexahedra edges "orthogonal" to the
 c     plane and adjacent to the point
-      dimension edge_comp(10)
+      real(8) :: edge_comp(10)
 c
 c  ...transformation matrix to patch coordinates
-      dimension transf(3,3)
+      real(8) :: transf(3,3)
 c
 c  ...tangents for a curve
-      dimension tangent(3)
+      real(8) :: tangent(3)
 c
 c  ...work space
-      dimension temp(3),temp1(3)
+      real(8) :: temp(3),temp1(3)
 c
 c  ...patch coordinates
-      dimension xy(2,10),r(10),theta(10),dtheta(10),theta_new(10)
+      real(8) :: xy(2,10),r(10),theta(10),dtheta(10),theta_new(10)
 c
 c  ...second derivatives of the implicit reconstruction of surface
-      dimension acoeff(3,3)
+      real(8) :: acoeff(3,3)
 c
 c  ...points for a curvature reconstruction
-      dimension list_points(20)
+      integer :: list_points(20)
 c
-      data pi /3.14159265358979312d0/
+      real(8), parameter :: pi = 3.14159265358979312d0
+c
+      real(8) :: alpha,dt,dtheta_new,dtheta_old
+      real(8) :: s,twopi,theta_min,theta_max,theta0
+      integer :: i,ic,icount,ie,ii,ip,ir,iv,iv1,ivc,ive,ive1,irnp
+      integer :: j,k,lab,nc,nh,np1,npv,nr
+      integer :: inconsistent
+c
+      integer :: iprint
 c
       integer, external :: imod
 ccc      imod(j,mod) = j-(j-1)/mod*mod
@@ -108,7 +117,7 @@ c  .....find attached tet
         call decode(TRIANGLES(nr)%BlockNo(1), nh,lab)
 c  .....loop over the edges
         do ie = 1,6
-        nc = iabs(TETRAS(nh)%EdgeNo(ie))
+        nc = abs(TETRAS(nh)%EdgeNo(ie))
 c  .......loop over endpoints
           do ive = 1,2
             iv = TETRA_EDGE_TO_VERT(ive,ie)

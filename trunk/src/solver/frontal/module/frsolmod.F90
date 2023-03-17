@@ -1,5 +1,5 @@
-!> Purpose : module defines space for frontal solver
-!! @revision Dec 10
+!> @brief Defines space for frontal solver
+!> @date Mar 2023
 module frsolmod
 !
    save
@@ -24,15 +24,15 @@ module frsolmod
    real(8)   , allocatable       :: ZWORKFRS(:)
 #endif
 !
-  logical                       :: REORDER = .false.
+   logical                       :: REORDER = .false.
 !
 contains
 !
-   !> Purpose : set the workspace for the frontal solver
-   !  @param iwork size of workspace
-   subroutine set_frsol_workspace(iwork)
+!> @brief Sets the workspace for the frontal solver
+!> @param Iwork - size of workspace
+   subroutine set_frsol_workspace(Iwork)
       implicit none
-      integer, intent(in) :: iwork
+      integer, intent(in) :: Iwork
       MFRSOL = iwork
    end subroutine set_frsol_workspace
 !

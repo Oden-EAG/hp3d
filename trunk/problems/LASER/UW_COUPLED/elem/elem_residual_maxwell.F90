@@ -164,9 +164,8 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !..timer
    real(8) :: MPI_Wtime,start_time,end_time
 !
-!..debug variables
 #if DEBUG_MODE
-   integer :: iprint = 0
+   integer :: iprint
 #endif
 !
 !..for Gram matrix compressed storage format
@@ -174,6 +173,10 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    nk(k1,k2) = (k2-1)*k2/2+k1
 !
 !--------------------------------------------------------------------------
+!
+#if DEBUG_MODE
+   iprint=0
+#endif
 !
    allocate(gramP(NrTest*(NrTest+1)/2))
 !

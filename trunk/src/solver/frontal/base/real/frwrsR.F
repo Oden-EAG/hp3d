@@ -1,7 +1,3 @@
-      subroutine frwrs (Alelm, Aldest, Amdest, Andest,
-     .                  Elem, Frnt, Bbuf, Buf)
-c
-#include "syscom.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:  Forward elimination of rhs's only
 c  calls solin1 for dest. vectors
@@ -21,7 +17,7 @@ c W  Frnt    equations in the front
 c W  Bbuf    Buffer to contain the new eliminated rhs
 c W  Buf     eliminated equations
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -31,11 +27,19 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      subroutine frwrs (Alelm, Aldest, Amdest, Andest,
+     .                  Elem, Frnt, Bbuf, Buf)
 c
-      dimension Aldest(*),Amdest(*),Andest(*),Elem(*),Frnt(*),Bbuf(*),
-     .          Buf(*),Alelm(*)
+      use surfsc1
+      use surfsc2
+c
+      implicit none
+c
+      real(8) :: Alelm(*),Aldest(*),Amdest(*),Andest(*)
+      real(8) :: Elem(*),Frnt(*),Bbuf(*),Buf(*)
+c
+      integer :: i,id,ie,iel,ifg,igot,ill,inc,is,j,jerr
+      integer :: n,ne,negiel,numdes
 c
       IB = 1
 cwb >
@@ -298,5 +302,5 @@ c
      .                     (10x,1p,10e12.5))
       endif
 c
-      return
-      end
+c
+      end subroutine frwrs

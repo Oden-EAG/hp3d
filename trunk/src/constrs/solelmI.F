@@ -4,10 +4,11 @@ c   routine name       - solelmI
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Aug 18
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine calculates unconstrained INTERFACE
 c                        solution dof for a 3D element
+c   remark: this routine must be OMP thread-safe
 c
 c   arguments :
 c     in:
@@ -18,35 +19,44 @@ c           ZdofE      - the element unconstrained interface H(curl) dof
 c           ZdofV      - the element unconstrained interface H(div) dof
 c
 c----------------------------------------------------------------------
+#include "typedefs.h"
 c
       subroutine solelmI(Mdle, ZdofH,ZdofE,ZdofV)
 c
       use data_structure3D
-#include "syscom.blk"
+      implicit none
 c
-      dimension ZdofH(MAXEQNH,MAXbrickH-MAXmdlbH)
-      dimension ZdofE(MAXEQNE,MAXbrickE-MAXmdlbE)
-      dimension ZdofV(MAXEQNV,MAXbrickV-MAXmdlbV)
+      integer, intent(in)  :: Mdle
+      VTYPE  , intent(out) :: ZdofH(MAXEQNH,MAXbrickH-MAXmdlbH)
+      VTYPE  , intent(out) :: ZdofE(MAXEQNE,MAXbrickE-MAXmdlbE)
+      VTYPE  , intent(out) :: ZdofV(MAXEQNV,MAXbrickV-MAXmdlbV)
 c
 c  ...element type
       integer :: ntype
 c
 c  ...element order of approximation
-      dimension norder(19)
+      integer :: norder(19)
 c
 c  ...modified element nodes and corresponding number of dof
-      dimension nodm  (MAXNODM),ndofmH(MAXNODM),
-     .          ndofmE(MAXNODM),ndofmV(MAXNODM)
+      integer :: nodm  (MAXNODM),ndofmH(MAXNODM),
+     .           ndofmE(MAXNODM),ndofmV(MAXNODM)
 c
-      dimension nrconH(MAXbrickH),nrconE(MAXbrickE),nrconV(MAXbrickV),
-     .          nacH(NACDIM,MAXbrickH),constrH(NACDIM,MAXbrickH),
-     .          nacE(NACDIM,MAXbrickE),constrE(NACDIM,MAXbrickE),
-     .          nacV(NACDIM,MAXbrickV),constrV(NACDIM,MAXbrickV)
+      integer :: nrconH(MAXbrickH),nacH(NACDIM,MAXbrickH),
+     .           nrconE(MAXbrickE),nacE(NACDIM,MAXbrickE),
+     .           nrconV(MAXbrickV),nacV(NACDIM,MAXbrickV)
+c
+      real(8) :: constrH(NACDIM,MAXbrickH),
+     .           constrE(NACDIM,MAXbrickE),
+     .           constrV(NACDIM,MAXbrickV)
 c
 c  ...modified element dof
-      dimension zvalH(MAXEQNH,2*MAXbrickH)
-      dimension zvalE(MAXEQNE,2*MAXbrickE)
-      dimension zvalV(MAXEQNV,2*MAXbrickV)
+      VTYPE :: zvalH(MAXEQNH,2*MAXbrickH)
+      VTYPE :: zvalE(MAXEQNE,2*MAXbrickE)
+      VTYPE :: zvalV(MAXEQNV,2*MAXbrickV)
+      VTYPE :: zvoid
+c
+      integer :: kH,kE,kV,kQ,ivar,j,kp,l
+      integer :: nrnodm,nrdoflH,nrdoflE,nrdoflV,nrdoflQ
 c
 c---------------------------------------------------------------------
 c
@@ -77,9 +87,9 @@ c
 c---------------------------------------------------------------------
 c
 c  ...initiate dof's
-      zvalH=ZERO ; zvalE=ZERO ; zvalV=ZERO
+      ZdofH=ZERO ; ZdofE=ZERO ; ZdofV=ZERO
 c
-c  ...initiate counters
+c  ...initiate counters (needed for dof_out)
       kH=0; kE=0; kV=0; kQ=0
 c
 c  ...copy dof's into the local arrays
@@ -104,11 +114,6 @@ c      kV = MAXbrickV-MAXmdlbV
 c      write(*,5030) kH, kE, kV
 c 5030 format('MAXbrickH-MAXmdlbH = ',I3,',
 c     .        MAXbrickE-MAXmdlbE = ',I3,', MAXbrickV-MAXmdlbV = ',I3)
-c
-c  ...initiate the dof
-      ZdofH(1:MAXEQNH,1:nrdoflH) = ZERO
-      ZdofE(1:MAXEQNE,1:nrdoflE) = ZERO
-      ZdofV(1:MAXEQNV,1:nrdoflV) = ZERO
 c
 c
 c-----------------------------------------------------------------------

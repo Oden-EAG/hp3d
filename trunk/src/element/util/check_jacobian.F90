@@ -1,3 +1,5 @@
+#if DEBUG_MODE
+
 subroutine check_jacobian
 
   !-------------------------------------------------------------------
@@ -174,4 +176,6 @@ subroutine check_jacobian
 
   write(*,*)'elements jacobians checked'
 
-endsubroutine check_jacobian
+end subroutine check_jacobian
+
+#endif

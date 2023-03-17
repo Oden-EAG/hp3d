@@ -5,14 +5,14 @@ SRC_PATH = .
 OBJ_PATH = _obj_
 
 CCINCS   = -I../../../../common/hp3d  \
-	   -I../../../../common/frontal/complex
+	        -I../../../../../module
 
 LIBS     =
 
 FC_WORK  =  $(FC) $(CCINCS) $(FFLAGS)
 
 SRC_FILE = bckwrd.F complt.F dest.F desvec.F elmrhs.F elmsol.F \
-	   frwcp.F frwrs.F frwsr.F locls.F loclu.F locr.F \
+	   frwcp.F frwrs.F locls.F loclu.F locr.F \
 	   resol.F semrhs.F surfsp.F surfss.F symasm.F \
 	   symelm.F unsasm.F unselm.F zdirio.F zdiriodum.F \
 	   zecond.F zeror.F zeros.F zerou.F
@@ -37,10 +37,7 @@ libfrontal.a : $(OBJ_PATH)/.dummy $(OBJ)
 
 $(OBJ_PATH)/.dummy :
 	@echo "Creating directory " $(OBJ_PATH)
-	@if [ -d $(OBJ_PATH) ]; then \
-		touch $@; \
-	else mkdir $(OBJ_PATH); touch $@; \
-	fi
+	@mkdir -p $(OBJ_PATH); touch $@;
 
 $(OBJ_PATH)/%.o : $(SRC_PATH)/%.F
 	@echo "Compiling $<"

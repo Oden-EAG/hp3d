@@ -1,6 +1,8 @@
+#if DEBUG_MODE
+
 c----------------------------------------------------------------------
 c
-c   routine name       - test_trian_aniso
+c   routine name       - test_trian_aniso_h1
 c
 c----------------------------------------------------------------------
 c
@@ -8,10 +10,6 @@ c   latest revision    - May 2020
 c
 c   purpose            - routine evaluates constraint coefficients for
 c                        the triangular master element
-c
-c   usage              - call setcnstrt
-c
-c   arguments          - none
 c
 c----------------------------------------------------------------------
 c
@@ -21,26 +19,26 @@ c--------------------------------------------------------------------
 c
       use parameters
       use constraints
-#include "syscom.blk"
 c
-      dimension shapsma(MAXquadH,MAXquadH),
-     .          shapbig(MAXquadH,MAXquadH),
-     .          void(2,MAXquadH),xibig(2),xisma(2)
+c     NOTE : define implicit variables
+      implicit none
+c
+      real(8) :: shapsma(MAXquadH,MAXquadH),
+     .           shapbig(MAXquadH,MAXquadH),
+     .           void(2,MAXquadH),xibig(2),xisma(2)
 c
 c  ...order and edge orientations
-      dimension norder(5),norient(4)
+      integer :: norder(5),norient(4)
 c
-      iprint = 0
+      real(8) :: val
+      integer :: i,k,nrb,nrs,nrdof
 c
-      if (MAXP.ne.MAXP) then
-        write(*,7005) MAXP,MAXP
- 7005      format('test_trian_aniso: INCONSISTENT MAXP,MAXP = ',2i3)
-        stop 1
-      endif
+      integer :: iprint
+      iprint=0
 c
  777  continue
 c
-      write(*,*) 'test_trian_aniso: SET nord '
+      write(*,*) 'test_trian_aniso_h1: SET nord '
       read(*,*) nord
 c
 c  ...set uniform order MAXP:
@@ -53,7 +51,7 @@ c
 c*********************************************************************
 c
 c  ...input from small quad and get xibig with bilinear map
-      write(*,*) 'test_trian_aniso: SET xisma '
+      write(*,*) 'test_trian_aniso_h1: SET xisma '
       read(*,*) xisma(1:2)
       call map_quad(Iref, xisma, xibig)
       write(*,*) 'xisma =', xisma(1:2)
@@ -108,15 +106,17 @@ c  .......small node 3 ( medg ):
 c
 c
          write(*,7002) i,shapbig(nrb+i,1),abs(val-shapbig(nrb+i,1))
- 7002    format('test_trian_aniso: i,shapebig,difference = ',i3,2e12.5)
+ 7002    format('test_trian_aniso_h1: i,shapebig,difference = ',i3,2e12.5)
 c
 c  ...end of loop through shape functions of big element
       enddo
 c
-      write(*,*) 'test_trian_anio: CONTINUE ?(1/0)'
+      write(*,*) 'test_trian_aniso_h1: CONTINUE ?(1/0)'
       read(*,*) ians
       if (ians.eq.1) go to 777
 c
       return
 c
       end subroutine test_trian_aniso_h1
+
+#endif

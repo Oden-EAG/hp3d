@@ -27,7 +27,7 @@ c$OMP THREADPRIVATE (WAGAUS1)
 c
 c
 c======================================================================
-c  Gauss-Jacoby points and weights                                    |
+c  Gauss-Jacobi points and weights                                    |
 c======================================================================
 c
       real(8), dimension(10,10) :: XIGAUSJ
@@ -88,7 +88,7 @@ c
 c
       end module gauss_quadrature
 c
-c
+c======================================================================
 c
       subroutine init_gauss_quadrature
 c

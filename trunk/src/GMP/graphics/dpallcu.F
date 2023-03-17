@@ -2,17 +2,10 @@ c-----------------------------------------------------------------------c
 c   routine name       - dpallcu
 c
 c-----------------------------------------------------------------------c
-c   computer           - machine independent
 c
-c   latest revision    - Dec, 01
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine draws all blocks' edges
-c
-c   usage              - call dpallcu
-c
-c   arguments          -none
-c
-c   required  routines -
 c
 c-----------------------------------------------------------------------c
       subroutine dpallcu
@@ -20,11 +13,14 @@ c
       use graphmod
       use GMP
 c
-#include "syscom.blk"
+      implicit none
 c
-      dimension dxdxi(3)
-      dimension xcoord(3,2),xobs(3,2)
+      real(8) :: xi,dxdxi(3)
+      real(8) :: xcoord(3,2),xobs(3,2)
 c
+      integer :: i,ivar,j,k,ncol,nc
+c
+      real(8) :: small,one
       data small,one /1.d-15,1.d0/
 c
       ncol=npcol(2)
@@ -59,8 +55,5 @@ c  .....end of the loop through segments
 c  ...end of the loop through curves
       enddo
 c
-      return
-      end
-
-
-
+c
+      end subroutine dpallcu

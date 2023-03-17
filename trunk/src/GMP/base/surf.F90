@@ -26,7 +26,7 @@ subroutine surf(No,X, Fval,Dfdx)
       iprint=0
 !
 !  ...determine surface orientations
-      no1=iabs(No) ; nsign=No/no1
+      no1=abs(No) ; nsign=No/no1
       if (No.eq.0) then
         write(*,*) 'following : ', No, no1, nsign
       endif

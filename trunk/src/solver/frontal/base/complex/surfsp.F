@@ -1,6 +1,3 @@
-      subroutine surfsp (In, Ia, Ms, Mu, Mr)
-c
-#include "syscomz.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: Primary driver routine for the frontal solver prefront modul
 c --------------------------------------------------------------
@@ -10,7 +7,7 @@ c ARGUMENTS:  (I : input, O : output, IO : input & output, W : workspace
 c
 c Typ Name      Function
 c
-c I   In : array (length numel) containing the number of nicknames/eleme
+c I   In : array (length NUMELM) containing the number of nicknames/eleme
 c          where the number of nicknames = nodes + multipliers (in gener
 c          **note: this must be pre-built by the calling program
 c
@@ -30,7 +27,7 @@ c O   Ms : minimum storage required for symmetric problem
 c O   Mr : minimum stroage required per right hand side
 c O   Mu : minimum storage required for unsymmetric problem
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -40,13 +37,23 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      subroutine surfsp (In, Ia, Ms, Mu, Mr)
 c
-      dimension In(*), Ia(*)
-      real(8) t0,t1
+      use surfsc1
+      use surfsc2
 c
+      implicit none
+c
+      integer :: In(*), Ia(*)
+      integer :: Ms,Mu,Mr
+c
+      real(8) :: dt,t0,t1
+      integer :: i,maxia,ntot
+c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
+#endif
 c
 c initialize the timers
 c
@@ -87,9 +94,11 @@ c
 c calculate the destination vectors
 c =================================
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(nfsout,*) 'IN SURFSP NFN,MLDEST = ',NFN,MLDEST
       endif
+#endif
       call desvec (In, Ia, Ia(NFN+1), Ia(2*NFN+1), ntot)
 c     --------------------------------------------------
 c
@@ -111,6 +120,7 @@ c
 c print the prefront summary
 c----------------------------
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write (NFSOUT,7020) MFW,MDOF,MLDEST
 c
@@ -130,5 +140,6 @@ c
      .            ' + ',i4,'*NRHS'   )
  7050 format(10x,'TIME IN PREFRONT =   ',f6.3,/)
 c
-      return
-      end
+#endif
+c
+      end subroutine surfsp

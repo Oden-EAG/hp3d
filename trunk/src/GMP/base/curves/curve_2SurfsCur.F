@@ -1,6 +1,6 @@
 c-----------------------------------------------------------------------
 c
-c   latest revision    - Jan 08
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine evaluates physical coordinates
 c                        and its derivatives wrt to reference
@@ -25,15 +25,15 @@ c
 c
       use control
       use GMP
-#include "syscom.blk"
-      common /cmnewt/ iprint_mnewt
-      common /ccone/ iprint_cone
 c
-      dimension X(3),Dxdeta(3)
+      implicit none
 c
-      dimension nsurf(4)
-      dimension xv(3,2),dxv(3),fgrad(3),f3grad(3),f4grad(3),
-     .          xs(3),sfact(4),void(4),aij(3,3),aux(3)
+      integer :: No,I1,I2,Ierror
+      real(8) :: Eta,X(3),Dxdeta(3)
+c
+      integer :: nsurf(4)
+      real(8) :: xv(3,2),dxv(3),fgrad(3),f3grad(3),f4grad(3),
+     .           xs(3),sfact(4),void(4),aij(3,3),aux(3)
 c
 c  ...local variables:
 c     nsurf     - surfaces defining the curve
@@ -45,16 +45,14 @@ c     sfact     - renormalization factor to adjust the definition
 c                 of surfaces cutting of the segment
 c     aij,aux   - matrices to determine derivatives
 c
+      integer :: i,ifl,j,np,ns1,ns2
+      real(8) :: fval,fval3,fval4,s,s1,s2
 c
-ccc      if (No.eq.39) then
-ccc        iprint=1
-ccc      else
-        iprint=0
-ccc      endif
+      integer :: iprint
+c
+      iprint=0
       Ierror=0
  5    continue
-      iprint_mnewt=iprint
-      iprint_cone=iprint
       if (iprint.eq.1) then
         write(*,7001) No
  7001   format('curve_2SurfsCur: No = ',i5)
@@ -177,4 +175,4 @@ c  ...delete the two temporary planes
       enddo
 c
 c
-      end
+      end subroutine curve_2SurfsCur

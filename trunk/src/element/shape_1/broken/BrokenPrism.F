@@ -266,6 +266,9 @@ c     Family 2: Q12 x H3
       call shape2QQ(MDLT,Xi(1:2),nordB(1), ndofQ12,shapQ12)
       call shape1HH(Xi(3),nordB(2), ndofH3,shapH3,dshapH3)
 c
+c  ...initiate counter for shape functions
+      m = 0
+c
 c  ...Evaluate Family 1
       do i3=1,ndofQ3
          do i12=1,ndofV12

@@ -41,7 +41,8 @@ subroutine nodgen(Ntype,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
 #if DEBUG_MODE
    integer :: ncase(NR_PHYSA)
    integer :: ibcnd(NRINDEX)
-   integer :: iprint = 0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !-----------------------------------------------------------------------

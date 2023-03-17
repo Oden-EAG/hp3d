@@ -55,7 +55,7 @@ subroutine recta_TraQua(No,Eta, X,Dxdeta)
       endselect
 !
 !  ...get the edge curves and orientations
-      noc(1:4)=iabs(RECTANGLES(No)%EdgeNo(1:4))
+      noc(1:4)=abs(RECTANGLES(No)%EdgeNo(1:4))
       norientc(1:4)=0
       if (RECTANGLES(No)%EdgeNo(1).lt.0) norientc(1)=1
       if (RECTANGLES(No)%EdgeNo(2).lt.0) norientc(2)=1
@@ -146,10 +146,7 @@ end subroutine recta_TraQua
 !
 !-----------------------------------------------------------------------
 !
-!
-!   computer           - machine independent
-!
-!   latest revision    - Jan 06
+!   latest revision    - Mar 2023
 !
 !   purpose            - routine evaluates bilinear and linear
 !                        blending functions for the transfinite
@@ -164,15 +161,15 @@ end subroutine recta_TraQua
 !               Val    - value of the blending functions
 !               Dval   - derivatives
 !
-!   required  routines -
-!
 !-----------------------------------------------------------------------
 !
       subroutine recta_blend(Eta, Val,Dval)
 !
-#include "syscom.blk"
+      implicit none
 !
-      dimension Eta(2),Val(8),Dval(2,8)
+      real(8) :: Eta(2),Val(8),Dval(2,8)
+!
+      integer :: k
 !
 !-----------------------------------------------------------------------
 !

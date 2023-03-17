@@ -4,11 +4,10 @@
 !
 !----------------------------------------------------------------------
 !
-!   computer           - machine independent
+!   latest revision    - Feb 2023
 !
-!   latest revision    - Jun 07
-!
-!   purpose            - routine locates an integer on a list
+!   purpose            - routine locates first instance of an integer
+!                        on a list of integers
 !
 !   arguments :
 !     in:
@@ -16,12 +15,9 @@
 !              List    - a list of integers
 !              Nlist   - length of the list
 !     out:
-!              Number  - the element location
-!
-!   required  routines -
+!              Number  - the integer location
 !
 !----------------------------------------------------------------------
-!
 subroutine locate(Nel,List,Nlist, Number)
 !
    implicit none
@@ -34,10 +30,10 @@ subroutine locate(Nel,List,Nlist, Number)
    integer :: i
 !
    do i=1,Nlist
-     if (List(i).eq.Nel) then
-       Number=i
-       return
-     endif
+      if (List(i).eq.Nel) then
+         Number=i
+         return
+      endif
    enddo
    Number=0
 !

@@ -94,7 +94,7 @@ subroutine recta(No,Eta, X,Dxdeta)
 !
 !  .....check curve compatibility
         do i=1,4
-          nc=iabs(RECTANGLES(No)%EdgeNo(i))
+          nc=abs(RECTANGLES(No)%EdgeNo(i))
           if (CURVES(nc)%Type.ne.'Seglin') then
             write(*,*)'recta: INCOMPATIBLE curve definition!'
             write(*,7002) No,i,nc,CURVES(nc)%Type
@@ -134,19 +134,14 @@ subroutine recta(No,Eta, X,Dxdeta)
       case('ImpRec' ) ; call recta_ImpRec( No,Eta, X,Dxdeta)
 !
 !  ...conforming rectangle (LEGACY)......................................
-      case('ConfRec') ; call recta_ConfRec(No,Eta, X,Dxdeta)
+      !case('ConfRec') ; call recta_ConfRec(No,Eta, X,Dxdeta)
 !
-!  ...C^1 transfite interpolation/geometry reconstruction rectangle (GOOD LUCK!)
-      case('HermRec') ; call recta_HermRec(No,Eta, X,Dxdeta)
+!  ...C^1 transfinite interpolation/geometry reconstruction rectangle (GOOD LUCK!)
+      !case('HermRec') ; call recta_HermRec(No,Eta, X,Dxdeta)
 !
-! ...cylindrical coordinates rectangle...................................
+!  ...cylindrical coordinates rectangle..................................
       case('CylRec' ) ; call recta_CylRec( No,Eta, X,Dxdeta)
 !
-#ifdef _PYGMP
-!  ...fourier surface rectangle
-      case('FourSurRec')
-         call recta_fourier_surf(no, eta, x, dxdeta)
-#endif
       case default
       write(*,7003) RECTANGLES(No)%Type
  7003 format(' recta: unknown Type = ',a10)

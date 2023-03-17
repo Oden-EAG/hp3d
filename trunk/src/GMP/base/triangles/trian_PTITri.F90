@@ -1,12 +1,12 @@
 !-------------------------------------------------------------------------------
-!> Purpose : parametric transfinite interpolation for a triangle
+!> @brief Parametric transfinite interpolation for a triangle
 !!
 !! @param[in]  No     - a GMP triangle number
 !! @param[in]  Eta    - reference coordinates of a point
 !! @param[out] X      - physical coordinates of the point
 !! @param[out] Dxdeta - derivatives of the physical coordinates
 !!
-!! @ revision Mar 11
+!> @date Mar 2023
 !-------------------------------------------------------------------------------
 !
 subroutine trian_PTITri(No,Eta, X,Dxdeta)
@@ -53,15 +53,14 @@ end subroutine trian_PTITri
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : parametric transfinite interpolation for a triangle on a
-!!           sphere
+!> @brief Parametric transfinite interpolation for a triangle on a sphere
 !!
 !! @param[in]  No        - triangle number
 !! @param[in]  Eta       - reference coordinates of a point
 !! @param[out] X         - physical coordinates of the point
 !! @param[out] Dxdeta    - derivatives wrt reference coordinates
 !!
-!! @revision Mar 11
+!> @date Mar 2023
 !----------------------------------------------------------------------
 !
 subroutine spherical_triangle(No,Eta, X,Dxdeta)
@@ -69,37 +68,45 @@ subroutine spherical_triangle(No,Eta, X,Dxdeta)
       use control
       use GMP
       use element_data
-#include "syscom.blk"
-      common /cspherical_triangle/ iprint
 !
-      dimension Eta(2), X(3),Dxdeta(3,2)
+      implicit none
+!
+      integer :: No
+      real(8) :: Eta(2),X(3),Dxdeta(3,2)
 !
 !  ...relative position vectors wrt sphere origin
-      dimension xrels(3),xpar(2),dxrels(3,2),dxpardeta(2,2)
+      real(8) :: xrels(3),xpar(2),dxrels(3,2),dxpardeta(2,2)
 !
 !  ...relative position vectors for triangle vertices in the global
 !     cartesian system
-      dimension xrelv(3,3)
+      real(8) :: xrelv(3,3)
 !
 !  ...vertex coordinates in the sphere Cartesian system and in the
 !     sphere reference coordinates
-      dimension xrelsv(3,3),xparv(2,3)
+      real(8) :: xrelsv(3,3),xparv(2,3)
 !
 !  ...transformation matrix from global Cartesian to sphere Cartesian
 !     coordinates; rows of the transformation matrix are unit
 !     vectors of the sphere system computed in the global system
-      dimension transf(3,3)
+      real(8) :: transf(3,3)
 !
 !  ...linear shape functions in the parametric space (psi,theta)
-      dimension shapH(3),dshapH(2,3)
+      real(8) :: shapH(3),dshapH(2,3)
 !
 !  ...point on an edge
-      dimension dsedeta(2),                                  &
-                xe(3),dxedeta(3),xerels(3),dxerelsdeta(3),   &
-                xepar(2),dxepardeta(2)
+      real(8) :: dsedeta(2),                                 &
+                 xe(3),dxedeta(3),xerels(3),dxerelsdeta(3),  &
+                 xepar(2),dxepardeta(2)
 !
 !  ...workspace
-      dimension void(3),dblend(2)
+      real(8) :: void(3),dblend(2)
+!
+      real(8) :: b,blend,db,dsdse,fval
+      real(8) :: r,r_aux,rad,radnew,rsinpsi,s,s1,s2,se
+      integer :: i,ie,ieta,ile,iv,iv1,iv2,ivar,j
+      integer :: nc,norient,np,ns
+!
+      integer :: iprint
 !
 !-----------------------------------------------------------------------
 !
@@ -408,15 +415,15 @@ end subroutine spherical_triangle
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : parametric transfinite interpolation for a triangle
-!!           on a cylinder
+!> @brief Parametric transfinite interpolation for a triangle
+!!        on a cylinder
 !!
 !! @param[in]  No     - triangle number
 !! @param[in]  Eta    - reference coordinates of a point
 !! @param[out] X      - physical coordinates of the point
 !! @param[out] Dxdeta - derivatives wrt reference coordinates
 !!
-!! @revision Mar 11
+!> @date Mar 2023
 !----------------------------------------------------------------------
 !
 subroutine cylindrical_triangle(No,Eta, X,Dxdeta)
@@ -424,41 +431,47 @@ subroutine cylindrical_triangle(No,Eta, X,Dxdeta)
       use control
       use GMP
       use element_data
-#include "syscom.blk"
-      common /ccylindrical_triangle/ iprint
 !
-      dimension Eta(2), X(3),Dxdeta(3,2)
+      implicit none
+!
+      integer :: No
+      real(8) :: Eta(2),X(3),Dxdeta(3,2)
 !
 !  ...cylinder center and direction vector
-      dimension center(3), direction(3)
+      real(8) :: center(3),direction(3)
 !
 !  ...relative position vectors wrt center of the cylinder, cylinder
 !     parameters (\theta,z), derivatives
-      dimension xrels(3),xpar(2),dxrels(3,2),dxpardeta(2,2)
+      real(8) :: xrels(3),xpar(2),dxrels(3,2),dxpardeta(2,2)
 !
 !  ...relative position vectors for triangle vertices in the global
 !     cartesian system
-      dimension xrelv(3,3)
+      real(8) :: xrelv(3,3)
 !
 !  ...vertex coordinates in the cylinder Cartesian system and in the
 !     cylinder reference coordinates
-      dimension xrelsv(3,3),xparv(2,3)
+      real(8) :: xrelsv(3,3),xparv(2,3)
 !
 !  ...transformation matrix from global Cartesian to cylinder Cartesian
 !     coordinates; rows of the transformation matrix are unit
 !     vectors of the cylinder system computed in the global system
-      dimension transf(3,3)
+      real(8) :: transf(3,3)
 !
 !  ...linear shape functions in the parametric space (psi,theta)
-      dimension shapH(3),dshapH(2,3)
+      real(8) :: shapH(3),dshapH(2,3)
 !
 !  ...point on an edge
-      dimension dsedeta(2),                                 &
-                xe(3),dxedeta(3),xerels(3),dxerelsdeta(3),  &
-                xepar(2),dxepardeta(2)
+      real(8) :: dsedeta(2),                                 &
+                 xe(3),dxedeta(3),xerels(3),dxerelsdeta(3),  &
+                 xepar(2),dxepardeta(2)
 !
 !  ...work space
-      dimension void(3),dblend(2)
+      real(8) :: void(3),dblend(2)
+!
+      real(8) :: b,blend,db,dsdse,fval,r,rad,s,s1,s2,se
+      integer :: i,ie,ile,iv,iv1,iv2,ivar,j,nc,norient,np,ns
+!
+      integer :: iprint
 !
 !-----------------------------------------------------------------------
 !
@@ -723,15 +736,14 @@ end subroutine cylindrical_triangle
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : parametric transfinite interpolation for a triangle on
-!!           a cone
+!> @brief Parametric transfinite interpolation for a triangle on a cone
 !!
 !! @param[in]  No     - triangle number
 !! @param[in]  Eta    - reference coordinates of a point
 !! @param[out] X      - physical coordinates of the point
 !! @param[out] Dxdeta - derivatives wrt reference coordinates
 !!
-!! @revision Mar 11
+!> @date Mar 2023
 !----------------------------------------------------------------------
 !
 subroutine conic_triangle(No,Eta, X,Dxdeta)
@@ -739,44 +751,50 @@ subroutine conic_triangle(No,Eta, X,Dxdeta)
       use control
       use GMP
       use element_data
-#include "syscom.blk"
-      common /cconic_triangle/ iprint
 !
-      dimension Eta(2), X(3),Dxdeta(3,2)
+      implicit none
+!
+      integer :: No
+      real(8) :: Eta(2),X(3),Dxdeta(3,2)
 !
 !  ...cone axis vector normalized
-      dimension cvec(3)
+      real(8) :: cvec(3)
 !
 !  ...relative position vectors wrt cone origin
-      dimension xrelc(3),xpar(2),dxrelc(3,2),dxpardeta(2,2)
+      real(8) :: xrelc(3),xpar(2),dxrelc(3,2),dxpardeta(2,2)
 !
 !  ...relative position vectors for triangle vertices in the global
 !     cartesian system
-      dimension xrelv(3,3)
+      real(8) :: xrelv(3,3)
 !
 !  ...vertex coordinates in the cone Cartesian system and in the
 !     cone reference coordinates
-      dimension xrelcv(3,3),xparv(2,3)
+      real(8) :: xrelcv(3,3),xparv(2,3)
 !
 !  ...transformation matrix from global Cartesian to cone Cartesian
 !     coordinates; rows of the transformation matrix are unit
 !     vectors of the cone system computed in the global system
-      dimension transf(3,3)
+      real(8) :: transf(3,3)
 !
 !  ...linear shape functions in the parametric space
-      dimension shapH(3),dshapH(2,3)
+      real(8) :: shapH(3),dshapH(2,3)
 !
 !  ...point on an edge
-      dimension dsedeta(2),  &
-                xe(3),dxedeta(3),xerelc(3),dxerelcdeta(3),  &
-                xepar(2),dxepardeta(2)
+      real(8) :: dsedeta(2),  &
+                 xe(3),dxedeta(3),xerelc(3),dxerelcdeta(3),  &
+                 xepar(2),dxepardeta(2)
 !
 !  ...work space
-      dimension void(3),dblend(2)
+      real(8) :: void(3),dblend(2)
+!
+      real(8) :: b,blend,c,db,dsdse,fval,r,rnorm,s,s1,s2,se
+      integer :: i,ie,ile,iv,iv1,iv2,ivar,j,nc,norient,np,ns
+!
+      integer :: iprint
 !
 !-----------------------------------------------------------------------
 !
-!cc      iprint=0
+      iprint=0
       if (iprint.eq.1) then
         write(*,*) '-----------------------------------'
         write(*,7001) No,Eta(1:2)
@@ -1000,23 +1018,20 @@ subroutine conic_triangle(No,Eta, X,Dxdeta)
 !
 !
 end subroutine conic_triangle
-
-
-
-
+!
 !
 !----------------------------------------------------------------------
-!> Purpose : provide for a triangle on a
-!!           a plane parametrized with Cylindrical coordinates
-!!           This is a ``dirty''routine, as it works only
-!!           for a very specific class of triangles
+!> @brief Provides for a triangle on a plane parametrized with
+!!        Cylindrical coordinates
+!> @note  This is a ``dirty'' routine, as it works only
+!!        for a very specific class of triangles
 !!
 !! @param[in]  No        - triangle number
 !! @param[in]  Eta       - reference coordinates of a point
 !! @param[out] X         - physical coordinates of the point
 !! @param[out] Dxdeta    - derivatives wrt reference coordinates
 !!
-!! @revision Mar 11
+!> @date Mar 2023
 !----------------------------------------------------------------------
 !
 subroutine PPwCC_triangle(No,Eta, X,Dxdeta)
@@ -1024,20 +1039,29 @@ subroutine PPwCC_triangle(No,Eta, X,Dxdeta)
       use control
       use GMP
       use element_data
-#include "syscom.blk"
 !
-      dimension Eta(2), X(3),Dxdeta(3,2)
+      implicit none
+!
+      integer :: No
+      real(8) :: Eta(2),X(3),Dxdeta(3,2)
 !
 !  ...x coordinate, min and max radius
 !      x0,rmin,rmax
 !
 !  ...endpoints, point in the parametric domain,
-      dimension eta_v(2,3), etap(2)
+      real(8) :: eta_v(2,3),etap(2)
 !
 !  ...derivatives
-      dimension dr_deta(2), dtheta_deta(2)
+      real(8) :: dr_deta(2),dtheta_deta(2)
 !
+      real(8) :: dr,r,r2,rmax,rmin,theta,theta1,x0
+      integer :: iv,ivar,nc,ns,nv
+!
+      integer :: iprint
+!
+      real(8) :: pi
       pi = acos(-1.d0)
+!
       iprint=0
 !
 !  ...check surface
@@ -1048,7 +1072,7 @@ subroutine PPwCC_triangle(No,Eta, X,Dxdeta)
         write(*,*) 'ERROR: inconsistent surface type.'
         write(*,*) '---------------------------------'
         stop
-      end if
+      endif
 !
 !  ...get the data for the plane
       x0       = SURFACES(ns)%Rdata(1)

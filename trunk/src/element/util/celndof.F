@@ -33,19 +33,23 @@ c
       integer :: i,j
       integer :: nredg
       integer :: ndofH,ndofE,ndofV,ndofQ
-      integer :: iprint
 c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
+#endif
       NrdofH=0; NrdofE=0; NrdofV=0; NrdofQ=0
 c
 c  ...V E R T I C E S..................................................
       do i=1,nvert(Ntype)
         call ndof_nod(VERT,1, ndofH,ndofE,ndofV,ndofQ)
+#if DEBUG_MODE
         if (iprint.eq.1) then
           write(*,7001) 'vert',1,ndofH,ndofE,ndofV,ndofQ
  7001     format('celndof: type,nord,ndofH,ndofE,ndofV,ndofQ = ',
      .                     a5,i4,4i6)
         endif
+#endif
         NrdofH=NrdofH+ndofH; NrdofE=NrdofE+ndofE
         NrdofV=NrdofV+ndofV; NrdofQ=NrdofQ+ndofQ
       enddo
@@ -54,9 +58,11 @@ c  ...E D G E S........................................................
       nredg = nedge(Ntype)
       do i=1,nredg
         call ndof_nod(MEDG,Norder(i), ndofH,ndofE,ndofV,ndofQ)
+#if DEBUG_MODE
         if (iprint.eq.1) then
           write(*,7001) 'medg',Norder(i),ndofH,ndofE,ndofV,ndofQ
         endif
+#endif
         NrdofH=NrdofH+ndofH; NrdofE=NrdofE+ndofE
         NrdofV=NrdofV+ndofV; NrdofQ=NrdofQ+ndofQ
       enddo
@@ -81,26 +87,32 @@ c  ...PRISM
         do i=1,2
           j=j+1
           call ndof_nod(MDLT,Norder(j), ndofH,ndofE,ndofV,ndofQ)
+#if DEBUG_MODE
           if (iprint.eq.1) then
             write(*,7001) 'mdlt',Norder(j),ndofH,ndofE,ndofV,ndofQ
           endif
+#endif
           NrdofH=NrdofH+ndofH; NrdofE=NrdofE+ndofE
           NrdofV=NrdofV+ndofV; NrdofQ=NrdofQ+ndofQ
         enddo
         do i=1,3
           j=j+1
           call ndof_nod(MDLQ,Norder(j), ndofH,ndofE,ndofV,ndofQ)
+#if DEBUG_MODE
           if (iprint.eq.1) then
             write(*,7001) 'mdlq',Norder(j),ndofH,ndofE,ndofV,ndofQ
           endif
+#endif
           NrdofH=NrdofH+ndofH; NrdofE=NrdofE+ndofE
           NrdofV=NrdofV+ndofV; NrdofQ=NrdofQ+ndofQ
         enddo
         j=j+1
         call ndof_nod(MDLP,Norder(j), ndofH,ndofE,ndofV,ndofQ)
+#if DEBUG_MODE
         if (iprint.eq.1) then
           write(*,7001) 'mdlp',Norder(j),ndofH,ndofE,ndofV,ndofQ
         endif
+#endif
         NrdofH=NrdofH+ndofH; NrdofE=NrdofE+ndofE
         NrdofV=NrdofV+ndofV; NrdofQ=NrdofQ+ndofQ
 c  ...TETRA

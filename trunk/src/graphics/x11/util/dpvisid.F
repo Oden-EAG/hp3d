@@ -4,7 +4,7 @@ c   routine name       - dpvisid
 c
 c-----------------------------------------------------------------------
 c
-c   latest revision    - Jan 08
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine displays triangles from the list RGTR
 c                        in order stored in the file IGTR
@@ -16,15 +16,22 @@ c                Nf    = 10*(number of levels for contour plot)+
 c                        flag whether to display elements numbers
 c
 c-----------------------------------------------------------------------
-c
       subroutine dpvisid(Nf)
 c
       use graphmod
 c
-#include "syscom.blk"
+      implicit none
 c
-      dimension xyn(2,3)
-      character(5) text
+      integer, intent(in) :: Nf
+c
+      real(8) :: xyn(2,3)
+c
+      real(8) :: angle,aux,height,shiftx,shifty,xtext,ytext
+      integer :: nick,nickno,numlev,nof,iedflag,ilo,itr,i3
+      integer :: i,j,iflag,iflag1,iflag2,iflag3,isub,itrtemp
+      integer :: ivar,k,ncar,ncol,ncol_line,nfstr,nsid,nsid1,nstr
+c
+      character(5) :: text
 c
       i3(j) = j-(j-1)/3*3
 c
@@ -123,7 +130,7 @@ c
               ncol_line=npcol(2)
 c
 c  ...........decode the edge number to draw
-              nsid = iabs(ncol)
+              nsid = abs(ncol)
               nsid1 = i3(nsid+1)
 ccc              write(*,*) 'dpvisid: ncol = ',ncol
               if (ncol.ne.0)
@@ -196,5 +203,4 @@ c  ...end of loop through traingles
       enddo
 c
 c
-      return
-      end
+      end subroutine dpvisid
