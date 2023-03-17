@@ -82,7 +82,6 @@ subroutine nodgen(Ntype,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
 !
    NODES(Nod)%ref_kind    = 0
    NODES(Nod)%father      = Nfath
-   NODES(Nod)%geom_interf = 0
    NODES(Nod)%visit       = 0
    NODES(Nod)%subd        = Subd
 !

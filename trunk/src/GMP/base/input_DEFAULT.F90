@@ -125,7 +125,7 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !  ...number of surfaces
       read(nin,*) NRSURFS
  IF (.NOT. QUIET_MODE)     write(*,1000) NRSURFS
- 1000 format(' NRSURFS = ',i5,' ; reading surfaces...')
+ 1000 format(' NRSURFS = ',i7,' ; reading surfaces...')
 !
       if (MAXSU.lt.NRSURFS) then
         write(*,*)'input_DEFAULT: increase MAXSU!' ; stop
@@ -227,7 +227,7 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !  ...read in number of points
       read(nin,*) NRPOINT
  IF (.NOT. QUIET_MODE)     write(*,1009) NRPOINT
- 1009 format(' NRPOINT = ',i5,' ; reading points...')
+ 1009 format(' NRPOINT = ',i7,' ; reading points...')
 !
       if (MAXNP.lt.NRPOINT) then
         write(*,*)'input_DEFAULT: increase MAXNP!' ; stop
@@ -283,7 +283,7 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !  ...read in number of curves
       read(nin,*) NRCURVE
  IF (.NOT. QUIET_MODE)     write(*,1011) NRCURVE
- 1011 format(' NRCURVE = ',i5,' ; reading curves...')
+ 1011 format(' NRCURVE = ',i7,' ; reading curves...')
 !
       if (MAXNC.lt.NRCURVE) then
         write(*,*) 'input_DEFAULT: increase MAXNC!' ; stop
@@ -369,7 +369,7 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !
       read(nin,*) NRTRIAN
  IF (.NOT. QUIET_MODE)     write(*,1012) NRTRIAN
- 1012 format(' NRTRIAN = ',i5,' ; reading triangles...')
+ 1012 format(' NRTRIAN = ',i7,' ; reading triangles...')
 !
       if (MAXTR.lt.NRTRIAN) then
         write(*,*) 'MAXTR = ',MAXTR
@@ -431,7 +431,7 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !
       read(nin,*) NRRECTA
  IF (.NOT. QUIET_MODE)     write(*,1013) NRRECTA
- 1013 format(' NRRECTA = ',i5,' ; reading rectangles...')
+ 1013 format(' NRRECTA = ',i7,' ; reading rectangles...')
 !
       if (MAXRE.lt.NRRECTA) then
         write(*,*) 'input_DEFAULT: increase MAXRE!' ; stop
@@ -480,7 +480,7 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !
       read(nin,*) NRPRISM
  IF (.NOT. QUIET_MODE)     write(*,1014) NRPRISM
- 1014 format(' NRPRISM = ',i5,' ; reading prisms...')
+ 1014 format(' NRPRISM = ',i7,' ; reading prisms...')
 !
       if (MAXBT.lt.NRPRISM) then
         write(*,*) 'input_DEFAULT: increase MAXBT!' ; stop
@@ -507,7 +507,7 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !
       read(nin,*) NRHEXAS
 IF (.NOT. QUIET_MODE) write(*,1015) NRHEXAS
- 1015 format(' NRHEXAS = ',i5,' ; reading hexas...')
+ 1015 format(' NRHEXAS = ',i7,' ; reading hexas...')
 !
       if (MAXHE.lt.NRHEXAS) then
         write(*,*) 'input_DEFAULT: increase MAXHE!' ; stop
@@ -533,7 +533,7 @@ IF (.NOT. QUIET_MODE) write(*,1015) NRHEXAS
 !
       read(nin,*) NRTETRA
 IF (.NOT. QUIET_MODE) write(*,1016) NRTETRA
- 1016 format(' NRTETRA = ',i5,' ; reading tets...')
+ 1016 format(' NRTETRA = ',i7,' ; reading tets...')
 !
       if (MAXTE.lt.NRTETRA) then
         write(*,*) 'input_DEFAULT: increase MAXTE!'
@@ -565,7 +565,7 @@ IF (.NOT. QUIET_MODE) write(*,1016) NRTETRA
 !
       read(nin,*) NRPYRAM
 IF (.NOT. QUIET_MODE) write(*,1017) NRPYRAM
- 1017 format(' NRPYRAM = ',i5,' ; reading pyramids...')
+ 1017 format(' NRPYRAM = ',i7,' ; reading pyramids...')
 !
       if (MAXPY.lt.NRPYRAM) then
         write(*,*) 'input_DEFAULT: increase MAXPY!'

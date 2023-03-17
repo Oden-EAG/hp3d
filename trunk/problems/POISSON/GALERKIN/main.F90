@@ -153,7 +153,7 @@ subroutine master_main()
 !
 !..test accessing data structures
    write(6,8020) '[', RANK, '] : ', 'NRELIS,NRELES,NRNODS = ',NRELIS,NRELES,NRNODS
- 8020 format(A,I3,A,A,I4,', ',I4,', ',I4)
+ 8020 format(A,I4,A,A,I7,', ',I7,', ',I7)
 !
    flush(6)
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
@@ -348,7 +348,7 @@ subroutine worker_main()
 !
 !..test accessing data structures
    write(6,9020) '[', RANK, '] : ', 'NRELIS,NRELES,NRNODS = ',NRELIS,NRELES,NRNODS
- 9020 format(A,I3,A,A,I4,', ',I4,', ',I4)
+ 9020 format(A,I4,A,A,I7,', ',I7,', ',I7)
 !
    flush(6)
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)

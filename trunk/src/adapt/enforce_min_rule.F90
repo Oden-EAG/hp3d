@@ -8,7 +8,6 @@
 !
 !   purpose            - routine enforces the min rule for a FE mesh
 !
-!
 !----------------------------------------------------------------------
 !
    subroutine enforce_min_rule
@@ -16,11 +15,12 @@
    use data_structure3D
    use refinements
    use constrained_nodes
-   use mpi_param,   only: ROOT,RANK
-   use MPI,         only: MPI_COMM_WORLD,MPI_COMM_WORLD,MPI_INTEGER, &
-                          MPI_MAX,MPI_IN_PLACE
+   use mpi_param,   only: ROOT, RANK
+   use MPI,         only: MPI_COMM_WORLD, MPI_INTEGER, MPI_MAX, &
+                          MPI_IN_PLACE
    use par_mesh,    only: DISTRIBUTED
    use bitvisit
+   use par_ghost
 !
    implicit none
 !
@@ -65,10 +65,10 @@
 !                 STEP 1: Minimum rule for faces
 !----------------------------------------------------------------------
 !
-!$omp parallel default(shared)
-!$omp do private(iel,mdle,ntype,nrv,nre,nrf,nodesl,norientl,   &
-!$omp            norder,j,i,nod,nord,nc,icase,nodp)            & 
-!$omp schedule(static)
+!$OMP PARALLEL DEFAULT(SHARED)
+!$OMP DO PRIVATE(iel,mdle,ntype,nrv,nre,nrf,nodesl,norientl,   &
+!$OMP            norder,j,i,nod,nord,nc,icase,nodp)            &
+!$OMP SCHEDULE(STATIC)
 !..loop through elements in the current mesh
    do iel=1,NRELES_GHOST
       mdle = ELEM_GHOST(iel)
@@ -128,12 +128,18 @@
             case(21,22,23,24,31,32,34,35,41,42,44,45,51,52,61,62,71,72,73,74)
                nodp = NFACEC(nc)
                call save_min_order(mdle,nodp,nord)
+!
+            case default
+               !$OMP CRITICAL
+               write(*,*) 'enforce_min_rule: icase = ',icase
+               stop
+               !$OMP END CRITICAL
             end select
          endif
       enddo
    enddo
-!$omp end do
-!$omp end parallel
+!$OMP END DO
+!$OMP END PARALLEL
 !
 !..Reduce to get nord of all nodes
 !  (computing elem_nodes in first two stages is most expensive, this
@@ -147,11 +153,12 @@
       enddo
 !
 !  ...max used here to fill 0's; all procs should agree on shared nodes
-      call MPI_Allreduce(MPI_IN_PLACE,buffer,NRNODS,MPI_INTEGER,MPI_MAX, MPI_COMM_WORLD,ierr)
+      call MPI_Allreduce(MPI_IN_PLACE,buffer,NRNODS,MPI_INTEGER,MPI_MAX,MPI_COMM_WORLD,ierr)
 !
       do nod=1,NRNODS
          if (visited(nod) .and. NODES(nod)%visit.ne.buffer(nod)) then
-            write(*,*) 'enforce_min_rule: buffered nod order does not agree with original:', buffer(nod),' vs ', NODES(nod)%visit
+            write(*,*) 'enforce_min_rule: buffered nod order does not agree with original:',&
+                                          buffer(nod),' vs ', NODES(nod)%visit
             stop 2
          endif
          NODES(nod)%visit = buffer(nod)
@@ -278,44 +285,45 @@
    if (RANK .eq. ROOT) write(*,2020) end_time-start_time
 2020 format(' enforce_min: ',f12.5,'  seconds')
 !
-
-CONTAINS
-
 !
+contains
+!
+!
+!> @date Mar 2023
 !-----------------------------------------------------------------------
-   subroutine save_min_order(mdle,Nod,Nord)
+   subroutine save_min_order(Mdle,Nod,Nord)
 !
       use data_structure3D
       use mpi_param
       implicit none
 !
-      integer, intent(in) :: mdle,Nod,Nord
+      integer, intent(in) :: Mdle,Nod,Nord
 !
       integer :: nordh ,nordv
       integer :: nordh1,nordv1
       integer :: nordh2,nordv2
 !
-!-----------------------------------------------------------------------
-!
 !  ...mark nodes connected to subdomain
-      if (NODES(mdle)%subd.eq.RANK) call visit(Nod)
+      if (NODES(Mdle)%subd.eq.RANK) call visit(Nod)
 !
-!$omp critical
+!$OMP CRITICAL
       if (NODES(Nod)%visit.eq.0) then
-         NODES(nod)%visit= Nord
+         NODES(Nod)%visit = Nord
       else
          select case(NODES(Nod)%ntype)
          case(MEDG,MDLT)
-            NODES(nod)%visit = min(NODES(nod)%visit,Nord)
+            NODES(Nod)%visit = min(NODES(Nod)%visit,Nord)
          case(MDLQ)
             call decode(Nord, nordh1,nordv1)
-            call decode(NODES(nod)%visit, nordh2,nordv2)
-            nordh = min(nordh1,nordh2); nordv = min(nordv1,nordv2)
-            NODES(nod)%visit = nordh*10+nordv
+            call decode(NODES(Nod)%visit, nordh2,nordv2)
+            nordh = min(nordh1,nordh2)
+            nordv = min(nordv1,nordv2)
+            NODES(Nod)%visit = nordh*10+nordv
          end select
       endif
-!$omp end critical
+!$OMP END CRITICAL
 !
    end subroutine save_min_order
+!-----------------------------------------------------------------------
 !
 end subroutine enforce_min_rule

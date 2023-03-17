@@ -316,7 +316,7 @@ end subroutine stc_fwd_wrapper
 !
 !----------------------------------------------------------------------
 !
-!    latest revision    - Sept 2018
+!    latest revision    - Mar 2023
 !
 !    purpose            - routine performs static condensation for the
 !                         real symmetric or complex Hermitian case
@@ -342,31 +342,30 @@ subroutine stc_fwd_herm(Ni,Nb, Aii,Abi,Aib,Abb,Bi,Bb)
    VTYPE  , intent(inout) :: Aii(Ni,Ni),Abi(Nb,Ni),Aib(Ni,Nb),Abb(Nb,Nb), &
                              Bi(Ni,NR_RHS),Bb(Nb,NR_RHS)
 !
-!..workspace for Hermitian bubble matrix in packed format
+!..workspace for Hermitian bubble matrix in RFP format
    VTYPE, dimension(Nb*(Nb+1)/2) :: AP
 !
-   integer  :: i,j,k,nk,k1,k2
    integer  :: info
-!
-!..function for vector storage of a symmetric matrix
-   nk(k1,k2) = (k2-1)*k2/2+k1
 !
 !----------------------------------------------------------------------
 !
 !..Compute Cholesky factorization: Abb = LL^*
-!..first rewrite in packed form
-   do i=1,Nb
-      do j=i,Nb
-         k = nk(i,j)
-         AP(k) = Abb(i,j)
-      enddo
-   enddo
+!..Copy to RFP format
+#if C_MODE
+   call ZTRTTF('N','U',Nb,Abb,Nb,AP,info)
+#else
+   call DTRTTF('N','U',Nb,Abb,Nb,AP,info)
+#endif
+if (info.ne.0) then
+   write(*,*) 'stc_fwd: TRTTF: info = ', info
+   stop
+endif
 !
 !..Cholesky factorization
 #if C_MODE
-   call ZPPTRF('U', Nb, AP, info)
+   call ZPFTRF('N','U', Nb, AP, info)
 #else
-   call DPPTRF('U', nb, AP, info)
+   call DPFTRF('N','U', Nb, AP, info)
 #endif
    if (info.ne.0) then
       write(*,*) 'stc_fwd: PPTRF: info = ', info
@@ -375,9 +374,9 @@ subroutine stc_fwd_herm(Ni,Nb, Aii,Abi,Aib,Abb,Bi,Bb)
 !
 !..Compute inv(Abb)*Bb
 #if C_MODE
-   call ZPPTRS('U', Nb, NR_RHS, AP, Bb, Nb, info)
+   call ZPFTRS('N','U', Nb, NR_RHS, AP, Bb, Nb, info)
 #else
-   call DPPTRS('U', Nb, NR_RHS, AP, Bb, Nb, info)
+   call DPFTRS('N','U', Nb, NR_RHS, AP, Bb, Nb, info)
 #endif
    if (info.ne.0) then
       write(*,*) 'stc_fwd: PPTRS: info = ', info
@@ -386,9 +385,9 @@ subroutine stc_fwd_herm(Ni,Nb, Aii,Abi,Aib,Abb,Bi,Bb)
 !
 !..Compute inv(Abb)*Abi
 #if C_MODE
-   call ZPPTRS('U', Nb, Ni, AP, Abi, Nb, info)
+   call ZPFTRS('N','U', Nb, Ni, AP, Abi, Nb, info)
 #else
-   call DPPTRS('U', Nb, Ni, AP, Abi, Nb, info)
+   call DPFTRS('N','U', Nb, Ni, AP, Abi, Nb, info)
 #endif
    if (info.ne.0) then
       write(*,*) 'stc_fwd: PPTRS: info = ', info
