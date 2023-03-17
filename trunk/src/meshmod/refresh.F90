@@ -14,9 +14,8 @@ subroutine refresh
 !
    integer :: ntype
    integer :: nodesl(27),norientl(27)
-   integer :: i,iel,nod,nfath,mdle,subd,ierr
+   integer :: i,iel,nod,nfath,nvef,mdle,subd
    integer :: nrdofH,nrdofE,nrdofV,nrdofQ
-   integer :: nvef
 !
 #if DEBUG_MODE
    integer :: iprint
