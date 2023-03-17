@@ -18,6 +18,7 @@
    use constrained_nodes
    use mpi_param  , only: ROOT,RANK
    use MPI        , only: MPI_COMM_WORLD,MPI_COMM_WORLD
+   use par_ghost
 !
    implicit none
 !
