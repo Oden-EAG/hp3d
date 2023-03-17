@@ -14,8 +14,6 @@ subroutine initialize
    use frsolmod
    use upscale
    use paraview
-   use zoltan_wrapper
-   use mpi_param, only: NUM_PROCS
 !
    implicit none
 !
@@ -87,10 +85,6 @@ subroutine initialize
 !
 !..read geometry
    call read_geometry(trim(FILE_GEOM))
-!
-!..optionally, choose partitioning algorithm for the initial mesh
-!              if using MPI parallelism
-   if (NUM_PROCS > 1) call zoltan_w_set_lb(ZOLTAN_LB_DEFAULT)
 !
 !..generate mesh and read physics file
 !..keep integration flag value
