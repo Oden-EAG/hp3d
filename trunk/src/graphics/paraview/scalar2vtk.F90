@@ -61,16 +61,10 @@ subroutine scalar2vtk(Sname,Sfile,Snick,Idx, Ic)
 !..OpenMP parallelization: auxiliary variables
    integer, dimension(NRELES) :: n_vert_offset, n_elem_vert
 !
-!..timer
-   !real(8) :: start_time,end_time
-!
 !..MPI
    integer :: ierr,count,subd
 !
 !----------------------------------------------------------------------------------------
-!
-!   if (RANK .eq. ROOT) write(*,*) 'scalar2vtk:'
-!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 !
 !..Step 1 : Preliminary calculations (offsets, etc.)
    Ic=0
@@ -99,13 +93,7 @@ subroutine scalar2vtk(Sname,Sfile,Snick,Idx, Ic)
       Ic = Ic + vis_obj%nr_vert
    enddo
 !
-!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
-!   if (RANK .eq. ROOT) write(*,300) end_time - start_time
-!   300 format(' timer: ',f12.5,' seconds')
-!
    call attr_init(1,Ic); ATTR_VAL(1,1:Ic) = 0
-!
-!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 !
 !..Step 2 : Write attribute of interest
 !
@@ -192,9 +180,6 @@ subroutine scalar2vtk(Sname,Sfile,Snick,Idx, Ic)
    enddo
 !$OMP END PARALLEL DO
 !
-!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
-!   if (RANK .eq. ROOT) write(*,300) end_time - start_time
-!
 !..Step 3 : Collect on host
 !
    if (DISTRIBUTED .and. .not. HOST_MESH) then
@@ -208,10 +193,7 @@ subroutine scalar2vtk(Sname,Sfile,Snick,Idx, Ic)
 !
 !..Step 4 : Write to file with HDF5
 !
-!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    if (RANK .eq. ROOT) call attr_write(Sname,len(Sname),Sfile,len(Sfile),Snick,len(Snick))
-!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
-!   if (RANK .eq. ROOT) write(*,300) end_time - start_time
 !
 !..Step 5 : Deallocate
 !
