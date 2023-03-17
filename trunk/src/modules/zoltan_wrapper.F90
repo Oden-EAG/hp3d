@@ -421,12 +421,7 @@ module zoltan_wrapper
                         case('normal') ; Wgts(num_neig) = Wgts(num_neig) + ndofV*NR_COMP(k)
                      end select
                   enddo
-                  if (Wgts(num_neig) .lt. 1.0_Zoltan_float) then
-#if DEBUG_MODE
-                     write(*,*) 'zoltan_w_query_neig_list: Wgts=',Wgts(num_neig)
-#endif
-                     Wgts(num_neig) = 1.0_Zoltan_float
-                  endif
+                  Wgts(num_neig) = max(1.0_Zoltan_float,Wgts(num_neig))
                endif
 #if DEBUG_MODE
                if (Is_inactive(neig)) then
@@ -509,14 +504,7 @@ module zoltan_wrapper
                            case('normal') ; Wgts(n) = Wgts(n) + ndofV*NR_COMP(l)
                         end select
                      enddo
-                     if (Wgts(n) .lt. 1.0_Zoltan_float) then
-#if DEBUG_MODE
-                        !$OMP CRITICAL
-                        write(*,*) 'zoltan_w_query_neig_list_omp: Wgts=',Wgts(n)
-                        !$OMP END CRITICAL
-#endif
-                        Wgts(n) = 1.0_Zoltan_float
-                     endif
+                     Wgts(n) = max(1.0_Zoltan_float,Wgts(n))
                   endif
 #if DEBUG_MODE
                   if (Is_inactive(neig)) then
@@ -772,8 +760,8 @@ subroutine zoltan_w_get_nrdofb(Mdle, Nrdofb)
    call decod(NODES(Mdle)%case,2,NR_PHYSA, ncase)
 !
 !..number of dofs for a SINGLE H1,H(curl),H(div),L2 component
-   ntype = NODES(Mdle)%ntype
    call find_order(Mdle, norder)
+   ntype = NODES(Mdle)%ntype
    select case(ntype)
       case(MDLB); nord = norder(19)
       case(MDLP); nord = norder(15)
@@ -798,14 +786,7 @@ subroutine zoltan_w_get_nrdofb(Mdle, Nrdofb)
          case('discon') ; nrdof(i)=nrdofQ*NR_COMP(i)
       end select
    enddo
-   Nrdofb = sum(nrdof)
-!
-   if (Nrdofb .lt. 1) then
-#if DEBUG_MODE
-      write(*,*) 'zoltan_w_get_nrdofb: Nrdofb=',Nrdofb
-#endif
-      Nrdofb = 1
-   endif
+   Nrdofb = max(1,sum(nrdof))
 !
 end subroutine zoltan_w_get_nrdofb
 !
