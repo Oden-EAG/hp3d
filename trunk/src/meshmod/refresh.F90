@@ -41,7 +41,7 @@ subroutine refresh
 !          all active elements                                      |
 !--------------------------------------------------------------------
 !$OMP PARALLEL DEFAULT(SHARED)
-!$OMP DO PRIVATE(iel,mdle,subd,type,i,nodesl,norientl) &
+!$OMP DO PRIVATE(mdle,subd,nodesl,norientl,ntype,nvef) &
 !$OMP    SCHEDULE(GUIDED)
    do iel=1,NRELES_SUBD
 !
