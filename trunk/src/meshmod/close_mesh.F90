@@ -35,8 +35,8 @@ subroutine close_mesh()
    integer :: nv,ne,nf,nve
 !
 #if DEBUG_MODE
-   integer :: nre, nrf
-   integer :: iprint = 0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !-----------------------------------------------------------------------------
@@ -92,9 +92,9 @@ subroutine close_mesh()
 !     Step 2 : pick the middle nodes to be refined
 !---------------------------------------------------------
 !
-!$OMP DO                                     &
-!$OMP PRIVATE(mdle,nodesl,norientl,nod,type, &
-!$OMP         nflag,krefe,kreff,kref,j)
+!$OMP DO                                              &
+!$OMP PRIVATE(mdle,nodesl,norientl,nod,ntype,nflag,   &
+!$OMP         krefe,kreff,kref,j,nv,ne,nf,nve)
       do i=1,NRELES
          mdle=ELEM_ORDER(i)
          call elem_nodes(mdle, nodesl,norientl)
@@ -137,8 +137,8 @@ subroutine close_mesh()
 !$OMP CRITICAL
 #if DEBUG_MODE
             if ((RANK.eq.ROOT) .and. (iprint.eq.1)) then
-               nre = nedge(NODES(mdle)%ntype)
-               nrf = nface(NODES(mdle)%ntype)
+               ne = nedge(NODES(mdle)%ntype)
+               nf = nface(NODES(mdle)%ntype)
                write(*,*) 'close_mesh: mdle = ', mdle
                write(*,7003) krefe(1:12)
    7003        format('krefe = ',12i2)
@@ -245,7 +245,6 @@ subroutine close_mesh_par()
    integer :: displs(NUM_PROCS), ic_procs(NUM_PROCS)
 !
 #if DEBUG_MODE
-   integer :: nre, nrf
    integer :: iprint = 0
 #endif
 !
@@ -300,9 +299,9 @@ subroutine close_mesh_par()
 !     Step 2 : pick the middle nodes to be refined
 !---------------------------------------------------------
 !
-!$OMP PARALLEL DO                            &
-!$OMP PRIVATE(mdle,nodesl,norientl,nod,type, &
-!$OMP         nflag,krefe,kreff,kref,j)
+!$OMP PARALLEL DO                                     &
+!$OMP PRIVATE(mdle,nodesl,norientl,nod,ntype,nflag,   &
+!$OMP         nflag,krefe,kreff,kref,j,nv,ne,nf,nve)
       do i=1,NRELES_SUBD
          mdle=ELEM_SUBD(i)
          call elem_nodes(mdle, nodesl,norientl)
@@ -345,8 +344,8 @@ subroutine close_mesh_par()
 !$OMP CRITICAL
 #if DEBUG_MODE
             if ((RANK.eq.ROOT) .and. (iprint.eq.1)) then
-               nre = nedge(NODES(mdle)%ntype)
-               nrf = nface(NODES(mdle)%ntype)
+               ne = nedge(NODES(mdle)%ntype)
+               nf = nface(NODES(mdle)%ntype)
                write(*,*) 'close_mesh: mdle = ', mdle
                write(*,7003) krefe(1:12)
    7003        format('krefe = ',12i2)
