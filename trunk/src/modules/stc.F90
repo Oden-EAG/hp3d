@@ -316,7 +316,7 @@ end subroutine stc_fwd_wrapper
 !
 !----------------------------------------------------------------------
 !
-!    latest revision    - Sept 2018
+!    latest revision    - Mar 2023
 !
 !    purpose            - routine performs static condensation for the
 !                         real symmetric or complex Hermitian case
@@ -366,7 +366,7 @@ endif
 #if C_MODE
    call ZPFTRF('N','U', Nb, AP, info)
 #else
-   call DPFTRF('N','U', nb, AP, info)
+   call DPFTRF('N','U', Nb, AP, info)
 #endif
    if (info.ne.0) then
       write(*,*) 'stc_fwd: PPTRF: info = ', info
