@@ -398,10 +398,8 @@ module zoltan_wrapper
       integer :: mdle,i,j,k,num_neig,neig,subd
       integer :: ndofH,ndofE,ndofV,ndofQ
       integer :: neig_list(4,6)
-      integer :: iprint = 0
-!
-!----------------------------------------------------------------------
-!
+      integer :: iprint
+      iprint=0
       mdle = GID(1)
       call zoltan_w_find_neig(mdle, neig_list)
       num_neig = 0
@@ -539,16 +537,12 @@ module zoltan_wrapper
 !$OMP END PARALLEL DO
       Ierr = ZOLTAN_OK
    end subroutine zoltan_w_query_neig_list_omp
-
-
+!
 !----------------------------------------------------------------------
 !     routine:    zoltan_w_partition
 !     purpose:    perform partitioning of current domain
 !----------------------------------------------------------------------
    subroutine zoltan_w_partition(Mdle_subd)
-!
-      implicit none
-!
       integer, intent(out) :: Mdle_subd(NRELES)
       logical :: changes,print_stats
       integer(Zoltan_int) :: ierr,nrGIDs,nrLIDs,nrImp,nrExp
@@ -556,9 +550,6 @@ module zoltan_wrapper
       integer(Zoltan_int),pointer,dimension(:) :: expGIDs,expLIDs,expProcs,expParts
       integer :: iel,i,mdle,subd,src,count,ierr_mpi
       character(16) :: fmt
-!
-!----------------------------------------------------------------------
-!
 !  ...find new partition
       ierr = Zoltan_LB_Partition(zz, changes,nrGIDs,nrLIDs,                   &
                                      nrImp,impGIDs,impLIDs,impProcs,impParts, &
@@ -644,12 +635,11 @@ module zoltan_wrapper
    end subroutine zoltan_w_handle_err
 !
 !--------------------------------------------------------------------------
-!> Purpose : find neighbors (up to 4, for an h4 refined face) across faces
+!> @brief Finds neighbors (up to 4, for an h4 refined face) across faces
 !! @param[in]  Mdle      - middle node
 !! @param[out] Neig_list - neighbors
 !!
-!! @revision Aug 2019
-!
+!> @date Mar 2023
 !--------------------------------------------------------------------------
    subroutine zoltan_w_find_neig(Mdle, Neig_list)
 !
