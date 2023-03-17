@@ -345,7 +345,6 @@ subroutine stc_fwd_herm(Ni,Nb, Aii,Abi,Aib,Abb,Bi,Bb)
 !..workspace for Hermitian bubble matrix in RFP format
    VTYPE, dimension(Nb*(Nb+1)/2) :: AP
 !
-   integer  :: i,j,k,k1,k2
    integer  :: info
 !
 !----------------------------------------------------------------------
