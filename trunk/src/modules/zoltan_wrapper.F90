@@ -793,11 +793,11 @@ module zoltan_wrapper
 !    ...skip interface variables
          if (PHYSAi(i))       cycle
 !
-         select case(DTYPE(i))
-            case('contin') ; nrdof(i)=nrdofH*NR_COMP(i)
-            case('tangen') ; nrdof(i)=nrdofE*NR_COMP(i)
-            case('normal') ; nrdof(i)=nrdofV*NR_COMP(i)
-            case('discon') ; nrdof(i)=nrdofQ*NR_COMP(i)
+         select case(D_TYPE(i))
+            case(CONTIN) ; nrdof(i)=nrdofH*NR_COMP(i)
+            case(TANGEN) ; nrdof(i)=nrdofE*NR_COMP(i)
+            case(NORMAL) ; nrdof(i)=nrdofV*NR_COMP(i)
+            case(DISCON) ; nrdof(i)=nrdofQ*NR_COMP(i)
          end select
       enddo
 !
