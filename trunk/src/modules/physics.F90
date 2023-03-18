@@ -2,6 +2,8 @@
 !> @date Mar 2023
 module physics
 
+  implicit none
+
   ! ...number of different physics attributes
   integer, save :: NR_PHYSA
 
@@ -228,6 +230,8 @@ contains
   !> @brief Compute the number of interface variables
   !> @date Mar 2023
   subroutine get_num_interf_vars(InrHvar,InrEvar,InrVvar)
+  integer, intent(out) :: InrHvar,InrEvar,InrVvar
+  integer :: i
   InrHvar=0; InrEvar=0; InrVvar=0
   do i=1,NR_PHYSA
      if (PHYSAi(i)) then
@@ -243,6 +247,9 @@ contains
           InrVvar = InrVvar+1
        case(DISCON)
           write(*,*) 'get_num_interf_vars: L2 INTERFACE VARIABLE ??'
+          stop 1
+       case default
+          write(*,*) 'get_num_interf_vars: D_TYPE = ',D_TYPE(i)
           stop 1
        end select
      endif
