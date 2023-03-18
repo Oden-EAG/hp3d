@@ -1,6 +1,0 @@
-      common /cphysics/ SIGMAB(MAXHE), ZEPSB(MAXHE), ZMUB(MAXHE)
-c
-c     SIGMAB  conductivity constants for bricks
-c     ZEPSB   dielectric permittivity constants for bricks
-c     ZMUB    magnetic permeability constants for bricks
-c

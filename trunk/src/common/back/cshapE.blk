@@ -1,2 +1,0 @@
-      dimension VshapE(3,NDOFMAXE),DvshapE(3,3,NDOFMAXE),
-     .         VshapEa(3,NDOFMAXE),curl(3,NDOFMAXE)
