@@ -45,8 +45,6 @@ subroutine elem_residual_heat(Mdle,                &
    integer, intent(in)  :: NrdofV
    real(8), intent(out) :: Resid
    integer, intent(out) :: Nref_flag
-!..auxiliary parameter
-   real(8), parameter :: rZERO = 0.d0
 !
 !..declare edge/face type variables
    integer :: etype,ftype
@@ -123,7 +121,7 @@ subroutine elem_residual_heat(Mdle,                &
    integer :: nordP,nsign,ifc,info,icomp,nrdof
 !
 #if DEBUG_MODE
-   integer :: iprint = 0
+   integer :: iprint
 #endif
 !
 !..for Gram matrix compressed storage format
@@ -131,6 +129,10 @@ subroutine elem_residual_heat(Mdle,                &
    nk(k1,k2) = (k2-1)*k2/2+k1
 !
 !-----------------------------------------------------------------------
+!
+#if DEBUG_MODE
+   iprint=0
+#endif
 !
 !..element type
    etype = NODES(Mdle)%ntype

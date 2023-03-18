@@ -1,7 +1,7 @@
 c----------------------------------------------------------------------
-c> Purporse : data structure arrays for Geometry Modeling Package
+c> @brief Data structure arrays for Geometry Modeling Package (GMP)
 c
-c  @revision Nov 12
+c> @date Mar 2023
 c----------------------------------------------------------------------
 c
       module GMP
@@ -324,7 +324,7 @@ c
 c     CylRec    : image of a linear rectangle through a global
 c                 system of cylindrical coordinates
 c
-c     CylRec (other) : LEGACY (this also exists as a routine written by Paolo)
+c     CylRec (other) : LEGACY
 c       Idata,Rdata - UNKNOWN
 c
 c     ConfRec : LEGACY
@@ -653,10 +653,12 @@ c----------------------------------------------------------------------
 c
 c  ...dump out GMP data structure
       subroutine dumpout_GMP
+c
+      integer, parameter :: ndump=31
+c
       integer :: iprint
       iprint=0
 c
-      ndump=31
       open(unit=ndump,file='files/dumpGMP',
      .     form='formatted',access='sequential',status='unknown')
 c
@@ -911,14 +913,18 @@ c
 c
 c----------------------------------------------------------------------
 c
+#if 0
+c
 c  ...dump in GMP datastructure in LEGACY format (before Feb '11)
 c
       subroutine dumpin_GMP_LEGACY(Fp)
 c
       character(len=*) :: Fp
+      integer, parameter :: ndump=31
+c
+      integer :: iprint
       iprint=0
 c
-      ndump=31
       open(unit=ndump,file=Fp,
      .     form='formatted',access='sequential',status='unknown')
 c
@@ -1151,6 +1157,8 @@ c
 c
       end subroutine dumpin_GMP_LEGACY
 c
+#endif
+c
 c
 c----------------------------------------------------------------------
 c
@@ -1158,7 +1166,9 @@ c  ...dump in GMP data structure
       subroutine dumpin_GMP(Fp)
 c
       character(len=*), intent(in)  :: Fp
-      integer, parameter :: ndump = 31
+      integer, parameter :: ndump=31
+c
+      integer :: iprint
       iprint=0
 c
       open(unit=ndump,file=Fp,
@@ -1436,10 +1446,15 @@ c
 c
       end subroutine dumpin_GMP
 c
+c----------------------------------------------------------------------
+c
       subroutine print_GMP
 c
       use control
-#include "syscom.blk"
+      implicit none
+c
+      integer :: i,idec,nc,nh,np,nr,ns,nt
+      integer :: npri,npyr,ntet,nrcurv,nrfig
 c
  10   continue
       write(*,*) 'print_GMP: SELECT:'
@@ -1645,6 +1660,7 @@ c
 c
       end subroutine print_GMP
 c
+c----------------------------------------------------------------------
 c
       subroutine set_gmp_parameters(NDIM_loc,
      .                              MANDIM_loc,
@@ -1722,6 +1738,7 @@ c
 c
       end subroutine set_gmp_parameters
 c
+c----------------------------------------------------------------------
 c
       subroutine print_GMP_parameters
       use environment , only : QUIET_MODE
@@ -1755,6 +1772,7 @@ ccc 8061   format(' NRPO_FG  = ',i12)
 c
       end subroutine print_GMP_parameters
 c
+c----------------------------------------------------------------------
 c
       integer function Ndomain_gmp(IGMP_block)
 c

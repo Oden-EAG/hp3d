@@ -1,6 +1,3 @@
-recta_ConfRec.F
-recta_HermRec1.F
-recta_HermRec.F
 recta_ImpRec.F90
 recta_linear.F
 recta_PTIRec.F90

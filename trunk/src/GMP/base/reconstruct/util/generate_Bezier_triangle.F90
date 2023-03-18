@@ -1370,6 +1370,5 @@
         write(*,*)'Nt = ',Nt
         call print_GMP
       endif
-
 !
-      end subroutine
+      end subroutine generate_Bezier_triangle

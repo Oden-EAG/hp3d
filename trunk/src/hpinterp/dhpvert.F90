@@ -39,7 +39,8 @@ subroutine dhpvert(Mdle,Iflag,No,Xi,Icase,Bcond, ZdofH)
    integer :: ivarH,nvarH,iphys,iload,icomp,ic
 !
 #if DEBUG_MODE
-   integer :: iprint = 0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !---------------------------------------------------------------------

@@ -50,8 +50,10 @@ c
       real(8) :: d,d_min,fact
       integer :: iel,i_min,nr_elem,loc,ivis,is,ifc,locn,nfl
       integer :: i,j,ifinside,ndom,ndomn,mdlen
+#if DEBUG_MODE
       integer :: iprint
       iprint=0
+#endif
 c
 c  ...initiate number of elements found
       nr_elem=0
@@ -91,11 +93,13 @@ c  .......loop through the face neighbors
           enddo
           if (ivis.eq.0) cycle
           call invmap_face(Mdle,ifc,Xy_in, t,xyz,nfl)
+#if DEBUG_MODE
           if (iprint.eq.1) then
             write(*,7002) Mdle,ifc,t,xyz,nfl
  7002       format('elem_no: Mdle,ifc,t,xyz,nfl = ',
      .                       i4,i2,2x,2f6.2,2x,3f6.2,i2)
           endif
+#endif
 c
 c  .......if the inverse map has converged...
           if (nfl.eq.0) then
@@ -129,6 +133,7 @@ c
 c  ...end of loop through elements
       enddo
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,*) 'elem_no: list_elem,xyz_list  = '
         do i=1,nr_elem
@@ -137,6 +142,7 @@ c
         enddo
         call pause
       endif
+#endif
 c
       if (nr_elem.eq.0) then
 c
@@ -161,10 +167,12 @@ c  .....select the element that is closest to the point of view
         enddo
         Mdle = list_elem(i_min)
       endif
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,*)'elem_no: FINAL Mdle = ',Mdle
         call pause
       endif
+#endif
 c
 c
       end subroutine elem_no

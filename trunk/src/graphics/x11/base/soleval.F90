@@ -66,7 +66,8 @@ subroutine soleval(Mdle,Xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,Zdo
       real(8) :: rjac
 !
 #if DEBUG_MODE
-      integer :: iprint = 0
+      integer :: iprint
+      iprint=0
 #endif
 !
 !-------------------------------------------------------------------------------

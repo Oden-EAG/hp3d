@@ -1,6 +1,3 @@
-      subroutine symasm (Amdest, Ellhs, Flhs)
-c
-#include "syscom.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: Assembles the lhs into the front for symmetric matrices
 c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
@@ -16,7 +13,7 @@ c                   a22 a23 ...      ==>   [a11, a12,a22, a13,a23,a33, .
 c                       a33 ...
 c                            :
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -26,17 +23,20 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      subroutine symasm (Amdest, Ellhs, Flhs)
 c
-ctim      dimension Amdest(*), Ellhs(*), Flhs(*), ntemp(100)
-ccccc dimension Amdest(*), Ellhs(*), Flhs(*), ntemp(324)
-      dimension Amdest(*), Ellhs(*), Flhs(*), ntemp(10000)
+      use surfsc1
+      use surfsc2
+c
+      implicit none
+c
+      real(8) :: Amdest(*), Ellhs(*), Flhs(*)
+      integer :: ntemp(10000)
+c
+      integer :: n,i,j,k,l,mi,mj,mk
 c
       n = 1
 c
-ctim      if (NDOFM .gt. 100) then
-cccc      if (NDOFM .gt. 324) then
       if (NDOFM .gt. 10000) then
          write(NFSOUT,7771)
 7771      format(1x,'THE TEMP ARRAY: ntemp MUST ',
@@ -44,8 +44,6 @@ cccc      if (NDOFM .gt. 324) then
          IERR = 1
          return
       endif
-
-
 
 c      write(*,*) 'in symasm ellhs = '
 c      kk=0
@@ -56,8 +54,6 @@ c          write(*,*) Ellhs(kk)
 c   43   continue
 c        pause
 c   44 continue
-
-
 
 c
 c loop thru the dof in the element
@@ -121,5 +117,5 @@ cwb <
 c
 100   continue
 c
-      return
-      end
+c
+      end subroutine symasm

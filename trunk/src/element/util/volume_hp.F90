@@ -1,4 +1,5 @@
-!
+#if DEBUG_MODE
+
 !-----------------------------------------------------------------------
 subroutine volume_hp(Vol)
 !
@@ -79,3 +80,4 @@ subroutine volume_hp_mdle(Mdle, Vol)
 !
 end subroutine volume_hp_mdle
 
+#endif

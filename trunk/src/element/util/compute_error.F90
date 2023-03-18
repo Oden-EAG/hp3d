@@ -55,12 +55,7 @@ subroutine compute_error(Flag,Itag)
 !     miscellanea
       integer :: mdle,i,iattr,nrdof_tot,ic
 !
-!     printing flag
-      integer :: iprint
-!
 !---------------------------------------------------------------------------------------
-!
-      iprint=0
 !
 !     check that exact solution is indeed known
       if (NEXACT == 0) then
@@ -297,12 +292,7 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, &
       integer :: nint,icase,iattr,l,i,j,ibeg,iflag,iload,icomp,ndom,ivar,nflag
       real(8) :: weight,wa
 !
-!     printing flag
-      integer :: iprint
-!
 !---------------------------------------------------------------------------------------
-!
-      iprint=0
 !
 !     initialize global quantities
       errorH=0.d0 ; rnormH=0.d0

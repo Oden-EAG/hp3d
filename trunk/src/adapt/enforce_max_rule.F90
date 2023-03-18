@@ -3,22 +3,18 @@
 !   routine name       - enforce_max_rule
 !
 !----------------------------------------------------------------------
-!
-!   latest revision    - Feb 2023
-!
-!   purpose            - routine enforces the max rule for a FE mesh
-!
-! REMARK: THIS ROUTINE HAS BEEN OBSERVED TO REFINE (INCREASE P)
-!         UNNECESSARILY WHEN THE MESH HAS ANISOTROPIC ORDER OF APPROX.
-!
+!> @brief routine enforces the max rule for a FE mesh
+!> @remark THIS ROUTINE HAS BEEN OBSERVED TO REFINE (INCREASE P)
+!!         UNNECESSARILY WHEN THE MESH HAS ANISOTROPIC ORDER OF APPROX.
+!> @date Feb 2023
 !----------------------------------------------------------------------
-!
-   subroutine enforce_max_rule
+subroutine enforce_max_rule
 !
    use data_structure3D
    use refinements
    use constrained_nodes
-#include "syscom.blk"
+!
+   implicit none
 !
 !..work space for elem_nodes
    integer :: nodesl(27),norientl(27)
@@ -26,12 +22,12 @@
 !..order for element nodes implied by the order of the middle node
    integer :: norder(19)
 !
-   integer :: ntype
-   integer :: iprint,iel,mdle,nre,nrf,nrv,i,j,nod,nord
+   integer :: iel,mdle,nre,nrf,nrv,i,j,nod,nord,ntype,nrsons
+   integer :: icase,is,jf,nc,ne1,ne2,ne3,ne4,nodp,nods
+   integer :: nordh,nordh1,nordhs,nordhl,nordhv
+   integer :: nordv,nordv1,nordvs,nordvl
 !
 !----------------------------------------------------------------------
-!
-   iprint=0
 !
 !..reset visitation flags
    call reset_visit
@@ -286,18 +282,25 @@
 !..reset visitation flags
    call reset_visit
 !
+end subroutine enforce_max_rule
 !
-   end subroutine enforce_max_rule
-
-
-
-
-
-
-
-   subroutine save_max_order(Nod,Nord)
+!
+!----------------------------------------------------------------------
+!> @brief Saves max order in Nod's visit flag
+!> @param[in]  Nod   - Node number
+!> @param[in]  Nord  - Minimum order requested for the node
+!> @date Feb 2023
+!----------------------------------------------------------------------
+subroutine save_max_order(Nod,Nord)
+!
    use data_structure3D
-#include "syscom.blk"
+   implicit none
+!
+   integer, intent(in) :: Nod,Nord
+!
+   integer :: nordh,nordh1,nordh2
+   integer :: nordv,nordv1,nordv2
+   integer :: nordhv
 !
    if (NODES(Nod)%visit.eq.0) then
       NODES(nod)%visit= Nord
@@ -312,10 +315,10 @@
          call decode(NODES(nod)%visit, nordh2,nordv2)
          nordh = max(nordh,nordh1,nordh2); nordv = max(nordv,nordv1,nordv2)
          ! NODES(nod)%visit = nordh*10+nordv
-!     ...enforce isotropic order for the face
+!     ...enforce isotropic order for the face (TODO: why?)
          nordhv = max(nordh,nordv)
          NODES(nod)%visit = nordhv*10+nordhv
       end select
    endif
 !
-   end subroutine save_max_order
+end subroutine save_max_order

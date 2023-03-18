@@ -33,6 +33,10 @@ pois
 uwLaser
 hose
 
+# Tests
+trunk/test/_exec_
+test_mpi
+
 # Output files
 *.e
 

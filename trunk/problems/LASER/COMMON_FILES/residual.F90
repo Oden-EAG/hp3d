@@ -34,9 +34,6 @@ subroutine residual(res)
 !..timer
    real(8) :: start_time,end_time
 !
-!..printing flag
-   integer :: iprint = 0
-!
 !-----------------------------------------------------------------------
 !
 !..start timer

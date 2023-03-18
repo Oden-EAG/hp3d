@@ -21,7 +21,8 @@ subroutine find_element_ref(Ntype,Kref,Kreff, Krefm)
   integer :: ipass, isum, iface, i, j, kref_trial
   !
 #if DEBUG_MODE
-   integer :: iprint = 0
+   integer :: iprint
+   iprint=0
 #endif
   !
   !-------------------------------------------------------

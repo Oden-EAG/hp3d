@@ -1,6 +1,3 @@
-      function locr (Nrh,Iin)
-c
-#include "syscomz.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c function to determine the position in the current front for
@@ -13,7 +10,7 @@ c I   Nrh  : the rhs number
 c I   Iin  : the current equation being assembled into the front
 c             (ie: the current dof destination vector)
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Feb 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -23,10 +20,16 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc2.blk"
+      function locr (Nrh,Iin)
+c
+      use surfsc2
+      implicit none
+c
+      integer :: locr
+      integer :: Nrh,Iin
+      integer :: ii
 c
       ii = abs(Iin)
       locr = (Nrh-1)*MFW + ii
 c
-      return
-      end
+      end function locr

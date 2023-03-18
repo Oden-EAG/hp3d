@@ -1,6 +1,3 @@
-      subroutine zeros (Flhs)
-c
-#include "syscom.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: If necessary, zero out for new symmetric lhs equations
 c            in the front
@@ -15,7 +12,7 @@ c               a11 a12 a13 ...
 c                   a22 a23 ...  ==>   [a11, a12,a22, a13,a23,a33, ...]
 c                       a33 ...
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -25,14 +22,20 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc2.blk"
+      subroutine zeros (Flhs)
 c
-      dimension Flhs(*)
+      use surfsc2
 c
-      data dzero /0.0d0/
+      implicit none
 c
-c if the new frontwidth is equal to the old frontwidth
-c   then there is nothing to zero
+      real(8) :: Flhs(*)
+c
+      real(8), parameter :: dzero = 0.0d0
+c
+      integer :: i,mi,mj
+c
+c  ...if the new frontwidth is equal to the old frontwidth
+c     then there is nothing to zero
 c
       if (NFW .eq. LFW) return
 c
@@ -50,5 +53,5 @@ c
          Flhs(i) = dzero
    10 continue
 c
-      return
-      end
+c
+      end subroutine zeros

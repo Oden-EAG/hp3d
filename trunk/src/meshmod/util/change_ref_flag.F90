@@ -27,11 +27,13 @@ subroutine change_ref_flag(How,Ntype,Kref,Nort, Krefm)
       integer, parameter, dimension(1:3,0:5) :: glob_to_loc(1:3,0:5) &
            = reshape( (/1,2,3, 2,3,1, 3,1,2, 1,3,2, 2,1,3, 3,2,1/), &
            (/3,6/) )
+!
+#if DEBUG_MODE
       integer :: iprint
+      iprint=0
+#endif
 !-----------------------------------------------------------------------------------
 !
-      iprint = 0
-
       select case(How)
 !===================================================================================
 !  Local -> Global                                                                 |
@@ -81,8 +83,8 @@ subroutine change_ref_flag(How,Ntype,Kref,Nort, Krefm)
 !
       endselect
 !
+#if DEBUG_MODE
 !  ...printing
-#if DEBUG_FLAG
       if (iprint.eq.1) then
          write(*,7001) How,S_Type(Ntype),Kref,Nort,Krefm
 7001     format('change_ref_flag: How,Type,Kref,Nort,Krefm = ', &

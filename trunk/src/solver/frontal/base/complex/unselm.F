@@ -1,6 +1,3 @@
-      subroutine unselm (Iel, Aidx, Flhs ,Ubuf)
-c
-#include "syscomz.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: Elimination of one equation (id) for unsymmetric matrices
 c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
@@ -21,7 +18,7 @@ c                :   :   :
 c
 c IO  Ubuf   : the buffer to hold eliminated lhs equations
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -31,20 +28,28 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      subroutine unselm (Iel, Aidx, Flhs ,Ubuf)
 c
+      use surfsc1
+      use surfsc2
 c
-      dimension Flhs(*), Ubuf(*)
+      implicit none
 c
-      data sml,zero /1.e-30, 0.0/
-cwb >
-      data sml2 /1.e-15/
-cwb <
-
+      integer    :: Iel
+      complex(8) :: Aidx
+      complex(8) :: Flhs(*), Ubuf(*)
+c
+      integer    :: id,idm,idp,i,j,k,kk,m,mp
+      complex(8) :: pivot,s
+c
+      real(8), parameter :: zero = 0.d0
+      real(8), parameter :: sml  = 1.d-30
+      real(8), parameter :: sml2 = 1.d-15
+c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
-
-
+#endif
 c
 c set up pointers into Flhs
 c
@@ -57,6 +62,7 @@ c   (ie: each equation has KFW entries, so id begins at (id-1)*KFW)
 c
       k = idm*KFW
       mp = k + id
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7001) Aidx,id,idm,idp,KFW,k,mp
         write(*,7002) (Flhs(mp+ii),ii=-3,3)
@@ -64,16 +70,19 @@ c
  7002   format('unselm: Flhs(mp+ii),ii=-3,3 = ',7(2e12.5,2x))
         call pause
       endif
+#endif
 c
 c pull the diagonal entry
 c
       pivot = Flhs(mp)
 c
+#if DEBUG_MODE
       iprint = 0
       if(IPRPIV .eq. 1 .and. iprint .eq. 1) then
          write(NFSOUT,7000)  Iel,NFW,id,pivot
  7000    format(5x,'IEL,NFW,ID,PIVOT',3i5,2e25.15)
       endif
+#endif
 c
 c check for zero pivots
 c
@@ -254,5 +263,5 @@ c
 c
    70 continue
 c
-      return
-      end
+c
+      end subroutine unselm

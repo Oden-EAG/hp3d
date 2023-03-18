@@ -1,6 +1,3 @@
-      subroutine frwcp (Alelm, Aldest, Amdest, Andest, Elem, Frnt, Buf)
-c
-#include "syscomz.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c Forward elimination of both lhs and rhs
@@ -21,7 +18,7 @@ c W   Frnt    equations in the front
 c W   Buf     eliminated equations
 c
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -31,25 +28,28 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
-#include "surfscwr.blk"
+      subroutine frwcp (Alelm, Aldest, Amdest, Andest, Elem, Frnt, Buf)
 c
-      dimension Aldest(*),Amdest(*),Andest(*),Elem(*),Frnt(*),Buf(*)
-     .         ,Alelm(*)
-
+      use surfsc1
+      use surfsc2
+c
+      implicit none
+c
+      complex(8) :: Aldest(*),Amdest(*),Andest(*),Elem(*),Frnt(*),
+     .              Buf(*),Alelm(*)
+c
+      integer :: i,id,ie,iel,ifg,iunsr,j,jerr,lenf
+      integer :: m,mke,n,ne,negiel,newl,newu,numdes
+c
 c  ...test......test......test......test......test......test......test...
-      dimension ndest1(100)
+ccc      integer :: ndest1(100)
 c  ...test......test......test......test......test......test......test...
 c
-
-
-
-ccccc iprint=1
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
+#endif
 c
-
-
 c
       IFU = 0
       IFL = 0
@@ -69,9 +69,11 @@ c
 c
 c loop over the Elements
 c **********************
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(nfsout,*) 'FRWCP: NUMELM = ',NUMELM
       endif
+#endif
       do 200 iel=1,NUMELM
 c     ********************
 
@@ -82,7 +84,9 @@ c
 c pull up the Elements nodal destination vectors (Aldest)
 c
          call solin1 (iel, numdes, Aldest)
+#if DEBUG_MODE
          if (iprint.eq.1) write(*,*) 'iel,numdes',iel,numdes
+#endif
 c        ------------------------------
 
 
@@ -426,9 +430,11 @@ c           -------------
 c ***************
 c store the final length of the current front (LFW) into Alelm
 c
+#if DEBUG_MODE
          if (iprint.eq.1) then
            write(*,*) 'frwcp: NFW = ',NFW
          endif
+#endif
          LFW = NFW
          Alelm(iel) = LFW
 c
@@ -462,9 +468,11 @@ c
   170       continue
 c
          endif
+#if DEBUG_MODE
          if (iprint.eq.1) then
            write(*,*) 'frwcp: at the end of the loop'
          endif
+#endif
 c
   200 continue
 c ************
@@ -539,5 +547,5 @@ c
 c
       endif
 c
-      return
-      end
+c
+      end subroutine frwcp

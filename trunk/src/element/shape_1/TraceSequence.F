@@ -52,15 +52,18 @@ c
       implicit none
       integer, intent(in)  :: Nord,Nori
       integer, intent(out) :: NrdofH
-      integer :: iprint,N,m,ndofE,minI,maxI,i
+      integer :: N,m,ndofE,minI,maxI,i
       logical :: IdecE
       double precision, intent(in)  :: T
       double precision, intent(out) :: ShapH(MAXP-1),GradH(MAXP-1)
       double precision :: Mu(0:1),DMu(0:1),GMu(0:1),GDMu(0:1)
       double precision :: phiE(2:Nord),DphiE(2:Nord)
 c
+#if DEBUG_MODE
 c  ...debugging flag
+      integer :: iprint
       iprint=0
+#endif
 c
 c  ...spatial dimensions
       N=1
@@ -94,6 +97,7 @@ c
 c  ...give total degrees of freedom
       NrdofH = m
 c
+#if DEBUG_MODE
 c  ...print this when debugging
       if (iprint.eq.1) then
         write(*,7001) T,Nord,Nori
@@ -110,6 +114,7 @@ c
         endif
         call pause
       endif
+#endif
 c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       contains
 c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -165,15 +170,18 @@ c
       implicit none
       integer, intent(in ) :: Nord,Nori
       integer, intent(out) :: NrdofE
-      integer :: iprint,N,m,ndofE,minI,maxI,i
+      integer :: N,m,ndofE,minI,maxI,i
       double precision, intent(in ) :: T
       double precision, intent(out) :: ShapE(MAXP)
       double precision :: Mu(0:1),DMu(0:1),GMu(0:1),GDMu(0:1)
       double precision :: homP(0:Nord-1)
       double precision :: jac
 c
+#if DEBUG_MODE
 c  ...debugging flag
+      integer :: iprint
       iprint=0
+#endif
 c
 c  ...spatial dimensions
       N=1
@@ -206,6 +214,7 @@ c
 c  ...give total degrees of freedom
       NrdofE = m
 c
+#if DEBUG_MODE
 c  ...print this when debugging
       if (iprint.eq.1) then
         write(*,7001) T,Nord,Nori
@@ -222,6 +231,7 @@ c
         endif
         call pause
       endif
+#endif
 c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       contains
 c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -277,16 +287,20 @@ c
       implicit none
       integer, intent(in ) :: Nord,Nori
       integer, intent(out) :: NrdofV
-      integer :: iprint,m,ndofE
+      integer :: m,ndofE
       double precision, intent(in ) :: T
       double precision, intent(out) :: ShapV(MAXP)
 c
+#if DEBUG_MODE
 c  ...debugging flag
+      integer :: iprint
       iprint=0
+#endif
 c
 c  ...the traces are the same as the H(curl) traces
       call TraceEshapeE(T,Nord,Nori, NrdofV,ShapV)
 c
+#if DEBUG_MODE
 c  ...print this when debugging
       if (iprint.eq.1) then
         write(*,7001) T,Nord,Nori
@@ -304,6 +318,7 @@ c
         endif
         call pause
       endif
+#endif
 c
       end subroutine TraceEshapeV
 c
@@ -372,7 +387,7 @@ c     Triangle traces
 c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         subroutine traceTriFshapeH
 c
-        integer :: i,j,nij,m,N,ndofF,iprint
+        integer :: i,j,nij,m,N,ndofF
         integer :: minI,minJ,minIJ,maxI,maxJ,maxIJ
         logical :: IdecF
         double precision :: Nu(0:2),DNu(2,0:2)
@@ -380,8 +395,11 @@ c
         double precision :: phiTri(2:Nord-1,1:Nord-2)
         double precision :: DphiTri(2,2:Nord-1,1:Nord-2)
 c
+#if DEBUG_MODE
 c    ...debugging flag
+        integer :: iprint
         iprint=0
+#endif
 c
 c    ...spatial dimensions
         N=2
@@ -422,6 +440,7 @@ c
 c    ...give total degrees of freedom
         NrdofH = m
 c
+#if DEBUG_MODE
 c    ...print this when debugging
         if (iprint.eq.1) then
           write(*,7001) T(1:2),Nord,Nori
@@ -437,6 +456,7 @@ c    ...print this when debugging
           endif
           call pause
         endif
+#endif
 c
         end subroutine traceTriFshapeH
 c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -444,15 +464,18 @@ c     Quadrilateral traces
 c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         subroutine traceQuadFshapeH
 c
-        integer :: iprint,N,m,i,j,nordF(2),ndofF,minI,minJ,maxI,maxJ
+        integer :: N,m,i,j,nordF(2),ndofF,minI,minJ,maxI,maxJ
         logical :: IdecF(2),GIdecF(2)
         double precision :: Mu(0:1,2),DMu(2,0:1,2)
         double precision :: GMu(0:1,2),GDMu(2,0:1,2)
         double precision :: phiQuad(2:MAXP,2:MAXP)
         double precision :: DphiQuad(2,2:MAXP,2:MAXP)
 c
+#if DEBUG_MODE
 c    ...debugging flag
+        integer :: iprint
         iprint=0
+#endif
 c
 c    ...spatial dimensions
         N=2
@@ -494,6 +517,7 @@ c
 c    ...give total degrees of freedom
         NrdofH = m
 c
+#if DEBUG_MODE
 c    ...print this when debugging
         if (iprint.eq.1) then
           write(*,7001) T(1:2),Nord,Nori
@@ -509,6 +533,7 @@ c    ...print this when debugging
           endif
           call pause
         endif
+#endif
 c
         end subroutine traceQuadFshapeH
 c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -587,7 +612,7 @@ c     Triangle traces
 c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         subroutine traceTriFshapeE
 c
-        integer :: i,j,nij,m,N,ndofF,iprint
+        integer :: i,j,nij,m,N,ndofF
         integer :: minI,minJ,minIJ,maxI,maxJ,maxIJ,abc(3),fam,famctr
         logical :: IdecF
         double precision :: Nu(0:2),DNu(2,0:2)
@@ -595,8 +620,11 @@ c
         double precision :: ETri(2,0:Nord-2,1:Nord-1)
         double precision :: CurlETri(0:Nord-2,1:Nord-1)
 c
+#if DEBUG_MODE
 c    ...debugging flag
+        integer :: iprint
         iprint=0
+#endif
 c
 c    ...spatial dimensions
         N=2
@@ -644,6 +672,7 @@ c
 c    ...give total degrees of freedom
         NrdofE = m
 c
+#if DEBUG_MODE
 c    ...print this when debugging
         if (iprint.eq.1) then
           write(*,7001) T(1:2),Nord,Nori
@@ -666,6 +695,7 @@ c    ...print this when debugging
           endif
           call pause
         endif
+#endif
 c
         end subroutine traceTriFshapeE
 c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -673,7 +703,7 @@ c     Quadrilateral traces
 c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         subroutine traceQuadFshapeE
 c
-        integer :: iprint,N,m,i,j,ij(2),ig,jg,a,b,ab(2),fam
+        integer :: N,m,i,j,ij(2),ig,jg,a,b,ab(2),fam
         integer :: nordF(2),ndofF(0:1),minF(2),maxF(2)
         logical :: IdecF(2),GIdecF(2)
         double precision :: Mu(0:1,2),DMu(2,0:1,2)
@@ -681,8 +711,11 @@ c
         double precision :: EQuad(2,0:MAXP-1,2:MAXP)
         double precision :: curlEQuad(0:MAXP-1,2:MAXP)
 c
+#if DEBUG_MODE
 c    ...debugging flag
+        integer :: iprint
         iprint=0
+#endif
 c
 c    ...spatial dimensions
         N=2
@@ -735,6 +768,7 @@ c
 c    ...give total degrees of freedom
         NrdofE = m
 c
+#if DEBUG_MODE
 c    ...print this when debugging
         if (iprint.eq.1) then
           write(*,7001) T(1:2),Nord,Nori
@@ -758,6 +792,7 @@ c    ...print this when debugging
           endif
           call pause
         endif
+#endif
 c
         end subroutine traceQuadFshapeE
 c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -833,15 +868,18 @@ c     Triangle traces
 c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         subroutine traceTriFshapeV
 c
-        integer :: iprint,i,j,nij,m,N,ndofF
+        integer :: i,j,nij,m,N,ndofF
         integer :: minalpha,minI,minJ,minIJ,maxI,maxJ,maxIJ
         double precision :: Nu(0:2),DNu(2,0:2)
         double precision :: GNu(0:2),GDNu(2,0:2)
         double precision :: homP(0:Nord-1),homPal(0:Nord-1,0:Nord-1)
         double precision :: jac
 c
+#if DEBUG_MODE
 c    ...debugging flag
+        integer :: iprint
         iprint=0
+#endif
 c
 c    ...spatial dimensions
         N=2
@@ -886,6 +924,7 @@ c
 c    ...give total degrees of freedom
         NrdofV = m
 c
+#if DEBUG_MODE
 c    ...print this when debugging
         if (iprint.eq.1) then
           write(*,7001) T(1:2),Nord,Nori
@@ -901,6 +940,7 @@ c    ...print this when debugging
           endif
           call pause
         endif
+#endif
 c
         end subroutine traceTriFshapeV
 c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -908,7 +948,7 @@ c     Quadrilateral traces
 c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         subroutine traceQuadFshapeV
 c
-        integer :: iprint,i,j,m,N,nordF(2),ndofF
+        integer :: i,j,m,N,nordF(2),ndofF
         integer :: minI,minJ,maxI,maxJ
         logical :: IdecF(2),GIdecF(2)
         double precision :: Mu(0:1,2),DMu(2,0:1,2)
@@ -916,8 +956,11 @@ c
         double precision :: homP(0:MAXP-1,2)
         double precision :: jac
 c
+#if DEBUG_MODE
 c    ...debugging flag
+        integer :: iprint
         iprint=0
+#endif
 c
 c    ...spatial dimensions
         N=2
@@ -958,6 +1001,7 @@ c
 c    ...give total degrees of freedom
         NrdofV = m
 c
+#if DEBUG_MODE
 c    ...print this when debugging
         if (iprint.eq.1) then
           write(*,7001) T(1:2),Nord,Nori
@@ -973,6 +1017,7 @@ c    ...print this when debugging
           endif
           call pause
         endif
+#endif
 c
         end subroutine traceQuadFshapeV
 c - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -137,8 +137,6 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
    real(8) , intent(in)  :: ZValues(NumPts)
    real(8) , intent(out) :: CoreTemp(NumPts)
 !
-   real(8), parameter :: rZero = 0.d0
-!
 !..mdle number
    integer :: mdle
 !
@@ -160,8 +158,8 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
 !
 !-------------------------------------------------------------------------------
 !
-   CoreTemp = rZero
-   coreVol  = rZero
+   CoreTemp = rZERO
+   coreVol  = rZERO
 !
 !..start timer
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()

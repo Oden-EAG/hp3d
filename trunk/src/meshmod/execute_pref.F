@@ -24,7 +24,8 @@ c
       use data_structure3D
       use element_data
       use constrained_nodes
-#include "syscom.blk"
+c
+      implicit none
 c
       integer, intent(in) :: Nlist
       integer, intent(in) :: List(Nlist)
@@ -36,17 +37,19 @@ c  ...order for element nodes implied by the order of the middle node
       integer :: norder(19)
 c
 c  ...miscellanea
-      integer :: iel,ip,is,j,mdle,nc,nrs
-      integer :: nod,nodp,nods,nrv,nre,nrf,ntype
-      integer :: iprint
+      integer :: icase,iel,ie,ip,is,j,mdle,nc,nrs
+      integer :: nod,newp,nodp,nods,nrv,nre,nrf,ntype
 c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
       if (iprint.eq.1) then
         write(*,7010) List(1:Nlist)
  7010   format('execute_pref: List = ',20(/,10i6))
         call pause
       endif
-
+#endif
+c
       call reset_visit
 c
 c  ...Step 1: loop over elements from the list and record
@@ -111,7 +114,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent mid-edge nodes (south,north)
               do ip=1,3,2
-                nodp = iabs(NFACE_CONS(ip,nc))
+                nodp = abs(NFACE_CONS(ip,nc))
                 NODES(nodp)%visit = 1
               enddo
 c
@@ -124,7 +127,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent mid-edge nodes (east,west)
               do ip=2,4,2
-                nodp = iabs(NFACE_CONS(ip,nc))
+                nodp = abs(NFACE_CONS(ip,nc))
                 NODES(nodp)%visit = 1
               enddo
 c
@@ -145,7 +148,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent mid-edge nodes (south,north)
               do ip=1,3,2
-                nodp = iabs(NFACE_CONS(ip,nc))
+                nodp = abs(NFACE_CONS(ip,nc))
                 NODES(nodp)%visit = 1
                 if (Is_inactive(nodp)) then
                   nodp = NODES(nodp)%father
@@ -170,7 +173,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent mid-edge nodes (east,west)
               do ip=2,4,2
-                nodp = iabs(NFACE_CONS(ip,nc))
+                nodp = abs(NFACE_CONS(ip,nc))
                 NODES(nodp)%visit = 1
                 if (Is_inactive(nodp)) then
                   nodp = NODES(nodp)%father
@@ -187,7 +190,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent medg nodes
               do ie=1,3
-                nodp = iabs(NFACE_CONS(ie,nc))
+                nodp = abs(NFACE_CONS(ie,nc))
                 NODES(nodp)%visit = 1
               enddo
 c
@@ -200,7 +203,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent medg nodes
               do ie=1,3
-                nodp = iabs(NFACE_CONS(ie,nc))
+                nodp = abs(NFACE_CONS(ie,nc))
                 NODES(nodp)%visit = 1
               enddo
 c
@@ -248,10 +251,12 @@ c  .........if nod is active
 c
         if (NODES(mdle)%visit.eq.1) then
           call find_new_order(mdle, newp)
+#if DEBUG_MODE
           if (iprint.eq.1) then
             write(*,7050) mdle,newp
  7050       format('execute_pref: REFINING mdle = ',i6,' new p = ',i3)
           endif
+#endif
           call nodmod(mdle, newp)
         endif
       enddo

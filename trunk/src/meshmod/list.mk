@@ -3,10 +3,10 @@ break.F90
 close_mesh.F90
 display_ref_kind.F90
 execute_pref.F
-perform_pref.F
 nodbreak.F90
 nodgen.F90
 nodmod.F90
+perform_pref.F
 random_refine.F90
 refine.F90
 refresh.F90

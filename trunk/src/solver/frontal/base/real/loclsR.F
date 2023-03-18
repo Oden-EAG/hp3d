@@ -1,6 +1,3 @@
-      function locls (Iin,Jin)
-c
-#include "syscom.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c function to determine the position in the current front for
@@ -13,7 +10,7 @@ c Typ Name      Function
 c I   Iin : row number into the current front for k(i,j)
 c I   Jin : column number into the current front for k(i,j)
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -23,14 +20,20 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
+      function locls (Iin,Jin)
+      implicit none
 c
-      ii = iabs(Iin)
-      jj = iabs(Jin)
+      integer :: locls
+      integer :: Iin,Jin
+      integer :: ii,jj,k,l
+c
+      ii = abs(Iin)
+      jj = abs(Jin)
 c
       k = max0(ii,jj)
       l = min0(ii,jj)
 c
       locls = k*(k-1)/2 + l
 c
-      return
-      end
+c
+      end function locls

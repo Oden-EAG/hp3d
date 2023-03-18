@@ -4,27 +4,30 @@ c   routine name       - draw_line
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Sep 01
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine draws various types of lines
 c
 c   arguments:
 c     in:
-c             X1,Y2,X2,Y2 - coordinates of endpoints of a line
+c             (X1,Y1)  - coordinates of endpoints of a line
+c             (X2,Y2)
 c             Ic       - color to draw the line with
 c             Itype    - type of a line
-c
-c   required  routines -
 c
 c----------------------------------------------------------------------
 c
       subroutine draw_line(X1,Y1,X2,Y2,Ic,Itype)
 c
-c
       use graphmod
-#include "syscom.blk"
+c
+      implicit none
+c
+      real(8) :: X1,Y1,X2,Y2
+      integer :: Ic,Itype
+c
+      real(8) :: dl,ds,dsl,xl1,xl2,yl1,yl2
+      integer :: iter
 c
 c  ...compute the line increment
       dl = RMARGIN/16.d0
@@ -73,10 +76,4 @@ c
         endif
       enddo
 c
-c
-      return
-      end
-
-
-
-
+      end subroutine draw_line

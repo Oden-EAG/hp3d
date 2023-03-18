@@ -1,8 +1,5 @@
-      subroutine zdirio (Unname, Commnd, Irec, Len, Sbuf, Jerr)
-c
-#include "syscomz.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
-c FUNCTION: This routine preforms direct access I/O for scratch tapes
+c FUNCTION: This routine performs direct access I/O for scratch tapes
 c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
 c ARGUMENTS:  (I : input, O : output, IO : input & output, W : workspace
 c
@@ -22,7 +19,7 @@ c O   Sbuf   - for read:  array for reading into
 c
 c O   Jerr   - error flag set to 0 for no error
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -32,20 +29,27 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfscwr.blk"
+      subroutine zdirio (Unname, Commnd, Irec, Len, Sbuf, Jerr)
+c
+      use surfsc1
+c
+      implicit none
 c
       character*(*) Unname, Commnd
-cwb >
-cwb       dimension Sbuf(*), nbuf(20), lenf(20)
-      dimension Sbuf(*), nbuf(9), lenf(9)
-      dimension lbuf(9), irsave(9)
 c
-cwb       save nbuf,lenf
-ccccc save nbuf, lenf, irsave
-      common /czdirio1/  nbuf, lenf, irsave
-      common /czdirio2/ storage(100)
-
+      integer    :: Irec,Len,Jerr
+      complex(8) :: Sbuf(*)
+c
+      integer    :: i,inow,iend,ioffst,iostat,irecp,irecsv,iunit
+      integer    :: lenop,lenr,lenw,ntape
+      complex(8) :: slen
+c
+      integer    :: nbuf(9), lenf(9)
+      integer    :: lbuf(9), irsave(9)
+      complex(8) :: storage(100)
+c
+      common /czdirio1/ nbuf, lenf, irsave
+      common /czdirio2/ storage
 
 c  ...test......test......test......test......test......test......test...
 c      allocatable sbuf1(:)
@@ -60,14 +64,12 @@ c     .            'TAPE71','TAPE72','TAPE73','TAPE74','TAPE75',
 c     .            'TAPE76','TAPE77','TAPE78','TAPE79','TAPE80'/
 c  ...test......test......test......test......test......test......test...
 
-cwb <
 c
-c the following data statement is machine dependant
+c the following data statement is machine dependent
 c ...................................................
-c within zdirio1.blk is contained the data statement:
 c
-      data maxrec,lenwrd /10000, 16/
-c for complex(8), lenwrd = 16
+      integer, parameter :: maxrec = 10000
+      integer, parameter :: lenwrd = 16
 c where:
 c   maxrec = the maximum record length for a direct access file
 c     **Note: on most machines this is bytes
@@ -80,14 +82,10 @@ c            vax,ibm,apollo,etc (most other machines) = 8
 c            cray,cdc = 1
 c            ardent = 2
 c
-cccccccc       include '../newcomm/zdirio1.blk'
 c ..................................................
 c set the logical unit numbers used herein
 c =========================================
-cwb >
       data lbuf / 19,18,20, 21,22,23, 24,25,26 /
-cwb       data lubufu, lubufb, lubufl / 19, 18, 20 /
-cwb <
 
       if(IDUMPWR.eq.1)then
         write(nfsout,*)'UNEXPECTED CALL TO ZDIRIO - STOP'
@@ -175,12 +173,10 @@ c
 c
 c the following open statement is machine dependant
 c .................................................
-c within zdirio2.blk is contained the apollo open statement:
 c
          open (ntape,access='direct',form='unformatted',
      .         status='unknown',recl=lenop,err=9000)
 c
-ccccccccc       include '../newcomm/zdirio2.blk'
 c..................................................
 c
 c normal return
@@ -403,4 +399,4 @@ c
      . 'UNNAME,COMMND,IREC,LEN,NTAPE ',a1,2x,a8,2x,a1,a8,3i6)
       return
 c
-      end
+      end subroutine zdirio

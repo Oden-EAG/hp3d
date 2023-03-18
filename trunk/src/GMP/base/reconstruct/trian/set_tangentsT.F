@@ -4,7 +4,7 @@ c   routine name       - set_tangents_Tsurf
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Mar 10
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine defines tangent versors for curves
 c                        connected to a point on a reconstructed
@@ -46,38 +46,38 @@ c
       use control
       use GMP
 c
-#include "syscom.blk"
+      implicit none
 c
-      dimension List_curves(Nrcurves),Newlist_curves(Nrcurves),
-     .          List_trian(3,Nrcurves)
-      dimension Rn1(3),Rn2(3)
+      integer :: Np,Nrcurves,Idec,Ifirst,Isecond
+      integer :: List_curves(Nrcurves),Newlist_curves(Nrcurves),
+     .           List_trian(3,Nrcurves)
+      real(8) :: Rn1(3),Rn2(3)
 c
 c  ...work lists containing adjacent surface triangles data
-      dimension list(10),list_tets(20)
-c     dimension list_rloc(3,10)
+      integer :: list(10),list_tets(20)
+c     integer :: list_rloc(3,10)
 c
 c  ...work space
-      dimension temp(3),void(3,3),list_aux(Nrcurves),
-     .                            list_aux1(3,Nrcurves)
+      real(8) :: temp(3),void(3,3)
+      integer :: list_aux(Nrcurves),list_aux1(3,Nrcurves)
 c
 c  ...secant vectors components
-      dimension xyz(3,10)
-      dimension vec(3,Nrcurves)
+      real(8) :: xyz(3,10)
+      real(8) :: vec(3,Nrcurves)
 c
       integer, external :: imod
 ccc      imod(j,mod) = j-(j-1)/mod*mod
 c
+      integer :: i,ipass,ic,ic1,id,ie1,ierror,if,ifig,ile_edge_curves
+      integer :: ii,ir,is,iv,iv3,j,lab,labt,loc,nc,nc1,next,nh,no1
+      integer :: nor,norient,np1,np2,nr,nr1,nr_trian,nrtet,ntet
+      real(8) :: s,s1,s2
+c
+      integer :: iprint
 c-----------------------------------------------------------------------
 c
       ipass=0
       iprint=0
-
-      if (Np.eq.3) then
-        iprint=0
-      else
-        iprint=0
-      endif
-
 c
  5    continue
 c  ...printing statement
@@ -113,7 +113,7 @@ c  .....loop over triangles connected to curve
         do ir = 1,CURVES(nc)%NrFig
           call decode(abs(CURVES(nc)%FigNo(ir)), nr,lab)
 c  .......loop over blocks adjacent to triangle
-          call decode(iabs(TRIANGLES(nr)%BlockNo(1)), ntet,labt)
+          call decode(abs(TRIANGLES(nr)%BlockNo(1)), ntet,labt)
 
           if (TRIANGLES(nr)%BlockNo(2).eq.0) then
 c   .......if block is a tet
@@ -139,7 +139,7 @@ c  .......cycle if triangle is already on the list or not on surface
           if (TRIANGLES(nr)%Type.ne.'G1RecTri') cycle
 c  .......loop over triangle edges
           do ie1 = 1,3
-            nc1 = iabs(TRIANGLES(nr)%EdgeNo(ie1))
+            nc1 = abs(TRIANGLES(nr)%EdgeNo(ie1))
 cc            if (iprint.ge.1) then
 cc              write(*,8045) nc,ir,nr,ie1,nc1
 cc 8045         format(' nc,ir,nr,ie1,nc1 = ',i5,i2,i5,i2,i5)
@@ -258,12 +258,12 @@ c  ...select orientation
       select case(norient)
 c  ...orientation of the triangle consistent with the normal
       case(0)
-        Newlist_curves(1) = iabs(TRIANGLES(nr)%EdgeNo(iv))
-        Newlist_curves(2) = iabs(TRIANGLES(nr)%EdgeNo(iv3))
+        Newlist_curves(1) = abs(TRIANGLES(nr)%EdgeNo(iv))
+        Newlist_curves(2) = abs(TRIANGLES(nr)%EdgeNo(iv3))
 c  ...orientation of the triangle opposite to the normal
       case(1)
-        Newlist_curves(1) = iabs(TRIANGLES(nr)%EdgeNo(iv3))
-        Newlist_curves(2) = iabs(TRIANGLES(nr)%EdgeNo(iv))
+        Newlist_curves(1) = abs(TRIANGLES(nr)%EdgeNo(iv3))
+        Newlist_curves(2) = abs(TRIANGLES(nr)%EdgeNo(iv))
       end select
 c
 c  ...loop over remaining curves
@@ -272,7 +272,7 @@ c  .....loop over triangles
         do ir = 1,Nrcurves
           nr = list(ir)
           call locate(Newlist_curves(ic),
-     .                iabs(TRIANGLES(nr)%EdgeNo(1:3)),3, ic1)
+     .                abs(TRIANGLES(nr)%EdgeNo(1:3)),3, ic1)
 c  .......if curve is found
           if ((ic1.ne.0).and.(nr.ne.List_trian(1,ic-1))) then
 c  .........build up the list
@@ -284,13 +284,13 @@ c  .........if consistent orientation
             if (ic1.eq.iv) then
               List_trian(3,ic) = 0
               if (ic.lt.Nrcurves) then
-                Newlist_curves(ic+1) = iabs(TRIANGLES(nr)%EdgeNo(iv3))
+                Newlist_curves(ic+1) = abs(TRIANGLES(nr)%EdgeNo(iv3))
               endif
 c  .........else inconsistent orientation
             elseif (ic1.eq.iv3) then
               List_trian(3,ic) = 1
               if (ic.lt.Nrcurves) then
-                Newlist_curves(ic+1) = iabs(TRIANGLES(nr)%EdgeNo(iv))
+                Newlist_curves(ic+1) = abs(TRIANGLES(nr)%EdgeNo(iv))
               endif
             else
               write(*,*)'set_tangents: ic1,iv = ',ic1,iv; stop 1

@@ -4,9 +4,7 @@ c   routine name       - reconstruct_sharp_edge_curve
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - May 07
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine reconstructs a curve
 c
@@ -29,16 +27,21 @@ c
 c
       use control
 c
-#include "syscom.blk"
+      implicit none
 c
-      dimension Xpoint(3,2), Evect(3,2), Eprim(3,2)
+      integer :: Nerr_flag
+      real(8) :: Xpoint(3,2),Evect(3,2),Eprim(3,2)
 c
 c  ...matrices for a system of linear equations
-      dimension aa(2,2),bb(2),uu(2)
+      real(8) :: aa(2,2),bb(2),uu(2)
 c
 c  ...secant vector
-      dimension dx(3)
+      real(8) :: dx(3)
 c
+      integer :: i
+      real(8) :: s,s1,s2,s3
+c
+      integer :: iprint
 c**********************************************************************
 c
       iprint=0
@@ -88,5 +91,4 @@ c  ...compute the second derivatives
      .                + 2.d0*Evect(1:3,1) + 4.d0*Evect(1:3,2)
 c
 c
-      end
-
+      end subroutine reconstruct_sharp_edge_curve

@@ -1,6 +1,3 @@
-      subroutine unselm (Iel, Aidx, Flhs ,Ubuf)
-c
-#include "syscom.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: Elimination of one equation (id) for unsymmetric matrices
 c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
@@ -21,7 +18,7 @@ c                :   :   :
 c
 c IO  Ubuf   : the buffer to hold eliminated lhs equations
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -31,15 +28,28 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      subroutine unselm (Iel, Aidx, Flhs, Ubuf)
 c
-      dimension Flhs(*), Ubuf(*)
+      use surfsc1
+      use surfsc2
 c
-      data sml,dzero /1.e-30, 0.0/
-cwb >
-      data sml2 /1.e-15/
-cwb <
+      implicit none
+c
+      integer :: Iel
+      real(8) :: Aidx
+      real(8) :: Flhs(*), Ubuf(*)
+c
+      real(8) :: pivot,s
+      integer :: i,id,idm,idp,j,k,kk,m,mp
+c
+      real(8), parameter :: sml   = 1.d-30
+      real(8), parameter :: dzero = 0.0d0
+      real(8), parameter :: sml2  = 1.d-15
+c
+#if DEBUG_MODE
+      integer :: iprint
+      iprint=0
+#endif
 c
 c set up pointers into Flhs
 c
@@ -57,11 +67,12 @@ c pull the diagonal entry
 c
       pivot = Flhs(mp)
 c
-      iprint = 0
+#if DEBUG_MODE
       if(IPRPIV .eq. 1 .and. iprint .eq. 1) then
          write(NFSOUT,7000)  Iel,NFW,id,pivot
  7000    format(5x,'IEL,NFW,ID,PIVOT',3i5,1pe11.3)
       endif
+#endif
 c
 c check for zero pivots
 c
@@ -229,5 +240,5 @@ c
 c
    70 continue
 c
-      return
-      end
+c
+      end subroutine unselm

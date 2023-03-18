@@ -22,7 +22,8 @@ subroutine find_neig(Mdle, Neig_list)
   integer :: i,nod,nrneig,ntype
   !
 #if DEBUG_MODE
-  integer :: iprint = 0
+  integer :: iprint
+  iprint=0
 #endif
   !---------------------------------------------------
 

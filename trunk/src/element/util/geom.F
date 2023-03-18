@@ -4,7 +4,7 @@ c   routine name       - geom
 c
 c-----------------------------------------------------------------------
 c
-c   latest revision    - Aug 08
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine determines derivatives of the master
 c                        element coordinates wrt to the physical
@@ -25,26 +25,32 @@ c               Rjac   - the jacobian
 c               Iflag  = 0 if the jacobian is positive
 c                      = 1 otherwise
 c
-c
 c-----------------------------------------------------------------------
 c
       subroutine geom(Dxdxi, Dxidx,Rjac,Iflag)
 c
-#include "syscom.blk"
-      common /cgeom/ iprint
+      implicit none
 c
-      dimension Dxdxi(3,3),Dxidx(3,3)
-      dimension a(3,3)
+      real(8), intent(in)  :: Dxdxi(3,3)
+      real(8), intent(out) :: Dxidx(3,3)
+      real(8), intent(out) :: Rjac
+      integer, intent(out) :: Iflag
 c
-ccc      iprint=0
+      real(8) :: a(3,3),a1,a2,a3,det1,det2,det3,s
+      integer :: i,j,k
+c
+#if DEBUG_MODE
+      integer :: iprint
+      iprint = 0
       if (iprint.eq.1) then
         do i=1,3
           write(*,9999)i,Dxdxi(i,1:3)
  9999     format(' geom: i,Dxdxiz(i,1:3) = ',i2,2x,3(e12.5,2x))
         enddo
       endif
-      Iflag=0
+#endif
 c
+      Dxidx=0; Iflag=0
 c
 c  ...jacobian
       Rjac = Dxdxi(1,1)*Dxdxi(2,2)*Dxdxi(3,3)
@@ -53,11 +59,17 @@ c  ...jacobian
      .     - Dxdxi(3,1)*Dxdxi(2,2)*Dxdxi(1,3)
      .     - Dxdxi(1,1)*Dxdxi(3,2)*Dxdxi(2,3)
      .     - Dxdxi(2,1)*Dxdxi(1,2)*Dxdxi(3,3)
+c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,*) 'geom: Rjac = ',Rjac
       endif
+#endif
+c
       if (Rjac.lt.0.d0) then
         Iflag=1
+c
+#if DEBUG_MODE
         if (iprint.eq.1) then
 c
 c  .......compute vector product of first two derivatives
@@ -73,6 +85,7 @@ c  .......compute vector product of first two derivatives
      .           e12.5)
           call pause
         endif
+#endif
       endif
 c
       det1 =   Dxdxi(2,2)*Dxdxi(3,3) - Dxdxi(3,2)*Dxdxi(2,3)
@@ -99,6 +112,7 @@ c
       Dxidx(2,3) = det2/Rjac
       Dxidx(3,3) = det3/Rjac
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
 c
 c  .....check the inversion
@@ -119,9 +133,6 @@ c  .....check the inversion
         enddo
         call pause
       endif
+#endif
 c
-c
-      end
-
-
-
+      end subroutine geom

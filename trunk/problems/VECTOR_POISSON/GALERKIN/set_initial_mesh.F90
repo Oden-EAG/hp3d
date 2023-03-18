@@ -33,7 +33,8 @@ subroutine set_initial_mesh(Nelem_order)
    integer :: ifc,iel,neig,ivar
 !
 #if DEBUG_MODE
-   integer :: iprint = 0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !-------------------------------------------------------------------------------

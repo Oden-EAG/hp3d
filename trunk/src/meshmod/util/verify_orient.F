@@ -1,3 +1,5 @@
+#if DEBUG_MODE
+
 c----------------------------------------------------------------------
 c
 c   routine name       - verify_orient
@@ -158,8 +160,7 @@ c  ...workspace
       integer, intent(in)  :: Nv1(4)
       integer, intent(out) :: Nv2(4)
 c
-      integer :: iprint,iv
-      iprint = 1
+      integer :: iv
 c
       Nv2(1:4) = 0
 c
@@ -179,3 +180,5 @@ c
       end select
 c
       end subroutine apply_orient
+
+#endif

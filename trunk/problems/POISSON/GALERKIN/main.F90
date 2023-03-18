@@ -203,7 +203,7 @@ subroutine master_main()
       write(*,*) 'MUMPS (MPI)............................40'
       write(*,*) 'MUMPS (OpenMP).........................41'
       write(*,*) 'Pardiso (OpenMP).......................42'
-      ! write(*,*) 'Frontal (Seq)..........................43'
+      write(*,*) 'Frontal (Seq)..........................43'
       write(*,*) 'MUMPS (Nested Dissection)..............44'
       write(*,*) 'PETSc (MPI)............................45'
       write(*,*) '                                         '
