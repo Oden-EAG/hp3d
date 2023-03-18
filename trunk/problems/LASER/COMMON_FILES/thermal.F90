@@ -128,7 +128,7 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
    use data_structure3D
    use environment, only : QUIET_MODE
    use mpi_param  , only : RANK,ROOT
-   use MPI        , only : MPI_COMM_WORLD,MPI_IN_PLACE,MPI_REAL8,MPI_SUM
+   use MPI        , only : MPI_COMM_WORLD,MPI_IN_PLACE,MPI_REAL8,MPI_SUM,MPI_Wtime
    use par_mesh   , only : DISTRIBUTED,HOST_MESH
 !
    implicit none
@@ -153,7 +153,7 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
    integer :: etype
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
    integer :: count,ierr
 !
 !-------------------------------------------------------------------------------

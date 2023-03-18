@@ -55,6 +55,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    use data_structure3D
    use laserParam
    use commonParam
+   use MPI, only: MPI_Wtime
 !..no implicit statements
    implicit none
 !..declare input/output variables
@@ -239,7 +240,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    real(8), dimension(3,6) :: nfce
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
    integer, dimension(3,3) :: deltak
 !

@@ -39,6 +39,7 @@ subroutine mumps_sc(mtype)
    use mumps,     only: MUMPS_PAR, mumps_start, mumps_destroy
    use par_mesh,  only: DISTRIBUTED,HOST_MESH
    use mpi_param, only: RANK,ROOT
+   use MPI,       only: MPI_Wtime
 !
    implicit none
 !
@@ -67,7 +68,7 @@ subroutine mumps_sc(mtype)
    VTYPE, allocatable :: RHS(:)
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time,time_stamp
+   real(8) :: start_time,end_time,time_stamp
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------

@@ -44,10 +44,10 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
    use assembly  , only: NR_RHS
    use MPI       , only: MPI_UNDEFINED,MPI_STATUS_IGNORE,      &
                          MPI_REAL8,MPI_COMPLEX16,MPI_INTEGER,  &
-                         MPI_IN_PLACE,MPI_SUM
+                         MPI_IN_PLACE,MPI_SUM,MPI_Wtime
    use mpi_param , only: RANK,ROOT
    use parameters, only: ZERO,ZONE
-   use stc,        only: stc_bwd
+   use stc       , only: stc_bwd
    use par_mumps
    use mkl_spblas
 !
@@ -95,7 +95,7 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
    VTYPE, allocatable :: Aii(:,:),Bi(:)
 !
 !..timer
-   real(8) :: MPI_Wtime,time_stamp,start_time
+   real(8) :: time_stamp,start_time
 !
 !..info (verbose output if true)
    logical :: info = .false.

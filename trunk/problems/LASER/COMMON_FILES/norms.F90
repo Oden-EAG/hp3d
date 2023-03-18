@@ -24,7 +24,7 @@ subroutine get_L2NormCOMS(Flag,No1,No2, L2NormDiff)
    use physics
    use par_mesh        , only: DISTRIBUTED,HOST_MESH
    use mpi_param       , only: ROOT,RANK
-   use MPI             , only: MPI_SUM,MPI_COMM_WORLD,MPI_REAL8
+   use MPI             , only: MPI_SUM,MPI_COMM_WORLD,MPI_REAL8,MPI_Wtime
 !
    implicit none
 !
@@ -44,7 +44,7 @@ subroutine get_L2NormCOMS(Flag,No1,No2, L2NormDiff)
    integer :: count,ierr
    real(8) :: L2NormDiff_subd
 !
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 !-------------------------------------------------------------------
 !
@@ -280,7 +280,7 @@ subroutine get_Norm(Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
    use physics
    use par_mesh         , only: DISTRIBUTED,HOST_MESH
    use mpi_param        , only: ROOT,RANK
-   use MPI              , only: MPI_SUM,MPI_COMM_WORLD,MPI_REAL8
+   use MPI              , only: MPI_SUM,MPI_COMM_WORLD,MPI_REAL8,MPI_Wtime
 !
    implicit none
 !
@@ -303,7 +303,7 @@ subroutine get_Norm(Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
               fieldNormV_subd, fieldNormQ_subd
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 !-------------------------------------------------------------------
 !
