@@ -113,7 +113,8 @@
   logical :: is_homD
 !
 #if DEBUG_MODE
-  integer :: iprint = 0
+  integer :: iprint
+  iprint=0
 #endif
 !
 !-----------------------------------------------------------------------
@@ -141,7 +142,7 @@
                 ndofH_face,ndofE_face,ndofV_face,ndofQ_face)
 !
 ! check if a homogeneous Dirichlet node
-  call homogenD('tangen',Icase,Bcond, is_homD,ncase,ibcnd)
+  call homogenD(TANGEN,Icase,Bcond, is_homD,ncase,ibcnd)
   if (is_homD) then
     zuE = ZERO
     go to 100
@@ -497,10 +498,10 @@
             if (ncase(i).eq.1) ic=ic+1
 !
 !  .........select the discretization type
-            select case(DTYPE(i))
+            select case(D_TYPE(i))
 !
 !  .........H(curl) component
-            case('tangen')
+            case(TANGEN)
 !
 !  ...........update global counter
               ivarE=ivarE+1

@@ -1,14 +1,11 @@
 add_void_curve.F90
+bernstein_poly.F90
+biv_bernstein_poly.F90
 check_orientation.F90
 combination.F90
 coord_cart2polar.F90
 coord_cart2spher.F90
 coord_spher2cart.F90
-export_gmp2vtk.F
-export_gmps2vtk.F
-export_mesh2stl.F
-export_surf2vtk.F
-export_vol2vtk.F
 factorial.F90
 find_GMPtriangle.F90
 find_curve_to_block.F
@@ -16,7 +13,6 @@ find_point_to_block.F
 give_surf.F90
 if_bound.F90
 imod.F90
-locate_curve.F90
 mixed_product.F90
 norm.F90
 normalize.F90

@@ -15,7 +15,7 @@ c   in:
 c        Number_of_RHS  - number of right-hand sides (load vectors)
 c
 c------------------------------------------------------------------
-c
+#include "typedefs.h"
       subroutine solve1(Number_of_RHS)
 c
       use data_structure3D
@@ -28,27 +28,37 @@ c
       use par_mesh,    only: DISTRIBUTED,HOST_MESH
       use mpi_param,   only: RANK,ROOT
 c
-c  ...system common blocks
-#include "syscom.blk"
-c
 c  ...frontal solver common blocks
-#include "surfsc1.blk"
-#include "surfsc2.blk"
-      common /ccelem/ iprint_celem
+      use surfsc1
+      use surfsc2
+c
+      implicit none
+c
+      integer, intent(in) :: Number_of_RHS
 c
 c  ...nodes for a modified element and the corresponding number
 c     of H1,H(curl),H(div) and L2 dof
-      dimension nodm(MAXNODM),ndofmH(MAXNODM),ndofmE(MAXNODM),
-     .                        ndofmV(MAXNODM),ndofmQ(MAXNODM)
+      integer :: nodm(MAXNODM),ndofmH(MAXNODM),ndofmE(MAXNODM),
+     .                         ndofmV(MAXNODM),ndofmQ(MAXNODM)
 c
 c  ...number of variables for each physics attribute for an element
-      dimension nrdofs(NR_PHYSA)
+      integer :: nrdofs(NR_PHYSA)
 c
 c  ...element geometry dof, direction vector
-      dimension xnod(3,MAXbrickH),xc(3),direction(3)
+      real(8) :: xnod(3,MAXbrickH),xc(3),direction(3)
 c
 c  ...number of local element dof for each physics variable
-      dimension nrdofi(NR_PHYSA), nrdofb(NR_PHYSA)
+      integer :: nrdofi(NR_PHYSA),nrdofb(NR_PHYSA)
+c
+      integer :: inick,iel,iel1,i,j,iv,kk,kel
+      integer :: max_active_node_no,mdle,mr,ms,mu,nod,nrnodm
+      integer :: nrnick,nrdof,nrdofm,nrdofc,nrnod1,nrdof_mdl
+      VTYPE   :: zvoid
+c
+#if DEBUG_MODE
+      integer :: iprint
+      iprint=0
+#endif
 c
 c-----------------------------------------------------------------------
 c
@@ -58,16 +68,17 @@ c
         return
       endif
 c
-      iprint=0
-c
+#if C_MODE
       IDUMPWR = 0
+#endif
 c
-      IFRSOLV = 0
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,*) 'solve1: NRELES,Number_of_RHS = ',
      .                      NRELES,Number_of_RHS
         call pause
       endif
+#endif
 c
 c  ...save the number of right-hand sides (load vectors)
       NR_RHS = Number_of_RHS
@@ -110,10 +121,12 @@ c     element matrices
         mdle = ELEM_ORDER(iel)
 c
 c  .....determine nodes of the modified element
+#if DEBUG_MODE
         if (iprint.eq.1) then
           write(*,*) 'solve1: iel', iel, 'mdle', mdle
           call pause
         endif
+#endif
         if (ISTC_FLAG) then
           call celem_systemI(iel,mdle,1,
      .               nrdofs,nrdofm,nrdofc,
@@ -169,6 +182,7 @@ c
       NRDOF_CON = nrdof
       NRDOF_TOT = nrdof + nrdof_mdl
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7006) NR_PHYSA
  7006   format("number of physical attributes, NR_PHYSA = ",i3)
@@ -179,6 +193,7 @@ c
         write(*,7007) max_active_node_no
  7007   format('solve1: max_active_node_no = ',i8)
       endif
+#endif
 c
 c-----------------------------------------------------------------------
 c
@@ -322,6 +337,7 @@ c  ...exit if no free dof
         return
       endif
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
    10   write(*,7002) NRELES
  7002   format(' solve1: SET ELEMENT NUMBER TO REVIEW NICKNAMES, ',
@@ -348,6 +364,8 @@ c
         enddo
         go to 10
       endif
+#endif
+c
  20   continue
 c
 c----------------------------------------------------------------------
@@ -359,9 +377,6 @@ c  ...hardwire ISYM to symmetry flag from control file
       ISYM   = ISYM_FLAG
       IRESOL = 0
       NRHS   = NR_RHS
-      NTAPEB = 0
-      NTAPEU = 21
-      NTAPEL = 0
       IWRT   = 0
       IASSEM = 1
       IPRSTR = 0
@@ -382,10 +397,9 @@ c     for debugging forward elimination
       IPFSLF = 0
       IPFSRF = 0
 c
-      NICMUL=1000
+      NICMUL = 1000
 c
-      NUMEL=   NRELES
-      NUMELM=  NRELES
+      NUMELM = NRELES
 c
       NPDESV = 1
       allocate(IDESVE(nrnick))
@@ -394,7 +408,9 @@ c
 c  ...call prefront
 ccc      write(*,*) 'solve1: nrnick,MAXDOFC = ',nrnick,MAXDOFC
       MA = 2*nrnick+3*MAXDOFC
+#if DEBUG_MODE
       if (iprint.eq.1) write(*,*) 'solve1: CALLING PREFRONT'
+#endif
       call surfsp(IN,IAWORK, ms,mu,mr)
       if (IERR.eq.1) stop 1
       deallocate(IN, IAWORK)
@@ -437,27 +453,32 @@ ccc        write(*,7004) mu+mr
       endif
 c
 c  ...allocate work space
+#if DEBUG_MODE
       if (iprint.eq.1) write(*,*) 'solve1: MFRSOL = ',MFRSOL
+#endif
       allocate(ZWORKFRS(MFRSOL))
 c
 c  ...allocate static condensation data structures
       if (ISTC_FLAG) call stc_alloc
 c
 c  ...call frontal solver
-      iprint_celem=0
       MA = MFRSOL
       ZWORKFRS(1:MFRSOL) = ZERO
+#if DEBUG_MODE
       if (iprint.eq.1) write(*,*) 'solve1: CALLING FRONTAL SOLVER'
+#endif
 c
       call surfss(ZWORKFRS)
       if (IERR.ne.0) then
         write(*,*) 'ERROR IN SURFSS'
         stop 1
-      else
-        if (iprint.eq.1) then
-          write(*,*) 'solve1: SURFSS COMPLETED'
-        endif
       endif
+c
+#if DEBUG_MODE
+      if (iprint.eq.1) then
+        write(*,*) 'solve1: SURFSS COMPLETED'
+      endif
+#endif
 c
 c  ...deallocate static condensation data structures
       if (ISTC_FLAG) call stc_dealloc
@@ -475,7 +496,8 @@ c  ...deallocate ALL arrays used by frontal solver
       deallocate(ZWORKFRS)
       deallocate(NEW_ELEM_ORDER)
 c
+#if DEBUG_MODE
       if (iprint.eq.1) write(*,*) 'solve1: EXIT ROUTINE SOLVE1'
+#endif
 c
       end subroutine solve1
-

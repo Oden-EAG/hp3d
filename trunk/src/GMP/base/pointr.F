@@ -1,6 +1,6 @@
 c----------------------------------------------------------------------
 c
-c   latest revision    - Aug 04
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine returns coordinates of a point
 c
@@ -15,21 +15,25 @@ c
       subroutine pointr(No, X)
 c
       use GMP
-#include "syscom.blk"
+      implicit none
 c
-      dimension X(NDIM)
+      integer :: No
+      real(8) :: X(NDIM)
 c
 c  ...surface numbers (only first three entries are meaningful),
 c     starting point for NR iterations
-      dimension nsurf(6),xs(3)
+      integer :: nsurf(6)
+      real(8) :: xs(3)
 c
 c  ...work space
-      dimension void2(4),void3(4)
+      real(8) :: void1,void2(4),void3(4)
 c
 c  ...point type
-      character(len=10) :: type
+      character(len=10) :: type     
 c
+      integer :: iprint
       iprint=0
+c
       if (iprint.eq.1) then
         write(*,7001) No
  7001   format('pointr: No = ',i4)
@@ -57,10 +61,6 @@ c
 c  .....call Newton solver to determine the point coordinates
         call mnewt(1,nsurf,void1,void2,xs,void3, X)
 c
-#ifdef _PYGMP
-      case('FourSurPt')
-         X(1:NDIM) = POINTS(No)%Rdata(1:NDIM)
-#endif
       case default
         write(*,*) 'pointr: type = ',type
         stop
@@ -70,6 +70,4 @@ c
  7002   format('pointr: X = ',3f8.3)
       endif
 c
-      end
-
-
+      end subroutine pointr

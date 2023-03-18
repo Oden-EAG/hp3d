@@ -1,3 +1,5 @@
+#if DEBUG_MODE
+
 !------------------------------------------------------------------------------
 !> Purpose : total number of H1,H(curl),H(div),L2 dof for a SINGLE
 !!           component
@@ -61,3 +63,5 @@ subroutine find_nrdof(NrdofH, NrdofE, NrdofV, NrdofQ)
   !
   !
 end subroutine find_nrdof
+
+#endif

@@ -4,13 +4,14 @@
 !----------------------------------------------------------------------
 !
 !     module:              zoltan_wrapper
-!     last modified:       July 2019
+!     last modified:       Feb 2023
 !
 !----------------------------------------------------------------------
 module zoltan_wrapper
 !
    use data_structure3D
    use element_data
+   use environment, only: QUIET_MODE
    use MPI
    use mpi_param
    use zoltan
@@ -22,15 +23,24 @@ module zoltan_wrapper
    logical, save :: ZOLTAN_IS_INIT = .false.
 !
 !..Load balancing strategy
-!  0: nelcon (block partition via nelcon)
-!  1: BLOCK  (block partition)
-!  2: RANDOM (random partition)
-!  3: RCB    (recursive coordinate bisection)
-!  4: RIB    (recursive inertial bisection)
-!  5: HSFC   (Hilbert space-filling curves)
-!  6: GRAPH  (Graph partitioners: ParMETIS,PT-Scotch)
-!  7: FIBER  (Custom partitioner for waveguide geometry)
-   integer, save :: ZOLTAN_LB = 0
+!  0: DEFAULT (block partition via nelcon)
+!  1: BLOCK   (block partition)
+!  2: RANDOM  (random partition)
+!  3: RCB     (recursive coordinate bisection)
+!  4: RIB     (recursive inertial bisection)
+!  5: HSFC    (Hilbert space-filling curves)
+!  6: GRAPH   (Graph partitioners: ParMETIS,PT-Scotch)
+!  7: FIBER   (Custom partitioner for waveguide geometry)
+   integer, parameter :: ZOLTAN_LB_DEFAULT = 0
+   integer, parameter :: ZOLTAN_LB_BLOCK   = 1
+   integer, parameter :: ZOLTAN_LB_RANDOM  = 2
+   integer, parameter :: ZOLTAN_LB_RCB     = 3
+   integer, parameter :: ZOLTAN_LB_RIB     = 4
+   integer, parameter :: ZOLTAN_LB_HSFC    = 5
+   integer, parameter :: ZOLTAN_LB_GRAPH   = 6
+   integer, parameter :: ZOLTAN_LB_FIBER   = 7
+!
+   integer, save :: ZOLTAN_LB = ZOLTAN_LB_DEFAULT
 !
    contains
 !
@@ -74,7 +84,7 @@ module zoltan_wrapper
 !  ...initialize Zoltan environment
       ierr = Zoltan_Initialize(ver)
       call zoltan_w_handle_err(ierr,'Zoltan_Initialize')
-      if (RANK .eq. ROOT) then
+      if (.not. QUIET_MODE .and. RANK .eq. ROOT) then
          write(*,100) 'Zoltan initialized sucessfully. Version = ', ver
       endif
   100 format(A,F5.2)
@@ -180,14 +190,14 @@ module zoltan_wrapper
       integer(Zoltan_int) :: ierr
       ierr = ZOLTAN_OK
       select case(LB)
-         case(0); ierr = Zoltan_Set_Param(zz,'LB_METHOD','NONE')
-         case(1); call zoltan_lb_param_block(ierr)
-         case(2); call zoltan_lb_param_random(ierr)
-         case(3); call zoltan_lb_param_rcb(ierr)
-         case(4); call zoltan_lb_param_rib(ierr)
-         case(5); call zoltan_lb_param_hsfc(ierr)
-         case(6); call zoltan_lb_param_graph(ierr)
-         case(7); ierr = Zoltan_Set_Param(zz,'LB_METHOD','NONE')
+         case(ZOLTAN_LB_DEFAULT); ierr = Zoltan_Set_Param(zz,'LB_METHOD','NONE')
+         case(ZOLTAN_LB_BLOCK  ); call zoltan_lb_param_block(ierr)
+         case(ZOLTAN_LB_RANDOM ); call zoltan_lb_param_random(ierr)
+         case(ZOLTAN_LB_RCB    ); call zoltan_lb_param_rcb(ierr)
+         case(ZOLTAN_LB_RIB    ); call zoltan_lb_param_rib(ierr)
+         case(ZOLTAN_LB_HSFC   ); call zoltan_lb_param_hsfc(ierr)
+         case(ZOLTAN_LB_GRAPH  ); call zoltan_lb_param_graph(ierr)
+         case(ZOLTAN_LB_FIBER  ); ierr = Zoltan_Set_Param(zz,'LB_METHOD','NONE')
          case default
             write(*,*) 'zoltan_w_set_lb: invalid param LB =', LB
             return
@@ -415,10 +425,10 @@ module zoltan_wrapper
                   Wgts(num_neig) = 0.0_Zoltan_float
                   do k=1,NR_PHYSA
                      if (.not. PHYSAm(k)) cycle
-                     select case(DTYPE(k))
-                        case('contin') ; Wgts(num_neig) = Wgts(num_neig) + ndofH*NR_COMP(k)
-                        case('tangen') ; Wgts(num_neig) = Wgts(num_neig) + ndofE*NR_COMP(k)
-                        case('normal') ; Wgts(num_neig) = Wgts(num_neig) + ndofV*NR_COMP(k)
+                     select case(D_TYPE(k))
+                        case(CONTIN) ; Wgts(num_neig) = Wgts(num_neig) + ndofH*NR_COMP(k)
+                        case(TANGEN) ; Wgts(num_neig) = Wgts(num_neig) + ndofE*NR_COMP(k)
+                        case(NORMAL) ; Wgts(num_neig) = Wgts(num_neig) + ndofV*NR_COMP(k)
                      end select
                   enddo
                   Wgts(num_neig) = max(1.0_Zoltan_float,Wgts(num_neig))
@@ -498,10 +508,10 @@ module zoltan_wrapper
                      Wgts(n) = 0.0_Zoltan_float
                      do l=1,NR_PHYSA
                         if (.not. PHYSAm(l)) cycle
-                        select case(DTYPE(l))
-                           case('contin') ; Wgts(n) = Wgts(n) + ndofH*NR_COMP(l)
-                           case('tangen') ; Wgts(n) = Wgts(n) + ndofE*NR_COMP(l)
-                           case('normal') ; Wgts(n) = Wgts(n) + ndofV*NR_COMP(l)
+                        select case(D_TYPE(l))
+                           case(CONTIN) ; Wgts(n) = Wgts(n) + ndofH*NR_COMP(l)
+                           case(TANGEN) ; Wgts(n) = Wgts(n) + ndofE*NR_COMP(l)
+                           case(NORMAL) ; Wgts(n) = Wgts(n) + ndofV*NR_COMP(l)
                         end select
                      enddo
                      Wgts(n) = max(1.0_Zoltan_float,Wgts(n))

@@ -29,37 +29,49 @@ c
      .     NR_EDGES,NEDGC,NEDG_CONS,NR_FACES,NFACEC,NFACE_CONS,
      .     SON_NUM,FATH_TYPE,FATH_ORIENT,FATH_NODES,
      .     rotate_edge_nodes,rotate_trian_nodes,rotate_quadr_nodes
-#include "syscom.blk"
 c
-      dimension Nodesl(27),Norientl(27)
+      implicit none
+c
+      integer, intent(in)  :: Mdle
+      integer, intent(out) :: Nodesl(27),Norientl(27)
+c
       integer :: npar_refs(27),nson_refs(27),nort_refs(27)
 c
-c  ...face edge and vertex numbers etc
-      integer :: ntype,ftype
-      integer :: if, ireff, is1, jef(4), jvf(4), kref_face(6)
-      integer :: nrnodes
+c  ...miscellanea
+      integer :: jef(4),jvf(4),kref_face(6)
+      integer :: ntype,ftype,stype,nfath
+      integer :: i,ie,ifc,is,is1,j,je,jp,jv,jv1,jv2,loc
+      integer :: iref,ireff,iref1,iref2,iref3,iref_fath
+      integer :: nef,nff,nvf,nod,nodp,nort,nrn,nson,nrnodes
+c
+#if DEBUG_MODE
+      integer :: iprint
+      iprint=0
+#endif
+c
+c  ...initialize output
+      Nodesl(1:27) = 0; Norientl(1:27) = 0
 c
 c  ...initialize variables like this or OpenMP will not work!
       ireff=0; is1=0;
 c
-      select case(Mdle)
-      case(135)
-        iprint=0
-      case default
-        iprint=0
-      end select
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7000) Mdle
  7000   format('get_connect_info: Mdle = ',i6)
         call pause
       endif
-c
+#endif
 c
       INFO_CONSTRAINTS=1
       call elem_nodes(Mdle, Nodesl,Norientl)
+c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         call elem_show(Mdle, NODES(Mdle)%ntype,Nodesl,Norientl)
       endif
+#endif
+c
       INFO_CONSTRAINTS=0
 c
 c  ...store the element father
@@ -102,23 +114,29 @@ c
 c
 c  .......parent edge node
           if (jp.le.nvf+nef) then
+#if DEBUG_MODE
             if (iprint.eq.1) then
               write(*,7021) j,jp,is
  7021         format('get_connect_info: 1: j,jp,is = ',3i5)
             endif
+#endif
             call rotate_edge(FATH_ORIENT(jp),is,nort)
+#if DEBUG_MODE
             if (iprint.eq.1) then
               write(*,7022) j,jp,is
  7022         format('get_connect_info: 2: j,jp,is = ',3i5)
             endif
+#endif
 c            nod = NODES(nodp)%sons(is)
             nod = Son(nodp,is)
+#if DEBUG_MODE
             if (iprint.eq.1) then
               write(*,7023) nodp,nod,NODES(nod)%act
  7023         format('get_connect_info: nodp,nod,NODES(nod)%act = ',
      .               2i6,l2)
               call pause
             endif
+#endif
 c
 c  .........if the node is constrained (inactive)
 ccc            if (Is_inactive(nod)) then
@@ -141,19 +159,21 @@ c  .......parent face node
           elseif (jp.le.nvf+nef+nff) then
 c
 c  .........local refinement flag for the face
-            if = jp-nvf-nef
-            iref = kref_face(if)
+            ifc = jp-nvf-nef
+            iref = kref_face(ifc)
 c
 c  .........global refinement flag for the face
             ireff = NODES(nodp)%ref_kind
 c
 c  .........face edge and vertex nodes numbers
-            call face_to_edge(ftype,if, jef(1),jef(2),jef(3),jef(4))
-            call face_to_vert(ftype,if, jvf(1),jvf(2),jvf(3),jvf(4))
+            call face_to_edge(ftype,ifc, jef(1),jef(2),jef(3),jef(4))
+            call face_to_vert(ftype,ifc, jvf(1),jvf(2),jvf(3),jvf(4))
+#if DEBUG_MODE
             if (iprint.eq.1) then
-              write(*,7100) j,jp,if,iref,ireff
- 7100         format('get_connect_info: j,jp,if,iref,ireff = ',5i4)
+              write(*,7100) j,jp,ifc,iref,ireff
+ 7100         format('get_connect_info: j,jp,ifc,iref,ireff = ',5i4)
             endif
+#endif
 c
             select case(TYPE_NOD(jp,ftype))
 c
@@ -162,11 +182,13 @@ c  .........triangular parent face
               call rotate_trian(iref,ireff,FATH_ORIENT(jp),is,nort)
 c              nod = NODES(nodp)%sons(is)
               nod = Son(nodp,is)
+#if DEBUG_MODE
               if (iprint.eq.1) then
                 write(*,7101) nodp,is,nod,NODES(nod)%act
  7101           format('get_connect_info: nodp,is,nod,NODES(nod)%act =',
      .                                    3i5,l2)
               endif
+#endif
               if (Is_inactive(nod).and.NODES(nod)%ref_kind.eq.0) then
 ccc              if (Is_inactive(nod)) then
                 call locate(nodp, NFACEC,NR_FACES,loc)
@@ -256,6 +278,7 @@ c
         endif
       enddo
 c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7011) Mdle
  7011   format('get_connect_info: CONSTRAINED NODES FOR Mdle = ',i6)
@@ -276,8 +299,9 @@ c
         call pause
         call result
       endif
+#endif
 c
-      end subroutine
+      end subroutine get_connect_info
 c
 c----------------------------------------------------------------------
 c
@@ -285,7 +309,7 @@ c   routine name       - modify_face_info
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - May 10
+c   latest revision    - Feb 2023
 c
 c   purpose            - a subsidiary of get_connect_info, routine
 c                        modifies the data base for a constraining
@@ -310,19 +334,30 @@ c
       use data_structure3D
       use refinements
       use constrained_nodes
-#include "syscom.blk"
 c
-      integer, parameter, dimension(1:2,0:1) :: ie_no
+      implicit none
+c
+      integer, intent(in)  :: Nodp,Is,Is1
+      integer, intent(out) :: Nodc
+c
+      integer :: ifc,i,ie,ie1,iec,ise,iv,jv,loc,loc1
+      integer :: medge,nson,nvoid,nvt
+c
+      integer, parameter :: ie_no(1:2,0:1)
      .  = reshape( (/1,3, 4,2/) , (/2,2/) )
 c
       integer, external :: imod
 ccc      imod(j,mod) = j-(j-1)/mod*mod
 c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
+c
       if (iprint.eq.1) then
         write(*,7001) Nodp,Is,Is1
  7001   format('modify_face_info: Nodp,Is,Is1 = ',i5,2i3)
       endif
+#endif
 c
       call locate(Nodp, NFACEC,NR_FACES,ifc)
       if (ifc.eq.0) then
@@ -357,7 +392,7 @@ c  .........store the mid-face node
 c
 c  .........store relevant edges only
             do ie=ie1+1,4,2
-              medge = iabs(NFACE_CONS(ie,ifc))
+              medge = abs(NFACE_CONS(ie,ifc))
               if (NFACE_CONS(ie,ifc).gt.0) then
                 ise = Is
               else
@@ -382,7 +417,7 @@ c  .......set up a new constraining edge
             NEDGC(iec) = nson
             do iv=1,2
               ie = ie_no(iv,ie1)
-              medge = iabs(NFACE_CONS(ie,ifc))
+              medge = abs(NFACE_CONS(ie,ifc))
 c              nvt = NODES(medge)%sons(3)
               nvt = Son(medge,3)
 c
@@ -416,6 +451,4 @@ c  ...any other option illegal
       end select
 c
 c
-      end subroutine
-
-
+      end subroutine modify_face_info

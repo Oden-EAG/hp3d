@@ -36,6 +36,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    use data_structure3D
    use commonParam
    use laserParam
+   use MPI, only: MPI_Wtime
 !..no implicit statements
    implicit none
 !..declare input/output variables
@@ -162,11 +163,10 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    real(8) :: delta_n
    integer :: dom_flag
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
-!..debug variables
 #if DEBUG_MODE
-   integer :: iprint = 0
+   integer :: iprint
 #endif
 !
 !..for Gram matrix compressed storage format
@@ -174,6 +174,10 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    nk(k1,k2) = (k2-1)*k2/2+k1
 !
 !--------------------------------------------------------------------------
+!
+#if DEBUG_MODE
+   iprint=0
+#endif
 !
    allocate(gramP(NrTest*(NrTest+1)/2))
 !

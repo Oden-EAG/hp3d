@@ -1,3 +1,5 @@
+#if DEBUG_MODE
+
 subroutine check_negative_jacobian(Nodesl, Nsize)
 
   !-------------------------------------------------------------------
@@ -78,4 +80,7 @@ subroutine check_negative_jacobian(Nodesl, Nsize)
   write(*,*) Nsize, ' elements Jacobians are negative '
 
   INTEGRATION = int_back
-endsubroutine check_negative_jacobian
+
+end subroutine check_negative_jacobian
+
+#endif

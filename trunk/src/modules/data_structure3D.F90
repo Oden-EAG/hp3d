@@ -1,5 +1,5 @@
 !----------------------------------------------------------------------
-!> @brief   module defines date structure arrays
+!> @brief   Defines data structure arrays
 !> @date    Mar 2023
 !----------------------------------------------------------------------
 module data_structure3D
@@ -81,7 +81,6 @@ module data_structure3D
 !
 !  .....case number indicating what physical attributes are supported
 !       (binary-encoded per physics variable)
-!  TODO: change to ncase
         integer          :: case
 !
 !  .....order of approximation (decimal-encoded per direction (x,y,z))
@@ -115,11 +114,6 @@ module data_structure3D
         type(dof_data), pointer :: dof
 !
 #if DEBUG_MODE
-!
-        integer          :: iback
-!
-!  .....locker number
-        integer          :: lock
 !
 !  .....error
 !       0   - scalar error
@@ -761,25 +755,25 @@ module data_structure3D
 !
 !  ...check Dirichlet flags for all variable types
       do iphys=1,NR_PHYSA
-         select case(DTYPE(iphys))
+         select case(D_TYPE(iphys))
 !     ...H1 checks all
-         case('contin')
+         case(CONTIN)
             continue
 !     ...skip checking vertices of H(curl) variables
-         case('tangen')
+         case(TANGEN)
             if (NODES(nod)%ntype .eq. VERT) then
                ic = ic + NR_COMP(iphys)
                cycle
             endif
 !     ...skip checking vertices and edges of H(div) variables
-         case('normal')
+         case(NORMAL)
             if (     NODES(nod)%ntype .eq. VERT   &
                 .or. NODES(nod)%ntype .eq. MEDG ) then
                ic = ic + NR_COMP(iphys)
                cycle
             endif
 !     ...skip checking all on L2
-         case('discon')
+         case(DISCON)
             ic = ic + NR_COMP(iphys)
             cycle
          end select
@@ -795,17 +789,16 @@ module data_structure3D
 !
 !-----------------------------------------------------------------------
 !
-      function Is_Dirichlet_attr(Nod,D_type)
+      function Is_Dirichlet_attr(Nod,Dtype)
       logical Is_Dirichlet_attr
-      integer Nod
-      character(6) D_type
+      integer Nod,Dtype
       integer ibc(NRINDEX), ic, iphys, ivar
 !
       call decod(NODES(Nod)%bcond,2,NRINDEX, ibc)
       Is_Dirichlet_attr = .false.
       ic = 0
       do iphys=1,NR_PHYSA
-        if (DTYPE(iphys).eq.D_type) then
+        if (D_TYPE(iphys).eq.Dtype) then
           do ivar=1,NR_COMP(iphys)
             ic = ic + 1
             if (ibc(ic).eq.1) Is_Dirichlet_attr = .true.
@@ -838,6 +831,8 @@ module data_structure3D
          enddo
          call mixed_product(a(1:3,1), a(1:3,2), a(1:3,3), val)
          Is_right_handed = (val > 0.d0)
+      case default
+         write(*,*) 'Is_right_handed'; stop
       end select
       end function Is_right_handed
 !

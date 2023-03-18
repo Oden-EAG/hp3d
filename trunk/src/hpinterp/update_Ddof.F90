@@ -15,7 +15,7 @@ subroutine update_Ddof
    use environment, only: QUIET_MODE
    use par_mesh   , only: DISTRIBUTED
    use MPI        , only: MPI_COMM_WORLD,MPI_INTEGER,MPI_REAL8,MPI_COMPLEX16, &
-                          MPI_SUM,MPI_MIN,MPI_IN_PLACE,MPI_STATUS_IGNORE
+                          MPI_SUM,MPI_MIN,MPI_IN_PLACE,MPI_STATUS_IGNORE,MPI_Wtime
    use mpi_param  , only: RANK,ROOT,NUM_PROCS
    use par_mesh   , only: DISTRIBUTED,HOST_MESH
 !
@@ -44,7 +44,7 @@ subroutine update_Ddof
    VTYPE, dimension(MAXEQNQ,MAXbrickQ) :: zdofQ
 !
 !..auxiliary variables for timing
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 !..auxiliary variables
    integer :: iel,iv,ie,ifc,ind,iflag
@@ -65,7 +65,8 @@ subroutine update_Ddof
    logical :: USE_THREADED = .false.
 !
 #if DEBUG_MODE
-   integer :: iprint = 0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !-----------------------------------------------------------------------
@@ -138,7 +139,7 @@ subroutine update_Ddof
             if (.not.associated(NODES(nod)%dof))       cycle
             if (.not.associated(NODES(nod)%dof%zdofH)) cycle
             if (NODES(nod)%visit.eq.1)                 cycle
-            if (is_Dirichlet_attr(nod,'contin')) then
+            if (is_Dirichlet_attr(nod,CONTIN)) then
 #if DEBUG_MODE
                if (iprint.eq.1) write(*,7010) mdle,iv,nod
           7010 format('update_Ddof: CALLING dhpvert FOR mdle,iv,nod = ',i8,i2,i8)
@@ -163,7 +164,7 @@ subroutine update_Ddof
             nod = nodesl(ind)
             if (.not.associated(NODES(nod)%dof)) cycle
             if (NODES(nod)%visit.eq.1)           cycle
-            if (is_Dirichlet_attr(nod,'contin')) then
+            if (is_Dirichlet_attr(nod,CONTIN)) then
 !           ...update H1 Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofH)) then
 #if DEBUG_MODE
@@ -177,7 +178,7 @@ subroutine update_Ddof
                endif
                NODES(nod)%visit=1
             endif
-            if (is_Dirichlet_attr(nod,'tangen')) then
+            if (is_Dirichlet_attr(nod,TANGEN)) then
 !           ...update H(curl) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofE)) then
 #if DEBUG_MODE
@@ -206,8 +207,8 @@ subroutine update_Ddof
 !        ...get global node number
             nod = nodesl(ind)
             if (.not.associated(NODES(nod)%dof)) cycle
-            if (NODES(nod)%visit.eq.1) cycle
-            if (is_Dirichlet_attr(nod,'contin')) then
+            if (NODES(nod)%visit.eq.1)           cycle
+            if (is_Dirichlet_attr(nod,CONTIN)) then
 !           ...update H1 Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofH)) then
 #if DEBUG_MODE
@@ -221,7 +222,7 @@ subroutine update_Ddof
                endif
                NODES(nod)%visit=1
             endif
-            if (is_Dirichlet_attr(nod,'tangen')) then
+            if (is_Dirichlet_attr(nod,TANGEN)) then
 !           ...update H(curl) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofE)) then
 #if DEBUG_MODE
@@ -235,7 +236,7 @@ subroutine update_Ddof
                endif
                NODES(nod)%visit=1
             endif
-            if (is_Dirichlet_attr(nod,'normal')) then
+            if (is_Dirichlet_attr(nod,NORMAL)) then
 !           ...update H(div) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofV)) then
 #if DEBUG_MODE

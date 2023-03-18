@@ -4,7 +4,7 @@ c   routine name       - set_sharp_edge_bundle
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Sep 07
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine sets tangent and normal dircetions
 c                        for curves connected to a point on a sharp
@@ -40,32 +40,35 @@ c
       use control
       use GMP
 c
-#include "syscom.blk"
+      implicit none
 c
-      dimension Newlist_curves(Nrcurves),
-     .          List_recta(3,Nrcurves)
-      dimension Rn1(3),Rn2(3)
+      integer :: Np,Nrcurves,Ifirst,Isecond
+      integer :: Newlist_curves(Nrcurves),
+     .           List_recta(3,Nrcurves)
+      real(8) :: Rn1(3),Rn2(3)
 c
 c  ...edge vector, dual basis to Rn1, Rn2 in the plane orthogonal
 c     to edge vector
-      dimension evect(3),dual1(3),dual2(3)
+      real(8) :: evect(3),dual1(3),dual2(3)
 c
 c  ...work space
-      dimension temp(3),list(10)
+      real(8) :: temp(3)
+      integer :: list(10)
 c
 c  ...second derivatives of the implicit reconstruction of surfaces
-      dimension acoeff1(3,3),acoeff2(3,3)
+      real(8) :: acoeff1(3,3),acoeff2(3,3)
+c
+      real(8) :: s,s1,s2
+      integer :: i,ic,ii,ivar,j,nc
+      integer :: nrcurves1,nrcurves2
 c
       integer, external :: imod
 ccc      imod(j,mod) = j-(j-1)/mod*mod
 c
+      integer :: iprint
 c-----------------------------------------------------------------------
 c
-ccc      if (Np.eq.428) then
-        iprint=0
-ccc      else
-ccc        iprint=0
-ccc      endif
+      iprint=0
 c
 c  ...there must be at least three curves in each smooth part of the
 c     bundle

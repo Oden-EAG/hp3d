@@ -1,6 +1,3 @@
-      subroutine elmrhs (Aid, Inc, Frhs, Ubuf, Bbuf)
-c
-#include "syscom.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c Elimination of rhs's for equation (id)
@@ -21,7 +18,7 @@ c IO  Ubuf   the buffer to hold eliminated lhs equations
 c IO  Bbuf   the buffer to hold eliminated rhs equations
 c
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -31,14 +28,22 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      subroutine elmrhs (Aid, Inc, Frhs, Ubuf, Bbuf)
 c
-      dimension Frhs(*), Ubuf(*), Bbuf(*)
-cwb >
-      data sml2 /1.e-15/
-cwb <
-
+      use surfsc1
+      use surfsc2
+c
+      implicit none
+c
+      real(8) :: Aid
+      integer :: Inc
+      real(8) :: Frhs(*), Ubuf(*), Bbuf(*)
+c
+      real(8) :: s
+      integer :: in,id,idm,idp,ii,ii1,ii2,im,iuu
+c
+      real(8), parameter :: sml2 = 1.d-15
+c
       id = Aid
       idm = id - 1
       idp = id + 1
@@ -141,5 +146,5 @@ c
          im = im + MFW
    60 continue
 c
-      return
-      end
+c
+      end subroutine elmrhs

@@ -1,6 +1,3 @@
-      subroutine elmrhs (Aid, Inc, Frhs, Ubuf, Bbuf)
-c
-#include "syscomz.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c Elimination of rhs's for equation (id)
@@ -9,7 +6,7 @@ c ARGUMENTS:  (I : input, O : output, IO : input & output, W : workspace
 c
 c Typ Name      Function
 c
-c I   Aidx   transfer loc for active dof in the front after eliminating
+c I   Aid    transfer loc for active dof in the front after eliminating
 c             this is the equation to be eliminated
 c
 c I   Inc    for unsymmetric this is the Increment to shift for picking
@@ -21,7 +18,7 @@ c IO  Ubuf   the buffer to hold eliminated lhs equations
 c IO  Bbuf   the buffer to hold eliminated rhs equations
 c
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -31,35 +28,26 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      subroutine elmrhs (Aid, Inc, Frhs, Ubuf, Bbuf)
 c
-      dimension Frhs(*), Ubuf(*), Bbuf(*)
-cwb >
-
-cwb <
-
-
-
-      data sml2 /1.e-15/
-
-
-
-
-
-
-
-
-      id = Aid
+      use surfsc1
+      use surfsc2
+c
+      implicit none
+c
+      complex(8) :: Aid
+      integer    :: Inc
+      complex(8) :: Frhs(*), Ubuf(*), Bbuf(*)
+c
+      complex(8) :: s
+      integer    :: ii,ii1,ii2,id,idm,idp,im,iuu,in
+c
+      real(8), parameter :: sml2 = 1.d-15
+c
+      id = INT(Aid)
       idm = id - 1
       idp = id + 1
       im = 0
-
-
-
-
-
-
 c
 c perform the rhs elimination:
 c-----------------------------
@@ -78,7 +66,6 @@ c
 c pull f(m)
 c
          s = Frhs(im+id)
-
 
 c
 c ***note: we load the rhs elimination buffer with the last  f(i)'
@@ -110,13 +97,10 @@ c$doit VBEST
 c
 c
 
-
-
          do 20 ii = ii1,ii2
             Frhs(ii) = Frhs(ii) - s*Ubuf(iuu)
             iuu = iuu + Inc
    20    continue
-
 
 c
    25    if (ISYM.eq.1 .or. ISYM.eq.4) iuu = iuu + 1
@@ -144,7 +128,6 @@ cvd$ select (vector)
 c ARDENT directives
 c$doit VBEST
 
-
 c
 c
                do 27 ii = ii1,ii2
@@ -158,7 +141,6 @@ c ALLIANT directives
 cvd$ select (vector)
 c ARDENT directives
 c$doit VBEST
-
 
 c
 c
@@ -174,5 +156,5 @@ c
          im = im + MFW
    60 continue
 c
-      return
-      end
+c
+      end subroutine elmrhs

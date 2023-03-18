@@ -9,13 +9,16 @@ subroutine read_input(Fp)
   character(len=*), intent(in) :: Fp
 
   ! local variables
-  character(len=6), parameter, dimension(4) :: type_array &
-       = (/'contin','tangen','normal','discon'/)
-  integer, dimension(10) :: narray,loc
-  integer :: iprint, i, j
+  integer      :: narray(10)
+  integer      :: i, j
+  character(6) :: dtype
   integer, parameter :: nin = 103
-  !----------------------------------------------------------------------
+  
+#if DEBUG_MODE
+  integer :: iprint
   iprint=0
+#endif
+  !----------------------------------------------------------------------
   !!write(*,*) 'QUIET_MODE = ',QUIET_MODE; call pause
   !----------------------------------------------------------------------
   ! file open
@@ -44,9 +47,10 @@ subroutine read_input(Fp)
   NRHVAR=0; NREVAR=0; NRVVAR=0; NRQVAR=0
   NRINDEX=0
   do i=1,NR_PHYSA
-     read(nin,*) PHYSA(i),DTYPE(i),NR_COMP(i)
-!!!     write(*,7001) PHYSA(i),DTYPE(i),NR_COMP(i)
-7001 format('read_input: PHYSICS ATTRIBUTE, DTYPE, NR OF COMP = ', &
+     read(nin,*) PHYSA(i),dtype,NR_COMP(i)
+     D_TYPE(i) = I_DType(dtype)
+!!!     write(*,7001) PHYSA(i),S_DType(D_TYPE(i)),NR_COMP(i)
+7001 format('read_input: PHYSICS ATTRIBUTE, D_TYPE, NR OF COMP = ', &
           a5,2x,a6,i3)
   !
   !  default setting for each attribute is `active'
@@ -58,22 +62,21 @@ subroutine read_input(Fp)
   !  default setting for each attribute is not a homogeneous Dirichlet variable
      PHYSAd(i) = .false.
   !
-     call locate_char(DTYPE(i),type_array,4, loc(i))
-     select case(DTYPE(i))
+     select case(D_TYPE(i))
         !  .....H^1
-     case('contin')
+     case(CONTIN)
         ADRES(i) = NRHVAR
         NRHVAR = NRHVAR + NR_COMP(i)
         !  .....H(curl)
-     case('tangen')
+     case(TANGEN)
         ADRES(i) = NREVAR
         NREVAR = NREVAR + NR_COMP(i)
         !  .....H(div)
-     case('normal')
+     case(NORMAL)
         ADRES(i) = NRVVAR
         NRVVAR = NRVVAR + NR_COMP(i)
         !  .....L^2
-     case('discon')
+     case(DISCON)
         ADRES(i) = NRQVAR
         NRQVAR = NRQVAR + NR_COMP(i)
      end select
@@ -87,8 +90,8 @@ IF (.NOT. QUIET_MODE) write(*,*) '-- Physics --'
 IF (.NOT. QUIET_MODE) write(*,9999) MAXNODS
 9999 format(' MAXNODS = ',i12)
   do i=1, NR_PHYSA
-IF (.NOT. QUIET_MODE) write(*,1003) PHYSA(i),DTYPE(i),NR_COMP(i)
-1003 format(' PHYSA,DTYPE,NR_COMP = ',a5,2x,a6,2x,i1)
+IF (.NOT. QUIET_MODE) write(*,1003) PHYSA(i),S_DType(D_TYPE(i)),NR_COMP(i)
+1003 format(' PHYSA,D_TYPE,NR_COMP = ',a5,2x,a6,2x,i1)
   enddo
 IF (.NOT. QUIET_MODE) write(*,*)''
 
@@ -96,12 +99,12 @@ IF (.NOT. QUIET_MODE) write(*,*)''
   !  check the order in which the attributes have been defined
   do i=1,NR_PHYSA
      if (i.ne.NR_PHYSA) then
-        if (loc(i+1).lt.loc(i)) then
+        if (D_TYPE(i+1).lt.D_TYPE(i)) then
            write(*,6001); stop 1
         endif
      endif
      if (i.ne.1) then
-        if (loc(i-1).gt.loc(i)) then
+        if (D_TYPE(i-1).gt.D_TYPE(i)) then
            write(*,6001); stop 2
         endif
      endif
@@ -117,22 +120,24 @@ IF (.NOT. QUIET_MODE) write(*,*)''
      call decod(i,2,NR_PHYSA, narray)
      do j=1,NR_PHYSA
         if (narray(j).eq.1) then
-           select case(DTYPE(j))
-           case('contin')
+           select case(D_TYPE(j))
+           case(CONTIN)
               NREQNH(i) = NREQNH(i) + NR_COMP(j)
-           case('tangen')
+           case(TANGEN)
               NREQNE(i) = NREQNE(i) + NR_COMP(j)
-           case('normal')
+           case(NORMAL)
               NREQNV(i) = NREQNV(i) + NR_COMP(j)
-           case('discon')
+           case(DISCON)
               NREQNQ(i) = NREQNQ(i) + NR_COMP(j)
            end select
         endif
      enddo
+#if DEBUG_MODE
      if (iprint.eq.1) then
        write(*,9998)i,NREQNH(i),NREQNE(i),NREQNV(i),NREQNQ(i)
 9998   format(' Icase,NREQNH,NREQNE,NREQNV,NREQNQ = ',5(i2,2x))
      endif
+#endif
   enddo
 
 end subroutine read_input

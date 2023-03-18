@@ -31,7 +31,8 @@ c
       use GMP
       use control
 c
-#include "syscom.blk"
+c  ...removed syscom (declare variables)
+      implicit none
 c
       dimension List_curves(Nrcurves),Rn(3),Acoeff(3,3)
 c

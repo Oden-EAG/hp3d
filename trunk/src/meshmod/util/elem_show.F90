@@ -1,3 +1,5 @@
+#if DEBUG_MODE
+
 !> @brief     print nodal connectivity
 !!
 !! @param[in] Mdle - middle node
@@ -90,3 +92,4 @@ subroutine elem_show_var2(Mdle,Ntype,Nodesl,Norientl)
 !
 end subroutine elem_show_var2
 
+#endif

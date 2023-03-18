@@ -106,7 +106,8 @@
   logical :: is_homD
 !
 #if DEBUG_MODE
-  integer :: iprint = 0
+  integer :: iprint
+  iprint=0
 #endif
 !
 !-----------------------------------------------------------------------
@@ -134,7 +135,7 @@
                 ndofH_face,ndofE_face,ndofV_face,ndofQ_face)
 !
 ! check if a homogeneous Dirichlet node
-  call homogenD('contin',Icase,Bcond, is_homD,ncase,ibcnd)
+  call homogenD(CONTIN,Icase,Bcond, is_homD,ncase,ibcnd)
   if (is_homD) then
     zuH = ZERO
     go to 100
@@ -366,10 +367,10 @@
             if (ncase(i).eq.1) ic=ic+1
 !
 !  .........select the discretization type
-            select case(DTYPE(i))
+            select case(D_TYPE(i))
 !
 !  .........H1 component
-            case('contin')
+            case(CONTIN)
 !
 !  ...........update global counter
               ivarH = ivarH + 1

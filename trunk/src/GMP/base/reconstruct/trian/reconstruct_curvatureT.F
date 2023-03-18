@@ -4,7 +4,7 @@ c   routine name       - reconstruct_curvature
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - May 10
+c   latest revision    - May 2023
 c
 c   purpose            - given a patch of elements surrounding a point
 c                        with a normal vector, routine reconstructs
@@ -33,32 +33,37 @@ c
       use GMP
       use control
 c
-#include "syscom.blk"
+      implicit none
 c
-      dimension List_curves(Nrcurves),Rn(3),Acoeff(3,3)
+      integer :: Np,Nrcurves,Idec
+      integer :: List_curves(Nrcurves)
+      real(8) :: Rn(3),Acoeff(3,3)
 c
 c  ...points to fit (use large number to possibly accomdate fine grid)
       integer, parameter :: n_cur_max = 700
-      dimension xp(3,n_cur_max),weight(n_cur_max)
+      real(8) :: xp(3,n_cur_max),weight(n_cur_max)
 c
 c  ...matrices for a system of linear equations
-      dimension aa(6,6),bb(6,3),cc(3,6),dd(3,3),uu(6),aux(6,3),ipiv(6)
+      real(8) :: aa(6,6),bb(6,3),cc(3,6),dd(3,3),uu(6),aux(6,3)
+      integer :: ipiv(6)
 c
 c  ...work space
-      dimension eigen(3),work(37),iwork(18),rnw(3),temp(3)
-c     dimension aGauss(3,3)
+      real(8) :: eigen(3),work(37),rnw(3),temp(3)
+c     real(8) :: aGauss(3,3)
+      integer :: iwork(18)
 c
-      dimension itrian(10)
-
+      integer :: itrian(10)
+c
+      real(8) :: ccc,ddd,diff,dist,dmin,dnew,fmin,s,s1,scale,sign
+      integer :: i,ibest,ic,ii,info,ifine_grid,it,iv,ivmin,j,jj
+      integer :: k,l,lab,nc,nc1,nc2,np1,nrs,nr_trian,nrcurves_save
+c
       real(8), parameter :: eps = 0.01d0
 c
+      integer :: iprint
 c-----------------------------------------------------------------------
 c
-      if (Np.eq.1578) then
-        iprint=0
-      else
-        iprint=0
-      endif
+      iprint=0
 c
       if (iprint.eq.1) then
         write(*,7006) Np,Nrcurves,Rn
@@ -633,4 +638,4 @@ c  .....restore original Nrcurves
       endif
 c
 c
-      end
+      end subroutine reconstruct_curvature

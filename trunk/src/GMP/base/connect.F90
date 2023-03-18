@@ -1,26 +1,31 @@
 !----------------------------------------------------------------------
-!> Purpose : reconstruction of complete connectivities from partial
-!!           connectivities used in the new format
-!!
-!! @revision Nov 12
+!> @brief Reconstruction of complete connectivities from partial
+!!        connectivities used in the new format
+!> @date Mar 2023
 !----------------------------------------------------------------------
-!
 subroutine connect
 !
       use GMP
       use element_data
-#include "syscom.blk"
+      implicit none
 !
       integer, dimension(:,:), pointer :: iwork
 !
 !  ...maximum anticipated number of curves attached to a point
-      parameter (maxnrcurv=100)
+      integer, parameter :: maxnrcurv=100
 !  ...maximum anticipated number of figures attached to a point
-      parameter (maxnrfig=100)
+      integer, parameter :: maxnrfig=100
+!
+      integer :: i1,i2,i3,i4,ic,ii,j,j1,j2,j3,j4,k,k1,k2,lab
+      integer :: nc,nc1,nc2,nc3,nc4,nh,nick,nick1,nick2,np,np1,np2
+      integer :: nr,nt,npyr,ntet,nrcurv,nrfig,nrfig3,nrfig4,nvoid
 !
 !  ...an auxiliary list
-      dimension listaux(20)
+      integer :: listaux(20)
+!
+      integer :: iprint
       iprint=0
+!
       if (iprint.eq.1) then
         write(*,*) 'connect: DEBUGGING...'
       endif
@@ -184,7 +189,7 @@ subroutine connect
 !  .....loop through rectangle edges
         do j=1,4
 !
-          nc = iabs(RECTANGLES(nr)%EdgeNo(j))
+          nc = abs(RECTANGLES(nr)%EdgeNo(j))
 !
 !  .......check if the rectangle is on the list of figures
 !         connected to the curve and add it to the list if it is not
@@ -209,7 +214,7 @@ subroutine connect
 !  .....loop through triangle edges
         do j=1,3
 !
-          nc = iabs(TRIANGLES(nt)%EdgeNo(j))
+          nc = abs(TRIANGLES(nt)%EdgeNo(j))
 !
 !  .......check if the triangle is on the list of figures
 !         connected to the curve and add it to the list if it is not
@@ -293,16 +298,16 @@ subroutine connect
           j4 = BRICK_FACE_TO_EDGE(4,j)
 !
 !  .......the corresponding edge curves numbers are
-          nc1 = iabs(HEXAS(nh)%EdgeNo(j1))
-          nc2 = iabs(HEXAS(nh)%EdgeNo(j2))
-          nc3 = iabs(HEXAS(nh)%EdgeNo(j3))
-          nc4 = iabs(HEXAS(nh)%EdgeNo(j4))
+          nc1 = abs(HEXAS(nh)%EdgeNo(j1))
+          nc2 = abs(HEXAS(nh)%EdgeNo(j2))
+          nc3 = abs(HEXAS(nh)%EdgeNo(j3))
+          nc4 = abs(HEXAS(nh)%EdgeNo(j4))
 !
 !  .......look for a rectangle connected to the first two curves
           do i1=1,CURVES(nc1)%NrFig
-            nick1 = iabs(CURVES(nc1)%FigNo(i1))
+            nick1 = abs(CURVES(nc1)%FigNo(i1))
             do i2=1,CURVES(nc2)%NrFig
-              nick2 = iabs(CURVES(nc2)%FigNo(i2))
+              nick2 = abs(CURVES(nc2)%FigNo(i2))
               if (nick1.eq.nick2) then
                 go to 40
               endif
@@ -334,10 +339,10 @@ subroutine connect
 !  .......determine the orientation of the rectangular face
           k1=0; k2=0
           do k=1,4
-            if (iabs(RECTANGLES(nr)%EdgeNo(k)).eq.nc1) then
+            if (abs(RECTANGLES(nr)%EdgeNo(k)).eq.nc1) then
               k1=k
             endif
-            if (iabs(RECTANGLES(nr)%EdgeNo(k)).eq.nc4) then
+            if (abs(RECTANGLES(nr)%EdgeNo(k)).eq.nc4) then
               k2=k
             endif
           enddo
@@ -435,16 +440,16 @@ subroutine connect
           j4 = PRISM_FACE_TO_EDGE(4,j)
 !
 !  .......the corresponding edge curves numbers are
-          nc1 = iabs(PRISMS(np)%EdgeNo(j1))
-          nc2 = iabs(PRISMS(np)%EdgeNo(j2))
-          nc3 = iabs(PRISMS(np)%EdgeNo(j3))
-          nc4 = iabs(PRISMS(np)%EdgeNo(j4))
+          nc1 = abs(PRISMS(np)%EdgeNo(j1))
+          nc2 = abs(PRISMS(np)%EdgeNo(j2))
+          nc3 = abs(PRISMS(np)%EdgeNo(j3))
+          nc4 = abs(PRISMS(np)%EdgeNo(j4))
 !
 !  .......look for a figure connected to the first two curves
           do i1=1,CURVES(nc1)%NrFig
-            nick1 = iabs(CURVES(nc1)%FigNo(i1))
+            nick1 = abs(CURVES(nc1)%FigNo(i1))
             do i2=1,CURVES(nc2)%NrFig
-              nick2 = iabs(CURVES(nc2)%FigNo(i2))
+              nick2 = abs(CURVES(nc2)%FigNo(i2))
               if (nick1.eq.nick2) then
                 go to 70
               endif
@@ -482,10 +487,10 @@ subroutine connect
 !  .........determine the orientation of the triangular face
             k1=0; k2=0
             do k=1,3
-              if (iabs(TRIANGLES(nt)%EdgeNo(k)).eq.nc1) then
+              if (abs(TRIANGLES(nt)%EdgeNo(k)).eq.nc1) then
                 k1=k
               endif
-              if (iabs(TRIANGLES(nt)%EdgeNo(k)).eq.nc2) then
+              if (abs(TRIANGLES(nt)%EdgeNo(k)).eq.nc2) then
                 k2=k
               endif
             enddo
@@ -513,10 +518,10 @@ subroutine connect
 !  .........determine the orientation of the rectangular face
             k1=0; k2=0
             do k=1,4
-              if (iabs(RECTANGLES(nr)%EdgeNo(k)).eq.nc1) then
+              if (abs(RECTANGLES(nr)%EdgeNo(k)).eq.nc1) then
                 k1=k
               endif
-              if (iabs(RECTANGLES(nr)%EdgeNo(k)).eq.nc4) then
+              if (abs(RECTANGLES(nr)%EdgeNo(k)).eq.nc4) then
                 k2=k
               endif
             enddo
@@ -610,15 +615,15 @@ subroutine connect
           j3 = TETRA_FACE_TO_EDGE(3,j)
 !
 !  .......the corresponding edge curves numbers are
-          nc1 = iabs(TETRAS(ntet)%EdgeNo(j1))
-          nc2 = iabs(TETRAS(ntet)%EdgeNo(j2))
-          nc3 = iabs(TETRAS(ntet)%EdgeNo(j3))
+          nc1 = abs(TETRAS(ntet)%EdgeNo(j1))
+          nc2 = abs(TETRAS(ntet)%EdgeNo(j2))
+          nc3 = abs(TETRAS(ntet)%EdgeNo(j3))
 !
 !  .......look for a triangle connected to the first two curves
           do i1=1,CURVES(nc1)%NrFig
-            nick1 = iabs(CURVES(nc1)%FigNo(i1))
+            nick1 = abs(CURVES(nc1)%FigNo(i1))
             do i2=1,CURVES(nc2)%NrFig
-              nick2 = iabs(CURVES(nc2)%FigNo(i2))
+              nick2 = abs(CURVES(nc2)%FigNo(i2))
               if (nick1.eq.nick2) then
                 go to 90
               endif
@@ -645,10 +650,10 @@ subroutine connect
 !  .......determine the orientation of the triangular face
           k1=0; k2=0
           do k=1,3
-            if (iabs(TRIANGLES(nt)%EdgeNo(k)).eq.nc1) then
+            if (abs(TRIANGLES(nt)%EdgeNo(k)).eq.nc1) then
               k1=k
             endif
-            if (iabs(TRIANGLES(nt)%EdgeNo(k)).eq.nc2) then
+            if (abs(TRIANGLES(nt)%EdgeNo(k)).eq.nc2) then
               k2=k
             endif
           enddo
@@ -744,16 +749,16 @@ subroutine connect
           j4 = PYRAM_FACE_TO_EDGE(4,j)
 !
 !  .......the corresponding edge curves numbers are
-          nc1 = iabs(PYRAMIDS(npyr)%EdgeNo(j1))
-          nc2 = iabs(PYRAMIDS(npyr)%EdgeNo(j2))
-          nc3 = iabs(PYRAMIDS(npyr)%EdgeNo(j3))
-          nc4 = iabs(PYRAMIDS(npyr)%EdgeNo(j4))
+          nc1 = abs(PYRAMIDS(npyr)%EdgeNo(j1))
+          nc2 = abs(PYRAMIDS(npyr)%EdgeNo(j2))
+          nc3 = abs(PYRAMIDS(npyr)%EdgeNo(j3))
+          nc4 = abs(PYRAMIDS(npyr)%EdgeNo(j4))
 !
 !  .......look for a figure connected to the first two curves
           do i1=1,CURVES(nc1)%NrFig
-            nick1 = iabs(CURVES(nc1)%FigNo(i1))
+            nick1 = abs(CURVES(nc1)%FigNo(i1))
             do i2=1,CURVES(nc2)%NrFig
-              nick2 = iabs(CURVES(nc2)%FigNo(i2))
+              nick2 = abs(CURVES(nc2)%FigNo(i2))
               if (nick1.eq.nick2) then
                 go to 170
               endif
@@ -794,10 +799,10 @@ subroutine connect
 !  .........determine the orientation of the rectangular face
             k1=0; k2=0
             do k=1,4
-              if (iabs(RECTANGLES(nr)%EdgeNo(k)).eq.nc1) then
+              if (abs(RECTANGLES(nr)%EdgeNo(k)).eq.nc1) then
                 k1=k
               endif
-              if (iabs(RECTANGLES(nr)%EdgeNo(k)).eq.nc4) then
+              if (abs(RECTANGLES(nr)%EdgeNo(k)).eq.nc4) then
                 k2=k
               endif
             enddo
@@ -829,10 +834,10 @@ subroutine connect
 !  .........determine the orientation of the triangular face
             k1=0; k2=0
             do k=1,3
-              if (iabs(TRIANGLES(nt)%EdgeNo(k)).eq.nc1) then
+              if (abs(TRIANGLES(nt)%EdgeNo(k)).eq.nc1) then
                 k1=k
               endif
-              if (iabs(TRIANGLES(nt)%EdgeNo(k)).eq.nc2) then
+              if (abs(TRIANGLES(nt)%EdgeNo(k)).eq.nc2) then
                 k2=k
               endif
             enddo
@@ -1039,15 +1044,15 @@ end subroutine connect
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : deletes connectivity info for GMP objects
-!!
-!! @revision Nov 12
+!> @brief Deletes connectivity info for GMP objects
+!> @date Mar 2023
 !----------------------------------------------------------------------
-!
 subroutine clean_GMP
 !
       use GMP
-#include "syscom.blk"
+      implicit none
+!
+      integer :: np,nc,nt,nr,nh,ntet,npri,npyr
 !
       do np=1,NRPOINT
         POINTS(np)%NrCurv=0

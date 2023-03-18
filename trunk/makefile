@@ -8,19 +8,21 @@ HP3D makefile targets:
   make -j
     Build and install the library in parallel
   make clean
-    Clean all object and library files
+    Clean object and library files
   make check
-    Compile and run one test problem (TODO)
+    Compile and run one test problem
   make test
-    Compile and run test suite (TODO)
+    Compile and run test suite
   make problems
     Compile examples in problems directory
   make all
-    Build/install the library and compile problems
+    Build/install the library, compile problems, and run tests
+  make clean-test
+    Clean test directory
   make clean-problems
     Clean problems directory
   make clean-all
-    Clean object/library files and problems directory
+    Clean object/library files, problems and test directory
 
   Advanced usage:
     make lib
@@ -56,14 +58,14 @@ HP3D_GMPNAME   = libhp3d_gmp.a
 # Complex version of library
 ifeq ($(COMPLEX),1)
 INSTALL_PATH   = ./complex
-CCINCS         = -I./$(SRC_PATH)/common/frontal/complex
+CCINCS         =
 FRONTAL_PATH   = ./$(SRC_PATH)/solver/frontal/base/complex
 endif
 #-------------------------------------------------
 # Real version of library
 ifeq ($(COMPLEX),0)
 INSTALL_PATH   = ./real
-CCINCS         = -I./$(SRC_PATH)/common/frontal/real
+CCINCS         =
 FRONTAL_PATH   = ./$(SRC_PATH)/solver/frontal/base/real
 endif
 #-------------------------------------------------
@@ -205,19 +207,21 @@ endif
 .PHONY : check
 
 check: lib
-	@echo "TODO: Checking the hp3D library."
+	@echo "Checking the hp3D library."
+	@(cd test ; $(MAKE) one run ; cd ..);
 	@(cd problems/MPI_TEST/TEST ; $(MAKE) ; cd ../..);
 
 #-------------------------------------------------
 .PHONY : test
 
 test: lib
-	@echo "TODO: Testing the hp3D library."
+	@echo "Testing the hp3D library."
+	@(cd test ; $(MAKE) all ; cd ..);
 
 #-------------------------------------------------
 .PHONY : all
 
-all: problems
+all: test problems
 
 #-------------------------------------------------
 .PHONY : dummy
@@ -319,6 +323,13 @@ clean:
 	@rm -f *.mk *.old *.mod
 
 #-------------------------------------------------
+.PHONY : clean-test
+
+clean-test:
+	@echo "Clean 'test' directory."
+	@(cd test ; $(MAKE) clean; cd ..);
+
+#-------------------------------------------------
 .PHONY : clean-problems
 
 clean-problems:
@@ -337,4 +348,4 @@ endif
 #-------------------------------------------------
 .PHONY : clean-all
 
-clean-all: clean clean-problems
+clean-all: clean clean-test clean-problems

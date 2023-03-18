@@ -6,10 +6,10 @@ subroutine exec_job_heat
    use commonParam
    use control
    use data_structure3D
-   use MPI           , only: MPI_COMM_WORLD
+   use MPI           , only: MPI_COMM_WORLD,MPI_Wtime
    use mpi_param     , only: RANK,ROOT,NUM_PROCS
    use par_mesh      , only: EXCHANGE_DOF,distr_mesh
-   use zoltan_wrapper, only: zoltan_w_set_lb,zoltan_w_eval
+   use zoltan_wrapper
 !
    implicit none
 !
@@ -18,7 +18,7 @@ subroutine exec_job_heat
    logical :: ires
 !
    integer :: i,ierr,numPts,fld
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 !----------------------------------------------------------------------
 !
@@ -42,7 +42,7 @@ subroutine exec_job_heat
 !..distribute mesh initially
    call distr_mesh
 !..set Zoltan partitioner
-   call zoltan_w_set_lb(0)
+   call zoltan_w_set_lb(ZOLTAN_LB_DEFAULT)
 !
    do i=1,IMAX
 !
@@ -67,7 +67,7 @@ subroutine exec_job_heat
       if (NUM_PROCS .eq. 1) goto 30
 !
       if (i .eq. IMAX-3) then
-         call zoltan_w_set_lb(7)
+         call zoltan_w_set_lb(ZOLTAN_LB_FIBER)
       elseif (i .gt. IMAX-3) then
          goto 30
       endif

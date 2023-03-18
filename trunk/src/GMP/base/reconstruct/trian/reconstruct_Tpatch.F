@@ -4,7 +4,7 @@ c   routine name       - reconstruct_patch
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Mar 10
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine solves a patch problem determining
 c                        second derivatives and derivatives of the
@@ -37,26 +37,29 @@ c
       use GMP
       use control
 c
-#include "syscom.blk"
-      common /crhsub/ iprint_rhsub
-      common /ctri/ iprint_tri
+      implicit none
 c
-      dimension List_curves(Nrcurves),List_trian(1:3,Nrcurves),
-     .          Rnorm(3)
+      integer :: Np,Nrcurves,Ipatch
+      integer :: List_curves(Nrcurves),List_trian(1:3,Nrcurves)
+      real(8) :: Rnorm(3)
 c
 c  ...list of tangent vectors and their derivatives
-      parameter(maxc=10)
-      dimension tangent(1:3,maxc), dtangent(1:3,maxc)
+      integer, parameter :: maxc=10
+      real(8) :: tangent(1:3,maxc),dtangent(1:3,maxc)
 c
 c  ...hesjan of the reconstructed surface at the point
-      dimension acoeff(3,3)
+      real(8) :: acoeff(3,3)
 c
 c  ...work space
-      dimension temp(3)
+      real(8) :: temp(3)
 c
       integer, external :: imod
 ccc      imod(j,mod) = j-(j-1)/mod*mod
 c
+      integer :: i,i1,io,iv,k,l,nc,nc1,nr,nr_trian
+      real(8) :: dd,s
+c
+      integer :: iprint
 c************************************************************************
 c
       iprint=0
@@ -187,4 +190,4 @@ c  ...end of loop over patch triangles
       enddo
 c
 c
-      end
+      end subroutine reconstruct_patch

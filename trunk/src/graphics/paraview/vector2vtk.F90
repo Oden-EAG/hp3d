@@ -16,10 +16,10 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
 !
    use data_structure3D
    use element_data
-   use physics          , only: DTYPE,ADRES
+   use physics
    use upscale
    use paraview
-   use MPI              , only: MPI_COMM_WORLD,MPI_SUM,MPI_INTEGER
+   use MPI              , only: MPI_COMM_WORLD,MPI_SUM,MPI_INTEGER,MPI_Wtime
    use mpi_param        , only: RANK,ROOT,NUM_PROCS
    use par_mesh         , only: DISTRIBUTED,HOST_MESH
 !
@@ -68,10 +68,10 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
    Ic=0
 !
 !..decode
-   ireal = iabs(Idx)/Idx
-   iload = iabs(Idx)/100
-   iattr = iabs(Idx) - iload*100 ; iattr=iattr/10
-   icomp = iabs(Idx) - iload*100 - iattr*10
+   ireal = abs(Idx)/Idx
+   iload = abs(Idx)/100
+   iattr = abs(Idx) - iload*100 ; iattr=iattr/10
+   icomp = abs(Idx) - iload*100 - iattr*10
 !
 !..address of 1st component for the attribute
    ibeg=ADRES(iattr)
@@ -138,10 +138,10 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
                       zsolH,zgradH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
 !
 !     ...approximation space
-         select case(DTYPE(iattr))
+         select case(D_TYPE(iattr))
 !
 !        -- H^1 -- (FOR GRADIENT INFO)
-         case('contin')
+         case(CONTIN)
             isol = (iload-1)*NRHVAR + ibeg + icomp
 !
 !        ...REAL part
@@ -157,7 +157,7 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
             endif
 !
 !        -- H(curl) --
-         case('tangen')
+         case(TANGEN)
             isol = (iload-1)*NREVAR + ibeg + icomp
 !
 !        ...REAL part
@@ -173,7 +173,7 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
             endif
 !
 !        -- H(div) --
-         case('normal')
+         case(NORMAL)
             isol = (iload-1)*NRVVAR + ibeg + icomp
 !
 !        ...REAL part

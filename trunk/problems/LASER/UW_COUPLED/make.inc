@@ -35,7 +35,6 @@ SRC_LASER = \
         exec_job_heat.F90 \
         exec_job_nl.F90 \
         exec_job_coupled.F90 \
-        fake.F90 \
         getf.F90 \
         finalize.F90 \
         initialize.F90 \

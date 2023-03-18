@@ -4,7 +4,7 @@ c   routine name       - input_RECONSTRUCT
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Feb 11
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine reads in geometry in the RECONSTRUCT
 c                        format:
@@ -42,7 +42,7 @@ c
       use element_data
       use pml
 c
-#include "syscom.blk"
+      implicit none
 c
       integer, parameter          :: nin = 15
       character(len=*),intent(in) :: Fp
@@ -53,8 +53,8 @@ c
 c  ...number of tets connected to a point (temporary)
       integer, dimension(:),   pointer :: point_nrtets
 c
-      integer, dimension(2,20) :: list
-      integer, dimension(3)    :: nvert_aux
+      integer :: list(2,20)
+      integer :: nvert_aux(3)
 c     for i-th block on the list
 c       list(1,i) = block connected to an edge
 c       list(2,i) = the corresponding edge number
@@ -63,15 +63,23 @@ c       list(1,i) = block connected to a face
 c       list(2,i) = the corresponding face number
 c
 c     nvert_aux - vertices for a surface triangle
-      character(10) surfstype(10), surfrtype(10)
+      character :: surfstype(10), surfrtype(10)
 c
 c  ...list of surfaces containing a curve
-      integer lists(10)
+      integer :: lists(10)
 c
 c  ...workspace
-      dimension rdata_save(3),rpos(3)
+      real(8) :: rdata_save(3),rpos(3)
+c
+      integer :: i,ibl,ie,if,iflag,ihead_flag,ii,is,itr,its,itsurf
+      integer :: iv,iv1,iv2,iv3,ive,ivf,je,jf,jj,jv,k,kv1,l,lab
+      integer :: mptet,nbl,nc,nf,nflag,nick,nn,no_surface_triangles
+      integer :: nos,np,np1,np2,np3
+      integer :: npri,npyr,nr,nrbl,nrtets,ns,nt,ntet,ntet1,num
+      real(8) :: r1,r2,r3,rsum
 c---------------------------------------------------------------------
 c
+      integer :: iprint
       iprint=0
 c
 c  ...check user defined parameters NDIM and MANDIM
@@ -715,8 +723,11 @@ c
 !  IF NEEDED, GEOMETRY CUSTOMIZATION MUST BE DONE HERE                 |
 !=======================================================================
 c
-      call customize_geometry
-      write(*,*) 'GMP: customization'
+c///////////////////////////////////////////////////////////////////////
+c  ...if needed, a geometry customization routine could be called HERE
+c     call customize_geometry
+c     write(*,*) 'GMP: customization'
+c///////////////////////////////////////////////////////////////////////
 c-----------------------------------------------------------------------
 c
 c  STEP 9: complete GMP connectivities
@@ -736,7 +747,7 @@ c       surface triangles adjacent to the curve segment
 c
 c  .....loop through figures connected to the curve
         do if=1,CURVES(nc)%NrFig
-          nick = iabs(CURVES(nc)%FigNo(if))
+          nick = abs(CURVES(nc)%FigNo(if))
           call decode(nick, nf,lab)
           select case(lab)
 c
@@ -844,7 +855,7 @@ c
         if (TRIANGLES(nt)%Type.eq.'PlaneTri') then
           nflag=0
           do ie=1,3
-            nc = iabs(TRIANGLES(nt)%EdgeNo(ie))
+            nc = abs(TRIANGLES(nt)%EdgeNo(ie))
             if (CURVES(nc)%Type.ne.'Seglin') nflag=1
           enddo
           if (nflag.eq.1) TRIANGLES(nt)%Type = 'TransTri'
@@ -855,7 +866,7 @@ c
         if (RECTANGLES(nr)%Type.eq.'BilQua') then
           nflag=0
           do ie=1,4
-            nc = iabs(RECTANGLES(nr)%EdgeNo(ie))
+            nc = abs(RECTANGLES(nr)%EdgeNo(ie))
             if (CURVES(nc)%Type.ne.'Seglin') nflag=1
           enddo
           if (nflag.eq.1) RECTANGLES(nr)%Type = 'TraQua'
@@ -869,7 +880,7 @@ c
       do ntet=1,NRTETRA
         nflag=0
         do ie=1,6
-          nc = iabs(TETRAS(ntet)%EdgeNo(ie))
+          nc = abs(TETRAS(ntet)%EdgeNo(ie))
           if (CURVES(nc)%Type.ne.'Seglin') nflag=1
         enddo
         do if=1,4
@@ -888,7 +899,7 @@ c
       do npri=1,NRPRISM
         nflag=0
         do ie=1,9
-          nc = iabs(PRISMS(npri)%EdgeNo(ie))
+          nc = abs(PRISMS(npri)%EdgeNo(ie))
           if (CURVES(nc)%Type.ne.'Seglin') nflag=1
         enddo
         do if=1,2
@@ -912,7 +923,7 @@ c
       do npyr=1,NRPYRAM
         nflag=0
         do ie=1,8
-          nc = iabs(PYRAMIDS(npyr)%EdgeNo(ie))
+          nc = abs(PYRAMIDS(npyr)%EdgeNo(ie))
           if (CURVES(nc)%Type.ne.'Seglin') nflag=1
         enddo
         do if=1,1
@@ -947,14 +958,6 @@ c
       write(*,*) 'GMP: Reconstruction done'
 c
       return
-
-
-
-
-
-
-
-
 
 
 c

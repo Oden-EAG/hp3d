@@ -1,6 +1,3 @@
-      subroutine resol (Awrk)
-c
-#include "syscom.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c initiate forward elimination of rhs only,  followed by backsubstitutio
@@ -10,7 +7,7 @@ c
 c Typ Name      Function
 c W   Awrk  : workspace used by the solver (it is cut and passed below)
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -20,19 +17,27 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      subroutine resol (Awrk)
 c
-      dimension Awrk(*)
+      use surfsc1
+      use surfsc2
+c
+      implicit none
+c
+      real(8) :: Awrk(*)
+c
+      real(8) :: dt,t0,tb,tf
+      integer :: ia1,iabf,iabr,iae,iaf,ial,iam,ian
+      integer :: machk,minn,n
 c
       call zecond(t0)
-cwb >
+c
       NNEGP = -1
       NPOSP = -1
 c
       IFU = -1
       IFL = -1
-cwb <
+c
       IERR = 0
       IFB = 0
 c
@@ -222,5 +227,5 @@ c error exit
 c ----------
  9100 continue
 c
-      return
-      end
+c
+      end subroutine resol

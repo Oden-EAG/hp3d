@@ -5,10 +5,10 @@ subroutine exec_job
 !
    use commonParam
    use data_structure3D
-   use MPI           , only: MPI_COMM_WORLD
+   use MPI           , only: MPI_COMM_WORLD,MPI_Wtime
    use mpi_param     , only: RANK,ROOT,NUM_PROCS
    use par_mesh      , only: EXCHANGE_DOF,distr_mesh
-   use zoltan_wrapper, only: zoltan_w_set_lb,zoltan_w_eval
+   use zoltan_wrapper
 !
    implicit none
 !
@@ -17,7 +17,7 @@ subroutine exec_job
    logical :: ires
 !
    integer :: i,ierr,numPts,fld
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 !----------------------------------------------------------------------
 !
@@ -36,7 +36,7 @@ subroutine exec_job
 !..distribute mesh initially
    call distr_mesh
 !..set Zoltan partitioner
-   call zoltan_w_set_lb(0)
+   call zoltan_w_set_lb(ZOLTAN_LB_DEFAULT)
 !
    do i=1,IMAX+JMAX
 !
@@ -69,9 +69,9 @@ subroutine exec_job
 !
 !  ...set partitioner for load balancing, redistributes mesh in 'distr_mesh'
       if (i .eq. IMAX-2) then
-         call zoltan_w_set_lb(7) ! fiber partitioner
+         call zoltan_w_set_lb(ZOLTAN_LB_FIBER) ! fiber partitioner
       elseif (i .gt. IMAX) then
-         !call zoltan_w_set_lb(6) ! graph partitioner
+         !call zoltan_w_set_lb(ZOLTAN_LB_GRAPH) ! graph partitioner
          goto 30 ! NO LOAD BALANCING
       else
          goto 30

@@ -36,7 +36,7 @@ subroutine hexa(No,Eta, X,Dxdeta)
 !
 !  .....check compatibility
         do i=1,12
-          nc=iabs(HEXAS(No)%EdgeNo(i))
+          nc=abs(HEXAS(No)%EdgeNo(i))
           if (CURVES(nc)%Type.ne.'Seglin') then
             write(*,7002) No,i,nc,CURVES(nc)%Type
  7002       format(' hexa: incompatible edge! No,i,nc,type = ',i7,2x,i2,2x,i7,2x,a10)

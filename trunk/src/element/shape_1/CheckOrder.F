@@ -32,18 +32,21 @@ c
 c
       use parameters , only : MODORDER
       use node_types
+      use physics
 c
       implicit none
       integer, intent(in)  :: Ntype
-      character(len=6), intent(in)  :: Dtype
+      integer, intent(in)  :: Dtype
       integer, intent(in)  :: Norder(19)
       integer, intent(in)  :: MaxOrd
       integer, intent(out) :: Nsize(2)
-      integer :: minp,maxp,nps(27),m,f,nordF(2),nordB(3),iprint
+      integer :: minp,maxp,nps(27),m,f,nordF(2),nordB(3)
       logical :: confident
 c
-c  ...intialize printing flag
+#if DEBUG_MODE
+      integer :: iprint
       iprint = 0
+#endif
 c
 c  ...initialize output variable
       Nsize = 0
@@ -114,14 +117,20 @@ c     in the shape element routines.
         case(SEGM)
           m=1
           nps(1:m)=Norder(1:m)
+        case default
+          write(*,*) 'checkorder'; stop
         end select
+c
+#if DEBUG_MODE
 c    ...print this when debugging
         if (iprint.ge.1) then
-          write(*,7006) S_Type(Ntype),Dtype
+          write(*,7006) S_Type(Ntype),S_DType(Dtype)
  7006     format('checkorder: Type, Dtype = ',1A6,2x,1A6)
           write(*,7007) nps(1:m)
  7007     format('checkorder: nps = ',27i2)
         endif
+#endif
+c
 c    ...Find the values of minp and maxp inside nps.
         minp=minval(nps(1:m))
         maxp=maxval(nps(1:m))
@@ -151,61 +160,62 @@ c     Compare these values with module parameters.
       select case(NType)
       case(BRIC,MDLB)
         select case(Dtype)
-        case('contin');Nsize(2)=(maxp+1)**3
-        case('tangen');Nsize(2)=3*maxp*(maxp+1)**2
-        case('normal');Nsize(2)=3*maxp**2*(maxp+1)
-        case('discon');Nsize(2)=maxp**3
+        case(CONTIN);Nsize(2)=(maxp+1)**3
+        case(TANGEN);Nsize(2)=3*maxp*(maxp+1)**2
+        case(NORMAL);Nsize(2)=3*maxp**2*(maxp+1)
+        case(DISCON);Nsize(2)=maxp**3
         end select
       case(TETR,MDLN)
         select case(Dtype)
-        case('contin');Nsize(2)=(maxp+1)*(maxp+2)*(maxp+3)/6
-        case('tangen');Nsize(2)=maxp*(maxp+2)*(maxp+3)/2
-        case('normal');Nsize(2)=maxp*(maxp+1)*(maxp+3)/2
-        case('discon');Nsize(2)=maxp*(maxp+1)*(maxp+2)/6
+        case(CONTIN);Nsize(2)=(maxp+1)*(maxp+2)*(maxp+3)/6
+        case(TANGEN);Nsize(2)=maxp*(maxp+2)*(maxp+3)/2
+        case(NORMAL);Nsize(2)=maxp*(maxp+1)*(maxp+3)/2
+        case(DISCON);Nsize(2)=maxp*(maxp+1)*(maxp+2)/6
         end select
       case(PRIS,MDLP)
         select case(Dtype)
-        case('contin');Nsize(2)=(maxp+1)*(maxp+2)*(maxp+1)/2
-        case('tangen');Nsize(2)=maxp*(maxp+2)*(maxp+1)
-     .                          +(maxp+1)*(maxp+2)*maxp/2
-        case('normal');Nsize(2)=maxp*(maxp+2)*maxp
-     .                          +maxp*(maxp+1)*(maxp+1)/2
-        case('discon');Nsize(2)=maxp*(maxp+1)*maxp/2
+        case(CONTIN);Nsize(2)=(maxp+1)*(maxp+2)*(maxp+1)/2
+        case(TANGEN);Nsize(2)=maxp*(maxp+2)*(maxp+1)
+     .                        +(maxp+1)*(maxp+2)*maxp/2
+        case(NORMAL);Nsize(2)=maxp*(maxp+2)*maxp
+     .                        +maxp*(maxp+1)*(maxp+1)/2
+        case(DISCON);Nsize(2)=maxp*(maxp+1)*maxp/2
         end select
       case(PYRA,MDLD)
         select case(Dtype)
-        case('contin');Nsize(2)=5+8*(maxp-1)+(maxp-1)**2
-     .                          +2*(maxp-2)*(maxp-1)+(maxp-1)**3
-        case('tangen');Nsize(2)=8*maxp+2*maxp*(maxp-1)
-     .                          +4*maxp*(maxp-1)+3*(maxp-1)**2*maxp
-        case('normal');Nsize(2)=maxp**2+2*maxp*(maxp+1)
-     .                          +3*(maxp-1)*maxp**2
-        case('discon');Nsize(2)=maxp**3
+        case(CONTIN);Nsize(2)=5+8*(maxp-1)+(maxp-1)**2
+     .                        +2*(maxp-2)*(maxp-1)+(maxp-1)**3
+        case(TANGEN);Nsize(2)=8*maxp+2*maxp*(maxp-1)
+     .                        +4*maxp*(maxp-1)+3*(maxp-1)**2*maxp
+        case(NORMAL);Nsize(2)=maxp**2+2*maxp*(maxp+1)
+     .                        +3*(maxp-1)*maxp**2
+        case(DISCON);Nsize(2)=maxp**3
         end select
       case(QUAD,MDLQ,RECT)
         select case(Dtype)
-        case('contin');         Nsize(2)=(maxp+1)**2
-        case('tangen','normal');Nsize(2)=2*maxp*(maxp+1)
-        case('discon');         Nsize(2)=maxp**2
+        case(CONTIN);       Nsize(2)=(maxp+1)**2
+        case(TANGEN,NORMAL);Nsize(2)=2*maxp*(maxp+1)
+        case(DISCON);       Nsize(2)=maxp**2
         end select
       case(TRIA,MDLT)
         select case(Dtype)
-        case('contin');         Nsize(2)=(maxp+1)*(maxp+2)/2
-        case('tangen','normal');Nsize(2)=maxp*(maxp+2)
-        case('discon');         Nsize(2)=maxp*(maxp+1)/2
+        case(CONTIN);       Nsize(2)=(maxp+1)*(maxp+2)/2
+        case(TANGEN,NORMAL);Nsize(2)=maxp*(maxp+2)
+        case(DISCON);       Nsize(2)=maxp*(maxp+1)/2
         end select
       case(SEGM)
         select case(Dtype)
-        case('contin');                  Nsize(2)=maxp+1
-        case('tangen','normal','discon');Nsize(2)=maxp
+        case(CONTIN);              Nsize(2)=maxp+1
+        case(TANGEN,NORMAL,DISCON);Nsize(2)=maxp
         end select
       end select
 c
+#if DEBUG_MODE
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7008) Nsize(1),Nsize(2)
  7008   format('checkorder: Nsize(1:2) = ',i2,i5)
       endif
-c
+#endif
 c
       end subroutine checkorder

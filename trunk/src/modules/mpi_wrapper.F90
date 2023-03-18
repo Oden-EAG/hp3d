@@ -49,7 +49,7 @@ module mpi_wrapper
       call MPI_COMM_SIZE (MPI_COMM_WORLD, NUM_PROCS, ierr)
       call mpi_w_handle_err(ierr,'MPI_COMM_SIZE')
 !
-      if (RANK .eq. ROOT) then
+      if (.not. QUIET_MODE .and. RANK .eq. ROOT) then
          write(*,100) 'MPI initialized sucessfully. NUM_PROCS = ',NUM_PROCS
       endif
   100 format(/,A,I4)

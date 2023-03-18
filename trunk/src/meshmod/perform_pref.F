@@ -29,7 +29,8 @@ c
       use data_structure3D
       use element_data
       use constrained_nodes
-#include "syscom.blk"
+c
+      implicit none
 c
       integer, intent(in) :: Nlist
       integer, intent(in) :: List_elem(Nlist), List_nord(Nlist)
@@ -41,7 +42,9 @@ c  ...order for element nodes
       integer :: norder(19)
 c
       integer :: ie,iel,ip,j,icase,nc,mdle,ntype,nrv,nre,nrf
-      integer :: nod,nodp,newp,newph,newpv,nord,nordh,nordv
+      integer :: nod,nodp,newp,newph,newpv,nord,nordh,nordv,nordm
+c
+#if DEBUG_MODE
       integer :: iprint
       iprint=0
 c
@@ -52,6 +55,7 @@ c
  7020   format('perform_pref: List_nord = ',20(/,10i6))
         call pause
       endif
+#endif
 c
 c  ...Step 1: loop over elements from the list and perform the requested
 c     p-refinements
@@ -126,7 +130,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent mid-edge nodes (south,north)
               do ip=1,3,2
-                nodp = iabs(NFACE_CONS(ip,nc))
+                nodp = abs(NFACE_CONS(ip,nc))
                 call enforce_order(nodp, newp)
               enddo
 c
@@ -140,7 +144,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent mid-edge nodes (east,west)
               do ip=2,4,2
-                nodp = iabs(NFACE_CONS(ip,nc))
+                nodp = abs(NFACE_CONS(ip,nc))
                 call enforce_order(nodp, newp)
               enddo
 c
@@ -162,7 +166,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent mid-edge nodes (south,north)
               do ip=1,3,2
-                nodp = iabs(NFACE_CONS(ip,nc))
+                nodp = abs(NFACE_CONS(ip,nc))
                 call enforce_order(nodp, newp)
                 if (Is_inactive(nodp)) then
                   nodp = NODES(nodp)%father
@@ -188,7 +192,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent mid-edge nodes (east,west)
               do ip=2,4,2
-                nodp = iabs(NFACE_CONS(ip,nc))
+                nodp = abs(NFACE_CONS(ip,nc))
                 call enforce_order(nodp, newp)
                 if (Is_inactive(nodp)) then
                   nodp = NODES(nodp)%father
@@ -205,7 +209,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent medg nodes
               do ie=1,3
-                nodp = iabs(NFACE_CONS(ie,nc))
+                nodp = abs(NFACE_CONS(ie,nc))
                 call enforce_order(nodp, newp)
               enddo
 c
@@ -218,7 +222,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent medg nodes
               do ie=1,3
-                nodp = iabs(NFACE_CONS(ie,nc))
+                nodp = abs(NFACE_CONS(ie,nc))
                call enforce_order(nodp, newp)
               enddo
 c
@@ -269,10 +273,12 @@ c
 c  .....the middle node has to be modified
         if (NODES(mdle)%visit.eq.1) then
           call element_middle_node_order(Mdle,norientl,norder, nordm)
+#if DEBUG_MODE
           if (iprint.eq.1) then
             write(*,7050) mdle,nordm
  7050       format('perform_pref: REFINING mdle = ',i6,' new p = ',i3)
           endif
+#endif
           call nodmod(mdle, nordm)
         endif
       enddo

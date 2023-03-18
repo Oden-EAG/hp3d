@@ -1,6 +1,3 @@
-      function loclu (Iin,Jin)
-c
-#include "syscomz.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c function to determine the position in the current front for
@@ -13,7 +10,7 @@ c Typ Name      Function
 c I   Iin : row number into the current front for k(i,j)
 c I   Jin : column number into the current front for k(i,j)
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Feb 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -23,11 +20,17 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc2.blk"
+      function loclu (Iin,Jin)
+c
+      use surfsc2
+      implicit none
+c
+      integer :: loclu
+      integer :: Iin,Jin
+      integer :: ii,jj
 c
       ii = abs(Iin)
       jj = abs(Jin)
       loclu = jj + (ii-1)*NFW
 c
-      return
-      end
+      end function loclu

@@ -23,7 +23,7 @@ c
       T = (Vshape(Iv2)-Vshape(Iv1)+1.d0)*.5d0
       Dtdxi(1:2) = (Dvshape(1:2,Iv2)-Dvshape(1:2,Iv1))*.5d0
 c
-      endsubroutine proj_t2e
+      end subroutine proj_t2e
 c
 c
 c----------------------------------------------------------------------
@@ -62,7 +62,7 @@ c  ...loop over edge vertices
         Dtdxi(1:2) = Dtdxi(1:2) + Dvshape(1:2,iv)
       enddo
 c
-      endsubroutine proj_r2e
+      end subroutine proj_r2e
 c
 c
 c----------------------------------------------------------------------
@@ -90,7 +90,7 @@ c
       T         =( Vshape(    Iv2)- Vshape(    Iv1)+1.d0)*0.5d0
       Dtdxi(1:3)=(Dvshape(1:3,Iv2)-Dvshape(1:3,Iv1)     )*0.5d0
 c
-      endsubroutine proj_n2e
+      end subroutine proj_n2e
 c
 c
 c----------------------------------------------------------------------
@@ -141,7 +141,7 @@ cc 7001   format('proj_n2f: Xi = ',3e12.5,' T = ',2e12.5)
 cc        call pause
 cc      endif
 c
-      endsubroutine proj_n2f
+      end subroutine proj_n2f
 c
 c
 c----------------------------------------------------------------------
@@ -150,7 +150,7 @@ c   routine name       - proj_d2e
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Nov 08
+c   latest revision    - Mar 2023
 c
 c   purpose            - define pyramiD to edge projection used
 c                        for edge to pyramiD extensions
@@ -171,10 +171,12 @@ c----------------------------------------------------------------------
 c
       subroutine proj_d2e(Xi,Ie,Vshap,Dvshap, T,Dtdxi)
 c
-#include "syscom.blk"
+      implicit none
 c
-      dimension Xi(3),Vshap(5),Dvshap(3,5), Dtdxi(3)
+      integer :: Ie,T
+      real(8) :: Xi(3),Vshap(5),Dvshap(3,5),Dtdxi(3)
 c
+      integer :: iv
 c
       select case(Ie)
       case(1,3)
@@ -187,10 +189,10 @@ c
         iv = Ie-4
         T = (Vshap(5) - Vshap(iv) + 1.d0)/2.d0
         Dtdxi(1:3) = (Dvshap(1:3,5) - Dvshap(1:3,iv))/2.d0
-      endselect
+      end select
 c
 c
-      end
+      end subroutine proj_d2e
 c
 c----------------------------------------------------------------------
 c
@@ -198,7 +200,7 @@ c   routine name       - proj_d2f
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Nov 08
+c   latest revision    - Mar 2023
 c
 c   purpose            - define pyramiD to face projection used
 c                        for face to pyramiD extensions
@@ -217,9 +219,10 @@ c----------------------------------------------------------------------
 c
       subroutine proj_d2f(Xi,If, T,Dtdxi)
 c
-#include "syscom.blk"
+      implicit none
 c
-      dimension Xi(3),T(2),Dtdxi(2,3)
+      integer :: If
+      real(8) :: Xi(3),T(2),Dtdxi(2,3)
 c
 c
       T(2) = Xi(3)
@@ -236,7 +239,7 @@ c
       end select
 c
 c
-      end
+      end subroutine proj_d2f
 c
 c
 c----------------------------------------------------------------------
@@ -276,7 +279,7 @@ c  ...loop over face vertices
       enddo
 c
 c
-      endsubroutine proj_b2e
+      end subroutine proj_b2e
 c
 c
 c----------------------------------------------------------------------
@@ -307,4 +310,4 @@ c  ...project on 2nd axis
       call proj_b2e(Iv1,Iv4,Vshape,Dvshape, T(2),Dtdxi(2,1:3))
 c
 c
-      endsubroutine proj_b2f
+      end subroutine proj_b2f

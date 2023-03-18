@@ -125,12 +125,12 @@ subroutine exact_error
 !
 !         skip if the error not calculated
           if (flag(iattr).eq.0) cycle
-          select case(DTYPE(iattr))
+          select case(D_TYPE(iattr))
           !  This is not perfect because it does not remove the fixed DOF from the boundary conditions
-          case('contin'); nrdof_tot = nrdof_tot + ndofH*NR_COMP(iattr)
-          case('tangen'); nrdof_tot = nrdof_tot + ndofE*NR_COMP(iattr)
-          case('normal'); nrdof_tot = nrdof_tot + ndofV*NR_COMP(iattr)
-          case('discon'); nrdof_tot = nrdof_tot + ndofQ*NR_COMP(iattr)
+          case(CONTIN); nrdof_tot = nrdof_tot + ndofH*NR_COMP(iattr)
+          case(TANGEN); nrdof_tot = nrdof_tot + ndofE*NR_COMP(iattr)
+          case(NORMAL); nrdof_tot = nrdof_tot + ndofV*NR_COMP(iattr)
+          case(DISCON); nrdof_tot = nrdof_tot + ndofQ*NR_COMP(iattr)
           end select
         enddo
       enddo

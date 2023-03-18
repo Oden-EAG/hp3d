@@ -13,7 +13,7 @@ OBJ_PATH        = $(OBJ_ROOT)/maindir
 MODULE_PATH     = $(OBJ_PATH)
 
 # Executable name
-EXEC            = test
+EXEC            = test_mpi
 
 # Includes and defs
 CCDEFS          = $(PROB_PP_DEFS)

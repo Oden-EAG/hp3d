@@ -53,6 +53,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    use data_structure3D
    use laserParam
    use commonParam
+   use MPI, only: MPI_Wtime
 !..no implicit statements
    implicit none
 !..declare input/output variables
@@ -257,7 +258,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    real(8), dimension(MAXPP+1,MAXPP+1) :: sH2p,sH3p,dsH2p,dsH3p
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
    integer, dimension(3,3) :: deltak
 !

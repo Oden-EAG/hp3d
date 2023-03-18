@@ -314,6 +314,8 @@ c
         case (MDLB); Ivtk_type = 12
         case (MDLP); Ivtk_type = 13
         case (MDLD); Ivtk_type = 14
+        case default
+          write(*,*) 'Ivtk_type'; stop
       end select
 c
       end function Ivtk_type
@@ -334,6 +336,8 @@ c
         case (MDLB); Ixdmf_type = 9
         case (MDLP); Ixdmf_type = 8
         case (MDLD); Ixdmf_type = 7
+        case default
+          write(*,*) 'Ixdmf_type'; stop
       end select
 c
       end function Ixdmf_type
@@ -535,6 +539,8 @@ c
         n1 = PYRAM_EDGE_TO_VERT(1,Ie);  n2 = PYRAM_EDGE_TO_VERT(2,Ie)
         xi1(1:3) = PYRAM_COORD(1:3,n1); xi2(1:3) = PYRAM_COORD(1:3,n2)
         nvar=3
+      case default
+        write(*,*) 'edge_param'; stop
       end select
 c
       Dxidt(1:nvar) = xi2(1:nvar) - xi1(1:nvar)
@@ -619,6 +625,8 @@ c
           Nsign_param=-1
         case(2,3,4)
           Nsign_param= 1
+        case default
+          write(*,*) 'Nsign_param'; stop
         end select
       case(MDLB,BRIC)
         select case(Iface)
@@ -626,6 +634,8 @@ c
           Nsign_param=-1
         case(2,3,4)
           Nsign_param= 1
+        case default
+          write(*,*) 'Nsign_param'; stop
         end select
       case(MDLN,TETR)
         select case(Iface)
@@ -633,6 +643,8 @@ c
           Nsign_param=-1
         case(2,3)
           Nsign_param= 1
+        case default
+          write(*,*) 'Nsign_param'; stop
         end select
       case(MDLD,PYRA)
         select case(Iface)
@@ -640,7 +652,11 @@ c
           Nsign_param=-1
         case(2,3)
           Nsign_param= 1
+        case default
+          write(*,*) 'Nsign_param'; stop
         end select
+      case default
+        write(*,*) 'Nsign_param'; stop
       end select
 c
       end function Nsign_param
@@ -654,20 +670,26 @@ c
       integer :: Ntype,Iface
 c
       select case(Ntype)
-      case(MDLP,PRIS)
-        select case(Iface)
-          case(1,2);   Face_type = TRIA
-          case(3,4,5); Face_type = RECT
-        end select
-      case(MDLB,BRIC)
-        Face_type = RECT
-      case(MDLN,TETR)
-        Face_type = TRIA
-      case(MDLD,PYRA)
-        select case(Iface)
-          case(1); Face_type = RECT
-          case(2,3,4,5); Face_type = TRIA
-        end select
+        case(MDLP,PRIS)
+          select case(Iface)
+            case(1,2)  ; Face_type = TRIA
+            case(3,4,5); Face_type = RECT
+            case default
+               write(*,*) 'Face_type'; stop
+          end select
+        case(MDLB,BRIC)
+          Face_type = RECT
+        case(MDLN,TETR)
+          Face_type = TRIA
+        case(MDLD,PYRA)
+          select case(Iface)
+            case(1)      ; Face_type = RECT
+            case(2,3,4,5); Face_type = TRIA
+            case default
+               write(*,*) 'Face_type'; stop
+          end select
+        case default
+          write(*,*) 'Face_type'; stop
       end select
 c
       end function Face_type
@@ -1145,6 +1167,9 @@ c$OMP THREADPRIVATE(AUX)
 c$OMP THREADPRIVATE(INITIALIZED)
       integer,       dimension(3) :: iface1,iface2,list
       integer                     :: i,i1,i2,ifound
+#if DEBUG_FLAG
+      integer :: j,iprint=0
+#endif
 c
       if (.NOT.INITIALIZED) then
 c
@@ -1176,13 +1201,15 @@ c
         AUX(i2,i1)=list(1)
       enddo
 c
-cccc  ...printing
-ccc      do i=1,8 ; do j=1,8
-cccc  .....print only relevant entries
-ccc        if (AUX(i,j).eq.0) cycle
-ccc        write(*,1000) i,j,AUX(i,j)
-ccc 1000   format(' iv1,2, face = '2(i1,2x),2x,i1)
-ccc      enddo    ; enddo
+#if DEBUG_FLAG
+c  ...printing
+      do i=1,8 ; do j=1,8
+c  .....print only relevant entries
+        if (AUX(i,j).eq.0) cycle
+        write(*,1000) i,j,AUX(i,j)
+ 1000   format(' iv1,2, face = '2(i1,2x),2x,i1)
+      enddo    ; enddo
+#endif
 c
 c  ...update initialization flag
       INITIALIZED=.TRUE.

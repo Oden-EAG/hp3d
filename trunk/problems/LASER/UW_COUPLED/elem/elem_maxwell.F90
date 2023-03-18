@@ -51,6 +51,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    use data_structure3D
    use laserParam
    use commonParam
+   use MPI, only: MPI_Wtime
 !..no implicit statements
    implicit none
 !..declare input/output variables
@@ -198,7 +199,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    VTYPE, dimension(3,3) :: Jstretch,invJstretch,JJstretch
 !
 !..timer
-!   real(8) :: MPI_Wtime,start_time,end_time
+!   real(8) :: start_time,end_time
 !
 !..for Gram matrix compressed storage format
    integer :: nk

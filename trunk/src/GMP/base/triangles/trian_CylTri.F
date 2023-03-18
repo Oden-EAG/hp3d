@@ -4,7 +4,7 @@ c   routine name       - trian_CylTri
 c
 c-----------------------------------------------------------------------
 c
-c   latest revision    - Dec 15
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine evaluates physical coordinates
 c                        and its derivatives wrt to reference
@@ -24,19 +24,25 @@ c               X      - physical coordinates of the point
 c               Dxdeta - derivatives of the physical coordinates wrt
 c                        to the parameters
 c
-c
 c-----------------------------------------------------------------------
 c
       subroutine trian_CylTri(No,Eta, X,Dxdeta)
 c
       use GMP
-#include "syscom.blk"
 c
-      dimension Eta(2),X(NDIM),Dxdeta(NDIM,2)
+      implicit none
+c
+      integer :: No
+      real(8) :: Eta(2),X(NDIM),Dxdeta(NDIM,2)
 c
 c  ...cylindrical coordinates of the endpoints of the triangle
-      dimension xp(3,3)
+      real(8) :: xp(3,3)
 c
+      integer :: iv,np
+      real(8) :: costhet,dr_deta1,dr_deta2,dthet_deta1,dthet_deta2
+      real(8) :: pi,twopi,r,sinthet,theta
+c
+      integer :: iprint
       iprint=0
 c
       if ((TRIANGLES(No)%Type.ne.'CylTri'.or.(NDIM.ne.3))) then
@@ -92,4 +98,3 @@ c  ...interpolate
 c
 c
       end subroutine trian_CylTri
-

@@ -18,7 +18,6 @@ subroutine soln2vtk(Sname, Sfile, Snick, Scenter, Scomp, Ic)
 !
    use data_structure3D
    use element_data
-   use physics          , only: DTYPE,ADRES
    use upscale
    use paraview
    use MPI              , only: MPI_COMM_WORLD,MPI_SUM,MPI_INTEGER

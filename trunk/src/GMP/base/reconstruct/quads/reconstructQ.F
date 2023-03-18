@@ -4,14 +4,10 @@ c   routine name       - reconstructQ
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Feb 07
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine performs G^1 reconstruction of
 c                        geometry for quads
-c
-c   arguments          - none
 c
 c----------------------------------------------------------------------
 c
@@ -20,10 +16,8 @@ c
       use GMP
       use control
 c
-#include "syscom.blk"
-      common /crhsub/ iprint_rhsub
-      common /ctri/ iprint_tri
-      common /creconstruct_curve/ iprint_reconstruct_curve
+c     ... removed syscom (declare variables)
+      implicit none
 c
 c  ...data for curve reconstruction, points and normals
       dimension x(3,2)
@@ -139,7 +133,7 @@ c  .....collect the data for the curve
           endif
         enddo
         do i=1,CURVES(nc)%NrFig
-          call decode(iabs(CURVES(nc)%FigNo(i)), nr,lab)
+          call decode(abs(CURVES(nc)%FigNo(i)), nr,lab)
           if (lab.eq.2) then
             if (RECTANGLES(nr)%Type.eq.'HermRec') nflag=nflag+1
           endif
@@ -219,11 +213,6 @@ c             vectors and local curvatures
 c
 c  ...loop through all curves
       do nc=1,NRCURVE
-        if (nc.eq.3214) then
-          iprint_reconstruct_curve=1
-        else
-          iprint_reconstruct_curve=0
-        endif
 c
 c  .....skip if not a Hermitian curve
         if (CURVES(nc)%Type.ne.'HermCur') cycle
@@ -251,7 +240,7 @@ c  .....store the second derivatives
           write(*,7039) nc
  7039     format('reconstruct: REVERSED TANGENT FOR nc = ',i6)
           nrfig = CURVES(nc)%NrFig
-          write(*,7040) iabs(CURVES(nc)%FigNo(1:nrfig))/10
+          write(*,7040) abs(CURVES(nc)%FigNo(1:nrfig))/10
  7040     format('             ADJACENT RECTANGLES = ',10i6)
           call pause
         endif
@@ -369,7 +358,7 @@ c  .....loop through connected rectangles
 c
 c  .......loop through edges of the rectangle
           do ie=1,4
-            nc1 = iabs(RECTANGLES(nr)%EdgeNo(ie))
+            nc1 = abs(RECTANGLES(nr)%EdgeNo(ie))
             if (nc1.ne.nc) cycle
             ifound = ifound+1
             nr_save(ifound) = nr; nedg_save(ifound) = ie
@@ -509,7 +498,8 @@ ccc      subroutine collect_tangent(Nc,Np, Tangent,Dtangent)
 cccc
 ccc      use GMP
 cccc
-ccc#include "syscom.blk"
+cccc     ... removed syscom (declare variables)
+ccc          implicit none
 ccc#include "cpmax.blk"
 cccc
 ccc      dimension Tangent(1:3), Dtangent(1:3)
@@ -561,7 +551,8 @@ ccc      subroutine check_edge(Nc, Idec)
 cccc
 ccc      use GMP
 cccc
-ccc#include "syscom.blk"
+ccc      ... removed syscom (declare variables)
+ccc      implicit none
 ccc#include "cpmax.blk"
 cccc
 ccc      dimension x(3),nedg_points(100),nface_points(1000)

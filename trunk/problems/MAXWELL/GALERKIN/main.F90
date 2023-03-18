@@ -22,7 +22,7 @@ program main
    use assembly_sc, only: IPRINT_TIME
    use stc        , only: STORE_STC,HERM_STC
 !
-   use MPI        , only: MPI_COMM_WORLD,MPI_BARRIER, &
+   use MPI        , only: MPI_COMM_WORLD,MPI_BARRIER,MPI_Wtime, &
                           MPI_GET_PROCESSOR_NAME,MPI_MAX_PROCESSOR_NAME
    use mpi_param  , only: ROOT,RANK,NUM_PROCS
    use mpi_wrapper, only: mpi_w_init,mpi_w_finalize
@@ -41,7 +41,7 @@ program main
    character(MPI_MAX_PROCESSOR_NAME) :: pname
 !
 !..timer
-   real(8) :: MPI_Wtime, start_time, end_time
+   real(8) :: start_time, end_time
 !
    character(1024) :: cmd
 !

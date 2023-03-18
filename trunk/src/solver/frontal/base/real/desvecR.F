@@ -1,6 +1,3 @@
-      subroutine desvec (In, Ia, Ibb, Ic, Ntot)
-c
-#include "syscom.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c calculation of nodal destination vectors from nicknames
@@ -24,7 +21,7 @@ c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
 c ARGUMENTS:  (I : input, O : output, IO : input & output, W : workspace
 c
 c Typ Name      Function
-c I   In    array (length numel) containing the number of nodes+multipli
+c I   In    array (length NUMELM) containing the number of nodes+multipli
 c             essentially the number of nicknames/element
 c             **note: this must be pre-built by the calling program
 c
@@ -46,7 +43,7 @@ c
 c W   Ic     temporary workspace for calculating the front elimination
 c..........................................................
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -56,14 +53,20 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
+      subroutine desvec (In, Ia, Ibb, Ic, Ntot)
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      use surfsc1
+      use surfsc2
 c
-      dimension In(*), Ia(*), Ibb(*), Ic(*)
+      implicit none
 c
-c internal function: modr
+      integer :: In(*), Ia(*), Ibb(*), Ic(*)
+      integer :: Ntot
 c
+      integer :: i,j,id,ides,iel,ifrst,inic,ip,ipc,ips
+      integer :: jd,jdes,jdn,jjd,jp,n,ne,nt,ntt
+c
+      integer :: modr
       modr(i,j) = i - (i/j)*j
 c
 c initialize
@@ -270,5 +273,5 @@ c
 c
   100 continue
 c
-      return
-      end
+c
+      end subroutine desvec

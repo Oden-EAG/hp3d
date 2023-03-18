@@ -38,7 +38,7 @@ contains
 
 !> @brief return cell type (XDMF 2) for vis object
 !> @param[in] Etype - Element type
-!> @date  Feb 2023
+!> @date Feb 2023
    integer function ivis_type(Etype)
 !
       integer :: Etype
@@ -48,12 +48,16 @@ contains
             case(TETR,MDLN); ivis_type = 38
             case(PRIS,MDLP); ivis_type = 41
             case(BRIC,MDLB); ivis_type = 50
+            case default
+               write(*,*) 'ivis_type'; stop
          end select
       else
          select case(Etype)
             case(TETR,MDLN); ivis_type = 6
             case(PRIS,MDLP); ivis_type = 8
             case(BRIC,MDLB); ivis_type = 9
+            case default
+               write(*,*) 'ivis_type'; stop
          end select
       endif
 !

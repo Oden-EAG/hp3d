@@ -4,7 +4,7 @@ c   routine name       - grbody
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Feb 10
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine displays 3D FEM grid or solution
 c
@@ -21,12 +21,19 @@ c
       use data_structure3D , ONLY: NRELES
       use graphmod
 c
-#include "syscom.blk"
+      implicit none
 c
-      dimension xcl(3),igv(10),im(2),xmod(2)
+      integer :: Iwind
 c
-      data pi /3.14159265358979312d0/
-      data bigp,bign,small /1.d30,-1.d30,1.d-14/
+      real(8) :: xcl(3),xmod(2)
+      integer :: igv(10),im(2)
+c
+      integer :: i,ibl,iblno,ichoice,idefcol,idom,iel,iflagn,inickbl
+      integer :: input_mode,ivis,mdle,mdlep,nrelem,nrsub1,numlev
+      real(8) :: psi,q,q1,rnsc,theta
+c
+      real(8), parameter :: pi = 3.14159265358979312d0
+      real(8), parameter :: bigp  =  1.d30
 c
 c  ...set initial coordinates of section plane
       CLPL(1)=1.d0
@@ -411,4 +418,4 @@ c
       goto 10
 c
 c
-      end
+      end subroutine grbody

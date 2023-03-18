@@ -140,17 +140,17 @@ subroutine stc_get_nrdof(Mdle, Nrdofi,Nrdofb)
 !  ...skip if variable is deactivated
       if (.not. PHYSAm(i)) cycle
 !
-      select case(DTYPE(i))
-         case('contin') ; Nrdofi(i)=nrdoflHi*NR_COMP(i)
-         case('tangen') ; Nrdofi(i)=nrdoflEi*NR_COMP(i)
-         case('normal') ; Nrdofi(i)=nrdoflVi*NR_COMP(i)
+      select case(D_TYPE(i))
+         case(CONTIN) ; Nrdofi(i)=nrdoflHi*NR_COMP(i)
+         case(TANGEN) ; Nrdofi(i)=nrdoflEi*NR_COMP(i)
+         case(NORMAL) ; Nrdofi(i)=nrdoflVi*NR_COMP(i)
       end select
       if (.not. PHYSAi(i)) then
-         select case(DTYPE(i))
-            case('contin') ; Nrdofb(i)=nrdofHmdl*NR_COMP(i)
-            case('tangen') ; Nrdofb(i)=nrdofEmdl*NR_COMP(i)
-            case('normal') ; Nrdofb(i)=nrdofVmdl*NR_COMP(i)
-            case('discon') ; Nrdofb(i)=nrdofQmdl*NR_COMP(i)
+         select case(D_TYPE(i))
+            case(CONTIN) ; Nrdofb(i)=nrdofHmdl*NR_COMP(i)
+            case(TANGEN) ; Nrdofb(i)=nrdofEmdl*NR_COMP(i)
+            case(NORMAL) ; Nrdofb(i)=nrdofVmdl*NR_COMP(i)
+            case(DISCON) ; Nrdofb(i)=nrdofQmdl*NR_COMP(i)
          end select
       endif
    enddo
@@ -587,12 +587,12 @@ subroutine stc_bwd_wrapper(Iel)
          if (ii .eq. 0) cycle
          k = ii/l
 !     ...copy data
-         select case(DTYPE(j))
-            case('contin')
+         select case(D_TYPE(j))
+            case(CONTIN)
                xi(ni+1:ni+ii,load) = RESHAPE(zdofH(lH+1:lH+l,1:k),(/ii/))
-            case('tangen')
+            case(TANGEN)
                xi(ni+1:ni+ii,load) = RESHAPE(zdofE(lE+1:lE+l,1:k),(/ii/))
-            case('normal')
+            case(NORMAL)
                xi(ni+1:ni+ii,load) = RESHAPE(zdofV(lV+1:lV+l,1:k),(/ii/))
             case default
                write(*,*) 'stc_bwd_wrapper: INCONSISTENCY. stop.'
@@ -601,10 +601,10 @@ subroutine stc_bwd_wrapper(Iel)
 !
          ni = ni+ii
  100     continue
-         select case(DTYPE(j))
-            case('contin'); lH = lH + l
-            case('tangen'); lE = lE + l
-            case('normal'); lV = lV + l
+         select case(D_TYPE(j))
+            case(CONTIN); lH = lH + l
+            case(TANGEN); lE = lE + l
+            case(NORMAL); lV = lV + l
          end select
       enddo
    enddo
@@ -714,7 +714,8 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
    integer :: mvarH,mvarE,mvarV,mvarQ
 !
 #if DEBUG_MODE
-   integer :: iprint=0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !----------------------------------------------------------------------
@@ -772,8 +773,8 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
 !  ...loop over physics variables
       do i=1,NR_PHYSA
          il = NR_COMP(i)
-         if (DTYPE(i) .ne. 'contin')  goto 110
-         if (ncase(i) .eq. 0)         goto 110
+         if (D_TYPE(i) .ne. CONTIN) goto 110
+         if (ncase(i)  .eq. 0)      goto 110
          if ((.not. PHYSAm(i)) .or. PHYSAi(i)) then
             mvarH=mvarH+il; goto 110
          endif
@@ -824,8 +825,8 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
 !  ...loop over physics variables
       do i=1,NR_PHYSA
          il = NR_COMP(i)
-         if (DTYPE(i) .ne. 'tangen')  goto 210
-         if (ncase(i) .eq. 0)         goto 210
+         if (D_TYPE(i) .ne. TANGEN) goto 210
+         if (ncase(i)  .eq. 0)      goto 210
          if ((.not. PHYSAm(i)) .or. PHYSAi(i)) then
             mvarE=mvarE+il; goto 210
          endif
@@ -875,8 +876,8 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
 !  ...loop over physics variables
       do i=1,NR_PHYSA
          il = NR_COMP(i)
-         if (DTYPE(i) .ne. 'normal')  goto 310
-         if (ncase(i) .eq. 0)         goto 310
+         if (D_TYPE(i) .ne. NORMAL) goto 310
+         if (ncase(i)  .eq. 0)      goto 310
          if ((.not. PHYSAm(i)) .or. PHYSAi(i)) then
             mvarV=mvarV+il; goto 310
          endif
@@ -927,8 +928,8 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
 !  ...loop over physics variables
       do i=1,NR_PHYSA
          il = NR_COMP(i)
-         if (DTYPE(i) .ne. 'discon')  goto 410
-         if (ncase(i) .eq. 0)         goto 410
+         if (D_TYPE(i) .ne. DISCON) goto 410
+         if (ncase(i)  .eq. 0)      goto 410
          if (.not. PHYSAm(i)) then
             mvarQ=mvarQ+il; goto 410
          endif
