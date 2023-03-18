@@ -18,7 +18,7 @@ module par_mesh
    use parameters,     only: NRCOMS
    use mpi_param,      only: RANK,ROOT,NUM_PROCS
    use MPI,            only: MPI_COMM_WORLD,MPI_STATUS_IGNORE, &
-                             MPI_SUCCESS,MPI_COMPLEX16,MPI_REAL8
+                             MPI_SUCCESS,MPI_COMPLEX16,MPI_REAL8,MPI_Wtime
    use zoltan_wrapper, only: ZOLTAN_LB,zoltan_w_partition
 !
    implicit none
@@ -50,7 +50,7 @@ subroutine distr_mesh()
    integer :: subd_next(NRELES), nodm(MAXNODM), nodesl(27)
    integer :: iel, inod, iproc, mdle, nod, subd, subd_size
    integer :: nrnodm, nrdof_nod
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 #if DEBUG_MODE
    integer :: iprint

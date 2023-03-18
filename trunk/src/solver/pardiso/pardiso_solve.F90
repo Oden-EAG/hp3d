@@ -23,6 +23,7 @@
 subroutine pardiso_solve(Ia,Ja,A,Type,Nnz,N,Nrhs, B)
 !
    use assembly_sc, only: IPRINT_TIME
+   use MPI        , only: MPI_Wtime
 !
    implicit none
 !
@@ -44,7 +45,7 @@ subroutine pardiso_solve(Ia,Ja,A,Type,Nnz,N,Nrhs, B)
    real(8)         :: tm
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 !------------------------------------------------------------------------
 !

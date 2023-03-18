@@ -18,6 +18,7 @@ subroutine par_solve(mumps)
 !
    use assembly_sc, only: IPRINT_TIME
    use mpi_param  , only: RANK,ROOT
+   use MPI        , only: MPI_Wtime
    use par_mumps
 !
    implicit none
@@ -32,7 +33,7 @@ subroutine par_solve(mumps)
    integer :: ierr,mRANK,mNUM_PROCS
 !
 !..timer
-   real(8) :: MPI_Wtime,time_stamp,start_time
+   real(8) :: time_stamp,start_time
 !
 !..info (verbose output if true)
    logical :: info = .false.

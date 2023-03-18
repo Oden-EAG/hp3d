@@ -8,12 +8,12 @@ subroutine global_href
    use data_structure3D
    use environment , only : QUIET_MODE
    use mpi_param   , only : RANK,ROOT
-   use MPI         , only : MPI_COMM_WORLD
+   use MPI         , only : MPI_COMM_WORLD,MPI_Wtime
 !
    implicit none
 !
    integer :: nr_elem,mdle,i,kref,ierr
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 !..collect elements
    nr_elem = NRELES
@@ -71,7 +71,7 @@ subroutine global_href_aniso(Krefxy,Krefz)
    use data_structure3D
    use environment , only : QUIET_MODE
    use mpi_param   , only : RANK,ROOT
-   use MPI         , only : MPI_COMM_WORLD
+   use MPI         , only : MPI_COMM_WORLD,MPI_Wtime
 !
    implicit none
 !
@@ -79,7 +79,7 @@ subroutine global_href_aniso(Krefxy,Krefz)
 !
    integer :: nr_elem,mdle,i,ierr
    integer :: kref_mdlb,kref_mdlp
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 !..check if valid refinement
    kref_mdlb = Krefxy*110 + Krefz
@@ -146,7 +146,7 @@ subroutine global_href_aniso_bric(Krefx,Krefy,Krefz)
    use data_structure3D
    use environment , only : QUIET_MODE
    use mpi_param   , only : RANK,ROOT
-   use MPI         , only : MPI_COMM_WORLD
+   use MPI         , only : MPI_COMM_WORLD,MPI_Wtime
 !
    implicit none
 !
@@ -154,7 +154,7 @@ subroutine global_href_aniso_bric(Krefx,Krefy,Krefz)
 !
    integer :: nr_elem,mdle,i,ierr
    integer :: kref_mdlb
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 !..check if valid refinement
    kref_mdlb = Krefx*100 + Krefy*10 + Krefz

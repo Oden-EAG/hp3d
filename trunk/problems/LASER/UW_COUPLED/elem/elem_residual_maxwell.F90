@@ -36,6 +36,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    use data_structure3D
    use commonParam
    use laserParam
+   use MPI, only: MPI_Wtime
 !..no implicit statements
    implicit none
 !..declare input/output variables
@@ -162,7 +163,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    real(8) :: delta_n
    integer :: dom_flag
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 #if DEBUG_MODE
    integer :: iprint

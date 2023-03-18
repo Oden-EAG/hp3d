@@ -47,7 +47,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
    use parametersDPG, only: NORD_ADD
    use par_mesh     , only: DISTRIBUTED,HOST_MESH
    use mpi_param    , only: ROOT,RANK,NUM_PROCS
-   use MPI          , only: MPI_COMM_WORLD,MPI_SUM,MPI_COMM_WORLD,   &
+   use MPI          , only: MPI_COMM_WORLD,MPI_SUM,MPI_COMM_WORLD,MPI_Wtime, &
                             MPI_REAL8,MPI_INTEGER,MPI_IN_PLACE,MPI_MAX
 !
    implicit none
@@ -92,7 +92,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
 !..element type
    integer :: etype
 !
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
    !character(len=8) :: filename
 !
@@ -446,7 +446,7 @@ subroutine href_solve(Nflag,PhysNick, Nstop)
    use MPI           , only: MPI_COMM_WORLD,MPI_INTEGER
    use mpi_param     , only: RANK,ROOT
    use par_mesh      , only: DISTRIBUTED,HOST_MESH,distr_mesh
-   use zoltan_wrapper, only: zoltan_w_set_lb,zoltan_w_partition
+   use zoltan_wrapper
 !
    implicit none
 !
@@ -491,7 +491,7 @@ subroutine href_solve(Nflag,PhysNick, Nstop)
 !     ...Uniform refinement and solve
          call refine_DPG(IUNIFORM,1,0.25d0,Nflag,PhysNick,ires, Nstop)
          if (DISTRIBUTED .and. (.not. HOST_MESH)) then
-            !call zoltan_w_set_lb(1)
+            !call zoltan_w_set_lb(ZOLTAN_LB_BLOCK)
             !call distr_mesh
             !call print_partition
             call par_mumps_sc('H')

@@ -49,7 +49,7 @@ subroutine petsc_solve(mtype)
    use MPI        , only:  MPI_SUM,MPI_MIN,MPI_MAX,MPI_IN_PLACE,  &
                            MPI_INTEGER,MPI_INTEGER8,              &
                            MPI_REAL8,MPI_COMPLEX16,               &
-                           MPI_COMM_WORLD,MPI_STATUS_SIZE
+                           MPI_COMM_WORLD,MPI_STATUS_SIZE,MPI_Wtime
    use petscksp
    use petsc_w_ksp, only:  petsc_ksp_start,petsc_ksp_destroy,     &
                            petsc_ksp,petsc_ksp_type,              &
@@ -118,7 +118,6 @@ subroutine petsc_solve(mtype)
    integer :: nrdof_subd(NUM_PROCS)
 !
 !..timer
-!   real(8) :: MPI_Wtime,start_time,end_time,time_stamp
    real(8) :: start_time,end_time,time_stamp
 !
 ! -----------------------------------------------------------------------

@@ -15,7 +15,7 @@ subroutine update_gdof()
    use element_data
    use environment, only: QUIET_MODE
    use MPI        , only: MPI_COMM_WORLD,MPI_INTEGER,MPI_REAL8,MPI_SUM, &
-                          MPI_MIN,MPI_IN_PLACE,MPI_STATUS_IGNORE
+                          MPI_MIN,MPI_IN_PLACE,MPI_STATUS_IGNORE,MPI_Wtime
    use mpi_param  , only: RANK,ROOT,NUM_PROCS
    use par_mesh   , only: DISTRIBUTED,HOST_MESH
    use GMP
@@ -43,7 +43,7 @@ subroutine update_gdof()
    real(8), dimension(3,MAXbrickH) :: xnod
 !
 !..auxiliary variables for timing
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 !..auxiliary variables
    integer :: iel,iv,ie,ifc,ind,iflag,i,k,loc
