@@ -42,7 +42,7 @@ c  ...miscellanea
       integer :: ntype,ftype,stype,nfath
       integer :: i,ie,ifc,is,is1,j,je,jp,jv,jv1,jv2,loc
       integer :: iref,ireff,iref1,iref2,iref3,iref_fath
-      integer :: nef,nff,nvf,nod,nodp,nort,nrn,nson
+      integer :: nef,nff,nvf,nod,nodp,nort,nrn,nson,nrnodes
 c
 #if DEBUG_MODE
       integer :: iprint

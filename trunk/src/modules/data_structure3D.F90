@@ -765,25 +765,25 @@ module data_structure3D
 !
 !  ...check Dirichlet flags for all variable types
       do iphys=1,NR_PHYSA
-         select case(DTYPE(iphys))
+         select case(D_TYPE(iphys))
 !     ...H1 checks all
-         case('contin')
+         case(CONTIN)
             continue
 !     ...skip checking vertices of H(curl) variables
-         case('tangen')
+         case(TANGEN)
             if (NODES(nod)%ntype .eq. VERT) then
                ic = ic + NR_COMP(iphys)
                cycle
             endif
 !     ...skip checking vertices and edges of H(div) variables
-         case('normal')
+         case(NORMAL)
             if (     NODES(nod)%ntype .eq. VERT   &
                 .or. NODES(nod)%ntype .eq. MEDG ) then
                ic = ic + NR_COMP(iphys)
                cycle
             endif
 !     ...skip checking all on L2
-         case('discon')
+         case(DISCON)
             ic = ic + NR_COMP(iphys)
             cycle
          end select
