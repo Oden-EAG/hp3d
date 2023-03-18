@@ -120,12 +120,12 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
 !..count number of variables for each physics type
    nrPhysH=0; nrPhysE=0; nrPhysV=0
    do iphys=1,NR_PHYSA
-      select case(DTYPE(iphys))
-         case('contin')
+      select case(D_TYPE(iphys))
+         case(CONTIN)
             nrPhysH=nrPhysH+1
-         case('tangen')
+         case(TANGEN)
             nrPhysE=nrPhysE+1
-         case('normal')
+         case(NORMAL)
             nrPhysV=nrPhysV+1
          case default
       end select

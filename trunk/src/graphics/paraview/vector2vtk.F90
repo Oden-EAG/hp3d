@@ -16,7 +16,7 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
 !
    use data_structure3D
    use element_data
-   use physics          , only: DTYPE,ADRES
+   use physics
    use upscale
    use paraview
    use MPI              , only: MPI_COMM_WORLD,MPI_SUM,MPI_INTEGER
@@ -150,10 +150,10 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
                       zsolH,zgradH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
 !
 !     ...approximation space
-         select case(DTYPE(iattr))
+         select case(D_TYPE(iattr))
 !
 !        -- H^1 -- (FOR GRADIENT INFO)
-         case('contin')
+         case(CONTIN)
             isol = (iload-1)*NRHVAR + ibeg + icomp
 !
 !        ...REAL part
@@ -169,7 +169,7 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
             endif
 !
 !        -- H(curl) --
-         case('tangen')
+         case(TANGEN)
             isol = (iload-1)*NREVAR + ibeg + icomp
 !
 !        ...REAL part
@@ -185,7 +185,7 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
             endif
 !
 !        -- H(div) --
-         case('normal')
+         case(NORMAL)
             isol = (iload-1)*NRVVAR + ibeg + icomp
 !
 !        ...REAL part

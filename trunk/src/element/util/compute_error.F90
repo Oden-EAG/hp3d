@@ -112,11 +112,11 @@ subroutine compute_error(Flag,Itag)
 !
 !       skip if the error not calculated
         if (Flag(iattr).eq.0) cycle
-        select case(DTYPE(iattr))
-        case('contin'); nrdof_tot = nrdof_tot + NRDOFSH*NR_COMP(iattr)
-        case('tangen'); nrdof_tot = nrdof_tot + NRDOFSE*NR_COMP(iattr)
-        case('normal'); nrdof_tot = nrdof_tot + NRDOFSV*NR_COMP(iattr)
-        case('discon'); nrdof_tot = nrdof_tot + NRDOFSQ*NR_COMP(iattr)
+        select case(D_TYPE(iattr))
+        case(CONTIN); nrdof_tot = nrdof_tot + NRDOFSH*NR_COMP(iattr)
+        case(TANGEN); nrdof_tot = nrdof_tot + NRDOFSE*NR_COMP(iattr)
+        case(NORMAL); nrdof_tot = nrdof_tot + NRDOFSV*NR_COMP(iattr)
+        case(DISCON); nrdof_tot = nrdof_tot + NRDOFSQ*NR_COMP(iattr)
         end select
       enddo
 !
@@ -327,12 +327,12 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, &
 !       address of the 1st component for the attribute
         ibeg=ADRES(iattr)
 !
-        select case(DTYPE(iattr))
+        select case(D_TYPE(iattr))
 !
 !===================================================================================
 !  H1 ATTRIBUTE                                                                    |
 !===================================================================================
-          case('contin')
+          case(CONTIN)
 !
 !         loop through integration points
           do l=1,nint
@@ -393,7 +393,7 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, &
 !===================================================================================
 !  H(curl) ATTRIBUTE                                                               |
 !===================================================================================
-          case('tangen')
+          case(TANGEN)
 !
 !         loop through integration points
           do l=1,nint
@@ -456,7 +456,7 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, &
 !===================================================================================
 !  H(div) ATTRIBUTE                                                                |
 !===================================================================================
-          case('normal')
+          case(NORMAL)
 !
 !         loop over integration points
           do l=1,nint
@@ -518,7 +518,7 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, &
 !===================================================================================
 !  L2 ATTRIBUTE                                                                    |
 !===================================================================================
-          case('discon')
+          case(DISCON)
 !
 !         loop through integration points
           do l=1,nint

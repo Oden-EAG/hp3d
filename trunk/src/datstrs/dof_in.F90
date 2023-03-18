@@ -44,33 +44,33 @@ subroutine dof_in(Nod,ZvalH,ZvalE,ZvalV,ZvalQ)
         if (ncase(i).eq.1) then
            ! loop through the components of the attribute
            do k=1,NR_COMP(i)
-              select case(DTYPE(i))
-              case('contin')
+              select case(D_TYPE(i))
+              case(CONTIN)
                  nvar = (j-1)*NRHVAR+ADRES(i)+k
                  ivarH = ivarH+1
                  if (ndofH.gt.0) then
                     NODES(Nod)%dof%zdofH(ivarH,1:ndofH) = ZvalH(nvar,1:ndofH)
                  endif
-              case('tangen')
+              case(TANGEN)
                  nvar = (j-1)*NREVAR+ADRES(i)+k
                  ivarE = ivarE+1
                  if (ndofE.gt.0) then
                     NODES(Nod)%dof%zdofE(ivarE,1:ndofE) = ZvalE(nvar,1:ndofE)
                  endif
-              case('normal')
+              case(NORMAL)
                  nvar = (j-1)*NRVVAR+ADRES(i)+k
                  ivarV = ivarV+1
                  if (ndofV.gt.0) then
                     NODES(Nod)%dof%zdofV(ivarV,1:ndofV) = ZvalV(nvar,1:ndofV)
                  endif
-              case('discon')
+              case(DISCON)
                  nvar = (j-1)*NRQVAR+ADRES(i)+k
                  ivarQ = ivarQ+1
                  if (ndofQ.gt.0) then
                     NODES(Nod)%dof%zdofQ(ivarQ,1:ndofQ) = ZvalQ(nvar,1:ndofQ)
                  endif
               case default
-                 write(*,*) 'dofin: NOT SUPPORT DTYPE ', DTYPE(i)
+                 write(*,*) 'dofin: D_TYPE = ', S_DType(D_TYPE(i))
                  call logic_error(ERR_INVALID_VALUE,__FILE__,__LINE__)
               end select
            enddo

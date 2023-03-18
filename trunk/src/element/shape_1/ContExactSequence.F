@@ -47,6 +47,7 @@ c
 c
       use parameters , only : MAXP
       use node_types
+      use physics
 c
       implicit none
       integer, intent(in)  :: Nord
@@ -58,7 +59,7 @@ c
       integer :: nsize(2),norder(19)
       norder = 0; norder(1) = Nord
 c
-      call checkorder(SEGM,'contin',norder,MAXP, nsize)
+      call checkorder(SEGM,CONTIN,norder,MAXP, nsize)
       call shape1DHSeg(Xi,Nord,nsize, NrdofH,ShapH,GradH)
 c
       end subroutine shape1DH
@@ -91,6 +92,7 @@ c
 c
       use parameters , only : MAXP
       use node_types
+      use physics
 c
       implicit none
       double precision, intent(in)  :: Xi
@@ -101,7 +103,7 @@ c
       integer :: nsize(2),norder(19)
       norder = 0; norder(1) = Nord
 c
-      call checkorder(SEGM,'discon',norder,MAXP, nsize)
+      call checkorder(SEGM,DISCON,norder,MAXP, nsize)
       call shape1DQSeg(Xi,Nord,nsize, NrdofQ,ShapQ)
 c
       end subroutine shape1DQ
@@ -147,6 +149,7 @@ c
 c
       use parameters , only : MAXP,MAXquadH
       use node_types
+      use physics
 c
       implicit none
       integer         , intent(in)  :: Ntype
@@ -162,7 +165,7 @@ c
 c
       ShapH = 0.d0; GradH = 0.d0
 c
-      call checkorder(NType,'contin',norder3D,MAXP, nsize)
+      call checkorder(NType,CONTIN,norder3D,MAXP, nsize)
       select case(NType)
       case(TRIA,MDLT)
         call shape2DHTri(Xi,Norder,NoriE,nsize, NrdofH,ShapH,GradH)
@@ -206,6 +209,7 @@ c
 c
       use parameters , only : MAXP,MAXquadE
       use node_types
+      use physics
 c
       implicit none
       integer         , intent(in)  :: Ntype
@@ -221,7 +225,7 @@ c
 c
       ShapE = 0.d0; CurlE = 0.d0
 c
-      call checkorder(NType,'tangen',norder3D,MAXP, nsize)
+      call checkorder(NType,TANGEN,norder3D,MAXP, nsize)
       select case(NType)
       case(TRIA,MDLT)
         call shape2DETri(Xi,Norder,NoriE,nsize, NrdofE,ShapE,CurlE)
@@ -267,6 +271,7 @@ c
 c
       use parameters , only : MAXP,MAXquadV
       use node_types
+      use physics
 c
       implicit none
       integer         , intent(in)  :: Ntype
@@ -282,7 +287,7 @@ c
 c
       ShapV = 0.d0; DivV = 0.d0
 c
-      call checkorder(NType,'normal',norder3D,MAXP, nsize)
+      call checkorder(NType,NORMAL,norder3D,MAXP, nsize)
       select case(NType)
       case(TRIA,MDLT)
         call shape2DVTri(Xi,Norder,NoriE,nsize, NrdofV,ShapV,DivV)
@@ -325,6 +330,7 @@ c
 c
       use parameters , only : MAXP,MAXquadQ
       use node_types
+      use physics
 c
       implicit none
       integer         , intent(in)  :: Ntype
@@ -338,7 +344,7 @@ c
 c
       ShapQ = 0.d0
 c
-      call checkorder(NType,'discon',norder3D,MAXP, nsize)
+      call checkorder(NType,DISCON,norder3D,MAXP, nsize)
       select case(NType)
       case(TRIA,MDLT)
         call shape2DQTri(Xi,Norder,nsize, NrdofQ,ShapQ)
@@ -393,6 +399,7 @@ c
 c
       use parameters , only : MAXP,MAXbrickH
       use node_types
+      use physics
 c
       implicit none
       integer         , intent(in)  :: Ntype
@@ -408,7 +415,7 @@ c
 c
       ShapH = 0.d0; GradH = 0.d0
 c
-      call checkorder(NType,'contin',Norder,MAXP, nsize)
+      call checkorder(NType,CONTIN,Norder,MAXP, nsize)
       select case(NType)
       case(BRIC,MDLB)
         call shape3DHHexa(Xi,Norder,NoriE,NoriF,nsize,
@@ -463,6 +470,7 @@ c
 c
       use parameters , only : MAXP,MAXbrickE
       use node_types
+      use physics
 c
       implicit none
       integer         , intent(in)  :: Ntype
@@ -478,7 +486,7 @@ c
 c
       ShapE = 0.d0; CurlE = 0.d0
 c
-      call checkorder(NType,'tangen',Norder,MAXP, nsize)
+      call checkorder(NType,TANGEN,Norder,MAXP, nsize)
       select case(NType)
       case(BRIC,MDLB)
         call shape3DEHexa(Xi,Norder,NoriE,NoriF,nsize,
@@ -531,6 +539,7 @@ c
 c
       use parameters , only : MAXP,MAXbrickV
       use node_types
+      use physics
 c
       implicit none
       integer         , intent(in)  :: Ntype
@@ -545,7 +554,7 @@ c
 c
       ShapV = 0.d0; DivV = 0.d0
 c
-      call checkorder(NType,'normal',Norder,MAXP, nsize)
+      call checkorder(NType,NORMAL,Norder,MAXP, nsize)
       select case(NType)
       case(BRIC,MDLB)
         call shape3DVHexa(Xi,Norder,NoriF,nsize, NrdofV,ShapV,DivV)
@@ -592,6 +601,7 @@ c
 c
       use parameters , only : MAXP,MAXbrickQ
       use node_types
+      use physics
 c
       implicit none
       integer         , intent(in)  :: Ntype
@@ -604,7 +614,7 @@ c
 c
       ShapQ = 0.d0
 c
-      call checkorder(NType,'discon',Norder,MAXP, nsize)
+      call checkorder(NType,DISCON,Norder,MAXP, nsize)
       select case(NType)
       case(BRIC,MDLB)
         Nsize=(/MAXP,MAXbrickQ/)

@@ -2,27 +2,27 @@
 #include "typedefs.h"
 !
 !-----------------------------------------------------------------------
-!> Purpose :  routine determines whether for a node case, all supported
-!             variable components of a specific variable type with 
-!             Dirichlet flags have homogeneous BC data
-!! @param[in]  D_type  - discretization type
+!> @brief Routine determines whether for a node case, all supported
+!!        variable components of a specific variable type with
+!!        Dirichlet flags have homogeneous BC data
+!! @param[in]  Dtype   - discretization type
 !! @param[in]  Icase   - encoded nodal case number
 !! @param[in]  Bcond   - encoded nodal BC flag
-!! @param[out] Is_homD = true/false
+!! @param[out] Is_homD - true/false
 !! @param[out] Ncase   - decoded nodal case numbers
 !! @param[out] Ibcnd   - decoded nodal BC flags
 !
+!> @date Mar 2023
 !-----------------------------------------------------------------------
 !
-subroutine homogenD(D_type,Icase,Bcond, Is_homD,Ncase,Ibcnd)
+subroutine homogenD(Dtype,Icase,Bcond, Is_homD,Ncase,Ibcnd)
 !
    use physics
 !
    implicit none
 !
 !..input arguments
-   character(len=6), intent(in) :: D_type
-   integer         , intent(in) :: Icase, Bcond
+   integer, intent(in)  :: Dtype,Icase,Bcond
 !
 !..output arguments
    logical, intent(out) :: Is_homD
@@ -42,7 +42,7 @@ subroutine homogenD(D_type,Icase,Bcond, Is_homD,Ncase,Ibcnd)
    do iphys = 1,NR_PHYSA
 !
 !  ...skip if the variable is not supported or the wrong type
-      if ((Ncase(iphys).eq.0) .or. (DTYPE(iphys).ne.D_type)) then
+      if ((Ncase(iphys).eq.0) .or. (D_TYPE(iphys).ne.Dtype)) then
          ic = ic + NR_COMP(iphys)
          cycle
       endif
