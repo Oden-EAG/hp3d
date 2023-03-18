@@ -48,4 +48,6 @@ $(OBJ_PATH)/%.o : $(SRC_PATH)/%.F
 clean :
 	@rm -f $(OBJ_PATH)/*.o
 	@rm -f *.o
+	@rm -f *genmod.mod
+	@rm -f *genmod.f90
 	@rm -f libfrontal.a
