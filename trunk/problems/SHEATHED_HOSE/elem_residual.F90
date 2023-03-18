@@ -647,11 +647,11 @@
 !      ...skip if field variable, otherwise remove middle dof and
 !         leave trace dof only
           if (nflag(iphys).eq.1) cycle
-          select case(DTYPE(iphys))
-          case('contin'); nrdof_total=nrdof_total-ndofH*NR_COMP(iphys)
-          case('tangen'); nrdof_total=nrdof_total-ndofE*NR_COMP(iphys)
-          case('normal'); nrdof_total=nrdof_total-ndofV*NR_COMP(iphys)
-          case('discon'); nrdof_total=nrdof_total-ndofQ*NR_COMP(iphys)
+          select case(D_TYPE(iphys))
+          case(CONTIN); nrdof_total=nrdof_total-ndofH*NR_COMP(iphys)
+          case(TANGEN); nrdof_total=nrdof_total-ndofE*NR_COMP(iphys)
+          case(NORMAL); nrdof_total=nrdof_total-ndofV*NR_COMP(iphys)
+          case(DISCON); nrdof_total=nrdof_total-ndofQ*NR_COMP(iphys)
           end select
         enddo
       enddo

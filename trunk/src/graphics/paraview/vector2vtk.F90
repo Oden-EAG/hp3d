@@ -16,7 +16,7 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
 !
    use data_structure3D
    use element_data
-   use physics          , only: DTYPE,ADRES
+   use physics
    use upscale
    use paraview
    use MPI              , only: MPI_COMM_WORLD,MPI_SUM,MPI_INTEGER
@@ -150,42 +150,26 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
                       zsolH,zgradH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
 !
 !     ...approximation space
-         select case(DTYPE(iattr))
+         select case(D_TYPE(iattr))
 !
-! !        -- H^1 -- (FOR GRADIENT INFO)
-!          case('contin')
-!             isol = (iload-1)*NRHVAR + ibeg + icomp
-! !
-! !        ...REAL part
-!             if (ireal == 1) then
-!                val(1) = dreal_part(zgradH(isol,1))
-!                val(2) = dreal_part(zgradH(isol,2))
-!                val(3) = dreal_part(zgradH(isol,3))
-! !        ...IMAGINARY part
-!             else
-!                val(1) = dimag_part(zgradH(isol,1))
-!                val(2) = dimag_part(zgradH(isol,2))
-!                val(3) = dimag_part(zgradH(isol,3))
-!             endif
-!            
-         case('contin')
-              isol = (iload-1)*NRHVAR + ibeg + icomp - 1
+!        -- H^1 -- (FOR GRADIENT INFO)
+         case(CONTIN)
+            isol = (iload-1)*NRHVAR + ibeg + icomp
 !
-!           REAL part
+!        ...REAL part
             if (ireal == 1) then
-               val(1) = dreal_part(zsolH(isol+1))
-               val(2) = dreal_part(zsolH(isol+2))
-               val(3) = dreal_part(zsolH(isol+3))
-!
-!           IMAGINARY part
+               val(1) = dreal_part(zgradH(isol,1))
+               val(2) = dreal_part(zgradH(isol,2))
+               val(3) = dreal_part(zgradH(isol,3))
+!        ...IMAGINARY part
             else
-               val(1) = dimag_part(zsolH(isol+1))
-               val(2) = dimag_part(zsolH(isol+2))
-               val(3) = dimag_part(zsolH(isol+3))
+               val(1) = dimag_part(zgradH(isol,1))
+               val(2) = dimag_part(zgradH(isol,2))
+               val(3) = dimag_part(zgradH(isol,3))
             endif
 !
 !        -- H(curl) --
-         case('tangen')
+         case(TANGEN)
             isol = (iload-1)*NREVAR + ibeg + icomp
 !
 !        ...REAL part
@@ -201,7 +185,7 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
             endif
 !
 !        -- H(div) --
-         case('normal')
+         case(NORMAL)
             isol = (iload-1)*NRVVAR + ibeg + icomp
 !
 !        ...REAL part
@@ -215,22 +199,7 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
                val(2) = dimag_part(zsolV(2,isol))
                val(3) = dimag_part(zsolV(3,isol))
             endif
-!            
-         case('discon')
-              isol = (iload-1)*NRQVAR + ibeg + icomp - 1
 !
-!           REAL part
-            if (ireal == 1) then
-               val(1) = dreal_part(zsolQ(isol+1))
-               val(2) = dreal_part(zsolQ(isol+2))
-               val(3) = dreal_part(zsolQ(isol+3))
-!
-!           IMAGINARY part
-            else
-               val(1) = dimag_part(zsolQ(isol+1))
-               val(2) = dimag_part(zsolQ(isol+2))
-               val(3) = dimag_part(zsolQ(isol+3))
-            endif
          case default
             write(*,*) 'vector2vtk: unexpected approximation space. stop.'
             stop

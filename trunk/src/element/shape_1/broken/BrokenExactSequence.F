@@ -46,6 +46,7 @@ c
 c
       use parametersDPG , only : MAXPP
       use node_types
+      use physics
 c
       implicit none
       integer, intent(in)  :: NordM
@@ -57,7 +58,7 @@ c
       integer :: nsize(2),norder(19)
       norder = 0; norder(1) = NordM
 c
-      call checkorder(SEGM,'contin',norder,MAXPP, nsize)
+      call checkorder(SEGM,CONTIN,norder,MAXPP, nsize)
       call shape1DHBrokenSeg(Xi,NordM,nsize, NrdofH,ShapH,GradH)
 c
       end subroutine shape1HH
@@ -90,6 +91,7 @@ c
 c
       use parametersDPG , only : MAXPP
       use node_types
+      use physics
 c
       implicit none
       integer, intent(in)  :: NordM
@@ -100,7 +102,7 @@ c
       integer :: nsize(2),norder(19)
       norder = 0; norder(1) = NordM
 c
-      call checkorder(SEGM,'discon',norder,MAXPP, nsize)
+      call checkorder(SEGM,DISCON,norder,MAXPP, nsize)
       call shape1DQBrokenSeg(Xi,NordM,nsize, NrdofQ,ShapQ)
 c
       end subroutine shape1QQ
@@ -145,6 +147,7 @@ c
 c
       use parametersDPG , only : MAXPP,MAXquadHH
       use node_types
+      use physics
 c
       implicit none
       integer, intent(in)  :: Ntype
@@ -161,12 +164,12 @@ c
       case(TRIA,MDLT)
         norder(1:3)=1
         norder(4)=NordM
-        call checkorder(Ntype,'contin',norder,MAXPP, nsize)
+        call checkorder(Ntype,CONTIN,norder,MAXPP, nsize)
         call shape2DHBrokenTri(Xi,NordM,nsize, NrdofH,ShapH,GradH)
       case(QUAD,MDLQ,RECT)
         norder(1:4)=1
         norder(5)=NordM
-        call checkorder(Ntype,'contin',norder,MAXPP, nsize)
+        call checkorder(Ntype,CONTIN,norder,MAXPP, nsize)
         call shape2DHBrokenQuad(Xi,NordM,nsize, NrdofH,ShapH,GradH)
       case default
         write(*,*)'shape2HH: Type = ', S_Type(Ntype)
@@ -206,6 +209,7 @@ c
 c
       use parametersDPG , only : MAXPP,MAXquadEE
       use node_types
+      use physics
 c
       implicit none
       integer, intent(in)  :: Ntype
@@ -222,12 +226,12 @@ c
       case(TRIA,MDLT)
         norder(1:3)=1
         norder(4)=NordM
-        call checkorder(Ntype,'tangen',norder,MAXPP, nsize)
+        call checkorder(Ntype,TANGEN,norder,MAXPP, nsize)
         call shape2DEBrokenTri(Xi,NordM,nsize, NrdofE,ShapE,CurlE)
       case(QUAD,MDLQ,RECT)
         norder(1:4)=1
         norder(5)=NordM
-        call checkorder(Ntype,'tangen',norder,MAXPP, nsize)
+        call checkorder(Ntype,TANGEN,norder,MAXPP, nsize)
         call shape2DEBrokenQuad(Xi,NordM,nsize, NrdofE,ShapE,CurlE)
       case default
         write(*,*)'shape2EE: Type = ', S_Type(Ntype)
@@ -268,6 +272,7 @@ c
 c
       use parametersDPG , only : MAXPP,MAXquadVV
       use node_types
+      use physics
 c
       implicit none
       integer, intent(in)  :: Ntype
@@ -284,12 +289,12 @@ c
       case(TRIA,MDLT)
         norder(1:3)=1
         norder(4)=NordM
-        call checkorder(Ntype,'normal',norder,MAXPP, nsize)
+        call checkorder(Ntype,NORMAL,norder,MAXPP, nsize)
         call shape2DVBrokenTri(Xi,NordM,nsize, NrdofV,ShapV,DivV)
       case(QUAD,MDLQ,RECT)
         norder(1:4)=1
         norder(5)=NordM
-        call checkorder(Ntype,'normal',norder,MAXPP, nsize)
+        call checkorder(Ntype,NORMAL,norder,MAXPP, nsize)
         call shape2DVBrokenQuad(Xi,NordM,nsize, NrdofV,ShapV,DivV)
       case default
         write(*,*)'shape2VV: Type = ', S_Type(Ntype)
@@ -328,6 +333,7 @@ c
 c
       use parametersDPG , only : MAXPP,MAXquadQQ
       use node_types
+      use physics
 c
       implicit none
       integer, intent(in)  :: Ntype
@@ -343,12 +349,12 @@ c
       case(TRIA,MDLT)
         norder(1:3)=1
         norder(4)=NordM
-        call checkorder(Ntype,'discon',norder,MAXPP, nsize)
+        call checkorder(Ntype,DISCON,norder,MAXPP, nsize)
         call shape2DQBrokenTri(Xi,NordM,nsize, NrdofQ,ShapQ)
       case(QUAD,MDLQ,RECT)
         norder(1:4)=1
         norder(5)=NordM
-        call checkorder(Ntype,'discon',norder,MAXPP, nsize)
+        call checkorder(Ntype,DISCON,norder,MAXPP, nsize)
         call shape2DQBrokenQuad(Xi,NordM,nsize, NrdofQ,ShapQ)
       case default
         write(*,*)'shape2QQ: Type = ', S_Type(Ntype)
@@ -397,6 +403,7 @@ c
       use parameters    , only : MODORDER
       use parametersDPG , only : MAXPP,MAXbrickHH
       use node_types
+      use physics
 c
       implicit none
       integer, intent(in)  :: Ntype
@@ -415,19 +422,19 @@ c
         call encod((/1,1/),MODORDER,2, nordF)
         norder(13:18)=nordF
         norder(19)=NordM
-        call checkorder(Ntype,'contin',norder,MAXPP, nsize)
+        call checkorder(Ntype,CONTIN,norder,MAXPP, nsize)
         call shape3DHBrokenHexa(Xi,NordM,nsize, NrdofH,ShapH,GradH)
       case(TETR,MDLN)
         norder(1:10)=1
         norder(11)=NordM
-        call checkorder(Ntype,'contin',norder,MAXPP, nsize)
+        call checkorder(Ntype,CONTIN,norder,MAXPP, nsize)
         call shape3DHBrokenTet(Xi,NordM,nsize, NrdofH,ShapH,GradH)
       case(PRIS,MDLP)
         norder(1:11)=1
         call encod((/1,1/),MODORDER,2, nordF)
         norder(12:14)=nordF
         norder(15)=NordM
-        call checkorder(Ntype,'contin',norder,MAXPP, nsize)
+        call checkorder(Ntype,CONTIN,norder,MAXPP, nsize)
         call shape3DHBrokenPris(Xi,NordM,nsize, NrdofH,ShapH,GradH)
       case(PYRA,MDLD)
         norder(1:8)=1
@@ -435,7 +442,7 @@ c
         norder(9)=nordF
         norder(10:13)=1
         norder(14)=NordM
-        call checkorder(Ntype,'contin',norder,MAXPP, nsize)
+        call checkorder(Ntype,CONTIN,norder,MAXPP, nsize)
         call shape3DHBrokenPyra(Xi,NordM,nsize, NrdofH,ShapH,GradH)
       case default
         write(*,*)'shape3HH: Type = ', S_Type(Ntype)
@@ -476,6 +483,7 @@ c
       use parameters , only : MODORDER
       use parametersDPG , only : MAXPP,MAXbrickEE
       use node_types
+      use physics
 c
       implicit none
       integer, intent(in)  :: Ntype
@@ -494,19 +502,19 @@ c
         call encod((/1,1/),MODORDER,2, nordF)
         norder(13:18)=nordF
         norder(19)=NordM
-        call checkorder(Ntype,'tangen',norder,MAXPP, nsize)
+        call checkorder(Ntype,TANGEN,norder,MAXPP, nsize)
         call shape3DEBrokenHexa(Xi,NordM,nsize, NrdofE,ShapE,CurlE)
       case(TETR,MDLN)
         norder(1:10)=1
         norder(11)=NordM
-        call checkorder(Ntype,'tangen',norder,MAXPP, nsize)
+        call checkorder(Ntype,TANGEN,norder,MAXPP, nsize)
         call shape3DEBrokenTet(Xi,NordM,nsize, NrdofE,ShapE,CurlE)
       case(PRIS,MDLP)
         norder(1:11)=1
         call encod((/1,1/),MODORDER,2, nordF)
         norder(12:14)=nordF
         norder(15)=NordM
-        call checkorder(Ntype,'tangen',norder,MAXPP, nsize)
+        call checkorder(Ntype,TANGEN,norder,MAXPP, nsize)
         call shape3DEBrokenPris(Xi,NordM,nsize, NrdofE,ShapE,CurlE)
       case(PYRA,MDLD)
         norder(1:8)=1
@@ -514,7 +522,7 @@ c
         norder(9)=nordF
         norder(10:13)=1
         norder(14)=NordM
-        call checkorder(Ntype,'tangen',norder,MAXPP, nsize)
+        call checkorder(Ntype,TANGEN,norder,MAXPP, nsize)
         call shape3DEBrokenPyra(Xi,NordM,nsize, NrdofE,ShapE,CurlE)
       case default
         write(*,*)'shape3EE: Type = ', S_Type(Ntype)
@@ -555,6 +563,7 @@ c
       use parameters , only : MODORDER
       use parametersDPG , only : MAXPP,MAXbrickVV
       use node_types
+      use physics
 c
       implicit none
       integer, intent(in)  :: Ntype
@@ -573,19 +582,19 @@ c
         call encod((/1,1/),MODORDER,2, nordF)
         norder(13:18)=nordF
         norder(19)=NordM
-        call checkorder(Ntype,'normal',norder,MAXPP, nsize)
+        call checkorder(Ntype,NORMAL,norder,MAXPP, nsize)
         call shape3DVBrokenHexa(Xi,NordM,nsize, NrdofV,ShapV,DivV)
       case(TETR,MDLN)
         norder(1:10)=1
         norder(11)=NordM
-        call checkorder(Ntype,'normal',norder,MAXPP, nsize)
+        call checkorder(Ntype,NORMAL,norder,MAXPP, nsize)
         call shape3DVBrokenTet(Xi,NordM,nsize, NrdofV,ShapV,DivV)
       case(PRIS,MDLP)
         norder(1:11)=1
         call encod((/1,1/),MODORDER,2, nordF)
         norder(12:14)=nordF
         norder(15)=NordM
-        call checkorder(Ntype,'normal',norder,MAXPP, nsize)
+        call checkorder(Ntype,NORMAL,norder,MAXPP, nsize)
         call shape3DVBrokenPris(Xi,NordM,nsize, NrdofV,ShapV,DivV)
       case(PYRA,MDLD)
         norder(1:8)=1
@@ -593,7 +602,7 @@ c
         norder(9)=nordF
         norder(10:13)=1
         norder(14)=NordM
-        call checkorder(Ntype,'normal',norder,MAXPP, nsize)
+        call checkorder(Ntype,NORMAL,norder,MAXPP, nsize)
         call shape3DVBrokenPyra(Xi,NordM,nsize, NrdofV,ShapV,DivV)
       case default
         write(*,*)'shape3VV: Type = ', S_Type(Ntype)
@@ -633,6 +642,7 @@ c
       use parameters , only : MODORDER
       use parametersDPG , only : MAXPP,MAXbrickQQ
       use node_types
+      use physics
 c
       implicit none
       integer, intent(in)  :: Ntype
@@ -650,19 +660,19 @@ c
         call encod((/1,1/),MODORDER,2, nordF)
         norder(13:18)=nordF
         norder(19)=NordM
-        call checkorder(Ntype,'discon',norder,MAXPP, nsize)
+        call checkorder(Ntype,DISCON,norder,MAXPP, nsize)
         call shape3DQBrokenHexa(Xi,NordM,nsize, NrdofQ,ShapQ)
       case(TETR,MDLN)
         norder(1:10)=1
         norder(11)=NordM
-        call checkorder(Ntype,'discon',norder,MAXPP, nsize)
+        call checkorder(Ntype,DISCON,norder,MAXPP, nsize)
         call shape3DQBrokenTet(Xi,NordM,nsize, NrdofQ,ShapQ)
       case(PRIS,MDLP)
         norder(1:11)=1
         call encod((/1,1/),MODORDER,2, nordF)
         norder(12:14)=nordF
         norder(15)=NordM
-        call checkorder(Ntype,'discon',norder,MAXPP, nsize)
+        call checkorder(Ntype,DISCON,norder,MAXPP, nsize)
         call shape3DQBrokenPris(Xi,NordM,nsize, NrdofQ,ShapQ)
       case(PYRA,MDLD)
         norder(1:8)=1
@@ -670,7 +680,7 @@ c
         norder(9)=nordF
         norder(10:13)=1
         norder(14)=NordM
-        call checkorder(Ntype,'discon',norder,MAXPP, nsize)
+        call checkorder(Ntype,DISCON,norder,MAXPP, nsize)
         call shape3DQBrokenPyra(Xi,NordM,nsize, NrdofQ,ShapQ)
       case default
         write(*,*)'shape3QQ: Type = ', S_Type(Ntype)

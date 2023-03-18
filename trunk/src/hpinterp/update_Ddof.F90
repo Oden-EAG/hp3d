@@ -137,7 +137,7 @@ subroutine update_Ddof()
             if (.not.associated(NODES(nod)%dof))       cycle
             if (.not.associated(NODES(nod)%dof%zdofH)) cycle
             if (NODES(nod)%visit.eq.1)                 cycle
-            if (is_Dirichlet_attr(nod,'contin')) then
+            if (is_Dirichlet_attr(nod,CONTIN)) then
 #if DEBUG_MODE
                if (iprint.eq.1) write(*,7010) mdle,iv,nod
           7010 format('update_Ddof: CALLING dhpvert FOR mdle,iv,nod = ',i8,i2,i8)
@@ -162,7 +162,7 @@ subroutine update_Ddof()
             nod = nodesl(ind)
             if (.not.associated(NODES(nod)%dof)) cycle
             if (NODES(nod)%visit.eq.1)           cycle
-            if (is_Dirichlet_attr(nod,'contin')) then
+            if (is_Dirichlet_attr(nod,CONTIN)) then
 !           ...update H1 Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofH)) then
 #if DEBUG_MODE
@@ -176,7 +176,7 @@ subroutine update_Ddof()
                endif
                NODES(nod)%visit=1
             endif
-            if (is_Dirichlet_attr(nod,'tangen')) then
+            if (is_Dirichlet_attr(nod,TANGEN)) then
 !           ...update H(curl) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofE)) then
 #if DEBUG_MODE
@@ -205,8 +205,8 @@ subroutine update_Ddof()
 !        ...get global node number
             nod = nodesl(ind)
             if (.not.associated(NODES(nod)%dof)) cycle
-            if (NODES(nod)%visit.eq.1) cycle
-            if (is_Dirichlet_attr(nod,'contin')) then
+            if (NODES(nod)%visit.eq.1)           cycle
+            if (is_Dirichlet_attr(nod,CONTIN)) then
 !           ...update H1 Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofH)) then
 #if DEBUG_MODE
@@ -220,7 +220,7 @@ subroutine update_Ddof()
                endif
                NODES(nod)%visit=1
             endif
-            if (is_Dirichlet_attr(nod,'tangen')) then
+            if (is_Dirichlet_attr(nod,TANGEN)) then
 !           ...update H(curl) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofE)) then
 #if DEBUG_MODE
@@ -234,7 +234,7 @@ subroutine update_Ddof()
                endif
                NODES(nod)%visit=1
             endif
-            if (is_Dirichlet_attr(nod,'normal')) then
+            if (is_Dirichlet_attr(nod,NORMAL)) then
 !           ...update H(div) Dirichlet dofs
                if (associated(NODES(nod)%dof%zdofV)) then
 #if DEBUG_MODE

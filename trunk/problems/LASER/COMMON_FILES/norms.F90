@@ -200,12 +200,12 @@ subroutine get_elem_L2NormCOMS(mdle,Flag,No1,No2, FieldNormQ)
 !  ...address of the 1st component for the attribute
       ibeg=ADRES(iattr)
 !
-      select case(DTYPE(iattr))
+      select case(D_TYPE(iattr))
 !
 !===================================================================================
 !  L2 ATTRIBUTE                                                                    |
 !===================================================================================
-      case('discon')
+      case(DISCON)
 !
 !     ...loop through integration points
          do l=1,nint
@@ -483,12 +483,12 @@ subroutine get_elem_Norm(Mdle,Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNor
 !  ...address of the 1st component for the attribute
       ibeg=ADRES(iattr)
 !
-      select case(DTYPE(iattr))
+      select case(D_TYPE(iattr))
 !
 !===================================================================================
 !  H1 ATTRIBUTE                                                                    |
 !===================================================================================
-      case('contin')
+      case(CONTIN)
 !
 !     ...loop through integration points
          do l=1,nint
@@ -537,10 +537,10 @@ subroutine get_elem_Norm(Mdle,Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNor
 !===================================================================================
 !  H(curl) ATTRIBUTE                                                               |
 !===================================================================================
-          case('tangen')
+      case(TANGEN)
 !
-!         loop through integration points
-          do l=1,nint
+!     ...loop through integration points
+         do l=1,nint
 !
 !           Gauss point and weight
             xi(1:3)=xiloc(1:3,l) ; wa=wxi(l)
@@ -584,10 +584,10 @@ subroutine get_elem_Norm(Mdle,Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNor
 !===================================================================================
 !  H(div) ATTRIBUTE                                                                |
 !===================================================================================
-          case('normal')
+      case(NORMAL)
 !
-!         loop over integration points
-          do l=1,nint
+!     ...loop over integration points
+         do l=1,nint
 !
 !           Gauss point and weight
             xi(1:3)=xiloc(1:3,l) ; wa=wxi(l)
@@ -632,10 +632,10 @@ subroutine get_elem_Norm(Mdle,Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNor
 !===================================================================================
 !  L2 ATTRIBUTE                                                                    |
 !===================================================================================
-          case('discon')
+      case(DISCON)
 !
-!         loop through integration points
-          do l=1,nint
+!     ...loop through integration points
+         do l=1,nint
 !
 !           Gauss point and weight
             xi(1:3)=xiloc(1:3,l) ; wa=wxi(l)

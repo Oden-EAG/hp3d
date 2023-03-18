@@ -5,7 +5,7 @@
 subroutine my_paraview_driver(IParAttr)
 !
    use upscale
-   use physics,            only: DTYPE,NR_COMP,NR_PHYSA,PHYSA
+   use physics
    use data_structure3D,   only: NRCOMS
    use environment,        only: PREFIX,QUIET_MODE
    use paraview,           only: PARAVIEW_DUMP_ATTR,FILE_VIS, &
@@ -67,28 +67,28 @@ subroutine my_paraview_driver(IParAttr)
 !           ...encode iload, iphys, icomp into a single attribute's index
                idx = iload*100 + iphys*10 + icomp*1
 !
-               select case(DTYPE(iphys))
+               select case(D_TYPE(iphys))
 !
 !                 -- H1 --
-                  case('contin')
+                  case(CONTIN)
                      call paraview_attr_scalar(id,idx)
 !
 !                 -- H(curl) --
-                  case('tangen')
+                  case(TANGEN)
                      call paraview_attr_vector(id,idx)
 !
 !                 -- H(div) --
-                  case('normal')
+                  case(NORMAL)
                      call paraview_attr_vector(id,idx)
 !
 !                 -- L2 --
-                  case('discon')
+                  case(DISCON)
                      call paraview_attr_scalar(id,idx)
 !
                end select
 !
                if ((.not. QUIET_MODE) .and. (RANK.eq.ROOT)) then
-                  write(*,8000) PHYSA(iphys),DTYPE(iphys),icomp,iload
+                  write(*,8000) PHYSA(iphys),S_DType(D_TYPE(iphys)),icomp,iload
  8000             format(/,1x,a5,7x,a6,12x,i1,5x,i2)
                endif
 !

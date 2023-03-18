@@ -129,11 +129,11 @@ subroutine celem_system(Mdle,Idec,                                &
 !
 !..number of dofs for ALL H1,H(curl),H(div),L2 components (EXPANDED mode)
    do i=1,NR_PHYSA
-      select case(DTYPE(i))
-      case('contin') ; Nrdofs(i)=nrdoflH*NR_COMP(i)
-      case('tangen') ; Nrdofs(i)=nrdoflE*NR_COMP(i)
-      case('normal') ; Nrdofs(i)=nrdoflV*NR_COMP(i)
-      case('discon') ; Nrdofs(i)=nrdoflQ*NR_COMP(i)
+      select case(D_TYPE(i))
+         case(CONTIN) ; Nrdofs(i)=nrdoflH*NR_COMP(i)
+         case(TANGEN) ; Nrdofs(i)=nrdoflE*NR_COMP(i)
+         case(NORMAL) ; Nrdofs(i)=nrdoflV*NR_COMP(i)
+         case(DISCON) ; Nrdofs(i)=nrdoflQ*NR_COMP(i)
       endselect
    enddo
 !
@@ -229,14 +229,14 @@ subroutine celem_system(Mdle,Idec,                                &
 !..count number of variables (not components) for each physics type
    nrPhysH=0; nrPhysE=0; nrPhysV=0; nrPhysQ=0
    do iphys=1,NR_PHYSA
-      select case(DTYPE(iphys))
-         case('contin')
+      select case(D_TYPE(iphys))
+         case(CONTIN)
             nrPhysH=nrPhysH+1
-         case('tangen')
+         case(TANGEN)
             nrPhysE=nrPhysE+1
-         case('normal')
+         case(NORMAL)
             nrPhysV=nrPhysV+1
-         case('discon')
+         case(DISCON)
             nrPhysQ=nrPhysQ+1
       end select
    enddo
@@ -585,8 +585,8 @@ subroutine celem_system(Mdle,Idec,                                &
 !  ...skip if the attribute is absent
       if (itest(iphys1).eq.0) cycle
 !
-      select case(DTYPE(iphys1))
-      case('contin')
+      select case(D_TYPE(iphys1))
+      case(CONTIN)
 !
 !  ......loop through element test functions
          do k=1,nrdoflH
@@ -628,7 +628,7 @@ subroutine celem_system(Mdle,Idec,                                &
 !  ......end of loop through element test functions
          enddo
 !
-      case('tangen')
+      case(TANGEN)
 !
 !  ......loop through element test functions
          do k=1,nrdoflE
@@ -670,7 +670,7 @@ subroutine celem_system(Mdle,Idec,                                &
 !  ......end of loop through element test functions
          enddo
 !
-      case('normal')
+      case(NORMAL)
 !
 !  ......loop through element test functions
          do k=1,nrdoflV
@@ -712,7 +712,7 @@ subroutine celem_system(Mdle,Idec,                                &
 !  ......end of loop through element test functions
          enddo
 !
-      case('discon')
+      case(DISCON)
 !
 !  ......loop through element test functions
          do k=1,nrdoflQ
@@ -760,8 +760,8 @@ subroutine celem_system(Mdle,Idec,                                &
 !  ...skip if the attribute is absent
       if (jtrial(iphys).eq.0) cycle
 !
-      select case(DTYPE(iphys))
-      case('contin')
+      select case(D_TYPE(iphys))
+      case(CONTIN)
 !
 !  ......loop through element trial functions
          do k=1,nrdoflH
@@ -790,7 +790,7 @@ subroutine celem_system(Mdle,Idec,                                &
 !  ......end of loop through element trial functions
          enddo
 !
-      case('tangen')
+      case(TANGEN)
 !
 !  .......loop through element trial functions
           do k=1,nrdoflE
@@ -819,7 +819,7 @@ subroutine celem_system(Mdle,Idec,                                &
 !  .......end of loop through element trial functions
           enddo
 !
-      case('normal')
+      case(NORMAL)
 !
 !  .......loop through element trial functions
           do k=1,nrdoflV
@@ -848,7 +848,7 @@ subroutine celem_system(Mdle,Idec,                                &
 !  ......end of loop through element trial functions
          enddo
 !
-      case('discon')
+      case(DISCON)
 !
 !  ......loop through element trial functions
          do k=1,nrdoflQ

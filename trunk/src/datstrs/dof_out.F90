@@ -52,8 +52,8 @@ subroutine dof_out( Nod,                     &
 
            ! loop through the components of the attribute
            do k=1,NR_COMP(i)
-              select case(DTYPE(i))
-              case('contin')
+              select case(D_TYPE(i))
+              case(CONTIN)
                  nvar = (j-1)*NRHVAR+ADRES(i)+k
                  ivarH = ivarH+1
                  if (ndofH.gt.0) then
@@ -74,7 +74,7 @@ subroutine dof_out( Nod,                     &
 #endif
                  endif
 
-              case('tangen')
+              case(TANGEN)
                  nvar = (j-1)*NREVAR+ADRES(i)+k
                  ivarE = ivarE+1
                  if (ndofE.gt.0) then
@@ -88,7 +88,7 @@ subroutine dof_out( Nod,                     &
 #endif
                  endif
 
-              case('normal')
+              case(NORMAL)
                  nvar = (j-1)*NRVVAR+ADRES(i)+k
                  ivarV = ivarV+1
                  if (ndofV.gt.0) then
@@ -102,7 +102,7 @@ subroutine dof_out( Nod,                     &
 #endif
                  endif
 
-              case('discon')
+              case(DISCON)
 !                 write(*,*) 'dof_out: ndofQ = ',ndofQ
                  nvar = (j-1)*NRQVAR+ADRES(i)+k
                  ivarQ = ivarQ+1
@@ -119,7 +119,7 @@ subroutine dof_out( Nod,                     &
 !                 endif
 
               case default
-                 write(*,*) 'dofout: NOT SUPPORT DTYPE', DTYPE(i)
+                 write(*,*) 'dofout: D_TYPE = ', S_DType(D_TYPE(i))
               end select
 7001          format('dof_out: ivar = ', i3,2x,'(',i3,',',i3,':',i3,') = ')
            enddo
