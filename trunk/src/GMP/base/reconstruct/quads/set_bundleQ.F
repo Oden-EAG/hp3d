@@ -39,7 +39,8 @@ c
       use control
       use GMP
 c
-#include "syscom.blk"
+c  ...removed syscom (declare variables)
+      implicit none
 c
       dimension Newlist_curves(Nrcurves),
      .          List_recta(3,Nrcurves)
@@ -121,7 +122,7 @@ c
 c
 c  .....loop through the edges of the hexahedron
         do ie=1,12
-          nc = iabs(HEXAS(nh)%EdgeNo(ie))
+          nc = abs(HEXAS(nh)%EdgeNo(ie))
 c
 c  .......loop through the endpoints of the edge
           do ive=1,2

@@ -33,7 +33,8 @@ subroutine hpvert(Iflag,No,Xi, Xnod)
    real(8) :: void(3,3)
 !
 #if DEBUG_MODE
-   integer :: iprint = 0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !----------------------------------------------------------------------

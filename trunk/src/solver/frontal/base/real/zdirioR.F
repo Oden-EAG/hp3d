@@ -1,8 +1,7 @@
-      subroutine zdirio (Unname, Commnd, Irec, Len, Sbuf, Jerr)
+      
 c
-#include "syscom.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
-c FUNCTION: This routine preforms direct access I/O for scratch tapes
+c FUNCTION: This routine performs direct access I/O for scratch tapes
 c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
 c ARGUMENTS:  (I : input, O : output, IO : input & output, W : workspace
 c
@@ -22,7 +21,7 @@ c O   Sbuf   - for read:  array for reading into
 c
 c O   Jerr   - error flag set to 0 for no error
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -32,20 +31,28 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
+      subroutine zdirio (Unname, Commnd, Irec, Len, Sbuf, Jerr)
+c
+      use surfsc1
+c
+      implicit none
 c
       character*(*) Unname, Commnd
-cwb >
-cwb       dimension Sbuf(*), nbuf(20), lenf(20)
-      dimension Sbuf(*), nbuf(9), lenf(9)
-      dimension lbuf(9), irsave(9)
 c
-
-
-
-cwb       save nbuf,lenf
+      integer :: Irec, Len, Jerr
+      real(8) :: Sbuf(*)
+c
+      integer :: nbuf(9), lenf(9)
+      integer :: lbuf(9), irsave(9)
+c
+      integer :: slen
+      integer :: i,iend,inow,ioffst,iostat,iunit
+      integer :: irecp,irecp0,irecpmax,irecsv
+      integer :: lenop,lenop19,lenr,lenw,lenwrd
+      integer :: maxrec,ntape,ntape0,ntape0_old
+      integer :: numfile,numfile_new,numfile_old
+c
       save nbuf, lenf, irsave
-cwb <
 c
 
 c  ...new !!!
@@ -58,9 +65,8 @@ c     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ccccc data irecpmax /5/
 
 
-c the following data statement is machine dependant
+c the following data statement is machine dependent
 c ...................................................
-c within zdirio1.blk is contained the data statement:
 c
       data maxrec,lenwrd /10000, 8/
 c where:
@@ -75,17 +81,12 @@ c            vax,ibm,apollo,etc (most other machines) = 8
 c            cray,cdc = 1
 c            ardent = 2
 c
-cccccccc       include '../newcomm/zdirio1.blk'
 c ..................................................
 c set the logical unit numbers used herein
 c =========================================
-cwb >
       data lbuf / 19,18,20, 21,22,23, 24,25,26 /
-cwb       data lubufu, lubufb, lubufl / 19, 18, 20 /
-cwb <
       irecp = 0
 c
-cwb >
 c No resolution
 c --------------
       ioffst = 0
@@ -164,25 +165,19 @@ c
 c
 c the following open statement is machine dependant
 c .................................................
-c within zdirio2.blk is contained the apollo open statement:
 c
-
 c         write(*,*)'ZDIRIO: standard open, ntape=',ntape
 c         call pause
 
          open (ntape,access='direct',form='unformatted',
      .                          recl=lenop,err=9000)
-ccccc.         status='scratch',recl=lenop,err=9000)
-
-
+c
       if(ntape.eq.19)then
         lenop19 = lenop
 c        write(*,*)'saved lenop=',lenop19
 c        call pause
       endif
-
 c
-ccccccccc       include '../newcomm/zdirio2.blk'
 c..................................................
 c
 c normal return
@@ -538,4 +533,5 @@ c
      . 'UNNAME,COMMND,IREC,LEN,NTAPE ',a1,2x,a8,2x,a1,a8,3i6)
       return
 c
-      end
+c
+      end subroutine zdirio

@@ -1,10 +1,12 @@
 module PML
-  !  ...PML PARAMETERS
+!
+  implicit none
+!  ...PML PARAMETERS
   real(8) :: RPML_MIN, RPML_MAX
-  !  ...PML domain, sphere
+!  ...PML domain, sphere
   integer :: PML_DOMAIN, PML_SPHERE
 contains
-
+!
   subroutine disp_pml_data
     write(*, 6000)
     write(*, 6001) PML_DOMAIN, PML_SPHERE
@@ -13,19 +15,22 @@ contains
 6001 format(' PML_DOMAIN, SPHERE  :   ', 2(i3,2x))
 6002 format(' PML_MIN, MAX        :   ', 2(e12.5,2x))
   end subroutine disp_pml_data
-
-  !  ...dump out the PML parameters
+!
+!  ...dump out PML parameters
   subroutine dumpout_PML
     integer, parameter :: ndump=31
     open(unit=ndump,file='files/dumpPML',form='formatted',access='sequential',status='unknown')
     write(ndump,*) RPML_MIN,RPML_MAX
     close(ndump)
   end subroutine dumpout_PML
+!
+!  ...dump in PML parameters
   subroutine dumpin_PML
     integer, parameter :: ndump=31
     open(unit=ndump,file='files/dumpGMP', form='formatted',access='sequential',status='unknown')
     read(ndump,*)  RPML_MIN,RPML_MAX
     close(ndump)
   end subroutine dumpin_PML
+!
 end module PML
 

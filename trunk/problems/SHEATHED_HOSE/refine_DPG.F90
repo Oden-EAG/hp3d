@@ -47,16 +47,16 @@
       integer, parameter :: max_step = 20
       integer, dimension(max_step), save :: nrdofDPG_mesh
       integer, dimension(max_step), save :: nrdofField_mesh
-      real*8, dimension(max_step), save :: residual_mesh
-      real*8, dimension(max_step), save :: rate_mesh
-      real*8, dimension(max_step), save :: error_mesh
-      real*8, dimension(max_step), save :: rel_error_mesh
-      real*8, dimension(max_step), save :: rate_error_mesh
+      real*8 , dimension(max_step), save :: residual_mesh
+      real*8 , dimension(max_step), save :: rate_mesh
+      real*8 , dimension(max_step), save :: error_mesh
+      real*8 , dimension(max_step), save :: rel_error_mesh
+      real*8 , dimension(max_step), save :: rate_error_mesh
 
 !
-      real*8, allocatable, dimension(:) :: elem_resid
-      real*8, allocatable, dimension(:) :: elem_error
-      real*8, allocatable, dimension(:) :: elem_rnorm
+      real*8 , allocatable, dimension(:) :: elem_resid
+      real*8 , allocatable, dimension(:) :: elem_error
+      real*8 , allocatable, dimension(:) :: elem_rnorm
       integer, allocatable, dimension(:) :: elem_ref_flag
       integer, allocatable, dimension(:) :: list_elem
       integer, allocatable, dimension(:) :: list_ref_flags
@@ -252,8 +252,10 @@
         call global_href
         call update_gdof
         call update_ddof
+#if DEBUG_MODE
         call verify_orient
         call verify_neig
+#endif
         nr_elem_to_refine = NRELES
 !
 !  ...adaptive refinements
@@ -352,8 +354,10 @@
 !      ...update geometry and Dirichlet flux dof after the refinements
           call update_gdof
           call update_Ddof
+#if DEBUG_MODE
           call verify_orient
           call verify_neig
+#endif
         endif
       end select
 !

@@ -107,7 +107,8 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
 !
 #if DEBUG_MODE
    integer :: ians,ibeg,iend,jbeg,jend,kbeg,kend,ivar1,ivar2
-   integer :: iprint=0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !----------------------------------------------------------------------

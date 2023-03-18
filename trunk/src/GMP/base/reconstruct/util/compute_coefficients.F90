@@ -27,7 +27,7 @@
  1000   format(' compute_coefficients: i = ',i1,'; j = ',i1,'; --> c = ',e12.5)
       endif
 !
-      end subroutine
+      end subroutine compute_coefficients
 
 
 !---------------------------------------------------------------------------------
@@ -86,4 +86,4 @@
  1000   format(' rad_der_coefficient: d = ',i1,'; i = ',i1,'; j = ',i1,'; --> c = ',e12.5)
       endif
 !
-      end subroutine
+      end subroutine rad_der_coefficient

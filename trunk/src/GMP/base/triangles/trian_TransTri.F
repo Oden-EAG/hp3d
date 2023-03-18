@@ -1,12 +1,12 @@
 c----------------------------------------------------------------------
-c> Purpose : transfinite interpolation for a triangle
+c> @brief Transfinite interpolation for a triangle
 c
-c  @param[in ] No        - triangle number
-c  @param[in ] Eta       - reference coordinates of a point
-c  @param[out] X         - physical coordinates of the point
-c  @param[out] Dxdeta    - derivatives wrt reference coordinates
+c> @param[in ] No        - triangle number
+c> @param[in ] Eta       - reference coordinates of a point
+c> @param[out] X         - physical coordinates of the point
+c> @param[out] Dxdeta    - derivatives wrt reference coordinates
 c
-c  @revision Nov 12
+c> @date Mar 2023
 c----------------------------------------------------------------------
 c
       subroutine trian_TransTri(No,Eta, X,Dxdeta)
@@ -14,19 +14,25 @@ c
       use control
       use GMP
       use element_data
-#include "syscom.blk"
-      common /cTI_triangle/ iprint
 c
-      dimension Eta(2), X(3),Dxdeta(3,2)
+      implicit none
+c
+      integer :: No
+      real(8) :: Eta(2),X(3),Dxdeta(3,2)
 c
 c  ...linear shape functions
-      dimension shapH(3),dshapH(2,3)
+      real(8) :: shapH(3),dshapH(2,3)
 c
 c  ...point on edge
-      dimension dseds(2),xc(3),dxcdse(3)
+      real(8) :: dseds(2),xc(3),dxcdse(3)
 c
 c  ...blending function
-      dimension dblend(2)
+      real(8) :: dblend(2)
+c
+      real(8) :: blend,se
+      integer :: ie,iv,iv1,iv2,ivar,j,nc,norient,np
+c
+      integer :: iprint
 c
 c-----------------------------------------------------------------------
 c

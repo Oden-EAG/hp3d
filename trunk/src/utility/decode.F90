@@ -6,8 +6,8 @@
 !
 !   latest revision    - May 2020
 !
-!   purpose            - routine decodes a nickname consisting of
-!                        2 digits
+!   purpose            - routine decodes a decimal-encoded nickname
+!                        consisting of 2 digits
 !
 !   arguments :
 !     in:       Nick   - a nickname
@@ -34,8 +34,8 @@ end subroutine decode
 !
 !   latest revision    - May 2020
 !
-!   purpose            - routine decodes a nickname consisting of
-!                        3 digits
+!   purpose            - routine decodes a decimal-encoded nickname
+!                        consisting of 3 digits
 !
 !   arguments :
 !     in:       Nick   - a nickname

@@ -50,21 +50,23 @@ TODO
 40. done, rename implicit_none.h to typedefs.h
 41. done, remove trailing whitespace in all files
 42. done, add Maxwell Galerkin implementation
+43. done, add Primal DPG Poisson implementation
+44. done, removal of implicit variables (syscom.blk)
+45. done, removal of common blocks
 --------------
-43. (LD) make corrections to find_neig routine (for anisotropic case)
-44. (LD) make corrections to global_pref routine (dof copying)
-45. (LD) fix enforce_max_rule routine (anisotropy issue)
-46. verify enforce_min_rule/enforce_max_rule routines
-47. data migration with Zoltan
-48. convert to modern Fortran (-std=f2018)
-49. OpenMP parallelize 'enforce_min_rule, enforce_max_rule'
-50. OpenMP parallelize global_href routine
-51. Add Primal DPG Poisson implementation (example problem)
-52. Add Ultraweak DPG Poisson implementation (example problem)
-53. Add Ultraweak DPG Acoustics (Helmholtz) implementation (example problem)
-54. Fix Zoltan warning about 'failing to dealloc memory' when 'RETURN_LISTS' is 'EXPORT'
+46. (LD) make corrections to find_neig routine (for anisotropic case)
+47. (LD) make corrections to global_pref routine (dof copying)
+48. (LD) fix enforce_max_rule routine (anisotropy issue)
+49. verify enforce_min_rule/enforce_max_rule routines
+50. data migration with Zoltan
+51. convert to modern Fortran (-std=f2018)
+52. OpenMP parallelize 'enforce_min_rule, enforce_max_rule'
+53. OpenMP parallelize global_href routine
+54. Add Ultraweak DPG Poisson implementation (example problem)
+55. Add Ultraweak DPG Acoustics (Helmholtz) implementation (example problem)
+56. Fix Zoltan warning about 'failing to dealloc memory' when 'RETURN_LISTS' is 'EXPORT'
 
-F --> F90 (incl. removal of implicit variables -- syscom.blk):
+F --> F90 conversion
 - delete back/ folders, if they are not needed anymore
   (or consider moving files into /src/unused) to declutter the library
 

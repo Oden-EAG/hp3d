@@ -79,7 +79,7 @@ end subroutine pyram
 !! @param[out] X      - physical coordinates
 !! @param[out] Dxdeta - derivatives
 !!
-!! @revision Mar 11
+!! @revision Mar 2023
 !-----------------------------------------------------------------------
 !
 subroutine pyram_TI(No,Eta, Xp,Dxdeta)
@@ -89,28 +89,32 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
       use element_data
       use node_types, only: PYRA
 !
-#include"syscom.blk"
-!-----------------------------------------------------------------------
+      implicit none
 !
-      dimension Eta(3),Xp(3),Dxdeta(3,3)
+      integer :: No
+      real(8) :: Eta(3),Xp(3),Dxdeta(3,3)
 !
 !  ...pyramid element order and vertex shape functions
-      dimension shapH(8),dshapH(3,8)
+      real(8) :: shapH(8),dshapH(3,8)
 !
 !  ...blending functions
-      dimension dblend(3),blend_edge(4),dblend_edge(3,4)
+      real(8) :: blend,dblend(3),blend_edge(4),dblend_edge(3,4)
 !
 !  ...projections
-      dimension dtedeta(3),tf(2),dtfdeta(2,3)
+      real(8) :: dtedeta(3),tf(2),dtfdeta(2,3)
 !
 !  ...edge kernels
-      dimension xe(3),dxedt(3)
+      real(8) :: xe(3),dxedt(3)
 !
 !  ...face kernels
-      dimension xf(3),dxfdtf(3,2)
+      real(8) :: xf(3),dxfdtf(3,2)
 !
-      real(8) x,y,z,xz1,yz1,z1
+      real(8) :: x,y,z,xz1,yz1,z1
 !
+      integer :: i,ie,ifig,iv,ivar,nc,norient,np,nr,nt
+      real(8) :: te,xz,yz
+!
+      integer :: iprint
 !----------------------------------------------------------------------
 !
       iprint=0

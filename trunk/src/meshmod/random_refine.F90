@@ -1,9 +1,12 @@
-!> @brief randomly refine mesh, only meant for testing;
-!!        routine does NOT update gdofs, since random refinements
+#if DEBUG_MODE
+
+!> @brief Randomly refines mesh
+!> @note  Only meant for testing;
+!!        routine does NOT update gdofs
 !! @param[in] Per   - percentage to refine
 !! @param[in] Niter - number of iteration
 !> @date Feb 2023
-subroutine random_refine(Per, Nitr)
+subroutine random_refine(Per,Nitr)
   use data_structure3D
   use refinements
   use environment , only : QUIET_MODE
@@ -15,7 +18,7 @@ subroutine random_refine(Per, Nitr)
   real(8) :: x
   integer :: iprint, iseed, iel, i, istat
   integer :: nsize_list, kref, mdle, nref, idx
-  integer, allocatable ::  mdle_list(:)
+  integer, allocatable :: mdle_list(:)
   logical :: mode_save
   !
   iprint=0
@@ -117,3 +120,5 @@ ENDIF
   enddo
 !
 end subroutine random_refine
+
+#endif

@@ -1,11 +1,8 @@
-!>  Purpose :
-!!    module defines various parameters used to parametric elements
-!!
-!! @rev Dec 10
+!> @brief Defines various parameters for parametric elements
+!> @date  Feb 2023
 module parameters
   use error
   implicit none
-  integer :: iprint_parameter
   !
   !  ...dimension of the problem
   integer, parameter :: NDIMEN = 3
@@ -69,13 +66,13 @@ module parameters
   integer, parameter :: MAXprismV = MAXtriaV*MAXP + MAXtriaQ*(MAXP+1)
   integer, parameter :: MAXprismQ = MAXtriaQ*MAXP
   !
-  !  ...max number of local dof for a 3D tetrahedral  element
+  !  ...max number of local dof for a 3D tetrahedral element
   integer, parameter :: MAXtetraH = (MAXP+1)*(MAXP+2)*(MAXP+3)/6
   integer, parameter :: MAXtetraE = MAXP*(MAXP+2)*(MAXP+3)/2
   integer, parameter :: MAXtetraV = MAXP*(MAXP+1)*(MAXP+3)/2
   integer, parameter :: MAXtetraQ = MAXP*(MAXP+1)*(MAXP+2)/6
   !
-  !  ...max number of local dof for a 3D pyramid  element
+  !  ...max number of local dof for a 3D pyramid element
   integer, parameter :: MAXpyramH = 5+8*(MAXP-1)+(MAXP-1)**2+(MAXP-2)*(MAXP-1)*2+(MAXP-1)**3
   integer, parameter :: MAXpyramE = 8*MAXP+2*MAXP*(MAXP-1)+4*MAXP*(MAXP-1)+3*(MAXP-1)**2*MAXP
   integer, parameter :: MAXpyramV = MAXquadQ+4*MAXtriaQ+3*(MAXP-1)*MAXP**2
@@ -83,47 +80,47 @@ module parameters
   !
   !----------------------------------------------------------------------
   !  ==== NODE ===
-  !  ...maximum number of dof for 'mdlt'
+  !  ...maximum number of dof for 'mdlt' (tria middle node)
   integer, parameter :: MAXmdltH=(MAXP-2)*(MAXP-1)/2
   integer, parameter :: MAXmdltE=(MAXP-1)*MAXP
   integer, parameter :: MAXmdltV=MAXmdltE
   integer, parameter :: MAXmdltQ=MAXP*(MAXP+1)/2
   !
-  !  ...maximum number of dof for 'mdlq'
+  !  ...maximum number of dof for 'mdlq' (quad middle node)
   integer, parameter :: MAXmdlqH=(MAXP-1)**2
   integer, parameter :: MAXmdlqE=2*MAXP*(MAXP-1)
   integer, parameter :: MAXmdlqV=MAXmdlqE
   integer, parameter :: MAXmdlqQ=MAXP**2
   !
-  !  ...maximum number of dof for 'mdlb'
+  !  ...maximum number of dof for 'mdlb' (bric middle node)
   integer, parameter :: MAXmdlbH=(MAXP-1)**3
   integer, parameter :: MAXmdlbE=3*MAXP*(MAXP-1)**2
   integer, parameter :: MAXmdlbV=3*MAXP**2*(MAXP-1)
   integer, parameter :: MAXmdlbQ=MAXbrickQ
   !
-  !  ...maximum number of dof for 'mdln'
+  !  ...maximum number of dof for 'mdln' (tetr middle node)
   integer, parameter :: MAXmdlnH=(MAXP-3)*(MAXP-2)*(MAXP-1)/6
   integer, parameter :: MAXmdlnE=(MAXP-2)*(MAXP-1)*MAXP/2
   integer, parameter :: MAXmdlnV=(MAXP-1)*MAXP*(MAXP+1)/2
   integer, parameter :: MAXmdlnQ=MAXtetraQ
   !
-  !  ...maximum number of dof for 'mdlp'
+  !  ...maximum number of dof for 'mdlp' (pris middle node)
   integer, parameter :: MAXmdlpH=MAXmdltH*(MAXP-1)
   integer, parameter :: MAXmdlpE=MAXmdltE*(MAXP-1)+MAXmdltH*MAXP
   integer, parameter :: MAXmdlpV=MAXmdltV*MAXP+MAXmdltQ*(MAXP-1)
   integer, parameter :: MAXmdlpQ=MAXprismQ
   !
-  !  ...maximum number of dof for 'mdld'
+  !  ...maximum number of dof for 'mdld' (pyra middle node)
   integer, parameter :: MAXmdldH=(MAXP-1)**3
   integer, parameter :: MAXmdldE=3*(MAXP-1)**2*MAXP
   integer, parameter :: MAXmdldV=3*(MAXP-1)*MAXP**2
   integer, parameter :: MAXmdldQ=MAXpyramQ
   !
   !----------------------------------------------------------------------
-
+  !
   !  ...number of maximum timesteps
   ! integer, save :: MAXTIMESTEP
-
+  !
   !  ...number of copies of variables stored
   integer, save :: NRCOMS
   !
@@ -147,6 +144,8 @@ module parameters
   !
   !----------------------------------------------------------------------
   ! real parameters
+  real(8)   , parameter :: rZERO = 0.d0
+  real(8)   , parameter :: rONE  = 1.d0
 #if C_MODE
   complex(8), parameter :: ZERO = (0.d0,0.d0)
   complex(8), parameter :: ZONE = (1.d0,0.d0)
@@ -159,15 +158,16 @@ module parameters
 #endif
   !
   contains
-
-    subroutine set_parameters(LNrcoms, LMaxnrhs, &
-         LMaxeqnh, LMaxeqne, LMaxeqnv, LMaxeqnq)
-      integer :: LNrcoms, LMaxnrhs, &
-           LMaxeqnh, LMaxeqne, LMaxeqnv, LMaxeqnq
-      NRCOMS  = LNrcoms
-      MAXNRHS = LMaxnrhs
-
-      MAXEQNH = LMaxeqnh;      MAXEQNE = LMaxeqne
-      MAXEQNV = LMaxeqnv;      MAXEQNQ = LMaxeqnq
+    !
+    subroutine set_parameters(LNrcoms , LMaxnrhs, &
+                              LMaxeqnh, LMaxeqne, &
+                              LMaxeqnv, LMaxeqnq)
+      integer, intent(in) :: LNrcoms , LMaxnrhs,  &
+                             LMaxeqnh, LMaxeqne,  &
+                             LMaxeqnv, LMaxeqnq
+      NRCOMS  = LNrcoms ; MAXNRHS = LMaxnrhs
+      MAXEQNH = LMaxeqnh; MAXEQNE = LMaxeqne
+      MAXEQNV = LMaxeqnv; MAXEQNQ = LMaxeqnq
     end subroutine set_parameters
+    !
 end module parameters

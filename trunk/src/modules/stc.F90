@@ -716,7 +716,8 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
    integer :: mvarH,mvarE,mvarV,mvarQ
 !
 #if DEBUG_MODE
-   integer :: iprint=0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !----------------------------------------------------------------------

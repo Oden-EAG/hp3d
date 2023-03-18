@@ -1,6 +1,3 @@
-      subroutine surfss (Awrk)
-c
-#include "syscom.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: Primary driver routine for the frontal solver solution modul
 c --------------------------------------------------------------
@@ -14,7 +11,7 @@ c
 c Typ Name      Function
 c W   Awrk  : temporary workspace required by surfs
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Feb 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -23,18 +20,19 @@ c     aaaaaaaa    LOCAL Variables
 c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+      subroutine surfss (Awrk)
 c
-#include "surfsc1.blk"
+      use surfsc1
 c
-      dimension Awrk(*)
+      real(8) :: Awrk(*)
 c
 c debug print
 c
       if (IPFSS1 .eq. 1) then
          write(NFSOUT,7701) ISYM,NUMELM,IRESOL,NRHS,MA,IWRT,
-     .                       IASSEM,NFSOUT,NICMUL
-7701      format(1x,'SURFSS:  ISYM,NUMELM,IRESOL,NRHS,MA,IWRT,',
-     .           'IASSEM,NFSOUT,NICMUL',/,10x,9i8)
+     .                      IASSEM,NFSOUT,NICMUL
+7701     format(1x,'SURFSS: ISYM,NUMELM,IRESOL,NRHS,MA,IWRT,',
+     .                     'IASSEM,NFSOUT,NICMUL',/,10x,9i8)
       endif
 c
 c for no resolution, solve the system of equations
@@ -46,5 +44,4 @@ c with resolution, solve the system of equations
 c
       if (IRESOL .eq. 1) call resol (Awrk)
 c                        -------------
-      return
-      end
+      end subroutine surfss

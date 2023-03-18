@@ -1,7 +1,3 @@
-      subroutine bckwrd (Alelm, Aldest, Amdest,
-     .                   Andest, Elem, Frnt, Bbuf, Ubuf)
-c
-#include "syscomz.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c     Backsubstitution
@@ -31,7 +27,7 @@ c W  Ubuf    The eliminated lhs buffered equations
 c W  Bbuf    The eliminated rhs buffered equations
 c
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -40,24 +36,31 @@ c     aaaaaaaa    LOCAL Variables
 c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
-c-
-#include "surfsc1.blk"
-#include "surfsc2.blk"
-#include "surfscwr.blk"
 c
-      dimension Aldest(*), Amdest(*), Andest(*), Elem(*), Frnt(*),
-     .          Bbuf(*), Ubuf(*), Alelm(*)
-
-
+      subroutine bckwrd (Alelm, Aldest, Amdest,
+     .                   Andest, Elem, Frnt, Bbuf, Ubuf)
+c
+      use surfsc1
+      use surfsc2
+c
+      implicit none
+c
+      complex(8) :: Aldest(*), Amdest(*), Andest(*), Elem(*),
+     .              Frnt(*), Bbuf(*), Ubuf(*), Alelm(*)
+c
+      integer :: iuu,jel,i,ie,iel,ifbi,ifui,ill
+      integer :: irout4,irout5,iuuold,j,jerr,k,l,lenx
+      integer :: md,n,ne,negiel,numdes
+c
 c  ...test......test......test......test......test......test......test...
-      dimension ndest1(100)
+ccc      integer :: ndest1(100)
 c  ...test......test......test......test......test......test......test...
-
-
-
 
 c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
+#endif
 c
       iuu = 1
       jel = NUMELM + 1
@@ -69,15 +72,12 @@ c
       IFU = IFU + 1
       IFB = IFB + 1
 
-
-
 c
 c loop over the Elements (we are actually looping thru them backwards)
 c **********************
       do 200 iel = 1,NUMELM
 c     *******************
 c set to loop backwards thru the Elems
-
 
 c
          jel = jel - 1
@@ -87,16 +87,15 @@ c
 c pull up the Elements nodal destination vectors (Aldest)
 c
 
-
          call solin1 (jel, numdes, Aldest)
 c        ----------------------------------
+#if DEBUG_MODE
          if (iprint.eq.1) then
            write(NFSOUT,*) 'IN BCKWRD BEFORE CALL TO dest= '
            write(NFSOUT,*) 'jel,numdes = ',jel,numdes
            write(NFSOUT,*) 'Aldest = ',(Aldest(ii),ii=1,numdes)
          endif
-
-
+#endif
 
 c  ...test......test......test......test......test......test......test...
 c  ...test......test......test......test......test......test......test...
@@ -127,9 +126,11 @@ c  and the transfer loc for active dof in the front after eliminating (A
 c
          call dest (numdes, Aldest, ne ,Amdest, Andest)
 c        -----------------------------------------------
+#if DEBUG_MODE
          if (iprint.eq.1) then
            write(NFSOUT,*) 'IN BCKWRD NDOFM AFTER CALL TO dest= ',NDOFM
          endif
+#endif
 c
 c pick up final frontwidth (after elim) for the next Element
 c
@@ -186,7 +187,6 @@ cwb <
                  else
                      call zdirio    ('U', 'READ', IFU, ill, Ubuf, jerr)
                  endif
-
 
 cwb >
 c for unsymmetric during resolution we didnt know IFU apriori
@@ -251,8 +251,6 @@ c
                if (IB .le. 0) then
                   IFB = IFB - 1
 
-
-
               if(IDUMPWR.eq.1)then
                 if(irout5.ne.100)then
                   write(NFSOUT,*)'BCKWRD: PRETEND READ B'
@@ -262,8 +260,6 @@ c
               else
                   call zdirio   ('B', 'READ', IFB, ill, Bbuf, jerr)
               endif
-
-
 
 c error out
 c
@@ -317,7 +313,7 @@ c$doit VBEST
 c
                do 160 i = 1,NDOFM
                   md = Amdest(i)
-                  md = iabs(md)
+                  md = abs(md)
                   l = (j-1)*MFW + md
                   Elem(k) = Frnt(l)
                   k = k + 1
@@ -340,9 +336,11 @@ cwb c
 cwb   180       continue
 cwb <
 c
+#if DEBUG_MODE
             if (iprint.eq.1) then
               write(NFSOUT,*) 'IN BCKWRD jel,NDOFM = ',jel,NDOFM
             endif
+#endif
             call solout (jel, NDOFM, NRHS, Amdest, Elem)
 c           ---------------------------------------------
 c debug print
@@ -362,6 +360,5 @@ c
       IFU = ifui
       IFB = ifbi
 c
-      return
-      end
-
+c
+      end subroutine bckwrd

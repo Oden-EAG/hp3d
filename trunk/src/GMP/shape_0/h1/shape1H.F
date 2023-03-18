@@ -4,7 +4,7 @@ c   routine name       - shape1H_0
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Nov 13
+c   latest revision    - Mar 2023
 c
 c   purpose            - evaluate 1D H1 shape functions
 c
@@ -17,23 +17,26 @@ c        ShapH         - values of shape functions
 c        DshapH        - values of derivatives of the shape functions
 c                        wrt to master element coordinates
 c
-c   required  routines -
-c
 c----------------------------------------------------------------------
 c
       subroutine shape1H_0(Xi,Nord, NrdofH,ShapH,DshapH)
 c
       use parameters
       use element_data
-#include "syscom.blk"
+      implicit none
 c
-      dimension ShapH(MAXP+1),DshapH(MAXP+1)
+      integer :: Nord,NrdofH
+      real(8) :: Xi,ShapH(MAXP+1),DshapH(MAXP+1)
 c
 c  ...kernel shape functions
-      dimension shapHk(MAXP-1),dshapHk(MAXP-1)
+      real(8) :: shapHk(MAXP-1),dshapHk(MAXP-1)
+c
+      real(8) :: t,dtdxi
+      integer :: j,k,norient,nrdofHk
 c
 c----------------------------------------------------------------------
 c
+      integer :: iprint
       iprint=0
 c
       NrdofH = Nord+1
@@ -76,4 +79,4 @@ c
       endif
 c
 c
-      end subroutine
+      end subroutine shape1H_0

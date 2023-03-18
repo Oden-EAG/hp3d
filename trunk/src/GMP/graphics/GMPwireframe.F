@@ -4,9 +4,7 @@ c   routine name       - GMPwireframe
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Apr 07
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine displays the wireframe for a 3D manifold
 c
@@ -15,40 +13,49 @@ c   arguments :
 c     in:
 c               Iwind  - window number
 c
-c   required  routines -
-c
 c----------------------------------------------------------------------
 c
       subroutine GMPwireframe(Iwind)
 c
       use graphmod
       use GMP
-
-#include "syscom.blk"
+c
+      implicit none
+c
+      integer :: Iwind
 c
 c  ...list of segments
       real(8), allocatable ::  SEGMENTS(:,:,:)
       integer, allocatable ::  COLORN(:)
 c
 c  ...list of rectangles to display
-      parameter (max_nr_rect=10)
-      dimension nrect(max_nr_rect)
+      integer, parameter :: max_nr_rect=10
+      integer :: nrect(max_nr_rect)
 c
 c  ...list of curves to display
-      parameter (max_nr_curv=10)
-      dimension ncurv(max_nr_curv)
+      integer, parameter :: max_nr_curv=10
+      integer :: ncurv(max_nr_curv)
 c
 c  ...point, derivatives
-      dimension x(3),dxdeta(3),xob(3),xyp(2,2)
+      real(8) :: x(3),dxdeta(3),xob(3),xyp(2,2)
 c
 c  ...bounds
-      dimension xmax(2),xmin(2),im(2)
+      real(8) :: xmax(2),xmin(2)
+      integer :: im(2)
 c
+      real(8) :: eta,psi,q,q1,rnsc,theta
+      integer :: ic,ichoice,idec,idec_bundle,idec_curve,idec_edge
+      integer :: idec_Hermite,idec_normal,idec_rectangle
+      integer :: ii,ip,ir,j,k,lab,nc,ncol,np,npoint
+      integer :: nr,nr_curv,nr_curves,nr_rect,nr_segments,nrsub1
+c
+      integer :: iprint
+c
+      real(8) :: bigp,bign,small,pi
       data bigp,bign,small /1.d30,-1.d30,1.d-14/
       data pi /3.14159265358979312d0/
 c
 c***********************************************************************
-c
       iprint=0
 c
 c  ...set up default values for control parameters
@@ -356,10 +363,4 @@ c  .....reset to the default
       end select
 c
       goto 10
-      end
-
-
-
-
-
-
+      end subroutine GMPwireframe

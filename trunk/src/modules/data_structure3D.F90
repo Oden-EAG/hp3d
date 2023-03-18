@@ -1,5 +1,5 @@
 !----------------------------------------------------------------------
-!> @brief   module defines date structure arrays
+!> @brief   Defines data structure arrays
 !> @date    Feb 2023
 !----------------------------------------------------------------------
 module data_structure3D
@@ -79,7 +79,6 @@ module data_structure3D
 !
 !  .....case number indicating what physical attributes are supported
 !       (binary-encoded per physics variable)
-!  TODO: change to ncase
         integer          :: case
 !
 !  .....order of approximation (decimal-encoded per direction (x,y,z))
@@ -113,11 +112,6 @@ module data_structure3D
         type(dof_data), pointer :: dof
 !
 #if DEBUG_MODE
-!
-        integer          :: iback
-!
-!  .....locker number
-        integer          :: lock
 !
 !  .....error
 !       0   - scalar error
@@ -847,6 +841,8 @@ module data_structure3D
          enddo
          call mixed_product(a(1:3,1), a(1:3,2), a(1:3,3), val)
          Is_right_handed = (val > 0.d0)
+      case default
+         write(*,*) 'Is_right_handed'; stop
       end select
       end function Is_right_handed
 !

@@ -4,7 +4,7 @@ c   routine name       - collect_tangent
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Feb 07
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine collects tanget vector for a curve
 c                        at one of its endpoints and its derivative
@@ -12,10 +12,11 @@ c                        wrt to the curve parameter
 c
 c   arguments
 c     in:
-c              Nc      - a Hermite curve
-c              Np      - a point
+c             Nc       - a Hermite curve
+c             Np       - a point
 c     out:
-c              Tangent - the tangent vector
+c             Tangent  - the tangent vector
+c             Dtangent -
 c
 c----------------------------------------------------------------------
 c
@@ -23,9 +24,12 @@ c
 c
       use GMP
 c
-#include "syscom.blk"
+      implicit none
 c
-      dimension Tangent(1:3), Dtangent(1:3)
+      integer :: Nc,Np
+      real(8) :: Tangent(1:3),Dtangent(1:3)
+c
+      integer :: i
 c
 c  ...locate the point
       call locate(Np,CURVES(Nc)%EndPoNo(1:2),2, i)
@@ -48,4 +52,4 @@ c       with orientation !!!
       end select
 c
 c
-      end
+      end subroutine collect_tangent

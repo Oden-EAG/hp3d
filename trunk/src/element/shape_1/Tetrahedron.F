@@ -38,7 +38,7 @@ c
       integer, intent(out) :: NrdofH
       integer :: i,j,k,nij,nijk,m,v,e,f,N,ndofE,nordE,nordF,ndofF
       integer :: minI,minJ,minK,minIJ,minIJK,maxI,maxJ,maxK,maxIJ,maxIJK
-      integer :: nordB,ndofB,iprint,minbeta
+      integer :: nordB,ndofB,minbeta
       logical :: IdecE,IdecF,IdecB(2)
       double precision, intent(in)  :: X(3)
       double precision, intent(out) :: ShapH(Nsize(2))
@@ -55,8 +55,11 @@ c
       double precision :: homLbet(3:Nsize(1)-1,1:Nsize(1)-3)
       double precision :: DhomLbet(3,3:Nsize(1)-1,1:Nsize(1)-3)
 c
+#if DEBUG_MODE
 c  ...debugging flag
+      integer :: iprint
       iprint=0
+#endif
 c
 c  ...spatial dimensions
       N=3
@@ -175,6 +178,7 @@ c
 c  ...give total degrees of freedom
       NrdofH = m
 c
+#if DEBUG_MODE
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001) X(1:3),Nord(1:11),
@@ -224,6 +228,7 @@ c  ...print this when debugging
         endif
         call pause
       endif
+#endif
 c
 c
       end subroutine shape3DHTet
@@ -264,7 +269,7 @@ c
       integer, intent(out) :: NrdofE
       integer :: i,j,k,nij,nijk,m,e,f,N,nordE,ndofE,nordF,ndofF
       integer :: minI,minJ,minK,minIJ,minIJK,maxI,maxJ,maxK,maxIJ,maxIJK
-      integer :: nordB,ndofB,iprint,minbeta,famctr,fam,abc(3),abcd(4),d
+      integer :: nordB,ndofB,minbeta,famctr,fam,abc(3),abcd(4),d
       logical :: IdecE,IdecF,IdecB(2)
       double precision, intent(in)  :: X(3)
       double precision, intent(out) :: ShapE(3,Nsize(2))
@@ -281,8 +286,11 @@ c
       double precision :: DhomLbet(1:3,1:Nsize(1)-1,1:Nsize(1)-1)
       double precision :: DhomLbetxETri(3)
 c
+#if DEBUG_MODE
 c  ...debugging flag
+      integer :: iprint
       iprint=0
+#endif
 c
 c  ...spatial dimension
       N=3
@@ -414,6 +422,7 @@ c
 c  ...give total degrees of freedom
       NrdofE = m
 c
+#if DEBUG_MODE
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001) X(1:3),Nord(1:11),
@@ -469,6 +478,7 @@ c  ...print this when debugging
         endif
         call pause
       endif
+#endif
 c
 c
       end subroutine shape3DETet
@@ -507,7 +517,7 @@ c
       integer, intent(out) :: NrdofV
       integer :: i,j,k,nij,nijk,m,f,N,nordF,ndofF
       integer :: minI,minJ,minK,minIJ,minIJK,maxI,maxJ,maxK,maxIJ,maxIJK
-      integer :: nordB,ndofB,iprint,minbeta,famctr,fam,abc(3),abcd(4),d
+      integer :: nordB,ndofB,minbeta,famctr,fam,abc(3),abcd(4),d
       logical :: IdecF,IdecB(2)
       double precision, intent(in)  :: X(3)
       double precision, intent(out) :: ShapV(3,Nsize(2))
@@ -521,8 +531,12 @@ c
       double precision :: DhomLbet(3,0:Nsize(1)-2,1:Nsize(1)-1)
       double precision :: DhomLbetVTri
 c
+#if DEBUG_MODE
 c  ...debugging flag
+      integer :: iprint
       iprint=0
+#endif
+c
 c  ...spatial dimensions
       N=3
 c
@@ -617,6 +631,7 @@ c
 c  ...give total degrees of freedom
       NrdofV = m
 c
+#if DEBUG_MODE
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001) X(1:3),Nord(7:11),NoriF(1:4)
@@ -655,6 +670,7 @@ c  ...print this when debugging
         endif
         call pause
       endif
+#endif
 c
 c
       end subroutine shape3DVTet
@@ -689,7 +705,7 @@ c
       implicit none
       integer, intent(in)  :: Nord(11),Nsize(2)
       integer, intent(out) :: NrdofQ
-      integer :: i,j,k,nij,nijk,m,N,nordB,ndofB,iprint,minalpha,minbeta
+      integer :: i,j,k,nij,nijk,m,N,nordB,ndofB,minalpha,minbeta
       integer :: minI,minJ,minK,minIJ,minIJK,maxI,maxJ,maxK,maxIJ,maxIJK
       double precision, intent(in)  :: X(3)
       double precision, intent(out) :: ShapQ(Nsize(2))
@@ -698,8 +714,12 @@ c
       double precision :: homPal(0:Nsize(1)-1,0:Nsize(1)-1)
       double precision :: homPbet(0:Nsize(1)-1,0:Nsize(1)-1)
 c
+#if DEBUG_MODE
 c  ...debugging flag
+      integer :: iprint
       iprint=0
+#endif
+c
 c  ...spatial dimensions
       N=3
 c  ...initiate counter for shape functions
@@ -748,6 +768,7 @@ c
 c  ...give total degrees of freedom
       NrdofQ = m
 c
+#if DEBUG_MODE
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001) X(1:3),Nord(11)
@@ -767,5 +788,6 @@ c  ...print this when debugging
         endif
         call pause
       endif
+#endif
 c
       end subroutine shape3DQTet

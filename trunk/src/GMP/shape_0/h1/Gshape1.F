@@ -4,9 +4,7 @@ c   routine name       - Gshape1
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Apr 07
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine evaluates 1D hierarchical C2-conforming
 c                        shape functions, the first six are determined
@@ -26,7 +24,7 @@ c
 c
       use parameters
 c
-#include "syscom.blk"
+      implicit none
 c
       integer,intent(in)                             :: Nord
       double precision,intent(in)                    :: Xi
@@ -43,8 +41,11 @@ c  ...auxiliary matrix and vector
       double precision,dimension(6,6) :: a
       double precision,dimension(6)   :: b
 c
+      integer :: j,k
+c
 c----------------------------------------------------------------------
 c
+      integer :: iprint
       iprint=0
 c
 c  ...check data
@@ -103,18 +104,16 @@ c  ...compute shape functions and their derivatives
       enddo
 c
 c
-      end
-
-
+      end subroutine Gshape1
+c
+c
 c----------------------------------------------------------------------
 c
 c   routine name       - Gshap1
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Apr 07
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine evaluates 1D hierarchical C2-conforming
 c                        shape functions, the first six are determined
@@ -135,8 +134,10 @@ c
 c
       use parameters
 c
-#include "syscom.blk"
+      implicit none
 c
+      integer,intent(in)                             :: Nord
+      double precision,intent(in)                    :: Xi
       double precision,dimension(MAXP+1),intent(out) :: Vshap,
      .                                                  Dvshap,
      .                                                  Ddvshap,
@@ -152,8 +153,11 @@ c
 c  ...visitation flag
       integer,save :: nflag_Gshap1 = 0
 c
+      integer :: j,k
+c
 c----------------------------------------------------------------------
 c
+      integer :: iprint
       iprint=0
 c
 c  ...check data
@@ -216,4 +220,4 @@ c  ...compute shape functions and their derivatives
       enddo
 c
 c
-      end
+      end subroutine Gshap1

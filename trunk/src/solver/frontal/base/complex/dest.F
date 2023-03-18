@@ -1,6 +1,3 @@
-      subroutine dest (Nd, Aldest ,Nee, Amdest, Andest)
-c
-#include "syscomz.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c converts nodal dest. vectors to dof dest. vectors
@@ -20,7 +17,7 @@ c O   Andest  destination in the front where the remaining values
 c             in the front will transfer to, as each exiting dof is
 c             eliminated
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -30,22 +27,33 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      subroutine dest (Nd, Aldest, Nee, Amdest, Andest)
 c
-      dimension Aldest(*), Amdest(*), Andest(*)
+      use surfsc1
+      use surfsc2
 c
-c internal function : modr
-c ------------------------
+      implicit none
 c
+      integer    :: Nd, Nee
+      complex(8) :: Aldest(*), Amdest(*), Andest(*)
+c
+      integer :: i,j,km,kn,l,ldest,m,n,ndi,ndl,ne
+c
+#if DEBUG_MODE
+      integer :: iprint
+#endif
+c
+      integer :: modr
       modr(i,j) = i - (i/j)*j
 c
-      iprint=0
+#if DEBUG_MODE
+      iprint = 0
       if (iprint.eq.1) then
         write(NFSOUT,*) 'DEST: Nd, Aldest = ',Nd
         write(NFSOUT,7001) (Aldest(iii),iii=1,Nd)
  7001   format(1x,6f10.1)
       endif
+#endif
 c
 c initialize
 c
@@ -124,17 +132,17 @@ c
 c set the current frontwidth number
 cwb >
 c ATTENTION, modified by me !!!!!!!!!!!!!!!!!!!!!!!!!!
-ccc         l = iabs(idnint(ZABS(Amdest(km-1))))
+ccc         l = abs(idnint(ZABS(Amdest(km-1))))
 cldem, 11.6.98
 cwr10.07.99
-ccccc       l = iabs(nint( real(Amdest(km-1))))
+ccccc       l = abs(nint( real(Amdest(km-1))))
 cccccc      l =  abs( int( real(Amdest(km-1))))
 c
 cwr07.12.00 - the above change was not necessary and may cause errors,
 cwr07.12.00   back to original "nint":
-            l = iabs(nint( dreal(Amdest(km-1))))
+            l = abs(nint( dreal(Amdest(km-1))))
 
-cwb           l = iabs(idnint(Amdest(km-1)))
+cwb           l = abs(idnint(Amdest(km-1)))
 cwb <
          if (l .gt. NFW) NFW = l
 c
@@ -215,5 +223,5 @@ cwb <
 7010    format(11x,'DOF DESTINATION VECTORS',10i7,10(/,35x,10i7))
 7020    format(9x,'ELIM. DESTINATION VECTORS',10i7,10(/,35x,10i7))
 c
-      return
-      end
+c
+      end subroutine dest

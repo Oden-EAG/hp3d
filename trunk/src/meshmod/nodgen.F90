@@ -23,7 +23,8 @@
 subroutine nodgen(Ntype,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
 !
    use data_structure3D
-   use mpi_param, only: RANK,ROOT
+   use environment, only: QUIET_MODE
+   use mpi_param  , only: RANK,ROOT
 !
    implicit none
 !
@@ -41,7 +42,8 @@ subroutine nodgen(Ntype,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
 #if DEBUG_MODE
    integer :: ncase(NR_PHYSA)
    integer :: ibcnd(NRINDEX)
-   integer :: iprint = 0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !-----------------------------------------------------------------------
@@ -61,7 +63,7 @@ subroutine nodgen(Ntype,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
 #endif
 !
    if ((NPNODS.eq.0) .or. (NPNODS.gt.MAXNODS)) then
-      if (RANK .eq. ROOT) then
+      if (.not. QUIET_MODE .and. RANK.eq.ROOT) then
          write(*,*) 'nodgen: increasing size of NODES array.'
       endif
       call increase_MAXNODS

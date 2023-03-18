@@ -1,6 +1,3 @@
-      subroutine complt (Awrk)
-c
-#include "syscom.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c Initiate forward elimination of lhs and rhs followed by backsubstituti
@@ -12,7 +9,7 @@ c
 c W   Awrk    Workspace used by the solver (it is cut and passed below)
 c
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -21,11 +18,17 @@ c     aaaaaaaa    LOCAL Variables
 c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+      subroutine complt (Awrk)
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      use surfsc1
+      use surfsc2
+
+      implicit none
 c
-      dimension Awrk(*)
+      real(8) :: Awrk(*)
+c
+      real(8) :: dt,t0,tb,tf
+      integer :: ia1,iab,iae,iaf,ial,iam,ian,iful,minn,n
 c
       call zecond(t0)
 c
@@ -226,5 +229,5 @@ c ==========
 c
  9100 continue
 c
-      return
-      end
+c
+      end subroutine complt

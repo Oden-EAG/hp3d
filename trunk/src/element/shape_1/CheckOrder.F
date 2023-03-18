@@ -40,11 +40,13 @@ c
       integer, intent(in)  :: Norder(19)
       integer, intent(in)  :: MaxOrd
       integer, intent(out) :: Nsize(2)
-      integer :: minp,maxp,nps(27),m,f,nordF(2),nordB(3),iprint
+      integer :: minp,maxp,nps(27),m,f,nordF(2),nordB(3)
       logical :: confident
 c
-c  ...intialize printing flag
+#if DEBUG_MODE
+      integer :: iprint
       iprint = 0
+#endif
 c
 c  ...initialize output variable
       Nsize = 0
@@ -115,7 +117,11 @@ c     in the shape element routines.
         case(SEGM)
           m=1
           nps(1:m)=Norder(1:m)
+        case default
+          write(*,*) 'checkorder'; stop
         end select
+c
+#if DEBUG_MODE
 c    ...print this when debugging
         if (iprint.ge.1) then
           write(*,7006) S_Type(Ntype),S_DType(Dtype)
@@ -123,6 +129,8 @@ c    ...print this when debugging
           write(*,7007) nps(1:m)
  7007     format('checkorder: nps = ',27i2)
         endif
+#endif
+c
 c    ...Find the values of minp and maxp inside nps.
         minp=minval(nps(1:m))
         maxp=maxval(nps(1:m))
@@ -202,11 +210,12 @@ c     Compare these values with module parameters.
         end select
       end select
 c
+#if DEBUG_MODE
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7008) Nsize(1),Nsize(2)
  7008   format('checkorder: Nsize(1:2) = ',i2,i5)
       endif
-c
+#endif
 c
       end subroutine checkorder

@@ -51,7 +51,8 @@ subroutine nodcor(Mdle, Xnod)
 #if DEBUG_MODE
    integer :: nodesl(27), norientl(27)
    integer :: inod,nod,ndofH,ndofE,ndofV,ndofQ
-   integer :: iprint = 0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !---------------------------------------------------------------------

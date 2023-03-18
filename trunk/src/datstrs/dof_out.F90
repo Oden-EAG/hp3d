@@ -1,34 +1,34 @@
-!> Purpose : copy dof for a node from data structure into local arrays
-!! @param[in]    Nod                     - a node number
-!! @param[inout] KdofH,KdofE,KdofV,KdofQ - dof counters for the local arrays
-!! @param[out]   ZvalH,ZvalE,ZvalV,ZvalQ - H1,H(curl),H(div) and L2 dof
-!!                                         from the data structure in the
-!!                                         expanded mode
-
+!> @brief   copy dof for a node from data structure into local arrays
+!! @param[in]     Nod                     - a node number
+!! @param[in,out] KdofH,KdofE,KdofV,KdofQ - dof counters for the local arrays
+!! @param[out]    ZvalH,ZvalE,ZvalV,ZvalQ - H1,H(curl),H(div) and L2 dof
+!!                                          from the data structure in the
+!!                                          expanded mode
+!> @date    Feb 2023
 #include "typedefs.h"
-subroutine dof_out( &
-     Nod, &
-     KdofH,KdofE,KdofV,KdofQ, &
-     ZvalH,ZvalE,ZvalV,ZvalQ)
+subroutine dof_out( Nod,                     &
+                    KdofH,KdofE,KdofV,KdofQ, &
+                    ZvalH,ZvalE,ZvalV,ZvalQ  )
+  !
   use data_structure3D
   implicit none
   !
   ! ** Arguments
   integer, intent(in)    :: Nod
   integer, intent(inout) :: KdofH, KdofE, KdofV, KdofQ
-  VTYPE,   intent(out)   :: &
-       ZvalH(MAXEQNH,*), ZvalE(MAXEQNE,*), &
-       ZvalV(MAXEQNV,*), ZvalQ(MAXEQNQ,*)
+  VTYPE,   intent(out)   :: ZvalH(MAXEQNH,*), ZvalE(MAXEQNE,*), &
+                            ZvalV(MAXEQNV,*), ZvalQ(MAXEQNQ,*)
   !
   ! ** Locals
-  integer, dimension(NR_PHYSA) :: ncase
-  integer :: i, j, k, ivarH, ivarE, ivarV, ivarQ, iprint, icase
+  integer :: ncase(NR_PHYSA)
+  integer :: i, j, k, ivarH, ivarE, ivarV, ivarQ
   integer :: ndofH, ndofE, ndofV, ndofQ, nvar
 
-
+#if DEBUG_MODE
+  integer :: iprint
   iprint=0
+#endif
 
-  icase = NODES(Nod)%case
   ! decode the physical attributes of the node
   call decod(NODES(Nod)%case,2,NR_PHYSA, ncase)
 
@@ -66,11 +66,12 @@ subroutine dof_out( &
 
                     ZvalH(nvar,KdofH+1:KdofH+ndofH) = &
                          NODES(Nod)%dof%zdofH(ivarH,1:ndofH)
-
+#if DEBUG_MODE
                     if (iprint.eq.1) then
                        write(*,7001) ivarH,nvar,KdofH+1,KdofH+ndofH
                        write(*,*) 'ZvalH = ',ZvalH(nvar,KdofH+1:KdofH+ndofH)
                     endif
+#endif
                  endif
 
               case(TANGEN)
@@ -79,11 +80,12 @@ subroutine dof_out( &
                  if (ndofE.gt.0) then
                     ZvalE(nvar,KdofE+1:KdofE+ndofE) = &
                          NODES(Nod)%dof%zdofE(ivarE,1:ndofE)
-
+#if DEBUG_MODE
                     if (iprint.eq.2) then
                        write(*,7001) ivarE,nvar,KdofE+1,KdofE+ndofE
                        write(*,*) 'ZvalE = ', ZvalE(nvar,KdofE+1:KdofE+ndofE)
                     endif
+#endif
                  endif
 
               case(NORMAL)
@@ -92,10 +94,12 @@ subroutine dof_out( &
                  if (ndofV.gt.0) then
                     ZvalV(nvar,KdofV+1:KdofV+ndofV) = &
                          NODES(Nod)%dof%zdofV(ivarV,1:ndofV)
+#if DEBUG_MODE
                     if (iprint.eq.3) then
                        write(*,7001) ivarV,nvar,KdofV+1,KdofV+ndofV
                        write(*,*) 'ZvalV = ', ZvalV(nvar,KdofV+1:KdofV+ndofV)
                     endif
+#endif
                  endif
 
               case(DISCON)

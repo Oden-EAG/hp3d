@@ -5,7 +5,7 @@ SRC_PATH = .
 OBJ_PATH = _obj_
 
 CCINCS   = -I../../../../common/hp3d  \
-	   -I../../../../common/frontal/real
+	        -I../../../../../module
 
 LIBS     =
 
@@ -37,10 +37,7 @@ libfrontal.a : $(OBJ_PATH)/.dummy $(OBJ)
 
 $(OBJ_PATH)/.dummy :
 	@echo "Creating directory " $(OBJ_PATH)
-	@if [ -d $(OBJ_PATH) ]; then \
-		touch $@; \
-	else mkdir $(OBJ_PATH); touch $@; \
-	fi
+	@mkdir -p $(OBJ_PATH); touch $@;
 
 $(OBJ_PATH)/%.o : $(SRC_PATH)/%.F
 	@echo "Compiling $<"

@@ -1,9 +1,5 @@
 trian_G1RecTri.F90
-trian_ImpliTri.F
-trian_PaSphTri.F
 trian_PTITri.F90
-trian_QtCirTri.F
-trian_SpherTri.F
 trian_TransTri.F
 trian_CylTri.F
 0

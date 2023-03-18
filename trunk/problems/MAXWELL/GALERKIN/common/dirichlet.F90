@@ -48,10 +48,6 @@ subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
    VTYPE,dimension(  MAXEQNQ,3  )             ::  dvalQ
    VTYPE,dimension(  MAXEQNQ,3,3)             :: d2valQ
 !
-#if DEBUG_MODE
-   integer :: iprint = 0
-#endif
-!
 !--------------------------------------------------------------------
 !
 !..initialize

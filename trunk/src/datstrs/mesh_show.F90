@@ -1,3 +1,5 @@
+#if DEBUG_MODE
+
 !> Purpose : show the mesh data structure
 subroutine mesh_show
   use data_structure3D
@@ -13,3 +15,5 @@ subroutine mesh_show
   enddo
   !
 end subroutine mesh_show
+
+#endif

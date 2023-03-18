@@ -54,10 +54,13 @@ subroutine compute_face(Numlev,Mdle,Iface,Nedge_orient,Nface_orient,Norder, &
       real(8), dimension(3,2) :: dxdt
       real(8), dimension(3) :: rn
 !
-      integer :: iprint, i, j, ntype
-!--------------------------------------------------------------------------------------------------
+      integer :: i, j, ntype
 !
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
+#endif
+!--------------------------------------------------------------------------------------------------
 !
       ntype=NODES(Mdle)%ntype
       call face_param(ntype,Iface,T, xi,dxidt)
@@ -66,6 +69,7 @@ subroutine compute_face(Numlev,Mdle,Iface,Nedge_orient,Nface_orient,Norder, &
       call soleval(Mdle,xi,Nedge_orient,Nface_orient,Norder,Xnod,ZdofH,ZdofE,ZdofV,ZdofQ, &
                    Numlev, X,dxdxi,zsolH,zgradH,zsolE,zcurlE,zsolV,zdivV,zsolQ            )
 !
+#if DEBUG_MODE
 !     printing
       if (iprint.eq.1) then
         write(*,*)'compute_face:'
@@ -78,6 +82,7 @@ subroutine compute_face(Numlev,Mdle,Iface,Nedge_orient,Nface_orient,Norder, &
 1113      format(' i,dxidt(:,i) = ',i1,2x,3(e12.5,2x))
         enddo
       endif
+#endif
 !
 !     face parameterization
       dxdt(1:3,1:2)=0.d0
@@ -87,6 +92,7 @@ subroutine compute_face(Numlev,Mdle,Iface,Nedge_orient,Nface_orient,Norder, &
         enddo
       enddo
 !
+#if DEBUG_MODE
 !     printing
       if (iprint.eq.1) then
         do i=1,2
@@ -94,6 +100,7 @@ subroutine compute_face(Numlev,Mdle,Iface,Nedge_orient,Nface_orient,Norder, &
 1111      format(' i, dxdt(:,i) = ',i1,2x,3(e12.5,2x))
         enddo
       endif
+#endif
 !
 !     normal vector
       call cross_product(dxdt(1:3,1),dxdt(1:3,2), rn)
@@ -107,4 +114,4 @@ subroutine compute_face(Numlev,Mdle,Iface,Nedge_orient,Nface_orient,Norder, &
       endif
 !
 !
-endsubroutine compute_face
+end subroutine compute_face
