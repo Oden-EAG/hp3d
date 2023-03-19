@@ -52,7 +52,6 @@ endif
 ifeq ($(DEBUG),1)
   FFLAGS += -O0 -g -traceback -check all -debug all
   FFLAGS += -check noarg_temp_created -assume noprotect_constants
-  FFLAGS += -gen-interface -warn none -warn interfaces
 endif
 
 
