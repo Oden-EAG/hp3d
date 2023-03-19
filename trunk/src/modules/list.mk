@@ -9,7 +9,6 @@ element_data.F
 environment.F90
 error.F90
 hdf5_wrapper.F90
-kinds.F90
 math_constants.F90
 mkl_spblas.F90
 mpi_param.F90
