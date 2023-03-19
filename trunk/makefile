@@ -319,6 +319,7 @@ clean:
 	@rm -f $(LIB_PATH)/*.a
 	@rm -f *~
 	@rm -f $(MODULE_PATH)/*.mod
+	@rm -f $(MODULE_PATH)/*genmod.f90
 	@rm -f *.mk *.old *.mod
 
 #-------------------------------------------------
