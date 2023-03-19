@@ -1,2 +1,0 @@
-      parameter(MAXERR=30000)
-      common /cerrors/ errors(MAXERR), listre(MAXERR)

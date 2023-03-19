@@ -1,8 +1,0 @@
-c
-c  ...maximum number of subdivisions for a GMP block for the
-c     initial mesh generator
-      parameter(NDIVMAX=20)
-c
-
-
-
