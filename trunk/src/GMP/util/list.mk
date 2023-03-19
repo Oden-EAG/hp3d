@@ -4,8 +4,8 @@ biv_bernstein_poly.F90
 check_orientation.F90
 coord_cart2polar.F90
 find_GMPtriangle.F90
-find_curve_to_block.F
-find_point_to_block.F
+find_curve_to_block.F90
+find_point_to_block.F90
 imod.F90
 mixed_product.F90
 norm.F90
