@@ -1,4 +1,0 @@
-      FUNCTION ZABS(ZR, ZI)
-      DOUBLE PRECISION ZABS
-      ZABS = ABS(CMPLX(ZR,ZI))
-      END
