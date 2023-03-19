@@ -1,5 +1,7 @@
 !---------------------------------------------------------------------------
-!> Purpose : adaptivity
+!> @brief Performs adaptivity based on user-provided element error estimates
+!> @note: This routine is currently unused but could be overhauled to be
+!!        helpful to hp3D users
 !---------------------------------------------------------------------------
 !
 module adaptivity

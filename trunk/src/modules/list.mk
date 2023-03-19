@@ -1,4 +1,3 @@
-adaptivity.F90
 assembly.F90
 assembly_sc.F90
 constrained_nodes.F90
