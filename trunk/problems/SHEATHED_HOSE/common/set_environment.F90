@@ -11,7 +11,6 @@ subroutine set_environment
   use common_prob_data
   use paraview
   use parametersDPG, only: NORD_ADD
-  use testvars
   implicit none
 !
 #if HP3D_USE_OPENMP

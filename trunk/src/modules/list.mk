@@ -21,7 +21,6 @@ physics.F90
 refinements.F90
 refinements_2D.F90
 stc.F90
-testvars.F90
 upscale.F90
 zoltan_wrapper.F90
 0
