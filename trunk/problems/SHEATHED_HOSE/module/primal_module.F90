@@ -3,9 +3,11 @@
 !--------------------------------------------------------------------------------
 !
 module primal_module
-
-  use parametersDPG
-  use parameters
+!
+   use parametersDPG
+   use parameters
+!
+   implicit none
 !
 !
 !  ...Necessary constant since there is no dynamic allocation
@@ -28,7 +30,5 @@ module primal_module
 !     Gram matrix for the local Riesz matrix in LAPACK format
       real*8, dimension(3*MAXbrickHH*(3*MAXbrickHH+1)/2) :: Gram
 !$OMP THREADPRIVATE (Gram)
-
-
 
 end module primal_module

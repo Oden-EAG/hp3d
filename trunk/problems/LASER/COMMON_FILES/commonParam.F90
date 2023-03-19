@@ -14,6 +14,8 @@ module commonParam
 !
    use parameters
 !
+   implicit none
+!
 !..i
    complex(8), parameter :: ZI = (0.d0,1.d0)
 !
