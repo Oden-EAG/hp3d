@@ -257,6 +257,12 @@ c      call shape3DVPris(Xi,norder,noriF,Nsize, NrdofV,ShapV,DivV)
 c
 c  ...Option 2: Write more efficient routine for enriched functions
 c
+c  ...initiate counter for shape functions
+      m = 0
+c
+c  ...Decode order
+      call decod(NordM,MODORDER,2, nordB)
+c
 c  ...Shape functions split into 2 families
 c     Family 1: V12 x Q3
       call shape2VV(MDLT,Xi(1:2),nordB(1), ndofV12,shapV12,divV12)
@@ -265,9 +271,6 @@ c
 c     Family 2: Q12 x H3
       call shape2QQ(MDLT,Xi(1:2),nordB(1), ndofQ12,shapQ12)
       call shape1HH(Xi(3),nordB(2), ndofH3,shapH3,dshapH3)
-c
-c  ...initiate counter for shape functions
-      m = 0
 c
 c  ...Evaluate Family 1
       do i3=1,ndofQ3
