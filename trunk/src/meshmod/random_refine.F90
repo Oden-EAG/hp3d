@@ -95,7 +95,7 @@ ENDIF
 
      !  ...close mesh (do not update gdof's. Those refinements are just for
      !     testing)
-     call close
+     call close_mesh
 
      !  ...testing "neig_face" routine
      call verify_neig

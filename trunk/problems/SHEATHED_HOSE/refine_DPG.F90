@@ -304,7 +304,7 @@
 !           enddo
 !           !
 ! !      ...close the mesh
-!           call close
+!           call close_mesh
 ! !      ...update geometry and Dirichlet flux dof after the refinements
 !           call update_gdof
 !           call update_Ddof
@@ -350,7 +350,7 @@
           enddo
           !
 !      ...close the mesh
-          call close
+          call close_mesh
 !      ...update geometry and Dirichlet flux dof after the refinements
           call update_gdof
           call update_Ddof
