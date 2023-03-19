@@ -6,6 +6,8 @@
 !
 module environment
 !
+      implicit none
+!
       save
 !
 !     command line inputs
@@ -383,4 +385,4 @@ contains
     !
   endsubroutine disp_env
   !
-endmodule environment
+end module environment

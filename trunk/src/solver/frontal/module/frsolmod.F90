@@ -2,6 +2,8 @@
 !> @date Mar 2023
 module frsolmod
 !
+   implicit none
+!
    save
 !..destination vectors and pointer
    integer, allocatable          :: IDESVE(:)

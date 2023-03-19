@@ -17,6 +17,8 @@
 !
       module pardiso_data
 !
+      implicit none
+!
 !  ...problem workspace
       integer                 :: PRDS_N,PRDS_NZ,PRDS_NRHS
       integer,    allocatable :: PRDS_IA(:), PRDS_JA(:)
