@@ -7,6 +7,7 @@
 module upscale
 !
    use node_types
+!
    implicit none
 !
    save

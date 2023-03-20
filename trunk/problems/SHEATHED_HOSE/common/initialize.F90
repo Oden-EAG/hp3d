@@ -9,8 +9,7 @@ subroutine initialize
   use data_structure3D
   use refinements
   use control
-  use gmp
-  use testvars
+  use GMP
   use frsolmod
   use upscale
   use paraview

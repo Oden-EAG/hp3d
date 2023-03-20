@@ -2,6 +2,8 @@
 !> @date Mar 2023
 module surfsc2
 !
+   implicit none
+!
    save
 !
    integer :: IB, IU, IL, IFB, IFU, IFL, MBUF, MW, MKF,  &

@@ -1,7 +1,7 @@
 #if DEBUG_MODE
 
 !-----------------------------------------------------------------------
-!> Purpose : routine employs the greedy strategy to performe adaptive
+!> Purpose : routine employs the greedy strategy to perform adaptive
 !!           h-refinements
 !!
 !> @param[in] Idom  - target domain, if 0, examine all elements
@@ -9,8 +9,11 @@
 !> rev@Dec 13
 !-----------------------------------------------------------------------
 subroutine adapt_mesh_size(Idom,Hmax)
+  !
   use data_structure3D, only : NRELES
+  !
   implicit none
+  !
   integer, intent(in) :: Idom
   real(8), intent(in) :: Hmax
   !
@@ -45,11 +48,12 @@ subroutine adapt_mesh_size(Idom,Hmax)
         call get_isoref(mdle, kref)
         call refine(mdle, kref)
      end do
-     call close
-     ! call update_gdof
-     ! call update_ddof
+     !
+     call close_mesh
+     call update_gdof
+     call update_ddof
+     !
      write(*,*) '# of elements (before, after, inc) ', nelts_prev, NRELES, (NRELES-nelts_prev)
-     write(*,*) 'Please update geometry and dirichlet boundary contidions'
      !
      deallocate(nlist, STAT=istat)
      if (istat.ne.0) then
