@@ -68,8 +68,9 @@ subroutine adaptivity_geom(Eps, Nref,Ratio)
          call refine(    nlist(i), kref)
       enddo
 !
-      call close
+      call close_mesh
       call update_gdof
+      call update_Ddof
 !
 !  ...number of refined elements, ratio
       Nref=j ; Ratio=float(j)/float(nreles_save)

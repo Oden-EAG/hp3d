@@ -4,8 +4,10 @@
 !
 module uweak_module
 
-  use parametersDPG
-  use parameters
+   use parametersDPG
+   use parameters
+!
+   implicit none
 !
 !  ...Necessary constant since there is no dynamic allocation
       integer, parameter :: MAXNRHS_MOD = 1

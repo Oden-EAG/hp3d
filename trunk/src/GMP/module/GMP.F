@@ -6,6 +6,8 @@ c----------------------------------------------------------------------
 c
       module GMP
 c
+      implicit none
+c
 c----------------------------------------------------------------------
 c  PARAMETERS                                                         |
 c----------------------------------------------------------------------
@@ -656,6 +658,9 @@ c  ...dump out GMP data structure
 c
       integer, parameter :: ndump=31
 c
+      integer :: nc,nh,nl,nn,np,nr,ns,nt
+      integer :: npri,npyr,ntet
+c
       integer :: iprint
       iprint=0
 c
@@ -1167,6 +1172,9 @@ c  ...dump in GMP data structure
 c
       character(len=*), intent(in)  :: Fp
       integer, parameter :: ndump=31
+c
+      integer :: nc,nh,nl,nn,np,nr,ns,nt
+      integer :: npri,npyr,ntet
 c
       integer :: iprint
       iprint=0

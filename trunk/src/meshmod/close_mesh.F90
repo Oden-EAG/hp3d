@@ -1,16 +1,6 @@
-subroutine close()
-   implicit none
-   integer :: iprint
-!..ensure backward compatibility
-   iprint=0
-   if (iprint /= 0)  write(*,*) 'Mesh closing begin'
-   call close_mesh
-   if (iprint /= 0)  write(*,*) 'Mesh closing end'
-end subroutine close
-!
 !-----------------------------------------------------------------------------
-!> @brief enforce one-irregular mesh
-!> @date Mar 2023
+!> @brief Enforces one-irregular mesh
+!> @date Feb 2023
 subroutine close_mesh()
    use error
    use refinements

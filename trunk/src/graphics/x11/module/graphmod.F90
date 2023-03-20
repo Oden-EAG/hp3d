@@ -1,6 +1,8 @@
 !> Purpose : define the workspace for graphics
 module graphmod
   !
+  implicit none
+  !
   ! ** coltab.blk :: color table
   integer, parameter :: NR_COLORS = 200
   integer, dimension(NR_COLORS) :: NPCOL, IRED, IBLUE, IGREEN

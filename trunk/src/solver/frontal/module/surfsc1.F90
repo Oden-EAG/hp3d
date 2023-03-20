@@ -2,6 +2,8 @@
 !> @date Mar 2023
 module surfsc1
 !
+   implicit none
+!
    save
 !
    integer :: ISYM, NUMELM, IRESOL, NRHS, MA, IWRT,   &
