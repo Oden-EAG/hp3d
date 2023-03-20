@@ -617,7 +617,7 @@ c
       call checkorder(NType,DISCON,Norder,MAXP, nsize)
       select case(NType)
       case(BRIC,MDLB)
-        Nsize=(/MAXP,MAXbrickQ/)
+        nsize=(/MAXP,MAXbrickQ/)
         call shape3DQHexa(Xi,Norder,nsize, NrdofQ,ShapQ)
       case(TETR,MDLN)
         call shape3DQTet(Xi,Norder,nsize, NrdofQ,ShapQ)

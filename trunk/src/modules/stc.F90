@@ -33,6 +33,8 @@ module stc
    use data_structure3D
    use par_mesh, only: DISTRIBUTED
 !
+   implicit none
+!
 !..storing Schur complements
    logical, save :: STORE_STC   = .true.
 !

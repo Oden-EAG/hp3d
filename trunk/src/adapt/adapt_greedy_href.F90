@@ -1,7 +1,7 @@
 #if DEBUG_MODE
 
 !-----------------------------------------------------------------------
-!> Purpose : routine employs the greedy strategy to performe adaptive
+!> Purpose : routine employs the greedy strategy to perform adaptive
 !!           h-refinements
 !!
 !> @param[in] Iphy  -
@@ -75,7 +75,7 @@ subroutine adapt_greedy_href(Iphy,Imode,Eps,Ath)
             call refine(mdle, kref)
 
          enddo
-         call close
+         call close_mesh
          call update_gdof
          call update_ddof
 
@@ -98,6 +98,6 @@ subroutine adapt_greedy_href(Iphy,Imode,Eps,Ath)
   endif
 
 
-endsubroutine adapt_greedy_href
+end subroutine adapt_greedy_href
 
 #endif

@@ -368,7 +368,6 @@ subroutine exec_case(idec)
       case(20)
          write(*,*) 'global h-refinement...'
          call global_href
-         call close_mesh
          call update_gdof
          call update_Ddof
 !
@@ -376,7 +375,6 @@ subroutine exec_case(idec)
       case(21)
          write(*,*) 'global p-refinement...'
          call global_pref
-         call close_mesh ! not needed?
          call update_gdof
          call update_Ddof
 !

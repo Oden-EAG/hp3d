@@ -2,7 +2,10 @@
 !! @rev - Feb.2012
 !------------------------------------------------------------------------------
 module common_prob_data
-  save
+!
+   implicit none
+!
+   save
 !
 !..TYPE OF JOB SUBMISSION
 !  0: interactive (usual main file)

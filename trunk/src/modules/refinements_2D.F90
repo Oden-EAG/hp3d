@@ -12,10 +12,11 @@
 !
 !----------------------------------------------------------------------
 !
-      module refinements_2D
-      
-      use node_types
-      implicit none
+module refinements_2D
+!
+   use node_types
+!
+   implicit none
 !
 !  ...denumeration of sons of an edge, in a local, edge system
 !     of coordinates
@@ -102,7 +103,7 @@
 !                      of the middle node
 !
 !
-      contains
+   contains
 !
 !-----------------------------------------------------------------------
 !
@@ -111,7 +112,7 @@
 !          Nson  - son number
 !          Nref  - ref kind
 !  ...Out: element node number of the father node
-      function Npar_ref(Ntype,J,Nson,Nref)
+   function Npar_ref(Ntype,J,Nson,Nref)
 !
       integer :: Ntype,J,Nson,Nref
       integer :: Npar_ref
@@ -131,11 +132,11 @@
         write(*,7001) S_Type(Ntype),J,Nson,Nref; stop 1
       end select
 !
-      end function Npar_ref
+   end function Npar_ref
 !
 !-----------------------------------------------------------------------
 !
-      function Nson_ref(Ntype,J,Nson,Nref)
+   function Nson_ref(Ntype,J,Nson,Nref)
 !
       integer :: Ntype,J,Nson,Nref
       integer :: Nson_ref
@@ -155,11 +156,11 @@
         write(*,7001) S_Type(Ntype),J,Nson,Nref; stop 1
       end select
 !
-      end function Nson_ref
+   end function Nson_ref
 !
 !-----------------------------------------------------------------------
 !
-      function Nort_ref(Ntype,J,Nson,Nref)
+   function Nort_ref(Ntype,J,Nson,Nref)
 !
       integer :: Ntype,J,Nson,Nref
       integer :: Nort_ref
@@ -178,13 +179,13 @@
  7001   format('Nort_ref: Type,J,Nson,Nref = ',a4,3i4)
       end select
 !
-      end function Nort_ref
+   end function Nort_ref
 !
 !-----------------------------------------------------------------------
 !
 !> @brief  return number of middle node sons for a specifi! refinement
 !> @date   Feb 2023
-      subroutine nr_mdle_sons(Ntype,Kref, Nrsons)
+   subroutine nr_mdle_sons(Ntype,Kref, Nrsons)
 !
       integer, intent(in)  :: Ntype,Kref
       integer, intent(out) :: Nrsons
@@ -208,13 +209,13 @@
         write(*,*) S_Type(Ntype),Kref; stop 1
       end select
 !
-      end subroutine nr_mdle_sons
+   end subroutine nr_mdle_sons
 !
 !-----------------------------------------------------------------------
 !
 !> @brief  return number of sons for different refinements of different nodes
 !> @date   Feb 2023
-      subroutine nr_sons(Ntype,Kref, Nrsons)
+   subroutine nr_sons(Ntype,Kref, Nrsons)
 !
       integer, intent(in)  :: Ntype,Kref
       integer, intent(out) :: Nrsons
@@ -243,7 +244,7 @@
  7001 format('nr_sons: Type,Kref = ',a4,2x,i3)
       stop 1
 !
-      end subroutine nr_sons
+   end subroutine nr_sons
 !
 !-----------------------------------------------------------------------
 !
@@ -251,7 +252,7 @@
 !!         of a mid-edge node according to the orientation 'Norient' of
 !!         the father
 !> @date   Feb 2023
-      subroutine rotate_edge(Norient,Is,Nort)
+   subroutine rotate_edge(Norient,Is,Nort)
 !
       integer, intent(in)    :: Norient
       integer, intent(inout) :: Is,Nort
@@ -269,7 +270,7 @@
       case(0)
       end select
 !
-      end subroutine rotate_edge
+   end subroutine rotate_edge
 !
 !
-      end module refinements_2D
+end module refinements_2D

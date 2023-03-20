@@ -1,46 +1,47 @@
-c----------------------------------------------------------------------
-c
-c   routine name       - find_curve_to_block
-c
-c----------------------------------------------------------------------
-c
-c   latest revision    - Mar 2023
-c
-c   purpose            - routine finds blocks adjacent to a curve
-c
-c   arguments :
-c     in:
-c               Nc     - a curve
-c               Maxbl  - dimension of Neigbl
-c                        (anticipated max number of adjacent blocks)
-c     out:
-c               Nrbl   - number of adjacent blocks
-c               Neigbl - list of the blocks nicknames
-c
-c----------------------------------------------------------------------
-c
-      subroutine find_curve_to_block(Nc,Maxbl, Nrbl,Neigbl)
-c
+!----------------------------------------------------------------------
+!
+!   routine name       - find_curve_to_block
+!
+!----------------------------------------------------------------------
+!
+!   latest revision    - Mar 2023
+!
+!   purpose            - routine finds blocks adjacent to a curve
+!
+!   arguments :
+!     in:
+!               Nc     - a curve
+!               Maxbl  - dimension of Neigbl
+!                        (anticipated max number of adjacent blocks)
+!     out:
+!               Nrbl   - number of adjacent blocks
+!               Neigbl - list of the blocks nicknames
+!
+!----------------------------------------------------------------------
+!
+subroutine find_curve_to_block(Nc,Maxbl, Nrbl,Neigbl)
+!
       use GMP
+!
       implicit none
-c
+!
       integer :: Nc,Maxbl,Nrbl
       integer :: Neigbl(Maxbl)
-c
+!
       integer :: if,is,lab,nf,num
-c
+!
 #if DEBUG_MODE
       integer :: iprint
       iprint=0
-c
+!
       if (iprint.eq.1) write(*,7001) Nc
  7001 format('find_curve_to_block: Nc = ',i8)
 #endif
-c
-c  ...initiate number of neighboring blocks
+!
+!  ...initiate number of neighboring blocks
       Nrbl=0
-c
-c  ...loop through figures adjacent to the curve
+!
+!  ...loop through figures adjacent to the curve
       do if=1,CURVES(Nc)%NrFig
         call decode(abs(CURVES(Nc)%FigNo(if)), nf,lab)
 #if DEBUG_MODE
@@ -50,11 +51,11 @@ c  ...loop through figures adjacent to the curve
         endif
 #endif
         select case(lab)
-c
-c  .....triangle
+!
+!  .....triangle
         case(1)
-c
-c  .......loop through blocks adjacent to the triangle
+!
+!  .......loop through blocks adjacent to the triangle
           do is=1,2
             if (TRIANGLES(nf)%BlockNo(is).eq.0) cycle
             call locate(TRIANGLES(nf)%BlockNo(is),Neigbl,Nrbl, num)
@@ -62,18 +63,18 @@ c  .......loop through blocks adjacent to the triangle
               Nrbl=Nrbl+1
               if (Nrbl.gt.Maxbl) then
                 write(*,7010)
- 7010           format('find_curve_to_block: ',
-     .                 'NUMBER OF NEIGHBORS EXCEEDED')
+ 7010           format('find_curve_to_block: ', &
+                       'NUMBER OF NEIGHBORS EXCEEDED')
                 stop 1
               endif
               Neigbl(Nrbl) = TRIANGLES(nf)%BlockNo(is)
             endif
           enddo
-c
-c  .....rectangle
+!
+!  .....rectangle
         case(2)
-c
-c  .......loop through blocks adjacent to the rectangle
+!
+!  .......loop through blocks adjacent to the rectangle
           do is=1,2
             if (RECTANGLES(nf)%BlockNo(is).eq.0) cycle
             call locate(RECTANGLES(nf)%BlockNo(is),Neigbl,Nrbl, num)
@@ -91,6 +92,6 @@ c  .......loop through blocks adjacent to the rectangle
 #if DEBUG_MODE
       if (iprint.eq.1) call pause
 #endif
-c
-c
-      end subroutine find_curve_to_block
+!
+!
+end subroutine find_curve_to_block

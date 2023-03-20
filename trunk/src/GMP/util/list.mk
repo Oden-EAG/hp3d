@@ -2,16 +2,10 @@ add_void_curve.F90
 bernstein_poly.F90
 biv_bernstein_poly.F90
 check_orientation.F90
-combination.F90
 coord_cart2polar.F90
-coord_cart2spher.F90
-coord_spher2cart.F90
-factorial.F90
 find_GMPtriangle.F90
-find_curve_to_block.F
-find_point_to_block.F
-give_surf.F90
-if_bound.F90
+find_curve_to_block.F90
+find_point_to_block.F90
 imod.F90
 mixed_product.F90
 norm.F90
@@ -19,5 +13,4 @@ normalize.F90
 rotation_about_axis.F90
 scalar_product.F90
 swap.F90
-transform.F90
 0
