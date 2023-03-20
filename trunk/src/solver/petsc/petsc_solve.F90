@@ -89,6 +89,17 @@ subroutine petsc_solve(mtype)
    character(256) :: info_string
    character( 16) :: fmt,val_string,v1,v2,v3
 !
+!..Set to compute eigenvalues of preconditioned system in PETSc solve
+!  0 : do not compute eigenvalues
+!  1 : compute eigenvalues, print lower bound of condition number
+!  2 : compute and print eigenvalues and lower bound of condition number
+   integer, parameter :: petsc_eigenvalues = 0
+   PetscReal, pointer :: petsc_eigen_r(:)
+   PetscReal, pointer :: petsc_eigen_c(:)
+   PetscInt           :: petsc_eigen_nmax
+   PetscInt           :: petsc_eigen_neig
+   real(8)            :: petsc_eigen_cond
+!
 !..Non-zero computation
    integer :: my_dnz, my_onz, NR_NOD_LIST, NRNODS_SUBD
    integer, allocatable :: NOD_COMM(:,:)
@@ -872,6 +883,12 @@ subroutine petsc_solve(mtype)
                '                    maxits = '//val_string//'\n'
    call PetscPrintf(MPI_COMM_WORLD,info_string, petsc_ierr); CHKERRQ(petsc_ierr)
 !
+   if (petsc_eigenvalues.gt.0) then
+      call KSPSetComputeEigenvalues(petsc_ksp,PETSC_TRUE, petsc_ierr); CHKERRQ(petsc_ierr)
+      info_string='KSPCompEigenvalues: Activated\n'
+      call PetscPrintf(MPI_COMM_WORLD,info_string, petsc_ierr); CHKERRQ(petsc_ierr)
+   endif
+!
 !..Perform global sparse solve
    call KSPSolve(petsc_ksp,petsc_rhs, petsc_sol,petsc_ierr); CHKERRQ(petsc_ierr)
 !
@@ -889,6 +906,37 @@ subroutine petsc_solve(mtype)
    fmt = '(I5)'; write(val_string,fmt) petsc_its
    info_string='                    Number of iterations = '//trim(val_string)//'\n\n'
    call PetscPrintf(MPI_COMM_WORLD,info_string, petsc_ierr); CHKERRQ(petsc_ierr)
+!
+   if (petsc_eigenvalues.gt.0) then
+      petsc_eigen_nmax = petsc_its
+      allocate(petsc_eigen_r(petsc_eigen_nmax))
+      allocate(petsc_eigen_c(petsc_eigen_nmax))
+      call KSPComputeEigenvalues(petsc_ksp,petsc_eigen_nmax, petsc_eigen_r,petsc_eigen_c,petsc_eigen_neig,petsc_ierr); CHKERRQ(petsc_ierr)
+      fmt='(I10)'; write(v1,fmt) petsc_eigen_nmax; write(v2,fmt) petsc_eigen_neig
+      info_string='KSPCompEigenvalues: nmax   = '//v1//'\n'//&
+                  '                    neig   = '//v2//'\n'
+      call PetscPrintf(MPI_COMM_WORLD,info_string, petsc_ierr); CHKERRQ(petsc_ierr)
+      if (RANK.eq.ROOT) then
+         if (petsc_eigenvalues.gt.1) then
+            do i = 1,petsc_eigen_neig
+               write(*,1078) petsc_eigen_r(i), petsc_eigen_c(i)
+          1078 format('(',ES10.2,',',ES10.2,')')
+            enddo
+         endif
+         select case(mtype)
+            case('P') ! spd matrix
+               petsc_eigen_cond = petsc_eigen_r(petsc_eigen_neig)/petsc_eigen_r(1)
+            case('H') ! sym/herm matrix
+               petsc_eigen_cond = abs(petsc_eigen_r(petsc_eigen_neig)/petsc_eigen_r(1))
+            case default ! general matrix
+               petsc_eigen_cond = 0.d0 ! TODO
+         end select
+         write(*,1079) petsc_eigen_cond
+       1079 format('Condition number of preconditioned system (lower bound):',ES10.2)
+      endif
+      deallocate(petsc_eigen_r)
+      deallocate(petsc_eigen_c)
+   endif
 !
 !..Optional: print detailed information about the solver
    !call KSPView(petsc_ksp,PETSC_VIEWER_STDOUT_WORLD, petsc_ierr); CHKERRQ(petsc_ierr)
