@@ -293,9 +293,8 @@ module refinements
 !
 !-----------------------------------------------------------------------
 !< @date Mar 2023
-  integer function nort_ref(Ntype, J, Nson, Iref1, Iref2, Iref3)
-    integer, intent(in) :: Ntype
-    integer, intent(in)          :: J, Nson, Iref1, Iref2, Iref3
+  integer function nort_ref(Ntype,J,Nson,Iref1,Iref2,Iref3)
+    integer, intent(in) :: Ntype,J,Nson,Iref1,Iref2,Iref3
     !
     select case(Ntype)
       case(MDLB); nort_ref = BRICK_ORT(J,Nson,Iref1,Iref2,Iref3)
@@ -644,30 +643,30 @@ end subroutine rotate_trian
     !     face_orient_??(2,Is,Norient) = its orientation
     select case(Iref)
       case(11)
-        Is   = face_orient_h11(1,Is,Norient)
         Nort = face_orient_h11(2,Is,Norient)
+        Is   = face_orient_h11(1,Is,Norient)
         !
         !  .....'Is' is the son number in face coordinates
         select case(Ireff)
           case(11)
             Is1 = 0
           case(10)
-            Is  = h11_to_h10(1,Is)
             Is1 = h11_to_h10(2,Is)
+            Is  = h11_to_h10(1,Is)
           case(01)
-            Is  = h11_to_h01(1,Is)
             Is1 = h11_to_h01(2,Is)
+            Is  = h11_to_h01(1,Is)
           case default
             write(*,*) "rotate_quad : ERROR, not a valid Ireff type"
             stop 1
         end select
       case(10)
-        Is   = face_orient_h10(1,Is,Norient)
         Nort = face_orient_h10(2,Is,Norient)
+        Is   = face_orient_h10(1,Is,Norient)
         Is1  = 0
       case(01)
-        Is   = face_orient_h01(1,Is,Norient)
         Nort = face_orient_h01(2,Is,Norient)
+        Is   = face_orient_h01(1,Is,Norient)
         Is1  = 0
       case default
         write(*,*) "rotate_quad : ERROR, not a valid Iref type"
