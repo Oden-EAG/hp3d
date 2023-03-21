@@ -91,14 +91,23 @@ subroutine petsc_solve(mtype)
 !
 !..Set to compute eigenvalues of preconditioned system in PETSc solve
 !  0 : do not compute eigenvalues
-!  1 : compute eigenvalues, print lower bound of condition number
-!  2 : compute and print eigenvalues and lower bound of condition number
+!  1 : compute eigenvalues
+!  2 : compute and print eigenvalues
+!  (1-2: also print condition number lower bound for 'H','P' matrices)
    integer, parameter :: petsc_eigenvalues = 0
    PetscReal, pointer :: petsc_eigen_r(:)
    PetscReal, pointer :: petsc_eigen_c(:)
    PetscInt           :: petsc_eigen_nmax
    PetscInt           :: petsc_eigen_neig
-   real(8)            :: petsc_eigen_cond
+!
+!..Set to compute singular values of preconditioned system in PETSc solve
+!  0 : do not compute singular values
+!  1 : compute min/max singular value, print lower bound of condition number
+   integer, parameter :: petsc_singularvalues = 0
+   PetscReal          :: petsc_singular_min
+   PetscReal          :: petsc_singular_max
+!
+   real(8)            :: petsc_cond
 !
 !..Non-zero computation
    integer :: my_dnz, my_onz, NR_NOD_LIST, NRNODS_SUBD
@@ -883,9 +892,17 @@ subroutine petsc_solve(mtype)
                '                    maxits = '//val_string//'\n'
    call PetscPrintf(MPI_COMM_WORLD,info_string, petsc_ierr); CHKERRQ(petsc_ierr)
 !
+!..Optionally, compute eigenvalues of the preconditioned operator
    if (petsc_eigenvalues.gt.0) then
       call KSPSetComputeEigenvalues(petsc_ksp,PETSC_TRUE, petsc_ierr); CHKERRQ(petsc_ierr)
       info_string='KSPCompEigenvalues: Activated\n'
+      call PetscPrintf(MPI_COMM_WORLD,info_string, petsc_ierr); CHKERRQ(petsc_ierr)
+   endif
+!
+!..Optionally, compute singular values of the preconditioned operator
+   if (petsc_singularvalues.gt.0) then
+      call KSPSetComputeSingularValues(petsc_ksp,PETSC_TRUE, petsc_ierr); CHKERRQ(petsc_ierr)
+      info_string='KSPCompSingularVal: Activated\n'
       call PetscPrintf(MPI_COMM_WORLD,info_string, petsc_ierr); CHKERRQ(petsc_ierr)
    endif
 !
@@ -907,15 +924,18 @@ subroutine petsc_solve(mtype)
    info_string='                    Number of iterations = '//trim(val_string)//'\n\n'
    call PetscPrintf(MPI_COMM_WORLD,info_string, petsc_ierr); CHKERRQ(petsc_ierr)
 !
+!..Optionally, compute eigenvalues of the preconditioned operator
    if (petsc_eigenvalues.gt.0) then
       petsc_eigen_nmax = petsc_its
       allocate(petsc_eigen_r(petsc_eigen_nmax))
       allocate(petsc_eigen_c(petsc_eigen_nmax))
       call KSPComputeEigenvalues(petsc_ksp,petsc_eigen_nmax, petsc_eigen_r,petsc_eigen_c,petsc_eigen_neig,petsc_ierr); CHKERRQ(petsc_ierr)
-      fmt='(I10)'; write(v1,fmt) petsc_eigen_nmax; write(v2,fmt) petsc_eigen_neig
-      info_string='KSPCompEigenvalues: nmax   = '//v1//'\n'//&
-                  '                    neig   = '//v2//'\n'
-      call PetscPrintf(MPI_COMM_WORLD,info_string, petsc_ierr); CHKERRQ(petsc_ierr)
+      if (petsc_eigenvalues.gt.1) then
+         fmt='(I10)'; write(v1,fmt) petsc_eigen_nmax; write(v2,fmt) petsc_eigen_neig
+         info_string='KSPCompEigenvalues: nmax   = '//v1//'\n'//&
+                     '                    neig   = '//v2//'\n'
+         call PetscPrintf(MPI_COMM_WORLD,info_string, petsc_ierr); CHKERRQ(petsc_ierr)
+      endif
       if (RANK.eq.ROOT) then
          if (petsc_eigenvalues.gt.1) then
             do i = 1,petsc_eigen_neig
@@ -923,19 +943,32 @@ subroutine petsc_solve(mtype)
           1078 format('(',ES10.2,',',ES10.2,')')
             enddo
          endif
-         select case(mtype)
-            case('P') ! spd matrix
-               petsc_eigen_cond = petsc_eigen_r(petsc_eigen_neig)/petsc_eigen_r(1)
-            case('H') ! sym/herm matrix
-               petsc_eigen_cond = abs(petsc_eigen_r(petsc_eigen_neig)/petsc_eigen_r(1))
-            case default ! general matrix
-               petsc_eigen_cond = 0.d0 ! TODO
-         end select
-         write(*,1079) petsc_eigen_cond
-       1079 format('Condition number of preconditioned system (lower bound):',ES10.2)
+         if (petsc_singularvalues.eq.0) then
+            select case(mtype)
+               case('P') ! spd matrix
+                  petsc_cond = petsc_eigen_r(petsc_eigen_neig)/petsc_eigen_r(1)
+               case('H') ! sym/herm matrix
+                  petsc_cond = abs(petsc_eigen_r(petsc_eigen_neig)/petsc_eigen_r(1))
+               case default ! general matrix
+                  petsc_cond = 0.d0 ! TODO
+            end select
+            if (petsc_cond.gt.0.d0) write(*,1079) petsc_cond
+       1079 format('Condition number of preconditioned system (lower bound):',ES10.2,/)
+         endif
       endif
       deallocate(petsc_eigen_r)
       deallocate(petsc_eigen_c)
+   endif
+!
+!..Optionally, compute singular values of the preconditioned operator
+   if (petsc_singularvalues.gt.0) then
+      call KSPComputeExtremeSingularValues(petsc_ksp, petsc_singular_max,petsc_singular_min,petsc_ierr); CHKERRQ(petsc_ierr)
+      fmt='(ES10.2)'; write(v1,fmt) petsc_singular_max; write(v2,fmt) petsc_singular_min
+      info_string='KSPCompSingularVal: max_val= '//v1//'\n'//&
+                  '                    min_val= '//v2//'\n'
+      call PetscPrintf(MPI_COMM_WORLD,info_string, petsc_ierr); CHKERRQ(petsc_ierr)
+      petsc_cond = petsc_singular_max/petsc_singular_min
+      if (RANK.eq.ROOT) write(*,1079) petsc_cond
    endif
 !
 !..Optional: print detailed information about the solver
