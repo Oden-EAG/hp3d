@@ -950,7 +950,7 @@ subroutine petsc_solve(mtype)
                case('H') ! sym/herm matrix
                   petsc_cond = abs(petsc_eigen_r(petsc_eigen_neig)/petsc_eigen_r(1))
                case default ! general matrix
-                  petsc_cond = 0.d0 ! TODO
+                  petsc_cond = -1.d0
             end select
             if (petsc_cond.gt.0.d0) write(*,1079) petsc_cond
        1079 format('Condition number of preconditioned system (lower bound):',ES10.2,/)
