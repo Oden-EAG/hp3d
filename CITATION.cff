@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use hp3D, please cite it as follows."
-url: "https://github.com/github/Oden-EAG/hp3d"
+url: "https://github.com/Oden-EAG/hp3d"
 preferred-citation:
   type: article
   authors:
