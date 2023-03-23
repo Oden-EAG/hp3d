@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use hp3D, please cite it as follows."
+url: "https://github.com/github/Oden-EAG/hp3d"
+preferred-citation:
+  type: article
+  authors:
+  - family-names: "Henneking"
+    given-names: "Stefan"
+    orcid: "https://orcid.org/0000-0003-2177-8519"
+  - family-names: "Demkowicz"
+    given-names: "Leszek"
+  doi: "10.48550/arXiv.2207.12211"
+  journal: "arXiv preprint arXiv:2207.12211"
+  title: "$hp$3D User Manual"
+  year: 2022
