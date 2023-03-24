@@ -84,10 +84,6 @@ program test_invert
    enddo
 !
 !
-   if (NPASS .ne. 1) then
-      write(*,*) 'test_invert FAILED.'
-   else
-      write(*,*) 'test_invert PASSED.'
-   endif
+   if (NPASS.ne.1) stop 1
 !
 end program test_invert

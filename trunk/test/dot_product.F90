@@ -42,10 +42,6 @@ program test_dot_product
    if (.not. znear(ac,val)) NPASS = 0
 !
 !
-   if (NPASS .ne. 1) then
-      write(*,*) 'test_dot_product FAILED.'
-   else
-      write(*,*) 'test_dot_product PASSED.'
-   endif
+   if (NPASS.ne.1) stop 1
 !
 end program test_dot_product

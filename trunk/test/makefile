@@ -58,11 +58,11 @@ TEST_PAR = hexa_adapt_h_aniso        \
            hexa_adapt_h_case1        \
            hexa_adapt_h_iso
 ifeq ($(COMPLEX),1)
-TEST_SEQ    += conv_maxw             \
-               poly_maxw
+TEST_SEQ+= conv_maxw                 \
+           poly_maxw
 else
-TEST_SEQ    += conv_pois             \
-               poly_pois
+TEST_SEQ+= conv_pois                 \
+           poly_pois
 endif
 
 # Includes and defs
@@ -97,35 +97,93 @@ one : $(OBJ_PATH)/.dummy $(OBJ_PATH)/$(TEST).o
 #-------------------------------------------------
 .PHONY : seq
 seq :
-	@for e in $(TEST_SEQ) ; do \
-		make one run TEST=$$e ;\
-	done
+	@seq_pass=0; seq_fail=0; \
+	for e in $(TEST_SEQ) ; do \
+		pass=1; make one run TEST=$$e || pass=0; \
+		if [ $$((pass)) == 1 ]; then \
+			seq_pass=$$((seq_pass+1)); \
+		else \
+			seq_fail=$$((seq_fail+1)); \
+		fi ; \
+	done ; \
+	if [ $$((seq_fail)) == 0 ]; then \
+		echo "\n All "$$((seq_pass)) \
+			  " Sequential Tests Passed.\n"; \
+	else \
+		echo "\n     "$$((seq_pass))/$$((seq_pass+seq_fail)) \
+			  " Sequential Tests Passed."; \
+		echo   "     "$$((seq_fail))/$$((seq_pass+seq_fail)) \
+			  " Sequential Tests FAILED!\n"; \
+	fi ; \
+	echo $$((seq_pass))" "$$((seq_fail)) > $(OBJ_PATH)/.seq_test
 
 #-------------------------------------------------
 .PHONY : par
 par :
-	@for e in $(TEST_PAR) ; do \
-		make one run-par TEST=$$e ;\
-	done
+	@par_pass=0; par_fail=0; \
+	for e in $(TEST_PAR) ; do \
+		pass=1; make one run-par TEST=$$e || pass=0; \
+		if [ $$((pass)) == 1 ]; then \
+			par_pass=$$((par_pass+1)); \
+		else \
+			par_fail=$$((par_fail+1)); \
+		fi ; \
+	done ; \
+	if [ $$((par_fail)) == 0 ]; then \
+		echo "\n All "$$((par_pass)) \
+			  " Parallel Tests Passed.\n"; \
+	else \
+		echo "\n     "$$((par_pass))/$$((par_pass+par_fail)) \
+			  " Parallel Tests Passed."; \
+		echo   "     "$$((par_fail))/$$((par_pass+par_fail)) \
+			  " Parallel Tests FAILED!\n"; \
+	fi ; \
+	echo $$((par_pass))" "$$((par_fail)) > $(OBJ_PATH)/.par_test
 
 #-------------------------------------------------
 .PHONY : all
 all : seq par
-	@echo ""
+	@read -r seq_pass seq_fail < $(OBJ_PATH)/.seq_test; \
+	 read -r par_pass par_fail < $(OBJ_PATH)/.par_test; \
+	 pass=$$((seq_pass+par_pass)); \
+	 fail=$$((seq_fail+par_fail)); \
+	 echo "++++++++++++++++++++++++++++++++++++++++"; \
+	if [ $$((fail)) == 0 ]; then \
+		echo "\n All "$$((pass)) \
+			  " Tests Passed.\n"; \
+	else \
+		echo "\n     "$$((pass))/$$((pass+fail)) \
+			  " Tests Passed."; \
+		echo   "     "$$((fail))/$$((pass+fail)) \
+			  " Tests FAILED!\n"; \
+	fi ; \
+	 echo "++++++++++++++++++++++++++++++++++++++++";
 
 #-------------------------------------------------
 .PHONY : run
 run : one
-	@echo ""
-	@echo "Running test: "$(TEST)
-	@./$(EXEC_PATH)/$(TEST)
+	@echo "\n Running test: "$(TEST)
+	@pass=1; ./$(EXEC_PATH)/$(TEST) || pass=0; \
+	if [ $$((pass)) == 1 ]; then \
+			echo "          test_"$(TEST)" PASSED"; \
+			true; \
+	else \
+			echo "          test_"$(TEST)" FAILED"; \
+			false; \
+	fi ;
 
 #-------------------------------------------------
 .PHONY : run-par
 run-par : one
-	@echo ""
-	@echo "Running test: "$(TEST)
-	@mpirun -np 4 ./$(EXEC_PATH)/$(TEST)
+	@echo "\n Running test: "$(TEST)
+	@pass=1; mpirun -np 4 ./$(EXEC_PATH)/$(TEST) || pass=0; \
+	if [ $$((pass)) == 1 ]; then \
+			echo "          test_"$(TEST)" PASSED"; \
+			true; \
+	else \
+			echo "          test_"$(TEST)" FAILED"; \
+			false; \
+	fi ;
 
 #-------------------------------------------------
 .PHONY : clean

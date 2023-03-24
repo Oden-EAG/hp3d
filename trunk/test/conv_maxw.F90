@@ -41,16 +41,13 @@ program test_conv_maxw
    endif
 !
    call conv_maxw(nref)
-   if (NPASS.eq.1 .and. RANK.eq.ROOT) then
-      write(*,*) 'test_conv_maxw PASSED.'
-   elseif (RANK.eq.ROOT) then
-      write(*,*) 'test_conv_maxw FAILED.'
-   endif
 !
  99 continue
 !
 !..finalize MPI environment
    call mpi_w_finalize
+!
+   if (NPASS.ne.1) stop 1
 !
    contains
 !
