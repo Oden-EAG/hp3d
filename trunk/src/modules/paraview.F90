@@ -14,7 +14,10 @@ module paraview
    integer,parameter  :: PARAVIEW_IO = 22
    logical            :: PARAVIEW_DUMP_GEOM = .FALSE.
    logical            :: PARAVIEW_DUMP_ATTR = .FALSE.
-   logical            :: SECOND_ORDER_VIS   = .FALSE.
+   logical            :: SECOND_ORDER_VIS   = .TRUE.
+
+   ! Flag for switching on VTU format for output meshes and solution Fields. FALSE switches to XDMF.
+   logical            :: VIS_VTU = .TRUE.
 !
 !  this is matching EXGEOM flag in "control" module
    integer,parameter  :: PARAVIEW_ISOGEOM = 0
@@ -30,6 +33,11 @@ module paraview
    integer, allocatable :: GEOM_OBJ(:)
    real(8), allocatable :: GEOM_PTS(:,:)
    real(8), allocatable :: ATTR_VAL(:,:)
+
+! Variables for VTU Format
+   integer, allocatable    :: IPARATTR_VTU(:)
+   integer(8),    allocatable :: ELEM_TYPES(:)
+
 !
    contains
 !
@@ -50,7 +58,8 @@ module paraview
 !> @date Feb 2023
 !-----------------------------------------------------------------------------
    subroutine paraview_finalize()
-      call hdf5_w_finalize()
+      !only call hdf5_w_finalize when xdmf output is chosen
+      if(VIS_VTU .eqv. .false.) call hdf5_w_finalize()
       if (allocated(GEOM_OBJ)) deallocate(GEOM_OBJ)
       if (allocated(GEOM_PTS)) deallocate(GEOM_PTS)
       if (allocated(GEOM_PTS)) deallocate(ATTR_VAL)

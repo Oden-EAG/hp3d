@@ -119,7 +119,7 @@ end subroutine paraview_driver
 !-------------------------------------------------------------------------------------------
 subroutine paraview_begin(Id,Time)
 !
-   use paraview    , only : PARAVIEW_IO,PARAVIEW_DIR,paraview_init
+   use paraview    , only : PARAVIEW_IO,PARAVIEW_DIR,paraview_init,VIS_VTU
    use environment , only : PREFIX
 !
    implicit none
@@ -131,28 +131,36 @@ subroutine paraview_begin(Id,Time)
 !
 !-------------------------------------------------------------------------------------------
 !
-   call paraview_init
-!
-!..convert integer to string
-   write(postfix,"(I5.5)") Id
-!
-!..open .xmf file
-   open(unit=PARAVIEW_IO , file=trim(PARAVIEW_DIR)//trim(PREFIX)//"_"//trim(postfix)//'.xmf')
-!
-   write(PARAVIEW_IO, 1001)
-   write(PARAVIEW_IO, 1002)
-   write(PARAVIEW_IO, 1003)
-!
-!..non negative time is provided
-   if (Time >= 0.d0) then
-      write(PARAVIEW_IO, 1004) Time
-   end if
-!
-!..HEADER of .xmf file
- 1001 format("<Xdmf xmlns:xi='http://www.w3.org/2003/XInclude' Version='2.1'>")
- 1002 format("  <Domain>")
- 1003 format("    <Grid Name='Geometry' GridType='Uniform'>")
- 1004 format("    <Time Value='", f14.10, "' />")
+   if(VIS_VTU .eqv. .false.) then
+         call paraview_init
+      !
+      !..convert integer to string
+         write(postfix,"(I5.5)") Id
+      !
+      !..open .xmf file
+         open(unit=PARAVIEW_IO , file=trim(PARAVIEW_DIR)//trim(PREFIX)//"_"//trim(postfix)//'.xmf')
+      !
+         write(PARAVIEW_IO, 1001)
+         write(PARAVIEW_IO, 1002)
+         write(PARAVIEW_IO, 1003)
+      !
+      !..non negative time is provided
+         if (Time >= 0.d0) then
+            write(PARAVIEW_IO, 1004) Time
+         end if
+      !
+      !..HEADER of .xmf file
+      1001 format("<Xdmf xmlns:xi='http://www.w3.org/2003/XInclude' Version='2.1'>")
+      1002 format("  <Domain>")
+      1003 format("    <Grid Name='Geometry' GridType='Uniform'>")
+      1004 format("    <Time Value='", f14.10, "' />")
+   else
+      !opening the VTU file in binary format.
+      write(postfix,"(I5.5)") Id
+      open(unit=PARAVIEW_IO , file=trim(PARAVIEW_DIR)//trim(PREFIX)//"_"//trim(postfix)//'.vtu', status  = 'replace',        &
+                  form    = 'unformatted',    &
+                  access  = 'stream')
+   endif
 !
 end subroutine paraview_begin
 !
@@ -164,17 +172,23 @@ end subroutine paraview_begin
 !-------------------------------------------------------------------------------------------
 subroutine paraview_end
 !
-   use paraview , only : PARAVIEW_IO, paraview_finalize
+   use paraview , only : PARAVIEW_IO, paraview_finalize,VIS_VTU
 !
    implicit none
 !
 !..FOOTER of .xmf file
-   write(PARAVIEW_IO, 1004)
-   write(PARAVIEW_IO, 1005)
-   write(PARAVIEW_IO, 1006)
- 1004 format("    </Grid>")
- 1005 format("  </Domain>")
- 1006 format("</Xdmf>")
+   if(VIS_VTU .eqv. .false.) then
+      write(PARAVIEW_IO, 1004)
+      write(PARAVIEW_IO, 1005)
+      write(PARAVIEW_IO, 1006)
+   1004 format("    </Grid>")
+   1005 format("  </Domain>")
+   1006 format("</Xdmf>")
+   else
+   ! Closing strings for the VTU file
+      write(PARAVIEW_IO) char(10) // '' // '</AppendedData>' // char(10)
+      write(PARAVIEW_IO)       '' // '</VTKFile>'      // char(10)
+   endif
 !
    close(PARAVIEW_IO)
 !

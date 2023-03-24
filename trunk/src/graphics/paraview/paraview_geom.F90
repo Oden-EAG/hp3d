@@ -8,7 +8,7 @@ subroutine paraview_geom
 !
    use environment     , only : PREFIX
    use paraview        , only : PARAVIEW_IO, PARAVIEW_DUMP_GEOM,   &
-                                PARAVIEW_DIR, SECOND_ORDER_VIS
+                                PARAVIEW_DIR, SECOND_ORDER_VIS, VIS_VTU
    use mpi_param       , only : RANK, ROOT
    use data_structure3D, only : NODES, ELEM_ORDER
    use node_types
@@ -36,50 +36,52 @@ subroutine paraview_geom
 !
    if (RANK .ne. ROOT) goto 90
 !
-   if (SECOND_ORDER_VIS) then
-      ico = icn
-!
-      mdle = ELEM_ORDER(1)
-      ntype = NODES(mdle)%ntype
-!
-      select case(ntype)
-      case(MDLB)
-         write(PARAVIEW_IO,1011) "'HEXAHEDRON_27'", ice, 27
-      case(MDLP)
-         write(PARAVIEW_IO,1011) "'WEDGE_18'", ice, 18
-      case(MDLN)
-         write(PARAVIEW_IO,1011) "'TETRAHEDRON_10'", ice, 10
-      case default
-         write(*,*) 'paraview_geom: unrecognized element type: ', S_Type(ntype)
-         stop 1
-      end select
-   else
-      ico = (ice+icn)
-      write(PARAVIEW_IO,1012) "'Mixed'", ice
+   if(VIS_VTU .eqv. .false.) then  !only used when XDMF output format is used i.e., VIS_VTU = .false.
+         if (SECOND_ORDER_VIS) then
+            ico = icn
+      !
+            mdle = ELEM_ORDER(1)
+            ntype = NODES(mdle)%ntype
+      !
+            select case(ntype)
+            case(MDLB)
+               write(PARAVIEW_IO,1011) "'HEXAHEDRON_27'", ice, 27
+            case(MDLP)
+               write(PARAVIEW_IO,1011) "'WEDGE_18'", ice, 18
+            case(MDLN)
+               write(PARAVIEW_IO,1011) "'TETRAHEDRON_10'", ice, 10
+            case default
+               write(*,*) 'paraview_geom: unrecognized element type: ', S_Type(ntype)
+               stop 1
+            end select
+         else
+            ico = (ice+icn)
+            write(PARAVIEW_IO,1012) "'Mixed'", ice
+         endif
+      !
+      !..write to .xmf file
+         write(PARAVIEW_IO,1013) ico
+         write(PARAVIEW_IO,1014) trim(PREFIX), trim(postfix)
+         write(PARAVIEW_IO,1015)
+         write(PARAVIEW_IO,1016)
+         write(PARAVIEW_IO,1017)
+         write(PARAVIEW_IO,1018) icp
+         write(PARAVIEW_IO,1019) trim(PREFIX), trim(postfix)
+         write(PARAVIEW_IO,1020)
+         write(PARAVIEW_IO,1021)
+      !
+      1011 format("      <Topology TopologyType=",a," NumberOfElements='",i8,"' NodesPerElement='",i8,"'>")
+      1012 format("      <Topology TopologyType=",a," NumberOfElements='",i8,"'>")
+      1013 format("        <DataItem Dimensions='",i12,"' NumberType='Int' Precision='4' Format='HDF'>")
+      1014 format("        ",a,"geom_",a,".h5:/Objects")
+      1015 format("        </DataItem>")
+      1016 format("      </Topology>")
+      1017 format("      <Geometry GeometryType='XYZ'>")
+      1018 format("        <DataItem Dimensions='",i10, " 3' NumberType='Float' Precision='4' Format='HDF'>")
+      1019 format("        ",a,"geom_",a,".h5:/Coords")
+      1020 format("        </DataItem>")
+      1021 format("      </Geometry>")
    endif
-!
-!..write to .xmf file
-   write(PARAVIEW_IO,1013) ico
-   write(PARAVIEW_IO,1014) trim(PREFIX), trim(postfix)
-   write(PARAVIEW_IO,1015)
-   write(PARAVIEW_IO,1016)
-   write(PARAVIEW_IO,1017)
-   write(PARAVIEW_IO,1018) icp
-   write(PARAVIEW_IO,1019) trim(PREFIX), trim(postfix)
-   write(PARAVIEW_IO,1020)
-   write(PARAVIEW_IO,1021)
-!
- 1011 format("      <Topology TopologyType=",a," NumberOfElements='",i8,"' NodesPerElement='",i8,"'>")
- 1012 format("      <Topology TopologyType=",a," NumberOfElements='",i8,"'>")
- 1013 format("        <DataItem Dimensions='",i12,"' NumberType='Int' Precision='4' Format='HDF'>")
- 1014 format("        ",a,"geom_",a,".h5:/Objects")
- 1015 format("        </DataItem>")
- 1016 format("      </Topology>")
- 1017 format("      <Geometry GeometryType='XYZ'>")
- 1018 format("        <DataItem Dimensions='",i10, " 3' NumberType='Float' Precision='4' Format='HDF'>")
- 1019 format("        ",a,"geom_",a,".h5:/Coords")
- 1020 format("        </DataItem>")
- 1021 format("      </Geometry>")
 !
    90 continue
 !

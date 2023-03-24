@@ -7,7 +7,7 @@
 module upscale
 !
    use node_types
-   use paraview,     only : SECOND_ORDER_VIS
+   use paraview,     only : SECOND_ORDER_VIS, VIS_VTU
 !
    implicit none
 !
@@ -36,7 +36,7 @@ module upscale
 contains
 
 
-!> @brief return cell type (XDMF 2) for vis object
+!> @brief return cell type (XDMF 2 or VTU: for vis object depending upon VIS_VTU Flag)
 !> @param[in] Etype - Element type
 !> @date Feb 2023
    integer function ivis_type(Etype)
@@ -44,21 +44,41 @@ contains
       integer :: Etype
 !
       if (SECOND_ORDER_VIS) then
-         select case(Etype)
-            case(TETR,MDLN); ivis_type = 38
-            case(PRIS,MDLP); ivis_type = 41
-            case(BRIC,MDLB); ivis_type = 50
-            case default
-               write(*,*) 'ivis_type'; stop
-         end select
+         if(VIS_VTU) then
+            select case(Etype)
+               case(TETR,MDLN); ivis_type = 24
+               case(PRIS,MDLP); ivis_type = 32
+               case(BRIC,MDLB); ivis_type = 29
+               case default
+                  write(*,*) 'ivis_type'; stop
+            end select
+         else
+            select case(Etype)
+               case(TETR,MDLN); ivis_type = 38
+               case(PRIS,MDLP); ivis_type = 41
+               case(BRIC,MDLB); ivis_type = 50
+               case default
+                  write(*,*) 'ivis_type'; stop
+            end select
+         endif
       else
-         select case(Etype)
-            case(TETR,MDLN); ivis_type = 6
-            case(PRIS,MDLP); ivis_type = 8
-            case(BRIC,MDLB); ivis_type = 9
-            case default
-               write(*,*) 'ivis_type'; stop
-         end select
+         if(VIS_VTU) then
+            select case(Etype)
+               case(TETR,MDLN); ivis_type = 10
+               case(PRIS,MDLP); ivis_type = 13
+               case(BRIC,MDLB); ivis_type = 12
+               case default
+                  write(*,*) 'ivis_type'; stop
+            end select
+         else
+            select case(Etype)
+               case(TETR,MDLN); ivis_type = 6
+               case(PRIS,MDLP); ivis_type = 8
+               case(BRIC,MDLB); ivis_type = 9
+               case default
+                  write(*,*) 'ivis_type'; stop
+            end select
+         endif
       endif
 !
    end function ivis_type
@@ -305,4 +325,33 @@ contains
       end do
    end subroutine disp_vis
 !
+
+!> @brief returns number of points/nodes for VTU element type number 
+!> @param[in] indx - VTU Element type number
+!> @date March 2023
+   integer function nobj_conf_VTU(indx)
+!
+      integer :: indx
+!
+      if (SECOND_ORDER_VIS) then
+         select case(indx)
+            case(24); nobj_conf_VTU = 10
+            case(32); nobj_conf_VTU = 18
+            case(29); nobj_conf_VTU = 27
+            case default
+               write(*,*) 'nobj_conf_VTU: unexpected type. stop.'
+               stop
+         end select
+      else
+         select case(indx)
+            case(10); nobj_conf_VTU = 4
+            case(13); nobj_conf_VTU = 6
+            case(12); nobj_conf_VTU = 8
+            case default
+               write(*,*) 'nobj_conf_VTU: unexpected type. stop.',indx
+               stop
+         end select
+      endif
+!
+   end function nobj_conf_VTU
 end module upscale
