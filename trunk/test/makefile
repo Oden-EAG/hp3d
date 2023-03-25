@@ -78,8 +78,7 @@ FC_WORK = $(FC) $(CCDEFS) $(CCINCS) $(FFLAGS) $(EXTRA_FFLAGS)
 #-------------------------------------------------
 
 $(OBJ) : $(OBJ_PATH)/%.o : %.F90
-	@echo ""
-	@echo "Compiling $<"
+	@printf "\nCompiling $<\n"
 	$(FC_WORK) -o $@ -c $<
 	
 $(OBJ_PATH)/.dummy :
@@ -90,8 +89,7 @@ $(OBJ_PATH)/.dummy :
 #-------------------------------------------------
 .PHONY : one
 one : $(OBJ_PATH)/.dummy $(OBJ_PATH)/$(TEST).o
-	@echo ""
-	@echo "- Linking - " $(TEST)
+	@printf "\n - Linking - "$(TEST)"\n"
 	$(FC_WORK) -o $(EXEC_PATH)/$(TEST) $(OBJ_PATH)/$(TEST).o $(LIBS) $(LDFLAGS)
 
 #-------------------------------------------------
@@ -107,13 +105,13 @@ seq :
 		fi ; \
 	done ; \
 	if [ $$((seq_fail)) == 0 ]; then \
-		echo "\n All "$$((seq_pass)) \
-			  " Sequential Tests Passed.\n"; \
+		printf "\n All "$$((seq_pass))"%s\n\n" \
+			    " Sequential Tests Passed."; \
 	else \
-		echo "\n     "$$((seq_pass))/$$((seq_pass+seq_fail)) \
-			  " Sequential Tests Passed."; \
-		echo   "     "$$((seq_fail))/$$((seq_pass+seq_fail)) \
-			  " Sequential Tests FAILED!\n"; \
+		printf "\n     "$$((seq_pass))/$$((seq_pass+seq_fail))"%s\n" \
+			    " Sequential Tests Passed."; \
+		printf   "     "$$((seq_fail))/$$((seq_pass+seq_fail))"%s\n\n" \
+			    " Sequential Tests FAILED!"; \
 	fi ; \
 	echo $$((seq_pass))" "$$((seq_fail)) > $(OBJ_PATH)/.seq_test
 
@@ -130,13 +128,13 @@ par :
 		fi ; \
 	done ; \
 	if [ $$((par_fail)) == 0 ]; then \
-		echo "\n All "$$((par_pass)) \
-			  " Parallel Tests Passed.\n"; \
+		printf "\n All "$$((par_pass))"%s\n\n" \
+			    " Parallel Tests Passed."; \
 	else \
-		echo "\n     "$$((par_pass))/$$((par_pass+par_fail)) \
-			  " Parallel Tests Passed."; \
-		echo   "     "$$((par_fail))/$$((par_pass+par_fail)) \
-			  " Parallel Tests FAILED!\n"; \
+		printf "\n     "$$((par_pass))/$$((par_pass+par_fail))"%s\n" \
+			    " Parallel Tests Passed."; \
+		printf   "     "$$((par_fail))/$$((par_pass+par_fail))"%s\n\n" \
+			    " Parallel Tests FAILED!"; \
 	fi ; \
 	echo $$((par_pass))" "$$((par_fail)) > $(OBJ_PATH)/.par_test
 
@@ -149,20 +147,20 @@ all : seq par
 	 fail=$$((seq_fail+par_fail)); \
 	 echo "++++++++++++++++++++++++++++++++++++++++"; \
 	if [ $$((fail)) == 0 ]; then \
-		echo "\n All "$$((pass)) \
-			  " Tests Passed.\n"; \
+		printf "\n All "$$((pass))"%s\n\n" \
+			    " Tests Passed."; \
 	else \
-		echo "\n     "$$((pass))/$$((pass+fail)) \
-			  " Tests Passed."; \
-		echo   "     "$$((fail))/$$((pass+fail)) \
-			  " Tests FAILED!\n"; \
+		printf "\n     "$$((pass))/$$((pass+fail))"%s\n" \
+			    " Tests Passed."; \
+		printf   "     "$$((fail))/$$((pass+fail))"%s\n\n" \
+			    " Tests FAILED!"; \
 	fi ; \
 	 echo "++++++++++++++++++++++++++++++++++++++++";
 
 #-------------------------------------------------
 .PHONY : run
 run : one
-	@echo "\n Running test: "$(TEST)
+	@printf "\n Running test: "$(TEST)"\n"
 	@pass=1; ./$(EXEC_PATH)/$(TEST) || pass=0; \
 	if [ $$((pass)) == 1 ]; then \
 			echo "          test_"$(TEST)" PASSED"; \
@@ -175,7 +173,7 @@ run : one
 #-------------------------------------------------
 .PHONY : run-par
 run-par : one
-	@echo "\n Running test: "$(TEST)
+	@printf "\n Running test: "$(TEST)"\n"
 	@pass=1; mpirun -np 4 ./$(EXEC_PATH)/$(TEST) || pass=0; \
 	if [ $$((pass)) == 1 ]; then \
 			echo "          test_"$(TEST)" PASSED"; \
