@@ -163,10 +163,10 @@ run : one
 	@printf "\n Running test: "$(TEST)"\n"
 	@pass=1; ./$(EXEC_PATH)/$(TEST) || pass=0; \
 	if [ $$((pass)) == 1 ]; then \
-			echo "          test_"$(TEST)" PASSED"; \
+			printf "          test_"$(TEST)" PASSED\n\n"; \
 			true; \
 	else \
-			echo "          test_"$(TEST)" FAILED"; \
+			printf "          test_"$(TEST)" FAILED\n\n"; \
 			false; \
 	fi ;
 
@@ -176,10 +176,10 @@ run-par : one
 	@printf "\n Running test: "$(TEST)"\n"
 	@pass=1; mpirun -np 4 ./$(EXEC_PATH)/$(TEST) || pass=0; \
 	if [ $$((pass)) == 1 ]; then \
-			echo "          test_"$(TEST)" PASSED"; \
+			printf "          test_"$(TEST)" PASSED\n\n"; \
 			true; \
 	else \
-			echo "          test_"$(TEST)" FAILED"; \
+			printf "          test_"$(TEST)" FAILED\n\n"; \
 			false; \
 	fi ;
 
