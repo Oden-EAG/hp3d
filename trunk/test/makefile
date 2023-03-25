@@ -28,6 +28,13 @@ SRC_FILE     = cross_product.F90         \
                near.F90                  \
                parameters.F90            \
                real_imag.F90
+ifeq ($(COMPLEX),1)
+SRC_FILE    += conv_maxw.F90             \
+               poly_maxw.F90
+else
+SRC_FILE    += conv_pois.F90             \
+               poly_pois.F90
+endif
 
 OBJ          = $(addprefix $(OBJ_PATH)/, $(SRC_FILE:.F90=.o))
 
@@ -50,6 +57,13 @@ TEST_SEQ = cross_product             \
 TEST_PAR = hexa_adapt_h_aniso        \
            hexa_adapt_h_case1        \
            hexa_adapt_h_iso
+ifeq ($(COMPLEX),1)
+TEST_SEQ    += conv_maxw             \
+               poly_maxw
+else
+TEST_SEQ    += conv_pois             \
+               poly_pois
+endif
 
 # Includes and defs
 CCDEFS = $(PROB_PP_DEFS)
