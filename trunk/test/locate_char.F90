@@ -18,10 +18,7 @@ program test_locate_char
    call locate_char('cont',a,10, loc)
    if (loc .ne. 0) NPASS = 0
 !
-   if (NPASS .ne. 1) then
-      write(*,*) 'test_locate_char FAILED.'
-   else
-      write(*,*) 'test_locate_char PASSED.'
-   endif
+!
+   if (NPASS.ne.1) stop 1
 !
 end program test_locate_char

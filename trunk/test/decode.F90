@@ -36,10 +36,6 @@ program test_decode
    if (ny .ne.  62) NPASS = 0
 !
 !
-   if (NPASS .ne. 1) then
-      write(*,*) 'test_decode FAILED.'
-   else
-      write(*,*) 'test_decode PASSED.'
-   endif
+   if (NPASS.ne.1) stop 1
 !
 end program test_decode

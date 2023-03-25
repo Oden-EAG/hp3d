@@ -40,16 +40,13 @@ program test_poly_pois
    endif
 !
    call poly_pois(nref)
-   if (NPASS.eq.1 .and. RANK.eq.ROOT) then
-      write(*,*) 'test_poly_pois PASSED.'
-   elseif (RANK.eq.ROOT) then
-      write(*,*) 'test_poly_pois FAILED.'
-   endif
 !
  99 continue
 !
 !..finalize MPI environment
    call mpi_w_finalize
+!
+   if (NPASS.ne.1) stop 1
 !
    contains
 !

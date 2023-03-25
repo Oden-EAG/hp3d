@@ -25,10 +25,7 @@ program real_imag
    if (dimag_part(a) .ne. 0.d0) NPASS = 0
 #endif
 !
-   if (NPASS .ne. 1) then
-      write(*,*) 'real_imag FAILED.'
-   else
-      write(*,*) 'real_imag PASSED.'
-   endif
+!
+   if (NPASS.ne.1) stop 1
 !
 end program real_imag
