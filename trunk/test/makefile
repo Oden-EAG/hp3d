@@ -161,7 +161,7 @@ all : seq par
 .PHONY : run
 run : one
 	@printf "\n Running test: "$(TEST)"\n"
-	@pass=1; ./$(EXEC_PATH)/$(TEST) || pass=0; \
+	@pass=1; mpirun -np 1 ./$(EXEC_PATH)/$(TEST) || pass=0; \
 	if [ $$((pass)) == 1 ]; then \
 			printf "          test_"$(TEST)" PASSED\n\n"; \
 			true; \
