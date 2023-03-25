@@ -30,10 +30,7 @@ program test_encode_decode_order
    if (nordx .ne. px) NPASS = 0
    if (nordy .ne. py) NPASS = 0
 !
-   if (NPASS .ne. 1) then
-      write(*,*) 'test_encode_decode_order FAILED.'
-   else
-      write(*,*) 'test_encode_decode_order PASSED.'
-   endif
+!
+   if (NPASS.ne.1) stop 1
 !
 end program test_encode_decode_order

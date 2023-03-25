@@ -1,19 +1,23 @@
 !> @date Mar 2023
 program test_parameters
    use parameters
+!
    implicit none
 !
+   integer :: NPASS
+!
    integer :: nsum
+!
+   NPASS = 1
 !
    call set_parameters(1,2,3,4,5,6)
 !
    nsum = NRCOMS + MAXNRHS + &
           MAXEQNH + MAXEQNE + MAXEQNV + MAXEQNQ
 !
-   if (nsum .ne. 21) then
-      write(*,*) 'test_parameters FAILED.'
-      stop
-   endif
-   write(*,*) 'test_parameters PASSED.'
+   if (nsum .ne. 21) NPASS = 0
+!
+!
+   if (NPASS.ne.1) stop 1
 !
 end program test_parameters

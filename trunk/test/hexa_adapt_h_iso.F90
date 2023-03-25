@@ -44,14 +44,11 @@ program test_hexa_adapt_h_iso
    endif
 !
    call hexa_adapt_h_iso
-   if (NPASS.eq.1 .and. RANK.eq.ROOT) then
-      write(*,*) 'test_hexa_adapt_h_iso PASSED.'
-   elseif (RANK.eq.ROOT) then
-      write(*,*) 'test_hexa_adapt_h_iso FAILED.'
-   endif
 !
 !..finalize MPI environment
    call mpi_w_finalize
+!
+   if (NPASS.ne.1) stop 1
 !
    contains
 !

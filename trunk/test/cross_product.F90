@@ -86,10 +86,6 @@ program test_cross_product
    if (.not. dnear(sVec(1),fg)) NPASS = 0
 !
 !
-   if (NPASS .ne. 1) then
-      write(*,*) 'test_cross_product FAILED.'
-   else
-      write(*,*) 'test_cross_product PASSED.'
-   endif
+   if (NPASS.ne.1) stop 1
 !
 end program test_cross_product

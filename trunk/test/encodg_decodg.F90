@@ -22,10 +22,7 @@ program test_encodg_decodg
       if (a(i) .ne. b(i)) NPASS = 0
    enddo
 !
-   if (NPASS .ne. 1) then
-      write(*,*) 'test_encodg_decodg FAILED.'
-   else
-      write(*,*) 'test_encodg_decodg PASSED.'
-   endif
+!
+   if (NPASS.ne.1) stop 1
 !
 end program test_encodg_decodg
