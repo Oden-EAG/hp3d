@@ -395,14 +395,14 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
           endif
           read(nin,*) TRIANGLES(nt)%Idata(1)
 !
-!  .....triangle on G^1 reconstructed surface Idata(1)
-        case('G1RecTri')
-          TRIANGLES(nt)%Type='PlaneTri'
-          allocate(TRIANGLES(nt)%Idata(1), stat=istat)
-          if (istat.ne.SUCCESS) then
-            call logic_error(ERR_ALLOC_FAILURE,__FILE__,__LINE__)
-          endif
-          read(nin,*) TRIANGLES(nt)%Idata(1)
+!  .....triangle on G^1 reconstructed surface Idata(1) (LEGACY)
+!        case('G1RecTri')
+!          TRIANGLES(nt)%Type='PlaneTri'
+!          allocate(TRIANGLES(nt)%Idata(1), stat=istat)
+!          if (istat.ne.SUCCESS) then
+!            call logic_error(ERR_ALLOC_FAILURE,__FILE__,__LINE__)
+!          endif
+!          read(nin,*) TRIANGLES(nt)%Idata(1)
 !
 !  .....implicit triangle lying on surface Idata(1) and bounded by
 !       surfaces Idata(2:4), listed counter clockwise

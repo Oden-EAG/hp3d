@@ -141,8 +141,8 @@ subroutine trian(No,Eta, X,Dxdeta)
 !  ...a part of spherical octant (LEGACY)...............................
       !case('PaSphTri') ; call trian_PaSphTri(No,Eta, X,Dxdeta)
 !
-!  ...G1 reconstructed surface triangle.................................
-      case('G1RecTri') ; call trian_G1RecTri(No,Eta, X,Dxdeta)
+!  ...G1 reconstructed surface triangle (LEGACY)........................
+      !case('G1RecTri') ; call trian_G1RecTri(No,Eta, X,Dxdeta)
 !
 !  ...cylindrical coordinates triangle
       case('CylTri')   ; call trian_CylTri(No,Eta, X,Dxdeta)

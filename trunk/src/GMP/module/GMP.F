@@ -527,27 +527,6 @@ c----------------------------------------------------------------------
       type(pprism   ), allocatable :: PRISMS(:)
       type(ppyramid ), allocatable :: PYRAMIDS(:)
 c
-C$$$      interface input_DEFAULT
-C$$$c
-C$$$      subroutine input_DEFAULT_default
-C$$$      end subroutine input_DEFAULT_default
-C$$$c
-C$$$      subroutine input_DEFAULT_from_file(fp)
-C$$$c
-C$$$      character(len=*), intent(in) :: fp
-C$$$      end subroutine input_DEFAULT_from_file
-C$$$      end interface
-c
-C$$$      interface input_NETGEN
-c
-C$$$      subroutine input_NETGEN_default
-C$$$      end subroutine input_NETGEN_default
-C$$$c
-C$$$      subroutine input_NETGEN_from_file(fp)
-C$$$c
-C$$$      character(len=*), intent(in) :: fp
-C$$$      end subroutine input_NETGEN_from_file
-C$$$      end interface
 c
       contains
 c
