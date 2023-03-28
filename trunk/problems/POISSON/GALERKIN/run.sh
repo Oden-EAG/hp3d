@@ -2,7 +2,7 @@
 
 #
 # MPI Procs
-nproc=2
+nproc=1
 #
 # OMP THREADS
 nthreads=1
@@ -23,7 +23,7 @@ job=0
 imax=2
 
 # Initial mesh
-geom='./geometries/fiber_b'
+geom='./geometries/hexa_orient0'
 
 # - MAXNODS
 maxnods=525000

@@ -47,7 +47,7 @@ subroutine solution(X, u,gradu,gradgradu)
 !  ...polynomial solution
       case(0)
 !     ...set polynomial order of manufactured solution
-         isol_p = 1
+         isol_p = 6
          np_x = real(isol_p,8)
          np_y = real(isol_p,8)
          np_z = real(isol_p,8)

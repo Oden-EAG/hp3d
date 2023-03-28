@@ -131,31 +131,31 @@ subroutine paraview_begin(Id,Time)
 !
 !-------------------------------------------------------------------------------------------
 !
-   if(VIS_VTU .eqv. .false.) then
+   if (.not. VIS_VTU) then
          call paraview_init
-      !
-      !..convert integer to string
+!
+!     ...convert integer to string
          write(postfix,"(I5.5)") Id
-      !
-      !..open .xmf file
+!
+!     ...open .xmf file
          open(unit=PARAVIEW_IO , file=trim(PARAVIEW_DIR)//trim(PREFIX)//"_"//trim(postfix)//'.xmf')
-      !
+!
          write(PARAVIEW_IO, 1001)
          write(PARAVIEW_IO, 1002)
          write(PARAVIEW_IO, 1003)
-      !
-      !..non negative time is provided
+!
+!     ...non negative time is provided
          if (Time >= 0.d0) then
             write(PARAVIEW_IO, 1004) Time
          end if
-      !
-      !..HEADER of .xmf file
+!
+!  ...HEADER of .xmf file
       1001 format("<Xdmf xmlns:xi='http://www.w3.org/2003/XInclude' Version='2.1'>")
       1002 format("  <Domain>")
       1003 format("    <Grid Name='Geometry' GridType='Uniform'>")
       1004 format("    <Time Value='", f14.10, "' />")
    else
-      !opening the VTU file in binary format.
+!  ...opening the VTU file in binary format.
       write(postfix,"(I5.5)") Id
       open(unit=PARAVIEW_IO , file=trim(PARAVIEW_DIR)//trim(PREFIX)//"_"//trim(postfix)//'.vtu', status  = 'replace',        &
                   form    = 'unformatted',    &
@@ -177,7 +177,7 @@ subroutine paraview_end
    implicit none
 !
 !..FOOTER of .xmf file
-   if(VIS_VTU .eqv. .false.) then
+   if (.not. VIS_VTU) then
       write(PARAVIEW_IO, 1004)
       write(PARAVIEW_IO, 1005)
       write(PARAVIEW_IO, 1006)
@@ -185,7 +185,7 @@ subroutine paraview_end
    1005 format("  </Domain>")
    1006 format("</Xdmf>")
    else
-   ! Closing strings for the VTU file
+!  ...Closing strings for the VTU file
       write(PARAVIEW_IO) char(10) // '' // '</AppendedData>' // char(10)
       write(PARAVIEW_IO)       '' // '</VTKFile>'      // char(10)
    endif

@@ -53,7 +53,7 @@ subroutine paraview_attr_scalar(Id, Idx)
    if (RANK .ne. ROOT) goto 50
 !
 !..write to .xmf file (only used if XDMF/XMF format is used)
-   if(VIS_VTU .eqv. .false.) then
+   if (.not. VIS_VTU) then
       write(PARAVIEW_IO, 1101) trim(nick)
       write(PARAVIEW_IO, 1102) ic
       write(PARAVIEW_IO, 1103) trim(PREFIX), trim(fname), trim(postfix), trim(nick)
@@ -79,7 +79,7 @@ subroutine paraview_attr_scalar(Id, Idx)
    if (RANK .ne. ROOT) goto 70
 !
 !..write to .xmf file (only used if XDMF/XMF format is used)
-   if(VIS_VTU .eqv. .false.) then
+   if (.not. VIS_VTU) then
       write(PARAVIEW_IO, 1101) trim(nick)
       write(PARAVIEW_IO, 1102) ic
       write(PARAVIEW_IO, 1103) trim(PREFIX), trim(fname), trim(postfix), trim(nick)
@@ -93,7 +93,7 @@ subroutine paraview_attr_scalar(Id, Idx)
 !
    if (RANK .ne. ROOT) goto 90
 !..write to .xmf file (only used if XDMF/XMF format is used)
-   if(VIS_VTU .eqv. .false.) then
+   if (.not. VIS_VTU) then
       1101 format("      <Attribute Name='",a,"' AttributeType='Scalar' Center='Node'>")
       1102 format("        <DataItem Dimensions='",i10, " 1' NumberType='Float' Precision='4' Format='HDF'>")
       1103 format("        ",a,"scalar_",a,a,".h5:",a)

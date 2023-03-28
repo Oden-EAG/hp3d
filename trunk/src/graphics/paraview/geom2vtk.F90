@@ -148,7 +148,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !
    ice_subd=0; icn_subd=0
 !..Additional Computational for computing the total number of elements (including subelements: vlevel > 0))
-!.. VTU Format needs this information apriori as VTU needs headers with this information before appending the data.   
+!..VTU Format needs this information apriori as VTU needs headers with this information before appending the data.   
    if(VIS_VTU) then
       if(SECOND_ORDER_VIS) then
          allocate(ELEM_TYPES(NRELES))
@@ -239,7 +239,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 
          if(VIS_VTU) then
             count = size(ELEM_TYPES)
-            call MPI_REDUCE(MPI_IN_PLACE,ELEM_TYPES,count,MPI_INTEGER8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+            call MPI_REDUCE(MPI_IN_PLACE,ELEM_TYPES,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
          endif
       else
          count = 3*IcP
@@ -249,7 +249,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
   
          if(VIS_VTU) then
             count = size(ELEM_TYPES)
-            call MPI_REDUCE(ELEM_TYPES,ELEM_TYPES,count,MPI_INTEGER8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+            call MPI_REDUCE(ELEM_TYPES,ELEM_TYPES,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
          endif
       endif
    else
@@ -261,10 +261,10 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !..Step 5 : Write to file with HDF5
 !
    if (RANK .eq. ROOT) then
-      if(VIS_VTU .eqv. .false.) then
+      if (.not. VIS_VTU) then
          call geometry_write(Sname,len(Sname),Sfile,len(Sfile))
       else
-         call Write_VTU_Headers(IcE)
+         call write_VTU_headers(IcE)
       endif
    endif
 !
@@ -283,7 +283,7 @@ end subroutine geom2vtk
 !!
 !> @date March 2023
 !----------------------------------------------------------------------------------------
-subroutine Write_VTU_Headers(IcE)
+subroutine write_VTU_headers(IcE)
 
 
    use data_structure3D
@@ -293,23 +293,21 @@ subroutine Write_VTU_Headers(IcE)
 
    implicit none
 
-   integer,intent(in)                 ::  IcE
+   integer,intent(in)      ::  IcE
 
-   ! These are integer 8 arrays needed for VTU output
-   integer(8), allocatable :: elem_connectivity(:,:)
-   integer(8), allocatable :: offsets_connectivity(:)
-   integer(8) :: VTU_DATA_OFFSET !keeps track of data offset when using VTU format (VIS_FORMAT = 1)
-   integer(4) :: VTU_DATA_SIZE   ! Size of the DATA for VTU FILE
+   integer, allocatable :: elem_connectivity(:,:)
+   integer, allocatable :: offsets_connectivity(:)
+   integer                 :: VTU_DATA_OFFSET !keeps track of data offset when using VTU format (VIS_FORMAT = 1)
+   integer                 :: VTU_DATA_SIZE   ! Size of the DATA for VTU FILE
 !..Auxiliary Variable
-   character(len=80) :: str1, str2, str3, str4
-   integer :: k,l,iv,j,count, nV
-   integer :: iphys,iload,icomp
+   character(len=80)       :: str1, str2, str3, str4
+   integer                 :: k,l,iv,j,count, nV
+   integer                 :: iphys,iload,icomp
 
 
-   !-----------------------------!
-   !     Main Header             !
-   !-----------------------------!
-   !number of vertices or nodes
+!..Main header starts here
+
+!..number of vertices or nodes
    nV = size(GEOM_PTS,dim=2)
 
    write(PARAVIEW_IO) ''// '<?xml version="1.0"?>' //char(10)
@@ -321,11 +319,9 @@ subroutine Write_VTU_Headers(IcE)
    write(PARAVIEW_IO) '    ' // '<Piece NumberOfPoints="' // trim(str1) //  &
                      '" NumberOfCells ="' // trim(str2) // '">' // char(10)
 
+!..Main header ends here
 
-
-   !----------------------------------------------!
-   !   Header for Co-ordinates of vertices/nodes  !
-   !----------------------------------------------!
+!..Header for co-ordinates of vertices/nodes..!
    write(PARAVIEW_IO) '      ' // '<Points>' // char(10)
    write(str1, '(i1)')   0                          ! data_offset
    write(str2, '(i0.0)') 8 * 8                     ! real precision
@@ -337,25 +333,23 @@ subroutine Write_VTU_Headers(IcE)
    write(PARAVIEW_IO) '      ' // '</Points>'    // char(10)
 
 
-   !---------------------------------!
-   !  Header for connectivity data   !
-   !---------------------------------!
+!..Header for connectivity data starts here
    VTU_data_offset = 0
    VTU_data_offset =  VTU_data_offset + 4 + nV * 3 * 8
    write(PARAVIEW_IO) '      ' // '<Cells>' // char(10)
 
    ! Connectivity
    write(str1, '(i0.0)') VTU_data_offset        ! data_offset
-   write(str2, '(i0.0)') 8 * 8                  ! integer precision
+   write(str2, '(i0.0)') 4 * 8                  ! integer precision
    write(PARAVIEW_IO) '        ' // '<DataArray type="Int' // trim(str2) // '"' //  &
                      ' Name="connectivity"'                      //  &
                      ' format="appended"'                        //  &
                      ' offset="' // trim(str1) // '">' // char(10)
    write(PARAVIEW_IO) '        ' // '</DataArray>' // char(10)
 
+!..Header for connectivity data ends here
 
-
-   !computations done to compute offsets for each element connectivity
+!..computations done to compute offsets for each element connectivity
 
    k = 0
    l = 0
@@ -393,26 +387,24 @@ subroutine Write_VTU_Headers(IcE)
 
    enddo
 
-   !-----------------------------------------!
-   !   Header for connectivity data offset   !
-   !-----------------------------------------!
+!..Header for connectivity data offset starts here
 
-   VTU_data_offset = VTU_data_offset + 4 + offsets_connectivity(IcE) * 8
+   VTU_data_offset = VTU_data_offset + 4 + offsets_connectivity(IcE) * 4
    write(str1, '(i0.0)') VTU_data_offset              ! data_offset
-   write(str2, '(i0.0)') 8 * 8                        ! integer precision
+   write(str2, '(i0.0)') 4 * 8                        ! integer precision
    write(PARAVIEW_IO) '        ' // '<DataArray type="Int' // trim(str2) // '"' //  &
    ' Name="offsets"'                           //  &
    ' format="appended"'                        //  &
    ' offset="' // trim(str1) // '">' // char(10)
    write(PARAVIEW_IO) '        ' // '</DataArray>' // char(10)
 
-   !-----------------------------------------!
-   !   Header for element types              !
-   !-----------------------------------------!
+!..Header for connectivity data offset ends here
 
-   VTU_data_offset = VTU_data_offset + 4 + IcE * 8 
+!..Header for element types starts here
+
+   VTU_data_offset = VTU_data_offset + 4 + IcE * 4 
    write(str1, '(i0.0)') VTU_data_offset              ! data_offset
-   write(str2, '(i0.0)') 8 * 8                        ! integer precision
+   write(str2, '(i0.0)') 4 * 8                        ! integer precision
    write(PARAVIEW_IO) '        ' // '<DataArray type="Int' // trim(str2) // '"' //  &
    ' Name="types"'                             //  &
    ' format="appended"'                        //  &
@@ -421,15 +413,16 @@ subroutine Write_VTU_Headers(IcE)
 
    write(PARAVIEW_IO) '      ' // '</Cells>' // char(10)
 
-   !------------Headers for attributes---------------------------------!
+!..Header for element types ends here
+
+!..Headers for attributes starts here
    write(PARAVIEW_IO) '      ' // '<PointData Scalars="scalars">' // char(10)
+!..Headers for attributes ends here
 
-   VTU_data_offset = VTU_data_offset + 4 + IcE * 8
+   VTU_data_offset = VTU_data_offset + 4 + IcE * 4
 
 
-   !-----------------------------------------!
-   !   Header for solution data              !
-   !-----------------------------------------!
+!..Header for solution data starts here
 
 
    if(PARAVIEW_DUMP_ATTR) then
@@ -504,29 +497,30 @@ subroutine Write_VTU_Headers(IcE)
          enddo
       enddo
    endif
-   !-----------------------------------------!
-   !   closing data headers                  !
-   !-----------------------------------------!
+
+!..Header for solution data ends here
+
+
+!..closing data headers
+
    write(PARAVIEW_IO) '      ' // '</PointData>' // char(10)
    write(PARAVIEW_IO) '    ' // '</Piece>'             // char(10)
    write(PARAVIEW_IO) '  ' // '</UnstructuredGrid>'  // char(10)
 
-   !-----------------------------------------!
-   !   Appending data in binary            !
-   !-----------------------------------------!
+!..Appending data in binary
    write(PARAVIEW_IO) '' // '<AppendedData encoding="raw">' // char(10)
    write(PARAVIEW_IO) '_'
 
 
-   ! writing point co-ordinates
+!.writing point co-ordinates
    VTU_data_size =  nV * 3 * 8
    write(PARAVIEW_IO) VTU_data_size ! data_size =  three coordinates for each node * 8
    do count = 1, nV
       write(PARAVIEW_IO) GEOM_PTS(1,count),GEOM_PTS(2,count),GEOM_PTS(3,count)
    end do
 
-   ! writing Connectivity data
-   VTU_data_size = offsets_connectivity(IcE) * 8
+!..writing Connectivity data
+   VTU_data_size = offsets_connectivity(IcE) * 4
    write(PARAVIEW_IO) VTU_data_size
    do count  = 1,IcE
       
@@ -537,24 +531,24 @@ subroutine Write_VTU_Headers(IcE)
       enddo
    end do
   
-   ! writing connectivity Offsets
-   VTU_data_size = IcE * 8
+!..writing connectivity Offsets
+   VTU_data_size = IcE * 4
    write(PARAVIEW_IO) VTU_data_size
    do count = 1, IcE
       write(PARAVIEW_IO) offsets_connectivity(count)
    end do
    
-   ! writing element types
+!..writing element types
 
-   VTU_data_size = IcE * 8
+   VTU_data_size = IcE * 4
    write(PARAVIEW_IO) VTU_data_size
 
    do count = 1, IcE
       write(PARAVIEW_IO) ELEM_TYPES(count)
    end do
 
-! deallocation
+!..deallocation
   deallocate(offsets_connectivity)
   deallocate(elem_connectivity)
 
-end subroutine Write_VTU_Headers
+end subroutine write_VTU_headers

@@ -53,7 +53,7 @@ subroutine paraview_attr_vector(Id, Idx)
    if (RANK .ne. ROOT) goto 50
 !
 !..write to .xmf file (only used if XDMF/XMF format is used)
-   if(VIS_VTU .eqv. .false.) then
+   if (.not. VIS_VTU) then
       write(PARAVIEW_IO, 1101) trim(nick)
       write(PARAVIEW_IO, 1102) ic
       write(PARAVIEW_IO, 1103) trim(PREFIX), trim(fname), trim(postfix), trim(nick)
@@ -79,7 +79,7 @@ subroutine paraview_attr_vector(Id, Idx)
    if (RANK .ne. ROOT) goto 70
 !
 !..write to .xmf file (only used if XDMF/XMF format is used)
-   if(VIS_VTU .eqv. .false.) then
+   if (.not. VIS_VTU) then
       write(PARAVIEW_IO, 1101) trim(nick)
       write(PARAVIEW_IO, 1102) ic
       write(PARAVIEW_IO, 1103) trim(PREFIX), trim(fname), trim(postfix), trim(nick)
@@ -91,13 +91,13 @@ subroutine paraview_attr_vector(Id, Idx)
 !
 #endif
 !..write to .xmf file (only used if XDMF/XMF format is used)
-if(VIS_VTU .eqv. .false.) then
-   1101 format("      <Attribute Name='",a,"' AttributeType='Vector' Center='Node'>")
-   1102 format("        <DataItem Dimensions='",i14, " 3' NumberType='Float' Precision='4' Format='HDF'>")
-   1103 format("        ",a,"vector_",a,a,".h5:",a)
-   1104 format("        </DataItem>")
-   1105 format("      </Attribute>")
-endif
+   if (.not. VIS_VTU) then
+      1101 format("      <Attribute Name='",a,"' AttributeType='Vector' Center='Node'>")
+      1102 format("        <DataItem Dimensions='",i14, " 3' NumberType='Float' Precision='4' Format='HDF'>")
+      1103 format("        ",a,"vector_",a,a,".h5:",a)
+      1104 format("        </DataItem>")
+      1105 format("      </Attribute>")
+   endif
 !
    90 continue
 !

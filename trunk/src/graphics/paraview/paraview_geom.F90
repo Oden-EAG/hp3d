@@ -36,7 +36,8 @@ subroutine paraview_geom
 !
    if (RANK .ne. ROOT) goto 90
 !
-   if(VIS_VTU .eqv. .false.) then  !only used when XDMF output format is used i.e., VIS_VTU = .false.
+!..only used with XDMF output format 
+   if (.not. VIS_VTU) then
          if (SECOND_ORDER_VIS) then
             ico = icn
       !

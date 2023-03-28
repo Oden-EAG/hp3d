@@ -60,7 +60,7 @@ subroutine scalar2vtk(Sname,Sfile,Snick,Idx, Ic)
 !
 !..OpenMP parallelization: auxiliary variables
    integer, dimension(NRELES) :: n_vert_offset, n_elem_vert
-   integer(4) :: VTU_DATA_SIZE 
+   integer :: VTU_DATA_SIZE 
 !
 !..MPI
    integer :: ierr,count,subd
@@ -195,10 +195,10 @@ subroutine scalar2vtk(Sname,Sfile,Snick,Idx, Ic)
 !..Step 4 : Write to file with HDF5
 !
    if (RANK .eq. ROOT) then
-      if(VIS_VTU .eqv. .false.) then
+      if (.not. VIS_VTU) then
          call attr_write(Sname,len(Sname),Sfile,len(Sfile),Snick,len(Snick))
       else
-         ! appending the attribute data in VTU file
+!     ...appending the attribute data in VTU file
          nV = size(ATTR_VAL)
          VTU_DATA_SIZE = nv * 8
          write(PARAVIEW_IO) VTU_data_size

@@ -34,7 +34,7 @@ subroutine set_environment
         ('-file-control'   ,'Control file'             ,'./control/control'         ,FILE_CONTROL)
 
    call get_option_string  &
-        ('-file-geometry'  ,'Geometry file'            ,'./geometries/fiber' ,FILE_GEOM)
+        ('-file-geometry'  ,'Geometry file'            ,'./geometries/hexa_orient0' ,FILE_GEOM)
 !
    call get_option_string  &
         ('-file-phys'      ,'Physics file'             ,'./input/physics'           ,FILE_PHYS)
@@ -73,7 +73,7 @@ subroutine set_environment
    call get_option_string  &
         ('-file_vis_upscale','Visualization upscale file location','../../../files/vis',FILE_VIS)
    call get_option_string  &
-        ('-vis_level'       ,'Visualization upscale level (0-3)'  ,'0'                 ,VLEVEL  )
+        ('-vis_level'       ,'Visualization upscale level (0-3)'  ,'3'                 ,VLEVEL  )
 !
    call get_option_string  &
         ('-dir_output'      ,'Paraview root directory'            ,'../outputs/'       ,OUTPUT_DIR)
