@@ -8,8 +8,10 @@ subroutine my_paraview_driver(IParAttr)
    use physics
    !use data_structure3D,   only: NRCOMS
    use environment,        only: QUIET_MODE
-   use paraview,           only: PARAVIEW_DUMP_ATTR,FILE_VIS, &
-                                 VLEVEL,PARAVIEW_DUMP_GEOM,IPARATTR_VTU,SECOND_ORDER_VIS,VIS_VTU,ELEM_TYPES
+   use paraview,           only: PARAVIEW_DUMP_ATTR,FILE_VIS,     &
+                                 VLEVEL,PARAVIEW_DUMP_GEOM,       &
+                                 IPARATTR_VTU,SECOND_ORDER_VIS,   &
+                                 VIS_VTU,ELEM_TYPES
    use mpi_param,          only: RANK,ROOT
 !
    implicit none
@@ -27,20 +29,18 @@ subroutine my_paraview_driver(IParAttr)
    PARAVIEW_DUMP_GEOM = .true.
 !
 !..load files for visualization upscale
-   if (SECOND_ORDER_VIS) then
-      if (.not. initialized) then
+   
+   if (.not. initialized) then
+      if (SECOND_ORDER_VIS) then
          call load_vis(TETR_VIS,trim(FILE_VIS)//'/tetra10',TETR)
          call load_vis(PRIS_VIS,trim(FILE_VIS)//'/prism18',PRIS)
          call load_vis(HEXA_VIS,trim(FILE_VIS)//'/hexa27' ,BRIC)
-         initialized = .true.
-      endif
-   else
-      if (.not. initialized) then
+      else
          call load_vis(TETR_VIS,trim(FILE_VIS)//'/tetra_'//trim(VLEVEL),TETR)
          call load_vis(PRIS_VIS,trim(FILE_VIS)//'/prism_'//trim(VLEVEL),PRIS)
-         call load_vis(HEXA_VIS,trim(FILE_VIS)//'/hexa_'//trim(VLEVEL),BRIC)
-         initialized = .true.
-      endif
+         call load_vis(HEXA_VIS,trim(FILE_VIS)//'/hexa_'//trim(VLEVEL),BRIC)      
+      endif      
+      initialized = .true.      
    endif
 !
    time=-1.d0
@@ -53,7 +53,7 @@ subroutine my_paraview_driver(IParAttr)
    endif
 !
 !  -- GEOMETRY --
-   !allocation only if using VTU format
+!..allocation only if using VTU format
    if(VIS_VTU) then
       allocate(IPARATTR_VTU(NR_PHYSA))
       IPARATTR_VTU = iParAttr(1:NR_PHYSA)
@@ -114,11 +114,11 @@ subroutine my_paraview_driver(IParAttr)
 !
   90 continue
 
-  !deallocation only if using VTU output format
-  if(VIS_VTU) then
-   deallocate(IPARATTR_VTU)
-   deallocate(ELEM_TYPES)
-  endif
+!..deallocation only if using VTU output format
+   if(VIS_VTU) then
+      deallocate(IPARATTR_VTU)
+      deallocate(ELEM_TYPES)
+   endif
 !
    if (RANK .eq. ROOT) then
       call paraview_end ! [CLOSES THE XMF FILE, WRITES FOOTER]
