@@ -83,7 +83,6 @@ subroutine paraview_geom
  1019 format("        ",a,"geom_",a,".h5:/Coords")
  1020 format("        </DataItem>")
  1021 format("      </Geometry>")
-   endif
 !
    90 continue
 !
