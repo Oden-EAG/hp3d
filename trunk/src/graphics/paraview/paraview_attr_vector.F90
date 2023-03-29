@@ -4,7 +4,7 @@
 !> @param[in] Id  - integer to be converted to file postfix
 !> @param[in] Idx - integer identifying vector attribute
 !!
-!> @date Oct 2019
+!> @date Mar 2023
 !-------------------------------------------------------------------------------------------
 !
 subroutine paraview_attr_vector(Id, Idx)
@@ -90,6 +90,7 @@ subroutine paraview_attr_vector(Id, Idx)
    70 continue
 !
 #endif
+!
 !..write to .xmf file (only used if XDMF/XMF format is used)
    if (.not. VIS_VTU) then
       1101 format("      <Attribute Name='",a,"' AttributeType='Vector' Center='Node'>")

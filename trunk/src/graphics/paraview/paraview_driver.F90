@@ -115,7 +115,7 @@ end subroutine paraview_driver
 !> @param[in] Id    - integer id to be appended to Fname (postfix)
 !> @param[in] Time  - currently non supported, set to -1.d0
 !!
-!> @date Oct 2019
+!> @date Mar 2023
 !-------------------------------------------------------------------------------------------
 subroutine paraview_begin(Id,Time)
 !
@@ -132,22 +132,22 @@ subroutine paraview_begin(Id,Time)
 !-------------------------------------------------------------------------------------------
 !
    if (.not. VIS_VTU) then
-         call paraview_init
+      call paraview_init
 !
-!     ...convert integer to string
-         write(postfix,"(I5.5)") Id
+!  ...convert integer to string
+      write(postfix,"(I5.5)") Id
 !
-!     ...open .xmf file
-         open(unit=PARAVIEW_IO , file=trim(PARAVIEW_DIR)//trim(PREFIX)//"_"//trim(postfix)//'.xmf')
+!  ...open .xmf file
+      open(unit=PARAVIEW_IO , file=trim(PARAVIEW_DIR)//trim(PREFIX)//"_"//trim(postfix)//'.xmf')
 !
-         write(PARAVIEW_IO, 1001)
-         write(PARAVIEW_IO, 1002)
-         write(PARAVIEW_IO, 1003)
+      write(PARAVIEW_IO, 1001)
+      write(PARAVIEW_IO, 1002)
+      write(PARAVIEW_IO, 1003)
 !
-!     ...non negative time is provided
-         if (Time >= 0.d0) then
-            write(PARAVIEW_IO, 1004) Time
-         end if
+!  ...non negative time is provided
+      if (Time >= 0.d0) then
+         write(PARAVIEW_IO, 1004) Time
+      end if
 !
 !  ...HEADER of .xmf file
       1001 format("<Xdmf xmlns:xi='http://www.w3.org/2003/XInclude' Version='2.1'>")
@@ -158,8 +158,8 @@ subroutine paraview_begin(Id,Time)
 !  ...opening the VTU file in binary format.
       write(postfix,"(I5.5)") Id
       open(unit=PARAVIEW_IO , file=trim(PARAVIEW_DIR)//trim(PREFIX)//"_"//trim(postfix)//'.vtu', status  = 'replace',        &
-                  form    = 'unformatted',    &
-                  access  = 'stream')
+            form    = 'unformatted',    &
+            access  = 'stream')
    endif
 !
 end subroutine paraview_begin
@@ -168,7 +168,7 @@ end subroutine paraview_begin
 !-------------------------------------------------------------------------------------------
 !> Purpose : print footer, close file
 !!
-!> @date Oct 2019
+!> @date Mar 2023
 !-------------------------------------------------------------------------------------------
 subroutine paraview_end
 !
@@ -181,11 +181,11 @@ subroutine paraview_end
       write(PARAVIEW_IO, 1004)
       write(PARAVIEW_IO, 1005)
       write(PARAVIEW_IO, 1006)
-   1004 format("    </Grid>")
-   1005 format("  </Domain>")
-   1006 format("</Xdmf>")
+      1004 format("    </Grid>")
+      1005 format("  </Domain>")
+      1006 format("</Xdmf>")
    else
-!  ...Closing strings for the VTU file
+!  ...closing strings for the VTU file
       write(PARAVIEW_IO) char(10) // '' // '</AppendedData>' // char(10)
       write(PARAVIEW_IO)       '' // '</VTKFile>'      // char(10)
    endif

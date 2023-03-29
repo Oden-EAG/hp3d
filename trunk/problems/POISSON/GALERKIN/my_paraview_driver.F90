@@ -29,7 +29,6 @@ subroutine my_paraview_driver(IParAttr)
    PARAVIEW_DUMP_GEOM = .true.
 !
 !..load files for visualization upscale
-   
    if (.not. initialized) then
       if (SECOND_ORDER_VIS) then
          call load_vis(TETR_VIS,trim(FILE_VIS)//'/tetra10',TETR)
@@ -38,9 +37,9 @@ subroutine my_paraview_driver(IParAttr)
       else
          call load_vis(TETR_VIS,trim(FILE_VIS)//'/tetra_'//trim(VLEVEL),TETR)
          call load_vis(PRIS_VIS,trim(FILE_VIS)//'/prism_'//trim(VLEVEL),PRIS)
-         call load_vis(HEXA_VIS,trim(FILE_VIS)//'/hexa_'//trim(VLEVEL),BRIC)      
-      endif      
-      initialized = .true.      
+         call load_vis(HEXA_VIS,trim(FILE_VIS)//'/hexa_'//trim(VLEVEL),BRIC)
+      endif
+      initialized = .true.
    endif
 !
    time=-1.d0
@@ -54,11 +53,11 @@ subroutine my_paraview_driver(IParAttr)
 !
 !  -- GEOMETRY --
 !..allocation only if using VTU format
-   if(VIS_VTU) then
+   if (VIS_VTU) then
       allocate(IPARATTR_VTU(NR_PHYSA))
       IPARATTR_VTU = iParAttr(1:NR_PHYSA)
    endif
-
+!
    call paraview_geom
 !
 !  -- PHYSICAL ATTRIBUTES --
@@ -113,11 +112,10 @@ subroutine my_paraview_driver(IParAttr)
    enddo
 !
   90 continue
-
+!
 !..deallocation only if using VTU output format
-   if(VIS_VTU) then
+   if (VIS_VTU) then
       deallocate(IPARATTR_VTU)
-      deallocate(ELEM_TYPES)
    endif
 !
    if (RANK .eq. ROOT) then

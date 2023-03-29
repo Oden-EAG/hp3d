@@ -4,13 +4,13 @@
 !> @param[in] Id  - integer to be converted to file postfix
 !> @param[in] Idx - index identifying scalar attribute
 !!
-!> @date Oct 2019
+!> @date Mar 2023
 !-------------------------------------------------------------------------------------------
 !
 subroutine paraview_attr_scalar(Id, Idx)
 !
    use environment , only : PREFIX
-   use paraview    , only : PARAVIEW_IO,PARAVIEW_DIR, VIS_VTU
+   use paraview    , only : PARAVIEW_IO,PARAVIEW_DIR,VIS_VTU
    use physics     , only : PHYSA
    use mpi_param   , only : RANK,ROOT
 !
@@ -92,6 +92,7 @@ subroutine paraview_attr_scalar(Id, Idx)
 #endif
 !
    if (RANK .ne. ROOT) goto 90
+!
 !..write to .xmf file (only used if XDMF/XMF format is used)
    if (.not. VIS_VTU) then
       1101 format("      <Attribute Name='",a,"' AttributeType='Scalar' Center='Node'>")

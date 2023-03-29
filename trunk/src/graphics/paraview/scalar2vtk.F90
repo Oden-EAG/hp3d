@@ -7,7 +7,7 @@
 !> @param[in ] Idx     - index identifying scalar attribute
 !> @param[out] Ic      - number of vertices of visualization object
 !!
-!> @date       Feb 2023
+!> @date       Mar 2023
 !----------------------------------------------------------------------------------------
 !
 #include "typedefs.h"
@@ -56,11 +56,12 @@ subroutine scalar2vtk(Sname,Sfile,Snick,Idx, Ic)
    real(8) :: val
    integer :: ibeg,iattr,icomp,isol,iload,ireal,ndom
 !
+   integer :: VTU_data_size
+!
    real(8), external :: dreal_part,dimag_part
 !
 !..OpenMP parallelization: auxiliary variables
    integer, dimension(NRELES) :: n_vert_offset, n_elem_vert
-   integer :: VTU_DATA_SIZE 
 !
 !..MPI
    integer :: ierr,count,subd
@@ -200,12 +201,11 @@ subroutine scalar2vtk(Sname,Sfile,Snick,Idx, Ic)
       else
 !     ...appending the attribute data in VTU file
          nV = size(ATTR_VAL)
-         VTU_DATA_SIZE = nv * 8
+         VTU_data_size = nv * 8
          write(PARAVIEW_IO) VTU_data_size
          do iv = 1,nV
-            Write(PARAVIEW_IO) ATTR_VAL(1,iv)
+            write(PARAVIEW_IO) ATTR_VAL(1,iv)
          enddo
-
       endif
    endif
 !

@@ -7,7 +7,7 @@
 !> @param[in ] Idx     - index identifying vector attribute
 !> @param[out] Ic      - number of vertices of visualization object
 !!
-!> @date       Feb 2023
+!> @date       Mar 2023
 !----------------------------------------------------------------------------------------
 !
 #include "typedefs.h"
@@ -56,9 +56,10 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
    integer :: ibeg,iattr,icomp,isol,iload,ireal,ndom
    real(8), external :: dreal_part,dimag_part
 !
+   integer :: VTU_data_size
+!
 !..OpenMP parallelization: auxiliary variables
    integer, dimension(NRELES) :: n_vert_offset, n_elem_vert
-   integer :: VTU_DATA_SIZE
 !
 !..MPI
    integer :: ierr,count,subd
@@ -227,7 +228,6 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
          do iv = 1,nV
             write(PARAVIEW_IO) ATTR_VAL(1,iv),ATTR_VAL(2,iv),ATTR_VAL(3,iv)
          enddo
-
       endif
    endif
 !
