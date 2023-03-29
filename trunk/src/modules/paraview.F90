@@ -15,7 +15,7 @@ module paraview
    logical            :: PARAVIEW_DUMP_GEOM = .FALSE.
    logical            :: PARAVIEW_DUMP_ATTR = .FALSE.
    logical            :: SECOND_ORDER_VIS   = .FALSE.
-
+!
 !..Flag for switching on VTU format for output meshes and solution Fields. FALSE switches to XDMF.
    logical            :: VIS_VTU = .FALSE.
 !
@@ -33,18 +33,18 @@ module paraview
    integer, allocatable :: GEOM_OBJ(:)
    real(8), allocatable :: GEOM_PTS(:,:)
    real(8), allocatable :: ATTR_VAL(:,:)
-
+!
 !..Variables for VTU Format
    integer, allocatable :: IPARATTR_VTU(:)
    integer, allocatable :: ELEM_TYPES(:)
-
+!
 !
    contains
 !
 !-----------------------------------------------------------------------------
 !> Purpose : initialize paraview output (open hdf5 file)
 !!
-!> @date Feb 2023
+!> @date Mar 2023
 !-----------------------------------------------------------------------------
    subroutine paraview_init()
 !  ...only call hdf5_w_finalize when xdmf output is chosen
@@ -56,7 +56,7 @@ module paraview
 !-----------------------------------------------------------------------------
 !> Purpose : finalize paraview output (close hdf5; deallocate data arrays)
 !!
-!> @date Feb 2023
+!> @date Mar 2023
 !-----------------------------------------------------------------------------
    subroutine paraview_finalize()
 !  ...only call hdf5_w_finalize when xdmf output is chosen

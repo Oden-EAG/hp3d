@@ -7,7 +7,7 @@
 module upscale
 !
    use node_types
-   use paraview,     only : SECOND_ORDER_VIS, VIS_VTU
+   use paraview, only : SECOND_ORDER_VIS, VIS_VTU
 !
    implicit none
 !
@@ -36,9 +36,10 @@ module upscale
 contains
 
 
-!> @brief return cell type (XDMF 2 or VTU: for vis object depending upon VIS_VTU Flag)
+!> @brief return cell type for vis object
+!! @note XDMF 2 or VTU depending upon VIS_VTU Flag
 !> @param[in] Etype - Element type
-!> @date Feb 2023
+!> @date Mar 2023
    integer function ivis_type(Etype)
 !
       integer :: Etype
@@ -328,7 +329,7 @@ contains
 
 !> @brief returns number of points/nodes for VTU element type number 
 !> @param[in] indx - VTU Element type number
-!> @date March 2023
+!> @date Mar 2023
    integer function nobj_conf_VTU(indx)
 !
       integer :: indx
@@ -339,7 +340,7 @@ contains
             case(32); nobj_conf_VTU = 18
             case(29); nobj_conf_VTU = 27
             case default
-               write(*,*) 'nobj_conf_VTU: unexpected type. stop.'
+               write(*,*) 'nobj_conf_VTU: unexpected type. stop.',indx
                stop
          end select
       else
@@ -354,4 +355,5 @@ contains
       endif
 !
    end function nobj_conf_VTU
+!
 end module upscale

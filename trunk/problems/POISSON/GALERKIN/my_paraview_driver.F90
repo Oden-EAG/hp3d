@@ -54,7 +54,7 @@ subroutine my_paraview_driver(IParAttr)
 !
 !  -- GEOMETRY --
 !..allocation only if using VTU format
-   if(VIS_VTU) then
+   if (VIS_VTU) then
       allocate(IPARATTR_VTU(NR_PHYSA))
       IPARATTR_VTU = iParAttr(1:NR_PHYSA)
    endif
@@ -115,7 +115,7 @@ subroutine my_paraview_driver(IParAttr)
   90 continue
 
 !..deallocation only if using VTU output format
-   if(VIS_VTU) then
+   if (VIS_VTU) then
       deallocate(IPARATTR_VTU)
       deallocate(ELEM_TYPES)
    endif
