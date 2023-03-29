@@ -304,8 +304,8 @@ subroutine write_VTU_headers(IcE)
 !
 !..keeps track of data offset and size when using VTU format
 !  (VIS_FORMAT = 1)
-   integer                 :: VTU_DATA_OFFSET
-   integer                 :: VTU_DATA_SIZE
+   integer                 :: VTU_data_offset
+   integer                 :: VTU_data_size
 !..Auxiliary variables
    character(len=80)       :: str1, str2, str3, str4
    integer                 :: k,l,iv,j,count, nV
