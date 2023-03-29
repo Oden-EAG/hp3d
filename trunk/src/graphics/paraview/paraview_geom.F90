@@ -38,7 +38,7 @@ subroutine paraview_geom
 !
    if (VIS_VTU) goto 90
 !
-!..only used with XDMF output format 
+!..only used with XDMF output format
    if (SECOND_ORDER_VIS) then
       ico = icn
 !
@@ -72,17 +72,17 @@ subroutine paraview_geom
    write(PARAVIEW_IO,1020)
    write(PARAVIEW_IO,1021)
 !
-1011 format("      <Topology TopologyType=",a," NumberOfElements='",i8,"' NodesPerElement='",i8,"'>")
-1012 format("      <Topology TopologyType=",a," NumberOfElements='",i8,"'>")
-1013 format("        <DataItem Dimensions='",i12,"' NumberType='Int' Precision='4' Format='HDF'>")
-1014 format("        ",a,"geom_",a,".h5:/Objects")
-1015 format("        </DataItem>")
-1016 format("      </Topology>")
-1017 format("      <Geometry GeometryType='XYZ'>")
-1018 format("        <DataItem Dimensions='",i10, " 3' NumberType='Float' Precision='4' Format='HDF'>")
-1019 format("        ",a,"geom_",a,".h5:/Coords")
-1020 format("        </DataItem>")
-1021 format("      </Geometry>")
+ 1011 format("      <Topology TopologyType=",a," NumberOfElements='",i8,"' NodesPerElement='",i8,"'>")
+ 1012 format("      <Topology TopologyType=",a," NumberOfElements='",i8,"'>")
+ 1013 format("        <DataItem Dimensions='",i12,"' NumberType='Int' Precision='4' Format='HDF'>")
+ 1014 format("        ",a,"geom_",a,".h5:/Objects")
+ 1015 format("        </DataItem>")
+ 1016 format("      </Topology>")
+ 1017 format("      <Geometry GeometryType='XYZ'>")
+ 1018 format("        <DataItem Dimensions='",i10, " 3' NumberType='Float' Precision='4' Format='HDF'>")
+ 1019 format("        ",a,"geom_",a,".h5:/Coords")
+ 1020 format("        </DataItem>")
+ 1021 format("      </Geometry>")
 !
    90 continue
 !

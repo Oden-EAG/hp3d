@@ -7,7 +7,7 @@
 module upscale
 !
    use node_types
-   use paraview, only : SECOND_ORDER_VIS,VIS_VTU
+   use paraview, only : SECOND_ORDER_VIS, VIS_VTU
 !
    implicit none
 !

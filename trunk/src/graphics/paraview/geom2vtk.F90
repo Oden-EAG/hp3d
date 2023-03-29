@@ -35,7 +35,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !
    real(8) :: xi(3), x(3), xnod(3,MAXbrickH), dxdxi(3,3)
 !
-!..auxiliary variable for VTU output
+!..auxiliary variables for VTU output
    integer, allocatable       :: VTU_element_type_offset(:)
    integer                    :: m
 !
@@ -149,10 +149,10 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !..Step 3 : Elements
 !
    ice_subd=0; icn_subd=0
-!..Additional Computational for computing the total number of elements 
-!  (including subelements: vlevel > 0))
-!..VTU Format needs this information apriori as VTU needs headers 
-!  with this information before appending the data.   
+!..Additional Computational for computing the total number of elements
+!  (including subelements: vlevel > 0)
+!..VTU Format needs this information a-priori as VTU needs headers
+!  with this information before appending the data.
    if(VIS_VTU) then
       if(SECOND_ORDER_VIS) then
          allocate(ELEM_TYPES(NRELES))
@@ -302,11 +302,11 @@ subroutine write_VTU_headers(IcE)
    integer, allocatable    :: elem_connectivity(:,:)
    integer, allocatable    :: offsets_connectivity(:)
 !
-!..keeps track of data offset when using VTU format 
-!  (VIS_VTU = .TRUE.)
+!..keeps track of data offset and size when using VTU format
+!  (VIS_FORMAT = 1)
    integer                 :: VTU_DATA_OFFSET
-   integer                 :: VTU_data_size
-!..Auxiliary Variable
+   integer                 :: VTU_DATA_SIZE
+!..Auxiliary variables
    character(len=80)       :: str1, str2, str3, str4
    integer                 :: k,l,iv,j,count, nV
    integer                 :: iphys,iload,icomp
@@ -469,7 +469,7 @@ subroutine write_VTU_headers(IcE)
 !
                   VTU_data_offset = VTU_data_offset + 4 + nV * 3 * 8
 !
-               case(DISCON)               
+               case(DISCON)
                   write(str1, '(i0.0)') VTU_data_offset        ! data_offset
                   write(str2, '(i0.0)') 8 * 8                  ! integer precision
                   write(str3, '(i0.0)') iphys
@@ -511,7 +511,7 @@ subroutine write_VTU_headers(IcE)
 !..writing connectivity data
    VTU_data_size = offsets_connectivity(IcE) * 4
    write(PARAVIEW_IO) VTU_data_size
-   do count  = 1,IcE   
+   do count  = 1,IcE
       l = ELEM_TYPES(count)
       j = nobj_conf_VTU(l)
       do iv = 1,j
