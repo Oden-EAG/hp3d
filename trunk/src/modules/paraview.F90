@@ -16,7 +16,9 @@ module paraview
    logical            :: PARAVIEW_DUMP_ATTR = .FALSE.
    logical            :: SECOND_ORDER_VIS   = .FALSE.
 !
-!..Flag for switching on VTU format for output meshes and solution Fields. FALSE switches to XDMF.
+!..Flag for switching between different formats for output meshes and solution fields
+!  ...VIS_VTU = .FALSE. : uses XDMF format (default)
+!  ...VIS_VTU = .TRUE.  : uses VTU format
    logical            :: VIS_VTU = .FALSE.
 !
 !  this is matching EXGEOM flag in "control" module

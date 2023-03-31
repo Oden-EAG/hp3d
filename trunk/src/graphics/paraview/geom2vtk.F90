@@ -53,7 +53,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !  and count number of visualization points
    IcP=0; ico=0; m = 0;
 
-   if(VIS_VTU) then 
+   if (VIS_VTU) then
       allocate(VTU_element_type_offset(NRELES))
    endif
 
@@ -69,7 +69,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
       n_obj_offset(iel) = ico
       n_elem_vert(iel) = vis_obj%NR_VERT
 
-      if(VIS_VTU) VTU_element_type_offset(iel) = m
+      if (VIS_VTU) VTU_element_type_offset(iel) = m
       
       IcP = IcP + vis_obj%NR_VERT
 !
@@ -153,19 +153,17 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !  (including subelements: vlevel > 0)
 !..VTU Format needs this information a-priori as VTU needs headers
 !  with this information before appending the data.
-   if(VIS_VTU) then
-      if(SECOND_ORDER_VIS) then
+   if (VIS_VTU) then
+      if (SECOND_ORDER_VIS) then
          allocate(ELEM_TYPES(NRELES))
          ELEM_TYPES = ZERO
       else
          do iel=1,NRELES
             mdle = ELEM_ORDER(iel)
-
             if (PARAVIEW_DOMAIN.ne.0) then
                call find_domain(mdle, ndom)
                if (ndom.ne.PARAVIEW_DOMAIN) cycle
             endif
-
             ntype = NODES(mdle)%ntype
             call get_vis_nrelem(ntype, ivis)
             ice_subd = ice_subd + ivis
@@ -213,11 +211,11 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !
          if (SECOND_ORDER_VIS) then
             GEOM_OBJ(k+1:k+j) = nverl(1:j)
-            if(VIS_VTU) ELEM_TYPES(VTU_element_type_offset(iel) + i) = l
+            if (VIS_VTU) ELEM_TYPES(VTU_element_type_offset(iel) + i) = l
          else
             GEOM_OBJ(k+1) = l
             GEOM_OBJ(k+2:k+1+j) = nverl(1:j)
-            if(VIS_VTU) ELEM_TYPES(VTU_element_type_offset(iel) + i) = l
+            if (VIS_VTU) ELEM_TYPES(VTU_element_type_offset(iel) + i) = l
          endif
          k = k + (1+j)
          ice_subd = ice_subd + 1
@@ -239,7 +237,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
          count = ico
          call MPI_REDUCE(MPI_IN_PLACE,GEOM_OBJ,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
 
-         if(VIS_VTU) then
+         if (VIS_VTU) then
             count = size(ELEM_TYPES)
             call MPI_REDUCE(MPI_IN_PLACE,ELEM_TYPES,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
          endif
@@ -249,7 +247,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
          count = ico
          call MPI_REDUCE(GEOM_OBJ,GEOM_OBJ,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
   
-         if(VIS_VTU) then
+         if (VIS_VTU) then
             count = size(ELEM_TYPES)
             call MPI_REDUCE(ELEM_TYPES,ELEM_TYPES,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
          endif
@@ -270,12 +268,12 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
       endif
    endif
 !
-   if(VIS_VTU) then
+!..Step 6 : Deallocate
+!
+   if (VIS_VTU) then
       deallocate(ELEM_TYPES)
       deallocate(VTU_element_type_offset)
    endif
-!
-!..Step 6 : Deallocate
 !
    call geometry_close()
 !
@@ -365,7 +363,7 @@ subroutine write_VTU_headers(IcE)
    offsets_connectivity = ZERO
 !
    do count  = 1,IcE
-      if(SECOND_ORDER_VIS) then
+      if (SECOND_ORDER_VIS) then
          l = ELEM_TYPES(count)
          j = nobj_conf_VTU(l)
          do iv = 1,j
@@ -382,7 +380,7 @@ subroutine write_VTU_headers(IcE)
             elem_connectivity(count,iv) = GEOM_OBJ(k+iv) 
          enddo
          k = k + j
-         if(count .eq. 1) then
+         if (count .eq. 1) then
          offsets_connectivity(count) = k - 1
          else
          offsets_connectivity(count) = k - count
