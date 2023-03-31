@@ -31,13 +31,13 @@ subroutine curve_local(No,Norient,T, X,Dxdt)
 !
 !  ...GIVEN -> GLOBAL REFERENCE
       select case(Norient)
-      case(0) ; eta=T      ; detadt= 1.d0
-      case(1) ; eta=1.d0-T ; detadt=-1.d0
-      case default
-        write(*,7001) Norient
- 7001   format(' curve_local: Norient = ',i3)
-        stop
-      endselect
+        case(0) ; eta=T      ; detadt= 1.d0
+        case(1) ; eta=1.d0-T ; detadt=-1.d0
+        case default
+          write(*,7001) Norient
+ 7001     format(' curve_local: Norient = ',i3)
+        stop 1
+      end select
 !
 !  ...GLOBAL REFERENCE -> PHYSICAL
       call curve(No,eta, X,dxdeta)
@@ -51,21 +51,20 @@ end subroutine curve_local
 !
 !
 !----------------------------------------------------------------------------
-!> Purpose :  physical coordinates for a curve parametrization, and
-!!            their derivative wrt to reference coordinate
+!> @brief Physical coordinates for a curve parametrization, and
+!!        their derivative wrt to reference coordinate
 !!
 !! @param[in ] No     - curve number
 !! @param[in ] Eta    - reference coordinate  (between 0 and 1)
 !! @param[out] X      - physical coordinates of the point
 !! @param[out] Dxdeta - derivatives of the physical coordinates
 !!
-!! @revision Nov 12
+!> @date Mar 2023
 !----------------------------------------------------------------------------
 !
 subroutine curve(No,Eta, X,Dxdeta)
 !
       use GMP
-      use bezier
 !
       implicit none
       integer             ,intent(in ) :: No
@@ -128,8 +127,8 @@ subroutine curve(No,Eta, X,Dxdeta)
 !  ...intersection of 3 algebraic surfaces (computed numerically)..........
       case('3SurfsCur') ; call curve_3SurfsCur(No,Eta, X,Dxdeta)
 !
-!  ...Bezier curve.........................................................
-      case('5Bezier','7Bezier') ; call curve_bezier(No,Eta, X=X,dXdEta=Dxdeta)
+!  ...Bezier curve...(LEGACY)..............................................
+      !case('5Bezier','7Bezier') ; call curve_bezier(No,Eta, X=X,dXdEta=Dxdeta)
 !
 !  ...curve on reconstructed surface (NOT DEVELOPED).......................
       !case('1SurfrCur') ; call curve_1SurfrCur(No,Eta, X,Dxdeta)
@@ -151,9 +150,9 @@ subroutine curve(No,Eta, X,Dxdeta)
       case default
         write(*,7001) type
  7001   format(' curve: UNKNOWN CURVE, type = ',a10)
-        stop
+        stop 1
 !
-      endselect
+      end select
 !
 !
 end subroutine curve

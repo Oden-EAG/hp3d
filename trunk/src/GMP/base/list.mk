@@ -8,8 +8,6 @@ fig_recta.F90
 fig_trian.F90
 GMP_kernels.F90
 input_DEFAULT.F90
-input_NETGEN.F
-input_RECONSTRUCT.F
 mnewt.F
 pointr.F
 read_geometry.F90
@@ -21,5 +19,4 @@ surf_plane.F90
 surf_superellipse.F90
 surf_sphere1.F90
 surf.F90
-upgrade2double.F90
 0
