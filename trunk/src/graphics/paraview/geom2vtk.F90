@@ -155,7 +155,16 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !  with this information before appending the data.
    if (VIS_VTU) then
       if (SECOND_ORDER_VIS) then
-         allocate(ELEM_TYPES(NRELES))
+         do iel = 1,NRELES
+            mdle = ELEM_ORDER(iel)
+
+            if (PARAVIEW_DOMAIN.ne.0) then
+               call find_domain(mdle, ndom)
+               if (ndom.ne.PARAVIEW_DOMAIN) cycle
+            endif
+            ice_subd = ice_subd + 1
+         enddo
+         allocate(ELEM_TYPES(ice_subd))
          ELEM_TYPES = ZERO
       else
          do iel=1,NRELES
@@ -206,17 +215,18 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !
       do i=1,ivis
 !
+         if (VIS_VTU) ELEM_TYPES(VTU_element_type_offset(iel) + i) = l
+!
 !     ...visualization element accounting for VLEVEL
          call get_vis_elem(vis_on_type(ntype),i,n_vert_offset(iel), nverl)
 !
          if (SECOND_ORDER_VIS) then
             GEOM_OBJ(k+1:k+j) = nverl(1:j)
-            if (VIS_VTU) ELEM_TYPES(VTU_element_type_offset(iel) + i) = l
          else
             GEOM_OBJ(k+1) = l
             GEOM_OBJ(k+2:k+1+j) = nverl(1:j)
-            if (VIS_VTU) ELEM_TYPES(VTU_element_type_offset(iel) + i) = l
          endif
+!
          k = k + (1+j)
          ice_subd = ice_subd + 1
          icn_subd = icn_subd + j

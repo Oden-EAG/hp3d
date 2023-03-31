@@ -7,7 +7,7 @@
 subroutine paraview_geom
 !
    use environment     , only : PREFIX
-   use paraview        , only : PARAVIEW_IO, PARAVIEW_DUMP_GEOM,   &
+   use paraview        , only : PARAVIEW_IO, PARAVIEW_DUMP_GEOM, VLEVEL, &
                                 PARAVIEW_DIR, SECOND_ORDER_VIS, VIS_VTU
    use mpi_param       , only : RANK, ROOT
    use data_structure3D, only : NODES, ELEM_ORDER
@@ -19,6 +19,15 @@ subroutine paraview_geom
    integer,         save :: ntype, ice, icn, icp, ico, mdle
 !
 !-------------------------------------------------------------------------------------------
+!
+!..VLEVEL upscaling is only supported for linear element output
+   if (SECOND_ORDER_VIS .and. VLEVEL.ne.'0') then
+      if (RANK .eq. ROOT) then
+         write(*,*) 'paraview_geom: VLEVEL upscaling only supported for linear output'
+         write(*,*) '               Setting VLEVEL to "0" for SECOND_ORDER_VIS.'
+      endif
+      VLEVEL = '0'
+   endif
 !
 !..h5 file is produced on 1st visit, OR as required by the user
    if (PARAVIEW_DUMP_GEOM .or. (id == -1)) then

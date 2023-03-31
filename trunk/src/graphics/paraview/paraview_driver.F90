@@ -42,31 +42,31 @@ subroutine paraview_driver
    call paraview_geom
 !
 !  -- PHYSICAL ATTRIBUTES --
-   if (PARAVIEW_DUMP_ATTR) then
+   if (.not. PARAVIEW_DUMP_ATTR) goto 80
 !
-      if (.not. QUIET_MODE .and. RANK .eq. ROOT) then
-         if (PARAVIEW_DOMAIN.eq.0) then
-            write(*,*)'Dumping to Paraview...'
-         else
-            write(*,*)'Dumping to Paraview from domain ',PARAVIEW_DOMAIN,'...'
-         endif
-         write(*,*)'--------------------------------------'
-         write(*,*)'ATTRIBUTE | DISC. SPACE | COMP. | LOAD'
+   if (.not. QUIET_MODE .and. RANK .eq. ROOT) then
+      if (PARAVIEW_DOMAIN.eq.0) then
+         write(*,*)'Dumping to Paraview...'
+      else
+         write(*,*)'Dumping to Paraview from domain ',PARAVIEW_DOMAIN,'...'
       endif
+      write(*,*)'--------------------------------------'
+      write(*,*)'ATTRIBUTE | DISC. SPACE | COMP. | LOAD'
+   endif
 !
-!  ...loop over rhs's
-      do iload=1,NRCOMS
+!..loop over rhs's
+   do iload=1,NRCOMS
 !
-!     ...loop over attributes
-         do iattr=1,NR_PHYSA
+!  ...loop over attributes
+      do iattr=1,NR_PHYSA
 !
-!        ...loop over components
-            do icomp=1,NR_COMP(iattr)
+!     ...loop over components
+         do icomp=1,NR_COMP(iattr)
 !
-!           ...encode iload, iattr, icomp into a single attribute's index
-               idx = iload*100 + iattr*10 + icomp*1
+!        ...encode iload, iattr, icomp into a single attribute's index
+            idx = iload*100 + iattr*10 + icomp*1
 !
-               select case(D_TYPE(iattr))
+            select case(D_TYPE(iattr))
 !
 !              -- H1 --
                case(CONTIN) ; call paraview_attr_scalar(id,idx)
@@ -80,27 +80,26 @@ subroutine paraview_driver
 !              -- L2 --
                case(DISCON) ; call paraview_attr_scalar(id,idx)
 !
-               end select
+            end select
 !
-               if (.not. QUIET_MODE .and. RANK .eq. ROOT) then
-                  write(*,8000) PHYSA(iattr),S_DType(D_TYPE(iattr)),icomp,iload
-            8000  format(1x,a5,7x,a6,12x,i1,5x,i2)
-               endif
+            if (.not. QUIET_MODE .and. RANK .eq. ROOT) then
+               write(*,8000) PHYSA(iattr),S_DType(D_TYPE(iattr)),icomp,iload
+         8000  format(1x,a5,7x,a6,12x,i1,5x,i2)
+            endif
 !
-!        ...end loop over components
-            enddo
-!     ...end loop over attributes
+!     ...end loop over components
          enddo
-!  ...loop over rhs's
+!  ...end loop over attributes
       enddo
+!..loop over rhs's
+   enddo
 !
-      if (.not. QUIET_MODE .and. RANK .eq. ROOT) then
-         write(*,*)'--------------------------------------'
-         write(*,*)''
-      endif
-!
-!..endif PARAVIEW_DUMP_ATTR
+   if (.not. QUIET_MODE .and. RANK .eq. ROOT) then
+      write(*,*)'--------------------------------------'
+      write(*,*)''
    endif
+!
+   80 continue
 !
    call paraview_end
 !
@@ -119,7 +118,7 @@ end subroutine paraview_driver
 !-------------------------------------------------------------------------------------------
 subroutine paraview_begin(Id,Time)
 !
-   use paraview    , only : PARAVIEW_IO,PARAVIEW_DIR,paraview_init,VIS_VTU
+   use paraview    , only : PARAVIEW_IO,PARAVIEW_DIR,VIS_VTU,paraview_init
    use environment , only : PREFIX
 !
    implicit none
@@ -131,6 +130,7 @@ subroutine paraview_begin(Id,Time)
 !
 !-------------------------------------------------------------------------------------------
 !
+!..XMDF format
    if (.not. VIS_VTU) then
       call paraview_init
 !
@@ -154,6 +154,8 @@ subroutine paraview_begin(Id,Time)
       1002 format("  <Domain>")
       1003 format("    <Grid Name='Geometry' GridType='Uniform'>")
       1004 format("    <Time Value='", f14.10, "' />")
+!
+!..VTU format
    else
 !  ...opening the VTU file in binary format.
       write(postfix,"(I5.5)") Id
@@ -176,14 +178,17 @@ subroutine paraview_end
 !
    implicit none
 !
-!..FOOTER of .xmf file
+!..XDMF format
    if (.not. VIS_VTU) then
+!  ...FOOTER of .xmf file
       write(PARAVIEW_IO, 1004)
       write(PARAVIEW_IO, 1005)
       write(PARAVIEW_IO, 1006)
       1004 format("    </Grid>")
       1005 format("  </Domain>")
       1006 format("</Xdmf>")
+!
+!..VTU format
    else
 !  ...closing strings for the VTU file
       write(PARAVIEW_IO) char(10) // '' // '</AppendedData>' // char(10)
