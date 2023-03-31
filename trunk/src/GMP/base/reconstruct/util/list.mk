@@ -1,9 +1,0 @@
-check_derivative.F90
-check_tri2edgs_compatibility.F90
-collect_tangent.F
-compute_coefficients.F90
-compute_radial_derivative.F90
-generate_Bezier_curve.F90
-generate_Bezier_triangle.F90
-radial_derivative.F90
-0

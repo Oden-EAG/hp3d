@@ -1,9 +1,5 @@
-add_void_curve.F90
-bernstein_poly.F90
-biv_bernstein_poly.F90
 check_orientation.F90
 coord_cart2polar.F90
-find_GMPtriangle.F90
 find_curve_to_block.F90
 find_point_to_block.F90
 imod.F90
