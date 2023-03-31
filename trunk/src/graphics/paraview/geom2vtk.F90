@@ -270,7 +270,10 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
       endif
    endif
 !
-   if(VIS_VTU) deallocate(ELEM_TYPES)
+   if(VIS_VTU) then
+      deallocate(ELEM_TYPES)
+      deallocate(VTU_element_type_offset)
+   endif
 !
 !..Step 6 : Deallocate
 !
