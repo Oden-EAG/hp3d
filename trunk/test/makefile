@@ -98,13 +98,13 @@ seq :
 	@seq_pass=0; seq_fail=0; \
 	for e in $(TEST_SEQ) ; do \
 		pass=1; make one run TEST=$$e || pass=0; \
-		if [ $$((pass)) == 1 ]; then \
+		if [ $$((pass)) -eq 1 ]; then \
 			seq_pass=$$((seq_pass+1)); \
 		else \
 			seq_fail=$$((seq_fail+1)); \
 		fi ; \
 	done ; \
-	if [ $$((seq_fail)) == 0 ]; then \
+	if [ $$((seq_fail)) -eq 0 ]; then \
 		printf "\n All "$$((seq_pass))"%s\n\n" \
 			    " Sequential Tests Passed."; \
 	else \
@@ -121,13 +121,13 @@ par :
 	@par_pass=0; par_fail=0; \
 	for e in $(TEST_PAR) ; do \
 		pass=1; make one run-par TEST=$$e || pass=0; \
-		if [ $$((pass)) == 1 ]; then \
+		if [ $$((pass)) -eq 1 ]; then \
 			par_pass=$$((par_pass+1)); \
 		else \
 			par_fail=$$((par_fail+1)); \
 		fi ; \
 	done ; \
-	if [ $$((par_fail)) == 0 ]; then \
+	if [ $$((par_fail)) -eq 0 ]; then \
 		printf "\n All "$$((par_pass))"%s\n\n" \
 			    " Parallel Tests Passed."; \
 	else \
@@ -146,7 +146,7 @@ all : seq par
 	 pass=$$((seq_pass+par_pass)); \
 	 fail=$$((seq_fail+par_fail)); \
 	 echo "++++++++++++++++++++++++++++++++++++++++"; \
-	if [ $$((fail)) == 0 ]; then \
+	if [ $$((fail)) -eq 0 ]; then \
 		printf "\n All "$$((pass))"%s\n\n" \
 			    " Tests Passed."; \
 	else \
@@ -162,7 +162,7 @@ all : seq par
 run : one
 	@printf "\n Running test: "$(TEST)"\n"
 	@pass=1; mpirun -np 1 ./$(EXEC_PATH)/$(TEST) || pass=0; \
-	if [ $$((pass)) == 1 ]; then \
+	if [ $$((pass)) -eq 1 ]; then \
 			printf "          test_"$(TEST)" PASSED\n\n"; \
 			true; \
 	else \
@@ -175,7 +175,7 @@ run : one
 run-par : one
 	@printf "\n Running test: "$(TEST)"\n"
 	@pass=1; mpirun -np 4 ./$(EXEC_PATH)/$(TEST) || pass=0; \
-	if [ $$((pass)) == 1 ]; then \
+	if [ $$((pass)) -eq 1 ]; then \
 			printf "          test_"$(TEST)" PASSED\n\n"; \
 			true; \
 	else \
