@@ -20,10 +20,7 @@ program test_fact
    a = -2
    if (fact(a) .ne.   0) NPASS = 0
 !
-   if (NPASS .ne. 1) then
-      write(*,*) 'test_fact FAILED.'
-   else
-      write(*,*) 'test_fact PASSED.'
-   endif
+!
+   if (NPASS.ne.1) stop 1
 !
 end program test_fact

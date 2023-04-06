@@ -35,10 +35,7 @@ program test_encod_decod
       if (c(i) .ne. d(i)) NPASS = 0
    enddo
 !
-   if (NPASS .ne. 1) then
-      write(*,*) 'test_encod_decod FAILED.'
-   else
-      write(*,*) 'test_encod_decod PASSED.'
-   endif
+!
+   if (NPASS.ne.1) stop 1
 !
 end program test_encod_decod

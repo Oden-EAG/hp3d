@@ -20,10 +20,7 @@ program test_isgn
    a = 0
    if (isgn(a) .ne.  0) NPASS = 0
 !
-   if (NPASS .ne. 1) then
-      write(*,*) 'test_isgn FAILED.'
-   else
-      write(*,*) 'test_isgn PASSED.'
-   endif
+!
+   if (NPASS.ne.1) stop 1
 !
 end program test_isgn
