@@ -97,9 +97,9 @@ subroutine Finegrid_padap(nr_elem_ref,mdle_ref,xnod_ref,flag_pref)
                       pord = MAX(nordx,nordy,nordz)
                      !  write(*,*) mdle,pord,MAXP
                       if (pord .gt. MAXP) then
-                          write(*,1002) 'local pref: mdle,p,MAXP = ',mdle,pord,MAXP,'. stop.'
+                          !write(*,1002) 'local pref: mdle,p,MAXP = ',mdle,pord,MAXP,'. stop.'
                           go to 700
-                          1002 format(A,I7,I3,I3,A)
+                          !1002 format(A,I7,I3,I3,A)
                       endif 
                     
 
@@ -132,7 +132,7 @@ subroutine Finegrid_padap(nr_elem_ref,mdle_ref,xnod_ref,flag_pref)
             ! write(*,*)  "here 2 = ",MAXNODS,NRNODS,NPNODS
             call MPI_BARRIER (MPI_COMM_WORLD, ierr)
             ! start_time = MPI_Wtime()
-            
+            if (RANK .eq. ROOT) write(*,*) "isotropic h-refinement of marked elements"
             !h-refinement of marked elements
 
             do iel = 1,nr_elem_ref

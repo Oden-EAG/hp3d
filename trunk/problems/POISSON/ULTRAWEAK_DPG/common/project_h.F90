@@ -158,7 +158,7 @@ if(etype .eq. 'mdlb') then
 
     endif
 
-    write(*,*) "Rate for elemental p-ref = ",rate_p,max_rate_hcomp,Mdle,sqrt(error_max_rate),error_org
+    !write(*,*) "Rate for elemental p-ref = ",rate_p,max_rate_hcomp,Mdle,sqrt(error_max_rate),error_org
 
     ! if(max_rate_hcomp .ge. rate_p) then !href
 

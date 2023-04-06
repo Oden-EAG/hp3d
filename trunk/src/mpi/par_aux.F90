@@ -401,7 +401,7 @@ end subroutine print_partition
 !
 !     subroutine:          print_subd
 !
-!     last modified:       July 2019
+!     last modified:       Mar 2023
 !
 !     purpose:             print current subdomain for each process
 !
@@ -410,12 +410,13 @@ subroutine print_subd()
 !
    use data_structure3D
    use par_mesh , only: DISTRIBUTED
-   use mpi_param, only: RANK,ROOT
+   use mpi_param, only: RANK,ROOT,NUM_PROCS
+   use mpi      , only: MPI_COMM_WORLD
 !
    implicit none
 !
    integer :: sub(NRNODS)
-   integer :: k,l,nod,nrnod_subd,subd,vis
+   integer :: ierr,j,k,l,nod,nrnod_subd,subd
    character(16) :: fmt
 !
 !----------------------------------------------------------------------
@@ -425,26 +426,29 @@ subroutine print_subd()
       goto 390
    endif
 !
-   call reset_visit
    nrnod_subd = 0
    do nod=1,NRNODS
       call get_subd(nod, subd)
       if (RANK .ne. subd) cycle
-      call get_visit(nod, vis)
-      if (vis .eq. 1) cycle
       nrnod_subd = nrnod_subd + 1
       sub(nrnod_subd) = nod
-      call set_visit(nod)
    enddo
-   write(6,3000) 'subdomain [', RANK, '] : '
-   k = 0
-   do while (k .lt. nrnod_subd)
-      l = MIN(k+10,nrnod_subd)
-      write(fmt,'("(",I0,"I6)")') l-k
-      write(6,fmt) sub(k+1:l)
-      k = l
-   enddo
+   do j=0,NUM_PROCS-1
+      if (j .ne. RANK) then
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr);
+         cycle
+      endif
+      write(6,3000) 'subdomain [', RANK, '] : '
  3000 format(A,I3,A)
+      k = 0
+      do while (k .lt. nrnod_subd)
+         l = MIN(k+10,nrnod_subd)
+         write(fmt,'("(",I0,"I6)")') l-k
+         write(6,fmt) sub(k+1:l)
+         k = l
+      enddo
+      call MPI_BARRIER (MPI_COMM_WORLD, ierr);
+   enddo
 !
   390 continue
 !
@@ -455,7 +459,7 @@ end subroutine print_subd
 !
 !     subroutine:          print_coord
 !
-!     last modified:       July 2019
+!     last modified:       Mar 2023
 !
 !     purpose:             print current subdomain for each process
 !
@@ -464,11 +468,12 @@ subroutine print_coord()
 !
    use data_structure3D
    use par_mesh , only: DISTRIBUTED
-   use mpi_param, only: RANK,ROOT
+   use mpi_param, only: RANK,ROOT,NUM_PROCS
+   use mpi      , only: MPI_COMM_WORLD
 !
    implicit none
 !
-   integer :: iel,i,mdle,nrv
+   integer :: ierr,iel,i,j,mdle,nrv
    real(8) :: x(NDIMEN), xnod(NDIMEN,8)
 !
 !----------------------------------------------------------------------
@@ -478,17 +483,24 @@ subroutine print_coord()
       return
    endif
 !
-   write(6,4000) 'partition [', RANK, '] : '
-   do iel=1,NRELES_SUBD
-      mdle = ELEM_SUBD(iel)
-      call nodcor_vert(mdle, xnod)
-      nrv = nvert(NODES(mdle)%type)
-      x(1:3) = 0.d0
-      do i = 1,nrv
-         x(1:3) = x(1:3) + xnod(1:3,i)
+   do j=0,NUM_PROCS-1
+      if (j .ne. RANK) then
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr);
+         cycle
+      endif
+      write(6,4000) 'partition [', RANK, '] : '
+      do iel=1,NRELES_SUBD
+         mdle = ELEM_SUBD(iel)
+         call nodcor_vert(mdle, xnod)
+         nrv = nvert(NODES(mdle)%type)
+         x(1:3) = 0.d0
+         do i = 1,nrv
+            x(1:3) = x(1:3) + xnod(1:3,i)
+         enddo
+         x(1:3) = x(1:3) / nrv
+         write(*,4010) 'Mdle = ', mdle,', Coords = ', x(1:3)
       enddo
-      x(1:3) = x(1:3) / nrv
-      write(*,4010) 'Mdle = ', mdle,', Coords = ', x(1:3)
+      call MPI_BARRIER (MPI_COMM_WORLD, ierr);
    enddo
   4000 format(A,I4,A)
   4010 format(A,I5,A,3F6.2)

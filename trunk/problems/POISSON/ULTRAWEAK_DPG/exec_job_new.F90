@@ -14,7 +14,7 @@ subroutine exec_job_new()
     integer :: i,ierr
     real(8) :: MPI_Wtime,start_time,end_time
     integer :: iParAttr(4) = (/0,0,0,1/)
-
+    integer,parameter :: ref_type = 1
     EXCHANGE_DOF = .false.
     !
     if(RANK .eq. ROOT) then
@@ -25,42 +25,96 @@ subroutine exec_job_new()
  
     !..distribute mesh initially
     call distr_mesh
-!..set Zoltan partitioner
-    call zoltan_w_set_lb(0)
-
+    !..set Zoltan partitioner
+    if (NUM_PROCS .gt. 1) then
+	 if(RANK .eq. ROOT) write(*,*) "setting up the partitioner  = ",0
+	 call zoltan_w_set_lb(0)
+    else
+	 call zoltan_w_set_lb(0)
+    endif
+!..first h-refinement
     call MPI_BARRIER (MPI_COMM_WORLD, ierr);start_time = MPI_Wtime()
     ! if(RANK .eq. ROOT) 
     call global_href
+    !!call close_mesh
+    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
     call update_gdof
     call update_Ddof
-
-    call MPI_BARRIER (MPI_COMM_WORLD, ierr);end_time   = MPI_Wtime()
+    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 
 !..distribute mesh initially
     call distr_mesh
+
+    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+    call par_verify
+    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+
+!..second h-refinement
+    !call global_href
+    !!call close_mesh
+    !call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+    !call update_gdof
+    !call update_Ddof
+    !call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+!..distribute
+    !call distr_mesh
+    !call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+    !call par_verify
+    !call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+ 
 !..set Zoltan partitioner
-    call zoltan_w_set_lb(0)
+    !call zoltan_w_set_lb(0)
 
     do i=1,IMAX
 
         if(RANK .eq. ROOT) write(*,100) 'Beginning iteration i = ', i
 
         Print *, HOST_MESH, RANK
-        if (DISTRIBUTED .and. (.not. HOST_MESH)) then
-           call par_mumps_sc('G')
-        else
-           call mumps_sc('G')
-        endif
-        call exact_error
-        call HpAdapt
+        call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 
+        if (DISTRIBUTED .and. (.not. HOST_MESH)) then
+           call par_mumps_sc('H')
+           !call petsc_solve('P')
+        else
+           call mumps_sc('H')
+        endif
+        call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+        !call exact_error
+	
+	!Anisotropic hp refinement
+	if(ref_type .eq. 1) then
+	 call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+         call HpAdapt
+	 call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+	else
+	!isotropic refinement
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+         call refine_DPG
+	 !call uniform_href(1,1,0.75)
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+	endif
+	! mesh distribution
+	if (NUM_PROCS .gt. 1) then
+
+	 if(RANK .eq. ROOT) write(*,*) " Redistributing the mesh "
+
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+         call distr_mesh
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+
+	endif
+	! mesh verification
+        call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+        call par_verify
+        call MPI_BARRIER (MPI_COMM_WORLD, ierr)
     enddo
 
     !solving on the last mesh
     if (DISTRIBUTED .and. (.not. HOST_MESH)) then
-        call par_mumps_sc('G')
+        call par_mumps_sc('H')
+        !call petsc_solve('P')
      else
-        call mumps_sc('G')
+        call mumps_sc('H')
      endif
      call exact_error
 

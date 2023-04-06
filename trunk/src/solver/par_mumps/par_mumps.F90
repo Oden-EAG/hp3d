@@ -125,7 +125,7 @@ subroutine mumps_start(mumps,mpi_comm)
 !
 !..icntl(14): percentage increase in estimated workspace
 !     [default: 20] - 20% increase in workspace
-   mumps%icntl(14) = 30
+   mumps%icntl(14) = 80
 !
 !..icntl(18): distribution strategy of the input matrix
 !     0: centralized on host

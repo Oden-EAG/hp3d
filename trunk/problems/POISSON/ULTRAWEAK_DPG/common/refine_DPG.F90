@@ -62,7 +62,7 @@ subroutine refine_DPG
     integer, parameter :: adap_strat = 1 !0 is for greedy strat and 1 is for Doerfler 
     ! parameters below were input to the function before but currently used as finxed parameters for debug
     integer, parameter :: physNick = 1 !if exact then adapting to reduce in error L2 solution u
-    integer, parameter :: max_step = 20
+    integer, parameter :: max_step = 40
     real(8), parameter :: Factor = 0.75
     logical :: Ires = .true.
     integer, parameter :: Irefine = 2
@@ -249,6 +249,15 @@ do i=1,istep
    if (i .eq. istep) write(*,*)
 enddo
 
+open(22,file="error.dat",status='replace')
+   do i  = 1,istep
+
+      write(22,*) i,nelem_mesh(i),nrdof_tot_mesh(i),nrdof_con_mesh(i),residual_mesh(i),rate_mesh(i), &
+                 error_mesh(i),rel_error_mesh(i),rate_error_mesh(i)
+
+   enddo
+close(22)
+
 70 continue
 
 !-----------------------------------------------------------------------
@@ -347,12 +356,6 @@ select case(Irefine)
             select case(etype)
                case('mdlb')
                   kref = 111 ! iso
-                  !kref = 110  ! radial
-                  ! kref = 10 ! refining in r
-                  !kref = 100 ! refining in theta
-               ! case('mdlp')
-               !    !kref = 11  ! iso
-               !    kref = 10   ! radial
                case default
                   write(*,*) 'refine_DPG: READING UNEXPECTED ELEMENT TYPE: ',etype
                   call pause
@@ -514,4 +517,3 @@ subroutine adap_solve
       enddo
    !
    end subroutine adap_solve
-   

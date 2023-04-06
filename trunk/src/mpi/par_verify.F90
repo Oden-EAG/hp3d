@@ -22,7 +22,7 @@ subroutine par_verify()
    integer :: ipass,ierr,buf,count
 !
    if (.not. DISTRIBUTED) then
-      if (RANK.eq.ROOT) write(*,*) 'par_verify: mesh is not distributed.'
+      if (RANK.eq.ROOT) write(*,*) 'par_verify : mesh is not distributed.'
       goto 190
    endif
 !
@@ -31,9 +31,9 @@ subroutine par_verify()
    count = 1
    call MPI_ALLREDUCE(ipass,buf,count,MPI_INTEGER,MPI_MIN,MPI_COMM_WORLD,ierr)
    if (buf .eq. 1) then
-      if (RANK.eq.ROOT)  write(*,*) 'par_verify: MESH CONSISTENCY TEST PASSED.'
+      if (RANK.eq.ROOT)  write(*,*) 'par_verify : MESH CONSISTENCY TEST PASSED.'
    else
-      if (RANK.eq.ROOT)  write(*,*) 'par_verify: MESH CONSISTENCY TEST FAILED.'
+      if (RANK.eq.ROOT)  write(*,*) 'par_verify : MESH CONSISTENCY TEST FAILED.'
       stop
    endif
 !

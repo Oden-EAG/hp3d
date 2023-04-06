@@ -119,8 +119,8 @@ subroutine project_p_linear(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
     real(8), allocatable :: shap3DQ_fine_store(:,:,:),shap3DQ_coarse_store(:,:,:)
     integer, allocatable :: nint_pp_store(:)
     !..function for vector storage for symmertic L2 gram matrix in lower triangular format
-    integer :: nk
-    nk(k1,k2,nrdofQ) = nrdofQ * (k2-1) + k1 - k2*(k2-1)/2
+    !integer :: nk
+    !nk(k1,k2,nrdofQ) = nrdofQ * (k2-1) + k1 - k2*(k2-1)/2
 
     !allocating memory to the p+1 order projection matrix
     etype = NODES(Mdle)%type
@@ -463,7 +463,7 @@ subroutine project_p_linear(Mdle,flag_pref_loc, Error_org,rate_p,Poly_flag)
 
         endif
     endif
-        write(*,*) "time is  = ",net_time_a,net_time_b,net_time_c,timer_f - timer_e
+        !write(*,*) "time is  = ",net_time_a,net_time_b,net_time_c,timer_f - timer_e
     
     deallocate(weights_fine_store)
     deallocate(quad_point_store)

@@ -103,6 +103,8 @@ subroutine my_paraview_driver(IParAttr)
       enddo
 !..end loop over rhs's
    enddo
+! it's a hack for poly order (only works for VTU)
+ call paraview_attr_Order(id,111)
 ! !
   90 continue
 ! !

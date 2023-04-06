@@ -1,7 +1,6 @@
 !--------------------------------------------------------------------
 !> Purpose : routine performs a global isotropic h-refinement
-!
-!> @date Aug 2019
+!> @date Feb 2023
 !--------------------------------------------------------------------
 subroutine global_href
 !
@@ -24,7 +23,7 @@ subroutine global_href
       mdle = ELEM_ORDER(i)
       if (is_leaf(mdle)) then
          call get_isoref(mdle, kref)
-         call break(mdle,kref)
+         call refine(mdle,kref)
       endif
    enddo
 !
@@ -37,9 +36,20 @@ subroutine global_href
       write(*,200) ' # of current elements, nodes = ', NRELES, NRNODS
       write(*,300) end_time-start_time
    endif
+!
+!..ensure that DOFs are allocated correctly within subdomains
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+   call distr_refresh
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+!
+   if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
+      write(*,400) end_time-start_time
+   endif
+!
  100 format(A,I8)
  200 format(A,I8,', ',I9)
  300 format(' refresh    : ',f12.5,'  seconds')
+ 400 format(' distr_refr : ',f12.5,'  seconds')
 !
 end subroutine global_href
 !
@@ -50,11 +60,10 @@ end subroutine global_href
 !                  and breaking along the same axis
 !                  (no mesh irregularity checks are done here)
 !
-!> Arguments:
-!     in:    Krefxy -   1 (break in xy)  - hexa/prism mesh
-!            Krefz  -   1 (break in  z)  - hexa/prism mesh
-!
-!> @date Aug 2019
+!> @param[in] Krefxy -   1 (break in xy)  - hexa/prism mesh
+!> @param[in] Krefz  -   1 (break in  z)  - hexa/prism mesh
+!!
+!> @date Feb 2023
 !--------------------------------------------------------------------
 subroutine global_href_aniso(Krefxy,Krefz)
 !
@@ -84,8 +93,8 @@ subroutine global_href_aniso(Krefxy,Krefz)
       mdle = ELEM_ORDER(i)
       if (is_leaf(mdle)) then
          select case(NODES(mdle)%type)
-            case('mdlb'); call break(mdle,kref_mdlb)
-            case('mdlp'); call break(mdle,kref_mdlp)
+            case('mdlb'); call refine(mdle,kref_mdlb)
+            case('mdlp'); call refine(mdle,kref_mdlp)
             case default
                write(*,*) 'global_href_aniso: unexpected node type. stop.'
                stop 1
@@ -102,24 +111,34 @@ subroutine global_href_aniso(Krefxy,Krefz)
       write(*,200) ' # of current elements, nodes = ', NRELES, NRNODS
       write(*,300) end_time-start_time
    endif
+!
+!..ensure that DOFs are allocated correctly within subdomains
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+   call distr_refresh
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+!
+   if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
+      write(*,400) end_time-start_time
+   endif
+!
  100 format(A,I8)
  200 format(A,I8,', ',I9)
  300 format(' refresh    : ',f12.5,'  seconds')
+ 400 format(' distr_refr : ',f12.5,'  seconds')
 !
 end subroutine global_href_aniso
 
 !--------------------------------------------------------------------
-!> Purpose : routine performs a global anisotropic h-refinement
-!            note: works only for meshes with hexas,
-!                  and breaking along the same axis
-!                  (no mesh irregularity checks are done here)
-!
-!> Arguments:
-!     in:    Krefx  -   1 (break in x)  - hexa mesh only
-!            Krefy  -   1 (break in y)  - hexa mesh only
-!            Krefz  -   1 (break in z)  - hexa mesh only
-!
-!> @date Aug 2019
+!> @brief     routine performs a global anisotropic h-refinement
+!!            note: works only for meshes with hexas,
+!!                  and breaking along the same axis
+!!                  (no mesh irregularity checks are done here)
+!!
+!> @param[in] Krefx  -   1 (break in x)  - hexa mesh only
+!> @param[in] Krefy  -   1 (break in y)  - hexa mesh only
+!> @param[in] Krefz  -   1 (break in z)  - hexa mesh only
+!!
+!> @date Feb 2023
 !--------------------------------------------------------------------
 subroutine global_href_aniso_bric(Krefx,Krefy,Krefz)
 !
@@ -148,7 +167,7 @@ subroutine global_href_aniso_bric(Krefx,Krefy,Krefz)
       mdle = ELEM_ORDER(i)
       if (is_leaf(mdle)) then
          select case(NODES(mdle)%type)
-            case('mdlb'); call break(mdle,kref_mdlb)
+            case('mdlb'); call refine(mdle,kref_mdlb)
             case default
                write(*,*) 'global_href_aniso_bric: unexpected node type. stop.'
                stop 1
@@ -165,8 +184,19 @@ subroutine global_href_aniso_bric(Krefx,Krefy,Krefz)
       write(*,200) ' # of current elements, nodes = ', NRELES, NRNODS
       write(*,300) end_time-start_time
    endif
+!
+!..ensure that DOFs are allocated correctly within subdomains
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+   call distr_refresh
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+!
+   if ((.not. QUIET_MODE) .and. (RANK .eq. ROOT)) then
+      write(*,400) end_time-start_time
+   endif
+!
  100 format(A,I8)
  200 format(A,I8,', ',I9)
  300 format(' refresh    : ',f12.5,'  seconds')
+ 400 format(' distr_refr : ',f12.5,'  seconds')
 !
 end subroutine global_href_aniso_bric

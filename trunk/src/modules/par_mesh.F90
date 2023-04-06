@@ -14,6 +14,7 @@
 module par_mesh
 !
    use data_structure3D
+   use environment,    only: QUIET_MODE
    use parameters,     only: NRCOMS
    use mpi_param,      only: RANK,ROOT,NUM_PROCS
    use MPI,            only: MPI_COMM_WORLD,MPI_STATUS_IGNORE, &
@@ -76,8 +77,8 @@ subroutine distr_mesh()
       call zoltan_w_partition(subd_next)
    endif
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
-   if(RANK .eq. ROOT) write(*,110) end_time - start_time
-   110 format(' partition time: ',f12.5,' seconds')
+   if(.not.QUIET_MODE .and. RANK.eq.ROOT) write(*,110) end_time - start_time
+   110 format(' partition  : ',f12.5,'  seconds')
 !
 !..2. Reset visit flags for all nodes to 0
    call reset_visit
@@ -98,14 +99,15 @@ subroutine distr_mesh()
 !  ...3b. iterate over list of nodes
       do inod=1,nrnodm
          nod = nodm(inod)
-         if (.not. EXCHANGE_DOF) then
+         !...Calculate nodal degrees of freedom
+         call get_dof_buf_size(nod, nrdof_nod)
+         if ((.not.EXCHANGE_DOF) .or. (nrdof_nod.eq.0)) then
+!        ...even if nrdof_nod=0, the node%dof pointer must be associated
             if (subd_next(iel) .eq. RANK) call alloc_nod_dof(nod)
             cycle
          endif
-!     ...3c. Calculate nodal degrees of freedom, and allocate buffer
-         call get_dof_buf_size(nod, nrdof_nod)
-         if (nrdof_nod .eq. 0) cycle
-         allocate(buf(nrdof_nod))
+!     ...3c. Allocate exchange buffer
+	 allocate(buf(nrdof_nod))
          buf = ZERO
 !     ...3d. if current subdomain is my subdomain, send data
          if (subd .eq. RANK) then
@@ -144,8 +146,8 @@ subroutine distr_mesh()
       enddo
    enddo
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
-   if(RANK .eq. ROOT) write(*,120) end_time - start_time
-   120 format(' migration time: ',f12.5,' seconds')
+   if(.not.QUIET_MODE .and. RANK.eq.ROOT) write(*,120) end_time - start_time
+   120 format(' migration  : ',f12.5,'  seconds')
    130 format(A,I2,A,A,I4,A,I6)
 !
    50 continue
@@ -176,12 +178,12 @@ subroutine distr_mesh()
       endif
    enddo
 !$OMP END DO
-!
+
 !..7. Delete degrees of freedom for NODES outside of subdomain
 !$OMP DO
    do nod=1,NRNODS
       call get_subd(nod, subd)
-      if (subd .ne. RANK .and. Is_active(nod)) then
+      if ((subd .ne. RANK) .and. Is_active(nod)) then
 !     ...delete solution degrees of freedom
          call dealloc_nod_dof(nod)
       endif
@@ -233,6 +235,8 @@ subroutine set_subd_elem(Mdle)
    call get_elem_nodes(Mdle, nodesl,nodm,nrnodm)
    call get_subd(Mdle, subd)
    type = NODES(Mdle)%type
+!..marking local node list is necessary so that activate_sons works
+!  correctly when breaking the element
    do i=1,nvert(type)+nedge(type)+nface(type)
       call set_subd(nodesl(i),subd)
    enddo
@@ -314,7 +318,7 @@ end subroutine dealloc_nod_dof
 !     purpose:    calculate buffer size for message passing of nodal dofs
 !----------------------------------------------------------------------
 subroutine get_dof_buf_size(Nod, Nrdof_nod)
-   integer, intent(in) :: Nod
+   integer, intent(in)  :: Nod
    integer, intent(out) :: Nrdof_nod
    integer :: ndofH,ndofE,ndofV,ndofQ
    integer :: nvarH,nvarE,nvarV,nvarQ

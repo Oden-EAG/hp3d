@@ -32,8 +32,9 @@ subroutine HpAdapt
     integer, parameter :: adap_strat = 1 !0 is for greedy strat and 1 is for Doerfler 
     ! parameters below were input to the function before but currently used as finxed parameters for debug
     integer, parameter :: physNick = 1 !if exact then adapting to reduce in error L2 solution u
-    integer, parameter :: max_step = 40
+    integer, parameter :: max_step = 100
     real(8), parameter :: Factor = 0.75
+    real(8), parameter :: Factor_max_rate = 0.25 !default value = 0.25
     logical :: Ires = .true.
     integer, parameter :: Irefine = 2
 
@@ -50,6 +51,7 @@ subroutine HpAdapt
     real(8), dimension(max_step), save :: error_mesh
     real(8), dimension(max_step), save :: rel_error_mesh
     real(8), dimension(max_step), save :: rate_error_mesh
+    integer, dimension(max_step), save :: nr_href_lst
 
     real(8) :: elem_resid(NRELES)
     integer :: elem_ref_flag(NRELES)
@@ -97,7 +99,7 @@ subroutine HpAdapt
 !..element type
     character(len=4)  :: etype
     character(len=15) :: mesh_filename
-    character(len=4) :: rankno
+    character(len=4)  :: rankno
 
 ! for coarse mesh retrieval
     type(node), allocatable :: NODES_cp(:)
@@ -122,7 +124,7 @@ subroutine HpAdapt
     mdle_ref(1:NRELES)      = 0
 
 
-    Nflag(1:NR_PHYSA) = (/0,0,1,0/) 
+    Nflag(1:NR_PHYSA) = (/0,0,1,1/) 
 
 
 !..increase step if necessary
@@ -254,10 +256,9 @@ do i=1,istep
    if (i .eq. istep) write(*,*)
 enddo
 
-70 continue
+
 
 open(22,file="error.dat",status='replace')
-! write(4,*) nr_elem_ref
    do i  = 1,istep
 
       write(22,*) i,nelem_mesh(i),nrdof_tot_mesh(i),nrdof_con_mesh(i),residual_mesh(i),rate_mesh(i), &
@@ -265,6 +266,8 @@ open(22,file="error.dat",status='replace')
 
    enddo
 close(22)
+
+70 continue
 
 !-----------------------------------------------------------------------
 !                         REFINE AND UPDATE MESH
@@ -341,6 +344,24 @@ MAXNODS_old = MAXNODS
 NRELIS_old = NRELIS
 
 !----------------------------------------------------------------------------
+if((istep .eq. 25) .and. (RANK .eq. ROOT) .and. iprint .eq. 2) then
+         open(5,file="h_ref_lst",status='old', position='append')
+         !write(5,*) nr_elem_ref
+          do iel = 1,nr_elem_ref
+	         write(5,*) mdle_ref(iel),111      
+  	  enddo
+         close(5)
+
+	 nr_href_lst(istep) = nr_elem_ref
+ 
+	 open(6,file="h_ref_count",status='replace')
+	 do iel = 1,istep
+	   write(6,*) nr_href_lst(iel)
+         enddo
+  	 close(6)
+
+endif
+
 ! call dumpout_hp3d("befor_mesh_copy")
 
 call MPI_BARRIER (MPI_COMM_WORLD, ierr)
@@ -349,7 +370,6 @@ allocate(flag_pref(nr_elem_ref)) !flag_pref contains the flags if element has be
 flag_pref = ZERO
 !hp refining the marked elements
 call Finegrid_padap(nr_elem_ref,mdle_ref,xnod_ref,flag_pref)
-
 
 ! solving on the hp refined mesh to fine mesh solution
 
@@ -471,8 +491,8 @@ call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
       
          call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
          !sets up p-refined flags for just p-refined elements
-         ! allocate(write_pref(nr_elem_ref,2))
-         ! write_pref = ZERO
+         allocate(write_pref(nr_elem_ref,2))
+         write_pref = ZERO
 
          do iel = 1,nr_elem_ref
 
@@ -483,14 +503,14 @@ call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 
             case('mdlb')
 
-               if(Nref_grate(iel) .gt. 0.25 * grate_mesh) then
+               if(Nref_grate(iel) .gt. Factor_max_rate * grate_mesh) then
                   if(Ref_indicator_flags((iel-1)*10 + 1) .eq. 2) then  !p-ref
                      
                      nord_new = Ref_indicator_flags((iel-1)*10 + 3)
                      write(*,*) "p-ref", mdle, nord_new
                      call nodmod(mdle,nord_new)
-                     ! write_pref(iel,1) = mdle
-                     ! write_pref(iel,2) = nord_new
+                      write_pref(iel,1) = mdle
+                      write_pref(iel,2) = nord_new
 
                   endif
                endif
@@ -503,13 +523,15 @@ call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 
          enddo
 
-
-         ! open(4,file="p_ref_lst",status='replace')
-         ! write(4,*) nr_elem_ref
-         ! do iel = 1,nr_elem_ref
-         !    write(4,*) write_pref(iel,:)
-         ! enddo
-         ! close(4)
+	 if((RANK .eq. 0) .and. (iprint .eq. 2)) then
+         !write(rankno,'(i0.0)') RANK
+         open(4,file="p_ref_lst",status='old', position='append')
+         !write(4,*) nr_elem_ref
+         do iel = 1,nr_elem_ref
+         write(4,*) write_pref(iel,:)
+         enddo
+         close(4)
+	 endif
 
          call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
          call enforce_min_rule
@@ -525,9 +547,9 @@ call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
          ! putting h-refinement flags
          ! call MPI_BARRIER (MPI_COMM_WORLD, ierr)
          if (RANK .eq. ROOT)  write(*,*) 'Starting to put  h-refined flags'
-         ! allocate(write_kref(nr_elem_ref,2))
-         ! write_kref = ZERO
-
+          allocate(write_kref(nr_elem_ref,2))
+          write_kref = ZERO
+	  href_count = 0
             do iel = 1,nr_elem_ref
 
                mdle = mdle_ref(iel)
@@ -537,14 +559,15 @@ call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 
                case('mdlb')
 
-                  if(Nref_grate(iel) .gt. 0.25 * grate_mesh) then
+                  if(Nref_grate(iel) .gt. Factor_max_rate * grate_mesh) then
                      if(Ref_indicator_flags((iel-1)*10 + 1) .eq. 1) then   !h-ref
 
                         kref = Ref_indicator_flags((iel-1)*10 + 2)
                         if(RANK .eq. ROOT) write(*,*) "href = ",mdle,kref,NODES(mdle)%ref_kind
                         call refine(mdle,kref)
-                        ! write_kref(iel,1) = mdle
-                        ! write_kref(iel,2) = kref
+                        write_kref(iel,1) = mdle
+                        write_kref(iel,2) = kref
+			href_count = href_count + 1
 
                      endif
                   endif
@@ -557,6 +580,29 @@ call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 
             enddo
 
+	 if((RANK .eq. 0) .and. (iprint .eq. 2)) then
+        
+         !write(rankno,'(i0.0)') RANK
+         open(5,file="h_ref_lst",status='old', position='append')
+         !write(5,*) nr_elem_ref
+         if(href_count .gt. 0) then
+          do iel = 1,nr_elem_ref
+           if(write_kref(iel,1) .gt. 0) then
+	         write(5,*) write_kref(iel,1),write_kref(iel,2)
+  	   endif      
+  	  enddo
+         endif
+
+         close(5)
+	 nr_href_lst(istep) = href_count
+
+	 open(6,file="h_ref_count",status='replace')
+	 do iel = 1,istep
+	   write(6,*) nr_href_lst(iel)
+         enddo
+  	 close(6)
+
+	 endif
 
 
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
@@ -591,7 +637,7 @@ call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 
             case('mdlb')
 
-               if(Nref_grate(iel) .gt. 0.25 * grate_mesh) then
+               if(Nref_grate(iel) .gt. Factor_max_rate * grate_mesh) then
                   if(Ref_indicator_flags((iel-1)*10 + 1) .eq. 1) then   !h-ref
 
                      kref_intent = Ref_indicator_flags((iel-1)*10+2)
@@ -673,7 +719,7 @@ call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 
                case('mdlb')
 
-                  if(Nref_grate(iel) .gt. 0.25 * grate_mesh) then
+                  if(Nref_grate(iel) .gt. Factor_max_rate * grate_mesh) then
                      ! if(Ref_indicator_flags(iel,1) .eq. 1) then   !h-ref
 
                         write(*,*) "The final ref flag = ",mdle,NODES(mdle)%ref_kind,NODES(mdle)%act
