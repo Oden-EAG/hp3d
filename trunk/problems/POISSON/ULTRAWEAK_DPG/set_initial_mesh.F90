@@ -19,6 +19,7 @@
 !
    subroutine set_initial_mesh(Nelem_order)
 !
+   use control    , only : NEXACT   
    use GMP
    use common_prob_data
    use data_structure3D
@@ -35,9 +36,10 @@
    integer :: nod,ibegin,iend
    integer :: nodesl(27),norientl(27)
    character(len=4) :: type
-   integer :: geomtype ! 0 for cube with dirichlet boundary condition,1 for fischera corner (make sure to change default
-   ! file-geometry in common/set_enviroment.F90), 2 for the cube but arc tan test case
-   geomtype = 2
+   integer :: geomtype ! 0 for cube with dirichlet boundary condition,
+   !1 for fischera corner (make sure to change default file-geometry in common/set_enviroment.F90)
+   !2 for the cube but arc tan test case
+   geomtype = 0
 !
 !------------------------------------------------------------------------------------
 !

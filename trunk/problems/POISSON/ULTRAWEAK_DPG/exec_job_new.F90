@@ -79,34 +79,35 @@ subroutine exec_job_new()
            call mumps_sc('H')
         endif
         call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+
         !call exact_error
 	
 	!Anisotropic hp refinement
-	if(ref_type .eq. 1) then
-	 call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+	 if(ref_type .eq. 1) then
+	     call MPI_BARRIER (MPI_COMM_WORLD, ierr)
          call HpAdapt
-	 call MPI_BARRIER (MPI_COMM_WORLD, ierr)
-	else
+	     call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+	 else
 	!isotropic refinement
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
          call refine_DPG
 	 !call uniform_href(1,1,0.75)
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
-	endif
+	 endif
 	! mesh distribution
-	if (NUM_PROCS .gt. 1) then
+	 if (NUM_PROCS .gt. 1) then
 
-	 if(RANK .eq. ROOT) write(*,*) " Redistributing the mesh "
+	    if(RANK .eq. ROOT) write(*,*) " Redistributing the mesh "
 
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
          call distr_mesh
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+    ! mesh verification
+         call par_verify
+         call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 
-	endif
-	! mesh verification
-        call MPI_BARRIER (MPI_COMM_WORLD, ierr)
-        call par_verify
-        call MPI_BARRIER (MPI_COMM_WORLD, ierr)
+     endif
+
     enddo
 
     !solving on the last mesh
@@ -116,7 +117,7 @@ subroutine exec_job_new()
      else
         call mumps_sc('H')
      endif
-     call exact_error
+    !  call exact_error
 
      100 format(/,'/////////////////////////////////////////////////////////////', &
      /,'             ',A,I2,/)

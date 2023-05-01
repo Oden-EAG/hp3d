@@ -209,23 +209,25 @@ subroutine scalar2vtk(Sname,Sfile,Snick,Idx, Ic)
 !..Step 4 : Write to file with HDF5
 !
 !   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-   if(VIS_FORMAT .eq. 0) then
-      if (RANK .eq. ROOT) call attr_write(Sname,len(Sname),Sfile,len(Sfile),Snick,len(Snick))
-   else
-      if(VIS_FORMAT .eq. 1) then
+   if (RANK .eq. ROOT) then
+      if(VIS_FORMAT .eq. 0) then
+         call attr_write(Sname,len(Sname),Sfile,len(Sfile),Snick,len(Snick))
+      else
+         if(VIS_FORMAT .eq. 1) then
+            
+            write(PARAVIEW_IO,1201) trim(sfile(len(trim(PARAVIEW_DIR))+  1 :len(Sfile)-3))
+            1201  format("<DataArray type=""","Float32"" Name=""",a,""" format=""ascii"">")
+      
+      
+         endif
+         nV = size(ATTR_VAL)
+         do count = 1,nV
 
-         write(PARAVIEW_IO,1201) trim(sfile(len(trim(PARAVIEW_DIR))+  1 :len(Sfile)-3))
-         1201  format("<DataArray type=""","Float32"" Name=""",a,""" format=""ascii"">")
-    
-   
+            write(PARAVIEW_IO,*) ATTR_VAL(1,count)
+
+         enddo
+         write(PARAVIEW_IO,*) "</DataArray>"
       endif
-      nV = size(ATTR_VAL)
-      do count = 1,nV
-
-         write(PARAVIEW_IO,*) ATTR_VAL(1,count)
-
-      enddo
-      write(PARAVIEW_IO,*) "</DataArray>"
    endif
       !   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
 !   if (RANK .eq. ROOT) write(*,300) end_time - start_time

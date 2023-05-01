@@ -381,7 +381,7 @@ if (DISTRIBUTED .and. (.not. HOST_MESH)) then
 else
    call mumps_sc('G')
 endif
-call exact_error
+if(NEXACT .eq. 1) call exact_error
 
 call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 !--------------------------------------------------------------------------
@@ -789,7 +789,7 @@ subroutine Hp_adapt_solve
    else
       call mumps_sc('G')
    endif
-   call exact_error
+   ! call exact_error
       ! ..do refinements and solve
    do i=0,nsteps
       !  ...display error and refine if necessary

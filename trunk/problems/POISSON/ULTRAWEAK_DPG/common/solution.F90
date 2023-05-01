@@ -53,8 +53,8 @@ subroutine solution(X, u,gradu,gradgradu)
 !     ...set polynomial order of manufactured solution
          isol_p = 4
          np_x = real(isol_p,8)
-         np_y = real(isol_p-4,8)
-         np_z = real(isol_p-4,8)
+         np_y = real(isol_p,8)
+         np_z = real(isol_p,8)
 !     ...value
          f_x = x1**np_x
          f_y = x2**np_y

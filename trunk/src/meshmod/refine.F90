@@ -89,6 +89,7 @@ subroutine refine(Mdle_in,Kref_in)
       endif
 !
       call get_connect_info(mdle, nodesl,norientl)
+      !norientl: for quads check page 63 in LD book part II: quads have 8 orientation
 !
 !     loop over faces
 !     ~~~~~~~~~~~~~~~~

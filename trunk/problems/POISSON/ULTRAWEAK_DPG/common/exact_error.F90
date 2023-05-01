@@ -11,6 +11,7 @@
 !----------------------------------------------------------------------
 subroutine exact_error
 !
+   use control         , only : NEXACT
    use data_structure3D
    use common_prob_data
    use environment
@@ -33,6 +34,11 @@ subroutine exact_error
 !
 !..compute the error only for L2 field
    iflag(1:NR_PHYSA) = (/0,0,1,1/) 
+   if(NEXACT .eq. 0) then 
+       write(*,*) " No exact solution provided, hence stop"
+       stop
+   endif
+
 !
 !..fetch active elements
    if (DISTRIBUTED .and. (.not. HOST_MESH)) then

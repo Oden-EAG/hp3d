@@ -36,3 +36,10 @@ args=" -job ${job} -maxnods ${maxnods} -p ${p}"
 args+=" -isol ${isol} -imax ${imax} -nthreads ${nthreads}"
 
 mpirun -np ${nproc} ./pois ${args}
+
+# to run fichera corner
+#   set NEXACT = 0 in control
+#   set geomtype = 1 in set_initial_mesh.F90
+#   set csn = 1 in ficheracornerdirichlet.F90 (always double check this as one may forget)
+#   set Fval = 0 in getF.F90 (always double check this as may forget)
+#   if u want to run exact solution with fichera corner then comment Nexact if statement in exact error to compute exact solution

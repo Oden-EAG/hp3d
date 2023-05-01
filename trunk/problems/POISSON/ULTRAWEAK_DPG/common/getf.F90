@@ -53,6 +53,15 @@ subroutine getf(Mdle,X, Fval)
       ! write(*,*) 'getf: source term cannot be computed;', &
       !                '  exact solution is unknown. stop.'
       ! stop
+      ! Fval = 0.d0
+
+      !to test manufactured solution with dirichlet and nueman boundary condition on fichera corner
+
+      ! call FicheraCornerDirichlet(X,Icase, ValH,DvalH,d2valH,ValE,DvalE,d2valE, &
+      ! ValV,DvalV,d2valV,valQ,dvalQ,d2valQ)
+      ! Fval = -(D2valH(1,1,1)+D2valH(1,2,2)+D2valH(1,3,3))
+
+      ! fichera corner for Rachowicz et al paper
       Fval = 0.d0
    
    else

@@ -190,6 +190,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
    enddo
 !$OMP END DO
 !$OMP END PARALLEL
+
 !
 !   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
 !   if (RANK .eq. ROOT) write(*,300) end_time - start_time
@@ -219,99 +220,102 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !..Step 5 : Write to file with HDF5
 !
 !   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-   if(VIS_FORMAT .eq. 0) then
-      if (RANK .eq. ROOT) call geometry_write(Sname,len(Sname),Sfile,len(Sfile))
-   else
-      nV = size(GEOM_PTS,dim=2)
-      write(PARAVIEW_IO,1032)
-      write(PARAVIEW_IO,1033)
-      write(PARAVIEW_IO,1034)nV,ice
-      write(PARAVIEW_IO,1035)
-      write(PARAVIEW_IO,1036)
+   if (RANK .eq. ROOT) then
+      if(VIS_FORMAT .eq. 0) then
+         call geometry_write(Sname,len(Sname),Sfile,len(Sfile))
+      else
+         nV = size(GEOM_PTS,dim=2)
+         write(PARAVIEW_IO,1032)
+         write(PARAVIEW_IO,1033)
+         write(PARAVIEW_IO,1034)nV,ice
+         write(PARAVIEW_IO,1035)
+         write(PARAVIEW_IO,1036)
 
-      1032 format("<VTKFile type=","""UnstructuredGrid""",">")
-      1033 format("<UnstructuredGrid>")
-      1034 format("<Piece NumberOfPoints=""",i0,""""," NumberOfCells=""",i0,""">")
-      1035 format("<Points>")
-      1036 format("<DataArray type=""","Float32"" Name=""Points"" NumberOfComponents=""3"" format=""ascii"">")
+         1032 format("<VTKFile type=","""UnstructuredGrid""",">")
+         1033 format("<UnstructuredGrid>")
+         1034 format("<Piece NumberOfPoints=""",i0,""""," NumberOfCells=""",i0,""">")
+         1035 format("<Points>")
+         1036 format("<DataArray type=""","Float32"" Name=""Points"" NumberOfComponents=""3"" format=""ascii"">")
 
-      !writting ascii format data for the coordinates
-      
-      do count = 1,nV
-         write(PARAVIEW_IO,*) GEOM_PTS(1,count),GEOM_PTS(2,count),GEOM_PTS(3,count)
-         ! Encode(PARAVIEW_IO,*) GEOM_PTS(1,count),GEOM_PTS(2,count),GEOM_PTS(3,count)
+         !writting ascii format data for the coordinates
+         
+         do count = 1,nV
+            write(PARAVIEW_IO,*) GEOM_PTS(1,count),GEOM_PTS(2,count),GEOM_PTS(3,count)
+            ! Encode(PARAVIEW_IO,*) GEOM_PTS(1,count),GEOM_PTS(2,count),GEOM_PTS(3,count)
 
-      enddo
-
-      write(PARAVIEW_IO,1037)
-      write(PARAVIEW_IO,1038)
-
-      1037 format("</DataArray>")
-      1038 format("</Points>")
-
-      write(PARAVIEW_IO,1039)
-      write(PARAVIEW_IO,1040)
-
-      1039 format("<Cells>")
-      1040 format("<DataArray type=""","Int64"" IdType=""1""  Name=""connectivity"" format=""ascii"">")
-
-      k = 0
-      l = 0
-      elem_connectivity = ZERO
-      allocate(offsets_connectivity(IcE))
-      allocate(elem_types(IcE))
-      offsets_connectivity = ZERO
-      elem_types = ZERO
-      do count  = 1,IcE
-
-         k = k + 1
-         l = GEOM_OBJ(k)
-         elem_types(count) = l
-         j = nobj_conf_reverse(l)
-
-         do iv = 1,j
-            elem_connectivity(iv) = GEOM_OBJ(k+iv) 
          enddo
-         write(PARAVIEW_IO,*) elem_connectivity(1:j)
 
-         k = k + j
-         if(count .eq. 1) then
-          offsets_connectivity(count) = k - 1
-         else
-           offsets_connectivity(count) = k - count
-         endif
-      enddo
+         write(PARAVIEW_IO,1037)
+         write(PARAVIEW_IO,1038)
 
-      write(PARAVIEW_IO,1041)
-      write(PARAVIEW_IO,1042)
-      
+         1037 format("</DataArray>")
+         1038 format("</Points>")
 
-      1041 format("</DataArray>")
-      1042 format("<DataArray type=""","Int64"" IdType=""1""  Name=""offsets"" format=""ascii"">")
-      
-      write(PARAVIEW_IO,*) offsets_connectivity
+         write(PARAVIEW_IO,1039)
+         write(PARAVIEW_IO,1040)
 
-      write(PARAVIEW_IO,1043)
-      write(PARAVIEW_IO,1044)
+         1039 format("<Cells>")
+         1040 format("<DataArray type=""","Int64"" IdType=""1""  Name=""connectivity"" format=""ascii"">")
 
-      1043 format("</DataArray>")
-      1044 format("<DataArray type=""","UInt8"" Name=""types"" format=""ascii"">")
+         k = 0
+         l = 0
+         elem_connectivity = ZERO
+         allocate(offsets_connectivity(IcE))
+         allocate(elem_types(IcE))
+         offsets_connectivity = ZERO
+         elem_types = ZERO
+         
+         do count  = 1,IcE
 
-      write(PARAVIEW_IO,*) elem_types
+            k = k + 1
+            l = GEOM_OBJ(k)
+            elem_types(count) = l
+            j = nobj_conf_reverse(l)
 
-      write(PARAVIEW_IO,1045)
-      write(PARAVIEW_IO,1046)
-      ! write(PARAVIEW_IO,1047)
-      ! write(PARAVIEW_IO,1048)
-      ! write(PARAVIEW_IO,1049)
+            do iv = 1,j
+               elem_connectivity(iv) = GEOM_OBJ(k+iv) 
+            enddo
+            write(PARAVIEW_IO,*) elem_connectivity(1:j)
 
-      1045 format("</DataArray>")
-      1046 format("</Cells>")
-      write(PARAVIEW_IO,*) "<PointData Scalars=""","scalars"">"
+            k = k + j
+            if(count .eq. 1) then
+            offsets_connectivity(count) = k - 1
+            else
+            offsets_connectivity(count) = k - count
+            endif
+         enddo
 
-      deallocate(offsets_connectivity)
-      deallocate(elem_types)
-      ! close(PARAVIEW_IO)
+         write(PARAVIEW_IO,1041)
+         write(PARAVIEW_IO,1042)
+         
+
+         1041 format("</DataArray>")
+         1042 format("<DataArray type=""","Int64"" IdType=""1""  Name=""offsets"" format=""ascii"">")
+         
+         write(PARAVIEW_IO,*) offsets_connectivity
+
+         write(PARAVIEW_IO,1043)
+         write(PARAVIEW_IO,1044)
+
+         1043 format("</DataArray>")
+         1044 format("<DataArray type=""","UInt8"" Name=""types"" format=""ascii"">")
+
+         write(PARAVIEW_IO,*) elem_types
+
+         write(PARAVIEW_IO,1045)
+         write(PARAVIEW_IO,1046)
+         ! write(PARAVIEW_IO,1047)
+         ! write(PARAVIEW_IO,1048)
+         ! write(PARAVIEW_IO,1049)
+
+         1045 format("</DataArray>")
+         1046 format("</Cells>")
+         write(PARAVIEW_IO,*) "<PointData Scalars=""","scalars"">"
+
+         deallocate(offsets_connectivity)
+         deallocate(elem_types)
+         ! close(PARAVIEW_IO)
+      endif
    endif
 !   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
 !   if (RANK .eq. ROOT) write(*,300) end_time - start_time

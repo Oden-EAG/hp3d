@@ -151,68 +151,68 @@ subroutine PVIS_VTK(Sname,Sfile,Snick,Idx, Ic)
          call get_vis_point(vis_on_type(etype),iv-1, xi)
 !
 !     ...compute element solution
-         call soleval(mdle,xi,nedge_orient,nface_orient,norder,xnod, &
-                      zdofH,zdofE,zdofV,zdofQ,nflag,x,dxdxi,         &
-                      zsolH,zgradH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
+         ! call soleval(mdle,xi,nedge_orient,nface_orient,norder,xnod, &
+         !              zdofH,zdofE,zdofV,zdofQ,nflag,x,dxdxi,         &
+         !              zsolH,zgradH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
 !
 !     ...approximation space
-         select case(DTYPE(iattr))
+!          select case(DTYPE(iattr))
 !
 !        -- H^1 -- (FOR GRADIENT INFO)
-         case('contin')
-            isol = (iload-1)*NRHVAR + ibeg + icomp
+!          case('contin')
+!             isol = (iload-1)*NRHVAR + ibeg + icomp
 !
 !        ...REAL part
-            if (ireal == 1) then
-               val(1) = dreal_part(zgradH(isol,1))
-               val(2) = dreal_part(zgradH(isol,2))
-               val(3) = dreal_part(zgradH(isol,3))
+!             if (ireal == 1) then
+!                val(1) = dreal_part(zgradH(isol,1))
+!                val(2) = dreal_part(zgradH(isol,2))
+!                val(3) = dreal_part(zgradH(isol,3))
 !        ...IMAGINARY part
-            else
-               val(1) = dimag_part(zgradH(isol,1))
-               val(2) = dimag_part(zgradH(isol,2))
-               val(3) = dimag_part(zgradH(isol,3))
-            endif
+!             else
+!                val(1) = dimag_part(zgradH(isol,1))
+!                val(2) = dimag_part(zgradH(isol,2))
+!                val(3) = dimag_part(zgradH(isol,3))
+!             endif
 !
 !        -- H(curl) --
-         case('tangen')
-            isol = (iload-1)*NREVAR + ibeg + icomp
+!          case('tangen')
+!             isol = (iload-1)*NREVAR + ibeg + icomp
 !
 !        ...REAL part
-            if (ireal == 1) then
-               val(1) = dreal_part(zsolE(1,isol))
-               val(2) = dreal_part(zsolE(2,isol))
-               val(3) = dreal_part(zsolE(3,isol))
+!             if (ireal == 1) then
+!                val(1) = dreal_part(zsolE(1,isol))
+!                val(2) = dreal_part(zsolE(2,isol))
+!                val(3) = dreal_part(zsolE(3,isol))
 !        ...IMAGINARY part
-            else
-               val(1) = dimag_part(zsolE(1,isol))
-               val(2) = dimag_part(zsolE(2,isol))
-               val(3) = dimag_part(zsolE(3,isol))
-            endif
+!             else
+!                val(1) = dimag_part(zsolE(1,isol))
+!                val(2) = dimag_part(zsolE(2,isol))
+!                val(3) = dimag_part(zsolE(3,isol))
+!             endif
 !
 !        -- H(div) --
-         case('normal')
-            isol = (iload-1)*NRVVAR + ibeg + icomp
+!          case('normal')
+!             isol = (iload-1)*NRVVAR + ibeg + icomp
 !
 !        ...REAL part
-            if (ireal == 1) then
-               val(1) = dreal_part(zsolV(1,isol))
-               val(2) = dreal_part(zsolV(2,isol))
-               val(3) = dreal_part(zsolV(3,isol))
+!             if (ireal == 1) then
+!                val(1) = dreal_part(zsolV(1,isol))
+!                val(2) = dreal_part(zsolV(2,isol))
+!                val(3) = dreal_part(zsolV(3,isol))
 !        ...IMAGINARY part
-            else
-               val(1) = dimag_part(zsolV(1,isol))
-               val(2) = dimag_part(zsolV(2,isol))
-               val(3) = dimag_part(zsolV(3,isol))
-            endif
+!             else
+!                val(1) = dimag_part(zsolV(1,isol))
+!                val(2) = dimag_part(zsolV(2,isol))
+!                val(3) = dimag_part(zsolV(3,isol))
+!             endif
 !
-         case default
-            write(*,*) 'vector2vtk: unexpected approximation space. stop.'
-            stop
-         end select
+!          case default
+!             write(*,*) 'vector2vtk: unexpected approximation space. stop.'
+!             stop
+!          end select
 !
 !     ...add value to visualization object
-	 val(1) = real(px,8);val(2) = real(py,8);val(3) = real(pz,8)
+	      val(1) = real(px,8);val(2) = real(py,8);val(3) = real(pz,8)
          ATTR_VAL(1:3,n_vert_offset(iel)+iv) = val
 !
 !  ...end loop over vis object vertices
@@ -238,24 +238,26 @@ subroutine PVIS_VTK(Sname,Sfile,Snick,Idx, Ic)
 !..Step 4 : Write to file with HDF5
 !
 !   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-   if(VIS_FORMAT .eq. 0) then
-      if (RANK .eq. ROOT) call attr_write(Sname,len(Sname),Sfile,len(Sfile),Snick,len(Snick))
-   else
-      if(VIS_FORMAT .eq. 1) then
+   if (RANK .eq. ROOT) then
+      if(VIS_FORMAT .eq. 0) then
+         call attr_write(Sname,len(Sname),Sfile,len(Sfile),Snick,len(Snick))
+      else
+         if(VIS_FORMAT .eq. 1) then
 
-         write(PARAVIEW_IO,1202) trim(sfile(len(trim(PARAVIEW_DIR))+1:len(Sfile)-3))
-         1202  format("<DataArray type=""","Float32"" Name=""",a,""" NumberOfComponents=""3"" format=""ascii"">")
-    
-   
+            write(PARAVIEW_IO,1202) trim(sfile(len(trim(PARAVIEW_DIR))+1:len(Sfile)-3))
+            1202  format("<DataArray type=""","Float32"" Name=""",a,""" NumberOfComponents=""3"" format=""ascii"">")
+      
+      
+         endif
+
+         nV = size(ATTR_VAL,dim=2)
+         do count = 1,nV
+
+            write(PARAVIEW_IO,*) ATTR_VAL(1,count),ATTR_VAL(2,count),ATTR_VAL(3,count)
+
+         enddo
+         write(PARAVIEW_IO,*) "</DataArray>"
       endif
-
-      nV = size(ATTR_VAL,dim=2)
-      do count = 1,nV
-
-         write(PARAVIEW_IO,*) ATTR_VAL(1,count),ATTR_VAL(2,count),ATTR_VAL(3,count)
-
-      enddo
-      write(PARAVIEW_IO,*) "</DataArray>"
    endif
 !   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
 !   if (RANK .eq. ROOT) write(*,300) end_time - start_time
