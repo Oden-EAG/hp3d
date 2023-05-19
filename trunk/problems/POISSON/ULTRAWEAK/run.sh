@@ -19,6 +19,7 @@ dp=1
 #   2: smooth sin*sinh solution
 #   3: arc tan solution
 #   4: x boundary layer
+#   5: x boundary layer
 isol=0
 # - user mode
 #   interactive run    (job=0)
