@@ -1,6 +1,6 @@
 !----------------------------------------------------------------------
 !> @brief   Defines data structure arrays
-!> @date    Feb 2023
+!> @date    Mar 2023
 !----------------------------------------------------------------------
 module data_structure3D
 !
@@ -23,6 +23,7 @@ module data_structure3D
 !
 !  ...number of initial mesh elements, active elements (global,local), nodes
       integer, save :: NRELIS,NRELES,NRELES_SUBD,NRNODS
+      integer, save :: NRELES_GHOST,NRELES_INTERF
 !
 !  ...total number of active H1,H(curl),H(div),L2 dofs
       integer, save :: NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ
@@ -171,28 +172,16 @@ module data_structure3D
       integer      , allocatable, save  :: ELEM_ORDER(:)
       integer      , allocatable, save  :: ELEM_SUBD(:)
 !
+!  ...all elements sharing nodes with subdomain (including ELEM_SUBD)
+      integer      , allocatable, save  :: ELEM_GHOST(:)
+!
+!  ...all elements touching the interface of subdomain
+!     (includes one layer of ELEM_SUBD but not all)
+      integer      , allocatable, save  :: ELEM_INTERF(:)
+!
 !-----------------------------------------------------------------------
 !
       contains
-!
-!-----------------------------------------------------------------------
-!
-      subroutine update_ELEM_ORDER
-         integer :: iel,mdle
-         if (allocated(ELEM_ORDER)) deallocate(ELEM_ORDER)
-         if (allocated(ELEM_SUBD))  deallocate(ELEM_SUBD)
-         allocate(ELEM_ORDER(NRELES))
-         allocate(ELEM_SUBD(NRELES))
-         mdle = 0; NRELES_SUBD = 0
-         do iel=1,NRELES
-            call nelcon(mdle, mdle)
-            ELEM_ORDER(iel) = mdle
-            if (NODES(mdle)%subd .eq. RANK) then
-               NRELES_SUBD = NRELES_SUBD + 1
-               ELEM_SUBD(NRELES_SUBD) = mdle
-            endif
-         enddo
-      end subroutine update_ELEM_ORDER
 !
 !-----------------------------------------------------------------------
 !

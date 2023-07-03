@@ -306,7 +306,7 @@ subroutine collect_dofs()
                write(6,1000) '[', RANK, ']: ', &
                   'Sending data to [',ROOT,'], nod = ',nod
             endif
-            count = nrdof_nod; dest = ROOT; tag = nod
+            count = nrdof_nod; dest = ROOT; tag = mod(nod,200000)
             call MPI_SEND(buf,count,MPI_VTYPE,dest,tag,MPI_COMM_WORLD,ierr)
 !     ...3d. if new subdomain is my subdomain, receive data
          else if (RANK .eq. ROOT) then
@@ -315,7 +315,7 @@ subroutine collect_dofs()
                write(6,1000) '[', RANK, ']: ',   &
                   'Receiving data from [',subd,'], nod = ',nod
             endif
-            count = nrdof_nod; src = subd; tag = nod
+            count = nrdof_nod; src = subd; tag = mod(nod,200000)
             call MPI_RECV(buf,count,MPI_VTYPE,src,tag,MPI_COMM_WORLD,stat,ierr)
 !        ...3f. unpack DOF data from buffer
             call alloc_nod_dof(nod)

@@ -42,7 +42,7 @@ module par_mesh
 subroutine distr_mesh()
 !
 !..MPI variables
-   integer :: ierr
+   integer :: ierr, base, remainder
    integer :: tag, count, src, dest
    VTYPE, allocatable :: buf(:)
 !
@@ -62,15 +62,27 @@ subroutine distr_mesh()
    100 format(A,L2)
 #endif
 !
+   if (NUM_PROCS.eq.1) return
+!
 !..1. Determine new partition
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    if ((ZOLTAN_LB .eq. 0) .or. (.not. DISTRIBUTED)) then
-      subd_size = (NRELES+NUM_PROCS-1)/NUM_PROCS
-      iproc=0
-      do iel=1,NRELES
-!     ...decide subdomain for iel
-         subd_next(iel) = iproc
-         iproc = iel/subd_size
+!
+      base = NRELES/NUM_PROCS
+      remainder = mod(NRELES,NUM_PROCS)
+!
+!  ...element offset
+      iel=0
+!
+!  ...first remainder procs get base+1, rest get base
+      do iproc = 0,NUM_PROCS-1
+         if (iproc .lt. remainder) then
+            subd_size = base + 1
+         else
+            subd_size = base
+         endif
+         subd_next(iel+1:iel+subd_size) = iproc
+         iel = iel + subd_size
       enddo
    elseif (ZOLTAN_LB .eq. 7) then
       if (RANK .eq. ROOT) write(*,*) 'calling (re-)partition_fiber...'
@@ -123,7 +135,7 @@ subroutine distr_mesh()
                   'Sending data to [',subd_next(iel),'], nod = ',nod
             endif
 #endif
-            count = nrdof_nod; dest = subd_next(iel); tag = nod
+            count = nrdof_nod; dest = subd_next(iel); tag = mod(nod,200000)
             call MPI_SEND(buf,count,MPI_VTYPE,dest,tag,MPI_COMM_WORLD,ierr)
             if (ierr .ne. MPI_SUCCESS) then
                write(6,*) 'MPI_SEND failed. stop.'
@@ -138,7 +150,7 @@ subroutine distr_mesh()
                   'Receiving data from [',subd,'], nod = ',nod
             endif
 #endif
-            count = nrdof_nod; src = subd; tag = nod
+            count = nrdof_nod; src = subd; tag = mod(nod,200000)
             call MPI_RECV(buf,count,MPI_VTYPE,src,tag,MPI_COMM_WORLD,MPI_STATUS_IGNORE,ierr)
             if (ierr .ne. MPI_SUCCESS) then
                write(6,*) 'MPI_RECV failed. stop.'
@@ -214,6 +226,31 @@ subroutine distr_mesh()
 #endif
 !
 end subroutine distr_mesh
+!
+!----------------------------------------------------------------------
+!     routine:    update_ELEM_ORDER
+!     purpose:    updates global and subdomain lists of mesh elements
+!----------------------------------------------------------------------
+      subroutine update_ELEM_ORDER
+         integer :: iel,mdle
+         if (allocated(ELEM_ORDER)) deallocate(ELEM_ORDER)
+         if (allocated(ELEM_SUBD))  deallocate(ELEM_SUBD)
+         allocate(ELEM_ORDER(NRELES))
+         allocate(ELEM_SUBD(NRELES))
+         mdle = 0; NRELES_SUBD = 0
+         do iel=1,NRELES
+            call nelcon(mdle, mdle)
+            ELEM_ORDER(iel) = mdle
+            if (NODES(mdle)%subd .eq. RANK) then
+               NRELES_SUBD = NRELES_SUBD + 1
+               ELEM_SUBD(NRELES_SUBD) = mdle
+            endif
+         enddo
+         if (.not. DISTRIBUTED) then
+            ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
+            NRELES_SUBD = NRELES
+         endif
+      end subroutine update_ELEM_ORDER
 !
 !----------------------------------------------------------------------
 !     routine:    get_elem_nodes
