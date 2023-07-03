@@ -140,7 +140,8 @@ MK_ALL_HP3D_OBJS := $(MK_COMMON_OBJS) \
 # Introduce ranlib flag to suppress warnings on Mac OS
 ARFLAG :=
 ifeq ($(shell uname -s),Darwin)
-	ARFLAG += -no_warning_for_no_symbols
+ARFLAG += -no_warning_for_no_symbols
+CCDEFS += -D"HP3D_USE_UNIX_DARWIN=1"
 endif
 
 #-------------------------------------------------
