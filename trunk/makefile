@@ -196,7 +196,7 @@ else
 	@echo "Compiling Poisson DPG Primal..."
 	@(cd problems/POISSON/PRIMAL_DPG      ; $(MAKE) ; cd ../..);
 	@echo "Compiling Poisson DPG Ultraweak..."
-	@(cd problems/POISSON/ULTRAWEAK      ; $(MAKE) ; cd ../..);
+	@(cd problems/POISSON/ULTRAWEAK_DPG   ; $(MAKE) ; cd ../..);
 	@echo "Compiling Vector Poisson Galerkin..."
 	@(cd problems/VECTOR_POISSON/GALERKIN ; $(MAKE) ; cd ../..);
 	@echo "Compiling Sheathed Hose application..."
