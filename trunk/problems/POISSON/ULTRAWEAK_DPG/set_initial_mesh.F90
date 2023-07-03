@@ -33,14 +33,14 @@
    integer, dimension(6,NRINDEX) :: ibc
 !..miscellaneous
    integer :: i,ifc,iel,neig
-!..0 for cube with dirichlet boundary condition,
-!..1 for fischera corner (make sure to change default file-geometry in common/set_enviroment.F90)
+!..0 for cube with Dirichlet boundary condition,
+!..1 for Fichera corner (make sure to change default file-geometry in common/set_enviroment.F90)
 !..2 for the cube but arc tan test case
    integer :: geomtype 
 !
 !------------------------------------------------------------------------------------
 !
-!setting the parameter for choosing Bc associated with a given geometry.   
+!  setting the parameter for choosing BC associated with a given geometry
    geomtype = 0
 !..check if have not exceeded the maximum order
    if (IP.gt.MAXP) then
@@ -100,7 +100,7 @@
                ibc(5,2) = 1
                ibc(6,1) = 1
 
-            else if (geomtype .eq. 1) then ! Fischera Croner boundary conditions (Neuman conditions as Dirichlet for normal flux)
+            else if (geomtype .eq. 1) then ! Fichera Corner BCs (Dirichlet BC for normal flux)
                if(iel .eq. 4) then
                   do ifc=1,nface(ELEMS(iel)%etype)
                      neig = ELEMS(iel)%neig(ifc)
