@@ -42,7 +42,7 @@
       ntype = NODES(Mdle)%ntype
 !
 !  ...number of (local) nodes for the element (- middle node)
-      nrnodl = Nvert(ntype)+Nedge(ntype)+Nface(ntype)
+      nrnodl = NVERT(ntype)+NEDGE(ntype)+NFACE(ntype)
 !
 !  ...loop through element constrained nodes
       do j=1,nrnodl

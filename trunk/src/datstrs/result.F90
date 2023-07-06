@@ -4,7 +4,7 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - June 2021
+!   latest revision    - Jul 2023
 !
 !   purpose            - (interactive) routine prints content
 !                        of data structure arrays
@@ -101,24 +101,24 @@ subroutine result
                       ' BC FLAGS = ',i6)
             enddo
          enddo
-         nb=0 ; ne=nvert(ELEMS(nel)%etype)
+         nb=0 ; ne=NVERT(ELEMS(nel)%etype)
          write(*,7004) ELEMS(nel)%nodes(nb+1:ne)
  7004    format(' VERTEX NODES = ',8i10)
-         nb=ne; ne=nb+nedge(ELEMS(nel)%etype)
+         nb=ne; ne=nb+NEDGE(ELEMS(nel)%etype)
          write(*,7005) ELEMS(nel)%nodes(nb+1:ne)
  7005    format(' EDGE NODES = ',12i10)
-         nb=ne; ne=nb+nface(ELEMS(nel)%etype)
+         nb=ne; ne=nb+NFACE(ELEMS(nel)%etype)
          write(*,7006) ELEMS(nel)%nodes(nb+1:ne)
  7006    format(' FACE NODES = ',12i10)
          write(*,7007) ELEMS(nel)%nodes(ne+1)
  7007    format(' MIDDLE NODE = ',i10)
          call decodg(ELEMS(nel)%edge_orient,2,12, nedge_orient)
-         write(*,7008) nedge_orient(1:nedge(ELEMS(nel)%etype))
+         write(*,7008) nedge_orient(1:NEDGE(ELEMS(nel)%etype))
  7008    format(' EDGE ORIENTATIONS DECODED = ',12i2)
          call decodg(ELEMS(nel)%face_orient,8,6, Nface_orient)
-         write(*,7009) nface_orient(1:nface(ELEMS(nel)%etype))
+         write(*,7009) nface_orient(1:NFACE(ELEMS(nel)%etype))
  7009    format(' FACE ORIENTATIONS DECODED = ',6i2)
-         write(*,7010) ELEMS(nel)%neig(1:nface(ELEMS(nel)%etype))
+         write(*,7010) ELEMS(nel)%neig(1:NFACE(ELEMS(nel)%etype))
  7010    format(' FACE NEIGHBORS = ',6i10)
          write(*,7011) ELEMS(nel)%GMPblock
  7011    format(' GMP BLOCK = ',6i10)
@@ -160,17 +160,17 @@ subroutine result
                ntype = NODES(nod)%ntype
 !
                ibegin = 1
-               iend   = nvert(ntype)
+               iend   = NVERT(ntype)
                write(*,7100) nodesl  (ibegin: iend)
                write(*,7200) norientl(ibegin: iend)
 !
                ibegin = iend + 1
-               iend   = iend + nedge(ntype)
+               iend   = iend + NEDGE(ntype)
                write(*,7110) nodesl  (ibegin: iend)
                write(*,7210) norientl(ibegin: iend)
 !
                ibegin = iend + 1
-               iend   = iend + nface(ntype)
+               iend   = iend + NFACE(ntype)
                write(*,7120) nodesl  (ibegin: iend)
                write(*,7220) norientl(ibegin: iend)
          end select

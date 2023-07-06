@@ -22,14 +22,14 @@ subroutine initialize
    integer, parameter :: MANDIM_PROB  = 3    ! Manifold dimension
                                              ! EXPECTED MAX NUMBER OF:
    integer, parameter :: MAXSU_PROB   = 1    ! surfaces
-   integer, parameter :: MAXNP_PROB   = 32768! points
-   integer, parameter :: MAXNC_PROB   = 49152! curves
-   integer, parameter :: MAXTR_PROB   = 1    ! triangles
-   integer, parameter :: MAXRE_PROB   = 24576! rectangles
-   integer, parameter :: MAXBT_PROB   = 1    ! prisms
-   integer, parameter :: MAXHE_PROB   = 4096 ! hexas
-   integer, parameter :: MAXTE_PROB   = 1    ! tetras
-   integer, parameter :: MAXPY_PROB   = 1    ! pyramids
+   integer, parameter :: MAXNP_PROB   = 1000 ! points
+   integer, parameter :: MAXNC_PROB   = 1000 ! curves
+   integer, parameter :: MAXTR_PROB   = 100  ! triangles
+   integer, parameter :: MAXRE_PROB   = 100  ! rectangles
+   integer, parameter :: MAXBT_PROB   = 10   ! prisms
+   integer, parameter :: MAXHE_PROB   = 10   ! hexas
+   integer, parameter :: MAXTE_PROB   = 10   ! tetras
+   integer, parameter :: MAXPY_PROB   = 10   ! pyramids
 !--------------------------------------------------------------------------
 !  E Q U A T I O N    S E T T I N G
    integer, parameter :: NRCOMS_PROB  = 1     ! number of component
@@ -83,6 +83,7 @@ subroutine initialize
        MAXBT_PROB, MAXHE_PROB, MAXTE_PROB, MAXPY_PROB)
 !
 !..read geometry
+   write(*,*) 'initialize: FILE_GEOM = ',FILE_GEOM
    call read_geometry(trim(FILE_GEOM))
 !
 !..generate mesh and read physics file

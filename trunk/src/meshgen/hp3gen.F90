@@ -802,6 +802,7 @@ x(1:NDIMEN) = 0.d0
    endif
 #endif
 !
+   call result
    call update_gdof
 !
 #if DEBUG_MODE

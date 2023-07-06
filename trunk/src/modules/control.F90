@@ -33,6 +33,7 @@ module control
    integer, parameter :: COMPACT_        =  3
    integer, parameter :: RECONSTRUCT_    =  4
    integer, parameter :: NETGEN_         =  5
+   integer, parameter :: LAGRANGE_       =  6
 !
 !..geometry tolerance
    real(8)            :: GEOM_TOL
@@ -155,6 +156,8 @@ contains
             if (.not. QUIET_MODE) write(*,*)'RECONSTRUCTION FORMAT'
          case(NETGEN_)
             if (.not. QUIET_MODE) write(*,*)'NETGEN FORMAT'
+         case(LAGRANGE_)
+            if (.not. QUIET_MODE) write(*,*)'LAGRANGE FORMAT'
          case default
             write(*,*)'invalid value for INPUT_FILE!'
             stop

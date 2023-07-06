@@ -32,9 +32,9 @@ subroutine set_environment
 !         option label // explanation // default value // parameter
    call get_option_string  &
         ('-file-control'   ,'Control file'             ,'./control/control'         ,FILE_CONTROL)
-
+!
    call get_option_string  &
-        ('-file-geometry'  ,'Geometry file'            ,'./geometries/hexa_orient0' ,FILE_GEOM)
+        ('-file-geometry'  ,'Geometry file'            ,'./geometries/hybrid_mesh_LAGR' ,FILE_GEOM)
 !
    call get_option_string  &
         ('-file-phys'      ,'Physics file'             ,'./input/physics'           ,FILE_PHYS)

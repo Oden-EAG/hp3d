@@ -21,6 +21,7 @@ subroutine read_geometry(Fp)
 !     case(COMPACT_)       ; call input_GMPdata    (Fp)
 !     case(RECONSTRUCT_)   ; call input_reconstruct(Fp)
 !     case(NETGEN_)        ; call input_NETGEN     (Fp)
+      case(LAGRANGE_)      ; call input_LAGRANGE   (Fp)
       case default
          write(*,*) 'read_geometry: INPUT_FILE'; stop
    end select
