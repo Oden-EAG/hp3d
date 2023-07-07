@@ -55,10 +55,10 @@
 !..set physics
       ELEMS(iel)%nrphysics = 4
       allocate(ELEMS(iel)%physics(4))
-      ELEMS(iel)%physics(1) ='trace_a'
-      ELEMS(iel)%physics(2) ='trace_b'
+      ELEMS(iel)%physics(1) ='trc_a'
+      ELEMS(iel)%physics(2) ='trc_b'
       ELEMS(iel)%physics(3) ='field'
-      ELEMS(iel)%physics(4) ='grad'
+      ELEMS(iel)%physics(4) ='gradu'
       
 !..set order of approximation
       if (IP.gt.0) then
@@ -84,22 +84,25 @@
 !..uniform BC
          case(BC_DIRICHLET)
 !..if exterior face, set boundary condition to IBC_PROB
-            if(geomtype .eq. 0) then  !all external faces have dirichlet boundary condition on H1 trace
+            if(geomtype .eq. 0) then
+            ! all external faces have Dirichlet BC on H1 trace
                do ifc=1,nface(ELEMS(iel)%etype)
                neig = ELEMS(iel)%neig(ifc)
                   select case(neig)
                      case(0); ibc(ifc,1) = 1 ! Dirichlet BC (H1 trace variable)
                   end select
                enddo
-
-            else if (geomtype .eq. 2) then ! three faces on co-ordinate planes have H1 trace dirichlet BC and other Three have H-div trace dirichlet BC
+!
+            else if (geomtype .eq. 2) then
+            ! three faces on co-ordinate planes have H1 trace Dirichlet BC
+            ! and the other three have H-div trace Dirichlet BC
                ibc(1,1) = 1
                ibc(2,2) = 1
                ibc(3,1) = 1
                ibc(4,2) = 1
                ibc(5,2) = 1
                ibc(6,1) = 1
-
+!
             else if (geomtype .eq. 1) then ! Fichera Corner BCs (Dirichlet BC for normal flux)
                if(iel .eq. 4) then
                   do ifc=1,nface(ELEMS(iel)%etype)
