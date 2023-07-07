@@ -119,33 +119,33 @@ end subroutine elem
 !              NrdofS   - number of L2 trial dof for sigma  = grad u (Dimension X NrdofQ)
 !              NrdofVi_a- number of H1 trial interface dof
 !              NrdofVi_b- number of H(div) trial interface dof
-!              MdU      - num rows of AlocUU,AlocUS,AlocUVi_a,AlocUVi_b
-!              MdS      - num rows of AlocSU,AlocSS,AlocSVi_a,AlocSVi_b
-!              MdVi_a   - num rows of AlocVi_aU,AlocVi_aS,AlocVi_aa,Aloc_Viab
-!              MdVi_b   - num rows of AlocVi_bU,AlocVi_bS,AlocVi_ba,Aloc_Vibb
+!              MdQ1      - num rows of AlocQ1Q1,AlocQ1Q2,AlocQ1H,AlocQ1V
+!              MdQ2      - num rows of AlocQ2Q1,AlocQ2Q2,AlocQ2H,AlocQ2V
+!              MdH   - num rows of AlocHQ1,AlocHQ2,AlocHH,AlocHV
+!              MdV   - num rows of AlocVQ1,AlocVSQ2,AlocVH,AlocVV
 !
 !        out:
-!              BlocU
+!              BlocQ1
+!              BlocQ2
+!              BlocH - load vectors
 !              BlocV
-!              BlocVi_a - load vectors
-!              BlocVi_b
 !
-!              AlocUU
-!              AlocUS
-!              AlocUVi_a
-!              AlocUVi_b
-!              AlocSU
-!              AlocSS
-!              AlocSVi_a
-!              AlocSVi_b
-!              AlocVi_aU
-!              AlocVi_aS   - stiffness matrices
-!              AlocVi_aa
-!              AlocVi_ab
-!              AlocVi_bU
-!              AlocVi_bS
-!              AlocVi_ba
-!              AlocVi_bb
+!              AlocQ1Q1
+!              AlocQ1Q2
+!              AlocQ1H
+!              AlocQ1V
+!              AlocQ2Q1
+!              AlocQ2Q2
+!              AlocQ2H
+!              AlocQ2V
+!              AlocHQ1
+!              AlocHQ2   - stiffness matrices
+!              AlocHH
+!              AlocHV
+!              AlocVQ1
+!              AlocVQ2
+!              AlocVH
+!              AlocVV
 !
 !-------------------------------------------------------------------------
 !
@@ -154,11 +154,11 @@ subroutine elem_poisson_UW(Mdle,                                             &
                            NrdofHH,NrdofVV,NrdofH,NrdofQ,                    &
                            NrdofU,NrdofS,                                    &
                            NrdofVi_a,NrdofVi_b,                              &
-                           MdVi_a,MdVi_b,MdU,MdS,                            &
-                           BlocVi_a,AlocVi_aa,AlocVi_ab,AlocVi_aU,AlocVi_aS, &
-                           BlocVi_b,AlocVi_ba,AlocVi_bb,AlocVi_bU,AlocVi_bS, & 
-                           BlocU,AlocUVi_a,AlocUVi_b,AlocUU,AlocUS,          &
-                           BlocS,AlocSVi_a,AlocSVi_b,AlocSU,AlocSS)
+                           MdH,MdV,MdQ1,MdQ2,                            &
+                           BlocH,AlocHH,AlocHV,AlocHQ1,AlocHQ2, &
+                           BlocV,AlocVH,AlocVV,AlocVQ1,AlocVQ2, & 
+                           BlocQ1,AlocQ1H,AlocQ1V,AlocQ1Q1,AlocQ1Q2,          &
+                           BlocQ2,AlocQ2H,AlocQ2V,AlocQ2Q1,AlocQ2Q2)
 !
 !..ALOC: holds local element stiffness matrices
 !..BLOC: holds local element load vectors
@@ -182,34 +182,34 @@ subroutine elem_poisson_UW(Mdle,                                             &
    integer,                          intent(in)  :: NrdofS
    integer,                          intent(in)  :: NrdofVi_a
    integer,                          intent(in)  :: NrdofVi_b
-   integer,                          intent(in)  :: MdU
-   integer,                          intent(in)  :: MdS
-   integer,                          intent(in)  :: MdVi_a
-   integer,                          intent(in)  :: MdVi_b
+   integer,                          intent(in)  :: MdQ1
+   integer,                          intent(in)  :: MdQ2
+   integer,                          intent(in)  :: MdH
+   integer,                          intent(in)  :: MdV
 !
-   real(8), dimension(MdU),          intent(out) :: BlocU
-   real(8), dimension(MdU,MdU),      intent(out) :: AlocUU
-   real(8), dimension(MdU,MdS),      intent(out) :: AlocUS
-   real(8), dimension(MdU,MdVi_a),   intent(out) :: AlocUVi_a
-   real(8), dimension(MdU,MdVi_b),   intent(out) :: AlocUVi_b
+   real(8), dimension(MdQ1),          intent(out) :: BlocQ1
+   real(8), dimension(MdQ1,MdQ1),      intent(out) :: AlocQ1Q1
+   real(8), dimension(MdQ1,MdQ2),      intent(out) :: AlocQ1Q2
+   real(8), dimension(MdQ1,MdH),   intent(out) :: AlocQ1H
+   real(8), dimension(MdQ1,MdV),   intent(out) :: AlocQ1V
 !
-   real(8), dimension(MdS),          intent(out) :: BlocS
-   real(8), dimension(MdS,MdU),      intent(out) :: AlocSU
-   real(8), dimension(MdS,MdS),      intent(out) :: AlocSS
-   real(8), dimension(MdS,MdVi_a),   intent(out) :: AlocSVi_a
-   real(8), dimension(MdS,MdVi_b),   intent(out) :: AlocSVi_b
+   real(8), dimension(MdQ2),          intent(out) :: BlocQ2
+   real(8), dimension(MdQ2,MdQ1),      intent(out) :: AlocQ2Q1
+   real(8), dimension(MdQ2,MdQ2),      intent(out) :: AlocQ2Q2
+   real(8), dimension(MdQ2,MdH),   intent(out) :: AlocQ2H
+   real(8), dimension(MdQ2,MdV),   intent(out) :: AlocQ2V
 !
-   real(8), dimension(MdVi_a),       intent(out) :: BlocVi_a
-   real(8), dimension(MdVi_a,MdU),   intent(out) :: AlocVi_aU
-   real(8), dimension(MdVi_a,MdS),   intent(out) :: AlocVi_aS
-   real(8), dimension(MdVi_a,MdVi_a),intent(out) :: AlocVi_aa
-   real(8), dimension(MdVi_a,MdVi_b),intent(out) :: AlocVi_ab
+   real(8), dimension(MdH),       intent(out) :: BlocH
+   real(8), dimension(MdH,MdQ1),   intent(out) :: AlocHQ1
+   real(8), dimension(MdH,MdQ2),   intent(out) :: AlocHQ2
+   real(8), dimension(MdH,MdH),intent(out) :: AlocHH
+   real(8), dimension(MdH,MdV),intent(out) :: AlocHV
 !
-   real(8), dimension(MdVi_b),       intent(out) :: BlocVi_b
-   real(8), dimension(MdVi_b,MdU),   intent(out) :: AlocVi_bU
-   real(8), dimension(MdVi_b,MdS),   intent(out) :: AlocVi_bS
-   real(8), dimension(MdVi_b,MdVi_a),intent(out) :: AlocVi_ba
-   real(8), dimension(MdVi_b,MdVi_b),intent(out) :: AlocVi_bb
+   real(8), dimension(MdV),       intent(out) :: BlocV
+   real(8), dimension(MdV,MdQ1),   intent(out) :: AlocVQ1
+   real(8), dimension(MdV,MdQ2),   intent(out) :: AlocVQ2
+   real(8), dimension(MdV,MdH),intent(out) :: AlocVH
+   real(8), dimension(MdV,MdV),intent(out) :: AlocVV
 !
 !-------------------------------------------------------------------------
 !
@@ -325,10 +325,10 @@ subroutine elem_poisson_UW(Mdle,                                             &
    call nodcor(Mdle, xnod)
 !
 !..clear space for stiffness matrix and load vector:
-   BlocU = ZERO; AlocUU = ZERO; AlocUS = ZERO; AlocUVi_a = ZERO; AlocUVi_b = ZERO
-   BlocS = ZERO; AlocSU = ZERO; AlocSS = ZERO; AlocSVi_a = ZERO; AlocSVi_b = ZERO
-   BlocVi_a = ZERO; AlocVi_aU = ZERO; AlocVi_aS = ZERO; AlocVi_aa = ZERO; AlocVi_ab = ZERO
-   BlocVi_b = ZERO; AlocVi_bU = ZERO; AlocVi_bS = ZERO; AlocVi_ba = ZERO; AlocVi_bb = ZERO
+   BlocQ1 = ZERO; AlocQ1Q1  = ZERO; AlocQ1Q2  = ZERO; AlocQ1H   = ZERO; AlocQ1V   = ZERO
+   BlocQ2 = ZERO; AlocQ2Q1  = ZERO; AlocQ2Q2  = ZERO; AlocQ2H   = ZERO; AlocQ2V   = ZERO
+   BlocH  = ZERO; AlocHQ1   = ZERO; AlocHQ2   = ZERO; AlocHH    = ZERO; AlocHV    = ZERO
+   BlocV  = ZERO; AlocVQ1   = ZERO; AlocVQ2   = ZERO; AlocVH    = ZERO; AlocVV    = ZERO
 !
 !..clear space for auxiliary matrices
    bload_H   = ZERO
@@ -629,30 +629,30 @@ subroutine elem_poisson_UW(Mdle,                                             &
    enddo
 !
 !  Fill the Aloc and Bloc matrices
-   BlocVi_a(1:j1) = raloc(1:j1,j1+j2+j3+j4+1)
-   BlocVi_b(1:j2) = raloc(j1+1:j1+j2,j1+j2+j3+j4+1)
-   BlocU(1:j3) = raloc(j1+j2+1:j1+j2+j3,j1+j2+j3+j4+1)
-   BlocS(1:j4) = raloc(j1+j2+j3+1:j1+j2+j3+j4,j1+j2+j3+j4+1)
+   BlocH(1:j1) = raloc(1:j1,j1+j2+j3+j4+1)
+   BlocV(1:j2) = raloc(j1+1:j1+j2,j1+j2+j3+j4+1)
+   BlocQ1(1:j3) = raloc(j1+j2+1:j1+j2+j3,j1+j2+j3+j4+1)
+   BlocQ2(1:j4) = raloc(j1+j2+j3+1:j1+j2+j3+j4,j1+j2+j3+j4+1)
 !
-   AlocVi_aa(1:j1,1:j1) = raloc(1:j1,1:j1)
-   AlocVi_ab(1:j1,1:j2) = raloc(1:j1,j1+1:j1+j2)
-   AlocVi_aU(1:j1,1:j3) = raloc(1:j1,j1+j2+1:j1+j2+j3)
-   AlocVi_aS(1:j1,1:j4) = raloc(1:j1,j1+j2+j3+1:j1+j2+j3+j4)
+   AlocHH(1:j1,1:j1)   = raloc(1:j1,1:j1)
+   AlocHV(1:j1,1:j2)   = raloc(1:j1,j1+1:j1+j2)
+   AlocHQ1(1:j1,1:j3)  = raloc(1:j1,j1+j2+1:j1+j2+j3)
+   AlocHQ2(1:j1,1:j4)  = raloc(1:j1,j1+j2+j3+1:j1+j2+j3+j4)
 !  
-   AlocVi_ba(1:j2,1:j1) = raloc(j1+1:j1+j2,1:j1)
-   AlocVi_bb(1:j2,1:j2) = raloc(j1+1:j1+j2,j1+1:j1+j2)
-   AlocVi_bU(1:j2,1:j3) = raloc(j1+1:j1+j2,j1+j2+1:j1+j2+j3)
-   AlocVi_bS(1:j2,1:j4) = raloc(j1+1:j1+j2,j1+j2+j3+1:j1+j2+j3+j4)
+   AlocVH(1:j2,1:j1)   = raloc(j1+1:j1+j2,1:j1)
+   AlocVV(1:j2,1:j2)   = raloc(j1+1:j1+j2,j1+1:j1+j2)
+   AlocVQ1(1:j2,1:j3)  = raloc(j1+1:j1+j2,j1+j2+1:j1+j2+j3)
+   AlocVQ2(1:j2,1:j4)  = raloc(j1+1:j1+j2,j1+j2+j3+1:j1+j2+j3+j4)
 !
-   AlocUVi_a(1:j3,1:j1) = raloc(j1+j2+1:j1+j2+j3,1:j1)
-   AlocUVi_b(1:j3,1:j2) = raloc(j1+j2+1:j1+j2+j3,j1+1:j1+j2)
-   AlocUU(1:j3,1:j3) =    raloc(j1+j2+1:j1+j2+j3,j1+j2+1:j1+j2+j3)
-   AlocUS(1:j3,1:j4) =    raloc(j1+j2+1:j1+j2+j3,j1+j2+j3+1:j1+j2+j3+j4)
+   AlocQ1H(1:j3,1:j1)  = raloc(j1+j2+1:j1+j2+j3,1:j1)
+   AlocQ1V(1:j3,1:j2)  = raloc(j1+j2+1:j1+j2+j3,j1+1:j1+j2)
+   AlocQ1Q1(1:j3,1:j3) = raloc(j1+j2+1:j1+j2+j3,j1+j2+1:j1+j2+j3)
+   AlocQ1Q2(1:j3,1:j4) = raloc(j1+j2+1:j1+j2+j3,j1+j2+j3+1:j1+j2+j3+j4)
 !
-   AlocSVi_a(1:j4,1:j1) = raloc(j1+j2+j3+1:j1+j2+j3+j4,1:j1)
-   AlocSVi_b(1:j4,1:j2) = raloc(j1+j2+j3+1:j1+j2+j3+j4,j1+1:j1+j2)
-   AlocSU(1:j4,1:j3) =    raloc(j1+j2+j3+1:j1+j2+j3+j4,j1+j2+1:j1+j2+j3)
-   AlocSS(1:j4,1:j4) =    raloc(j1+j2+j3+1:j1+j2+j3+j4,j1+j2+j3+1:j1+j2+j3+j4)
+   AlocQ2H(1:j4,1:j1)  = raloc(j1+j2+j3+1:j1+j2+j3+j4,1:j1)
+   AlocQ2V(1:j4,1:j2)  = raloc(j1+j2+j3+1:j1+j2+j3+j4,j1+1:j1+j2)
+   AlocQ2Q1(1:j4,1:j3) = raloc(j1+j2+j3+1:j1+j2+j3+j4,j1+j2+1:j1+j2+j3)
+   AlocQ2Q2(1:j4,1:j4) = raloc(j1+j2+j3+1:j1+j2+j3+j4,j1+j2+j3+1:j1+j2+j3+j4)
 !
    deallocate(raloc)
 !
