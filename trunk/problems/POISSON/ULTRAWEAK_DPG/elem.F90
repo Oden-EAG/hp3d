@@ -86,12 +86,12 @@ subroutine elem(Mdle, Itest,Itrial)
    nrTrial = nrdofQ + 3 * nrdofQ + nrdofVi_a + nrdofVi_b
 !
 !..call element integration routine
-   call elem_poisson_UW(Mdle,nrTest,nrTrial,                                                             &
-            nrdofHH,nrdofVV,nrdofH,nrdofQ,nrdofQ,3*nrdofQ,nrdofVi_a,nrdofVi_b,                           &
-            BLOC(1)%nrow,BLOC(2)%nrow,BLOC(3)%nrow,BLOC(4)%nrow,                                         &
-            BLOC(1)%array,ALOC(1,1)%array,ALOC(1,2)%array,ALOC(1,3)%array,ALOC(1,4)%array,               &
-            BLOC(2)%array,ALOC(2,1)%array,ALOC(2,2)%array,ALOC(2,3)%array,ALOC(2,4)%array,               &
-            BLOC(3)%array,ALOC(3,1)%array,ALOC(3,2)%array,ALOC(3,3)%array,ALOC(3,4)%array,               &
+   call elem_poisson_UW(Mdle,nrTest,nrTrial,                                                 &
+            nrdofHH,nrdofVV,nrdofH,nrdofQ,nrdofQ,3*nrdofQ,nrdofVi_a,nrdofVi_b,               &
+            BLOC(1)%nrow,BLOC(2)%nrow,BLOC(3)%nrow,BLOC(4)%nrow,                             &
+            BLOC(1)%array,ALOC(1,1)%array,ALOC(1,2)%array,ALOC(1,3)%array,ALOC(1,4)%array,   &
+            BLOC(2)%array,ALOC(2,1)%array,ALOC(2,2)%array,ALOC(2,3)%array,ALOC(2,4)%array,   &
+            BLOC(3)%array,ALOC(3,1)%array,ALOC(3,2)%array,ALOC(3,3)%array,ALOC(3,4)%array,   &
             BLOC(4)%array,ALOC(4,1)%array,ALOC(4,2)%array,ALOC(4,3)%array,ALOC(4,4)%array)
 !     
 end subroutine elem
@@ -119,15 +119,15 @@ end subroutine elem
 !              NrdofS   - number of L2 trial dof for sigma  = grad u (Dimension X NrdofQ)
 !              NrdofVi_a- number of H1 trial interface dof
 !              NrdofVi_b- number of H(div) trial interface dof
-!              MdQ1      - num rows of AlocQ1Q1,AlocQ1Q2,AlocQ1H,AlocQ1V
-!              MdQ2      - num rows of AlocQ2Q1,AlocQ2Q2,AlocQ2H,AlocQ2V
-!              MdH   - num rows of AlocHQ1,AlocHQ2,AlocHH,AlocHV
-!              MdV   - num rows of AlocVQ1,AlocVSQ2,AlocVH,AlocVV
+!              MdQ1     - num rows of AlocQ1Q1,AlocQ1Q2,AlocQ1H,AlocQ1V
+!              MdQ2     - num rows of AlocQ2Q1,AlocQ2Q2,AlocQ2H,AlocQ2V
+!              MdH      - num rows of AlocHQ1,AlocHQ2,AlocHH,AlocHV
+!              MdV      - num rows of AlocVQ1,AlocVSQ2,AlocVH,AlocVV
 !
 !        out:
 !              BlocQ1
 !              BlocQ2
-!              BlocH - load vectors
+!              BlocH    - load vectors
 !              BlocV
 !
 !              AlocQ1Q1
@@ -139,7 +139,7 @@ end subroutine elem
 !              AlocQ2H
 !              AlocQ2V
 !              AlocHQ1
-!              AlocHQ2   - stiffness matrices
+!              AlocHQ2  - stiffness matrices
 !              AlocHH
 !              AlocHV
 !              AlocVQ1
@@ -149,15 +149,15 @@ end subroutine elem
 !
 !-------------------------------------------------------------------------
 !
-subroutine elem_poisson_UW(Mdle,                                             &
-                           NrTest,NrTrial,                                   &
-                           NrdofHH,NrdofVV,NrdofH,NrdofQ,                    &
-                           NrdofU,NrdofS,                                    &
-                           NrdofVi_a,NrdofVi_b,                              &
-                           MdH,MdV,MdQ1,MdQ2,                            &
-                           BlocH,AlocHH,AlocHV,AlocHQ1,AlocHQ2, &
-                           BlocV,AlocVH,AlocVV,AlocVQ1,AlocVQ2, & 
-                           BlocQ1,AlocQ1H,AlocQ1V,AlocQ1Q1,AlocQ1Q2,          &
+subroutine elem_poisson_UW(Mdle,                                        &
+                           NrTest,NrTrial,                              &
+                           NrdofHH,NrdofVV,NrdofH,NrdofQ,               &
+                           NrdofU,NrdofS,                               &
+                           NrdofVi_a,NrdofVi_b,                         &
+                           MdH,MdV,MdQ1,MdQ2,                           &
+                           BlocH,AlocHH,AlocHV,AlocHQ1,AlocHQ2,         &
+                           BlocV,AlocVH,AlocVV,AlocVQ1,AlocVQ2,         &
+                           BlocQ1,AlocQ1H,AlocQ1V,AlocQ1Q1,AlocQ1Q2,    &
                            BlocQ2,AlocQ2H,AlocQ2V,AlocQ2Q1,AlocQ2Q2)
 !
 !..ALOC: holds local element stiffness matrices
@@ -171,45 +171,45 @@ subroutine elem_poisson_UW(Mdle,                                             &
    implicit none
 !
 !..declare input/output variables
-   integer,                          intent(in)  :: Mdle
-   integer,                          intent(in)  :: NrTest
-   integer,                          intent(in)  :: NrTrial
-   integer,                          intent(in)  :: NrdofHH
-   integer,                          intent(in)  :: NrdofVV
-   integer,                          intent(in)  :: NrdofH
-   integer,                          intent(in)  :: NrdofQ
-   integer,                          intent(in)  :: NrdofU
-   integer,                          intent(in)  :: NrdofS
-   integer,                          intent(in)  :: NrdofVi_a
-   integer,                          intent(in)  :: NrdofVi_b
-   integer,                          intent(in)  :: MdQ1
-   integer,                          intent(in)  :: MdQ2
-   integer,                          intent(in)  :: MdH
-   integer,                          intent(in)  :: MdV
+   integer, intent(in) :: Mdle
+   integer, intent(in) :: NrTest
+   integer, intent(in) :: NrTrial
+   integer, intent(in) :: NrdofHH
+   integer, intent(in) :: NrdofVV
+   integer, intent(in) :: NrdofH
+   integer, intent(in) :: NrdofQ
+   integer, intent(in) :: NrdofU
+   integer, intent(in) :: NrdofS
+   integer, intent(in) :: NrdofVi_a
+   integer, intent(in) :: NrdofVi_b
+   integer, intent(in) :: MdQ1
+   integer, intent(in) :: MdQ2
+   integer, intent(in) :: MdH
+   integer, intent(in) :: MdV
 !
-   real(8), dimension(MdQ1),          intent(out) :: BlocQ1
-   real(8), dimension(MdQ1,MdQ1),      intent(out) :: AlocQ1Q1
-   real(8), dimension(MdQ1,MdQ2),      intent(out) :: AlocQ1Q2
+   real(8), dimension(MdQ1),       intent(out) :: BlocQ1
+   real(8), dimension(MdQ1,MdQ1),  intent(out) :: AlocQ1Q1
+   real(8), dimension(MdQ1,MdQ2),  intent(out) :: AlocQ1Q2
    real(8), dimension(MdQ1,MdH),   intent(out) :: AlocQ1H
    real(8), dimension(MdQ1,MdV),   intent(out) :: AlocQ1V
 !
-   real(8), dimension(MdQ2),          intent(out) :: BlocQ2
-   real(8), dimension(MdQ2,MdQ1),      intent(out) :: AlocQ2Q1
-   real(8), dimension(MdQ2,MdQ2),      intent(out) :: AlocQ2Q2
+   real(8), dimension(MdQ2),       intent(out) :: BlocQ2
+   real(8), dimension(MdQ2,MdQ1),  intent(out) :: AlocQ2Q1
+   real(8), dimension(MdQ2,MdQ2),  intent(out) :: AlocQ2Q2
    real(8), dimension(MdQ2,MdH),   intent(out) :: AlocQ2H
    real(8), dimension(MdQ2,MdV),   intent(out) :: AlocQ2V
 !
-   real(8), dimension(MdH),       intent(out) :: BlocH
+   real(8), dimension(MdH),        intent(out) :: BlocH
    real(8), dimension(MdH,MdQ1),   intent(out) :: AlocHQ1
    real(8), dimension(MdH,MdQ2),   intent(out) :: AlocHQ2
-   real(8), dimension(MdH,MdH),intent(out) :: AlocHH
-   real(8), dimension(MdH,MdV),intent(out) :: AlocHV
+   real(8), dimension(MdH,MdH),    intent(out) :: AlocHH
+   real(8), dimension(MdH,MdV),    intent(out) :: AlocHV
 !
-   real(8), dimension(MdV),       intent(out) :: BlocV
+   real(8), dimension(MdV),        intent(out) :: BlocV
    real(8), dimension(MdV,MdQ1),   intent(out) :: AlocVQ1
    real(8), dimension(MdV,MdQ2),   intent(out) :: AlocVQ2
-   real(8), dimension(MdV,MdH),intent(out) :: AlocVH
-   real(8), dimension(MdV,MdV),intent(out) :: AlocVV
+   real(8), dimension(MdV,MdH),    intent(out) :: AlocVH
+   real(8), dimension(MdV,MdV),    intent(out) :: AlocVV
 !
 !-------------------------------------------------------------------------
 !
@@ -270,7 +270,7 @@ subroutine elem_poisson_UW(Mdle,                                             &
    real(8) :: tloc(2,MAXNINT2ADD), wtloc(MAXNINT2ADD)
 !
 !..workspace for trial and test variables
-   real(8) :: u, v, q, divtau_a, divtau_b, tn, sn, lambda, aux
+   real(8) :: u, v, q, divtau_a, divtau_b, tn, sn, u_hat, aux
    real(8) :: sig(3), dv(3), dq(3), tau_a(3), tau_b(3), s(3)
 !
    integer :: nk
@@ -325,22 +325,22 @@ subroutine elem_poisson_UW(Mdle,                                             &
    call nodcor(Mdle, xnod)
 !
 !..clear space for stiffness matrix and load vector:
-   BlocQ1 = ZERO; AlocQ1Q1  = ZERO; AlocQ1Q2  = ZERO; AlocQ1H   = ZERO; AlocQ1V   = ZERO
-   BlocQ2 = ZERO; AlocQ2Q1  = ZERO; AlocQ2Q2  = ZERO; AlocQ2H   = ZERO; AlocQ2V   = ZERO
-   BlocH  = ZERO; AlocHQ1   = ZERO; AlocHQ2   = ZERO; AlocHH    = ZERO; AlocHV    = ZERO
-   BlocV  = ZERO; AlocVQ1   = ZERO; AlocVQ2   = ZERO; AlocVH    = ZERO; AlocVV    = ZERO
+   BlocQ1 = ZERO; AlocQ1Q1 = ZERO; AlocQ1Q2 = ZERO; AlocQ1H = ZERO; AlocQ1V = ZERO
+   BlocQ2 = ZERO; AlocQ2Q1 = ZERO; AlocQ2Q2 = ZERO; AlocQ2H = ZERO; AlocQ2V = ZERO
+   BlocH  = ZERO; AlocHQ1  = ZERO; AlocHQ2  = ZERO; AlocHH  = ZERO; AlocHV  = ZERO
+   BlocV  = ZERO; AlocVQ1  = ZERO; AlocVQ2  = ZERO; AlocVH  = ZERO; AlocVV  = ZERO
 !
 !..clear space for auxiliary matrices
    bload_H   = ZERO
    gramP     = ZERO
-   stiff_HQ1  = ZERO
-   stiff_HQ2  = ZERO
-   stiff_HH = ZERO
-   stiff_HV = ZERO
+   stiff_HQ1 = ZERO
+   stiff_HQ2 = ZERO
+   stiff_HH  = ZERO
+   stiff_HV  = ZERO
    stiff_VQ1 = ZERO
    stiff_VQ2 = ZERO
-   stiff_VH = ZERO
-   stiff_VV = ZERO
+   stiff_VH  = ZERO
+   stiff_VV  = ZERO
 !
 !----------------------------------------------------------------------
 !     E L E M E N T    I N T E G R A L S                              |
@@ -395,10 +395,10 @@ subroutine elem_poisson_UW(Mdle,                                             &
                n1 = k1
                n2 = (k2 - 1)*3 + ivar
                sig = ZERO
-!..Piola Transform for L2 fields i.e for the ivar th component of sigma
-               sig(ivar) = shapQ(k2)/rjac 
-               stiff_HQ2(n1,n2) = stiff_HQ2(n1,n2) + weight * (sig(1) * dv(1) &
-                                                            +sig(2) * dv(2) + sig(3)*dv(3))
+!..Piola Transform for L2 fields i.e for the ivar-th component of sigma
+               sig(ivar) = shapQ(k2)/rjac
+               stiff_HQ2(n1,n2) = stiff_HQ2(n1,n2) + weight * &
+                                  (sig(1)*dv(1) + sig(2)*dv(2) + sig(3)*dv(3))
             enddo
 !
 !..end of loop through L2 trial functions
@@ -414,7 +414,7 @@ subroutine elem_poisson_UW(Mdle,                                             &
 !
 !..determine index in triangular packed format            
             k = nk(k1,k2)
-!..accumlate Gram components of Gram matrix correspoding to $v$. 
+!..accumlate Gram components of Gram matrix correspoding to v
             aux = q*v + (dq(1)*dv(1) + dq(2)*dv(2) + dq(3)*dv(3))
             gramP(k) = gramP(k) + aux*weight
 !           
@@ -423,14 +423,14 @@ subroutine elem_poisson_UW(Mdle,                                             &
 !
 !..cross terms for  graph norm
          do k2 = 1,NrdofVV
-            tau_a(1:3) =     dxdxi(1:3,1) * shapVV(1,k2)      &
-                           + dxdxi(1:3,2) * shapVV(2,k2)       &
-                           + dxdxi(1:3,3) * shapVV(3,k2)
-            
+            tau_a(1:3) = dxdxi(1:3,1) * shapVV(1,k2) &
+                       + dxdxi(1:3,2) * shapVV(2,k2) &
+                       + dxdxi(1:3,3) * shapVV(3,k2)
             tau_a(1:3) = tau_a(1:3)/rjac
+!
             k = nk(k1,NrdofHH+k2)
-
-            aux = dv(1) * tau_a(1) + dv(2) * tau_a(2) + dv(3) * tau_a(3)
+!
+            aux = dv(1)*tau_a(1) + dv(2)*tau_a(2) + dv(3)*tau_a(3)
             gramP(k) = gramP(k) + aux * weight
          enddo
 !
@@ -440,49 +440,50 @@ subroutine elem_poisson_UW(Mdle,                                             &
       do k1=1,NrdofVV
 !..Piola Transform of the H(div) test functions.
          divtau_a = divVV(k1)/rjac
-         tau_a(1:3) =     dxdxi(1:3,1) * shapVV(1,k1)      &
-                        + dxdxi(1:3,2) * shapVV(2,k1)       &
-                        + dxdxi(1:3,3) * shapVV(3,k1)
-!
+         tau_a(1:3) = dxdxi(1:3,1) * shapVV(1,k1) &
+                    + dxdxi(1:3,2) * shapVV(2,k1) &
+                    + dxdxi(1:3,3) * shapVV(3,k1)
          tau_a(1:3) = tau_a(1:3)/rjac   
-!         
+!
+!..loop over L2 trial functions
          do k2=1,NrdofQ
 !..Piola transform of L2 variable
             u = shapQ(k2)/rjac
             stiff_VQ1(k1,k2) = stiff_VQ1(k1,k2) + weight*(u * divtau_a)
-!
+!..loop over L2 components
             do ivar = 1,3
                sig = ZERO
-               sig(ivar) = shapQ(k2)/rjac  !Piola Transform for the ivar th comp
+               sig(ivar) = shapQ(k2)/rjac ! Piola Transform for the ivar-th comp
                n1 = k1
                n2 = (k2 - 1)*3 + ivar
-               stiff_VQ2(n1,n2) = stiff_VQ2(n1,n2) + weight*(tau_a(1)*sig(1) + tau_a(2) * sig(2) &
-                                                          + tau_a(3)*sig(3))
+               stiff_VQ2(n1,n2) = stiff_VQ2(n1,n2) + weight * &
+                                 (tau_a(1)*sig(1) + tau_a(2)*sig(2) + tau_a(3)*sig(3))
 !
+!..end of loop over L2 components
             enddo
+!..end of loop over L2 trial functions
          enddo
 !
 !..Gram matrix contribution for H(div) inner product
          do k2=k1,NrdofVV
 !..Piola transform for H(div) test function and its divergence. 
             divtau_b = divVV(k2)/rjac
-            tau_b(1:3) =     dxdxi(1:3,1) * shapVV(1,k2)      &
-                           + dxdxi(1:3,2) * shapVV(2,k2)       &
-                           + dxdxi(1:3,3) * shapVV(3,k2)
-!   
+            tau_b(1:3) = dxdxi(1:3,1) * shapVV(1,k2) &
+                       + dxdxi(1:3,2) * shapVV(2,k2) &
+                       + dxdxi(1:3,3) * shapVV(3,k2)
             tau_b(1:3) = tau_b(1:3)/rjac
 !
             k = nk(k1 + NrdofHH,k2 + NrdofHH)
-            aux = divtau_a * divtau_b + 2.d0 * (tau_a(1)*tau_b(1) + tau_a(2)*tau_b(2) + tau_a(3)*tau_b(3))
+            aux = divtau_a * divtau_b + 2.d0 * &
+                  (tau_a(1)*tau_b(1) + tau_a(2)*tau_b(2) + tau_a(3)*tau_b(3))
             gramP(k) = gramP(k) +  weight * aux
 !
          enddo   
-!..end of loop on H(div) test functions
+!..end of loop over H(div) test functions
       enddo
-!
 !..end of loop through integration points
    enddo
-
+!
 !
 !---------------------------------------------------------------------
 !    B O U N D A R Y    I N T E G R A L S                            |
@@ -527,10 +528,10 @@ subroutine elem_poisson_UW(Mdle,                                             &
 !..determine H(div) shape functions (for fluxes)
          call shape3DV(etype,xi,norderi,norient_face, &
                        nrdof,shapV,divV)
-
+!
 !..geometry map
          call bgeom3D(Mdle,xi,xnod,shapH,gradH,NrdofH,dxidt,nsign, &
-                  x,dxdxi,dxidx,rjac,dxdt,rn,bjac)
+                      x,dxdxi,dxidx,rjac,dxdt,rn,bjac)
 !..integration weight
          weight = bjac*wtloc(l)
 !
@@ -542,8 +543,8 @@ subroutine elem_poisson_UW(Mdle,                                             &
             do k2=1,NrdofVi_b
 !..Piola transformation
                s(1:3) = dxdxi(1:3,1)*shapV(1,k2) &
-                        + dxdxi(1:3,2)*shapV(2,k2) &
-                        + dxdxi(1:3,3)*shapV(3,k2)
+                      + dxdxi(1:3,2)*shapV(2,k2) &
+                      + dxdxi(1:3,3)*shapV(3,k2)
                s(1:3) = s(1:3)/rjac
 !..normal component
                sn = s(1)*rn(1)+s(2)*rn(2)+s(3)*rn(3)
@@ -558,21 +559,19 @@ subroutine elem_poisson_UW(Mdle,                                             &
 !..loop through enriched H(div) test functions
          do k1=1,NrdofVV
 !..Piola Transform
-            tau_a(1:3) =     dxdxi(1:3,1) * shapVV(1,k1)      &
-                           + dxdxi(1:3,2) * shapVV(2,k1)       &
-                           + dxdxi(1:3,3) * shapVV(3,k1)
-!
+            tau_a(1:3) = dxdxi(1:3,1) * shapVV(1,k1)  &
+                       + dxdxi(1:3,2) * shapVV(2,k1)  &
+                       + dxdxi(1:3,3) * shapVV(3,k1)
             tau_a(1:3) = tau_a(1:3)/rjac
             tn = tau_a(1)*rn(1) + tau_a(2)*rn(2) + tau_a(3)*rn(3)
+!
             do k2=1,NrdofVi_a
-               lambda = shapH(k2)
-!
-               stiff_VH(k1,k2) = stiff_VH(k1,k2) - weight * tn * lambda
-!..end loop through H1 trial functions
+               u_hat = shapH(k2)
+               stiff_VH(k1,k2) = stiff_VH(k1,k2) - weight * tn * u_hat
             enddo
-!..end loop through enriched H(div) test functions
-         enddo   
 !
+!..end loop through enriched H(div) test functions
+         enddo
 !..end loop through integration points
       enddo
 !..end loop through element faces
