@@ -4,7 +4,7 @@
 !
 !----------------------------------------------------------------------
 !
-!     latest revision:  - July 2019
+!     latest revision:  - May 2023
 !
 !     purpose:          - compute and print exact error
 !

@@ -4,7 +4,7 @@
 !
 !----------------------------------------------------------------------
 !
-!     latest revision:  -  May 2023
+!     latest revision:  - May 2023
 !
 !     purpose:          - returns Boundary conditions for Fichera Corner Problem
 !

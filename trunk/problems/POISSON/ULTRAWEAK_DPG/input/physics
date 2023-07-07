@@ -1,7 +1,6 @@
 1025000             MAXNODS  max number of nodes anticipated
 4                   NR_PHYSA number of physics attributes
-trace_a contin  1    H1 Variable
-trace_b normal  1    H(div) variable
-field   discon  1    L2 variable
-grad    discon  3    L2 Variable
-
+trc_a contin  1    H1 Variable
+trc_b normal  1    H(div) variable
+field discon  1    L2 variable
+gradu discon  3    L2 Variable
