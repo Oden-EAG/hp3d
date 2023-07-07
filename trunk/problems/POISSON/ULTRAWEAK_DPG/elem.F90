@@ -253,14 +253,14 @@ subroutine elem_poisson_UW(Mdle,                                             &
    real(8) :: shapVV(3,MAXbrickVV), divVV(MAXbrickVV)
 !
 !..load vector for the enriched space
-   real(8) :: bload_V(NrTest)
+   real(8) :: bload_H(NrTest)
 !
 !..Gram matrix in packed format
    real(8), allocatable :: gramP(:)
 !
 !..stiffness matrices for the enriched test space
-   real(8), allocatable :: stiff_UV(:,:),stiff_SV(:,:),stiff_Vi_aV(:,:),stiff_Vi_bV(:,:)
-   real(8), allocatable :: stiff_UT(:,:),stiff_ST(:,:),stiff_Vi_aT(:,:),stiff_Vi_bT(:,:)
+   real(8), allocatable :: stiff_HQ1(:,:),stiff_HQ2(:,:),stiff_HH(:,:),stiff_HV(:,:)
+   real(8), allocatable :: stiff_VQ1(:,:),stiff_VQ2(:,:),stiff_VH(:,:),stiff_VV(:,:)
    real(8), allocatable :: stiff_ALL(:,:),raloc(:,:)
 !
 !..3D quadrature data
@@ -283,14 +283,14 @@ subroutine elem_poisson_UW(Mdle,                                             &
 !
 !..allocate auxiliary matrices
    allocate(gramP((NrTest)*(NrTest+1)/2))
-   allocate(stiff_UV(NrdofHH,NrdofU))
-   allocate(stiff_SV(NrdofHH,NrdofS))
-   allocate(stiff_Vi_aV(NrdofHH,NrdofVi_a))
-   allocate(stiff_Vi_bV(NrdofHH,NrdofVi_b))
-   allocate(stiff_UT(NrdofVV,NrdofU))
-   allocate(stiff_ST(NrdofVV,NrdofS))
-   allocate(stiff_Vi_aT(NrdofVV,NrdofVi_a))
-   allocate(stiff_Vi_bT(NrdofVV,NrdofVi_b))
+   allocate(stiff_HQ1(NrdofHH,NrdofU))
+   allocate(stiff_HQ2(NrdofHH,NrdofS))
+   allocate(stiff_HH(NrdofHH,NrdofVi_a))
+   allocate(stiff_HV(NrdofHH,NrdofVi_b))
+   allocate(stiff_VQ1(NrdofVV,NrdofU))
+   allocate(stiff_VQ2(NrdofVV,NrdofS))
+   allocate(stiff_VH(NrdofVV,NrdofVi_a))
+   allocate(stiff_VV(NrdofVV,NrdofVi_b))
 !
 !..element type
    etype = NODES(Mdle)%ntype
@@ -331,16 +331,16 @@ subroutine elem_poisson_UW(Mdle,                                             &
    BlocVi_b = ZERO; AlocVi_bU = ZERO; AlocVi_bS = ZERO; AlocVi_ba = ZERO; AlocVi_bb = ZERO
 !
 !..clear space for auxiliary matrices
-   bload_V   = ZERO
+   bload_H   = ZERO
    gramP     = ZERO
-   stiff_UV  = ZERO
-   stiff_SV  = ZERO
-   stiff_Vi_aV = ZERO
-   stiff_Vi_bV = ZERO
-   stiff_UT = ZERO
-   stiff_ST = ZERO
-   stiff_Vi_aT = ZERO
-   stiff_Vi_bT = ZERO
+   stiff_HQ1  = ZERO
+   stiff_HQ2  = ZERO
+   stiff_HH = ZERO
+   stiff_HV = ZERO
+   stiff_VQ1 = ZERO
+   stiff_VQ2 = ZERO
+   stiff_VH = ZERO
+   stiff_VV = ZERO
 !
 !----------------------------------------------------------------------
 !     E L E M E N T    I N T E G R A L S                              |
@@ -349,7 +349,6 @@ subroutine elem_poisson_UW(Mdle,                                             &
 !..use the enriched order to set the quadrature
    INTEGRATION = NORD_ADD
    call set_3D_int_DPG(etype,norder,norient_face, nint,xiloc,waloc)
-   INTEGRATION = 0
 !
 !..loop over integration points
    do l=1,nint
@@ -361,7 +360,7 @@ subroutine elem_poisson_UW(Mdle,                                             &
 !..H1 shape functions (for geometry)
       call shape3DH(etype,xi,norder,norient_edge,norient_face, nrdof,shapH,gradH)
 
-!..L2 shape function
+!..L2 shape functions
       call shape3DQ(etype,xi,norder, nrdof,shapQ)
 !
 !..discontinuous H1 shape functions
@@ -386,20 +385,19 @@ subroutine elem_poisson_UW(Mdle,                                             &
                  + gradHH(2,k1)*dxidx(2,1:3) &
                  + gradHH(3,k1)*dxidx(3,1:3)
 !
-!..EXTENDED LOAD VECTOR: (f,v)
-         bload_V(k1) = bload_V(k1) + fval*v*weight
+!..accumulate load vector: (f,v)
+         bload_H(k1) = bload_H(k1) + fval*v*weight
 !
 !..loop through L2 trial functions
          do k2=1,NrdofQ
-
+!
             do ivar = 1,3
                n1 = k1
-               ! n2 = (ivar - 1)*NrdofQ + k2
                n2 = (k2 - 1)*3 + ivar
                sig = ZERO
 !..Piola Transform for L2 fields i.e for the ivar th component of sigma
                sig(ivar) = shapQ(k2)/rjac 
-               stiff_SV(n1,n2) = stiff_SV(n1,n2) + weight * (sig(1) * dv(1) &
+               stiff_HQ2(n1,n2) = stiff_HQ2(n1,n2) + weight * (sig(1) * dv(1) &
                                                             +sig(2) * dv(2) + sig(3)*dv(3))
             enddo
 !
@@ -416,15 +414,15 @@ subroutine elem_poisson_UW(Mdle,                                             &
 !
 !..determine index in triangular packed format            
             k = nk(k1,k2)
+!..accumlate Gram components of Gram matrix correspoding to $v$. 
             aux = q*v + (dq(1)*dv(1) + dq(2)*dv(2) + dq(3)*dv(3))
             gramP(k) = gramP(k) + aux*weight
 !           
-!..enddo 2nd loop through enriched H1 test functions
+!..end of 2nd loop through enriched H1 test functions
          enddo
 !
 !..cross terms for  graph norm
          do k2 = 1,NrdofVV
-            divtau_a = divVV(k2)/rjac
             tau_a(1:3) =     dxdxi(1:3,1) * shapVV(1,k2)      &
                            + dxdxi(1:3,2) * shapVV(2,k2)       &
                            + dxdxi(1:3,3) * shapVV(3,k2)
@@ -440,7 +438,7 @@ subroutine elem_poisson_UW(Mdle,                                             &
       enddo
 !..loop over discontinuous H(div) test functions
       do k1=1,NrdofVV
-!..Piola Transform of the divergence
+!..Piola Transform of the H(div) test functions.
          divtau_a = divVV(k1)/rjac
          tau_a(1:3) =     dxdxi(1:3,1) * shapVV(1,k1)      &
                         + dxdxi(1:3,2) * shapVV(2,k1)       &
@@ -451,14 +449,14 @@ subroutine elem_poisson_UW(Mdle,                                             &
          do k2=1,NrdofQ
 !..Piola transform of L2 variable
             u = shapQ(k2)/rjac
-            stiff_UT(k1,k2) = stiff_UT(k1,k2) + weight*(u * divtau_a)
+            stiff_VQ1(k1,k2) = stiff_VQ1(k1,k2) + weight*(u * divtau_a)
 !
             do ivar = 1,3
                sig = ZERO
                sig(ivar) = shapQ(k2)/rjac  !Piola Transform for the ivar th comp
                n1 = k1
                n2 = (k2 - 1)*3 + ivar
-               stiff_ST(n1,n2) = stiff_ST(n1,n2) + weight*(tau_a(1)*sig(1) + tau_a(2) * sig(2) &
+               stiff_VQ2(n1,n2) = stiff_VQ2(n1,n2) + weight*(tau_a(1)*sig(1) + tau_a(2) * sig(2) &
                                                           + tau_a(3)*sig(3))
 !
             enddo
@@ -494,7 +492,7 @@ subroutine elem_poisson_UW(Mdle,                                             &
 !..loop through element faces
    do ifc=1,nrf
 !
-!..sign factor to determine the OUTWARD normal unit vector
+!..sign factor to determine the outward normal unit vector
       nsign = nsign_param(etype,ifc)
 !
 !..face type
@@ -526,13 +524,14 @@ subroutine elem_poisson_UW(Mdle,                                             &
          call shape3DH(etype,xi,norder,norient_edge,norient_face, &
                        nrdof,shapH,gradH)
 !
-!..determine element H(div) shape functions (for fluxes)
+!..determine H(div) shape functions (for fluxes)
          call shape3DV(etype,xi,norderi,norient_face, &
                        nrdof,shapV,divV)
 
-!..geometry
+!..geometry map
          call bgeom3D(Mdle,xi,xnod,shapH,gradH,NrdofH,dxidt,nsign, &
                   x,dxdxi,dxidx,rjac,dxdt,rn,bjac)
+!..integration weight
          weight = bjac*wtloc(l)
 !
 !..loop through enriched H1 test functions
@@ -550,7 +549,7 @@ subroutine elem_poisson_UW(Mdle,                                             &
                sn = s(1)*rn(1)+s(2)*rn(2)+s(3)*rn(3)
 !
 !..EXTENDED HV STIFFNESS MATRIX: -<dot(σ,n), v>_{Γ_h}
-               stiff_Vi_bV(k1,k2) = stiff_Vi_bV(k1,k2) - sn*v*weight
+               stiff_HV(k1,k2) = stiff_HV(k1,k2) - sn*v*weight
 !..end loop through H(div) trial functions
             enddo
 !..end loop through enriched H1 test functions
@@ -568,7 +567,7 @@ subroutine elem_poisson_UW(Mdle,                                             &
             do k2=1,NrdofVi_a
                lambda = shapH(k2)
 !
-               stiff_Vi_aT(k1,k2) = stiff_Vi_aT(k1,k2) - weight * tn * lambda
+               stiff_VH(k1,k2) = stiff_VH(k1,k2) - weight * tn * lambda
 !..end loop through H1 trial functions
             enddo
 !..end loop through enriched H(div) test functions
@@ -588,20 +587,20 @@ subroutine elem_poisson_UW(Mdle,                                             &
 !
 !  Total test/trial DOFs of the element
    i1 = NrdofHH; i2 = NrdofVV; j1 = NrdofVi_a; j2 = NrdofVi_b; j3 = NrdofU; j4 = NrdofS
-   stiff_ALL(1:i1,1:j1) = stiff_Vi_aV
-   stiff_ALL(1:i1,j1+1:j1+j2) = stiff_Vi_bV
-   stiff_ALL(1:i1,j1+j2+1:j1+j2+j3) = stiff_UV
-   stiff_ALL(1:i1,j1+j2+j3+1:j1+j2+j3+j4) = stiff_SV
+   stiff_ALL(1:i1,1:j1) = stiff_HH
+   stiff_ALL(1:i1,j1+1:j1+j2) = stiff_HV
+   stiff_ALL(1:i1,j1+j2+1:j1+j2+j3) = stiff_HQ1
+   stiff_ALL(1:i1,j1+j2+j3+1:j1+j2+j3+j4) = stiff_HQ2
 !
-   stiff_ALL(i1+1:i1+i2,1:j1) = stiff_Vi_aT
-   stiff_ALL(i1+1:i1+i2,j1+1:j1+j2) = stiff_Vi_bT
-   stiff_ALL(i1+1:i1+i2,j1+j2+1:j1+j2+j3) = stiff_UT
-   stiff_ALL(i1+1:i1+i2,j1+j2+j3+1:j1+j2+j3+j4) = stiff_ST
+   stiff_ALL(i1+1:i1+i2,1:j1) = stiff_VH
+   stiff_ALL(i1+1:i1+i2,j1+1:j1+j2) = stiff_VV
+   stiff_ALL(i1+1:i1+i2,j1+j2+1:j1+j2+j3) = stiff_VQ1
+   stiff_ALL(i1+1:i1+i2,j1+j2+j3+1:j1+j2+j3+j4) = stiff_VQ2
 !
-   stiff_ALL(1:i1+i2,j1+j2+j3+j4+1) = bload_V
+   stiff_ALL(1:i1+i2,j1+j2+j3+j4+1) = bload_H
 !
-   deallocate(stiff_UV,stiff_SV,stiff_Vi_aV,stiff_Vi_bV)
-   deallocate(stiff_UT,stiff_ST,stiff_Vi_aT,stiff_Vi_bT)
+   deallocate(stiff_HQ1,stiff_HQ2,stiff_HH,stiff_HV)
+   deallocate(stiff_VQ1,stiff_VQ2,stiff_VH,stiff_VV)
 !
 !..A. Compute Cholesky factorization of Gram Matrix, G=U^T U (=LL^T)
    call DPPTRF('U',NrTest,gramP,info)
