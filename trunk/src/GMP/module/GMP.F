@@ -518,7 +518,6 @@ c  ARRAYS OF 0,1,2,3-D OBJECTS                                        |
 c----------------------------------------------------------------------
       type(surface  ), allocatable :: SURFACES(:)
       type(point    ), allocatable :: POINTS(:)
-      type(point    ), allocatable :: POINTS_FG(:)
       type(ccurve   ), allocatable :: CURVES(:)
       type(triangle ), allocatable :: TRIANGLES(:)
       type(rectangle), allocatable :: RECTANGLES(:)
@@ -548,15 +547,6 @@ c
         nullify(POINTS(i)%CurvNo)
         nullify(POINTS(i)%Idata)
         nullify(POINTS(i)%Rdata)
-      enddo
-c
-      allocate(POINTS_FG(MAXNP_FG))
-      do i=1,MAXNP_FG
-        POINTS_FG(i)%Type = 'None'
-        POINTS_FG(i)%NrCurv = 0
-        nullify(POINTS_FG(i)%CurvNo)
-        nullify(POINTS_FG(i)%Idata)
-        nullify(POINTS_FG(i)%Rdata)
       enddo
 c
       allocate(CURVES(MAXNC))
