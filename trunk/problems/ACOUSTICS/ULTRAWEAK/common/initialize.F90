@@ -11,7 +11,6 @@ subroutine initialize
    use refinements
    use control
    use gmp
-   use testvars
    use frsolmod
    use upscale
    use paraview

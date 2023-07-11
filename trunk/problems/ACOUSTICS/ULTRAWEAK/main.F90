@@ -104,14 +104,15 @@ PHYSAd(1:3) = (/.false.,.false.,.false./)
 !
    if (IBC_PROB.eq.3 .or. IBC_PROB.eq.4 .or. IBC_PROB.eq.6) call propagate_flag(2,3)
 !
+   if (JOB .ne. 0) then
       call exec_job
-!   else
-!      if (RANK .eq. 0) then
-!         call master_main
-!      else
-!         call worker_main
-!      endif
-!   endif
+   else
+      if (RANK .eq. 0) then
+         call master_main
+      else
+         call worker_main
+      endif
+   endif
 !
    call finalize
    call mpi_w_finalize
@@ -208,7 +209,6 @@ subroutine master_main()
       write(*,*) 'Frontal (Seq)..........................43'
       write(*,*) 'MUMPS (Nested Dissection)..............44'
       write(*,*) 'PETSc (MPI)............................45'
-      write(*,*) 'MGCG (OpenMP)..........................46'
       write(*,*) '                                         '
       write(*,*) '     ---- Error and Residual ----        '
       write(*,*) 'Compute exact error....................50'

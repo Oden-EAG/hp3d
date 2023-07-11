@@ -38,6 +38,7 @@
 !   
 !  ...EXACT SOLUTION (exact.F90)
       integer :: IEXACT_PROB
+      integer, parameter :: IEXACT_TRIVIAL     = 0
       integer, parameter :: IEXACT_SINUSOIDAL  = 1
       integer, parameter :: IEXACT_POLYNOMIAL  = 2
       integer, parameter :: IEXACT_PLANE       = 3

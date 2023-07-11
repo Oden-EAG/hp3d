@@ -29,7 +29,7 @@ dp=1
 nthreads=1
 
 # Problem: 0 = freespace, 1 = Cavity
-prob=1
+prob=0
 
 # Geometry
 if [ $prob == 0 ]; then
@@ -43,7 +43,6 @@ elif
     bc=4
 fi
 
-bc=1
 #boundary condition (1=Dirichlet, 2=Neumann, 3=Impedance)
 if [ $bc == 1 ]; then
     bc_verb="Dirichlet"
@@ -56,7 +55,7 @@ elif [ $bc == 4 ]; then
 fi
 
 # Exact solution
-exact=5
+exact=4
 if [ $exact == 0 ]; then
     exact_verb="Polynomial in x dimension"
 elif [ $exact == 1 ]; then
@@ -72,7 +71,7 @@ elif [ $exact == 5 ]; then
 fi
 
 # Number of wavelengths
-rnum=5.0d0
+rnum=2.0d0
 
 # DPG test norm scaling parameter
 alpha=1.0d0

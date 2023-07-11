@@ -670,7 +670,6 @@
       use par_mesh,            only: DISTRIBUTED
       use MPI,                 only: MPI_IN_PLACE, MPI_INTEGER, MPI_SUM,   &
                                      MPI_COMM_WORLD
-      use GLU
 !
       implicit none
 !
@@ -689,7 +688,7 @@
 !
       select case(IBC_PROB)
       case(3,4,5,6)
-
+         continue
       case default
          write(*,*) 'propagate_flag called for non-impedence BC, returning...'
          return
@@ -745,7 +744,7 @@
       if (DISTRIBUTED) then
 !     ...Sum used since values are positive and negative;
 !        value isn't important, only sign and whether non-zero
-         call GLU_AllReduceNodes(NODES(:)%visit, MPI_SUM)
+         call MPI_Allreduce(MPI_IN_PLACE,NODES(:)%visit,NRNODS,MPI_INTEGER,MPI_SUM,MPI_COMM_WORLD, ierr)
       endif
 !
 !  ...change -Nflag to zero

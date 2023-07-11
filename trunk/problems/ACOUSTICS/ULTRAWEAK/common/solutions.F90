@@ -55,14 +55,14 @@
 
    select case (IEXACT_PROB)
 !
-!..polynomial in x dimension
+!..trivial solution
    case(0)  
 !
-      p = x1**2 
-      Gradp(1) = 2.d0*x1
+      p = ZERO
+      Gradp(1) = ZERO
       Gradp(2) = ZERO
       Gradp(3) = ZERO
-      Grad2p(1,1) = 2.d0
+      Grad2p(1,1) = ZERO
       Grad2p(1,2) = ZERO
       Grad2p(1,3) = ZERO
       Grad2p(2,1) = ZERO
