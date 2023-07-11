@@ -17,7 +17,7 @@ err=./output/errorlogs/log.tx
 level=1
 
 # paraview directory
-paraview=../output/gaussbeam/paraview/
+paraview=../output/paraview/
 
 # Polynomial order
 p=2
@@ -43,7 +43,7 @@ elif
     bc=4
 fi
 
-
+bc=1
 #boundary condition (1=Dirichlet, 2=Neumann, 3=Impedance)
 if [ $bc == 1 ]; then
     bc_verb="Dirichlet"
@@ -79,20 +79,18 @@ alpha=1.0d0
     
 # Executable
 echo
-if [ $formulation == ultraweak ]; then
-    exec=DPG_uweak_acoustics
-    echo "Running ultraweak formulation..."
-    echo "Problem          = " $prob_verb
-    echo "geometry file    = " $geometry
-    echo "Order            = " $p
-    echo "Enriched order   = " $dp
-    echo "Test norm        = " $testnorm_verb
-    echo "bc               = " $bc_verb
-    echo "Exact solution   = " $exact_verb
-    echo "# of wavelengths = " $rnum
-    echo "solver           = " $solver_verb
-    echo "OMP threads      = " $nthreads
-fi
+
+# Print setup info
+exec=DPG_uweak_acoustics
+echo "Running ultraweak formulation..."
+echo "Problem          = " $prob_verb
+echo "geometry file    = " $geometry
+echo "Order            = " $p
+echo "Enriched order   = " $dp
+echo "bc               = " $bc_verb
+echo "Exact solution   = " $exact_verb
+echo "# of wavelengths = " $rnum
+echo "OMP threads      = " $nthreads
 echo
 
 mpirun -np 4 ./$exec \

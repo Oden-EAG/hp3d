@@ -137,7 +137,7 @@
                Gval = -valV(1,1)*Rn(1)-valV(2,1)*Rn(2)-valV(3,1)*Rn(3) + valH(1)
 !
 !           ...for gaussian beam problem, window near corner only
-               if (IEXACT_PROB .eq. IEXACT_PROB_GAUSS) then
+               if (IEXACT_PROB .eq. IEXACT_GAUSS) then
                   Gval = Gval*exp((-x(1)**6-x(2)**6-x(3)**6)*1000)
                endif
 !

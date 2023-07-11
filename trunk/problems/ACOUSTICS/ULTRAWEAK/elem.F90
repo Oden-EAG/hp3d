@@ -135,9 +135,9 @@
       integer, intent(in) :: mdle
       integer, intent(in) :: nord_add_local
       integer, intent(in) :: nrTest, nrTrial
-      integer, intent(in) :: nrdofHH,nrdofVV
-      integer, intent(in) :: nrdofH,nrdofV,nrdofQ
-      integer, intent(in) :: ndofHmdl,ndofVmdl
+      integer, intent(in) :: nrdofHH, nrdofVV
+      integer, intent(in) :: nrdofH, nrdofV, nrdofQ
+      integer, intent(in) :: ndofHmdl, ndofVmdl
 !
 !  ...element and face types
       integer :: ntype, ftype
@@ -146,7 +146,7 @@
       integer :: norder(19), norderf(5)
       integer :: norient_edge(12), norient_face(6)
       integer :: ibc(6,NRINDEX)
-      integer :: nre, nrv, nrf
+      integer :: nordP, nre, nrv, nrf
 !
 !  ...geometry
       real(8) :: xnod(3,MAXbrickH)
@@ -161,11 +161,12 @@
       real(8) :: wa, weight
 !
 !  ...trial and test variables
-      real(8) :: u(3), v(3), div_v, vec(3), un, vn
+      real(8) :: u(3), v(3), div_u, div_v, un, vn, vec(3)
       real(8) :: q, p, dq(3), dp(3)
       integer :: nrdofHi, nrdofVi
 !
-      complex(8) :: zf(4)
+!  ...load
+      complex(8) :: zf(4), zg
 !
 !  ...shape function workspace
       real(8) :: shapH(MAXbrickH),     gradH(3,MAXbrickH)

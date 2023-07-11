@@ -32,7 +32,7 @@ LIBS            = $(PROB_LIBS)
 SRC         = $(addprefix $(SRC_PATH)/,$(SRC_FILE))
 OBJ         = $(addprefix $(OBJ_PATH)/,$(SRC_FILE:.F90=.o))
 
-FC_WORK       = $(FC) $(CCDEFS) $(CCINCS) $(FFLAGS) $(EXTRA_FFLAGS)
+FC_WORK     = $(FC) $(CCDEFS) $(CCINCS) $(FFLAGS) $(EXTRA_FFLAGS)
 
 #-------------------------------------------------
 .PHONY : one

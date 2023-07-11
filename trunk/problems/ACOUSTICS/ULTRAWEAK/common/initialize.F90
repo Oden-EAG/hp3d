@@ -11,13 +11,11 @@ subroutine initialize
    use refinements
    use control
    use gmp
-   use geometry_transformations
    use testvars
    use frsolmod
    use upscale
    use paraview
    use mpi_param
-   use salt_data
 !
    implicit none
 !

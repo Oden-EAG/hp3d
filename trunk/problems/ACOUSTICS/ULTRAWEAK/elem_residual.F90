@@ -16,14 +16,18 @@
 !
       implicit none
 !
+      integer, intent(in)  :: Mdle
+      real(8), intent(out) :: Resid
+      integer, intent(out) :: Nref_flag
+!
 !  ...element and face types
       integer :: ntype, ftype
 !
 !  ...element data
-      integer :: norder(19), norderf(5)
+      integer :: norder(19), norderP(19), norderf(5)
       integer :: norient_edge(12), norient_face(6)
       integer :: ibc(6,NRINDEX)
-      integer :: nre, nrv, nrf
+      integer :: nordP, nre, nrv, nrf
 !
 !  ...geometry
       real(8) :: xnod(3,MAXbrickH)
@@ -31,6 +35,12 @@
       real(8) :: dxdxi(3,3), dxidx(3,3), rjac
       real(8) :: dxidt(3,2), dxdt(3,2), bjac
       real(8) :: rt(3,2), rn(3)
+!
+!  ...number of DOFs
+      integer :: nrTest, nrTrial
+      integer :: nrdofHH, nrdofEE, nrdofVV, nrdofQQ
+      integer :: nrdofH, nrdofE, nrdofV, nrdofQ
+      integer :: ndofHmdl, ndofEmdl, ndofVmdl, ndofQmdl
 !
 !  ...solution DOFs
       complex(8) :: zdofH(MAXEQNH,MAXbrickH)
@@ -49,12 +59,13 @@
       real(8) :: wa, weight
 !
 !  ...trial and test variables
-      real(8)    :: u(3), v(3), div_v, vec(3), vn
-      real(8)    :: p, dp(3), q, dq(3),
+      real(8)    :: u(3), v(3), div_u, div_v, vn, vec(3)
+      real(8)    :: p, dp(3), q, dq(3)
       complex(8) :: zu(3), zp, zvec(3), zun
       integer    :: nrdofHi, nrdofVi
 !
-      complex(8) :: zf(4)
+!  ...load
+      complex(8) :: zf(4), zg
 !
 !  ...shape function workspace
       real(8) :: shapH(MAXbrickH),     gradH(3,MAXbrickH)

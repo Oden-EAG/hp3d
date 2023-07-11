@@ -69,7 +69,7 @@ subroutine my_paraview_driver(IParAttr)
    if (.not. PARAVIEW_DUMP_ATTR) goto 90
 !
 !..loop over rhs's
-   do iload=1,NR_RHS
+   do iload=1,1 !NR_RHS
 !
 !  ...loop over physics variables
       do iphys=1,NR_PHYSA

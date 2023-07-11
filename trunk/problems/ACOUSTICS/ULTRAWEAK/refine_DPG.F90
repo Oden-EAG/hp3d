@@ -484,7 +484,9 @@ end subroutine refine_DPG
       integer, intent(out) :: Iref
 !
       real(8) :: hmin, lambda
-      integer :: ntype, nrv, nre, loc
+      integer :: ntype, loc, nod, nodp
+      integer :: iv, ie, nrv, nre
+      integer :: nodesl(27), norientl(27)
       logical :: found
 !
 !  ...for cavity problem; list of singular edges and vertices
@@ -507,7 +509,7 @@ end subroutine refine_DPG
 !  ...look for a singular vertex
       found = .false.
 !
-      if (PROB_KIND.eq.PROB_CAVITY)
+      if (PROB_KIND.eq.PROB_CAVITY) then
 !
 !     ...check whether any element vertices are singular
          do iv=1,nrv

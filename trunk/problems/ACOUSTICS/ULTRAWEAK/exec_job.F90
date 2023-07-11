@@ -32,7 +32,7 @@
       endif
 !
 !  ...h-refine so all procs can have elements
-      if (NUM_PROCS .ge. 2) then
+      if (NUM_PROCS .ge. NRELES) then
          if (RANK .eq. ROOT) write(*,*) 'global h-refinement...'
          call global_href
          if (IBC_PROB.eq.3 .or. IBC_PROB.eq.4 .or. IBC_PROB.eq.6) call propagate_flag(2,3)
@@ -58,11 +58,11 @@
          call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
       endif
 !
-!  ...set which attributes to output
-      iParAttr = (/1, 1, 4/)
-!
 !  ...call MUMPS
       call par_mumps_sc('H')
+!
+!  ...set which attributes to output
+      iParAttr = (/1, 1, 4/)
 !
 !  ...write paraview output
       call my_paraview_driver(iParAttr)
