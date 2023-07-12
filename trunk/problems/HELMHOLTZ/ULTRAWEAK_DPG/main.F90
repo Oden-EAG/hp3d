@@ -32,7 +32,9 @@ program main
    integer :: i, ierr, req, ret
 !
 !..OMP variables
+#if HP3D_USE_OPENMP
    integer :: num_threads, omp_get_num_threads
+#endif
 !
 !..timer
    real(8) :: MPI_Wtime,start_time,end_time
@@ -94,16 +96,20 @@ program main
    HERM_STC  = .true.
 !
 !..determine number of omp threads running
+ 1025 format(A,I2)
    if (RANK .eq. ROOT) then
       write(6,1025) ' Initial polynomial order: ',IP
-!$OMP parallel
-!$OMP single
+   endif
+#if HP3D_USE_OPENMP
+   if (RANK .eq. ROOT) then
+   !$OMP parallel
+   !$OMP single
       num_threads = omp_get_num_threads()
       write(6,1025) ' Number of OpenMP threads: ',num_threads
- 1025 format(A,I2)
-!$OMP end single
-!$OMP end parallel
+   !$OMP end single
+   !$OMP end parallel
    endif
+#endif
 !
    if (IBC_PROB.eq.3 .or. IBC_PROB.eq.4 .or. IBC_PROB.eq.6) call propagate_flag(2,3)
 !

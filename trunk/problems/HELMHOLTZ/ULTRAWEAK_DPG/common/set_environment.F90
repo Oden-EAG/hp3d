@@ -86,8 +86,11 @@ subroutine set_environment
 !   
    call get_option_real( '-alpha', 'Scaling parameter for the test norm' , 1.d0, ALPHA)
 !
+#if HP3D_USE_OPENMP
+!..number of OpenMP threads
    call get_option_int( '-nthreads', 'Number of OpenMP threads', 1, nthreads)
    call omp_set_num_threads(nthreads)
+#endif
 !
 end subroutine set_environment
 
