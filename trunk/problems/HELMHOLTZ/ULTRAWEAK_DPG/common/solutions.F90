@@ -306,7 +306,3 @@
    end select
 ! 
    end subroutine acoustics_solution
-
-
-
-

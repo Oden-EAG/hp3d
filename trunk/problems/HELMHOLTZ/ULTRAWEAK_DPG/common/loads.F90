@@ -73,19 +73,14 @@
    end subroutine getf
 
 
-
-
-
-
-
 !---------------------------------------------------------------------
-!> @brief      Returns impedence source term at a point
+!> @brief      Returns impedance source term at a point
 !!
 !> @param[in]  Mdle     - middle node number
 !> @param[in]  X        - a point in physical space
 !> @param[in]  Rn       - surface normal
 !> @param[in]  NBCflag  - boudnary condition flag
-!> @param[out] Gval     - value of impedence source term at the point
+!> @param[out] Gval     - value of impedance source term at the point
 !!
 !> @date       July 2023
 !----------------------------------------------------------------------

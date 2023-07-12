@@ -8,7 +8,7 @@ HP3D_USE_OPENMP    ?= 0
 HP3D_USE_INTEL_MKL ?= 0
 
 ifeq ($(COMPLEX),0)
-$(error COMPLEX FLAG MUST BE 1 FOR ACOUSTICS)
+$(error COMPLEX FLAG MUST BE 1 FOR HELMHOLTZ)
 endif
 
 SRC_PATH        = .
@@ -29,10 +29,17 @@ LIBS            = $(PROB_LIBS)
 # Defines SRC_MODULE,SRC_COMMON,SRC_LASER
 -include make.inc
 
-SRC         = $(addprefix $(SRC_PATH)/,$(SRC_FILE))
-OBJ         = $(addprefix $(OBJ_PATH)/,$(SRC_FILE:.F90=.o))
+MODULE_FILE   = $(addprefix $(SRC_PATH)/,$(SRC_MODULE))
+COMMON_FILE   = $(addprefix $(SRC_PATH)/,$(SRC_COMMON))
+UW_FILE   = $(addprefix $(SRC_PATH)/,$(SRC_UW))
 
-FC_WORK     = $(FC) $(CCDEFS) $(CCINCS) $(FFLAGS) $(EXTRA_FFLAGS)
+MODULE_OBJ    = $(addprefix $(OBJ_PATH)/, $(MODULE_FILE:.F90=.o))
+COMMON_OBJ    = $(addprefix $(OBJ_PATH)/, $(COMMON_FILE:.F90=.o))
+UW_OBJ    = $(addprefix $(OBJ_PATH)/, $(UW_FILE:.F90=.o))
+
+OBJ           = $(MODULE_OBJ) $(COMMON_OBJ) $(UW_OBJ)
+
+FC_WORK       = $(FC) $(CCDEFS) $(CCINCS) $(FFLAGS) $(EXTRA_FFLAGS)
 
 #-------------------------------------------------
 .PHONY : one
@@ -49,10 +56,24 @@ $(OBJ_PATH)/.dummy :
 	@echo "Creating directory " $(OBJ_PATH)
 	@mkdir -p $(OBJ_PATH); touch $@;
 	
-$(OBJ_PATH)/%.o : $(SRC_PATH)/%.F90
+# assumes no module inter-dependencies
+$(MODULE_OBJ) : $(OBJ_PATH)/%.o : $(SRC_PATH)/%.F90
 	@mkdir -p $(dir $@)
 	@echo "Compiling $<"
 	$(FC_WORK) -o $@ -c $<
+
+# common files may depend on modules
+$(COMMON_OBJ) : $(OBJ_PATH)/%.o : $(SRC_PATH)/%.F90 $(MODULE_OBJ)
+	@mkdir -p $(dir $@)
+	@echo "Compiling $<"
+	$(FC_WORK) -o $@ -c $<
+
+# UW files may depend on modules
+$(UW_OBJ) : $(OBJ_PATH)/%.o : $(SRC_PATH)/%.F90 $(MODULE_OBJ)
+	@mkdir -p $(dir $@)
+	@echo "Compiling $<"
+	$(FC_WORK) -o $@ -c $<
+
 
 #-------------------------------------------------
 .PHONY : print clean clean-pv
@@ -65,9 +86,7 @@ clean :
 	@rm -f $(EXEC)
 	@rm -f *~
 	@rm -f *.mod
-	@rm -f *genmod.f90
 
 clean-pv :
-	@rm -f ../outputs/paraview/*
-	@rm -f ../outputs/power/*
-	@rm -f ../outputs/temp/*
+	@rm -f ../outputs/paraview/*.xmf
+	@rm -f ../outputs/paraview/*.h5
