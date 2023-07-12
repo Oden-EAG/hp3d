@@ -341,11 +341,13 @@ clean-problems:
 	@echo "Clean 'problems' directory."
 	@(cd problems/MPI_TEST/TEST ; $(MAKE) clean; cd ../..);
 ifeq ($(COMPLEX),1)
-	@(cd problems/MAXWELL/GALERKIN ; $(MAKE) clean; cd ../..);
-	@(cd problems/LASER/UW_COUPLED ; $(MAKE) clean; cd ../..);
+	@(cd problems/MAXWELL/GALERKIN        ; $(MAKE) clean; cd ../..);
+	@(cd problems/HELMHOLTZ/ULTRAWEAK_DPG ; $(MAKE) clean; cd ../..);
+	@(cd problems/LASER/UW_COUPLED        ; $(MAKE) clean; cd ../..);
 else
 	@(cd problems/POISSON/GALERKIN        ; $(MAKE) clean; cd ../..);
 	@(cd problems/POISSON/PRIMAL_DPG      ; $(MAKE) clean; cd ../..);
+	@(cd problems/POISSON/ULTRAWEAK_DPG   ; $(MAKE) clean; cd ../..);
 	@(cd problems/VECTOR_POISSON/GALERKIN ; $(MAKE) clean; cd ../..);
 	@(cd problems/SHEATHED_HOSE           ; $(MAKE) clean; cd ..);
 endif
