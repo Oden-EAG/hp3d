@@ -66,6 +66,9 @@ isol=4
 comp=1
 
 #
+omega=10.d0
+
+#
 # ==================
 # RUN CONFIGURATIONS
 # ==================

@@ -40,7 +40,7 @@ subroutine set_environment_maxwell
 ! =============================
 ! ========== PHYSICS ==========
 ! =============================
-   call get_option_string( '-file_phys', 'Physics file', '../UW_COUPLED/input/physMaxwell', FILE_PHYS)
+   call get_option_string( '-file_phys', 'Physics file', '../ULTRAWEAK_DPG/input/physMaxwell', FILE_PHYS)
 !
 !..Misc (refinement, history error files)
    call get_option_string( '-file_refinement', 'Refinement files location', '../../../files/ref', FILE_REFINE )
