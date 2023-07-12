@@ -3,7 +3,7 @@
 !
 !------------------------------------------------------------------------------
 !> @brief      Propagate flag from father to son nodes; used to correctly
-!!             inherit impedence BCs
+!!             inherit impedance BCs
 !!
 !> @param[in]  Icomp  - Physics component on which to propagate BC flag
 !> @param[in]  Nflag  - flag to propagate

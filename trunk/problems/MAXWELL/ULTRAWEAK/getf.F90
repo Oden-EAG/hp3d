@@ -100,7 +100,7 @@ end subroutine getf
 !> @param[in]  Mdle     - element (middle node) number
 !> @param[in]  X        - physical coordinates
 !> @param[in]  Rn       - surface normal
-!> @param[out] Imp_val  - impedence value at point
+!> @param[out] Imp_val  - impedance value at point
 !!
 !> @date       July 2023
 !------------------------------------------------------------------------------
