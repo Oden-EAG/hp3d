@@ -65,7 +65,6 @@ subroutine set_environment_maxwell
    call get_option_int('-isol', 'ISOL'       , 1, ISOL         )
 !
    call get_option_int('-imax', 'IMAX', 3, IMAX)
-   call get_option_int('-jmax', 'JMAX', 0, JMAX)
    call get_option_int('-job' , 'JOB' , 0, JOB )
 !
    call get_option_int('-maxnods','MAXNODS_USER',0 ,MAXNODS_USER)

@@ -21,7 +21,7 @@
       integer :: i, ierr, numPts, fld
       real(8) :: MPI_Wtime, start_time, end_time
 !
-      logical :: adaptive_refs = .true.
+      logical :: adaptive_refs = .false.
 !
 !----------------------------------------------------------------------
 !

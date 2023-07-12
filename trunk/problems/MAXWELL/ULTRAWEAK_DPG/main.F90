@@ -135,7 +135,7 @@ program main
 !..set interface variables
 !  (1) - Hcurl for Maxwell trace (2 components)
 !  (2) - L2 field for Maxwell (6 components)
-   PHYSAi(1:2) = (/.true., .true./)
+   PHYSAi(1:2) = (/.true., .false./)
 !
 !..set homogeneous Dirichlet flags
    if (NEXACT.eq.0) then

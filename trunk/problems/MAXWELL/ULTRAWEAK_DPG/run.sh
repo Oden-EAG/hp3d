@@ -35,9 +35,8 @@ p=2
 dp=1
 
 # EXEC JOB options
-job=1
-imax=0
-jmax=1
+job=0
+imax=3
 
 # max NODES
 maxnods=100000
@@ -65,7 +64,7 @@ isol=4
 # component number for manufactured solution
 comp=1
 
-#
+# angular frequency
 omega=10.d0
 
 #
