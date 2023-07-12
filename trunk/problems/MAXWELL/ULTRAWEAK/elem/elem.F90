@@ -55,7 +55,7 @@
       norder (1:19) = 0
       norderP(1:19) = 0
 !
-      ntype = NODES(Mdle)%type
+      ntype = NODES(Mdle)%ntype
       nrv = nvert(ntype); nre = nedge(ntype); nrf = nface(ntype)
 !
 !  ...determine order of approximation
@@ -70,18 +70,18 @@
          case(MDLN,MDLD)
             nordP = NODES(Mdle)%order + NORD_ADD
          case default
-            write(*,*) 'elem: invalid etype param. stop.'
+            write(*,*) 'elem: invalid ntype param. stop.'
             stop
       end select
 !
 !  ...note: compute_enriched_order works only for hexa and prism currently
-      call compute_enriched_order(etype,nordP, norderP)
+      call compute_enriched_order(ntype,nordP, norderP)
 !  ...compute nrdof for trial
-      call celndof(etype,norder, nrdofH,nrdofE,nrdofV,nrdofQ)
+      call celndof(ntype,norder, nrdofH,nrdofE,nrdofV,nrdofQ)
 !  ...compute nrdof for test
-      call celndof(etype,norderP, nrdofHH,nrdofEE,nrdofVV,nrdofQQ)
+      call celndof(ntype,norderP, nrdofHH,nrdofEE,nrdofVV,nrdofQQ)
 !  ...compute number of bubble dofs
-      call ndof_nod(etype,norder(nre+nrf+1), ndofHmdl,ndofEmdl,ndofVmdl,ndofQmdl)
+      call ndof_nod(ntype,norder(nre+nrf+1), ndofHmdl,ndofEmdl,ndofVmdl,ndofQmdl)
 !
 !  ...node supports all physical attributes
 !  ...2 physical attributes: case = 2^2-1 = 3
@@ -129,6 +129,7 @@
    subroutine compute_enriched_order(ntype,Nord, Norder)
 !
       use parameters, only : MODORDER
+      use node_types
 !
       implicit none
 !
@@ -142,7 +143,7 @@
 !----------------------------------------------------------------------
 !
 !  ...see implementation of BrokenExactSequence in shape functions
-      select case(Etype)
+      select case(ntype)
          case(MDLB)
             call decod(Nord,MODORDER,2, temp) !xy face, z edge
             nordF(1) = temp(1); nordB(3) = temp(2)

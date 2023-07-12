@@ -53,13 +53,13 @@
 !
       real(8) :: r_x, r_xx, r_xy, r_xz
       real(8) :: r_y, r_yx, r_yy, r_yz
-      real(8) ;; r_z, r_zx, r_zy, r_zz
+      real(8) :: r_z, r_zx, r_zy, r_zz
 !
       real(8) :: dxdxs, dxdys, dxdzs
       real(8) :: dydxs, dydys, dydzs
       real(8) :: dzdxs, dzdys, dzdzs
 !
-      real(8) :: x1, x2, x3, xshift, yshift, zshift,
+      real(8) :: x1, x2, x3, xshift, yshift, zshift
       real(8) :: r, alpha, zm
 !
 !TODO: Fix this

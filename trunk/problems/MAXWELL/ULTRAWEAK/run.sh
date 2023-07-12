@@ -72,7 +72,7 @@ comp=1
 #
 # NEW RUN CONFIGS (MPI+OpenMP CODE)
 # ===========================================================================
-file_geometry='../geometries/cube'
+file_geometry='./geometries/cube'
 ctrl='control/control_1'
 #
 args=" -isol ${isol} -omega ${omega} -gamma 1.0d0 -comp ${comp}"

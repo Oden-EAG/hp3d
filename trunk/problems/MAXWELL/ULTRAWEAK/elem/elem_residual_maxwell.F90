@@ -143,7 +143,7 @@
       allocate(gramP(NrTest*(NrTest+1)/2))
 !
 !  ...element type
-      ntype = NODES(Mdle)%type
+      ntype = NODES(Mdle)%ntype
       nrf = nface(ntype)
 !
 !  ...determine order of approximation
@@ -183,8 +183,6 @@
          xi(1:3) = xiloc(1:3,l)
          wa = waloc(l)
 !
-         call get_permittivity(mdle,xi,norient_edge,norient_face, eps)
-!
 !     ...determine element H1 shape functions
          call shape3DH(ntype,xi,norder,norient_edge,norient_face,  &
                        nrdof,shapH,gradH)
@@ -222,6 +220,10 @@
 !     ...geometry
          call geom3D(Mdle,xi,xnod,shapH,gradH,NrdofH, &
                       x,dxdxi,dxidx,rjac,iflag)
+!
+!     ...get permittivity tensor
+         call get_permittivity(mdle,x, eps)
+!
 !     ...integration weight
          weight = rjac*wa
 !     ...compute the approximate solution
@@ -446,7 +448,7 @@
 !
                k=2*k1-1
 !           ...check for impedance BC (elimination strategy)
-               if (ibc(ifc,2).eq.3)
+               if (ibc(ifc,2).eq.3) then
 !              - GAMMA * < n x n x E , G >
                   zaux = E1(1)*zflux2(1,1) + E1(2)*zflux2(2,1) + E1(3)*zflux2(3,1)
                   bload_E(k) = bload_E(k) - zaux * weight

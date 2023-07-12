@@ -17,6 +17,7 @@ program main
    use GMP
    use physics
    use commonParam
+   use parametersDPG
 !
    use assembly
    use assembly_sc, only: IPRINT_TIME
@@ -107,7 +108,7 @@ program main
    if (RANK .ne. ROOT) goto 80
 !
 !..print problem parameters
-   write(*,9030) ' Polynomial order (x,y,z) = ',IP
+   write(*,9030) ' Polynomial order (x,y,z) = ', IP
    write(*,9010) ' NORD_ADD (Delta p)       = ', NORD_ADD
    write(*,9010) ' ISOL                     = ', ISOL
    write(*,9010) ' NEXACT                   = ', NEXACT
@@ -134,14 +135,14 @@ program main
 !..set interface variables
 !  (1) - Hcurl for Maxwell trace (2 components)
 !  (2) - L2 field for Maxwell (6 components)
-   PHYSAi(1:6) = (/.true., .true./)
+   PHYSAi(1:2) = (/.true., .true./)
 !
 !..set homogeneous Dirichlet flags
    if (NEXACT.eq.0) then
       PHYSAd(1:2) = (/.false.,.false./)
    endif
 !
-   PHYSAm(1:6) = (/.true.,.true./)
+   PHYSAm(1:2) = (/.true.,.true./)
 !
 !..set static condensation flags
    ISTC_FLAG = .true. ! activate automatic static condensation
@@ -360,11 +361,11 @@ subroutine master_main()
                write(*,*) '   nr_elem_ref = ', nr_elem_ref
                do i=1,nr_elem_ref
                   read(UNIT=9, FMT="(I6)") mdle
-                  select case (NODES(mdle)%type)
-                     case('mdlb'); kref = 110
-                     case('mdlp'); kref = 10
+                  select case (NODES(mdle)%ntype)
+                     case(MDLB); kref = 110
+                     case(MDLP); kref = 10
                      case default
-                        write(*,*) 'READING UNEXPECTED ELEMENT TYPE (mdle): ',NODES(mdle)%type,' (',mdle,')'
+                        write(*,*) 'READING UNEXPECTED ELEMENT TYPE (mdle): ',s_type(NODES(mdle)%ntype),' (',mdle,')'
                         call pause
                   end select
                   call refine(mdle,kref)

@@ -77,11 +77,6 @@ subroutine set_environment_maxwell
    call get_option_real('-mu'     , 'MU'     , 1.d0, MU     )
    call get_option_real('-epsilon', 'EPSILON', 1.d0, EPSILON)
 !
-!..PML VARIABLES
-!..exp_coeff is only used for manufactured solution tests
-   call get_option_real('-expA'   , 'EXP_COEFF', 0.2d0   , EXP_COEFF)
-   call get_option_real('-pmlfrac', 'PML_FRAC' , 0.25d0  , PML_FRAC )
-!
 !..Set frequency OMEGA and impedance constant GAMMA
    call get_option_real('-omega' , 'OMEGA', 2.d0*PI, OMEGA)
    call get_option_real('-gamma' , 'GAMMA', 1.0d0, GAMMA)

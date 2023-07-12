@@ -56,16 +56,16 @@
          case(MDLN,MDLD)
             nordP = NODES(Mdle)%order+NORD_ADD
          case default
-            write(*,*) 'elem_residual: invalid etype param. stop.'
+            write(*,*) 'elem_residual: invalid ntype param. stop.'
             stop
       end select
 !
 !  ...note: compute_enriched_order works only for hexa and prism currently
-      call compute_enriched_order(etype,nordP, norderP)
+      call compute_enriched_order(ntype,nordP, norderP)
 !  ...compute nrdof for trial
-      call celndof(etype,norder, nrdofH,nrdofE,nrdofV,nrdofQ)
+      call celndof(ntype,norder, nrdofH,nrdofE,nrdofV,nrdofQ)
 !  ...compute nrdof for test
-      call celndof(etype,norderP, nrdofHH,nrdofEE,nrdofVV,nrdofQQ)
+      call celndof(ntype,norderP, nrdofHH,nrdofEE,nrdofVV,nrdofQQ)
 !
       nrTest = 2*nrdofEE
 !

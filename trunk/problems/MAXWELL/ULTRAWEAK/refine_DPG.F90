@@ -26,6 +26,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
    use parametersDPG, only: NORD_ADD
    use par_mesh     , only: DISTRIBUTED,HOST_MESH
    use mpi_param    , only: ROOT,RANK,NUM_PROCS
+   use sorts        , only: qsort_duplet
    use MPI          , only: MPI_COMM_WORLD,MPI_SUM,MPI_COMM_WORLD,   &
                             MPI_REAL8,MPI_INTEGER,MPI_IN_PLACE,MPI_MAX
 !
@@ -75,7 +76,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
    real(8) :: error_subd, rnorm_subd
 !
    integer :: nod, nel, mdle, iel, kref, subd
-   integer :: count, ierr, i, ic,
+   integer :: count, ierr, i, ic
    real(8) :: x(3), xnod(3,8)
    integer :: refine_strategy
 !
@@ -309,7 +310,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
             call get_subd(mdle, subd)
             if (DISTRIBUTED .and. (RANK .ne. subd)) cycle
 !
-            ntype = NODES(mdle)%type
+            ntype = NODES(mdle)%ntype
 !
 !        ...set potential h-ref
             select case(ntype)

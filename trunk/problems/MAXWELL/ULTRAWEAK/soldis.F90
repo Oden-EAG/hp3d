@@ -63,12 +63,12 @@
       select case (IEXACT_DISP)
 !  ...exact solution
       case(1)
-        call exact(X, icase, &
-                   zvalH,zdvalH,zd2valH, &
-                   zvalE,zdvalE,zd2valE, &
-                   zvalV,zdvalV,zd2valV, &
-                   zvalQ,zdvalQ,zd2valQ)
-        select case (ICHOOSE_COMP)
+         call exact(X, icase, &
+                    zvalH,zdvalH,zd2valH, &
+                    zvalE,zdvalE,zd2valE, &
+                    zvalV,zdvalV,zd2valV, &
+                    zvalQ,zdvalQ,zd2valQ)
+         select case (ICHOOSE_COMP)
 !
 !     ...exact E (tangential) trace
          case(1)
@@ -107,6 +107,7 @@
             Val = dreal(zvalQ(5))
          case(12)
             Val = dreal(zvalQ(6))
+         end select
 !
 !  ...approximate solution
       case(0)
@@ -150,6 +151,7 @@
             Val = dreal(zsolQ(5))
          case(12)
             Val = dreal(zsolQ(6))
+!
          end select
       end select
       if (iprint.eq.1) then

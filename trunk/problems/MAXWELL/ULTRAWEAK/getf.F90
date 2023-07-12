@@ -71,7 +71,7 @@ subroutine getf(Mdle,X, Zfval,ZJval)
                             valV,dvalV,d2valV,valQ,dvalQ,d2valQ)
 !
 !        ...RHS = curl H - iωεE
-            zaux = ZI*OMEGA*OMEGA_RATIO_SIGNAL*EPSILON
+            zaux = ZI*OMEGA*EPSILON
             ZJval(1) = dvalE(3,2,2) - dvalE(2,2,3) - zaux*valE(1,1)
             ZJval(2) = dvalE(1,2,3) - dvalE(3,2,1) - zaux*valE(2,1)
             ZJval(3) = dvalE(2,2,1) - dvalE(1,2,2) - zaux*valE(3,1)

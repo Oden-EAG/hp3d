@@ -235,9 +235,6 @@
 !
          xi(1:3)=xiloc(1:3,l); wa=waloc(l)
 !
-!     ...get permittivity at xi
-         call get_permittivity(mdle,xi,norient_edge,norient_face, eps)
-!
 !     ...H1 shape functions (for geometry)
          call shape3DH(ntype,xi,norder,norient_edge,norient_face, nrdofH,shapH,gradH)
 !
@@ -249,6 +246,9 @@
 !
 !     ...geometry map
          call geom3D(Mdle,xi,xnod,shapH,gradH,nrdofH, x,dxdxi,dxidx,rjac,iflag)
+!
+!     ...get permittivity at x
+         call get_permittivity(mdle,x, eps)
 !
 #if DEBUG_MODE
          if (iflag .ne. 0) then
