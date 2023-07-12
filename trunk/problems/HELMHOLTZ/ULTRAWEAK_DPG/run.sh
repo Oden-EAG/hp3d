@@ -80,7 +80,7 @@ alpha=1.0d0
 echo
 
 # Print setup info
-exec=DPG_uweak_acoustics
+exec=helm
 echo "Running ultraweak formulation..."
 echo "Problem          = " $prob_verb
 echo "geometry file    = " $geometry

@@ -28,10 +28,11 @@ history
 *.obj
 
 # Binary Applications
+helm
+hose
 maxw
 pois
 uwLaser
-hose
 
 # Tests
 trunk/test/_exec_

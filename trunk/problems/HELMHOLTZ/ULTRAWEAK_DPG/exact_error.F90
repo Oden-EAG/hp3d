@@ -104,8 +104,8 @@
          NRELES_SUBD = NRELES
       endif
 !   
-!$OMP PARALLEL DEFAULT(PRIVATE)                              &
-!$OMP SHARED(mdle_list,elem_resid,elem_ref_flag,NRELES)  &
+!$OMP PARALLEL DEFAULT(PRIVATE)                &
+!$OMP SHARED(elem_resid,elem_ref_flag,NRELES)  &
 !$OMP REDUCTION(+:residual)           
 !$OMP DO
       do iel=1,NRELES_SUBD

@@ -17,7 +17,7 @@ OBJ_PATH        = $(OBJ_ROOT)/maindir
 MODULE_PATH     = $(OBJ_PATH)
 
 # Executable name
-EXEC            = DPG_uweak_acoustics
+EXEC            = helm
 
 # Includes and defs
 CCDEFS          = $(PROB_PP_DEFS)

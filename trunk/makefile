@@ -188,6 +188,8 @@ problems: lib
 ifeq ($(COMPLEX),1)
 	@echo "Compiling Maxwell Galerkin..."
 	@(cd problems/MAXWELL/GALERKIN ; $(MAKE) ; cd ../..);
+	@echo "Compiling Helmholtz DPG Ultraweak..."
+	@(cd problems/HELMHOLTZ/ULTRAWEAK_DPG   ; $(MAKE) ; cd ../..);
 	@echo "Compiling Laser application..."
 	@(cd problems/LASER/UW_COUPLED ; $(MAKE) ; cd ../..);
 	@echo "Finished building complex-valued problems."
