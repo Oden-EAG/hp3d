@@ -1,21 +1,20 @@
-!----------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 !> @brief       Routine propagates impedance BC from parent to son nodes.
 !!              This is an advanced routine for enforcing impedance
 !!              boundary conditions using the elimination strategy; see
 !!              notes in parallel hp-book.
 !!
-!> @param[in]   icomp   - component to propagate flag
+!> @param[in]   Icomp   - component to propagate flag
 !> @param[in]   Nflag   - flag to propagate
 !!
 !> @date        July 2023
-!----------------------------------------------------------------------
+!-------------------------------------------------------------------------------
    subroutine propagate_flag(Icomp,Nflag)
 !
       use data_structure3D
       use common_prob_data_UW, only: IBC_PROB
       use par_mesh,            only: DISTRIBUTED
-      use MPI,                 only: MPI_IN_PLACE, MPI_INTEGER, MPI_SUM,   &
-                                     MPI_COMM_WORLD
+      use MPI,                 only: MPI_IN_PLACE, MPI_INTEGER, MPI_SUM, MPI_COMM_WORLD
 !
       implicit none
 !

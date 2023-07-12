@@ -49,8 +49,8 @@ subroutine initialize
    character(len=1024) :: argv
 !--------------------------------------------------------------------------
 !
-!..read history
-   call open_history_file(trim(FILE_HISTORY))
+!..output file open for the history of refinements (not for MPI)
+!  call open_history_file(trim(FILE_HISTORY))
 !
 !..intialize refinements
    call init_refinements(trim(FILE_REFINE))
@@ -63,8 +63,8 @@ subroutine initialize
 !
    if (MAXNODS_USER .gt. 0) MAXNODS = MAXNODS_USER
    if (.not. QUIET_MODE) then
-      write(*,*) 'User specified MAXNODS value:'
-      write(*,9999) MAXNODS
+      !write(*,*) 'User specified MAXNODS value:'
+      !write(*,9999) MAXNODS
       9999 format(' MAXNODS = ',i12)
    endif
 !

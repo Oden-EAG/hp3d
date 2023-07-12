@@ -1,5 +1,5 @@
 !---------------------------------------------------------------------
-!> @brief      Computes dirichlet data at a point
+!> @brief      Computes Dirichlet data at a point
 !!
 !> @param[in]  X        - a point in physical space
 !> @param[in]  Icase    - node case (specifies what variables are supported)

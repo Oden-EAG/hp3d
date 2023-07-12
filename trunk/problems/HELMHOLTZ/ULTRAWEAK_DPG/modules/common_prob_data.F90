@@ -1,7 +1,7 @@
 !
 !----------------------------------------------------------------------
-!> @brief      Module containing global variables for UW acoustics problem
-!> @date       July 2023
+!> @brief   Module containing global variables for UW acoustics problem
+!> @date    July 2023
 !----------------------------------------------------------------------
    module common_prob_data_UW
 !

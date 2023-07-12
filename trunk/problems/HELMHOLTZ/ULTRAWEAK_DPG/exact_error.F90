@@ -28,7 +28,7 @@
 !----------------------------------------------------------------------
 !
 !  ...flag components to compute error for
-      iflag(1) = 0; iflag(2) = 0 ; iflag(3) = 1
+      iflag(1) = 0; iflag(2) = 0; iflag(3) = 1
 !
       err = 0.d0; rnorm = 0.d0
 !

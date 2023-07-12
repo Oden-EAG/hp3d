@@ -4,10 +4,10 @@
 !
 !----------------------------------------------------------------------
 !
-!     latest revision:  - May 2020
+!     latest revision:  - July 2023
 !
 !     purpose:          - main driver for MPI Test Program
-!                         Poisson Galerkin implementation
+!                         Helmholtz UW DPG implementation
 !
 !----------------------------------------------------------------------
 !
@@ -82,10 +82,13 @@ program main
 !..(1)--trace
 !..(2)--fluxv
 !..(3)--L2 field (x4)
-PHYSAi(1:3) = (/.true.,.true.,.false./)
-PHYSAm(1:3) = (/.true.,.true.,.true./)
-PHYSAd(1:3) = (/.false.,.false.,.false./)
-!..FLAGS
+   PHYSAi(1:3) = (/.true.,.true.,.false./)
+!..Set flags for de-/activating variables
+   PHYSAm(1:3) = (/.true.,.true.,.true./)
+!..Set flags for in-/homogeneous Dirichlet BCs
+   PHYSAd(1:3) = (/.false.,.false.,.false./)
+!
+!..Static condenstation module flags
    ISTC_FLAG = .true.
    STORE_STC = .true.
    HERM_STC  = .true.
@@ -191,7 +194,7 @@ subroutine master_main()
       write(*,*) '        ---- Refinements ----            '
       write(*,*) 'Single uniform h-refinement............20'
       write(*,*) 'Single uniform p-refinement............21'
-      write(*,*) 'Multiple uniform h-refs + solve........22'
+      !write(*,*) 'Multiple uniform h-refs + solve........22'
       write(*,*) 'Single anisotropic h-refinement (z)....23'
       write(*,*) 'Refine a single element................26'
       write(*,*) '                                         '

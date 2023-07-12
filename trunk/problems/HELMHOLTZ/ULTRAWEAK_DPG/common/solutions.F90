@@ -1,6 +1,6 @@
 !---------------------------------------------------------------------
 !> @brief      Compute all relevant quantities of the exact solutions
-!!             for the linear elasticty problems
+!!             for the linear acoustics problem
 !!
 !> @param[in]  X        - a point in physical space
 !> @param[out] p        - value of the solution pressure
