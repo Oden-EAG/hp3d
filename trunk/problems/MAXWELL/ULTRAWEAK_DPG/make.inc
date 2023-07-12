@@ -1,10 +1,14 @@
-SRC_FILE    = \
-        common/commonParam.F90 \
+SRC_MODULE  = \
+        modules/commonParam.F90
+        
+SRC_COMMON  = \
         common/commonRoutines.F90 \
         common/exact_error.F90 \
         common/mfd_solutions.F90 \
         common/residual.F90 \
-        common/set_environment.F90 \
+        common/set_environment.F90
+        
+SRC_UW      = \
         celem.F90 \
         dirichlet.F90 \
         elem/elem.F90 \
