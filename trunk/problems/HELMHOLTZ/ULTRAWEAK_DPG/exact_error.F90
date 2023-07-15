@@ -37,20 +37,18 @@
          NRELES_SUBD = NRELES
       endif
 !
-!$OMP PARALLEL DEFAULT(PRIVATE)        &
-!$OMP SHARED(NRELES,iflag,mdle)        &
+!$OMP PARALLEL DO                            &
+!$OMP PRIVATE(errorH,errorE,errorV,errorQ,   &
+!$OMP         rnormH,rnormE,rnormV,rnormQ)   &
 !$OMP REDUCTION(+:err,rnorm)
-!$OMP DO
       do iel=1,NRELES_SUBD
-         mdle = ELEM_SUBD(iel)
-         call element_error(mdle,iflag,                     &
+         call element_error(ELEM_SUBD(iel),iflag,           &
                             errorH,errorE,errorV,errorQ,    &
                             rnormH,rnormE,rnormV,rnormQ)
          err = err + errorQ
          rnorm = rnorm + rnormQ
       enddo
-!$OMP END DO        
-!$OMP END PARALLEL
+!$OMP END PARALLEL DO
 !
       if (DISTRIBUTED) then
          call MPI_ALLREDUCE(MPI_IN_PLACE,err,1,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
@@ -104,17 +102,13 @@
          NRELES_SUBD = NRELES
       endif
 !   
-!$OMP PARALLEL DEFAULT(PRIVATE)                &
-!$OMP SHARED(elem_resid,elem_ref_flag,NRELES)  &
-!$OMP REDUCTION(+:residual)           
-!$OMP DO
+!$OMP PARALLEL DO            &
+!$OMP REDUCTION(+:residual)
       do iel=1,NRELES_SUBD
-         mdle = ELEM_SUBD(iel)
-         call elem_residual(mdle, elem_resid(iel),elem_ref_flag(iel))
+         call elem_residual(ELEM_SUBD(iel), elem_resid(iel),elem_ref_flag(iel))
          residual = residual + elem_resid(iel)
       enddo
-!$OMP END DO        
-!$OMP END PARALLEL
+!$OMP END PARALLEL DO
 !
       if (DISTRIBUTED) then
          call MPI_ALLREDUCE(MPI_IN_PLACE,residual,1,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
