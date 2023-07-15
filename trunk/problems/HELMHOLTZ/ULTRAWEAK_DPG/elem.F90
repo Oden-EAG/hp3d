@@ -60,7 +60,7 @@
             case(MDLP)      ; nordP = NODES(Mdle)%order + nord_add_local*11
          end select
 !
-         call compute_enriched_order(nordP, norderP)
+         call compute_enriched_order(ntype,nordP, norderP)
 !
 !     ...number of element trial DOFs
          call celndof(ntype,norder, nrdofH,nrdofE,nrdofV,nrdofQ)
@@ -519,7 +519,7 @@
 !      Alternative construction of normal matrix
 !----------------------------------------------------------------------
 !
-      i1 = nrTEST ; j1 = nrdofHi ; j2 = nrdofVi ; j3 = 4*nrdofQ
+      i1 = nrTEST; j1 = nrdofHi; j2 = nrdofVi; j3 = 4*nrdofQ
 !
       Stiff_ALL(1:i1,1:j1)             = transpose(StiffHV_H(1:j1,1:i1))
       Stiff_ALL(1:i1,j1+1:j1+j2)       = transpose(StiffHV_V(1:j2,1:i1))
@@ -540,11 +540,9 @@
       call ZTRSM('L','U','C','N',N,NRHS,ZONE,Gram,N,Stiff_ALL,N)
       call ZHERK('U','C',NRHS,N,ZONE,Stiff_ALL,N,ZERO,Zaloc,NRHS)
 !
-      do i=1,NRHS-1
+      do i=1,nrdofHi+nrdofVi+4*nrdofQ
          Zaloc(i+1:NRHS,i) = conjg(Zaloc(i,i+1:NRHS))
       enddo
-!
-      N = NRHS-1
 !
       BLOC(1)%array(1:j1,1) = Zaloc(1:j1,j1+j2+j3+1)
       BLOC(2)%array(1:j2,1) = Zaloc(j1+1:j1+j2,j1+j2+j3+1)
@@ -579,38 +577,60 @@
 !!
 !> @date        July 2023
 !----------------------------------------------------------------------
-   subroutine compute_enriched_order(Nord,Norder)
+   subroutine compute_enriched_order(EType,Nord, Norder)
 !
-      use parameters , only : MODORDER
+      use node_types, only : MDLB, MDLP, MDLN
+      use parameters, only : MODORDER
 !
       implicit none
+!
+      integer, intent(in)  :: Etype
       integer, intent(in)  :: Nord
       integer, intent(out) :: Norder(19)
+!
       integer :: temp(2)
-      integer :: nordF(3)
-      integer :: nordB(3),ndofH(3)
+      integer :: nordF(3),nordB(3)
 !
 !----------------------------------------------------------------------
 !
-      call decod(Nord,MODORDER,2, temp)
-      nordF(1) = temp(1) ; nordB(3) = temp(2)
-      call decod(nordF(1),MODORDER,2, nordB(1:2))
-      call encod((/nordB(1),nordB(3)/),MODORDER,2, nordF(2))
-      call encod(nordB(2:3),MODORDER,2, nordF(3))
-!
-!  ...edges
-      norder(1:4)=(/nordB(1),nordB(2),nordB(1),nordB(2)/)
-      norder(5:8)=(/nordB(1),nordB(2),nordB(1),nordB(2)/)
-      norder(9:12)=nordB(3)
-!
-!  ...faces
-      norder(13:14)=nordF(1)
-      norder(15:18)=(/nordF(2),nordF(3),nordF(2),nordF(3)/)
-!
-!  ...middle
-      norder(19)=Nord
+!  ...see implementation of BrokenExactSequence in shape functions
+      select case(Etype)
+         case(MDLB)
+            call decod(Nord,MODORDER,2, temp) !xy face, z edge
+            nordF(1) = temp(1); nordB(3) = temp(2)
+            call decod(nordF(1),MODORDER,2, nordB(1:2)) !x edge, y edge
+            call encod((/nordB(1),nordB(3)/),MODORDER,2, nordF(2)) !xz face
+            call encod(nordB(2:3),MODORDER,2, nordF(3)) !yz face
+!        ...edges
+            Norder(1:4)   = (/nordB(1),nordB(2),nordB(1),nordB(2)/) !x,y,x,y edges
+            Norder(5:8)   = (/nordB(1),nordB(2),nordB(1),nordB(2)/) !x,y,x,y edges
+            Norder(9:12)  = nordB(3) !z edges
+!        ...faces
+            Norder(13:14) = nordF(1) !xy faces
+            Norder(15:18) = (/nordF(2),nordF(3),nordF(2),nordF(3)/) !xz,yz,xz,yz faces
+!        ...element interior
+            Norder(19)    = Nord
+         case(MDLP)
+            call decod(Nord,MODORDER,2, nordB(1:2))
+!        ...edges (xy)
+            norder(1:6)   = nordB(1)
+!        ...edges (z)
+            norder(7:9)   = nordB(2)
+!        ...triangular faces
+            norder(10:11) = nordB(1)
+!        ...quadrilateral faces (z)
+            norder(12:14) = Nord
+!        ...element interior
+            norder(15)    = Nord
+         case(MDLN)
+            norder(1:11) = Nord
+         case default
+            write(*,*) 'compute_enriched_order: only available for hexa and prism. stop.'
+            stop
+      end select
 !
    end subroutine compute_enriched_order
+!
 
 
 

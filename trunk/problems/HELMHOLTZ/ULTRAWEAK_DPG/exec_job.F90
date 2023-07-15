@@ -25,7 +25,7 @@
 !
       EXCHANGE_DOF = .true.
 !
-      if(RANK .eq. ROOT) then
+      if (RANK .eq. ROOT) then
          write(*,*) '=================='
          write(*,*) 'exec_job: starting'
          write(*,*) '=================='
@@ -67,7 +67,7 @@
 !  ...write paraview output
       call my_paraview_driver(iParAttr)
 !
-      if(RANK .eq. ROOT) then
+      if (RANK .eq. ROOT) then
          write(*,*)
          write(*,*) '=================='
          write(*,*) 'exec_job: finished'
