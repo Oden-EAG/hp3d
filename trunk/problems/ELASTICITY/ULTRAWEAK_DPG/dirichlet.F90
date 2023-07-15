@@ -21,18 +21,18 @@
       integer, intent(in)  :: Icase,Mdle
 !
 !  ...exact solution
-      real*(8), intent(out) ::   ValH(  MAXEQNH    )
-      real*(8), intent(out) ::  DvalH(  MAXEQNH,3  )
-      real*(8)              :: d2valH(  MAXEQNH,3,3)
-      real*(8), intent(out) ::   ValE(3,MAXEQNE    )
-      real*(8), intent(out) ::  DvalE(3,MAXEQNE,3  )
-      real*(8)              :: d2valE(3,MAXEQNE,3,3)
-      real*(8), intent(out) ::   ValV(3,MAXEQNV    )
-      real*(8), intent(out) ::  DvalV(3,MAXEQNV,3  )
-      real*(8)              :: d2valV(3,MAXEQNV,3,3)
-      real*(8)              ::   valQ(  MAXEQNQ    )
-      real*(8)              ::  dvalQ(  MAXEQNQ,3  )
-      real*(8)              :: d2valQ(  MAXEQNQ,3,3)
+      real(8), intent(out) ::   ValH(  MAXEQNH    )
+      real(8), intent(out) ::  DvalH(  MAXEQNH,3  )
+      real(8)              :: d2valH(  MAXEQNH,3,3)
+      real(8), intent(out) ::   ValE(3,MAXEQNE    )
+      real(8), intent(out) ::  DvalE(3,MAXEQNE,3  )
+      real(8)              :: d2valE(3,MAXEQNE,3,3)
+      real(8), intent(out) ::   ValV(3,MAXEQNV    )
+      real(8), intent(out) ::  DvalV(3,MAXEQNV,3  )
+      real(8)              :: d2valV(3,MAXEQNV,3,3)
+      real(8)              ::   valQ(  MAXEQNQ    )
+      real(8)              ::  dvalQ(  MAXEQNQ,3  )
+      real(8)              :: d2valQ(  MAXEQNQ,3,3)
 !
       integer :: iprint = 0
 !
@@ -44,9 +44,7 @@
       ValV = ZERO; DvalV = ZERO
       select case(NEXACT)
 !
-!==============================================================================
-!  UNKNOWN EXACT SOLUTION                                                     |
-!==============================================================================
+!  ...unknown exact solution
       case(0)
 !
 ! TODO: Fix this
@@ -54,9 +52,7 @@
             ValV(2,2) = -1.d0
          endif
 !
-!==============================================================================
-!  KNOWN EXACT SOLUTION                                                       |
-!==============================================================================
+!  ...known exact solution
       case(1,2)
 !     ...use the exact solution to determine Dirichlet data
          call exact(X,Icase, ValH,DvalH,d2valH, ValE,DvalE,d2valE,   &
