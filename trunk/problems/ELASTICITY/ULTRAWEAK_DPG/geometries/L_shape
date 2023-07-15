@@ -1,0 +1,219 @@
+3   3     NDIM,MANDIM
+
+0         no surfaces
+
+1         NRDOMAIN
+
+
+16          NRPOINT
+
+Regular             point 1
+-1.d0 1.d0 0.d0
+
+Regular             point 2
+-1.d0 0.d0 0.d0
+
+Regular             point 3
+0.d0 1.d0 0.d0
+
+Regular             point 4
+0.d0 0.d0 0.d0
+
+Regular             point 5
+0.d0 -1.d0 0.d0
+
+Regular             point 6
+1.d0 1.d0 0.d0
+
+Regular             point 7
+1.d0 0.d0 0.d0
+
+Regular             point 8
+1.d0 -1.d0 0.d0
+
+Regular             point 9
+-1.d0 1.d0 1.d0
+
+Regular             point 10
+-1.d0 0.d0 1.d0
+
+Regular             point 11
+0.d0 1.d0 1.d0
+
+Regular             point 12
+0.d0 0.d0 1.d0
+
+Regular             point 13
+0.d0 -1.d0 1.d0
+
+Regular             point 14
+1.d0 1.d0 1.d0
+
+Regular             point 15
+1.d0 0.d0 1.d0
+
+Regular             point 16
+1.d0 -1.d0 1.d0
+
+28 NRCURVE
+
+Seglin              curve 1
+1 2
+
+Seglin              curve 2
+3 4
+
+Seglin              curve 3
+4 5
+
+Seglin              curve 4
+6 7
+
+Seglin              curve 5
+7 8
+
+Seglin              curve 6
+1 3
+
+Seglin              curve 7
+2 4
+
+Seglin              curve 8
+3 6
+
+Seglin              curve 9
+4 7
+
+Seglin              curve 10
+5 8
+
+Seglin              curve 11
+9 10
+
+Seglin              curve 12
+11 12
+
+Seglin              curve 13
+12 13
+
+Seglin              curve 14
+14 15
+
+Seglin              curve 15
+15 16
+
+Seglin              curve 16
+9 11
+
+Seglin              curve 17
+10 12
+
+Seglin              curve 18
+11 14
+
+Seglin              curve 19
+12 15
+
+Seglin              curve 20
+13 16
+
+Seglin              curve 21
+1 9
+
+Seglin              curve 22
+2 10
+
+Seglin              curve 23
+3 11
+
+Seglin              curve 24
+4 12
+
+Seglin              curve 25
+5 13
+
+Seglin              curve 26
+6 14
+
+Seglin              curve 27
+7 15
+
+Seglin              curve 28
+8 16
+
+0  NRTRIAN
+
+
+16 NRRECTA
+
+BilQua              rectangle 1
+1 2 4 3
+
+BilQua              rectangle 2
+3 4 7 6
+
+BilQua              rectangle 3
+4 5 8 7
+
+BilQua              rectangle 4
+9 10 12 11
+
+BilQua              rectangle 5
+11 12 15 14
+
+BilQua              rectangle 6
+12 13 16 15
+
+BilQua              rectangle 7
+1 9 11 3
+
+BilQua              rectangle 8
+2 10 12 4
+
+BilQua              rectangle 9
+3 11 14 6
+
+BilQua              rectangle 10
+4 12 15 7
+
+BilQua              rectangle 11
+5 13 16 8
+
+BilQua              rectangle 12
+2 10 9 1
+
+BilQua              rectangle 13
+4 12 11 3
+
+BilQua              rectangle 14
+5 13 12 4
+
+BilQua              rectangle 15
+7 15 14 6
+
+BilQua              rectangle 16
+8 16 15 7
+
+
+
+0 NRPRISM
+
+
+
+3 NRHEXAS
+
+Linear              hexa 1
+1    1 2 4 3 9 10 12 11
+
+Linear              hexa 2
+1    3 4 7 6 11 12 15 14
+
+Linear              hexa 3
+1    4 5 8 7 12 13 16 15
+
+0 NRTETRA
+
+
+
+0 NRPYRAM
+
