@@ -188,7 +188,7 @@ contains
 !
       implicit none
 !
-      real(8), intent(out) :: Symm(3,3,3,3),
+      real(8), intent(out) :: Symm(3,3,3,3)
 !
       integer :: i, j, k, l
 !

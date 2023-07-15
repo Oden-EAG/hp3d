@@ -42,6 +42,9 @@
 !  ...Resid vector for the enriched space
       real(8), allocatable :: EnrResid(:), EnrResidc(:)
 !
+!  ...gram matrix
+      real(8), allocatable :: Gram(:)
+!
 !  ...tensors in physical coordinates
       real(8), dimension(3,3,3,3) :: A,AA,Symm
 !
@@ -79,6 +82,7 @@
       integer :: i, j, k, m, n, k1, k2, m1, m2
       integer :: ic, jc, ijc, kc, lc, klc
       integer :: ipt, nint, ifc, iload, iflag, info, nordtmp
+      integer :: nrTest
       real(8) :: diff, DDOT
 !
       integer :: iprint = 0
@@ -298,7 +302,7 @@
                         k2 = int((m2-6*nrdofHH-1)/3)+1
                         kc = mod(m2-6*nrdofHH-1,3)+1
 
-                        tmp ZERO
+                        tmp = ZERO
                         if (ic.eq.jc) then
                            do m = 1,3
                               tmp = tmp  &
@@ -548,9 +552,9 @@
 !
 !  ...compute the product of inverted test Gram matrix with RHS
       call DPPTRS('U',9*nrdofHH,1,Gram,EnrResid,1, info)
-      if (info1.ne.0) then
+      if (info.ne.0) then
          write(*,*) 'elem_residual: info1 = ',info
-         stop1
+         stop 1
       endif
 !
 !  ...compute the residual
@@ -603,7 +607,7 @@
       integer, save :: iwork(10)
 !
 !  ...miscellaneous
-      integer :: i,iel,iphys
+      integer :: i, iel, iphys, ierr
 !
       integer :: iprint = 0
 !

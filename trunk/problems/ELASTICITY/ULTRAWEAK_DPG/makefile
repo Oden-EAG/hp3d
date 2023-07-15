@@ -35,7 +35,7 @@ ELAST_FILE    = $(addprefix $(SRC_PATH)/,$(SRC_ELAST))
 
 MODULE_OBJ    = $(addprefix $(OBJ_PATH)/, $(MODULE_FILE:.F90=.o))
 COMMON_OBJ    = $(addprefix $(OBJ_PATH)/, $(COMMON_FILE:.F90=.o))
-ELAST_OBJ     = $(addprefix $(OBJ_PATH)/, $(UW_FILE:.F90=.o))
+ELAST_OBJ     = $(addprefix $(OBJ_PATH)/, $(ELAST_FILE:.F90=.o))
 
 OBJ           = $(MODULE_OBJ) $(COMMON_OBJ) $(ELAST_OBJ)
 

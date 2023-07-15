@@ -393,10 +393,9 @@
       real(8),          intent(out) :: Epsilon(3,3)
       real(8),          intent(out) :: Sigma(3,3)
 !
-  
       real(8) :: x, y, r, drdx, drdy, poisson, sig
       real(8) :: theta, dthetadx,dthetady
-      real(8) :: a, b, alpha, ak,
+      real(8) :: a, b, alpha, ak
       real(8) :: F, Fd, Fdd, G, Gd, Gdd
       real(8) :: ur, utheta, urdr, urdtheta, uthetadr, uthetadtheta
       real(8) :: trr, tthetatheta, trtheta

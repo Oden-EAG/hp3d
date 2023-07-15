@@ -8,18 +8,19 @@
    subroutine exec_case(idec)
 !
       use data_structure3D
+      use physics
       use par_mesh
       use mpi_param
       use paraview      , only: VLEVEL
       use mpi
-      use common_prob_data_UW
+      use common_prob_data
       use zoltan_wrapper, only: zoltan_w_set_lb,zoltan_w_eval
 !
       implicit none
 !
       integer, intent(in) :: idec
 !
-      integer :: iParAttr(3)
+      integer :: iParAttr(NR_PHYSA)
       character(len=2) :: vis_level
 !
       logical :: solved
@@ -85,7 +86,7 @@
          case(20)
             write(*,*) 'global h-refinement...'
             call global_href
-            if (IBC_PROB.eq.3 .or. IBC_PROB.eq.4) call propagate_flag(2,3)
+!            if (IBC_PROB.eq.3 .or. IBC_PROB.eq.4) call propagate_flag(2,3)
             call update_gdof
             call update_Ddof
 !

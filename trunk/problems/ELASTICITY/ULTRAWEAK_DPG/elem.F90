@@ -58,15 +58,15 @@
 !--------------------------------------------------------------------------
    subroutine elem_DPG_UWEAK_SYMM(Mdle)
 !
-      use control, only: INTEGRATION
+      use control,                  only: INTEGRATION
       use parameters
       use parametersDPG
       use data_structure3D
       use element_data
       use isotropic_elast_material
-      use physics   , only : NR_PHYSA
-      use assembly  , only : ALOC,BLOC,NR_RHS
-      use common_prob_data, only: SYMMETRY_TOL, TEST_NORM
+      use physics,                  only: NR_PHYSA
+      use assembly,                 only: ALOC, BLOC, NR_RHS
+      use common_prob_data,         only: SYMMETRY_TOL, TEST_NORM, ALPHA
 !
       implicit none
 !
@@ -118,10 +118,10 @@
       real(8) :: EnrFieldDispl (9*MAXbrickHH,3*MAXbrickQ)  !EnrFieldDisplc
       real(8) :: EnrFieldStress(9*MAXbrickHH,6*MAXbrickQ)  !EnrFieldStressc
       real(8) :: EnrLoad       (9*MAXbrickHH,NR_RHS)
-      real(8) :: EnrEverything (9*MAXbrickHH,                                         &
-                                    3*MAXbrickH+3*MAXbrickV+9*MAXbrickQ+NR_RHS)
-      real(8) :: FullDPG       (3*MAXbrickH+3*MAXbrickV+9*MAXbrickQ,                  &
-                                    3*MAXbrickH+3*MAXbrickV+9*MAXbrickQ+NR_RHS)
+      real(8) :: Stiff_All(9*MAXbrickHH,                                &
+                           3*MAXbrickH+3*MAXbrickV+9*MAXbrickQ+NR_RHS)
+      real(8) :: FullDPG(3*MAXbrickH+3*MAXbrickV+9*MAXbrickQ,           &
+                         3*MAXbrickH+3*MAXbrickV+9*MAXbrickQ+NR_RHS)
 !  ...Gram matrix
       real(8) :: Gram((9*MAXbrickHH)*(9*MAXbrickHH+1)/2)
 !

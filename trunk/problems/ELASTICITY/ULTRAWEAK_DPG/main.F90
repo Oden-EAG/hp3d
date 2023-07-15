@@ -128,7 +128,7 @@
    subroutine master_main()
 !
       use environment
-      use common_prob_data_UW
+      use common_prob_data
       use data_structure3D
       use GMP
 !
@@ -321,7 +321,7 @@
    subroutine worker_main()
 !
       use environment
-      use common_prob_data_UW
+      use common_prob_data
       use data_structure3D
       use GMP
 !

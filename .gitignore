@@ -28,6 +28,7 @@ history
 *.obj
 
 # Binary Applications
+elastUW
 maxw
 pois
 uwLaser

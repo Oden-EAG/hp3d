@@ -10,7 +10,6 @@
       use common_prob_data
       use paraview
       use parametersDPG, only: NORD_ADD
-      use testvars
 !
       implicit none
 !
@@ -39,9 +38,10 @@
       call get_option_int('-exact'     , 'Manufactured solution (integer: 1-5)'         ,IEXACT_TRILINEAR,IEXACT_PROB)
       call get_option_int('-norm-trial', '1)L2, 2)Natural, 3)Custom'                    ,IERROR_NATURAL  ,IERROR_PROB)
       call get_option_int('-norm-test' , '1) Adj Graph, 2)Natural, 3)Custom'            ,ADJOINT_GRAPH   ,TEST_NORM  )
-      call get_option_int('-alpha'     , 'DPG test norm L2 weight'                      ,1.d0            ,ALPHA      )
+      call get_option_real('-alpha'    , 'DPG test norm L2 weight'                     ,1.d0           ,ALPHA      )
 !
 !  ...The variable dp defining enrichment in DPG problems - src/modules/parametersDPG
       call get_option_int('-dp', 'p-enrichment order for DPG', 1, NORD_ADD)
+      call get_option_int('-job','job number to run'         , 0, JOB)
 !
    end subroutine set_environment

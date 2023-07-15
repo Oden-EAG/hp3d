@@ -12,7 +12,7 @@ SRC_COMMON = \
 SRC_ELAST  = \
             celem.F90 \
             dirichlet.F90 \
-            elem.F90 \
+            elem_new.F90 \
             elem_residual.F90 \
             exact.F90 \
             exact_error.F90 \

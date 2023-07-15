@@ -22,14 +22,16 @@
       use control
       use element_data
       use data_structure3D
-      use environment  , only: QUIET_MODE
-      use assembly_sc  , only: NRDOF_CON, NRDOF_TOT
-      use parametersDPG, only: NORD_ADD
-      use par_mesh     , only: DISTRIBUTED,HOST_MESH
-      use mpi_param    , only: ROOT,RANK,NUM_PROCS
-      use MPI          , only: MPI_COMM_WORLD,MPI_SUM,MPI_COMM_WORLD,   &
-                              MPI_REAL8,MPI_INTEGER,MPI_IN_PLACE,MPI_MAX
-      use sorts        , only: qsort_duplet
+      use environment,     only: QUIET_MODE
+      use assembly_sc,     only: NRDOF_CON, NRDOF_TOT
+      use parametersDPG,   only: NORD_ADD
+      use par_mesh,        only: DISTRIBUTED,HOST_MESH
+      use mpi_param,       only: ROOT,RANK,NUM_PROCS
+      use MPI,             only: MPI_COMM_WORLD, MPI_SUM, MPI_COMM_WORLD,  &
+                                 MPI_REAL8, MPI_INTEGER, MPI_IN_PLACE,     &
+                                 MPI_MAX
+      use sorts,           only: qsort_duplet
+      use common_prob_data
 !
       implicit none
 !
@@ -451,6 +453,41 @@
   2025 format(' close mesh : ',f12.5,'  seconds')
   2030 format(A,I8,', ',I9)
 !
-      if (IBC_PROB.eq.3 .or. IBC_PROB.eq.4 .or. IBC_PROB.eq.6) call propagate_flag(2,3)
+!      if (IBC_PROB.eq.3 .or. IBC_PROB.eq.4 .or. IBC_PROB.eq.6) call propagate_flag(2,3)
 !
    end subroutine refine_DPG
+
+
+
+
+
+!------------------------------------------------------------------------------
+!> @brief      criterion set by user for choosing between h and p refinement
+!!
+!> @param[in]  Mdle     - element (middle node) number
+!> @param[out] Iref     - refinement kind
+!!                         1: h-refinement
+!!                         2: p-refinement
+!!
+!> @date       July 2023
+!------------------------------------------------------------------------------
+   subroutine select_refinement(Mdle,Iref)
+!
+      use data_structure3D
+      use element_data
+!
+      implicit none
+!
+      integer, intent(in)  :: Mdle
+      integer, intent(out) :: Iref
+!
+      integer :: i,j,nod,nodp,iv,ie,nrv,nre,nel
+      integer :: nodesl(27), norientl(27)
+      real*8  :: h, lambda
+!
+!---------------------------------------------------------------------
+!
+! TODO: define critereon here
+      Iref = 1
+!
+   end subroutine select_refinement

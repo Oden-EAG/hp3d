@@ -69,4 +69,8 @@
 !  ...tolerance for element computations
       real*8,  parameter :: SYMMETRY_TOL = 1.d-9
 !
+!  ...command-line defined max nodes
+      integer :: MAXNODS_USER
+      integer :: JOB
+!
    end module common_prob_data

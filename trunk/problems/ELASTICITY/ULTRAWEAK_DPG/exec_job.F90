@@ -6,7 +6,7 @@
 !----------------------------------------------------------------------
    subroutine exec_job
 !
-      use common_prob_data_UW
+      use common_prob_data
       use data_structure3D
       use mpi_param
       use MPI,             only: MPI_COMM_WORLD
@@ -18,7 +18,7 @@
       implicit none
 !
       integer :: i, ierr
-      integer :: iParAttr(3)
+      integer :: iParAttr(4)
       real(8) :: MPI_Wtime, start_time, end_time
 !
 !----------------------------------------------------------------------
@@ -35,7 +35,7 @@
       if (NUM_PROCS .ge. NRELES) then
          if (RANK .eq. ROOT) write(*,*) 'global h-refinement...'
          call global_href
-         if (IBC_PROB.eq.3 .or. IBC_PROB.eq.4 .or. IBC_PROB.eq.6) call propagate_flag(2,3)
+!         if (IBC_PROB.eq.3 .or. IBC_PROB.eq.4 .or. IBC_PROB.eq.6) call propagate_flag(2,3)
          call update_gdof
          call update_Ddof
       endif

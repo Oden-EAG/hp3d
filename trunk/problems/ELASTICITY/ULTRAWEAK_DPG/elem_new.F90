@@ -10,9 +10,10 @@
 !--------------------------------------------------------------------------
    subroutine elem(Mdle, Itest,Itrial)
 !
-      use physics   , only : NR_PHYSA
-      use assembly  , only : ALOC,BLOC,NR_RHS
+      use physics,         only : NR_PHYSA
+      use assembly,        only : ALOC, BLOC, NR_RHS
       use data_structure3D
+      use parametersDPG
 !
       implicit none
 !
@@ -42,7 +43,6 @@
       select case(NODES(Mdle)%case)
       case(15)
          Itest(1:NR_PHYSA)=1; Itrial(1:NR_PHYSA)=1
-         call elem_DPG_UWEAK_SYMM(Mdle)
 !
 !     ...get DPG enrichment order
          nord_add_local = NORD_ADD
@@ -75,18 +75,18 @@
          nrdofVi = nrdofV - ndofVmdl
          nrTrial = 3*nrdofHi + 3*nrdofVi + 9*nrdofQ
 !
-         if (nrTest .le. nrTrial-ndofHmdl-ndofVmdl) then
+         if (nrTest .le. nrTrial) then
             nord_add_local = nord_add_local + 1
 !$omp critical
             write(*,*) 'elem: WARNING mdle =  ', mdle
-            write(*,*) 'elem: NrTest, NrTrial = ', nrTest, nrTrial-ndofHmdl-ndofVmdl
+            write(*,*) 'elem: NrTest, NrTrial = ', nrTest, nrTrial
             write(*,*) 'elem: nord_add_local  = ', nord_add_local
 !$omp end critical
             go to 10
          endif
 !
-         call elem_uw_elasticity_DPG(nord_add_local,nrTest,nrTrial,  &
-                                     nrdofHH,nrdofH,nrdofV,nrdofQ,   &
+         call elem_uw_elasticity_DPG(mdle,nord_add_local,nrTest,nrTrial,  &
+                                     nrdofHH,nrdofH,nrdofV,nrdofQ,        &
                                      ndofHmdl,ndofVmdl)
 !
       case default
@@ -207,12 +207,12 @@
       integer :: k1, k2, k3, k4, k5
       integer :: m1, m2, m3, m4, m5
       integer :: n1, n2, n3
-      integer :: i1, j1, j2, j3, j4, j1, j12, j123, j1234
+      integer :: i1, j1, j2, j3, j4, j12, j123, j1234
       integer :: ic, jc, kc, lc, klc, ijc
-      integer :: ipt, ifc, iflag, info
+      integer :: ipt, ifc, iflag, info, nrhs
       integer :: kH, kV, kQ, lH, lV, lQ
       integer :: ndofphys(NR_PHYSA)
-      real(8) :: diffmax,dmax
+      real(8) :: diffmax, dmax
 !
       integer :: iprint = 0
 !
@@ -245,7 +245,7 @@
       allocate(EnrTraceStress(3*nrdofVi,NrTest));  EnrTraceStress(:,:) = ZERO
       allocate(EnrFieldDispl (3*NrdofQ, NrTest));  EnrFieldDispl (:,:) = ZERO
       allocate(EnrFieldStress(6*NrdofQ, NrTest));  EnrFieldStress(:,:) = ZERO
-      allocate(EnrLoad(NrTest,NR_RHS));            EnrLoad(:) = ZERO
+      allocate(EnrLoad(NrTest,NR_RHS));            EnrLoad(:,:) = ZERO
 !
 !  ...initialize the Gram matrix
       allocate(Gram(NrTest,NrTest))
@@ -764,8 +764,8 @@
 #if DEBUG_MODE
       if (iprint.eq.1) then
          write(*,*) 'Gram = '
-         do i=1,25
-            write(*,6000) i,Gram((i+1)*i/2-(i-1):(i+1)*i/2)
+         do i=1,NrTest
+            write(*,6000) i,Gram(i,1:NrTest)
  6000       format('i = ',i3,'  ',25e12.5)
          enddo
 !
@@ -834,7 +834,7 @@
       deallocate(EnrLoad)
 !
       N     = NrTest
-      NRHS  = j1234 + NR_RHS
+      nrhs  = j1234 + NR_RHS
 !
 !  ...G^-1 * Stiff_ALL
       call DPOTRF('U',N,Gram,N,info)
@@ -843,14 +843,14 @@
       endif
 !
 !  ...Build full DPG matrix (stiffness + load) in one go
-      call DTRSM('L','U','T','N',N,NRHS,ZONE,Gram,N,Stiff_ALL,N)
-      deallocate(Gram); allocate(FullDPG(NRHS,NRHS))
-      call DHERK('U','T',NRHS,N,ZONE,Stiff_ALL,N,ZERO,FullDPG,NRHS)
+      call DTRSM('L','U','T','N',N,nrhs,ZONE,Gram,N,Stiff_ALL,N)
+      deallocate(Gram); allocate(FullDPG(nrhs,nrhs))
+      call DSYRK('U','T',nrhs,N,ZONE,Stiff_ALL,N,ZERO,FullDPG,nrhs)
       deallocate(Stiff_ALL)
 !
 !  ...Fill lower triangular part
       do i=1,j1234
-         FullDPG(i+1:NRHS,i) = FullDPG(i,i+1:NRHS)
+         FullDPG(i+1:nrhs,i) = FullDPG(i,i+1:nrhs)
       enddo
 !
 !  ...Populate the assembly matrices accordingly
