@@ -15,6 +15,12 @@
 !
 !     NRDOMAIN
 !
+!     isurf_flag     (surface domains flags
+!                     =  0    no surface domains are read when inputing
+!                             data for TRIANGLES and RECTANGLES
+!                     =  1    surface domains are expected when inputing
+!                             data for TRIANGLES and RECTANGLES  )
+!
 !     NRPOINT
 !     POINTS(1)%Type
 !     POINTS(1)%Idata(:)   (as implied by Type)
@@ -100,7 +106,7 @@ subroutine input_DEFAULT(Fp)
 
       integer, parameter :: nin=16
       character(len=10) :: type
-      integer :: ns,np,nc,j,k,nt,nr,npri,nh,ntet,npyr
+      integer :: ns,np,nc,j,k,nt,nr,npri,nh,ntet,npyr,isurf_flag
       integer :: istat
       integer :: iprint
 !-----------------------------------------------------------------------
@@ -221,12 +227,28 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
       read(nin,*) NRDOMAIN
 !
 !---------------------------------------------------------------------
-!  POINTS                                                            |
+!  POINTS  and surface domains flag                                  |
 !---------------------------------------------------------------------
 !
 !  ...read in number of points
       read(nin,*) NRPOINT
- IF (.NOT. QUIET_MODE)     write(*,1009) NRPOINT
+!
+!  ...most likely, we have read the surface domains flag
+      if ((NRPOINT.eq.0).or.(NRPOINT.eq.1)) then
+        isurf_flag = NRPOINT
+!
+!  .....proceed with reading the actual number of points
+        read(nin,*) NRPOINT
+!
+!  ...most likely, the surface domains flag is missing, set it to 0
+      else
+        write(*,*) 'input_DEFAULT: surface domains flag missing, ',&
+                   ' setting it to 0'
+        call pause
+        isurf_flag = 0
+      endif 
+!
+      IF (.NOT. QUIET_MODE)     write(*,1009) NRPOINT
  1009 format(' NRPOINT = ',i7,' ; reading points...')
 !
       if (MAXNP.lt.NRPOINT) then
@@ -379,7 +401,10 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !  ...loop over triangles
       do nt=1,NRTRIAN
         read(nin,*)  TRIANGLES(nt)%Type
-        read(nin,*) (TRIANGLES(nt)%VertNo(j) , j=1,3)
+        select case(isurf_flag)
+        case(0); read(nin,*) (TRIANGLES(nt)%VertNo(j) , j=1,3)
+        case(1); read(nin,*) TRIANGLES(nt)%Domain, (TRIANGLES(nt)%VertNo(j) , j=1,3)
+        end select
 !
         type=TRIANGLES(nt)%Type
         select case(type)
@@ -440,7 +465,10 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !  ...loop over rectangles
       do nr=1,NRRECTA
         read(nin,*)  RECTANGLES(nr)%Type
-        read(nin,*) (RECTANGLES(nr)%VertNo(j) , j=1,4)
+        select case(isurf_flag)
+        case(0); read(nin,*) (RECTANGLES(nr)%VertNo(j) , j=1,4)
+        case(1); read(nin,*) RECTANGLES(nr)%Domain, (RECTANGLES(nr)%VertNo(j) , j=1,4)
+        end select
 !
         select case(RECTANGLES(nr)%Type)
 !

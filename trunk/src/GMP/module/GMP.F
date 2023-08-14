@@ -286,6 +286,9 @@ c     tetrahedron : nick = ntetra*10 + 3
 c     pyramid     : nick = npyram*10 + 4
 c     no block (figure on the boundary) : nick=0
 c
+c  Domain  - part of a 2D manifold, the triangle is on; useful for
+c            setting up boundary or interface conditions
+c
 c  Idata   - integer data associated to the triangle
 c
 c  Rdata   - real    data associated to the triangle
@@ -296,6 +299,7 @@ c----------------------------------------------------------------------
         integer                                 :: VertNo(3)
         integer                                 :: EdgeNo(3)
         integer                                 :: BlockNo(2)
+        integer                                 :: Domain
         integer,          dimension(:), pointer :: Idata
         real(8),          dimension(:), pointer :: Rdata
       endtype triangle
@@ -346,6 +350,9 @@ c   ( tetrahedron : nick = ntetra*10 + 3 )
 c     pyramid     : nick = npyram*10 + 4
 c     no block (figure on the boundary) : nick=0
 c
+c  Domain  - part of a 2D manifold, the triangle is on; useful for
+c            setting up boundary or interface conditions
+c
 c  Idata   - integer data associated to the rectangle
 c
 c  Rdata   - real    data associated to the rectangle
@@ -356,6 +363,7 @@ c----------------------------------------------------------------------
         integer                                 :: VertNo(4)
         integer                                 :: EdgeNo(4)
         integer                                 :: BlockNo(2)
+        integer                                 :: Domain
         integer,          dimension(:), pointer :: Idata
         real(8),          dimension(:), pointer :: Rdata
       endtype rectangle
@@ -565,6 +573,7 @@ c
         TRIANGLES(i)%VertNo = 0
         TRIANGLES(i)%EdgeNo = 0
         TRIANGLES(i)%BlockNo = 0
+        TRIANGLES(i)%Domain = 0
         nullify(TRIANGLES(i)%Idata)
       enddo
 c
@@ -574,6 +583,7 @@ c
         RECTANGLES(i)%VertNo = 0
         RECTANGLES(i)%EdgeNo = 0
         RECTANGLES(i)%BlockNo = 0
+        RECTANGLES(i)%Domain = 0
         nullify(RECTANGLES(i)%Idata)
         nullify(RECTANGLES(i)%Rdata)
       enddo
@@ -753,6 +763,7 @@ c
         write(ndump,*) TRIANGLES(nt)%VertNo(1:3)
         write(ndump,*) TRIANGLES(nt)%EdgeNo(1:3)
         write(ndump,*) TRIANGLES(nt)%BlockNo(1:2)
+        write(ndump,*) TRIANGLES(nt)%Domain
 c  .....Idata
         if (associated(TRIANGLES(nt)%Idata)) then
           nn = ubound(TRIANGLES(nt)%Idata,1)
@@ -781,6 +792,7 @@ c
         write(ndump,*) RECTANGLES(nr)%VertNo(1:4)
         write(ndump,*) RECTANGLES(nr)%EdgeNo(1:4)
         write(ndump,*) RECTANGLES(nr)%BlockNo(1:2)
+        write(ndump,*) RECTANGLES(nr)%Domain
 c  .....Idata
         if (associated(RECTANGLES(nr)%Idata)) then
           nn = ubound(RECTANGLES(nr)%Idata,1)
@@ -1044,6 +1056,7 @@ c
         read(ndump,*) TRIANGLES(nt)%VertNo(1:3)
         read(ndump,*) TRIANGLES(nt)%EdgeNo(1:3)
         read(ndump,*) TRIANGLES(nt)%BlockNo(1:2)
+        read(ndump,*) TRIANGLES(nt)%Domain
         read(ndump,*) nn
         if (nn.gt.0) then
           allocate(TRIANGLES(nt)%Idata(nn))
@@ -1058,6 +1071,7 @@ c
         read(ndump,*) RECTANGLES(nr)%VertNo(1:4)
         read(ndump,*) RECTANGLES(nr)%EdgeNo(1:4)
         read(ndump,*) RECTANGLES(nr)%BlockNo(1:2)
+        read(ndump,*) RECTANGLES(nr)%Domain
         read(ndump,*) nn
         if (nn.gt.0) then
           allocate(RECTANGLES(nr)%Idata(nn))
