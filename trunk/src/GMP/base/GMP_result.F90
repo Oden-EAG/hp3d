@@ -76,11 +76,12 @@
       case(4)
         if ((i.lt.1).or.(i.gt.NRTRIAN)) go to 10
         write(*,7040) TRIANGLES(i)%Type,TRIANGLES(i)%VertNo,&
-                      TRIANGLES(i)%EdgeNo,TRIANGLES(i)%BlockNo
- 7040   format('TRIANGLES(i)%Type   = ',a10,/,&
-               'TRIANGLES(i)%VertNo = ',3i6,/,&
-               'TRIANGLES(i)%EdgeNo = ',3i6,/,&
-               'TRIANGLES(i)%BlockNo = ',2i6)
+                      TRIANGLES(i)%EdgeNo,TRIANGLES(i)%BlockNo,TRIANGLES(i)%Domain
+ 7040   format('TRIANGLES(i)%Type    = ',a10,/,&
+               'TRIANGLES(i)%VertNo  = ',3i6,/,&
+               'TRIANGLES(i)%EdgeNo  = ',3i6,/,&
+               'TRIANGLES(i)%BlockNo = ',2i6,/&
+               'TRIANGLES(i)%Domain  = ',i4)
         if (associated(TRIANGLES(i)%Idata)) write(*,7041) TRIANGLES(i)%Idata
  7041   format('TRIANGLES(i)%Idata = ',30i10)
 !
@@ -88,11 +89,12 @@
       case(5)
         if ((i.lt.1).or.(i.gt.NRRECTA)) go to 10
         write(*,7050) RECTANGLES(i)%Type,RECTANGLES(i)%VertNo, &
-                      RECTANGLES(i)%EdgeNo,RECTANGLES(i)%BlockNo 
+                      RECTANGLES(i)%EdgeNo,RECTANGLES(i)%BlockNo,RECTANGLES(i)%Domain 
  7050   format('RECTANGLES(i)%Type    = ',a10,/,&
                'RECTANGLES(i)%VertNo  = ',4i6,/,&
                'RECTANGLES(i)%EdgeNo  = ',4i6,/,&
-               'RECTANGLES(i)%BlockNo = ',2i6)
+               'RECTANGLES(i)%BlockNo = ',2i6,/,&
+               'RECTANGLES(i)%Domain  = ',i4)
         if (associated(RECTANGLES(i)%Idata)) write(*,7051) RECTANGLES(i)%Idata
  7051   format('RECTANGLES(i)%Idata = ',30i10)
         if (associated(RECTANGLES(i)%Rdata)) write(*,7052) RECTANGLES(i)%Rdata

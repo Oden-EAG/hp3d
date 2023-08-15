@@ -376,7 +376,7 @@
         endif
 !
 !  .....loop through the curves connected to the block
-        do je=1,nedge(ntype)
+        do je=1,NEDGE(ntype)
 !
 !  .......quit if the curve has already been defined and connected
           select case(ntype)
@@ -537,8 +537,7 @@
           nr3 = point_nrblocks(np3)
 !
 !  .......determine blocks adjacent to the face
-          call find_figure_blocks(ftype, &
-                                  np1,nr1,point_to_blocks(1:nr1,np1), &
+          call find_figure_blocks(np1,nr1,point_to_blocks(1:nr1,np1), &
                                   np2,nr2,point_to_blocks(1:nr2,np2), &
                                   np3,nr3,point_to_blocks(1:nr3,np3), &
                                   list_blk,nr_blk)
@@ -643,6 +642,9 @@
 !
 !  ...complete GMP connectivities
       call connect
+!
+!  ...read surface domains data
+      call read_surf_domains(nin,point_to_blocks,mpblock,point_nrblocks)
 !
 !----------------------------------------------------------------------
 !
