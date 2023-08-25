@@ -28,6 +28,9 @@ dp=1
 # Number of OpenMP threads
 nthreads=1
 
+# Job number: 0 = interactive, 1 = exec_job
+job=1
+
 # Problem: 0 = freespace, 1 = Cavity
 prob=0
 
@@ -105,8 +108,9 @@ mpirun -np 4 ./$exec \
     -dp $dp \
     -exact $exact \
     -bc $bc \
-    -rnum $rnum   \
+    -rnum $rnum \
     -alpha $alpha \
-    -nthreads $nthreads
+    -job $job \
+    -nthreads $nthreads 
 
 

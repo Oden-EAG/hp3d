@@ -104,7 +104,7 @@
          case(MDLP);      nordP = NODES(Mdle)%order+NORD_ADD*11
       end select
 !
-      call compute_enriched_order(nordP, norderP)
+      call compute_enriched_order(ntype,nordP, norderP)
 !
 !  ...determine edge and face orientations
       call find_orient( Mdle, norient_edge,norient_face)
