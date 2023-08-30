@@ -823,7 +823,7 @@
       j123  = j12 + j3
       j1234 = j123 + j4
 !
-      allocate(Stiff_ALL(j1,j1234+NR_RHS))
+      allocate(Stiff_ALL(i1,j1234+NR_RHS))
       Stiff_ALL(1:i1,1:j1)                 = transpose(EnrTraceDispl (1:j1,1:i1))
       Stiff_ALL(1:i1,j1+1:j1+j2)           = transpose(EnrTraceStress(1:j2,1:i1))
       Stiff_ALL(1:i1,j12+1:j12+j3)         = transpose(EnrFieldDispl (1:j3,1:i1))

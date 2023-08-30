@@ -13,6 +13,7 @@
       use data_structure3D
       use isotropic_elast_material
       use common_prob_data,         only: SYMMETRY_TOL, TEST_NORM, ALPHA
+      use assembly,                 only: NR_RHS
 !
       implicit none
 !
@@ -23,13 +24,13 @@
 !  ...element data
       integer :: ntype,ftype
       integer :: nrv, nre, nrf
-      integer :: norder(19), nordf(5), nordP
+      integer :: norder(19), nordf(5), nordP, norderP(19)
       integer :: nedge_orient(12), nface_orient(6)
 !
 !  ...shape functions
       real(8) :: shapH(MAXbrickH),   gradH(3,MAXbrickH)
       real(8) :: shapHH(MAXbrickHH), gradHH(3,MAXbrickHH)
-      integer :: nrdofH, nrdofHH
+      integer :: nrdofH, nrdofHH, nrdofEE, nrdofVV, nrdofQQ
 !
 !  ...geometry
       real(8) :: xnod(3,MAXbrickH)
@@ -52,7 +53,7 @@
       real(8) :: tmp, tmpDivTau1(3), tmpDivTau2(3), tmpTau_n(3)
 !
 !  ...source term (don't need Neumann term)
-      real(8) :: fval(3,MAXNRHS)
+      real(8) :: fval(3,NR_RHS)
 !
 !  ...quadrature data
       real(8) :: xiloc(3,MAXNINT3ADD), wxi(MAXNINT3ADD)
@@ -111,6 +112,12 @@
       case(MDLP);       nordP = NODES(Mdle)%order + nordtmp*11
       case(MDLN,MDLD);  nordP = NODES(Mdle)%order + nordtmp*1
       end select
+!
+!  ...get enriched order vector
+      call compute_enriched_order(ntype,nordP, norderP)
+!
+!  ...number of element test DOFs
+      call celndof(ntype,norderP, nrdofHH,nrdofEE,nrdofVV,nrdofQQ)
 !
 !  ...determine solution dof
       call solelm(Mdle, dofH,dofE,dofV,dofQ)
@@ -551,7 +558,7 @@
       EnrResidc(:) = EnrResid(:)
 !
 !  ...compute the product of inverted test Gram matrix with RHS
-      call DPPTRS('U',9*nrdofHH,1,Gram,EnrResid,1, info)
+      call DPPTRS('U',9*nrdofHH,1,Gram,EnrResid,NrTest, info)
       if (info.ne.0) then
          write(*,*) 'elem_residual: info1 = ',info
          stop 1

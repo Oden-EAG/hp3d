@@ -58,14 +58,15 @@
          call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
       endif
 !
-!  ...call MUMPS
-      call par_mumps_sc('H')
+      call mg_driver(1,1,0.2d0,1,10,500,1,1.d-9,0.2d0,.false.,iParAttr)
+!!  ...call MUMPS
+!      call par_mumps_sc('H')
 !
-!  ...set which attributes to output
-      iParAttr = (/3, 3, 3, 6/)
-!
-!  ...write paraview output
-      call my_paraview_driver(iParAttr)
+!!  ...set which attributes to output
+!      iParAttr = (/3, 3, 3, 6/)
+!!
+!!  ...write paraview output
+!      call my_paraview_driver(iParAttr)
 !
       if (RANK .eq. ROOT) then
          write(*,*)
