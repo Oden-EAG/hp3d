@@ -58,12 +58,11 @@
          call zoltan_w_handle_err(ierr,'Zoltan_Set_Param')
       endif
 !
+!  ...call MUMPS
+      call par_mumps_sc('H')
+!
 !  ...set which attributes to output
       iParAttr = (/1, 1, 4/)
-!
-!  ...call MUMPS
-!      call par_mumps_sc('H')
-      call mg_driver(1,1,0.2d0,0,20,500,1,1.d-6,0.2d0,.false.,iParAttr) 
 !
 !  ...write paraview output
       call my_paraview_driver(iParAttr)
