@@ -11,7 +11,7 @@
 !!
 !> @date       July 2023
 !------------------------------------------------------------------------------
-subroutine getf(Mdle,X, Zfval,ZJval)
+subroutine getf(Mdle,X, ZJval)
 !
    use control     , only: NEXACT
    use parameters  , only: MAXEQNH,MAXEQNE,MAXEQNV,MAXEQNQ,ZERO
@@ -21,7 +21,6 @@ subroutine getf(Mdle,X, Zfval,ZJval)
 !
    integer, intent(in)  :: Mdle
    real(8), intent(in)  :: X(3)
-   VTYPE  , intent(out) :: Zfval
    VTYPE  , intent(out) :: ZJval(3)
 !
 !..exact solution
@@ -52,7 +51,6 @@ subroutine getf(Mdle,X, Zfval,ZJval)
    endif
 !
 !..initialize source terms
-   Zfval = ZERO
    ZJval = ZERO
 !
    select case(NEXACT)
@@ -60,7 +58,6 @@ subroutine getf(Mdle,X, Zfval,ZJval)
 !  ...UNKNOWN EXACT SOLUTION...
       case(0)
 !
-         Zfval = ZERO
          ZJval(1:3) = ZERO
 !
 !  ........................................
@@ -81,12 +78,6 @@ subroutine getf(Mdle,X, Zfval,ZJval)
       case(2)
          continue
    end select
-!
-   if (iprint.eq.1) then
-      write(*,7010) Zfval
- 7010 format(' getf: Zfval = ',2e12.5)
-      call pause
-   endif
 !
 end subroutine getf
 

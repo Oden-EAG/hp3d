@@ -147,7 +147,7 @@
       integer :: iflag, iprint, itime, iverb
       integer :: nrdof, nordP, nsign, ifc, ndom, info, icomp, idec
 !
-      complex(8) :: zfval, zc1
+      complex(8) :: zc1
       complex(8) :: za(3,3), zc(3,3)
 !
 !  ...permittivity data
@@ -262,7 +262,7 @@
          weight = rjac*wa
 !
 !     ...get the RHS
-         call getf(Mdle,x, zfval,zJ)
+         call getf(Mdle,x, zJ)
 !
          za = (ZI*OMEGA*EPSILON) * eps(:,:)
          zc = (ZI*OMEGA*MU) * IDENTITY(:,:)

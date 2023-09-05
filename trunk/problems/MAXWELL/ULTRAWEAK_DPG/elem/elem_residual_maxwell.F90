@@ -123,7 +123,6 @@
       real(8) :: CC,EE,CE,E,EC,q,h
       integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,j,m,n,nint,kE,k,l,ivar,iflag
       integer :: nordP,nsign,ifc,ndom,info,icomp,nrdof,nrdof_eig,idec
-      VTYPE   :: zfval
       VTYPE   :: za(3,3),zc(3,3),zc1
 !
 !  ...timer
@@ -235,8 +234,8 @@
          zsolQ = zsolQ/rjac
 !
 !     ...get the RHS
-!     ...zfval (heat eqn rhs), zJ (maxwell rhs)
-         call getf(Mdle,x, zfval,zJ)
+!     ...zJ (maxwell rhs)
+         call getf(Mdle,x, zJ)
 !
 !     ...set auxiliary constants
          za = (ZI*OMEGA*EPSILON)*eps(:,:)
