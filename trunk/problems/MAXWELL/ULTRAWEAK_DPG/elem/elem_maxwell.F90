@@ -102,7 +102,7 @@
       integer, allocatable :: idxEE(:)
 !
 !  ...element mdle node dof
-      integer :: ndofHHmdl, ndofEEmdl, ndofVVmdl ,ndofQQmdl
+      integer :: ndofHHmdl, ndofEEmdl, ndofVVmdl, ndofQQmdl
 !
 !  ...load vector for the enriched space
       complex(8) :: bload_E(NrTest)
@@ -225,7 +225,7 @@
 !-----------------------------------------------------------------------
 !
 !  ...use the enriched order to set the quadrature
-      INTEGRATION = NORD_ADD + 1
+      INTEGRATION = NORD_ADD
       call set_3D_int_DPG(ntype,norder,norient_face, nint,xiloc,waloc)
       INTEGRATION = 0
 !

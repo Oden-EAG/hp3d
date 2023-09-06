@@ -2,11 +2,11 @@
 #include "typedefs.h"
 !
 !-------------------------------------------------------------------------------
-! REMARK 1: THIS ROUTINE MUST BE OMP THREAD-SAFE
-!           DUE TO OMP PARALLELIZATION OF UPDATE_DDOF->DIRICHLET
-!-------------------------------------------------------------------------------
-!> Purpose : calculate dirichlet boundary condition
-!> last mod: June 2021
+!> @remark     THIS ROUTINE MUST BE OMP THREAD-SAFE
+!              DUE TO OMP PARALLELIZATION OF UPDATE_DDOF->DIRICHLET
+!!
+!> @brief      calculate Dirichlet boundary condition
+!> @date       Sep 2023
 !!
 !> @param[in]  Mdle  - an element (middle node) number
 !> @param[in]  X     - physical coordinates of a point

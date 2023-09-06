@@ -24,12 +24,6 @@ module commonParam
    real(8), dimension(3,3), parameter :: IDENTITY = &
       reshape((/1.d0,0.d0,0.d0, 0.d0,1.d0,0.d0, 0.d0,0.d0,1.d0/), (/ 3, 3 /))
 !
-!..Speed of light in vacuum
-   real(8), parameter :: LIGHT_SPEED = 2.99792458d8
-!
-!..Planck's constant (hbar=h/2pi)
-   real(8), parameter :: H_BAR = 1.05457266d-34
-!
 !..material constants
    real(8) :: MU,EPSILON
 !
@@ -54,7 +48,6 @@ module commonParam
    integer :: ICOMP_EXACT
    integer :: ICHOOSE_DISP, ICHOOSE_COMP
    integer :: IEXACT_DISP
-   integer, parameter :: MY_NR_RHS=1
 !
 !..choose case for exact
    integer :: ISOL

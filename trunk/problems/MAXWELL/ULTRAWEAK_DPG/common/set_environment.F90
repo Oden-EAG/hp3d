@@ -4,7 +4,7 @@
 !
 !----------------------------------------------------------------------
 !
-!     latest revision:  - Apr 2019
+!     latest revision:  - Sep 2023
 !
 !     purpose:          - define options for main file specific to the problem.
 !                         These can be consulted with the -help option when running
@@ -40,7 +40,7 @@ subroutine set_environment_maxwell
 ! =============================
 ! ========== PHYSICS ==========
 ! =============================
-   call get_option_string( '-file_phys', 'Physics file', '../ULTRAWEAK_DPG/input/physMaxwell', FILE_PHYS)
+   call get_option_string( '-file_phys', 'Physics file', '../ULTRAWEAK_DPG/input/physics', FILE_PHYS)
 !
 !..Misc (refinement, history error files)
    call get_option_string( '-file_refinement', 'Refinement files location', '../../../files/ref', FILE_REFINE )

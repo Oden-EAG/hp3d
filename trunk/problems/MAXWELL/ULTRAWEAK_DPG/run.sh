@@ -23,7 +23,7 @@ dir_output='../outputs/'
 vis_level=0
 
 # MPI Procs
-nproc=4
+nproc=1
 
 # OMP THREADS
 nthreads=1
@@ -75,7 +75,7 @@ omega=10.d0
 # NEW RUN CONFIGS (MPI+OpenMP CODE)
 # ===========================================================================
 file_geometry='./geometries/cube'
-ctrl='control/control_1'
+ctrl='control/control'
 #
 args=" -isol ${isol} -omega ${omega} -gamma 1.0d0 -comp ${comp}"
 args+=" -job ${job} -imax ${imax} -jmax ${jmax}"
