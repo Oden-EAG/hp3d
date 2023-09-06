@@ -187,15 +187,19 @@ problems: lib
 	@(cd problems/MPI_TEST/TEST ; $(MAKE) ; cd ../..);
 ifeq ($(COMPLEX),1)
 	@echo "Compiling Maxwell Galerkin..."
-	@(cd problems/MAXWELL/GALERKIN ; $(MAKE) ; cd ../..);
+	@(cd problems/MAXWELL/GALERKIN      ; $(MAKE) ; cd ../..);
+	@echo "Compiling Maxwell DPG Ultraweak..."
+	@(cd problems/MAXWELL/ULTRAWEAK_DPG ; $(MAKE) ; cd ../..);
 	@echo "Compiling Laser application..."
-	@(cd problems/LASER/UW_COUPLED ; $(MAKE) ; cd ../..);
+	@(cd problems/LASER/UW_COUPLED      ; $(MAKE) ; cd ../..);
 	@echo "Finished building complex-valued problems."
 else
 	@echo "Compiling Poisson Galerkin..."
 	@(cd problems/POISSON/GALERKIN        ; $(MAKE) ; cd ../..);
 	@echo "Compiling Poisson DPG Primal..."
 	@(cd problems/POISSON/PRIMAL_DPG      ; $(MAKE) ; cd ../..);
+	@echo "Compiling Poisson DPG Ultraweak..."
+	@(cd problems/POISSON/ULTRAWEAK_DPG   ; $(MAKE) ; cd ../..);
 	@echo "Compiling Vector Poisson Galerkin..."
 	@(cd problems/VECTOR_POISSON/GALERKIN ; $(MAKE) ; cd ../..);
 	@echo "Compiling Sheathed Hose application..."
@@ -337,11 +341,13 @@ clean-problems:
 	@echo "Clean 'problems' directory."
 	@(cd problems/MPI_TEST/TEST ; $(MAKE) clean; cd ../..);
 ifeq ($(COMPLEX),1)
-	@(cd problems/MAXWELL/GALERKIN ; $(MAKE) clean; cd ../..);
-	@(cd problems/LASER/UW_COUPLED ; $(MAKE) clean; cd ../..);
+	@(cd problems/MAXWELL/GALERKIN      ; $(MAKE) clean; cd ../..);
+	@(cd problems/MAXWELL/ULTRAWEAK_DPG ; $(MAKE) clean; cd ../..);
+	@(cd problems/LASER/UW_COUPLED      ; $(MAKE) clean; cd ../..);
 else
 	@(cd problems/POISSON/GALERKIN        ; $(MAKE) clean; cd ../..);
 	@(cd problems/POISSON/PRIMAL_DPG      ; $(MAKE) clean; cd ../..);
+	@(cd problems/POISSON/ULTRAWEAK_DPG   ; $(MAKE) clean; cd ../..);
 	@(cd problems/VECTOR_POISSON/GALERKIN ; $(MAKE) clean; cd ../..);
 	@(cd problems/SHEATHED_HOSE           ; $(MAKE) clean; cd ..);
 endif

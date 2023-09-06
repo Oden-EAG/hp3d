@@ -34,12 +34,13 @@ subroutine mumps_sc(mtype)
                                ALOC, BLOC, AAUX, ZAMOD, ZBMOD, &
                                NR_PHYSA, MAXNODM
    use assembly_sc
-   use control,   only: ISTC_FLAG
-   use stc,       only: HERM_STC,CLOC,stc_alloc,stc_dealloc,stc_get_nrdof
-   use mumps,     only: MUMPS_PAR, mumps_start, mumps_destroy
-   use par_mesh,  only: DISTRIBUTED,HOST_MESH
-   use mpi_param, only: RANK,ROOT
-   use MPI,       only: MPI_Wtime
+   use control,     only: ISTC_FLAG
+   use environment, only: QUIET_MODE
+   use stc,         only: HERM_STC,CLOC,stc_alloc,stc_dealloc,stc_get_nrdof
+   use mumps,       only: MUMPS_PAR, mumps_start, mumps_destroy
+   use par_mesh,    only: DISTRIBUTED,HOST_MESH
+   use mpi_param,   only: RANK,ROOT
+   use MPI,         only: MPI_Wtime
 !
    implicit none
 !
@@ -194,9 +195,11 @@ subroutine mumps_sc(mtype)
 !  STEP 2 : ASSEMBLE AND STORE IN SPARSE FORM
 ! ----------------------------------------------------------------------
 !
-   write(*,2010) ' Number of dof  : nrdof_con = ', NRDOF_CON
-   write(*,2010) '                  nrdof_tot = ', NRDOF_TOT
-   write(*,2010) ' Total non-zeros: nnz       = ', nnz
+   if (.not. QUIET_MODE) then
+      write(*,2010) ' Number of dof  : nrdof_con = ', NRDOF_CON
+      write(*,2010) '                  nrdof_tot = ', NRDOF_TOT
+      write(*,2010) ' Total non-zeros: nnz       = ', nnz
+   endif
 2010 format(A,I12)
 !
    if (IPRINT_TIME .eq. 1) then

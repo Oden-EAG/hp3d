@@ -46,14 +46,11 @@ program test_hexa_adapt_h_case1
    endif
 !
    call hexa_adapt_h_case1
-   if (NPASS.eq.1 .and. RANK.eq.ROOT) then
-      write(*,*) 'test_hexa_adapt_h_case1 PASSED.'
-   elseif (RANK.eq.ROOT) then
-      write(*,*) 'test_hexa_adapt_h_case1 FAILED.'
-   endif
 !
 !..finalize MPI environment
    call mpi_w_finalize
+!
+   if (NPASS.ne.1) stop 1
 !
    contains
 !

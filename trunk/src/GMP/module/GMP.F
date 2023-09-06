@@ -518,7 +518,6 @@ c  ARRAYS OF 0,1,2,3-D OBJECTS                                        |
 c----------------------------------------------------------------------
       type(surface  ), allocatable :: SURFACES(:)
       type(point    ), allocatable :: POINTS(:)
-      type(point    ), allocatable :: POINTS_FG(:)
       type(ccurve   ), allocatable :: CURVES(:)
       type(triangle ), allocatable :: TRIANGLES(:)
       type(rectangle), allocatable :: RECTANGLES(:)
@@ -527,27 +526,6 @@ c----------------------------------------------------------------------
       type(pprism   ), allocatable :: PRISMS(:)
       type(ppyramid ), allocatable :: PYRAMIDS(:)
 c
-C$$$      interface input_DEFAULT
-C$$$c
-C$$$      subroutine input_DEFAULT_default
-C$$$      end subroutine input_DEFAULT_default
-C$$$c
-C$$$      subroutine input_DEFAULT_from_file(fp)
-C$$$c
-C$$$      character(len=*), intent(in) :: fp
-C$$$      end subroutine input_DEFAULT_from_file
-C$$$      end interface
-c
-C$$$      interface input_NETGEN
-c
-C$$$      subroutine input_NETGEN_default
-C$$$      end subroutine input_NETGEN_default
-C$$$c
-C$$$      subroutine input_NETGEN_from_file(fp)
-C$$$c
-C$$$      character(len=*), intent(in) :: fp
-C$$$      end subroutine input_NETGEN_from_file
-C$$$      end interface
 c
       contains
 c
@@ -569,15 +547,6 @@ c
         nullify(POINTS(i)%CurvNo)
         nullify(POINTS(i)%Idata)
         nullify(POINTS(i)%Rdata)
-      enddo
-c
-      allocate(POINTS_FG(MAXNP_FG))
-      do i=1,MAXNP_FG
-        POINTS_FG(i)%Type = 'None'
-        POINTS_FG(i)%NrCurv = 0
-        nullify(POINTS_FG(i)%CurvNo)
-        nullify(POINTS_FG(i)%Idata)
-        nullify(POINTS_FG(i)%Rdata)
       enddo
 c
       allocate(CURVES(MAXNC))

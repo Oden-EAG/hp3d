@@ -50,10 +50,7 @@ program test_near
    if (znear(c,d)) NPASS = 0
 #endif
 !
-   if (NPASS .ne. 1) then
-      write(*,*) 'test_near FAILED.'
-   else
-      write(*,*) 'test_near PASSED.'
-   endif
+!
+   if (NPASS.ne.1) stop 1
 !
 end program test_near

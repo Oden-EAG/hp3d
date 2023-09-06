@@ -117,5 +117,13 @@ https://github.com/Oden-EAG/hp3d_user_guide (LaTeX source)
 
 A PDF version of the user manual is available on arXiv: https://arxiv.org/abs/2207.12211
 
+## How to Contribute
+hp3D is distributed under the terms of the BSD-3 license. All new contributions must be made under this license.
+
+Contributions of all kinds are welcome, including bug fixes, code optimizations, new capabilities, improved documentation, and model problems or applications. The new feature or contribution should be developed on a properly named feature branch based off of `hp3d:master` in a forked repository. If you would like to propose a contribution, please use a pull request (PR) toward the `hp3d:master` branch from your forked hp3D repository. Before starting a PR or working on a new feature, we encourage opening an [issue](https://github.com/Oden-EAG/hp3d/issues) first and discussing the new feature or contribution with the developer team.
+
 ## Support
-Contact: ``stefan@oden.utexas.edu``, ``leszek@oden.utexas.edu``
+The [issue tracker](https://github.com/Oden-EAG/hp3d/issues) serves as the primary tool for resolving questions related to code features, etc.
+
+For other inquiries, please contact:
+``stefan@oden.utexas.edu``, ``leszek@oden.utexas.edu``
