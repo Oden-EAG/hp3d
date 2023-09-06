@@ -8,12 +8,17 @@ module paraview
 !
    save
 !
+!..linear upscaling with VLEVEL supported only for first-order geometry
+!  output (i.e., when SECOND_ORDER_VIS = .false.)
    character(len=128) :: FILE_VIS = '../../files/vis'
    character(len=2  ) :: VLEVEL = '2'
    character(len=128) :: PARAVIEW_DIR = 'vtk/'
    integer,parameter  :: PARAVIEW_IO = 22
    logical            :: PARAVIEW_DUMP_GEOM = .FALSE.
    logical            :: PARAVIEW_DUMP_ATTR = .FALSE.
+!
+!..Flag for enabling second-order geometry output (both XDMF and VTU)
+!  NOTE: Only VTU supports higher-order geometry for hybrid meshes
    logical            :: SECOND_ORDER_VIS   = .FALSE.
 !
 !..Flag for switching between different formats for output meshes and solution fields
