@@ -31,6 +31,9 @@ subroutine my_paraview_driver(IParAttr)
 !  Set false to write out geometry file only on first call to this routine
    PARAVIEW_DUMP_GEOM = .false.
 !
+!..check compatibility of paraview input flags
+   call paraview_check
+!
 !..load files for visualization upscale
    if (.not. initialized) then
       call load_vis(TETR_VIS,trim(FILE_VIS)//'/tetra_'//trim(VLEVEL),TETR)

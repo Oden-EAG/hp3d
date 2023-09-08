@@ -34,6 +34,9 @@ subroutine my_paraview_driver(IParAttr)
 !  Set false to write out geometry file only on first call to this routine
    PARAVIEW_DUMP_GEOM = .true.
 !
+!..check compatibility of paraview input flags
+   call paraview_check
+!
 !..load files for visualization upscale
    if (SECOND_ORDER_VIS) then
       if (.not. initialized) then

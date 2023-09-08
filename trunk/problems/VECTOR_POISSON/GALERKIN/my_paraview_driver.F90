@@ -29,6 +29,9 @@ subroutine my_paraview_driver(IParAttr)
 !
    PARAVIEW_DUMP_GEOM = .true.
 !
+!..check compatibility of paraview input flags
+   call paraview_check
+!
 !..load files for visualization upscale
    if (.not. initialized) then
       call load_vis(TETR_VIS,trim(FILE_VIS)//'/tetra_'//trim(VLEVEL),TETR)
