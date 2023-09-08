@@ -40,6 +40,7 @@ subroutine paraview_driver(IParAttr)
       initialized = .true.
    endif
 !
+!.."time" value is only written to file if "time" is non-negative
    time=-1.d0
 !
 !..integer id to append to Fname
