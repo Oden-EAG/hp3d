@@ -6,7 +6,7 @@ subroutine my_paraview_driver(IParAttr)
 !
    use upscale
    use physics
-   !use data_structure3D,   only: NRCOMS
+   !use data_structure3D, only: NRCOMS
    use environment, only: QUIET_MODE
    use mpi_param,   only: RANK,ROOT
    use paraview

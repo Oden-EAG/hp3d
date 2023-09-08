@@ -6,13 +6,10 @@ subroutine my_paraview_driver(IParAttr)
 !
    use upscale
    use physics
-   !use data_structure3D,   only: NRCOMS
-   use environment,        only: QUIET_MODE
-   use paraview,           only: PARAVIEW_DUMP_ATTR,FILE_VIS,     &
-                                 VLEVEL,PARAVIEW_DUMP_GEOM,       &
-                                 IPARATTR_VTU,SECOND_ORDER_VIS,   &
-                                 VIS_VTU,ELEM_TYPES
-   use mpi_param,          only: RANK,ROOT
+   !use data_structure3D, only: NRCOMS
+   use environment, only: QUIET_MODE
+   use mpi_param,   only: RANK,ROOT
+   use paraview
 !
    implicit none
 !
