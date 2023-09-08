@@ -1,18 +1,15 @@
 !-------------------------------------------------------------------------------------------
-!> Purpose : paraview driver
+!> @brief   Interface for paraview export
+!> @date    Sep 2023
 !-------------------------------------------------------------------------------------------
-!
 subroutine my_paraview_driver(IParAttr)
 !
    use upscale
    use physics
    !use data_structure3D,   only: NRCOMS
-   use environment,        only: QUIET_MODE
-   use paraview,           only: PARAVIEW_DUMP_ATTR,FILE_VIS,     &
-                                 VLEVEL,PARAVIEW_DUMP_GEOM,       &
-                                 IPARATTR_VTU,SECOND_ORDER_VIS,   &
-                                 VIS_VTU,ELEM_TYPES
-   use mpi_param,          only: RANK,ROOT
+   use environment, only: QUIET_MODE
+   use mpi_param,   only: RANK,ROOT
+   use paraview
 !
    implicit none
 !
@@ -26,7 +23,13 @@ subroutine my_paraview_driver(IParAttr)
 !
 !-------------------------------------------------------------------------------------------
 !
+!..PARAVIEW_DUMP_GEOM
+!  if enabled : paraview_geometry writes geometry on every call
+!  if disabled: paraview_geometry writes geometry on first call only (supported with XDMF)
    PARAVIEW_DUMP_GEOM = .true.
+!
+!..check compatibility of paraview input flags
+   call paraview_check
 !
 !..load files for visualization upscale
    if (.not. initialized) then
@@ -52,13 +55,12 @@ subroutine my_paraview_driver(IParAttr)
    endif
 !
 !  -- GEOMETRY --
-! !..allocation only if using VTU format
    if (VIS_VTU) then
       allocate(IPARATTR_VTU(NR_PHYSA))
       IPARATTR_VTU = iParAttr(1:NR_PHYSA)
    endif
-
-   call paraview_geom
+!
+   call paraview_geometry
 !
 !  -- PHYSICAL ATTRIBUTES --
    if (.not. PARAVIEW_DUMP_ATTR) goto 90
@@ -66,16 +68,16 @@ subroutine my_paraview_driver(IParAttr)
 !..loop over rhs's
    do iload=1,1 !NRCOMS
 
-!..loop over physics variables
+!  ...loop over physics variables
       do iphys=1,NR_PHYSA
 
          if (IParAttr(iphys) .eq. 0) cycle
 !
-!..loop over components
+!     ...loop over components
          do icomp=1,NR_COMP(iphys)
             if (IParAttr(iphys) .ge. icomp) then
 !
-!..encode iload, iphys, icomp into a single attribute's index
+!           ...encode iload, iphys, icomp into a single attribute's index
                idx = iload*100 + iphys*10 + icomp*1
 !
                select case(D_TYPE(iphys))
@@ -104,16 +106,15 @@ subroutine my_paraview_driver(IParAttr)
                endif
 !
             endif
-!..end loop over components of physics variable
+!     ...end loop over components of physics variable
          enddo
-!..end loop over physics variables
+!  ...end loop over physics variables
       enddo
 !..end loop over rhs's
    enddo
 !
   90 continue
 !
-!..deallocation only if using VTU output format
    if (VIS_VTU) then
       deallocate(IPARATTR_VTU)
    endif

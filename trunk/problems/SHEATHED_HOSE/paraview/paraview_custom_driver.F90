@@ -37,7 +37,7 @@ subroutine paraview_custom_driver
       endif
 !
 !     -- GEOMETRY --
-      call paraview_geom
+      call paraview_geometry
 !
 !     loop over custom components (that we care about)
       do scomp=1,3

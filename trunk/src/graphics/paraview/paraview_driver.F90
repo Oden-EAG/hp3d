@@ -2,7 +2,6 @@
 !> @brief   Interface for paraview export
 !> @date    Sep 2023
 !-------------------------------------------------------------------------------------------
-!
 subroutine paraview_driver(IParAttr)
 !
    use upscale
@@ -24,7 +23,13 @@ subroutine paraview_driver(IParAttr)
 !
 !-------------------------------------------------------------------------------------------
 !
+!..PARAVIEW_DUMP_GEOM
+!  if enabled : paraview_geometry writes geometry on every call
+!  if disabled: paraview_geometry writes geometry on first call only (supported with XDMF)
    PARAVIEW_DUMP_GEOM = .true.
+!
+!..check compatibility of paraview input flags
+   call paraview_check
 !
 !..load files for visualization upscale
    if (.not. initialized) then
@@ -55,7 +60,7 @@ subroutine paraview_driver(IParAttr)
       IPARATTR_VTU = iParAttr(1:NR_PHYSA)
    endif
 !
-   call paraview_geom
+   call paraview_geometry
 !
 !  -- PHYSICAL ATTRIBUTES --
    if (.not. PARAVIEW_DUMP_ATTR) goto 80
@@ -129,6 +134,63 @@ end subroutine paraview_driver
 !
 !
 !-------------------------------------------------------------------------------------------
+!> @brief     paraview compatibility checks
+!> @date      Sep 2023
+!-------------------------------------------------------------------------------------------
+subroutine paraview_check
+!
+   use GMP, only: NRHEXAS,NRPRISM,NRTETRA,NRPYRAM
+   use paraview
+!
+   implicit none
+!
+   integer :: num_types
+!
+!-------------------------------------------------------------------------------------------
+!
+!..check for compatibility of writing the mesh only at first call with output format
+!  (VTU format requires the mesh to be written each time the solution is exported)
+   if (.not.PARAVIEW_DUMP_GEOM .and. VIS_VTU) then
+      if (RANK .eq. ROOT) then
+         write(*,*) 'paraview_check: PARAVIEW_DUMP_GEOM disabled is not supported for VTU.'
+         write(*,*) '                Setting PARAVIEW_DUMP_GEOM=.true.'
+         write(*,*) '                (writing mesh each time the solution is exported).'
+      endif
+      PARAVIEW_DUMP_GEOM = .true.
+   endif
+!
+!..check for compatibility of upscaling with output order
+!  (VLEVEL upscaling is only supported for linear element output)
+   if (SECOND_ORDER_VIS .and. VLEVEL.ne.'0') then
+      if (RANK .eq. ROOT) then
+         write(*,*) 'paraview_check: VLEVEL upscaling is only supported for linear output.'
+         write(*,*) '                Setting VLEVEL to "0" for SECOND_ORDER_VIS.'
+      endif
+      VLEVEL = '0'
+   endif
+!
+!..check for compatibility of mixed mesh with output format
+!  (XDMF does not support mixed meshes with higher-order)
+   num_types = 0
+   if (NRHEXAS .gt. 0) num_types = num_types + 1
+   if (NRPRISM .gt. 0) num_types = num_types + 1
+   if (NRTETRA .gt. 0) num_types = num_types + 1
+   if (NRPYRAM .gt. 0) num_types = num_types + 1
+!
+   if (SECOND_ORDER_VIS .and. .not.VIS_VTU) then
+      if (num_types .gt. 1) then
+         if (RANK .eq. ROOT) then
+            write(*,*) 'paraview_check: XDMF does not support hybrid mesh with SECOND_ORDER_VIS.'
+            write(*,*) '                Changing output format from XDMF to VTU.'
+         endif
+         VIS_VTU = .true.
+      endif
+   endif
+!
+end subroutine paraview_check
+!
+!
+!-------------------------------------------------------------------------------------------
 !> @brief     open file, print header
 !!
 !> @param[in] Id    - integer id to be appended to Fname (postfix)
@@ -138,8 +200,8 @@ end subroutine paraview_driver
 !-------------------------------------------------------------------------------------------
 subroutine paraview_begin(Id,Time)
 !
-   use paraview    , only : PARAVIEW_IO,PARAVIEW_DIR,VIS_VTU,paraview_init
-   use environment , only : PREFIX
+   use environment, only : PREFIX
+   use paraview
 !
    implicit none
 !

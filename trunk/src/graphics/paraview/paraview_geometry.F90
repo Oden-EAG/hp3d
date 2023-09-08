@@ -1,10 +1,8 @@
 !-------------------------------------------------------------------------------------------
-!> Purpose : driver for writing geometry to .h5 file
-!!
-!> @date Mar 2023
+!> @brief   paraview routine for writing geometry to .h5 file
+!> @date    Sep 2023
 !-------------------------------------------------------------------------------------------
-!
-subroutine paraview_geom
+subroutine paraview_geometry
 !
    use environment     , only : PREFIX
    use paraview        , only : PARAVIEW_IO, PARAVIEW_DUMP_GEOM, VLEVEL, &
@@ -12,44 +10,14 @@ subroutine paraview_geom
    use mpi_param       , only : RANK, ROOT
    use data_structure3D, only : NODES, ELEM_ORDER
    use node_types
-   use gmp
 !
    implicit none
+!
    integer,         save :: id=-1
    character(len=5),save :: postfix
    integer,         save :: ntype, ice, icn, icp, ico, mdle
-!..auxiliary variables
-   integer               :: num_types
 !
 !-------------------------------------------------------------------------------------------
-!
-!..VLEVEL upscaling is only supported for linear element output
-   if (SECOND_ORDER_VIS .and. VLEVEL.ne.'0') then
-      if (RANK .eq. ROOT) then
-         write(*,*) 'paraview_geom: VLEVEL upscaling only supported for linear output'
-         write(*,*) '               Setting VLEVEL to "0" for SECOND_ORDER_VIS.'
-      endif
-      VLEVEL = '0'
-   endif
-
-   !.. check for compatability of mixed mesh with format of output
-   num_types = 0
-   if(NRHEXAS .gt. 0) num_types = num_types + 1
-   if(NRPRISM .gt. 0) num_types = num_types + 1 
-   if(NRTETRA .gt. 0) num_types = num_types + 1 
-   if(NRPYRAM .gt. 0) num_types = num_types + 1 
-
-   if(SECOND_ORDER_VIS .and. (.not. VIS_VTU)) then
-      if(num_types .gt. 1) then
-
-         if(RANK .eq. ROOT) then
-          write(*,*) "paraview_geom: format change, XDMF doesnt support hybrid mesh"
-          write(*,*) "               Change the VIS_VTU flag to .TRUE. in src/modules/paraview.F90 and recompile Library."
-         endif 
-         stop 'error'    
-      endif
-      
-   endif
 !
 !..h5 file is produced on 1st visit, OR as required by the user
    if (PARAVIEW_DUMP_GEOM .or. (id == -1)) then
@@ -84,7 +52,7 @@ subroutine paraview_geom
       case(MDLN)
          write(PARAVIEW_IO,1011) "'TETRAHEDRON_10'", ice, 10
       case default
-         write(*,*) 'paraview_geom: unrecognized element type: ', S_Type(ntype)
+         write(*,*) 'paraview_geometry: unrecognized element type: ', S_Type(ntype)
          stop 1
       end select
    else
@@ -117,4 +85,4 @@ subroutine paraview_geom
 !
    90 continue
 !
-end subroutine paraview_geom
+end subroutine paraview_geometry

@@ -69,7 +69,7 @@ subroutine my_paraview_driver(IParAttr)
    endif
 !
 !  -- GEOMETRY --
-   call paraview_geom
+   call paraview_geometry
 !
 !  -- PHYSICAL ATTRIBUTES --
    if (.not. PARAVIEW_DUMP_ATTR) goto 90

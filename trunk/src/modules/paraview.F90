@@ -1,4 +1,7 @@
-
+!-------------------------------------------------------------------------------------------
+!> @brief   paraview module for exporting mesh and solutions for visualization
+!> @date    Sep 2023
+!-------------------------------------------------------------------------------------------
 module paraview
 !
    use hdf5_wrapper
@@ -8,8 +11,8 @@ module paraview
 !
    save
 !
-!..linear upscaling with VLEVEL supported only for first-order geometry
-!  output (i.e., when SECOND_ORDER_VIS = .false.)
+!..linear upscaling with VLEVEL is supported only for linear
+!  geometry output (i.e., when SECOND_ORDER_VIS = .false.)
    character(len=128) :: FILE_VIS = '../../files/vis'
    character(len=2  ) :: VLEVEL = '2'
    character(len=128) :: PARAVIEW_DIR = 'vtk/'

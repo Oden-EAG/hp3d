@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------------------
-!> Purpose : paraview driver
+!> @brief   Interface for paraview export
+!> @date    Sep 2023
 !-------------------------------------------------------------------------------------------
-!
 subroutine my_paraview_driver(IParAttr)
 !
    use upscale
@@ -26,7 +26,13 @@ subroutine my_paraview_driver(IParAttr)
 !
 !-------------------------------------------------------------------------------------------
 !
+!..PARAVIEW_DUMP_GEOM
+!  if enabled : paraview_geometry writes geometry on every call
+!  if disabled: paraview_geometry writes geometry on first call only (supported with XDMF)
    PARAVIEW_DUMP_GEOM = .true.
+!
+!..check compatibility of paraview input flags
+   call paraview_check
 !
 !..load files for visualization upscale
    if (.not. initialized) then
@@ -52,13 +58,12 @@ subroutine my_paraview_driver(IParAttr)
    endif
 !
 !  -- GEOMETRY --
-!..allocation only if using VTU format
    if (VIS_VTU) then
       allocate(IPARATTR_VTU(NR_PHYSA))
       IPARATTR_VTU = iParAttr(1:NR_PHYSA)
    endif
 !
-   call paraview_geom
+   call paraview_geometry
 !
 !  -- PHYSICAL ATTRIBUTES --
    if (.not. PARAVIEW_DUMP_ATTR) goto 90
@@ -113,7 +118,6 @@ subroutine my_paraview_driver(IParAttr)
 !
   90 continue
 !
-!..deallocation only if using VTU output format
    if (VIS_VTU) then
       deallocate(IPARATTR_VTU)
    endif
