@@ -27,8 +27,6 @@ subroutine my_paraview_driver(IParAttr)
 !
 !-------------------------------------------------------------------------------------------
 !
-   PARAVIEW_DUMP_GEOM = .true.
-!
 !..check compatibility of paraview input flags
    call paraview_check
 !

@@ -20,6 +20,7 @@ subroutine paraview_geometry
 !-------------------------------------------------------------------------------------------
 !
 !..h5 file is produced on 1st visit, OR as required by the user
+!  NOTE: VTU format always writes geometry file
    if (PARAVIEW_DUMP_GEOM .or. (id == -1)) then
 !
 !  ...increment visitation flag

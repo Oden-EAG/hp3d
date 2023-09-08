@@ -1,5 +1,5 @@
 !-------------------------------------------------------------------------------------------
-!> @brief   Interface for paraview export
+!> @brief   Default interface for paraview export
 !> @date    Sep 2023
 !-------------------------------------------------------------------------------------------
 subroutine paraview_driver(IParAttr)
@@ -22,11 +22,6 @@ subroutine paraview_driver(IParAttr)
    logical, save :: initialized = .false.
 !
 !-------------------------------------------------------------------------------------------
-!
-!..PARAVIEW_DUMP_GEOM
-!  if enabled : paraview_geometry writes geometry on every call
-!  if disabled: paraview_geometry writes geometry on first call only (supported with XDMF)
-   PARAVIEW_DUMP_GEOM = .true.
 !
 !..check compatibility of paraview input flags
    call paraview_check
