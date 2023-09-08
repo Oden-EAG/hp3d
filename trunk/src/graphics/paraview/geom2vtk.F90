@@ -145,6 +145,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
       enddo
    enddo
 !$OMP END DO
+!$OMP END PARALLEL
 !
 !..Step 3 : Elements
 !
@@ -182,7 +183,9 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
       endif
       ice_subd = 0
    endif
+   
 !
+!$OMP PARALLEL
 !$OMP DO                                     &
 !$OMP PRIVATE(mdle,ntype,i,j,k,l,ivis,ndom,  &
 !$OMP         nodesl,norientl,nverl,subd)    &

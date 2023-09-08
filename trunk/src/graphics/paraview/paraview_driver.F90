@@ -1,44 +1,63 @@
 !-------------------------------------------------------------------------------------------
 !> Purpose : main driver
 !-------------------------------------------------------------------------------------------
-subroutine paraview_driver
+!
+subroutine paraview_driver(IParAttr)
 !
    use upscale
    use physics
    use data_structure3D , only : NRCOMS
-   use environment      , only : QUIET_MODE
-   use paraview         , only : PARAVIEW_DUMP_ATTR,VLEVEL,FILE_VIS,PARAVIEW_DOMAIN
-   use mpi_param        , only : RANK,ROOT
+   use environment,        only: QUIET_MODE
+   use paraview,           only: PARAVIEW_DUMP_ATTR,FILE_VIS,     &
+                                 VLEVEL,PARAVIEW_DUMP_GEOM,       &
+                                 IPARATTR_VTU,SECOND_ORDER_VIS,   &
+                                 VIS_VTU,ELEM_TYPES,PARAVIEW_DOMAIN
+   use mpi_param,          only: RANK,ROOT
 !
    implicit none
+!
+   integer, intent(in) :: IParAttr(NR_PHYSA)
 !
    real(8) :: time
    integer :: idx,iattr,iload,icomp
 !
    integer, save :: id = -1
-!
    logical, save :: initialized = .false.
 !
 !-------------------------------------------------------------------------------------------
 !
+   PARAVIEW_DUMP_GEOM = .true.
+!
 !..load files for visualization upscale
    if (.not. initialized) then
-      call load_vis(TETR_VIS,trim(FILE_VIS)//'/tetra_'//trim(VLEVEL),TETR)
-      call load_vis(PRIS_VIS,trim(FILE_VIS)//'/prism_'//trim(VLEVEL),PRIS)
-      call load_vis(HEXA_VIS,trim(FILE_VIS)//'/hexa_' //trim(VLEVEL),BRIC)
+      if (SECOND_ORDER_VIS) then
+         call load_vis(TETR_VIS,trim(FILE_VIS)//'/tetra10',TETR)
+         call load_vis(PRIS_VIS,trim(FILE_VIS)//'/prism18',PRIS)
+         call load_vis(HEXA_VIS,trim(FILE_VIS)//'/hexa27' ,BRIC)
+      else
+         call load_vis(TETR_VIS,trim(FILE_VIS)//'/tetra_'//trim(VLEVEL),TETR)
+         call load_vis(PRIS_VIS,trim(FILE_VIS)//'/prism_'//trim(VLEVEL),PRIS)
+         call load_vis(HEXA_VIS,trim(FILE_VIS)//'/hexa_'//trim(VLEVEL),BRIC)
+      endif
       initialized = .true.
    endif
 !
-   time=-1.d0 ! set to negative for now
+   time=-1.d0
 !
 !..integer id to append to Fname
    id=id+1
 !
    if (RANK .eq. ROOT) then
-      call paraview_begin(id,time)
+      call paraview_begin(id,time) ! [OPENS THE XMF FILE, WRITES HEADER]
    endif
 !
 !  -- GEOMETRY --
+!..allocation only if using VTU format
+   if (VIS_VTU) then
+      allocate(IPARATTR_VTU(NR_PHYSA))
+      IPARATTR_VTU = iParAttr(1:NR_PHYSA)
+   endif
+!
    call paraview_geom
 !
 !  -- PHYSICAL ATTRIBUTES --
@@ -100,10 +119,14 @@ subroutine paraview_driver
    endif
 !
    80 continue
+!..deallocation only if using VTU output format
+   if (VIS_VTU) then
+      deallocate(IPARATTR_VTU)
+   endif
 !
-   call paraview_end
-!
-   90 continue
+   if (RANK .eq. ROOT) then
+      call paraview_end ! [CLOSES THE XMF FILE, WRITES FOOTER]
+   endif
 !
 end subroutine paraview_driver
 !

@@ -12,11 +12,14 @@ subroutine paraview_geom
    use mpi_param       , only : RANK, ROOT
    use data_structure3D, only : NODES, ELEM_ORDER
    use node_types
+   use gmp
 !
    implicit none
    integer,         save :: id=-1
    character(len=5),save :: postfix
    integer,         save :: ntype, ice, icn, icp, ico, mdle
+!..auxiliary variables
+   integer               :: num_types
 !
 !-------------------------------------------------------------------------------------------
 !
@@ -27,6 +30,25 @@ subroutine paraview_geom
          write(*,*) '               Setting VLEVEL to "0" for SECOND_ORDER_VIS.'
       endif
       VLEVEL = '0'
+   endif
+
+   !.. check for compatability of mixed mesh with format of output
+   num_types = 0
+   if(NRHEXAS .gt. 0) num_types = num_types + 1
+   if(NRPRISM .gt. 0) num_types = num_types + 1 
+   if(NRTETRA .gt. 0) num_types = num_types + 1 
+   if(NRPYRAM .gt. 0) num_types = num_types + 1 
+
+   if(SECOND_ORDER_VIS .and. (.not. VIS_VTU)) then
+      if(num_types .gt. 1) then
+
+         if(RANK .eq. ROOT) then
+          write(*,*) "paraview_geom: format change, XDMF doesnt support hybrid mesh"
+          write(*,*) "               Change the VIS_VTU flag to .TRUE. in src/modules/paraview.F90 and recompile Library."
+         endif 
+         stop 'error'    
+      endif
+      
    endif
 !
 !..h5 file is produced on 1st visit, OR as required by the user
