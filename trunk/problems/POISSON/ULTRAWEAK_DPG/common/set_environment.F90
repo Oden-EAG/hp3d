@@ -83,7 +83,7 @@ subroutine set_environment
    PARAVIEW_DIR = trim(OUTPUT_DIR)//'paraview/'
 !
    call get_option_bool    &
-        ('-paraview_geom'   ,'Dump geom at every Paraview call'   ,.false.             ,PARAVIEW_DUMP_GEOM)
+        ('-paraview_geom'   ,'Dump geom at every Paraview call'   ,.true.              ,PARAVIEW_DUMP_GEOM)
    call get_option_bool    &
         ('-paraview_attr'   ,'Dump solution to Paraview'          ,.true.              ,PARAVIEW_DUMP_ATTR)
 !
