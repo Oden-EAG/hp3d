@@ -41,6 +41,7 @@ subroutine paraview_driver(IParAttr)
    endif
 !
 !.."time" value is only written to file if "time" is non-negative
+!  (currently, only supported with XDMF output)
    time=-1.d0
 !
 !..integer id to append to Fname

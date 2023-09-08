@@ -150,23 +150,20 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !..Step 3 : Elements
 !
    ice_subd=0; icn_subd=0
-!..Additional Computational for computing the total number of elements
-!  (including subelements: vlevel > 0)
+!
+!..Computing the total number of elements (incl. subelements if vlevel > 0)
 !..VTU Format needs this information a-priori as VTU needs headers
 !  with this information before appending the data.
    if (VIS_VTU) then
       if (SECOND_ORDER_VIS) then
          do iel = 1,NRELES
             mdle = ELEM_ORDER(iel)
-
             if (PARAVIEW_DOMAIN.ne.0) then
                call find_domain(mdle, ndom)
                if (ndom.ne.PARAVIEW_DOMAIN) cycle
             endif
             ice_subd = ice_subd + 1
          enddo
-         allocate(ELEM_TYPES(ice_subd))
-         ELEM_TYPES = ZERO
       else
          do iel=1,NRELES
             mdle = ELEM_ORDER(iel)
@@ -178,12 +175,11 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
             call get_vis_nrelem(ntype, ivis)
             ice_subd = ice_subd + ivis
          enddo
-         allocate(ELEM_TYPES(ice_subd))
-         ELEM_TYPES = ZERO
       endif
+      allocate(ELEM_TYPES(ice_subd))
+      ELEM_TYPES = 0
       ice_subd = 0
    endif
-   
 !
 !$OMP PARALLEL
 !$OMP DO                                     &
@@ -372,8 +368,8 @@ subroutine write_VTU_headers(IcE)
 !
    allocate(offsets_connectivity(IcE))
    allocate(elem_connectivity(IcE,(MAXP+1)**3))
-   elem_connectivity = ZERO
-   offsets_connectivity = ZERO
+   elem_connectivity = 0
+   offsets_connectivity = 0
 !
    do count  = 1,IcE
       if (SECOND_ORDER_VIS) then
