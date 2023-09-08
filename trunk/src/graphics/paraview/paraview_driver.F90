@@ -1,18 +1,16 @@
 !-------------------------------------------------------------------------------------------
-!> Purpose : main driver
+!> @brief   Interface for paraview export
+!> @date    Sep 2023
 !-------------------------------------------------------------------------------------------
 !
 subroutine paraview_driver(IParAttr)
 !
    use upscale
    use physics
-   use data_structure3D , only : NRCOMS
-   use environment,        only: QUIET_MODE
-   use paraview,           only: PARAVIEW_DUMP_ATTR,FILE_VIS,     &
-                                 VLEVEL,PARAVIEW_DUMP_GEOM,       &
-                                 IPARATTR_VTU,SECOND_ORDER_VIS,   &
-                                 VIS_VTU,ELEM_TYPES,PARAVIEW_DOMAIN
-   use mpi_param,          only: RANK,ROOT
+   use data_structure3D, only: NRCOMS
+   use environment,      only: QUIET_MODE
+   use mpi_param,        only: RANK,ROOT
+   use paraview
 !
    implicit none
 !
@@ -52,7 +50,6 @@ subroutine paraview_driver(IParAttr)
    endif
 !
 !  -- GEOMETRY --
-!..allocation only if using VTU format
    if (VIS_VTU) then
       allocate(IPARATTR_VTU(NR_PHYSA))
       IPARATTR_VTU = iParAttr(1:NR_PHYSA)
@@ -63,7 +60,7 @@ subroutine paraview_driver(IParAttr)
 !  -- PHYSICAL ATTRIBUTES --
    if (.not. PARAVIEW_DUMP_ATTR) goto 80
 !
-   if (.not. QUIET_MODE .and. RANK .eq. ROOT) then
+   if (.not.QUIET_MODE .and. RANK.eq.ROOT) then
       if (PARAVIEW_DOMAIN.eq.0) then
          write(*,*)'Dumping to Paraview...'
       else
@@ -113,13 +110,13 @@ subroutine paraview_driver(IParAttr)
 !..loop over rhs's
    enddo
 !
-   if (.not. QUIET_MODE .and. RANK .eq. ROOT) then
+   if (.not.QUIET_MODE .and. RANK.eq.ROOT) then
       write(*,*)'--------------------------------------'
       write(*,*)''
    endif
 !
    80 continue
-!..deallocation only if using VTU output format
+!
    if (VIS_VTU) then
       deallocate(IPARATTR_VTU)
    endif
@@ -132,12 +129,12 @@ end subroutine paraview_driver
 !
 !
 !-------------------------------------------------------------------------------------------
-!> Purpose : open file, print header
+!> @brief     open file, print header
 !!
 !> @param[in] Id    - integer id to be appended to Fname (postfix)
-!> @param[in] Time  - currently non supported, set to -1.d0
+!> @param[in] Time  - currently not supported, set to -1.d0
 !!
-!> @date Mar 2023
+!> @date      Mar 2023
 !-------------------------------------------------------------------------------------------
 subroutine paraview_begin(Id,Time)
 !
@@ -153,7 +150,7 @@ subroutine paraview_begin(Id,Time)
 !
 !-------------------------------------------------------------------------------------------
 !
-!..XMDF format
+!..XDMF format
    if (.not. VIS_VTU) then
       call paraview_init
 !
@@ -161,13 +158,14 @@ subroutine paraview_begin(Id,Time)
       write(postfix,"(I5.5)") Id
 !
 !  ...open .xmf file
-      open(unit=PARAVIEW_IO , file=trim(PARAVIEW_DIR)//trim(PREFIX)//"_"//trim(postfix)//'.xmf')
+      open(unit=PARAVIEW_IO, &
+           file=trim(PARAVIEW_DIR)//trim(PREFIX)//"_"//trim(postfix)//'.xmf')
 !
       write(PARAVIEW_IO, 1001)
       write(PARAVIEW_IO, 1002)
       write(PARAVIEW_IO, 1003)
 !
-!  ...non negative time is provided
+!  ...non-negative time is provided
       if (Time >= 0.d0) then
          write(PARAVIEW_IO, 1004) Time
       end if
@@ -182,22 +180,22 @@ subroutine paraview_begin(Id,Time)
    else
 !  ...opening the VTU file in binary format.
       write(postfix,"(I5.5)") Id
-      open(unit=PARAVIEW_IO , file=trim(PARAVIEW_DIR)//trim(PREFIX)//"_"//trim(postfix)//'.vtu', status  = 'replace',        &
-            form    = 'unformatted',    &
-            access  = 'stream')
+      open(unit=PARAVIEW_IO,                                                  &
+           file=trim(PARAVIEW_DIR)//trim(PREFIX)//"_"//trim(postfix)//'.vtu', &
+           status = 'replace', form = 'unformatted', access = 'stream')
    endif
 !
 end subroutine paraview_begin
 !
 !
 !-------------------------------------------------------------------------------------------
-!> Purpose : print footer, close file
+!> @brief   print footer, close file
 !!
-!> @date Mar 2023
+!> @date    Mar 2023
 !-------------------------------------------------------------------------------------------
 subroutine paraview_end
 !
-   use paraview , only : PARAVIEW_IO, paraview_finalize,VIS_VTU
+   use paraview, only: PARAVIEW_IO,VIS_VTU,paraview_finalize
 !
    implicit none
 !
