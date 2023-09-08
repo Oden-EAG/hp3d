@@ -145,41 +145,42 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
       enddo
    enddo
 !$OMP END DO
-!$OMP END PARALLEL
 !
 !..Step 3 : Elements
-!
-   ice_subd=0; icn_subd=0
 !
 !..Computing the total number of elements (incl. subelements if vlevel > 0)
 !..VTU Format needs this information a-priori as VTU needs headers
 !  with this information before appending the data.
    if (VIS_VTU) then
-      if (SECOND_ORDER_VIS) then
-         do iel = 1,NRELES
-            mdle = ELEM_ORDER(iel)
-            if (PARAVIEW_DOMAIN.ne.0) then
-               call find_domain(mdle, ndom)
-               if (ndom.ne.PARAVIEW_DOMAIN) cycle
-            endif
+      ice_subd=0
+   !$OMP DO                            &
+   !$OMP PRIVATE(mdle,ndom,ntype,ivis) &
+   !$OMP REDUCTION(+:ice_subd)
+      do iel = 1,NRELES
+         mdle = ELEM_ORDER(iel)
+         if (PARAVIEW_DOMAIN.ne.0) then
+            call find_domain(mdle, ndom)
+            if (ndom.ne.PARAVIEW_DOMAIN) cycle
+         endif
+         if (SECOND_ORDER_VIS) then
             ice_subd = ice_subd + 1
-         enddo
-      else
-         do iel=1,NRELES
-            mdle = ELEM_ORDER(iel)
-            if (PARAVIEW_DOMAIN.ne.0) then
-               call find_domain(mdle, ndom)
-               if (ndom.ne.PARAVIEW_DOMAIN) cycle
-            endif
+         else
             ntype = NODES(mdle)%ntype
             call get_vis_nrelem(ntype, ivis)
             ice_subd = ice_subd + ivis
-         enddo
-      endif
+         endif
+      enddo
+   !$OMP END DO
+   endif
+!
+!$OMP END PARALLEL
+!
+   if (VIS_VTU) then
       allocate(ELEM_TYPES(ice_subd))
       ELEM_TYPES = 0
-      ice_subd = 0
    endif
+!
+   ice_subd=0; icn_subd=0
 !
 !$OMP PARALLEL
 !$OMP DO                                     &
@@ -238,27 +239,26 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !
    if (DISTRIBUTED .and. .not. HOST_MESH) then
       count = 1; IcE=0; IcN=0;
-      call MPI_REDUCE(ice_subd,IcE,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE(icn_subd,IcN,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(ice_subd,IcE,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
+      call MPI_REDUCE(icn_subd,IcN,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
       if (RANK .eq. ROOT) then
          count = 3*IcP
-         call MPI_REDUCE(MPI_IN_PLACE,GEOM_PTS,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+         call MPI_REDUCE(MPI_IN_PLACE,GEOM_PTS,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
          count = ico
-         call MPI_REDUCE(MPI_IN_PLACE,GEOM_OBJ,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+         call MPI_REDUCE(MPI_IN_PLACE,GEOM_OBJ,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
 
          if (VIS_VTU) then
             count = size(ELEM_TYPES)
-            call MPI_REDUCE(MPI_IN_PLACE,ELEM_TYPES,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+            call MPI_REDUCE(MPI_IN_PLACE,ELEM_TYPES,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
          endif
       else
          count = 3*IcP
-         call MPI_REDUCE(GEOM_PTS,GEOM_PTS,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+         call MPI_REDUCE(GEOM_PTS,GEOM_PTS,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
          count = ico
-         call MPI_REDUCE(GEOM_OBJ,GEOM_OBJ,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-  
+         call MPI_REDUCE(GEOM_OBJ,GEOM_OBJ,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
          if (VIS_VTU) then
             count = size(ELEM_TYPES)
-            call MPI_REDUCE(ELEM_TYPES,ELEM_TYPES,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+            call MPI_REDUCE(ELEM_TYPES,ELEM_TYPES,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
          endif
       endif
    else
@@ -270,10 +270,10 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !..Step 5 : Write to file with HDF5
 !
    if (RANK .eq. ROOT) then
-      if (.not. VIS_VTU) then
-         call geometry_write(Sname,len(Sname),Sfile,len(Sfile))
-      else
+      if (VIS_VTU) then
          call write_VTU_headers(IcE)
+      else
+         call geometry_write(Sname,len(Sname),Sfile,len(Sfile))
       endif
    endif
 !
