@@ -34,7 +34,9 @@ program main
    integer :: i, ierr, req, ret, plen
 !
 !..OMP variables
+#if HP3D_USE_OPENMP
    integer :: num_threads, omp_get_num_threads
+#endif
 !
 !..MPI variables
    character(MPI_MAX_PROCESSOR_NAME) :: pname
@@ -108,7 +110,7 @@ program main
    if (RANK .ne. ROOT) goto 80
 !
 !..print problem parameters
-   write(*,9030) ' Polynomial order (x,y,z) = ', IP
+   write(*,9010) ' Initial polynomial order = ', IP
    write(*,9010) ' NORD_ADD (Delta p)       = ', NORD_ADD
    write(*,9010) ' ISOL                     = ', ISOL
    write(*,9010) ' NEXACT                   = ', NEXACT
@@ -120,15 +122,16 @@ program main
  9010 format(A,I3)
  9015 format(A,A)
  9020 format(A,ES13.2)
- 9030 format(A,' (',I1,',',I1,',',I1,') ')
 !
-!$OMP parallel
-!$OMP single
-   num_threads = omp_get_num_threads()
-   write(6,1025) ' Number of OpenMP threads: ',num_threads
+#if HP3D_USE_OPENMP
+   !$OMP parallel
+   !$OMP single
+      num_threads = omp_get_num_threads()
+      write(6,1025) ' Number of OpenMP threads: ',num_threads
  1025 format(A,I2)
-!$OMP end single
-!$OMP end parallel
+   !$OMP end single
+   !$OMP end parallel
+#endif
 !
    80 continue
 !

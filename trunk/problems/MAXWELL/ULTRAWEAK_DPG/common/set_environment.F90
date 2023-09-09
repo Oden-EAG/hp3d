@@ -96,20 +96,22 @@ subroutine set_environment_maxwell
    call get_option_string('-file_vis_upscale','Visualization upscale file location','../../../files/vis', FILE_VIS)
    call get_option_string('-vis_level'       ,'Visualization upscale level (0-3)'  ,'2'                 , VLEVEL  )
 !
-   call get_option_bool('-paraview_ho' , 'Enable higher order element output', .false. , SECOND_ORDER_VIS)
-   call get_option_bool('-paraview_vtu', 'Enable VTU output format'          , .false. , VIS_VTU         )
+   call get_option_bool('-paraview_ho' , 'Enable higher order element output', .false., SECOND_ORDER_VIS)
+   call get_option_bool('-paraview_vtu', 'Enable VTU output format'          , .false., VIS_VTU         )
 !
 !..I/O
    call get_option_string('-dir_output','Paraview root directory','../outputs/',OUTPUT_DIR)
    PARAVIEW_DIR = trim(OUTPUT_DIR)//'paraview/'
 !
 !..Paraview MISC
-   call get_option_bool('-paraview_geom', 'Dump geom at every Paraview call', .false., PARAVIEW_DUMP_GEOM)
-   call get_option_bool('-paraview_attr', 'Dump solution to Paraview'       , .true. , PARAVIEW_DUMP_ATTR)
+   call get_option_bool('-paraview_geom', 'Dump geom at every Paraview call', .true., PARAVIEW_DUMP_GEOM)
+   call get_option_bool('-paraview_attr', 'Dump solution to Paraview'       , .true., PARAVIEW_DUMP_ATTR)
 !
+#if HP3D_USE_OPENMP
 !..number of OpenMP threads
    call get_option_int( '-nthreads', 'Number of OpenMP threads', 1, nthreads)
    call omp_set_num_threads(nthreads)
+#endif
 !
 end subroutine set_environment_maxwell
 !
