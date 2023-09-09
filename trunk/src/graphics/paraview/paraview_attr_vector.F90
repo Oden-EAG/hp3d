@@ -4,15 +4,15 @@
 !> @param[in] Id  - integer to be converted to file postfix
 !> @param[in] Idx - integer identifying vector attribute
 !!
-!> @date Mar 2023
+!> @date Sep 2023
 !-------------------------------------------------------------------------------------------
 !
 subroutine paraview_attr_vector(Id, Idx)
 !
    use environment , only : PREFIX
-   use paraview    , only : PARAVIEW_IO,PARAVIEW_DIR,VIS_VTU
-   use physics     , only : PHYSA
+   use physics     , only : NR_COMP,PHYSA
    use mpi_param   , only : RANK,ROOT
+   use paraview
 !
    implicit none
 
@@ -20,7 +20,7 @@ subroutine paraview_attr_vector(Id, Idx)
    integer, intent(in) :: Idx
 !
    character(len=60) :: fname,nick
-   integer           :: ic,iload,iattr,icomp
+   integer           :: ic,iload,iattr,icomp,jcomp
    character(len=5)  :: postfix
    character(len=2)  :: comp,load
 !
@@ -33,6 +33,7 @@ subroutine paraview_attr_vector(Id, Idx)
    iload = Idx/100
    iattr = Idx - iload*100 ; iattr=iattr/10
    icomp = Idx - iload*100 - iattr*10
+   jcomp = sum(NR_COMP(1:iattr-1)) + icomp ! component index
 !
 !..convert integers to string
    write(comp,"(I2.2)") icomp
@@ -40,10 +41,11 @@ subroutine paraview_attr_vector(Id, Idx)
 !
 !
 !  -- REAL PART --
+   if (.not. PARAVIEW_COMP_REAL(jcomp)) goto 50
 !
 !..file name and nickname for attribute
-   fname = PHYSA(iattr)//"_vec_comp_"//comp//"_load_"//load//"_real_"
-   nick  = PHYSA(iattr)//"_vec_comp_"//comp//"_load_"//load//"_real"
+   fname = PHYSA(iattr)//"_comp_"//comp//"_load_"//load//"_real_"
+   nick  = PHYSA(iattr)//"_comp_"//comp//"_load_"//load//"_real"
 !
 !..write to .h5 file
    call vector2vtk("Vector",  &
@@ -66,6 +68,7 @@ subroutine paraview_attr_vector(Id, Idx)
 #if C_MODE
 !
 !  -- IMAGINARY PART --
+   if (.not. PARAVIEW_COMP_IMAG(jcomp)) goto 70
 !
 !..file name and nickname for attribute
    fname = PHYSA(iattr)//"_vec_comp_"//comp//"_load_"//load//"_imag_"

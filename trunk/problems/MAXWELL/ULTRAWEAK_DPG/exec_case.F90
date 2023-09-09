@@ -7,10 +7,10 @@
       use control
       use data_structure3D
       use par_mesh
-      use paraview      , only: VLEVEL
+      use paraview      , only: VLEVEL,paraview_select_attr
       use zoltan_wrapper, only: zoltan_w_partition,zoltan_w_eval
       use mpi_param
-      use MPI           , only: MPI_COMM_WORLD, MPI_INTEGER
+      use MPI           , only: MPI_COMM_WORLD,MPI_INTEGER,MPI_LOGICAL
 !
       implicit none
 !
@@ -22,7 +22,7 @@
       integer :: flag(2)
       integer :: physNick
 !
-      integer :: iParAttr(2)
+      logical :: iPvAttr(2)
       character(len=2) :: vis_level
 !
       integer :: fld,numPts,i,mdle,kref,refs
@@ -42,17 +42,17 @@
 !     ...Paraview graphics
          case(3)
 !
-            iParAttr = (/ 2,6 /)
+            iPvAttr = (/.false.,.true./) ! write field output only
             if (RANK .eq. ROOT) then
                write(*,300) ' paraview output: select fields...'   , &
                             '  - 2 H(curl) (E and H flux)' ,         &
                             '  - 6 L2      (E and H field)'
-               read (*,*) iParAttr(1), iParAttr(2)
+               read (*,*) iPvAttr(1), iPvAttr(2)
            300 format(A,/,A,/,A)
             endif
 !
             count = 2; src = ROOT
-            call MPI_BCAST (iParAttr,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+            call MPI_BCAST (iPvAttr,count,MPI_LOGICAL,src,MPI_COMM_WORLD,ierr)
 !
             if (RANK .eq. ROOT) then
                write(*,*) 'paraview output: select VLEVEL (0-4)...'
@@ -69,7 +69,8 @@
             count = 1; src = ROOT
             call MPI_BCAST (VLEVEL,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
 !
-            call my_paraview_driver(iParAttr)
+            call paraview_select_attr(iPvAttr)
+            call paraview_driver
             call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 !     ...print data structure (interactive)

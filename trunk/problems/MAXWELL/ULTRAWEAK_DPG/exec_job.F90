@@ -11,11 +11,13 @@
       use MPI,             only: MPI_COMM_WORLD
       use mpi_param
       use par_mesh,        only: EXCHANGE_DOF,distr_mesh
+      use paraview      , only: paraview_select_attr
       use zoltan_wrapper,  only: zoltan_w_set_lb,zoltan_w_eval
 !
       implicit none
 !
-      integer :: flag(2),iParAttr(2)
+      integer :: flag(2)
+      logical :: iPvAttr(2)
       integer :: physNick, nstop
 !
       integer :: i, ierr, numPts, fld
@@ -64,8 +66,9 @@
          endif
 !
 !     ...write paraview output
-         iParAttr = (/2,6/)
-         call my_paraview_driver(iParAttr)
+         iPvAttr(1:2) = (/.true.,.true./)
+         call paraview_select_attr(iPvAttr)
+         call paraview_driver
 !
       enddo
 !

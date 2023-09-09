@@ -11,8 +11,6 @@ module upscale
 !
    implicit none
 !
-   save
-!
 !  define generic type for a visualization object
    type :: vis
 !
@@ -45,7 +43,7 @@ contains
       integer :: Etype
 !
       if (SECOND_ORDER_VIS) then
-         if(VIS_VTU) then
+         if (VIS_VTU) then
             select case(Etype)
                case(TETR,MDLN); ivis_type = 24
                case(PRIS,MDLP); ivis_type = 32
@@ -63,7 +61,7 @@ contains
             end select
          endif
       else
-         if(VIS_VTU) then
+         if (VIS_VTU) then
             select case(Etype)
                case(TETR,MDLN); ivis_type = 10
                case(PRIS,MDLP); ivis_type = 13

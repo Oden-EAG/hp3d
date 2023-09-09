@@ -1,47 +1,31 @@
 !-------------------------------------------------------------------------------------------
-!> Purpose : paraview driver
+!> @brief   Custom interface for paraview export
+!> @date    Sep 2023
 !-------------------------------------------------------------------------------------------
-!
-subroutine my_paraview_driver(IParAttr)
+subroutine my_paraview_driver
 !
    use upscale
    use physics
-   use data_structure3D,   only: NRCOMS
-   use environment,        only: PREFIX,QUIET_MODE
-   use paraview,           only: PARAVIEW_DUMP_ATTR,FILE_VIS, &
-                                 PARAVIEW_DOMAIN,VLEVEL, &
-                                 PARAVIEW_DUMP_GEOM
-   use mpi_param,          only: RANK,ROOT
+   use data_structure3D, only: NRCOMS
+   use environment,      only: QUIET_MODE
+   use mpi_param,        only: RANK,ROOT
+   use paraview
 !
    implicit none
 !
-   integer, intent(in) :: IParAttr(NR_PHYSA)
-!
    real(8) :: time
-   integer :: idx,iphys,iload,icomp
+   integer :: idx,iattr,iload,icomp,jcomp
 !
    integer, save :: id = -1
-   logical, save :: initialized = .false.
-!
-   character(len=2) :: vis_level
 !
 !-------------------------------------------------------------------------------------------
 !
-!..Set true to write out geometry file on every call to this routine
-!  Set false to write out geometry file only on first call to this routine
-   PARAVIEW_DUMP_GEOM = .false.
+!..check compatibility of paraview input flags, and
+!  initialize visualization files and auxiliary arrays
+   call paraview_initialize
 !
-!..check compatibility of paraview input flags
-   call paraview_check
-!
-!..load files for visualization upscale
-   if (.not. initialized) then
-      call load_vis(TETR_VIS,trim(FILE_VIS)//'/tetra_'//trim(VLEVEL),TETR)
-      call load_vis(PRIS_VIS,trim(FILE_VIS)//'/prism_'//trim(VLEVEL),PRIS)
-      call load_vis(HEXA_VIS,trim(FILE_VIS)//'/hexa_'//trim(VLEVEL),BRIC)
-      initialized = .true.
-   endif
-!
+!.."time" value is only written to file if "time" is non-negative
+!  (currently, only supported with XDMF output)
    time=-1.d0
 !
 !..integer id to append to Fname
@@ -75,65 +59,94 @@ subroutine my_paraview_driver(IParAttr)
    call paraview_geometry
 !
 !  -- PHYSICAL ATTRIBUTES --
-   if (.not. PARAVIEW_DUMP_ATTR) goto 90
+   if (.not. PARAVIEW_DUMP_ATTR) goto 80
 !
-!..loop over rhs's
-   do iload=1,1 !NRCOMS
+   if (.not.QUIET_MODE .and. RANK.eq.ROOT) then
+      if (PARAVIEW_DOMAIN.eq.0) then
+         write(*,*)'Dumping to Paraview...'
+      else
+         write(*,*)'Dumping to Paraview from domain ',PARAVIEW_DOMAIN,'...'
+      endif
+      write(*,*)'--------------------------------------'
+      write(*,*)'ATTRIBUTE | DISC. SPACE | COMP. | LOAD'
+   endif
 !
-!  ...loop over physics variables
-      do iphys=1,NR_PHYSA
-
-         if (IParAttr(iphys) .eq. 0) cycle
+!..loop over solution copies
+   do iload=1,NRCOMS
+!
+!  ...skip selected physics variables
+      if (.not. PARAVIEW_LOAD(iload)) cycle
+!
+      jcomp = 0
+!
+!  ...loop over attributes
+      do iattr=1,NR_PHYSA
+!
+         if (.not. PARAVIEW_ATTR(iattr)) then
+            jcomp = jcomp + NR_COMP(iattr)
+            cycle
+         endif
 !
 !     ...loop over components
-         do icomp=1,NR_COMP(iphys)
-            if (IParAttr(iphys) .ge. icomp) then
+         do icomp=1,NR_COMP(iattr)
+            jcomp = jcomp+1
 !
-!           ...encode iload, iphys, icomp into a single attribute's index
-               idx = iload*100 + iphys*10 + icomp*1
+#if C_MODE
+            if (.not. PARAVIEW_COMP_REAL(jcomp) .and. &
+                .not. PARAVIEW_COMP_IMAG(jcomp)) cycle
+#else
+            if (.not. PARAVIEW_COMP_REAL(jcomp)) cycle
+#endif
 !
-               select case(D_TYPE(iphys))
+!        ...encode iload, iattr, icomp into a single attribute's index
+            idx = iload*100 + iattr*10 + icomp*1
 !
-!                 -- H1 --
-                  case(CONTIN)
-                     call paraview_attr_scalar(id,idx)
+            select case(D_TYPE(iattr))
 !
-!                 -- H(curl) --
-                  case(TANGEN)
-                     call paraview_attr_vector(id,idx)
+!              -- H1 --
+               case(CONTIN) ; call paraview_attr_scalar(id,idx)
 !
-!                 -- H(div) --
-                  case(NORMAL)
-                     call paraview_attr_vector(id,idx)
+!              -- H(curl) --
+               case(TANGEN) ; call paraview_attr_vector(id,idx)
 !
-!                 -- L2 --
-                  case(DISCON)
-                     call paraview_attr_scalar(id,idx)
+!              -- H(div) --
+               case(NORMAL) ; call paraview_attr_vector(id,idx)
 !
-               end select
+!              -- L2 --
+               case(DISCON) ; call paraview_attr_scalar(id,idx)
 !
-               if (.not. QUIET_MODE .and. RANK .eq. ROOT) then
-                  write(*,8000) PHYSA(iphys),S_DType(D_TYPE(iphys)),icomp,iload
- 8000             format(/,1x,a5,7x,a6,12x,i1,5x,i2)
-               endif
+            end select
 !
+            if (.not. QUIET_MODE .and. RANK .eq. ROOT) then
+               write(*,8000) PHYSA(iattr),S_DType(D_TYPE(iattr)),icomp,iload
+         8000  format(1x,a5,7x,a6,12x,i1,5x,i2)
             endif
-!     ...end loop over components of physics variable
+!
+!     ...end loop over components
          enddo
-!  ...end loop over physics variables
+!  ...end loop over attributes
       enddo
-!..end loop over rhs's
+!..end loop over solution copies
    enddo
 !
-  90 continue
+   if (.not.QUIET_MODE .and. RANK.eq.ROOT) then
+      write(*,*)'--------------------------------------'
+      write(*,*)''
+   endif
+!
+   80 continue
 !
    if (RANK .eq. ROOT) then
       call paraview_end ! [CLOSES THE XMF FILE, WRITES FOOTER]
    endif
 !
-!
 end subroutine my_paraview_driver
 
+
+
+!-------------------------------------------------------------------------------------------
+! TESTING
+!-------------------------------------------------------------------------------------------
 subroutine paraview_geom_vis0
 !
    use environment , only : PREFIX
@@ -189,11 +202,12 @@ subroutine paraview_geom_vis0
    90 continue
 !
 end subroutine paraview_geom_vis0
-
-
+!
+!
+!-------------------------------------------------------------------------------------------
 subroutine paraview_begin_vis0(Id,Time)
 !
-   use paraview    , only : PARAVIEW_IO,PARAVIEW_DIR,paraview_init
+   use paraview    , only : PARAVIEW_IO,PARAVIEW_DIR,paraview_data_init
    use environment , only : PREFIX
 !
    implicit none
@@ -205,7 +219,7 @@ subroutine paraview_begin_vis0(Id,Time)
 !
 !-------------------------------------------------------------------------------------------
 !
-   call paraview_init
+   call paraview_data_init
 !
 !..convert integer to string
    write(postfix,"(I5.5)") Id
@@ -232,13 +246,9 @@ end subroutine paraview_begin_vis0
 !
 !
 !-------------------------------------------------------------------------------------------
-!> Purpose : print footer, close file
-!!
-!> @date Oct 2019
-!-------------------------------------------------------------------------------------------
 subroutine paraview_end_vis0
 !
-   use paraview , only : PARAVIEW_IO, paraview_finalize
+   use paraview , only : PARAVIEW_IO, paraview_data_finalize
 !
    implicit none
 !
@@ -252,6 +262,6 @@ subroutine paraview_end_vis0
 !
    close(PARAVIEW_IO)
 !
-   call paraview_finalize
+   call paraview_data_finalize
 !
 end subroutine paraview_end_vis0

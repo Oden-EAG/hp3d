@@ -13,11 +13,13 @@ subroutine exec_job_coupled
    use MPI           , only: MPI_COMM_WORLD,MPI_Wtime
    use mpi_param     , only: RANK,ROOT,NUM_PROCS
    use par_mesh      , only: EXCHANGE_DOF,distr_mesh
+   use paraview      , only: paraview_select_attr
    use zoltan_wrapper
 !
    implicit none
 !
-   integer :: flag(6),iParAttr(6)
+   integer :: flag(6)
+   logical :: iPvAttr(6)
    integer :: physNick,nstop,nskip
    logical :: ires
 !
@@ -201,14 +203,15 @@ subroutine exec_job_coupled
 !
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
 !
-!  ...Set default paraview output; all fields: iParAttr = (/1,2,2,1,6,6/)
-      iParAttr = (/1,0,0,0,6,0/) ! output heat solution and signal laser field
+!  ...Set default paraview output; all components = (/1,2,2,1,6,6/)
+!     output temperature field and signal laser field
+      iPvAttr = (/.true.,.false.,.false.,.false.,.true.,.false./)
 !
 !  ...Optionally, skip computing Maxwell problem for nskip time steps
 !     (except in the initial time step)
       if (time_step.ge.1 .and. time_step.le.nskip) then
          if (RANK.eq.ROOT) write(*,4200) ' Skipping Maxwell solve in this time step...'
-         iParAttr = (/1,0,0,0,0,0/) ! output only the heat solution
+         iPvAttr = (/.true.,.false.,.false.,.false.,.false.,.false./) ! output only the heat solution
          goto 420
       endif
 !
@@ -356,8 +359,9 @@ subroutine exec_job_coupled
 !
 !  ...write paraview output
       if(RANK.eq.ROOT) write(*,200) ' Writing paraview output...'
+      call paraview_select_attr(iPvAttr)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-      call my_paraview_driver(iParAttr)
+      call my_paraview_driver
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
       if(RANK.eq.ROOT) write(*,300) end_time - start_time
  425  continue

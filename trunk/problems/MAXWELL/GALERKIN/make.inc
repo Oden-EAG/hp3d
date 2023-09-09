@@ -17,6 +17,5 @@ SRC_GALERKIN = \
             set_initial_mesh.F90 \
             exec_case.F90 \
             exec_job.F90 \
-            my_paraview_driver.F90 \
             soldis.F90 \
             main.F90

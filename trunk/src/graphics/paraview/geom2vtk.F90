@@ -176,8 +176,8 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !$OMP END PARALLEL
 !
    if (VIS_VTU) then
-      allocate(ELEM_TYPES(ice_subd))
-      ELEM_TYPES = 0
+      allocate(VTU_ELEM_TYPES(ice_subd))
+      VTU_ELEM_TYPES = 0
    endif
 !
    ice_subd=0; icn_subd=0
@@ -215,7 +215,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !
       do i=1,ivis
 !
-         if (VIS_VTU) ELEM_TYPES(VTU_element_type_offset(iel) + i) = l
+         if (VIS_VTU) VTU_ELEM_TYPES(VTU_element_type_offset(iel) + i) = l
 !
 !     ...visualization element accounting for VLEVEL
          call get_vis_elem(vis_on_type(ntype),i,n_vert_offset(iel), nverl)
@@ -248,8 +248,8 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
          call MPI_REDUCE(MPI_IN_PLACE,GEOM_OBJ,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
 
          if (VIS_VTU) then
-            count = size(ELEM_TYPES)
-            call MPI_REDUCE(MPI_IN_PLACE,ELEM_TYPES,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
+            count = size(VTU_ELEM_TYPES)
+            call MPI_REDUCE(MPI_IN_PLACE,VTU_ELEM_TYPES,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
          endif
       else
          count = 3*IcP
@@ -257,8 +257,8 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
          count = ico
          call MPI_REDUCE(GEOM_OBJ,GEOM_OBJ,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
          if (VIS_VTU) then
-            count = size(ELEM_TYPES)
-            call MPI_REDUCE(ELEM_TYPES,ELEM_TYPES,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
+            count = size(VTU_ELEM_TYPES)
+            call MPI_REDUCE(VTU_ELEM_TYPES,VTU_ELEM_TYPES,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
          endif
       endif
    else
@@ -280,7 +280,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !..Step 6 : Deallocate
 !
    if (VIS_VTU) then
-      deallocate(ELEM_TYPES)
+      deallocate(VTU_ELEM_TYPES)
       deallocate(VTU_element_type_offset)
    endif
 !
@@ -293,12 +293,11 @@ end subroutine geom2vtk
 !----------------------------------------------------------------------------------------
 !> @brief writes the header for VTU file and also appends the co-ordinate, connectivity and element type data in VTU file.
 !!
-!> @param[in ] IcE - total number of elements for visualization
+!> @param[in] IcE - total number of elements for visualization
 !!
 !> @date Mar 2023
 !----------------------------------------------------------------------------------------
 subroutine write_VTU_headers(IcE)
-!
 !
    use data_structure3D
    use upscale
@@ -317,9 +316,19 @@ subroutine write_VTU_headers(IcE)
    integer                 :: VTU_data_offset
    integer                 :: VTU_data_size
 !..Auxiliary variables
-   character(len=80)       :: str1, str2, str3, str4
-   integer                 :: k,l,iv,j,count, nV
-   integer                 :: iphys,iload,icomp
+   character(len=80)       :: str1,str2,str3,str4
+   integer                 :: k,l,iv,j,count,nV
+   integer                 :: iphys,iload,icomp,jcomp
+!
+   integer                 :: ipart,npart
+   character(len=4)        :: suffix
+!
+!..Export both real- and imaginary-part for complex solutions
+#if C_MODE
+   npart = 2
+#else
+   npart = 1
+#endif
 !
 !..Main header starts here
 !
@@ -373,7 +382,7 @@ subroutine write_VTU_headers(IcE)
 !
    do count  = 1,IcE
       if (SECOND_ORDER_VIS) then
-         l = ELEM_TYPES(count)
+         l = VTU_ELEM_TYPES(count)
          j = nobj_conf_VTU(l)
          do iv = 1,j
             elem_connectivity(count,iv) = GEOM_OBJ(k+iv) 
@@ -382,9 +391,8 @@ subroutine write_VTU_headers(IcE)
          offsets_connectivity(count) = k
       else
          k = k + 1
-         l = ELEM_TYPES(count)
+         l = VTU_ELEM_TYPES(count)
          j = nobj_conf_VTU(l)
-
          do iv = 1,j
             elem_connectivity(count,iv) = GEOM_OBJ(k+iv) 
          enddo
@@ -430,72 +438,98 @@ subroutine write_VTU_headers(IcE)
 !
 !..Header for solution data starts here
 !
-!..loop over NRCOMS
+!..loop over solution copies
    do iload=1,NRCOMS
+!
+      if (.not. PARAVIEW_LOAD(iload)) cycle
+!
+      jcomp = 0
+!
 !  ...loop over physics variables
       do iphys=1,NR_PHYSA
-         if (IPARATTR_VTU(iphys) .eq. 0) cycle
+!
+         if (.not. PARAVIEW_ATTR(iphys)) then
+            jcomp = jcomp + NR_COMP(iphys)
+            cycle
+         endif
+!
 !     ...loop over components
          do icomp=1,NR_COMP(iphys)
+            jcomp = jcomp+1
 !
-            if (IPARATTR_VTU(iphys) .lt. icomp) cycle
+!        ...loop over real/imag parts
+            do ipart = 1,npart
+               if (ipart .eq. 1) then
+                  if (.not. PARAVIEW_COMP_REAL(jcomp)) cycle
+                  suffix = "real"
+               else
+                  if (.not. PARAVIEW_COMP_IMAG(jcomp)) cycle
+                  suffix = "imag"
+               endif
 !
-            select case(D_TYPE(iphys))
+!           ...specify type of physics variable
+               select case(D_TYPE(iphys))
 !
+!           ...H1-variable
                case(CONTIN)
                   write(str1, '(i0.0)') VTU_data_offset        ! data_offset
                   write(str2, '(i0.0)') 8 * 8                  ! integer precision
                   write(str3, '(i0.0)') iphys
                   write(str4, '(i0.0)') icomp
-                  write(PARAVIEW_IO) '        ' // '<DataArray type="Float' // trim(str2) // '"' //  &
-                  ' Name='//'"H1_'//trim(str3)//'_'//trim(str4)//'_var"'                     //  &
-                  ' format="appended"'                          //  &
-                  ' offset="' // trim(str1) // '">' // char(10)
-                  write(PARAVIEW_IO) '        ' // '</DataArray>' // char(10)
-!
+                  write(PARAVIEW_IO) '        '//'<DataArray type="Float'//trim(str2)//'"'//    &
+                     ' Name='//'"contin_'//trim(str3)//'_'//trim(str4)//'_var_'//suffix//'"'//  &
+                     ' format="appended"'//                                                     &
+                     ' offset="'//trim(str1)//'">'//char(10)
+                  write(PARAVIEW_IO) '        '//'</DataArray>'//char(10)
                   VTU_data_offset = VTU_data_offset + 4 + nV * 8
 !
+!           ...H(curl)-variable
                case(TANGEN)
                   write(str1, '(i0.0)') VTU_data_offset        ! data_offset
                   write(str2, '(i0.0)') 8 * 8                  ! integer precision
                   write(str3, '(i0.0)') iphys
-                  write(PARAVIEW_IO) '        ' // '<DataArray type="Float' // trim(str2) // '"' //  &
-                  ' Name='//'"HCurl_'//trim(str3)//'_var"'//' NumberOfComponents="3"' //  &
-                  ' format="appended"'                          //  &
-                  ' offset="' // trim(str1) // '">' // char(10)
-                  write(PARAVIEW_IO) '        ' // '</DataArray>' // char(10)
-!
+                  write(PARAVIEW_IO) '        '// '<DataArray type="Float'//trim(str2)//'"'//   &
+                     ' Name='//'"tangen_'//trim(str3)//'_'//trim(str4)//'_var_'//suffix//'"'//  &
+                     ' NumberOfComponents="3"'//                                                &
+                     ' format="appended"'//                                                     &
+                     ' offset="'//trim(str1)//'">'//char(10)
+                  write(PARAVIEW_IO) '        '//'</DataArray>'//char(10)
                   VTU_data_offset = VTU_data_offset + 4 + nV * 3 * 8
 !
+!           ...H(div)-variable
                case(NORMAL)
                   write(str1, '(i0.0)') VTU_data_offset        ! data_offset
                   write(str2, '(i0.0)') 8 * 8                  ! integer precision
                   write(str3, '(i0.0)') iphys
-                  write(PARAVIEW_IO) '        ' // '<DataArray type="Float' // trim(str2) // '"' //  &
-                  ' Name='//'"HDiv_'//trim(str3)//'_var"'//' NumberOfComponents="3"' //  &
-                  ' format="appended"'                          //  &
-                  ' offset="' // trim(str1) // '">' // char(10)
-                  write(PARAVIEW_IO) '        ' // '</DataArray>' // char(10)
-!
+                  write(PARAVIEW_IO) '        '//'<DataArray type="Float'//trim(str2)//'"'//    &
+                     ' Name='//'"normal_'//trim(str3)//'_'//trim(str4)//'_var_'//suffix//'"'//  &
+                     ' NumberOfComponents="3"'//                                                &
+                     ' format="appended"'//                                                     &
+                     ' offset="'//trim(str1)//'">'//char(10)
+                  write(PARAVIEW_IO) '        '//'</DataArray>'//char(10)
                   VTU_data_offset = VTU_data_offset + 4 + nV * 3 * 8
 !
+!           ...L2-variable
                case(DISCON)
                   write(str1, '(i0.0)') VTU_data_offset        ! data_offset
                   write(str2, '(i0.0)') 8 * 8                  ! integer precision
                   write(str3, '(i0.0)') iphys
                   write(str4, '(i0.0)') icomp
-                  write(PARAVIEW_IO) '        ' // '<DataArray type="Float' // trim(str2) // '"' //  &
-                  ' Name='//'"L2_'//trim(str3)//'_'//trim(str4)//'_var"'                     //  &
-                  ' format="appended"'                          //  &
-                  ' offset="' // trim(str1) // '">' // char(10)
-                  write(PARAVIEW_IO) '        ' // '</DataArray>' // char(10)
+                  write(PARAVIEW_IO) '        '//'<DataArray type="Float'//trim(str2)//'"'//    &
+                     ' Name='//'"discon_'//trim(str3)//'_'//trim(str4)//'_var_'//suffix//'"'//  &
+                     ' format="appended"'//                                                     &
+                     ' offset="'//trim(str1)//'">'//char(10)
+                  write(PARAVIEW_IO) '        '//'</DataArray>'//char(10)
                   VTU_data_offset = VTU_data_offset + 4 + nV * 8
-            end select
+!
+               end select
+!        ...end loop over real/imag parts
+            enddo
 !     ...end loop over components
          enddo
 !  ...end loop over physics variables
       enddo
-!..end loop over NRCOMS
+!..end loop over solution copies
    enddo
 !
    50 continue
@@ -513,7 +547,7 @@ subroutine write_VTU_headers(IcE)
 !
 !..writing point coordinates
    VTU_data_size =  nV * 3 * 8
-   write(PARAVIEW_IO) VTU_data_size ! data_size =  three coordinates for each node * 8
+   write(PARAVIEW_IO) VTU_data_size ! data_size = 3 coordinates for each node * 8
    do count = 1, nV
       write(PARAVIEW_IO) GEOM_PTS(1,count),GEOM_PTS(2,count),GEOM_PTS(3,count)
    enddo
@@ -522,7 +556,7 @@ subroutine write_VTU_headers(IcE)
    VTU_data_size = offsets_connectivity(IcE) * 4
    write(PARAVIEW_IO) VTU_data_size
    do count  = 1,IcE
-      l = ELEM_TYPES(count)
+      l = VTU_ELEM_TYPES(count)
       j = nobj_conf_VTU(l)
       do iv = 1,j
       write(PARAVIEW_IO) elem_connectivity(count,iv)
@@ -540,7 +574,7 @@ subroutine write_VTU_headers(IcE)
    VTU_data_size = IcE * 4
    write(PARAVIEW_IO) VTU_data_size
    do count = 1, IcE
-      write(PARAVIEW_IO) ELEM_TYPES(count)
+      write(PARAVIEW_IO) VTU_ELEM_TYPES(count)
    enddo
 !
 !..deallocation

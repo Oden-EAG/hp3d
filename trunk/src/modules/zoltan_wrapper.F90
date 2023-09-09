@@ -85,7 +85,7 @@ module zoltan_wrapper
       ierr = Zoltan_Initialize(ver)
       call zoltan_w_handle_err(ierr,'Zoltan_Initialize')
       if (.not. QUIET_MODE .and. RANK .eq. ROOT) then
-         write(*,100) 'Zoltan initialized sucessfully. Version = ', ver
+         write(*,100) 'Zoltan initialized successfully. Version = ', ver
       endif
   100 format(A,F5.2)
 !

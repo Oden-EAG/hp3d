@@ -8,13 +8,14 @@ subroutine exec_job_adap_ref()
     use MPI           , only: MPI_COMM_WORLD
     use mpi_param     , only: RANK,ROOT,NUM_PROCS
     use par_mesh      , only: EXCHANGE_DOF,distr_mesh,DISTRIBUTED,HOST_MESH
+    use paraview      , only: paraview_select_attr
     use zoltan_wrapper, only: zoltan_w_set_lb,zoltan_w_eval
  !
     implicit none
  !
     integer :: i,ierr
     real(8) :: MPI_Wtime,start_time,end_time
-    integer :: iParAttr(4) = (/0,0,0,1/)
+    logical :: iPvAttr(4)
     integer,parameter :: ref_type = 1
     EXCHANGE_DOF = .false.
     !
@@ -92,8 +93,9 @@ subroutine exec_job_adap_ref()
      /,'             ',A,I2,/)
      call MPI_BARRIER (MPI_COMM_WORLD, ierr);end_time   = MPI_Wtime()
 
-     iParAttr(1:4) = (/1,1,1,3/) ! write field output only
-     call my_paraview_driver(iParAttr)
+     iPvAttr(1:4) = (/.true.,.true.,.true.,.true./) ! write field output only
+     call paraview_select_attr(iPvAttr)
+     call paraview_driver
      call MPI_BARRIER (MPI_COMM_WORLD, ierr)
      
      if(RANK .eq. ROOT) then
