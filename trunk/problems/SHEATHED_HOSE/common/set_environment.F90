@@ -28,7 +28,7 @@ subroutine set_environment
 !
 ! Variables relevant to src/modules/paraview
 !                        option label       // explanation                        // default value     // parameter
-  call get_option_string('-prefix'          ,'Prefix for paraview files'          ,'hose_'             ,PREFIX      )
+  call get_option_string('-prefix'          ,'Prefix for paraview files'          ,'hose'              ,PREFIX      )
   call get_option_string('-file-vis-upscale','Visualization upscale file location','../../files/vis'   ,FILE_VIS          )
   call get_option_string('-vis-level'       ,'Visualization upscale level (0-3)'  ,'2'                 ,VLEVEL            )
   call get_option_string('-dir-paraview'    ,'Paraview root directory'            ,'./output/figures/' ,PARAVIEW_DIR      )

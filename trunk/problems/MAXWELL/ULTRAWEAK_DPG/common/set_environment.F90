@@ -92,17 +92,20 @@ subroutine set_environment_maxwell
 !     -- Paraview Interface --
 ! Variables relevant to src/modules/paraview
 ! option label // explanation // default value // parameter
-   call get_option_string('-prefix'          ,'Prefix paraview file'               ,'Maxwell'           , PREFIX  )
+   call get_option_string('-prefix'          ,'Prefix paraview file'               ,'maxw'              , PREFIX  )
    call get_option_string('-file_vis_upscale','Visualization upscale file location','../../../files/vis', FILE_VIS)
-   call get_option_string('-vis_level'       ,'Visualization upscale level (0-3)'  ,'0'                 , VLEVEL  )
+   call get_option_string('-vis_level'       ,'Visualization upscale level (0-3)'  ,'2'                 , VLEVEL  )
+!
+   call get_option_bool('-paraview_ho' , 'Enable higher order element output', .false. , SECOND_ORDER_VIS)
+   call get_option_bool('-paraview_vtu', 'Enable VTU output format'          , .false. , VIS_VTU         )
 !
 !..I/O
    call get_option_string('-dir_output','Paraview root directory','../outputs/',OUTPUT_DIR)
    PARAVIEW_DIR = trim(OUTPUT_DIR)//'paraview/'
 !
 !..Paraview MISC
-   call get_option_bool('-paraview_geom', 'Dump geom at every Paraview call', .FALSE., PARAVIEW_DUMP_GEOM)
-   call get_option_bool('-paraview_attr', 'Dump solution to Paraview'       , .TRUE. , PARAVIEW_DUMP_ATTR)
+   call get_option_bool('-paraview_geom', 'Dump geom at every Paraview call', .false., PARAVIEW_DUMP_GEOM)
+   call get_option_bool('-paraview_attr', 'Dump solution to Paraview'       , .true. , PARAVIEW_DUMP_ATTR)
 !
 !..number of OpenMP threads
    call get_option_int( '-nthreads', 'Number of OpenMP threads', 1, nthreads)

@@ -30,7 +30,8 @@ subroutine paraview_geometry
       write(postfix,"(I5.5)") id
 !
 !  ...produce .h5 file
-      call geom2vtk("Geometry",trim(PARAVIEW_DIR)//trim(PREFIX)//"geom_"//trim(postfix)//".h5", ice,icn,icp)
+      call geom2vtk("Geometry",trim(PARAVIEW_DIR)//trim(PREFIX)//"_geom_"//            &
+                                                   trim(postfix)//".h5", ice,icn,icp)
 !
    endif
 !

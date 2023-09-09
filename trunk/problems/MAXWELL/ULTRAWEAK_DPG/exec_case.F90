@@ -44,8 +44,8 @@
 !
             iPvAttr = (/.false.,.true./) ! write field output only
             if (RANK .eq. ROOT) then
-               write(*,300) ' paraview output: select fields...'   , &
-                            '  - 2 H(curl) (E and H flux)' ,         &
+               write(*,300) ' paraview output: select fields (T/F)' , &
+                            '  - 2 H(curl) (E and H flux)'          , &
                             '  - 6 L2      (E and H field)'
                read (*,*) iPvAttr(1), iPvAttr(2)
            300 format(A,/,A,/,A)

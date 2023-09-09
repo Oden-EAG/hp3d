@@ -49,7 +49,7 @@ subroutine paraview_attr_vector(Id, Idx)
 !
 !..write to .h5 file
    call vector2vtk("Vector",  &
-      trim(PARAVIEW_DIR)//trim(PREFIX)//"vector_"//trim(fname)//postfix//".h5", &
+      trim(PARAVIEW_DIR)//trim(PREFIX)//"_"//trim(fname)//postfix//".h5", &
       trim(nick),Idx, ic)
 !
    if (RANK .ne. ROOT) goto 50
@@ -71,12 +71,12 @@ subroutine paraview_attr_vector(Id, Idx)
    if (.not. PARAVIEW_COMP_IMAG(jcomp)) goto 70
 !
 !..file name and nickname for attribute
-   fname = PHYSA(iattr)//"_vec_comp_"//comp//"_load_"//load//"_imag_"
-   nick  = PHYSA(iattr)//"_vec_comp_"//comp//"_load_"//load//"_imag"
+   fname = PHYSA(iattr)//"_comp_"//comp//"_load_"//load//"_imag_"
+   nick  = PHYSA(iattr)//"_comp_"//comp//"_load_"//load//"_imag"
 !
 !..write to .h5 file (flip sign of "Idx")
    call vector2vtk("Vector",  &
-      trim(PARAVIEW_DIR)//trim(PREFIX)//"vector_"//trim(fname)//postfix//".h5", &
+      trim(PARAVIEW_DIR)//trim(PREFIX)//"_"//trim(fname)//postfix//".h5", &
       trim(nick),-abs(Idx), ic)
 !
    if (RANK .ne. ROOT) goto 70

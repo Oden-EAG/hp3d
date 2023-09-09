@@ -66,12 +66,6 @@ subroutine paraview_driver
             jcomp = jcomp + NR_COMP(iattr)
             cycle
          endif
-         ! TODO: just testing
-         if (jcomp .ne. sum(NR_COMP(1:iattr-1))) then
-            write(*,*) 'jcomp = ',jcomp
-            write(*,*) 'sum   = ',sum(NR_COMP(1:iattr-1))
-            stop
-         endif
 !
 !     ...loop over components
          do icomp=1,NR_COMP(iattr)
