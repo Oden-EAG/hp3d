@@ -73,7 +73,6 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
       
       IcP = IcP + vis_obj%NR_VERT
 !
-!  ...second-order vis doesn't yet work with mixed meshes (paraview error)
       if (SECOND_ORDER_VIS) then
          ico = ico + vis_obj%NR_ELEM*(nobj_conf(ntype))
          m = m + 1
