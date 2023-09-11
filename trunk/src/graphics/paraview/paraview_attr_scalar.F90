@@ -100,7 +100,7 @@ subroutine paraview_attr_scalar(Id, Idx)
    if (.not. VIS_VTU) then
       1101 format("      <Attribute Name='",a,"' AttributeType='Scalar' Center='Node'>")
       1102 format("        <DataItem Dimensions='",i10, " 1' NumberType='Float' Precision='4' Format='HDF'>")
-      1103 format("        ",a,"scalar_",a,a,".h5:",a)
+      1103 format("        ",a,"_",a,a,".h5:",a)
       1104 format("        </DataItem>")
       1105 format("      </Attribute>")
    endif

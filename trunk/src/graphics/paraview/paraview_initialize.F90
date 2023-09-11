@@ -13,9 +13,6 @@
 !  ...check compatibility of paraview input flags
       call paraview_check
 !
-!  ...check if already initialized
-      if (PARAVIEW_IS_INIT) goto 90
-!
 !  ...paraview ex./iso. geometry flag
       PARAVIEW_GEOM = EXGEOM
 !
@@ -29,6 +26,10 @@
          call load_vis(PRIS_VIS,trim(FILE_VIS)//'/prism_'//trim(VLEVEL),PRIS)
          call load_vis(HEXA_VIS,trim(FILE_VIS)//'/hexa_'//trim(VLEVEL),BRIC)
       endif
+!
+!  ...check if already initialized
+      if (PARAVIEW_IS_INIT) goto 90
+!
 !  ...allocate array for selectively exporting variables
       allocate(PARAVIEW_LOAD(NRCOMS))      ; PARAVIEW_LOAD = .true.
       allocate(PARAVIEW_ATTR(NR_PHYSA))    ; PARAVIEW_ATTR = .true.
