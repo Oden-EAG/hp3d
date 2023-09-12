@@ -245,7 +245,6 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
          call MPI_REDUCE(MPI_IN_PLACE,GEOM_PTS,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
          count = ico
          call MPI_REDUCE(MPI_IN_PLACE,GEOM_OBJ,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
-
          if (VIS_VTU) then
             count = size(VTU_ELEM_TYPES)
             call MPI_REDUCE(MPI_IN_PLACE,VTU_ELEM_TYPES,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
@@ -264,7 +263,6 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
       IcE = ice_subd
       IcN = icn_subd
    endif
-   call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 !..Step 5 : Write to file with HDF5
 !
