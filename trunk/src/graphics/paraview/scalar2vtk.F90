@@ -7,7 +7,7 @@
 !> @param[in ] Idx     - index identifying scalar attribute
 !> @param[out] Ic      - number of vertices of visualization object
 !!
-!> @date       Feb 2023
+!> @date       Mar 2023
 !----------------------------------------------------------------------------------------
 !
 #include "typedefs.h"
@@ -19,9 +19,9 @@ subroutine scalar2vtk(Sname,Sfile,Snick,Idx, Ic)
    use physics
    use upscale
    use paraview
-   use MPI              , only: MPI_COMM_WORLD,MPI_SUM,MPI_INTEGER,MPI_Wtime
-   use mpi_param        , only: RANK,ROOT,NUM_PROCS
-   use par_mesh         , only: DISTRIBUTED,HOST_MESH
+   use MPI       , only: MPI_COMM_WORLD,MPI_SUM,MPI_INTEGER,MPI_Wtime
+   use mpi_param , only: RANK,ROOT,NUM_PROCS
+   use par_mesh  , only: DISTRIBUTED,HOST_MESH
 !
    implicit none
 !
@@ -55,6 +55,8 @@ subroutine scalar2vtk(Sname,Sfile,Snick,Idx, Ic)
 !
    real(8) :: val
    integer :: ibeg,iattr,icomp,isol,iload,ireal,ndom
+!
+   integer :: VTU_data_size
 !
    real(8), external :: dreal_part,dimag_part
 !
@@ -193,7 +195,19 @@ subroutine scalar2vtk(Sname,Sfile,Snick,Idx, Ic)
 !
 !..Step 4 : Write to file with HDF5
 !
-   if (RANK .eq. ROOT) call attr_write(Sname,len(Sname),Sfile,len(Sfile),Snick,len(Snick))
+   if (RANK .eq. ROOT) then
+      if (.not. VIS_VTU) then
+         call attr_write(Sname,len(Sname),Sfile,len(Sfile),Snick,len(Snick))
+      else
+!     ...appending the attribute data in VTU file
+         nV = size(ATTR_VAL)
+         VTU_data_size = nv * 8
+         write(PARAVIEW_IO) VTU_data_size
+         do iv = 1,nV
+            write(PARAVIEW_IO) ATTR_VAL(1,iv)
+         enddo
+      endif
+   endif
 !
 !..Step 5 : Deallocate
 !

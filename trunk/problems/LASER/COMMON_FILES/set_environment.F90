@@ -154,13 +154,16 @@ subroutine set_environment_maxwell
    call get_option_string('-file_vis_upscale','Visualization upscale file location','../../../files/vis', FILE_VIS)
    call get_option_string('-vis_level'       ,'Visualization upscale level (0-3)'  ,'3'                 , VLEVEL  )
 !
+   call get_option_bool('-paraview_ho' ,'Enable higher order element output',.false.,SECOND_ORDER_VIS)
+   call get_option_bool('-paraview_vtu','Enable VTU output format'          ,.false.,VIS_VTU         )
+!
 !..I/O
    call get_option_string('-dir_output','Paraview root directory','../outputs/',OUTPUT_DIR)
    PARAVIEW_DIR = trim(OUTPUT_DIR)//'paraview/'
 !
 !..Paraview MISC
-   call get_option_bool('-paraview_geom', 'Dump geom at every Paraview call', .FALSE., PARAVIEW_DUMP_GEOM)
-   call get_option_bool('-paraview_attr', 'Dump solution to Paraview'       , .TRUE. , PARAVIEW_DUMP_ATTR)
+   call get_option_bool('-paraview_geom', 'Dump geom at every Paraview call', .false., PARAVIEW_DUMP_GEOM)
+   call get_option_bool('-paraview_attr', 'Dump solution to Paraview'       , .true. , PARAVIEW_DUMP_ATTR)
 !
 !..FOR DUMPING OUT POWER
 !   call get_option_int('-dumppower', 'DUMP_POWER', 0, DUMP_POWER)

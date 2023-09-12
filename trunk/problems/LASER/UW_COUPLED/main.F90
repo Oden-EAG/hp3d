@@ -20,6 +20,7 @@ program main
    use physics
    use commonParam
    use laserParam
+   use paraview
 !
    use assembly
    use assembly_sc, only: IPRINT_TIME
@@ -34,6 +35,8 @@ program main
 !
 !..auxiliary variables
    integer :: i, ierr, req, ret, plen
+!
+   logical :: iPvLoad(2),iPvAttr(6),iPvCompReal(18),iPvCompImag(18)
 !
 !..OMP variables
 #if HP3D_USE_OPENMP
@@ -203,6 +206,22 @@ program main
 !         NO_PROBLEM: 2 - heat, 3 - signal, 4 - pump
    NO_PROBLEM = 3
    PHYSAm(1:6) = (/.false.,.true.,.false.,.false.,.true.,.false./)
+!
+!..Paraview export: by default,
+!     print only the first solution copy
+      iPvLoad = (/.true.,.false./)
+      call paraview_select_load(iPvLoad)
+!     print only the field variables (no traces)
+      iPvAttr = (/.true.,.false.,.false.,.false.,.true.,.true./)
+      call paraview_select_attr(iPvAttr)
+!     print real parts of all components
+      iPvCompReal = .true.
+      call paraview_select_comp_real(iPvCompReal)
+!     print imaginary parts of complex-valued fields only
+      iPvCompImag = .true.
+      iPvCompImag(1) = .false. ! temperature field
+      iPvCompImag(6) = .false. ! heat flux
+      call paraview_select_comp_imag(iPvCompImag)
 !
 !..set static condensation flags
    ISTC_FLAG = .true. ! activate automatic static condensation

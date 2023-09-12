@@ -1,4 +1,7 @@
-
+!-------------------------------------------------------------------------------------------
+!> @brief   paraview module for exporting mesh and solutions for visualization
+!> @date    Sep 2023
+!-------------------------------------------------------------------------------------------
 module paraview
 !
    use hdf5_wrapper
@@ -8,13 +11,31 @@ module paraview
 !
    save
 !
+!..FLAGS:
+!  - VLEVEL
+!     linear upscaling of geometry output via "VLEVEL" uniform refinements
+!     only for linear geometry output (i.e., when SECOND_ORDER_VIS = .false.)
+!  - PARAVIEW_DUMP_GEOM
+!     if enabled : paraview_geometry writes geometry on every call
+!     if disabled: paraview_geometry writes geometry on first call only (supported with XDMF)
+!  - PARAVIEW_DUMP_ATTR
+!     if enabled : paraview_driver writes all physical attributes (solutions)
+!     if disabled: paraview_driver does not write any solution fields
    character(len=128) :: FILE_VIS = '../../files/vis'
    character(len=2  ) :: VLEVEL = '2'
    character(len=128) :: PARAVIEW_DIR = 'vtk/'
    integer,parameter  :: PARAVIEW_IO = 22
-   logical            :: PARAVIEW_DUMP_GEOM = .FALSE.
-   logical            :: PARAVIEW_DUMP_ATTR = .FALSE.
+   logical            :: PARAVIEW_DUMP_GEOM = .TRUE.
+   logical            :: PARAVIEW_DUMP_ATTR = .TRUE.
+!
+!..Flag for enabling second-order geometry output (both XDMF and VTU)
+!  NOTE: Only VTU supports higher-order geometry for hybrid meshes
    logical            :: SECOND_ORDER_VIS   = .FALSE.
+!
+!..Flag for switching between different formats for output meshes and solution fields
+!  ...VIS_VTU = .FALSE. : uses XDMF format (default)
+!  ...VIS_VTU = .TRUE.  : uses VTU format
+   logical            :: VIS_VTU = .FALSE.
 !
 !  this is matching EXGEOM flag in "control" module
    integer,parameter  :: PARAVIEW_ISOGEOM = 0
@@ -31,30 +52,173 @@ module paraview
    real(8), allocatable :: GEOM_PTS(:,:)
    real(8), allocatable :: ATTR_VAL(:,:)
 !
-   contains
+!..Variables for VTU Format
+   integer, allocatable :: VTU_ELEM_TYPES(:)
 !
+!..Advanced control over exporting variables
+!     PARAVIEW_LOAD enables/disables writing specific solution vectors
+!     PARAVIEW_ATTR enables/disables writing specific physics variables
+!     PARAVIEW_COMP_REAL enables/disables writing real part of specific components
+!     PARAVIEW_COMP_IMAG enables/disables writing imag part of specific components
+   logical, allocatable :: PARAVIEW_LOAD(:)      ! 1...NRCOMS
+   logical, allocatable :: PARAVIEW_ATTR(:)      ! 1...NR_PHYSA
+   logical, allocatable :: PARAVIEW_COMP_REAL(:) ! 1...NRINDEX
+   logical, allocatable :: PARAVIEW_COMP_IMAG(:) ! 1...NRINDEX
+!
+   logical              :: PARAVIEW_IS_INIT = .false.
+!
+   contains
+
+
+
+!-----------------------------------------------------------------------------
+!> @brief     paraview compatibility checks
+!> @date      Sep 2023
+!-----------------------------------------------------------------------------
+   subroutine paraview_check
+      use GMP, only: NRHEXAS,NRPRISM,NRTETRA,NRPYRAM
+      integer :: num_types
+!
+!  ...check for compatibility of writing the mesh only at first call with output format
+!     (VTU format requires the mesh to be written each time the solution is exported)
+      if (.not.PARAVIEW_DUMP_GEOM .and. VIS_VTU) then
+         if (RANK .eq. ROOT) then
+            write(*,*) 'paraview_check: PARAVIEW_DUMP_GEOM disabled is not supported for VTU.'
+            write(*,*) '                Setting PARAVIEW_DUMP_GEOM=.true.'
+            write(*,*) '                (writing mesh each time the solution is exported).'
+         endif
+         PARAVIEW_DUMP_GEOM = .true.
+      endif
+!
+!  ...check for compatibility of upscaling with output order
+!     (VLEVEL upscaling is only supported for linear element output)
+      if (SECOND_ORDER_VIS .and. VLEVEL.ne.'0') then
+         if (RANK .eq. ROOT) then
+            write(*,*) 'paraview_check: VLEVEL upscaling is only supported for linear output.'
+            write(*,*) '                Setting VLEVEL to "0" for SECOND_ORDER_VIS.'
+         endif
+         VLEVEL = '0'
+      endif
+!
+!  ...check for compatibility of mixed mesh with output format
+!     (XDMF does not support mixed meshes with higher-order)
+      num_types = 0
+      if (NRHEXAS .gt. 0) num_types = num_types + 1
+      if (NRPRISM .gt. 0) num_types = num_types + 1
+      if (NRTETRA .gt. 0) num_types = num_types + 1
+      if (NRPYRAM .gt. 0) num_types = num_types + 1
+!
+      if (SECOND_ORDER_VIS .and. .not.VIS_VTU) then
+         if (num_types .gt. 1) then
+            if (RANK .eq. ROOT) then
+               write(*,*) 'paraview_check: XDMF does not support hybrid mesh with SECOND_ORDER_VIS.'
+               write(*,*) '                Changing output format from XDMF to VTU.'
+            endif
+            VIS_VTU = .true.
+         endif
+      endif
+!
+   end subroutine paraview_check
+
+
+
+!-----------------------------------------------------------------------------
+!> @brief     select solution vectors for paraview export
+!> @date      Sep 2023
+!-----------------------------------------------------------------------------
+   subroutine paraview_select_load(EnableLoad)
+      use data_structure3D, only: NRCOMS
+      logical, intent(in) :: EnableLoad(NRCOMS)
+      integer :: iload
+      if (.not.PARAVIEW_IS_INIT) call paraview_initialize
+!
+      do iload = 1,NRCOMS
+         PARAVIEW_LOAD(iload) = EnableLoad(iload)
+      enddo
+   end subroutine paraview_select_load
+
+
+!-----------------------------------------------------------------------------
+!> @brief     select physics attributes for paraview export
+!> @date      Sep 2023
+!-----------------------------------------------------------------------------
+   subroutine paraview_select_attr(EnableAttr)
+      use physics, only: NR_PHYSA
+      logical, intent(in) :: EnableAttr(NR_PHYSA)
+      integer :: iattr
+      if (.not.PARAVIEW_IS_INIT) call paraview_initialize
+!
+      do iattr = 1,NR_PHYSA
+         PARAVIEW_ATTR(iattr) = EnableAttr(iattr)
+      enddo
+   end subroutine paraview_select_attr
+
+
+!-----------------------------------------------------------------------------
+!> @brief     select components (real part) for paraview export
+!> @date      Sep 2023
+!-----------------------------------------------------------------------------
+   subroutine paraview_select_comp_real(EnableCompReal)
+      use physics, only: NR_PHYSA,NR_COMP,NRINDEX
+      logical, intent(in) :: EnableCompReal(NRINDEX)
+      integer :: iattr,icomp,jcomp
+      if (.not.PARAVIEW_IS_INIT) call paraview_initialize
+!
+      jcomp = 0
+      do iattr = 1,NR_PHYSA
+         do icomp = 1,NR_COMP(iattr)
+            jcomp = jcomp+1
+            PARAVIEW_COMP_REAL(jcomp) = EnableCompReal(jcomp)
+         enddo
+      enddo
+   end subroutine paraview_select_comp_real
+
+
+!-----------------------------------------------------------------------------
+!> @brief     select components (imaginary part) for paraview export
+!> @date      Sep 2023
+!-----------------------------------------------------------------------------
+   subroutine paraview_select_comp_imag(EnableCompImag)
+      use physics, only: NR_PHYSA,NR_COMP,NRINDEX
+      logical, intent(in) :: EnableCompImag(NRINDEX)
+      integer :: iattr,icomp,jcomp
+      if (.not.PARAVIEW_IS_INIT) call paraview_initialize
+!
+      jcomp = 0
+      do iattr = 1,NR_PHYSA
+         do icomp = 1,NR_COMP(iattr)
+            jcomp = jcomp+1
+            PARAVIEW_COMP_IMAG(jcomp) = EnableCompImag(jcomp)
+         enddo
+      enddo
+   end subroutine paraview_select_comp_imag
+
+
+
 !-----------------------------------------------------------------------------
 !> Purpose : initialize paraview output (open hdf5 file)
 !!
-!> @date Feb 2023
+!> @date Mar 2023
 !-----------------------------------------------------------------------------
-   subroutine paraview_init()
-      call hdf5_w_init()
-   end subroutine paraview_init
+   subroutine paraview_data_init()
+!  ...only call hdf5_w_finalize when xdmf output is chosen
+      if (.not. VIS_VTU) call hdf5_w_init()
+   end subroutine paraview_data_init
 
 
 
 !-----------------------------------------------------------------------------
 !> Purpose : finalize paraview output (close hdf5; deallocate data arrays)
 !!
-!> @date Feb 2023
+!> @date Mar 2023
 !-----------------------------------------------------------------------------
-   subroutine paraview_finalize()
-      call hdf5_w_finalize()
+   subroutine paraview_data_finalize()
+!  ...only call hdf5_w_finalize when xdmf output is chosen
+      if (.not. VIS_VTU) call hdf5_w_finalize()
       if (allocated(GEOM_OBJ)) deallocate(GEOM_OBJ)
       if (allocated(GEOM_PTS)) deallocate(GEOM_PTS)
       if (allocated(GEOM_PTS)) deallocate(ATTR_VAL)
-   end subroutine paraview_finalize
+   end subroutine paraview_data_finalize
 
 
 

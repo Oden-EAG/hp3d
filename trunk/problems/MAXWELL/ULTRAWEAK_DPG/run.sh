@@ -87,4 +87,4 @@ args+=" -file_control ${ctrl}"
 args+=" -maxnods ${maxnods}"
 args+=" -nthreads ${nthreads} -alpha ${alpha}"
 
-mpirun -np ${nproc} ./maxwell_UW ${args}
+mpirun -np ${nproc} ./maxw ${args}

@@ -7,7 +7,7 @@
 !> @param[in ] Idx     - index identifying vector attribute
 !> @param[out] Ic      - number of vertices of visualization object
 !!
-!> @date       Feb 2023
+!> @date       Mar 2023
 !----------------------------------------------------------------------------------------
 !
 #include "typedefs.h"
@@ -55,6 +55,8 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
 !
    integer :: ibeg,iattr,icomp,isol,iload,ireal,ndom
    real(8), external :: dreal_part,dimag_part
+!
+   integer :: VTU_data_size
 !
 !..OpenMP parallelization: auxiliary variables
    integer, dimension(NRELES) :: n_vert_offset, n_elem_vert
@@ -215,7 +217,19 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
 !
 !..Step 4 : Write to file with HDF5
 !
-   if (RANK .eq. ROOT) call attr_write(Sname,len(Sname),Sfile,len(Sfile),Snick,len(Snick))
+   if (RANK .eq. ROOT) then
+      if (.not. VIS_VTU) then
+         call attr_write(Sname,len(Sname),Sfile,len(Sfile),Snick,len(Snick))
+      else
+!     ...appending the attribute data in VTU file
+         nV = size(ATTR_VAL,dim=2)
+         VTU_data_size = nV * 3 * 8
+         write(PARAVIEW_IO) VTU_data_size
+         do iv = 1,nV
+            write(PARAVIEW_IO) ATTR_VAL(1,iv),ATTR_VAL(2,iv),ATTR_VAL(3,iv)
+         enddo
+      endif
+   endif
 !
 !..Step 5 : Deallocate
 !

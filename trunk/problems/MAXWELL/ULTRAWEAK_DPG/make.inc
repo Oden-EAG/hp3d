@@ -22,7 +22,6 @@ SRC_UW      = \
         finalize.F90 \
         initialize.F90 \
         main.F90 \
-        my_paraview_driver.F90 \
         refine_DPG.F90 \
         set_initial_mesh.F90 \
         soldis.F90

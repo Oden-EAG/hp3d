@@ -20,7 +20,7 @@ OBJ_PATH        = _obj_
 MODULE_PATH     = $(OBJ_PATH)
 
 # Executable name
-EXEC            = maxwell_UW
+EXEC            = maxw
 
 # Includes and defs
 CCDEFS          = $(PROB_PP_DEFS)
@@ -84,4 +84,4 @@ clean :
 clean-pv :
 	@rm -f ../outputs/paraview/*.h5
 	@rm -f ../outputs/paraview/*.xmf
-
+	@rm -f ../outputs/paraview/*.vtu
