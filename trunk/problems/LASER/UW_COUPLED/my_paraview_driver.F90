@@ -8,15 +8,16 @@ subroutine my_paraview_driver
    use physics
    use data_structure3D, only: NRCOMS
    use environment,      only: QUIET_MODE
+   use laserParam,       only: DELTA_T
    use mpi_param,        only: RANK,ROOT
    use paraview
 !
    implicit none
 !
-   real(8) :: time
    integer :: idx,iattr,iload,icomp,jcomp
 !
    integer, save :: id = -1
+   real(8), save :: time = 0.d0
 !
 !-------------------------------------------------------------------------------------------
 !
@@ -26,7 +27,9 @@ subroutine my_paraview_driver
 !
 !.."time" value is only written to file if "time" is non-negative
 !  (currently, only supported with XDMF output)
-   time=-1.d0
+!  note: DELTA_T is non-dimensional time increment;
+!        DELTA_T * TIME_0 is time in seconds.
+   if (id .ge. 0) time = time+DELTA_T
 !
 !..integer id to append to Fname
    id=id+1
