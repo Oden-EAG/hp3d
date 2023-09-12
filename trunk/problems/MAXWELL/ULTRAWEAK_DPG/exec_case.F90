@@ -10,7 +10,7 @@
       use paraview      , only: VLEVEL,paraview_select_attr
       use zoltan_wrapper, only: zoltan_w_partition,zoltan_w_eval
       use mpi_param
-      use MPI           , only: MPI_COMM_WORLD,MPI_INTEGER,MPI_LOGICAL
+      use MPI           , only: MPI_COMM_WORLD,MPI_CHARACTER,MPI_INTEGER,MPI_LOGICAL
 !
       implicit none
 !
@@ -66,8 +66,8 @@
                end select
             endif
 !
-            count = 1; src = ROOT
-            call MPI_BCAST (VLEVEL,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+            count = len(VLEVEL); src = ROOT
+            call MPI_BCAST (VLEVEL,count,MPI_CHARACTER,src,MPI_COMM_WORLD,ierr)
 !
             call paraview_select_attr(iPvAttr)
             call paraview_driver

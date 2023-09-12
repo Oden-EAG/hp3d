@@ -10,7 +10,7 @@ subroutine exec_case(idec)
    use paraview      , only: VLEVEL,paraview_select_attr
    use zoltan_wrapper, only: zoltan_w_partition,zoltan_w_eval
    use mpi_param     , only: RANK,ROOT
-   use MPI           , only: MPI_COMM_WORLD,MPI_INTEGER,MPI_LOGICAL
+   use MPI           , only: MPI_COMM_WORLD,MPI_CHARACTER,MPI_INTEGER,MPI_LOGICAL
 !
    implicit none
 !
@@ -78,8 +78,9 @@ subroutine exec_case(idec)
             end select
          endif
 !
-         count = 1; src = ROOT
-         call MPI_BCAST (VLEVEL,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+         count = len(VLEVEL); src = ROOT
+         write(*,*) 'len(VLEVEL) = ',count
+         call MPI_BCAST (VLEVEL,count,MPI_CHARACTER,src,MPI_COMM_WORLD,ierr)
 !
 !         iPvAttr = (/.false.,.false.,.false.,.false.,.true.,.false./)
          call paraview_select_attr(iPvAttr)
