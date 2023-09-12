@@ -59,7 +59,7 @@ module paraview
 !     PARAVIEW_LOAD enables/disables writing specific solution vectors
 !     PARAVIEW_ATTR enables/disables writing specific physics variables
 !     PARAVIEW_COMP_REAL enables/disables writing real part of specific components
-!     PARAVIEW_COMP_REAL enables/disables writing imag part of specific components
+!     PARAVIEW_COMP_IMAG enables/disables writing imag part of specific components
    logical, allocatable :: PARAVIEW_LOAD(:)      ! 1...NRCOMS
    logical, allocatable :: PARAVIEW_ATTR(:)      ! 1...NR_PHYSA
    logical, allocatable :: PARAVIEW_COMP_REAL(:) ! 1...NRINDEX

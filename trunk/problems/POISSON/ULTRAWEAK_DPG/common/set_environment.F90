@@ -76,7 +76,7 @@ subroutine set_environment
    call get_option_string  &
         ('-file_vis_upscale','Visualization upscale file location','../../../files/vis',FILE_VIS)
    call get_option_string  &
-        ('-vis_level'       ,'Visualization upscale level (0-3)'  ,'0'                 ,VLEVEL  )
+        ('-vis_level'       ,'Visualization upscale level (0-3)'  ,'2'                 ,VLEVEL  )
 !
    call get_option_bool    &
         ('-paraview_ho'    ,'Enable higher order element output'  ,.false.             ,SECOND_ORDER_VIS)

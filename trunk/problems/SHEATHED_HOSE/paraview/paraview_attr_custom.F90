@@ -39,7 +39,7 @@ subroutine paraview_attr_custom(Id,Scomp)
 !
 !     write to .h5 file
       call soln2vtk("Scalar", &
-           trim(PARAVIEW_DIR)//trim(PREFIX)//"scalar_"//trim(fname)//postfix//".h5", &
+           trim(PARAVIEW_DIR)//trim(PREFIX)//"_"//trim(fname)//postfix//".h5", &
            trim(nick), "Node", Scomp, ic)
 !
       if (RANK .ne. ROOT) goto 90
@@ -53,7 +53,7 @@ subroutine paraview_attr_custom(Id,Scomp)
 !
  1101 format("      <Attribute Name='",a,"' AttributeType='Scalar' Center='Node'>")
  1102 format("        <DataItem Dimensions='",i8, " 1' NumberType='Float' Precision='4' Format='HDF'>")
- 1103 format("        ",a,"scalar_",a,a,".h5:",a)
+ 1103 format("        ",a,"_",a,a,".h5:",a)
  1104 format("        </DataItem>")
  1105 format("      </Attribute>")
 !

@@ -54,7 +54,7 @@ subroutine paraview_driver
 !..loop over solution copies
    do iload=1,NRCOMS
 !
-!  ...skip selected physics variables
+!  ...skip selected loads
       if (.not. PARAVIEW_LOAD(iload)) cycle
 !
       jcomp = 0
@@ -62,6 +62,7 @@ subroutine paraview_driver
 !  ...loop over attributes
       do iattr=1,NR_PHYSA
 !
+!     ...skip selected physics variables
          if (.not. PARAVIEW_ATTR(iattr)) then
             jcomp = jcomp + NR_COMP(iattr)
             cycle
@@ -71,6 +72,7 @@ subroutine paraview_driver
          do icomp=1,NR_COMP(iattr)
             jcomp = jcomp+1
 !
+!        ...skip selected components
 #if C_MODE
             if (.not. PARAVIEW_COMP_REAL(jcomp) .and. &
                 .not. PARAVIEW_COMP_IMAG(jcomp)) cycle

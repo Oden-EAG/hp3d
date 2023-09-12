@@ -8,11 +8,11 @@
 !
       use commonParam
       use data_structure3D
-      use MPI,             only: MPI_COMM_WORLD
       use mpi_param
-      use par_mesh,        only: EXCHANGE_DOF,distr_mesh
-      use paraview      , only: paraview_select_attr
-      use zoltan_wrapper,  only: zoltan_w_set_lb,zoltan_w_eval
+      use MPI,            only: MPI_COMM_WORLD
+      use par_mesh,       only: EXCHANGE_DOF,distr_mesh
+      use paraview,       only: paraview_select_attr
+      use zoltan_wrapper, only: zoltan_w_set_lb,zoltan_w_eval
 !
       implicit none
 !
