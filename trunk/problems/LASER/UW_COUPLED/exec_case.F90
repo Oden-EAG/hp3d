@@ -79,7 +79,6 @@ subroutine exec_case(idec)
          endif
 !
          count = len(VLEVEL); src = ROOT
-         write(*,*) 'len(VLEVEL) = ',count
          call MPI_BCAST (VLEVEL,count,MPI_CHARACTER,src,MPI_COMM_WORLD,ierr)
 !
 !         iPvAttr = (/.false.,.false.,.false.,.false.,.true.,.false./)
