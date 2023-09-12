@@ -8,6 +8,7 @@ subroutine my_paraview_driver
    use physics
    use data_structure3D, only: NRCOMS
    use environment,      only: QUIET_MODE
+   use commonParam,      only: TIMESTEP
    use laserParam,       only: DELTA_T
    use mpi_param,        only: RANK,ROOT
    use paraview
@@ -28,8 +29,8 @@ subroutine my_paraview_driver
 !.."time" value is only written to file if "time" is non-negative
 !  (currently, only supported with XDMF output)
 !  note: DELTA_T is non-dimensional time increment;
-!        DELTA_T * TIME_0 is time in seconds.
-   if (id .ge. 0) time = time+DELTA_T
+!        DELTA_T * TIME_0 is time increment in seconds.
+   time = TIMESTEP * DELTA_T
 !
 !..integer id to append to Fname
    id=id+1
