@@ -194,6 +194,7 @@
                    nrdofE,shapE,curlE)
 !
 !    evaluate reference coordinates of the point as needed by GMP
+!    brefgeom3D returns the outward normal as seen from the local element
      nsign = nsign_param(Ntype,Iface)
      call brefgeom3D(Mdle,xi,Etav,shapH,gradH,nrv,dxidt,nsign, &
                      eta,detadxi,dxideta,rjac,detadt,rn,bjac)
@@ -220,8 +221,8 @@
        call logic_error(ERR_INVALID_VALUE,__FILE__,__LINE__)
      end select
 !
-!    compute inverse jacobian (for transforming the curl)
-     call geom(dxdeta, detadx, rjacdxdeta, nflag)
+!    compute inverse Jacobian (for transforming the curl)
+     call geom(dxdeta, detadx,rjacdxdeta,nflag)
      if (nflag.ne.0) then
        write(*,*) 'dhpfaceE: rjacdxdeta = ',rjacdxdeta
        stop 1
