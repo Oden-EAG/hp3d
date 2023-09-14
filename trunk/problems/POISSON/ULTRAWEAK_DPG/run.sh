@@ -2,10 +2,10 @@
 
 #
 # MPI Procs
-nproc=1
+nproc=2
 #
 # OMP THREADS
-nthreads=1
+nthreads=2
 
 # Configure problem params
 # - initial polynomial order of approximation

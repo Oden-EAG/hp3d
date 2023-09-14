@@ -31,6 +31,8 @@ subroutine paraview_driver
 !..integer id to append to Fname
    id=id+1
 !
+   if(PARAVIEW_TIME .ne. -1.d0) time = PARAVIEW_TIME
+!
    if (RANK .eq. ROOT) then
       call paraview_begin(id,time) ! [OPENS THE XMF FILE, WRITES HEADER]
    endif

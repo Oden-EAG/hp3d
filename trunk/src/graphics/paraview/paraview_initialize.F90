@@ -59,11 +59,14 @@ subroutine paraview_begin(Id,Time)
 !
    integer, intent(in) :: Id
    real(8), intent(in) :: Time
-!
-   character(len=5) :: postfix
+   character(len=5) :: postfix, timestamp
+   integer          :: i
+!..time_tags saves all time values until the current step.
+   real(8),save     :: time_tags(PARAVIEW_TIME_STEPS_NUM)
 !
 !-------------------------------------------------------------------------------------------
 !
+   time_tags(Id+1) = Time
    call paraview_data_init
 !
 !..XDMF format
@@ -98,6 +101,26 @@ subroutine paraview_begin(Id,Time)
       open(unit=PARAVIEW_IO,                                                  &
            file=trim(PARAVIEW_DIR)//trim(PREFIX)//"_"//trim(postfix)//'.vtu', &
            status = 'replace', form = 'unformatted', access = 'stream')
+      
+      open(unit = PVD_IO,file=trim(PARAVIEW_DIR)//trim(PREFIX)//'.pvd',status = 'replace', form = 'unformatted', access = 'stream')
+      write(PVD_IO) '<VTKFile type="Collection" version="1.0" byte_order="LittleEndian" header_type="UInt64">' //char(10)
+      write(PVD_IO) '  <Collection>'//char(10)
+!..For every time step, pvd file is written from scratch.
+      do i = 0,Id
+         if(time_tags(i+1) .gt. -1.d0) then
+            write(timestamp,"(f5.3)") time_tags(i+1)
+         else
+            write(timestamp,"(I5.5)") i
+         endif
+         write(postfix,"(I5.5)") i
+         write(PVD_IO) '     <DataSet timestep=' // '"'//trim(timestamp)//'"'//'  part="0"   file="'//trim(PREFIX)//"_"//trim(postfix)//'.vtu" />'//char(10)
+      enddo
+!..closing pvd file
+      write(PVD_IO) '  </Collection>'//char(10)
+      write(PVD_IO) '</VTKFile>'//char(10)
+      close(PVD_IO)
+      write(postfix,"(I5.5)") Id
+
    endif
 !
 end subroutine paraview_begin

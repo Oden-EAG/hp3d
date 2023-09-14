@@ -8,7 +8,7 @@ subroutine exec_case(idec)
    use mpi_param
    use mpi
    use common_prob_data
-   use paraview      , only: paraview_select_attr
+   use paraview      , only: paraview_select_attr,PARAVIEW_TIME
    use zoltan_wrapper, only: zoltan_w_partition,zoltan_w_eval
 !
    implicit none
@@ -20,6 +20,7 @@ subroutine exec_case(idec)
    integer :: mdle_subd(NRELES)
    integer :: i,mdle,kref,src,count,ierr,nord
    real(8) :: res
+   real(8), save :: time = 0.d0
 !
 !----------------------------------------------------------------------
 !
@@ -32,6 +33,8 @@ subroutine exec_case(idec)
       case(3)
          iPvAttr(1:4) = (/.false.,.false.,.true.,.true./) ! write field output only
          call paraview_select_attr(iPvAttr)
+         time = time + 0.01
+         PARAVIEW_TIME = time
          call paraview_driver
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
