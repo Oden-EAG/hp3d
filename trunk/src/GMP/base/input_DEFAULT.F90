@@ -248,7 +248,7 @@ subroutine input_DEFAULT(Fp)
                      'all surfaces are assigned domain "0"'
         ENDIF
         isurf_flag = 0
-      endif 
+      endif
 !
       IF (.NOT. QUIET_MODE) write(*,1009) NRPOINT
  1009 format(' NRPOINT = ',i7,' ; reading points...')
