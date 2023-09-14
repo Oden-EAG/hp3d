@@ -65,7 +65,7 @@ c       and build the data base for the constrained nodes
 c       (module constrained_nodes)
         call get_connect_info(mdle, nodesl,norientl)
         ntype = NODES(mdle)%ntype
-        nrv = nvert(ntype); nre = nedge(ntype); nrf = nface(ntype)
+        nrv = NVERT(ntype); nre = NEDGE(ntype); nrf = NFACE(ntype)
 c
 c  .....loop through element higher order nodes
 C         do j=nrv+1,nrv+nre+nrf+1
@@ -232,7 +232,7 @@ c
 c  .....determine whether the element will be p-refined
         if (NODES(mdle)%visit.eq.0) then
           ntype = NODES(mdle)%ntype
-          nrv = nvert(ntype); nre = nedge(ntype); nrf = nface(ntype)
+          nrv = NVERT(ntype); nre = NEDGE(ntype); nrf = NFACE(ntype)
 c
 c  .......loop through element higher order nodes
           do j=1,nre+nrf+1

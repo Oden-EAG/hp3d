@@ -40,7 +40,7 @@ subroutine find_neig(Mdle, Neig_list)
   ! Step 0: short cut for initial mesh elements only
   !---------------------------------------------------
   if (is_root(Mdle)) then
-     do i=1,nface(ntype)
+     do i=1,NFACE(ntype)
         Neig_list(1:4,i) = ELEMS(Mdle)%neig(i)
      enddo
      return
@@ -50,8 +50,8 @@ subroutine find_neig(Mdle, Neig_list)
   ! Step 1: use neig_face
   !---------------------------------------------------
   call elem_nodes(Mdle, nodesl,norientl)
-  do i=1,nface(ntype)
-     nod = nodesl(nvert(ntype)+nedge(ntype)+i)
+  do i=1,NFACE(ntype)
+     nod = nodesl(NVERT(ntype)+NEDGE(ntype)+i)
      call neig_face(nod, nrneig,neig,nsid_list,norient_list)
      select case (nrneig)
      case(1)

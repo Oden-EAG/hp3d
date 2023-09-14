@@ -121,7 +121,7 @@ c
         if (iprint.eq.1) then
           write(*,*)'lsvisidb: VERTEX COORDINATES = '
           do ivar=1,3
-            write(*,8001) xnod(ivar,1:nvert(NODES(mdle)%ntype))
+            write(*,8001) xnod(ivar,1:NVERT(NODES(mdle)%ntype))
  8001       format(8(f8.5,2x))
           enddo
           call pause
@@ -132,7 +132,7 @@ c  .....get neighbors
         call find_neig(mdle, neig)
 #if DEBUG_MODE
         if (iprint.eq.1) then
-          write(*,8002) neig(1,1:nface(NODES(mdle)%ntype))
+          write(*,8002) neig(1,1:NFACE(NODES(mdle)%ntype))
  8002     format('lsvisidb: neig = ',6(i8,2x))
           call pause
         endif
@@ -147,7 +147,7 @@ c
 c  .....check whether the element is sliced by the cutting plane
         icut=0
         daux=1
-        do iv=1,nvert(NODES(mdle)%ntype)
+        do iv=1,NVERT(NODES(mdle)%ntype)
           cl = CLPL(1)*xnod(1,iv) + CLPL(2)*xnod(2,iv) +
      .         CLPL(3)*xnod(3,iv) + CLPL(4)
           if (iv.eq.1)then
@@ -167,7 +167,7 @@ c
         nrintertot=0
 c
 c  .....loop through element faces
-        do 10 ifc=1,nface(NODES(mdle)%ntype)
+        do 10 ifc=1,NFACE(NODES(mdle)%ntype)
 #if DEBUG_MODE
           if (iprint.eq.1) then
             write(*,7003) ifc

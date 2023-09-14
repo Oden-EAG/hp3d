@@ -209,10 +209,10 @@ c  .......reorder the elements in order to minimize the bandwidth...
             mdle = ELEM_ORDER(iel)
             call nodcor(mdle, xnod)
             xc(1:3) = 0.d0
-            do iv=1,nvert(NODES(mdle)%ntype)
+            do iv=1,NVERT(NODES(mdle)%ntype)
               xc(1:3) = xc(1:3) + xnod(1:3,iv)
             enddo
-            xc(1:3) = xc(1:3)/nvert(NODES(mdle)%ntype)
+            xc(1:3) = xc(1:3)/NVERT(NODES(mdle)%ntype)
             call scalar_product(xc,direction, ELEM_CENTER(iel))
           enddo
           call sortm(NRELES,NEW_ELEM_ORDER,ELEM_CENTER)

@@ -93,8 +93,8 @@ subroutine refine(Mdle_in,Kref_in)
 !
 !     loop over faces
 !     ~~~~~~~~~~~~~~~~
-      do iface=1,nface(ntype)
-         i = nvert(ntype)+nedge(ntype)+iface
+      do iface=1,NFACE(ntype)
+         i = NVERT(ntype)+NEDGE(ntype)+iface
          nod = nodesl(i)
 !
 #if DEBUG_MODE
@@ -257,7 +257,7 @@ subroutine refine(Mdle_in,Kref_in)
             call break(mdle,krefm)
             n = n - 1
          else
-            write(*,7010) mdle,S_Type(ntype),kref,kreff(1:nface(ntype)),krefm
+            write(*,7010) mdle,S_Type(ntype),kref,kreff(1:NFACE(ntype)),krefm
  7010       format('refine: INCONSISTENCY, mdle,type,kref,kreff,krefm = ', &
                                            i7,',',a4,',',i3,',',6(i3,1x),',',i3)
             call logic_error(ERR_INVALID_VALUE, __FILE__,__LINE__)

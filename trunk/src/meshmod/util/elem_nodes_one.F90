@@ -55,8 +55,8 @@ subroutine elem_nodes_one(Nfath,Nodesl_fath,Norientl_fath,Ison, &
    Nodesl(1:27) = 0; Norientl(1:27) = 0
 !
    ntype_fath = NODES(Nfath)%ntype
-   nvert_fath = nvert(ntype_fath)
-   nedge_fath = nedge(ntype_fath)
+   nvert_fath = NVERT(ntype_fath)
+   nedge_fath = NEDGE(ntype_fath)
    nref_fath  = NODES(Nfath)%ref_kind
    Nod        = NODES(Nfath)%first_son+Ison-1
    ntype_cur  = NODES(Nod)%ntype
@@ -71,7 +71,7 @@ subroutine elem_nodes_one(Nfath,Nodesl_fath,Norientl_fath,Ison, &
    call nson_ref_all(ntype_fath,Ison,iref1,iref2,iref3, nson_refs)
    call nort_ref_all(ntype_fath,Ison,iref1,iref2,iref3, nort_refs)
 !
-   n_nodes = nvert(ntype_cur)+nedge(ntype_cur)+nface(ntype_cur)+1
+   n_nodes = NVERT(ntype_cur)+NEDGE(ntype_cur)+NFACE(ntype_cur)+1
    do j=1,n_nodes
 !
       jp   = npar_refs(j)

@@ -44,9 +44,9 @@ subroutine break(Mdle,Kref)
  7000 format('break: Mdle = ',i7)
       write(*,7011) Kref
  7011 format('       Kref  = ',i3)
-      write(*,7012) kreff(1:nface(ntype))
+      write(*,7012) kreff(1:NFACE(ntype))
  7012 format('       kreff = ',6i3)
-      write(*,7013) krefe(1:nedge(ntype))
+      write(*,7013) krefe(1:NEDGE(ntype))
  7013 format('       krefe = ',12i2)
       call pause
    endif
@@ -57,8 +57,8 @@ subroutine break(Mdle,Kref)
 !=========================================================================
 !
 !..loop over edges and generate INACTIVE son nodes
-   do i=1,nedge(ntype)
-      nod=nodesl(nvert(ntype)+i)
+   do i=1,NEDGE(ntype)
+      nod=nodesl(NVERT(ntype)+i)
       if (iprint .eq. 2) write(*,*) 'edge nod = ', nod
 !  ...check if edge is unrefined and needs to be refined
       if ((krefe(i).ne.0) .and. (is_leaf(nod))) then
@@ -73,8 +73,8 @@ subroutine break(Mdle,Kref)
 !=========================================================================
 !
 !..loop over faces and generate ACTIVE/INACTIVE son nodes
-   do i=1,nface(ntype)
-      iface=nvert(ntype)+nedge(ntype)+i
+   do i=1,NFACE(ntype)
+      iface=NVERT(ntype)+NEDGE(ntype)+i
       nod=nodesl(iface)
       if (iprint .eq. 2) write(*,*) 'face nod = ', nod
 !

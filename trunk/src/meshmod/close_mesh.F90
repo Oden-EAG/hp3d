@@ -100,9 +100,9 @@ subroutine close_mesh()
 !        ~~~~~~~~~~~~
          krefe = 0
 !
-         nv = nvert(ntype)
-         ne = nedge(ntype)
-         nf = nface(ntype)
+         nv = NVERT(ntype)
+         ne = NEDGE(ntype)
+         nf = NFACE(ntype)
          nve = nv + ne
 !
          do j = 1,ne
@@ -322,9 +322,9 @@ subroutine close_mesh_par()
 !        ~~~~~~~~~~~~
          krefe = 0
 !
-         nv = nvert(ntype)
-         ne = nedge(ntype)
-         nf = nface(ntype)
+         nv = NVERT(ntype)
+         ne = NEDGE(ntype)
+         nf = NFACE(ntype)
          nve = nv + ne
 !
          do j = 1,ne

@@ -114,11 +114,11 @@ subroutine print_order(Ntype,Norder)
   integer, intent(in) :: Norder(19)
   integer :: ii, nn
 !
-  ii=0; nn = nedge(Ntype)
+  ii=0; nn = NEDGE(Ntype)
   write(*,7001) Norder(ii+1:ii+nn)
 7001 format('EDGE ORDERS = ',12i2)
 !
-  ii=ii+nn; nn = nface(Ntype)
+  ii=ii+nn; nn = NFACE(Ntype)
   write(*,7002) Norder(ii+1:ii+nn)
 7002 format('FACE ORDERS = ',6i3)
 !

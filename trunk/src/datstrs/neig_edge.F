@@ -111,8 +111,8 @@ c  .....store the neighbor, for the initial mesh
 c       middle node numbers coincide with element numbers...
         Neig(1,ib) = nel; Neig(2,ib) = 0
         etype = ELEMS(nel)%etype
-        ibeg = nvert(etype)+1
-        call locate(nod, ELEMS(nel)%nodes(ibeg),nedge(etype), ie)
+        ibeg = NVERT(etype)+1
+        call locate(nod, ELEMS(nel)%nodes(ibeg),NEDGE(etype), ie)
         if (ie.eq.0) then
           write(*,7004)
  7004     format('neig_edge: INCONSISTENCY')

@@ -282,7 +282,7 @@ subroutine set_subd_elem(Mdle)
    ntype = NODES(Mdle)%ntype
 !..marking local node list is necessary so that activate_sons works
 !  correctly when breaking the element
-   do i=1,nvert(ntype)+nedge(ntype)+nface(ntype)
+   do i=1,NVERT(ntype)+NEDGE(ntype)+NFACE(ntype)
       call set_subd(nodesl(i),subd)
    enddo
    do i=1,nrnodm

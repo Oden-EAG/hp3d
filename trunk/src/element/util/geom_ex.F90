@@ -56,7 +56,7 @@ subroutine exact_geom(Mdle,Xi, X,Dxdxi)
 !
 !  ...determine refinement map : Eta = Eta(Xi)
       eta(1:3)=0.d0 ; detadxi(1:3,1:3)=0.d0
-      do k=1,nvert(ntype)
+      do k=1,NVERT(ntype)
         eta(1:3) = eta(1:3) + etav(1:3,k)*shapH(k)
         do i=1,3
           detadxi(1:3,i) = detadxi(1:3,i) + etav(1:3,k)*dshapH(i,k)

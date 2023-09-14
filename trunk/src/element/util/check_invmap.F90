@@ -109,7 +109,7 @@ subroutine check_invmap
 !  E L E M E N T   F A C E S                                              |
 !--------------------------------------------------------------------------
 !  .....loop over element faces
-        do ifig=1,nface(NODES(mdle)%ntype)
+        do ifig=1,NFACE(NODES(mdle)%ntype)
 !
 !  .......set up the element quadrature
           ftype=face_type(NODES(mdle)%ntype,ifig)

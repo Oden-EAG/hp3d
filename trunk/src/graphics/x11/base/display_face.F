@@ -131,7 +131,7 @@ c      - mid-face node order of approximation according to face
 c        LOCAL system of coordinates
       j=0
       do i=1,nrfn
-        k=nface_nodes(i)-nvert(ntype)
+        k=nface_nodes(i)-NVERT(ntype)
 c
 c  .....record global node number
         l=nface_nodes(i)

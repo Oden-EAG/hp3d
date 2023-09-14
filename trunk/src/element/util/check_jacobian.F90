@@ -58,7 +58,7 @@ subroutine check_jacobian
      call set_3Dint(NODES(mdle)%ntype,norder, nint,xiloc,wxi)
 
      !  ...number of element vertices, neeed to perfrom incremental check
-     nv=nvert(NODES(mdle)%ntype)
+     nv=NVERT(NODES(mdle)%ntype)
 
      !  ...loop over integration points
      do l=1,nint
@@ -121,7 +121,7 @@ subroutine check_jacobian
      !-------------------------------------------------------------------------
 
      !  ...loop over element faces
-     do ifig=1,nface(NODES(mdle)%ntype)
+     do ifig=1,NFACE(NODES(mdle)%ntype)
 
         !  ...face integration points
         ftype=face_type(NODES(mdle)%ntype,ifig)

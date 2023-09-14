@@ -235,7 +235,7 @@ module zoltan_wrapper
       real(8) :: x(3), xnod(3,8)
       mdle = GID(1)
       call nodcor_vert(mdle, xnod)
-      nrv = nvert(NODES(mdle)%ntype)
+      nrv = NVERT(NODES(mdle)%ntype)
       x(1:3) = 0.d0
       do i = 1,nrv
          x(1:3) = x(1:3) + xnod(1:3,i)
@@ -269,7 +269,7 @@ module zoltan_wrapper
       do k = 1,NumObj
          mdle = GIDs(k)
          call nodcor_vert(mdle, xnod)
-         nrv = nvert(NODES(mdle)%ntype)
+         nrv = NVERT(NODES(mdle)%ntype)
          x(1:3) = 0.d0
          do i = 1,nrv
             x(1:3) = x(1:3) + xnod(1:3,i)
@@ -681,7 +681,7 @@ module zoltan_wrapper
 !---------------------------------------------------
       ntype=NODES(Mdle)%ntype
       if (is_root(Mdle)) then
-         do i=1,nface(ntype)
+         do i=1,NFACE(ntype)
             mdle_neig = ELEMS(Mdle)%neig(i)
 !
             if (mdle_neig .eq. 0) then
@@ -689,7 +689,7 @@ module zoltan_wrapper
             elseif (NODES(mdle_neig)%ref_kind .eq. 0) then
                Neig_list(1,i) = ELEMS(Mdle)%neig(i)
             else
-               nod = ELEMS(Mdle)%nodes(nvert(ntype)+nedge(ntype)+i)
+               nod = ELEMS(Mdle)%nodes(NVERT(ntype)+NEDGE(ntype)+i)
 !
                l = 0
                do j=1,NODES(nod)%nr_sons
@@ -716,8 +716,8 @@ module zoltan_wrapper
 ! Step 1: use neig_face
 !---------------------------------------------------
       call elem_nodes(Mdle, nodesl,norientl)
-      do i=1,nface(ntype)
-         nod = nodesl(nvert(ntype)+nedge(ntype)+i)
+      do i=1,NFACE(ntype)
+         nod = nodesl(NVERT(ntype)+NEDGE(ntype)+i)
          call neig_face(nod, nrneig,neig,nsid_list,norient_list)
          select case (nrneig)
             case(2)

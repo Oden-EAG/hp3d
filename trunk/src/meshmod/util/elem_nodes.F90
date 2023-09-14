@@ -111,7 +111,7 @@ subroutine elem_nodes(Mdle, Nodesl,Norientl)
    if ((iprint.eq.2).and.(INFO_CONSTRAINTS.eq.1)) then
       write(*,7200) Mdle
 7200  format('elem_nodes: FATHER INFO FOR Mdle = ',i6)
-      n_nodes = nvert(FATH_TYPE)+nedge(FATH_TYPE)+nface(FATH_TYPE)+1
+      n_nodes = NVERT(FATH_TYPE)+NEDGE(FATH_TYPE)+NFACE(FATH_TYPE)+1
       write(*,7201) FATH_NODES(1:n_nodes)
 7201  format('FATHER NODES = ',27i6)
       write(*,7202) FATH_ORIENT(1:n_nodes)

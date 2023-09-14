@@ -41,7 +41,7 @@ c
       NrdofH=0; NrdofE=0; NrdofV=0; NrdofQ=0
 c
 c  ...V E R T I C E S..................................................
-      do i=1,nvert(Ntype)
+      do i=1,NVERT(Ntype)
         call ndof_nod(VERT,1, ndofH,ndofE,ndofV,ndofQ)
 #if DEBUG_MODE
         if (iprint.eq.1) then
@@ -55,7 +55,7 @@ c  ...V E R T I C E S..................................................
       enddo
 c
 c  ...E D G E S........................................................
-      nredg = nedge(Ntype)
+      nredg = NEDGE(Ntype)
       do i=1,nredg
         call ndof_nod(MEDG,Norder(i), ndofH,ndofE,ndofV,ndofQ)
 #if DEBUG_MODE

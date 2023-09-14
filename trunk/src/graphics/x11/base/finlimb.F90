@@ -76,7 +76,7 @@
           write(*,7002) mdle
 7002      format('finlimb: VERTEX COORDINATES FOR mdle = ',i5)
           do ivar=1,3
-             write(*,7003) xnod(ivar,1:nvert(NODES(mdle)%ntype))
+             write(*,7003) xnod(ivar,1:NVERT(NODES(mdle)%ntype))
 7003         format(8(f8.5,2x))
           enddo
           call pause
@@ -87,7 +87,7 @@
                     nrdofH,nrdofE,nrdofV,nrdofQ)
 
        ! loop through element faces
-       do iface=1,nface(ntype)
+       do iface=1,NFACE(ntype)
 
           do j=0,NRSUB
              select case(face_type(ntype,iface))

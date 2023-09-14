@@ -93,7 +93,7 @@ c
       call decode_ref(ftype,iref_fath, iref1,iref2,iref3)
 c
 c  ...number of vertices and edges for the father
-      nvf = nvert(ftype); nef = nedge(ftype); nff = nface(ftype)
+      nvf = NVERT(ftype); nef = NEDGE(ftype); nff = NFACE(ftype)
 c
 c  ...pre-compute info for loop
       call npar_ref_all(ftype,nson,iref1,iref2,iref3, npar_refs)
@@ -101,7 +101,7 @@ c  ...pre-compute info for loop
       call nort_ref_all(ftype,nson,iref1,iref2,iref3, nort_refs)
 c
 c  ...loop through nodes of the element son
-      nrnodes = nvert(ntype)+nedge(ntype)+nface(ntype)+1
+      nrnodes = NVERT(ntype)+NEDGE(ntype)+NFACE(ntype)+1
       do j=1,nrnodes
 c
 c  .....parent node

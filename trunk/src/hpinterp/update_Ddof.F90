@@ -113,7 +113,7 @@ subroutine update_Ddof
 !
 !     ...check if all parent nodes have been updated
          ntype = NODES(mdle)%ntype
-         nr_elem_nodes = nvert(ntype)+nedge(ntype)+nface(ntype)+1
+         nr_elem_nodes = NVERT(ntype)+NEDGE(ntype)+NFACE(ntype)+1
          do i=1,nrnodm
             nod = nodm(i)
             call locate(nod,nodesl,nr_elem_nodes, loc)
@@ -134,7 +134,7 @@ subroutine update_Ddof
 !
 !-----------------------------------------------------------------------
 !     ...Step 1: Update   V E R T   dof for Dirichlet nodes
-         do iv=1,nvert(ntype)
+         do iv=1,NVERT(ntype)
             nod = nodesl(iv)
             if (.not.associated(NODES(nod)%dof))       cycle
             if (.not.associated(NODES(nod)%dof%zdofH)) cycle
@@ -159,8 +159,8 @@ subroutine update_Ddof
 !     ...compute solution dofs (need for H1 update)
          call solelm(mdle, zdofH,zdofE,zdofV,zdofQ)
 !
-         do ie=1,nedge(ntype)
-            ind = nvert(ntype)+ie
+         do ie=1,NEDGE(ntype)
+            ind = NVERT(ntype)+ie
             nod = nodesl(ind)
             if (.not.associated(NODES(nod)%dof)) cycle
             if (NODES(nod)%visit.eq.1)           cycle
@@ -201,9 +201,9 @@ subroutine update_Ddof
          call solelm(mdle, zdofH,zdofE,zdofV,zdofQ)
 !
 !     ...loop over faces
-         do ifc=1,nface(ntype)
+         do ifc=1,NFACE(ntype)
 !        ...get local node number
-            ind = nvert(ntype)+nedge(ntype)+ifc
+            ind = NVERT(ntype)+NEDGE(ntype)+ifc
 !        ...get global node number
             nod = nodesl(ind)
             if (.not.associated(NODES(nod)%dof)) cycle
@@ -309,7 +309,7 @@ subroutine update_Ddof
 !  ...determine nodes for the modified element
       call get_connect_info(mdle, nodesl,norientl)
       call logic_nodes(mdle,nodesl, nodm,nrnodm)
-      nr_elem_nodes = nvert(ntype)+nedge(ntype)+nface(ntype)+1
+      nr_elem_nodes = NVERT(ntype)+NEDGE(ntype)+NFACE(ntype)+1
 !  ...iterate through the nodes of the modified element
       do i=1,nrnodm
          nod = nodm(i)
@@ -577,7 +577,7 @@ subroutine update_Ddof_omp
 !
 !  ...check if constrained nodes are regular (negative for irregular)
       ntype = NODES(mdle)%ntype
-      nr_elem_nodes = nvert(ntype)+nedge(ntype)+nface(ntype)+1
+      nr_elem_nodes = NVERT(ntype)+NEDGE(ntype)+NFACE(ntype)+1
       do i=1,nr_elem_nodes
          nod = nodesl(i)
          call locate(nod,nodm,nrnodm, loc)
@@ -631,7 +631,7 @@ subroutine update_Ddof_omp
 !
 !     ...check if all parent nodes have been updated
          ntype = NODES(mdle)%ntype
-         nr_elem_nodes = nvert(ntype)+nedge(ntype)+nface(ntype)+1
+         nr_elem_nodes = NVERT(ntype)+NEDGE(ntype)+NFACE(ntype)+1
 !
          nrnodi = nrnodes_irreg(iel)
          nodesi(1:nrnodi) = nodes_irreg(1:nrnodi,iel)
@@ -652,7 +652,7 @@ subroutine update_Ddof_omp
 !
 !-----------------------------------------------------------------------
 !     ...Step 1: Update   V E R T   dof for Dirichlet nodes
-         do iv=1,nvert(ntype)
+         do iv=1,NVERT(ntype)
             nod = abs(nodesl(iv))
             if (.not.associated(NODES(nod)%dof))       cycle
             if (.not.associated(NODES(nod)%dof%zdofH)) cycle
@@ -688,8 +688,8 @@ subroutine update_Ddof_omp
 !     ...compute solution dofs (need for H1 update)
          call solelm(mdle, zdofH,zdofE,zdofV,zdofQ)
 !
-         do ie=1,nedge(ntype)
-            ind = nvert(ntype)+ie
+         do ie=1,NEDGE(ntype)
+            ind = NVERT(ntype)+ie
             nod = abs(nodesl(ind))
 !
             if (.not.associated(NODES(nod)%dof)) cycle
@@ -758,9 +758,9 @@ subroutine update_Ddof_omp
          call solelm(mdle, zdofH,zdofE,zdofV,zdofQ)
 !
 !     ...loop over faces
-         do ifc=1,nface(ntype)
+         do ifc=1,NFACE(ntype)
 !        ...get local node number
-            ind = nvert(ntype)+nedge(ntype)+ifc
+            ind = NVERT(ntype)+NEDGE(ntype)+ifc
 !        ...get global node number
             nod = abs(nodesl(ind))
             if (.not.associated(NODES(nod)%dof)) cycle

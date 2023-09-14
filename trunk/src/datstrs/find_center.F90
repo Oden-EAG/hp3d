@@ -12,7 +12,7 @@ subroutine find_center(Mdle, X)
    integer :: i, nv
 !
    call elem_nodes(Mdle, nodesl,norientl)
-   nv = nvert(NODES(Mdle)%ntype)
+   nv = NVERT(NODES(Mdle)%ntype)
 !
    X(1:3) = 0.d0
    do i=1,nv

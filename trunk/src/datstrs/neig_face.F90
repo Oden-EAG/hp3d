@@ -131,8 +131,8 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
    if (mdle.lt.0) then
      mdle = abs(mdle)
      ntype = ELEMS(mdle)%etype
-     nve = nvert(ntype)+nedge(ntype)
-     nrf = nface(ntype)
+     nve = NVERT(ntype)+NEDGE(ntype)
+     nrf = NFACE(ntype)
 !
 ! ...locate face node on list of element nodes
      call locate(nod,ELEMS(mdle)%nodes(nve+1:nve+nrf),nrf, iface)
@@ -150,8 +150,8 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
 ! ...if present, record neighbor of "mdle"
      if (mdle.ne.0) then
         ntype = ELEMS(mdle)%etype
-        nve = nvert(ntype)+nedge(ntype)
-        nrf = nface(ntype)
+        nve = NVERT(ntype)+NEDGE(ntype)
+        nrf = NFACE(ntype)
 !
 !    ...locate face node on list of element nodes
         call locate(nod,ELEMS(mdle)%nodes(nve+1:nve+nrf),nrf, iface)
@@ -176,8 +176,8 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
         call elem_nodes_one( mdle, nodesl, norientl, is, &
                              mdle_is, nodesl_is, norientl_is )
         ntype = NODES(mdle_is)%ntype
-        nve  = nvert(ntype)+nedge(ntype)
-        nrf  = nface(ntype)
+        nve  = NVERT(ntype)+NEDGE(ntype)
+        nrf  = NFACE(ntype)
 
         call locate(nod, nodesl_is(nve+1:nve+nrf),nrf, iface)
         if (iface.gt.0) then
@@ -271,8 +271,8 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
                 nodesl_neig(1:27,i), norientl_neig(1:27,i), is, &
                 mdle_is, nodesl_is, norientl_is )
            ntype = NODES(mdle_is)%ntype
-           nve = nvert(ntype)+nedge(ntype)
-           nrf = nface(ntype)
+           nve = NVERT(ntype)+NEDGE(ntype)
+           nrf = NFACE(ntype)
 !
 !       ...if face is found, update
            call locate(nod, nodesl_is(nve+1:nve+nrf),nrf, iface)

@@ -73,7 +73,7 @@
    do iel=1,NRELES_GHOST
       mdle = ELEM_GHOST(iel)
       ntype = NODES(Mdle)%ntype
-      nrv = nvert(ntype); nre = nedge(ntype); nrf = nface(ntype)
+      nrv = NVERT(ntype); nre = NEDGE(ntype); nrf = NFACE(ntype)
 !
       call get_connect_info(mdle, nodesl,norientl)
       call element_order(mdle,norientl, norder)

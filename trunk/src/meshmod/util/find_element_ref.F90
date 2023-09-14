@@ -51,15 +51,15 @@ subroutine find_element_ref(Ntype,Kref,Kreff, Krefm)
      call find_face_ref_flags(Ntype,kref_trial, kreff_trial)
      !
      isum = 0
-     do iface=1,nface(Ntype)
-        j = nvert(Ntype) + nedge(Ntype) + iface
+     do iface=1,NFACE(Ntype)
+        j = NVERT(Ntype) + NEDGE(Ntype) + iface
         call check_ref(TYPE_NOD(j,Ntype), Kreff(iface), &
                        kreff_trial(iface), ipass)
         isum = isum + ipass
      enddo
      !
      ! pass all test, loop out with modified one
-     if (isum.eq.nface(Ntype)) then
+     if (isum.eq.NFACE(Ntype)) then
         Krefm = kref_trial
         exit
      endif
@@ -67,7 +67,7 @@ subroutine find_element_ref(Ntype,Kref,Kreff, Krefm)
   !
 #if DEBUG_MODE
   if (iprint.eq.1) then
-     write(*,7001) S_Type(Ntype),Kref,Krefm,Kreff(1:nface(Ntype))
+     write(*,7001) S_Type(Ntype),Kref,Krefm,Kreff(1:NFACE(Ntype))
      call pause
   endif
 #endif

@@ -21,7 +21,7 @@ subroutine elem_face(Mdle,Iface, Mdlf)
 !
 !..determine face node
    call elem_nodes(Mdle, nodesl,nvoid)
-   inode = nvert(ntype) + nedge(ntype) + Iface
+   inode = NVERT(ntype) + NEDGE(ntype) + Iface
    mdlf  = nodesl(inode)
 !
 end subroutine elem_face

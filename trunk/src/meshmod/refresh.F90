@@ -50,7 +50,7 @@ subroutine refresh
       call elem_nodes(mdle, nodesl,norientl)
 !
       ntype = NODES(mdle)%ntype
-      nvef = nvert(ntype)+nedge(ntype)+nface(ntype)
+      nvef = NVERT(ntype)+NEDGE(ntype)+NFACE(ntype)
 !
       do i=1,nvef
 !     ...bitflag stores visit in bit collection (better for MPI)

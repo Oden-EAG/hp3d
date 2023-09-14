@@ -77,7 +77,7 @@ c  ...initiate the NR iterations
 c
 c  ...use element centroid as initial guess
       Xi(1:3)=0.d0
-      do i=1,nvert(Ntype)
+      do i=1,NVERT(Ntype)
         select case(Ntype)
         case(MDLB,BRIC) ; Xi(1:3) = Xi(1:3) + BRICK_COORD(1:3,i)
         case(MDLN,TETR) ; Xi(1:3) = Xi(1:3) + TETRA_COORD(1:3,i)
@@ -85,7 +85,7 @@ c  ...use element centroid as initial guess
         case(MDLD,PYRA) ; Xi(1:3) = Xi(1:3) + PYRAM_COORD(1:3,i)
         endselect
       enddo
-      Xi(1:3)=Xi(1:3)/nvert(Ntype)
+      Xi(1:3)=Xi(1:3)/NVERT(Ntype)
 
       do iter=1,15
         call shape3DH(Ntype,Xi,Norder, Nedge_orient,Nface_orient,

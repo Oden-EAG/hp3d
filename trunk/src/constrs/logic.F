@@ -216,7 +216,7 @@ c     initialize local H1, H(curl), H(div) dof counters
 c
 c     number of element's nodes
       ntype=NODES(Mdle)%ntype
-      nrnodes=nvert(ntype)+nedge(ntype)+nface(ntype)+1
+      nrnodes=NVERT(ntype)+NEDGE(ntype)+NFACE(ntype)+1
 c
 c     loop over element nodes
       do i=1,nrnodes

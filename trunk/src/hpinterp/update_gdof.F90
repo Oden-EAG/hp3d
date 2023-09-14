@@ -105,7 +105,7 @@ subroutine update_gdof
 !
 !     ...check if all parent nodes have been updated
          ntype = NODES(mdle)%ntype
-         nr_elem_nodes = nvert(ntype)+nedge(ntype)+nface(ntype)+1
+         nr_elem_nodes = NVERT(ntype)+NEDGE(ntype)+NFACE(ntype)+1
          do i=1,nrnodm
             nod = nodm(i)
             call locate(nod,nodesl,nr_elem_nodes, loc)
@@ -127,7 +127,7 @@ subroutine update_gdof
 !-----------------------------------------------------------------------
 !
 !     ...loop through the element vertex nodes
-         do iv=1,nvert(ntype)
+         do iv=1,NVERT(ntype)
             nod = nodesl(iv)
             if (.not.associated(NODES(nod)%dof)) then
                NODES(nod)%visit=1
@@ -146,8 +146,8 @@ subroutine update_gdof
          call nodcor(mdle, xnod)
 !
 !     ...loop through element edge nodes
-         do ie=1,nedge(ntype)
-            ind = nvert(ntype)+ie
+         do ie=1,NEDGE(ntype)
+            ind = NVERT(ntype)+ie
             nod = nodesl(ind)
 !
 !        ...if no gdof, mark as processed
@@ -175,8 +175,8 @@ subroutine update_gdof
          call nodcor(mdle, xnod)
 !
 !     ...loop through element face nodes
-         do ifc=1,nface(ntype)
-            ind = nvert(ntype)+nedge(ntype)+ifc
+         do ifc=1,NFACE(ntype)
+            ind = NVERT(ntype)+NEDGE(ntype)+ifc
             nod = nodesl(ind)
 !        ...if no gdof, mark as processed
             if (.not.associated(NODES(nod)%dof)) then
@@ -253,7 +253,7 @@ subroutine update_gdof
 !  ...determine nodes for the modified element
       call get_connect_info(mdle, nodesl,norientl)
       call logic_nodes(mdle,nodesl, nodm,nrnodm)
-      nr_elem_nodes = nvert(ntype)+nedge(ntype)+nface(ntype)+1
+      nr_elem_nodes = NVERT(ntype)+NEDGE(ntype)+NFACE(ntype)+1
 !  ...iterate through the nodes of the modified element
       do i=1,nrnodm
          nod = nodm(i)
@@ -534,7 +534,7 @@ subroutine update_gdof_omp
 !
 !  ...check if constrained nodes are regular (negative for irregular)
       ntype = NODES(mdle)%ntype
-      nr_elem_nodes = nvert(ntype)+nedge(ntype)+nface(ntype)+1
+      nr_elem_nodes = NVERT(ntype)+NEDGE(ntype)+NFACE(ntype)+1
       do i=1,nr_elem_nodes
          nod = nodesl(i)
          call locate(nod,nodm,nrnodm, loc)
@@ -589,7 +589,7 @@ subroutine update_gdof_omp
 !
 !     ...check if all parent nodes have been updated
          ntype = NODES(mdle)%ntype
-         nr_elem_nodes = nvert(ntype)+nedge(ntype)+nface(ntype)+1
+         nr_elem_nodes = NVERT(ntype)+NEDGE(ntype)+NFACE(ntype)+1
 !
          nrnodi = nrnodes_irreg(iel)
          nodesi(1:nrnodi) = nodes_irreg(1:nrnodi,iel)
@@ -611,7 +611,7 @@ subroutine update_gdof_omp
 !-----------------------------------------------------------------------
 !
 !     ...loop through the element vertex nodes
-         do iv=1,nvert(ntype)
+         do iv=1,NVERT(ntype)
             nod = abs(nodesl(iv))
             if (.not.associated(NODES(nod)%dof)) then
                NODES(nod)%visit=1
@@ -638,8 +638,8 @@ subroutine update_gdof_omp
          call nodcor(mdle, xnod)
 !
 !     ...loop through element edge nodes
-         do ie=1,nedge(ntype)
-            ind = nvert(ntype)+ie
+         do ie=1,NEDGE(ntype)
+            ind = NVERT(ntype)+ie
             nod = iabs(nodesl(ind))
 !
 !        ...if no gdof, mark as processed
@@ -677,8 +677,8 @@ subroutine update_gdof_omp
          call nodcor(mdle, xnod)
 !
 !     ...loop through element face nodes
-         do ifc=1,nface(ntype)
-            ind = nvert(ntype)+nedge(ntype)+ifc
+         do ifc=1,NFACE(ntype)
+            ind = NVERT(ntype)+NEDGE(ntype)+ifc
             nod = iabs(nodesl(ind))
 !        ...if no gdof, mark as processed
             if (.not.associated(NODES(nod)%dof)) then
@@ -768,7 +768,7 @@ subroutine update_gdof_omp
       if (NODES(mdle)%visit.eq.1) cycle
 !
       ntype = NODES(mdle)%ntype
-      nr_elem_nodes = nvert(ntype)+nedge(ntype)+nface(ntype)+1
+      nr_elem_nodes = NVERT(ntype)+NEDGE(ntype)+NFACE(ntype)+1
 !
 !  ...check if irregular nodes have been updated; add to list if not
       nrnodi = nrnodes_irreg(iel)

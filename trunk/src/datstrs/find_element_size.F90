@@ -12,7 +12,7 @@ subroutine find_element_size(Mdle, H)
   real(8) :: dist, x(3), y(3)
   !
   call elem_nodes(Mdle, nodesl,norientl)
-  nv = nvert(NODES(Mdle)%ntype)
+  nv = NVERT(NODES(Mdle)%ntype)
   !
   H = 0.d0
   do i=1,nv

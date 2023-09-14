@@ -19,8 +19,8 @@ subroutine verify_neig
 
      !  ...loop over element's faces
      ntype=NODES(mdle)%ntype
-     do iface=1,nface(ntype)
-        j   = nvert(ntype) + nedge(ntype) + iface
+     do iface=1,NFACE(ntype)
+        j   = NVERT(ntype) + NEDGE(ntype) + iface
         nod = nodesl(j)
 
 #if DEBUG_MODE

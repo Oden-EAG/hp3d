@@ -300,7 +300,7 @@ subroutine geometry_error_elem(Mdle, Derr,Dnorm)
         enddo
 !
 !       evaluate the reference geometry
-        nrv = nvert(ntype)
+        nrv = NVERT(ntype)
         call refgeom3D(Mdle,xi,etav,shapH,gradH,nrv, &
                        eta,detadxi,dxideta,rjac,error_flag)
 !

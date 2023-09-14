@@ -105,7 +105,7 @@
 !
 !----------------------------------------------------------------------
 !
-  nrv = nvert(Ntype); nre = nedge(Ntype); nrf = nface(Ntype)
+  nrv = NVERT(Ntype); nre = NEDGE(Ntype); nrf = NFACE(Ntype)
 !
 #if DEBUG_MODE
   if (iprint.eq.1) then

@@ -419,10 +419,10 @@ subroutine hp3gen(Fp)
                nvar = nvar+1
 !
 !           ...decode the BC flags for the faces
-               call decodg(ELEMS(nel)%bcond(nvar),10,nface(etype), ibc_elem)
+               call decodg(ELEMS(nel)%bcond(nvar),10,NFACE(etype), ibc_elem)
 !
 !           ...determine faces adjacent to the vertex
-               call locate(nod_new,ELEMS(nel)%nodes(1),nvert(etype), iv)
+               call locate(nod_new,ELEMS(nel)%nodes(1),NVERT(etype), iv)
                call vert_to_faces(etype,iv, nrfaces,nofaces)
 !
 !           ...loop through the faces adjacent to the vertex and
@@ -515,7 +515,7 @@ subroutine hp3gen(Fp)
          enddo
 !
 !     ...determine faces adjacent to the edge
-         call locate(nod_new,ELEMS(nel)%nodes(nvert(etype)+1),nedge(etype), ie)
+         call locate(nod_new,ELEMS(nel)%nodes(NVERT(etype)+1),NEDGE(etype), ie)
          call edge_to_faces(etype,ie, nofaces)
 !
 !     ...loop through the element physics attributes
@@ -529,7 +529,7 @@ subroutine hp3gen(Fp)
                nvar = nvar+1
 !
 !           ...decode the BC flags for the faces
-               call decodg(ELEMS(nel)%bcond(nvar),10,nface(etype), ibc_elem)
+               call decodg(ELEMS(nel)%bcond(nvar),10,NFACE(etype), ibc_elem)
 !
 !           ...loop through the faces adjacent to the edge and
 !              use element face BC flags to establish BC flag for the
@@ -617,8 +617,8 @@ subroutine hp3gen(Fp)
 
 !     ...determine face local number
          call locate(nod_new, &
-               ELEMS(nel)%nodes(nvert(etype)+nedge(etype)+1), &
-               nface(etype), ifc)
+               ELEMS(nel)%nodes(NVERT(etype)+NEDGE(etype)+1), &
+               NFACE(etype), ifc)
 
 !     ...loop through neighbor's physical attributes
          nvar=0
@@ -631,7 +631,7 @@ subroutine hp3gen(Fp)
                nvar = nvar+1
 
 !           ...decode the BC flags for the faces
-               call decodg(ELEMS(nel)%bcond(nvar),10,nface(etype), ibc_elem)
+               call decodg(ELEMS(nel)%bcond(nvar),10,NFACE(etype), ibc_elem)
 
 !           ...copy face BC flag to GLOBAL list associated to the face node
                call copyBCflag(3,ibc_elem(ifc), ibc_nod(nvar))
@@ -639,7 +639,7 @@ subroutine hp3gen(Fp)
          enddo
 !
          mdle = nel
-         call decodg(ELEMS(nel)%face_orient,8,nface(etype),nface_orient)
+         call decodg(ELEMS(nel)%face_orient,8,NFACE(etype),nface_orient)
          call min_order(etype,3,ifc,nface_orient(ifc),NODES(mdle)%order, nord)
 !
 !  ...end of loop through neighboring blocks
@@ -716,7 +716,7 @@ subroutine hp3gen(Fp)
 !
 !     ...determine adjacent face
          call locate(nod_new, &
-               ELEMS(nel)%nodes(nvert(etype)+nedge(etype)+1),nface(etype), ifc)
+               ELEMS(nel)%nodes(NVERT(etype)+NEDGE(etype)+1),NFACE(etype), ifc)
 !
 !     ...loop through the element physics attributes
          nvar=0
@@ -729,13 +729,13 @@ subroutine hp3gen(Fp)
                nvar = nvar+1
 !
 !           ...decode the BC flags for the faces
-               call decodg(ELEMS(nel)%bcond(nvar),10,nface(etype), ibc_elem)
+               call decodg(ELEMS(nel)%bcond(nvar),10,NFACE(etype), ibc_elem)
                call copyBCflag(3,ibc_elem(ifc), ibc_nod(nvar))
             enddo
          enddo
 !
          mdle = nel
-         call decodg(ELEMS(nel)%face_orient,8,nface(etype), nface_orient)
+         call decodg(ELEMS(nel)%face_orient,8,NFACE(etype), nface_orient)
          call min_order(etype,3,ifc,nface_orient(ifc),NODES(mdle)%order, nord)
       enddo
 !

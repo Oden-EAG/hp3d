@@ -43,8 +43,8 @@ subroutine find_element_closing_ref(Ntype,Kreff,Krefe, Kref)
 
      ! Step 1 : check face
      !~~~~~~~~~~~~~~~~~~~~~
-     do i=1,nface(Ntype)
-        j = nvert(Ntype) + nedge(Ntype) + i
+     do i=1,NFACE(Ntype)
+        j = NVERT(Ntype) + NEDGE(Ntype) + i
         call check_ref(TYPE_NOD(j,Ntype), &
                        Kreff(i),kreff_trial(i), ipass)
         isum = isum + ipass
@@ -52,7 +52,7 @@ subroutine find_element_closing_ref(Ntype,Kreff,Krefe, Kref)
 
      ! Step 2 : check edge
      !~~~~~~~~~~~~~~~~~~~~
-     do i=1,nedge(Ntype)
+     do i=1,NEDGE(Ntype)
         if (krefe_trial(i).lt.Krefe(i)) then
            ipass = 0
         else
@@ -63,7 +63,7 @@ subroutine find_element_closing_ref(Ntype,Kreff,Krefe, Kref)
 
      ! Step 3 : if all pass, set the kref
      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     if (isum.eq.(nface(Ntype)+nedge(Ntype))) then
+     if (isum.eq.(NFACE(Ntype)+NEDGE(Ntype))) then
         Kref = kref_trial; exit
      endif
   enddo
@@ -71,9 +71,9 @@ subroutine find_element_closing_ref(Ntype,Kreff,Krefe, Kref)
 #if DEBUG_MODE
   if (iprint.eq.1) then
      write(*,7001) S_Type(Ntype)
-     write(*,7002) Kreff(1:nface(Ntype))
+     write(*,7002) Kreff(1:NFACE(Ntype))
 7002 format('                          Face flags = ',6i3)
-     write(*,7003) Krefe(1:nedge(Ntype))
+     write(*,7003) Krefe(1:NEDGE(Ntype))
 7003 format('                          Edge flags = ',12i3)
      write(*,7004) Kref
 7004 format('                          Element flag = ',i3)

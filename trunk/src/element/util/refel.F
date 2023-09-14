@@ -126,7 +126,7 @@ c  ...go down the tree reconstructing reference coordinates
         ftype = father_type(igen)
 c
 c  .....loop through son's vertex nodes
-        do j=1,nvert(son_type(igen))
+        do j=1,NVERT(son_type(igen))
 c
 c  .......decode father refinement flag
           call decode_ref(ftype,nfather_ref_kind(igen),
@@ -154,8 +154,8 @@ c  .......node generated through refinement
           else
 c
 c  .........parent edge node
-            if (jp.le.nvert(ftype)+nedge(ftype)) then
-              ie = jp-nvert(ftype)
+            if (jp.le.NVERT(ftype)+NEDGE(ftype)) then
+              ie = jp-NVERT(ftype)
               call edge_to_vert(ftype,ie, nv1,nv2)
               x_new(1:3,j) = (x(1:3,nv1) + x(1:3,nv2))/2.d0
 c
@@ -167,9 +167,9 @@ c
 #endif
 c
 c  .........parent rectangular face node
-            elseif (jp.le.nvert(ftype)+nedge(ftype)+nface(ftype))
+            elseif (jp.le.NVERT(ftype)+NEDGE(ftype)+NFACE(ftype))
      .        then
-              ifc = jp-nvert(ftype)-nedge(ftype)
+              ifc = jp-NVERT(ftype)-NEDGE(ftype)
               call face_to_vert(ftype,ifc, nv1,nv2,nv3,nv4)
               x_new(1:3,j) = (x(1:3,nv1) + x(1:3,nv2)
      .                      + x(1:3,nv3) + x(1:3,nv4))/4.d0
@@ -223,12 +223,12 @@ c
 c  ...end of loop through generations
       enddo
 c
-      Xsubel(1:3,1:nvert(NODES(Mdle)%ntype)) =
-     .     x(1:3,1:nvert(NODES(Mdle)%ntype))
+      Xsubel(1:3,1:NVERT(NODES(Mdle)%ntype)) =
+     .     x(1:3,1:NVERT(NODES(Mdle)%ntype))
 c
 #if DEBUG_MODE
       if (iprint.eq.1) then
-        write(*,7001) Mdle,Xsubel(1:3,1:nvert(NODES(Mdle)%ntype))
+        write(*,7001) Mdle,Xsubel(1:3,1:NVERT(NODES(Mdle)%ntype))
  7001   format('refel: Mdle = ',i6,' Xsubel = ',8(/,3(f8.3,2x)))
         call pause
       endif

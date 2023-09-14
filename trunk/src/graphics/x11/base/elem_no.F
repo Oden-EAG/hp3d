@@ -74,7 +74,7 @@ c  .....get neighbors
         call find_neig(Mdle, neig)
 c
 c  .....loop through element sides
-        do ifc=1,nface(NODES(Mdle)%ntype)
+        do ifc=1,NFACE(NODES(Mdle)%ntype)
 c
 c  .......check visibility of the face...
           ivis=0

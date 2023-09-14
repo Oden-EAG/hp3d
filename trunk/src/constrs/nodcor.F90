@@ -155,12 +155,12 @@ subroutine nodcor(Mdle, Xnod)
       call elem_nodes(Mdle, nodesl,norientl)
       write(*,*) 'nodcor: VERTEX dof'
       inod=0; k=0
-      do i=1,nvert(NODES(Mdle)%ntype)
+      do i=1,NVERT(NODES(Mdle)%ntype)
          inod=inod+1; k=k+1
          write(*,7003) (Xnod(ivar,k),ivar=1,NDIMEN)
       enddo
       write(*,*) 'nodcor: EDGE dof'
-      do i=1,nedge(NODES(Mdle)%ntype)
+      do i=1,NEDGE(NODES(Mdle)%ntype)
          inod=inod+1; nod = nodesl(inod)
          call ndof_nod(NODES(nod)%ntype,NODES(nod)%order, &
                        ndofH,ndofE,ndofV,ndofQ)
@@ -171,7 +171,7 @@ subroutine nodcor(Mdle, Xnod)
          enddo
       enddo
       write(*,*) 'nodcor: FACE dof'
-      do i=1,nface(NODES(Mdle)%ntype)
+      do i=1,NFACE(NODES(Mdle)%ntype)
          inod=inod+1; nod = nodesl(inod)
          call ndof_nod(NODES(nod)%ntype,NODES(nod)%order, &
                        ndofH,ndofE,ndofV,ndofQ)
@@ -245,7 +245,7 @@ subroutine test_nodcor(Mdle)
    call set_3Dint(NODES(Mdle)%ntype,norder, nint,xiloc,wxi)
 !
 !..number of element vertices, need to perform incremental check
-   nv=nvert(NODES(Mdle)%ntype)
+   nv=NVERT(NODES(Mdle)%ntype)
 !
 !..loop over integration points
    do l=1,nint

@@ -13,7 +13,7 @@ subroutine neig_show
       call find_neig(mdle, neig)
       ntype = NODES(mdle)%ntype
       write(*,*) 'neig_show: mdle, type, neig= ', &
-          mdle, S_Type(ntype), neig(1,1:nface(ntype))
+          mdle, S_Type(ntype), neig(1,1:NFACE(ntype))
    enddo
 !
 end subroutine neig_show

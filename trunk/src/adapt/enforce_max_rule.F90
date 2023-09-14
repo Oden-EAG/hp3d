@@ -40,7 +40,7 @@ subroutine enforce_max_rule
    do iel=1,NRELES
       mdle = ELEM_ORDER(iel)
       ntype = NODES(Mdle)%ntype
-      nrv = nvert(ntype); nre = nedge(ntype); nrf = nface(ntype)
+      nrv = NVERT(ntype); nre = NEDGE(ntype); nrf = NFACE(ntype)
       call get_connect_info(mdle, nodesl,norientl)
       call element_order(mdle,norientl, norder)
 !
@@ -94,7 +94,7 @@ subroutine enforce_max_rule
       mdle = ELEM_ORDER(iel)
       call elem_nodes(mdle, nodesl,norientl)
       ntype = NODES(Mdle)%ntype
-      nrv = nvert(ntype); nre = nedge(ntype); nrf = nface(ntype)
+      nrv = NVERT(ntype); nre = NEDGE(ntype); nrf = NFACE(ntype)
 !
 !  ...collect the order for nodes determined so far in the ELEMENT coordinates
       do j=1,nre+nrf

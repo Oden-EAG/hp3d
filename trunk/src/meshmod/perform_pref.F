@@ -78,7 +78,7 @@ c  .....determine the order for element nodes implied by the middle node
         call element_order(mdle,norientl,norder)
 c
         ntype = NODES(mdle)%ntype
-        nrv = nvert(ntype); nre = nedge(ntype); nrf = nface(ntype)
+        nrv = NVERT(ntype); nre = NEDGE(ntype); nrf = NFACE(ntype)
 c
 c
 c  .....loop through element higher order nodes
@@ -251,7 +251,7 @@ c
 c  .....determine whether the element will be p-refined
         if (NODES(mdle)%visit.eq.0) then
           ntype = NODES(mdle)%ntype
-          nrv = nvert(ntype); nre = nedge(ntype); nrf = nface(ntype)
+          nrv = NVERT(ntype); nre = NEDGE(ntype); nrf = NFACE(ntype)
 c
 c  .......loop through element higher order nodes
           do j=1,nre+nrf+1

@@ -18,7 +18,7 @@ subroutine calculate_ndof(NrdofH,NrdofE,NrdofV,NrdofQ)
      call elem_nodes(mdle, nodesl, norientl)
 
      ntype = NODES(mdle)%ntype
-     nrnodes = nvert(ntype) + nedge(ntype) + nface(ntype) + 1
+     nrnodes = NVERT(ntype) + NEDGE(ntype) + NFACE(ntype) + 1
      do i=1,nrnodes
         nod = nodesl(i)
 
