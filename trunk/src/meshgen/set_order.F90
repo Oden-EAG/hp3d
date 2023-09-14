@@ -62,7 +62,7 @@ subroutine set_order_elem(Iel,Order, ElemOrder)
    1000 format('set_order_elem: invalid input: ',A,' = ',I9)
 !
 !..set isotropic order of approximation
-   etype = ELEMS(iel)%etype
+   etype = ELEMS(Iel)%etype
    select case(etype)
       case(TETR); ElemOrder =   1*Order
       case(PYRA); ElemOrder =   1*Order
