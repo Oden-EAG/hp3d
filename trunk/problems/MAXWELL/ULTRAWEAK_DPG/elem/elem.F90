@@ -42,9 +42,6 @@
 !  ...middle node type
       integer :: ntype
 !
-!  ...fld_flag refers to either pump (0) or signal (1) field
-      integer :: fld_flag
-!
 !  ...timer
       real(8) :: MPI_Wtime, start_time, end_time
 !
@@ -101,7 +98,6 @@
 !
 !  ...signal case
       Itest(1:2)=1; Itrial(1:2)=1
-      fld_flag = 1;
 !
       call elem_maxwell(Mdle,nrTest,nrTrial,                   &
          nrdofEE,nrdofH,nrdofE,nrdofQ,nrdofEi,                 &

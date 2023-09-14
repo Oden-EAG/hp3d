@@ -75,25 +75,24 @@
 !
 !     ...physics attributes components (2+6 = 8 components)
 !        phys| comp | description
-!        (1) |  1-2 | Hcurl for Maxwell trace (\hat E,\hat H) (signal, 2 comps)
-!        (2) |  3-8 | L2 field for Maxwell (E,H) (signal, 6 components)
+!        (1) |  1-2 | Hcurl for Maxwell trace (\hat E,\hat H) (2 components)
+!        (2) |  3-8 | L2 field for Maxwell (E,H) (6 components)
 !
 !     ...set BCs on exterior faces
          do ifc=1,nface(etype)
             neig = ELEMS(iel)%neig(ifc)
             select case(neig)
                case(0)
-!              ...BCs on EH-traces signal and pump
+!              ...BCs on EH-traces
                   if((IBCFLAG.eq.2..or.IBCFLAG.eq.3).and.(ifc.eq.2)) then
 !                    REMARK: if IBCFLAG.eq.3 (i.e., using elimination), then
 !                            the routine propagate_flag must be called after
 !                            refining the mesh to correctly propagate the
 !                            impedance flag from faces to edges and vertices
-!                 ...Signal
                      ibc(ifc,2) = IBCFLAG !..sets Impedance flag on H_s trace
                   else
 !                       ...Dirichlet on E-trace
-                     ibc(ifc,1) = 1 ! Signal trace \hat E_s
+                     ibc(ifc,1) = 1
                   endif
                case default
                   continue

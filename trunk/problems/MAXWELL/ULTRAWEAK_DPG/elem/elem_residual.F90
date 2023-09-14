@@ -33,9 +33,6 @@
       integer :: norder(19),norderP(19),nordP
       integer :: ntype
 !
-!  ...fld_flag refers to either pump (0) or signal (1) field
-      integer :: fld_flag
-!
 !---------------------------------------------------------------------
 !
       norder (1:19) = 0
