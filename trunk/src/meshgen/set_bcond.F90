@@ -29,10 +29,11 @@ subroutine set_bcond(Dom,Attr,Comp,Flag)
 !
 end subroutine set_bcond
 
+
 !-------------------------------------------------------------------------------
 !> @brief      Set boundary condition flags for a physics attribute component
-!!             of an initial mesh element if the face domain number matches the
-!!             requested boundary domain ID.
+!!             of an initial mesh element if the face domain number matches
+!!             the requested boundary domain ID.
 !!
 !> @param[in]  Iel  - initial mesh element: 1,...,NRELIS
 !> @param[in]  Dom  - boundary domain ID where to set BC on
@@ -46,7 +47,6 @@ subroutine set_bcond_elem(Iel,Dom,Attr,Comp,Flag)
 !
    use data_structure3D, only: ELEMS,NRELIS
    use GMP             , only: TRIANGLES,RECTANGLES,HEXAS,TETRAS,PRISMS,PYRAMIDS
-   use mpi_param       , only: RANK,ROOT
    use node_types
    use physics
 !
@@ -57,24 +57,24 @@ subroutine set_bcond_elem(Iel,Dom,Attr,Comp,Flag)
 !..auxiliary array with BC flags for each face
    integer :: ibc(1:6)
 !
-   integer :: etype,ifc,idom,neig,nelem,nrect,ntria,index
+   integer :: etype,ifc,idom,index,neig,nelem,nrect,ntria
 !
 !..verifying input arguments
    if (Iel.lt.1 .or. Iel.gt.NRELIS) then
-      if (RANK.eq.ROOT) write(*,1000) 'Iel',Iel
-      goto 90
+      write(*,1000) 'Iel',Iel
+      stop
    endif
    if (Attr.lt.1 .or. Attr.gt.NR_PHYSA) then
-      if (RANK.eq.ROOT) write(*,1000) 'Attr',Attr
-      goto 90
+      write(*,1000) 'Attr',Attr
+      stop
    endif
    if (Comp.lt.1 .or. Comp.gt.NR_COMP(Attr)) then
-      if (RANK.eq.ROOT) write(*,1000) 'Comp',Comp
-      goto 90
+      write(*,1000) 'Comp',Comp
+      stop
    endif
    if (Flag.lt.1 .or. Flag.gt.9) then
-      if (RANK.eq.ROOT) write(*,1000) 'Flag',Flag
-      goto 90
+      write(*,1000) 'Flag',Flag
+      stop
    endif
    1000 format('set_bcond_elem: invalid input: ',A,' = ',I9)
 !
@@ -82,13 +82,13 @@ subroutine set_bcond_elem(Iel,Dom,Attr,Comp,Flag)
 !  with the correct boundary domain ID
    ibc(1:6) = 0
 !
-   etype = ELEMS(iel)%etype
+   etype = ELEMS(Iel)%etype
    do ifc=1,NFACE(etype)
-      neig = ELEMS(iel)%neig(ifc)
+      neig = ELEMS(Iel)%neig(ifc)
 !  ...exterior face (no neighbor)
       if (neig .eq. 0) then
 !     ...get element number in GMP data structure
-         nelem = ELEMS(iel)%GMPblock / 10
+         nelem = ELEMS(Iel)%GMPblock / 10
 !     ...get domain number of this face
          select case(etype)
             case(BRIC)
@@ -130,7 +130,5 @@ subroutine set_bcond_elem(Iel,Dom,Attr,Comp,Flag)
 !..Encode face BC into a single BC flag
    call attr_to_index(Attr,Comp, index)
    call encodg(ibc(1:6),10,6, ELEMS(Iel)%bcond(index))
-!
-   90 continue
 !
 end subroutine set_bcond_elem
