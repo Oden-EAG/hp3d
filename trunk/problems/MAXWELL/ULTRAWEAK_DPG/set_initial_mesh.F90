@@ -31,7 +31,7 @@ subroutine set_initial_mesh(Nelem_order)
 !
 !..set up number of physical attributes supported by the element
    nr_attr = NR_PHYSA
-   attr_list = [(i, i=1,NR_PHYSA)]
+   attr_list = [(i, i=1,nr_attr)]
    call set_attr(nr_attr,attr_list)
 !
 !..BC flag
@@ -44,7 +44,7 @@ subroutine set_initial_mesh(Nelem_order)
 !  attr | comp | index | description
 !     1 |  1-2 |   1-2 | Hcurl for Maxwell trace (\hat E,\hat H) (2 components)
 !     2 |  1-6 |   3-8 | L2 field for Maxwell (E,H) (6 components)
-   attr = 1 ! set BC for Hcurl variables
+   attr = 1 ! set BC for Hcurl variable
 !
 !..boundary domain "0" (Dirichlet BC on E-trace)
    bdom = 0 ! set on all exterior faces with boundary domain "0" (default domain)

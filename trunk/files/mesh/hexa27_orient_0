@@ -4,7 +4,9 @@
 
 1         NRDOMAIN
 
-64          NRPOINT
+0         no surface domains
+
+64        NRPOINT
 
 Regular             point 1
 0.d0 3.d0 0.d0

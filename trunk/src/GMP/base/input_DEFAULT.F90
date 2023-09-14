@@ -122,7 +122,7 @@ subroutine input_DEFAULT(Fp)
 !  ...allocate memory for GMP data structure
       call alloc_GMP
 !
-IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
+      IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !
 !-----------------------------------------------------------------------
 !  SURFACES                                                            |
@@ -130,7 +130,7 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !
 !  ...number of surfaces
       read(nin,*) NRSURFS
- IF (.NOT. QUIET_MODE)     write(*,1000) NRSURFS
+      IF (.NOT. QUIET_MODE) write(*,1000) NRSURFS
  1000 format(' NRSURFS = ',i7,' ; reading surfaces...')
 !
       if (MAXSU.lt.NRSURFS) then
@@ -242,13 +242,15 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !
 !  ...most likely, the surface domains flag is missing, set it to 0
       else
-        write(*,*) 'input_DEFAULT: surface domains flag missing,', &
-                   ' setting it to 0'
-        call pause
+        IF (.NOT. QUIET_MODE) THEN
+          write(*,*) 'input_DEFAULT: ',                     &
+                     'surface domains flag not defined; ',  &
+                     'all surfaces are assigned domain "0"'
+        ENDIF
         isurf_flag = 0
       endif 
 !
-      IF (.NOT. QUIET_MODE)     write(*,1009) NRPOINT
+      IF (.NOT. QUIET_MODE) write(*,1009) NRPOINT
  1009 format(' NRPOINT = ',i7,' ; reading points...')
 !
       if (MAXNP.lt.NRPOINT) then
@@ -304,7 +306,7 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 
 !  ...read in number of curves
       read(nin,*) NRCURVE
- IF (.NOT. QUIET_MODE)     write(*,1011) NRCURVE
+      IF (.NOT. QUIET_MODE) write(*,1011) NRCURVE
  1011 format(' NRCURVE = ',i7,' ; reading curves...')
 !
       if (MAXNC.lt.NRCURVE) then
@@ -390,7 +392,7 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !---------------------------------------------------------------------
 !
       read(nin,*) NRTRIAN
- IF (.NOT. QUIET_MODE)     write(*,1012) NRTRIAN
+      IF (.NOT. QUIET_MODE) write(*,1012) NRTRIAN
  1012 format(' NRTRIAN = ',i7,' ; reading triangles...')
 !
       if (MAXTR.lt.NRTRIAN) then
@@ -455,7 +457,7 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !---------------------------------------------------------------------
 !
       read(nin,*) NRRECTA
- IF (.NOT. QUIET_MODE)     write(*,1013) NRRECTA
+      IF (.NOT. QUIET_MODE) write(*,1013) NRRECTA
  1013 format(' NRRECTA = ',i7,' ; reading rectangles...')
 !
       if (MAXRE.lt.NRRECTA) then
@@ -497,7 +499,7 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !
         case default
           write(*,1004) RECTANGLES(nr)%Type
- 1004     format(' input_DEFAULT: unknow rectangle type! Type = ',a10)
+ 1004     format(' input_DEFAULT: unknown rectangle type! Type = ',a10)
           stop
         endselect
       enddo
@@ -507,7 +509,7 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !---------------------------------------------------------------------
 !
       read(nin,*) NRPRISM
- IF (.NOT. QUIET_MODE)     write(*,1014) NRPRISM
+      IF (.NOT. QUIET_MODE) write(*,1014) NRPRISM
  1014 format(' NRPRISM = ',i7,' ; reading prisms...')
 !
       if (MAXBT.lt.NRPRISM) then
@@ -534,7 +536,7 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !---------------------------------------------------------------------
 !
       read(nin,*) NRHEXAS
-IF (.NOT. QUIET_MODE) write(*,1015) NRHEXAS
+      IF (.NOT. QUIET_MODE) write(*,1015) NRHEXAS
  1015 format(' NRHEXAS = ',i7,' ; reading hexas...')
 !
       if (MAXHE.lt.NRHEXAS) then
@@ -560,7 +562,7 @@ IF (.NOT. QUIET_MODE) write(*,1015) NRHEXAS
 !---------------------------------------------------------------------
 !
       read(nin,*) NRTETRA
-IF (.NOT. QUIET_MODE) write(*,1016) NRTETRA
+      IF (.NOT. QUIET_MODE) write(*,1016) NRTETRA
  1016 format(' NRTETRA = ',i7,' ; reading tets...')
 !
       if (MAXTE.lt.NRTETRA) then
@@ -592,7 +594,7 @@ IF (.NOT. QUIET_MODE) write(*,1016) NRTETRA
 !---------------------------------------------------------------------
 !
       read(nin,*) NRPYRAM
-IF (.NOT. QUIET_MODE) write(*,1017) NRPYRAM
+      IF (.NOT. QUIET_MODE) write(*,1017) NRPYRAM
  1017 format(' NRPYRAM = ',i7,' ; reading pyramids...')
 !
       if (MAXPY.lt.NRPYRAM) then
@@ -619,7 +621,7 @@ IF (.NOT. QUIET_MODE) write(*,1017) NRPYRAM
         endselect
       enddo
 !
-IF (.NOT. QUIET_MODE) write(*,*)''
+      IF (.NOT. QUIET_MODE) write(*,*)''
 !
       close(nin)
 !
