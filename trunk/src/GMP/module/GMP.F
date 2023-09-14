@@ -260,17 +260,8 @@ c
 c     G1RecTri : septic Bezier triangle
 c       Rdata(0:107) - control points (36 x 3)
 c
-c     SpherTri : LEGACY
-c       Idata,Rdata - UNKNOWN
-c
-c     QtCirTri : LEGACY
-c       Idata,Rdata - UNKNOWN
-c
-c     PaSphTri : LEGACY
-c       Idata,Rdata - UNKNOWN
-c
-c     CylTri    : image of a linear triangle through a global
-c                 system of cylindrical coordinates
+c     CylTri   : image of a linear triangle through a global
+c                system of cylindrical coordinates
 c
 c  VertNo  - vertex points numbers
 c
@@ -286,7 +277,7 @@ c     tetrahedron : nick = ntetra*10 + 3
 c     pyramid     : nick = npyram*10 + 4
 c     no block (figure on the boundary) : nick=0
 c
-c  Domain  - part of a 2D manifold, the triangle is on; useful for
+c  Domain  - part of a 2D manifold the triangle is on; useful for
 c            setting up boundary or interface conditions
 c
 c  Idata   - integer data associated to the triangle
@@ -326,15 +317,8 @@ c
 c     HermRec : geometry reconstruction triangle
 c       Rdata - degrees of freedom
 c
-c
-c     CylRec    : image of a linear rectangle through a global
-c                 system of cylindrical coordinates
-c
-c     CylRec (other) : LEGACY
-c       Idata,Rdata - UNKNOWN
-c
-c     ConfRec : LEGACY
-c       Idata,Rdata - UNKNOWN
+c     CylRec  : image of a linear rectangle through a global
+c               system of cylindrical coordinates
 c
 c  VertNo  - vertex points numbers
 c
@@ -350,7 +334,7 @@ c   ( tetrahedron : nick = ntetra*10 + 3 )
 c     pyramid     : nick = npyram*10 + 4
 c     no block (figure on the boundary) : nick=0
 c
-c  Domain  - part of a 2D manifold, the triangle is on; useful for
+c  Domain  - part of a 2D manifold the rectangle is on; useful for
 c            setting up boundary or interface conditions
 c
 c  Idata   - integer data associated to the rectangle
