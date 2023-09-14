@@ -122,12 +122,12 @@ subroutine set_bcond_elem(Iel,Dom,Attr,Comp,Flag)
 !..end loop over element faces
    enddo
 !
-!..Check if BC flag array has been allocated
+!..check if BC flag array has been allocated
    if (.not. associated(ELEMS(Iel)%bcond)) then
       allocate(ELEMS(Iel)%bcond(NRINDEX))
    endif
 !
-!..Encode face BC into a single BC flag
+!..encode face BC into a single BC flag
    call attr_to_index(Attr,Comp, index)
    call encodg(ibc(1:6),10,6, ELEMS(Iel)%bcond(index))
 !

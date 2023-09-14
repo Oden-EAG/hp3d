@@ -880,258 +880,6 @@ c
 c
       end subroutine dumpout_GMP
 c
-c
-c----------------------------------------------------------------------
-c
-#if 0
-c
-c  ...dump in GMP datastructure in LEGACY format (before Feb '11)
-c
-      subroutine dumpin_GMP_LEGACY(Fp)
-c
-      character(len=*) :: Fp
-      integer, parameter :: ndump=31
-c
-      integer :: iprint
-      iprint=0
-c
-      open(unit=ndump,file=Fp,
-     .     form='formatted',access='sequential',status='unknown')
-c
-      read(ndump,*)
-     .           NDIM,MANDIM,
-     .           NRSURFS,
-     .           NRPOINT,NRCURVE,NRTRIAN,NRRECTA,
-     .           NRHEXAS,NRTETRA,NRPRISM,NRPYRAM,
-     .           NRDOMAIN
-c
-      read(ndump,*)
-     .           MAXSU,
-     .           MAXNP,MAXNC,MAXTR,MAXRE,
-     .           MAXBT,MAXHE,MAXTE,MAXPY
-c
-ccc      if ((MAXSU.ne.MAXSU_old).or.
-ccc     .    (MAXNP.ne.MAXNP_old).or.
-ccc     .    (MAXNC.ne.MAXNC_old).or.
-ccc     .    (MAXTR.ne.MAXTR_old).or.
-ccc     .    (MAXRE.ne.MAXRE_old).or.
-ccc     .    (MAXBT.ne.MAXBT_old).or.
-ccc     .    (MAXHE.ne.MAXHE_old).or.
-ccc     .    (MAXTE.ne.MAXTE_old).or.
-ccc     .    (MAXPY.ne.MAXPY_old)) then
-ccc        write(*,*) 'dumpin_GMP: INCOMPATIBLE GMP DATA STRUCTURES'
-ccc        write(*,*)'MAXSU_old =',MAXSU_old
-ccc        write(*,*)'MAXNP_old =',MAXNP_old
-ccc        write(*,*)'MAXNC_old =',MAXNC_old
-ccc        write(*,*)'MAXTR_old =',MAXTR_old
-ccc        write(*,*)'MAXRE_old =',MAXRE_old
-ccc        write(*,*)'MAXBT_old =',MAXBT_old
-ccc        write(*,*)'MAXHE_old =',MAXHE_old
-ccc        write(*,*)'MAXTE_old =',MAXTE_old
-ccc        write(*,*)'MAXPY_old =',MAXPY_old
-ccc        stop 1
-ccc      endif
-c
-      if (iprint.eq.1) then
-        write(*,*)'---------------------------------------------'
-        write(*,*)'dumpin_GMP_LEGACY: '
-        write(*,8000)NDIM
-8000    format('     NDIM     = ',i12)
-        write(*,8001)MANDIM
-8001    format('     MANDIM   = ',i12)
-        write(*,8002)NRSURFS
-8002    format('     NRSURFS  = ',i12)
-        write(*,8003)NRPOINT
-8003    format('     NRPOINT  = ',i12)
-        write(*,8004)NRCURVE
-8004    format('     NRCURVE  = ',i12)
-        write(*,8005)NRTRIAN
-8005    format('     NRTRIAN  = ',i12)
-        write(*,8006)NRRECTA
-8006    format('     NRRECTA  = ',i12)
-        write(*,8007)NRHEXAS
-8007    format('     NRHEXAS  = ',i12)
-        write(*,8008)NRTETRA
-8008    format('     NRTETRA  = ',i12)
-        write(*,8009)NRPRISM
-8009    format('     NRPRIAM  = ',i12)
-        write(*,8010)NRPYRAM
-8010    format('     NRPYRAM  = ',i12)
-        write(*,8011)NRDOMAIN
-8011    format('     NRDOMAIN = ',i12)
-        write(*,*)'---------------------------------------------'
-        call pause
-      endif
-      call alloc_GMP
-c
-      do ns=1,MAXSU
-        read(ndump,*) SURFACES(ns)%Type
-        read(ndump,*) nn
-        if (nn.gt.0) then
-          allocate(SURFACES(ns)%Idata(nn))
-          read(ndump,*) SURFACES(ns)%Idata
-        else
-          nullify(SURFACES(ns)%Idata)
-        endif
-        read(ndump,*) nn
-        if (nn.gt.0) then
-          allocate(SURFACES(ns)%Rdata(nn))
-          read(ndump,*) SURFACES(ns)%Rdata
-        else
-          nullify(SURFACES(ns)%Rdata)
-        endif
-      enddo
-c
-      do np=1,MAXNP
-        read(ndump,*) POINTS(np)%Type
-        read(ndump,*) POINTS(np)%NrCurv
-        read(ndump,*) nn
-        if (nn.gt.0) then
-          allocate(POINTS(np)%CurvNo(nn))
-          read(ndump,*) POINTS(np)%CurvNo
-        else
-          nullify(POINTS(np)%CurvNo)
-        endif
-        read(ndump,*) nn
-        if (nn.gt.0) then
-          allocate(POINTS(np)%Idata(nn))
-          read(ndump,*) POINTS(np)%Idata
-        else
-          nullify(POINTS(np)%Idata)
-        endif
-        read(ndump,*) nn
-        if (nn.gt.0) then
-          allocate(POINTS(np)%Rdata(nn))
-          read(ndump,*) POINTS(np)%Rdata
-        else
-          nullify(POINTS(np)%Rdata)
-        endif
-      enddo
-c
-      do nc=1,MAXNC
-        read(ndump,*) CURVES(nc)%Type
-        read(ndump,*) CURVES(nc)%EndPoNo(1:2)
-        read(ndump,*) CURVES(nc)%NrFig
-        read(ndump,*) nn
-        if (nn.gt.0) then
-          allocate(CURVES(nc)%FigNo(nn))
-          read(ndump,*) CURVES(nc)%FigNo
-        else
-          nullify(CURVES(nc)%FigNo)
-        endif
-        read(ndump,*) nn
-        if (nn.gt.0) then
-          allocate(CURVES(nc)%Idata(nn))
-          read(ndump,*) CURVES(nc)%Idata
-        else
-          nullify(CURVES(nc)%Idata)
-        endif
-        read(ndump,*) nn
-        if (nn.gt.0) then
-          allocate(CURVES(nc)%Rdata(nn))
-          read(ndump,*) CURVES(nc)%Rdata
-        else
-          nullify(CURVES(nc)%Rdata)
-        endif
-      enddo
-c
-      do nt=1,MAXTR
-        read(ndump,*) TRIANGLES(nt)%Type
-        read(ndump,*) TRIANGLES(nt)%VertNo(1:3)
-        read(ndump,*) TRIANGLES(nt)%EdgeNo(1:3)
-        read(ndump,*) TRIANGLES(nt)%BlockNo(1:2)
-        read(ndump,*) TRIANGLES(nt)%Domain
-        read(ndump,*) nn
-        if (nn.gt.0) then
-          allocate(TRIANGLES(nt)%Idata(nn))
-          read(ndump,*) TRIANGLES(nt)%Idata
-        else
-          nullify(TRIANGLES(nt)%Idata)
-        endif
-      enddo
-c
-      do nr=1,MAXRE
-        read(ndump,*) RECTANGLES(nr)%Type
-        read(ndump,*) RECTANGLES(nr)%VertNo(1:4)
-        read(ndump,*) RECTANGLES(nr)%EdgeNo(1:4)
-        read(ndump,*) RECTANGLES(nr)%BlockNo(1:2)
-        read(ndump,*) RECTANGLES(nr)%Domain
-        read(ndump,*) nn
-        if (nn.gt.0) then
-          allocate(RECTANGLES(nr)%Idata(nn))
-          read(ndump,*) RECTANGLES(nr)%Idata
-        else
-          nullify(RECTANGLES(nr)%Idata)
-        endif
-        read(ndump,*) nn
-        if (nn.gt.0) then
-          allocate(RECTANGLES(nr)%Rdata(nn))
-          read(ndump,*) RECTANGLES(nr)%Rdata
-        else
-          nullify(RECTANGLES(nr)%Rdata)
-        endif
-      enddo
-c
-      do npri=1,MAXBT
-        read(ndump,*) PRISMS(npri)%Type
-        read(ndump,*) PRISMS(npri)%VertNo(1:6)
-        read(ndump,*) PRISMS(npri)%EdgeNo(1:9)
-        read(ndump,*) PRISMS(npri)%FigNo(1:5)
-        read(ndump,*) PRISMS(npri)%Domain
-      enddo
-c
-      do nh=1,MAXHE
-        read(ndump,*) HEXAS(nh)%Type
-        read(ndump,*) HEXAS(nh)%VertNo(1:8)
-        read(ndump,*) HEXAS(nh)%EdgeNo(1:12)
-        read(ndump,*) HEXAS(nh)%FigNo(1:6)
-        read(ndump,*) HEXAS(nh)%Domain
-        read(ndump,*) nn
-        if (nn.gt.0) then
-          allocate(HEXAS(nh)%Idata(nn))
-          read(ndump,*) HEXAS(nh)%Idata
-        else
-          nullify(HEXAS(nh)%Idata)
-        endif
-      enddo
-c
-      do ntet=1,MAXTE
-        read(ndump,*) TETRAS(ntet)%Type
-        read(ndump,*) TETRAS(ntet)%VertNo(1:4)
-        read(ndump,*) TETRAS(ntet)%EdgeNo(1:6)
-        read(ndump,*) TETRAS(ntet)%FigNo(1:4)
-        read(ndump,*) TETRAS(ntet)%Domain
-        read(ndump,*) nn
-        if (nn.gt.0) then
-          allocate(TETRAS(ntet)%Idata(nn))
-          read(ndump,*) TETRAS(ntet)%Idata
-        else
-          nullify(TETRAS(ntet)%Idata)
-        endif
-      enddo
-c
-      do npyr=1,MAXPY
-        read(ndump,*) PYRAMIDS(npyr)%Type
-        read(ndump,*) PYRAMIDS(npyr)%VertNo(1:5)
-        read(ndump,*) PYRAMIDS(npyr)%EdgeNo(1:8)
-        read(ndump,*) PYRAMIDS(npyr)%FigNo(1:5)
-        read(ndump,*) PYRAMIDS(npyr)%Domain
-        read(ndump,*) nn
-        if (nn.gt.0) then
-          allocate(PYRAMIDS(npyr)%Idata(nn))
-          read(ndump,*) PYRAMIDS(npyr)%Idata
-        else
-          nullify(PYRAMIDS(npyr)%Idata)
-        endif
-      enddo
-c
-      close(ndump)
-c
-      end subroutine dumpin_GMP_LEGACY
-c
-#endif
-c
-c
 c----------------------------------------------------------------------
 c
 c  ...dump in GMP data structure
@@ -1434,7 +1182,7 @@ c
  10   continue
       write(*,*) 'print_GMP: SELECT:'
       write(*,*) 'EXIT....................................0'
-      write(*,*) 'GENERAL DATA STRUCTURE PARAMETRS........1'
+      write(*,*) 'GENERAL DATA STRUCTURE PARAMETERS.......1'
       write(*,*) 'POINT DATA..............................2'
       write(*,*) 'CURVE DATA..............................3'
       write(*,*) 'TRIANGLE DATA...........................4'
@@ -1749,23 +1497,24 @@ c
 c
 c----------------------------------------------------------------------
 c
-      integer function Ndomain_gmp(IGMP_block)
+      integer function Ndomain_GMP(IGMP_block)
 c
       integer IGMP_block, no, lab
       call decode(IGMP_block, no,lab)
       select case(lab)
       case(1)
-        Ndomain_gmp = PRISMS(no)%Domain
+        Ndomain_GMP = PRISMS(no)%Domain
       case(2)
-        Ndomain_gmp = HEXAS(no)%Domain
+        Ndomain_GMP = HEXAS(no)%Domain
       case(3)
-        Ndomain_gmp = TETRAS(no)%Domain
+        Ndomain_GMP = TETRAS(no)%Domain
       case(4)
-        Ndomain_gmp = PYRAMIDS(no)%Domain
+        Ndomain_GMP = PYRAMIDS(no)%Domain
       case default
-        write(*,*) 'Ndomain_gmp: lab = ',lab
+        write(*,*) 'Ndomain_GMP: lab = ',lab
         stop
       endselect
-      end function
+c
+      end function Ndomain_GMP
 c
       end module GMP

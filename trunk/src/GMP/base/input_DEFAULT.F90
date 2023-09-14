@@ -1,8 +1,8 @@
 !-----------------------------------------------------------------------
-!> Purpose : routine reads in the geometry data for the Geometry
-!!           Modeling Package in the DEFAULT format
+!> @brief   routine reads in the geometry data for the Geometry
+!!          Modeling Package in the DEFAULT format
 !!
-!! @revision Nov 12
+!> @date    Sep 2023
 !-----------------------------------------------------------------------
 !  DEFAULT file format:
 !
@@ -15,11 +15,11 @@
 !
 !     NRDOMAIN
 !
-!     isurf_flag     (surface domains flags
-!                     =  0    no surface domains are read when inputing
+!     isurf_flag      surface domains flags
+!                     =  0    no surface domains are read when reading
 !                             data for TRIANGLES and RECTANGLES
-!                     =  1    surface domains are expected when inputing
-!                             data for TRIANGLES and RECTANGLES  )
+!                     =  1    surface domains are expected when reading
+!                             data for TRIANGLES and RECTANGLES
 !
 !     NRPOINT
 !     POINTS(1)%Type
@@ -242,7 +242,7 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !
 !  ...most likely, the surface domains flag is missing, set it to 0
       else
-        write(*,*) 'input_DEFAULT: surface domains flag missing, ',&
+        write(*,*) 'input_DEFAULT: surface domains flag missing,', &
                    ' setting it to 0'
         call pause
         isurf_flag = 0
@@ -400,7 +400,7 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !
 !  ...loop over triangles
       do nt=1,NRTRIAN
-        read(nin,*)  TRIANGLES(nt)%Type
+        read(nin,*) TRIANGLES(nt)%Type
         select case(isurf_flag)
         case(0); read(nin,*) (TRIANGLES(nt)%VertNo(j) , j=1,3)
         case(1); read(nin,*) TRIANGLES(nt)%Domain, (TRIANGLES(nt)%VertNo(j) , j=1,3)
@@ -464,7 +464,7 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !
 !  ...loop over rectangles
       do nr=1,NRRECTA
-        read(nin,*)  RECTANGLES(nr)%Type
+        read(nin,*) RECTANGLES(nr)%Type
         select case(isurf_flag)
         case(0); read(nin,*) (RECTANGLES(nr)%VertNo(j) , j=1,4)
         case(1); read(nin,*) RECTANGLES(nr)%Domain, (RECTANGLES(nr)%VertNo(j) , j=1,4)
