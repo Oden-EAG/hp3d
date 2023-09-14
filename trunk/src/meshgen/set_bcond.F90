@@ -78,10 +78,20 @@ subroutine set_bcond_elem(Iel,Dom,Attr,Comp,Flag)
    endif
    1000 format('set_bcond_elem: invalid input: ',A,' = ',I9)
 !
+!..get component index for physics attribute component
+   call attr_to_index(Attr,Comp, index)
+!
+!..check if BC flag array has been allocated
+   if (.not. associated(ELEMS(Iel)%bcond)) then
+      allocate(ELEMS(Iel)%bcond(NRINDEX))
+      ibc(1:6) = 0
+   else
+!  ...retain previously set BC flags for this component
+      call decodg(ELEMS(Iel)%bcond(index),10,6, ibc)
+   endif
+!
 !..set BC flags on all exterior faces of this element
 !  with the correct boundary domain ID
-   ibc(1:6) = 0
-!
    etype = ELEMS(Iel)%etype
    do ifc=1,NFACE(etype)
       neig = ELEMS(Iel)%neig(ifc)
@@ -122,13 +132,7 @@ subroutine set_bcond_elem(Iel,Dom,Attr,Comp,Flag)
 !..end loop over element faces
    enddo
 !
-!..check if BC flag array has been allocated
-   if (.not. associated(ELEMS(Iel)%bcond)) then
-      allocate(ELEMS(Iel)%bcond(NRINDEX))
-   endif
-!
 !..encode face BC into a single BC flag
-   call attr_to_index(Attr,Comp, index)
    call encodg(ibc(1:6),10,6, ELEMS(Iel)%bcond(index))
 !
 end subroutine set_bcond_elem
