@@ -293,7 +293,7 @@ subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
    Zaloc = ZERO; Zbloc = ZERO
 !
    etype = NODES(Mdle)%ntype
-   nrv = NVERT(etype); nre = NEDGE(etype); nrf = NFACE(etype)
+   nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
 !
    call find_order(Mdle, norder)
    call find_orient(Mdle, norient_edge,norient_face)
