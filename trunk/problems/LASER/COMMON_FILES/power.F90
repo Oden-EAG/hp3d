@@ -1000,7 +1000,7 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
    nflag = 1
 !..element type
    etype = NODES(Mdle)%ntype
-   nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
+   nrv = NVERT(etype); nre = NEDGE(etype); nrf = NFACE(etype)
    call find_order(Mdle, norder)
    call find_orient(Mdle, nedge_orient,nface_orient)
    call nodcor(mdle, xnod)
@@ -1208,7 +1208,7 @@ subroutine compute_mode_power(Mdle,Facenumber,Fld, ModePower,ModeNorm,ModeCoef)
    nflag = 1
 !..element type
    etype = NODES(Mdle)%ntype
-   nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
+   nrv = NVERT(etype); nre = NEDGE(etype); nrf = NFACE(etype)
    call find_order(Mdle, norder)
    call find_orient(Mdle, nedge_orient,nface_orient)
    call nodcor(mdle, xnod)

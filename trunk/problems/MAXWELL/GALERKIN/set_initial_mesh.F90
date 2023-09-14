@@ -69,7 +69,7 @@
 !  ...set BC flags: 0 - no BC ; 1 - Dirichlet
       ibc(1:6,1:NRINDEX) = 0
 !
-      do ifc=1,nface(ELEMS(iel)%etype)
+      do ifc=1,NFACE(ELEMS(iel)%etype)
          neig = ELEMS(iel)%neig(ifc)
          select case(neig)
             case(0); ibc(ifc,1) = 1

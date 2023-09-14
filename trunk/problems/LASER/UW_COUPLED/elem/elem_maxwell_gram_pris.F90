@@ -183,7 +183,7 @@
 !
 !..element type
    etype = NODES(Mdle)%ntype
-   nre = nedge(etype); nrf = nface(etype)
+   nre = NEDGE(etype); nrf = NFACE(etype)
 !
 !..determine order of approximation
    call find_order(Mdle, norder)

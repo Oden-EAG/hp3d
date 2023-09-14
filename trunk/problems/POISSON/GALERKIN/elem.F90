@@ -125,9 +125,9 @@ subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
 !..element type
    etype = NODES(Mdle)%ntype
 !  [number of vertices, edges, and faces of this element (type)]
-   nrv = nvert(etype)
-   nre = nedge(etype)
-   nrf = nface(etype)
+   nrv = NVERT(etype)
+   nre = NEDGE(etype)
+   nrf = NFACE(etype)
 !
 !..determine order of approximation
    !write(*,2050) '[', RANK, '] FIND ORDER'; call pause

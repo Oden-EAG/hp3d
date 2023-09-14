@@ -132,7 +132,7 @@
 !
 !  ...element type
       etype = NODES(Mdle)%ntype
-      nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
+      nrv = NVERT(etype); nre = NEDGE(etype); nrf = NFACE(etype)
 !
 !  ...order of approximation, orientations, geometry dof's (don't need bc flags)
       call find_order (Mdle, norder)

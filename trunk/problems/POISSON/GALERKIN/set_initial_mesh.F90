@@ -76,7 +76,7 @@
 !     ...uniform BC
          case(BC_DIRICHLET)
 !        ...if exterior face, set boundary condition to IBC_PROB
-            do ifc=1,nface(ELEMS(iel)%etype)
+            do ifc=1,NFACE(ELEMS(iel)%etype)
                neig = ELEMS(iel)%neig(ifc)
                select case(neig)
                   case(0); ibc(ifc,1) = 1 ! trace (H1)

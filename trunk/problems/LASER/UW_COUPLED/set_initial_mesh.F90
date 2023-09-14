@@ -137,7 +137,7 @@ subroutine set_initial_mesh(Nelem_order)
 !     ...single cube/brick with Dirichlet
 !        perfect electrical conductor (PEC) BC on all faces
          case (1)
-            do ifc=1,nface(etype)
+            do ifc=1,NFACE(etype)
                neig = ELEMS(iel)%neig(ifc)
                select case(neig)
                   case(0)
@@ -166,7 +166,7 @@ subroutine set_initial_mesh(Nelem_order)
 !
 !     ...fiber core hexa: fhcor_curv or fhcor_str
          case (4)
-            do ifc=1,nface(etype)
+            do ifc=1,NFACE(etype)
                neig = ELEMS(iel)%neig(ifc)
                select case(neig)
                   case(0)
@@ -180,7 +180,7 @@ subroutine set_initial_mesh(Nelem_order)
 !
 !     ...full fiber hexa: fhcc_curv or fhcc_str
          case (5)
-            do ifc=1,nface(etype)
+            do ifc=1,NFACE(etype)
                neig = ELEMS(iel)%neig(ifc)
                select case(neig)
                   case(0)

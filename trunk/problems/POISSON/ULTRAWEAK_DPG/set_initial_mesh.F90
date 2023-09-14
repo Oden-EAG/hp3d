@@ -86,7 +86,7 @@
 !..if exterior face, set boundary condition to IBC_PROB
             if(geomtype .eq. 0) then
             ! all external faces have Dirichlet BC on H1 trace
-               do ifc=1,nface(ELEMS(iel)%etype)
+               do ifc=1,NFACE(ELEMS(iel)%etype)
                neig = ELEMS(iel)%neig(ifc)
                   select case(neig)
                      case(0); ibc(ifc,1) = 1 ! Dirichlet BC (H1 trace variable)
@@ -105,7 +105,7 @@
 !
             else if (geomtype .eq. 1) then ! Fichera Corner BCs (Dirichlet BC for normal flux)
                if(iel .eq. 4) then
-                  do ifc=1,nface(ELEMS(iel)%etype)
+                  do ifc=1,NFACE(ELEMS(iel)%etype)
                      neig = ELEMS(iel)%neig(ifc)
                      select case(neig)
                         case(0)
@@ -117,7 +117,7 @@
                      end select
                   enddo
                elseif (iel .eq. 6) then
-                  do ifc=1,nface(ELEMS(iel)%etype)
+                  do ifc=1,NFACE(ELEMS(iel)%etype)
                      neig = ELEMS(iel)%neig(ifc)
                      select case(neig)
                         case(0)
@@ -129,7 +129,7 @@
                      end select
                   enddo
                elseif (iel .eq. 7) then
-                  do ifc=1,nface(ELEMS(iel)%etype)
+                  do ifc=1,NFACE(ELEMS(iel)%etype)
                      neig = ELEMS(iel)%neig(ifc)
                      select case(neig)
                         case(0)
@@ -141,7 +141,7 @@
                      end select
                   enddo
                else 
-                  do ifc=1,nface(ELEMS(iel)%etype)
+                  do ifc=1,NFACE(ELEMS(iel)%etype)
                      neig = ELEMS(iel)%neig(ifc)
                         select case(neig)
                            case(0); ibc(ifc,2) = 1 ! Dirichlet BC (Hdiv trace variable)

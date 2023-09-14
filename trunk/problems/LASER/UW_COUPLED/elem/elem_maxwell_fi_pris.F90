@@ -273,7 +273,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
 !..element type
    etype = NODES(Mdle)%ntype
-   nre = nedge(etype); nrf = nface(etype)
+   nre = NEDGE(etype); nrf = NFACE(etype)
 !
 !..determine order of approximation
    call find_order(Mdle, norder)
@@ -1363,7 +1363,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !  ...Verify that we've found all face dofs
 #if DEBUG_MODE
 !  ...Trial
-      nordEfc = norder(nedge(etype) + ifc)
+      nordEfc = norder(NEDGE(etype) + ifc)
       allocate(dummyE(1:2,NrdofE))
       allocate(dummyC(NrdofE))
       call shape2EE(ftype,t,nordEfc, nrdof,dummyE,dummyC)
@@ -1377,9 +1377,9 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !  ...Test
       select case(ftype)
          case(TRIA,MDLT)
-            nordEEfc = norder(nedge(etype) + ifc) + NORD_ADD
+            nordEEfc = norder(NEDGE(etype) + ifc) + NORD_ADD
          case(QUAD,MDLQ,RECT)
-            nordEEfc = norder(nedge(etype) + ifc) + NORD_ADD*11
+            nordEEfc = norder(NEDGE(etype) + ifc) + NORD_ADD*11
          case default
             write(*,*) 'elem_maxwell_fi_pris: invalid face type ', S_Type(ftype)
             stop

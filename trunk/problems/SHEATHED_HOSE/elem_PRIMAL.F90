@@ -308,7 +308,7 @@ subroutine elem_DPG_PRIMAL(Mdle)
 !
 !
 !  ...loop through element faces
-      do ifc=1,nface(etype)
+      do ifc=1,NFACE(etype)
 !
 !  .....sign factor to determine the OUTWARD normal unit vector
         nsign = nsign_param(etype,ifc)

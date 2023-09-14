@@ -79,7 +79,7 @@ subroutine set_initial_mesh(Nelem_order)
       ibc(1:6,1:NRINDEX) = 0
 !
 !  ...loop through the element faces
-      do ifc=1,nface(ELEMS(iel)%etype)
+      do ifc=1,NFACE(ELEMS(iel)%etype)
          neig = ELEMS(iel)%neig(ifc)
 !
 !     ...no neighbor, set the BC flags

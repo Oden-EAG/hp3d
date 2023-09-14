@@ -56,7 +56,7 @@
       norderP(1:19) = 0
 !
       ntype = NODES(Mdle)%ntype
-      nrv = nvert(ntype); nre = nedge(ntype); nrf = nface(ntype)
+      nrv = NVERT(ntype); nre = NEDGE(ntype); nrf = NFACE(ntype)
 !
 !  ...determine order of approximation
       call find_order(Mdle, norder)

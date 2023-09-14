@@ -51,7 +51,7 @@ subroutine elem(Mdle, Itest,Itrial)
    norderP(1:19) = 0
 !
    etype = NODES(Mdle)%ntype
-   nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
+   nrv = NVERT(etype); nre = NEDGE(etype); nrf = NFACE(etype)
 !..determine order of approximation
    call find_order(Mdle, norder)
 !
@@ -229,9 +229,9 @@ subroutine elem_poisson(Mdle,                   &
 !
 !..element type
    etype = NODES(Mdle)%ntype
-   nrv = nvert(etype)
-   nre = nedge(etype)
-   nrf = nface(etype)
+   nrv = NVERT(etype)
+   nre = NEDGE(etype)
+   nrf = NFACE(etype)
 !
 !..determine order of approximation
    call find_order(Mdle, norder)

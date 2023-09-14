@@ -786,7 +786,7 @@ end subroutine get_elem_Norm
 !      nflag = 1
 !! ...element type
 !      etype = NODES(mdle)%ntype
-!      nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
+!      nrv = NVERT(etype); nre = NEDGE(etype); nrf = NFACE(etype)
 !      call find_order(mdle, norder)
 !      call find_orient(mdle, nedge_orient,nface_orient)
 !      call nodcor(mdle, xnod)

@@ -143,7 +143,7 @@
 !
 !  ...element type
       ntype = NODES(Mdle)%ntype
-      nrf = nface(ntype)
+      nrf = NFACE(ntype)
 !
 !  ...determine order of approximation
       call find_order(Mdle, norder)

@@ -224,7 +224,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !..element type
    etype = NODES(Mdle)%ntype
-   nre = nedge(etype); nrf = nface(etype)
+   nre = NEDGE(etype); nrf = NFACE(etype)
 !
 !..determine order of approximation
    call find_order(Mdle, norder)
@@ -1032,7 +1032,7 @@ subroutine imp_penalty(Mdle,Fld_flag,NrdofH,NrdofEi,MdE,Norder,Norderi, &
 !
 !..determine element type and number of faces
    etype = NODES(Mdle)%ntype
-   nrf = nface(etype)
+   nrf = NFACE(etype)
 !
 !..determine edge and face orientations
    call find_orient(Mdle, norient_edge,norient_face)

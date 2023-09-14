@@ -79,7 +79,7 @@
 !        (2) |  3-8 | L2 field for Maxwell (E,H) (signal, 6 components)
 !
 !     ...set BCs on exterior faces
-         do ifc=1,nface(etype)
+         do ifc=1,NFACE(etype)
             neig = ELEMS(iel)%neig(ifc)
             select case(neig)
                case(0)

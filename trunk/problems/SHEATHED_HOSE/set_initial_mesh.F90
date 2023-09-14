@@ -146,7 +146,7 @@ subroutine set_initial_mesh(Nelem_order)
 !
 !   Free ends and pressure BCs at exterior faces of hose
     case(2)
-      do ifc=1,nface(etype)
+      do ifc=1,NFACE(etype)
           neig = ELEMS(iel)%neig(ifc)
           select case(neig)
           case(0)

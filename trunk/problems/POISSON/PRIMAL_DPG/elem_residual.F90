@@ -199,7 +199,7 @@ subroutine elem_residual_poisson(Mdle,                &
 !
 !..element type
    etype = NODES(Mdle)%ntype
-   nrf = nface(etype)
+   nrf = NFACE(etype)
 !
 !..determine order of approximation
    call find_order(Mdle, norder)

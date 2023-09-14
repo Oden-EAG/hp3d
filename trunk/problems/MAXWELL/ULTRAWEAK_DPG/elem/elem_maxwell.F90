@@ -176,7 +176,7 @@
 !
 !  ...element type
       ntype = NODES(Mdle)%ntype
-      nre = nedge(ntype); nrf = nface(ntype)
+      nre = NEDGE(ntype); nrf = NFACE(ntype)
 !
 !  ...determine order of approximation
       call find_order(Mdle, norder)
@@ -684,7 +684,7 @@
 !
 !  ...determine element type and number of faces
       ntype = NODES(Mdle)%ntype
-      nrf = nface(ntype)
+      nrf = NFACE(ntype)
 !
 !  ...determine edge and face orientations
       call find_orient(Mdle, norient_edge,norient_face)

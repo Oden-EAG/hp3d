@@ -52,7 +52,7 @@
          call find_bc(mdle, ibc)
 !
 !     ...loop through element faces
-         do ifc=1,nface(ntype)
+         do ifc=1,NFACE(ntype)
 !
 !        ...if face has a Dirichlet BC flag on this component,
 !           then neither propagate Nflag from this face to its edges/vertices,
