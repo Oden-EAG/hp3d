@@ -27,7 +27,8 @@ subroutine paraview_driver
    id=id+1
 !
    if (RANK .eq. ROOT) then
-      call paraview_begin(id,PARAVIEW_TIME) ! [OPENS THE XMF FILE, WRITES HEADER]
+!  ...OPENS XMF OR VTU/PVD FILE, WRITES HEADER
+      call paraview_begin(id,PARAVIEW_TIME)
    endif
 !
 !  -- GEOMETRY --
