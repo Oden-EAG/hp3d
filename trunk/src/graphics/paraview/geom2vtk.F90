@@ -84,6 +84,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !
    call geometry_init(ico,Icp)
    GEOM_PTS(1:3,1:Icp) = 0.d0; GEOM_OBJ(1:ico) = 0
+   ice_subd = 0
 !
 !$OMP PARALLEL
 !
@@ -144,17 +145,13 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
       enddo
    enddo
 !$OMP END DO
-!$OMP END PARALLEL
 !
 !..Step 3 : Elements
 !
-   ! ice_subd=0
 !..Computing the total number of elements (incl. subelements if vlevel > 0)
 !..VTU Format needs this information a-priori as VTU needs headers
 !  with this information before appending the data.
    if (VIS_VTU) then
-   ice_subd=0
-   !$OMP PARALLEL
    !$OMP DO                            &
    !$OMP PRIVATE(mdle,ndom,ntype,ivis) &
    !$OMP REDUCTION(+:ice_subd)
@@ -173,10 +170,9 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
          endif
       enddo
    !$OMP END DO
-   !$OMP END PARALLEL
    endif
 !
-
+!$OMP END PARALLEL
 !
    if (VIS_VTU) then
       allocate(VTU_ELEM_TYPES(ice_subd))
