@@ -72,30 +72,31 @@ subroutine paraview_begin(Id,Time)
 !
 !-------------------------------------------------------------------------------------------
 !
-   if (.not. allocated(time_tags)) then
-      allocate(time_tags(PARAVIEW_MAX_TIMESTEPS))
-   endif
-!
    if (Id .lt. 0) then
       write(*,*) 'paraview_begin: Id = ',Id
       stop
    endif
 !
-!..check if time_tags array size needs to be increased
-   if (Id .ge. PARAVIEW_MAX_TIMESTEPS) then
-!  ...determine size of new time_tags array
-      max_new = 2*PARAVIEW_MAX_TIMESTEPS
-!  ...allocate new time_tags array
-      allocate(temp(max_new))
-!  ...copy data from old time_tags array into the new one
-      temp(1:PARAVIEW_MAX_TIMESTEPS) = time_tags(1:PARAVIEW_MAX_TIMESTEPS)
-!  ...move time_tags pointer to the new array
-!     and deallocate the old array
-      call move_alloc(temp, time_tags)
-      PARAVIEW_MAX_TIMESTEPS = max_new
+!..Rewriting PVD file requires history of all time values
+   if (VIS_VTU) then
+      if (.not. allocated(time_tags)) then
+         allocate(time_tags(PARAVIEW_MAX_TIMESTEPS))
+      endif
+!  ...check if time_tags array size needs to be increased
+      if (Id .ge. PARAVIEW_MAX_TIMESTEPS) then
+!     ...determine size of new time_tags array
+         max_new = 2*PARAVIEW_MAX_TIMESTEPS
+!     ...allocate new time_tags array
+         allocate(temp(max_new))
+!     ...copy data from old time_tags array into the new one
+         temp(1:PARAVIEW_MAX_TIMESTEPS) = time_tags(1:PARAVIEW_MAX_TIMESTEPS)
+!     ...move time_tags pointer to the new array
+!        and deallocate the old array
+         call move_alloc(temp, time_tags)
+         PARAVIEW_MAX_TIMESTEPS = max_new
+      endif
+      time_tags(Id+1) = Time
    endif
-!
-   time_tags(Id+1) = Time
 !
    call paraview_data_init
 !
