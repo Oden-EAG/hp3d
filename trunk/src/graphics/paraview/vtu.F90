@@ -1,12 +1,12 @@
 !----------------------------------------------------------------------------------------
-!> @brief writes the header of the VTU file and also appends the coordinates,
-!!        connectivity and element type data in VTU file.
+!> @brief writes the header of the VTU file and appends the geometry mesh data
+!!        (coordinates, connectivity and element type) in VTU file.
 !!
 !> @param[in] IcE - total number of elements for visualization
 !!
 !> @date Sep 2023
 !----------------------------------------------------------------------------------------
-subroutine write_VTU_headers(IcE)
+subroutine write_VTU_geom(IcE)
 !
    use data_structure3D
    use upscale
@@ -186,8 +186,9 @@ subroutine write_VTU_headers(IcE)
                   write(str3, '(i2.2)') icomp
                   write(str4, '(i2.2)') iload
                   write(PARAVIEW_IO) '        '//'<DataArray type="Float'//trim(str2)//'"'//    &
-                     ' Name="'//PHYSA(iphys)//'_comp_'//trim(str3)//                             &
+                     ' Name="'//PHYSA(iphys)//'_comp_'//trim(str3)//                            &
                                              '_load_'//trim(str4)//'_'//suffix//'"'//           &
+                     ' NumberOfComponents="1"'//                                                &
                      ' format="appended"'//                                                     &
                      ' offset="'//trim(str1)//'">'//char(10)
                   write(PARAVIEW_IO) '        '//'</DataArray>'//char(10)
@@ -200,7 +201,7 @@ subroutine write_VTU_headers(IcE)
                   write(str3, '(i2.2)') icomp
                   write(str4, '(i2.2)') iload
                   write(PARAVIEW_IO) '        '// '<DataArray type="Float'//trim(str2)//'"'//   &
-                     ' Name="'//PHYSA(iphys)//'_comp_'//trim(str3)//                             &
+                     ' Name="'//PHYSA(iphys)//'_comp_'//trim(str3)//                            &
                                              '_load_'//trim(str4)//'_'//suffix//'"'//           &
                      ' NumberOfComponents="3"'//                                                &
                      ' format="appended"'//                                                     &
@@ -215,7 +216,7 @@ subroutine write_VTU_headers(IcE)
                   write(str3, '(i2.2)') icomp
                   write(str4, '(i2.2)') iload
                   write(PARAVIEW_IO) '        '//'<DataArray type="Float'//trim(str2)//'"'//    &
-                     ' Name="'//PHYSA(iphys)//'_comp_'//trim(str3)//                             &
+                     ' Name="'//PHYSA(iphys)//'_comp_'//trim(str3)//                            &
                                              '_load_'//trim(str4)//'_'//suffix//'"'//           &
                      ' NumberOfComponents="3"'//                                                &
                      ' format="appended"'//                                                     &
@@ -230,8 +231,9 @@ subroutine write_VTU_headers(IcE)
                   write(str3, '(i2.2)') icomp
                   write(str4, '(i2.2)') iload
                   write(PARAVIEW_IO) '        '//'<DataArray type="Float'//trim(str2)//'"'//    &
-                     ' Name="'//PHYSA(iphys)//'_comp_'//trim(str3)//                             &
+                     ' Name="'//PHYSA(iphys)//'_comp_'//trim(str3)//                            &
                                              '_load_'//trim(str4)//'_'//suffix//'"'//           &
+                     ' NumberOfComponents="1"'//                                                &
                      ' format="appended"'//                                                     &
                      ' offset="'//trim(str1)//'">'//char(10)
                   write(PARAVIEW_IO) '        '//'</DataArray>'//char(10)
@@ -296,4 +298,4 @@ subroutine write_VTU_headers(IcE)
    deallocate(offsets_connectivity)
    deallocate(elem_connectivity)
 !
-end subroutine write_VTU_headers
+end subroutine write_VTU_geom

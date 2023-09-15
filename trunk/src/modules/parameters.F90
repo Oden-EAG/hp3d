@@ -118,9 +118,6 @@ module parameters
   !
   !----------------------------------------------------------------------
   !
-  !  ...number of maximum timesteps
-  ! integer, save :: MAXTIMESTEP
-  !
   !  ...number of copies of variables stored
   integer, save :: NRCOMS
   !

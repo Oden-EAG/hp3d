@@ -13,7 +13,6 @@ subroutine paraview_driver
 !
    implicit none
 !
-   real(8) :: time
    integer :: idx,iattr,iload,icomp,jcomp
 !
    integer, save :: id = -1
@@ -24,17 +23,11 @@ subroutine paraview_driver
 !  initialize visualization files and auxiliary arrays
    call paraview_initialize
 !
-!.."time" value is only written to file if "time" is non-negative
-!  (currently, only supported with XDMF output)
-   time=-1.d0
-!
 !..integer id to append to Fname
    id=id+1
 !
-   if(PARAVIEW_TIME .ne. -1.d0) time = PARAVIEW_TIME
-!
    if (RANK .eq. ROOT) then
-      call paraview_begin(id,time) ! [OPENS THE XMF FILE, WRITES HEADER]
+      call paraview_begin(id,PARAVIEW_TIME) ! [OPENS THE XMF FILE, WRITES HEADER]
    endif
 !
 !  -- GEOMETRY --

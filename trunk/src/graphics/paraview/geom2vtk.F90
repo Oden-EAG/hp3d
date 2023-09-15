@@ -268,12 +268,14 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
       IcN = icn_subd
    endif
 !
-!..Step 5 : Write to file with HDF5
+!..Step 5 : Write to file
 !
    if (RANK .eq. ROOT) then
       if (VIS_VTU) then
-         call write_VTU_headers(IcE)
+!     ...with standard I/O
+         call write_VTU_geom(IcE)
       else
+!     ...with HDF5
          call geometry_write(Sname,len(Sname),Sfile,len(Sfile))
       endif
    endif
