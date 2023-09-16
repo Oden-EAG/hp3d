@@ -41,10 +41,11 @@ args+=" -isol ${isol} -imax ${imax} -nthreads ${nthreads}"
 
 mpirun -np ${nproc} ./pois ${args}
 
-# to run fichera corner
+# To run Fichera corner:
 #   set NEXACT = 0 in control
 #   set geomtype = 1 in set_initial_mesh.F90
-#   set csn = 2 in ficheracornerdirichlet.F90 (always double check this as one may forget)
-#   set Fval = 0 in getF.F90 (always double check this as may forget)
-#   if u want to run exact solution with fichera corner then comment Nexact if statement in exact error to compute exact solution
-#   remember to switch back when running dirchlet boundary condition
+#   set csn = 2 in ficheracornerdirichlet.F90
+#   set Fval = 0 in getF.F90
+#   to run exact solution with fichera corner, comment out
+#     NEXACT if statement in exact_error to compute exact solution
+#     remember to switch back when computing with Dirchlet BC

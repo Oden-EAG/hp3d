@@ -69,3 +69,4 @@ test_mpi
 *.vtk
 *.xmf
 *.vtu
+*.pvd
