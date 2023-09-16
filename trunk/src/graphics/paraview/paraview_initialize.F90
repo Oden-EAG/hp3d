@@ -139,8 +139,7 @@ subroutine paraview_begin(Id,Time)
            status = 'replace', form = 'unformatted', access = 'stream')
 !
       write(PVD_IO) '<VTKFile type="Collection" version="0.1" '//             &
-                             'byte_order="LittleEndian" '//                   &
-                             '>'//char(10)
+                             'byte_order="LittleEndian">'//char(10)
       write(PVD_IO) '  <Collection>'//char(10)
 !
 !  ...for every time step, PVD file is written from scratch
