@@ -10,9 +10,9 @@ program test_parameters
 !
    NPASS = 1
 !
-   call set_parameters(1,2,3,4,5,6)
+   call set_parameters(2,1,3,4,5,6)
 !
-   nsum = NRCOMS + MAXNRHS + &
+   nsum = NRCOMS + NRRHS + &
           MAXEQNH + MAXEQNE + MAXEQNV + MAXEQNQ
 !
    if (nsum .ne. 21) NPASS = 0

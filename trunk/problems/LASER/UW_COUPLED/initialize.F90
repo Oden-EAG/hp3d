@@ -65,19 +65,16 @@ subroutine initialize
 !
 !     set HP3D parameters
 !=======================================================================
-!  NRCOMS  - number of copies of the Data Structure (DS), namely the
-!            number of right-hand sides (rhs)
-!  MAXEQNH - maximum number of equations posed in H1 [ Example :
-!            acoustic & elasticity. (3 + 1) * number of rhs ]
+!  NRCOMS  - number of copies of the defined physics variables
+!  MAXEQNH - maximum number of equations posed in H1
 !  MAXEQHE - maximum number of equations posed in H(curl)
 !  MAXEQHV - maximum number of equations posed in H(div)
 !  MAXEQHQ - maximum number of equations posed in L2
-!  MAXNRHS - maximum number of rhs
+!  MAXNRHS - maximum number of rhs (CURRENTLY UNUSED PARAMETER)
 !
-!  Constraints on parameters to avoid catastrophe :
+!  Constraints on parameters:
 !
 !  MAX...  >= 1
-!  MAXNRHS >= NRCOMS
 !  MAXEQNH >= NRCOMS * number of equations posed in H1
 !  MAXEQNE >= NRCOMS * number of equations posed in H(curl)
 !  MAXEQNV >= NRCOMS * number of equations posed in H(div)
