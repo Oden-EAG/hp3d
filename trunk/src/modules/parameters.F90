@@ -42,13 +42,13 @@ module parameters
 !
 !----------------------------------------------------------------------
 !  === ELEMENT ====
-!  ...max number of local dof for a 2D quad element
+!..max number of local dof for a 2D quad element
    integer, parameter :: MAXquadH = (MAXP+1)**2
    integer, parameter :: MAXquadE = 2*MAXP*(MAXP+1)
    integer, parameter :: MAXquadV = MAXquadE
    integer, parameter :: MAXquadQ = MAXP**2
 !
-!  ...max number of local dof for a 2D triangular element
+!..max number of local dof for a 2D triangular element
    integer, parameter :: MAXtriaH = (MAXP+1)*(MAXP+2)/2
    integer, parameter :: MAXtriaE = MAXP*(MAXP+2)
    integer, parameter :: MAXtriaV = MAXtriaE
@@ -82,37 +82,37 @@ module parameters
 !
 !----------------------------------------------------------------------
 !  ==== NODE ===
-!  ...maximum number of dof for 'mdlt' (tria middle node)
+!..maximum number of dof for 'mdlt' (tria middle node)
    integer, parameter :: MAXmdltH=(MAXP-2)*(MAXP-1)/2
    integer, parameter :: MAXmdltE=(MAXP-1)*MAXP
    integer, parameter :: MAXmdltV=MAXmdltE
    integer, parameter :: MAXmdltQ=MAXP*(MAXP+1)/2
 !
-!  ...maximum number of dof for 'mdlq' (quad middle node)
+!..maximum number of dof for 'mdlq' (quad middle node)
    integer, parameter :: MAXmdlqH=(MAXP-1)**2
    integer, parameter :: MAXmdlqE=2*MAXP*(MAXP-1)
    integer, parameter :: MAXmdlqV=MAXmdlqE
    integer, parameter :: MAXmdlqQ=MAXP**2
 !
-!  ...maximum number of dof for 'mdlb' (bric middle node)
+!..maximum number of dof for 'mdlb' (bric middle node)
    integer, parameter :: MAXmdlbH=(MAXP-1)**3
    integer, parameter :: MAXmdlbE=3*MAXP*(MAXP-1)**2
    integer, parameter :: MAXmdlbV=3*MAXP**2*(MAXP-1)
    integer, parameter :: MAXmdlbQ=MAXbrickQ
 !
-!  ...maximum number of dof for 'mdln' (tetr middle node)
+!..maximum number of dof for 'mdln' (tetr middle node)
    integer, parameter :: MAXmdlnH=(MAXP-3)*(MAXP-2)*(MAXP-1)/6
    integer, parameter :: MAXmdlnE=(MAXP-2)*(MAXP-1)*MAXP/2
    integer, parameter :: MAXmdlnV=(MAXP-1)*MAXP*(MAXP+1)/2
    integer, parameter :: MAXmdlnQ=MAXtetraQ
 !
-!  ...maximum number of dof for 'mdlp' (pris middle node)
+!..maximum number of dof for 'mdlp' (pris middle node)
    integer, parameter :: MAXmdlpH=MAXmdltH*(MAXP-1)
    integer, parameter :: MAXmdlpE=MAXmdltE*(MAXP-1)+MAXmdltH*MAXP
    integer, parameter :: MAXmdlpV=MAXmdltV*MAXP+MAXmdltQ*(MAXP-1)
    integer, parameter :: MAXmdlpQ=MAXprismQ
 !
-!  ...maximum number of dof for 'mdld' (pyra middle node)
+!..maximum number of dof for 'mdld' (pyra middle node)
    integer, parameter :: MAXmdldH=(MAXP-1)**3
    integer, parameter :: MAXmdldE=3*(MAXP-1)**2*MAXP
    integer, parameter :: MAXmdldV=3*(MAXP-1)*MAXP**2
@@ -120,28 +120,28 @@ module parameters
 !
 !----------------------------------------------------------------------
 !
-!  ...number of copies of variables stored
+!..number of copies of variables stored
    integer, save :: NRCOMS
 !
-!  ...number of right-hand sides (load vectors)
+!..number of right-hand sides (load vectors)
    integer, save :: NRRHS ! currently, only NRRHS=1 is supported
 !
-!  ...maximum number of solution H1 components for all possible cases
+!..maximum number of solution H1 components for all possible cases
    integer, save :: MAXEQNH
 !
-!  ...maximum number of solution components discretized
-!     with H(curl)-conforming shape functions
+!..maximum number of solution components discretized
+!  with H(curl)-conforming shape functions
    integer, save :: MAXEQNE
 !
-!  ...maximum number of solution components discretized
-!     with H(div)-conforming shape functions
+!..maximum number of solution components discretized
+!  with H(div)-conforming shape functions
    integer, save :: MAXEQNV
 !
-!  ...maximum number of solution components discretized
-!     with L^2-conforming shape functions
+!..maximum number of solution components discretized
+!  with L^2-conforming shape functions
    integer, save :: MAXEQNQ
 !
-!
+!..auxiliary parameter
    logical, private, save :: IS_SET_PARAMETERS = .false.
 !
 !----------------------------------------------------------------------
@@ -174,13 +174,21 @@ contains
                              LMaxEqnV, LMaxEqnQ
 !
       if (IS_SET_PARAMETERS) then
-         write(*,*) 'set_parameters: parameters may only be set once. stop.'
+         write(*,1000) 'Parameters may only be set once.'
          stop
       endif
       if (LNrRhs .ne. 1) then
-         write(*,*) 'set_parameters: currently, only NRRHS=1 is supported. stop.'
+         write(*,1000) 'Currently, only NRRHS=1 is supported.'
          stop
       endif
+!
+      if (LNrComs.lt.1) then
+         write(*,2000) 'Invalid parameter: LNrComs',LNrComs
+         stop
+      endif
+!
+ 1000 format("set_parameters: ",A," stop.")
+ 2000 format("set_parameters: ",A," = ",I9,"; stop.")
 !
       NRCOMS  = LNrComs
       NRRHS   = LNrRhs

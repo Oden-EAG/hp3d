@@ -8,7 +8,7 @@ subroutine dof_in(Nod,ZvalH,ZvalE,ZvalV,ZvalQ)
   use data_structure3D
   implicit none
   !
-  ! ** Arguements
+  ! ** Arguments
   integer, intent(in) :: Nod
   VTYPE,   intent(in) :: &
        ZvalH(MAXEQNH,*), ZvalE(MAXEQNE,*), &

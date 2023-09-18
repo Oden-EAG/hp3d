@@ -32,7 +32,7 @@ module physics
   !  ...location of the first component for the attribute
   integer, save, allocatable :: ADRES(:)
   !
-  !  ...total number of H1,H(curl),H(div) and L2 variables
+  !  ...total number of H1,H(curl),H(div) and L2 components
   integer, save :: NRHVAR,NREVAR,NRVVAR,NRQVAR
   !
   !  ...number of entries in index
