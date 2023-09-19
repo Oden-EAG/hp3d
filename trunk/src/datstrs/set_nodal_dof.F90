@@ -10,7 +10,7 @@
 subroutine set_nodal_dof
 !
       use data_structure3D , only : NODES,NRNODS,Is_inactive,find_ndof
-      use parameters       , only : ZERO,ZONE
+      use parameters       , only : N_COMS,ZERO,ZONE
       use node_types
 !
       implicit none
@@ -66,13 +66,13 @@ subroutine set_nodal_dof
 !         select space
           select case(ispace)
 !         H1
-          case(1) ; NODES(inod)%dof%zdofH(:,idof)=ZONE
+          case(1) ; NODES(inod)%dof%zdofH(:,idof,N_COMS)=ZONE
 !         H(curl)
-          case(2) ; NODES(inod)%dof%zdofE(:,idof)=ZONE
+          case(2) ; NODES(inod)%dof%zdofE(:,idof,N_COMS)=ZONE
 !         H(div)
-          case(3) ; NODES(inod)%dof%zdofV(:,idof)=ZONE
+          case(3) ; NODES(inod)%dof%zdofV(:,idof,N_COMS)=ZONE
 !         L2
-          case(4) ; NODES(inod)%dof%zdofQ(:,idof)=ZONE
+          case(4) ; NODES(inod)%dof%zdofQ(:,idof,N_COMS)=ZONE
           endselect
         endif
 !

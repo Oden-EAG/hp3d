@@ -13,9 +13,6 @@ module parameters
    integer, parameter :: NSTD_OUT = 6
    integer, parameter :: NSTD_ERR = 0
 !
-!..maximum number of physics attributes
-   integer, parameter :: MAXPHYA=6
-!
 !..maximum order of approximation: 1,...,9
    integer, parameter :: MAXP=6
 !
@@ -120,25 +117,35 @@ module parameters
 !
 !----------------------------------------------------------------------
 !
-!..number of copies of variables stored
+!..number of solution component sets (COMS) stored
+!  NRCOMS = 1 by default (only one copy of the solution DOFs)
    integer, save :: NRCOMS
 !
+!..solution component set being assembled and solved for
+!  currently, only N_COMS=1 is supported
+   integer, save :: N_COMS
+!
 !..number of right-hand sides (load vectors)
-   integer, save :: NRRHS ! currently, only NRRHS=1 is supported
+!  currently, only NRRHS=1 is supported
+   integer, save :: NRRHS
 !
 !..maximum number of solution H1 components for all possible cases
+!  MAXEQNH := NRHVAR * NRRHS
    integer, save :: MAXEQNH
 !
 !..maximum number of solution components discretized
 !  with H(curl)-conforming shape functions
+!  MAXEQNE := NREVAR * NRRHS
    integer, save :: MAXEQNE
 !
 !..maximum number of solution components discretized
 !  with H(div)-conforming shape functions
+!  MAXEQNV := NRVVAR * NRRHS
    integer, save :: MAXEQNV
 !
 !..maximum number of solution components discretized
 !  with L^2-conforming shape functions
+!  MAXEQNQ := NRQVAR * NRRHS
    integer, save :: MAXEQNQ
 !
 !..auxiliary parameter
@@ -165,13 +172,9 @@ contains
 !----------------------------------------------------------------------
 !> @brief   Set user-defined parameters
 !> @date    Sep 2023
-   subroutine set_parameters(LNrComs , LNrRhs,   &
-                             LMaxEqnH, LMaxEqnE, &
-                             LMaxeqnV, LMaxEqnQ)
+   subroutine set_parameters(LNrComs,LNrRhs)
 !
-      integer, intent(in) :: LNrComs , LNrRhs,   &
-                             LMaxEqnH, LMaxEqnE, &
-                             LMaxEqnV, LMaxEqnQ
+      integer, intent(in) :: LNrComs,LNrRhs
 !
       if (IS_SET_PARAMETERS) then
          write(*,1000) 'Parameters may only be set once.'
@@ -181,21 +184,19 @@ contains
          write(*,1000) 'Currently, only NRRHS=1 is supported.'
          stop
       endif
-!
-      if (LNrComs.lt.1) then
+      if (LNrComs .lt. 1) then
          write(*,2000) 'Invalid parameter: LNrComs',LNrComs
          stop
       endif
-!
  1000 format("set_parameters: ",A," stop.")
  2000 format("set_parameters: ",A," = ",I9,"; stop.")
 !
-      NRCOMS  = LNrComs
-      NRRHS   = LNrRhs
-      MAXEQNH = LMaxEqnH
-      MAXEQNE = LMaxEqnE
-      MAXEQNV = LMaxEqnV
-      MAXEQNQ = LMaxEqnQ
+!  ...set number of solution copies and number of right-hand sides
+      NRCOMS = LNrComs
+      NRRHS  = LNrRhs
+!
+!  ...by default, the first solution component set is assembled and solved for
+      N_COMS = 1
 !
       IS_SET_PARAMETERS = .true.
 !

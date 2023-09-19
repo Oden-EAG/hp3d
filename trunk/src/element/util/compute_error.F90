@@ -1,14 +1,12 @@
 !---------------------------------------------------------------------------------------
-!> Purpose : routine computes error for a physical attribute, in the  appropriate energy
-!            space.
-!
-!> param[in] Flag - vector of length NR_PHYSA indicating for which
-!                   attribute the error should be computed. The error
-!                   is accumulated over components and rhs's.
-!
-!> param[in] Itag - tag to identify problem being tested
-!
-!> rev@Sep 14
+!> @brief     Compute error for a physical attribute, in the appropriate energy space.
+!!
+!> @param[in] Flag - vector of length NR_PHYSA indicating for which attribute the error
+!                    is computed. The error is accumulated over components and rhs's.
+!!
+!> @param[in] Itag - tag to identify problem being tested
+!!
+!> @date      Sep 2023
 !---------------------------------------------------------------------------------------
 !  REMARK : miracles do not happen! Routine "exact" providing the exact
 !           solution, should use the following ordering:
@@ -34,8 +32,9 @@ subroutine compute_error(Flag,Itag)
       use physics
 !
       implicit none
-      integer, dimension(NR_PHYSA),intent(in) :: Flag
-      integer,                     intent(in) :: Itag
+!
+      integer, intent(in) :: Flag(NR_PHYSA)
+      integer, intent(in) :: Itag
 !
       real(8) :: errorH,errorE,errorV,errorQ,errorHEVQ,derrorH,derrorE,derrorV,derrorQ
       real(8) :: rnormH,rnormE,rnormV,rnormQ,rnormHEVQ,drnormH,drnormE,drnormV,drnormQ
@@ -362,7 +361,7 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, &
             weight=wa*rjac
 !
 !           loop over rhs's
-            do iload=1,NRCOMS
+            do iload=1,NRRHS
 !
 !             loop over components of physical attribute
               do icomp=1,NR_COMP(iattr)
@@ -427,7 +426,7 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, &
             weight=wa*rjac
 !
 !           loop over rhs's
-            do iload=1,NRCOMS
+            do iload=1,NRRHS
 !
 !             loop over components of the physical attribute
               do icomp=1,NR_COMP(iattr)
@@ -490,7 +489,7 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, &
             weight=wa*rjac
 !
 !           loop over rhs's
-            do iload=1,NRCOMS
+            do iload=1,NRRHS
 !
 !             loop over components of the physical attribute
               do icomp=1,NR_COMP(iattr)
@@ -547,7 +546,7 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, &
             weight=wa*rjac
 !
 !           loop over rhs's
-            do iload=1,NRCOMS
+            do iload=1,NRRHS
 !
 !             loop over components of the physical attribute
               do icomp=1,NR_COMP(iattr)

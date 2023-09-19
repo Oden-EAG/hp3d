@@ -53,7 +53,7 @@ subroutine par_nested(mtype)
    use control,    only: ISTC_FLAG
    use stc,        only: HERM_STC,CLOC,stc_alloc,stc_dealloc,  &
                          stc_get_nrdof,stc_bwd
-   use parameters, only: ZONE
+   use parameters, only: ZONE,NRRHS
    use par_mumps , only: mumps_par,mumps_bub,                  &
                          mumps_start_par,mumps_destroy_par,    &
                          mumps_start_subd,mumps_destroy_subd
@@ -142,7 +142,8 @@ subroutine par_nested(mtype)
    endif
 !
 !..TODO multiple right-hand sides
-   NR_RHS = 1
+   NR_RHS = NRRHS
+!
    call mumps_start_par
    call mumps_start_subd
 !

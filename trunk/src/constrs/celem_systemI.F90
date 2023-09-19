@@ -320,7 +320,7 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
                   if (Idec.eq.2) then
                      IDBC(l)=1
                      do iload=1,NR_RHS
-                        ZDOFD(l,iload) = NODES(nod)%dof%zdofH((iload-1)*nvarHt+ivar,j)
+                        ZDOFD(l,iload) = NODES(nod)%dof%zdofH((iload-1)*nvarHt+ivar,j,N_COMS)
                      enddo
                   endif
 !
@@ -388,7 +388,7 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
                   if (Idec.eq.2) then
                      IDBC(l)=1
                      do iload=1,NR_RHS
-                        ZDOFD(l,iload) = NODES(nod)%dof%zdofE((iload-1)*nvarEt+ivar,j)
+                        ZDOFD(l,iload) = NODES(nod)%dof%zdofE((iload-1)*nvarEt+ivar,j,N_COMS)
                      enddo
                   endif
 !
@@ -456,7 +456,7 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
                   if (Idec.eq.2) then
                      IDBC(l)=1
                      do iload=1,NR_RHS
-                        ZDOFD(l,iload) = NODES(nod)%dof%zdofV((iload-1)*nvarVt+ivar,j)
+                        ZDOFD(l,iload) = NODES(nod)%dof%zdofV((iload-1)*nvarVt+ivar,j,N_COMS)
                      enddo
                   endif
 !

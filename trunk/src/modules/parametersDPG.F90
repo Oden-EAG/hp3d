@@ -61,9 +61,20 @@ module parametersDPG
 !
    contains
 !
-   subroutine set_parametersDPG(Nord_add_read)
-      integer, intent(in) :: Nord_add_read
-      NORD_ADD = Nord_add_read
+!> @brief   Specify p-enrichment of test space for DPG formulation
+!> @date    Sep 2023
+   subroutine set_parametersDPG(NordAdd)
+!
+      integer, intent(in) :: NordAdd
+!
+      if (NordAdd < 0) then
+         write(*,1000) 'Invalid parameter: NordAdd',NordAdd
+         stop
+      endif
+ 1000 format("set_parametersDPG: ",A," = ",I9,"; stop.")
+!
+      NORD_ADD = NordAdd
+!
    end subroutine set_parametersDPG
 !
 end module parametersDPG

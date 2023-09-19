@@ -7,7 +7,7 @@
 !
 !---------------------------------------------------------------------
 !
-!   latest revision    - Feb 2023
+!   latest revision    - Sep 2023
 !
 !   purpose            - routine modifies the order of approximation
 !                        for a node
@@ -46,7 +46,8 @@
       VTYPE  , allocatable :: zdofV(:,:)
       VTYPE  , allocatable :: zdofQ(:,:)
 !
-!  ...set whether current dofxs should be copied to modified node
+!  ...set whether current dofs should be copied to modified node
+!     copies only the currently active solution component set N_COMS
       logical, parameter :: COPY_DOFS = .false.
 !
       logical :: act_dof
@@ -83,10 +84,10 @@
       call ndof_nod(ntype,nordo, ndofH,ndofE,ndofV,ndofQ)
 !
 !  ...determine the number of components supported on this node
-      nvarH = NREQNH(icase)*NRCOMS
-      nvarE = NREQNE(icase)*NRCOMS
-      nvarV = NREQNV(icase)*NRCOMS
-      nvarQ = NREQNQ(icase)*NRCOMS
+      nvarH = NREQNH(icase)*NRRHS
+      nvarE = NREQNE(icase)*NRRHS
+      nvarV = NREQNV(icase)*NRRHS
+      nvarQ = NREQNQ(icase)*NRRHS
 !
 !  ...save current gdofs in local array and update number of gdofs
       if (ndofH.gt.0) then
@@ -107,7 +108,7 @@
             if (associated(NODES(Nod)%dof%zdofH)) then
                if (COPY_DOFS) then
                   allocate(zdofH(nvarH,ndofH))
-                  zdofH(1:nvarH,1:ndofH) = NODES(Nod)%dof%zdofH(1:nvarH,1:ndofH)
+                  zdofH(1:nvarH,1:ndofH) = NODES(Nod)%dof%zdofH(1:nvarH,1:ndofH,N_COMS)
                endif
                deallocate(NODES(Nod)%dof%zdofH)
             endif
@@ -120,7 +121,7 @@
             if (associated(NODES(Nod)%dof%zdofE)) then
                if (COPY_DOFS) then
                   allocate(zdofE(nvarE,ndofE))
-                  zdofE(1:nvarE,1:ndofE) = NODES(Nod)%dof%zdofE(1:nvarE,1:ndofE)
+                  zdofE(1:nvarE,1:ndofE) = NODES(Nod)%dof%zdofE(1:nvarE,1:ndofE,N_COMS)
                endif
                deallocate(NODES(Nod)%dof%zdofE)
             endif
@@ -133,7 +134,7 @@
             if (associated(NODES(Nod)%dof%zdofV)) then
                if (COPY_DOFS) then
                   allocate(zdofV(nvarV,ndofV))
-                  zdofV(1:nvarV,1:ndofV) = NODES(Nod)%dof%zdofV(1:nvarV,1:ndofV)
+                  zdofV(1:nvarV,1:ndofV) = NODES(Nod)%dof%zdofV(1:nvarV,1:ndofV,N_COMS)
                endif
                deallocate(NODES(Nod)%dof%zdofV)
             endif
@@ -146,7 +147,7 @@
             if (associated(NODES(Nod)%dof%zdofQ)) then
                if (COPY_DOFS) then
                   allocate(zdofQ(nvarQ,ndofQ))
-                  zdofQ(1:nvarQ,1:ndofQ) = NODES(Nod)%dof%zdofQ(1:nvarQ,1:ndofQ)
+                  zdofQ(1:nvarQ,1:ndofQ) = NODES(Nod)%dof%zdofQ(1:nvarQ,1:ndofQ,N_COMS)
                endif
                deallocate(NODES(Nod)%dof%zdofQ)
             endif
@@ -207,11 +208,11 @@
       endif
       if ((NREQNH(icase).gt.0).and.(ndofH.gt.0)) then
          if (act_dof) then
-            allocate(NODES(Nod)%dof%zdofH(nvarH,ndofH))
+            allocate(NODES(Nod)%dof%zdofH(nvarH,ndofH,NRCOMS))
             NODES(Nod)%dof%zdofH = ZERO
             if (allocated(zdofH)) then
                call copy_dofH(ntype,nordo,Nordn,ndofHo,ndofH, &
-                              nvarH,zdofH,NODES(Nod)%dof%zdofH)
+                              nvarH,zdofH,NODES(Nod)%dof%zdofH(:,:,N_COMS))
             endif
          endif
 !$omp atomic
@@ -219,11 +220,11 @@
       endif
       if ((NREQNE(icase).gt.0).and.(ndofE.gt.0)) then
          if (act_dof) then
-            allocate(NODES(Nod)%dof%zdofE(nvarE,ndofE))
+            allocate(NODES(Nod)%dof%zdofE(nvarE,ndofE,NRCOMS))
             NODES(Nod)%dof%zdofE = ZERO
             if (allocated(zdofE)) then
                call copy_dofE(ntype,nordo,Nordn,ndofEo,ndofE, &
-                              nvarE,zdofE,NODES(Nod)%dof%zdofE)
+                              nvarE,zdofE,NODES(Nod)%dof%zdofE(:,:,N_COMS))
             endif
          endif
 !$omp atomic
@@ -231,11 +232,11 @@
       endif
       if ((NREQNV(icase).gt.0).and.(ndofV.gt.0)) then
          if (act_dof) then
-            allocate(NODES(Nod)%dof%zdofV(nvarV,ndofV))
+            allocate(NODES(Nod)%dof%zdofV(nvarV,ndofV,NRCOMS))
             NODES(Nod)%dof%zdofV = ZERO
             if (allocated(zdofV)) then
                call copy_dofV(ntype,nordo,Nordn,ndofVo,ndofV, &
-                              nvarV,zdofV,NODES(Nod)%dof%zdofV)
+                              nvarV,zdofV,NODES(Nod)%dof%zdofV(:,:,N_COMS))
             endif
          endif
 !$omp atomic
@@ -243,11 +244,11 @@
       endif
       if ((NREQNQ(icase).gt.0).and.(ndofQ.gt.0)) then
          if (act_dof) then
-            allocate( NODES(Nod)%dof%zdofQ(nvarQ,ndofQ))
+            allocate( NODES(Nod)%dof%zdofQ(nvarQ,ndofQ,NRCOMS))
             NODES(Nod)%dof%zdofQ = ZERO
             if (allocated(zdofQ)) then
                call copy_dofQ(ntype,nordo,Nordn,ndofQo,ndofQ, &
-                              nvarQ,zdofQ,NODES(Nod)%dof%zdofQ)
+                              nvarQ,zdofQ,NODES(Nod)%dof%zdofQ(:,:,N_COMS))
             endif
          endif
 !$omp atomic

@@ -18,16 +18,16 @@ subroutine exec_job_nl
 !
    implicit none
 !
-   integer :: flag(6)
-   logical :: iPvAttr(6)
+   integer :: flag(7)
+   logical :: iPvAttr(7)
    integer :: physNick,nstop
    logical :: ires
 !
 !..variables for nonlinear loop
-   integer :: No,No1,No2
+   integer :: currAttr,prevAttr
    real(8) :: L2NormDiff,stopEpsilon
    real(8) :: L2NormDiffIter(100),SignalRes(100),PumpRes(100)
-   real(8) :: FieldNormH,FieldNormE,FieldNormV,FieldNormQ
+   real(8) :: fieldNormQ
 !
    integer :: i,j,ierr,numPts,fld
    real(8) :: start_time,end_time,aux_time
@@ -164,15 +164,16 @@ subroutine exec_job_nl
 !..set stopping criterion for nonlinear iteration
    stopEpsilon = 1.0d-4
    L2NormDiff = 1.d0
-   FieldNormQ = 1.d0
+   fieldNormQ = 1.d0
    L2NormDiffIter = 0.d0
 !
    SignalRes = 0.d0
    PumpRes = 0.d0
    i = 0
 !
-!..set components (1: signal, 2: pump)
-   No1 = 1; No2 = 2
+!..set attributes for norm of signal difference
+   currAttr = 5 ! signal field, current solution
+   prevAttr = 7 ! signal field, previous iterate (auxiliary solution)
 !
    if (RANK.eq.ROOT) write(*,200) '6. Beginning nonlinear iterations...'
  4200 format(/,A)
@@ -184,10 +185,10 @@ subroutine exec_job_nl
 !
 !  ...check stopping criterion
       if (i .eq. 0) goto 405
-      L2NormDiffIter(i) = L2NormDiff/FieldNormQ
-      if((L2NormDiff/FieldNormQ).lt.stopEpsilon) then
+      L2NormDiffIter(i) = L2NormDiff/fieldNormQ
+      if((L2NormDiff/fieldNormQ).lt.stopEpsilon) then
          if (RANK.eq.ROOT) then
-            write(*,4230) '   ', L2NormDiff/FieldNormQ, ' < ', stopEpsilon
+            write(*,4230) '   ', L2NormDiff/fieldNormQ, ' < ', stopEpsilon
             write(*,*) ' Stopping criterion satisfied.'
             write(*,*) '---------------------------------------------'
             write(*,4210) ' Ending nonlinear loop after ', i, ' iterations.'
@@ -199,7 +200,7 @@ subroutine exec_job_nl
          write(*,*) '++++++++++++++++++++++++++++++++++++++++++++++++++'
          write(*,4220) ' Stopping criterion not yet satisfied. i = ', i
    4220  format(A,I3)
-         write(*,4230) '   ', L2NormDiff/FieldNormQ, ' > ', stopEpsilon
+         write(*,4230) '   ', L2NormDiff/fieldNormQ, ' > ', stopEpsilon
    4230  format(A, F11.5,A,F11.5)
          write(*,*) '++++++++++++++++++++++++++++++++++++++++++++++++++'
          write(*,4201) ' Proceed with nonlinear iterations..'
@@ -259,17 +260,17 @@ subroutine exec_job_nl
       NO_PROBLEM = 3
       call set_physAm(NO_PROBLEM, physNick,flag)
       if (i .gt. 0) then
-         call get_L2NormCOMS(flag,No1,No2, L2NormDiff)
-         call get_Norm(flag,No2, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
+         call get_L2NormDiff(currAttr,prevAttr, L2NormDiff)
+         call get_L2NormAttr(prevAttr, fieldNormQ)
       endif
       if (RANK.eq.ROOT) write(*,4240) '   L2NormDiff = ', L2NormDiff
-      if (RANK.eq.ROOT) write(*,4240) '   FieldNormQ = ', FieldNormQ
+      if (RANK.eq.ROOT) write(*,4240) '   fieldNormQ = ', fieldNormQ
   4240 format(A,F10.4)
 !
 !  ...copy current solution components of all fields into previous solution
-      if (RANK.eq.ROOT) write(*,4200) 'copy_coms...'
+      if (RANK.eq.ROOT) write(*,4200) 'copy_attr...'
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-      call copy_coms(No1,No2)
+      call copy_attr(currAttr,prevAttr)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
       if (RANK.eq.ROOT) write(*,300) end_time - start_time
       if (RANK.eq.ROOT) write(*,*)
@@ -297,7 +298,7 @@ subroutine exec_job_nl
 !
 !..display stats
    if (RANK.eq.ROOT) then
-      write(*,*) 'L2NormDiff/FieldNormQ:'
+      write(*,*) 'L2NormDiff/fieldNormQ:'
       do j=1,i
          write(*,4241) L2NormDiffIter(j)
       enddo
@@ -325,7 +326,7 @@ subroutine exec_job_nl
 !
 !..write paraview output
    if (RANK.eq.ROOT) write(*,200) '8. writing paraview output...'
-   iPvAttr = (/.false.,.false.,.false.,.false.,.true.,.false./)
+   iPvAttr = (/.false.,.false.,.false.,.false.,.true.,.false.,.false./)
    call paraview_select_attr(iPvAttr)
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    call my_paraview_driver

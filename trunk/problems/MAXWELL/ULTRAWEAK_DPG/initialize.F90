@@ -55,20 +55,12 @@ subroutine initialize
 !
 !     set HP3D parameters
 !=======================================================================
-!  NRCOMS  - number of copies of the Data Structure (DS), namely the
-!            number of right-hand sides (rhs)
-!  MAXEQNH - maximum number of equations posed in H1 [ Example :
-!            acoustic & elasticity. (3 + 1) * number of rhs ]
-!  MAXEQHE - maximum number of equations posed in H(curl)
-!  MAXEQHV - maximum number of equations posed in H(div)
-!  MAXEQHQ - maximum number of equations posed in L2
-!  MAXNRHS - maximum number of rhs
+!  NRCOMS  - number of solution copies
+!  NRRHS   - number of right-hand sides (rhs)
 !=======================================================================
 !
-!                        NRCOMS // MAXNRHS //
-   call set_parameters(      1 ,        1 ,  &
-!                       MAXEQNH // MAXEQNE // MAXEQNV // MAXEQNQ //
-                             0 ,        2,         0,         6)
+!                      NRCOMS, NRRHS
+   call set_parameters(     1,     1)
 !
 !..read geometry file
    call read_geometry(trim(FILE_GEOM))

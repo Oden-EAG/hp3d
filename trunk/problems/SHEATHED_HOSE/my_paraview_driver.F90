@@ -6,9 +6,9 @@ subroutine my_paraview_driver
 !
    use upscale
    use physics
-   use data_structure3D, only: NRCOMS
-   use environment,      only: QUIET_MODE
-   use mpi_param,        only: RANK,ROOT
+   use environment, only: QUIET_MODE
+   use mpi_param,   only: RANK,ROOT
+   use parameters,  only: NRRHS
    use paraview
 !
    implicit none
@@ -51,8 +51,8 @@ subroutine my_paraview_driver
       write(*,*)'ATTRIBUTE | DISC. SPACE | COMP. | LOAD'
    endif
 !
-!..loop over solution copies
-   do iload=1,NRCOMS
+!..loop over multiple loads
+   do iload=1,NRRHS
 !
 !  ...skip selected physics variables
       if (.not. PARAVIEW_LOAD(iload)) cycle

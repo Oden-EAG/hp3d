@@ -19,10 +19,10 @@ subroutine exec_case(idec)
    integer :: nstop
    logical :: solved
 !
-   integer :: flag(6)
+   integer :: flag(7)
    integer :: physNick
 !
-   logical :: iPvAttr(6)
+   logical :: iPvAttr(7)
    character(len=2) :: vis_level
 !
    integer :: fld,numPts,i,mdle,kref,refs
@@ -49,7 +49,7 @@ subroutine exec_case(idec)
 !        - 6 L2 (signal, E and H field)
 !        - 6 L2 (pump,   E and H Field)
 !
-         iPvAttr = (/.true.,.true.,.true.,.true.,.true.,.true./)
+         iPvAttr = (/.true.,.true.,.true.,.true.,.true.,.true.,.false./)
          if (RANK .eq. ROOT) then
             write(*,300) ' paraview output: select fields (T/F)', &
                          '  - 1 H1 (heat)'                      , &
@@ -63,7 +63,7 @@ subroutine exec_case(idec)
         300 format(A,/,A,/,A,/,A,/,A,/,A,/,A)
          endif
 !
-         count = 6; src = ROOT
+         count = 7; src = ROOT
          call MPI_BCAST (iPvAttr,count,MPI_LOGICAL,src,MPI_COMM_WORLD,ierr)
 !
          if (RANK .eq. ROOT) then
@@ -81,7 +81,7 @@ subroutine exec_case(idec)
          count = len(VLEVEL); src = ROOT
          call MPI_BCAST (VLEVEL,count,MPI_CHARACTER,src,MPI_COMM_WORLD,ierr)
 !
-!         iPvAttr = (/.false.,.false.,.false.,.false.,.true.,.false./)
+!         iPvAttr = (/.false.,.false.,.false.,.false.,.true.,.false.,.false./)
          call paraview_select_attr(iPvAttr)
          call my_paraview_driver
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)

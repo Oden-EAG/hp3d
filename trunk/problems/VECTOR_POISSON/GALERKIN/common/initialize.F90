@@ -32,16 +32,11 @@ subroutine initialize
    integer, parameter :: MAXPY_PROB   = 1    ! pyramids
 !--------------------------------------------------------------------------
 !  E Q U A T I O N    S E T T I N G
-   integer, parameter :: NRCOMS_PROB  = 1     ! number of component
-   integer :: MAXNRHS_PROB                    ! MAX nr rhs
-   integer :: MAXEQNH_PROB                    ! MAX H1 var
-   integer :: MAXEQNE_PROB                    ! MAX Hcurl var
-   integer :: MAXEQNV_PROB                    ! MAX Hdiv var
-   integer :: MAXEQNQ_PROB                    ! MAX L2 var
+   integer, parameter :: NRCOMS_PROB  = 1    ! number of solution copies
+   integer, parameter :: NRRHS_PROB   = 1    ! number of right-hand sides
 !--------------------------------------------------------------------------
    integer :: iflag,i,INTEGRATION_tmp
    character(len=1024) :: argv
-   logical :: qtmp
 !--------------------------------------------------------------------------
 !..output file open for the history of refinements (not for MPI)
 !  call open_history_file(trim(FILE_HISTORY))
@@ -63,19 +58,8 @@ subroutine initialize
 9999 format(' MAXNODS = ',i12)
    endif
 !
-!..read physics file quietly first to automatically setup equation settings
-   qtmp = QUIET_MODE; QUIET_MODE = .true.
-   call read_input(trim(FILE_PHYS))
-   QUIET_MODE = qtmp
-!
 !..setup equation settings based on physics data and common problem data
-   MAXNRHS_PROB = NR_RHS_PROB !from common_prob_data
-   MAXEQNH_PROB = max(1,NRHVAR) !from physics - after quietly reading physics
-   MAXEQNE_PROB = max(1,NREVAR) !from physics - after quietly reading physics
-   MAXEQNV_PROB = max(1,NRVVAR) !from physics - after quietly reading physics
-   MAXEQNQ_PROB = max(1,NRQVAR) !from physics - after quietly reading physics
-   call set_parameters(NRCOMS_PROB,MAXNRHS_PROB,  &
-      MAXEQNH_PROB,MAXEQNE_PROB,MAXEQNV_PROB,MAXEQNQ_PROB)
+   call set_parameters(NRCOMS_PROB,NRRHS_PROB)
 !
 !..setup geometry settings
    call set_gmp_parameters( &

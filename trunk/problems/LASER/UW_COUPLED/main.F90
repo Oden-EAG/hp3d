@@ -36,7 +36,7 @@ program main
 !..auxiliary variables
    integer :: i, ierr, req, ret, plen
 !
-   logical :: iPvLoad(2),iPvAttr(6),iPvCompReal(18),iPvCompImag(18)
+   logical :: iPvAttr(7),iPvCompReal(18),iPvCompImag(18)
 !
 !..OMP variables
 #if HP3D_USE_OPENMP
@@ -192,27 +192,25 @@ program main
 !  (2) - Hcurl for Maxwell trace for signal (2 components)
 !  (3) - Hcurl for Maxwell trace for pump   (2 components)
 !  (4) - Hdiv trace for heat (1 component)
-!  (5) - L2 field for Maxwell (signal, 6 components)
-!  (6) - L2 field for Maxwell (pump  , 6 components)
-   PHYSAi(1:6) = (/.false.,.true.,.true.,.true.,.false.,.false./)
+!  (5) - L2 field for Maxwell (signal   , 6 components)
+!  (6) - L2 field for Maxwell (pump     , 6 components)
+!  (7) - L2 field for Maxwell (auxiliary, 6 components)
+   PHYSAi(1:7) = (/.false.,.true.,.true.,.true.,.false.,.false.,.false./)
 !
 !..set homogeneous Dirichlet flags
    if (NEXACT.eq.0) then
-      PHYSAd(1:6) = (/.true.,.false.,.false.,.true.,.false.,.false./)
+      PHYSAd(1:7) = (/.true.,.false.,.false.,.true.,.false.,.false.,.false./)
    endif
 !
 !..By default, solve Maxwell for signal field
 !  (note: NO_PROBLEM and PHYSAm(:) flags are used in updating Dirichlet BCs)
 !         NO_PROBLEM: 2 - heat, 3 - signal, 4 - pump
    NO_PROBLEM = 3
-   PHYSAm(1:6) = (/.false.,.true.,.false.,.false.,.true.,.false./)
+   PHYSAm(1:7) = (/.false.,.true.,.false.,.false.,.true.,.false.,.false./)
 !
 !..Paraview export: by default,
-!     print only the first solution copy
-      iPvLoad = (/.true.,.false./)
-      call paraview_select_load(iPvLoad)
-!     print only the field variables (no traces)
-      iPvAttr = (/.true.,.false.,.false.,.false.,.true.,.true./)
+!     print only the field variables (no traces), and no auxiliary fields
+      iPvAttr = (/.true.,.false.,.false.,.false.,.true.,.true.,.false./)
       call paraview_select_attr(iPvAttr)
 !     print real parts of all components
       iPvCompReal = .true.

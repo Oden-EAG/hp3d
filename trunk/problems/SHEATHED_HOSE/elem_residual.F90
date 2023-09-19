@@ -70,7 +70,7 @@
       real*8, dimension(3,3,3,3) :: A,AA,Symm,Skew
 !
 !  ...source term (don't need Neumann term)
-      real*8, dimension(3,MAXNRHS) :: fval
+      real*8, dimension(3,NRRHS) :: fval
 !
 !  ...3D quadrature data
       real*8, dimension(3,MAXNINT3ADD) :: xiloc

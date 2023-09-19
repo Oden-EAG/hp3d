@@ -4,8 +4,8 @@
 !-------------------------------------------------------------------------------------------
    subroutine paraview_initialize()
       use control         , only: EXGEOM
-      use data_structure3D, only: NRCOMS
       use node_types      , only: TETR,PRIS,BRIC
+      use parameters      , only: NRRHS
       use physics         , only: NR_PHYSA,NRINDEX
       use upscale         , only: TETR_VIS,PRIS_VIS,HEXA_VIS,load_vis
       use paraview
@@ -31,7 +31,7 @@
       if (PARAVIEW_IS_INIT) goto 90
 !
 !  ...allocate array for selectively exporting variables
-      allocate(PARAVIEW_LOAD(NRCOMS))      ; PARAVIEW_LOAD = .true.
+      allocate(PARAVIEW_LOAD(NRRHS))       ; PARAVIEW_LOAD = .true.
       allocate(PARAVIEW_ATTR(NR_PHYSA))    ; PARAVIEW_ATTR = .true.
       allocate(PARAVIEW_COMP_REAL(NRINDEX)); PARAVIEW_COMP_REAL = .true.
       allocate(PARAVIEW_COMP_IMAG(NRINDEX)); PARAVIEW_COMP_IMAG = .true.

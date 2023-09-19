@@ -109,13 +109,14 @@ subroutine set_initial_mesh(Nelem_order)
 !
 !     set up the number of physical attributes supported by the element
       ELEMS(iel)%nrphysics=6
-      allocate(ELEMS(iel)%physics(6))
+      allocate(ELEMS(iel)%physics(7))
       ELEMS(iel)%physics(1)='tempr'
       ELEMS(iel)%physics(2)='EHtr1'
       ELEMS(iel)%physics(3)='EHtr2'
       ELEMS(iel)%physics(4)='hflux'
       ELEMS(iel)%physics(5)='EHfd1'
       ELEMS(iel)%physics(6)='EHfd2'
+      ELEMS(iel)%physics(7)='EHtmp'
 !
 !  ...initialize BC flags
 !     0 - no BC
@@ -130,8 +131,9 @@ subroutine set_initial_mesh(Nelem_order)
 !     (2) |  2-3 | Hcurl for Maxwell trace (\hat E,\hat H) (signal, 2 comps)
 !     (3) |  4-5 | Hcurl for Maxwell trace (\hat E,\hat H) (pump  , 2 comps)
 !     (4) |  6   | Hdiv trace for heat (1 component)
-!     (5) |  7-12| L2 field for Maxwell (E,H) (signal, 6 components)
-!     (6) | 13-18| L2 field for Maxwell (E,H) (pump  , 6 components)
+!     (5) |  7-12| L2 field for Maxwell (E,H) (signal   , 6 components)
+!     (6) | 13-18| L2 field for Maxwell (E,H) (pump     , 6 components)
+!     (7) | 19-24| L2 field for Maxwell (E,H) (auxiliary, 6 components)
 !
       select case(GEOM_NO)
 !     ...single cube/brick with Dirichlet

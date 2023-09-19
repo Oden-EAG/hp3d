@@ -2,21 +2,17 @@
 #include "typedefs.h"
 !
 !-------------------------------------------------------------------
-!  subroutine: get_L2NormCOMS
-!
-!  last modified : Jan 2019
-!
-!  purpose: - evaluates the L2 norm of the difference of components
-!             No1 and No2 (as specified in NRCOMS) of L2 variable
-!             [used to evaluate
-!
-!  input:   - Flag
-!           - No1,No2
-!
-!  output:  - L2NormDiff
-!
+!> @brief      evaluates the L2 norm of the difference between
+!              physics attributes Attr1 and Attr2
+!!
+!> @param[in]  Attr1: physics attribute = 1,...,NR_PHYSA
+!> @param[in]  Attr2: physics attribute = 1,...,NR_PHYSA
+!!
+!> @param[out] L2NormDiff
+!!
+!> @date       Sep 2023
 !-------------------------------------------------------------------
-subroutine get_L2NormCOMS(Flag,No1,No2, L2NormDiff)
+subroutine get_L2NormDiff(Attr1,Attr2, L2NormDiff)
 !
    use control         , only: NEXACT
    use data_structure3D
@@ -28,17 +24,13 @@ subroutine get_L2NormCOMS(Flag,No1,No2, L2NormDiff)
 !
    implicit none
 !
-   integer, intent(in)  :: Flag(NR_PHYSA)
-   integer, intent(in)  :: No1, No2
+   integer, intent(in)  :: Attr1,Attr2
    real(8), intent(out) :: L2NormDiff
 !
-   real(8)              :: currL2NormDiff
-!
-   integer, parameter :: nin = 13
-   integer, parameter :: maxvis =2000
+   real(8) :: currL2NormDiff
 !
 !..miscellanea
-   integer :: mdle,nint,iattr,nrdof_tot,ic,iel
+   integer :: mdle,nint,nrdof_tot,ic,iel
 !
 !..auxiliary
    integer :: count,ierr
@@ -47,6 +39,32 @@ subroutine get_L2NormCOMS(Flag,No1,No2, L2NormDiff)
    real(8) :: start_time,end_time
 !
 !-------------------------------------------------------------------
+!
+!..consistency check
+   if ((Attr1 < 1) .or. (Attr1 > NR_PHYSA)) then
+      write(*,1000) 'Attr1',Attr1
+      stop
+   endif
+   if ((Attr2 < 1) .or. (Attr2 > NR_PHYSA)) then
+      write(*,1000) 'Attr2',Attr2
+      stop
+   endif
+   if (D_TYPE(Attr1) .ne. DISCON) then
+      write(*,1000) 'D_TYPE(Attr1)',D_TYPE(Attr1)
+      stop
+   endif
+   if (D_TYPE(Attr2) .ne. DISCON) then
+      write(*,1000) 'D_TYPE(Attr2)',D_TYPE(Attr2)
+      stop
+   endif
+   if (NR_COMP(Attr1) .ne. NR_COMP(Attr2)) then
+      write(*,2000) 'NR_COMP(Attr1)',NR_COMP(Attr1), &
+                    'NR_COMP(Attr2)',NR_COMP(Attr2)
+      stop
+   endif
+   1000 format('get_L2NormDiff: Invalid argument: ' ,A,' = ',I5)
+   2000 format('get_L2NormDiff: Invalid arguments: ',A,' = ',I5, &
+                                                ', ',A,' = ',I5)
 !
 !..start timer
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
@@ -70,7 +88,7 @@ subroutine get_L2NormCOMS(Flag,No1,No2, L2NormDiff)
 !$OMP SCHEDULE(DYNAMIC)
    do iel=1,NRELES_SUBD
       mdle = ELEM_SUBD(iel)
-      call get_elem_L2NormCOMS(mdle,Flag,No1,No2, currL2NormDiff)
+      call get_elem_L2NormDiff(mdle,Attr1,Attr2, currL2NormDiff)
 !  ...accumulate L2NormDiff
       L2NormDiff_subd = L2NormDiff_subd + currL2NormDiff
    enddo
@@ -90,30 +108,27 @@ subroutine get_L2NormCOMS(Flag,No1,No2, L2NormDiff)
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
    if (RANK.eq.ROOT .and. .not. QUIET_MODE) then
       write(*,6010) end_time-start_time
- 6010 format('  get_L2NormCOMS : ',f12.5,'  seconds',/)
+ 6010 format('  get_L2NormDiff : ',f12.5,'  seconds',/)
    endif
 !
 !..compute sqrt of total difference
    L2NormDiff = sqrt(L2NormDiff)
 !
-end subroutine get_L2NormCOMS
+end subroutine get_L2NormDiff
 !
 !
 !-------------------------------------------------------------------
-!
-!  routine: get_elem_L2NormCOMS, TODO: VERIFY CORRECTNESS
-!
-!  purpose: to evaluate the L2 norm of the difference between components
-!           No1 and No2 with components (set using NRCOMS) of L2 variables
-!
-!  last modified: Jan 2019
-!
-!  input:   - mdle,Flag,No1,No2
-!
-!  output:  - FieldNormQ: L2 norm of difference
-!
+!> @brief      evaluates the L2 norm over Mdle of the difference
+!!             between physics attributes Attr1 and Attr2
+!!
+!> @param[in]  Mdle:       element middle node number
+!> @param[in]  Attr1:      physics attribute = 1,...,NR_PHYSA
+!> @param[in]  Attr2:      physics attribute = 1,...,NR_PHYSA
+!> @param[out] FieldNormQ: L2 norm of difference
+!!
+!> @date       Sep 2023
 !-------------------------------------------------------------------
-subroutine get_elem_L2NormCOMS(mdle,Flag,No1,No2, FieldNormQ)
+subroutine get_elem_L2NormDiff(Mdle,Attr1,Attr2, FieldNormQ)
 !
    use laserParam
    use commonParam
@@ -125,16 +140,13 @@ subroutine get_elem_L2NormCOMS(mdle,Flag,No1,No2, FieldNormQ)
 !
    implicit none
 !
-   integer, dimension(NR_PHYSA),intent(in ) :: Flag
-   integer,                     intent(in ) :: mdle,No1,No2
-   real(8),                     intent(out) :: FieldNormQ
-!
-!..node case (decimal form)
-   integer,dimension(NR_PHYSA) :: icased
+   integer, intent(in)  :: Mdle
+   integer, intent(in)  :: Attr1,Attr2
+   real(8), intent(out) :: FieldNormQ
 !
 !..element, face order, geometry dof
    integer,dimension(19)           :: norder
-   real(8) ,dimension(3,MAXbrickH) :: xnod
+   real(8),dimension(3,MAXbrickH)  :: xnod
    integer,dimension(12)           :: nedge_orient
    integer,dimension(6)            :: nface_orient
 !
@@ -163,7 +175,7 @@ subroutine get_elem_L2NormCOMS(mdle,Flag,No1,No2, FieldNormQ)
    VTYPE, dimension(  MAXEQNQ  ) ::  zsolQ
 !
 !..miscellanea
-   integer :: nint,icase,iattr,l,i,j,ibeg,iflag,iload,icomp,ndom,ivar,nflag
+   integer :: nint,icase,iflag,l,i,j,ibeg1,ibeg2,icomp,ndom,ivar,nflag
    real(8) :: weight,wa
 !
 !---------------------------------------------------------------------------------------
@@ -174,33 +186,21 @@ subroutine get_elem_L2NormCOMS(mdle,Flag,No1,No2, FieldNormQ)
    FieldNormQ = 0.d0
 !
 !..order of approx, orientations, geometry dof's, solution dof's
-   call find_order( mdle, norder)
-   call find_orient(mdle, nedge_orient,nface_orient)
-   call nodcor(     mdle, xnod)
-   call solelm(     mdle, zdofH,zdofE,zdofV,zdofQ)
+   call find_order( Mdle, norder)
+   call find_orient(Mdle, nedge_orient,nface_orient)
+   call nodcor(     Mdle, xnod)
+   call solelm(     Mdle, zdofH,zdofE,zdofV,zdofQ)
 !
 !..set up the element quadrature
    INTEGRATION=0
-   call set_3D_int_DPG(NODES(mdle)%ntype,norder,nface_orient, nint,xiloc,wxi)
+   call set_3D_int_DPG(NODES(Mdle)%ntype,norder,nface_orient, nint,xiloc,wxi)
    INTEGRATION=0
 !
-!..supported physical attributes
-   icase=NODES(mdle)%case
-   call decod(icase,2,NR_PHYSA, icased)
+!..address of the 1st component for the attribute
+   ibeg1=ADRES(Attr1)
+   ibeg2=ADRES(Attr2)
 !
-!..loop over physical attributes
-   do iattr=1,NR_PHYSA
-!
-!  ...if the error not needed, skip
-      if (Flag(iattr) == 0) cycle
-!
-!  ...if attribute is absent, skip
-      if (icased(iattr) == 0) cycle
-!
-!  ...address of the 1st component for the attribute
-      ibeg=ADRES(iattr)
-!
-      select case(D_TYPE(iattr))
+   select case(D_TYPE(Attr1))
 !
 !===================================================================================
 !  L2 ATTRIBUTE                                                                    |
@@ -214,7 +214,7 @@ subroutine get_elem_L2NormCOMS(mdle,Flag,No1,No2, FieldNormQ)
             xi(1:3)=xiloc(1:3,l) ; wa=wxi(l)
 !
 !           -- APPROXIMATE SOLUTION --
-            call soleval(mdle,xi,nedge_orient,nface_orient,norder,xnod, &
+            call soleval(Mdle,xi,nedge_orient,nface_orient,norder,xnod, &
                          zdofH,zdofE,zdofV,zdofQ,nflag,                 &
                          x,dxdxi,zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
 !
@@ -222,57 +222,283 @@ subroutine get_elem_L2NormCOMS(mdle,Flag,No1,No2, FieldNormQ)
             call geom(dxdxi, dxidx,rjac,iflag)
 #if DEBUG_MODE
             if (iflag /= 0) then
-              call find_domain(mdle, ndom)
-              write(*,*)' get_elem_L2NormCOMS: mdle,ndom,rjac = ', mdle,ndom,rjac
+               call find_domain(Mdle, ndom)
+               write(*,*)' get_elem_L2NormDiff: Mdle,ndom,rjac = ', Mdle,ndom,rjac
             endif
 #endif
-
+!
 !        ...total weight
             weight=wa*rjac
 !
 !        ...loop over components of the physical attribute
-            do icomp=1,NR_COMP(iattr)
+            do icomp=1,NR_COMP(Attr1)
 !
-               i=(No1-1)*NRQVAR+ibeg+icomp
-               j=(No2-1)*NRQVAR+ibeg+icomp
+               i=ibeg1+icomp
+               j=ibeg2+icomp
 !
 !           ...accumulate L2 norm
                FieldNormQ = FieldNormQ+(abs(zsolQ(i)-zsolQ(j))**2)*weight
 !
             enddo
-
+!
 !     ...end loop over integration points
          enddo
 !
          case default
-         write(*,*)' get_elem_L2NormCOMS: PHYSICAL ATTRIBUTE MUST BE L2!. stop.'
-         stop
+            write(*,*)' get_elem_L2NormDiff: PHYSICAL ATTRIBUTE MUST BE L2. stop.'
+            stop
 !
-      end select
+   end select
 !
-!..loop over physical attributes
+end subroutine get_elem_L2NormDiff
+!
+!
+!-------------------------------------------------------------------
+!> @brief      evaluates the L2 norm of physics attribute
+!!
+!> @param[in]  Attr: physics attribute = 1,...,NR_PHYSA
+!> @param[out] L2Norm
+!!
+!> @date       Sep 2023
+!-------------------------------------------------------------------
+subroutine get_L2NormAttr(Attr, L2Norm)
+!
+   use control         , only: NEXACT
+   use data_structure3D
+   use environment     , only: QUIET_MODE,L2PROJ,FILE_ERR
+   use physics
+   use par_mesh        , only: DISTRIBUTED,HOST_MESH
+   use mpi_param       , only: ROOT,RANK
+   use MPI             , only: MPI_SUM,MPI_COMM_WORLD,MPI_REAL8,MPI_Wtime
+!
+   implicit none
+!
+   integer, intent(in)  :: Attr
+   real(8), intent(out) :: L2Norm
+!
+   real(8) :: currL2Norm
+!
+!..miscellanea
+   integer :: mdle,nint,nrdof_tot,ic,iel
+!
+!..auxiliary
+   integer :: count,ierr
+   real(8) :: L2Norm_subd
+!
+   real(8) :: start_time,end_time
+!
+!-------------------------------------------------------------------
+!
+!..consistency check
+   if ((Attr < 1) .or. (Attr > NR_PHYSA)) then
+      write(*,1000) 'Attr',Attr
+      stop
+   endif
+   if (D_TYPE(Attr) .ne. DISCON) then
+      write(*,1000) 'D_TYPE(Attr)',D_TYPE(Attr)
+      stop
+   endif
+   1000 format('get_L2NormAttr: Invalid argument: ' ,A,' = ',I5)
+!
+!..start timer
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
+!
+!..fetch active elements
+   if (.not. DISTRIBUTED .or. HOST_MESH) then
+      if (RANK .ne. ROOT) goto 90
+      ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
+      NRELES_SUBD = NRELES
+   endif
+!
+!..initialize global quantities
+   L2Norm_subd = 0.d0
+   currL2Norm = 0.d0
+!
+!..iterate over elements
+!
+!$OMP PARALLEL DO                &
+!$OMP PRIVATE(mdle,currL2Norm)   &
+!$OMP REDUCTION(+:L2norm_subd)   &
+!$OMP SCHEDULE(DYNAMIC)
+   do iel=1,NRELES_SUBD
+      mdle = ELEM_SUBD(iel)
+      call get_elem_L2NormAttr(mdle,Attr, currL2Norm)
+!  ...accumulate L2Norm
+      L2Norm_subd = L2Norm_subd + currL2Norm
    enddo
+!$OMP END PARALLEL DO
 !
-end subroutine get_elem_L2NormCOMS
+   L2Norm = 0.d0
+   if (DISTRIBUTED .and. (.not. HOST_MESH)) then
+      count = 1
+      call MPI_ALLREDUCE(L2Norm_subd,L2Norm,count,MPI_REAL8,MPI_SUM,MPI_COMM_WORLD,ierr)
+   else
+      L2Norm = L2Norm_subd
+   endif
+!
+ 90 continue
+!
+!..end timer
+   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
+   if (RANK.eq.ROOT .and. .not. QUIET_MODE) then
+      write(*,6010) end_time-start_time
+ 6010 format('  get_L2NormAttr : ',f12.5,'  seconds',/)
+   endif
+!
+   L2Norm = sqrt(L2Norm)
+!
+end subroutine get_L2NormAttr
+!
+!
+!-------------------------------------------------------------------
+!> @brief      evaluates the L2 norm over Mdle of physics
+!!             attribute Attr
+!!
+!> @param[in]  Mdle:       element middle node number
+!> @param[in]  Attr:       physics attribute = 1,...,NR_PHYSA
+!> @param[out] FieldNormQ: L2 norm of difference
+!!
+!> @date       Sep 2023
+!-------------------------------------------------------------------
+subroutine get_elem_L2NormAttr(Mdle,Attr, FieldNormQ)
+!
+   use laserParam
+   use commonParam
+!
+   use control          , only : INTEGRATION
+   use data_structure3D
+   use environment      , only : L2PROJ
+   use physics
+!
+   implicit none
+!
+   integer, intent(in)  :: Mdle
+   integer, intent(in)  :: Attr
+   real(8), intent(out) :: FieldNormQ
+!
+!..element, face order, geometry dof
+   integer,dimension(19)           :: norder
+   real(8),dimension(3,MAXbrickH)  :: xnod
+   integer,dimension(12)           :: nedge_orient
+   integer,dimension(6)            :: nface_orient
+!
+!..geometry
+   real(8),dimension(3)   :: xi,x
+   real(8),dimension(3,3) :: dxidx,dxdxi
+   real(8)                :: rjac
+!
+!..3D quadrature data
+   real(8),dimension(3,MAX_NINT3) :: xiloc
+   real(8),dimension(  MAX_NINT3) :: wxi
+!
+!..approximate solution dof's
+   VTYPE, dimension(MAXEQNH,MAXbrickH) :: zdofH
+   VTYPE, dimension(MAXEQNE,MAXbrickE) :: zdofE
+   VTYPE, dimension(MAXEQNV,MAXbrickV) :: zdofV
+   VTYPE, dimension(MAXEQNQ,MAXbrickQ) :: zdofQ
+!
+!..approximate solution
+   VTYPE, dimension(  MAXEQNH  ) ::  zsolH
+   VTYPE, dimension(  MAXEQNH,3) :: zdsolH
+   VTYPE, dimension(3,MAXEQNE  ) ::  zsolE
+   VTYPE, dimension(3,MAXEQNE  ) :: zcurlE
+   VTYPE, dimension(3,MAXEQNV  ) ::  zsolV
+   VTYPE, dimension(  MAXEQNV  ) ::  zdivV
+   VTYPE, dimension(  MAXEQNQ  ) ::  zsolQ
+!
+!..miscellanea
+   integer :: nint,icase,iflag,l,i,ibeg,icomp,ndom,ivar,nflag
+   real(8) :: weight,wa
+!
+!---------------------------------------------------------------------------------------
+!
+   nflag=1
+!
+!..initialize global quantities
+   FieldNormQ = 0.d0
+!
+!..order of approx, orientations, geometry dof's, solution dof's
+   call find_order( Mdle, norder)
+   call find_orient(Mdle, nedge_orient,nface_orient)
+   call nodcor(     Mdle, xnod)
+   call solelm(     Mdle, zdofH,zdofE,zdofV,zdofQ)
+!
+!..set up the element quadrature
+   INTEGRATION=0
+   call set_3D_int_DPG(NODES(Mdle)%ntype,norder,nface_orient, nint,xiloc,wxi)
+   INTEGRATION=0
+!
+!..address of the 1st component for the attribute
+   ibeg=ADRES(Attr)
+!
+   select case(D_TYPE(Attr))
+!
+!===================================================================================
+!  L2 ATTRIBUTE                                                                    |
+!===================================================================================
+      case(DISCON)
+!
+!     ...loop through integration points
+         do l=1,nint
+!
+!        ...Gauss point and weight
+            xi(1:3)=xiloc(1:3,l) ; wa=wxi(l)
+!
+!           -- APPROXIMATE SOLUTION --
+            call soleval(Mdle,xi,nedge_orient,nface_orient,norder,xnod, &
+                         zdofH,zdofE,zdofV,zdofQ,nflag,                 &
+                         x,dxdxi,zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
+!
+!        ...Jacobian
+            call geom(dxdxi, dxidx,rjac,iflag)
+#if DEBUG_MODE
+            if (iflag /= 0) then
+               call find_domain(Mdle, ndom)
+               write(*,*)' get_elem_L2NormAttr: Mdle,ndom,rjac = ', Mdle,ndom,rjac
+            endif
+#endif
+!
+!        ...total weight
+            weight=wa*rjac
+!
+!        ...loop over components of the physical attribute
+            do icomp=1,NR_COMP(Attr)
+!
+               i=ibeg+icomp
+!
+!           ...accumulate L2 norm
+               FieldNormQ = FieldNormQ + abs(zsolQ(i))**2 * weight
+!
+            enddo
+!
+!     ...end loop over integration points
+         enddo
+!
+         case default
+            write(*,*)' get_elem_L2NormAttr: PHYSICAL ATTRIBUTE MUST BE L2. stop.'
+            stop
+!
+   end select
+!
+end subroutine get_elem_L2NormAttr
 !
 !
 !-------------------------------------------------------------------
 !
-!  routine: get_Norm, TODO: VERIFY CORRECTNESS
+!  routine: get_Norm
 !
 !  purpose: evaluates the norm of specified physical attributes
 !           and specified component by integrating the current
 !           solution over the entire domain
 !
-!  last modified: Jan 2019
-!
-!  input:   - Field, No
+!  input:   - Flag
 !
 !  output:  - FieldNormH,FieldNormE,FieldNormV,FieldNormQ
 !             [(norm of field variable) = \int_{\Omega} |X|^2]
 !
+!> @date    Sep 2023
 !-------------------------------------------------------------------
-subroutine get_Norm(Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
+subroutine get_Norm(Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
 !
    use control          , only: NEXACT
    use data_structure3D
@@ -285,17 +511,13 @@ subroutine get_Norm(Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
    implicit none
 !
    integer, intent(in)  :: Flag(NR_PHYSA)
-   integer, intent(in)  :: No
 !
    real(8), intent(out) :: FieldNormH,FieldNormE,FieldNormV,FieldNormQ
 !
    real(8) :: currFieldNormH,currFieldNormE,currFieldNormV,currFieldNormQ
 !
-   integer, parameter :: nin = 13
-   integer, parameter :: maxvis =2000
-!
 !..miscellanea
-   integer :: mdle,nint,iattr,nrdof_tot,ic,iel
+   integer :: mdle,nint,nrdof_tot,ic,iel
 !
 !..auxiliary
    integer :: count, ierr
@@ -331,7 +553,7 @@ subroutine get_Norm(Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
 !$OMP SCHEDULE(DYNAMIC)
    do iel=1,NRELES_SUBD
       mdle = ELEM_SUBD(iel)
-      call get_elem_Norm(mdle,Flag,No, &
+      call get_elem_Norm(mdle,Flag, &
          currFieldNormH,currFieldNormE,currFieldNormV,currFieldNormQ)
 !  ...accumulate
       fieldNormH_subd = fieldNormH_subd + currFieldNormH
@@ -379,21 +601,19 @@ end subroutine get_Norm
 !
 !-------------------------------------------------------------------
 !
-!  routine: get_elem_Norm, TODO: VERIFY CORRECTNESS
+!  routine: get_elem_Norm
 !
 !  purpose: evaluates the magnitude of a physical attribute and
 !           component by integrating the current solution over a
 !           given middle node
 !
-!  last modified: Jan 2019
-!
-!  input:   Mdle,Flag,No
+!  input:   Mdle,Flag
 !
 !  output:  FieldNormH,FieldNormE,FieldNormV,FieldNormQ
-!           (FieldNorm (norm of field variable))
 !
+!> @date    Sep 2023
 !-------------------------------------------------------------------
-subroutine get_elem_Norm(Mdle,Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
+subroutine get_elem_Norm(Mdle,Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
 !
    use laserParam
    use commonParam
@@ -405,12 +625,9 @@ subroutine get_elem_Norm(Mdle,Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNor
 !
    implicit none
 !
+   integer, intent(in)  :: Mdle
    integer, intent(in)  :: Flag(NR_PHYSA)
-   integer, intent(in)  :: Mdle,No
    real(8), intent(out) :: FieldNormH,FieldNormE,FieldNormV,FieldNormQ
-!
-!..node case (decimal form)
-   integer :: icased(NR_PHYSA)
 !
 !..element, face order, geometry dof
    integer :: norder(19)
@@ -446,7 +663,7 @@ subroutine get_elem_Norm(Mdle,Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNor
    integer :: nint,icase,iattr,l,i,j,ibeg,iflag,iload,icomp,ndom,ivar,nflag
    real(8) :: weight,wa
 !
-!---------------------------------------------------------------------------------------
+!-------------------------------------------------------------------
 !
    nflag=1
 !
@@ -457,28 +674,21 @@ subroutine get_elem_Norm(Mdle,Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNor
    FieldNormQ=0.d0
 !
 !..order of approx, orientations, geometry dof's, solution dof's
-   call find_order( mdle, norder)
-   call find_orient(mdle, nedge_orient,nface_orient)
-   call nodcor(     mdle, xnod)
-   call solelm(     mdle, zdofH,zdofE,zdofV,zdofQ)
+   call find_order( Mdle, norder)
+   call find_orient(Mdle, nedge_orient,nface_orient)
+   call nodcor(     Mdle, xnod)
+   call solelm(     Mdle, zdofH,zdofE,zdofV,zdofQ)
 !
 !..set up the element quadrature
    INTEGRATION=0
-   call set_3D_int_DPG(NODES(mdle)%ntype,norder,nface_orient, nint,xiloc,wxi)
+   call set_3D_int_DPG(NODES(Mdle)%ntype,norder,nface_orient, nint,xiloc,wxi)
    INTEGRATION=0
-!
-!..supported physical attributes
-   icase=NODES(mdle)%case
-   call decod(icase,2,NR_PHYSA, icased)
 !
 !..loop over physical attributes
    do iattr=1,NR_PHYSA
 !
 !  ...if the error not needed, skip
       if (Flag(iattr) == 0) cycle
-!
-!  ...if attribute is absent, skip
-      if (icased(iattr) == 0) cycle
 !
 !  ...address of the 1st component for the attribute
       ibeg=ADRES(iattr)
@@ -497,17 +707,17 @@ subroutine get_elem_Norm(Mdle,Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNor
             xi(1:3)=xiloc(1:3,l) ; wa=wxi(l)
 !
 !           -- APPROXIMATE SOLUTION --
-            call soleval(mdle,xi,nedge_orient,nface_orient,norder,xnod, &
+            call soleval(Mdle,xi,nedge_orient,nface_orient,norder,xnod, &
                          zdofH,zdofE,zdofV,zdofQ,nflag,                 &
                          x,dxdxi,zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
 !        ...Jacobian
             call geom(dxdxi, dxidx,rjac,iflag)
 #if DEBUG_MODE
             if (iflag /= 0) then
-               call find_domain(mdle, ndom)
-               write(*,9997) mdle,ndom,rjac
+               call find_domain(Mdle, ndom)
+               write(*,9997) Mdle,ndom,rjac
             endif
- 9997       format(' get_elem_Norm: mdle,ndom,rjac = ',i8,2x,i2,2x,e12.5)
+ 9997       format(' get_elem_Norm: Mdle,ndom,rjac = ',i8,2x,i2,2x,e12.5)
 #endif
 !
 !        ...total weight
@@ -516,7 +726,7 @@ subroutine get_elem_Norm(Mdle,Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNor
 !        ...loop over components of physical attribute
             do icomp=1,NR_COMP(iattr)
 !
-               i=(No-1)*NRHVAR+ibeg+icomp
+               i=ibeg+icomp
 !
 !           ...accumulate H1 seminorm
                if (.not. L2PROJ) then
@@ -546,7 +756,7 @@ subroutine get_elem_Norm(Mdle,Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNor
             xi(1:3)=xiloc(1:3,l) ; wa=wxi(l)
 !
 !           -- APPROXIMATE SOLUTION --
-            call soleval(mdle,xi,nedge_orient,nface_orient,norder,xnod, &
+            call soleval(Mdle,xi,nedge_orient,nface_orient,norder,xnod, &
                          zdofH,zdofE,zdofV,zdofQ,nflag,                 &
                          x,dxdxi,zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
 !
@@ -554,8 +764,8 @@ subroutine get_elem_Norm(Mdle,Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNor
             call geom(dxdxi, dxidx,rjac,iflag)
 #if DEBUG_MODE
             if (iflag /= 0) then
-              call find_domain(mdle, ndom)
-              write(*,9997) mdle,ndom,rjac
+               call find_domain(Mdle, ndom)
+               write(*,9997) Mdle,ndom,rjac
             endif
 #endif
 !
@@ -565,14 +775,18 @@ subroutine get_elem_Norm(Mdle,Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNor
 !             loop over the components of the physical attribute
               do icomp=1,NR_COMP(iattr)
 !
-                i=(No-1)*NREVAR+ibeg+icomp
+                i=ibeg+icomp
 !
-!               accumulate for the error and norm
+!               accumulate H(curl) seminorm
+                if (.not. L2PROJ) then
+                  do ivar=1,3
+                    FieldNormE = FieldNormE + abs(zcurlE(ivar,i))**2 * weight
+                  enddo
+                endif
+!
+!               accumulate L2 norm
                 do ivar=1,3
                   FieldNormE = FieldNormE + abs(zsolE(ivar,i))**2 * weight
-                  IF (.NOT. L2PROJ) THEN
-                  FieldNormE = FieldNormE + abs(zcurlE(ivar,i))**2 * weight
-                  ENDIF
                 enddo
 !
 !        ...end loop over components
@@ -593,15 +807,15 @@ subroutine get_elem_Norm(Mdle,Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNor
             xi(1:3)=xiloc(1:3,l) ; wa=wxi(l)
 !
 !           -- APPROXIMATE SOLUTION --
-            call soleval(mdle,xi,nedge_orient,nface_orient,norder,xnod, &
+            call soleval(Mdle,xi,nedge_orient,nface_orient,norder,xnod, &
                          zdofH,zdofE,zdofV,zdofQ,nflag,                 &
                          x,dxdxi,zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
 !           Jacobian
             call geom(dxdxi, dxidx,rjac,iflag)
 #if DEBUG_MODE
             if (iflag /= 0) then
-              call find_domain(mdle, ndom)
-              write(*,9997) mdle,ndom,rjac
+               call find_domain(Mdle, ndom)
+               write(*,9997) Mdle,ndom,rjac
             endif
 #endif
 !
@@ -611,12 +825,12 @@ subroutine get_elem_Norm(Mdle,Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNor
 !             loop over components of the physical attribute
               do icomp=1,NR_COMP(iattr)
 !
-                i=(No-1)*NRVVAR+ibeg+icomp
+                i=ibeg+icomp
 !
 !               accumulate H(div) seminorm
-                IF (.NOT. L2PROJ) THEN
-                FieldNormV = FieldNormV + abs(zdivV(i))**2 * weight
-                ENDIF
+                if (.not. L2PROJ) then
+                  FieldNormV = FieldNormV + abs(zdivV(i))**2 * weight
+                endif
 !
 !               accumulate L2 norm
                 do ivar=1,3
@@ -641,7 +855,7 @@ subroutine get_elem_Norm(Mdle,Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNor
             xi(1:3)=xiloc(1:3,l) ; wa=wxi(l)
 !
 !           -- APPROXIMATE SOLUTION --
-            call soleval(mdle,xi,nedge_orient,nface_orient,norder,xnod, &
+            call soleval(Mdle,xi,nedge_orient,nface_orient,norder,xnod, &
                          zdofH,zdofE,zdofV,zdofQ,nflag,                 &
                          x,dxdxi,zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
 !
@@ -649,8 +863,8 @@ subroutine get_elem_Norm(Mdle,Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNor
             call geom(dxdxi, dxidx,rjac,iflag)
 #if DEBUG_MODE
             if (iflag /= 0) then
-              call find_domain(mdle, ndom)
-              write(*,9997) mdle,ndom,rjac
+               call find_domain(Mdle, ndom)
+               write(*,9997) Mdle,ndom,rjac
             endif
 #endif
 !
@@ -660,7 +874,7 @@ subroutine get_elem_Norm(Mdle,Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNor
 !             loop over components of the physical attribute
               do icomp=1,NR_COMP(iattr)
 !
-                i=(No-1)*NRQVAR+ibeg+icomp
+                i=ibeg+icomp
 !
 !               accumulate L2 norm
                 FieldNormQ = FieldNormQ + abs(zsolQ(i))**2 * weight
@@ -672,8 +886,8 @@ subroutine get_elem_Norm(Mdle,Flag,No, FieldNormH,FieldNormE,FieldNormV,FieldNor
          enddo
 !
          case default
-         write(*,*)  'get_elem_Norm: UNKNOWN PHYSICAL ATTRIBUTE TYPE. stop.'
-         stop
+            write(*,*)  'get_elem_Norm: UNKNOWN PHYSICAL ATTRIBUTE TYPE. stop.'
+            stop
 !
 !  ...end select data type
       end select
@@ -777,7 +991,7 @@ end subroutine get_elem_Norm
 !      integer :: nint,icase,iattr,l,i,j
 !      real(8) :: weight,wa
 !      integer :: iel,nsign
-!      integer :: nflag,iload
+!      integer :: nflag
 !!
 !!---------------------------------------------------------------------------------------
 !!

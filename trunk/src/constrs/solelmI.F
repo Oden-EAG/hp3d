@@ -4,7 +4,7 @@ c   routine name       - solelmI
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Feb 2023
+c   latest revision    - Sep 2023
 c
 c   purpose            - routine calculates unconstrained INTERFACE
 c                        solution dof for a 3D element
@@ -13,6 +13,7 @@ c
 c   arguments :
 c     in:
 c           Mdle       - middle node of an element
+c           Ncoms      - solution component set: 1,...,NRCOMS
 c     out:
 c           ZdofH      - the element unconstrained interface H1 dof
 c           ZdofE      - the element unconstrained interface H(curl) dof
@@ -21,12 +22,13 @@ c
 c----------------------------------------------------------------------
 #include "typedefs.h"
 c
-      subroutine solelmI(Mdle, ZdofH,ZdofE,ZdofV)
+      subroutine solelmI_coms(Mdle,Ncoms, ZdofH,ZdofE,ZdofV)
 c
       use data_structure3D
       implicit none
 c
       integer, intent(in)  :: Mdle
+      integer, intent(in)  :: Ncoms
       VTYPE  , intent(out) :: ZdofH(MAXEQNH,MAXbrickH-MAXmdlbH)
       VTYPE  , intent(out) :: ZdofE(MAXEQNE,MAXbrickE-MAXmdlbE)
       VTYPE  , intent(out) :: ZdofV(MAXEQNV,MAXbrickV-MAXmdlbV)
@@ -94,7 +96,7 @@ c  ...initiate counters (needed for dof_out)
 c
 c  ...copy dof's into the local arrays
       do j=1,nrnodm
-        call dof_out(nodm(j), kH,kE,kV,kQ,zvalH,zvalE,zvalV,zvoid)
+        call dof_out(nodm(j),Ncoms, kH,kE,kV,kQ,zvalH,zvalE,zvalV,zvoid)
       enddo
       if (kQ.ne.0) then
         write(*,*) 'solelmI: INCONSISTENCY, kQ = ',kQ
@@ -126,7 +128,7 @@ c
 c  .....accumulate for the values
         do kp=1,nrconH(kH)
           l = nacH(kp,kH)
-          do ivar=1,NRHVAR*NRCOMS
+          do ivar=1,NRHVAR*NRRHS
             ZdofH(ivar,kH) = ZdofH(ivar,kH)
      .                     + constrH(kp,kH)*zvalH(ivar,l)
           enddo
@@ -146,7 +148,7 @@ c
 c  .....accumulate for the values
         do kp=1,nrconE(kE)
           l = nacE(kp,kE)
-          do ivar=1,NREVAR*NRCOMS
+          do ivar=1,NREVAR*NRRHS
             ZdofE(ivar,kE) = ZdofE(ivar,kE)
      .                     + constrE(kp,kE)*zvalE(ivar,l)
           enddo
@@ -166,7 +168,7 @@ c
 c  .....accumulate for the values
         do kp=1,nrconV(kV)
           l = nacV(kp,kV)
-          do ivar=1,NRVVAR*NRCOMS
+          do ivar=1,NRVVAR*NRRHS
             ZdofV(ivar,kV) = ZdofV(ivar,kV)
      .                     + constrV(kp,kV)*zvalV(ivar,l)
           enddo
@@ -175,5 +177,24 @@ c
 c  ...loop through local H(div) dof
       enddo
 c
+c
+      end subroutine solelmI_coms
+c
+c
+c-----------------------------------------------------------------------
+c  ...see routine solelmI_coms for description
+c     last rev: Sep 2023
+      subroutine solelmI(Mdle, ZdofH,ZdofE,ZdofV)
+c
+      use data_structure3D
+      implicit none
+c
+      integer, intent(in)  :: Mdle
+      VTYPE  , intent(out) :: ZdofH(MAXEQNH,MAXbrickH-MAXmdlbH)
+      VTYPE  , intent(out) :: ZdofE(MAXEQNE,MAXbrickE-MAXmdlbE)
+      VTYPE  , intent(out) :: ZdofV(MAXEQNV,MAXbrickV-MAXmdlbV)
+c
+c  ...by default, request solution component set N_COMS
+      call solelmI_coms(Mdle,N_COMS, ZdofH,ZdofE,ZdofV)
 c
       end subroutine solelmI

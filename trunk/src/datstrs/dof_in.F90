@@ -1,18 +1,18 @@
-!> Purpose : copy local dof into datastructure
-!! @param[in] Nod         - a node number
+!> @brief   copy local dof into datastructure
+!! @param[in] Nod                     - a node number
+!! @param[in] Ncoms                   - solution component set: 1,...,NRCOMS
 !! @param[in] ZvalH,ZvalE,ZvalV,ZvalQ - H1,H(curl),H(div) and L2 dof
-!!                        for the node in the expanded mode
-
+!!                                      for the node in the expanded mode
+!> @date    Sep 2023
 #include "typedefs.h"
-subroutine dof_in(Nod,ZvalH,ZvalE,ZvalV,ZvalQ)
+subroutine dof_in(Nod,Ncoms,ZvalH,ZvalE,ZvalV,ZvalQ)
   use data_structure3D
   implicit none
   !
   ! ** Arguments
-  integer, intent(in) :: Nod
-  VTYPE,   intent(in) :: &
-       ZvalH(MAXEQNH,*), ZvalE(MAXEQNE,*), &
-       ZvalV(MAXEQNE,*), ZvalQ(MAXEQNQ,*)
+  integer, intent(in) :: Nod,Ncoms
+  VTYPE,   intent(in) :: ZvalH(MAXEQNH,*), ZvalE(MAXEQNE,*), &
+                         ZvalV(MAXEQNE,*), ZvalQ(MAXEQNQ,*)
   !
   ! ** Locals
   ! node physics attributes flags
@@ -36,12 +36,13 @@ subroutine dof_in(Nod,ZvalH,ZvalE,ZvalV,ZvalQ)
     return
   endif
 
-  ! loop through multiple copies of variables
-  do j=1,NRCOMS
+  ! loop through multiple loads
+  do j=1,NRRHS
 
      ! loop through physical attributes of the node
      do i=1,NR_PHYSA
-        if (ncase(i).eq.1) then
+        if (ncase(i).ne.1) cycle
+
            ! loop through the components of the attribute
            do k=1,NR_COMP(i)
               select case(D_TYPE(i))
@@ -49,36 +50,34 @@ subroutine dof_in(Nod,ZvalH,ZvalE,ZvalV,ZvalQ)
                  nvar = (j-1)*NRHVAR+ADRES(i)+k
                  ivarH = ivarH+1
                  if (ndofH.gt.0) then
-                    NODES(Nod)%dof%zdofH(ivarH,1:ndofH) = ZvalH(nvar,1:ndofH)
+                    NODES(Nod)%dof%zdofH(ivarH,1:ndofH,Ncoms) = ZvalH(nvar,1:ndofH)
                  endif
               case(TANGEN)
                  nvar = (j-1)*NREVAR+ADRES(i)+k
                  ivarE = ivarE+1
                  if (ndofE.gt.0) then
-                    NODES(Nod)%dof%zdofE(ivarE,1:ndofE) = ZvalE(nvar,1:ndofE)
+                    NODES(Nod)%dof%zdofE(ivarE,1:ndofE,Ncoms) = ZvalE(nvar,1:ndofE)
                  endif
               case(NORMAL)
                  nvar = (j-1)*NRVVAR+ADRES(i)+k
                  ivarV = ivarV+1
                  if (ndofV.gt.0) then
-                    NODES(Nod)%dof%zdofV(ivarV,1:ndofV) = ZvalV(nvar,1:ndofV)
+                    NODES(Nod)%dof%zdofV(ivarV,1:ndofV,Ncoms) = ZvalV(nvar,1:ndofV)
                  endif
               case(DISCON)
                  nvar = (j-1)*NRQVAR+ADRES(i)+k
                  ivarQ = ivarQ+1
                  if (ndofQ.gt.0) then
-                    NODES(Nod)%dof%zdofQ(ivarQ,1:ndofQ) = ZvalQ(nvar,1:ndofQ)
+                    NODES(Nod)%dof%zdofQ(ivarQ,1:ndofQ,Ncoms) = ZvalQ(nvar,1:ndofQ)
                  endif
               case default
                  write(*,*) 'dofin: D_TYPE = ', S_DType(D_TYPE(i))
                  call logic_error(ERR_INVALID_VALUE,__FILE__,__LINE__)
               end select
+           ! loop through the components of the attribute
            enddo
-        endif
+     ! loop through physical attributes of the node
      enddo
+  ! loop through multiple loads
   enddo
 end subroutine dof_in
-
-
-
-

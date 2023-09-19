@@ -147,8 +147,8 @@ subroutine write_VTU_geom(IcE)
 !
 !..Header for solution data starts here
 !
-!..loop over solution copies
-   do iload=1,NRCOMS
+!..loop over multiple loads
+   do iload=1,NRRHS
 !
       if (.not. PARAVIEW_LOAD(iload)) cycle
 !
@@ -246,7 +246,7 @@ subroutine write_VTU_geom(IcE)
          enddo
 !  ...end loop over physics variables
       enddo
-!..end loop over solution copies
+!..end loop over multiple loads
    enddo
 !
    50 continue

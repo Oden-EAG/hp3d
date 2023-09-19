@@ -6,11 +6,12 @@
 !!           PB interpolation; NOTE: the interpolation (projection) is
 !!           done in the reference space
 !!
+!! @param[in]  Mdle         - element (middle node) number
 !! @param[in]  Iflag        - a flag specifying which of the objects the
 !!                            face is on: 5 pris, 6 hexa, 7 tetr, 8 pyra
 !! @param[in]  No           - number of a specific object
 !! @param[in]  Etav         - reference coordinates of the element vertices
-!! @param[in]  Ntype         - element (middle node) type
+!! @param[in]  Ntype        - element (middle node) type
 !! @param[in]  Icase        - the face node case
 !! @param[in]  Bcond        - the face node BC flag
 !! @param[in]  Nedge_orient - edge orientation
@@ -21,11 +22,11 @@
 !!
 !! @param[in,out] ZnodH     - H1 dof for the face
 !!
-!> @date Feb 2023
+!> @date Sep 2023
 !-----------------------------------------------------------------------
-  subroutine dhpfaceH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond, &
-                      Nedge_orient,Nface_orient,Norder,Iface, &
-                      ZdofH, ZnodH)
+subroutine dhpfaceH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
+                    Nedge_orient,Nface_orient,Norder,Iface, &
+                    ZdofH, ZnodH)
   use control
   use parameters
   use physics
@@ -42,8 +43,8 @@
   integer, dimension(6),   intent(in)  :: Nface_orient
   integer, dimension(19),  intent(in)  :: Norder
 !
-  VTYPE,   dimension(MAXEQNH,MAXbrickH),      intent(in)    :: ZdofH
-  VTYPE,   dimension(NRCOMS*NREQNH(Icase),*), intent(inout) :: ZnodH
+  VTYPE,   dimension(MAXEQNH,MAXbrickH),     intent(in)    :: ZdofH
+  VTYPE,   dimension(NRRHS*NREQNH(Icase),*), intent(inout) :: ZnodH
 !
 ! ** Locals
 !-----------------------------------------------------------------------
@@ -351,8 +352,8 @@
 !  ...initialize global variable counter, and node local variable counter
       ivarH=0 ; nvarH=0
 !
-!  ...loop through multiple copies of variables
-      do j=1,NRCOMS
+!  ...loop through multiple loads
+      do j=1,NRRHS
 !
 !  .....initiate the BC component counter
         ic=0
@@ -386,15 +387,19 @@
 !
 !  .............store Dirichlet dof
                 if (ibcnd(ic).eq.1) ZnodH(nvarH,1:ndofH_face) = zuH(1:ndofH_face,ivarH)
+!
               endif
+!
             end select
+!  .......loop through components
           enddo
+!  .....loop through physical attributes
         enddo
+!  ...loop through multiple loads
       enddo
 !
 #if DEBUG_MODE
       if (iprint.eq.1) call result
 #endif
 !
-  end subroutine dhpfaceH
-
+end subroutine dhpfaceH

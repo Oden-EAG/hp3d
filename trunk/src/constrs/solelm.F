@@ -4,7 +4,7 @@ c   routine name       - solelm
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Feb 2023
+c   latest revision    - Sep 2023
 c
 c   purpose            - routine calculates unconstrained solution dof
 c                        for a 3D element
@@ -13,6 +13,7 @@ c
 c   arguments :
 c     in:
 c           Mdle       - middle node of an element
+c           Ncoms      - solution component set: 1,...,NRCOMS
 c     out:
 c           ZdofH      - the element unconstrained H1 dof
 c           ZdofE      - the element unconstrained H(curl) dof
@@ -22,12 +23,13 @@ c
 c----------------------------------------------------------------------
 #include "typedefs.h"
 c
-      subroutine solelm(Mdle, ZdofH,ZdofE,ZdofV,ZdofQ)
+      subroutine solelm_coms(Mdle,Ncoms, ZdofH,ZdofE,ZdofV,ZdofQ)
 c
       use data_structure3D
       implicit none
 c
       integer, intent(in)  :: Mdle
+      integer, intent(in)  :: Ncoms
       VTYPE  , intent(out) :: ZdofH(MAXEQNH,MAXbrickH)
       VTYPE  , intent(out) :: ZdofE(MAXEQNE,MAXbrickE)
       VTYPE  , intent(out) :: ZdofV(MAXEQNV,MAXbrickV)
@@ -55,10 +57,11 @@ c  ...modified element dof
 c
 c  ...miscellanea
       integer :: nrdoflH,nrdoflE,nrdoflV,nrdoflQ
-      integer :: kH,kE,kV,kQ,j,k,l,kp,ibeg,iend,icomp,ivar,nrnodm
+      integer :: kH,kE,kV,kQ,j,k,l,kp,ivar,nrnodm
 c
 #if DEBUG_MODE
       integer :: nvarE,nvarQ
+      integer :: iload,ibeg,iend
       integer :: iprint
       iprint=0
 #endif
@@ -97,7 +100,7 @@ c  ...initiate counters (needed for dof_out)
 c
 c  ...copy dof's into the local arrays (use ZdofQ for simplicity)
       do j=1,nrnodm
-        call dof_out(nodm(j), kH,kE,kV,kQ,zvalH,zvalE,zvalV,ZdofQ)
+        call dof_out(nodm(j),Ncoms, kH,kE,kV,kQ,zvalH,zvalE,zvalV,ZdofQ)
       enddo
 c
 c-----------------------------------------------------------------------
@@ -128,20 +131,19 @@ c
 c  .....accumulate for the values
         do kp=1,nrconH(k)
           l = nacH(kp,k)
-          do ivar=1,NRHVAR*NRCOMS
+          do ivar=1,NRHVAR*NRRHS
             ZdofH(ivar,k) = ZdofH(ivar,k) + constrH(kp,k)*zvalH(ivar,l)
           enddo
         enddo
 #if DEBUG_MODE
         if (iprint.eq.1) then
-ccc           do icomp=1,NRCOMS
-           do icomp=1,1
-             ibeg = (icomp-1)*NRHVAR+1
+           do iload=1,NRRHS
+             ibeg = (iload-1)*NRHVAR+1
              iend = ibeg+NRHVAR-1
-             write(*,7004) icomp,(ZdofH(ivar,k),ivar=ibeg,iend)
- 7004        format('icomp = ',i2,' ZdofH = ',4(2e12.5,2x))
-           enddo
+             write(*,7004) ivar,(ZdofH(ivar,k),ivar=ibeg,iend)
+ 7004        format('ivar = ',i2,' ZdofH = ',4(2e12.5,2x))
 ccc           call pause
+           enddo
         endif
 #endif
 c
@@ -160,7 +162,7 @@ c  ...loop through the local dof
           write(*,*) 'kE =',kE
           write(*,7001) (nacE(l,kE),l=1,nrconE(kE))
           write(*,7002) (constrE(l,kE),l=1,nrconE(kE))
-          do ivar=1,NREVAR*NRCOMS
+          do ivar=1,NREVAR*NRRHS
             write(*,7002) (zvalE(ivar,nacE(l,kE)),l=1,nrconE(kE))
           enddo
         endif
@@ -169,7 +171,7 @@ c
 c  .....accumulate for the values
         do kp=1,nrconE(kE)
           l = nacE(kp,kE)
-          do ivar=1,NREVAR*NRCOMS
+          do ivar=1,NREVAR*NRRHS
             ZdofE(ivar,kE) = ZdofE(ivar,kE)
      .                      + constrE(kp,kE)*zvalE(ivar,l)
           enddo
@@ -197,7 +199,7 @@ c  ...loop through the local dof
           write(*,*) 'kV=',kV
           write(*,7001) (nacV(l,kV),l=1,nrconV(kV))
           write(*,7002) (constrV(l,kV),l=1,nrconV(kV))
-          do ivar=1,NRVVAR*NRCOMS
+          do ivar=1,NRVVAR*NRRHS
             write(*,7002) (zvalV(ivar,nacV(l,kV)),l=1,nrconV(kV))
           enddo
         endif
@@ -206,14 +208,14 @@ c
 c  .....accumulate for the values
         do kp=1,nrconV(kV)
           l = nacV(kp,kV)
-          do ivar=1,NRVVAR*NRCOMS
+          do ivar=1,NRVVAR*NRRHS
             ZdofV(ivar,kV) = ZdofV(ivar,kV)
      .                      + constrV(kp,kV)*zvalV(ivar,l)
           enddo
         enddo
 #if DEBUG_MODE
         if (iprint.eq.3) then
-           write(*,7006) kV,ZdofV(1:NRVVAR*NRCOMS,kV)
+           write(*,7006) kV,ZdofV(1:NRVVAR*NRRHS,kV)
  7006      format('solelm: kV,ZdofV = ',i2,8e12.5)
 ccc           call pause
         endif
@@ -229,7 +231,7 @@ c
 #if DEBUG_MODE
       if (iprint.eq.4) then
         do kQ=1,nrdoflQ
-          nvarQ = NRQVAR*NRCOMS
+          nvarQ = NRQVAR*NRRHS
           write(*,7007) kQ,ZdofQ(1:nvarQ,kQ)
  7007     format('solelm: ZdofQ(1:nvarQ,',i2,') = ',10e12.5)
         enddo
@@ -239,5 +241,25 @@ c
       if (iprint.ne.0) call pause
 #endif
 c
+c
+      end subroutine solelm_coms
+c
+c
+c-----------------------------------------------------------------------
+c  ...see routine solelm_coms for description
+c     last rev: Sep 2023
+      subroutine solelm(Mdle, ZdofH,ZdofE,ZdofV,ZdofQ)
+c
+      use data_structure3D
+      implicit none
+c
+      integer, intent(in)  :: Mdle
+      VTYPE  , intent(out) :: ZdofH(MAXEQNH,MAXbrickH)
+      VTYPE  , intent(out) :: ZdofE(MAXEQNE,MAXbrickE)
+      VTYPE  , intent(out) :: ZdofV(MAXEQNV,MAXbrickV)
+      VTYPE  , intent(out) :: ZdofQ(MAXEQNQ,MAXbrickQ)
+c
+c  ...by default, request solution component set N_COMS
+      call solelm_coms(Mdle,N_COMS, ZdofH,ZdofE,ZdofV,ZdofQ)
 c
       end subroutine solelm

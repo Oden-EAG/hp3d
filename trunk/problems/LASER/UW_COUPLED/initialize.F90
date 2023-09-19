@@ -1,7 +1,7 @@
 !----------------------------------------------------------------------------
 !> @brief   initialize problem dependent environments, solvers, graphics and
 !!          create initial mesh.
-!> @date    Feb 2023
+!> @date    Sep 2023
 !----------------------------------------------------------------------------
 subroutine initialize
 !
@@ -62,29 +62,14 @@ subroutine initialize
 !                                MAXHE //     MAXTE //     MAXPY //
                                     40 ,        1 ,       1)
 !
-!
 !     set HP3D parameters
 !=======================================================================
-!  NRCOMS  - number of copies of the defined physics variables
-!  MAXEQNH - maximum number of equations posed in H1
-!  MAXEQHE - maximum number of equations posed in H(curl)
-!  MAXEQHV - maximum number of equations posed in H(div)
-!  MAXEQHQ - maximum number of equations posed in L2
-!  MAXNRHS - maximum number of rhs (CURRENTLY UNUSED PARAMETER)
-!
-!  Constraints on parameters:
-!
-!  MAX...  >= 1
-!  MAXEQNH >= NRCOMS * number of equations posed in H1
-!  MAXEQNE >= NRCOMS * number of equations posed in H(curl)
-!  MAXEQNV >= NRCOMS * number of equations posed in H(div)
-!  MAXEQNQ >= NRCOMS * number of equations posed in L2
+!  NRCOMS  - number of solution copies
+!  NRRHS   - number of right-hand sides
 !=======================================================================
 !
-!                        NRCOMS // MAXNRHS //
-   call set_parameters(      2 ,        1 ,  &
-!                       MAXEQNH // MAXEQNE // MAXEQNV // MAXEQNQ //
-                             2 ,        8,         2,         24)
+!                      NRCOMS, NRRHS
+   call set_parameters(     1,     1)
 !
 !..read geometry file
    call read_geometry(trim(FILE_GEOM))
