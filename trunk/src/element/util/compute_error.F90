@@ -7,8 +7,8 @@
 !!
 !> @date      Sep 2023
 !---------------------------------------------------------------------------------------
-!> @note : Routine "exact" must provide the exact solution
-!!         with the following dof ordering:
+!> @note      Routine "exact" must provide the exact solution
+!!            with the following dof ordering:
 !!
 !!   comp1|comp2|...|comp1|comp2|... ... |comp1|comp2|...|comp1|comp2|... ...
 !!   attr1          |attr2           ... |attr1          |attr2           ...
@@ -151,7 +151,8 @@ ENDIF
 IF (ivis == 1) THEN
 !
 !       open file
-        open(unit=nin,file=trim(FILE_ERR),form='formatted',access='sequential',status='unknown',iostat=ic)
+        open(unit=nin,file=trim(FILE_ERR),form='formatted',access='sequential', &
+             status='unknown',iostat=ic)
         if (ic /= 0) then
           write(*,*)'compute_error: COULD NOT OPEN FILE! [0]'
           stop
@@ -176,7 +177,8 @@ IF (ivis == 1) THEN
 ELSE
 !
 !       append to file
-        open(unit=nin,file=trim(FILE_ERR),form='formatted',access='sequential',status='old',position='append',iostat=ic)
+        open(unit=nin,file=trim(FILE_ERR),form='formatted',access='sequential', &
+             status='old',position='append',iostat=ic)
         if (ic /= 0) then
           write(*,*)'compute_error: COULD NOT OPEN FILE! [1]'
           stop
