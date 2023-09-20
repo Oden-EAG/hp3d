@@ -3,24 +3,16 @@
 !!
 !> @param[in] Flag - vector of length NR_PHYSA indicating for which attribute the error
 !                    is computed. The error is accumulated over components and rhs's.
-!!
-!> @param[in] Itag - tag to identify problem being tested
+!> @param[in] Itag - tag to identify problem being tested (for debugging only)
 !!
 !> @date      Sep 2023
 !---------------------------------------------------------------------------------------
-!  REMARK : miracles do not happen! Routine "exact" providing the exact
-!           solution, should use the following ordering:
-!
-!  H1 :
-!
-!    comp1|comp2|... comp1|comp2|... ... |comp1|comp2|... comp1|comp2|... ...
-!    attr1          |attr2           ... |attr1          |attr2           ...
-!    rhs1                                |rhs2                            ...
-!
-!  H(curl), H(div), L2 : same as above
-!---------------------------------------------------------------------------------------
-!  REMARK : do NOT change field delimiter ";" in dump file! It is used by
-!           testing script!
+!> @note : Routine "exact" must provide the exact solution
+!!         with the following dof ordering:
+!!
+!!   comp1|comp2|...|comp1|comp2|... ... |comp1|comp2|...|comp1|comp2|... ...
+!!   attr1          |attr2           ... |attr1          |attr2           ...
+!!   rhs1                                |rhs2                            ...
 !---------------------------------------------------------------------------------------
 #include "typedefs.h"
 !
@@ -156,7 +148,7 @@ ENDIF
 !     printing
 !
 !     -- 1st visit --
-      if (ivis == 1) then
+IF (ivis == 1) THEN
 !
 !       open file
         open(unit=nin,file=trim(FILE_ERR),form='formatted',access='sequential',status='unknown',iostat=ic)
@@ -166,11 +158,11 @@ ENDIF
         endif
 !
 !       print header
-IF (.NOT. L2PROJ) THEN
+   IF (.NOT. L2PROJ) THEN
         write(nin,*)'-- Error Report --'
-ELSE
+   ELSE
         write(nin,*)'-- Error Report (L2 only)--'
-ENDIF
+   ENDIF
         write(nin,9998)
  9998   format('             H1            //', &
                            ' H(curl)       //', &
@@ -181,7 +173,7 @@ ENDIF
                            ' Case tag')
 !
 !     -- subsequent visits --
-      else
+ELSE
 !
 !       append to file
         open(unit=nin,file=trim(FILE_ERR),form='formatted',access='sequential',status='old',position='append',iostat=ic)
@@ -189,7 +181,7 @@ ENDIF
           write(*,*)'compute_error: COULD NOT OPEN FILE! [1]'
           stop
         endif
-      endif
+ENDIF
 !
 !     print to file
       write(nin,9999)ivis,errorH,errorE,errorV,errorQ,errorHEVQ,rateHEVQ,Itag
@@ -197,13 +189,13 @@ ENDIF
 !
 !     print to screen
 IF (.NOT.QUIET_MODE) THEN ; write(*,*)''
-IF (.NOT. L2PROJ   ) THEN ; write(*,*)'-- Error Report --'
-ELSE                      ; write(*,*)'-- Error Report (L2 only)--'
-ENDIF
-                            write(*,9998)
-      do i=1,ivis         ; write(*,9999)i,rwork(i,1:6),iwork(i,1)
-      enddo
-                            write(*,*)''
+   IF (.NOT. L2PROJ   ) THEN ; write(*,*)'-- Error Report --'
+   ELSE                      ; write(*,*)'-- Error Report (L2 only)--'
+   ENDIF
+                         write(*,9998)
+   do i=1,ivis         ; write(*,9999)i,rwork(i,1:6),iwork(i,1)
+   enddo
+                         write(*,*)''
 ENDIF
 !
 !     close file
@@ -219,9 +211,14 @@ end subroutine compute_error
 !
 !
 !---------------------------------------------------------------------------------------
-!>  Purpose : compute element contributions to the total error
+!> @brief   Compute element contributions to the total error
 !!
-!>  @date : Nov 2014
+!> @param[in]  Mdle  - Element (middle node) number
+!> @param[in]  Flag  - Array indicating which physics attributes to accumulate error for
+!> @param[out] errorH/E/V/Q - Element contribution to error norms
+!> @param[out] rnormH/E/V/Q - Element contribution to exact solution norms
+!!
+!> @bdate   Sep 2023
 !---------------------------------------------------------------------------------------
 !
 subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, &
@@ -233,10 +230,10 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, &
       use physics
 !
       implicit none
-      integer, dimension(NR_PHYSA),intent(in ) :: Flag
-      integer,                     intent(in ) :: Mdle
-      real(8),                     intent(out) :: errorH,errorE,errorV,errorQ
-      real(8),                     intent(out) :: rnormH,rnormE,rnormV,rnormQ
+      integer, intent(in)  :: Flag(NR_PHYSA)
+      integer, intent(in)  :: Mdle
+      real(8), intent(out) :: errorH,errorE,errorV,errorQ
+      real(8), intent(out) :: rnormH,rnormE,rnormV,rnormQ
 !
 !     node case (decimal form)
       integer,dimension(NR_PHYSA) :: icased
@@ -369,12 +366,12 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, &
                 i=(iload-1)*NRHVAR+ibeg+icomp
 !
 !               accumulate H1 seminorm
-                IF (.NOT. L2PROJ) THEN
-                do j=1,3
-                  errorH = errorH + abs(zdvalH(i,j) - zdsolH(i,j))**2 * weight
-                  rnormH = rnormH + abs(zdvalH(i,j)              )**2 * weight
-                enddo
-                ENDIF
+                if (.not. L2PROJ) then
+                  do j=1,3
+                    errorH = errorH + abs(zdvalH(i,j) - zdsolH(i,j))**2 * weight
+                    rnormH = rnormH + abs(zdvalH(i,j)              )**2 * weight
+                  enddo
+                endif
 !
 !               accumulate L2 norm
                 errorH = errorH + abs(zvalH(i) - zsolH(i))**2 * weight
@@ -433,14 +430,18 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, &
 !
                 i=(iload-1)*NREVAR+ibeg+icomp
 !
-!               accumulate for the error and norm
+!               accumulate H(curl) seminorm
+                if (.not. L2PROJ) then
+                  do ivar=1,3
+                    ErrorE = ErrorE + abs(zcurlE(ivar,i) - zcurlE_ex(ivar,i))**2 * weight
+                    RnormE = RnormE + abs(                 zcurlE_ex(ivar,i))**2 * weight
+                  enddo
+                endif
+!
+!               accumulate L2 norm
                 do ivar=1,3
                   ErrorE = ErrorE + abs(zsolE(ivar,i) - zvalE(ivar,i))**2 * weight
                   RnormE = RnormE + abs(                zvalE(ivar,i))**2 * weight
-                  IF (.NOT. L2PROJ) THEN
-                  ErrorE = ErrorE + abs(zcurlE(ivar,i) - zcurlE_ex(ivar,i))**2 * weight
-                  RnormE = RnormE + abs(                 zcurlE_ex(ivar,i))**2 * weight
-                  ENDIF
                 enddo
 !
 !             loop over components
@@ -497,10 +498,10 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, &
                 i=(iload-1)*NRVVAR+ibeg+icomp
 !
 !               accumulate H(div) seminorm
-                IF (.NOT. L2PROJ) THEN
-                ErrorV = ErrorV + abs(zdivV_ex(i) - zdivV(i))**2 * weight
-                RnormV = RnormV + abs(zdivV_ex(i)           )**2 * weight
-                ENDIF
+                if (.not. L2PROJ) then
+                  ErrorV = ErrorV + abs(zdivV_ex(i) - zdivV(i))**2 * weight
+                  RnormV = RnormV + abs(zdivV_ex(i)           )**2 * weight
+                endif
 !
 !               accumulate L2 norm
                 do ivar=1,3
@@ -564,8 +565,8 @@ subroutine element_error(Mdle,Flag, errorH,errorE,errorV,errorQ, &
           enddo
 !
           case default
-          write(*,*)'element_error: UNKNOWN PHYSICAL ATTRIBUTE TYPE!'
-          stop
+            write(*,*)'element_error: UNKNOWN PHYSICAL ATTRIBUTE TYPE!'
+            stop
 !
           endselect
 !

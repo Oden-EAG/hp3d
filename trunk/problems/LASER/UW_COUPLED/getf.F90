@@ -191,9 +191,10 @@ subroutine get_bdSource(Mdle,X,Rn, Imp_val)
    VTYPE,dimension(  MAXEQNQ,3,3) :: zd2valQ
 !
 !..miscellaneus
-   integer :: ivar,ibeg,icomp,jcomp,k,l
+   integer    :: ivar,ibeg,icomp,jcomp,k,l
    complex(8) :: zaux
-   VTYPE, dimension(3) :: rntimesE,rn2timesE,rntimesH
+!
+   VTYPE  , dimension(3)   :: rntimesE,rn2timesE,rntimesH
    real(8)                 :: impedanceConstant
    real(8)                 :: E   ! vector field
    real(8), dimension(3)   :: dE  ! 1st derivative
