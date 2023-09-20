@@ -1,5 +1,5 @@
 !-------------------------------------------------------------------------------
-!> @brief      copies one physics variable component set into another, all loads
+!> @brief      copies one physics variable component into another, all loads
 !!
 !> @param[in]  SrcAttr: physics attribute to copy from   = 1,...,NR_PHYSA
 !> @param[in]  SrcComp: attribute component to copy from = 1,...,NR_COMP(SrcAttr)
@@ -8,7 +8,7 @@
 !!
 !> @date       Sep 2023
 !-------------------------------------------------------------------------------
-subroutine copy_attr(SrcAttr,SrcComp,DstAttr,DstComp)
+subroutine copy_comp(SrcAttr,SrcComp,DstAttr,DstComp)
 !
    use parameters
    use data_structure3D
@@ -134,4 +134,4 @@ subroutine copy_attr(SrcAttr,SrcComp,DstAttr,DstComp)
    enddo
 !$OMP END PARALLEL DO
 !
-end subroutine copy_attr
+end subroutine copy_comp
