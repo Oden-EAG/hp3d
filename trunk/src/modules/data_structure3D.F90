@@ -135,7 +135,7 @@ module data_structure3D
 !           do iload=1,NRRHS                                           |
 !              do icomp=1,NREQNH(node%case)                            |
 !                 ivar = ivar+1                                        |
-!                 node%dof(ivar, idof, icoms) = ...                    |
+!                 node%dof%zdofH(ivar, idof, icoms) = ...              |
 !----------------------------------------------------------------------
       type dof_data
 !
