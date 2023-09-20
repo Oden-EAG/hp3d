@@ -132,7 +132,7 @@ subroutine my_paraview_driver
          enddo
 !  ...end loop over attributes
       enddo
-!..end loop over solution copies
+!..end loop over multiple loads
    enddo
 !
    if (.not.QUIET_MODE .and. RANK.eq.ROOT) then

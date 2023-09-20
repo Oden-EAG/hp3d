@@ -47,7 +47,7 @@ subroutine paraview_driver
       write(*,*)'ATTRIBUTE | DISC. SPACE | COMP. | LOAD'
    endif
 !
-!..loop over solution copies
+!..loop over multiple loads
    do iload=1,NRRHS
 !
 !  ...skip selected loads
@@ -104,7 +104,7 @@ subroutine paraview_driver
          enddo
 !  ...end loop over attributes
       enddo
-!..end loop over solution copies
+!..end loop over multiple loads
    enddo
 !
    if (.not.QUIET_MODE .and. RANK.eq.ROOT) then

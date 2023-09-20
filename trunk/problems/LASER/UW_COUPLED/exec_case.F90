@@ -46,9 +46,9 @@ subroutine exec_case(idec)
 !        - 2 H(curl) (signal, E and H flux)
 !        - 2 H(curl) (pump,   E and H flux)
 !        - 1 H(div) (heat flux)
-!        - 6 L2 (signal, E and H field)
-!        - 6 L2 (pump,   E and H Field)
-!
+!        - 6 L2 (signal,    E and H field)
+!        - 6 L2 (pump,      E and H Field)
+!        - 6 L2 (auxiliary, E and H Field)
          iPvAttr = (/.true.,.true.,.true.,.true.,.true.,.true.,.false./)
          if (RANK .eq. ROOT) then
             write(*,300) ' paraview output: select fields (T/F)', &

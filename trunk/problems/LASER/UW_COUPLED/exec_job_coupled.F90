@@ -212,7 +212,7 @@ subroutine exec_job_coupled
 !     (except in the initial time step)
       if (time_step.ge.1 .and. time_step.le.nskip) then
          if (RANK.eq.ROOT) write(*,4200) ' Skipping Maxwell solve in this time step...'
-         iPvAttr = (/.true.,.false.,.false.,.false.,.false.,.false.,.false./) ! output only the heat solution
+         iPvAttr = .false.; iPvAttr(1) = .true. ! output only the heat solution
          goto 420
       endif
 !
