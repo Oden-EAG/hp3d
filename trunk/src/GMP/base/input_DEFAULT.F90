@@ -227,7 +227,7 @@ subroutine input_DEFAULT(Fp)
       read(nin,*) NRDOMAIN
 !
 !---------------------------------------------------------------------
-!  POINTS  and surface domains flag                                  |
+!  POINTS and surface domains flag                                   |
 !---------------------------------------------------------------------
 !
 !  ...read in number of points
@@ -242,11 +242,6 @@ subroutine input_DEFAULT(Fp)
 !
 !  ...most likely, the surface domains flag is missing, set it to 0
       else
-        IF (.NOT. QUIET_MODE) THEN
-          write(*,*) 'input_DEFAULT: ',                     &
-                     'surface domains flag not defined; ',  &
-                     'all surfaces are assigned domain "0"'
-        ENDIF
         isurf_flag = 0
       endif
 !
