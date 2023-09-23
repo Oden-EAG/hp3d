@@ -8,7 +8,7 @@
 !> @param[out] IcN   - Number of all vis object subelement vertices in the active mesh
 !> @param[out] IcP   - Number of points (coords) of all vis objects in the active mesh
 !!
-!> @date Mar 2023
+!> @date Sep 2023
 !----------------------------------------------------------------------------------------
 subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !
@@ -52,11 +52,11 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !..create list of mdle node numbers,
 !  and count number of visualization points
    IcP=0; ico=0; m = 0;
-
+!
    if (VIS_VTU) then
       allocate(VTU_element_type_offset(NRELES))
    endif
-
+!
    do iel=1,NRELES
       mdle = ELEM_ORDER(iel)
       if (PARAVIEW_DOMAIN.ne.0) then
@@ -68,9 +68,9 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
       n_vert_offset(iel) = IcP
       n_obj_offset(iel) = ico
       n_elem_vert(iel) = vis_obj%NR_VERT
-
+!
       if (VIS_VTU) VTU_element_type_offset(iel) = m
-      
+!
       IcP = IcP + vis_obj%NR_VERT
 !
       if (SECOND_ORDER_VIS) then
@@ -84,6 +84,8 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !
    call geometry_init(ico,Icp)
    GEOM_PTS(1:3,1:Icp) = 0.d0; GEOM_OBJ(1:ico) = 0
+!
+   ice_subd = 0
 !
 !$OMP PARALLEL
 !
@@ -147,11 +149,10 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !
 !..Step 3 : Elements
 !
-!..Computing the total number of elements (incl. subelements if vlevel > 0)
+!..Computing the total number of elements (incl. subelements if VLEVEL > 0)
 !..VTU Format needs this information a-priori as VTU needs headers
 !  with this information before appending the data.
    if (VIS_VTU) then
-      ice_subd=0
    !$OMP DO                            &
    !$OMP PRIVATE(mdle,ndom,ntype,ivis) &
    !$OMP REDUCTION(+:ice_subd)
@@ -171,7 +172,6 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
       enddo
    !$OMP END DO
    endif
-!
 !$OMP END PARALLEL
 !
    if (VIS_VTU) then
@@ -264,12 +264,14 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
       IcN = icn_subd
    endif
 !
-!..Step 5 : Write to file with HDF5
+!..Step 5 : Write to file
 !
    if (RANK .eq. ROOT) then
       if (VIS_VTU) then
-         call write_VTU_headers(IcE)
+!     ...with standard I/O
+         call write_VTU_geom(IcE)
       else
+!     ...with HDF5
          call geometry_write(Sname,len(Sname),Sfile,len(Sfile))
       endif
    endif

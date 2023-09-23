@@ -35,9 +35,9 @@ subroutine find_orient_from_list(Ntype,Norientl, Nedge_orient,Nface_orient)
    Nedge_orient(1:12) = 0
    Nface_orient(1: 6) = 0
 !
-   nrv = NVERT(Ntype)
-   nre = NEDGE(Ntype)
-   nrf = NFACE(Ntype)
+   nrv = nvert(Ntype)
+   nre = nedge(Ntype)
+   nrf = nface(Ntype)
 !
    Nedge_orient(1:nre) = Norientl(nrv+1:nrv+nre)
    Nface_orient(1:nrf) = Norientl(nrv+nre+1:nrv+nre+nrf)

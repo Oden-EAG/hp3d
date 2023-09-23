@@ -47,8 +47,8 @@ subroutine find_order_from_list(Ntype,Nodesl, Norder)
   integer, intent(out) :: Norder(19)
   integer :: i, j, nrv, n
 !
-  nrv = NVERT(Ntype)
-  n = NEDGE(Ntype) + NFACE(Ntype) + 1
+  nrv = nvert(Ntype)
+  n = nedge(Ntype) + nface(Ntype) + 1
 !
   do i=1,n
      j = nrv+i

@@ -90,3 +90,4 @@ clean-pv :
 	@rm -f output/figures/*.xmf
 	@rm -f output/figures/*.h5
 	@rm -f ../outputs/paraview/*.vtu
+	@rm -f ../outputs/paraview/*.pvd

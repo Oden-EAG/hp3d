@@ -1,5 +1,5 @@
 ! @brief  module defines node type parameters
-! @date   Feb 2023
+! @date   Sep 2023
 module node_types
 !
    implicit none
@@ -26,22 +26,22 @@ module node_types
       integer, parameter :: SEGM = 16
 !
 !  ...number of vertices for node types
-      integer, parameter, dimension(16) :: NVERT =    &
-       (/   8,   4,   6,   5,   4,   3,   2,   0,     &
+      integer, parameter, dimension(16), private :: NVERT_DATA =  &
+       (/   8,   4,   6,   5,   4,   3,   2,   0,                 &
 !     (/ MDLB,MDLN,MDLP,MDLD,MDLQ,MDLT,MEDG,VERT )
             8,   4,   6,   5,   4,   3,   4,   2 /)
 !     (/ BRIC,TETR,PRIS,PYRA,QUAD,TRIA,RECT,SEGM )
 !
 !  ...number of edges for node types
-      integer, parameter, dimension(16) :: NEDGE =    &
-       (/  12,   6,   9,   8,   4,   3,   0,   0,     &
+      integer, parameter, dimension(16), private :: NEDGE_DATA =  &
+       (/  12,   6,   9,   8,   4,   3,   0,   0,                 &
 !     (/ MDLB,MDLN,MDLP,MDLD,MDLQ,MDLT,MEDG,VERT )
            12,   6,   9,   8,   4,   3,   4,   0 /)
 !     (/ BRIC,TETR,PRIS,PYRA,QUAD,TRIA,RECT,SEGM )
 !
 !  ...number of face for node types
-      integer, parameter, dimension(16) :: NFACE =    &
-       (/   6,   4,   5,   5,   0,   0,   0,   0,     &
+      integer, parameter, dimension(16), private :: NFACE_DATA =  &
+       (/   6,   4,   5,   5,   0,   0,   0,   0,                 &
 !     (/ MDLB,MDLN,MDLP,MDLD,MDLQ,MDLT,MEDG,VERT )
             6,   4,   5,   5,   0,   0,   0,   0 /)
 !     (/ BRIC,TETR,PRIS,PYRA,QUAD,TRIA,RECT,SEGM )
@@ -77,11 +77,31 @@ module node_types
 !
 !-----------------------------------------------------------------------
 !
+!@brief  returns number of vertices for a node type
+!@date   Sep 2023
+      pure integer function nvert(Ntype)
+         integer, intent(in) :: Ntype
+         nvert = NVERT_DATA(Ntype)
+      end function nvert
+!
+!@brief  returns number of edges for a node type
+!@date   Sep 2023
+      pure integer function nedge(Ntype)
+         integer, intent(in) :: Ntype
+         nedge = NEDGE_DATA(Ntype)
+      end function nedge
+!
+!@brief  returns number of faces for a node type
+!@date   Sep 2023
+      pure integer function nface(Ntype)
+         integer, intent(in) :: Ntype
+         nface = NFACE_DATA(Ntype)
+      end function nface
+!
 !@brief  return string representation of a type
 !@date   Feb 2023
-      function S_Type(Itype)
-         Integer Itype
-         character(4) S_Type
+      character(4) function S_Type(Itype)
+         integer, intent(in) :: Itype
          select case(Itype)
             ! node types
             case(MDLB); S_Type = 'mdlb'
@@ -113,9 +133,8 @@ module node_types
 !
 !@brief  return integer representation of a type
 !@date   Feb 2023
-      function I_Type(Stype)
-         character(4) Stype
-         integer I_Type
+      integer function I_Type(Stype)
+         character(4), intent(in) :: Stype
          select case(Stype)
             ! node types
             case('mdlb'); I_Type = MDLB

@@ -37,6 +37,16 @@ module paraview
 !  ...VIS_VTU = .TRUE.  : uses VTU format
    logical            :: VIS_VTU = .FALSE.
 !
+!..PVD_IO: File identifier for writting pvd file.
+   integer,parameter  :: PVD_IO  = 23
+!
+!..PARAVIEW_TIME: time tag set by the user
+   real(8)            :: PARAVIEW_TIME = -1.d0
+!
+!..maximum number of time steps anticipated
+!  (used to pre-allocate array for saving time tags)
+   integer            :: PARAVIEW_MAX_TIMESTEPS = 10000
+!
 !  this is matching EXGEOM flag in "control" module
    integer,parameter  :: PARAVIEW_ISOGEOM = 0
    integer,parameter  :: PARAVIEW_EXGEOM  = 1
