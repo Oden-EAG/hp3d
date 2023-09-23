@@ -4,7 +4,7 @@
 
 1         NRDOMAIN
 
-0         BDOM_FLAG
+1         BDOM_FLAG
 
 8         NRPOINT
 
@@ -78,28 +78,25 @@ Seglin              curve 12
 6 NRRECTA
 
 BilQua              rectangle 1
-1 2 3 4
+1   1 2 3 4
 
 BilQua              rectangle 2
-5 6 7 8
+2   5 6 7 8
 
 BilQua              rectangle 3
-1 2 6 5
+3   1 2 6 5
 
 BilQua              rectangle 4
-2 3 7 6
+4   2 3 7 6
 
 BilQua              rectangle 5
-4 3 7 8
+5   4 3 7 8
 
 BilQua              rectangle 6
-1 4 8 5
-
-
+6   1 4 8 5
 
 
 0 NRPRISM
-
 
 
 1 NRHEXAS
@@ -108,9 +105,7 @@ Linear              hexa 1
 1    1 2 3 4 5 6 7 8
 
 
-
 0 NRTETRA
-
 
 
 0 NRPYRAM

@@ -27,9 +27,9 @@ module node_types
 !
 !  ...number of vertices for node types
       integer, parameter, dimension(16), private :: NVERT_DATA =  &
-       (/   8,   4,   6,   4,   4,   3,   2,   0,                 &
+       (/   8,   4,   6,   5,   4,   3,   2,   0,                 &
 !     (/ MDLB,MDLN,MDLP,MDLD,MDLQ,MDLT,MEDG,VERT )
-            8,   4,   6,   4,   4,   3,   4,   2 /)
+            8,   4,   6,   5,   4,   3,   4,   2 /)
 !     (/ BRIC,TETR,PRIS,PYRA,QUAD,TRIA,RECT,SEGM )
 !
 !  ...number of edges for node types

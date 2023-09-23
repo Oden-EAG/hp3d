@@ -1,29 +1,16 @@
-!> @brief Tests a specific h-adaptive refinement case for hexa mesh
-!> @details Tests a specific refinement pattern that caused an issue
-!!          with DOF allocation of a constrained edge at a subdomain
-!!          interface (see Remark 2 in distr_refresh). The now-fixex
-!!          issue was observed when using 2 or 4 MPI ranks and
-!!          isotropic closing in refine and close_mesh.
-!> @date Mar 2023
-program test_hexa_adapt_h_case1
+!> @brief Tests index_to_attr subroutine
+!> @date Sep 2023
+program test_index_to_attr
 !
-   use data_structure3D
-   use environment
-   use mpi
    use mpi_param
    use mpi_wrapper
-   use par_mesh
+   use physics
 !
    implicit none
 !
    integer :: NPASS
 !
-!..percentage of elements to refine per iteration
-   real(8), parameter :: PERC = 0.2d0
-!..number of iterations
-   integer, parameter :: NITR = 5
-!..max number of randomly refined elements
-   integer, parameter :: NREF_MAX = 10000
+   integer :: attr,comp,index
 !
    QUIET_MODE = .true.
 !
@@ -33,114 +20,69 @@ program test_hexa_adapt_h_case1
 !..initialize physics, geometry, etc.
    call initialize
 !
-!..perform one uniform h-refinement
-   call global_href
-   call update_gdof
-   call update_Ddof
-!
-   if (DISTRIBUTED) then
-      EXCHANGE_DOF = .false.
-      call par_verify
-      call zoltan_w_set_lb(0)
-      call distr_mesh
+!..this test is set up for sequential computation
+   if (NUM_PROCS > 1) then
+      write(*,*) 'test_index_to_attr: NUM_PROCS>1'
+      NPASS = 1; goto 99
    endif
 !
-   call hexa_adapt_h_case1
+   NPASS = 1
+!
+!..physics attributes components
+!  attr | comp | index | description
+!     1 |  1-2 |   1-2 | H1
+!     2 |  1-2 |   3-4 | H(curl)
+!     3 |  1-2 |   5-6 | H(div)
+!     4 |  1-2 |   7-8 | L2
+!
+   index = 1
+   call index_to_attr(index, attr,comp)
+   if (attr .ne. 1) NPASS = 0
+   if (comp .ne. 1) NPASS = 0
+!
+   index = 2
+   call index_to_attr(index, attr,comp)
+   if (attr .ne. 1) NPASS = 0
+   if (comp .ne. 2) NPASS = 0
+!
+   index = 3
+   call index_to_attr(index, attr,comp)
+   if (attr .ne. 2) NPASS = 0
+   if (comp .ne. 1) NPASS = 0
+!
+   index = 4
+   call index_to_attr(index, attr,comp)
+   if (attr .ne. 2) NPASS = 0
+   if (comp .ne. 2) NPASS = 0
+!
+   index = 5
+   call index_to_attr(index, attr,comp)
+   if (attr .ne. 3) NPASS = 0
+   if (comp .ne. 1) NPASS = 0
+!
+   index = 6
+   call index_to_attr(index, attr,comp)
+   if (attr .ne. 3) NPASS = 0
+   if (comp .ne. 2) NPASS = 0
+!
+   index = 7
+   call index_to_attr(index, attr,comp)
+   if (attr .ne. 4) NPASS = 0
+   if (comp .ne. 1) NPASS = 0
+!
+   index = 8
+   call index_to_attr(index, attr,comp)
+   if (attr .ne. 4) NPASS = 0
+   if (comp .ne. 2) NPASS = 0
+!
+ 99 continue
 !
 !..finalize MPI environment
    call mpi_w_finalize
 !
    if (NPASS.ne.1) stop 1
 !
-   contains
-!
-!----------------------------------------------------------------------
-! !> @brief Refines mesh randomly
-! !> @date Mar 2023
-!----------------------------------------------------------------------
-   subroutine hexa_adapt_h_case1
-!
-      integer :: idx,icnt,itr,kref,mdle,nref
-      real(8) :: x
-!
-      integer :: mdle_ref(NREF_MAX)
-      integer :: kref_ref(NREF_MAX)
-!
-      integer, parameter :: myitr(7) = (/ 1, 3, 1, 5, 7, 9, 37 /)
-      integer, parameter :: nin = 103
-!
-      integer :: iprint
-      iprint=0
-!
-      NPASS = 1
-!
-      icnt = 0
-!
-      open(unit=nin,file='./hexa_adapt_h_case1.txt', &
-           form='formatted',access='sequential',status='old',action='read')
-      do idx=1,sum(myitr)
-         icnt = icnt+1
-         read(nin,*) mdle_ref(icnt),kref_ref(icnt)
-      enddo
-      close(nin)
-!
-      if (iprint.ge.1 .and. RANK.eq.ROOT) then
-         write(*,110) ' NITR,PERC = ',NITR,PERC
-     110 format(' hexa_adapt_h_case1: ',A,I3,',',F5.2)
-      endif
-!
-      icnt = 0
-      do itr=1,7
-!
-         nref = myitr(itr)
-         if (iprint.ge.1 .and. RANK.eq.ROOT) then
-            write(*,120) '  itr,nref = ',itr,nref
-        120 format(' hexa_adapt_h_case1: ',A,I3,',',I5)
-         endif
-!
-         ! iterate nref times
-         do while (nref.gt.0)
-!
-!        ...random number generate from 0.0 to 1.0
-            icnt = icnt+1
-            mdle = mdle_ref(icnt)
-            kref = kref_ref(icnt)
-!
-            if (iprint.gt.1 .and. RANK.eq.ROOT) then
-               write(*,140) ' mdle,kref = ',mdle,kref
-           140 format(' hexa_adapt_h_case1: ',A,I6,',',I4)
-            endif
-!
-            if (NODES(mdle)%ntype .ne. MDLB) then
-               if (RANK.eq.ROOT) then
-                  write(*,*) ' NOT MDLB: mdle,ntype = ',mdle,S_Type(NODES(mdle)%ntype)
-               endif
-            endif
-!
-            call refine(mdle, kref)
-!
-            nref = nref-1
-!
-!     ...end loop over nref
-         enddo
-!
-         call close_mesh
-!
-         if (DISTRIBUTED) then
-!        ...verify mesh consistency
-            call par_verify
-!        ...repartition
-            call distr_mesh
-         endif
-!
-!  ...end loop over itr
-      enddo
-!
-   end subroutine hexa_adapt_h_case1
-!
-!
-end program test_hexa_adapt_h_case1
-!
+end program test_index_to_attr
 !
 !----------------------------------------------------------------------
 !> @brief initialization
@@ -151,7 +93,6 @@ subroutine initialize
    use GMP
    use data_structure3D
    use refinements
-   use zoltan_wrapper
 !
    implicit none
 !
@@ -193,7 +134,7 @@ subroutine initialize
    call read_geometry('../files/mesh/hexa_orient_0')
 !
 !..read physics file and generate mesh data structures
-   call hp3gen('../files/physics/physics_0')
+   call hp3gen('../files/physics/physics_2')
 !
    QUIET_MODE = q
 !

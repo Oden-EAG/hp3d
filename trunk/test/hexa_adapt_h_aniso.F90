@@ -267,7 +267,7 @@ subroutine set_initial_mesh(Nelem_order)
       do i=1,NRINDEX
          call encodg(ibc(1:6,i),10,6, ELEMS(iel)%bcond(i))
       enddo
-      
+!
    enddo
 !
 end subroutine set_initial_mesh
