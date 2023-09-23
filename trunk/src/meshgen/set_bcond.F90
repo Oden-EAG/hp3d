@@ -93,7 +93,7 @@ subroutine set_bcond_elem(Iel,Dom,Attr,Comp,Flag)
 !..set BC flags on all exterior faces of this element
 !  with the correct boundary domain ID
    etype = ELEMS(Iel)%etype
-   do ifc=1,NFACE(etype)
+   do ifc=1,nface(etype)
       neig = ELEMS(Iel)%neig(ifc)
 !  ...exterior face (no neighbor)
       if (neig .eq. 0) then
