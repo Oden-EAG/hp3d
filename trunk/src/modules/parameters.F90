@@ -14,19 +14,19 @@ module parameters
    integer, parameter :: NSTD_ERR = 0
 !
 !..maximum order of approximation: 1,...,9
-   integer, parameter :: MAXP=6
+   integer, parameter :: MAXP = 6
 !
 !..modulo to encode polynomial orders
 !  (do not change unless using stand-alone shape functions package)
-   integer, parameter :: MODORDER=10
+   integer, parameter :: MODORDER = 10
 !
 !----------------------------------------------------------------------
 !
 !..maximum number of parent dof for a constrained dof
-   integer, parameter :: NACDIM=(MAXP+1)**2
+   integer, parameter :: NACDIM = (MAXP+1)**2
 !
 !..maximum number of nodes for a modified element
-   integer, parameter :: MAXNODM=50
+   integer, parameter :: MAXNODM = 50
 !
 !..maximum number of generation
    integer, parameter :: MAXGEN = 20
@@ -80,40 +80,40 @@ module parameters
 !----------------------------------------------------------------------
 !  ==== NODE ===
 !..maximum number of dof for 'mdlt' (tria middle node)
-   integer, parameter :: MAXmdltH=(MAXP-2)*(MAXP-1)/2
-   integer, parameter :: MAXmdltE=(MAXP-1)*MAXP
-   integer, parameter :: MAXmdltV=MAXmdltE
-   integer, parameter :: MAXmdltQ=MAXP*(MAXP+1)/2
+   integer, parameter :: MAXmdltH = (MAXP-2)*(MAXP-1)/2
+   integer, parameter :: MAXmdltE = (MAXP-1)*MAXP
+   integer, parameter :: MAXmdltV = MAXmdltE
+   integer, parameter :: MAXmdltQ = MAXP*(MAXP+1)/2
 !
 !..maximum number of dof for 'mdlq' (quad middle node)
-   integer, parameter :: MAXmdlqH=(MAXP-1)**2
-   integer, parameter :: MAXmdlqE=2*MAXP*(MAXP-1)
-   integer, parameter :: MAXmdlqV=MAXmdlqE
-   integer, parameter :: MAXmdlqQ=MAXP**2
+   integer, parameter :: MAXmdlqH = (MAXP-1)**2
+   integer, parameter :: MAXmdlqE = 2*MAXP*(MAXP-1)
+   integer, parameter :: MAXmdlqV = MAXmdlqE
+   integer, parameter :: MAXmdlqQ = MAXP**2
 !
 !..maximum number of dof for 'mdlb' (bric middle node)
-   integer, parameter :: MAXmdlbH=(MAXP-1)**3
-   integer, parameter :: MAXmdlbE=3*MAXP*(MAXP-1)**2
-   integer, parameter :: MAXmdlbV=3*MAXP**2*(MAXP-1)
-   integer, parameter :: MAXmdlbQ=MAXbrickQ
+   integer, parameter :: MAXmdlbH = (MAXP-1)**3
+   integer, parameter :: MAXmdlbE = 3*MAXP*(MAXP-1)**2
+   integer, parameter :: MAXmdlbV = 3*MAXP**2*(MAXP-1)
+   integer, parameter :: MAXmdlbQ = MAXbrickQ
 !
 !..maximum number of dof for 'mdln' (tetr middle node)
-   integer, parameter :: MAXmdlnH=(MAXP-3)*(MAXP-2)*(MAXP-1)/6
-   integer, parameter :: MAXmdlnE=(MAXP-2)*(MAXP-1)*MAXP/2
-   integer, parameter :: MAXmdlnV=(MAXP-1)*MAXP*(MAXP+1)/2
-   integer, parameter :: MAXmdlnQ=MAXtetraQ
+   integer, parameter :: MAXmdlnH = (MAXP-3)*(MAXP-2)*(MAXP-1)/6
+   integer, parameter :: MAXmdlnE = (MAXP-2)*(MAXP-1)*MAXP/2
+   integer, parameter :: MAXmdlnV = (MAXP-1)*MAXP*(MAXP+1)/2
+   integer, parameter :: MAXmdlnQ = MAXtetraQ
 !
 !..maximum number of dof for 'mdlp' (pris middle node)
-   integer, parameter :: MAXmdlpH=MAXmdltH*(MAXP-1)
-   integer, parameter :: MAXmdlpE=MAXmdltE*(MAXP-1)+MAXmdltH*MAXP
-   integer, parameter :: MAXmdlpV=MAXmdltV*MAXP+MAXmdltQ*(MAXP-1)
-   integer, parameter :: MAXmdlpQ=MAXprismQ
+   integer, parameter :: MAXmdlpH = MAXmdltH*(MAXP-1)
+   integer, parameter :: MAXmdlpE = MAXmdltE*(MAXP-1)+MAXmdltH*MAXP
+   integer, parameter :: MAXmdlpV = MAXmdltV*MAXP+MAXmdltQ*(MAXP-1)
+   integer, parameter :: MAXmdlpQ = MAXprismQ
 !
 !..maximum number of dof for 'mdld' (pyra middle node)
-   integer, parameter :: MAXmdldH=(MAXP-1)**3
-   integer, parameter :: MAXmdldE=3*(MAXP-1)**2*MAXP
-   integer, parameter :: MAXmdldV=3*(MAXP-1)*MAXP**2
-   integer, parameter :: MAXmdldQ=MAXpyramQ
+   integer, parameter :: MAXmdldH = (MAXP-1)**3
+   integer, parameter :: MAXmdldE = 3*(MAXP-1)**2*MAXP
+   integer, parameter :: MAXmdldV = 3*(MAXP-1)*MAXP**2
+   integer, parameter :: MAXmdldQ = MAXpyramQ
 !
 !----------------------------------------------------------------------
 !
