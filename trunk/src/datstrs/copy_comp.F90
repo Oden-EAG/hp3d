@@ -18,7 +18,8 @@ subroutine copy_comp(SrcAttr,SrcComp,DstAttr,DstComp)
    integer, intent(in)  :: SrcAttr,SrcComp
    integer, intent(in)  :: DstAttr,DstComp
 !
-   integer :: nod,src_off,dst_off,src_comp,dst_comp,ndof,iload,icomp_src,icomp_dst
+   integer :: nod,src_off,dst_off,src_comp,dst_comp,ndof
+   integer :: idof,iload,icomp_src,icomp_dst
 !
 !-------------------------------------------------------------------------------
 !
@@ -39,17 +40,17 @@ subroutine copy_comp(SrcAttr,SrcComp,DstAttr,DstComp)
       write(*,1000) 'DstComp',DstComp
       stop
    endif
-   1000 format('copy_attr: Invalid parameter:',A,' = ',I5)
+   1000 format('copy_comp: Invalid parameter:',A,' = ',I5)
 !
    if (D_TYPE(SrcAttr).ne.D_TYPE(DstAttr)) then
       write(*,2000) 'D_TYPE(SrcAttr)',D_TYPE(SrcAttr), &
                     'D_TYPE(DstAttr)',D_TYPE(DstAttr)
       stop
    endif
-   2000 format('copy_attr: Invalid parameters:',A,' = ',I5,', ',A,' = ',I5)
+   2000 format('copy_comp: Invalid parameters:',A,' = ',I5,', ',A,' = ',I5)
 !
    if ((SrcAttr.eq.DstAttr).and.(SrcComp.eq.DstComp)) then
-      write(*,*) 'copy_attr: SrcAttr = DstAttr = ',SrcAttr, &
+      write(*,*) 'copy_comp: SrcAttr = DstAttr = ',SrcAttr, &
                           ', SrcComp = DstComp = ',SrcComp
       return
    endif
@@ -58,8 +59,8 @@ subroutine copy_comp(SrcAttr,SrcComp,DstAttr,DstComp)
    icomp_src = ADRES(SrcAttr) + SrcComp
    icomp_dst = ADRES(DstAttr) + DstComp
 !
-!$OMP PARALLEL DO                            &
-!$OMP PRIVATE(src_comp,dst_comp,ndof,iload)  &
+!$OMP PARALLEL DO                                 &
+!$OMP PRIVATE(src_comp,dst_comp,ndof,idof,iload)  &
 !$OMP SCHEDULE(DYNAMIC)
 !..loop through active nodes
    do nod=1,NRNODS
@@ -73,14 +74,14 @@ subroutine copy_comp(SrcAttr,SrcComp,DstAttr,DstComp)
 !     ...H1 dof
          if (.not. associated(NODES(nod)%dof%zdofH)) goto 10
          ndof = ubound(NODES(nod)%dof%zdofH,2)
-         if (ndof > 0) then
+         do idof=1,ndof
             do iload=1,NRRHS
                src_comp = (iload-1)*NRHVAR + icomp_src
                dst_comp = (iload-1)*NRHVAR + icomp_dst
-               NODES(nod)%dof%zdofH(dst_comp,1:ndof,N_COMS) = &
-               NODES(nod)%dof%zdofH(src_comp,1:ndof,N_COMS)
+               NODES(nod)%dof%zdofH(dst_comp,idof,N_COMS) = &
+               NODES(nod)%dof%zdofH(src_comp,idof,N_COMS)
             enddo
-         endif
+         enddo
      10  continue
 !
       case(TANGEN)
@@ -88,14 +89,14 @@ subroutine copy_comp(SrcAttr,SrcComp,DstAttr,DstComp)
 !     ...H(curl) dof
          if (.not. associated(NODES(nod)%dof%zdofE)) goto 20
          ndof = ubound(NODES(nod)%dof%zdofE,2)
-         if (ndof > 0) then
+         do idof=1,ndof
             do iload=1,NRRHS
                src_comp = (iload-1)*NREVAR + icomp_src
                dst_comp = (iload-1)*NREVAR + icomp_dst
-               NODES(nod)%dof%zdofE(dst_comp,1:ndof,N_COMS) = &
-               NODES(nod)%dof%zdofE(src_comp,1:ndof,N_COMS)
+               NODES(nod)%dof%zdofE(dst_comp,idof,N_COMS) = &
+               NODES(nod)%dof%zdofE(src_comp,idof,N_COMS)
             enddo
-         endif
+         enddo
      20  continue
 !
       case(NORMAL)
@@ -103,14 +104,14 @@ subroutine copy_comp(SrcAttr,SrcComp,DstAttr,DstComp)
 !     ...H(div) dof
          if (.not. associated(NODES(nod)%dof%zdofV)) goto 30
          ndof = ubound(NODES(nod)%dof%zdofV,2)
-         if (ndof > 0) then
+         do idof=1,ndof
             do iload=1,NRRHS
                src_comp = (iload-1)*NRVVAR + icomp_src
                dst_comp = (iload-1)*NRVVAR + icomp_dst
-               NODES(nod)%dof%zdofV(dst_comp,1:ndof,N_COMS) = &
-               NODES(nod)%dof%zdofV(src_comp,1:ndof,N_COMS)
+               NODES(nod)%dof%zdofV(dst_comp,idof,N_COMS) = &
+               NODES(nod)%dof%zdofV(src_comp,idof,N_COMS)
             enddo
-         endif
+         enddo
      30  continue
 !
       case(DISCON)
@@ -118,14 +119,14 @@ subroutine copy_comp(SrcAttr,SrcComp,DstAttr,DstComp)
 !     ...L2 dof
          if (.not. associated(NODES(nod)%dof%zdofQ)) goto 40
          ndof = ubound(NODES(nod)%dof%zdofQ,2)
-         if (ndof > 0) then
+         do idof=1,ndof
             do iload=1,NRRHS
                src_comp = (iload-1)*NRQVAR + icomp_src
                dst_comp = (iload-1)*NRQVAR + icomp_dst
-               NODES(nod)%dof%zdofQ(dst_comp,1:ndof,N_COMS) = &
-               NODES(nod)%dof%zdofQ(src_comp,1:ndof,N_COMS)
+               NODES(nod)%dof%zdofQ(dst_comp,idof,N_COMS) = &
+               NODES(nod)%dof%zdofQ(src_comp,idof,N_COMS)
             enddo
-         endif
+         enddo
      40  continue
 !
      end select
