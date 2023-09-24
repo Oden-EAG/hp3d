@@ -90,7 +90,7 @@ subroutine close_mesh()
 !$OMP         krefe,kreff,kref,j,nv,ne,nf,nve)        &
 !$OMP REDUCTION (+:ic)
       do i=1,NRELES
-         mdle=ELEM_ORDER(i)
+         mdle = ELEM_ORDER(i)
          call elem_nodes(mdle, nodesl,norientl)
 !
          ntype = NODES(mdle)%ntype
