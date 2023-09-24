@@ -430,8 +430,6 @@ subroutine exact(X,Icase, ValH,DvalH,D2valH, &
    VTYPE,dimension(  MAXEQNQ,3  ) ::  dvalQ
    VTYPE,dimension(  MAXEQNQ,3,3) :: D2valQ
 !
-   real(8), parameter :: PI = 4.d0*datan(1.d0)
-!
    real(8) :: x1,x2,x3
    x1 = X(1); x2 = X(2); x3 = X(3)
 !
