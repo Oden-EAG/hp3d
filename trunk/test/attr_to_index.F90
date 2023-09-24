@@ -120,7 +120,7 @@ subroutine initialize
 !                        NRCOMS // MAXNRHS //
    call set_parameters(      1 ,        1 ,  &
 !                       MAXEQNH // MAXEQNE // MAXEQNV // MAXEQNQ //
-                             1 ,        1,         1,         1)
+                             2 ,        2,         2,         2)
 !
 !..read geometry file
    call read_geometry('../files/mesh/hexa_orient_0')
