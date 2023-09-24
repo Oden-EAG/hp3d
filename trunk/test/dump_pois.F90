@@ -1,8 +1,8 @@
-!> @brief Tests polynomial solution for Poisson Galerkin problem
-!> @details Tests exact representation of a polynomial solution
-!!          for the classical variational Poisson problem
-!> @date Mar 2023
-program test_poly_pois
+!> @brief Tests datastructure dumpout and dumpin debug routines
+!> @details Tests whether exporting the datastructure to file
+!!          and then importing retains all DOFs correctly
+!> @date Sep 2023
+program test_dump_pois
 !
    use control
    use data_structure3D
@@ -15,10 +15,9 @@ program test_poly_pois
 !
    implicit none
 !
-   integer :: NPASS
+   logical, external :: dnear
 !
-!..number of uniform h-refinements
-   integer, parameter :: nref = 2
+   integer :: NPASS
 !
    QUIET_MODE = .true.
 !
@@ -26,7 +25,7 @@ program test_poly_pois
    call mpi_w_init
 !
 #if C_MODE
-   write(*,*) 'test_poly_pois: C_MODE'
+   write(*,*) 'test_dump_pois: C_MODE'
    NPASS = 1; goto 99
 #endif
 !
@@ -35,11 +34,11 @@ program test_poly_pois
 !
 !..this test is set up for sequential computation
    if (NUM_PROCS > 1) then
-      write(*,*) 'test_poly_pois: NUM_PROCS>1'
+      write(*,*) 'test_dump_pois: NUM_PROCS>1'
       NPASS = 1; goto 99
    endif
 !
-   call poly_pois(nref)
+   call dump_pois
 !
  99 continue
 !
@@ -51,20 +50,19 @@ program test_poly_pois
    contains
 !
 !----------------------------------------------------------------------
-! !> @brief Computes H1 error for Poisson Galerkin problem with
-!!          manufactured polynomial solution
-! !> @date Mar 2023
+!> @brief Computes H1 error for Poisson Galerkin problem with
+!!        manufactured sinusoidal solution before dumping out
+!!        datastructure and after dumping in again
+!> @date Sep 2023
 !----------------------------------------------------------------------
-   subroutine poly_pois(Nref)
-!
-      use assembly_sc, only: NRDOF_TOT
-!
-      integer, intent(in) :: Nref
+   subroutine dump_pois
 !
       real(8) :: errorH,errorE,errorV,errorQ
       real(8) :: rnormH,rnormE,rnormV,rnormQ
 !
-      real(8) :: err_curr
+      real(8) :: err_curr,err_dump
+!
+      character(len=15) :: dump_file
 !
       integer :: iflag(1),iel,i
 !
@@ -80,42 +78,85 @@ program test_poly_pois
 !
       iflag(1) = 1
 !
-!  ...do refinements and solve
-      do i=1,Nref
-!     ...refine
-         call global_href
-!     ...update geometry and Dirichlet DOFs
-         call update_gdof
-         call update_Ddof
-!     ...solve
-         call mumps_sc('G')
+!  ...refine
+      call global_href
 !
-!     ...compute H1 error
-         err_curr = 0.d0
-         do iel=1,NRELES
-            call element_error(ELEM_ORDER(iel),iflag,          &
-                               errorH,errorE,errorV,errorQ,    &
-                               rnormH,rnormE,rnormV,rnormQ)
-            err_curr = err_curr + errorH
-         enddo
-         err_curr = sqrt(err_curr)
+!  ...update geometry and Dirichlet DOFs
+      call update_gdof
+      call update_Ddof
 !
-         if (err_curr > 1.0d-15) then
-            NPASS = 0
-            iprint = 1
-         endif
+!  ...solve
+      call mumps_sc('G')
 !
-         if (iprint.eq.1) then
-            write(*,210) NRDOF_TOT,err_curr
-        210 format(  'poly_pois: dof_curr, err_curr = ',I10,' ,',ES12.4)
-         endif
-!
+!  ...compute H1 error
+      err_curr = 0.d0
+      do iel=1,NRELES
+         call element_error(ELEM_ORDER(iel),iflag,          &
+                            errorH,errorE,errorV,errorQ,    &
+                            rnormH,rnormE,rnormV,rnormQ)
+         err_curr = err_curr + errorH
       enddo
+      err_curr = sqrt(err_curr)
 !
-   end subroutine poly_pois
+!  ...dumpout datastructure
+      dump_file = 'dump_pois_file'
+      call dumpout_hp3d(dump_file)
+!
+!  ...refine the mesh to change current DOFs
+      call global_href
+!
+!  ...dumpin datastructure
+      call dumpin_hp3d(dump_file,Delete_file=.true.)
+!
+!  ...compute the error again
+      err_dump = 0.d0
+      do iel=1,NRELES
+         call element_error(ELEM_ORDER(iel),iflag,          &
+                            errorH,errorE,errorV,errorQ,    &
+                            rnormH,rnormE,rnormV,rnormQ)
+         err_dump = err_dump + errorH
+      enddo
+      err_dump = sqrt(err_dump)
+!
+      if (.not. dnear(err_curr,err_dump)) then
+         NPASS = 0
+         iprint = 1
+         goto 80
+      endif
+!
+!  ...update geometry and Dirichlet DOFs
+      call update_gdof
+      call update_Ddof
+!
+!  ...solve
+      call mumps_sc('G')
+!
+!  ...compute the error again after resolving the problem
+      err_dump = 0.d0
+      do iel=1,NRELES
+         call element_error(ELEM_ORDER(iel),iflag,          &
+                            errorH,errorE,errorV,errorQ,    &
+                            rnormH,rnormE,rnormV,rnormQ)
+         err_dump = err_dump + errorH
+      enddo
+      err_dump = sqrt(err_dump)
+!
+      if (.not. dnear(err_curr,err_dump)) then
+         NPASS = 0
+         iprint = 1
+      endif
+!
+   80 continue
+!
+      if (iprint.eq.1) then
+         write(*,210) err_curr,err_dump
+     210 format(  'dump_pois: err_curr, err_dump = ',I10,' ,',ES12.4)
+      endif
+!
+   end subroutine dump_pois
 !
 !
-end program test_poly_pois
+end program test_dump_pois
 !
 !
 !----------------------------------------------------------------------
@@ -160,8 +201,10 @@ subroutine initialize
                                     1 ,        0 ,           0)
 !
 !..set hp3D parameters
-!                      NRCOMS, NRRHS
-   call set_parameters(     1,     1)
+!                        NRCOMS // MAXNRHS //
+   call set_parameters(      1 ,        1 ,  &
+!                       MAXEQNH // MAXEQNE // MAXEQNV // MAXEQNQ //
+                             1 ,        1,         1,         1)
 !
 !..read geometry file
    call read_geometry('../files/mesh/hexa_orient_0')
@@ -187,7 +230,7 @@ subroutine set_initial_mesh(Nelem_order)
    integer, intent(out) :: Nelem_order(NRELIS)
 !
    if (NRINDEX .ne. 1) then
-      write(*,*) 'poly_pois: NRINDEX = ',NRINDEX
+      write(*,*) 'dump_pois: NRINDEX = ',NRINDEX
       stop
    endif
 !
@@ -199,7 +242,7 @@ subroutine set_initial_mesh(Nelem_order)
       ELEMS(iel)%physics(1) ='field'
 !
 !  ...set initial mesh element order
-      Nelem_order(iel) = 111
+      Nelem_order(iel) = 222
 !
 !  ...set boundary condition flags: 0 - no BC ; 1 - Dirichlet
       ibc(1:6,1) = 1
@@ -379,36 +422,35 @@ subroutine exact(X,Icase, ValH,DvalH,D2valH, &
    real(8),dimension(  MAXEQNQ,3  ) ::  dvalQ
    real(8),dimension(  MAXEQNQ,3,3) :: D2valQ
 !
+   real(8), parameter   :: PI = 4.d0*datan(1.d0)
+!
    real(8) :: f_x,f_y,f_z,df_x,df_y,df_z,ddf_x,ddf_y,ddf_z
    real(8) :: x1,x2,x3
    x1 = X(1); x2 = X(2); x3 = X(3)
 !
 !..make sure exact solution is available
    if (NEXACT.ne.1) then
-      write(*,*) 'poly_pois: NEXACT =',NEXACT
+      write(*,*) 'dump_pois: NEXACT =',NEXACT
       stop
    endif
 !
-   f_x = x1; df_x = 1.d0; ddf_x = 0.d0
-   f_y = x2; df_y = 1.d0; ddf_y = 0.d0
-   f_z = x3; df_z = 1.d0; ddf_z = 0.d0
+!..smooth sin sinh z solution on unit cube
+!  non-vanishing boundary only on x=1,y=1,z=1
+   ValH(1)    = dsin(x1*PI)*dsinh(x2*PI)*(x3**2)
 !
-!..linear polynomial solution
-   ValH(1)    = f_x*f_y*f_z
+   DValH(1,1) = PI*dcos(x1*PI)*dsinh(x2*PI)*(x3**2)
+   DValH(1,2) = PI*dsin(x1*PI)*dcosh(x2*PI)*(x3**2)
+   DValH(1,3) = 2.*dsin(x1*PI)*dsinh(x2*PI)*x3
 !
-   DValH(1,1) = df_x *   f_y *   f_z
-   DValH(1,2) = f_x *  df_y *   f_z
-   DValH(1,3) = f_x *   f_y *  df_z
-!
-   D2valH(1,1,1) = ddf_x *   f_y *   f_z
-   D2valH(1,1,2) =  df_x *  df_y *   f_z
-   D2valH(1,1,3) =  df_x *   f_y *  df_z
-   D2valH(1,2,1) =  D2valH(1,1,2)
-   D2valH(1,2,2) =   f_x * ddf_y *   f_z
-   D2valH(1,2,3) =   f_x *  df_y *  df_z
-   D2valH(1,3,1) =  D2valH(1,1,3)
-   D2valH(1,3,2) =  D2valH(1,2,3)
-   D2valH(1,3,3) =   f_x *   f_y * ddf_z
+   D2valH(1,1,1) = -PI*PI*dsin(x1*PI)*dsinh(x2*PI)*(x3**2)
+   D2valH(1,1,2) =  PI*PI*dcos(x1*PI)*dcosh(x2*PI)*(x3**2)
+   D2valH(1,1,3) =  2.*PI*dcos(x1*PI)*dsinh(x2*PI)*x3
+   D2valH(1,2,1) =  PI*PI*dcos(x1*PI)*dcosh(x2*PI)*(x3**2)
+   D2valH(1,2,2) =  PI*PI*dsin(x1*PI)*dsinh(x2*PI)*(x3**2)
+   D2valH(1,2,3) =  2.*PI*dsin(x1*PI)*dcosh(x2*PI)*x3
+   D2valH(1,3,1) =  2.*PI*dcos(x1*PI)*dsinh(x2*PI)*x3
+   D2valH(1,3,2) =  2.*PI*dsin(x1*PI)*dcosh(x2*PI)*x3
+   D2valH(1,3,3) =  2.*   dsin(x1*PI)*dsinh(x2*PI)
 !
 end subroutine exact
 !
@@ -452,7 +494,7 @@ end subroutine getf
 subroutine celem(Mdle,Idec,Nrdofs,Nrdofm,Nrdofc,Nodm, &
                  NdofmH,NdofmE,NdofmV,NdofmQ,Nrnodm,Bload,Astif)
 !
-   write(*,*) 'poly_pois: celem'
+   write(*,*) 'dump_pois: celem'
    stop
 !
 end subroutine celem

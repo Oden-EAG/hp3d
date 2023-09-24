@@ -52,8 +52,8 @@ program test_conv_pois
    contains
 !
 !----------------------------------------------------------------------
-! !> @brief Computes convergence rate for Poisson Galerkin problem
-! !> @date Mar 2023
+!> @brief Computes convergence rate for Poisson Galerkin problem
+!> @date Mar 2023
 !----------------------------------------------------------------------
    subroutine conv_pois(Nref)
 !
