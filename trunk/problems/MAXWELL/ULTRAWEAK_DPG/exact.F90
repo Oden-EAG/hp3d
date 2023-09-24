@@ -63,8 +63,7 @@
       ValV=ZERO ; DvalV=ZERO ; D2valV=ZERO
       ValQ=ZERO ; DvalQ=ZERO ; D2valQ=ZERO
 !
-!  ...set Maxwell field: signal (1) or pump (0)
-!     (only relevant for Maxwell cases)
+!  ...auxiliary value
       idx = 1
 !
 !  ...set icomp (the only non-zero component of the Etrc solution)
@@ -111,8 +110,7 @@
 !  ...2nd order derivatives (not needed)
 !
 !  ...L2 components, derivatives not needed
-!  ...signal EH fields
-      ValQ(1:3) = ValE(1:3,1)
-      ValQ(4:6) = ValE(1:3,2)
+      ValQ(1:3) = ValE(1:3,1) ! E-field
+      ValQ(4:6) = ValE(1:3,2) ! H-field
 !
    end subroutine exact

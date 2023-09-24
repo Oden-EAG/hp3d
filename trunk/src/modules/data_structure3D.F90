@@ -7,7 +7,7 @@ module data_structure3D
       use physics
       use parameters
       use element_data
-      use mpi_param, only: RANK
+      use mpi_param, only: RANK,NUM_PROCS
 !
       implicit none
 !
@@ -404,6 +404,35 @@ module data_structure3D
 !
       end subroutine increase_MAXNODS
 !
+!----------------------------------------------------------------------
+!> @brief   update global and subdomain lists of mesh elements
+!> @date    Sep 2023
+      subroutine update_ELEM_ORDER
+!
+      integer :: iel,mdle
+!
+      if (allocated(ELEM_ORDER)) deallocate(ELEM_ORDER)
+      if (allocated(ELEM_SUBD))  deallocate(ELEM_SUBD)
+      allocate(ELEM_ORDER(NRELES))
+      allocate(ELEM_SUBD(NRELES))
+!
+      mdle = 0; NRELES_SUBD = 0
+      do iel=1,NRELES
+         call nelcon(mdle, mdle)
+         ELEM_ORDER(iel) = mdle
+         if (NODES(mdle)%subd .eq. RANK) then
+            NRELES_SUBD = NRELES_SUBD + 1
+            ELEM_SUBD(NRELES_SUBD) = mdle
+         endif
+      enddo
+!
+      if (NUM_PROCS .eq. 1) then
+         ELEM_SUBD(1:NRELES) = ELEM_ORDER(1:NRELES)
+         NRELES_SUBD = NRELES
+      endif
+!
+      end subroutine update_ELEM_ORDER
+!
 !-----------------------------------------------------------------------
 !
 !  ...dump out hp3d data structure
@@ -414,6 +443,13 @@ module data_structure3D
       integer :: ndump
       ndump=31
 !
+      if (NUM_PROCS > 1) then
+         write(*,*) 'dumpout_hp3d: not supported for MPI parallel computation.'
+         return
+      else
+         write(*,*) 'dumpout_hp3d: writing to ',Dump_file
+      endif
+!
       open(unit=ndump,file=Dump_file,  &
            form='formatted',access='sequential',status='unknown')
 !
@@ -422,121 +458,122 @@ module data_structure3D
       write(ndump,*) MAXNODS,NPNODS
 !
       do nel=1,NRELIS
-        write(ndump,*) ELEMS(nel)%etype
-        write(ndump,*) ELEMS(nel)%nrphysics
-        if (associated(ELEMS(nel)%physics)) then
-          nn = ubound(ELEMS(nel)%physics,1)
-          write(ndump,*) nn
-          write(ndump,1010) ELEMS(nel)%physics
- 1010     format(1x,20(a5,2x))
-        else
-          write(ndump,*) 0
-        endif
-        if (associated(ELEMS(nel)%bcond)) then
-          nn = ubound(ELEMS(nel)%bcond,1)
-          write(ndump,*) nn
-          write(ndump,*) ELEMS(nel)%bcond
-        else
-          write(ndump,*) 0
-        endif
-        if (associated(ELEMS(nel)%nodes)) then
-          nn = ubound(ELEMS(nel)%nodes,1)
-          write(ndump,*) nn
-          write(ndump,*) ELEMS(nel)%nodes
-        else
-          write(ndump,*) 0
-        endif
-        write(ndump,*) ELEMS(nel)%edge_orient
-        write(ndump,*) ELEMS(nel)%face_orient
-        if (associated(ELEMS(nel)%neig)) then
-          nn = ubound(ELEMS(nel)%neig,1)
-          write(ndump,*) nn
-          write(ndump,*) ELEMS(nel)%neig
-        else
-          write(ndump,*) 0
-        endif
-        write(ndump,*) ELEMS(nel)%GMPblock
+         write(ndump,*) ELEMS(nel)%etype
+         write(ndump,*) ELEMS(nel)%nrphysics
+         if (associated(ELEMS(nel)%physics)) then
+            nn = ubound(ELEMS(nel)%physics,1)
+            write(ndump,*) nn
+            write(ndump,1010) ELEMS(nel)%physics
+ 1010       format(1x,20(a5,2x))
+         else
+            write(ndump,*) 0
+         endif
+         if (associated(ELEMS(nel)%bcond)) then
+            nn = ubound(ELEMS(nel)%bcond,1)
+            write(ndump,*) nn
+            write(ndump,*) ELEMS(nel)%bcond
+         else
+            write(ndump,*) 0
+         endif
+         if (associated(ELEMS(nel)%nodes)) then
+            nn = ubound(ELEMS(nel)%nodes,1)
+            write(ndump,*) nn
+            write(ndump,*) ELEMS(nel)%nodes
+         else
+            write(ndump,*) 0
+         endif
+         write(ndump,*) ELEMS(nel)%edge_orient
+         write(ndump,*) ELEMS(nel)%face_orient
+         if (associated(ELEMS(nel)%neig)) then
+            nn = ubound(ELEMS(nel)%neig,1)
+            write(ndump,*) nn
+            write(ndump,*) ELEMS(nel)%neig
+         else
+            write(ndump,*) 0
+         endif
+         write(ndump,*) ELEMS(nel)%GMPblock
       enddo
 !
       do nod=1,NRNODS
-        write(ndump,*) NODES(nod)%ntype
-        write(ndump,*) NODES(nod)%case
-        write(ndump,*) NODES(nod)%order
-        write(ndump,*) NODES(nod)%bcond
-        write(ndump,*) NODES(nod)%ref_kind
-        write(ndump,*) NODES(nod)%father
-        write(ndump,*) NODES(nod)%first_son
-        write(ndump,*) NODES(nod)%nr_sons
-        write(ndump,*) NODES(nod)%visit
-        write(ndump,*) NODES(nod)%act
-        if (associated(NODES(nod)%dof)) then
-          write(ndump,*) 1
-        else
-          write(ndump,*) 0
-        endif
-        if (associated(NODES(nod)%dof)) then
-          if (associated(NODES(nod)%dof%coord)) then
-            nn1 = ubound(NODES(nod)%dof%coord,1)
-            nn2 = ubound(NODES(nod)%dof%coord,2)
-            write(ndump,*) nn1, nn2
-            write(ndump,*) NODES(nod)%dof%coord
-          else
+         write(ndump,*) NODES(nod)%ntype
+         write(ndump,*) NODES(nod)%case
+         write(ndump,*) NODES(nod)%order
+         write(ndump,*) NODES(nod)%bcond
+         write(ndump,*) NODES(nod)%father
+         write(ndump,*) NODES(nod)%first_son
+         write(ndump,*) NODES(nod)%nr_sons
+         write(ndump,*) NODES(nod)%ref_kind
+         write(ndump,*) NODES(nod)%visit
+         write(ndump,*) NODES(nod)%act
+         write(ndump,*) NODES(nod)%subd
+         if (associated(NODES(nod)%dof)) then
+            write(ndump,*) 1
+         else
+            write(ndump,*) 0
+         endif
+         if (associated(NODES(nod)%dof)) then
+            if (associated(NODES(nod)%dof%coord)) then
+               nn1 = ubound(NODES(nod)%dof%coord,1)
+               nn2 = ubound(NODES(nod)%dof%coord,2)
+               write(ndump,*) nn1, nn2
+               write(ndump,*) NODES(nod)%dof%coord
+            else
+               write(ndump,*) 0 , 0
+            endif
+         else
             write(ndump,*) 0 , 0
-          endif
-        else
-          write(ndump,*) 0 , 0
-        endif
+         endif
 #if DEBUG_MODE
-        write(ndump,*) NODES(nod)%error
+         write(ndump,*) NODES(nod)%error
 #endif
-        if (associated(NODES(nod)%dof)) then
-          if (associated(NODES(nod)%dof%zdofH)) then
-            nn1 = ubound(NODES(nod)%dof%zdofH,1)
-            nn2 = ubound(NODES(nod)%dof%zdofH,2)
-            write(ndump,*) nn1, nn2, NRCOMS
-            write(ndump,*) NODES(nod)%dof%zdofH
-          else
-            write(ndump,*) 0 , 0
-          endif
-        else
-          write(ndump,*) 0 , 0
-        endif
-        if (associated(NODES(nod)%dof)) then
-          if (associated(NODES(nod)%dof%zdofE)) then
-            nn1 = ubound(NODES(nod)%dof%zdofE,1)
-            nn2 = ubound(NODES(nod)%dof%zdofE,2)
-            write(ndump,*) nn1, nn2, NRCOMS
-            write(ndump,*) NODES(nod)%dof%zdofE
-          else
-            write(ndump,*) 0 , 0
-          endif
-        else
-          write(ndump,*) 0 , 0
-        endif
-        if (associated(NODES(nod)%dof)) then
-          if (associated(NODES(nod)%dof%zdofV)) then
-            nn1 = ubound(NODES(nod)%dof%zdofV,1)
-            nn2 = ubound(NODES(nod)%dof%zdofV,2)
-            write(ndump,*) nn1, nn2, NRCOMS
-            write(ndump,*) NODES(nod)%dof%zdofV
-          else
-            write(ndump,*) 0 , 0
-          endif
-        else
-          write(ndump,*) 0 , 0
-        endif
-        if (associated(NODES(nod)%dof)) then
-          if (associated(NODES(nod)%dof%zdofQ)) then
-            nn1 = ubound(NODES(nod)%dof%zdofQ,1)
-            nn2 = ubound(NODES(nod)%dof%zdofQ,2)
-            write(ndump,*) nn1, nn2, NRCOMS
-            write(ndump,*) NODES(nod)%dof%zdofQ
-          else
-            write(ndump,*) 0 , 0
-          endif
-        else
-          write(ndump,*) 0 , 0
-        endif
+         if (associated(NODES(nod)%dof)) then
+            if (associated(NODES(nod)%dof%zdofH)) then
+               nn1 = ubound(NODES(nod)%dof%zdofH,1)
+               nn2 = ubound(NODES(nod)%dof%zdofH,2)
+               write(ndump,*) nn1, nn2, NRCOMS
+               write(ndump,*) NODES(nod)%dof%zdofH
+            else
+               write(ndump,*) 0 , 0 , NRCOMS
+            endif
+         else
+            write(ndump,*) 0 , 0 , NRCOMS
+         endif
+         if (associated(NODES(nod)%dof)) then
+            if (associated(NODES(nod)%dof%zdofE)) then
+               nn1 = ubound(NODES(nod)%dof%zdofE,1)
+               nn2 = ubound(NODES(nod)%dof%zdofE,2)
+               write(ndump,*) nn1, nn2, NRCOMS
+               write(ndump,*) NODES(nod)%dof%zdofE
+            else
+               write(ndump,*) 0 , 0 , NRCOMS
+            endif
+         else
+            write(ndump,*) 0 , 0 , NRCOMS
+         endif
+         if (associated(NODES(nod)%dof)) then
+            if (associated(NODES(nod)%dof%zdofV)) then
+               nn1 = ubound(NODES(nod)%dof%zdofV,1)
+               nn2 = ubound(NODES(nod)%dof%zdofV,2)
+               write(ndump,*) nn1, nn2, NRCOMS
+               write(ndump,*) NODES(nod)%dof%zdofV
+            else
+               write(ndump,*) 0 , 0 , NRCOMS
+            endif
+         else
+            write(ndump,*) 0 , 0 , NRCOMS
+         endif
+         if (associated(NODES(nod)%dof)) then
+            if (associated(NODES(nod)%dof%zdofQ)) then
+               nn1 = ubound(NODES(nod)%dof%zdofQ,1)
+               nn2 = ubound(NODES(nod)%dof%zdofQ,2)
+               write(ndump,*) nn1, nn2, NRCOMS
+               write(ndump,*) NODES(nod)%dof%zdofQ
+            else
+               write(ndump,*) 0 , 0 , NRCOMS
+            endif
+         else
+            write(ndump,*) 0 , 0 , NRCOMS
+         endif
       enddo
 !
       close(ndump)
@@ -550,6 +587,13 @@ module data_structure3D
       character(len=15) :: Dump_file
       integer :: npnods_loc,nel,nod,nn,nn1,nn2,i
       integer :: ndump
+!
+      if (NUM_PROCS > 1) then
+         write(*,*) 'dumpin_hp3d: not supported for MPI parallel computation.'
+         return
+      else
+         write(*,*) 'dumpin_hp3d: reading from ',Dump_file
+      endif
 !
       if (allocated(ELEMS).or.allocated(NODES)) call deallocds
 !
@@ -605,12 +649,13 @@ module data_structure3D
         read(ndump,*) NODES(nod)%case
         read(ndump,*) NODES(nod)%order
         read(ndump,*) NODES(nod)%bcond
-        read(ndump,*) NODES(nod)%ref_kind
         read(ndump,*) NODES(nod)%father
         read(ndump,*) NODES(nod)%first_son
         read(ndump,*) NODES(nod)%nr_sons
+        read(ndump,*) NODES(nod)%ref_kind
         read(ndump,*) NODES(nod)%visit
         read(ndump,*) NODES(nod)%act
+        read(ndump,*) NODES(nod)%subd
         read(ndump,*) nn1
         if (nn1.eq.1) then
           allocate(NODES(nod)%dof)
@@ -659,6 +704,8 @@ module data_structure3D
       enddo
 !
       close(ndump)
+!
+      call update_ELEM_ORDER
 !
       end subroutine dumpin_hp3d
 !

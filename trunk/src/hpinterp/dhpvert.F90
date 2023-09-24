@@ -6,6 +6,7 @@
 !!
 !! @param[in]  Mdle  - element (middle node) number
 !! @param[in]  Iflag - a flag specifying which of the objects the vertex
+!!                     is on: 5 pris, 6 hexa, 7 tetr, 8 pyra
 !! @param[in]  No    - number of a specific object
 !! @param[in]  Xi    - reference coordinates of the point
 !! @param[in]  Icase - node case

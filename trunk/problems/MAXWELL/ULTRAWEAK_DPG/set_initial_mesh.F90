@@ -1,4 +1,3 @@
-
 !-------------------------------------------------------------------------------
 !> @brief       Define problem dependent data (multiphysics, BC, approximation)
 !!
@@ -6,109 +5,64 @@
 !!
 !> @date        July 2023
 !-------------------------------------------------------------------------------
-   subroutine set_initial_mesh(Nelem_order)
+subroutine set_initial_mesh(Nelem_order)
 !
-      use GMP
-      use parameters
-      use data_structure3D
-      use commonParam
-      use mpi_param, only: RANK,ROOT
+   use data_structure3D, only: NRELIS
+   use physics         , only: NR_PHYSA
+   use commonParam
 !
-      implicit none
+   implicit none
 !
-!  ...polynomial order for initial mesh elements
-      integer, intent(out) :: Nelem_order(NRELIS)
+!..polynomial order for initial mesh elements
+   integer, intent(out) :: Nelem_order(NRELIS)
 !
-!  ...BC flags; dimension = num_faces * components
-      integer :: ibc(6,NRINDEX)
-!
-!  ...misc
-      integer :: etype, iel, ndom, i, ifc, neig, max_order
+!..misc
+   integer :: attr,bdom,comp,flag,i
+   integer :: nr_attr,attr_list(NR_PHYSA)
 !
 !-------------------------------------------------------------------------------
 !
-      Nelem_order = 0
+!  STEP 1 : set initial element order
 !
-!  ...check if exceeding maximum order
-      if (IP.gt.MAXP) then
-         write(*,1000) 'set_initial_mesh: ',max_order,MAXP
- 1000 format(A,'max_order = ',I3,', MAXP = ', I3, '. stop.')
-         stop
-      endif
-!
-!  ...loop through initial mesh elements
-      do iel=1,NRELIS
-!
-         etype = ELEMS(iel)%etype
-!
-!     ...set order of approximation
-         if (IP.gt.0) then
-!        ...uniform order of approximation
-            select case(etype)
-               case(TETR); Nelem_order(iel) = 1*IP
-               case(PYRA); Nelem_order(iel) = 1*IP
-               case(PRIS); Nelem_order(iel) = 11*IP
-               case(BRIC); Nelem_order(iel) = 111*IP
-            end select
-         else
-!        ...custom order of approximation (NOT IMPLEMENTED)
-            write(*,1003) IP
-1003        format('ERROR in set_initial_mesh: IP = ',i3)
-            stop 2
-         endif
-!
+!..setting uniform isotropic polynomial order "IP"
+   call set_order(IP, Nelem_order)
 !
 !  STEP 2 : set up physics
 !
-!     ...set up the number of physical attributes supported by the element
-         ELEMS(iel)%nrphysics=2
-         allocate(ELEMS(iel)%physics(2))
-         ELEMS(iel)%physics(1)='EHtrc'
-         ELEMS(iel)%physics(2)='EHfld'
+!..set up number of physical attributes supported by the element
+   nr_attr = NR_PHYSA
+   attr_list = [(i, i=1,nr_attr)]
+   call set_attr(nr_attr,attr_list)
 !
-!     ...initialize BC flags
-!        0 - no BC
-!        1 - Dirichlet BC everywhere
-!        2 - Impedance BC via penalty term
-!        3 - Impedance BC via elimination
-         ibc(1:6,1:NRINDEX) = 0
+!..BC flag
+!  0 - no BC
+!  1 - Dirichlet BC
+!  2 - impedance BC via penalty term
+!  3 - impedance BC via elimination
 !
-!     ...physics attributes components (2+6 = 8 components)
-!        phys| comp | description
-!        (1) |  1-2 | Hcurl for Maxwell trace (\hat E,\hat H) (signal, 2 comps)
-!        (2) |  3-8 | L2 field for Maxwell (E,H) (signal, 6 components)
+!..physics attributes components
+!  attr | comp | index | description
+!     1 |  1-2 |   1-2 | Hcurl for Maxwell trace (\hat E,\hat H) (2 components)
+!     2 |  1-6 |   3-8 | L2 field for Maxwell (E,H) (6 components)
+   attr = 1 ! set BC for Hcurl variable
 !
-!     ...set BCs on exterior faces
-         do ifc=1,nface(etype)
-            neig = ELEMS(iel)%neig(ifc)
-            select case(neig)
-               case(0)
-!              ...BCs on EH-traces signal and pump
-                  if((IBCFLAG.eq.2..or.IBCFLAG.eq.3).and.(ifc.eq.2)) then
-!                    REMARK: if IBCFLAG.eq.3 (i.e., using elimination), then
-!                            the routine propagate_flag must be called after
-!                            refining the mesh to correctly propagate the
-!                            impedance flag from faces to edges and vertices
-!                 ...Signal
-                     ibc(ifc,2) = IBCFLAG !..sets Impedance flag on H_s trace
-                  else
-!                       ...Dirichlet on E-trace
-                     ibc(ifc,1) = 1 ! Signal trace \hat E_s
-                  endif
-               case default
-                  continue
-            end select
-         enddo
+!..boundary domain "0" (Dirichlet BC on E-trace)
+   bdom = 0 ! set on all exterior faces with boundary domain "0" (default domain)
+   comp = 1 ! E-trace
+   flag = 1 ! Dirichlet BC flag
+   call set_bcond(bdom,attr,comp,flag)
 !
-!     ...allocate BC flags (one per attribute component)
-         allocate(ELEMS(iel)%bcond(NRINDEX))
+!..boundary domain "1" (BC depends on IBCFLAG)
+   bdom = 1 ! set on all exterior faces with boundary domain "1"
+   if (IBCFLAG.eq.2..or.IBCFLAG.eq.3) then
+!  ...impedance BC on H-trace
+      comp = 2       ! H-trace
+      flag = IBCFLAG ! impedance BC flag
+   else
+!  ...Dirichlet BC on E-trace
+      comp = 1 ! E-trace
+      flag = 1 ! Dirichlet BC flag
+   endif
+   call set_bcond(bdom,attr,comp,flag)
 !
-!     ...for each component, encode face BC into a single BC flag
-         do i=1,NRINDEX
-            call encodg(ibc(1:6,i),10,6, ELEMS(iel)%bcond(i))
-         enddo
-!
-!  ...end of loop through initial mesh elements
-      enddo
-!
-   end subroutine set_initial_mesh
+end subroutine set_initial_mesh
