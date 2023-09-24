@@ -5,10 +5,9 @@
 !> @brief      evaluates the L2 norm of the difference between
 !              physics attributes Attr1 and Attr2
 !!
-!> @param[in]  Attr1: physics attribute = 1,...,NR_PHYSA
-!> @param[in]  Attr2: physics attribute = 1,...,NR_PHYSA
-!!
-!> @param[out] L2NormDiff
+!> @param[in]  Attr1:      physics attribute = 1,...,NR_PHYSA
+!> @param[in]  Attr2:      physics attribute = 1,...,NR_PHYSA
+!> @param[out] L2NormDiff: L2 norm of difference
 !!
 !> @date       Sep 2023
 !-------------------------------------------------------------------
@@ -124,11 +123,11 @@ end subroutine get_L2NormDiff
 !> @param[in]  Mdle:       element middle node number
 !> @param[in]  Attr1:      physics attribute = 1,...,NR_PHYSA
 !> @param[in]  Attr2:      physics attribute = 1,...,NR_PHYSA
-!> @param[out] FieldNormQ: L2 norm of difference
+!> @param[out] L2NormDiff: element L2 norm squared of difference
 !!
 !> @date       Sep 2023
 !-------------------------------------------------------------------
-subroutine get_elem_L2NormDiff(Mdle,Attr1,Attr2, FieldNormQ)
+subroutine get_elem_L2NormDiff(Mdle,Attr1,Attr2, L2NormDiff)
 !
    use laserParam
    use commonParam
@@ -142,7 +141,7 @@ subroutine get_elem_L2NormDiff(Mdle,Attr1,Attr2, FieldNormQ)
 !
    integer, intent(in)  :: Mdle
    integer, intent(in)  :: Attr1,Attr2
-   real(8), intent(out) :: FieldNormQ
+   real(8), intent(out) :: L2NormDiff
 !
 !..element, face order, geometry dof
    integer,dimension(19)           :: norder
@@ -183,7 +182,7 @@ subroutine get_elem_L2NormDiff(Mdle,Attr1,Attr2, FieldNormQ)
    nflag=1
 !
 !..initialize global quantities
-   FieldNormQ = 0.d0
+   L2NormDiff = 0.d0
 !
 !..order of approx, orientations, geometry dof's, solution dof's
    call find_order( Mdle, norder)
@@ -237,16 +236,16 @@ subroutine get_elem_L2NormDiff(Mdle,Attr1,Attr2, FieldNormQ)
                j=ibeg2+icomp
 !
 !           ...accumulate L2 norm
-               FieldNormQ = FieldNormQ+(abs(zsolQ(i)-zsolQ(j))**2)*weight
+               L2NormDiff = L2NormDiff+(abs(zsolQ(i)-zsolQ(j))**2)*weight
 !
             enddo
 !
 !     ...end loop over integration points
          enddo
 !
-         case default
-            write(*,*)' get_elem_L2NormDiff: PHYSICAL ATTRIBUTE MUST BE L2. stop.'
-            stop
+      case default
+         write(*,*)' get_elem_L2NormDiff: PHYSICAL ATTRIBUTE MUST BE L2. stop.'
+         stop
 !
    end select
 !
@@ -256,8 +255,8 @@ end subroutine get_elem_L2NormDiff
 !-------------------------------------------------------------------
 !> @brief      evaluates the L2 norm of physics attribute
 !!
-!> @param[in]  Attr: physics attribute = 1,...,NR_PHYSA
-!> @param[out] L2Norm
+!> @param[in]  Attr:    physics attribute = 1,...,NR_PHYSA
+!> @param[out] L2Norm:  L2 norm of attribute
 !!
 !> @date       Sep 2023
 !-------------------------------------------------------------------
@@ -354,13 +353,13 @@ end subroutine get_L2NormAttr
 !> @brief      evaluates the L2 norm over Mdle of physics
 !!             attribute Attr
 !!
-!> @param[in]  Mdle:       element middle node number
-!> @param[in]  Attr:       physics attribute = 1,...,NR_PHYSA
-!> @param[out] FieldNormQ: L2 norm of difference
+!> @param[in]  Mdle:    element middle node number
+!> @param[in]  Attr:    physics attribute = 1,...,NR_PHYSA
+!> @param[out] L2Norm:  element L2 norm squared of attribute
 !!
 !> @date       Sep 2023
 !-------------------------------------------------------------------
-subroutine get_elem_L2NormAttr(Mdle,Attr, FieldNormQ)
+subroutine get_elem_L2NormAttr(Mdle,Attr, L2Norm)
 !
    use laserParam
    use commonParam
@@ -374,7 +373,7 @@ subroutine get_elem_L2NormAttr(Mdle,Attr, FieldNormQ)
 !
    integer, intent(in)  :: Mdle
    integer, intent(in)  :: Attr
-   real(8), intent(out) :: FieldNormQ
+   real(8), intent(out) :: L2Norm
 !
 !..element, face order, geometry dof
    integer,dimension(19)           :: norder
@@ -415,7 +414,7 @@ subroutine get_elem_L2NormAttr(Mdle,Attr, FieldNormQ)
    nflag=1
 !
 !..initialize global quantities
-   FieldNormQ = 0.d0
+   L2Norm = 0.d0
 !
 !..order of approx, orientations, geometry dof's, solution dof's
    call find_order( Mdle, norder)
@@ -467,16 +466,16 @@ subroutine get_elem_L2NormAttr(Mdle,Attr, FieldNormQ)
                i=ibeg+icomp
 !
 !           ...accumulate L2 norm
-               FieldNormQ = FieldNormQ + abs(zsolQ(i))**2 * weight
+               L2Norm = L2Norm + abs(zsolQ(i))**2 * weight
 !
             enddo
 !
 !     ...end loop over integration points
          enddo
 !
-         case default
-            write(*,*)' get_elem_L2NormAttr: PHYSICAL ATTRIBUTE MUST BE L2. stop.'
-            stop
+      case default
+         write(*,*)' get_elem_L2NormAttr: PHYSICAL ATTRIBUTE MUST BE L2. stop.'
+         stop
 !
    end select
 !
@@ -484,17 +483,16 @@ end subroutine get_elem_L2NormAttr
 !
 !
 !-------------------------------------------------------------------
-!
 !  routine: get_Norm
 !
 !  purpose: evaluates the norm of specified physical attributes
 !           and specified component by integrating the current
 !           solution over the entire domain
 !
-!  input:   - Flag
+!  input:   Flag
 !
-!  output:  - FieldNormH,FieldNormE,FieldNormV,FieldNormQ
-!             [(norm of field variable) = \int_{\Omega} |X|^2]
+!  output:  FieldNormH,FieldNormE,FieldNormV,FieldNormQ
+!             - norm of field variable = sqrt(\int_{\Omega} |X|^2)
 !
 !> @date    Sep 2023
 !-------------------------------------------------------------------
@@ -610,6 +608,7 @@ end subroutine get_Norm
 !  input:   Mdle,Flag
 !
 !  output:  FieldNormH,FieldNormE,FieldNormV,FieldNormQ
+!           - element H1/H(curl)/H(div)/L2 norms squared
 !
 !> @date    Sep 2023
 !-------------------------------------------------------------------
@@ -752,7 +751,7 @@ subroutine get_elem_Norm(Mdle,Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
 !     ...loop through integration points
          do l=1,nint
 !
-!           Gauss point and weight
+!        ...Gauss point and weight
             xi(1:3)=xiloc(1:3,l) ; wa=wxi(l)
 !
 !           -- APPROXIMATE SOLUTION --
@@ -760,7 +759,7 @@ subroutine get_elem_Norm(Mdle,Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
                          zdofH,zdofE,zdofV,zdofQ,nflag,                 &
                          x,dxdxi,zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
 !
-!           Jacobian
+!        ...Jacobian
             call geom(dxdxi, dxidx,rjac,iflag)
 #if DEBUG_MODE
             if (iflag /= 0) then
@@ -769,25 +768,25 @@ subroutine get_elem_Norm(Mdle,Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
             endif
 #endif
 !
-!           total weight
+!        ...total weight
             weight=wa*rjac
 !
-!             loop over the components of the physical attribute
-              do icomp=1,NR_COMP(iattr)
+!        ...loop over components of physical attribute
+            do icomp=1,NR_COMP(iattr)
 !
-                i=ibeg+icomp
+               i=ibeg+icomp
 !
-!               accumulate H(curl) seminorm
-                if (.not. L2PROJ) then
+!           ...accumulate H(curl) seminorm
+               if (.not. L2PROJ) then
                   do ivar=1,3
-                    FieldNormE = FieldNormE + abs(zcurlE(ivar,i))**2 * weight
+                     FieldNormE = FieldNormE + abs(zcurlE(ivar,i))**2 * weight
                   enddo
-                endif
+               endif
 !
-!               accumulate L2 norm
-                do ivar=1,3
+!           ...accumulate L2 norm
+               do ivar=1,3
                   FieldNormE = FieldNormE + abs(zsolE(ivar,i))**2 * weight
-                enddo
+               enddo
 !
 !        ...end loop over components
             enddo
@@ -803,14 +802,14 @@ subroutine get_elem_Norm(Mdle,Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
 !     ...loop over integration points
          do l=1,nint
 !
-!           Gauss point and weight
+!        ...Gauss point and weight
             xi(1:3)=xiloc(1:3,l) ; wa=wxi(l)
 !
 !           -- APPROXIMATE SOLUTION --
             call soleval(Mdle,xi,nedge_orient,nface_orient,norder,xnod, &
                          zdofH,zdofE,zdofV,zdofQ,nflag,                 &
                          x,dxdxi,zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
-!           Jacobian
+!        ...Jacobian
             call geom(dxdxi, dxidx,rjac,iflag)
 #if DEBUG_MODE
             if (iflag /= 0) then
@@ -819,23 +818,23 @@ subroutine get_elem_Norm(Mdle,Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
             endif
 #endif
 !
-!           total weight
+!        ...total weight
             weight=wa*rjac
 !
-!             loop over components of the physical attribute
-              do icomp=1,NR_COMP(iattr)
+!        ...loop over components of physical attribute
+            do icomp=1,NR_COMP(iattr)
 !
-                i=ibeg+icomp
+               i=ibeg+icomp
 !
-!               accumulate H(div) seminorm
-                if (.not. L2PROJ) then
+!           ...accumulate H(div) seminorm
+               if (.not. L2PROJ) then
                   FieldNormV = FieldNormV + abs(zdivV(i))**2 * weight
-                endif
+               endif
 !
-!               accumulate L2 norm
-                do ivar=1,3
+!           ...accumulate L2 norm
+               do ivar=1,3
                   FieldNormV = FieldNormV + abs(zsolV(ivar,i))**2 * weight
-                enddo
+               enddo
 !
 !        ...end loop over components
             enddo
@@ -851,7 +850,7 @@ subroutine get_elem_Norm(Mdle,Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
 !     ...loop through integration points
          do l=1,nint
 !
-!           Gauss point and weight
+!        ...Gauss point and weight
             xi(1:3)=xiloc(1:3,l) ; wa=wxi(l)
 !
 !           -- APPROXIMATE SOLUTION --
@@ -859,7 +858,7 @@ subroutine get_elem_Norm(Mdle,Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
                          zdofH,zdofE,zdofV,zdofQ,nflag,                 &
                          x,dxdxi,zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
 !
-!           Jacobian
+!        ...Jacobian
             call geom(dxdxi, dxidx,rjac,iflag)
 #if DEBUG_MODE
             if (iflag /= 0) then
@@ -868,16 +867,16 @@ subroutine get_elem_Norm(Mdle,Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
             endif
 #endif
 !
-!           total weight
+!        ...total weight
             weight=wa*rjac
 !
-!             loop over components of the physical attribute
-              do icomp=1,NR_COMP(iattr)
+!        ...loop over components of physical attribute
+            do icomp=1,NR_COMP(iattr)
 !
-                i=ibeg+icomp
+               i=ibeg+icomp
 !
-!               accumulate L2 norm
-                FieldNormQ = FieldNormQ + abs(zsolQ(i))**2 * weight
+!           ...accumulate L2 norm
+               FieldNormQ = FieldNormQ + abs(zsolQ(i))**2 * weight
 !
 !        ...end loop over components
             enddo
@@ -885,9 +884,9 @@ subroutine get_elem_Norm(Mdle,Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
 !     ...end loop over integration points
          enddo
 !
-         case default
-            write(*,*)  'get_elem_Norm: UNKNOWN PHYSICAL ATTRIBUTE TYPE. stop.'
-            stop
+      case default
+         write(*,*)  'get_elem_Norm: UNKNOWN PHYSICAL ATTRIBUTE TYPE. stop.'
+         stop
 !
 !  ...end select data type
       end select
