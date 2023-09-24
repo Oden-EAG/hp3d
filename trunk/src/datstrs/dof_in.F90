@@ -1,14 +1,17 @@
+#include "typedefs.h"
+
 !> @brief   copy local dof into datastructure
 !! @param[in] Nod                     - a node number
 !! @param[in] Ncoms                   - solution component set: 1,...,NRCOMS
 !! @param[in] ZvalH,ZvalE,ZvalV,ZvalQ - H1,H(curl),H(div) and L2 dof
 !!                                      for the node in the expanded mode
 !> @date    Sep 2023
-#include "typedefs.h"
 subroutine dof_in(Nod,Ncoms,ZvalH,ZvalE,ZvalV,ZvalQ)
+
   use data_structure3D
+
   implicit none
-  !
+
   ! ** Arguments
   integer, intent(in) :: Nod,Ncoms
   VTYPE,   intent(in) :: ZvalH(MAXEQNH,*), ZvalE(MAXEQNE,*), &
@@ -43,9 +46,9 @@ subroutine dof_in(Nod,Ncoms,ZvalH,ZvalE,ZvalV,ZvalQ)
      do i=1,NR_PHYSA
         if (ncase(i).ne.1) cycle
 
-           ! loop through the components of the attribute
-           do k=1,NR_COMP(i)
-              select case(D_TYPE(i))
+        ! loop through the components of the attribute
+        do k=1,NR_COMP(i)
+           select case(D_TYPE(i))
               case(CONTIN)
                  nvar = (j-1)*NRHVAR+ADRES(i)+k
                  ivarH = ivarH+1
@@ -73,11 +76,12 @@ subroutine dof_in(Nod,Ncoms,ZvalH,ZvalE,ZvalV,ZvalQ)
               case default
                  write(*,*) 'dofin: D_TYPE = ', S_DType(D_TYPE(i))
                  call logic_error(ERR_INVALID_VALUE,__FILE__,__LINE__)
-              end select
-           ! loop through the components of the attribute
-           enddo
+           end select
+        ! loop through the components of the attribute
+        enddo
      ! loop through physical attributes of the node
      enddo
   ! loop through multiple loads
   enddo
+
 end subroutine dof_in

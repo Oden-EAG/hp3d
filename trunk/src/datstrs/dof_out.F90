@@ -1,3 +1,5 @@
+#include "typedefs.h"
+
 !> @brief   copy dof for a node from data structure into local arrays
 !! @param[in]     Nod                     - a node number
 !! @param[in]     Ncoms                   - solution component set: 1,...,NRCOMS
@@ -5,20 +7,20 @@
 !! @param[out]    ZvalH,ZvalE,ZvalV,ZvalQ - H1,H(curl),H(div) and L2 dof from the
 !!                                          data structure in the expanded mode
 !> @date    Sep 2023
-#include "typedefs.h"
 subroutine dof_out( Nod,Ncoms,               &
                     KdofH,KdofE,KdofV,KdofQ, &
                     ZvalH,ZvalE,ZvalV,ZvalQ  )
-  !
+
   use data_structure3D
+
   implicit none
-  !
+
   ! ** Arguments
   integer, intent(in)    :: Nod, Ncoms
   integer, intent(inout) :: KdofH, KdofE, KdofV, KdofQ
   VTYPE,   intent(out)   :: ZvalH(MAXEQNH,*), ZvalE(MAXEQNE,*), &
                             ZvalV(MAXEQNV,*), ZvalQ(MAXEQNQ,*)
-  !
+
   ! ** Locals
   integer :: ncase(NR_PHYSA)
   integer :: i, j, k, ivarH, ivarE, ivarV, ivarQ
@@ -50,9 +52,9 @@ subroutine dof_out( Nod,Ncoms,               &
      do i=1,NR_PHYSA
         if (ncase(i).ne.1) cycle
 
-           ! loop through the components of the attribute
-           do k=1,NR_COMP(i)
-              select case(D_TYPE(i))
+        ! loop through the components of the attribute
+        do k=1,NR_COMP(i)
+           select case(D_TYPE(i))
               case(CONTIN)
                  nvar = (j-1)*NRHVAR+ADRES(i)+k
                  ivarH = ivarH+1
@@ -120,8 +122,8 @@ subroutine dof_out( Nod,Ncoms,               &
 
               case default
                  write(*,*) 'dofout: D_TYPE = ', S_DType(D_TYPE(i))
-              end select
-7001          format('dof_out: ivar = ', i3,2x,'(',i3,',',i3,':',i3,') = ')
+           end select
+7001       format('dof_out: ivar = ', i3,2x,'(',i3,',',i3,':',i3,') = ')
         ! loop through the components of the attribute
         enddo
      ! loop through physical attributes of the node
