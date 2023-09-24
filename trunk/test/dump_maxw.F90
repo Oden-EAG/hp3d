@@ -1,8 +1,8 @@
-!> @brief Tests polynomial solution for Maxwell Galerkin problem
-!> @details Tests exact representation of a polynomial solution
-!!          for the variational curl-curl Maxwell problem
-!> @date Mar 2023
-program test_poly_maxw
+!> @brief Tests datastructure dumpout and dumpin debug routines
+!> @details Tests whether exporting the datastructure to file
+!!          and then importing retains all DOFs correctly
+!> @date Sep 2023
+program test_dump_maxw
 !
    use control
    use data_structure3D
@@ -15,10 +15,9 @@ program test_poly_maxw
 !
    implicit none
 !
-   integer :: NPASS
+   logical, external :: dnear
 !
-!..number of uniform h-refinements
-   integer, parameter :: nref = 2
+   integer :: NPASS
 !
    QUIET_MODE = .true.
 !
@@ -26,7 +25,7 @@ program test_poly_maxw
    call mpi_w_init
 !
 #if C_MODE==0
-   write(*,*) 'test_poly_maxw: C_MODE=0'
+   write(*,*) 'test_dump_maxw: C_MODE=0'
    NPASS = 1; goto 99
 #endif
 !
@@ -35,11 +34,11 @@ program test_poly_maxw
 !
 !..this test is set up for sequential computation
    if (NUM_PROCS > 1) then
-      write(*,*) 'test_poly_maxw: NUM_PROCS>1'
+      write(*,*) 'test_dump_maxw: NUM_PROCS>1'
       NPASS = 1; goto 99
    endif
 !
-   call poly_maxw(nref)
+   call dump_maxw
 !
  99 continue
 !
@@ -51,20 +50,19 @@ program test_poly_maxw
    contains
 !
 !----------------------------------------------------------------------
-! !> @brief Computes H(curl) error for Maxwell Galerkin problem with
-!!          manufactured polynomial solution
-! !> @date Mar 2023
+!> @brief Computes H(curl) error for Maxwell Galerkin problem with
+!!        manufactured polynomial solution before dumping out
+!!        datastructure and after dumping in again
+!> @date Sep 2023
 !----------------------------------------------------------------------
-   subroutine poly_maxw(Nref)
-!
-      use assembly_sc, only: NRDOF_TOT
-!
-      integer, intent(in) :: Nref
+   subroutine dump_maxw
 !
       real(8) :: errorH,errorE,errorV,errorQ
       real(8) :: rnormH,rnormE,rnormV,rnormQ
 !
-      real(8) :: err_curr
+      real(8) :: err_curr,err_dump
+!
+      character(len=15) :: dump_file
 !
       integer :: iflag(1),iel,i
 !
@@ -80,42 +78,86 @@ program test_poly_maxw
 !
       iflag(1) = 1
 !
-!  ...do refinements and solve
-      do i=1,Nref
-!     ...refine
-         call global_href
-!     ...update geometry and Dirichlet DOFs
-         call update_gdof
-         call update_Ddof
-!     ...solve
-         call mumps_sc('G')
 !
-!     ...compute H(curl) error
-         err_curr = 0.d0
-         do iel=1,NRELES
-            call element_error(ELEM_ORDER(iel),iflag,          &
-                               errorH,errorE,errorV,errorQ,    &
-                               rnormH,rnormE,rnormV,rnormQ)
-            err_curr = err_curr + errorE
-         enddo
-         err_curr = sqrt(err_curr)
+!  ...refine
+      call global_href
 !
-         if (err_curr > 1.0d-14) then
-            NPASS = 0
-            iprint = 1
-         endif
+!  ...update geometry and Dirichlet DOFs
+      call update_gdof
+      call update_Ddof
 !
-         if (iprint.eq.1) then
-            write(*,210) NRDOF_TOT,err_curr
-        210 format(  'poly_maxw: dof_curr, err_curr = ',I10,' ,',ES12.4)
-         endif
+!  ...solve
+      call mumps_sc('G')
 !
+!  ...compute H1 error
+      err_curr = 0.d0
+      do iel=1,NRELES
+         call element_error(ELEM_ORDER(iel),iflag,          &
+                            errorH,errorE,errorV,errorQ,    &
+                            rnormH,rnormE,rnormV,rnormQ)
+         err_curr = err_curr + errorE
       enddo
+      err_curr = sqrt(err_curr)
 !
-   end subroutine poly_maxw
+!  ...dumpout datastructure
+      dump_file = 'dump_maxw_file'
+      call dumpout_hp3d(dump_file)
+!
+!  ...refine the mesh to change current DOFs
+      call global_href
+!
+!  ...dumpin datastructure
+      call dumpin_hp3d(dump_file,Delete_file=.true.)
+!
+!  ...compute the error again
+      err_dump = 0.d0
+      do iel=1,NRELES
+         call element_error(ELEM_ORDER(iel),iflag,          &
+                            errorH,errorE,errorV,errorQ,    &
+                            rnormH,rnormE,rnormV,rnormQ)
+         err_dump = err_dump + errorE
+      enddo
+      err_dump = sqrt(err_dump)
+!
+      if (.not. dnear(err_curr,err_dump)) then
+         NPASS = 0
+         iprint = 1
+         goto 80
+      endif
+!
+!  ...update geometry and Dirichlet DOFs
+      call update_gdof
+      call update_Ddof
+!
+!  ...solve
+      call mumps_sc('G')
+!
+!  ...compute the error again after resolving the problem
+      err_dump = 0.d0
+      do iel=1,NRELES
+         call element_error(ELEM_ORDER(iel),iflag,          &
+                            errorH,errorE,errorV,errorQ,    &
+                            rnormH,rnormE,rnormV,rnormQ)
+         err_dump = err_dump + errorE
+      enddo
+      err_dump = sqrt(err_dump)
+!
+      if (.not. dnear(err_curr,err_dump)) then
+         NPASS = 0
+         iprint = 1
+      endif
+!
+   80 continue
+!
+      if (iprint.eq.1) then
+         write(*,210) err_curr,err_dump
+     210 format(  'dump_maxw: err_curr, err_dump = ',I10,' ,',ES12.4)
+      endif
+!
+   end subroutine dump_maxw
 !
 !
-end program test_poly_maxw
+end program test_dump_maxw
 !
 #include "typedefs.h"
 !
@@ -190,7 +232,7 @@ subroutine set_initial_mesh(Nelem_order)
    integer, intent(out) :: Nelem_order(NRELIS)
 !
    if (NRINDEX .ne. 1) then
-      write(*,*) 'poly_maxw: NRINDEX = ',NRINDEX
+      write(*,*) 'dump_maxw: NRINDEX = ',NRINDEX
       stop
    endif
 !
@@ -202,7 +244,7 @@ subroutine set_initial_mesh(Nelem_order)
       ELEMS(iel)%physics(1) ='field'
 !
 !  ...set initial mesh element order
-      Nelem_order(iel) = 222
+      Nelem_order(iel) = 111
 !
 !  ...set boundary condition flags: 0 - no BC ; 1 - Dirichlet
       ibc(1:6,1) = 1
@@ -418,7 +460,7 @@ subroutine exact(X,Icase, ValH,DvalH,D2valH, &
 !
 !..make sure exact solution is available
    if (NEXACT.ne.1) then
-      write(*,*) 'poly_maxw: NEXACT =',NEXACT
+      write(*,*) 'dump_maxw: NEXACT =',NEXACT
       stop
    endif
 !
@@ -547,7 +589,7 @@ end subroutine getf
 subroutine celem(Mdle,Idec,Nrdofs,Nrdofm,Nrdofc,Nodm, &
                  NdofmH,NdofmE,NdofmV,NdofmQ,Nrnodm,Bload,Astif)
 !
-   write(*,*) 'poly_maxw: celem'
+   write(*,*) 'dump_maxw: celem'
    stop
 !
 end subroutine celem

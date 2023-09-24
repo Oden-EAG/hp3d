@@ -7,7 +7,8 @@ module data_structure3D
       use physics
       use parameters
       use element_data
-      use mpi_param, only: RANK,NUM_PROCS
+      use environment, only: QUIET_MODE
+      use mpi_param  , only: RANK,NUM_PROCS
 !
       implicit none
 !
@@ -437,7 +438,7 @@ module data_structure3D
          write(*,*) 'dumpout_hp3d: not supported for MPI parallel computation.'
          return
       else
-         write(*,*) 'dumpout_hp3d: writing to ',Dump_file
+         if (.not.QUIET_MODE) write(*,*) 'dumpout_hp3d: writing to ',Dump_file
       endif
 !
       open(unit=ndump,file=Dump_file,  &
@@ -572,9 +573,13 @@ module data_structure3D
 !
 !-----------------------------------------------------------------------
 !  ...dump in hp3d data structure
-      subroutine dumpin_hp3d(Dump_file)
+      subroutine dumpin_hp3d(Dump_file,Delete_file)
 !
-      character(len=15) :: Dump_file
+      character(len=15), intent(in) :: Dump_file
+      logical, optional, intent(in) :: Delete_file
+!
+      logical :: Delete_file_
+!
       integer :: npnods_loc,nel,nod,nn,nn1,nn2,i
       integer :: ndump
 !
@@ -582,7 +587,14 @@ module data_structure3D
          write(*,*) 'dumpin_hp3d: not supported for MPI parallel computation.'
          return
       else
-         write(*,*) 'dumpin_hp3d: reading from ',Dump_file
+         if (.not.QUIET_MODE) write(*,*) 'dumpin_hp3d: reading from ',Dump_file
+      endif
+!
+!  ...by default, do not delete file after reading
+      if (present(Delete_file)) then
+         Delete_file_ = Delete_file
+      else
+         Delete_file_ = .false.
       endif
 !
       if (allocated(ELEMS).or.allocated(NODES)) call deallocds
@@ -693,7 +705,11 @@ module data_structure3D
         endif
       enddo
 !
-      close(ndump)
+      if (Delete_file_) then
+         close(ndump, status='DELETE')
+      else
+         close(ndump)
+      endif
 !
       call update_ELEM_ORDER
 !
