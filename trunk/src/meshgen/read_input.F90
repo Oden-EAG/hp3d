@@ -84,6 +84,11 @@ subroutine read_input(Fp)
      NRINDEX = NRINDEX + NR_COMP(i)
   enddo
   !
+  if (NRINDEX > MAX_NRINDEX) then
+    write(*,*) 'NRINDEX, MAX_NRINDEX = ',NRINDEX,MAX_NRINDEX
+    stop
+  endif
+  !
   !  set parameter module variables used by solelm
   MAXEQNH = NRHVAR * NRRHS
   MAXEQNE = NREVAR * NRRHS

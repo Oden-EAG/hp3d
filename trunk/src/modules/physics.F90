@@ -35,8 +35,14 @@ module physics
   !  ...total number of H1,H(curl),H(div) and L2 components
   integer, save :: NRHVAR,NREVAR,NRVVAR,NRQVAR
   !
-  !  ...number of entries in index
+  !  ...number of entries in index (total number of components)
   integer, save :: NRINDEX
+  !
+  !  ...max number of component indices
+  !     currently, 31 is the maximum number of components supported
+  !     because the Dirichlet BC flags are binary-encoded per component
+  !     into node%bcond which is an integer value
+  integer, parameter :: MAX_NRINDEX = 31
   !
   !----------------------------------------------------------------------
   !
