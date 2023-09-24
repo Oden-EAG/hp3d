@@ -15,7 +15,7 @@ subroutine copy_load(Src,Dst)
 !
    integer, intent(in)  :: Src,Dst
 !
-   integer :: nod, nsrc, ndst, ndof, ivar
+   integer :: nod,nsrc,ndst,ndof,idof
 !
 !-------------------------------------------------------------------------------
 !
@@ -28,15 +28,15 @@ subroutine copy_load(Src,Dst)
       write(*,1000) 'Dst',Dst
       stop
    endif
-   1000 format('copy_coms: Invalid parameter:',A,' = ',I5)
+   1000 format('copy_load: Invalid parameter:',A,' = ',I5)
 !
    if (Src.eq.Dst) then
-      write(*,*) 'copy_coms: Src = Dst = ',Src
+      write(*,*) 'copy_load: Src = Dst = ',Src
       return
    endif
 !
 !$OMP PARALLEL DO                  &
-!$OMP PRIVATE(nsrc,ndst,ndof,ivar) &
+!$OMP PRIVATE(nsrc,ndst,ndof,idof) &
 !$OMP SCHEDULE(DYNAMIC)
 !..loop through active nodes
    do nod=1,NRNODS
@@ -48,12 +48,10 @@ subroutine copy_load(Src,Dst)
       nsrc = (Src-1)*NRHVAR
       ndst = (Dst-1)*NRHVAR
       ndof = ubound(NODES(nod)%dof%zdofH,2)
-      if (ndof > 0) then
-         do ivar=1,NRHVAR
-            NODES(nod)%dof%zdofH(ndst+ivar,1:ndof,N_COMS) = &
-            NODES(nod)%dof%zdofH(nsrc+ivar,1:ndof,N_COMS)
-         enddo
-      endif
+      do idof=1,ndof
+         NODES(nod)%dof%zdofH(ndst+1:ndst+NRHVAR,idof,N_COMS) = &
+         NODES(nod)%dof%zdofH(nsrc+1:nsrc+NRHVAR,idof,N_COMS)
+      enddo
   10  continue
 !
 !  ...H(curl) dof
@@ -61,12 +59,10 @@ subroutine copy_load(Src,Dst)
       nsrc = (Src-1)*NREVAR
       ndst = (Dst-1)*NREVAR
       ndof = ubound(NODES(nod)%dof%zdofE,2)
-      if (ndof > 0) then
-         do ivar=1,NREVAR
-            NODES(nod)%dof%zdofE(ndst+ivar,1:ndof,N_COMS) = &
-            NODES(nod)%dof%zdofE(nsrc+ivar,1:ndof,N_COMS)
-         enddo
-      endif
+      do idof=1,ndof
+         NODES(nod)%dof%zdofE(ndst+1:ndst+NREVAR,idof,N_COMS) = &
+         NODES(nod)%dof%zdofE(nsrc+1:nsrc+NREVAR,idof,N_COMS)
+      enddo
   20  continue
 !
 !  ...H(div) dof
@@ -74,12 +70,10 @@ subroutine copy_load(Src,Dst)
       nsrc = (Src-1)*NRVVAR
       ndst = (Dst-1)*NRVVAR
       ndof = ubound(NODES(nod)%dof%zdofV,2)
-      if (ndof > 0) then
-         do ivar=1,NRVVAR
-            NODES(nod)%dof%zdofV(ndst+ivar,1:ndof,N_COMS) = &
-            NODES(nod)%dof%zdofV(nsrc+ivar,1:ndof,N_COMS)
-         enddo
-      endif
+      do idof=1,ndof
+         NODES(nod)%dof%zdofV(ndst+1:ndst+NRVVAR,idof,N_COMS) = &
+         NODES(nod)%dof%zdofV(nsrc+1:nsrc+NRVVAR,idof,N_COMS)
+      enddo
   30  continue
 !
 !  ...L2 dof
@@ -87,12 +81,10 @@ subroutine copy_load(Src,Dst)
       nsrc = (Src-1)*NRQVAR
       ndst = (Dst-1)*NRQVAR
       ndof = ubound(NODES(nod)%dof%zdofQ,2)
-      if (ndof > 0) then
-         do ivar=1,NRQVAR
-            NODES(nod)%dof%zdofQ(ndst+ivar,1:ndof,N_COMS) = &
-            NODES(nod)%dof%zdofQ(nsrc+ivar,1:ndof,N_COMS)
-         enddo
-      endif
+      do idof=1,ndof
+         NODES(nod)%dof%zdofQ(ndst+1:ndst+NRQVAR,idof,N_COMS) = &
+         NODES(nod)%dof%zdofQ(nsrc+1:nsrc+NRQVAR,idof,N_COMS)
+      enddo
   40  continue
 !
 !..end of loop through nodes
