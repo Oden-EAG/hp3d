@@ -190,12 +190,15 @@ subroutine exec_job_coupled
       if (RANK.eq.ROOT) write(*,4200) ' Updating heat Dirichlet DOFs...'
       call update_Ddof
       if (time_step .gt. 0) then
+#if HP3D_USE_INTEL_MKL
          if (NUM_PROCS .eq. 1) then
             call pardiso_sc('H')
          else
-            !call par_mumps_sc('H')
             call par_nested('H')
          endif
+#else
+         call par_mumps_sc('H')
+#endif
       endif
 !  ...calculating temperature
       numPts = 2**IMAX
@@ -279,11 +282,15 @@ subroutine exec_job_coupled
          if (RANK.eq.ROOT) write(*,*) '   Signal solve...'
          NO_PROBLEM = 3
          call set_physAm(NO_PROBLEM, physNick,flag)
+#if HP3D_USE_INTEL_MKL
          if (NUM_PROCS .eq. 1) then
             call pardiso_sc('H')
          else
             call par_nested('H')
          endif
+#else
+         call par_mumps_sc('H')
+#endif
 !
 !     ...compute signal residual
          if (ires) then
@@ -303,11 +310,15 @@ subroutine exec_job_coupled
          if (RANK.eq.ROOT) write(*,*) '   Pump solve...'
          NO_PROBLEM = 4
          call set_physAm(NO_PROBLEM, physNick,flag)
+#if HP3D_USE_INTEL_MKL
          if (NUM_PROCS .eq. 1) then
             call pardiso_sc('H')
          else
             call par_nested('H')
          endif
+#else
+         call par_mumps_sc('H')
+#endif
 !
 !     ...compute pump residual
          if (ires) then
