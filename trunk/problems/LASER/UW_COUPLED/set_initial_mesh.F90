@@ -108,7 +108,7 @@ subroutine set_initial_mesh(Nelem_order)
 !  STEP 2 : set up physics
 !
 !     set up the number of physical attributes supported by the element
-      ELEMS(iel)%nrphysics=6
+      ELEMS(iel)%nrphysics=7
       allocate(ELEMS(iel)%physics(7))
       ELEMS(iel)%physics(1)='tempr'
       ELEMS(iel)%physics(2)='EHtr1'
