@@ -6,9 +6,9 @@ subroutine paraview_driver
 !
    use upscale
    use physics
-   use data_structure3D, only: NRCOMS
-   use environment,      only: QUIET_MODE
-   use mpi_param,        only: RANK,ROOT
+   use environment, only: QUIET_MODE
+   use mpi_param,   only: RANK,ROOT
+   use parameters,  only: NRRHS
    use paraview
 !
    implicit none
@@ -47,8 +47,8 @@ subroutine paraview_driver
       write(*,*)'ATTRIBUTE | DISC. SPACE | COMP. | LOAD'
    endif
 !
-!..loop over solution copies
-   do iload=1,NRCOMS
+!..loop over multiple loads
+   do iload=1,NRRHS
 !
 !  ...skip selected loads
       if (.not. PARAVIEW_LOAD(iload)) cycle
@@ -104,7 +104,7 @@ subroutine paraview_driver
          enddo
 !  ...end loop over attributes
       enddo
-!..end loop over solution copies
+!..end loop over multiple loads
    enddo
 !
    if (.not.QUIET_MODE .and. RANK.eq.ROOT) then

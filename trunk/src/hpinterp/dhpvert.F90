@@ -2,7 +2,9 @@
 #include "typedefs.h"
 !
 !-----------------------------------------------------------------------
-!> Purpose :  routine determines Dirichlet dof for a vertex
+!> @brief      determine Dirichlet dof for a vertex
+!!
+!! @param[in]  Mdle  - element (middle node) number
 !! @param[in]  Iflag - a flag specifying which of the objects the vertex
 !!                     is on: 5 pris, 6 hexa, 7 tetr, 8 pyra
 !! @param[in]  No    - number of a specific object
@@ -11,6 +13,8 @@
 !! @param[in]  Bcond - node BC flags
 !!
 !! @param[out] ZdofH - updated Dirichlet BC dof
+!!
+!> @date Sep 2023
 !-----------------------------------------------------------------------
 subroutine dhpvert(Mdle,Iflag,No,Xi,Icase,Bcond, ZdofH)
 !
@@ -20,7 +24,7 @@ subroutine dhpvert(Mdle,Iflag,No,Xi,Icase,Bcond, ZdofH)
 !..Arguments
    integer, intent(in)  :: Iflag,No,Icase,Bcond,Mdle
    real(8), intent(in)  :: Xi(3)
-   VTYPE  , intent(out) :: ZdofH(NRCOMS*NREQNH(Icase))
+   VTYPE  , intent(out) :: ZdofH(NRRHS*NREQNH(Icase))
 !
 !..Locals
 !..work space for dirichlet
@@ -65,7 +69,7 @@ subroutine dhpvert(Mdle,Iflag,No,Xi,Icase,Bcond, ZdofH)
    endif
 #endif
 !
-!..dirichlet value in compact mode
+!..Dirichlet value in compact mode
    call dirichlet(Mdle,x,Icase, zvalH,zdvalH,zvalE,zdvalE,zvalV,zdvalV)
 !
 !..shift the data skipping irrelevant entries
@@ -74,8 +78,8 @@ subroutine dhpvert(Mdle,Iflag,No,Xi,Icase,Bcond, ZdofH)
 !
    ivarH=0; nvarH=0
 
-!..loop through multiple copies of variables
-   do iload=1,NRCOMS
+!..loop through multiple loads
+   do iload=1,NRRHS
 !
 !  ...initiate the BC component counter
       ic=0
@@ -114,12 +118,12 @@ subroutine dhpvert(Mdle,Iflag,No,Xi,Icase,Bcond, ZdofH)
 !  ...loop through physical attributes
       enddo
 !
-!..loop through multiple copies of variables
+!..loop through multiple loads
    enddo
 !
 #if DEBUG_MODE
    if (iprint.eq.1) then
-      write(*,7030) ZdofH(1:NRCOMS*NREQNH(Icase))
+      write(*,7030) ZdofH(1:NRRHS*NREQNH(Icase))
  7030 format('dhpvert: ZdofH = ',10e12.5)
    endif
 #endif

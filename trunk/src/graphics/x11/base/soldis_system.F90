@@ -2,16 +2,16 @@
 #include "typedefs.h"
 !
 !-------------------------------------------------------------------------------------
-!> Purpose - Selection for quantities to be displayed by graphics
+!> @brief   Selection for quantities to be displayed by graphics
 !!
-!> @data Nov 14
+!> @date    Sep 2023
 !-------------------------------------------------------------------------------------
 !
 subroutine soldis_select_system
 !
       use physics
-      use data_structure3D , only : NRCOMS
-      use graphmod         , only : ISELECT
+      use parameters , only : NRRHS
+      use graphmod   , only : ISELECT
 !
       integer :: iattr,icomp,ireal,iload
 !
@@ -49,10 +49,10 @@ subroutine soldis_select_system
 !
 !     load
  13   continue
-      write(*,1001) NRCOMS
- 1001 format(' Set load (NRCOMS  = ',i2,')')
+      write(*,1001) NRRHS
+ 1001 format(' Set load (NRRHS  = ',i2,')')
       read(*,*) iload
-      if ((iload < 1) .OR. (iload > NRCOMS))  goto 13
+      if ((iload < 1) .OR. (iload > NRRHS))  goto 13
 !
 !     trace
       select case(D_TYPE(iattr))

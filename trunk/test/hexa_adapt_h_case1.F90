@@ -184,10 +184,8 @@ subroutine initialize
                                     1 ,        0 ,           0)
 !
 !..set hp3D parameters
-!                        NRCOMS // MAXNRHS //
-   call set_parameters(      1 ,        1 ,  &
-!                       MAXEQNH // MAXEQNE // MAXEQNV // MAXEQNQ //
-                             1 ,        1,         1,         1)
+!                      NRCOMS, NRRHS
+   call set_parameters(     1,     1)
 !
 !..read geometry file
    call read_geometry('../files/mesh/hexa_orient_0')

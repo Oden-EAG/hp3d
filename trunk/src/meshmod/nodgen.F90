@@ -119,26 +119,26 @@ subroutine nodgen(Ntype,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
 !..allocate and initialize solution dofs
    if (Iact) then
       if ((NREQNH(Icase).gt.0).and.(ndofH.gt.0)) then
-         nvar = NREQNH(Icase)*NRCOMS
-         allocate( NODES(Nod)%dof%zdofH(nvar,ndofH))
+         nvar = NREQNH(Icase)*NRRHS
+         allocate( NODES(Nod)%dof%zdofH(nvar,ndofH,NRCOMS))
          NODES(Nod)%dof%zdofH = ZERO
          NRDOFSH = NRDOFSH + ndofH*NREQNH(Icase)
       endif
       if ((NREQNE(Icase).gt.0).and.(ndofE.gt.0)) then
-         nvar = NREQNE(Icase)*NRCOMS
-         allocate( NODES(Nod)%dof%zdofE(nvar,ndofE))
+         nvar = NREQNE(Icase)*NRRHS
+         allocate( NODES(Nod)%dof%zdofE(nvar,ndofE,NRCOMS))
          NODES(Nod)%dof%zdofE = ZERO
          NRDOFSE = NRDOFSE + ndofE*NREQNE(Icase)
       endif
       if ((NREQNV(Icase).gt.0).and.(ndofV.gt.0)) then
-         nvar = NREQNV(Icase)*NRCOMS
-         allocate( NODES(Nod)%dof%zdofV(nvar,ndofV))
+         nvar = NREQNV(Icase)*NRRHS
+         allocate( NODES(Nod)%dof%zdofV(nvar,ndofV,NRCOMS))
          NODES(Nod)%dof%zdofV = ZERO
          NRDOFSV = NRDOFSV + ndofV*NREQNV(Icase)
       endif
       if ((NREQNQ(Icase).gt.0).and.(ndofQ.gt.0)) then
-         nvar = NREQNQ(Icase)*NRCOMS
-         allocate( NODES(Nod)%dof%zdofQ(nvar,ndofQ))
+         nvar = NREQNQ(Icase)*NRRHS
+         allocate( NODES(Nod)%dof%zdofQ(nvar,ndofQ,NRCOMS))
          NODES(Nod)%dof%zdofQ = ZERO
          NRDOFSQ = NRDOFSQ + ndofQ*NREQNQ(Icase)
       endif

@@ -114,7 +114,7 @@
   norder_1(Iedge) = Norder(Iedge)
 !
 ! 1D integration rule
-  call set_1Dint(Norder(Iedge), nint, xi_list, wa_list)
+  call set_1Dint(Norder(Iedge), nint,xi_list,wa_list)
 !
 ! initialize
   aaH = 0.d0; bb = 0.d0

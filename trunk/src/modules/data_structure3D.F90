@@ -128,6 +128,16 @@ module data_structure3D
 !----------------------------------------------------------------------
 !  DOF DATA                                                            |
 !----------------------------------------------------------------------
+!  Solution dof ordering: (nvar, ndof, NRCOMS)                         |
+!                                                                      |
+!     do icoms=1,NRCOMS                                                |
+!        do idof=1,ndof                                                |
+!           ivar = 0                                                   |
+!           do iload=1,NRRHS                                           |
+!              do icomp=1,NREQNH(node%case)                            |
+!                 ivar = ivar+1                                        |
+!                 node%dof%zdofH(ivar, idof, icoms) = ...              |
+!----------------------------------------------------------------------
       type dof_data
 !
 !  .....geometry dof
@@ -135,30 +145,30 @@ module data_structure3D
 !
 !  .....H1 solution dof
 #if C_MODE
-        complex(8), dimension(:,:), pointer :: zdofH
+        complex(8), dimension(:,:,:), pointer :: zdofH
 #else
-        real(8)   , dimension(:,:), pointer :: zdofH
+        real(8)   , dimension(:,:,:), pointer :: zdofH
 #endif
 !
 !  .....H(curl) solution dof
 #if C_MODE
-        complex(8), dimension(:,:), pointer :: zdofE
+        complex(8), dimension(:,:,:), pointer :: zdofE
 #else
-        real(8)   , dimension(:,:), pointer :: zdofE
+        real(8)   , dimension(:,:,:), pointer :: zdofE
 #endif
 !
 !  .....H(div) solution dof
 #if C_MODE
-        complex(8), dimension(:,:), pointer :: zdofV
+        complex(8), dimension(:,:,:), pointer :: zdofV
 #else
-        real(8)   , dimension(:,:), pointer :: zdofV
+        real(8)   , dimension(:,:,:), pointer :: zdofV
 #endif
 !
 !  .....L2 solution dof
 #if C_MODE
-        complex(8), dimension(:,:), pointer :: zdofQ
+        complex(8), dimension(:,:,:), pointer :: zdofQ
 #else
-        real(8)   , dimension(:,:), pointer :: zdofQ
+        real(8)   , dimension(:,:,:), pointer :: zdofQ
 #endif
       endtype dof_data
 !
@@ -521,49 +531,49 @@ module data_structure3D
             if (associated(NODES(nod)%dof%zdofH)) then
                nn1 = ubound(NODES(nod)%dof%zdofH,1)
                nn2 = ubound(NODES(nod)%dof%zdofH,2)
-               write(ndump,*) nn1, nn2
+               write(ndump,*) nn1, nn2, NRCOMS
                write(ndump,*) NODES(nod)%dof%zdofH
             else
-               write(ndump,*) 0 , 0
+               write(ndump,*) 0 , 0 , NRCOMS
             endif
          else
-            write(ndump,*) 0 , 0
+            write(ndump,*) 0 , 0 , NRCOMS
          endif
          if (associated(NODES(nod)%dof)) then
             if (associated(NODES(nod)%dof%zdofE)) then
                nn1 = ubound(NODES(nod)%dof%zdofE,1)
                nn2 = ubound(NODES(nod)%dof%zdofE,2)
-               write(ndump,*) nn1, nn2
+               write(ndump,*) nn1, nn2, NRCOMS
                write(ndump,*) NODES(nod)%dof%zdofE
             else
-               write(ndump,*) 0 , 0
+               write(ndump,*) 0 , 0 , NRCOMS
             endif
          else
-            write(ndump,*) 0 , 0
+            write(ndump,*) 0 , 0 , NRCOMS
          endif
          if (associated(NODES(nod)%dof)) then
             if (associated(NODES(nod)%dof%zdofV)) then
                nn1 = ubound(NODES(nod)%dof%zdofV,1)
                nn2 = ubound(NODES(nod)%dof%zdofV,2)
-               write(ndump,*) nn1, nn2
+               write(ndump,*) nn1, nn2, NRCOMS
                write(ndump,*) NODES(nod)%dof%zdofV
             else
-               write(ndump,*) 0 , 0
+               write(ndump,*) 0 , 0 , NRCOMS
             endif
          else
-            write(ndump,*) 0 , 0
+            write(ndump,*) 0 , 0 , NRCOMS
          endif
          if (associated(NODES(nod)%dof)) then
             if (associated(NODES(nod)%dof%zdofQ)) then
                nn1 = ubound(NODES(nod)%dof%zdofQ,1)
                nn2 = ubound(NODES(nod)%dof%zdofQ,2)
-               write(ndump,*) nn1, nn2
+               write(ndump,*) nn1, nn2, NRCOMS
                write(ndump,*) NODES(nod)%dof%zdofQ
             else
-               write(ndump,*) 0 , 0
+               write(ndump,*) 0 , 0 , NRCOMS
             endif
          else
-            write(ndump,*) 0 , 0
+            write(ndump,*) 0 , 0 , NRCOMS
          endif
       enddo
 !
@@ -675,30 +685,30 @@ module data_structure3D
         read(ndump,*) NODES(nod)%error
 #endif
 !
-        read(ndump,*) nn1, nn2
+        read(ndump,*) nn1, nn2, NRCOMS
         if ((nn1.gt.0).and.(nn2.gt.0)) then
-          allocate(NODES(nod)%dof%zdofH(nn1,nn2))
+          allocate(NODES(nod)%dof%zdofH(nn1,nn2,NRCOMS))
           read(ndump,*) NODES(nod)%dof%zdofH
         else
           if(associated(NODES(nod)%dof)) nullify(NODES(nod)%dof%zdofH)
         endif
-        read(ndump,*) nn1, nn2
+        read(ndump,*) nn1, nn2, NRCOMS
         if ((nn1.gt.0).and.(nn2.gt.0)) then
-          allocate(NODES(nod)%dof%zdofE(nn1,nn2))
+          allocate(NODES(nod)%dof%zdofE(nn1,nn2,NRCOMS))
           read(ndump,*) NODES(nod)%dof%zdofE
         else
           if(associated(NODES(nod)%dof)) nullify(NODES(nod)%dof%zdofE)
         endif
-        read(ndump,*) nn1, nn2
+        read(ndump,*) nn1, nn2, NRCOMS
         if ((nn1.gt.0).and.(nn2.gt.0)) then
-          allocate(NODES(nod)%dof%zdofV(nn1,nn2))
+          allocate(NODES(nod)%dof%zdofV(nn1,nn2,NRCOMS))
           read(ndump,*) NODES(nod)%dof%zdofV
         else
           if(associated(NODES(nod)%dof)) nullify(NODES(nod)%dof%zdofV)
         endif
-        read(ndump,*) nn1, nn2
+        read(ndump,*) nn1, nn2, NRCOMS
         if ((nn1.gt.0).and.(nn2.gt.0)) then
-          allocate(NODES(nod)%dof%zdofQ(nn1,nn2))
+          allocate(NODES(nod)%dof%zdofQ(nn1,nn2,NRCOMS))
           read(ndump,*) NODES(nod)%dof%zdofQ
         else
           if(associated(NODES(nod)%dof)) nullify(NODES(nod)%dof%zdofQ)

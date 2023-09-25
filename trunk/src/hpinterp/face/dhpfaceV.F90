@@ -6,6 +6,7 @@
 !!           using PB interpolation; NOTE: the interpolation (projection)
 !!           is done in the reference space
 !!
+!! @param[in]  Mdle         - element (middle node) number
 !! @param[in]  Iflag        - a flag specifying which of the objects the
 !!                            face is on: 5 pris, 6 hexa, 7 tetr, 8 pyra
 !! @param[in]  No           - number of a specific object
@@ -20,11 +21,11 @@
 !!
 !! @param[in,out] ZnodV     - H(div) dof for the face
 !!
-!> @date Feb 2023
+!> @date Sep 2023
 !-----------------------------------------------------------------------
-  subroutine dhpfaceV(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond, &
-                      Nedge_orient,Nface_orient,Norder,Iface, &
-                      ZnodV)
+subroutine dhpfaceV(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
+                    Nedge_orient,Nface_orient,Norder,Iface, &
+                    ZnodV)
   use control
   use parameters
   use physics
@@ -41,7 +42,7 @@
   integer, dimension(6),   intent(in)  :: Nface_orient
   integer, dimension(19),  intent(in)  :: Norder
 !
-  VTYPE,   dimension(NRCOMS*NREQNH(Icase),*), intent(inout) :: ZnodV
+  VTYPE,   dimension(NRRHS*NREQNH(Icase),*), intent(inout) :: ZnodV
 !
 ! ** Locals
 !-----------------------------------------------------------------------
@@ -352,8 +353,8 @@
 !  ...initialize global variable counter, and node local variable counter
       ivarV=0; nvarV=0
 !
-!  ...loop through multiple copies of variables
-      do j=1,NRCOMS
+!  ...loop through multiple loads
+      do j=1,NRRHS
 !
 !  .....initiate the BC component counter
         ic=0
@@ -387,15 +388,19 @@
 !
 !  .............store Dirichlet dof
                 if (ibcnd(ic).eq.1) ZnodV(nvarV,1:ndofV_face) = zuV(1:ndofV_face,ivarV)
+!
               endif
             end select
+!
+!  .......loop through components
           enddo
+!  .....loop through physical attributes
         enddo
+!  ...loop through multiple loads
       enddo
 !
 #if DEBUG_MODE
       if (iprint.eq.1) call result
 #endif
 !
-  end subroutine dhpfaceV
-
+end subroutine dhpfaceV

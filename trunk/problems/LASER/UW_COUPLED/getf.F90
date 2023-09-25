@@ -43,7 +43,7 @@ subroutine getf(Mdle,X, Zfval,ZJval)
    VTYPE,dimension(  MAXEQNQ,3,3) :: d2valQ
 !
 !..miscellaneus
-   integer :: iload,ivar,ibeg,icomp,jcomp,k,l,iprint
+   integer :: ivar,ibeg,icomp,jcomp,k,l,iprint
 !
 !------------------------------------------------------------------------------
 !
@@ -163,7 +163,6 @@ end subroutine getf
 subroutine get_bdSource(Mdle,X,Rn, Imp_val)
 !
    use control          , only : NEXACT
-   use assembly         , only : NR_RHS
    use data_structure3D , only : NR_COMP,ADRES,NRINDEX
    use parameters       , only : MAXEQNH,MAXEQNE,MAXEQNV,MAXEQNQ,ZERO
    use commonParam
@@ -192,9 +191,10 @@ subroutine get_bdSource(Mdle,X,Rn, Imp_val)
    VTYPE,dimension(  MAXEQNQ,3,3) :: zd2valQ
 !
 !..miscellaneus
-   integer :: iload,ivar,ibeg,icomp,jcomp,k,l
+   integer    :: ivar,ibeg,icomp,jcomp,k,l
    complex(8) :: zaux
-   VTYPE, dimension(3) :: rntimesE,rn2timesE,rntimesH
+!
+   VTYPE  , dimension(3)   :: rntimesE,rn2timesE,rntimesH
    real(8)                 :: impedanceConstant
    real(8)                 :: E   ! vector field
    real(8), dimension(3)   :: dE  ! 1st derivative

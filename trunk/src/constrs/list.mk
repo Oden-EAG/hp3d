@@ -6,6 +6,6 @@ logic.F
 logic_nodes.F
 nodcor.F90
 nodcor_vert.F90
-solelm.F
-solelmI.F
+solelm.F90
+solelmI.F90
 0

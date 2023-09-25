@@ -70,7 +70,7 @@ module paraview
 !     PARAVIEW_ATTR enables/disables writing specific physics variables
 !     PARAVIEW_COMP_REAL enables/disables writing real part of specific components
 !     PARAVIEW_COMP_IMAG enables/disables writing imag part of specific components
-   logical, allocatable :: PARAVIEW_LOAD(:)      ! 1...NRCOMS
+   logical, allocatable :: PARAVIEW_LOAD(:)      ! 1...NRRHS
    logical, allocatable :: PARAVIEW_ATTR(:)      ! 1...NR_PHYSA
    logical, allocatable :: PARAVIEW_COMP_REAL(:) ! 1...NRINDEX
    logical, allocatable :: PARAVIEW_COMP_IMAG(:) ! 1...NRINDEX
@@ -137,12 +137,12 @@ module paraview
 !> @date      Sep 2023
 !-----------------------------------------------------------------------------
    subroutine paraview_select_load(EnableLoad)
-      use data_structure3D, only: NRCOMS
-      logical, intent(in) :: EnableLoad(NRCOMS)
+      use parameters, only: NRRHS
+      logical, intent(in) :: EnableLoad(NRRHS)
       integer :: iload
       if (.not.PARAVIEW_IS_INIT) call paraview_initialize
 !
-      do iload = 1,NRCOMS
+      do iload = 1,NRRHS
          PARAVIEW_LOAD(iload) = EnableLoad(iload)
       enddo
    end subroutine paraview_select_load

@@ -836,7 +836,7 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
       mdle = ELEM_SUBD(iel)
       if (GEOM_NO .eq. 5) call find_domain(mdle, ndom)
       call nodcor_vert(mdle, xnod)
-      etype = NODES(Mdle)%ntype
+      etype = NODES(mdle)%ntype
       select case(etype)
          case(MDLB)
             maxz = maxval(xnod(3,1:8))
@@ -991,7 +991,7 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
    integer :: nint,icase,iattr,l,i,j
    real(8) :: weight,wa
    integer :: iel,nsign
-   integer :: nflag,iload
+   integer :: nflag
 !
 !---------------------------------------------------------------------------------------
 !
@@ -1003,8 +1003,8 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
    nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
    call find_order(Mdle, norder)
    call find_orient(Mdle, nedge_orient,nface_orient)
-   call nodcor(mdle, xnod)
-   call solelm(mdle, zdofH,zdofE,zdofV,zdofQ)
+   call nodcor(Mdle, xnod)
+   call solelm(Mdle, zdofH,zdofE,zdofV,zdofQ)
 !..sign factor to determine the OUTWARD normal unit vector
    nsign = nsign_param(etype,Facenumber)
 !
@@ -1200,7 +1200,7 @@ subroutine compute_mode_power(Mdle,Facenumber,Fld, ModePower,ModeNorm,ModeCoef)
    integer :: nint,icase,iattr,l,i,j
    real(8) :: weight,wa
    integer :: iel,nsign
-   integer :: nflag,iload
+   integer :: nflag
 !
 !---------------------------------------------------------------------------------------
 !
@@ -1211,8 +1211,8 @@ subroutine compute_mode_power(Mdle,Facenumber,Fld, ModePower,ModeNorm,ModeCoef)
    nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
    call find_order(Mdle, norder)
    call find_orient(Mdle, nedge_orient,nface_orient)
-   call nodcor(mdle, xnod)
-   call solelm(mdle, zdofH,zdofE,zdofV,zdofQ)
+   call nodcor(Mdle, xnod)
+   call solelm(Mdle, zdofH,zdofE,zdofV,zdofQ)
 !..sign factor to determine the OUTWARD normal unit vector
    nsign = nsign_param(etype,Facenumber)
 !

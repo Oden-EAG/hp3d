@@ -82,6 +82,10 @@ c
 c
 c  ...save the number of right-hand sides (load vectors)
       NR_RHS = Number_of_RHS
+      if (NR_RHS .ne. NRRHS) then
+         write(*,*) 'NR_RHS, NRRHS = ',NR_RHS,NRRHS
+         stop
+      endif
 c
 c  ...preliminary loop through elements to collect the necessary data
 c     for allocating memory

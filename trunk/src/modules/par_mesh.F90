@@ -5,7 +5,7 @@
 !
 !     module:              par_mesh
 !
-!     last modified:       Oct 2019
+!     last modified:       Sep 2023
 !
 !     purpose:             provides functionality for distributing
 !                          degrees of freedom in the FE mesh
@@ -15,7 +15,6 @@ module par_mesh
 !
    use data_structure3D
    use environment,    only: QUIET_MODE
-   use parameters,     only: NRCOMS
    use mpi_param,      only: RANK,ROOT,NUM_PROCS
    use MPI,            only: MPI_COMM_WORLD,MPI_STATUS_IGNORE, &
                              MPI_SUCCESS,MPI_COMPLEX16,MPI_REAL8,MPI_Wtime
@@ -277,10 +276,10 @@ subroutine alloc_nod_dof(Nod)
 !..calculate ndof,nvar for this node
    call find_ndof(Nod, ndofH,ndofE,ndofV,ndofQ)
    icase = NODES(Nod)%case
-   nvarH = NREQNH(icase)*NRCOMS
-   nvarE = NREQNE(icase)*NRCOMS
-   nvarV = NREQNV(icase)*NRCOMS
-   nvarQ = NREQNQ(icase)*NRCOMS
+   nvarH = NREQNH(icase)*NRRHS
+   nvarE = NREQNE(icase)*NRRHS
+   nvarV = NREQNV(icase)*NRRHS
+   nvarQ = NREQNQ(icase)*NRRHS
 !..allocate dof data type
    if (.not. associated(NODES(Nod)%dof)) then
       allocate(NODES(Nod)%dof)
@@ -297,22 +296,22 @@ subroutine alloc_nod_dof(Nod)
    endif
 !..allocate H1 DOFS
    if (.not. associated(NODES(Nod)%dof%zdofH) .and. (ndofH .gt. 0)) then
-      allocate(NODES(Nod)%dof%zdofH(nvarH, ndofH))
+      allocate(NODES(Nod)%dof%zdofH(nvarH, ndofH, NRCOMS))
       NODES(Nod)%dof%zdofH = ZERO
    endif
 !..allocate H(curl) DOFs
    if (.not. associated(NODES(Nod)%dof%zdofE) .and. (ndofE .gt. 0)) then
-      allocate(NODES(Nod)%dof%zdofE(nvarE, ndofE))
+      allocate(NODES(Nod)%dof%zdofE(nvarE, ndofE, NRCOMS))
       NODES(Nod)%dof%zdofE = ZERO
    endif
 !..allocate H(div) DOFs
    if (.not. associated(NODES(Nod)%dof%zdofV) .and. (ndofV .gt. 0)) then
-      allocate(NODES(Nod)%dof%zdofV(nvarV, ndofV))
+      allocate(NODES(Nod)%dof%zdofV(nvarV, ndofV, NRCOMS))
       NODES(Nod)%dof%zdofV = ZERO
    endif
 !..allocate L2 DOFs
    if (.not. associated(NODES(Nod)%dof%zdofQ) .and. (ndofQ .gt.  0)) then
-      allocate(NODES(Nod)%dof%zdofQ(nvarQ, ndofQ))
+      allocate(NODES(Nod)%dof%zdofQ(nvarQ, ndofQ, NRCOMS))
       NODES(Nod)%dof%zdofQ = ZERO
    endif
 end subroutine alloc_nod_dof
@@ -345,10 +344,10 @@ subroutine get_dof_buf_size(Nod, Nrdof_nod)
    integer :: icase
    call find_ndof(Nod, ndofH,ndofE,ndofV,ndofQ)
    icase = NODES(Nod)%case
-   nvarH = NREQNH(icase)*NRCOMS
-   nvarE = NREQNE(icase)*NRCOMS
-   nvarV = NREQNV(icase)*NRCOMS
-   nvarQ = NREQNQ(icase)*NRCOMS
+   nvarH = NREQNH(icase)*NRRHS
+   nvarE = NREQNE(icase)*NRRHS
+   nvarV = NREQNV(icase)*NRRHS
+   nvarQ = NREQNQ(icase)*NRRHS
    Nrdof_nod = ndofH*NDIMEN + ndofH*nvarH + ndofE*nvarE + ndofV*nvarV + ndofQ*nvarQ
 end subroutine get_dof_buf_size
 !
@@ -369,10 +368,10 @@ subroutine pack_dof_buf(Nod,Nrdof_nod, Buf)
 !..calculate ndof,nvar for this node
    call find_ndof(Nod, ndofH,ndofE,ndofV,ndofQ)
    icase = NODES(Nod)%case
-   nvarH = NREQNH(icase)*NRCOMS
-   nvarE = NREQNE(icase)*NRCOMS
-   nvarV = NREQNV(icase)*NRCOMS
-   nvarQ = NREQNQ(icase)*NRCOMS
+   nvarH = NREQNH(icase)*NRRHS
+   nvarE = NREQNE(icase)*NRRHS
+   nvarV = NREQNV(icase)*NRRHS
+   nvarQ = NREQNQ(icase)*NRRHS
 !
    j = 0
 !
@@ -386,28 +385,28 @@ subroutine pack_dof_buf(Nod,Nrdof_nod, Buf)
 !..add H1 dof to buffer
    if(nvarH .gt. 0 .and. ndofH .gt. 0) then
       do ivar=1,nvarH
-         Buf(j+1:j+ndofH) = NODES(Nod)%dof%zdofH(ivar,1:ndofH)
+         Buf(j+1:j+ndofH) = NODES(Nod)%dof%zdofH(ivar,1:ndofH,N_COMS)
          j = j + ndofH
       enddo
    endif
 !..add H(curl) dof to buffer
    if(nvarE .gt. 0 .and. ndofE .gt. 0) then
       do ivar=1,nvarE
-         Buf(j+1:j+ndofE) = NODES(Nod)%dof%zdofE(ivar,1:ndofE)
+         Buf(j+1:j+ndofE) = NODES(Nod)%dof%zdofE(ivar,1:ndofE,N_COMS)
          j = j + ndofE
       enddo
    endif
 !..add H(div) dof to buffer
    if(nvarV .gt. 0 .and. ndofV .gt. 0) then
       do ivar=1,nvarV
-         Buf(j+1:j+ndofV) = NODES(Nod)%dof%zdofV(ivar,1:ndofV)
+         Buf(j+1:j+ndofV) = NODES(Nod)%dof%zdofV(ivar,1:ndofV,N_COMS)
          j = j + ndofV
       enddo
    endif
 !..add L2 dof to buffer
    if(nvarQ .gt. 0 .and. ndofQ .gt. 0) then
       do ivar=1,nvarQ
-         Buf(j+1:j+ndofQ) = NODES(Nod)%dof%zdofQ(ivar,1:ndofQ)
+         Buf(j+1:j+ndofQ) = NODES(Nod)%dof%zdofQ(ivar,1:ndofQ,N_COMS)
          j = j + ndofQ
       enddo
    endif
@@ -434,10 +433,10 @@ subroutine unpack_dof_buf(Nod,Nrdof_nod,Buf)
    call find_ndof(Nod, ndofH,ndofE,ndofV,ndofQ)
 !
    icase = NODES(Nod)%case
-   nvarH = NREQNH(icase)*NRCOMS
-   nvarE = NREQNE(icase)*NRCOMS
-   nvarV = NREQNV(icase)*NRCOMS
-   nvarQ = NREQNQ(icase)*NRCOMS
+   nvarH = NREQNH(icase)*NRRHS
+   nvarE = NREQNE(icase)*NRRHS
+   nvarV = NREQNV(icase)*NRRHS
+   nvarQ = NREQNQ(icase)*NRRHS
 !
    j = 0
 !..extract geometry dof from buffer
@@ -450,28 +449,28 @@ subroutine unpack_dof_buf(Nod,Nrdof_nod,Buf)
 !..extract H1 dof from buffer
    if(nvarH .gt. 0 .and. ndofH .gt. 0) then
       do ivar=1,nvarH
-         NODES(Nod)%dof%zdofH(ivar,1:ndofH) = Buf(j+1:j+ndofH)
+         NODES(Nod)%dof%zdofH(ivar,1:ndofH,N_COMS) = Buf(j+1:j+ndofH)
          j = j + ndofH
       enddo
    endif
 !..extract H(curl) dof from buffer
    if(nvarE .gt. 0 .and. ndofE .gt. 0) then
       do ivar=1,nvarE
-         NODES(Nod)%dof%zdofE(ivar,1:ndofE) = Buf(j+1:j+ndofE)
+         NODES(Nod)%dof%zdofE(ivar,1:ndofE,N_COMS) = Buf(j+1:j+ndofE)
          j = j + ndofE
       enddo
    endif
 !..extract H(div) dof from buffer
    if(nvarV .gt. 0 .and. ndofV .gt. 0) then
       do ivar=1,nvarV
-         NODES(Nod)%dof%zdofV(ivar,1:ndofV) = Buf(j+1:j+ndofV)
+         NODES(Nod)%dof%zdofV(ivar,1:ndofV,N_COMS) = Buf(j+1:j+ndofV)
          j = j + ndofV
       enddo
    endif
 !..extract L2 dof from buffer
    if(nvarQ .gt. 0 .and. ndofQ .gt. 0) then
       do ivar=1,nvarQ
-         NODES(Nod)%dof%zdofQ(ivar,1:ndofQ) = Buf(j+1:j+ndofQ)
+         NODES(Nod)%dof%zdofQ(ivar,1:ndofQ,N_COMS) = Buf(j+1:j+ndofQ)
          j = j + ndofQ
       enddo
    endif

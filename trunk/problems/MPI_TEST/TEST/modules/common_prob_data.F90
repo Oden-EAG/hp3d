@@ -22,9 +22,6 @@ module common_prob_data
 !
 !..MATLAB DIR
    character(len=128) :: MATLAB_DIR
-!..MISCELLANEOUS
-!
-   integer :: NR_RHS_PROB = 1
 !
 !..DPG
    integer :: TEST_NORM

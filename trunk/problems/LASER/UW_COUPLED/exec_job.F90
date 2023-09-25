@@ -13,8 +13,8 @@ subroutine exec_job
 !
    implicit none
 !
-   integer :: flag(6)
-   logical :: iPvAttr(6)
+   integer :: flag(7)
+   logical :: iPvAttr(7)
    integer :: physNick,nstop
    logical :: ires
 !
@@ -172,7 +172,7 @@ subroutine exec_job
 !
 !  ...write paraview output
       if(RANK .eq. ROOT) write(*,200) '8. writing paraview output...'
-      iPvAttr = (/.false.,.false.,.false.,.false.,.true.,.false./)
+      iPvAttr = (/.false.,.false.,.false.,.false.,.true.,.false.,.false./)
       call paraview_select_attr(iPvAttr)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
       call my_paraview_driver

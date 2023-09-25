@@ -43,6 +43,7 @@ subroutine par_mumps_sc(mtype)
    use control,   only: ISTC_FLAG
    use stc,       only: HERM_STC,CLOC,                         &
                         stc_alloc,stc_dealloc,stc_get_nrdof
+   use parameters,only: NRRHS
    use par_mumps, only: mumps_par,mumps_start_par,mumps_destroy_par
    use par_mesh , only: DISTRIBUTED,HOST_MESH
    use mpi_param, only: RANK,ROOT,NUM_PROCS
@@ -109,7 +110,8 @@ subroutine par_mumps_sc(mtype)
    endif
 !
 !..TODO multiple right-hand sides
-   NR_RHS = 1
+   NR_RHS = NRRHS
+!
    call mumps_start_par
 !
 !  ----------------------------------------------------------------------

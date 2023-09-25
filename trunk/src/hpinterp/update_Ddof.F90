@@ -6,7 +6,7 @@
 !-----------------------------------------------------------------------
 !> @brief Routine updates values of solution degrees of freedom
 !!        for Dirichlet nodes
-!> @date Mar 2023
+!> @date Sep 2023
 !-----------------------------------------------------------------------
 !
 subroutine update_Ddof
@@ -145,7 +145,7 @@ subroutine update_Ddof
           7010 format('update_Ddof: CALLING dhpvert FOR mdle,iv,nod = ',i8,i2,i8)
 #endif
                call dhpvert(mdle,iflag,no,xsub(1:3,iv),NODES(nod)%case, &
-                            NODES(nod)%bcond, NODES(nod)%dof%zdofH)
+                            NODES(nod)%bcond, NODES(nod)%dof%zdofH(:,:,N_COMS))
                NODES(nod)%visit=1
             endif
          enddo
@@ -174,7 +174,7 @@ subroutine update_Ddof
                   call dhpedgeH(mdle,iflag,no,xsub,                     &
                                 ntype,NODES(nod)%case,NODES(nod)%bcond, &
                                 nedge_orient,nface_orient,norder,ie,    &
-                                zdofH, NODES(nod)%dof%zdofH)
+                                zdofH, NODES(nod)%dof%zdofH(:,:,N_COMS))
                endif
                NODES(nod)%visit=1
             endif
@@ -188,7 +188,7 @@ subroutine update_Ddof
                   call dhpedgeE(mdle,iflag,no,xsub,                     &
                                 ntype,NODES(nod)%case,NODES(nod)%bcond, &
                                 nedge_orient,nface_orient,norder,ie,    &
-                                NODES(nod)%dof%zdofE)
+                                NODES(nod)%dof%zdofE(:,:,N_COMS))
                endif
                NODES(nod)%visit=1
             endif
@@ -218,7 +218,7 @@ subroutine update_Ddof
                   call dhpfaceH(mdle,iflag,no,xsub,                     &
                                 ntype,NODES(nod)%case,NODES(nod)%bcond, &
                                 nedge_orient,nface_orient,norder,ifc,   &
-                                zdofH, NODES(nod)%dof%zdofH)
+                                zdofH, NODES(nod)%dof%zdofH(:,:,N_COMS))
                endif
                NODES(nod)%visit=1
             endif
@@ -232,7 +232,7 @@ subroutine update_Ddof
                   call dhpfaceE(mdle,iflag,no,xsub,                     &
                                 ntype,NODES(nod)%case,NODES(nod)%bcond, &
                                 nedge_orient,nface_orient,norder,ifc,   &
-                                zdofE, NODES(nod)%dof%zdofE)
+                                zdofE, NODES(nod)%dof%zdofE(:,:,N_COMS))
                endif
                NODES(nod)%visit=1
             endif
@@ -246,7 +246,7 @@ subroutine update_Ddof
                   call dhpfaceV(mdle,iflag,no,xsub,                     &
                                 ntype,NODES(nod)%case,NODES(nod)%bcond, &
                                 nedge_orient,nface_orient,norder,ifc,   &
-                                NODES(nod)%dof%zdofV)
+                                NODES(nod)%dof%zdofV(:,:,N_COMS))
                endif
                NODES(nod)%visit=1
             endif
@@ -391,37 +391,37 @@ subroutine update_Ddof
       nod = nod_glb(i)
       call find_ndof(nod, ndofH,ndofE,ndofV,ndofQ)
       icase = NODES(Nod)%case
-      nvarH = NREQNH(icase)*NRCOMS
-      nvarE = NREQNE(icase)*NRCOMS
-      nvarV = NREQNV(icase)*NRCOMS
+      nvarH = NREQNH(icase)*NRRHS
+      nvarE = NREQNE(icase)*NRRHS
+      nvarV = NREQNV(icase)*NRRHS
 !  ...check whether supplier
       if (src .eq. RANK) then
          !write(*,6010) RANK,'SENDING  ',nod,S_Type(NODES(nod)%ntype)
          if (nvarH > 0 .and. ndofH > 0) then
-            count = ndofH*nvarH; buf => NODES(nod)%dof%zdofH
+            count = ndofH*nvarH; buf => NODES(nod)%dof%zdofH(:,:,N_COMS)
             call MPI_SEND(buf,count,MPI_VTYPE,rcv,tag,MPI_COMM_WORLD,ierr)
          endif
          if (nvarE > 0 .and. ndofE > 0) then
-            count = ndofE*nvarE; buf => NODES(nod)%dof%zdofE
+            count = ndofE*nvarE; buf => NODES(nod)%dof%zdofE(:,:,N_COMS)
             call MPI_SEND(buf,count,MPI_VTYPE,rcv,tag,MPI_COMM_WORLD,ierr)
          endif
          if (nvarV > 0 .and. ndofV > 0) then
-            count = ndofV*nvarV; buf => NODES(nod)%dof%zdofV
+            count = ndofV*nvarV; buf => NODES(nod)%dof%zdofV(:,:,N_COMS)
             call MPI_SEND(buf,count,MPI_VTYPE,rcv,tag,MPI_COMM_WORLD,ierr)
          endif
 !  ...check whether receiver
       elseif (rcv .eq. RANK) then
          !write(*,6010) RANK,'RECEIVING',nod,S_Type(NODES(nod)%ntype)
          if (nvarH > 0 .and. ndofH > 0) then
-            count = ndofH*nvarH; buf => NODES(nod)%dof%zdofH
+            count = ndofH*nvarH; buf => NODES(nod)%dof%zdofH(:,:,N_COMS)
             call MPI_RECV(buf,count,MPI_VTYPE,src,tag,MPI_COMM_WORLD,MPI_STATUS_IGNORE,ierr)
          endif
          if (nvarE > 0 .and. ndofE > 0) then
-            count = ndofE*nvarE; buf => NODES(nod)%dof%zdofE
+            count = ndofE*nvarE; buf => NODES(nod)%dof%zdofE(:,:,N_COMS)
             call MPI_RECV(buf,count,MPI_VTYPE,src,tag,MPI_COMM_WORLD,MPI_STATUS_IGNORE,ierr)
          endif
          if (nvarV > 0 .and. ndofV > 0) then
-            count = ndofV*nvarV; buf => NODES(nod)%dof%zdofV
+            count = ndofV*nvarV; buf => NODES(nod)%dof%zdofV(:,:,N_COMS)
             call MPI_RECV(buf,count,MPI_VTYPE,src,tag,MPI_COMM_WORLD,MPI_STATUS_IGNORE,ierr)
          endif
          NODES(nod)%visit = 1
@@ -478,7 +478,7 @@ end subroutine update_Ddof
 !> @warning  "dirichlet" and other user-supplied routines must be
 !!           threadsafe to use this version; not recommended without
 !!           proper verification.
-!> @date Mar 2023
+!> @date Sep 2023
 !-----------------------------------------------------------------------
 !
 subroutine update_Ddof_omp
@@ -671,7 +671,7 @@ subroutine update_Ddof_omp
 !
 !$OMP CRITICAL
                if (NODES(nod)%visit.eq.0) then
-                  NODES(nod)%dof%zdofH = tempH(1:nvar,1:ndof)
+                  NODES(nod)%dof%zdofH(:,:,N_COMS) = tempH(1:nvar,1:ndof)
                   NODES(nod)%visit = 1
                endif
 !$OMP END CRITICAL
@@ -712,7 +712,7 @@ subroutine update_Ddof_omp
 !
 !$OMP CRITICAL
                   if (NODES(nod)%visit.eq.0) then
-                     NODES(nod)%dof%zdofH = tempH(1:nvar,1:ndof)
+                     NODES(nod)%dof%zdofH(:,:,N_COMS) = tempH(1:nvar,1:ndof)
                      NODES(nod)%visit = 1
                   endif
 !$OMP END CRITICAL
@@ -740,7 +740,7 @@ subroutine update_Ddof_omp
 !
 !$OMP CRITICAL
                   if (NODES(nod)%visit.lt.2) then
-                     NODES(nod)%dof%zdofE = tempE(1:nvar,1:ndof)
+                     NODES(nod)%dof%zdofE(:,:,N_COMS) = tempE(1:nvar,1:ndof)
                      NODES(nod)%visit = 2
                   endif
 !$OMP END CRITICAL
@@ -783,7 +783,7 @@ subroutine update_Ddof_omp
 !
 !$OMP CRITICAL
                   if (NODES(nod)%visit.eq.0) then
-                     NODES(nod)%dof%zdofH = tempH(1:nvar,1:ndof)
+                     NODES(nod)%dof%zdofH(:,:,N_COMS) = tempH(1:nvar,1:ndof)
                      NODES(nod)%visit = 1
                   endif
 !$OMP END CRITICAL
@@ -810,7 +810,7 @@ subroutine update_Ddof_omp
 !
 !$OMP CRITICAL
                   if (NODES(nod)%visit.lt.2) then
-                     NODES(nod)%dof%zdofE = tempE(1:nvar,1:ndof)
+                     NODES(nod)%dof%zdofE(:,:,N_COMS) = tempE(1:nvar,1:ndof)
                      NODES(nod)%visit = 2
                   endif
 !$OMP END CRITICAL
@@ -837,7 +837,7 @@ subroutine update_Ddof_omp
 !
 !$OMP CRITICAL
                   if (NODES(nod)%visit.lt.3) then
-                     NODES(nod)%dof%zdofV = tempV(1:nvar,1:ndof)
+                     NODES(nod)%dof%zdofV(:,:,N_COMS) = tempV(1:nvar,1:ndof)
                      NODES(nod)%visit = 3
                   endif
 !$OMP END CRITICAL
@@ -992,37 +992,37 @@ subroutine update_Ddof_omp
       nod = nod_glb(i)
       call find_ndof(nod, ndofH,ndofE,ndofV,ndofQ)
       icase = NODES(Nod)%case
-      nvarH = NREQNH(icase)*NRCOMS
-      nvarE = NREQNE(icase)*NRCOMS
-      nvarV = NREQNV(icase)*NRCOMS
+      nvarH = NREQNH(icase)*NRRHS
+      nvarE = NREQNE(icase)*NRRHS
+      nvarV = NREQNV(icase)*NRRHS
 !  ...check whether supplier
       if (src .eq. RANK) then
          !write(*,6010) RANK,'SENDING  ',nod,S_Type(NODES(nod)%ntype)
          if (nvarH > 0 .and. ndofH > 0) then
-            count = ndofH*nvarH; buf => NODES(nod)%dof%zdofH
+            count = ndofH*nvarH; buf => NODES(nod)%dof%zdofH(:,:,N_COMS)
             call MPI_SEND(buf,count,MPI_VTYPE,rcv,tag,MPI_COMM_WORLD,ierr)
          endif
          if (nvarE > 0 .and. ndofE > 0) then
-            count = ndofE*nvarE; buf => NODES(nod)%dof%zdofE
+            count = ndofE*nvarE; buf => NODES(nod)%dof%zdofE(:,:,N_COMS)
             call MPI_SEND(buf,count,MPI_VTYPE,rcv,tag,MPI_COMM_WORLD,ierr)
          endif
          if (nvarV > 0 .and. ndofV > 0) then
-            count = ndofV*nvarV; buf => NODES(nod)%dof%zdofV
+            count = ndofV*nvarV; buf => NODES(nod)%dof%zdofV(:,:,N_COMS)
             call MPI_SEND(buf,count,MPI_VTYPE,rcv,tag,MPI_COMM_WORLD,ierr)
          endif
 !  ...check whether receiver
       elseif (rcv .eq. RANK) then
          !write(*,6010) RANK,'RECEIVING',nod,S_Type(NODES(nod)%ntype)
          if (nvarH > 0 .and. ndofH > 0) then
-            count = ndofH*nvarH; buf => NODES(nod)%dof%zdofH
+            count = ndofH*nvarH; buf => NODES(nod)%dof%zdofH(:,:,N_COMS)
             call MPI_RECV(buf,count,MPI_VTYPE,src,tag,MPI_COMM_WORLD,MPI_STATUS_IGNORE,ierr)
          endif
          if (nvarE > 0 .and. ndofE > 0) then
-            count = ndofE*nvarE; buf => NODES(nod)%dof%zdofE
+            count = ndofE*nvarE; buf => NODES(nod)%dof%zdofE(:,:,N_COMS)
             call MPI_RECV(buf,count,MPI_VTYPE,src,tag,MPI_COMM_WORLD,MPI_STATUS_IGNORE,ierr)
          endif
          if (nvarV > 0 .and. ndofV > 0) then
-            count = ndofV*nvarV; buf => NODES(nod)%dof%zdofV
+            count = ndofV*nvarV; buf => NODES(nod)%dof%zdofV(:,:,N_COMS)
             call MPI_RECV(buf,count,MPI_VTYPE,src,tag,MPI_COMM_WORLD,MPI_STATUS_IGNORE,ierr)
          endif
          NODES(nod)%visit = 3
