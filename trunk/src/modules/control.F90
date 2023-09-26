@@ -62,7 +62,6 @@ contains
 !> Purpose : routine reads in global control parameters from file
    subroutine read_control_from_file(fp)
       use environment , only : QUIET_MODE
-      use paraview    , only : PARAVIEW_GEOM
       use MPI
 !
       implicit none
@@ -184,9 +183,6 @@ contains
       if (.not. QUIET_MODE) write(*,*)''
 !
       close (ncontrol)
-!
-!  ...initialize Paraview ex./iso. geometry flag
-      PARAVIEW_GEOM = EXGEOM
 !
    end subroutine read_control_from_file
 !

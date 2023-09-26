@@ -1,4 +1,8 @@
 big_neig_across_face.F90
+copy_attr.F90
+copy_comp.F90
+copy_coms.F90
+copy_load.F90
 dof_in.F90
 dof_out.F90
 domain_number.F90

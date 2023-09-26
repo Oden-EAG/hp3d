@@ -32,11 +32,17 @@ module physics
   !  ...location of the first component for the attribute
   integer, save, allocatable :: ADRES(:)
   !
-  !  ...total number of H1,H(curl),H(div) and L2 variables
+  !  ...total number of H1,H(curl),H(div) and L2 components
   integer, save :: NRHVAR,NREVAR,NRVVAR,NRQVAR
   !
-  !  ...number of entries in index
+  !  ...number of entries in index (total number of components)
   integer, save :: NRINDEX
+  !
+  !  ...max number of component indices
+  !     currently, 31 is the maximum number of components supported
+  !     because the Dirichlet BC flags are binary-encoded per component
+  !     into node%bcond which is an integer value
+  integer, parameter :: MAX_NRINDEX = 31
   !
   !----------------------------------------------------------------------
   !
@@ -104,6 +110,60 @@ contains
                stop
          end select
       end function I_DType
+!
+!-----------------------------------------------------------------------
+!
+!> @brief      Returns component index for a physics attribute component
+!> @param[in]  Attr  - physics attribute number: 1,...,NR_PHYSA
+!> @param[in]  Comp  - physics attribute component: 1,...,NR_COMP(Attr)
+!> @param[out] Index - component index: 1,...,NRINDEX
+!> @date       Sep 2023
+subroutine attr_to_index(Attr,Comp, Index)
+   integer, intent(in)  :: Attr,Comp
+   integer, intent(out) :: Index
+   if (Attr.lt.1 .or. Attr.gt.NR_PHYSA) then
+      write(*,1000) 'Attr',Attr
+      stop
+   endif
+   if (Comp.lt.1 .or. Comp.gt.NR_COMP(Attr)) then
+      write(*,1000) 'Comp',Comp
+      stop
+   endif
+   1000 format('attr_to_index: invalid input: ',A,' = ',I9)
+   Index = sum(NR_COMP(1:Attr-1)) + Comp
+end subroutine attr_to_index
+!
+!-----------------------------------------------------------------------
+!
+!> @brief      Returns physics attribute and its component number
+!!             for a component index
+!> @param[in]  Index - component index: 1,...,NRINDEX
+!> @param[out] Attr  - physics attribute number: 1,...,NR_PHYSA
+!> @param[out] Comp  - physics attribute component: 1,...,NR_COMP(Attr)
+!> @date       Sep 2023
+subroutine index_to_attr(Index, Attr,Comp)
+   integer, intent(in)  :: Index
+   integer, intent(out) :: Attr,Comp
+   integer :: iattr,icomp,j
+   if (Index.lt.1 .or. Index.gt.NRINDEX) then
+      write(*,1000) 'Index',Index
+      stop
+   endif
+   1000 format('index_to_attr: invalid input: ',A,' = ',I9)
+   j = 0
+   do iattr = 1,NR_PHYSA
+      do icomp = 1,NR_COMP(iattr)
+         j = j+1
+         if (j .eq. Index) then
+            Attr = iattr
+            Comp = icomp
+            return
+         endif
+      enddo
+   enddo
+end subroutine index_to_attr
+
+
 
   !> Purpose : allocate data structure for multiphysics
   subroutine alloc_physics

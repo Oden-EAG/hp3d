@@ -160,10 +160,8 @@ subroutine initialize
                                     1 ,        0 ,           0)
 !
 !..set hp3D parameters
-!                        NRCOMS // MAXNRHS //
-   call set_parameters(      1 ,        1 ,  &
-!                       MAXEQNH // MAXEQNE // MAXEQNV // MAXEQNQ //
-                             1 ,        1,         1,         1)
+!                      NRCOMS, NRRHS
+   call set_parameters(     1,     1)
 !
 !..read geometry file
    call read_geometry('../files/mesh/hexa_orient_0')
@@ -213,7 +211,7 @@ subroutine set_initial_mesh(Nelem_order)
       do i=1,NRINDEX
          call encodg(ibc(1:6,i),10,6, ELEMS(iel)%bcond(i))
       enddo
-      
+!
    enddo
 !
 end subroutine set_initial_mesh
@@ -276,7 +274,7 @@ subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
    Zaloc = ZERO; Zbloc = ZERO
 !
    etype = NODES(Mdle)%ntype
-   nrv = NVERT(etype); nre = NEDGE(etype); nrf = NFACE(etype)
+   nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
 !
    call find_order(Mdle, norder)
    call find_orient(Mdle, norient_edge,norient_face)
@@ -380,8 +378,6 @@ subroutine exact(X,Icase, ValH,DvalH,D2valH, &
    real(8),dimension(  MAXEQNQ    ) ::   ValQ
    real(8),dimension(  MAXEQNQ,3  ) ::  dvalQ
    real(8),dimension(  MAXEQNQ,3,3) :: D2valQ
-!
-   real(8), parameter   :: PI = 4.d0*datan(1.d0)
 !
    real(8) :: f_x,f_y,f_z,df_x,df_y,df_z,ddf_x,ddf_y,ddf_z
    real(8) :: x1,x2,x3

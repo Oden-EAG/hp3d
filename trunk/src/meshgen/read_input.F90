@@ -1,8 +1,9 @@
 !> Purpose : read input file and set physics and data structure
 subroutine read_input(Fp)
-  use data_structure3D , only : MAXNODS
+  use data_structure3D , only: MAXNODS
+  use environment      , only: QUIET_MODE
+  use parameters       , only: MAXEQNH,MAXEQNE,MAXEQNV,MAXEQNQ,NRRHS
   use physics
-  use environment , only : QUIET_MODE
   implicit none
   !----------------------------------------------------------------------
   ! input arguments
@@ -82,7 +83,18 @@ subroutine read_input(Fp)
      end select
      NRINDEX = NRINDEX + NR_COMP(i)
   enddo
-
+  !
+  if (NRINDEX > MAX_NRINDEX) then
+    write(*,*) 'NRINDEX, MAX_NRINDEX = ',NRINDEX,MAX_NRINDEX
+    stop
+  endif
+  !
+  !  set parameter module variables used by solelm
+  MAXEQNH = NRHVAR * NRRHS
+  MAXEQNE = NREVAR * NRRHS
+  MAXEQNV = NRVVAR * NRRHS
+  MAXEQNQ = NRQVAR * NRRHS
+  !
   close(nin)
   !----------------------------------------------------------------------
   ! printing

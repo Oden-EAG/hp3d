@@ -49,8 +49,9 @@ subroutine celem(Mdle,Idec, Nrdofs,Nrdofm,Nrdofc,Nodm,NdofmH,NdofmE,NdofmV,Ndofm
 !           (2) - Hcurl for Maxwell trace for signal (2 components)
 !           (3) - Hcurl for Maxwell trace for pump   (2 components)
 !           (4) - Hdiv trace for heat (1 component)
-!           (5) - L2 field for Maxwell (signal, 6 components)
-!           (6) - L2 field for Maxwell (pump  , 6 components)
+!           (5) - L2 field for Maxwell (signal   , 6 components)
+!           (6) - L2 field for Maxwell (pump     , 6 components)
+!           (7) - L2 field for Maxwell (auxiliary, 6 components)
 !
 !..remove bubble DOFs from trace components
    nbcond = 0; nbcond(2:6) = 1

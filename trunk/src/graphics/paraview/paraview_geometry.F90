@@ -1,26 +1,26 @@
 !-------------------------------------------------------------------------------------------
-!> Purpose : driver for writing geometry to .h5 file
-!!
-!> @date Mar 2023
+!> @brief   paraview routine for writing geometry to .h5 file
+!> @date    Sep 2023
 !-------------------------------------------------------------------------------------------
-!
-subroutine paraview_geom
+subroutine paraview_geometry
 !
    use environment     , only : PREFIX
-   use paraview        , only : PARAVIEW_IO, PARAVIEW_DUMP_GEOM,   &
-                                PARAVIEW_DIR, SECOND_ORDER_VIS
+   use paraview        , only : PARAVIEW_IO, PARAVIEW_DUMP_GEOM, VLEVEL, &
+                                PARAVIEW_DIR, SECOND_ORDER_VIS, VIS_VTU
    use mpi_param       , only : RANK, ROOT
    use data_structure3D, only : NODES, ELEM_ORDER
    use node_types
 !
    implicit none
+!
    integer,         save :: id=-1
    character(len=5),save :: postfix
    integer,         save :: ntype, ice, icn, icp, ico, mdle
 !
 !-------------------------------------------------------------------------------------------
 !
-!...h5 file is produced on 1st visit, OR as required by the user
+!..h5 file is produced on 1st visit, OR as required by the user
+!  NOTE: VTU format always writes geometry file
    if (PARAVIEW_DUMP_GEOM .or. (id == -1)) then
 !
 !  ...increment visitation flag
@@ -30,12 +30,16 @@ subroutine paraview_geom
       write(postfix,"(I5.5)") id
 !
 !  ...produce .h5 file
-      call geom2vtk("Geometry",trim(PARAVIEW_DIR)//trim(PREFIX)//"geom_"//trim(postfix)//".h5", ice,icn,icp)
+      call geom2vtk("Geometry",trim(PARAVIEW_DIR)//trim(PREFIX)//"_geom_"//            &
+                                                   trim(postfix)//".h5", ice,icn,icp)
 !
    endif
 !
    if (RANK .ne. ROOT) goto 90
 !
+   if (VIS_VTU) goto 90
+!
+!..only used with XDMF output format
    if (SECOND_ORDER_VIS) then
       ico = icn
 !
@@ -50,7 +54,7 @@ subroutine paraview_geom
       case(MDLN)
          write(PARAVIEW_IO,1011) "'TETRAHEDRON_10'", ice, 10
       case default
-         write(*,*) 'paraview_geom: unrecognized element type: ', S_Type(ntype)
+         write(*,*) 'paraview_geometry: unrecognized element type: ', S_Type(ntype)
          stop 1
       end select
    else
@@ -72,15 +76,15 @@ subroutine paraview_geom
  1011 format("      <Topology TopologyType=",a," NumberOfElements='",i8,"' NodesPerElement='",i8,"'>")
  1012 format("      <Topology TopologyType=",a," NumberOfElements='",i8,"'>")
  1013 format("        <DataItem Dimensions='",i12,"' NumberType='Int' Precision='4' Format='HDF'>")
- 1014 format("        ",a,"geom_",a,".h5:/Objects")
+ 1014 format("        ",a,"_geom_",a,".h5:/Objects")
  1015 format("        </DataItem>")
  1016 format("      </Topology>")
  1017 format("      <Geometry GeometryType='XYZ'>")
  1018 format("        <DataItem Dimensions='",i10, " 3' NumberType='Float' Precision='4' Format='HDF'>")
- 1019 format("        ",a,"geom_",a,".h5:/Coords")
+ 1019 format("        ",a,"_geom_",a,".h5:/Coords")
  1020 format("        </DataItem>")
  1021 format("      </Geometry>")
 !
    90 continue
 !
-end subroutine paraview_geom
+end subroutine paraview_geometry

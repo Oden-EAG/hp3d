@@ -52,8 +52,8 @@ program test_conv_pois
    contains
 !
 !----------------------------------------------------------------------
-! !> @brief Computes convergence rate for Poisson Galerkin problem
-! !> @date Mar 2023
+!> @brief Computes convergence rate for Poisson Galerkin problem
+!> @date Mar 2023
 !----------------------------------------------------------------------
    subroutine conv_pois(Nref)
 !
@@ -177,10 +177,8 @@ subroutine initialize
                                     1 ,        0 ,           0)
 !
 !..set hp3D parameters
-!                        NRCOMS // MAXNRHS //
-   call set_parameters(      1 ,        1 ,  &
-!                       MAXEQNH // MAXEQNE // MAXEQNV // MAXEQNQ //
-                             1 ,        1,         1,         1)
+!                      NRCOMS, NRRHS
+   call set_parameters(     1,     1)
 !
 !..read geometry file
    call read_geometry('../files/mesh/hexa_orient_0')
@@ -230,7 +228,7 @@ subroutine set_initial_mesh(Nelem_order)
       do i=1,NRINDEX
          call encodg(ibc(1:6,i),10,6, ELEMS(iel)%bcond(i))
       enddo
-      
+!
    enddo
 !
 end subroutine set_initial_mesh
@@ -293,7 +291,7 @@ subroutine elem_poisson(Mdle,Nrdof, Zaloc,Zbloc)
    Zaloc = ZERO; Zbloc = ZERO
 !
    etype = NODES(Mdle)%ntype
-   nrv = NVERT(etype); nre = NEDGE(etype); nrf = NFACE(etype)
+   nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
 !
    call find_order(Mdle, norder)
    call find_orient(Mdle, norient_edge,norient_face)

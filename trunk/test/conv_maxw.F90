@@ -178,10 +178,8 @@ subroutine initialize
                                     1 ,        0 ,           0)
 !
 !..set hp3D parameters
-!                        NRCOMS // MAXNRHS //
-   call set_parameters(      1 ,        1 ,  &
-!                       MAXEQNH // MAXEQNE // MAXEQNV // MAXEQNQ //
-                             1 ,        1,         1,         1)
+!                      NRCOMS, NRRHS
+   call set_parameters(     1,     1)
 !
 !..read geometry file
    call read_geometry('../files/mesh/hexa_orient_0')
@@ -231,7 +229,7 @@ subroutine set_initial_mesh(Nelem_order)
       do i=1,NRINDEX
          call encodg(ibc(1:6,i),10,6, ELEMS(iel)%bcond(i))
       enddo
-      
+!
    enddo
 !
 end subroutine set_initial_mesh
@@ -429,8 +427,6 @@ subroutine exact(X,Icase, ValH,DvalH,D2valH, &
    VTYPE,dimension(  MAXEQNQ    ) ::   ValQ
    VTYPE,dimension(  MAXEQNQ,3  ) ::  dvalQ
    VTYPE,dimension(  MAXEQNQ,3,3) :: D2valQ
-!
-   real(8), parameter :: PI = 4.d0*datan(1.d0)
 !
    real(8) :: x1,x2,x3
    x1 = X(1); x2 = X(2); x3 = X(3)

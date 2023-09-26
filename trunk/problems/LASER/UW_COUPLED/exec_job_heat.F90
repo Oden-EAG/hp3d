@@ -13,7 +13,7 @@ subroutine exec_job_heat
 !
    implicit none
 !
-   integer :: flag(6)
+   integer :: flag(7)
    integer :: physNick,nstop
    logical :: ires
 !

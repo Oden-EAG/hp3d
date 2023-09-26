@@ -11,7 +11,8 @@ OBJ_PATH     = _obj_
 EXEC_PATH    = _exec_
 MODULE_PATH  = $(OBJ_PATH)
 
-SRC_FILE     = cross_product.F90         \
+SRC_FILE     = attr_to_index.F90         \
+               cross_product.F90         \
                decode.F90                \
                dot_product.F90           \
                encod_decod.F90           \
@@ -21,6 +22,7 @@ SRC_FILE     = cross_product.F90         \
                hexa_adapt_h_aniso.F90    \
                hexa_adapt_h_case1.F90    \
                hexa_adapt_h_iso.F90      \
+               index_to_attr.F90         \
                invert.F90                \
                isgn.F90                  \
                locate_char.F90           \
@@ -30,9 +32,11 @@ SRC_FILE     = cross_product.F90         \
                real_imag.F90
 ifeq ($(COMPLEX),1)
 SRC_FILE    += conv_maxw.F90             \
+               dump_maxw.F90             \
                poly_maxw.F90
 else
 SRC_FILE    += conv_pois.F90             \
+               dump_pois.F90             \
                poly_pois.F90
 endif
 
@@ -40,13 +44,15 @@ OBJ          = $(addprefix $(OBJ_PATH)/, $(SRC_FILE:.F90=.o))
 
 # Tests
 TEST     = decode
-TEST_SEQ = cross_product             \
+TEST_SEQ = attr_to_index             \
+           cross_product             \
            decode                    \
            dot_product               \
            encod_decod               \
            encode_decode_order       \
            encodg_decodg             \
            fact                      \
+           index_to_attr             \
            invert                    \
            isgn                      \
            locate_char               \
@@ -59,9 +65,11 @@ TEST_PAR = hexa_adapt_h_aniso        \
            hexa_adapt_h_iso
 ifeq ($(COMPLEX),1)
 TEST_SEQ+= conv_maxw                 \
+           dump_maxw                 \
            poly_maxw
 else
 TEST_SEQ+= conv_pois                 \
+           dump_pois                 \
            poly_pois
 endif
 

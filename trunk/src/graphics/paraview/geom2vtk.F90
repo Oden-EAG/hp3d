@@ -8,7 +8,7 @@
 !> @param[out] IcN   - Number of all vis object subelement vertices in the active mesh
 !> @param[out] IcP   - Number of points (coords) of all vis objects in the active mesh
 !!
-!> @date Feb 2023
+!> @date Sep 2023
 !----------------------------------------------------------------------------------------
 subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !
@@ -35,6 +35,10 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !
    real(8) :: xi(3), x(3), xnod(3,MAXbrickH), dxdxi(3,3)
 !
+!..auxiliary variables for VTU output
+   integer, allocatable       :: VTU_element_type_offset(:)
+   integer                    :: m
+!
 !..OpenMP parallelization: auxiliary variables
    integer, dimension(NRELES) :: n_vert_offset,n_obj_offset,n_elem_vert
 !
@@ -47,7 +51,12 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !
 !..create list of mdle node numbers,
 !  and count number of visualization points
-   IcP=0; ico=0;
+   IcP=0; ico=0; m = 0;
+!
+   if (VIS_VTU) then
+      allocate(VTU_element_type_offset(NRELES))
+   endif
+!
    do iel=1,NRELES
       mdle = ELEM_ORDER(iel)
       if (PARAVIEW_DOMAIN.ne.0) then
@@ -59,18 +68,24 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
       n_vert_offset(iel) = IcP
       n_obj_offset(iel) = ico
       n_elem_vert(iel) = vis_obj%NR_VERT
+!
+      if (VIS_VTU) VTU_element_type_offset(iel) = m
+!
       IcP = IcP + vis_obj%NR_VERT
 !
-!  ...second order vis doesn't yet work with mixed meshes (paraview error)
       if (SECOND_ORDER_VIS) then
          ico = ico + vis_obj%NR_ELEM*(nobj_conf(ntype))
+         m = m + 1
       else
          ico = ico + vis_obj%NR_ELEM*(nobj_conf(ntype)+1)
+         m = m + vis_obj%NR_ELEM
       endif
    enddo
 !
    call geometry_init(ico,Icp)
    GEOM_PTS(1:3,1:Icp) = 0.d0; GEOM_OBJ(1:ico) = 0
+!
+   ice_subd = 0
 !
 !$OMP PARALLEL
 !
@@ -134,8 +149,39 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !
 !..Step 3 : Elements
 !
+!..Computing the total number of elements (incl. subelements if VLEVEL > 0)
+!..VTU Format needs this information a-priori as VTU needs headers
+!  with this information before appending the data.
+   if (VIS_VTU) then
+   !$OMP DO                            &
+   !$OMP PRIVATE(mdle,ndom,ntype,ivis) &
+   !$OMP REDUCTION(+:ice_subd)
+      do iel = 1,NRELES
+         mdle = ELEM_ORDER(iel)
+         if (PARAVIEW_DOMAIN.ne.0) then
+            call find_domain(mdle, ndom)
+            if (ndom.ne.PARAVIEW_DOMAIN) cycle
+         endif
+         if (SECOND_ORDER_VIS) then
+            ice_subd = ice_subd + 1
+         else
+            ntype = NODES(mdle)%ntype
+            call get_vis_nrelem(ntype, ivis)
+            ice_subd = ice_subd + ivis
+         endif
+      enddo
+   !$OMP END DO
+   endif
+!$OMP END PARALLEL
+!
+   if (VIS_VTU) then
+      allocate(VTU_ELEM_TYPES(ice_subd))
+      VTU_ELEM_TYPES = 0
+   endif
+!
    ice_subd=0; icn_subd=0
 !
+!$OMP PARALLEL
 !$OMP DO                                     &
 !$OMP PRIVATE(mdle,ntype,i,j,k,l,ivis,ndom,  &
 !$OMP         nodesl,norientl,nverl,subd)    &
@@ -168,6 +214,8 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !
       do i=1,ivis
 !
+         if (VIS_VTU) VTU_ELEM_TYPES(VTU_element_type_offset(iel) + i) = l
+!
 !     ...visualization element accounting for VLEVEL
          call get_vis_elem(vis_on_type(ntype),i,n_vert_offset(iel), nverl)
 !
@@ -177,6 +225,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
             GEOM_OBJ(k+1) = l
             GEOM_OBJ(k+2:k+1+j) = nverl(1:j)
          endif
+!
          k = k + (1+j)
          ice_subd = ice_subd + 1
          icn_subd = icn_subd + j
@@ -189,31 +238,51 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
 !
    if (DISTRIBUTED .and. .not. HOST_MESH) then
       count = 1; IcE=0; IcN=0;
-      call MPI_REDUCE(ice_subd,IcE,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
-      call MPI_REDUCE(icn_subd,IcN,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(ice_subd,IcE,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
+      call MPI_REDUCE(icn_subd,IcN,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
       if (RANK .eq. ROOT) then
          count = 3*IcP
-         call MPI_REDUCE(MPI_IN_PLACE,GEOM_PTS,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+         call MPI_REDUCE(MPI_IN_PLACE,GEOM_PTS,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
          count = ico
-         call MPI_REDUCE(MPI_IN_PLACE,GEOM_OBJ,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+         call MPI_REDUCE(MPI_IN_PLACE,GEOM_OBJ,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
+         if (VIS_VTU) then
+            count = size(VTU_ELEM_TYPES)
+            call MPI_REDUCE(MPI_IN_PLACE,VTU_ELEM_TYPES,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
+         endif
       else
          count = 3*IcP
-         call MPI_REDUCE(GEOM_PTS,GEOM_PTS,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+         call MPI_REDUCE(GEOM_PTS,GEOM_PTS,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
          count = ico
-         call MPI_REDUCE(GEOM_OBJ,GEOM_OBJ,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+         call MPI_REDUCE(GEOM_OBJ,GEOM_OBJ,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
+         if (VIS_VTU) then
+            count = size(VTU_ELEM_TYPES)
+            call MPI_REDUCE(VTU_ELEM_TYPES,VTU_ELEM_TYPES,count,MPI_INTEGER,MPI_SUM,ROOT,MPI_COMM_WORLD, ierr)
+         endif
       endif
    else
       IcE = ice_subd
       IcN = icn_subd
    endif
 !
-!..Step 5 : Write to file with HDF5
+!..Step 5 : Write to file
 !
-   if (RANK .eq. ROOT) call geometry_write(Sname,len(Sname),Sfile,len(Sfile))
+   if (RANK .eq. ROOT) then
+      if (VIS_VTU) then
+!     ...with standard I/O
+         call write_VTU_geom(IcE)
+      else
+!     ...with HDF5
+         call geometry_write(Sname,len(Sname),Sfile,len(Sfile))
+      endif
+   endif
 !
 !..Step 6 : Deallocate
+!
+   if (VIS_VTU) then
+      deallocate(VTU_ELEM_TYPES)
+      deallocate(VTU_element_type_offset)
+   endif
 !
    call geometry_close()
 !
 end subroutine geom2vtk
-

@@ -101,8 +101,8 @@ subroutine elem(Mdle, Itest,Itrial)
    call ndof_nod(etype,norder(nre+nrf+1), ndofHmdl,ndofEmdl,ndofVmdl,ndofQmdl)
 !
 !..node supports all physical attributes
-!..6 physical attributes: case = 2^6-1 = 63
-   if (NODES(Mdle)%case .ne. 63) then
+!..7 physical attributes: case = 2^7-1 = 127
+   if (NODES(Mdle)%case .ne. 127) then
       write(*,*) 'elem: Mdle,NODES(Mdle)%case = ', &
            Mdle,NODES(Mdle)%case, '. stop.'
       call logic_error(ERR_INVALID_VALUE, __FILE__,__LINE__)

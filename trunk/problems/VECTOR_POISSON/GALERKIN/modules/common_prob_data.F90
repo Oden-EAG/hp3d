@@ -28,9 +28,6 @@ module common_prob_data
 !..User can specify parameter MAXNODS via argument list instead of input file
    integer :: MAXNODS_USER
 !
-!..MISCELLANEOUS
-   integer :: NR_RHS_PROB = 1
-!
 !..INITIAL ORDER OF APPROXIMATION
    integer :: IP
 !

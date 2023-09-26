@@ -70,7 +70,7 @@ subroutine hp3gen(Fp)
    endif
 #endif
 !
-x(1:NDIMEN) = 0.d0
+   x(1:NDIMEN) = 0.d0
 !
    call read_input(Fp)
 !
@@ -90,8 +90,8 @@ x(1:NDIMEN) = 0.d0
       call logic_error(ERR_ALLOC_FAILURE,__FILE__,__LINE__)
    endif
 !
-!  ...elements are generated in the order listed above: prisms, hexas,
-!     tets, pyramids
+!  ...elements are generated in the order listed above:
+!     prisms, hexas, tets, pyramids
 !
 !  ...nodes are enumerated in the order: middle nodes (to make the
 !     element and middle number for an initial mesh coincide),
@@ -99,7 +99,7 @@ x(1:NDIMEN) = 0.d0
 !     and triangles next)
 !
 !..generate initial mesh elements
-  nel=0
+   nel=0
 !
 !..loop through prisms
    do npri=1,NRPRISM

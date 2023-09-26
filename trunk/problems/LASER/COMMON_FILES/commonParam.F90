@@ -73,7 +73,6 @@ module commonParam
 !$OMP THREADPRIVATE (ICOMP_TS)
    integer :: ICHOOSE_DISP, ICHOOSE_COMP, ICHOOSE_SIGPUMP
    integer :: IEXACT_DISP
-   integer, parameter :: MY_NR_RHS=1
 !
 !..Problem Number
 !  ...... NO_PROBLEM = 1 Heat Solve (linear)

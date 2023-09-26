@@ -10,7 +10,7 @@
 !           The remaining fields are assumed not to be written by update_Ddof,
 !           since the corresponding attributes are deactivated via PHYSAm.
 !-------------------------------------------------------------------------------
-!> Purpose : calculate dirichlet boundary condition
+!> Purpose : calculate Dirichlet boundary condition
 !> last mod: June 2021
 !!
 !! @param[in]  Mdle  - an element (middle node) number

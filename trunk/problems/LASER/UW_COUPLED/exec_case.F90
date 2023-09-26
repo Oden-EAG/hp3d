@@ -7,10 +7,10 @@ subroutine exec_case(idec)
    use control
    use data_structure3D
    use par_mesh
-   use paraview      , only: VLEVEL
+   use paraview      , only: VLEVEL,paraview_select_attr
    use zoltan_wrapper, only: zoltan_w_partition,zoltan_w_eval
    use mpi_param     , only: RANK,ROOT
-   use MPI           , only: MPI_COMM_WORLD,MPI_INTEGER
+   use MPI           , only: MPI_COMM_WORLD,MPI_CHARACTER,MPI_INTEGER,MPI_LOGICAL
 !
    implicit none
 !
@@ -19,10 +19,10 @@ subroutine exec_case(idec)
    integer :: nstop
    logical :: solved
 !
-   integer :: flag(6)
+   integer :: flag(7)
    integer :: physNick
 !
-   integer :: iParAttr(6)
+   logical :: iPvAttr(7)
    character(len=2) :: vis_level
 !
    integer :: fld,numPts,i,mdle,kref,refs
@@ -41,30 +41,30 @@ subroutine exec_case(idec)
 !
 !  ...Paraview graphics
       case(3)
-!     ...iParAttr parameter specifies which fields we dump out to paraview:
+!     ...iPvAttr parameter specifies which fields we dump out to paraview:
 !        - 1 H1 (heat)
 !        - 2 H(curl) (signal, E and H flux)
 !        - 2 H(curl) (pump,   E and H flux)
 !        - 1 H(div) (heat flux)
-!        - 6 L2 (signal, E and H field)
-!        - 6 L2 (pump,   E and H Field)
-!
-         iParAttr = (/1,2,2,1,6,6/)
+!        - 6 L2 (signal,    E and H field)
+!        - 6 L2 (pump,      E and H Field)
+!        - 6 L2 (auxiliary, E and H Field)
+         iPvAttr = (/.true.,.true.,.true.,.true.,.true.,.true.,.false./)
          if (RANK .eq. ROOT) then
-            write(*,300) ' paraview output: select fields...'   , &
+            write(*,300) ' paraview output: select fields (T/F)', &
                          '  - 1 H1 (heat)'                      , &
                          '  - 2 H(curl) (signal, E and H flux)' , &
                          '  - 2 H(curl) (pump,   E and H flux)' , &
                          '  - 1 H(div) (heat flux)'             , &
                          '  - 6 L2 (signal, E and H field)'     , &
                          '  - 6 L2 (pump,   E and H Field)'
-            read (*,*) iParAttr(1),iParAttr(2),iParAttr(3), &
-                       iParAttr(4),iParAttr(5),iParAttr(6)
+            read (*,*) iPvAttr(1),iPvAttr(2),iPvAttr(3), &
+                       iPvAttr(4),iPvAttr(5),iPvAttr(6)
         300 format(A,/,A,/,A,/,A,/,A,/,A,/,A)
          endif
 !
-         count = 6; src = ROOT
-         call MPI_BCAST (iParAttr,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+         count = 7; src = ROOT
+         call MPI_BCAST (iPvAttr,count,MPI_LOGICAL,src,MPI_COMM_WORLD,ierr)
 !
          if (RANK .eq. ROOT) then
             write(*,*) 'paraview output: select VLEVEL (0-4)...'
@@ -78,11 +78,12 @@ subroutine exec_case(idec)
             end select
          endif
 !
-         count = 1; src = ROOT
-         call MPI_BCAST (VLEVEL,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
+         count = len(VLEVEL); src = ROOT
+         call MPI_BCAST (VLEVEL,count,MPI_CHARACTER,src,MPI_COMM_WORLD,ierr)
 !
-!         iParAttr = (/0,0,0,0,2,0/)
-         call my_paraview_driver(iParAttr)
+!         iPvAttr = (/.false.,.false.,.false.,.false.,.true.,.false.,.false./)
+         call paraview_select_attr(iPvAttr)
+         call my_paraview_driver
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 !  ...print data structure (interactive)

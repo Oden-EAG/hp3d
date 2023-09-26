@@ -1,8 +1,8 @@
-!----------------------------------------------------------------------
+!------------------------------------------------------------------------------
 !
 !     routine name      - FicheraCornerDirichlet
 !
-!----------------------------------------------------------------------
+!------------------------------------------------------------------------------
 !
 !     latest revision:  - May 2023
 !
@@ -25,12 +25,11 @@
 !             DvalQ     - value of the L2 solution
 !             DdvalQ    - corresponding first derivatives
 !             Dd2valQ   - corresponding second derivatives
-
 subroutine ficheracornerdirichlet(X,Icase, ValH,DvalH,D2valH, &
                                  ValE,DvalE,D2valE, &
                                  ValV,DvalV,D2valV, &
                                  ValQ,DvalQ,D2valQ)
-
+!
     use data_structure3D
 !   
     implicit none
@@ -73,15 +72,16 @@ subroutine ficheracornerdirichlet(X,Icase, ValH,DvalH,D2valH, &
     ValQ = ZERO ; DvalQ = ZERO ; D2valQ = ZERO
 
     q = ZERO; gradu = ZERO; Dq = ZERO
-!..dirichlet boundary conditions on Hdiv trace at y = 0,2 plane, x = 0,2 plane and z = 0,2 plane
-    
+!..dirichlet boundary conditions on Hdiv trace at
+!  y = 0,2 plane, x = 0,2 plane and z = 0,2 plane
+!
     x1 = X(1)
     x2 = X(2)
     x3 = X(3)
 !    
 !..csn stands for case for solution (1 for analytical sol and 2 for Fichera Corner)
     csn = 1
-
+!
     if(csn .eq. 1) then 
 !        
         call exact(X,Icase, ValH,DvalH,D2valH,ValE,DvalE,D2valE, &
@@ -191,4 +191,4 @@ subroutine ficheracornerdirichlet(X,Icase, ValH,DvalH,D2valH, &
 !
     endif
 !
-    end subroutine ficheracornerdirichlet
+end subroutine ficheracornerdirichlet

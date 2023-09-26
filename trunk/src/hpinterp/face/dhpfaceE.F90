@@ -5,6 +5,7 @@
 !> @brief    determine H(curl) face dof interpolating H(curl) Dirichlet
 !!           data using PB interpolation
 !!
+!! @param[in]  Mdle         - element (middle node) number
 !! @param[in]  Iflag        - a flag specifying the GMP object
 !!                            5 pris, 6 hexa, 7 tetr, 8 pyra
 !! @param[in]  No           - number of a specific object
@@ -20,11 +21,11 @@
 !!
 !! @param[in,out] ZnodE     - H(curl) dof for the face
 !!
-!> @date Feb 2023
+!> @date Sep 2023
 !-----------------------------------------------------------------------
-  subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond, &
-                      Nedge_orient,Nface_orient,Norder,Iface, &
-                      ZdofE, ZnodE)
+subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
+                    Nedge_orient,Nface_orient,Norder,Iface, &
+                    ZdofE, ZnodE)
   use control
   use parameters
   use physics
@@ -42,8 +43,8 @@
   integer, dimension(6),   intent(in)  :: Nface_orient
   integer, dimension(19),  intent(in)  :: Norder
 !
-  VTYPE,   dimension(MAXEQNE,MAXbrickE),      intent(in)    :: ZdofE
-  VTYPE,   dimension(NRCOMS*NREQNE(Icase),*), intent(inout) :: ZnodE
+  VTYPE,   dimension(MAXEQNE,MAXbrickE),     intent(in)    :: ZdofE
+  VTYPE,   dimension(NRRHS*NREQNE(Icase),*), intent(inout) :: ZnodE
 !
 ! ** Locals
 !-----------------------------------------------------------------------
@@ -194,6 +195,7 @@
                    nrdofE,shapE,curlE)
 !
 !    evaluate reference coordinates of the point as needed by GMP
+!    brefgeom3D returns the outward normal as seen from the local element
      nsign = nsign_param(Ntype,Iface)
      call brefgeom3D(Mdle,xi,Etav,shapH,gradH,nrv,dxidt,nsign, &
                      eta,detadxi,dxideta,rjac,detadt,rn,bjac)
@@ -220,8 +222,8 @@
        call logic_error(ERR_INVALID_VALUE,__FILE__,__LINE__)
      end select
 !
-!    compute inverse jacobian (for transforming the curl)
-     call geom(dxdeta, detadx, rjacdxdeta, nflag)
+!    compute inverse Jacobian (for transforming the curl)
+     call geom(dxdeta, detadx,rjacdxdeta,nflag)
      if (nflag.ne.0) then
        write(*,*) 'dhpfaceE: rjacdxdeta = ',rjacdxdeta
        stop 1
@@ -482,8 +484,8 @@
 !  ...initialize global variable counter, and node local variable counter
       ivarE=0; nvarE=0
 !
-!  ...loop through multiple copies of variables
-      do j=1,NRCOMS
+!  ...loop through multiple loads
+      do j=1,NRRHS
 !
 !  .....initiate the BC component counter
         ic=0
@@ -517,14 +519,19 @@
 !
 !  .............store Dirichlet dof
                 if (ibcnd(ic).eq.1) ZnodE(nvarE,1:ndofE_face) = zuE(1:ndofE_face,ivarE)
+!
               endif
+!
             end select
+!  .......loop through components
           enddo
+!  .....loop through physical attributes
         enddo
+!  ...loop through multiple loads
       enddo
 !
 #if DEBUG_MODE
       if (iprint.eq.1) call result
 #endif
 !
-  end subroutine dhpfaceE
+end subroutine dhpfaceE

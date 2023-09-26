@@ -24,6 +24,5 @@ SRC_UW = \
             elem.F90 \
             elem_residual.F90 \
             main.F90 \
-            my_paraview_driver.F90 \
             set_initial_mesh.F90 \
             soldis.F90

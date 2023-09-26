@@ -32,12 +32,8 @@ subroutine initialize
    integer, parameter :: MAXPY_PROB   = 1    ! pyramids
 !--------------------------------------------------------------------------
 !  E Q U A T I O N    S E T T I N G
-   integer, parameter :: NRCOMS_PROB  = 1     ! number of component
-   integer :: MAXNRHS_PROB                    ! MAX nr rhs
-   integer :: MAXEQNH_PROB                    ! MAX H1 var
-   integer :: MAXEQNE_PROB                    ! MAX Hcurl var
-   integer :: MAXEQNV_PROB                    ! MAX Hdiv var
-   integer :: MAXEQNQ_PROB                    ! MAX L2 var
+   integer, parameter :: NRCOMS_PROB  = 1     ! number of solution copies
+   integer, parameter :: NRRHS_PROB   = 1     ! number of rhs
 !--------------------------------------------------------------------------
    integer :: tmp
 !--------------------------------------------------------------------------
@@ -57,13 +53,7 @@ subroutine initialize
    call read_input(trim(FILE_PHYS))
 !
 !  setup equation settings based on physics data and common problem data
-   MAXNRHS_PROB = NR_RHS_PROB   !from common_prob_data
-   MAXEQNH_PROB = max(1,NRHVAR) !from physics - after quietly reading physics
-   MAXEQNE_PROB = max(1,NREVAR) !from physics - after quietly reading physics
-   MAXEQNV_PROB = max(1,NRVVAR) !from physics - after quietly reading physics
-   MAXEQNQ_PROB = max(1,NRQVAR) !from physics - after quietly reading physics
-   call set_parameters(NRCOMS_PROB,MAXNRHS_PROB,  &
-                       MAXEQNH_PROB,MAXEQNE_PROB,MAXEQNV_PROB,MAXEQNQ_PROB)
+   call set_parameters(NRCOMS_PROB,NRRHS_PROB)
 !
 !  setup geometry settings
    call set_gmp_parameters( &

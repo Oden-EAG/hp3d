@@ -1,8 +1,8 @@
 !-----------------------------------------------------------------------
-!
 !> @brief    update H1 edge dof interpolating H1 Dirichlet data using
 !            PB interpolation
 !!
+!! @param[in]  Mdle         - element (middle node) number
 !! @param[in]  Iflag        - a flag specifying which of the objects the
 !!                            edge is on: 5 pris, 6 hexa, 7 tetr, 8 pyra
 !! @param[in]  No           - number of a specific object
@@ -18,13 +18,13 @@
 !!
 !! @param[in,out] ZnodH     - H1 dof for the edge
 !!
-!> @date Feb 2023
+!> @date Sep 2023
 !-----------------------------------------------------------------------
 !
 #include "typedefs.h"
-  subroutine dhpedgeH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,&
-                      Nedge_orient,Nface_orient,Norder,Iedge,&
-                      ZdofH, ZnodH)
+subroutine dhpedgeH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
+                    Nedge_orient,Nface_orient,Norder,Iedge, &
+                    ZdofH, ZnodH)
 !
   use control
   use parameters
@@ -43,7 +43,7 @@
   integer, intent(in)    :: Nface_orient(6)
   integer, intent(in)    :: Norder(19)
   VTYPE,   intent(in)    :: ZdofH(MAXEQNH,MAXbrickH)
-  VTYPE,   intent(inout) :: ZnodH(NRCOMS*NREQNH(Icase),*)
+  VTYPE,   intent(inout) :: ZnodH(NRRHS*NREQNH(Icase),*)
 !
 ! ** Locals
 !-----------------------------------------------------------------------
@@ -143,7 +143,7 @@
 !
 ! 1D integration rule
   INTEGRATION=1   ! overintegrate
-  call set_1Dint(Norder(Iedge), nint, xi_list, wa_list)
+  call set_1Dint(Norder(Iedge), nint,xi_list,wa_list)
   INTEGRATION=0   ! reset
 !
 ! initialize
@@ -352,8 +352,8 @@
 !  ...initialize global variable counter, and node local variable counter
       ivarH=0 ; nvarH=0
 !
-!  ...loop through multiple copies of variables
-      do j=1,NRCOMS
+!  ...loop through multiple loads
+      do j=1,NRRHS
 !
 !  .....initiate the BC component counter
         ic=0
@@ -361,7 +361,7 @@
 !  .....loop through physical attributes
         do i=1,NR_PHYSA
 !
-!  .......loop through components of physical attribute
+!  .......loop through components
           do k=1,NR_COMP(i)
 !
 !  .........if the variable is supported by the node, update the BC component counter
@@ -390,9 +390,12 @@
 !
               endif
             end select
+!  .......loop through components
           enddo
+!  .....loop through physical attributes
         enddo
+!  ...loop through multiple loads
       enddo
 !
 !
-      end subroutine dhpedgeH
+end subroutine dhpedgeH
