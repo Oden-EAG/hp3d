@@ -166,6 +166,9 @@ subroutine break(Mdle,Kref)
    call nr_mdle_sons(ntype,Kref, nrsons)
    NRELES=NRELES+nrsons-1
 !
+!..generate new dof for the new and active nodes
+!!!!!   call initiate_dof(Mdle,Xnod,ZdofH,ZdofE,ZdofV,ZdofQ)
+!
 #if DEBUG_MODE
    if (iprint.ge.1) then
       write(*,7100) Mdle, S_Type(NODES(Mdle)%ntype), Kref
