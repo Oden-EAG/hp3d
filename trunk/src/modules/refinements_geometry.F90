@@ -1,11 +1,13 @@
 !----------------------------------------------------------------------
-!   latest revision    - Jun 20
-!
-!   purpose            - module defines geometry of different
-!                        h-refinements
+!> @brief   module defines geometry of different h-refinements
+!> @date    Oct 2023
 !----------------------------------------------------------------------
-
-      module refinements_geometry
+   module refinements_geometry
+!
+      use node_types
+      use parameters, only: NDIMEN
+!
+      implicit none
 !
 !  ...1D segment
       real(8), parameter, dimension (2,2) :: XVERT_medg =   &
@@ -181,64 +183,63 @@
         .0d0,.0d0,.1d1, .1d1,.0d0,.1d1, .0d0,.1d1,.1d1/)                   &
         ,(/3,6,2/) )
 !
-      contains
+   contains
 !
-      subroutine get_son_coord(Type,Kref,Is, Nvert,Xvert)
-      use parameters, only: NDIMEN
+   subroutine get_son_coord(Ntype,Kref,Is, Nvert,Xvert)
 !
-      character(len=4),        intent(in)  :: Type
-      integer,                 intent(in)  :: Kref,Is
-      integer,                 intent(out) :: Nvert
-      real*8, dimension (NDIMEN,8), intent(out) :: Xvert
+      integer, intent(in)  :: Ntype
+      integer, intent(in)  :: Kref,Is
+      integer, intent(out) :: Nvert
+      real(8), intent(out) :: Xvert(NDIMEN,8)
 !
       integer :: iprint
       iprint=0
       if (iprint.eq.1) then
-        write(*,*) 'get_son_coord: Type,Kref,Is = ',Type,Kref,Is
+        write(*,*) 'get_son_coord: Type,Kref,Is = ',S_Type(Ntype),Kref,Is
       endif
 !
-      select case(Type)
-      case('mdlb')
-        Nvert=8
-        select case(Kref)
-        case(111); Xvert(1:3,1:8) = XVERT_mdlb111(1:3,1:8,Is)
-        case(011); Xvert(1:3,1:8) = XVERT_mdlb011(1:3,1:8,Is)
-        case(101); Xvert(1:3,1:8) = XVERT_mdlb101(1:3,1:8,Is)
-        case(110); Xvert(1:3,1:8) = XVERT_mdlb110(1:3,1:8,Is)
-        case(100); Xvert(1:3,1:8) = XVERT_mdlb100(1:3,1:8,Is)
-        case(010); Xvert(1:3,1:8) = XVERT_mdlb010(1:3,1:8,Is)
-        case(001); Xvert(1:3,1:8) = XVERT_mdlb001(1:3,1:8,Is)
-        case default
-          write(*,7010) Kref; stop 1
- 7010     format(' get_son_coord: UNFINISHED, Kref = ', i10)
-        end select
-      case('mdln')
-        Nvert=4
-        select case(Kref)
-        case(11); Xvert(1:3,1:4) = XVERT_mdln11(1:3,1:4,Is)
-        case(12); Xvert(1:3,1:4) = XVERT_mdln12(1:3,1:4,Is)
-        case(13); Xvert(1:3,1:4) = XVERT_mdln13(1:3,1:4,Is)
-        case default
-          write(*,7010) Kref; stop 2
-        end select
-      case('mdlp')
-        Nvert=6
-        select case(Kref)
-        case(11); Xvert(1:3,1:6) = XVERT_mdlp11(1:3,1:6,Is)
-        case(10); Xvert(1:3,1:6) = XVERT_mdlp10(1:3,1:6,Is)
-        case(01); Xvert(1:3,1:6) = XVERT_mdlp01(1:3,1:6,Is)
-        case default
-          write(*,7010) Kref; stop 3
-        end select
+      select case(Ntype)
+      case(MDLB)
+         Nvert=8
+         select case(Kref)
+         case(111); Xvert(1:3,1:8) = XVERT_mdlb111(1:3,1:8,Is)
+         case(011); Xvert(1:3,1:8) = XVERT_mdlb011(1:3,1:8,Is)
+         case(101); Xvert(1:3,1:8) = XVERT_mdlb101(1:3,1:8,Is)
+         case(110); Xvert(1:3,1:8) = XVERT_mdlb110(1:3,1:8,Is)
+         case(100); Xvert(1:3,1:8) = XVERT_mdlb100(1:3,1:8,Is)
+         case(010); Xvert(1:3,1:8) = XVERT_mdlb010(1:3,1:8,Is)
+         case(001); Xvert(1:3,1:8) = XVERT_mdlb001(1:3,1:8,Is)
+         case default
+            write(*,7010) Kref; stop 1
+7010          format(' get_son_coord: UNFINISHED, Kref = ', i10)
+         end select
+      case(MDLN)
+         Nvert=4
+         select case(Kref)
+         case(11); Xvert(1:3,1:4) = XVERT_mdln11(1:3,1:4,Is)
+         case(12); Xvert(1:3,1:4) = XVERT_mdln12(1:3,1:4,Is)
+         case(13); Xvert(1:3,1:4) = XVERT_mdln13(1:3,1:4,Is)
+         case default
+            write(*,7010) Kref; stop 2
+         end select
+      case(MDLP)
+         Nvert=6
+         select case(Kref)
+         case(11); Xvert(1:3,1:6) = XVERT_mdlp11(1:3,1:6,Is)
+         case(10); Xvert(1:3,1:6) = XVERT_mdlp10(1:3,1:6,Is)
+         case(01); Xvert(1:3,1:6) = XVERT_mdlp01(1:3,1:6,Is)
+         case default
+            write(*,7010) Kref; stop 3
+         end select
       case default
-        write(*,7020) Type ; stop 4
- 7020   format(' get_son_coord: UNFINISHED, Type = ', a10)
+         write(*,7020) S_Type(Ntype) ; stop 4
+ 7020    format(' get_son_coord: UNFINISHED, Type = ', a10)
       end select
       if (iprint.eq.1) then
-        write(*,*) 'get_son_coord: Xvert = ',Xvert
-        call pause
+         write(*,*) 'get_son_coord: Xvert = ',Xvert
+         call pause
       endif
 !
-      end subroutine get_son_coord
+   end subroutine get_son_coord
 !
-      end module refinements_geometry
+   end module refinements_geometry

@@ -1,42 +1,40 @@
 #include "typedefs.h"
 !----------------------------------------------------------------------------------------
-!> Purpose : initiate H1, H(curl) and H(div), and L2 dof for the sons of 
-!            the middle node of an element
-!
-!> @date Jun 20
+!> @brief      Initiate H1, H(curl) and H(div), and L2 dof for the sons of
+!              the middle node of an element
 !
 !> @param[in]  Mdle - mdle node number
-!
 !> @param[out] dof stored directly in the data structure arrays
 !
+!> @date       Oct 2023
 !----------------------------------------------------------------------------------------
 !
-      subroutine initiate_dof(Mdle,Xnod_fath,ZdofH_fath,ZdofE_fath,ZdofV_fath,ZdofQ_fath, &
-                                   NH,NE,NV,NQ)
+   subroutine initiate_dof(Mdle,Xnod_fath,ZdofH_fath,ZdofE_fath,ZdofV_fath,ZdofQ_fath, &
+                           NH,NE,NV,NQ)
 !
+      use data_structure3D
       use refinements_geometry
       use refinements
-      use data_structure3D
       implicit none
 !
-      integer, intent(in)  :: Mdle,NH,NE,NV,NQ
-      real*8, dimension(NDIMEN,  NH),  intent(in)  :: Xnod_fath
-      VTYPE,  dimension(MAXEQNH, NH),  intent(in)  :: ZdofH_fath
-      VTYPE,  dimension(MAXEQNE, NE),  intent(in)  :: ZdofE_fath
-      VTYPE,  dimension(MAXEQNV, NV),  intent(in)  :: ZdofV_fath
-      VTYPE,  dimension(MAXEQNV, NQ),  intent(in)  :: ZdofQ_fath
+      integer, intent(in) :: Mdle,NH,NE,NV,NQ
+      real(8), intent(in) :: Xnod_fath (NDIMEN,  NH)
+      VTYPE,   intent(in) :: ZdofH_fath(MAXEQNH, NH)
+      VTYPE,   intent(in) :: ZdofE_fath(MAXEQNE, NE)
+      VTYPE,   intent(in) :: ZdofV_fath(MAXEQNV, NV)
+      VTYPE,   intent(in) :: ZdofQ_fath(MAXEQNV, NQ)
 !
 !  ...locals
-      real*8, dimension(NDIMEN,  MAXbrickH)  :: xnod
-      VTYPE,  dimension(MAXEQNH, MAXbrickH)  :: zdofH
-      VTYPE,  dimension(MAXEQNE, MAXbrickE)  :: zdofE
-      VTYPE,  dimension(MAXEQNV, MAXbrickV)  :: zdofV
-      VTYPE,  dimension(MAXEQNV, MAXbrickQ)  :: zdofQ
+      real(8) :: xnod (NDIMEN,  MAXbrickH)
+      VTYPE   :: zdofH(MAXEQNH, MAXbrickH)
+      VTYPE   :: zdofE(MAXEQNE, MAXbrickE)
+      VTYPE   :: zdofV(MAXEQNV, MAXbrickV)
+      VTYPE   :: zdofQ(MAXEQNV, MAXbrickQ)
 !
-      real*8, allocatable, dimension(:)   :: aloc
-      real*8, allocatable, dimension(:,:) :: bloc
+      real(8), allocatable :: aloc(:)
+      real(8), allocatable :: bloc(:,:)
 !
-      character(len=4) :: type_fath, type
+      integer :: ntype_fath, ntype
 !
 !  ...element order, orientation for edges and faces
       integer :: kref_fath, nrs,is,mdle_son, nint, l, iflag, k1, k2, nk, k, info, ivar, iprint, &
@@ -97,19 +95,19 @@
 !----------------------------------------------------------------------
 !
       iprint=0
-      nvarH = NRHVAR*NRCOMS; nvarE = NREVAR*NRCOMS
-      nvarV = NRVVAR*NRCOMS; nvarQ = NRQVAR*NRCOMS
+      nvarH = NRHVAR*NRRHS; nvarE = NREVAR*NRRHS
+      nvarV = NRVVAR*NRRHS; nvarQ = NRQVAR*NRRHS
 !
 !  ...element type
-      type_fath = NODES(Mdle)%type
+      ntype_fath = NODES(Mdle)%ntype
       kref_fath = NODES(Mdle)%ref_kind
-      call nr_mdle_sons(type_fath,kref_fath, nrs)
+      call nr_mdle_sons(ntype_fath,kref_fath, nrs)
 !
       call find_order(Mdle, norder_fath)
       call find_orient(Mdle, norient_edge_fath,norient_face_fath)
 !
       if (iprint.eq.1) then
-        call celndof(type_fath,norder_fath, nrdofH_fath,nrdofE_fath,nrdofV_fath,nrdofQ_fath)
+        call celndof(ntype_fath,norder_fath, nrdofH_fath,nrdofE_fath,nrdofV_fath,nrdofQ_fath)
         write(*,*) 'initiate_dof: Xnod_fath = '
         do ivar=1,NDIMEN
           write(*,7010) Xnod_fath(ivar,1:nrdofH_fath)
@@ -137,14 +135,14 @@
 !  ...loop through the element middle node sons
       do is=1,nrs
         mdle_son = son(mdle,is)
-        type = NODES(mdle_son)%type
+        ntype = NODES(mdle_son)%ntype
         call find_order(mdle_son, norder)
         call find_orient(mdle_son, norient_edge,norient_face)
-        call set_3Dint(type,norder, nint,xiloc,waloc)
-        call get_son_coord(type_fath,kref_fath,is, nrv,xvert)
+        call set_3Dint(ntype,norder, nint,xiloc,waloc)
+        call get_son_coord(ntype_fath,kref_fath,is, nrv,xvert)
         if (iprint.eq.1) write(*,*) 'initiate_dof: is,mdle_son = ',is,mdle_son
-        call celndof(type,norder, nrdofH,nrdofE,nrdofV,nrdofQ)
-        call set_linear_order(type, norder1)
+        call celndof(ntype,norder, nrdofH,nrdofE,nrdofV,nrdofQ)
+        call set_linear_order(ntype, norder1)
 !
 !  *********************************** H1 variables ***********************************
 !
@@ -163,14 +161,14 @@
 !  .......coordinates and weight of this integration point
           xi(1:3) = xiloc(1:3,l)
           wa=waloc(l)
-          call shape3DH(type,xi,norder,norient_edge,norient_face, nrdofH,shapH,gradH)
+          call shape3DH(ntype,xi,norder,norient_edge,norient_face, nrdofH,shapH,gradH)
           call geom3D(mdle_son,xi,xvert,shapH,gradH,nrv, x,dxdxi,dxidx,rjac,iflag)
 !
 !  .......integration weight
           weight = rjac*wa
 !
 !  .......compute the father solution to be projected
-          call shape3DH(type_fath,x,norder_fath,norient_edge_fath,norient_face_fath, &
+          call shape3DH(ntype_fath,x,norder_fath,norient_edge_fath,norient_face_fath, &
                         nrdofH_fath,shapH_fath,gradH_fath)
           xp  = 0.d0; zsolH = ZERO
           do k1=1,nrdofH_fath
@@ -269,15 +267,15 @@
 !  .......coordinates and weight of this integration point
           xi(1:3) = xiloc(1:3,l)
           wa=waloc(l)
-          call shape3DH(type,xi,norder1,norient_edge,norient_face, nrdofH,shapH,gradH)
-          call shape3DE(type,xi,norder, norient_edge,norient_face, nrdofE,shapE,curlE)
+          call shape3DH(ntype,xi,norder1,norient_edge,norient_face, nrdofH,shapH,gradH)
+          call shape3DE(ntype,xi,norder, norient_edge,norient_face, nrdofE,shapE,curlE)
           call geom3D(mdle_son,xi,xvert,shapH,gradH,nrv, x,dxdxi,dxidx,rjac,iflag)
 !
 !  .......integration weight
           weight = rjac*wa
 !
 !  .......compute the father solution to be projected
-          call shape3DE(type_fath,x,norder_fath,norient_edge_fath,norient_face_fath, &
+          call shape3DE(ntype_fath,x,norder_fath,norient_edge_fath,norient_face_fath, &
                         nrdofE_fath,shapE_fath,curlE_fath)
           zsolE = ZERO
           do k1=1,nrdofE_fath
@@ -385,15 +383,15 @@
 !  .......coordinates and weight of this integration point
           xi(1:3) = xiloc(1:3,l)
           wa=waloc(l)
-          call shape3DH(type,xi,norder1,norient_edge,norient_face, nrdofH,shapH,gradH)
-          call shape3DV(type,xi,norder,norient_face, nrdofV,shapV,divV)
+          call shape3DH(ntype,xi,norder1,norient_edge,norient_face, nrdofH,shapH,gradH)
+          call shape3DV(ntype,xi,norder,norient_face, nrdofV,shapV,divV)
           call geom3D(mdle_son,xi,xvert,shapH,gradH,nrv, x,dxdxi,dxidx,rjac,iflag)
 !
 !  .......integration weight
           weight = rjac*wa
 !
 !  .......compute the father solution to be projected
-          call shape3DV(type_fath,x,norder_fath,norient_face_fath, &
+          call shape3DV(ntype_fath,x,norder_fath,norient_face_fath, &
                         nrdofV_fath,shapV_fath,divV_fath)
           zsolV = ZERO
           do k1=1,nrdofV_fath
@@ -476,15 +474,15 @@
 !  .......coordinates and weight of this integration point
           xi(1:3) = xiloc(1:3,l)
           wa=waloc(l)
-          call shape3DH(type,xi,norder1,norient_edge,norient_face, nrdofH,shapH,gradH)
-          call shape3DQ(type,xi,norder, nrdofQ,shapQ)
+          call shape3DH(ntype,xi,norder1,norient_edge,norient_face, nrdofH,shapH,gradH)
+          call shape3DQ(ntype,xi,norder, nrdofQ,shapQ)
           call geom3D(mdle_son,xi,xvert,shapH,gradH,nrv, x,dxdxi,dxidx,rjac,iflag)
 !
 !  .......integration weight
           weight = rjac*wa
 !
 !  .......compute the father solution to be projected
-          call shape3DQ(type_fath,x,norder_fath, nrdofQ_fath,shapQ_fath)
+          call shape3DQ(ntype_fath,x,norder_fath, nrdofQ_fath,shapQ_fath)
           zsolQ = ZERO
           do k1=1,nrdofQ_fath
             zsolQ(1:MAXEQNQ) = zsolQ(1:MAXEQNQ) + ZdofQ_fath(1:MAXEQNQ,k1)*shapQ_fath(k1)
@@ -540,7 +538,7 @@
 !
 !  ....determine element nodes
        call elem_nodes(mdle_son, nodesl,norientl)
-       nrn  = nvert(type)+nedge(type)+nface(type)+1
+       nrn = nvert(ntype)+nedge(ntype)+nface(ntype)+1
        if (iprint.eq.1) then
          write(*,7020) nodesl(1:nrn)
  7020    format(' initiate_dof: nodesl = ',8i5,3x,12i5,3x,6i5,3x,i5)
@@ -550,7 +548,7 @@
        nrdofH = 0; nrdofE = 0; nrdofV = 0; nrdofQ = 0; 
        do j=1,nrn
          nod = nodesl(j)
-         call ndof_nod(NODES(nod)%type,NODES(nod)%order, ndofH,ndofE,ndofV,ndofQ)
+         call ndof_nod(NODES(nod)%ntype,NODES(nod)%order, ndofH,ndofE,ndofV,ndofQ)
          if ((iprint.eq.1).and.(j.le.nrv)) then
            write(*,7030) j, xnod(1:NDIMEN,nrdofH+1:nrdofH+ndofH),XVERT_mdlb111(1:3,j,is)
  7030      format(' VERTEX = ',i1,' COORD = ',3f8.3,' XVERT = ',3f8.3)
@@ -585,27 +583,32 @@
       endif
 !
 !
-      end subroutine initiate_dof
-
-
-
-      subroutine set_linear_order(Type,Norder)
-      character(len=4),  intent(in) :: Type
-      integer,           intent(out) :: Norder(19)
-      select case(Type)
-      case('medg')
-        Norder(1)=1
-      case('mdlq')
-        Norder(1:4)=1; Norder(5)=11
-      case('mdlt')
-        Norder(1:4)=1
-      case('mdlb')
-        Norder(1:12)=1; Norder(13:18)=11; Norder(19)=111
-      case('mdlp')
-        Norder(1:9)=1; Norder(10:11)=1; Norder(12:15)=11
-      case('mdln')
-        Norder(1:11)=1
-      case('mdld')
-        Norder(1:8)=1; Norder(9)=11; Norder(10:14)=1
+   end subroutine initiate_dof
+!
+!
+   subroutine set_linear_order(Ntype,Norder)
+!
+      use node_types
+      implicit none
+!
+      integer, intent(in)  :: Ntype
+      integer, intent(out) :: Norder(19)
+!
+      select case(Ntype)
+         case(MEDG)
+            Norder(1)=1
+         case(MDLQ)
+            Norder(1:4)=1; Norder(5)=11
+         case(MDLT)
+            Norder(1:4)=1
+         case(MDLB)
+            Norder(1:12)=1; Norder(13:18)=11; Norder(19)=111
+         case(MDLP)
+            Norder(1:9)=1; Norder(10:11)=1; Norder(12:15)=11
+         case(MDLN)
+            Norder(1:11)=1
+         case(MDLD)
+            Norder(1:8)=1; Norder(9)=11; Norder(10:14)=1
       end select
-      end subroutine set_linear_order
+!
+   end subroutine set_linear_order

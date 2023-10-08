@@ -1,79 +1,79 @@
 #include "typedefs.h"
 !----------------------------------------------------------------------
-!   latest revision    - Jun 2020
-!
-!   purpose            - module stores information about h-refined
-!                        elements
+!> @brief   module stores information about h-refined elements
+!> @date    Oct 2023
 !----------------------------------------------------------------------
 !
-      module refinements_history
+   module refinements_history
 !
+      use node_types
       use parameters, only: NDIMEN,MAXEQNH,MAXEQNQ,MAXEQNV,MAXEQNQ, &
                             MAXbrickH,MAXbrickE,MAXbrickV,MAXbrickQ
-      use mpi_param, only: RANK
+!
+      implicit none
 !
 !  ...anticipated max number of refined elements
-      integer  :: MAX_ELEMS_REF
+      integer :: MAX_ELEMS_REF
 !
 !  ...number of refined elements
-      integer  :: NR_ELEMS_REF
+      integer :: NR_ELEMS_REF
 !
 !----------------------------------------------------------------------
 !  REFINED ELEMENT                                                    |
 !----------------------------------------------------------------------
       type refined_element
 !
-!  .....element middle node
-        integer          :: mdle
+!  ......element middle node
+         integer :: mdle
 !
-!  .....element dof
-        real*8, dimension(:,:), pointer ::  xnod
-        VTYPE,  dimension(:,:), pointer ::  zdofH
-        VTYPE,  dimension(:,:), pointer ::  zdofE
-        VTYPE,  dimension(:,:), pointer ::  zdofV
-        VTYPE,  dimension(:,:), pointer ::  zdofQ
+!  ......element dof
+         real*8, dimension(:,:), pointer :: xnod
+         VTYPE,  dimension(:,:), pointer :: zdofH
+         VTYPE,  dimension(:,:), pointer :: zdofE
+         VTYPE,  dimension(:,:), pointer :: zdofV
+         VTYPE,  dimension(:,:), pointer :: zdofQ
       endtype refined_element
 !
 !-----------------------------------------------------------------------
 !
 !  ...data structure arrays
-      type(refined_element), allocatable, save  :: ELEMS_REF(:)
+      type(refined_element), allocatable, save :: ELEMS_REF(:)
 !
 !-----------------------------------------------------------------------
 !
-      contains
+   contains
 !
 !-----------------------------------------------------------------------
 !
-!  ...allocate memory for data structure
-      subroutine allocref
+!..allocate memory for data structure
+   subroutine allocref
 !
       integer :: nel
 !
       if (allocated(ELEMS_REF)) then
-        write(*,*) 'allocref: WARNING !! ELEMS_REFINED', &
-                   ' HAS NOT BEEN DEALLOCATED'
-        call deallocref
+         write(*,*) 'allocref: WARNING !! ELEMS_REFINED', &
+                    ' HAS NOT BEEN DEALLOCATED'
+         call deallocref
       endif
 !
       allocate(ELEMS_REF(MAX_ELEMS_REF))
       do nel=1,MAX_ELEMS_REF
-        ELEMS_REF(nel)%mdle = -1
-        nullify (ELEMS_REF(nel)%xnod)
-        nullify (ELEMS_REF(nel)%zdofH)
-        nullify (ELEMS_REF(nel)%zdofE)
-        nullify (ELEMS_REF(nel)%zdofV)
-        nullify (ELEMS_REF(nel)%zdofQ)
+         ELEMS_REF(nel)%mdle = -1
+         nullify (ELEMS_REF(nel)%xnod)
+         nullify (ELEMS_REF(nel)%zdofH)
+         nullify (ELEMS_REF(nel)%zdofE)
+         nullify (ELEMS_REF(nel)%zdofV)
+         nullify (ELEMS_REF(nel)%zdofQ)
       enddo
 !
       NR_ELEMS_REF = 0
 !
-      end subroutine allocref
+   end subroutine allocref
 !
 !-----------------------------------------------------------------------
 !
-!  ...deallocate ELEMS_REF
-      subroutine deallocref
+!..deallocate ELEMS_REF
+   subroutine deallocref
 !
       integer :: nel
 !
@@ -88,12 +88,12 @@
       NR_ELEMS_REF=0
 !
 !
-      end subroutine deallocref
+   end subroutine deallocref
 !
 !-----------------------------------------------------------------------
 !
-!  ...increase MAX_ELEMS_REF
-      subroutine increase_MAXELEMS_REF()
+!..increase MAX_ELEMS_REF
+   subroutine increase_MAXELEMS_REF()
 !
       type(refined_element), allocatable :: ELEMS_REF_NEW(:)
       integer :: max_ELEMS_REF_new,nel
@@ -157,7 +157,7 @@
 !
       ELEMS_REF(nel)%mdle = Mdle
       call find_order(Mdle, norder)
-      call celndof(NODES(Mdle)%type,norder, nrdofH,nrdofE,nrdofV,nrdofQ)
+      call celndof(NODES(Mdle)%ntype,norder, nrdofH,nrdofE,nrdofV,nrdofQ)
 !
       if (nrdofH.gt.0) then
         allocate(ELEMS_REF(nel)%xnod (NDIMEN, nrdofH))
@@ -178,9 +178,7 @@
         ELEMS_REF(nel)%zdofQ(1:MAXEQNQ,1:nrdofQ) = ZdofQ(1:MAXEQNQ,1:nrdofQ)
       endif
 !
-      end subroutine save_element
+   end subroutine save_element
 !
 !
-      end module refinements_history
-
-   
+   end module refinements_history
