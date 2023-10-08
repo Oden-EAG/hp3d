@@ -28,10 +28,10 @@ module refinements
   ! Even dummy arguments should be avoided
   !integer, dimension(1:13), parameter :: TETRA_REF = &
   !     (/11,12,13, 21,22,23,24,25,26, 31,32,33,34/)
-  integer, parameter :: TETRA_REF(5) = (/11,12,13, 24,32/)
+  integer, parameter :: TETRA_REF(5) = (/11,12,13, 24,32/) !  24,32 inoperational
   integer, parameter :: PRISM_REF(3) = (/11,10,01/)
   !integer, parameter :: PYRAM_REF(2) = (/10,01/)
-  integer, parameter :: PYRAM_REF(1) = (/10/)
+  integer, parameter :: PYRAM_REF(1) = (/10/) ! inoperational
   integer, parameter :: BRICK_REF(7) = (/111,110,101,011,100,010,001/)
 !
   logical :: ISO_ONLY = .FALSE.
