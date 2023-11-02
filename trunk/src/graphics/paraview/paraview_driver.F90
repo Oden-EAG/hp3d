@@ -38,10 +38,9 @@ subroutine paraview_driver
    if (.not. PARAVIEW_DUMP_ATTR) goto 80
 !
    if (.not.QUIET_MODE .and. RANK.eq.ROOT) then
-      if (PARAVIEW_DOMAIN.eq.0) then
-         write(*,*)'Dumping to Paraview...'
-      else
-         write(*,*)'Dumping to Paraview from domain ',PARAVIEW_DOMAIN,'...'
+      write(*,*)'Dumping ParaView files to ',PARAVIEW_DIR
+      if (PARAVIEW_DOMAIN.ne.0) then
+         write(*,*)'Dumping ParaView files for domain ',PARAVIEW_DOMAIN
       endif
       write(*,*)'--------------------------------------'
       write(*,*)'ATTRIBUTE | DISC. SPACE | COMP. | LOAD'
