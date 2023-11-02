@@ -42,7 +42,7 @@ bibliography: paper.bib
 
 The $hp\mathrm{3D}$ finite element (FE) library is a tool for computational modeling of engineering applications. The library provides a framework for discretization of three-dimensional[^1] multiphysics problems described by systems of partial differential equations. $hp\mathrm{3D}$ can be compiled in real or complex mode to accommodate the need for real- or complex-valued physics variables, respectively. The library is written entirely in Fortran; user applications interfacing with the library are also written in Fortran. The $hp\mathrm{3D}$ software can be installed and runs efficiently on various CPU-based compute architectures, from laptops and single workstations to state-of-the-art supercomputers.
 
-[^1]: The hp2D FE library for two-dimensional problems is conceptually equivalent to hp3D but has not yet been released publicly.
+[^1]: The $hp\mathrm{2D}$ FE library for two-dimensional problems is conceptually equivalent to $hp\mathrm{3D}$ but has not yet been released publicly.
 
 # Statement of need
 
