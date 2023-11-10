@@ -50,6 +50,7 @@ subroutine par_mumps_sc(mtype)
    use MPI      , only: MPI_SUM,MPI_MIN,MPI_MAX,MPI_IN_PLACE,  &
                         MPI_INTEGER,MPI_INTEGER8,              &
                         MPI_REAL8,MPI_COMPLEX16,MPI_Wtime
+   use environment, only: QUIET_MODE
 !
    implicit none
 !
@@ -268,12 +269,14 @@ subroutine par_mumps_sc(mtype)
 !  ----------------------------------------------------------------------
 !
    call MPI_BARRIER(mumps_par%COMM, ierr)
-   if (RANK .eq. ROOT) then
+   if ((RANK .eq. ROOT) .and. (.not. QUIET_MODE)) then
       write(*,2010) '[', RANK, '] Number of dof  : nrdof_con = ', NRDOF_CON
       write(*,2010) '[', RANK, ']                  nrdof_tot = ', NRDOF_TOT
       write(*,2010) '[', RANK, '] Total non-zeros: nnz       = ', nnz
    endif
-   write(*,2010) '[', RANK, '] Local non-zeros: nnz_loc   = ', nnz_loc
+   if (.not. QUIET_MODE) then
+      write(*,2010) '[', RANK, '] Local non-zeros: nnz_loc   = ', nnz_loc
+   endif
 2010 format(A,I4,A,I12)
 !
    if (IPRINT_TIME .eq. 1) then
