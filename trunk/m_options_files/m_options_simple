@@ -7,7 +7,7 @@ COMPLEX ?= 0
 DEBUG   ?= 1
 
 #------------------------------------------------------------------
-# SET HP3D AND LIBRARY PATHS
+# Set hp3D PATH, PETSC_DIR, and PETSC_ARCH
 #------------------------------------------------------------------
 HP3D_BASE_PATH = /Users/stefan/hp3D/LIBS/hp3d/trunk
 
@@ -19,11 +19,7 @@ else
 endif
 
 
-
-
-
-
-
+##### ++++ Settings below should not need to be modified ++++ #####
 
 #------------------------------------------------------------------
 # COMPILER SETTINGS (a 64bit processor architecture is assumed)
@@ -35,7 +31,7 @@ PACKAGES := $(petsc.pc)
 CC := $(shell pkg-config --variable=ccompiler $(PACKAGES))
 FC := $(shell pkg-config --variable=fcompiler $(PACKAGES))
 FFLAGS := $(shell pkg-config --variable=fflags_extra $(PACKAGES))
-FFLAGS += -fallow-argument-mismatch
+FFLAGS += -w -fallow-argument-mismatch
 
 CFLAGS  =
 
