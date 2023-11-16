@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 !> Purpose : routine finds 'numlev'- levels of solution values
 !! @param[in]  Numlev - number of levels to plot solution values
 !! @param[out] Solev  - limiting values for each level
@@ -148,3 +150,5 @@
        Solev(i+1) = Solev(1) +float(i)*dsol
     enddo
   end subroutine finlimb
+
+#endif

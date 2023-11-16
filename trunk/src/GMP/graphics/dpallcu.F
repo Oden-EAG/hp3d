@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c-----------------------------------------------------------------------c
 c   routine name       - dpallcu
 c
@@ -57,3 +59,5 @@ c  ...end of the loop through curves
 c
 c
       end subroutine dpallcu
+
+#endif

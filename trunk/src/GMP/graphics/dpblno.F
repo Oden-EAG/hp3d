@@ -1,4 +1,5 @@
-c
+#if HP3D_USE_X11
+
 c----------------------------------------------------------------------
 c
 c   routine name       - dpblno
@@ -157,3 +158,5 @@ c  .....write the block nickname
 c
 c
       end subroutine dpblno
+
+#endif

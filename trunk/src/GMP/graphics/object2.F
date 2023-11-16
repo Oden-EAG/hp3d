@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c----------------------------------------------------------------------
 c
 c   latest revision     - Mar 2023
@@ -169,3 +171,5 @@ c
       go to 100
 c
       end subroutine object2
+
+#endif

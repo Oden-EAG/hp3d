@@ -3,6 +3,9 @@ c> @brief  : interactively controls calls to various hp3d
 cc           graphics routines
 c> @date   : Feb 2023
 c----------------------------------------------------------------------
+
+#if HP3D_USE_X11
+
 c
       subroutine graphb
 c
@@ -77,3 +80,15 @@ c
 c
 c
       end subroutine graphb
+
+#else
+
+      subroutine graphb
+      
+      implicit none
+      
+      write(*,*) 'graphb is only supported with HP3D_USE_X11 enabled.'
+      
+      end subroutine graphb
+
+#endif

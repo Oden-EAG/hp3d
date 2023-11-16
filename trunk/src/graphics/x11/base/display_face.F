@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c----------------------------------------------------------------------
 c
 c   routine name       - display_face
@@ -588,3 +590,5 @@ c  ...end of loop through the horizontal integer coordinate
 c
 c
       end subroutine display_face
+
+#endif

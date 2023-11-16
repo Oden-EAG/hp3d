@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c----------------------------------------------------------------------
 c
 c   routine name       - GMPwireframe
@@ -364,3 +366,5 @@ c  .....reset to the default
 c
       goto 10
       end subroutine GMPwireframe
+
+#endif

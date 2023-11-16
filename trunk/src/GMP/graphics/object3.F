@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c----------------------------------------------------------------------
 c
 c   routine name       - object3
@@ -441,3 +443,5 @@ c
 c
 c
       end subroutine object3
+
+#endif

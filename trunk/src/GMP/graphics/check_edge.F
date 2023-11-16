@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c----------------------------------------------------------------------
 c
 c   routine name       - check_edge
@@ -414,3 +416,5 @@ c
 c
 c
       end subroutine check_edge
+
+#endif

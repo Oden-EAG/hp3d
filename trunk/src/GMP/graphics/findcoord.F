@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c----------------------------------------------------------------------
 c
 c   routine name       - findcoord
@@ -94,3 +96,5 @@ c
       end select
 c
       end subroutine findcoord
+
+#endif

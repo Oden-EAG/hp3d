@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c----------------------------------------------------------------------
 c
 c   routine name       - grbody
@@ -419,3 +421,5 @@ c
 c
 c
       end subroutine grbody
+
+#endif

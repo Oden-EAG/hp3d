@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c----------------------------------------------------------------------
 c
 c   routine name       - fincut
@@ -133,3 +135,5 @@ c  ...perform multistage checking
 c
 c
       end subroutine fincut
+
+#endif

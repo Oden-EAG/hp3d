@@ -46,6 +46,7 @@ DEBUG      ?= 0
 
 HP3D_USE_OPENMP    ?= 0
 HP3D_USE_INTEL_MKL ?= 0
+HP3D_USE_X11       ?= 1
 
 ####################################################
 
@@ -76,7 +77,8 @@ endif
 CCDEFS    = -D"C_MODE=$(COMPLEX)" \
             -D"DEBUG_MODE=$(DEBUG)" \
             -D"HP3D_USE_OPENMP=$(HP3D_USE_OPENMP)" \
-            -D"HP3D_USE_INTEL_MKL=$(HP3D_USE_INTEL_MKL)"
+            -D"HP3D_USE_INTEL_MKL=$(HP3D_USE_INTEL_MKL)" \
+            -D"HP3D_USE_X11=$(HP3D_USE_X11)"
 
 # -- Includes --
 CCINCS   += -I./$(SRC_PATH) \
@@ -172,6 +174,7 @@ fastlib :
 	@echo " - COMPLEX, DEBUG         :" $(COMPLEX) $(DEBUG)
 	@echo " - HP3D_USE_OPENMP        :" $(HP3D_USE_OPENMP)
 	@echo " - HP3D_USE_INTEL_MKL     :" $(HP3D_USE_INTEL_MKL)
+	@echo " - HP3D_USE_X11           :" $(HP3D_USE_X11)
 	@echo " - Preprocessor options   :" $(CCDEFS)
 	@echo " - HP3D Library           :" $(LIB_PATH)/$(HP3D_LIBNAME)
 	@echo " - Frontal Solver Library :" $(LIB_PATH)/$(FRONTAL_NAME)

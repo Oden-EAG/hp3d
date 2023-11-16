@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 !
 #include "typedefs.h"
 !
@@ -202,3 +204,5 @@ subroutine soldis_system(Mdle,Xi,X,Rn,SolH,GradH,SolE,CurlE,SolV,DivV,SolQ, Val)
 !
 !
 end subroutine soldis_system
+
+#endif

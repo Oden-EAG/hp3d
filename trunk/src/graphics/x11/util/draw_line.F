@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c----------------------------------------------------------------------
 c
 c   routine name       - draw_line
@@ -77,3 +79,5 @@ c
       enddo
 c
       end subroutine draw_line
+
+#endif

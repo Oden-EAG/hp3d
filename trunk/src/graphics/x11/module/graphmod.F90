@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 !> Purpose : define the workspace for graphics
 module graphmod
   !
@@ -118,3 +120,5 @@ module graphmod
   !     IGTR   - ordered list of triangles (back-to-front)
   !     IGINV  - invisible blocks
 end module graphmod
+
+#endif

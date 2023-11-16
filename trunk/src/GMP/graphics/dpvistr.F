@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c----------------------------------------------------------------------
 c
 c   routine name       - dpvistr
@@ -112,3 +114,5 @@ c  ...end of loop through small triangles
 c
 c
       end subroutine dpvistr
+
+#endif

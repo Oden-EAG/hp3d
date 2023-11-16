@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c----------------------------------------------------------------------
 c
 c   routine name       - elem_no
@@ -176,3 +178,5 @@ c  .....select the element that is closest to the point of view
 c
 c
       end subroutine elem_no
+
+#endif

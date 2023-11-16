@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c----------------------------------------------------------------------
 c
 c   routine name       - dpborder
@@ -184,3 +186,5 @@ c  .....loop through the color boxes of isolines
       endif
 c
       end subroutine dpborder
+
+#endif

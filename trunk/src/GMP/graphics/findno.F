@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c----------------------------------------------------------------------
 c
 c   routine name       - findno
@@ -145,3 +147,5 @@ c
       write(*,*)'findno: NUMBER = ',NUMBER
 c
       end subroutine findno
+
+#endif

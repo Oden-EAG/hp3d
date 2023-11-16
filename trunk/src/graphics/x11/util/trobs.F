@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c-----------------------------------------------------------------------
 c
 c   routine name       - trobs
@@ -42,3 +44,5 @@ c
       enddo
 c
       end subroutine trobs
+
+#endif

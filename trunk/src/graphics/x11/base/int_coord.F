@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c----------------------------------------------------------------------
 c
 c   routine name       - int_coord
@@ -356,3 +358,5 @@ c
 #endif
 c
       end subroutine int_coord
+
+#endif

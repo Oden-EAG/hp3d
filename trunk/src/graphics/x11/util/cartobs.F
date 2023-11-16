@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c----------------------------------------------------------------------
 c
 c   routine name       - cartobs
@@ -77,3 +79,5 @@ c  .....loop through the 3D Cartesian coordinates
 c
 c
       end subroutine cartobs
+
+#endif

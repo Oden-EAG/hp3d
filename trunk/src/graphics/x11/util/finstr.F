@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c----------------------------------------------------------------------
 c
 c   routine name       - finstr
@@ -164,3 +166,5 @@ c            endif
       endif
 c
       end subroutine finstr
+
+#endif

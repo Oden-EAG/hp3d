@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c  GRAPHICAL INTERFACE FOR X-WINDOWS AND POSTCRIPT FILES
 c
 c  THE AVALIBLE BASIC ROUTINES ARE AS FOLLOWS
@@ -1193,3 +1195,5 @@ c               do nothing - no close for xwindow
         maxcol=0
         return
         end
+
+#endif
