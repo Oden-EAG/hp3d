@@ -27,7 +27,7 @@ subroutine homogenD(Dtype,Icase,Bcond, Is_homD,Ncase,Ibcnd)
 !..output arguments
    logical, intent(out) :: Is_homD
    integer, intent(out) :: Ncase(NR_PHYSA)
-   integer, intent(out) :: Ibcnd(NRINDEX)
+   integer, intent(out) :: Ibcnd(NRINDEX_HEV)
 !
    logical :: is_Dirichlet
 !
@@ -36,7 +36,7 @@ subroutine homogenD(Dtype,Icase,Bcond, Is_homD,Ncase,Ibcnd)
 !-----------------------------------------------------------------------
 !
    call decod(Icase,2,NR_PHYSA, Ncase)
-   call decod(Bcond,2,NRINDEX,  Ibcnd)
+   call decod(Bcond,2,NRINDEX_HEV,  Ibcnd)
    Is_homD = .true.
    ic=0
    do iphys = 1,NR_PHYSA

@@ -39,7 +39,7 @@ subroutine get_index(Nod, Indexd)
    integer :: ncase(NR_PHYSA)
 !
 !..decimal version of NODES(Nod)%bcond
-   integer :: ibcd(NRINDEX)
+   integer :: ibcd(NRINDEX_HEV)
 !
 !..misc
    integer :: ic,iphys,ivar
@@ -53,7 +53,7 @@ subroutine get_index(Nod, Indexd)
 !
 !..decode the case and the BC flags
    call decod(NODES(Nod)%case,2,NR_PHYSA, ncase)
-   call decod(NODES(Nod)%bcond,2,NRINDEX, ibcd )
+   call decod(NODES(Nod)%bcond,2,NRINDEX_HEV, ibcd )
 !
 !..initiate index counter
    ic=0
@@ -127,14 +127,15 @@ subroutine get_index(Nod, Indexd)
 !              ...loop through components
                   do ivar=1,NR_COMP(iphys)
                      ic=ic+1
-                     select case(ibcd(ic))
-!
-!                    ...free H(div) component
-                        case(0); Indexd(ic)=8
-!
-!                    ...component known from Dirichlet BC
-                        case(1); Indexd(ic)=7
-                     end select
+!                      select case(ibcd(ic))
+! !
+! !                    ...free L2 component
+!                         case(0); Indexd(ic)=8
+! !
+! !                    ...component known from Dirichlet BC
+!                         case(1); Indexd(ic)=7
+!                      end select
+                     Indexd(ic)=8
                   enddo
             end select
       end select
@@ -151,7 +152,7 @@ subroutine get_index(Nod, Indexd)
       if (iprint.eq.1) then
         write(*,7010) nod,ncase(1:NR_PHYSA)
  7010   format('get_index: nod = ',i8,' ncase = ',10i2)
-        write(*,7020) ibcd(1:NRINDEX)
+        write(*,7020) ibcd(1:NRINDEX_HEV)
  7020   format('           ibcd  = ',30i1)
         write(*,7030) Indexd
  7030   format('           Index = ',30i1)

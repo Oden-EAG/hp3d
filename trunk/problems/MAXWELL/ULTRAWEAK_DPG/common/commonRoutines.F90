@@ -26,7 +26,7 @@
       integer :: nodesl(27),norientl(27),nface_nodes(9)
 !
 !  ...element face BC flags, decoded BC flag for a node
-      integer :: ibc(6,NRINDEX),nodflag(NRINDEX)
+      integer :: ibc(6,NRINDEX),nodflag(NRINDEX_HEV)
 !
 !----------------------------------------------------------------------------
 !
@@ -89,13 +89,13 @@
 !$OMP DO
       do nod=1,NRNODS
          if (NODES(nod)%visit.eq.0) cycle
-         call decod(NODES(nod)%bcond,2,NRINDEX, nodflag)
+         call decod(NODES(nod)%bcond,2,NRINDEX_HEV, nodflag)
          if (NODES(nod)%visit.eq.-Nflag) then
             nodflag(Icomp) = 0
          elseif (NODES(nod)%visit.eq.Nflag) then
             nodflag(Icomp) = 1
          endif
-         call encod(nodflag,2,NRINDEX, NODES(nod)%bcond)
+         call encod(nodflag,2,NRINDEX_HEV, NODES(nod)%bcond)
 !
       enddo
 !$OMP END DO

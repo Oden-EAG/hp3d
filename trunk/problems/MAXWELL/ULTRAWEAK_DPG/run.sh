@@ -23,13 +23,13 @@ dir_output='../outputs/'
 vis_level=0
 
 # MPI Procs
-nproc=1
+nproc=2
 
 # OMP THREADS
-nthreads=1
+nthreads=2
 
 # Set polynomial order p
-p=2
+p=3
 
 # Set enriched order (p+dp)
 dp=1
@@ -59,7 +59,7 @@ ibc=0
 alpha=1.d0
 
 # solution number
-isol=4
+isol=2
 
 # component number for manufactured solution
 comp=1

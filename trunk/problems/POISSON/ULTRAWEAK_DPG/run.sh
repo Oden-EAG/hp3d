@@ -2,14 +2,14 @@
 
 #
 # MPI Procs
-nproc=1
+nproc=2
 #
 # OMP THREADS
-nthreads=1
+nthreads=2
 
 # Configure problem params
 # - initial polynomial order of approximation
-p=2
+p=4
 
 # set enriched order (p+dp)
 dp=1

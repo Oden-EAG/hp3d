@@ -98,7 +98,7 @@ subroutine dhpfaceH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !
 ! decoded case and BC flags for the edge node
   integer, dimension(NR_PHYSA)          :: ncase
-  integer, dimension(NRINDEX)           :: ibcnd
+  integer, dimension(NRINDEX_HEV)       :: ibcnd
 !
 ! misc work space
   integer :: nrv,nre,nrf,i,j,k,ie,ivarH,nvarH,kj,ki,&

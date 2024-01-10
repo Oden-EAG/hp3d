@@ -105,7 +105,7 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !
 ! decoded case and BC flag for the face node
   integer, dimension(NR_PHYSA)          :: ncase
-  integer, dimension(NRINDEX)           :: ibcnd
+  integer, dimension(NRINDEX_HEV)       :: ibcnd
 !
 ! misc
   integer :: nrv,nre,nrf,nsign,nflag,i,j,jH,iE,jE,kjE,kiE,kjH,k,kE,info,ic,naE,&

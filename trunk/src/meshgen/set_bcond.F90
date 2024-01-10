@@ -84,6 +84,7 @@ subroutine set_bcond_elem(Iel,Dom,Attr,Comp,Flag)
 !..check if BC flag array has been allocated
    if (.not. associated(ELEMS(Iel)%bcond)) then
       allocate(ELEMS(Iel)%bcond(NRINDEX))
+      ELEMS(Iel)%bcond = 0
       ibc(1:6) = 0
    else
 !  ...retain previously set BC flags for this component

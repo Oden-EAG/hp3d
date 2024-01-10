@@ -39,7 +39,7 @@ subroutine dhpvert(Mdle,Iflag,No,Xi,Icase,Bcond, ZdofH)
    integer :: ncase(NR_PHYSA)
 !
 !..decimal representation of Bcond
-   integer :: ibcnd(NRINDEX)
+   integer :: ibcnd(NRINDEX_HEV)
 !
    integer :: ivarH,nvarH,iphys,iload,icomp,ic
 !
@@ -74,7 +74,7 @@ subroutine dhpvert(Mdle,Iflag,No,Xi,Icase,Bcond, ZdofH)
 !
 !..shift the data skipping irrelevant entries
    call decod(Icase,2,NR_PHYSA, ncase)
-   call decod(Bcond,2,NRINDEX,  ibcnd)
+   call decod(Bcond,2,NRINDEX_HEV,  ibcnd)
 !
    ivarH=0; nvarH=0
 

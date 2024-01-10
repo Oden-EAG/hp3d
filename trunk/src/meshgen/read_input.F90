@@ -81,11 +81,12 @@ subroutine read_input(Fp)
         ADRES(i) = NRQVAR
         NRQVAR = NRQVAR + NR_COMP(i)
      end select
-     NRINDEX = NRINDEX + NR_COMP(i)
   enddo
+  NRINDEX = NRHVAR + NREVAR + NRVVAR + NRQVAR
+  NRINDEX_HEV = NRINDEX - NRQVAR
   !
-  if (NRINDEX > MAX_NRINDEX) then
-    write(*,*) 'NRINDEX, MAX_NRINDEX = ',NRINDEX,MAX_NRINDEX
+  if (NRINDEX_HEV > MAX_NRINDEX_HEV) then
+    write(*,*) 'NRINDEX_HEV, MAX_NRINDEX_HEV = ',NRINDEX_HEV,MAX_NRINDEX_HEV
     stop
   endif
   !
