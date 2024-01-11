@@ -226,10 +226,10 @@ subroutine elem_heat(Mdle,                   &
 !
 !..determine z-coordinate inside the element
    select case(etype)
-      case('mdlb')
+      case(MDLB)
          maxz = maxval(xnod(3,1:8))
          minz = minval(xnod(3,1:8))
-      case('mdlp')
+      case(MDLP)
          maxz = maxval(xnod(3,1:6))
          minz = minval(xnod(3,1:6))
       case default
@@ -393,7 +393,7 @@ subroutine elem_heat(Mdle,                   &
                   if (ANISO_HEAT .eq. 1) then
                      dv2(3) = ALPHA_Z*ALPHA_Z*dv2(3)
                   elseif (NO_PROBLEM.eq.2 .and. USE_PML .and. &
-                          x(3).ge.(ZL-2.d0*PML_FRAC*ZL)) then
+                          x(3).ge.(ZL-1.25d0*PML_FRAC*ZL)) then
 !              ...reduce artificial cooling from PML
                      dv2(3) = ALPHA_Z*ALPHA_Z*dv2(3)
                   endif
@@ -423,7 +423,7 @@ subroutine elem_heat(Mdle,                   &
             if (ANISO_HEAT .eq. 1) then
                dv2(3) = ALPHA_Z*ALPHA_Z*dv2(3)
             elseif (NO_PROBLEM.eq.2 .and. USE_PML .and. &
-                    x(3).ge.(ZL-2.d0*PML_FRAC*ZL)) then
+                    x(3).ge.(ZL-1.25d0*PML_FRAC*ZL)) then
 !        ...reduce artificial cooling from PML
                dv2(3) = ALPHA_Z*ALPHA_Z*dv2(3)
             endif

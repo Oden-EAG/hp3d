@@ -324,12 +324,9 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !
 !..determine z-coordinate inside the element
    select case(etype)
-      case('mdlb')
+      case(MDLB)
          maxz = maxval(xnod(3,1:8))
          minz = minval(xnod(3,1:8))
-      case('mdlp')
-         maxz = maxval(xnod(3,1:6))
-         minz = minval(xnod(3,1:6))
       case default
          write(*,*) 'elem_maxwell_fi_hexa: unexpected etype=',etype,'. stop.'
          stop

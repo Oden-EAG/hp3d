@@ -255,10 +255,10 @@
 !
 !..determine z-coordinate inside the element
    select case(etype)
-      case('mdlb')
+      case(MDLB)
          maxz = maxval(xnod(3,1:8))
          minz = minval(xnod(3,1:8))
-      case('mdlp')
+      case(MDLP)
          maxz = maxval(xnod(3,1:6))
          minz = minval(xnod(3,1:6))
       case default
