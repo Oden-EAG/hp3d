@@ -1,9 +1,9 @@
-!> Purpose : define matrices
-
+!> @brief define matrices for FE assembly
 module assembly
    use parameters
    use physics
    use error
+   implicit none
 
 #include "typedefs.h"
 
@@ -50,9 +50,8 @@ module assembly
 
 contains
 
-!> Purpose : create workspace for the celem call
+!> @brief create workspace for the celem call
    subroutine assembly_begin
-      implicit none
       integer :: istat
 
 !  ...set the possible maximum and allocate workspace
@@ -71,7 +70,7 @@ contains
    end subroutine assembly_begin
 
    subroutine assembly_begin_par
-      implicit none
+
 
 !  ...set the possible maximum and allocate workspace
       MAXDOFM = &
@@ -85,7 +84,6 @@ contains
 
 !> Purpose : free workspace
    subroutine assembly_end
-      implicit none
       integer :: istat
       deallocate( &
          NEXTRACT, IDBC, ZDOFD, MAXDOFS, &
@@ -98,13 +96,11 @@ contains
    end subroutine assembly_end
 
    subroutine assembly_end_par
-      implicit none
       deallocate(NEXTRACT, IDBC, ZDOFD)
    end subroutine assembly_end_par
 
-!> Purpose : allocate arrays
+!> @brief allocate arrays
    subroutine assembly_alloc
-      implicit none
       integer :: i, j, istat
       allocate( &
          BLOC(NR_PHYSA), AAUX(NR_PHYSA), ALOC(NR_PHYSA,NR_PHYSA), &
@@ -149,9 +145,8 @@ contains
 
    end subroutine assembly_alloc
 
-!> Purpose : deallocate arrays
+!> @brief deallocate arrays
    subroutine assembly_dealloc
-      implicit none
       integer :: i, j, istat
       do i=1,NR_PHYSA
          if (allocated(BLOC(i)%array)) deallocate(BLOC(i)%array, stat=istat)

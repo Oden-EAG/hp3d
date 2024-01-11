@@ -1,6 +1,5 @@
-      subroutine symelm (Iel, Aidx, Flhs, Ubuf)
+      
 c
-#include "syscom.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: Elimination of one equation (id) for symmetric matricies
 c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
@@ -11,7 +10,7 @@ c
 c I   Iel   : element number
 c
 c I   Aidx  : transfer loc for active dof in the front after eliminating
-c          this is the equation to be eliminated
+c             this is the equation to be eliminated
 c
 c IO  Flhs  : the assembled front lhs
 c             note: for symmetric, lhs is stored as:  *** by column ***
@@ -22,7 +21,7 @@ c                            :
 c
 c IO  Ubuf     : the buffer to hold eliminated lhs equations
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -32,17 +31,28 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      subroutine symelm (Iel, Aidx, Flhs, Ubuf)
 c
-      dimension Flhs(*), Ubuf(*)
+      use surfsc1
+      use surfsc2
 c
-      data sml,dzero /1.e-30, 0.0/
-cwb >
-      data sml2 /1.e-15/
-cwb <
+      implicit none
 c
+      integer :: Iel
+      real(8) :: Aidx
+      real(8) :: Flhs(*), Ubuf(*)
+c
+      real(8) :: pivot,s
+      integer :: i,id,idm,idp,j,k,m,mp,n,nn
+c
+      real(8), parameter :: sml   = 1.d-30
+      real(8), parameter :: dzero = 0.0d0
+      real(8), parameter :: sml2  = 1.d-15
+c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
+c
       if (iprint.eq.1) then
         write(*,*) 'SYMELM: Iel,Aidx,Flhs,Ubuf = ',Iel,Aidx
         write(*,7001) (Flhs(iii),iii=1,10)
@@ -50,6 +60,7 @@ c
  7001   format(1x,5e12.5)
         call pause
       endif
+#endif
 c
 c set up pointers into Flhs
 c
@@ -64,10 +75,12 @@ c pull the diagonal entry
 c
       pivot = Flhs(mp)
 c
-      if(IPRPIV .eq. 1 .and. iprint  .eq. 1) then
+#if DEBUG_MODE
+      if(IPRPIV .eq. 1 .and. iprint .eq. 1) then
          write(NFSOUT,1000) Iel,nfw,id,pivot
  1000    format(5x,'IEL,NFW,ID,PIVOT',3i5,1pe11.3)
       endif
+#endif
 c
       Ubuf(id) = pivot
 c
@@ -218,5 +231,5 @@ c
 c
    80 continue
 c  ------------
-      return
-      end
+c
+      end subroutine symelm

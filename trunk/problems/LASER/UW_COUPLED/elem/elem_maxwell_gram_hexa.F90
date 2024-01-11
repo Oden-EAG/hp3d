@@ -43,7 +43,7 @@
    VTYPE  , intent(out) :: GramP(NrTest*(NrTest+1)/2)
 !
 !..locals
-   character(len=4) :: etype
+   integer :: etype
 !
 !..number of edge,faces per element type
    integer :: nre, nrf
@@ -167,7 +167,7 @@
 !----------------------------------------------------------------------
 !
 !..element type
-   etype = NODES(Mdle)%type
+   etype = NODES(Mdle)%ntype
    nre = nedge(etype); nrf = nface(etype)
 !
 !..determine order of approximation
@@ -175,7 +175,7 @@
 !
 !..set the enriched order of approximation
    select case(etype)
-      case('mdlb')
+      case(MDLB)
          nordP = NODES(Mdle)%order+NORD_ADD*111
       case default
          write(*,*) 'elem_maxwell_gram_hexa: unsupported etype param. stop.'

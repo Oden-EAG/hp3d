@@ -32,7 +32,7 @@ subroutine elem_DPG_PRIMAL(Mdle)
 !------------------------------------------------------------------------------------------
 !
 !  ...element and face type
-      character(len=4) :: etype,ftype
+      integer :: etype,ftype
 !
 !  ...element and face order, enriched order
       integer, dimension(19) :: norder
@@ -63,7 +63,7 @@ subroutine elem_DPG_PRIMAL(Mdle)
       real*8, dimension(  MAXbrickV)  :: shapV_n
 ! !
 ! !  ...load vector for the enriched space
-!       real*8, dimension(3*MAXbrickHH,MAXNRHS) :: EnrLoad
+!       real*8, dimension(3*MAXbrickHH,NRRHS) :: EnrLoad
 !
 !  ...geometry
       real*8, dimension(3,MAXbrickH) :: xnod
@@ -76,7 +76,7 @@ subroutine elem_DPG_PRIMAL(Mdle)
       real*8, dimension(3,3,3,3) :: C,Symm,CC
 !
 !  ...source term (don't need Neumann term)
-      real*8, dimension(3,MAXNRHS) :: fval
+      real*8, dimension(3,NRRHS) :: fval
 !
 !  ...3D quadrature data
       real*8, dimension(3,MAXNINT3ADD) :: xiloc
@@ -107,7 +107,7 @@ subroutine elem_DPG_PRIMAL(Mdle)
       tmp = 0.d0
 !
 !  ...element type
-      etype = NODES(Mdle)%type
+      etype = NODES(Mdle)%ntype
 !
 !  ...order of approximation, orientations, geometry dof's, domain number
       call find_order (Mdle, norder)
@@ -117,9 +117,9 @@ subroutine elem_DPG_PRIMAL(Mdle)
 !
 !  ...set the enriched order of appoximation
       select case(etype)
-      case('mdlb')        ; nordP = NODES(Mdle)%order + NORD_ADD*111
-      case('mdln','mdld') ; nordP = NODES(Mdle)%order + NORD_ADD*1
-      case('mdlp')        ; nordP = NODES(Mdle)%order + NORD_ADD*11
+      case(MDLB)      ; nordP = NODES(Mdle)%order + NORD_ADD*111
+      case(MDLP)      ; nordP = NODES(Mdle)%order + NORD_ADD*11
+      case(MDLN,MDLD) ; nordP = NODES(Mdle)%order + NORD_ADD*1
       end select
 !
 !  ...initialize the enriched local element stiffness matrices and load vectors

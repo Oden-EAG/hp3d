@@ -27,7 +27,8 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
    use assembly_sc, only: NRDOF_CON,NRDOF_TOT
    use par_mesh   , only: DISTRIBUTED,HOST_MESH
    use mpi_param  , only: ROOT,RANK
-   use MPI        , only: MPI_COMM_WORLD,MPI_SUM,MPI_COMM_WORLD,MPI_REAL8
+   use MPI        , only: MPI_COMM_WORLD,MPI_SUM,MPI_COMM_WORLD, &
+                          MPI_REAL8,MPI_Wtime
 !
    implicit none
 !
@@ -53,7 +54,7 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
    integer :: i,iel,mdle,count,ierr,nrelem_ref,kref
    integer :: iprint
 !
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 !-----------------------------------------------------------------------
 !
@@ -179,9 +180,9 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
             nrelem_ref = NRELES
             do iel=1,nrelem_ref
                mdle = ELEM_ORDER(iel)
-               select case(NODES(mdle)%type)
-                  case('mdlb'); kref = 1 ! refine in z
-                  case('mdlp'); kref = 1 ! refine in z
+               select case(NODES(mdle)%ntype)
+                  case(MDLB); kref = 1 ! refine in z
+                  case(MDLP); kref = 1 ! refine in z
                   case default
                      write(*,*) 'href WARNING: anisoref for unexpected type. stop.'
                      stop 1
@@ -216,7 +217,7 @@ subroutine href_solve()
    use MPI           , only: MPI_COMM_WORLD,MPI_INTEGER
    use mpi_param     , only: RANK,ROOT
    use par_mesh      , only: DISTRIBUTED,HOST_MESH,distr_mesh
-   use zoltan_wrapper, only: zoltan_w_set_lb,zoltan_w_partition
+   use zoltan_wrapper
 !
    implicit none
 !
@@ -249,9 +250,10 @@ subroutine href_solve()
 !     ...Uniform refinement and solve
          call uniform_href(IUNIFORM,1,0.25d0)
          if (DISTRIBUTED .and. (.not. HOST_MESH)) then
-            !call zoltan_w_set_lb(1)
+            !call zoltan_w_set_lb(ZOLTAN_LB_BLOCK)
             !call distr_mesh
             !call print_partition
+            !call petsc_solve('G')
             call par_mumps_sc('G')
          else
             call mumps_sc('G')

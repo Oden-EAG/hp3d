@@ -15,6 +15,8 @@ module laserParam
    use parametersDPG
    use commonParam
 !
+   implicit none
+!
 !
 !..toggle heat flag, nonlinear problem, co/counter pumping, plane pump
    integer :: HEAT_FLAG, ANISO_HEAT, NONLINEAR_FLAG, COPUMP, PLANE_PUMP

@@ -4,7 +4,7 @@ c   routine name       - perform_pref
 c
 c---------------------------------------------------------------------
 c
-c   latest revision    - Aug 17
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine executes p-refinements for a group
 c                        of element middle nodes, along with the
@@ -29,19 +29,25 @@ c
       use data_structure3D
       use element_data
       use constrained_nodes
-#include "syscom.blk"
 c
-      dimension List_elem(Nlist),List_nord(Nlist)
+      implicit none
 c
-      character(len=4) :: etype
+      integer, intent(in) :: Nlist
+      integer, intent(in) :: List_elem(Nlist), List_nord(Nlist)
 c
 c  ...element nodes
-      dimension nodesl(27), norientl(27)
+      integer :: nodesl(27), norientl(27)
 c
 c  ...order for element nodes
-      dimension norder(19)
+      integer :: norder(19)
 c
+      integer :: ie,iel,ip,j,icase,nc,mdle,ntype,nrv,nre,nrf
+      integer :: nod,nodp,newp,newph,newpv,nord,nordh,nordv,nordm
+c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
+c
       if (iprint.eq.1) then
         write(*,7010) List_elem(1:Nlist)
  7010   format('perform_pref: List_elem = ',20(/,10i6))
@@ -49,6 +55,7 @@ c
  7020   format('perform_pref: List_nord = ',20(/,10i6))
         call pause
       endif
+#endif
 c
 c  ...Step 1: loop over elements from the list and perform the requested
 c     p-refinements
@@ -65,13 +72,13 @@ c  .....enforce the new order for the element middle node
 c  .....determine nodes for the element (active and constrained)
 c       and build the data base for the constrained nodes
 c       (module constrained_nodes)
-        call get_connect_info(mdle, nodesl, norientl)
+        call get_connect_info(mdle, nodesl,norientl)
 c
 c  .....determine the order for element nodes implied by the middle node
         call element_order(mdle,norientl,norder)
 c
-        etype = NODES(mdle)%type
-        nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
+        ntype = NODES(mdle)%ntype
+        nrv = nvert(ntype); nre = nedge(ntype); nrf = nface(ntype)
 c
 c
 c  .....loop through element higher order nodes
@@ -82,7 +89,7 @@ c
 c  .......new order for the node
           newp = norder(j-nrv)
 C
-          if (NODES(nod)%type.eq.'mdlq') call decode(newp, newph,newpv)
+          if (NODES(nod)%ntype.eq.MDLQ) call decode(newp, newph,newpv)
 c
 c  .......if nod is active
           if (Is_active(nod)) then
@@ -123,7 +130,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent mid-edge nodes (south,north)
               do ip=1,3,2
-                nodp = iabs(NFACE_CONS(ip,nc))
+                nodp = abs(NFACE_CONS(ip,nc))
                 call enforce_order(nodp, newp)
               enddo
 c
@@ -137,7 +144,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent mid-edge nodes (east,west)
               do ip=2,4,2
-                nodp = iabs(NFACE_CONS(ip,nc))
+                nodp = abs(NFACE_CONS(ip,nc))
                 call enforce_order(nodp, newp)
               enddo
 c
@@ -159,7 +166,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent mid-edge nodes (south,north)
               do ip=1,3,2
-                nodp = iabs(NFACE_CONS(ip,nc))
+                nodp = abs(NFACE_CONS(ip,nc))
                 call enforce_order(nodp, newp)
                 if (Is_inactive(nodp)) then
                   nodp = NODES(nodp)%father
@@ -185,7 +192,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent mid-edge nodes (east,west)
               do ip=2,4,2
-                nodp = iabs(NFACE_CONS(ip,nc))
+                nodp = abs(NFACE_CONS(ip,nc))
                 call enforce_order(nodp, newp)
                 if (Is_inactive(nodp)) then
                   nodp = NODES(nodp)%father
@@ -202,7 +209,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent medg nodes
               do ie=1,3
-                nodp = iabs(NFACE_CONS(ie,nc))
+                nodp = abs(NFACE_CONS(ie,nc))
                 call enforce_order(nodp, newp)
               enddo
 c
@@ -215,7 +222,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent medg nodes
               do ie=1,3
-                nodp = iabs(NFACE_CONS(ie,nc))
+                nodp = abs(NFACE_CONS(ie,nc))
                call enforce_order(nodp, newp)
               enddo
 c
@@ -243,8 +250,8 @@ c       node order
 c
 c  .....determine whether the element will be p-refined
         if (NODES(mdle)%visit.eq.0) then
-          etype = NODES(mdle)%type
-          nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
+          ntype = NODES(mdle)%ntype
+          nrv = nvert(ntype); nre = nedge(ntype); nrf = nface(ntype)
 c
 c  .......loop through element higher order nodes
           do j=1,nre+nrf+1
@@ -266,10 +273,12 @@ c
 c  .....the middle node has to be modified
         if (NODES(mdle)%visit.eq.1) then
           call element_middle_node_order(Mdle,norientl,norder, nordm)
+#if DEBUG_MODE
           if (iprint.eq.1) then
             write(*,7050) mdle,nordm
  7050       format('perform_pref: REFINING mdle = ',i6,' new p = ',i3)
           endif
+#endif
           call nodmod(mdle, nordm)
         endif
       enddo
@@ -285,7 +294,7 @@ c   routine name       - enforce_order
 c
 c---------------------------------------------------------------------
 c
-c   latest revision    - Aug 17
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine modifies order for a node enforcing
 c                        the min rule if the node is flagged as
@@ -294,7 +303,6 @@ c   arguments :
 c
 c     in:
 c             Nod      - node number
-c     out:
 c             Newp     - new order of approximation
 c
 c-----------------------------------------------------------------------
@@ -303,21 +311,27 @@ c
 c
       use data_structure3D
 c
+      implicit none
+c
+      integer, intent(in) :: Nod
+      integer, intent(in) :: Newp
+c
+      integer :: nord,nordh,nordv,newph,newpv
+c
       select case(NODES(Nod)%visit)
       case(0)
         nord = Newp
         NODES(Nod)%visit = 1
       case default
-        select case(NODES(Nod)%type)
-        case('medg','mdlt')
+        select case(NODES(Nod)%ntype)
+        case(MEDG,MDLT)
           nord = min(Newp,NODES(Nod)%order)
-        case('mdlq')
+        case(MDLQ)
           call decode(Newp, newph,newpv)
           call decode(NODES(Nod)%order, nordh,nordv)
           nord = min(newph,nordh)*10 + min(newpv,nordv)
         end select
       end select
       call nodmod(Nod,nord)
-c
 c
       end subroutine enforce_order

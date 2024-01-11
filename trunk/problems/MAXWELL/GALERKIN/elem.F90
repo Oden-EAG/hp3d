@@ -40,7 +40,7 @@ subroutine elem(Mdle, Itest,Itrial)
    call find_order(Mdle, norder)
 !
 !..find number of dof for each energy space supported by the element
-   call celndof(NODES(Mdle)%type,norder, nrdofH,nrdofE,nrdofV,nrdofQ)
+   call celndof(NODES(Mdle)%ntype,norder, nrdofH,nrdofE,nrdofV,nrdofQ)
 !
 !..call element integration routine
    call elem_maxwell(Mdle,nrdofE, ALOC(1,1)%array,BLOC(1)%array)
@@ -95,7 +95,7 @@ subroutine elem_maxwell(Mdle,Nrdof, Zaloc,Zbloc)
    real(8) :: rjac, wa, weight
    integer :: iflag, nrdofH, nrdofE, nint, k1, k2, l
 !
-   character(len=4) :: etype
+   integer :: etype
 !
 !..element order, orientation for edges and faces
    integer :: norder(19), norient_edge(12), norient_face(6)
@@ -131,7 +131,7 @@ subroutine elem_maxwell(Mdle,Nrdof, Zaloc,Zbloc)
    Zaloc = ZERO; Zbloc = ZERO
 !
 !..element type
-   etype = NODES(Mdle)%type
+   etype = NODES(Mdle)%ntype
 !
 !..determine order of approximation
    call find_order(Mdle, norder)

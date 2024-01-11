@@ -1,3 +1,5 @@
+#if DEBUG_MODE
+
 !-----------------------------------------------------------------------
 subroutine volume(Vol)
 !
@@ -11,7 +13,7 @@ subroutine volume(Vol)
 !
 !  ...local variables
       integer, dimension(19) :: norder
-      character(len=4) :: type
+      integer :: ntype
       real(8) :: xiloc(3,MAX_NINT3),wxi(MAX_NINT3)
       real(8) :: xi(3), x(3)
       real(8) :: dxdxi(3,3), dxidx(3,3)
@@ -31,8 +33,8 @@ subroutine volume(Vol)
       do mdle=1,NRELIS
 !
 !  .....integration points
-        type = NODES(mdle)%type
-        call set_3Dint(type,norder, nint,xiloc,wxi)
+        ntype = NODES(mdle)%ntype
+        call set_3Dint(ntype,norder, nint,xiloc,wxi)
 !
 !  .....loop over integration points
         do l=1,nint
@@ -62,4 +64,6 @@ subroutine volume(Vol)
       enddo
 !
 !
-endsubroutine volume
+end subroutine volume
+
+#endif

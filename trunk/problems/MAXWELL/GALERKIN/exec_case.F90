@@ -8,6 +8,7 @@ subroutine exec_case(idec)
    use mpi_param
    use mpi
    use common_prob_data
+   use paraview      , only: paraview_select_attr
    use zoltan_wrapper, only: zoltan_w_partition,zoltan_w_eval
 !
    implicit none
@@ -20,6 +21,7 @@ subroutine exec_case(idec)
 !
    integer :: mdle_list(1)
    integer :: mdle_nord(1)
+   logical :: iPvAttr(1)
 !
 !----------------------------------------------------------------------
 !
@@ -29,7 +31,9 @@ subroutine exec_case(idec)
 !
 !  ...paraview graphics
       case(3)
-         call my_paraview_driver(1)
+         iPvAttr = (/.true./)
+         call paraview_select_attr(iPvAttr)
+         call paraview_driver
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 !  ...print data structure (interactive)

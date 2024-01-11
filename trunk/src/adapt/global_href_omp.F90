@@ -9,12 +9,12 @@ subroutine global_href_omp
    use data_structure3D
    use environment , only : QUIET_MODE
    use mpi_param   , only : RANK,ROOT
-   use MPI         , only : MPI_COMM_WORLD
+   use MPI         , only : MPI_COMM_WORLD,MPI_Wtime
 !
    implicit none
 !
    integer :: nr_elem,mdle,i,kref,ierr
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 !..OpenMP auxiliary variables
    integer :: nrleafs,nrsons
@@ -95,7 +95,7 @@ subroutine global_href_aniso_omp(Krefxy,Krefz)
    use data_structure3D
    use environment , only : QUIET_MODE
    use mpi_param   , only : RANK,ROOT
-   use MPI         , only : MPI_COMM_WORLD
+   use MPI         , only : MPI_COMM_WORLD,MPI_Wtime
 !
    implicit none
 !
@@ -103,7 +103,7 @@ subroutine global_href_aniso_omp(Krefxy,Krefz)
 !
    integer :: nr_elem,mdle,i,ierr
    integer :: kref_mdlb,kref_mdlp
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 !..check if valid refinement
    kref_mdlb = Krefxy*110 + Krefz
@@ -117,9 +117,9 @@ subroutine global_href_aniso_omp(Krefxy,Krefz)
    do i=1,nr_elem
       mdle = ELEM_ORDER(i)
       if (is_leaf(mdle)) then
-         select case(NODES(mdle)%type)
-            case('mdlb'); call break(mdle,kref_mdlb)
-            case('mdlp'); call break(mdle,kref_mdlp)
+         select case(NODES(mdle)%ntype)
+            case(MDLB); call break(mdle,kref_mdlb)
+            case(MDLP); call break(mdle,kref_mdlp)
             case default
                write(*,*) 'global_href_aniso: unexpected node type. stop.'
                stop 1

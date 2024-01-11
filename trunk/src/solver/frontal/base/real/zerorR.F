@@ -1,6 +1,3 @@
-       subroutine zeror (Frhs)
-c
-#include "syscom.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: If necessary, zero out for new rhs equations in the front
 c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
@@ -9,7 +6,7 @@ c
 c Typ Name      Function
 c IO  Frhs  : the space which holds the rhs equations in the front
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -19,15 +16,21 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      subroutine zeror (Frhs)
 c
-      dimension Frhs(*)
+      use surfsc1
+      use surfsc2
 c
-      data dzero /0.0d0/
+      implicit none
 c
-c if the new frontwidth is equal to the old frontwidth
-c   then there is nothing to zero
+      real(8) :: Frhs(*)
+c
+      integer :: i,ia,in,m
+c
+      real(8), parameter :: dzero = 0.0d0
+c
+c  ...if the new frontwidth is equal to the old frontwidth
+c     then there is nothing to zero
 c
       if (LFW .eq. NFW) return
 c
@@ -47,5 +50,5 @@ c
 c
 120   continue
 c
-      return
-      end
+c
+      end subroutine zeror

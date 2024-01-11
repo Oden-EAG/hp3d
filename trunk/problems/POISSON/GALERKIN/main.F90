@@ -22,7 +22,7 @@ program main
    use assembly_sc, only: IPRINT_TIME
    use stc        , only: STORE_STC,HERM_STC
 !
-   use MPI        , only: MPI_COMM_WORLD
+   use MPI        , only: MPI_COMM_WORLD,MPI_Wtime
    use mpi_param  , only: ROOT,RANK,NUM_PROCS
    use mpi_wrapper, only: mpi_w_init,mpi_w_finalize
 !
@@ -37,7 +37,7 @@ program main
 #endif
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 !----------------------------------------------------------------------
 !
@@ -153,7 +153,7 @@ subroutine master_main()
 !
 !..test accessing data structures
    write(6,8020) '[', RANK, '] : ', 'NRELIS,NRELES,NRNODS = ',NRELIS,NRELES,NRNODS
- 8020 format(A,I3,A,A,I4,', ',I4,', ',I4)
+ 8020 format(A,I4,A,A,I7,', ',I7,', ',I7)
 !
    flush(6)
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)
@@ -203,7 +203,7 @@ subroutine master_main()
       write(*,*) 'MUMPS (MPI)............................40'
       write(*,*) 'MUMPS (OpenMP).........................41'
       write(*,*) 'Pardiso (OpenMP).......................42'
-      ! write(*,*) 'Frontal (Seq)..........................43'
+      write(*,*) 'Frontal (Seq)..........................43'
       write(*,*) 'MUMPS (Nested Dissection)..............44'
       write(*,*) 'PETSc (MPI)............................45'
       write(*,*) '                                         '
@@ -348,7 +348,7 @@ subroutine worker_main()
 !
 !..test accessing data structures
    write(6,9020) '[', RANK, '] : ', 'NRELIS,NRELES,NRNODS = ',NRELIS,NRELES,NRNODS
- 9020 format(A,I3,A,A,I4,', ',I4,', ',I4)
+ 9020 format(A,I4,A,A,I7,', ',I7,', ',I7)
 !
    flush(6)
    call MPI_BARRIER (MPI_COMM_WORLD, ierr)

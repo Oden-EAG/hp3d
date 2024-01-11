@@ -4,7 +4,7 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - Jul 01
+!   latest revision    - Feb 2023
 !
 !   purpose            - module contains logical information
 !                        related to 2D h-refinements
@@ -12,7 +12,11 @@
 !
 !----------------------------------------------------------------------
 !
-      module refinements_2D
+module refinements_2D
+!
+   use node_types
+!
+   implicit none
 !
 !  ...denumeration of sons of an edge, in a local, edge system
 !     of coordinates
@@ -99,161 +103,163 @@
 !                      of the middle node
 !
 !
-      contains
+   contains
 !
 !-----------------------------------------------------------------------
 !
-!  ...In:  middle node father type, node number, son number, ref kind
+!  ...In:  Ntype - middle node father type
+!          J     - node number
+!          Nson  - son number
+!          Nref  - ref kind
 !  ...Out: element node number of the father node
-      function Npar_ref(Type,J,Nson,Nref)
-      character(len=4) :: Type
-      integer :: J,Nson,Nref, Npar_ref
+   function Npar_ref(Ntype,J,Nson,Nref)
 !
-      select case(Type)
-      case('mdlt')
-        Npar_ref   = PARENT_NODES_T4(1,J,Nson)
-      case('mdlq')
+      integer :: Ntype,J,Nson,Nref
+      integer :: Npar_ref
+!
+      select case(Ntype)
+      case(MDLT);   Npar_ref = PARENT_NODES_T4(1,J,Nson)
+      case(MDLQ)
         select case(Nref)
-        case(11)
-          Npar_ref   = PARENT_NODES_Q11(1,J,Nson)
-        case(10)
-          Npar_ref   = PARENT_NODES_Q10(1,J,Nson)
-        case(01)
-          Npar_ref   = PARENT_NODES_Q01(1,J,Nson)
+          case(11); Npar_ref = PARENT_NODES_Q11(1,J,Nson)
+          case(10); Npar_ref = PARENT_NODES_Q10(1,J,Nson)
+          case(01); Npar_ref = PARENT_NODES_Q01(1,J,Nson)
         case default
-          write(*,7001) Type,J,Nson,Nref; stop 1
+          write(*,7001) S_Type(Ntype),J,Nson,Nref; stop 1
  7001     format('Npar_ref: Type,J,Nson,Nref = ',a4,3i4)
         end select
       case default
-        write(*,7001) Type,J,Nson,Nref; stop 1
+        write(*,7001) S_Type(Ntype),J,Nson,Nref; stop 1
       end select
 !
-      end function Npar_ref
+   end function Npar_ref
 !
+!-----------------------------------------------------------------------
 !
-      function Nson_ref(Type,J,Nson,Nref)
-      character(len=4) :: Type
-      integer :: J,Nson,Nref, Nson_ref
+   function Nson_ref(Ntype,J,Nson,Nref)
 !
-      select case(Type)
-      case('mdlt')
-        Nson_ref   = PARENT_NODES_T4(2,J,Nson)
-      case('mdlq')
+      integer :: Ntype,J,Nson,Nref
+      integer :: Nson_ref
+!
+      select case(Ntype)
+      case(MDLT); Nson_ref = PARENT_NODES_T4(2,J,Nson)
+      case(MDLQ)
         select case(Nref)
-        case(11)
-          Nson_ref   = PARENT_NODES_Q11(2,J,Nson)
-        case(10)
-          Nson_ref   = PARENT_NODES_Q10(2,J,Nson)
-        case(01)
-          Nson_ref   = PARENT_NODES_Q01(2,J,Nson)
-        case default
-          write(*,7001) Type,J,Nson,Nref; stop 1
- 7001     format('Nson_ref: Type,J,Nson,Nref = ',a4,3i4)
+          case(11); Nson_ref = PARENT_NODES_Q11(2,J,Nson)
+          case(10); Nson_ref = PARENT_NODES_Q10(2,J,Nson)
+          case(01); Nson_ref = PARENT_NODES_Q01(2,J,Nson)
+          case default
+            write(*,7001) S_Type(Ntype),J,Nson,Nref; stop 1
+ 7001       format('Nson_ref: Type,J,Nson,Nref = ',a4,3i4)
         end select
       case default
-        write(*,7001) Type,J,Nson,Nref; stop 1
+        write(*,7001) S_Type(Ntype),J,Nson,Nref; stop 1
       end select
 !
-      end function Nson_ref
+   end function Nson_ref
 !
+!-----------------------------------------------------------------------
 !
-      function Nort_ref(Type,J,Nson,Nref)
-      character(len=4) :: Type
-      integer :: J,Nson,Nref, Nort_ref
+   function Nort_ref(Ntype,J,Nson,Nref)
 !
-      select case(Type)
-      case('mdlt')
+      integer :: Ntype,J,Nson,Nref
+      integer :: Nort_ref
+!
+      select case(Ntype)
+      case(MDLT)
         select case(J)
-        case(1,2,3,7)
-          Nort_ref   = 0
-        case(4,5,6)
-          Nort_ref = T4_ORIENT(J-3,Nson)
-        case default
-          write(*,7001) Type,J,Nson,Nref; stop 1
+          case(1,2,3,7); Nort_ref = 0
+          case(4,5,6)  ; Nort_ref = T4_ORIENT(J-3,Nson)
+          case default
+            write(*,7001) S_Type(Ntype),J,Nson,Nref; stop 1
         end select
-      case('mdlq')
-        Nort_ref   = 0
+      case(MDLQ); Nort_ref = 0
       case default
-        write(*,7001) Type,J,Nson,Nref; stop 1
+        write(*,7001) S_Type(Ntype),J,Nson,Nref; stop 1
  7001   format('Nort_ref: Type,J,Nson,Nref = ',a4,3i4)
       end select
 !
-      end function Nort_ref
+   end function Nort_ref
+!
 !-----------------------------------------------------------------------
 !
-!  ...return number of middle node sons for a specifi! refinement
-      subroutine nr_mdle_sons(Type,Kref, Nrsons)
-      character(len=4) :: Type
-      integer Kref,Nrsons
+!> @brief  return number of middle node sons for a specifi! refinement
+!> @date   Feb 2023
+   subroutine nr_mdle_sons(Ntype,Kref, Nrsons)
 !
-      select case(Type)
-      case('mdlt')
+      integer, intent(in)  :: Ntype,Kref
+      integer, intent(out) :: Nrsons
+!
+      select case(Ntype)
+      case(MDLT)
         select case(Kref)
-        case(1)
-          Nrsons=4
+          case(1); Nrsons=4
         case default
-          write(*,7001) Type,Kref; stop 1
+          write(*,7001) S_Type(Ntype),Kref; stop 1
  7001     format('nr_mdle_sons: Type,Kref = ',a4,i3)
         end select
-      case('mdlq')
+      case(MDLQ)
         select case(Kref)
-        case(11)
-          Nrsons=4
-        case(10,01)
-          Nrsons=2
-        case default
-          write(*,7001) Type,Kref; stop 1
+          case(11)   ; Nrsons=4
+          case(10,01); Nrsons=2
+          case default
+            write(*,7001) S_Type(Ntype),Kref; stop 1
         end select
       case default
-        write(*,*) Type,Kref; stop 1
+        write(*,*) S_Type(Ntype),Kref; stop 1
       end select
 !
-      end subroutine nr_mdle_sons
+   end subroutine nr_mdle_sons
+!
 !-----------------------------------------------------------------------
 !
-!  ...return number of sons for different refinements of different nodes
-      subroutine nr_sons(Type,Kref, Nrsons)
+!> @brief  return number of sons for different refinements of different nodes
+!> @date   Feb 2023
+   subroutine nr_sons(Ntype,Kref, Nrsons)
 !
-      character(len=4) :: Type
-      integer :: Kref,Nrsons
+      integer, intent(in)  :: Ntype,Kref
+      integer, intent(out) :: Nrsons
 !
-      select case(Type)
-      case('medg')
+      select case(Ntype)
+      case(MEDG)
         select case(Kref)
         case(1); Nrsons=3
         case default; go to 10
         end select
-      case('mdlt')
+      case(MDLT)
         select case(Kref)
         case(1); Nrsons=7
         case default; go to 10
         end select
-      case('mdlq')
+      case(MDLQ)
         select case(Kref)
-        case(11); Nrsons=9
+        case(11)   ; Nrsons=9
         case(10,01); Nrsons=3
         case default; go to 10
         end select
       end select
 !
-!
       return
- 10   write(*,7001) Type,Kref
+ 10   write(*,7001) S_Type(Ntype),Kref
  7001 format('nr_sons: Type,Kref = ',a4,2x,i3)
       stop 1
 !
-      end subroutine
+   end subroutine nr_sons
 !
 !-----------------------------------------------------------------------
 !
-!  ...modify son number 'Is' and node orientation 'Nort' for a son of
-!     a mid-edge node according to the orientation 'Norient' of
-!     the father
-      subroutine rotate_edge(Norient,Is,Nort)
-      integer Norient,Is,Nort,imod,j,m
+!> @brief  modify son number 'Is' and node orientation 'Nort' for a son
+!!         of a mid-edge node according to the orientation 'Norient' of
+!!         the father
+!> @date   Feb 2023
+   subroutine rotate_edge(Norient,Is,Nort)
+!
+      integer, intent(in)    :: Norient
+      integer, intent(inout) :: Is,Nort
+      integer :: imod,j,m
+!
       imod(j,m) = j-(j-1)/m*m
       select case(Norient)
-      case(0)
       case(1)
         select case(Is)
         case(1,2)
@@ -261,11 +267,10 @@
           Nort = mod(Nort+1,2)
         case(3)
         end select
+      case(0)
       end select
-      end subroutine rotate_edge
+!
+   end subroutine rotate_edge
 !
 !
-      end module refinements_2D
-
-
-
+end module refinements_2D

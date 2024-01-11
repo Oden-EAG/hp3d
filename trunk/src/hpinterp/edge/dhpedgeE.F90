@@ -1,13 +1,13 @@
 !-----------------------------------------------------------------------
-!
-!> Purpose : update H(curl) edge dof interpolating H1 Dirichlet data
+!> @brief    update H(curl) edge dof interpolating H1 Dirichlet data
 !            using PB interpolation
 !!
+!! @param[in]  Mdle         - element (middle node) number
 !! @param[in]  Iflag        - a flag specifying which of the objects the
 !!                            edge is on: 5 pris, 6 hexa, 7 tetr, 8 pyra
 !! @param[in]  No           - number of a specific object
 !! @param[in]  Etav         - reference coordinates of the element vertices
-!! @param[in]  Type         - element (middle node) type
+!! @param[in]  Ntype        - element (middle node) type
 !! @param[in]  Icase        - the edge node case
 !! @param[in]  Bcond        - the edge node BC flag
 !! @param[in]  Nedge_orient - edge orientation
@@ -15,15 +15,15 @@
 !! @param[in]  Norder       - element order
 !! @param[in]  Iedge        - edge number
 !!
-!! @param[out] ZnodE        - H(curl) dof for the edge
+!! @param[in,out] ZnodE     - H(curl) dof for the edge
 !!
-!> @date Mar 17
+!> @date Sep 2023
 !-----------------------------------------------------------------------
 !
 #include "typedefs.h"
-  subroutine dhpedgeE(Mdle,Iflag,No,Etav,Type,Icase,Bcond,&
-                      Nedge_orient,Nface_orient,Norder,Iedge,&
-                      ZnodE)
+subroutine dhpedgeE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,&
+                    Nedge_orient,Nface_orient,Norder,Iedge,&
+                    ZnodE)
 !
   use control
   use parameters
@@ -34,14 +34,14 @@
 ! ** Arguments
 !-----------------------------------------------------------------------
 !
-  integer,          intent(in)    :: Iflag,No,Mdle
-  integer,          intent(in)    :: Icase,Bcond,Iedge
-  real(8),          intent(in)    :: Etav(3,8)
-  character(len=4), intent(in)    :: Type
-  integer,          intent(in)    :: Nedge_orient(12)
-  integer,          intent(in)    :: Nface_orient(6)
-  integer,          intent(in)    :: Norder(19)
-  VTYPE,            intent(inout) :: ZnodE(NRCOMS*NREQNE(Icase),*)
+  integer, intent(in)    :: Iflag,No,Mdle
+  integer, intent(in)    :: Icase,Bcond,Iedge
+  real(8), intent(in)    :: Etav(3,8)
+  integer, intent(in)    :: Ntype
+  integer, intent(in)    :: Nedge_orient(12)
+  integer, intent(in)    :: Nface_orient(6)
+  integer, intent(in)    :: Norder(19)
+  VTYPE,   intent(inout) :: ZnodE(NRRHS*NREQNE(Icase),*)
 !
 ! ** Locals
 !-----------------------------------------------------------------------
@@ -102,16 +102,17 @@
   logical :: is_homD
 !
 #if DEBUG_MODE
-  integer :: iprint = 0
+  integer :: iprint
+  iprint=0
 #endif
 !
 !----------------------------------------------------------------------
 !
-  nrv = nvert(Type); nre = nedge(Type); nrf = nface(Type)
+  nrv = nvert(Ntype); nre = nedge(Ntype); nrf = nface(Ntype)
 !
 #if DEBUG_MODE
   if (iprint.eq.1) then
-     write(*,7010) Mdle,Iflag,No,Icase,Iedge,Type
+     write(*,7010) Mdle,Iflag,No,Icase,Iedge,S_Type(Ntype)
 7010 format('dhpedgeE: Mdle,Iflag,No,Icase,Iedge,Type = ',5i4,2x,a4)
      write(*,7020) Etav(1:3,1:nrv)
 7020 format('          Etav = ',8(3f6.2,1x))
@@ -126,11 +127,11 @@
 #endif
 !
 ! # of edge dof
-  call ndof_nod('medg',norder(Iedge), &
+  call ndof_nod(MEDG,norder(Iedge), &
                 ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_edge)
 !
 ! check if a homogeneous Dirichlet node
-  call homogenD('tangen',Icase,Bcond, is_homD,ncase,ibcnd)
+  call homogenD(TANGEN,Icase,Bcond, is_homD,ncase,ibcnd)
   if (is_homD) then
     zuE = ZERO
     go to 100
@@ -143,12 +144,12 @@
   endif
 !
 ! set order and orientation for the edge node
-  call initiate_order(Type, norder_1)
+  call initiate_order(Ntype, norder_1)
   norder_1(Iedge) = Norder(Iedge)
 !
 ! 1D integration rule
   INTEGRATION=1   ! overintegrate
-  call set_1Dint(Norder(Iedge), nint, xi_list, wa_list)
+  call set_1Dint(Norder(Iedge), nint,xi_list,wa_list)
   INTEGRATION=0   ! reset
 !
 ! initialize
@@ -162,14 +163,14 @@
     wa = wa_list(l)
 !
 !   determine edge parameterization for line integral
-    call edge_param(Type,Iedge,t, xi,dxidt)
+    call edge_param(Ntype,Iedge,t, xi,dxidt)
 !
 !   compute element H1 shape functions (for geometry)
-    call shape3DH(Type,xi,norder_1,Nedge_orient,Nface_orient, &
+    call shape3DH(Ntype,xi,norder_1,Nedge_orient,Nface_orient, &
                   nrdofH,shapH,gradH)
 !
 !   compute element Hcurl shape functions
-    call shape3DE(Type,xi,norder_1,Nedge_orient,Nface_orient, &
+    call shape3DE(Ntype,xi,norder_1,Nedge_orient,Nface_orient, &
                   nrdofE,shapE,curlE)
 !
 !   compute reference geometry
@@ -192,7 +193,7 @@
     case(7) ; call tetra(No,eta, x,dxdeta)
     case(8) ; call pyram(No,eta, x,dxdeta)
     case default
-      write(*,*) 'dhpedgeE: Type,Iflag = ', Type,Iflag
+      write(*,*) 'dhpedgeE: Type,Iflag = ', S_Type(Ntype),Iflag
       call logic_error(ERR_INVALID_VALUE,__FILE__,__LINE__)
     endselect
 !
@@ -338,8 +339,8 @@
 !  ...initialize global variable counter, and node local variable counter
       ivarE=0 ; nvarE=0
 ! 
-!  ...loop through multiple copies of variables
-      do j=1,NRCOMS
+!  ...loop through multiple loads
+      do j=1,NRRHS
 !
 !  .....initiate the BC component counter
         ic=0
@@ -347,17 +348,17 @@
 !  .....loop through physical attributes
         do i=1,NR_PHYSA
 !
-!  .......loop through components of physical attribute
+!  .......loop through components
           do k=1,NR_COMP(i)
 !
 !  .........if the variable is supported by the node, update the BC component counter
             if (ncase(i).eq.1) ic=ic+1
 !
 !  .........select the discretization type
-            select case(DTYPE(i))
+            select case(D_TYPE(i))
 !
 !  .........H(curl) component
-            case('tangen')
+            case(TANGEN)
 !
 !  ...........update global counter
               ivarE = ivarE + 1
@@ -376,12 +377,15 @@
 !
               endif
             end select
+!  .......loop through components
           enddo
+!  .....loop through physical attributes
         enddo
+!  ...loop through multiple loads
       enddo
 !
 #if DEBUG_MODE
       if (iprint.eq.1) call result
 #endif
 !
-      end subroutine dhpedgeE
+end subroutine dhpedgeE

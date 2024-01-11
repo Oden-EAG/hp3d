@@ -1,3 +1,6 @@
+!
+#include "typedefs.h"
+!
 !-----------------------------------------------------------------------
 !
 !    module name        - assembly_sc
@@ -17,7 +20,7 @@
 !----------------------------------------------------------------------!
 module assembly_sc
 !
-#include "typedefs.h"
+   implicit none
 !
 !..timers
    real(8) :: MTime(20)

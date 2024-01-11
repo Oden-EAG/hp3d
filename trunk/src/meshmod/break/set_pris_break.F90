@@ -1,32 +1,43 @@
-!> Purpose : prepare the necessary information for breaking a prism middle node
-subroutine set_pris_break(Kref,Nord, Nrsons,Type,Norder)
+!----------------------------------------------------------------------------
+!> @brief prepare the necessary information for breaking a prism middle node
+!!
+!> @param[in ] Kref    - node refinement kind
+!> @param[in ] Nord    - node order of approximation
+!> @param[out] Nrsons  - number of sons
+!> @param[out] Ntype   - sons' types
+!> @param[out] Norder  - sons' orders of approximation
+!!
+!> @date Feb 2023
+!----------------------------------------------------------------------------
+subroutine set_pris_break(Kref,Nord, Nrsons,Ntype,Norder)
+  use node_types
   implicit none
-  integer,                         intent(in)  :: Kref,Nord
-  integer,          dimension(27), intent(out) :: Norder
-  integer,                         intent(out) :: Nrsons
-  character(len=4), dimension(27), intent(out) :: Type
+  integer, intent(in)  :: Kref,Nord
+  integer, intent(out) :: Nrsons
+  integer, intent(out) :: Ntype(27),Norder(27)
+!----------------------------------------------------------------------------
 !
   integer :: nordh, nordz
   call decode(Nord, nordh,nordz)
 !
-  Norder = 0; Type(1:27) = 'none'
+  Norder = 0; Ntype(1:27) = 0
 !
   select case(Kref)
   case(01)
      Nrsons       = 3
-     Type(1:3)    = (/'mdlp','mdlp','mdlt'/)
-     Norder(1:3)  = (/nord,nord,nordh/)
+     Ntype(1:3)   = (/ MDLP,MDLP,MDLT  /)
+     Norder(1:3)  = (/ nord,nord,nordh /)
   case(10)
      Nrsons = 7
-     Type(1:4)    = 'mdlp'
-     Type(5:7)    = 'mdlq'
+     Ntype(1:4)   = MDLP
+     Ntype(5:7)   = MDLQ
      Norder(1:7)  = nord
   case(11)
      Nrsons = 21
-     Type(1:8)     = 'mdlp'
-     Type(9:12)    = 'mdlt'
-     Type(13:18)   = 'mdlq'
-     Type(19:21)   = 'medg'
+     Ntype(1:8)    = MDLP
+     Ntype(9:12)   = MDLT
+     Ntype(13:18)  = MDLQ
+     Ntype(19:21)  = MEDG
      Norder(1:8)   = nord
      Norder(9:12)  = nordh
      Norder(13:18) = nord

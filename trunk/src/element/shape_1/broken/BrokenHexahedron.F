@@ -35,15 +35,21 @@ c
       implicit none
       integer, intent(in)  :: NordM,Nsize(2)
       integer, intent(out) :: NrdofH
-      !integer :: noriE(12),noriF(6),norder(19),nordF(3)
+c      integer :: noriE(12),noriF(6),norder(19),nordF(3)
       integer :: i,j,k,m
-      integer :: nordB(3),ndofH(3),iprint
+      integer :: nordB(3),ndofH(3)
       double precision, intent(in)  :: Xi(3)
       double precision, intent(out) :: ShapH(Nsize(2))
       double precision, intent(out) :: GradH(1:3,Nsize(2))
       double precision :: shapH1(Nsize(1)+1),dshapH1(Nsize(1)+1)
       double precision :: shapH2(Nsize(1)+1),dshapH2(Nsize(1)+1)
       double precision :: shapH3(Nsize(1)+1),dshapH3(Nsize(1)+1)
+c
+#if DEBUG_MODE
+c  ...debugging flag
+      integer :: iprint
+      iprint=0
+#endif
 c
 c  ...Option 1: Simply call the usual shape functions with enrichment
 c      noriE(1:12)=0
@@ -64,8 +70,6 @@ c
 c
 c  ...Option 2: Write more efficient routine for enriched functions
 c
-c  ...debugging flag
-      iprint=0
 c  ...initiate counter for shape functions
       m=0
 c
@@ -90,6 +94,7 @@ c
 c  ...give total degrees of freedom
       NrdofH = m
 c
+#if DEBUG_MODE
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001) Xi(1:3)
@@ -100,6 +105,7 @@ c  ...print this when debugging
         enddo
         call pause
       endif
+#endif
 c
 c
       end subroutine shape3DHBrokenHexa
@@ -137,9 +143,9 @@ c
       implicit none
       integer, intent(in)  :: NordM,Nsize(2)
       integer, intent(out) :: NrdofE
-      !integer :: noriE(12),noriF(6),norder(19),nordF(3)
+c      integer :: noriE(12),noriF(6),norder(19),nordF(3)
       integer :: i,j,k,m
-      integer :: nordB(3),ndofH(3),ndofQ(3),iprint
+      integer :: nordB(3),ndofH(3),ndofQ(3)
       double precision, intent(in)  :: Xi(3)
       double precision, intent(out) :: ShapE(1:3,Nsize(2))
       double precision, intent(out) :: CurlE(1:3,Nsize(2))
@@ -149,6 +155,12 @@ c
       double precision :: shapQ1(Nsize(1))
       double precision :: shapQ2(Nsize(1))
       double precision :: shapQ3(Nsize(1))
+c
+#if DEBUG_MODE
+c  ...debugging flag
+      integer :: iprint
+      iprint=0
+#endif
 c
 c  ...Option 1: Simply call the usual shape functions with enrichment
 c      noriE(1:12)=0
@@ -169,8 +181,6 @@ c
 c
 c  ...Option 2: Write more efficient routine for enriched functions
 c
-c  ...debugging flag
-      iprint=0
 c  ...initiate counter for shape functions
       m=0
 c
@@ -231,6 +241,7 @@ c
 c  ...give total degrees of freedom
       NrdofE = m
 c
+#if DEBUG_MODE
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001) Xi(1:3)
@@ -241,6 +252,7 @@ c  ...print this when debugging
         enddo
         call pause
       endif
+#endif
 c
 c
       end subroutine shape3DEBrokenHexa
@@ -278,9 +290,9 @@ c
       implicit none
       integer, intent(in)  :: NordM,Nsize(2)
       integer, intent(out) :: NrdofV
-      !integer :: noriF(6),norder(19),nordF(3)
+c      integer :: noriF(6),norder(19),nordF(3)
       integer :: i,j,k,m
-      integer :: nordB(3),ndofH(3),ndofQ(3),iprint
+      integer :: nordB(3),ndofH(3),ndofQ(3)
       double precision, intent(in)  :: Xi(3)
       double precision, intent(out) :: ShapV(1:3,Nsize(2))
       double precision, intent(out) :: DivV(Nsize(2))
@@ -290,6 +302,12 @@ c
       double precision :: shapQ1(Nsize(1))
       double precision :: shapQ2(Nsize(1))
       double precision :: shapQ3(Nsize(1))
+c
+#if DEBUG_MODE
+c  ...debugging flag
+      integer :: iprint
+      iprint=0
+#endif
 c
 c  ...Option 1: Simply call the usual shape functions with enrichment
 c      noriF(1:6)=0
@@ -303,10 +321,9 @@ c      norder(15:18)=(/nordF(2),nordF(3),nordF(2),nordF(3)/)
 c      norder(19)=NordM
 c      call shape3DVHexa(Xi,norder,noriF,Nsize, NrdofV,ShapV,DivV)
 c
+c
 c  ...Option 2: Write more efficient routine for enriched functions
 c
-c  ...debugging flag
-      iprint=0
 c  ...initiate counter for shape functions
       m=0
 c
@@ -361,6 +378,7 @@ c
 c  ...give total degrees of freedom
       NrdofV = m
 c
+#if DEBUG_MODE
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001) Xi(1:3)
@@ -371,6 +389,7 @@ c  ...print this when debugging
         enddo
         call pause
       endif
+#endif
 c
 c
       end subroutine shape3DVBrokenHexa

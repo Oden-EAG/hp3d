@@ -1,1 +1,0 @@
-      dimension VshapP(NDOFMAXP),DvshapP(3,NDOFMAXP)

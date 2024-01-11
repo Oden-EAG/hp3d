@@ -48,7 +48,7 @@ subroutine propagate_flag(Icomp,Nflag)
 !
    integer, intent(in) :: Icomp,Nflag
 !
-   character(len=4) :: etype
+   integer :: etype
    integer :: iel,mdle,ifc,nrfn,i,j,nod
 !
 !..element nodes and orientations, face nodes
@@ -72,7 +72,7 @@ subroutine propagate_flag(Icomp,Nflag)
 !$OMP DO
    do iel=1,NRELES
       mdle = ELEM_ORDER(iel)
-      etype = NODES(mdle)%type
+      etype = NODES(mdle)%ntype
 !
 !  ...determine element nodes
       call elem_nodes(mdle, nodesl,norientl)
@@ -178,20 +178,20 @@ subroutine my_sizetest
    nH=0; nE=0; nV=0; nQ=0
 !
    write(*,*) 'my_sizetest: NRHVAR, NREVAR, NRVVAR, NRQVAR = ', &
-                                  NRHVAR, NREVAR, NRVVAR, NRQVAR
+                            NRHVAR, NREVAR, NRVVAR, NRQVAR
    do nod = 1, NRNODS
       if (Is_inactive(nod)) cycle
-      select case(NODES(nod)%type)
-         case('vert')
+      select case(NODES(nod)%ntype)
+         case(VERT)
             nH = nH + 1
-         case('medg')
+         case(MEDG)
             nH = nH + MAXP-1
             nE = nE + NREVAR*MAXP
-         case('mdlq')
+         case(MDLQ)
             nH = nH + NRHVAR*MAXmdlqH
             nE = nE + NREVAR*MAXmdlqE
             nV = nV + NRVVAR*MAXmdlqV
-         case('mdlb')
+         case(MDLB)
             nH = nH + NRHVAR*MAXmdlbH
             nE = nE + NREVAR*MAXmdlbE
             nV = nV + NRVVAR*MAXmdlbV
@@ -338,101 +338,3 @@ subroutine get_Beta(Xp,Fld_flag, Zbeta,Zdbeta,Zd2beta)
    endif
 !
 end subroutine get_Beta
-!
-!
-!-------------------------------------------------------------------------------
-!
-!  routine: copy_coms
-!
-!  last modified: Jan 2019
-!
-!  purpose: copies all solution dofs from one component set to another
-!
-!  input:   - No1: component to copy from
-!           - No2: component to copy to
-!
-!-------------------------------------------------------------------------------
-!
-subroutine copy_coms(No1,No2)
-!
-   use parameters
-   use data_structure3D
-!
-   implicit none
-!
-   integer, intent(in)  :: No1,No2
-!
-   integer :: nod, nf, nt, nn2, i
-!
-!-------------------------------------------------------------------------------
-!
-!..check consistency
-   if ((No1.lt.0).or.(No2.lt.0).or.(No1.gt.NRCOMS).or.(No2.gt.NRCOMS)) then
-      write(*,*) 'copy_coms: No1,No2,NRCOMS = ', No1,No2,NRCOMS, ' . stop.'
-      stop
-   endif
-   if (No1.eq.No2) return
-!
-!..loop through active nodes
-!$OMP PARALLEL DO          &
-!$OMP PRIVATE(nf,nt,nn2,i) &
-!$OMP SCHEDULE(DYNAMIC)
-   do nod=1,NRNODS
-      if (Is_inactive(nod)) cycle
-      if (.not. associated(NODES(nod)%dof)) cycle
-!
-!  ...H1 dof
-      if (.not. associated(NODES(nod)%dof%zdofH)) goto 10
-      nf = (No1-1)*NRHVAR
-      nt = (No2-1)*NRHVAR
-      nn2 = ubound(NODES(nod)%dof%zdofH,2)
-      if(nn2.gt.0) then
-         do i=1,NRHVAR
-            NODES(nod)%dof%zdofH(nt+i,1:nn2) = NODES(nod)%dof%zdofH(nf+i,1:nn2)
-         enddo
-      endif
-  10  continue
-!
-!  ...H(curl) dof
-      if (.not. associated(NODES(nod)%dof%zdofE)) goto 20
-      nf = (No1-1)*NREVAR
-      nt = (No2-1)*NREVAR
-      nn2 = ubound(NODES(nod)%dof%zdofE,2)
-      if(nn2.gt.0) then
-         do i=1,NREVAR
-            NODES(nod)%dof%zdofE(nt+i,1:nn2) = NODES(nod)%dof%zdofE(nf+i,1:nn2)
-         enddo
-      endif
-  20  continue
-!
-!  ...H(div) dof
-      if (.not. associated(NODES(nod)%dof%zdofV)) goto 30
-      nf = (No1-1)*NRVVAR
-      nt = (No2-1)*NRVVAR
-      nn2 = ubound(NODES(nod)%dof%zdofV,2)
-      if(nn2.gt.0) then
-         do i=1,NRVVAR
-            NODES(nod)%dof%zdofV(nt+i,1:nn2) = NODES(nod)%dof%zdofV(nf+i,1:nn2)
-         enddo
-      endif
-  30  continue
-!
-!  ...L2 dof
-      if (.not. associated(NODES(nod)%dof%zdofQ)) goto 40
-      nf = (No1-1)*NRQVAR
-      nt = (No2-1)*NRQVAR
-      nn2 = ubound(NODES(nod)%dof%zdofQ,2)
-      if(nn2.gt.0) then
-         do i=1,NRQVAR
-            NODES(nod)%dof%zdofQ(nt+i,1:nn2) = NODES(nod)%dof%zdofQ(nf+i,1:nn2)
-         enddo
-      endif
-  40  continue
-!
-!..end of loop through nodes
-   enddo
-!$OMP END PARALLEL DO
-!
-end subroutine copy_coms
-!
-!

@@ -14,6 +14,8 @@ module commonParam
 !
    use parameters
 !
+   implicit none
+!
 !..i
    complex(8), parameter :: ZI = (0.d0,1.d0)
 !
@@ -71,7 +73,6 @@ module commonParam
 !$OMP THREADPRIVATE (ICOMP_TS)
    integer :: ICHOOSE_DISP, ICHOOSE_COMP, ICHOOSE_SIGPUMP
    integer :: IEXACT_DISP
-   integer, parameter :: MY_NR_RHS=1
 !
 !..Problem Number
 !  ...... NO_PROBLEM = 1 Heat Solve (linear)
@@ -145,16 +146,16 @@ module commonParam
       use data_structure3D
       logical :: Is_pml
       integer, intent(in) :: Mdle
-      real(8)          :: xnod(3,8)
-      real(8)          :: maxz
-      character(len=4) :: etype
+      real(8) :: xnod(3,8)
+      real(8) :: maxz
+      integer :: etype
       xnod(1:3,1:8) = 0.d0
       call nodcor_vert(Mdle, xnod)
-      etype = NODES(Mdle)%type
+      etype = NODES(Mdle)%ntype
       select case(etype)
-         case('mdlb')
+         case(MDLB)
             maxz = maxval(xnod(3,1:8))
-         case('mdlp')
+         case(MDLP)
             maxz = maxval(xnod(3,1:6))
          case default
             write(*,*) 'Is_pml: invalid etype param. stop.'

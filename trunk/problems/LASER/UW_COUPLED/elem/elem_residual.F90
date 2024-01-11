@@ -44,7 +44,7 @@ subroutine elem_residual(Mdle, Resid,Nref_flag)
    integer :: norder(19),norderP(19),nordP
 !
 !..element type
-   character(len=4) :: etype
+   integer :: etype
 !
 !..fld_flag refers to either pump (0) or signal (1) field
    integer :: fld_flag
@@ -54,17 +54,17 @@ subroutine elem_residual(Mdle, Resid,Nref_flag)
    norder (1:19) = 0
    norderP(1:19) = 0
 !
-   etype = NODES(Mdle)%type
+   etype = NODES(Mdle)%ntype
 !..determine order of approximation
    call find_order(Mdle, norder)
 !..set the enriched order of appoximation
    select case(etype)
-      case('mdlb')
+      case(MDLB)
          nordP = NODES(Mdle)%order+NORD_ADD*111
-      case('mdln','mdld')
-         nordP = NODES(Mdle)%order+NORD_ADD
-      case('mdlp')
+      case(MDLP)
          nordP = NODES(Mdle)%order+NORD_ADD*11
+      case(MDLN,MDLD)
+         nordP = NODES(Mdle)%order+NORD_ADD
       case default
          write(*,*) 'elem_residual: invalid etype param. stop.'
          stop

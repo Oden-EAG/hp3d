@@ -1,0 +1,6 @@
+100000              MAXNODS max number of nodes anticipated
+4                   NR_PHYSA number of physics attributes
+ucont   contin 2    H1 component
+etang   tangen 2    H(curl) component
+vnorm   normal 2    H(div) component
+qdisc   discon 2    L2 component

@@ -8,6 +8,7 @@ subroutine exec_case(idec)
    use mpi_param
    use mpi
    use common_prob_data
+   use paraview      , only: paraview_select_attr
    use zoltan_wrapper, only: zoltan_w_partition,zoltan_w_eval
 !
    implicit none
@@ -17,7 +18,8 @@ subroutine exec_case(idec)
    logical :: solved
    integer :: mdle_subd(NRELES)
    integer :: i,mdle,kref,src,count,ierr,nord
-   integer :: iParAttr(2) = (/1,0/)
+   logical :: iPvAttr(2)
+   real(8) :: res
 !
 !----------------------------------------------------------------------
 !
@@ -27,8 +29,9 @@ subroutine exec_case(idec)
 !
 !  ...paraview graphics
       case(3)
-         iParAttr(1:2) = (/1,0/) ! write field output only
-         call my_paraview_driver(iParAttr)
+         iPvAttr(1:2) = (/.true.,.false./) ! write field output only
+         call paraview_select_attr(iPvAttr)
+         call paraview_driver
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 !  ...print data structure (interactive)
@@ -138,17 +141,17 @@ subroutine exec_case(idec)
 !  ...solve problem with omp_mumps (OpenMP MUMPS)
       case(40)
          write(*,*) 'calling MUMPS (MPI) solver...'
-         call par_mumps_sc('G')
+         call par_mumps_sc('H')
 !
 !  ...solve problem with par_mumps (MPI MUMPS)
       case(41)
          write(*,*) 'calling MUMPS (OpenMP) solver...'
-         call mumps_sc('G')
+         call mumps_sc('H')
 !
 !  ...solve problem with pardiso (OpenMP)
       case(42)
          write(*,*) 'calling Pardiso (OpenMP) solver...'
-         call pardiso_sc('G')
+         call pardiso_sc('H')
 !
 !  ...solve problem with Frontal solver (sequential)
       case(43)
@@ -158,12 +161,12 @@ subroutine exec_case(idec)
 !  ...solve problem with omp_mumps (OpenMP MUMPS)
       case(44)
          write(*,*) 'calling MUMPS (MPI) nested dissection solver...'
-         call par_nested('G')
+         call par_nested('H')
 !
 !  ...solve problem with PETSc solver (MPI)
       case(45)
          write(*,*) 'calling PETSc (MPI) solver...'
-         call petsc_solve('G')
+         call petsc_solve('P')
 !
       case(50)
          write(*,*) 'computing error...'
@@ -171,7 +174,7 @@ subroutine exec_case(idec)
 !
       case(51)
          write(*,*) 'computing residual...'
-         call residual
+         call residual(res)
 !
       case(60)
          write(*,*) 'flushing dof'

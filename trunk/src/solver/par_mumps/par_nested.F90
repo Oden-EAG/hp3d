@@ -53,7 +53,7 @@ subroutine par_nested(mtype)
    use control,    only: ISTC_FLAG
    use stc,        only: HERM_STC,CLOC,stc_alloc,stc_dealloc,  &
                          stc_get_nrdof,stc_bwd
-   use parameters, only: ZONE
+   use parameters, only: ZONE,NRRHS
    use par_mumps , only: mumps_par,mumps_bub,                  &
                          mumps_start_par,mumps_destroy_par,    &
                          mumps_start_subd,mumps_destroy_subd
@@ -61,7 +61,7 @@ subroutine par_nested(mtype)
    use mpi_param , only: RANK,ROOT,NUM_PROCS
    use MPI       , only: MPI_SUM,MPI_MIN,MPI_MAX,MPI_IN_PLACE, &
                          MPI_INTEGER,MPI_INTEGER8,             &
-                         MPI_REAL8,MPI_COMPLEX16
+                         MPI_REAL8,MPI_COMPLEX16,MPI_Wtime
    use mkl_spblas
 !
    implicit none
@@ -111,7 +111,7 @@ subroutine par_nested(mtype)
    type (MATRIX_DESCR)    :: Aib_descr
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time,time_stamp
+   real(8) :: start_time,end_time,time_stamp
 !
 !..info (verbose output if true)
    logical :: info = .false.
@@ -142,7 +142,8 @@ subroutine par_nested(mtype)
    endif
 !
 !..TODO multiple right-hand sides
-   NR_RHS = 1
+   NR_RHS = NRRHS
+!
    call mumps_start_par
    call mumps_start_subd
 !

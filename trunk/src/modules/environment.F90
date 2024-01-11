@@ -1,10 +1,11 @@
 !----------------------------------------------------------------------------
-!> Purpose : define initialization variables
-!!
-!! @date Dec 14
+!> @brief Defines variables for initialization
+!> @date Mar 2023
 !----------------------------------------------------------------------------
 !
 module environment
+!
+      implicit none
 !
       save
 !
@@ -31,21 +32,20 @@ module environment
       logical :: L2PROJ     = .FALSE.
       logical :: L2GEOM     = .FALSE.
 !
-contains
 !
+   contains
 !
 !
 !----------------------------------------------------------------------------
-!> Purpose : determines value of a BOOLEAN option variable (.TRUE. if
-!!           present). If option is not present, valued is set to a
-!!           user-provided default value.
+!> @brief Determines value of a BOOLEAN option variable (.TRUE. if present)
+!> @note  If option is not present, value is set to a user-provided default
 !!
 !! @param[in ] Aopt  - name of BOOLEAN option
 !! @param[in ] Atext - text explanation of option
 !! @param[in ] Ndef  - default value of BOOLEAN option
 !! @param[out] Nval  - actual value of BOOLEAN option
 !!
-!> rev@Dec 2012
+!> @date Mar 2023
 !----------------------------------------------------------------------------
   subroutine get_option_bool(Aopt,Atext,Ndef, Nval)
  !
@@ -94,20 +94,19 @@ contains
        end if
     end if
 
-  endsubroutine get_option_bool
-
-
-
+  end subroutine get_option_bool
+!
+!
 !----------------------------------------------------------------------------
-!> Purpose : determines value of an INTEGER option variable. If option is
-!!           not present, valued is set to a user-provided default value.
+!> @brief Determines value of an INTEGER option variable
+!> @note  If option is not present, value is set to a user-provided default
 !!
 !! @param[in ] Aopt  - name of INTEGER option
 !! @param[in ] Atext - text explanation of option
 !! @param[in ] Ndef  - default value of INTEGER option
 !! @param[out] Nval  - actual value of INTEGER option
 !!
-!> rev@Dec 2012
+!> @date Mar 2023
 !----------------------------------------------------------------------------
   subroutine get_option_int(Aopt, Atext, Ndef, Nval)
 !
@@ -156,20 +155,19 @@ contains
        end if
     end if
 
-  endsubroutine get_option_int
-
-
-
+  end subroutine get_option_int
+!
+!
 !----------------------------------------------------------------------------
-!> Purpose : determines value of a REAL option variable. If option is
-!!           not present, valued is set to a user-provided default value.
+!> @brief Determines value of a REAL option variable
+!> @note  If option is not present, value is set to a user-provided default
 !!
 !! @param[in ] Aopt  - name of REAL option
 !! @param[in ] Atext - text explanation of option
 !! @param[in ] Def   - default value of REAL option
 !! @param[out] Val   - actual value of REAL option
 !!
-!> rev@Dec 2012
+!> @date Mar 2023
 !----------------------------------------------------------------------------
   subroutine get_option_real(Aopt,Atext,Def, Val)
 !
@@ -218,20 +216,19 @@ contains
        end if
     end if
 
-  endsubroutine get_option_real
-
-
-
+  end subroutine get_option_real
+!
+!
 !----------------------------------------------------------------------------
-!> Purpose : determines value of a COMPLEX option variable. If option is
-!!           not present, valued is set to a user-provided default value.
+!> @brief Determines value of a COMPLEX option variable
+!> @note  If option is not present, value is set to a user-provided default
 !!
 !! @param[in ] Aopt  - name of COMPLEX option
 !! @param[in ] Atext - text explanation of option
 !! @param[in ] Def   - default value of COMPLEX option
 !! @param[out] Val   - actual value of COMPLEX option
 !!
-!> rev@Mar 2013
+!> @date Mar 2023
 !----------------------------------------------------------------------------
   subroutine get_option_comp(Aopt,Atext,Def, Val)
 
@@ -241,8 +238,7 @@ contains
     complex(8),      intent(out) :: Val
 
     integer :: i, ifound
-!----------------------------------------------------------------------------
-
+!
     if (IDRY_) then
        write(*,*) Aopt, ' Real has default value = ', Def, ' ,', Atext
     else
@@ -273,20 +269,19 @@ contains
        end if
     end if
 
-  endsubroutine get_option_comp
-
-
-
+  end subroutine get_option_comp
+!
+!
 !----------------------------------------------------------------------------
-!> Purpose : determines value of a STRING option variable. If option is not
-!!           present, valued is set to a user-provided default value.
+!> @brief Determines value of a STRING option variable
+!> @note  If option is not present, value is set to a user-provided default
 !!
 !! @param[in ] Aopt  - name of STRING option
 !! @param[in ] Atext - text explanation of option
 !! @param[in ] Adef  - defaul value of STRING option
 !! @param[out] Aval  - actual value of STRING option
 !!
-!> rev@Dec 2012
+!> @date Mar 2023
 !----------------------------------------------------------------------------
   subroutine get_option_string(Aopt, Atext, Adef, Aval)
 !
@@ -298,8 +293,7 @@ contains
     character(len=25 ) :: str2
     character(len=100) :: str3
     integer :: i, ifound
-!----------------------------------------------------------------------------
-
+!
     if (IDRY_) then
        write(str1,'(a20)' ) Aopt
        write(str2,'(a25)' ) Adef
@@ -334,19 +328,18 @@ contains
        end if
     end if
 
-  endsubroutine get_option_string
-
-
-
+  end subroutine get_option_string
+!
+!
 !----------------------------------------------------------------------------
-!> Purpose : reads in options arguments
+!> @brief Reads in options arguments
+!> @date Mar 2023
 !----------------------------------------------------------------------------
   subroutine begin_environment
-
+!
     implicit none
     integer :: i
-!----------------------------------------------------------------------------
-
+!
     ! number of arguments
     ARGC_ = command_argument_count()
 
@@ -360,17 +353,23 @@ contains
     call get_option_bool('-help'   ,'Dry run'       ,.FALSE., IDRY_)
     call get_option_bool('-verbose','Verbose output',.FALSE., IVERBOSE_)
 
-  endsubroutine begin_environment
-
-
-
+  end subroutine begin_environment
+!
+!
+!----------------------------------------------------------------------------
+!> @date Mar 2023
+!----------------------------------------------------------------------------
   subroutine end_environment
     implicit none
     if (IDRY_) then
        stop 1
     end if
   end subroutine end_environment
-
+!
+!
+!----------------------------------------------------------------------------
+!> @date Mar 2023
+!----------------------------------------------------------------------------
   subroutine disp_env(Iout)
     implicit none
     integer, intent(in) :: Iout
@@ -381,6 +380,7 @@ contains
        write(Iout,*) 'Idx = ', i, '  Content = ', ARGS_(i)
     end do
     !
-  endsubroutine disp_env
-  !
-endmodule environment
+  end subroutine disp_env
+!
+!
+end module environment

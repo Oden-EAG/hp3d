@@ -1,5 +1,5 @@
 !----------------------------------------------------------------------------------------
-!> Purpose : write vector attribute to .h5 file
+!> @brief      write vector attribute to .h5 file
 !!
 !> @param[in ] Sname   - name/description (e.g., 'Vector')
 !> @param[in ] Sfile   - attribute file name (e.g., ../output/paraview/vector_00000.h5)
@@ -7,7 +7,7 @@
 !> @param[in ] Idx     - index identifying vector attribute
 !> @param[out] Ic      - number of vertices of visualization object
 !!
-!> @date Oct 2019
+!> @date       Mar 2023
 !----------------------------------------------------------------------------------------
 !
 #include "typedefs.h"
@@ -16,10 +16,10 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
 !
    use data_structure3D
    use element_data
-   use physics          , only: DTYPE,ADRES
+   use physics
    use upscale
    use paraview
-   use MPI              , only: MPI_COMM_WORLD,MPI_SUM,MPI_INTEGER
+   use MPI              , only: MPI_COMM_WORLD,MPI_SUM,MPI_INTEGER,MPI_Wtime
    use mpi_param        , only: RANK,ROOT,NUM_PROCS
    use par_mesh         , only: DISTRIBUTED,HOST_MESH
 !
@@ -32,7 +32,7 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
    integer,          intent(out) :: Ic
 !
    type(vis)                           :: vis_obj
-   character(len=4)                    :: etype
+   integer                             :: ntype
    integer                             :: mdle, nflag, iel, iv, nV
    real(8), dimension(3)               :: xi,x,val
    integer, dimension(12)              :: nedge_orient
@@ -56,28 +56,24 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
    integer :: ibeg,iattr,icomp,isol,iload,ireal,ndom
    real(8), external :: dreal_part,dimag_part
 !
+   integer :: VTU_data_size
+!
 !..OpenMP parallelization: auxiliary variables
    integer, dimension(NRELES) :: n_vert_offset, n_elem_vert
-!
-!..timer
-   !real(8) :: start_time,end_time
 !
 !..MPI
    integer :: ierr,count,subd
 !
 !----------------------------------------------------------------------------------------
 !
-!   if (RANK .eq. ROOT) write(*,*) 'vector2vtk:'
-!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-!
 !..Step 1 : Preliminary calculations (offsets, etc.)
    Ic=0
 !
 !..decode
-   ireal = iabs(Idx)/Idx
-   iload = iabs(Idx)/100
-   iattr = iabs(Idx) - iload*100 ; iattr=iattr/10
-   icomp = iabs(Idx) - iload*100 - iattr*10
+   ireal = abs(Idx)/Idx
+   iload = abs(Idx)/100
+   iattr = abs(Idx) - iload*100 ; iattr=iattr/10
+   icomp = abs(Idx) - iload*100 - iattr*10
 !
 !..address of 1st component for the attribute
    ibeg=ADRES(iattr)
@@ -90,26 +86,20 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
          call find_domain(mdle, ndom)
          if (ndom.ne.PARAVIEW_DOMAIN) cycle
       endif
-      etype = NODES(mdle)%type
-      vis_obj = vis_on_type(etype)
+      ntype = NODES(mdle)%ntype
+      vis_obj = vis_on_type(ntype)
       n_vert_offset(iel) = Ic
       n_elem_vert(iel) = vis_obj%nr_vert
       Ic = Ic + vis_obj%nr_vert
    enddo
 !
-!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
-!   if (RANK .eq. ROOT) write(*,300) end_time - start_time
-!   300 format(' timer: ',f12.5,' seconds')
-!
    call attr_init(3,Ic); ATTR_VAL(1:3,1:Ic) = 0
-!
-!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
 !
 !..Step 2 : Write attribute of interest
 !
    nflag=1
 !$OMP PARALLEL DO                                     &
-!$OMP PRIVATE(mdle,ndom,etype,iv,nV,xi,               &
+!$OMP PRIVATE(mdle,ndom,ntype,iv,nV,xi,               &
 !$OMP         xnod,zdofH,zdofE,zdofV,zdofQ,           &
 !$OMP         norder,nedge_orient,nface_orient,       &
 !$OMP         x,dxdxi,zsolH,zgradH,zsolE,zcurlE,      &
@@ -135,14 +125,14 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
       call find_elem_nodes(mdle, norder,nedge_orient,nface_orient)
 !
 !  ...select appropriate visualization object
-      etype = NODES(mdle)%type
+      ntype = NODES(mdle)%ntype
       nV = n_elem_vert(iel)
 !
 !  ...loop over nodes of visualization object
       do iv=1,nV
 !
 !     ...visualization point accounting for VLEVEL
-         call get_vis_point(vis_on_type(etype),iv-1, xi)
+         call get_vis_point(vis_on_type(ntype),iv-1, xi)
 !
 !     ...compute element solution
          call soleval(mdle,xi,nedge_orient,nface_orient,norder,xnod, &
@@ -150,10 +140,10 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
                       zsolH,zgradH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
 !
 !     ...approximation space
-         select case(DTYPE(iattr))
+         select case(D_TYPE(iattr))
 !
 !        -- H^1 -- (FOR GRADIENT INFO)
-         case('contin')
+         case(CONTIN)
             isol = (iload-1)*NRHVAR + ibeg + icomp
 !
 !        ...REAL part
@@ -169,7 +159,7 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
             endif
 !
 !        -- H(curl) --
-         case('tangen')
+         case(TANGEN)
             isol = (iload-1)*NREVAR + ibeg + icomp
 !
 !        ...REAL part
@@ -185,7 +175,7 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
             endif
 !
 !        -- H(div) --
-         case('normal')
+         case(NORMAL)
             isol = (iload-1)*NRVVAR + ibeg + icomp
 !
 !        ...REAL part
@@ -214,9 +204,6 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
    enddo
 !$OMP END PARALLEL DO
 !
-!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
-!   if (RANK .eq. ROOT) write(*,300) end_time - start_time
-!
 !..Step 3 : Collect on host
 !
    if (DISTRIBUTED .and. .not. HOST_MESH) then
@@ -230,10 +217,19 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
 !
 !..Step 4 : Write to file with HDF5
 !
-!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-   if (RANK .eq. ROOT) call attr_write(Sname,len(Sname),Sfile,len(Sfile),Snick,len(Snick))
-!   call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time = MPI_Wtime()
-!   if (RANK .eq. ROOT) write(*,300) end_time - start_time
+   if (RANK .eq. ROOT) then
+      if (.not. VIS_VTU) then
+         call attr_write(Sname,len(Sname),Sfile,len(Sfile),Snick,len(Snick))
+      else
+!     ...appending the attribute data in VTU file
+         nV = size(ATTR_VAL,dim=2)
+         VTU_data_size = nV * 3 * 8
+         write(PARAVIEW_IO) VTU_data_size
+         do iv = 1,nV
+            write(PARAVIEW_IO) ATTR_VAL(1,iv),ATTR_VAL(2,iv),ATTR_VAL(3,iv)
+         enddo
+      endif
+   endif
 !
 !..Step 5 : Deallocate
 !

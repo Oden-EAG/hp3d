@@ -10,7 +10,7 @@
 !           The remaining fields are assumed not to be written by update_Ddof,
 !           since the corresponding attributes are deactivated via PHYSAm.
 !-------------------------------------------------------------------------------
-!> Purpose : calculate dirichlet boundary condition
+!> Purpose : calculate Dirichlet boundary condition
 !> last mod: June 2021
 !!
 !! @param[in]  Mdle  - an element (middle node) number
@@ -54,8 +54,8 @@ subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
    VTYPE,dimension(  MAXEQNQ,3,3)             :: d2valQ
 !
 #if DEBUG_MODE
-!..printing flag : 0 - silent ; 1 - verbose
-   integer :: iprint = 0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !-------------------------------------------------------------------------------

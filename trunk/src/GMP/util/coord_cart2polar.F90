@@ -27,13 +27,12 @@ end subroutine coord_cart2polar
 !  ...for backward compatibility
 subroutine cart_to_polar(Xp, R,Theta)
 !
-      use math_constants , only : PI
-!
       implicit none
       real(8), intent(in ) :: Xp(2)
       real(8), intent(out) :: R,Theta
 !
       real(8) :: x,y
+      real(8), parameter :: PI = acos(-1.d0)
       real(8), parameter :: eps=1.d-13
       integer :: iprint
 !----------------------------------------------------------------------

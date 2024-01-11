@@ -1,9 +1,9 @@
 !--------------------------------------------------------------------------
-!> Purpose : find neighbors (up to 4, for an h4 refined face) across faces
-!! @param[in]  Mdle - middle node
-!! @param[out] Neig - neighbors
+!> @brief      find neighbors (up to 4 for an h4 refined face) across faces
+!! @param[in]  Mdle      - middle node
+!! @param[out] Neig_list - neighbors
 !!
-!! @revision May 12
+!! @date       Feb 2023
 !--------------------------------------------------------------------------
 !
 subroutine find_neig(Mdle, Neig_list)
@@ -12,30 +12,35 @@ subroutine find_neig(Mdle, Neig_list)
   implicit none
   ! ** Arguments
   !---------------------------------------------------
-  integer,                 intent(in)  :: Mdle
-  integer, dimension(4,6), intent(out) :: Neig_list
+  integer, intent(in)  :: Mdle
+  integer, intent(out) :: Neig_list(4,6)
 
   ! ** Locals
   !---------------------------------------------------
-  character(len=4) :: type
   integer, dimension(27) :: nodesl,norientl
-  integer, dimension(2)  :: neig, nsid_list,norient_list
-  integer :: iprint, i, nod, nrneig
+  integer, dimension(2)  :: neig,nsid_list,norient_list
+  integer :: i,nod,nrneig,ntype
+  !
+#if DEBUG_MODE
+  integer :: iprint
+  iprint=0
+#endif
   !---------------------------------------------------
-  iprint = 0
 
   !  ...initialize
   Neig_list(1:4,1:6)=0
-  type=NODES(Mdle)%type
+  ntype=NODES(Mdle)%ntype
+  !
+#if DEBUG_MODE
   if (iprint.eq.1) then
-     write(*,*) 'find_neig: Mdle, type = ', Mdle, type
+     write(*,*) 'find_neig: Mdle, type = ', Mdle, S_Type(ntype)
   endif
-
+#endif
   !---------------------------------------------------
   ! Step 0: short cut for initial mesh elements only
   !---------------------------------------------------
   if (is_root(Mdle)) then
-     do i=1,nface(type)
+     do i=1,nface(ntype)
         Neig_list(1:4,i) = ELEMS(Mdle)%neig(i)
      enddo
      return
@@ -45,8 +50,8 @@ subroutine find_neig(Mdle, Neig_list)
   ! Step 1: use neig_face
   !---------------------------------------------------
   call elem_nodes(Mdle, nodesl,norientl)
-  do i=1,nface(type)
-     nod = nodesl(nvert(type)+nedge(type)+i)
+  do i=1,nface(ntype)
+     nod = nodesl(nvert(ntype)+nedge(ntype)+i)
      call neig_face(nod, nrneig,neig,nsid_list,norient_list)
      select case (nrneig)
      case(1)

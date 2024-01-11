@@ -1,13 +1,16 @@
-!> Purpose - test routines determining neighbors
+!> @brief   test routines determining neighbors
+!> @date    Feb 2023
 subroutine verify_neig
   use data_structure3D
   implicit none
-  integer, dimension(27) :: nodesl,norientl
+  integer, dimension(27) :: nodesl, norientl
   integer, dimension(2)  :: neig, nsid_list, norient_list
-  integer :: i,j, iface, mdle, nod, nrneig, loc, iprint
-  character(len=4) :: type
+  integer :: i, j, iface, mdle, nod, nrneig, loc, ntype
 
+#if DEBUG_MODE
+  integer :: iprint
   iprint=0
+#endif
 
   !  ...loop over active elements
   do i=1,NRELES
@@ -15,24 +18,28 @@ subroutine verify_neig
      call elem_nodes(mdle, nodesl,norientl)
 
      !  ...loop over element's faces
-     type=NODES(mdle)%type
-     do iface=1,nface(type)
-        j   = nvert(type) + nedge(type) + iface
+     ntype=NODES(mdle)%ntype
+     do iface=1,nface(ntype)
+        j   = nvert(ntype) + nedge(ntype) + iface
         nod = nodesl(j)
 
-        !  ...printing
+#if DEBUG_MODE
         if (iprint.eq.1) then
            write(*,7002) mdle, iface, nod
 7002       format(' verify_neig: mdle, iface, nod    = ',3i10)
         endif
+#endif
 
         call neig_face(nod, nrneig,neig,nsid_list,norient_list)
+
+#if DEBUG_MODE
         if (iprint.eq.1) then
           write(*,7003) neig(1:nrneig)
 7003      format('verify_neig: mdle NODES NEIGHBORS = ',2i10)
         endif
+#endif
         call locate(mdle,neig,nrneig, loc)
-
+        
         !  ...check
         select case(loc)
         !  ...mdle not found on list of neighbors
@@ -53,10 +60,9 @@ subroutine verify_neig
         endselect
 
      enddo
+#if DEBUG_MODE
      if (iprint.eq.1) call pause
+#endif
   enddo
 
-
 end subroutine verify_neig
-
-

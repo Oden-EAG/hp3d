@@ -20,12 +20,13 @@ program main
    use physics
    use commonParam
    use laserParam
+   use paraview
 !
    use assembly
    use assembly_sc, only: IPRINT_TIME
    use stc        , only: STORE_STC,HERM_STC
 !
-   use MPI        , only: MPI_COMM_WORLD,MPI_BARRIER,MPI_ABORT, &
+   use MPI        , only: MPI_COMM_WORLD,MPI_BARRIER,MPI_ABORT,MPI_Wtime, &
                           MPI_GET_PROCESSOR_NAME,MPI_MAX_PROCESSOR_NAME
    use mpi_param  , only: ROOT,RANK,NUM_PROCS
    use mpi_wrapper, only: mpi_w_init,mpi_w_finalize
@@ -34,6 +35,8 @@ program main
 !
 !..auxiliary variables
    integer :: i, ierr, req, ret, plen
+!
+   logical :: iPvAttr(7),iPvCompReal(18),iPvCompImag(18)
 !
 !..OMP variables
 #if HP3D_USE_OPENMP
@@ -44,7 +47,7 @@ program main
    character(MPI_MAX_PROCESSOR_NAME) :: pname
 !
 !..timer
-   real(8) :: MPI_Wtime, start_time, end_time
+   real(8) :: start_time, end_time
 !
    character       :: arg
    character(1024) :: cmd
@@ -192,20 +195,34 @@ program main
 !  (2) - Hcurl for Maxwell trace for signal (2 components)
 !  (3) - Hcurl for Maxwell trace for pump   (2 components)
 !  (4) - Hdiv trace for heat (1 component)
-!  (5) - L2 field for Maxwell (signal, 6 components)
-!  (6) - L2 field for Maxwell (pump  , 6 components)
-   PHYSAi(1:6) = (/.false.,.true.,.true.,.true.,.false.,.false./)
+!  (5) - L2 field for Maxwell (signal   , 6 components)
+!  (6) - L2 field for Maxwell (pump     , 6 components)
+!  (7) - L2 field for Maxwell (auxiliary, 6 components)
+   PHYSAi(1:7) = (/.false.,.true.,.true.,.true.,.false.,.false.,.false./)
 !
 !..set homogeneous Dirichlet flags
    if (NEXACT.eq.0) then
-      PHYSAd(1:6) = (/.true.,.false.,.false.,.true.,.false.,.false./)
+      PHYSAd(1:7) = (/.true.,.false.,.false.,.true.,.false.,.false.,.false./)
    endif
 !
 !..By default, solve Maxwell for signal field
 !  (note: NO_PROBLEM and PHYSAm(:) flags are used in updating Dirichlet BCs)
 !         NO_PROBLEM: 2 - heat, 3 - signal, 4 - pump
    NO_PROBLEM = 3
-   PHYSAm(1:6) = (/.false.,.true.,.false.,.false.,.true.,.false./)
+   PHYSAm(1:7) = (/.false.,.true.,.false.,.false.,.true.,.false.,.false./)
+!
+!..Paraview export: by default,
+!     print only the field variables (no traces), and no auxiliary fields
+      iPvAttr = (/.true.,.false.,.false.,.false.,.true.,.true.,.false./)
+      call paraview_select_attr(iPvAttr)
+!     print real parts of all components
+      iPvCompReal = .true.
+      call paraview_select_comp_real(iPvCompReal)
+!     print imaginary parts of complex-valued fields only
+      iPvCompImag = .true.
+      iPvCompImag(1) = .false. ! temperature field
+      iPvCompImag(6) = .false. ! heat flux
+      call paraview_select_comp_imag(iPvCompImag)
 !
 !..set static condensation flags
    ISTC_FLAG = .true. ! activate automatic static condensation
@@ -445,11 +462,12 @@ subroutine master_main()
                write(*,*) '   nr_elem_ref = ', nr_elem_ref
                do i=1,nr_elem_ref
                   read(UNIT=9, FMT="(I6)") mdle
-                  select case (NODES(mdle)%type)
-                     case('mdlb'); kref = 110
-                     case('mdlp'); kref = 10
+                  select case (NODES(mdle)%ntype)
+                     case(MDLB); kref = 110
+                     case(MDLP); kref = 10
                      case default
-                        write(*,*) 'READING UNEXPECTED ELEMENT TYPE (mdle): ',NODES(mdle)%type,' (',mdle,')'
+                        write(*,*) 'READING UNEXPECTED ELEMENT TYPE (mdle): ', &
+                                    S_Type(NODES(mdle)%ntype),' (',mdle,')'
                         call pause
                   end select
                   call refine(mdle,kref)

@@ -5,19 +5,21 @@ subroutine exec_job
 !
    use commonParam
    use data_structure3D
-   use MPI           , only: MPI_COMM_WORLD
+   use MPI           , only: MPI_COMM_WORLD,MPI_Wtime
    use mpi_param     , only: RANK,ROOT,NUM_PROCS
    use par_mesh      , only: EXCHANGE_DOF,distr_mesh
-   use zoltan_wrapper, only: zoltan_w_set_lb,zoltan_w_eval
+   use paraview      , only: paraview_select_attr
+   use zoltan_wrapper
 !
    implicit none
 !
-   integer :: flag(6),iParAttr(6)
+   integer :: flag(7)
+   logical :: iPvAttr(7)
    integer :: physNick,nstop
    logical :: ires
 !
    integer :: i,ierr,numPts,fld
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 !----------------------------------------------------------------------
 !
@@ -36,7 +38,7 @@ subroutine exec_job
 !..distribute mesh initially
    call distr_mesh
 !..set Zoltan partitioner
-   call zoltan_w_set_lb(0)
+   call zoltan_w_set_lb(ZOLTAN_LB_DEFAULT)
 !
    do i=1,IMAX+JMAX
 !
@@ -69,9 +71,9 @@ subroutine exec_job
 !
 !  ...set partitioner for load balancing, redistributes mesh in 'distr_mesh'
       if (i .eq. IMAX-2) then
-         call zoltan_w_set_lb(7) ! fiber partitioner
+         call zoltan_w_set_lb(ZOLTAN_LB_FIBER) ! fiber partitioner
       elseif (i .gt. IMAX) then
-         !call zoltan_w_set_lb(6) ! graph partitioner
+         !call zoltan_w_set_lb(ZOLTAN_LB_GRAPH) ! graph partitioner
          goto 30 ! NO LOAD BALANCING
       else
          goto 30
@@ -170,9 +172,10 @@ subroutine exec_job
 !
 !  ...write paraview output
       if(RANK .eq. ROOT) write(*,200) '8. writing paraview output...'
-      iParAttr = (/0,0,0,0,2,0/)
+      iPvAttr = (/.false.,.false.,.false.,.false.,.true.,.false.,.false./)
+      call paraview_select_attr(iPvAttr)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-      call my_paraview_driver(iParAttr)
+      call my_paraview_driver
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
       if(RANK .eq. ROOT) write(*,300) end_time - start_time
 !

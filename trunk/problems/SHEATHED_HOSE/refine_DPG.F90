@@ -47,16 +47,16 @@
       integer, parameter :: max_step = 20
       integer, dimension(max_step), save :: nrdofDPG_mesh
       integer, dimension(max_step), save :: nrdofField_mesh
-      real*8, dimension(max_step), save :: residual_mesh
-      real*8, dimension(max_step), save :: rate_mesh
-      real*8, dimension(max_step), save :: error_mesh
-      real*8, dimension(max_step), save :: rel_error_mesh
-      real*8, dimension(max_step), save :: rate_error_mesh
+      real*8 , dimension(max_step), save :: residual_mesh
+      real*8 , dimension(max_step), save :: rate_mesh
+      real*8 , dimension(max_step), save :: error_mesh
+      real*8 , dimension(max_step), save :: rel_error_mesh
+      real*8 , dimension(max_step), save :: rate_error_mesh
 
 !
-      real*8, allocatable, dimension(:) :: elem_resid
-      real*8, allocatable, dimension(:) :: elem_error
-      real*8, allocatable, dimension(:) :: elem_rnorm
+      real*8 , allocatable, dimension(:) :: elem_resid
+      real*8 , allocatable, dimension(:) :: elem_error
+      real*8 , allocatable, dimension(:) :: elem_rnorm
       integer, allocatable, dimension(:) :: elem_ref_flag
       integer, allocatable, dimension(:) :: list_elem
       integer, allocatable, dimension(:) :: list_ref_flags
@@ -252,8 +252,10 @@
         call global_href
         call update_gdof
         call update_ddof
+#if DEBUG_MODE
         call verify_orient
         call verify_neig
+#endif
         nr_elem_to_refine = NRELES
 !
 !  ...adaptive refinements
@@ -302,7 +304,7 @@
 !           enddo
 !           !
 ! !      ...close the mesh
-!           call close
+!           call close_mesh
 ! !      ...update geometry and Dirichlet flux dof after the refinements
 !           call update_gdof
 !           call update_Ddof
@@ -348,12 +350,14 @@
           enddo
           !
 !      ...close the mesh
-          call close
+          call close_mesh
 !      ...update geometry and Dirichlet flux dof after the refinements
           call update_gdof
           call update_Ddof
+#if DEBUG_MODE
           call verify_orient
           call verify_neig
+#endif
         endif
       end select
 !
@@ -400,11 +404,11 @@
 !    ...calculate number of components in each energy space
         nH=0;nE=0;nV=0;nQ=0
         do iphys=1,NR_PHYSA
-          select case(DTYPE(iphys))
-          case('contin'); nH = nH + NR_COMP(iphys)
-          case('tangen'); nE = nE + NR_COMP(iphys)
-          case('normal'); nV = nV + NR_COMP(iphys)
-          case('discon'); nQ = nQ + NR_COMP(iphys)
+          select case(D_TYPE(iphys))
+          case(CONTIN); nH = nH + NR_COMP(iphys)
+          case(TANGEN); nE = nE + NR_COMP(iphys)
+          case(NORMAL); nV = nV + NR_COMP(iphys)
+          case(DISCON); nQ = nQ + NR_COMP(iphys)
           end select
         enddo
 !    ...calculate nrdofField
@@ -412,11 +416,11 @@
         do iphys=1,NR_PHYSA
 !         skip the trace variables
           if (nflag(iphys).eq.0) cycle
-          select case(DTYPE(iphys))
-          case('contin'); nrdofField=nrdofField+(NRDOFSH/nH)*NR_COMP(iphys)
-          case('tangen'); nrdofField=nrdofField+(NRDOFSE/nE)*NR_COMP(iphys)
-          case('normal'); nrdofField=nrdofField+(NRDOFSV/nV)*NR_COMP(iphys)
-          case('discon'); nrdofField=nrdofField+(NRDOFSQ/nQ)*NR_COMP(iphys)
+          select case(D_TYPE(iphys))
+          case(CONTIN); nrdofField=nrdofField+(NRDOFSH/nH)*NR_COMP(iphys)
+          case(TANGEN); nrdofField=nrdofField+(NRDOFSE/nE)*NR_COMP(iphys)
+          case(NORMAL); nrdofField=nrdofField+(NRDOFSV/nV)*NR_COMP(iphys)
+          case(DISCON); nrdofField=nrdofField+(NRDOFSQ/nQ)*NR_COMP(iphys)
           end select
         enddo
 !    ...calculation of nrdofDPG - first add all possible dof
@@ -431,11 +435,11 @@
 !        ...skip if field variable, otherwise remove middle dof and
 !           leave trace dof only
             if (nflag(iphys).eq.1) cycle
-            select case(DTYPE(iphys))
-            case('contin'); nrdofDPG=nrdofDPG-ndofH*NR_COMP(iphys)
-            case('tangen'); nrdofDPG=nrdofDPG-ndofE*NR_COMP(iphys)
-            case('normal'); nrdofDPG=nrdofDPG-ndofV*NR_COMP(iphys)
-            case('discon'); nrdofDPG=nrdofDPG-ndofQ*NR_COMP(iphys)
+            select case(D_TYPE(iphys))
+            case(CONTIN); nrdofDPG=nrdofDPG-ndofH*NR_COMP(iphys)
+            case(TANGEN); nrdofDPG=nrdofDPG-ndofE*NR_COMP(iphys)
+            case(NORMAL); nrdofDPG=nrdofDPG-ndofV*NR_COMP(iphys)
+            case(DISCON); nrdofDPG=nrdofDPG-ndofQ*NR_COMP(iphys)
             end select
           enddo
         enddo

@@ -95,23 +95,23 @@ subroutine set_physAm(NO_PROBLEM, PhysNick,Flag)
 !
    implicit none
 !
-   integer,               intent(in)  :: NO_PROBLEM
-   integer,               intent(out) :: PhysNick
-   integer, dimension(6), intent(out) :: Flag
+   integer, intent(in)  :: NO_PROBLEM
+   integer, intent(out) :: PhysNick
+   integer, intent(out) :: Flag(7)
 !
    select case(NO_PROBLEM)
       case(1,2)
          PhysNick = 1000
          Flag=0; Flag(1)=1
-         PHYSAm(1:6) = (/.true.,.false.,.false.,.true.,.false.,.false./)
+         PHYSAm(1:7) = (/.true.,.false.,.false.,.true.,.false.,.false.,.false./)
       case(3)
          PhysNick = 1
          Flag=0; Flag(5)=1
-         PHYSAm(1:6) = (/.false.,.true.,.false.,.false.,.true.,.false./)
+         PHYSAm(1:7) = (/.false.,.true.,.false.,.false.,.true.,.false.,.false./)
       case(4)
          PhysNick = 1
          Flag=0; Flag(6)=1
-         PHYSAm(1:6) = (/.false.,.false.,.true.,.false.,.false.,.true./)
+         PHYSAm(1:7) = (/.false.,.false.,.true.,.false.,.false.,.true.,.false./)
       case default
       write(*,*) 'set_physAm: invalid NO_PROBLEM param. stop.'
          stop
@@ -159,10 +159,10 @@ subroutine ref_core()
       mdle = n_elem(iel)
       write(*,2400) mdle
 !  ...refine element mdle
-      select case(NODES(mdle)%type)
-         case('mdlb')
+      select case(NODES(mdle)%ntype)
+         case(MDLB)
             call refine(mdle,kref_mdlb)
-         case('mdlp')
+         case(MDLP)
             call refine(mdle,kref_mdlp)
          case default
          write(*,*) 'ref_core: unsupported node type. stop.'

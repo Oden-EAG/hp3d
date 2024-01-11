@@ -19,7 +19,7 @@
     real(8), dimension(2) :: t
     real(8), dimension(3) :: xp
     real(8)               :: xnod(NDIMEN,MAXbrickH)
-    character(len=4)      :: type
+    integer               :: ntype
     VTYPE :: &
          zdofH(MAXEQNH,MAXbrickH), &
          zdofE(MAXEQNE,MAXbrickE), &
@@ -27,14 +27,23 @@
          zdofQ(MAXEQNQ,MAXbrickQ)
 
     real(8) :: dsol, dxi, solmax, solmin, val
-    integer :: iprint, i, j, ivar, loc, iel, idec, iface, nsub
-    !----------------------------------------
+    integer :: i, j, ivar, loc, iel, idec, iface, nsub
+    !
+#if DEBUG_MODE
+    integer :: iprint
     iprint=0
+#endif
+    !
+    !----------------------------------------
+    !
     t = 0.d0; xp = 0.d0; val = 0.d0
+    !
+#if DEBUG_MODE
     if (iprint.eq.1) then
        write(*,*) 'finlimb: Numlev = ',Numlev
        call pause
     endif
+#endif
     ! increment in master element coordinates
     dxi = DX
 
@@ -45,7 +54,7 @@
     mdle=0
     do iel=1,NRELES
        call nelcon(mdle, mdle)
-       type = NODES(mdle)%type
+       ntype = NODES(mdle)%ntype
 
        ! if it is not visible domain hide it
        call find_domain(mdle, ndom)
@@ -62,27 +71,28 @@
        call find_orient(mdle, nedge_orient,nface_orient)
        call find_order(mdle, norder)
        call nodcor(mdle, xnod)
+#if DEBUG_MODE
        if (iprint.eq.1) then
           write(*,7002) mdle
 7002      format('finlimb: VERTEX COORDINATES FOR mdle = ',i5)
           do ivar=1,3
-             write(*,7003) xnod(ivar,1:nvert(NODES(mdle)%type))
+             write(*,7003) xnod(ivar,1:nvert(NODES(mdle)%ntype))
 7003         format(8(f8.5,2x))
           enddo
           call pause
        endif
-
+#endif
        call solelm(mdle, zdofH,zdofE,zdofV,zdofQ)
-       call celndof(type,norder, &
+       call celndof(ntype,norder, &
                     nrdofH,nrdofE,nrdofV,nrdofQ)
 
        ! loop through element faces
-       do iface=1,nface(type)
+       do iface=1,nface(ntype)
 
           do j=0,NRSUB
-             select case(face_type(type,iface))
-             case('tria');   nsub=NRSUB-j
-             case('rect');   nsub=NRSUB
+             select case(face_type(ntype,iface))
+             case(TRIA);   nsub=NRSUB-j
+             case(RECT);   nsub=NRSUB
              end select
 
              do i=0,nsub
@@ -94,13 +104,14 @@
                      xnod, &
                      zdofH,zdofE,zdofV,zdofQ, &
                      t, xp,val)
+#if DEBUG_MODE
                 if (iprint.eq.1) then
                    write(*,7001) mdle,iface,i,j,xp,val
 7001               format('finlimb: mdle,iface,i,j,xp,val = ', &
                         i5,3i2,3f8.3,2x,e12.5)
                    call pause
                 endif
-
+#endif
                 ! update extremes
                 solmax = max(solmax,val)
                 solmin = min(solmin,val)

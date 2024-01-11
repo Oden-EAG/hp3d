@@ -12,6 +12,7 @@
 subroutine hexa(No,Eta, X,Dxdeta)
 !
       use GMP          , only : HEXAS,POINTS,CURVES,RECTANGLES
+      use node_types   , only : BRIC
 !
       implicit none
       integer               ,intent(in ) :: No
@@ -35,7 +36,7 @@ subroutine hexa(No,Eta, X,Dxdeta)
 !
 !  .....check compatibility
         do i=1,12
-          nc=iabs(HEXAS(No)%EdgeNo(i))
+          nc=abs(HEXAS(No)%EdgeNo(i))
           if (CURVES(nc)%Type.ne.'Seglin') then
             write(*,7002) No,i,nc,CURVES(nc)%Type
  7002       format(' hexa: incompatible edge! No,i,nc,type = ',i7,2x,i2,2x,i7,2x,a10)
@@ -53,7 +54,7 @@ subroutine hexa(No,Eta, X,Dxdeta)
         enddo
 !
 !  .....vertex shape functions
-        call vshape3('bric',Eta, vshape,dvshape)
+        call vshape3(BRIC,Eta, vshape,dvshape)
 !
 !  .....accumulate
         X(1:3)=0.d0 ; Dxdeta(1:3,1:3)=0.d0
@@ -97,6 +98,7 @@ subroutine hexa_TraHex(No,Eta, X,Dxdeta)
 !
       use GMP          , only : HEXAS,POINTS
       use element_data , only : BRICK_EDGE_TO_VERT,BRICK_FACE_TO_VERT
+      use node_types   , only : BRIC
       implicit none
       integer               ,intent(in ) :: No
       real(8),dimension(3  ),intent(in ) :: Eta
@@ -132,7 +134,7 @@ subroutine hexa_TraHex(No,Eta, X,Dxdeta)
       iprint=0
 !
 !  ...vertex shape functions
-      call vshape3('bric',Eta, vshape,dvshape)
+      call vshape3(BRIC,Eta, vshape,dvshape)
 !
 !  ...edge blending functions
       blende( 1)=(1.d0-Eta(2))*(1.d0-Eta(3))
@@ -298,6 +300,7 @@ end subroutine hexa_TraHex
 !
       use control
       use GMP          , only : HEXAS,POINTS,NDIM
+      use node_types   , only : BRIC
       implicit none
 !----------------------------------------------------------------------
       integer,                 intent(in)  :: No
@@ -339,7 +342,7 @@ end subroutine hexa_TraHex
       theta = 0.d0; dthetadeta(1:3) = 0.d0
 !
 !  ...vertex shape functions
-      call vshape3('bric',Eta, vshape,dvshape)
+      call vshape3(BRIC,Eta, vshape,dvshape)
 !
 !  ...interpolate in x,r,theta
       X(1)  = 0.d0; Dxdeta(1,1:3)     = 0.d0

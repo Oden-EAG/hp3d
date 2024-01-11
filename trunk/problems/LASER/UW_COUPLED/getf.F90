@@ -43,7 +43,7 @@ subroutine getf(Mdle,X, Zfval,ZJval)
    VTYPE,dimension(  MAXEQNQ,3,3) :: d2valQ
 !
 !..miscellaneus
-   integer :: iload,ivar,ibeg,icomp,jcomp,k,l,iprint
+   integer :: ivar,ibeg,icomp,jcomp,k,l,iprint
 !
 !------------------------------------------------------------------------------
 !
@@ -163,7 +163,6 @@ end subroutine getf
 subroutine get_bdSource(Mdle,X,Rn, Imp_val)
 !
    use control          , only : NEXACT
-   use assembly         , only : NR_RHS
    use data_structure3D , only : NR_COMP,ADRES,NRINDEX
    use parameters       , only : MAXEQNH,MAXEQNE,MAXEQNV,MAXEQNQ,ZERO
    use commonParam
@@ -192,23 +191,28 @@ subroutine get_bdSource(Mdle,X,Rn, Imp_val)
    VTYPE,dimension(  MAXEQNQ,3,3) :: zd2valQ
 !
 !..miscellaneus
-   integer :: iload,ivar,ibeg,icomp,jcomp,k,l
+   integer    :: ivar,ibeg,icomp,jcomp,k,l
    complex(8) :: zaux
-   VTYPE, dimension(3) :: rntimesE,rn2timesE,rntimesH
+!
+   VTYPE  , dimension(3)   :: rntimesE,rn2timesE,rntimesH
    real(8)                 :: impedanceConstant
    real(8)                 :: E   ! vector field
    real(8), dimension(3)   :: dE  ! 1st derivative
    real(8), dimension(3,3) :: d2E ! 2nd derivative
 !
-!..printing flag
-   integer :: iprint = 0
+#if DEBUG_MODE
+   integer :: iprint
+   iprint=0
+#endif
 !
 !------------------------------------------------------------------------------
 !
+#if DEBUG_MODE
       if (iprint.eq.1) then
          write(*,7001) Mdle,X
  7001    format(' get_bdSource: Mdle,X = ',i8,2x,3(f8.3,2x))
       endif
+#endif
 !
 !     initialize source terms
       Imp_val = ZERO
@@ -256,10 +260,13 @@ subroutine get_bdSource(Mdle,X,Rn, Imp_val)
          write(*,*) 'get_bdSource: UNSPECIFIED NEXACT'
          stop
    end select
+!
+#if DEBUG_MODE
    if (iprint.eq.1) then
       write(*,7002) Imp_val
  7002 format('get_bsource: Imp_val = ',2e12.5)
    endif
+#endif
 !
 end subroutine get_bdSource
 !

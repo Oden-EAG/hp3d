@@ -29,7 +29,7 @@ subroutine set_initial_mesh(Nelem_order)
    integer, intent(out) :: Nelem_order(NRELIS)
 !
 !..element type
-   character(len=4) :: etype
+   integer :: etype
 !
    integer :: iel,ndom,i,ifc,neig,max_order
 !
@@ -55,26 +55,26 @@ subroutine set_initial_mesh(Nelem_order)
 !..loop through initial mesh elements
    do iel=1,NRELIS
 !
-      etype = ELEMS(iel)%type
+      etype = ELEMS(iel)%etype
 !
 !  STEP 1 : set up order of approximation (elements may have different
 !           orders in each direction)
-      if (etype .ne. 'bric' .and. etype .ne. 'pris') then
+      if (etype .ne. BRIC .and. etype .ne. PRIS) then
          write(*,*) 'set_initial mesh: element type not equal bric/pris. stop.'
          stop
       endif
 
 !  ...uniform isotropic polynomial order
 !      select case(etype)
-!         case('pris') ; Nelem_order(iel)=ORDER_APPROX*11
-!         case('bric') ; Nelem_order(iel)=ORDER_APPROX*111
-!         case('tetr') ; Nelem_order(iel)=ORDER_APPROX*1
-!         case('pyra') ; Nelem_order(iel)=ORDER_APPROX*1
+!         case(BRIC) ; Nelem_order(iel)=ORDER_APPROX*111
+!         case(PRIS) ; Nelem_order(iel)=ORDER_APPROX*11
+!         case(TETR) ; Nelem_order(iel)=ORDER_APPROX*1
+!         case(PYRA) ; Nelem_order(iel)=ORDER_APPROX*1
 !      end select
 
 !  ...uniform anisotropic polynomial order (geometry axes: x-y-z)
       select case(etype)
-         case('pris')
+         case(PRIS)
             if (ORDER_APPROX_X .ne. ORDER_APPROX_Y) then
                write(*,*) 'set_initial mesh: pris requires ', &
                           'ORDER_APPROX_X=ORDER_APPROX_Y. stop.'
@@ -82,7 +82,7 @@ subroutine set_initial_mesh(Nelem_order)
             endif
             Nelem_order(iel)= ORDER_APPROX_X*10 + &
                               ORDER_APPROX_Z*1
-         case('bric')
+         case(BRIC)
             Nelem_order(iel)= ORDER_APPROX_X*100 + &
                               ORDER_APPROX_Y*10  + &
                               ORDER_APPROX_Z*1
@@ -91,7 +91,7 @@ subroutine set_initial_mesh(Nelem_order)
 !  ...non-uniform polynomial order (HEXA)
 !  ...set p differently in core and cladding of fiber geometry
 !  ...TODO: apply min/max rule afterwards
-!      if(etype .eq. 'bric') then
+!      if(etype .eq. BRIC) then
 !         call domain_number(iel, ndom)
 !         write(*,1020) 'iel = ', iel, ' , ndom = ', ndom
 ! 1020    format(A,i2,A,i2)
@@ -108,14 +108,15 @@ subroutine set_initial_mesh(Nelem_order)
 !  STEP 2 : set up physics
 !
 !     set up the number of physical attributes supported by the element
-      ELEMS(iel)%nrphysics=6
-      allocate(ELEMS(iel)%physics(6))
+      ELEMS(iel)%nrphysics=7
+      allocate(ELEMS(iel)%physics(7))
       ELEMS(iel)%physics(1)='tempr'
       ELEMS(iel)%physics(2)='EHtr1'
       ELEMS(iel)%physics(3)='EHtr2'
       ELEMS(iel)%physics(4)='hflux'
       ELEMS(iel)%physics(5)='EHfd1'
       ELEMS(iel)%physics(6)='EHfd2'
+      ELEMS(iel)%physics(7)='EHtmp'
 !
 !  ...initialize BC flags
 !     0 - no BC
@@ -130,8 +131,9 @@ subroutine set_initial_mesh(Nelem_order)
 !     (2) |  2-3 | Hcurl for Maxwell trace (\hat E,\hat H) (signal, 2 comps)
 !     (3) |  4-5 | Hcurl for Maxwell trace (\hat E,\hat H) (pump  , 2 comps)
 !     (4) |  6   | Hdiv trace for heat (1 component)
-!     (5) |  7-12| L2 field for Maxwell (E,H) (signal, 6 components)
-!     (6) | 13-18| L2 field for Maxwell (E,H) (pump  , 6 components)
+!     (5) |  7-12| L2 field for Maxwell (E,H) (signal   , 6 components)
+!     (6) | 13-18| L2 field for Maxwell (E,H) (pump     , 6 components)
+!     (7) | 19-24| L2 field for Maxwell (E,H) (auxiliary, 6 components)
 !
       select case(GEOM_NO)
 !     ...single cube/brick with Dirichlet

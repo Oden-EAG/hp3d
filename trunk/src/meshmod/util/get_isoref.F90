@@ -1,54 +1,58 @@
 !---------------------------------------------------------------------------------
-!> Purpose : return isotropic refinement flag
+!> @brief return isotropic refinement flag
 !!
 !! @param[in ] Nod  - a node number
 !! @param[out] Kref - isotropic refinement flag
 !!
-!> rev@Dec 12
+!> @date Feb 2023
 !---------------------------------------------------------------------------------
 subroutine get_isoref(Nod, Kref)
 !
-       use data_structure3D
+      use data_structure3D
 !
-       implicit none
-       integer, intent(in)     :: Nod
-       integer, intent(out)    :: Kref
+      implicit none
+      integer, intent(in)     :: Nod
+      integer, intent(out)    :: Kref
 !
-       real(8), dimension(3,8) :: xsub
-       real(8), dimension(3)   :: dist, xi
-       real(8), dimension(3,2) :: x
-
-       integer, dimension(27)  :: nodesl,norientl
-       integer, dimension(2)   :: iv
-       integer, dimension(2,3), parameter :: ie = &
+      real(8), dimension(3,8) :: xsub
+      real(8), dimension(3)   :: dist, xi
+      real(8), dimension(3,2) :: x
+!
+      integer, dimension(27)  :: nodesl,norientl
+      integer, dimension(2)   :: iv
+      integer, dimension(2,3), parameter :: ie = &
             reshape( (/1,6, 3,5, 4,2/), (/2,3/) )
-       integer :: iprint, iflag, no, i,j,k, loc
+      integer :: iflag, no, i,j,k, loc
+!
+#if DEBUG_MODE
+      integer :: iprint
+      iprint=0
+#endif
 !---------------------------------------------------------------------------------
 !
       Kref = 0
-      iprint = 0
 !
 !  ...select refinement based on node type
-      select case(NODES(Nod)%type)
+      select case(NODES(Nod)%ntype)
 !
 !     EDGE
-      case('medg') ; Kref=1
+      case(MEDG) ; Kref=1
 !
 !     TRIANGLE
-      case('mdlt') ; Kref=1
+      case(MDLT) ; Kref=1
 !
 !     QUAD
-      case('mdlq') ; Kref=11
+      case(MDLQ) ; Kref=11
 !
 !     PRISM
-      case('mdlp') ; Kref=11
+      case(MDLP) ; Kref=11
 !
 !     BRICK
-      case('mdlb') ; Kref=111
+      case(MDLB) ; Kref=111
 !
 !     TET
-      case('mdln')
-        call refel(     Nod, iflag,no,xsub)
+      case(MDLN)
+        call refel     (Nod, iflag,no,xsub)
         call elem_nodes(Nod, nodesl,norientl)
 !
 !  .....measure 3 diagonals
@@ -81,16 +85,17 @@ subroutine get_isoref(Nod, Kref)
 !
 !  .....selec appropriate refinement kind
         Kref = 10 + loc
-
+!
+#if DEBUG_MODE
         if (iprint.eq.1) then
           write(*,7000) Kref, dist
 7000      format(' get_isoref : Kref = ',i3,' dist = ',3f8.3)
         endif
-
-      case('mdld')
+#endif
+!
+      case(MDLD)
         write(*,*) 'get_isoref: no isotropic refinement for pyramid.'
         stop
       endselect
 !
-!
-endsubroutine get_isoref
+end subroutine get_isoref

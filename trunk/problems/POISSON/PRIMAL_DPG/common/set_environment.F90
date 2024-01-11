@@ -21,7 +21,6 @@ subroutine set_environment
    use common_prob_data
    use paraview
    use parametersDPG, only: MAXNORD_ADD
-   use testvars
 !
    implicit none
 !
@@ -70,18 +69,23 @@ subroutine set_environment
 ! =============================
 !
    call get_option_string  &
-        ('-prefix'          ,'Prefix paraview file'               ,'pois_'             ,PREFIX  )
+        ('-prefix'          ,'Prefix paraview file'               ,'pois'              ,PREFIX  )
    call get_option_string  &
         ('-file_vis_upscale','Visualization upscale file location','../../../files/vis',FILE_VIS)
    call get_option_string  &
-        ('-vis_level'       ,'Visualization upscale level (0-3)'  ,'3'                 ,VLEVEL  )
+        ('-vis_level'       ,'Visualization upscale level (0-3)'  ,'2'                 ,VLEVEL  )
+!
+   call get_option_bool    &
+        ('-paraview_ho'    ,'Enable higher order element output'  ,.false.             ,SECOND_ORDER_VIS)
+   call get_option_bool    &
+        ('-paraview_vtu'   ,'Enable VTU output format'            ,.false.             ,VIS_VTU)
 !
    call get_option_string  &
         ('-dir_output'      ,'Paraview root directory'            ,'../outputs/'       ,OUTPUT_DIR)
    PARAVIEW_DIR = trim(OUTPUT_DIR)//'paraview/'
 !
    call get_option_bool    &
-        ('-paraview_geom'   ,'Dump geom at every Paraview call'   ,.false.             ,PARAVIEW_DUMP_GEOM)
+        ('-paraview_geom'   ,'Dump geom at every Paraview call'   ,.true.              ,PARAVIEW_DUMP_GEOM)
    call get_option_bool    &
         ('-paraview_attr'   ,'Dump solution to Paraview'          ,.true.              ,PARAVIEW_DUMP_ATTR)
 !

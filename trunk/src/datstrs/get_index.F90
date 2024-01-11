@@ -45,7 +45,8 @@ subroutine get_index(Nod, Indexd)
    integer :: ic,iphys,ivar
 !
 #if DEBUG_MODE
-   integer :: iprint = 0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !-----------------------------------------------------------------------
@@ -70,10 +71,10 @@ subroutine get_index(Nod, Indexd)
 !
 !     ...physical attribute is present
          case(1)
-            select case(DTYPE(iphys))
+            select case(D_TYPE(iphys))
 !
 !           ...H1 variable
-               case('contin')
+               case(CONTIN)
 !
 !              ...loop through components
                   do ivar=1,NR_COMP(iphys)
@@ -89,7 +90,7 @@ subroutine get_index(Nod, Indexd)
                   enddo
 !
 !           ...H(curl) variable
-               case('tangen')
+               case(TANGEN)
 !
 !              ...loop through components
                   do ivar=1,NR_COMP(iphys)
@@ -105,7 +106,7 @@ subroutine get_index(Nod, Indexd)
                   enddo
 !
 !           ...H(div) variable
-               case('normal')
+               case(NORMAL)
 !
 !              ...loop through components
                   do ivar=1,NR_COMP(iphys)
@@ -121,7 +122,7 @@ subroutine get_index(Nod, Indexd)
                   enddo
 !
 !           ...L2 variable
-               case('discon')
+               case(DISCON)
 !
 !              ...loop through components
                   do ivar=1,NR_COMP(iphys)

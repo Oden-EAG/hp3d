@@ -1,11 +1,12 @@
 3   3     NDIM,MANDIM
 
-0         no surfaces
+0         NRSURFS
 
 1         NRDOMAIN
 
+0         BDOM_FLAG
 
-8          NRPOINT
+8         NRPOINT
 
 Regular             point 1
 0.d0 0.d0 0.d0

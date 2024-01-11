@@ -36,6 +36,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    use data_structure3D
    use commonParam
    use laserParam
+   use MPI, only: MPI_Wtime
 !..no implicit statements
    implicit none
 !..declare input/output variables
@@ -50,7 +51,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    real(8), intent(out) :: Resid
 !
 !..declare edge/face type variables
-   character(len=4) :: etype,ftype
+   integer :: etype,ftype
 !
 !..declare element order, orientation for edges and faces
    integer, dimension(19) :: norder
@@ -163,11 +164,10 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    real(8) :: delta_n
    integer :: dom_flag
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
-!..debug variables
 #if DEBUG_MODE
-   integer :: iprint = 0
+   integer :: iprint
 #endif
 !
 !..for Gram matrix compressed storage format
@@ -176,19 +176,23 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !
 !--------------------------------------------------------------------------
 !
+#if DEBUG_MODE
+   iprint=0
+#endif
+!
    allocate(gramP(NrTest*(NrTest+1)/2))
 !
 !..element type
-   etype = NODES(Mdle)%type
+   etype = NODES(Mdle)%ntype
    nrf = nface(etype)
 !
 !..determine order of approximation
    call find_order(Mdle, norder)
 !..set the enriched order of approximation
    select case(etype)
-      case('mdlb'); nordP = NODES(Mdle)%order+NORD_ADD*111
-      case('mdln','mdld'); nordP = NODES(Mdle)%order+NORD_ADD
-      case('mdlp'); nordP = NODES(Mdle)%order+NORD_ADD*11
+      case(MDLB)     ; nordP = NODES(Mdle)%order+NORD_ADD*111
+      case(MDLP)     ; nordP = NODES(Mdle)%order+NORD_ADD*11
+      case(MDLN,MDLD); nordP = NODES(Mdle)%order+NORD_ADD
    end select
 !..determine edge and face orientations
    call find_orient(Mdle, norient_edge,norient_face)
@@ -482,8 +486,8 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 ! ===============================================================================
 !     ...Computation of Gram Matrix (w/o fast integration)
 !     ...loop through enriched H(curl) test functions
-         if (FAST_INT .eq. 1 .and. etype .eq. 'mdlb') cycle
-         if (FAST_INT .eq. 1 .and. etype .eq. 'mdlp') cycle
+         if (FAST_INT .eq. 1 .and. etype .eq. MDLB) cycle
+         if (FAST_INT .eq. 1 .and. etype .eq. MDLP) cycle
          do k2=k1,NrdofEE
 !        ...Piola transformation
             do i = 1,3
@@ -615,15 +619,15 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !   start_time = MPI_Wtime()
    if (FAST_INT .eq. 1) then
       select case (etype)
-         case('mdlb')
+         case(MDLB)
             call elem_maxwell_gram_hexa(Mdle,Fld_flag,NrTest,NrdofH, gramP)
-         case('mdlp')
+         case(MDLP)
             call elem_maxwell_gram_pris(Mdle,Fld_flag,NrTest,NrdofH, gramP)
       end select
 !..end timer
 !   end_time = MPI_Wtime()
 !   !$OMP CRITICAL
-!   write(*,10) etype, end_time-start_time
+!   write(*,10) S_Type(etype), end_time-start_time
 !   10 format(A,' gram : ',f12.5,'  seconds')
 !   !$OMP END CRITICAL
 !
@@ -638,7 +642,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !            diff_r = abs(real(gramP(k))-real(gramTest(k)))
 !            diff_i = abs(imag(gramP(k))-imag(gramTest(k)))
 !            !$OMP CRITICAL
-!            write(*,*) 'etype    = ', etype
+!            write(*,*) 'etype    = ', S_Type(etype)
 !            write(*,*) 'Mlde     = ', Mdle
 !            write(*,*) 'NrTest   = ', NrTest
 !            write(*,*) 'gramSize = ', NrTest*(NrTest+1)/2
@@ -880,9 +884,9 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !..set suggested refinement flag
    select case(etype)
    !  isotropic
-      case('mdlb');        Nref_flag = 111
-      case('mdlp');        Nref_flag = 11
-      case('mdln','mdld'); Nref_flag = 1
+      case(MDLB)     ; Nref_flag = 111
+      case(MDLP)     ; Nref_flag = 11
+      case(MDLN,MDLD); Nref_flag = 1
    end select
 !
 #if DEBUG_MODE

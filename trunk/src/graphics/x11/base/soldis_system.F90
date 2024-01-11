@@ -2,16 +2,16 @@
 #include "typedefs.h"
 !
 !-------------------------------------------------------------------------------------
-!> Purpose - Selection for quantities to be displayed by graphics
+!> @brief   Selection for quantities to be displayed by graphics
 !!
-!> @data Nov 14
+!> @date    Sep 2023
 !-------------------------------------------------------------------------------------
 !
 subroutine soldis_select_system
 !
-      use physics          , only : NR_PHYSA, NR_COMP, DTYPE, PHYSA
-      use data_structure3D , only : NRCOMS
-      use graphmod         , only : ISELECT
+      use physics
+      use parameters , only : NRRHS
+      use graphmod   , only : ISELECT
 !
       integer :: iattr,icomp,ireal,iload
 !
@@ -22,7 +22,7 @@ subroutine soldis_select_system
       write(*,*)'     ATTRIBUTE | DISC. SPACE | COMPONENTS'
       do iattr=1,NR_PHYSA
 !
-        write(*,1000) iattr, PHYSA(iattr), DTYPE(iattr), NR_COMP(iattr)
+        write(*,1000) iattr, PHYSA(iattr), S_DType(D_TYPE(iattr)), NR_COMP(iattr)
  1000   format(i2,' - ',a6,7x,a6,8x,i10)
 !
       enddo
@@ -49,15 +49,15 @@ subroutine soldis_select_system
 !
 !     load
  13   continue
-      write(*,1001) NRCOMS
- 1001 format(' Set load (NRCOMS  = ',i2,')')
+      write(*,1001) NRRHS
+ 1001 format(' Set load (NRRHS  = ',i2,')')
       read(*,*) iload
-      if ((iload < 1) .OR. (iload > NRCOMS))  goto 13
+      if ((iload < 1) .OR. (iload > NRRHS))  goto 13
 !
 !     trace
-      select case(DTYPE(iattr))
-      case('tangen') ; write(*,*) 'Displaying magnitude of tangential trace...'
-      case('normal') ; write(*,*) 'Displaying magnitude of normal trace...'
+      select case(D_TYPE(iattr))
+      case(TANGEN) ; write(*,*) 'Displaying magnitude of tangential trace...'
+      case(NORMAL) ; write(*,*) 'Displaying magnitude of normal trace...'
       endselect
 !
 !     store selection
@@ -142,10 +142,10 @@ subroutine soldis_system(Mdle,Xi,X,Rn,SolH,GradH,SolE,CurlE,SolV,DivV,SolQ, Val)
       ibeg=ADRES(iattr)
 !
 !     discretization type
-      select case(DTYPE(iattr))
+      select case(D_TYPE(iattr))
 !
 !     -- H1 --
-      case('contin')
+      case(CONTIN)
 !
         isol = (iload-1)*NRHVAR + ibeg + icomp
 !
@@ -154,7 +154,7 @@ subroutine soldis_system(Mdle,Xi,X,Rn,SolH,GradH,SolE,CurlE,SolV,DivV,SolQ, Val)
         endif
 !
 !     -- H(curl) --
-      case('tangen')
+      case(TANGEN)
 !
         isol = (iload-1)*NREVAR + ibeg + icomp
 !
@@ -175,7 +175,7 @@ subroutine soldis_system(Mdle,Xi,X,Rn,SolH,GradH,SolE,CurlE,SolV,DivV,SolQ, Val)
         call norm(aux, Val)
 !
 !     -- H(div) --
-      case('normal')
+      case(NORMAL)
 !
         isol = (iload-1)*NRVVAR + ibeg + icomp
 !
@@ -191,7 +191,7 @@ subroutine soldis_system(Mdle,Xi,X,Rn,SolH,GradH,SolE,CurlE,SolV,DivV,SolQ, Val)
         Val = abs(s)
 !
 !     -- L2 --
-      case('discon')
+      case(DISCON)
 !
         isol = (iload-1)*NRQVAR + ibeg + icomp
 !

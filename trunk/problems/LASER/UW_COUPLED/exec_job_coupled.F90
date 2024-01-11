@@ -10,26 +10,28 @@ subroutine exec_job_coupled
    use laserParam
    use control
    use data_structure3D
-   use MPI           , only: MPI_COMM_WORLD
+   use MPI           , only: MPI_COMM_WORLD,MPI_Wtime
    use mpi_param     , only: RANK,ROOT,NUM_PROCS
    use par_mesh      , only: EXCHANGE_DOF,distr_mesh
-   use zoltan_wrapper, only: zoltan_w_set_lb,zoltan_w_eval
+   use paraview      , only: paraview_select_attr
+   use zoltan_wrapper
 !
    implicit none
 !
-   integer :: flag(6),iParAttr(6)
+   integer :: flag(7)
+   logical :: iPvAttr(7)
    integer :: physNick,nstop,nskip
    logical :: ires
 !
 !..variables for nonlinear loop
-   integer :: No,No1,No2
+   integer :: currAttr,prevAttr
    real(8) :: L2NormDiff,stopEpsilon
    real(8) :: L2NormDiffIter(100)
    real(8) :: res
-   real(8) :: FieldNormH,FieldNormE,FieldNormV,FieldNormQ
+   real(8) :: fieldNormQ
 !
    integer :: i,j,ierr,numPts,fld,time_step
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 !----------------------------------------------------------------------
 !
@@ -74,7 +76,7 @@ subroutine exec_job_coupled
 !..distribute mesh initially
    call distr_mesh
 !..set Zoltan partitioner
-   call zoltan_w_set_lb(0)
+   call zoltan_w_set_lb(ZOLTAN_LB_DEFAULT)
 !
 !..refine the mesh anisotropically
    do i=1,IMAX+JMAX
@@ -102,7 +104,7 @@ subroutine exec_job_coupled
 !
 !  ...set partitioner for load balancing, redistributes mesh in 'distr_mesh'
       if (i .eq. IMAX-2) then
-         call zoltan_w_set_lb(7) ! fiber partitioner
+         call zoltan_w_set_lb(ZOLTAN_LB_FIBER) ! fiber partitioner
       elseif (i .gt. IMAX-2) then
          goto 30 ! no load balancing
       endif
@@ -164,11 +166,12 @@ subroutine exec_job_coupled
 !..set stopping criterion for nonlinear iteration
    stopEpsilon = 1.0d-4
    L2NormDiff = 1.d0
-   FieldNormQ = 1.d0
+   fieldNormQ = 1.d0
    L2NormDiffIter = 0.d0
 !
-!..set components (1: signal, 2: pump)
-   No1 = 1; No2 = 2
+!..set attributes for norm of signal difference
+   currAttr = 5 ! signal field, current solution
+   prevAttr = 7 ! signal field, previous iterate (auxiliary solution)
 !
 !..set max number of nonlinear iterations per time step
    MAX_ITER = 10
@@ -193,12 +196,15 @@ subroutine exec_job_coupled
       if (RANK.eq.ROOT) write(*,4200) ' Updating heat Dirichlet DOFs...'
       call update_Ddof
       if (time_step .gt. 0) then
+#if HP3D_USE_INTEL_MKL
          if (NUM_PROCS .eq. 1) then
             call pardiso_sc('H')
          else
-            !call par_mumps_sc('H')
             call par_nested('H')
          endif
+#else
+         call par_mumps_sc('H')
+#endif
       endif
 !  ...calculating temperature
       numPts = 2**IMAX
@@ -207,20 +213,21 @@ subroutine exec_job_coupled
 !
       call MPI_BARRIER (MPI_COMM_WORLD, ierr);
 !
-!  ...Set default paraview output; all fields: iParAttr = (/1,2,2,1,6,6/)
-      iParAttr = (/1,0,0,0,6,0/) ! output heat solution and signal laser field
+!  ...Set default paraview output; all components = (/1,2,2,1,6,6,6/)
+!     output temperature field and signal laser field
+      iPvAttr = (/.true.,.false.,.false.,.false.,.true.,.false.,.false./)
 !
 !  ...Optionally, skip computing Maxwell problem for nskip time steps
 !     (except in the initial time step)
       if (time_step.ge.1 .and. time_step.le.nskip) then
          if (RANK.eq.ROOT) write(*,4200) ' Skipping Maxwell solve in this time step...'
-         iParAttr = (/1,0,0,0,0,0/) ! output only the heat solution
+         iPvAttr = .false.; iPvAttr(1) = .true. ! output only the heat solution
          goto 420
       endif
 !
 !  ...solve nonlinear Maxwell loop for SIGNAL and PUMP
       L2NormDiff = 1.d0
-      FieldNormQ = 1.d0
+      fieldNormQ = 1.d0
 !
 !  ...update Dirichlet DOFs for signal field
       if (RANK.eq.ROOT) write(*,4200) ' Updating signal Dirichlet DOFs...'
@@ -250,10 +257,10 @@ subroutine exec_job_coupled
 !
 !     ...check stopping criterion
          if (i .eq. 0) goto 405
-         L2NormDiffIter(i) = L2NormDiff/FieldNormQ
-         if((L2NormDiff/FieldNormQ).lt.(stopEpsilon)) then
+         L2NormDiffIter(i) = L2NormDiff/fieldNormQ
+         if((L2NormDiff/fieldNormQ).lt.(stopEpsilon)) then
             if (RANK .eq. ROOT) then
-               write(*,4230) '   ', L2NormDiff/FieldNormQ, ' < ', stopEpsilon
+               write(*,4230) '   ', L2NormDiff/fieldNormQ, ' < ', stopEpsilon
                write(*,*) ' Stopping criterion satisfied.'
                write(*,*) '---------------------------------------------'
                write(*,4210) ' Ending nonlinear loop after ', i, ' iterations.'
@@ -264,7 +271,7 @@ subroutine exec_job_coupled
          elseif (RANK .eq. ROOT) then
             write(*,4220) ' Stopping criterion not yet satisfied. i = ', i
    4220     format(A,I3)
-            write(*,4230) '   ', L2NormDiff/FieldNormQ, ' > ', stopEpsilon
+            write(*,4230) '   ', L2NormDiff/fieldNormQ, ' > ', stopEpsilon
    4230     format(A, F11.5,A,F11.5)
             write(*,*) '---------------------------------------------'
             write(*,4201) ' Proceed with nonlinear iterations..'
@@ -281,11 +288,15 @@ subroutine exec_job_coupled
          if (RANK.eq.ROOT) write(*,*) '   Signal solve...'
          NO_PROBLEM = 3
          call set_physAm(NO_PROBLEM, physNick,flag)
+#if HP3D_USE_INTEL_MKL
          if (NUM_PROCS .eq. 1) then
             call pardiso_sc('H')
          else
             call par_nested('H')
          endif
+#else
+         call par_mumps_sc('H')
+#endif
 !
 !     ...compute signal residual
          if (ires) then
@@ -309,11 +320,15 @@ subroutine exec_job_coupled
          if (RANK.eq.ROOT) write(*,*) '   Pump solve...'
          NO_PROBLEM = 4
          call set_physAm(NO_PROBLEM, physNick,flag)
+#if HP3D_USE_INTEL_MKL
          if (NUM_PROCS .eq. 1) then
             call pardiso_sc('H')
          else
             call par_nested('H')
          endif
+#else
+         call par_mumps_sc('H')
+#endif
 !
 !     ...compute pump residual
          if (ires) then
@@ -329,17 +344,18 @@ subroutine exec_job_coupled
          NO_PROBLEM = 3
          call set_physAm(NO_PROBLEM, physNick,flag)
          if (i .gt. 0 .or. time_step .gt. 0) then
-            call get_L2NormCOMS(flag,No1,No2, L2NormDiff)
-            call get_Norm(flag,No2, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
+            call get_L2NormDiff(currAttr,prevAttr, L2NormDiff)
+            call get_L2NormAttr(prevAttr, fieldNormQ)
          endif
          if (RANK.eq.ROOT) write(*,4240) '   L2NormDiff = ', L2NormDiff
-         if (RANK.eq.ROOT) write(*,4240) '   FieldNormQ = ', FieldNormQ
+         if (RANK.eq.ROOT) write(*,4240) '   fieldNormQ = ', fieldNormQ
   4240   format(A,F10.4)
 !
 !     ...copy current solution components of all fields into previous solution
-         if (RANK.eq.ROOT) write(*,4200) 'copy_coms...'
+         if (RANK.eq.ROOT) write(*,*)
+         if (RANK.eq.ROOT) write(*,*) 'copy_attr...'
          call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-         call copy_coms(No1,No2)
+         call copy_attr(currAttr,prevAttr)
          call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
          if (RANK.eq.ROOT) write(*,300) end_time - start_time
          if (RANK.eq.ROOT) write(*,*)
@@ -365,8 +381,9 @@ subroutine exec_job_coupled
 !
 !  ...write paraview output
       if(RANK.eq.ROOT) write(*,200) ' Writing paraview output...'
+      call paraview_select_attr(iPvAttr)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
-      call my_paraview_driver(iParAttr)
+      call my_paraview_driver
       call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
       if(RANK.eq.ROOT) write(*,300) end_time - start_time
  425  continue
@@ -393,7 +410,7 @@ subroutine exec_job_coupled
 !
 !..display stats
    if (RANK.eq.ROOT) then
-      write(*,*) 'L2NormDiff/FieldNormQ:'
+      write(*,*) 'L2NormDiff/fieldNormQ:'
       do j=1,i
          write(*,4241) L2NormDiffIter(j)
  4241    format(es14.5)

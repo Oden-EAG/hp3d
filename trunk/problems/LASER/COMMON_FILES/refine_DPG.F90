@@ -47,7 +47,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
    use parametersDPG, only: NORD_ADD
    use par_mesh     , only: DISTRIBUTED,HOST_MESH
    use mpi_param    , only: ROOT,RANK,NUM_PROCS
-   use MPI          , only: MPI_COMM_WORLD,MPI_SUM,MPI_COMM_WORLD,   &
+   use MPI          , only: MPI_COMM_WORLD,MPI_SUM,MPI_COMM_WORLD,MPI_Wtime, &
                             MPI_REAL8,MPI_INTEGER,MPI_IN_PLACE,MPI_MAX
 !
    implicit none
@@ -90,12 +90,10 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
    real(8) :: x(3), xnod(3,8)
 !
 !..element type
-   character(len=4) :: etype
+   integer :: etype
 !
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
-!..printing flag
-   integer :: iprint = 0
    !character(len=8) :: filename
 !
 !-----------------------------------------------------------------------
@@ -384,18 +382,18 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
          if (RANK .eq. ROOT)  write(*,*) 'NRELES = ', NRELES
          do iel = 1,nr_elem_ref
             mdle = mdle_ref(iel)
-            etype = NODES(mdle)%type
+            etype = NODES(mdle)%ntype
             select case(etype)
-               case('mdlb')
+               case(MDLB)
                   !kref = 111 ! iso
                   !kref = 110  ! radial
                   kref = 10 ! refining in r
                   !kref = 100 ! refining in theta
-               case('mdlp')
+               case(MDLP)
                   !kref = 11  ! iso
                   kref = 10   ! radial
                case default
-                  write(*,*) 'refine_DPG: READING UNEXPECTED ELEMENT TYPE: ',etype
+                  write(*,*) 'refine_DPG: READING UNEXPECTED ELEMENT TYPE: ',S_Type(etype)
                   call pause
             end select
             call refine(mdle,kref)
@@ -448,7 +446,7 @@ subroutine href_solve(Nflag,PhysNick, Nstop)
    use MPI           , only: MPI_COMM_WORLD,MPI_INTEGER
    use mpi_param     , only: RANK,ROOT
    use par_mesh      , only: DISTRIBUTED,HOST_MESH,distr_mesh
-   use zoltan_wrapper, only: zoltan_w_set_lb,zoltan_w_partition
+   use zoltan_wrapper
 !
    implicit none
 !
@@ -493,7 +491,7 @@ subroutine href_solve(Nflag,PhysNick, Nstop)
 !     ...Uniform refinement and solve
          call refine_DPG(IUNIFORM,1,0.25d0,Nflag,PhysNick,ires, Nstop)
          if (DISTRIBUTED .and. (.not. HOST_MESH)) then
-            !call zoltan_w_set_lb(1)
+            !call zoltan_w_set_lb(ZOLTAN_LB_BLOCK)
             !call distr_mesh
             !call print_partition
             call par_mumps_sc('H')

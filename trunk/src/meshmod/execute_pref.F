@@ -4,7 +4,7 @@ c   routine name       - execute_pref
 c
 c---------------------------------------------------------------------
 c
-c   latest revision    - Aug 17
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine executes p-refinement for a group
 c                        of elements
@@ -24,25 +24,32 @@ c
       use data_structure3D
       use element_data
       use constrained_nodes
-#include "syscom.blk"
 c
-      character(len=4) :: etype
+      implicit none
+c
+      integer, intent(in) :: Nlist
+      integer, intent(in) :: List(Nlist)
 c
 c  ...element nodes
-      dimension nodesl(27), norientl(27)
+      integer :: nodesl(27), norientl(27)
 c
 c  ...order for element nodes implied by the order of the middle node
-      dimension norder(19)
+      integer :: norder(19)
 c
-      dimension List(Nlist)
+c  ...miscellanea
+      integer :: icase,iel,ie,ip,is,j,mdle,nc,nrs
+      integer :: nod,newp,nodp,nods,nrv,nre,nrf,ntype
 c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
       if (iprint.eq.1) then
         write(*,7010) List(1:Nlist)
  7010   format('execute_pref: List = ',20(/,10i6))
         call pause
       endif
-
+#endif
+c
       call reset_visit
 c
 c  ...Step 1: loop over elements from the list and record
@@ -56,9 +63,9 @@ c
 c  .....determine nodes for the element (active and constrained)
 c       and build the data base for the constrained nodes
 c       (module constrained_nodes)
-        call get_connect_info(mdle, nodesl, norientl)
-        etype = NODES(mdle)%type
-        nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
+        call get_connect_info(mdle, nodesl,norientl)
+        ntype = NODES(mdle)%ntype
+        nrv = nvert(ntype); nre = nedge(ntype); nrf = nface(ntype)
 c
 c  .....loop through element higher order nodes
 C         do j=nrv+1,nrv+nre+nrf+1
@@ -107,7 +114,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent mid-edge nodes (south,north)
               do ip=1,3,2
-                nodp = iabs(NFACE_CONS(ip,nc))
+                nodp = abs(NFACE_CONS(ip,nc))
                 NODES(nodp)%visit = 1
               enddo
 c
@@ -120,7 +127,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent mid-edge nodes (east,west)
               do ip=2,4,2
-                nodp = iabs(NFACE_CONS(ip,nc))
+                nodp = abs(NFACE_CONS(ip,nc))
                 NODES(nodp)%visit = 1
               enddo
 c
@@ -141,7 +148,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent mid-edge nodes (south,north)
               do ip=1,3,2
-                nodp = iabs(NFACE_CONS(ip,nc))
+                nodp = abs(NFACE_CONS(ip,nc))
                 NODES(nodp)%visit = 1
                 if (Is_inactive(nodp)) then
                   nodp = NODES(nodp)%father
@@ -166,7 +173,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent mid-edge nodes (east,west)
               do ip=2,4,2
-                nodp = iabs(NFACE_CONS(ip,nc))
+                nodp = abs(NFACE_CONS(ip,nc))
                 NODES(nodp)%visit = 1
                 if (Is_inactive(nodp)) then
                   nodp = NODES(nodp)%father
@@ -183,7 +190,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent medg nodes
               do ie=1,3
-                nodp = iabs(NFACE_CONS(ie,nc))
+                nodp = abs(NFACE_CONS(ie,nc))
                 NODES(nodp)%visit = 1
               enddo
 c
@@ -196,7 +203,7 @@ c  ...........parent mid-face node
 c
 c  ...........parent medg nodes
               do ie=1,3
-                nodp = iabs(NFACE_CONS(ie,nc))
+                nodp = abs(NFACE_CONS(ie,nc))
                 NODES(nodp)%visit = 1
               enddo
 c
@@ -224,8 +231,8 @@ c       node order
 c
 c  .....determine whether the element will be p-refined
         if (NODES(mdle)%visit.eq.0) then
-          etype = NODES(mdle)%type
-          nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
+          ntype = NODES(mdle)%ntype
+          nrv = nvert(ntype); nre = nedge(ntype); nrf = nface(ntype)
 c
 c  .......loop through element higher order nodes
           do j=1,nre+nrf+1
@@ -244,10 +251,12 @@ c  .........if nod is active
 c
         if (NODES(mdle)%visit.eq.1) then
           call find_new_order(mdle, newp)
+#if DEBUG_MODE
           if (iprint.eq.1) then
             write(*,7050) mdle,newp
  7050       format('execute_pref: REFINING mdle = ',i6,' new p = ',i3)
           endif
+#endif
           call nodmod(mdle, newp)
         endif
       enddo
@@ -262,7 +271,7 @@ c   routine name       - find_new_order
 c
 c---------------------------------------------------------------------
 c
-c   latest revision    - Aug 17
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine determines the increased order
 c                        for a node
@@ -278,15 +287,19 @@ c
       subroutine find_new_order(Nod, Newp)
 c
       use data_structure3D
+      implicit none
 c
-      select case(NODES(Nod)%type)
-      case('vert')
+      integer, intent(in)  :: Nod
+      integer, intent(out) :: Newp
+c
+      select case(NODES(Nod)%ntype)
+      case(VERT)
         Newp = 1
-      case('medg','mdlt','mdln','mdld')
+      case(MEDG,MDLT,MDLN,MDLD)
         Newp = NODES(Nod)%order+1
-      case('mdlq','mdlp')
+      case(MDLQ,MDLP)
         Newp = NODES(Nod)%order+11
-      case('mdlb')
+      case(MDLB)
         Newp = NODES(Nod)%order+111
       end select
 c

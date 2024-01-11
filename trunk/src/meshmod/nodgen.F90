@@ -4,56 +4,53 @@
 !
 !---------------------------------------------------------------------
 !
-!   latest revision    - June 2021
 !
-!   purpose            - routine generates a new node
-!
-!   arguments :
-!
-!     in:
-!              Type    - type of a new node
-!              Icase   - node case
-!              Nbcond  - boundary condition flag
-!              Nfath   - father of the node
-!              Norder  - order of approximation for the new node
-!              Subd    - subdomain of node
-!              Iact    = T  active node, allocate dof
-!                      = F  inactive node, DO NOT allocate dof
-!              X       = coord for vertex
-!     out:
-!              Nod     - number of the new node
-!
+!> @brief      routine generates a new node
+!!
+!> @param[in]  Ntype   - type of a new node
+!> @param[in]  Icase   - node case
+!> @param[in]  Nbcond  - boundary condition flag
+!> @param[in]  Nfath   - father of the node
+!> @param[in]  Norder  - order of approximation for the new node
+!> @param[in]  Subd    - subdomain of node
+!> @param[in]  Iact    = T  active node, allocate dof
+!!                     = F  inactive node, DO NOT allocate dof
+!> @param[out] Nod     - number of the new node
+!!
+!> @date       Feb 2023
 !-----------------------------------------------------------------------
 !
-subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
+subroutine nodgen(Ntype,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
 !
    use data_structure3D
-   use mpi_param, only: RANK,ROOT
+   use environment, only: QUIET_MODE
+   use mpi_param  , only: RANK,ROOT
 !
    implicit none
 !
-   character(len=4), intent(in)  :: Type
-   integer, intent(in)           :: Icase
-   integer, intent(in)           :: Nbcond
-   integer, intent(in)           :: Nfath
-   integer, intent(in)           :: Norder
-   integer, intent(in)           :: Subd
-   logical, intent(in)           :: Iact
-   integer, intent(out)          :: Nod
+   integer, intent(in)  :: Ntype
+   integer, intent(in)  :: Icase
+   integer, intent(in)  :: Nbcond
+   integer, intent(in)  :: Nfath
+   integer, intent(in)  :: Norder
+   integer, intent(in)  :: Subd
+   logical, intent(in)  :: Iact
+   integer, intent(out) :: Nod
 !
    integer :: ndofH,ndofE,ndofV,ndofQ,nvar
 !
 #if DEBUG_MODE
    integer :: ncase(NR_PHYSA)
    integer :: ibcnd(NRINDEX)
-   integer :: iprint = 0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !-----------------------------------------------------------------------
 !
 #if DEBUG_MODE
    if (iprint.eq.1) then
-      write(*,7000) Type,Icase,Nbcond,Nfath,Norder,Iact
+      write(*,7000) S_Type(Ntype),Icase,Nbcond,Nfath,Norder,Iact
  7000 format(' nodgen: Type,Icase,Nbcond,Nfath,Norder,Iact = ', &
                         a4,2x,i3,2x,i6,2x,i6,2x,i3,2x,l2)
       call decod(Icase,2,NR_PHYSA, ncase)
@@ -66,7 +63,7 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
 #endif
 !
    if ((NPNODS.eq.0) .or. (NPNODS.gt.MAXNODS)) then
-      if (RANK .eq. ROOT) then
+      if (.not. QUIET_MODE .and. RANK.eq.ROOT) then
          write(*,*) 'nodgen: increasing size of NODES array.'
       endif
       call increase_MAXNODS
@@ -80,14 +77,13 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
    NPNODS=NODES(Nod)%bcond
 !
 !..store node information
-   NODES(Nod)%type  = Type
+   NODES(Nod)%ntype = Ntype
    NODES(Nod)%case  = Icase
    NODES(Nod)%order = Norder
    NODES(Nod)%bcond = Nbcond
 !
    NODES(Nod)%ref_kind    = 0
    NODES(Nod)%father      = Nfath
-   NODES(Nod)%geom_interf = 0
    NODES(Nod)%visit       = 0
    NODES(Nod)%subd        = Subd
 !
@@ -123,26 +119,26 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
 !..allocate and initialize solution dofs
    if (Iact) then
       if ((NREQNH(Icase).gt.0).and.(ndofH.gt.0)) then
-         nvar = NREQNH(Icase)*NRCOMS
-         allocate( NODES(Nod)%dof%zdofH(nvar,ndofH))
+         nvar = NREQNH(Icase)*NRRHS
+         allocate( NODES(Nod)%dof%zdofH(nvar,ndofH,NRCOMS))
          NODES(Nod)%dof%zdofH = ZERO
          NRDOFSH = NRDOFSH + ndofH*NREQNH(Icase)
       endif
       if ((NREQNE(Icase).gt.0).and.(ndofE.gt.0)) then
-         nvar = NREQNE(Icase)*NRCOMS
-         allocate( NODES(Nod)%dof%zdofE(nvar,ndofE))
+         nvar = NREQNE(Icase)*NRRHS
+         allocate( NODES(Nod)%dof%zdofE(nvar,ndofE,NRCOMS))
          NODES(Nod)%dof%zdofE = ZERO
          NRDOFSE = NRDOFSE + ndofE*NREQNE(Icase)
       endif
       if ((NREQNV(Icase).gt.0).and.(ndofV.gt.0)) then
-         nvar = NREQNV(Icase)*NRCOMS
-         allocate( NODES(Nod)%dof%zdofV(nvar,ndofV))
+         nvar = NREQNV(Icase)*NRRHS
+         allocate( NODES(Nod)%dof%zdofV(nvar,ndofV,NRCOMS))
          NODES(Nod)%dof%zdofV = ZERO
          NRDOFSV = NRDOFSV + ndofV*NREQNV(Icase)
       endif
       if ((NREQNQ(Icase).gt.0).and.(ndofQ.gt.0)) then
-         nvar = NREQNQ(Icase)*NRCOMS
-         allocate( NODES(Nod)%dof%zdofQ(nvar,ndofQ))
+         nvar = NREQNQ(Icase)*NRRHS
+         allocate( NODES(Nod)%dof%zdofQ(nvar,ndofQ,NRCOMS))
          NODES(Nod)%dof%zdofQ = ZERO
          NRDOFSQ = NRDOFSQ + ndofQ*NREQNQ(Icase)
       endif
@@ -154,7 +150,7 @@ subroutine nodgen(Type,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
 #if DEBUG_MODE
    if (iprint.eq.1) then
       write(*,*) 'nodgen: Nod ',Nod,'HAS BEEN GENERATED'
-      write(*,*) '        Type ',Type, ', Norder = ',Norder
+      write(*,*) '        Type ',S_Type(Ntype), ', Norder = ',Norder
       call pause
    endif
 #endif

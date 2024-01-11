@@ -1,10 +1,11 @@
 !-------------------------------------------------------------------------
-!> Purpose : break a node and generate hierarchical nodes
+!> @brief     break a node and generate hierarchical nodes
 !!
 !> @param[in] Nod     - node number
 !> @param[in] Kref    - refinement flag
 !> @param[in] Iact    - T : generate active   sons
 !!                      F : generate inactive sons
+!> @date      Feb 2023
 !-------------------------------------------------------------------------
 !
 subroutine nodbreak(Nod,Kref,Iact)
@@ -13,12 +14,11 @@ subroutine nodbreak(Nod,Kref,Iact)
 !
    implicit none
 !..Arguments
-   integer,               intent(in) :: Nod, Kref
-   logical,               intent(in) :: Iact
+   integer, intent(in) :: Nod, Kref
+   logical, intent(in) :: Iact
 !..Local variables
-   character(len=4), dimension(27) :: type_sons
-   integer,          dimension(27) :: norder, nbcond, nsubd
-   integer                         :: nrsons, i, ison, icase
+   integer, dimension(27) :: ntype_sons, norder, nbcond, nsubd
+   integer                :: nrsons, i, ison, icase
 !
 !-------------------------------------------------------------------------
 !
@@ -35,12 +35,12 @@ subroutine nodbreak(Nod,Kref,Iact)
    NODES(Nod)%ref_kind=Kref
 !
 !..use Nod info to determine info about son nodes
-   call set_break( NODES(Nod)%type,                        &
+   call set_break( NODES(Nod)%ntype,                       &
                    NODES(Nod)%ref_kind,                    &
                    NODES(Nod)%order,                       &
                    NODES(Nod)%bcond,                       &
                    NODES(Nod)%subd,                        &
-                   nrsons, type_sons, norder, nbcond, nsubd )
+                   nrsons, ntype_sons, norder, nbcond, nsubd )
 !
 !..generate the son nodes
    NODES(Nod)%nr_sons = nrsons
@@ -48,7 +48,7 @@ subroutine nodbreak(Nod,Kref,Iact)
 !..Note: do not pass any member variable from NODES(Nod) into nodgen
 !        if MAXNODS is increased, then NODES is reallocated
    do i=1,nrsons
-      call nodgen( type_sons(i),                           &
+      call nodgen( ntype_sons(i),                          &
                    icase,                                  &
                    nbcond(i),                              &
                    Nod,                                    &
@@ -56,7 +56,7 @@ subroutine nodbreak(Nod,Kref,Iact)
                    nsubd(i),                               &
                    Iact,                                   &
                    ison )
-      if (i .eq. 1) NODES(Nod)%first_son = ison
+      if (i.eq.1) NODES(Nod)%first_son = ison
    enddo
 !
 #if DEBUG_MODE

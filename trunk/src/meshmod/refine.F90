@@ -1,13 +1,12 @@
-!> Purpose - routine refines an element enforcing TWO mesh regularity rules:
-!!
-!!                        Rule 1: no element can be broken unless
-!!                                ALL its mid-face nodes are active
-!!                        Rule 2: an element refinement flag is
-!!                                always upgraded to accommodate
-!!                                existing refinements of faces
-!!
-!! @param[in] Mdle_in - middle node
-!! @param[in] Kref_in - refinement kind
+!> @brief     Refines an element enforcing TWO mesh regularity rules:
+!> @details           Rule 1: no element can be broken unless
+!!                            ALL its mid-face nodes are active
+!!                    Rule 2: an element refinement flag is
+!!                            always upgraded to accommodate
+!!                            existing refinements of faces
+!> @param[in] Mdle_in - middle node
+!> @param[in] Kref_in - refinement kind
+!> @date      Feb 2023
 !--------------------------------------------------------------------
 subroutine refine(Mdle_in,Kref_in)
    use data_structure3D
@@ -18,19 +17,21 @@ subroutine refine(Mdle_in,Kref_in)
 !
    integer, intent(in) :: Mdle_in, Kref_in
 !
-   character(len=4) :: type
-!
    integer, dimension(MAXQUEUE) :: mdle_list,kref_list
    integer, dimension(2)        :: neig,nsid_list,norient_list
    integer, dimension(27)       :: nodesl,norientl
    integer, dimension(6)        :: kreff
-   integer :: iprint, i, n, loc, loc2, iface, iface_loc, kref, krefm, kref_iso
-   integer :: nrneig, nod, nodp, mdle, mdle_loc, norient_loc, nc, icase
+   integer :: i, n, loc, loc2, iface, iface_loc, kref, krefm, kref_iso
+   integer :: nrneig, nod, nodp, mdle, mdle_loc, norient_loc, nc, icase, ntype
    logical :: iflag
+!
+#if DEBUG_MODE
+   integer :: iprint
+   iprint=0
+#endif
 !
 !---------------------------------------------------------------------
 !
-   iprint=0
 #if DEBUG_MODE
    if (RANK.eq.ROOT .and. iprint.ge.1) then
       write(*,*) 'refine: BEGIN Mdle_in,Kref_in,ISO = ', &
@@ -69,12 +70,12 @@ subroutine refine(Mdle_in,Kref_in)
       iflag = .true.
       mdle  = mdle_list(n)
       kref  = kref_list(n)
-      type  = NODES(mdle)%type
+      ntype  = NODES(mdle)%ntype
 !
 #if DEBUG_MODE
       if (RANK.eq.ROOT .and. iprint.ge.1) then
          write(*,*)'------------------------------------------------'
-         write(*,7003) n,mdle,kref,type
+         write(*,7003) n,mdle,kref,S_Type(ntype)
          write(*,*)'------------------------------------------------'
  7003    format(' refine: n,mdle,kref,type = ',i2,',',i9,',',i3,',',a4)
       endif
@@ -92,13 +93,13 @@ subroutine refine(Mdle_in,Kref_in)
 !
 !     loop over faces
 !     ~~~~~~~~~~~~~~~~
-      do iface=1,nface(type)
-         i = nvert(type)+nedge(type)+iface
+      do iface=1,nface(ntype)
+         i = nvert(ntype)+nedge(ntype)+iface
          nod = nodesl(i)
 !
 #if DEBUG_MODE
          if (RANK.eq.ROOT .and. iprint.eq.2) then
-            write(*,8000) iface,nod,NODES(nod)%type
+            write(*,8000) iface,nod,S_Type(NODES(nod)%ntype)
 8000        format('refine: active,iface,nod,type = ',i2,',',i9,',',a4)
          endif
 #endif
@@ -109,7 +110,7 @@ subroutine refine(Mdle_in,Kref_in)
             if (is_leaf(nod)) then
                kreff(iface) = 0
             else
-               call change_ref_flag('g2l', NODES(nod)%type, &
+               call change_ref_flag('g2l', NODES(nod)%ntype, &
                                     NODES(nod)%ref_kind,norientl(i), &
                                     kreff(iface))
             endif
@@ -125,7 +126,7 @@ subroutine refine(Mdle_in,Kref_in)
                if (is_leaf(nod)) then
                   kreff(iface) = 0
                else
-                  call change_ref_flag('g2l', NODES(nod)%type, &
+                  call change_ref_flag('g2l', NODES(nod)%ntype, &
                                        NODES(nod)%ref_kind,norientl(i), &
                                        kreff(iface))
                endif
@@ -143,7 +144,7 @@ subroutine refine(Mdle_in,Kref_in)
 !
 !-----------------------------------------------------------------------
 !!!              ! skip triangle
-!!!              if (NODES(nod)%type.eq.'mdlt') then
+!!!              if (NODES(nod)%ntype.eq.MDLT) then
 !!!                 kreff(iface) = 0
 !!!                 cycle
 !!!              endif
@@ -176,24 +177,24 @@ subroutine refine(Mdle_in,Kref_in)
                endif
 !
                kreff = 0
-               call change_ref_flag('g2l',NODES(nodp)%type, &
+               call change_ref_flag('g2l',NODES(nodp)%ntype, &
                     NODES(nodp)%ref_kind,norient_loc, kreff(iface_loc))
 !
 !           ...-------------------------------------------------------------------
 !           ...Option 1: do minimum refinement that is necessary
-               !call find_element_ref(NODES(mdle_loc)%type,0,kreff, krefm)
+               !call find_element_ref(NODES(mdle_loc)%ntype,0,kreff, krefm)
 !           ...-------------------------------------------------------------------
 !           ...Option 2: always ask for isotropic refinement
                call get_isoref(mdle_loc, kref_iso)
-               call find_element_ref(NODES(mdle_loc)%type,kref_iso,kreff, krefm)
+               call find_element_ref(NODES(mdle_loc)%ntype,kref_iso,kreff, krefm)
 !           ...-------------------------------------------------------------------
 !           ...Option 3: always ask for radial (xy) refinement (FIBER LASER)
-               !select case (NODES(mdle_loc)%type)
-               !   case('mdlb'); krefm = 110
-               !   case('mdlp'); krefm = 10
+               !select case (NODES(mdle_loc)%nntype)
+               !   case(MDLB); krefm = 110
+               !   case(MDLP); krefm = 10
                !   case default
                !      write(*,*) 'refine: unexpected element type: mdle_loc,type = ', &
-               !                          mdle_loc,NODES(mdle_loc)%type
+               !                          mdle_loc,S_Type(NODES(mdle_loc)%ntype)
                !end select
 !           ...-------------------------------------------------------------------
 !
@@ -207,9 +208,9 @@ subroutine refine(Mdle_in,Kref_in)
                if (krefm.lt.0) then
                   write(*,*) 'refine: INCONSISTENCY'
                   write(*,*) 'mdle_loc%type,kreff,krefm      = ', &
-                        NODES(mdle_loc)%type,kreff,krefm
+                        S_Type(NODES(mdle_loc)%ntype),kreff,krefm
                   write(*,*) 'nodp, nodp%type, nodp%ref_kind =', &
-                        nodp,NODES(nodp)%type,NODES(nodp)%ref_kind
+                        nodp,S_Type(NODES(nodp)%ntype),NODES(nodp)%ref_kind
                endif
 !
 !           ...add neighboring element to queue
@@ -232,13 +233,13 @@ subroutine refine(Mdle_in,Kref_in)
 !     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       if (iflag) then
 !
-!         write(*,1234) 'refine: type,kref,kreff = ',type,kref,kreff
+!         write(*,1234) 'refine: type,kref,kreff = ',S_Type(ntype),kref,kreff
 ! 1234    format(a,a,',',i3,',',6(i3,1x))
 !
          if ( is_iso_only() ) then
             call get_isoref(mdle, krefm)
          else
-            call find_element_ref(type,kref,kreff, krefm)
+            call find_element_ref(ntype,kref,kreff, krefm)
          endif
          if (kref .ne. krefm) then
             ! CHECK (FOR FIBER ONLY)
@@ -256,7 +257,7 @@ subroutine refine(Mdle_in,Kref_in)
             call break(mdle,krefm)
             n = n - 1
          else
-            write(*,7010) mdle,type,kref,kreff(1:nface(type)),krefm
+            write(*,7010) mdle,S_Type(ntype),kref,kreff(1:nface(ntype)),krefm
  7010       format('refine: INCONSISTENCY, mdle,type,kref,kreff,krefm = ', &
                                            i7,',',a4,',',i3,',',6(i3,1x),',',i3)
             call logic_error(ERR_INVALID_VALUE, __FILE__,__LINE__)

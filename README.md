@@ -10,8 +10,8 @@ for Complex Multiphysics Applications
 
 ## Compiling the library
 1. Create `m_options` file in `hp3d/trunk/`:
-Use the default `m_options` file in `hp3d/trunk/` or copy one of the existing `m_options` files from `hp3d/trunk/m_options_files/` into `hp3d/trunk/`.
-For example: `cp m_options_files/m_options_TACC_intel18 m_options`
+Copy one of the existing `m_options` files from `hp3d/trunk/m_options_files/` into `hp3d/trunk/`.
+For example: `cp m_options_files/m_options_debian_10 m_options`
 2. Modify `m_options` file to set the correct path to the main directory:
 Set the `HP3D_BASE_PATH` to the path of the `hp3d/trunk/`
 3. To compile the library, type `make` in `hp3d/trunk/`. **Before compiling**, you **must** link to the external libraries and set compiler options by modifying the `m_options` file as described below.
@@ -59,13 +59,14 @@ Compilation is governed by preprocessing flags `COMPLEX` and `DEBUG`.
 Library will be created under either `hp3d/complex/` or `hp3d/real/`.
 
 Additional preprocessing flags for enabling/disabling third-party libraries:
-- `HP3D_USE_INTEL_MKL = 0` , dependency on Intel MKL package is disabled
-- `HP3D_USE_INTEL_MKL = 1` , additional solver options are available to the user (e.g., Intel MKL PARDISO)
-- `HP3D_USE_OPENMP = 0` , OpenMP threading is disabled
-- `HP3D_USE_OPENMP = 1` , OpenMP threading is enabled
+- `HP3D_USE_OPENMP    = 0/1` , enable/disable OpenMP threading
+- `HP3D_USE_INTEL_MKL = 0/1` , enable/disable dependency on Intel MKL package
+
+## Verifying build
+In addition to the default `make` that builds and installs the hp3D library, the `makefile` provides various targets which can be viewed via `make help`. For example, use `make check` to run a quick check after building the library, or run more extensive tests using `make test`.
 
 ## Compiling a problem
-Projects are implemented in `hp3d/trunk/problems/`. A few projects have been implemented and can serve as an example. For example, `/problems/MPI_POISSON/GALERKIN/` is a Galerkin implementation for the classical variational Poisson problem. To compile and run the problem, type `make`  in the project folder, i.e., `cd problems/MPI_POISSON/GALERKIN; make; ./run.sh`.
+Projects are implemented in `hp3d/trunk/problems/`. A few projects have been implemented and can serve as an example. For example, `/problems/POISSON/GALERKIN/` is a Galerkin implementation for the classical variational Poisson problem. To compile and run the problem, type `make`  in the project folder, i.e., `cd problems/POISSON/GALERKIN; make; ./run.sh`.
 
 ## Citing hp3D
 Please add the following citation to any paper, technical report, or article that incorporated the `hp3D` library:
@@ -116,5 +117,13 @@ https://github.com/Oden-EAG/hp3d_user_guide (LaTeX source)
 
 A PDF version of the user manual is available on arXiv: https://arxiv.org/abs/2207.12211
 
+## How to Contribute
+hp3D is distributed under the terms of the BSD-3 license. All new contributions must be made under this license.
+
+Contributions of all kinds are welcome, including bug fixes, code optimizations, new capabilities, improved documentation, and model problems or applications. The new feature or contribution should be developed on a properly named feature branch based off of `hp3d:master` in a forked repository. If you would like to propose a contribution, please use a pull request (PR) toward the `hp3d:master` branch from your forked hp3D repository. Before starting a PR or working on a new feature, we encourage opening an [issue](https://github.com/Oden-EAG/hp3d/issues) first and discussing the new feature or contribution with the developer team.
+
 ## Support
-Contact: ``stefan@oden.utexas.edu``, ``leszek@oden.utexas.edu``
+The [issue tracker](https://github.com/Oden-EAG/hp3d/issues) serves as the primary tool for resolving questions related to code features, etc.
+
+For other inquiries, please contact:
+``stefan@oden.utexas.edu``, ``leszek@oden.utexas.edu``

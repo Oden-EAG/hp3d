@@ -768,7 +768,7 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
    use control    , only : GEOM_TOL
    use environment, only : QUIET_MODE
    use mpi_param  , only : RANK,ROOT
-   use MPI        , only : MPI_COMM_WORLD
+   use MPI        , only : MPI_COMM_WORLD,MPI_Wtime
    use par_mesh   , only : DISTRIBUTED
 !
    implicit none
@@ -797,14 +797,14 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
    integer :: iel, i, ndom
 !
 !..element type
-   character(len=4) :: etype
+   integer :: etype
 !
 !..face number over which power is computed
 !  (in brick and prism, face 2 is face normal to xi3, at xi3=1)
    integer, parameter :: faceNum = 2
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
    integer :: ierr
 !
 !---------------------------------------------------------------------------------------
@@ -853,12 +853,12 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
       mdle = ELEM_SUBD(iel)
       if (GEOM_NO .eq. 5) call find_domain(mdle, ndom)
       call nodcor_vert(mdle, xnod)
-      etype = NODES(Mdle)%type
+      etype = NODES(mdle)%ntype
       select case(etype)
-         case('mdlb')
+         case(MDLB)
             maxz = maxval(xnod(3,1:8))
             minz = minval(xnod(3,1:8))
-         case('mdlp')
+         case(MDLP)
             maxz = maxval(xnod(3,1:6))
             minz = minval(xnod(3,1:6))
          case default
@@ -953,7 +953,7 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
    integer :: nrv, nre, nrf
 !
 !..declare edge/face type varibles
-   character(len=4) :: etype,ftype
+   integer :: etype,ftype
 !
 !..variables for geometry
    real(8), dimension(3)   :: xi,x,rn,x_new
@@ -1009,7 +1009,7 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
    integer :: nint,icase,iattr,l,i,j
    real(8) :: weight,wa
    integer :: iel,nsign
-   integer :: nflag,iload
+   integer :: nflag
 !
 !---------------------------------------------------------------------------------------
 !
@@ -1017,12 +1017,12 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
    FaceDiffPower = 0.0d0
    nflag = 1
 !..element type
-   etype = NODES(Mdle)%type
+   etype = NODES(Mdle)%ntype
    nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
    call find_order(Mdle, norder)
    call find_orient(Mdle, nedge_orient,nface_orient)
-   call nodcor(mdle, xnod)
-   call solelm(mdle, zdofH,zdofE,zdofV,zdofQ)
+   call nodcor(Mdle, xnod)
+   call solelm(Mdle, zdofH,zdofE,zdofV,zdofQ)
 !..sign factor to determine the OUTWARD normal unit vector
    nsign = nsign_param(etype,Facenumber)
 !
@@ -1162,7 +1162,7 @@ subroutine compute_mode_power(Mdle,Facenumber,Fld, ModePower,ModeNorm,ModeCoef)
    integer :: nrv, nre, nrf
 !
 !..declare edge/face type varibles
-   character(len=4) :: etype,ftype
+   integer :: etype,ftype
 !
 !..variables for geometry
    real(8), dimension(3)   :: xi,x,rn,x_new
@@ -1218,19 +1218,19 @@ subroutine compute_mode_power(Mdle,Facenumber,Fld, ModePower,ModeNorm,ModeCoef)
    integer :: nint,icase,iattr,l,i,j
    real(8) :: weight,wa
    integer :: iel,nsign
-   integer :: nflag,iload
+   integer :: nflag
 !
 !---------------------------------------------------------------------------------------
 !
    ModePower = 0.d0
    nflag = 1
 !..element type
-   etype = NODES(Mdle)%type
+   etype = NODES(Mdle)%ntype
    nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
    call find_order(Mdle, norder)
    call find_orient(Mdle, nedge_orient,nface_orient)
-   call nodcor(mdle, xnod)
-   call solelm(mdle, zdofH,zdofE,zdofV,zdofQ)
+   call nodcor(Mdle, xnod)
+   call solelm(Mdle, zdofH,zdofE,zdofV,zdofQ)
 !..sign factor to determine the OUTWARD normal unit vector
    nsign = nsign_param(etype,Facenumber)
 !

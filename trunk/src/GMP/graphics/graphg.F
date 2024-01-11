@@ -4,13 +4,11 @@ c   routine name       - graphg
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Dec,01
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine controls interactively calls to
 c                        various graphics routines for the GMP
 c                        package
-c
-c   arguments          - none
 c
 c----------------------------------------------------------------------
 c
@@ -19,7 +17,9 @@ c
       use GMP
       use graphmod
 c
-#include "syscom.blk"
+      implicit none
+c
+      integer :: idec,iwin
 c
 c  ...initial lengths of the arrays
       MXIGTR   = 100000000
@@ -65,5 +65,5 @@ c
 c
       go to 10
 c
-      end
+      end subroutine graphg
 

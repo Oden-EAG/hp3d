@@ -4,18 +4,13 @@ c   routine name       - object3
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Sep 07
+c   latest revision    - Mar 2023
 c
 c   purpose            - routine displays a 3D manifold
-c
 c
 c   arguments :
 c     in:
 c               Iwind  - window number
-c
-c   required  routines -
 c
 c----------------------------------------------------------------------
 c
@@ -24,11 +19,18 @@ c
       use GMP
       use graphmod
 
-#include "syscom.blk"
+      implicit none
 c
+      integer :: Iwind
 c
-      dimension xcl(3),igv(20),im(2),xxy(2)
+      real(8) :: xcl(3),xxy(2)
+      integer :: igv(20),im(2)
 c
+      integer :: i,ibl,iblno,ichoice,icount,inickbl,ivis,loc
+      integer :: nel,nh,nick,nickbl,npri,npyr,nrsub1,ntet
+      real(8) :: psi,q,q1,rnsc,theta
+c
+      real(8) :: bigp,bign,small,pi
       data bigp,bign,small /1.d30,-1.d30,1.d-14/
       data pi /3.14159265358979312d0/
 c
@@ -50,7 +52,7 @@ ccc        if (RECTANGLES(nr)%BlockNo(2).eq.0) then
 ccc          call recta_linear(nr,eta, x,dxdeta)
 ccc          if (x(3).gt.-29.d0) then
 ccc            NRCURVBL = NRCURVBL + 1
-ccc            NLINBLOCKS(NRCURVBL) = iabs(RECTANGLES(nr)%BlockNo(1))
+ccc            NLINBLOCKS(NRCURVBL) = abs(RECTANGLES(nr)%BlockNo(1))
 ccc          endif
 ccc        endif
 ccc      enddo
@@ -239,7 +241,7 @@ c
           xxy(1) = (im(1) - XCWIN(1))/SIZE*DIMIM + XCIM(1)
           xxy(2) = (im(2) - XCWIN(2))/SIZE*DIMIM + XCIM(2)
           call findno(xxy, nel)
-          nel = iabs(nel)
+          nel = abs(nel)
           if (nel.gt.0) then
             icount = icount +1
             igv(icount) = nel
@@ -438,10 +440,4 @@ c
       goto 10
 c
 c
-      end
-
-
-
-
-
-
+      end subroutine object3

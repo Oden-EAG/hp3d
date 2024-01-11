@@ -3,34 +3,31 @@
 !   routine name       - enforce_max_rule
 !
 !----------------------------------------------------------------------
-!
-!   latest revision    - Aug 2019
-!
-!   purpose            - routine enforces the max rule for a FE mesh
-!
-! REMARK: THIS ROUTINE HAS BEEN OBSERVED TO REFINE (INCREASE P)
-!         UNNECESSARILY WHEN THE MESH HAS ANISOTROPIC ORDER OF APPROX.
-!
+!> @brief routine enforces the max rule for a FE mesh
+!> @remark THIS ROUTINE HAS BEEN OBSERVED TO REFINE (INCREASE P)
+!!         UNNECESSARILY WHEN THE MESH HAS ANISOTROPIC ORDER OF APPROX.
+!> @date Feb 2023
 !----------------------------------------------------------------------
-!
-   subroutine enforce_max_rule
+subroutine enforce_max_rule
 !
    use data_structure3D
    use refinements
    use constrained_nodes
-#include "syscom.blk"
+!
+   implicit none
 !
 !..work space for elem_nodes
-   dimension nodesl(27),norientl(27)
+   integer :: nodesl(27),norientl(27)
 !
 !..order for element nodes implied by the order of the middle node
-   dimension norder(19)
+   integer :: norder(19)
 !
-   character(len=4) :: etype
+   integer :: iel,mdle,nre,nrf,nrv,i,j,nod,nord,ntype,nrsons
+   integer :: icase,is,jf,nc,ne1,ne2,ne3,ne4,nodp,nods
+   integer :: nordh,nordh1,nordhs,nordhl,nordhv
+   integer :: nordv,nordv1,nordvs,nordvl
 !
 !----------------------------------------------------------------------
-!
-   iprint=0
 !
 !..reset visitation flags
    call reset_visit
@@ -42,8 +39,8 @@
 !..loop through elements in the current mesh
    do iel=1,NRELES
       mdle = ELEM_ORDER(iel)
-      etype = NODES(Mdle)%type
-      nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
+      ntype = NODES(Mdle)%ntype
+      nrv = nvert(ntype); nre = nedge(ntype); nrf = nface(ntype)
       call get_connect_info(mdle, nodesl,norientl)
       call element_order(mdle,norientl, norder)
 !
@@ -96,8 +93,8 @@
    do iel=1,NRELES
       mdle = ELEM_ORDER(iel)
       call elem_nodes(mdle, nodesl,norientl)
-      etype = NODES(Mdle)%type
-      nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
+      ntype = NODES(Mdle)%ntype
+      nrv = nvert(ntype); nre = nedge(ntype); nrf = nface(ntype)
 !
 !  ...collect the order for nodes determined so far in the ELEMENT coordinates
       do j=1,nre+nrf
@@ -107,8 +104,8 @@
          norder(j) = NODES(nod)%visit
 !
 !     ...determaxe the face order in element coordinates
-         select case(NODES(nod)%type)
-         case('mdlq')
+         select case(NODES(nod)%ntype)
+         case(MDLQ)
             call decode(norder(j), nordh,nordv)
             select case(norientl(nrv+j))
             case(1,3,4,6); norder(j) = nordv*10+nordh
@@ -121,12 +118,12 @@
       do jf=1,nrf
 !
 !     ...determine local edge numbers for the face
-         call face_to_edge(etype,jf, ne1,ne2,ne3,ne4)
+         call face_to_edge(ntype,jf, ne1,ne2,ne3,ne4)
          nod = nodesl(nrv+nre+jf)
-         select case(face_type(etype,jf))
-         case('tria')
+         select case(face_type(ntype,jf))
+         case(TRIA)
             norder(nre+jf) = max(norder(nre+jf),norder(ne1),norder(ne2),norder(ne3))
-         case('rect')
+         case(RECT)
             call decode(norder(nre+jf), nordh,nordv)
             nordh = max(nordh,norder(ne1),norder(ne3))
             nordv = max(nordv,norder(ne2),norder(ne4))
@@ -137,10 +134,10 @@
 !  ...loop through faces
       do jf=1,nrf
          nod = nodesl(nrv+nre+jf)
-         select case(face_type(etype,jf))
-         case('tria')
+         select case(face_type(ntype,jf))
+         case(TRIA)
             NODES(nod)%visit = max(NODES(nod)%visit,norder(nre+jf))
-         case('rect')
+         case(RECT)
             call decode(NODES(nod)%visit, nordh,nordv)
             call decode(norder(nre+jf), nordhl,nordvl)
             select case(norientl(nrv+nre+jf))
@@ -168,10 +165,10 @@
 !
 !     ...refined node, check order of its sons
          if (NODES(nod)%ref_kind.ne.0) then
-            select case(NODES(nod)%type)
+            select case(NODES(nod)%ntype)
 !
 !        ...edge node
-            case('medg')
+            case(MEDG)
                do is=1,2
                   !nods = NODES(nod)%sons(is)
                   nods = Son(nod,is)
@@ -190,15 +187,15 @@
             enddo
 !
 !        ...triangular face node
-            case('mdlt')
-               call nr_face_sons('mdlt',NODES(nod)%ref_kind, nrsons)
+            case(MDLT)
+               call nr_face_sons(MDLT,NODES(nod)%ref_kind, nrsons)
                do is=1,nrsons
                   !nods = NODES(nod)%sons(is)
                   nods = Son(nod,is)
-                  select case(NODES(nods)%type)
-                  case('mdlt')
+                  select case(NODES(nods)%ntype)
+                  case(MDLT)
                      nord = max(nord,NODES(nods)%visit)
-                  case('mdlq')
+                  case(MDLQ)
                      call decode(NODES(nods)%visit, nordh,nordv)
                      nord = max(nord,nordv)
                   end select
@@ -209,20 +206,20 @@
                call nodmod(nod, nord)
 !
 !           ...communicate the new order to the (inactive) sons
-               call nr_sons('mdlt',NODES(nod)%ref_kind, nrsons)
+               call nr_sons(MDLT,NODES(nod)%ref_kind, nrsons)
                do is=1,nrsons
                   !nods = NODES(nod)%sons(is)
                   nods = Son(nod,is)
-                  select case(NODES(nods)%type)
-                  case('mdlt'); NODES(nods)%order = nord
-                  case('mdlq'); NODES(nods)%order = nord*10+nord
+                  select case(NODES(nods)%ntype)
+                  case(MDLT); NODES(nods)%order = nord
+                  case(MDLQ); NODES(nods)%order = nord*10+nord
                   end select
                enddo
 !
 !        ...rectangular face node
-            case('mdlq')
+            case(MDLQ)
                call decode(nord, nordh,nordv)
-               call nr_face_sons('mdlq',NODES(nod)%ref_kind, nrsons)
+               call nr_face_sons(MDLQ,NODES(nod)%ref_kind, nrsons)
                do is=1,nrsons
                   !nods = NODES(nod)%sons(is)
                   nods = Son(nod,is)
@@ -285,36 +282,43 @@
 !..reset visitation flags
    call reset_visit
 !
+end subroutine enforce_max_rule
 !
-   end subroutine enforce_max_rule
-
-
-
-
-
-
-
-   subroutine save_max_order(Nod,Nord)
+!
+!----------------------------------------------------------------------
+!> @brief Saves max order in Nod's visit flag
+!> @param[in]  Nod   - Node number
+!> @param[in]  Nord  - Minimum order requested for the node
+!> @date Feb 2023
+!----------------------------------------------------------------------
+subroutine save_max_order(Nod,Nord)
+!
    use data_structure3D
-#include "syscom.blk"
+   implicit none
+!
+   integer, intent(in) :: Nod,Nord
+!
+   integer :: nordh,nordh1,nordh2
+   integer :: nordv,nordv1,nordv2
+   integer :: nordhv
 !
    if (NODES(Nod)%visit.eq.0) then
       NODES(nod)%visit= Nord
    else
-      select case(NODES(Nod)%type)
-      case('medg','mdlt')
+      select case(NODES(Nod)%ntype)
+      case(MEDG,MDLT)
          NODES(nod)%visit = max(NODES(nod)%visit,Nord,NODES(nod)%order)
          ! write(*,*) 'save_max_order: Nod, NODES(nod)%visit = ', Nod,NODES(nod)%visit
-      case('mdlq')
+      case(MDLQ)
          call decode(NODES(nod)%order, nordh,nordv)
          call decode(Nord, nordh1,nordv1)
          call decode(NODES(nod)%visit, nordh2,nordv2)
          nordh = max(nordh,nordh1,nordh2); nordv = max(nordv,nordv1,nordv2)
          ! NODES(nod)%visit = nordh*10+nordv
-!     ...enforce isotropic order for the face
+!     ...enforce isotropic order for the face (TODO: why?)
          nordhv = max(nordh,nordv)
          NODES(nod)%visit = nordhv*10+nordhv
       end select
    endif
 !
-   end subroutine save_max_order
+end subroutine save_max_order

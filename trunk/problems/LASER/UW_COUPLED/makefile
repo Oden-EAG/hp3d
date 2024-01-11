@@ -1,4 +1,4 @@
-#####-----------------------------------------
+#-------------------------------------------------
 
 -include ../../../m_options
 
@@ -11,15 +11,9 @@ ifeq ($(COMPLEX),0)
 $(error COMPLEX FLAG MUST BE 1 FOR LASER APPLICATION)
 endif
 
-ifeq ($(COMPILER),INTEL)
-ifeq ($(DEBUG),1)
-FFLAGS += -gen-interface -warn none -warn interfaces
-endif
-endif
-
 SRC_PATH        = .
-#OBJ_PATH        = _obj_
-OBJ_PATH        = COMMON_FILES
+OBJ_ROOT        = _obj_
+OBJ_PATH        = $(OBJ_ROOT)/maindir
 MODULE_PATH     = $(OBJ_PATH)
 
 # Executable name
@@ -32,24 +26,34 @@ CCINCS          = $(PROB_INCS)
 # User defined libraries
 LIBS            = $(PROB_LIBS)
 
-# Defines SRC_FILE
+# Defines SRC_MODULE,SRC_COMMON,SRC_LASER
 -include make.inc
 
-SRC         = $(addprefix $(SRC_PATH)/,$(SRC_FILE))
+# Modules (resolve dependencies between modules)
+commonParam_SRC = $(SRC_PATH)/../COMMON_FILES/commonParam.F90
+laserParam_SRC  = $(SRC_PATH)/../COMMON_FILES/laserParam.F90
 
-SRC_FILE_F  = $(filter %.F, $(SRC_FILE))
-SRC_FILE_F90= $(filter %.F90, $(SRC_FILE))
+commonParam_OBJ = $(OBJ_PATH)/$(SRC_PATH)/../COMMON_FILES/commonParam.o
+laserParam_OBJ  = $(OBJ_PATH)/$(SRC_PATH)/../COMMON_FILES/laserParam.o
 
-OBJ_F90     = $(addprefix $(OBJ_PATH)/, $(SRC_FILE_F90:.F90=.F90.o))
-OBJ_F       = $(addprefix $(OBJ_PATH)/, $(SRC_FILE_F:.F=.F.o))
+MODULE_OBJ    = $(commonParam_OBJ) $(laserParam_OBJ)
 
-OBJ         = $(OBJ_F) $(OBJ_F90)
+COMMON_FILE   = $(addprefix $(SRC_PATH)/,$(SRC_COMMON))
+LASER_FILE    = $(addprefix $(SRC_PATH)/,$(SRC_LASER))
 
-FC_WORK     = $(FC) $(CCDEFS) $(CCINCS) $(FFLAGS) $(EXTRA_FFLAGS)
+COMMON_OBJ    = $(addprefix $(OBJ_PATH)/, $(COMMON_FILE:.F90=.o))
+LASER_OBJ     = $(addprefix $(OBJ_PATH)/, $(LASER_FILE:.F90=.o))
+
+OBJ           = $(MODULE_OBJ) $(COMMON_OBJ) $(LASER_OBJ)
+
+FC_WORK       = $(FC) $(CCDEFS) $(CCINCS) $(FFLAGS) $(EXTRA_FFLAGS)
+
+#-------------------------------------------------
+.PHONY : one
 
 one : $(OBJ_PATH)/.dummy $(OBJ)
 	@echo " "
-	@echo "- Linking , " $(EXEC)
+	@echo "- Linking - " $(EXEC)
 	@echo "- COMPLEX = " $(COMPLEX)
 	@echo "- DEBUG   = " $(DEBUG)
 	@echo "------------------------------ "
@@ -57,23 +61,40 @@ one : $(OBJ_PATH)/.dummy $(OBJ)
 
 $(OBJ_PATH)/.dummy :
 	@echo "Creating directory " $(OBJ_PATH)
-	@if [ -d $(OBJ_PATH) ]; then \
-		touch $@; \
-	else mkdir $(OBJ_PATH); touch $@; \
-	fi
+	@mkdir -p $(OBJ_PATH); touch $@;
 
-$(OBJ_PATH)/%.F.o : $(SRC_PATH)/%.F
+### Module dependencies ###
+$(commonParam_OBJ) : $(commonParam_SRC)
 	@mkdir -p $(dir $@)
 	@echo "Compiling $<"
 	$(FC_WORK) -o $@ -c $<
 
-$(OBJ_PATH)/%.F90.o : $(SRC_PATH)/%.F90
+$(laserParam_OBJ) : $(laserParam_SRC) $(commonParam_OBJ)
 	@mkdir -p $(dir $@)
 	@echo "Compiling $<"
 	$(FC_WORK) -o $@ -c $<
+### End Module dependencies ###
+
+# common files may depend on modules
+$(COMMON_OBJ) : $(OBJ_PATH)/%.o : $(SRC_PATH)/%.F90 $(MODULE_OBJ)
+	@mkdir -p $(dir $@)
+	@echo "Compiling $<"
+	$(FC_WORK) -o $@ -c $<
+
+# laser files may depend on modules
+$(LASER_OBJ) : $(OBJ_PATH)/%.o : $(SRC_PATH)/%.F90 $(MODULE_OBJ)
+	@mkdir -p $(dir $@)
+	@echo "Compiling $<"
+	$(FC_WORK) -o $@ -c $<
+
+#-------------------------------------------------
+.PHONY : print clean clean-pv
+
+print :
+	@echo $(OBJ)
 
 clean :
-	@rm -rf $(OBJ_PATH)
+	@rm -rf $(OBJ_ROOT)
 	@rm -f $(EXEC)
 	@rm -f *~
 	@rm -f *.mod
@@ -83,4 +104,3 @@ clean-pv :
 	@rm -f ../outputs/paraview/*
 	@rm -f ../outputs/power/*
 	@rm -f ../outputs/temp/*
-

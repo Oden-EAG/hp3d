@@ -28,10 +28,7 @@ subroutine find_domain(Mdle, Ndom)
 !
 ! determine domain number
   nel = abs(nfath)
-  Ndom = Ndomain_gmp(ELEMS(nel)%GMPblock)
+  Ndom = Ndomain_GMP(ELEMS(nel)%GMPblock)
 !
 !
 end subroutine find_domain
-
-
-

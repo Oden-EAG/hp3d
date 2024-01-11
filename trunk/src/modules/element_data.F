@@ -1,12 +1,13 @@
 c----------------------------------------------------------------------
-c> Purpose : element data for elements of different type
-c
-c> @revision Nov 12
+c> @brief   element data for elements of different type
+c> @date    Feb 2023
 c----------------------------------------------------------------------
 c
       module element_data
 c
-!       save
+      use node_types
+c
+      implicit none
 c
 c----------------------------------------------------------------------
 c  MASTER ELEMENTS VERTEX COORDINATES (vertex enumeration)            |
@@ -293,204 +294,127 @@ c
       integer, parameter, dimension(6) :: NBLENDF =
      . (/1,2,1,2,2,1/)
 c
-c
+c----------------------------------------------------------------------
 c
       contains
 c
-      function Ivtk_type(Type)
-      character(len=4) :: Type
+c----------------------------------------------------------------------
 c
-      select case(Type)
-      case ('vert'); Ivtk_type = 1
-      case ('medg'); Ivtk_type = 2
-      case ('mdlt'); Ivtk_type = 5
-      case ('mdlq'); Ivtk_type = 9
-      case ('mdln'); Ivtk_type = 10
-      case ('mdlb'); Ivtk_type = 12
-      case ('mdlp'); Ivtk_type = 13
-      case ('mdld'); Ivtk_type = 14
+      function Ivtk_type(Ntype)
+c
+      integer :: Ivtk_type
+      integer :: Ntype
+c
+      select case(Ntype)
+        case (VERT); Ivtk_type = 1
+        case (MEDG); Ivtk_type = 2
+        case (MDLT); Ivtk_type = 5
+        case (MDLQ); Ivtk_type = 9
+        case (MDLN); Ivtk_type = 10
+        case (MDLB); Ivtk_type = 12
+        case (MDLP); Ivtk_type = 13
+        case (MDLD); Ivtk_type = 14
+        case default
+          write(*,*) 'Ivtk_type'; stop
       end select
 c
-      end function
+      end function Ivtk_type
 c
-      function Ixdmf_type(Type)
-      character(len=4) :: Type
+c----------------------------------------------------------------------
 c
-      select case(Type)
-      case ('vert'); Ixdmf_type = 0
-      case ('medg'); Ixdmf_type = 0
-      case ('mdlt'); Ixdmf_type = 4
-      case ('mdlq'); Ixdmf_type = 5
-      case ('mdln'); Ixdmf_type = 6
-      case ('mdlb'); Ixdmf_type = 9
-      case ('mdlp'); Ixdmf_type = 8
-      case ('mdld'); Ixdmf_type = 7
+      function Ixdmf_type(Ntype)
+c
+      integer :: Ixdmf_type
+      integer :: Ntype
+c
+      select case(Ntype)
+        case (VERT); Ixdmf_type = 0
+        case (MEDG); Ixdmf_type = 0
+        case (MDLT); Ixdmf_type = 4
+        case (MDLQ); Ixdmf_type = 5
+        case (MDLN); Ixdmf_type = 6
+        case (MDLB); Ixdmf_type = 9
+        case (MDLP); Ixdmf_type = 8
+        case (MDLD); Ixdmf_type = 7
+        case default
+          write(*,*) 'Ixdmf_type'; stop
       end select
 c
-      end function
+      end function Ixdmf_type
 c
-      function Type_nod(Type, J)
-      integer :: J
-      character(len=4) :: Type_nod, Type;
-      select case(Type)
-      case ('mdln')
-        select case(J)
-        case (1,2,3,4);       Type_nod = 'vert'
-        case (5,6,7, 8,9,10); Type_nod = 'medg'
-        case (11,12,13,14);   Type_nod = 'mdlt'
-        case (15);            Type_nod = 'mdln'
-        end select
-      case ('mdlp')
-        select case(J)
-        case (1,2,3, 4,5,6);               Type_nod = 'vert'
-        case (7,8,9, 10,11,12, 13,14,15);  Type_nod = 'medg'
-        case (16,17);                      Type_nod = 'mdlt'
-        case (18,19,20);                   Type_nod = 'mdlq'
-        case (21);                         Type_nod = 'mdlp'
-        end select
-      case ('mdlb')
-        select case(J)
-        case (1,2,3,4, 5,6,7,8);           Type_nod = 'vert'
-        case (9,10,11,12, 13,14,15,16, 17,18,19,20)
-          Type_nod = 'medg'
-        case (21,22,23,24,25,26);          Type_nod = 'mdlq'
-        case (27);                         Type_nod = 'mdlb'
-        end select
-      case ('mdld')
-        select case(J)
-        case (1,2,3,4,5);            Type_nod = 'vert'
-        case (6,7,8,9, 10,11,12,13); Type_nod = 'medg'
-        case (14);                   Type_nod = 'mdlq'
-        case (15,16,17,18);          Type_nod = 'mdlt'
-        case (19);                   Type_nod = 'mdld'
-        end select
-      case default
-        write(*,*) 'Type_nod: wrong input type [', Type,']'
-        stop 1
-      end select
-c
-      end function Type_nod
-c
-c  ...determine number of vertices for a middle node or element type
-      function Nvert(Type)
-c
-      character(len=4) :: Type
-      integer Nvert
-c
-      select case(Type)
-      case('medg'); Nvert=2
-      case('mdlt','tria'); Nvert=3
-      case('mdlq','quad'); Nvert=4
-      case('mdlp','pris'); Nvert=6
-      case('mdlb','bric'); Nvert=8
-      case('mdln','tetr'); Nvert=4
-      case('mdld','pyra'); Nvert=5
-      end select
-c
-      end function Nvert
-c
-c
-c  ...determine number of edges for a middle node or element  type
-      function Nedge(Type)
-c
-      character(len=4) :: Type
-      integer Nedge
-c
-      select case(Type)
-      case('medg'); Nedge=0
-      case('mdlt','tria'); Nedge=3
-      case('mdlq','quad'); Nedge=4
-      case('mdlp','pris'); Nedge=9
-      case('mdlb','bric'); Nedge=12
-      case('mdln','tetr'); Nedge=6
-      case('mdld','pyra'); Nedge=8
-      end select
-c
-      end function Nedge
-c
-c
-c  ...determine number of faces for a middle node or element  type
-      function Nface(Type)
-c
-      character(len=4) :: Type
-      integer Nface
-c
-      select case(Type)
-      case('mdlp','pris'); Nface=5
-      case('mdlb','bric'); Nface=6
-      case('mdln','tetr'); Nface=4
-      case('mdld','pyra'); Nface=5
-      end select
-c
-      end function Nface
+c----------------------------------------------------------------------
 c
 c  ...return vertex numbers endpoints of an edge......
-      subroutine edge_to_vert(Type,Ie, Nv1,Nv2)
-      implicit none
-      character(len=4), intent(in) :: Type
-      integer, intent(in)  :: Ie
+      subroutine edge_to_vert(Ntype,Ie, Nv1,Nv2)
+c
+      integer, intent(in)  :: Ntype,Ie
       integer, intent(out) :: Nv1,Nv2
 c
-      select case(Type)
-      case('mdlt','tria')
+      select case(Ntype)
+      case(MDLT,TRIA)
         Nv1 = TRIAN_EDGE_TO_VERT(1,Ie); Nv2 = TRIAN_EDGE_TO_VERT(2,Ie)
-      case('mdlq','rect')
+      case(MDLQ,RECT)
         Nv1 = QUADR_EDGE_TO_VERT(1,Ie); Nv2 = QUADR_EDGE_TO_VERT(2,Ie)
-      case('mdlp','pris')
+      case(MDLP,PRIS)
         Nv1 = PRISM_EDGE_TO_VERT(1,Ie); Nv2 = PRISM_EDGE_TO_VERT(2,Ie)
-      case('mdlb','bric')
+      case(MDLB,BRIC)
         Nv1 = BRICK_EDGE_TO_VERT(1,Ie); Nv2 = BRICK_EDGE_TO_VERT(2,Ie)
-      case('mdln','tetr')
+      case(MDLN,TETR)
         Nv1 = TETRA_EDGE_TO_VERT(1,Ie); Nv2 = TETRA_EDGE_TO_VERT(2,Ie)
-      case('mdld','pyra')
+      case(MDLD,PYRA)
         Nv1 = PYRAM_EDGE_TO_VERT(1,Ie); Nv2 = PYRAM_EDGE_TO_VERT(2,Ie)
       end select
+c
       end subroutine edge_to_vert
 c
+c----------------------------------------------------------------------
+c
 c  ...return vertex numbers for a face
-      subroutine face_to_vert(Type,Ifc, Nv1,Nv2,Nv3,Nv4)
-      implicit none
-      character(len=4), intent(in) :: Type
-      integer, intent(in)  :: Ifc
+      subroutine face_to_vert(Ntype,Ifc, Nv1,Nv2,Nv3,Nv4)
+c
+      integer, intent(in)  :: Ntype,Ifc
       integer, intent(out) :: Nv1,Nv2,Nv3,Nv4
 c
-      select case(Type)
-      case('mdlp','pris')
+      select case(Ntype)
+      case(MDLP,PRIS)
         Nv1 = PRISM_FACE_TO_VERT(1,Ifc);Nv2 = PRISM_FACE_TO_VERT(2,Ifc);
         Nv3 = PRISM_FACE_TO_VERT(3,Ifc);Nv4 = PRISM_FACE_TO_VERT(4,Ifc);
-      case('mdlb','bric')
+      case(MDLB,BRIC)
         Nv1 = BRICK_FACE_TO_VERT(1,Ifc);Nv2 = BRICK_FACE_TO_VERT(2,Ifc);
         Nv3 = BRICK_FACE_TO_VERT(3,Ifc);Nv4 = BRICK_FACE_TO_VERT(4,Ifc);
-      case('mdln','tetr')
+      case(MDLN,TETR)
         Nv1 = TETRA_FACE_TO_VERT(1,Ifc);Nv2 = TETRA_FACE_TO_VERT(2,Ifc);
         Nv3 = TETRA_FACE_TO_VERT(3,Ifc);Nv4 = TETRA_FACE_TO_VERT(1,Ifc);
-      case('mdld','pyra')
+      case(MDLD,PYRA)
         Nv1 = PYRAM_FACE_TO_VERT(1,Ifc);Nv2 = PYRAM_FACE_TO_VERT(2,Ifc);
         Nv3 = PYRAM_FACE_TO_VERT(3,Ifc);Nv4 = PYRAM_FACE_TO_VERT(4,Ifc);
       end select
+c
       end subroutine face_to_vert
 c
+c----------------------------------------------------------------------
+c
 c  ...return edge numbers for a face
-      subroutine face_to_edge(Type,Ifc, Ne1,Ne2,Ne3,Ne4)
-      implicit none
-      character(len=4), intent(in) :: Type
-      integer, intent(in)  :: Ifc
+      subroutine face_to_edge(Ntype,Ifc, Ne1,Ne2,Ne3,Ne4)
+c
+      integer, intent(in)  :: Ntype,Ifc
       integer, intent(out) :: Ne1,Ne2,Ne3,Ne4
 c
-      select case(Type)
-      case('mdlp','pris')
+      select case(Ntype)
+      case(MDLP,PRIS)
         Ne1 = PRISM_FACE_TO_EDGE(1,Ifc);Ne2 = PRISM_FACE_TO_EDGE(2,Ifc);
         Ne3 = PRISM_FACE_TO_EDGE(3,Ifc);Ne4 = PRISM_FACE_TO_EDGE(4,Ifc);
-      case('mdlb','bric')
+      case(MDLB,BRIC)
         Ne1 = BRICK_FACE_TO_EDGE(1,Ifc);Ne2 = BRICK_FACE_TO_EDGE(2,Ifc);
         Ne3 = BRICK_FACE_TO_EDGE(3,Ifc);Ne4 = BRICK_FACE_TO_EDGE(4,Ifc);
-      case('mdln','tetr')
+      case(MDLN,TETR)
         Ne1 = TETRA_FACE_TO_EDGE(1,Ifc);Ne2 = TETRA_FACE_TO_EDGE(2,Ifc);
         Ne3 = TETRA_FACE_TO_EDGE(3,Ifc);Ne4 = TETRA_FACE_TO_EDGE(1,Ifc);
-      case('mdld','pyra')
+      case(MDLD,PYRA)
         Ne1 = PYRAM_FACE_TO_EDGE(1,Ifc);Ne2 = PYRAM_FACE_TO_EDGE(2,Ifc);
         Ne3 = PYRAM_FACE_TO_EDGE(3,Ifc);Ne4 = PYRAM_FACE_TO_EDGE(4,Ifc);
       end select
+c
       end subroutine face_to_edge
 c
 c----------------------------------------------------------------------
@@ -499,53 +423,49 @@ c> @param[in ] Ftype    - 2D element type = 3D element face type
 c> @param[in ] Nface_or - the face orientation as seen by the element
 c> @param[out] Nfver    - face edge numbers from the point of view
 c                         of the face
-c> @revision Feb 18
+c> @date       Feb 2023
 c----------------------------------------------------------------------
       subroutine face_to_vert_nos(Ftype,Nface_or, Nfver)
-      implicit none
-      character(len=4)     ,intent(in ) :: Ftype
-      integer              ,intent(in ) :: Nface_or
-      integer,dimension(4) ,intent(out) :: Nfver
+c
+      integer, intent(in ) :: Ftype,Nface_or
+      integer, intent(out) :: Nfver(4)
 c
       integer :: iv
 c
       select case(Ftype)
-      case('mdlt')
+      case(MDLT)
         do iv=1,3
           Nfver(iv) = TRIAN_L2G(iv,Nface_or)
         enddo
-      case('mdlq')
+      case(MDLQ)
         do iv=1,4
           Nfver(iv) = QUADR_L2G(iv,Nface_or)
         enddo
       end select
 c
       end subroutine face_to_vert_nos
-
+c
+c----------------------------------------------------------------------
+c
       subroutine face_to_edge_nos(Ftype,Nface_or, Nfedg)
-      implicit none
-      character(len=4)     ,intent(in ) :: Ftype
-      integer              ,intent(in ) :: Nface_or
-      integer,dimension(4) ,intent(out) :: Nfedg
+c
+      integer, intent(in ) :: Ftype,Nface_or
+      integer, intent(out) :: Nfedg(4)
 c
       integer :: ie
 c
       select case(Ftype)
-      case('mdlt')
+      case(MDLT)
         do ie=1,3
           Nfedg(ie) = TRIAN_L2G_EDGE(ie,Nface_or)
         enddo
-      case('mdlq')
+      case(MDLQ)
         do ie=1,4
           Nfedg(ie) = QUADR_L2G_EDGE(ie,Nface_or)
         enddo
       end select
 c
       end subroutine face_to_edge_nos
-
-
-
-
 c
 c----------------------------------------------------------------------
 c
@@ -555,24 +475,25 @@ c> @param[in ] Nedge_or - orientations for the face edges from
 c                         the element point of view
 c> @param[out] Nfedg_or - orientations for the face edges from
 c                         the face point of view
-c> @revision Feb 18
+c> @date       Feb 2023
 c----------------------------------------------------------------------
       subroutine face_to_edge_orient(Ftype,Nface_or,Nedge_or, Nfedg_or)
-      implicit none
-      character(len=4)     ,intent(in ) :: Ftype
-      integer              ,intent(in ) :: Nface_or
-      integer,dimension(4) ,intent(in ) :: Nedge_or
-      integer,dimension(4) ,intent(out) :: Nfedg_or
+c
+      integer, intent(in ) :: Ftype
+      integer, intent(in ) :: Nface_or
+      integer, intent(in ) :: Nedge_or(4)
+      integer, intent(out) :: Nfedg_or(4)
 c
       integer :: ie
 c
+      Nfedg_or(1:4) = 0
       select case(Ftype)
-      case('mdlt')
+      case(MDLT)
         do ie=1,3
           Nfedg_or(ie) =
      .            mod(Nedge_or(ie)+TRIAN_ORIENT_L2G(ie,Nface_or),2)
         enddo
-      case('mdlq')
+      case(MDLQ)
         do ie=1,4
           Nfedg_or(ie) =
      .            mod(Nedge_or(ie)+QUADR_ORIENT_L2G(ie,Nface_or),2)
@@ -584,54 +505,65 @@ c
 c----------------------------------------------------------------------
 c
 c  ...return local edge parametrizations......
-      subroutine edge_param(Type,Ie,T, Xi,Dxidt)
+      subroutine edge_param(Ntype,Ie,T, Xi,Dxidt)
 c
-      character(len=4) :: Type
-      real(8) T,Xi(*),Dxidt(*)
-      real(8) xi1(3),xi2(3)
+      integer, intent(in)  :: Ntype,Ie
+      real(8), intent(in)  :: T
+      real(8), intent(out) :: Xi(*),Dxidt(*)
 c
-      select case(Type)
-      case('mdlt','tria')
+      real(8) :: xi1(3),xi2(3)
+      integer :: n1,n2,nvar
+c
+      select case(Ntype)
+      case(MDLT,TRIA)
         n1 = TRIAN_EDGE_TO_VERT(1,Ie);  n2 = TRIAN_EDGE_TO_VERT(2,Ie)
         xi1(1:2) = TRIAN_COORD(1:2,n1); xi2(1:2) = TRIAN_COORD(1:2,n2)
         nvar=2
-      case('mdlq','quad')
+      case(MDLQ,QUAD)
         n1 = QUADR_EDGE_TO_VERT(1,Ie);  n2 = QUADR_EDGE_TO_VERT(2,Ie)
         xi1(1:2) = QUADR_COORD(1:2,n1); xi2(1:2) = QUADR_COORD(1:2,n2)
         nvar=2
-      case('mdlp','pris')
+      case(MDLP,PRIS)
         n1 = PRISM_EDGE_TO_VERT(1,Ie);  n2 = PRISM_EDGE_TO_VERT(2,Ie)
         xi1(1:3) = PRISM_COORD(1:3,n1); xi2(1:3) = PRISM_COORD(1:3,n2)
         nvar=3
-      case('mdlb','bric')
+      case(MDLB,BRIC)
         n1 = BRICK_EDGE_TO_VERT(1,Ie);  n2 = BRICK_EDGE_TO_VERT(2,Ie)
         xi1(1:3) = BRICK_COORD(1:3,n1); xi2(1:3) = BRICK_COORD(1:3,n2)
         nvar=3
-      case('mdln','tetr')
+      case(MDLN,TETR)
         n1 = TETRA_EDGE_TO_VERT(1,Ie);  n2 = TETRA_EDGE_TO_VERT(2,Ie)
         xi1(1:3) = TETRA_COORD(1:3,n1); xi2(1:3) = TETRA_COORD(1:3,n2)
         nvar=3
-      case('mdld','pyra')
+      case(MDLD,PYRA)
         n1 = PYRAM_EDGE_TO_VERT(1,Ie);  n2 = PYRAM_EDGE_TO_VERT(2,Ie)
         xi1(1:3) = PYRAM_COORD(1:3,n1); xi2(1:3) = PYRAM_COORD(1:3,n2)
         nvar=3
+      case default
+        write(*,*) 'edge_param'; stop
       end select
 c
       Dxidt(1:nvar) = xi2(1:nvar) - xi1(1:nvar)
       Xi(1:nvar) = xi1(1:nvar) + T*Dxidt(1:nvar)
+c
       end subroutine edge_param
 c
+c----------------------------------------------------------------------
+c
 c  ...return local face parametrizations......
-      subroutine face_param(Type,If,T, Xi,Dxidt)
+      subroutine face_param(Ntype,Iface,T, Xi,Dxidt)
 c
       use control , only : GEOM_TOL
 c
-      character(len=4) :: Type
-      real(8) T(2),Xi(3),Dxidt(3,2)
-      real(8) xi1(3),xi2(3),xi3(3)
+      integer, intent(in)  :: Ntype,Iface
+      real(8), intent(in)  :: T(2)
+      real(8), intent(out) :: Xi(3),Dxidt(3,2)
+c
+      real(8) :: xi1(3),xi2(3),xi3(3)
+      integer :: n,k
 c
 c  ...check that point is inside master face
-      if (face_type(Type,If).eq.'tria') then
+      if (face_type(Ntype,Iface).eq.TRIA) then
         if ((T(1)     .lt.-GEOM_TOL    ).or.
      .      (T(2)     .lt.-GEOM_TOL    ).or.
      .      (T(1)+T(2).gt.1.d0+GEOM_TOL)    ) then
@@ -643,7 +575,7 @@ c  ...check that point is inside master face
           k=3
       endif
 c
-      if (face_type(Type,If).eq.'rect') then
+      if (face_type(Ntype,Iface).eq.RECT) then
         if ((T(1).lt.-GEOM_TOL).or.(T(1).gt.1.d0+GEOM_TOL).or.
      .      (T(2).lt.-GEOM_TOL).or.(T(2).gt.1.d0+GEOM_TOL)) then
           write(*,*)'face_param: point outside of rect face'
@@ -653,23 +585,23 @@ c
           k=4
       endif
 c
-      select case(Type)
-      case('mdlp','pris')
-        n = PRISM_FACE_TO_VERT(1,If);  xi1(1:3) = PRISM_COORD(1:3,n)
-        n = PRISM_FACE_TO_VERT(2,If);  xi2(1:3) = PRISM_COORD(1:3,n)
-        n = PRISM_FACE_TO_VERT(k,If);  xi3(1:3) = PRISM_COORD(1:3,n)
-      case('mdlb','bric')
-        n = BRICK_FACE_TO_VERT(1,If);  xi1(1:3) = BRICK_COORD(1:3,n)
-        n = BRICK_FACE_TO_VERT(2,If);  xi2(1:3) = BRICK_COORD(1:3,n)
-        n = BRICK_FACE_TO_VERT(k,If);  xi3(1:3) = BRICK_COORD(1:3,n)
-      case('mdln','tetr')
-        n = TETRA_FACE_TO_VERT(1,If);  xi1(1:3) = TETRA_COORD(1:3,n)
-        n = TETRA_FACE_TO_VERT(2,If);  xi2(1:3) = TETRA_COORD(1:3,n)
-        n = TETRA_FACE_TO_VERT(k,If);  xi3(1:3) = TETRA_COORD(1:3,n)
-      case('mdld','pyra')
-        n = PYRAM_FACE_TO_VERT(1,If);  xi1(1:3) = PYRAM_COORD(1:3,n)
-        n = PYRAM_FACE_TO_VERT(2,If);  xi2(1:3) = PYRAM_COORD(1:3,n)
-        n = PYRAM_FACE_TO_VERT(k,If);  xi3(1:3) = PYRAM_COORD(1:3,n)
+      select case(Ntype)
+      case(MDLP,PRIS)
+        n = PRISM_FACE_TO_VERT(1,Iface); xi1(1:3) = PRISM_COORD(1:3,n)
+        n = PRISM_FACE_TO_VERT(2,Iface); xi2(1:3) = PRISM_COORD(1:3,n)
+        n = PRISM_FACE_TO_VERT(k,Iface); xi3(1:3) = PRISM_COORD(1:3,n)
+      case(MDLB,BRIC)
+        n = BRICK_FACE_TO_VERT(1,Iface); xi1(1:3) = BRICK_COORD(1:3,n)
+        n = BRICK_FACE_TO_VERT(2,Iface); xi2(1:3) = BRICK_COORD(1:3,n)
+        n = BRICK_FACE_TO_VERT(k,Iface); xi3(1:3) = BRICK_COORD(1:3,n)
+      case(MDLN,TETR)
+        n = TETRA_FACE_TO_VERT(1,Iface); xi1(1:3) = TETRA_COORD(1:3,n)
+        n = TETRA_FACE_TO_VERT(2,Iface); xi2(1:3) = TETRA_COORD(1:3,n)
+        n = TETRA_FACE_TO_VERT(k,Iface); xi3(1:3) = TETRA_COORD(1:3,n)
+      case(MDLD,PYRA)
+        n = PYRAM_FACE_TO_VERT(1,Iface); xi1(1:3) = PYRAM_COORD(1:3,n)
+        n = PYRAM_FACE_TO_VERT(2,Iface); xi2(1:3) = PYRAM_COORD(1:3,n)
+        n = PYRAM_FACE_TO_VERT(k,Iface); xi3(1:3) = PYRAM_COORD(1:3,n)
       end select
 c
       Dxidt(1:3,1) = xi2(1:3)-xi1(1:3)
@@ -678,202 +610,236 @@ c
 c
       end subroutine face_param
 c
+c----------------------------------------------------------------------
+c
 c  ...return normal signs corresponding to face parametrizations......
-      integer function Nsign_param(Type,If)
+      function Nsign_param(Ntype,Iface)
 c
-      character(len=4) :: Type
-      integer :: If
+      integer Nsign_param
+      integer Ntype,Iface
 c
-      select case(Type)
-      case('mdlp','pris')
-        select case(If)
+      select case(Ntype)
+      case(MDLP,PRIS)
+        select case(Iface)
         case(1,5)
           Nsign_param=-1
         case(2,3,4)
           Nsign_param= 1
+        case default
+          write(*,*) 'Nsign_param'; stop
         end select
-      case('mdlb','bric')
-        select case(If)
+      case(MDLB,BRIC)
+        select case(Iface)
         case(1,5,6)
           Nsign_param=-1
         case(2,3,4)
           Nsign_param= 1
+        case default
+          write(*,*) 'Nsign_param'; stop
         end select
-      case('mdln','tetr')
-        select case(If)
+      case(MDLN,TETR)
+        select case(Iface)
         case(1,4)
           Nsign_param=-1
         case(2,3)
           Nsign_param= 1
+        case default
+          write(*,*) 'Nsign_param'; stop
         end select
-      case('mdld','pyra')
-        select case(If)
+      case(MDLD,PYRA)
+        select case(Iface)
         case(1,4,5)
           Nsign_param=-1
         case(2,3)
           Nsign_param= 1
+        case default
+          write(*,*) 'Nsign_param'; stop
         end select
+      case default
+        write(*,*) 'Nsign_param'; stop
       end select
 c
       end function Nsign_param
 c
+c----------------------------------------------------------------------
+c
 c  ...check if element face is triangle or rectangle
-      function Face_type(Type,If)
+      function Face_type(Ntype,Iface)
 c
-      character(len=4) :: Face_type,Type
+      integer :: Face_type
+      integer :: Ntype,Iface
 c
-      select case(Type)
-      case('mdlp','pris')
-        select case(If)
-          case(1,2);   Face_type = 'tria'
-          case(3,4,5); Face_type = 'rect'
-        end select
-      case('mdlb','bric')
-        Face_type = 'rect'
-      case('mdln','tetr')
-        Face_type = 'tria'
-      case('mdld','pyra')
-        select case(If)
-          case(1); Face_type = 'rect'
-          case(2,3,4,5); Face_type = 'tria'
-        end select
+      select case(Ntype)
+        case(MDLP,PRIS)
+          select case(Iface)
+            case(1,2)  ; Face_type = TRIA
+            case(3,4,5); Face_type = RECT
+            case default
+               write(*,*) 'Face_type'; stop
+          end select
+        case(MDLB,BRIC)
+          Face_type = RECT
+        case(MDLN,TETR)
+          Face_type = TRIA
+        case(MDLD,PYRA)
+          select case(Iface)
+            case(1)      ; Face_type = RECT
+            case(2,3,4,5); Face_type = TRIA
+            case default
+               write(*,*) 'Face_type'; stop
+          end select
+        case default
+          write(*,*) 'Face_type'; stop
       end select
+c
       end function Face_type
 c
+c----------------------------------------------------------------------
+c
 c  ...return local face node numbers
-      subroutine face_nodes(Type,If, Nface_nodes,Nrfn)
+      subroutine face_nodes(Ntype,Iface, Nface_nodes,Nrfn)
 c
-      character(len=4) :: Type
-      integer If, Nface_nodes(9),Nrfn
+      integer, intent(in)  :: Ntype,Iface
+      integer, intent(out) :: Nface_nodes(9),Nrfn
 c
-      select case(Type)
-      case('mdlp','pris')
-        select case(If)
+      Nface_nodes(1:9) = 0
+      select case(Ntype)
+      case(MDLB,BRIC)
+        Nface_nodes(1:4) = BRICK_FACE_TO_VERT(1:4,Iface)
+        Nface_nodes(5:8) = 8+BRICK_FACE_TO_EDGE(1:4,Iface)
+        Nface_nodes(9) = 20+Iface
+        Nrfn=9
+      case(MDLP,PRIS)
+        select case(Iface)
         case(1,2)
-          Nface_nodes(1:3) = PRISM_FACE_TO_VERT(1:3,If)
-          Nface_nodes(4:6) = 6+PRISM_FACE_TO_EDGE(1:3,If)
-          Nface_nodes(7) = 15+If
+          Nface_nodes(1:3) = PRISM_FACE_TO_VERT(1:3,Iface)
+          Nface_nodes(4:6) = 6+PRISM_FACE_TO_EDGE(1:3,Iface)
+          Nface_nodes(7) = 15+Iface
           Nrfn=7
         case(3,4,5)
-          Nface_nodes(1:4) = PRISM_FACE_TO_VERT(1:4,If)
-          Nface_nodes(5:8) = 6+PRISM_FACE_TO_EDGE(1:4,If)
-          Nface_nodes(9) = 15+If
+          Nface_nodes(1:4) = PRISM_FACE_TO_VERT(1:4,Iface)
+          Nface_nodes(5:8) = 6+PRISM_FACE_TO_EDGE(1:4,Iface)
+          Nface_nodes(9) = 15+Iface
           Nrfn=9
         end select
-      case('mdlb','bric')
-        Nface_nodes(1:4) = BRICK_FACE_TO_VERT(1:4,If)
-        Nface_nodes(5:8) = 8+BRICK_FACE_TO_EDGE(1:4,If)
-        Nface_nodes(9) = 20+If
-        Nrfn=9
-      case('mdln','tetr')
-        Nface_nodes(1:3) = TETRA_FACE_TO_VERT(1:3,If)
-        Nface_nodes(4:6) = 4+TETRA_FACE_TO_EDGE(1:3,If)
-        Nface_nodes(7) = 10+If
+      case(MDLN,TETR)
+        Nface_nodes(1:3) = TETRA_FACE_TO_VERT(1:3,Iface)
+        Nface_nodes(4:6) = 4+TETRA_FACE_TO_EDGE(1:3,Iface)
+        Nface_nodes(7) = 10+Iface
         Nrfn=7
-      case('mdld','pyra')
-        select case(If)
+      case(MDLD,PYRA)
+        select case(Iface)
         case(1)
-          Nface_nodes(1:4) = PYRAM_FACE_TO_VERT(1:4,If)
-          Nface_nodes(5:8) = 5+PYRAM_FACE_TO_EDGE(1:4,If)
-          Nface_nodes(9) = 13+If
+          Nface_nodes(1:4) = PYRAM_FACE_TO_VERT(1:4,Iface)
+          Nface_nodes(5:8) = 5+PYRAM_FACE_TO_EDGE(1:4,Iface)
+          Nface_nodes(9) = 13+Iface
           Nrfn=9
         case(2,3,4,5)
-          Nface_nodes(1:3) = PYRAM_FACE_TO_VERT(1:3,If)
-          Nface_nodes(4:6) = 5+PYRAM_FACE_TO_EDGE(1:3,If)
-          Nface_nodes(7) = 13+If
+          Nface_nodes(1:3) = PYRAM_FACE_TO_VERT(1:3,Iface)
+          Nface_nodes(4:6) = 5+PYRAM_FACE_TO_EDGE(1:3,Iface)
+          Nface_nodes(7) = 13+Iface
           Nrfn=7
         end select
       end select
+c
       end subroutine face_nodes
 c
+c----------------------------------------------------------------------
+c
 c  ...return local face order of approximation
-      subroutine face_order(Type,If,Norder, Nordf)
+      subroutine face_order(Ntype,Iface,Norder, Nordf)
 c
-      character(len=4) :: Type
-      integer If, Nordf(5),Norder(19)
+      integer, intent(in)  :: Ntype,Iface,Norder(19)
+      integer, intent(out) :: Nordf(5)
 c
-      select case(Type)
-      case('mdlp','pris')
-        select case(If)
+      integer :: i,k
+c
+      Nordf(1:5) = 0
+      select case(Ntype)
+      case(MDLP,PRIS)
+        select case(Iface)
         case(1,2)
           do i=1,3
-            k = PRISM_FACE_TO_EDGE(i,If)
+            k = PRISM_FACE_TO_EDGE(i,Iface)
             Nordf(i) = Norder(k)
           enddo
-          Nordf(4) = Norder(9+If)
+          Nordf(4) = Norder(9+Iface)
         case(3,4,5)
           do i=1,4
-            k = PRISM_FACE_TO_EDGE(i,If)
+            k = PRISM_FACE_TO_EDGE(i,Iface)
             Nordf(i) = Norder(k)
           enddo
-          Nordf(5) = Norder(9+If)
+          Nordf(5) = Norder(9+Iface)
         end select
-      case('mdlb','bric')
+      case(MDLB,BRIC)
         do i=1,4
-          k = BRICK_FACE_TO_EDGE(i,If)
+          k = BRICK_FACE_TO_EDGE(i,Iface)
           Nordf(i) = Norder(k)
         enddo
-        Nordf(5) = Norder(12+If)
-      case('mdln','tetr')
+        Nordf(5) = Norder(12+Iface)
+      case(MDLN,TETR)
         do i=1,3
-          k = TETRA_FACE_TO_EDGE(i,If)
+          k = TETRA_FACE_TO_EDGE(i,Iface)
           Nordf(i) = Norder(k)
         enddo
-        Nordf(4) = Norder(6+If)
-      case('mdld','pyra')
-        select case(If)
+        Nordf(4) = Norder(6+Iface)
+      case(MDLD,PYRA)
+        select case(Iface)
         case(1)
           do i=1,4
-            k = PYRAM_FACE_TO_EDGE(i,If)
+            k = PYRAM_FACE_TO_EDGE(i,Iface)
             Nordf(i) = Norder(k)
           enddo
-          Nordf(5) = Norder(8+If)
+          Nordf(5) = Norder(8+Iface)
         case(2,3,4,5)
           do i=1,3
-            k = PYRAM_FACE_TO_EDGE(i,If)
+            k = PYRAM_FACE_TO_EDGE(i,Iface)
             Nordf(i) = Norder(k)
           enddo
-          Nordf(4) = Norder(8+If)
+          Nordf(4) = Norder(8+Iface)
         end select
       end select
+c
       end subroutine face_order
 c
+c----------------------------------------------------------------------
+c
 c  ...return number of dof for a single component
-      subroutine ndof_nod(Type,Nord, NdofH,NdofE,NdofV,NdofQ)
+      subroutine ndof_nod(Ntype,Nord, NdofH,NdofE,NdofV,NdofQ)
 c
-      character(len=4) :: Type
-      integer Nord,NdofH,NdofE,NdofV,NdofQ
-      integer nordx,nordy,nordz,naux
+      integer, intent(in)  :: Ntype,Nord
+      integer, intent(out) :: NdofH,NdofE,NdofV,NdofQ
+      integer :: nordx,nordy,nordz,naux,n
 c
-      select case(Type)
+      select case(Ntype)
 c  ...VERTEX
-      case('vert')
+      case(VERT)
         NdofH=1; NdofE=0; NdofV=0; NdofQ=0
 c  ...EDGE
-      case('medg')
+      case(MEDG)
         NdofH=Nord-1; NdofE=Nord; NdofV=0; NdofQ=0
 c  ...TRIANGLE
-      case('tria','mdlt')
+      case(TRIA,MDLT)
         NdofH=(Nord-2)*(Nord-1)/2
         NdofE=(Nord-1)*Nord
         NdofV=Nord*(Nord+1)/2
         NdofQ=0
 c  ...QUAD
-      case('rect','mdlq')
+      case(RECT,MDLQ)
         call decode(Nord, nordx,nordy)
         NdofH=(nordx-1)*(nordy-1)
         NdofE=nordx*(nordy-1)+nordy*(nordx-1)
         NdofV=nordx*nordy
         NdofQ=0
 c  ...PRISM
-      case('pris','mdlp')
+      case(PRIS,MDLP)
         call decode(Nord, nordx,nordz)
         NdofH=(nordx-2)*(nordx-1)/2*(nordz-1)
         NdofE= (nordx-1)*nordx*(nordz-1) + (nordx-2)*(nordx-1)/2*nordz
         NdofV=(nordx-1)*nordx*nordz + nordx*(nordx+1)/2*(nordz-1)
         NdofQ=(nordx+1)*nordx/2*nordz
 c  ...HEXA
-      case('bric','mdlb')
+      case(BRIC,MDLB)
         call decode(Nord, naux,nordz)
         call decode(naux, nordx,nordy)
         NdofH=(nordx-1)*(nordy-1)*(nordz-1)
@@ -883,13 +849,13 @@ c  ...HEXA
      .           + nordx*nordy*(nordz-1)
         NdofQ=nordx*nordy*nordz
 c  ...TETRA
-      case('tetr','mdln')
+      case(TETR,MDLN)
         NdofH=(Nord-3)*(Nord-2)*(Nord-1)/6
         NdofE=(Nord-2)*(Nord-1)*Nord/2
         NdofV=(Nord-1)*Nord*(Nord+1)/2
         NdofQ=Nord*(Nord+1)*(Nord+2)/6
 c  ...PYRAMID
-      case('pyra','mdld')
+      case(PYRA,MDLD)
         n = Nord-1
 c  LD: value for the original pyramid of Paolo
 ccc        NdofH=(2*n**3+3*n**2+n)/6
@@ -901,23 +867,21 @@ c        NdofQ=Nord**2*(Nord+1)
         NdofQ=Nord**3
 
       case default
-        write(*,*) 'Error!!! ndof_nod: Type = ',Type
+        write(*,*) 'Error!!! ndof_nod: Type = ', S_Type(Ntype)
         NdofH=0
-        NdofE= 0
+        NdofE=0
         NdofV=0
         NdofQ=0
-        call pause
-        return
+        stop
       end select
-ccc      write(*,*) 'ndof_nod: Type,Nord, NdofH,NdofE,NdofV,NdofQ = ',
-ccc     .                      Type,Nord, NdofH,NdofE,NdofV,NdofQ
+ccc      write(*,*) 'ndof_nod: S_Type(NType),Nord, NdofH,NdofE,NdofV,NdofQ = ',
+ccc     .                      S_Type(NType),Nord, NdofH,NdofE,NdofV,NdofQ
 ccc      call pause
 c
       end subroutine ndof_nod
 c
 c
       end module element_data
-c
 c
 c
 c======================================================================
@@ -929,26 +893,27 @@ c
 c
 c
 c----------------------------------------------------------------------
-c> Purpose : given a point in a 2D master element having coordinates
-c            T(1:2) wrt a LOCAL system of coordinates, routine
-c            returns coordinates Eta(1:2) wrt a GLOBAL system having
-c            orientation Norient wrt the LOCAL system. Orientations
-c            are defined by TRIAN,QUADR_L2G.
+c> @brief      given a point in a 2D master element having coordinates
+c              T(1:2) wrt a LOCAL system of coordinates, routine
+c              returns coordinates Eta(1:2) wrt a GLOBAL system having
+c              orientation Norient wrt the LOCAL system. Orientations
+c              are defined by TRIAN,QUADR_L2G.
 c
-c> @param[in ] Type    - 2D element type
+c> @param[in ] Ntype   - 2D element type
 c> @param[in ] T       - coordinates in the LOCAL system
 c> @param[in ] Norient - orientation of GLOBAL system wrt LOCAL system
 c> @param[out] Eta     - coordinates in the GLOBAL system
 c> @param[out] Detadt  - derivatives
 c
-c> @revision Dec 12
+c> @date       Feb 2023
 c----------------------------------------------------------------------
-      subroutine local2global(Type,T,Norient, Eta,Detadt)
+      subroutine local2global(Ntype,T,Norient, Eta,Detadt)
 c
       use element_data , only : TRIAN_L2G,QUADR_L2G,QUADR_EDGE_TO_VERT
+      use node_types
 c
       implicit none
-      character(len=4)      ,intent(in ) :: Type
+      integer               ,intent(in ) :: Ntype
       real(8),dimension(2  ),intent(in ) :: T
       integer               ,intent(in ) :: Norient
       real(8),dimension(2  ),intent(out) :: Eta
@@ -964,18 +929,18 @@ c  ...initialize
       Eta(1:2)=0.d0 ; Detadt(1:2,1:2)=0.d0
 c
 c  ...vertex shape functions
-      call vshape2(Type,T, rlam,drlam)
+      call vshape2(Ntype,T, rlam,drlam)
 c
-      select case(Type)
+      select case(Ntype)
 c
 c  ...TRIANGLE.........................................................
-      case('tria')
+      case(TRIA)
         iv2=TRIAN_L2G(2,Norient) ; iv3=TRIAN_L2G(3,Norient)
         Eta(1)=rlam(iv2) ; Detadt(1,1:2)=drlam(1:2,iv2)
         Eta(2)=rlam(iv3) ; Detadt(2,1:2)=drlam(1:2,iv3)
 c
 c  ...QUAD.............................................................
-      case('quad')
+      case(QUAD)
         iv1=QUADR_L2G(1,Norient)
         iv2=QUADR_L2G(2,Norient)
         iv4=QUADR_L2G(4,Norient)
@@ -996,51 +961,48 @@ c  .....projection on (iv1,iv4) edge
         enddo
 c
       case default
-        write(*,7001) Type
+        write(*,7001) S_Type(Ntype)
  7001   format(' local2global: invalid Type = ',a10)
         stop
-      endselect
+      end select
 c
-c
-      endsubroutine local2global
-c
-c
+      end subroutine local2global
 c
 c----------------------------------------------------------------------
-c> Purpose : auxiliary routine needed by "hp3gen"
+c> @brief      auxiliary routine needed by "hp3gen"
 c
-c> @param[in ] Type    - element type
+c> @param[in ] Ntype   - element type
 c> @param[in ] Ivert   - vertex number
 c> @param[out] Nrfaces - number of adjacent faces
 c> @param[out] Nofaces - adjacent face numbers
 c
-c> @revision Nov 12
+c> @date       Feb 2023
 c----------------------------------------------------------------------
 c
-      subroutine vert_to_faces(Type,Ivert, Nrfaces,Nofaces)
+      subroutine vert_to_faces(Ntype,Ivert, Nrfaces,Nofaces)
 c
       use element_data , only : PRISM_VERT_TO_FACE,
      .                          BRICK_VERT_TO_FACE,
      .                          TETRA_VERT_TO_FACE,
      .                          PYRAM_VERT_TO_FACE
+      use node_types
 c
       implicit none
-      character(len=4)    ,intent(in ) :: Type
-      integer             ,intent(in ) :: Ivert
-      integer             ,intent(out) :: Nrfaces
-      integer,dimension(4),intent(out) :: Nofaces
-c----------------------------------------------------------------------
+      integer, intent(in ) :: Ntype
+      integer, intent(in ) :: Ivert
+      integer, intent(out) :: Nrfaces
+      integer, intent(out) :: Nofaces(4)
 c
 c  ...number of connected faces
       Nrfaces=3
-      select case(Type)
-      case('bric','mdlb')
+      select case(Ntype)
+      case(BRIC,MDLB)
         Nofaces(1:3)=BRICK_VERT_TO_FACE(1:3,Ivert)
-      case('tetr','mdln')
+      case(TETR,MDLN)
         Nofaces(1:3)=TETRA_VERT_TO_FACE(1:3,Ivert)
-      case('pris','mdlp')
+      case(PRIS,MDLP)
         Nofaces(1:3)=PRISM_VERT_TO_FACE(1:3,Ivert)
-      case('pyra','mdld')
+      case(PYRA,MDLD)
         select case(Ivert)
 c  .....lateral triangular faces
         case(1,2,3,4)
@@ -1049,51 +1011,49 @@ c  .....rectangular base
         case(5)
           Nrfaces=4
           Nofaces(1:4)=PYRAM_VERT_TO_FACE(1:4,Ivert)
-        endselect
-      endselect
+        end select
+      end select
 c
       end subroutine vert_to_faces
 c
-c
 c----------------------------------------------------------------------
-c> Purpose : auxiliary routine needed by "hp3gen"
+c> @brief      auxiliary routine needed by "hp3gen"
 c
 c> @param[in ] Type    - element type
 c> @param[in ] Iedge   - edge number
 c> @param[out] Nofaces - adjacent face numbers
 c
-c> @revision Nov 12
+c> @date       Feb 2023
 c----------------------------------------------------------------------
 c
-      subroutine edge_to_faces(Type,Iedge, Nofaces)
+      subroutine edge_to_faces(Ntype,Iedge, Nofaces)
 c
       use element_data , only : PRISM_EDGE_TO_FACE,
      .                          BRICK_EDGE_TO_FACE,
      .                          TETRA_EDGE_TO_FACE,
      .                          PYRAM_EDGE_TO_FACE
+      use node_types
 c
       implicit none
-      character(len=4)    ,intent(in ) :: Type
+      integer             ,intent(in ) :: Ntype
       integer             ,intent(in ) :: Iedge
       integer,dimension(2),intent(out) :: Nofaces
-c----------------------------------------------------------------------
 c
-      select case(Type)
-      case('bric','mdlb')
+      select case(Ntype)
+      case(BRIC,MDLB)
         Nofaces(1:2)=BRICK_EDGE_TO_FACE(1:2,Iedge)
-      case('tetr','mdln')
+      case(TETR,MDLN)
         Nofaces(1:2)=TETRA_EDGE_TO_FACE(1:2,Iedge)
-      case('pris','mdlp')
+      case(PRIS,MDLP)
         Nofaces(1:2)=PRISM_EDGE_TO_FACE(1:2,Iedge)
-      case('pyra','mdld')
+      case(PYRA,MDLD)
         Nofaces(1:2)=PYRAM_EDGE_TO_FACE(1:2,Iedge)
       end select
 c
-c
       end subroutine edge_to_faces
 c
-c
 c----------------------------------------------------------------------
+c
       subroutine quad_aux(Iv1,Iv2, Iedge)
 c
       use element_data , only : QUADR_EDGE_TO_VERT
@@ -1103,7 +1063,9 @@ c
       integer,intent(out) :: Iedge
 c
       integer,save,dimension(4,4) :: AUX
+c$OMP THREADPRIVATE(AUX)
       logical,save                :: INITIALIZED=.FALSE.
+c$OMP THREADPRIVATE(INITIALIZED)
       integer,       dimension(2) :: iedge1,iedge2,list
       integer                     :: i,j,i1,i2,ifound
 c----------------------------------------------------------------------
@@ -1149,22 +1111,20 @@ c  ...update initialization flag
 c
       endif
 c
-c  ...retrive edge number
+c  ...retrieve edge number
       Iedge=AUX(Iv1,Iv2)
 c
-c
-      endsubroutine quad_aux
-c
+      end subroutine quad_aux
 c
 c----------------------------------------------------------------------
-c> Pupose : {List1} - {List2} = {List3}
+c> @brief      Returns {List3} = {List1} - {List2}
 c
 c> @param[in ] List1,2 - lists of integers
 c> @param[in ] N       - length of List1,2
 c> @param[out] List3   - difference
 c> @param[out] J       - length of List3
 c
-c> @revision Nov 12
+c> @date       Feb 2023
 c----------------------------------------------------------------------
       subroutine list_minus(List1,List2,N, List3,J)
 c
@@ -1174,7 +1134,6 @@ c
       integer,dimension(N),intent(out) :: List3
       integer             ,intent(out) :: J
       integer :: i,ifound
-c----------------------------------------------------------------------
 c
 c  ...initialize
       J=0 ; List3(1:N)=0
@@ -1189,11 +1148,10 @@ c  .....if entry was not found, add it to List3
         endif
       enddo
 c
-c
-      endsubroutine list_minus
-c
+      end subroutine list_minus
 c
 c----------------------------------------------------------------------
+c
       subroutine hexa_aux(Iv1,Iv2, Iface)
 c
       use element_data , only : BRICK_EDGE_TO_VERT,
@@ -1204,10 +1162,14 @@ c
       integer,intent(out) :: Iface
 c
       integer,save,dimension(8,8) :: AUX
+c$OMP THREADPRIVATE(AUX)
       logical,save                :: INITIALIZED=.FALSE.
+c$OMP THREADPRIVATE(INITIALIZED)
       integer,       dimension(3) :: iface1,iface2,list
       integer                     :: i,i1,i2,ifound
-c----------------------------------------------------------------------
+#if DEBUG_FLAG
+      integer :: j,iprint=0
+#endif
 c
       if (.NOT.INITIALIZED) then
 c
@@ -1239,21 +1201,22 @@ c
         AUX(i2,i1)=list(1)
       enddo
 c
-cccc  ...printing
-ccc      do i=1,8 ; do j=1,8
-cccc  .....print only relevant entries
-ccc        if (AUX(i,j).eq.0) cycle
-ccc        write(*,1000) i,j,AUX(i,j)
-ccc 1000   format(' iv1,2, face = '2(i1,2x),2x,i1)
-ccc      enddo    ; enddo
+#if DEBUG_FLAG
+c  ...printing
+      do i=1,8 ; do j=1,8
+c  .....print only relevant entries
+        if (AUX(i,j).eq.0) cycle
+        write(*,1000) i,j,AUX(i,j)
+ 1000   format(' iv1,2, face = '2(i1,2x),2x,i1)
+      enddo    ; enddo
+#endif
 c
 c  ...update initialization flag
       INITIALIZED=.TRUE.
 c
       endif
 c
-c  ...retrive face number
+c  ...retrieve face number
       Iface=AUX(Iv1,Iv2)
-c
 c
       end subroutine hexa_aux

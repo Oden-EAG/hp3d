@@ -71,7 +71,7 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
    VTYPE,                       intent(out) :: Zastif(MAXDOFM**2)
 !
 !..element type
-   character(len=4) :: type
+   integer :: ntype
 !
 !..element order
    integer :: norder(19),norderi(19)
@@ -107,7 +107,8 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
 !
 #if DEBUG_MODE
    integer :: ians,ibeg,iend,jbeg,jend,kbeg,kend,ivar1,ivar2
-   integer :: iprint=0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !----------------------------------------------------------------------
@@ -123,37 +124,37 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
 !  ...number of dofs for a SINGLE H1,H(curl),H(div),L2 component
       call find_order(Mdle, norder)
       norderi = norder
-      type = NODES(Mdle)%type
-      select case(type)
-        case('mdlb'); norderi(19) = 111
-        case('mdlp'); norderi(15) = 11
-        case('mdln'); norderi(11) = 1
-        case('mdld'); norderi(14) = 1
+      ntype = NODES(Mdle)%ntype
+      select case(ntype)
+        case(MDLB); norderi(19) = 111
+        case(MDLP); norderi(15) = 11
+        case(MDLN); norderi(11) = 1
+        case(MDLD); norderi(14) = 1
       end select
-      call celndof(type,norder, nrdoflH,nrdoflE,nrdoflV,nrdoflQ)
-      call celndof(type,norderi, nrdoflHi,nrdoflEi,nrdoflVi,nvoid)
+      call celndof(ntype,norder, nrdoflH,nrdoflE,nrdoflV,nrdoflQ)
+      call celndof(ntype,norderi, nrdoflHi,nrdoflEi,nrdoflVi,nvoid)
 #if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,5001) Mdle
  5001   format(' celem_systemI: DEBUGGING for Mdle = ',i8)
-        call print_order(type,norder)
+        call print_order(ntype,norder)
       endif
 #endif
 !
 !  ...number of dofs for ALL H1,H(curl),H(div),L2 components (EXPANDED mode)
       do i=1,NR_PHYSA
         if (PHYSAi(i)) then
-          select case(DTYPE(i))
-            case('contin') ; Nrdofs(i)=nrdoflHi*NR_COMP(i)
-            case('tangen') ; Nrdofs(i)=nrdoflEi*NR_COMP(i)
-            case('normal') ; Nrdofs(i)=nrdoflVi*NR_COMP(i)
+          select case(D_TYPE(i))
+            case(CONTIN) ; Nrdofs(i)=nrdoflHi*NR_COMP(i)
+            case(TANGEN) ; Nrdofs(i)=nrdoflEi*NR_COMP(i)
+            case(NORMAL) ; Nrdofs(i)=nrdoflVi*NR_COMP(i)
           endselect
         else
-          select case(DTYPE(i))
-            case('contin') ; Nrdofs(i)=nrdoflH*NR_COMP(i)
-            case('tangen') ; Nrdofs(i)=nrdoflE*NR_COMP(i)
-            case('normal') ; Nrdofs(i)=nrdoflV*NR_COMP(i)
-            case('discon') ; Nrdofs(i)=nrdoflQ*NR_COMP(i)
+          select case(D_TYPE(i))
+            case(CONTIN) ; Nrdofs(i)=nrdoflH*NR_COMP(i)
+            case(TANGEN) ; Nrdofs(i)=nrdoflE*NR_COMP(i)
+            case(NORMAL) ; Nrdofs(i)=nrdoflV*NR_COMP(i)
+            case(DISCON) ; Nrdofs(i)=nrdoflQ*NR_COMP(i)
           endselect
         endif
       enddo
@@ -255,12 +256,12 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
 !..count number of variables (not components) for each physics type
    nrPhysH=0; nrPhysE=0; nrPhysV=0
    do iphys=1,NR_PHYSA
-      select case(DTYPE(iphys))
-         case('contin')
+      select case(D_TYPE(iphys))
+         case(CONTIN)
             nrPhysH=nrPhysH+1
-         case('tangen')
+         case(TANGEN)
             nrPhysE=nrPhysE+1
-         case('normal')
+         case(NORMAL)
             nrPhysV=nrPhysV+1
          case default
       end select
@@ -319,7 +320,7 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
                   if (Idec.eq.2) then
                      IDBC(l)=1
                      do iload=1,NR_RHS
-                        ZDOFD(l,iload) = NODES(nod)%dof%zdofH((iload-1)*nvarHt+ivar,j)
+                        ZDOFD(l,iload) = NODES(nod)%dof%zdofH((iload-1)*nvarHt+ivar,j,N_COMS)
                      enddo
                   endif
 !
@@ -387,7 +388,7 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
                   if (Idec.eq.2) then
                      IDBC(l)=1
                      do iload=1,NR_RHS
-                        ZDOFD(l,iload) = NODES(nod)%dof%zdofE((iload-1)*nvarEt+ivar,j)
+                        ZDOFD(l,iload) = NODES(nod)%dof%zdofE((iload-1)*nvarEt+ivar,j,N_COMS)
                      enddo
                   endif
 !
@@ -455,7 +456,7 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
                   if (Idec.eq.2) then
                      IDBC(l)=1
                      do iload=1,NR_RHS
-                        ZDOFD(l,iload) = NODES(nod)%dof%zdofV((iload-1)*nvarVt+ivar,j)
+                        ZDOFD(l,iload) = NODES(nod)%dof%zdofV((iload-1)*nvarVt+ivar,j,N_COMS)
                      enddo
                   endif
 !
@@ -551,8 +552,8 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
 !  ...skip if the attribute is absent
       if (itest(iphys1).eq.0) cycle
 !
-      select case(DTYPE(iphys1))
-      case('contin')
+      select case(D_TYPE(iphys1))
+      case(CONTIN)
 !
 !     ...loop through element test functions excluding middle node
          do k=1,nrdoflHi
@@ -594,7 +595,7 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
 !     ...end of loop through element test functions
          enddo
 !
-      case('tangen')
+      case(TANGEN)
 !
 !     ...loop through element test functions excluding middle node
          do k=1,nrdoflEi
@@ -636,7 +637,7 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
 !     ...end of loop through element test functions
          enddo
 !
-      case('normal')
+      case(NORMAL)
 !
 !     ...loop through element test functions excluding middle node
          do k=1,nrdoflVi
@@ -695,8 +696,8 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
 !  ...skip if the attribute is absent
       if (jtrial(iphys).eq.0) cycle
 !
-      select case(DTYPE(iphys))
-      case('contin')
+      select case(D_TYPE(iphys))
+      case(CONTIN)
 !
 !     ...loop through element trial functions
          do k=1,nrdoflHi
@@ -725,7 +726,7 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
 !     ...end of loop through element trial functions
          enddo
 !
-      case('tangen')
+      case(TANGEN)
 !
 !     ...loop through element trial functions
          do k=1,nrdoflEi
@@ -754,7 +755,7 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
 !     ...end of loop through element trial functions
          enddo
 !
-      case('normal')
+      case(NORMAL)
 !
 !     ...loop through element trial functions
          do k=1,nrdoflVi
@@ -863,7 +864,7 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
         read(*,*) load
         write(*,*) 'SET PHYSICAL ATTRIBUTE'
         read(*,*) iphys1
-        if (DTYPE(iphys1).eq.'discon') goto 20
+        if (D_TYPE(iphys1).eq.DISCON) goto 20
         write(*,8001) iphys1,load
  8001   format(' LOCAL LOAD VECTOR FOR ATTRIBUTE = ',i2,' AND LOAD = ',i2)
         do ivar1=1,NR_COMP(iphys1)
@@ -880,7 +881,7 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
 !
 !  .....loop through physical attributes
         do iphys2 = 1, NR_PHYSA
-          if (DTYPE(iphys2).eq.'discon') cycle
+          if (D_TYPE(iphys2).eq.DISCON) cycle
           if (jtrial(iphys2).eq.0) cycle
           write(*,8002) iphys1,iphys2
  8002     format(' LOCAL STIFFNESS MATRIX  FOR ATTRIBUTES = ',2i2)

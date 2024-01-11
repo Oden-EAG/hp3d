@@ -32,15 +32,18 @@ c
       implicit none
       integer, intent(in ) :: Nord,Nsize(2)
       integer, intent(out) :: NrdofH
-      integer :: iprint,N,m,v,ndofE,minI,maxI,i
+      integer :: N,m,v,ndofE,minI,maxI,i
       logical :: IdecE
       double precision, intent(in)  :: Xi
       double precision, intent(out) :: ShapH(Nsize(2)),GradH(Nsize(2))
       double precision :: Mu(0:1),DMu(0:1),MubV(2),DMubV(2)
       double precision :: phiE(2:Nsize(1)),DphiE(2:Nsize(1))
 c
+#if DEBUG_MODE
 c  ...debugging flag
+      integer :: iprint
       iprint=0
+#endif
 c
 c  ...spatial dimensions
       N=1
@@ -81,6 +84,7 @@ c
 c  ...give total degrees of freedom
       NrdofH = m
 c
+#if DEBUG_MODE
 c  ...print this when debugging
       if (iprint.eq.1) then
         write(*,7001) Xi,Nord
@@ -102,6 +106,7 @@ c
         endif
         call pause
       endif
+#endif
 c
       end subroutine shape1DHSeg
 c
@@ -135,13 +140,16 @@ c
       implicit none
       integer, intent(in ) :: Nord,Nsize(2)
       integer, intent(out) :: NrdofQ
-      integer :: iprint,N,m,ndofE,minI,maxI,i
+      integer :: N,m,ndofE,minI,maxI,i
       double precision, intent(in)  :: Xi
       double precision, intent(out) :: ShapQ(Nsize(2))
       double precision :: Mu(0:1),DMu(0:1),homP(0:Nsize(1)-1)
 c
+#if DEBUG_MODE
 c  ...debugging flag
+      integer :: iprint
       iprint=0
+#endif
 c
 c  ...spatial dimensions
       N=1
@@ -170,6 +178,7 @@ c
 c  ...give total degrees of freedom
       NrdofQ = m
 c
+#if DEBUG_MODE
 c  ...print this when debugging
       if (iprint.eq.1) then
         write(*,7001) Xi,Nord
@@ -185,6 +194,7 @@ c
         endif
         call pause
       endif
+#endif
 c
       end subroutine shape1DQSeg
 c

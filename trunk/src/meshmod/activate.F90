@@ -1,12 +1,12 @@
 !-------------------------------------------------------------------------
-!> Purpose : activate a node and initialize its dofs.
-!            note: if mesh is distributed, routine will only allocate dofs
-!            if the node is within subdomain (NODES(Nod)%subd == rank).
-!
-!> @date Aug 2019
-!
-!> @param[in]    Nod          - node to be activated
-!> @param[inout] NrdofH,E,V,Q - Allocated number of solution dofs
+!> @brief         activate a node and initialize its dofs.
+!> @note          if mesh is distributed, routine will only allocate dofs
+!!                if the node is within subdomain (NODES(Nod)%subd==rank).
+!!
+!> @param[in]     Nod          - node to be activated
+!> @param[inout]  NrdofH,E,V,Q - Allocated number of solution dofs
+!!
+!> @date          Sep 2023
 !-------------------------------------------------------------------------
 subroutine activate(Nod, NrdofH,NrdofE,NrdofV,NrdofQ)
    use data_structure3D
@@ -65,33 +65,33 @@ subroutine activate(Nod, NrdofH,NrdofE,NrdofV,NrdofQ)
    endif
    icase = NODES(Nod)%case
    if ((NREQNH(icase).gt.0).and.(ndofH.gt.0)) then
-      nvar = NREQNH(icase)*NRCOMS
+      nvar = NREQNH(icase)*NRRHS
       if(act_dof.eq.1) then
-         allocate(NODES(Nod)%dof%zdofH(nvar, ndofH))
+         allocate(NODES(Nod)%dof%zdofH(nvar, ndofH, NRCOMS))
          NODES(Nod)%dof%zdofH = ZERO
       endif
       NrdofH = NrdofH + ndofH*NREQNH(icase)
    endif
    if ((NREQNE(icase).gt.0).and.(ndofE.gt.0)) then
-      nvar = NREQNE(icase)*NRCOMS
+      nvar = NREQNE(icase)*NRRHS
       if(act_dof.eq.1) then
-         allocate(NODES(Nod)%dof%zdofE(nvar, ndofE))
+         allocate(NODES(Nod)%dof%zdofE(nvar, ndofE, NRCOMS))
          NODES(Nod)%dof%zdofE = ZERO
       endif
       NrdofE = NrdofE + ndofE*NREQNE(icase)
    endif
    if ((NREQNV(icase).gt.0).and.(ndofV.gt.0)) then
-      nvar = NREQNV(icase)*NRCOMS
+      nvar = NREQNV(icase)*NRRHS
       if(act_dof.eq.1) then
-         allocate(NODES(Nod)%dof%zdofV(nvar, ndofV))
+         allocate(NODES(Nod)%dof%zdofV(nvar, ndofV, NRCOMS))
          NODES(Nod)%dof%zdofV = ZERO
       endif
       NrdofV = NrdofV + ndofV*NREQNV(icase)
    endif
    if ((NREQNQ(icase).gt.0).and.(ndofQ.gt.0)) then
-      nvar = NREQNQ(icase)*NRCOMS
+      nvar = NREQNQ(icase)*NRRHS
       if(act_dof.eq.1) then
-         allocate(NODES(Nod)%dof%zdofQ(nvar, ndofQ))
+         allocate(NODES(Nod)%dof%zdofQ(nvar, ndofQ, NRCOMS))
          NODES(Nod)%dof%zdofQ = ZERO
       endif
       NrdofQ = NrdofQ + ndofQ*NREQNQ(icase)
@@ -130,7 +130,8 @@ subroutine deactivate(Nod, NrdofH,NrdofE,NrdofV,NrdofQ)
    integer :: icase,ndofH,ndofE,ndofV,ndofQ
 !
 #if DEBUG_MODE
-   integer :: iprint = 0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !-------------------------------------------------------------------------

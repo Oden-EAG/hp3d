@@ -44,10 +44,8 @@
 !
    VTYPE  , intent(out) :: GramP(NrTest*(NrTest+1)/2)
 !
-   real(8), parameter :: rZero = 0.d0
-!
 !..declare edge/face type variables
-   character(len=4) :: etype, etype1, ftype
+   integer :: etype, etype1, ftype
 !
 !..declare element order, orientation for edges and faces
    integer, dimension(19)    :: norder
@@ -184,7 +182,7 @@
    iprint = 0
 !
 !..element type
-   etype = NODES(Mdle)%type
+   etype = NODES(Mdle)%ntype
    nre = nedge(etype); nrf = nface(etype)
 !
 !..determine order of approximation
@@ -192,14 +190,14 @@
 !
 !..set the enriched order of approximation
    select case(etype)
-      case('mdlp')
+      case(MDLP)
          nord3 = 0
          nord3 = max(nord3,norder(7))
          nord3 = max(nord3,norder(8))
          nord3 = max(nord3,norder(9))
          nord3 = nord3+NORD_ADD
          nordP = NODES(Mdle)%order+NORD_ADD*11
-      case('mdlb')
+      case(MDLB)
          nord3 = 0
          nord3 = max(nord3,norder(9))
          nord3 = max(nord3,norder(10))
@@ -213,8 +211,8 @@
    end select
 !
    select case(etype)
-      case('mdlp') ! prism
-         etype1 = 'mdlt'
+      case(MDLP) ! prism
+         etype1 = MDLT
 !     ...calc face order and enriched face order
          norder_f(1:3) = norder(1:3); norder_fe(1:3) = norder(1:3) + NORD_ADD
          norder_f(4) = max(norder(10),norder(11)); norder_fe(4) = norder_f(4) + NORD_ADD
@@ -229,8 +227,8 @@
          allocate(mapEE(nrdofE12*(nord3+1) + nrdofH12*nord3)) ! test  dof ordering
          call tens_prism_ordEE(pe,nord3, mapEE)
 !
-      case('mdlb') ! hexa
-         etype1 = 'mdlq'
+      case(MDLB) ! hexa
+         etype1 = MDLQ
  !    ...calc face order and enriched face order
          norder_f(1:4) = norder(1:4); norder_fe(1:4) = norder(1:4) + NORD_ADD
 !     ...take max order of this face (13) and the opposite face (14)
@@ -245,7 +243,7 @@
          call tens_hexa_ordEE(pe,nord3, mapEE)
 !
       case default
-         write(*,*) 'elem_maxwell_gram_pris: unexpected element type:', etype
+         write(*,*) 'elem_maxwell_gram_pris: unexpected element type:',S_Type(etype)
             stop
    end select
 !
@@ -409,8 +407,8 @@
 !     ...Shape function subroutine is called only once, when
 !        pz=1 and stored in sH2p(:,py) and dsH2p(:,py)
          if (pz.eq.1) then
-            sH12(:,pxy)   = rZero;  gH12(:,:,pxy) = rZero
-            sE12(:,:,pxy) = rZero;  cE12(:,pxy)   = rZero
+            sH12(:,pxy)   = rZERO;  gH12(:,:,pxy) = rZERO
+            sE12(:,:,pxy) = rZERO;  cE12(:,pxy)   = rZERO
             call shape2HH(etype1,xi12,norder_fe(5), nrdofH12,sH12(:,pxy),gH12(1:2,:,pxy))
             call shape2EE(etype1,xi12,norder_fe(5), nrdofE12,sE12(1:2,:,pxy),cE12(:,pxy))
          endif
@@ -418,8 +416,8 @@
 !     ...Copy shape functions in coord. 2 previously evaluated
 !     ...E12 is for E terms, separated into family 1 and 2 of tri shape fns.
          E12(1:2, 1:NrdofE12 ) = sE12(1:2,1:NrdofE12,pxy)
-         E12(3  , 1:NrdofE12 ) = rZero
-         E12(1:2, (NrdofE12+1):(NrdofE12+NrdofH12) ) = rZero
+         E12(3  , 1:NrdofE12 ) = rZERO
+         E12(1:2, (NrdofE12+1):(NrdofE12+NrdofH12) ) = rZERO
          E12(3  , (NrdofE12+1):(NrdofE12+NrdofH12) ) = sH12(1:NrdofH12,pxy)
 !
 !     ...C12 is for C terms, curl of E terms, same separation as above
@@ -428,7 +426,7 @@
          C12(3 , 1:NrdofE12 ) =  cE12(  1:NrdofE12,pxy)
          C12(1 , (NrdofE12+1):(NrdofE12+NrdofH12) ) =  gH12(2,1:NrdofH12,pxy)
          C12(2 , (NrdofE12+1):(NrdofE12+NrdofH12) ) = -gH12(1,1:NrdofH12,pxy)
-         C12(3 , (NrdofE12+1):(NrdofE12+NrdofH12) ) = rZero
+         C12(3 , (NrdofE12+1):(NrdofE12+NrdofH12) ) = rZERO
 !
 !     ...Condense quad pt into single array
          xip(1:2) = xi12(1:2); xip(3) = xi3
@@ -607,7 +605,7 @@
 !        ...J^T e_z x J^-T = -(e_z x J)^T J^-T
             D_aux(1,1:3) = -dxdxi(2,1:3)
             D_aux(2,1:3) = dxdxi(1,1:3)
-            D_aux(3,1:3) = rZero
+            D_aux(3,1:3) = rZERO
             call DGEMM('T','T',3,3,3,-1.0d0,D_aux,3,dxidx,3,0.0d0,D_aux2,3)
             C_RC = D_aux2 * WAVENUM_FLD*detJstretch * wt123
 !

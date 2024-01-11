@@ -1,6 +1,3 @@
-      subroutine elmsol (Aidx, Ubuf, Bbuf, Xfrnt)
-c
-#include "syscomz.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION:
 c Calculates the solution for one dof specified by (id)
@@ -20,7 +17,7 @@ c              positioned relative to the this equation
 c
 c IO  Xfrnt : the solution front
 cc*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -48,28 +45,36 @@ c note: that it doesnt look like this forever,( ie: this is really a fro
 c        some equations remain till the next element, some are 'forgotte
 c        they have already been passed to permanent storage, and the 'fo
 c        ones become new destinations in Xfrnt() based on Aidx
+c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      subroutine elmsol (Aidx, Ubuf, Bbuf, Xfrnt)
 c
-      dimension Ubuf(*), Bbuf(*), Xfrnt(*)
-
-
+      use surfsc1
+      use surfsc2
 c
-      data one /1.0/
-
-
-
-
+      implicit none
 c
+      complex(8) :: Aidx
+      complex(8) :: Ubuf(*), Bbuf(*), Xfrnt(*)
+c
+      complex(8) :: s,f1,f2
+      integer    :: i,ia,id,idm,idp,in,iuu,ja
+c
+      complex(8) :: one = (1.d0,0.d0)
+c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
+#endif
 c
       id = Aidx
       idm = id - 1
       idp = id + 1
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(nfsout,*) 'ELMSOL: Aidx = ',Aidx
       endif
+#endif
 c
 c because Ubuf contains slightly different info for symmetric versus uns
 c  we must take a different path herein
@@ -95,14 +100,12 @@ c --------------------------------------------
 c     -----------------
          iuu = NFW
 
-
 c
 c ja : points to multiple rhs entries (ja=0 ; for NRHS=1)
 c ia : points back to previously solved dof
 c
          ja = (in-1)*MFW
          ia = ja + NFW - 1
-
 
 c
 c recall that Bbuf() contains the elimination accumulated global rhs
@@ -114,13 +117,14 @@ c for symmetric   : s = f(m)/k(m,m)
 c for unsymmetric : s = f(m)
 c
          s = Bbuf(in)/f1
+#if DEBUG_MODE
          if (iprint.eq.1) then
            write(nfsout,*) 'ELMSOL: in,Bbuf(in) = ',in,Bbuf(in)
            write(nfsout,*) 'ELMSOL: f1 = ',f1
            write(nfsout,*) 'ELMSOL: s = ',s
            call pause
          endif
-c
+#endif
 c
 c ALLIANT directives
 cvd$ select (vector)
@@ -133,8 +137,6 @@ c
 c loop thru the dof beyond this one in the solution front
 c --------------------------------------------------------
          do 10 i = idp,NFW
-
-
 
 c
 c suffle the solution forward 1 slot to make room for this solution
@@ -167,8 +169,6 @@ c ARDENT directives
 c$doit VBEST
 c
 
-
-
          do 30 i = 1,idm
             s = s - Ubuf(iuu)*Xfrnt(ia)
             ia = ia - 1
@@ -183,6 +183,5 @@ c
 c
    40 continue
 c
-      return
-      end
-
+c
+      end subroutine elmsol

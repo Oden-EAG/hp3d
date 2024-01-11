@@ -1,21 +1,17 @@
 c----------------------------------------------------------------------
 c
-c   routine name       - setcnstr_trian_iso
+c   routine name       - setcnstr_trian_iso_h1
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - May 2020
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine evaluates constraint coefficients for
 c                        the triangular master element
 c
-c   usage              - call setcnstrt
-c
 c   arguments          - none
 c
 c----------------------------------------------------------------------
-c
-      subroutine setcnstr_trian_iso_h1
 c
 c    'big' parent nodes
 c
@@ -51,19 +47,30 @@ c      *************************
 c
 c--------------------------------------------------------------------
 c
+      subroutine setcnstr_trian_iso_h1
+c
       use parameters
       use constraints
-#include "syscom.blk"
 c
-      dimension shapsma(MAXtriaH,MAXtriaH),
-     .          shapbig(MAXtriaH,MAXtriaH),
-     .          void(2,MAXtriaH),ip(MAXtriaH),
-     .          r(MAXtriaH,MAXtriaH),xibig(2),xisma(2)
+      implicit none
+c
+      real(8) :: shapsma(MAXtriaH,MAXtriaH),
+     .           shapbig(MAXtriaH,MAXtriaH),
+     .           void(2,MAXtriaH),
+     .           r(MAXtriaH,MAXtriaH),xibig(2),xisma(2)
+      integer :: ip(MAXtriaH)
 c
 c  ...order and edge orientations
-      dimension norder(4),norient(3),nsize(2)
+      integer :: norder(4),norient(3),nsize(2)
 c
+      real(8) :: aux,val
+      integer :: i,ipp,j,jbeg,jp,jpbeg,jpend,k,ians,icl,info
+      integer :: n,nel,nrb,nord,nrdof,nrs
+c
+#if DEBUG_MODE
+      integer :: iprint
       iprint = 0
+#endif
 c
       nord = MAXP
 c
@@ -123,6 +130,7 @@ c
       enddo
 c
       n = (nord+1)*(nord+2)/2
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,*) 'setcnstr_trian_iso_h1: shapsma COLUMNWISE ....'
         do i=1,n
@@ -133,6 +141,7 @@ c
         enddo
         call pause
       endif
+#endif
 ccc      call decomp(n,na,shapsma,ip,iflag)
 cccc
 ccc      if (iflag.ne.0) then
@@ -142,16 +151,19 @@ ccc      endif
 cccc
 ccc      do i=1,n
 ccc        call gauss2(n,na,shapsma,ip,shapbig(1:n,i), r(1:n,i))
+ccc#if DEBUG_MODE
 ccc        if (iprint.eq.1) then
 ccc          write(*,*) 'setcnstr_trian: r FOR i = ',i
 ccc          write(*,7003) r(1:n,i)
 ccc        endif
+ccc#endif
 ccc      enddo
 
 
       call dgetrf(n,n,shapsma,MAXtriaH,ip,info)
       if (info.ne.0) then
-        write(*,*)'setcnstr_trian_iso: H1 DGETRF RETURNED INFO =',info
+        write(*,*)'setcnstr_trian_iso_h1: H1 DGETRF RETURNED INFO =',
+     .             info
         call logic_error(FAILURE,
      .  __FILE__,__LINE__)
       endif
@@ -285,11 +297,12 @@ ccc      endif
 ccc      do i=1,n
 ccc        call gauss2(n,na,shapsma,ip,shapbig(1:n,i), r(1:n,i))
 ccc      enddo
-
+c
 c  ...decompose the matrix
       call dgetrf(n,n,shapsma,MAXtriaH,ip,info)
       if (info.ne.0) then
-        write(*,*)'setcnstr_trian_iso: H1 DGETRF RETURNED INFO =',info
+        write(*,*)'setcnstr_trian_iso_h1: H1 DGETRF RETURNED INFO =',
+     .             info
         call logic_error(FAILURE,
      . __FILE__,__LINE__)
       endif
@@ -301,10 +314,7 @@ c  ...right-hand side resolution
       call dtrsm('L','U','N','N',n,n,1.d0,shapsma,MAXtriaH,shapbig,
      .            MAXtriaH)
       r = shapbig
-
-
-
-
+c
 c
 c  ...degrees of freedom of small node 6:
 c     **********************************
@@ -427,11 +437,12 @@ cccc
 ccc      do i=1,n
 ccc        call gauss2(n,na,shapsma,ip,shapbig(1:n,i),r(1:n,i))
 ccc      enddo
-
+c
 c  ...decompose the matrix
       call dgetrf(n,n,shapsma,MAXtriaH,ip,info)
       if (info.ne.0) then
-        write(*,*)'setcnstr_trian_iso: H1 DGETRF RETURNED INFO =',info
+        write(*,*)'setcnstr_trian_iso_h1: H1 DGETRF RETURNED INFO =',
+     .             info
         call logic_error(FAILURE,
      .  __FILE__,__LINE__)
       endif
@@ -443,10 +454,7 @@ c  ...right-hand side resolution
       call dtrsm('L','U','N','N',n,n,1.d0,shapsma,MAXtriaH,shapbig,
      .            MAXtriaH)
       r = shapbig
-
-
-
-
+c
 c
 c  ...degrees of freedom of small node 7:
 c     **********************************
@@ -569,11 +577,12 @@ cccc
 ccc      do i=1,n
 ccc        call gauss2(n,na,shapsma,ip,shapbig(1:n,i),r(1:n,i))
 ccc      enddo
-
+c
 c  ...decompose the matrix
       call dgetrf(n,n,shapsma,MAXtriaH,ip,info)
       if (info.ne.0) then
-        write(*,*)'setcnstr_trian_iso: H1 DGETRF RETURNED INFO =',info
+        write(*,*)'setcnstr_trian_iso_h1: H1 DGETRF RETURNED INFO =',
+     .             info
         call logic_error(FAILURE,
      .  __FILE__,__LINE__)
       endif
@@ -585,8 +594,7 @@ c  ...right-hand side resolution
       call dtrsm('L','U','N','N',n,n,1.d0,shapsma,MAXtriaH,shapbig,
      .            MAXtriaH)
       r = shapbig
-
-
+c
 c
 c  ...degrees of freedom of small node 4:
 c*****************************************
@@ -671,6 +679,8 @@ c
       return
 c
 c*********************************************************************
+c
+#if DEBUG_MODE
 c
 c  ...begin testing
   777 continue
@@ -823,5 +833,6 @@ c
       read(*,*) ians
       if (ians.eq.1) go to 777
 c
-      return
-      end
+#endif
+c
+      end subroutine setcnstr_trian_iso_h1

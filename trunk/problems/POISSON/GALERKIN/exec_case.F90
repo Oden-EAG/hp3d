@@ -8,6 +8,7 @@ subroutine exec_case(idec)
    use mpi_param
    use mpi
    use common_prob_data
+   use paraview      , only: paraview_select_attr
    use zoltan_wrapper, only: zoltan_w_partition,zoltan_w_eval
 !
    implicit none
@@ -17,6 +18,7 @@ subroutine exec_case(idec)
    logical :: solved
    integer :: mdle_subd(NRELES)
    integer :: i,mdle,kref,src,count,ierr,nord
+   logical :: iPvAttr(1)
 !
 !----------------------------------------------------------------------
 !
@@ -26,7 +28,9 @@ subroutine exec_case(idec)
 !
 !  ...paraview graphics
       case(3)
-         call my_paraview_driver(1)
+         iPvAttr = (/.true./)
+         call paraview_select_attr(iPvAttr)
+         call paraview_driver
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
 !  ...print data structure (interactive)
@@ -149,9 +153,9 @@ subroutine exec_case(idec)
          call pardiso_sc('G')
 !
 !  ...solve problem with Frontal solver (sequential)
-      ! case(43)
-      !    write(*,*) 'calling Frontal (Seq) solver...'
-      !    call solve1(1)
+      case(43)
+         write(*,*) 'calling Frontal (Seq) solver...'
+         call solve1(1)
 !
 !  ...solve problem with omp_mumps (OpenMP MUMPS)
       case(44)

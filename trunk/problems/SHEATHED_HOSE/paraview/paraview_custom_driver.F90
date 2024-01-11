@@ -1,7 +1,7 @@
 !-------------------------------------------------------------------------------------------
-!> Purpose : main driver
+!> @brief   custom paraview driver
+!> @date    Sep 2023
 !-------------------------------------------------------------------------------------------
-!
 subroutine paraview_custom_driver
 !
       use upscale
@@ -19,39 +19,37 @@ subroutine paraview_custom_driver
 !
 !-------------------------------------------------------------------------------------------
 !
-!..load files for visualization upscale
-      if (.not. initialized) then
-         call load_vis(TETR_VIS,trim(FILE_VIS)//'/tetra_'//trim(VLEVEL),'tetr')
-         call load_vis(PRIS_VIS,trim(FILE_VIS)//'/prism_'//trim(VLEVEL),'pris')
-         call load_vis(HEXA_VIS,trim(FILE_VIS)//'/hexa_'//trim(VLEVEL),'hexa')
-         initialized = .true.
+!..check compatibility of paraview input flags, and
+!  initialize visualization files and auxiliary arrays
+   call paraview_initialize
+!
+!.."time" value is only written to file if "time" is non-negative
+!  (currently, only supported with XDMF output)
+   time=-1.d0
+!
+!..integer id to append to Fname
+   id=id+1
+!
+   if (RANK .eq. ROOT) then
+      call paraview_begin(id,time) ! [OPENS THE XMF FILE, WRITES HEADER]
+   endif
+!
+!  -- GEOMETRY --
+   call paraview_geometry
+!
+!  loop over custom components (that we care about)
+   do scomp=1,3
+      call paraview_attr_custom(id,scomp)
+!
+      if ((.not. QUIET_MODE) .and. (RANK.eq.ROOT)) then
+                write(*,8000) sAttr(scomp)
+       8000     format(1x,a8)
       endif
 !
-      time=-1.d0 ! set to negative for now
+   enddo
 !
-!     integer id to append to Fname
-      id=id+1
+   if (RANK .eq. ROOT) then
+      call paraview_end ! [CLOSES THE XMF FILE, WRITES FOOTER]
+   endif
 !
-      if (RANK .eq. ROOT) then
-         call paraview_begin(id,time) ! [OPENS THE XMF FILE, WRITES HEADER]
-      endif
-!
-!     -- GEOMETRY --
-      call paraview_geom
-!
-!     loop over custom components (that we care about)
-      do scomp=1,3
-         call paraview_attr_custom(id,scomp)
-!
-         if ((.not. QUIET_MODE) .and. (RANK.eq.ROOT)) then
-                   write(*,8000) sAttr(scomp)
-          8000     format(1x,a8)
-         endif
-!
-      enddo
-!
-      if (RANK .eq. ROOT) then
-         call paraview_end ! [CLOSES THE XMF FILE, WRITES FOOTER]
-      endif
-!
-endsubroutine paraview_custom_driver
+end subroutine paraview_custom_driver

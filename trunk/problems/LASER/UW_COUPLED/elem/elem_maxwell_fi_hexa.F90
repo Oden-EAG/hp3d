@@ -53,6 +53,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    use data_structure3D
    use laserParam
    use commonParam
+   use MPI, only: MPI_Wtime
 !..no implicit statements
    implicit none
 !..declare input/output variables
@@ -75,7 +76,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    VTYPE, dimension(MdQ,MdQ), intent(out) :: ZalocQQ
 !
 !..declare edge/face type variables
-   character(len=4) :: etype,ftype
+   integer :: etype,ftype
 !
 !..declare element order, orientation for edges and faces
    integer, dimension(19)    :: norder
@@ -257,7 +258,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    real(8), dimension(MAXPP+1,MAXPP+1) :: sH2p,sH3p,dsH2p,dsH3p
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
    integer, dimension(3,3) :: deltak
 !
@@ -298,7 +299,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    allocate(stiff_EQ_T(6*NrdofQ ,NrTest))
 !
 !..element type
-   etype = NODES(Mdle)%type
+   etype = NODES(Mdle)%ntype
    nre = nedge(etype); nrf = nface(etype)
 !
 !..determine order of approximation
@@ -307,7 +308,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !
 !..set the enriched order of approximation
    select case(etype)
-      case('mdlb')
+      case(MDLB)
          nordP = NODES(Mdle)%order+NORD_ADD*111
          norderi(nre+nrf+1) = 111
       case default

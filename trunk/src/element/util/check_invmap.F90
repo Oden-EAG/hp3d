@@ -1,3 +1,5 @@
+#if DEBUG_MODE
+
 subroutine check_invmap
 !
 !--------------------------------------------------------------------------
@@ -9,7 +11,7 @@ subroutine check_invmap
 !
       integer :: mdle,nel,ifig,nint,l,k,i,idec,nrdofH
       real(8) :: s
-      character (len=4) :: ftype
+      integer :: ftype
       real(8),dimension(3)           :: xi,xi_aux,x,temp
       real(8),dimension(3,MAXbrickH) :: xnod
       real(8),dimension(2)           :: t
@@ -31,8 +33,7 @@ subroutine check_invmap
       real(8),dimension(  MAXquadH)  :: wt
 !
       real(8), parameter :: eps=1.d-10
-      integer :: iprint_invmap,iprint
-      common /cinvmap/ iprint_invmap
+      integer :: iprint
 !
 !--------------------------------------------------------------------------
 !
@@ -44,7 +45,7 @@ subroutine check_invmap
         mdle = ELEM_ORDER(nel)
 !
         if (iprint.eq.1) then
-          write(*,9999)mdle,NODES(mdle)%type
+          write(*,9999)mdle,S_Type(NODES(mdle)%ntype)
  9999     format(' mdle,type = ',i7,2x,a4)
         endif
 !
@@ -56,7 +57,7 @@ subroutine check_invmap
 !--------------------------------------------------------------------------
 !  E L E M E N T   I N T E R I O R                                        |
 !--------------------------------------------------------------------------
-        call set_3Dint(NODES(Mdle)%type,norder, nint,xiloc,wxi)
+        call set_3Dint(NODES(Mdle)%ntype,norder, nint,xiloc,wxi)
 !
 !  .....loop over interior integration points
         do l=1,nint
@@ -68,7 +69,7 @@ subroutine check_invmap
 !  .......parametric element
           case(0)
 !  .........shape functions
-            call shape3DH(NODES(Mdle)%type,xi,norder,nedge_orient, &
+            call shape3DH(NODES(Mdle)%ntype,xi,norder,nedge_orient, &
                           nface_orient, nrdofH,vshapH,dvshapH)
 !
 !  .........accumulate
@@ -85,7 +86,7 @@ subroutine check_invmap
           endselect
 !
 !  .......compute inverse map
-          call invmap(NODES(mdle)%type,x,norder,nedge_orient, &
+          call invmap(NODES(mdle)%ntype,x,norder,nedge_orient, &
                       nface_orient,xnod ,idec,xi_aux)
 !
 !  .......check
@@ -93,7 +94,7 @@ subroutine check_invmap
           call norm(temp, s)
           if (s.gt.eps) then
             write(*,*)'Interior point FAIL'
-            write(*,6665)mdle,NODES(mdle)%type
+            write(*,6665)mdle,S_Type(NODES(mdle)%ntype)
  6665       format(' mdle,type = ',i7,2x,a4)
             write(*,6666)xi(    1:3)
  6666       format(' xi     = ',3(e12.5,2x))
@@ -108,13 +109,13 @@ subroutine check_invmap
 !  E L E M E N T   F A C E S                                              |
 !--------------------------------------------------------------------------
 !  .....loop over element faces
-        do ifig=1,nface(NODES(mdle)%type)
+        do ifig=1,nface(NODES(mdle)%ntype)
 !
 !  .......set up the element quadrature
-          ftype=face_type(NODES(mdle)%type,ifig)
+          ftype=face_type(NODES(mdle)%ntype,ifig)
 !
 !  .......determine order for the face
-          call face_order(NODES(mdle)%type,ifig,norder, nordf)
+          call face_order(NODES(mdle)%ntype,ifig,norder, nordf)
           call set_2Dint(ftype,nordf, nint,tloc,wt)
 !
 !  .......loop through face integration points
@@ -124,13 +125,13 @@ subroutine check_invmap
             t(1:2)=tloc(1:2,l)
 !
 !  .........determine the master element coordinates
-            call face_param(NODES(mdle)%type,ifig,t, xi,dxidt)
+            call face_param(NODES(mdle)%ntype,ifig,t, xi,dxidt)
 !
             select case(EXGEOM)
 !  .........parametric element
             case(0)
 !  ...........derivatives and values of the shape functions
-              call shape3DH(NODES(mdle)%type,xi,norder,nedge_orient, &
+              call shape3DH(NODES(mdle)%ntype,xi,norder,nedge_orient, &
                             nface_orient, nrdofH,vshapH,dvshapH)
 !
 !  ...........accumulate
@@ -147,7 +148,7 @@ subroutine check_invmap
             endselect
 !
 !  .........compute inverse map
-            call invmap(NODES(mdle)%type,x,norder,nedge_orient, &
+            call invmap(NODES(mdle)%ntype,x,norder,nedge_orient, &
                         nface_orient,xnod ,idec,xi_aux)
 !
             temp(1:3)=xi_aux(1:3)-xi(1:3)
@@ -155,7 +156,7 @@ subroutine check_invmap
             if (s.gt.eps) then
               write(*,6668)ifig
  6668         format(' Face point FAIL, ifig = ',i1)
-              write(*,6665)mdle,NODES(mdle)%type
+              write(*,6665)mdle,S_Type(NODES(mdle)%ntype)
               write(*,6666)xi(    1:3)
               write(*,6667)xi_aux(1:3)
             endif
@@ -172,3 +173,5 @@ subroutine check_invmap
 !
 !
 end subroutine check_invmap
+
+#endif

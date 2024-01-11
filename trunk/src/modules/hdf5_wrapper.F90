@@ -32,7 +32,7 @@ module hdf5_wrapper
       call hdf5_w_handle_err(ierr,'h5open_f')
 !
       if (RANK .eq. ROOT) then
-         write(*,100) 'HDF5 initialized sucessfully.'
+         write(*,100) 'HDF5 initialized successfully.'
       endif
   100 format(/,A)
 !
@@ -61,7 +61,7 @@ module hdf5_wrapper
       HDF5_IS_INIT = .false.
 !
       if (RANK .eq. ROOT) then
-         write(*,100) 'HDF5 closed sucessfully.'
+         write(*,100) 'HDF5 closed successfully.'
       endif
   100 format(/,A)
 !

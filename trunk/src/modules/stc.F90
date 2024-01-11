@@ -33,6 +33,8 @@ module stc
    use data_structure3D
    use par_mesh, only: DISTRIBUTED
 !
+   implicit none
+!
 !..storing Schur complements
    logical, save :: STORE_STC   = .true.
 !
@@ -59,7 +61,6 @@ contains
 !
 !
 subroutine stc_alloc
-   if (.not. DISTRIBUTED) NRELES_SUBD = NRELES
    allocate(CLOC(NRELES_SUBD))
 end subroutine stc_alloc
 !
@@ -98,7 +99,7 @@ subroutine stc_get_nrdof(Mdle, Nrdofi,Nrdofb)
    integer, intent(out) :: Nrdofi(NR_PHYSA),Nrdofb(NR_PHYSA)
 !
 !..element type
-   character(len=4) :: etype
+   integer :: ntype
 !
 !..element order
    integer :: nord,norderi(19)
@@ -120,15 +121,15 @@ subroutine stc_get_nrdof(Mdle, Nrdofi,Nrdofb)
 !
 !..number of dofs for a SINGLE H1,H(curl),H(div),L2 component
    call find_order(Mdle, norderi)
-   etype = NODES(Mdle)%type
-   select case(etype)
-      case('mdlb'); nord = norderi(19); norderi(19) = 111
-      case('mdlp'); nord = norderi(15); norderi(15) = 11
-      case('mdln'); nord = norderi(11); norderi(11) = 1
-      case('mdld'); nord = norderi(14); norderi(14) = 1
+   ntype = NODES(Mdle)%ntype
+   select case(ntype)
+      case(MDLB); nord = norderi(19); norderi(19) = 111
+      case(MDLP); nord = norderi(15); norderi(15) = 11
+      case(MDLN); nord = norderi(11); norderi(11) = 1
+      case(MDLD); nord = norderi(14); norderi(14) = 1
    end select
-   call celndof(etype,norderi, nrdoflHi,nrdoflEi,nrdoflVi,nvoid)
-   call ndof_nod(etype,nord, nrdofHmdl,nrdofEmdl,nrdofVmdl,nrdofQmdl)
+   call celndof(ntype,norderi, nrdoflHi,nrdoflEi,nrdoflVi,nvoid)
+   call ndof_nod(ntype,nord, nrdofHmdl,nrdofEmdl,nrdofVmdl,nrdofQmdl)
 !
 !..number of dofs for ALL H1,H(curl),H(div),L2 components
    do i=1,NR_PHYSA
@@ -141,17 +142,17 @@ subroutine stc_get_nrdof(Mdle, Nrdofi,Nrdofb)
 !  ...skip if variable is deactivated
       if (.not. PHYSAm(i)) cycle
 !
-      select case(DTYPE(i))
-         case('contin') ; Nrdofi(i)=nrdoflHi*NR_COMP(i)
-         case('tangen') ; Nrdofi(i)=nrdoflEi*NR_COMP(i)
-         case('normal') ; Nrdofi(i)=nrdoflVi*NR_COMP(i)
+      select case(D_TYPE(i))
+         case(CONTIN) ; Nrdofi(i)=nrdoflHi*NR_COMP(i)
+         case(TANGEN) ; Nrdofi(i)=nrdoflEi*NR_COMP(i)
+         case(NORMAL) ; Nrdofi(i)=nrdoflVi*NR_COMP(i)
       end select
       if (.not. PHYSAi(i)) then
-         select case(DTYPE(i))
-            case('contin') ; Nrdofb(i)=nrdofHmdl*NR_COMP(i)
-            case('tangen') ; Nrdofb(i)=nrdofEmdl*NR_COMP(i)
-            case('normal') ; Nrdofb(i)=nrdofVmdl*NR_COMP(i)
-            case('discon') ; Nrdofb(i)=nrdofQmdl*NR_COMP(i)
+         select case(D_TYPE(i))
+            case(CONTIN) ; Nrdofb(i)=nrdofHmdl*NR_COMP(i)
+            case(TANGEN) ; Nrdofb(i)=nrdofEmdl*NR_COMP(i)
+            case(NORMAL) ; Nrdofb(i)=nrdofVmdl*NR_COMP(i)
+            case(DISCON) ; Nrdofb(i)=nrdofQmdl*NR_COMP(i)
          end select
       endif
    enddo
@@ -316,7 +317,7 @@ end subroutine stc_fwd_wrapper
 !
 !----------------------------------------------------------------------
 !
-!    latest revision    - Sept 2018
+!    latest revision    - Mar 2023
 !
 !    purpose            - routine performs static condensation for the
 !                         real symmetric or complex Hermitian case
@@ -342,31 +343,30 @@ subroutine stc_fwd_herm(Ni,Nb, Aii,Abi,Aib,Abb,Bi,Bb)
    VTYPE  , intent(inout) :: Aii(Ni,Ni),Abi(Nb,Ni),Aib(Ni,Nb),Abb(Nb,Nb), &
                              Bi(Ni,NR_RHS),Bb(Nb,NR_RHS)
 !
-!..workspace for Hermitian bubble matrix in packed format
+!..workspace for Hermitian bubble matrix in RFP format
    VTYPE, dimension(Nb*(Nb+1)/2) :: AP
 !
-   integer  :: i,j,k,nk,k1,k2
    integer  :: info
-!
-!..function for vector storage of a symmetric matrix
-   nk(k1,k2) = (k2-1)*k2/2+k1
 !
 !----------------------------------------------------------------------
 !
 !..Compute Cholesky factorization: Abb = LL^*
-!..first rewrite in packed form
-   do i=1,Nb
-      do j=i,Nb
-         k = nk(i,j)
-         AP(k) = Abb(i,j)
-      enddo
-   enddo
+!..Copy to RFP format
+#if C_MODE
+   call ZTRTTF('N','U',Nb,Abb,Nb,AP,info)
+#else
+   call DTRTTF('N','U',Nb,Abb,Nb,AP,info)
+#endif
+if (info.ne.0) then
+   write(*,*) 'stc_fwd: TRTTF: info = ', info
+   stop
+endif
 !
 !..Cholesky factorization
 #if C_MODE
-   call ZPPTRF('U', Nb, AP, info)
+   call ZPFTRF('N','U', Nb, AP, info)
 #else
-   call DPPTRF('U', nb, AP, info)
+   call DPFTRF('N','U', Nb, AP, info)
 #endif
    if (info.ne.0) then
       write(*,*) 'stc_fwd: PPTRF: info = ', info
@@ -375,9 +375,9 @@ subroutine stc_fwd_herm(Ni,Nb, Aii,Abi,Aib,Abb,Bi,Bb)
 !
 !..Compute inv(Abb)*Bb
 #if C_MODE
-   call ZPPTRS('U', Nb, NR_RHS, AP, Bb, Nb, info)
+   call ZPFTRS('N','U', Nb, NR_RHS, AP, Bb, Nb, info)
 #else
-   call DPPTRS('U', Nb, NR_RHS, AP, Bb, Nb, info)
+   call DPFTRS('N','U', Nb, NR_RHS, AP, Bb, Nb, info)
 #endif
    if (info.ne.0) then
       write(*,*) 'stc_fwd: PPTRS: info = ', info
@@ -386,9 +386,9 @@ subroutine stc_fwd_herm(Ni,Nb, Aii,Abi,Aib,Abb,Bi,Bb)
 !
 !..Compute inv(Abb)*Abi
 #if C_MODE
-   call ZPPTRS('U', Nb, Ni, AP, Abi, Nb, info)
+   call ZPFTRS('N','U', Nb, Ni, AP, Abi, Nb, info)
 #else
-   call DPPTRS('U', Nb, Ni, AP, Abi, Nb, info)
+   call DPFTRS('N','U', Nb, Ni, AP, Abi, Nb, info)
 #endif
    if (info.ne.0) then
       write(*,*) 'stc_fwd: PPTRS: info = ', info
@@ -589,12 +589,12 @@ subroutine stc_bwd_wrapper(Iel)
          if (ii .eq. 0) cycle
          k = ii/l
 !     ...copy data
-         select case(DTYPE(j))
-            case('contin')
+         select case(D_TYPE(j))
+            case(CONTIN)
                xi(ni+1:ni+ii,load) = RESHAPE(zdofH(lH+1:lH+l,1:k),(/ii/))
-            case('tangen')
+            case(TANGEN)
                xi(ni+1:ni+ii,load) = RESHAPE(zdofE(lE+1:lE+l,1:k),(/ii/))
-            case('normal')
+            case(NORMAL)
                xi(ni+1:ni+ii,load) = RESHAPE(zdofV(lV+1:lV+l,1:k),(/ii/))
             case default
                write(*,*) 'stc_bwd_wrapper: INCONSISTENCY. stop.'
@@ -603,10 +603,10 @@ subroutine stc_bwd_wrapper(Iel)
 !
          ni = ni+ii
  100     continue
-         select case(DTYPE(j))
-            case('contin'); lH = lH + l
-            case('tangen'); lE = lE + l
-            case('normal'); lV = lV + l
+         select case(D_TYPE(j))
+            case(CONTIN); lH = lH + l
+            case(TANGEN); lE = lE + l
+            case(NORMAL); lV = lV + l
          end select
       enddo
    enddo
@@ -716,7 +716,8 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
    integer :: mvarH,mvarE,mvarV,mvarQ
 !
 #if DEBUG_MODE
-   integer :: iprint=0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !----------------------------------------------------------------------
@@ -774,8 +775,8 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
 !  ...loop over physics variables
       do i=1,NR_PHYSA
          il = NR_COMP(i)
-         if (DTYPE(i) .ne. 'contin')  goto 110
-         if (ncase(i) .eq. 0)         goto 110
+         if (D_TYPE(i) .ne. CONTIN) goto 110
+         if (ncase(i)  .eq. 0)      goto 110
          if ((.not. PHYSAm(i)) .or. PHYSAi(i)) then
             mvarH=mvarH+il; goto 110
          endif
@@ -791,13 +792,13 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
                      ivar = ivar+1
                      nn = nn+1
 !                 ...copy the dof
-                     NODES(nod)%dof%zdofH(ivar,j) = Xb(nn,load)
+                     NODES(nod)%dof%zdofH(ivar,j,N_COMS) = Xb(nn,load)
 #if DEBUG_MODE
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Xb(nn,load)
  7006                   format('stc_solout: nn,load,Xb(nn,load) = ',i4,i2,1x,2e13.5)
-                        write(*,7007) nod,j,ivar,NODES(nod)%dof%zdofH(ivar,j)
- 7007                   format('stc_solout: nod,j,ivar,NODES(nod)%dof%zdofH(ivar,j)', &
+                        write(*,7007)       nod,j,ivar,NODES(nod)%dof%zdofH(ivar,j,N_COMS)
+ 7007                   format('stc_solout: nod,j,ivar,NODES(nod)%dof%zdofH(ivar,j,N_COMS)', &
                                ' = ',i5,i3,i3,1x,2e13.5)
                      endif
 #endif
@@ -826,8 +827,8 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
 !  ...loop over physics variables
       do i=1,NR_PHYSA
          il = NR_COMP(i)
-         if (DTYPE(i) .ne. 'tangen')  goto 210
-         if (ncase(i) .eq. 0)         goto 210
+         if (D_TYPE(i) .ne. TANGEN) goto 210
+         if (ncase(i)  .eq. 0)      goto 210
          if ((.not. PHYSAm(i)) .or. PHYSAi(i)) then
             mvarE=mvarE+il; goto 210
          endif
@@ -843,12 +844,12 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
                      ivar = ivar+1
                      nn = nn+1
 !                 ...copy the dof
-                     NODES(nod)%dof%zdofE(ivar,j) = Xb(nn,load)
+                     NODES(nod)%dof%zdofE(ivar,j,N_COMS) = Xb(nn,load)
 #if DEBUG_MODE
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Xb(nn,load)
-                        write(*,7009) nod,j,ivar,NODES(nod)%dof%zdofE(ivar,j)
- 7009                   format('stc_solout: nod,j,ivar,NODES(nod)%dof%zdofE(ivar,j)', &
+                        write(*,7009)       nod,j,ivar,NODES(nod)%dof%zdofE(ivar,j,N_COMS)
+ 7009                   format('stc_solout: nod,j,ivar,NODES(nod)%dof%zdofE(ivar,j,N_COMS)', &
                                ' = ',i5,i3,i3,1x,2e13.5)
                      endif
 #endif
@@ -877,8 +878,8 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
 !  ...loop over physics variables
       do i=1,NR_PHYSA
          il = NR_COMP(i)
-         if (DTYPE(i) .ne. 'normal')  goto 310
-         if (ncase(i) .eq. 0)         goto 310
+         if (D_TYPE(i) .ne. NORMAL) goto 310
+         if (ncase(i)  .eq. 0)      goto 310
          if ((.not. PHYSAm(i)) .or. PHYSAi(i)) then
             mvarV=mvarV+il; goto 310
          endif
@@ -894,12 +895,12 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
                      ivar = ivar+1
                      nn = nn+1
 !                 ...copy the dof
-                     NODES(nod)%dof%zdofV(ivar,j) = Xb(nn,load)
+                     NODES(nod)%dof%zdofV(ivar,j,N_COMS) = Xb(nn,load)
 #if DEBUG_MODE
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Xb(nn,load)
-                        write(*,7010) nod,j,ivar,NODES(nod)%dof%zdofV(ivar,j)
- 7010                   format('stc_solout: nod,j,ivar,NODES(nod)%dof%zdofV(ivar,j)', &
+                        write(*,7010)       nod,j,ivar,NODES(nod)%dof%zdofV(ivar,j,N_COMS)
+ 7010                   format('stc_solout: nod,j,ivar,NODES(nod)%dof%zdofV(ivar,j,N_COMS)', &
                                ' = ',i5,i3,i3,1x,2e13.5)
                      endif
 #endif
@@ -929,8 +930,8 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
 !  ...loop over physics variables
       do i=1,NR_PHYSA
          il = NR_COMP(i)
-         if (DTYPE(i) .ne. 'discon')  goto 410
-         if (ncase(i) .eq. 0)         goto 410
+         if (D_TYPE(i) .ne. DISCON) goto 410
+         if (ncase(i)  .eq. 0)      goto 410
          if (.not. PHYSAm(i)) then
             mvarQ=mvarQ+il; goto 410
          endif
@@ -950,12 +951,12 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
                      ivar = ivar+1
                      nn = nn+1
 !                 ...copy the dof
-                     NODES(nod)%dof%zdofQ(ivar,j) = Xb(nn,load)
+                     NODES(nod)%dof%zdofQ(ivar,j,N_COMS) = Xb(nn,load)
 #if DEBUG_MODE
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Xb(nn,load)
-                        write(*,7011) nod,j,ivar,NODES(nod)%dof%zdofQ(ivar,j)
- 7011                   format('stc_solout: nod,j,ivar,NODES(nod)%dof%zdofQ(ivar,j)', &
+                        write(*,7011)       nod,j,ivar,NODES(nod)%dof%zdofQ(ivar,j,N_COMS)
+ 7011                   format('stc_solout: nod,j,ivar,NODES(nod)%dof%zdofQ(ivar,j,N_COMS)', &
                                ' = ',i5,i3,i3,1x,2e13.5)
                      endif
 #endif

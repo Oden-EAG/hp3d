@@ -40,8 +40,10 @@ subroutine pardiso_sc(mtype)
    use control,   only: ISTC_FLAG
    use stc,       only: HERM_STC, CLOC,                          &
                         stc_alloc, stc_dealloc, stc_get_nrdof
+   use parameters,only: NRRHS
    use par_mesh,  only: DISTRIBUTED,HOST_MESH
    use mpi_param, only: RANK,ROOT
+   use MPI,       only: MPI_Wtime
 !
    implicit none
 !
@@ -72,7 +74,7 @@ subroutine pardiso_sc(mtype)
    VTYPE, allocatable :: SA(:), RHS(:)
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
@@ -97,7 +99,7 @@ subroutine pardiso_sc(mtype)
    endif
 !
 !..TODO multiple right-hand sides
-   NR_RHS = 1
+   NR_RHS = NRRHS
 !
 !..case with static condensation
    if (ISTC_FLAG) then

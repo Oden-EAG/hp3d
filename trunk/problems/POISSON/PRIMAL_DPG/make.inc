@@ -2,7 +2,6 @@ SRC_MODULE = \
             ./modules/common_prob_data.F90
 
 SRC_COMMON = \
-            ./common/customize_geometry.F90 \
             ./common/dirichlet.F90 \
             ./common/exact.F90 \
             ./common/exact_error.F90 \
@@ -21,8 +20,5 @@ SRC_PRIMAL = \
             elem.F90 \
             elem_residual.F90 \
             main.F90 \
-            my_paraview_driver.F90 \
             set_initial_mesh.F90 \
             soldis.F90
-
-SRC_FILE   += $(SRC_MODULE) $(SRC_COMMON) $(SRC_PRIMAL)

@@ -4,6 +4,8 @@
 !
 module sheathed_isotropic_materials
 !
+  implicit none
+!
 !  G E O M E T R Y
   real*8, parameter :: R_inside  = 0.5d0
   real*8, parameter :: R_middle  = 0.99d0

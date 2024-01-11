@@ -128,40 +128,38 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
    use data_structure3D
    use environment, only : QUIET_MODE
    use mpi_param  , only : RANK,ROOT
-   use MPI        , only : MPI_COMM_WORLD,MPI_IN_PLACE,MPI_REAL8,MPI_SUM
+   use MPI        , only : MPI_COMM_WORLD,MPI_IN_PLACE,MPI_REAL8,MPI_SUM,MPI_Wtime
    use par_mesh   , only : DISTRIBUTED,HOST_MESH
 !
    implicit none
 !
-   integer, intent(in)  :: NumPts
+   integer , intent(in)  :: NumPts
    real(8) , intent(in)  :: ZValues(NumPts)
    real(8) , intent(out) :: CoreTemp(NumPts)
-!
-   real(8), parameter :: rZero = 0.d0
 !
 !..mdle number
    integer :: mdle
 !
 !..element, face order, geometry dof
-   real(8) :: xnod (3,MAXbrickH)
+   real(8) :: xnod(3,MAXbrickH)
    real(8) :: maxz,minz
 !
 !..miscellanea
-   integer :: iel, i, ndom
+   integer :: iel,i,ndom
    real(8) :: elemTemp,elemVol
    real(8) :: coreVol(NumPts)
 !
 !..element type
-   character(len=4) :: etype
+   integer :: etype
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
    integer :: count,ierr
 !
 !-------------------------------------------------------------------------------
 !
-   CoreTemp = rZero
-   coreVol  = rZero
+   CoreTemp = rZERO
+   coreVol  = rZERO
 !
 !..start timer
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
@@ -187,16 +185,16 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
          end select
       endif
       call nodcor(mdle, xnod)
-      etype = NODES(mdle)%type
+      etype = NODES(mdle)%ntype
       select case(etype)
-         case('mdlb')
+         case(MDLB)
             maxz = maxval(xnod(3,1:8))
             minz = minval(xnod(3,1:8))
-         case('mdlp')
+         case(MDLP)
             maxz = maxval(xnod(3,1:6))
             minz = minval(xnod(3,1:6))
          case default
-            write(*,*) 'comp_avgTemp: invalid etype=',etype,'. stop.'
+            write(*,*) 'comp_avgTemp: invalid etype=',S_Type(etype),'. stop.'
             stop
       end select
       do i=1,NumPts
@@ -309,14 +307,14 @@ subroutine comp_elem_avgTemp(Mdle, ElemTemp,ElemVol)
    nflag=1
 !
 !..order of approx, orientations, geometry dof's, solution dof's
-   call find_order( mdle, norder)
-   call find_orient(mdle, nedge_orient,nface_orient)
-   call nodcor(     mdle, xnod)
-   call solelm(     mdle, zdofH,zdofE,zdofV,zdofQ)
+   call find_order( Mdle, norder)
+   call find_orient(Mdle, nedge_orient,nface_orient)
+   call nodcor(     Mdle, xnod)
+   call solelm(     Mdle, zdofH,zdofE,zdofV,zdofQ)
 !
 !..set up the element quadrature
    INTEGRATION=0
-   call set_3D_int_DPG(NODES(mdle)%type,norder,nface_orient, nint,xiloc,wxi)
+   call set_3D_int_DPG(NODES(Mdle)%ntype,norder,nface_orient, nint,xiloc,wxi)
    INTEGRATION=0
 !
    ElemVol  = 0.d0
@@ -328,7 +326,7 @@ subroutine comp_elem_avgTemp(Mdle, ElemTemp,ElemVol)
 !  ...Gauss point and weight
       xi(1:3)=xiloc(1:3,l); wa=wxi(l)
 !
-      call soleval(mdle,xi,nedge_orient,nface_orient,norder,xnod, &
+      call soleval(Mdle,xi,nedge_orient,nface_orient,norder,xnod, &
                    zdofH,zdofE,zdofV,zdofQ,nflag, &
                    x,dxdxi,zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
       rsolH = real(zsolH(1))

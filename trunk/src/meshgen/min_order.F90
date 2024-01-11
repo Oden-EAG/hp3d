@@ -1,24 +1,24 @@
 !----------------------------------------------------------------------
-!> Purpose  - routine uses the "minimum rule" to update order of
-!!            approximation of an initial mesh edge-node or face-node.
+!> @brief    routine uses the "minimum rule" to update order of
+!!           approximation of an initial mesh edge-node or face-node.
 !!
-!> @param[in]    Etype   - element type
-!> @param[in]    Nflag   = 2 mid-edge node
-!> @param[in]            = 3 mid-face node
-!> @param[in]    Ient    - edge or face number (entities)
-!> @param[in]    Norient - face orientation (for faces only)
-!> @param[in]    Norder  - element (middle node) order
-!> @param[inout] Nord    - order of the node
+!> @param[in]     Etype   - element type
+!> @param[in]     Nflag   = 2 mid-edge node
+!> @param[in]             = 3 mid-face node
+!> @param[in]     Ient    - edge or face number (entities)
+!> @param[in]     Norient - face orientation (for faces only)
+!> @param[in]     Norder  - element (middle node) order
+!> @param[in,out] Nord    - order of the node
 !
-!> @date Dec 14
+!> @date    Feb 2023
 !----------------------------------------------------------------------
-!
 subroutine min_order(Etype,Nflag,Ient,Norient,Norder, Nord)
 !
+      use node_types
       implicit none
-      character(len=4), intent(in)    :: Etype
-      integer         , intent(in)    :: Nflag,Ient,Norient,Norder
-      integer         , intent(inout) :: Nord
+      integer, intent(in)    :: Etype
+      integer, intent(in)    :: Nflag,Ient,Norient,Norder
+      integer, intent(inout) :: Nord
 !
       integer :: nordx,nordy,nordz, nordh,nordv
 !
@@ -26,9 +26,8 @@ subroutine min_order(Etype,Nflag,Ient,Norient,Norder, Nord)
 !
       select case(Etype)
 !
-!
 !     -- PRISM --
-      case('pris')
+      case(PRIS)
          call decode(Norder, nordx,nordz)
 !
 !        -- EDGES --
@@ -71,7 +70,7 @@ subroutine min_order(Etype,Nflag,Ient,Norient,Norder, Nord)
 !
 !
 !     -- BRICK --
-      case('bric')
+      case(BRIC)
 !
 !        decode brick
          call decode(Norder, nordh,nordz)
@@ -111,7 +110,6 @@ subroutine min_order(Etype,Nflag,Ient,Norient,Norder, Nord)
                case(1,3,4,6) ; nordh=min(nordh,nordy) ; nordv=min(nordv,nordx)
                endselect
 !
-!
 !           parallel to xz-plane
             case(3,5)
                select case(Norient)
@@ -141,12 +139,12 @@ subroutine min_order(Etype,Nflag,Ient,Norient,Norder, Nord)
 !
 !
 !     -- TET --
-      case('tetr')
+      case(TETR)
          Nord = min(Nord,Norder)
 !
 !
 !     -- PYRAMID --
-      case('pyra')
+      case(PYRA)
 !
 !        -- EDGES --
          select case(Nflag)
@@ -175,11 +173,9 @@ subroutine min_order(Etype,Nflag,Ient,Norient,Norder, Nord)
             endselect
          endselect
 !
-!
       case default
-         write(*,*) 'min_order: Etype = ',Etype
+         write(*,*) 'min_order: Etype = ',S_Type(Etype)
          stop
       endselect
 !
-!
-endsubroutine min_order
+end subroutine min_order

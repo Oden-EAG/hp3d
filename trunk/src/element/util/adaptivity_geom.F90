@@ -1,13 +1,13 @@
 #if DEBUG_MODE
 
 !------------------------------------------------------------------------
-!> Purpose : performs adaptive h-refinements of the geometry
-!
-!> rev@Jan 13
+!> @brief  performs adaptive h-refinements of the geometry
+!> @date   Feb 2023
 !------------------------------------------------------------------------
 subroutine adaptivity_geom(Eps, Nref,Ratio)
 !
       use data_structure3D , only : NRELES,NODES,ELEM_ORDER
+      use node_types
       implicit none
 !
       real(8), intent(in)  :: Eps
@@ -59,7 +59,7 @@ subroutine adaptivity_geom(Eps, Nref,Ratio)
 !
 !  ......printing
          if (iprint.eq.1) then
-            write(*,7003)j,nlist(i),NODES(nlist(i))%Type,rlist(i)
+            write(*,7003)j,nlist(i),S_Type(NODES(nlist(i))%ntype),rlist(i)
  7003    format(' j,mdle,type,err = ',i4,2x,i5,2x,a4,2x,e12.5)
          endif
 !
@@ -68,8 +68,9 @@ subroutine adaptivity_geom(Eps, Nref,Ratio)
          call refine(    nlist(i), kref)
       enddo
 !
-      call close
+      call close_mesh
       call update_gdof
+      call update_Ddof
 !
 !  ...number of refined elements, ratio
       Nref=j ; Ratio=float(j)/float(nreles_save)

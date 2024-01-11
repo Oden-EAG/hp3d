@@ -43,12 +43,14 @@ subroutine par_mumps_sc(mtype)
    use control,   only: ISTC_FLAG
    use stc,       only: HERM_STC,CLOC,                         &
                         stc_alloc,stc_dealloc,stc_get_nrdof
+   use parameters,only: NRRHS
    use par_mumps, only: mumps_par,mumps_start_par,mumps_destroy_par
    use par_mesh , only: DISTRIBUTED,HOST_MESH
    use mpi_param, only: RANK,ROOT,NUM_PROCS
    use MPI      , only: MPI_SUM,MPI_MIN,MPI_MAX,MPI_IN_PLACE,  &
                         MPI_INTEGER,MPI_INTEGER8,              &
-                        MPI_REAL8,MPI_COMPLEX16
+                        MPI_REAL8,MPI_COMPLEX16,MPI_Wtime
+   use environment, only: QUIET_MODE
 !
    implicit none
 !
@@ -81,7 +83,7 @@ subroutine par_mumps_sc(mtype)
    integer :: nrdof_subd(NUM_PROCS)
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time,time_stamp
+   real(8) :: start_time,end_time,time_stamp
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -109,7 +111,8 @@ subroutine par_mumps_sc(mtype)
    endif
 !
 !..TODO multiple right-hand sides
-   NR_RHS = 1
+   NR_RHS = NRRHS
+!
    call mumps_start_par
 !
 !  ----------------------------------------------------------------------
@@ -266,12 +269,14 @@ subroutine par_mumps_sc(mtype)
 !  ----------------------------------------------------------------------
 !
    call MPI_BARRIER(mumps_par%COMM, ierr)
-   if (RANK .eq. ROOT) then
+   if ((RANK .eq. ROOT) .and. (.not. QUIET_MODE)) then
       write(*,2010) '[', RANK, '] Number of dof  : nrdof_con = ', NRDOF_CON
       write(*,2010) '[', RANK, ']                  nrdof_tot = ', NRDOF_TOT
       write(*,2010) '[', RANK, '] Total non-zeros: nnz       = ', nnz
    endif
-   write(*,2010) '[', RANK, '] Local non-zeros: nnz_loc   = ', nnz_loc
+   if (.not. QUIET_MODE) then
+      write(*,2010) '[', RANK, '] Local non-zeros: nnz_loc   = ', nnz_loc
+   endif
 2010 format(A,I4,A,I12)
 !
    if (IPRINT_TIME .eq. 1) then
@@ -351,9 +356,19 @@ subroutine par_mumps_sc(mtype)
 !  ...H1 dof
       do i = nrnodm,1,-1
          nod = nodm(i)
+#if DEBUG_MODE
+         if (NFIRST_DOF(nod).lt.0) then
+            write(*,*) 'par_mumps_sc: NFIRST_DOF(nod).lt.0'; stop
+         endif
+#endif
          do j=1,ndofmH(i)
             l=l+1
             LCON(l) = NFIRST_DOF(nod)+j
+#if DEBUG_MODE
+            if (LCON(l).le.0) then
+               write(*,*) 'par_mumps_sc: H1 LCON(l).le.0'; stop
+            endif
+#endif
          enddo
       enddo
 !  ...H(curl) dof
@@ -362,6 +377,11 @@ subroutine par_mumps_sc(mtype)
          do j=1,ndofmE(i)
             l=l+1
             LCON(l) = NFIRST_DOF(nod)+ndofmH(i)+j
+#if DEBUG_MODE
+            if (LCON(l).le.0) then
+               write(*,*) 'par_mumps_sc: HCurl LCON(l).le.0'; stop
+            endif
+#endif
          enddo
       enddo
 !  ...H(div) dof
@@ -370,6 +390,11 @@ subroutine par_mumps_sc(mtype)
          do j=1,ndofmV(i)
             l=l+1
             LCON(l) = NFIRST_DOF(nod)+ndofmH(i)+ndofmE(i)+j
+#if DEBUG_MODE
+            if (LCON(l).le.0) then
+               write(*,*) 'par_mumps_sc: HDiv LCON(l).le.0'; stop
+            endif
+#endif
          enddo
       enddo
 !  ...L2 dof
@@ -378,6 +403,11 @@ subroutine par_mumps_sc(mtype)
          do j=1,ndofmQ(nrnodm)
             l=l+1
             LCON(l) = NFIRST_DOF(nod)+ndofmH(nrnodm)+ndofmE(nrnodm)+ndofmV(nrnodm)+j
+#if DEBUG_MODE
+            if (LCON(l).le.0) then
+               write(*,*) 'par_mumps_sc: L2 LCON(l).le.0'; stop
+            endif
+#endif
          enddo
       endif
 !

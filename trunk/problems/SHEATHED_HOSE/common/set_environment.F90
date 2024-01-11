@@ -11,7 +11,6 @@ subroutine set_environment
   use common_prob_data
   use paraview
   use parametersDPG, only: NORD_ADD
-  use testvars
   implicit none
 !
 #if HP3D_USE_OPENMP
@@ -29,7 +28,7 @@ subroutine set_environment
 !
 ! Variables relevant to src/modules/paraview
 !                        option label       // explanation                        // default value     // parameter
-  call get_option_string('-prefix'          ,'Prefix for paraview files'          ,'hose_'             ,PREFIX      )
+  call get_option_string('-prefix'          ,'Prefix for paraview files'          ,'hose'              ,PREFIX      )
   call get_option_string('-file-vis-upscale','Visualization upscale file location','../../files/vis'   ,FILE_VIS          )
   call get_option_string('-vis-level'       ,'Visualization upscale level (0-3)'  ,'2'                 ,VLEVEL            )
   call get_option_string('-dir-paraview'    ,'Paraview root directory'            ,'./output/figures/' ,PARAVIEW_DIR      )
@@ -52,10 +51,6 @@ subroutine set_environment
 ! The variable dp defining enrichment in DPG problems - src/modules/parametersDPG
 !                        option label     // explanation                // default  // parameter
   call get_option_int(   '-dp'            ,'p-enrichment order for DPG' ,1          ,NORD_ADD)
-!
-! The DPG test variables (could be specified manually if desired) - src/modules/testvars
-!                        option label     // explanation                           // default value     // parameter
-  call get_option_string('-file-testvars' ,'Test variables file for DPG'           ,'./input/testvars'  ,FILE_TESTVARS)
 !
 !
 end subroutine set_environment

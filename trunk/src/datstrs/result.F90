@@ -47,10 +47,10 @@ subroutine result
 !   dimension neig(2),nsid_list(2),norient_list(2)
 !   dimension neig_mdle(4,6)
 !
-   character(len=4) :: type
+   integer :: ntype
 !
 !..auxiliary
-   integer :: ne,nb,i,ii,k,l,icomp,nbeg,nend,nel,loc,nvar,ivar,ibegin,iend
+   integer :: ne,nb,i,ii,k,l,iload,nbeg,nend,nel,loc,nvar,ivar,ibegin,iend
    integer :: ndofH,ndofE,ndofV,ndofQ,nod,iel,mdle,nr_conel,idec,ndom
    integer :: nrdofm,nrdofc,nrnodm
 !
@@ -78,6 +78,8 @@ subroutine result
  6002    format(' NRDOFSH,NRDOFSE,NRDOFSV,NRDOFSQ = ',4i10)
          write(*,6003) MAXNODS,NPNODS
  6003    format(' MAXNODS,NPNODS                  = ',2i10)
+         write(*,6004) NRCOMS,N_COMS
+ 6004    format(' NRCOMS,N_COMS                   = ',2i10)
 !
       case(2)
          write(*,*) 'SET INITIAL MESH ELEMENT NUMBER'
@@ -88,7 +90,7 @@ subroutine result
          endif
          write(*,7001) nel
  7001    format(' ELEMENT = ',i10)
-         write(*,7002) ELEMS(nel)%type
+         write(*,7002) S_Type(ELEMS(nel)%etype)
  7002    format(' TYPE = ',a4)
          ii=0
          do i=1,ELEMS(nel)%nrphysics
@@ -101,24 +103,24 @@ subroutine result
                       ' BC FLAGS = ',i6)
             enddo
          enddo
-         nb=0 ; ne=nvert(ELEMS(nel)%type)
+         nb=0 ; ne=nvert(ELEMS(nel)%etype)
          write(*,7004) ELEMS(nel)%nodes(nb+1:ne)
  7004    format(' VERTEX NODES = ',8i10)
-         nb=ne; ne=nb+nedge(ELEMS(nel)%type)
+         nb=ne; ne=nb+nedge(ELEMS(nel)%etype)
          write(*,7005) ELEMS(nel)%nodes(nb+1:ne)
  7005    format(' EDGE NODES = ',12i10)
-         nb=ne; ne=nb+nface(ELEMS(nel)%type)
+         nb=ne; ne=nb+nface(ELEMS(nel)%etype)
          write(*,7006) ELEMS(nel)%nodes(nb+1:ne)
  7006    format(' FACE NODES = ',12i10)
          write(*,7007) ELEMS(nel)%nodes(ne+1)
  7007    format(' MIDDLE NODE = ',i10)
          call decodg(ELEMS(nel)%edge_orient,2,12, nedge_orient)
-         write(*,7008) nedge_orient(1:nedge(ELEMS(nel)%type))
+         write(*,7008) nedge_orient(1:nedge(ELEMS(nel)%etype))
  7008    format(' EDGE ORIENTATIONS DECODED = ',12i2)
          call decodg(ELEMS(nel)%face_orient,8,6, Nface_orient)
-         write(*,7009) nface_orient(1:nface(ELEMS(nel)%type))
+         write(*,7009) nface_orient(1:nface(ELEMS(nel)%etype))
  7009    format(' FACE ORIENTATIONS DECODED = ',6i2)
-         write(*,7010) ELEMS(nel)%neig(1:nface(ELEMS(nel)%type))
+         write(*,7010) ELEMS(nel)%neig(1:nface(ELEMS(nel)%etype))
  7010    format(' FACE NEIGHBORS = ',6i10)
          write(*,7011) ELEMS(nel)%GMPblock
  7011    format(' GMP BLOCK = ',6i10)
@@ -128,7 +130,7 @@ subroutine result
          read(*,*) nod
          write(*,7021) nod, NODES(nod)%act
  7021    format(' NODE = ',i10, ' active = ', l2)
-         write(*,7022) NODES(nod)%type
+         write(*,7022) S_Type(NODES(nod)%ntype)
  7022    format(' TYPE = ',a4)
          call decod(NODES(nod)%case,2,NR_PHYSA, icase)
          write(*,7023) icase(1:NR_PHYSA)
@@ -151,26 +153,26 @@ subroutine result
  7041       format(' FIRST_SON = ',i10,', NR_SONS = ',i10)
          endif
 !
-         select case (NODES(nod)%type)
-            case ('mdln','mdlp','mdlb','mdld')
+         select case (NODES(nod)%ntype)
+            case (MDLB,MDLP,MDLN,MDLD)
                call find_domain(nod,ndom)
                write(*,8000) ndom
  8000          format(' DOMAIN = ',i3)
                call elem_nodes(nod, nodesl,norientl)
-               type = NODES(nod)%type
+               ntype = NODES(nod)%ntype
 !
                ibegin = 1
-               iend   = nvert(type)
+               iend   = nvert(ntype)
                write(*,7100) nodesl  (ibegin: iend)
                write(*,7200) norientl(ibegin: iend)
 !
                ibegin = iend + 1
-               iend   = iend + nedge(type)
+               iend   = iend + nedge(ntype)
                write(*,7110) nodesl  (ibegin: iend)
                write(*,7210) norientl(ibegin: iend)
 !
                ibegin = iend + 1
-               iend   = iend + nface(type)
+               iend   = iend + nface(ntype)
                write(*,7120) nodesl  (ibegin: iend)
                write(*,7220) norientl(ibegin: iend)
          end select
@@ -187,8 +189,6 @@ subroutine result
  7310    format(' FACE_NEIG = ',6i6)
  7320    format(' FACE_NEIG = ',6i6)
 !
-         write(*,7030) NODES(nod)%geom_interf
- 7030    format(' GMP INTERFACE FLAG = ',i2)
          call find_ndof(nod, ndofH,ndofE,ndofV,ndofQ)
 !
 !     ...Geometry dof
@@ -209,12 +209,12 @@ subroutine result
                write(*,7033)
  7033          format(' H1 DOF = ')
                nvar=NREQNH(NODES(nod)%case)
-               do icomp=1,NRCOMS
-                  write(*,7035) icomp
- 7035             format(' icomp = ',i3)
-                  nbeg =(icomp-1)*nvar; nend=nbeg+nvar
+               do iload=1,NRRHS
+                  write(*,7035) iload
+ 7035             format(' iload = ',i3)
+                  nbeg =(iload-1)*nvar; nend=nbeg+nvar
                   do k=1,ndofH
-                     write(*,7034) NODES(nod)%dof%zdofH(nbeg+1:nend,k)
+                     write(*,7034) NODES(nod)%dof%zdofH(nbeg+1:nend,k,N_COMS)
 #if C_MODE
  7034                format(10x,5(2e12.5,2x))
 #else
@@ -231,11 +231,11 @@ subroutine result
                write(*,7036)
  7036          format(' H(curl) DOF = ')
                nvar=NREQNE(NODES(nod)%case)
-               do icomp=1,NRCOMS
-                  write(*,7035) icomp
-                  nbeg =(icomp-1)*nvar; nend=nbeg+nvar
+               do iload=1,NRRHS
+                  write(*,7035) iload
+                  nbeg =(iload-1)*nvar; nend=nbeg+nvar
                   do k=1,ndofE
-                     write(*,7034) NODES(nod)%dof%zdofE(nbeg+1:nend,k)
+                     write(*,7034) NODES(nod)%dof%zdofE(nbeg+1:nend,k,N_COMS)
                   enddo
                enddo
             endif
@@ -247,11 +247,11 @@ subroutine result
                write(*,7037)
  7037          format(' H(div) DOF = ')
                nvar=NREQNV(NODES(nod)%case)
-               do icomp=1,NRCOMS
-                  write(*,7035) icomp
-                  nbeg =(icomp-1)*nvar; nend=nbeg+nvar
+               do iload=1,NRRHS
+                  write(*,7035) iload
+                  nbeg =(iload-1)*nvar; nend=nbeg+nvar
                   do k=1,ndofV
-                     write(*,7034) NODES(nod)%dof%zdofV(nbeg+1:nend,k)
+                     write(*,7034) NODES(nod)%dof%zdofV(nbeg+1:nend,k,N_COMS)
                   enddo
                enddo
             endif
@@ -263,11 +263,11 @@ subroutine result
                write(*,7038)
  7038          format(' L2 DOF = ')
                nvar=NREQNQ(NODES(nod)%case)
-               do icomp=1,NRCOMS
-                  write(*,7035) icomp
-                  nbeg =(icomp-1)*nvar; nend=nbeg+nvar
+               do iload=1,NRRHS
+                  write(*,7035) iload
+                  nbeg =(iload-1)*nvar; nend=nbeg+nvar
                   do k=1,ndofQ
-                     write(*,7034) NODES(nod)%dof%zdofQ(nbeg+1:nend,k)
+                     write(*,7034) NODES(nod)%dof%zdofQ(nbeg+1:nend,k,N_COMS)
                   enddo
                enddo
             endif
@@ -279,7 +279,7 @@ subroutine result
                  + MAXbrickV*NRVVAR + MAXbrickQ*NRQVAR
          allocate(NEXTRACT(MAXDOFM))
          allocate(IDBC(MAXDOFM))
-         allocate(ZDOFD(MAXDOFM,NRCOMS))
+         allocate(ZDOFD(MAXDOFM,NRRHS))
          write(*,*) 'SET NODE NUMBER'
          read(*,*) nod
          call get_index(nod, index)

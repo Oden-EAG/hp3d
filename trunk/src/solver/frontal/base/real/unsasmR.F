@@ -1,6 +1,3 @@
-      subroutine unsasm (Amdest, Ellhs, Flhs)
-c
-#include "syscom.blk"
 c***===***===***===***===***===***===***===***===***===***===***===***==
 c FUNCTION: Assembles lhs into the front for unsymmetric matrices
 c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
@@ -17,7 +14,7 @@ c               a21 a22 a23 ...   ==>  [a11,a12,a13,..., a21,a22,a23, ..
 c               a31 a32 a33 ...
 c                :   :   :
 c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c AUTHOR:                             LATEST REVISION:
+c LATEST REVISION: Mar 2023
 c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
 c NAMING CONVENTIONS:
 c     AAAAAAAA    Variables in COMMON & PARAMETERS
@@ -27,15 +24,20 @@ c         7xxx    FORMAT Statements
 c         9xxx    ERROR Handling
 c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 c
-#include "surfsc1.blk"
-#include "surfsc2.blk"
+      subroutine unsasm (Amdest, Ellhs, Flhs)
 c
-ctim      dimension Amdest(*), Ellhs(*) ,Flhs(*), ntemp(100)
-      dimension Amdest(*), Ellhs(*) ,Flhs(*), ntemp(324)
+      use surfsc1
+      use surfsc2
+c
+      implicit none
+c
+      real(8) :: Amdest(*), Ellhs(*), Flhs(*)
+      integer :: ntemp(324)
+c
+      integer :: n,i,j,mdi,mdj,ml
 c
       n = 1
-cwb >
-ctim      if (NDOFM .gt. 100) then
+c
       if (NDOFM .gt. 324) then
          write(NFSOUT,7771)
 7771      format(1x,'THE TEMP ARRAY: ntemp MUST ',
@@ -43,7 +45,6 @@ ctim      if (NDOFM .gt. 100) then
          IERR = 1
          return
       endif
-cwb <
 c
 c loop thru the dof in the element
 c
@@ -105,5 +106,5 @@ cwb <
 c
 100   continue
 c
-      return
-      end
+c
+      end subroutine unsasm

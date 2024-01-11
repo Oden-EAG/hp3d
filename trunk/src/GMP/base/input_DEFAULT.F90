@@ -1,8 +1,8 @@
 !-----------------------------------------------------------------------
-!> Purpose : routine reads in the geometry data for the Geometry
-!!           Modeling Package in the DEFAULT format
+!> @brief   routine reads in the geometry data for the Geometry
+!!          Modeling Package in the DEFAULT format
 !!
-!! @revision Nov 12
+!> @date    Sep 2023
 !-----------------------------------------------------------------------
 !  DEFAULT file format:
 !
@@ -14,6 +14,12 @@
 !     ...
 !
 !     NRDOMAIN
+!
+!     isurf_flag      surface domains flags
+!                     =  0    no surface domains are read when reading
+!                             data for TRIANGLES and RECTANGLES
+!                     =  1    surface domains are expected when reading
+!                             data for TRIANGLES and RECTANGLES
 !
 !     NRPOINT
 !     POINTS(1)%Type
@@ -100,7 +106,7 @@ subroutine input_DEFAULT(Fp)
 
       integer, parameter :: nin=16
       character(len=10) :: type
-      integer :: ns,np,nc,j,k,nt,nr,npri,nh,ntet,npyr
+      integer :: ns,np,nc,j,k,nt,nr,npri,nh,ntet,npyr,isurf_flag
       integer :: istat
       integer :: iprint
 !-----------------------------------------------------------------------
@@ -116,7 +122,7 @@ subroutine input_DEFAULT(Fp)
 !  ...allocate memory for GMP data structure
       call alloc_GMP
 !
-IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
+      IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !
 !-----------------------------------------------------------------------
 !  SURFACES                                                            |
@@ -124,8 +130,8 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !
 !  ...number of surfaces
       read(nin,*) NRSURFS
- IF (.NOT. QUIET_MODE)     write(*,1000) NRSURFS
- 1000 format(' NRSURFS = ',i5,' ; reading surfaces...')
+      IF (.NOT. QUIET_MODE) write(*,1000) NRSURFS
+ 1000 format(' NRSURFS = ',i7,' ; reading surfaces...')
 !
       if (MAXSU.lt.NRSURFS) then
         write(*,*)'input_DEFAULT: increase MAXSU!' ; stop
@@ -221,13 +227,26 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
       read(nin,*) NRDOMAIN
 !
 !---------------------------------------------------------------------
-!  POINTS                                                            |
+!  POINTS and surface domains flag                                   |
 !---------------------------------------------------------------------
 !
 !  ...read in number of points
       read(nin,*) NRPOINT
- IF (.NOT. QUIET_MODE)     write(*,1009) NRPOINT
- 1009 format(' NRPOINT = ',i5,' ; reading points...')
+!
+!  ...most likely, we have read the surface domains flag
+      if ((NRPOINT.eq.0).or.(NRPOINT.eq.1)) then
+        isurf_flag = NRPOINT
+!
+!  .....proceed with reading the actual number of points
+        read(nin,*) NRPOINT
+!
+!  ...most likely, the surface domains flag is missing, set it to 0
+      else
+        isurf_flag = 0
+      endif
+!
+      IF (.NOT. QUIET_MODE) write(*,1009) NRPOINT
+ 1009 format(' NRPOINT = ',i7,' ; reading points...')
 !
       if (MAXNP.lt.NRPOINT) then
         write(*,*)'input_DEFAULT: increase MAXNP!' ; stop
@@ -282,8 +301,8 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 
 !  ...read in number of curves
       read(nin,*) NRCURVE
- IF (.NOT. QUIET_MODE)     write(*,1011) NRCURVE
- 1011 format(' NRCURVE = ',i5,' ; reading curves...')
+      IF (.NOT. QUIET_MODE) write(*,1011) NRCURVE
+ 1011 format(' NRCURVE = ',i7,' ; reading curves...')
 !
       if (MAXNC.lt.NRCURVE) then
         write(*,*) 'input_DEFAULT: increase MAXNC!' ; stop
@@ -368,8 +387,8 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !---------------------------------------------------------------------
 !
       read(nin,*) NRTRIAN
- IF (.NOT. QUIET_MODE)     write(*,1012) NRTRIAN
- 1012 format(' NRTRIAN = ',i5,' ; reading triangles...')
+      IF (.NOT. QUIET_MODE) write(*,1012) NRTRIAN
+ 1012 format(' NRTRIAN = ',i7,' ; reading triangles...')
 !
       if (MAXTR.lt.NRTRIAN) then
         write(*,*) 'MAXTR = ',MAXTR
@@ -378,8 +397,11 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !
 !  ...loop over triangles
       do nt=1,NRTRIAN
-        read(nin,*)  TRIANGLES(nt)%Type
-        read(nin,*) (TRIANGLES(nt)%VertNo(j) , j=1,3)
+        read(nin,*) TRIANGLES(nt)%Type
+        select case(isurf_flag)
+        case(0); read(nin,*) (TRIANGLES(nt)%VertNo(j) , j=1,3)
+        case(1); read(nin,*) TRIANGLES(nt)%Domain, (TRIANGLES(nt)%VertNo(j) , j=1,3)
+        end select
 !
         type=TRIANGLES(nt)%Type
         select case(type)
@@ -395,14 +417,14 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
           endif
           read(nin,*) TRIANGLES(nt)%Idata(1)
 !
-!  .....triangle on G^1 reconstructed surface Idata(1)
-        case('G1RecTri')
-          TRIANGLES(nt)%Type='PlaneTri'
-          allocate(TRIANGLES(nt)%Idata(1), stat=istat)
-          if (istat.ne.SUCCESS) then
-            call logic_error(ERR_ALLOC_FAILURE,__FILE__,__LINE__)
-          endif
-          read(nin,*) TRIANGLES(nt)%Idata(1)
+!  .....triangle on G^1 reconstructed surface Idata(1) (LEGACY)
+!        case('G1RecTri')
+!          TRIANGLES(nt)%Type='PlaneTri'
+!          allocate(TRIANGLES(nt)%Idata(1), stat=istat)
+!          if (istat.ne.SUCCESS) then
+!            call logic_error(ERR_ALLOC_FAILURE,__FILE__,__LINE__)
+!          endif
+!          read(nin,*) TRIANGLES(nt)%Idata(1)
 !
 !  .....implicit triangle lying on surface Idata(1) and bounded by
 !       surfaces Idata(2:4), listed counter clockwise
@@ -430,8 +452,8 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !---------------------------------------------------------------------
 !
       read(nin,*) NRRECTA
- IF (.NOT. QUIET_MODE)     write(*,1013) NRRECTA
- 1013 format(' NRRECTA = ',i5,' ; reading rectangles...')
+      IF (.NOT. QUIET_MODE) write(*,1013) NRRECTA
+ 1013 format(' NRRECTA = ',i7,' ; reading rectangles...')
 !
       if (MAXRE.lt.NRRECTA) then
         write(*,*) 'input_DEFAULT: increase MAXRE!' ; stop
@@ -439,8 +461,11 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !
 !  ...loop over rectangles
       do nr=1,NRRECTA
-        read(nin,*)  RECTANGLES(nr)%Type
-        read(nin,*) (RECTANGLES(nr)%VertNo(j) , j=1,4)
+        read(nin,*) RECTANGLES(nr)%Type
+        select case(isurf_flag)
+        case(0); read(nin,*) (RECTANGLES(nr)%VertNo(j) , j=1,4)
+        case(1); read(nin,*) RECTANGLES(nr)%Domain, (RECTANGLES(nr)%VertNo(j) , j=1,4)
+        end select
 !
         select case(RECTANGLES(nr)%Type)
 !
@@ -469,7 +494,7 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !
         case default
           write(*,1004) RECTANGLES(nr)%Type
- 1004     format(' input_DEFAULT: unknow rectangle type! Type = ',a10)
+ 1004     format(' input_DEFAULT: unknown rectangle type! Type = ',a10)
           stop
         endselect
       enddo
@@ -479,8 +504,8 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !---------------------------------------------------------------------
 !
       read(nin,*) NRPRISM
- IF (.NOT. QUIET_MODE)     write(*,1014) NRPRISM
- 1014 format(' NRPRISM = ',i5,' ; reading prisms...')
+      IF (.NOT. QUIET_MODE) write(*,1014) NRPRISM
+ 1014 format(' NRPRISM = ',i7,' ; reading prisms...')
 !
       if (MAXBT.lt.NRPRISM) then
         write(*,*) 'input_DEFAULT: increase MAXBT!' ; stop
@@ -506,8 +531,8 @@ IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !---------------------------------------------------------------------
 !
       read(nin,*) NRHEXAS
-IF (.NOT. QUIET_MODE) write(*,1015) NRHEXAS
- 1015 format(' NRHEXAS = ',i5,' ; reading hexas...')
+      IF (.NOT. QUIET_MODE) write(*,1015) NRHEXAS
+ 1015 format(' NRHEXAS = ',i7,' ; reading hexas...')
 !
       if (MAXHE.lt.NRHEXAS) then
         write(*,*) 'input_DEFAULT: increase MAXHE!' ; stop
@@ -532,8 +557,8 @@ IF (.NOT. QUIET_MODE) write(*,1015) NRHEXAS
 !---------------------------------------------------------------------
 !
       read(nin,*) NRTETRA
-IF (.NOT. QUIET_MODE) write(*,1016) NRTETRA
- 1016 format(' NRTETRA = ',i5,' ; reading tets...')
+      IF (.NOT. QUIET_MODE) write(*,1016) NRTETRA
+ 1016 format(' NRTETRA = ',i7,' ; reading tets...')
 !
       if (MAXTE.lt.NRTETRA) then
         write(*,*) 'input_DEFAULT: increase MAXTE!'
@@ -564,8 +589,8 @@ IF (.NOT. QUIET_MODE) write(*,1016) NRTETRA
 !---------------------------------------------------------------------
 !
       read(nin,*) NRPYRAM
-IF (.NOT. QUIET_MODE) write(*,1017) NRPYRAM
- 1017 format(' NRPYRAM = ',i5,' ; reading pyramids...')
+      IF (.NOT. QUIET_MODE) write(*,1017) NRPYRAM
+ 1017 format(' NRPYRAM = ',i7,' ; reading pyramids...')
 !
       if (MAXPY.lt.NRPYRAM) then
         write(*,*) 'input_DEFAULT: increase MAXPY!'
@@ -591,7 +616,7 @@ IF (.NOT. QUIET_MODE) write(*,1017) NRPYRAM
         endselect
       enddo
 !
-IF (.NOT. QUIET_MODE) write(*,*)''
+      IF (.NOT. QUIET_MODE) write(*,*)''
 !
       close(nin)
 !
@@ -605,816 +630,3 @@ IF (.NOT. QUIET_MODE) write(*,*)''
 !
 !
     end subroutine input_DEFAULT
-!
-!
-!
-!-----------------------------------------------------------------------
-!
-!   routine name       - new_old
-!
-!-----------------------------------------------------------------------
-!
-!   computer           - machine independent
-!
-!   latest revision    - Aug 04
-!
-!   purpose            - routine reads in geometry data for GMP
-!                        in the NEW FORMAT, allocates dynamically
-!                        the necessary data structure arrays, and
-!                        produces automatically a copy of the input
-!                        file in the OLD FORMAT
-!
-!
-!   arguments in       -
-!
-!   required  routines -
-!
-!-----------------------------------------------------------------------
-!
-      subroutine new_old
-!
-      use GMP
-#include "syscom.blk"
-#include "cinout.blk"
-!
-      character(10) type
-!
-!-----------------------------------------------------------------------
-!
-      iprint=1
-!
-!  ...read in the dimension of the problem and the manifold
-      read(NWE,*)  NDIM,MANDIM
-      write(NIN,*) NDIM,MANDIM,'             ...NDIM,MANDIM'
-      write(NIN,*) ''
-      write(NIN,*) ''
-!
-!  ...read in surfaces data
-      read(NWE,*)  NRSURFS
-      write(NIN,*) NRSURFS,   &
-           '                         ...NUMBER OF SURFACES '
-      write(NIN,*)''
-!
-!
-!  ...allocate dynamically the memory
-      allocate( SURFACES(NRSURFS), STAT=ic )
-      if (ic.ne.0) then
-        print*,'SURFACES ARE NOT ALLOCATED '
-        stop
-      endif
-      if (iprint.eq.1) then
-        write(*,*) 'new_old: READING SURFACES...'
-      endif
-!
-!  ...read in and store the data on surfaces...
-      do isur=1,NRSURFS
-!
-!  .....transfer label of the points  to type of the points
-        read(NWE,*) Type
-        select case(Type)
-!
-!    ...plane with normal vector and one point
-        case('VecPt')
-          label= 1
-!
-!    ...plane with three points
-        case('ThrPt')
-          label = 2
-!
-!    ...sphere with radius and central point
-        case('Sphere')
-          label = 3
-!
-!    ...cylinder with vector of direction ,  point of begining and
-!       radius
-        case('Cylinder')
-          label = 4
-!
-!  .....ellipsoid with a given center and axes aligned with
-!       the global system of coordinates
-        case('Ellipsoid')
-          label = 7
-!
-!    ...other cases
-        case default
-          write(*,*)'input_geometry.f: WRONG TYPE FOR THE SURFACE!!'
-        end select
-        SURFACES(isur)%Type = Type
-        write(NIN,*) label, &
-        '                         ...LABEL OF SURFACE', isur
-!
-!
-        select case(label)
-!
-!  .......plane which is normal to a given vector and passing through
-!         a point, orientation specified by the normal
-          case(1)
-            allocate( SURFACES(isur)%Rdata(6), STAT = ic)
-            if (ic.ne.0) then
-              write(*,*) 'Rdate IS NOT ALLOCATED', &
-                         'SURFACE NUMBER = ',isur
-              stop
-            endif
-            read(NWE,*)(SURFACES(isur)%Rdata(j),j=1,3)
-            write(NIN,300)SURFACES(isur)%Rdata(1:3), &
-                 '          ...COORDINATES OF THE POINTS'
-            read(NWE,*)(SURFACES(isur)%Rdata(3+j),j=1,3)
-            write(NIN,300)(SURFACES(isur)%Rdata(3+j),j=1,3), &
-                 '          ...COORDINATES OF THE NORMAL VECTOR'
-!
-!  .......plane passing through three given points, A,B,C
-!         orientation specified by AB x AC
-          case(2)
-             allocate( SURFACES(isur)%Rdata(9), STAT = ic)
-             if(ic.ne.0)then
-                write(*,*) 'Rdate IS  NOT ALLOCATED', &
-                     'SURFACE NUMBER = ',isur
-                stop
-            endif
-            read(NWE,*)( SURFACES(isur)%Rdata(j),j=1,3)
-            write(NIN,300)(SURFACES(isur)%Rdata(j),j=1,3), &
-                 '          ...COORDINATES OF THE FIRST POINT'
-            read(NWE,*)(SURFACES(isur)%Rdata(3+j),j=1,3)
-            write(NIN,300)(SURFACES(isur)%Rdata(3+j),j=1,3), &
-                 '          ...COORDINATES OF THE SECOND POINT'
-            read(NWE,*)(SURFACES(isur)%Rdata(6+j),j=1,3)
-            write(NIN,300)(SURFACES(isur)%Rdata(6+j),j=1,3), &
-                 '          ...COORDINATES OF THE THIRD POINT'
-!
-!  .......sphere
-          case(3)
-            allocate( SURFACES(isur)%Rdata(4), STAT = ic)
-            if(ic.ne.0)then
-              write(*,*) 'SURFACES COORDINATES ARE NOT ALLOCATED', &
-                         'SURFACE NUMBER = ',isur
-              stop
-            endif
-            read(NWE,*)(SURFACES(isur)%Rdata(j),j=1,3)
-            write(NIN,300)(SURFACES(isur)%Rdata(j),j=1,3),  &
-                 '          ...COORDINATES OF THE CENTER'
-            read(NWE,*)SURFACES(isur)%Rdata(4)
-            write(NIN,100)SURFACES(isur)%Rdata(4),  &
-                 '                            ...RADIUS OF THE SPHERE'
-!
-!  .......cylinder
-          case(4)
-            allocate( SURFACES(isur)%Rdata(7), STAT = ic)
-            if(ic.ne.0)then
-              write(*,*) 'Rdate IS  NOT ALLOCATED', &
-                         'SURFACE NUMBER = ',isur
-              stop
-            endif
-            read(NWE,*)(SURFACES(isur)%Rdata(j),j=1,3)
-            write(NIN,300)(SURFACES(isur)%Rdata(j),j=1,3)
-            read(NWE,*)(SURFACES(isur)%Rdata(3+j),j=1,3)
-            write(NIN,300)(SURFACES(isur)%Rdata(3+j),j=1,3)
-            read(NWE,*) SURFACES(isur)%Rdata(7)
-            write(NIN,*) SURFACES(isur)%Rdata(7)
-!
-!  .......ellipsoid with semi-axes a,b,c along x,y,z and given central
-!         point
-          case(7)
-            allocate( SURFACES(isur)%Rdata(6), STAT = ic)
-            if(ic.ne.0)then
-              write(*,*) 'Rdata IS  NOT ALLOCATED', &
-                         'SURFACE NUMBER = ',isur
-              stop
-            endif
-!
-!  .........read coordinates of the central point
-            read(NWE,*)(SURFACES(isur)%Rdata(j),j=1,3)
-!
-!  .........read semiaxes lengths
-            read(NWE,*)(SURFACES(isur)%Rdata(3+j),j=1,3)
-!
-!  .........write out the data to the new format input file
-            write(NIN,300)(SURFACES(isur)%Rdata(j),j=1,3)
-            write(NIN,300)(SURFACES(isur)%Rdata(3+j),j=1,3)
-!
-!
-!  .......other cases
-          case default
-            write(*,*)'new_old: WRONG SURFACE TYPE'
-            stop
-        end select
-!
-        write(NIN,*)''
-      enddo
-!
-!----------------------------------------------------------------------
-!
-!                            P O I N T S
-!
-!  ...read in number of points
-      read(NWE,*) NRPOINT
-      write(NIN,*)''
-      write(NIN,*)NRPOINT, &
-      '                         ...NUMBER OF POINTS'
-      write(NIN,*)''
-!
-!  ...allocate the memory dynamically
-      allocate( POINTS(NRPOINT), STAT=ic )
-      if (ic.ne.0) then
-        write(*,*) 'new_old: POINTS ARE NOT ALLOCATED'
-        stop
-      endif
-!
-      if (iprint.eq.1) then
-        write(*,*) 'new_old: READING POINTS...'
-      endif
-!
-!  ...read in and store the points data
-      do ip=1,NRPOINT
-        read(NWE,*)Type
-        POINTS(ip)%Type  = Type
-        POINTS(ip)%NrCurv = 0
-!
-        select case(Type)
-!
-!  .....read in and store the coordinates for regular points
-        case('Regular')
-          allocate( POINTS(ip)%Rdata(3), STAT = ic)
-          if (ic.ne.0) then
-            write(*,*) 'new_old: Rdata IS  NOT ALLOCATED', &
-                       'POINT NUMBER IS', ip
-            stop
-          endif
-          read(NWE,*) (POINTS(ip)%Rdata(k),k=1,3)
-!
-        case('CoorNrm')
-          allocate( POINTS(ip)%Rdata(6), STAT = ic)
-          if (ic.ne.0) then
-            write(*,*) 'new_old: Rdata IS  NOT ALLOCATED', &
-                       'POINT NUMBER IS', ip
-            stop
-          endif
-          read(NWE,*) (POINTS(ip)%Rdata(k),k=1,6)
-!
-!  .....read in and store the intersecting surfaces data and
-!       starting point for implicit  points
-        case('Implicit')
-          allocate (POINTS(ip)%Idata(3), STAT = ic)
-          if (ic.ne.0) then
-            write(*,*) 'new_old: Idata IS  NOT ALLOCATED', &
-                       'POINT NUMBER IS', ip
-            stop
-          endif
-          read(NWE,*) (POINTS(ip)%Idata(j),j=1,3)
-          allocate( POINTS(ip)%Rdata(3), STAT = ic)
-          if (ic.ne.0) then
-            write(*,*) 'new_old: Rdata IS  NOT ALLOCATED', &
-                       'POINT NUMBER IS', ip
-            stop
-          endif
-          read(NWE,*) (POINTS(ip)%Rdata(j),j=1,3)
-!
-!
-        case default
-           write(*,*)'new_old: WRONG POINT TYPE'
-        end select
-!
-      enddo
-!
-!----------------------------------------------------------------------
-!
-!                        C U R V E S
-!
-!
-!  ...read in number of curves
-      read(NWE,*) NRCURVE
-!
-      allocate( CURVES(NRCURVE), STAT=ic )
-      if( ic.ne.0 )then
-        print*,'CURVES ARE NOT ALLOCATED'
-        stop
-      endif
-!
-      if (iprint.eq.1) then
-        write(*,*) 'new_old: READING CURVES...'
-      endif
-!
-      do ic = 1, NRCURVE
-        read(NWE,*) type
-        CURVES(ic)%NrFig = 0
-        CURVES(ic)%Type  = type
-!
-!  .....read in and store endpoints for the curve
-        read(NWE,*) (CURVES(ic)%EndPoNo(j),j=1,2)
-!
-        select case (type)
-        case('QuaCir','SegCir','QuaEl1','QuaEl2')
-!
-!  .......read in and store the coordinates of the center of a circle
-          allocate(CURVES(ic)%Rdata(NDIM))
-          read(NWE,*) (CURVES(ic)%Rdata(k),k=1,NDIM)
-!
-        case('QuaSEl')
-!
-!  .......read in and store the coordinates of the center of a
-!         superellipse and powers
-          allocate(CURVES(ic)%Rdata(NDIM+2))
-          read(NWE,*) (CURVES(ic)%Rdata(k),k=1,NDIM+2)
-!
-        case('ImpCir')
-!
-!  .......read in and store the intersecting surfaces
-          allocate( CURVES(ic)%Idata(4), STAT = icc)
-          if (icc.ne.0) then
-            write(*,*) 'Idata IS NOT ALLOCATED', &
-                       'THE CURVE NUMBER IS ', icur
-            stop
-          endif
-          read(NWE,*) (CURVES(ic)%Idata(k),k=1,4)
-        end select
-!
-      enddo
-!
-!---------------------------------------------------------------------
-!
-!                       T R I A N G L E S
-!
-!  ...read in number of triangles
-      read(NWE,*) NRTRIAN
-      if (NRTRIAN.ne.0) then
-        write(*,*) 'new_old: UNFINISHED '
-        stop
-      endif
-!
-!
-!  ...allocate dynamically the memory
-      allocate( TRIANGLES(NRTRIAN), STAT=ic )
-      if( ic.ne.0 )then
-        print*,'TRIANGLES ARE NOT ALLOCATED'
-        stop
-      endif
-!
-!---------------------------------------------------------------------
-!
-!                        R E C T A N G L E S
-!
-!  ...read in and store the rectangles data
-      read(NWE,*) NRRECTA
-!
-!  ...allocate dynamically the memory
-      allocate( RECTANGLES(NRRECTA), STAT=ic )
-      if (ic.ne.0) then
-        print*,'RECTANGLES ARE NOT ALLOCATED'
-        stop
-      endif
-!
-      if (iprint.eq.1) then
-        write(*,*) 'new_old: READING RECTANGLES...'
-      endif
-!
-      do irec=1,NRRECTA
-        read(NWE,*) Type
-        RECTANGLES(irec)%EdgeNo(1:4) = 0
-        RECTANGLES(irec)%BlockNo(1:2) = 0
-        RECTANGLES(irec)%Type  = Type
-!
-        read(NWE,*) RECTANGLES(irec)%VertNo(1:4)
-!
-!  .....read in and store surfaces that define the implicit rectangle
-        if (type.eq.'ImpRec')then
-          allocate(RECTANGLES(irec)%Idata(5), STAT = ic)
-          if (ic.ne.0) then
-            write(*,*) 'Idata IS NOT ALLOCATED', &
-                       'RECTANGLE NUMBER IS', irec
-            stop
-          endif
-          read(NWE,*) (RECTANGLES(irec)%Idata(j),j=1,5)
-        endif
-!
-      enddo
-!
-      read(NWE,*) NRPRISM
-!
-!
-!  ...read in number of hexas
-      read(NWE,*) NRHEXAS
-!
-!  ...allocate dynamically the memory
-      allocate(HEXAS(NRHEXAS), STAT=ic )
-      if (ic.ne.0) then
-        print*,'new_old: HEXAS ARE NOT ALLOCATED'
-        stop
-      endif
-!
-      if (iprint.eq.1) then
-        write(*,*) 'new_old: READING HEXAS...'
-      endif
-!
-      do ih=1,NRHEXAS
-        read(NWE,*) HEXAS(ih)%Type
-        read(NWE,*) HEXAS(ih)%VertNo(1:8)
-!
-!  ...end of loop through hexahedra
-      enddo
-!
-!  ...determine missing connectivities and orientations
-      call connect
-!
-!
-!
-!*************************************************************
-!...write down the result into input file
-!*************************************************************
-!
-      do i=1,NRPOINT
-        select case(POINTS(i)%Type)
-        case('Regular')
-          write(NIN,*)1,  &
-               '                         ...LABEL OF POINT',i
-          write(NIN,*)POINTS(i)%NrCurv, &
-               '                         ...NUMBER OF CURVES', &
-               ' MEETING AT THE POINT '
-          NrCurv = POINTS(i)%NrCurv
-          select case(nrcurv)
-            case(4)
-               write(NIN,40)POINTS(i)%CurvNo(1:NrCurv), &
-                    '             ...CURVES NUMBERS'
-            case(5)
-               write(NIN,50)POINTS(i)%CurvNo(1:NrCurv), &
-                    '       ...CURVES NUMBERS'
-            case(6)
-               write(NIN,60)POINTS(i)%CurvNo(1:NrCurv), &
-                    '       ...CURVES NUMBERS'
-          end select
-
-          write(NIN,300) (POINTS(i)%Rdata(k),k=1,3),'   ' &
-               ,'       ...COORDINATES OF THE POINT'
-          write(NIN,*)''
-!
-        case('CoorNrm')
-          write(NOUT,*)30, &
-               '                         ...LABEL OF POINT',i
-          write(NIN,*)POINTS(i)%NrCurv, &
-               '                   ...NUMBER OF CURVES', &
-               ' MEETING AT THE POINT '
-          NrCurv = POINTS(i)%NrCurv
-          select case(nrcurv)
-            case(4)
-               write(NIN,40)POINTS(i)%CurvNo(1:NrCurv), &
-                    '             ...CURVES NUMBERS'
-            case(5)
-               write(NIN,50)POINTS(i)%CurvNo(1:NrCurv), &
-                    '       ...CURVES NUMBERS'
-            case(6)
-               write(NIN,60)POINTS(i)%CurvNo(1:NrCurv), &
-                    '       ...CURVES NUMBERS'
-          end select
-          write(NIN,600) (POINTS(i)%Rdata(k),k=1,6),'   ' &
-               ,'      ...COORDINATES AND NORMAL VECTORS'
-          write(NIN,*)''
-!
-        case('Implicit')
-          write(NIN,*) 50, &
-               '                         ...LABEL OF POINT',i
-          write(NIN,*) POINTS(i)%NrCurv, &
-               '                         ...NUMBER OF CURVES', &
-               ' MEETING AT THE POINT '
-          NrCurv = POINTS(i)%NrCurv
-          select case(nrcurv)
-            case(4)
-               write(NIN,40) POINTS(i)%CurvNo(1:NrCurv), &
-                    '             ...CURVES NUMBERS'
-            case(5)
-               write(NIN,50) POINTS(i)%CurvNo(1:NrCurv), &
-                    '       ...CURVES NUMBERS'
-            case(6)
-               write(NIN,60) POINTS(i)%CurvNo(1:NrCurv), &
-                    '       ...CURVES NUMBERS'
-          end select
-            write(NIN,30)(POINTS(i)%Idata(j),j=1,3), &
-                 '                   ...SURFACES THAT CONSTITUTE THE', &
-                 ' POINT'
-          write(NIN,300)(POINTS(i)%Rdata(k),k=1,3), &
-                 '          ...INITIAL APPROXIMATION POINT'
-!
-        case default
-          write(*,*) 'new_old: WRONG POINT LABEL', POINTS(i)%Type
-        end select
-      enddo
-!
-!
-      write(NIN,*)''
-      write(NIN,*)NRCURVE  ,'                         ...NUMBER', &
-           ' OF CURVES'
-      write(NIN,*)''
-      do i=1,NRCURVE
-        if(CURVES(i)%Type.eq.'NormCoord')then
-            write(NIN,*)30,'                         ...TYPE OF CURVE',i
-            write(NIN,*) (CURVES(i)%EndPoNo(j),j=1,2), &
-                 '             ...END POINTS OF THE CURVE'
-            NrFig = CURVES(i)%NrFig
-            write(NIN,*)NrFig, &
-                 '                         ...NUMBER OF FIGURES', &
-                 ' MEETING AT THE CURVE'
-            select case(nrfig)
-            case(2)
-               write(NIN,20)CURVES(i)%FigNo(1:nrfig), &
-                    '                 ...FIGURES NUMBERS'
-            case(3)
-               write(NIN,30)CURVES(i)%FigNo(1:nrfig), &
-                    '                 ...FIGURES NUMBERS'
-            case(4)
-               write(NIN,40)CURVES(i)%FigNo(1:nrfig), &
-                    '               ...FIGURES NUMBERS'
-            case(5)
-               write(NIN,50)CURVES(i)%FigNo(1:nrfig), &
-                    '               ...FIGURES NUMBERS'
-            case(6)
-               write(NIN,60)CURVES(i)%FigNo(1:nrfig), &
-                    '              ...FIGURES NUMBERS'
-            end select
-            write(NIN,*)''
-!
-        elseif(CURVES(i)%Type.eq.'ImpCir')then
-            write(NIN,*)50,'                         ...TYPE OF CURVE',i
-            write(NIN,*) (CURVES(i)%EndPoNo(j),j=1,2), &
-                 '             ...END POINTS OF THE CURVE'
-            NrFig = CURVES(i)%NrFig
-            write(NIN,*)NrFig, &
-                 '                         ...NUMBER OF FIGURES', &
-                 ' MEETING AT THE CURVES'
-            select case(nrfig)
-            case(2)
-               write(NIN,20)CURVES(i)%FigNo(1:nrfig), &
-                    '                   ...FIGURES NUMBERS'
-            case(3)
-               write(NIN,30)CURVES(i)%FigNo(1:nrfig), &
-                    '                   ...FIGURES NUMBERS'
-            case(4)
-               write(NIN,40)CURVES(i)%FigNo(1:nrfig), &
-                    '               ...FIGURES NUMBERS'
-            case(5)
-               write(NIN,50)CURVES(i)%FigNo(1:nrfig), &
-                    '               ...FIGURES NUMBERS'
-            case(6)
-               write(NIN,60)CURVES(i)%FigNo(1:nrfig), &
-                    '              ...FIGURES NUMBERS'
-            end select
-            write(NIN,40)(CURVES(i)%Idata(k),k=1,4), &
-                 '             ...SURFACES CONSTITUTING THE CURVE'
-            write(NIN,*)''
-!
-        elseif(CURVES(i)%Type.eq.'Seglin')then
-            write(NIN,*)1,'                         ...TYPE OF CURVE',i
-            write(NIN,*) (CURVES(i)%EndPoNo(j),j=1,2), &
-                 '             ...END POINTS OF THE CURVE'
-            NrFig = CURVES(i)%NrFig
-            write(NIN,*)NrFig, &
-                 '                         ...NUMBER OF FIGURES', &
-                 ' MEETING AT THE CURVE'
-            select case(nrfig)
-            case(2)
-               write(NIN,20)CURVES(i)%FigNo(1:nrfig), &
-                    '                     ...FIGURES NUMBERS'
-            case(3)
-               write(NIN,30)CURVES(i)%FigNo(1:nrfig), &
-                    '                   ...FIGURES NUMBERS'
-            case(4)
-               write(NIN,40)CURVES(i)%FigNo(1:nrfig), &
-                    '             ...FIGURES NUMBERS'
-            case(5)
-               write(NIN,50)CURVES(i)%FigNo(1:nrfig), &
-                    '                 ...FIGURES NUMBERS'
-            case(6)
-               write(NIN,60)CURVES(i)%FigNo(1:nrfig), &
-                    '                ...FIGURES NUMBERS'
-            end select
-            write(NIN,*)''
-
-        elseif(CURVES(i)%Type.eq.'QuaCir')then
-            write(NIN,*)-1,'                         ...TYPE OF CURVE',i
-            write(NIN,*) (CURVES(i)%EndPoNo(j),j=1,2), &
-                 '             ...END POINTS OF THE CURVE'
-            NrFig = CURVES(i)%NrFig
-            write(NIN,*)NrFig, &
-                 '                         ...NUMBER OF FIGURES', &
-                 ' MEETING AT THE CURVE'
-            select case(nrfig)
-            case(2)
-               write(NIN,20)CURVES(i)%FigNo(1:nrfig), &
-                    '                     ...FIGURES NUMBERS'
-            case(3)
-               write(NIN,30)CURVES(i)%FigNo(1:nrfig), &
-                    '                   ...FIGURES NUMBERS'
-            case(4)
-               write(NIN,40)CURVES(i)%FigNo(1:nrfig), &
-                    '                 ...FIGURES NUMBERS'
-            case(5)
-               write(NIN,50)CURVES(i)%FigNo(1:nrfig), &
-                    '                 ...FIGURES NUMBERS'
-            case(6)
-               write(NIN,60)CURVES(i)%FigNo(1:nrfig), &
-                    '                ...FIGURES NUMBERS'
-            end select
-            write(NIN,*)''
-
-         elseif(CURVES(i)%Type.eq.'SegCir')then
-            write(NIN,*)-2,'                         ...TYPE OF CURVE',i
-            write(NIN,*) (CURVES(i)%EndPoNo(j),j=1,2), &
-                 '             ...END POINTS OF THE CURVE'
-            NrFig = CURVES(i)%NrFig
-            write(NIN,*)NrFig, &
-                 '                         ...NUMBER OF FIGURES', &
-                 ' MEETING AT THE CURVE'
-            select case(nrfig)
-            case(2)
-               write(NIN,20)CURVES(i)%FigNo(1:nrfig), &
-                    '                     ...FIGURES NUMBERS'
-            case(3)
-               write(NIN,30)CURVES(i)%FigNo(1:nrfig), &
-                    '                   ...FIGURES NUMBERS'
-            case(4)
-               write(NIN,40)CURVES(i)%FigNo(1:nrfig), &
-                    '                 ...FIGURES NUMBERS'
-            case(5)
-               write(NIN,50)CURVES(i)%FigNo(1:nrfig), &
-                    '                 ...FIGURES NUMBERS'
-            case(6)
-               write(NIN,60)CURVES(i)%FigNo(1:nrfig), &
-                    '                ...FIGURES NUMBERS'
-            end select
-            write(NIN,*)''
-
-        elseif(CURVES(i)%Type.eq.'QuaEl1')then
-            write(NIN,*)-3,'                         ...TYPE OF CURVE',i
-            write(NIN,*) (CURVES(i)%EndPoNo(j),j=1,2), &
-                 '             ...END POINTS OF THE CURVE'
-            NrFig = CURVES(i)%NrFig
-            write(NIN,*)NrFig, &
-                 '                         ...NUMBER OF FIGURES', &
-                 ' MEETING AT THE CURVE'
-            select case(nrfig)
-            case(2)
-               write(NIN,20)CURVES(i)%FigNo(1:nrfig), &
-                    '                     ...FIGURES NUMBERS'
-            case(3)
-               write(NIN,30)CURVES(i)%FigNo(1:nrfig), &
-                    '                   ...FIGURES NUMBERS'
-            case(4)
-               write(NIN,40)CURVES(i)%FigNo(1:nrfig), &
-                    '                 ...FIGURES NUMBERS'
-            case(5)
-               write(NIN,50)CURVES(i)%FigNo(1:nrfig), &
-                    '                 ...FIGURES NUMBERS'
-            case(6)
-               write(NIN,60)CURVES(i)%FigNo(1:nrfig), &
-                    '                ...FIGURES NUMBERS'
-            end select
-            write(NIN,*)''
-
-        elseif(CURVES(i)%Type.eq.'QuaEl2')then
-            write(NIN,*)-4,'                         ...TYPE OF CURVE',i
-            write(NIN,*) (CURVES(i)%EndPoNo(j),j=1,2), &
-                 '             ...END POINTS OF THE CURVE'
-            NrFig = CURVES(i)%NrFig
-            write(NIN,*)NrFig, &
-                 '                         ...NUMBER OF FIGURES', &
-                 ' MEETING AT THE CURVE'
-            select case(nrfig)
-            case(2)
-               write(NIN,20)CURVES(i)%FigNo(1:nrfig), &
-                    '                     ...FIGURES NUMBERS'
-            case(3)
-               write(NIN,30)CURVES(i)%FigNo(1:nrfig), &
-                    '                   ...FIGURES NUMBERS'
-            case(4)
-               write(NIN,40)CURVES(i)%FigNo(1:nrfig), &
-                    '                 ...FIGURES NUMBERS'
-            case(5)
-               write(NIN,50)CURVES(i)%FigNo(1:nrfig), &
-                    '                 ...FIGURES NUMBERS'
-            case(6)
-               write(NIN,60)CURVES(i)%FigNo(1:nrfig), &
-                    '                ...FIGURES NUMBERS'
-            end select
-            write(NIN,*)''
-
-        elseif(CURVES(i)%Type.eq.'QuaSEl')then
-            write(NIN,*)-5,'                         ...TYPE OF CURVE',i
-            write(NIN,*) (CURVES(i)%EndPoNo(j),j=1,2), &
-                 '             ...END POINTS OF THE CURVE'
-            NrFig = CURVES(i)%NrFig
-            write(NIN,*)NrFig, &
-                 '                         ...NUMBER OF FIGURES', &
-                 ' MEETING AT THE CURVE'
-            select case(nrfig)
-            case(2)
-               write(NIN,20)CURVES(i)%FigNo(1:nrfig), &
-                    '                     ...FIGURES NUMBERS'
-            case(3)
-               write(NIN,30)CURVES(i)%FigNo(1:nrfig), &
-                    '                   ...FIGURES NUMBERS'
-            case(4)
-               write(NIN,40)CURVES(i)%FigNo(1:nrfig), &
-                    '                 ...FIGURES NUMBERS'
-            case(5)
-               write(NIN,50)CURVES(i)%FigNo(1:nrfig), &
-                    '                 ...FIGURES NUMBERS'
-            case(6)
-               write(NIN,60)CURVES(i)%FigNo(1:nrfig), &
-                    '                ...FIGURES NUMBERS'
-            end select
-            write(NIN,*)''
-        else
-            write(*,*)'INPUT_HEAD: WRONG CURVE LABEL', CURVES(i)%Type
-        endif
-      enddo
-!
-!
-      write(NIN,*)''
-      write(NIN,*) NRTRIAN,  &
-           '                         ...NUMBER OF TRIANGLES'
-!
-!
-      write(NIN,*)''
-      write(NIN,*)''
-      write(NIN,*)NRRECTA ,  &
-           '                         ...NUMBER OF RECTANGLES'
-      do i = 1,NRRECTA
-         if(RECTANGLES(i)%Type.eq.'BilQua')then
-            write(NIN,*)''
-            write(NIN,*)1, &
-                 '                         ...TYPE OF RECTANGLE',i
-            write(NIN,40)(RECTANGLES(i)%EdgeNo(j),j=1,4), &
-                 '             ...FOUR CURVES NUMBERS'
-            write(NIN,20)RECTANGLES(i)%BlockNo(1:2), &
-                 '                         ...ADJACENT', &
-                 'HEXAHEDRONS NUMBERS'
-!
-         else if(RECTANGLES(i)%Type.eq.'TraQua')then
-            write(NIN,*)''
-            write(NIN,*)3, &
-                 '                         ...TYPE OF RECTANGLE',i
-            write(NIN,40)(RECTANGLES(i)%EdgeNo(j),j=1,4), &
-                 '             ...FOUR CURVES NUMBERS'
-            write(NIN,20)RECTANGLES(i)%BlockNo(1:2), &
-            '                         ...ADJACENT HEXAHEDRONS NUMBERS'
-!
-          else if(RECTANGLES(i)%Type.eq.'RatioRec')then
-            write(NIN,*)''
-            write(NIN,*)30, &
-                 '                         ...TYPE OF RECTANGLE',i
-            write(NIN,40)(RECTANGLES(i)%EdgeNo(j),j=1,4), &
-                 '             ...FOUR CURVES NUMBERS'
-            write(NIN,20)RECTANGLES(i)%BlockNo(1:2), &
-            '                         ...ADJACENT HEXAHEDRON NUMBERS'
-!
-         else if(RECTANGLES(i)%Type.eq.'ImpRec')then
-            write(NIN,*)''
-            write(NIN,*)50, &
-                 '                         ...TYPE OF RECTANGLE',i
-            write(NIN,40)(RECTANGLES(i)%EdgeNo(j),j=1,4), &
-                 '             ...FOUR CURVES NUMBERS'
-            write(NIN,20)RECTANGLES(i)%BlockNo(1:2), &
-            '                         ...ADJACENT HEXAHEDRONS NUMBERS'
-            write(NIN,50)RECTANGLES(i)%Idata(1:5), &
-                 '       ...SURFACES THAT CONSISTUTE THE RECTANGLE'
-!
-         elseif(RECTANGLES(i)%Type.eq.'CylRec')then
-            write(NIN,*)''
-            write(NIN,*)-1, &
-                 '                        ...TYPE OF RECTANGLE',i
-            write(NIN,40)(RECTANGLES(i)%EdgeNo(j),j=1,4), &
-                 '             ...FOUR CURVES NUMBERS'
-            write(NIN,20)RECTANGLES(i)%BlockNo(1:2), &
-            '                         ...ADJACENT HEXAHEDRONS NUMBERS'
-         else
-            write(*,*)'INPUT_HEAD: WRONG RECTANGLE LABEL',  &
-                 RECTANGLES(i)%Type
-         endif
-      enddo
-!
-!
-      write(NIN,*)''
-      write(NIN,*) NRPRISM  , &
-           '                         ...NUMBER OF PRISMS'
-!
-!
-      write(NIN,*)''
-      write(NIN,*)''
-      write(NIN,*) NRHEXAS  ,  &
-           '                         ...NUMBER OF HEXAHEDRONS'
-      do iii = 1,  NRHEXAS
-         write(NIN,*)''
-         write(NIN,*)1, &
-              '                         ...TYPE OF HEXAHEDRON',III
-         write(NIN,60) (HEXAS(iii)%FigNo(j), j = 1,6), &
-              ' ...RECTANGULAR FACES NUMBERS'
-       enddo
-!
- 100   format(1x,1f9.3,5a)
- 300   format(1x,3f9.3,5a)
- 600   format(1x,6f9.3,5a)
-!
- 20    format(1x,2i6,9a)
- 30    format(1x,3i6,9a)
- 40    format(1x,4i6,9a)
- 50    format(1x,5i6,9a)
- 60    format(1x,6i6,9a)
-!
-!
-     end subroutine new_old

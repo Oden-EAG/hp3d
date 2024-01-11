@@ -4,20 +4,19 @@ c   routine name       - display_face
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - Feb 11
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine makes a list of all visible
 c                        triangles and stores rescaled coordinates
 c                        of their end-points (vertices) in an array
 c                        RGTR for an element face
 c
-c
 c   arguments :
 c     in:
 c         Numlev       - number of levels to plot solution values
 c                        (0-encode p-approximation colors)
 c         Mdle         - element number, same as the middle node
-c         If           - face number
+c         Ifc          - face number
 c         Nodesl       - element nodes
 c         Nedge_orient - edge orientation
 c         Nface_orient - face orientation
@@ -34,8 +33,8 @@ c         Solev        - scale of solution levels
 c         Xmin,Xmax    - bounds for the picture
 c
 c----------------------------------------------------------------------
-c
-      subroutine display_face(Numlev,Mdle,If,Nodesl,
+#include "typedefs.h"
+      subroutine display_face(Numlev,Mdle,Ifc,Nodesl,
      .                        Nedge_orient,Nface_orient,Norder,Iflagn,
      .                        Xnod,ZdofH,ZdofE,ZdofV,ZdofQ,
      .                        Solev,Xmin,Xmax,
@@ -46,67 +45,84 @@ c
       use graphmod
       use physics
 c
-#include "syscom.blk"
+      implicit none
 c
-      character(len=4) :: type
-      dimension Nedge_orient(12),Nface_orient(6),Norder(19),Nodesl(27)
-      dimension Xnod(3,MAXbrickH),
-     .          ZdofH(MAXEQNH,MAXbrickH),ZdofE(MAXEQNE,MAXbrickE),
-     .          ZdofV(MAXEQNV,MAXbrickV),ZdofQ(MAXEQNQ,MAXbrickQ),
-     .          Solev(*),Xmin(3),Xmax(3)
+      integer :: Numlev,Mdle,Ifc,Iflagn,Nrintertot,Nrinter
+      integer :: Nedge_orient(12),Nface_orient(6),Norder(19),Nodesl(27)
+      real(8) :: Xnod(3,MAXbrickH),Solev(*),Xmin(3),Xmax(3)
+      VTYPE   :: ZdofH(MAXEQNH,MAXbrickH),ZdofE(MAXEQNE,MAXbrickE),
+     .           ZdofV(MAXEQNV,MAXbrickV),ZdofQ(MAXEQNQ,MAXbrickQ)
+      real(8) :: Xlocinter(3,500)
 c
 c  ...local face nodes numbers
-      dimension nface_nodes(9)
+      integer :: nface_nodes(9)
 c
 c  ...global face nodes numbers
-      dimension nface_nodes_global(9)
+      integer :: nface_nodes_global(9)
 c
 c  ...local order of approximation (4 edges + 1 middle)
-      dimension norder_face(5)
+      integer :: norder_face(5)
 c
 c  ...master face and element coordinates
-      dimension it(2,3,2),t(2),xi(3,3),id_flag(2)
-      dimension pm(2),pn(2),xtro(3,3),xcoord(3,3),val(3),costr(2,3,3)
-      dimension utemp(3),cotriancut(2,3,3)
-      dimension Xlocinter(3,500)
+      integer :: it(2,3,2),id_flag(2)
+      real(8) :: t(2),xi(3,3),pm(2),pn(2)
+      real(8) :: xtro(3,3),xcoord(3,3),val(3),costr(2,3,3)
+      real(8) :: utemp(3),cotriancut(2,3,3)
+      
 c
 c  ...color code for subtriangles, nicknames encoding which edges
 c     of a subtriangle should be drawn
-      dimension mpcol(2),nsid(2)
+      integer :: mpcol(2),nsid(2)
 c
 c  ...BC's flags
-      dimension ibc(6,NRINDEX)
+      integer :: ibc(6,NRINDEX)
+c
+c  ...misc
+      real(8) :: dt,sdw,sup,vis
+      integer :: i,iaux,iclip,idec,iflag,ifree,il,ilev
+      integer :: isav,isflag,istr,isub,itriancut,ivar,j,k,l
+      integer :: ntype,nfstr,nhalf,nick,nod,nordh,nordv,nrfn
+      integer :: nrtriancut,nstr,nstrl,nsub1,nsub2
+c
+      real(8) :: small = 1.d-6
+c
+#if DEBUG_MODE
+      integer :: iprint,nrdofH,nrdofE,nrdofV,nrdofQ
+#endif
+c
 c---------------------------------------------------------------------
 c
-      data small /1.d-6/
+      ntype = NODES(Mdle)%ntype
 c
+#if DEBUG_MODE
       iprint = 0
-      type = NODES(Mdle)%type
-c
       if (iprint.eq.1) then
-        write(*,*) 'display_face: type,Mdle,If = ',type,Mdle,If
-        write(*,*) '              face_type(type,If) = ',
-     .                            face_type(type,If)
+        write(*,*) 'display_face: type,Mdle,Ifc = ',S_Type(ntype),Mdle,Ifc
+        write(*,*) '              face_type(ntype,Ifc) = ',
+     .                            face_type(ntype,Ifc)
         write(*,*) '              Xnod = '
-        call celndof(type,Norder, nrdofH,nrdofE,nrdofV,nrdofQ)
+        call celndof(ntype,Norder, nrdofH,nrdofE,nrdofV,nrdofQ)
         do k=1,nrdofH
           write(*,7003) k,Xnod(1:3,k)
  7003     format('k = ',i4,3e12.5)
         enddo
         call pause
       endif
+#endif
 c
 c  ...get the element boundary conditions flags
       call find_bc(Mdle, ibc)
 c
 c  ...determine the local number of the nodes on the face
 c     [vertices ; edges ; middle ]
-      call face_nodes(type,If, nface_nodes,nrfn)
+      call face_nodes(ntype,Ifc, nface_nodes,nrfn)
+#if DEBUG_MODE
       if (iprint.eq.1) then
-        write(*,7010) If, nface_nodes(1:nrfn)
+        write(*,7010) Ifc, nface_nodes(1:nrfn)
  7010   format('display_face: FACE = ',i2,' FACE NODES = ',9i3)
         call pause
       endif
+#endif
 c
 c  ...loop over face nodes and record:
 c      - edge nodes and mid-face node
@@ -115,7 +131,7 @@ c      - mid-face node order of approximation according to face
 c        LOCAL system of coordinates
       j=0
       do i=1,nrfn
-        k=nface_nodes(i)-nvert(type)
+        k=nface_nodes(i)-nvert(ntype)
 c
 c  .....record global node number
         l=nface_nodes(i)
@@ -128,11 +144,11 @@ c
 c  .......record order of approximation accounting for orientation
 ccccc          nod=nface_nodes(j)
           nod = nface_nodes_global(i)
-          select case(NODES(nod)%type)
+          select case(NODES(nod)%ntype)
 c
 c  .......rectangular face node
-          case('mdlq','rect')
-            select case(NFAXES(3,Nface_orient(If)))
+          case(MDLQ,RECT)
+            select case(NFAXES(3,Nface_orient(Ifc)))
 c  .........the face axes have NOT been reversed
             case(0) ; norder_face(j)=Norder(k)
 c
@@ -159,9 +175,9 @@ c
 c  ...loop through subtriangles...
       do i=1,nsub1
 c
-        select case(face_type(type,If))
-        case('tria'); nsub2=NRSUB+1-i
-        case('rect'); nsub2=NRSUB
+        select case(face_type(ntype,Ifc))
+          case(TRIA); nsub2=NRSUB+1-i
+          case(RECT); nsub2=NRSUB
         end select
 c
         do j=1,nsub2
@@ -169,19 +185,21 @@ c
 c  .......determine integer coordinates for the subtriangles
 c         and color flags for the mesh visualization
 
-          call int_coord(Numlev,NRSUB,face_type(type,If),norder_face,
+          call int_coord(Numlev,NRSUB,face_type(ntype,Ifc),norder_face,
      .                   i,j,it(1:2,1:3,1),it(1:2,1:3,2),
      .                   mpcol(1),mpcol(2),
      .                   nsid(1),nsid(2))
           if (Iflagn.eq.3) then
 !...TODO: this is not correct after updating BC implementation: NRPHY_DISP
 !         now has to refer to a particular component (not physics attr)
-            mpcol(1:2) = ibc(If,NRPHY_DISP)+1
+            mpcol(1:2) = ibc(Ifc,NRPHY_DISP)+1
           endif
+#if DEBUG_MODE
           if (iprint.eq.1) then
             write(*,7002) i,j,mpcol(1),mpcol(2)
  7002       format('display_face: i,j,mpcol = ',4i3)
           endif
+#endif
 c
 c  .......loop through the lower/upper triangle
           do 20 l=1,2
@@ -192,7 +210,7 @@ c
 c  .........find coordinates of vertices
             do k=1,3
               t(1:2) = it(1:2,k,l)*dt
-              call compute_face(Numlev,Mdle,If,
+              call compute_face(Numlev,Mdle,Ifc,
      .                          Nedge_orient,Nface_orient,Norder,
      .                          Xnod,ZdofH,ZdofE,ZdofV,ZdofQ,t,
      .                          xcoord(1:3,k),val(k))
@@ -202,6 +220,7 @@ c  ...........transform the coordinates to observer's system
 c
 c  .........end of loop through the vertices
             enddo
+#if DEBUG_MODE
             if (iprint.eq.1) then
               write(*,8002) i,j,l
  8002         format('display_face: i,j,l = ',3i3)
@@ -214,6 +233,7 @@ c  .........end of loop through the vertices
               write(*,8006) val(1:3)
  8006         format('display_face: val = ',3e12.5)
             endif
+#endif
 c
 c  .........perform 2D clipping wrt the current window
             call clip2(xtro,iclip)
@@ -242,11 +262,12 @@ c           intersection with the clipping plane
             utemp(3)=CLPL(1)*xcoord(1,3)+CLPL(2)*xcoord(2,3)+
      .               CLPL(3)*xcoord(3,3)+CLPL(4)
 c
-            call fincut(xi,utemp,
-     .                  nrtriancut,cotriancut,isflag)
+            call fincut(xi,utemp, nrtriancut,cotriancut,isflag)
+#if DEBUG_MODE
             if (iprint.eq.1) then
               write(*,*) 'display_face: isflag = ',isflag
             endif
+#endif
 c
 c  .........loop over visible cut triangles
             do itriancut=1,nrtriancut
@@ -268,7 +289,7 @@ c  .............collect new vertices
 c
 c  .............skip not visible small triangles
                 if (iclip.eq.0) go to 20
-                select case (If)
+                select case (Ifc)
 c
 c  ...............orientation of the face consistent with the external
 c                 normal
@@ -289,7 +310,7 @@ c  .............substitute new local coordinates
                   do il=1,3
                     xi(il,k) = cotriancut(itriancut,il,k)
                   enddo
-                  call compute_face(Numlev,Mdle,If,
+                  call compute_face(Numlev,Mdle,Ifc,
      .                              Nedge_orient,Nface_orient,Norder,
      .                              Xnod,ZdofH,ZdofE,ZdofV,ZdofQ,t,
      .                              xcoord(1:3,k),val(k))
@@ -302,9 +323,11 @@ c
               endif
 c
 c  ...........skip not visible small triangles
+#if DEBUG_MODE
               if (iprint.eq.1) then
                 write(*,*) 'display_face: iclip,vis = ',iclip,vis
               endif
+#endif
               if (iclip.eq.0) go to 20
 ccc              if (vis.lt.small) go to 20
 c
@@ -425,10 +448,12 @@ c  .............save storage information
               endif
 c
 c  ...........update list of triangles midpoints
+#if DEBUG_MODE
               if (iprint.eq.1) then
                 write(*,7001) NRVISTR
  7001           format(' display_face: NRVISTR = ',i8)
               endif
+#endif
               RGTRZ(NRVISTR) = (xtro(3,1)+xtro(3,2)+xtro(3,3))/3
 c
 c  ...........update list of visible curves when on boundary
@@ -442,8 +467,8 @@ c  ...........encode nodes numbers
 c
 c  .............encode element (middle node) numbers
                 if (Iflagn.eq.1) then
-                  select case(face_type(type,If))
-                  case('tria')
+                  select case(face_type(ntype,Ifc))
+                  case(TRIA)
 c
 c  .................encode mid-face node number
                     nick = Mdle
@@ -452,7 +477,7 @@ c  .................encode mid-face node number
                         IGTRCU(NRVISTR) = IGTRCU(NRVISTR)+1000*nick
                       endif
                     endif
-                 case('rect')
+                 case(RECT)
 c
 c  .................encode mid-face node number
                     nick = Mdle
@@ -465,8 +490,8 @@ c  .................encode mid-face node number
 c
 c  .............encode face nodes numbers
                 elseif (Iflagn.eq.2) then
-                  select case(face_type(type,If))
-                  case('tria')
+                  select case(face_type(ntype,Ifc))
+                  case(TRIA)
 c
 c  .................encode mid-face node number
                     nick = nface_nodes_global(7)
@@ -498,7 +523,7 @@ c  .................encode nodes numbers
                       endif
                       IGTRNO(NRVISTR) = IGTRNO(NRVISTR)+nick
                     endif
-                 case('rect')
+                 case(RECT)
 c
 c  .................encode mid-face node number
                     nick = nface_nodes_global(9)
@@ -537,10 +562,12 @@ c  .................encode nodes numbers
                   end select
                 endif
               endif
+#if DEBUG_MODE
               if (iprint.eq.1) then
                 write(*,8005) NRVISTR,IGTRNO(NRVISTR)
  8005           format('display_face: NRVISTR,IGTRNO(NRVISTR) = ',2i5)
               endif
+#endif
 c
             enddo
 c
@@ -552,10 +579,12 @@ c  .....end of loop through the vertical integer coordinate
 c
 c  ...end of loop through the horizontal integer coordinate
       enddo
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,*) 'display_face: EXITING...'
         call pause
       endif
+#endif
 c
 c
-      end
+      end subroutine display_face

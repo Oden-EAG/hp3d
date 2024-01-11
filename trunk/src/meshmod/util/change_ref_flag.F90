@@ -1,20 +1,21 @@
 !-----------------------------------------------------------------------------------
-!> Purpose : change face refinement flag wrt orientation
+!> @brief      change face refinement flag wrt orientation
 !!
 !> @param[in]  How   - 'l2g' : local to global ; 'g2l' - global to local
-!> @param[in]  Type  - face type
+!> @param[in]  Ntype - face type
 !> @param[in]  Kref  - face refinement flag (tria : 1,2,3,4 ; rect : 11,10,01 )
 !> @param[in]  Nort  - face orientation
 !> @param[out] Krefm - modified face refinement flag
-!
-!> rev@Mar 13
+!!
+!> @date       Feb 2023
 !-----------------------------------------------------------------------------------
-subroutine change_ref_flag(How,Type,Kref,Nort, Krefm)
+subroutine change_ref_flag(How,Ntype,Kref,Nort, Krefm)
 !
+      use node_types
       implicit none
       character(len=3), intent(in) :: How
 !
-      character(len=4), intent(in) :: Type
+      integer, intent(in)  :: Ntype
       integer, intent(in)  :: Kref, Nort
       integer, intent(out) :: Krefm
 !
@@ -26,25 +27,27 @@ subroutine change_ref_flag(How,Type,Kref,Nort, Krefm)
       integer, parameter, dimension(1:3,0:5) :: glob_to_loc(1:3,0:5) &
            = reshape( (/1,2,3, 2,3,1, 3,1,2, 1,3,2, 2,1,3, 3,2,1/), &
            (/3,6/) )
+!
+#if DEBUG_MODE
       integer :: iprint
+      iprint=0
+#endif
 !-----------------------------------------------------------------------------------
 !
-      iprint = 0
-
       select case(How)
 !===================================================================================
 !  Local -> Global                                                                 |
 !===================================================================================
       case('l2g')
-        select case(Type)
+        select case(Ntype)
 !
-        case('mdlt')
+        case(MDLT)
           select case(Kref)
           case(1)     ; Krefm=1
           case(2,3,4) ; Krefm=1+loc_to_glob(Kref-1,Nort)
           endselect
 !
-        case('mdlq')
+        case(MDLQ)
           select case(Kref)
           case(11)        ; Krefm=11
           case(10,01)
@@ -59,15 +62,15 @@ subroutine change_ref_flag(How,Type,Kref,Nort, Krefm)
 !  Global -> Local                                                                 |
 !===================================================================================
       case('g2l')
-        select case(Type)
+        select case(Ntype)
 !
-        case('mdlt')
+        case(MDLT)
           select case(Kref)
           case(1)     ; Krefm=1
           case(2,3,4) ; Krefm=1+glob_to_loc(Kref-1,Nort)
           endselect
 !
-        case('mdlq')
+        case(MDLQ)
           select case(Kref)
           case(11)        ; Krefm=11
           case(10,01)
@@ -80,14 +83,13 @@ subroutine change_ref_flag(How,Type,Kref,Nort, Krefm)
 !
       endselect
 !
+#if DEBUG_MODE
 !  ...printing
-#if DEBUG_FLAG
       if (iprint.eq.1) then
-         write(*,7001) How,Type,Kref,Nort,Krefm
+         write(*,7001) How,S_Type(Ntype),Kref,Nort,Krefm
 7001     format('change_ref_flag: How,Type,Kref,Nort,Krefm = ', &
           a3,2x,a5,2x,i2,2x,i2,5x,i2)
       endif
 #endif
-!
 !
 end subroutine change_ref_flag

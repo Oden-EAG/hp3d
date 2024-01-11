@@ -1,4 +1,4 @@
-#####-----------------------------------------
+#-------------------------------------------------
 
 -include ../../m_options
 
@@ -11,17 +11,10 @@ ifeq ($(COMPLEX),1)
 $(error COMPLEX FLAG MUST BE 0 FOR LINEAR ELASTICITY APPLICATION)
 endif
 
-ifeq ($(COMPILER),INTEL)
-ifeq ($(DEBUG),1)
-FFLAGS += -gen-interface -warn none -warn interfaces
-endif
-endif
-
 SRC_PATH        = .
 OBJ_ROOT        = _obj_
 OBJ_PATH        = $(OBJ_ROOT)/maindir
 MODULE_PATH     = $(OBJ_PATH)
-
 
 # Executable name
 EXEC            = hose
@@ -30,17 +23,26 @@ EXEC            = hose
 CCDEFS          = $(PROB_PP_DEFS)
 CCINCS          = $(PROB_INCS)
 
-###### User defined libraries
+# User defined libraries
 LIBS            = $(PROB_LIBS)
 
-# Defines SRC_FILE
+# Defines SRC_MODULE,SRC_COMMON,SRC_ELAST
 -include ./make.inc
 
-SRC         = $(addprefix $(SRC_PATH)/,$(SRC_FILE))
-OBJ         = $(addprefix $(OBJ_PATH)/,$(SRC_FILE:.F90=.o))
-# OBJ	    += $(OBJ_PATH)/main.o
+MODULE_FILE   = $(addprefix $(SRC_PATH)/,$(SRC_MODULE))
+COMMON_FILE   = $(addprefix $(SRC_PATH)/,$(SRC_COMMON))
+ELAST_FILE    = $(addprefix $(SRC_PATH)/,$(SRC_ELAST))
 
-FC_WORK     = $(FC) $(CCDEFS) $(CCINCS) $(FFLAGS) $(EXTRA_FFLAGS)
+MODULE_OBJ    = $(addprefix $(OBJ_PATH)/, $(MODULE_FILE:.F90=.o))
+COMMON_OBJ    = $(addprefix $(OBJ_PATH)/, $(COMMON_FILE:.F90=.o))
+ELAST_OBJ     = $(addprefix $(OBJ_PATH)/, $(ELAST_FILE:.F90=.o))
+
+OBJ           = $(MODULE_OBJ) $(COMMON_OBJ) $(ELAST_OBJ)
+
+FC_WORK       = $(FC) $(CCDEFS) $(CCINCS) $(FFLAGS) $(EXTRA_FFLAGS)
+
+#-------------------------------------------------
+.PHONY : one
 
 one : $(OBJ_PATH)/.dummy $(OBJ)
 	@echo " "
@@ -52,15 +54,28 @@ one : $(OBJ_PATH)/.dummy $(OBJ)
 
 $(OBJ_PATH)/.dummy :
 	@echo "Creating directory " $(OBJ_PATH)
-	@if [ -d $(OBJ_PATH) ]; then \
-		touch $@; \
-	else mkdir $(OBJ_ROOT); mkdir $(OBJ_PATH); touch $@; \
-	fi
+	@mkdir -p $(OBJ_PATH); touch $@;
 
-$(OBJ_PATH)/%.o : $(SRC_PATH)/%.F90
+# assumes no module inter-dependencies
+$(MODULE_OBJ) : $(OBJ_PATH)/%.o : $(SRC_PATH)/%.F90
 	@mkdir -p $(dir $@)
 	@echo "Compiling $<"
 	$(FC_WORK) -o $@ -c $<
+
+# common files may depend on modules
+$(COMMON_OBJ) : $(OBJ_PATH)/%.o : $(SRC_PATH)/%.F90 $(MODULE_OBJ)
+	@mkdir -p $(dir $@)
+	@echo "Compiling $<"
+	$(FC_WORK) -o $@ -c $<
+
+# elast files may depend on modules
+$(ELAST_OBJ) : $(OBJ_PATH)/%.o : $(SRC_PATH)/%.F90 $(MODULE_OBJ)
+	@mkdir -p $(dir $@)
+	@echo "Compiling $<"
+	$(FC_WORK) -o $@ -c $<
+
+#-------------------------------------------------
+.PHONY : print clean clean-pv
 
 print :
 	@echo $(OBJ)
@@ -74,3 +89,5 @@ clean :
 clean-pv :
 	@rm -f output/figures/*.xmf
 	@rm -f output/figures/*.h5
+	@rm -f ../outputs/paraview/*.vtu
+	@rm -f ../outputs/paraview/*.pvd

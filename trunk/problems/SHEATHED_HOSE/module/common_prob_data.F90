@@ -2,7 +2,10 @@
 !! @rev - Feb.2012
 !------------------------------------------------------------------------------
 module common_prob_data
-  save
+!
+   implicit none
+!
+   save
 !
 !..TYPE OF JOB SUBMISSION
 !  0: interactive (usual main file)
@@ -11,9 +14,6 @@ module common_prob_data
 !
 !..User can specify parameter MAXNODS via argument list instead of input file
    integer :: MAXNODS_USER
-!------------------------------------------------------------------------------
-! MISCELLANEOUS
-  integer :: NR_RHS_PROB = 1
 
 !------------------------------------------------------------------------------
 ! DPG

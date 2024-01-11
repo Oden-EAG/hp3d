@@ -4,9 +4,7 @@ c   routine name       - elem_no
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - Aug 08
+c   latest revision    - Feb 2023
 c
 c   purpose            - given a point on the projected plane,
 c                        routine identifies an element's face
@@ -15,13 +13,11 @@ c                        closest to the point of view
 c
 c   arguments :
 c     in:
-c                Xy_in    - coordinates of a projected point
+c                Xy_in - coordinates of a projected point
 c     out:
 c                Mdle  = the (middle node of) element, if the search
 c                        has been succesful
 c                      = 0 otherwise
-c
-c   required  routines -
 c
 c----------------------------------------------------------------------
 c
@@ -29,25 +25,35 @@ c
 c
       use data_structure3D
       use graphmod
+      use node_types
 c
-      dimension Xy_in(2)
+      implicit none
+c
+      real(8), intent(in)  :: Xy_in(2)
+      integer, intent(out) :: Mdle
 c
 c  ...master face coordinates
-      dimension t(2)
+      real(8) :: t(2)
 c
 c  ...physical coordinates
-      dimension xyz(3)
+      real(8) :: xyz(3)
 c
 c  ...neighbors of an element
-      dimension neig(4,6)
+      integer :: neig(4,6)
 c
-c  ...list of elements interseting with the projecting line
-c     and physical coordinates of the corresponding intersection
-c     points
-      parameter(maxlist=10)
-      dimension list_elem(maxlist),xyz_list(3,maxlist)
+c  ...list of elements intersecting with the projecting line and
+c     physical coordinates of the corresponding intersection points
+      integer, parameter :: maxlist = 10
+      integer :: list_elem(maxlist)
+      real(8) :: xyz_list(3,maxlist)
 c
+      real(8) :: d,d_min,fact
+      integer :: iel,i_min,nr_elem,loc,ivis,is,ifc,locn,nfl
+      integer :: i,j,ifinside,ndom,ndomn,mdlen
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
+#endif
 c
 c  ...initiate number of elements found
       nr_elem=0
@@ -61,21 +67,21 @@ c
 c  .....check if on the list of invisible elements
         call locate(Mdle,IGINV,NRINVBL, loc)
         if (loc.gt.0) cycle
-        call find_domain(mdle, ndom)
+        call find_domain(Mdle, ndom)
         if (NDOMAIN(ndom).eq.0) cycle
 c
 c  .....get neighbors
         call find_neig(Mdle, neig)
 c
 c  .....loop through element sides
-        do if=1,nface(NODES(Mdle)%type)
+        do ifc=1,nface(NODES(Mdle)%ntype)
 c
 c  .......check visibility of the face...
           ivis=0
 c
 c  .......loop through the face neighbors
           do is=1,4
-            mdlen = neig(is,if)
+            mdlen = neig(is,ifc)
             if (mdlen.eq.0) then
               ivis=1
             else
@@ -86,23 +92,25 @@ c  .......loop through the face neighbors
             endif
           enddo
           if (ivis.eq.0) cycle
-          call invmap_face(Mdle,if,Xy_in, t,xyz,nfl)
+          call invmap_face(Mdle,ifc,Xy_in, t,xyz,nfl)
+#if DEBUG_MODE
           if (iprint.eq.1) then
-            write(*,7002) Mdle,if,t,xyz,nfl
- 7002       format('elem_no: Mdle,if,t,xyz,nfl = ',
+            write(*,7002) Mdle,ifc,t,xyz,nfl
+ 7002       format('elem_no: Mdle,ifc,t,xyz,nfl = ',
      .                       i4,i2,2x,2f6.2,2x,3f6.2,i2)
           endif
+#endif
 c
 c  .......if the inverse map has converged...
           if (nfl.eq.0) then
 c
 c  .........check if within the face
             ifinside=0
-            select case(face_type(NODES(Mdle)%type,If))
-            case('tria')
+            select case(face_type(NODES(Mdle)%ntype,ifc))
+            case(TRIA)
               if ((t(1).gt.0.d0).and.(t(2).gt.0.d0).and.
      .            (t(1)+t(2).lt.1.d0)) ifinside=1
-            case('rect')
+            case(RECT)
               if ((t(1).gt.0.d0).and.(t(2).gt.0.d0).and.
      .            (t(1).lt.1.d0).and.(t(2).lt.1.d0)) ifinside=1
             end select
@@ -124,6 +132,8 @@ c  .....end of loop through the element faces
 c
 c  ...end of loop through elements
       enddo
+c
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,*) 'elem_no: list_elem,xyz_list  = '
         do i=1,nr_elem
@@ -132,12 +142,12 @@ c  ...end of loop through elements
         enddo
         call pause
       endif
+#endif
 c
       if (nr_elem.eq.0) then
 c
 c  .....no element has been found, return with zero flag
         Mdle=0
-        Nref=0
       else
 c
 c  .....select the element that is closest to the point of view
@@ -157,10 +167,12 @@ c  .....select the element that is closest to the point of view
         enddo
         Mdle = list_elem(i_min)
       endif
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,*)'elem_no: FINAL Mdle = ',Mdle
         call pause
       endif
+#endif
 c
 c
-      end
+      end subroutine elem_no

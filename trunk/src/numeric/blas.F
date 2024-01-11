@@ -1,9 +1,21 @@
-
+c-----------------------------------------------------------------------
+c> @date Feb 2023
+c-----------------------------------------------------------------------
       subroutine decomp(n,na,a,ip,Iflag)
-#include "syscom.blk"
-
-      dimension a(na,n),ip(n)
+      implicit none
 c
+      integer :: n,na
+      real(8) :: a(na,n)
+      integer :: ip(n)
+      integer :: Iflag
+c
+      integer :: i,j,k,imax,inc
+      real(8) :: c,pivmin
+c
+      integer, external :: idamax
+c
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
       if (iprint.eq.1) then
         write(*,7001)
@@ -14,6 +26,7 @@ c
         enddo
         call pause
       endif
+#endif
 c
       pivmin = 1.d30
 c
@@ -23,7 +36,7 @@ c
       do k=1,n
         imax = idamax(n-k+1,a(k,k),inc)
         ip(k) = k+imax-1
-        if (abs(a(ip(k),k)).le.1.e-10) then
+        if (abs(a(ip(k),k)).le.1.d-10) then
           write(*,*)'k,ip(k) = ',k,ip(k)
           write(*,*)'K,PIVOT=', k,abs(a(ip(k),k))
           call pause
@@ -40,6 +53,7 @@ c
         c=1.d0/c
 c
         call dscal(n-k,c,a(k+1,k),inc)
+#if DEBUG_MODE
         if (iprint.eq.1) then
           write(*,7003) k
  7003     format('decomp: k = ',i4)
@@ -48,6 +62,7 @@ c
           enddo
           call pause
         endif
+#endif
 c
         do j=k+1,n
           c = a(ip(k),j)
@@ -58,17 +73,25 @@ c
 c
       enddo
 c
+      end subroutine decomp
 c
-      end subroutine
-
-
-
-
+c-----------------------------------------------------------------------
+c> @date Feb 2023
+c-----------------------------------------------------------------------
       subroutine gauss2(n,na,a,ip,b,x)
-#include "syscom.blk"
-      dimension a(na,n),b(n),x(n),ip(n)
 c
-      iprint=0
+      implicit none
+c
+      integer :: n,na
+      real(8) :: a(na,n),b(n),x(n)
+      integer :: ip(n)
+c
+      integer :: inc,i,j,k
+      real(8) :: c
+c
+#if DEBUG_MODE
+      integer :: iprint
+      iprint = 0
 c
       if (iprint.eq.1) then
         write(*,7001)
@@ -85,6 +108,7 @@ c
  7005   format(10e12.5)
         call pause
       endif
+#endif
 c
       inc=1
 c
@@ -100,113 +124,131 @@ c
         call daxpy(j-1,-x(j),a(1,j),inc,b,inc)
       enddo
 c
+      end subroutine gauss2
 c
-      end subroutine
-
-
-
 c-----------------------------------------------------------------------
 c
 c   routine name       - gausse
 c
 c-----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - april 2, 1988
-c
 c   purpose            - solution of a full matrix linear system
 c                        of equations using gauss elimination
 c                        without pivoting
 c
-c   usage              - call gausse(gk,igk,gf,u,n)
-c
-c   arguments in: gk   - n by n matrix
-c                 igk  - row dimension of matrix gk exactly as
-c                        specified in the dimension statement in the
-c                        calling program
-c                 gf   - vector of length n (the right-hand side)
-c                 n    - number of equations
-c             out:u    - vector of length n containing the solution
+c   arguments
+!        in:      gk   - n by n matrix
+!                 igk  - row dimension of matrix gk exactly as
+!                        specified in the dimension statement in the
+!                        calling program
+!                 gf   - vector of length n (the right-hand side)
+!                 n    - number of equations
+!       out:      u    - vector of length n containing the solution
 c
 c   required routines  - rhsub,tri
 c
 c-----------------------------------------------------------------------
-c
+c> @date Feb 2023
+c-----------------------------------------------------------------------
       subroutine gausse(gk,igk,gf,u,n)
 c
-#include "syscom.blk"
+      implicit none
 c
-c
-      dimension gk(igk,*),gf(*),u(*)
+      integer :: igk,n
+      real(8) :: gk(igk,*),gf(*),u(*)
 c
       call tri(gk,igk,n)
       call rhsub(gk,u,gf,igk,n)
 c
-      end subroutine
-
-
+      end subroutine gausse
+c
+c-----------------------------------------------------------------------
+c> @date Feb 2023
+c-----------------------------------------------------------------------
       subroutine matinv(n,na,a,ip,Work)
-#include "syscom.blk"
-      real a(na,n),Work(n)
-      integer ip(n)
-
+c
+      implicit none
+c
+      integer :: n,na
+      real(8) :: a(na,n)
+      integer :: ip(n)
+      real(8) :: Work(n)
+c
+      integer :: i,k
+c
       do i=n,2,-1
         a(i,i)=1/a(i,i)
-        call sscal (i-1, -a(i,i), a(1,i), 1)
+        call dscal (i-1, -a(i,i), a(1,i), 1)
         a(i-1,i)=a(i-1,i)/a(i-1,i-1)
 
         do k=i-1,2,-1
-          call saxpy (k-1, -a(k,i), a(1,k), 1, a(1,i), 1)
+          call daxpy (k-1, -a(k,i), a(1,k), 1, a(1,i), 1)
           a(k-1,i)=a(k-1,i)/a(k-1,k-1)
         enddo
       enddo
-
+c
       a(1,1)=1/a(1,1)
-
-
+c
       do i=n-1,1,-1
-        call scopy(   i, a(1,i), 1, Work     , 1)
-        call scopy( n-i, 0.    , 0, Work(i+1), 1)
-
+        call dcopy(   i, a(1,i), 1, Work     , 1)
+        call dcopy( n-i, 0.d0  , 0, Work(i+1), 1)
+c
         do k=i+1,n
-          call saxpy( n, -a(k,i), a(1,k), 1, Work, 1)
+          call daxpy( n, -a(k,i), a(1,k), 1, Work, 1)
         enddo
-
-        call scopy( n, Work, 1, a(1,i), 1)
-        call sswap( n, a(1,i), 1, a(1,ip(i)), 1)
+c
+        call dcopy( n, Work, 1, a(1,i), 1)
+        call dswap( n, a(1,i), 1, a(1,ip(i)), 1)
       enddo
-
-      end subroutine
-
-
+c
+      end subroutine matinv
+c
+c-----------------------------------------------------------------------
+c> @date Feb 2023
+c-----------------------------------------------------------------------
       function sdot1(n,sx,Incx,sy,Incy)
-#include "syscom.blk"
-      dimension sx(*),sy(*)
-
-      sdot1=0.
+c
+      implicit none
+c
+      real(8) :: sdot1
+      integer :: n
+      real(8) :: sx(*),sy(*)
+      integer :: Incx,Incy
+c
+      integer :: jx,jy,i
+c
+      sdot1=0.d0
       if(n.le.0) return
-
+c
       jx=1
       if(Incx.lt.0) jx=1+(n-1)*(-Incx)
       jy=1
       if(Incy.lt.0) jy=1+(n-1)*(-Incy)
-
+c
       do i=1,n
         sdot1 = sdot1+sx(jx)*sy(jy)
         jx=jx+Incx
         jy=jy+Incy
       enddo
-
-      end function
-
-
-
+c
+      end function sdot1
+c
+c-----------------------------------------------------------------------
+c> @date Feb 2023
+c-----------------------------------------------------------------------
       function snrm21(n,sx,Incx)
-#include "syscom.blk"
-      dimension sx(*)
-
-      sn=0.
+c
+      implicit none
+c
+      real(8) :: snrm21
+      integer :: n
+      real(8) :: sx(*)
+      integer :: Incx
+c
+      real(8) :: sn
+      integer :: i,jx
+c
+      sn=0.d0
       jx=1
       if(Incx.lt.0) jx=1+(n-1)*(-Incx)
 
@@ -217,5 +259,4 @@ c
 
       snrm21=sqrt(sn)
 
-      end function
-
+      end function snrm21

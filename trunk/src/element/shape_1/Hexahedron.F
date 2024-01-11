@@ -39,7 +39,7 @@ c
       integer, intent(in)  :: Nord(19),NoriE(12),NoriF(6),Nsize(2)
       integer, intent(out) :: NrdofH
       integer :: i,j,k,m,v,e,f,N,ndofE,nordF(2),ndofF
-      integer :: nordB(3),ndofB,iprint
+      integer :: nordB(3),ndofB
       logical :: IdecE,IdecF(2),GIdecF(2),IdecB(3)
       double precision, intent(in)  :: Xi(3)
       double precision, intent(out) :: ShapH(Nsize(2))
@@ -56,8 +56,12 @@ c
       double precision :: phiQuad(2:Nsize(1),2:Nsize(1))
       double precision :: DphiQuad(1:3,2:Nsize(1),2:Nsize(1))
 c
+#if DEBUG_MODE
 c  ...debugging flag
+      integer :: iprint
       iprint=0
+#endif
+c
 c  ...spatial dimensions
       N=3
 c  ...initiate counter for shape functions
@@ -154,6 +158,7 @@ c
 c  ...give total degrees of freedom
       NrdofH = m
 c
+#if DEBUG_MODE
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001) Xi(1:3),Nord(1:19),NoriE(1:12),NoriF(1:6),NrdofH
@@ -200,6 +205,7 @@ c  ...print this when debugging
         endif
         call pause
       endif
+#endif
 c
       end subroutine shape3DHHexa
 c
@@ -239,7 +245,7 @@ c
       implicit none
       integer, intent(in)  :: Nord(19),NoriE(12),NoriF(6),Nsize(2)
       integer, intent(out) :: NrdofE
-      integer :: i,j,k,ig,jg,kg,m,e,f,fam,a,b,c,ab(2),abc(3),N,iprint
+      integer :: i,j,k,ig,jg,kg,m,e,f,fam,a,b,c,ab(2),abc(3),N
       integer :: ndofE,nordF(2),ndofF(0:1),minF(2),maxF(2),ij(2)
       integer :: nordB(3),ndofB(0:2),minB(3),maxB(3),ijk(3)
       logical :: IdecE,IdecF(2),GIdecF(2),IdecB(3)
@@ -259,8 +265,12 @@ c
       double precision :: phiE(2:Nsize(1)),DphiE(1:3,2:Nsize(1))
       double precision :: DTemp(1:3),CTemp(1:3)
 c
+#if DEBUG_MODE
 c  ...debugging flag
+      integer :: iprint
       iprint=0
+#endif
+c
 c  ...spatial dimensions
       N=3
 c  ...initiate counter for shape functions
@@ -380,6 +390,7 @@ c
 c  ...give total degrees of freedom
       NrdofE = m
 c
+#if DEBUG_MODE
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001) Xi(1:3),Nord(1:19),
@@ -423,6 +434,7 @@ c  ...print this when debugging
         endif
         call pause
       endif
+#endif
 c
       end subroutine shape3DEHexa
 c
@@ -460,7 +472,7 @@ c
       implicit none
       integer, intent(in)  :: Nord(19),NoriF(6),Nsize(2)
       integer, intent(out) :: NrdofV
-      integer :: i,j,k,ig,jg,kg,m,f,fam,a,b,c,ab(2),abc(3),N,iprint
+      integer :: i,j,k,ig,jg,kg,m,f,fam,a,b,c,ab(2),abc(3),N
       integer :: nordF(2),ndofF
       integer :: nordB(3),ndofB(0:2),minB(3),maxB(3),ijk(3)
       logical :: IdecF(2),GIdecF(2),IdecB(3)
@@ -475,8 +487,12 @@ c
       double precision :: divVQuad(0:Nsize(1)-1,0:Nsize(1)-1)
       double precision :: phiE(2:Nsize(1)),DphiE(1:3,2:Nsize(1))
 c
+#if DEBUG_MODE
 c  ...debugging flag
+      integer :: iprint
       iprint=0
+#endif
+c
 c  ...spatial dimensions
       N=3
 c  ...initiate counter for shape functions
@@ -555,6 +571,7 @@ c
 c  ...give total degrees of freedom
       NrdofV = m
 c
+#if DEBUG_MODE
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001) Xi(1:3),Nord(13:19),NoriF(1:6),NrdofV
@@ -585,6 +602,7 @@ c  ...print this when debugging
         endif
         call pause
       endif
+#endif
 c
       end subroutine shape3DVHexa
 c
@@ -620,14 +638,18 @@ c
       implicit none
       integer, intent(in)  :: Nord(19),Nsize(2)
       integer, intent(out) :: NrdofQ
-      integer :: i,j,k,m,N,nordB(3),ndofB,iprint
+      integer :: i,j,k,m,N,nordB(3),ndofB
       double precision, intent(in)  :: Xi(3)
       double precision, intent(out) :: ShapQ(Nsize(2))
       double precision :: Mu(0:1,1:3),DMu(1:3,0:1,1:3)
       double precision :: homP(0:Nsize(1)-1,1:3)
 c
+#if DEBUG_MODE
 c  ...debugging flag
+      integer :: iprint
       iprint=0
+#endif
+c
 c  ...spatial dimensions
       N=3
 c  ...initiate counter for shape functions
@@ -659,6 +681,7 @@ c
 c  ...give total degrees of freedom
       NrdofQ = m
 c
+#if DEBUG_MODE
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001) Xi(1:3),Nord(19),NrdofQ
@@ -670,5 +693,6 @@ c  ...print this when debugging
         enddo
         call pause
       endif
+#endif
 c
       end subroutine shape3DQHexa

@@ -8,6 +8,7 @@ subroutine exec_case(idec)
    use mpi_param
    use mpi
    use common_prob_data
+   use paraview      , only: paraview_select_attr
    use zoltan_wrapper, only: zoltan_w_partition,zoltan_w_eval
 !
    implicit none
@@ -17,7 +18,8 @@ subroutine exec_case(idec)
    logical :: solved
    integer :: mdle_subd(NRELES)
    integer :: i,mdle,kref,src,count,ierr,nord
-   integer :: iParAttr(NR_PHYSA) ! iParAttr = (/3,3,3,6,3/)
+   logical :: iPvAttr(NR_PHYSA) ! components = (/3,3,3,6,3/)
+   real(8) :: res
 !
 !----------------------------------------------------------------------
 !
@@ -27,8 +29,9 @@ subroutine exec_case(idec)
 !
 !  ...paraview graphics (displacement components only)
       case(3)
-         iParAttr(1:NR_PHYSA) = (/0,0,3,0,0/)
-         call my_paraview_driver(iParAttr)
+         iPvAttr(1:NR_PHYSA) = (/.false.,.false.,.true.,.false.,.false./)
+         call paraview_select_attr(iPvAttr)
+         call my_paraview_driver
          call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !  ...paraview graphics (stresses)
       case(4)
@@ -175,7 +178,7 @@ subroutine exec_case(idec)
 !
       case(51)
          write(*,*) 'computing residual...'
-         call residual
+         call residual(res)
 !
       case(60)
          write(*,*) 'flushing dof'

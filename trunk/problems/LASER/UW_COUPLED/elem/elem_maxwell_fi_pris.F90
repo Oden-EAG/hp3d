@@ -55,6 +55,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    use data_structure3D
    use laserParam
    use commonParam
+   use MPI, only: MPI_Wtime
 !..no implicit statements
    implicit none
 !..declare input/output variables
@@ -76,10 +77,8 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    complex(8), dimension(MdQ,MdE), intent(out) :: ZalocQE
    complex(8), dimension(MdQ,MdQ), intent(out) :: ZalocQQ
 !
-   real(8), parameter :: rZero = 0.d0
-!
 !..declare edge/face type variables
-   character(len=4) :: etype, etype1, ftype
+   integer :: etype, etype1, ftype
 !
 !..declare element order, orientation for edges and faces
    integer, dimension(19)    :: norder
@@ -241,7 +240,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    real(8), dimension(3,6) :: nfce
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
    integer, dimension(3,3) :: deltak
 !
@@ -273,7 +272,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    allocate(stiff_EQ_T(6*NrdofQ ,NrTest))
 !
 !..element type
-   etype = NODES(Mdle)%type
+   etype = NODES(Mdle)%ntype
    nre = nedge(etype); nrf = nface(etype)
 !
 !..determine order of approximation
@@ -282,7 +281,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
 !..set the enriched order of approximation
    select case(etype)
-      case('mdlp')
+      case(MDLP)
          nord3 = 0
          nord3 = max(nord3,norder(7))
          nord3 = max(nord3,norder(8))
@@ -290,7 +289,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
          nord3 = nord3+NORD_ADD
          nordP = NODES(Mdle)%order+NORD_ADD*11
          norderi(nre+nrf+1) = 11
-      case('mdlb')
+      case(MDLB)
          nord3 = 0
          nord3 = max(nord3,norder(9))
          nord3 = max(nord3,norder(10))
@@ -309,8 +308,8 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    nrdofEEi = NrdofEE-ndofEEmdl
 !
    select case(etype)
-      case('mdlp') ! prism
-         etype1 = 'mdlt'
+      case(MDLP) ! prism
+         etype1 = MDLT
 !     ...calc face order and enriched face order
          norder_f(1:3) = norder(1:3); norder_fe(1:3) = norder(1:3) + NORD_ADD
          norder_f(4) = max(norder(10),norder(11)); norder_fe(4) = norder_f(4) + NORD_ADD
@@ -326,8 +325,8 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
          allocate(mapEE(nrdofE12*(nord3+1)+nrdofH12*nord3))
          call tens_prism_ordEE(pe,nord3, mapEE)
 !
-      case('mdlb') ! hexa
-         etype1 = 'mdlq'
+      case(MDLB) ! hexa
+         etype1 = MDLQ
  !    ...calc face order and enriched face order
          norder_f(1:4) = norder(1:4); norder_fe(1:4) = norder(1:4) + NORD_ADD
 !     ...take max order of this face (13) and the opposite face (14)
@@ -343,7 +342,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
          call tens_hexa_ordEE(pe,nord3, mapEE)
 !
       case default
-         write(*,*) 'elem_maxwell_fi_pris: unexpected element type:', etype
+         write(*,*) 'elem_maxwell_fi_pris: unexpected element type:',S_Type(etype)
             stop
    end select
 !
@@ -555,9 +554,9 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !     ...Shape function subroutine is called only once, when
 !        pz=1 and stored in sH2p(:,py) and dsH2p(:,py)
          if (pz.eq.1) then
-            sH12(:,pxy)   = rZero;  gH12(:,:,pxy) = rZero
-            sE12(:,:,pxy) = rZero;  cE12(:,pxy)   = rZero
-            sQ12(:,pxy)   = rZero;
+            sH12(:,pxy)   = rZERO;  gH12(:,:,pxy) = rZERO
+            sE12(:,:,pxy) = rZERO;  cE12(:,pxy)   = rZERO
+            sQ12(:,pxy)   = rZERO;
 !
             call shape2HH(etype1,xi12,norder_fe(5), nrdofH12,sH12(:,pxy),gH12(1:2,:,pxy))
             call shape2EE(etype1,xi12,norder_fe(5), nrdofE12,sE12(1:2,:,pxy),cE12(:,pxy))
@@ -568,8 +567,8 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !     ...Copy shape functions in coord. 2 previously evaluated
 !     ...E12 is for E terms, separated into family 1 and 2 of tri shape fns.
          E12(1:2, 1:NrdofE12 ) = sE12(1:2,1:NrdofE12,pxy)
-         E12(3  , 1:NrdofE12 ) = rZero
-         E12(1:2, (NrdofE12+1):(NrdofE12+NrdofH12) ) = rZero
+         E12(3  , 1:NrdofE12 ) = rZERO
+         E12(1:2, (NrdofE12+1):(NrdofE12+NrdofH12) ) = rZERO
          E12(3  , (NrdofE12+1):(NrdofE12+NrdofH12) ) = sH12(1:NrdofH12,pxy)
 !
 !     ...C12 is for C terms, curl of E terms, same separation as above
@@ -578,7 +577,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
          C12(3 , 1:NrdofE12 ) =  cE12(  1:NrdofE12,pxy)
          C12(1 , (NrdofE12+1):(NrdofE12+NrdofH12) ) =  gH12(2,1:NrdofH12,pxy)
          C12(2 , (NrdofE12+1):(NrdofE12+NrdofH12) ) = -gH12(1,1:NrdofH12,pxy)
-         C12(3 , (NrdofE12+1):(NrdofE12+NrdofH12) ) = rZero
+         C12(3 , (NrdofE12+1):(NrdofE12+NrdofH12) ) = rZERO
 !
 !     ...Q12 is for L2 trial shape functions
          Q12(1:nrdofQ12) = sQ12(1:nrdofQ12,pxy)
@@ -769,7 +768,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !        ...J^T e_z x J^-T = -(e_z x J)^T J^-T
             D_aux(1,1:3) = -dxdxi(2,1:3)
             D_aux(2,1:3) = dxdxi(1,1:3)
-            D_aux(3,1:3) = rZero
+            D_aux(3,1:3) = rZERO
             call DGEMM('T','T',3,3,3,-1.0d0,D_aux,3,dxidx,3,0.0d0,D_aux2,3)
             C_RC = D_aux2 * WAVENUM_FLD*detJstretch * wt123
 !
@@ -1289,7 +1288,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
 !..Get face normals (there has to be a way to compute this)
    select case(etype)
-      case('mdlp')
+      case(MDLP)
          nfce = reshape((/  0.d0,  0.d0, -1.d0,          & ! face 1
                             0.d0,  0.d0,  1.d0,          & ! face 2
                             0.d0, -1.d0,  0.d0,          & ! face 3
@@ -1298,7 +1297,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                             0.d0,  0.d0,  0.d0  /),      & ! Place holder
                         (/3,6/))
          nfce(:,4) = nfce(:,4)/sqrt(2.d0)
-      case('mdlb')
+      case(MDLB)
          nfce = reshape((/  0.d0,  0.d0, -1.d0,          & ! face 1
                             0.d0,  0.d0,  1.d0,          & ! face 2
                             0.d0, -1.d0,  0.d0,          & ! face 3
@@ -1307,7 +1306,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                            -1.d0,  0.d0,  0.d0  /),      & ! face 6
                         (/3,6/))
       case default
-         write(*,*) 'elem_maxwell_fi_prism: unsupported etype: ', etype
+         write(*,*) 'elem_maxwell_fi_prism: unsupported etype: ',S_Type(etype)
          stop
    end select
 !
@@ -1391,12 +1390,12 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
 !  ...Test
       select case(ftype)
-         case('tria','mdlt')
+         case(TRIA,MDLT)
             nordEEfc = norder(nedge(etype) + ifc) + NORD_ADD
-         case('quad','mdlq','rect')
+         case(QUAD,MDLQ,RECT)
             nordEEfc = norder(nedge(etype) + ifc) + NORD_ADD*11
          case default
-            write(*,*) 'elem_maxwell_fi_pris: invalid face type ', ftype
+            write(*,*) 'elem_maxwell_fi_pris: invalid face type ', S_Type(ftype)
             stop
       end select
       allocate(dummyE(1:2,NrdofEE))

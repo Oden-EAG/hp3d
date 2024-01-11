@@ -1,13 +1,4 @@
       subroutine zecond(T)
-c
-#include "syscom.blk"
-c
-ccc      call second(T)
-c
-cwr07.03.03
+      real(8), intent(out) :: T
       T = 0.d0
-
-      return
-      end
-
-
+      end subroutine zecond

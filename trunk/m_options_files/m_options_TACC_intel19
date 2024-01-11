@@ -15,7 +15,7 @@ DEBUG    ?= 0
 #------------------------------------------------------------------
 
 # Enable OpenMP threading
-OPENMP   ?= 1
+HP3D_USE_OPENMP ?= 1
 
 # Enable performance profiling with TAU
 TAU_PERF ?= 0
@@ -39,7 +39,7 @@ FFLAGS = -fPIC
 #FFLAGS += -stand
 
 # OpenMP
-ifeq ($(OPENMP),1)
+ifeq ($(HP3D_USE_OPENMP),1)
   FFLAGS += -qopenmp
 endif
 
@@ -133,23 +133,22 @@ VIS_INCS   = -I${TACC_HDF5_INC}
 #
 # Mainly for library makefile
 
-ifeq ($(COMPLEX),1)
-  HP3D_PATH      = $(HP3D_BASE_PATH)/complex
-else
-  HP3D_PATH      = $(HP3D_BASE_PATH)/real
-endif
+HP3D_PATH_COMPLEX = $(HP3D_BASE_PATH)/complex
+HP3D_PATH_REAL    = $(HP3D_BASE_PATH)/real
 
-SRC_PATH         = src
-MODULE_PATH      = module
-LIB_PATH         = lib
+OBJ_PATH_COMPLEX  =  _obj_complex_
+OBJ_PATH_REAL     =  _obj_real_
 
-OBJ_PATH_COMPLEX =  _obj_complex_
-OBJ_PATH_REAL    =  _obj_real_
+SRC_PATH          = src
+MODULE_PATH       = module
+LIB_PATH          = lib
 
 ifeq ($(COMPLEX),1)
-  OBJ_PATH       = $(OBJ_PATH_COMPLEX)
+  HP3D_PATH       = $(HP3D_PATH_COMPLEX)
+  OBJ_PATH        = $(OBJ_PATH_COMPLEX)
 else
-  OBJ_PATH       = $(OBJ_PATH_REAL)
+  HP3D_PATH       = $(HP3D_PATH_REAL)
+  OBJ_PATH        = $(OBJ_PATH_REAL)
 endif
 
 HP3D_LIB_EXTRA_INCS = $(MKL_INCS) $(MUMPS_INCS) $(VIS_INCS)
@@ -220,5 +219,5 @@ PROB_INCS    += $(HP3D_LINK_INCS)   \
 HP3D_USE_INTEL_MKL = 1
 PROB_PP_DEFS  = -D"C_MODE=$(COMPLEX)" \
                 -D"DEBUG_MODE=$(DEBUG)" \
-                -D"HP3D_USE_OPENMP=$(OPENMP)" \
+                -D"HP3D_USE_OPENMP=$(HP3D_USE_OPENMP)" \
                 -D"HP3D_USE_INTEL_MKL=$(HP3D_USE_INTEL_MKL)"

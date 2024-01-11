@@ -7,7 +7,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-!    latest revision    - Feb 2020
+!    latest revision    - Mar 2023
 !
 !    purpose            - interface for distributed PETSc solvers
 !                       - routine computes global stiffness matrix
@@ -40,19 +40,22 @@ subroutine petsc_solve(mtype)
                                ALOC, BLOC, AAUX, ZAMOD, ZBMOD,    &
                                NR_PHYSA, MAXNODM
    use assembly_sc
-   use control    ,  only: ISTC_FLAG
+   use control    , only:  ISTC_FLAG
    use stc        , only:  HERM_STC,CLOC,                         &
                            stc_alloc,stc_dealloc,stc_get_nrdof
+   use parameters , only:  NRRHS
    use par_mesh   , only:  DISTRIBUTED,HOST_MESH
    use mpi_param  , only:  RANK,ROOT,NUM_PROCS
    use mpi_wrapper, only:  mpi_w_handle_err
    use MPI        , only:  MPI_SUM,MPI_MIN,MPI_MAX,MPI_IN_PLACE,  &
                            MPI_INTEGER,MPI_INTEGER8,              &
                            MPI_REAL8,MPI_COMPLEX16,               &
-                           MPI_COMM_WORLD,MPI_STATUS_SIZE
+                           MPI_COMM_WORLD,MPI_STATUS_SIZE,MPI_Wtime
    use petscksp
    use petsc_w_ksp, only:  petsc_ksp_start,petsc_ksp_destroy,     &
-                           petsc_ksp,petsc_A,petsc_rhs,petsc_sol
+                           petsc_ksp,petsc_ksp_type,              &
+                           petsc_pc,petsc_pc_type,                &
+                           petsc_A,petsc_rhs,petsc_sol
 !
    implicit none
 !
@@ -75,17 +78,37 @@ subroutine petsc_solve(mtype)
 !..PETSc variables
 !  note: PetscScalar  can be real (8byte) or complex (16byte), depending on library linking
    PetscErrorCode petsc_ierr
-   PetscInt petsc_its, petsc_void !, petsc_low, petsc_high
+   PetscReal petsc_rtol, petsc_atol, petsc_dtol
+   PetscInt petsc_maxits, petsc_its, petsc_reason, petsc_void !, petsc_low, petsc_high
    PetscInt petsc_nstash, petsc_reallocs, petsc_nvoid
    PetscInt, allocatable :: petsc_dnz(:), petsc_onz(:)
    Vec petsc_sol_glb
    VecScatter petsc_ctx
    PetscScalar, pointer :: petsc_vec_ptr(:)
-   KSPType petsc_method
    real(8) :: petsc_info(MAT_INFO_SIZE)
    real(8) :: petsc_mallocs,petsc_nz_alloc,petsc_nz_used
-   character(64) :: info_string
-   character(8)  :: fmt,val_string
+   character(256) :: info_string
+   character( 16) :: fmt,val_string,v1,v2,v3
+!
+!..Set to compute eigenvalues of preconditioned system in PETSc solve
+!  0 : do not compute eigenvalues
+!  1 : compute eigenvalues
+!  2 : compute and print eigenvalues
+!  (1-2: also print condition number lower bound for 'H','P' matrices)
+   integer, parameter :: petsc_eigenvalues = 0
+   PetscReal, pointer :: petsc_eigen_r(:)
+   PetscReal, pointer :: petsc_eigen_c(:)
+   PetscInt           :: petsc_eigen_nmax
+   PetscInt           :: petsc_eigen_neig
+!
+!..Set to compute singular values of preconditioned system in PETSc solve
+!  0 : do not compute singular values
+!  1 : compute min/max singular value, print lower bound of condition number
+   integer, parameter :: petsc_singularvalues = 0
+   PetscReal          :: petsc_singular_min
+   PetscReal          :: petsc_singular_max
+!
+   real(8)            :: petsc_cond
 !
 !..Non-zero computation
    integer :: my_dnz, my_onz, NR_NOD_LIST, NRNODS_SUBD
@@ -103,7 +126,7 @@ subroutine petsc_solve(mtype)
    integer, allocatable :: TEMP_BUF(:)
 !
 !..dummy variables
-   VTYPE   :: zvoid
+   VTYPE :: zvoid
 !
 !..workspace for celem
    integer, dimension(MAXNODM) :: nodm,ndofmH,ndofmE,ndofmV,ndofmQ
@@ -116,7 +139,6 @@ subroutine petsc_solve(mtype)
    integer :: nrdof_subd(NUM_PROCS)
 !
 !..timer
-!   real(8) :: MPI_Wtime,start_time,end_time,time_stamp
    real(8) :: start_time,end_time,time_stamp
 !
 ! -----------------------------------------------------------------------
@@ -131,7 +153,7 @@ subroutine petsc_solve(mtype)
    endif
 !
    select case(mtype)
-      case('H')
+      case('P','H')
          HERM_STC = .true.
       case default
          HERM_STC = .false.
@@ -144,7 +166,7 @@ subroutine petsc_solve(mtype)
    endif
 !
 !..TODO multiple right-hand sides
-   NR_RHS = 1
+   NR_RHS = NRRHS
 !
 !..Initialize PETSc environment and allocate KSP data structure
    call petsc_ksp_start
@@ -663,9 +685,19 @@ subroutine petsc_solve(mtype)
 !  ...H1 dof
       do i = nrnodm,1,-1
          nod = nodm(i)
+#if DEBUG_MODE
+         if (NFIRST_DOF(nod).lt.0) then
+            write(*,*) 'petsc_solve: NFIRST_DOF(nod).lt.0'; stop
+         endif
+#endif
          do j=1,ndofmH(i)
             l=l+1
             LCON(l) = NFIRST_DOF(nod)+j
+#if DEBUG_MODE
+            if (LCON(l).le.0) then
+               write(*,*) 'petsc_solve: H1 LCON(l).le.0'; stop
+            endif
+#endif
          enddo
       enddo
 !  ...H(curl) dof
@@ -674,6 +706,11 @@ subroutine petsc_solve(mtype)
          do j=1,ndofmE(i)
             l=l+1
             LCON(l) = NFIRST_DOF(nod)+ndofmH(i)+j
+#if DEBUG_MODE
+            if (LCON(l).le.0) then
+               write(*,*) 'petsc_solve: HCurl LCON(l).le.0'; stop
+            endif
+#endif
          enddo
       enddo
 !  ...H(div) dof
@@ -682,6 +719,11 @@ subroutine petsc_solve(mtype)
          do j=1,ndofmV(i)
             l=l+1
             LCON(l) = NFIRST_DOF(nod)+ndofmH(i)+ndofmE(i)+j
+#if DEBUG_MODE
+            if (LCON(l).le.0) then
+               write(*,*) 'petsc_solve: HDiv LCON(l).le.0'; stop
+            endif
+#endif
          enddo
       enddo
 !  ...L2 dof
@@ -690,6 +732,11 @@ subroutine petsc_solve(mtype)
          do j=1,ndofmQ(nrnodm)
             l=l+1
             LCON(l) = NFIRST_DOF(nod)+ndofmH(nrnodm)+ndofmE(nrnodm)+ndofmV(nrnodm)+j
+#if DEBUG_MODE
+            if (LCON(l).le.0) then
+               write(*,*) 'petsc_solve: L2 LCON(l).le.0'; stop
+            endif
+#endif
          enddo
       endif
 !
@@ -801,28 +848,131 @@ subroutine petsc_solve(mtype)
 !
 !..Set type of PETSc solver
    select case(mtype)
-      case('P')
-         petsc_method = KSPCG
-         ! default for CG is Hermitian positive definite when complex mode
-         !call KSPCGSetType(petsc_ksp, KSPCGType KSP_CG_SYMMETRIC)
-      case default
-         petsc_method = KSPGMRES
+      ! note: default for CG is Hermitian positive definite when complex mode;
+      !       symmetric (non-Hermitian) can be set by KSPCGSetType
+      ! call KSPCGSetType(petsc_ksp,KSP_CG_SYMMETRIC, petsc_ierr); CHKERRQ(petsc_ierr)
+      case('P')   ; petsc_ksp_type = KSPCG
+      case default; petsc_ksp_type = KSPGMRES
    end select
-   call KSPSetType(petsc_ksp,petsc_method, petsc_ierr)
+   call KSPSetType(petsc_ksp,petsc_ksp_type, petsc_ierr)
+!  print solver info
+   call KSPGetType(petsc_ksp,petsc_ksp_type, petsc_ierr); CHKERRQ(petsc_ierr)
+   info_string='\nKSPGetType        : '//trim(petsc_ksp_type)//'\n'
+   call PetscPrintf(MPI_COMM_WORLD,info_string, petsc_ierr); CHKERRQ(petsc_ierr)
+!
+!..Optional: set preconditioner type
+!      e.g., PCJACOBI (Jacobi preconditioner)
+!            PCLU     (LU direct solver)
+!            PCNONE   (No preconditioning)
+   !petsc_pc_type = PCLU
+   call KSPGetPC(petsc_ksp,petsc_pc, petsc_ierr); CHKERRQ(petsc_ierr)
+   if (len_trim(petsc_pc_type) .gt. 0) then
+      call PCSetType(petsc_pc,petsc_pc_type, petsc_ierr); CHKERRQ(petsc_ierr)
+!     print preconditioner info
+      call PCGetType(petsc_pc,petsc_pc_type, petsc_ierr); CHKERRQ(petsc_ierr)
+      info_string='PCGetType         : '//trim(petsc_pc_type)//'\n'
+      call PetscPrintf(MPI_COMM_WORLD,info_string, petsc_ierr); CHKERRQ(petsc_ierr)
+   endif
+!
+!..Set solver tolerances (convergence criteria)
+   petsc_rtol   = PETSC_DEFAULT_REAL
+   petsc_atol   = PETSC_DEFAULT_REAL
+   petsc_dtol   = PETSC_DEFAULT_REAL
+   petsc_maxits = PETSC_DEFAULT_INTEGER
+   call KSPSetTolerances(petsc_ksp,petsc_rtol,petsc_atol,petsc_dtol,petsc_maxits, petsc_ierr); CHKERRQ(petsc_ierr)
+!  print tolerance info
+   if (petsc_rtol  .eq.PETSC_DEFAULT_REAL   ) petsc_rtol  =1.0d-5
+   if (petsc_atol  .eq.PETSC_DEFAULT_REAL   ) petsc_atol  =1.0d-50
+   if (petsc_dtol  .eq.PETSC_DEFAULT_REAL   ) petsc_dtol  =1.0d5
+   if (petsc_maxits.eq.PETSC_DEFAULT_INTEGER) petsc_maxits=10000
+   fmt='(ES10.2)'; write(v1,fmt) petsc_rtol; write(v2,fmt) petsc_atol; write(v3,fmt) petsc_dtol;
+   fmt='(I10)'   ; write(val_string,fmt) petsc_maxits
+   info_string='KSPSetTolerances  : rtol   = '//v1        //'\n'//&
+               '                    atol   = '//v2        //'\n'//&
+               '                    dtol   = '//v3        //'\n'//&
+               '                    maxits = '//val_string//'\n'
+   call PetscPrintf(MPI_COMM_WORLD,info_string, petsc_ierr); CHKERRQ(petsc_ierr)
+!
+!..Optionally, compute eigenvalues of the preconditioned operator
+   if (petsc_eigenvalues.gt.0) then
+      call KSPSetComputeEigenvalues(petsc_ksp,PETSC_TRUE, petsc_ierr); CHKERRQ(petsc_ierr)
+      info_string='KSPCompEigenvalues: Activated\n'
+      call PetscPrintf(MPI_COMM_WORLD,info_string, petsc_ierr); CHKERRQ(petsc_ierr)
+   endif
+!
+!..Optionally, compute singular values of the preconditioned operator
+   if (petsc_singularvalues.gt.0) then
+      call KSPSetComputeSingularValues(petsc_ksp,PETSC_TRUE, petsc_ierr); CHKERRQ(petsc_ierr)
+      info_string='KSPCompSingularVal: Activated\n'
+      call PetscPrintf(MPI_COMM_WORLD,info_string, petsc_ierr); CHKERRQ(petsc_ierr)
+   endif
 !
 !..Perform global sparse solve
    call KSPSolve(petsc_ksp,petsc_rhs, petsc_sol,petsc_ierr); CHKERRQ(petsc_ierr)
 !
-!..print number of iterations
-   call KSPGetIterationNumber(petsc_ksp, petsc_its,petsc_ierr); CHKERRQ(petsc_ierr);
-   fmt = '(I5)'
-   write (val_string,fmt) petsc_its
-   info_string='KSPSolve: number of iterations = '//trim(val_string)
-   call PetscPrintf(MPI_COMM_WORLD,info_string, petsc_ierr); CHKERRQ(petsc_ierr);
-   if (RANK .eq. ROOT) write(*,*)
-   if (RANK .eq. ROOT) write(*,*)
+!..Print solver convergence info
+   call KSPGetConvergedReason(petsc_ksp, petsc_reason,petsc_ierr); CHKERRQ(petsc_ierr)
+   if (petsc_reason .lt. 0) then
+      info_string='KSPSolve          : SOLVER DID NOT CONVERGE !!!\n'
+   else
+      info_string='KSPSolve          : Solver converged!\n'
+   endif
+   call PetscPrintf(MPI_COMM_WORLD,info_string, petsc_ierr); CHKERRQ(petsc_ierr)
 !
-!..print solver info
+!..Print number of iterations
+   call KSPGetIterationNumber(petsc_ksp, petsc_its,petsc_ierr); CHKERRQ(petsc_ierr)
+   fmt = '(I5)'; write(val_string,fmt) petsc_its
+   info_string='                    Number of iterations = '//trim(val_string)//'\n\n'
+   call PetscPrintf(MPI_COMM_WORLD,info_string, petsc_ierr); CHKERRQ(petsc_ierr)
+!
+!..Optionally, compute eigenvalues of the preconditioned operator
+   if (petsc_eigenvalues.gt.0) then
+      petsc_eigen_nmax = petsc_its
+      allocate(petsc_eigen_r(petsc_eigen_nmax))
+      allocate(petsc_eigen_c(petsc_eigen_nmax))
+      call KSPComputeEigenvalues(petsc_ksp,petsc_eigen_nmax, petsc_eigen_r,petsc_eigen_c,petsc_eigen_neig,petsc_ierr); CHKERRQ(petsc_ierr)
+      if (petsc_eigenvalues.gt.1) then
+         fmt='(I10)'; write(v1,fmt) petsc_eigen_nmax; write(v2,fmt) petsc_eigen_neig
+         info_string='KSPCompEigenvalues: nmax   = '//v1//'\n'//&
+                     '                    neig   = '//v2//'\n'
+         call PetscPrintf(MPI_COMM_WORLD,info_string, petsc_ierr); CHKERRQ(petsc_ierr)
+      endif
+      if (RANK.eq.ROOT) then
+         if (petsc_eigenvalues.gt.1) then
+            do i = 1,petsc_eigen_neig
+               write(*,1078) petsc_eigen_r(i), petsc_eigen_c(i)
+          1078 format('(',ES10.2,',',ES10.2,')')
+            enddo
+         endif
+         if (petsc_singularvalues.eq.0) then
+            select case(mtype)
+               case('P') ! spd matrix
+                  petsc_cond = petsc_eigen_r(petsc_eigen_neig)/petsc_eigen_r(1)
+               case('H') ! sym/herm matrix
+                  petsc_cond = abs(petsc_eigen_r(petsc_eigen_neig)/petsc_eigen_r(1))
+               case default ! general matrix
+                  petsc_cond = -1.d0
+            end select
+            if (petsc_cond.gt.0.d0) write(*,1079) petsc_cond
+       1079 format('Condition number of preconditioned system (lower bound):',ES10.2,/)
+         endif
+      endif
+      deallocate(petsc_eigen_r)
+      deallocate(petsc_eigen_c)
+   endif
+!
+!..Optionally, compute singular values of the preconditioned operator
+   if (petsc_singularvalues.gt.0) then
+      call KSPComputeExtremeSingularValues(petsc_ksp, petsc_singular_max,petsc_singular_min,petsc_ierr); CHKERRQ(petsc_ierr)
+      fmt='(ES10.2)'; write(v1,fmt) petsc_singular_max; write(v2,fmt) petsc_singular_min
+      info_string='KSPCompSingularVal: max_val= '//v1//'\n'//&
+                  '                    min_val= '//v2//'\n'
+      call PetscPrintf(MPI_COMM_WORLD,info_string, petsc_ierr); CHKERRQ(petsc_ierr)
+      petsc_cond = petsc_singular_max/petsc_singular_min
+      if (RANK.eq.ROOT) write(*,1079) petsc_cond
+   endif
+!
+!..Optional: print detailed information about the solver
    !call KSPView(petsc_ksp,PETSC_VIEWER_STDOUT_WORLD, petsc_ierr); CHKERRQ(petsc_ierr)
 !
 ! ----------------------------------------------------------------------

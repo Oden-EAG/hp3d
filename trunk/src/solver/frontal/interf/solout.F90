@@ -65,7 +65,8 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
    VTYPE   :: zvoid
 !
 #if DEBUG_MODE
-   integer :: iprint=0
+   integer :: iprint
+   iprint=0
 #endif
 !
 !----------------------------------------------------------------------
@@ -119,12 +120,12 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
 !..count number of variables for each physics type
    nrPhysH=0; nrPhysE=0; nrPhysV=0
    do iphys=1,NR_PHYSA
-      select case(DTYPE(iphys))
-         case('contin')
+      select case(D_TYPE(iphys))
+         case(CONTIN)
             nrPhysH=nrPhysH+1
-         case('tangen')
+         case(TANGEN)
             nrPhysE=nrPhysE+1
-         case('normal')
+         case(NORMAL)
             nrPhysV=nrPhysV+1
          case default
       end select
@@ -201,13 +202,13 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
                      nn=nn+1
 !
 !                 ...copy the dof
-                     NODES(nod)%dof%zdofH(ivar,j) = Zele(nn)
+                     NODES(nod)%dof%zdofH(ivar,j,N_COMS) = Zele(nn)
 #if DEBUG_MODE
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Zele(nn)
   7006                  format('solout: nn,load,Zele(nn) = ',i4,i3,1x,2e13.5)
-                        write(*,7007) nod,j,ivar,NODES(nod)%dof%zdofH(ivar,j)
-  7007                  format('solout: nod,j,ivar,NODES(nod)%dof%zdofH(ivar,j)', &
+                        write(*,7007)   nod,j,ivar,NODES(nod)%dof%zdofH(ivar,j,N_COMS)
+  7007                  format('solout: nod,j,ivar,NODES(nod)%dof%zdofH(ivar,j,N_COMS)', &
                                ' = ',i5,i3,i3,1x,2e13.5)
                      endif
 #endif
@@ -276,12 +277,12 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
                      nn=nn+1
 !
 !                 ...copy the dof
-                     NODES(nod)%dof%zdofE(ivar,j) = Zele(nn)
+                     NODES(nod)%dof%zdofE(ivar,j,N_COMS) = Zele(nn)
 #if DEBUG_MODE
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Zele(nn)
-                        write(*,7009) nod,j,ivar,NODES(nod)%dof%zdofE(ivar,j)
- 7009                   format('solout: nod,j,ivar,NODES(nod)%dof%zdofE(ivar,j)', &
+                        write(*,7009)   nod,j,ivar,NODES(nod)%dof%zdofE(ivar,j,N_COMS)
+ 7009                   format('solout: nod,j,ivar,NODES(nod)%dof%zdofE(ivar,j,N_COMS)', &
                                ' = ',i5,i3,i3,1x,2e13.5)
                      endif
 #endif
@@ -351,12 +352,12 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
                      nn=nn+1
 !
 !                 ...copy the dof
-                     NODES(nod)%dof%zdofV(ivar,j) = Zele(nn)
+                     NODES(nod)%dof%zdofV(ivar,j,N_COMS) = Zele(nn)
 #if DEBUG_MODE
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Zele(nn)
-                        write(*,7010) nod,j,ivar,NODES(nod)%dof%zdofV(ivar,j)
- 7010                   format('solout: nod,j,ivar,NODES(nod)%dof%zdofV(ivar,j)', &
+                        write(*,7010)   nod,j,ivar,NODES(nod)%dof%zdofV(ivar,j,N_COMS)
+ 7010                   format('solout: nod,j,ivar,NODES(nod)%dof%zdofV(ivar,j,N_COMS)', &
                                ' = ',i5,i3,i3,1x,2e13.5)
                      endif
 #endif
@@ -424,12 +425,12 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
                   nn=nn+1
 !
 !              ...copy the dof
-                  NODES(nod)%dof%zdofQ(ivar,j) = Zele(nn)
+                  NODES(nod)%dof%zdofQ(ivar,j,N_COMS) = Zele(nn)
 #if DEBUG_MODE
                   if (iprint.eq.1) then
                      write(*,7006) nn,load,Zele(nn)
-                     write(*,7011) nod,j,ivar,NODES(nod)%dof%zdofQ(ivar,j)
- 7011                format('solout: nod,j,ivar,NODES(nod)%dof%zdofQ(ivar,j)', &
+                     write(*,7011)   nod,j,ivar,NODES(nod)%dof%zdofQ(ivar,j,N_COMS)
+ 7011                format('solout: nod,j,ivar,NODES(nod)%dof%zdofQ(ivar,j,N_COMS)', &
                             ' = ',i5,i3,i3,1x,2e13.5)
                   endif
 #endif
@@ -457,4 +458,3 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
    endif
 !
 end subroutine solout
-

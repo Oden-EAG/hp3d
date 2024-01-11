@@ -1,5 +1,0 @@
-c  ...additional parameters for logicE:
-c     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      common /clogicE/ Ndof2E(20),
-     .                 NrconE(NDOFMAXE),NacE(NACDIM,NDOFMAXE),
-     .                 ConstrE(NACDIM,NDOFMAXE)

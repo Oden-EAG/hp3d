@@ -1,17 +1,14 @@
 !---------------------------------------------------------------------------------
-!> Purpose : Given order of an element middle node, determine the implied
-!            order for its edges and faces accounting for the orientation
-!            of the nodes
+!> @brief  Given order of an element middle node, determine the implied order for
+!!         its edges and faces accounting for the orientation of the nodes
 !!
+!! @param[in]  Mdle      - element middle node
+!! @param[in]  Norientl  - element nodes orientations
+!! @param[out] Norder    - order for the element nodes
 !!
-!! @param[in]  Mdle        - element middle node
-!! @param[in]  Norientl    - element nodes orientations
-!! @param[out] Norder      - order for the element nodes
-!!
-!! @revision Aug 17
+!! @date Feb 2023
 !---------------------------------------------------------------------------------
-!
-      subroutine element_order(Mdle,Norientl, Norder)
+subroutine element_order(Mdle,Norientl, Norder)
 !
       use element_data
       use data_structure3D
@@ -22,28 +19,27 @@
       integer, dimension(27), intent(in)  :: Norientl
       integer, dimension(19), intent(out) :: Norder
 !
-      character(len=4)           :: type
-      integer :: iprint,nord,nord1,nord2,nord3,norda,i,ie,if,nordh,nordv
+      integer :: ntype,iprint,nord,nord1,nord2,nord3,norda,i,ie,ifc,nordh,nordv
 !
       select case(Mdle)
-      case(469); iprint=0
-      case default; iprint=0
+         case(469)   ; iprint=0
+         case default; iprint=0
       end select
 !
-      type = NODES(Mdle)%type
+      ntype = NODES(Mdle)%ntype
       nord = NODES(Mdle)%order
 !
       if (iprint.eq.1) then
-        write(*,*) 'element_order: Mdle, type, nord = ', Mdle, type, nord
+        write(*,*) 'element_order: Mdle, type, nord = ', Mdle, S_Type(ntype), nord
       endif
-      select case(type)
 !
+      select case(ntype)
 !  ...tet
-      case('mdln')
+      case(MDLN)
         Norder(1:11) = nord
 !
 !  ...prism
-      case('mdlp')
+      case(MDLP)
         call decode(nord, nord1,nord2)
 !
 !  .....horizontal edges
@@ -70,7 +66,7 @@
         Norder(15) = nord
 !
 !  ...hexa
-      case('mdlb')
+      case(MDLB)
         call decode(nord, norda,nord3)
         call decode(norda, nord1,nord2)
 !
@@ -90,26 +86,26 @@
         enddo
 !
 !  .....loop through faces
-        do if=1,6
-          select case(if)
+        do ifc=1,6
+          select case(ifc)
           case(1,2); nordh=nord1; nordv=nord2
           case(3,5); nordh=nord1; nordv=nord3
           case(4,6); nordh=nord2; nordv=nord3
           end select
-          select case(Norientl(20+if))
+          select case(Norientl(20+ifc))
           case(0,2,5,7)
-            Norder(12+if) = nordh*10+nordv
+            Norder(12+ifc) = nordh*10+nordv
           case(1,3,4,6)
-            Norder(12+if) = nordv*10+nordh
+            Norder(12+ifc) = nordv*10+nordh
           case default
-            write(*,*) 'element_order: if,Norientl(20+if) = ',if,Norientl(20+if)
+            write(*,*) 'element_order: ifc,Norientl(20+ifc) = ',ifc,Norientl(20+ifc)
             stop 1
           end select
         enddo
         Norder(19) = nord
 !
 !  ...pyramid
-      case('mdld')
+      case(MDLD)
         Norder(1:8) = nord
         Norder(9) = nord*10+nord
         Norder(10:14) = nord
@@ -119,12 +115,11 @@
         call pause
       endif
 !
-!
-      end subroutine element_order
+end subroutine element_order
 !
 !---------------------------------------------------------------------------------
-!> Purpose : Given order of an element nodes, use the min rule in reverse to
-!            determine the necessary new order for the middle node
+!> @brief  Given order of an element nodes, use the min rule in reverse to
+!!         determine the necessary new order for the middle node
 !!
 !!
 !! @param[in]  Mdle        - element middle node
@@ -132,10 +127,9 @@
 !! @param[in]  Norder      - order for the element nodes
 !! @param[out] Nordm       - order for the middle node
 !!
-!! @revision Aug 17
+!! @date Feb 2023
 !---------------------------------------------------------------------------------
-!
-      subroutine element_middle_node_order(Mdle,Norientl,Norder, Nordm)
+subroutine element_middle_node_order(Mdle,Norientl,Norder, Nordm)
 !
       use element_data
       use data_structure3D
@@ -147,23 +141,22 @@
       integer, dimension(27), intent(in)  :: Norientl
       integer, dimension(19), intent(out) :: Norder
 !
-      character(len=4)           :: type
-      integer :: nord,nord1,nord2,nord3,norda,i,ie,if,nordh,nordv
+      integer :: ntype,nord,nord1,nord2,nord3,norda,i,ie,ifc,nordh,nordv
 !
-!
-      type = NODES(Mdle)%type
+      ntype = NODES(Mdle)%ntype
       nord = NODES(Mdle)%order
-      select case(type)
+!
+      select case(ntype)
 !
 !  ...tet
-      case('mdln')
+      case(MDLN)
         do i=1,10
           nord = max(nord,Norder(i))
         enddo
         Nordm = nord
 !
 !  ...prism
-      case('mdlp')
+      case(MDLP)
         call decode(nord, nord1,nord2)
 !
 !  .....horizontal edges
@@ -199,7 +192,7 @@
         Nordm = nord1*10+nord2
 !
 !  ...hexa
-      case('mdlb')
+      case(MDLB)
         call decode(nord, norda,nord3)
         call decode(norda, nord1,nord2)
 !
@@ -222,11 +215,11 @@
         enddo
 !
 !  .....loop through faces
-        do if=1,6
-          call decode(Norder(12+if), nordh,nordv)
-          select case(if)
+        do ifc=1,6
+          call decode(Norder(12+ifc), nordh,nordv)
+          select case(ifc)
           case(1,2)
-            select case(Norientl(20+if))
+            select case(Norientl(20+ifc))
             case(0,2,5,7)
               nord1 = max(nord1,nordh)
               nord2 = max(nord2,nordv)
@@ -235,7 +228,7 @@
               nord2 = max(nord2,nordh)
             end select
           case(3,5)
-            select case(Norientl(20+if))
+            select case(Norientl(20+ifc))
             case(0,2,5,7)
               nord1 = max(nord1,nordh)
               nord3 = max(nord3,nordv)
@@ -244,7 +237,7 @@
               nord3 = max(nord3,nordh)
             end select
           case(4,6)
-            select case(Norientl(20+if))
+            select case(Norientl(20+ifc))
             case(0,2,5,7)
               nord2 = max(nord2,nordh)
               nord3 = max(nord3,nordv)
@@ -257,7 +250,7 @@
         Nordm = nord1*100+nord2*10+nord3
 !
 !  ...pyramid
-      case('mdld')
+      case(MDLD)
         do i=1,8
           nord = max(nord,Norder(i))
         enddo
@@ -270,5 +263,4 @@
         Nordm = nord
       end select
 !
-!
-      end subroutine element_middle_node_order
+end subroutine element_middle_node_order

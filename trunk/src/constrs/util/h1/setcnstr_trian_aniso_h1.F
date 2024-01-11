@@ -1,21 +1,15 @@
 c----------------------------------------------------------------------
 c
-c   routine name       - setcnstr_trian_aniso
+c   routine name       - setcnstr_trian_aniso_h1
 c
 c----------------------------------------------------------------------
 c
-c   latest revision    - May 2020
+c   latest revision    - Feb 2023
 c
 c   purpose            - routine evaluates constraint coefficients for
 c                        the triangular master element
 c
-c   usage              - call setcnstrt
-c
-c   arguments          - none
-c
 c----------------------------------------------------------------------
-c
-      subroutine setcnstr_trian_aniso_h1(Iref)
 c
 c     'big' parent nodes
 c      *
@@ -80,25 +74,33 @@ c      *************************
 c
 c--------------------------------------------------------------------
 c
+      subroutine setcnstr_trian_aniso_h1(Iref)
+c
       use parameters
       use constraints
-#include "syscom.blk"
 c
-      dimension shapsma(MAXquadH,MAXquadH),
-     .          shapbig(MAXquadH,MAXquadH),
-     .          void(2,MAXquadH),ip(MAXquadH),
-     .          r(MAXquadH,MAXquadH),xibig(2),xisma(2)
+      implicit none
+c
+      integer, intent(in) :: Iref
+c
+      real(8) :: shapsma(MAXquadH,MAXquadH),
+     .           shapbig(MAXquadH,MAXquadH),
+     .           void(2,MAXquadH),
+     .           r(MAXquadH,MAXquadH),xibig(2),xisma(2)
+      integer :: ip(MAXquadH)
 c
 c  ...order and edge orientations
-      dimension norder(5),norient(4)
+      integer :: norder(5),norient(4)
 c
+      real(8) :: aux
+      integer :: i,ie,i1,i2,i1beg,ipp,jp,jpbeg,jpend,j,icl
+      integer :: n,na,nord,nrb,nrdof,nrs,info
+c
+#if DEBUG_MODE
+      integer :: iprint
       iprint = 0
+#endif
 c
-      if (MAXP.ne.MAXP) then
-        write(*,7005) MAXP,MAXP
- 7005   format('setcnstrt: INCONSISTENT MAXP,MAXP = ',2i3)
-        stop 1
-      endif
       nord = MAXP
 c
 c  ...set uniform order MAXP:
@@ -124,13 +126,13 @@ c
 c  .......find small shape functions at this point:
 c          call shapeHq(xisma,norder(1:5),norient(1:4),
 c     .                 nrdof,shapsma(1:MAXquadH,icl),void)
-          call shape2DH('quad',xisma,norder,norient,
+          call shape2DH(QUAD,xisma,norder,norient,
      .                  nrdof,shapsma(:,icl),void)
 c
 c  .......find big shape functions at this point:
 c          call shapeHt(xibig,norder(1:4),norient(1:3),
 c     .                 nrdof,shapbig(1:MAXtriaH,icl),void)
-          call shape2DH('tria',xibig,norder,norient,
+          call shape2DH(TRIA,xibig,norder,norient,
      .                  nrdof,shapbig(:,icl),void)
         enddo
       enddo
@@ -150,16 +152,18 @@ c
 c
       n = (nord+1)**2
       na = MAXquadH + 1
+#if DEBUG_MODE
       if (iprint.eq.1) then
-        write(*,*) 'setcnstr_trian: shapsma COLUMNWISE ....'
+        write(*,*) 'setcnstr_trian_aniso_h1: shapsma COLUMNWISE ....'
         do i=1,n
           write(*,7004) i
- 7004     format('setcnstr_trian: i = ',i2)
+ 7004     format('setcnstr_trian_aniso_h1: i = ',i2)
           write(*,7003) shapsma(1:n,i)
  7003     format(10e12.5)
         enddo
         call pause
       endif
+#endif
 ccc      call decomp(n,na,shapsma,ip,iflag)
 cccc
 ccc      if (iflag.ne.0) then
@@ -169,16 +173,19 @@ ccc      endif
 cccc
 ccc      do i = 1,n
 ccc        call gauss2(n,na,shapsma,ip,shapbig(1:n,i), r(1:n,i))
+ccc#if DEBUG_MODE
 ccc        if (iprint.eq.1) then
 ccc          write(*,*) 'setcnstr_trian: r FOR i = ',i
 ccc          write(*,7003) r(1:n,i)
 ccc        endif
+ccc#endif
 ccc      enddo
 
 c  ...decompose the matrix
       call dgetrf(n,n,shapsma,MAXquadH,ip,info)
       if (info.ne.0) then
-        write(*,*)'setcnstr_trian_aniso: H1 DGETRF RETURNED INFO =',info
+        write(*,*)'setcnstr_trian_aniso_h1: H1 DGETRF RETURNED INFO =',
+     .             info
         call logic_error(FAILURE,
      .  __FILE__,__LINE__)
       endif
@@ -254,8 +261,8 @@ c  .............constrained dof is
 ccc              if (abs(get_rrqh(Iref, n, ipp,jp,j)).gt.1.d-12) then
                 if (abs(RRQH(Iref,ipp,jp,j)).gt.1.d-12) then
                   write(*,7001) n,ipp,jp,i1,i2,RRQH(Iref,ipp,jp,j)
- 7001             format('setcnstr_trian_aniso: n,ipp,jp,i1,i2,RRQH = ',
-     .                    5i3,2x,e12.5)
+ 7001             format('setcnstr_trian_aniso_h1: ',
+     .                  /'n,ipp,jp,i1,i2,RRQH = ',5i3,2x,e12.5)
                   stop 1
                 endif
                 RRQH(Iref,ipp,jp,j) = 0.d0
@@ -265,9 +272,6 @@ ccc              if (abs(get_rrqh(Iref, n, ipp,jp,j)).gt.1.d-12) then
         enddo
       enddo
 c
-ccc      call test_trian_aniso(Iref)
+ccc      call test_trian_aniso_h1(Iref)
 c
-      end
-
-
-
+      end subroutine setcnstr_trian_aniso_h1

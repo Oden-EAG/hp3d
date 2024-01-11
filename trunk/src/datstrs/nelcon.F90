@@ -4,7 +4,7 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - Dec 07
+!   latest revision    - Feb 2023
 !
 !   purpose            - routine enables the natural order of elements
 !
@@ -22,7 +22,17 @@ subroutine nelcon(Mdle0, Mdle1)
       use data_structure3D
       use refinements
 !
+      implicit none
+!
+      integer, intent(in)  :: Mdle0
+      integer, intent(out) :: Mdle1
+!
+      integer :: mdle,nfath,nrbros,noson
+!
+#if DEBUG_MODE
+      integer :: iprint
       iprint=0
+#endif
 !
       mdle = Mdle0
 !
@@ -45,14 +55,17 @@ subroutine nelcon(Mdle0, Mdle1)
       else
 !
 !  .....find the son number in the family
-        call nr_mdle_sons(NODES(nfath)%type,NODES(nfath)%ref_kind,nrbros)
+        call nr_mdle_sons(NODES(nfath)%ntype,NODES(nfath)%ref_kind,nrbros)
 !        call locate(mdle,NODES(nfath)%sons,nrbros, noson)
         noson = mdle - NODES(nfath)%first_son + 1
 !        if (noson<0 .or. noson>nrbros) call pause
+!
+#if DEBUG_MODE
         if (iprint.eq.1) then
           write(*,7002) mdle,nfath,nrbros,noson
  7002     format('nelcon: mdle,nfath,nrbros,noson = ',2i7,2i3)
         endif
+#endif
 !
 !  .....if mdle is not the last son in the family, go to the next brother
         if (noson.lt.nrbros) then
@@ -76,51 +89,51 @@ subroutine nelcon(Mdle0, Mdle1)
       Mdle1 = mdle
 !
 !
+#if DEBUG_MODE
       if (iprint.eq.1) then
         write(*,7010) Mdle0,Mdle1
  7010   format('nelcon: Mdle0,Mdle1 = ',2i7)
       endif
+#endif
 !
 end subroutine nelcon
 
 
-!cccc      I like this routine more
-!C$$$      subroutine nelcon(Mdle, Mdle_next)
-!C$$$      integer, intent(in)  :: Mdle
-!C$$$      integer, intent(out) :: Mdle_next
+!! Alternate routine
+!      subroutine nelcon(Mdle, Mdle_next)
+!      integer, intent(in)  :: Mdle
+!      integer, intent(out) :: Mdle_next
 !
-!C$$$! Step 0 : if Mdle = 0, set Mdle as the first element. Then start from Step 2.
-!C$$$      iflag = 1;
-!C$$$      if (Mdle.eq.0) then
-!C$$$        Mdle = 1; iflag = 0;
-!C$$$      end if
+!! Step 0 : if Mdle = 0, set Mdle as the first element. Then start from Step 2.
+!      iflag = 1;
+!      if (Mdle.eq.0) then
+!        Mdle = 1; iflag = 0;
+!      end if
 !
-!C$$$! Step 1 : move right on the brothers' list until it meet a node that is not
-!C$$$      a middle node.
-!C$$$      do while ( true.and.iflag )
-!C$$$        father = Mdle->father
-!C$$$        if (father.lt.0) then   ! if Mdle is initial mesh element
-!C$$$          Mdle = Mdle + 1       ! move to the right
-!C$$$          exit                  ! loop exit
-!C$$$        else
-!C$$$          ison  = locate(Mdle, father->sons) ! otherwise, find next brother
-!C$$$          nbros = nr_midle_sons(Mdle)
-!C$$$          if (ison.lt.nbros) then ! if next brother is middle node
-!C$$$            Mdle = father->sons( ison + 1 ) ! Mdle = next brother
-!C$$$            exit                ! loop exit
-!C$$$          end if
-!C$$$        end if
-!C$$$        Mdle = father           ! move up on the tree
-!C$$$      end if
+!! Step 1 : move right on the brothers' list until it meet a node that is not
+!      a middle node.
+!      do while ( true.and.iflag )
+!        father = Mdle->father
+!        if (father.lt.0) then   ! if Mdle is initial mesh element
+!          Mdle = Mdle + 1       ! move to the right
+!          exit                  ! loop exit
+!        else
+!          ison  = locate(Mdle, father->sons) ! otherwise, find next brother
+!          nbros = nr_midle_sons(Mdle)
+!          if (ison.lt.nbros) then ! if next brother is middle node
+!            Mdle = father->sons( ison + 1 ) ! Mdle = next brother
+!            exit                ! loop exit
+!          end if
+!        end if
+!        Mdle = father           ! move up on the tree
+!      end if
 !
-!C$$$! Step 2 : move down to first son until it reach the leaf level middle node.
-!C$$$      do while ( .not.Is_leaf(Mdle) )
-!C$$$        Mdle = Mdle->sons( 1 )
-!C$$$      end do
+!! Step 2 : move down to first son until it reach the leaf level middle node.
+!      do while ( .not.Is_leaf(Mdle) )
+!        Mdle = Mdle->sons( 1 )
+!      end do
 !
-!C$$$! Assign next middle node
-!C$$$      Mdle_next = Mdle
+!! Assign next middle node
+!      Mdle_next = Mdle
 !
-!C$$$      end subroutine nelcon
-
-
+!      end subroutine nelcon

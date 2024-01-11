@@ -43,23 +43,23 @@ subroutine elem_residual(Mdle, Resid,Nref_flag)
    integer :: norder(19),norderP(19),nordP
 !
 !..element type
-   character(len=4) :: etype
+   integer :: etype
 !
 !---------------------------------------------------------------------
 !
    norder (1:19) = 0
    norderP(1:19) = 0
 !
-   etype = NODES(Mdle)%type
+   etype = NODES(Mdle)%ntype
 !..determine order of approximation
    call find_order(Mdle, norder)
 !..set the enriched order of appoximation
    select case(etype)
-      case('mdlb')
+      case(MDLB)
          nordP = NODES(Mdle)%order+NORD_ADD*111
-      case('mdlp')
+      case(MDLP)
          nordP = NODES(Mdle)%order+NORD_ADD*11
-      case('mdln','mdld')
+      case(MDLN,MDLD)
          nordP = NODES(Mdle)%order+NORD_ADD
       case default
          write(*,*) 'elem_residual: invalid etype param. stop.'
@@ -126,7 +126,7 @@ subroutine elem_residual_poisson(Mdle,                &
    integer, intent(out) :: Nref_flag
 !
 !..declare edge/face type variables
-   character(len=4) :: etype,ftype
+   integer :: etype,ftype
 !
 !..element order, orientation for edges and faces
    integer :: norder(19), norient_edge(12), norient_face(6)
@@ -184,7 +184,7 @@ subroutine elem_residual_poisson(Mdle,                &
    integer :: nordP, nrdof, nsign, ifc, info
 !
 #if DEBUG_MODE
-   integer :: iprint = 0
+   integer :: iprint
 #endif
 !
 !..for Gram matrix compressed storage format
@@ -193,8 +193,12 @@ subroutine elem_residual_poisson(Mdle,                &
 !
 !-----------------------------------------------------------------------
 !
+#if DEBUG_MODE
+   iprint=0
+#endif
+!
 !..element type
-   etype = NODES(Mdle)%type
+   etype = NODES(Mdle)%ntype
    nrf = nface(etype)
 !
 !..determine order of approximation
@@ -202,9 +206,9 @@ subroutine elem_residual_poisson(Mdle,                &
 !
 !  ...set the enriched order of approximation
    select case(etype)
-      case('mdlb'); nordP = NODES(Mdle)%order+NORD_ADD*111
-      case('mdln','mdld'); nordP = NODES(Mdle)%order+NORD_ADD
-      case('mdlp'); nordP = NODES(Mdle)%order+NORD_ADD*11
+      case(MDLB)     ; nordP = NODES(Mdle)%order+NORD_ADD*111
+      case(MDLP)     ; nordP = NODES(Mdle)%order+NORD_ADD*11
+      case(MDLN,MDLD); nordP = NODES(Mdle)%order+NORD_ADD
    end select
 !
 !..determine edge and face orientations

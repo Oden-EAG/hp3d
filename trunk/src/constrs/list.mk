@@ -1,11 +1,11 @@
 celem_system.F90
 celem_systemI.F90
-flag_constr_parents.F
+flag_constr_parents.F90
 get_connect_info.F
 logic.F
 logic_nodes.F
 nodcor.F90
 nodcor_vert.F90
-solelm.F
-solelmI.F
+solelm.F90
+solelmI.F90
 0

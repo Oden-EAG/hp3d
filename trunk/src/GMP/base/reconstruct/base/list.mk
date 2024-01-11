@@ -1,6 +1,0 @@
-check_edge.F
-reconstruct_curve.F
-reconstruct_normal.F
-reconstruct_sharp_edge_curve.F
-set_sharp_edge_bundle.F
-0
