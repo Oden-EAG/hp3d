@@ -42,10 +42,6 @@ subroutine exec_job_nl
       write(*,*) 'NEXACT must be 0 for nonlinear Maxwell problem. stop.'
       stop
    endif
-   if(PLANE_PUMP.ne.0) then
-      write(*,*) 'exec_job_nl script not yet set up for PLANE_PUMP. stop.'
-      stop
-   endif
 !
 !..Initiate pump field ODE solution
    if(PLANE_PUMP.eq.2) then
@@ -59,7 +55,7 @@ subroutine exec_job_nl
    call set_physAm(NO_PROBLEM, physNick,flag)
 !
 !..set .true. to compute the residual in all steps
-   ires = .true.
+   ires = .false.
 !
    if (RANK.eq.ROOT) then
       write(*,*) '====================='
