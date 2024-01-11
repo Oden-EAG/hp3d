@@ -264,7 +264,7 @@ subroutine compute_gain(ZValues,Num_zpts,Fld, Gain)
    integer :: iel, i, ndom
 !
 !..element type
-   character(len=4) :: etype
+   integer :: etype
 !
 !..face number over which power is computed
 !  (in brick and prism, face 2 is face normal to xi3, at xi3=1)
@@ -305,12 +305,12 @@ subroutine compute_gain(ZValues,Num_zpts,Fld, Gain)
          if (ndom.ne.1 .and. ndom.ne.2) cycle
       endif
       call nodcor_vert(mdle, xnod)
-      etype = NODES(Mdle)%type
+      etype = NODES(Mdle)%ntype
       select case(etype)
-         case('mdlb')
+         case(MDLB)
             maxz = maxval(xnod(3,1:8))
             minz = minval(xnod(3,1:8))
-         case('mdlp')
+         case(MDLP)
             maxz = maxval(xnod(3,1:6))
             minz = minval(xnod(3,1:6))
          case default
@@ -390,7 +390,7 @@ subroutine compute_faceGain(Mdle,Facenumber,Fld, FaceGain)
    integer :: nrv, nre, nrf
 !
 !..declare edge/face type varibles
-   character(len=4) :: etype,ftype
+   integer :: etype,ftype
 !
 !..variables for geometry
    real(8), dimension(3)   :: xi,x,rn,x_new
@@ -458,17 +458,17 @@ subroutine compute_faceGain(Mdle,Facenumber,Fld, FaceGain)
 !
    nflag = 1
 !..element type
-   etype = NODES(Mdle)%type
+   etype = NODES(Mdle)%ntype
    nrv = nvert(etype); nre = nedge(etype); nrf = nface(etype)
    call find_order(Mdle, norder)
    call find_orient(Mdle, nedge_orient,nface_orient)
    call nodcor(mdle, xnod)
    !..determine z-coordinate inside the element
    select case(etype)
-      case('mdlb')
+      case(MDLB)
          maxz = maxval(xnod(3,1:8))
          minz = minval(xnod(3,1:8))
-      case('mdlp')
+      case(MDLP)
          maxz = maxval(xnod(3,1:6))
          minz = minval(xnod(3,1:6))
       case default
