@@ -127,14 +127,6 @@ subroutine get_index(Nod, Indexd)
 !              ...loop through components
                   do ivar=1,NR_COMP(iphys)
                      ic=ic+1
-!                      select case(ibcd(ic))
-! !
-! !                    ...free L2 component
-!                         case(0); Indexd(ic)=8
-! !
-! !                    ...component known from Dirichlet BC
-!                         case(1); Indexd(ic)=7
-!                      end select
                      Indexd(ic)=8
                   enddo
             end select
