@@ -155,12 +155,13 @@ end subroutine get_bgPol
 !           Dom_flag - 1 for core, 0 for cladding
 !           Fld_flag - 1 for signal, 0 for pump
 !           Delta_n  - thermally induced refractive index perturbation
+!           Coord_z  - Element z-coordinate in physical coordinates
 !
 ! output:
 !           active_pol - value of active polarization
 !
 !-------------------------------------------------------------------------------
-subroutine get_activePol(ZsolQ,Fld_flag,Delta_n, Active_pol)
+subroutine get_activePol(ZsolQ,Fld_flag,Delta_n,Coord_z, Active_pol)
 !
    use commonParam
    use laserParam
@@ -170,11 +171,13 @@ subroutine get_activePol(ZsolQ,Fld_flag,Delta_n, Active_pol)
    VTYPE  , intent(in)  :: ZsolQ(12)
    integer, intent(in)  :: Fld_flag
    real(8), intent(in)  :: Delta_n
+   real(8), intent(in)  :: Coord_z
    VTYPE  , intent(out) :: Active_pol(3,3)
 !
    VTYPE, dimension(3) :: Es,Hs,Ep,Hp,ETimesHs,ETimesHp
 !
-   real(8) :: eta,Nex,Ngd,sum1,sum2,Is,Ip,Pp,g0,gain_ampl
+   integer :: jz,numPts
+   real(8) :: eta,sum1,sum2,Is,Ip,g0,dz
    VTYPE   :: gain
 !
 !-------------------------------------------------------------------------------
@@ -191,14 +194,15 @@ subroutine get_activePol(ZsolQ,Fld_flag,Delta_n, Active_pol)
 !
 !..compute pump irradiance
    Ip = 0.d0
-   if (FAKE_PUMP .eq. 1) then
-!     set fake pump power the same here and in thermal polarization computation
-!  ...either assume pump is a plane wave in fiber core (core-pumped)
-      Pp = 100.d0 ! set non-dimensional core pump power (scaled by I_0*L_0*L_0)
-      Ip = Pp / (PI*R_CORE*R_CORE) ! calculate non-dimensional irradiance
-!  ...or assume pump is a plane wave in fiber cladding (cladding-pumped)
-      !Pp = 1000.d0 ! set non-dimensional clad pump power (scaled by I_0*L_0*L_0)
-      !Ip = Pp / (PI*R_CLAD*R_CLAD) ! calculate non-dimensional irradiance
+   if (PLANE_PUMP .eq. 1) then
+!     set plane pump power the same here and in thermal polarization computation
+!  ...assume pump is a plane wave in fiber cladding (cladding-pumped)
+      Ip = PLANE_PUMP_POWER / (PI*R_CLAD*R_CLAD) ! calculate non-dimensional irradiance
+   elseif (PLANE_PUMP .eq. 2) then
+      numPts = size(PUMP_VAL)
+      dz = ZL / numPts
+      jz = min(INT(Coord_z/dz), numPts-1) + 1
+      Ip = PUMP_VAL(jz) / (PI*R_CLAD*R_CLAD) ! calculate non-dimensional irradiance
    else
       call zz_cross_product(Ep,conjg(Hp), ETimesHp)
       Ip = sqrt(real(EtimesHp(1))**2+real(EtimesHp(2))**2+real(EtimesHp(3))**2)

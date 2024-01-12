@@ -42,9 +42,11 @@ subroutine exec_job_nl
       write(*,*) 'NEXACT must be 0 for nonlinear Maxwell problem. stop.'
       stop
    endif
-   if(FAKE_PUMP.eq.1) then
-      write(*,*) 'exec_job_nl script not yet set up for FAKE_PUMP=1. stop.'
-      stop
+!
+!..Initiate pump field ODE solution
+   if(PLANE_PUMP.eq.2) then
+      numPts = 2**IMAX
+      call pump_ode_alloc(numPts)
    endif
 !
    EXCHANGE_DOF = .false.
@@ -53,9 +55,9 @@ subroutine exec_job_nl
    call set_physAm(NO_PROBLEM, physNick,flag)
 !
 !..set .true. to compute the residual in all steps
-   ires = .true.
+   ires = .false.
 !
-   if(RANK .eq. ROOT) then
+   if (RANK.eq.ROOT) then
       write(*,*) '====================='
       write(*,*) 'exec_job_nl: starting'
       write(*,*) '====================='
@@ -152,14 +154,18 @@ subroutine exec_job_nl
    call update_gdof
 !
 !..update Dirichlet DOFs for signal field
+   if (RANK.eq.ROOT) write(*,4200) ' Updating signal Dirichlet DOFs...'
    NO_PROBLEM = 3
    call set_physAm(NO_PROBLEM, physNick,flag)
    call update_Ddof
 !
 !..update Dirichlet DOFs for pump field
-   NO_PROBLEM = 4
-   call set_physAm(NO_PROBLEM, physNick,flag)
-   call update_Ddof
+   if (PLANE_PUMP.eq.0) then
+      if (RANK.eq.ROOT) write(*,4200) ' Updating pump Dirichlet DOFs...'
+      NO_PROBLEM = 4
+      call set_physAm(NO_PROBLEM, physNick,flag)
+      call update_Ddof
+   endif
 !
 !..set stopping criterion for nonlinear iteration
    stopEpsilon = 1.0d-4
@@ -169,7 +175,6 @@ subroutine exec_job_nl
 !
    SignalRes = 0.d0
    PumpRes = 0.d0
-   i = 0
 !
 !..set attributes for norm of signal difference
    currAttr = 5 ! signal field, current solution
@@ -178,6 +183,8 @@ subroutine exec_job_nl
    if (RANK.eq.ROOT) write(*,200) '6. Beginning nonlinear iterations...'
  4200 format(/,A)
  4201 format(A,/)
+!
+   i = 0
 !
 !..do until stopping criterion is satisfied
    do
@@ -239,6 +246,16 @@ subroutine exec_job_nl
          QUIET_MODE = .false.; IPRINT_TIME = 1
       endif
 !
+!  ...if assuming a pump plane wave, skip the pump field computation
+      if (PLANE_PUMP.eq.1) then
+         if (RANK.eq.ROOT) write(*,*) '   Assuming constant pump plane wave...'
+         goto 410
+      elseif (PLANE_PUMP.eq.2) then
+         if (RANK.eq.ROOT) write(*,*) '   Computing pump plane wave solution by ODE model...'
+         call pump_ode_solve
+         goto 410
+      endif
+!
 !  ...next solve for pump
       if (RANK.eq.ROOT) write(*,4200) '   Pump solve..'
       NO_PROBLEM = 4
@@ -264,6 +281,8 @@ subroutine exec_job_nl
          QUIET_MODE = .false.; IPRINT_TIME = 1
       endif
 !
+  410 continue
+!
 !  ...calculate norm corresponding to signal
       NO_PROBLEM = 3
       call set_physAm(NO_PROBLEM, physNick,flag)
@@ -272,8 +291,8 @@ subroutine exec_job_nl
          call get_L2NormAttr(prevAttr, fieldNormQ)
       endif
       if (RANK.eq.ROOT) write(*,4240) '   L2NormDiff = ', L2NormDiff
-      if (RANK.eq.ROOT) write(*,4240) '   fieldNormQ = ', fieldNormQ
-  4240 format(A,F10.4)
+      if (RANK.eq.ROOT) write(*,4240) '   FieldNormQ = ', fieldNormQ
+ 4240 format(A,F10.4)
 !
 !  ...copy current solution components of all fields into previous solution
       if (RANK.eq.ROOT) write(*,4200) 'copy_attr...'
@@ -291,11 +310,13 @@ subroutine exec_job_nl
 !
 !..compute final residual values (if not previously computed)
    if (.not. ires) then
-      QUIET_MODE = .true.; IPRINT_TIME = 0
-      if (RANK.eq.ROOT) write(*,4200) '   Pump residual:'
-      NO_PROBLEM = 4
-      call set_physAm(NO_PROBLEM, physNick,flag)
-      call residual(PumpRes(i))
+      if (PLANE_PUMP.eq.0) then
+         QUIET_MODE = .true.; IPRINT_TIME = 0
+         if (RANK.eq.ROOT) write(*,4200) '   Pump residual:'
+         NO_PROBLEM = 4
+         call set_physAm(NO_PROBLEM, physNick,flag)
+         call residual(PumpRes(i))
+      endif
 !
       if (RANK.eq.ROOT) write(*,4200) '   Signal residual:'
       NO_PROBLEM = 3
@@ -306,7 +327,7 @@ subroutine exec_job_nl
 !
 !..display stats
    if (RANK.eq.ROOT) then
-      write(*,*) 'L2NormDiff/fieldNormQ:'
+      write(*,*) 'L2NormDiff/FieldNormQ:'
       do j=1,i
          write(*,4241) L2NormDiffIter(j)
       enddo
@@ -315,10 +336,12 @@ subroutine exec_job_nl
          do j=1,i
             write(*,4241) SignalRes(j)
          enddo
-         write(*,*) 'Pump Residuals:'
-         do j=1,i
-            write(*,4241) PumpRes(j)
-         enddo
+         if (PLANE_PUMP.eq.0) then
+            write(*,*) 'Pump Residuals:'
+            do j=1,i
+               write(*,4241) PumpRes(j)
+            enddo
+         endif
       endif
  4241 format(es14.5)
    endif
@@ -326,6 +349,7 @@ subroutine exec_job_nl
 !..compute power in fiber for signal and pump field
    if (RANK.eq.ROOT) write(*,200) '7. computing power...'
    numPts = 2**IMAX; fld = 2
+   if (PLANE_PUMP.eq.1) fld = 1
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); start_time = MPI_Wtime()
    !call get_power(fld,numPts,-1) ! write to stdout
    call get_power(fld,numPts,0) ! write to file
@@ -341,6 +365,7 @@ subroutine exec_job_nl
    call MPI_BARRIER (MPI_COMM_WORLD, ierr); end_time   = MPI_Wtime()
    if (RANK .eq. ROOT) write(*,300) end_time - start_time
 !
+   if (PLANE_PUMP.eq.2) call pump_ode_dealloc
 !
   100 format(/,'/////////////////////////////////////////////////////////////', &
              /,'             ',A,I2,/)

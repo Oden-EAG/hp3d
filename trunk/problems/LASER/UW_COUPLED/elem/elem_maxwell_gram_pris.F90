@@ -104,7 +104,7 @@
 !
 !..various variables for the problem
    real(8) :: h_elem,rjac,weight,wa,v2n,CC,EE,CE,E,EC,q,h,omeg,alpha_scale
-   real(8) :: bjac
+   real(8) :: bjac,minz,maxz,elem_z
    integer :: i1,j1,i2,j2
    integer :: i12,j12,k12,k1,k2,fa,fb,i3mod,j3mod,kH,kk,i,ik,j,k,l,nint,kE,n,m,p,pe
    integer :: iflag,iprint,itime,iverb
@@ -252,6 +252,20 @@
 !
 !..determine nodes coordinates
    call nodcor(Mdle, xnod)
+!
+!..determine z-coordinate inside the element
+   select case(etype)
+      case(MDLB)
+         maxz = maxval(xnod(3,1:8))
+         minz = minval(xnod(3,1:8))
+      case(MDLP)
+         maxz = maxval(xnod(3,1:6))
+         minz = minval(xnod(3,1:6))
+      case default
+         write(*,*) 'elem_maxwell_gram_pris: unexpected etype=',etype,'. stop.'
+         stop
+   end select
+   elem_z = (minz + maxz) / 2.d0
 !
 !..clear space for Gram matrix
    GramP = ZERO
@@ -464,7 +478,7 @@
                ) goto 190
             if (ACTIVE_GAIN .gt. 0.d0) then
                if (dom_flag .eq. 1) then ! .and. x(3).le.PML_REGION) then
-                  call get_activePol(zsolQ_soleval(1:12),Fld_flag,delta_n, gain_pol)
+                  call get_activePol(zsolQ_soleval(1:12),Fld_flag,delta_n,elem_z, gain_pol)
                endif
             endif
             if (RAMAN_GAIN .gt. 0.d0) then
