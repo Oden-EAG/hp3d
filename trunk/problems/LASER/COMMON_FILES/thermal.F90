@@ -254,11 +254,13 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp,PeakTemp)
    if (.not. DISTRIBUTED .or. HOST_MESH) goto 50
    count = NumPts
    if (RANK .eq. ROOT) then
-      call MPI_REDUCE(MPI_IN_PLACE,coreTemp,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE,CoreTemp,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE(MPI_IN_PLACE,coreVol ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE,PeakTemp,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
    else
-      call MPI_REDUCE(coreTemp,coreTemp,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(CoreTemp,CoreTemp,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
       call MPI_REDUCE(coreVol ,coreVol ,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
+      call MPI_REDUCE(PeakTemp,PeakTemp,count,MPI_REAL8,MPI_SUM,ROOT,MPI_COMM_WORLD,ierr)
    endif
    50 continue
 !

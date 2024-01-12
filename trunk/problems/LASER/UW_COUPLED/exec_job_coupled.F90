@@ -348,7 +348,7 @@ subroutine exec_job_coupled
             call get_L2NormAttr(prevAttr, fieldNormQ)
          endif
          if (RANK.eq.ROOT) write(*,4240) '   L2NormDiff = ', L2NormDiff
-         if (RANK.eq.ROOT) write(*,4240) '   fieldNormQ = ', fieldNormQ
+         if (RANK.eq.ROOT) write(*,4240) '   FieldNormQ = ', fieldNormQ
   4240   format(A,F10.4)
 !
 !     ...copy current solution components of all fields into previous solution
@@ -410,7 +410,7 @@ subroutine exec_job_coupled
 !
 !..display stats
    if (RANK.eq.ROOT) then
-      write(*,*) 'L2NormDiff/fieldNormQ:'
+      write(*,*) 'L2NormDiff/FieldNormQ:'
       do j=1,i
          write(*,4241) L2NormDiffIter(j)
  4241    format(es14.5)
