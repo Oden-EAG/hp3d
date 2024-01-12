@@ -46,10 +46,10 @@
 #SBATCH -p development     # Queue (partition) name
 #SBATCH -N 16              # Total # of nodes
 #SBATCH -n 64              # Total # of mpi tasks
-#SBATCH -t 02:00:00        # Run time (hh:mm:ss)
+#SBATCH -t 01:00:00        # Run time (hh:mm:ss)
 #SBATCH --mail-user=stefan@oden.utexas.edu
 #SBATCH --mail-type=all    # Send email at begin and end of job
-#SBATCH -A FTA-SUB-Ghattas # Allocation name (req'd if you have more than 1)
+#SBATCH -A DMS22025        # Allocation name (req'd if you have more than 1)
 
 # Other commands must follow all #SBATCH directives...
 
@@ -61,14 +61,18 @@ date
 nthreads=14
 #
 # set OpenMP stack size
-export KMP_STACKSIZE=24M   # p=3
+export KMP_STACKSIZE=24M   # p=6
+#export KMP_STACKSIZE=48M   # p=7
 #
 # Fix Intel18 OMP issue
 export KMP_INIT_AT_FORK=FALSE
 
+# weight for l2 term in test norm
+alpha=1.0d-4
+
 # Set up envelope formulation:
 envelope=true
-envelope_config=2
+envelope_config=3
 # envelope configs:
 #   #1
 #   assuming wavenum_signal=85.0d0
@@ -118,17 +122,17 @@ if [ "$envelope_config" = 1 ] ; then
    #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_650'
    #
    # 16 NODES
-   #  1300_0 (1.25cm = 17000 wavelengths), 9 refs (16*  512 elems), 126000 nodes
+   #  1300_0 (1.25cm = 17,000 wavelengths), 9 refs (16*  512 elems), 126000 nodes
    #zl=1300.0d0; pmlfrac=0.03125d0; imax=9; maxnods=126000
    #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_1300'
    #
    # 32 NODES
-   #  2600_0 (2.5cm = 34000 wavelengths), 10 refs (16*  1024 elems), 251000 nodes
+   #  2600_0 (2.5cm = 34,000 wavelengths), 10 refs (16*  1024 elems), 251000 nodes
    zl=2600.0d0; pmlfrac=0.015625d0; imax=10; maxnods=251000
    file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_2600'
    #
    # 64 NODES
-   #  5100_0 (5.0cm = 68000 wavelengths), 11 refs (16*  2048 elems), 501000 nodes
+   #  5100_0 (5.0cm = 68,000 wavelengths), 11 refs (16*  2048 elems), 501000 nodes
    #zl=5100.0d0; pmlfrac=7.8125d-3; imax=11; maxnods=501000
    #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_5100'
    #
@@ -160,17 +164,17 @@ if [ "$envelope_config" = 2 ] ; then
    #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_800'
    #
    # 4 NODES
-   #  L=1500 (1.25 cm = 17000 wavelengths), 7 refs (16*  128 elems), 32000 nodes
+   #  L=1500 (1.25 cm = 17,000 wavelengths), 7 refs (16*  128 elems), 32000 nodes
    #zl=1500.0d0; pmlfrac=0.125d0; imax=7; maxnods=32000
    #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_1500'
    #
    # 8 NODES
-   #  L=2750 (2.5 cm = 34000 wavelengths), 8 refs (16*  256 elems),63000 nodes
-   zl=2750.0d0; pmlfrac=0.0625d0; imax=8; maxnods=63000
-   file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_2750'
+   #  L=2750 (2.5 cm = 34,000 wavelengths), 8 refs (16*  256 elems), 63000 nodes
+   #zl=2750.0d0; pmlfrac=0.0625d0; imax=8; maxnods=63000
+   #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_2750'
    #
    # 16 NODES
-   #  L=5250 (5 cm = 68000 wavelengths), 9 refs (16*  512 elems), 126000 nodes
+   #  L=5250 (5 cm = 68,000 wavelengths), 9 refs (16*  512 elems), 126000 nodes
    #zl=5250.0d0; pmlfrac=0.03125d0; imax=9; maxnods=126000
    #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_5250'
    #
@@ -181,8 +185,8 @@ if [ "$envelope_config" = 2 ] ; then
    #
    # 64 NODES
    #  L=20250 (20 cm = 272,000 wavelengths), 11 refs (16*  2048 elems), 501000 nodes
-   #zl=20250.0d0; pmlfrac=7.8125d-3; imax=11; maxnods=501000
-   #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_20250'
+   zl=20250.0d0; pmlfrac=7.8125d-3; imax=11; maxnods=501000
+   file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_20250'
    #
    # 128 NODES
    #  L=40250 (40 cm = 544,000 wavelengths), 12 refs (16*  4096 elems), 1001000 nodes
@@ -198,6 +202,50 @@ if [ "$envelope_config" = 2 ] ; then
    #  L=160250 (160 cm = 2,176,000 wavelengths), 14 refs (16*  16384 elems), 4001000 nodes
    #zl=160250.0d0; pmlfrac=9.765625d-4; imax=14; maxnods=4001000
    #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_160250'
+fi
+
+# NOTE: p=666 appears too low for longer than 40 cm fibers
+#       p=777 needs twice the number nodes
+if [ "$envelope_config" = 3 ] ; then
+   # 4 NODES
+   #  L=3000 (2 cm = 27,000 wavelengths), 7 refs (16*  128 elems), 32000 nodes
+   #zl=3000.0d0; pmlfrac=0.25d0; imax=7; maxnods=32000
+   #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_3000'
+   #
+   # 8 NODES
+   #  L=6000 (5 cm = 68,000 wavelengths), 8 refs (16*  256 elems), 63000 nodes
+   #zl=6000.0d0; pmlfrac=0.125d0; imax=8; maxnods=63000
+   #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_6000'
+   #
+   # 16 NODES
+   #  L=11000 (10 cm = 136,000 wavelengths), 9 refs (16*  512 elems), 126000 nodes
+   zl=11000.0d0; pmlfrac=0.0625d0; imax=9; maxnods=126000
+   file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_11000'
+   #
+   # 32 NODES p=666 | 64 NODES p=777
+   #  L=21000 (20 cm = 272,000 wavelengths), 10 refs (16*  1024 elems), 251000 nodes
+   #zl=21000.0d0; pmlfrac=0.03125d0; imax=10; maxnods=251000
+   #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_21000'
+   #
+   # 64 NODES p=666 | 128 NODES p=777
+   #  L=41000 (40 cm = 544,000 wavelengths), 11 refs (16*  2048 elems), 501000 nodes
+   #zl=41000.0d0; pmlfrac=0.015625d0; imax=11; maxnods=501000
+   #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_41000'
+   #
+   # 128 NODES p=666 | 256 NODES p=777
+   #  L=81000 (80 cm = 1,088,000 wavelengths), 12 refs (16*  4096 elems), 1001000 nodes
+   #zl=81000.0d0; pmlfrac=7.8125d-3; imax=12; maxnods=1001000
+   #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_81000'
+   #
+   # 256 NODES p=666 | 512 NODES p=777
+   #  L=161000 (160 cm = 2,176,000 wavelengths), 13 refs (16*  8192 elems), 2001000 nodes
+   #zl=161000.0d0; pmlfrac=3.90625d-3; imax=13; maxnods=2001000
+   #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_161000'
+   #
+   # 512 NODES p=666 | 1024 NODES p=777
+   #  L=321000 (320 cm = 4,352,000 wavelengths), 14 refs (16*  16384 elems), 4001000 nodes
+   #zl=321000.0d0; pmlfrac=1.953125d-3; imax=14; maxnods=4001000
+   #file_geometry='../GEOMETRIES/fiber/fiber_prism/fiber_prism_321000'
 fi
 
 # set job type
@@ -232,7 +280,11 @@ nlflag=1
 heat=1
 #
 # set pump field
-fake_pump=1
+# 0: Maxwell
+# 1: Constant
+# 2: ODE model
+plane_pump=2
+plane_pump_power=1.0d3
 #
 # set pump direction
 copump=1
@@ -251,7 +303,7 @@ aniso_ref_index=0
 art_grating=0
 #
 # set number and size of steps
-nsteps=20
+nsteps=10
 dt=0.1d0
 #
 # other params
@@ -270,7 +322,7 @@ cd ../..
 dir_output="${SLURM_JOB_ID}/outputs/"
 vis_level=2
 
-args=" -geom 5 -isol 17 -gamma ${gamma} -comp 1"
+args=" -geom 5 -isol 17 -alpha ${alpha} -gamma ${gamma} -comp 1"
 #args+=" -omega ${omega}"
 args+=" -ref_core ${ref_core} -ref_clad ${ref_clad}"
 args+=" -aniso_ref_index ${aniso_ref_index}"
@@ -278,7 +330,8 @@ args+=" -art_grating ${art_grating}"
 args+=" -job ${job} -imax ${imax} -jmax ${jmax}"
 args+=" -ibc ${ibc}"
 args+=" -px ${px} -py ${py} -pz ${pz} -dp ${dp}"
-args+=" -copump ${copump} -nlflag ${nlflag} -gain ${gain} -raman ${raman} -fake_pump ${fake_pump}"
+args+=" -copump ${copump} -nlflag ${nlflag} -gain ${gain} -raman ${raman}"
+args+=" -plane_pump ${plane_pump} -plane_pump_power ${plane_pump_power}"
 args+=" -heat ${heat} -aniso_heat ${aniso_heat} -nsteps ${nsteps} -dt ${dt}"
 args+=" -dir_output ${dir_output} -vis_level ${vis_level}"
 args+=" -file_geometry ${file_geometry} -zl ${zl}"
