@@ -48,6 +48,12 @@ subroutine exec_job_coupled
       stop
    endif
 !
+!..Initiate pump field ODE solution
+   if(PLANE_PUMP.eq.2) then
+      numPts = 2**IMAX
+      call pump_ode_alloc(numPts)
+   endif
+!
    EXCHANGE_DOF = .false.
 !
    NO_PROBLEM = 3
@@ -230,7 +236,7 @@ subroutine exec_job_coupled
       call update_Ddof
 !
 !  ...update Dirichlet DOFs for pump field
-      if (FAKE_PUMP .ne. 1) then
+      if (PLANE_PUMP .eq. 0) then
          if (RANK.eq.ROOT) write(*,4200) ' Updating pump Dirichlet DOFs...'
          NO_PROBLEM = 4
          call set_physAm(NO_PROBLEM, physNick,flag)
@@ -301,8 +307,12 @@ subroutine exec_job_coupled
          endif
 !
 !     ...if assuming a pump plane wave, skip the pump field computation
-         if (FAKE_PUMP .eq. 1) then
-            if (RANK.eq.ROOT) write(*,*) '   Assuming pump plane wave...'
+         if (PLANE_PUMP .eq. 1) then
+            if (RANK.eq.ROOT) write(*,*) '   Assuming constant pump plane wave...'
+            goto 410
+         elseif (PLANE_PUMP .eq. 2) then
+            if (RANK.eq.ROOT) write(*,*) '   Computing pump plane wave solution by ODE model...'
+            call pump_ode_solve
             goto 410
          endif
 !
@@ -338,7 +348,7 @@ subroutine exec_job_coupled
             call get_L2NormAttr(prevAttr, fieldNormQ)
          endif
          if (RANK.eq.ROOT) write(*,4240) '   L2NormDiff = ', L2NormDiff
-         if (RANK.eq.ROOT) write(*,4240) '   fieldNormQ = ', fieldNormQ
+         if (RANK.eq.ROOT) write(*,4240) '   FieldNormQ = ', fieldNormQ
   4240   format(A,F10.4)
 !
 !     ...copy current solution components of all fields into previous solution
@@ -358,7 +368,7 @@ subroutine exec_job_coupled
 !  ...calculating power
       if (RANK.eq.ROOT) write(*,*) 'Computing power...'
       numPts = 2**IMAX; fld = 2
-      if (FAKE_PUMP .eq. 1) fld = 1
+      if (PLANE_PUMP.eq.1) fld = 1
       call get_power(fld,numPts,time_step)
       !call get_power(2,numPts,-1)
       if (RANK.eq.ROOT) write(*,*) ''
@@ -383,7 +393,7 @@ subroutine exec_job_coupled
 !
 !..compute final residual values (if not previously computed)
    if (.not. ires) then
-      if (FAKE_PUMP .ne. 1) then
+      if (PLANE_PUMP.eq.0) then
          QUIET_MODE = .true.; IPRINT_TIME = 0
          if (RANK.eq.ROOT) write(*,4200) '   Pump residual:'
          NO_PROBLEM = 4
@@ -400,13 +410,14 @@ subroutine exec_job_coupled
 !
 !..display stats
    if (RANK.eq.ROOT) then
-      write(*,*) 'L2NormDiff/fieldNormQ:'
+      write(*,*) 'L2NormDiff/FieldNormQ:'
       do j=1,i
          write(*,4241) L2NormDiffIter(j)
  4241    format(es14.5)
       enddo
    endif
 !
+   if (PLANE_PUMP.eq.2) call pump_ode_dealloc
 !
   100 format(/,'/////////////////////////////////////////////////////////////', &
              /,'             ',A,I2,/)

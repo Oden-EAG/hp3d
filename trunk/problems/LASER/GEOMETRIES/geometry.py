@@ -27,6 +27,37 @@ LZ =   1.2; f = open("fiber_prism_1_2","w+")
 #LZ = 614.4; f = open("fiber_prism_614_4","w+")
 #LZ = 1228.8; f = open("fiber_prism_1228_8","w+")
 
+# Fibers for envelope config #1
+#LZ = 650.0; f = open("fiber_prism_650","w+")
+#LZ = 1300.0; f = open("fiber_prism_1300","w+")
+#LZ = 2600.0; f = open("fiber_prism_2600","w+")
+#LZ = 5100.0; f = open("fiber_prism_5100","w+")
+#LZ = 10100.0; f = open("fiber_prism_10100","w+")
+#LZ = 20100.0; f = open("fiber_prism_20100","w+")
+#LZ = 40100.0; f = open("fiber_prism_40100","w+")
+
+# Fibers for envelope config #2
+#LZ = 400.0; f = open("fiber_prism_400","w+")
+#LZ = 800.0; f = open("fiber_prism_800","w+")
+#LZ = 1500.0; f = open("fiber_prism_1500","w+")
+#LZ = 2750.0; f = open("fiber_prism_2750","w+")
+#LZ = 5250.0; f = open("fiber_prism_5250","w+")
+#LZ = 10250.0; f = open("fiber_prism_10250","w+")
+#LZ = 20250.0; f = open("fiber_prism_20250","w+")
+#LZ = 40250.0; f = open("fiber_prism_40250","w+")
+#LZ = 80250.0; f = open("fiber_prism_80250","w+")
+#LZ = 160250.0; f = open("fiber_prism_160250","w+")
+
+# Fibers for envelope config #3
+#LZ = 3000.0; f = open("fiber_prism_3000","w+")
+#LZ = 6000.0; f = open("fiber_prism_6000","w+")
+#LZ = 11000.0; f = open("fiber_prism_11000","w+")
+#LZ = 21000.0; f = open("fiber_prism_21000","w+")
+#LZ = 41000.0; f = open("fiber_prism_41000","w+")
+#LZ = 81000.0; f = open("fiber_prism_81000","w+")
+#LZ = 161000.0; f = open("fiber_prism_161000","w+")
+#LZ = 321000.0; f = open("fiber_prism_321000","w+")
+
 # Core and cladding size parameters
 core = 0.9
 clad = 9.0

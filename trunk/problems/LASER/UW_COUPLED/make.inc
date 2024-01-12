@@ -11,6 +11,7 @@ SRC_COMMON = \
         ../COMMON_FILES/norms.F90 \
         ../COMMON_FILES/polarization.F90 \
         ../COMMON_FILES/power.F90 \
+        ../COMMON_FILES/pump_ode.F90 \
         ../COMMON_FILES/refine_DPG.F90 \
         ../COMMON_FILES/residual.F90 \
         ../COMMON_FILES/set_environment.F90 \
