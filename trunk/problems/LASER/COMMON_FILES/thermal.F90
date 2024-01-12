@@ -7,10 +7,11 @@
 !
 !-------------------------------------------------------------------------------
 !
-!     latest revision:  - June 2021
+!     latest revision:  - Jan 2024
 !
-!     purpose:          - routine sets up computation of average temperature
-!                         in the fiber at certain z-locations
+!     purpose:          - routine sets up computation of average and peak
+!                         temperature in the fiber at certain z-locations
+!                         (peak temperature assumed at R=0 fiber axis)
 !
 !     arguments:
 !        inout:
@@ -32,7 +33,7 @@ subroutine get_avgTemp(NumPts,FileIter)
    integer, intent(in)    :: FileIter
    integer, intent(inout) :: NumPts
 !
-   real(8), allocatable :: zValues(:),coreTemp(:)
+   real(8), allocatable :: zValues(:),coreTemp(:),peakTemp(:)
 !
    real(8) :: a,b
    integer :: i
@@ -52,7 +53,7 @@ subroutine get_avgTemp(NumPts,FileIter)
 !
    if ((.not. DISTRIBUTED .or. HOST_MESH) .and. RANK .ne. ROOT) goto 99
 !
-   allocate(zValues(NumPts),coreTemp(NumPts))
+   allocate(zValues(NumPts),coreTemp(NumPts),peakTemp(NumPts))
 !
 !..distributing sample points uniformly
    if (RANK .eq. ROOT) then
@@ -69,33 +70,47 @@ subroutine get_avgTemp(NumPts,FileIter)
    zValues = zValues*PI*(113.d0/355.d0)
 !
    if (RANK .eq. ROOT) write(*,*) ' get_avgTemp: computing core temperature values..'
-   call comp_avgTemp(zValues,NumPts, coreTemp)
+   call comp_avgTemp(zValues,NumPts, coreTemp,peakTemp)
 !
-!..only ROOT proc has valid coreTemp values
+!..only ROOT proc has valid coreTemp and peakTemp values
    if (RANK .ne. ROOT) goto 90
 !
    if (FileIter .eq. -1) then
-      write(*,*) ' get_avgTemp: printing core temperature values..'
+      write(*,*) ' get_avgTemp: printing average core temperature values..'
       do i = 1,NumPts
          write(*,2020) coreTemp(i)
  2020    format('    ',es12.5)
       enddo
+!
+      write(*,*) ' get_avgTemp: printing peak temperature values..'
+      do i = 1,NumPts
+         write(*,2020) peakTemp(i)
+      enddo
    endif
 !
    if (FileIter .ge. 0) then
-      write(*,*) ' get_avgTemp: printing core temperature values to file..'
+      write(*,*) ' get_avgTemp: printing average core temperature values to file..'
       fmt = '(I5.5)'
       write (suffix,fmt) FileIter
-      filename=trim(OUTPUT_DIR)//'temp/temp_'//trim(suffix)//'.dat'
+      filename=trim(OUTPUT_DIR)//'temp/avg_temp_'//trim(suffix)//'.dat'
       open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
       do i = 1,NumPts
          write(UNIT=9, FMT="(es12.5)") coreTemp(i)
       enddo
       close(UNIT=9)
+!
+      write(*,*) ' get_avgTemp: printing peak temperature values to file..'
+      write (suffix,fmt) FileIter
+      filename=trim(OUTPUT_DIR)//'temp/peak_temp_'//trim(suffix)//'.dat'
+      open(UNIT=9,FILE=filename,FORM="FORMATTED",STATUS="REPLACE",ACTION="WRITE")
+      do i = 1,NumPts
+         write(UNIT=9, FMT="(es12.5)") peakTemp(i)
+      enddo
+      close(UNIT=9)
    endif
 !
    90 continue
-   deallocate(zValues,coreTemp)
+   deallocate(zValues,coreTemp,peakTemp)
 !
    99 continue
 !
@@ -108,9 +123,9 @@ end subroutine get_avgTemp
 !
 !-------------------------------------------------------------------------------
 !
-!     latest revision:    - June 2021
+!     latest revision:    - Jan 2024
 !
-!     purpose:            - routine computes average temperature in the
+!     purpose:            - routine computes average and peak temperature in the
 !                           fiber at certain z-locations (sample points)
 !
 !     arguments:
@@ -120,12 +135,15 @@ end subroutine get_avgTemp
 !        out:
 !              CoreTemp   - average temperature in fiber core
 !                           computed for elements at ZValues
+!              PeakTemp   - peak temperature in fiber core
+!                           computed for elements at ZValues and R=0
 !
 !-------------------------------------------------------------------------------
-subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
+subroutine comp_avgTemp(ZValues,NumPts, CoreTemp,PeakTemp)
 !
    use commonParam
    use data_structure3D
+   use control    , only : GEOM_TOL
    use environment, only : QUIET_MODE
    use mpi_param  , only : RANK,ROOT
    use MPI        , only : MPI_COMM_WORLD,MPI_IN_PLACE,MPI_REAL8,MPI_SUM,MPI_Wtime
@@ -136,21 +154,20 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
    integer , intent(in)  :: NumPts
    real(8) , intent(in)  :: ZValues(NumPts)
    real(8) , intent(out) :: CoreTemp(NumPts)
+   real(8) , intent(out) :: PeakTemp(NumPts)
 !
 !..mdle number
    integer :: mdle
 !
 !..element, face order, geometry dof
-   real(8) :: xnod(3,MAXbrickH)
-   real(8) :: maxz,minz
+   real(8) :: xnod(3,8)
+   real(8) :: maxz,minz,minr,rval
 !
 !..miscellanea
-   integer :: iel,i,ndom
+   integer :: iel,i,j,minj,ndom,nod,nv
+   integer :: nodesl(27),norientl(27)
    real(8) :: elemTemp,elemVol
    real(8) :: coreVol(NumPts)
-!
-!..element type
-   integer :: etype
 !
 !..timer
    real(8) :: start_time,end_time
@@ -159,6 +176,7 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
 !-------------------------------------------------------------------------------
 !
    CoreTemp = rZERO
+   PeakTemp = rZERO
    coreVol  = rZERO
 !
 !..start timer
@@ -170,9 +188,11 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
    endif
 !
 !..iterate over elements
-!$OMP PARALLEL DO                                                 &
-!$OMP PRIVATE(mdle,etype,xnod,maxz,minz,i,ndom,elemTemp,elemVol)  &
-!$OMP REDUCTION(+:coreTemp,coreVol)                               &
+!$OMP PARALLEL DO                                              &
+!$OMP PRIVATE(mdle,nv,xnod,maxz,minz,minr,rval,i,j,minj,ndom,  &
+!$OMP         nod,nodesl,norientl,elemTemp,elemVol)            &
+!$OMP REDUCTION(+:CoreTemp,coreVol)                            &
+!$OMP REDUCTION(max:PeakTemp)                                  &
 !$OMP SCHEDULE(DYNAMIC)
    do iel=1,NRELES_SUBD
       mdle = ELEM_SUBD(iel)
@@ -184,24 +204,47 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp)
                cycle ! skip cladding
          end select
       endif
-      call nodcor(mdle, xnod)
-      etype = NODES(mdle)%ntype
-      select case(etype)
-         case(MDLB)
-            maxz = maxval(xnod(3,1:8))
-            minz = minval(xnod(3,1:8))
-         case(MDLP)
-            maxz = maxval(xnod(3,1:6))
-            minz = minval(xnod(3,1:6))
-         case default
-            write(*,*) 'comp_avgTemp: invalid etype=',S_Type(etype),'. stop.'
-            stop
-      end select
+      call nodcor_vert(mdle, xnod)
+      nv = nvert(NODES(mdle)%ntype)
+      maxz = maxval(xnod(3,1:nv))
+      minz = minval(xnod(3,1:nv))
       do i=1,NumPts
          if((ZValues(i).le.maxz).and.(ZValues(i).gt.minz)) then
+!        ...compute avg temp
             call comp_elem_avgTemp(mdle, elemTemp,elemVol)
             CoreTemp(i) = CoreTemp(i) + elemTemp*elemVol
             coreVol(i)  = coreVol(i)  + elemVol
+!        ...compute peak temp
+            minr = 1.d0; minj = 0
+            do j=1,nv
+               rval = sqrt(xnod(1,j)**2+xnod(2,j)**2)
+               if (rval .lt. minr) then
+                  minr = rval; minj = j
+               endif
+            enddo
+            if (minr .lt. GEOM_TOL) then
+               if (minj .eq. 0) then
+                  !$OMP CRITICAL
+                  write(*,*) 'compute_avgTemp: minj = 0.'
+                  !$OMP END CRITICAL
+                  cycle
+               endif
+               call elem_nodes(mdle, nodesl,norientl)
+               nod = nodesl(minj)
+               if (associated(NODES(nod)%dof)) then
+                  if (associated(NODES(nod)%dof%zdofH)) then
+                     PeakTemp(i) = real(NODES(nod)%dof%zdofH(1,1,N_COMS))
+                  else
+                     !$OMP CRITICAL
+                     write(*,*) 'compute_avgTemp: NOT associated zdofH nod = ', nod
+                     !$OMP END CRITICAL
+                  endif
+               else
+                  !$OMP CRITICAL
+                  write(*,*) 'compute_avgTemp: NOT associated dof nod = ', nod
+                  !$OMP END CRITICAL
+               endif
+            endif
          endif
       enddo
    enddo

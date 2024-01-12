@@ -69,7 +69,7 @@ subroutine get_power(Fld,NumPts,FileIter)
    integer :: count,ierr
 !
 !..activate to calculate power in each signal LP mode (by projection)
-   logical, parameter :: modeProj = .false.
+   logical, parameter :: modeProj = .true.
 !
 !----------------------------------------------------------------------
 !
@@ -790,14 +790,11 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
    integer :: mdle
 !
 !..element, face order, geometry dof
-   real*8 :: xnod (3,8)
-   real*8 :: maxz,minz
+   real(8) :: xnod(3,8)
+   real(8) :: maxz,minz
 !
 !..miscellanea
-   integer :: iel, i, ndom
-!
-!..element type
-   integer :: etype
+   integer :: iel, i, ndom, nv
 !
 !..face number over which power is computed
 !  (in brick and prism, face 2 is face normal to xi3, at xi3=1)
@@ -845,7 +842,7 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
 !..iterate over elements
 !
 !$OMP PARALLEL DO                                        &
-!$OMP PRIVATE(mdle,etype,xnod,maxz,minz,i,ndom,          &
+!$OMP PRIVATE(mdle,nv,xnod,maxz,minz,i,ndom,             &
 !$OMP         facePower,faceDiffPower,modeNorm,modeCoef) &
 !$OMP REDUCTION(+:Power,DiffPower,corePower,cladPower)   &
 !$OMP SCHEDULE(DYNAMIC)
@@ -853,18 +850,9 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
       mdle = ELEM_SUBD(iel)
       if (GEOM_NO .eq. 5) call find_domain(mdle, ndom)
       call nodcor_vert(mdle, xnod)
-      etype = NODES(mdle)%ntype
-      select case(etype)
-         case(MDLB)
-            maxz = maxval(xnod(3,1:8))
-            minz = minval(xnod(3,1:8))
-         case(MDLP)
-            maxz = maxval(xnod(3,1:6))
-            minz = minval(xnod(3,1:6))
-         case default
-            write(*,*) 'compute_power: invalid etype param. stop.'
-            stop
-      end select
+      nv = nvert(NODES(mdle)%ntype)
+      maxz = maxval(xnod(3,1:nv))
+      minz = minval(xnod(3,1:nv))
       do i=1,Num_zpts
          if((ZValues(i).le.maxz).and.(ZValues(i).gt.minz)) then
             if (Fld .le. 9) then
