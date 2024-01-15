@@ -6,6 +6,7 @@ hp3d - A Scalable MPI/OpenMP hp-Adaptive Finite Element Software Library
 1. Build instructions: see README
 
 2. Compatibility with required external libraries:
+   (note: other versions may be compatible but have not been tested)
 
  - PETSc
    Versions: 3.11 - 3.15
