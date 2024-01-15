@@ -142,7 +142,8 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    integer :: nrf
 !
 !..various variables for the problem
-   real(8) :: rjac,bjac,weight,wa,CC,EE,CE,E,EC,q,h,tol,diff_r,diff_i,max_r,max_i
+   real(8) :: rjac,bjac,weight,wa,CC,EE,CE,E,EC,q,h,tol
+   real(8) :: diff_r,diff_i,max_r,max_i,minz,maxz,elem_z
    integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,j,m,n,nint,kE,k,l,ivar,iflag
    integer :: nordP,nsign,ifc,ndom,info,icomp,nrdof,nrdof_eig,idec
    VTYPE   :: zfval
@@ -197,6 +198,21 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    call find_orient(Mdle, norient_edge,norient_face)
 !..determine nodes coordinates
    call nodcor(Mdle, xnod)
+!
+!..determine z-coordinate inside the element
+   select case(etype)
+      case(MDLB)
+         maxz = maxval(xnod(3,1:8))
+         minz = minval(xnod(3,1:8))
+      case(MDLP)
+         maxz = maxval(xnod(3,1:6))
+         minz = minval(xnod(3,1:6))
+      case default
+         write(*,*) 'elem_residual_maxwell: unexpected etype=',etype,'. stop.'
+         stop
+   end select
+   elem_z = (minz + maxz) / 2.d0
+!
 !..get the element boundary conditions flags
    call find_bc(Mdle, ibc)
 !..get current solution dofs
@@ -363,7 +379,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
             ) goto 190
          if (ACTIVE_GAIN .gt. 0.d0) then
             if (dom_flag .eq. 1) then
-               call get_activePol(zsolQ_soleval(1:12),Fld_flag,delta_n, gain_pol)
+               call get_activePol(zsolQ_soleval(1:12),Fld_flag,delta_n,elem_z, gain_pol)
             endif
          endif
          if (RAMAN_GAIN .gt. 0.d0) then

@@ -146,7 +146,10 @@ program main
       write(*,9020) ' Raman gain               = ', RAMAN_GAIN
       write(*,9020) ' Active gain              = ', ACTIVE_GAIN
       write(*,9010) ' COPUMP                   = ', COPUMP
-      write(*,9010) ' FAKE_PUMP                = ', FAKE_PUMP
+      write(*,9010) ' PLANE_PUMP               = ', PLANE_PUMP
+      if (PLANE_PUMP .ne. 0) then
+         write(*,9020) ' PLANE_PUMP_POWER         = ', PLANE_PUMP_POWER
+      endif
    endif
    write(*,9030) ' Polynomial order (x,y,z) = ', ORDER_APPROX_X,ORDER_APPROX_Y,ORDER_APPROX_Z
    write(*,9010) ' NORD_ADD (Delta p)       = ', NORD_ADD
@@ -165,8 +168,8 @@ program main
    endif
    if (ENVELOPE) then
       write (*,*) ' Solving vectorial envelope formulation:'
-      write (*,9000) ' WAVENUM_SIGNAL          = ', WAVENUM_SIGNAL
-      write (*,9000) ' WAVENUM_PUMP            = ', WAVENUM_PUMP
+      write (*,9000) ' WAVENUM_SIGNAL           = ', WAVENUM_SIGNAL
+      write (*,9000) ' WAVENUM_PUMP             = ', WAVENUM_PUMP
    endif
  9000 format(A,F13.6)
  9001 format(A,F13.3)

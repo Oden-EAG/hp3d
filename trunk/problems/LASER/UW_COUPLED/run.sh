@@ -83,6 +83,10 @@ ref_clad=1.4500d0
 nlflag=0
 heat=0
 #
+# set pump field
+plane_pump=0
+plane_pump_power=1.d3
+#
 # set anisotropic heat operator
 aniso_heat=1
 #
@@ -198,6 +202,7 @@ args+=" -job ${job} -imax ${imax} -jmax ${jmax}"
 args+=" -ibc ${ibc}"
 args+=" -px ${px} -py ${py} -pz ${pz} -dp ${dp} -npx 4 -npy 4 -npz 4"
 args+=" -copump 1 -nlflag ${nlflag} -gain ${gain} -raman ${raman}"
+args+=" -plane_pump ${plane_pump} -plane_pump_power ${plane_pump_power}"
 args+=" -heat ${heat} -aniso_heat ${aniso_heat} -nsteps ${nsteps} -dt ${dt}"
 args+=" -dir_output ${dir_output} -vis_level ${vis_level}"
 args+=" -file_geometry ${file_geometry} -zl ${zl}"
@@ -287,6 +292,7 @@ args+=" -job ${job} -imax ${imax} -jmax ${jmax}"
 args+=" -ibc ${ibc}"
 args+=" -px ${px} -py ${py} -pz ${pz} -dp ${dp} -npx 4 -npy 4 -npz 4"
 args+=" -copump 1 -nlflag ${nlflag} -gain ${gain} -raman ${raman}"
+args+=" -plane_pump ${plane_pump} -plane_pump_power ${plane_pump_power}"
 args+=" -heat ${heat} -aniso_heat ${aniso_heat} -nsteps ${nsteps} -dt ${dt}"
 args+=" -dir_output ${dir_output} -vis_level ${vis_level}"
 args+=" -file_geometry ${file_geometry} -zl ${zl}"
