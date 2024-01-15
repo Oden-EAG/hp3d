@@ -1,5 +1,5 @@
 !---------------------------------------------------------------------
-!   latest revision    - June 2021
+!   latest revision    - Jan 2024
 !
 !   purpose            - define index for a node using the nodal case
 !                        and boundary condition flags for the node
@@ -21,8 +21,7 @@
 !                    = 4  free H(curl) component
 !                    = 5  H(div) component with Dirichlet BC flag
 !                    = 6  free H(div) component
-!                    = 7  L2 component with Dirichlet BC flag
-!                    = 8  free L2 component
+!                    = 8  L2 component
 !---------------------------------------------------------------------
 !
 subroutine get_index(Nod, Indexd)
@@ -53,7 +52,7 @@ subroutine get_index(Nod, Indexd)
 !
 !..decode the case and the BC flags
    call decod(NODES(Nod)%case,2,NR_PHYSA, ncase)
-   call decod(NODES(Nod)%bcond,2,NRINDEX_HEV, ibcd )
+   call decod(NODES(Nod)%bcond,2,NRINDEX_HEV, ibcd)
 !
 !..initiate index counter
    ic=0
@@ -127,6 +126,8 @@ subroutine get_index(Nod, Indexd)
 !              ...loop through components
                   do ivar=1,NR_COMP(iphys)
                      ic=ic+1
+!
+!                 ...L2 component
                      Indexd(ic)=8
                   enddo
             end select

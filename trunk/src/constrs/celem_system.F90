@@ -464,20 +464,20 @@ subroutine celem_system(Mdle,Idec,                                &
 !  ...skip L2 if no L2 physics present
   300 if (nrPhysQ .eq. 0) goto 400
 !
-!..loop through higher order nodes, middle node first
+!..only middle node
    nod = Mdle
-!..total number of H(curl) components for a single load
+!..total number of L2 components for a single load
    nvarQt = NREQNQ(NODES(nod)%case)
    call get_index(nod, index)
    kold = k
    call find_ndof(nod, nvoid,nvoid,nvoid,ndofQ)
    l = nrdofmHEV
 !
-!..loop through L2 dof for the node
+!..loop through L2 dof for the middle node
    do j=1,ndofQ
       ivar=0; ii=NRHVAR+NREVAR+NRVVAR
 !
-!  ...loop through physics variables
+!  ...loop through L2 physics variables
       do iphys=nrPhysHEV+1,NR_PHYSA
          il = NR_COMP(iphys)
          if (index(ii+1) .eq. 0) then
@@ -489,11 +489,12 @@ subroutine celem_system(Mdle,Idec,                                &
             cycle
          endif
 !
-!  ......loop through components of this physics variable
+!  ......loop through L2 components of this L2 physics variable
          do icomp=1,il
             l=l+1; ii=ii+1; ivar=ivar+1
             select case(index(ii))
 !
+!  TODO: check use case
 !  .........dof present but known from Dirichlet BC, save the BC data
             case(7)
                if (Idec.eq.2) then
@@ -514,7 +515,7 @@ subroutine celem_system(Mdle,Idec,                                &
                stop
 #endif
             end select
-!  ......end loop through components
+!  ......end loop through L2 components
          enddo
 !  ...end loop through L2 physics variables
       enddo
