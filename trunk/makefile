@@ -8,7 +8,7 @@ HP3D makefile targets:
   make -j
     Build and install the library in parallel
   make clean
-    Clean object and library files
+    Clean object/library files, problems and test directory
   make check
     Compile and run one test problem
   make test
@@ -17,6 +17,8 @@ HP3D makefile targets:
     Compile examples in problems directory
   make all
     Build/install the library, compile problems, and run tests
+  make clean-lib
+    Clean object and library files
   make clean-test
     Clean test directory
   make clean-problems
@@ -215,15 +217,15 @@ endif
 
 check: lib
 	@echo "Checking the hp3D library."
-	@(cd test ; $(MAKE) one run ; cd ..);
-	@(cd problems/MPI_TEST/TEST ; $(MAKE) ; cd ../..);
+	@($(MAKE) -C test one run);
+	@($(MAKE) -C problems/MPI_TEST/TEST);
 
 #-------------------------------------------------
 .PHONY : test
 
 test: lib
 	@echo "Testing the hp3D library."
-	@(cd test ; $(MAKE) all ; cd ..);
+	@($(MAKE) -C test all);
 
 #-------------------------------------------------
 .PHONY : all
@@ -318,10 +320,15 @@ print:
 #-------------------------------------------------
 .PHONY : clean
 
-clean:
+clean: clean-all
+
+#-------------------------------------------------
+.PHONY : clean-lib
+
+clean-lib:
 	@echo "Clean frontal solver, object files, libraries, modules and mk files"
-	@( cd ./$(SRC_PATH)/solver/frontal/base/real ; $(MAKE) clean )
-	@( cd ./$(SRC_PATH)/solver/frontal/base/complex ; $(MAKE) clean )
+	@( $(MAKE) -C ./$(SRC_PATH)/solver/frontal/base/real    clean )
+	@( $(MAKE) -C ./$(SRC_PATH)/solver/frontal/base/complex clean )
 	@rm -rf $(OBJ_PATH_COMPLEX) $(OBJ_PATH_REAL)
 	@rm -rf $(HP3D_PATH_COMPLEX) $(HP3D_PATH_REAL)
 	@rm -f $(LIB_PATH)/*.a
@@ -335,27 +342,27 @@ clean:
 
 clean-test:
 	@echo "Clean 'test' directory."
-	@(cd test ; $(MAKE) clean; cd ..);
+	@($(MAKE) -C test clean);
 
 #-------------------------------------------------
 .PHONY : clean-problems
 
 clean-problems:
 	@echo "Clean 'problems' directory."
-	@(cd problems/MPI_TEST/TEST ; $(MAKE) clean; cd ../..);
+	@($(MAKE) -C problems/MPI_TEST/TEST clean);
 ifeq ($(COMPLEX),1)
-	@(cd problems/MAXWELL/GALERKIN      ; $(MAKE) clean; cd ../..);
-	@(cd problems/MAXWELL/ULTRAWEAK_DPG ; $(MAKE) clean; cd ../..);
-	@(cd problems/LASER/UW_COUPLED      ; $(MAKE) clean; cd ../..);
+	@($(MAKE) -C problems/MAXWELL/GALERKIN      clean);
+	@($(MAKE) -C problems/MAXWELL/ULTRAWEAK_DPG clean);
+	@($(MAKE) -C problems/LASER/UW_COUPLED      clean);
 else
-	@(cd problems/POISSON/GALERKIN        ; $(MAKE) clean; cd ../..);
-	@(cd problems/POISSON/PRIMAL_DPG      ; $(MAKE) clean; cd ../..);
-	@(cd problems/POISSON/ULTRAWEAK_DPG   ; $(MAKE) clean; cd ../..);
-	@(cd problems/VECTOR_POISSON/GALERKIN ; $(MAKE) clean; cd ../..);
-	@(cd problems/SHEATHED_HOSE           ; $(MAKE) clean; cd ..);
+	@($(MAKE) -C problems/POISSON/GALERKIN        clean);
+	@($(MAKE) -C problems/POISSON/PRIMAL_DPG      clean);
+	@($(MAKE) -C problems/POISSON/ULTRAWEAK_DPG   clean);
+	@($(MAKE) -C problems/VECTOR_POISSON/GALERKIN clean);
+	@($(MAKE) -C problems/SHEATHED_HOSE           clean);
 endif
 
 #-------------------------------------------------
 .PHONY : clean-all
 
-clean-all: clean clean-test clean-problems
+clean-all: clean-lib clean-test clean-problems
