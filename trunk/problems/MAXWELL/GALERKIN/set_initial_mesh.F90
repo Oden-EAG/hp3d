@@ -67,6 +67,7 @@
       endif
 !
 !  ...set BC flags: 0 - no BC ; 1 - Dirichlet
+!     (Maxwell Galerkin: NRINDEX = 1)
       ibc(1:6,1:NRINDEX) = 0
 !
       do ifc=1,nface(ELEMS(iel)%etype)

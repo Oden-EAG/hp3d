@@ -35,6 +35,11 @@
          return
       endif
 !
+      if ((Icomp.lt.1) .or. (Icomp.gt.NRINDEX_HEV))
+         write(*,*) 'propagate_flag: invalid Icomp = ', Icomp
+         return
+      endif
+!
 !..loop through active elements
 !$OMP PARALLEL                                     &
 !$OMP PRIVATE(ntype,mdle,ifc,nrfn,i,j,nod,nodesl,  &

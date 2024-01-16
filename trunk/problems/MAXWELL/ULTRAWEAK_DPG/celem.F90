@@ -39,7 +39,7 @@ subroutine celem(Mdle,Idec, Nrdofs,Nrdofm,Nrdofc,Nodm,NdofmH,NdofmE,NdofmV,Ndofm
       integer,                      intent(out) :: Nrnodm
       VTYPE  ,                      intent(out) :: Bload(*),Astif(*)
 !
-      integer, dimension(NRINDEX_HEV) :: nbcond
+      integer :: nbcond(NRINDEX_HEV)
 !
 !---------------------------------------------------------------------------------------------------------------
 !
@@ -49,7 +49,7 @@ subroutine celem(Mdle,Idec, Nrdofs,Nrdofm,Nrdofc,Nodm,NdofmH,NdofmE,NdofmV,Ndofm
 !           (2) - L2 field for Maxwell (6 components)
 !
 !..remove bubble DOFs from trace components
-   nbcond = 0; nbcond(1) = 1
+   nbcond(1:2) = 1
    call encod(nbcond,2,NRINDEX_HEV, NODES(Mdle)%bcond)
 !
 !..redirect to the system routine
