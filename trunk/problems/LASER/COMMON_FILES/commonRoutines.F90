@@ -64,7 +64,7 @@ subroutine propagate_flag(Icomp,Nflag)
       return
    endif
 !
-   if ((Icomp.lt.1) .or. (Icomp.gt.NRINDEX_HEV))
+   if ((Icomp.lt.1) .or. (Icomp.gt.NRINDEX_HEV)) then
       write(*,*) 'propagate_flag: invalid Icomp = ', Icomp
       return
    endif
