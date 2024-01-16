@@ -36,7 +36,7 @@ subroutine homogenD(Dtype,Icase,Bcond, Is_homD,Ncase,Ibcnd)
 !-----------------------------------------------------------------------
 !
    call decod(Icase,2,NR_PHYSA, Ncase)
-   call decod(Bcond,2,NRINDEX_HEV,  Ibcnd)
+   call decod(Bcond,2,NRINDEX_HEV, Ibcnd)
    Is_homD = .true.
    ic=0
    do iphys = 1,NR_PHYSA

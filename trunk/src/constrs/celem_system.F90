@@ -494,16 +494,6 @@ subroutine celem_system(Mdle,Idec,                                &
             l=l+1; ii=ii+1; ivar=ivar+1
             select case(index(ii))
 !
-!  TODO: check use case
-!  .........dof present but known from Dirichlet BC, save the BC data
-            case(7)
-               if (Idec.eq.2) then
-                  IDBC(l)=1
-                  do iload=1,NR_RHS
-                     ZDOFD(l,iload) = NODES(nod)%dof%zdofQ((iload-1)*nvarQt+ivar,j,N_COMS)
-                  enddo
-               endif
-!
 !  .........dof present and active
             case(8)
                k=k+1;

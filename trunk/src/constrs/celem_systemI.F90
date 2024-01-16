@@ -418,7 +418,7 @@ subroutine celem_systemI(Iel,Mdle,Idec,                            &
 !
 !---------------------------- H(div) dof -------------------------------
 !
-!  ...skip Hdiv if no H(div) physics present
+!  ...skip H(div) if no H(div) physics present
   200 if (nrPhysV .eq. 0) goto 300
 !
 !..loop through nodes in the reversed order

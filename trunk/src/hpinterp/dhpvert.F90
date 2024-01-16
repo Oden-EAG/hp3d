@@ -74,10 +74,10 @@ subroutine dhpvert(Mdle,Iflag,No,Xi,Icase,Bcond, ZdofH)
 !
 !..shift the data skipping irrelevant entries
    call decod(Icase,2,NR_PHYSA, ncase)
-   call decod(Bcond,2,NRINDEX_HEV,  ibcnd)
+   call decod(Bcond,2,NRINDEX_HEV, ibcnd)
 !
    ivarH=0; nvarH=0
-
+!
 !..loop through multiple loads
    do iload=1,NRRHS
 !

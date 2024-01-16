@@ -83,7 +83,7 @@ subroutine read_input(Fp)
      end select
   enddo
   NRINDEX = NRHVAR + NREVAR + NRVVAR + NRQVAR
-  NRINDEX_HEV = NRINDEX - NRQVAR
+  NRINDEX_HEV = NRHVAR + NREVAR + NRVVAR
   !
   if (NRINDEX_HEV > MAX_NRINDEX_HEV) then
     write(*,*) 'NRINDEX_HEV, MAX_NRINDEX_HEV = ',NRINDEX_HEV,MAX_NRINDEX_HEV
