@@ -36,7 +36,7 @@ subroutine result
    integer :: index(NRINDEX)
 !
 !..decoded boundary flag and case for a node
-   integer :: ibcnd(NRINDEX), icase(NR_PHYSA)
+   integer :: ibcnd(NRINDEX_HEV), icase(NR_PHYSA)
 !
 !..egde and face orientations decode
    integer :: nedge_orient(12), nface_orient(6)
@@ -137,8 +137,8 @@ subroutine result
  7023    format(' CASE = ',10i1)
          write(*,7025) NODES(nod)%order
  7025    format(' ORDER = ',i3)
-         call decod(NODES(nod)%bcond,2,NRINDEX, ibcnd)
-         write(*,7026) ibcnd(1:NRINDEX)
+         call decod(NODES(nod)%bcond,2,NRINDEX_HEV, ibcnd)
+         write(*,7026) ibcnd(1:NRINDEX_HEV)
  7026    format(' BC FLAG = ',30i1)
          write(*,7027) NODES(nod)%visit
  7027    format(' VISITATION FLAG = ',i5)

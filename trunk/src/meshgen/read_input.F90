@@ -81,11 +81,12 @@ subroutine read_input(Fp)
         ADRES(i) = NRQVAR
         NRQVAR = NRQVAR + NR_COMP(i)
      end select
-     NRINDEX = NRINDEX + NR_COMP(i)
   enddo
+  NRINDEX = NRHVAR + NREVAR + NRVVAR + NRQVAR
+  NRINDEX_HEV = NRHVAR + NREVAR + NRVVAR
   !
-  if (NRINDEX > MAX_NRINDEX) then
-    write(*,*) 'NRINDEX, MAX_NRINDEX = ',NRINDEX,MAX_NRINDEX
+  if (NRINDEX_HEV > MAX_NRINDEX_HEV) then
+    write(*,*) 'NRINDEX_HEV, MAX_NRINDEX_HEV = ',NRINDEX_HEV,MAX_NRINDEX_HEV
     stop
   endif
   !
@@ -109,16 +110,9 @@ IF (.NOT. QUIET_MODE) write(*,*)''
 
   !----------------------------------------------------------------------
   !  check the order in which the attributes have been defined
-  do i=1,NR_PHYSA
-     if (i.ne.NR_PHYSA) then
-        if (D_TYPE(i+1).lt.D_TYPE(i)) then
-           write(*,6001); stop 1
-        endif
-     endif
-     if (i.ne.1) then
-        if (D_TYPE(i-1).gt.D_TYPE(i)) then
-           write(*,6001); stop 2
-        endif
+  do i=1,NR_PHYSA-1
+     if (D_TYPE(i+1).lt.D_TYPE(i)) then
+        write(*,6001); stop 1
      endif
   enddo
 

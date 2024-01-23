@@ -96,10 +96,10 @@ subroutine set_initial_mesh(Nelem_order)
       enddo
 !
 !  ...allocate BC flags (one per physical attribute component)
-      allocate(ELEMS(iel)%bcond(3))
+      allocate(ELEMS(iel)%bcond(NRINDEX))
 !
 !  ...encode face BCs into a single BC flag, one component at a time
-      do ivar=1,3
+      do ivar=1,NRINDEX
          call encodg(ibc(1:6,ivar),10,6, ELEMS(iel)%bcond(ivar))
 #if DEBUG_MODE
          if (iprint.eq.1) then

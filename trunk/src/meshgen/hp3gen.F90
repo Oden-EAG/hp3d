@@ -439,7 +439,7 @@ subroutine hp3gen(Fp)
       call find_case(num,phys_vect, icase)
 !
 !  ...encode BC flags for the node into a single nickname
-      call encod(ibc_nod,2,NRINDEX, nbcond)
+      call encod(ibc_nod(1:NRINDEX_HEV),2,NRINDEX_HEV, nbcond)
 !
       subd = -1; iact = .true.
       call nodgen(VERT,icase,nbcond,-nel,1,subd,iact, nod)
@@ -549,7 +549,7 @@ subroutine hp3gen(Fp)
       call find_case(num,phys_vect, icase)
 !
 !  ...encode BC flags for the node into a single nickname
-      call encod(ibc_nod,2,NRINDEX, nbcond)
+      call encod(ibc_nod(1:NRINDEX_HEV),2,NRINDEX_HEV, nbcond)
 !
       subd = -1; iact = .true.
       call nodgen(MEDG,icase,nbcond,-nel,nord,subd,iact, nod)
@@ -648,7 +648,7 @@ subroutine hp3gen(Fp)
       call find_case(num,phys_vect, icase)
 !
 !  ...encode BC flags for the node into a single nickname
-      call encod(ibc_nod,2,NRINDEX, nbcond)
+      call encod(ibc_nod(1:NRINDEX_HEV),2,NRINDEX_HEV, nbcond)
 !
       subd = -1; iact = .true.
       call nodgen(MDLQ,icase,nbcond,-nel,nord,subd,iact, nod)
@@ -742,7 +742,7 @@ subroutine hp3gen(Fp)
       call find_case(num,phys_vect, icase)
 !
 !  ...encode BC flags for the node into a single nickname
-      call encod(ibc_nod,2,NRINDEX, nbcond)
+      call encod(ibc_nod(1:NRINDEX_HEV),2,NRINDEX_HEV, nbcond)
 !
       subd = -1; iact = .true.
       call nodgen(MDLT,icase,nbcond,-nel,nord,subd,iact, nod)

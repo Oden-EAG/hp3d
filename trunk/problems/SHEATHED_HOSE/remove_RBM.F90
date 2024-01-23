@@ -8,7 +8,7 @@ subroutine remove_RBM
   implicit none
 !--------------------------------------------------------------------------
   integer :: pt
-  integer :: nbcond(NRINDEX)
+  integer :: nbcond(NRINDEX_HEV)
 !--------------------------------------------------------------------------
 !
 ! This is a hack to eliminate vertex DOF in the trace variables.
@@ -27,17 +27,17 @@ subroutine remove_RBM
 !
 !  A
   pt=1
-  nbcond = (/1,1,0, 0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0/) ! 3 H1 + 3 H(div) + 12 L2
-  call encod(nbcond,2,NRINDEX, NODES(NRELIS+pt)%bcond)
+  nbcond = (/1,1,0, 0,0,0/) ! 3 H1 + 3 H(div)
+  call encod(nbcond,2,NRINDEX_HEV, NODES(NRELIS+pt)%bcond)
 !
 !  B
   pt=2
-  nbcond = (/1,0,1, 0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0/)
-  call encod(nbcond,2,NRINDEX, NODES(NRELIS+pt)%bcond)
+  nbcond = (/1,0,1, 0,0,0/)
+  call encod(nbcond,2,NRINDEX_HEV, NODES(NRELIS+pt)%bcond)
 !
 !  C
   pt=11
-  nbcond = (/1,0,1, 0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0/)
-  call encod(nbcond,2,NRINDEX, NODES(NRELIS+pt)%bcond)
+  nbcond = (/1,0,1, 0,0,0/)
+  call encod(nbcond,2,NRINDEX_HEV, NODES(NRELIS+pt)%bcond)
 
 end subroutine remove_RBM

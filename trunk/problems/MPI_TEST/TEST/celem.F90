@@ -28,14 +28,14 @@
 !---------------------------------------------------------------------
 #include "typedefs.h"
 !
-   subroutine celem(Mdle,Idec,Nrdofs,Nrdofm,Nrdofc,Nodm, &
-                    NdofmH,NdofmE,NdofmV,NdofmQ,Nrnodm,Bload,Astif)
+subroutine celem(Mdle,Idec,Nrdofs,Nrdofm,Nrdofc,Nodm, &
+                 NdofmH,NdofmE,NdofmV,NdofmQ,Nrnodm,Bload,Astif)
    use physics
    use data_structure3D
 !
 !--------------------------------------------------------------------------
 !
-  implicit none
+   implicit none
 !
    integer,                      intent(in)  :: Mdle,Idec
    integer, dimension(NR_PHYSA), intent(out) :: Nrdofs
@@ -44,17 +44,8 @@
    integer, dimension(MAXNODM),  intent(out) :: NdofmH,NdofmE,NdofmV,NdofmQ
    integer,                      intent(out) :: Nrnodm
    VTYPE  ,                      intent(out) :: Bload(*),Astif(*)
-   integer, dimension(NRINDEX)               :: nbcond
 !
 !--------------------------------------------------------------------------
-!
-!..This is a hack to eliminate the bubbles in the trace physics variables,
-!  so that only the boundary dof are included for the trace variables.
-!  This is done by saying that the value is known (to be zero) for the
-!  bubble (middle/interior) dof by using the BC flag (1 if known, 0 if unknown)
-!  The 'known' dof are eliminated by static condensation locally
-   nbcond = (/1,1,0,0,0,0,0,0/) ! removes the bubbles
-   call encod(nbcond,2,NRINDEX, NODES(Mdle)%bcond)
 !
 !..redirect to the system routine
    call celem_system(Mdle,Idec, &
@@ -62,8 +53,4 @@
                      Nodm,NdofmH,NdofmE,NdofmV,NdofmQ,Nrnodm, &
                      Bload,Astif)
 !
-!..reset the BC flags back to zero (unknown)
-   NODES(Mdle)%bcond = 0
-!
-!
-   end subroutine celem
+end subroutine celem
