@@ -1,5 +1,5 @@
-name: Linux Build and Tests
-run-name: hp3d-linux-build-and-tests
+name: Linux makedepend
+run-name: hp3d-linux-makedepend
 
 on: [push]
 jobs:
@@ -54,6 +54,7 @@ jobs:
         run: |
           echo "Running hp3D tests"
           cd trunk
+          make test
 
       - run: echo "This job's status is ${{ job.status }}."
 
