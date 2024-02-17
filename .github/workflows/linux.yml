@@ -31,7 +31,11 @@ jobs:
 
       # Get MPI
       - name: get MPI (Linux)
-        run: sudo apt-get install mpich libmpich-dev
+        run: |
+          sudo apt-get install mpich libmpich-dev
+          mpicc --version
+          mpicxx --version
+          mpif90 --version
 
       - run: echo "Finished installing MPI."
 
@@ -46,7 +50,7 @@ jobs:
           git clone -b release https://gitlab.com/petsc/petsc.git petsc
           echo "Configuring PETSc"
           cd petsc
-          ./configure --with-cc=mpicc --with-cxx=mpicxx --with-mpiexec=mpirun \
+          ./configure --with-cc=mpicc --with-cxx=mpicxx --with-fc=mpif90 --with-mpiexec=mpirun \
           --with-scalar-type=real --PETSC_ARCH=arch-ubuntu-real
 
           echo "Building PETSc"
