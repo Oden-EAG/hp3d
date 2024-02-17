@@ -1,0 +1,38 @@
+name: Linux Build and Tests
+
+on: [push]
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+      steps:
+       - run: echo "The job was automatically triggered by a ${{ github.event_name }} event."
+       - run: echo "This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+       - run: echo "The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+
+       # Interrupt workflow already running on the same branch.
+       - name: Cancel Previous Runs
+         uses: styfle/cancel-workflow-action@0.12.1
+         with:
+           access_token: ${{ github.token }}
+
+       # Check out hp3d repository
+       - name: Check out hp3d
+         uses: actions/checkout@v4
+
+       - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+       - run: echo "The workflow is now ready to test your code on the runner."
+
+       # List files in the repository
+       - name: List files in the repository
+         run: ls ${{ github.workspace }}
+
+       - run: echo "This job's status is ${{ job.status }}."
+
+       # Get MPI
+       - name: get MPI (Linux)
+         run: sudo apt-get install mpich libmpich-dev
+
+       - run: echo "Finished installing MPI."
+
+       # Get PETSc
+       
