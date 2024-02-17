@@ -39,43 +39,6 @@ jobs:
           mpif90 --version
           mpirun --version
 
-      # Get PETSc
-      #- name: build-petsc
-      #  run: spack info petsc
-
-      # Get PETSc
-      - name: Build PETSc
-        run: |
-          echo "Getting latest PETSc release version"
-          git clone -b release https://gitlab.com/petsc/petsc.git petsc
-          
-          echo "Configuring PETSc"
-          cd petsc
-          ./configure \
-          --with-cc=mpicc --COPTFLAGS="-g -O" \
-          --with-cxx=mpicxx --CXXOPTFLAGS="-g -O" \
-          --with-fc=mpif90 --FOPTFLAGS="-g -O" \
-          --with-mpiexec=mpirun \
-          --download-fblaslapack=yes \
-          --download-scalapack=yes \
-          --download-mumps=yes \
-          --download-metis=yes \
-          --download-parmetis=yes \
-          --download-ptscotch=yes \
-          --download-zoltan=yes \
-          --download-hdf5=yes \
-          --with-hdf5-fortran-bindings=1 \
-          --with-shared-libraries=0 \
-          --with-debugging=0 \
-          --with-scalar-type=real \
-          --PETSC_ARCH=arch-ubuntu-real
-
-          echo "Building PETSc"
-          make -j
-
-          echo "Checking PETSc build"
-          make check
-
       # Build hp3D
       - name: Build hp3D
         run: |
