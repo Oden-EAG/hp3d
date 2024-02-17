@@ -120,6 +120,7 @@ seq :
 			    " Sequential Tests Passed."; \
 		printf   "     "$$((seq_fail))/$$((seq_pass+seq_fail))"%s\n\n" \
 			    " Sequential Tests FAILED!"; \
+		exit 1; \
 	fi ; \
 	echo $$((seq_pass))" "$$((seq_fail)) > $(OBJ_PATH)/.seq_test
 
@@ -143,6 +144,7 @@ par :
 			    " Parallel Tests Passed."; \
 		printf   "     "$$((par_fail))/$$((par_pass+par_fail))"%s\n\n" \
 			    " Parallel Tests FAILED!"; \
+		exit 1; \
 	fi ; \
 	echo $$((par_pass))" "$$((par_fail)) > $(OBJ_PATH)/.par_test
 
@@ -162,6 +164,7 @@ all : seq par
 			    " Tests Passed."; \
 		printf   "     "$$((fail))/$$((pass+fail))"%s\n\n" \
 			    " Tests FAILED!"; \
+		exit 1; \
 	fi ; \
 	 echo "++++++++++++++++++++++++++++++++++++++++";
 
@@ -171,11 +174,12 @@ run : one
 	@printf "\n Running test: "$(TEST)"\n"
 	@pass=1; mpirun -np 1 ./$(EXEC_PATH)/$(TEST) || pass=0; \
 	if [ $$((pass)) -eq 1 ]; then \
-			printf "          test_"$(TEST)" PASSED\n\n"; \
-			true; \
+		printf "          test_"$(TEST)" PASSED\n\n"; \
+		true; \
 	else \
-			printf "          test_"$(TEST)" FAILED\n\n"; \
-			false; \
+		printf "          test_"$(TEST)" FAILED\n\n"; \
+		false; \
+		exit 1; \
 	fi ;
 
 #-------------------------------------------------
@@ -184,11 +188,12 @@ run-par : one
 	@printf "\n Running test: "$(TEST)"\n"
 	@pass=1; mpirun -np 4 ./$(EXEC_PATH)/$(TEST) || pass=0; \
 	if [ $$((pass)) -eq 1 ]; then \
-			printf "          test_"$(TEST)" PASSED\n\n"; \
-			true; \
+		printf "          test_"$(TEST)" PASSED\n\n"; \
+		true; \
 	else \
-			printf "          test_"$(TEST)" FAILED\n\n"; \
-			false; \
+		printf "          test_"$(TEST)" FAILED\n\n"; \
+		false; \
+		exit 1; \
 	fi ;
 
 #-------------------------------------------------

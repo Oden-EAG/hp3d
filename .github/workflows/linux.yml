@@ -86,11 +86,15 @@ jobs:
           echo "Building hp3D"
           make -j
 
+          echo "Checking hp3D build"
+          make check
+
       # Run hp3D tests
       - name: Run hp3D tests
         run: |
           echo "Running hp3D tests"
           cd trunk
+          make test
 
       - run: echo "This job's status is ${{ job.status }}."
 
