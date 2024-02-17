@@ -30,12 +30,16 @@ jobs:
       - run: echo "This job's status is ${{ job.status }}."
 
       # Get MPI
-      - name: get MPI (Linux)
+      - name: get MPI
+        run: sudo apt-get install mpich libmpich-dev
+          
+
+      - name: Check MPI compiler
         run: |
-          sudo apt-get install mpich libmpich-dev
           mpicc --version
           mpicxx --version
           mpif90 --version
+          mpirun --version
 
       - run: echo "Finished installing MPI."
 
@@ -44,16 +48,51 @@ jobs:
       #  run: spack info petsc
 
       # Get PETSc
-      - name: build-petsc
+      - name: Build PETSc
         run: |
           echo "Getting latest PETSc release version"
           git clone -b release https://gitlab.com/petsc/petsc.git petsc
+          
           echo "Configuring PETSc"
           cd petsc
-          ./configure --with-cc=mpicc --with-cxx=mpicxx --with-fc=mpif90 --with-mpiexec=mpirun \
-          --with-scalar-type=real --PETSC_ARCH=arch-ubuntu-real
+          ./configure \
+          --with-cc=mpicc \
+          --with-cxx=mpicxx \
+          --with-fc=mpif90 \
+          --with-mpiexec=mpirun \
+          --download-fblaslapack=yes \
+          --download-scalapack=yes \
+          --download-mumps=yes \
+          --download-metis=yes \
+          --download-parmetis=yes \
+          --download-ptscotch=yes \
+          --download-zoltan=yes \
+          --download-hdf5=yes \
+          --with-hdf5-fortran-bindings=1 \
+          --with-shared-libraries=0 \
+          --with-debugging=0 \
+          --with-scalar-type=real \
+          --PETSC_ARCH=arch-ubuntu-real
 
           echo "Building PETSc"
           make -j
 
-          # echo "Installing PETSc"
+          echo "Checking PETSc build"
+          make check
+
+      # Build hp3D
+      - name: Build hp3D
+        run: |
+          echo "Configuring hp3D"
+          cd trunk
+          cp m_options_files/workflows/m_options_ubuntu_real .
+
+          echo "Building hp3D"
+          make -j
+
+      # Run hp3D tests
+      - name: Run hp3D tests
+        run: |
+          echo "Running hp3D tests"
+          cd trunk
+          
