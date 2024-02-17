@@ -36,5 +36,17 @@ jobs:
       #- run: echo "Finished installing MPI."
 
       # Get PETSc
+      #- name: build-petsc
+      #  run: spack info petsc
+
+      # Get PETSc
       - name: build-petsc
-        run: spack info petsc
+        run: |
+          echo "Getting latest PETSc release version"
+          git clone -b release https://gitlab.com/petsc/petsc.git petsc
+          echo "Configuring PETSc"
+
+          echo "Building PETSc"
+          # make -j
+
+          # echo "Installing PETSc"
