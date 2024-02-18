@@ -22,7 +22,7 @@ HP3D_USE_OPENMP ?= 0
 FF = mpif90
 CC = mpicc
 FC     =  $(FF)
-FFLAGS = -fPIC -ffree-line-length-none -flto -Wno-lto-type-mismatch
+FFLAGS = -fPIC -ffree-line-length-none -Wno-lto-type-mismatch
 
 # OpenMP
 ifeq ($(HP3D_USE_OPENMP),1)
