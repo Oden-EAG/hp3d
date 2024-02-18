@@ -41,8 +41,6 @@ jobs:
       - name: Check out hp3d repository
         uses: actions/checkout@v4
 
-      - run: echo "${{ github.repository }} repository has been cloned to the runner."
-
       # List files in the repository
       - name: List files in the repository
         run: ls ${{ github.workspace }}
@@ -52,13 +50,14 @@ jobs:
       - name: Symlink gfortran (MacOS)
         if: matrix.os == 'macos-latest'
         run: |
-          ln -s /usr/local/bin/gfortran-13 /usr/local/bin/gfortran
+          sudo ln -s /usr/local/bin/gfortran-13 /usr/local/bin/gfortran
           gfortran --version
 
       # Get Bison and Flex (MacOS)
       - name: Get Bison and Flex (MacOS)
         if: matrix.os == 'macos-latest'
         run: |
+          export HOMEBREW_NO_INSTALL_CLEANUP=1
           brew install bison flex
           sudo ln -s /usr/local/opt/bison/bin/bison /usr/local/bin/bison
           sudo ln -s /usr/local/opt/flex/bin/flex /usr/local/bin/flex
@@ -67,7 +66,6 @@ jobs:
       - name: Get MPI (MacOS)
         if: matrix.os == 'macos-latest'
         run: |
-          export HOMEBREW_NO_INSTALL_CLEANUP=1
           brew install open-mpi
 
       # Get MPI (Linux)
