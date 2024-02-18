@@ -70,16 +70,17 @@ jobs:
 
       # Get X11 (MacOS)
       # (alternatively, use "brew install xquartz --cask")
+      # (brew reinstall libx11)
+      # ls /usr/local/Cellar/libx11/1.8.7
+      # find /usr/local/Cellar -name "libx11*"
       - name: Get X11 (MacOS)
         if: matrix.os == 'macos-latest'
         run: |
           echo $PATH 
-          brew reinstall libx11
-          echo $PATH
-          ls /usr/local/Cellar/libx11
-          ls /usr/local/Cellar/libx11/1.8.7
-          find /usr/local/Cellar -name "libx11*"
-          find /usr/local/opt -name "libx11*"
+          export PATH="/usr/local/opt/libx11:${PATH}"
+          echo $PATH 
+          ls /usr/local/opt/libx11
+          find /usr/local/opt/libx11 -name "libx11*"
 
       # Get MPI (MacOS)
       - name: Get MPI (MacOS)
