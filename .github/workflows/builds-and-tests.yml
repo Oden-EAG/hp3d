@@ -18,12 +18,12 @@ jobs:
         mode: [real, complex]
         target: [dbg, opt]
 
-    env: 
-      CONFIG: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.target }}
-
-    name: $CONFIG
+    name: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.target }}
 
     runs-on: ${{ matrix.os }}
+
+    env:
+      CONFIG: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.target }}
 
     steps:
       # Print runner info to console
