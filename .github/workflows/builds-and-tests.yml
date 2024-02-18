@@ -56,15 +56,15 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: |
           export HOMEBREW_NO_INSTALL_CLEANUP=1
+          brew reinstall gfortran
           brew install open-mpi
 
       # Check MPI
-      - name: Check MPI (Linux)
-        if: matrix.os == 'ubuntu-latest'
+      - name: Check MPI
         run: |
           mpicc --version
           mpicxx --version
-          mpifort --version
+          mpif90 --version
           mpirun --version
 
       # Build PETSc
