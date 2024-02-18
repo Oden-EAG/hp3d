@@ -111,7 +111,6 @@ jobs:
           echo "Configuring PETSc"
           cd petsc
           ./configure \
-          --download-openmpi=yes \
           --with-cc=mpicc --COPTFLAGS="-g -O" \
           --with-cxx=mpicxx --CXXOPTFLAGS="-g -O" \
           --with-fc=mpifort --FOPTFLAGS="-g -O" \
