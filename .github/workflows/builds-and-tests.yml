@@ -112,9 +112,9 @@ jobs:
           cd petsc
           ./configure \
           --download-openmpi=yes \
-          --with-cc=mpicc --COPTFLAGS="-g -O" \
-          --with-cxx=mpicxx --CXXOPTFLAGS="-g -O" \
-          --with-fc=mpif90 --FOPTFLAGS="-g -O" \
+          --with-cc=gcc --COPTFLAGS="-g -O" \
+          --with-cxx=g++ --CXXOPTFLAGS="-g -O" \
+          --with-fc=gfortran --FOPTFLAGS="-g -O" \
           --with-mpiexec=mpirun \
           --download-fblaslapack=yes \
           --download-scalapack=yes \
