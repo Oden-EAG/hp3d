@@ -1,5 +1,5 @@
-name: Linux Builds and Tests
-run-name: linux-builds-and-tests
+name: Builds and Tests
+run-name: builds-and-tests
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  linux-builds-and-tests:
+  builds-and-tests:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
@@ -56,6 +56,7 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: |
           export HOMEBREW_NO_INSTALL_CLEANUP=1
+          brew install gfortran
           brew install openmpi
 
       # Check MPI
