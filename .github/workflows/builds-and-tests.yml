@@ -14,7 +14,7 @@ jobs:
   linux-builds-and-tests:
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest]
         mode: [real, complex]
         target: [dbg, opt]
 
@@ -48,8 +48,15 @@ jobs:
         run: ls ${{ github.workspace }}
 
       # Get MPI
-      - name: Get MPI
+      - name: Get MPI (Linux)
+        if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get install mpich libmpich-dev
+
+      - name: Get MPI (MacOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          export HOMEBREW_NO_INSTALL_CLEANUP=1
+          brew install openmpi
 
       # Check MPI
       - name: Check MPI
