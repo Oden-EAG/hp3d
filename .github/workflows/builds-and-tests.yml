@@ -52,6 +52,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get install mpich libmpich-dev
 
+      # Alternatively, use "brew reinstall gfortran"
       - name: Get MPI (MacOS)
         if: matrix.os == 'macos-latest'
         run: |
@@ -67,6 +68,11 @@ jobs:
           mpicxx --version
           mpif90 --version
           mpirun --version
+
+      # Get Bison
+      - name: Get Bison (MacOS)
+        if: matrix.os == 'macos-latest'
+        run: brew install bison
 
       # Build PETSc
       - name: Build PETSc
