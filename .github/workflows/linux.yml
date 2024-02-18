@@ -49,10 +49,6 @@ jobs:
           mpirun --version
 
       # Get PETSc
-      #- name: build-petsc
-      #  run: spack info petsc
-
-      # Get PETSc
       - name: Build PETSc
         run: |
           echo "Getting latest PETSc release version"

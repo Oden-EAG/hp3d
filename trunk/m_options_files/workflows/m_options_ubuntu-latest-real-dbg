@@ -23,8 +23,7 @@ HP3D_USE_OPENMP ?= 0
 FF = mpif90
 CC = mpicc
 FC     =  $(FF)
-FFLAGS = -fPIC -ffree-line-length-none 
-FFLAGS += -fno-strict-aliasing
+FFLAGS = -fPIC -ffree-line-length-none
 
 # OpenMP
 ifeq ($(HP3D_USE_OPENMP),1)

@@ -23,8 +23,7 @@ HP3D_USE_OPENMP ?= 0
 FF = mpif90
 CC = mpicc
 FC     =  $(FF)
-FFLAGS = -fPIC -ffree-line-length-none 
-FFLAGS += -fno-strict-aliasing
+FFLAGS = -fPIC -ffree-line-length-none
 
 # OpenMP
 ifeq ($(HP3D_USE_OPENMP),1)
@@ -84,11 +83,11 @@ MKL_INCS = -I/opt/intel/mkl/include
 # also adding PETSC library dependence (petsc needs phdf5)
 
 ifeq ($(COMPLEX),1)
-  PETSC_LIB = /home/runner/work/hp3d/hp3d/petsc/arch-ubuntu-latest-complex-dbg/lib
-  PETSC_INC = /home/runner/work/hp3d/hp3d/petsc/arch-ubuntu-latest-complex-dbg/include
+  PETSC_LIB = /home/runner/work/hp3d/hp3d/petsc/arch-ubuntu-latest-complex-opt/lib
+  PETSC_INC = /home/runner/work/hp3d/hp3d/petsc/arch-ubuntu-latest-complex-opt/include
 else
-  PETSC_LIB = /home/runner/work/hp3d/hp3d/petsc/arch-ubuntu-latest-real-dbg/lib
-  PETSC_INC = /home/runner/work/hp3d/hp3d/petsc/arch-ubuntu-latest-real-dbg/include
+  PETSC_LIB = /home/runner/work/hp3d/hp3d/petsc/arch-ubuntu-latest-real-opt/lib
+  PETSC_INC = /home/runner/work/hp3d/hp3d/petsc/arch-ubuntu-latest-real-opt/include
 endif
 
 SOLVER_LIBS = -L$(PETSC_LIB) -lpetsc -ldmumps -lzmumps \
