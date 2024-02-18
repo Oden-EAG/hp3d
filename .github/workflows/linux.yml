@@ -7,6 +7,7 @@ on:
       - master
       - release
       - next
+    workflow_dispatch:
 
 jobs:
   linux-builds-and-tests:
