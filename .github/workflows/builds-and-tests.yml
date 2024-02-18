@@ -52,15 +52,15 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get install mpich libmpich-dev
 
-      - name: Get MPI (MacOS)
-        if: matrix.os == 'macos-latest'
-        run: |
-          export HOMEBREW_NO_INSTALL_CLEANUP=1
-          brew install gfortran
-          brew install openmpi
+      # - name: Get MPI (MacOS)
+      #   if: matrix.os == 'macos-latest'
+      #   run: |
+      #     export HOMEBREW_NO_INSTALL_CLEANUP=1
+      #     brew install open-mpi
 
       # Check MPI
-      - name: Check MPI
+      - name: Check MPI (Linux)
+        if: matrix.os == 'ubuntu-latest'
         run: |
           mpicc --version
           mpicxx --version
@@ -68,7 +68,8 @@ jobs:
           mpirun --version
 
       # Build PETSc
-      - name: Build PETSc
+      - name: Build PETSc (Linux)
+        if: matrix.os == 'ubuntu-latest'
         run: |
           echo "Getting latest PETSc release version"
           git clone -b release https://gitlab.com/petsc/petsc.git petsc
@@ -76,6 +77,41 @@ jobs:
           echo "Configuring PETSc"
           cd petsc
           ./configure \
+          --with-cc=mpicc --COPTFLAGS="-g -O" \
+          --with-cxx=mpicxx --CXXOPTFLAGS="-g -O" \
+          --with-fc=mpif90 --FOPTFLAGS="-g -O" \
+          --with-mpiexec=mpirun \
+          --download-fblaslapack=yes \
+          --download-scalapack=yes \
+          --download-mumps=yes \
+          --download-metis=yes \
+          --download-parmetis=yes \
+          --download-ptscotch=yes \
+          --download-zoltan=yes \
+          --download-hdf5=yes \
+          --with-hdf5-fortran-bindings=1 \
+          --with-shared-libraries=0 \
+          --with-debugging=0 \
+          --with-scalar-type=${{ matrix.mode }} \
+          --PETSC_ARCH=arch-${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.target }}
+
+          echo "Building PETSc"
+          make -j
+
+          echo "Checking PETSc build"
+          make check
+
+      # Build PETSc
+      - name: Build PETSc (MacOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          echo "Getting latest PETSc release version"
+          git clone -b release https://gitlab.com/petsc/petsc.git petsc
+          
+          echo "Configuring PETSc"
+          cd petsc
+          ./configure \
+          --download-openmpi=yes \
           --with-cc=mpicc --COPTFLAGS="-g -O" \
           --with-cxx=mpicxx --CXXOPTFLAGS="-g -O" \
           --with-fc=mpif90 --FOPTFLAGS="-g -O" \
