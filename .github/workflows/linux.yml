@@ -49,8 +49,7 @@ jobs:
 
       # Get MPI
       - name: Get MPI
-        run: |
-          sudo apt-get install mpich libmpich-dev
+        run: sudo apt-get install mpich libmpich-dev
 
       # Check MPI
       - name: Check MPI
@@ -113,5 +112,7 @@ jobs:
           cd trunk
           make test
 
-      - run: echo "This job's status is ${{ job.status }}."
+      # Report job status
+      - name: Report job status
+        run: echo "This job's status is ${{ job.status }}."
 
