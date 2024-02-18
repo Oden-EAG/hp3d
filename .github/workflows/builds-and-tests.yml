@@ -56,8 +56,7 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: |
           export HOMEBREW_NO_INSTALL_CLEANUP=1
-          brew install gfortran
-      #brew install open-mpi
+          brew install open-mpi
 
       # Check MPI
       - name: Check MPI (Linux)
@@ -65,7 +64,7 @@ jobs:
         run: |
           mpicc --version
           mpicxx --version
-          mpif90 --version
+          mpifort --version
           mpirun --version
 
       # Build PETSc
@@ -113,9 +112,9 @@ jobs:
           cd petsc
           ./configure \
           --download-openmpi=yes \
-          --with-cc=gcc --COPTFLAGS="-g -O" \
-          --with-cxx=g++ --CXXOPTFLAGS="-g -O" \
-          --with-fc=gfortran --FOPTFLAGS="-g -O" \
+          --with-cc=mpicc --COPTFLAGS="-g -O" \
+          --with-cxx=mpicxx --CXXOPTFLAGS="-g -O" \
+          --with-fc=mpifort --FOPTFLAGS="-g -O" \
           --with-mpiexec=mpirun \
           --download-fblaslapack=yes \
           --download-scalapack=yes \
