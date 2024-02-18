@@ -18,10 +18,13 @@ jobs:
         mode: [real, complex]
         target: [dbg, opt]
 
-    name: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.target }}
+    env: 
+      CONFIG: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.target }}
+
+    name: $CONFIG
 
     runs-on: ${{ matrix.os }}
-    
+
     steps:
       # Print runner info to console
       - name: Print runner info
@@ -61,6 +64,11 @@ jobs:
           brew install bison flex
           sudo ln -s /usr/local/opt/bison/bin/bison /usr/local/bin/bison
           sudo ln -s /usr/local/opt/flex/bin/flex /usr/local/bin/flex
+
+      # Get X11 (MacOS)
+      - name: Get X11 (MacOS)
+        if: matrix.os == 'macos-latest'
+        run: brew --cask install xquartz
 
       # Get MPI (MacOS)
       - name: Get MPI (MacOS)
@@ -106,7 +114,7 @@ jobs:
           --with-shared-libraries=0 \
           --with-debugging=0 \
           --with-scalar-type=${{ matrix.mode }} \
-          --PETSC_ARCH=arch-${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.target }}
+          --PETSC_ARCH=arch-$CONFIG
 
           echo "Building PETSc"
           make -j
@@ -119,7 +127,7 @@ jobs:
         run: |
           echo "Configuring hp3D"
           cd trunk
-          cp m_options_files/workflows/m_options_${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.target }} ./m_options
+          cp m_options_files/workflows/m_options_$CONFIG ./m_options
 
           echo "Building hp3D"
           make -j
