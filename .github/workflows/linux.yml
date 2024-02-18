@@ -1,7 +1,13 @@
 name: Linux Builds and Tests
 run-name: linux-builds-and-tests
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+      - release
+      - next
+
 jobs:
   linux-builds-and-tests:
     strategy:
@@ -15,12 +21,15 @@ jobs:
     runs-on: ${{ matrix.os }}
     
     steps:
-      - run: echo "The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      # Print runner info to console
+      - name: Print runner info
+        run: |
+          echo "The job was automatically triggered by a ${{ github.event_name }} event."
+          echo "This job is now running on a ${{ runner.os }} server hosted by GitHub."
+          echo "The branch name is ${{ github.ref }} repository is ${{ github.repository }}."
 
       # Interrupt workflow already running on the same branch
-      - name: Cancel Previous Runs
+      - name: Cancel previous runs
         uses: styfle/cancel-workflow-action@0.12.1
         with:
           access_token: ${{ github.token }}
@@ -29,8 +38,7 @@ jobs:
       - name: Check out hp3d
         uses: actions/checkout@v4
 
-      - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "The workflow is now ready to test your code on the runner."
+      - run: echo "${{ github.repository }} repository has been cloned to the runner."
 
       # List files in the repository
       - name: List files in the repository
