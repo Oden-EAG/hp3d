@@ -1,10 +1,19 @@
-name: Linux Build and Tests
-run-name: hp3d-linux-build-and-tests
+name: Linux Builds and Tests
+run-name: linux-builds-and-tests
 
 on: [push]
 jobs:
-  linux:
-    runs-on: ubuntu-latest
+  linux-builds-and-tests:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        mode: [real, complex]
+        target: [dbg, opt]
+
+    name: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.target }}
+
+    runs-on: ${{ matrix.os }}
+    
     steps:
       - run: echo "The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "This job is now running on a ${{ runner.os }} server hosted by GitHub!"
@@ -67,8 +76,8 @@ jobs:
           --with-hdf5-fortran-bindings=1 \
           --with-shared-libraries=0 \
           --with-debugging=0 \
-          --with-scalar-type=real \
-          --PETSC_ARCH=arch-ubuntu-real
+          --with-scalar-type=${{ matrix.mode }} \
+          --PETSC_ARCH=arch-${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.target }}
 
           echo "Building PETSc"
           make -j
@@ -81,7 +90,7 @@ jobs:
         run: |
           echo "Configuring hp3D"
           cd trunk
-          cp m_options_files/workflows/m_options_ubuntu_real ./m_options
+          cp m_options_files/workflows/m_options_${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.target }} ./m_options
 
           echo "Building hp3D"
           make -j
