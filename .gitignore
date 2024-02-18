@@ -33,6 +33,9 @@ pois
 uwLaser
 hose
 
+# Mesh files
+fiber_prism_*
+
 # Tests
 trunk/test/_exec_
 test_mpi

@@ -155,7 +155,7 @@ subroutine elem_heat(Mdle,                   &
    integer :: nrv,nre,nrf
 !
 !..various variables for the problem
-   real(8)    :: rjac,bjac,weight,wa,v2n,v1,v2
+   real(8)    :: rjac,bjac,weight,wa,v2n,v1,v2,minz,maxz,elem_z
    integer    :: i1,i2,j1,j2,k1,k2,kH,kk,i,j,nint,iflag,kE,k
    integer    :: nordP,nrdof,l,nsign,ifc,info,ndom,iphys,icomp
    real(8)    :: rfval,therm_Load
@@ -223,6 +223,20 @@ subroutine elem_heat(Mdle,                   &
 !
 !..determine nodes coordinates
    call nodcor(Mdle, xnod)
+!
+!..determine z-coordinate inside the element
+   select case(etype)
+      case(MDLB)
+         maxz = maxval(xnod(3,1:8))
+         minz = minval(xnod(3,1:8))
+      case(MDLP)
+         maxz = maxval(xnod(3,1:6))
+         minz = minval(xnod(3,1:6))
+      case default
+         write(*,*) 'elem_maxwell: unexpected etype=',etype,'. stop.'
+         stop
+   end select
+   elem_z = (minz + maxz) / 2.d0
 !
 !..determine dof for current solution if running multiple
 !..steps of heat equation
@@ -319,7 +333,7 @@ subroutine elem_heat(Mdle,                   &
 !     ...heat deposition in fiber core only
          if (ndom .eq. 1 .or. ndom .eq.  2) then
 !        ...compute the H1 solution load at the point
-            call get_thermLoad(zsolQ_soleval, therm_Load)
+            call get_thermLoad(zsolQ_soleval,elem_z, therm_Load)
          endif
       endif
 !
@@ -379,7 +393,7 @@ subroutine elem_heat(Mdle,                   &
                   if (ANISO_HEAT .eq. 1) then
                      dv2(3) = ALPHA_Z*ALPHA_Z*dv2(3)
                   elseif (NO_PROBLEM.eq.2 .and. USE_PML .and. &
-                          x(3).ge.(ZL-2.d0*PML_FRAC*ZL)) then
+                          x(3).ge.(ZL-1.25d0*PML_FRAC*ZL)) then
 !              ...reduce artificial cooling from PML
                      dv2(3) = ALPHA_Z*ALPHA_Z*dv2(3)
                   endif
@@ -409,7 +423,7 @@ subroutine elem_heat(Mdle,                   &
             if (ANISO_HEAT .eq. 1) then
                dv2(3) = ALPHA_Z*ALPHA_Z*dv2(3)
             elseif (NO_PROBLEM.eq.2 .and. USE_PML .and. &
-                    x(3).ge.(ZL-2.d0*PML_FRAC*ZL)) then
+                    x(3).ge.(ZL-1.25d0*PML_FRAC*ZL)) then
 !        ...reduce artificial cooling from PML
                dv2(3) = ALPHA_Z*ALPHA_Z*dv2(3)
             endif

@@ -57,7 +57,7 @@ subroutine check_jacobian
      !  ...integration points
      call set_3Dint(NODES(mdle)%ntype,norder, nint,xiloc,wxi)
 
-     !  ...number of element vertices, neeed to perfrom incremental check
+     !  ...number of element vertices, need to perform incremental check
      nv=nvert(NODES(mdle)%ntype)
 
      !  ...loop over integration points

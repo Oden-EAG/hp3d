@@ -201,15 +201,16 @@ subroutine set_environment_laser
 !
    call set_environment_maxwell
 !
-   call get_option_int ('-nlflag'         , 'NONLINEAR_FLAG' , 0       , NONLINEAR_FLAG )
-   call get_option_int ('-heat'           , 'HEAT_FLAG'      , 0       , HEAT_FLAG      )
-   call get_option_int ('-aniso_heat'     , 'ANISO_HEAT'     , 0       , ANISO_HEAT     )
-   call get_option_int ('-aniso_ref_index', 'ANISO_REF_INDEX', 0       , ANISO_REF_INDEX)
-   call get_option_int ('-art_grating'    , 'ART_GRATING'    , 0       , ART_GRATING    )
-   call get_option_int ('-copump'         , 'COPUMP'         , 1       , COPUMP         )
-   call get_option_int ('-fake_pump'      , 'FAKE_PUMP'      , 0       , FAKE_PUMP      )
-   call get_option_real('-raman'          , 'RAMAN_GAIN'     , 1.d-3   , RAMAN_GAIN     )
-   call get_option_real('-gain'           , 'ACTIVE_GAIN'    , 1.d3    , ACTIVE_GAIN    )
+   call get_option_int ('-nlflag'          , 'NONLINEAR_FLAG'  , 0       , NONLINEAR_FLAG )
+   call get_option_int ('-heat'            , 'HEAT_FLAG'       , 0       , HEAT_FLAG      )
+   call get_option_int ('-aniso_heat'      , 'ANISO_HEAT'      , 0       , ANISO_HEAT     )
+   call get_option_int ('-aniso_ref_index' , 'ANISO_REF_INDEX' , 0       , ANISO_REF_INDEX)
+   call get_option_int ('-art_grating'     , 'ART_GRATING'     , 0       , ART_GRATING    )
+   call get_option_int ('-copump'          , 'COPUMP'          , 1       , COPUMP         )
+   call get_option_int ('-plane_pump'      , 'PLANE_PUMP'      , 0       , PLANE_PUMP      )
+   call get_option_real('-plane_pump_power', 'PLANE_PUMP_POWER', 1.d3    , PLANE_PUMP_POWER)
+   call get_option_real('-raman'           , 'RAMAN_GAIN'      , 1.d-3   , RAMAN_GAIN     )
+   call get_option_real('-gain'            , 'ACTIVE_GAIN'     , 1.d3    , ACTIVE_GAIN    )
 !
 !..time stepping: number of steps, and step size
    call get_option_int ('-nsteps'   , 'NSTEPS'  , 1       , NSTEPS  )

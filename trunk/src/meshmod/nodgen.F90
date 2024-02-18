@@ -41,7 +41,7 @@ subroutine nodgen(Ntype,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
 !
 #if DEBUG_MODE
    integer :: ncase(NR_PHYSA)
-   integer :: ibcnd(NRINDEX)
+   integer :: ibcnd(NRINDEX_HEV)
    integer :: iprint
    iprint=0
 #endif
@@ -56,8 +56,8 @@ subroutine nodgen(Ntype,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
       call decod(Icase,2,NR_PHYSA, ncase)
       write(*,7001) ncase(1:NR_PHYSA)
  7001 format(' decoded Icase = ',10i1)
-      call decod(Nbcond,2,NRINDEX, ibcnd)
-      write(*,7002) ibcnd(1:NRINDEX)
+      call decod(Nbcond,2,NRINDEX_HEV, ibcnd)
+      write(*,7002) ibcnd(1:NRINDEX_HEV)
  7002 format(' decoded Nbcond = ',30i1)
    endif
 #endif

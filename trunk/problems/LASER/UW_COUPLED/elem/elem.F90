@@ -33,8 +33,10 @@ subroutine elem(Mdle, Itest,Itrial)
    use commonParam
    use data_structure3D
    use parametersDPG
-   use physics, only: NR_PHYSA
-   use MPI, only: MPI_Wtime
+   use physics   , only: NR_PHYSA
+   use mpi_param , only: RANK,ROOT
+   use laserParam, only: PLANE_PUMP
+   use MPI       , only: MPI_Wtime
 !
    implicit none
 !
@@ -164,6 +166,13 @@ subroutine elem(Mdle, Itest,Itrial)
             endif
 !
          else
+!        ...notify user that PLANE_PUMP=0 is required for pump Maxwell solve
+            if (PLANE_PUMP.ne.0) then
+               if (RANK.eq.ROOT) then
+                  write(*,*) 'elem: pump solve via Maxwell requires PLANE_PUMP=0. stop.'
+               endif
+               stop
+            endif
 !        ...pump case
             Itest(3)=1; Itrial(3)=1
             Itest(6)=1; Itrial(6)=1
