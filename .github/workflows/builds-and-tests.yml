@@ -78,10 +78,14 @@ jobs:
         run: |
           echo $PATH 
           export PATH="/usr/local/opt/libx11:${PATH}"
-          echo $PATH 
+          echo $PATH
+          echo "ls /usr/local/opt/libx11"
           ls /usr/local/opt/libx11
+          echo "ls /usr/local/opt/libx11/lib"
           ls /usr/local/opt/libx11/lib
+          echo "ls /usr/local/opt/libx11/include"
           ls /usr/local/opt/libx11/include
+          echo "find /usr/local/opt/libx11 -name libX11*"
           find /usr/local/opt/libx11 -name "libX11*"
 
       # Get MPI (MacOS)
