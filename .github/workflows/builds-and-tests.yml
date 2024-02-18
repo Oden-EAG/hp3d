@@ -69,8 +69,8 @@ jobs:
           sudo ln -s /usr/local/opt/flex/bin/flex /usr/local/bin/flex
 
       # Get X11 (MacOS)
-      # (alternatively, use "brew install xquartz --cask")
-      # (brew reinstall libx11)
+      # (alternatively, use "brew reinstall libx11"
+      #                  or "brew install xquartz --cask")
       # ls /usr/local/Cellar/libx11/1.8.7
       # find /usr/local/Cellar -name "libx11*"
       - name: Get X11 (MacOS)
@@ -80,7 +80,9 @@ jobs:
           export PATH="/usr/local/opt/libx11:${PATH}"
           echo $PATH 
           ls /usr/local/opt/libx11
-          find /usr/local/opt/libx11 -name "libx11*"
+          ls /usr/local/opt/libx11/lib
+          ls /usr/local/opt/libx11/include
+          find /usr/local/opt/libx11 -name "libX11*"
 
       # Get MPI (MacOS)
       - name: Get MPI (MacOS)
