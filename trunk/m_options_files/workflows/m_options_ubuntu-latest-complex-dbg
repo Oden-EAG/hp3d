@@ -23,21 +23,12 @@ HP3D_USE_OPENMP ?= 0
 FF = mpif90
 CC = mpicc
 FC     =  $(FF)
-FFLAGS = -fPIC -ffree-line-length-none
+FFLAGS = -fPIC -ffree-line-length-none -flto -Wno-lto-type-mismatch
 
 # OpenMP
 ifeq ($(HP3D_USE_OPENMP),1)
   FFLAGS += -fopenmp
 endif
-
-# Additional gfortran compiler flags check Fortran standard
-#FFLAGS += -std=legacy
-#FFLAGS += -std=f2018
-
-# Additional gfortran compiler flags to generate warnings
-#FFLAGS += -Wall
-#FFLAGS += -Wextra
-#FFLAGS += -Wpedantic
 
 # Optimization flags
 ifeq ($(DEBUG),0)
