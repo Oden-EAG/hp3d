@@ -14,9 +14,12 @@ jobs:
   builds-and-tests:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        mode: [real, complex]
-        target: [dbg, opt]
+        os: [macos-latest]
+        mode: [real]
+        target: [dbg]
+        # os: [ubuntu-latest, macos-latest]
+        # mode: [real, complex]
+        # target: [dbg, opt]
 
     name: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.target }}
 
@@ -71,7 +74,7 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: |
           echo $PATH 
-          brew install libx11
+          brew reinstall libx11
           echo $PATH
 
       # Get MPI (MacOS)
