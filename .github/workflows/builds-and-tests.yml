@@ -69,7 +69,7 @@ jobs:
       # (alternatively, use "brew install xquartz --cask")
       - name: Get X11 (MacOS)
         if: matrix.os == 'macos-latest'
-        run:
+        run: |
           echo $PATH 
           brew install libx11
           echo $PATH
