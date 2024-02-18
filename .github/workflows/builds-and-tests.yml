@@ -68,7 +68,8 @@ jobs:
       # Get X11 (MacOS)
       - name: Get X11 (MacOS)
         if: matrix.os == 'macos-latest'
-        run: brew --cask install xquartz
+        run: |
+          brew cask install xquartz
 
       # Get MPI (MacOS)
       - name: Get MPI (MacOS)
