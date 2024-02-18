@@ -58,7 +58,7 @@ jobs:
       # Get Bison and Flex (MacOS)
       - name: Get Bison and Flex (MacOS)
         if: matrix.os == 'macos-latest'
-        run: 
+        run: |
           brew install bison flex
           sudo ln -s /usr/local/opt/bison/bin/bison /usr/local/bin/bison
           sudo ln -s /usr/local/opt/flex/bin/flex /usr/local/bin/flex
