@@ -60,11 +60,12 @@ jobs:
           gfortran --version
 
       # Set deployment target (MacOS)
+      # $(sw_vers -productVersion)
       - name: Set deployment target (MacOS)
         if: matrix.os == 'macos-latest'
         run: |
           echo $MACOSX_DEPLOYMENT_TARGET
-          export MACOSX_DEPLOYMENT_TARGET=$(sw_vers -productVersion)
+          export MACOSX_DEPLOYMENT_TARGET=12.0
           echo $MACOSX_DEPLOYMENT_TARGET
 
       # Get X11 (MacOS)
