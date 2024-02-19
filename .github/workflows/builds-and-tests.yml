@@ -27,6 +27,8 @@ jobs:
 
     env:
       CONFIG: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.target }}
+      MACOSX_DEPLOYMENT_TARGET: 12.0
+      CMAKE_OSX_DEPLOYMENT_TARGET: 12.0
 
     steps:
       # Print runner info to console
@@ -52,7 +54,6 @@ jobs:
         run: ls ${{ github.workspace }}
 
       # Symlink gfortran (MacOS)
-      # (alternatively, use "brew reinstall gfortran")
       - name: Symlink gfortran (MacOS)
         if: runner.os == 'macOS'
         run: |
@@ -82,7 +83,9 @@ jobs:
       # Get MPI (MacOS)
       - name: Get MPI (MacOS)
         if: runner.os == 'macOS'
-        run: brew install open-mpi
+        run: |
+          export HOMEBREW_NO_INSTALL_CLEANUP=1
+          brew install open-mpi
 
       # Get MPI (Linux)
       - name: Get MPI (Linux)
@@ -100,8 +103,6 @@ jobs:
       # Build PETSc
       - name: Build PETSc
         run: |
-          export MACOSX_DEPLOYMENT_TARGET=12.0
-          export CMAKE_OSX_DEPLOYMENT_TARGET=12.0
           echo "$MACOSX_DEPLOYMENT_TARGET"
           echo "$CMAKE_OSX_DEPLOYMENT_TARGET"
 
