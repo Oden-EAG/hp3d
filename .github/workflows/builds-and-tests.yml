@@ -59,14 +59,13 @@ jobs:
           sudo ln -s /usr/local/bin/gfortran-13 /usr/local/bin/gfortran
           gfortran --version
 
-      # Get Bison and Flex (MacOS)
-      - name: Get Bison and Flex (MacOS)
+      # Set deployment target (MacOS)
+      - name: Set deployment target (MacOS)
         if: matrix.os == 'macos-latest'
         run: |
-          export HOMEBREW_NO_INSTALL_CLEANUP=1
-          brew install bison flex
-          sudo ln -s /usr/local/opt/bison/bin/bison /usr/local/bin/bison
-          sudo ln -s /usr/local/opt/flex/bin/flex /usr/local/bin/flex
+          echo $MACOSX_DEPLOYMENT_TARGET
+          export MACOSX_DEPLOYMENT_TARGET=$(sw_vers -productVersion)
+          echo $MACOSX_DEPLOYMENT_TARGET
 
       # Get X11 (MacOS)
       # (alternatively, use "brew reinstall libx11"
@@ -76,19 +75,16 @@ jobs:
       - name: Get X11 (MacOS)
         if: matrix.os == 'macos-latest'
         run: |
-          echo $PATH 
           export PATH="/usr/local/opt/libx11:${PATH}"
-          echo $PATH
-          echo "ls /usr/local/opt/libx11"
-          ls /usr/local/opt/libx11
-          echo "ls /usr/local/opt/libx11/lib"
-          ls /usr/local/opt/libx11/lib
-          echo "ls /usr/local/opt/libx11/lib/X11"
-          ls /usr/local/opt/libx11/lib/X11
-          echo "ls /usr/local/opt/libx11/include"
-          ls /usr/local/opt/libx11/include
-          echo "ls /usr/local/opt/libx11/include/X11"
-          ls /usr/local/opt/libx11/include/X11
+
+      # Get Bison and Flex (MacOS)
+      - name: Get Bison and Flex (MacOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          export HOMEBREW_NO_INSTALL_CLEANUP=1
+          brew install bison flex
+          sudo ln -s /usr/local/opt/bison/bin/bison /usr/local/bin/bison
+          sudo ln -s /usr/local/opt/flex/bin/flex /usr/local/bin/flex
 
       # Get MPI (MacOS)
       - name: Get MPI (MacOS)
