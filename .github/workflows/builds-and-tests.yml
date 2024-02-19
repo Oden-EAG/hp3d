@@ -53,13 +53,13 @@ jobs:
 
       # Symlink gfortran (MacOS)
       # (alternatively, use "brew reinstall gfortran")
-      - name: Symlink gfortran (MacOS)
-        if: matrix.os == 'macos-latest'
-        run: |
-          echo "ls /usr/local/bin/gfort*"
-          ls /usr/local/bin/gfort*
-          sudo ln -s /usr/local/bin/gfortran-12 /usr/local/bin/gfortran
-          gfortran --version
+      # - name: Symlink gfortran (MacOS)
+      #   if: matrix.os == 'macos-latest'
+      #   run: |
+      #     echo "ls /usr/local/bin/gfort*"
+      #     ls /usr/local/bin/gfort*
+      #     sudo ln -s /usr/local/bin/gfortran-12 /usr/local/bin/gfortran
+      #     gfortran --version
 
       # Install gfortran (MacOS)
       - name: Symlink gfortran (MacOS)
