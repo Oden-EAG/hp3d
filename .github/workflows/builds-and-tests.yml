@@ -62,14 +62,14 @@ jobs:
 
       # Set deployment target (MacOS)
       # $(sw_vers -productVersion)
-      - name: Set deployment target (MacOS)
-        if: runner.os == 'macOS'
-        run: |
-          echo "$(sw_vers -productVersion)"
-          export MACOSX_DEPLOYMENT_TARGET=$(sw_vers -productVersion)
-          export CMAKE_OSX_DEPLOYMENT_TARGET=$(sw_vers -productVersion)
-          echo "$MACOSX_DEPLOYMENT_TARGET"
-          echo "$CMAKE_OSX_DEPLOYMENT_TARGET"
+      # - name: Set deployment target (MacOS)
+      #   if: runner.os == 'macOS'
+      #   run: |
+      #     echo "$(sw_vers -productVersion)"
+      #     export MACOSX_DEPLOYMENT_TARGET=$(sw_vers -productVersion)
+      #     export CMAKE_OSX_DEPLOYMENT_TARGET=$(sw_vers -productVersion)
+      #     echo "$MACOSX_DEPLOYMENT_TARGET"
+      #     echo "$CMAKE_OSX_DEPLOYMENT_TARGET"
 
       # Get Bison and Flex (MacOS)
       - name: Get Bison and Flex (MacOS)
@@ -101,6 +101,8 @@ jobs:
       # Build PETSc
       - name: Build PETSc
         run: |
+          export MACOSX_DEPLOYMENT_TARGET=$(sw_vers -productVersion)
+          export CMAKE_OSX_DEPLOYMENT_TARGET=$(sw_vers -productVersion)
           echo "$MACOSX_DEPLOYMENT_TARGET"
           echo "$CMAKE_OSX_DEPLOYMENT_TARGET"
 
@@ -134,12 +136,12 @@ jobs:
           echo "Checking PETSc build"
           make check
 
-      # Build hp3D
-      - name: Build hp3D
-        run: |
           echo "$MACOSX_DEPLOYMENT_TARGET"
           echo "$CMAKE_OSX_DEPLOYMENT_TARGET"
 
+      # Build hp3D
+      - name: Build hp3D
+        run: |
           echo "Configuring hp3D"
           cd trunk
           cp m_options_files/workflows/m_options_$CONFIG ./m_options
