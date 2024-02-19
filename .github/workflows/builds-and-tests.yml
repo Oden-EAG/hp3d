@@ -38,10 +38,10 @@ jobs:
           echo "The branch name is ${{ github.ref }}."
 
       # Interrupt workflow already running on the same branch
-      - name: Cancel previous runs
-        uses: styfle/cancel-workflow-action@0.12.1
-        with:
-          access_token: ${{ github.token }}
+      # - name: Cancel previous runs
+      #   uses: styfle/cancel-workflow-action@0.12.1
+      #   with:
+      #     access_token: ${{ github.token }}
 
       # Check out hp3d repository
       - name: Check out hp3d repository
@@ -62,13 +62,13 @@ jobs:
       #     gfortran --version
 
       # Install gfortran (MacOS)
-      - name: Symlink gfortran (MacOS)
+      - name: Install gfortran (MacOS)
         if: matrix.os == 'macos-latest'
         run: |
           export HOMEBREW_NO_INSTALL_CLEANUP=1
           echo "ls /usr/local/bin/gfort*"
           ls /usr/local/bin/gfort*
-          brew reinstall gfortran
+          brew reinstall gcc@12
           echo "ls /usr/local/bin/gfort*"
           ls /usr/local/bin/gfort*
           echo "gfortran --version"
