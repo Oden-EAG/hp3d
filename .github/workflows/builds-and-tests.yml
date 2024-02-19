@@ -27,8 +27,8 @@ jobs:
 
     env:
       CONFIG: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.target }}
-      MACOSX_DEPLOYMENT_TARGET: 13.0
-      CMAKE_OSX_DEPLOYMENT_TARGET: 13.0
+      MACOSX_DEPLOYMENT_TARGET: 13.6
+      CMAKE_OSX_DEPLOYMENT_TARGET: 13.6
 
     steps:
       # Print runner info to console
