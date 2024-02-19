@@ -24,8 +24,8 @@ jobs:
 
     env:
       CONFIG: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.target }}
-      MACOSX_DEPLOYMENT_TARGET: '12.0'
-      CMAKE_OSX_DEPLOYMENT_TARGET: '12.0'
+      MACOSX_DEPLOYMENT_TARGET: '$(sw_vers -productVersion)'
+      CMAKE_OSX_DEPLOYMENT_TARGET: '$(sw_vers -productVersion)'
       HOMEBREW_NO_INSTALL_CLEANUP: 1
 
     steps:
