@@ -104,9 +104,9 @@ jobs:
           echo "Configuring PETSc"
           cd petsc
           ./configure \
-          --with-cc=mpicc --COPTFLAGS="-g -O -mmacosx-version-min=12.7" \
-          --with-cxx=mpicxx --CXXOPTFLAGS="-g -O -mmacosx-version-min=12.7" \
-          --with-fc=mpif90 --FOPTFLAGS="-g -O -mmacosx-version-min=12.7" \
+          --with-cc=mpicc --COPTFLAGS="-g -O -mmacosx-version-min=12.0" \
+          --with-cxx=mpicxx --CXXOPTFLAGS="-g -O -mmacosx-version-min=12.0" \
+          --with-fc=mpif90 --FOPTFLAGS="-g -O -mmacosx-version-min=12.0" \
           --with-mpiexec=mpirun \
           --download-scalapack=yes \
           --download-fblaslapack=yes \
