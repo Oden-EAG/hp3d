@@ -7,6 +7,9 @@ info :
 
 include ../m_options
 
+HP3D_MPIRUN ?= mpirun
+HP3D_MPI_NP ?= 2
+
 OBJ_PATH     = _obj_
 EXEC_PATH    = _exec_
 MODULE_PATH  = $(OBJ_PATH)
@@ -120,6 +123,7 @@ seq :
 			    " Sequential Tests Passed."; \
 		printf   "     "$$((seq_fail))/$$((seq_pass+seq_fail))"%s\n\n" \
 			    " Sequential Tests FAILED!"; \
+		exit 1; \
 	fi ; \
 	echo $$((seq_pass))" "$$((seq_fail)) > $(OBJ_PATH)/.seq_test
 
@@ -143,6 +147,7 @@ par :
 			    " Parallel Tests Passed."; \
 		printf   "     "$$((par_fail))/$$((par_pass+par_fail))"%s\n\n" \
 			    " Parallel Tests FAILED!"; \
+		exit 1; \
 	fi ; \
 	echo $$((par_pass))" "$$((par_fail)) > $(OBJ_PATH)/.par_test
 
@@ -162,6 +167,7 @@ all : seq par
 			    " Tests Passed."; \
 		printf   "     "$$((fail))/$$((pass+fail))"%s\n\n" \
 			    " Tests FAILED!"; \
+		exit 1; \
 	fi ; \
 	 echo "++++++++++++++++++++++++++++++++++++++++";
 
@@ -169,26 +175,28 @@ all : seq par
 .PHONY : run
 run : one
 	@printf "\n Running test: "$(TEST)"\n"
-	@pass=1; mpirun -np 1 ./$(EXEC_PATH)/$(TEST) || pass=0; \
+	@pass=1; $(HP3D_MPIRUN) -np 1 ./$(EXEC_PATH)/$(TEST) || pass=0; \
 	if [ $$((pass)) -eq 1 ]; then \
-			printf "          test_"$(TEST)" PASSED\n\n"; \
-			true; \
+		printf "          test_"$(TEST)" PASSED\n\n"; \
+		true; \
 	else \
-			printf "          test_"$(TEST)" FAILED\n\n"; \
-			false; \
+		printf "          test_"$(TEST)" FAILED\n\n"; \
+		false; \
+		exit 1; \
 	fi ;
 
 #-------------------------------------------------
 .PHONY : run-par
 run-par : one
 	@printf "\n Running test: "$(TEST)"\n"
-	@pass=1; mpirun -np 4 ./$(EXEC_PATH)/$(TEST) || pass=0; \
+	@pass=1; $(HP3D_MPIRUN) -np $(HP3D_MPI_NP) ./$(EXEC_PATH)/$(TEST) || pass=0; \
 	if [ $$((pass)) -eq 1 ]; then \
-			printf "          test_"$(TEST)" PASSED\n\n"; \
-			true; \
+		printf "          test_"$(TEST)" PASSED\n\n"; \
+		true; \
 	else \
-			printf "          test_"$(TEST)" FAILED\n\n"; \
-			false; \
+		printf "          test_"$(TEST)" FAILED\n\n"; \
+		false; \
+		exit 1; \
 	fi ;
 
 #-------------------------------------------------

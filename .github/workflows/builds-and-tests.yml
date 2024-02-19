@@ -1,0 +1,150 @@
+name: Builds and Tests
+run-name: builds-and-tests
+
+on:
+  push:
+    branches:
+      - master
+      - release
+      - next
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  builds-and-tests:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-12, macos-13]
+        mode: [real, complex]
+        target: [dbg, opt]
+        include:
+          - os: ubuntu-latest
+            deployment: ''
+          - os: macos-12
+            deployment: '12.7'
+          - os: macos-13
+            deployment: '13.6'
+
+    name: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.target }}
+
+    runs-on: ${{ matrix.os }}
+
+    env:
+      CONFIG: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.target }}
+      MACOSX_DEPLOYMENT_TARGET: ${{ matrix.deployment }}
+      CMAKE_OSX_DEPLOYMENT_TARGET: ${{ matrix.deployment }}
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
+
+    steps:
+      # Print runner info to console
+      - name: Print runner info
+        run: |
+          echo "This job was triggered by a ${{ github.event_name }} event."
+          echo "This job is running on a ${{ runner.os }} server hosted by GitHub."
+          echo "The repository name is ${{ github.repository }}."
+          echo "The branch name is ${{ github.ref }}."
+
+      # Interrupt workflow already running on the same branch
+      - name: Cancel previous runs
+        uses: styfle/cancel-workflow-action@0.12.1
+        with:
+          access_token: ${{ github.token }}
+
+      # Check out hp3d repository
+      - name: Check out hp3d repository
+        uses: actions/checkout@v4
+
+      # List files in the repository
+      - name: List files in the repository
+        run: ls ${{ github.workspace }}
+
+      # Symlink gfortran (MacOS)
+      - name: Symlink gfortran (MacOS)
+        if: runner.os == 'macOS'
+        run: |
+          sudo ln -s /usr/local/bin/gfortran-13 /usr/local/bin/gfortran
+          gfortran --version
+
+      # Get Bison and Flex (MacOS)
+      - name: Get Bison and Flex (MacOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install bison flex
+          sudo ln -s /usr/local/opt/bison/bin/bison /usr/local/bin/bison
+          sudo ln -s /usr/local/opt/flex/bin/flex /usr/local/bin/flex
+
+      # Get MPI (MacOS)
+      - name: Get MPI (MacOS)
+        if: runner.os == 'macOS'
+        run: brew install open-mpi
+
+      # Get MPI (Linux)
+      - name: Get MPI (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get install mpich
+
+      # Check MPI
+      - name: Check MPI
+        run: |
+          mpicc --version
+          mpicxx --version
+          mpif90 --version
+          mpirun --version
+
+      # Build PETSc
+      - name: Build PETSc
+        run: |
+          echo "Getting latest PETSc release version"
+          git clone -b release https://gitlab.com/petsc/petsc.git petsc
+          
+          echo "Configuring PETSc"
+          cd petsc
+          ./configure \
+          --with-cc=mpicc --COPTFLAGS="-g -O" \
+          --with-cxx=mpicxx --CXXOPTFLAGS="-g -O" \
+          --with-fc=mpif90 --FOPTFLAGS="-g -O" \
+          --with-mpiexec=mpirun \
+          --download-scalapack=yes \
+          --download-fblaslapack=yes \
+          --download-mumps=yes \
+          --download-metis=yes \
+          --download-parmetis=yes \
+          --download-ptscotch=yes \
+          --download-zoltan=yes \
+          --download-hdf5=yes \
+          --with-hdf5-fortran-bindings=1 \
+          --with-shared-libraries=0 \
+          --with-debugging=0 \
+          --with-scalar-type=${{ matrix.mode }} \
+          --PETSC_ARCH=arch-$CONFIG
+
+          echo "Building PETSc"
+          make -j
+
+          echo "Checking PETSc build"
+          make check
+
+      # Build hp3D
+      - name: Build hp3D
+        run: |
+          echo "Configuring hp3D"
+          cd trunk
+          cp m_options_files/workflows/m_options_$CONFIG ./m_options
+
+          echo "Building hp3D"
+          make -j
+
+          echo "Checking hp3D build"
+          make check
+
+      # Run hp3D tests
+      - name: Run hp3D tests
+        run: |
+          echo "Running hp3D tests"
+          cd trunk
+          make test
+
+      # Report job status
+      - name: Report job status
+        run: echo "This job's status is ${{ job.status }}."
+
