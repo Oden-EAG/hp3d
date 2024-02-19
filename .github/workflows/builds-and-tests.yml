@@ -102,7 +102,9 @@ jobs:
       # Get MPI (MacOS)
       - name: Get MPI (MacOS)
         if: runner.os == 'macOS'
-        run: brew install open-mpi
+        run: |
+          brew install open-mpi
+          brew install scalapack
 
       # Get MPI (Linux)
       - name: Get MPI (Linux)
@@ -117,6 +119,7 @@ jobs:
           mpif90 --version
           mpirun --version
 
+###          --download-scalapack=yes \
       # Build PETSc
       - name: Build PETSc
         run: |
@@ -131,7 +134,6 @@ jobs:
           --with-fc=mpif90 --FOPTFLAGS="-g -O" \
           --with-mpiexec=mpirun \
           --download-fblaslapack=yes \
-          --download-scalapack=yes \
           --download-mumps=yes \
           --download-metis=yes \
           --download-parmetis=yes \
