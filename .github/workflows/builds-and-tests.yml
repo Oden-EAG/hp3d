@@ -125,7 +125,7 @@ jobs:
           --download-zoltan=yes \
           --download-hdf5=yes \
           --with-hdf5-fortran-bindings=1 \
-          --with-shared-libraries=0 \
+          --with-shared-libraries=1 \
           --with-debugging=0 \
           --with-scalar-type=${{ matrix.mode }} \
           --PETSC_ARCH=arch-$CONFIG
