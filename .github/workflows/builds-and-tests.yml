@@ -133,6 +133,7 @@ jobs:
           --with-cxx=mpicxx --CXXOPTFLAGS="-g -O" \
           --with-fc=mpif90 --FOPTFLAGS="-g -O" \
           --with-mpiexec=mpirun \
+          --with-scalapack-dir=/usr/local/Cellar/scalapack/2.2.0_1 \
           --download-fblaslapack=yes \
           --download-mumps=yes \
           --download-metis=yes \
