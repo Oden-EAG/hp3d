@@ -56,17 +56,16 @@ jobs:
       - name: Symlink gfortran (MacOS)
         if: matrix.os == 'macos-latest'
         run: |
-          sudo ln -s /usr/local/bin/gfortran-13 /usr/local/bin/gfortran
+          echo "ls /usr/local/bin/gfortran-12"
+          ls /usr/local/bin/gfortran-12
+          sudo ln -s /usr/local/bin/gfortran-12 /usr/local/bin/gfortran
           gfortran --version
 
       # Set deployment target (MacOS)
       # $(sw_vers -productVersion)
       - name: Set deployment target (MacOS)
         if: matrix.os == 'macos-latest'
-        run: |
-          echo $MACOSX_DEPLOYMENT_TARGET
-          export MACOSX_DEPLOYMENT_TARGET=12.0
-          echo $MACOSX_DEPLOYMENT_TARGET
+        run: export MACOSX_DEPLOYMENT_TARGET=12.0
 
       # Get X11 (MacOS)
       # (alternatively, use "brew reinstall libx11"
