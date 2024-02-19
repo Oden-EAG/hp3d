@@ -65,8 +65,8 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           echo "$(sw_vers -productVersion)"
-          export MACOSX_DEPLOYMENT_TARGET=13.0
-          export CMAKE_OSX_DEPLOYMENT_TARGET=13.0
+          export MACOSX_DEPLOYMENT_TARGET=$(sw_vers -productVersion)
+          export CMAKE_OSX_DEPLOYMENT_TARGET=$(sw_vers -productVersion)
 
       # Get Bison and Flex (MacOS)
       - name: Get Bison and Flex (MacOS)
