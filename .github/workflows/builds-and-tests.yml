@@ -56,26 +56,39 @@ jobs:
       - name: Symlink gfortran (MacOS)
         if: matrix.os == 'macos-latest'
         run: |
-          echo "ls /usr/local/bin/gfortran-12"
-          ls /usr/local/bin/gfortran-12
+          echo "ls /usr/local/bin/gfort*"
+          ls /usr/local/bin/gfort*
           sudo ln -s /usr/local/bin/gfortran-12 /usr/local/bin/gfortran
+          gfortran --version
+
+      # Install gfortran (MacOS)
+      - name: Symlink gfortran (MacOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          export HOMEBREW_NO_INSTALL_CLEANUP=1
+          echo "ls /usr/local/bin/gfort*"
+          ls /usr/local/bin/gfort*
+          brew reinstall gfortran
+          echo "ls /usr/local/bin/gfort*"
+          ls /usr/local/bin/gfort*
+          echo "gfortran --version"
           gfortran --version
 
       # Set deployment target (MacOS)
       # $(sw_vers -productVersion)
-      - name: Set deployment target (MacOS)
-        if: matrix.os == 'macos-latest'
-        run: export MACOSX_DEPLOYMENT_TARGET=12.0
+      # - name: Set deployment target (MacOS)
+      #   if: matrix.os == 'macos-latest'
+      #   run: export MACOSX_DEPLOYMENT_TARGET=12.0
 
       # Get X11 (MacOS)
       # (alternatively, use "brew reinstall libx11"
       #                  or "brew install xquartz --cask")
       # ls /usr/local/Cellar/libx11/1.8.7
       # find /usr/local/Cellar -name "libx11*"
-      - name: Get X11 (MacOS)
-        if: matrix.os == 'macos-latest'
-        run: |
-          export PATH="/usr/local/opt/libx11:${PATH}"
+      # - name: Get X11 (MacOS)
+      #   if: matrix.os == 'macos-latest'
+      #   run: |
+      #     export PATH="/usr/local/opt/libx11:${PATH}"
 
       # Get Bison and Flex (MacOS)
       - name: Get Bison and Flex (MacOS)
