@@ -1,0 +1,192 @@
+#------------------------------------------------------------------
+# SET HP3D AND LIBRARY PATH
+#------------------------------------------------------------------
+HP3D_BASE_PATH = /Users/runner/work/hp3d/hp3d/trunk
+
+#------------------------------------------------------------------
+# PREPROCESSOR VARIABLES
+#------------------------------------------------------------------
+COMPLEX ?= 1
+DEBUG   ?= 0
+
+# Dependencies
+HP3D_USE_INTEL_MKL ?= 0
+
+#------------------------------------------------------------------
+# COMPILER SETTINGS (a 64bit processor architecture is assumed)
+#------------------------------------------------------------------
+
+# Enable OpenMP threading
+HP3D_USE_OPENMP ?= 0
+
+FF = mpif90
+CC = mpicc
+FC     =  $(FF)
+FFLAGS = -fPIC -ffree-line-length-none
+# gcc 10 issue mpi: add flag
+FFLAGS += -fallow-argument-mismatch
+
+# OpenMP
+ifeq ($(HP3D_USE_OPENMP),1)
+  FFLAGS += -fopenmp
+endif
+
+# Optimization flags
+ifeq ($(DEBUG),0)
+  FFLAGS += -O2
+endif
+
+# Debug flags
+ifeq ($(DEBUG),1)
+  FFLAGS += -Og -g -fbacktrace -fcheck=all
+endif
+
+CFLAGS  =
+
+# Preprocessor defs to call Fortran from C
+# (-DAdd_ or -DAdd__ or -DUPPER)
+CDEFS   = -DAdd_
+
+HP3D_MPIRUN = mpirun
+HP3D_MPI_NP = 2
+
+#------------------------------------------------------------------
+# INTEL MKL LIBRARY
+#------------------------------------------------------------------
+#
+# See https://software.intel.com/en-us/articles/intel-mkl-link-line-advisor
+#
+MKL_LIBS = /opt/intel/mkl/lib/libmkl_intel_lp64.a \
+           /opt/intel/mkl/lib/libmkl_intel_thread.a \
+           /opt/intel/mkl/lib/libmkl_core.a \
+           /opt/intel/compilers_and_libraries_2020.1.216/mac/compiler/lib/libiomp5.a \
+MKL_INCS = -I/opt/intel/mkl/include
+# -i8 (default 64-bit integer)
+
+#------------------------------------------------------------------
+# SOLVER LIBRARY
+#------------------------------------------------------------------
+#
+# also adding PT-SCOTCH and parMETIS
+# also adding Zoltan library dependence
+# also adding PETSC library dependence (petsc needs phdf5)
+
+ifeq ($(COMPLEX),1)
+  PETSC_LIB = /Users/runner/work/hp3d/hp3d/petsc/arch-macos-13-complex-opt/lib
+  PETSC_INC = /Users/runner/work/hp3d/hp3d/petsc/arch-macos-13-complex-opt/include
+else
+  PETSC_LIB = /Users/runner/work/hp3d/hp3d/petsc/arch-macos-13-real-opt/lib
+  PETSC_INC = /Users/runner/work/hp3d/hp3d/petsc/arch-macos-13-real-opt/include
+endif
+
+SOLVER_LIBS = -L$(PETSC_LIB) -lpetsc -ldmumps -lzmumps \
+                             -lmumps_common -lpord -lscalapack \
+                             -lflapack -lfblas -lzoltan -lptesmumps \
+                             -lptscotchparmetisv3 -lptscotch \
+                             -lptscotcherr -lesmumps -lscotch \
+                             -lscotcherr -lparmetis -lmetis
+
+SOLVER_INCS = -I$(PETSC_INC) -I/Users/runner/work/hp3d/hp3d/petsc/include
+
+#------------------------------------------------------------------
+# VIS LIBRARY
+#------------------------------------------------------------------
+#
+
+VIS_LIBS   = -L$(PETSC_LIB) -lhdf5 -lhdf5_hl -lhdf5_fortran -lhdf5hl_fortran
+VIS_INCS   = -I$(PETSC_INC)
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# EXTRA LIBS LINKING
+EXTRA_LINK_LIBS    = -L/usr/local/opt/libx11/lib -lX11
+EXTRA_LINK_INCS    = -I/usr/local/opt/libx11/include
+
+#------------------------------------------------------------------
+# HP3D PATHS
+#------------------------------------------------------------------
+#
+# Mainly for library makefile
+
+HP3D_PATH_COMPLEX = $(HP3D_BASE_PATH)/complex
+HP3D_PATH_REAL    = $(HP3D_BASE_PATH)/real
+
+OBJ_PATH_COMPLEX  =  _obj_complex_
+OBJ_PATH_REAL     =  _obj_real_
+
+SRC_PATH          = src
+MODULE_PATH       = module
+LIB_PATH          = lib
+
+ifeq ($(COMPLEX),1)
+  HP3D_PATH       = $(HP3D_PATH_COMPLEX)
+  OBJ_PATH        = $(OBJ_PATH_COMPLEX)
+else
+  HP3D_PATH       = $(HP3D_PATH_REAL)
+  OBJ_PATH        = $(OBJ_PATH_REAL)
+endif
+
+ifeq ($(HP3D_USE_INTEL_MKL),1)
+  HP3D_LIB_EXTRA_INCS = $(MKL_INCS)
+endif
+HP3D_LIB_EXTRA_INCS += $(SOLVER_INCS) $(VIS_INCS) $(EXTRA_LINK_INCS)
+
+HP3D_MOD_OPTION_INC = -J./$(MODULE_PATH)
+
+# For problem makefiles
+HP3D_LIB        = $(HP3D_PATH)/lib/libhp3d.a
+HP3D_FRONTAL    = $(HP3D_PATH)/lib/libfrontal.a
+HP3D_COMMON     = $(HP3D_PATH)/lib/libhp3d_common.a
+HP3D_GMP        = $(HP3D_PATH)/lib/libhp3d_gmp.a
+
+#------------------------------------------------------------------
+# FOR PROBLEM LINKING
+#------------------------------------------------------------------
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# HP3D LINKING (includes frontal solver)
+
+# Cyclic dependencies force to compile as a group.
+#HP3D_LINK_LIBS    = -Wl,--start-group \
+#                    $(HP3D_LIB) $(HP3D_FRONTAL) \
+#HP3D_LINK_LIBS   += $(HP3D_COMMON) $(HP3D_GMP)
+#HP3D_LINK_LIBS   += -Wl,--end-group
+
+HP3D_LINK_LIBS    = $(HP3D_LIB) $(HP3D_FRONTAL)
+HP3D_LINK_INCS    = -I$(HP3D_PATH)/common/hp3d \
+                    -I$(HP3D_PATH)/common/graphics \
+                    -I$(HP3D_PATH)/module
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# SOLVER & MKL LINKING
+
+SOLVER_LINK_LIBS = $(SOLVER_LIBS)
+SOLVER_LINK_INCS = $(SOLVER_INCS)
+
+ifeq ($(HP3D_USE_INTEL_MKL),1)
+   SOLVER_LINK_LIBS += $(MKL_LIBS)
+   SOLVER_LINK_INCS += $(MKL_INCS)
+endif
+
+SOLVER_LINK_LIBS += -lpthread -lm -lc++ -ldl
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# PROBLEM LINKING
+
+PROB_LIBS    = $(HP3D_LINK_LIBS)   \
+               $(SOLVER_LINK_LIBS) \
+               $(VIS_LIBS)         \
+               $(EXTRA_LINK_LIBS)
+
+#PROB_INCS     = -module ./$(MODULE_PATH)
+PROB_INCS     = -J./$(MODULE_PATH)
+PROB_INCS    += $(HP3D_LINK_INCS)   \
+                $(SOLVER_LINK_INCS) \
+                $(VIS_INCS)         \
+                $(EXTRA_LINK_INCS)
+
+# Files with ending in .F and .F90 (not .f and .f90)
+# are preprocessed according to certain directives
+
+PROB_PP_DEFS  = -D"C_MODE=$(COMPLEX)" \
+                -D"DEBUG_MODE=$(DEBUG)" \
+                -D"HP3D_USE_OPENMP=$(HP3D_USE_OPENMP)" \
+                -D"HP3D_USE_INTEL_MKL=$(HP3D_USE_INTEL_MKL)"

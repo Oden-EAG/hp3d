@@ -38,7 +38,7 @@ subroutine celem( &
   integer,                      intent(out) :: Nrnodm
   real*8,                       intent(out) :: Bload(*),Astif(*)
 !--------------------------------------------------------------------------
-  integer, dimension(NRINDEX) :: nbcond
+  integer, dimension(NRINDEX_HEV) :: nbcond
 !--------------------------------------------------------------------------
 
 ! Physics attributes:               Components:
@@ -53,17 +53,16 @@ subroutine celem( &
   case(24)  ! 2^4+2^3
 
     ! eliminate middle node H(div) dof in celem_system by using BC flag
-    nbcond(1:18) = 0
-    nbcond(4: 6) = 1
-    call encod(nbcond,2,NRINDEX, NODES(Mdle)%bcond)
+    nbcond(1:3) = 0
+    nbcond(4:6) = 1
+    call encod(nbcond,2,NRINDEX_HEV, NODES(Mdle)%bcond)
 
 ! ULTRA-WEAK
   case(31)  ! 2^4+2^3+2^2+2^1+2^0
 
     ! eliminate middle node H^1 and H(div) dof in celem_system by using BC flag
-    nbcond(1:18) = 0
-    nbcond(1: 6) = 1
-    call encod(nbcond,2,NRINDEX, NODES(Mdle)%bcond)
+    nbcond(1:6) = 1
+    call encod(nbcond,2,NRINDEX_HEV, NODES(Mdle)%bcond)
 
   case default
 

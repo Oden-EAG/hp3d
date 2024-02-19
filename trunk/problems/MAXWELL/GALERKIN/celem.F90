@@ -42,7 +42,6 @@ subroutine celem(Mdle,Idec,Nrdofs,Nrdofm,Nrdofc,Nodm, &
    integer, dimension(MAXNODM),  intent(out) :: NdofmH,NdofmE,NdofmV,NdofmQ
    integer,                      intent(out) :: Nrnodm
    complex(8),                   intent(out) :: Bload(*),Astif(*)
-   integer, dimension(NR_PHYSA)              :: nbcond
 !
 !--------------------------------------------------------------------------
 !

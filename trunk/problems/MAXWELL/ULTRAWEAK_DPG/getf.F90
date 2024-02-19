@@ -98,7 +98,6 @@ end subroutine getf
 subroutine get_bdSource(Mdle,X,Rn, Imp_val)
 !
    use control          , only : NEXACT
-   use data_structure3D , only : NR_COMP,ADRES,NRINDEX
    use parameters       , only : MAXEQNH,MAXEQNE,MAXEQNV,MAXEQNQ,ZERO
    use commonParam
 !

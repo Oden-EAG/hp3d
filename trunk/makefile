@@ -217,15 +217,27 @@ endif
 
 check: lib
 	@echo "Checking the hp3D library."
-	@($(MAKE) -C test one run);
-	@($(MAKE) -C problems/MPI_TEST/TEST);
+	@ERR=0; \
+	if ! $(MAKE) -C test one run; then ERR=1; fi; \
+	if ! $(MAKE) -C problems/MPI_TEST/TEST; then ERR=1; fi; \
+	if [ 0 -eq $${ERR} ]; then \
+		echo "'make check' passed."; \
+	else \
+		echo "'make check' failed."; \
+		exit 1; \
+	fi ;
 
 #-------------------------------------------------
 .PHONY : test
 
 test: lib
 	@echo "Testing the hp3D library."
-	@($(MAKE) -C test all);
+	@if $(MAKE) -C test all; then \
+		echo "'make test' passed."; \
+	else \
+		echo "'make test' failed."; \
+		exit 1; \
+	fi;
 
 #-------------------------------------------------
 .PHONY : all

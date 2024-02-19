@@ -5,7 +5,6 @@
 !! @param[in ] Kref       - refinement kind
 !! @param[in ] Nord       - order of approximation for the node
 !! @param[in ] Nbc        - BC flags
-!! @param[in ] Nbc        - BC flags
 !! @param[in ] Subd       - subdomain of node
 !! @param[out] Nrsons     - number of sons
 !! @param[out] Ntype_sons - son type

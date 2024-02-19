@@ -819,9 +819,9 @@ module data_structure3D
       function Is_Dirichlet(Nod)
       logical Is_Dirichlet
       integer Nod
-      integer ibc(NRINDEX), ic, iphys, ivar
+      integer ibc(NRINDEX_HEV), ic, iphys, ivar
 !
-      call decod(NODES(Nod)%bcond,2,NRINDEX, ibc)
+      call decod(NODES(Nod)%bcond,2,NRINDEX_HEV, ibc)
       Is_Dirichlet = .false.
 !
       ic = 0
@@ -834,14 +834,14 @@ module data_structure3D
             continue
 !     ...skip checking vertices of H(curl) variables
          case(TANGEN)
-            if (NODES(nod)%ntype .eq. VERT) then
+            if (NODES(Nod)%ntype .eq. VERT) then
                ic = ic + NR_COMP(iphys)
                cycle
             endif
 !     ...skip checking vertices and edges of H(div) variables
          case(NORMAL)
-            if (     NODES(nod)%ntype .eq. VERT   &
-                .or. NODES(nod)%ntype .eq. MEDG ) then
+            if (     NODES(Nod)%ntype .eq. VERT   &
+                .or. NODES(Nod)%ntype .eq. MEDG ) then
                ic = ic + NR_COMP(iphys)
                cycle
             endif
@@ -865,13 +865,13 @@ module data_structure3D
       function Is_Dirichlet_attr(Nod,Dtype)
       logical Is_Dirichlet_attr
       integer Nod,Dtype
-      integer ibc(NRINDEX), ic, iphys, ivar
+      integer ibc(NRINDEX_HEV), ic, iphys, ivar
 !
-      call decod(NODES(Nod)%bcond,2,NRINDEX, ibc)
+      call decod(NODES(Nod)%bcond,2,NRINDEX_HEV, ibc)
       Is_Dirichlet_attr = .false.
       ic = 0
       do iphys=1,NR_PHYSA
-        if (D_TYPE(iphys).eq.Dtype) then
+        if ((D_TYPE(iphys).eq.Dtype) .and. (Dtype.ne.DISCON)) then
           do ivar=1,NR_COMP(iphys)
             ic = ic + 1
             if (ibc(ic).eq.1) Is_Dirichlet_attr = .true.

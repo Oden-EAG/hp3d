@@ -235,7 +235,7 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
       do i=nrnodm,1,-1
          nod = nodm(i)
 !
-!     ...compute the number of active H1 variables for the node
+!     ...compute the number of active H(curl) variables for the node
          call get_index(nod, index)
 #if DEBUG_MODE
          if (iprint.eq.1) write(*,7100) nod,index
@@ -308,7 +308,7 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
       do i=nrnodm,1,-1
          nod = nodm(i)
 !
-!     ...compute the number of active H1 variables for the node
+!     ...compute the number of active H(div) variables for the node
          call get_index(nod, index)
 #if DEBUG_MODE
          if (iprint.eq.1) write(*,7100) nod,index

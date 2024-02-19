@@ -39,7 +39,7 @@ subroutine celem(Mdle,Idec, Nrdofs,Nrdofm,Nrdofc,Nodm,NdofmH,NdofmE,NdofmV,Ndofm
       integer,                      intent(out) :: Nrnodm
       VTYPE  ,                      intent(out) :: Bload(*),Astif(*)
 !
-      integer, dimension(NRINDEX) :: nbcond
+      integer :: nbcond(NRINDEX_HEV)
 !
 !---------------------------------------------------------------------------------------------------------------
 !
@@ -55,7 +55,7 @@ subroutine celem(Mdle,Idec, Nrdofs,Nrdofm,Nrdofc,Nodm,NdofmH,NdofmE,NdofmV,Ndofm
 !
 !..remove bubble DOFs from trace components
    nbcond = 0; nbcond(2:6) = 1
-   call encod(nbcond,2,NRINDEX, NODES(Mdle)%bcond)
+   call encod(nbcond,2,NRINDEX_HEV, NODES(Mdle)%bcond)
 !
 !..redirect to the system routine
    call celem_system(Mdle,Idec,                            &
