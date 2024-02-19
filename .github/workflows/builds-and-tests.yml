@@ -74,8 +74,8 @@ jobs:
       #     echo "gfortran --version"
       #     gfortran --version
 
-      Set deployment target (MacOS)
-      $(sw_vers -productVersion)
+      # Set deployment target (MacOS)
+      # $(sw_vers -productVersion)
       - name: Set deployment target (MacOS)
         if: runner.os == 'macOS'
         run: |
