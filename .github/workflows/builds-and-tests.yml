@@ -14,7 +14,7 @@ jobs:
   builds-and-tests:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, macos-13]
         mode: [real]
         target: [dbg]
         # os: [ubuntu-latest, macos-latest, macos-13]
@@ -68,6 +68,8 @@ jobs:
           echo "$(sw_vers -productVersion)"
           export MACOSX_DEPLOYMENT_TARGET=$(sw_vers -productVersion)
           export CMAKE_OSX_DEPLOYMENT_TARGET=$(sw_vers -productVersion)
+          echo "$MACOSX_DEPLOYMENT_TARGET"
+          echo "$CMAKE_OSX_DEPLOYMENT_TARGET"
 
       # Get Bison and Flex (MacOS)
       - name: Get Bison and Flex (MacOS)
@@ -99,6 +101,9 @@ jobs:
       # Build PETSc
       - name: Build PETSc
         run: |
+          echo "$MACOSX_DEPLOYMENT_TARGET"
+          echo "$CMAKE_OSX_DEPLOYMENT_TARGET"
+
           echo "Getting latest PETSc release version"
           git clone -b release https://gitlab.com/petsc/petsc.git petsc
           
