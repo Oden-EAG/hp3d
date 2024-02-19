@@ -83,8 +83,7 @@ jobs:
       # Get MPI (MacOS)
       - name: Get MPI (MacOS)
         if: runner.os == 'macOS'
-        run: brew install mpich libmpich-dev
-#open-mpi
+        run: brew install open-mpi
 
       # Get MPI (Linux)
       - name: Get MPI (Linux)
