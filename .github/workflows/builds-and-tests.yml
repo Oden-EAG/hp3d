@@ -14,12 +14,9 @@ jobs:
   builds-and-tests:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, macos-13]
-        mode: [real]
-        target: [dbg]
-        # os: [ubuntu-latest, macos-latest, macos-13]
-        # mode: [real, complex]
-        # target: [dbg, opt]
+        os: [ubuntu-latest, macos-12, macos-13]
+        mode: [real, complex]
+        target: [dbg, opt]
 
     name: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.target }}
 
@@ -61,17 +58,6 @@ jobs:
           sudo ln -s /usr/local/bin/gfortran-13 /usr/local/bin/gfortran
           gfortran --version
 
-      # Set deployment target (MacOS)
-      # $(sw_vers -productVersion)
-      # - name: Set deployment target (MacOS)
-      #   if: runner.os == 'macOS'
-      #   run: |
-      #     echo "$(sw_vers -productVersion)"
-      #     export MACOSX_DEPLOYMENT_TARGET=$(sw_vers -productVersion)
-      #     export CMAKE_OSX_DEPLOYMENT_TARGET=$(sw_vers -productVersion)
-      #     echo "$MACOSX_DEPLOYMENT_TARGET"
-      #     echo "$CMAKE_OSX_DEPLOYMENT_TARGET"
-
       # Get Bison and Flex (MacOS)
       - name: Get Bison and Flex (MacOS)
         if: runner.os == 'macOS'
@@ -88,7 +74,7 @@ jobs:
       # Get MPI (Linux)
       - name: Get MPI (Linux)
         if: runner.os == 'Linux'
-        run: sudo apt-get install mpich libmpich-dev
+        run: sudo apt-get install mpich
 
       # Check MPI
       - name: Check MPI
@@ -101,9 +87,6 @@ jobs:
       # Build PETSc
       - name: Build PETSc
         run: |
-          echo "$MACOSX_DEPLOYMENT_TARGET"
-          echo "$CMAKE_OSX_DEPLOYMENT_TARGET"
-
           echo "Getting latest PETSc release version"
           git clone -b release https://gitlab.com/petsc/petsc.git petsc
           
@@ -133,9 +116,6 @@ jobs:
 
           echo "Checking PETSc build"
           make check
-
-          echo "$MACOSX_DEPLOYMENT_TARGET"
-          echo "$CMAKE_OSX_DEPLOYMENT_TARGET"
 
       # Build hp3D
       - name: Build hp3D

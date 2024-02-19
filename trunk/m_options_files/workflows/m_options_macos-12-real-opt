@@ -7,7 +7,7 @@ HP3D_BASE_PATH = /Users/runner/work/hp3d/hp3d/trunk
 # PREPROCESSOR VARIABLES
 #------------------------------------------------------------------
 COMPLEX ?= 0
-DEBUG   ?= 1
+DEBUG   ?= 0
 
 # Dependencies
 HP3D_USE_INTEL_MKL ?= 0
@@ -72,11 +72,11 @@ MKL_INCS = -I/opt/intel/mkl/include
 # also adding PETSC library dependence (petsc needs phdf5)
 
 ifeq ($(COMPLEX),1)
-  PETSC_LIB = /Users/runner/work/hp3d/hp3d/petsc/arch-macos-latest-complex-dbg/lib
-  PETSC_INC = /Users/runner/work/hp3d/hp3d/petsc/arch-macos-latest-complex-dbg/include
+  PETSC_LIB = /Users/runner/work/hp3d/hp3d/petsc/arch-macos-12-complex-opt/lib
+  PETSC_INC = /Users/runner/work/hp3d/hp3d/petsc/arch-macos-12-complex-opt/include
 else
-  PETSC_LIB = /Users/runner/work/hp3d/hp3d/petsc/arch-macos-latest-real-dbg/lib
-  PETSC_INC = /Users/runner/work/hp3d/hp3d/petsc/arch-macos-latest-real-dbg/include
+  PETSC_LIB = /Users/runner/work/hp3d/hp3d/petsc/arch-macos-12-real-opt/lib
+  PETSC_INC = /Users/runner/work/hp3d/hp3d/petsc/arch-macos-12-real-opt/include
 endif
 
 SOLVER_LIBS = -L$(PETSC_LIB) -lpetsc -ldmumps -lzmumps \
