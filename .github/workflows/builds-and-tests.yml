@@ -36,7 +36,6 @@ jobs:
           echo "This job is running on a ${{ runner.os }} server hosted by GitHub."
           echo "The repository name is ${{ github.repository }}."
           echo "The branch name is ${{ github.ref }}."
-          ld -v
 
       # Interrupt workflow already running on the same branch
       # - name: Cancel previous runs
@@ -101,8 +100,8 @@ jobs:
       # Build PETSc
       - name: Build PETSc
         run: |
-          export MACOSX_DEPLOYMENT_TARGET=$(sw_vers -productVersion)
-          export CMAKE_OSX_DEPLOYMENT_TARGET=$(sw_vers -productVersion)
+          export MACOSX_DEPLOYMENT_TARGET=12.0
+          export CMAKE_OSX_DEPLOYMENT_TARGET=12.0
           echo "$MACOSX_DEPLOYMENT_TARGET"
           echo "$CMAKE_OSX_DEPLOYMENT_TARGET"
 
