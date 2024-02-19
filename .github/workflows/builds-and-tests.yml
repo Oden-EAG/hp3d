@@ -80,8 +80,7 @@ jobs:
       # Get MPI (MacOS)
       - name: Get MPI (MacOS)
         if: runner.os == 'macOS'
-        run: brew install mpich 
-        #open-mpi
+        run: brew install open-mpi
 
       # Get MPI (Linux)
       - name: Get MPI (Linux)
@@ -105,9 +104,9 @@ jobs:
           echo "Configuring PETSc"
           cd petsc
           ./configure \
-          --with-cc=mpicc --COPTFLAGS="-g -O" \
-          --with-cxx=mpicxx --CXXOPTFLAGS="-g -O" \
-          --with-fc=mpif90 --FOPTFLAGS="-g -O" \
+          --with-cc=mpicc --COPTFLAGS="-g -O -mmacosx-version-min=12.0" \
+          --with-cxx=mpicxx --CXXOPTFLAGS="-g -O -mmacosx-version-min=12.0" \
+          --with-fc=mpif90 --FOPTFLAGS="-g -O -mmacosx-version-min=12.0" \
           --with-mpiexec=mpirun \
           --download-scalapack=yes \
           --download-fblaslapack=yes \
