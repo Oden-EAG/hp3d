@@ -14,7 +14,7 @@ jobs:
   builds-and-tests:
     strategy:
       matrix:
-        os: [macos-13]
+        os: [macos-latest]
         mode: [real]
         target: [dbg]
         # os: [ubuntu-latest, macos-latest]
@@ -74,11 +74,13 @@ jobs:
       #     echo "gfortran --version"
       #     gfortran --version
 
-      # Set deployment target (MacOS)
-      # $(sw_vers -productVersion)
-      # - name: Set deployment target (MacOS)
-      #   if: runner.os == 'macOS'
-      #   run: export MACOSX_DEPLOYMENT_TARGET=12.0
+      Set deployment target (MacOS)
+      $(sw_vers -productVersion)
+      - name: Set deployment target (MacOS)
+        if: runner.os == 'macOS'
+        run: |
+          export MACOSX_DEPLOYMENT_TARGET=12.0
+          export CMAKE_OSX_DEPLOYMENT_TARGET=12.0
 
       # Get X11 (MacOS)
       # (alternatively, use "brew reinstall libx11"
@@ -102,9 +104,7 @@ jobs:
       # Get MPI (MacOS)
       - name: Get MPI (MacOS)
         if: runner.os == 'macOS'
-        run: |
-          brew install open-mpi
-          brew install scalapack
+        run: brew install open-mpi
 
       # Get MPI (Linux)
       - name: Get MPI (Linux)
@@ -119,7 +119,6 @@ jobs:
           mpif90 --version
           mpirun --version
 
-###          --download-scalapack=yes \
       # Build PETSc
       - name: Build PETSc
         run: |
@@ -133,7 +132,7 @@ jobs:
           --with-cxx=mpicxx --CXXOPTFLAGS="-g -O" \
           --with-fc=mpif90 --FOPTFLAGS="-g -O" \
           --with-mpiexec=mpirun \
-          --with-scalapack-dir=/usr/local/Cellar/scalapack/2.2.0_1 \
+          --download-scalapack=yes \
           --download-fblaslapack=yes \
           --download-mumps=yes \
           --download-metis=yes \
