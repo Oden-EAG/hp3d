@@ -17,6 +17,7 @@ jobs:
         os: [ubuntu-latest, macos-12, macos-13]
         mode: [real, complex]
         target: [dbg, opt]
+        deployment: ['']
       include:
         - os: macos-12
           deployment: '12.0'
