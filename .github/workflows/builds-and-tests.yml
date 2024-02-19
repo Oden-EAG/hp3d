@@ -68,7 +68,7 @@ jobs:
           export HOMEBREW_NO_INSTALL_CLEANUP=1
           echo "ls /usr/local/bin/gfort*"
           ls /usr/local/bin/gfort*
-          brew reinstall gfortran@12
+          brew reinstall gfortran@11
           echo "ls /usr/local/bin/gfort*"
           ls /usr/local/bin/gfort*
           echo "gfortran --version"
