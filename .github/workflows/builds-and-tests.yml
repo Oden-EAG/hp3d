@@ -58,7 +58,7 @@ jobs:
         run: |
           echo "ls /usr/local/bin/gfort*"
           ls /usr/local/bin/gfort*
-          sudo ln -s /usr/local/bin/gfortran-11 /usr/local/bin/gfortran
+          sudo ln -s /usr/local/bin/gfortran-13 /usr/local/bin/gfortran
           gfortran --version
 
       # Install gfortran (MacOS)
