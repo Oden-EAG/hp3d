@@ -76,9 +76,6 @@ jobs:
           brew install bison flex
           sudo ln -s /usr/local/opt/bison/bin/bison /usr/local/bin/bison
           sudo ln -s /usr/local/opt/flex/bin/flex /usr/local/bin/flex
-          cmake --version
-          brew reinstall cmake
-          cmake --version
 
       # Get MPI (MacOS)
       - name: Get MPI (MacOS)
@@ -134,6 +131,9 @@ jobs:
       # Build hp3D
       - name: Build hp3D
         run: |
+          echo "$MACOSX_DEPLOYMENT_TARGET"
+          echo "$CMAKE_OSX_DEPLOYMENT_TARGET"
+
           echo "Configuring hp3D"
           cd trunk
           cp m_options_files/workflows/m_options_$CONFIG ./m_options
