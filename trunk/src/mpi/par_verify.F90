@@ -16,7 +16,8 @@ subroutine par_verify()
    use environment, only: QUIET_MODE
    use mpi_param  , only: RANK,ROOT
    use par_mesh   , only: DISTRIBUTED
-   use MPI        , only: MPI_COMM_WORLD,MPI_INTEGER,MPI_MIN
+   use MPI        , only: MPI_COMM_WORLD,MPI_INTEGER,MPI_MIN,MPI_BCAST, &
+                          MPI_BCAST,MPI_REDUCE,MPI_ALLREDUCE
 !
    implicit none
 !

@@ -196,7 +196,7 @@ module bitvisit
 !
       use mpi_param,       only: RANK,ROOT
       use MPI,             only: MPI_INTEGER, MPI_BOR, MPI_IN_PLACE, &
-                                 MPI_COMM_WORLD
+                                 MPI_COMM_WORLD, MPI_ALLREDUCE
       use par_mesh,        only: DISTRIBUTED
 !
       implicit none
@@ -207,7 +207,7 @@ module bitvisit
 !
       if (.not. DISTRIBUTED) return
 !
-      call MPI_Allreduce(MPI_IN_PLACE,visitation, nword,MPI_INTEGER,MPI_BOR,MPI_COMM_WORLD,ierr)
+      call MPI_ALLREDUCE(MPI_IN_PLACE,visitation, nword,MPI_INTEGER,MPI_BOR,MPI_COMM_WORLD,ierr)
 !
    end subroutine reduce_visit
 !

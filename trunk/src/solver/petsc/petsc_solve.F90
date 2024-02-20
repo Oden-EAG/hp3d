@@ -50,7 +50,9 @@ subroutine petsc_solve(mtype)
    use MPI        , only:  MPI_SUM,MPI_MIN,MPI_MAX,MPI_IN_PLACE,  &
                            MPI_INTEGER,MPI_INTEGER8,              &
                            MPI_REAL8,MPI_COMPLEX16,               &
-                           MPI_COMM_WORLD,MPI_STATUS_SIZE,MPI_Wtime
+                           MPI_COMM_WORLD,MPI_STATUS_SIZE,        &
+                           MPI_BCAST,MPI_REDUCE,MPI_ALLREDUCE,    &
+                           MPI_Wtime
    use petscksp
    use petsc_w_ksp, only:  petsc_ksp_start,petsc_ksp_destroy,     &
                            petsc_ksp,petsc_ksp_type,              &

@@ -15,7 +15,8 @@ subroutine update_Ddof
    use environment, only: QUIET_MODE
    use par_mesh   , only: DISTRIBUTED
    use MPI        , only: MPI_COMM_WORLD,MPI_INTEGER,MPI_REAL8,MPI_COMPLEX16, &
-                          MPI_SUM,MPI_MIN,MPI_IN_PLACE,MPI_STATUS_IGNORE,MPI_Wtime
+                          MPI_SUM,MPI_MIN,MPI_IN_PLACE,MPI_STATUS_IGNORE,     &
+                          MPI_BCAST,MPI_REDUCE,MPI_ALLREDUCE,MPI_Wtime
    use mpi_param  , only: RANK,ROOT,NUM_PROCS
    use par_mesh   , only: DISTRIBUTED,HOST_MESH
 !

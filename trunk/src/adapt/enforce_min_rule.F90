@@ -16,8 +16,8 @@
    use refinements
    use constrained_nodes
    use mpi_param,   only: ROOT, RANK
-   use MPI,         only: MPI_COMM_WORLD, MPI_INTEGER, MPI_MAX, &
-                          MPI_IN_PLACE, MPI_Wtime
+   use MPI,         only: MPI_COMM_WORLD,MPI_INTEGER,MPI_MAX,MPI_IN_PLACE, &
+                          MPI_BCAST,MPI_REDUCE,MPI_ALLREDUCE,MPI_Wtime
    use par_mesh,    only: DISTRIBUTED
    use bitvisit
    use par_ghost
@@ -153,7 +153,7 @@
       enddo
 !
 !  ...max used here to fill 0's; all procs should agree on shared nodes
-      call MPI_Allreduce(MPI_IN_PLACE,buffer,NRNODS,MPI_INTEGER,MPI_MAX,MPI_COMM_WORLD,ierr)
+      call MPI_ALLREDUCE(MPI_IN_PLACE,buffer,NRNODS,MPI_INTEGER,MPI_MAX,MPI_COMM_WORLD,ierr)
 !
       do nod=1,NRNODS
          if (visited(nod) .and. NODES(nod)%visit.ne.buffer(nod)) then
