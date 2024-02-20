@@ -6,8 +6,7 @@ subroutine exec_job_heat
    use commonParam
    use control
    use data_structure3D
-   use MPI           , only: MPI_COMM_WORLD,MPI_Wtime
-   use mpi_param     , only: RANK,ROOT,NUM_PROCS
+   use mpi_wrapper
    use par_mesh      , only: EXCHANGE_DOF,distr_mesh
    use zoltan_wrapper
 !

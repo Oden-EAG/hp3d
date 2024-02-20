@@ -22,8 +22,7 @@ subroutine pump_ode_solve
 !
    use commonParam
    use laserParam
-   use mpi_param, only: RANK,ROOT
-   use MPI      , only: MPI_COMM_WORLD,MPI_IN_PLACE,MPI_REAL8,MPI_SUM
+   use mpi_wrapper
 !
    implicit none
 !
@@ -239,8 +238,7 @@ subroutine compute_gain(ZValues,Num_zpts,Fld, Gain)
    use data_structure3D
    use control    , only : GEOM_TOL
    use environment, only : QUIET_MODE
-   use mpi_param  , only : RANK,ROOT
-   use MPI        , only : MPI_COMM_WORLD
+   use mpi_wrapper
    use par_mesh   , only : DISTRIBUTED
 !
    implicit none
@@ -271,7 +269,7 @@ subroutine compute_gain(ZValues,Num_zpts,Fld, Gain)
    integer, parameter :: faceNum = 2
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
    integer :: ierr
 !
 !---------------------------------------------------------------------------------------

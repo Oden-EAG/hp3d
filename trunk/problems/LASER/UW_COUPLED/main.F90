@@ -26,10 +26,7 @@ program main
    use assembly_sc, only: IPRINT_TIME
    use stc        , only: STORE_STC,HERM_STC
 !
-   use MPI        , only: MPI_COMM_WORLD,MPI_BARRIER,MPI_ABORT,MPI_Wtime, &
-                          MPI_GET_PROCESSOR_NAME,MPI_MAX_PROCESSOR_NAME
-   use mpi_param  , only: ROOT,RANK,NUM_PROCS
-   use mpi_wrapper, only: mpi_w_init,mpi_w_finalize
+   use mpi_wrapper
 !
    implicit none
 !
@@ -289,8 +286,7 @@ subroutine master_main()
    use data_structure3D
    use GMP
 !
-   use MPI           , only: MPI_COMM_WORLD,MPI_INTEGER
-   use mpi_param     , only: ROOT,RANK,NUM_PROCS
+   use mpi_wrapper
    use par_mesh      , only: DISTRIBUTED
    use zoltan_wrapper, only: zoltan_w_set_lb
 !
@@ -522,8 +518,7 @@ subroutine worker_main()
    use data_structure3D
    use GMP
 !
-   use MPI           , only: MPI_COMM_WORLD,MPI_INTEGER
-   use mpi_param     , only: ROOT,RANK,NUM_PROCS
+   use mpi_wrapper
    use par_mesh      , only: DISTRIBUTED
    use zoltan_wrapper, only: zoltan_w_set_lb
 !

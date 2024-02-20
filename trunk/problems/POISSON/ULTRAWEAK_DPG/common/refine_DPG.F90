@@ -26,9 +26,7 @@ subroutine refine_DPG
    use assembly_sc  , only: NRDOF_CON, NRDOF_TOT
    use parametersDPG, only: NORD_ADD
    use par_mesh     , only: DISTRIBUTED,HOST_MESH
-   use mpi_param    , only: ROOT,RANK,NUM_PROCS
-   use MPI          , only: MPI_COMM_WORLD,MPI_SUM,MPI_COMM_WORLD,MPI_Wtime,   &
-                           MPI_REAL8,MPI_INTEGER,MPI_IN_PLACE,MPI_MAX
+   use mpi_wrapper
     
    implicit none
 !
@@ -422,8 +420,7 @@ end subroutine qsort_duplet
 subroutine adap_solve
 !
    use common_prob_data
-   use MPI           , only: MPI_COMM_WORLD,MPI_INTEGER
-   use mpi_param     , only: RANK,ROOT
+   use mpi_wrapper
    use par_mesh      , only: DISTRIBUTED,HOST_MESH,distr_mesh
    use zoltan_wrapper
 !

@@ -9,8 +9,7 @@ subroutine exec_case(idec)
    use par_mesh
    use paraview      , only: VLEVEL,paraview_select_attr
    use zoltan_wrapper, only: zoltan_w_partition,zoltan_w_eval
-   use mpi_param     , only: RANK,ROOT
-   use MPI           , only: MPI_COMM_WORLD,MPI_CHARACTER,MPI_INTEGER,MPI_LOGICAL
+   use mpi_wrapper
 !
    implicit none
 !

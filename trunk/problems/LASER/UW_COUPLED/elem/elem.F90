@@ -34,9 +34,8 @@ subroutine elem(Mdle, Itest,Itrial)
    use data_structure3D
    use parametersDPG
    use physics   , only: NR_PHYSA
-   use mpi_param , only: RANK,ROOT
    use laserParam, only: PLANE_PUMP
-   use MPI       , only: MPI_Wtime
+   use mpi_wrapper
 !
    implicit none
 !

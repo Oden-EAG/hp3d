@@ -8,8 +8,7 @@
 !
       use commonParam
       use data_structure3D
-      use mpi_param
-      use MPI,            only: MPI_COMM_WORLD
+      use mpi_wrapper
       use par_mesh,       only: EXCHANGE_DOF,distr_mesh
       use paraview,       only: paraview_select_attr
       use zoltan_wrapper, only: zoltan_w_set_lb,zoltan_w_eval
@@ -21,7 +20,7 @@
       integer :: physNick, nstop
 !
       integer :: i, ierr, numPts, fld
-      real(8) :: MPI_Wtime, start_time, end_time
+      real(8) :: start_time, end_time
 !
       logical :: adaptive_refs = .false.
 !

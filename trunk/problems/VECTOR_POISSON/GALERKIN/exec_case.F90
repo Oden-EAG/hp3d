@@ -5,8 +5,7 @@ subroutine exec_case(idec)
 !
    use data_structure3D
    use par_mesh
-   use mpi_param
-   use mpi
+   use mpi_wrapper
    use common_prob_data
    use paraview      , only: paraview_select_attr
    use zoltan_wrapper, only: zoltan_w_partition,zoltan_w_eval

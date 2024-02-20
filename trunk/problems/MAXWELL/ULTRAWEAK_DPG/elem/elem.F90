@@ -43,7 +43,7 @@
       integer :: ntype
 !
 !  ...timer
-      real(8) :: MPI_Wtime, start_time, end_time
+      real(8) :: start_time, end_time
 !
 !----------------------------------------------------------------------
 !

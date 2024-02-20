@@ -5,15 +5,14 @@ subroutine exec_job
 !
    use common_prob_data
    use data_structure3D
-   use MPI           , only: MPI_COMM_WORLD
-   use mpi_param     , only: RANK,ROOT,NUM_PROCS
+   use mpi_wrapper
    use par_mesh      , only: EXCHANGE_DOF,distr_mesh
    use zoltan_wrapper, only: zoltan_w_set_lb,zoltan_w_eval
 !
    implicit none
 !
    integer :: i,ierr
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 !----------------------------------------------------------------------
 !
