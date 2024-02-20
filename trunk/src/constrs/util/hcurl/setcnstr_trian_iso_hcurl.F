@@ -69,7 +69,8 @@ c  ...order and edge orientations
 c
       real(8) :: val(2),dbds(2,2)
 c
-      integer :: icl,i,ians,ib,ic,ibcase,info,is,iscase,ivoid
+      integer :: icl,i,ians,ib,ic,ibcase,info,is,iscase
+      integer :: ivoid,jvoid,kvoid
       integer :: j,k,nord,nc,nel,nrb,nrdof,nrs,nspan
       integer :: ndof_i,ndof_j,ndof_mdlt,ndof_medg
 c
@@ -85,8 +86,8 @@ c  ...set up order and orientation
       nsize   = (/MAXP,MAXtriaE/)
 c
       ivoid = 0
-      call ndof_nod(MEDG,nord, ivoid, ndof_medg, ivoid, ivoid)
-      call ndof_nod(MDLT,nord, ivoid, ndof_mdlt, ivoid, ivoid)
+      call ndof_nod(MEDG,nord, ivoid, ndof_medg, jvoid, kvoid)
+      call ndof_nod(MDLT,nord, ivoid, ndof_mdlt, jvoid, kvoid)
       nrdof = 3*ndof_medg + ndof_mdlt
 c
 c*********************************************************************

@@ -29,6 +29,8 @@ include $(PETSC_DIR)/$(PETSC_ARCH)/lib/petsc/conf/petscvariables
 
 FFLAGS  = $(FC_FLAGS)
 FFLAGS += -fallow-argument-mismatch
+FFLAGS += -Wno-unused-variable -Wno-unused-label -Wno-conversion \
+          -Wno-maybe-uninitialized -Wno-surprising
 
 CFLAGS  =
 
