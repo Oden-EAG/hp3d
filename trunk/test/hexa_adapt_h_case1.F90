@@ -13,6 +13,7 @@ program test_hexa_adapt_h_case1
    use mpi_param
    use mpi_wrapper
    use par_mesh
+   use zoltan_wrapper
 !
    implicit none
 !

@@ -15,7 +15,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
    use data_structure3D
    use upscale
    use paraview
-   use MPI           , only: MPI_COMM_WORLD,MPI_SUM,MPI_INTEGER,MPI_Wtime
+   use MPI
    use mpi_param     , only: RANK,ROOT,NUM_PROCS
    use par_mesh      , only: DISTRIBUTED,HOST_MESH
 !

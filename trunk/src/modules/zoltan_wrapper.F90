@@ -807,3 +807,13 @@ module zoltan_wrapper
 !
 !
 end module zoltan_wrapper
+
+subroutine zoltan_ext_init
+   use zoltan_wrapper
+   call zoltan_w_init
+end subroutine zoltan_ext_init
+
+subroutine zoltan_ext_finalize
+   use zoltan_wrapper
+   call zoltan_w_finalize
+end subroutine zoltan_ext_finalize

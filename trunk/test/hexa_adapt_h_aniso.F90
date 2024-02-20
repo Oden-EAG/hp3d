@@ -11,6 +11,7 @@ program test_hexa_adapt_h_aniso
    use mpi_param
    use mpi_wrapper
    use par_mesh
+   use zoltan_wrapper
 !
    implicit none
 !
