@@ -44,6 +44,7 @@ jobs:
           echo "This job is running on a ${{ runner.os }} server hosted by GitHub."
           echo "The repository name is ${{ github.repository }}."
           echo "The branch name is ${{ github.ref }}."
+          pkg-config --version
 
       # Interrupt workflow already running on the same branch
       - name: Cancel previous runs
@@ -95,7 +96,6 @@ jobs:
       # Build PETSc
       - name: Build PETSc
         run: |
-          brew install pkg-config
           echo "Getting latest PETSc release version"
           git clone -b release https://gitlab.com/petsc/petsc.git petsc
           
