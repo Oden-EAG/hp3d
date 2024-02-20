@@ -1,3 +1,4 @@
+#include "typedefs.h"
 !-------------------------------------------------------------------------
 !> @brief     routine breaks an element middle node according to a given
 !!            refinement flag. Compatibility is assumed across the faces
@@ -6,17 +7,24 @@
 !> @param[in] Mdle - middle node
 !> @param[in] Kref - refinement flag
 !!
-!> @date      Feb 2023
+!> @date      Oct 2023
 !-------------------------------------------------------------------------
 subroutine break(Mdle,Kref)
 !
    use data_structure3D
    use element_data
    use refinements
+   use refinements_history
 !
    implicit none
 !
    integer, intent(in) :: Mdle, Kref
+!
+   real(8) :: xnod (NDIMEN ,MAXbrickH)
+   VTYPE   :: zdofH(MAXEQNH,MAXbrickH)
+   VTYPE   :: zdofE(MAXEQNE,MAXbrickE)
+   VTYPE   :: zdofV(MAXEQNV,MAXbrickV)
+   VTYPE   :: zdofQ(MAXEQNQ,MAXbrickQ)
 !
    integer :: ntype
    integer :: nodesl(27),norientl(27)
@@ -29,6 +37,11 @@ subroutine break(Mdle,Kref)
 !-------------------------------------------------------------------------
 !
    iprint = 0
+!
+!..save element dof
+   call nodcor(Mdle, xnod)
+   call solelm(Mdle, zdofH,zdofE,zdofV,zdofQ)
+   call save_element(Mdle,xnod,zdofH,zdofE,zdofV,zdofQ)
 !
 !..nodal connectivities
    call elem_nodes(Mdle, nodesl,norientl)
@@ -152,6 +165,9 @@ subroutine break(Mdle,Kref)
 !..update the number of active elements
    call nr_mdle_sons(ntype,Kref, nrsons)
    NRELES=NRELES+nrsons-1
+!
+!..generate new dof for the new and active nodes
+!!!!!   call initiate_dof(Mdle,Xnod,ZdofH,ZdofE,ZdofV,ZdofQ)
 !
 #if DEBUG_MODE
    if (iprint.ge.1) then

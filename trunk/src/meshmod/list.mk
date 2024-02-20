@@ -3,6 +3,7 @@ break.F90
 close_mesh.F90
 display_ref_kind.F90
 execute_pref.F
+initiate_dof.F90
 nodbreak.F90
 nodgen.F90
 nodmod.F90
