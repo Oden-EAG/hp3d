@@ -15,8 +15,7 @@ subroutine geom2vtk(Sname,Sfile, IcE,IcN,IcP)
    use data_structure3D
    use upscale
    use paraview
-   use MPI
-   use mpi_param     , only: RANK,ROOT,NUM_PROCS
+   use mpi_wrapper
    use par_mesh      , only: DISTRIBUTED,HOST_MESH
 !
    implicit none

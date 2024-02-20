@@ -14,9 +14,8 @@
 subroutine par_verify()
 !
    use environment, only: QUIET_MODE
-   use mpi_param  , only: RANK,ROOT
+   use mpi_wrapper
    use par_mesh   , only: DISTRIBUTED
-   use MPI
 !
    implicit none
 !
@@ -71,8 +70,7 @@ subroutine mesh_consistency(ipass)
 !
    use data_structure3D
    use par_mesh , only: DISTRIBUTED
-   use mpi_param, only: ROOT,RANK
-   use MPI      , only: MPI_INTEGER,MPI_COMM_WORLD
+   use mpi_wrapper
 !
    implicit none
 !
@@ -251,8 +249,7 @@ end subroutine mesh_consistency
 subroutine verify_dof(ipass)
 !
    use par_mesh , only: DISTRIBUTED,distr_mesh
-   use mpi_param, only: ROOT,RANK
-   use MPI      , only: MPI_INTEGER,MPI_COMM_WORLD
+   use mpi_wrapper
 !
    implicit none
 !

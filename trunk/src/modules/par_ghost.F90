@@ -32,8 +32,7 @@ contains
    use data_structure3D
    use bitvisit
    use par_mesh,           only: DISTRIBUTED, HOST_MESH
-   use mpi_param
-   use MPI
+   use mpi_wrapper
 !
    implicit none
 !

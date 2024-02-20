@@ -14,8 +14,7 @@ subroutine update_gdof
    use data_structure3D
    use element_data
    use environment, only: QUIET_MODE
-   use MPI
-   use mpi_param  , only: RANK,ROOT,NUM_PROCS
+   use mpi_wrapper
    use par_mesh   , only: DISTRIBUTED,HOST_MESH
    use GMP
 !
@@ -449,8 +448,7 @@ subroutine update_gdof_omp
    use data_structure3D
    use element_data
    use environment, only: QUIET_MODE
-   use MPI
-   use mpi_param  , only: RANK,ROOT,NUM_PROCS
+   use mpi_wrapper
    use par_mesh   , only: DISTRIBUTED,HOST_MESH
    use GMP
 !

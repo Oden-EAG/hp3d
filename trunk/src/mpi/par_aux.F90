@@ -16,8 +16,7 @@
 subroutine partition_fiber(subd_next)
 !
    use data_structure3D
-   use mpi_param, only: RANK,ROOT,NUM_PROCS
-   use MPI
+   use mpi_wrapper
 !
    implicit none
 !
@@ -96,8 +95,7 @@ end subroutine partition_fiber
 subroutine repartition_fiber(Subd_next)
 !
    use data_structure3D
-   use mpi_param, only: RANK,ROOT,NUM_PROCS
-   use MPI
+   use mpi_wrapper
    use stc,       only: stc_get_nrdof
 !
    implicit none
@@ -249,9 +247,7 @@ subroutine collect_dofs()
 !
    use data_structure3D
    use par_mesh
-   use mpi_param, only: ROOT,RANK
-   use MPI      , only: MPI_COMM_WORLD,MPI_STATUS_SIZE,  &
-                        MPI_COMPLEX16,MPI_REAL8
+   use mpi_wrapper
 !
    implicit none
 !
@@ -356,7 +352,7 @@ subroutine print_partition()
 !
    use data_structure3D
    use par_mesh , only: DISTRIBUTED
-   use mpi_param, only: RANK,ROOT,NUM_PROCS
+   use mpi_wrapper
 !
    implicit none
 !
@@ -412,8 +408,7 @@ subroutine print_subd()
 !
    use data_structure3D
    use par_mesh , only: DISTRIBUTED
-   use mpi_param, only: RANK,ROOT,NUM_PROCS
-   use mpi      , only: MPI_COMM_WORLD
+   use mpi_wrapper
 !
    implicit none
 !
@@ -470,8 +465,7 @@ subroutine print_coord()
 !
    use data_structure3D
    use par_mesh , only: DISTRIBUTED
-   use mpi_param, only: RANK,ROOT,NUM_PROCS
-   use mpi      , only: MPI_COMM_WORLD
+   use mpi_wrapper
 !
    implicit none
 !
