@@ -1,17 +1,17 @@
-# Simple m_options file, using pkg-config from petsc.pc
+# Simple m_options file, using petsc/conf/petscvariables
 
 #------------------------------------------------------------------
 # PREPROCESSOR VARIABLES (Set to 0/1)
 #------------------------------------------------------------------
 COMPLEX ?= 0
-DEBUG   ?= 1
+DEBUG   ?= 0
 
 #------------------------------------------------------------------
 # Set hp3D PATH, PETSC_DIR, and PETSC_ARCH
 #------------------------------------------------------------------
-HP3D_BASE_PATH = /Users/stefan/hp3D/LIBS/hp3d/trunk
+HP3D_BASE_PATH = /Users/user/hp3D/LIBS/hp3d/trunk
 
-PETSC_DIR ?= /Users/stefan/hp3D/LIBS/petsc
+PETSC_DIR ?= /Users/user/hp3D/LIBS/petsc
 ifeq ($(COMPLEX),1)
   PETSC_ARCH ?= arch-darwin-complex
 else
@@ -25,12 +25,9 @@ endif
 # COMPILER SETTINGS (a 64bit processor architecture is assumed)
 #------------------------------------------------------------------
 
-petsc.pc := $(PETSC_DIR)/$(PETSC_ARCH)/lib/pkgconfig/petsc.pc
-PACKAGES := $(petsc.pc)
+include $(PETSC_DIR)/$(PETSC_ARCH)/lib/petsc/conf/petscvariables
 
-CC := $(shell pkg-config --variable=ccompiler $(PACKAGES))
-FC := $(shell pkg-config --variable=fcompiler $(PACKAGES))
-FFLAGS := $(shell pkg-config --variable=fflags_extra $(PACKAGES))
+FFLAGS := $(FC_FLAGS)
 FFLAGS += -w -fallow-argument-mismatch
 
 CFLAGS  =
@@ -43,8 +40,8 @@ CDEFS   = -DAdd_
 # LINKING
 #------------------------------------------------------------------
 
-LDLIBS   := $(shell pkg-config --libs --static $(PACKAGES))
-CPPFLAGS := $(shell pkg-config --cflags-only-I $(PACKAGES))
+LDLIBS   := $(PETSC_WITH_EXTERNAL_LIB)
+CPPFLAGS := $(PETSC_CC_INCLUDES)
 
 #------------------------------------------------------------------
 # HP3D PATHS

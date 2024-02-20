@@ -9,13 +9,13 @@ DEBUG   ?= 1
 #------------------------------------------------------------------
 # Set hp3D PATH, PETSC_DIR, and PETSC_ARCH
 #------------------------------------------------------------------
-HP3D_BASE_PATH = /home/runner/work/hp3d/hp3d/trunk
+HP3D_BASE_PATH = /home/work/hp3d/trunk
 
-PETSC_DIR ?= /home/runner/work/hp3d/hp3d/petsc
+PETSC_DIR ?= /home/work/petsc
 ifeq ($(COMPLEX),1)
-  PETSC_ARCH ?= arch-ubuntu-latest-complex-dbg
+  PETSC_ARCH ?= arch-linux-complex
 else
-  PETSC_ARCH ?= arch-ubuntu-latest-real-dbg
+  PETSC_ARCH ?= arch-linux-real
 endif
 
 

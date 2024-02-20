@@ -4,18 +4,18 @@
 # PREPROCESSOR VARIABLES (Set to 0/1)
 #------------------------------------------------------------------
 COMPLEX ?= 0
-DEBUG   ?= 1
+DEBUG   ?= 0
 
 #------------------------------------------------------------------
 # Set hp3D PATH, PETSC_DIR, and PETSC_ARCH
 #------------------------------------------------------------------
-HP3D_BASE_PATH = /home/runner/work/hp3d/hp3d/trunk
+HP3D_BASE_PATH = /Users/user/hp3D/LIBS/hp3d/trunk
 
-PETSC_DIR ?= /home/runner/work/hp3d/hp3d/petsc
+PETSC_DIR ?= /Users/user/hp3D/LIBS/petsc
 ifeq ($(COMPLEX),1)
-  PETSC_ARCH ?= arch-ubuntu-latest-complex-dbg
+  PETSC_ARCH ?= arch-darwin-complex
 else
-  PETSC_ARCH ?= arch-ubuntu-latest-real-dbg
+  PETSC_ARCH ?= arch-darwin-real
 endif
 
 
