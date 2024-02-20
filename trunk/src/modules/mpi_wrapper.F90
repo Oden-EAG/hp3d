@@ -8,11 +8,8 @@
 module mpi_wrapper
 !
    use mpi_param
-   use MPI, only: MPI_THREAD_FUNNELED,MPI_INIT_THREAD,         &
-                  MPI_COMM_RANK,MPI_COMM_WORLD,MPI_COMM_SIZE,  &
-                  MPI_BARRIER,MPI_FINALIZE,MPI_SUCCESS,        &
-                  MPI_ERRORS_RETURN
-   use zoltan_wrapper
+   use MPI
+   use environment, only: QUIET_MODE
 !
    implicit none
 !
@@ -55,7 +52,7 @@ module mpi_wrapper
   100 format(/,A,I4)
 !
 !  ...initialize Zoltan environment
-      call zoltan_w_init
+      call zoltan_ext_init
 !
 !  ...set initialization flag
       MPI_IS_INIT = .true.
@@ -79,7 +76,7 @@ module mpi_wrapper
       endif
 !
 !  ...close Zoltan environment
-      call zoltan_w_finalize
+      call zoltan_ext_finalize
 !
 !  ...close MPI environment
       call MPI_FINALIZE (ierr)

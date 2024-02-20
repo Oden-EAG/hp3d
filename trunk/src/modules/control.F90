@@ -1,5 +1,9 @@
 !> Purpose : module stores a number of control parameters
 module control
+!
+   use environment , only : QUIET_MODE
+   use mpi_wrapper
+!
    save
 !
    integer            :: SHAPE_FLAG
@@ -60,8 +64,6 @@ contains
 !--------------------------------------------------------------------------
 !> Purpose : routine reads in global control parameters from file
    subroutine read_control_from_file(fp)
-      use environment , only : QUIET_MODE
-      use MPI
 !
       implicit none
 !
