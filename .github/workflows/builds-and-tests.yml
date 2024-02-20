@@ -73,12 +73,6 @@ jobs:
           sudo ln -s /usr/local/opt/bison/bin/bison /usr/local/bin/bison
           sudo ln -s /usr/local/opt/flex/bin/flex /usr/local/bin/flex
 
-      # Get pkg-config (MacOS)
-      - name: Get pkg-config (MacOS)
-        if: runner.os == 'macOS'
-        run: |
-          brew install pkg-config
-
       # Get MPI (MacOS)
       - name: Get MPI (MacOS)
         if: runner.os == 'macOS'
