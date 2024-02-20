@@ -51,7 +51,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    use data_structure3D
    use laserParam
    use commonParam
-   use MPI, only: MPI_Wtime
+   use mpi_wrapper
 !..no implicit statements
    implicit none
 !..declare input/output variables

@@ -23,7 +23,7 @@
 subroutine pardiso_solve(Ia,Ja,A,Type,Nnz,N,Nrhs, B)
 !
    use assembly_sc, only: IPRINT_TIME
-   use MPI        , only: MPI_Wtime
+   use mpi_wrapper
 !
    implicit none
 !
