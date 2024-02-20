@@ -3,19 +3,30 @@
 #------------------------------------------------------------------
 # PREPROCESSOR VARIABLES (Set to 0/1)
 #------------------------------------------------------------------
+
+# Note:
+# This m_options file uses compiler flags, library paths, and
+# include paths directly from the PETSc configuration.
+
 COMPLEX ?= 0
 DEBUG   ?= 0
+
+# Optional dependencies
+HP3D_USE_INTEL_MKL := 0
+HP3D_USE_OPENMP    := 0
+HP3D_USE_X11       := 0
 
 #------------------------------------------------------------------
 # Set hp3D PATH, PETSC_DIR, and PETSC_ARCH
 #------------------------------------------------------------------
+
 HP3D_BASE_PATH = /home/work/hp3d/trunk
 
 PETSC_DIR ?= /home/work/petsc
 ifeq ($(COMPLEX),1)
-  PETSC_ARCH ?= arch-darwin-complex
+  PETSC_ARCH ?= arch-linux-complex
 else
-  PETSC_ARCH ?= arch-darwin-real
+  PETSC_ARCH ?= arch-linux-real
 endif
 
 

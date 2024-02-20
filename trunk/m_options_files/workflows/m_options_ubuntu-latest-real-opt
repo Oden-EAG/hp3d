@@ -79,7 +79,9 @@ HP3D_LIB_EXTRA_INCS = $(CPPFLAGS)
 # FOR PROBLEM LINKING
 #------------------------------------------------------------------
 
-HP3D_LINK_LIBS    = $(HP3D_LIB) $(HP3D_FRONTAL)
+HP3D_LINK_LIBS    = -Wl,--start-group \
+                    $(HP3D_LIB) $(HP3D_FRONTAL) \
+                    -Wl,--end-group
 HP3D_LINK_INCS    = -I$(HP3D_PATH)/common/hp3d \
                     -I$(HP3D_PATH)/common/graphics \
                     -I$(HP3D_PATH)/module

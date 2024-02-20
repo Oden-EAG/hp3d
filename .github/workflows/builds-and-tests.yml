@@ -14,17 +14,16 @@ jobs:
   builds-and-tests:
     strategy:
       matrix:
-        #os: [ubuntu-latest, macos-12, macos-13]
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-12, macos-13]
         mode: [real, complex]
         target: [dbg, opt]
         include:
           - os: ubuntu-latest
             deployment: ''
-          #- os: macos-12
-          #  deployment: '12.7'
-          #- os: macos-13
-          #  deployment: '13.6'
+          - os: macos-12
+            deployment: '12.7'
+          - os: macos-13
+            deployment: '13.6'
 
     name: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.target }}
 
@@ -44,7 +43,6 @@ jobs:
           echo "This job is running on a ${{ runner.os }} server hosted by GitHub."
           echo "The repository name is ${{ github.repository }}."
           echo "The branch name is ${{ github.ref }}."
-          pkg-config --version
 
       # Interrupt workflow already running on the same branch
       - name: Cancel previous runs
@@ -74,6 +72,12 @@ jobs:
           brew install bison flex
           sudo ln -s /usr/local/opt/bison/bin/bison /usr/local/bin/bison
           sudo ln -s /usr/local/opt/flex/bin/flex /usr/local/bin/flex
+
+      # Get pkg-config (MacOS)
+      - name: Get pkg-config (MacOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install pkg-config
 
       # Get MPI (MacOS)
       - name: Get MPI (MacOS)
