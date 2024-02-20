@@ -19,9 +19,8 @@ HP3D_USE_INTEL_MKL ?= 0
 # Enable OpenMP threading
 HP3D_USE_OPENMP ?= 0
 
-FF = mpif90
+FC = mpif90
 CC = mpicc
-FC     =  $(FF)
 FFLAGS = -fPIC -ffree-line-length-none
 # gcc 10 issue mpi: add flag
 FFLAGS += -fallow-argument-mismatch

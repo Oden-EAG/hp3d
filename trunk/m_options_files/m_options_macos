@@ -5,16 +5,16 @@
 #------------------------------------------------------------------
 
 # Note:
-# This m_options file uses compiler flags, library paths, and
+# This m_options file uses compiler settings, library paths, and
 # include paths directly from the PETSc configuration.
 
 COMPLEX ?= 0
 DEBUG   ?= 0
 
 # Optional dependencies
-HP3D_USE_INTEL_MKL := 0
-HP3D_USE_OPENMP    := 0
-HP3D_USE_X11       := 0
+HP3D_USE_INTEL_MKL = 0
+HP3D_USE_OPENMP    = 0
+HP3D_USE_X11       = 0
 
 #------------------------------------------------------------------
 # Set hp3D PATH, PETSC_DIR, and PETSC_ARCH
@@ -38,10 +38,27 @@ endif
 
 include $(PETSC_DIR)/$(PETSC_ARCH)/lib/petsc/conf/petscvariables
 
-FFLAGS := $(FC_FLAGS)
-FFLAGS += -w -fallow-argument-mismatch
+FF     =  $(FC)
+FFLAGS = -fPIC -ffree-line-length-none -w -fallow-argument-mismatch
+CFLAGS =
 
-CFLAGS  =
+# Use compiler flags from PETSc configuration
+# FFLAGS = $(FC_FLAGS)
+
+# OpenMP
+ifeq ($(HP3D_USE_OPENMP),1)
+  FFLAGS += -fopenmp
+endif
+
+# Optimization flags
+ifeq ($(DEBUG),0)
+  FFLAGS += -O3
+endif
+
+# Debug flags
+ifeq ($(DEBUG),1)
+  FFLAGS += -Og -g -fbacktrace -fcheck=all
+endif
 
 # Preprocessor defs to call Fortran from C
 # (-DAdd_ or -DAdd__ or -DUPPER)
@@ -51,8 +68,8 @@ CDEFS   = -DAdd_
 # LINKING
 #------------------------------------------------------------------
 
-LDLIBS   := $(PETSC_WITH_EXTERNAL_LIB)
-CPPFLAGS := $(PETSC_CC_INCLUDES)
+LDLIBS   = $(PETSC_WITH_EXTERNAL_LIB)
+CPPFLAGS = $(PETSC_CC_INCLUDES)
 
 #------------------------------------------------------------------
 # HP3D PATHS

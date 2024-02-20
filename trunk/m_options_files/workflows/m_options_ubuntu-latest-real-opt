@@ -27,8 +27,8 @@ endif
 
 include $(PETSC_DIR)/$(PETSC_ARCH)/lib/petsc/conf/petscvariables
 
-FFLAGS := $(FC_FLAGS)
-FFLAGS += -w -fallow-argument-mismatch
+FFLAGS  = $(FC_FLAGS)
+FFLAGS += -fallow-argument-mismatch
 
 CFLAGS  =
 
@@ -99,9 +99,9 @@ PROB_INCS   += $(HP3D_LINK_INCS)   \
 # Files with ending in .F and .F90 (not .f and .f90)
 # are preprocessed according to certain directives
 
-HP3D_USE_OPENMP    := 0
-HP3D_USE_INTEL_MKL := 0
-HP3D_USE_X11       := 0
+HP3D_USE_OPENMP    = 0
+HP3D_USE_INTEL_MKL = 0
+HP3D_USE_X11       = 0
 
 PROB_PP_DEFS  = -D"C_MODE=$(COMPLEX)" \
                 -D"DEBUG_MODE=$(DEBUG)" \
