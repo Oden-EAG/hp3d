@@ -17,9 +17,7 @@ subroutine partition_fiber(subd_next)
 !
    use data_structure3D
    use mpi_param, only: RANK,ROOT,NUM_PROCS
-   use MPI,       only: MPI_COMM_WORLD,MPI_INTEGER,MPI_REAL8,  &
-                        MPI_MIN,MPI_MAX,MPI_IN_PLACE,          &
-                        MPI_BCAST,MPI_REDUCE,MPI_ALLREDUCE
+   use MPI
 !
    implicit none
 !
@@ -99,8 +97,7 @@ subroutine repartition_fiber(Subd_next)
 !
    use data_structure3D
    use mpi_param, only: RANK,ROOT,NUM_PROCS
-   use MPI,       only: MPI_COMM_WORLD,MPI_INTEGER,MPI_REAL8,MPI_SUM,  &
-                        MPI_IN_PLACE,MPI_BCAST,MPI_REDUCE,MPI_ALLREDUCE
+   use MPI
    use stc,       only: stc_get_nrdof
 !
    implicit none

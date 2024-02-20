@@ -42,10 +42,7 @@
 recursive subroutine par_fiber(mumps,nrdof,nproc,level)
 !
    use assembly  , only: NR_RHS
-   use MPI       , only: MPI_UNDEFINED,MPI_STATUS_IGNORE,      &
-                         MPI_REAL8,MPI_COMPLEX16,MPI_INTEGER,  &
-                         MPI_IN_PLACE,MPI_SUM,MPI_Wtime,       &
-                         MPI_BCAST,MPI_REDUCE,MPI_ALLREDUCE
+   use MPI
    use mpi_param , only: RANK,ROOT
    use parameters, only: ZERO,ZONE
    use stc       , only: stc_bwd

@@ -16,8 +16,7 @@
    use refinements
    use constrained_nodes
    use mpi_param,   only: ROOT, RANK
-   use MPI,         only: MPI_COMM_WORLD,MPI_INTEGER,MPI_MAX,MPI_IN_PLACE, &
-                          MPI_BCAST,MPI_REDUCE,MPI_ALLREDUCE,MPI_Wtime
+   use MPI
    use par_mesh,    only: DISTRIBUTED
    use bitvisit
    use par_ghost

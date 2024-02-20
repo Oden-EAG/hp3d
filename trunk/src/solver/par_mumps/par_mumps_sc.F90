@@ -47,10 +47,7 @@ subroutine par_mumps_sc(mtype)
    use par_mumps, only: mumps_par,mumps_start_par,mumps_destroy_par
    use par_mesh , only: DISTRIBUTED,HOST_MESH
    use mpi_param, only: RANK,ROOT,NUM_PROCS
-   use MPI      , only: MPI_SUM,MPI_MIN,MPI_MAX,MPI_IN_PLACE,  &
-                        MPI_INTEGER,MPI_INTEGER8,MPI_REAL8,    &
-                        MPI_COMPLEX16,MPI_Wtime,               &
-                        MPI_BCAST,MPI_REDUCE,MPI_ALLREDUCE
+   use MPI
    use environment, only: QUIET_MODE
 !
    implicit none
