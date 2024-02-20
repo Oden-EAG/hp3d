@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 /*
   FORTRAN INTERFACE TO GRAPHICS (X11 Windows style):
   =======================================================
@@ -939,3 +941,5 @@ void XGDOTS ( void )
 
   fprintf(stderr, "." );
 }
+
+#endif

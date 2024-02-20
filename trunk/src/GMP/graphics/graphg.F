@@ -11,6 +11,9 @@ c                        various graphics routines for the GMP
 c                        package
 c
 c----------------------------------------------------------------------
+
+#if HP3D_USE_X11
+
 c
       subroutine graphg
 c
@@ -67,3 +70,14 @@ c
 c
       end subroutine graphg
 
+#else
+
+      subroutine graphg
+      
+      implicit none
+      
+      write(*,*) 'graphg is only supported with HP3D_USE_X11 enabled.'
+      
+      end subroutine graphg
+
+#endif

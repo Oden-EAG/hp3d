@@ -14,6 +14,7 @@ geometry_error.F90
 invmap.F
 invmap_face.F
 refel.F
+soleval.F90
 volume.F90
 volume_hp.F90
 vshape.F90

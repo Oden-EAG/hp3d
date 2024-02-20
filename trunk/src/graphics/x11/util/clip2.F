@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c----------------------------------------------------------------------
 c
 c   routine name       - clip2
@@ -41,3 +43,5 @@ c  .....if visible
       Imod = 1
 c
       end subroutine clip2
+
+#endif

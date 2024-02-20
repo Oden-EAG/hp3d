@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 C******************************************************
 C
 C THE IMPORTANT ROUTINES FOR THE POSTSCRIPT FILES
@@ -526,3 +528,4 @@ c
         return
         end subroutine
 
+#endif

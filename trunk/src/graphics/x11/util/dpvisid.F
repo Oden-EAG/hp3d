@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c-----------------------------------------------------------------------
 c
 c   routine name       - dpvisid
@@ -204,3 +206,5 @@ c  ...end of loop through traingles
 c
 c
       end subroutine dpvisid
+
+#endif

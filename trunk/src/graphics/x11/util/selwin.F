@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c----------------------------------------------------------------------
 c
 c   latest revision     - Feb 2023
@@ -52,3 +54,5 @@ c
 c
 c
       end subroutine selwin
+
+#endif

@@ -1,0 +1,34 @@
+*****************************************************************************
+
+hp3d - A Scalable MPI/OpenMP hp-Adaptive Finite Element Software Library
+       for Complex Multiphysics Applications
+
+1. Build instructions: see README
+
+2. Compatibility with required external libraries:
+   (note: other versions may be compatible but have not been tested)
+
+ - PETSc
+   Versions: 3.11 - 3.20.4
+
+ - HDF5
+   Versions: 1.10.4 - 1.12.2
+
+ - MUMPS
+   Versions: 5.1 - 5.6.1
+
+ - METIS
+   Versions: 5.1.0
+   
+ - ParMETIS
+   Versions: 4.0.3
+
+ - PT-Scotch
+   (requires bison version >= 3.0)
+   Versions: 6.0.9
+             7.0.1 - 7.0.3
+
+ - Zoltan
+   Versions: 3.83
+
+*****************************************************************************

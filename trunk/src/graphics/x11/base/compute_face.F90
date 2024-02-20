@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 !-------------------------------------------------------------------------------------
 !> @brief      routine computes physical coordinates and quantity to display
 !!
@@ -115,3 +117,5 @@ subroutine compute_face(Numlev,Mdle,Iface,Nedge_orient,Nface_orient,Norder, &
 !
 !
 end subroutine compute_face
+
+#endif

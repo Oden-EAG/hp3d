@@ -7,6 +7,8 @@
 !!
 !-------------------------------------------------------------------------------
 !
+#if HP3D_USE_X11
+
 subroutine set_x11_workspace(Nxigtr, Nxigstr, Nxrgtrz)
 !
   use graphmod , only : MXIGTR,MXIGSTR,MXRGTRZ,INITIALIZED
@@ -24,3 +26,12 @@ subroutine set_x11_workspace(Nxigtr, Nxigstr, Nxrgtrz)
   INITIALIZED = .TRUE.
 
 end subroutine set_x11_workspace
+
+#else
+
+subroutine set_x11_workspace(Nxigtr, Nxigstr, Nxrgtrz)
+  implicit none
+  integer, intent(in) :: Nxigtr, Nxigstr, Nxrgtrz
+end subroutine set_x11_workspace
+
+#endif

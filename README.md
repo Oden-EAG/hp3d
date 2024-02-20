@@ -11,10 +11,12 @@ for Complex Multiphysics Applications
 ## Compiling the library
 1. Create `m_options` file in `hp3d/trunk/`:
 Copy one of the existing `m_options` files from `hp3d/trunk/m_options_files/` into `hp3d/trunk/`.
-For example: `cp m_options_files/m_options_debian_10 m_options`
+For example: `cp m_options_files/m_options_linux ./m_options`
 2. Modify `m_options` file to set the correct path to the main directory:
 Set the `HP3D_BASE_PATH` to the path of the `hp3d/trunk/`
 3. To compile the library, type `make` in `hp3d/trunk/`. **Before compiling**, you **must** link to the external libraries and set compiler options by modifying the `m_options` file as described below.
+
+- Note: We recommend configuring PETSc with all of hp3D's dependencies (see below). Then, the default `m_options` files `m_options_files/m_options_linux` and `m_options_files/m_options_macos` only require setting the corresponding values of `PETSC_DIR` and `PETSC_ARCH` to link to the required external libraries.
 
 ## Linking to external libraries
 The `m_options` file must link to the correct paths for external libraries. The following external libraries are used:
@@ -53,14 +55,15 @@ e.g. `--download-openmpi=yes` or `--download-mpich=yes`.
 Compilation is governed by preprocessing flags `COMPLEX` and `DEBUG`.
 - `COMPLEX = 0` , stiffness matrix, load vector(s) and solution DOFs are real-valued
 - `COMPLEX = 1` , stiffness matrix, load vector(s) and solution DOFs are complex-valued
-- `DEBUG   = 0` , compiler uses optimization flags and the library performs only minimal checks during the computation
+- `DEBUG   = 0` , compiler uses optimization flags, and the library performs only minimal checks during the computation
 - `DEBUG   = 1` , compiler uses debug flags, and the library performs additional checks during the computation
 
 Library will be created under either `hp3d/complex/` or `hp3d/real/`.
 
-Additional preprocessing flags for enabling/disabling third-party libraries:
+Additional preprocessing flags for enabling/disabling dependencies on third-party libraries:
 - `HP3D_USE_OPENMP    = 0/1` , enable/disable OpenMP threading
 - `HP3D_USE_INTEL_MKL = 0/1` , enable/disable dependency on Intel MKL package
+- `HP3D_USE_X11       = 0/1` , enable/disable dependency on X11
 
 ## Verifying build
 In addition to the default `make` that builds and installs the hp3D library, the `makefile` provides various targets which can be viewed via `make help`. For example, use `make check` to run a quick check after building the library, or run more extensive tests using `make test`.

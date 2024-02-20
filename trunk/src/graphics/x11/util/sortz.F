@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c----------------------------------------------------------------------
 c
 c   routine name       - sortz
@@ -79,3 +81,5 @@ c  ...start sorting (heapsort algorithm)
       go to 20
 c
       end subroutine sortz
+
+#endif

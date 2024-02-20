@@ -8,7 +8,7 @@ HP3D makefile targets:
   make -j
     Build and install the library in parallel
   make clean
-    Clean object and library files
+    Clean object/library files, problems and test directory
   make check
     Compile and run one test problem
   make test
@@ -17,6 +17,8 @@ HP3D makefile targets:
     Compile examples in problems directory
   make all
     Build/install the library, compile problems, and run tests
+  make clean-lib
+    Clean object and library files
   make clean-test
     Clean test directory
   make clean-problems
@@ -46,6 +48,7 @@ DEBUG      ?= 0
 
 HP3D_USE_OPENMP    ?= 0
 HP3D_USE_INTEL_MKL ?= 0
+HP3D_USE_X11       ?= 1
 
 ####################################################
 
@@ -76,7 +79,8 @@ endif
 CCDEFS    = -D"C_MODE=$(COMPLEX)" \
             -D"DEBUG_MODE=$(DEBUG)" \
             -D"HP3D_USE_OPENMP=$(HP3D_USE_OPENMP)" \
-            -D"HP3D_USE_INTEL_MKL=$(HP3D_USE_INTEL_MKL)"
+            -D"HP3D_USE_INTEL_MKL=$(HP3D_USE_INTEL_MKL)" \
+            -D"HP3D_USE_X11=$(HP3D_USE_X11)"
 
 # -- Includes --
 CCINCS   += -I./$(SRC_PATH) \
@@ -172,6 +176,7 @@ fastlib :
 	@echo " - COMPLEX, DEBUG         :" $(COMPLEX) $(DEBUG)
 	@echo " - HP3D_USE_OPENMP        :" $(HP3D_USE_OPENMP)
 	@echo " - HP3D_USE_INTEL_MKL     :" $(HP3D_USE_INTEL_MKL)
+	@echo " - HP3D_USE_X11           :" $(HP3D_USE_X11)
 	@echo " - Preprocessor options   :" $(CCDEFS)
 	@echo " - HP3D Library           :" $(LIB_PATH)/$(HP3D_LIBNAME)
 	@echo " - Frontal Solver Library :" $(LIB_PATH)/$(FRONTAL_NAME)
@@ -327,10 +332,15 @@ print:
 #-------------------------------------------------
 .PHONY : clean
 
-clean:
+clean: clean-all
+
+#-------------------------------------------------
+.PHONY : clean-lib
+
+clean-lib:
 	@echo "Clean frontal solver, object files, libraries, modules and mk files"
-	@( cd ./$(SRC_PATH)/solver/frontal/base/real ; $(MAKE) clean )
-	@( cd ./$(SRC_PATH)/solver/frontal/base/complex ; $(MAKE) clean )
+	@( $(MAKE) -C ./$(SRC_PATH)/solver/frontal/base/real    clean )
+	@( $(MAKE) -C ./$(SRC_PATH)/solver/frontal/base/complex clean )
 	@rm -rf $(OBJ_PATH_COMPLEX) $(OBJ_PATH_REAL)
 	@rm -rf $(HP3D_PATH_COMPLEX) $(HP3D_PATH_REAL)
 	@rm -f $(LIB_PATH)/*.a
@@ -344,27 +354,27 @@ clean:
 
 clean-test:
 	@echo "Clean 'test' directory."
-	@(cd test ; $(MAKE) clean; cd ..);
+	@($(MAKE) -C test clean);
 
 #-------------------------------------------------
 .PHONY : clean-problems
 
 clean-problems:
 	@echo "Clean 'problems' directory."
-	@(cd problems/MPI_TEST/TEST ; $(MAKE) clean; cd ../..);
+	@($(MAKE) -C problems/MPI_TEST/TEST clean);
 ifeq ($(COMPLEX),1)
-	@(cd problems/MAXWELL/GALERKIN      ; $(MAKE) clean; cd ../..);
-	@(cd problems/MAXWELL/ULTRAWEAK_DPG ; $(MAKE) clean; cd ../..);
-	@(cd problems/LASER/UW_COUPLED      ; $(MAKE) clean; cd ../..);
+	@($(MAKE) -C problems/MAXWELL/GALERKIN      clean);
+	@($(MAKE) -C problems/MAXWELL/ULTRAWEAK_DPG clean);
+	@($(MAKE) -C problems/LASER/UW_COUPLED      clean);
 else
-	@(cd problems/POISSON/GALERKIN        ; $(MAKE) clean; cd ../..);
-	@(cd problems/POISSON/PRIMAL_DPG      ; $(MAKE) clean; cd ../..);
-	@(cd problems/POISSON/ULTRAWEAK_DPG   ; $(MAKE) clean; cd ../..);
-	@(cd problems/VECTOR_POISSON/GALERKIN ; $(MAKE) clean; cd ../..);
-	@(cd problems/SHEATHED_HOSE           ; $(MAKE) clean; cd ..);
+	@($(MAKE) -C problems/POISSON/GALERKIN        clean);
+	@($(MAKE) -C problems/POISSON/PRIMAL_DPG      clean);
+	@($(MAKE) -C problems/POISSON/ULTRAWEAK_DPG   clean);
+	@($(MAKE) -C problems/VECTOR_POISSON/GALERKIN clean);
+	@($(MAKE) -C problems/SHEATHED_HOSE           clean);
 endif
 
 #-------------------------------------------------
 .PHONY : clean-all
 
-clean-all: clean clean-test clean-problems
+clean-all: clean-lib clean-test clean-problems

@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c----------------------------------------------------------------------
 c
 c   routine name       - lsvistr
@@ -851,3 +853,5 @@ c  ...sort according to z-coordinate in order back-to-front
       call sortz
 c
       end subroutine lsvistr
+
+#endif

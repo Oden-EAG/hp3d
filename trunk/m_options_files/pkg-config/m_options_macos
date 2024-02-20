@@ -3,19 +3,30 @@
 #------------------------------------------------------------------
 # PREPROCESSOR VARIABLES (Set to 0/1)
 #------------------------------------------------------------------
+
+# Note:
+# This m_options file uses compiler settings, library paths, and
+# include paths directly from the PETSc configuration.
+
 COMPLEX ?= 0
-DEBUG   ?= 1
+DEBUG   ?= 0
+
+# Optional dependencies
+HP3D_USE_INTEL_MKL = 0
+HP3D_USE_OPENMP    = 0
+HP3D_USE_X11       = 0
 
 #------------------------------------------------------------------
 # Set hp3D PATH, PETSC_DIR, and PETSC_ARCH
 #------------------------------------------------------------------
-HP3D_BASE_PATH = /Users/runner/work/hp3d/hp3d/trunk
 
-PETSC_DIR ?= /Users/runner/work/hp3d/hp3d/petsc
+HP3D_BASE_PATH = /Users/user/hp3D/LIBS/hp3d/trunk
+
+PETSC_DIR ?= /Users/user/hp3D/LIBS/petsc
 ifeq ($(COMPLEX),1)
-  PETSC_ARCH ?= arch-macos-13-complex-dbg
+  PETSC_ARCH ?= arch-darwin-complex
 else
-  PETSC_ARCH ?= arch-macos-13-real-dbg
+  PETSC_ARCH ?= arch-darwin-real
 endif
 
 
@@ -31,7 +42,7 @@ PACKAGES := $(petsc.pc)
 CC := $(shell pkg-config --variable=ccompiler $(PACKAGES))
 FC := $(shell pkg-config --variable=fcompiler $(PACKAGES))
 FFLAGS := $(shell pkg-config --variable=fflags_extra $(PACKAGES))
-FFLAGS += -fallow-argument-mismatch
+FFLAGS += -w -fallow-argument-mismatch
 
 CFLAGS  =
 
@@ -100,9 +111,9 @@ PROB_INCS   += $(HP3D_LINK_INCS)   \
 # Files with ending in .F and .F90 (not .f and .f90)
 # are preprocessed according to certain directives
 
-HP3D_USE_OPENMP    = 0
-HP3D_USE_INTEL_MKL = 0
-HP3D_USE_X11       = 0
+HP3D_USE_OPENMP    := 0
+HP3D_USE_INTEL_MKL := 0
+HP3D_USE_X11       := 0
 
 PROB_PP_DEFS  = -D"C_MODE=$(COMPLEX)" \
                 -D"DEBUG_MODE=$(DEBUG)" \

@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c----------------------------------------------------------------------
 c
 c   routine name       - dptrno
@@ -153,3 +155,5 @@ c  .....write the block nickname
   190 continue
 c
       end subroutine dptrno
+
+#endif

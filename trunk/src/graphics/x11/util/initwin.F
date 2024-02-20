@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c----------------------------------------------------------------------
 c
 c   routine name       - initwin
@@ -72,3 +74,5 @@ c
       call closwind(IWINDNUM)
 c
       end subroutine initwin
+
+#endif

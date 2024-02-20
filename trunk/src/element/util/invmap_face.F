@@ -1,3 +1,5 @@
+#if HP3D_USE_X11
+
 c----------------------------------------------------------------------
 c
 c   routine name       - invmap_face
@@ -187,3 +189,5 @@ c
 c
 c
       end subroutine invmap_face
+
+#endif
