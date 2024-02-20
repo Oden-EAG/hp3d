@@ -7,8 +7,6 @@ program test_dump_pois
    use control
    use data_structure3D
    use environment
-   use mpi
-   use mpi_param
    use mpi_wrapper
    use par_mesh
    use stc
