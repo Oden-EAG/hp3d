@@ -33,8 +33,7 @@ contains
    use bitvisit
    use par_mesh,           only: DISTRIBUTED, HOST_MESH
    use mpi_param
-   use MPI,                only: MPI_IN_PLACE, MPI_INTEGER, &
-                                 MPI_SUM, MPI_COMM_WORLD, MPI_ALLREDUCE
+   use MPI
 !
    implicit none
 !
