@@ -33,8 +33,7 @@ contains
    use bitvisit
    use par_mesh,           only: DISTRIBUTED, HOST_MESH
    use mpi_param
-   use MPI,                only: MPI_IN_PLACE, MPI_INTEGER, &
-                                 MPI_SUM, MPI_COMM_WORLD
+   use MPI
 !
    implicit none
 !
@@ -136,7 +135,7 @@ contains
    enddo
 !$omp end parallel do
 !
-   call MPI_Allreduce(MPI_IN_PLACE,vert_nprocs,nrvert,MPI_INTEGER, MPI_SUM,MPI_COMM_WORLD, ierr)
+   call MPI_ALLREDUCE(MPI_IN_PLACE,vert_nprocs,nrvert,MPI_INTEGER, MPI_SUM,MPI_COMM_WORLD, ierr)
 !
 !..Renumber verts, only counting interface verts
    nrvert = 0;
@@ -272,7 +271,7 @@ contains
    enddo
 !$omp end parallel do
 !
-   call MPI_Allreduce(MPI_IN_PLACE,elem_nrvert,nrelem_interf,MPI_INTEGER, MPI_SUM,MPI_COMM_WORLD, ierr)
+   call MPI_ALLREDUCE(MPI_IN_PLACE,elem_nrvert,nrelem_interf,MPI_INTEGER, MPI_SUM,MPI_COMM_WORLD, ierr)
 !
    allocate(offsets(nrelem_interf)); offsets = 0;
 !
@@ -311,7 +310,7 @@ contains
       enddo
    enddo
 !
-   call MPI_Allreduce(MPI_IN_PLACE,elem_verts,sum,MPI_INTEGER, MPI_SUM,MPI_COMM_WORLD, ierr)
+   call MPI_ALLREDUCE(MPI_IN_PLACE,elem_verts,sum,MPI_INTEGER, MPI_SUM,MPI_COMM_WORLD, ierr)
 !
 !-----------------------------------------------------------------------
 ! Step 6: Add only interface elements touching my subdomain
