@@ -441,7 +441,7 @@ subroutine update_Ddof
 !
    deallocate(nod_rnk,nod_glb)
 !
-!..wait for non-blocking send/recv to finish (use MPI_ISEND/MPI_IRECV)
+!..wait for non-blocking send/recv to finish (with MPI_ISEND/MPI_IRECV)
    !call MPI_WAITALL()
 !
 !..go back to first loop and process elements if necessary
@@ -486,8 +486,7 @@ subroutine update_Ddof_omp
    use data_structure3D
    use environment, only: QUIET_MODE
    use par_mesh   , only: DISTRIBUTED
-   use MPI        , only: MPI_COMM_WORLD,MPI_INTEGER,MPI_REAL8,MPI_COMPLEX16, &
-                          MPI_SUM,MPI_MIN,MPI_IN_PLACE,MPI_STATUS_IGNORE
+   use MPI
    use mpi_param  , only: RANK,ROOT,NUM_PROCS
    use par_mesh   , only: DISTRIBUTED,HOST_MESH
 !
@@ -516,7 +515,7 @@ subroutine update_Ddof_omp
    VTYPE, dimension(MAXEQNQ,MAXbrickQ) :: zdofQ
 !
 !..auxiliary variables for timing
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 !..auxiliary variables
    integer :: iel,iv,ie,ifc,ind,iflag
@@ -1042,7 +1041,7 @@ subroutine update_Ddof_omp
 !
    deallocate(nod_rnk,nod_glb)
 !
-!..wait for non-blocking send/recv to finish (use MPI_ISEND/MPI_IRECV)
+!..wait for non-blocking send/recv to finish (with MPI_ISEND/MPI_IRECV)
    !call MPI_WAITALL()
 !
 !..go back to first loop and process elements if necessary
