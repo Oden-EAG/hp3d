@@ -21,10 +21,10 @@ jobs:
         include:
           - os: ubuntu-latest
             deployment: ''
-          - os: macos-12
-            deployment: '12.7'
-          - os: macos-13
-            deployment: '13.6'
+          #- os: macos-12
+          #  deployment: '12.7'
+          #- os: macos-13
+          #  deployment: '13.6'
 
     name: ${{ matrix.os }}-${{ matrix.mode }}-${{ matrix.target }}
 
@@ -73,7 +73,6 @@ jobs:
           brew install bison flex
           sudo ln -s /usr/local/opt/bison/bin/bison /usr/local/bin/bison
           sudo ln -s /usr/local/opt/flex/bin/flex /usr/local/bin/flex
-          brew install pkg-config
 
       # Get MPI (MacOS)
       - name: Get MPI (MacOS)
@@ -96,6 +95,7 @@ jobs:
       # Build PETSc
       - name: Build PETSc
         run: |
+          brew install pkg-config
           echo "Getting latest PETSc release version"
           git clone -b release https://gitlab.com/petsc/petsc.git petsc
           
