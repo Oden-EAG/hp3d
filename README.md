@@ -11,12 +11,12 @@ for Complex Multiphysics Applications
 ## Compiling the library
 1. Create `m_options` file in `hp3d/trunk/`:
 Copy one of the existing `m_options` files from `hp3d/trunk/m_options_files/` into `hp3d/trunk/`.
-For example: `cp m_options_files/m_options_linux m_options`
+For example: `cp m_options_files/m_options_linux ./m_options`
 2. Modify `m_options` file to set the correct path to the main directory:
 Set the `HP3D_BASE_PATH` to the path of the `hp3d/trunk/`
 3. To compile the library, type `make` in `hp3d/trunk/`. **Before compiling**, you **must** link to the external libraries and set compiler options by modifying the `m_options` file as described below.
 
-- Note: We recommend configuring PETSc with all of hp3D's dependencies (see below). Then, the default m_options files `m_options_files/m_options_linux` and `m_options_files/m_options_macos` only require setting the corresponding values of `PETSC_DIR` and `PETSC_ARCH` to link to the required external libraries.
+- Note: We recommend configuring PETSc with all of hp3D's dependencies (see below). Then, the default `m_options` files `m_options_files/m_options_linux` and `m_options_files/m_options_macos` only require setting the corresponding values of `PETSC_DIR` and `PETSC_ARCH` to link to the required external libraries.
 
 ## Linking to external libraries
 The `m_options` file must link to the correct paths for external libraries. The following external libraries are used:
