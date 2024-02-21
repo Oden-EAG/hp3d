@@ -18,6 +18,7 @@
       use commonParam
       use data_structure3D
       use parametersDPG
+      use MPI
       use physics, only: NR_PHYSA
 !
       implicit none
