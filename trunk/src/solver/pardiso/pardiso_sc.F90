@@ -42,8 +42,7 @@ subroutine pardiso_sc(mtype)
                         stc_alloc, stc_dealloc, stc_get_nrdof
    use parameters,only: NRRHS
    use par_mesh,  only: DISTRIBUTED,HOST_MESH
-   use mpi_param, only: RANK,ROOT
-   use MPI,       only: MPI_Wtime
+   use mpi_wrapper
 !
    implicit none
 !

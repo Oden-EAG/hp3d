@@ -17,8 +17,7 @@ subroutine residual(res)
    use environment
    use assembly_sc, only: NRDOF_TOT,NRDOF_CON
    use par_mesh   , only: DISTRIBUTED,HOST_MESH
-   use mpi_param  , only: ROOT,RANK
-   use MPI
+   use mpi_wrapper
 !
    implicit none
 !

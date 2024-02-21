@@ -25,9 +25,8 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
    use assembly_sc  , only: NRDOF_CON, NRDOF_TOT
    use parametersDPG, only: NORD_ADD
    use par_mesh     , only: DISTRIBUTED,HOST_MESH
-   use mpi_param    , only: ROOT,RANK,NUM_PROCS
+   use mpi_wrapper
    use sorts        , only: qsort_duplet
-   use MPI
 !
    implicit none
 !

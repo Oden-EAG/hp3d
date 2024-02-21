@@ -40,8 +40,7 @@ subroutine mumps_sc(mtype)
    use mumps,       only: MUMPS_PAR, mumps_start, mumps_destroy
    use parameters,  only: NRRHS
    use par_mesh,    only: DISTRIBUTED,HOST_MESH
-   use mpi_param,   only: RANK,ROOT
-   use MPI,         only: MPI_Wtime
+   use mpi_wrapper
 !
    implicit none
 !

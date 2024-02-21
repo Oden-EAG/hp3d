@@ -26,9 +26,7 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
    use common_prob_data
    use assembly_sc, only: NRDOF_CON,NRDOF_TOT
    use par_mesh   , only: DISTRIBUTED,HOST_MESH
-   use mpi_param  , only: ROOT,RANK
-   use MPI        , only: MPI_COMM_WORLD,MPI_SUM,MPI_COMM_WORLD, &
-                          MPI_REAL8,MPI_Wtime
+   use mpi_wrapper
 !
    implicit none
 !
@@ -213,8 +211,7 @@ end subroutine uniform_href
 subroutine href_solve()
 !
    use common_prob_data
-   use MPI           , only: MPI_COMM_WORLD,MPI_INTEGER
-   use mpi_param     , only: RANK,ROOT
+   use mpi_wrapper
    use par_mesh      , only: DISTRIBUTED,HOST_MESH,distr_mesh
    use zoltan_wrapper
 !

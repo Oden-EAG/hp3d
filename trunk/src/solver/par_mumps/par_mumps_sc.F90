@@ -46,8 +46,7 @@ subroutine par_mumps_sc(mtype)
    use parameters,only: NRRHS
    use par_mumps, only: mumps_par,mumps_start_par,mumps_destroy_par
    use par_mesh , only: DISTRIBUTED,HOST_MESH
-   use mpi_param, only: RANK,ROOT,NUM_PROCS
-   use MPI
+   use mpi_wrapper
    use environment, only: QUIET_MODE
 !
    implicit none

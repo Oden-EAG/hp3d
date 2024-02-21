@@ -58,8 +58,7 @@ subroutine par_nested(mtype)
                          mumps_start_par,mumps_destroy_par,    &
                          mumps_start_subd,mumps_destroy_subd
    use par_mesh  , only: DISTRIBUTED,HOST_MESH
-   use mpi_param , only: RANK,ROOT,NUM_PROCS
-   use MPI
+   use mpi_wrapper
 
    use mkl_spblas
 !

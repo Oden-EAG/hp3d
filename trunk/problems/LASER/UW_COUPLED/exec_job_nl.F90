@@ -10,8 +10,7 @@ subroutine exec_job_nl
    use laserParam
    use control
    use data_structure3D
-   use MPI           , only: MPI_COMM_WORLD,MPI_Wtime
-   use mpi_param     , only: RANK,ROOT,NUM_PROCS
+   use mpi_wrapper
    use par_mesh      , only: EXCHANGE_DOF,distr_mesh
    use paraview      , only: paraview_select_attr
    use zoltan_wrapper

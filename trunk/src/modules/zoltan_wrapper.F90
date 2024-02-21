@@ -12,8 +12,7 @@ module zoltan_wrapper
    use data_structure3D
    use element_data
    use environment, only: QUIET_MODE
-   use MPI
-   use mpi_param
+   use mpi_wrapper
    use zoltan
 !
    implicit none

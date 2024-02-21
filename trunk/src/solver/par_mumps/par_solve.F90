@@ -17,8 +17,7 @@
 subroutine par_solve(mumps)
 !
    use assembly_sc, only: IPRINT_TIME
-   use mpi_param  , only: RANK,ROOT
-   use MPI        , only: MPI_Wtime
+   use mpi_wrapper
    use par_mumps
 !
    implicit none

@@ -14,7 +14,7 @@
 ! -----------------------------------------------------------------------
 module mumps
 !
-   use MPI, only: MPI_COMM_SELF
+   use mpi_wrapper
 !
    implicit none
 !

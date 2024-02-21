@@ -7,8 +7,7 @@ subroutine close_mesh()
    use data_structure3D
    use par_mesh   , only: DISTRIBUTED
    use environment, only: QUIET_MODE
-   use mpi_param  , only: ROOT,RANK
-   use MPI        , only: MPI_COMM_WORLD,MPI_Wtime
+   use mpi_wrapper
    use bitvisit
 !
    implicit none
@@ -232,10 +231,9 @@ subroutine close_mesh_par()
    use error
    use refinements
    use data_structure3D
-   use mpi_param
+   use mpi_wrapper
    use bitvisit
    use environment, only: QUIET_MODE
-   use MPI        , only: MPI_COMM_WORLD, MPI_INTEGER, MPI_BOR, MPI_IN_PLACE
 !
    implicit none
 !
@@ -249,7 +247,7 @@ subroutine close_mesh_par()
    integer :: nv,ne,nf,nve
    integer :: nreles_aux, ic_glob
    logical :: nflag
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
    integer :: displs(NUM_PROCS), ic_procs(NUM_PROCS)
 !
 #if DEBUG_MODE

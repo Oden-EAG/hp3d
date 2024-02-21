@@ -194,9 +194,8 @@ module bitvisit
 !--------------------------------------------------------------------
    subroutine reduce_visit
 !
-      use MPI
-      use mpi_param,       only: RANK,ROOT
-      use par_mesh,        only: DISTRIBUTED
+      use mpi_wrapper
+      use par_mesh, only: DISTRIBUTED
 !
       implicit none
 !
