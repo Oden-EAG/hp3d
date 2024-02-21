@@ -18,8 +18,7 @@ subroutine get_L2NormDiff(Attr1,Attr2, L2NormDiff)
    use environment     , only: QUIET_MODE,L2PROJ,FILE_ERR
    use physics
    use par_mesh        , only: DISTRIBUTED,HOST_MESH
-   use mpi_param       , only: ROOT,RANK
-   use MPI             , only: MPI_SUM,MPI_COMM_WORLD,MPI_REAL8,MPI_Wtime
+   use mpi_wrapper
 !
    implicit none
 !
@@ -267,8 +266,7 @@ subroutine get_L2NormAttr(Attr, L2Norm)
    use environment     , only: QUIET_MODE,L2PROJ,FILE_ERR
    use physics
    use par_mesh        , only: DISTRIBUTED,HOST_MESH
-   use mpi_param       , only: ROOT,RANK
-   use MPI             , only: MPI_SUM,MPI_COMM_WORLD,MPI_REAL8,MPI_Wtime
+   use mpi_wrapper
 !
    implicit none
 !
@@ -503,8 +501,7 @@ subroutine get_Norm(Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
    use environment      , only: QUIET_MODE,L2PROJ,FILE_ERR
    use physics
    use par_mesh         , only: DISTRIBUTED,HOST_MESH
-   use mpi_param        , only: ROOT,RANK
-   use MPI              , only: MPI_SUM,MPI_COMM_WORLD,MPI_REAL8,MPI_Wtime
+   use mpi_wrapper
 !
    implicit none
 !

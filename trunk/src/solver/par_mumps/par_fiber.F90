@@ -42,8 +42,7 @@
 recursive subroutine par_fiber(mumps,nrdof,nproc,level)
 !
    use assembly  , only: NR_RHS
-   use MPI
-   use mpi_param , only: RANK,ROOT
+   use mpi_wrapper
    use parameters, only: ZERO,ZONE
    use stc       , only: stc_bwd
    use par_mumps

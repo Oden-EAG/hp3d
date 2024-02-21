@@ -15,8 +15,7 @@
    use data_structure3D
    use refinements
    use constrained_nodes
-   use mpi_param,   only: ROOT, RANK
-   use MPI
+   use mpi_wrapper
    use par_mesh,    only: DISTRIBUTED
    use bitvisit
    use par_ghost
@@ -293,7 +292,6 @@ contains
    subroutine save_min_order(Mdle,Nod,Nord)
 !
       use data_structure3D
-      use mpi_param
       implicit none
 !
       integer, intent(in) :: Mdle,Nod,Nord

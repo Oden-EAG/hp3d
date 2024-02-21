@@ -2,7 +2,6 @@
 !> @date Sep 2023
 program test_attr_to_index
 !
-   use mpi_param
    use mpi_wrapper
    use physics
 !

@@ -7,8 +7,7 @@ subroutine global_href
    use error
    use data_structure3D
    use environment , only : QUIET_MODE
-   use mpi_param   , only : RANK,ROOT
-   use MPI         , only : MPI_COMM_WORLD,MPI_Wtime
+   use mpi_wrapper
 !
    implicit none
 !
@@ -70,8 +69,7 @@ subroutine global_href_aniso(Krefxy,Krefz)
    use error
    use data_structure3D
    use environment , only : QUIET_MODE
-   use mpi_param   , only : RANK,ROOT
-   use MPI         , only : MPI_COMM_WORLD,MPI_Wtime
+   use mpi_wrapper
 !
    implicit none
 !
@@ -145,8 +143,7 @@ subroutine global_href_aniso_bric(Krefx,Krefy,Krefz)
    use error
    use data_structure3D
    use environment , only : QUIET_MODE
-   use mpi_param   , only : RANK,ROOT
-   use MPI         , only : MPI_COMM_WORLD,MPI_Wtime
+   use mpi_wrapper
 !
    implicit none
 !

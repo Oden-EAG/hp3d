@@ -5,8 +5,7 @@
 module hdf5_wrapper
 !
    use HDF5
-   use mpi_param
-   use MPI
+   use mpi_wrapper
 !
    implicit none
 !

@@ -9,8 +9,6 @@ program test_hexa_adapt_h_case1
 !
    use data_structure3D
    use environment
-   use mpi
-   use mpi_param
    use mpi_wrapper
    use par_mesh
    use zoltan_wrapper

@@ -14,8 +14,7 @@
 ! -----------------------------------------------------------------------
 module par_mumps
 !
-   use MPI      , only: MPI_COMM_WORLD,MPI_COMM_SELF
-   use mpi_param, only: RANK,NUM_PROCS
+   use mpi_wrapper
 !
    implicit none
 !

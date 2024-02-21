@@ -93,7 +93,8 @@ subroutine celem_system(Mdle,Idec,                                &
    integer, dimension(NR_PHYSA) :: itest,jtrial
 !
 !..auxiliary variables
-   integer :: i,ii,il,j,k,k1,k2,kk,kold,kp,l,l1,l2,ll,ll1,load,nvoid
+   integer :: i,ii,il,j,k,k1,k2,kk,kold,kp,l,l1,l2,ll,ll1,load
+   integer :: ivoid,jvoid,kvoid
    integer :: iphys,iphys1,iphys2,icomp,iload,ivar
    integer :: nod,nvarHt,nvarEt,nvarVt,nvarQt
    integer :: nrPhysH,nrPhysE,nrPhysV,nrPhysHE,nrPhysHEV,nrPhysQ
@@ -470,7 +471,7 @@ subroutine celem_system(Mdle,Idec,                                &
    nvarQt = NREQNQ(NODES(nod)%case)
    call get_index(nod, index)
    kold = k
-   call find_ndof(nod, nvoid,nvoid,nvoid,ndofQ)
+   call find_ndof(nod, ivoid,jvoid,kvoid,ndofQ)
    l = nrdofmHEV
 !
 !..loop through L2 dof for the middle node

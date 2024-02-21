@@ -19,8 +19,7 @@ subroutine vector2vtk(Sname,Sfile,Snick,Idx, Ic)
    use physics
    use upscale
    use paraview
-   use MPI
-   use mpi_param        , only: RANK,ROOT,NUM_PROCS
+   use mpi_wrapper
    use par_mesh         , only: DISTRIBUTED,HOST_MESH
 !
    implicit none

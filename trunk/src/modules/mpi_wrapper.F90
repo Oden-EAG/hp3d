@@ -3,7 +3,7 @@
 !
 !----------------------------------------------------------------------
 !     module:              mpi_wrapper
-!     last modified:       July 2019
+!     last modified:       Feb 2024
 !----------------------------------------------------------------------
 module mpi_wrapper
 !
@@ -46,10 +46,10 @@ module mpi_wrapper
       call MPI_COMM_SIZE (MPI_COMM_WORLD, NUM_PROCS, ierr)
       call mpi_w_handle_err(ierr,'MPI_COMM_SIZE')
 !
-      if (.not. QUIET_MODE .and. RANK .eq. ROOT) then
+      if (.not.QUIET_MODE .and. RANK.eq.ROOT) then
          write(*,100) 'MPI initialized successfully. NUM_PROCS = ',NUM_PROCS
       endif
-  100 format(/,A,I4)
+  100 format(/,A,I6)
 !
 !  ...initialize Zoltan environment
       call zoltan_ext_init

@@ -14,9 +14,7 @@ subroutine update_gdof
    use data_structure3D
    use element_data
    use environment, only: QUIET_MODE
-   use MPI        , only: MPI_COMM_WORLD,MPI_INTEGER,MPI_REAL8,MPI_SUM, &
-                          MPI_MIN,MPI_IN_PLACE,MPI_STATUS_IGNORE,MPI_Wtime
-   use mpi_param  , only: RANK,ROOT,NUM_PROCS
+   use mpi_wrapper
    use par_mesh   , only: DISTRIBUTED,HOST_MESH
    use GMP
 !
@@ -381,7 +379,7 @@ subroutine update_gdof
 !
    deallocate(nod_rnk,nod_glb)
 !
-!..wait for non-blocking send/recv to finish (use MPI_ISEND/MPI_IRECV)
+!..wait for non-blocking send/recv to finish (with MPI_ISEND/MPI_IRECV)
    !call MPI_WAITALL()
 !
 !..go back to first loop and process elements if necessary
@@ -450,9 +448,7 @@ subroutine update_gdof_omp
    use data_structure3D
    use element_data
    use environment, only: QUIET_MODE
-   use MPI        , only: MPI_COMM_WORLD,MPI_INTEGER,MPI_REAL8,MPI_SUM, &
-                          MPI_MIN,MPI_IN_PLACE,MPI_STATUS_IGNORE
-   use mpi_param  , only: RANK,ROOT,NUM_PROCS
+   use mpi_wrapper
    use par_mesh   , only: DISTRIBUTED,HOST_MESH
    use GMP
 !
@@ -482,7 +478,7 @@ subroutine update_gdof_omp
    real(8) :: coord(3,MAXquadH)
 !
 !..auxiliary variables for timing
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 !..auxiliary variables
    integer :: iel,iv,ie,ifc,ind,iflag,i,k,loc
@@ -899,7 +895,7 @@ subroutine update_gdof_omp
 !
    deallocate(nod_rnk,nod_glb)
 !
-!..wait for non-blocking send/recv to finish (use MPI_ISEND/MPI_IRECV)
+!..wait for non-blocking send/recv to finish (with MPI_ISEND/MPI_IRECV)
    !call MPI_WAITALL()
 !
 !..go back to first loop and process elements if necessary

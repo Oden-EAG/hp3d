@@ -20,8 +20,7 @@ subroutine soln2vtk(Sname, Sfile, Snick, Scenter, Scomp, Ic)
    use element_data
    use upscale
    use paraview
-   use MPI              , only: MPI_COMM_WORLD,MPI_SUM,MPI_INTEGER
-   use mpi_param        , only: RANK,ROOT,NUM_PROCS
+   use mpi_wrapper
    use par_mesh         , only: DISTRIBUTED,HOST_MESH
    use sheathed_isotropic_materials
 !
