@@ -240,7 +240,7 @@ subroutine compute_gain(ZValues,Num_zpts,Fld, Gain)
    use control    , only : GEOM_TOL
    use environment, only : QUIET_MODE
    use mpi_param  , only : RANK,ROOT
-   use MPI        , only : MPI_COMM_WORLD
+   use MPI
    use par_mesh   , only : DISTRIBUTED
 !
    implicit none
@@ -271,7 +271,7 @@ subroutine compute_gain(ZValues,Num_zpts,Fld, Gain)
    integer, parameter :: faceNum = 2
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
    integer :: ierr
 !
 !---------------------------------------------------------------------------------------

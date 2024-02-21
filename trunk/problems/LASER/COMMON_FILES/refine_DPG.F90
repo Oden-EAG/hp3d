@@ -47,8 +47,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
    use parametersDPG, only: NORD_ADD
    use par_mesh     , only: DISTRIBUTED,HOST_MESH
    use mpi_param    , only: ROOT,RANK,NUM_PROCS
-   use MPI          , only: MPI_COMM_WORLD,MPI_SUM,MPI_COMM_WORLD,MPI_Wtime, &
-                            MPI_REAL8,MPI_INTEGER,MPI_IN_PLACE,MPI_MAX
+   use MPI
 !
    implicit none
 !

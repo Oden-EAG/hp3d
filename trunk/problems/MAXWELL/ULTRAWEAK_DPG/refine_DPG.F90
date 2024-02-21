@@ -27,8 +27,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
    use par_mesh     , only: DISTRIBUTED,HOST_MESH
    use mpi_param    , only: ROOT,RANK,NUM_PROCS
    use sorts        , only: qsort_duplet
-   use MPI          , only: MPI_COMM_WORLD,MPI_SUM,MPI_COMM_WORLD,   &
-                            MPI_REAL8,MPI_INTEGER,MPI_IN_PLACE,MPI_MAX
+   use MPI
 !
    implicit none
 !
@@ -83,7 +82,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
 !..element type
    integer :: ntype
 !
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 !..printing flag
    integer :: iprint = 0

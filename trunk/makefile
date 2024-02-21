@@ -189,27 +189,40 @@ fastlib :
 
 problems: lib
 	@echo "Compiling examples in 'problems' directory."
-	@(cd problems/MPI_TEST/TEST ; $(MAKE) ; cd ../..);
 ifeq ($(COMPLEX),1)
-	@echo "Compiling Maxwell Galerkin..."
-	@(cd problems/MAXWELL/GALERKIN      ; $(MAKE) ; cd ../..);
-	@echo "Compiling Maxwell DPG Ultraweak..."
-	@(cd problems/MAXWELL/ULTRAWEAK_DPG ; $(MAKE) ; cd ../..);
-	@echo "Compiling Laser application..."
-	@(cd problems/LASER/UW_COUPLED      ; $(MAKE) ; cd ../..);
-	@echo "Finished building complex-valued problems."
+	@ERR=0; \
+	echo "Compiling Maxwell Galerkin..."; \
+	if ! $(MAKE) -C problems/MAXWELL/GALERKIN; then ERR=1; fi; \
+	echo "Compiling Maxwell DPG Ultraweak..."; \
+	if ! $(MAKE) -C problems/MAXWELL/ULTRAWEAK_DPG; then ERR=1; fi; \
+	echo "Compiling Laser application..."; \
+	if ! $(MAKE) -C problems/LASER/UW_COUPLED; then ERR=1; fi; \
+	echo "Finished building complex-valued problems."; \
+	if [ 0 -eq $${ERR} ]; then \
+		echo "'make problems' passed."; \
+	else \
+		echo "'make problems' failed."; \
+		exit 1; \
+	fi ;
 else
-	@echo "Compiling Poisson Galerkin..."
-	@(cd problems/POISSON/GALERKIN        ; $(MAKE) ; cd ../..);
-	@echo "Compiling Poisson DPG Primal..."
-	@(cd problems/POISSON/PRIMAL_DPG      ; $(MAKE) ; cd ../..);
-	@echo "Compiling Poisson DPG Ultraweak..."
-	@(cd problems/POISSON/ULTRAWEAK_DPG   ; $(MAKE) ; cd ../..);
-	@echo "Compiling Vector Poisson Galerkin..."
-	@(cd problems/VECTOR_POISSON/GALERKIN ; $(MAKE) ; cd ../..);
-	@echo "Compiling Sheathed Hose application..."
-	@(cd problems/SHEATHED_HOSE           ; $(MAKE) ; cd ..);
-	@echo "Finished building real-valued problems."
+	@ERR=0; \
+	echo "Compiling Poisson Galerkin..."; \
+	if ! $(MAKE) -C problems/POISSON/GALERKIN; then ERR=1; fi; \
+	echo "Compiling Poisson DPG Primal..."; \
+	if ! $(MAKE) -C problems/POISSON/PRIMAL_DPG; then ERR=1; fi; \
+	echo "Compiling Poisson DPG Ultraweak..."; \
+	if ! $(MAKE) -C problems/POISSON/ULTRAWEAK_DPG; then ERR=1; fi; \
+	echo "Compiling Vector Poisson Galerkin..."; \
+	if ! $(MAKE) -C problems/VECTOR_POISSON/GALERKIN; then ERR=1; fi; \
+	echo "Compiling Sheathed Hose application..."; \
+	if ! $(MAKE) -C problems/SHEATHED_HOSE; then ERR=1; fi; \
+	echo "Finished building real-valued problems."; \
+	if [ 0 -eq $${ERR} ]; then \
+		echo "'make problems' passed."; \
+	else \
+		echo "'make problems' failed."; \
+		exit 1; \
+	fi ;
 endif
 
 #-------------------------------------------------
