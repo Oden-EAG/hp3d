@@ -293,7 +293,8 @@ c ----------------------------------------------------
 c
          if (IASSEM .eq. 0) then
 c
-            call solout (jel, NDOFM, NRHS, Amdest, Frnt)
+            md = Amdest(1)
+            call solout (jel, NDOFM, NRHS, md, Frnt)
 c           ---------------------------------------------
          else
 c
@@ -341,7 +342,8 @@ c
               write(NFSOUT,*) 'IN BCKWRD jel,NDOFM = ',jel,NDOFM
             endif
 #endif
-            call solout (jel, NDOFM, NRHS, Amdest, Elem)
+            md = Amdest(1)
+            call solout (jel, NDOFM, NRHS, md, Elem)
 c           ---------------------------------------------
 c debug print
 c

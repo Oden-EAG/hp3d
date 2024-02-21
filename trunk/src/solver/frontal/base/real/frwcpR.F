@@ -38,7 +38,7 @@ c
       real(8) :: Elem(*),Frnt(*),Buf(*)
 c
       integer :: i,id,ie,iel,ifg,iunsr,j,jerr
-      integer :: lenf,m,mke,n,ne,negiel,newl,newu,numdes
+      integer :: lenf,m,md,mke,n,ne,negiel,newl,newu,numdes
 c
       IFU = 0
       IFL = 0
@@ -108,7 +108,8 @@ c pointers into Elem(): (1: points to lhs  ;  mke+1: points to rhs)
 c flag for solin2 (ifg=1: get rhs ; =2: get lhs as well)
 c
          ifg = 2
-         call solin2 (iel, ifg, NDOFM, NRHS, Amdest, Elem, Elem(mke+1))
+         md = Amdest(1)
+         call solin2 (iel, ifg, NDOFM, NRHS, md, Elem, Elem(mke+1))
 c        --------------------------------------------------------------
 c debug print
 c

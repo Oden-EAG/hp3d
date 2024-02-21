@@ -94,7 +94,7 @@ c convert the nodal destination vectors to dof destination vectors (Amde
 c  also determine the number of dof to eliminate from the front (ne)
 c  and the transfer loc for active dof in the front after eliminating (A
 c
-         call dest (numdes, Aldest, ne ,Amdest, Andest)
+         call dest (numdes, Aldest, ne, Amdest, Andest)
 c        -----------------------------------------------
 #if DEBUG_MODE
          if (iprint.eq.1) then
@@ -240,7 +240,8 @@ c ----------------------------------------------------
 c
          if (IASSEM .eq. 0) then
 c
-            call solout (jel, NDOFM, NRHS, Amdest, Frnt)
+            md = Amdest(1)
+            call solout (jel, NDOFM, NRHS, md, Frnt)
 c           ---------------------------------------------
          else
 c
@@ -289,7 +290,8 @@ c
               call pause
             endif
 #endif
-            call solout (jel, NDOFM, NRHS, Amdest, Elem)
+            md = Amdest(1)
+            call solout (jel, NDOFM, NRHS, md, Elem)
 c           ---------------------------------------------
 c debug print
 c

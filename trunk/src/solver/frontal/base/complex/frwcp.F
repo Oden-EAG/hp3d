@@ -39,7 +39,7 @@ c
      .              Buf(*),Alelm(*)
 c
       integer :: i,id,ie,iel,ifg,iunsr,j,jerr,lenf
-      integer :: m,mke,n,ne,negiel,newl,newu,numdes
+      integer :: m,md,mke,n,ne,negiel,newl,newu,numdes
 c
 c  ...test......test......test......test......test......test......test...
 ccc      integer :: ndest1(100)
@@ -155,7 +155,8 @@ c flag for solin2 (ifg=1: get rhs ; =2: get lhs as well)
 c
 
          ifg = 2
-         call solin2 (iel, ifg, NDOFM, NRHS, Amdest, Elem, Elem(mke+1))
+         md = Amdest(1)
+         call solin2 (iel, ifg, NDOFM, NRHS, md, Elem, Elem(mke+1))
 c        --------------------------------------------------------------
 
 
