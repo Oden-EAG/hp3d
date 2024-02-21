@@ -54,7 +54,7 @@ subroutine result
    integer :: ndofH,ndofE,ndofV,ndofQ,nod,iel,mdle,nr_conel,idec,ndom
    integer :: nrdofm,nrdofc,nrnodm
 !
-   VTYPE :: zvoid
+   VTYPE :: zvoid1(1),zvoid2(1)
 !
 !----------------------------------------------------------------------
 !
@@ -290,7 +290,7 @@ subroutine result
             mdle = ELEM_ORDER(iel)
             call celem(mdle,1,nrdofs,nrdofm,nrdofc,              &
                        nodm,ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,  &
-                       zvoid,zvoid)
+                       zvoid1,zvoid2)
             call locate(nod,nodm,nrnodm, loc)
             if (loc.gt.0) then
                l=l+1

@@ -58,13 +58,13 @@ subroutine pardiso_sc(mtype)
    integer, dimension(NR_PHYSA) :: nrdofi,nrdofb
 !
 !..integer counters
-   integer   :: nrdof_H,nrdof_E,nrdof_V,nrdof_Q
-   integer   :: nrdofm,nrdofc,nrnodm,nrdof,ndof
-   integer   :: iel,mdle,i,j,k,l,k1,k2,nod
-   integer   :: inz,nz,nnz,nrdof_mdl
+   integer :: nrdof_H,nrdof_E,nrdof_V,nrdof_Q
+   integer :: nrdofm,nrdofc,nrnodm,nrdof,ndof
+   integer :: iel,mdle,i,j,k,l,k1,k2,nod
+   integer :: inz,nz,nnz,nrdof_mdl
 !
 !..dummy variables
-   VTYPE   :: zvoid
+   VTYPE :: zvoid1(1),zvoid2(1)
 !
 !..work space for celem
    integer, dimension(MAXNODM) :: nodm,ndofmH,ndofmE,ndofmV,ndofmQ
@@ -145,10 +145,10 @@ subroutine pardiso_sc(mtype)
 !  ...get information from celem
       if (ISTC_FLAG) then
          call celem_systemI(iel,mdle,1, nrdofs,nrdofm,nrdofc,nodm,  &
-            ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid,zvoid)
+            ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid1,zvoid2)
       else
          call celem(mdle,1, nrdofs,nrdofm,nrdofc,nodm,  &
-            ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid,zvoid)
+            ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid1,zvoid2)
       endif
 !
       nz = nrdofc

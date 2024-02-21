@@ -74,14 +74,14 @@ subroutine par_nested(mtype)
    integer, dimension(NR_PHYSA) :: nrdofi,nrdofb
 !
 !..integer counters
-   integer    :: nrdofm,nrdofc,nrnodm,nrdof,nrdof_mdl,ndof
-   integer    :: iel,mdle,subd,i,j,k,l,k1,k2,nod,idec
+   integer :: nrdofm,nrdofc,nrnodm,nrdof,nrdof_mdl,ndof
+   integer :: iel,mdle,subd,i,j,k,l,k1,k2,nod,idec
 !
 !..MPI variables
    integer :: count,src,ierr
 !
 !..dummy variables
-   VTYPE   :: zvoid
+   VTYPE :: zvoid1(1),zvoid2(1)
 !
 !..workspace for celem
    integer, dimension(MAXNODM) :: nodm,ndofmH,ndofmE,ndofmV,ndofmQ
@@ -207,10 +207,10 @@ subroutine par_nested(mtype)
 !  ...get information from celem
       if (ISTC_FLAG) then
          call celem_systemI(iel,mdle,idec, nrdofs,nrdofm,nrdofc,nodm,  &
-            ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid,zvoid)
+            ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid1,zvoid2)
       else
          call celem(mdle,idec, nrdofs,nrdofm,nrdofc,nodm,  &
-            ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid,zvoid)
+            ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid1,zvoid2)
       endif
 !
 !  ...update the maximum number of local dof
