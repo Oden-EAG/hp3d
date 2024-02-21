@@ -768,7 +768,7 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
    use control    , only : GEOM_TOL
    use environment, only : QUIET_MODE
    use mpi_param  , only : RANK,ROOT
-   use MPI        , only : MPI_COMM_WORLD,MPI_Wtime
+   use MPI
    use par_mesh   , only : DISTRIBUTED
 !
    implicit none

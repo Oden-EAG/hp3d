@@ -146,7 +146,7 @@ subroutine comp_avgTemp(ZValues,NumPts, CoreTemp,PeakTemp)
    use control    , only : GEOM_TOL
    use environment, only : QUIET_MODE
    use mpi_param  , only : RANK,ROOT
-   use MPI        , only : MPI_COMM_WORLD,MPI_IN_PLACE,MPI_REAL8,MPI_SUM,MPI_Wtime
+   use MPI
    use par_mesh   , only : DISTRIBUTED,HOST_MESH
 !
    implicit none
