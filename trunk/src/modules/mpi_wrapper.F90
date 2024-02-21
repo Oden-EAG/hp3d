@@ -102,3 +102,31 @@ module mpi_wrapper
    end subroutine mpi_w_handle_err
 !
 end module mpi_wrapper
+
+! MPI wrapper module using F90 MPI binding
+module mpif90_wrapper
+!
+   use mpi_param
+   use MPI
+   use environment, only: QUIET_MODE
+!
+   implicit none
+!
+   contains
+!
+!----------------------------------------------------------------------
+!     routine:    mpif90_w_handle_err
+!     purpose:    handle error code returned by an MPI function
+!----------------------------------------------------------------------
+   subroutine mpi_w_handle_err(Ierr,Str)
+      integer         , intent(in) :: Ierr
+      character(len=*), intent(in) :: Str
+      character(len=64) :: errStr
+      integer :: ierr1,len
+      if (Ierr .ne. MPI_SUCCESS) then
+         call MPI_Error_string(Ierr, errStr, len, ierr1)
+         write(*,*) Str,': Ierr = ', Ierr, errStr(1:len)
+      endif
+   end subroutine mpi_w_handle_err
+
+end module mpif90_wrapper

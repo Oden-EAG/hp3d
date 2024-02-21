@@ -45,8 +45,7 @@ subroutine petsc_solve(mtype)
                            stc_alloc,stc_dealloc,stc_get_nrdof
    use parameters , only:  NRRHS
    use par_mesh   , only:  DISTRIBUTED,HOST_MESH
-   use MPI
-   use mpi_param
+   use mpif90_wrapper
    use petscksp
    use petsc_w_ksp, only:  petsc_ksp_start,petsc_ksp_destroy,     &
                            petsc_ksp,petsc_ksp_type,              &
@@ -173,7 +172,7 @@ subroutine petsc_solve(mtype)
 !
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(MPI_COMM_WORLD, ierr)
-      !call mpi_w_handle_err(ierr,'MPI_BARRIER')
+      call mpi_w_handle_err(ierr,'MPI_BARRIER')
       if (RANK .eq. ROOT) write(*,1001)
  1001 format(' STEP 1 started : Get assembly info')
       start_time = MPI_Wtime()
@@ -194,7 +193,7 @@ subroutine petsc_solve(mtype)
 !..compute global node ownership
    count = NRNODS
    call MPI_ALLREDUCE(MPI_IN_PLACE,NOD_OWN,count,MPI_INTEGER,MPI_MIN,MPI_COMM_WORLD, ierr)
-   !call mpi_w_handle_err(ierr,'MPI_ALLREDUCE')
+   call mpi_w_handle_err(ierr,'MPI_ALLREDUCE')
 !
    allocate(MAXDOFS(NR_PHYSA))
    MAXDOFS = 0; MAXDOFM = 0
@@ -326,7 +325,7 @@ subroutine petsc_solve(mtype)
    nrdof_subd(RANK+1) = nrdof
    count = NUM_PROCS
    call MPI_ALLREDUCE(MPI_IN_PLACE,nrdof_subd,count,MPI_INTEGER,MPI_MAX,MPI_COMM_WORLD, ierr)
-   !call mpi_w_handle_err(ierr,'MPI_ALLREDUCE')
+   call mpi_w_handle_err(ierr,'MPI_ALLREDUCE')
 !
 !..compute non-zero entries per row, accounting for own subdomain interaction
    allocate(petsc_dnz(nrdof_subd(RANK+1))); petsc_dnz = 0
@@ -408,7 +407,7 @@ subroutine petsc_solve(mtype)
 !  in order to account for non-zero entries from interaction between subdomains
    count = NUM_PROCS * NUM_PROCS
    call MPI_ALLREDUCE(MPI_IN_PLACE,NOD_COMM(1:NUM_PROCS,1:NUM_PROCS),count,MPI_INTEGER,MPI_SUM,MPI_COMM_WORLD, ierr)
-   !call mpi_w_handle_err(ierr,'MPI_ALLREDUCE')
+   call mpi_w_handle_err(ierr,'MPI_ALLREDUCE')
 !
 !..exchange off-diagonal contributions
    nr_send = 0; nr_recv = 0
@@ -420,7 +419,7 @@ subroutine petsc_solve(mtype)
          tag   = count
          nr_send  = nr_send + 1
          call MPI_ISEND(ONZ(i)%SEND_BUF(1:count),count,MPI_INTEGER,rcv,tag,MPI_COMM_WORLD, reqs(nr_send),ierr)
-         !call mpi_w_handle_err(ierr,'MPI_ISEND')
+         call mpi_w_handle_err(ierr,'MPI_ISEND')
       endif
    enddo
    do i=1,NUM_PROCS
@@ -432,7 +431,7 @@ subroutine petsc_solve(mtype)
          nr_recv = nr_recv + 1
          allocate(ONZ(i)%RECV_BUF(count))
          call MPI_IRECV(ONZ(i)%RECV_BUF(1:count),count,MPI_INTEGER,src,tag,MPI_COMM_WORLD, reqs(nr_send+nr_recv),ierr)
-         !call mpi_w_handle_err(ierr,'MPI_IRECV')
+         call mpi_w_handle_err(ierr,'MPI_IRECV')
       endif
    enddo
    !write(*,'(A,I4,A,I4)') '[RANK], nr_send = [',RANK,'],',nr_send
@@ -440,7 +439,7 @@ subroutine petsc_solve(mtype)
 !
 !..wait until all send and receive operations are completed
    call MPI_Waitall(nr_send+nr_recv,reqs(1:nr_send+nr_recv), stats(:,1:nr_send+nr_recv),ierr)
-   !call mpi_w_handle_err(ierr,'MPI_Waitall')
+   call mpi_w_handle_err(ierr,'MPI_Waitall')
 !
 !..process the received node interactions
    do i=1,NUM_PROCS
@@ -529,7 +528,7 @@ subroutine petsc_solve(mtype)
 !..communicate offsets (to receive offsets for non-owned nodes within subdomain)
    count = NRNODS
    call MPI_ALLREDUCE(MPI_IN_PLACE,NFIRST_DOF,count,MPI_INTEGER,MPI_MAX,MPI_COMM_WORLD, ierr)
-   !call mpi_w_handle_err(ierr,'MPI_ALLREDUCE')
+   call mpi_w_handle_err(ierr,'MPI_ALLREDUCE')
 !
 !..calculate total number of (interface) dofs
    nrdof = 0
@@ -540,12 +539,12 @@ subroutine petsc_solve(mtype)
 !..compute total number of condensed bubble dofs
    count = 1
    call MPI_ALLREDUCE(MPI_IN_PLACE,nrdof_mdl,count,MPI_INTEGER,MPI_SUM,MPI_COMM_WORLD, ierr)
-   !call mpi_w_handle_err(ierr,'MPI_ALLREDUCE')
+   call mpi_w_handle_err(ierr,'MPI_ALLREDUCE')
 !
 !..compute total number of non-zeros in global matrix
    count = 1
    call MPI_ALLREDUCE(nnz_loc,nnz,count,MPI_INTEGER8,MPI_SUM,MPI_COMM_WORLD, ierr)
-   !call mpi_w_handle_err(ierr,'MPI_ALLREDUCE')
+   call mpi_w_handle_err(ierr,'MPI_ALLREDUCE')
 !
 !..total number of (interface) dof is nrdof
    NRDOF_CON = nrdof
@@ -565,7 +564,7 @@ subroutine petsc_solve(mtype)
 !
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(MPI_COMM_WORLD, ierr)
-      !call mpi_w_handle_err(ierr,'MPI_BARRIER')
+      call mpi_w_handle_err(ierr,'MPI_BARRIER')
       end_time = MPI_Wtime()
       Mtime(1) = end_time-start_time
       if (RANK .eq. ROOT) write(*,1002) Mtime(1)
@@ -577,7 +576,7 @@ subroutine petsc_solve(mtype)
 ! ----------------------------------------------------------------------
 !
    call MPI_BARRIER(MPI_COMM_WORLD, ierr)
-   !call mpi_w_handle_err(ierr,'MPI_BARRIER')
+   call mpi_w_handle_err(ierr,'MPI_BARRIER')
    if (RANK .eq. ROOT) then
       write(*,2010) '[', RANK, '] Number of dof  : nrdof_con = ', NRDOF_CON
       write(*,2010) '[', RANK, ']                  nrdof_tot = ', NRDOF_TOT
@@ -588,7 +587,7 @@ subroutine petsc_solve(mtype)
 !
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(MPI_COMM_WORLD, ierr)
-      !call mpi_w_handle_err(ierr,'MPI_BARRIER')
+      call mpi_w_handle_err(ierr,'MPI_BARRIER')
       if (RANK .eq. ROOT) write(*,1003)
  1003 format(/,' STEP 2 started : Global Assembly')
       start_time = MPI_Wtime()
@@ -771,7 +770,7 @@ subroutine petsc_solve(mtype)
    if (RANK .eq. ROOT) write(*,*) ' PETSc Assembly...'
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(MPI_COMM_WORLD, ierr)
-      !call mpi_w_handle_err(ierr,'MPI_BARRIER')
+      call mpi_w_handle_err(ierr,'MPI_BARRIER')
       time_stamp = MPI_Wtime()
    endif
    call VecAssemblyBegin(petsc_rhs, petsc_ierr); CHKERRQ(petsc_ierr)
@@ -790,14 +789,14 @@ subroutine petsc_solve(mtype)
    2348 format('[',I4,']',': nstash = ',I9,', reallocs = ',I6)
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(MPI_COMM_WORLD, ierr)
-      !call mpi_w_handle_err(ierr,'MPI_BARRIER')
+      call mpi_w_handle_err(ierr,'MPI_BARRIER')
       time_stamp = MPI_Wtime()
    endif
    call MatAssemblyBegin(petsc_A,MAT_FINAL_ASSEMBLY, petsc_ierr); CHKERRQ(petsc_ierr)
    call MatAssemblyEnd  (petsc_A,MAT_FINAL_ASSEMBLY, petsc_ierr); CHKERRQ(petsc_ierr)
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(MPI_COMM_WORLD, ierr)
-      !call mpi_w_handle_err(ierr,'MPI_BARRIER')
+      call mpi_w_handle_err(ierr,'MPI_BARRIER')
       time_stamp = MPI_Wtime()-time_stamp
       if (RANK .eq. ROOT) write(*,3002) time_stamp
  3002 format(' - MatAssembly : ',f12.5,'  seconds')
@@ -820,7 +819,7 @@ subroutine petsc_solve(mtype)
 !
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(MPI_COMM_WORLD, ierr)
-      !call mpi_w_handle_err(ierr,'MPI_BARRIER')
+      call mpi_w_handle_err(ierr,'MPI_BARRIER')
       end_time = MPI_Wtime()
       Mtime(2) =  end_time-start_time
       if (RANK .eq. ROOT) write(*,1004) Mtime(2)
@@ -833,7 +832,7 @@ subroutine petsc_solve(mtype)
 !
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(MPI_COMM_WORLD, ierr)
-      !call mpi_w_handle_err(ierr,'MPI_BARRIER')
+      call mpi_w_handle_err(ierr,'MPI_BARRIER')
       if (RANK .eq. ROOT) write(*,1009)
  1009 format(' STEP 3 started : Solve')
       start_time = MPI_Wtime()
@@ -977,7 +976,7 @@ subroutine petsc_solve(mtype)
 !
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(MPI_COMM_WORLD, ierr)
-      !call mpi_w_handle_err(ierr,'MPI_BARRIER')
+      call mpi_w_handle_err(ierr,'MPI_BARRIER')
       end_time = MPI_Wtime()
       Mtime(3) =  end_time-start_time
       if (RANK .eq. ROOT) write(*,1010) Mtime(3)
@@ -990,7 +989,7 @@ subroutine petsc_solve(mtype)
 !
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(MPI_COMM_WORLD, ierr)
-      !call mpi_w_handle_err(ierr,'MPI_BARRIER')
+      call mpi_w_handle_err(ierr,'MPI_BARRIER')
       if (RANK .eq. ROOT) write(*,1011)
  1011 format(' STEP 4 started : Store the solution')
       start_time = MPI_Wtime()
@@ -1004,7 +1003,7 @@ subroutine petsc_solve(mtype)
 !
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(MPI_COMM_WORLD, ierr)
-      !call mpi_w_handle_err(ierr,'MPI_BARRIER')
+      call mpi_w_handle_err(ierr,'MPI_BARRIER')
       time_stamp = MPI_Wtime()-start_time
       if (RANK .eq. ROOT) write(*,3004) time_stamp
  3004 format(' - Broadcast: ',f12.5,'  seconds')
@@ -1043,7 +1042,7 @@ subroutine petsc_solve(mtype)
 !
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(MPI_COMM_WORLD, ierr)
-      !call mpi_w_handle_err(ierr,'MPI_BARRIER')
+      call mpi_w_handle_err(ierr,'MPI_BARRIER')
       end_time = MPI_Wtime()
       Mtime(4) = end_time-start_time
       if (RANK .eq. ROOT) write(*,1012) Mtime(4)
@@ -1060,7 +1059,7 @@ subroutine petsc_solve(mtype)
    call petsc_ksp_destroy
 !
    call MPI_BARRIER(MPI_COMM_WORLD, ierr)
-   !call mpi_w_handle_err(ierr,'MPI_BARRIER')
+   call mpi_w_handle_err(ierr,'MPI_BARRIER')
    if ((RANK .eq. ROOT) .and. (IPRINT_TIME .ge. 1)) then
       write(*,1013) sum(Mtime(1:4))
  1013 format(' petsc_solve FINISHED: ',f12.5,'  seconds',/)

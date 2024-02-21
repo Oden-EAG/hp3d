@@ -15,8 +15,7 @@
 ! -----------------------------------------------------------------------
 module petsc_w_ksp
 !
-   use MPI
-   use mpi_param
+   use mpif90_wrapper
    use petscksp
 !
    implicit none
