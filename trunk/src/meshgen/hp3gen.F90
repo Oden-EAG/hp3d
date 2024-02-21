@@ -53,7 +53,7 @@ subroutine hp3gen(Fp)
    integer :: nel, npri, nh, ntet, npyr, np, iv, is, ifc, ie, mdle
    integer :: nt, nrbl, nbl, nr, lab, nord, nod_new, nbcond, nod, nrfaces
    integer :: nb, nc, i, ib, iii, istat, icase, iphys, num, number, subd
-   integer :: ivar, nvar
+   integer :: ivar, nvar, ibeg, iend
    logical :: iact, lflag
 !
 #if DEBUG_MODE
@@ -422,7 +422,9 @@ subroutine hp3gen(Fp)
                call decodg(ELEMS(nel)%bcond(nvar),10,nface(etype), ibc_elem)
 !
 !           ...determine faces adjacent to the vertex
-               call locate(nod_new,ELEMS(nel)%nodes(1),nvert(etype), iv)
+               ibeg = 1
+               iend = nvert(etype)
+               call locate(nod_new,ELEMS(nel)%nodes(ibeg:iend),nvert(etype), iv)
                call vert_to_faces(etype,iv, nrfaces,nofaces)
 !
 !           ...loop through the faces adjacent to the vertex and
@@ -515,7 +517,9 @@ subroutine hp3gen(Fp)
          enddo
 !
 !     ...determine faces adjacent to the edge
-         call locate(nod_new,ELEMS(nel)%nodes(nvert(etype)+1),nedge(etype), ie)
+         ibeg = nvert(etype)+1
+         iend = nvert(etype)+nedge(etype)
+         call locate(nod_new,ELEMS(nel)%nodes(ibeg:iend),nedge(etype), ie)
          call edge_to_faces(etype,ie, nofaces)
 !
 !     ...loop through the element physics attributes
@@ -616,9 +620,9 @@ subroutine hp3gen(Fp)
          enddo
 
 !     ...determine face local number
-         call locate(nod_new, &
-               ELEMS(nel)%nodes(nvert(etype)+nedge(etype)+1), &
-               nface(etype), ifc)
+         ibeg = nvert(etype)+nedge(etype)+1
+         iend = nvert(etype)+nedge(etype)+nface(etype)
+         call locate(nod_new,ELEMS(nel)%nodes(ibeg:iend),nface(etype), ifc)
 
 !     ...loop through neighbor's physical attributes
          nvar=0
@@ -715,8 +719,9 @@ subroutine hp3gen(Fp)
          enddo
 !
 !     ...determine adjacent face
-         call locate(nod_new, &
-               ELEMS(nel)%nodes(nvert(etype)+nedge(etype)+1),nface(etype), ifc)
+         ibeg = nvert(etype)+nedge(etype)+1
+         iend = nvert(etype)+nedge(etype)+nface(etype)
+         call locate(nod_new,ELEMS(nel)%nodes(ibeg:iend),nface(etype), ifc)
 !
 !     ...loop through the element physics attributes
          nvar=0
