@@ -126,7 +126,7 @@
       VTYPE   :: za(3,3),zc(3,3),zc1
 !
 !  ...timer
-      real(8) :: MPI_Wtime,start_time,end_time
+      real(8) :: start_time,end_time
 !
 !  ...debug variables
 #if DEBUG_MODE

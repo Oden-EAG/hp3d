@@ -18,7 +18,7 @@ subroutine residual(res)
    use assembly_sc, only: NRDOF_TOT,NRDOF_CON
    use par_mesh   , only: DISTRIBUTED,HOST_MESH
    use mpi_param  , only: ROOT,RANK
-   use MPI        , only: MPI_SUM,MPI_COMM_WORLD,MPI_REAL8
+   use MPI
 !
    implicit none
 !
@@ -32,7 +32,7 @@ subroutine residual(res)
    integer :: elem_ref_flag
 !
 !..timer
-   real(8) :: MPI_Wtime,start_time,end_time
+   real(8) :: start_time,end_time
 !
 !..printing flag
    integer :: iprint = 0

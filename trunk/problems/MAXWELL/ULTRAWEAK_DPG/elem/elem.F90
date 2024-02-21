@@ -18,6 +18,7 @@
       use commonParam
       use data_structure3D
       use parametersDPG
+      use MPI
       use physics, only: NR_PHYSA
 !
       implicit none
@@ -43,7 +44,7 @@
       integer :: ntype
 !
 !  ...timer
-      real(8) :: MPI_Wtime, start_time, end_time
+      real(8) :: start_time, end_time
 !
 !----------------------------------------------------------------------
 !
