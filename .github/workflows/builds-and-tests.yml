@@ -132,7 +132,7 @@ jobs:
           cp m_options_files/workflows/m_options_$CONFIG ./m_options
 
           echo "Building hp3D"
-          make -j
+          make
 
           echo "Checking hp3D build"
           make check
