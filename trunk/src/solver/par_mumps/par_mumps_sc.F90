@@ -40,12 +40,12 @@ subroutine par_mumps_sc(mtype)
                                ALOC, BLOC, AAUX, ZAMOD, ZBMOD, &
                                NR_PHYSA, MAXNODM
    use assembly_sc
-   use control,   only: ISTC_FLAG
-   use stc,       only: HERM_STC,CLOC,                         &
-                        stc_alloc,stc_dealloc,stc_get_nrdof
-   use parameters,only: NRRHS
-   use par_mumps, only: mumps_par,mumps_start_par,mumps_destroy_par
-   use par_mesh , only: DISTRIBUTED,HOST_MESH
+   use control,     only: ISTC_FLAG
+   use stc,         only: HERM_STC,CLOC,                       &
+                          stc_alloc,stc_dealloc,stc_get_nrdof
+   use parameters,  only: NRRHS
+   use par_mumps,   only: mumps_par,mumps_start_par,mumps_destroy_par
+   use par_mesh,    only: DISTRIBUTED,HOST_MESH
    use environment, only: QUIET_MODE
    use mpi_wrapper
 !
