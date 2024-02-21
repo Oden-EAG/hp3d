@@ -38,7 +38,7 @@ subroutine mumps_start
 !  communicator containing a single processor to the MUMPS library
 !
 !..Define a communicator for the package.
-   mumps_par%COMM = MPI_COMM_SELF
+   mumps_par%COMM = MPI_COMM_SELF%MPI_VAL
 !
 !..PAR
 !     0 : host is not involved in factorization/solve phases

@@ -28,6 +28,8 @@ subroutine par_solve(mumps)
    type (DMUMPS_STRUC), intent(inout) :: mumps
 #endif
 !
+   type(MPI_Comm) :: mumps_comm
+!
 !..aux variables
    integer :: ierr,mRANK,mNUM_PROCS
 !
@@ -39,8 +41,11 @@ subroutine par_solve(mumps)
 !
 ! -----------------------------------------------------------------------
 !
-   call MPI_COMM_RANK(mumps%COMM, mRANK     ,ierr)
-   call MPI_COMM_SIZE(mumps%COMM, mNUM_PROCS,ierr)
+!..mumps%COMM uses F90 binding
+   mumps_comm%MPI_VAL = mumps%COMM
+!
+   call MPI_COMM_RANK(mumps_comm, mRANK     ,ierr)
+   call MPI_COMM_SIZE(mumps_comm, mNUM_PROCS,ierr)
 !
    if ((mRANK.eq.ROOT) .and. info) then
       write(*,5010) '[',RANK,'] par_solve: mNUM_PROCS = ', mNUM_PROCS
@@ -54,7 +59,7 @@ subroutine par_solve(mumps)
    mumps%JOB = 1
 !
    if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       time_stamp = MPI_Wtime()
       start_time = time_stamp
    endif
@@ -70,7 +75,7 @@ subroutine par_solve(mumps)
       stop
    endif
    if (IPRINT_TIME .eq. 1 .and. info) then
-      call MPI_BARRIER(mumps%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       time_stamp = MPI_Wtime()-time_stamp
       if (mRANK .eq. ROOT) write(*,3001) time_stamp
  3001 format(' - Analysis : ',f12.5,'  seconds')
@@ -90,7 +95,7 @@ subroutine par_solve(mumps)
    mumps%JOB = 2
 !
    if (IPRINT_TIME .eq. 1 .and. info) then
-      call MPI_BARRIER(mumps%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       time_stamp = MPI_Wtime()
    endif
 #if C_MODE
@@ -109,7 +114,7 @@ subroutine par_solve(mumps)
       stop
    endif
    if (IPRINT_TIME .eq. 1 .and. info) then
-      call MPI_BARRIER(mumps%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       time_stamp = MPI_Wtime()-time_stamp
       if (mRANK .eq. ROOT) write(*,3002) time_stamp
  3002 format(' - Factorize: ',f12.5,'  seconds')
@@ -123,7 +128,7 @@ subroutine par_solve(mumps)
    mumps%JOB = 3
 !
   if (IPRINT_TIME .eq. 1 .and. info) then
-      call MPI_BARRIER(mumps%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       time_stamp = MPI_Wtime()
    endif
 #if C_MODE
@@ -137,14 +142,14 @@ subroutine par_solve(mumps)
       stop
    endif
    if (IPRINT_TIME .eq. 1 .and. info) then
-      call MPI_BARRIER(mumps%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       time_stamp = MPI_Wtime()-time_stamp
       if (mRANK .eq. ROOT) write(*,3003) time_stamp
  3003 format(' - Solve    : ',f12.5,'  seconds')
    endif
 !
    if (IPRINT_TIME .eq. 1 .and. info) then
-      call MPI_BARRIER(mumps%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       time_stamp = MPI_Wtime()-start_time
       if (mRANK .eq. ROOT) write(*,3004) '[',RANK,'] par_solve: ',time_stamp,' seconds'
  3004 format(A,I4,A,f12.5,A)

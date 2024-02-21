@@ -46,8 +46,8 @@ subroutine par_mumps_sc(mtype)
    use parameters,only: NRRHS
    use par_mumps, only: mumps_par,mumps_start_par,mumps_destroy_par
    use par_mesh , only: DISTRIBUTED,HOST_MESH
-   use mpi_wrapper
    use environment, only: QUIET_MODE
+   use mpi_wrapper
 !
    implicit none
 !
@@ -60,14 +60,17 @@ subroutine par_mumps_sc(mtype)
    integer, dimension(NR_PHYSA) :: nrdofi,nrdofb
 !
 !..integer counters
-   integer    :: nrdofm,nrdofc,nrnodm,nrdof,nrdof_mdl,ndof
-   integer    :: iel,mdle,subd,i,j,k,l,k1,k2,nod,idec
+   integer :: nrdofm,nrdofc,nrnodm,nrdof,nrdof_mdl,ndof
+   integer :: iel,mdle,subd,i,j,k,l,k1,k2,nod,idec
 !
 !..MPI variables
    integer :: count,src,ierr
 !
+!..MPI communicator (F08 binding)
+   type(MPI_Comm) :: mumps_comm
+!
 !..dummy variables
-   VTYPE   :: zvoid
+   VTYPE   :: zvoid1(1),zvoid2(1)
 !
 !..workspace for celem
    integer, dimension(MAXNODM) :: nodm,ndofmH,ndofmE,ndofmV,ndofmQ
@@ -116,8 +119,10 @@ subroutine par_mumps_sc(mtype)
 !  STEP 1 : 1ST LOOP THROUGH ELEMENTS, 1ST CALL TO CELEM TO GET INFO
 !  ----------------------------------------------------------------------
 !
+   mumps_comm%MPI_VAL = mumps_par%COMM
+!
    if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       if (RANK .eq. ROOT) write(*,1001)
  1001 format(' STEP 1 started : Get assembly info')
       start_time = MPI_Wtime()
@@ -137,7 +142,7 @@ subroutine par_mumps_sc(mtype)
 !
 !..compute global node ownership
    count = NRNODS
-   call MPI_ALLREDUCE(MPI_IN_PLACE,NOD_OWN,count,MPI_INTEGER,MPI_MIN,mumps_par%COMM,ierr)
+   call MPI_ALLREDUCE(MPI_IN_PLACE,NOD_OWN,count,MPI_INTEGER,MPI_MIN,mumps_comm,ierr)
 !
    allocate(MAXDOFS(NR_PHYSA))
    MAXDOFS = 0; MAXDOFM = 0
@@ -160,10 +165,10 @@ subroutine par_mumps_sc(mtype)
 !  ...get information from celem
       if (ISTC_FLAG) then
          call celem_systemI(iel,mdle,idec, nrdofs,nrdofm,nrdofc,nodm,  &
-            ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid,zvoid)
+            ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid1,zvoid2)
       else
          call celem(mdle,idec, nrdofs,nrdofm,nrdofc,nodm,  &
-            ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid,zvoid)
+            ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid1,zvoid2)
       endif
 !
 !  ...nrdofc = number of modified element dof after compression
@@ -206,7 +211,7 @@ subroutine par_mumps_sc(mtype)
    nrdof_subd(1:NUM_PROCS) = 0
    nrdof_subd(RANK+1) = nrdof
    count = NUM_PROCS
-   call MPI_ALLREDUCE(MPI_IN_PLACE,nrdof_subd,count,MPI_INTEGER,MPI_MAX,mumps_par%COMM,ierr)
+   call MPI_ALLREDUCE(MPI_IN_PLACE,nrdof_subd,count,MPI_INTEGER,MPI_MAX,mumps_comm,ierr)
 !
 !..calculate prefix sum for global offsets
    nrdof = 0
@@ -221,7 +226,7 @@ subroutine par_mumps_sc(mtype)
 !
 !..communicate offsets (to receive offsets for non-owned nodes within subdomain)
    count = NRNODS
-   call MPI_ALLREDUCE(MPI_IN_PLACE,NFIRST_DOF,count,MPI_INTEGER,MPI_MAX,mumps_par%COMM,ierr)
+   call MPI_ALLREDUCE(MPI_IN_PLACE,NFIRST_DOF,count,MPI_INTEGER,MPI_MAX,mumps_comm,ierr)
 !
 !..calculate total number of (interface) dofs
    nrdof = 0
@@ -231,11 +236,11 @@ subroutine par_mumps_sc(mtype)
 !
 !..compute total number of condensed bubble dofs
    count = 1
-   call MPI_ALLREDUCE(MPI_IN_PLACE,nrdof_mdl,count,MPI_INTEGER,MPI_SUM,mumps_par%COMM,ierr)
+   call MPI_ALLREDUCE(MPI_IN_PLACE,nrdof_mdl,count,MPI_INTEGER,MPI_SUM,mumps_comm,ierr)
 !
 !..compute total number of non-zeros in global matrix
    count = 1
-   call MPI_ALLREDUCE(nnz_loc,nnz,count,MPI_INTEGER8,MPI_SUM,mumps_par%COMM,ierr)
+   call MPI_ALLREDUCE(nnz_loc,nnz,count,MPI_INTEGER8,MPI_SUM,mumps_comm,ierr)
 !
 !..total number of (interface) dof is nrdof
    NRDOF_CON = nrdof
@@ -254,7 +259,7 @@ subroutine par_mumps_sc(mtype)
 !  ----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       end_time = MPI_Wtime()
       Mtime(1) = end_time-start_time
       if (RANK .eq. ROOT) write(*,1002) Mtime(1)
@@ -265,7 +270,7 @@ subroutine par_mumps_sc(mtype)
 !  STEP 2 : ASSEMBLE AND STORE IN SPARSE FORM
 !  ----------------------------------------------------------------------
 !
-   call MPI_BARRIER(mumps_par%COMM, ierr)
+   call MPI_BARRIER(mumps_comm, ierr)
    if ((RANK .eq. ROOT) .and. (.not. QUIET_MODE)) then
       write(*,2010) '[', RANK, '] Number of dof  : nrdof_con = ', NRDOF_CON
       write(*,2010) '[', RANK, ']                  nrdof_tot = ', NRDOF_TOT
@@ -277,7 +282,7 @@ subroutine par_mumps_sc(mtype)
 2010 format(A,I4,A,I12)
 !
    if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       if (RANK .eq. ROOT) write(*,1003)
  1003 format(/,' STEP 2 started : Global Assembly')
       start_time = MPI_Wtime()
@@ -460,7 +465,7 @@ subroutine par_mumps_sc(mtype)
    deallocate(MAXDOFS,NFIRST_DOF)
 !
    if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       end_time = MPI_Wtime()
       Mtime(2) =  end_time-start_time
       if (RANK .eq. ROOT) write(*,1004) Mtime(2)
@@ -472,7 +477,7 @@ subroutine par_mumps_sc(mtype)
 !  ----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       if (RANK .eq. ROOT) write(*,1009)
  1009 format(' STEP 3 started : Solve')
       start_time = MPI_Wtime()
@@ -481,9 +486,9 @@ subroutine par_mumps_sc(mtype)
 !..gather RHS vector information on host
    count = mumps_par%N
    if (RANK .eq. ROOT) then
-      call MPI_REDUCE(MPI_IN_PLACE,mumps_par%RHS,count,MPI_VTYPE,MPI_SUM,ROOT,mumps_par%COMM,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE,mumps_par%RHS,count,MPI_VTYPE,MPI_SUM,ROOT,mumps_comm,ierr)
    else
-      call MPI_REDUCE(mumps_par%RHS,mumps_par%RHS,count,MPI_VTYPE,MPI_SUM,ROOT,mumps_par%COMM,ierr)
+      call MPI_REDUCE(mumps_par%RHS,mumps_par%RHS,count,MPI_VTYPE,MPI_SUM,ROOT,mumps_comm,ierr)
    endif
 !
    call par_solve(mumps_par)
@@ -497,7 +502,7 @@ subroutine par_mumps_sc(mtype)
 !  ----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       end_time = MPI_Wtime()
       Mtime(3) =  end_time-start_time
       if (RANK .eq. ROOT) write(*,1010) Mtime(3)
@@ -509,7 +514,7 @@ subroutine par_mumps_sc(mtype)
 !  ----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       if (RANK .eq. ROOT) write(*,1011)
  1011 format(' STEP 4 started : Store the solution')
       start_time = MPI_Wtime()
@@ -517,10 +522,10 @@ subroutine par_mumps_sc(mtype)
 !
 !..broadcast global solution from host to other processes
    count = mumps_par%N; src = ROOT
-   call MPI_BCAST (mumps_par%RHS,count,MPI_VTYPE,src,mumps_par%COMM,ierr)
+   call MPI_BCAST (mumps_par%RHS,count,MPI_VTYPE,src,mumps_comm,ierr)
 !
    if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       time_stamp = MPI_Wtime()-start_time
       if (RANK .eq. ROOT) write(*,3004) time_stamp
  3004 format(' - Broadcast: ',f12.5,'  seconds')
@@ -553,7 +558,7 @@ subroutine par_mumps_sc(mtype)
 !  ----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       end_time = MPI_Wtime()
       Mtime(4) = end_time-start_time
       if (RANK .eq. ROOT) write(*,1012) Mtime(4)
@@ -565,7 +570,7 @@ subroutine par_mumps_sc(mtype)
 !..Destroy the instance (deallocate internal data structures)
    call mumps_destroy_par
 !
-   call MPI_BARRIER(mumps_par%COMM, ierr)
+   call MPI_BARRIER(mumps_comm, ierr)
    if ((RANK .eq. ROOT) .and. (IPRINT_TIME .ge. 1)) then
       write(*,1013) sum(Mtime(1:4))
  1013 format(' par_mumps_sc FINISHED: ',f12.5,'  seconds',/)
