@@ -75,6 +75,7 @@ subroutine recta(No,Eta, X,Dxdeta)
       real(8),dimension(2  ),intent(in ) :: Eta
       real(8),dimension(3  ),intent(out) :: X
       real(8),dimension(3,2),intent(out) :: Dxdeta
+      real(8),dimension(3,3)             :: dxdeta_aux
 !--------------------------------------------------------------------------
 !  ...vertex coordinates
       real(8),dimension(3,4) :: xv
@@ -125,13 +126,13 @@ subroutine recta(No,Eta, X,Dxdeta)
         enddo
 !
 !  ...Transfinite Interpolation..........................................
-      case('TraQua' ) ; call recta_TraQua( No,Eta, X,Dxdeta)
+      case('TraQua') ; call recta_TraQua(No,Eta, X,Dxdeta)
 !
 !  ...Parametric Transfinite Interpolation...............................
-      case('PTIRec' ) ; call recta_PTIRec( No,Eta, X,Dxdeta)
+      case('PTIRec') ; call recta_PTIRec(No,Eta, X,Dxdeta)
 !
 !  ...implicit rectangle.................................................
-      case('ImpRec' ) ; call recta_ImpRec( No,Eta, X,Dxdeta)
+      case('ImpRec') ; call recta_ImpRec(No,Eta, X,Dxdeta)
 !
 !  ...conforming rectangle (LEGACY)......................................
       !case('ConfRec') ; call recta_ConfRec(No,Eta, X,Dxdeta)
@@ -140,11 +141,13 @@ subroutine recta(No,Eta, X,Dxdeta)
       !case('HermRec') ; call recta_HermRec(No,Eta, X,Dxdeta)
 !
 !  ...cylindrical coordinates rectangle..................................
-      case('CylRec' ) ; call recta_CylRec( No,Eta, X,Dxdeta)
+      case('CylRec')
+        call recta_CylRec(No,Eta, X,dxdeta_aux)
+        Dxdeta(1:3,1:2) = dxdeta_aux(1:3,1:2)
 !
       case default
-      write(*,7003) RECTANGLES(No)%Type
- 7003 format(' recta: unknown Type = ',a10)
+        write(*,7003) RECTANGLES(No)%Type
+   7003 format(' recta: unknown Type = ',a10)
       stop
 !
       endselect

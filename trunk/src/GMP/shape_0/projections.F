@@ -173,8 +173,9 @@ c
 c
       implicit none
 c
-      integer :: Ie,T
-      real(8) :: Xi(3),Vshap(5),Dvshap(3,5),Dtdxi(3)
+      integer, intent(in)  :: Ie
+      real(8), intent(in)  :: Xi(3),Vshap(5),Dvshap(3,5)
+      real(8), intent(out) :: T,Dtdxi(3)
 c
       integer :: iv
 c
@@ -221,8 +222,9 @@ c
 c
       implicit none
 c
-      integer :: If
-      real(8) :: Xi(3),T(2),Dtdxi(2,3)
+      integer, intent(in)  :: If
+      real(8), intent(in)  :: Xi(3)
+      real(8), intent(out) :: T(2),Dtdxi(2,3)
 c
 c
       T(2) = Xi(3)
