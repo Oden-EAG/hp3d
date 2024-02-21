@@ -8,7 +8,7 @@
 module mpi_wrapper
 !
    use mpi_param
-   use MPI
+   use mpi_f08
    use environment, only: QUIET_MODE
 !
    implicit none
@@ -49,7 +49,7 @@ module mpi_wrapper
       if (.not. QUIET_MODE .and. RANK .eq. ROOT) then
          write(*,100) 'MPI initialized successfully. NUM_PROCS = ',NUM_PROCS
       endif
-  100 format(/,A,I4)
+  100 format(/,A,I6)
 !
 !  ...initialize Zoltan environment
       call zoltan_ext_init
@@ -93,7 +93,7 @@ module mpi_wrapper
    subroutine mpi_w_handle_err(Ierr,Str)
       integer         , intent(in) :: Ierr
       character(len=*), intent(in) :: Str
-      character(len=64) :: errStr
+      character(len=MPI_MAX_ERROR_STRING) :: errStr
       integer :: ierr1,len
       if (Ierr .ne. MPI_SUCCESS) then
          call MPI_Error_string(Ierr, errStr, len, ierr1)

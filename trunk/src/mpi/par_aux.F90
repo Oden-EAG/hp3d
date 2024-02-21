@@ -254,7 +254,7 @@ subroutine collect_dofs()
 !..MPI variables
    integer :: ierr
    integer :: tag, count, src, dest
-   integer :: stat(MPI_STATUS_SIZE)
+   type(MPI_Status) :: stat
    VTYPE, allocatable :: buf(:)
 !
 !..auxiliary variables
