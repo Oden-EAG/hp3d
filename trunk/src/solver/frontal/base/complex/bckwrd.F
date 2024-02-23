@@ -135,7 +135,7 @@ c
 c pick up final frontwidth (after elim) for the next Element
 c
          if (jel .ne. 1) then
-            LFW = Alelm(jel-1)
+            LFW = int(Alelm(jel-1))
             if (LFW .gt. NFW) NFW = LFW
          endif
 c
@@ -293,7 +293,7 @@ c ----------------------------------------------------
 c
          if (IASSEM .eq. 0) then
 c
-            md = Amdest(1)
+            md = int(Amdest(1))
             call solout (jel, NDOFM, NRHS, md, Frnt)
 c           ---------------------------------------------
          else
@@ -313,7 +313,7 @@ c ARDENT directives
 c$doit VBEST
 c
                do 160 i = 1,NDOFM
-                  md = Amdest(i)
+                  md = int(Amdest(i))
                   md = abs(md)
                   l = (j-1)*MFW + md
                   Elem(k) = Frnt(l)
@@ -328,7 +328,7 @@ cwb c
 cwb cvd$ select (vector)
 cwb c
 cwb                do 160 j = 1,NRHS
-cwb                   md = Amdest(i)
+cwb                   md = int(Amdest(i))
 cwb                   l = locr(j,md)
 cwb                   Elem(k+i) = Frnt(l)
 cwb                   k = k + NDOFM
@@ -342,7 +342,7 @@ c
               write(NFSOUT,*) 'IN BCKWRD jel,NDOFM = ',jel,NDOFM
             endif
 #endif
-            md = Amdest(1)
+            md = int(Amdest(1))
             call solout (jel, NDOFM, NRHS, md, Elem)
 c           ---------------------------------------------
 c debug print

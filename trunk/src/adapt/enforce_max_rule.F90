@@ -24,8 +24,8 @@ subroutine enforce_max_rule
 !
    integer :: iel,mdle,nre,nrf,nrv,i,j,nod,nord,ntype,nrsons
    integer :: icase,is,jf,nc,ne1,ne2,ne3,ne4,nodp,nods
-   integer :: nordh,nordh1,nordhs,nordhl,nordhv
-   integer :: nordv,nordv1,nordvs,nordvl
+   integer :: nordh,nordhs,nordhl,nordhv
+   integer :: nordv,nordvs,nordvl
 !
 !----------------------------------------------------------------------
 !

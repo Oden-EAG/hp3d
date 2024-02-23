@@ -25,7 +25,7 @@ c
       character(3) :: text
 c
       real(8) :: angle,height,xtext,ytext
-      integer :: i,inv,iv,ivar,j,k,nc,ncol,nick,np,nt1,ntb,ntv
+      integer :: i,inv,iv,ivar,j,k,nc,ncol,nick,np,nt1,ntb
 c
 c  ...set colour
       ncol=npcol(2)

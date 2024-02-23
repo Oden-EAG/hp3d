@@ -69,7 +69,7 @@ c  ...order and edge orientations
 c
       real(8) :: val(2),dbds(2,2)
 c
-      integer :: icl,i,ians,ib,ic,ibcase,info,is,iscase
+      integer :: i,ians,ib,ic,ibcase,info,is,iscase
       integer :: ivoid,jvoid,kvoid
       integer :: j,k,nord,nc,nel,nrb,nrdof,nrs,nspan
       integer :: ndof_i,ndof_j,ndof_mdlt,ndof_medg

@@ -178,7 +178,7 @@ subroutine result
          end select
 !
 !        call neig_face(nod, nrneig,neig,nsid_list,norient_list)
-!        write(*,7320) neig(1:2)
+!        write(*,7310) neig(1:2)
 !
  7100    format(' ELEM_VERT = ',8i6)
  7110    format(' ELEM_EDGE = ',12i6)
@@ -186,8 +186,7 @@ subroutine result
  7200    format(' VERT_ORIT = ',8i6)
  7210    format(' EDGE_ORIT = ',12i6)
  7220    format(' FACE_ORIT = ',6i6)
- 7310    format(' FACE_NEIG = ',6i6)
- 7320    format(' FACE_NEIG = ',6i6)
+!7310    format(' FACE_NEIG = ',6i6)
 !
          call find_ndof(nod, ndofH,ndofE,ndofV,ndofQ)
 !

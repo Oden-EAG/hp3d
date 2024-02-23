@@ -41,7 +41,8 @@ subroutine break(Mdle,Kref)
 #if DEBUG_MODE
    if (iprint.eq.2) then
       call elem_show(Mdle,ntype,nodesl,norientl)
- 7000 format('break: Mdle = ',i7)
+      write(*,7010) Mdle
+ 7010 format('break: Mdle = ',i10)
       write(*,7011) Kref
  7011 format('       Kref  = ',i3)
       write(*,7012) kreff(1:nface(ntype))

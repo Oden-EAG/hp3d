@@ -7,9 +7,7 @@ c   routine name       - mat3prod
 c
 c----------------------------------------------------------------------
 c
-c   computer           - machine independent
-c
-c   latest revision    - May 2020
+c   latest revision    - Feb 2024
 c
 c   purpose            - routine computes the product of two given
 c                        matrices 3x3
@@ -20,15 +18,17 @@ c   arguments
 c             in       - Ma, Mb - matrices 3x3
 c             out      - Mc - their product
 c
-c   required  routines - none
-c
 c----------------------------------------------------------------------
 c
       subroutine mat3prod(Ma,Mb,Mc)
 c
-      implicit real(8) (a-h,m-z)
+      implicit none
 c
-      dimension Ma(3,3), Mb(3,3), Mc(3,3)
+      real(8), intent(in)  :: Ma(3,3), Mb(3,3)
+      real(8), intent(out) :: Mc(3,3)
+c
+      integer :: i,j,k
+      real(8) :: pr
 c
       do i=1,3
          do j=1,3

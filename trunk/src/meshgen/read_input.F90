@@ -51,8 +51,8 @@ subroutine read_input(Fp)
      read(nin,*) PHYSA(i),dtype,NR_COMP(i)
      D_TYPE(i) = I_DType(dtype)
 !!!     write(*,7001) PHYSA(i),S_DType(D_TYPE(i)),NR_COMP(i)
-7001 format('read_input: PHYSICS ATTRIBUTE, D_TYPE, NR OF COMP = ', &
-          a5,2x,a6,i3)
+!!!7001 format('read_input: PHYSICS ATTRIBUTE, D_TYPE, NR OF COMP = ', &
+!!!          a5,2x,a6,i3)
   !
   !  default setting for each attribute is `active'
      PHYSAm(i) = .true.

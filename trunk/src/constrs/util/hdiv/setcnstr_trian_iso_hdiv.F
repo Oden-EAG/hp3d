@@ -68,6 +68,8 @@ c
       integer :: i,j,icl,i1,i2,ians,info
       integer :: mp,np,n,nord,nel,nrdofQ
 c
+      real(8), parameter :: eps = 1.0d-13
+c
 c  ...set up order
       nord   = MAXP
       norder = (/1,1,1,nord/)
@@ -256,8 +258,8 @@ c  .....initiate value of the linear combination:
         do mp=0,nord-1
         do i2=0,mp
           j=j+1
-          if ((mp.gt.np).and.(RRTQ(i,nel,j).ne.0.d0)) then
-            write(7040) np,i1,mp,i2,RRTQ(i,nel,j)
+          if ((mp.gt.np).and.(dabs(RRTQ(i,nel,j)) > eps)) then
+            write(*,7040) np,i1,mp,i2,RRTQ(i,nel,j)
  7040       format('np,i1,mp,i2,RRTQ(i,nel,j) = ',4i4,2x,e12.5)
             stop 1
           endif

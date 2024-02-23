@@ -155,7 +155,7 @@ c flag for solin2 (ifg=1: get rhs ; =2: get lhs as well)
 c
 
          ifg = 2
-         md = Amdest(1)
+         md = int(Amdest(1))
          call solin2 (iel, ifg, NDOFM, NRHS, md, Elem, Elem(mke+1))
 c        --------------------------------------------------------------
 

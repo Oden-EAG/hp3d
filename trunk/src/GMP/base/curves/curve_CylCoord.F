@@ -36,7 +36,7 @@ c
 c  ...cylindrical coordinates of the endpoints of the curve
       real(8) :: xp(3,2)
 c
-      integer :: i,iv,np
+      integer :: iv,np
       real(8) :: costhet,dr_deta,dthet_deta,pi,r,sinthet,theta,twopi
 c
       integer :: iprint

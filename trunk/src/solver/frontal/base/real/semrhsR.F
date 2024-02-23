@@ -47,7 +47,7 @@ c
 c        ---------------
 c pull the dof destination vector
 c
-            md = Amdest(i)
+            md = int(Amdest(i))
 c
 cwb >
 c determine the position in the front (function locr)

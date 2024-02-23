@@ -32,10 +32,6 @@ subroutine par_mumps_sc(mtype)
    use data_structure3D, only: NRNODS, NRELES_SUBD, ELEM_SUBD, &
                                get_subd
    use assembly,         only: NR_RHS, MAXDOFM, MAXDOFS,       &
-                               MAXbrickH, MAXmdlbH,            &
-                               MAXbrickE, MAXmdlbE,            &
-                               MAXbrickV, MAXmdlbV,            &
-                               MAXbrickQ,                      &
                                NEXTRACT, IDBC, ZDOFD, ZERO,    &
                                ALOC, BLOC, AAUX, ZAMOD, ZBMOD, &
                                NR_PHYSA, MAXNODM

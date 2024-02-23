@@ -72,7 +72,7 @@ subroutine diag_segment(Nc,Eta, X,dX_dEta)
 !  ...endpoints, point in the parametric domain,
       real(8) :: eta_v(2,2),etap(2)
 !
-      integer :: i,iv,ivar,ns,nv
+      integer :: iv,ivar,ns,nv
       real(8) :: dr,dr_deta,dtheta_deta
       real(8) :: r,r2,rmax,rmin,theta,theta1,x0
 !
@@ -199,7 +199,7 @@ subroutine circular_segment(Nc,Eta, X,dX_dEta)
       real(8) :: Eta,X(3),dX_dEta(3)
       real(8) :: cen(3),r1(3),r2(3),ax(3),dX_dalpha(3)
 !
-      integer :: i,ns,nv1,nv2
+      integer :: ns,nv1,nv2
       real(8) :: alpha,dalpha_dEta,rad,rnorm1,rnorm2,sp,theta
 !
       integer :: iprint

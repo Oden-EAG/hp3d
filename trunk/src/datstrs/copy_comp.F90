@@ -18,7 +18,7 @@ subroutine copy_comp(SrcAttr,SrcComp,DstAttr,DstComp)
    integer, intent(in)  :: SrcAttr,SrcComp
    integer, intent(in)  :: DstAttr,DstComp
 !
-   integer :: nod,src_off,dst_off,src_comp,dst_comp,ndof
+   integer :: nod,src_comp,dst_comp,ndof
    integer :: idof,iload,icomp_src,icomp_dst
 !
 !-------------------------------------------------------------------------------

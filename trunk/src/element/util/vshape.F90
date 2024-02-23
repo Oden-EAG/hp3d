@@ -10,7 +10,7 @@
 !----------------------------------------------------------------------
 subroutine vshape2(Ftype,Xi, Rlam,Drlam)
 !
-   use parameters, only : MAXquadH,MAXtriaH
+   use parameters, only : MAXquadH !,MAXtriaH
    use node_types
 !
    implicit none
