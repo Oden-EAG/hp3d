@@ -1070,7 +1070,7 @@ c$OMP THREADPRIVATE(INITIALIZED)
       integer                     :: i,j,i1,i2,ifound
 c----------------------------------------------------------------------
 c
-      if (.NOT.INITIALIZED) then
+      if (.not.INITIALIZED) then
 c
 c  ...initialize
       AUX(1:4,1:4)=0
@@ -1171,7 +1171,7 @@ c$OMP THREADPRIVATE(INITIALIZED)
       integer :: j,iprint=0
 #endif
 c
-      if (.NOT.INITIALIZED) then
+      if (.not.INITIALIZED) then
 c
 c  ...initialize
       AUX(1:8,1:8)=0

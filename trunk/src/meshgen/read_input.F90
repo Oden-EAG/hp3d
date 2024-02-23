@@ -99,14 +99,14 @@ subroutine read_input(Fp)
   close(nin)
   !----------------------------------------------------------------------
   ! printing
-IF (.NOT. QUIET_MODE) write(*,*) '-- Physics --'
-IF (.NOT. QUIET_MODE) write(*,9999) MAXNODS
+if (.not. QUIET_MODE) write(*,*) '-- Physics --'
+if (.not. QUIET_MODE) write(*,9999) MAXNODS
 9999 format(' MAXNODS = ',i12)
   do i=1, NR_PHYSA
-IF (.NOT. QUIET_MODE) write(*,1003) PHYSA(i),S_DType(D_TYPE(i)),NR_COMP(i)
+if (.not. QUIET_MODE) write(*,1003) PHYSA(i),S_DType(D_TYPE(i)),NR_COMP(i)
 1003 format(' PHYSA,D_TYPE,NR_COMP = ',a5,2x,a6,2x,i1)
   enddo
-IF (.NOT. QUIET_MODE) write(*,*)''
+if (.not. QUIET_MODE) write(*,*)''
 
   !----------------------------------------------------------------------
   !  check the order in which the attributes have been defined

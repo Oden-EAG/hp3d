@@ -126,7 +126,7 @@ subroutine compute_error(Flag,Itag)
 !     raise visitation flag
       ivis=ivis+1
 !
-IF (.NOT. QUIET_MODE) THEN
+if (.not. QUIET_MODE) then
 !
 !     check
       if (ivis > maxvis) then
@@ -143,12 +143,12 @@ IF (.NOT. QUIET_MODE) THEN
       rwork(ivis, 6)=rateHEVQ
       iwork(ivis, 1)=Itag
 !
-ENDIF
+endif
 !
 !     printing
 !
 !     -- 1st visit --
-IF (ivis == 1) THEN
+if (ivis == 1) then
 !
 !       open file
         open(unit=nin,file=trim(FILE_ERR),form='formatted',access='sequential', &
@@ -159,11 +159,11 @@ IF (ivis == 1) THEN
         endif
 !
 !       print header
-   IF (.NOT. L2PROJ) THEN
+   if (.not. L2PROJ) then
         write(nin,*)'-- Error Report --'
-   ELSE
+   else
         write(nin,*)'-- Error Report (L2 only)--'
-   ENDIF
+   endif
         write(nin,9998)
  9998   format('             H1            //', &
                            ' H(curl)       //', &
@@ -174,7 +174,7 @@ IF (ivis == 1) THEN
                            ' Case tag')
 !
 !     -- subsequent visits --
-ELSE
+else
 !
 !       append to file
         open(unit=nin,file=trim(FILE_ERR),form='formatted',access='sequential', &
@@ -183,22 +183,22 @@ ELSE
           write(*,*)'compute_error: COULD NOT OPEN FILE! [1]'
           stop
         endif
-ENDIF
+endif
 !
 !     print to file
       write(nin,9999)ivis,errorH,errorE,errorV,errorQ,errorHEVQ,rateHEVQ,Itag
  9999 format(1x,i6,' ; ',2x,5(e12.5,' ; ',2x),f9.6,' ; ',3x,i8)
 !
 !     print to screen
-IF (.NOT.QUIET_MODE) THEN ; write(*,*)''
-   IF (.NOT. L2PROJ   ) THEN ; write(*,*)'-- Error Report --'
-   ELSE                      ; write(*,*)'-- Error Report (L2 only)--'
-   ENDIF
+if (.not.QUIET_MODE) then ; write(*,*)''
+   if (.not. L2PROJ   ) then ; write(*,*)'-- Error Report --'
+   else                      ; write(*,*)'-- Error Report (L2 only)--'
+   endif
                          write(*,9998)
    do i=1,ivis         ; write(*,9999)i,rwork(i,1:6),iwork(i,1)
    enddo
                          write(*,*)''
-ENDIF
+endif
 !
 !     close file
       close(unit=nin,iostat=ic)

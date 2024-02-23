@@ -16,7 +16,7 @@ c
       integer :: idec,istat,iwin
 c
 c  ...initialized dimensions for workspaces, if not set by the user
-      if (.NOT. INITIALIZED) then
+      if (.not. INITIALIZED) then
 c                                MXIGTR // MXIGSTR // MXRGTRZ
         call set_x11_workspace(10000000,10000000,10000000)
       endif

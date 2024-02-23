@@ -127,7 +127,7 @@ C========================================================
       subroutine WVPSDL(X1,Y1,X2,Y2,IC)
 C========================================================
 C
-C  author - Satish Chavva and many otheres
+C  author - Satish Chavva and many others
 C
 C  version - 1998
 C
@@ -147,8 +147,8 @@ c
         call wvpsout(x1,y1,1)
         call wvpsout(x2,y2,4)
         call wvpsout(dum,dum,6)
-        RETURN
-      END SUBROUTINE WVPSDL
+        return
+      end subroutine WVPSDL
 
       subroutine wvpsfp(N,Xc,Icf,Icl)
 c
@@ -226,7 +226,7 @@ c     draw pixel in postcript
 C========================================================
 
 
-      SUBROUTINE WVPSPX(X,Y,IC)
+      subroutine WVPSPX(X,Y,IC)
 c
 #include "wvglob.blk"
 #include "wvpost.blk"
@@ -237,15 +237,15 @@ c
         call wvpsout(x,y,1)
         call wvpsout(x,y,4)
         call wvpsout(dum,dum,6)
-        RETURN
-      END SUBROUTINE WVPSPX
+        return
+      end subroutine WVPSPX
 
 
 C========================================================
 c     draw text in postscript
 C========================================================
 
-      SUBROUTINE WVPSTE(X1,Y1,H,MESS,A,N,ICOL)
+      subroutine WVPSTE(X1,Y1,H,MESS,A,N,ICOL)
         integer H,A
 c        CHARACTER MESS*80
         CHARACTER MESS*(*)
@@ -262,8 +262,8 @@ c
         call flushps
         write(ifile,1000) ' (',mess(1:n),') show'
  1000   format(a)
-        RETURN
-      END SUBROUTINE WVPSTE
+        return
+      end subroutine WVPSTE
 
 
 C-------------------------------------------------------------------

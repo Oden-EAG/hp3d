@@ -136,7 +136,7 @@ c
       NdofmV = 0; NrconV = 0; NacV = 0; ConstrV = 0.d0
 c
 c     initialize constraints arrays
-      if (.NOT. INITIALIZED_CONSTR) call init_cnstr
+      if (.not. INITIALIZED_CONSTR) call init_cnstr
 c
 #if DEBUG_MODE
       if (iprint.ge.1) then
