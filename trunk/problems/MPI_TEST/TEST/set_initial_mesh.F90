@@ -31,7 +31,7 @@
 !..BC flags
    integer, dimension(6,NR_PHYSA) :: ibc
 !..miscellaneous
-   integer :: iprint,ifc,iel,neig,iat,iDisplacement
+   integer :: iprint,ifc,iel,neig,iat
    integer, parameter :: adj_elems(1:6) = (/123,165,171,172,178,220/)
 
 !

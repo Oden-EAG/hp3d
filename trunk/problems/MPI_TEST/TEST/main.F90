@@ -21,7 +21,7 @@ program main
    implicit none
 !
 !..auxiliary variables
-   integer :: i, ierr, req, ret
+   integer :: i, ierr
 !
 !----------------------------------------------------------------------
 !
@@ -115,7 +115,7 @@ subroutine master_main()
 #endif
 !
 !..auxiliary variables
-   integer :: idec, i, r, count, src
+   integer :: idec, r, count, src
 !
 !----------------------------------------------------------------------
 !
@@ -248,7 +248,7 @@ subroutine worker_main()
 #endif
 !
 !..auxiliary variables
-   integer :: idec, i, r, count, src
+   integer :: idec, r, count, src
 !
 !----------------------------------------------------------------------
 !
