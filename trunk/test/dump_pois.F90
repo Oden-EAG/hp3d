@@ -62,7 +62,7 @@ program test_dump_pois
 !
       character(len=15) :: dump_file
 !
-      integer :: iflag(1),iel,i
+      integer :: iflag(1),iel
 !
       integer :: iprint
       iprint=0
@@ -420,7 +420,6 @@ subroutine exact(X,Icase, ValH,DvalH,D2valH, &
 !
    real(8), parameter   :: PI = 4.d0*datan(1.d0)
 !
-   real(8) :: f_x,f_y,f_z,df_x,df_y,df_z,ddf_x,ddf_y,ddf_z
    real(8) :: x1,x2,x3
    x1 = X(1); x2 = X(2); x3 = X(3)
 !
