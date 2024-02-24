@@ -9,19 +9,17 @@ HP3D_BASE_PATH = /home/runner/work/hp3d/hp3d/trunk
 COMPLEX ?= 1
 DEBUG   ?= 1
 
-# Dependencies
+HP3D_USE_OPENMP    ?= 0
 HP3D_USE_INTEL_MKL ?= 0
+HP3D_USE_X11       ?= 1
 
 #------------------------------------------------------------------
 # COMPILER SETTINGS (a 64bit processor architecture is assumed)
 #------------------------------------------------------------------
 
-# Enable OpenMP threading
-HP3D_USE_OPENMP ?= 0
-
 FC = mpif90
 CC = mpicc
-FFLAGS = -fPIC -ffree-line-length-none -Wno-lto-type-mismatch
+FFLAGS = -fPIC -ffree-line-length-none
 
 # OpenMP
 ifeq ($(HP3D_USE_OPENMP),1)
@@ -29,6 +27,12 @@ ifeq ($(HP3D_USE_OPENMP),1)
 else
   FFLAGS += -frecursive
 endif
+
+FFLAGS += -Wall \
+          -Wno-unused-dummy-argument \
+          -Wno-maybe-uninitialized \
+          -Wno-unused-label \
+          -Wno-lto-type-mismatch
 
 # Optimization flags
 ifeq ($(DEBUG),0)
@@ -202,4 +206,5 @@ PROB_INCS    += $(HP3D_LINK_INCS)   \
 PROB_PP_DEFS  = -D"C_MODE=$(COMPLEX)" \
                 -D"DEBUG_MODE=$(DEBUG)" \
                 -D"HP3D_USE_OPENMP=$(HP3D_USE_OPENMP)" \
-                -D"HP3D_USE_INTEL_MKL=$(HP3D_USE_INTEL_MKL)"
+                -D"HP3D_USE_INTEL_MKL=$(HP3D_USE_INTEL_MKL)" \
+                -D"HP3D_USE_X11=$(HP3D_USE_X11)"
