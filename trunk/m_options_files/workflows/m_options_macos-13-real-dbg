@@ -32,8 +32,7 @@ CC := $(shell pkg-config --variable=ccompiler $(PACKAGES))
 FC := $(shell pkg-config --variable=fcompiler $(PACKAGES))
 FFLAGS := $(shell pkg-config --variable=fflags_extra $(PACKAGES))
 FFLAGS += -fallow-argument-mismatch
-FFLAGS += -Wno-unused-variable -Wno-unused-label -Wno-conversion \
-          -Wno-maybe-uninitialized -Wno-surprising
+FFLAGS += -Wno-unused-label -Wno-maybe-uninitialized
 
 CFLAGS  =
 
