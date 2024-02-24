@@ -1,5 +1,6 @@
 !---------------------------------------------------------------------------------------
 !> Purpose : display user-defined quantity
+!
 !! @param[in] Mdle   - element (middle node) number
 !! @param[in] Xi     - master element coordinates
 !! @param[in] X      - physical coordinates
@@ -11,7 +12,7 @@
 !! @param[in] ZsolV  - Hdiv  sol
 !! @param[in] ZdivV  - Hdiv  div
 !! @param[in] ZsolQ  - L2    sol
-!!
+!
 !! @param[out] val   - quantity to display
 !---------------------------------------------------------------------------------------
 !
@@ -21,28 +22,23 @@ subroutine soldis(Mdle,Xi,X,Rn,RsolH,RgradH,RsolE,RcurlE,RsolV,RdivV,RsolQ, Val)
 !
     use data_structure3D
     use common_prob_data
-!---------------------------------------------------------------------------------------
+!
     implicit none
 !
-    integer,                     intent(in)  :: Mdle
-    real(8),dimension(3),        intent(in)  :: Xi,X,Rn
-    VTYPE,dimension(  MAXEQNH  ),intent(in)  :: RsolH
-    VTYPE,dimension(  MAXEQNH,3),intent(in)  :: RgradH
-    VTYPE,dimension(3,MAXEQNE  ),intent(in)  :: RsolE
-    VTYPE,dimension(3,MAXEQNE  ),intent(in)  :: RcurlE
-    VTYPE,dimension(3,MAXEQNV  ),intent(in)  :: RsolV
-    VTYPE,dimension(  MAXEQNV  ),intent(in)  :: RdivV
-    VTYPE,dimension(  MAXEQNQ  ),intent(in)  :: RsolQ
-    real(8),                     intent(out) :: Val
-    VTYPE                                    :: rntimesE(3)
-!---------------------------------------------------------------------------------------
-!..work space for routine 'exact'
-    VTYPE :: valH(MAXEQNH)  , zdvalH(MAXEQNH,3)  , zd2valH(MAXEQNH,3,3)
-    VTYPE :: zvalE(3,MAXEQNE), zdvalE(3,MAXEQNE,3), zd2valE(3,MAXEQNE,3,3)
-    VTYPE :: zvalV(3,MAXEQNV), zdvalV(3,MAXEQNV,3), zd2valV(3,MAXEQNV,3,3)
-    VTYPE :: zvalQ(MAXEQNQ)  , zdvalQ(MAXEQNQ,3)  , zd2valQ(MAXEQNQ,3,3)
+    integer,                       intent(in)  :: Mdle
+    real(8),dimension(3),          intent(in)  :: Xi,X,Rn
+    VTYPE  ,dimension(  MAXEQNH  ),intent(in)  :: RsolH
+    VTYPE  ,dimension(  MAXEQNH,3),intent(in)  :: RgradH
+    VTYPE  ,dimension(3,MAXEQNE  ),intent(in)  :: RsolE
+    VTYPE  ,dimension(3,MAXEQNE  ),intent(in)  :: RcurlE
+    VTYPE  ,dimension(3,MAXEQNV  ),intent(in)  :: RsolV
+    VTYPE  ,dimension(  MAXEQNV  ),intent(in)  :: RdivV
+    VTYPE  ,dimension(  MAXEQNQ  ),intent(in)  :: RsolQ
+    real(8),                       intent(out) :: Val
 !
-    integer :: icase = 1, iprint
+!---------------------------------------------------------------------------------------
+!
+    integer :: iprint
 
     select case (IEXACT_DISP)
         case(0)

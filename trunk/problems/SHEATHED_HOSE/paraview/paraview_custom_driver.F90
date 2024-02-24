@@ -5,17 +5,15 @@
 subroutine paraview_custom_driver
 !
       use upscale
-      use environment      , only : QUIET_MODE
-      use paraview         , only : VLEVEL,FILE_VIS
-      use mpi_param        , only : RANK,ROOT
+      use environment, only : QUIET_MODE
+      use mpi_param  , only : RANK,ROOT
       !
       implicit none
-      character*8, parameter, dimension(3) :: sAttr = (/'sigma_rr','sigma_rt','sigma_tt'/)
-      real*8 :: time
+      character*8, parameter :: sAttr(3) = (/'sigma_rr','sigma_rt','sigma_tt'/)
+      real(8) :: time
       integer :: scomp
 !
       integer,save :: id = -1
-      logical,save :: initialized = .FALSE.
 !
 !-------------------------------------------------------------------------------------------
 !

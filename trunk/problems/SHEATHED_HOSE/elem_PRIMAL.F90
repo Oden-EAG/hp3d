@@ -73,7 +73,7 @@ subroutine elem_DPG_PRIMAL(Mdle)
       real*8, dimension(3,2)         :: dxidt,dxdt
 !
 !  ...stiffness tensors in master coordinates and physical coordinates
-      real*8, dimension(3,3,3,3) :: C,Symm,CC
+      real*8, dimension(3,3,3,3) :: C,Symm !,CC
 !
 !  ...source term (don't need Neumann term)
       real*8, dimension(3,NRRHS) :: fval

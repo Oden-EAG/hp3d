@@ -35,7 +35,7 @@ subroutine solution(X, u,gradu,gradgradu)
    real(8) :: np_x,np_y,np_z
    integer :: isol_p
    real(8) :: x1c,x2c,x3c,alpha,ro
-   real(8) :: t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20
+   real(8) :: t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20
    real(8) :: t21,t22,t23,t24,t25,t26
    real(8) :: u1,u2,u3,u1x,u2x,u3x,u1xx,u2xx,u3xx
 !

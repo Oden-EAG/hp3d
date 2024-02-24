@@ -191,7 +191,7 @@ subroutine elem_residual_poisson_UW(Mdle,                                     &
 !..various variables for the problem
    real(8) :: rjac, bjac, fval, wa, weight
    integer :: iflag, nrf, nint
-   integer :: k1, k2, k, l, i
+   integer :: k1, k2, k, l
    integer :: nordP, nrdof, nsign, ifc, info
 !
 #if DEBUG_MODE

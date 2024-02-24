@@ -13,8 +13,7 @@
 subroutine paraview_attr_custom(Id,Scomp)
 !
       use environment , only : PREFIX
-      use paraview    , only : PARAVIEW_IO,PARAVIEW_DIR,PARAVIEW_DOMAIN
-      use physics     , only : PHYSA
+      use paraview    , only : PARAVIEW_IO,PARAVIEW_DIR
       use mpi_param   , only : RANK,ROOT
 !
       implicit none

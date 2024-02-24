@@ -19,7 +19,6 @@
 !
    subroutine set_initial_mesh(Nelem_order)
 !
-   use control    , only : NEXACT   
    use GMP
    use common_prob_data
    use data_structure3D

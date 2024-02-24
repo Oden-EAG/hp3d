@@ -20,7 +20,6 @@ subroutine set_environment
    use environment
    use common_prob_data
    use paraview
-   use parametersDPG, only: NORD_ADD, MAXNORD_ADD
 !
    implicit none
 !
