@@ -61,9 +61,9 @@ Compilation is governed by preprocessing flags `COMPLEX` and `DEBUG`.
 Library will be created under either `hp3d/complex/` or `hp3d/real/`.
 
 Additional preprocessing flags for enabling/disabling dependencies on third-party libraries:
-- `HP3D_USE_OPENMP    = 0/1` , enable/disable OpenMP threading
-- `HP3D_USE_INTEL_MKL = 0/1` , enable/disable dependency on Intel MKL package
-- `HP3D_USE_X11       = 0/1` , enable/disable dependency on X11
+- `HP3D_USE_OPENMP    = 0/1` , disable/enable OpenMP threading
+- `HP3D_USE_INTEL_MKL = 0/1` , disable/enable dependency on Intel MKL package
+- `HP3D_USE_X11       = 0/1` , disable/enable dependency on X11
 
 ## Verifying build
 In addition to the default `make` that builds and installs the hp3D library, the `makefile` provides various targets which can be viewed via `make help`. For example, use `make check` to run a quick check after building the library, or run more extensive tests using `make test`.
@@ -83,10 +83,10 @@ Please add the following citation to any paper, technical report, or article tha
 And, optionally,
 ```bibtex
 @book{hpBook3,
-      Author = {Henneking, Stefan and Demkowicz, Leszek},
+      Author = {Henneking, Stefan and Demkowicz, Leszek and Petrides, Socratis and Fuentes, Federico and Keith, Brendan and Gatto, Paolo},
       Publisher = {In preparation},
       Title = {{Computing with $hp$ Finite Elements. III. Parallel $hp$3D Code}},
-      Year = {2023}}
+      Year = {2024}}
 ```
 ```bibtex
 @book{hpBook2,
