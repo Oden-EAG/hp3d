@@ -165,8 +165,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    real(8) :: bjac,minz,maxz,elem_z
    integer :: i1,j1,j2
    integer :: i12,j12,k1,k2,fa,fb,i3mod,j3mod,kk,i,ik,k,l,nint,p,pe
-   integer :: iflag,iprint,iverb
-   integer :: nordP,nsign,ifc,ndom,info,iphys,icomp
+   integer :: nordP,nsign,ifc,ndom,info,iflag
    complex(8) :: zfval
    complex(8) :: za(3,3),zc(3,3)
    complex(8) :: zaJ(3,3),zcJ(3,3)
@@ -229,8 +228,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
 !..H(curl) face dof maps
    integer, allocatable :: idxEE(:),idxE(:)
-   integer :: jk,nrdofEEfc,nrdofEfc,nordEfc,nordEEfc
-   real(8), allocatable :: dummyC(:), dummyE(:,:)
+   integer :: jk,nrdofEEfc,nrdofEfc
    real(8), dimension(3,6) :: nfce
 !
    integer, external :: ij_upper_to_packed
@@ -240,6 +238,12 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
    integer :: deltak(3,3)
 !
+#if DEBUG_MODE
+   real(8), allocatable :: dummyC(:), dummyE(:,:)
+   integer :: iphys,icomp,nordEfc,nordEEfc
+   integer :: iprint = 0
+#endif
+!
 !..Identity/Kronecker delta tensor
    deltak=0
    do a=1,3
@@ -248,10 +252,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
 !---------------------------------------------------------------------
 !
-!..Set iverb = 0/1 (Non-/VERBOSE)
-   iverb = 0
 !..Set iprint = 0/1 (Non-/VERBOSE)
-   iprint = 0
 #if DEBUG_MODE
    if (iprint.eq.1) then
       write(*,*) 'elem_maxwell_fi_pris: Mdle = ', Mdle

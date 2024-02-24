@@ -82,30 +82,30 @@ Please add the following citation to any paper, technical report, or article tha
 ```
 And, optionally,
 ```bibtex
-@book{hpbook3,
+@book{hpBook3,
       Author = {Henneking, Stefan and Demkowicz, Leszek},
       Publisher = {In preparation},
       Title = {{Computing with $hp$ Finite Elements. III. Parallel $hp$3D Code}},
       Year = {2023}}
 ```
 ```bibtex
-@book{hpbook2,
+@book{hpBook2,
       Author = {Demkowicz, Leszek and Kurtz, Jason and Pardo, David and Paszy\'{n}ski, Maciej and Rachowicz, Waldemar and Zdunek, Adam},
       Publisher = {Chapman \& Hall/CRC},
-      Title = {Computing with $hp$ Finite Elements. II. Frontiers: Three-Dimensional Elliptic and Maxwell Problems with Applications},
+      Title = {{Computing with $hp$ Finite Elements. II. Frontiers: Three-Dimensional Elliptic and Maxwell Problems with Applications}},
       Year = {2007}}
 ```
 ```bibtex
-@book{hpbook,
+@book{hpBook1,
       Author = {Demkowicz, Leszek},
       Publisher = {Chapman \& Hall/CRC Press, Taylor and Francis},
-      Title = {Computing with $hp$ Finite Elements. I. One- and Two-Dimensional Elliptic and Maxwell Problems},
+      Title = {{Computing with $hp$ Finite Elements. I. One- and Two-Dimensional Elliptic and Maxwell Problems}},
       Year = {2006}}
 ```
 ```bibtex
-@article{fuentes2015shape,
+@article{shape2015,
          Author = {Fuentes, Federico and Keith, Brendan and Demkowicz, Leszek and Nagaraj, Sriram},
-         Journal = {Comput. Math. Appl.},
+         Journal = {Computers \& Mathematics with Applications},
          Number = {4},
          Pages = {353--458},
          Publisher = {Elsevier},

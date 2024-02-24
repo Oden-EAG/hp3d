@@ -171,8 +171,12 @@ subroutine get_elem_L2NormDiff(Mdle,Attr1,Attr2, L2NormDiff)
    VTYPE, dimension(  MAXEQNQ  ) ::  zsolQ
 !
 !..miscellanea
-   integer :: nint,iflag,l,i,j,ibeg1,ibeg2,icomp,ndom,nflag
+   integer :: nint,iflag,l,i,j,ibeg1,ibeg2,icomp,nflag
    real(8) :: weight,wa
+!
+#if DEBUG_MODE
+   integer :: ndom
+#endif
 !
 !---------------------------------------------------------------------------------------
 !
@@ -400,8 +404,12 @@ subroutine get_elem_L2NormAttr(Mdle,Attr, L2Norm)
    VTYPE, dimension(  MAXEQNQ  ) ::  zsolQ
 !
 !..miscellanea
-   integer :: nint,iflag,l,i,ibeg,icomp,ndom,nflag
+   integer :: nint,iflag,l,i,ibeg,icomp,nflag
    real(8) :: weight,wa
+!
+#if DEBUG_MODE
+   integer :: ndom
+#endif
 !
 !---------------------------------------------------------------------------------------
 !
@@ -651,8 +659,12 @@ subroutine get_elem_Norm(Mdle,Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
    VTYPE, dimension(  MAXEQNQ  ) ::  zsolQ
 !
 !..miscellanea
-   integer :: nint,iattr,l,i,j,ibeg,iflag,icomp,ndom,ivar,nflag
+   integer :: nint,iattr,l,i,j,ibeg,iflag,icomp,ivar,nflag
    real(8) :: weight,wa
+!
+#if DEBUG_MODE
+   integer :: ndom
+#endif
 !
 !-------------------------------------------------------------------
 !

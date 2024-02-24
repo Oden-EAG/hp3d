@@ -157,7 +157,7 @@ subroutine elem_heat(Mdle,                   &
 !..various variables for the problem
    real(8)    :: rjac,bjac,weight,wa,v2n,v1,v2,minz,maxz,elem_z
    integer    :: i1,j1,j2,k1,k2,i,nint,iflag,k
-   integer    :: nordP,nrdof,l,nsign,ifc,info,ndom,iphys,icomp
+   integer    :: nordP,nrdof,l,nsign,ifc,info,ndom
    real(8)    :: rfval,therm_Load
    complex(8) :: zfval
 !
@@ -169,7 +169,7 @@ subroutine elem_heat(Mdle,                   &
    integer, external :: ij_upper_to_packed
 !
 #if DEBUG_MODE
-!..BC's flags
+   integer :: icomp,iphys
    integer :: ibc(6,NRINDEX)
 !..Set iprint = 0/1 (Non-/VERBOSE)
    integer :: iprint

@@ -167,7 +167,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    real(8) :: rjac,weight
    real(8) :: bjac,minz,maxz,elem_z
    integer :: i1,i2,j1,j2,k1,k2,kk,i,ik,k,l
-   integer :: iflag,info,iphys,icomp,ifc
+   integer :: iflag,info,ifc
    integer :: nrdof,nordP,nsign,ndom,nint
    complex(8) :: zfval
    complex(8) :: za(3,3),zc(3,3)
@@ -257,6 +257,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    integer, external :: ij_upper_to_packed
 !
 #if DEBUG_MODE
+   integer :: icomp,iphys
    integer :: iprint
    iprint = 0
 #endif
