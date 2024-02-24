@@ -83,7 +83,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !
 !..variables for geometry
    real(8), dimension(3)   :: xi,x,rn,daux
-   real(8), dimension(3,2) :: dxidt,dxdt,rt
+   real(8), dimension(3,2) :: dxidt,dxdt
    real(8), dimension(3,3) :: dxdxi,dxidx
    real(8), dimension(2)   :: t
 !
@@ -106,10 +106,8 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    !VTYPE, dimension(NrTest*(NrTest+1)/2) :: gramTest
    VTYPE, allocatable :: gramP(:)
    real(8) :: FF, CF, FC
-   real(8) :: fldE(3), fldH(3), crlE(3), crlH(3), rotE(3)
+   real(8) :: fldE(3), crlE(3), rotE(3)
    real(8) :: fldF(3), fldG(3), crlF(3), crlG(3), rotF(3)
-!
-   real(8) :: D_aux(3,3),D_za(3,3),D_zc(3,3)
 !
 !..load vector for the enriched space
    VTYPE, dimension(NrTest)   :: bload_E,bload_Ec
@@ -142,10 +140,10 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    integer :: nrf
 !
 !..various variables for the problem
-   real(8) :: rjac,bjac,weight,wa,CC,EE,CE,E,EC,q,h,tol
-   real(8) :: diff_r,diff_i,max_r,max_i,minz,maxz,elem_z
-   integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,j,m,n,nint,kE,k,l,ivar,iflag
-   integer :: nordP,nsign,ifc,ndom,info,icomp,nrdof,nrdof_eig,idec
+   real(8) :: rjac,bjac,weight,wa,CC
+   real(8) :: minz,maxz,elem_z
+   integer :: k1,k2,i,m,n,nint,k,l,ivar,iflag
+   integer :: nordP,nsign,ifc,ndom,info,nrdof
    VTYPE   :: zfval
    VTYPE   :: za(3,3),zc(3,3)
    VTYPE   :: zaJ(3,3),zcJ(3,3)
@@ -160,14 +158,14 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    real(8) :: WAVENUM_FLD
 !
 !..for polarizations function
-   VTYPE, dimension(3,3) :: bg_pol,gain_pol,raman_pol,rndotE
+   VTYPE, dimension(3,3) :: bg_pol,gain_pol,raman_pol
    real(8) :: delta_n
    integer :: dom_flag
 !
    integer, external :: ij_upper_to_packed
 !
 !..timer
-   real(8) :: start_time,end_time
+   !real(8) :: start_time,end_time
 !
 #if DEBUG_MODE
    integer :: iprint

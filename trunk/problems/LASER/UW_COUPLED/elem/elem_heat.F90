@@ -105,7 +105,7 @@ subroutine elem_heat(Mdle,                   &
 !
 !..variables for geometry
    real(8), dimension(3)    :: xi,x,rn
-   real(8), dimension(3,2)  :: dxidt,dxdt,rt
+   real(8), dimension(3,2)  :: dxidt,dxdt
    real(8), dimension(3,3)  :: dxdxi,dxidx
    real(8), dimension(2)    :: t
 !
@@ -156,7 +156,7 @@ subroutine elem_heat(Mdle,                   &
 !
 !..various variables for the problem
    real(8)    :: rjac,bjac,weight,wa,v2n,v1,v2,minz,maxz,elem_z
-   integer    :: i1,i2,j1,j2,k1,k2,kH,kk,i,j,nint,iflag,kE,k
+   integer    :: i1,j1,j2,k1,k2,i,nint,iflag,k
    integer    :: nordP,nrdof,l,nsign,ifc,info,ndom,iphys,icomp
    real(8)    :: rfval,therm_Load
    complex(8) :: zfval

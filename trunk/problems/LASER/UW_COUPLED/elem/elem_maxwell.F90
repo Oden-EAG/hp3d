@@ -109,7 +109,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !..variables for geometry
    real(8), dimension(3)    :: xi,x,rn,daux
-   real(8), dimension(3,2)  :: dxidt,dxdt,rt
+   real(8), dimension(3,2)  :: dxidt,dxdt
    real(8), dimension(3,3)  :: dxdxi,dxidx
    real(8), dimension(2)    :: t
 !
@@ -129,13 +129,10 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    real(8) , dimension(3,MAXbrickEE) :: curlEE
 !
 !..nrdof for interface only (without bubbles)
-   integer :: nrdofEEi
+   !integer :: ik,nrdofEEi
 !
 !..H(curl) bubble index
-   integer, allocatable :: idxEE(:)
-!
-!..element mdle node dof
-   integer :: ndofHHmdl,ndofEEmdl,ndofVVmdl,ndofQQmdl
+   !integer, allocatable :: idxEE(:)
 !
 !..load vector for the enriched space
    VTYPE :: bload_E(NrTest)
@@ -144,7 +141,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    !VTYPE :: gramP(NrTest*(NrTest+1)/2)
    VTYPE, allocatable :: gramP(:)
    real(8)  :: FF, CF, FC
-   real(8)  :: fldE(3), fldH(3), crlE(3), crlH(3), rotE(3)
+   real(8)  :: fldE(3), fldH(3), crlE(3), rotE(3)
    real(8)  :: fldF(3), fldG(3), crlF(3), crlG(3), rotF(3), rotG(3)
 !
 !..matrices for transpose filling (swapped loops)
@@ -169,17 +166,16 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !..Maxwell load and auxiliary variables
    VTYPE  , dimension(3) :: zJ,zImp
    real(8), dimension(3) :: E1,E2,rntimesE,rn2timesE
-   real(8), dimension(3) :: F1,rntimesF,rn2timesF
 !
 !..number of edge,faces per element type
    integer :: nre, nrf
 !
 !..various variables for the problem
-   real(8) :: h_elem,rjac,weight,wa,v2n,CC,EE,CE,E,EC,q,h,omeg,eps
+   real(8) :: rjac,weight,wa,CC
    real(8) :: bjac,minz,maxz,elem_z
-   integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,ik,j,k,l,nint,kE,n,m
-   integer :: iflag,itime
-   integer :: nrdof,nordP,nsign,ifc,ndom,info,icomp,idec
+   integer :: i1,j1,j2,k1,k2,i,k,l,nint,n,m
+   integer :: iflag,info
+   integer :: nrdof,nordP,nsign,ifc,ndom
    VTYPE   :: zfval
    VTYPE   :: za(3,3),zc(3,3)
    VTYPE   :: zaJ(3,3),zcJ(3,3)
@@ -1001,7 +997,7 @@ subroutine imp_penalty(Mdle,Fld_flag,NrdofH,NrdofEi,MdE,Norder,Norderi, &
 !
 !..variables for geometry
    real(8), dimension(3)    :: xi,x,rn
-   real(8), dimension(3,2)  :: dxidt,dxdt,rt
+   real(8), dimension(3,2)  :: dxidt,dxdt
    real(8), dimension(3,3)  :: dxdxi,dxidx
    real(8), dimension(2)    :: t
 !
@@ -1026,8 +1022,8 @@ subroutine imp_penalty(Mdle,Fld_flag,NrdofH,NrdofEi,MdE,Norder,Norderi, &
    real(8), dimension(3) :: F1,rntimesF,rn2timesF
 !
 !..various variables for the problem
-   real(8) :: rjac,weight,wa,eps,bjac
-   integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,ik,j,k,l,nint,kE,n,m
+   real(8) :: rjac,weight,eps,bjac
+   integer :: k1,k2,k,l,nint
    integer :: nrdof,nsign,ifc,nrf
 !
 !-------------------------------------------------------------------------------

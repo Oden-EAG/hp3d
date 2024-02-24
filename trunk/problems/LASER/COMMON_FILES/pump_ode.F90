@@ -33,7 +33,7 @@ subroutine pump_ode_solve
 !
 !..auxiliary variables
    integer :: numPts, i, j, max_it, ierr, fld
-   real(8) :: a, eta, sum1, sum2, Is, Ip, dz, g0, gain, l2norm, l2diff, eps
+   real(8) :: a, eta, sum1, sum2, Is, Ip, dz, g0, l2norm, l2diff, eps
 !
 !..pump gain
 !   = 1: computing pump gain from transverse-averaged signal irradiance
@@ -236,7 +236,6 @@ subroutine compute_gain(ZValues,Num_zpts,Fld, Gain)
    use commonParam
    use laserParam
    use data_structure3D
-   use control    , only : GEOM_TOL
    use environment, only : QUIET_MODE
    use mpi_wrapper
    use par_mesh   , only : DISTRIBUTED
@@ -362,7 +361,6 @@ subroutine compute_faceGain(Mdle,Facenumber,Fld, FaceGain)
 !
    use control
    use data_structure3D
-   use environment, only : L2PROJ
    use physics
    use parametersDPG
    use commonParam
@@ -391,8 +389,8 @@ subroutine compute_faceGain(Mdle,Facenumber,Fld, FaceGain)
    integer :: etype,ftype
 !
 !..variables for geometry
-   real(8), dimension(3)   :: xi,x,rn,x_new
-   real(8), dimension(3,2) :: dxidt,dxdt,rt
+   real(8), dimension(3)   :: xi,x,rn
+   real(8), dimension(3,2) :: dxidt,dxdt
    real(8), dimension(3,3) :: dxdxi,dxidx
    real(8), dimension(2)   :: t
    real(8)                 :: rjac,bjac
@@ -420,31 +418,14 @@ subroutine compute_faceGain(Mdle,Facenumber,Fld, FaceGain)
    VTYPE, dimension(  MAXEQNV  ) ::  zdivV
    VTYPE, dimension(  MAXEQNQ  ) ::  zsolQ
 !
-!..exact solution
-   VTYPE,dimension(  MAXEQNH    ) ::   ValH
-   VTYPE,dimension(  MAXEQNH,3  ) ::  DvalH
-   VTYPE,dimension(  MAXEQNH,3,3) :: d2valH
-   VTYPE,dimension(3,MAXEQNE    ) ::   ValE
-   VTYPE,dimension(3,MAXEQNE,3  ) ::  DvalE
-   VTYPE,dimension(3,MAXEQNE,3,3) :: d2valE
-   VTYPE,dimension(3,MAXEQNV    ) ::   ValV
-   VTYPE,dimension(3,MAXEQNV,3  ) ::  DvalV
-!
-!..exact solution (UNUSED)
-   VTYPE,dimension(3,MAXEQNV,3,3) :: d2valV
-   VTYPE,dimension(  MAXEQNQ    ) ::   valQ
-   VTYPE,dimension(  MAXEQNQ,3  ) ::  dvalQ
-   VTYPE,dimension(  MAXEQNQ,3,3) :: d2valQ
-!
 !..for Poynting vector
-   VTYPE, dimension(3) :: EtimesH
-   VTYPE               :: FdotN
+   VTYPE :: EtimesH(3)
 !
 !..miscellanea
-   integer :: nint,icase,iattr,l,i,j,jz
-   real(8) :: weight,wa
-   integer :: iel,nsign
-   integer :: nflag,iload,numPts
+   integer :: nint,l,jz
+   real(8) :: weight
+   integer :: nsign
+   integer :: nflag,numPts
 !
 !..
    real(8) :: sigma_abs, sigma_ems, Is, Ip

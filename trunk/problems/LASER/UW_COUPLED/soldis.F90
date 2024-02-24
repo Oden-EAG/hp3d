@@ -135,7 +135,7 @@ subroutine soldis(Mdle,Xi,X,Rn,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ, Val)
 
 !  .....exact (normal) flux
         case(8)
-          Val = ZvalV(1,1)*Rn(1) + ZvalV(2,1)*Rn(2) + ZvalV(3,1)*Rn(3)
+          Val = dreal(ZvalV(1,1)*Rn(1) + ZvalV(2,1)*Rn(2) + ZvalV(3,1)*Rn(3))
 
 !  .....exact E field
         case(9)
@@ -253,7 +253,7 @@ subroutine soldis(Mdle,Xi,X,Rn,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ, Val)
           end select
 !  .....approximate (normal) flux
         case(8)
-          Val = ZsolV(1,1)*Rn(1) + ZsolV(2,1)*Rn(2) + ZsolV(3,1)*Rn(3)
+          Val = dreal(ZsolV(1,1)*Rn(1) + ZsolV(2,1)*Rn(2) + ZsolV(3,1)*Rn(3))
 !  .....approximate E field
         case(9)
           select case(ICHOOSE_SIGPUMP)

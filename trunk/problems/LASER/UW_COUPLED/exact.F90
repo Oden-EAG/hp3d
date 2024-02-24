@@ -63,9 +63,6 @@ subroutine exact(Xp,Mdle, ValH,DvalH,D2valH, ValE,DvalE,D2valE, &
    integer              :: icomp,fld,idx
    real(8)              :: OMEGA_RATIO_FLD,WAVENUM_FLD
 !
-!..auxiliary variables
-   real(8) :: k,r,n
-!
 !------------------------------------------------------------------------------
 !
 !..initialize exact solution
