@@ -1,11 +1,14 @@
 !-------------------------------------------------------------
-!> @brief Returns factorial n!
+!> @brief Returns factorial N!
 !> @date Feb 2023
 !-------------------------------------------------------------
-integer function fact(n)
+integer function fact(N)
 !
    implicit none
-   integer :: n,i
+!
+   integer, intent(in) :: N
+!
+   integer :: i
 !
    if (n.lt.0) then
       fact = 0

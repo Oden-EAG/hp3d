@@ -10,6 +10,7 @@ encod.F90
 encode_order.F90
 encodg.F90
 fact.F90
+ij_to_packed.F90
 invert.F90
 isgn.F90
 locate_char.F90
