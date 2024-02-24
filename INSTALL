@@ -3,9 +3,11 @@
 hp3d - A Scalable MPI/OpenMP hp-Adaptive Finite Element Software Library
        for Complex Multiphysics Applications
 
-1. Build instructions: see README
+1. hp3D is supported on Linux and macOS
 
-2. Compatibility with required external libraries:
+2. Build instructions: see README and User Manual
+
+3. Compatibility with required external libraries:
    (note: other versions may be compatible but have not been tested)
 
  - PETSc
