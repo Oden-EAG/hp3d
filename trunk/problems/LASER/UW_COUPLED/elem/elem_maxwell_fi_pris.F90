@@ -240,9 +240,9 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    real(8), dimension(3,6) :: nfce
 !
 !..timer
-   real(8) :: start_time,end_time
+   !real(8) :: start_time,end_time
 !
-   integer, dimension(3,3) :: deltak
+   integer :: deltak(3,3)
 !
 !..for Gram matrix compressed storage format
    integer :: nk

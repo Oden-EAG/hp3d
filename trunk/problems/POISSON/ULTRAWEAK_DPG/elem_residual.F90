@@ -196,16 +196,19 @@ subroutine elem_residual_poisson_UW(Mdle,                                     &
 !
 #if DEBUG_MODE
    integer :: iprint
-   iprint = 0
 #endif
 !
 !..for Gram matrix compressed storage format
    integer :: nk
    nk(k1,k2) = (k2-1)*k2/2+k1
 !
-   dofQ = ZERO; dofV = ZERO; dofE = ZERO; dofH = ZERO
-!
 !-----------------------------------------------------------------------
+!
+#if DEBUG_MODE
+   iprint = 0
+#endif
+!
+   dofQ = ZERO; dofV = ZERO; dofE = ZERO; dofH = ZERO
 !
 !..element type
    etype = NODES(Mdle)%ntype
