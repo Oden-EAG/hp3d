@@ -143,6 +143,12 @@ jobs:
           echo "Running hp3D tests"
           cd trunk
           make test
+
+      # Build hp3D problems
+      - name: Build hp3D problems
+        run: |
+          echo "Building hp3D problems"
+          cd trunk
           make problems
 
       # Report job status
