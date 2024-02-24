@@ -15,13 +15,8 @@
 !
       implicit none
 !
-      integer :: flag(2)
+      integer :: nstop, i, ierr
       logical :: iPvAttr(2)
-      integer :: physNick, nstop
-!
-      integer :: i, ierr, numPts, fld
-      real(8) :: start_time, end_time
-!
       logical :: adaptive_refs = .false.
 !
 !----------------------------------------------------------------------

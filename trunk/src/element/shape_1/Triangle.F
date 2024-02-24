@@ -364,13 +364,16 @@ c
       implicit none
       integer, intent(in)  :: Nord(4),NoriE(3),Nsize(2)
       integer, intent(out) :: NrdofV
-      integer :: m,j,e,ndofE,nordF,ndofF,famctr,fam
+c
       double precision, intent(in)  :: X(2)
       double precision, intent(out) :: ShapV(2,Nsize(2))
       double precision, intent(out) :: DivV(Nsize(2))
+c
       double precision :: shapE(2,Nsize(2))
+      integer          :: m
 c
 #if DEBUG_MODE
+      integer :: j,e,ndofE,nordF,ndofF,famctr,fam
 c  ...debugging flag
       integer :: iprint
       iprint=0

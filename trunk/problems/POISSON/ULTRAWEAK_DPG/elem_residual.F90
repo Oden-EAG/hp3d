@@ -195,7 +195,8 @@ subroutine elem_residual_poisson_UW(Mdle,                                     &
    integer :: nordP, nrdof, nsign, ifc, info
 !
 #if DEBUG_MODE
-   integer :: iprint = 0
+   integer :: iprint
+   iprint = 0
 #endif
 !
 !..for Gram matrix compressed storage format

@@ -9,7 +9,7 @@ c
       integer :: ip(n)
       integer :: Iflag
 c
-      integer :: i,j,k,imax,inc
+      integer :: j,k,imax,inc
       real(8) :: c,pivmin
 c
       real(8), parameter :: eps = 1.0d-15
@@ -17,6 +17,7 @@ c
       integer, external :: idamax
 c
 #if DEBUG_MODE
+      integer :: i
       integer :: iprint
       iprint=0
       if (iprint.eq.1) then
@@ -88,10 +89,11 @@ c
       real(8) :: a(na,n),b(n),x(n)
       integer :: ip(n)
 c
-      integer :: inc,i,j,k
+      integer :: inc,j,k
       real(8) :: c
 c
 #if DEBUG_MODE
+      integer :: i
       integer :: iprint
       iprint = 0
 c

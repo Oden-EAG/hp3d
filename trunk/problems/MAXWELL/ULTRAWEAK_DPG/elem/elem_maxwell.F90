@@ -72,8 +72,8 @@
       real(8) :: xnod(3,MAXbrickH)
 !
 !  ...geometry
-      real(8) :: xi(3), x(3), rn(3), daux(3)
-      real(8) :: dxidt(3,2), dxdt(3,2), rt(3,2)
+      real(8) :: xi(3), x(3), rn(3)
+      real(8) :: dxidt(3,2), dxdt(3,2)
       real(8) :: dxdxi(3,3), dxidx(3,3)
       real(8) :: t(2), rjac, bjac
 !
@@ -95,15 +95,6 @@
 !  ...L2 shape functions
       real(8) :: shapQ(MAXbrickQ)
 !
-!  ...nrdof for interface only (without bubbles)
-      integer :: nrdofEEi
-!
-!  ...H(curl) bubble index
-      integer, allocatable :: idxEE(:)
-!
-!  ...element mdle node dof
-      integer :: ndofHHmdl, ndofEEmdl, ndofVVmdl, ndofQQmdl
-!
 !  ...load vector for the enriched space
       complex(8) :: bload_E(NrTest)
 !
@@ -112,7 +103,7 @@
 !
 !  ...Field and material values
       real(8) :: FF
-      real(8) :: fldE(3), fldH(3), crlE(3), crlH(3)
+      real(8) :: fldE(3), fldH(3), crlE(3)
       real(8) :: fldF(3), fldG(3), crlF(3), crlG(3)
       complex(8) :: epsTfldE(3), epsTfldF(3), epscrlE(3)
       complex(8) :: eps(3,3)
@@ -131,27 +122,26 @@
       integer :: ibc(6,NRINDEX)
 !
 !  ...for auxiliary computation
-      complex(8) :: zaux,zbux,zcux
+      complex(8) :: zaux,zcux
 !
 !  ...Maxwell load and auxiliary variables
       complex(8) :: zJ(3), zImp(3)
       real(8), dimension(3) :: E1,E2,rntimesE,rn2timesE
-      real(8), dimension(3) :: F1,rntimesF,rn2timesF
 !
 !  ...number of edge,faces per element type
       integer :: nre, nrf
 !
 !  ...various variables for the problem
-      real(8) :: h_elem, v2n, CC, EE, CE, E, EC, q, h, omeg
-      integer :: i1, i2, j1, j2, k1, k2, kH, kk, i, ik, j, k, l, nint, kE, n, m
-      integer :: iflag, iprint, itime, iverb
-      integer :: nrdof, nordP, nsign, ifc, ndom, info, icomp, idec
+      real(8) :: CC
+      integer :: i1, j1, j2, k1, k2, i, k, l, nint, n, m
+      integer :: iflag, ifc, info, nrdof, nordP, nsign
 !
       complex(8) :: zc1
       complex(8) :: za(3,3), zc(3,3)
 !
-!  ...permittivity data
-      complex(8) :: permittivity(3,3)
+#if DEBUG_MODE
+      integer :: iprint
+#endif
 !
 !  ...for Gram matrix compressed storage format
       integer :: nk
@@ -159,11 +149,9 @@
 !
 !-------------------------------------------------------------------------------
 !
-!  ...Set iverb = 0/1 (Non-/VERBOSE)
-      iverb = 0
+#if DEBUG_MODE
 !  ...Set iprint = 0/1 (Non-/VERBOSE)
       iprint = 0
-#if DEBUG_MODE
       if (iprint.eq.1) then
          write(*,*) 'elem_maxwell: Mdle = ', Mdle
       endif
@@ -592,9 +580,6 @@
    end subroutine elem_maxwell
 
 
-
-
-
 !------------------------------------------------------------------------------
 !> @brief       Routine adds impedance L2 penalty terms to the stiffness matrix
 !               and load vector for the UW DPG Maxwell problem
@@ -640,7 +625,7 @@
 !  ...geometry
       real(8) :: xnod(3,MAXbrickH)
       real(8) :: xi(3), x(3), rn(3)
-      real(8) :: dxidt(3,2), dxdt(3,2), rt(3,2)
+      real(8) :: dxidt(3,2), dxdt(3,2)
       real(8) :: dxdxi(3,3), dxidx(3,3)
       real(8) :: t(2)
       real(8) :: rjac, bjac
@@ -652,7 +637,7 @@
 !
 !  ...quadrature
       real(8) :: tloc(2,MAXNINT2ADD), wtloc(MAXNINT2ADD)
-      real(8) :: weight, wa
+      real(8) :: weight
 !
 !  ...BCs
       integer, dimension(6,NRINDEX)      :: ibc
@@ -666,7 +651,7 @@
       real(8) :: penalty
 !
 !  ...misc
-      integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,ik,j,k,l,nint,kE,n,m
+      integer :: k1,k2,k,l,nint
       integer :: nrdof,ifc,nrf
 !
 !-------------------------------------------------------------------------------

@@ -45,7 +45,7 @@
       integer :: norder(19), norient_edge(12), norient_face(6)
 !
 !  ...element nodes order (trial) for interfaces
-      integer :: norderi(19), norderf(5)
+      integer :: norderf(5)
 !
 !  ...geometry dof (work space for nodcor)
       real(8) :: xnod(3,MAXbrickH)
@@ -57,8 +57,8 @@
       complex(8) :: zdofQ(MAXeqnQ,MAXbrickQ)
 !
 !  ...geometry
-      real(8) :: xi(3), x(3), rn(3), daux(3)
-      real(8) :: dxidt(3,2), dxdt(3,2), rt(3,2)
+      real(8) :: xi(3), x(3), rn(3)
+      real(8) :: dxidt(3,2), dxdt(3,2)
       real(8) :: dxdxi(3,3), dxidx(3,3)
       real(8) :: t(2), rjac, bjac
 !
@@ -70,8 +70,7 @@
       real(8), dimension(3,MAXbrickE)  :: shapE, curlE
       real(8), dimension(3,NrdofEE)    :: shapF, curlF
       complex(8), dimension(3,NrdofEE) :: zshapF, zcurlF
-      real(8), dimension(3,NrdofE)     :: shapFi
-      complex(8), dimension(3,NrdofEE) :: epsTshapE, epsTshapF, epscurlF
+      complex(8), dimension(3,NrdofEE) :: epsTshapF, epscurlF
 !
 !  ...L2 shape functions
       real(8), dimension(MAXbrickQ) :: shapQ
@@ -85,12 +84,10 @@
 !
 !  ...intermediate values
       real(8) :: FF
-      real(8) :: fldE(3), fldH(3), crlE(3), crlH(3)
+      real(8) :: fldE(3), crlE(3)
       real(8) :: fldF(3), fldG(3), crlF(3), crlG(3)
-      complex(8) :: epsTfldE(3), epsTfldF(3), epscrlF(3), epscrlE(3)
-      complex(8) :: eps(3,3), CF, FC
-!
-      real(8) :: D_aux(3,3) ,D_za(3,3), D_zc(3,3)
+      complex(8) :: epsTfldE(3), epsTfldF(3), epscrlE(3)
+      complex(8) :: eps(3,3)
 !
 !  ...load vector for the enriched space
       VTYPE, dimension(NrTest)   :: bload_E,bload_Ec
@@ -114,28 +111,25 @@
       VTYPE, dimension(6)   :: zsolQ
 !
 !  ...auxiliary
-      VTYPE :: zresid, zaux, zbux, zcux
+      VTYPE :: zresid, zaux, zcux
 !
 !  ...number of faces per element type
       integer :: nrf
 !
 !  ...various variables for the problem
-      real(8) :: CC,EE,CE,E,EC,q,h
-      integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,j,m,n,nint,kE,k,l,ivar,iflag
-      integer :: nordP,nsign,ifc,ndom,info,icomp,nrdof,nrdof_eig,idec
+      real(8) :: CC
+      integer :: k1,k2,m,n,nint,k,l,ivar,iflag
+      integer :: nordP,nsign,ifc,info,nrdof
       VTYPE   :: za(3,3),zc(3,3),zc1
-!
-!  ...timer
-      real(8) :: start_time,end_time
-!
-!  ...debug variables
-#if DEBUG_MODE
-      integer :: iprint = 0
-#endif
 !
 !  ...for Gram matrix compressed storage format
       integer :: nk
       nk(k1,k2) = (k2-1)*k2/2+k1
+!
+#if DEBUG_MODE
+      integer :: iprint
+      iprint = 0
+#endif
 !
 !--------------------------------------------------------------------------
 !

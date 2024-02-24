@@ -52,9 +52,6 @@
       VTYPE   :: d2E(3,3)
       integer :: icomp, idx
 !
-!  ...auxiliary variables
-      real(8) :: k,r,n
-!
 !------------------------------------------------------------------------------
 !
 !  ...initialize exact solution

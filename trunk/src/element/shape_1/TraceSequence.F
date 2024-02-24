@@ -287,11 +287,12 @@ c
       implicit none
       integer, intent(in ) :: Nord,Nori
       integer, intent(out) :: NrdofV
-      integer :: m,ndofE
+c
       double precision, intent(in ) :: T
       double precision, intent(out) :: ShapV(MAXP)
 c
 #if DEBUG_MODE
+      integer :: m,ndofE
 c  ...debugging flag
       integer :: iprint
       iprint=0

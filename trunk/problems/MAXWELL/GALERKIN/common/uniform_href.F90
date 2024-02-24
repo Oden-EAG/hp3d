@@ -49,7 +49,7 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
    real(8) :: errorH,errorE,errorV,errorQ
    real(8) :: rnormH,rnormE,rnormV,rnormQ
    real(8) :: error_tot,rnorm_tot,error_subd,rnorm_subd
-   integer :: i,iel,mdle,subd,count,ierr,nrelem_ref,kref
+   integer :: i,iel,mdle,count,ierr,nrelem_ref,kref
    integer :: iprint
 !
    real(8) :: start_time,end_time

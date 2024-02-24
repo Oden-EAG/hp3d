@@ -64,11 +64,16 @@ c  ...big(parent) and small element shape functions, collocation points
 c
       integer :: norder(4),nsize(2)
 c
-      real(8) :: aux,diff,val
-      integer :: i,j,icl,i1,i2,ians,info
-      integer :: mp,np,n,nord,nel,nrdofQ
+      real(8) :: aux
+      integer :: i,j,icl,info
+      integer :: n,nord,nel,nrdofQ
 c
       real(8), parameter :: eps = 1.0d-13
+c
+#if DEBUG_MODE
+      real(8) :: diff,val
+      integer :: i1,i2,ians,mp,np
+#endif
 c
 c  ...set up order
       nord   = MAXP

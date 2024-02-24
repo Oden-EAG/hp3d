@@ -161,11 +161,8 @@
       endif
 !
    end subroutine soldis
-
-
-
-
-
+!
+!
 !---------------------------------------------------------------------------------------
 !> Purpose : select quantities to display
 !---------------------------------------------------------------------------------------
@@ -208,17 +205,14 @@
       call disp_soldis(NSTD_OUT)
 !
    end subroutine soldis_select
-
-
-
-
-
+!
+!
 !---------------------------------------------------------------------------------------
 !> Purpose : show the quantities selected to display
 !---------------------------------------------------------------------------------------
    subroutine disp_soldis(Nstream)
 !
-      use commonParam,      only: IEXACT_DISP,ICHOOSE_COMP
+      use commonParam, only: IEXACT_DISP
 !
       implicit none
       integer, intent(in) :: Nstream
