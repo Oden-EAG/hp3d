@@ -216,8 +216,8 @@ subroutine master_main()
       write(*,*) '=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='
 !
       read( *,*) idec
-      write(6,8010) '[', RANK, '] : ','Broadcast: idec = ', idec
- 8010 format(A,I3,A,A,I3)
+      !write(6,8010) '[', RANK, '] : ','Broadcast: idec = ', idec
+ !8010 format(A,I3,A,A,I3)
       count = 1; src = ROOT
       call MPI_BCAST (idec,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
 !
@@ -360,11 +360,11 @@ subroutine worker_main()
    idec = 1
    do while(idec /= 0)
 !
-      write(6,9030) '[', RANK, '] : ','Waiting for broadcast from master...'
+      !write(6,9030) '[', RANK, '] : ','Waiting for broadcast from master...'
       count = 1; src = ROOT
       call MPI_BCAST (idec,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
-      write(6,9010) '[', RANK, '] : ','Broadcast: idec = ', idec
- 9010 format(A,I3,A,A,I3)
+      !write(6,9010) '[', RANK, '] : ','Broadcast: idec = ', idec
+ !9010 format(A,I3,A,A,I3)
 !
       select case(idec)
 !     ...QUIT
