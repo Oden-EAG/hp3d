@@ -273,8 +273,7 @@ subroutine elem_poisson_UW(Mdle,                                        &
    real(8) :: u, v, q, divtau_a, divtau_b, tn, sn, u_hat, aux
    real(8) :: sig(3), dv(3), dq(3), tau_a(3), tau_b(3), s(3)
 !
-   integer :: nk
-   nk(k1,k2) = (k2-1)*k2/2 + k1
+   integer, external :: ij_upper_to_packed
 !
 !---------------------------------------------------------------------
 !--------- INITIALIZE THE ELEMENT ORDER, ORIENTATION ETC. ------------
@@ -413,7 +412,7 @@ subroutine elem_poisson_UW(Mdle,                                        &
                     + gradHH(3,k2)*dxidx(3,1:3)
 !
 !..determine index in triangular packed format            
-            k = nk(k1,k2)
+            k = ij_upper_to_packed(k1,k2)
 !..accumlate Gram components of Gram matrix correspoding to v
             aux = q*v + (dq(1)*dv(1) + dq(2)*dv(2) + dq(3)*dv(3))
             gramP(k) = gramP(k) + aux*weight
@@ -428,7 +427,7 @@ subroutine elem_poisson_UW(Mdle,                                        &
                        + dxdxi(1:3,3) * shapVV(3,k2)
             tau_a(1:3) = tau_a(1:3)/rjac
 !
-            k = nk(k1,NrdofHH+k2)
+            k = ij_upper_to_packed(k1,NrdofHH+k2)
 !
             aux = dv(1)*tau_a(1) + dv(2)*tau_a(2) + dv(3)*tau_a(3)
             gramP(k) = gramP(k) + aux * weight
@@ -473,7 +472,7 @@ subroutine elem_poisson_UW(Mdle,                                        &
                        + dxdxi(1:3,3) * shapVV(3,k2)
             tau_b(1:3) = tau_b(1:3)/rjac
 !
-            k = nk(k1 + NrdofHH,k2 + NrdofHH)
+            k = ij_upper_to_packed(k1 + NrdofHH,k2 + NrdofHH)
             aux = divtau_a * divtau_b + 2.d0 * &
                   (tau_a(1)*tau_b(1) + tau_a(2)*tau_b(2) + tau_a(3)*tau_b(3))
             gramP(k) = gramP(k) +  weight * aux

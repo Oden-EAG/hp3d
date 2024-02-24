@@ -107,9 +107,8 @@
       real*8  :: weight,wa,rjac,brjac,tmp,tmp2,DDOT,omegaWeight,l2Weight,l2StressWeight
 !
 !  ...LAPACK stuff
-      character uplo
-      integer :: nk
-      nk(k1,k2) = (k2-1)*k2/2+k1
+      character :: uplo
+      integer, external :: ij_upper_to_packed
 !
 !-----------------------------------------------------------------------------------
 !      I N I T I A L I Z A T I O N                                                 |
@@ -300,7 +299,7 @@
             case(1)
               do m2=m1,3*nrdofVV
                 lcomp = mod(m2-1,3)+1
-                k = nk(m1,m2)
+                k = ij_upper_to_packed(m1,m2)
                 k2 = int((m2-1)/3)+1
 
                 tmp=0.d0
@@ -325,7 +324,7 @@
               enddo
 
               do m2=3*nrdofVV+1,3*nrdofVV+3*nrdofHH
-                k = nk(m1,m2)
+                k = ij_upper_to_packed(m1,m2)
                 k2 = int((m2-3*nrdofVV-1)/3)+1
                 lcomp = mod(m2-1,3)+1
 
@@ -343,7 +342,7 @@
               do m2=m1,3*nrdofVV
                 lcomp = mod(m2-1,3)+1
                 if (kcomp.eq.lcomp) then
-                  k = nk(m1,m2)
+                  k = ij_upper_to_packed(m1,m2)
                   k2 = int((m2-1)/3)+1
                   Gram(k) = Gram(k)  &
                           + ( divVV(k1)*divVV(k2)  &
@@ -386,7 +385,7 @@
             case(1)
               do m2=m1,3*nrdofVV+3*nrdofHH
                 lcomp = mod(m2-1,3)+1
-                k = nk(m1,m2)
+                k = ij_upper_to_packed(m1,m2)
                 k2 = int((m2-3*nrdofVV-1)/3)+1
 
                 tmp=0.d0
@@ -408,7 +407,7 @@
               do m2=m1,3*nrdofVV+3*nrdofHH
                 lcomp = mod(m2-1,3)+1
                 if (lcomp.eq.kcomp) then
-                  k = nk(m1,m2)
+                  k = ij_upper_to_packed(m1,m2)
                   k2 = int((m2-3*nrdofVV-1)/3)+1
                   Gram(k) = Gram(k)  &
                           + ( shapHH(k1)*shapHH(k2)  &

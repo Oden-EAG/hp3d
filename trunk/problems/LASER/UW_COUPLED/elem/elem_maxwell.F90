@@ -178,7 +178,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    real(8) :: h_elem,rjac,weight,wa,v2n,CC,EE,CE,E,EC,q,h,omeg,eps
    real(8) :: bjac,minz,maxz,elem_z
    integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,ik,j,k,l,nint,kE,n,m
-   integer :: iflag,iprint,itime,iverb
+   integer :: iflag,itime
    integer :: nrdof,nordP,nsign,ifc,ndom,info,icomp,idec
    VTYPE   :: zfval
    VTYPE   :: za(3,3),zc(3,3)
@@ -198,19 +198,18 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    VTYPE :: zbeta,zdbeta,zd2beta,detJstretch
    VTYPE, dimension(3,3) :: Jstretch,invJstretch,JJstretch
 !
+   integer, external :: ij_upper_to_packed
+!
 !..timer
 !   real(8) :: start_time,end_time
 !
-!..for Gram matrix compressed storage format
-   integer :: nk
-   nk(k1,k2) = (k2-1)*k2/2+k1
+#if DEBUG_MODE
+   integer :: iprint
+   iprint = 0
+#endif
 !
 !-------------------------------------------------------------------------------
 !
-!..Set iverb = 0/1 (Non-/VERBOSE)
-   iverb = 0
-!..Set iprint = 0/1 (Non-/VERBOSE)
-   iprint = 0
 #if DEBUG_MODE
    if (iprint.eq.1) then
       write(*,*) 'elem_maxwell: Mdle = ', Mdle
@@ -595,7 +594,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !           (F_j,F_i) terms = Int[F_^*i F_j] terms (G_11)
             n = 2*k1-1; m = 2*k2-1
-            k = nk(n,m)
+            k = ij_upper_to_packed(n,m)
             zaux = abs(zaJ(1,1))**2*fldF(1)*fldE(1) + &
                    abs(zaJ(2,2))**2*fldF(2)*fldE(2) + &
                    abs(zaJ(3,3))**2*fldF(3)*fldE(3)
@@ -617,7 +616,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !           (G_j,F_i) terms = Int[F_^*i G_j] terms (G_12)
             n = 2*k1-1; m = 2*k2
-            k = nk(n,m)
+            k = ij_upper_to_packed(n,m)
             zaux = - (zaJ(1,1)*fldF(1)*crlE(1) + &
                       zaJ(2,2)*fldF(2)*crlE(2) + &
                       zaJ(3,3)*fldF(3)*crlE(3) )
@@ -645,7 +644,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
             if (k1 .ne. k2) then
 !              (F_j,G_i) terms = Int[G_^*i F_j] terms (G_21)
                n = 2*k1; m = 2*k2-1
-               k = nk(n,m)
+               k = ij_upper_to_packed(n,m)
                zaux = - (conjg(zaJ(1,1))*crlF(1)*fldE(1) + &
                          conjg(zaJ(2,2))*crlF(2)*fldE(2) + &
                          conjg(zaJ(3,3))*crlF(3)*fldE(3) )
@@ -671,7 +670,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !           (G_j,G_i) terms = Int[G_^*i G_j] terms (G_22)
             n = 2*k1; m = 2*k2
-            k = nk(n,m)
+            k = ij_upper_to_packed(n,m)
             zcux = abs(zcJ(1,1))**2*fldF(1)*fldE(1) + &
                    abs(zcJ(2,2))**2*fldF(2)*fldE(2) + &
                    abs(zcJ(3,3))**2*fldF(3)*fldE(3)

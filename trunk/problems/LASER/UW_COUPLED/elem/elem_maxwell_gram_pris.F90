@@ -107,7 +107,7 @@
    real(8) :: bjac,minz,maxz,elem_z
    integer :: i1,j1,i2,j2
    integer :: i12,j12,k12,k1,k2,fa,fb,i3mod,j3mod,kH,kk,i,ik,j,k,l,nint,kE,n,m,p,pe
-   integer :: iflag,iprint,itime,iverb
+   integer :: iflag,itime
    integer :: nordP,nsign,ifc,ndom,info,icomp,idec
    complex(8) :: zfval
    complex(8) :: za(3,3),zc(3,3)
@@ -162,11 +162,9 @@
 !
    integer, allocatable :: mapEE(:)
 !
-   integer, dimension(3,3) :: deltak
+   integer, external :: ij_upper_to_packed
 !
-!..for Gram matrix compressed storage format
-   integer :: nk
-   nk(k1,k2) = (k2-1)*k2/2+k1
+   integer, dimension(3,3) :: deltak
 !
 !..Identity/Kronecker delta tensor
    deltak=0
@@ -175,11 +173,6 @@
    enddo
 !
 !---------------------------------------------------------------------
-!
-!..Set iverb = 0/1 (Non-/VERBOSE)
-   iverb = 0
-!..Set iprint = 0/1 (Non-/VERBOSE)
-   iprint = 0
 !
 !..element type
    etype = NODES(Mdle)%ntype
@@ -795,7 +788,7 @@
 !
                      if (j3mod.le.nrdofH3 .and. m1.le.m2) then
 !                    ...Sum EE_11 and CC_11 terms
-                        kk = nk(2*m1-1,2*m2-1)
+                        kk = ij_upper_to_packed(2*m1-1,2*m2-1)
                         do b=1,3
                            do a=1,3
                               gramP(kk) = gramP(kk)                        &
@@ -829,7 +822,7 @@
                         endif
 !
 !                    ...Sum EC and CE terms
-                        kk = nk(2*m1-1,2*m2)
+                        kk = ij_upper_to_packed(2*m1-1,2*m2)
                         do b=1,3
                            do a=1,3
                               gramP(kk) = gramP(kk)                        &
@@ -860,7 +853,7 @@
 !
 !                    ...Sum other CE and EC terms
                         if (m1.ne.m2) then
-                           kk = nk(2*m1  ,2*m2-1)
+                           kk = ij_upper_to_packed(2*m1  ,2*m2-1)
                            do b=1,3
                               do a=1,3
                                  gramP(kk) = gramP(kk)                     &
@@ -891,7 +884,7 @@
                         endif
 !
 !                    ...Sum EE_22 and CC_22 terms
-                        kk = nk(2*m1  ,2*m2  )
+                        kk = ij_upper_to_packed(2*m1  ,2*m2  )
                         do b=1,3
                            do a=1,3
                               gramP(kk) = gramP(kk)                        &

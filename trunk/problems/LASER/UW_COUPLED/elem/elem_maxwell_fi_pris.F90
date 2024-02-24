@@ -239,14 +239,12 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
    real(8), allocatable :: dummyC(:), dummyE(:,:)
    real(8), dimension(3,6) :: nfce
 !
+   integer, external :: ij_upper_to_packed
+!
 !..timer
    !real(8) :: start_time,end_time
 !
    integer :: deltak(3,3)
-!
-!..for Gram matrix compressed storage format
-   integer :: nk
-   nk(k1,k2) = (k2-1)*k2/2+k1
 !
 !..Identity/Kronecker delta tensor
    deltak=0
@@ -1018,7 +1016,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
                      if (j3mod.le.nrdofH3 .and. m1.le.m2) then
 !                    ...Sum EE_11 and CC_11 terms
-                        kk = nk(2*m1-1,2*m2-1)
+                        kk = ij_upper_to_packed(2*m1-1,2*m2-1)
                         do b=1,3
                            do a=1,3
                               gramP(kk) = gramP(kk)                        &
@@ -1052,7 +1050,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                         endif
 !
 !                    ...Sum EC and CE terms
-                        kk = nk(2*m1-1,2*m2)
+                        kk = ij_upper_to_packed(2*m1-1,2*m2)
                         do b=1,3
                            do a=1,3
                               gramP(kk) = gramP(kk)                        &
@@ -1083,7 +1081,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
 !                    ...Sum other CE and EC terms
                         if (m1.ne.m2) then
-                           kk = nk(2*m1  ,2*m2-1)
+                           kk = ij_upper_to_packed(2*m1  ,2*m2-1)
                            do b=1,3
                               do a=1,3
                                  gramP(kk) = gramP(kk)                     &
@@ -1114,7 +1112,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
                         endif
 !
 !                    ...Sum EE_22 and CC_22 terms
-                        kk = nk(2*m1  ,2*m2  )
+                        kk = ij_upper_to_packed(2*m1  ,2*m2  )
                         do b=1,3
                            do a=1,3
                               gramP(kk) = gramP(kk)                        &

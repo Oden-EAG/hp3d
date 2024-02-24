@@ -166,24 +166,21 @@ subroutine elem_heat(Mdle,                   &
    ! real(8), allocatable     :: W(:),   RWORK(:)
    ! integer, allocatable    :: IWORK(:)
 !
+   integer, external :: ij_upper_to_packed
+!
 #if DEBUG_MODE
 !..BC's flags
    integer :: ibc(6,NRINDEX)
-!..auxiliary
+!..Set iprint = 0/1 (Non-/VERBOSE)
    integer :: iprint
+   iprint = 0
 #endif
-!
-!..for Gram matrix compressed storage format
-   integer :: nk
-   nk(k1,k2) = (k2-1)*k2/2+k1
 !
 !---------------------------------------------------------------------
 !--------- INITIALIZE THE ELEMENT ORDER, ORIENTATION ETC. ------------
 !---------------------------------------------------------------------
 !
 #if DEBUG_MODE
-!..Set iprint = 0/1 (Non-/VERBOSE)
-   iprint = 0
    if (iprint.eq.1) then
       write(*,*) 'elem_heat: Mdle = ', Mdle
    endif
@@ -383,7 +380,7 @@ subroutine elem_heat(Mdle,                   &
 !------------------ G R A M   M A T R I X --------------------------------
 !
 !        ...determine index in triangular format
-            k = nk(k1,k2)
+            k = ij_upper_to_packed(k1,k2)
 !
 !        ...problem-dependent inner product
 !        ...primal DPG heat: H1 inner product
@@ -449,10 +446,10 @@ subroutine elem_heat(Mdle,                   &
 !      write(*,*) 'elem_heat: GRAM MATRIX = '
 !      do i=1,10
 !         do j=1,i-1
-!            raux(j) = gramP(nk(j,i))
+!            raux(j) = gramP(ij_upper_to_packed(j,i))
 !         enddo
 !         do j=i,10
-!            raux(j) = gramP(nk(i,j))
+!            raux(j) = gramP(ij_upper_to_packed(i,j))
 !         enddo
 !         write(*,7011) raux
 !      enddo

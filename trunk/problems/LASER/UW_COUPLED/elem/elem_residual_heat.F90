@@ -120,19 +120,14 @@ subroutine elem_residual_heat(Mdle,                &
    integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,j,nint,nint3,iflag,kE,k,l
    integer :: nordP,nsign,ifc,info,icomp,nrdof
 !
+   integer, external :: ij_upper_to_packed
+!
 #if DEBUG_MODE
    integer :: iprint
+   iprint = 0
 #endif
-!
-!..for Gram matrix compressed storage format
-   integer :: nk
-   nk(k1,k2) = (k2-1)*k2/2+k1
 !
 !-----------------------------------------------------------------------
-!
-#if DEBUG_MODE
-   iprint=0
-#endif
 !
 !..element type
    etype = NODES(Mdle)%ntype
@@ -262,7 +257,7 @@ subroutine elem_residual_heat(Mdle,                &
                      + gradHH(3,k2)*dxidx(3,1:3)
 !
 !        ...accumulate for the test stiffness matrix
-            k = nk(k1,k2)
+            k = ij_upper_to_packed(k1,k2)
             select case(INNER_PRODUCT)
                case(1)
                   if (ANISO_HEAT .eq. 1) then

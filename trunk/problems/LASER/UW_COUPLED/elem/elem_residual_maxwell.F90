@@ -163,22 +163,18 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    VTYPE, dimension(3,3) :: bg_pol,gain_pol,raman_pol,rndotE
    real(8) :: delta_n
    integer :: dom_flag
+!
+   integer, external :: ij_upper_to_packed
+!
 !..timer
    real(8) :: start_time,end_time
 !
 #if DEBUG_MODE
    integer :: iprint
+   iprint = 0
 #endif
-!
-!..for Gram matrix compressed storage format
-   integer :: nk
-   nk(k1,k2) = (k2-1)*k2/2+k1
 !
 !--------------------------------------------------------------------------
-!
-#if DEBUG_MODE
-   iprint=0
-#endif
 !
    allocate(gramP(NrTest*(NrTest+1)/2))
 !
@@ -517,7 +513,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !           -------------------------
 !           (F_i,F_j) terms
             n = 2*k1-1; m = 2*k2-1
-            k = nk(n,m)
+            k = ij_upper_to_packed(n,m)
             zaux = (abs(zaJ(1,1))**2)*fldF(1)*fldE(1) + &
                    (abs(zaJ(2,2))**2)*fldF(2)*fldE(2) + &
                    (abs(zaJ(3,3))**2)*fldF(3)*fldE(3)
@@ -539,7 +535,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !
 !           (F_i,G_j) terms
             n = 2*k1-1; m = 2*k2
-            k = nk(n,m)
+            k = ij_upper_to_packed(n,m)
             zaux = - (zaJ(1,1)*fldF(1)*crlE(1) + &
                       zaJ(2,2)*fldF(2)*crlE(2) + &
                       zaJ(3,3)*fldF(3)*crlE(3) )
@@ -567,7 +563,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
             if (k1 .ne. k2) then
 !              (G_i,F_j) terms
                n = 2*k1; m = 2*k2-1
-               k = nk(n,m)
+               k = ij_upper_to_packed(n,m)
                zaux = - (conjg(zaJ(1,1))*crlF(1)*fldE(1) + &
                          conjg(zaJ(2,2))*crlF(2)*fldE(2) + &
                          conjg(zaJ(3,3))*crlF(3)*fldE(3) )
@@ -593,7 +589,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !
 !           (G_i,G_j) terms
             n = 2*k1; m = 2*k2
-            k = nk(n,m)
+            k = ij_upper_to_packed(n,m)
             zcux = (abs(zcJ(1,1))**2)*fldF(1)*fldE(1) + &
                    (abs(zcJ(2,2))**2)*fldF(2)*fldE(2) + &
                    (abs(zcJ(3,3))**2)*fldF(3)*fldE(3)
@@ -635,7 +631,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !      do k=1,NrTest*(NrTest+1)/2
 !!      do k1=1,NrTest
 !!      do k2=k1,NrTest
-!!         k = nk(k1,k2)
+!!         k = ij_upper_to_packed(k1,k2)
 !         if (.not. cmp_dc(gramP(k),gramTest(k))) then
 !!           if (mod(k1,2) .eq. 1 .and. mod(k2,2) .eq. 1) cycle
 !            if (mod(k1,2) .eq. 0 .and. mod(k2,2) .eq. 0) cycle

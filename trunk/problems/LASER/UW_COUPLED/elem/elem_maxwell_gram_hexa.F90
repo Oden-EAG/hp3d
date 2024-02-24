@@ -152,11 +152,10 @@
 !
    real(8), dimension(MAXPP+1,2) :: shapH1,shapH2,shapH3
    real(8), dimension(MAXPP+1,MAXPP+1) :: sH2p,sH3p,dsH2p,dsH3p
-   integer, dimension(3,3) :: deltak
 !
-!..for Gram matrix compressed storage format
-   integer :: nk
-   nk(k1,k2) = (k2-1)*k2/2+k1
+   integer, external :: ij_upper_to_packed
+!
+   integer :: deltak(3,3)
 !
 !..Identity/Kronecker delta tensor
    deltak=0
@@ -1006,7 +1005,7 @@
                                     if (m1.le.m2) then
                                        sa=1+deltak(a,1)
                                        sb=1+deltak(b,1)
-                                       kk = nk(2*m1-1,2*m2-1)
+                                       kk = ij_upper_to_packed(2*m1-1,2*m2-1)
 !                                   ...sum EE terms
                                        GramP(kk) = GramP(kk)         &
                                                  + shapH1(idxa,sa)   &
@@ -1051,7 +1050,7 @@
                                           enddo
                                        endif
 
-                                       kk = nk(2*m1-1,2*m2)
+                                       kk = ij_upper_to_packed(2*m1-1,2*m2)
 !                                   ...sum CE terms
                                        do alph=1,2
                                           idxalph=mod(a+alph-1,3)+1
@@ -1087,7 +1086,7 @@
 
                                        if (m1.ne.m2) then
 
-                                          kk = nk(2*m1  ,2*m2-1)
+                                          kk = ij_upper_to_packed(2*m1  ,2*m2-1)
 !                                      ...sum CE terms
                                           do alph=1,2
                                              idxalph=mod(a+alph-1,3)+1
@@ -1122,7 +1121,7 @@
                                           endif
                                        endif
 !
-                                       kk = nk(2*m1  ,2*m2  )
+                                       kk = ij_upper_to_packed(2*m1  ,2*m2  )
 !                                   ...sum EE terms
                                        sb=1+deltak(b,1)
                                        sa=1+deltak(a,1)

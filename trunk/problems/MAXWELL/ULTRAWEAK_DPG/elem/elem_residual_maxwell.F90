@@ -122,9 +122,7 @@
       integer :: nordP,nsign,ifc,info,nrdof
       VTYPE   :: za(3,3),zc(3,3),zc1
 !
-!  ...for Gram matrix compressed storage format
-      integer :: nk
-      nk(k1,k2) = (k2-1)*k2/2+k1
+      integer, external :: ij_upper_to_packed
 !
 #if DEBUG_MODE
       integer :: iprint
@@ -304,7 +302,7 @@
 !              -------------------------
 !              (F_j,F_i) terms = Int[F_^*i F_j] terms (G_11)
                n = 2*k1-1; m = 2*k2-1
-               k = nk(n,m)
+               k = ij_upper_to_packed(n,m)
                zaux = conjg(epsTfldF(1))*epsTfldE(1) + &
                       conjg(epsTfldF(2))*epsTfldE(2) + &
                       conjg(epsTfldF(3))*epsTfldE(3)
@@ -313,7 +311,7 @@
 !
 !              (G_j,F_i) terms = Int[F_^*i G_j] terms (G_12)
                n = 2*k1-1; m = 2*k2
-               k = nk(n,m)
+               k = ij_upper_to_packed(n,m)
                zaux = - (fldF(1)*epscrlE(1) + &
                          fldF(2)*epscrlE(2) + &
                          fldF(3)*epscrlE(3) )
@@ -327,7 +325,7 @@
                if (k1 .ne. k2) then
 !                 (F_j,G_i) terms = Int[G_^*i F_j] terms (G_21)
                   n = 2*k1; m = 2*k2-1
-                  k = nk(n,m)
+                  k = ij_upper_to_packed(n,m)
                   zaux = - (crlF(1)*epsTfldE(1) + &
                             crlF(2)*epsTfldE(2) + &
                             crlF(3)*epsTfldE(3) )
@@ -339,7 +337,7 @@
 !
 !              (G_j,G_i) terms = Int[G_^*i G_j] terms (G_22)
                n = 2*k1; m = 2*k2
-               k = nk(n,m)
+               k = ij_upper_to_packed(n,m)
                zcux = abs(zc1)**2*(fldF(1)*fldE(1) + &
                                    fldF(2)*fldE(2) + &
                                    fldF(3)*fldE(3) )

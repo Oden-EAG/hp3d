@@ -73,7 +73,7 @@ subroutine dbessJY(x, order, bessJ, bessY, bessJder, bessYder)
     gam1, gam2, gammi, gampl, h, p, pimu, pimu2, q, r, &
     bessJl, bessJl1, bessJmu, bessJder1, bessJderl, &
     bessJtemp, bessY1, bessYmu, bessYmup, bessYtemp, summ, &
-    summ1, temp, w, x2, xi, xi2, xmu, xmu2, gampl1, negate
+    summ1, temp, w, x2, xi, xi2, xmu, xmu2, negate
 
   if (order < 0.d0) then
     order  = dabs(order)
