@@ -46,10 +46,11 @@ c  ...history information: father, its type, refinement kind, son number
      .           nfather_ref_kind(MAXGEN),noson(MAXGEN)
 c
       integer :: nson,nfath,nrgen,nel
-      integer :: i,j,ie,is,iv,ifc,igen,jp,kref1,kref2,kref3
+      integer :: j,ie,is,iv,ifc,igen,jp,kref1,kref2,kref3
       integer :: nrsons,nv1,nv2,nv3,nv4,lab
 c
 #if DEBUG_MODE
+      integer :: i
       integer :: iprint
       iprint=0
 #endif

@@ -21,10 +21,11 @@ c
 c
       implicit none
 c
-      integer :: i,ii,index,ir,j,l
+      integer :: i,index,ir,j,l
       real(8) :: q
 c
 #if DEBUG_MODE
+      integer :: ii
       integer :: iprint
       iprint=0
 #endif

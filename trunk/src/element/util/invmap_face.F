@@ -56,14 +56,16 @@ c
 c  ...miscellanea
       real(8) :: s,det,det1,det2
       integer :: nrdofH
-      integer :: iter,i,j,k,ivar
-      integer :: iprint
+      integer :: iter,i,j,k
 c
 c  ...tolerance for Newton-Raphson iterations
-      real(8) :: epsilon
+      real(8), parameter :: epsilon = 1.d-4
 c
-      epsilon = 1.d-4
+#if DEBUG_MODE
+      integer :: ivar
+      integer :: iprint
       iprint = 0
+#endif
 c
 c  ...find order of approXimation for the element
       call find_order(Mdle, norder)

@@ -18,9 +18,10 @@ subroutine elem_nodes(Mdle, Nodesl,Norientl)
 !..history information nfathl, isonl
    integer :: nfathl(MAXGEN),isonl(MAXGEN)
    integer :: nodesl_fath(27),norientl_fath(27)
-   integer :: igen,nfath,nod,nson,nrgen,n_nodes,nrsons
+   integer :: igen,nfath,nod,nson,nrgen,nrsons
 !
 #if DEBUG_MODE
+   integer :: n_nodes
    integer :: iprint
    iprint=0
 #endif

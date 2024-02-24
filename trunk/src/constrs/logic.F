@@ -121,9 +121,9 @@ c  ...miscellanea
       integer :: ndofH,ndofHh,ndofHv
       integer :: ndofV,ndofQ,ndofHpp
       integer :: nrdofH,nrdofE,nrdofV,nrdofQ
-      integer :: nrdofH_loc,nrdofE_loc,nrdofV_loc
 c
 #if DEBUG_MODE
+      integer :: nrdofH_loc,nrdofE_loc,nrdofV_loc
       integer :: iprint
       iprint=0
 #endif

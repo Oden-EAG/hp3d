@@ -390,9 +390,9 @@ c
                if (IPFSRE .eq. 1 .or. IPFSRE.eq.negiel) then
                   write (NFSOUT,7708) iel,Andest(ie),
      .                                ((Frnt(MKF+i),i=1,NFW),j=1,NRHS)
- 7708              format(1x,'FRWCP:  iel,Andest(ie):',i8,1p,(2e12.4,2x),
-     .                     /,10x,'Frnt: Eliminated RHS',/,
-     .                     (10x,1p,5(2e12.5,2x)))
+ 7708              format(1x,'FRWCP:  iel,Andest(ie):',i8,1p,
+     .                    (2e12.4,2x),/,10x,'Frnt: Eliminated RHS',/,
+     .                    (10x,1p,5(2e12.5,2x)))
                endif
 c
             endif
