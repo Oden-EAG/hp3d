@@ -28,7 +28,7 @@ endif
 include $(PETSC_DIR)/$(PETSC_ARCH)/lib/petsc/conf/petscvariables
 
 FFLAGS  = $(FC_FLAGS)
-FFLAGS += -fallow-argument-mismatch
+FFLAGS += -fallow-argument-mismatch -frecursive
 FFLAGS += -Wno-unused-label -Wno-maybe-uninitialized
 
 CFLAGS  =

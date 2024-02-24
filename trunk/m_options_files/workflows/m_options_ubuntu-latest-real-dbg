@@ -31,7 +31,7 @@ PACKAGES := $(petsc.pc)
 CC := $(shell pkg-config --variable=ccompiler $(PACKAGES))
 FC := $(shell pkg-config --variable=fcompiler $(PACKAGES))
 FFLAGS := $(shell pkg-config --variable=fflags_extra $(PACKAGES))
-FFLAGS += -fallow-argument-mismatch
+FFLAGS += -fallow-argument-mismatch -frecursive
 FFLAGS += -Wno-unused-label -Wno-maybe-uninitialized
 
 CFLAGS  =

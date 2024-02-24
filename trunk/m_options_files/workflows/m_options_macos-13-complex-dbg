@@ -28,6 +28,8 @@ FFLAGS += -fallow-argument-mismatch
 # OpenMP
 ifeq ($(HP3D_USE_OPENMP),1)
   FFLAGS += -fopenmp
+else
+  FFLAGS += -frecursive
 endif
 
 # Optimization flags
