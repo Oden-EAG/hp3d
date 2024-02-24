@@ -121,4 +121,10 @@ module graphmod
   !     IGINV  - invisible blocks
 end module graphmod
 
+#else
+
+module graphmod
+   implicit none
+end module graphmod
+
 #endif
