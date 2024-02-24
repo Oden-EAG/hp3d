@@ -115,9 +115,10 @@ subroutine elem_vect_poisson(Mdle,Nn, Zaloc,Zbloc)
 !..workspace for trial and test variables
    real(8) :: dq(3), dp(1:3)
 !
-   integer :: ivar1,ivar2,ifc,nsign
+   integer :: ifc,nsign
 !
 #if DEBUG_MODE
+   integer :: ivar1,ivar2
    integer :: iprint
    iprint=0
 #endif
