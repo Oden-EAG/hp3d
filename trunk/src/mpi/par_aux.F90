@@ -254,8 +254,12 @@ subroutine collect_dofs()
 !..MPI variables
    integer :: ierr
    integer :: tag, count, src, dest
-   integer :: stat(MPI_STATUS_SIZE)
    VTYPE, allocatable :: buf(:)
+#if HP3D_USE_MPI_F08
+   type(MPI_Status) :: stat
+#else
+   integer :: stat(MPI_STATUS_SIZE)
+#endif
 !
 !..auxiliary variables
    integer :: nodm(MAXNODM), nodesl(27)

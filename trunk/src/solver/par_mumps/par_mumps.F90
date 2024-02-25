@@ -40,14 +40,19 @@ subroutine mumps_destroy_par
    call mumps_destroy(mumps_par)
 end subroutine mumps_destroy_par
 !
-subroutine mumps_start(mumps,mpi_comm)
+subroutine mumps_start(mumps,mumps_comm)
 !
 #if C_MODE
    type (ZMUMPS_STRUC), intent(inout) :: mumps
 #else
    type (DMUMPS_STRUC), intent(inout) :: mumps
 #endif
-   integer, intent(in) :: mpi_comm
+!
+#if HP3D_USE_MPI_F08
+   type(MPI_Comm), intent(in) :: mumps_comm
+#else
+   integer       , intent(in) :: mumps_comm
+#endif
 !
 !..NOTE:
 !..If you plan to run MUMPS sequentially from a parallel MPI application,
@@ -55,7 +60,11 @@ subroutine mumps_start(mumps,mpi_comm)
 !  communicator containing a single processor to the MUMPS library
 !
 !..Define a communicator for the package.
-   mumps%COMM = mpi_comm
+#if HP3D_USE_MPI_F08
+   mumps%COMM = mumps_comm%MPI_VAL
+#else
+   mumps%COMM = mumps_comm
+#endif
 !
 !..PAR
 !     0 : host is not involved in factorization/solve phases
@@ -194,7 +203,11 @@ subroutine mumps_start_subd
 !..this routine initiates sparse solver for interior of subdomain
 !
 !..Define a communicator for the package.
+#if HP3D_USE_MPI_F08
+   mumps_bub%COMM = MPI_COMM_SELF%MPI_VAL
+#else
    mumps_bub%COMM = MPI_COMM_SELF
+#endif
 !
 !..PAR
 !     0 : host is not involved in factorization/solve phases

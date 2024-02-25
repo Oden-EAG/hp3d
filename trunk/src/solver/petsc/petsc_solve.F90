@@ -41,7 +41,7 @@ subroutine petsc_solve(mtype)
                            stc_alloc,stc_dealloc,stc_get_nrdof
    use parameters , only:  NRRHS
    use par_mesh   , only:  DISTRIBUTED,HOST_MESH
-   use mpi_wrapper
+   use mpif90_wrapper
    use petscksp
    use petsc_w_ksp, only:  petsc_ksp_start,petsc_ksp_destroy,     &
                            petsc_ksp,petsc_ksp_type,              &

@@ -124,9 +124,11 @@ jobs:
           echo "Checking PETSc build"
           make check
 
-      # Build hp3D
-      - name: Build hp3D
+      # Build hp3D (MPI F90)
+      - name: Build hp3D (MPI F90)
         run: |
+          export HP3D_USE_MPI_F08=0
+
           echo "Configuring hp3D"
           cd trunk
           cp m_options_files/workflows/m_options_$CONFIG ./m_options
@@ -137,16 +139,60 @@ jobs:
           echo "Checking hp3D build"
           make check
 
-      # Run hp3D tests
-      - name: Run hp3D tests
+      # Run hp3D tests (MPI F90)
+      - name: Run hp3D tests (MPI F90)
         run: |
+          export HP3D_USE_MPI_F08=0
+
           echo "Running hp3D tests"
           cd trunk
           make test
 
-      # Build hp3D problems
-      - name: Build hp3D problems
+      # Build hp3D problems (MPI F90)
+      - name: Build hp3D problems (MPI F90)
         run: |
+          export HP3D_USE_MPI_F08=0
+
+          echo "Building hp3D problems"
+          cd trunk
+          make problems
+
+      # Clean hp3D directory
+      - name: Clean hp3D directory
+        run: |
+          echo "Cleaning hp3D directory"
+          cd trunk
+          make clean
+
+      # Build hp3D (MPI F08)
+      - name: Build hp3D (MPI F08)
+        run: |
+          export HP3D_USE_MPI_F08=1
+
+          echo "Configuring hp3D"
+          cd trunk
+          cp m_options_files/workflows/m_options_$CONFIG ./m_options
+
+          echo "Building hp3D"
+          make
+
+          echo "Checking hp3D build"
+          make check
+
+      # Run hp3D tests (MPI F08)
+      - name: Run hp3D tests (MPI F08)
+        run: |
+          export HP3D_USE_MPI_F08=1
+
+          echo "Running hp3D tests"
+          cd trunk
+          make test
+
+      # Build hp3D problems (MPI F08)
+      - name: Build hp3D problems (MPI F08)
+        run: |
+          export HP3D_USE_MPI_F08=1
+
           echo "Building hp3D problems"
           cd trunk
           make problems
