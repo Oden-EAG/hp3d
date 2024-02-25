@@ -83,7 +83,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !
 !..variables for geometry
    real(8), dimension(3)   :: xi,x,rn,daux
-   real(8), dimension(3,2) :: dxidt,dxdt,rt
+   real(8), dimension(3,2) :: dxidt,dxdt
    real(8), dimension(3,3) :: dxdxi,dxidx
    real(8), dimension(2)   :: t
 !
@@ -106,10 +106,8 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    !VTYPE, dimension(NrTest*(NrTest+1)/2) :: gramTest
    VTYPE, allocatable :: gramP(:)
    real(8) :: FF, CF, FC
-   real(8) :: fldE(3), fldH(3), crlE(3), crlH(3), rotE(3)
+   real(8) :: fldE(3), crlE(3), rotE(3)
    real(8) :: fldF(3), fldG(3), crlF(3), crlG(3), rotF(3)
-!
-   real(8) :: D_aux(3,3),D_za(3,3),D_zc(3,3)
 !
 !..load vector for the enriched space
    VTYPE, dimension(NrTest)   :: bload_E,bload_Ec
@@ -142,10 +140,10 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    integer :: nrf
 !
 !..various variables for the problem
-   real(8) :: rjac,bjac,weight,wa,CC,EE,CE,E,EC,q,h,tol
-   real(8) :: diff_r,diff_i,max_r,max_i,minz,maxz,elem_z
-   integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,j,m,n,nint,kE,k,l,ivar,iflag
-   integer :: nordP,nsign,ifc,ndom,info,icomp,nrdof,nrdof_eig,idec
+   real(8) :: rjac,bjac,weight,wa,CC
+   real(8) :: minz,maxz,elem_z
+   integer :: k1,k2,i,m,n,nint,k,l,ivar,iflag
+   integer :: nordP,nsign,ifc,ndom,info,nrdof
    VTYPE   :: zfval
    VTYPE   :: za(3,3),zc(3,3)
    VTYPE   :: zaJ(3,3),zcJ(3,3)
@@ -160,25 +158,22 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
    real(8) :: WAVENUM_FLD
 !
 !..for polarizations function
-   VTYPE, dimension(3,3) :: bg_pol,gain_pol,raman_pol,rndotE
+   VTYPE, dimension(3,3) :: bg_pol,gain_pol,raman_pol
    real(8) :: delta_n
    integer :: dom_flag
+!
+   integer, external :: ij_upper_to_packed
+!
 !..timer
-   real(8) :: start_time,end_time
+   !real(8) :: start_time,end_time
 !
 #if HP3D_DEBUG
    integer :: iprint
+   iprint = 0
 #endif
-!
-!..for Gram matrix compressed storage format
-   integer :: nk
-   nk(k1,k2) = (k2-1)*k2/2+k1
 !
 !--------------------------------------------------------------------------
 !
-#if HP3D_DEBUG
-   iprint=0
-#endif
 !
    allocate(gramP(NrTest*(NrTest+1)/2))
 !
@@ -517,7 +512,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !           -------------------------
 !           (F_i,F_j) terms
             n = 2*k1-1; m = 2*k2-1
-            k = nk(n,m)
+            k = ij_upper_to_packed(n,m)
             zaux = (abs(zaJ(1,1))**2)*fldF(1)*fldE(1) + &
                    (abs(zaJ(2,2))**2)*fldF(2)*fldE(2) + &
                    (abs(zaJ(3,3))**2)*fldF(3)*fldE(3)
@@ -539,7 +534,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !
 !           (F_i,G_j) terms
             n = 2*k1-1; m = 2*k2
-            k = nk(n,m)
+            k = ij_upper_to_packed(n,m)
             zaux = - (zaJ(1,1)*fldF(1)*crlE(1) + &
                       zaJ(2,2)*fldF(2)*crlE(2) + &
                       zaJ(3,3)*fldF(3)*crlE(3) )
@@ -567,7 +562,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
             if (k1 .ne. k2) then
 !              (G_i,F_j) terms
                n = 2*k1; m = 2*k2-1
-               k = nk(n,m)
+               k = ij_upper_to_packed(n,m)
                zaux = - (conjg(zaJ(1,1))*crlF(1)*fldE(1) + &
                          conjg(zaJ(2,2))*crlF(2)*fldE(2) + &
                          conjg(zaJ(3,3))*crlF(3)*fldE(3) )
@@ -593,7 +588,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !
 !           (G_i,G_j) terms
             n = 2*k1; m = 2*k2
-            k = nk(n,m)
+            k = ij_upper_to_packed(n,m)
             zcux = (abs(zcJ(1,1))**2)*fldF(1)*fldE(1) + &
                    (abs(zcJ(2,2))**2)*fldF(2)*fldE(2) + &
                    (abs(zcJ(3,3))**2)*fldF(3)*fldE(3)
@@ -635,7 +630,7 @@ subroutine elem_residual_maxwell(Mdle,Fld_flag,          &
 !      do k=1,NrTest*(NrTest+1)/2
 !!      do k1=1,NrTest
 !!      do k2=k1,NrTest
-!!         k = nk(k1,k2)
+!!         k = ij_upper_to_packed(k1,k2)
 !         if (.not. cmp_dc(gramP(k),gramTest(k))) then
 !!           if (mod(k1,2) .eq. 1 .and. mod(k2,2) .eq. 1) cycle
 !            if (mod(k1,2) .eq. 0 .and. mod(k2,2) .eq. 0) cycle

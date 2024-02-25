@@ -37,6 +37,7 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
       real(8), dimension(2  ) :: dtdeta
       integer, dimension(4  ) :: ncurv,npoint
       integer, dimension(5  ) :: nsurf
+      integer, dimension(6  ) :: nsurf_aux
 
       real(8) :: fval,fval1,fval2,fval3,fval4,fval5,t
       integer :: i,j,iv1,iv2,norient,ifl1,ifl2,ii
@@ -298,7 +299,9 @@ subroutine recta_ImpRec(No,Eta, X,Dxdeta)
 !-----------------------------------------------------------------------
 ! STEP 2 : solve the linear system defining the point
 !-----------------------------------------------------------------------
-      call mnewt(4,nsurf,Eta,fxi,xs,sfact, X)
+      nsurf_aux(1:5) = nsurf(1:5)
+      nsurf_aux(6  ) = 0
+      call mnewt(4,nsurf_aux,Eta,fxi,xs,sfact, X)
 !
 !-----------------------------------------------------------------------
 ! STEP 3 : compute derivatives

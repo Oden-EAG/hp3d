@@ -6,8 +6,6 @@ program test_parameters
 !
    integer :: NPASS
 !
-   integer :: nsum
-!
    NPASS = 1
 !
    call set_parameters(2,1)

@@ -1,2 +1,5 @@
-      common /wvpost1/ ILBUF,IBUFC(5),IFILE,icolval
-      common /wvpost2/ BUFOR(2,5)
+      common /wvpost1/ ILBUF,IBUFC,IFILE,ICOLVAL
+      common /wvpost2/ BUFOR
+
+      integer ILBUF,IBUFC(5),IFILE,ICOLVAL
+      real(8) BUFOR(2,5)

@@ -394,7 +394,7 @@ subroutine get_power(Fld,NumPts,FileIter)
       if (NONLINEAR_FLAG .eq. 0) then
         i = NumPts
         if (USE_PML) then
-           i = (1.0d0 - PML_FRAC) * NumPts
+           i = int((1.0d0 - PML_FRAC) * NumPts)
         endif
         write(*,2021) (sign_power(1)-sign_power(i))/sign_power(1) * 100.d0
    2021 format(' Power loss: ',f6.2,' %',/)
@@ -764,7 +764,6 @@ subroutine compute_power(ZValues,Num_zpts,Fld, Power,DiffPower,CorePower,CladPow
    use commonParam
    use laserParam
    use data_structure3D
-   use control    , only : GEOM_TOL
    use environment, only : QUIET_MODE
    use mpi_wrapper
    use par_mesh   , only : DISTRIBUTED
@@ -913,7 +912,6 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
 !
    use control
    use data_structure3D
-   use environment, only : L2PROJ
    use physics
    use parametersDPG
    use commonParam
@@ -942,8 +940,8 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
    integer :: etype,ftype
 !
 !..variables for geometry
-   real(8), dimension(3)   :: xi,x,rn,x_new
-   real(8), dimension(3,2) :: dxidt,dxdt,rt
+   real(8), dimension(3)   :: xi,x,rn
+   real(8), dimension(3,2) :: dxidt,dxdt
    real(8), dimension(3,3) :: dxdxi,dxidx
    real(8), dimension(2)   :: t
    real(8)                 :: rjac,bjac
@@ -992,9 +990,9 @@ subroutine compute_facePower(Mdle,Facenumber,Fld, FacePower,FaceDiffPower)
    VTYPE               :: FdotN
 !
 !..miscellanea
-   integer :: nint,icase,iattr,l,i,j
-   real(8) :: weight,wa
-   integer :: iel,nsign
+   integer :: nint,l
+   real(8) :: weight
+   integer :: nsign
    integer :: nflag
 !
 !---------------------------------------------------------------------------------------
@@ -1121,7 +1119,6 @@ subroutine compute_mode_power(Mdle,Facenumber,Fld, ModePower,ModeNorm,ModeCoef)
 !
    use control
    use data_structure3D
-   use environment, only : L2PROJ
    use physics
    use parametersDPG
    use commonParam
@@ -1151,8 +1148,8 @@ subroutine compute_mode_power(Mdle,Facenumber,Fld, ModePower,ModeNorm,ModeCoef)
    integer :: etype,ftype
 !
 !..variables for geometry
-   real(8), dimension(3)   :: xi,x,rn,x_new
-   real(8), dimension(3,2) :: dxidt,dxdt,rt
+   real(8), dimension(3)   :: xi,x,rn
+   real(8), dimension(3,2) :: dxidt,dxdt
    real(8), dimension(3,3) :: dxdxi,dxidx
    real(8), dimension(2)   :: t
    real(8)                 :: rjac,bjac
@@ -1201,9 +1198,9 @@ subroutine compute_mode_power(Mdle,Facenumber,Fld, ModePower,ModeNorm,ModeCoef)
    VTYPE :: FdotN
 !
 !..miscellanea
-   integer :: nint,icase,iattr,l,i,j
-   real(8) :: weight,wa
-   integer :: iel,nsign
+   integer :: nint,l
+   real(8) :: weight
+   integer :: nsign
    integer :: nflag
 !
 !---------------------------------------------------------------------------------------

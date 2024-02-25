@@ -7,7 +7,7 @@
 !--------------------------------------------------------------------
 subroutine set_mesh_order(P)
 !
-   use data_structure3D , only : NRNODS,Is_inactive
+   use data_structure3D, only : NRNODS,Is_inactive
 !
    implicit none
    integer, intent(in) :: P
@@ -46,7 +46,7 @@ end subroutine set_mesh_order
 !--------------------------------------------------------------------
 subroutine set_p(Nod,P,Q,R)
 !
-   use data_structure3D , only : NODES,MAXP
+   use data_structure3D, only : NODES !,MAXP
    use node_types
 !
    implicit none

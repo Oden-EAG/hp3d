@@ -245,7 +245,7 @@ subroutine close_mesh_par()
 !
    integer :: i, j, ic, mdle, nod, kref, ierr
    integer :: nv,ne,nf,nve
-   integer :: nreles_aux, ic_glob
+   integer :: ic_glob
    logical :: nflag
    real(8) :: start_time,end_time
    integer :: displs(NUM_PROCS), ic_procs(NUM_PROCS)

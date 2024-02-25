@@ -55,7 +55,6 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
    integer :: i,iel,mdle,count,ierr,nrelem_ref,kref
    integer :: iprint
 !
-   real(8) :: res
    real(8) :: resid_subd,resid_tot
    real(8) :: elem_resid
    integer :: elem_ref_flag

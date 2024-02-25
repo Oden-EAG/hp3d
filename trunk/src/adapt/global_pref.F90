@@ -5,8 +5,7 @@
 subroutine global_pref
 !
    use parameters      , only: MAXP
-   use data_structure3D, only: NRELES,NODES,MAXNODM, &
-                               ELEM_ORDER
+   use data_structure3D, only: NRELES,NODES,ELEM_ORDER
    use node_types
 !
    implicit none

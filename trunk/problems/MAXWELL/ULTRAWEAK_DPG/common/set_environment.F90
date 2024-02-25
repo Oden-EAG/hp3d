@@ -25,7 +25,9 @@ subroutine set_environment_maxwell
 !
    implicit none
 !
+#if HP3D_USE_OPENMP
    integer :: nthreads
+#endif
 !
 ! =============================
 ! ======= Control file ========

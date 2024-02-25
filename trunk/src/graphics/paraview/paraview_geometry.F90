@@ -5,7 +5,7 @@
 subroutine paraview_geometry
 !
    use environment     , only : PREFIX
-   use paraview        , only : PARAVIEW_IO, PARAVIEW_DUMP_GEOM, VLEVEL, &
+   use paraview        , only : PARAVIEW_IO, PARAVIEW_DUMP_GEOM, &
                                 PARAVIEW_DIR, SECOND_ORDER_VIS, VIS_VTU
    use mpi_param       , only : RANK, ROOT
    use data_structure3D, only : NODES, ELEM_ORDER

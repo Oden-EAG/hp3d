@@ -443,7 +443,7 @@ c  ...check the size of workspace for surfss:
 c     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       if (ISYM.eq.1 .or. ISYM.eq.4) then
 ccc        write(*,7004) ms+mr
- 7004   format('solve1: MINIMUM MEMORY  = ',i10)
+ccc 7004   format('solve1: MINIMUM MEMORY  = ',i10)
         if (ms+mr.gt.MFRSOL) then
           write(*,*)'solve1: MFRSOL TOO SMALL',ms,mr,MFRSOL
           stop 1

@@ -105,7 +105,8 @@ c.........switch to any active window
       endif
 c
       return
-      end
+      end subroutine closwind
+c
 c----------------------------------------------------------------------
 c
 c   routine name       - openwind
@@ -254,7 +255,9 @@ c
   123 continue
 c
       return
-      end
+      end subroutine openwind
+c
+c
       subroutine selwind(Iwin)
 c
 c-----------------------------------------------------------------------
@@ -279,6 +282,7 @@ c   required  routines - wvwarn,wverr,wvpscl,wvsccl
 c
 c-----------------------------------------------------------------------
 c
+      implicit real(8) (a-h,o-y)
 #include "wvglob.blk"
 #include "wvscrn.blk"
 c
@@ -317,8 +321,10 @@ c        if (LWTYPE(ICURRWIN).eq.1) call wvdfcl(iclip)
       endif
 c
       return
-      end
-      subroutine  drawline(X1,Y1,X2,Y2,Ilcol)
+      end subroutine selwind
+c
+c
+      subroutine drawline(X1,Y1,X2,Y2,Ilcol)
 c
 c---------------------------------------------------------------------
 c
@@ -346,6 +352,7 @@ c
 c---------------------------------------------------------------------
 c
       real(8) X1,X2,Y1,Y2
+      real(8) xx1,xx2,xy1,xy2
       integer sx1,sx2,sy1,sy2
 c
 #include "wvglob.blk"
@@ -355,15 +362,15 @@ c
 c
       if (LWTYPE(ICURRWIN).le.1) then
           if (LSCALE(ICURRWIN).eq.0) then
-              sx1=X1
-              sx2=X2
-              sy2=Y2
-              sy1=Y1
+              sx1=int(X1)
+              sx2=int(X2)
+              sy2=int(Y2)
+              sy1=int(Y1)
           else
-              sx1=xgscal(ICURRWIN,1)*x1+xgscal(ICURRWIN,3)
-              sx2=xgscal(ICURRWIN,1)*x2+xgscal(ICURRWIN,3)
-              sy1=xgscal(ICURRWIN,2)*y1+xgscal(ICURRWIN,4)
-              sy2=xgscal(ICURRWIN,2)*y2+xgscal(ICURRWIN,4)
+              sx1=int(XGSCAL(ICURRWIN,1)*x1+XGSCAL(ICURRWIN,3))
+              sx2=int(XGSCAL(ICURRWIN,1)*x2+XGSCAL(ICURRWIN,3))
+              sy1=int(XGSCAL(ICURRWIN,2)*y1+XGSCAL(ICURRWIN,4))
+              sy2=int(XGSCAL(ICURRWIN,2)*y2+XGSCAL(ICURRWIN,4))
           endif
           if (LWTYPE(ICURRWIN).eq.0) call wvscdl(sx1,sy1,sx2,sy2,il)
 c          if (LWTYPE(ICURRWIN).eq.1) call wvdfdl(sx1,sy1,sx2,sy2,il)
@@ -376,10 +383,10 @@ c          if (LWTYPE(ICURRWIN).eq.1) call wvdfdl(sx1,sy1,sx2,sy2,il)
               xy1=Y1
               call wvpsdl(xx1,xy1,xx2,xy2,il)
           else
-              xx1=xgscal(ICURRWIN,1)*x1+xgscal(ICURRWIN,3)
-              xx2=xgscal(ICURRWIN,1)*x2+xgscal(ICURRWIN,3)
-              xy1=xgscal(ICURRWIN,2)*y1+xgscal(ICURRWIN,4)
-              xy2=xgscal(ICURRWIN,2)*y2+xgscal(ICURRWIN,4)
+              xx1=XGSCAL(ICURRWIN,1)*x1+XGSCAL(ICURRWIN,3)
+              xx2=XGSCAL(ICURRWIN,1)*x2+XGSCAL(ICURRWIN,3)
+              xy1=XGSCAL(ICURRWIN,2)*y1+XGSCAL(ICURRWIN,4)
+              xy2=XGSCAL(ICURRWIN,2)*y2+XGSCAL(ICURRWIN,4)
               call wvpsdl(xx1,xy1,xx2,xy2,il)
           endif
       endif
@@ -391,17 +398,18 @@ c          if (LWTYPE(ICURRWIN).eq.1) call wvdfdl(sx1,sy1,sx2,sy2,il)
           xy1=y1*10.0/MAXSCX
           call wvpsdl(xx1,xy1,xx2,xy2,il)
         else
-          xx1=(XGSCAL(ICURRWIN,1)*X1+xgscal(ICURRWIN,3))*10.0/MAXSCX
-          xx2=(XGSCAL(ICURRWIN,1)*X2+xgscal(ICURRWIN,3))*10.0/MAXSCX
-          xy1=(XGSCAL(ICURRWIN,2)*Y1+xgscal(ICURRWIN,4))*10.0/MAXSCX
-          xy2=(XGSCAL(ICURRWIN,2)*Y2+xgscal(ICURRWIN,4))*10.0/MAXSCX
+          xx1=(XGSCAL(ICURRWIN,1)*X1+XGSCAL(ICURRWIN,3))*10.0/MAXSCX
+          xx2=(XGSCAL(ICURRWIN,1)*X2+XGSCAL(ICURRWIN,3))*10.0/MAXSCX
+          xy1=(XGSCAL(ICURRWIN,2)*Y1+XGSCAL(ICURRWIN,4))*10.0/MAXSCX
+          xy2=(XGSCAL(ICURRWIN,2)*Y2+XGSCAL(ICURRWIN,4))*10.0/MAXSCX
           call wvpsdl(xx1,xy1,xx2,xy2,il)
         endif
       endif
 c
       return
-      end
-
+      end subroutine drawline
+c
+c
       subroutine drawpoly(N,Coor,Ilcol)
 c
 c-----------------------------------------------------------------------c
@@ -432,8 +440,9 @@ c
       call fillpoly(N,Coor,-1,Ilcol)
 c
       return
-      end
-
+      end subroutine drawpoly
+c
+c
       subroutine fillpoly(Nin,Coor,Ifcol,Ilcol)
 c
 c-----------------------------------------------------------------------
@@ -462,10 +471,13 @@ c   required  routines - wvpsfp,wvwarn
 c
 c-----------------------------------------------------------------------
 c
+      integer Nin
       real(8) Coor(2,Nin)
+      integer Ifcol,Ilcol
 c
       integer scoor(2,65)
-      real xcoor(2,65)
+      real(8) xcoor(2,65)
+      integer i,if,il
 c
 #include "wvscrn.blk"
 #include "wvglob.blk"
@@ -478,15 +490,15 @@ c
       if (LWTYPE(ICURRWIN).le.1) then
         if (LSCALE(ICURRWIN).eq.0) then
           do 17 i=1,n
-            scoor(1,i)=coor(1,i)
-            scoor(2,i)=coor(2,i)
+            scoor(1,i)=int(Coor(1,i))
+            scoor(2,i)=int(Coor(2,i))
    17     continue
         else
           do 20 i=1,n
-            scoor(1,i)=XGSCAL(ICURRWIN,1)*Coor(1,i)+
-     .                 XGSCAL(ICURRWIN,3)
-            scoor(2,i)=XGSCAL(ICURRWIN,2)*Coor(2,i)+
-     .                 XGSCAL(ICURRWIN,4)
+            scoor(1,i)=int(XGSCAL(ICURRWIN,1)*Coor(1,i)+
+     .                     XGSCAL(ICURRWIN,3))
+            scoor(2,i)=int(XGSCAL(ICURRWIN,2)*Coor(2,i)+
+     .                     XGSCAL(ICURRWIN,4))
    20     continue
         endif
         if (LWTYPE(ICURRWIN).eq.0) call wvscfp(n,scoor,il,if)
@@ -504,9 +516,9 @@ c
         else
           do 40 i=1,n
             xcoor(1,i)=(XGSCAL(ICURRWIN,1)*Coor(1,i)+
-     .                 XGSCAL(ICURRWIN,3))*xmult
+     .                  XGSCAL(ICURRWIN,3))*xmult
             xcoor(2,i)=(XGSCAL(ICURRWIN,2)*Coor(2,i)+
-     .                 XGSCAL(ICURRWIN,4))*xmult
+     .                  XGSCAL(ICURRWIN,4))*xmult
    40     continue
         endif
 c..ldem        call wvpsfp(n,xcoor,il,if)
@@ -514,8 +526,9 @@ c..ldem        call wvpsfp(n,xcoor,il,if)
       endif
 c
       return
-      end
-
+      end subroutine fillpoly
+c
+c
       subroutine symbol(X1,Y1,Height,Mess,Angle,N,Icol)
 c
 c-----------------------------------------------------------------------c
@@ -544,8 +557,11 @@ c   required  routines -
 c
 c-----------------------------------------------------------------------c
       real(8) X1,Y1,Height,Angle
-      integer h,a,sx1,sy1
       character Mess*(*)
+      integer N,Icol
+c
+      real(8) xx1,xy1,xx2
+      integer h,a,sx1,sy1
 c
 #include "wvglob.blk"
 #include "wvscrn.blk"
@@ -554,16 +570,16 @@ c      write(*,*) 'in symbol'
 c      write(*,*) 'Mess',Mess
       nn = N
       ic = Icol
-      h = Height*16
-      a = Angle
+      h = int(Height*16)
+      a = int(Angle)
 c
       if (LWTYPE(ICURRWIN).le.1) then
         if (LSCALE(ICURRWIN).eq.0) then
-          sx1=x1
-          sy1=y1
+          sx1=int(X1)
+          sy1=int(Y1)
         else
-          sx1=XGSCAL(ICURRWIN,1)*x1+XGSCAL(ICURRWIN,3)
-          sy1=XGSCAL(ICURRWIN,2)*y1+XGSCAL(ICURRWIN,4)
+          sx1=int(XGSCAL(ICURRWIN,1)*X1+XGSCAL(ICURRWIN,3))
+          sy1=int(XGSCAL(ICURRWIN,2)*Y1+XGSCAL(ICURRWIN,4))
         endif
         if (LWTYPE(ICURRWIN).eq.0) call wvscte(sx1,sy1,h,Mess,a,nn,ic)
 c        if (LWTYPE(ICURRWIN).eq.1) call wvdfte(sx1,sy1,h,Mess,a,nn,ic)
@@ -572,20 +588,20 @@ c      write(*,*) 'symbol1'
 c
       if (LWTYPE(ICURRWIN).eq.2) then
         if (LSCALE(ICURRWIN).eq.0) then
-           xx1 = x1
-           xy1 = y1
+           xx1 = X1
+           xy1 = Y1
         else
-           xx1=XGSCAL(ICURRWIN,1)*x1+XGSCAL(ICURRWIN,3)
-           xy1=XGSCAL(ICURRWIN,2)*y1+XGSCAL(ICURRWIN,4)
+           xx1=XGSCAL(ICURRWIN,1)*X1+XGSCAL(ICURRWIN,3)
+           xy1=XGSCAL(ICURRWIN,2)*Y1+XGSCAL(ICURRWIN,4)
         endif
         call wvpste(xx1,xy1,h,Mess,a,nn,ic)
       endif
 c      write(*,*) 'symbol2'
 c
-      if (IGPSP(ICURRWIN).eq.1) THEN
+      if (IGPSP(ICURRWIN).eq.1) then
         if (LSCALE(ICURRWIN).eq.0) then
-          xx1 = x1*10.0/MAXSCX
-          xy1 = y1*10.0/MAXSCX
+          xx1 = X1*10.0/MAXSCX
+          xy1 = Y1*10.0/MAXSCX
         else
           xx1=(XGSCAL(ICURRWIN,1)*x1+XGSCAL(ICURRWIN,3))*10.0/MAXSCX
 c          xx2=(XGSCAL(ICURRWIN,1)*x2+XGSCAL(ICURRWIN,3))*10.0/MAXSCX
@@ -597,8 +613,9 @@ c        write(*,*) 'before wvpste'
 c      write(*,*) 'symbol3'
 c
       return
-      end
-
+      end subroutine symbol
+c
+c
       subroutine setpost(ionoff)
 c
 c-----------------------------------------------------------------------c
@@ -623,6 +640,7 @@ c
 c   required  routines - wverr
 c
 c-----------------------------------------------------------------------c
+      implicit real(8) (a-h,o-y)
 #include "wvglob.blk"
 c
       if(IOPEN.ne.1) call wverr(2)
@@ -641,7 +659,9 @@ c
       endif
 c
       return
-      end
+      end subroutine setpost
+c
+c
       subroutine clrwind(Iback)
 c
 c-----------------------------------------------------------------------c
@@ -681,9 +701,9 @@ c
       LSCALE(ICURRWIN)=is
 c
       return
-      end
-
-
+      end subroutine clrwind
+c
+c
       subroutine scaleon(Ionoff)
 c
 c-----------------------------------------------------------------------c
@@ -706,13 +726,15 @@ c
 c   required  routines - wverr
 c
 c-----------------------------------------------------------------------c
+      implicit real(8) (a-h,o-y)
 #include "wvglob.blk"
 c
       if (IOPEN.ne.1) call wverr(2)
       LSCALE(ICURRWIN) = Ionoff
 c
       return
-      end
+      end subroutine scaleon
+c
       subroutine newscale(Range)
 c
 c-----------------------------------------------------------------------c
@@ -749,7 +771,7 @@ c
       call scaleon(1)
 c
       return
-      end
+      end subroutine newscale
 
       subroutine initcm
 c
@@ -801,7 +823,7 @@ c##   30     continue
 c##          return
 c##      endif
 c##c
-c##      if (ISET.EQ.1) THEN
+c##      if (ISET.eq.1) then
 c
 c         color map for mesh plot
 c
@@ -820,9 +842,9 @@ c
       call xgsetcm(14,0,  0,  0)
       call xgsetcm(15,200,200,200)
 c
-c##      ENDIF
+c##      endif
 c##
-c##      IF (ISET.EQ.2) THEN
+c##      if (ISET.eq.2) then
 c##c
 c##c         color map for contour plot
 c##c
@@ -841,7 +863,7 @@ c##         call xgsetcm(ncolshft+13,0,  0,  255)
 c##         call xgsetcm(ncolshft+14,0,  100,255)
 c##         call xgsetcm(ncolshft+15,200,200,200)
 c##
-c##      ENDIF
+c##      endif
 c##
 c##      if (Iset.gt.13) then
 c##c
@@ -855,9 +877,9 @@ c##c
         if (nrcol.ge.iram(1,nrrow+1)) nrrow = nrrow + 1
         alfa = float(nrcol-iram(1,nrrow))/
      .        (iram(1,nrrow+1)-iram(1,nrrow))
-        ir = alfa*iram(2,nrrow+1)+(1-alfa)*iram(2,nrrow)
-        ig = alfa*iram(3,nrrow+1)+(1-alfa)*iram(3,nrrow)
-        ib = alfa*iram(4,nrrow+1)+(1-alfa)*iram(4,nrrow)
+        ir = int(alfa*iram(2,nrrow+1)+(1-alfa)*iram(2,nrrow))
+        ig = int(alfa*iram(3,nrrow+1)+(1-alfa)*iram(3,nrrow))
+        ib = int(alfa*iram(4,nrrow+1)+(1-alfa)*iram(4,nrrow))
         call xgsetcm(16+i,ir,ig,ib)
         nrcol = nrcol + 1000/iset
    10 continue
@@ -865,22 +887,19 @@ c
 c##      endif
 c
       return
-      end
-
-
+      end subroutine initcm
+c
+c
 c ********************************************************************
 c
       subroutine flushx
-
 c********************************************************************
-
 c
 c
       return
-      end
-
-
-
+      end subroutine flushx
+c
+c
       subroutine wvsccl(Iclip)
 c
 c-----------------------------------------------------------------------
@@ -906,6 +925,7 @@ c   required  routines -
 c
 c-----------------------------------------------------------------------
 c
+      implicit real(8) (a-h,o-y)
 #include "rastcom.blk"
 c
       dimension Iclip(4)
@@ -930,11 +950,11 @@ c  .....set clip for X-windows
       endif
 c
       return
-      end
-
-
+      end subroutine wvsccl
+c
+c
 C========================================================
-        SUBROUTINE WVSCDL(X1,Y1,X2,Y2,IC)
+        subroutine WVSCDL(X1,Y1,X2,Y2,IC)
 C========================================================
         common/rastcom/ifile,idump,lastcol,lastx,lasty
         integer X1,X2,Y1,Y2
@@ -945,10 +965,12 @@ c           X-window
             call xgdrawl(x1,y1,x2,y2)
             return
         endif
-        RETURN
-        END
+        return
+        end subroutine WVSCDL
+c
+c
 C========================================================
-        SUBROUTINE WVSCFP(N,XC,ICF,ICL)
+        subroutine WVSCFP(N,XC,ICF,ICL)
 C========================================================
         common/rastcom/ifile,idump,lastcol,lastx,lasty
         integer XC(*),ix(100),iy(100)
@@ -966,10 +988,12 @@ c           fillpoly for X
             endif
             return
         endif
-        RETURN
-        END
+        return
+        end subroutine WVSCFP
+c
+c
 C========================================================
-        SUBROUTINE WVSCPX(X,Y,IC)
+        subroutine WVSCPX(X,Y,IC)
 C=======================================================
         integer X,Y
         common/rastcom/ifile,idump,lastcol,lastx,lasty
@@ -978,10 +1002,12 @@ C=======================================================
             call xgdrawl(x,y,x,y)
             return
         endif
-        RETURN
-        END
+        return
+        end subroutine WVSCPX
+c
+c
 C========================================================
-        SUBROUTINE WVSCTE(X1,Y1,H,MESS,A,N,ICOL)
+        subroutine WVSCTE(X1,Y1,H,MESS,A,N,ICOL)
 C========================================================
         integer X1,Y1,H,A
         CHARACTER MESS*(*),text*100
@@ -995,8 +1021,10 @@ c           text for X
             call xgdrtxt(text,n)
             return
         endif
-        RETURN
-        END
+        return
+        end subroutine WVSCTE
+c
+c
       subroutine wvwarn(N)
 c
 c----------------------------------------------------------------------
@@ -1070,7 +1098,7 @@ c
       if (n.eq.2) write(*,*) ' INITIALIZE GRAPHIC'
 c
       stop 1
-      end
+      end subroutine wverr
 c---------------------------------------------------------------------
 c
 c   routine name       - wvgrph
@@ -1166,7 +1194,8 @@ c
 c---------------------------------------------------------------------
 c
       return
-      end
+      end subroutine wvgrph
+c
 C========================================================
         subroutine wvtext
 C======================================================
@@ -1194,6 +1223,6 @@ c               do nothing - no close for xwindow
         endif
         maxcol=0
         return
-        end
+        end subroutine wvtext
 
 #endif

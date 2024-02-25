@@ -43,11 +43,13 @@ c  ...pivoting array, work array
       integer :: ip(MAXP+1)
       real(8) :: r(MAXP+1,MAXP+1)
 c
-      real(8) :: aux,val,xibig,xisma
-      integer :: i,j,ians,icl,info,jbeg,jp,jpbeg,jpend
-      integer :: n,nord,ndofh,nel,nrb,nrs
+      real(8) :: aux,xibig,xisma
+      integer :: i,j,icl,info,jbeg,jp,jpbeg,jpend
+      integer :: n,nord,ndofh,nrb,nrs
 c
 #if HP3D_DEBUG
+      real(8) :: val
+      integer :: ians,nel
       integer :: iprint
       iprint = 0
 #endif

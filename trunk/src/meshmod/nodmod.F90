@@ -51,12 +51,13 @@
       logical, parameter :: COPY_DOFS = .false.
 !
       logical :: act_dof
-      integer :: ntype,iprint,icase,nordo,subd, &
+      integer :: ntype,icase,nordo,subd,        &
                  nvarH ,nvarE ,nvarV ,nvarQ,    &
                  ndofH ,ndofE ,ndofV ,ndofQ,    &
                  ndofHo,ndofEo,ndofVo,ndofQo
 !
 #if HP3D_DEBUG
+      integer :: iprint
       iprint=0
       iprint_copy_dofG=iprint
       iprint_copy_dofH=iprint; iprint_copy_dofE=iprint

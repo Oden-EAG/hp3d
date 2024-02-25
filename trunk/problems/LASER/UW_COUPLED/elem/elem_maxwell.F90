@@ -109,7 +109,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !..variables for geometry
    real(8), dimension(3)    :: xi,x,rn,daux
-   real(8), dimension(3,2)  :: dxidt,dxdt,rt
+   real(8), dimension(3,2)  :: dxidt,dxdt
    real(8), dimension(3,3)  :: dxdxi,dxidx
    real(8), dimension(2)    :: t
 !
@@ -129,13 +129,10 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    real(8) , dimension(3,MAXbrickEE) :: curlEE
 !
 !..nrdof for interface only (without bubbles)
-   integer :: nrdofEEi
+   !integer :: ik,nrdofEEi
 !
 !..H(curl) bubble index
-   integer, allocatable :: idxEE(:)
-!
-!..element mdle node dof
-   integer :: ndofHHmdl,ndofEEmdl,ndofVVmdl,ndofQQmdl
+   !integer, allocatable :: idxEE(:)
 !
 !..load vector for the enriched space
    VTYPE :: bload_E(NrTest)
@@ -144,7 +141,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    !VTYPE :: gramP(NrTest*(NrTest+1)/2)
    VTYPE, allocatable :: gramP(:)
    real(8)  :: FF, CF, FC
-   real(8)  :: fldE(3), fldH(3), crlE(3), crlH(3), rotE(3)
+   real(8)  :: fldE(3), fldH(3), crlE(3), rotE(3)
    real(8)  :: fldF(3), fldG(3), crlF(3), crlG(3), rotF(3), rotG(3)
 !
 !..matrices for transpose filling (swapped loops)
@@ -169,17 +166,16 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !..Maxwell load and auxiliary variables
    VTYPE  , dimension(3) :: zJ,zImp
    real(8), dimension(3) :: E1,E2,rntimesE,rn2timesE
-   real(8), dimension(3) :: F1,rntimesF,rn2timesF
 !
 !..number of edge,faces per element type
    integer :: nre, nrf
 !
 !..various variables for the problem
-   real(8) :: h_elem,rjac,weight,wa,v2n,CC,EE,CE,E,EC,q,h,omeg,eps
+   real(8) :: rjac,weight,wa,CC
    real(8) :: bjac,minz,maxz,elem_z
-   integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,ik,j,k,l,nint,kE,n,m
-   integer :: iflag,iprint,itime,iverb
-   integer :: nrdof,nordP,nsign,ifc,ndom,info,icomp,idec
+   integer :: i1,j1,j2,k1,k2,i,k,l,nint,n,m
+   integer :: iflag,info
+   integer :: nrdof,nordP,nsign,ifc,ndom
    VTYPE   :: zfval
    VTYPE   :: za(3,3),zc(3,3)
    VTYPE   :: zaJ(3,3),zcJ(3,3)
@@ -198,19 +194,18 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
    VTYPE :: zbeta,zdbeta,zd2beta,detJstretch
    VTYPE, dimension(3,3) :: Jstretch,invJstretch,JJstretch
 !
+   integer, external :: ij_upper_to_packed
+!
 !..timer
 !   real(8) :: start_time,end_time
 !
-!..for Gram matrix compressed storage format
-   integer :: nk
-   nk(k1,k2) = (k2-1)*k2/2+k1
+#if DEBUG_MODE
+   integer :: iprint
+   iprint = 0
+#endif
 !
 !-------------------------------------------------------------------------------
 !
-!..Set iverb = 0/1 (Non-/VERBOSE)
-   iverb = 0
-!..Set iprint = 0/1 (Non-/VERBOSE)
-   iprint = 0
 #if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,*) 'elem_maxwell: Mdle = ', Mdle
@@ -595,7 +590,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !           (F_j,F_i) terms = Int[F_^*i F_j] terms (G_11)
             n = 2*k1-1; m = 2*k2-1
-            k = nk(n,m)
+            k = ij_upper_to_packed(n,m)
             zaux = abs(zaJ(1,1))**2*fldF(1)*fldE(1) + &
                    abs(zaJ(2,2))**2*fldF(2)*fldE(2) + &
                    abs(zaJ(3,3))**2*fldF(3)*fldE(3)
@@ -617,7 +612,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !           (G_j,F_i) terms = Int[F_^*i G_j] terms (G_12)
             n = 2*k1-1; m = 2*k2
-            k = nk(n,m)
+            k = ij_upper_to_packed(n,m)
             zaux = - (zaJ(1,1)*fldF(1)*crlE(1) + &
                       zaJ(2,2)*fldF(2)*crlE(2) + &
                       zaJ(3,3)*fldF(3)*crlE(3) )
@@ -645,7 +640,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
             if (k1 .ne. k2) then
 !              (F_j,G_i) terms = Int[G_^*i F_j] terms (G_21)
                n = 2*k1; m = 2*k2-1
-               k = nk(n,m)
+               k = ij_upper_to_packed(n,m)
                zaux = - (conjg(zaJ(1,1))*crlF(1)*fldE(1) + &
                          conjg(zaJ(2,2))*crlF(2)*fldE(2) + &
                          conjg(zaJ(3,3))*crlF(3)*fldE(3) )
@@ -671,7 +666,7 @@ subroutine elem_maxwell(Mdle,Fld_flag,                &
 !
 !           (G_j,G_i) terms = Int[G_^*i G_j] terms (G_22)
             n = 2*k1; m = 2*k2
-            k = nk(n,m)
+            k = ij_upper_to_packed(n,m)
             zcux = abs(zcJ(1,1))**2*fldF(1)*fldE(1) + &
                    abs(zcJ(2,2))**2*fldF(2)*fldE(2) + &
                    abs(zcJ(3,3))**2*fldF(3)*fldE(3)
@@ -1002,7 +997,7 @@ subroutine imp_penalty(Mdle,Fld_flag,NrdofH,NrdofEi,MdE,Norder,Norderi, &
 !
 !..variables for geometry
    real(8), dimension(3)    :: xi,x,rn
-   real(8), dimension(3,2)  :: dxidt,dxdt,rt
+   real(8), dimension(3,2)  :: dxidt,dxdt
    real(8), dimension(3,3)  :: dxdxi,dxidx
    real(8), dimension(2)    :: t
 !
@@ -1027,8 +1022,8 @@ subroutine imp_penalty(Mdle,Fld_flag,NrdofH,NrdofEi,MdE,Norder,Norderi, &
    real(8), dimension(3) :: F1,rntimesF,rn2timesF
 !
 !..various variables for the problem
-   real(8) :: rjac,weight,wa,eps,bjac
-   integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,ik,j,k,l,nint,kE,n,m
+   real(8) :: rjac,weight,eps,bjac
+   integer :: k1,k2,k,l,nint
    integer :: nrdof,nsign,ifc,nrf
 !
 !-------------------------------------------------------------------------------

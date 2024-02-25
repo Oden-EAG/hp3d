@@ -67,14 +67,16 @@ c
 c  ...order and edge orientations
       integer :: norder(4),norient(3),nsize(2)
 c
-      real(8) :: val(2),dbds(2,2)
+      real(8) :: dbds(2,2)
 c
-      integer :: icl,i,ians,ib,ic,ibcase,info,is,iscase
+      integer :: i,ib,ic,ibcase,info,is,iscase
       integer :: ivoid,jvoid,kvoid
-      integer :: j,k,nord,nc,nel,nrb,nrdof,nrs,nspan
+      integer :: j,k,nord,nc,nrb,nrdof,nrs,nspan
       integer :: ndof_i,ndof_j,ndof_mdlt,ndof_medg
 c
 #if HP3D_DEBUG
+      real(8) :: val(2)
+      integer :: ians,nel
       integer :: iprint
       iprint = 0
 #endif

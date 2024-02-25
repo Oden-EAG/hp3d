@@ -45,7 +45,7 @@ subroutine cart_to_polar(Xp, R,Theta)
       if (R < eps) then
         Theta=0.d0
       else
-        if (y == 0.d0) then
+        if (dabs(y) < eps) then
           if (x < 0.d0) then
             Theta=PI
           elseif (x > 0.d0) then

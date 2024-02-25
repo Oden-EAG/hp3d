@@ -44,9 +44,10 @@ c
       integer, intent(out) :: Ixi1(2,3),Ixi2(2,3)
       integer, intent(out) :: Np1,Np2,Nsid1,Nsid2
 c
-      integer :: k,nhalf,nordh,nordv
+      integer :: nhalf,nordh,nordv
 c
 #if HP3D_DEBUG
+      integer :: k
       integer :: iprint
       iprint=0
 #endif

@@ -29,9 +29,10 @@
          zdofQ(MAXEQNQ,MAXbrickQ)
 
     real(8) :: dsol, dxi, solmax, solmin, val
-    integer :: i, j, ivar, loc, iel, idec, iface, nsub
+    integer :: i, j, loc, iel, idec, iface, nsub
     !
 #if HP3D_DEBUG
+    integer :: ivar
     integer :: iprint
     iprint=0
 #endif

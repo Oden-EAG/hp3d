@@ -265,9 +265,6 @@ end subroutine elem
 !> @brief Auxiliary routine for assembling element matrices
 subroutine elem_maxwell(Mdle,Nrdof, Zaloc,Zbloc)
 !
-   use assembly, only: ALOC,BLOC
-   use control , only: INTEGRATION
-   use physics , only: NR_PHYSA
    use data_structure3D
    use element_data
    use parameters

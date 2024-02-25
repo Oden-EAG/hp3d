@@ -62,7 +62,7 @@ c
 c     ------------------
 c pull the dof destination vector (for this row)
 c
-          mi = Amdest(i)
+          mi = int(Amdest(i))
 cwb >
 c ALLIANT directives
 cvd$ select (vector)
@@ -91,7 +91,7 @@ c
 c        -------------
 c pull the dof destination vector (for this column)
 c
-            mj = Amdest(j)
+            mj = int(Amdest(j))
 cwb >
 c determine the position in the front (function locls)
 cwb   (**note: we may wish to inline this code)

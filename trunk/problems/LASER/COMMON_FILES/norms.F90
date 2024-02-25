@@ -13,9 +13,8 @@
 !-------------------------------------------------------------------
 subroutine get_L2NormDiff(Attr1,Attr2, L2NormDiff)
 !
-   use control         , only: NEXACT
    use data_structure3D
-   use environment     , only: QUIET_MODE,L2PROJ,FILE_ERR
+   use environment     , only: QUIET_MODE
    use physics
    use par_mesh        , only: DISTRIBUTED,HOST_MESH
    use mpi_wrapper
@@ -28,7 +27,7 @@ subroutine get_L2NormDiff(Attr1,Attr2, L2NormDiff)
    real(8) :: currL2NormDiff
 !
 !..miscellanea
-   integer :: mdle,nint,nrdof_tot,ic,iel
+   integer :: mdle,iel
 !
 !..auxiliary
    integer :: count,ierr
@@ -133,7 +132,6 @@ subroutine get_elem_L2NormDiff(Mdle,Attr1,Attr2, L2NormDiff)
 !
    use control          , only : INTEGRATION
    use data_structure3D
-   use environment      , only : L2PROJ
    use physics
 !
    implicit none
@@ -173,8 +171,12 @@ subroutine get_elem_L2NormDiff(Mdle,Attr1,Attr2, L2NormDiff)
    VTYPE, dimension(  MAXEQNQ  ) ::  zsolQ
 !
 !..miscellanea
-   integer :: nint,icase,iflag,l,i,j,ibeg1,ibeg2,icomp,ndom,ivar,nflag
+   integer :: nint,iflag,l,i,j,ibeg1,ibeg2,icomp,nflag
    real(8) :: weight,wa
+!
+#if DEBUG_MODE
+   integer :: ndom
+#endif
 !
 !---------------------------------------------------------------------------------------
 !
@@ -261,9 +263,8 @@ end subroutine get_elem_L2NormDiff
 !-------------------------------------------------------------------
 subroutine get_L2NormAttr(Attr, L2Norm)
 !
-   use control         , only: NEXACT
    use data_structure3D
-   use environment     , only: QUIET_MODE,L2PROJ,FILE_ERR
+   use environment     , only: QUIET_MODE
    use physics
    use par_mesh        , only: DISTRIBUTED,HOST_MESH
    use mpi_wrapper
@@ -276,7 +277,7 @@ subroutine get_L2NormAttr(Attr, L2Norm)
    real(8) :: currL2Norm
 !
 !..miscellanea
-   integer :: mdle,nint,nrdof_tot,ic,iel
+   integer :: mdle,iel
 !
 !..auxiliary
    integer :: count,ierr
@@ -364,7 +365,6 @@ subroutine get_elem_L2NormAttr(Mdle,Attr, L2Norm)
 !
    use control          , only : INTEGRATION
    use data_structure3D
-   use environment      , only : L2PROJ
    use physics
 !
    implicit none
@@ -404,8 +404,12 @@ subroutine get_elem_L2NormAttr(Mdle,Attr, L2Norm)
    VTYPE, dimension(  MAXEQNQ  ) ::  zsolQ
 !
 !..miscellanea
-   integer :: nint,icase,iflag,l,i,ibeg,icomp,ndom,ivar,nflag
+   integer :: nint,iflag,l,i,ibeg,icomp,nflag
    real(8) :: weight,wa
+!
+#if DEBUG_MODE
+   integer :: ndom
+#endif
 !
 !---------------------------------------------------------------------------------------
 !
@@ -496,9 +500,8 @@ end subroutine get_elem_L2NormAttr
 !-------------------------------------------------------------------
 subroutine get_Norm(Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
 !
-   use control          , only: NEXACT
    use data_structure3D
-   use environment      , only: QUIET_MODE,L2PROJ,FILE_ERR
+   use environment      , only: QUIET_MODE
    use physics
    use par_mesh         , only: DISTRIBUTED,HOST_MESH
    use mpi_wrapper
@@ -512,7 +515,7 @@ subroutine get_Norm(Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
    real(8) :: currFieldNormH,currFieldNormE,currFieldNormV,currFieldNormQ
 !
 !..miscellanea
-   integer :: mdle,nint,nrdof_tot,ic,iel
+   integer :: mdle,iel
 !
 !..auxiliary
    integer :: count, ierr
@@ -656,8 +659,12 @@ subroutine get_elem_Norm(Mdle,Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
    VTYPE, dimension(  MAXEQNQ  ) ::  zsolQ
 !
 !..miscellanea
-   integer :: nint,icase,iattr,l,i,j,ibeg,iflag,iload,icomp,ndom,ivar,nflag
+   integer :: nint,iattr,l,i,j,ibeg,iflag,icomp,ivar,nflag
    real(8) :: weight,wa
+!
+#if DEBUG_MODE
+   integer :: ndom
+#endif
 !
 !-------------------------------------------------------------------
 !

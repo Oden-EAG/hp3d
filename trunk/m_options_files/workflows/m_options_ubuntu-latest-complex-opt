@@ -9,24 +9,31 @@ HP3D_BASE_PATH = /home/runner/work/hp3d/hp3d/trunk
 HP3D_COMPLEX ?= 1
 HP3D_DEBUG   ?= 0
 
-# Dependencies
 HP3D_USE_INTEL_MKL ?= 0
+HP3D_USE_MPI_F08   ?= 0
+HP3D_USE_OPENMP    ?= 1
+HP3D_USE_X11       ?= 1
 
 #------------------------------------------------------------------
 # COMPILER SETTINGS (a 64bit processor architecture is assumed)
 #------------------------------------------------------------------
 
-# Enable OpenMP threading
-HP3D_USE_OPENMP ?= 0
-
 FC = mpif90
 CC = mpicc
-FFLAGS = -fPIC -ffree-line-length-none -Wno-lto-type-mismatch
+FFLAGS = -fPIC -ffree-line-length-none
 
 # OpenMP
 ifeq ($(HP3D_USE_OPENMP),1)
   FFLAGS += -fopenmp
+else
+  FFLAGS += -frecursive
 endif
+
+FFLAGS += -Wall \
+          -Wno-unused-dummy-argument \
+          -Wno-maybe-uninitialized \
+          -Wno-unused-label \
+          -Wno-lto-type-mismatch
 
 # Optimization flags
 ifeq ($(HP3D_DEBUG),0)
@@ -196,9 +203,6 @@ PROB_INCS    += $(HP3D_LINK_INCS)   \
 
 # Files with ending in .F and .F90 (not .f and .f90)
 # are preprocessed according to certain directives
-
-HP3D_USE_MPI_F08   ?= 0
-HP3D_USE_X11       ?= 1
 
 PROB_PP_DEFS  = -D"HP3D_COMPLEX=$(HP3D_COMPLEX)" \
                 -D"HP3D_DEBUG=$(HP3D_DEBUG)" \

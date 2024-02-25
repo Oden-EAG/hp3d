@@ -36,15 +36,16 @@ c
       real(8), intent(out) :: Rjac
       integer, intent(out) :: Iflag
 c
-      real(8) :: a(3,3),a1,a2,a3,det1,det2,det3,s
-      integer :: i,j,k
+      real(8) :: det1,det2,det3
 c
 #if HP3D_DEBUG
+      real(8) :: a(3,3),a1,a2,a3,s
+      integer :: i,j,k
       integer :: iprint
       iprint = 0
       if (iprint.eq.1) then
         do i=1,3
-          write(*,9999)i,Dxdxi(i,1:3)
+          write(*,9999) i,Dxdxi(i,1:3)
  9999     format(' geom: i,Dxdxiz(i,1:3) = ',i2,2x,3(e12.5,2x))
         enddo
       endif

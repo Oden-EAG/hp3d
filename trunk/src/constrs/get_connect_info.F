@@ -39,10 +39,10 @@ c
 c
 c  ...miscellanea
       integer :: jef(4),jvf(4),kref_face(6)
-      integer :: ntype,ftype,stype,nfath
+      integer :: ntype,ftype,nfath
       integer :: i,ie,ifc,is,is1,j,je,jp,jv,jv1,jv2,loc
       integer :: iref,ireff,iref1,iref2,iref3,iref_fath
-      integer :: nef,nff,nvf,nod,nodp,nort,nrn,nson,nrnodes
+      integer :: nef,nff,nvf,nod,nodp,nort,nson,nrnodes
 c
 #if HP3D_DEBUG
       integer :: iprint

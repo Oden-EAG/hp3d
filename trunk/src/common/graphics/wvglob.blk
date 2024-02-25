@@ -1,7 +1,10 @@
-        common /wvglob1/ IOPEN,LWTYPE(10),LWSIZE(10,4),LSCALE(10),
-     .                   IGPSP(10),ILEPSP,ILESCR,ILEDF,
-     .                   ICURRWIN
-        common /wvglob2/ XGSCAL(10,4)
+        common /wvglob1/ IOPEN,LWTYPE,LWSIZE,LSCALE,
+     .                   IGPSP,ILEPSP,ILESCR,ILEDF,ICURRWIN
+        common /wvglob2/ XGSCAL
+c
+        integer IOPEN,LWTYPE(10),LWSIZE(10,4),LSCALE(10),
+     .          IGPSP(10),ILEPSP,ILESCR,ILEDF,ICURRWIN
+        real(8) XGSCAL(10,4)
 c
 c  explanation of variables:
 c

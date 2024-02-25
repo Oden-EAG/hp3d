@@ -25,7 +25,7 @@
 !
 subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
 !
-   use control    , only : NEXACT, GEOM_TOL
+   use control    , only : NEXACT
    use parameters , only : MAXEQNH,MAXEQNE,MAXEQNV,MAXEQNQ, ZERO
    use common_prob_data
 !

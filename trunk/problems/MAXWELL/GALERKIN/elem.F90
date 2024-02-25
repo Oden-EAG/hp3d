@@ -70,11 +70,6 @@ end subroutine elem
 !
 subroutine elem_maxwell(Mdle,Nrdof, Zaloc,Zbloc)
 !
-!..ALOC: holds local element stiffness matrices
-!..BLOC: holds local element load vectors
-   use assembly, only: ALOC,BLOC
-   use control , only: INTEGRATION
-   use physics , only: NR_PHYSA
    use common_prob_data
    use data_structure3D
    use element_data

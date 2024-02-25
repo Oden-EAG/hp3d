@@ -36,7 +36,7 @@
 !
          implicit none
 !
-         integer, intent(in) :: list(n),n
+         integer, intent(in) :: n,list(n)
          integer :: i,j
          type(indmap) :: Index_map_init
 !

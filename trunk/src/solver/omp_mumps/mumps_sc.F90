@@ -26,10 +26,6 @@ subroutine mumps_sc(mtype)
 !
    use data_structure3D, only: NRNODS, NRELES, ELEM_ORDER
    use assembly,         only: NR_RHS, MAXDOFM, MAXDOFS,       &
-                               MAXbrickH, MAXmdlbH,            &
-                               MAXbrickE, MAXmdlbE,            &
-                               MAXbrickV, MAXmdlbV,            &
-                               MAXbrickQ,                      &
                                NEXTRACT, IDBC, ZDOFD, ZERO,    &
                                ALOC, BLOC, AAUX, ZAMOD, ZBMOD, &
                                NR_PHYSA, MAXNODM
@@ -57,7 +53,7 @@ subroutine mumps_sc(mtype)
    integer :: iel,mdle,i,j,k,l,k1,k2,nod
 !
 !..dummy variables
-   VTYPE   :: zvoid1(1),zvoid2(1)
+   VTYPE :: zvoid1(1),zvoid2(1)
 !
 !..work space for celem
    integer, dimension(MAXNODM) :: nodm,ndofmH,ndofmE,ndofmV,ndofmQ

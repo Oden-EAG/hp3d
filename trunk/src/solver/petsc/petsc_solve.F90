@@ -32,10 +32,6 @@ subroutine petsc_solve(mtype)
    use data_structure3D, only: NRNODS, NRELES_SUBD, ELEM_SUBD,    &
                                get_subd
    use assembly,         only: NR_RHS, MAXDOFM, MAXDOFS,          &
-                               MAXbrickH, MAXmdlbH,               &
-                               MAXbrickE, MAXmdlbE,               &
-                               MAXbrickV, MAXmdlbV,               &
-                               MAXbrickQ,                         &
                                NEXTRACT, IDBC, ZDOFD, ZERO,       &
                                ALOC, BLOC, AAUX, ZAMOD, ZBMOD,    &
                                NR_PHYSA, MAXNODM
@@ -135,6 +131,8 @@ subroutine petsc_solve(mtype)
 !
 !..timer
    real(8) :: start_time,end_time,time_stamp
+!
+   real(8), parameter :: eps = 1.0d-8
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -876,9 +874,9 @@ subroutine petsc_solve(mtype)
    petsc_maxits = PETSC_DEFAULT_INTEGER
    call KSPSetTolerances(petsc_ksp,petsc_rtol,petsc_atol,petsc_dtol,petsc_maxits, petsc_ierr); CHKERRQ(petsc_ierr)
 !  print tolerance info
-   if (petsc_rtol  .eq.PETSC_DEFAULT_REAL   ) petsc_rtol  =1.0d-5
-   if (petsc_atol  .eq.PETSC_DEFAULT_REAL   ) petsc_atol  =1.0d-50
-   if (petsc_dtol  .eq.PETSC_DEFAULT_REAL   ) petsc_dtol  =1.0d5
+   if (dabs(petsc_rtol-PETSC_DEFAULT_REAL) < eps) petsc_rtol = 1.0d-5
+   if (dabs(petsc_atol-PETSC_DEFAULT_REAL) < eps) petsc_atol = 1.0d-50
+   if (dabs(petsc_dtol-PETSC_DEFAULT_REAL) < eps) petsc_dtol = 1.0d5
    if (petsc_maxits.eq.PETSC_DEFAULT_INTEGER) petsc_maxits=10000
    fmt='(ES10.2)'; write(v1,fmt) petsc_rtol; write(v2,fmt) petsc_atol; write(v3,fmt) petsc_dtol;
    fmt='(I10)'   ; write(val_string,fmt) petsc_maxits

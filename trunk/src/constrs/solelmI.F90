@@ -55,7 +55,7 @@
       VTYPE :: zvalH(MAXEQNH,2*MAXbrickH)
       VTYPE :: zvalE(MAXEQNE,2*MAXbrickE)
       VTYPE :: zvalV(MAXEQNV,2*MAXbrickV)
-      VTYPE :: zvoid
+      VTYPE :: zvoid(1,1)
 !
       integer :: kH,kE,kV,kQ,ivar,j,kp,l
       integer :: nrnodm,nrdoflH,nrdoflE,nrdoflV,nrdoflQ

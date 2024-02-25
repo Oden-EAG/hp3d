@@ -63,7 +63,6 @@
 !
 #if HP3D_DEBUG
       integer :: nvarQ
-      integer :: iload,ibeg,iend
       integer :: iprint
       iprint=0
 #endif

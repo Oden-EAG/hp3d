@@ -30,7 +30,6 @@
    subroutine elem_maxwell_gram_pris(Mdle,Fld_flag,NrTest,NrdofH, GramP)
 !
    use data_structure3D
-   use control, only: INTEGRATION
    use commonParam
    use laserParam
    use parametersDPG
@@ -45,16 +44,13 @@
    VTYPE  , intent(out) :: GramP(NrTest*(NrTest+1)/2)
 !
 !..declare edge/face type variables
-   integer :: etype, etype1, ftype
+   integer :: etype, etype1
 !
 !..declare element order, orientation for edges and faces
    integer, dimension(19)    :: norder
    integer, dimension(12)    :: norient_edge
    integer, dimension(6)     :: norient_face
    integer, dimension(5)     :: norder_f, norder_fe
-!
-!..face order
-   integer, dimension(5)     :: norderf
 !
 !..geometry dof (work space for nodcor)
    real(8) :: xnod(3,MAXbrickH)
@@ -77,24 +73,12 @@
    real(8) :: rsolH
 !
 !..variables for geometry
-   real(8), dimension(3)    :: xi,x,rn
-   real(8), dimension(3,2)  :: dxidt,dxdt,rt
+   real(8), dimension(3)    :: x
    real(8), dimension(3,3)  :: dxdxi,dxidx
-   real(8), dimension(2)    :: t
 !
 !..H1 shape functions
    real(8), dimension(MAXbrickH)   :: shapH
    real(8), dimension(3,MAXbrickH) :: gradH
-!
-!..load vector for the enriched space
-   complex(8) :: bload_E(NrTest)
-!
-!..2D quadrature data
-   real(8), dimension(2,MAXNINT2ADD) :: tloc
-   real(8), dimension(  MAXNINT2ADD) :: wtloc
-!
-!..for auxiliary computation
-   complex(8) :: zaux
 !
 !..Maxwell load and auxiliary variables
    complex(8) :: zJ(3)
@@ -103,12 +87,11 @@
    integer :: nre, nrf
 !
 !..various variables for the problem
-   real(8) :: h_elem,rjac,weight,wa,v2n,CC,EE,CE,E,EC,q,h,omeg,alpha_scale
-   real(8) :: bjac,minz,maxz,elem_z
-   integer :: i1,j1,i2,j2
-   integer :: i12,j12,k12,k1,k2,fa,fb,i3mod,j3mod,kH,kk,i,ik,j,k,l,nint,kE,n,m,p,pe
-   integer :: iflag,iprint,itime,iverb
-   integer :: nordP,nsign,ifc,ndom,info,icomp,idec
+   real(8) :: rjac
+   real(8) :: minz,maxz,elem_z
+   integer :: i12,j12,k12,fa,fb,i3mod,j3mod,kk,p,pe
+   integer :: iflag
+   integer :: nordP,ndom
    complex(8) :: zfval
    complex(8) :: za(3,3),zc(3,3)
    complex(8) :: zaJ(3,3),zcJ(3,3)
@@ -139,19 +122,16 @@
    complex(8), allocatable :: AUXER_zb(:,:,:,:), AUXER_zc(:,:,:,:)
    complex(8), allocatable :: AUXRE_zb(:,:,:,:), AUXRE_zc(:,:,:,:)
 !
-   integer :: a,b,sa,sb,sc,alph,beta
+   integer :: a,b,sa,sb
    integer :: pxy,pz
-   integer :: l1,l2,l3,i3,j3,k3,idxbeta,idxalph
-   integer :: idxa,idxa2,idxa3,idxb,idxb2,idxb3,m1,m2
-   integer :: nord1,nord2,nord3,nintxy,nintz
+   integer :: i3,j3,m1,m2
+   integer :: nord3,nintxy,nintz
    integer :: nrdof
    integer :: nrdofH12, nrdofE12, nrdofH3
-   integer :: nrdofH12_tr,nrdofH3_tr
    real(8) :: xi12(2),xi3,wt12,wt3
    real(8) :: wt123,weighthh,weightvv
    real(8) :: xiloc_xy(2,MAXNINT2ADD), xiloc_z(MAXPP+1)
    real(8) :: wloc_xy(MAXNINT2ADD), wloc_z(MAXPP+1)
-   real(8), dimension(3,MAXNINT3ADD) :: wloc3
    real(8), dimension(3) :: xip
 !
    real(8)   , dimension(3,3) :: D_za,D_zc,D_aux,D_aux2,C,D,D_RR
@@ -162,11 +142,9 @@
 !
    integer, allocatable :: mapEE(:)
 !
-   integer, dimension(3,3) :: deltak
+   integer, external :: ij_upper_to_packed
 !
-!..for Gram matrix compressed storage format
-   integer :: nk
-   nk(k1,k2) = (k2-1)*k2/2+k1
+   integer, dimension(3,3) :: deltak
 !
 !..Identity/Kronecker delta tensor
    deltak=0
@@ -175,11 +153,6 @@
    enddo
 !
 !---------------------------------------------------------------------
-!
-!..Set iverb = 0/1 (Non-/VERBOSE)
-   iverb = 0
-!..Set iprint = 0/1 (Non-/VERBOSE)
-   iprint = 0
 !
 !..element type
    etype = NODES(Mdle)%ntype
@@ -795,7 +768,7 @@
 !
                      if (j3mod.le.nrdofH3 .and. m1.le.m2) then
 !                    ...Sum EE_11 and CC_11 terms
-                        kk = nk(2*m1-1,2*m2-1)
+                        kk = ij_upper_to_packed(2*m1-1,2*m2-1)
                         do b=1,3
                            do a=1,3
                               gramP(kk) = gramP(kk)                        &
@@ -829,7 +802,7 @@
                         endif
 !
 !                    ...Sum EC and CE terms
-                        kk = nk(2*m1-1,2*m2)
+                        kk = ij_upper_to_packed(2*m1-1,2*m2)
                         do b=1,3
                            do a=1,3
                               gramP(kk) = gramP(kk)                        &
@@ -860,7 +833,7 @@
 !
 !                    ...Sum other CE and EC terms
                         if (m1.ne.m2) then
-                           kk = nk(2*m1  ,2*m2-1)
+                           kk = ij_upper_to_packed(2*m1  ,2*m2-1)
                            do b=1,3
                               do a=1,3
                                  gramP(kk) = gramP(kk)                     &
@@ -891,7 +864,7 @@
                         endif
 !
 !                    ...Sum EE_22 and CC_22 terms
-                        kk = nk(2*m1  ,2*m2  )
+                        kk = ij_upper_to_packed(2*m1  ,2*m2  )
                         do b=1,3
                            do a=1,3
                               gramP(kk) = gramP(kk)                        &

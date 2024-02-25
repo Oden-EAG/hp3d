@@ -237,9 +237,6 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
           blend_edge(ie) = blend
           dblend_edge(1:3,ie) = dblend(1:3)
         endif
-
-
-
 !
 !  .....add edge contribution
         Xp(1:3) = Xp(1:3) + xe(1:3)*blend

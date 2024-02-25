@@ -27,6 +27,8 @@ c
       integer :: i,j,j1,k,m1
       real(8) :: fac,tiny
 c
+      real(8), parameter :: eps = 1.0d-15
+c
 #if HP3D_DEBUG
       integer :: iprint
       iprint=0
@@ -57,7 +59,7 @@ c.......modify rows j
         do j=j1,m
 c
 c  .......skip if the leading coefficient is zero
-          if (a(j,i).eq.0.d0) cycle
+          if (dabs(a(j,i)) < eps) cycle
           fac = a(j,i)/a(i,i)
           do k=j1,m
             a(j,k) = a(j,k) - a(i,k)*fac

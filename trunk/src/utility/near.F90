@@ -15,7 +15,7 @@ logical function dnear(a,b)
 !
    implicit none
 !
-   real(8) :: a,b
+   real(8), intent(in) :: a,b
 !
    real(8), parameter :: eps = 1.0d-15
 !
@@ -42,12 +42,12 @@ logical function znear(a,b)
 !
    implicit none
 !
-   VTYPE   :: a,b
+   VTYPE, intent(in) :: a,b
+!
    real(8) :: diff_real,diff_imag
 !
    real(8), parameter :: eps = 1.0d-15
-!
-   real(8), external :: dreal_part,dimag_part
+   real(8), external  :: dreal_part,dimag_part
 !
    diff_real = dreal_part(a-b)
    diff_imag = dimag_part(a-b)

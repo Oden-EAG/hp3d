@@ -14,7 +14,7 @@ subroutine refresh
 !
    integer :: ntype
    integer :: nodesl(27),norientl(27)
-   integer :: i,iel,nod,nfath,nvef,mdle,subd
+   integer :: i,iel,nod,nfath,nvef,mdle
    integer :: nrdofH,nrdofE,nrdofV,nrdofQ
 !
 #if HP3D_DEBUG
@@ -41,7 +41,7 @@ subroutine refresh
 !          all active elements                                      |
 !--------------------------------------------------------------------
 !$OMP PARALLEL DEFAULT(SHARED)
-!$OMP DO PRIVATE(mdle,subd,nodesl,norientl,ntype,nvef) &
+!$OMP DO PRIVATE(mdle,nodesl,norientl,ntype,nvef) &
 !$OMP    SCHEDULE(GUIDED)
    do iel=1,NRELES_SUBD
 !

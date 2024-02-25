@@ -32,8 +32,7 @@
 !
    integer :: iel,mdle,nod,nrv,nre,nrf,nord
    integer :: i,j,k,nc,icase,nodp,nordh,nordv
-   integer :: je,jf,ne1,ne2,ne3,ne4,is,nods
-   integer :: nrsons,nordhs,nordvs
+   integer :: is,nods,nrsons,nordhs,nordvs
 !
    integer, allocatable :: buffer(:)
 !

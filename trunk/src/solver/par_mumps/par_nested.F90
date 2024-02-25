@@ -79,7 +79,7 @@ subroutine par_nested(mtype)
    integer :: count,src,ierr
 !
 !..dummy variables
-   VTYPE   :: zvoid1(1),zvoid2(1)
+   VTYPE :: zvoid1(1),zvoid2(1)
 !
 !..workspace for celem
    integer, dimension(MAXNODM) :: nodm,ndofmH,ndofmE,ndofmV,ndofmQ

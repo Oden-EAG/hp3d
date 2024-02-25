@@ -165,7 +165,7 @@ c  .....define the colors for contour plots
 c
 c  .......use the colors already defined
           do i=0,NR_COLORS-11
-            NPCOL(11+i)=float(i)/float(NR_COLORS-10)*8 + 2
+            NPCOL(11+i)=int(float(i)/float(NR_COLORS-10)*8 + 2)
           enddo
         elseif (Iwind.eq.5) then
 c
@@ -178,9 +178,9 @@ c  .......loop through the colors to be generated
             if (nrcol.ge.iram(1,nrrow+1)) nrrow = nrrow + 1
             alpha = float(nrcol-iram(1,nrrow))/
      .                (iram(1,nrrow+1)-iram(1,nrrow))
-            ir = alpha*iram(2,nrrow+1)+(1-alpha)*iram(2,nrrow)
-            ig = alpha*iram(3,nrrow+1)+(1-alpha)*iram(3,nrrow)
-            ib = alpha*iram(4,nrrow+1)+(1-alpha)*iram(4,nrrow)
+            ir = int(alpha*iram(2,nrrow+1)+(1-alpha)*iram(2,nrrow))
+            ig = int(alpha*iram(3,nrrow+1)+(1-alpha)*iram(3,nrrow))
+            ib = int(alpha*iram(4,nrrow+1)+(1-alpha)*iram(4,nrrow))
 c
 #if HP3D_DEBUG
             if (iprint.eq.1) then
@@ -193,7 +193,7 @@ c
 c
             call xgsetcm(10+i,ir,ig,ib)
             call   afill(11+i,ir,ig,ib)
-            nrcol = nrcol + 1000/(NR_COLORS-10)
+            nrcol = nrcol + int(1000.e0/(NR_COLORS-10))
             NPCOL(11+i)=10+i
           enddo
 c

@@ -63,7 +63,7 @@ subroutine elem(Mdle, Itest,Itrial)
    integer :: fld_flag
 !
 !..timer
-   real(8) :: start_time,end_time
+   !real(8) :: start_time,end_time
 !
 !----------------------------------------------------------------------
 !

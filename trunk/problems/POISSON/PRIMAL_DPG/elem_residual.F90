@@ -183,19 +183,14 @@ subroutine elem_residual_poisson(Mdle,                &
    integer :: k1, k2, k, l
    integer :: nordP, nrdof, nsign, ifc, info
 !
+   integer, external :: ij_upper_to_packed
+!
 #if HP3D_DEBUG
    integer :: iprint
-#endif
-!
-!..for Gram matrix compressed storage format
-   integer :: nk
-   nk(k1,k2) = (k2-1)*k2/2+k1
-!
-!-----------------------------------------------------------------------
-!
-#if HP3D_DEBUG
    iprint=0
 #endif
+!
+!-----------------------------------------------------------------------
 !
 !..element type
    etype = NODES(Mdle)%ntype
@@ -287,7 +282,7 @@ subroutine elem_residual_poisson(Mdle,                &
                     + gradHH(3,k2)*dxidx(3,1:3)
 !
 !        ...determine index in triangular packed format
-            k = nk(k1,k2)
+            k = ij_upper_to_packed(k1,k2)
 !
 !        ...H1 test inner product: (q,v) + (grad_h q, grad_h v)
             aux = q*v + (dq(1)*dv(1) + dq(2)*dv(2) + dq(3)*dv(3))

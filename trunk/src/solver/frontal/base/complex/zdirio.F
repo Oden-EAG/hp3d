@@ -249,7 +249,7 @@ c read the buffer length
 c
          slen=storage(ntape)
          read (ntape, rec=irecp, err=9300) slen
-         Len = slen
+         Len = int(slen)
          lenr = min0(lenf(iunit),Len)
 c
 c read the first buffer

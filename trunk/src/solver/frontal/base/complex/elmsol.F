@@ -67,7 +67,7 @@ c
       iprint=0
 #endif
 c
-      id = Aidx
+      id = int(Aidx)
       idm = id - 1
       idp = id + 1
 #if HP3D_DEBUG

@@ -41,7 +41,7 @@ subroutine set_3Dint_fi(EType,Norder, nordx,nordy,nordz,nintx,ninty, &
    real(8), intent(out) :: Waloc(3,MAXNINT3ADD)
    integer, intent(out) :: nordx,nordy,nordz,nintx,ninty,nintz
 !
-   integer :: i,l,l1,l2,l3,nordh,nordv,nord1,nord2,nord3
+   integer :: l,l1,l2,l3,nordh,nord1,nord2,nord3
 !
 #if HP3D_DEBUG
    integer :: iprint

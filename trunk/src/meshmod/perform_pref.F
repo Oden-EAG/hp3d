@@ -75,7 +75,7 @@ c       (module constrained_nodes)
         call get_connect_info(mdle, nodesl,norientl)
 c
 c  .....determine the order for element nodes implied by the middle node
-        call element_order(mdle,norientl,norder)
+        call element_order(mdle,norientl, norder)
 c
         ntype = NODES(mdle)%ntype
         nrv = nvert(ntype); nre = nedge(ntype); nrf = nface(ntype)

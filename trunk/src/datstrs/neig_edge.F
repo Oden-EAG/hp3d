@@ -47,7 +47,7 @@ c  ...element type
       integer :: etype
 c
 c  ...miscellanea
-      integer :: nod,nc,nrbl,nb,lab,ib,ie,nel,ibeg
+      integer :: nod,nc,nrbl,nb,lab,ib,ie,nel,ibeg,iend
 c
 #if HP3D_DEBUG
       integer :: iprint
@@ -112,7 +112,8 @@ c       middle node numbers coincide with element numbers...
         Neig(1,ib) = nel; Neig(2,ib) = 0
         etype = ELEMS(nel)%etype
         ibeg = nvert(etype)+1
-        call locate(nod, ELEMS(nel)%nodes(ibeg),nedge(etype), ie)
+        iend = nvert(etype)+nedge(etype)
+        call locate(nod,ELEMS(nel)%nodes(ibeg:iend),nedge(etype), ie)
         if (ie.eq.0) then
           write(*,7004)
  7004     format('neig_edge: INCONSISTENCY')

@@ -191,20 +191,19 @@ subroutine elem_residual_poisson_UW(Mdle,                                     &
 !..various variables for the problem
    real(8) :: rjac, bjac, fval, wa, weight
    integer :: iflag, nrf, nint
-   integer :: k1, k2, k, l, i
+   integer :: k1, k2, k, l
    integer :: nordP, nrdof, nsign, ifc, info
 !
+   integer, external :: ij_upper_to_packed
+!
 #if HP3D_DEBUG
-   integer :: iprint = 0
+   integer :: iprint
+   iprint = 0
 #endif
 !
-!..for Gram matrix compressed storage format
-   integer :: nk
-   nk(k1,k2) = (k2-1)*k2/2+k1
+!-----------------------------------------------------------------------
 !
    dofQ = ZERO; dofV = ZERO; dofE = ZERO; dofH = ZERO
-!
-!-----------------------------------------------------------------------
 !
 !..element type
    etype = NODES(Mdle)%ntype
@@ -312,7 +311,7 @@ subroutine elem_residual_poisson_UW(Mdle,                                     &
                     + gradHH(3,k2)*dxidx(3,1:3)
 !
 !..determine index in triangular packed format
-            k = nk(k1,k2)
+            k = ij_upper_to_packed(k1,k2)
 !
 !..H1 test inner product: (q,v) + (grad_h q, grad_h v)
             aux = q*v + (dq(1)*dv(1) + dq(2)*dv(2) + dq(3)*dv(3))
@@ -329,7 +328,7 @@ subroutine elem_residual_poisson_UW(Mdle,                                     &
 !            
             tau_a(1:3) = tau_a(1:3)/rjac
 
-            k = nk(k1,NrdofHH+k2)
+            k = ij_upper_to_packed(k1,NrdofHH+k2)
             aux = dv(1) * tau_a(1) + dv(2) * tau_a(2) + dv(3) * tau_a(3)
             gramP(k) = gramP(k) + aux * weight
          enddo
@@ -359,7 +358,7 @@ subroutine elem_residual_poisson_UW(Mdle,                                     &
 !            
             aux = divtau_a * divtau_b + 2.d0* (tau_a(1)*tau_b(1) + tau_a(2)*tau_b(2) + tau_a(3)*tau_b(3))
 !
-            k = nk(k1 + NrdofHH,k2 + NrdofHH)
+            k = ij_upper_to_packed(k1 + NrdofHH,k2 + NrdofHH)
             gramP(k) = gramP(k) +  weight * aux
 !.. end of first loop through enriched discont H(div) test functions            
          enddo

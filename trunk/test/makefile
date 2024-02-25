@@ -25,6 +25,7 @@ SRC_FILE     = attr_to_index.F90         \
                hexa_adapt_h_aniso.F90    \
                hexa_adapt_h_case1.F90    \
                hexa_adapt_h_iso.F90      \
+               ij_to_packed.F90          \
                index_to_attr.F90         \
                invert.F90                \
                isgn.F90                  \
@@ -55,6 +56,7 @@ TEST_SEQ = attr_to_index             \
            encode_decode_order       \
            encodg_decodg             \
            fact                      \
+           ij_to_packed              \
            index_to_attr             \
            invert                    \
            isgn                      \

@@ -213,9 +213,7 @@ subroutine elem_poisson(Mdle,                   &
    real(8) :: q, v, sn, aux
    real(8) :: dq(3), dp(3), dv(3), s(3)
 !
-!..for Gram matrix compressed storage format
-   integer :: nk
-   nk(k1,k2) = (k2-1)*k2/2+k1
+   integer, external :: ij_upper_to_packed
 !
 !---------------------------------------------------------------------
 !--------- INITIALIZE THE ELEMENT ORDER, ORIENTATION ETC. ------------
@@ -334,7 +332,7 @@ subroutine elem_poisson(Mdle,                   &
                     + gradHH(3,k2)*dxidx(3,1:3)
 !
 !        ...determine index in triangular packed format
-            k = nk(k1,k2)
+            k = ij_upper_to_packed(k1,k2)
 !
 !        ...H1 test inner product: (q,v) + (grad_h q, grad_h v)
             aux = q*v + (dq(1)*dv(1) + dq(2)*dv(2) + dq(3)*dv(3))

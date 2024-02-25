@@ -44,7 +44,7 @@ c
 c
       real(8), parameter :: sml2 = 1.d-15
 c
-      id = Aid
+      id = int(Aid)
       idm = id - 1
       idp = id + 1
       im = 0

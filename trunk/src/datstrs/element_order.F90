@@ -118,7 +118,7 @@ subroutine element_order(Mdle,Norientl, Norder)
 end subroutine element_order
 !
 !---------------------------------------------------------------------------------
-!> @brief  Given order of an element nodes, use the min rule in reverse to
+!> @brief  Given order of element nodes, use the min rule in reverse to
 !!         determine the necessary new order for the middle node
 !!
 !!
@@ -136,10 +136,10 @@ subroutine element_middle_node_order(Mdle,Norientl,Norder, Nordm)
 !
       implicit none
 !
-      integer,                intent(in)  :: Mdle
-      integer,                intent(out) :: Nordm
-      integer, dimension(27), intent(in)  :: Norientl
-      integer, dimension(19), intent(out) :: Norder
+      integer, intent(in)  :: Mdle
+      integer, intent(in)  :: Norientl(27)
+      integer, intent(in)  :: Norder(19)
+      integer, intent(out) :: Nordm
 !
       integer :: ntype,nord,nord1,nord2,nord3,norda,i,ie,ifc,nordh,nordv
 !

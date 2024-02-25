@@ -31,7 +31,7 @@ contains
 !
    use data_structure3D
    use bitvisit
-   use par_mesh,           only: DISTRIBUTED, HOST_MESH
+   use par_mesh, only: DISTRIBUTED, HOST_MESH
    use mpi_wrapper
 !
    implicit none
@@ -41,7 +41,7 @@ contains
    integer :: my_elems(NRELES_SUBD)
    integer :: nrelem_procs(NUM_PROCS), displs(NUM_PROCS)
 !
-   integer :: iel, mdle, subd, nrnodm, nrvert, nrelem, loc
+   integer :: iel, mdle, subd, nrnodm, nrvert, nrelem
    integer :: i, nod, nrelem_interf, ierr, n, ivert, off, sum
    integer :: ig, il, mdleI
 !
@@ -443,13 +443,13 @@ contains
    use data_structure3D
    use bitvisit
    use mpi_param
-   use par_mesh,           only: DISTRIBUTED, HOST_MESH
+   use par_mesh, only: DISTRIBUTED
 !
    implicit none
 !
    integer :: nodesl(27), norientl(27), nodm(MAXNODM)
 !
-   integer :: iel, mdle, subd, nrnodm, nrvert, nrelem, loc
+   integer :: iel, mdle, subd, nrnodm
    integer :: i, nod, nr_interf_elems
    integer, allocatable :: interf_elems(:)
 !
@@ -575,13 +575,13 @@ contains
    use data_structure3D
    use bitvisit
    use mpi_param
-   use par_mesh,           only: DISTRIBUTED, HOST_MESH
+   use par_mesh, only: DISTRIBUTED
 !
    implicit none
 !
    integer :: nodesl(27), norientl(27), nodm(MAXNODM)
 !
-   integer :: iel, mdle, subd, nrnodm, nrvert, nrelem, loc
+   integer :: iel, mdle, subd, nrnodm
    integer :: i, nod, nr_ghost_elems
    integer, allocatable :: ghost_elems(:)
 !

@@ -39,7 +39,7 @@ c
       real(8) :: Elem(*),Frnt(*),Bbuf(*),Buf(*)
 c
       integer :: i,id,ie,iel,ifg,igot,ill,inc,is,j,jerr
-      integer :: n,ne,negiel,numdes
+      integer :: md,n,ne,negiel,numdes
 c
       IB = 1
 cwb >
@@ -111,7 +111,8 @@ c pointers into Elem(): (1: points to rhs)
 c flag for solin2 (ifg=1: get rhs ; =2: get lhs as well)
 c
          ifg = 1
-         call solin2 (iel, ifg, NDOFM, NRHS, Amdest, Elem, Elem)
+         md = int(Amdest(1))
+         call solin2 (iel, ifg, NDOFM, NRHS, md, Elem, Elem)
 c        -------------------------------------------------------
 c debug print
 c

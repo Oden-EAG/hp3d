@@ -26,13 +26,12 @@ J ?= 24
 # Compiler
 # Tau performance tool
 ifeq ($(TAU_PERF),YES)
-  FF = tau_f90.sh
+  FC = tau_f90.sh
   CC = tau_cc.sh
 else
-  FF = mpif90
+  FC = mpif90
   CC = mpicc
 endif
-FC     =  $(FF)
 FFLAGS = -fPIC
 
 # Additional Intel compiler flags

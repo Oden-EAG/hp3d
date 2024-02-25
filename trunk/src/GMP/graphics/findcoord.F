@@ -41,7 +41,7 @@ c  ...derivatives of the physical coordinates wrt reference coordinates
       real(8) :: dxdeta(3,2)
 c
 c  ...work space for NR iterations
-      real(8) :: xy(2),aa(2,2),bb(2),deta(2)
+      real(8) :: xy(2),aa(2,2),bb(2),deta(2),aux(3,2)
 c
       real(8) :: d
       integer :: iter
@@ -68,7 +68,8 @@ c  .....Newton-Raphson iterations
         do iter=1,10
 c
           call recta_linear(No,Eta,X,Dxdeta)
-          call trobs(X, xy)
+          call trobs(X, aux(1:3,1))
+          xy(1:2) = aux(1:2,1)
 c
 c  .......residual
           bb(1:2) = Xp(1:2) - xy(1:2)
@@ -79,8 +80,10 @@ c  .......residual
           endif
 c
 c  .......tangent matrix
-          call trobs(Dxdeta(1:3,1), aa(1:2,1))
-          call trobs(Dxdeta(1:3,2), aa(1:2,2))
+          call trobs(Dxdeta(1:3,1), aux(1:3,1))
+          call trobs(Dxdeta(1:3,2), aux(1:3,2))
+          aa(1:2,1) = aux(1:2,1)
+          aa(1:2,2) = aux(1:2,2)
 c
 c  .......solve for the increment
           call gausse(aa,2,bb, deta,2)

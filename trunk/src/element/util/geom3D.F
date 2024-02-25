@@ -247,9 +247,10 @@ c
      .           ShapH(8),GradH(3,8),
      .           Eta(3),Detadxi(3,3),Dxideta(3,3)
 c
-      integer :: i,k,imas
+      integer :: k,imas
 c
 #if HP3D_DEBUG
+      integer :: i
       integer :: iprint
       iprint=0
       if (iprint.eq.1) then

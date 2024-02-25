@@ -67,7 +67,6 @@ end subroutine elem
 !
 subroutine elem_vect_poisson(Mdle,Nn, Zaloc,Zbloc)
 !
-   use control , only: INTEGRATION
    use data_structure3D
    use element_data
    use parameters
@@ -82,7 +81,7 @@ subroutine elem_vect_poisson(Mdle,Nn, Zaloc,Zbloc)
 !..aux variables
    real(8) :: rjac, fval, gval, wa, weight, q, p
    integer :: iflag, nrv, nre, nrf
-   integer :: nrdofH,nrdofE,nrdofV,nrdofQ,nint,k1,k2,l,ivar,n1,n2
+   integer :: nrdofH,nint,k1,k2,l,ivar,n1,n2
 !
 !----------------------------------------------------------------------
 !
@@ -102,7 +101,7 @@ subroutine elem_vect_poisson(Mdle,Nn, Zaloc,Zbloc)
 !
 !..geometry
    real(8) :: xi(3), dxidt(3,2), x(3), dxdxi(3,3), dxidx(3,3), dxdt(3,2)
-   real(8) :: rt(3,2), rn(3), t(2),bjac
+   real(8) :: rn(3), t(2),bjac
 !
 !..H1 shape functions
    real(8) :: shapH(MAXbrickH), gradH(3,MAXbrickH)
@@ -114,11 +113,12 @@ subroutine elem_vect_poisson(Mdle,Nn, Zaloc,Zbloc)
    real(8) :: tloc(2,MAX_NINT2), wtloc(MAX_NINT2)
 !
 !..workspace for trial and test variables
-   real(8) :: dq(3), u(3), dp(1:3), v(3), vec(3)
+   real(8) :: dq(3), dp(1:3)
 !
-   integer :: ivar1,ivar2,ifc,nsign
+   integer :: ifc,nsign
 !
 #if HP3D_DEBUG
+   integer :: ivar1,ivar2
    integer :: iprint
    iprint=0
 #endif

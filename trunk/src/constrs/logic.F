@@ -121,9 +121,9 @@ c  ...miscellanea
       integer :: ndofH,ndofHh,ndofHv
       integer :: ndofV,ndofQ,ndofHpp
       integer :: nrdofH,nrdofE,nrdofV,nrdofQ
-      integer :: nrdofH_loc,nrdofE_loc,nrdofV_loc
 c
 #if HP3D_DEBUG
+      integer :: nrdofH_loc,nrdofE_loc,nrdofV_loc
       integer :: iprint
       iprint=0
 #endif
@@ -136,7 +136,7 @@ c
       NdofmV = 0; NrconV = 0; NacV = 0; ConstrV = 0.d0
 c
 c     initialize constraints arrays
-      if (.NOT. INITIALIZED_CONSTR) call init_cnstr
+      if (.not. INITIALIZED_CONSTR) call init_cnstr
 c
 #if HP3D_DEBUG
       if (iprint.ge.1) then

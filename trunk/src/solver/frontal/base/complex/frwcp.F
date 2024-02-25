@@ -39,7 +39,7 @@ c
      .              Buf(*),Alelm(*)
 c
       integer :: i,id,ie,iel,ifg,iunsr,j,jerr,lenf
-      integer :: m,mke,n,ne,negiel,newl,newu,numdes
+      integer :: m,md,mke,n,ne,negiel,newl,newu,numdes
 c
 c  ...test......test......test......test......test......test......test...
 ccc      integer :: ndest1(100)
@@ -155,7 +155,8 @@ c flag for solin2 (ifg=1: get rhs ; =2: get lhs as well)
 c
 
          ifg = 2
-         call solin2 (iel, ifg, NDOFM, NRHS, Amdest, Elem, Elem(mke+1))
+         md = int(Amdest(1))
+         call solin2 (iel, ifg, NDOFM, NRHS, md, Elem, Elem(mke+1))
 c        --------------------------------------------------------------
 
 
@@ -389,9 +390,9 @@ c
                if (IPFSRE .eq. 1 .or. IPFSRE.eq.negiel) then
                   write (NFSOUT,7708) iel,Andest(ie),
      .                                ((Frnt(MKF+i),i=1,NFW),j=1,NRHS)
- 7708              format(1x,'FRWCP:  iel,Andest(ie):',i8,1p,(2e12.4,2x),
-     .                     /,10x,'Frnt: Eliminated RHS',/,
-     .                     (10x,1p,5(2e12.5,2x)))
+ 7708              format(1x,'FRWCP:  iel,Andest(ie):',i8,1p,
+     .                    (2e12.4,2x),/,10x,'Frnt: Eliminated RHS',/,
+     .                    (10x,1p,5(2e12.5,2x)))
                endif
 c
             endif

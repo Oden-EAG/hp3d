@@ -94,7 +94,7 @@ c convert the nodal destination vectors to dof destination vectors (Amde
 c  also determine the number of dof to eliminate from the front (ne)
 c  and the transfer loc for active dof in the front after eliminating (A
 c
-         call dest (numdes, Aldest, ne ,Amdest, Andest)
+         call dest (numdes, Aldest, ne, Amdest, Andest)
 c        -----------------------------------------------
 #if HP3D_DEBUG
          if (iprint.eq.1) then
@@ -106,7 +106,7 @@ c
 c pick up final frontwidth (after elim) for the next Element
 c
          if (jel .ne. 1) then
-            LFW = Alelm(jel-1)
+            LFW = int(Alelm(jel-1))
             if (LFW .gt. NFW) NFW = LFW
          endif
 c
@@ -240,7 +240,8 @@ c ----------------------------------------------------
 c
          if (IASSEM .eq. 0) then
 c
-            call solout (jel, NDOFM, NRHS, Amdest, Frnt)
+            md = int(Amdest(1))
+            call solout (jel, NDOFM, NRHS, md, Frnt)
 c           ---------------------------------------------
          else
 c
@@ -259,7 +260,7 @@ c ARDENT directives
 c$doit VBEST
 c
                do 160 i = 1,NDOFM
-                  md = Amdest(i)
+                  md = int(Amdest(i))
                   md = abs(md)
                   l = (j-1)*MFW + md
                   Elem(k) = Frnt(l)
@@ -274,7 +275,7 @@ cwb c
 cwb cvd$ select (vector)
 cwb c
 cwb                do 160 j = 1,NRHS
-cwb                   md = Amdest(i)
+cwb                   md = int(Amdest(i))
 cwb                   l = locr(j,md)
 cwb                   Elem(k+i) = Frnt(l)
 cwb                   k = k + NDOFM
@@ -289,7 +290,8 @@ c
               call pause
             endif
 #endif
-            call solout (jel, NDOFM, NRHS, Amdest, Elem)
+            md = int(Amdest(1))
+            call solout (jel, NDOFM, NRHS, md, Elem)
 c           ---------------------------------------------
 c debug print
 c

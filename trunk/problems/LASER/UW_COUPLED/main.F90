@@ -31,7 +31,7 @@ program main
    implicit none
 !
 !..auxiliary variables
-   integer :: i, ierr, req, ret, plen
+   integer :: i, ierr, plen
 !
    logical :: iPvAttr(7),iPvCompReal(18),iPvCompImag(18)
 !
@@ -528,7 +528,7 @@ subroutine worker_main()
    integer :: ierr
 !
 !..auxiliary variables
-   integer :: idec, i, r, lb, count, src
+   integer :: idec, r, lb, count, src
 !
 !----------------------------------------------------------------------
 !

@@ -27,7 +27,7 @@ program main
    implicit none
 !
 !..auxiliary variables
-   integer :: i, ierr, req, ret, plen
+   integer :: i, ierr, plen
 !
 !..OMP variables
 #if HP3D_USE_OPENMP
@@ -426,7 +426,7 @@ subroutine worker_main()
    integer :: ierr
 !
 !..auxiliary variables
-   integer :: idec, i, r, lb, count, src
+   integer :: idec, r, lb, count, src
 !
 !----------------------------------------------------------------------
 !

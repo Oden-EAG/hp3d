@@ -31,7 +31,8 @@ c
       integer :: No,I1,I2,Ierror
       real(8) :: Eta,X(3),Dxdeta(3)
 c
-      integer :: nsurf(4)
+      real(8) :: eta_aux(1)
+      integer :: nsurf(4),nsurf_aux(6)
       real(8) :: xv(3,2),dxv(3),fgrad(3),f3grad(3),f4grad(3),
      .           xs(3),sfact(4),void(4),aij(3,3),aux(3)
 c
@@ -131,7 +132,10 @@ c
       enddo
 c
 c  ...use NR method to determine the point
-      call mnewt(2,nsurf,Eta,void,xs,sfact, X)
+      eta_aux(1) = Eta
+      nsurf_aux(1:4) = nsurf(1:4)
+      nsurf_aux(5:6) = 0
+      call mnewt(2,nsurf_aux,eta_aux,void,xs,sfact, X)
 c
 c  ...compute derivatives
       do i=1,2

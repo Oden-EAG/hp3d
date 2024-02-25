@@ -42,17 +42,19 @@ subroutine getf(Mdle,X, Zfval,ZJval)
    VTYPE,dimension(  MAXEQNQ,3  ) ::  dvalQ
    VTYPE,dimension(  MAXEQNQ,3,3) :: d2valQ
 !
-!..miscellaneus
-   integer :: ivar,ibeg,icomp,jcomp,k,l,iprint
+#if DEBUG_MODE
+   integer :: iprint
+   iprint = 0
+#endif
 !
 !------------------------------------------------------------------------------
 !
-   iprint = 0
-!
+#if DEBUG_MODE
    if (iprint.eq.1) then
       write(*,7001) Mdle,X
  7001 format(' getf: Mdle,X = ',i8,2x,3(f8.3,2x))
    endif
+#endif
 !
 !..initialize source terms
    Zfval = ZERO
@@ -144,11 +146,13 @@ subroutine getf(Mdle,X, Zfval,ZJval)
 !     ...do nothing
    end select
 !
+#if DEBUG_MODE
    if (iprint.eq.1) then
       write(*,7010) Zfval
  7010 format(' getf: Zfval = ',2e12.5)
       call pause
    endif
+#endif
 !
 end subroutine getf
 !
@@ -189,15 +193,7 @@ subroutine get_bdSource(Mdle,X,Rn, Imp_val)
    VTYPE,dimension(  MAXEQNQ,3  ) ::  zdvalQ
    VTYPE,dimension(  MAXEQNQ,3,3) :: zd2valQ
 !
-!..miscellaneus
-   integer    :: ivar,ibeg,icomp,jcomp,k,l
-   complex(8) :: zaux
-!
-   VTYPE  , dimension(3)   :: rntimesE,rn2timesE,rntimesH
-   real(8)                 :: impedanceConstant
-   real(8)                 :: E   ! vector field
-   real(8), dimension(3)   :: dE  ! 1st derivative
-   real(8), dimension(3,3) :: d2E ! 2nd derivative
+   VTYPE,dimension(3) :: rntimesE,rn2timesE,rntimesH
 !
 #if HP3D_DEBUG
    integer :: iprint

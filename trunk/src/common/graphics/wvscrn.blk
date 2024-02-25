@@ -1,4 +1,6 @@
         common /wvscrn/ MAXSCX,MAXSCY,MAXCOL,MAXDFX,MAXDFY
+
+        integer MAXSCX,MAXSCY,MAXCOL,MAXDFX,MAXDFY
 c
 c  explanation of variables:
 c

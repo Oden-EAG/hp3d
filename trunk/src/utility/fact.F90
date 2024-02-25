@@ -1,19 +1,22 @@
 !-------------------------------------------------------------
-!> @brief Returns factorial n!
+!> @brief Returns factorial N!
 !> @date Feb 2023
 !-------------------------------------------------------------
-integer function fact(n)
+integer function fact(N)
 !
    implicit none
-   integer :: n,i
 !
-   if (n.lt.0) then
+   integer, intent(in) :: N
+!
+   integer :: i
+!
+   if     (N.lt.0) then
       fact = 0
-   elseif (n.eq.0) then
+   elseif (N.eq.0) then
       fact = 1
    else
       fact = 1
-      do i = 1,n
+      do i = 1,N
          fact = fact*i
       enddo
    endif
