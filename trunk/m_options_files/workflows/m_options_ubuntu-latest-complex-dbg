@@ -51,8 +51,10 @@ CFLAGS  =
 # (-DAdd_ or -DAdd__ or -DUPPER)
 CDEFS   = -DAdd_
 
-HP3D_MPIRUN = mpirun
-HP3D_MPI_NP = 2
+# Utility used to launch MPI jobs
+HP3D_MPIEXEC    = mpirun
+HP3D_MPIEXEC_NP = -np
+HP3D_MPI_NP     = 2
 
 #------------------------------------------------------------------
 # INTEL MKL LIBRARY

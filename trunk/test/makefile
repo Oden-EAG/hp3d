@@ -7,8 +7,11 @@ info :
 
 include ../m_options
 
-HP3D_MPIRUN ?= mpirun
-HP3D_MPI_NP ?= 2
+HP3D_MPIEXEC    ?= mpirun
+HP3D_MPIEXEC_NP ?= -np
+HP3D_MPI_NP     ?= 2
+
+HP3D_MPI_LAUNCH ?= $(HP3D_MPIEXEC) $(HP3D_MPIEXEC_NP) $(HP3D_MPI_NP)
 
 OBJ_PATH     = _obj_
 EXEC_PATH    = _exec_
@@ -191,7 +194,7 @@ run : one
 .PHONY : run-par
 run-par : one
 	@printf "\n Running test: "$(TEST)"\n"
-	@pass=1; $(HP3D_MPIRUN) -np $(HP3D_MPI_NP) ./$(EXEC_PATH)/$(TEST) || pass=0; \
+	@pass=1; $(HP3D_MPI_LAUNCH) ./$(EXEC_PATH)/$(TEST) || pass=0; \
 	if [ $$((pass)) -eq 1 ]; then \
 		printf "          test_"$(TEST)" PASSED\n\n"; \
 		true; \

@@ -66,6 +66,11 @@ endif
 # (-DAdd_ or -DAdd__ or -DUPPER)
 CDEFS   = -DAdd_
 
+# Utility used to launch MPI jobs
+HP3D_MPIEXEC    = $(MPIEXEC)
+HP3D_MPIEXEC_NP = -np
+HP3D_MPI_NP     = 2
+
 #------------------------------------------------------------------
 # LINKING
 #------------------------------------------------------------------

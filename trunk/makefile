@@ -51,6 +51,10 @@ HP3D_USE_MPI_F08   ?= 0
 HP3D_USE_OPENMP    ?= 0
 HP3D_USE_X11       ?= 1
 
+HP3D_MPIEXEC    ?= mpirun
+HP3D_MPIEXEC_NP ?= -np
+HP3D_MPI_NP     ?= 2
+
 ####################################################
 
 HP3D_LIBNAME   = libhp3d.a
@@ -181,6 +185,9 @@ fastlib :
 	@echo " - HP3D_USE_MPI_F08       :" $(HP3D_USE_MPI_F08)
 	@echo " - HP3D_USE_OPENMP        :" $(HP3D_USE_OPENMP)
 	@echo " - HP3D_USE_X11           :" $(HP3D_USE_X11)
+	@echo " - HP3D_MPIEXEC           :" $(HP3D_MPIEXEC)
+	@echo " - HP3D_MPIEXEC_NP        :" $(HP3D_MPIEXEC_NP)
+	@echo " - HP3D_MPI_NP            :" $(HP3D_MPI_NP)
 	@echo " - Preprocessor options   :" $(CCDEFS)
 	@echo " - HP3D Library           :" $(LIB_PATH)/$(HP3D_LIBNAME)
 	@echo " - Frontal Solver Library :" $(LIB_PATH)/$(FRONTAL_NAME)
