@@ -58,8 +58,6 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
    type (DMUMPS_STRUC) :: mumps_sub, mumps_int
 #endif
 !
-   type(MPI_Comm) :: mumps_comm
-!
 !..number of owned dofs per MPI proc
 !  (owned from the viewpoint of the nested dissection solver)
    integer, intent(in) :: nproc
@@ -77,7 +75,12 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
    integer :: mRANK,mPROCS,mSUB_RANK,mINT_PROCS,mINT_RANK
    integer :: group,key,color,count,src,rcv,tag,ierr
    integer :: nrdof_int(nproc/mSUB_PROCS)
-   type(MPI_Comm) :: mpi_comm_sub,mpi_comm_int
+!
+#if HP3D_USE_MPI_F08
+   type(MPI_Comm) :: mumps_comm, mpi_comm_sub, mpi_comm_int
+#else
+   integer        :: mumps_comm, mpi_comm_sub, mpi_comm_int
+#endif
 !
 !..aux variables for subproblem assembly
    integer :: dof_off,dof_sub,dof_int,dof_int_L,dof_int_R
@@ -108,7 +111,11 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
 !
  123 format('[',I3,'] ',A10,': ',I8)
 !
+#if HP3D_USE_MPI_F08
    mumps_comm%MPI_VAL = mumps%COMM
+#else
+   mumps_comm         = mumps%COMM
+#endif
 !
    call MPI_COMM_RANK(mumps_comm, mRANK ,ierr)
    call MPI_COMM_SIZE(mumps_comm, mPROCS,ierr)

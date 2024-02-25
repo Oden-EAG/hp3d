@@ -28,7 +28,12 @@ subroutine par_solve(mumps)
    type (DMUMPS_STRUC), intent(inout) :: mumps
 #endif
 !
+!..MPI communicator
+#if HP3D_USE_MPI_F08
    type(MPI_Comm) :: mumps_comm
+#else
+   integer        :: mumps_comm
+#endif
 !
 !..aux variables
    integer :: ierr,mRANK,mNUM_PROCS
@@ -42,7 +47,11 @@ subroutine par_solve(mumps)
 ! -----------------------------------------------------------------------
 !
 !..mumps%COMM uses F90 binding
+#if HP3D_USE_MPI_F08
    mumps_comm%MPI_VAL = mumps%COMM
+#else
+   mumps_comm         = mumps%COMM
+#endif
 !
    call MPI_COMM_RANK(mumps_comm, mRANK     ,ierr)
    call MPI_COMM_SIZE(mumps_comm, mNUM_PROCS,ierr)

@@ -7,8 +7,12 @@
 !----------------------------------------------------------------------
 module mpi_wrapper
 !
-   use mpi_param
+#if HP3D_USE_MPI_F08
    use mpi_f08
+#else
+   use MPI
+#endif
+   use mpi_param
    use environment, only: QUIET_MODE
 !
    implicit none
@@ -103,7 +107,12 @@ module mpi_wrapper
 !
 end module mpi_wrapper
 
-! MPI wrapper module using F90 MPI binding
+!----------------------------------------------------------------------
+!     module:              mpif90_wrapper
+!     purpose:             MPI wrapper module using F90 MPI binding
+!                          (some dependencies require F90 MPI)
+!     last modified:       Feb 2024
+!----------------------------------------------------------------------
 module mpif90_wrapper
 !
    use mpi_param

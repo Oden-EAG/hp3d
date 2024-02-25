@@ -107,8 +107,12 @@ subroutine par_nested(mtype)
    type (SPARSE_MATRIX_T) :: Aib_sparse
    type (MATRIX_DESCR)    :: Aib_descr
 !
-!..MPI communicator (F08 binding)
+!..MPI communicator
+#if HP3D_USE_MPI_F08
    type(MPI_Comm) :: mumps_comm
+#else
+   integer        :: mumps_comm
+#endif
 !
 !..timer
    real(8) :: start_time,end_time,time_stamp
@@ -148,7 +152,11 @@ subroutine par_nested(mtype)
    call mumps_start_subd
 !
 !..mumps%COMM uses F90 binding
+#if HP3D_USE_MPI_F08
    mumps_comm%MPI_VAL = mumps_par%COMM
+#else
+   mumps_comm         = mumps_par%COMM
+#endif
 !
 ! ----------------------------------------------------------------------
 !  STEP 1 : 1ST LOOP THROUGH ELEMENTS, 1ST CALL TO CELEM TO GET INFO

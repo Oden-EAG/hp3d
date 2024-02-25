@@ -38,7 +38,11 @@ subroutine mumps_start
 !  communicator containing a single processor to the MUMPS library
 !
 !..Define a communicator for the package.
+#if HP3D_USE_MPI_F08
    mumps_par%COMM = MPI_COMM_SELF%MPI_VAL
+#else
+   mumps_par%COMM = MPI_COMM_SELF
+#endif
 !
 !..PAR
 !     0 : host is not involved in factorization/solve phases

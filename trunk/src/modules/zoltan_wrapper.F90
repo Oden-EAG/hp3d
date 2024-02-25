@@ -89,7 +89,11 @@ module zoltan_wrapper
   100 format(A,F5.2)
 !
 !  ...create Zoltan memory, and set default parameters
+#if HP3D_USE_MPI_F08
       zz => Zoltan_Create(MPI_COMM_WORLD%MPI_VAL)
+#else
+      zz => Zoltan_Create(MPI_COMM_WORLD)
+#endif
       if (.not. associated(zz)) then
          write(*,*) 'zoltan_w_init: Fatal error in Zoltan_Create.'
          return

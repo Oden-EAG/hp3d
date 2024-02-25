@@ -66,8 +66,12 @@ subroutine par_mumps_sc(mtype)
 !..MPI variables
    integer :: count,src,ierr
 !
-!..MPI communicator (F08 binding)
+!..MPI communicator
+#if HP3D_USE_MPI_F08
    type(MPI_Comm) :: mumps_comm
+#else
+   integer        :: mumps_comm
+#endif
 !
 !..dummy variables
    VTYPE   :: zvoid1(1),zvoid2(1)
@@ -119,7 +123,11 @@ subroutine par_mumps_sc(mtype)
 !  STEP 1 : 1ST LOOP THROUGH ELEMENTS, 1ST CALL TO CELEM TO GET INFO
 !  ----------------------------------------------------------------------
 !
+#if HP3D_USE_MPI_F08
    mumps_comm%MPI_VAL = mumps_par%COMM
+#else
+   mumps_comm         = mumps_par%COMM
+#endif
 !
    if (IPRINT_TIME .eq. 1) then
       call MPI_BARRIER(mumps_comm, ierr)
