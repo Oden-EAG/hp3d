@@ -11,7 +11,8 @@ HP3D_MPIEXEC    ?= mpirun
 HP3D_MPIEXEC_NP ?= -np
 HP3D_MPI_NP     ?= 2
 
-HP3D_MPI_LAUNCH ?= $(HP3D_MPIEXEC) $(HP3D_MPIEXEC_NP) $(HP3D_MPI_NP)
+HP3D_MPI_SEQ ?= $(HP3D_MPIEXEC) $(HP3D_MPIEXEC_NP) 1
+HP3D_MPI_PAR ?= $(HP3D_MPIEXEC) $(HP3D_MPIEXEC_NP) $(HP3D_MPI_NP)
 
 OBJ_PATH     = _obj_
 EXEC_PATH    = _exec_
@@ -180,7 +181,7 @@ all : seq par
 .PHONY : run
 run : one
 	@printf "\n Running test: "$(TEST)"\n"
-	@pass=1; $(HP3D_MPIRUN) -np 1 ./$(EXEC_PATH)/$(TEST) || pass=0; \
+	@pass=1; $(HP3D_MPI_SEQ) ./$(EXEC_PATH)/$(TEST) || pass=0; \
 	if [ $$((pass)) -eq 1 ]; then \
 		printf "          test_"$(TEST)" PASSED\n\n"; \
 		true; \
@@ -194,7 +195,7 @@ run : one
 .PHONY : run-par
 run-par : one
 	@printf "\n Running test: "$(TEST)"\n"
-	@pass=1; $(HP3D_MPI_LAUNCH) ./$(EXEC_PATH)/$(TEST) || pass=0; \
+	@pass=1; $(HP3D_MPI_PAR) ./$(EXEC_PATH)/$(TEST) || pass=0; \
 	if [ $$((pass)) -eq 1 ]; then \
 		printf "          test_"$(TEST)" PASSED\n\n"; \
 		true; \
