@@ -9,7 +9,7 @@ HP3D_BASE_PATH = /home/runner/work/hp3d/hp3d/trunk
 COMPLEX ?= 1
 DEBUG   ?= 0
 
-HP3D_USE_OPENMP    ?= 0
+HP3D_USE_OPENMP    ?= 1
 HP3D_USE_INTEL_MKL ?= 0
 HP3D_USE_X11       ?= 1
 
