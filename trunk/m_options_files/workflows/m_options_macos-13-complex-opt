@@ -185,7 +185,7 @@ PROB_INCS    += $(HP3D_LINK_INCS)   \
 # Files with ending in .F and .F90 (not .f and .f90)
 # are preprocessed according to certain directives
 
-HP3D_USE_MPI_F08   = 0
+HP3D_USE_MPI_F08   = 1
 HP3D_USE_X11       = 1
 
 PROB_PP_DEFS  = -D"C_MODE=$(COMPLEX)" \
