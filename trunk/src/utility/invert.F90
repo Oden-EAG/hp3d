@@ -36,9 +36,9 @@ end subroutine get_zdet
 !> @date Mar 2023
 subroutine dinvert(A, Ainv,Adet)
    implicit none
-   real(8), dimension(3,3), intent(in)  :: A
-   real(8), dimension(3,3), intent(out) :: Ainv
-   real(8),                 intent(out) :: Adet
+   real(8), intent(in)  :: A(3,3)
+   real(8), intent(out) :: Ainv(3,3)
+   real(8), intent(out) :: Adet
    real(8) :: det(3)
    logical, external :: dnear
 
