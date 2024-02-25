@@ -174,7 +174,7 @@ subroutine get_elem_L2NormDiff(Mdle,Attr1,Attr2, L2NormDiff)
    integer :: nint,iflag,l,i,j,ibeg1,ibeg2,icomp,nflag
    real(8) :: weight,wa
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: ndom
 #endif
 !
@@ -407,7 +407,7 @@ subroutine get_elem_L2NormAttr(Mdle,Attr, L2Norm)
    integer :: nint,iflag,l,i,ibeg,icomp,nflag
    real(8) :: weight,wa
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: ndom
 #endif
 !
@@ -662,7 +662,7 @@ subroutine get_elem_Norm(Mdle,Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
    integer :: nint,iattr,l,i,j,ibeg,iflag,icomp,ivar,nflag
    real(8) :: weight,wa
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: ndom
 #endif
 !

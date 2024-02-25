@@ -155,7 +155,7 @@ endif
 .PHONY : lib
 
 lib :
-	@$(MAKE) depend;$(MAKE) depend;$(MAKE) fastlib;$(MAKE) install
+	@$(MAKE) depend; $(MAKE) depend; $(MAKE) fastlib; $(MAKE) install
 
 #-------------------------------------------------
 .PHONY : fast

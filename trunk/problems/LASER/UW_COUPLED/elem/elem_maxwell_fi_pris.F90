@@ -238,7 +238,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 !
    integer :: deltak(3,3)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    real(8), allocatable :: dummyC(:), dummyE(:,:)
    integer :: iphys,icomp,nordEfc,nordEEfc
    integer :: iprint = 0

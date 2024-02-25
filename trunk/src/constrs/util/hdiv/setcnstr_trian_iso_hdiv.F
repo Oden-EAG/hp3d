@@ -70,7 +70,7 @@ c
 c
       real(8), parameter :: eps = 1.0d-13
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       real(8) :: diff,val
       integer :: i1,i2,ians,mp,np
 #endif

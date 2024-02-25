@@ -61,7 +61,7 @@ c
 c  ...tolerance for Newton-Raphson iterations
       real(8), parameter :: epsilon = 1.d-4
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: ivar
       integer :: iprint
       iprint = 0

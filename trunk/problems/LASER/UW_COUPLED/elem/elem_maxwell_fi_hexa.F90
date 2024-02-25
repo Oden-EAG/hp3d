@@ -256,7 +256,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !
    integer, external :: ij_upper_to_packed
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: icomp,iphys
    integer :: iprint
    iprint = 0

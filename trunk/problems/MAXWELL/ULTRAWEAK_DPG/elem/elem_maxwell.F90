@@ -141,7 +141,7 @@
 !
       integer, external :: ij_upper_to_packed
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
 !  ...Set iprint = 0/1 (Non-/VERBOSE)
       integer :: iprint
       iprint = 0
