@@ -7,8 +7,12 @@
 !----------------------------------------------------------------------
 module mpi_wrapper
 !
-   use mpi_param
+#if HP3D_USE_MPI_F08
+   use mpi_f08
+#else
    use MPI
+#endif
+   use mpi_param
    use environment, only: QUIET_MODE
 !
    implicit none
@@ -93,7 +97,7 @@ module mpi_wrapper
    subroutine mpi_w_handle_err(Ierr,Str)
       integer         , intent(in) :: Ierr
       character(len=*), intent(in) :: Str
-      character(len=64) :: errStr
+      character(len=MPI_MAX_ERROR_STRING) :: errStr
       integer :: ierr1,len
       if (Ierr .ne. MPI_SUCCESS) then
          call MPI_Error_string(Ierr, errStr, len, ierr1)
@@ -102,3 +106,36 @@ module mpi_wrapper
    end subroutine mpi_w_handle_err
 !
 end module mpi_wrapper
+
+!----------------------------------------------------------------------
+!     module:              mpif90_wrapper
+!     purpose:             MPI wrapper module using F90 MPI binding
+!                          (some dependencies require F90 MPI)
+!     last modified:       Feb 2024
+!----------------------------------------------------------------------
+module mpif90_wrapper
+!
+   use mpi_param
+   use MPI
+   use environment, only: QUIET_MODE
+!
+   implicit none
+!
+   contains
+!
+!----------------------------------------------------------------------
+!     routine:    mpif90_w_handle_err
+!     purpose:    handle error code returned by an MPI function
+!----------------------------------------------------------------------
+   subroutine mpi_w_handle_err(Ierr,Str)
+      integer         , intent(in) :: Ierr
+      character(len=*), intent(in) :: Str
+      character(len=MPI_MAX_ERROR_STRING) :: errStr
+      integer :: ierr1,len
+      if (Ierr .ne. MPI_SUCCESS) then
+         call MPI_Error_string(Ierr, errStr, len, ierr1)
+         write(*,*) Str,': Ierr = ', Ierr, errStr(1:len)
+      endif
+   end subroutine mpi_w_handle_err
+
+end module mpif90_wrapper

@@ -53,11 +53,11 @@ subroutine mumps_sc(mtype)
    integer, dimension(NR_PHYSA) :: nrdofi,nrdofb
 !
 !..integer counters
-   integer    :: nrdofm,nrdofc,nrnodm,nrdof,nrdof_mdl,ndof
-   integer    :: iel,mdle,i,j,k,l,k1,k2,nod
+   integer :: nrdofm,nrdofc,nrnodm,nrdof,nrdof_mdl,ndof
+   integer :: iel,mdle,i,j,k,l,k1,k2,nod
 !
 !..dummy variables
-   VTYPE   :: zvoid
+   VTYPE   :: zvoid1(1),zvoid2(1)
 !
 !..work space for celem
    integer, dimension(MAXNODM) :: nodm,ndofmH,ndofmE,ndofmV,ndofmQ
@@ -130,11 +130,11 @@ subroutine mumps_sc(mtype)
       if (ISTC_FLAG) then
          !write(*,*) 'celem_systemI, iel = ', iel
          call celem_systemI(iel,mdle,1, nrdofs,nrdofm,nrdofc,nodm,  &
-            ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid,zvoid)
+            ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid1,zvoid2)
       else
          !write(*,*) 'celem, iel = ', iel
          call celem(mdle,1, nrdofs,nrdofm,nrdofc,nodm,  &
-            ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid,zvoid)
+            ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid1,zvoid2)
       endif
 !
       k = nrdofc**2

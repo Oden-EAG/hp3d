@@ -73,9 +73,14 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
 !
 !..aux variables for subcommunicators
    integer :: mRANK,mPROCS,mSUB_RANK,mINT_PROCS,mINT_RANK
-   integer :: mpi_comm_sub,mpi_comm_int
    integer :: group,key,color,count,src,rcv,tag,ierr
    integer :: nrdof_int(nproc/mSUB_PROCS)
+!
+#if HP3D_USE_MPI_F08
+   type(MPI_Comm) :: mumps_comm, mpi_comm_sub, mpi_comm_int
+#else
+   integer        :: mumps_comm, mpi_comm_sub, mpi_comm_int
+#endif
 !
 !..aux variables for subproblem assembly
    integer :: dof_off,dof_sub,dof_int,dof_int_L,dof_int_R
@@ -106,8 +111,14 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
 !
  123 format('[',I3,'] ',A10,': ',I8)
 !
-   call MPI_COMM_RANK(mumps%COMM, mRANK ,ierr)
-   call MPI_COMM_SIZE(mumps%COMM, mPROCS,ierr)
+#if HP3D_USE_MPI_F08
+   mumps_comm%MPI_VAL = mumps%COMM
+#else
+   mumps_comm         = mumps%COMM
+#endif
+!
+   call MPI_COMM_RANK(mumps_comm, mRANK ,ierr)
+   call MPI_COMM_SIZE(mumps_comm, mPROCS,ierr)
    if (mPROCS .ne. nproc) then
       write(*,*) 'par_fiber: mPROCS != nproc : ',mPROCS,nproc
    endif
@@ -135,14 +146,14 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
       goto 90
    endif
 !
-   call MPI_BARRIER(mumps%COMM, ierr); start_time = MPI_Wtime()
+   call MPI_BARRIER(mumps_comm, ierr); start_time = MPI_Wtime()
 !
 !..divide into "small enough" subproblems (groups) and solve separately
 !  [Step 1: define communicators for the subproblems]
    group = mRANK / mSUB_PROCS
    color = group
    key   = MOD(mRANK,mSUB_PROCS)
-   call MPI_COMM_SPLIT(mumps%COMM,color,key, mpi_comm_sub,ierr)
+   call MPI_COMM_SPLIT(mumps_comm,color,key, mpi_comm_sub,ierr)
    call MPI_COMM_RANK(mpi_comm_sub, mSUB_RANK,ierr)
    if (mSUB_RANK .ne. key) then
       write(*,5050) 'RANK, mSUB_RANK, key = ',RANK,mSUB_RANK,key
@@ -155,7 +166,7 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
    color = MPI_UNDEFINED; mINT_RANK = -1
    key   = group
    if (mSUB_RANK .eq. ROOT) color = 0
-   call MPI_COMM_SPLIT(mumps%COMM,color,key, mpi_comm_int,ierr)
+   call MPI_COMM_SPLIT(mumps_comm,color,key, mpi_comm_int,ierr)
    if (mSUB_RANK .eq. ROOT) then
       call MPI_COMM_RANK(mpi_comm_int, mINT_RANK ,ierr)
       call MPI_COMM_SIZE(mpi_comm_int, mINT_PROCS,ierr)
@@ -194,7 +205,7 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
 !  to group reps of other groups
    if (mSUB_RANK .eq. ROOT) then
       count = mumps%N; src = ROOT
-      call MPI_BCAST(mumps%RHS,count,MPI_VTYPE,src,mumps_int%COMM,ierr)
+      call MPI_BCAST(mumps%RHS,count,MPI_VTYPE,src,mpi_comm_int,ierr)
    endif
 !
 !..allocate subproblem data structures
@@ -409,10 +420,10 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
 !     hence we can overwrite the values (which should currently be zeros on the host)
    if (mSUB_RANK .eq. ROOT) then
       src = mSUB_PROCS-1; count = dof_sub*dof_int_R; tag = 1
-      call MPI_RECV(mumps_sub%RHS(dof_sub*(NR_RHS+dof_int_L)+1:dof_sub*(NR_RHS+dof_int)),count,MPI_VTYPE,src,tag,mumps_sub%COMM, MPI_STATUS_IGNORE,ierr)
+      call MPI_RECV(mumps_sub%RHS(dof_sub*(NR_RHS+dof_int_L)+1:dof_sub*(NR_RHS+dof_int)),count,MPI_VTYPE,src,tag,mpi_comm_sub, MPI_STATUS_IGNORE,ierr)
    elseif (mSUB_RANK .eq. mSUB_PROCS-1) then
       rcv = ROOT; count = dof_sub*dof_int_R; tag = 1
-      call MPI_SEND(mumps_sub%RHS(dof_sub*(NR_RHS+dof_int_L)+1:dof_sub*(NR_RHS+dof_int)),count,MPI_VTYPE,rcv,tag,mumps_sub%COMM, ierr)
+      call MPI_SEND(mumps_sub%RHS(dof_sub*(NR_RHS+dof_int_L)+1:dof_sub*(NR_RHS+dof_int)),count,MPI_VTYPE,rcv,tag,mpi_comm_sub, ierr)
    endif
 !
 !..percentage increase in estimated workspace for global interface problem
@@ -432,7 +443,7 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
 !..send A_ib matrix to host (left proc) to be assembled
    if (mSUB_RANK .eq. ROOT) then
       src = mSUB_PROCS-1; count = 1; tag = 1
-      call MPI_RECV(l,count,MPI_INTEGER,src,tag,mumps_sub%COMM, MPI_STATUS_IGNORE,ierr)
+      call MPI_RECV(l,count,MPI_INTEGER,src,tag,mpi_comm_sub, MPI_STATUS_IGNORE,ierr)
       if (kib + l > nnz_ib) then ! CHECK (initial allocation was insufficient)
          write(*,*) 'MUST REALLOCATE since kib + l > nnz_ib',kib,l,nnz_ib
          allocate(tmp_irn(kib + l),tmp_jcn(kib + l),tmp_val(kib + l))
@@ -441,27 +452,27 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
          tmp_val(1:kib) = Aib_val(1:kib); call move_alloc(tmp_val, Aib_val)
       endif
       count = l; tag = 2
-      call MPI_RECV(Aib_row(kib+1:kib+l),count,MPI_INTEGER,src,tag,mumps_sub%COMM, MPI_STATUS_IGNORE,ierr)
+      call MPI_RECV(Aib_row(kib+1:kib+l),count,MPI_INTEGER,src,tag,mpi_comm_sub, MPI_STATUS_IGNORE,ierr)
       tag = 3
-      call MPI_RECV(Aib_col(kib+1:kib+l),count,MPI_INTEGER,src,tag,mumps_sub%COMM, MPI_STATUS_IGNORE,ierr)
+      call MPI_RECV(Aib_col(kib+1:kib+l),count,MPI_INTEGER,src,tag,mpi_comm_sub, MPI_STATUS_IGNORE,ierr)
       tag = 4
-      call MPI_RECV(Aib_val(kib+1:kib+l),count,MPI_VTYPE,src,tag,mumps_sub%COMM, MPI_STATUS_IGNORE,ierr)
+      call MPI_RECV(Aib_val(kib+1:kib+l),count,MPI_VTYPE,src,tag,mpi_comm_sub, MPI_STATUS_IGNORE,ierr)
       nnz_ib = kib + l
       ! reduction (sum) over Aii (dense matrix)
       count = dof_int*dof_int_R; tag = 5
-      call MPI_RECV(Aii(1:dof_int,dof_int_L+1:dof_int),count,MPI_VTYPE,src,tag,mumps_sub%COMM, MPI_STATUS_IGNORE,ierr)
+      call MPI_RECV(Aii(1:dof_int,dof_int_L+1:dof_int),count,MPI_VTYPE,src,tag,mpi_comm_sub, MPI_STATUS_IGNORE,ierr)
    elseif (mSUB_RANK .eq. mSUB_PROCS-1) then
       rcv = ROOT; count = 1; tag = 1
-      call MPI_SEND(kib,count,MPI_INTEGER,rcv,tag,mumps_sub%COMM, ierr)
+      call MPI_SEND(kib,count,MPI_INTEGER,rcv,tag,mpi_comm_sub, ierr)
       count = kib; tag = 2
-      call MPI_SEND(Aib_row(1:kib),count,MPI_INTEGER,rcv,tag,mumps_sub%COMM, ierr)
+      call MPI_SEND(Aib_row(1:kib),count,MPI_INTEGER,rcv,tag,mpi_comm_sub, ierr)
       tag = 3
-      call MPI_SEND(Aib_col(1:kib),count,MPI_INTEGER,rcv,tag,mumps_sub%COMM, ierr)
+      call MPI_SEND(Aib_col(1:kib),count,MPI_INTEGER,rcv,tag,mpi_comm_sub, ierr)
       tag = 4
-      call MPI_SEND(Aib_val(1:kib),count,MPI_VTYPE,rcv,tag,mumps_sub%COMM, ierr)
+      call MPI_SEND(Aib_val(1:kib),count,MPI_VTYPE,rcv,tag,mpi_comm_sub, ierr)
       ! reduction (sum) over Aii (dense matrix)
       count = dof_int*dof_int_R; tag = 5
-      call MPI_SEND(Aii(1:dof_int,dof_int_L+1:dof_int),count,MPI_VTYPE,rcv,tag,mumps_sub%COMM, ierr)
+      call MPI_SEND(Aii(1:dof_int,dof_int_L+1:dof_int),count,MPI_VTYPE,rcv,tag,mpi_comm_sub, ierr)
       deallocate(Aib_val,Aib_row,Aib_col,Aii)
       goto 60
    endif
@@ -470,7 +481,7 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
 !  each group (representative) works on assembling their part of the interface problem
    ni = dof_int; nb = dof_sub
 !
-   call MPI_BARRIER(mumps_int%COMM, ierr); time_stamp = MPI_Wtime()
+   call MPI_BARRIER(mpi_comm_int, ierr); time_stamp = MPI_Wtime()
 !
    Aib_descr%type = SPARSE_MATRIX_TYPE_GENERAL
 #if C_MODE
@@ -509,7 +520,7 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
                               ni, nb, ZONE, Aii, ni)
 #endif
 !
-   call MPI_BARRIER(mumps_int%COMM, ierr)
+   call MPI_BARRIER(mpi_comm_int, ierr)
    if (mINT_RANK.eq.ROOT .and. info) then
       write(*,7891) '[',RANK,'] INTERFACE ASSEMBLY Sparse MKL: ', MPI_Wtime()-time_stamp
 7891  format(A,I4,A,F12.5)
@@ -559,9 +570,9 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
 !..gather RHS vector information on host
    count = mumps_int%N
    if (RANK .eq. ROOT) then
-      call MPI_REDUCE(MPI_IN_PLACE,mumps_int%RHS,count,MPI_VTYPE,MPI_SUM,ROOT,mumps_int%COMM, ierr)
+      call MPI_REDUCE(MPI_IN_PLACE,mumps_int%RHS,count,MPI_VTYPE,MPI_SUM,ROOT,mpi_comm_int, ierr)
    else
-      call MPI_REDUCE(mumps_int%RHS,mumps_int%RHS,count,MPI_VTYPE,MPI_SUM,ROOT,mumps_int%COMM, ierr)
+      call MPI_REDUCE(mumps_int%RHS,mumps_int%RHS,count,MPI_VTYPE,MPI_SUM,ROOT,mpi_comm_int, ierr)
    endif
 !
 !..solve interface problem
@@ -579,7 +590,7 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
 !..backsubstitute to obtain subproblem solutions
 !  1. broadcast interface solution to group representatives
    count = mumps_int%N; src = ROOT
-   call MPI_BCAST(mumps_int%RHS,count,MPI_VTYPE,src,mumps_int%COMM, ierr)
+   call MPI_BCAST(mumps_int%RHS,count,MPI_VTYPE,src,mpi_comm_int, ierr)
 !
 !..2. Perform backsubstitution to obtain subproblem bubble solution (assuming NR_RHS=1 currently)
 !     NOTE: All vectors and matrices here are dense
@@ -603,9 +614,9 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
 !
    count = mumps%N
    if (mINT_RANK .eq. ROOT) then
-      call MPI_REDUCE(MPI_IN_PLACE,mumps%RHS,count,MPI_VTYPE,MPI_SUM,ROOT,mumps_int%COMM, ierr)
+      call MPI_REDUCE(MPI_IN_PLACE,mumps%RHS,count,MPI_VTYPE,MPI_SUM,ROOT,mpi_comm_int, ierr)
    else
-      call MPI_REDUCE(mumps%RHS,mumps%RHS,count,MPI_VTYPE,MPI_SUM,ROOT,mumps_int%COMM, ierr)
+      call MPI_REDUCE(mumps%RHS,mumps%RHS,count,MPI_VTYPE,MPI_SUM,ROOT,mpi_comm_int, ierr)
    endif
 !
 !..cleanup
@@ -613,7 +624,7 @@ recursive subroutine par_fiber(mumps,nrdof,nproc,level)
 !
  60 continue
 !
-   call MPI_BARRIER(mumps%COMM, ierr)
+   call MPI_BARRIER(mumps_comm, ierr)
    if (mRANK.eq.ROOT) then
       time_stamp = MPI_Wtime()-start_time
       write(*,9090) '[',RANK,'] par_fiber (level ',level,'): ',time_stamp,' seconds'

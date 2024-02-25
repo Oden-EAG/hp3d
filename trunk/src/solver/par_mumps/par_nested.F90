@@ -59,7 +59,6 @@ subroutine par_nested(mtype)
                          mumps_start_subd,mumps_destroy_subd
    use par_mesh  , only: DISTRIBUTED,HOST_MESH
    use mpi_wrapper
-
    use mkl_spblas
 !
    implicit none
@@ -73,14 +72,14 @@ subroutine par_nested(mtype)
    integer, dimension(NR_PHYSA) :: nrdofi,nrdofb
 !
 !..integer counters
-   integer    :: nrdofm,nrdofc,nrnodm,nrdof,nrdof_mdl,ndof
-   integer    :: iel,mdle,subd,i,j,k,l,k1,k2,nod,idec
+   integer :: nrdofm,nrdofc,nrnodm,nrdof,nrdof_mdl,ndof
+   integer :: iel,mdle,subd,i,j,k,l,k1,k2,nod,idec
 !
 !..MPI variables
    integer :: count,src,ierr
 !
 !..dummy variables
-   VTYPE   :: zvoid
+   VTYPE   :: zvoid1(1),zvoid2(1)
 !
 !..workspace for celem
    integer, dimension(MAXNODM) :: nodm,ndofmH,ndofmE,ndofmV,ndofmQ
@@ -107,6 +106,13 @@ subroutine par_nested(mtype)
    VTYPE  , allocatable :: Aib_val(:)
    type (SPARSE_MATRIX_T) :: Aib_sparse
    type (MATRIX_DESCR)    :: Aib_descr
+!
+!..MPI communicator
+#if HP3D_USE_MPI_F08
+   type(MPI_Comm) :: mumps_comm
+#else
+   integer        :: mumps_comm
+#endif
 !
 !..timer
    real(8) :: start_time,end_time,time_stamp
@@ -145,12 +151,19 @@ subroutine par_nested(mtype)
    call mumps_start_par
    call mumps_start_subd
 !
+!..mumps%COMM uses F90 binding
+#if HP3D_USE_MPI_F08
+   mumps_comm%MPI_VAL = mumps_par%COMM
+#else
+   mumps_comm         = mumps_par%COMM
+#endif
+!
 ! ----------------------------------------------------------------------
 !  STEP 1 : 1ST LOOP THROUGH ELEMENTS, 1ST CALL TO CELEM TO GET INFO
 ! ----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       if (RANK .eq. ROOT) write(*,1001)
  1001 format(' STEP 1 started : Get assembly info')
       start_time = MPI_Wtime()
@@ -179,8 +192,8 @@ subroutine par_nested(mtype)
 !..compute whether node is subdomain bubble or subdomain interface node
 !  (if NOD_SUM(nod) > 1, then node is at the interface)
    count = NRNODS
-   call MPI_ALLREDUCE(MPI_IN_PLACE,NOD_OWN,count,MPI_INTEGER,MPI_MIN,mumps_par%COMM,ierr)
-   call MPI_ALLREDUCE(MPI_IN_PLACE,NOD_SUM,count,MPI_INTEGER,MPI_SUM,mumps_par%COMM,ierr)
+   call MPI_ALLREDUCE(MPI_IN_PLACE,NOD_OWN,count,MPI_INTEGER,MPI_MIN,mumps_comm,ierr)
+   call MPI_ALLREDUCE(MPI_IN_PLACE,NOD_SUM,count,MPI_INTEGER,MPI_SUM,mumps_comm,ierr)
 !
    allocate(MAXDOFS(NR_PHYSA))
    MAXDOFS = 0; MAXDOFM = 0
@@ -206,10 +219,10 @@ subroutine par_nested(mtype)
 !  ...get information from celem
       if (ISTC_FLAG) then
          call celem_systemI(iel,mdle,idec, nrdofs,nrdofm,nrdofc,nodm,  &
-            ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid,zvoid)
+            ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid1,zvoid2)
       else
          call celem(mdle,idec, nrdofs,nrdofm,nrdofc,nodm,  &
-            ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid,zvoid)
+            ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid1,zvoid2)
       endif
 !
 !  ...update the maximum number of local dof
@@ -284,7 +297,7 @@ subroutine par_nested(mtype)
    nrdof_subd(0:NUM_PROCS-1) = 0
    nrdof_subd(RANK) = nrdof ! subdomain interface dofs from owned nodes
    count = NUM_PROCS
-   call MPI_ALLREDUCE(MPI_IN_PLACE,nrdof_subd,count,MPI_INTEGER,MPI_MAX,mumps_par%COMM,ierr)
+   call MPI_ALLREDUCE(MPI_IN_PLACE,nrdof_subd,count,MPI_INTEGER,MPI_MAX,mumps_comm,ierr)
 !
 !..calculate prefix sum for global offsets for global interface dofs
    nrdof = 0
@@ -301,7 +314,7 @@ subroutine par_nested(mtype)
 !
 !..communicate offsets (to receive offsets for non-owned nodes within subdomain, i.e., at subdomain interface)
    count = NRNODS
-   call MPI_ALLREDUCE(MPI_IN_PLACE,NFIRST_DOF,count,MPI_INTEGER,MPI_MAX,mumps_par%COMM,ierr)
+   call MPI_ALLREDUCE(MPI_IN_PLACE,NFIRST_DOF,count,MPI_INTEGER,MPI_MAX,mumps_comm,ierr)
 !
 !..calculate total number of (interface) dofs
    nrdof = 0
@@ -311,15 +324,15 @@ subroutine par_nested(mtype)
 !
 !..compute total number of condensed element bubble dofs
    count = 1
-   call MPI_ALLREDUCE(MPI_IN_PLACE,nrdof_mdl,count,MPI_INTEGER,MPI_SUM,mumps_par%COMM,ierr)
+   call MPI_ALLREDUCE(MPI_IN_PLACE,nrdof_mdl,count,MPI_INTEGER,MPI_SUM,mumps_comm,ierr)
 !
 !..compute total number of condensed subdomain bubble dofs
    nrdof_bub = 0; count = 1;
-   call MPI_ALLREDUCE(nrdof_subd_bub,nrdof_bub,count,MPI_INTEGER,MPI_SUM,mumps_par%COMM,ierr)
+   call MPI_ALLREDUCE(nrdof_subd_bub,nrdof_bub,count,MPI_INTEGER,MPI_SUM,mumps_comm,ierr)
 !
 !..compute total number of non-zeros in global interface matrix
    nnz_loc = int8(nrdof_subd_con**2); nnz = 0_8; count = 1;
-   call MPI_ALLREDUCE(nnz_loc,nnz,count,MPI_INTEGER8,MPI_SUM,mumps_par%COMM,ierr)
+   call MPI_ALLREDUCE(nnz_loc,nnz,count,MPI_INTEGER8,MPI_SUM,mumps_comm,ierr)
 !
 !..total number of (interface) dof is nrdof
    NRDOF_CON = nrdof
@@ -336,7 +349,7 @@ subroutine par_nested(mtype)
 ! ----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       end_time = MPI_Wtime()
       Mtime(1) = end_time-start_time
       if (RANK .eq. ROOT) write(*,1002) Mtime(1)
@@ -347,7 +360,7 @@ subroutine par_nested(mtype)
 !  STEP 2 : ASSEMBLE AND STORE IN SPARSE FORM
 ! ----------------------------------------------------------------------
 !
-   call MPI_BARRIER(mumps_par%COMM, ierr)
+   call MPI_BARRIER(mumps_comm, ierr)
    if (RANK .eq. ROOT) then
       write(*,2010) '       Number of dof   : nrdof_con      = ', NRDOF_CON,  &
                     '                         nrdof_bub      = ', nrdof_bub,  &
@@ -355,7 +368,7 @@ subroutine par_nested(mtype)
                     '                         nrdof_tot      = ', NRDOF_TOT,  &
                     '       Total interf nnz: nnz            = ', nnz
    endif
-   call MPI_BARRIER(mumps_par%COMM, ierr)
+   call MPI_BARRIER(mumps_comm, ierr)
    if (info) then
    write(*,2011) '[', RANK, '] Local interf dof: nrdof_subd_con = ', nrdof_subd_con, &
                        '       Local bubble dof: nrdof_subd_bub = ', nrdof_subd_bub, &
@@ -369,7 +382,7 @@ subroutine par_nested(mtype)
 
 2010 format(A,I12,/,A,I12,/,A,I12,/,A,I12,/,A,I12,/)
 2011 format(A,I4,A,I12,/,A,I12,/,A,I12,/,A,I12,/,A,I12,/)
-   call MPI_BARRIER(mumps_par%COMM, ierr)
+   call MPI_BARRIER(mumps_comm, ierr)
 !
 !..memory allocation for local subdomain MUMPS solve
 !  TODO write warning if subdomain has NO bubble dofs,
@@ -380,7 +393,7 @@ subroutine par_nested(mtype)
    endif
 !
    if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       if (RANK .eq. ROOT) write(*,1003)
  1003 format(/,' STEP 2 started : Global Assembly')
       start_time = MPI_Wtime()
@@ -620,7 +633,7 @@ subroutine par_nested(mtype)
    if (IPRINT_TIME .eq. 1) then
       !write(*,2101) RANK,MPI_Wtime()-start_time
  2101 format('[',I4,'] - Subdomain Assembly: ',f12.5,'  seconds')
-      call MPI_BARRIER(mumps_par%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       end_time = MPI_Wtime()
       Mtime(2) =  end_time-start_time
       if (RANK .eq. ROOT) write(*,1004) Mtime(2)
@@ -632,7 +645,7 @@ subroutine par_nested(mtype)
 !----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       if (RANK .eq. ROOT) write(*,1005)
  1005 format(' STEP 3 started : Local solve')
       start_time = MPI_Wtime()
@@ -660,7 +673,7 @@ subroutine par_nested(mtype)
  3101 format('[',I4,'] - Analysis : ',f12.5,'  seconds',/,A,F11.3,/,A,I1)
    endif
 !
-   if (info) call MPI_BARRIER(mumps_par%COMM, ierr)
+   if (info) call MPI_BARRIER(mumps_comm, ierr)
 !
   35 continue
 !
@@ -690,7 +703,7 @@ subroutine par_nested(mtype)
  3102 format('[',I4,'] - Factorize: ',f12.5,'  seconds',/,A,F11.3)
    endif
 !
-   if (info) call MPI_BARRIER(mumps_par%COMM, ierr)
+   if (info) call MPI_BARRIER(mumps_comm, ierr)
 !
 !..MUMPS solve
    mumps_bub%JOB = 3
@@ -715,7 +728,7 @@ subroutine par_nested(mtype)
    if (IPRINT_TIME .eq. 1) then
       !write(*,3104) RANK,MPI_Wtime()-start_time
  3104 format('[',I4,'] - Local Solve: ',f12.5,'  seconds')
-      call MPI_BARRIER(mumps_par%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       end_time = MPI_Wtime()
       Mtime(3) = end_time-start_time
       if (RANK .eq. ROOT) write(*,1006) Mtime(3)
@@ -729,7 +742,7 @@ subroutine par_nested(mtype)
 !----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       if (RANK .eq. ROOT) write(*,1007)
  1007 format(' STEP 4 started : Construct condensed global system')
       start_time = MPI_Wtime()
@@ -737,7 +750,7 @@ subroutine par_nested(mtype)
 !
    ni = nrdof_subd_con; nb = mumps_bub%N
 !
-   call MPI_BARRIER(mumps_par%COMM, ierr); time_stamp = MPI_Wtime()
+   call MPI_BARRIER(mumps_comm, ierr); time_stamp = MPI_Wtime()
 !
    Aib_descr%type = SPARSE_MATRIX_TYPE_GENERAL
 #if C_MODE
@@ -776,7 +789,7 @@ subroutine par_nested(mtype)
                               ni, nb, ZONE, Aii, ni)
 #endif
 !
-   call MPI_BARRIER(mumps_par%COMM, ierr)
+   call MPI_BARRIER(mumps_comm, ierr)
    if (RANK.eq.ROOT) then
       write(*,7891) '  Sparse: ', MPI_Wtime()-time_stamp
 7891  format(A,F12.5)
@@ -824,13 +837,13 @@ subroutine par_nested(mtype)
 !..gather RHS vector information on host
    count = mumps_par%N
    if (RANK .eq. ROOT) then
-      call MPI_REDUCE(MPI_IN_PLACE,mumps_par%RHS,count,MPI_VTYPE,MPI_SUM,ROOT,mumps_par%COMM,ierr)
+      call MPI_REDUCE(MPI_IN_PLACE,mumps_par%RHS,count,MPI_VTYPE,MPI_SUM,ROOT,mumps_comm,ierr)
    else
-      call MPI_REDUCE(mumps_par%RHS,mumps_par%RHS,count,MPI_VTYPE,MPI_SUM,ROOT,mumps_par%COMM,ierr)
+      call MPI_REDUCE(mumps_par%RHS,mumps_par%RHS,count,MPI_VTYPE,MPI_SUM,ROOT,mumps_comm,ierr)
    endif
 !
    if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       end_time = MPI_Wtime()
       Mtime(4) = end_time-start_time
       if (RANK .eq. ROOT) write(*,1008) Mtime(4)
@@ -842,7 +855,7 @@ subroutine par_nested(mtype)
 !----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       if (RANK .eq. ROOT) write(*,1009)
  1009 format(' STEP 5 started : Global solve')
       start_time = MPI_Wtime()
@@ -852,7 +865,7 @@ subroutine par_nested(mtype)
    !call par_fiber(mumps_par,nrdof_subd,NUM_PROCS,1)
 !
   if (IPRINT_TIME .eq. 1) then
-     call MPI_BARRIER(mumps_par%COMM, ierr)
+     call MPI_BARRIER(mumps_comm, ierr)
      end_time = MPI_Wtime()
      Mtime(5) =  end_time-start_time
      if (RANK .eq. ROOT) write(*,1010) Mtime(5)
@@ -868,7 +881,7 @@ subroutine par_nested(mtype)
 !----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       if (RANK .eq. ROOT) write(*,1011)
  1011 format(' STEP 6 started : Backsubstitution for bubble solution')
       start_time = MPI_Wtime()
@@ -876,10 +889,10 @@ subroutine par_nested(mtype)
 !
 !..broadcast global solution from host to other processes
    count = mumps_par%N; src = ROOT
-   call MPI_BCAST (mumps_par%RHS,count,MPI_VTYPE,src,mumps_par%COMM,ierr)
+   call MPI_BCAST (mumps_par%RHS,count,MPI_VTYPE,src,mumps_comm,ierr)
 !
    if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       time_stamp = MPI_Wtime()-start_time
       if (RANK .eq. ROOT) write(*,3004) time_stamp
  3004 format(' - Broadcast: ',f12.5,'  seconds')
@@ -906,7 +919,7 @@ subroutine par_nested(mtype)
    deallocate(ZSOL_SUBD)
 !
    if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       end_time = MPI_Wtime()
       Mtime(6) = end_time-start_time
       if (RANK .eq. ROOT) write(*,1012) Mtime(6)
@@ -918,7 +931,7 @@ subroutine par_nested(mtype)
 ! ----------------------------------------------------------------------
 !
    if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       if (RANK .eq. ROOT) write(*,1013)
  1013 format(' STEP 7 started : Store the solution')
       start_time = MPI_Wtime()
@@ -951,7 +964,7 @@ subroutine par_nested(mtype)
 !$OMP END PARALLEL
 !
    if (IPRINT_TIME .eq. 1) then
-      call MPI_BARRIER(mumps_par%COMM, ierr)
+      call MPI_BARRIER(mumps_comm, ierr)
       end_time = MPI_Wtime()
       Mtime(7) = end_time-start_time
       if (RANK .eq. ROOT) write(*,1014) Mtime(7)
@@ -965,7 +978,7 @@ subroutine par_nested(mtype)
    call mumps_destroy_par
    call mumps_destroy_subd
 !
-   call MPI_BARRIER(mumps_par%COMM, ierr)
+   call MPI_BARRIER(mumps_comm, ierr)
    if ((RANK .eq. ROOT) .and. (IPRINT_TIME .ge. 1)) then
       write(*,1015) sum(Mtime(1:7))
  1015 format(' par_nested FINISHED: ',f12.5,'  seconds',/)

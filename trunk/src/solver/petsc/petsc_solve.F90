@@ -45,7 +45,7 @@ subroutine petsc_solve(mtype)
                            stc_alloc,stc_dealloc,stc_get_nrdof
    use parameters , only:  NRRHS
    use par_mesh   , only:  DISTRIBUTED,HOST_MESH
-   use mpi_wrapper
+   use mpif90_wrapper
    use petscksp
    use petsc_w_ksp, only:  petsc_ksp_start,petsc_ksp_destroy,     &
                            petsc_ksp,petsc_ksp_type,              &
@@ -121,7 +121,7 @@ subroutine petsc_solve(mtype)
    integer, allocatable :: TEMP_BUF(:)
 !
 !..dummy variables
-   VTYPE :: zvoid
+   VTYPE :: zvoid1(1),zvoid2(1)
 !
 !..workspace for celem
    integer, dimension(MAXNODM) :: nodm,ndofmH,ndofmE,ndofmV,ndofmQ
@@ -231,10 +231,10 @@ subroutine petsc_solve(mtype)
 !  ...get information from celem
       if (ISTC_FLAG) then
          call celem_systemI(iel,mdle,idec, nrdofs,nrdofm,nrdofc,nodm,  &
-            ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid,zvoid)
+            ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid1,zvoid2)
       else
          call celem(mdle,idec, nrdofs,nrdofm,nrdofc,nodm,  &
-            ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid,zvoid)
+            ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,zvoid1,zvoid2)
       endif
 !
 !  ...nrdofc = number of modified element dof after compression
