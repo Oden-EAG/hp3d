@@ -44,7 +44,7 @@
       VTYPE              :: dvalQ (  MAXEQNQ,3  )
       VTYPE              :: d2valQ(  MAXEQNQ,3,3)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
 !  ...printing flag : 0 - silent ; 1 - verbose
       integer :: iprint = 0
 #endif
@@ -77,7 +77,7 @@
 !  ...end select NEXACT
       end select
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint == 1) then
          write(*,1001)X(1:3),ValH(1:MAXEQNH)
  1001    format(' dirichlet: X,ValH = ',3(e12.5,2x),2x,10(e12.5,2x))

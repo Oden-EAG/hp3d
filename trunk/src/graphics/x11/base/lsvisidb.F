@@ -58,7 +58,7 @@ c
       real(8), parameter :: bigp  =  1.d30
       real(8), parameter :: bign  = -1.d30
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -81,7 +81,7 @@ c  ...loop through elements
       mdle=0
       do 20 iel=1,NRELES
         call nelcon(mdle, mdle)
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,*) 'lsvisidb: mdle = ',mdle
         endif
@@ -107,7 +107,7 @@ c
         call locate(mdle,IGINV,NRINVBL, loc)
         if (loc.gt.0) go to 20
         call find_domain(mdle, ndom)
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7056) mdle,ndom,NDOMAIN(ndom)
  7056     format('lsvisidb: mdle,ndom,NDOMAIN(ndom) = ',i6,i3,i2)
@@ -119,7 +119,7 @@ c
         call find_order(mdle, norder)
 c
         call nodcor(mdle,xnod)
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,*)'lsvisidb: VERTEX COORDINATES = '
           do ivar=1,3
@@ -132,7 +132,7 @@ c
 c
 c  .....get neighbors
         call find_neig(mdle, neig)
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,8002) neig(1,1:nface(NODES(mdle)%ntype))
  8002     format('lsvisidb: neig = ',6(i8,2x))
@@ -170,7 +170,7 @@ c
 c
 c  .....loop through element faces
         do 10 ifc=1,nface(NODES(mdle)%ntype)
-#if DEBUG_MODE
+#if HP3D_DEBUG
           if (iprint.eq.1) then
             write(*,7003) ifc
  7003       format('lsvisidb: ifc = ',i2)
@@ -246,7 +246,7 @@ c  ...sort according to z-coordinate in order back-to-front
  7002   format('lsvisidb: NO TRIANGLES TO BE DRAWN...')
       endif
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'lsvisidb: EXITING...'
         call pause

@@ -244,7 +244,7 @@ module zoltan_wrapper
          x(1:3) = x(1:3) + xnod(1:3,i)
       enddo
       Coords(1:3) = x(1:3) / nrv
-#if DEBUG_MODE
+#if HP3D_DEBUG
       write(*,200) 'Mdle = ', mdle,', Coords = ', x(1:3)/nrv
   200 format(A,I5,A,3F6.2)
 #endif
@@ -279,7 +279,7 @@ module zoltan_wrapper
          enddo
          i = (k-1)*NumDim
          Coords(i+1:i+3) = x(1:3) / nrv
-#if DEBUG_MODE
+#if HP3D_DEBUG
          !$OMP CRITICAL
          write(*,200) 'Mdle = ', mdle,', Coords = ', x(1:3)/nrv
      200 format(A,I5,A,3F6.2)
@@ -436,7 +436,7 @@ module zoltan_wrapper
                   enddo
                   Wgts(num_neig) = max(1.0_Zoltan_float,Wgts(num_neig))
                endif
-#if DEBUG_MODE
+#if HP3D_DEBUG
                if (Is_inactive(neig)) then
                   write(*,*) 'zoltan_w_query_neig_list: neig not active'; stop
                endif
@@ -450,7 +450,7 @@ module zoltan_wrapper
             endif
          enddo
       enddo
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint .eq. 1) then
          write(*,500) 'Neighbors of mdle = ', mdle
          do i=1,num_neig
@@ -519,7 +519,7 @@ module zoltan_wrapper
                      enddo
                      Wgts(n) = max(1.0_Zoltan_float,Wgts(n))
                   endif
-#if DEBUG_MODE
+#if HP3D_DEBUG
                   if (Is_inactive(neig)) then
                      !$OMP CRITICAL
                      write(*,*) 'zoltan_w_query_neig_list_omp: neig not active'; stop
@@ -539,7 +539,7 @@ module zoltan_wrapper
                endif
             enddo
          enddo
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (iprint .eq. 1) then
             !$OMP CRITICAL
             write(*,600) 'Neighbors of mdle = ', mdle

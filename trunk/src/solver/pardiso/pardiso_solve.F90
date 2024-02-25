@@ -49,7 +49,7 @@ subroutine pardiso_solve(Ia,Ja,A,Type,Nnz,N,Nrhs, B)
 !
 !------------------------------------------------------------------------
 !
-#if C_MODE
+#if HP3D_COMPLEX
    select case(Type)
       case('S')
          mtype   = 6   ! complex symmetric
@@ -186,7 +186,7 @@ subroutine pardiso_solve_vect(ia,ja,a,type,nnz,b_vect,n,nrhs,B,bb)
 !------------------------------------------------------------------------
 !------------------------------------------------------------------------
 !
-#if C_MODE
+#if HP3D_COMPLEX
    select case(type)
    case('S')
       mtype   = 6  ! complex symmetric

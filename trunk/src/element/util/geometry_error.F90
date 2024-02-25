@@ -1,4 +1,4 @@
-#if DEBUG_MODE
+#if HP3D_DEBUG
 
 !------------------------------------------------------------------------
 !> Purpose : calculate H1- or L2-norm of the PB interpolation error

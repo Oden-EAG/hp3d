@@ -55,7 +55,7 @@ c
       integer :: nrnick,nrdof,nrdofm,nrdofc,nrnod1,nrdof_mdl
       VTYPE   :: zvoid
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -68,11 +68,11 @@ c
         return
       endif
 c
-#if C_MODE
+#if HP3D_COMPLEX
       IDUMPWR = 0
 #endif
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'solve1: NRELES,Number_of_RHS = ',
      .                      NRELES,Number_of_RHS
@@ -125,7 +125,7 @@ c     element matrices
         mdle = ELEM_ORDER(iel)
 c
 c  .....determine nodes of the modified element
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,*) 'solve1: iel', iel, 'mdle', mdle
           call pause
@@ -186,7 +186,7 @@ c
       NRDOF_CON = nrdof
       NRDOF_TOT = nrdof + nrdof_mdl
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7006) NR_PHYSA
  7006   format("number of physical attributes, NR_PHYSA = ",i3)
@@ -341,7 +341,7 @@ c  ...exit if no free dof
         return
       endif
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
    10   write(*,7002) NRELES
  7002   format(' solve1: SET ELEMENT NUMBER TO REVIEW NICKNAMES, ',
@@ -412,7 +412,7 @@ c
 c  ...call prefront
 ccc      write(*,*) 'solve1: nrnick,MAXDOFC = ',nrnick,MAXDOFC
       MA = 2*nrnick+3*MAXDOFC
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) write(*,*) 'solve1: CALLING PREFRONT'
 #endif
       call surfsp(IN,IAWORK, ms,mu,mr)
@@ -457,7 +457,7 @@ ccc        write(*,7004) mu+mr
       endif
 c
 c  ...allocate work space
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) write(*,*) 'solve1: MFRSOL = ',MFRSOL
 #endif
       allocate(ZWORKFRS(MFRSOL))
@@ -468,7 +468,7 @@ c
 c  ...call frontal solver
       MA = MFRSOL
       ZWORKFRS(1:MFRSOL) = ZERO
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) write(*,*) 'solve1: CALLING FRONTAL SOLVER'
 #endif
 c
@@ -478,7 +478,7 @@ c
         stop 1
       endif
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'solve1: SURFSS COMPLETED'
       endif
@@ -500,7 +500,7 @@ c  ...deallocate ALL arrays used by frontal solver
       deallocate(ZWORKFRS)
       deallocate(NEW_ELEM_ORDER)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) write(*,*) 'solve1: EXIT ROUTINE SOLVE1'
 #endif
 c

@@ -68,7 +68,7 @@ subroutine paraview_driver
             jcomp = jcomp+1
 !
 !        ...skip selected components
-#if C_MODE
+#if HP3D_COMPLEX
             if (.not. PARAVIEW_COMP_REAL(jcomp) .and. &
                 .not. PARAVIEW_COMP_IMAG(jcomp)) cycle
 #else

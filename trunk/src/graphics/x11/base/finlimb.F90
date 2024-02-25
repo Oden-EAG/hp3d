@@ -31,7 +31,7 @@
     real(8) :: dsol, dxi, solmax, solmin, val
     integer :: i, j, ivar, loc, iel, idec, iface, nsub
     !
-#if DEBUG_MODE
+#if HP3D_DEBUG
     integer :: iprint
     iprint=0
 #endif
@@ -40,7 +40,7 @@
     !
     t = 0.d0; xp = 0.d0; val = 0.d0
     !
-#if DEBUG_MODE
+#if HP3D_DEBUG
     if (iprint.eq.1) then
        write(*,*) 'finlimb: Numlev = ',Numlev
        call pause
@@ -73,7 +73,7 @@
        call find_orient(mdle, nedge_orient,nface_orient)
        call find_order(mdle, norder)
        call nodcor(mdle, xnod)
-#if DEBUG_MODE
+#if HP3D_DEBUG
        if (iprint.eq.1) then
           write(*,7002) mdle
 7002      format('finlimb: VERTEX COORDINATES FOR mdle = ',i5)
@@ -106,7 +106,7 @@
                      xnod, &
                      zdofH,zdofE,zdofV,zdofQ, &
                      t, xp,val)
-#if DEBUG_MODE
+#if HP3D_DEBUG
                 if (iprint.eq.1) then
                    write(*,7001) mdle,iface,i,j,xp,val
 7001               format('finlimb: mdle,iface,i,j,xp,val = ', &

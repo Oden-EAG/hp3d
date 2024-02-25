@@ -16,7 +16,7 @@ Version 1.0 (dev)
   corresponding PETSC_DIR and PETSC_ARCH.
 
 - Introduced global parameter `NRINDEX_HEV=31` used for binary-encoding
-  Dirichlet flags of (at most 31)  H1, H(div),and H(curl) components.
+  Dirichlet flags of (at most 31) H1, H(div), and H(curl) components.
 
 ==========================================
 Version 1.0-beta, released on Sep 24, 2023

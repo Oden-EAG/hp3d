@@ -70,7 +70,7 @@
             enddo
          endif
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
 !     ...check that list is sorted
          if(n.gt.1) then
            do i=1,n-1

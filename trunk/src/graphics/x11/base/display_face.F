@@ -88,7 +88,7 @@ c  ...misc
 c
       real(8) :: small = 1.d-6
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint,nrdofH,nrdofE,nrdofV,nrdofQ
 #endif
 c
@@ -96,7 +96,7 @@ c---------------------------------------------------------------------
 c
       ntype = NODES(Mdle)%ntype
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       iprint = 0
       if (iprint.eq.1) then
         write(*,*) 'display_face: type,Mdle,Ifc = ',S_Type(ntype),Mdle,Ifc
@@ -118,7 +118,7 @@ c
 c  ...determine the local number of the nodes on the face
 c     [vertices ; edges ; middle ]
       call face_nodes(ntype,Ifc, nface_nodes,nrfn)
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7010) Ifc, nface_nodes(1:nrfn)
  7010   format('display_face: FACE = ',i2,' FACE NODES = ',9i3)
@@ -196,7 +196,7 @@ c         and color flags for the mesh visualization
 !         now has to refer to a particular component (not physics attr)
             mpcol(1:2) = ibc(Ifc,NRPHY_DISP)+1
           endif
-#if DEBUG_MODE
+#if HP3D_DEBUG
           if (iprint.eq.1) then
             write(*,7002) i,j,mpcol(1),mpcol(2)
  7002       format('display_face: i,j,mpcol = ',4i3)
@@ -222,7 +222,7 @@ c  ...........transform the coordinates to observer's system
 c
 c  .........end of loop through the vertices
             enddo
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iprint.eq.1) then
               write(*,8002) i,j,l
  8002         format('display_face: i,j,l = ',3i3)
@@ -265,7 +265,7 @@ c           intersection with the clipping plane
      .               CLPL(3)*xcoord(3,3)+CLPL(4)
 c
             call fincut(xi,utemp, nrtriancut,cotriancut,isflag)
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iprint.eq.1) then
               write(*,*) 'display_face: isflag = ',isflag
             endif
@@ -325,7 +325,7 @@ c
               endif
 c
 c  ...........skip not visible small triangles
-#if DEBUG_MODE
+#if HP3D_DEBUG
               if (iprint.eq.1) then
                 write(*,*) 'display_face: iclip,vis = ',iclip,vis
               endif
@@ -450,7 +450,7 @@ c  .............save storage information
               endif
 c
 c  ...........update list of triangles midpoints
-#if DEBUG_MODE
+#if HP3D_DEBUG
               if (iprint.eq.1) then
                 write(*,7001) NRVISTR
  7001           format(' display_face: NRVISTR = ',i8)
@@ -564,7 +564,7 @@ c  .................encode nodes numbers
                   end select
                 endif
               endif
-#if DEBUG_MODE
+#if HP3D_DEBUG
               if (iprint.eq.1) then
                 write(*,8005) NRVISTR,IGTRNO(NRVISTR)
  8005           format('display_face: NRVISTR,IGTRNO(NRVISTR) = ',2i5)
@@ -581,7 +581,7 @@ c  .....end of loop through the vertical integer coordinate
 c
 c  ...end of loop through the horizontal integer coordinate
       enddo
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'display_face: EXITING...'
         call pause

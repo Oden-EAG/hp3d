@@ -32,7 +32,7 @@ subroutine set_initial_mesh(Nelem_order)
 !..miscellaneous
    integer :: ifc,iel,neig,ivar
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint=0
 #endif
@@ -101,7 +101,7 @@ subroutine set_initial_mesh(Nelem_order)
 !  ...encode face BCs into a single BC flag, one component at a time
       do ivar=1,NRINDEX
          call encodg(ibc(1:6,ivar),10,6, ELEMS(iel)%bcond(ivar))
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (iprint.eq.1) then
             write(*,*) 'ivar, ELEMS(iel)%bcond(ivar) = ', &
                         ivar,', ',ELEMS(iel)%bcond(ivar)
@@ -109,7 +109,7 @@ subroutine set_initial_mesh(Nelem_order)
 #endif
       enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
 !  ...print order of approximation
       if (iprint.eq.1 .and. IP.gt.0) then
          write(*,*) '-- uniform order of approximation --'

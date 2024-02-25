@@ -39,7 +39,7 @@ c
       double precision :: Mu(0:1),DMu(0:1),MubV(2),DMubV(2)
       double precision :: phiE(2:Nsize(1)),DphiE(2:Nsize(1))
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...debugging flag
       integer :: iprint
       iprint=0
@@ -84,7 +84,7 @@ c
 c  ...give total degrees of freedom
       NrdofH = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.eq.1) then
         write(*,7001) Xi,Nord
@@ -145,7 +145,7 @@ c
       double precision, intent(out) :: ShapQ(Nsize(2))
       double precision :: Mu(0:1),DMu(0:1),homP(0:Nsize(1)-1)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...debugging flag
       integer :: iprint
       iprint=0
@@ -178,7 +178,7 @@ c
 c  ...give total degrees of freedom
       NrdofQ = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.eq.1) then
         write(*,7001) Xi,Nord

@@ -39,7 +39,7 @@ c.....colors to interpolate between
       integer, parameter :: nscales = 5
       integer :: iram(4,nscales)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -182,7 +182,7 @@ c  .......loop through the colors to be generated
             ig = alpha*iram(3,nrrow+1)+(1-alpha)*iram(3,nrrow)
             ib = alpha*iram(4,nrrow+1)+(1-alpha)*iram(4,nrrow)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iprint.eq.1) then
               write(*,7003) nrcol,nrrow,alpha
  7003         format('nrcol,nrrow,alpha = ',2i4,f8.3)
@@ -200,7 +200,7 @@ c
         endif
       endif
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'COLORSET: NPCOL = '
         write(*,7002) NPCOL

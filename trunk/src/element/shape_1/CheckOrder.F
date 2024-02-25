@@ -43,7 +43,7 @@ c
       integer :: minp,maxp,nps(27),m,f,nordF(2),nordB(3)
       logical :: confident
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint = 0
 #endif
@@ -121,7 +121,7 @@ c     in the shape element routines.
           write(*,*) 'checkorder'; stop
         end select
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c    ...print this when debugging
         if (iprint.ge.1) then
           write(*,7006) S_Type(Ntype),S_DType(Dtype)
@@ -210,7 +210,7 @@ c     Compare these values with module parameters.
         end select
       end select
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7008) Nsize(1),Nsize(2)

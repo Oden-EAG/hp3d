@@ -99,7 +99,7 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !
 ! load vector and solution
   VTYPE,   dimension(MAXmdlqH+MAXmdlqE,MAXEQNE) :: zbE,zuE
-#if C_MODE
+#if HP3D_COMPLEX
   real(8), dimension(MAXmdlqH+MAXmdlqE,MAXEQNE) :: duE_real, duE_imag
 #endif
 !
@@ -113,7 +113,7 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !
   logical :: is_homD
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   integer :: iprint
   iprint=0
 #endif
@@ -122,7 +122,7 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !
   nrv = nvert(Ntype); nre = nedge(Ntype); nrf = nface(Ntype)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Icase,Iface,S_Type(Ntype)
 7010 format('dhpfaceE: Mdle,Iflag,No,Icase,Iface,Type = ',5i4,2x,a4)
@@ -159,7 +159,7 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
   enddo
   norder_1(nre+Iface) = Norder(nre+Iface)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
      write(*,7060) norder_1; call pause
 7060 format('dhpfaceE: norder_1 = ',20i4)
@@ -201,7 +201,7 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
                      eta,detadxi,dxideta,rjac,detadt,rn,bjac)
      weight = wa*bjac
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
      if (iprint.eq.1) then
        write(*,7100) xi(1:2),eta(1:3),detadxi(1:3,1:3),rn(1:3),bjac
 7100   format('dhpfaceE: xi,eta  = ',2f8.3,3x,3f8.3,/, &
@@ -238,7 +238,7 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
      zcurlE(2,1:MAXEQNE) = zdvalE(1,1:MAXEQNE,3) - zdvalE(3,1:MAXEQNE,1)
      zcurlE(3,1:MAXEQNE) = zdvalE(2,1:MAXEQNE,1) - zdvalE(1,1:MAXEQNE,2)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
      if (iprint.eq.1) then
        write(*,7130) x(1:3)
 7130   format('dhpfaceE: x      = ',3f8.3)
@@ -266,7 +266,7 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
        enddo
      enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
      if (iprint.eq.1) then
        write(*,*) 'zvalEeta, zcurlEeta BEFORE EDGE SUBTRACTION = '
        write(*,7110) zvalEeta(1:3,1:MAXEQNE)
@@ -297,7 +297,7 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
        enddo
      enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
      if (iprint.eq.1) then
        write(*,*) 'zvalEeta, zcurlEeta AFTER EDGE SUBTRACTION = '
        write(*,7110) zvalEeta(1:3,1:MAXEQNE)
@@ -405,7 +405,7 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
   enddo
   ndofE_tot = ndofE_face + ndofH_face
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.ge.1) then
     write(*,*) 'dhpfaceE: LOAD VECTOR AND STIFFNESS MATRIX FOR ', &
                'ndofE_face,ndofH_face = ',ndofE_face,ndofH_face
@@ -413,12 +413,12 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
       write(*,7015) j, zbE(j,1:MAXEQNE)
       write(*,7016) aaE(j,1:ndofE_tot)
     enddo
-# if C_MODE
-7015    format(i5,2x,6(2e10.3,2x))
-# else
-7015    format(i5,2x,10e12.5)
-# endif
-7016    format(10e12.5)
+    #if HP3D_COMPLEX
+      7015 format(i5, 6(2e10.3,2x))
+    #else
+      7015 format(i5, 10e12.5)
+    #endif
+    7016 format(10e12.5)
   endif
 #endif
 !
@@ -437,7 +437,7 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 ! copy load vector
   zuE(1:ndofE_tot,:) = zbE(1:ndofE_tot,:)
 !
-#if C_MODE
+#if HP3D_COMPLEX
 ! apply pivots to load vector
   call zlaswp(MAXEQNE,zuE,naE,1,ndofE_tot,ipivE,1)
 !
@@ -460,7 +460,7 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
   call dtrsm('L','U','N','N',ndofE_tot,MAXEQNE,1.d0,aaE,naE, zuE,naE)
 #endif
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.ge.1) then
      write(*,*) 'dhpfaceE: k,zuE(k) = '
      do k=1,ndofE_tot
@@ -475,7 +475,7 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !  ...save the DOFs, skipping irrelevant entries
   100 continue
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'dhpfaceE: ncase = ', ncase
       endif
@@ -530,7 +530,7 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !  ...loop through multiple loads
       enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) call result
 #endif
 !

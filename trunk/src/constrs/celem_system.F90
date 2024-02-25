@@ -101,7 +101,7 @@ subroutine celem_system(Mdle,Idec,                                &
    integer :: nrdofmH,nrdofmE,nrdofmV,nrdofmHE,nrdofmHEV,ndofQ
    integer :: nrdoflH,nrdoflE,nrdoflV,nrdoflQ
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: ians,ibeg,iend,jbeg,jend,kbeg,kend,ivar1,ivar2
    integer :: iprint
    iprint=0
@@ -120,7 +120,7 @@ subroutine celem_system(Mdle,Idec,                                &
 !..number of dofs for a SINGLE H1,H(curl),H(div),L2 component
    call find_order(Mdle, norder)
    call celndof(NODES(Mdle)%ntype,norder, nrdoflH,nrdoflE,nrdoflV,nrdoflQ)
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,5001) Mdle
  5001 format(' celem_system: DEBUGGING for Mdle = ',i8)
@@ -145,7 +145,7 @@ subroutine celem_system(Mdle,Idec,                                &
               nrconE,nacE,constrE,                   &
               nrconV,nacV,constrV)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
 !  ...printing
       if ((iprint.ge.1).and.(Idec.ne.1)) then
          write(*,*) ' - H1 - '
@@ -210,7 +210,7 @@ subroutine celem_system(Mdle,Idec,                                &
    nrdofmHEV = nrdofmHE  + nrdofmV
    Nrdofm    = nrdofmHEV + nrdoflQ*NRQVAR
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint .eq. 1) then
          write(*,6001) nrdoflH,nrdoflE,nrdoflV,nrdoflQ
  6001    format('celem_system: nrdoflH,nrdoflE,nrdoflV,nrdoflQ = ',4i4)
@@ -241,7 +241,7 @@ subroutine celem_system(Mdle,Idec,                                &
             nrPhysQ=nrPhysQ+1
       end select
    enddo
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint .eq. 1) then
       write(*,*) 'Physics variables:'
       write(*,*) 'nrPhysH = ', nrPhysH
@@ -304,7 +304,7 @@ subroutine celem_system(Mdle,Idec,                                &
                case(2)
                   k=k+1
                   if (Idec.eq.2) NEXTRACT(k) = l
-#if DEBUG_MODE
+#if HP3D_DEBUG
                case default
                   write(*,*) 'celem_system: nod,ii,index(ii) = ',nod,ii,index(ii)
                   write(*,*) '                   in H1: Mdle = ', Mdle, '. stop.'
@@ -372,7 +372,7 @@ subroutine celem_system(Mdle,Idec,                                &
                case(4)
                   k=k+1
                   if (Idec.eq.2) NEXTRACT(k) = l
-#if DEBUG_MODE
+#if HP3D_DEBUG
                case default
                   write(*,*) 'celem_system: nod,ii,index(ii) = ',nod,ii,index(ii)
                   write(*,*) '              in H(curl): Mdle = ', Mdle, '. stop.'
@@ -440,7 +440,7 @@ subroutine celem_system(Mdle,Idec,                                &
                case(6)
                   k=k+1
                   if (Idec.eq.2) NEXTRACT(k) = l
-#if DEBUG_MODE
+#if HP3D_DEBUG
                case default
                   write(*,*) 'celem_system: nod,ii,index(ii) = ',nod,ii,index(ii)
                   write(*,*) '               in H(div): Mdle = ', Mdle, '. stop.'
@@ -499,7 +499,7 @@ subroutine celem_system(Mdle,Idec,                                &
             case(8)
                k=k+1;
                if (Idec.eq.2) NEXTRACT(k) = l
-#if DEBUG_MODE
+#if HP3D_DEBUG
             case default
                write(*,*) 'celem_system: nod,ii,index(ii) = ',nod,ii,index(ii)
                write(*,*) '                   in L2: Mdle = ', Mdle, '. stop.'
@@ -523,7 +523,7 @@ subroutine celem_system(Mdle,Idec,                                &
 !..save number of dof for the modified element in the compressed mode
    Nrdofc = k
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
 !  ...printing
       if (iprint.eq.1) then
         write(*,7002) (Nodm(i),NdofmH(i),NdofmE(i),NdofmV(i), &
@@ -553,7 +553,7 @@ subroutine celem_system(Mdle,Idec,                                &
 !
 !..determine the element local load vector and stiffness matrix
    call elem(Mdle, itest,jtrial)
-#if DEBUG_MODE
+#if HP3D_DEBUG
    do i=1,NR_PHYSA
      if((.not. PHYSAm(i)) .and. ((itest(i).eq.1) .or. (jtrial(i).eq.1))) then
        write(*,*) 'celem_system: INCONSISTENCY of PHYSAm and itest/jtrial. stop.'
@@ -923,7 +923,7 @@ subroutine celem_system(Mdle,Idec,                                &
 !-----------------------------------------------------------------------
 !     PRINTING STATEMENTS                                              |
 !-----------------------------------------------------------------------
-#if DEBUG_MODE
+#if HP3D_DEBUG
       select case(Mdle)
          case(4); iprint=0
          case default; iprint=0
@@ -946,7 +946,7 @@ subroutine celem_system(Mdle,Idec,                                &
             write(*,8000) ( BLOC(iphys1)%array((k1-1)*NR_COMP(iphys1)+ivar1,  &
                                             load                         ),   &
                           k1=1,Nrdofs(iphys1)/NR_COMP(iphys1)            )
-#if C_MODE
+#if HP3D_COMPLEX
  8000       format(24(2e11.4,1x))
 #else
  8000       format(16(e12.5,1x))

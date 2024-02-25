@@ -8,7 +8,7 @@ program test_dot_product
    real(8) :: A(3),B(3)
    real(8) :: ab
 !
-#if C_MODE
+#if HP3D_COMPLEX
    complex(8) :: C(3)
    complex(8) :: ac,val
 #else
@@ -29,7 +29,7 @@ program test_dot_product
    if (.not. dnear(ab,1.d0)) NPASS = 0
 !
 !  Test: zdot_product
-#if C_MODE
+#if HP3D_COMPLEX
    C = (/ (4.d0,-4.d0), (-3.d0,3.0d0), (1.d0,-1.d0) /)
    val = (1.d0,-1.d0)
 #else

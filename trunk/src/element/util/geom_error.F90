@@ -1,4 +1,4 @@
-#if DEBUG_MODE
+#if HP3D_DEBUG
 
 !------------------------------------------------------------------------
 !> Purpose : calculate geometry error. Refer to hp book, vol. 2,

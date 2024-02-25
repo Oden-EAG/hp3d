@@ -46,7 +46,7 @@ c
       real(8), parameter :: sml  = 1.d-30
       real(8), parameter :: sml2 = 1.d-15
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -62,7 +62,7 @@ c   (ie: each equation has KFW entries, so id begins at (id-1)*KFW)
 c
       k = idm*KFW
       mp = k + id
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) Aidx,id,idm,idp,KFW,k,mp
         write(*,7002) (Flhs(mp+ii),ii=-3,3)
@@ -76,7 +76,7 @@ c pull the diagonal entry
 c
       pivot = Flhs(mp)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       iprint = 0
       if(IPRPIV .eq. 1 .and. iprint .eq. 1) then
          write(NFSOUT,7000)  Iel,NFW,id,pivot

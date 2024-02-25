@@ -29,7 +29,7 @@ c
 c
       integer :: i,iaux,naux,np
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -37,7 +37,7 @@ c
       Numdes = NDESVE(1,Iel)
       np = NDESVE(2,Iel)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'solin1: Numdes,np = ',Numdes,np
         write(*,*) 'solin1: NDESVE(1,2403),NDESVE(2,2403) = ',
@@ -47,7 +47,7 @@ c
 c
       do i=1,Numdes
         iaux = IDESVE(np+i-1)
-#if C_MODE
+#if HP3D_COMPLEX
         Zaldest(i) = dcmplx(dfloat(IDESVE(np+i-1)),0.d0)
 #else
         Zaldest(i) = dfloat(IDESVE(np+i-1))
@@ -62,14 +62,14 @@ c  .....double check
         endif
       enddo
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) Iel
  7001   format('solin1: DESTINATION VECTORS FOR Iel = ',i8)
         write(*,7003) (IDESVE(np+i-1),i=1,Numdes)
  7003   format(5(6x,i10))
         write(*,7002) (Zaldest(i),i=1,Numdes)
-#if C_MODE
+#if HP3D_COMPLEX
  7002   format(5('(',f10.1,f4.1,')',2x))
 #else
  7002   format(5(f10.1,2x))

@@ -114,7 +114,7 @@ module data_structure3D
 !  .....geometry and solution degrees of freedom
         type(dof_data), pointer :: dof
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
 !
 !  .....error
 !       0   - scalar error
@@ -144,28 +144,28 @@ module data_structure3D
         real(8), dimension(:,:), pointer :: coord
 !
 !  .....H1 solution dof
-#if C_MODE
+#if HP3D_COMPLEX
         complex(8), dimension(:,:,:), pointer :: zdofH
 #else
         real(8)   , dimension(:,:,:), pointer :: zdofH
 #endif
 !
 !  .....H(curl) solution dof
-#if C_MODE
+#if HP3D_COMPLEX
         complex(8), dimension(:,:,:), pointer :: zdofE
 #else
         real(8)   , dimension(:,:,:), pointer :: zdofE
 #endif
 !
 !  .....H(div) solution dof
-#if C_MODE
+#if HP3D_COMPLEX
         complex(8), dimension(:,:,:), pointer :: zdofV
 #else
         real(8)   , dimension(:,:,:), pointer :: zdofV
 #endif
 !
 !  .....L2 solution dof
-#if C_MODE
+#if HP3D_COMPLEX
         complex(8), dimension(:,:,:), pointer :: zdofQ
 #else
         real(8)   , dimension(:,:,:), pointer :: zdofQ
@@ -309,7 +309,7 @@ module data_structure3D
         NODES(nod)%first_son = 0
         NODES(nod)%nr_sons = 0
         nullify (NODES(nod)%dof)
-#if DEBUG_MODE
+#if HP3D_DEBUG
         NODES(nod)%error = 0.d0
 #endif
       enddo
@@ -390,7 +390,7 @@ module data_structure3D
         NODES_NEW(nod)%first_son = 0
         NODES_NEW(nod)%nr_sons = 0
         nullify (NODES_NEW(nod)%dof)
-#if DEBUG_MODE
+#if HP3D_DEBUG
         NODES_NEW(nod)%error = 0.d0
 #endif
       enddo
@@ -524,7 +524,7 @@ module data_structure3D
          else
             write(ndump,*) 0 , 0
          endif
-#if DEBUG_MODE
+#if HP3D_DEBUG
          write(ndump,*) NODES(nod)%error
 #endif
          if (associated(NODES(nod)%dof)) then
@@ -681,7 +681,7 @@ module data_structure3D
         else
           if(associated(NODES(nod)%dof)) nullify(NODES(nod)%dof%coord)
         endif
-#if DEBUG_MODE
+#if HP3D_DEBUG
         read(ndump,*) NODES(nod)%error
 #endif
 !

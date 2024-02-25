@@ -180,7 +180,7 @@ c
 c
 c*********************************************************************
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c
 c  ...begin testing
   777 continue

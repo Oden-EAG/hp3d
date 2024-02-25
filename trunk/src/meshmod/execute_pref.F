@@ -40,7 +40,7 @@ c  ...miscellanea
       integer :: icase,iel,ie,ip,is,j,mdle,nc,nrs
       integer :: nod,newp,nodp,nods,nrv,nre,nrf,ntype
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
       if (iprint.eq.1) then
@@ -251,7 +251,7 @@ c  .........if nod is active
 c
         if (NODES(mdle)%visit.eq.1) then
           call find_new_order(mdle, newp)
-#if DEBUG_MODE
+#if HP3D_DEBUG
           if (iprint.eq.1) then
             write(*,7050) mdle,newp
  7050       format('execute_pref: REFINING mdle = ',i6,' new p = ',i3)

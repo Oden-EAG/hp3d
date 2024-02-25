@@ -57,7 +57,7 @@ ccc      integer :: ndest1(100)
 c  ...test......test......test......test......test......test......test...
 
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -89,7 +89,7 @@ c
 
          call solin1 (jel, numdes, Aldest)
 c        ----------------------------------
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (iprint.eq.1) then
            write(NFSOUT,*) 'IN BCKWRD BEFORE CALL TO dest= '
            write(NFSOUT,*) 'jel,numdes = ',jel,numdes
@@ -126,7 +126,7 @@ c  and the transfer loc for active dof in the front after eliminating (A
 c
          call dest (numdes, Aldest, ne ,Amdest, Andest)
 c        -----------------------------------------------
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (iprint.eq.1) then
            write(NFSOUT,*) 'IN BCKWRD NDOFM AFTER CALL TO dest= ',NDOFM
          endif
@@ -336,7 +336,7 @@ cwb c
 cwb   180       continue
 cwb <
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iprint.eq.1) then
               write(NFSOUT,*) 'IN BCKWRD jel,NDOFM = ',jel,NDOFM
             endif

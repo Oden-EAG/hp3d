@@ -32,7 +32,7 @@ c
 c
       integer :: i,np
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 c
@@ -59,7 +59,7 @@ c
         IDESVE(NPDESV)=Ib(i)
         NPDESV = NPDESV + 1
       enddo
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) Iel, (Ib(i),i=1,N)
  7001   format('preout: DEST VECTORS FOR iel = ',i8,

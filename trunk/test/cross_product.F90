@@ -15,7 +15,7 @@ program test_cross_product
    real(8) :: sVEC(1)
    real(8) :: val
 !
-#if C_MODE
+#if HP3D_COMPLEX
    complex(8) :: C(3),D(3)
    complex(8) :: AC(3),CD(3)
    complex(8) :: zVEC(3)
@@ -42,7 +42,7 @@ program test_cross_product
    enddo
 !
 !  Test: zcross_product
-#if C_MODE
+#if HP3D_COMPLEX
    C  = (/ ( 2.d0,1.d0), ( -3.d0,-1.d0), (-4.d0,  1.d0) /)
    D  = (/ ( 1.d0,2.d0), (  2.d0, 1.d0), ( 2.d0, -2.d0) /)
    AC = (/ (-2.d0,4.d0), (  8.d0, 1.d0), (-7.d0, -3.d0) /)

@@ -52,7 +52,7 @@ c
       real(8) :: d,d_min,fact
       integer :: iel,i_min,nr_elem,loc,ivis,is,ifc,locn,nfl
       integer :: i,j,ifinside,ndom,ndomn,mdlen
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -95,7 +95,7 @@ c  .......loop through the face neighbors
           enddo
           if (ivis.eq.0) cycle
           call invmap_face(Mdle,ifc,Xy_in, t,xyz,nfl)
-#if DEBUG_MODE
+#if HP3D_DEBUG
           if (iprint.eq.1) then
             write(*,7002) Mdle,ifc,t,xyz,nfl
  7002       format('elem_no: Mdle,ifc,t,xyz,nfl = ',
@@ -135,7 +135,7 @@ c
 c  ...end of loop through elements
       enddo
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'elem_no: list_elem,xyz_list  = '
         do i=1,nr_elem
@@ -169,7 +169,7 @@ c  .....select the element that is closest to the point of view
         enddo
         Mdle = list_elem(i_min)
       endif
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*)'elem_no: FINAL Mdle = ',Mdle
         call pause

@@ -22,8 +22,8 @@ program test_dump_pois
 !..initialize MPI environment
    call mpi_w_init
 !
-#if C_MODE
-   write(*,*) 'test_dump_pois: C_MODE'
+#if HP3D_COMPLEX
+   write(*,*) 'test_dump_pois: HP3D_COMPLEX'
    NPASS = 1; goto 99
 #endif
 !

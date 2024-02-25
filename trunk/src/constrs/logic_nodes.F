@@ -46,7 +46,7 @@ c  ...miscellanea
       integer :: ie,ip,iv,jv,icv,ice,icf,icase,j
       integer :: nvoid,nrnodl,nod,nodp,nc,nce
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -274,7 +274,7 @@ ccc      do j=1,Nrnodm-1
 ccc        NODES(Nodm(j))%visit = 0
 ccc      enddo
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7002) Mdle
  7002   format('logic_nodes: Mdle = ',i6,' MODIFIED ELEMENT NODES = ')

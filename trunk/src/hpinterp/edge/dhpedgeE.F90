@@ -91,7 +91,7 @@ subroutine dhpedgeE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,&
 !
 ! load vector and solution
   VTYPE,   dimension(MAXP,MAXEQNE)      :: zbE,zuE
-#if C_MODE
+#if HP3D_COMPLEX
   real(8), dimension(MAXP,MAXEQNE)      :: uE_real,uE_imag
 #endif
 !
@@ -101,7 +101,7 @@ subroutine dhpedgeE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,&
 !
   logical :: is_homD
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   integer :: iprint
   iprint=0
 #endif
@@ -110,7 +110,7 @@ subroutine dhpedgeE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,&
 !
   nrv = nvert(Ntype); nre = nedge(Ntype); nrf = nface(Ntype)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Icase,Iedge,S_Type(Ntype)
 7010 format('dhpedgeE: Mdle,Iflag,No,Icase,Iedge,Type = ',5i4,2x,a4)
@@ -255,7 +255,7 @@ subroutine dhpedgeE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,&
 ! end of loop through integration points
   enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
     write(*,*) 'dhpedgeE: LOAD VECTOR AND STIFFNESS MATRIX FOR ', &
                'ndofE_edge = ',ndofE_edge
@@ -263,12 +263,12 @@ subroutine dhpedgeE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,&
       write(*,7015) j, zbE(j,1:MAXEQNE)
       write(*,7016) aaE(j,1:ndofE_edge)
     enddo
-# if C_MODE
-7015    format(i5, 6(2e10.3,2x))
-# else
-7015    format(i5, 10e12.5)
-# endif
-7016    format(10e12.5)
+    #if HP3D_COMPLEX
+      7015 format(i5, 6(2e10.3,2x))
+    #else
+      7015 format(i5, 10e12.5)
+    #endif
+    7016 format(10e12.5)
   endif
 #endif
 !
@@ -289,7 +289,7 @@ subroutine dhpedgeE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,&
 ! copy load vector
   zuE(1:ndofE_edge,:) = zbE(1:ndofE_edge,:)
 !
-#if C_MODE
+#if HP3D_COMPLEX
 !
 ! apply pivots to load vector
   call zlaswp(MAXEQNE,zuE,naE,1,ndofE_edge,ipivE,1)
@@ -323,7 +323,7 @@ subroutine dhpedgeE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,&
 !
 #endif
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
    write(*,*) 'dhpedgeE: k,zuE(k) = '
    do k=1,ndofE_edge
@@ -384,7 +384,7 @@ subroutine dhpedgeE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,&
 !  ...loop through multiple loads
       enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) call result
 #endif
 !

@@ -18,7 +18,7 @@ module mumps
 !
    implicit none
 !
-#if C_MODE
+#if HP3D_COMPLEX
    include 'zmumps_struc.h'
    type (ZMUMPS_STRUC) mumps_par
 #else
@@ -58,7 +58,7 @@ subroutine mumps_start
 !..initialize an instance of the package
    mumps_par%JOB = -1
 !
-#if C_MODE
+#if HP3D_COMPLEX
    call zmumps(mumps_par)
 #else
    call dmumps(mumps_par)
@@ -121,7 +121,7 @@ subroutine mumps_destroy
 !..Destroy the instance (deallocate internal data structures)
    mumps_par%JOB = -2
 !
-#if C_MODE
+#if HP3D_COMPLEX
    call zmumps(mumps_par)
 #else
    call dmumps(mumps_par)

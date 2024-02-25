@@ -49,7 +49,7 @@ c
 c  ...miscellanea
       integer :: nod,nc,nrbl,nb,lab,ib,ie,nel,ibeg
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint = 0
 #endif
@@ -125,7 +125,7 @@ c
 c  ...end of loop through adjacent blocks
       enddo
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7011) Medge
  7011   format('neig_edge: FIRST NEIGHBORS OF Medge = ',i5)

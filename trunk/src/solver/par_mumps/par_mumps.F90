@@ -18,7 +18,7 @@ module par_mumps
 !
    implicit none
 !
-#if C_MODE
+#if HP3D_COMPLEX
    include 'zmumps_struc.h'
    type (ZMUMPS_STRUC) mumps_par
    type (ZMUMPS_STRUC) mumps_bub
@@ -42,7 +42,7 @@ end subroutine mumps_destroy_par
 !
 subroutine mumps_start(mumps,mumps_comm)
 !
-#if C_MODE
+#if HP3D_COMPLEX
    type (ZMUMPS_STRUC), intent(inout) :: mumps
 #else
    type (DMUMPS_STRUC), intent(inout) :: mumps
@@ -80,7 +80,7 @@ subroutine mumps_start(mumps,mumps_comm)
 !..initialize an instance of the package
    mumps%JOB = -1
 !
-#if C_MODE
+#if HP3D_COMPLEX
    call zmumps(mumps)
 #else
    call dmumps(mumps)
@@ -173,7 +173,7 @@ end subroutine mumps_start
 !
 subroutine mumps_destroy(mumps)
 !
-#if C_MODE
+#if HP3D_COMPLEX
    type (ZMUMPS_STRUC), intent(inout) :: mumps
 #else
    type (DMUMPS_STRUC), intent(inout) :: mumps
@@ -187,7 +187,7 @@ subroutine mumps_destroy(mumps)
 !..Destroy the instance (deallocate internal data structures)
    mumps%JOB = -2
 !
-#if C_MODE
+#if HP3D_COMPLEX
    call zmumps(mumps)
 #else
    call dmumps(mumps)
@@ -223,7 +223,7 @@ subroutine mumps_start_subd
 !..initialize an instance of the package
    mumps_bub%JOB = -1
 !
-#if C_MODE
+#if HP3D_COMPLEX
    call zmumps(mumps_bub)
 #else
    call dmumps(mumps_bub)
@@ -292,7 +292,7 @@ subroutine mumps_destroy_subd
 !..Destroy the instance (deallocate internal data structures)
    mumps_bub%JOB = -2
 !
-#if C_MODE
+#if HP3D_COMPLEX
    call zmumps(mumps_bub)
 #else
    call dmumps(mumps_bub)

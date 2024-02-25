@@ -24,8 +24,8 @@ program test_conv_maxw
 !..initialize MPI environment
    call mpi_w_init
 !
-#if C_MODE==0
-   write(*,*) 'test_conv_maxw: C_MODE=0'
+#if HP3D_COMPLEX==0
+   write(*,*) 'test_conv_maxw: HP3D_COMPLEX=0'
    NPASS = 1; goto 99
 #endif
 !

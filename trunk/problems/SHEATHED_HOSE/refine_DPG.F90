@@ -252,7 +252,7 @@
         call global_href
         call update_gdof
         call update_ddof
-#if DEBUG_MODE
+#if HP3D_DEBUG
         call verify_orient
         call verify_neig
 #endif
@@ -354,7 +354,7 @@
 !      ...update geometry and Dirichlet flux dof after the refinements
           call update_gdof
           call update_Ddof
-#if DEBUG_MODE
+#if HP3D_DEBUG
           call verify_orient
           call verify_neig
 #endif

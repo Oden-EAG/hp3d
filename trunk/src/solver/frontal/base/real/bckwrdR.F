@@ -50,7 +50,7 @@ c
       integer :: i,ie,iel,ifbi,ifui,ill,iuu,iuuold
       integer :: j,jel,jerr,k,l,lenx,md,n,ne,negiel,numdes
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -79,7 +79,7 @@ c pull up the Elements nodal destination vectors (Aldest)
 c
          call solin1 (jel, numdes, Aldest)
 c        ----------------------------------
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (iprint.eq.1) then
            write(*,*) 'IN BCKWRD BEFORE CALL TO dest= '
            write(*,*) 'jel,numdes = ',jel,numdes
@@ -96,7 +96,7 @@ c  and the transfer loc for active dof in the front after eliminating (A
 c
          call dest (numdes, Aldest, ne ,Amdest, Andest)
 c        -----------------------------------------------
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (iprint.eq.1) then
            write(*,*) 'IN BCKWRD NDOFM AFTER CALL TO dest= ',NDOFM
            call pause
@@ -283,7 +283,7 @@ cwb c
 cwb   180       continue
 cwb <
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iprint.eq.1) then
               write(*,*) 'IN BCKWRD jel,NDOFM = ',jel,NDOFM
               call pause

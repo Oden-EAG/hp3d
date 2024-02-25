@@ -26,7 +26,7 @@ c
 c
       integer :: iwindtype
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...debug print
       integer :: iprint
       iprint=0

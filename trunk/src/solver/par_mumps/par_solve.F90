@@ -22,7 +22,7 @@ subroutine par_solve(mumps)
 !
    implicit none
 !
-#if C_MODE
+#if HP3D_COMPLEX
    type (ZMUMPS_STRUC), intent(inout) :: mumps
 #else
    type (DMUMPS_STRUC), intent(inout) :: mumps
@@ -73,7 +73,7 @@ subroutine par_solve(mumps)
       start_time = time_stamp
    endif
 !
-#if C_MODE
+#if HP3D_COMPLEX
    call zmumps(mumps)
 #else
    call dmumps(mumps)
@@ -107,7 +107,7 @@ subroutine par_solve(mumps)
       call MPI_BARRIER(mumps_comm, ierr)
       time_stamp = MPI_Wtime()
    endif
-#if C_MODE
+#if HP3D_COMPLEX
    call zmumps(mumps)
 #else
    call dmumps(mumps)
@@ -140,7 +140,7 @@ subroutine par_solve(mumps)
       call MPI_BARRIER(mumps_comm, ierr)
       time_stamp = MPI_Wtime()
    endif
-#if C_MODE
+#if HP3D_COMPLEX
    call zmumps(mumps)
 #else
    call dmumps(mumps)

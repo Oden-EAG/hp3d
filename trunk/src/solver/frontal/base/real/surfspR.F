@@ -49,7 +49,7 @@ c
       real(8) :: dt,t0,t1
       integer :: i,maxia,ntot
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 c
@@ -97,7 +97,7 @@ c
 c calculate the destination vectors
 c =================================
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'surfsp: NFN,MLDEST = ',NFN,MLDEST
       endif
@@ -122,7 +122,7 @@ c
 c print the prefront summary
 c----------------------------
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write (NFSOUT,7020) MFW,MDOF,MLDEST
 c

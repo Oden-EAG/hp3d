@@ -49,7 +49,7 @@ c
       double precision :: phiTri(2:Nsize(1)-1,1:Nsize(1)-2)
       double precision :: DphiTri(2,2:Nsize(1)-1,1:Nsize(1)-2)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...debugging flag
       integer :: iprint
       iprint=0
@@ -130,7 +130,7 @@ c
 c  ...give total degrees of freedom
       NrdofH = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.eq.1) then
         write(*,7001) X(1:2),Nord(1:4),NoriE(1:3)
@@ -214,7 +214,7 @@ c
       double precision :: ETri(2,0:Nsize(1)-2,1:Nsize(1)-1)
       double precision :: CurlETri(0:Nsize(1)-2,1:Nsize(1)-1)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...debugging flag
       integer :: iprint
       iprint=0
@@ -292,7 +292,7 @@ c
 c  ...give total degrees of freedom
       NrdofE = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.eq.1) then
         write(*,7001) X(1:2),Nord(1:4),NoriE(1:3)
@@ -370,7 +370,7 @@ c
       double precision, intent(out) :: DivV(Nsize(2))
       double precision :: shapE(2,Nsize(2))
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...debugging flag
       integer :: iprint
       iprint=0
@@ -386,7 +386,7 @@ c  ...'rotate' shape functions
         ShapV(2,m) = -shapE(1,m)
       end do
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.eq.1) then
         write(*,7001) X(1:2),Nord(1:4),NoriE(1:3)
@@ -465,7 +465,7 @@ c
       double precision :: homP(0:Nsize(1)-1)
       double precision :: homPal(0:Nsize(1)-1,0:Nsize(1)-1)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...debugging flag
       integer :: iprint
       iprint=0
@@ -510,7 +510,7 @@ c
 c  ...give total degrees of freedom
       NrdofQ = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.eq.1) then
         write(*,7002) X(1:2),Nord(4)

@@ -40,7 +40,7 @@
    real(8) :: start_time,end_time
    integer :: ierr
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint = 0
 #endif

@@ -218,7 +218,7 @@ subroutine get_elem_L2NormDiff(Mdle,Attr1,Attr2, L2NormDiff)
 !
 !        ...Jacobian
             call geom(dxdxi, dxidx,rjac,iflag)
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iflag /= 0) then
                call find_domain(Mdle, ndom)
                write(*,*)' get_elem_L2NormDiff: Mdle,ndom,rjac = ', Mdle,ndom,rjac
@@ -448,7 +448,7 @@ subroutine get_elem_L2NormAttr(Mdle,Attr, L2Norm)
 !
 !        ...Jacobian
             call geom(dxdxi, dxidx,rjac,iflag)
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iflag /= 0) then
                call find_domain(Mdle, ndom)
                write(*,*)' get_elem_L2NormAttr: Mdle,ndom,rjac = ', Mdle,ndom,rjac
@@ -708,7 +708,7 @@ subroutine get_elem_Norm(Mdle,Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
                          x,dxdxi,zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
 !        ...Jacobian
             call geom(dxdxi, dxidx,rjac,iflag)
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iflag /= 0) then
                call find_domain(Mdle, ndom)
                write(*,9997) Mdle,ndom,rjac
@@ -758,7 +758,7 @@ subroutine get_elem_Norm(Mdle,Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
 !
 !        ...Jacobian
             call geom(dxdxi, dxidx,rjac,iflag)
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iflag /= 0) then
                call find_domain(Mdle, ndom)
                write(*,9997) Mdle,ndom,rjac
@@ -808,7 +808,7 @@ subroutine get_elem_Norm(Mdle,Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
                          x,dxdxi,zsolH,zdsolH,zsolE,zcurlE,zsolV,zdivV,zsolQ)
 !        ...Jacobian
             call geom(dxdxi, dxidx,rjac,iflag)
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iflag /= 0) then
                call find_domain(Mdle, ndom)
                write(*,9997) Mdle,ndom,rjac
@@ -857,7 +857,7 @@ subroutine get_elem_Norm(Mdle,Flag, FieldNormH,FieldNormE,FieldNormV,FieldNormQ)
 !
 !        ...Jacobian
             call geom(dxdxi, dxidx,rjac,iflag)
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iflag /= 0) then
                call find_domain(Mdle, ndom)
                write(*,9997) Mdle,ndom,rjac

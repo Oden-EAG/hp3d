@@ -123,7 +123,7 @@ c  ...miscellanea
       integer :: nrdofH,nrdofE,nrdofV,nrdofQ
       integer :: nrdofH_loc,nrdofE_loc,nrdofV_loc
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -138,7 +138,7 @@ c
 c     initialize constraints arrays
       if (.NOT. INITIALIZED_CONSTR) call init_cnstr
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.ge.1) then
         write(*,7000) Mdle
  7000   format(' -- logic: Mdle = ',i6,' --')
@@ -149,7 +149,7 @@ c     get element nodes and build the local data base on constrained
 c     nodes for the element
       call get_connect_info(Mdle, nodesl,norientl)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         call elem_show(Mdle, NODES(Mdle)%ntype,nodesl,norientl)
       endif
@@ -186,7 +186,7 @@ c       update H1,H(curl),H(div) dofs counters
         icH=icH+NdofmH(im) ; icE=icE+NdofmE(im) ; icV=icV+NdofmV(im)
       enddo
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c     printing
       if (iprint.eq.1) then
         write(*,*) 'MODIFIED ELEMENT NODES:'
@@ -265,7 +265,7 @@ c         H(div)-loop through the nodal dof
             ConstrV(1,kV)=1.d0
           enddo
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c         printing
           if (iprint.eq.1) then
             write(*,7030) i,nod,S_Type(NODES(nod)%ntype),
@@ -285,7 +285,7 @@ c
 c         identify the node case
           call decode2(NODES_CONSTR(i), nc,icase)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c         printing
           if (iprint.eq.1) then
             select case(icase)
@@ -1412,7 +1412,7 @@ c             loop through parent medg nodes
 ccc             loc = NODES(nodp)%visit
                 call locate(nodp,Nodm,Nrnodm, loc)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
                 if (iprint.eq.1) then
                   write(*,*) 'logic: ie,nodp,loc = ',ie,nodp,loc
                 endif
@@ -1429,7 +1429,7 @@ c               loop through parent medg node dof
                   endif
                 enddo
               enddo
-#if DEBUG_MODE
+#if HP3D_DEBUG
               if (iprint.eq.1) then
                 write(*,*) 'l = ',l
                 write(*,7013) NacH(1:jp,kH)
@@ -1465,7 +1465,7 @@ c             loop through parent medg nodes
                 nodp = abs(NFACE_CONS(ie,nc))
 ccc             loc = NODES(nodp)%visit
                 call locate(nodp,Nodm,Nrnodm, loc)
-#if DEBUG_MODE
+#if HP3D_DEBUG
                 if (iprint.eq.1) then
                   write(*,*) 'logic: ie,nodp,loc = ',ie,nodp,loc
                 endif
@@ -1482,7 +1482,7 @@ c               loop through parent medg node dof
                   endif
                 enddo
               enddo
-#if DEBUG_MODE
+#if HP3D_DEBUG
               if ((iprint.eq.1).and.(Idec.gt.1)) then
                 write(*,*) '75,76,77::Mdle,l,jp = ',Mdle,l,jp
                 write(*,7013) NacE(1:jp,kE)
@@ -1529,7 +1529,7 @@ c             loop through parent medg nodes
                 nodp = abs(NFACE_CONS(ie,nc))
 ccc             loc = NODES(nodp)%visit
                 call locate(nodp,Nodm,Nrnodm, loc)
-#if DEBUG_MODE
+#if HP3D_DEBUG
                 if (iprint.eq.1) then
                   write(*,*) 'logic: ie,nodp,loc = ',ie,nodp,loc
                 endif
@@ -1547,7 +1547,7 @@ c               loop through parent medg node dof
                   endif
                 enddo
               enddo
-#if DEBUG_MODE
+#if HP3D_DEBUG
               if (iprint.eq.1) then
                 write(*,*) 'l = ',l
                 write(*,7013) NacH(1:jp,kH)
@@ -1566,7 +1566,7 @@ c
 c  .....if a constrained node
         endif
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  .....printing
         if (iprint.eq.1) then
           write(*,9000) i,nod,kH,kE,kV
@@ -1614,7 +1614,7 @@ c
 c
 c-----------------------------------------------------------------------
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if ((iprint.ge.1).and.(Idec.ne.1)) then
         write(*,7011) Mdle
 c

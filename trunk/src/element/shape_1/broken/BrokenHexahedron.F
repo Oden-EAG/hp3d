@@ -45,7 +45,7 @@ c      integer :: noriE(12),noriF(6),norder(19),nordF(3)
       double precision :: shapH2(Nsize(1)+1),dshapH2(Nsize(1)+1)
       double precision :: shapH3(Nsize(1)+1),dshapH3(Nsize(1)+1)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...debugging flag
       integer :: iprint
       iprint=0
@@ -94,7 +94,7 @@ c
 c  ...give total degrees of freedom
       NrdofH = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001) Xi(1:3)
@@ -156,7 +156,7 @@ c      integer :: noriE(12),noriF(6),norder(19),nordF(3)
       double precision :: shapQ2(Nsize(1))
       double precision :: shapQ3(Nsize(1))
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...debugging flag
       integer :: iprint
       iprint=0
@@ -241,7 +241,7 @@ c
 c  ...give total degrees of freedom
       NrdofE = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001) Xi(1:3)
@@ -303,7 +303,7 @@ c      integer :: noriF(6),norder(19),nordF(3)
       double precision :: shapQ2(Nsize(1))
       double precision :: shapQ3(Nsize(1))
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...debugging flag
       integer :: iprint
       iprint=0
@@ -378,7 +378,7 @@ c
 c  ...give total degrees of freedom
       NrdofV = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001) Xi(1:3)

@@ -14,7 +14,7 @@ c
 c
       integer, external :: idamax
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
       if (iprint.eq.1) then
@@ -53,7 +53,7 @@ c
         c=1.d0/c
 c
         call dscal(n-k,c,a(k+1,k),inc)
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7003) k
  7003     format('decomp: k = ',i4)
@@ -89,7 +89,7 @@ c
       integer :: inc,i,j,k
       real(8) :: c
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint = 0
 c

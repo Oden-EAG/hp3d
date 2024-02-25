@@ -40,7 +40,7 @@ c
       integer ::                                                      i
       double precision ::                                          tt,y
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -62,7 +62,7 @@ c  ...higher order if necessary - use recurrence formula
         enddo
       endif
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...catching problems (debugging)
       if (iprint.eq.1) then
         write(*,7002) Nord, X,T
@@ -116,7 +116,7 @@ c
       integer ::                                                i,ifact
       double precision ::                              ptemp(0:Nord),tt
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -144,7 +144,7 @@ c  ...general case: compute R
         enddo
       endif
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...catching problems (debugging)
       if (iprint.eq.1) then
         write(*,7002) Idec,Nord, X,T
@@ -203,7 +203,7 @@ c
       integer ::       minI,maxI,i,ni,a,aa,al,ai,bi,ci,di,alpha(0:Nord)
       double precision ::                                          y,tt
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -252,7 +252,7 @@ c
         enddo
       endif
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...catching problems (debugging)
       if (iprint.eq.1) then
         write(*,7003) Nord, X,T
@@ -312,7 +312,7 @@ c
      .                                                    alpha(1:Nord)
       double precision ::            ai,bi,ci,tt,ptemp(1:Nord+1,0:Nord)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -396,7 +396,7 @@ c              P(a,i-1) =  ptemp(a,i-1)
         endif
       endif
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...catching problems (debugging)
       if (iprint.eq.1) then
         write(*,7003) minI,Nord, X,T

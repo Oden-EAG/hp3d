@@ -38,7 +38,7 @@ subroutine break(Mdle,Kref)
    call find_face_ref_flags(ntype,Kref, kreff)
    call find_edge_ref_flags(ntype,Kref, krefe)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.2) then
       call elem_show(Mdle,ntype,nodesl,norientl)
  7000 format('break: Mdle = ',i7)
@@ -153,7 +153,7 @@ subroutine break(Mdle,Kref)
    call nr_mdle_sons(ntype,Kref, nrsons)
    NRELES=NRELES+nrsons-1
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.ge.1) then
       write(*,7100) Mdle, S_Type(NODES(Mdle)%ntype), Kref
  7100 format('break: Mdle ',i7,' ',a4, ' HAS BEEN BROKEN WITH Kref = ', i3)

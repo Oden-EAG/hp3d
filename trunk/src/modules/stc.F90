@@ -352,7 +352,7 @@ subroutine stc_fwd_herm(Ni,Nb, Aii,Abi,Aib,Abb,Bi,Bb)
 !
 !..Compute Cholesky factorization: Abb = LL^*
 !..Copy to RFP format
-#if C_MODE
+#if HP3D_COMPLEX
    call ZTRTTF('N','U',Nb,Abb,Nb,AP,info)
 #else
    call DTRTTF('N','U',Nb,Abb,Nb,AP,info)
@@ -363,7 +363,7 @@ if (info.ne.0) then
 endif
 !
 !..Cholesky factorization
-#if C_MODE
+#if HP3D_COMPLEX
    call ZPFTRF('N','U', Nb, AP, info)
 #else
    call DPFTRF('N','U', Nb, AP, info)
@@ -374,7 +374,7 @@ endif
    endif
 !
 !..Compute inv(Abb)*Bb
-#if C_MODE
+#if HP3D_COMPLEX
    call ZPFTRS('N','U', Nb, NR_RHS, AP, Bb, Nb, info)
 #else
    call DPFTRS('N','U', Nb, NR_RHS, AP, Bb, Nb, info)
@@ -385,7 +385,7 @@ endif
    endif
 !
 !..Compute inv(Abb)*Abi
-#if C_MODE
+#if HP3D_COMPLEX
    call ZPFTRS('N','U', Nb, Ni, AP, Abi, Nb, info)
 #else
    call DPFTRS('N','U', Nb, Ni, AP, Abi, Nb, info)
@@ -398,7 +398,7 @@ endif
 !..Compute condensed RHS Bi (store it in Bi)
 !  Bi = Bi - Aib*inv(Abb)*Bb
 !  GEMM: Bi = -1.0 * Aib * (inv(Abb)*Bb) + 1.0 * Bi
-#if C_MODE
+#if HP3D_COMPLEX
    call ZGEMM('N','N',Ni,NR_RHS,Nb,-ZONE,Aib,Ni,Bb,Nb,ZONE,Bi,Ni)
 #else
    call DGEMM('N','N',Ni,NR_RHS,Nb,-ZONE,Aib,Ni,Bb,Nb,ZONE,Bi,Ni)
@@ -407,7 +407,7 @@ endif
 !..Compute condensed system Aii (store it in Aii)
 !  Aii = Aii - Aib*inv(Abb)*Abi
 !  GEMM: Aii = -1.0 * Aib * (inv(Abb)*Abi) + 1.0 * Aii
-#if C_MODE
+#if HP3D_COMPLEX
    call ZGEMM('N','N',Ni,Ni,Nb,-ZONE,Aib,Ni,Abi,Nb,ZONE,Aii,Ni)
 #else
    call DGEMM('N','N',Ni,Ni,Nb,-ZONE,Aib,Ni,Abi,Nb,ZONE,Aii,Ni)
@@ -456,7 +456,7 @@ subroutine stc_fwd_gen(Ni,Nb, Aii,Abi,Aib,Abb,Bi,Bb)
 !----------------------------------------------------------------------
 !
 !..Compute pivoted LU factorization: Abb = PLU
-#if C_MODE
+#if HP3D_COMPLEX
       call ZGETRF(Nb,Nb,Abb,Nb,piv,info)
 #else
       call DGETRF(Nb,Nb,Abb,Nb,piv,info)
@@ -467,7 +467,7 @@ subroutine stc_fwd_gen(Ni,Nb, Aii,Abi,Aib,Abb,Bi,Bb)
    endif
 !
 !..Compute inv(Abb)*Bb
-#if C_MODE
+#if HP3D_COMPLEX
       call ZGETRS('N',Nb,NR_RHS,Abb,Nb,piv,Bb,Nb,info)
 #else
       call DGETRS('N',Nb,NR_RHS,Abb,Nb,piv,Bb,Nb,info)
@@ -478,7 +478,7 @@ subroutine stc_fwd_gen(Ni,Nb, Aii,Abi,Aib,Abb,Bi,Bb)
    endif
 !
 !..Compute inv(Abb)*Abi
-#if C_MODE
+#if HP3D_COMPLEX
       call ZGETRS('N',Nb,Ni,Abb,Nb,piv,Abi,Nb,info)
 #else
       call DGETRS('N',Nb,Ni,Abb,Nb,piv,Abi,Nb,info)
@@ -491,7 +491,7 @@ subroutine stc_fwd_gen(Ni,Nb, Aii,Abi,Aib,Abb,Bi,Bb)
 !..Compute condensed RHS Bi (store it in Bi)
 !  Bi = Bi - Aib*inv(Abb)*Bb
 !  GEMM: Bi = -1.0 * Aib * (inv(Abb)*Bb) + 1.0 * Bi
-#if C_MODE
+#if HP3D_COMPLEX
    call ZGEMM('N','N',Ni,NR_RHS,Nb,-ZONE,Aib,Ni,Bb,Nb,ZONE,Bi,Ni)
 #else
    call DGEMM('N','N',Ni,NR_RHS,Nb,-ZONE,Aib,Ni,Bb,Nb,ZONE,Bi,Ni)
@@ -500,7 +500,7 @@ subroutine stc_fwd_gen(Ni,Nb, Aii,Abi,Aib,Abb,Bi,Bb)
 !..Compute condensed system Aii (store it in Aii)
 !  Aii = Aii - Aib*inv(Abb)*Abi
 !  GEMM: Aii = -1.0 * Aib * (inv(Abb)*Abi) + 1.0 * Aii
-#if C_MODE
+#if HP3D_COMPLEX
    call ZGEMM('N','N',Ni,Ni,Nb,-ZONE,Aib,Ni,Abi,Nb,ZONE,Aii,Ni)
 #else
    call DGEMM('N','N',Ni,Ni,Nb,-ZONE,Aib,Ni,Abi,Nb,ZONE,Aii,Ni)
@@ -670,7 +670,7 @@ subroutine stc_bwd(Ni,Nb,Abi,Xi, Xb)
 !----------------------------------------------------------------------
 !
 !..GEMM: Xb = -1.0 * Abi * Xi + 1.0 * Xb
-#if C_MODE
+#if HP3D_COMPLEX
    call ZGEMM('N','N',Nb,NR_RHS,Ni,-ZONE,Abi,Nb,Xi,Ni,ZONE,Xb,Nb)
 #else
    call DGEMM('N','N',Nb,NR_RHS,Ni,-ZONE,Abi,Nb,Xi,Ni,ZONE,Xb,Nb)
@@ -715,7 +715,7 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
 !..component counters for the nodes (use in case of multiple loads)
    integer :: mvarH,mvarE,mvarV,mvarQ
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint=0
 #endif
@@ -733,7 +733,7 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
 !
 !..get index for each component of middle node
    call get_index(nod, index)
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,7001) nod,index
  7001 format('stc_solout: nod = ',i5,' index = ',10i2)
@@ -793,7 +793,7 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
                      nn = nn+1
 !                 ...copy the dof
                      NODES(nod)%dof%zdofH(ivar,j,N_COMS) = Xb(nn,load)
-#if DEBUG_MODE
+#if HP3D_DEBUG
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Xb(nn,load)
  7006                   format('stc_solout: nn,load,Xb(nn,load) = ',i4,i2,1x,2e13.5)
@@ -845,7 +845,7 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
                      nn = nn+1
 !                 ...copy the dof
                      NODES(nod)%dof%zdofE(ivar,j,N_COMS) = Xb(nn,load)
-#if DEBUG_MODE
+#if HP3D_DEBUG
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Xb(nn,load)
                         write(*,7009)       nod,j,ivar,NODES(nod)%dof%zdofE(ivar,j,N_COMS)
@@ -896,7 +896,7 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
                      nn = nn+1
 !                 ...copy the dof
                      NODES(nod)%dof%zdofV(ivar,j,N_COMS) = Xb(nn,load)
-#if DEBUG_MODE
+#if HP3D_DEBUG
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Xb(nn,load)
                         write(*,7010)       nod,j,ivar,NODES(nod)%dof%zdofV(ivar,j,N_COMS)
@@ -952,7 +952,7 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
                      nn = nn+1
 !                 ...copy the dof
                      NODES(nod)%dof%zdofQ(ivar,j,N_COMS) = Xb(nn,load)
-#if DEBUG_MODE
+#if HP3D_DEBUG
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Xb(nn,load)
                         write(*,7011)       nod,j,ivar,NODES(nod)%dof%zdofQ(ivar,j,N_COMS)
@@ -977,14 +977,14 @@ subroutine stc_solout(Mdle,Nb,Xb,Nrdofb)
 !
  500  continue
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) call pause
 #endif
 !
 !..end of loop through loads
    enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) write(*,*) 'stc_solout finished.'
 #endif
 !

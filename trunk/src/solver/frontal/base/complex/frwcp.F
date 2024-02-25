@@ -45,7 +45,7 @@ c  ...test......test......test......test......test......test......test...
 ccc      integer :: ndest1(100)
 c  ...test......test......test......test......test......test......test...
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -69,7 +69,7 @@ c
 c
 c loop over the Elements
 c **********************
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(nfsout,*) 'FRWCP: NUMELM = ',NUMELM
       endif
@@ -84,7 +84,7 @@ c
 c pull up the Elements nodal destination vectors (Aldest)
 c
          call solin1 (iel, numdes, Aldest)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (iprint.eq.1) write(*,*) 'iel,numdes',iel,numdes
 #endif
 c        ------------------------------
@@ -430,7 +430,7 @@ c           -------------
 c ***************
 c store the final length of the current front (LFW) into Alelm
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (iprint.eq.1) then
            write(*,*) 'frwcp: NFW = ',NFW
          endif
@@ -468,7 +468,7 @@ c
   170       continue
 c
          endif
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (iprint.eq.1) then
            write(*,*) 'frwcp: at the end of the loop'
          endif

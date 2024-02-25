@@ -26,7 +26,7 @@ subroutine dof_out( Nod,Ncoms,               &
   integer :: i, j, k, ivarH, ivarE, ivarV, ivarQ
   integer :: ndofH, ndofE, ndofV, ndofQ, nvar
 
-#if DEBUG_MODE
+#if HP3D_DEBUG
   integer :: iprint
   iprint=0
 #endif
@@ -68,7 +68,7 @@ subroutine dof_out( Nod,Ncoms,               &
 
                     ZvalH(nvar,KdofH+1:KdofH+ndofH) = &
                          NODES(Nod)%dof%zdofH(ivarH,1:ndofH,Ncoms)
-#if DEBUG_MODE
+#if HP3D_DEBUG
                     if (iprint.eq.1) then
                        write(*,7001) ivarH,nvar,KdofH+1,KdofH+ndofH
                        write(*,*) 'ZvalH = ',ZvalH(nvar,KdofH+1:KdofH+ndofH)
@@ -82,7 +82,7 @@ subroutine dof_out( Nod,Ncoms,               &
                  if (ndofE.gt.0) then
                     ZvalE(nvar,KdofE+1:KdofE+ndofE) = &
                          NODES(Nod)%dof%zdofE(ivarE,1:ndofE,Ncoms)
-#if DEBUG_MODE
+#if HP3D_DEBUG
                     if (iprint.eq.2) then
                        write(*,7001) ivarE,nvar,KdofE+1,KdofE+ndofE
                        write(*,*) 'ZvalE = ', ZvalE(nvar,KdofE+1:KdofE+ndofE)
@@ -96,7 +96,7 @@ subroutine dof_out( Nod,Ncoms,               &
                  if (ndofV.gt.0) then
                     ZvalV(nvar,KdofV+1:KdofV+ndofV) = &
                          NODES(Nod)%dof%zdofV(ivarV,1:ndofV,Ncoms)
-#if DEBUG_MODE
+#if HP3D_DEBUG
                     if (iprint.eq.3) then
                        write(*,7001) ivarV,nvar,KdofV+1,KdofV+ndofV
                        write(*,*) 'ZvalV = ', ZvalV(nvar,KdofV+1:KdofV+ndofV)

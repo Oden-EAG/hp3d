@@ -265,7 +265,7 @@
       integer, intent(in) :: Nod
       integer :: nfath
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
 !
       iprint=0

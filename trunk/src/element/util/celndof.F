@@ -34,7 +34,7 @@ c
       integer :: nredg
       integer :: ndofH,ndofE,ndofV,ndofQ
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -43,7 +43,7 @@ c
 c  ...V E R T I C E S..................................................
       do i=1,nvert(Ntype)
         call ndof_nod(VERT,1, ndofH,ndofE,ndofV,ndofQ)
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7001) 'vert',1,ndofH,ndofE,ndofV,ndofQ
  7001     format('celndof: type,nord,ndofH,ndofE,ndofV,ndofQ = ',
@@ -58,7 +58,7 @@ c  ...E D G E S........................................................
       nredg = nedge(Ntype)
       do i=1,nredg
         call ndof_nod(MEDG,Norder(i), ndofH,ndofE,ndofV,ndofQ)
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7001) 'medg',Norder(i),ndofH,ndofE,ndofV,ndofQ
         endif
@@ -87,7 +87,7 @@ c  ...PRISM
         do i=1,2
           j=j+1
           call ndof_nod(MDLT,Norder(j), ndofH,ndofE,ndofV,ndofQ)
-#if DEBUG_MODE
+#if HP3D_DEBUG
           if (iprint.eq.1) then
             write(*,7001) 'mdlt',Norder(j),ndofH,ndofE,ndofV,ndofQ
           endif
@@ -98,7 +98,7 @@ c  ...PRISM
         do i=1,3
           j=j+1
           call ndof_nod(MDLQ,Norder(j), ndofH,ndofE,ndofV,ndofQ)
-#if DEBUG_MODE
+#if HP3D_DEBUG
           if (iprint.eq.1) then
             write(*,7001) 'mdlq',Norder(j),ndofH,ndofE,ndofV,ndofQ
           endif
@@ -108,7 +108,7 @@ c  ...PRISM
         enddo
         j=j+1
         call ndof_nod(MDLP,Norder(j), ndofH,ndofE,ndofV,ndofQ)
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7001) 'mdlp',Norder(j),ndofH,ndofE,ndofV,ndofQ
         endif

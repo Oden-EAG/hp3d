@@ -1,4 +1,4 @@
-#if DEBUG_MODE
+#if HP3D_DEBUG
 
 !-----------------------------------------------------------------------
 subroutine volume_hp(Vol)

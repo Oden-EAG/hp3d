@@ -74,7 +74,7 @@ c
       integer :: j,k,nord,nc,nel,nrb,nrdof,nrs,nspan
       integer :: ndof_i,ndof_j,ndof_mdlt,ndof_medg
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint = 0
 #endif
@@ -145,7 +145,7 @@ c
         enddo
       enddo
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'ic, nrdof = ', ic, nrdof
         call pause
@@ -171,7 +171,7 @@ c
       endif
 ccc      r = 2.d0*evalbig(1:nrdof,1:nrdof)
       r = evalbig(1:nrdof,1:nrdof)
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7002) r(1:nrdof,1:nrdof)
  7002   format('r=', 10e12.5)
@@ -273,7 +273,7 @@ c
         enddo
       enddo
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'ic, nrdof = ', ic, nrdof
         call pause
@@ -299,7 +299,7 @@ c
 ccc      r = 2.d0*evalbig(1:nrdof,1:nrdof)
       r = evalbig(1:nrdof,1:nrdof)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7002) r(1:nrdof,1:nrdof)
       endif
@@ -401,7 +401,7 @@ c
         enddo
       enddo
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'ic, nrdof = ', ic, nrdof
         call pause
@@ -427,7 +427,7 @@ c
 ccc      r = 2.d0*evalbig(1:nrdof,1:nrdof)
       r = evalbig(1:nrdof,1:nrdof)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7002) r(1:nrdof,1:nrdof)
       endif
@@ -529,7 +529,7 @@ c
         enddo
       enddo
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'ic, nrdof = ', ic, nrdof
         call pause
@@ -554,7 +554,7 @@ c
       endif
 ccc      r = -2.d0*evalbig(1:nrdof,1:nrdof)
       r = evalbig(1:nrdof,1:nrdof)
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7002) r(1:nrdof,1:nrdof)
       endif
@@ -611,7 +611,7 @@ c
 c
 c*********************************************************************
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c
 c  ...begin testing
   777 continue

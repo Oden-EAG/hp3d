@@ -166,7 +166,7 @@ subroutine elem_heat(Mdle,                   &
    ! real(8), allocatable     :: W(:),   RWORK(:)
    ! integer, allocatable    :: IWORK(:)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
 !..BC's flags
    integer :: ibc(6,NRINDEX)
 !..auxiliary
@@ -181,7 +181,7 @@ subroutine elem_heat(Mdle,                   &
 !--------- INITIALIZE THE ELEMENT ORDER, ORIENTATION ETC. ------------
 !---------------------------------------------------------------------
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
 !..Set iprint = 0/1 (Non-/VERBOSE)
    iprint = 0
    if (iprint.eq.1) then
@@ -250,7 +250,7 @@ subroutine elem_heat(Mdle,                   &
          stop
    end select
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
 !..get the element boundary conditions flags
    call find_bc(Mdle, ibc)
    if (iprint.eq.1) then
@@ -296,7 +296,7 @@ subroutine elem_heat(Mdle,                   &
 !  ...H1 shape functions
       call shape3DH(etype,xi,norder,norient_edge,norient_face, &
                     nrdof,shapH,gradH)
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (nrdof .ne. NrdofH) then
          write(*,*) 'elem_heat: INCONSISTENCY NrdofH. stop.'
          stop
@@ -305,7 +305,7 @@ subroutine elem_heat(Mdle,                   &
 !
 !  ...discontinuous H1 shape functions
       call shape3HH(etype,xi,nordP, nrdof,shapHH,gradHH)
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (nrdof .ne. NrdofHH) then
          write(*,*) 'elem_heat: INCONSISTENCY NrdofHH. stop.'
          stop
@@ -442,7 +442,7 @@ subroutine elem_heat(Mdle,                   &
 !..end loop through integration points
    enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
 !..printing Gram matrix
 !   iprint = 0
 !   if (iprint.eq.1) then
@@ -492,7 +492,7 @@ subroutine elem_heat(Mdle,                   &
 !
 !     ...determine discontinuous H1 shape functions
          call shape3HH(etype,xi,nordP, nrdof,shapHH,gradHH)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (nrdof .ne. NrdofHH) then
             write(*,*) 'elem_heat: INCONSISTENCY NrdofHH. stop.'
             stop
@@ -502,7 +502,7 @@ subroutine elem_heat(Mdle,                   &
 !     ...determine element H1 shape functions (for geometry)
          call shape3DH(etype,xi,norder,norient_edge,norient_face, &
                        nrdof,shapH,gradH)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (nrdof .ne. NrdofH) then
             write(*,*) 'elem_heat: INCONSISTENCY NrdofH. stop.'
             stop
@@ -513,7 +513,7 @@ subroutine elem_heat(Mdle,                   &
 !     ...for interfaces only (no bubbles)
          call shape3DV(etype,xi,norderi,norient_face, &
                        nrdof,shapV,divV)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (nrdof .ne. NrdofVi) then
             write(*,*) 'elem_heat: INCONSISTENCY NrdofV. stop.'
             stop

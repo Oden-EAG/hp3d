@@ -43,7 +43,7 @@ subroutine set_3Dint_fi(EType,Norder, nordx,nordy,nordz,nintx,ninty, &
 !
    integer :: i,l,l1,l2,l3,nordh,nordv,nord1,nord2,nord3
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
 #endif
 !
@@ -52,7 +52,7 @@ subroutine set_3Dint_fi(EType,Norder, nordx,nordy,nordz,nintx,ninty, &
 !..initialize if needed
    if (.not. INITIALIZED) call init_gauss_quadrature
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    iprint=0
    if (iprint.eq.1) then
       write(*,7001) S_Type(etype),Norder

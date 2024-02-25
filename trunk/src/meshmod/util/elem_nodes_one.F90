@@ -32,14 +32,14 @@ subroutine elem_nodes_one(Nfath,Nodesl_fath,Norientl_fath,Ison, &
    integer :: iref, ireff, iref1, iref2, iref3, nort
    integer :: j, jp, nodp, nodpp, is, is1, n_nodes
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint=0
 #endif
 !
 !----------------------------------------------------------------------------
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,*) '------------------------------------------------'
       write(*,*) 'elem_nodes_one: Begin'
@@ -116,7 +116,7 @@ subroutine elem_nodes_one(Nfath,Nodesl_fath,Norientl_fath,Ison, &
       endif
    enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,7031) Nod
  7031 format('elem_nodes_one: NODES AND ORIENT FOR mdle = ',i6)

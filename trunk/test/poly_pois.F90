@@ -23,8 +23,8 @@ program test_poly_pois
 !..initialize MPI environment
    call mpi_w_init
 !
-#if C_MODE
-   write(*,*) 'test_poly_pois: C_MODE'
+#if HP3D_COMPLEX
+   write(*,*) 'test_poly_pois: HP3D_COMPLEX'
    NPASS = 1; goto 99
 #endif
 !

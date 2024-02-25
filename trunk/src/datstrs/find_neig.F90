@@ -21,7 +21,7 @@ subroutine find_neig(Mdle, Neig_list)
   integer, dimension(2)  :: neig,nsid_list,norient_list
   integer :: i,nod,nrneig,ntype
   !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   integer :: iprint
   iprint=0
 #endif
@@ -31,7 +31,7 @@ subroutine find_neig(Mdle, Neig_list)
   Neig_list(1:4,1:6)=0
   ntype=NODES(Mdle)%ntype
   !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
      write(*,*) 'find_neig: Mdle, type = ', Mdle, S_Type(ntype)
   endif

@@ -67,7 +67,7 @@ c
       integer :: i,ipp,j,jbeg,jp,jpbeg,jpend,k,ians,icl,info
       integer :: n,nel,nrb,nord,nrdof,nrs
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint = 0
 #endif
@@ -130,7 +130,7 @@ c
       enddo
 c
       n = (nord+1)*(nord+2)/2
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'setcnstr_trian_iso_h1: shapsma COLUMNWISE ....'
         do i=1,n
@@ -151,7 +151,7 @@ ccc      endif
 cccc
 ccc      do i=1,n
 ccc        call gauss2(n,na,shapsma,ip,shapbig(1:n,i), r(1:n,i))
-ccc#if DEBUG_MODE
+ccc#if HP3D_DEBUG
 ccc        if (iprint.eq.1) then
 ccc          write(*,*) 'setcnstr_trian: r FOR i = ',i
 ccc          write(*,7003) r(1:n,i)
@@ -680,7 +680,7 @@ c
 c
 c*********************************************************************
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c
 c  ...begin testing
   777 continue

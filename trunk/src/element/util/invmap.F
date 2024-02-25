@@ -57,7 +57,7 @@ c
       integer :: i,iter,k
       integer :: iflag
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
 #endif
 c
@@ -65,7 +65,7 @@ c
 c
 c-----------------------------------------------------------------------
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       iprint=0
 c
 c  ...initiate the NR iterations
@@ -100,7 +100,7 @@ c       the physical coordinates wrt master element coordinates
             dxdxi(1:3,i) = dxdxi(1:3,i) + Xnod(1:3,k)*gradH(i,k)
           enddo
         enddo
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,*)'----------------------------'
           write(*,7001) iter,Xi(1:3),x(1:3)
@@ -122,7 +122,7 @@ c       element
         enddo
 c
 c  .....update xi
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7002) eps,dxi(1:3)
  7002     format('invmap: eps, dxi = ',e12.5,4x,3(e12.5,2x))
@@ -136,7 +136,7 @@ c  .....check convergence
       enddo
       Idec=0; return
  10   continue
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'invmap: NR LOOP FINISHED'
         write(*,*) '***************************'
@@ -176,7 +176,7 @@ c  ...check if the point lies within the element
         endif
       end select
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if(iprint.eq.1)then
         write(*,*)'Exiting invmap with Idec=',Idec
       endif

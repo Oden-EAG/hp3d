@@ -372,7 +372,7 @@ subroutine mumps_sc(mtype)
    mumps_par%JOB = 1
 !
    if (IPRINT_TIME .eq. 1) time_stamp = MPI_Wtime()
-#if C_MODE
+#if HP3D_COMPLEX
    call zmumps(mumps_par)
 #else
    call dmumps(mumps_par)
@@ -398,7 +398,7 @@ subroutine mumps_sc(mtype)
    mumps_par%JOB = 2
 !
    if (IPRINT_TIME .eq. 1) time_stamp = MPI_Wtime()
-#if C_MODE
+#if HP3D_COMPLEX
    call zmumps(mumps_par)
 #else
    call dmumps(mumps_par)
@@ -424,7 +424,7 @@ subroutine mumps_sc(mtype)
    mumps_par%JOB = 3
 !
    if (IPRINT_TIME .eq. 1) time_stamp = MPI_Wtime()
-#if C_MODE
+#if HP3D_COMPLEX
    call zmumps(mumps_par)
 #else
    call dmumps(mumps_par)

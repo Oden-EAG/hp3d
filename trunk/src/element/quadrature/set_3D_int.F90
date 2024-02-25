@@ -178,7 +178,7 @@ subroutine set_3Dint_aux(Ntype,Norder,Maxp,Max_nint3, Nint,Xiloc,Waloc)
       integer :: i,l,l1,l2,l3
       real(8) :: factor
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -188,7 +188,7 @@ subroutine set_3Dint_aux(Ntype,Norder,Maxp,Max_nint3, Nint,Xiloc,Waloc)
 !  ...initialize if needed
       if (.not. INITIALIZED) call init_gauss_quadrature
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) S_Type(Ntype),Norder
  7001   format('set_3Dint_aux: Type, Norder = ',a4,2x,19i4)
@@ -388,7 +388,7 @@ subroutine set_3Dint_aux(Ntype,Norder,Maxp,Max_nint3, Nint,Xiloc,Waloc)
 end subroutine set_3Dint_aux
 !
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
 !
 !----------------------------------------------------------------------
 !

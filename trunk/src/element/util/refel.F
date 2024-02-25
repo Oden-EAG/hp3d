@@ -49,7 +49,7 @@ c
       integer :: i,j,ie,is,iv,ifc,igen,jp,kref1,kref2,kref3
       integer :: nrsons,nv1,nv2,nv3,nv4,lab
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -58,7 +58,7 @@ c----------------------------------------------------------------------
 c
       Xsubel = 0.d0
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.ge.1) then
         write(*,7000)mdle
  7000   format(' refel: mdle = ',i10)
@@ -80,7 +80,7 @@ c        call locate(nson,NODES(nfath)%sons,nrsons, noson(igen))
 c        if (noson(igen)<0 .or. noson(igen)>nrsons) call pause
 c
 c  .....extensive printing
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.ge.2) then
           write(*,7002)igen,nfath,nson,S_Type(father_type(igen)),
      .                 S_Type(son_type(igen)),
@@ -107,7 +107,7 @@ c  ...reference coordinates of ancestor
       case(MDLD); x(1:3,1:5) = PYRAM_COORD(1:3,1:5)
       end select
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...printing
       if (iprint.ge.2) then
         do i=1,Nvert(NODES(nel)%ntype)
@@ -143,7 +143,7 @@ c  .......node shared with the father
             if (jp.eq.0) jp=j
             x_new(1:3,j) = x(1:3,jp)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iprint.ge.2) then
               write(*,*)'node shared with the father: jp = ',jp
               write(*,8000)j,x_new(1:3,j)
@@ -159,7 +159,7 @@ c  .........parent edge node
               call edge_to_vert(ftype,ie, nv1,nv2)
               x_new(1:3,j) = (x(1:3,nv1) + x(1:3,nv2))/2.d0
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
               if (iprint.ge.2) then
                 write(*,*)'parent edge node: nv1,nv2 = ',nv1,nv2
                 write(*,8000)j,x_new(1:3,j)
@@ -174,7 +174,7 @@ c  .........parent rectangular face node
               x_new(1:3,j) = (x(1:3,nv1) + x(1:3,nv2)
      .                      + x(1:3,nv3) + x(1:3,nv4))/4.d0
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
               if (iprint.ge.2) then
                 write(*,*)'parent rectangular face node: nv1,nv2,nv3,
      . nv4 = ',nv1,nv2,nv3,nv4
@@ -190,7 +190,7 @@ c  .........parent middle node (brick element only)
               enddo
               x_new(1:3,j) = x_new(1:3,j)/8.d0
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
               if (iprint.ge.2) then
                 write(*,*)'parent middle node (brick only!)'
                 write(*,8000)j,x_new(1:3,j)
@@ -205,7 +205,7 @@ c
 c  .....end of loop through vertex nodes
         enddo
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  .....printing
         if (iprint.ge.2) then
           write(*,7003)igen,Nvert(son_type(igen))
@@ -226,7 +226,7 @@ c
       Xsubel(1:3,1:nvert(NODES(Mdle)%ntype)) =
      .     x(1:3,1:nvert(NODES(Mdle)%ntype))
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) Mdle,Xsubel(1:3,1:nvert(NODES(Mdle)%ntype))
  7001   format('refel: Mdle = ',i6,' Xsubel = ',8(/,3(f8.3,2x)))

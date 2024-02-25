@@ -62,7 +62,7 @@ c
 c
       complex(8) :: one = (1.d0,0.d0)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -70,7 +70,7 @@ c
       id = Aidx
       idm = id - 1
       idp = id + 1
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(nfsout,*) 'ELMSOL: Aidx = ',Aidx
       endif
@@ -117,7 +117,7 @@ c for symmetric   : s = f(m)/k(m,m)
 c for unsymmetric : s = f(m)
 c
          s = Bbuf(in)/f1
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (iprint.eq.1) then
            write(nfsout,*) 'ELMSOL: in,Bbuf(in) = ',in,Bbuf(in)
            write(nfsout,*) 'ELMSOL: f1 = ',f1

@@ -11,7 +11,7 @@ subroutine find_order(Mdle, Norder)
 !
   integer, dimension(27) :: nodesl, norientl
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   integer :: iprint
   iprint=0
 #endif
@@ -20,7 +20,7 @@ subroutine find_order(Mdle, Norder)
   call elem_nodes(Mdle, nodesl,norientl)
   call find_order_from_list(NODES(Mdle)%Ntype,nodesl, Norder)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
      write(*,7001) Mdle,S_Type(NODES(Mdle)%Ntype)
 7001 format('find_order: Mdle = ',i8,' Mdle type = ',a5)

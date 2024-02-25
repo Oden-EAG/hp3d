@@ -77,7 +77,7 @@
   integer :: nrv,nre,nrf,i,j,k,kj,ki,&
              ndofH_edge,ndofE_edge,ndofV_edge,ndofQ_Edge,iflag1
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   integer :: iprint
   iprint=0
 #endif
@@ -86,7 +86,7 @@
 !
   nrv = nvert(Ntype); nre = nedge(Ntype); nrf = nface(Ntype)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Iedge,S_Type(Ntype)
 7010 format('hpedge: Mdle,Iflag,No,Iedge,Type = ',4i4,2x,a4)
@@ -220,7 +220,7 @@
 ! end of loop through integration points
   enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
     write(*,*) 'hpedge: LOAD VECTOR AND STIFFNESS MATRIX FOR ', &
                'ndofH_edge = ',ndofH_edge
@@ -257,7 +257,7 @@
   call dtrsm('L','L','N','U',ndofH_edge,3,1.d0,aaH,naH, uu,naH)
   call dtrsm('L','U','N','N',ndofH_edge,3,1.d0,aaH,naH, uu,naH)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
    write(*,*) 'hpedge: k,uu(k) = '
    do k=1,ndofH_edge

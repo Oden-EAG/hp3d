@@ -215,7 +215,7 @@ subroutine result
                   nbeg =(iload-1)*nvar; nend=nbeg+nvar
                   do k=1,ndofH
                      write(*,7034) NODES(nod)%dof%zdofH(nbeg+1:nend,k,N_COMS)
-#if C_MODE
+#if HP3D_COMPLEX
  7034                format(10x,5(2e12.5,2x))
 #else
  7034                format(10x,5e23.15)

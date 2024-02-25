@@ -79,7 +79,7 @@ c  ...use origin for the initial guess
 c
 c  ...start NR iterations
       do iter=1,10
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7001) iter
  7001     format('invmap_face: iter = ',i2)
@@ -89,7 +89,7 @@ c
 c  .....determine master element coordinates of the point and their
 c       derivatives wrt master face coordinates
         call face_param(NODES(Mdle)%ntype,Ifc,t, Xi,dxidt)
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7002) S_Type(NODES(Mdle)%ntype),Ifc,T
  7002     format('invmap_face: NODES(Mdle)%type,Ifc,T = ',
@@ -115,7 +115,7 @@ c       master element coordinates
             dxdxi(1:3,i) = dxdxi(1:3,i) + xnod(1:3,k)*dvshapH(i,k)
           enddo
         enddo
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           do ivar=1,3
             write(*,7004) ivar,X(ivar),dxdxi(ivar,1:3)
@@ -132,7 +132,7 @@ c       coordinates
             dxdt(1:3,i) = dxdt(1:3,i) + dxdxi(1:3,j)*dxidt(j,i)
           enddo
         enddo
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           do ivar=1,3
             write(*,7005) ivar,dxdt(ivar,1:2)
@@ -153,7 +153,7 @@ c       derivatives wrt master face coordinates
           enddo
         enddo
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,*) 'invmap_face: dxpdt,Xy_in-xp = '
           do i=1,2
@@ -170,7 +170,7 @@ c  .....solve for the next iterate
         det1 = (Xy_in(1)-xp(1))*dxpdt(2,2) - (Xy_in(2)-xp(2))*dxpdt(1,2)
         det2 = (Xy_in(2)-xp(2))*dxpdt(1,1) - (Xy_in(1)-xp(1))*dxpdt(2,1)
         dt(1) = det1/det; dt(2) = det2/det
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7007) dt
  7007     format('invmap_face: dt = ',2f8.3)

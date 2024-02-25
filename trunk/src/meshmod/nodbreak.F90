@@ -22,7 +22,7 @@ subroutine nodbreak(Nod,Kref,Iact)
 !
 !-------------------------------------------------------------------------
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint = 0
    if (iprint.eq.1) then
@@ -59,7 +59,7 @@ subroutine nodbreak(Nod,Kref,Iact)
       if (i.eq.1) NODES(Nod)%first_son = ison
    enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,7011) Nod
  7011 format('nodbreak: Nod ',i5,' HAS BEEN BROKEN')

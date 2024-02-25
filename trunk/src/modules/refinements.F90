@@ -37,7 +37,7 @@ module refinements
   logical :: ISO_ONLY = .FALSE.
 !
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
 !-----------------------------------------------------------------------
 !< @date Mar 2023
   interface elem_show

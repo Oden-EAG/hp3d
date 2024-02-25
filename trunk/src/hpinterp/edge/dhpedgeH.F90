@@ -88,7 +88,7 @@ subroutine dhpedgeH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !
 ! load vector and solution
   VTYPE,   dimension(MAXP-1,MAXEQNH)    :: zbH,zuH
-#if C_MODE
+#if HP3D_COMPLEX
   real(8), dimension(MAXP-1,MAXEQNH)    :: duH_real,duH_imag
 #endif
 !
@@ -98,7 +98,7 @@ subroutine dhpedgeH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !
   logical :: is_homD
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   integer :: iprint
   iprint=0
 #endif
@@ -107,7 +107,7 @@ subroutine dhpedgeH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !
   nrv = nvert(Ntype); nre = nedge(Ntype); nrf = nface(Ntype)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Icase,Iedge,S_Type(Ntype)
 7010 format('dhpedgeH: Mdle,Iflag,No,Icase,Iedge,Type = ',5i4,2x,a4)
@@ -263,7 +263,7 @@ subroutine dhpedgeH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 ! end of loop through integration points
   enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
     write(*,*) 'dhpedgeH: LOAD VECTOR AND STIFFNESS MATRIX FOR ', &
                'ndofH_edge = ',ndofH_edge
@@ -271,12 +271,12 @@ subroutine dhpedgeH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
       write(*,7015) j, zbH(j,1:MAXEQNH)
       write(*,7016) aaH(j,1:ndofH_edge)
     enddo
-# if C_MODE
-7015    format(i5, 6(2e10.3,2x))
-# else
-7015    format(i5, 10e12.5)
-# endif
-7016    format(10e12.5)
+    #if HP3D_COMPLEX
+      7015 format(i5, 6(2e10.3,2x))
+    #else
+      7015 format(i5, 10e12.5)
+    #endif
+    7016 format(10e12.5)
   endif
 #endif
 !
@@ -297,7 +297,7 @@ subroutine dhpedgeH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 ! copy load vector
   zuH(1:ndofH_edge,:) = zbH(1:ndofH_edge,:)
 !
-#if C_MODE
+#if HP3D_COMPLEX
 !
 ! apply pivots to load vector
   call zlaswp(MAXEQNH,zuH,naH,1,ndofH_edge,ipivH,1)
@@ -336,7 +336,7 @@ subroutine dhpedgeH(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !
 #endif
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
    write(*,*) 'dhpedgeH: k,zu(k) = '
    do k=1,ndofH_edge

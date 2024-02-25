@@ -46,7 +46,7 @@ c
 c
       integer :: k,nhalf,nordh,nordv
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -345,7 +345,7 @@ c
         stop 1
       end select
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) I,J
  7001   format('int_coord: I,J = ',2i3)

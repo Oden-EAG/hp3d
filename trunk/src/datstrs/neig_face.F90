@@ -49,7 +49,7 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
   integer :: igen, nrgen, nve, nrf, nod, mdle, mdle_is
   integer :: kref, i, is, nrsons, iface, iflag
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   integer :: iprint
   iprint=0
 #endif
@@ -86,7 +86,7 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
 !
   Nrneig=0 ; Neig=0 ; Nsid_list=0 ; Norient_list=0
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
      write(*,1)Mface,S_Type(NODES(Mface)%ntype)
   endif
@@ -107,7 +107,7 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
 !  ...record number of generations
   nrgen=igen
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
     do i=1,nrgen
       write(*,9)i,nface_list(i)
@@ -120,7 +120,7 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
   ! CASE 2 : middle father node       // face node (namely Mface)
              mdle=nod                 ;  nod=nface_list(nrgen)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
      write(*,3)nrgen,mdle,nod
 3    format(' neig_face: nrgen,mdle,nod = ',i2,2x,2(i10,2x))
@@ -199,7 +199,7 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
        call result
        stop
      endif
-#if DEBUG_MODE
+#if HP3D_DEBUG
      if (iprint.eq.1) then
        write(*,4)Nrneig,Neig(1:2)
 4      format(' neig_face: Nrneig,Neig(:) = ',i1,2x,2(i10,2x))
@@ -208,7 +208,7 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
 !
   endif
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
     write(*,7) Nrneig,Neig(1:Nrneig)
 7   format(' neig_face: neighbors at top level: Nrneig,Neig = ',i1,4x,2(i10,2x))
@@ -256,7 +256,7 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
         ntype=NODES(Neig(i))%ntype
         kref=NODES(Neig(i))%ref_kind
         call nr_mdle_sons(ntype,kref, nrsons)
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
            write(*,13)i,igen,nod,Neig(i),kref,nrsons
 13         format(' neig_face: i,igen,nod,Neig,kref,nrsons = ',2(i2),2x,2i10,2i3)
@@ -285,7 +285,7 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
               nodesl_neig  (1:27,i) = nodesl_is
               norientl_neig(1:27,i) = norientl_is
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
               if (iprint.eq.1) then
                  write(*,8) i,igen,Neig(i)
 8                format(' neig_face: i,igen,Neig(i) = ',i1,2x,i3,2x,i10)

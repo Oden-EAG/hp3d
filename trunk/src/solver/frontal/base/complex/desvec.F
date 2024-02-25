@@ -66,7 +66,7 @@ c
       integer :: i,id,ides,iel,ifrst,inic,ip,ipc,ips
       integer :: j,jd,jdes,jdn,jjd,jp,n,ne,nt,ntt
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
 #endif
 c
@@ -87,7 +87,7 @@ c
       do 10 i = 1,NFN
          Ibb(i) = 0
    10 continue
-#if DEBUG_MODE
+#if HP3D_DEBUG
       iprint = 0
       if (iprint.eq.1) write(NFSOUT,*) 'in desvec.f, numelm=',numelm
 #endif
@@ -99,7 +99,7 @@ c     **********************
 c
 c if the element contains no nodes or multipliers, then skip it
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (iprint.eq.1) then
            write(*,*) 'desvec: iel = ',iel
          endif
@@ -120,7 +120,7 @@ c
          do 60 id = 1,n
 c        ***************
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iprint.eq.1) then
               write(*,*) 'desvec: id = ',id
             endif
@@ -134,13 +134,13 @@ c
 c
 c unpack the number of dof associated w/ this nickname
 cwb >
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iprint.eq.1) then
               write(*,*) 'desvec: inic,NICMUL = ',inic,NICMUL
             endif
 #endif
             NDOFM = modr(inic,NICMUL)
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iprint.eq.1) then
               write(*,*) 'desvec: NDOFM = ',NDOFM
             endif
