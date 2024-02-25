@@ -2,8 +2,8 @@
 
 -include ../../../m_options
 
-COMPLEX   ?= 0
-DEBUG     ?= 0
+HP3D_COMPLEX   ?= 0
+HP3D_DEBUG     ?= 0
 HP3D_USE_OPENMP    ?= 0
 HP3D_USE_INTEL_MKL ?= 0
 
@@ -43,8 +43,8 @@ FC_WORK       = $(FC) $(CCDEFS) $(CCINCS) $(FFLAGS) $(EXTRA_FFLAGS)
 one : $(OBJ_PATH)/.dummy $(OBJ)
 	@echo " "
 	@echo "- Linking - " $(EXEC)
-	@echo "- COMPLEX = " $(COMPLEX)
-	@echo "- DEBUG   = " $(DEBUG)
+	@echo "- HP3D_COMPLEX = " $(HP3D_COMPLEX)
+	@echo "- HP3D_DEBUG   = " $(HP3D_DEBUG)
 	@echo "------------------------------ "
 	$(FC_WORK) -o $(EXEC) $(OBJ) $(LIBS) $(LDFLAGS)
 

@@ -10,7 +10,7 @@ LIBRARIES   = /org/groups/aeg/LIBS
 # COMPILER SETTING (a 64bit processor architecture is assumed)
 #------------------------------------------------------------------
 
-DEBUG       ?= YES
+HP3D_DEBUG   ?= YES
 LARGE        = NO
 OPENMP_USE   = YES
 
@@ -27,11 +27,11 @@ FFLAGS  = -fPIC
 ifeq ($(OPENMP_USE),YES)
 FFLAGS += -qopenmp
 endif
-ifeq ($(DEBUG),YES)
+ifeq ($(HP3D_DEBUG),YES)
 FFLAGS += -O0 -g -traceback -check all -debug all -check noarg_temp_created -assume noprotect_constants 
 # FFLAGS +=  -fpe0 -Dintel_ -DALLOW_NON_INIT
 endif
-ifeq ($(DEBUG),NO)
+ifeq ($(HP3D_DEBUG),NO)
 FFLAGS += -O3 -xHost
 # FFLAGS += -O3 -fpe1
 endif
@@ -54,11 +54,11 @@ FFLAGS  = -m64
 ifeq ($(OPENMP_USE),YES)
 FFLAGS += -fopenmp
 endif
-ifeq ($(DEBUG),YES)
+ifeq ($(HP3D_DEBUG),YES)
 FFLAGS += -g -O0 -ffpe-trap=list -fno-backtrace
 # -fprofile-arcs -ftest-coverage
 endif
-ifeq ($(DEBUG),NO)
+ifeq ($(HP3D_DEBUG),NO)
 FFLAGS += -O3 
 endif
 CFLAGS  =
@@ -271,9 +271,9 @@ VIS_LIB         = $(VIS_PATH)/lib/libvis.a \
 # PREPROCESSOR VARIABLES
 #------------------------------------------------------------------
 
-COMPLEX  ?= 1
-SHAPE    ?= 1
-PARALLEL ?= 0
+HP3D_COMPLEX ?= 1
+SHAPE        ?= 1
+PARALLEL     ?= 0
 
 #------------------------------------------------------------------
 # HP3D PATHS
@@ -284,10 +284,10 @@ PARALLEL ?= 0
 HP3D_BASE_PATH  = /org/groups/aeg/socratis/HP3D_svn/trunk
 # HP3D_BASE_PATH  = /org/groups/aeg/socratis/hp3d_private
 
-ifeq ($(COMPLEX),1)
+ifeq ($(HP3D_COMPLEX),1)
 HP3D_PATH       = $(HP3D_BASE_PATH)/complex
 endif
-ifeq ($(COMPLEX),0)
+ifeq ($(HP3D_COMPLEX),0)
 HP3D_PATH       = $(HP3D_BASE_PATH)/real
 endif
 
@@ -298,10 +298,10 @@ LIB_PATH        = lib
 OBJ_PATH_COMPLEX =  _obj_complex_
 OBJ_PATH_REAL    =  _obj_real_
 
-ifeq ($(COMPLEX),1)
+ifeq ($(HP3D_COMPLEX),1)
 OBJ_PATH        = $(OBJ_PATH_COMPLEX)
 endif
-ifeq ($(COMPLEX),0)
+ifeq ($(HP3D_COMPLEX),0)
 OBJ_PATH        = $(OBJ_PATH_REAL)
 endif
 
@@ -412,6 +412,6 @@ PROB_INCS    += $(HP3D_LINK_INCS) \
 
 # Files with ending in .F and .F90 (not .f and .f90)
 # are preprocessed according to certain directives
-PROB_PP_DEFS  = -D"C_MODE=$(COMPLEX)" \
+PROB_PP_DEFS  = -D"HP3D_COMPLEX=$(HP3D_COMPLEX)" \
                 -D"PARALLEL_MODE=$(PARALLEL)" \
                 -D"SHAPE_MODE=$(SHAPE)"

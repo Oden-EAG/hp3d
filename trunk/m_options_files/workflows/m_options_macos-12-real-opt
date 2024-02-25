@@ -3,8 +3,8 @@
 #------------------------------------------------------------------
 # PREPROCESSOR VARIABLES (Set to 0/1)
 #------------------------------------------------------------------
-COMPLEX ?= 0
-DEBUG   ?= 0
+HP3D_COMPLEX ?= 0
+HP3D_DEBUG   ?= 0
 
 #------------------------------------------------------------------
 # Set hp3D PATH, PETSC_DIR, and PETSC_ARCH
@@ -12,7 +12,7 @@ DEBUG   ?= 0
 HP3D_BASE_PATH = /Users/runner/work/hp3d/hp3d/trunk
 
 PETSC_DIR ?= /Users/runner/work/hp3d/hp3d/petsc
-ifeq ($(COMPLEX),1)
+ifeq ($(HP3D_COMPLEX),1)
   PETSC_ARCH ?= arch-macos-12-complex-opt
 else
   PETSC_ARCH ?= arch-macos-12-real-opt
@@ -59,7 +59,7 @@ SRC_PATH          = src
 MODULE_PATH       = module
 LIB_PATH          = lib
 
-ifeq ($(COMPLEX),1)
+ifeq ($(HP3D_COMPLEX),1)
   HP3D_PATH       = $(HP3D_PATH_COMPLEX)
   OBJ_PATH        = $(OBJ_PATH_COMPLEX)
 else
@@ -104,8 +104,8 @@ HP3D_USE_MPI_F08   ?= 0
 HP3D_USE_OPENMP    ?= 0
 HP3D_USE_X11       ?= 0
 
-PROB_PP_DEFS  = -D"C_MODE=$(COMPLEX)" \
-                -D"DEBUG_MODE=$(DEBUG)" \
+PROB_PP_DEFS  = -D"HP3D_COMPLEX=$(HP3D_COMPLEX)" \
+                -D"HP3D_DEBUG=$(HP3D_DEBUG)" \
                 -D"HP3D_USE_INTEL_MKL=$(HP3D_USE_INTEL_MKL)" \
                 -D"HP3D_USE_MPI_F08=$(HP3D_USE_MPI_F08)" \
                 -D"HP3D_USE_OPENMP=$(HP3D_USE_OPENMP)" \

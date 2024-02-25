@@ -33,7 +33,7 @@ SRC_FILE     = attr_to_index.F90         \
                near.F90                  \
                parameters.F90            \
                real_imag.F90
-ifeq ($(COMPLEX),1)
+ifeq ($(HP3D_COMPLEX),1)
 SRC_FILE    += conv_maxw.F90             \
                dump_maxw.F90             \
                poly_maxw.F90
@@ -66,7 +66,7 @@ TEST_SEQ = attr_to_index             \
 TEST_PAR = hexa_adapt_h_aniso        \
            hexa_adapt_h_case1        \
            hexa_adapt_h_iso
-ifeq ($(COMPLEX),1)
+ifeq ($(HP3D_COMPLEX),1)
 TEST_SEQ+= conv_maxw                 \
            dump_maxw                 \
            poly_maxw

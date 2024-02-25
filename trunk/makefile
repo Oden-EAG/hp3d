@@ -43,8 +43,8 @@ endef
 -include ./m_options
 
 # Set variables if not set by m_options
-COMPLEX    ?= 0
-DEBUG      ?= 0
+HP3D_COMPLEX ?= 0
+HP3D_DEBUG   ?= 0
 
 HP3D_USE_INTEL_MKL ?= 0
 HP3D_USE_MPI_F08   ?= 0
@@ -60,14 +60,14 @@ HP3D_GMPNAME   = libhp3d_gmp.a
 
 #-------------------------------------------------
 # Complex version of library
-ifeq ($(COMPLEX),1)
+ifeq ($(HP3D_COMPLEX),1)
 INSTALL_PATH   = ./complex
 CCINCS         =
 FRONTAL_PATH   = ./$(SRC_PATH)/solver/frontal/base/complex
 endif
 #-------------------------------------------------
 # Real version of library
-ifeq ($(COMPLEX),0)
+ifeq ($(HP3D_COMPLEX),0)
 INSTALL_PATH   = ./real
 CCINCS         =
 FRONTAL_PATH   = ./$(SRC_PATH)/solver/frontal/base/real
@@ -77,8 +77,8 @@ endif
 # -- Preprocessor options -- 
 # Files with ending in .F and .F90 (not .f and .f90)
 # are preprocessed according to certain directives
-CCDEFS    = -D"C_MODE=$(COMPLEX)" \
-            -D"DEBUG_MODE=$(DEBUG)" \
+CCDEFS    = -D"HP3D_COMPLEX=$(HP3D_COMPLEX)" \
+            -D"HP3D_DEBUG=$(HP3D_DEBUG)" \
             -D"HP3D_USE_INTEL_MKL=$(HP3D_USE_INTEL_MKL)" \
             -D"HP3D_USE_MPI_F08=$(HP3D_USE_MPI_F08)" \
             -D"HP3D_USE_OPENMP=$(HP3D_USE_OPENMP)" \
@@ -175,7 +175,8 @@ fastlib :
 	@(cd $(FRONTAL_PATH) ; $(MAKE) lib); \
 	(cp -f $(FRONTAL_PATH)/$(FRONTAL_NAME) $(LIB_PATH));
 	@echo "------------------------------------------"
-	@echo " - COMPLEX, DEBUG         :" $(COMPLEX) $(DEBUG)
+	@echo " - HP3D_COMPLEX           :" $(HP3D_COMPLEX)
+	@echo " - HP3D_DEBUG             :" $(HP3D_DEBUG)
 	@echo " - HP3D_USE_INTEL_MKL     :" $(HP3D_USE_INTEL_MKL)
 	@echo " - HP3D_USE_MPI_F08       :" $(HP3D_USE_MPI_F08)
 	@echo " - HP3D_USE_OPENMP        :" $(HP3D_USE_OPENMP)
@@ -192,7 +193,7 @@ fastlib :
 
 problems: lib
 	@echo "Compiling examples in 'problems' directory."
-ifeq ($(COMPLEX),1)
+ifeq ($(HP3D_COMPLEX),1)
 	@ERR=0; \
 	echo "Compiling Maxwell Galerkin..."; \
 	if ! $(MAKE) -C problems/MAXWELL/GALERKIN; then ERR=1; fi; \
@@ -378,7 +379,7 @@ clean-test:
 clean-problems:
 	@echo "Clean 'problems' directory."
 	@($(MAKE) -C problems/MPI_TEST/TEST clean);
-ifeq ($(COMPLEX),1)
+ifeq ($(HP3D_COMPLEX),1)
 	@($(MAKE) -C problems/MAXWELL/GALERKIN      clean);
 	@($(MAKE) -C problems/MAXWELL/ULTRAWEAK_DPG clean);
 	@($(MAKE) -C problems/LASER/UW_COUPLED      clean);
