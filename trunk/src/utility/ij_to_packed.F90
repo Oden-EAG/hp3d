@@ -16,7 +16,7 @@ integer function ij_upper_to_packed(I,J)
 !
    implicit none
 !
-   integer :: I,J
+   integer, intent(in) :: I,J
 !
 #if DEBUG_MODE
    if (I < 1 .or. I > J) then
@@ -49,7 +49,7 @@ integer function ij_lower_to_packed(I,J,N)
 !
    implicit none
 !
-   integer :: I,J,N
+   integer, intent(in) :: I,J,N
 !
 #if DEBUG_MODE
    if (J > I .or. I > N) then
@@ -83,8 +83,8 @@ integer function ij_to_packed(I,J,N,UPLO)
 !
    implicit none
 !
-   integer      :: I,J,N
-   character(1) :: UPLO
+   integer     , intent(in) :: I,J,N
+   character(1), intent(in) :: UPLO
 !
    integer, external :: ij_upper_to_packed, ij_lower_to_packed
 !
