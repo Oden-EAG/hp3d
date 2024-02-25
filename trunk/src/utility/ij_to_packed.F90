@@ -72,10 +72,11 @@ end function ij_lower_to_packed
 !!        matrix, returns the corresponding index in a packed
 !!        columnwise linear array.
 !!
-!> @param[in] I - row index
-!> @param[in] J - col index
-!> @param[in] N - size of matrix
-!> @param[in] N - size of matrix
+!> @param[in] I    - row index
+!> @param[in] J    - col index
+!> @param[in] N    - size of matrix
+!> @param[in] UPLO - 'U' (upper triangle)
+!!                   'L' (lower triangle)
 !!
 !> @date  Feb 2024
 !----------------------------------------------------------------------
