@@ -39,7 +39,6 @@ endif
 
 include $(PETSC_DIR)/$(PETSC_ARCH)/lib/petsc/conf/petscvariables
 
-FF     =  $(FC)
 FFLAGS = -fPIC -ffree-line-length-none -w -fallow-argument-mismatch
 CFLAGS =
 
@@ -49,6 +48,8 @@ CFLAGS =
 # OpenMP
 ifeq ($(HP3D_USE_OPENMP),1)
   FFLAGS += -fopenmp
+else
+  FFLAGS += -frecursive
 endif
 
 # Optimization flags
