@@ -232,7 +232,7 @@ module zoltan_wrapper
       integer(Zoltan_int)   , intent(in)  :: NrGIDs,NrLIDs
       integer(Zoltan_int)   , intent(in)  :: GID(*)
       integer(Zoltan_int) :: LID(1) ! dummy declaration, do not use
-      integer(Zoltan_double), intent(out) :: Coords(*)
+      real   (Zoltan_double), intent(out) :: Coords(*)
       integer(Zoltan_int)   , intent(out) :: Ierr
       integer :: mdle,i,nrv
       real(8) :: x(3), xnod(3,8)
@@ -263,7 +263,7 @@ module zoltan_wrapper
       integer(Zoltan_int)   , intent(in)  :: GIDs(*)
       integer(Zoltan_int) :: LIDs(1) ! dummy declaration, do not use
       integer(Zoltan_int)   , intent(in)  :: NumDim
-      integer(Zoltan_double), intent(out) :: Coords(*)
+      real   (Zoltan_double), intent(out) :: Coords(*)
       integer(Zoltan_int)   , intent(out) :: Ierr
       integer :: mdle,i,k,nrv
       real(8) :: x(3), xnod(3,8)
