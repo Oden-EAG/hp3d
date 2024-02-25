@@ -45,10 +45,10 @@ jobs:
           echo "The branch name is ${{ github.ref }}."
 
       # Interrupt workflow already running on the same branch
-#      - name: Cancel previous runs
-#        uses: styfle/cancel-workflow-action@0.12.1
-#        with:
-#          access_token: ${{ github.token }}
+      - name: Cancel previous runs
+        uses: styfle/cancel-workflow-action@0.12.1
+        with:
+          access_token: ${{ github.token }}
 
       # Check out hp3d repository
       - name: Check out hp3d repository
@@ -124,25 +124,71 @@ jobs:
           echo "Checking PETSc build"
           make check
 
-      # Build hp3D
-      - name: Build hp3D
+      # Build hp3D (MPI F90)
+      - name: Build hp3D (MPI F90)
         run: |
-          echo "Configuring hp3D"
+          echo "Configuring hp3D (MPI F90)"
           cd trunk
           cp m_options_files/workflows/m_options_$CONFIG ./m_options
+          export HP3D_USE_MPI_F08=0
 
           echo "Building hp3D"
-          make -j
+          make
 
           echo "Checking hp3D build"
           make check
 
-      # Run hp3D tests
-      - name: Run hp3D tests
+      # Run hp3D tests (MPI F90)
+      - name: Run hp3D tests (MPI F90)
         run: |
-          echo "Running hp3D tests"
+          echo "Running hp3D tests (MPI F90)"
           cd trunk
+          export HP3D_USE_MPI_F08=0
           make test
+
+      # Build hp3D problems (MPI F90)
+      - name: Build hp3D problems (MPI F90)
+        run: |
+          echo "Building hp3D problems"
+          cd trunk
+          export HP3D_USE_MPI_F08=0
+          make problems
+
+      # Clean hp3D directory
+      - name: Clean hp3D directory
+        run: |
+          echo "Cleaning hp3D directory"
+          cd trunk
+          make clean
+
+      # Build hp3D (MPI F08)
+      - name: Build hp3D (MPI F08)
+        run: |
+          echo "Configuring hp3D (MPI F08)"
+          cd trunk
+          cp m_options_files/workflows/m_options_$CONFIG ./m_options
+          export HP3D_USE_MPI_F08=1
+
+          echo "Building hp3D"
+          make
+
+          echo "Checking hp3D build"
+          make check
+
+      # Run hp3D tests (MPI F08)
+      - name: Run hp3D tests (MPI F08)
+        run: |
+          echo "Running hp3D tests (MPI F90)"
+          cd trunk
+          export HP3D_USE_MPI_F08=1
+          make test
+
+      # Build hp3D problems (MPI F08)
+      - name: Build hp3D problems (MPI F08)
+        run: |
+          echo "Building hp3D problems"
+          cd trunk
+          export HP3D_USE_MPI_F08=1
           make problems
 
       # Report job status
