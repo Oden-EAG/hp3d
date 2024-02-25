@@ -61,8 +61,9 @@ Compilation is governed by preprocessing flags `COMPLEX` and `DEBUG`.
 Library will be created under either `hp3d/complex/` or `hp3d/real/`.
 
 Additional preprocessing flags for enabling/disabling dependencies on third-party libraries:
-- `HP3D_USE_OPENMP    = 0/1` , disable/enable OpenMP threading
 - `HP3D_USE_INTEL_MKL = 0/1` , disable/enable dependency on Intel MKL package
+- `HP3D_USE_MPI_F08   = 0/1` , disable/enable MPI Fortran 2008 binding (module `mpi_f08`)
+- `HP3D_USE_OPENMP    = 0/1` , disable/enable OpenMP threading
 - `HP3D_USE_X11       = 0/1` , disable/enable dependency on X11
 
 ## Verifying build

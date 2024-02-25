@@ -130,7 +130,7 @@ module mpif90_wrapper
    subroutine mpi_w_handle_err(Ierr,Str)
       integer         , intent(in) :: Ierr
       character(len=*), intent(in) :: Str
-      character(len=64) :: errStr
+      character(len=MPI_MAX_ERROR_STRING) :: errStr
       integer :: ierr1,len
       if (Ierr .ne. MPI_SUCCESS) then
          call MPI_Error_string(Ierr, errStr, len, ierr1)
