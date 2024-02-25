@@ -415,7 +415,7 @@ c  ...catching problems (debugging)
  7005     format('a = ',i1,' alpha = ',i2,
      .         ' P(a,0:Nord-1) = ',10e12.5)
         enddo
-        if (.NOT.Idec) then
+        if (.not.Idec) then
           write(*,*) '  '
           do a=minI,maxI
             al = alpha(a)

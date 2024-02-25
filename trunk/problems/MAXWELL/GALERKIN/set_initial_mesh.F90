@@ -31,7 +31,7 @@
 !..BC flags
    integer :: ibc(6,NRINDEX)
 !..miscellaneous
-   integer :: iprint,ifc,iel,neig
+   integer :: ifc,iel,neig
 !
 !------------------------------------------------------------------------------------
 !

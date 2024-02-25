@@ -589,12 +589,10 @@ end subroutine rotate_trian
     integer, intent(inout) :: Is
     integer, intent(out)   :: Is1,Nort
 !
-    integer, parameter, dimension(1:4,0:7) :: nson &
-         = reshape( (/1,2,3,4, 4,1,2,3, 3,4,1,2, 2,3,4,1, &
-                      1,4,3,2, 2,1,4,3, 3,2,1,4, 4,3,2,1/), &
-                    (/4,8/) )
-    integer, parameter, dimension(1:4) :: nsgn1 = (/0,0,1,1/)
-    integer, parameter, dimension(1:4) :: nsgn2 = (/0,1,1,0/)
+!    integer, parameter, dimension(1:4,0:7) :: nson &
+!         = reshape( (/1,2,3,4, 4,1,2,3, 3,4,1,2, 2,3,4,1, &
+!                      1,4,3,2, 2,1,4,3, 3,2,1,4, 4,3,2,1/), &
+!                    (/4,8/) )
 !
     integer, parameter, dimension(1:2,1:9) :: h11_to_h10 &
          = reshape( (/1,1, 2,1, 2,2, 1,2, 3,1, 2,3, 3,2, 1,3, 3,3/), &

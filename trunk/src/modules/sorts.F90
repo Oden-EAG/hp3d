@@ -88,7 +88,7 @@ module sorts
 !
             if (jstack > nstack) then
                write(*,*) 'sortIndex: NSTACK too small in indexArray()'
-               error stop
+               stop
             end if
 !
             if (r-i+1 >= j-l) then

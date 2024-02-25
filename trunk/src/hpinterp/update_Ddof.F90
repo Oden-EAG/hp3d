@@ -537,7 +537,8 @@ subroutine update_Ddof_omp
    VTYPE :: tempV(MAXEQNV,MAXquadV)
 !
 #if DEBUG_MODE
-   integer :: iprint = 0
+   integer :: iprint
+   iprint = 0
 #endif
 !
 !-----------------------------------------------------------------------

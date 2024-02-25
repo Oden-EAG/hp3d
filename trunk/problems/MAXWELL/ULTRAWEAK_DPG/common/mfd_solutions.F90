@@ -35,12 +35,12 @@
       complex(8), intent(out) :: Grad2p(3,3)
 !
 !  ...intermediate variables
-      real(8) :: rl, w0, p0, z_R, rk, pi_mod
-      real(8) :: theta_x, theta_y, theta_z
-      real(8) :: rad_x, rad_y, rad_z
-      real(8) :: sinx, siny, cosx, cosy, sinz, cosz
+      real(8) :: w0, p0, rk, pi_mod
+      real(8) :: theta_x, theta_y
+      real(8) :: rad_x, rad_y
+      real(8) :: sinx, siny, cosx, cosy
       real(8) :: x, y, z
-      real(8) :: Rx(3,3), Ry(3,3), Rz(3,3), Rxy(3,3), Rxyz(3,3)
+      real(8) :: Rx(3,3), Ry(3,3), Rxy(3,3)
 !
 !  ...functions and their derivatives
       complex(8) :: zf_x, zf_y, zf_z, cn
@@ -60,7 +60,7 @@
       real(8) :: dzdxs, dzdys, dzdzs
 !
       real(8) :: x1, x2, x3, xshift, yshift, zshift
-      real(8) :: r, alpha, zm
+      real(8) :: r, alpha
 !
 !TODO: Fix this
       integer :: iprob

@@ -105,7 +105,7 @@ subroutine elem_heat(Mdle,                   &
 !
 !..variables for geometry
    real(8), dimension(3)    :: xi,x,rn
-   real(8), dimension(3,2)  :: dxidt,dxdt,rt
+   real(8), dimension(3,2)  :: dxidt,dxdt
    real(8), dimension(3,3)  :: dxdxi,dxidx
    real(8), dimension(2)    :: t
 !
@@ -156,8 +156,8 @@ subroutine elem_heat(Mdle,                   &
 !
 !..various variables for the problem
    real(8)    :: rjac,bjac,weight,wa,v2n,v1,v2,minz,maxz,elem_z
-   integer    :: i1,i2,j1,j2,k1,k2,kH,kk,i,j,nint,iflag,kE,k
-   integer    :: nordP,nrdof,l,nsign,ifc,info,ndom,iphys,icomp
+   integer    :: i1,j1,j2,k1,k2,i,nint,iflag,k
+   integer    :: nordP,nrdof,l,nsign,ifc,info,ndom
    real(8)    :: rfval,therm_Load
    complex(8) :: zfval
 !
@@ -166,24 +166,21 @@ subroutine elem_heat(Mdle,                   &
    ! real(8), allocatable     :: W(:),   RWORK(:)
    ! integer, allocatable    :: IWORK(:)
 !
-#if DEBUG_MODE
-!..BC's flags
-   integer :: ibc(6,NRINDEX)
-!..auxiliary
-   integer :: iprint
-#endif
+   integer, external :: ij_upper_to_packed
 !
-!..for Gram matrix compressed storage format
-   integer :: nk
-   nk(k1,k2) = (k2-1)*k2/2+k1
+#if DEBUG_MODE
+   integer :: icomp,iphys
+   integer :: ibc(6,NRINDEX)
+!..Set iprint = 0/1 (Non-/VERBOSE)
+   integer :: iprint
+   iprint = 0
+#endif
 !
 !---------------------------------------------------------------------
 !--------- INITIALIZE THE ELEMENT ORDER, ORIENTATION ETC. ------------
 !---------------------------------------------------------------------
 !
 #if DEBUG_MODE
-!..Set iprint = 0/1 (Non-/VERBOSE)
-   iprint = 0
    if (iprint.eq.1) then
       write(*,*) 'elem_heat: Mdle = ', Mdle
    endif
@@ -383,7 +380,7 @@ subroutine elem_heat(Mdle,                   &
 !------------------ G R A M   M A T R I X --------------------------------
 !
 !        ...determine index in triangular format
-            k = nk(k1,k2)
+            k = ij_upper_to_packed(k1,k2)
 !
 !        ...problem-dependent inner product
 !        ...primal DPG heat: H1 inner product
@@ -449,10 +446,10 @@ subroutine elem_heat(Mdle,                   &
 !      write(*,*) 'elem_heat: GRAM MATRIX = '
 !      do i=1,10
 !         do j=1,i-1
-!            raux(j) = gramP(nk(j,i))
+!            raux(j) = gramP(ij_upper_to_packed(j,i))
 !         enddo
 !         do j=i,10
-!            raux(j) = gramP(nk(i,j))
+!            raux(j) = gramP(ij_upper_to_packed(i,j))
 !         enddo
 !         write(*,7011) raux
 !      enddo

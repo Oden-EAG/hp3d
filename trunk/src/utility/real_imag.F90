@@ -5,7 +5,7 @@
 real(8) function dreal_part(Z)
 !
    implicit none
-   VTYPE :: Z
+   VTYPE, intent(in) :: Z
 !
 #if C_MODE
    dreal_part = dreal(Z)
@@ -21,7 +21,7 @@ end function dreal_part
 real(8) function dimag_part(Z)
 !
    implicit none
-   VTYPE :: Z
+   VTYPE, intent(in) :: Z
 !
 #if C_MODE
    dimag_part = dimag(Z)

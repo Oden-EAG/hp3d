@@ -99,7 +99,8 @@ c
 #if DEBUG_MODE
       iprint = 0
       if (iprint.eq.1) then
-        write(*,*) 'display_face: type,Mdle,Ifc = ',S_Type(ntype),Mdle,Ifc
+        write(*,*) 'display_face: type,Mdle,Ifc = ',
+     .                            S_Type(ntype),Mdle,Ifc
         write(*,*) '              face_type(ntype,Ifc) = ',
      .                            face_type(ntype,Ifc)
         write(*,*) '              Xnod = '

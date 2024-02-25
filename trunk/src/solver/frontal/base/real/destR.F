@@ -75,7 +75,7 @@ c
 cld,aug,1991 wrong!!!  desvec = (destflag + NICMUL*ndof + 100*frontdest)
 c  desvec = (destflag + 10*ndof + NICMUL*10*frontdest)
 c
-         ldest = Aldest(i)
+         ldest = int(Aldest(i))
 c
 c pull the destination flag for this node
 c  0 = first occurance of this node
@@ -163,8 +163,8 @@ c loop over the remaining number of dof to eliminate
 c
          do 60 l = j,ne
 c
-            ndi = Andest(i)
-            ndl = Andest(l)
+            ndi = int(Andest(i))
+            ndl = int(Andest(l))
 c
             if (ndi .lt. ndl) ndl = ndl - 1
             Andest(l) = ndl

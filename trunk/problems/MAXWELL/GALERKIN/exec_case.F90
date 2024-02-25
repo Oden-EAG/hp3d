@@ -18,8 +18,8 @@ subroutine exec_case(idec)
    integer :: mdle_subd(NRELES)
    integer :: i,mdle,kref,src,count,ierr,nord
 !
-   integer :: mdle_list(1)
-   integer :: mdle_nord(1)
+   !integer :: mdle_list(1)
+   !integer :: mdle_nord(1)
    logical :: iPvAttr(1)
 !
 !----------------------------------------------------------------------

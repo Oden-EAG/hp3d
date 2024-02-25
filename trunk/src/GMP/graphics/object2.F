@@ -23,8 +23,8 @@ c
       real(8) :: x1(3),dxdx(3),x2(3)
       real(8) :: x(3),xmin(2),xmax(2)
 c
-      integer :: dimobj,i,ichoice,ivar,j,nbgcol,ncol,nc,nrsub1
-      real(8) :: q,q1,rncp1,rncp2,rnsc,xc1,xc2,xi
+      integer :: i,ichoice,ivar,j,nbgcol,ncol,nc,nrsub1
+      real(8) :: dimobj,q,q1,rncp1,rncp2,rnsc,xc1,xc2,xi
 c
       real(8) :: bigp,bign,small
       data bigp,bign,small /1.d30,-1.d30,1.d-14/

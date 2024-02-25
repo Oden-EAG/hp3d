@@ -63,7 +63,6 @@
 !
 #if DEBUG_MODE
       integer :: nvarQ
-      integer :: iload,ibeg,iend
       integer :: iprint
       iprint=0
 #endif

@@ -398,7 +398,7 @@ c
 c
       use control
       use GMP
-      use node_types, only: TETR
+c
       implicit none
 c
       integer, intent(in)  :: No

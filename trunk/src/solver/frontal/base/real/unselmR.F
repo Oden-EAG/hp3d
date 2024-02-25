@@ -53,7 +53,7 @@ c
 c
 c set up pointers into Flhs
 c
-      id = Aidx
+      id = int(Aidx)
       idm = id - 1
       idp = id + 1
 c

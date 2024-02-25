@@ -26,7 +26,7 @@ c     starting point for NR iterations
       real(8) :: xs(3)
 c
 c  ...work space
-      real(8) :: void1,void2(4),void3(4)
+      real(8) :: void1(1),void2(4),void3(4)
 c
 c  ...point type
       character(len=10) :: type     

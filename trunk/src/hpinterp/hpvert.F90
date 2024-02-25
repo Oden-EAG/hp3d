@@ -21,8 +21,6 @@
 !
 subroutine hpvert(Iflag,No,Xi, Xnod)
 !
-   use parameters , only : NDIMEN
-!
    implicit none
 !
    integer, intent(in)  :: Iflag

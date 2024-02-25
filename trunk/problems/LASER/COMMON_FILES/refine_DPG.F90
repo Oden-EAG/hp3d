@@ -44,8 +44,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
    use data_structure3D
    use environment  , only: QUIET_MODE
    use assembly_sc  , only: NRDOF_CON, NRDOF_TOT
-   use parametersDPG, only: NORD_ADD
-   use par_mesh     , only: DISTRIBUTED,HOST_MESH
+   use par_mesh     , only: DISTRIBUTED
    use mpi_wrapper
 !
    implicit none
@@ -84,8 +83,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor,Nflag,PhysNick,Ires, Nstop)
    real(8) :: errorH,errorE,errorV,errorQ,rnormH,rnormE,rnormV,rnormQ
    real(8) :: error_tot,rnorm_tot,error_subd,rnorm_subd
 !
-   integer :: i,ic,mdle,iel,kref,subd,count,ierr
-   real(8) :: x(3), xnod(3,8)
+   integer :: i,mdle,iel,kref,subd,count,ierr
 !
 !..element type
    integer :: etype

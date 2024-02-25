@@ -1,4 +1,6 @@
 !
+#include "typedefs.h"
+!
 !----------------------------------------------------------------------
 !
 !     routine name      - dirichlet
@@ -26,34 +28,21 @@
 !
    subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
 !
-   use control    , only : NEXACT, GEOM_TOL
-   use parameters , only : MAXEQNH,MAXEQNE,MAXEQNV,MAXEQNQ, ZERO
-   use common_prob_data
+   use parameters, only : MAXEQNH,MAXEQNE,MAXEQNV,ZERO
 !
    implicit none
 !
    real(8), intent(in)  :: X(3)
    integer, intent(in)  :: Icase,Mdle
-!..exact solution
-   complex(8),dimension(  MAXEQNH    ) ::   ValH
-   complex(8),dimension(  MAXEQNH,3  ) ::  DvalH
-   complex(8),dimension(  MAXEQNH,3,3) :: d2valH
-   complex(8),dimension(3,MAXEQNE    ) ::   ValE
-   complex(8),dimension(3,MAXEQNE,3  ) ::  DvalE
-   complex(8),dimension(3,MAXEQNE,3,3) :: d2valE
-   complex(8),dimension(3,MAXEQNV    ) ::   ValV
-   complex(8),dimension(3,MAXEQNV,3  ) ::  DvalV
-   complex(8),dimension(3,MAXEQNV,3,3) :: d2valV
-   complex(8),dimension(  MAXEQNQ    ) ::   valQ
-   complex(8),dimension(  MAXEQNQ,3  ) ::  dvalQ
-   complex(8),dimension(  MAXEQNQ,3,3) :: d2valQ
 !
-!..printing flag
-   integer :: iprint
+   VTYPE, dimension(  MAXEQNH    ) ::   ValH
+   VTYPE, dimension(  MAXEQNH,3  ) ::  DvalH
+   VTYPE, dimension(3,MAXEQNE    ) ::   ValE
+   VTYPE, dimension(3,MAXEQNE,3  ) ::  DvalE
+   VTYPE, dimension(3,MAXEQNV    ) ::   ValV
+   VTYPE, dimension(3,MAXEQNV,3  ) ::  DvalV
 !
 !--------------------------------------------------------------------
-!
-   iprint = 0
 !
 !..initialize
    ValH = ZERO; DvalH = ZERO

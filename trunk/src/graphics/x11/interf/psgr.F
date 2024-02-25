@@ -18,7 +18,7 @@ C OTHER PARAMETERS ARE DISCUSSED IN THE ROUTINES
 C
 C********************************************************
 
-        subroutine wvopps
+      subroutine wvopps
 C---------------------------------------------------------
 C      AUTHOR(S)        - Satish Chavva,Tadeusz Liszka and others
 C
@@ -30,7 +30,7 @@ C========================================================
 cwr07.08.99
 cwr03.14.02
 c
-      implicit real (a-h,o-y)
+      implicit real(8) (a-h,o-y)
 #include "wvglob.blk"
 #include "wvpost.blk"
 #include "wvscrn.blk"
@@ -52,7 +52,7 @@ c
 c        Check if color Postscript required
 
           write(*,*) 'B/W or  Color Postscript (0 - B/W  1-Color)'
-          read(*,*) icolval
+          read(*,*) ICOLVAL
 
  1000     format('%!  TL PostScript file, name ',a10/
      &        '%%BoundingBox: 36 36 518 756',/
@@ -79,7 +79,7 @@ c      write(*,*) 'NO POSTSCRIPT GENERATED, iflag=',iflag
       write(*,*) ' File ',name,' exists !!'
       write(*,*) ' I will not overwrite it !!'
       goto 110
-      end
+      end subroutine wvopps
 
 
 c-----------------------------------------------------------------
@@ -121,13 +121,13 @@ c        call flushps
       endif
 c
       return
-      end
+      end subroutine wvpscl
 
 C========================================================
-        SUBROUTINE WVPSDL(X1,Y1,X2,Y2,IC)
+      subroutine WVPSDL(X1,Y1,X2,Y2,IC)
 C========================================================
 C
-C  author - Satish Chavva and many otheres
+C  author - Satish Chavva and many others
 C
 C  version - 1998
 C
@@ -147,8 +147,9 @@ c
         call wvpsout(x1,y1,1)
         call wvpsout(x2,y2,4)
         call wvpsout(dum,dum,6)
-        RETURN
-        END
+        return
+      end subroutine WVPSDL
+
       subroutine wvpsfp(N,Xc,Icf,Icl)
 c
 c----------------------------------------------------------------------
@@ -218,14 +219,14 @@ c  ...draw the boundary line if a different color
 c
 c
       return
-      end
+      end subroutine wvpsfp
 
 C========================================================
 c     draw pixel in postcript
 C========================================================
 
 
-        SUBROUTINE WVPSPX(X,Y,IC)
+      subroutine WVPSPX(X,Y,IC)
 c
 #include "wvglob.blk"
 #include "wvpost.blk"
@@ -236,15 +237,15 @@ c
         call wvpsout(x,y,1)
         call wvpsout(x,y,4)
         call wvpsout(dum,dum,6)
-        RETURN
-        END
+        return
+      end subroutine WVPSPX
 
 
 C========================================================
 c     draw text in postscript
 C========================================================
 
-        SUBROUTINE WVPSTE(X1,Y1,H,MESS,A,N,ICOL)
+      subroutine WVPSTE(X1,Y1,H,MESS,A,N,ICOL)
         integer H,A
 c        CHARACTER MESS*80
         CHARACTER MESS*(*)
@@ -261,8 +262,8 @@ c
         call flushps
         write(ifile,1000) ' (',mess(1:n),') show'
  1000   format(a)
-        RETURN
-        END
+        return
+      end subroutine WVPSTE
 
 
 C-------------------------------------------------------------------
@@ -301,7 +302,7 @@ c
 c
       iprint=2
 
-c      icolval=1
+c      ICOLVAL=1
 c
       if (ifile.eq.0) return
       ilbuf=ilbuf+1
@@ -311,7 +312,7 @@ c     size is in inches, output in points (1/72")
 
       if (icode.eq.5) then
 c         set grayscale colors
-         if (icolval.eq.0) then
+         if (ICOLVAL.eq.0) then
           color = 1.0 - y / 9.0
           if (color .lt.0.0) color = 1.0 - (y-16)/50.0
           if ((iprint.eq.2).and.(y.gt.ymax)) then
@@ -320,7 +321,7 @@ c         set grayscale colors
             call pause
           endif
           bufor(1,ilbuf)=color
-         elseif (icolval.eq.1) then
+         elseif (ICOLVAL.eq.1) then
           bufor(1,ilbuf)=y
          endif
       elseif (icode.eq.8) then
@@ -330,7 +331,7 @@ c         set grayscale colors
           bufor(2,ilbuf)=y*scale
 c      make sure they are in correct limits
           do 20 i=1,2
-              bufor(i,ilbuf)=max(-999.0,min(9990.0,bufor(i,ilbuf)))
+              bufor(i,ilbuf)=max(-999.d0,min(9990.d0,bufor(i,ilbuf)))
    20     continue
       endif
 c
@@ -342,7 +343,7 @@ c
       ibufc(ilbuf)=icode
       if (ilbuf.eq.5) call flushps
       return
-      end subroutine
+      end subroutine wvpsout
 c
 c-----------------------------------------------------------------------
 c
@@ -409,7 +410,7 @@ c
               lentext=18
             endif
             if (IBUFC(i).eq.5) then
-             if (icolval.eq.1) then
+             if (ICOLVAL.eq.1) then
               i7=int(BUFOR(1,i))+1
               ir1=ired(i7)
               ig1=igreen(i7)
@@ -422,12 +423,12 @@ c    0 and 1
              endif
             endif
             if (IBUFC(i).eq.5) then
-             if (icolval.eq.0) then
+             if (ICOLVAL.eq.0) then
               write(ifile,1020) BUFOR(1,i)
 
  1020         format(f5.2,' f')
               lentext=7
-             elseif (icolval.eq.1) then
+             elseif (ICOLVAL.eq.1) then
               write(ifile,1024) r1,g1,b1
  1024         format(3f6.3,1x,' rf')
               lentext=19
@@ -441,7 +442,7 @@ c    0 and 1
               write(ifile,*)' clip '
               lentext=5
             elseif (IBUFC(i).eq.8) then
-              k=BUFOR(1,i)
+              k=int(BUFOR(1,i))
               write(ifile,1030) k
 c              write(*,1030) k
 c              write(*,*)"3"
@@ -507,9 +508,9 @@ c        read(*,*)
       endif
 c
       return
-      end
+      end subroutine flushps
 c========================================================
-        subroutine wvclps
+      subroutine wvclps
 c
 #include "wvglob.blk"
 #include "wvpost.blk"
@@ -526,6 +527,6 @@ c
         close(ifile)
         write(*,*)' PostScript file closed'
         return
-        end subroutine
+      end subroutine wvclps
 
 #endif

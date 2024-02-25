@@ -29,6 +29,7 @@ c
       integer :: No
       real(8) :: Eta,X(3),Dxdeta(3)
 c
+      real(8) :: eta_aux(1)
       integer :: nsurf(6)
       real(8) :: xv(3,2),dxv(3),fgrad(3),f3grad(3),f4grad(3),
      .           xs(3),sfact(4),void(4),aij(3,3),aux(3)
@@ -107,7 +108,8 @@ c       compatible with the direction of the line segment
       enddo
 c
 c  ...use NR method to determine the point
-      call mnewt(2,nsurf,Eta,void,xs,sfact, X)
+      eta_aux(1) = Eta
+      call mnewt(2,nsurf,eta_aux,void,xs,sfact, X)
 c
 c  ...compute derivatives
       do i=1,2

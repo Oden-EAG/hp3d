@@ -11,7 +11,7 @@ integer function isgn(I)
 !
    implicit none
 !
-   integer I
+   integer, intent(in) :: I
 !
    if     (I.gt.0) then
       isgn= 1

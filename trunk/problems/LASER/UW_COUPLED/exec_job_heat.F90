@@ -16,7 +16,7 @@ subroutine exec_job_heat
    integer :: physNick,nstop
    logical :: ires
 !
-   integer :: i,ierr,numPts,fld
+   integer :: i,ierr
    real(8) :: start_time,end_time
 !
 !----------------------------------------------------------------------

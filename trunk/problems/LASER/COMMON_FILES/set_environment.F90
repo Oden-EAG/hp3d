@@ -26,8 +26,6 @@ subroutine set_environment_maxwell
 !
    implicit none
 !
-   integer :: nthreads
-!
 ! =============================
 ! ======= Control file ========
 ! =============================

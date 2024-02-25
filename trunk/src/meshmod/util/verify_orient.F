@@ -33,6 +33,7 @@ c  ...miscellanea
       integer :: nrv,nre,nrf,nod,nflag,nsum
 c
       integer, allocatable ::  node_orient(:,:,:)
+      integer ::  node_orient_aux(4)
 c     for a mid-edge or mid0face node 'nod' and i-th element
 c     connected to the node,
 c        node_orient(1,i,nod) = element (middle node) number
@@ -69,7 +70,8 @@ c  .....loop through the element edges
           call edge_to_vert(Nodes(mdle)%ntype,ie, nv(1),nv(2))
           nv(1:2) = nodesl(nv(1:2))
           call apply_orient(norientl(inod),NODES(nod)%ntype,
-     .                      nv, node_orient(2:3,ic,nod))
+     .                      nv, node_orient_aux)
+          node_orient(2:3,ic,nod) = node_orient_aux(1:2)
         enddo
 c
 c  .....loop through the element faces
@@ -90,12 +92,14 @@ c  .....loop through the element faces
           if (nv(1).eq.nv(4)) then
             nv(1:3) = nodesl(nv(1:3))
             call apply_orient(norientl(inod),NODES(nod)%ntype,
-     .                        nv, node_orient(2:4, ic,nod))
+     .                        nv, node_orient_aux)
+            node_orient(2:4,ic,nod) = node_orient_aux(1:3)
 
           else
             nv(1:4) = nodesl(nv(1:4))
             call apply_orient(norientl(inod),NODES(nod)%ntype,
-     .                        nv, node_orient(2:5, ic,nod))
+     .                        nv, node_orient_aux)
+            node_orient(2:5,ic,nod) = node_orient_aux(1:4)
           endif
         enddo
       enddo

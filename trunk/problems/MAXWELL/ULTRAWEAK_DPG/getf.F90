@@ -37,18 +37,21 @@ subroutine getf(Mdle,X, ZJval)
    VTYPE :: dvalQ (  MAXEQNQ,3  )
    VTYPE :: d2valQ(  MAXEQNQ,3,3)
 !
-!..miscellaneus
-   integer :: iload,ivar,ibeg,icomp,jcomp,k,l,iprint
    VTYPE   :: zaux
+!
+#if DEBUG_MODE
+   integer :: iprint
+   iprint = 0
+#endif
 !
 !------------------------------------------------------------------------------
 !
-   iprint = 0
-!
+#if DEBUG_MODE
    if (iprint.eq.1) then
       write(*,7001) Mdle,X
  7001 format(' getf: Mdle,X = ',i8,2x,3(f8.3,2x))
    endif
+#endif
 !
 !..initialize source terms
    ZJval = ZERO
@@ -124,21 +127,22 @@ subroutine get_bdSource(Mdle,X,Rn, Imp_val)
    VTYPE :: zdvalQ (  MAXEQNQ,3  )
    VTYPE :: zd2valQ(  MAXEQNQ,3,3)
 !
-!..miscellaneus
-   integer :: iload,ivar,ibeg,icomp,jcomp,k,l
-   complex(8) :: zaux
    VTYPE, dimension(3) :: rntimesE,rn2timesE,rntimesH
-   real(8) :: impedanceConstant
 !
+#if DEBUG_MODE
 !..printing flag
-   integer :: iprint = 0
+   integer :: iprint
+   iprint = 0
+#endif
 !
 !------------------------------------------------------------------------------
 !
+#if DEBUG_MODE
       if (iprint.eq.1) then
          write(*,7001) Mdle,X
  7001    format(' get_bdSource: Mdle,X = ',i8,2x,3(f8.3,2x))
       endif
+#endif
 !
 !     initialize source terms
       Imp_val = ZERO
@@ -187,10 +191,13 @@ subroutine get_bdSource(Mdle,X,Rn, Imp_val)
          write(*,*) 'get_bdSource: UNSPECIFIED NEXACT'
          stop
    end select
+!
+#if DEBUG_MODE
    if (iprint.eq.1) then
       write(*,7002) Imp_val
  7002 format('get_bsource: Imp_val = ',2e12.5)
    endif
+#endif
 !
 end subroutine get_bdSource
 !

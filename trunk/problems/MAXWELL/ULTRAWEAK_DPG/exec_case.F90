@@ -15,7 +15,6 @@
 !
       integer, intent(in) :: idec
 !
-      integer :: nstop
       logical :: solved
 !
       integer :: flag(2)
@@ -24,7 +23,7 @@
       logical :: iPvAttr(2)
       character(len=2) :: vis_level
 !
-      integer :: fld,numPts,i,mdle,kref,refs
+      integer :: i,mdle,kref
       real(8) :: res
 !
       integer :: src,count,ierr

@@ -287,11 +287,12 @@ c
       implicit none
       integer, intent(in ) :: Nord,Nori
       integer, intent(out) :: NrdofV
-      integer :: m,ndofE
+c
       double precision, intent(in ) :: T
       double precision, intent(out) :: ShapV(MAXP)
 c
 #if DEBUG_MODE
+      integer :: m,ndofE
 c  ...debugging flag
       integer :: iprint
       iprint=0
@@ -873,7 +874,7 @@ c
         double precision :: Nu(0:2),DNu(2,0:2)
         double precision :: GNu(0:2),GDNu(2,0:2)
         double precision :: homP(0:Nord-1),homPal(0:Nord-1,0:Nord-1)
-        double precision :: jac
+        double precision :: jac(1)
 c
 #if DEBUG_MODE
 c    ...debugging flag
@@ -916,7 +917,7 @@ c      ...get homogenized Jacobi polynomials, homPal
               m=m+1
 c
               call cross(N,GDNu(1:N,1),GDNu(1:N,2), jac)
-              ShapV(m) = homP(i)*homPal(i,j)*jac
+              ShapV(m) = homP(i)*homPal(i,j)*jac(1)
             enddo
           enddo
         endif
@@ -954,7 +955,7 @@ c
         double precision :: Mu(0:1,2),DMu(2,0:1,2)
         double precision :: GMu(0:1,2),GDMu(2,0:1,2)
         double precision :: homP(0:MAXP-1,2)
-        double precision :: jac
+        double precision :: jac(1)
 c
 #if DEBUG_MODE
 c    ...debugging flag
@@ -993,7 +994,7 @@ c      ...construct the shape functions
               m=m+1
 c
               call cross(N,GDMu(1:N,1,1),GDMu(1:N,1,2), jac)
-              ShapV(m) = homP(i,1)*homP(j,2)*jac
+              ShapV(m) = homP(i,1)*homP(j,2)*jac(1)
             enddo
           enddo
         endif

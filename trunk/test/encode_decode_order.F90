@@ -7,8 +7,6 @@ program test_encode_decode_order
 !
    integer :: NPASS
 !
-   integer :: i,len,mod
-!
    integer :: nordx,nordy,nordz,norder
 !
    integer, parameter :: px = min(2,MAXP)

@@ -62,7 +62,7 @@ program test_dump_maxw
 !
       character(len=15) :: dump_file
 !
-      integer :: iflag(1),iel,i
+      integer :: iflag(1),iel
 !
       integer :: iprint
       iprint=0
@@ -290,9 +290,6 @@ end subroutine elem
 !> @brief Auxiliary routine for assembling element matrices
 subroutine elem_maxwell(Mdle,Nrdof, Zaloc,Zbloc)
 !
-   use assembly, only: ALOC,BLOC
-   use control , only: INTEGRATION
-   use physics , only: NR_PHYSA
    use data_structure3D
    use element_data
    use parameters

@@ -60,7 +60,6 @@ program test_hexa_adapt_h_case1
    subroutine hexa_adapt_h_case1
 !
       integer :: idx,icnt,itr,kref,mdle,nref
-      real(8) :: x
 !
       integer :: mdle_ref(NREF_MAX)
       integer :: kref_ref(NREF_MAX)

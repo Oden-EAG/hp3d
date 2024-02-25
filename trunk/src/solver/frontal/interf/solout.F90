@@ -62,7 +62,7 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
    integer :: nrPhysH,nrPhysE,nrPhysV,nrPhysHE,nrPhysHEV
    integer :: nrVarHE,nrVarHEV
    integer :: i,j,k,il,iphys,icomp,ivar,load,mdle,nn,nod
-   VTYPE   :: zvoid
+   VTYPE   :: zvoid1(1),zvoid2(1)
 !
 #if DEBUG_MODE
    integer :: iprint
@@ -92,13 +92,13 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
       call celem_systemI(Iel,mdle,1,                              &
                          nrdofs,nrdofm,nrdofc,                    &
                          nodm,ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm, &
-                         zvoid,zvoid)
+                         zvoid1,zvoid2)
 
    else
       call celem(mdle,1,                                          &
                  nrdofs,nrdofm,nrdofc,                            &
                  nodm,ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,         &
-                 zvoid,zvoid)
+                 zvoid1,zvoid2)
    endif
 !
 #if DEBUG_MODE

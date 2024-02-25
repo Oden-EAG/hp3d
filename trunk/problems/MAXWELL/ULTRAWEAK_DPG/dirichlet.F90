@@ -21,7 +21,7 @@
 !-------------------------------------------------------------------------------
    subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
 !
-      use control,         only : NEXACT,GEOM_TOL
+      use control,         only : NEXACT
       use commonParam
       use parameters,      only : MAXEQNH,MAXEQNE,MAXEQNV,MAXEQNQ,ZERO
 !
@@ -46,7 +46,8 @@
 !
 #if DEBUG_MODE
 !  ...printing flag : 0 - silent ; 1 - verbose
-      integer :: iprint = 0
+      integer :: iprint
+      iprint = 0
 #endif
 !
 !-------------------------------------------------------------------------------

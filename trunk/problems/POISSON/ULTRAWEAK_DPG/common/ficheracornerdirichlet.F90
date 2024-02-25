@@ -52,14 +52,13 @@ subroutine ficheracornerdirichlet(X,Icase, ValH,DvalH,D2valH, &
     real(8),dimension(  MAXEQNQ,3  ), intent(out) ::  DvalQ
     real(8),dimension(  MAXEQNQ,3,3), intent(out) :: D2valQ
 !
-    real(8) :: x1,x2,x3,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11
-    real(8) :: t12,t13,t14,t15,t16,t17,t18,t19,t20,t21
-    real(8) :: u,divq
-    real(8), dimension(3) :: q,gradu,zdu
-    real(8),dimension(3,MAXEQNV,3) :: Dq
+    real(8) :: x1,x2,x3
+    real(8) :: zdu(3)
+    real(8) :: gradu(3)
+    real(8) :: q(3)
+    real(8) :: Dq(3,MAXEQNV,3)
 !
-    integer :: isol_p, csn
-    real(8) :: np_x,np_y,np_z
+    integer :: csn
 !
     real(8) :: eps,pi,a23,theta,r
     real(8) :: drdx1,drdx2,drdx3,dtdx1,dtdx2,dtdx3

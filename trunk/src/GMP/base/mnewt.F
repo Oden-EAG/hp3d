@@ -23,8 +23,9 @@ c
 c
       implicit none
 c
-      integer :: Nusf,Nsurf(6)
-      real(8) :: Eta(*),Feta(4),Xs(3),Sfact(4),X(3)
+      integer, intent(in)  :: Nusf,Nsurf(6)
+      real(8), intent(in)  :: Eta(*),Feta(4),Xs(3),Sfact(4)
+      real(8), intent(out) :: X(3)
 c
 c  ...stiffness matrix and load vector for NR iterations
       real(8) :: alpha(3,3),beta(3)

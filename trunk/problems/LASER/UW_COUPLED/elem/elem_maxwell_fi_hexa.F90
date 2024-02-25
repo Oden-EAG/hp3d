@@ -111,7 +111,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !
 !..variables for geometry
    real(8), dimension(3)    :: xi,x,rn
-   real(8), dimension(3,2)  :: dxidt,dxdt,rt
+   real(8), dimension(3,2)  :: dxidt,dxdt
    real(8), dimension(3,3)  :: dxdxi,dxidx
    real(8), dimension(2)    :: t
 !
@@ -123,21 +123,12 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    real(8), dimension(3,MAXbrickE)  :: shapE
    real(8), dimension(3,MAXbrickE)  :: curlE
 !
-!..L2 shape functions
-   real(8), dimension(MAXbrickQ)    :: shapQ
-!
 !..Enriched H1 shape functions
    real(8), dimension(3,MAXbrickEE) :: shapEE
    real(8), dimension(3,MAXbrickEE) :: curlEE
 !
-!..nrdof for interface only (without bubbles)
-   integer :: nrdofEEi
-!
 !..H(curl) face dof maps
    integer, allocatable :: idxEE(:), idxE(:)
-!
-!..element mdle node dof
-   integer :: ndofHHmdl,ndofEEmdl,ndofVVmdl,ndofQQmdl
 !
 !..load vector for the enriched space
    complex(8) :: bload_E(NrTest)
@@ -145,9 +136,6 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !..Gram matrix in packed format
    !complex(8) :: gramP(NrTest*(NrTest+1)/2)
    complex(8), allocatable :: gramP(:), Grfp(:)
-   real(8) :: FF, CF, FC
-   real(8) :: fldE(3), fldH(3), crlE(3), crlH(3)
-   real(8) :: fldF(3), fldG(3), crlF(3), crlG(3)
 !
 !..matrices for transpose filling (swapped loops)
 !..stiffness matrices (transposed) for the enriched test space
@@ -160,7 +148,6 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !
 !..3D quadrature data
    real(8), dimension(3,MAXNINT3ADD)  :: xiloc
-   real(8), dimension(  MAXNINT3ADD)  :: waloc
 !
 !..2D quadrature data
    real(8), dimension(2,MAXNINT2ADD)  :: tloc
@@ -168,9 +155,6 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !
 !..BC's flags
    integer, dimension(6,NRINDEX)      :: ibc
-!
-!..for auxiliary computation
-   complex(8) :: zaux
 !
 !..Maxwell load and auxiliary variables
    complex(8), dimension(3) :: zJ,zImp
@@ -180,11 +164,11 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    integer :: nre, nrf
 !
 !..various variables for the problem
-   real(8) :: h_elem,rjac,weight,wa,v2n,CC,EE,CE,E,EC,q,h,omeg,alpha_scale
+   real(8) :: rjac,weight
    real(8) :: bjac,minz,maxz,elem_z
-   integer :: i1,i2,j1,j2,k1,k2,kH,kk,i,ik,j,k,l,nint,kE,n,m
-   integer :: iflag,iprint,itime,iverb
-   integer :: nrdof,nordP,nsign,ifc,ndom,info,iphys,icomp,idec
+   integer :: i1,i2,j1,j2,k1,k2,kk,i,ik,k,l
+   integer :: iflag,info,ifc
+   integer :: nrdof,nordP,nsign,ndom,nint
    complex(8) :: zfval
    complex(8) :: za(3,3),zc(3,3)
    complex(8) :: zaJ(3,3),zcJ(3,3)
@@ -237,19 +221,19 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !..Forcing aux array
    VTYPE, allocatable :: LOADE_B(:,:,:)
 !
-   integer :: a,b,sa,sb,sc,alph,beta
+   integer :: a,b,sa,sb,alph,beta
    integer :: px,py,pz
    integer :: l1,l2,l3,i3,j3,k3,idxbeta,idxalph,idxa,idxa2,idxa3,idxb,idxb2,idxb3,m1,m2
    integer :: nord1,nord2,nord3,nintx,ninty,nintz
    integer :: nrdofH1,nrdofH2,nrdofH3
    integer :: nrdofH1_tr,nrdofH2_tr,nrdofH3_tr
    integer :: nrdofQ1_tr,nrdofQ2_tr,nrdofQ3_tr
-   real(8) :: xi1,xi2,xi3,wt1,wt2,wt3,clock1,clock2
+   real(8) :: xi1,xi2,xi3,wt1,wt2,wt3
    real(8) :: wt123,weighthh,weightvv
    real(8), dimension(MAXPP+1) :: xilocx,xilocy,xilocz
    real(8), dimension(MAXPP+1) :: wlocx,wlocy,wlocz
    real(8), dimension(3,MAXNINT3ADD) :: wloc3
-   real(8), dimension(3) :: xip,dHdx,dHHdx
+   real(8), dimension(3) :: xip
 !
    real(8), dimension(3,3) :: D_za,D_zc,D_aux,D_aux2,C,D,D_RR
    VTYPE,   dimension(3,3) :: Z_za,Z_zc,Z_aux,C_RC,D_ER_za,D_ER_zc,invJrot
@@ -258,7 +242,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    real(8), dimension(MAXPP+1,MAXPP+1) :: sH2p,sH3p,dsH2p,dsH3p
 !
 !..timer
-   real(8) :: start_time,end_time
+   !real(8) :: start_time,end_time
 !
    integer, dimension(3,3) :: deltak
 !
@@ -269,11 +253,14 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    integer, dimension(2,6) :: fam
    integer, dimension(6) :: NrdofEEFc
    real(8), dimension(3,6) :: nfce
-
 !
-!..for Gram matrix compressed storage format
-   integer :: nk
-   nk(k1,k2) = (k2-1)*k2/2+k1
+   integer, external :: ij_upper_to_packed
+!
+#if DEBUG_MODE
+   integer :: icomp,iphys
+   integer :: iprint
+   iprint = 0
+#endif
 !
 !..Identity/Kronecker delta tensor
    deltak=0
@@ -283,10 +270,6 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 !
 !---------------------------------------------------------------------
 !
-!..Set iverb = 0/1 (Non-/VERBOSE)
-   iverb = 0
-!..Set iprint = 0/1 (Non-/VERBOSE)
-   iprint = 0
 #if DEBUG_MODE
    if (iprint.eq.1) then
       write(*,*) 'elem_maxwell_fi_hexa: Mdle = ', Mdle
@@ -1390,7 +1373,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                                     if (m1.le.m2) then
                                        sa=1+deltak(a,1)
                                        sb=1+deltak(b,1)
-                                       kk = nk(2*m1-1,2*m2-1)
+                                       kk = ij_upper_to_packed(2*m1-1,2*m2-1)
 !                                   ...sum EE terms
                                        gramP(kk) = gramP(kk)         &
                                                  + shapH1(idxa,sa)   &
@@ -1435,7 +1418,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                                           enddo
                                        endif
 
-                                       kk = nk(2*m1-1,2*m2)
+                                       kk = ij_upper_to_packed(2*m1-1,2*m2)
 !                                   ...sum CE terms
                                        do alph=1,2
                                           idxalph=mod(a+alph-1,3)+1
@@ -1472,7 +1455,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
 
                                        if (m1.ne.m2) then
 
-                                          kk = nk(2*m1  ,2*m2-1)
+                                          kk = ij_upper_to_packed(2*m1  ,2*m2-1)
 !                                      ...sum CE terms
                                           do alph=1,2
                                              idxalph=mod(a+alph-1,3)+1
@@ -1507,7 +1490,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                                           endif
                                        endif
 !
-                                       kk = nk(2*m1  ,2*m2  )
+                                       kk = ij_upper_to_packed(2*m1  ,2*m2  )
 !                                   ...sum EE terms
                                        sb=1+deltak(b,1)
                                        sa=1+deltak(a,1)

@@ -31,7 +31,6 @@
 !
       integer, intent(in)       :: m, n
       integer                   :: i,j,k
-      integer                   :: nk, n1, n2
 #if C_MODE
       complex(8), intent(inout) :: GP(m*(m+1)/2)
       complex(8), intent(inout) :: B(m,n)
@@ -41,15 +40,15 @@
 #endif
       real(8)                   :: D(m),diag
       integer                   :: ip
-!  ...function for vector storage of Hermitian Gram matrix
-      nk(n1,n2) = (n2-1)*n2/2+n1
+!
+      integer, external         :: ij_upper_to_packed
 !
 !-----------------------------------------------------------------------
 !
 !  ...preconditioning: GP ---> D^-1/2 * GP * D^-1/2
 !  ...extract the diagonal of the matrix
       do i=1,m
-         k = nk(i,i)
+         k = ij_upper_to_packed(i,i)
          diag = dsqrt(real(GP(k),8))
          ip = floor(log(diag)/log(2.d0))
          D(i) = 0.5d0**ip
@@ -57,7 +56,7 @@
 !  ...apply the scaling to the Gram matrix
       do j=1,m
          do i=1,j
-            k = nk(i,j)
+            k = ij_upper_to_packed(i,j)
             GP(k) = GP(k)*D(i)*D(j)
          enddo
       enddo

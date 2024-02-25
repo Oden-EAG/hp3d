@@ -14,7 +14,6 @@
 !                         It also displays dof, residuals and
 !                         relevant errors at each step.
 !
-!
 !---------------------------------------------------------------------
 !
 subroutine refine_DPG
@@ -24,8 +23,7 @@ subroutine refine_DPG
    use data_structure3D
    use environment  , only: QUIET_MODE
    use assembly_sc  , only: NRDOF_CON, NRDOF_TOT
-   use parametersDPG, only: NORD_ADD
-   use par_mesh     , only: DISTRIBUTED,HOST_MESH
+   use par_mesh     , only: DISTRIBUTED
    use mpi_wrapper
     
    implicit none
@@ -44,7 +42,6 @@ subroutine refine_DPG
    integer, parameter :: Irefine = 2
 ! 
    integer            :: Nflag(NR_PHYSA)
-   integer            :: Nreflag
    integer            :: Nstop
 !
    integer, dimension(max_step), save :: nrdof_tot_mesh
@@ -72,16 +69,12 @@ subroutine refine_DPG
    real(8) :: errorH,errorE,errorV,errorQ,rnormH,rnormE,rnormV,rnormQ
    real(8) :: error_tot,rnorm_tot,error_subd,rnorm_subd
 !
-   integer :: i,ic,mdle,iel,kref,subd,count,ierr
-   real(8) :: x(3), xnod(3,8)
+   integer :: i,mdle,iel,kref,subd,count,ierr
 !
 !..element type
    integer :: etype
 !
    real(8) :: start_time,end_time
-!
-!..printing flag
-   integer :: iprint = 0
 !
 !-----------------------------------------------------------------------
 !
@@ -127,7 +120,7 @@ subroutine refine_DPG
    do iel = 1,NRELES
       mdle = ELEM_ORDER(iel)
       call get_subd(mdle, subd)
-      if (DISTRIBUTED .and. (RANK .ne. subd)) cycle
+      if (DISTRIBUTED .and. (RANK.ne.subd)) cycle
 
       if(ires) then ! compute the max residual and the residual in the subdomain
          call elem_residual(mdle, elem_resid(iel),elem_ref_flag(iel))

@@ -31,7 +31,7 @@ subroutine set_initial_mesh(Nelem_order)
 !..element type
    integer :: etype
 !
-   integer :: iel,ndom,i,ifc,neig,max_order
+   integer :: iel,i,ifc,neig,max_order !,ndom
 !
 !..BC flags; dimension = num_faces * components
    integer :: ibc(6,NRINDEX)

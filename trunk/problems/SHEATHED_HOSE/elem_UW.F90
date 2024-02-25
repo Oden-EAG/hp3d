@@ -102,10 +102,8 @@ subroutine elem_DPG_UWEAK(Mdle)
       real*8  :: weight,wa,rjac,brjac,tmp,diffmax,dmax,omegaWeight,l2Weight,l2StressWeight
 !
 !  ...LAPACK stuff
-      character uplo,transa,transb
-! NOTE: nk is a "statement function"
-      integer :: nk
-      nk(k1,k2) = (k2-1)*k2/2+k1
+      character :: uplo,transa,transb
+      integer, external :: ij_upper_to_packed
 !
 !-----------------------------------------------------------------------------------
 !      I N I T I A L I Z A T I O N                                                 |
@@ -252,7 +250,7 @@ subroutine elem_DPG_UWEAK(Mdle)
             case(1)
               do m2=m1,3*nrdofVV
                 icomp = mod(m2-1,3)+1
-                k = nk(m1,m2)
+                k = ij_upper_to_packed(m1,m2)
                 k2 = int((m2-1)/3)+1
 
                 tmp=0.d0
@@ -277,7 +275,7 @@ subroutine elem_DPG_UWEAK(Mdle)
               enddo
 
               do m2=3*nrdofVV+1,3*nrdofVV+3*nrdofHH
-                k = nk(m1,m2)
+                k = ij_upper_to_packed(m1,m2)
                 k2 = int((m2-3*nrdofVV-1)/3)+1
                 icomp = mod(m2-1,3)+1
 
@@ -295,7 +293,7 @@ subroutine elem_DPG_UWEAK(Mdle)
               do m2=m1,3*nrdofVV
                 icomp = mod(m2-1,3)+1
                 if (icomp.eq.jcomp) then
-                  k = nk(m1,m2)
+                  k = ij_upper_to_packed(m1,m2)
                   k2 = int((m2-1)/3)+1
                   Gram(k) = Gram(k)  &
                           + ( divVV(k1)*divVV(k2)  &
@@ -452,7 +450,7 @@ subroutine elem_DPG_UWEAK(Mdle)
             case(1)
               do m2=m1,3*nrdofVV+3*nrdofHH
                 icomp = mod(m2-1,3)+1
-                k = nk(m1,m2)
+                k = ij_upper_to_packed(m1,m2)
                 k2 = int((m2-3*nrdofVV-1)/3)+1
 
                 tmp=0.d0
@@ -474,7 +472,7 @@ subroutine elem_DPG_UWEAK(Mdle)
               do m2=m1,3*nrdofVV+3*nrdofHH
                 icomp = mod(m2-1,3)+1
                 if (icomp.eq.jcomp) then
-                  k = nk(m1,m2)
+                  k = ij_upper_to_packed(m1,m2)
                   k2 = int((m2-3*nrdofVV-1)/3)+1
                   Gram(k) = Gram(k)  &
                           + ( shapHH(k1)*shapHH(k2)  &

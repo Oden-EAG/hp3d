@@ -40,8 +40,6 @@ subroutine get_avgTemp(NumPts,FileIter)
    character(8)  :: fmt,suffix
    character(64) :: filename
 !
-   integer :: ierr
-!
 !-------------------------------------------------------------------------------
 !
    if (NumPts.le.0) NumPts = 4
@@ -427,7 +425,7 @@ subroutine get_thermLoad(ZsolQ,Coord_z, Therm_load)
 !
    integer :: jz,numPts
    real(8) :: gs,gp,Is,Ip
-   real(8) :: eta,Nex,Ngd,sum1,sum2,dz
+   real(8) :: eta,sum1,sum2,dz
 !
 !-------------------------------------------------------------------------------
 !

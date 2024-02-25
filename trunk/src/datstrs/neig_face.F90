@@ -221,23 +221,23 @@ subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
 !
 !  igen = nrgen ; Neig = Neig(i)
 !
-!  DO WHILE igen > 0
+!  do while igen > 0
 !
 !     face = face(igen)
 !
 !     look for son of Neig attached to face
 !
-!     IF found [update neighbor]
+!     if found [update neighbor]
 !
 !        Neig <- son
 !
-!     ELSE     [advance with generation]
+!     else     [advance with generation]
 !
 !        igen = igen - 1
 !
-!     ENDIF
+!     endif
 !
-!  ENDDO
+!  enddo
 !
 !------------------------------------------------------------------------
 !

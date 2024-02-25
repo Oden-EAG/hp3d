@@ -35,8 +35,7 @@ subroutine initialize
    integer, parameter :: NRCOMS_PROB  = 1     ! number of solution copies
    integer, parameter :: NRRHS_PROB   = 1     ! number of rhs
 !--------------------------------------------------------------------------
-   integer :: iflag,i,INTEGRATION_tmp
-   character(len=1024) :: argv
+   integer :: INTEGRATION_tmp
 !--------------------------------------------------------------------------
 !..output file open for the history of refinements (not for MPI)
 !  call open_history_file(trim(FILE_HISTORY))

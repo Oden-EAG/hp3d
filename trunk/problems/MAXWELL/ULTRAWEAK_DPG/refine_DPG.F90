@@ -23,8 +23,7 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
    use data_structure3D
    use environment  , only: QUIET_MODE
    use assembly_sc  , only: NRDOF_CON, NRDOF_TOT
-   use parametersDPG, only: NORD_ADD
-   use par_mesh     , only: DISTRIBUTED,HOST_MESH
+   use par_mesh     , only: DISTRIBUTED
    use mpi_wrapper
    use sorts        , only: qsort_duplet
 !
@@ -54,14 +53,11 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
    integer, allocatable :: mdle_ref(:), ref_type(:), ref_kind(:)
 !
 !..adaptive refinements
-   integer :: ref_pml
-   integer :: ref_ndom(4)
    integer :: mdle_pml(NRELES)
    real(8) :: res_sum
 !
    integer, save :: istep = 0
    integer, save :: irefineold = 0
-   integer, save :: STAGE = 1
 !
    integer :: iref, nord_comp(3), nordx_new, nordy_new, nordz_new
    integer :: nord, nord_new, icpref, idec_pref
@@ -73,18 +69,14 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
    real(8) :: error_tot,  rnorm_tot
    real(8) :: error_subd, rnorm_subd
 !
-   integer :: nod, nel, mdle, iel, kref, subd
-   integer :: count, ierr, i, ic
-   real(8) :: x(3), xnod(3,8)
+   integer :: mdle, iel, kref, subd
+   integer :: count, ierr, i
    integer :: refine_strategy
 !
 !..element type
    integer :: ntype
 !
    real(8) :: start_time,end_time
-!
-!..printing flag
-   integer :: iprint = 0
 !
 !-----------------------------------------------------------------------
 !
@@ -507,10 +499,6 @@ subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
 end subroutine refine_DPG
 
 
-
-
-
-
 !------------------------------------------------------------------------------
 !> @brief      criterion set by user for choosing between h and p refinement
 !!
@@ -521,24 +509,13 @@ end subroutine refine_DPG
 !!
 !> @date       July 2023
 !------------------------------------------------------------------------------
-   subroutine select_refinement(Mdle,Iref)
-!
-      use data_structure3D
-      use commonParam
-      use element_data
+   subroutine select_refinement(Mdle, Iref)
 !
       implicit none
 !
       integer, intent(in)  :: Mdle
       integer, intent(out) :: Iref
 !
-      integer :: i,j,nod,nodp,iv,ie,nrv,nre,nel
-      integer :: nodesl(27), norientl(27)
-      real*8  :: h, lambda
-!
-!---------------------------------------------------------------------
-!
-! TODO: define critereon here
       Iref = 1
 !
    end subroutine select_refinement

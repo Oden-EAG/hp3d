@@ -32,8 +32,8 @@
       integer :: nrdofH,   nrdofE,   nrdofV,   nrdofQ
       integer :: nrdofHH,  nrdofEE,  nrdofVV,  nrdofQQ
       integer :: ndofHmdl, ndofEmdl, ndofVmdl, ndofQmdl
-      integer :: nrdofEi, nrdofVi
-      integer :: nrTest,  nrTrial
+      integer :: nrdofEi
+      integer :: nrTest, nrTrial
 !
       integer :: nrv, nre, nrf
 !
@@ -42,9 +42,6 @@
 !
 !  ...middle node type
       integer :: ntype
-!
-!  ...timer
-      real(8) :: start_time, end_time
 !
 !----------------------------------------------------------------------
 !

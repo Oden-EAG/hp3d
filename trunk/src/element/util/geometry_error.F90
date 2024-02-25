@@ -117,7 +117,7 @@ subroutine geometry_error(Err,Rnorm)
 !     raise visitation flag
       ivis=ivis+1
 !
-IF (.NOT. QUIET_MODE) THEN
+if (.not. QUIET_MODE) then
 !
 !     check
       if (ivis > maxvis) then
@@ -132,7 +132,7 @@ IF (.NOT. QUIET_MODE) THEN
       rwork(ivis,4)=err_rate
       iwork(ivis,1)=nrgdof
 !
-ENDIF
+endif
 !
 !     printing
 !
@@ -152,11 +152,11 @@ ENDIF
         endif
 !
 !       print header
-IF (.NOT. L2GEOM) THEN
+if (.not. L2GEOM) then
         write(nin,*)'-- Geometry Error Report --'
-ELSE
+else
         write(nin,*)'-- Geometry Error Report (L2 only) --'
-ENDIF
+endif
         write(nin,1000)
  1000   format('          Gdofs // ' , &
                  '        Error // ' , &
@@ -186,15 +186,15 @@ ENDIF
  9998 format(1x,i3,' ; ',2x,i6,' ; ',2x,3(e12.5,' ; ',2x),f9.6)
 !
 !     print to screen
-IF (.NOT. QUIET_MODE) THEN ; write(*,*)''
-  IF (.NOT. L2GEOM) THEN   ; write(*,*)'-- Geometry Error Report --'
-  ELSE                     ; write(*,*)'-- Geometry Error Report (L2 only) --'
-  ENDIF
+if (.not. QUIET_MODE) then ; write(*,*)''
+  if (.not. L2GEOM) then   ; write(*,*)'-- Geometry Error Report --'
+  else                     ; write(*,*)'-- Geometry Error Report (L2 only) --'
+  endif
                              write(*,1000)
         do i=1,ivis        ; write(*,9998)i,iwork(i,1),rwork(i,1:4)
         enddo
                              write(*,*)''
-ENDIF
+endif
 !
 !     close file
       close(unit=nin,iostat=ic)
@@ -339,7 +339,7 @@ subroutine geometry_error_elem(Mdle, Derr,Dnorm)
         enddo
 !
 !       H1 seminorm contribution
-        if (.NOT. L2GEOM) then
+        if (.not. L2GEOM) then
           do i=1,3
             do j=1,3
               Dnorm=Dnorm+(dxexdeta(i,j)              )**2*weight
