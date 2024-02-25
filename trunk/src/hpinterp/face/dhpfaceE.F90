@@ -413,13 +413,13 @@ subroutine dhpfaceE(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
       write(*,7015) j, zbE(j,1:MAXEQNE)
       write(*,7016) aaE(j,1:ndofE_tot)
     enddo
-    #if HP3D_COMPLEX
-      7015 format(i5, 6(2e10.3,2x))
-    #else
-      7015 format(i5, 10e12.5)
-    #endif
-    7016 format(10e12.5)
   endif
+#if HP3D_COMPLEX
+  7015 format(i5,2x,6(2e10.3,2x))
+#else
+  7015 format(i5,2x,10e12.5)
+#endif
+  7016 format(10e12.5)
 #endif
 !
 !------------------------------------------------------
