@@ -63,11 +63,8 @@ c
       integer :: In(*), Ia(*), Ibb(*), Ic(*)
       integer :: Ntot
 c
-      integer :: i,j,id,ides,iel,ifrst,inic,ip,ipc,ips
+      integer :: i,id,ides,iel,ifrst,inic,ip,ipc,ips
       integer :: jd,jdes,jdn,jjd,jp,n,ne,nt,ntt
-c
-      integer :: modr
-      modr(i,j) = i - (i/j)*j
 c
 c initialize
 c

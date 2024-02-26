@@ -1,5 +1,5 @@
 !> @brief Saves common variables used in frontal solver
-!> @date Mar 2023
+!> @date Feb 2024
 module surfsc1
 !
    implicit none
@@ -16,6 +16,16 @@ module surfsc1
 #if HP3D_COMPLEX
    integer :: IDUMPWR
 #endif
+!
+   contains
+!
+   integer function modr(I,J)
+!
+      integer, intent(in) :: I,J
+!
+      modr = I - (I/J)*J
+!
+   end function modr
 !
 end module surfsc1
 
