@@ -1,27 +1,26 @@
 !----------------------------------------------------------------------
 !
-!   routine name       - setcnstr_trian_hdiv
+!   routine name       - setcnstr_trian_hcurl
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - Feb 2024
+!   latest revision    - Feb 2023
 !
 !   purpose            - routine evaluates constraint coefficients for
-!                        the triangular master element and H(div) (L2)
-!                        constrained appoximation
+!                        the triangular master element
 !
 !   arguments          - none
 !
 !----------------------------------------------------------------------
 !
-   subroutine setcnstr_trian_hdiv
+      subroutine setcnstr_trian_hcurl
 !
       use parameters
       use constraints
       implicit none
 !
-      RRTQ = 0.d0
+      RRTE = 0.d0
 !
-      call setcnstr_trian_iso_hdiv
+      call setcnstr_trian_iso_hcurl
 !
-   end subroutine setcnstr_trian_hdiv
+      end subroutine setcnstr_trian_hcurl

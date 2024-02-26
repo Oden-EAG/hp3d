@@ -1,158 +1,158 @@
-c----------------------------------------------------------------------
-c
-c   routine name       - setcnstr_trian_iso_hcurl
-c
-c----------------------------------------------------------------------
-c
-c   latest revision    - Feb 2023
-c
-c   purpose            - routine evaluates constraint coefficients for
-c                        the triangular master element
-c
-c   arguments          - none
-c
-c----------------------------------------------------------------------
-c
-c    'big' parent nodes
-c
-c      *
-c      * *
-c      *   *
-c      *     *
-c      *       *
-c      *         *
-c    4 *           *  3
-c      *             *
-c      *       1       *
-c      *                 *
-c      *                   *
-c      *                     *
-c      *************************
-c                  2
-c
-c      'small' constrained nodes
-c      *
-c      * *
-c      *   *
-c      *     *
-c      *   3   *
-c      *         *
-c      ******7******
-c      * *         * *
-c      *   *   4   *   *
-c      *     5     6     *
-c      *   1   *   *   2   *
-c      *         * *         *
-c      *************************
-c
-c--------------------------------------------------------------------
-c
-      subroutine setcnstr_trian_iso_hcurl
-c
+!----------------------------------------------------------------------
+!
+!   routine name       - setcnstr_trian_iso_hcurl
+!
+!----------------------------------------------------------------------
+!
+!   latest revision    - Feb 2024
+!
+!   purpose            - routine evaluates constraint coefficients for
+!                        the triangular master element
+!
+!   arguments          - none
+!
+!----------------------------------------------------------------------
+!
+!    'big' parent nodes
+!
+!      *
+!      * *
+!      *   *
+!      *     *
+!      *       *
+!      *         *
+!    4 *           *  3
+!      *             *
+!      *       1       *
+!      *                 *
+!      *                   *
+!      *                     *
+!      *************************
+!                  2
+!
+!      'small' constrained nodes
+!      *
+!      * *
+!      *   *
+!      *     *
+!      *   3   *
+!      *         *
+!      ******7******
+!      * *         * *
+!      *   *   4   *   *
+!      *     5     6     *
+!      *   1   *   *   2   *
+!      *         * *         *
+!      *************************
+!
+!--------------------------------------------------------------------
+!
+   subroutine setcnstr_trian_iso_hcurl
+!
       use parameters
       use constraints
       use element_data
-c
+!
       implicit none
-c
-c  ...use collocation points for lagrange shape functions h1
+!
+!  ...use collocation points for lagrange shape functions h1
       integer, parameter :: npts  = 4*MAXtriaE
       integer, parameter :: lwork = MAXtriaE**2
-c
-      real(8) :: shapsma(2,MAXtriaE),curl(MAXtriaE),
-     .           shapbig(2,MAXtriaE),
-     .           evalsma(npts,MAXtriaE),evalbig(npts,MAXtriaE),
-     .           work(lwork),r(MAXtriaE,MAXtriaE),xibig(2),xisma(2)
-c
-c  ...order and edge orientations
+!
+      real(8) :: shapsma(2,MAXtriaE),curl(MAXtriaE),              &
+                 shapbig(2,MAXtriaE),                             &
+                 evalsma(npts,MAXtriaE),evalbig(npts,MAXtriaE),   &
+                 work(lwork),r(MAXtriaE,MAXtriaE),xibig(2),xisma(2)
+!
+!  ...order and edge orientations
       integer :: norder(4),norient(3),nsize(2)
-c
+!
       real(8) :: dbds(2,2)
-c
+!
       integer :: i,ib,ic,ibcase,info,is,iscase
       integer :: ivoid,jvoid,kvoid
       integer :: j,k,nord,nc,nrb,nrdof,nrs,nspan
       integer :: ndof_i,ndof_j,ndof_mdlt,ndof_medg
-c
+!
 #if HP3D_DEBUG
       real(8) :: val(2)
       integer :: ians,nel
       integer :: iprint
       iprint = 0
 #endif
-c
-c  ...set up order and orientation
+!
+!  ...set up order and orientation
       nord = MAXP
       norder  = nord
       norient = 0
       nsize   = (/MAXP,MAXtriaE/)
-c
+!
       ivoid = 0
       call ndof_nod(MEDG,nord, ivoid, ndof_medg, jvoid, kvoid)
       call ndof_nod(MDLT,nord, ivoid, ndof_mdlt, jvoid, kvoid)
       nrdof = 3*ndof_medg + ndof_mdlt
-c
-c*********************************************************************
-c
-c  ...small triangle 1 -- small nodes 1 and 5:
-c
-c*********************************************************************
-c
+!
+!*********************************************************************
+!
+!  ...small triangle 1 -- small nodes 1 and 5:
+!
+!*********************************************************************
+!
       ic =0; nspan = (2*nord);
       dbds    = 0.d0;   curl    = 0.d0;
       shapsma = 0.d0;   shapbig = 0.d0;
       evalsma = 0.d0;   evalbig = 0.d0;
-c  ...derivative dx/dxi
+!  ...derivative dx/dxi
       dbds(1,1) = 0.5d0;
       dbds(2,2) = 0.5d0
-c
-c  ...loop through collocation points:
+!
+!  ...loop through collocation points:
       do i=1,nspan
-c
+!
         xibig(1) = (i-1)*0.5d0/(nspan-1)
         xisma(1) = (i-1)*1.0d0/(nspan-1)
-c
+!
         do j=1,nspan-(i-1)
-c
+!
           xibig(2) = 0.5d0/(nspan-1)*(j-1)
           xisma(2) = 1.0d0/(nspan-1)*(j-1)
-c
-c  .......find small shape functions at this point:
-c          call shapeEt(
-c     .      xisma,norder,norient,ivoid,
-c     .      shapsma(1:2,1:MAXtriaE),
-c     .      curl(1:MAXtriaE))
-          call shape2DETri(xisma,norder,norient,nsize,
-     .                     ivoid,shapsma(1:2,:),curl)
-c
-c  .......find big shape functions at this point:
-c          call shapeEt(
-c     .      xibig,norder,norient,ivoid,
-c     .      shapbig(1:2,1:MAXtriaE),
-c     .      curl(1:MAXtriaE))
-          call shape2DETri(xibig,norder,norient,nsize,
-     .                     ivoid,shapbig(1:2,:),curl)
-c  .......for each component variable,
+!
+!  .......find small shape functions at this point:
+!          call shapeEt(                  &
+!            xisma,norder,norient,ivoid,  &
+!            shapsma(1:2,1:MAXtriaE),     &
+!            curl(1:MAXtriaE))
+          call shape2DETri(xisma,norder,norient,nsize,   &
+                           ivoid,shapsma(1:2,:),curl)
+!
+!  .......find big shape functions at this point:
+!          call shapeEt(                  &
+!            xibig,norder,norient,ivoid,  &
+!            shapbig(1:2,1:MAXtriaE),     &
+!            curl(1:MAXtriaE))
+          call shape2DETri(xibig,norder,norient,nsize,   &
+                           ivoid,shapbig(1:2,:),curl)
+!  .......for each component variable,
           if ((ic+2).gt.npts) then
-            write(*,*) '1 setcnstr_trian_iso_hcurl: INCREASE WORKSPACE',
-     .        npts, (ic+2)
+            write(*,*) '1 setcnstr_trian_iso_hcurl: INCREASE WORKSPACE', &
+              npts, (ic+2)
           endif
-c
+!
           do k=1,2
-            evalbig(ic+k, 1:MAXtriaE) = shapbig(k,1:MAXtriaE)*dbds(k,1)
-     .                                + shapbig(k,1:MAXtriaE)*dbds(k,2)
+            evalbig(ic+k, 1:MAXtriaE) = shapbig(k,1:MAXtriaE)*dbds(k,1)  &
+                                      + shapbig(k,1:MAXtriaE)*dbds(k,2)
             evalsma(ic+k, 1:MAXtriaE) = shapsma(k,1:MAXtriaE)
           enddo
           ic = ic + 2
         enddo
       enddo
-c
+!
 #if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'ic, nrdof = ', ic, nrdof
         call pause
       endif
-c
+!
       if (iprint.eq.1) then
         write(*,*) 'setcnstr_trian_iso_hcurl: COLUMNWISE ....'
         do i=1,nc
@@ -162,14 +162,13 @@ c
         call pause
       endif
 #endif
-c
+!
       nc = ic;
-      call dgels('N', nc, nrdof, nrdof,
-     .           evalsma, npts, evalbig, npts, work, lwork, info)
+      call dgels('N', nc, nrdof, nrdof,   &
+                 evalsma, npts, evalbig, npts, work, lwork, info)
       if (info.ne.0) then
         write(*,*)'setcnstr_trian_iso_hcurl: HCURL DGELS INFO =',info
-        call logic_error(FAILURE,
-     .  __FILE__,__LINE__)
+        call logic_error(FAILURE,__FILE__,__LINE__)
       endif
 ccc      r = 2.d0*evalbig(1:nrdof,1:nrdof)
       r = evalbig(1:nrdof,1:nrdof)
@@ -179,108 +178,107 @@ ccc      r = 2.d0*evalbig(1:nrdof,1:nrdof)
  7002   format('r=', 10e12.5)
       endif
 #endif
-c
-c  ...degrees of freedom of small node 5:
-c****************************************
+!
+!  ...degrees of freedom of small node 5:
+!****************************************
       nrs = ndof_medg
       do i=1,ndof_medg
-c
-c  .....big node 2,3,4:
+!
+!  .....big node 2,3,4:
         do ib=2,4
           nrb = (ib-2)*ndof_medg
           do j=1,ndof_medg
             RRTE(ib,j,5,i) = r(nrs+i,nrb+j)
           enddo
         enddo
-c
-c  .....big node 1:
+!
+!  .....big node 1:
         nrb = 3*ndof_medg
         do j=1,ndof_mdlt
           RRTE(1,j,5,i) = r(nrs+i,nrb+j)
         enddo
       enddo
-c
-c  ...degrees of freedom of small node 1:
-c*****************************************
+!
+!  ...degrees of freedom of small node 1:
+!*****************************************
       nrs = 3*ndof_medg
       do i=1,ndof_mdlt
-c
-c  .....big node 2,3,4:
+!
+!  .....big node 2,3,4:
         do ib=2,4
           nrb = (ib-2)*ndof_medg
           do j=1,ndof_medg
             RRTE(ib,j,1,i) = r(nrs+i,nrb+j)
           enddo
         enddo
-c
-c  .....big node 1:
+!
+!  .....big node 1:
         nrb = 3*ndof_medg
         do j=1,ndof_mdlt
           RRTE(1,j,1,i) = r(nrs+i,nrb+j)
         enddo
       enddo
-c*********************************************************************
-c
-c  ...small triangle 2 -- small nodes 2 and 6:
-c
-c*********************************************************************
-c
+!*********************************************************************
+!
+!  ...small triangle 2 -- small nodes 2 and 6:
+!
+!*********************************************************************
+!
       ic =0; nspan = (2*nord);
       dbds    = 0.d0;   curl    = 0.d0;
       shapsma = 0.d0;   shapbig = 0.d0;
       evalsma = 0.d0;   evalbig = 0.d0;
-c  ...derivative dx/dxi
+!  ...derivative dx/dxi
       dbds(1,1) = 0.5d0;
       dbds(2,2) = 0.5d0
-c
-c  ...loop through collocation points:
+!
+!  ...loop through collocation points:
       do i=1,nspan
-c
+!
         xibig(1) = (i-1)*0.5d0/(nspan-1) + 0.5d0
         xisma(1) = (i-1)*1.0d0/(nspan-1)
-c
+!
         do j=1,nspan-(i-1)
-c
+!
           xibig(2) = 0.5d0/(nspan-1)*(j-1)
           xisma(2) = 1.0d0/(nspan-1)*(j-1)
-c
-c  .......find small shape functions at this point:
-c          call shapeEt(
-c     .      xisma,norder,norient,ivoid,
-c     .      shapsma(1:2,1:MAXtriaE),
-c     .      curl(1:MAXtriaE))
-          call shape2DETri(xisma,norder,norient,nsize,
-     .                     ivoid,shapsma(1:2,:),curl)
-c
-c  .......find big shape functions at this point:
-c          call shapeEt(
-c     .      xibig,norder,norient,ivoid,
-c     .      shapbig(1:2,1:MAXtriaE),
-c     .      curl(1:MAXtriaE))
-          call shape2DETri(xibig,norder,norient,nsize,
-     .                     ivoid,shapbig(1:2,:),curl)
-c
-c  .......for each component variable,
+!
+!  .......find small shape functions at this point:
+!          call shapeEt(                  &
+!            xisma,norder,norient,ivoid,  &
+!            shapsma(1:2,1:MAXtriaE),     &
+!            curl(1:MAXtriaE))
+          call shape2DETri(xisma,norder,norient,nsize,   &
+                           ivoid,shapsma(1:2,:),curl)
+!
+!  .......find big shape functions at this point:
+!          call shapeEt(                  &
+!            xibig,norder,norient,ivoid,  &
+!            shapbig(1:2,1:MAXtriaE),     &
+!            curl(1:MAXtriaE))
+          call shape2DETri(xibig,norder,norient,nsize,   &
+                           ivoid,shapbig(1:2,:),curl)
+!
+!  .......for each component variable,
           if ((ic+2).gt.npts) then
-            write(*,*) '2 setcnstr_trian_iso_hcurl: INCREASE WORKSPACE',
-     .        npts
+            write(*,*) '2 setcnstr_trian_iso_hcurl: INCREASE WORKSPACE',npts
           endif
-c
+!
           do k=1,2
-            evalbig(ic+k, 1:MAXtriaE) = shapbig(k,1:MAXtriaE)*dbds(k,1)
-     .                                + shapbig(k,1:MAXtriaE)*dbds(k,2)
+            evalbig(ic+k, 1:MAXtriaE) = shapbig(k,1:MAXtriaE)*dbds(k,1)  &
+                                      + shapbig(k,1:MAXtriaE)*dbds(k,2)
             evalsma(ic+k, 1:MAXtriaE) = shapsma(k,1:MAXtriaE)
           enddo
           ic = ic + 2
         enddo
       enddo
-c
+!
 #if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'ic, nrdof = ', ic, nrdof
         call pause
       endif
-c
+!
       if (iprint.eq.1) then
         write(*,*) 'setcnstr_trian_iso_hcurl: COLUMNWISE ....'
         do i=1,nc
@@ -289,126 +287,124 @@ c
         call pause
       endif
 #endif
-c
+!
       nc = ic;
-      call dgels('N', nc, nrdof, nrdof,
-     .           evalsma, npts, evalbig, npts, work, lwork, info)
+      call dgels('N', nc, nrdof, nrdof,   &
+                 evalsma, npts, evalbig, npts, work, lwork, info)
       if (info.ne.0) then
         write(*,*)'setcnstr_trian_iso_hcurl: HCURL DGELS INFO =',info
-        call logic_error(FAILURE,
-     .  __FILE__,__LINE__)
+        call logic_error(FAILURE,__FILE__,__LINE__)
       endif
 ccc      r = 2.d0*evalbig(1:nrdof,1:nrdof)
       r = evalbig(1:nrdof,1:nrdof)
-c
+!
 #if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7002) r(1:nrdof,1:nrdof)
       endif
 #endif
-c
-c  ...degrees of freedom of small node 6:
-c****************************************
+!
+!  ...degrees of freedom of small node 6:
+!****************************************
       nrs = 2*ndof_medg
       do i=1,ndof_medg
-c
-c  .....big node 2,3,4:
+!
+!  .....big node 2,3,4:
         do ib=2,4
           nrb = (ib-2)*ndof_medg
           do j=1,ndof_medg
             RRTE(ib,j,6,i) = r(nrs+i,nrb+j)
           enddo
         enddo
-c
-c  .....big node 1:
+!
+!  .....big node 1:
         nrb = 3*ndof_medg
         do j=1,ndof_mdlt
           RRTE(1,j,6,i) = r(nrs+i,nrb+j)
         enddo
       enddo
-c
-c  ...degrees of freedom of small node 2:
-c*****************************************
+!
+!  ...degrees of freedom of small node 2:
+!*****************************************
       nrs = 3*ndof_medg
       do i=1,ndof_mdlt
-c
-c  .....big node 2,3,4:
+!
+!  .....big node 2,3,4:
         do ib=2,4
           nrb = (ib-2)*ndof_medg
           do j=1,ndof_medg
             RRTE(ib,j,2,i) = r(nrs+i,nrb+j)
           enddo
         enddo
-c
-c  .....big node 1:
+!
+!  .....big node 1:
         nrb = 3*ndof_medg
         do j=1,ndof_mdlt
           RRTE(1,j,2,i) = r(nrs+i,nrb+j)
         enddo
       enddo
-c
-c*********************************************************************
-c
-c  ...small triangle 3 -- small nodes 3 and 7:
-c
-c*********************************************************************
-c
+!
+!*********************************************************************
+!
+!  ...small triangle 3 -- small nodes 3 and 7:
+!
+!*********************************************************************
+!
       ic =0; nspan = (2*nord);
       dbds    = 0.d0;   curl    = 0.d0;
       shapsma = 0.d0;   shapbig = 0.d0;
       evalsma = 0.d0;   evalbig = 0.d0;
-c  ...derivative dx/dxi
+!  ...derivative dx/dxi
       dbds(1,1) = 0.5d0;
       dbds(2,2) = 0.5d0
-c
-c  ...loop through collocation points:
+!
+!  ...loop through collocation points:
       do i=1,nspan
-c
+!
         xibig(1) = (i-1)*0.5d0/(nspan-1)
         xisma(1) = (i-1)*1.0d0/(nspan-1)
-c
+!
         do j=1,nspan-(i-1)
-c
+!
           xibig(2) = 0.5d0/(nspan-1)*(j-1) + 0.5d0
           xisma(2) = 1.0d0/(nspan-1)*(j-1)
-c
-c  .......find small shape functions at this point:
-c          call shapeEt(
-c     .      xisma,norder,norient,ivoid,
-c     .      shapsma(1:2,1:MAXtriaE),
-c     .      curl(1:MAXtriaE))
-          call shape2DETri(xisma,norder,norient,nsize,
-     .                     ivoid,shapsma(1:2,:),curl)
-c
-c  .......find big shape functions at this point:
-c          call shapeEt(
-c     .      xibig,norder,norient,ivoid,
-c     .      shapbig(1:2,1:MAXtriaE),
-c     .      curl(1:MAXtriaE))
-          call shape2DETri(xibig,norder,norient,nsize,
-     .                     ivoid,shapbig(1:2,:),curl)
-c
-c  .......for each component variable,
+!
+!  .......find small shape functions at this point:
+!          call shapeEt(                  &
+!            xisma,norder,norient,ivoid,  &
+!            shapsma(1:2,1:MAXtriaE),     &
+!            curl(1:MAXtriaE))
+          call shape2DETri(xisma,norder,norient,nsize,   &
+                           ivoid,shapsma(1:2,:),curl)
+!
+!  .......find big shape functions at this point:
+!          call shapeEt(                  &
+!            xibig,norder,norient,ivoid,  &
+!            shapbig(1:2,1:MAXtriaE),     &
+!            curl(1:MAXtriaE))
+          call shape2DETri(xibig,norder,norient,nsize,   &
+                           ivoid,shapbig(1:2,:),curl)
+!
+!  .......for each component variable,
           if ((ic+2).gt.npts) then
-            write(*,*) '3 setcnstr_trian_iso_hcurl: INCREASE WORKSPACE',
-     .        npts
+            write(*,*) '3 setcnstr_trian_iso_hcurl: INCREASE WORKSPACE',npts
           endif
-c
+!
           do k=1,2
-            evalbig(ic+k, 1:MAXtriaE) = shapbig(k,1:MAXtriaE)*dbds(k,1)
-     .                                + shapbig(k,1:MAXtriaE)*dbds(k,2)
+            evalbig(ic+k, 1:MAXtriaE) = shapbig(k,1:MAXtriaE)*dbds(k,1)  &
+                                      + shapbig(k,1:MAXtriaE)*dbds(k,2)
             evalsma(ic+k, 1:MAXtriaE) = shapsma(k,1:MAXtriaE)
           enddo
           ic = ic + 2
         enddo
       enddo
-c
+!
 #if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'ic, nrdof = ', ic, nrdof
         call pause
       endif
-c
+!
       if (iprint.eq.1) then
         write(*,*) 'setcnstr_trian: COLUMNWISE ....'
         do i=1,nc
@@ -417,126 +413,124 @@ c
         call pause
       endif
 #endif
-c
+!
       nc = ic;
-      call dgels('N', nc, nrdof, nrdof,
-     .           evalsma, npts, evalbig, npts, work, lwork, info)
+      call dgels('N', nc, nrdof, nrdof,   &
+                 evalsma, npts, evalbig, npts, work, lwork, info)
       if (info.ne.0) then
         write(*,*)'setcnstr_trian_iso_hcurl: HCURL DGELS INFO =',info
-        call logic_error(FAILURE,
-     .  __FILE__,__LINE__)
+        call logic_error(FAILURE,__FILE__,__LINE__)
       endif
 ccc      r = 2.d0*evalbig(1:nrdof,1:nrdof)
       r = evalbig(1:nrdof,1:nrdof)
-c
+!
 #if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7002) r(1:nrdof,1:nrdof)
       endif
 #endif
-c
-c  ...degrees of freedom of small node 7:
-c****************************************
+!
+!  ...degrees of freedom of small node 7:
+!****************************************
       nrs = 0
       do i=1,ndof_medg
-c
-c  .....big node 2,3,4:
+!
+!  .....big node 2,3,4:
         do ib=2,4
           nrb = (ib-2)*ndof_medg
           do j=1,ndof_medg
             RRTE(ib,j,7,i) = r(nrs+i,nrb+j)
           enddo
         enddo
-c
-c  .....big node 1:
+!
+!  .....big node 1:
         nrb = 3*ndof_medg
         do j=1,ndof_mdlt
           RRTE(1,j,7,i) = r(nrs+i,nrb+j)
         enddo
       enddo
-c
-c  ...degrees of freedom of small node 3:
-c*****************************************
+!
+!  ...degrees of freedom of small node 3:
+!*****************************************
       nrs = 3*ndof_medg
       do i=1,ndof_mdlt
-c
-c  .....big node 2,3,4:
+!
+!  .....big node 2,3,4:
         do ib=2,4
           nrb = (ib-2)*ndof_medg
           do j=1,ndof_medg
             RRTE(ib,j,3,i) = r(nrs+i,nrb+j)
           enddo
         enddo
-c
-c  .....big node 1:
+!
+!  .....big node 1:
         nrb = 3*ndof_medg
         do j=1,ndof_mdlt
           RRTE(1,j,3,i) = r(nrs+i,nrb+j)
         enddo
       enddo
-c
-c*********************************************************************
-c
-c  ...small triangle 4 -- small nodes 4:
-c
-c*********************************************************************
-c
+!
+!*********************************************************************
+!
+!  ...small triangle 4 -- small nodes 4:
+!
+!*********************************************************************
+!
       ic =0; nspan = (2*nord);
       dbds    = 0.d0;   curl    = 0.d0;
       shapsma = 0.d0;   shapbig = 0.d0;
       evalsma = 0.d0;   evalbig = 0.d0;
-c  ...derivative dx/dxi
+!  ...derivative dx/dxi
       dbds(1,1) = -0.5d0;
       dbds(2,2) = -0.5d0
-c
-c  ...loop through collocation points:
+!
+!  ...loop through collocation points:
       do i=1,nspan
-c
+!
         xibig(1) = 0.5d0 - (i-1)*0.5d0/(nspan-1)
         xisma(1) =         (i-1)*1.0d0/(nspan-1)
-c
+!
         do j=1,nspan-(i-1)
-c
+!
           xibig(2) = 0.5d0 - 0.5d0/(nspan-1)*(j-1)
           xisma(2) =         1.0d0/(nspan-1)*(j-1)
-c
-c  .......find small shape functions at this point:
-c          call shapeEt(
-c     .      xisma,norder,norient,ivoid,
-c     .      shapsma(1:2,1:MAXtriaE),
-c     .      curl(1:MAXtriaE))
-          call shape2DETri(xisma,norder,norient,nsize,
-     .                     ivoid,shapsma(1:2,:),curl)
-c
-c  .......find big shape functions at this point:
-c          call shapeEt(
-c     .      xibig,norder,norient,ivoid,
-c     .      shapbig(1:2,1:MAXtriaE),
-c     .      curl(1:MAXtriaE))
-          call shape2DETri(xibig,norder,norient,nsize,
-     .                     ivoid,shapbig(1:2,:),curl)
-c
-c  .......for each component variable,
+!
+!  .......find small shape functions at this point:
+!          call shapeEt(                  &
+!            xisma,norder,norient,ivoid,  &
+!            shapsma(1:2,1:MAXtriaE),     &
+!            curl(1:MAXtriaE))
+          call shape2DETri(xisma,norder,norient,nsize,   &
+                           ivoid,shapsma(1:2,:),curl)
+!
+!  .......find big shape functions at this point:
+!          call shapeEt(                  &
+!            xibig,norder,norient,ivoid,  &
+!            shapbig(1:2,1:MAXtriaE),     &
+!            curl(1:MAXtriaE))
+          call shape2DETri(xibig,norder,norient,nsize,   &
+                           ivoid,shapbig(1:2,:),curl)
+!
+!  .......for each component variable,
           if ((ic+2).gt.npts) then
-            write(*,*) '4 setcnstr_trian_iso_hcurl: INCREASE WORKSPACE',
-     .        npts
+            write(*,*) '4 setcnstr_trian_iso_hcurl: INCREASE WORKSPACE',npts
           endif
-c
+!
           do k=1,2
-            evalbig(ic+k, 1:MAXtriaE) = shapbig(k,1:MAXtriaE)*dbds(k,1)
-     .                                + shapbig(k,1:MAXtriaE)*dbds(k,2)
+            evalbig(ic+k, 1:MAXtriaE) = shapbig(k,1:MAXtriaE)*dbds(k,1)  &
+                                      + shapbig(k,1:MAXtriaE)*dbds(k,2)
             evalsma(ic+k, 1:MAXtriaE) = shapsma(k,1:MAXtriaE)
           enddo
           ic = ic + 2
         enddo
       enddo
-c
+!
 #if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'ic, nrdof = ', ic, nrdof
         call pause
       endif
-c
+!
       if (iprint.eq.1) then
         write(*,*) 'setcnstr_trian_iso_hcurl: COLUMNWISE ....'
         do i=1,nc
@@ -545,14 +539,13 @@ c
         call pause
       endif
 #endif
-c
+!
       nc = ic;
-      call dgels('N', nc, nrdof, nrdof,
-     .           evalsma, npts, evalbig, npts, work, lwork, info)
+      call dgels('N', nc, nrdof, nrdof,   &
+                 evalsma, npts, evalbig, npts, work, lwork, info)
       if (info.ne.0) then
         write(*,*)'setcnstr_trian_iso_hcurl: HCURL DGELS INFO =',info
-        call logic_error(FAILURE,
-     .  __FILE__,__LINE__)
+        call logic_error(FAILURE,__FILE__,__LINE__)
       endif
 ccc      r = -2.d0*evalbig(1:nrdof,1:nrdof)
       r = evalbig(1:nrdof,1:nrdof)
@@ -561,44 +554,44 @@ ccc      r = -2.d0*evalbig(1:nrdof,1:nrdof)
         write(*,7002) r(1:nrdof,1:nrdof)
       endif
 #endif
-c
-c  ...degrees of freedom of small node 4:
-c*****************************************
+!
+!  ...degrees of freedom of small node 4:
+!*****************************************
       nrs = 3*ndof_medg
       do i=1,ndof_mdlt
-c
-c  .....big node 2,3,4:
+!
+!  .....big node 2,3,4:
         do ib=2,4
           nrb = (ib-2)*ndof_medg
           do j=1,ndof_medg
             RRTE(ib,j,4,i) = r(nrs+i,nrb+j)
           enddo
         enddo
-c
-c  .....big node 1:
+!
+!  .....big node 1:
         nrb = 3*ndof_medg
         do j=1,ndof_mdlt
           RRTE(1,j,4,i) = r(nrs+i,nrb+j)
         enddo
       enddo
-c
-c-----------------------------------------------------------------------
-c
-c  ...clean up machine zeros...
+!
+!-----------------------------------------------------------------------
+!
+!  ...clean up machine zeros...
       ibcase = 0; iscase = 0;
       do ib=1,4
         do is=1,7
-c
+!
           select case(ib)
           case(1);     ndof_i = ndof_mdlt; ibcase = 0
           case(2,3,4); ndof_i = ndof_medg; ibcase = 1
           end select
-c
+!
           select case(is)
           case(1,2,3,4); ndof_j = ndof_mdlt; iscase = 0
           case(5,6,7);   ndof_j = ndof_medg; iscase = 1
           end select
-c
+!
           do i=1,ndof_i
             do j=1,ndof_j
               if (abs(RRTE(ib,i,is,j)).lt.1.d-12) then
@@ -608,60 +601,60 @@ c
           enddo
         enddo
       enddo
-c
+!
       return
-c
-c*********************************************************************
-c
+!
+!*********************************************************************
+!
 #if HP3D_DEBUG
-c
-c  ...begin testing
+!
+!  ...begin testing
   777 continue
-c
+!
       write(*,*) 'setcnstr_trian_iso_hcurl: SET xibig '
       read(*,*) xibig(1:2)
-c
-c  ...shape functions of big element
-c      call shapeEt(
-c     .  xibig,norder,norient,ivoid,
-c     .  shapbig(1:2,1:MAXtriaE),
-c     .  curl(1:MAXtriaE))
-      call shape2DETri(xibig,norder,norient,nsize,
-     .                 ivoid,shapbig(1:2,:),curl)
-c
+!
+!  ...shape functions of big element
+!      call shapeEt(                   &
+!        xibig,norder,norient,ivoid,   &
+!        shapbig(1:2,1:MAXtriaE),      &
+!        curl(1:MAXtriaE))
+      call shape2DETri(xibig,norder,norient,nsize, &
+                       ivoid,shapbig(1:2,:),curl)
+!
       write(*,*) 'xibig = ',xibig
-c
-c  ...which small element is this:
-c  ...coordinates in a small element:
-c
+!
+!  ...which small element is this:
+!  ...coordinates in a small element:
+!
       dbds = 0.d0
       dbds(1,1) = 0.5d0
       dbds(2,2) = 0.5d0
       if (xibig(1)+xibig(2).le.0.5d0) then
-c
-c  .....element 1 - nodes 1,4
+!
+!  .....element 1 - nodes 1,4
         nel = 1
         xisma(1) = 2*xibig(1)
         xisma(2) = 2*xibig(2)
-c
-c
+!
+!
       elseif (xibig(1).ge.0.5d0) then
-c
-c  .....element 2 - nodes 2,5:
+!
+!  .....element 2 - nodes 2,5:
         nel = 2
         xisma(1) = (xibig(1)-0.5d0)*2.d0
         xisma(2) =  xibig(2)*2.d0
-c
+!
       elseif (xibig(2).gt.0.5d0) then
-c
-c  .....element 3 - nodes 3,6:
+!
+!  .....element 3 - nodes 3,6:
         nel = 3
         xisma(2) = (xibig(2)-0.5d0)*2.d0
         xisma(1) =  xibig(1)*2.d0
-c
+!
       else
-c
-c  .....element 4:
+!
+!  .....element 4:
         nel = 4
         xisma(1) = (0.5d0-xibig(1))*2
         xisma(2) = (0.5d0-xibig(2))*2
@@ -669,117 +662,117 @@ c  .....element 4:
       endif
 
       write(*,*) 'setcnstr_trian_iso_hcurl: nel = ', nel
-c
-c  ...find small shape functions at this point:
-c      call shapeEt(
-c     .  xisma,norder,norient,ivoid,
-c     .  shapsma(1:2,1:MAXtriaE),
-c     .  curl(1:MAXtriaE))
-      call shape2DETri(xisma,norder,norient,nsize,
-     .                 ivoid,shapsma(1:2,:),curl)
-c
-c*********************************************************************
-c
-c  ...verify if big shape functions are right combinations of small
-c     ones:
-c
-c  ...loop through big shape functions - central node:
+!
+!  ...find small shape functions at this point:
+!      call shapeEt(
+!        xisma,norder,norient,ivoid,   &
+!        shapsma(1:2,1:MAXtriaE),      &
+!        curl(1:MAXtriaE))             &
+      call shape2DETri(xisma,norder,norient,nsize, &
+                       ivoid,shapsma(1:2,:),curl)
+!
+!*********************************************************************
+!
+!  ...verify if big shape functions are right combinations of small
+!     ones:
+!
+!  ...loop through big shape functions - central node:
       write(*,*) 'testing = ', ndof_mdlt
       do i=1,ndof_mdlt
-c
-c  .....initiate value of the linear combination:
+!
+!  .....initiate value of the linear combination:
         val = 0.d0
-c
+!
         select case(nel)
         case(1)
-c
-c  .......small node 5:
+!
+!  .......small node 5:
           nrs = ndof_medg
           do j=1,ndof_medg
             val(1:2) = val(1:2)+2.d0*RRTE(1,i, 5,j)*shapsma(1:2,nrs+j)
           enddo
-c
-c  .......small node 1:
+!
+!  .......small node 1:
           nrs = 3*ndof_medg
           do j=1,ndof_mdlt
             val(1:2) = val(1:2)+2.d0*RRTE(1,i, 1,j)*shapsma(1:2,nrs+j)
           enddo
-c
+!
         case(2)
-c
-c  .......small node 6:
+!
+!  .......small node 6:
           nrs = 2*ndof_medg
           do j=1,ndof_medg
             val(1:2) = val(1:2)+2.d0*RRTE(1,i, 6,j)*shapsma(1:2,nrs+j)
           enddo
-c
-c  .......small node 2:
+!
+!  .......small node 2:
           nrs = 3*ndof_medg
           do j=1,ndof_mdlt
             val(1:2) = val(1:2)+2.d0*RRTE(1,i, 2,j)*shapsma(1:2,nrs+j)
           enddo
-c
+!
         case(3)
-c
-c  .......small node 7:
+!
+!  .......small node 7:
           nrs = 0
           do j=1,ndof_medg
             val(1:2) = val(1:2)+2.d0*RRTE(1,i, 7,j)*shapsma(1:2,nrs+j)
           enddo
-c
-c  .......small node 3:
+!
+!  .......small node 3:
           nrs = 3*ndof_medg
           do j=1,ndof_mdlt
             val(1:2) = val(1:2)+2.d0*RRTE(1,i, 3,j)*shapsma(1:2,nrs+j)
           enddo
-c
+!
         case(4)
-c
-c  ........small node 5:
+!
+!  ........small node 5:
            nrs = ndof_medg
            do j=1,ndof_medg
-             val(1:2) = val(1:2)+2.d0*RRTE(1,i, 5,j)
-     .         * shapsma(1:2,nrs+j)*(-1)**(j+1)
+             val(1:2) = val(1:2)+2.d0*RRTE(1,i, 5,j)  &
+               * shapsma(1:2,nrs+j)*(-1)**(j+1)
            enddo
-c
-c  ........small node 6:
+!
+!  ........small node 6:
            nrs = 2*ndof_medg
            do j=1,ndof_medg
-             val(1:2) = val(1:2)+2.d0*RRTE(1,i, 6,j)
-     .         * shapsma(1:2,nrs+j)*(-1)**(j+1)
+             val(1:2) = val(1:2)+2.d0*RRTE(1,i, 6,j)  &
+               * shapsma(1:2,nrs+j)*(-1)**(j+1)
 
            enddo
-c
-c  ........small node 7:
+!
+!  ........small node 7:
            nrs = 0
            do j=1,ndof_medg
-             val(1:2) = val(1:2)+2.d0*RRTE(1,i, 7,j)
-     .         * shapsma(1:2,nrs+j)*(-1)**(j+1)
+             val(1:2) = val(1:2)+2.d0*RRTE(1,i, 7,j)  &
+               * shapsma(1:2,nrs+j)*(-1)**(j+1)
            enddo
-c
-c  ........small node 4:
+!
+!  ........small node 4:
            nrs = 3*ndof_medg
            do j=1,ndof_mdlt
              val(1:2) = val(1:2)-2.d0*RRTE(1,i, 4,j)*shapsma(1:2,nrs+j)
            enddo
-c
+!
          end select
-c
+!
          nrb = 3*ndof_medg
-c
-         write(*,8002) i,shapbig(1:2,nrb+i),
-     .     abs(val(1:2)-shapbig(1:2,nrb+i))
- 8002    format('setcnstr_trian_iso_hcurl: i,shapebig,difference = ',
-     .     i3,2(2e12.5,2x))
-c
-c  ...end of loop through shape functions of big element
+!
+         write(*,8002) i,shapbig(1:2,nrb+i), &
+           abs(val(1:2)-shapbig(1:2,nrb+i))
+ 8002    format('setcnstr_trian_iso_hcurl: i,shapebig,difference = ',   &
+           i3,2(2e12.5,2x))
+!
+!  ...end of loop through shape functions of big element
       enddo
-c
+!
       write(*,*) 'setcnstr_trian_iso_hcurl: CONTINUE ?(1/0)'
       read(*,*) ians
-c
+!
       if (ians.eq.1) go to 777
-c
+!
 #endif
-c
-      end subroutine setcnstr_trian_iso_hcurl
+!
+   end subroutine setcnstr_trian_iso_hcurl

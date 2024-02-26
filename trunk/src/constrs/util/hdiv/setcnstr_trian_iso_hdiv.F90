@@ -4,7 +4,7 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - Feb 2023
+!   latest revision    - Feb 2024
 !
 !   purpose            - routine evaluates constraint coefficients for
 !                        the triangular master element and H(div) (L2)
@@ -48,7 +48,7 @@
 !
 !--------------------------------------------------------------------
 !
-      subroutine setcnstr_trian_iso_hdiv
+   subroutine setcnstr_trian_iso_hdiv
 !
       use parameters
       use constraints
@@ -284,4 +284,4 @@
 !
 #endif
 !
-      end subroutine setcnstr_trian_iso_hdiv
+   end subroutine setcnstr_trian_iso_hdiv
