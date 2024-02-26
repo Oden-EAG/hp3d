@@ -170,7 +170,7 @@
         write(*,*)'setcnstr_trian_iso_hcurl: HCURL DGELS INFO =',info
         call logic_error(FAILURE,__FILE__,__LINE__)
       endif
-ccc      r = 2.d0*evalbig(1:nrdof,1:nrdof)
+!!!      r = 2.d0*evalbig(1:nrdof,1:nrdof)
       r = evalbig(1:nrdof,1:nrdof)
 #if HP3D_DEBUG
       if (iprint.eq.1) then
@@ -295,7 +295,7 @@ ccc      r = 2.d0*evalbig(1:nrdof,1:nrdof)
         write(*,*)'setcnstr_trian_iso_hcurl: HCURL DGELS INFO =',info
         call logic_error(FAILURE,__FILE__,__LINE__)
       endif
-ccc      r = 2.d0*evalbig(1:nrdof,1:nrdof)
+!!!      r = 2.d0*evalbig(1:nrdof,1:nrdof)
       r = evalbig(1:nrdof,1:nrdof)
 !
 #if HP3D_DEBUG
@@ -421,7 +421,7 @@ ccc      r = 2.d0*evalbig(1:nrdof,1:nrdof)
         write(*,*)'setcnstr_trian_iso_hcurl: HCURL DGELS INFO =',info
         call logic_error(FAILURE,__FILE__,__LINE__)
       endif
-ccc      r = 2.d0*evalbig(1:nrdof,1:nrdof)
+!!!      r = 2.d0*evalbig(1:nrdof,1:nrdof)
       r = evalbig(1:nrdof,1:nrdof)
 !
 #if HP3D_DEBUG
@@ -547,7 +547,7 @@ ccc      r = 2.d0*evalbig(1:nrdof,1:nrdof)
         write(*,*)'setcnstr_trian_iso_hcurl: HCURL DGELS INFO =',info
         call logic_error(FAILURE,__FILE__,__LINE__)
       endif
-ccc      r = -2.d0*evalbig(1:nrdof,1:nrdof)
+!!!      r = -2.d0*evalbig(1:nrdof,1:nrdof)
       r = evalbig(1:nrdof,1:nrdof)
 #if HP3D_DEBUG
       if (iprint.eq.1) then

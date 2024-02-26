@@ -82,7 +82,7 @@
       nsize   = (/MAXP,MAXtriaH/)
 !
 !  ...initiate the matrix of coefficients
-cccc      RRTH = 0.d0
+!!!!      RRTH = 0.d0
 !
 !*********************************************************************
 !
@@ -144,22 +144,22 @@ cccc      RRTH = 0.d0
         call pause
       endif
 #endif
-ccc      call decomp(n,na,shapsma,ip,iflag)
-cccc
-ccc      if (iflag.ne.0) then
-ccc        write(*,*) 'setcnstr_trian: iflag = ',iflag
-ccc        stop 1
-ccc      endif
-cccc
-ccc      do i=1,n
-ccc        call gauss2(n,na,shapsma,ip,shapbig(1:n,i), r(1:n,i))
-ccc#if HP3D_DEBUG
-ccc        if (iprint.eq.1) then
-ccc          write(*,*) 'setcnstr_trian: r FOR i = ',i
-ccc          write(*,7003) r(1:n,i)
-ccc        endif
-ccc#endif
-ccc      enddo
+!!!      call decomp(n,na,shapsma,ip,iflag)
+!!!!
+!!!      if (iflag.ne.0) then
+!!!        write(*,*) 'setcnstr_trian: iflag = ',iflag
+!!!        stop 1
+!!!      endif
+!!!!
+!!!      do i=1,n
+!!!        call gauss2(n,na,shapsma,ip,shapbig(1:n,i), r(1:n,i))
+!!!#if HP3D_DEBUG
+!!!        if (iprint.eq.1) then
+!!!          write(*,*) 'setcnstr_trian: r FOR i = ',i
+!!!          write(*,7003) r(1:n,i)
+!!!        endif
+!!!#endif
+!!!      enddo
 
 
       call dgetrf(n,n,shapsma,MAXtriaH,ip,info)
@@ -287,14 +287,14 @@ ccc      enddo
       enddo
 !
       n = (nord+1)*(nord+2)/2
-ccc      call decomp(n,na,shapsma,ip,Iflag)
-ccc      if (iflag.eq.1)then
-ccc        write(*,*) 'setcnstr_trian: WARNING 2 !! iflag = ',iflag
-ccc        call pause
-ccc      endif
-ccc      do i=1,n
-ccc        call gauss2(n,na,shapsma,ip,shapbig(1:n,i), r(1:n,i))
-ccc      enddo
+!!!      call decomp(n,na,shapsma,ip,Iflag)
+!!!      if (iflag.eq.1)then
+!!!        write(*,*) 'setcnstr_trian: WARNING 2 !! iflag = ',iflag
+!!!        call pause
+!!!      endif
+!!!      do i=1,n
+!!!        call gauss2(n,na,shapsma,ip,shapbig(1:n,i), r(1:n,i))
+!!!      enddo
 !
 !  ...decompose the matrix
       call dgetrf(n,n,shapsma,MAXtriaH,ip,info)
@@ -422,15 +422,15 @@ ccc      enddo
       enddo
 !
       n = (nord+1)*(nord+2)/2
-ccc      call decomp(n,na,shapsma,ip,iflag)
-ccc      if (iflag.eq.1)then
-ccc        write(*,*) 'setcnstr_trian: WARNING 3 !! iflag = ',iflag
-ccc        call pause
-ccc      endif
-cccc
-ccc      do i=1,n
-ccc        call gauss2(n,na,shapsma,ip,shapbig(1:n,i),r(1:n,i))
-ccc      enddo
+!!!      call decomp(n,na,shapsma,ip,iflag)
+!!!      if (iflag.eq.1)then
+!!!        write(*,*) 'setcnstr_trian: WARNING 3 !! iflag = ',iflag
+!!!        call pause
+!!!      endif
+!!!!
+!!!      do i=1,n
+!!!        call gauss2(n,na,shapsma,ip,shapbig(1:n,i),r(1:n,i))
+!!!      enddo
 !
 !  ...decompose the matrix
       call dgetrf(n,n,shapsma,MAXtriaH,ip,info)
@@ -558,15 +558,15 @@ ccc      enddo
       enddo
 !
       n = (nord+1)*(nord+2)/2
-ccc      call decomp(n,na,shapsma,ip,iflag)
-ccc      if (iflag.eq.1)then
-ccc        write(*,*) 'setcnstr_trian: WARNING 4 !! iflag = ',iflag
-ccc        call pause
-ccc      endif
-cccc
-ccc      do i=1,n
-ccc        call gauss2(n,na,shapsma,ip,shapbig(1:n,i),r(1:n,i))
-ccc      enddo
+!!!      call decomp(n,na,shapsma,ip,iflag)
+!!!      if (iflag.eq.1)then
+!!!        write(*,*) 'setcnstr_trian: WARNING 4 !! iflag = ',iflag
+!!!        call pause
+!!!      endif
+!!!!
+!!!      do i=1,n
+!!!        call gauss2(n,na,shapsma,ip,shapbig(1:n,i),r(1:n,i))
+!!!      enddo
 !
 !  ...decompose the matrix
       call dgetrf(n,n,shapsma,MAXtriaH,ip,info)

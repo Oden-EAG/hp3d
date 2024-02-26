@@ -1,60 +1,60 @@
-c----------------------------------------------------------------------
-c
-c   routine name       - get_connect_info
-c
-c----------------------------------------------------------------------
-c
-c   latest revision    - Mar 2023
-c
-c   purpose            - routine returns element to nodes connectivities
-c                        for an element, including info on constrained
-c                        nodes
-c
-c   arguments :
-c     in:
-c             Mdle     - an element middle node, identified with
-c                        the element
-c     out:
-c             Nodesl   - element nodes
-c             Norientl - their orientations
-c
-c-----------------------------------------------------------------------
-c
-      subroutine get_connect_info(Mdle, Nodesl,Norientl)
-c
+!----------------------------------------------------------------------
+!
+!   routine name       - get_connect_info
+!
+!----------------------------------------------------------------------
+!
+!   latest revision    - Feb 2024
+!
+!   purpose            - routine returns element to nodes connectivities
+!                        for an element, including info on constrained
+!                        nodes
+!
+!   arguments :
+!     in:
+!             Mdle     - an element middle node, identified with
+!                        the element
+!     out:
+!             Nodesl   - element nodes
+!             Norientl - their orientations
+!
+!-----------------------------------------------------------------------
+!
+   subroutine get_connect_info(Mdle, Nodesl,Norientl)
+!
       use element_data
       use data_structure3D
       use refinements
-      use constrained_nodes, only: INFO_CONSTRAINTS,NODES_CONSTR,
-     .     NR_EDGES,NEDGC,NEDG_CONS,NR_FACES,NFACEC,NFACE_CONS,
-     .     SON_NUM,FATH_TYPE,FATH_ORIENT,FATH_NODES,
-     .     rotate_edge_nodes,rotate_trian_nodes,rotate_quadr_nodes
-c
+      use constrained_nodes, only: INFO_CONSTRAINTS,NODES_CONSTR, &
+           NR_EDGES,NEDGC,NEDG_CONS,NR_FACES,NFACEC,NFACE_CONS,   &
+           SON_NUM,FATH_TYPE,FATH_ORIENT,FATH_NODES,              &
+           rotate_edge_nodes,rotate_trian_nodes,rotate_quadr_nodes
+!
       implicit none
-c
+!
       integer, intent(in)  :: Mdle
       integer, intent(out) :: Nodesl(27),Norientl(27)
-c
+!
       integer :: npar_refs(27),nson_refs(27),nort_refs(27)
-c
-c  ...miscellanea
+!
+!  ...miscellanea
       integer :: jef(4),jvf(4),kref_face(6)
       integer :: ntype,ftype,nfath
       integer :: i,ie,ifc,is,is1,j,je,jp,jv,jv1,jv2,loc
       integer :: iref,ireff,iref1,iref2,iref3,iref_fath
       integer :: nef,nff,nvf,nod,nodp,nort,nson,nrnodes
-c
+!
 #if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
-c
-c  ...initialize output
+!
+!  ...initialize output
       Nodesl(1:27) = 0; Norientl(1:27) = 0
-c
-c  ...initialize variables like this or OpenMP will not work!
+!
+!  ...initialize variables like this or OpenMP will not work!
       ireff=0; is1=0;
-c
+!
 #if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7000) Mdle
@@ -62,57 +62,57 @@ c
         call pause
       endif
 #endif
-c
+!
       INFO_CONSTRAINTS=1
       call elem_nodes(Mdle, Nodesl,Norientl)
-c
+!
 #if HP3D_DEBUG
       if (iprint.eq.1) then
         call elem_show(Mdle, NODES(Mdle)%ntype,Nodesl,Norientl)
       endif
 #endif
-c
+!
       INFO_CONSTRAINTS=0
-c
-c  ...store the element father
+!
+!  ...store the element father
       nfath = NODES(Mdle)%father
-c
-c  ...initiate the data base for constraints
+!
+!  ...initiate the data base for constraints
       NODES_CONSTR=0
       NR_EDGES=0; NEDGC=0; NEDG_CONS=0
       NR_FACES=0; NFACEC=0; NFACE_CONS=0
-c
-c  ...quit if an initial mesh element
+!
+!  ...quit if an initial mesh element
       if (nfath.le.0) return
-c
+!
       nson = SON_NUM
       ftype = FATH_TYPE
       ntype = NODES(Mdle)%ntype
       iref_fath = NODES(nfath)%ref_kind
       call find_face_ref_flags(ftype,iref_fath, kref_face)
       call decode_ref(ftype,iref_fath, iref1,iref2,iref3)
-c
-c  ...number of vertices and edges for the father
+!
+!  ...number of vertices and edges for the father
       nvf = nvert(ftype); nef = nedge(ftype); nff = nface(ftype)
-c
-c  ...pre-compute info for loop
+!
+!  ...pre-compute info for loop
       call npar_ref_all(ftype,nson,iref1,iref2,iref3, npar_refs)
       call nson_ref_all(ftype,nson,iref1,iref2,iref3, nson_refs)
       call nort_ref_all(ftype,nson,iref1,iref2,iref3, nort_refs)
-c
-c  ...loop through nodes of the element son
+!
+!  ...loop through nodes of the element son
       nrnodes = nvert(ntype)+nedge(ntype)+nface(ntype)+1
       do j=1,nrnodes
-c
-c  .....parent node
+!
+!  .....parent node
         jp   = npar_refs(j)
         is   = nson_refs(j)
         nort = nort_refs(j)
-c
+!
         if (is.ne.0) then
           nodp = FATH_NODES(jp)
-c
-c  .......parent edge node
+!
+!  .......parent edge node
           if (jp.le.nvf+nef) then
 #if HP3D_DEBUG
             if (iprint.eq.1) then
@@ -127,19 +127,19 @@ c  .......parent edge node
  7022         format('get_connect_info: 2: j,jp,is = ',3i5)
             endif
 #endif
-c            nod = NODES(nodp)%sons(is)
+!            nod = NODES(nodp)%sons(is)
             nod = Son(nodp,is)
 #if HP3D_DEBUG
             if (iprint.eq.1) then
               write(*,7023) nodp,nod,NODES(nod)%act
- 7023         format('get_connect_info: nodp,nod,NODES(nod)%act = ',
-     .               2i6,l2)
+ 7023         format('get_connect_info: nodp,nod,NODES(nod)%act = ', &
+                     2i6,l2)
               call pause
             endif
 #endif
-c
-c  .........if the node is constrained (inactive)
-ccc            if (Is_inactive(nod)) then
+!
+!  .........if the node is constrained (inactive)
+!!!            if (Is_inactive(nod)) then
             if (Is_inactive(nod) .and. NODES(nod)%ref_kind.eq.0) then
               call locate(nodp, NEDGC,NR_EDGES,loc)
               if (loc.eq.0) then
@@ -154,18 +154,18 @@ ccc            if (Is_inactive(nod)) then
               endif
               NODES_CONSTR(j) = loc*100+10+is
             endif
-c
-c  .......parent face node
+!
+!  .......parent face node
           elseif (jp.le.nvf+nef+nff) then
-c
-c  .........local refinement flag for the face
+!
+!  .........local refinement flag for the face
             ifc = jp-nvf-nef
             iref = kref_face(ifc)
-c
-c  .........global refinement flag for the face
+!
+!  .........global refinement flag for the face
             ireff = NODES(nodp)%ref_kind
-c
-c  .........face edge and vertex nodes numbers
+!
+!  .........face edge and vertex nodes numbers
             call face_to_edge(ftype,ifc, jef(1),jef(2),jef(3),jef(4))
             call face_to_vert(ftype,ifc, jvf(1),jvf(2),jvf(3),jvf(4))
 #if HP3D_DEBUG
@@ -174,23 +174,23 @@ c  .........face edge and vertex nodes numbers
  7100         format('get_connect_info: j,jp,ifc,iref,ireff = ',5i4)
             endif
 #endif
-c
+!
             select case(TYPE_NOD(jp,ftype))
-c
-c  .........triangular parent face
+!
+!  .........triangular parent face
             case(MDLT)
               call rotate_trian(iref,ireff,FATH_ORIENT(jp),is,nort)
-c              nod = NODES(nodp)%sons(is)
+!              nod = NODES(nodp)%sons(is)
               nod = Son(nodp,is)
 #if HP3D_DEBUG
               if (iprint.eq.1) then
                 write(*,7101) nodp,is,nod,NODES(nod)%act
- 7101           format('get_connect_info: nodp,is,nod,NODES(nod)%act =',
-     .                                    3i5,l2)
+ 7101           format('get_connect_info: nodp,is,nod,NODES(nod)%act =', &
+                                          3i5,l2)
               endif
 #endif
               if (Is_inactive(nod).and.NODES(nod)%ref_kind.eq.0) then
-ccc              if (Is_inactive(nod)) then
+!!!              if (Is_inactive(nod)) then
                 call locate(nodp, NFACEC,NR_FACES,loc)
                 if (loc.eq.0) then
                   NR_FACES = NR_FACES+1
@@ -223,20 +223,20 @@ ccc              if (Is_inactive(nod)) then
                   end select
                 end select
               endif
-c
-c  .........quadrilateral parent face
+!
+!  .........quadrilateral parent face
             case(MDLQ)
-              call rotate_quad(iref,ireff,FATH_ORIENT(jp),
-     .                         is,is1,nort)
-c              nod = NODES(nodp)%sons(is)
+              call rotate_quad(iref,ireff,FATH_ORIENT(jp), &
+                               is,is1,nort)
+!              nod = NODES(nodp)%sons(is)
               nod = Son(nodp,is)
               if (is1.ne.0) then
-c                nod = NODES(nod)%sons(is1)
+!                nod = NODES(nod)%sons(is1)
                 nod = Son(nod,is1)
               endif
-c
+!
              if (Is_inactive(nod).and.NODES(nod)%ref_kind.eq.0) then
-ccc             if (Is_inactive(nod)) then
+!!!             if (Is_inactive(nod)) then
                 call locate(nodp, NFACEC,NR_FACES,loc)
                 if (loc.eq.0) then
                   NR_FACES = NR_FACES+1
@@ -255,7 +255,7 @@ ccc             if (Is_inactive(nod)) then
                   call rotate_quadr_nodes(FATH_ORIENT(jp),NR_FACES)
                   loc = NR_FACES
                 endif
-c
+!
                 select case(ireff)
                 case(11)
                   NODES_CONSTR(j) = loc*100+20+is
@@ -277,7 +277,7 @@ c
           endif
         endif
       enddo
-c
+!
 #if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7011) Mdle
@@ -300,65 +300,65 @@ c
         call result
       endif
 #endif
-c
-      end subroutine get_connect_info
-c
-c----------------------------------------------------------------------
-c
-c   routine name       - modify_face_info
-c
-c----------------------------------------------------------------------
-c
-c   latest revision    - Feb 2023
-c
-c   purpose            - a subsidiary of get_connect_info, routine
-c                        modifies the data base for a constraining
-c                        face that has been h2-refined
-c
-c   arguments :
-c     in:
-c                 Nodp - mid-face node
-c                 Is   - son number for a son of the mid-face node
-c                 Is1  - grandson number, and
-c                        data base for constraining nodes in module
-c                        'constrained_nodes'
-c     out:
-c                 Nodc - nickname for the constrained node, and
-c                        modifications in the data base
-c
-c-----------------------------------------------------------------------
-c
-      subroutine modify_face_info(Nodp,Is,Is1, Nodc)
-c
+!
+   end subroutine get_connect_info
+!
+!----------------------------------------------------------------------
+!
+!   routine name       - modify_face_info
+!
+!----------------------------------------------------------------------
+!
+!   latest revision    - Feb 2024
+!
+!   purpose            - a subsidiary of get_connect_info, routine
+!                        modifies the data base for a constraining
+!                        face that has been h2-refined
+!
+!   arguments :
+!     in:
+!                 Nodp - mid-face node
+!                 Is   - son number for a son of the mid-face node
+!                 Is1  - grandson number, and
+!                        data base for constraining nodes in module
+!                        'constrained_nodes'
+!     out:
+!                 Nodc - nickname for the constrained node, and
+!                        modifications in the data base
+!
+!-----------------------------------------------------------------------
+!
+   subroutine modify_face_info(Nodp,Is,Is1, Nodc)
+!
       use element_data
       use data_structure3D
       use refinements
       use constrained_nodes
-c
+!
       implicit none
-c
+!
       integer, intent(in)  :: Nodp,Is,Is1
       integer, intent(out) :: Nodc
-c
+!
       integer :: ifc,i,ie,ie1,iec,ise,iv,jv,loc,loc1
       integer :: medge,nson,nvoid,nvt
-c
-      integer, parameter :: ie_no(1:2,0:1)
-     .  = reshape( (/1,3, 4,2/) , (/2,2/) )
-c
+!
+      integer, parameter :: ie_no(1:2,0:1) &
+            = reshape( (/1,3, 4,2/) , (/2,2/) )
+!
       integer, external :: imod
-ccc      imod(j,mod) = j-(j-1)/mod*mod
-c
+!!!      imod(j,mod) = j-(j-1)/mod*mod
+!
 #if HP3D_DEBUG
       integer :: iprint
       iprint=0
-c
+!
       if (iprint.eq.1) then
         write(*,7001) Nodp,Is,Is1
  7001   format('modify_face_info: Nodp,Is,Is1 = ',i5,2i3)
       endif
 #endif
-c
+!
       call locate(Nodp, NFACEC,NR_FACES,ifc)
       if (ifc.eq.0) then
         write(*,7002) Nodp
@@ -366,31 +366,31 @@ c
         stop 1
       endif
       select case(NODES(Nodp)%ref_kind)
-c
-c  ...the face has been h2-refined, vertically of horizontally
+!
+!  ...the face has been h2-refined, vertically of horizontally
       case(10,01)
-c
-c  .....offset for the first edge
+!
+!  .....offset for the first edge
         call decode(NODES(Nodp)%ref_kind, nvoid,ie1)
-c
-c  .....move to the son
-c        nson = NODES(Nodp)%sons(Is)
+!
+!  .....move to the son
+!        nson = NODES(Nodp)%sons(Is)
         nson = Son(Nodp,Is)
         select case(Is)
-c
-c  .....mid-face node son
+!
+!  .....mid-face node son
         case(1,2)
-c
-c  .......set up a new constraining face
+!
+!  .......set up a new constraining face
           call locate(nson,NFACEC,NR_FACES, loc)
           if (loc.eq.0) then
             NR_FACES = NR_FACES+1
-c
-c  .........store the mid-face node
+!
+!  .........store the mid-face node
             NFACEC(NR_FACES) = nson
             NFACE_CONS(1:8,NR_FACES)=0
-c
-c  .........store relevant edges only
+!
+!  .........store relevant edges only
             do ie=ie1+1,4,2
               medge = abs(NFACE_CONS(ie,ifc))
               if (NFACE_CONS(ie,ifc).gt.0) then
@@ -398,18 +398,18 @@ c  .........store relevant edges only
               else
                 ise = imod(Is+1,2)
               endif
-              NFACE_CONS(ie,NR_FACES) =
-     .        sign(Son(medge,ise),NFACE_CONS(ie,ifc))
-c     .        sign(NODES(medge)%sons(ise),NFACE_CONS(ie,ifc))
+              NFACE_CONS(ie,NR_FACES) = &
+               sign(Son(medge,ise),NFACE_CONS(ie,ifc))
+!              sign(NODES(medge)%sons(ise),NFACE_CONS(ie,ifc))
             enddo
             loc = NR_FACES
           endif
           Nodc = loc*100+30+ie1*10+(Is-1)*3+Is1
-c
-c  .....horizontal or vertical mid-edge node
+!
+!  .....horizontal or vertical mid-edge node
         case(3)
-c
-c  .......set up a new constraining edge
+!
+!  .......set up a new constraining edge
           call locate(nson, NEDGC,NR_EDGES,iec)
           if (iec.eq.0) then
             NR_EDGES = NR_EDGES+1
@@ -418,10 +418,10 @@ c  .......set up a new constraining edge
             do iv=1,2
               ie = ie_no(iv,ie1)
               medge = abs(NFACE_CONS(ie,ifc))
-c              nvt = NODES(medge)%sons(3)
+!              nvt = NODES(medge)%sons(3)
               nvt = Son(medge,3)
-c
-c  ...........inactive vertex node, add the edge to the data base
+!
+!  ...........inactive vertex node, add the edge to the data base
               if (Is_inactive(nvt)) then
                 call locate(medge, NEDGC,NR_EDGES,loc1)
                 if (loc1.eq.0) then
@@ -431,8 +431,8 @@ c  ...........inactive vertex node, add the edge to the data base
                     jv = QUADR_EDGE_TO_VERT(i,ie)
                     NEDG_CONS(i,NR_EDGES) = NFACE_CONS(4+jv,ifc)
                   enddo
-                  if (NFACE_CONS(ie,ifc).lt.0)
-     .              call rotate_edge_nodes(1,NR_EDGES)
+                  if (NFACE_CONS(ie,ifc).lt.0) &
+                    call rotate_edge_nodes(1,NR_EDGES)
                   loc1 = NR_EDGES
                 endif
                 nvt = -(loc1*100+13)
@@ -442,13 +442,13 @@ c  ...........inactive vertex node, add the edge to the data base
           endif
           Nodc = iec*100+ie1*10+36+Is1
         end select
-c
-c  ...any other option illegal
+!
+!  ...any other option illegal
       case default
         write(*,7003) Nodp
  7003   format('modify_face_info: Nodp = ',i5)
         stop 1
       end select
-c
-c
-      end subroutine modify_face_info
+!
+!
+   end subroutine modify_face_info

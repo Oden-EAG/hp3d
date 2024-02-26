@@ -325,7 +325,7 @@
         val = RRRH(2,1, 3,1)*shapsma(1,1)
       end select
       write(*,7005) shapbig(1,1),abs(val-shapbig(1,1))
- 7005 format('setcnstr_edge_h1: LEFT VERTEX NODE SHAPE FUNCTION ',
+ 7005 format('setcnstr_edge_h1: LEFT VERTEX NODE SHAPE FUNCTION ', &
               ' VALUE = ',e12.5, ' DIFFERENCE = ',e12.5)
 !
 !  ...right big vertex node

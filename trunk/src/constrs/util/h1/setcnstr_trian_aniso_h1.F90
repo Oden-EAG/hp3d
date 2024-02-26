@@ -164,22 +164,22 @@
         call pause
       endif
 #endif
-ccc      call decomp(n,na,shapsma,ip,iflag)
-cccc
-ccc      if (iflag.ne.0) then
-ccc        write(*,*) 'setcnstr_trian: iflag = ',iflag
-ccc        stop 1
-ccc      endif
-cccc
-ccc      do i = 1,n
-ccc        call gauss2(n,na,shapsma,ip,shapbig(1:n,i), r(1:n,i))
-ccc#if HP3D_DEBUG
-ccc        if (iprint.eq.1) then
-ccc          write(*,*) 'setcnstr_trian: r FOR i = ',i
-ccc          write(*,7003) r(1:n,i)
-ccc        endif
-ccc#endif
-ccc      enddo
+!!!      call decomp(n,na,shapsma,ip,iflag)
+!!!!
+!!!      if (iflag.ne.0) then
+!!!        write(*,*) 'setcnstr_trian: iflag = ',iflag
+!!!        stop 1
+!!!      endif
+!!!!
+!!!      do i = 1,n
+!!!        call gauss2(n,na,shapsma,ip,shapbig(1:n,i), r(1:n,i))
+!!!#if HP3D_DEBUG
+!!!        if (iprint.eq.1) then
+!!!          write(*,*) 'setcnstr_trian: r FOR i = ',i
+!!!          write(*,7003) r(1:n,i)
+!!!        endif
+!!!#endif
+!!!      enddo
 
 !  ...decompose the matrix
       call dgetrf(n,n,shapsma,MAXquadH,ip,info)
@@ -218,7 +218,7 @@ ccc      enddo
       enddo
 !
 !  ...skip the cleaning
-ccc      return
+!!!      return
 !
 !-----------------------------------------------------------------------
 !
@@ -254,7 +254,7 @@ ccc      return
 !
 !  .............constrained dof is
                 j = (i2-1)*(nord-1)+i1
-ccc              if (abs(get_rrqh(Iref, n, ipp,jp,j)).gt.1.d-12) then
+!!!              if (abs(get_rrqh(Iref, n, ipp,jp,j)).gt.1.d-12) then
                 if (abs(RRQH(Iref,ipp,jp,j)).gt.1.d-12) then
                   write(*,7001) n,ipp,jp,i1,i2,RRQH(Iref,ipp,jp,j)
  7001             format('setcnstr_trian_aniso_h1: ', &
@@ -268,6 +268,6 @@ ccc              if (abs(get_rrqh(Iref, n, ipp,jp,j)).gt.1.d-12) then
         enddo
       enddo
 !
-ccc      call test_trian_aniso_h1(Iref)
+!!!      call test_trian_aniso_h1(Iref)
 !
       end subroutine setcnstr_trian_aniso_h1

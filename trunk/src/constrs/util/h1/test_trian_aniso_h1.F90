@@ -87,13 +87,13 @@
 !
 !  .......small node 2 ( quad ):
           nrs = 4*nord
-cc          do j2=1,nord-1
-cc          do j1=1,nord-1
-cc            jj = (j2-1)*(MAXP-1)+j1
-cc            j = (j2-1)*(nord-1)+j1
-cc            val = val + RRQH(Iref,1,i,jj)*shapsma(nrs+j,1)
-cc          enddo
-cc          enddo
+!!          do j2=1,nord-1
+!!          do j1=1,nord-1
+!!            jj = (j2-1)*(MAXP-1)+j1
+!!            j = (j2-1)*(nord-1)+j1
+!!            val = val + RRQH(Iref,1,i,jj)*shapsma(nrs+j,1)
+!!          enddo
+!!          enddo
           do j=1,(nord-1)**2
             val = val + get_rrqh(Iref, nord, 1, i, j)*shapsma(nrs+j,1)
           enddo
