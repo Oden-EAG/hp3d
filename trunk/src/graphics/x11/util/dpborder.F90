@@ -1,37 +1,37 @@
 #if HP3D_USE_X11
 
-c----------------------------------------------------------------------
-c
-c   routine name       - dpborder
-c
-c----------------------------------------------------------------------
-c
-c   latest revision    - Feb 2023
-c
-c   purpose            - routine displays the border of the window
-c                        and the color table
-c
-c   arguments
-c     in:
-c                  Ibf - a flag whether to display color table
-c
-c----------------------------------------------------------------------
+!----------------------------------------------------------------------
+!
+!   routine name       - dpborder
+!
+!----------------------------------------------------------------------
+!
+!   latest revision    - Feb 2024
+!
+!   purpose            - routine displays the border of the window
+!                        and the color table
+!
+!   arguments
+!     in:
+!                  Ibf - a flag whether to display color table
+!
+!----------------------------------------------------------------------
       subroutine dpborder(Ibf)
-c
+!
       use graphmod
-c
+!
       implicit none
-c
+!
       integer, intent(in) :: Ibf
-c
-c  ...screen coordinates of up to four points, components of
-c     a 3D unit vector, components of the same vector after
-c     transformation to screen coordinates
+!
+!  ...screen coordinates of up to four points, components of
+!     a 3D unit vector, components of the same vector after
+!     transformation to screen coordinates
       real(8) :: xgr(2,4),coord(3),cgr(3)
-c
+!
       real(8) :: angle,c0,c1x,c1y,c2,c3,c4,c5,height,vbox
       integer :: i,j,nacol,nscol,nblack,ncol
-c
+!
 #if HP3D_DEBUG
       integer :: iprint
       iprint=0
@@ -39,10 +39,10 @@ c
         write(*,*) 'dpborder: Ibf = ',Ibf
       endif
 #endif
-c
+!
       nblack=NPCOL(2)
-c
-c  ...fill in borders with white color...
+!
+!  ...fill in borders with white color...
       ncol=NPCOL(1)
       c0 = 0.d0
       c1x = rwindl
@@ -87,8 +87,8 @@ c  ...fill in borders with white color...
       xgr(1,4)=c1x
       xgr(2,4)=c5
       call fillpoly(4,xgr,ncol,ncol)
-c
-c  ...specify the box dimensions for the system of coordinates icon
+!
+!  ...specify the box dimensions for the system of coordinates icon
       xgr(1,1)=rwindl-rmargin
       xgr(2,1)=rmargin
       XY_BOX(1,1,0) = xgr(1,1) - rmargin/2.d0
@@ -99,8 +99,8 @@ c  ...specify the box dimensions for the system of coordinates icon
       XY_BOX(2,3,0) = xgr(2,1) + rmargin/2.d0
       XY_BOX(1,4,0) = xgr(1,1) - rmargin/2.d0
       XY_BOX(2,4,0) = xgr(2,1) + rmargin/2.d0
-c
-c  ...draw the icon for the system of coordinates...
+!
+!  ...draw the icon for the system of coordinates...
       nacol=NPCOL(2)
       nscol=NPCOL(2)
       coord(1)=1.d0
@@ -133,11 +133,11 @@ c  ...draw the icon for the system of coordinates...
       height=1.
       angle=0.
       call symbol(xgr(1,2),xgr(2,2),height,'z',angle,1,nscol)
-c
-c  ...draw the color table
+!
+!  ...draw the color table
       if (Ibf.eq.0) then
-c
-c  .....loop through the color boxes of p-approximation
+!
+!  .....loop through the color boxes of p-approximation
         vbox=(rwindh-4.d0*rmargin)/8.d0
         do i=1,8
           xgr(1,1) = c1x-1.5d0*rmargin
@@ -153,8 +153,8 @@ c  .....loop through the color boxes of p-approximation
             XY_BOX(j,1:4,i) = xgr(j,1:4)
           enddo
         enddo
-c
-c  .....loop one more time and redraw the lines
+!
+!  .....loop one more time and redraw the lines
         vbox=(rwindh-4.d0*rmargin)/8.d0
         do i=1,9
           xgr(1,1) = c1x-1.5d0*rmargin
@@ -167,10 +167,10 @@ c  .....loop one more time and redraw the lines
         xgr(2,2) = 3.d0*rmargin+8*vbox
         call drawline(xgr(1,1),xgr(2,1),xgr(1,1),xgr(2,2),nblack)
         call drawline(xgr(1,2),xgr(2,1),xgr(1,2),xgr(2,2),nblack)
-c
+!
       elseif (ibf.gt.0) then
-c
-c  .....loop through the color boxes of isolines
+!
+!  .....loop through the color boxes of isolines
         vbox=(rwindh-4.d0*rmargin)/float(NR_COLORS-10)*1.001d0
         do i=1,NR_COLORS-10
           xgr(1,1) = c1x-1.5d0*rmargin
@@ -184,7 +184,7 @@ c  .....loop through the color boxes of isolines
           call fillpoly(4,xgr,NPCOL(i+10),NPCOL(i+10))
         enddo
       endif
-c
+!
       end subroutine dpborder
 
 #endif

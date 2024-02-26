@@ -1,82 +1,82 @@
 #if HP3D_USE_X11
 
-c----------------------------------------------------------------------
-c
-c   routine name       - lsvisidb
-c
-c----------------------------------------------------------------------
-c
-c   latest revision    - Feb 2023
-c
-c   purpose            - routine makes a list of all visible
-c                        triangles and stores rescaled coordinates
-c                        of their end-points (vertices) in an array
-c                        RGTR
-c
-c   arguments :
-c     in:
-c               Numlev = 0 display graphical image of the mesh
-c                      > 0 number of levels to plot solution values
-c               Iflagn = 1 encode element (middle node) numbers
-c                      = 2 encode face nodes numbers
-c
-c----------------------------------------------------------------------
+!----------------------------------------------------------------------
+!
+!   routine name       - lsvisidb
+!
+!----------------------------------------------------------------------
+!
+!   latest revision    - Feb 2023
+!
+!   purpose            - routine makes a list of all visible
+!                        triangles and stores rescaled coordinates
+!                        of their end-points (vertices) in an array
+!                        RGTR
+!
+!   arguments :
+!     in:
+!               Numlev = 0 display graphical image of the mesh
+!                      > 0 number of levels to plot solution values
+!               Iflagn = 1 encode element (middle node) numbers
+!                      = 2 encode face nodes numbers
+!
+!----------------------------------------------------------------------
 #include "typedefs.h"
       subroutine lsvisidb(Numlev,Iflagn)
-c
+!
       use element_data
       use data_structure3D
       use graphmod
-c
+!
       implicit none
-c
+!
       integer, intent(in) :: Numlev,Iflagn
-c
-c  ...geometry and solution dof
+!
+!  ...geometry and solution dof
       real(8) :: xnod(3,MAXbrickH)
-      VTYPE   :: zdofH(MAXEQNH,MAXbrickH),zdofE(MAXEQNE,MAXbrickE),
-     .           zdofV(MAXEQNV,MAXbrickV),zdofQ(MAXEQNQ,MAXbrickQ)
-c
+      VTYPE   :: zdofH(MAXEQNH,MAXbrickH),zdofE(MAXEQNE,MAXbrickE),  &
+                 zdofV(MAXEQNV,MAXbrickV),zdofQ(MAXEQNQ,MAXbrickQ)
+!
       real(8) :: xmax(3),xmin(3)
       integer :: nedge_orient(12),nface_orient(6),norder(19)
-c
-c  ...element neighbors through faces
+!
+!  ...element neighbors through faces
       integer :: neig(4,6)
-c
-c  ...element nodes and their orientation
+!
+!  ...element nodes and their orientation
       integer :: nodesl(27),norientl(27)
       real(8) :: solev(NR_COLORS-10)
 
       integer :: nrinter(8)
       real(8) :: xlocinter(3,500)
       real(8) :: xcenter(3)
-c
+!
       real(8) :: cl,daux,daux1
       integer :: icut,iel,ifc,iloc,ineig,iv,ivar,ivis
       integer :: loc,mdle,ndom,nrintertot
-c
+!
       real(8), parameter :: bigp  =  1.d30
       real(8), parameter :: bign  = -1.d30
-c
+!
 #if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
-c
-c---------------------------------------------------------------
-c
-c  ...find limiting values for contour plot
+!
+!---------------------------------------------------------------
+!
+!  ...find limiting values for contour plot
       if (Numlev.gt.0) call finlimb(Numlev,solev)
-c
-c  ...set default bounds for the picture
+!
+!  ...set default bounds for the picture
       do ivar=1,3
         XEX(2*ivar-1) = bigp
         XEX(2*ivar)   = bign
         xmin(ivar)    = bigp
         xmax(ivar)    = bign
       enddo
-c
-c  ...loop through elements
+!
+!  ...loop through elements
       NRVISTR = 0
       mdle=0
       do 20 iel=1,NRELES
@@ -86,24 +86,24 @@ c  ...loop through elements
           write(*,*) 'lsvisidb: mdle = ',mdle
         endif
 #endif
-c
-c  .....check visibility (elements)
+!
+!  .....check visibility (elements)
 
         if (IBOX_CUT.ne.0) then
           call find_center(mdle, xcenter)
           if (IBOX_CUT.gt.0) then
             if (xcenter(IBOX_CUT).gt.BOX_CUT(IBOX_CUT,1)) then
-cc              write(*,*) 'box mdle ', mdle
+!!              write(*,*) 'box mdle ', mdle
               go to 20
             endif
           else
             if (xcenter(-IBOX_CUT).lt.BOX_CUT(-IBOX_CUT,1)) then
-cc              write(*,*) 'box mdle ', mdle
+!!              write(*,*) 'box mdle ', mdle
               go to 20
             endif
           endif
         endif
-c
+!
         call locate(mdle,IGINV,NRINVBL, loc)
         if (loc.gt.0) go to 20
         call find_domain(mdle, ndom)
@@ -114,10 +114,10 @@ c
         endif
 #endif
         if (NDOMAIN(ndom).eq.0) go to 20
-c
+!
         call find_orient(mdle, nedge_orient,nface_orient)
         call find_order(mdle, norder)
-c
+!
         call nodcor(mdle,xnod)
 #if HP3D_DEBUG
         if (iprint.eq.1) then
@@ -129,8 +129,8 @@ c
           call pause
         endif
 #endif
-c
-c  .....get neighbors
+!
+!  .....get neighbors
         call find_neig(mdle, neig)
 #if HP3D_DEBUG
         if (iprint.eq.1) then
@@ -139,19 +139,19 @@ c  .....get neighbors
           call pause
         endif
 #endif
-c
-c  .....get node numbers
+!
+!  .....get node numbers
         call elem_nodes(mdle, nodesl,norientl)
-c
-c  .....determine element dof
+!
+!  .....determine element dof
         call solelm(mdle, zdofH,zdofE,zdofV,zdofQ)
-c
-c  .....check whether the element is sliced by the cutting plane
+!
+!  .....check whether the element is sliced by the cutting plane
         icut=0
         daux=1
         do iv=1,nvert(NODES(mdle)%ntype)
-          cl = CLPL(1)*xnod(1,iv) + CLPL(2)*xnod(2,iv) +
-     .         CLPL(3)*xnod(3,iv) + CLPL(4)
+          cl = CLPL(1)*xnod(1,iv) + CLPL(2)*xnod(2,iv) + &
+               CLPL(3)*xnod(3,iv) + CLPL(4)
           if (iv.eq.1)then
             daux1=cl
           else
@@ -162,13 +162,13 @@ c  .....check whether the element is sliced by the cutting plane
             exit
           endif
         enddo
-c
-c  .....skip elements totally in front of the cutting plane
+!
+!  .....skip elements totally in front of the cutting plane
         if ((icut.eq.0).and.(cl.gt.0)) go to 20
-c
+!
         nrintertot=0
-c
-c  .....loop through element faces
+!
+!  .....loop through element faces
         do 10 ifc=1,nface(NODES(mdle)%ntype)
 #if HP3D_DEBUG
           if (iprint.eq.1) then
@@ -176,15 +176,15 @@ c  .....loop through element faces
  7003       format('lsvisidb: ifc = ',i2)
           endif
 #endif
-c
-c  .......for not sliced elements
+!
+!  .......for not sliced elements
           if (icut.eq.0) then
-c
-c  .........check if adjacent to the boundary or to the invisible
-c           element, continue only if it is
-c
-c  .........flag : invisible
-ccc            ivis=1
+!
+!  .........check if adjacent to the boundary or to the invisible
+!           element, continue only if it is
+!
+!  .........flag : invisible
+!!!            ivis=1
             ivis=0
             if (neig(1,ifc).lt.0) then
               call locate(-neig(1,ifc),IGINV,NRINVBL, iloc)
@@ -194,7 +194,7 @@ ccc            ivis=1
             elseif (neig(1,ifc).eq.0) then
               ivis=0
             else
-ccc              do ineig=1,4
+!!!              do ineig=1,4
               do ineig=1,1
                 call locate(neig(ineig,ifc),IGINV,NRINVBL, iloc)
                 if (iloc.gt.0) ivis=0
@@ -203,57 +203,57 @@ ccc              do ineig=1,4
               enddo
             endif
             if (ivis.eq.1) go to 10
-c
-c  .......end for uncut elements
+!
+!  .......end for uncut elements
           endif
-c
-c  .......prepare the list of triangles for the face
-          call display_face(Numlev,mdle,ifc,nodesl,
-     .                      nedge_orient,nface_orient,norder,Iflagn,
-     .                      xnod,zdofH,zdofE,zdofV,zdofQ,
-     .                      solev,xmin,xmax,
-     .                      nrintertot,nrinter(ifc),xlocinter)
-c
+!
+!  .......prepare the list of triangles for the face
+          call display_face(Numlev,mdle,ifc,nodesl,                  &
+                            nedge_orient,nface_orient,norder,Iflagn, &
+                            xnod,zdofH,zdofE,zdofV,zdofQ,            &
+                            solev,xmin,xmax,                         &
+                            nrintertot,nrinter(ifc),xlocinter)
+!
    10   continue
-c
+!
         if ((icut.eq.1).and.(nrintertot.gt.0)) then
-c
+!
           if (nrintertot.ge.500) then
             write(*,7001)
  7001       format('lsvisidb: TOO MANY INTERSECTION POINTS')
             stop 1
           endif
-c
-cc          call display_slice(Numlev,eltype,mdle
-cc     .                 ,nodesl,norder,xnod,zdofH,solev,xmin,xmax
-cc     .                 ,nrintertot,nrinter,xlocinter)
+!
+!!          call display_slice(Numlev,eltype,mdle                    &
+!!                       ,nodesl,norder,xnod,zdofH,solev,xmin,xmax   &
+!!                       ,nrintertot,nrinter,xlocinter)
 
         endif
    20 continue
-c
-c  ...compute objects dimensions and coordinates of its
-c     central point
+!
+!  ...compute objects dimensions and coordinates of its
+!     central point
       DIMOB(1:3)  = (xmax(1:3)-xmin(1:3))/2.d0
       XCENTR(1:3) = (xmax(1:3)+xmin(1:3))/2.d0
       write(*,7035) xmin,xmax
  7035 format('lsvisidb: xmin,xmax = ',2(3f8.3,2x))
-c
-c  ...sort according to z-coordinate in order back-to-front
+!
+!  ...sort a!!ording to z-coordinate in order back-to-front
       if (NRVISTR.gt.0) then
         call sortz
       else
         write(*,7002)
  7002   format('lsvisidb: NO TRIANGLES TO BE DRAWN...')
       endif
-c
+!
 #if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'lsvisidb: EXITING...'
         call pause
       endif
 #endif
-c
-c
+!
+!
       end subroutine lsvisidb
 
 #endif

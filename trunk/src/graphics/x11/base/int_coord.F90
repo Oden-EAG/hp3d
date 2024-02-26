@@ -1,61 +1,61 @@
 #if HP3D_USE_X11
 
-c----------------------------------------------------------------------
-c
-c   routine name       - int_coord
-c
-c----------------------------------------------------------------------
-c
-c   latest revision    - Feb 2023
-c
-c   purpose            - routine determines integer coordinates of
-c                        vertices for a subtriangle of a 2D element,
-c                        the corresponding color flag, and flags
-c                        indicating adjacency to element sides
-c
-c   arguments :
-c     in:
-c             Numlev   - a flag = 0 for mesh display,
-c                               > 0 for contour maps
-c             Nsub     - (even,.ge.4) number of subdivisions
-c             Ntype    - type of element
-c             Norder   - order of approximation (4 edges + 1 middle)
-c             I,J      - integer indices of the field
-c     out:
-c             Ixi1     - integer coordinates of the lower triangle
-c             Ixi2     - integer coordinates of the upper triangle
-c             Np1      - color code for the lower triangle
-c             Np2      - color code for the upper triangle
-c             Nsid1    - adjacency info for the lower triangle
-c             Nsid2    - adjacency info for the upper triangle
-c
-c----------------------------------------------------------------------
-c
-      subroutine int_coord(Numlev,Nsub,Ntype,Norder,I,J,
-     .                     Ixi1,Ixi2,Np1,Np2,Nsid1,Nsid2)
-c
+!----------------------------------------------------------------------
+!
+!   routine name       - int_coord
+!
+!----------------------------------------------------------------------
+!
+!   latest revision    - Feb 2023
+!
+!   purpose            - routine determines integer coordinates of
+!                        vertices for a subtriangle of a 2D element,
+!                        the corresponding color flag, and flags
+!                        indicating adjacency to element sides
+!
+!   arguments :
+!     in:
+!             Numlev   - a flag = 0 for mesh display,
+!                               > 0 for contour maps
+!             Nsub     - (even,.ge.4) number of subdivisions
+!             Ntype    - type of element
+!             Norder   - order of approximation (4 edges + 1 middle)
+!             I,J      - integer indices of the field
+!     out:
+!             Ixi1     - integer coordinates of the lower triangle
+!             Ixi2     - integer coordinates of the upper triangle
+!             Np1      - color code for the lower triangle
+!             Np2      - color code for the upper triangle
+!             Nsid1    - adjacency info for the lower triangle
+!             Nsid2    - adjacency info for the upper triangle
+!
+!----------------------------------------------------------------------
+!
+      subroutine int_coord(Numlev,Nsub,Ntype,Norder,I,J, &
+                           Ixi1,Ixi2,Np1,Np2,Nsid1,Nsid2)
+!
       use node_types
-c
+!
       implicit none
-c
+!
       integer, intent(in)  :: Numlev,Nsub,Ntype
       integer, intent(in)  :: Norder(5)
       integer, intent(in)  :: I,J
       integer, intent(out) :: Ixi1(2,3),Ixi2(2,3)
       integer, intent(out) :: Np1,Np2,Nsid1,Nsid2
-c
+!
       integer :: nhalf,nordh,nordv
-c
+!
 #if HP3D_DEBUG
       integer :: k
       integer :: iprint
       iprint=0
 #endif
-c
-c  ...initialize
+!
+!  ...initialize
       Ixi1 = 0; Ixi2 = 0
-c
-c  ...check input
+!
+!  ...check input
       nhalf = Nsub/2
       if ((Nsub.lt.4).or.(Nsub.ne.2*nhalf)) then
         write(*,*) 'int_coord:  WRONG INPUT !! Nsub = ',Nsub
@@ -63,8 +63,8 @@ c  ...check input
       endif
       select case(Ntype)
       case(TRIA)
-        if ((I.le.0).or.(I.gt.Nsub).or.(J.le.0).or.(J.gt.Nsub).or.
-     .      (I+J.gt.nsub+1)) then
+        if ((I.le.0).or.(I.gt.Nsub).or.(J.le.0).or.(J.gt.Nsub).or.   &
+            (I+J.gt.nsub+1)) then
           write(*,*)  'int_coord:  WRONG INPUT (T) !! I,J = ', I,J
           stop 1
         endif
@@ -77,7 +77,7 @@ c  ...check input
         write(*,*) 'int_coord:  WRONG INPUT !! Type = ',S_Type(Ntype)
         stop 1
       end select
-c
+!
       Nsid1=0
       Nsid2=0
       select case(Ntype)
@@ -224,27 +224,27 @@ c
             Np2=0
           endif
         endif
-c
+!
       case(QUAD,RECT,MDLQ)
-c
-c   ....determine the coordinates
-        if ( (I.le.nhalf .and. J.le.nhalf)
-     .  .or. (I.gt.nhalf .and. J.gt.nhalf)) then
+!
+!   ....determine the coordinates
+        if ( (I.le.nhalf .and. J.le.nhalf)   &
+        .or. (I.gt.nhalf .and. J.gt.nhalf)) then
           Ixi1(1,1)=I-1;   Ixi1(1,2)=I  ;   Ixi1(1,3)=I
           Ixi1(2,1)=J-1;   Ixi1(2,2)=J-1;   Ixi1(2,3)=J
-c
+!
           Ixi2(1,1)=I-1;   Ixi2(1,2)=I  ;   Ixi2(1,3)=I-1
           Ixi2(2,1)=J-1;   Ixi2(2,2)=J  ;   Ixi2(2,3)=J
         else
           Ixi1(1,1)=I-1;   Ixi1(1,2)=I  ;   Ixi1(1,3)=I-1
           Ixi1(2,1)=J-1;   Ixi1(2,2)=J-1;   Ixi1(2,3)=J
-c
+!
           Ixi2(1,1)=I-1;   Ixi2(1,2)=I  ;   Ixi2(1,3)=I
           Ixi2(2,1)=J  ;   Ixi2(2,2)=J-1;   Ixi2(2,3)=J
         endif
         call decode(Norder(5), nordh,nordv)
-c
-c  .....determine the color flags
+!
+!  .....determine the color flags
         if (I.eq.1) then
           if (J.eq.1) then
             Np1=Norder(1)
@@ -314,8 +314,8 @@ c  .....determine the color flags
             Np2=Norder(3)
           endif
         endif
-c
-c  .....determine the adjacency flags
+!
+!  .....determine the adjacency flags
         if (J.eq.1) then
           Nsid1 = 1*4+0*2+0
         endif
@@ -340,12 +340,12 @@ c  .....determine the adjacency flags
             Nsid1 = 0*4+0*2+1
           endif
         endif
-c
+!
       case default
         write(*,*) 'int_coord: Type = ',S_Type(Ntype)
         stop 1
       end select
-c
+!
 #if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) I,J
@@ -357,7 +357,7 @@ c
         call pause
       endif
 #endif
-c
+!
       end subroutine int_coord
 
 #endif

@@ -70,9 +70,6 @@ c
       integer :: iprint
 #endif
 c
-      integer :: modr
-      modr(i,j) = i - (i/j)*j
-c
 c initialize
 c
       MDOF = 0

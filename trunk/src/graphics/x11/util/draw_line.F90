@@ -1,59 +1,59 @@
 #if HP3D_USE_X11
 
-c----------------------------------------------------------------------
-c
-c   routine name       - draw_line
-c
-c----------------------------------------------------------------------
-c
-c   latest revision    - Feb 2023
-c
-c   purpose            - routine draws various types of lines
-c
-c   arguments:
-c     in:
-c             (X1,Y1)  - coordinates of endpoints of a line
-c             (X2,Y2)
-c             Ic       - color to draw the line with
-c             Itype    - type of a line
-c
-c----------------------------------------------------------------------
-c
+!----------------------------------------------------------------------
+!
+!   routine name       - draw_line
+!
+!----------------------------------------------------------------------
+!
+!   latest revision    - Feb 2024
+!
+!   purpose            - routine draws various types of lines
+!
+!   arguments:
+!     in:
+!             (X1,Y1)  - coordinates of endpoints of a line
+!             (X2,Y2)
+!             Ic       - color to draw the line with
+!             Itype    - type of a line
+!
+!----------------------------------------------------------------------
+!
       subroutine draw_line(X1,Y1,X2,Y2,Ic,Itype)
-c
+!
       use graphmod
-c
+!
       implicit none
-c
+!
       real(8) :: X1,Y1,X2,Y2
       integer :: Ic,Itype
-c
+!
       real(8) :: dl,ds,dsl,xl1,xl2,yl1,yl2
       integer :: iter
-c
-c  ...compute the line increment
+!
+!  ...compute the line increment
       dl = RMARGIN/16.d0
-c
+!
       if (Itype.eq.0) then
-c
-c  .....solid line case
+!
+!  .....solid line case
         call drawline(X1,Y1,X2,Y2,Ic)
         return
       endif
-c
-c  ...compute the increments in the line and space
+!
+!  ...compute the increments in the line and space
       select case(Itype)
-c
+!
         case(1)
         ds = dl
-c
+!
         case(2)
         ds = 3.d0*dl
-c
+!
         case(3)
         ds = 7.d0*dl
       end select
-c
+!
       xl1 = X1
       yl1 = Y1
       do iter=1,1000
@@ -68,7 +68,7 @@ c
           call drawline(xl1,yl1,X2,Y2,Ic)
           exit
         endif
-c
+!
         dsl = sqrt((X2-xl1)**2+(Y2-yl1)**2)
         if (ds.le.dsl) then
           xl1 = xl1 + (X2-xl1)/dsl*ds
@@ -77,7 +77,7 @@ c
           exit
         endif
       enddo
-c
+!
       end subroutine draw_line
 
 #endif

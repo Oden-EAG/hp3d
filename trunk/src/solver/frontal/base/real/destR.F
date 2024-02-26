@@ -42,9 +42,6 @@ c
       integer :: iprint
 #endif
 c
-      integer :: modr
-      modr(i,j) = i - (i/j)*j
-c
 #if HP3D_DEBUG
       iprint = 0
       if (iprint.eq.1) then

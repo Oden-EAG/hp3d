@@ -1,43 +1,43 @@
 #if HP3D_USE_X11
 
-c----------------------------------------------------------------------
-c
-c   routine name       - sortz
-c
-c----------------------------------------------------------------------
-c
-c   latest revision    - Feb 2023
-c
-c   purpose            - routine sorts all visible triangles in order
-c                        back-to-front according to z-coordinate
-c                        of their mid-points (array RGTRZ) and stores
-c                        sorted numbers in the array IGTR
-c
-c----------------------------------------------------------------------
-c
+!----------------------------------------------------------------------
+!
+!   routine name       - sortz
+!
+!----------------------------------------------------------------------
+!
+!   latest revision    - Feb 2024
+!
+!   purpose            - routine sorts all visible triangles in order
+!                        back-to-front according to z-coordinate
+!                        of their mid-points (array RGTRZ) and stores
+!                        sorted numbers in the array IGTR
+!
+!----------------------------------------------------------------------
+!
       subroutine sortz
-c
+!
       use graphmod
-c
+!
       implicit none
-c
+!
       integer :: i,index,ir,j,l
       real(8) :: q
-c
+!
 #if HP3D_DEBUG
       integer :: ii
       integer :: iprint
       iprint=0
 #endif
-c
+!
       if (NRVISTR.eq.0) return
-c
-c  ...initialize index array
+!
+!  ...initialize index array
       do 10 i=1,NRVISTR
         IGTR(i) = i
  10   continue
-c
-c  ...start sorting (heapsort algorithm)
+!
+!  ...start sorting (heapsort algorithm)
       l=NRVISTR/2+1
       ir=NRVISTR
    20 continue
@@ -80,7 +80,7 @@ c  ...start sorting (heapsort algorithm)
    40 continue
       IGTR(i) = index
       go to 20
-c
+!
       end subroutine sortz
 
 #endif
