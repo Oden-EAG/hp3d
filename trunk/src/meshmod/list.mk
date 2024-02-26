@@ -2,11 +2,11 @@ activate.F90
 break.F90
 close_mesh.F90
 display_ref_kind.F90
-execute_pref.F
+execute_pref.F90
 nodbreak.F90
 nodgen.F90
 nodmod.F90
-perform_pref.F
+perform_pref.F90
 refine.F90
 refresh.F90
 set_mesh_order.F90
