@@ -1,89 +1,89 @@
-c----------------------------------------------------------------------
-c
-c   routine name       - setcnstr_trian_iso_hdiv
-c
-c----------------------------------------------------------------------
-c
-c   latest revision    - Feb 2023
-c
-c   purpose            - routine evaluates constraint coefficients for
-c                        the triangular master element and H(div) (L2)
-c                        constrained approximation
-c
-c   arguments          - none
-c
-c----------------------------------------------------------------------
-c
-c    'big' parent node (just one)
-c
-c      *
-c      * *
-c      *   *
-c      *     *
-c      *       *
-c      *         *
-c      *           *
-c      *             *
-c      *       1       *
-c      *                 *
-c      *                   *
-c      *                     *
-c      *************************
-c
-c
-c      'small' constrained nodes
-c      *
-c      * *
-c      *   *
-c      *     *
-c      *   3   *
-c      *         *
-c      *************
-c      * *         * *
-c      *   *   4   *   *
-c      *     *     *     *
-c      *   1   *   *   2   *
-c      *         * *         *
-c      *************************
-c
-c--------------------------------------------------------------------
-c
+!----------------------------------------------------------------------
+!
+!   routine name       - setcnstr_trian_iso_hdiv
+!
+!----------------------------------------------------------------------
+!
+!   latest revision    - Feb 2023
+!
+!   purpose            - routine evaluates constraint coefficients for
+!                        the triangular master element and H(div) (L2)
+!                        constrained approximation
+!
+!   arguments          - none
+!
+!----------------------------------------------------------------------
+!
+!    'big' parent node (just one)
+!
+!      *
+!      * *
+!      *   *
+!      *     *
+!      *       *
+!      *         *
+!      *           *
+!      *             *
+!      *       1       *
+!      *                 *
+!      *                   *
+!      *                     *
+!      *************************
+!
+!
+!      'small' constrained nodes
+!      *
+!      * *
+!      *   *
+!      *     *
+!      *   3   *
+!      *         *
+!      *************
+!      * *         * *
+!      *   *   4   *   *
+!      *     *     *     *
+!      *   1   *   *   2   *
+!      *         * *         *
+!      *************************
+!
+!--------------------------------------------------------------------
+!
       subroutine setcnstr_trian_iso_hdiv
-c
+!
       use parameters
       use constraints
       use element_data
-c
+!
       implicit none
-c
-c  ...big(parent) and small element shape functions, collocation points
-      real(8) :: shapsma(MAXtriaQ,MAXtriaQ),
-     .           shapbig(MAXtriaQ,MAXtriaQ),
-     .           xibig(2),xisma(2)
+!
+!  ...big(parent) and small element shape functions, collocation points
+      real(8) :: shapsma(MAXtriaQ,MAXtriaQ), &
+                 shapbig(MAXtriaQ,MAXtriaQ), &
+                 xibig(2),xisma(2)
       integer :: ip(MAXtriaQ)
-c
+!
       integer :: norder(4),nsize(2)
-c
+!
       real(8) :: aux
       integer :: i,j,icl,info
       integer :: n,nord,nel,nrdofQ
-c
+!
       real(8), parameter :: eps = 1.0d-13
-c
+!
 #if HP3D_DEBUG
       real(8) :: diff,val
       integer :: i1,i2,ians,mp,np
 #endif
-c
-c  ...set up order
+!
+!  ...set up order
       nord   = MAXP
       norder = (/1,1,1,nord/)
       nsize  = (/MAXP,MAXtriaQ/)
-c
-c  ...loop through small triangles
+!
+!  ...loop through small triangles
       do nel=1,4
-c
-c  .....loop through collocation points
+!
+!  .....loop through collocation points
         icl=0
         do i=1,nord
           select case(nel)
@@ -100,7 +100,7 @@ c  .....loop through collocation points
             xibig(1) = 0.5d0 - (i-1)*0.5d0/(nord-1)
             xisma(1) =         (i-1)*1.0d0/(nord-1)
           end select
-c
+!
           do j=1,nord -(i-1)
             icl = icl+1
             select case(nel)
@@ -117,58 +117,55 @@ c
               xibig(2) = 0.5d0 - 0.5d0/(nord-1)*(j-1)
               xisma(2) =         1.0d0/(nord-1)*(j-1)
             end select
-c
-c  .........compute small shape functions at this point:
-c            call shapeQt(xisma,(/1,1,1,nord/),
-c     .                        nrdofQ,shapsma(1:MAXtriaQ,icl))
-            call shape2DQTri(xisma,norder,nsize,
-     .                       nrdofQ,shapsma(:,icl))
-c
-c  .........Piola transform (divide by jacobian)
+!
+!  .........compute small shape functions at this point:
+!            call shapeQt(xisma,(/1,1,1,nord/), &
+!                              nrdofQ,shapsma(1:MAXtriaQ,icl))
+            call shape2DQTri(xisma,norder,nsize, &
+                             nrdofQ,shapsma(:,icl))
+!
+!  .........Piola transform (divide by jacobian)
             shapsma(1:MAXtriaQ,icl) = shapsma(1:MAXtriaQ,icl)/.25d0
-c
-c  .........compute big shape functions at this point:
-c            call shapeQt(xibig,(/1,1,1,nord/),
-c     .                        nrdofQ,shapbig(1:MAXtriaQ,icl))
-            call shape2DQTri(xibig,norder,nsize,
-     .                       nrdofQ,shapbig(:,icl))
+!
+!  .........compute big shape functions at this point:
+!            call shapeQt(xibig,(/1,1,1,nord/), &
+!                              nrdofQ,shapbig(1:MAXtriaQ,icl))
+            call shape2DQTri(xibig,norder,nsize, &
+                             nrdofQ,shapbig(:,icl))
           enddo
         enddo
         if (icl.ne.nrdofQ) then
           write(*,*) 'setcnstr_trian_iso_hdiv: icl,nrdofQ = ',icl,nrdofQ
           stop 1
         endif
-c
-c  .....transpose both matrices (due to the way, we interface with linear solver)
+!
+!  .....transpose both matrices (due to the way, we interface with linear solver)
         do i=1,nrdofQ
           do j=1,i
             aux = shapsma(i,j)
             shapsma(i,j) = shapsma(j,i)
             shapsma(j,i) = aux
-c
+!
             aux = shapbig(i,j)
             shapbig(i,j) = shapbig(j,i)
             shapbig(j,i) = aux
           enddo
         enddo
-c
-c  .....solve for the constrained approximation coefficients
+!
+!  .....solve for the constrained approximation coefficients
         n=nrdofQ
         call dgetrf(n,n,shapsma,MAXtriaQ,ip,info)
         if (info.ne.0) then
           write(*,*)'setcnstr_trian_iso_hdiv: DGETRF INFO =',info
-          call logic_error(FAILURE,
-     .    __FILE__,__LINE__)
+          call logic_error(FAILURE, __FILE__,__LINE__)
         endif
-c
-c  .....right-hand side resolution
+!
+!  .....right-hand side resolution
         call dlaswp(n,shapbig,n,1,MAXtriaQ,ip,1)
-        call dtrsm('L','L','N','U',n,n,1.d0,shapsma,MAXtriaQ,shapbig,
-     .              MAXtriaQ)
-        call dtrsm('L','U','N','N',n,n,1.d0,shapsma,MAXtriaQ,shapbig,
-     .              MAXtriaQ)
-c
-c  .....save coefficients cleaning machine zeros
+        call dtrsm('L','L','N','U',n,n,1.d0,shapsma,MAXtriaQ,shapbig,MAXtriaQ)
+        call dtrsm('L','U','N','N',n,n,1.d0,shapsma,MAXtriaQ,shapbig,MAXtriaQ)
+!
+!  .....save coefficients cleaning machine zeros
         do i=1,nrdofQ
           do j=1,nrdofQ
             if (abs(shapbig(i,j)).gt.1.d-12) then
@@ -178,74 +175,74 @@ c  .....save coefficients cleaning machine zeros
             endif
           enddo
         enddo
-c
-c  ...end of loop through small triangles
+!
+!  ...end of loop through small triangles
       enddo
-c
-c
+!
+!
       return
-c
-c*********************************************************************
-c
+!
+!*********************************************************************
+!
 #if HP3D_DEBUG
-c
-c  ...begin testing
+!
+!  ...begin testing
   777 continue
-c
+!
       write(*,*) 'setcnstr_trian_iso_hdiv: SET xibig '
       read(*,*) xibig(1:2)
       write(*,*) 'xibig = ',xibig
-c
-c  ...shape functions of big element
-c     call shapeQt(xibig,(/1,1,1,nord/), nrdofQ,shapbig(1:MAXtriaQ,1))
+!
+!  ...shape functions of big element
+!     call shapeQt(xibig,(/1,1,1,nord/), nrdofQ,shapbig(1:MAXtriaQ,1))
       call shape2DQTri(xibig,norder,nsize, nrdofQ,shapbig(:,1))
-c
-c  ...determine which small element is this:
-c  ...coordinates in a small element:
+!
+!  ...determine which small element is this:
+!  ...coordinates in a small element:
       if (xibig(1)+xibig(2).le.0.5d0) then
-c
-c  .....element 1
+!
+!  .....element 1
         nel = 1
         xisma(1) = 2*xibig(1)
         xisma(2) = 2*xibig(2)
-c
-c
+!
+!
       elseif (xibig(1).ge.0.5d0) then
-c
-c  .....element 2
+!
+!  .....element 2
         nel = 2
         xisma(1) = (xibig(1)-0.5d0)*2.d0
         xisma(2) =  xibig(2)*2.d0
-c
+!
       elseif (xibig(2).gt.0.5d0) then
-c
-c  .....element 3
+!
+!  .....element 3
         nel = 3
         xisma(2) = (xibig(2)-0.5d0)*2.d0
         xisma(1) =  xibig(1)*2.d0
-c
+!
       else
-c
-c  .....element 4:
+!
+!  .....element 4:
         nel = 4
         xisma(1) = (0.5d0-xibig(1))*2
         xisma(2) = (0.5d0-xibig(2))*2
       endif
 
       write(*,*) 'setcnstr_trian_iso_hdiv: nel = ', nel
-c
-c  ...find small shape functions at this point:
-c     call shapeQt(xisma,(/1,1,1,nord/), nrdofQ,shapsma(1:MAXtriaQ,1))
+!
+!  ...find small shape functions at this point:
+!     call shapeQt(xisma,(/1,1,1,nord/), nrdofQ,shapsma(1:MAXtriaQ,1))
       call shape2DQTri(xisma,norder,nsize, nrdofQ,shapsma(:,1))
-c
-c*********************************************************************
-c
-c  ...verify if big shape functions are right combinations of small
-c     ones:
-c
-c  ...loop through big shape functions (central node)
-c
-c  ...loop through polynomial orders
+!
+!*********************************************************************
+!
+!  ...verify if big shape functions are right combinations of small
+!     ones:
+!
+!  ...loop through big shape functions (central node)
+!
+!  ...loop through polynomial orders
       i=0
       do np=0,nord-1
       do i1=0,np
@@ -256,8 +253,8 @@ c  ...loop through polynomial orders
  7020   format('nel = ',i2,' COEFFICIENTS = ')
         write(*,7030) RRTQ(i,nel,1:nrdofQ)
  7030   format(10e12.5)
-c
-c  .....initiate value of the linear combination:
+!
+!  .....initiate value of the linear combination:
         val = 0.d0
         j=0
         do mp=0,nord-1
@@ -273,18 +270,18 @@ c  .....initiate value of the linear combination:
         enddo
         diff = abs(val-shapbig(i,1))
         if (diff.gt.1.d-12) then
-          write(*,*) 'i,shapbig(i,1),val,diff = ',
-     .                i,shapbig(i,1),val,diff
+          write(*,*) 'i,shapbig(i,1),val,diff = ', &
+                      i,shapbig(i,1),val,diff
           call pause
         endif
       enddo
       enddo
-c
+!
       write(*,*) 'setcnstr_trian_iso_hdiv: CONTINUE ?(1/0)'
       read(*,*) ians
-c
+!
       if (ians.eq.1) go to 777
-c
+!
 #endif
-c
+!
       end subroutine setcnstr_trian_iso_hdiv

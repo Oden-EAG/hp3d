@@ -1,3 +1,3 @@
-setcnstr_trian_hdiv.F
-setcnstr_trian_iso_hdiv.F
+setcnstr_trian_hdiv.F90
+setcnstr_trian_iso_hdiv.F90
 0
