@@ -24,26 +24,26 @@ subroutine exact(X,Icase, ValH,DvalH,D2valH, &
   use data_structure3D
   implicit none
 !------------------------------------------------------------------------------
-  real*8,dimension(3),             intent(in)  :: X
+  real(8),dimension(3),             intent(in)  :: X
   integer,                         intent(in)  :: Icase
-  real*8,dimension(  MAXEQNH    ), intent(out) ::   ValH
-  real*8,dimension(  MAXEQNH,3  ), intent(out) ::  DvalH
-  real*8,dimension(  MAXEQNH,3,3), intent(out) :: D2valH
-  real*8,dimension(3,MAXEQNE    ), intent(out) ::   ValE
-  real*8,dimension(3,MAXEQNE,3  ), intent(out) ::  DvalE
-  real*8,dimension(3,MAXEQNE,3,3), intent(out) :: D2valE
-  real*8,dimension(3,MAXEQNV    ), intent(out) ::   ValV
-  real*8,dimension(3,MAXEQNV,3  ), intent(out) ::  DvalV
-  real*8,dimension(3,MAXEQNV,3,3), intent(out) :: D2valV
-  real*8,dimension(  MAXEQNQ    ), intent(out) ::   ValQ
-  real*8,dimension(  MAXEQNQ,3  ), intent(out) ::  DvalQ
-  real*8,dimension(  MAXEQNQ,3,3), intent(out) :: D2valQ
+  real(8),dimension(  MAXEQNH    ), intent(out) ::   ValH
+  real(8),dimension(  MAXEQNH,3  ), intent(out) ::  DvalH
+  real(8),dimension(  MAXEQNH,3,3), intent(out) :: D2valH
+  real(8),dimension(3,MAXEQNE    ), intent(out) ::   ValE
+  real(8),dimension(3,MAXEQNE,3  ), intent(out) ::  DvalE
+  real(8),dimension(3,MAXEQNE,3,3), intent(out) :: D2valE
+  real(8),dimension(3,MAXEQNV    ), intent(out) ::   ValV
+  real(8),dimension(3,MAXEQNV,3  ), intent(out) ::  DvalV
+  real(8),dimension(3,MAXEQNV,3,3), intent(out) :: D2valV
+  real(8),dimension(  MAXEQNQ    ), intent(out) ::   ValQ
+  real(8),dimension(  MAXEQNQ,3  ), intent(out) ::  DvalQ
+  real(8),dimension(  MAXEQNQ,3,3), intent(out) :: D2valQ
 !------------------------------------------------------------------------------
-  real*8, dimension(3)   :: u
-  real*8, dimension(3,3) :: gradu
-  real*8, dimension(3,3) :: epsilon
-  real*8, dimension(3,3) :: sigma
-  real*8, dimension(3)   :: divsigma
+  real(8), dimension(3)   :: u
+  real(8), dimension(3,3) :: gradu
+  real(8), dimension(3,3) :: epsilon
+  real(8), dimension(3,3) :: sigma
+  real(8), dimension(3)   :: divsigma
 !------------------------------------------------------------------------------
 ! initialize exact solution
   ValH = 0.d0 ; DvalH = 0.d0 ; D2valH = 0.d0

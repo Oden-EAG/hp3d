@@ -186,11 +186,11 @@ subroutine refine_DPG
    case default
       rate_mesh(istep) =  &
       log(residual_mesh(istep-1)/residual_mesh(istep))/  &
-      log(float(nrdof_tot_mesh(istep-1))/float(nrdof_tot_mesh(istep)))
+      log(real(nrdof_tot_mesh(istep-1))/real(nrdof_tot_mesh(istep)))
       if (NEXACT.ge.1) then
          rate_error_mesh(istep) = &
          log(error_mesh(istep-1)/error_mesh(istep))/  &
-         log(float(nrdof_tot_mesh(istep-1))/float(nrdof_tot_mesh(istep)))
+         log(real(nrdof_tot_mesh(istep-1))/real(nrdof_tot_mesh(istep)))
       endif
    end select
 !

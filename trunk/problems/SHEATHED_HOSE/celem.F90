@@ -36,7 +36,7 @@ subroutine celem( &
   integer, dimension(MAXNODM),  intent(out) :: Nodm
   integer, dimension(MAXNODM),  intent(out) :: NdofmH,NdofmE,NdofmV,NdofmQ
   integer,                      intent(out) :: Nrnodm
-  real*8,                       intent(out) :: Bload(*),Astif(*)
+  real(8),                       intent(out) :: Bload(*),Astif(*)
 !--------------------------------------------------------------------------
   integer, dimension(NRINDEX_HEV) :: nbcond
 !--------------------------------------------------------------------------

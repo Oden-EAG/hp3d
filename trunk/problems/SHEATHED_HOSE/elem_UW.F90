@@ -50,56 +50,56 @@ subroutine elem_DPG_UWEAK(Mdle)
 !
 !  ...SHAPE FUNCTIONS
 !     H1  (geometry and trial)
-      real*8, dimension(  MAXbrickH)  :: shapH
-      real*8, dimension(3,MAXbrickH)  :: gradH
+      real(8), dimension(  MAXbrickH)  :: shapH
+      real(8), dimension(3,MAXbrickH)  :: gradH
       integer                         :: nrdofH
 !     H(div)  (trial)
-      real*8, dimension(3,MAXbrickV)  :: shapV
-      real*8, dimension(  MAXbrickV)  :: divV
-      real*8, dimension(  MAXbrickV)  :: shapV_n
+      real(8), dimension(3,MAXbrickV)  :: shapV
+      real(8), dimension(  MAXbrickV)  :: divV
+      real(8), dimension(  MAXbrickV)  :: shapV_n
       integer                         :: nrdofV
 !     L2  (trial)
-      real*8, dimension(  MAXbrickQ)  :: shapQ
+      real(8), dimension(  MAXbrickQ)  :: shapQ
       integer                         :: nrdofQ
 !     H1   (test)
-      real*8, dimension(  MAXbrickHH) :: shapHH
-      real*8, dimension(3,MAXbrickHH) :: gradHH
+      real(8), dimension(  MAXbrickHH) :: shapHH
+      real(8), dimension(3,MAXbrickHH) :: gradHH
       integer                         :: nrdofHH
 !     H(div)  (test)
-      real*8, dimension(3,MAXbrickVV) :: shapVV
-      real*8, dimension(  MAXbrickVV) :: divVV
-      real*8, dimension(  MAXbrickVV) :: shapVV_n
+      real(8), dimension(3,MAXbrickVV) :: shapVV
+      real(8), dimension(  MAXbrickVV) :: divVV
+      real(8), dimension(  MAXbrickVV) :: shapVV_n
       integer                         :: nrdofVV
 !
 !
 !  ...geometry
-      real*8, dimension(3,MAXbrickH) :: xnod
-      real*8, dimension(3)           :: xi,x,rn
-      real*8, dimension(3,3)         :: dxdxi,dxidx
-      real*8, dimension(2)           :: t
-      real*8, dimension(3,2)         :: dxidt,dxdt
+      real(8), dimension(3,MAXbrickH) :: xnod
+      real(8), dimension(3)           :: xi,x,rn
+      real(8), dimension(3,3)         :: dxdxi,dxidx
+      real(8), dimension(2)           :: t
+      real(8), dimension(3,2)         :: dxidt,dxdt
       integer                        :: nsign
 !
 !  ...tensors in physical coordinates
-      real*8, dimension(3,3,3,3) :: A,AA,Symm,Skew
+      real(8), dimension(3,3,3,3) :: A,AA,Symm,Skew
 !
 !  ...source term (don't need Neumann term)
-      real*8, dimension(3,NRRHS) :: fval
+      real(8), dimension(3,NRRHS) :: fval
 !
 !  ...3D quadrature data
-      real*8, dimension(3,MAXNINT3ADD) :: xiloc
-      real*8, dimension(MAXNINT3ADD)   :: wxi
+      real(8), dimension(3,MAXNINT3ADD) :: xiloc
+      real(8), dimension(MAXNINT3ADD)   :: wxi
 !
 !  ...2D quadrature data for boundary terms
-      real*8, dimension(2,MAXNINT2ADD) :: tloc
-      real*8, dimension(MAXNINT2ADD)   :: wt
+      real(8), dimension(2,MAXNINT2ADD) :: tloc
+      real(8), dimension(MAXNINT2ADD)   :: wt
 !
 !  ...miscellaneous
       integer :: i,j,k,l,m,n,k1,k2,k3,k4,k5,m1,m2,m3,m4,m5,n1,n2,ipt,ifc,  &
                  icomp,jcomp,nint,iprint,iflag,info,info1,  &
                  kH,lH,kmin,kmax,enrdof,weightedWeakSymmetryConstraint
       integer, dimension(NR_PHYSA) :: ndofphysics
-      real*8  :: weight,wa,rjac,brjac,tmp,diffmax,dmax,omegaWeight,l2Weight,l2StressWeight
+      real(8)  :: weight,wa,rjac,brjac,tmp,diffmax,dmax,omegaWeight,l2Weight,l2StressWeight
 !
 !  ...LAPACK stuff
       character :: uplo,transa,transb

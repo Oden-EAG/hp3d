@@ -15,7 +15,6 @@ subroutine exec_job_adap_ref()
    integer :: i,ierr
    real(8) :: start_time,end_time
    logical :: iPvAttr(4)
-   integer,parameter :: ref_type = 1
 !
 !----------------------------------------------------------------------
 !

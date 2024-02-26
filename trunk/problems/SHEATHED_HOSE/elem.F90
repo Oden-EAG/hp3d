@@ -8,7 +8,6 @@
 !------------------------------------------------------------------------------------
 !
 subroutine elem(Mdle, Itest,Itrial)
-  use parameters, only : ZERO
   use physics   , only : NR_PHYSA
   use data_structure3D
 !------------------------------------------------------------------------------------

@@ -37,9 +37,9 @@ module common_prob_data
   integer :: IMAX
 
 ! pi for sinusoidal solution
-  real*8,  parameter :: PI = 4.d0*datan(1.d0)
+  real(8),  parameter :: PI = 4.d0*datan(1.d0)
 ! tolerance for singular solution
-  real*8,  parameter :: EPS = 1.d-10
+  real(8),  parameter :: EPS = 1.d-10
 
 !------------------------------------------------------------------------------
 ! ERROR (exact_error.F90)
@@ -80,6 +80,6 @@ module common_prob_data
 
 !------------------------------------------------------------------------------
 ! ELEMENT CALCULATIONS (elem.F90)
-  real*8,  parameter :: SYMMETRY_TOL = 1.d-9
+  real(8),  parameter :: SYMMETRY_TOL = 1.d-9
 !
 end module common_prob_data

@@ -13,8 +13,8 @@ subroutine stress_error(Mdle, Err,SolNorm)
 !------------------------------------------------------------------------------------------
       implicit none
       integer, intent(in)  :: Mdle
-      real*8 , intent(out) :: Err
-      real*8 , intent(out) :: SolNorm
+      real(8) , intent(out) :: Err
+      real(8) , intent(out) :: SolNorm
 !------------------------------------------------------------------------------------------
 !  ...element and face type
       integer :: etype
@@ -30,50 +30,50 @@ subroutine stress_error(Mdle, Err,SolNorm)
       integer, dimension(6)  :: nface_orient
 !
 !  ...geometry
-      real*8, dimension(3,MAXbrickH) :: xnod
-      real*8, dimension(3)           :: xi,x
-      real*8, dimension(3,3)         :: dxdxi,dxidx
+      real(8), dimension(3,MAXbrickH) :: xnod
+      real(8), dimension(3)           :: xi,x
+      real(8), dimension(3,3)         :: dxdxi,dxidx
 !
 !  ...temporary variables
-      real*8 :: tmp
+      real(8) :: tmp
 !
 !  ...3D quadrature data
-      real*8, dimension(3,MAX_NINT3) :: xiloc
-      real*8, dimension(MAX_NINT3)   :: wxi
+      real(8), dimension(3,MAX_NINT3) :: xiloc
+      real(8), dimension(MAX_NINT3)   :: wxi
 !
 !  ...stiffness tensor
-      real*8, dimension(3,3,3,3) :: C
+      real(8), dimension(3,3,3,3) :: C
 !
 !  ...approximate solution
-      real*8, dimension(MAXEQNH,MAXbrickH) :: dofH
-      real*8, dimension(MAXEQNE,MAXbrickE) :: dofE
-      real*8, dimension(MAXEQNV,MAXbrickV) :: dofV
-      real*8, dimension(MAXEQNQ,MAXbrickQ) :: dofQ
-      real*8, dimension(  MAXEQNH  )       :: solH
-      real*8, dimension(  MAXEQNH,3)       :: dsolH
-      real*8, dimension(3,MAXEQNE  )       :: solE
-      real*8, dimension(3,MAXEQNE  )       :: curlE
-      real*8, dimension(3,MAXEQNV  )       :: solV
-      real*8, dimension(  MAXEQNV  )       :: divV
-      real*8, dimension(  MAXEQNQ  )       :: solQ
+      real(8), dimension(MAXEQNH,MAXbrickH) :: dofH
+      real(8), dimension(MAXEQNE,MAXbrickE) :: dofE
+      real(8), dimension(MAXEQNV,MAXbrickV) :: dofV
+      real(8), dimension(MAXEQNQ,MAXbrickQ) :: dofQ
+      real(8), dimension(  MAXEQNH  )       :: solH
+      real(8), dimension(  MAXEQNH,3)       :: dsolH
+      real(8), dimension(3,MAXEQNE  )       :: solE
+      real(8), dimension(3,MAXEQNE  )       :: curlE
+      real(8), dimension(3,MAXEQNV  )       :: solV
+      real(8), dimension(  MAXEQNV  )       :: divV
+      real(8), dimension(  MAXEQNQ  )       :: solQ
 !
 !  ...solution variables
-      real*8, dimension(  MAXEQNH    ) ::   valH
-      real*8, dimension(  MAXEQNH,3  ) ::  dvalH
-      real*8, dimension(  MAXEQNH,3,3) :: d2valH
-      real*8, dimension(3,MAXEQNE    ) ::   valE
-      real*8, dimension(3,MAXEQNE,3  ) ::  dvalE
-      real*8, dimension(3,MAXEQNE,3,3) :: d2valE
-      real*8, dimension(3,MAXEQNV    ) ::   valV
-      real*8, dimension(3,MAXEQNV,3  ) ::  dvalV
-      real*8, dimension(3,MAXEQNV,3,3) :: d2valV
-      real*8, dimension(  MAXEQNQ    ) ::   valQ
-      real*8, dimension(  MAXEQNQ,3  ) ::  dvalQ
-      real*8, dimension(  MAXEQNQ,3,3) :: d2valQ
+      real(8), dimension(  MAXEQNH    ) ::   valH
+      real(8), dimension(  MAXEQNH,3  ) ::  dvalH
+      real(8), dimension(  MAXEQNH,3,3) :: d2valH
+      real(8), dimension(3,MAXEQNE    ) ::   valE
+      real(8), dimension(3,MAXEQNE,3  ) ::  dvalE
+      real(8), dimension(3,MAXEQNE,3,3) :: d2valE
+      real(8), dimension(3,MAXEQNV    ) ::   valV
+      real(8), dimension(3,MAXEQNV,3  ) ::  dvalV
+      real(8), dimension(3,MAXEQNV,3,3) :: d2valV
+      real(8), dimension(  MAXEQNQ    ) ::   valQ
+      real(8), dimension(  MAXEQNQ,3  ) ::  dvalQ
+      real(8), dimension(  MAXEQNQ,3,3) :: d2valQ
 !
 !  ...miscellaneous
       integer :: k,l,m,n,nint,ipt,iprint,iload,iflag,ndom
-      real*8  :: weight,wa,rjac
+      real(8)  :: weight,wa,rjac
 !
 !-----------------------------------------------------------------------------------
 !      I N I T I A L I Z A T I O N                                                 |

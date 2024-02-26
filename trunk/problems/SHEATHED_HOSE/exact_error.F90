@@ -14,10 +14,10 @@ subroutine exact_error
 
   integer, dimension(NR_PHYSA) :: flag
 !
-  real*8 :: errorH,errorE,errorV,errorQ,errorHEVQ,derrorH,derrorE,derrorV,derrorQ
-  real*8 :: rnormH,rnormE,rnormV,rnormQ,rnormHEVQ,drnormH,drnormE,drnormV,drnormQ
-  real*8 :: errorH_rel,errorE_rel,errorV_rel,errorQ_rel,errorHEVQ_rel
-  real*8 :: rateH,rateE,rateQ,rateHEVQ
+  real(8) :: errorH,errorE,errorV,errorQ,errorHEVQ,derrorH,derrorE,derrorV,derrorQ
+  real(8) :: rnormH,rnormE,rnormV,rnormQ,rnormHEVQ,drnormH,drnormE,drnormV,drnormQ
+  real(8) :: errorH_rel,errorE_rel,errorV_rel,errorQ_rel,errorHEVQ_rel
+  real(8) :: rateH,rateE,rateQ,rateHEVQ
 !
   integer, parameter :: nin = 13
   integer, parameter :: maxvis =2000
@@ -26,8 +26,8 @@ subroutine exact_error
   integer :: ndofH,ndofE,ndofV,ndofQ
   integer, save :: ivis = 0
   integer, save :: nrdof_tot_save
-  real*8 , save :: errorH_save,errorE_save,errorV_save,errorQ_save,errorHEVQ_save
-  real*8 , dimension(maxvis,10), save :: rwork
+  real(8) , save :: errorH_save,errorE_save,errorV_save,errorQ_save,errorHEVQ_save
+  real(8) , dimension(maxvis,10), save :: rwork
   integer, dimension(maxvis,10), save :: iwork
 !
 ! miscellaneous
@@ -161,7 +161,7 @@ subroutine exact_error
       rateHEVQ=0.d0 ; rateH=0.d0 ; rateE=0.d0 ; rateQ=0.d0
       if (ivis /= 0) then
         if (nrdof_tot > nrdof_tot_save) then
-          rateHEVQ = (log(errorHEVQ_save/errorHEVQ))/log(float(nrdof_tot_save)/float(nrdof_tot))
+          rateHEVQ = (log(errorHEVQ_save/errorHEVQ))/log(real(nrdof_tot_save)/real(nrdof_tot))
       endif ; endif
 !
 !     save quantities
