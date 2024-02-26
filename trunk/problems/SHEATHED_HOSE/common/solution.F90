@@ -15,16 +15,16 @@ subroutine elast_solution(X, U,GradU,Epsilon,Sigma,DivSigma)
   use sheathed_isotropic_materials
   implicit none
 !-----------------------------------------------------------------------------------
-  real*8, dimension(3),   intent(in)  :: X
-  real*8, dimension(3),   intent(out) :: U
-  real*8, dimension(3,3), intent(out) :: GradU
-  real*8, dimension(3,3), intent(out) :: Epsilon
-  real*8, dimension(3,3), intent(out) :: Sigma
-  real*8, dimension(3),   intent(out) :: DivSigma
+  real(8), dimension(3),   intent(in)  :: X
+  real(8), dimension(3),   intent(out) :: U
+  real(8), dimension(3,3), intent(out) :: GradU
+  real(8), dimension(3,3), intent(out) :: Epsilon
+  real(8), dimension(3,3), intent(out) :: Sigma
+  real(8), dimension(3),   intent(out) :: DivSigma
 !-----------------------------------------------------------------------------------
 ! local variables
   integer :: ndom
-  real*8  :: r
+  real(8)  :: r
 !-----------------------------------------------------------------------------------
 !      I N I T I A L I Z A T I O N                                                 |
 !-----------------------------------------------------------------------------------
@@ -59,18 +59,18 @@ end subroutine elast_solution
   use sheathed_isotropic_materials
   implicit none
 !-----------------------------------------------------------------------------------
-  real*8, dimension(3),   intent(in)  :: X
+  real(8), dimension(3),   intent(in)  :: X
   integer,                intent(in)  :: Ndom
-  real*8, dimension(3),   intent(out) :: U
-  real*8, dimension(3,3), intent(out) :: GradU
-  real*8, dimension(3,3), intent(out) :: Epsilon
-  real*8, dimension(3,3), intent(out) :: Sigma
+  real(8), dimension(3),   intent(out) :: U
+  real(8), dimension(3,3), intent(out) :: GradU
+  real(8), dimension(3,3), intent(out) :: Epsilon
+  real(8), dimension(3,3), intent(out) :: Sigma
 !-----------------------------------------------------------------------------------
   integer :: iprint,itest,i,j,k,l,icomp
-  real*8 :: y,z,r,c1,c2,p,denom,theta,drdy,drdz,dthetady,dthetadz,   &
+  real(8) :: y,z,r,c1,c2,p,denom,theta,drdy,drdz,dthetady,dthetadz,   &
             ur,urdr,trr,tthetatheta,diffmax,dmax,tol
-  real*8, dimension(3,3,3,3) :: A
-  real*8, dimension(3,3)     :: tmpTensor
+  real(8), dimension(3,3,3,3) :: A
+  real(8), dimension(3,3)     :: tmpTensor
 !
 !-----------------------------------------------------------------------------------
 !      I N I T I A L I Z A T I O N                                                 |

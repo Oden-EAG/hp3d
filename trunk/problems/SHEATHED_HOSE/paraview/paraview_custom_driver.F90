@@ -9,7 +9,7 @@ subroutine paraview_custom_driver
       use mpi_param  , only : RANK,ROOT
       !
       implicit none
-      character*8, parameter :: sAttr(3) = (/'sigma_rr','sigma_rt','sigma_tt'/)
+      character(len=8), parameter :: sAttr(3) = (/'sigma_rr','sigma_rt','sigma_tt'/)
       real(8) :: time
       integer :: scomp
 !

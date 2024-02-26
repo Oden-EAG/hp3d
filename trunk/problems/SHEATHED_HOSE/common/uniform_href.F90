@@ -125,7 +125,7 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
       if (NEXACT.ge.1) then
          rate_error_mesh(istep) = &
          log(rel_error_mesh(istep-1)/rel_error_mesh(istep))/  &
-         log(float(nrdof_tot_mesh(istep-1))/float(nrdof_tot_mesh(istep)))
+         log(real(nrdof_tot_mesh(istep-1))/real(nrdof_tot_mesh(istep)))
       endif
    end select
 !

@@ -235,7 +235,7 @@ subroutine elem_vect_poisson(Mdle,Nn, Zaloc,Zbloc)
         read(*,*) ivar1,ivar2
         if (ivar1.eq.0) goto 200
         write(*,7100) ivar1,ivar2
- 7100   format(    '                   ivar1,ivar2 = '2i2)
+ 7100   format(    '                   ivar1,ivar2 = ',2i2)
         do k1=1,nrdofH
           n1 = (k1-1)*3+ivar1
           write(*,7200) k1

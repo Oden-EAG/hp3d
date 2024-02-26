@@ -1182,12 +1182,12 @@ subroutine get_LP11b(Xp,ampl,k,gamm,beta, E,dE)
 !
    implicit none
 !
-   real*8, intent(in)  :: Xp(3)
-   real*8, intent(in)  :: ampl, k, gamm, beta
+   real(8), intent(in)  :: Xp(3)
+   real(8), intent(in)  :: ampl, k, gamm, beta
    VTYPE , intent(out) :: E, dE(3)
 !
-   real*8 :: x1, x2, x3, r, ca, cb, cc
-   real*8 :: BESSEL_dJ1, BESSEL_K1, BESSEL_dK1
+   real(8) :: x1, x2, x3, r, ca, cb, cc
+   real(8) :: BESSEL_dJ1, BESSEL_K1, BESSEL_dK1
 !
 !------------------------------------------------------
 !
@@ -1363,15 +1363,15 @@ subroutine get_LP21b(Xp,ampl,k,gamm,beta, E,dE)
 !
    implicit none
 !
-   real*8, intent(in)  :: Xp(3)
-   real*8, intent(in)  :: ampl, k, gamm, beta
+   real(8), intent(in)  :: Xp(3)
+   real(8), intent(in)  :: ampl, k, gamm, beta
    VTYPE , intent(out) :: E, dE(3)
 !
-   real*8 :: x1, x2, x3, r, ca, cb, cc
-   real*8 :: BESSEL_J2, BESSEL_dJ2, BESSEL_K2, BESSEL_dK2
+   real(8) :: x1, x2, x3, r, ca, cb, cc
+   real(8) :: BESSEL_J2, BESSEL_dJ2, BESSEL_K2, BESSEL_dK2
 !
-   real*8 :: cos_t,cos_2t
-   real*8 :: sin_t,sin_2t
+   real(8) :: cos_t,cos_2t
+   real(8) :: sin_t,sin_2t
 !
 !------------------------------------------------------
 !

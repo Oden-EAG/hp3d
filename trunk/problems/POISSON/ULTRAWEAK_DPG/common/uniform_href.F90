@@ -153,12 +153,12 @@ subroutine uniform_href(Irefine,Nreflag,Factor)
       if (NEXACT.gt.0) then
          rate_error_mesh(istep) = &
          log(rel_error_mesh(istep-1)/rel_error_mesh(istep))/  &
-         log(float(nrdof_tot_mesh(istep-1))/float(nrdof_tot_mesh(istep)))
+         log(real(nrdof_tot_mesh(istep-1))/real(nrdof_tot_mesh(istep)))
       endif
 !
       rate_residual_mesh(istep) = &
       log(residual_mesh(istep-1)/residual_mesh(istep))/  &
-      log(float(nrdof_tot_mesh(istep-1))/float(nrdof_tot_mesh(istep)))
+      log(real(nrdof_tot_mesh(istep-1))/real(nrdof_tot_mesh(istep)))
    end select
 !
 !..print out the history of refinements

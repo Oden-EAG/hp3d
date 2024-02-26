@@ -11,31 +11,31 @@
 !! @param[out] DvalV  - H(div) corresponding first derivatives
 !--------------------------------------------------------------------
 subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
-  use sheathed_isotropic_materials, only : R_inside,R_middle,R_outside,P_inner,P_outer,X_1,X_2
+  use sheathed_isotropic_materials, only : P_inner,P_outer,X_1,X_2
   use control    , only : NEXACT
   use parameters , only : MAXEQNH,MAXEQNE,MAXEQNV,MAXEQNQ, ZERO
   implicit none
-  real*8, dimension(3),          intent(in)  :: X
+  real(8), dimension(3),          intent(in)  :: X
   integer,                       intent(in)  :: Icase,Mdle
 ! exact solution
-  real*8,dimension(  MAXEQNH    ),intent(out) ::   ValH
-  real*8,dimension(  MAXEQNH,3  ),intent(out) ::  DvalH
-  real*8,dimension(  MAXEQNH,3,3)             :: d2valH
-  real*8,dimension(3,MAXEQNE    ),intent(out) ::   ValE
-  real*8,dimension(3,MAXEQNE,3  ),intent(out) ::  DvalE
-  real*8,dimension(3,MAXEQNE,3,3)             :: d2valE
-  real*8,dimension(3,MAXEQNV    ),intent(out) ::   ValV
-  real*8,dimension(3,MAXEQNV,3  ),intent(out) ::  DvalV
-  real*8,dimension(3,MAXEQNV,3,3)             :: d2valV
-  real*8,dimension(  MAXEQNQ    )             ::   valQ
-  real*8,dimension(  MAXEQNQ,3  )             ::  dvalQ
-  real*8,dimension(  MAXEQNQ,3,3)             :: d2valQ
+  real(8),dimension(  MAXEQNH    ),intent(out) ::   ValH
+  real(8),dimension(  MAXEQNH,3  ),intent(out) ::  DvalH
+  real(8),dimension(  MAXEQNH,3,3)             :: d2valH
+  real(8),dimension(3,MAXEQNE    ),intent(out) ::   ValE
+  real(8),dimension(3,MAXEQNE,3  ),intent(out) ::  DvalE
+  real(8),dimension(3,MAXEQNE,3,3)             :: d2valE
+  real(8),dimension(3,MAXEQNV    ),intent(out) ::   ValV
+  real(8),dimension(3,MAXEQNV,3  ),intent(out) ::  DvalV
+  real(8),dimension(3,MAXEQNV,3,3)             :: d2valV
+  real(8),dimension(  MAXEQNQ    )             ::   valQ
+  real(8),dimension(  MAXEQNQ,3  )             ::  dvalQ
+  real(8),dimension(  MAXEQNQ,3,3)             :: d2valQ
 ! printing flag
   integer :: iprint
 ! for exact solution
 !--------------------------------------------------------------------
-  real*8, dimension(3)   :: u
-  real*8, dimension(3,3) :: gradU,epsilon,sigma
+  real(8), dimension(3)   :: u
+  real(8), dimension(3,3) :: gradU,epsilon,sigma
 !--------------------------------------------------------------------
 ! miscellaneous
   integer :: ndom

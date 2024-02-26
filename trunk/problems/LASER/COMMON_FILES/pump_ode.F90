@@ -254,8 +254,8 @@ subroutine compute_gain(ZValues,Num_zpts,Fld, Gain)
    integer :: mdle
 !
 !..element, face order, geometry dof
-   real*8 :: xnod (3,8)
-   real*8 :: maxz,minz
+   real(8) :: xnod (3,8)
+   real(8) :: maxz,minz
 !
 !..miscellanea
    integer :: iel, i, ndom
