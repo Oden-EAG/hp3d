@@ -1,41 +1,41 @@
-c-----------------------------------------------------------------------
-c
-c   routine name       - rhsub
-c
-c-----------------------------------------------------------------------
-c
-c   latest revision    - april 2, 1988
-c
-c   purpose            - backward gauss substitution
-c
-c   arguments in: a    - m by m matrix
-c                 b    - vector of length m containing the right
-c                        hand side
-c                 n    - row dimension of matrix a exactly as
-c                        specified in the dimension statement in the
-c                        calling program
-c                 m    - number of equations
-c             out:x    - vector of length m containing the solution
-c
-c-----------------------------------------------------------------------
-c
+!-----------------------------------------------------------------------
+!
+!   routine name       - rhsub
+!
+!-----------------------------------------------------------------------
+!
+!   latest revision    - Feb 2024
+!
+!   purpose            - backward gauss substitution
+!
+!   arguments in: a    - m by m matrix
+!                 b    - vector of length m containing the right
+!                        hand side
+!                 n    - row dimension of matrix a exactly as
+!                        specified in the dimension statement in the
+!                        calling program
+!                 m    - number of equations
+!             out:x    - vector of length m containing the solution
+!
+!-----------------------------------------------------------------------
+!
       subroutine rhsub(a,x,b,n,m)
-c
+!
       implicit none
-c
+!
       integer, intent(in) :: n,m
       real(8) :: a(n,n),x(*),b(*)
-c
+!
       integer :: i,j,j1,m1,ib
-c
+!
 #if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
-c
+!
       m1=m-1
-c
-c.....begin forward reduction of right hand side
+!
+!.....begin forward reduction of right hand side
       do i=1,m1
         j1=i+1
         do j=j1,m
@@ -50,8 +50,8 @@ c.....begin forward reduction of right hand side
  7002   format(12e10.3)
       endif
 #endif
-c
-c.....begin back substitution
+!
+!.....begin back substitution
       x(m)=b(m)/a(m,m)
 #if HP3D_DEBUG
       if (iprint.eq.1) then
@@ -77,5 +77,5 @@ c.....begin back substitution
         endif
 #endif
       enddo
-c
+!
       end subroutine rhsub
