@@ -63,7 +63,7 @@ subroutine solout_mg(Ielc,Iel,Mdle,Ndof,Nrhs,Zele)
    integer :: i,j,k,il,iphys,icomp,ivar,load,nn,nod
    VTYPE   :: zvoid
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint=0
 #endif
 !
@@ -80,7 +80,7 @@ subroutine solout_mg(Ielc,Iel,Mdle,Ndof,Nrhs,Zele)
                  nodm,ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm, &
                  zvoid,zvoid)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.ge.1) then
         write(*,7001) Ielc,mdle,nodm(1:nrnodm)
  7001   format(' solout_mg: Ielc,mdle = ',i8,i10,' nodm = ',10(/,10i10))
@@ -137,7 +137,7 @@ subroutine solout_mg(Ielc,Iel,Mdle,Ndof,Nrhs,Zele)
 !
 !     ...compute the number of active H1 variables for the node
          call get_index(nod, index)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (iprint.eq.1) then
             write(*,7100) nod,index(1:NRINDEX)
  7100       format('solout_mg: nod,index = ',i8,2x,20i2)
@@ -182,7 +182,7 @@ subroutine solout_mg(Ielc,Iel,Mdle,Ndof,Nrhs,Zele)
 !
 !                 ...copy the dof
                      NODES(nod)%zdofH(ivar,j) = Zele(nn)
-#if DEBUG_MODE
+#if HP3D_DEBUG
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Zele(nn)
   7006                  format('solout_mg: nn,load,Zele(nn) = ',i4,i3,x,2e13.5)
@@ -216,7 +216,7 @@ subroutine solout_mg(Ielc,Iel,Mdle,Ndof,Nrhs,Zele)
 !
 !     ...compute the number of active H1 variables for the node
          call get_index(nod, index)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (iprint.eq.1) write(*,7100) nod,index
 #endif
          nvarE=0; k=NRHVAR
@@ -257,7 +257,7 @@ subroutine solout_mg(Ielc,Iel,Mdle,Ndof,Nrhs,Zele)
 !
 !                 ...copy the dof
                      NODES(nod)%zdofE(ivar,j) = Zele(nn)
-#if DEBUG_MODE
+#if HP3D_DEBUG
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Zele(nn)
                         write(*,7009) nod,j,ivar,NODES(nod)%zdofE(ivar,j)
@@ -289,7 +289,7 @@ subroutine solout_mg(Ielc,Iel,Mdle,Ndof,Nrhs,Zele)
 !
 !     ...compute the number of active H1 variables for the node
          call get_index(nod, index)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (iprint.eq.1) write(*,7100) nod,index
 #endif
          nvarV=0; k=nrVarHE
@@ -332,7 +332,7 @@ subroutine solout_mg(Ielc,Iel,Mdle,Ndof,Nrhs,Zele)
 !
 !                 ...copy the dof
                      NODES(nod)%zdofV(ivar,j) = Zele(nn)
-#if DEBUG_MODE
+#if HP3D_DEBUG
                      if (iprint.eq.1) then
                         write(*,7006) nn,load,Zele(nn)
                         write(*,7010) nod,j,ivar,NODES(nod)%zdofV(ivar,j)
@@ -357,7 +357,7 @@ subroutine solout_mg(Ielc,Iel,Mdle,Ndof,Nrhs,Zele)
 !
   400 continue
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) call pause
 #endif
 !

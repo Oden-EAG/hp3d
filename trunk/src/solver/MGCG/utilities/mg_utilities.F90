@@ -8,7 +8,7 @@
 
    VTYPE,   intent(in) :: v(:)
    real*8 :: l2norm
-#if C_MODE
+#if HP3D_COMPLEX
    real*8,  external   :: dznrm2
 #else
    real*8,  external   :: dnrm2
@@ -19,7 +19,7 @@
 !
    n = size(v)
 
-#if C_MODE
+#if HP3D_COMPLEX
    l2norm = dznrm2(n,v,1)
 #else
    l2norm = dnrm2(n,v,1)
@@ -37,7 +37,7 @@
    VTYPE, intent(in) :: v(:), u(:)
    VTYPE :: dotp
    integer :: n,m
-#if C_MODE
+#if HP3D_COMPLEX
    complex*16, external :: zdotc
 #else
    real*8, external :: ddot
@@ -51,7 +51,7 @@
       stop 1
    endif
 
-#if C_MODE
+#if HP3D_COMPLEX
    dotp = zdotc(n,v,1,u,1)
 #else
    dotp =  ddot(n,v,1,u,1)
