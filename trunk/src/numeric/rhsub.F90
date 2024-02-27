@@ -19,7 +19,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine rhsub(a,x,b,n,m)
+   subroutine rhsub(a,x,b,n,m)
 !
       implicit none
 !
@@ -78,4 +78,4 @@
 #endif
       enddo
 !
-      end subroutine rhsub
+   end subroutine rhsub

@@ -17,7 +17,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine tri(a,n,m)
+   subroutine tri(a,n,m)
 !
       implicit none
 !
@@ -74,4 +74,4 @@
       endif
 #endif
 !
-      end subroutine tri
+   end subroutine tri
