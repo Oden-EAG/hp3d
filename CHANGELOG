@@ -15,8 +15,9 @@ Version 1.0 (dev)
   library paths, and include paths. The user only needs to provide the
   corresponding PETSC_DIR and PETSC_ARCH.
 
-- Introduced global parameter `NRINDEX_HEV=31` used for binary-encoding
+- Introduced global parameter `MAX_NRINDEX_HEV=31` used for binary-encoding
   Dirichlet flags of (at most 31) H1, H(div), and H(curl) components.
+  This parameter replaces the previous global parameter MAX_NRINDEX.
 
 ==========================================
 Version 1.0-beta, released on Sep 24, 2023
