@@ -53,7 +53,7 @@
 !     ...
 !------------------------------------------------------------------------
 !
-subroutine geom_error(Err,Rnorm)
+   subroutine geom_error(Err,Rnorm)
 !
       use data_structure3D , only : NRELES,ELEM_ORDER
       use environment      , only : QUIET_MODE,L2GEOM
@@ -460,6 +460,6 @@ subroutine display_geom_error(Nfath)
       endif
 !
 !
-end subroutine display_geom_error
+   end subroutine display_geom_error
 
 #endif

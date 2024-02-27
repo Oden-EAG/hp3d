@@ -1,5 +1,5 @@
 adaptivity_geom.F90
-celndof.F
+celndof.F90
 check_invmap.F90
 check_jacobian.F90
 check_negative_jacobian.F90
@@ -8,12 +8,12 @@ diag_scaling.F90
 geom_error.F90
 geom_ex.F90
 geom_hp.F90
-geom.F
-geom3D.F
+geom.F90
+geom3D.F90
 geometry_error.F90
-invmap.F
-invmap_face.F
-refel.F
+invmap.F90
+invmap_face.F90
+refel.F90
 soleval.F90
 volume.F90
 volume_hp.F90
