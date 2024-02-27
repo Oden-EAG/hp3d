@@ -29,7 +29,7 @@ subroutine nelcon(Mdle0, Mdle1)
 !
       integer :: mdle,nfath,nrbros,noson
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -60,7 +60,7 @@ subroutine nelcon(Mdle0, Mdle1)
         noson = mdle - NODES(nfath)%first_son + 1
 !        if (noson<0 .or. noson>nrbros) call pause
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7002) mdle,nfath,nrbros,noson
  7002     format('nelcon: mdle,nfath,nrbros,noson = ',2i7,2i3)
@@ -89,7 +89,7 @@ subroutine nelcon(Mdle0, Mdle1)
       Mdle1 = mdle
 !
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7010) Mdle0,Mdle1
  7010   format('nelcon: Mdle0,Mdle1 = ',2i7)

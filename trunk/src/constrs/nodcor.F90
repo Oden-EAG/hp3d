@@ -48,7 +48,7 @@ subroutine nodcor(Mdle, Xnod)
    integer :: nrnodm
    integer :: i,j,k,l,kp,ivar
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: nodesl(27), norientl(27)
    integer :: inod,nod,ndofH,ndofE,ndofV,ndofQ
    integer :: iprint
@@ -64,7 +64,7 @@ subroutine nodcor(Mdle, Xnod)
 !..determine order of approximation
    call find_order(Mdle, norder)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7006) Mdle
  7006   format('nodcor: Mdle   = ',i6)
@@ -82,7 +82,7 @@ subroutine nodcor(Mdle, Xnod)
               nrconE,nacE,constrE,              &
               nrconV,nacV,constrV)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,*) 'nodcor: nodm,ndofmH = '
       write(*,7004) (nodm(i),i=1,nrnodm)
@@ -116,7 +116,7 @@ subroutine nodcor(Mdle, Xnod)
 !..loop through the local dof
    do k=1,nrdoflH
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
          write(*,*) 'k = ',k
          write(*,7001) (nacH(l,k),l=1,nrconH(k))
@@ -138,7 +138,7 @@ subroutine nodcor(Mdle, Xnod)
          enddo
       enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
          write(*,7003) (Xnod(ivar,k),ivar=1,NDIMEN)
  7003    format('Xnod = ',3f10.4)
@@ -150,7 +150,7 @@ subroutine nodcor(Mdle, Xnod)
    enddo
 !
 !..printing
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.2) then
       call elem_nodes(Mdle, nodesl,norientl)
       write(*,*) 'nodcor: VERTEX dof'

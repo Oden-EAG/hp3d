@@ -13,7 +13,7 @@ module surfsc1
               IPFSLF, IPFSRF, IPFSZD, IPFSLE, IPFSRE, &
               IPFSBF, IPFSBK, IPFSXX
 !
-#if C_MODE
+#if HP3D_COMPLEX
    integer :: IDUMPWR
 #endif
 !

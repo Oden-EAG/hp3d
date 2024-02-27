@@ -38,7 +38,7 @@ c
 c
       real(8) :: det1,det2,det3
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       real(8) :: a(3,3),a1,a2,a3,s
       integer :: i,j,k
       integer :: iprint
@@ -61,7 +61,7 @@ c  ...jacobian
      .     - Dxdxi(1,1)*Dxdxi(3,2)*Dxdxi(2,3)
      .     - Dxdxi(2,1)*Dxdxi(1,2)*Dxdxi(3,3)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'geom: Rjac = ',Rjac
       endif
@@ -70,7 +70,7 @@ c
       if (Rjac.lt.0.d0) then
         Iflag=1
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
 c
 c  .......compute vector product of first two derivatives
@@ -113,7 +113,7 @@ c
       Dxidx(2,3) = det2/Rjac
       Dxidx(3,3) = det3/Rjac
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
 c
 c  .....check the inversion

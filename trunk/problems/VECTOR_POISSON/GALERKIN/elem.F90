@@ -117,7 +117,7 @@ subroutine elem_vect_poisson(Mdle,Nn, Zaloc,Zbloc)
 !
    integer :: ifc,nsign
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: ivar1,ivar2
    integer :: iprint
    iprint=0
@@ -138,7 +138,7 @@ subroutine elem_vect_poisson(Mdle,Nn, Zaloc,Zbloc)
    !write(*,2050) '[', RANK, '] FIND ORDER'; call pause
    call find_order(Mdle, norder)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
      write(*,7010) norder(1:nre+nrf+1)
 7010 format('elem_vect_poisson: norder = ',19i4)
@@ -152,7 +152,7 @@ subroutine elem_vect_poisson(Mdle,Nn, Zaloc,Zbloc)
 !..determine BC flags
    call find_bc(Mdle, ibc)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       do ivar=1,3
          write(*,7020) ivar, ibc(1:6,ivar)
@@ -229,7 +229,7 @@ subroutine elem_vect_poisson(Mdle,Nn, Zaloc,Zbloc)
 !..end of loop through integration points
    enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
   100   write(*,*) 'elem_vect_possion: SET ivar1,ivar2 (1:3)'
         read(*,*) ivar1,ivar2

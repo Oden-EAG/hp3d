@@ -59,7 +59,7 @@ c
       double precision :: Mu(0:1),DMu(0:1),GMu(0:1),GDMu(0:1)
       double precision :: phiE(2:Nord),DphiE(2:Nord)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...debugging flag
       integer :: iprint
       iprint=0
@@ -97,7 +97,7 @@ c
 c  ...give total degrees of freedom
       NrdofH = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.eq.1) then
         write(*,7001) T,Nord,Nori
@@ -177,7 +177,7 @@ c
       double precision :: homP(0:Nord-1)
       double precision :: jac
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...debugging flag
       integer :: iprint
       iprint=0
@@ -214,7 +214,7 @@ c
 c  ...give total degrees of freedom
       NrdofE = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.eq.1) then
         write(*,7001) T,Nord,Nori
@@ -291,7 +291,7 @@ c
       double precision, intent(in ) :: T
       double precision, intent(out) :: ShapV(MAXP)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: m,ndofE
 c  ...debugging flag
       integer :: iprint
@@ -301,7 +301,7 @@ c
 c  ...the traces are the same as the H(curl) traces
       call TraceEshapeE(T,Nord,Nori, NrdofV,ShapV)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.eq.1) then
         write(*,7001) T,Nord,Nori
@@ -396,7 +396,7 @@ c
         double precision :: phiTri(2:Nord-1,1:Nord-2)
         double precision :: DphiTri(2,2:Nord-1,1:Nord-2)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c    ...debugging flag
         integer :: iprint
         iprint=0
@@ -441,7 +441,7 @@ c
 c    ...give total degrees of freedom
         NrdofH = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c    ...print this when debugging
         if (iprint.eq.1) then
           write(*,7001) T(1:2),Nord,Nori
@@ -472,7 +472,7 @@ c
         double precision :: phiQuad(2:MAXP,2:MAXP)
         double precision :: DphiQuad(2,2:MAXP,2:MAXP)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c    ...debugging flag
         integer :: iprint
         iprint=0
@@ -518,7 +518,7 @@ c
 c    ...give total degrees of freedom
         NrdofH = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c    ...print this when debugging
         if (iprint.eq.1) then
           write(*,7001) T(1:2),Nord,Nori
@@ -621,7 +621,7 @@ c
         double precision :: ETri(2,0:Nord-2,1:Nord-1)
         double precision :: CurlETri(0:Nord-2,1:Nord-1)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c    ...debugging flag
         integer :: iprint
         iprint=0
@@ -673,7 +673,7 @@ c
 c    ...give total degrees of freedom
         NrdofE = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c    ...print this when debugging
         if (iprint.eq.1) then
           write(*,7001) T(1:2),Nord,Nori
@@ -712,7 +712,7 @@ c
         double precision :: EQuad(2,0:MAXP-1,2:MAXP)
         double precision :: curlEQuad(0:MAXP-1,2:MAXP)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c    ...debugging flag
         integer :: iprint
         iprint=0
@@ -769,7 +769,7 @@ c
 c    ...give total degrees of freedom
         NrdofE = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c    ...print this when debugging
         if (iprint.eq.1) then
           write(*,7001) T(1:2),Nord,Nori
@@ -876,7 +876,7 @@ c
         double precision :: homP(0:Nord-1),homPal(0:Nord-1,0:Nord-1)
         double precision :: jac(1)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c    ...debugging flag
         integer :: iprint
         iprint=0
@@ -925,7 +925,7 @@ c
 c    ...give total degrees of freedom
         NrdofV = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c    ...print this when debugging
         if (iprint.eq.1) then
           write(*,7001) T(1:2),Nord,Nori
@@ -957,7 +957,7 @@ c
         double precision :: homP(0:MAXP-1,2)
         double precision :: jac(1)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c    ...debugging flag
         integer :: iprint
         iprint=0
@@ -1002,7 +1002,7 @@ c
 c    ...give total degrees of freedom
         NrdofV = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c    ...print this when debugging
         if (iprint.eq.1) then
           write(*,7001) T(1:2),Nord,Nori

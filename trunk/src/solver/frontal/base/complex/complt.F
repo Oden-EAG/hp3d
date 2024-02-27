@@ -37,7 +37,7 @@ c
       NPOSP = 0
       IERR = 0
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -50,7 +50,7 @@ c      the workspace
 c
       n = NUMELM + MLDEST + 2*MDOF
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
          write(NFSOUT,*) 'in complt.f'
          write(NFSOUT,*) 'mdof,numelm,mldest,n',mdof,numelm,mldest,n

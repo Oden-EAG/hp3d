@@ -7,7 +7,7 @@ real(8) function dreal_part(Z)
    implicit none
    VTYPE, intent(in) :: Z
 !
-#if C_MODE
+#if HP3D_COMPLEX
    dreal_part = dreal(Z)
 #else
    dreal_part = Z
@@ -23,7 +23,7 @@ real(8) function dimag_part(Z)
    implicit none
    VTYPE, intent(in) :: Z
 !
-#if C_MODE
+#if HP3D_COMPLEX
    dimag_part = dimag(Z)
 #else
    dimag_part = 0.d0

@@ -27,7 +27,7 @@ subroutine encode_orderb(Nord1,Nord2,Nord3, Norderb)
 !
    Norderb = (Nord1*(MAXP+1)+Nord2)*(MAXP+1)+Nord3
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (Nord1<1.or.Nord1>MAXP) then
       write(*,*)'encode_orderb: OUT OF RANGE Nord1 = ',Nord1
       stop
@@ -73,7 +73,7 @@ subroutine encode_orderq(Nord1,Nord2, Norderq)
 !
    Norderq = Nord1*(MAXP+1)+Nord2
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (Nord1<1.or.Nord1>MAXP) then
       write(*,*)'encode_orderq: OUT OF RANGE Nord1 = ',Nord1
       stop

@@ -96,7 +96,7 @@ c
       integer :: i,ie,i1,i2,i1beg,ipp,jp,jpbeg,jpend,j,icl
       integer :: n,na,nord,nrb,nrdof,nrs,info
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint = 0
 #endif
@@ -152,7 +152,7 @@ c
 c
       n = (nord+1)**2
       na = MAXquadH + 1
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'setcnstr_trian_aniso_h1: shapsma COLUMNWISE ....'
         do i=1,n
@@ -173,7 +173,7 @@ ccc      endif
 cccc
 ccc      do i = 1,n
 ccc        call gauss2(n,na,shapsma,ip,shapbig(1:n,i), r(1:n,i))
-ccc#if DEBUG_MODE
+ccc#if HP3D_DEBUG
 ccc        if (iprint.eq.1) then
 ccc          write(*,*) 'setcnstr_trian: r FOR i = ',i
 ccc          write(*,7003) r(1:n,i)

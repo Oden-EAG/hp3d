@@ -20,14 +20,14 @@ subroutine find_element_ref(Ntype,Kref,Kreff, Krefm)
   integer, dimension(6) :: kreff_trial
   integer :: ipass, isum, iface, i, j, kref_trial
   !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint=0
 #endif
   !
   !-------------------------------------------------------
   !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.ge.1) then
       write(*,7000) S_Type(NType),Kref,Kreff(1:6)
   endif
@@ -65,7 +65,7 @@ subroutine find_element_ref(Ntype,Kref,Kreff, Krefm)
      endif
   enddo
   !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
      write(*,7001) S_Type(Ntype),Kref,Krefm,Kreff(1:nface(Ntype))
      call pause

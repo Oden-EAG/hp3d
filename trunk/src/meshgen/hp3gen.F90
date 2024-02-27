@@ -56,7 +56,7 @@ subroutine hp3gen(Fp)
    integer :: ivar, nvar, ibeg, iend
    logical :: iact, lflag
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    integer :: iprint_vert,iprint_edge,iprint_face,iprint_mdle
    iprint = -1
@@ -64,7 +64,7 @@ subroutine hp3gen(Fp)
 #endif
 !----------------------------------------------------------------------
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint .eq. 1) then
       write(*,*) 'hp3gen: DEBUGGING'
    endif
@@ -155,7 +155,7 @@ subroutine hp3gen(Fp)
       call encodg(nface_orient,8,5, ELEMS(nel)%face_orient)
       ELEMS(nel)%GMPblock = npri*10+1
    enddo
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if ((iprint.eq.1).and.(NRPRISM.ne.0)) then
       write(*,*) 'hp3gen: HAVE GENERATED PRISMS'
    endif
@@ -198,7 +198,7 @@ subroutine hp3gen(Fp)
       call encodg(nface_orient,8,6, ELEMS(nel)%face_orient)
       ELEMS(nel)%GMPblock = nh*10+2
    enddo
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if ((iprint.eq.1).and.(NRHEXAS.ne.0)) then
       write(*,*) 'hp3gen: HAVE GENERATED HEXAS'
    endif
@@ -241,7 +241,7 @@ subroutine hp3gen(Fp)
       call encodg(nface_orient,8,4, ELEMS(nel)%face_orient)
       ELEMS(nel)%GMPblock = ntet*10+3
    enddo
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if ((iprint.eq.1).and.(NRTETRA.ne.0)) then
       write(*,*) 'hp3gen: HAVE GENERATED TETRAS'
    endif
@@ -299,7 +299,7 @@ subroutine hp3gen(Fp)
       call encodg(nface_orient,8,5, ELEMS(nel)%face_orient)
       ELEMS(nel)%GMPblock = npyr*10+4
    enddo
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if ((iprint.eq.1).and.(NRPYRAM.ne.0)) then
       write(*,*) 'hp3gen: HAVE GENERATED PYRAMIDS'
    endif
@@ -309,7 +309,7 @@ subroutine hp3gen(Fp)
 !
 !..set physics flags, boundary conditions flags and order
 !  of approximation for initial mesh elements (user provided routine)
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.ne.-1) then
       write(*,*)'CALLING set_initial_mesh'
    endif
@@ -346,7 +346,7 @@ subroutine hp3gen(Fp)
          stop 1
       endif
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint_mdle.eq.1) then
          write(*,7004) nod
 7004     format('hp3gen: HAVE GENERATED MIDDLE NODE ',i6)
@@ -355,7 +355,7 @@ subroutine hp3gen(Fp)
 !
    enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,*) 'hp3gen: HAVE GENERATED MIDDLE NODES'
    endif
@@ -450,7 +450,7 @@ subroutine hp3gen(Fp)
          stop 1
       endif
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint_vert.eq.1) then
          write(*,7001) nod
 7001     format('hp3gen: HAVE GENERATED VERTEX NODE ',i6)
@@ -459,7 +459,7 @@ subroutine hp3gen(Fp)
 !
    enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
      write(*,*) 'hp3gen: HAVE GENERATED VERTEX NODES'
   endif
@@ -562,7 +562,7 @@ subroutine hp3gen(Fp)
          stop 1
       endif
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint_edge.eq.1) then
          write(*,7002) nod
 7002     format('hp3gen: HAVE GENERATED EDGE NODE ',i6)
@@ -571,7 +571,7 @@ subroutine hp3gen(Fp)
 !
    enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,*) 'hp3gen: HAVE GENERATED EDGE NODES'
    endif
@@ -661,7 +661,7 @@ subroutine hp3gen(Fp)
          stop 1
       endif
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint_face.eq.1) then
          write(*,7003) nod
 7003     format('hp3gen: HAVE GENERATED FACE NODE ',i6)
@@ -670,7 +670,7 @@ subroutine hp3gen(Fp)
 !
    enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,*) 'hp3gen: HAVE GENERATED RECTANGULAR FACE NODES'
    endif
@@ -757,7 +757,7 @@ subroutine hp3gen(Fp)
          stop 1
       endif
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint_face.eq.1) then
          write(*,7003) nod
       endif
@@ -765,7 +765,7 @@ subroutine hp3gen(Fp)
 !
    enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,*) 'hp3gen: HAVE GENERATED TRIANGULAR FACE NODES'
    endif
@@ -780,7 +780,7 @@ subroutine hp3gen(Fp)
 !
 !  ...filling ELEM_ORDER array
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.ne.-1) then
       write(*,*)'CALLING update_ELEM_ORDER'
    endif
@@ -801,7 +801,7 @@ subroutine hp3gen(Fp)
 !
 !  ...generate geometry and Dirichlet dof
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.ne.-1) then
       write(*,*)'CALLING update_gdof'
    endif
@@ -809,7 +809,7 @@ subroutine hp3gen(Fp)
 !
    call update_gdof
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.ne.-1) then
       write(*,2000)
 2000  format('GEOMETRY DOFs HAVE BEEN UPDATED')
@@ -818,7 +818,7 @@ subroutine hp3gen(Fp)
 !
    call update_Ddof
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.ne.-1) then
       write(*,2001)
 2001  format('DIRICHLET DOFs HAVE BEEN UPDATED')

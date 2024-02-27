@@ -164,10 +164,10 @@ subroutine master_main()
     flush(6)
     call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
-#if DEBUG_MODE
-    write(*,*) '========================='
-    write(*,*) '  RUNNING in DEBUG_MODE  '
-    write(*,*) '========================='
+#if HP3D_DEBUG
+    write(*,*) '    ===================================    '
+    write(*,*) '      RUNNING with HP3D_DEBUG enabled      '
+    write(*,*) '    ===================================    '
 #endif
 !
 !..display menu in infinite loop

@@ -28,7 +28,7 @@ c
 c
       integer :: i,j,j1,m1,ib
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -42,7 +42,7 @@ c.....begin forward reduction of right hand side
           b(j) = b(j)-b(i)*a(j,i)/a(i,i)
         enddo
       enddo
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001)
  7001   format('rhsub: RHS AFTER FORWARD ELIMINATION')
@@ -53,7 +53,7 @@ c.....begin forward reduction of right hand side
 c
 c.....begin back substitution
       x(m)=b(m)/a(m,m)
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7003) m,b(m),a(m,m),x(m)
  7003   format('rhsub: i,b(i),a(i,i),x(i) = ',i3,3e12.5)
@@ -64,14 +64,14 @@ c.....begin back substitution
         j1=ib+1
         do j=j1,m
           b(ib) = b(ib) - a(ib,j)*x(j)
-#if DEBUG_MODE
+#if HP3D_DEBUG
           if (iprint.eq.1.and.ib.eq.9) then
             write(*,*) 'ib,j,b(ib) = ',ib,j,b(ib)
           endif
 #endif
         enddo
         x(ib)=b(ib)/a(ib,ib)
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7003) ib,b(ib),a(ib,ib),x(ib)
         endif

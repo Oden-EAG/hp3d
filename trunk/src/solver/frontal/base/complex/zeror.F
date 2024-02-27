@@ -29,7 +29,7 @@ c
 c
       complex(8), parameter :: zero = (0.d0, 0.d0)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -39,7 +39,7 @@ c   then there is nothing to zero
 c
       if (LFW .eq. NFW) return
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(nfsout,*) 'ZEROR: NRHS,MFW,NFW,LFW = ',NRHS,MFW,NFW,LFW
       endif

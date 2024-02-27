@@ -30,7 +30,7 @@ subroutine hpvert(Iflag,No,Xi, Xnod)
 !
    real(8) :: void(3,3)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint=0
 #endif
@@ -48,7 +48,7 @@ subroutine hpvert(Iflag,No,Xi, Xnod)
          stop 1
    end select
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,7005) Iflag,No,Xi,Xnod
  7005 format('hpvert: Iflag,No = ',2i8,' Xi = ',3f8.3, &

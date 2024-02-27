@@ -244,7 +244,7 @@ subroutine stc_bwd_wrapper_mg(Ielc,Iel)
                xi(ni+1:ni+ii,load) = RESHAPE(zdofE(lE+1:lE+l,1:k),(/ii/))
             case('normal')
                xi(ni+1:ni+ii,load) = RESHAPE(zdofV(lV+1:lV+l,1:k),(/ii/))
-#if DEBUG_MODE
+#if HP3D_DEBUG
             case default
                write(*,*) 'stc_bwd_wrapper_mg: INCONSISTENCY. stop.'
                stop

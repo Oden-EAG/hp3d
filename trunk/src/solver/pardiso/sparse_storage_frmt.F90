@@ -152,7 +152,7 @@ subroutine assemble_triplet(row,col,val,nz,nnz)
    integer    , intent(in)    :: nz
    integer    , intent(out)   :: nnz
    integer    , intent(inout) :: row(nz),col(nz)
-#if C_MODE
+#if HP3D_COMPLEX
    complex(8) , intent(inout) :: val(nz)
 #else
    real(8)    , intent(inout) :: val(nz)
@@ -222,7 +222,7 @@ recursive subroutine qsort_triplet_old(ia,ja,xa,n,first,last)
 !..declare variables
    integer     , intent(in)    :: n,first,last
    integer     , intent(inout) :: ia(n), ja(n)
-#if C_MODE
+#if HP3D_COMPLEX
    complex(8)  , intent(inout) :: xa(n)
    complex(8)                  :: x
 #else
@@ -284,7 +284,7 @@ recursive subroutine qsort_triplet(ia,ja,xa,n,first,last)
 !..declare variables
    integer     , intent(in)    :: n,first,last
    integer     , intent(inout) :: ia(n), ja(n)
-#if C_MODE
+#if HP3D_COMPLEX
    complex(8)  , intent(inout) :: xa(n)
    complex(8)                  :: x
 #else
@@ -349,7 +349,7 @@ recursive subroutine partition_triplet_omp(ip,jp,n,k,ia,ja,xa)
    integer    , intent(in)     :: ip,jp,n
    integer    , intent(out)    :: k
    integer    , intent(inout)  :: ia(n), ja(n)
-#if C_MODE
+#if HP3D_COMPLEX
    complex(8) , intent(inout)  :: xa(n)
    complex(8)                  :: xaux
 #else
@@ -430,7 +430,7 @@ recursive subroutine qsort_triplet_omp(n,ia,ja,xa)
 !..declare variables
    integer    , intent(in)    :: n
    integer    , intent(inout) :: ia(n), ja(n)
-#if C_MODE
+#if HP3D_COMPLEX
    complex(8) , intent(inout) :: xa(n)
 #else
    real(8)    , intent(inout) :: xa(n)
@@ -492,7 +492,7 @@ subroutine assemble_double(row,val,nz,nnz)
 !
    integer       :: nz, nnz
    integer       :: row(nz)
-#if C_MODE
+#if HP3D_COMPLEX
    complex(8)    :: Val(nz)
 #else
    real(8)       :: Val(nz)
@@ -548,7 +548,7 @@ recursive subroutine qsort_double(ia,val,n,first, last)
    implicit none
    integer     :: i, j, n, k, l
    integer     :: ia(n)
-#if C_MODE
+#if HP3D_COMPLEX
    complex(8)  :: val(n), x
 #else
    real(8)     :: val(n), x

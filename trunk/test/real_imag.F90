@@ -5,7 +5,7 @@ program real_imag
 !
    integer :: NPASS
 !
-#if C_MODE
+#if HP3D_COMPLEX
    complex(8) :: a
 #else
    real(8)    :: a
@@ -15,7 +15,7 @@ program real_imag
 !
    NPASS = 1
 !
-#if C_MODE
+#if HP3D_COMPLEX
    a = (1.d0, 2.d0)
    if (dreal_part(a) .ne. 1.d0) NPASS = 0
    if (dimag_part(a) .ne. 2.d0) NPASS = 0

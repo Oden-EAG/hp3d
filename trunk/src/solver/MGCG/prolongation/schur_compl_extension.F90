@@ -173,7 +173,7 @@
    call pardiso_solve(IA,JA,SA,'H',inz,n2,1,z2)
 
 !..compute -A22^-1*A21*z1
-#if C_MODE
+#if HP3D_COMPLEX
    call ZGEMV('N',n2,n1,-ZONE,GRID(Igrid)%sch(iel)%A21,n2,z1,1,ZERO,z2,1)
 #else
    call DGEMV('N',n2,n1,-ZONE,GRID(Igrid)%sch(iel)%A21,n2,z1,1,ZERO,z2,1)

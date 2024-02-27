@@ -45,7 +45,7 @@ c
 c
       real(8), external :: dreal
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -54,7 +54,7 @@ c
       real(8), parameter :: sml  = 1.d-30
       real(8), parameter :: sml2 = 1.d-15
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(NFSOUT,*) 'SYMELM: Iel,Aidx,Flhs,Ubuf = ',Iel,Aidx
         write(NFSOUT,7001) (Flhs(iii),iii=1,10)
@@ -82,7 +82,7 @@ c pull the diagonal entry
 c
       pivot = Flhs(mp)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if(IPRPIV .eq. 1 .and. iprint .eq. 1) then
          write(NFSOUT,1000) Iel,nfw,id,pivot
  1000    format(5x,'IEL,NFW,ID,PIVOT',3i5,2e11.3)

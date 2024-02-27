@@ -7,7 +7,7 @@ subroutine verify_neig
   integer, dimension(2)  :: neig, nsid_list, norient_list
   integer :: i, j, iface, mdle, nod, nrneig, loc, ntype
 
-#if DEBUG_MODE
+#if HP3D_DEBUG
   integer :: iprint
   iprint=0
 #endif
@@ -23,7 +23,7 @@ subroutine verify_neig
         j   = nvert(ntype) + nedge(ntype) + iface
         nod = nodesl(j)
 
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
            write(*,7002) mdle, iface, nod
 7002       format(' verify_neig: mdle, iface, nod    = ',3i10)
@@ -32,7 +32,7 @@ subroutine verify_neig
 
         call neig_face(nod, nrneig,neig,nsid_list,norient_list)
 
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7003) neig(1:nrneig)
 7003      format('verify_neig: mdle NODES NEIGHBORS = ',2i10)
@@ -60,7 +60,7 @@ subroutine verify_neig
         endselect
 
      enddo
-#if DEBUG_MODE
+#if HP3D_DEBUG
      if (iprint.eq.1) call pause
 #endif
   enddo

@@ -25,14 +25,14 @@ subroutine refine(Mdle_in,Kref_in)
    integer :: nrneig, nod, nodp, mdle, mdle_loc, norient_loc, nc, icase, ntype
    logical :: iflag
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint=0
 #endif
 !
 !---------------------------------------------------------------------
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (RANK.eq.ROOT .and. iprint.ge.1) then
       write(*,*) 'refine: BEGIN Mdle_in,Kref_in,ISO = ', &
                                 Mdle_in,Kref_in,is_iso_only()
@@ -72,7 +72,7 @@ subroutine refine(Mdle_in,Kref_in)
       kref  = kref_list(n)
       ntype  = NODES(mdle)%ntype
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (RANK.eq.ROOT .and. iprint.ge.1) then
          write(*,*)'------------------------------------------------'
          write(*,7003) n,mdle,kref,S_Type(ntype)
@@ -97,7 +97,7 @@ subroutine refine(Mdle_in,Kref_in)
          i = nvert(ntype)+nedge(ntype)+iface
          nod = nodesl(i)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (RANK.eq.ROOT .and. iprint.eq.2) then
             write(*,8000) iface,nod,S_Type(NODES(nod)%ntype)
 8000        format('refine: active,iface,nod,type = ',i2,',',i9,',',a4)
@@ -198,7 +198,7 @@ subroutine refine(Mdle_in,Kref_in)
                !end select
 !           ...-------------------------------------------------------------------
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
                if (RANK.eq.ROOT .and. iprint.eq.2) then
                   write(*,8002) kreff,krefm
  8002             format(' kreff,krefm = ',6(i2,2x),',',i3)
@@ -248,7 +248,7 @@ subroutine refine(Mdle_in,Kref_in)
          endif
 !
          if (krefm.gt.0) then
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (RANK.eq.ROOT .and. iprint.ge.1) then
                write(*,7001) mdle,kref,krefm
  7001          format('refine: BREAKING mdle,kref,krefm = ',i7,', ',i3,', ',i3)

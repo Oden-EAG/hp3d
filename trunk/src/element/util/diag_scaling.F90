@@ -31,7 +31,8 @@
 !
       integer, intent(in)       :: m, n
       integer                   :: i,j,k
-#if C_MODE
+!
+#if HP3D_COMPLEX
       complex(8), intent(inout) :: GP(m*(m+1)/2)
       complex(8), intent(inout) :: B(m,n)
 #else
@@ -104,7 +105,7 @@
 
       integer, intent(in)       :: m, n
       integer                   :: i,j
-#if C_MODE
+#if HP3D_COMPLEX
       complex(8), intent(inout) :: GP(m,m)
       complex(8), intent(inout) :: B(m,n)
 #else
@@ -176,7 +177,7 @@
 
       integer, intent(in)       :: n, Nrhs, Nz, IA(Nz), JA(Nz)
       integer                   :: i,j,k
-#if C_MODE
+#if HP3D_COMPLEX
       complex(8), intent(in)    :: DA(n)
       complex(8), intent(inout) :: SA(Nz), Rhs(n,Nrhs)
 #else

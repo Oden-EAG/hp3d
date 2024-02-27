@@ -71,7 +71,7 @@ subroutine my_paraview_driver
          do icomp=1,NR_COMP(iattr)
             jcomp = jcomp+1
 !
-#if C_MODE
+#if HP3D_COMPLEX
             if (.not. PARAVIEW_COMP_REAL(jcomp) .and. &
                 .not. PARAVIEW_COMP_IMAG(jcomp)) cycle
 #else

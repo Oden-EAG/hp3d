@@ -32,7 +32,7 @@ c
       real(8) :: angle,c0,c1x,c1y,c2,c3,c4,c5,height,vbox
       integer :: i,j,nacol,nscol,nblack,ncol
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
       if (iprint.eq.1) then

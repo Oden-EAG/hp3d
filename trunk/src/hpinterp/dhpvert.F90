@@ -43,7 +43,7 @@ subroutine dhpvert(Mdle,Iflag,No,Xi,Icase,Bcond, ZdofH)
 !
    integer :: ivarH,nvarH,iphys,iload,icomp,ic
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint=0
 #endif
@@ -62,7 +62,7 @@ subroutine dhpvert(Mdle,Iflag,No,Xi,Icase,Bcond, ZdofH)
          stop
    end select
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,7020) No, Xi, x
  7020 format('dhpvert: No = ',i3,' Xi = ',3f8.3,' x = ',3f8.3)
@@ -121,7 +121,7 @@ subroutine dhpvert(Mdle,Iflag,No,Xi,Icase,Bcond, ZdofH)
 !..loop through multiple loads
    enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,7030) ZdofH(1:NRRHS*NREQNH(Icase))
  7030 format('dhpvert: ZdofH = ',10e12.5)

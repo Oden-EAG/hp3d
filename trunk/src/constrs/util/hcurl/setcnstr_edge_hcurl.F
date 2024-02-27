@@ -46,7 +46,7 @@ c
       integer :: i,j,icl,is,info
       integer :: nord,nvoid
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       real(8) :: val
       integer :: ians,nel
       integer :: iprint
@@ -58,7 +58,7 @@ c  ...clear:
 c
       nord = MAXP
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'Compute constraints wrt p = ', nord
       end if
@@ -105,7 +105,7 @@ c  ...solve the collocation system to determine the constrained
 c     approximation coefficients
 c
 c  ...invert the collocation matrix
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7010)
  7010   format('setcnstr_edge_hcurl: COLLOCATION MATRIX = ')
@@ -213,7 +213,7 @@ c
 c
 c---------------------------------------------------------------------
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c
 c  ...this is a test which should be run when installing the code
 c     on a new machine

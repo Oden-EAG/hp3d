@@ -925,7 +925,7 @@ ENDIF
           write(*,8000) ( BLOC(iphys1)%array((k1-1)*NR_COMP(iphys1)+ivar1,    &
                                             load                         ),   &
                           k1=1,Nrdofs(iphys1)/NR_COMP(iphys1)               )
-#if C_MODE
+#if HP3D_COMPLEX
  8000     format(24(2e11.4,1x))
 #else
  8000     format(16(e12.5,1x))

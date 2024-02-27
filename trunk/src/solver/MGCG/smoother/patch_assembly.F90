@@ -321,7 +321,7 @@
                      endif
                      if (i .le. j) then
                         ij = nk(i,j)
-#if C_MODE
+#if HP3D_COMPLEX
                         if (k2 .ge. k1 ) then
                            GRID(Igrid)%ptch(ip)%zAp(ij) = GRID(Igrid)%ptch(ip)%zAp(ij) &
                                                         + GRID(Igrid)%dloc(iel)%zstiff(kk)
@@ -344,7 +344,7 @@
 !  ...end of loop through mdle nodes with in the patch
       enddo
 !
-#if C_MODE
+#if HP3D_COMPLEX
       call ZPPTRF('U', nrdof, GRID(Igrid)%ptch(ip)%zAp, info)
 #else
       call DPPTRF('U', nrdof, GRID(Igrid)%ptch(ip)%zAp, info)

@@ -1,4 +1,4 @@
-#if DEBUG_MODE
+#if HP3D_DEBUG
 
 !> @brief Recovers mesh from history file
 !> @note For testing and debugging only

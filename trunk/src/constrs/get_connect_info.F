@@ -44,7 +44,7 @@ c  ...miscellanea
       integer :: iref,ireff,iref1,iref2,iref3,iref_fath
       integer :: nef,nff,nvf,nod,nodp,nort,nson,nrnodes
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -55,7 +55,7 @@ c
 c  ...initialize variables like this or OpenMP will not work!
       ireff=0; is1=0;
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7000) Mdle
  7000   format('get_connect_info: Mdle = ',i6)
@@ -66,7 +66,7 @@ c
       INFO_CONSTRAINTS=1
       call elem_nodes(Mdle, Nodesl,Norientl)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         call elem_show(Mdle, NODES(Mdle)%ntype,Nodesl,Norientl)
       endif
@@ -114,14 +114,14 @@ c
 c
 c  .......parent edge node
           if (jp.le.nvf+nef) then
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iprint.eq.1) then
               write(*,7021) j,jp,is
  7021         format('get_connect_info: 1: j,jp,is = ',3i5)
             endif
 #endif
             call rotate_edge(FATH_ORIENT(jp),is,nort)
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iprint.eq.1) then
               write(*,7022) j,jp,is
  7022         format('get_connect_info: 2: j,jp,is = ',3i5)
@@ -129,7 +129,7 @@ c  .......parent edge node
 #endif
 c            nod = NODES(nodp)%sons(is)
             nod = Son(nodp,is)
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iprint.eq.1) then
               write(*,7023) nodp,nod,NODES(nod)%act
  7023         format('get_connect_info: nodp,nod,NODES(nod)%act = ',
@@ -168,7 +168,7 @@ c
 c  .........face edge and vertex nodes numbers
             call face_to_edge(ftype,ifc, jef(1),jef(2),jef(3),jef(4))
             call face_to_vert(ftype,ifc, jvf(1),jvf(2),jvf(3),jvf(4))
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iprint.eq.1) then
               write(*,7100) j,jp,ifc,iref,ireff
  7100         format('get_connect_info: j,jp,ifc,iref,ireff = ',5i4)
@@ -182,7 +182,7 @@ c  .........triangular parent face
               call rotate_trian(iref,ireff,FATH_ORIENT(jp),is,nort)
 c              nod = NODES(nodp)%sons(is)
               nod = Son(nodp,is)
-#if DEBUG_MODE
+#if HP3D_DEBUG
               if (iprint.eq.1) then
                 write(*,7101) nodp,is,nod,NODES(nod)%act
  7101           format('get_connect_info: nodp,is,nod,NODES(nod)%act =',
@@ -278,7 +278,7 @@ c
         endif
       enddo
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7011) Mdle
  7011   format('get_connect_info: CONSTRAINED NODES FOR Mdle = ',i6)
@@ -349,7 +349,7 @@ c
       integer, external :: imod
 ccc      imod(j,mod) = j-(j-1)/mod*mod
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 c

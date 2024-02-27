@@ -7,7 +7,7 @@ program test_near
 !
    real(8) :: a,b
 !
-#if C_MODE
+#if HP3D_COMPLEX
    complex(8) :: c,d
 #else
    real(8) :: c,d
@@ -29,7 +29,7 @@ program test_near
 !
 !
 !  Test: znear
-#if C_MODE
+#if HP3D_COMPLEX
    c = (1.d0,-1.d0)
    d = (1.d0,-1.d0)
    if (.not. znear(c,d)) NPASS = 0

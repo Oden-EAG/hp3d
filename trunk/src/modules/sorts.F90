@@ -219,7 +219,7 @@ module sorts
 !..declare variables
       integer     , intent(in)    :: n,first,last
       integer     , intent(inout) :: ia(n), ja(n)
-#if C_MODE
+#if HP3D_COMPLEX
       complex(8)  , intent(inout) :: xa(n)
       complex(8)                  :: x
 #else
@@ -270,7 +270,7 @@ module sorts
       integer    , intent(in)     :: ip,jp,n
       integer    , intent(out)    :: k
       integer    , intent(inout)  :: ia(n), ja(n)
-#if C_MODE
+#if HP3D_COMPLEX
       complex(8) , intent(inout)  :: xa(n)
       complex(8)                  :: xaux
 #else
@@ -335,7 +335,7 @@ recursive subroutine qsort_triplet_omp(n,ia,ja,xa)
 !..declare variables
    integer    , intent(in)    :: n
    integer    , intent(inout) :: ia(n), ja(n)
-#if C_MODE
+#if HP3D_COMPLEX
    complex(8) , intent(inout) :: xa(n)
 #else
    real(8)    , intent(inout) :: xa(n)
@@ -393,7 +393,7 @@ recursive subroutine qsort_triplet_omp(n,ia,ja,xa)
 !
       integer     :: i, j, n, k, l
       integer     :: ia(n)
-#if C_MODE
+#if HP3D_COMPLEX
       complex(8)  :: val(n), x
 #else
       real(8)     :: val(n), x

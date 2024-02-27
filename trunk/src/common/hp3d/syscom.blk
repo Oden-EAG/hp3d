@@ -1,4 +1,4 @@
-#if C_MODE
+#if HP3D_COMPLEX
       implicit real(8) (a-h,o-y), complex(8) (z)
 #else
       implicit real(8) (a-h,o-z)

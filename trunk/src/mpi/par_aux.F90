@@ -159,7 +159,7 @@ subroutine repartition_fiber(Subd_next)
       endif
    enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (RANK.eq.ROOT) then
       do i=1,NUM_PROCS
          write(*,130) 'rank, x3_subd = ', i-1,x3_subd(i)

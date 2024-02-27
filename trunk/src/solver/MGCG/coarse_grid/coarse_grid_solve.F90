@@ -72,7 +72,7 @@
       mumps_par%RHS = rhs_coarse
 !
       mumps_par%JOB = 3
-#if C_MODE
+#if HP3D_COMPLEX
       call zmumps(mumps_par)
 #else
       call dmumps(mumps_par)

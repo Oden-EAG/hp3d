@@ -17,14 +17,14 @@ subroutine refresh
    integer :: i,iel,nod,nfath,nvef,mdle
    integer :: nrdofH,nrdofE,nrdofV,nrdofQ
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint=0
 #endif
 !
 !--------------------------------------------------------------------
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,*) 'refresh: Begin'
    endif
@@ -201,7 +201,7 @@ subroutine distr_refresh()
 !
    integer :: iel,mdle,nod,subd
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint=0
 #endif
@@ -237,7 +237,7 @@ subroutine distr_refresh()
 !     ...delete solution degrees of freedom
          call dealloc_nod_dof(nod)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
 !     ...print nodes that had previously been incorrectly marked
          if ((iprint.eq.1) .and. associated(NODES(nod)%dof)) then
             !$OMP CRITICAL
@@ -252,7 +252,7 @@ subroutine distr_refresh()
 !        ...allocate solution degrees of freedom (see Remark 2)
             call alloc_nod_dof(nod)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
 !        ...print active subd nodes that had previously not been allocated
             if (iprint.eq.1) then
                !$OMP CRITICAL

@@ -122,7 +122,7 @@ subroutine elem_residual_heat(Mdle,                &
 !
    integer, external :: ij_upper_to_packed
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint = 0
 #endif
@@ -152,7 +152,7 @@ subroutine elem_residual_heat(Mdle,                &
 !..determine solution dof
    call solelm(Mdle, zdofH,zdofE,zdofV,zdofQ)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,7020) xnod(1,1:8),xnod(2,1:8),xnod(3,1:8)
 7020  format('elem_residual_heat: xnod  = ',8(f8.3,2x), &
@@ -186,7 +186,7 @@ subroutine elem_residual_heat(Mdle,                &
 !  ...determine element H1 shape functions
       call shape3DH(etype,xi,norder,norient_edge,norient_face, &
                     nrdof,shapH,gradH)
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (nrdof .ne. NrdofH) then
          write(*,*) 'elem_residual_heat: INCONSISTENCY NrdofH. stop.'
          stop
@@ -195,7 +195,7 @@ subroutine elem_residual_heat(Mdle,                &
 !
 !  ...determine discontinuous H1 shape functions
       call shape3HH(etype,xi,nordP, nrdof,shapHH,gradHH)
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (nrdof .ne. NrdofHH) then
          write(*,*) 'elem_residual_heat: INCONSISTENCY NrdofHH. stop.'
          stop
@@ -314,7 +314,7 @@ subroutine elem_residual_heat(Mdle,                &
 !
 !     ...determine discontinuous H1 shape functions
          call shape3HH(etype,xi,nordP, nrdof,shapHH,gradHH)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (nrdof .ne. NrdofHH) then
             write(*,*) 'elem_residual_heat: INCONSISTENCY NrdofHH. stop.'
             stop
@@ -324,7 +324,7 @@ subroutine elem_residual_heat(Mdle,                &
 !     ...determine element H1 shape functions (for geometry)
          call shape3DH(etype,xi,norder,norient_edge,norient_face, &
                        nrdof,shapH,gradH)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (nrdof .ne. NrdofH) then
             write(*,*) 'elem_residual_heat: INCONSISTENCY NrdofH. stop.'
             stop
@@ -334,7 +334,7 @@ subroutine elem_residual_heat(Mdle,                &
 !     ...determine element Hdiv shape functions (for fluxes)
          call shape3DV(etype,xi,norder,norient_face, &
                        nrdof,shapV,divV)
-#if DEBUG_MODE
+#if HP3D_DEBUG
          if (nrdof .ne. NrdofV) then
             write(*,*) 'elem_residual_heat: INCONSISTENCY NrdofV. stop.'
             stop
@@ -365,7 +365,7 @@ subroutine elem_residual_heat(Mdle,                &
       enddo
    enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.ge.1) then
       write(*,7015) bload_H(1:NrTest)
 7015  format('elem_residual_heat: FINAL bload_H = ',10(/,10(e12.5,2x)))
@@ -402,7 +402,7 @@ subroutine elem_residual_heat(Mdle,                &
    enddo
    Nref_flag = 111
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.ge.1) then
       write(*,7010) Mdle, Resid
  7010 format('elem_residual_heat: Mdle, Resid = ',i5,3x,e12.5)

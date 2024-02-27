@@ -39,7 +39,7 @@ subroutine nodgen(Ntype,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
 !
    integer :: ndofH,ndofE,ndofV,ndofQ,nvar
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: ncase(NR_PHYSA)
    integer :: ibcnd(NRINDEX_HEV)
    integer :: iprint
@@ -48,7 +48,7 @@ subroutine nodgen(Ntype,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
 !
 !-----------------------------------------------------------------------
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,7000) S_Type(Ntype),Icase,Nbcond,Nfath,Norder,Iact
  7000 format(' nodgen: Type,Icase,Nbcond,Nfath,Norder,Iact = ', &
@@ -93,7 +93,7 @@ subroutine nodgen(Ntype,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
    call find_ndof(Nod, ndofH,ndofE,ndofV,ndofQ)
 !
 !..printing
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,7005) Nod,ndofH,ndofE,ndofV,ndofQ
  7005 format(' nodgen: Nod = ',i10,' ndofH,ndofE,ndofV,ndofQ = ',4i4)
@@ -147,7 +147,7 @@ subroutine nodgen(Ntype,Icase,Nbcond,Nfath,Norder,Subd,Iact, Nod)
 !..activation flag
    NODES(Nod)%act=Iact
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.eq.1) then
       write(*,*) 'nodgen: Nod ',Nod,'HAS BEEN GENERATED'
       write(*,*) '        Type ',S_Type(Ntype), ', Norder = ',Norder

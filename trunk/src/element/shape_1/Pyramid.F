@@ -66,7 +66,7 @@ c
       double precision :: phiTri(2:Nsize(1)-1,1:Nsize(1)-2)
       double precision :: DphiTri(3,2:Nsize(1)-1,1:Nsize(1)-2)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...debugging flag
       integer :: iprint
       iprint=0
@@ -242,7 +242,7 @@ c
 c  ...give total degrees of freedom
       NrdofH = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001) Xi(1:3),Nord(1:14),NoriE(1:8),NoriF(1:5)
@@ -385,7 +385,7 @@ c
       double precision :: DMubMExEE(3),DMuZxEQuad(3),DMubTFxETri(3)
       double precision :: tmp,vectmp(3),DphiQuadxDMuZ(3)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...debugging flag
       integer :: iprint
       iprint=0
@@ -646,7 +646,7 @@ c
 c  ...give total degrees of freedom
       NrdofE = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001)Xi(1:3),Nord(1:14),NoriE(1:8),NoriF(1:5),NrdofE
@@ -817,7 +817,7 @@ c
       double precision :: vectmp(3),vectmp1(3),vectmp2(3)
       double precision :: DMuZVQuad,DphiQuadxDMuZ(3)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...debugging flag
       integer :: iprint
       iprint=0
@@ -1069,7 +1069,7 @@ c
 c  ...total degrees of freedom
       NrdofV = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001)Xi(1:3),Nord(1:14),NoriF(1:5),NrdofV
@@ -1194,7 +1194,7 @@ c
       double precision :: MuZ(0:1),DMuZ(3,0:1)
       double precision :: homP(0:Nsize(1)-1,3)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...debugging flag
       integer :: iprint
       iprint=0
@@ -1238,7 +1238,7 @@ c
 c  ...give total degrees of freedom
       NrdofQ = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001) Xi(1:3),Nord(14)

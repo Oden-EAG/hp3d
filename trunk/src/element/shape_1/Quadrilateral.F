@@ -52,7 +52,7 @@ c
       double precision :: phiQuad(2:Nsize(1),2:Nsize(1))
       double precision :: DphiQuad(2,2:Nsize(1),2:Nsize(1))
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...debugging flag
       integer :: iprint
       iprint=0
@@ -134,7 +134,7 @@ c
 c  ...give total degrees of freedom
       NrdofH = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.eq.1) then
         write(*,7001) Xi(1:2),Nord(1:5),NoriE(1:4)
@@ -221,7 +221,7 @@ c
       double precision :: EQuad(2,0:Nsize(1)-1,2:Nsize(1))
       double precision :: curlEQuad(0:Nsize(1)-1,2:Nsize(1))
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...debugging flag
       integer :: iprint
       iprint=0
@@ -304,7 +304,7 @@ c
 c  ...give total degrees of freedom
       NrdofE = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.eq.1) then
         write(*,7001) Xi(1:2),Nord(1:5),NoriE(1:4)
@@ -386,7 +386,7 @@ c
       double precision :: shapE(2,Nsize(2))
       integer          :: m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: j,e,ndofE,nordF(2),ndofF(0:1)
 c  ...debugging flag
       integer :: iprint
@@ -403,7 +403,7 @@ c  ...'rotate' shape functions
         ShapV(2,m) = -shapE(1,m)
       end do
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.eq.1) then
         write(*,7001) Xi(1:2),Nord(1:5),NoriE(1:4)
@@ -478,7 +478,7 @@ c
       double precision :: Mu(0:1,2),DMu(2,0:1,2)
       double precision :: homP(2,0:Nsize(1)-1)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...debugging flag
       integer :: iprint
       iprint=0
@@ -517,7 +517,7 @@ c
 c  ...give total degrees of freedom
       NrdofQ = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.eq.1) then
         write(*,7001) Xi(1:2),Nord(5)

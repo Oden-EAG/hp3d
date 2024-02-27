@@ -44,7 +44,7 @@ c
       integer :: ie,iel,ip,j,icase,nc,mdle,ntype,nrv,nre,nrf
       integer :: nod,nodp,newp,newph,newpv,nord,nordh,nordv,nordm
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 c
@@ -273,7 +273,7 @@ c
 c  .....the middle node has to be modified
         if (NODES(mdle)%visit.eq.1) then
           call element_middle_node_order(Mdle,norientl,norder, nordm)
-#if DEBUG_MODE
+#if HP3D_DEBUG
           if (iprint.eq.1) then
             write(*,7050) mdle,nordm
  7050       format('perform_pref: REFINING mdle = ',i6,' new p = ',i3)

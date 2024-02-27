@@ -32,7 +32,7 @@ subroutine decode_orderb(Norderb, Nord1,Nord2,Nord3)
    Nord1 = naux/(MAXP+1)
    Nord2 = naux-Nord1*(MAXP+1)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (Nord1<1.or.Nord1>MAXP) then
       write(*,*)'decode_orderb: OUT OF RANGE Nord1 = ',Nord1
       stop
@@ -82,7 +82,7 @@ subroutine decode_orderq(Norderq, Nord1,Nord2)
    Nord1 = Norderq/(MAXP+1)
    Nord2 = Norderq-Nord1*(MAXP+1)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (Nord1<1.or.Nord1>MAXP) then
       write(*,*)'decode_orderq: OUT OF RANGE Nord1 = ',Nord1
       stop

@@ -46,7 +46,7 @@ c
       real(8), parameter :: dzero = 0.0d0
       real(8), parameter :: sml2  = 1.d-15
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -67,7 +67,7 @@ c pull the diagonal entry
 c
       pivot = Flhs(mp)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if(IPRPIV .eq. 1 .and. iprint .eq. 1) then
          write(NFSOUT,7000)  Iel,NFW,id,pivot
  7000    format(5x,'IEL,NFW,ID,PIVOT',3i5,1pe11.3)

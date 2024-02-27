@@ -18,7 +18,7 @@ integer function ij_upper_to_packed(I,J)
 !
    integer, intent(in) :: I,J
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (I < 1 .or. I > J) then
       write(*,*) 'ij_upper_to_packed: I,J = ',I,J
       stop
@@ -51,7 +51,7 @@ integer function ij_lower_to_packed(I,J,N)
 !
    integer, intent(in) :: I,J,N
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (J > I .or. I > N) then
       write(*,*) 'ij_lower_to_packed: I,J,N = ',I,J,N
       stop

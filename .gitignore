@@ -13,6 +13,7 @@ fort.20
 *~
 m_options
 log.txt
+*__genmod.f90
 
 # Data files
 history

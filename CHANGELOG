@@ -1,0 +1,29 @@
+
+=================
+Version 1.0 (dev)
+=================
+
+- Renamed preprocessor flags:
+  `C_MODE` --> `HP3D_COMPLEX`, `DEBUG_MODE` --> `HP3D_DEBUG`
+
+- Added preprocessor flag `HP3D_USE_X11` and `HP3D_USE_MPI_F08`
+
+- Added CI via GitHub actions for Linux and macOS.
+
+- New default configuration files in `m_options_linux` and `m_options_macos`. 
+  Both m_options files use PETSc's configuration for setting compiler options,
+  library paths, and include paths. The user only needs to provide the
+  corresponding PETSC_DIR and PETSC_ARCH.
+
+- Introduced global parameter `MAX_NRINDEX_HEV=31` used for binary-encoding
+  Dirichlet flags of (at most 31) H1, H(div), and H(curl) components.
+  This parameter replaces the previous global parameter MAX_NRINDEX.
+
+==========================================
+Version 1.0-beta, released on Sep 24, 2023
+==========================================
+
+- Release tag: 
+  https://github.com/Oden-EAG/hp3d/releases/tag/v1.0-beta
+
+- Initial pre-release.

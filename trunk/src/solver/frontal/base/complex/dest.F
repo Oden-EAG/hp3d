@@ -39,14 +39,14 @@ c
 c
       integer :: i,j,km,kn,l,ldest,m,n,ndi,ndl,ne
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
 #endif
 c
       integer :: modr
       modr(i,j) = i - (i/j)*j
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       iprint = 0
       if (iprint.eq.1) then
         write(NFSOUT,*) 'DEST: Nd, Aldest = ',Nd

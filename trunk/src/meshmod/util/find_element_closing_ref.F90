@@ -22,7 +22,7 @@ subroutine find_element_closing_ref(Ntype,Kreff,Krefe, Kref)
 
   integer :: i, j, isum, ipass, iref, kref_trial
   !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   integer :: iprint
   iprint=0
 #endif
@@ -68,7 +68,7 @@ subroutine find_element_closing_ref(Ntype,Kreff,Krefe, Kref)
      endif
   enddo
   !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
      write(*,7001) S_Type(Ntype)
      write(*,7002) Kreff(1:nface(Ntype))

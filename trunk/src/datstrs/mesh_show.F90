@@ -1,4 +1,4 @@
-#if DEBUG_MODE
+#if HP3D_DEBUG
 
 !> Purpose : show the mesh data structure
 subroutine mesh_show

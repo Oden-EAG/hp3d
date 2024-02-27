@@ -55,7 +55,7 @@ c
       double precision :: homLbet(3:Nsize(1)-1,1:Nsize(1)-3)
       double precision :: DhomLbet(3,3:Nsize(1)-1,1:Nsize(1)-3)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...debugging flag
       integer :: iprint
       iprint=0
@@ -178,7 +178,7 @@ c
 c  ...give total degrees of freedom
       NrdofH = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001) X(1:3),Nord(1:11),
@@ -286,7 +286,7 @@ c
       double precision :: DhomLbet(1:3,1:Nsize(1)-1,1:Nsize(1)-1)
       double precision :: DhomLbetxETri(3)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...debugging flag
       integer :: iprint
       iprint=0
@@ -422,7 +422,7 @@ c
 c  ...give total degrees of freedom
       NrdofE = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001) X(1:3),Nord(1:11),
@@ -531,7 +531,7 @@ c
       double precision :: DhomLbet(3,0:Nsize(1)-2,1:Nsize(1)-1)
       double precision :: DhomLbetVTri
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...debugging flag
       integer :: iprint
       iprint=0
@@ -631,7 +631,7 @@ c
 c  ...give total degrees of freedom
       NrdofV = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001) X(1:3),Nord(7:11),NoriF(1:4)
@@ -714,7 +714,7 @@ c
       double precision :: homPal(0:Nsize(1)-1,0:Nsize(1)-1)
       double precision :: homPbet(0:Nsize(1)-1,0:Nsize(1)-1)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...debugging flag
       integer :: iprint
       iprint=0
@@ -768,7 +768,7 @@ c
 c  ...give total degrees of freedom
       NrdofQ = m
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001) X(1:3),Nord(11)

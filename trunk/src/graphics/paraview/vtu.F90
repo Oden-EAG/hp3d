@@ -33,7 +33,7 @@ subroutine write_VTU_geom(IcE)
    character(len=4)        :: suffix
 !
 !..Export both real- and imaginary-part for complex solutions
-#if C_MODE
+#if HP3D_COMPLEX
    npart = 2
 #else
    npart = 1

@@ -96,7 +96,7 @@ subroutine dhpfaceV(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !
 ! load vector and solution
   VTYPE,   dimension(MAXmdlqV,MAXEQNV)  :: zbV,zuV
-#if C_MODE
+#if HP3D_COMPLEX
   real(8), dimension(MAXmdlqV,MAXEQNV)  :: uV_real,uV_imag
 #endif
 !
@@ -110,7 +110,7 @@ subroutine dhpfaceV(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !
   logical :: is_homD
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   integer :: iprint
   iprint=0
 #endif
@@ -119,7 +119,7 @@ subroutine dhpfaceV(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !
   nrv = nvert(Ntype); nre = nedge(Ntype); nrf = nface(Ntype)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
      write(*,7010) Mdle,Iflag,No,Icase,Iface,S_Type(Ntype)
 7010 format('dhpfaceV: Mdle,Iflag,No,Icase,Iface,Type = ',5i4,2x,a4)
@@ -156,7 +156,7 @@ subroutine dhpfaceV(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
   call initiate_order(Ntype, norder_1)
   norder_1(nre+Iface) = Norder(nre+Iface)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
      write(*,7060) norder_1; call pause
 7060 format('dhpfaceV: norder_1 = ',20i4)
@@ -278,7 +278,7 @@ subroutine dhpfaceV(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 ! end of loop through integration points
   enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
     write(*,*) 'dhpfaceV: LOAD VECTOR AND STIFFNESS MATRIX FOR ', &
                'ndofV_face = ',ndofV_face
@@ -286,13 +286,13 @@ subroutine dhpfaceV(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
       write(*,7015) j, zbV(j,1:MAXEQNV)
       write(*,7016) aaV(j,1:ndofV_face)
     enddo
-# if C_MODE
-7015    format(i5, 6(2e10.3,2x))
-# else
-7015    format(i5, 10e12.5)
-# endif
-7016    format(10e12.5)
   endif
+#if HP3D_COMPLEX
+  7015 format(i5,2x,6(2e10.3,2x))
+#else
+  7015 format(i5,2x,10e12.5)
+#endif
+  7016 format(10e12.5)
 #endif
 !
 !-----------------------------------------------------------------------
@@ -308,7 +308,7 @@ subroutine dhpfaceV(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 ! copy load vector
   zuV(1:ndofV_face,:) = zbV(1:ndofV_face,:)
 !
-#if C_MODE
+#if HP3D_COMPLEX
 ! apply pivots to load vector
   call zlaswp(MAXEQNV,zuV,naV,1,ndofV_face,ipivV,1)
 !
@@ -331,7 +331,7 @@ subroutine dhpfaceV(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
   call dtrsm('L','U','N','N',ndofV_face,MAXEQNV,1.d0,aaV,naV, zuV,naV)
 #endif
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
   if (iprint.eq.1) then
    write(*,*) 'dhpfaceV: k,zu(k) = '
    do k=1,ndofV_face
@@ -344,7 +344,7 @@ subroutine dhpfaceV(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !  ...save the DOFs, skipping irrelevant entries
   100 continue
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'dhpfaceV: ncase = ', ncase
       endif
@@ -399,7 +399,7 @@ subroutine dhpfaceV(Mdle,Iflag,No,Etav,Ntype,Icase,Bcond,   &
 !  ...loop through multiple loads
       enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) call result
 #endif
 !

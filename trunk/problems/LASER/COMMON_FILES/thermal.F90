@@ -375,7 +375,7 @@ subroutine comp_elem_avgTemp(Mdle, ElemTemp,ElemVol)
 !  ...Jacobian
       call geom(dxdxi, dxidx,rjac,iflag)
       weight = wa*rjac
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iflag .ne. 0) then
         write(*,*) 'comp_elem_avgTemp: geom iflag != 0. Mdle,rjac = ',Mdle,rjac
       endif

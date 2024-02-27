@@ -43,7 +43,7 @@ subroutine get_index(Nod, Indexd)
 !..misc
    integer :: ic,iphys,ivar
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint=0
 #endif
@@ -141,7 +141,7 @@ subroutine get_index(Nod, Indexd)
       stop
    endif
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7010) nod,ncase(1:NR_PHYSA)
  7010   format('get_index: nod = ',i8,' ncase = ',10i2)

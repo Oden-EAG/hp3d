@@ -7,8 +7,8 @@ HP3D_BASE_PATH  = /home/stefan/hp3D/LIBS/hp3d/trunk
 #------------------------------------------------------------------
 # PREPROCESSOR VARIABLES
 #------------------------------------------------------------------
-COMPLEX ?= 0
-DEBUG   ?= 0
+HP3D_COMPLEX ?= 0
+HP3D_DEBUG   ?= 0
 
 # Dependencies
 HP3D_USE_INTEL_MKL ?= 0
@@ -39,12 +39,12 @@ endif
 #FFLAGS += -Wpedantic
 
 # Optimization flags
-ifeq ($(DEBUG),0)
+ifeq ($(HP3D_DEBUG),0)
   FFLAGS += -O3
 endif
 
 # Debug flags
-ifeq ($(DEBUG),1)
+ifeq ($(HP3D_DEBUG),1)
   FFLAGS += -Og -g -fbacktrace -fcheck=all
 endif
 
@@ -81,7 +81,7 @@ MKL_INCS = -I/opt/intel/mkl/include
 # also adding Zoltan library dependence
 # also adding PETSC library dependence (petsc needs phdf5)
 
-ifeq ($(COMPLEX),1)
+ifeq ($(HP3D_COMPLEX),1)
   PETSC_LIB = /home/stefan/hp3D/LIBS/petsc-3.13.5/arch-debian-complex/lib
   PETSC_INC = /home/stefan/hp3D/LIBS/petsc-3.13.5/arch-debian-complex/include
 else
@@ -133,7 +133,7 @@ SRC_PATH          = src
 MODULE_PATH       = module
 LIB_PATH          = lib
 
-ifeq ($(COMPLEX),1)
+ifeq ($(HP3D_COMPLEX),1)
   HP3D_PATH       = $(HP3D_PATH_COMPLEX)
   OBJ_PATH        = $(OBJ_PATH_COMPLEX)
 else
@@ -202,7 +202,7 @@ PROB_INCS    += $(HP3D_LINK_INCS)   \
 # Files with ending in .F and .F90 (not .f and .f90)
 # are preprocessed according to certain directives
 
-PROB_PP_DEFS  = -D"C_MODE=$(COMPLEX)" \
-                -D"DEBUG_MODE=$(DEBUG)" \
+PROB_PP_DEFS  = -D"HP3D_COMPLEX=$(HP3D_COMPLEX)" \
+                -D"HP3D_DEBUG=$(HP3D_DEBUG)" \
                 -D"HP3D_USE_OPENMP=$(HP3D_USE_OPENMP)" \
                 -D"HP3D_USE_INTEL_MKL=$(HP3D_USE_INTEL_MKL)"

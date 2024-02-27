@@ -41,7 +41,7 @@
 !
       implicit none
 !
-#if C_MODE
+#if HP3D_COMPLEX
       select case(PRDS_TYPE)
       case('S')
          PRDS_MTYPE   = 6  ! complex symmetric

@@ -24,7 +24,7 @@ c
       integer :: i,index,ir,j,l
       real(8) :: q
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: ii
       integer :: iprint
       iprint=0
@@ -52,7 +52,7 @@ c  ...start sorting (heapsort algorithm)
         ir = ir - 1
         if (ir.eq.1) then
           IGTR(1) = index
-#if DEBUG_MODE
+#if HP3D_DEBUG
           if (iprint.eq.1) then
             write(*,7001) (IGTR(ii),ii=1,NRVISTR)
  7001       format(20i6)

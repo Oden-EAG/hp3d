@@ -30,7 +30,7 @@ subroutine find_curve_to_block(Nc,Maxbl, Nrbl,Neigbl)
 !
       integer :: if,is,lab,nf,num
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 !
@@ -44,7 +44,7 @@ subroutine find_curve_to_block(Nc,Maxbl, Nrbl,Neigbl)
 !  ...loop through figures adjacent to the curve
       do if=1,CURVES(Nc)%NrFig
         call decode(abs(CURVES(Nc)%FigNo(if)), nf,lab)
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7002) if,CURVES(Nc)%FigNo(if),nf,lab
  7002     format('if,CURVES(Nc)%FigNo(if),nf,lab = ',i2,i8,2x,i8,i2)
@@ -89,7 +89,7 @@ subroutine find_curve_to_block(Nc,Maxbl, Nrbl,Neigbl)
           enddo
         end select
       enddo
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) call pause
 #endif
 !

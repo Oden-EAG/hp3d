@@ -39,7 +39,7 @@ subroutine exact_geom(Mdle,Xi, X,Dxdxi)
       integer :: iflag, i, j, k, no
       integer :: ntype
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -63,7 +63,7 @@ subroutine exact_geom(Mdle,Xi, X,Dxdxi)
         enddo
       enddo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) Mdle,iflag,no
 7001    format('exact_geom: Mdle = ',i5,' iflag,no  = ',2i4,' etav = ')

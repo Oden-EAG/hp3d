@@ -38,7 +38,7 @@ c
 c
       integer :: icart
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
       if (iprint.eq.1) then

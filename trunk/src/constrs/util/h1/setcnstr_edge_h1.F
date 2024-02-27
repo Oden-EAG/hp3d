@@ -47,7 +47,7 @@ c
       integer :: i,j,icl,info,jbeg,jp,jpbeg,jpend
       integer :: n,nord,ndofh,nrb,nrs
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       real(8) :: val
       integer :: ians,nel
       integer :: iprint
@@ -103,7 +103,7 @@ c  ...number of unknowns
       n = nord+1
 c
 c  ...invert the collocation matrix
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7010)
  7010   format('setcnstr_edge_h1: COLLOCATION MATRIX = ')
@@ -244,7 +244,7 @@ c
 c
 c---------------------------------------------------------------------
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
 c
 c  ...this is a test which should be run when installing the code
 c     on a new machine

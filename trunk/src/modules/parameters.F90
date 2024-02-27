@@ -155,7 +155,7 @@ module parameters
 !..real parameters
    real(8)   , parameter :: rZERO = 0.d0
    real(8)   , parameter :: rONE  = 1.d0
-#if C_MODE
+#if HP3D_COMPLEX
    complex(8), parameter :: ZERO = (0.d0,0.d0)
    complex(8), parameter :: ZONE = (1.d0,0.d0)
    complex(8), parameter :: ZEYE = (1.d0,0.d0)

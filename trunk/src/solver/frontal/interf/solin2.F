@@ -44,7 +44,7 @@ c  ...number of variables for each physics attribute for an element
 c
       integer :: mdle,i,nrdofm,nrdofc,nrnodm
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -64,7 +64,7 @@ c  .....find the element number using the standard ordering of elements
         enddo
       endif
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) Iel,mdle
  7001   format('solin2: Iel,mdle = ',i8,i10)
@@ -84,7 +84,7 @@ c  ...evaluate the element load vector and stiffness matrix
      .           Zarhs,Zalhs)
       endif
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
          write(*,*)'Element',mdle,'RHS'
          do i=1,nrdofc

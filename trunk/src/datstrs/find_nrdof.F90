@@ -1,4 +1,4 @@
-#if DEBUG_MODE
+#if HP3D_DEBUG
 
 !------------------------------------------------------------------------------
 !> Purpose : total number of H1,H(curl),H(div),L2 dof for a SINGLE

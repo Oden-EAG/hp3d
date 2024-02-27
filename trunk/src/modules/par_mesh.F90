@@ -49,7 +49,7 @@ subroutine distr_mesh()
    integer :: nrnodm, nrdof_nod
    real(8) :: start_time,end_time
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint=0
 !
@@ -126,7 +126,7 @@ subroutine distr_mesh()
 !        ...3e. pack buffer with DOF data
             call pack_dof_buf(nod,nrdof_nod, buf)
 !        ...3f. send buffer to new subdomain
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iprint .eq. 1) then
                write(6,130) '[', RANK, ']: ', &
                   'Sending data to [',subd_next(iel),'], nod = ',nod
@@ -141,7 +141,7 @@ subroutine distr_mesh()
 !     ...3d. if new subdomain is my subdomain, receive data
          else if (subd_next(iel) .eq. RANK) then
 !        ...3e. receive buffer from old subdomain
-#if DEBUG_MODE
+#if HP3D_DEBUG
             if (iprint .eq. 1) then
                write(6,130) '[', RANK, ']: ',   &
                   'Receiving data from [',subd,'], nod = ',nod
@@ -216,7 +216,7 @@ subroutine distr_mesh()
       call update_Ddof
    endif
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint .eq. 1) then
       write(6,100) 'end   distr_mesh, DISTRIBUTED = .true.'
    endif

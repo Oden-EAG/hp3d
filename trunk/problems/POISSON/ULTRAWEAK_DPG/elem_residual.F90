@@ -196,7 +196,7 @@ subroutine elem_residual_poisson_UW(Mdle,                                     &
 !
    integer, external :: ij_upper_to_packed
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    integer :: iprint
    iprint = 0
 #endif
@@ -489,7 +489,7 @@ subroutine elem_residual_poisson_UW(Mdle,                                     &
 !..set recommended h-refinement flag for this hexa element
    Nref_flag = 111
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    if (iprint.ge.1) then
       write(*,7010) Mdle, Resid
  7010 format('elem_residual_poisson: Mdle, Resid = ',i5,3x,e12.5)

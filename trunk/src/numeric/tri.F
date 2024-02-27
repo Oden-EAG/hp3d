@@ -29,7 +29,7 @@ c
 c
       real(8), parameter :: eps = 1.0d-15
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -39,7 +39,7 @@ c
 c
 c.....eliminate degree of freedom i
       do i=1,m1
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7001) i,a(i,i)
  7001     format('tri: i,a(i,i) = ',i3,e12.5)
@@ -68,7 +68,7 @@ c  .......skip if the leading coefficient is zero
       enddo
 c
 c  ...write out the last pivot
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) m,a(m,m)
       endif

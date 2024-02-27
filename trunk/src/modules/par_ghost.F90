@@ -405,7 +405,7 @@ contains
 !
    call bitvisit_finalize
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
    call check_ghost_elems
    call check_interf_elems
 #endif

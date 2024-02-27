@@ -28,7 +28,7 @@
 !
       implicit none
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       common /ccopy_dofG/ iprint_copy_dofG
       common /ccopy_dofH/ iprint_copy_dofH
       common /ccopy_dofE/ iprint_copy_dofE
@@ -56,7 +56,7 @@
                  ndofH ,ndofE ,ndofV ,ndofQ,    &
                  ndofHo,ndofEo,ndofVo,ndofQo
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
       iprint_copy_dofG=iprint
@@ -69,7 +69,7 @@
       ntype = NODES(Nod)%ntype
       nordo = NODES(Nod)%order
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
          write(*,7010) Nod,S_Type(ntype),nordo,icase
  7010    format('nodmod: Nod,type,order,icase = ',i6,2x,a5,2x,2i3)
@@ -172,7 +172,7 @@
 !  ...calculate the new number of dof for the node
       call ndof_nod(ntype,Nordn, ndofH,ndofE,ndofV,ndofQ)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
          write(*,7015) ndofH,ndofE,ndofV,ndofQ
  7015    format('nodmod: ndofH,ndofE,ndofV,ndofQ = ',4i5)
@@ -262,7 +262,7 @@
       if (allocated(zdofV)) deallocate(zdofV)
       if (allocated(zdofQ)) deallocate(zdofQ)
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
          write(*,7020) Nod
  7020    format('nodmod: Nod = ',i6,' HAS BEEN UPDATED ')
@@ -302,7 +302,7 @@
       use parameters, only: NDIMEN
       implicit none
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       common /ccopy_dofG/ iprint
       integer :: iprint
 #endif
@@ -314,7 +314,7 @@
       integer :: nord1o,nord2o,nord3o, &
                  nord1n,nord2n,nord3n
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
          write(*,7010) S_Type(Ntype),Nordo,Nordn,NdofGo,NdofGn
  7010    format(' copy_dofG: Ntype,Nordo,Nordn,NdofGo,NdofGn = ', &
@@ -351,7 +351,7 @@
 !
       end select
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) write(*,*) 'copy_dofG: DONE'
 #endif
 !
@@ -386,7 +386,7 @@
       use node_types
       implicit none
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       common /ccopy_dofH/ iprint
       integer :: iprint
 #endif
@@ -398,7 +398,7 @@
       integer :: nord1o,nord2o,nord3o, &
                  nord1n,nord2n,nord3n
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
          write(*,7010) S_Type(Ntype),Nordo,Nordn,NdofHo,NdofHn
  7010    format(' copy_dofH: Ntype,Nordo,Nordn,NdofHo,NdofHn = ', &
@@ -436,7 +436,7 @@
 !
       end select
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) write(*,*) 'copy_dofH: DONE'
 #endif
 !
@@ -471,7 +471,7 @@
       use node_types
       implicit none
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       common /ccopy_dofE/ iprint
       integer :: iprint
 #endif
@@ -485,7 +485,7 @@
                  nord1n,nord2n,nord3n, &
                  ibego,ibegn
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
          write(*,7010) Ntype,Nordo,Nordn,NdofEo,NdofEn
  7010    format(' copy_dofE: Ntype,Nordo,Nordn,NdofEo,NdofEn = ', &
@@ -631,7 +631,7 @@
 !
       end select
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) write(*,*) 'copy_dofE: DONE'
 #endif
 !
@@ -666,7 +666,7 @@
       use node_types
       implicit none
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       common /ccopy_dofV/ iprint
       integer :: iprint
 #endif
@@ -679,7 +679,7 @@
                  nord1n,nord2n,nord3n, &
                  ibego,ibegn
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
          write(*,7010) S_Type(Ntype),Nordo,Nordn,NdofVo,NdofVn
  7010    format(' copy_dofV: Ntype,Nordo,Nordn,NdofVo,NdofVn = ', &
@@ -819,7 +819,7 @@
 !
       end select
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) write(*,*) 'copy_dofV: DONE'
 #endif
 !
@@ -854,7 +854,7 @@
       use node_types
       implicit none
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       common /ccopy_dofQ/ iprint
       integer :: iprint
 #endif
@@ -866,7 +866,7 @@
       integer :: nord1o,nord2o,nord3o, &
                  nord1n,nord2n,nord3n
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
          write(*,7010) S_Type(Ntype),Nordo,Nordn,NdofQo,NdofQn
  7010    format(' copy_dofQ: Ntype,Nordo,Nordn,NdofQo,NdofQn = ', &
@@ -907,7 +907,7 @@
 !
       end select
 !
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) write(*,*) 'copy_dofQ: DONE'
 #endif
 !

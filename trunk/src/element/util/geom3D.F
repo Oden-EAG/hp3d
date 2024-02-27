@@ -44,7 +44,7 @@ c
 c
       integer :: i,k
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
       if (iprint.eq.1) then
@@ -59,7 +59,7 @@ c     the physical coordinates wrt master element coordinates
 c
 c  ...isoparametric element
       case(0)
-#if DEBUG_MODE
+#if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,*) 'geom3D: Xnod  = '
           do i=1,3
@@ -162,7 +162,7 @@ c
 c
       integer :: i,j,iflag
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -192,7 +192,7 @@ c
 c  ...unit normal vector
       Rn(1:3) = Rn(1:3)*Nsign/Bjac
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) X,Rn,Rjac,Bjac
  7001   format('bgeom3D: X,Rn,Rjac,Bjac = ',4(3f8.3,2x))
@@ -249,7 +249,7 @@ c
 c
       integer :: k,imas
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: i
       integer :: iprint
       iprint=0
@@ -261,7 +261,7 @@ c
 c
 c  ...determine reference coordinates and the derivatives of
 c     the reference coordinates wrt master element ccordinates
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'refgeom3D: Etav,ShapH = '
         do i=1,3
@@ -289,7 +289,7 @@ c
 c  ...evaluate the inverse Jacobian of the geometry map
       call geom(Detadxi, Dxideta,Rjac,Iflag)
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'Eta,Detadxi = '
         do i=1,3
@@ -358,7 +358,7 @@ c
 c
       integer :: i,j,iflag
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
@@ -386,7 +386,7 @@ c
 c  ...unit normal vector
       Rn(1:3) = Rn(1:3)*Nsign/Bjac
 c
-#if DEBUG_MODE
+#if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7001) Eta,Rn,Rjac,Bjac
  7001   format('brefgeom3D: Eta,Rn,Rjac,Bjac = ',4(3f8.3,2x))

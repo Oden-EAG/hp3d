@@ -65,7 +65,7 @@ subroutine paraview_attr_vector(Id, Idx)
 !
    50 continue
 !
-#if C_MODE
+#if HP3D_COMPLEX
 !
 !  -- IMAGINARY PART --
    if (.not. PARAVIEW_COMP_IMAG(jcomp)) goto 70
