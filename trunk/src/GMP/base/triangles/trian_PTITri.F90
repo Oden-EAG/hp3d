@@ -283,7 +283,7 @@ subroutine spherical_triangle(No,Eta, X,Dxdeta)
         if (abs(rad-r).gt.GEOM_TOL) then
           write(*,7004) rad,r
  7004     format('spherical_triangle: rad,r = ',2e12.5)
-!c          call pause
+!          call pause
         endif
         if (abs(sin(xepar(1))).lt.GEOM_TOL) then
           write(*,*) 'spherical triangle: POINT ON A POLE'
@@ -311,7 +311,7 @@ subroutine spherical_triangle(No,Eta, X,Dxdeta)
           if (abs(s1-s2).gt.GEOM_TOL) then
             write(*,7005) s1,s2
  7005       format('spherical_triangle: s1,s2 = ',2e12.5)
-!c            call pause
+!            call pause
           endif
         endif
         if (iprint.eq.1) then
@@ -633,8 +633,8 @@ subroutine cylindrical_triangle(No,Eta, X,Dxdeta)
         endif
 !
 !  .....this part is specific for cylindrical coordinates
-!cc        write(*,*)'dxerelsdeta(1)*xerels(2) = ',dxerelsdeta(1)*xerels(2)
-!cc        write(*,*)'dxerelsdeta(2)*xerels(1) = ',dxerelsdeta(2)*xerels(1)
+!!!        write(*,*)'dxerelsdeta(1)*xerels(2) = ',dxerelsdeta(1)*xerels(2)
+!!!        write(*,*)'dxerelsdeta(2)*xerels(1) = ',dxerelsdeta(2)*xerels(1)
         dxepardeta(2) = dxerelsdeta(3)
         s1 = dxerelsdeta(1)
         s2 = dxerelsdeta(2)

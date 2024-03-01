@@ -1,50 +1,50 @@
 #if HP3D_USE_X11
 
-c----------------------------------------------------------------------
-c
-c   routine name       - dpblno
-c
-c----------------------------------------------------------------------
-c
-c   latest revision    - Mar 2023
-c
-c   purpose            - routine displays the nicknames of all blocks
-c
-c   usage              - call dpblno
-c
-c----------------------------------------------------------------------
-c
-      subroutine dpblno
-c
+!----------------------------------------------------------------------
+!
+!   routine name       - dpblno
+!
+!----------------------------------------------------------------------
+!
+!   latest revision    - Mar 2023
+!
+!   purpose            - routine displays the nicknames of all blocks
+!
+!   usage              - call dpblno
+!
+!----------------------------------------------------------------------
+!
+   subroutine dpblno
+!
       use graphmod
       use GMP
-c
+!
       implicit none
-c
+!
       real(8) :: xcoord(3,8),dxdxi(3,2)
       real(8) :: xav(3),xavob(3),xi(2)
       character(3) :: text
-c
+!
       real(8) :: angle,height,xtext,ytext
       integer :: i,iv,ivar,inv,j,k,nc,ncol,nick,np,ntb,nt1
-c
-c  ...set colour
+!
+!  ...set colour
       ncol=npcol(2)
-c
-c  ...loop through triangular blocks
+!
+!  ...loop through triangular blocks
       do 90 ntb = 1, NRPRISM
         nick=ntb*10+1
-c
-c  ...check if not invisible
+!
+!  ...check if not invisible
         do 10 inv=1,NRINVBL
           if(nick.eq.IGINV(inv)) go to 90
    10     continue
-c
-c  .....bilinear blocks
+!
+!  .....bilinear blocks
         if (PRISMS(ntb)%Type.eq.'LiLiPrism') then
 
-c
-c  .....get the bases, next edges and then the vertices
+!
+!  .....get the bases, next edges and then the vertices
           iv=0
           do 30 i=1,2
             nt1 = abs(PRISMS(ntb)%FigNo(i)/10)
@@ -59,8 +59,8 @@ c  .....get the bases, next edges and then the vertices
               call pointr(np, xcoord(1,iv))
    20       continue
    30     continue
-c
-c  .....compute the average
+!
+!  .....compute the average
           do 80 i = 1,3
             xav(i) = 0.d0
             do 70 j = 1,6
@@ -69,11 +69,11 @@ c  .....compute the average
             xav(i) = xav(i)/6.d0
   80      continue
         endif
-c
-c  .....spherical blocks
+!
+!  .....spherical blocks
         if (PRISMS(ntb)%Type.eq. 'TriaShell') then
-c
-c  .....get the bases, next its central points
+!
+!  .....get the bases, next its central points
           xi(1) = 0.33333333333333d0
           xi(2) = 0.33333333333333d0
           do 230 i=1,2
@@ -84,17 +84,17 @@ c  .....get the bases, next its central points
             xav(i) = (xcoord(i,2)+xcoord(i,1))/2.d0
   280     continue
         endif
-c
-c  .....transform to observer's system
+!
+!  .....transform to observer's system
         call trobs(xav,xavob)
-c
-c  .....rescale
+!
+!  .....rescale
         do 95 ivar=1,2
-          XY(ivar,1) = (xavob(ivar)-XCIM(ivar))/DIMIM*SIZE
-     .                 + XCWIN(ivar)
+          XY(ivar,1) = (xavob(ivar)-XCIM(ivar))/DIMIM*SIZE &
+                       + XCWIN(ivar)
    95   continue
-c
-c  .....and finally write the block nickname
+!
+!  .....and finally write the block nickname
         write(text,'(i3)') ntb*10+1
         xtext = xy(1,1)
         ytext = xy(2,1)
@@ -102,18 +102,18 @@ c  .....and finally write the block nickname
         angle=0.
         call symbol(xtext,ytext,height,text,angle,3,ncol)
    90 continue
-c
-c  ...loop through rectangular blocks
+!
+!  ...loop through rectangular blocks
 
       do 190 ntb = 1, NRHEXAS
         nick=ntb*10+2
-c
-c  ...check if not invisible
+!
+!  ...check if not invisible
         do 110 inv=1,NRINVBL
           if(nick.eq.IGINV(inv)) go to 190
   110     continue
-c
-c  .....get the bases, next edges and then the vertices
+!
+!  .....get the bases, next edges and then the vertices
         iv=0
         do 130 i=1,2
           nt1 = abs(HEXAS(ntb)%FigNo(i)/10)
@@ -128,8 +128,8 @@ c  .....get the bases, next edges and then the vertices
             call pointr(np, xcoord(1,iv))
   120     continue
   130   continue
-c
-c  .....compute the average
+!
+!  .....compute the average
         do 180 i = 1,3
           xav(i) = 0.d0
           do 170 j = 1,8
@@ -137,17 +137,17 @@ c  .....compute the average
   170      continue
           xav(i) = xav(i)/8.d0
   180    continue
-c
-c  .....transform
+!
+!  .....transform
         call trobs(xav,xavob)
-c
-c  .....rescale
+!
+!  .....rescale
         do 195 ivar=1,2
-          XY(ivar,1) = (xavob(ivar)-XCIM(ivar))/DIMIM*SIZE
-     .                 + XCWIN(ivar)
+          XY(ivar,1) = (xavob(ivar)-XCIM(ivar))/DIMIM*SIZE &
+                       + XCWIN(ivar)
   195     continue
-c
-c  .....write the block nickname
+!
+!  .....write the block nickname
         write(text,'(i3)') ntb*10+2
         xtext = xy(1,1)
         ytext = xy(2,1)
@@ -155,8 +155,8 @@ c  .....write the block nickname
         angle=0.
         call symbol(xtext,ytext,height,text,angle,3,ncol)
   190 continue
-c
-c
-      end subroutine dpblno
+!
+!
+   end subroutine dpblno
 
 #endif

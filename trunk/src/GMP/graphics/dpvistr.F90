@@ -1,67 +1,67 @@
 #if HP3D_USE_X11
 
-c----------------------------------------------------------------------
-c
-c   routine name       - dpvistr
-c
-c----------------------------------------------------------------------
-c
-c   latest revision    - Mar 2023
-c
-c   purpose            - routine displays triangles from the RGTR
-c                        list in order stored in IGTR list
-c
-c   argument
-c     in :
-c                  Nof - flag whether to display block numbers or not
-c
-c----------------------------------------------------------------------
-c
-      subroutine dpvistr(Nof)
-c
+!----------------------------------------------------------------------
+!
+!   routine name       - dpvistr
+!
+!----------------------------------------------------------------------
+!
+!   latest revision    - Mar 2023
+!
+!   purpose            - routine displays triangles from the RGTR
+!                        list in order stored in IGTR list
+!
+!   argument
+!     in :
+!                  Nof - flag whether to display block numbers or not
+!
+!----------------------------------------------------------------------
+!
+   subroutine dpvistr(Nof)
+!
       use graphmod
-c
+!
       implicit none
-c
+!
       integer :: Nof
-c
-c  ...flags for drawing boundary segments
+!
+!  ...flags for drawing boundary segments
       integer :: nplotb(3)
       character(5) :: text
-c
+!
       real(8) :: angle,height,shiftx,shifty,xtext,ytext
       integer :: i,iblno,icolor,itr,ivar,k,ncar,ncol,nickb,nvoid
       integer :: nblack,ngreen,norange,nred,nyellow
-c
+!
       integer :: iprint
       iprint=0
-c
-c  ...define colors
+!
+!  ...define colors
       nblack  = npcol(2)
       ngreen  = npcol(5)
       nyellow = npcol(6)
       norange = npcol(7)
       nred    = npcol(8)
-c
-c  ...loop through all visible triangles
+!
+!  ...loop through all visible triangles
       do i=1,NRVISTR
-c
-c  .....get the triangle number
+!
+!  .....get the triangle number
         itr=IGTR(i)
-c
-c  .....rescale
+!
+!  .....rescale
         do k=1,3
           do ivar=1,2
             XY(ivar,k) = RGTR((itr-1)*9+(k-1)*3+ivar)
-            XY(ivar,k) = (XY(ivar,k)-XCIM(ivar))/DIMIM*SIZE
-     .                   + XCWIN(ivar)
+            XY(ivar,k) = (XY(ivar,k)-XCIM(ivar))/DIMIM*SIZE &
+                         + XCWIN(ivar)
           enddo
         enddo
-c
+!
         iblno = IGTRCU(itr)/10000
         IGTRCU(itr) = IGTRCU(itr)-10000*iblno
-c
-c  .....set color
+!
+!  .....set color
         icolor = IGTRCU(itr)/1000
         select case(icolor)
         case(1)
@@ -75,28 +75,28 @@ c  .....set color
         case default
           write(*,*) 'itr,IGTRCU(itr) = ',itr,IGTRCU(itr)
           write(*,*) 'dpvistr: UNKNOWN COLOR '
-cccc          stop 1
+!!!!          stop 1
         end select
-c
-c  .....fill the subtriangle
+!
+!  .....fill the subtriangle
         call fillpoly(3,XY,ncol,ncol)
-c
-c  .....clear the buffer
+!
+!  .....clear the buffer
         call flushx
-c
-c  .....check whether subsequent edges are to be displayed
-c       and draw them when needed
+!
+!  .....check whether subsequent edges are to be displayed
+!       and draw them when needed
         call decode(IGTRCU(itr), nvoid,nickb)
         call decodg(nickb,2,3, nplotb)
-c
-        if (nplotb(1).eq.1)
-     .    call drawline(XY(1,1),XY(2,1),XY(1,2),XY(2,2),nblack)
-        if (nplotb(2).eq.1)
-     .    call drawline(XY(1,2),XY(2,2),XY(1,3),XY(2,3),nblack)
-        if (nplotb(3).eq.1)
-     .    call drawline(XY(1,3),XY(2,3),XY(1,1),XY(2,1),nblack)
-c
-c  .....write block number when required
+!
+        if (nplotb(1).eq.1) &
+          call drawline(XY(1,1),XY(2,1),XY(1,2),XY(2,2),nblack)
+        if (nplotb(2).eq.1) &
+          call drawline(XY(1,2),XY(2,2),XY(1,3),XY(2,3),nblack)
+        if (nplotb(3).eq.1) &
+          call drawline(XY(1,3),XY(2,3),XY(1,1),XY(2,1),nblack)
+!
+!  .....write block number when required
         shiftx=0.017d0*xlength
         shifty=0.004d0*ylength
         if ((Nof.eq.1).and.(iblno.ne.0)) then
@@ -108,11 +108,11 @@ c  .....write block number when required
           angle=0.
           call symbol(xtext,ytext,height,text,angle,ncar,nblack)
         endif
-c
-c  ...end of loop through small triangles
+!
+!  ...end of loop through small triangles
       enddo
-c
-c
-      end subroutine dpvistr
+!
+!
+   end subroutine dpvistr
 
 #endif

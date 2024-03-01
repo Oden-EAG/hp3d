@@ -417,7 +417,7 @@ subroutine cylinder_geodesic(No,Eta, X,Dxdeta)
 !
 !  ...geodesics on the cylinder is simply a straight line in the
 !     (\theta,z) parameter space
-!cc      xpar(1:2) = xparv(1:2,1)*(1.d0-Eta) + xparv(1:2,2)*Eta
+!!!      xpar(1:2) = xparv(1:2,1)*(1.d0-Eta) + xparv(1:2,2)*Eta
       xpar(     1:2) = xparv(1:2,2)*Eta
       dxpardeta(1:2) = xparv(1:2,2)
 !
@@ -461,59 +461,59 @@ end subroutine cylinder_geodesic
 !
 !
 !----------------------------------------------------------------------
-!!!      subroutine check_cyl_geodesic(Nc, Iflag)
-!!!c
+!!!   subroutine check_cyl_geodesic(Nc, Iflag)
+!!!!
 !!!      use control
 !!!      use GMP
 !!!      use element_data
 !!!   ...removed syscom (declare variables)
 !!!      implicit none
-!!!c
+!!!!
 !!!      dimension center(1:3),axis(3),x(3),dxdeta(3),void(3)
 !!!      dimension xrel(3)
-!!!c
+!!!!
 !!!      nsub=100 ; Iflag=0
-!!!c
+!!!!
 !!!      ns=CURVES(Nc)%Idata(1)
 !!!      center(1:3)=SURFACES(ns)%Rdata(1:3)
 !!!      axis(  1:3)=SURFACES(ns)%Rdata(4:6)
 !!!      call normalize(axis(1:3))
-!!!c
-!!!c  ...shift center
+!!!!
+!!!!  ...shift center
 !!!      np=CURVES(Nc)%EndPoNo(1)
 !!!      void(1:3) = POINTS(np)%Rdata(1:3) - center(1:3)
 !!!      call scalar_product(void,axis, s)
 !!!      center(1:3) = center(1:3) + s*axis(1:3)
-!!!c
-!!!c  ...xrel is prep to axis and vector from center through
-!!!c     first endpoint
+!!!!
+!!!!  ...xrel is prep to axis and vector from center through
+!!!!     first endpoint
 !!!      void(1:3) = POINTS(np)%Rdata(1:3) - center(1:3)
 !!!      call cross_product(axis,void,xrel)
 !!!      call normalize(xrel)
-!!!c
-!!!c  ...compute values at second endpoint
+!!!!
+!!!!  ...compute values at second endpoint
 !!!      np=CURVES(Nc)%EndPoNo(2)
 !!!      void(1:3) = POINTS(np)%Rdata(1:3) - center(1:3)
 !!!      call scalar_product(void,axis, x_max)
 !!!      call scalar_product(void,xrel, y_max)
-!!!c
+!!!!
 !!!      do i=0,nsub
 !!!        eta=float(i)*1.d0/nsub
 !!!        call cylinder_geodesic(Nc,eta, x,dxdeta)
-!!!c
-!!!c  .....compute cartesian coordinates of projection
+!!!!
+!!!!  .....compute cartesian coordinates of projection
 !!!        x(1:3)=x(1:3)-center(1:3)
 !!!        call scalar_product(axis,x, s_x)
 !!!        call scalar_product(xrel,x, s_y)
 !!!        s_x=s_x/x_max ; s_y=s_y/y_max
-!!!ccc        write(*,*)s_y/s_x
+!!!!!!        write(*,*)s_y/s_x
 !!!        write(*,*)'s_x,s_y = ',s_x,s_y
-!!!ccc        s=s/s_max
-!!!ccc        if (abs(s-eta).gt.1.d-10) then
-!!!ccc          write(*,*)'s,eta = ',s,eta
-!!!ccc        endif
-!!!c
-!!!c  .....second check
+!!!!!!        s=s/s_max
+!!!!!!        if (abs(s-eta).gt.1.d-10) then
+!!!!!!          write(*,*)'s,eta = ',s,eta
+!!!!!!        endif
+!!!!
+!!!!  .....second check
 !!!        call scalar_product(axis,dxdeta, s_new)
 !!!        if (i.eq.0) then
 !!!          s_old=s_new ; cycle
@@ -530,8 +530,8 @@ end subroutine cylinder_geodesic
 !!!      else
 !!!        write(*,*)'FAIL!'
 !!!      endif
-!!!c
-!!!c
+!!!!
+!!!!
 !!!      end
 !
 !

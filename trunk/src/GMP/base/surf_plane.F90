@@ -291,7 +291,7 @@ subroutine determine_plane2(X,Y, Rn)
       endif
       rlambda = w(1)
 !wr10.05.05
-!cccc x1(1:3) = b(1:3,1)
+!!!!! x1(1:3) = b(1:3,1)
       x1(1:2) = b(1:2,1)
 !
       if (iprint.eq.1) then

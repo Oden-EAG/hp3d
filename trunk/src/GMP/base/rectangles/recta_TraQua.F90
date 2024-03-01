@@ -163,7 +163,7 @@ end subroutine recta_TraQua
 !
 !-----------------------------------------------------------------------
 !
-      subroutine recta_blend(Eta, Val,Dval)
+   subroutine recta_blend(Eta, Val,Dval)
 !
       implicit none
 !
@@ -228,4 +228,4 @@ end subroutine recta_TraQua
       Dval(2,k) =  0.d0
 !
 !
-      end subroutine recta_blend
+   end subroutine recta_blend

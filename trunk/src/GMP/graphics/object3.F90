@@ -1,106 +1,106 @@
 #if HP3D_USE_X11
 
-c----------------------------------------------------------------------
-c
-c   routine name       - object3
-c
-c----------------------------------------------------------------------
-c
-c   latest revision    - Mar 2023
-c
-c   purpose            - routine displays a 3D manifold
-c
-c   arguments :
-c     in:
-c               Iwind  - window number
-c
-c----------------------------------------------------------------------
-c
-      subroutine object3(Iwind)
-c
+!----------------------------------------------------------------------
+!
+!   routine name       - object3
+!
+!----------------------------------------------------------------------
+!
+!   latest revision    - Mar 2023
+!
+!   purpose            - routine displays a 3D manifold
+!
+!   arguments :
+!     in:
+!               Iwind  - window number
+!
+!----------------------------------------------------------------------
+!
+   subroutine object3(Iwind)
+!
       use GMP
       use graphmod
 
       implicit none
-c
+!
       integer :: Iwind
-c
+!
       real(8) :: xcl(3),xxy(2)
       integer :: igv(20),im(2)
-c
+!
       integer :: i,ibl,iblno,ichoice,icount,inickbl,ivis,loc
       integer :: nel,nh,nick,nickbl,npri,npyr,nrsub1,ntet
       real(8) :: psi,q,q1,rnsc,theta
-c
+!
       real(8) :: bigp,bign,small,pi
       data bigp,bign,small /1.d30,-1.d30,1.d-14/
       data pi /3.14159265358979312d0/
-c
-c  ...set initial clipping plane for sections
+!
+!  ...set initial clipping plane for sections
       CLPL(1) = 0.d0
       CLPL(2) = 0.d0
       CLPL(3) = 0.d0
       CLPL(4) = 0.d0
-c
-c  ...initialize array of invisible blocks
+!
+!  ...initialize array of invisible blocks
       NRINVBL = 0
-ccc      IGINV(1) = 0
-c
-c  ...initiate the number of curvilinear blocks
+!!!      IGINV(1) = 0
+!
+!  ...initiate the number of curvilinear blocks
       NRCURVBL=0
-ccc      eta(1:2) = 0.5d0
-ccc      do nr=1,NRRECTA
-ccc        if (RECTANGLES(nr)%BlockNo(2).eq.0) then
-ccc          call recta_linear(nr,eta, x,dxdeta)
-ccc          if (x(3).gt.-29.d0) then
-ccc            NRCURVBL = NRCURVBL + 1
-ccc            NLINBLOCKS(NRCURVBL) = abs(RECTANGLES(nr)%BlockNo(1))
-ccc          endif
-ccc        endif
-ccc      enddo
-c
-c  ...set initial scaling constants
+!!!      eta(1:2) = 0.5d0
+!!!      do nr=1,NRRECTA
+!!!        if (RECTANGLES(nr)%BlockNo(2).eq.0) then
+!!!          call recta_linear(nr,eta, x,dxdeta)
+!!!          if (x(3).gt.-29.d0) then
+!!!            NRCURVBL = NRCURVBL + 1
+!!!            NLINBLOCKS(NRCURVBL) = abs(RECTANGLES(nr)%BlockNo(1))
+!!!          endif
+!!!        endif
+!!!      enddo
+!
+!  ...set initial scaling constants
       DIMIM = bigp
       XCIM(1) = 0.d0
       XCIM(2) = 0.d0
-c
-c  ...set up number of line segments for drawing a curve
+!
+!  ...set up number of line segments for drawing a curve
       nrsub1 = 2
       NRSUB = 2**nrsub1
       DX=1.d0/NRSUB
-c
-c
-c  ...determine data for projection...
+!
+!
+!  ...determine data for projection...
 
       theta = pi/5.d0+pi
       psi   = pi/6.d0
 
-C       theta = pi/4.d0
-C       psi = pi/4.d0
+!       theta = pi/4.d0
+!       psi = pi/4.d0
       RN(1) = cos(psi)*cos(theta)
       RN(2) = cos(psi)*sin(theta)
       RN(3) = sin(psi)
-c
-c  ...set all domains to be displayed
+!
+!  ...set all domains to be displayed
       if (NRDOMAIN.gt.MAXNRDOMAIN) then
         write(*,*) 'object3: INCREASE MAXNRDOMAIN'
         stop 1
       endif
       NDOMAIN(1:NRDOMAIN)=1
-c
-c  ...select the window
+!
+!  ...select the window
       call selwin(Iwind)
       write(*,*) '...PLEASE WAIT, PREPARING IMAGE'
-c
-c  ...create global image
+!
+!  ...create global image
       call cartobs
-c
-c  ...create the list of triangles to display
+!
+!  ...create the list of triangles to display
       call lsvistr
       XCIM(1) = XCENTR(1)
       XCIM(2) = XCENTR(2)
-c
-c  ...decide whether to scale by x or y axes
+!
+!  ...decide whether to scale by x or y axes
       q = DIMOB(1)/DIMOB(2)
       q1 = xlength/ylength
       if (q.gt.q1) then
@@ -112,25 +112,25 @@ c  ...decide whether to scale by x or y axes
       endif
       XCWIN(1) = rmargin + xlength/2.d0
       XCWIN(2) = rmargin + ylength/2.d0
-c
-c  ...display image
+!
+!  ...display image
       call dpvistr(0)
-c
-c  ...display menu in infinite loop
+!
+!  ...display menu in infinite loop
    10 continue
-c
-c  ...close window
+!
+!  ...close window
       call dpborder(-1)
       write(*,*) 'PLEASE CLICK THE MOUSE INSIDE THE GRAPHICS'
       write(*,*) 'WINDOW TO CONTINUE ...'
       call closwind(iwindnum)
-c
+!
       write(*,*) 'SELECT OPTION :'
       write(*,*) '0 - EXIT'
       write(*,*) '1 - CHANGE THE POINT OF VIEW (WITH RESCALING)'
       write(*,*) '2 - CHANGE THE POINT OF VIEW (WITHOUT RESCALING)'
-      write(*,*) '3 - CHANGE THE CENTRAL POINT OF THE IMAGE AND',
-     .           ' RESCALE THE IMAGE'
+      write(*,*) '3 - CHANGE THE CENTRAL POINT OF THE IMAGE AND', &
+                 ' RESCALE THE IMAGE'
       write(*,*) '41 - MAKE ONLY FEW BLOCKS INVISIBLE (MOUSE)'
       write(*,*) '42 - MAKE SOME BLOCKS INVISIBLE (MOUSE)'
       write(*,*) '5  - DRAW A CROSS-SECTION'
@@ -143,12 +143,12 @@ c
       write(*,*) '12 - UPGRADE THE BLOCK TO CURVILINEAR'
       write(*,*) '13 - SELECT SUBDOMAINS TO BE DISPLAYED'
       read(*,*) ichoice
-c
+!
       select case(ichoice)
-c
+!
       case(0)
         return
-c
+!
       case(8)
         write(*,*) 'DISPLAY BLOCK NUMBERS ? (0-NO/1-YES)'
         read(*,*) iblno
@@ -169,7 +169,7 @@ c
           NRINVBL = NRINVBL + 1
           IGINV(NRINVBL) = nickbl
         enddo
-c
+!
       case(41)
         write(*,*) 'DISPLAY BLOCK NUMBERS ? (0-NO/1-YES)'
         read(*,*) iblno
@@ -222,7 +222,7 @@ c
             IGINV(NRINVBL) = nick
           endif
         enddo
-c
+!
       case(42)
         write(*,*) 'DISPLAY BLOCK NUMBERS ? (0-NO/1-YES)'
         read(*,*) iblno
@@ -256,7 +256,7 @@ c
           NRINVBL = NRINVBL + 1
           IGINV(NRINVBL) = igv(i)
         enddo
-c
+!
       case(9)
         write(*,*) 'DISPLAY BLOCK NUMBERS ? (0-NO/1-YES)'
         read(*,*) iblno
@@ -309,7 +309,7 @@ c
             IGINV(NRINVBL) = nick
           endif
         enddo
-c
+!
       case(1,2)
         write(*,6024) psi/pi*180,theta/pi*180,RN(1:3)
  6024   format('CURRENT psi,theta,RN = ',2f6.1, 2x, 3f8.3)
@@ -324,7 +324,7 @@ c
  6025   format('NEW psi,theta,RN = ',2f6.1, 2x, 3f8.3)
         call cartobs
         if (ichoice.eq.1) DIMIM = bigp
-c
+!
       case(11)
         write(*,*)'SET NEW DEGREE OF COARSENESS FOR OVALS.'
         write(*,*)'MUST BE BETWEEN 1 AND 4'
@@ -340,7 +340,7 @@ c
         endif
         NRSUB=2**nrsub1
         DX=1.d0/NRSUB
-c
+!
       case(3)
         write(*,*) 'CLICK AT THE NEW CENTRAL POINT'
         call xmousepos(im(1),im(2))
@@ -351,7 +351,7 @@ c
         read(*,*) rnsc
         rnsc=dabs(rnsc)
         DIMIM=DIMIM/rnsc
-c
+!
       case(5)
         write(*,*) 'THE EXTREME VALUES OF COORDINATES '
         write(*,*) 'ARE (IN ORIGINAL SYSTEM OXYZ) :'
@@ -360,22 +360,22 @@ c
         write(*,*) 'Z - ',XEX(3),XEX(4)
         write(*,*) 'SET NORMAL TO THE SECTION PLANE'
         read(*,*) CLPL(1),CLPL(2),CLPL(3)
-        write(*,*) 'SET COORDINATES OF A POINT ',
-     .             'BELONGING TO THE SECTION PLANE'
+        write(*,*) 'SET COORDINATES OF A POINT ', &
+                   'BELONGING TO THE SECTION PLANE'
         read(*,*) xcl(1),xcl(2),xcl(3)
         CLPL(4)=-CLPL(1)*xcl(1)-CLPL(2)*xcl(2)-CLPL(3)*xcl(3)
-c
+!
       case(6)
         DIMIM = bigp
         CLPL(1) = 0.d0
         CLPL(2) = 0.d0
         CLPL(3) = 0.d0
         CLPL(4) = 0.d0
-c
+!
       case(10)
         NRINVBL = 1
         IGINV(1) = 0
-c
+!
       case(12)
         do
           write(*,*) 'CLICK AT THE BLOCK TO BE DISPLAYED'
@@ -392,27 +392,27 @@ c
             exit
           endif
         enddo
-c
+!
       case(13)
         write(*,*) 'SELECT WHICH DOMAINS TO DISPLAY'
         write(*,*) 'NRDOMAIN = ',NRDOMAIN
         read(*,*) NDOMAIN(1:NRDOMAIN)
         write(*,7038) NDOMAIN(1:NRDOMAIN)
  7038   format('object3: NDOMAIN = ',20i2)
-c
+!
       end select
-c
-c-----------------------------------------------------------------------
-c
+!
+!-----------------------------------------------------------------------
+!
       write(*,*) '...PLEASE WAIT, PREPARING IMAGE'
       if (ichoice.ne.7) call lsvistr
-c
-c  ...rescale when necessary
+!
+!  ...rescale when necessary
       if ((ichoice.eq.1).or.(ichoice.eq.6)) then
         XCIM(1) = XCENTR(1)
         XCIM(2) = XCENTR(2)
-c
-c  .....decide whether to scale by x or y axes
+!
+!  .....decide whether to scale by x or y axes
         q = DIMOB(1)/DIMOB(2)
         q1 = xlength/ylength
         if (q.gt.q1) then
@@ -422,12 +422,12 @@ c  .....decide whether to scale by x or y axes
           DIMIM = DIMOB(2)
           SIZE = ylength/2.d0
         endif
-c
+!
       endif
-c
-c  ...open the window again
+!
+!  ...open the window again
       call selwin(Iwind)
-c
+!
       if (ichoice.ne.7) then
         write(*,*) 'DISPLAY BLOCK NUMBERS ? (0-NO/1-YES)'
         read(*,*) iblno
@@ -438,10 +438,10 @@ c
         if (MANDIM.eq.2) call dptrno
         call dpallcu
       endif
-c
+!
       goto 10
-c
-c
-      end subroutine object3
+!
+!
+   end subroutine object3
 
 #endif

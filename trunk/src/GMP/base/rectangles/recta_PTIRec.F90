@@ -338,7 +338,7 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
           write(*,7004) rad,r
  7004     format('recta_sphere: rad,r = ',2e12.5)
           write(*,*)'no,ie = ',No,ie
-!c          call pause
+!          call pause
         endif
         if (abs(sin(xepar(1))).lt.GEOM_TOL) then
           write(*,*) 'recta_sphere: POINT ON A POLE'
@@ -366,7 +366,7 @@ subroutine recta_sphere(No,Eta, X,Dxdeta)
           if (abs(s1-s2).gt.GEOM_TOL) then
             write(*,7005) s1,s2
  7005       format('recta_sphere: s1,s2 = ',2e12.5)
-!c            call pause
+!            call pause
           endif
         endif
         if (iprint.eq.1) then
@@ -697,8 +697,8 @@ subroutine recta_cylinder(No,Eta, X,Dxdeta)
         endif
 !
 !  .....this part is specific for cylindrical coordinates
-!cc        write(*,*)'dxerelsdeta(1)*xerels(2) = ',dxerelsdeta(1)*xerels(2)
-!cc        write(*,*)'dxerelsdeta(2)*xerels(1) = ',dxerelsdeta(2)*xerels(1)
+!!!        write(*,*)'dxerelsdeta(1)*xerels(2) = ',dxerelsdeta(1)*xerels(2)
+!!!        write(*,*)'dxerelsdeta(2)*xerels(1) = ',dxerelsdeta(2)*xerels(1)
         dxepardeta(2) = dxerelsdeta(3)
         s1 = dxerelsdeta(1)
         s2 = dxerelsdeta(2)

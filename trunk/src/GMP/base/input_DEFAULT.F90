@@ -122,7 +122,7 @@ subroutine input_DEFAULT(Fp)
 !  ...allocate memory for GMP data structure
       call alloc_GMP
 !
-      IF (.NOT. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
+      if (.not. QUIET_MODE) write(*,*)'-- input_DEFAULT --'
 !
 !-----------------------------------------------------------------------
 !  SURFACES                                                            |
@@ -130,7 +130,7 @@ subroutine input_DEFAULT(Fp)
 !
 !  ...number of surfaces
       read(nin,*) NRSURFS
-      IF (.NOT. QUIET_MODE) write(*,1000) NRSURFS
+      if (.not. QUIET_MODE) write(*,1000) NRSURFS
  1000 format(' NRSURFS = ',i7,' ; reading surfaces...')
 !
       if (MAXSU.lt.NRSURFS) then
@@ -245,7 +245,7 @@ subroutine input_DEFAULT(Fp)
         isurf_flag = 0
       endif
 !
-      IF (.NOT. QUIET_MODE) write(*,1009) NRPOINT
+      if (.not. QUIET_MODE) write(*,1009) NRPOINT
  1009 format(' NRPOINT = ',i7,' ; reading points...')
 !
       if (MAXNP.lt.NRPOINT) then
@@ -301,7 +301,7 @@ subroutine input_DEFAULT(Fp)
 
 !  ...read in number of curves
       read(nin,*) NRCURVE
-      IF (.NOT. QUIET_MODE) write(*,1011) NRCURVE
+      if (.not. QUIET_MODE) write(*,1011) NRCURVE
  1011 format(' NRCURVE = ',i7,' ; reading curves...')
 !
       if (MAXNC.lt.NRCURVE) then
@@ -387,7 +387,7 @@ subroutine input_DEFAULT(Fp)
 !---------------------------------------------------------------------
 !
       read(nin,*) NRTRIAN
-      IF (.NOT. QUIET_MODE) write(*,1012) NRTRIAN
+      if (.not. QUIET_MODE) write(*,1012) NRTRIAN
  1012 format(' NRTRIAN = ',i7,' ; reading triangles...')
 !
       if (MAXTR.lt.NRTRIAN) then
@@ -452,7 +452,7 @@ subroutine input_DEFAULT(Fp)
 !---------------------------------------------------------------------
 !
       read(nin,*) NRRECTA
-      IF (.NOT. QUIET_MODE) write(*,1013) NRRECTA
+      if (.not. QUIET_MODE) write(*,1013) NRRECTA
  1013 format(' NRRECTA = ',i7,' ; reading rectangles...')
 !
       if (MAXRE.lt.NRRECTA) then
@@ -504,7 +504,7 @@ subroutine input_DEFAULT(Fp)
 !---------------------------------------------------------------------
 !
       read(nin,*) NRPRISM
-      IF (.NOT. QUIET_MODE) write(*,1014) NRPRISM
+      if (.not. QUIET_MODE) write(*,1014) NRPRISM
  1014 format(' NRPRISM = ',i7,' ; reading prisms...')
 !
       if (MAXBT.lt.NRPRISM) then
@@ -531,7 +531,7 @@ subroutine input_DEFAULT(Fp)
 !---------------------------------------------------------------------
 !
       read(nin,*) NRHEXAS
-      IF (.NOT. QUIET_MODE) write(*,1015) NRHEXAS
+      if (.not. QUIET_MODE) write(*,1015) NRHEXAS
  1015 format(' NRHEXAS = ',i7,' ; reading hexas...')
 !
       if (MAXHE.lt.NRHEXAS) then
@@ -557,7 +557,7 @@ subroutine input_DEFAULT(Fp)
 !---------------------------------------------------------------------
 !
       read(nin,*) NRTETRA
-      IF (.NOT. QUIET_MODE) write(*,1016) NRTETRA
+      if (.not. QUIET_MODE) write(*,1016) NRTETRA
  1016 format(' NRTETRA = ',i7,' ; reading tets...')
 !
       if (MAXTE.lt.NRTETRA) then
@@ -589,7 +589,7 @@ subroutine input_DEFAULT(Fp)
 !---------------------------------------------------------------------
 !
       read(nin,*) NRPYRAM
-      IF (.NOT. QUIET_MODE) write(*,1017) NRPYRAM
+      if (.not. QUIET_MODE) write(*,1017) NRPYRAM
  1017 format(' NRPYRAM = ',i7,' ; reading pyramids...')
 !
       if (MAXPY.lt.NRPYRAM) then
@@ -616,7 +616,7 @@ subroutine input_DEFAULT(Fp)
         endselect
       enddo
 !
-      IF (.NOT. QUIET_MODE) write(*,*)''
+      if (.not. QUIET_MODE) write(*,*)''
 !
       close(nin)
 !
