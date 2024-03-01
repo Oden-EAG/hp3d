@@ -1,4 +1,4 @@
 trian_PTITri.F90
-trian_TransTri.F
-trian_CylTri.F
+trian_TransTri.F90
+trian_CylTri.F90
 0

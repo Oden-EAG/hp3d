@@ -1,57 +1,57 @@
-c----------------------------------------------------------------------
-c> @brief Transfinite interpolation for a triangle
-c
-c> @param[in ] No        - triangle number
-c> @param[in ] Eta       - reference coordinates of a point
-c> @param[out] X         - physical coordinates of the point
-c> @param[out] Dxdeta    - derivatives wrt reference coordinates
-c
-c> @date Mar 2023
-c----------------------------------------------------------------------
-c
+!----------------------------------------------------------------------
+!> @brief Transfinite interpolation for a triangle
+!
+!> @param[in ] No        - triangle number
+!> @param[in ] Eta       - reference coordinates of a point
+!> @param[out] X         - physical coordinates of the point
+!> @param[out] Dxdeta    - derivatives wrt reference coordinates
+!
+!> @date Mar 2023
+!----------------------------------------------------------------------
+!
       subroutine trian_TransTri(No,Eta, X,Dxdeta)
-c
+!
       use control
       use GMP
       use element_data
-c
+!
       implicit none
-c
+!
       integer :: No
       real(8) :: Eta(2),X(3),Dxdeta(3,2)
-c
-c  ...linear shape functions
+!
+!  ...linear shape functions
       real(8) :: shapH(3),dshapH(2,3)
-c
-c  ...point on edge
+!
+!  ...point on edge
       real(8) :: dseds(2),xc(3),dxcdse(3)
-c
-c  ...blending function
+!
+!  ...blending function
       real(8) :: dblend(2)
-c
+!
       real(8) :: blend,se
       integer :: ie,iv,iv1,iv2,ivar,j,nc,norient,np
-c
+!
       integer :: iprint
-c
-c-----------------------------------------------------------------------
-c
+!
+!-----------------------------------------------------------------------
+!
       iprint=0
-c
-c  ...evaluate linear shape functions
+!
+!  ...evaluate linear shape functions
       shapH(1) = 1.d0-Eta(1)-Eta(2); dshapH(1:2,1) = -1.d0
       shapH(2) = Eta(1); dshapH(1,2) = 1.d0; dshapH(2,2) = 0.d0
       shapH(3) = Eta(2); dshapH(1,3) = 0.d0; dshapH(2,3) = 1.d0
-c
+!
       X(1:3) = 0.d0; Dxdeta(1:3,1:2) = 0.d0
-c
-c  ...compute vertex interpolant
+!
+!  ...compute vertex interpolant
       do iv=1,3
         np = TRIANGLES(No)%VertNo(iv)
         X(1:3) = X(1:3) + POINTS(np)%Rdata(1:3)*shapH(iv)
         do j=1,2
-          Dxdeta(1:3,j) = Dxdeta(1:3,j)
-     .                  + POINTS(np)%Rdata(1:3)*dshapH(j,iv)
+          Dxdeta(1:3,j) = Dxdeta(1:3,j) &
+                        + POINTS(np)%Rdata(1:3)*dshapH(j,iv)
         enddo
       enddo
       if (iprint.eq.1) then
@@ -61,42 +61,42 @@ c  ...compute vertex interpolant
  7035     format(e12.5,3x,3e12.5)
         enddo
       endif
-c
-c  ...add edge bubbles
+!
+!  ...add edge bubbles
       do ie=1,3
-c
-c  .....get the curve number
+!
+!  .....get the curve number
         nc = TRIANGLES(No)%EdgeNo(ie); norient=0
         if (nc.lt.0) then
           nc = -nc; norient=1
         endif
         if (CURVES(nc)%Type.eq.'Seglin') cycle
-c
-c  .....get the edge vertices specifying the local edge orientation
+!
+!  .....get the edge vertices specifying the local edge orientation
         iv1=TRIAN_EDGE_TO_VERT(1,ie) ; iv2=TRIAN_EDGE_TO_VERT(2,ie)
-c
-c  .....project s onto the edge
+!
+!  .....project s onto the edge
         call proj_t2e(iv1,iv2,shapH,dshapH, se,dseds)
         if ((se.lt.GEOM_TOL).or.(se.gt.1.d0-GEOM_TOL)) cycle
         if (iprint.eq.1) then
           write(*,7003) ie,nc,CURVES(nc)%Type
  7003     format(' trian_TransTri: ie,nc,Type = ',i2,i5,2x,a5)
         endif
-c
-c  .....compute the kernel function
+!
+!  .....compute the kernel function
         call curveK(nc,se,norient, xc,dxcdse)
-c
-c  .....blending function
+!
+!  .....blending function
         blend = shapH(iv1)*shapH(iv2)
-        dblend(1:2) = dshapH(1:2,iv1)*shapH(iv2)
-     .              + shapH(iv1)*dshapH(1:2,iv2)
-c
-c  .....add adge contribution
+        dblend(1:2) = dshapH(1:2,iv1)*shapH(iv2) &
+                    + shapH(iv1)*dshapH(1:2,iv2)
+!
+!  .....add adge contribution
         X(1:3) = X(1:3) + xc(1:3)*blend
         do j=1,2
-          Dxdeta(1:3,j) = Dxdeta(1:3,j)
-     .                  + dxcdse(1:3)*dseds(j)*blend
-     .                  + xc(1:3)*dblend(j)
+          Dxdeta(1:3,j) = Dxdeta(1:3,j) &
+                        + dxcdse(1:3)*dseds(j)*blend &
+                        + xc(1:3)*dblend(j)
         enddo
       enddo
       if (iprint.eq.1) then
@@ -106,6 +106,6 @@ c  .....add adge contribution
         enddo
         call pause
       endif
-c
-c
+!
+!
       end subroutine trian_TransTri

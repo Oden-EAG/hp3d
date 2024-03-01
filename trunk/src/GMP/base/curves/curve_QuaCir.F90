@@ -1,98 +1,98 @@
-c----------------------------------------------------------------------
-c
-c   routine name       - curve_QuaCir
-c
-c----------------------------------------------------------------------
-c
-c   latest revision    - Mar 2023
-c
-c   purpose            - routine defines a parametrization for
-c                        a quarter of circle
-c
-c   arguments :
-c     in:
-c               No     - the curve number
-c               Eta    - reference coordinate (between 0 and 1)
-c     out:
-c               X      - physical coordinates of the point
-c               Dxdeta - derivatives of the physical coordinates wrt
-c                        reference coordinate
-c
-c----------------------------------------------------------------------
-c
+!----------------------------------------------------------------------
+!
+!   routine name       - curve_QuaCir
+!
+!----------------------------------------------------------------------
+!
+!   latest revision    - Mar 2023
+!
+!   purpose            - routine defines a parametrization for
+!                        a quarter of circle
+!
+!   arguments :
+!     in:
+!               No     - the curve number
+!               Eta    - reference coordinate (between 0 and 1)
+!     out:
+!               X      - physical coordinates of the point
+!               Dxdeta - derivatives of the physical coordinates wrt
+!                        reference coordinate
+!
+!----------------------------------------------------------------------
+!
       subroutine curve_QuaCir(No,Eta, X,Dxdeta)
-c
+!
       use GMP
-c
+!
       implicit none
-c
+!
       integer :: No
       real(8) :: Eta,X(3),Dxdeta(3)
-c
-c  ...coordinates of the endpoints
+!
+!  ...coordinates of the endpoints
       real(8) :: xv(3,2)
-c
-c  ...center coordinates
+!
+!  ...center coordinates
       real(8) :: center(3)
-c
-c  ...transformation matrix
+!
+!  ...transformation matrix
       real(8) :: aij(3,3)
-c
-c  ...local coordinates and their derivatives
+!
+!  ...local coordinates and their derivatives
       real(8) :: xprim(3),dxprdeta(3)
-c
+!
       integer :: i,j,np
       real(8) :: alpha,pihalf,rad,s,s1
-c
+!
       integer :: iprint
       iprint=0
-c
+!
       if (CURVES(No)%Type.ne.'QuaCir') then
         write(*,7001)
  7001   format(' curve_QuaCir: WRONG CALL')
         stop
       endif
-c
+!
       if (iprint.eq.1) then
         write(*,*)'No,Eta = ',No,Eta
-ccc        write(*,7002) No, Eta
-ccc 7002   format(' curve_QuaCir: No,Eta = ',i4,2x,f8.3)
+!!!        write(*,7002) No, Eta
+!!! 7002   format(' curve_QuaCir: No,Eta = ',i4,2x,f8.3)
         call pause
       endif
-c
-c  ...get the endpoints coordinates
+!
+!  ...get the endpoints coordinates
       do i=1,2
         np=CURVES(No)%EndPoNo(i)
         call pointr(np, xv(1:3,i))
       enddo
-c
-c  ...get coordinates of the center
+!
+!  ...get coordinates of the center
       center(1:3)=CURVES(No)%Rdata(1:3)
-c
-c  ...evaluate the radius
+!
+!  ...evaluate the radius
       rad = 0.d0
       do i=1,3
         rad = rad + (xv(i,1) - center(i))**2
       enddo
       rad = sqrt(rad)
-c
-c  ...evaluate the transformation matrix
+!
+!  ...evaluate the transformation matrix
       do i=1,3
         aij(i,1) = (xv(i,1) - center(i))/rad
         aij(i,2) = (xv(i,2) - center(i))/rad
       enddo
       call cross_product(aij(1:3,1),aij(1:3,2), aij(1:3,3))
-c
-c  ...printing
+!
+!  ...printing
       if (iprint.eq.1) then
         do i=1,3
           write(*,7005) i,aij(i,1:3)
  7005     format(' i,a(i,:) = ',i1,2x,3(e12.5,2x))
         enddo
       endif
-c
-c  ...evaluate coordinates and their derivatives in the auxiliary
-c     system of coordinates (see manual for explanation)
+!
+!  ...evaluate coordinates and their derivatives in the auxiliary
+!     system of coordinates (see manual for explanation)
       pihalf = dacos(0.d0)
       alpha = pihalf*Eta
       xprim(1) = rad*dcos(alpha)
@@ -101,17 +101,17 @@ c     system of coordinates (see manual for explanation)
       dxprdeta(1) = -xprim(2)*pihalf
       dxprdeta(2) =  xprim(1)*pihalf
       dxprdeta(3) =  0.d0
-c
-c  ...printing
+!
+!  ...printing
       if (iprint.eq.1) then
         write(*,7006) xprim(1:3)
  7006   format(' xprim    = ',3(e12.5,2x))
         write(*,7007) dxprdeta(1:3)
  7007   format(' dxprdeta = ',3(e12.5,2x))
       endif
-c
-c  ...evaluate physical coordinates and their derivatives wrt the
-c     reference coordinate
+!
+!  ...evaluate physical coordinates and their derivatives wrt the
+!     reference coordinate
       do i=1,3
         s =0.d0
         s1=0.d0
@@ -122,14 +122,14 @@ c     reference coordinate
         X(i) = s + center(i)
         Dxdeta(i) = s1
       enddo
-c
-c  ...printing
+!
+!  ...printing
       if (iprint.eq.1) then
         write(*,7003) X(1:3)
         write(*,7004) Dxdeta(1:3)
  7003   format(' X      = ',3(e12.5,2x))
  7004   format(' Dxdeta = ',3(e12.5,2x))
       endif
-c
-c
+!
+!
       end subroutine curve_QuaCir
