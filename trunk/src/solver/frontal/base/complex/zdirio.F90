@@ -31,6 +31,7 @@
 !
    subroutine zdirio (Unname, Commnd, Irec, Len, Sbuf, Jerr)
 !
+      use czdirio
       use surfsc1
 !
       implicit none
@@ -43,13 +44,8 @@
       integer    :: i,inow,iend,ioffst,iostat,irecp,irecsv,iunit
       integer    :: lenop,lenr,lenw,ntape
       complex(8) :: slen
+      integer    :: lbuf(9)
 !
-      integer    :: nbuf(9), lenf(9)
-      integer    :: lbuf(9), irsave(9)
-      complex(8) :: storage(100)
-!
-      common /czdirio1/ nbuf, lenf, irsave
-      common /czdirio2/ storage
 
 !  ...test......test......test......test......test......test......test...
 !      allocatable sbuf1(:)
