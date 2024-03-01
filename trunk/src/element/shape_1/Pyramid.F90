@@ -1,40 +1,40 @@
-c Routines:
-c  - shape3DHPyra
-c  - shape3DEPyra
-c  - shape3DVPyra
-c  - shape3DQPyra
-c--------------------------------------------------------------------
-c
-c     routine name      - shape3DHPyra
-c
-c--------------------------------------------------------------------
-c
-c     latest revision:  - Jan 15, Apr 17, Jul 21
-c
-c     purpose:          - routine returns values of 3D pyramid element
-c                         H1 shape functions and their derivatives
-c
-c     arguments:
-c
-c     in:
-c          Xi           - master pyramid coordinates from (0,1)^3
-c          Nord         - polynomial order for the nodes (H1 sense)
-c          NoriE        - edge orientation
-c          NoriF        - face orientation
-c          Nsize        - relevant sizes of local arrays
-c
-c     out:
-c          NrdofH       - number of dof
-c          ShapH        - values of the shape functions at the point
-c          GradH        - gradients of the shape functions
-c
-c-----------------------------------------------------------------------
-c
-      subroutine shape3DHPyra(Xi,Nord,NoriE,NoriF,Nsize,
-     .                                              NrdofH,ShapH,GradH)
-c
+! Routines:
+!  - shape3DHPyra
+!  - shape3DEPyra
+!  - shape3DVPyra
+!  - shape3DQPyra
+!--------------------------------------------------------------------
+!
+!     routine name      - shape3DHPyra
+!
+!--------------------------------------------------------------------
+!
+!     latest revision:  - Jan 15, Apr 17, Jul 21
+!
+!     purpose:          - routine returns values of 3D pyramid element
+!                         H1 shape functions and their derivatives
+!
+!     arguments:
+!
+!     in:
+!          Xi           - master pyramid coordinates from (0,1)^3
+!          Nord         - polynomial order for the nodes (H1 sense)
+!          NoriE        - edge orientation
+!          NoriF        - face orientation
+!          Nsize        - relevant sizes of local arrays
+!
+!     out:
+!          NrdofH       - number of dof
+!          ShapH        - values of the shape functions at the point
+!          GradH        - gradients of the shape functions
+!
+!-----------------------------------------------------------------------
+!
+   subroutine shape3DHPyra(Xi,Nord,NoriE,NoriF,Nsize, &
+                                                    NrdofH,ShapH,GradH)
+!
       use parameters , only : MODORDER
-c
+!
       implicit none
       integer, intent(in)  :: Nord(14),NoriE(8),NoriF(5),Nsize(2)
       integer, intent(out) :: NrdofH
@@ -65,74 +65,74 @@ c
       double precision :: DphiQuad(3,2:Nsize(1),2:Nsize(1))
       double precision :: phiTri(2:Nsize(1)-1,1:Nsize(1)-2)
       double precision :: DphiTri(3,2:Nsize(1)-1,1:Nsize(1)-2)
-c
+!
 #if HP3D_DEBUG
-c  ...debugging flag
+!  ...debugging flag
       integer :: iprint
       iprint=0
 #endif
-c
-c  ...spatial dimensions
+!
+!  ...spatial dimensions
       N=3
-c
-c  ...initiate counter for shape functions
+!
+!  ...initiate counter for shape functions
       m=0
-c
-c  ...Define affine coordinates and gradients
+!
+!  ...Define affine coordinates and gradients
       call AffinePyramid(Xi, Lam,DLam,Mu,DMu,Nu,DNu,MuZ,DMuZ)
-c
-c  ...VERTEX SHAPE FUNCTIONS
+!
+!  ...VERTEX SHAPE FUNCTIONS
       call BlendPyraV(Lam,DLam, LambV,DLambV)
       do v=1,5
        m=m+1
        ShapH(m)     = LambV(v)
        GradH(1:N,m) = DLambV(1:N,v)
       enddo
-c
-c  ...MIXED EDGE SHAPE FUNCTIONS
-      call BlendProjectPyraME(Mu,DMu,Nu,DNu,
-     .                                 MubME,DMubME,NupME,DNupME,IdecME)
-c  ...loop over edges
+!
+!  ...MIXED EDGE SHAPE FUNCTIONS
+      call BlendProjectPyraME(Mu,DMu,Nu,DNu, &
+                                       MubME,DMubME,NupME,DNupME,IdecME)
+!  ...loop over edges
       do e=1,4
-c    ...local parameters
+!    ...local parameters
         nordME = Nord(e)
         ndofME = nordME-1
         if (ndofME.gt.0) then
-c      ...local parameters (again)
+!      ...local parameters (again)
           minI = 2
           maxI = nordME
-c      ...orient first
-          call OrientE(NupME(0:1,e),DNupME(1:N,0:1,e),NoriE(e),N,
-     .                                                   GNupME,GDNupME)
-c      ...construct the shape functions
-          call AncPhiE(GNupME,GDNupME,nordME,IdecME,N,
-     .                             phiE(minI:maxI),DphiE(1:N,minI:maxI))
+!      ...orient first
+          call OrientE(NupME(0:1,e),DNupME(1:N,0:1,e),NoriE(e),N, &
+                                                         GNupME,GDNupME)
+!      ...construct the shape functions
+          call AncPhiE(GNupME,GDNupME,nordME,IdecME,N, &
+                                   phiE(minI:maxI),DphiE(1:N,minI:maxI))
           do i=minI,maxI
             m=m+1
             ShapH(m)     = MubME(e)*phiE(i)
-            GradH(1:N,m) = DMubME(1:N,e)*phiE(i)
-     .                   + MubME(e)*DphiE(1:N,i)
+            GradH(1:N,m) = DMubME(1:N,e)*phiE(i) &
+                         + MubME(e)*DphiE(1:N,i)
           enddo
         endif
       enddo
-c
-c  ...TRIANGLE EDGE SHAPE FUNCTIONS
+!
+!  ...TRIANGLE EDGE SHAPE FUNCTIONS
       call ProjectPyraTE(Lam,DLam, LampTE,DLampTE,IdecTE)
-c  ...loop over edges
+!  ...loop over edges
       do e=1,4
-c    ...local parameters
+!    ...local parameters
         nordTE = Nord(e+4)
         ndofTE = nordTE-1
         if (ndofTE.gt.0) then
-c      ...local parameters (again)
+!      ...local parameters (again)
           minI = 2
           maxI = nordTE
-c      ...orient first
-          call OrientE(LampTE(0:1,e),DLampTE(1:N,0:1,e),NoriE(e+4),N,
-     .                                                 GLampTE,GDLampTE)
-c      ...construct the shape functions
-          call AncPhiE(GLampTE,GDLampTE,nordTE,IdecTE,N,
-     .                             phiE(minI:maxI),DphiE(1:N,minI:maxI))
+!      ...orient first
+          call OrientE(LampTE(0:1,e),DLampTE(1:N,0:1,e),NoriE(e+4),N, &
+                                                       GLampTE,GDLampTE)
+!      ...construct the shape functions
+          call AncPhiE(GLampTE,GDLampTE,nordTE,IdecTE,N, &
+                                   phiE(minI:maxI),DphiE(1:N,minI:maxI))
           do i=minI,maxI
             m=m+1
             ShapH(m)     = phiE(i)
@@ -140,79 +140,79 @@ c      ...construct the shape functions
           enddo
         endif
       enddo
-c
-c  ...QUADRILATERAL FACE SHAPE FUNCTION
+!
+!  ...QUADRILATERAL FACE SHAPE FUNCTION
       call ProjectPyraQF(Mu,DMu, MupQF,DMupQF,IdecQF)
-c  ...local parameters
+!  ...local parameters
       call decod(Nord(9),MODORDER,2, nordQF)
       ndofQF = (nordQF(1)-1)*(nordQF(2)-1)
       if (ndofQF.gt.0) then
-c    ...local parameters (again)
+!    ...local parameters (again)
         minI = 2
         minJ = 2
         maxI = nordQF(1)
         maxJ = nordQF(2)
-c    ...orient first
-        call OrientQuad(MupQF,DMupQF,NoriF(1),IdecQF,N,
-     .                                           GMupQF,GDMupQF,GIdecQF)
-c    ...construct the shape functions
-        call AncPhiQuad(GMupQF,GDMupQF,nordQF,GIdecQF,N,
-     .                                     phiQuad(minI:maxI,minJ:maxJ),
-     .                                DphiQuad(1:N,minI:maxI,minJ:maxJ))
+!    ...orient first
+        call OrientQuad(MupQF,DMupQF,NoriF(1),IdecQF,N, &
+                                                 GMupQF,GDMupQF,GIdecQF)
+!    ...construct the shape functions
+        call AncPhiQuad(GMupQF,GDMupQF,nordQF,GIdecQF,N, &
+                                           phiQuad(minI:maxI,minJ:maxJ), &
+                                      DphiQuad(1:N,minI:maxI,minJ:maxJ))
           do j=minJ,maxJ
             do i=minI,maxI
               m=m+1
-c
+!
               ShapH(m)     = MuZ(0)*phiQuad(i,j)
-              GradH(1:N,m) = DMuZ(1:N,0)*phiQuad(i,j)
-     .                     + MuZ(0)*DphiQuad(1:N,i,j)
+              GradH(1:N,m) = DMuZ(1:N,0)*phiQuad(i,j) &
+                           + MuZ(0)*DphiQuad(1:N,i,j)
             enddo
           enddo
         endif
-c
-c  ...TRIANGULAR FACE SHAPE FUNCTIONS
-      call BlendProjectPyraTF(Mu,DMu,Nu,DNu,
-     .                                 MubTF,DMubTF,NupTF,DNupTF,IdecTF)
-c  ...loop over faces
+!
+!  ...TRIANGULAR FACE SHAPE FUNCTIONS
+      call BlendProjectPyraTF(Mu,DMu,Nu,DNu, &
+                                       MubTF,DMubTF,NupTF,DNupTF,IdecTF)
+!  ...loop over faces
       do f=1,4
-c    ...local parameters
+!    ...local parameters
         nordTF = Nord(9+f)
         ndofTF = (nordTF-1)*(nordTF-2)/2
         if (ndofTF.gt.0) then
-c      ...local parameters (again)
+!      ...local parameters (again)
           minI = 2
           minJ = 1
           minIJ = minI+minJ
           maxIJ = nordTF
           maxI = maxIJ-minJ
           maxJ = maxIJ-minI
-c      ...orient first
-          call OrientTri(NupTF(0:2,f),DNupTF(1:N,0:2,f),NoriF(f+1),N,
-     .                                                   GNupTF,GDNupTF)
-c      ...construct the shape functions
-          call AncPhiTri(GNupTF,GDNupTF,nordTF,IdecTF,N,
-     .                                      phiTri(minI:maxI,minJ:maxJ),
-     .                                 DphiTri(1:N,minI:maxI,minJ:maxJ))
+!      ...orient first
+          call OrientTri(NupTF(0:2,f),DNupTF(1:N,0:2,f),NoriF(f+1),N, &
+                                                         GNupTF,GDNupTF)
+!      ...construct the shape functions
+          call AncPhiTri(GNupTF,GDNupTF,nordTF,IdecTF,N, &
+                                            phiTri(minI:maxI,minJ:maxJ), &
+                                       DphiTri(1:N,minI:maxI,minJ:maxJ))
             do nij=minIJ,maxIJ
               do i=minI,nij-minJ
                 j=nij-i
                 m=m+1
-c
+!
                 ShapH(m)     = MubTF(f)*phiTri(i,j)
-                GradH(1:N,m) = DMubTF(1:N,f)*phiTri(i,j)
-     .                       + MubTF(f)*DphiTri(1:N,i,j)
+                GradH(1:N,m) = DMubTF(1:N,f)*phiTri(i,j) &
+                             + MubTF(f)*DphiTri(1:N,i,j)
               enddo
             enddo
         endif
       enddo
-c
-c  ...BUBBLE FUNCTIONS
-c  ...local parameters
+!
+!  ...BUBBLE FUNCTIONS
+!  ...local parameters
       nordB = Nord(14)
       ndofB = (nordB-1)**3
-c  ...if necessary, create bubbles
+!  ...if necessary, create bubbles
       if (ndofB.gt.0) then
-c    ...local parameters (again)
+!    ...local parameters (again)
         IdecB(1:2) = IdecQF; IdecB(3) = .TRUE.
         minI = 2
         minJ = 2
@@ -220,35 +220,35 @@ c    ...local parameters (again)
         maxI = nordB
         maxJ = nordB
         maxK = nordB
-c    ...call phiQuad and phiE - no need to orient
-        call AncPhiQuad(Mu,DMu,(/nordB,nordB/),IdecB(1:2),N,
-     .                                     phiQuad(minI:maxI,minJ:maxJ),
-     .                                DphiQuad(1:N,minI:maxI,minJ:maxJ))
-        call AncPhiE(MuZ,DMuZ,nordB,IdecB(3),N,
-     .                             phiE(minK:maxK),DphiE(1:N,minK:maxK))
+!    ...call phiQuad and phiE - no need to orient
+        call AncPhiQuad(Mu,DMu,(/nordB,nordB/),IdecB(1:2),N, &
+                                           phiQuad(minI:maxI,minJ:maxJ), &
+                                      DphiQuad(1:N,minI:maxI,minJ:maxJ))
+        call AncPhiE(MuZ,DMuZ,nordB,IdecB(3),N, &
+                                   phiE(minK:maxK),DphiE(1:N,minK:maxK))
         do k=minK,maxK
           do j=minJ,maxJ
             do i=minI,maxI
               m=m+1
-c
+!
               ShapH(m) = phiQuad(i,j)*phiE(k)
-              GradH(1:N,m) = phiQuad(i,j)*DphiE(1:N,k)
-     .                     + DphiQuad(1:N,i,j)*phiE(k)
+              GradH(1:N,m) = phiQuad(i,j)*DphiE(1:N,k) &
+                           + DphiQuad(1:N,i,j)*phiE(k)
             enddo
           enddo
         enddo
       endif
-c
-c  ...give total degrees of freedom
+!
+!  ...give total degrees of freedom
       NrdofH = m
-c
+!
 #if HP3D_DEBUG
-c  ...print this when debugging
+!  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001) Xi(1:3),Nord(1:14),NoriE(1:8),NoriF(1:5)
- 7001   format('shape3DHPyra: Xi = ',3f8.3,/,
-     .         'Norder = ',8i2,3x,5i2,3x,i2,/,
-     .         'orient = ',8i2,3x,5i2)
+ 7001   format('shape3DHPyra: Xi = ',3f8.3,/, &
+               'Norder = ',8i2,3x,5i2,3x,i2,/, &
+               'orient = ',8i2,3x,5i2)
         write(*,7010)
  7010   format('VERTEX SHAPE FUNCTIONS = ')
         do v=1,5
@@ -312,43 +312,43 @@ c  ...print this when debugging
         call pause
       endif
 #endif
-c
-c
-      end subroutine shape3DHPyra
-c
-c
-c--------------------------------------------------------------------
-c
-c     routine name      - shape3DEPyra
-c
-c--------------------------------------------------------------------
-c
-c     latest revision:  - Jan 15, Apr 17, Jul 21
-c
-c     purpose:          - routine returns values of 3D pyramid element
-c                         H(curl) shape functions and their curls
-c
-c     arguments:
-c
-c     in:
-c          Xi           - master pyramid coordinates from (0,1)^3
-c          Nord         - polynomial order for the nodes (H1 sense)
-c          NoriE        - edge orientation
-c          NoriF        - face orientation
-c          Nsize        - relevant sizes of local arrays
-c
-c     out:
-c          NrdofE       - number of dof
-c          ShapE        - values of the shape functions at the point
-c          CurlE        - curl of the shape functions
-c
-c-----------------------------------------------------------------------
-c
-      subroutine shape3DEPyra(Xi,Nord,NoriE,NoriF,Nsize,
-     .                                              NrdofE,ShapE,CurlE)
-c
+!
+!
+   end subroutine shape3DHPyra
+!
+!
+!--------------------------------------------------------------------
+!
+!     routine name      - shape3DEPyra
+!
+!--------------------------------------------------------------------
+!
+!     latest revision:  - Jan 15, Apr 17, Jul 21
+!
+!     purpose:          - routine returns values of 3D pyramid element
+!                         H(curl) shape functions and their curls
+!
+!     arguments:
+!
+!     in:
+!          Xi           - master pyramid coordinates from (0,1)^3
+!          Nord         - polynomial order for the nodes (H1 sense)
+!          NoriE        - edge orientation
+!          NoriF        - face orientation
+!          Nsize        - relevant sizes of local arrays
+!
+!     out:
+!          NrdofE       - number of dof
+!          ShapE        - values of the shape functions at the point
+!          CurlE        - curl of the shape functions
+!
+!-----------------------------------------------------------------------
+!
+   subroutine shape3DEPyra(Xi,Nord,NoriE,NoriF,Nsize, &
+                                                    NrdofE,ShapE,CurlE)
+!
       use parameters , only : MODORDER
-c
+!
       implicit none
       integer, intent(in)  :: Nord(14),NoriE(8),NoriF(5),Nsize(2)
       integer, intent(out) :: NrdofE
@@ -384,169 +384,169 @@ c
       double precision :: DphiQuad(3,2:Nsize(1),2:Nsize(1))
       double precision :: DMubMExEE(3),DMuZxEQuad(3),DMubTFxETri(3)
       double precision :: tmp,vectmp(3),DphiQuadxDMuZ(3)
-c
+!
 #if HP3D_DEBUG
-c  ...debugging flag
+!  ...debugging flag
       integer :: iprint
       iprint=0
 #endif
-c
-c  ...spatial dimensions
+!
+!  ...spatial dimensions
       N=3
-c
-c  ...initiate counter for shape functions
+!
+!  ...initiate counter for shape functions
       m=0
-c
-c  ...Define affine coordinates and gradients
+!
+!  ...Define affine coordinates and gradients
       call AffinePyramid(Xi, Lam,DLam,Mu,DMu,Nu,DNu,MuZ,DMuZ)
-c
-c  ...MIXED EDGE SHAPE FUNCTIONS
-      call BlendProjectPyraME(Mu,DMu,Nu,DNu,
-     .                                 MubME,DMubME,NupME,DNupME,IdecME)
-c  ...loop over edges
+!
+!  ...MIXED EDGE SHAPE FUNCTIONS
+      call BlendProjectPyraME(Mu,DMu,Nu,DNu, &
+                                       MubME,DMubME,NupME,DNupME,IdecME)
+!  ...loop over edges
       do e=1,4
-c    ...local parameters
+!    ...local parameters
         nordME = Nord(e)
         ndofME = nordME
         if (ndofME.gt.0) then
-c      ...local parameters (again)
+!      ...local parameters (again)
           minI = 0
           maxI = nordME-1
-c      ...orient first
-          call OrientE(NupME(0:1,e),DNupME(1:N,0:1,e),NoriE(e),N,
-     .                                                   GNupME,GDNupME)
-c      ...construct the shape functions
-          call AncEE(GNupME,GDNupME,nordME,IdecME,N,
-     .                          EE(1:N,minI:maxI),CurlEE(1:N,minI:maxI))
+!      ...orient first
+          call OrientE(NupME(0:1,e),DNupME(1:N,0:1,e),NoriE(e),N, &
+                                                         GNupME,GDNupME)
+!      ...construct the shape functions
+          call AncEE(GNupME,GDNupME,nordME,IdecME,N, &
+                                EE(1:N,minI:maxI),CurlEE(1:N,minI:maxI))
           do i=minI,maxI
             m=m+1
-c
+!
             ShapE(1:N,m) = MubME(e)*EE(1:N,i)
             call cross(3,DMubME(1:N,e),EE(1:N,i), DMubMExEE)
-            CurlE(1:N,m) = MubME(e)*CurlEE(1:N,i)
-     .                   + DMubMExEE
+            CurlE(1:N,m) = MubME(e)*CurlEE(1:N,i) &
+                         + DMubMExEE
           enddo
         endif
       enddo
-c
-c  ...TRIANGLE EDGE SHAPE FUNCTIONS
+!
+!  ...TRIANGLE EDGE SHAPE FUNCTIONS
       call ProjectPyraTE(Lam,DLam, LampTE,DLampTE,IdecTE)
-c  ...loop over edges
+!  ...loop over edges
       do e=1,4
-c    ...local parameters
+!    ...local parameters
         nordTE = Nord(e+4)
         ndofTE = nordTE
         if (ndofTE.gt.0) then
-c      ...local parameters (again)
+!      ...local parameters (again)
           minI = 0
           maxI = nordTE-1
-c      ...orient first
-          call OrientE(LampTE(0:1,e),DLampTE(1:N,0:1,e),NoriE(e+4),N,
-     .                                                 GLampTE,GDLampTE)
-c      ...construct the shape functions
-          call AncEE(GLampTE,GDLampTE,nordTE,IdecTE,N,
-     .                          EE(1:N,minI:maxI),CurlEE(1:N,minI:maxI))
+!      ...orient first
+          call OrientE(LampTE(0:1,e),DLampTE(1:N,0:1,e),NoriE(e+4),N, &
+                                                       GLampTE,GDLampTE)
+!      ...construct the shape functions
+          call AncEE(GLampTE,GDLampTE,nordTE,IdecTE,N, &
+                                EE(1:N,minI:maxI),CurlEE(1:N,minI:maxI))
           do i=minI,maxI
             m=m+1
-c
+!
             ShapE(1:N,m) = EE(1:N,i)
             CurlE(1:N,m) = CurlEE(1:N,i)
           enddo
         endif
       enddo
-c
-c  ...QUADRILATERAL FACE SHAPE FUNCTIONS
+!
+!  ...QUADRILATERAL FACE SHAPE FUNCTIONS
       call ProjectPyraQF(Mu,DMu, MupQF,DMupQF,IdecQF)
-c  ...local parameters
+!  ...local parameters
       call decod(Nord(9),MODORDER,2, nordQF)
-c  ...orient
-      call OrientQuad(MupQF,DMupQF,NoriF(1),IdecQF,N,
-     .                                           GMupQF,GDMupQF,GIdecQF)
-c  ...loop over families
+!  ...orient
+      call OrientQuad(MupQF,DMupQF,NoriF(1),IdecQF,N, &
+                                                 GMupQF,GDMupQF,GIdecQF)
+!  ...loop over families
       do fam=0,1
         ab = cshift((/1,2/),fam);
         a = ab(1); b = ab(2)
         ndofQF = nordQF(a)*(nordQF(b)-1)
         if (ndofQF.gt.0) then
-c      ...local parameters (again)
+!      ...local parameters (again)
           minF(1) = 0
           minF(2) = 2
           maxF(1) = nordQF(a)-1
           maxF(2) = nordQF(b)
-c      ...construct the shape functions
-          call AncEQuad(GMupQF(0:1,ab),GDMupQF(1:N,0:1,ab),nordQF(ab),
-     .                                                  GIdecQF(ab),N,
-     .                       EQuad(1:N,minF(1):maxF(1),minF(2):maxF(2)),
-     .                   CurlEQuad(1:N,minF(1):maxF(1),minF(2):maxF(2)))
-c      ...in the code the outer loop always is
-c      ...numbered wrt the second global face axis
+!      ...construct the shape functions
+          call AncEQuad(GMupQF(0:1,ab),GDMupQF(1:N,0:1,ab),nordQF(ab), &
+                                                        GIdecQF(ab),N, &
+                             EQuad(1:N,minF(1):maxF(1),minF(2):maxF(2)), &
+                         CurlEQuad(1:N,minF(1):maxF(1),minF(2):maxF(2)))
+!      ...in the code the outer loop always is
+!      ...numbered wrt the second global face axis
           minF = cshift(minF,-fam); maxF = cshift(maxF,-fam)
           do jg=minF(2),maxF(2)
             do ig=minF(1),maxF(1)
               ij = cshift((/ig,jg/),fam)
               i = ij(1); j = ij(2)
               m=m+1
-c
+!
               ShapE(1:N,m) = EQuad(1:N,i,j)*MuZ(0)**2
               call cross(N,DMuZ(1:N,0),EQuad(1:N,i,j), DMuZxEQuad)
-              CurlE(1:N,m) = CurlEQuad(1:N,i,j)*MuZ(0)**2
-     .                     + 2*DMuZxEQuad*MuZ(0)
+              CurlE(1:N,m) = CurlEQuad(1:N,i,j)*MuZ(0)**2 &
+                           + 2*DMuZxEQuad*MuZ(0)
             enddo
           enddo
         endif
       enddo
-c
-c  ...TRIANGULAR FACE SHAPE FUNCTIONS
-      call BlendProjectPyraTF(Mu,DMu,Nu,DNu,
-     .                                 MubTF,DMubTF,NupTF,DNupTF,IdecTF)
-c  ...loop over faces
+!
+!  ...TRIANGULAR FACE SHAPE FUNCTIONS
+      call BlendProjectPyraTF(Mu,DMu,Nu,DNu, &
+                                       MubTF,DMubTF,NupTF,DNupTF,IdecTF)
+!  ...loop over faces
       do f=1,4
-c    ...local parameters
+!    ...local parameters
         nordTF = Nord(9+f)
         ndofTF = nordTF*(nordTF-1)/2
         if (ndofTF.gt.0) then
-c      ...local parameters (again)
+!      ...local parameters (again)
           minI  = 0
           minJ  = 1
           minIJ = minI+minJ
           maxIJ = nordTF-1
           maxI  = maxIJ-minJ
           maxJ  = maxIJ-minI
-c      ...orient first
-          call OrientTri(NupTF(0:2,f),DNupTF(1:N,0:2,f),NoriF(f+1),N,
-     .                                                   GNupTF,GDNupTF)
-c      ...loop over families
+!      ...orient first
+          call OrientTri(NupTF(0:2,f),DNupTF(1:N,0:2,f),NoriF(f+1),N, &
+                                                         GNupTF,GDNupTF)
+!      ...loop over families
           famctr=m
           do fam=0,1
             m=famctr+fam-1
             abc = cshift((/0,1,2/),fam)
-c        ...construct the shape functions
-            call AncETri(GNupTF(abc),GDNupTF(1:N,abc),nordTF,IdecTF,N,
-     .                                    ETri(1:N,minI:maxI,minJ:maxJ),
-     .                                CurlETri(1:N,minI:maxI,minJ:maxJ))
+!        ...construct the shape functions
+            call AncETri(GNupTF(abc),GDNupTF(1:N,abc),nordTF,IdecTF,N, &
+                                          ETri(1:N,minI:maxI,minJ:maxJ), &
+                                      CurlETri(1:N,minI:maxI,minJ:maxJ))
             do nij=minIJ,maxIJ
               do i=minI,nij-minJ
                 j=nij-i
                 m=m+2
-c
+!
                 ShapE(1:N,m) = ETri(1:N,i,j)*MubTF(f)
                 call cross(N,DMubTF(1:N,f),ETri(1:N,i,j), DMubTFxETri)
-                CurlE(1:N,m) = MubTF(f)*CurlETri(1:N,i,j)
-     .                       + DMubTFxETri
+                CurlE(1:N,m) = MubTF(f)*CurlETri(1:N,i,j) &
+                             + DMubTFxETri
               enddo
             enddo
           enddo
         endif
       enddo
-c
-c  ...BUBBLE FUNCTIONS
-c  ...local parameters
+!
+!  ...BUBBLE FUNCTIONS
+!  ...local parameters
       nordB = Nord(14)
-c  ...FAMILY 1 (gradients of H1 bubbles)
+!  ...FAMILY 1 (gradients of H1 bubbles)
       ndofB = (nordB-1)**3
-c  ...if necessary, create bubbles
+!  ...if necessary, create bubbles
       if (ndofB.gt.0) then
-c    ...local parameters (again)
+!    ...local parameters (again)
         IdecB(1:2) = .TRUE.; IdecB(3) = .TRUE.
         minI = 2
         minJ = 2
@@ -554,29 +554,29 @@ c    ...local parameters (again)
         maxI = nordB
         maxJ = nordB
         maxK = nordB
-c    ...construct shape functions, no need to orient
-        call AncPhiQuad(Mu,DMu,(/nordB,nordB/),IdecB(1:2),N,
-     .                                     phiQuad(minI:maxI,minJ:maxJ),
-     .                                DphiQuad(1:N,minI:maxI,minJ:maxJ))
-        call AncPhiE(MuZ,DMuZ,nordB,IdecB(3),N,
-     .                             phiE(minK:maxK),DphiE(1:N,minK:maxK))
+!    ...construct shape functions, no need to orient
+        call AncPhiQuad(Mu,DMu,(/nordB,nordB/),IdecB(1:2),N, &
+                                           phiQuad(minI:maxI,minJ:maxJ), &
+                                      DphiQuad(1:N,minI:maxI,minJ:maxJ))
+        call AncPhiE(MuZ,DMuZ,nordB,IdecB(3),N, &
+                                   phiE(minK:maxK),DphiE(1:N,minK:maxK))
         do k=minK,maxK
           do j=minJ,maxJ
             do i=minI,maxI
               m=m+1
-c
-              ShapE(1:N,m) = phiQuad(i,j)*DphiE(1:N,k)
-     .                     + DphiQuad(1:N,i,j)*phiE(k)
+!
+              ShapE(1:N,m) = phiQuad(i,j)*DphiE(1:N,k) &
+                           + DphiQuad(1:N,i,j)*phiE(k)
               CurlE(1:N,m) = 0.d0
             enddo
           enddo
         enddo
       endif
-c  ...FAMILY 2 AND 3 (induced from quad face functions)
+!  ...FAMILY 2 AND 3 (induced from quad face functions)
       ndofB = nordB*(nordB-1)**2
-c  ...if necessary, create bubbles
+!  ...if necessary, create bubbles
       if (ndofB.gt.0) then
-c    ...local parameters
+!    ...local parameters
         IdecB(1:2) = .TRUE.; IdecB(3) = .TRUE.
         minF(1) = 0
         minF(2) = 2
@@ -584,19 +584,19 @@ c    ...local parameters
         maxF(1) = nordB-1
         maxF(2) = nordB
         maxK    = nordB
-c    ...loop over families
+!    ...loop over families
         do fam=0,1
           ab = cshift((/1,2/),fam);
           a = ab(1); b = ab(2)
-c    ...construct shape functions, no need to orient
-          call AncEQuad(Mu(0:1,ab),DMu(1:N,0:1,ab),(/nordB,nordB/),
-     .                                                    IdecB(ab),N,
-     .                       EQuad(1:N,minF(1):maxF(1),minF(2):maxF(2)),
-     .                   CurlEQuad(1:N,minF(1):maxF(1),minF(2):maxF(2)))
-          call AncPhiE(MuZ,DMuZ,nordB,IdecB(3),N,
-     .                             phiE(minK:maxK),DphiE(1:N,minK:maxK))
-c      ...in the code the outer loop always is
-c      ...numbered wrt the second global face axis
+!    ...construct shape functions, no need to orient
+          call AncEQuad(Mu(0:1,ab),DMu(1:N,0:1,ab),(/nordB,nordB/), &
+                                                          IdecB(ab),N, &
+                             EQuad(1:N,minF(1):maxF(1),minF(2):maxF(2)), &
+                         CurlEQuad(1:N,minF(1):maxF(1),minF(2):maxF(2)))
+          call AncPhiE(MuZ,DMuZ,nordB,IdecB(3),N, &
+                                   phiE(minK:maxK),DphiE(1:N,minK:maxK))
+!      ...in the code the outer loop always is
+!      ...numbered wrt the second global face axis
           minF = cshift(minF,-fam); maxF = cshift(maxF,-fam)
           do k=minK,maxK
             do jg=minF(2),maxF(2)
@@ -604,36 +604,36 @@ c      ...numbered wrt the second global face axis
                 ij = cshift((/ig,jg/),fam)
                 i = ij(1); j = ij(2)
                 m=m+1
-c
+!
                 ShapE(1:N,m) = MuZ(0)*EQuad(1:N,i,j)*phiE(k)
-                call cross(3,DMuZ(1:N,0)*phiE(k) + MuZ(0)*DphiE(1:N,k),
-     .                                           EQuad(1:N,i,j), vectmp)
-                CurlE(1:N,m) = MuZ(0)*CurlEQuad(1:N,i,j)*phiE(k)
-     .                       + vectmp
+                call cross(3,DMuZ(1:N,0)*phiE(k) + MuZ(0)*DphiE(1:N,k), &
+                                                 EQuad(1:N,i,j), vectmp)
+                CurlE(1:N,m) = MuZ(0)*CurlEQuad(1:N,i,j)*phiE(k) &
+                             + vectmp
               enddo
             enddo
           enddo
         enddo
       endif
-c  ...FAMILY 4
+!  ...FAMILY 4
       ndofB = (nordB-1)**2
-c  ...if necessary, create bubbles
+!  ...if necessary, create bubbles
       if (ndofB.gt.0) then
-c    ...local parameters (again)
+!    ...local parameters (again)
         IdecB(1:2) = .TRUE.
         minI = 2
         minJ = 2
         maxI = nordB
         maxJ = nordB
-c    ...construct shape functions, no need to orient
-        call AncPhiQuad(Mu,DMu,(/nordB,nordB/),IdecB(1:2),N,
-     .                                     phiQuad(minI:maxI,minJ:maxJ),
-     .                                DphiQuad(1:N,minI:maxI,minJ:maxJ))
+!    ...construct shape functions, no need to orient
+        call AncPhiQuad(Mu,DMu,(/nordB,nordB/),IdecB(1:2),N, &
+                                           phiQuad(minI:maxI,minJ:maxJ), &
+                                      DphiQuad(1:N,minI:maxI,minJ:maxJ))
         do j=minJ,maxJ
           do i=minI,maxI
             m=m+1
             ijmax = max(i,j)
-c
+!
             tmp = phiQuad(i,j)*MuZ(0)**(ijmax-1)
             ShapE(1:N,m) = tmp*DMuZ(1:N,1)
             call cross(N,DphiQuad(1:N,i,j),DMuZ(1:N,1), DphiQuadxDMuZ)
@@ -642,18 +642,18 @@ c
         enddo
       endif
 
-c
-c  ...give total degrees of freedom
+!
+!  ...give total degrees of freedom
       NrdofE = m
-c
+!
 #if HP3D_DEBUG
-c  ...print this when debugging
+!  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001)Xi(1:3),Nord(1:14),NoriE(1:8),NoriF(1:5),NrdofE
- 7001   format('shape3DEPyra: Xi = ',3f8.3,/,
-     .         'Norder = ',4i3,1x,4i3,3x,i3,1x,4i3,3x,i3,/,
-     .         'orient = ',4i3,1x,4i3,3x,i3,1x,4i3,/,
-     .         'NrdofE = ',2i3)
+ 7001   format('shape3DEPyra: Xi = ',3f8.3,/, &
+               'Norder = ',4i3,1x,4i3,3x,i3,1x,4i3,3x,i3,/, &
+               'orient = ',4i3,1x,4i3,3x,i3,1x,4i3,/, &
+               'NrdofE = ',2i3)
         m=0
         do e=1,4
           nordME = Nord(e)
@@ -743,41 +743,41 @@ c  ...print this when debugging
         call pause
       endif
 #endif
-c
-c
-      end subroutine shape3DEPyra
-c
-c
-c--------------------------------------------------------------------
-c
-c     routine name      - shape3DVPyra
-c
-c--------------------------------------------------------------------
-c
-c     latest revision:  - Jan 15, Apr 17, Jul 21
-c
-c     purpose:          - routine returns values of 3D pyramid element
-c                         H(div) shape functions and their divergences
-c
-c     arguments:
-c
-c     in:
-c          Xi           - master pyramid coordinates from (0,1)^3
-c          Nord         - polynomial order for the nodes (H1 sense)
-c          NoriF        - face orientation
-c          Nsize        - relevant sizes of local arrays
-c
-c     out:
-c          NrdofV       - number of dof
-c          ShapV        - values of the shape functions at the point
-c          DivV         - divergence of the shape functions
-c
-c-----------------------------------------------------------------------
-c
-      subroutine shape3DVPyra(Xi,Nord,NoriF,Nsize, NrdofV,ShapV,DivV)
-c
+!
+!
+   end subroutine shape3DEPyra
+!
+!
+!--------------------------------------------------------------------
+!
+!     routine name      - shape3DVPyra
+!
+!--------------------------------------------------------------------
+!
+!     latest revision:  - Jan 15, Apr 17, Jul 21
+!
+!     purpose:          - routine returns values of 3D pyramid element
+!                         H(div) shape functions and their divergences
+!
+!     arguments:
+!
+!     in:
+!          Xi           - master pyramid coordinates from (0,1)^3
+!          Nord         - polynomial order for the nodes (H1 sense)
+!          NoriF        - face orientation
+!          Nsize        - relevant sizes of local arrays
+!
+!     out:
+!          NrdofV       - number of dof
+!          ShapV        - values of the shape functions at the point
+!          DivV         - divergence of the shape functions
+!
+!-----------------------------------------------------------------------
+!
+   subroutine shape3DVPyra(Xi,Nord,NoriF,Nsize, NrdofV,ShapV,DivV)
+!
       use parameters , only : MODORDER
-c
+!
       implicit none
       integer, intent(in)  :: Nord(14),NoriF(5),Nsize(2)
       integer, intent(out) :: NrdofV
@@ -816,25 +816,25 @@ c
       double precision :: tmp,tmp1,tmp2,tmp3
       double precision :: vectmp(3),vectmp1(3),vectmp2(3)
       double precision :: DMuZVQuad,DphiQuadxDMuZ(3)
-c
+!
 #if HP3D_DEBUG
-c  ...debugging flag
+!  ...debugging flag
       integer :: iprint
       iprint=0
 #endif
-c
-c  ...spatial dimensions
+!
+!  ...spatial dimensions
       N=3
-c
-c  ...initiate counter for shape functions
+!
+!  ...initiate counter for shape functions
       m=0
-c
-c  ...Define affine coordinates and gradients
+!
+!  ...Define affine coordinates and gradients
       call AffinePyramid(Xi, Lam,DLam,Mu,DMu,Nu,DNu,MuZ,DMuZ)
-c
-c  ...QUADRILATERAL FACE SHAPE FUNCTIONS
+!
+!  ...QUADRILATERAL FACE SHAPE FUNCTIONS
       call ProjectPyraQF(Mu,DMu, MupQF,DMupQF,IdecQF)
-c  ...local parameters
+!  ...local parameters
       call decod(Nord(9),MODORDER,2, nordQF)
       ndofQF = nordQF(1)*nordQF(2)
       if (ndofQF.gt.0) then
@@ -842,63 +842,63 @@ c  ...local parameters
         minJ = 0
         maxI = NordQF(1)-1
         maxJ = NordQF(2)-1
-c    ...orient
-        call OrientQuad(MupQF,DMupQF,NoriF(1),IdecQF,N,
-     .                                           GMupQF,GDMupQF,GIdecQF)
-c    ...construct the shape functions
-        call AncVQuad(GMupQF,GDMupQF,nordQF,GIdecQF,N,
-     .                                   VQuad(1:N,minI:maxI,minJ:maxJ),
-     .                                    DivVQuad(minI:maxI,minJ:maxJ))
+!    ...orient
+        call OrientQuad(MupQF,DMupQF,NoriF(1),IdecQF,N, &
+                                                 GMupQF,GDMupQF,GIdecQF)
+!    ...construct the shape functions
+        call AncVQuad(GMupQF,GDMupQF,nordQF,GIdecQF,N, &
+                                         VQuad(1:N,minI:maxI,minJ:maxJ), &
+                                          DivVQuad(minI:maxI,minJ:maxJ))
         do j=minJ,maxJ
           do i=minI,maxI
             m=m+1
-c
+!
             ShapV(1:N,m) = MuZ(0)**3*VQuad(1:N,i,j)
             call dot_product(DMuZ(1:N,0),VQuad(1:N,i,j), DMuZVQuad)
-            DivV(m)      = MuZ(0)**3*DivVQuad(i,j)
-     .                   + 3*MuZ(0)**2*DMuZVQuad
+            DivV(m)      = MuZ(0)**3*DivVQuad(i,j) &
+                         + 3*MuZ(0)**2*DMuZVQuad
           enddo
         enddo
       endif
-c
-c  ...TRIANGULAR FACE SHAPE FUNCTIONS
-      call BlendProjectPyraTF(Mu,DMu,Nu,DNu,
-     .                                 MubTF,DMubTF,NupTF,DNupTF,IdecTF)
+!
+!  ...TRIANGULAR FACE SHAPE FUNCTIONS
+      call BlendProjectPyraTF(Mu,DMu,Nu,DNu, &
+                                       MubTF,DMubTF,NupTF,DNupTF,IdecTF)
       call ProjectPyraLamTF(Lam,DLam, LampTF,DLampTF,IdecLamTF)
-c  ...loop over faces
+!  ...loop over faces
       do f=1,4
-c    ...local parameters
+!    ...local parameters
         nordTF = Nord(9+f)
         ndofTF = (nordTF+1)*nordTF/2
         if (ndofTF.gt.0) then
-c      ...local parameters (again)
+!      ...local parameters (again)
           minI  = 0
           minJ  = 0
           minIJ = minI+minJ
           maxIJ = nordTF-1
           maxI  = maxIJ-minJ
           maxJ  = maxIJ-minI
-c      ...orient first
-          call OrientTri(NupTF(0:2,f),DNupTF(1:N,0:2,f),NoriF(f+1),N,
-     .                                                   GNupTF,GDNupTF)
-          call OrientTri(LampTF(0:2,f),DLampTF(1:N,0:2,f),NoriF(f+1),N,
-     .                                                 GLampTF,GDLampTF)
-c        ...construct the shape functions
-          call AncVTri(GNupTF,GDNupTF,nordTF,IdecTF,N,
-     .                                    VTri(1:N,minI:maxI,minJ:maxJ),
-     .                                     DivVTri(minI:maxI,minJ:maxJ))
-          call AncVTri(GLampTF,GDLampTF,nordTF,IdecLamTF,N,
-     .                                   VTri2(1:N,minI:maxI,minJ:maxJ),
-     .                                    DivVTri2(minI:maxI,minJ:maxJ))
+!      ...orient first
+          call OrientTri(NupTF(0:2,f),DNupTF(1:N,0:2,f),NoriF(f+1),N, &
+                                                         GNupTF,GDNupTF)
+          call OrientTri(LampTF(0:2,f),DLampTF(1:N,0:2,f),NoriF(f+1),N, &
+                                                       GLampTF,GDLampTF)
+!        ...construct the shape functions
+          call AncVTri(GNupTF,GDNupTF,nordTF,IdecTF,N, &
+                                          VTri(1:N,minI:maxI,minJ:maxJ), &
+                                           DivVTri(minI:maxI,minJ:maxJ))
+          call AncVTri(GLampTF,GDLampTF,nordTF,IdecLamTF,N, &
+                                         VTri2(1:N,minI:maxI,minJ:maxJ), &
+                                          DivVTri2(minI:maxI,minJ:maxJ))
           do nij=minIJ,maxIJ
             do i=minI,nij-minJ
               j=nij-i
               m=m+1
-c
+!
               vectmp1 = MubTF(f)*VTri(1:N,i,j)
               vectmp2 = VTri2(1:N,i,j)/MubTF(f)
               ShapV(1:N,m) = (vectmp1+vectmp2)/2
-c
+!
               tmp1 = MubTF(f)*DivVTri(i,j)
               tmp2 = DivVTri2(i,j)/MubTF(f)
               vectmp = VTri(1:N,i,j)-VTri2(1:N,i,j)/(MubTF(f)**2)
@@ -908,14 +908,14 @@ c
           enddo
         endif
       enddo
-c
-c  ...BUBBLE FUNCTIONS
+!
+!  ...BUBBLE FUNCTIONS
       nordB = Nord(14)
-c  ...FAMILY 1 AND 2 (curl of families 2 and 3 from H(curl))
+!  ...FAMILY 1 AND 2 (curl of families 2 and 3 from H(curl))
       ndofB = nordB*(nordB-1)**2
-c  ...if necessary, create bubbles
+!  ...if necessary, create bubbles
       if (ndofB.gt.0) then
-c    ...local parameters
+!    ...local parameters
         IdecB(1:2) = .TRUE.; IdecB(3) = .TRUE.
         minF(1) = 0
         minF(2) = 2
@@ -923,19 +923,19 @@ c    ...local parameters
         maxF(1) = nordB-1
         maxF(2) = nordB
         maxK    = nordB
-c    ...loop over families
+!    ...loop over families
         do fam=0,1
           ab = cshift((/1,2/),fam);
           a = ab(1); b = ab(2)
-c    ...construct shape functions, no need to orient
-          call AncEQuad(Mu(0:1,ab),DMu(1:N,0:1,ab),(/nordB,nordB/),
-     .                                                    IdecB(ab),N,
-     .                       EQuad(1:N,minF(1):maxF(1),minF(2):maxF(2)),
-     .                   CurlEQuad(1:N,minF(1):maxF(1),minF(2):maxF(2)))
-          call AncPhiE(MuZ,DMuZ,nordB,IdecB(3),N,
-     .                             phiE(minK:maxK),DphiE(1:N,minK:maxK))
-c      ...in the code the outer loop always is
-c      ...numbered wrt the second global face axis
+!    ...construct shape functions, no need to orient
+          call AncEQuad(Mu(0:1,ab),DMu(1:N,0:1,ab),(/nordB,nordB/), &
+                                                          IdecB(ab),N, &
+                             EQuad(1:N,minF(1):maxF(1),minF(2):maxF(2)), &
+                         CurlEQuad(1:N,minF(1):maxF(1),minF(2):maxF(2)))
+          call AncPhiE(MuZ,DMuZ,nordB,IdecB(3),N, &
+                                   phiE(minK:maxK),DphiE(1:N,minK:maxK))
+!      ...in the code the outer loop always is
+!      ...numbered wrt the second global face axis
           minF = cshift(minF,-fam); maxF = cshift(maxF,-fam)
           do k=minK,maxK
             do jg=minF(2),maxF(2)
@@ -943,47 +943,47 @@ c      ...numbered wrt the second global face axis
                 ij = cshift((/ig,jg/),fam)
                 i = ij(1); j = ij(2)
                 m=m+1
-c
-                call cross(3,DMuZ(1:N,0)*phiE(k) + MuZ(0)*DphiE(1:N,k),
-     .                                           EQuad(1:N,i,j), vectmp)
-                ShapV(1:N,m) = MuZ(0)*CurlEQuad(1:N,i,j)*phiE(k)
-     .                       + vectmp
+!
+                call cross(3,DMuZ(1:N,0)*phiE(k) + MuZ(0)*DphiE(1:N,k), &
+                                                 EQuad(1:N,i,j), vectmp)
+                ShapV(1:N,m) = MuZ(0)*CurlEQuad(1:N,i,j)*phiE(k) &
+                             + vectmp
                 DivV(m)      = 0
               enddo
             enddo
           enddo
         enddo
       endif
-c  ...FAMILY 3 (curl of family 4 from H(curl))
+!  ...FAMILY 3 (curl of family 4 from H(curl))
       ndofB = (nordB-1)**2
-c  ...if necessary, create bubbles
+!  ...if necessary, create bubbles
       if (ndofB.gt.0) then
-c    ...local parameters (again)
+!    ...local parameters (again)
         IdecB(1:2) = .TRUE.; IdecB(3) = .TRUE.
         minI = 2
         minJ = 2
         maxI = nordB
         maxJ = nordB
-c    ...construct shape functions, no need to orient
-        call AncPhiQuad(Mu,DMu,(/nordB,nordB/),IdecB(1:2),N,
-     .                                     phiQuad(minI:maxI,minJ:maxJ),
-     .                                DphiQuad(1:N,minI:maxI,minJ:maxJ))
+!    ...construct shape functions, no need to orient
+        call AncPhiQuad(Mu,DMu,(/nordB,nordB/),IdecB(1:2),N, &
+                                           phiQuad(minI:maxI,minJ:maxJ), &
+                                      DphiQuad(1:N,minI:maxI,minJ:maxJ))
         do j=minJ,maxJ
           do i=minI,maxI
             m=m+1
             ijmax = max(i,j)
-c
+!
             call cross(N,DphiQuad(1:N,i,j),DMuZ(1:N,1), DphiQuadxDMuZ)
             ShapV(1:N,m) = DphiQuadxDMuZ*MuZ(0)**(ijmax-1)
             DivV(m)      = 0
           enddo
         enddo
       endif
-c  ...FAMILY 4 (induced from quad face functions)
+!  ...FAMILY 4 (induced from quad face functions)
       ndofB = nordB**2*(nordB-1)
-c  ...if necessary, create bubbles
+!  ...if necessary, create bubbles
       if (ndofB.gt.0) then
-c    ...local parameters (again)
+!    ...local parameters (again)
         IdecB(1:2) = .TRUE.
         minI = 0
         minJ = 0
@@ -991,48 +991,48 @@ c    ...local parameters (again)
         maxI = nordB-1
         maxJ = nordB-1
         maxK = nordB
-c    ...construct shape functions, no need to orient
-        call AncVQuad(Mu,DMu,(/nordB,nordB/),IdecB(1:2),N,
-     .                                   VQuad(1:N,minI:maxI,minJ:maxJ),
-     .                                    DivVQuad(minI:maxI,minJ:maxJ))
-        call AncPhiE(MuZ,DMuZ,nordB,IdecB(3),N,
-     .                             phiE(minK:maxK),DphiE(1:N,minK:maxK))
+!    ...construct shape functions, no need to orient
+        call AncVQuad(Mu,DMu,(/nordB,nordB/),IdecB(1:2),N, &
+                                         VQuad(1:N,minI:maxI,minJ:maxJ), &
+                                          DivVQuad(minI:maxI,minJ:maxJ))
+        call AncPhiE(MuZ,DMuZ,nordB,IdecB(3),N, &
+                                   phiE(minK:maxK),DphiE(1:N,minK:maxK))
         do k=minK,maxK
           do j=minJ,maxJ
             do i=minI,maxI
               m=m+1
-c
+!
               ShapV(1:N,m) = MuZ(0)**2*VQuad(1:N,i,j)*phiE(k)
-              call dot_product(2*MuZ(0)*phiE(k)*DMuZ(1:N,0)
-     .                     + MuZ(0)**2*DphiE(1:N,k),VQuad(1:N,i,j), tmp)
-              DivV(m)      = MuZ(0)**2*DivVQuad(i,j)*phiE(k)
-     .                     + tmp
+              call dot_product(2*MuZ(0)*phiE(k)*DMuZ(1:N,0) &
+                           + MuZ(0)**2*DphiE(1:N,k),VQuad(1:N,i,j), tmp)
+              DivV(m)      = MuZ(0)**2*DivVQuad(i,j)*phiE(k) &
+                           + tmp
             enddo
           enddo
         enddo
       endif
-c  ...FAMILY 5
+!  ...FAMILY 5
       ndofB = (nordB-1)**2
-c  ...if necessary, create bubbles
+!  ...if necessary, create bubbles
       if (ndofB.gt.0) then
-c    ...local parameters (again)
+!    ...local parameters (again)
         IdecB(1:2) = .TRUE.
         minI = 2
         minJ = 2
         maxI = nordB
         maxJ = nordB
-c    ...construct shape functions, no need to orient
-        call AncPhiE(Mu(0:1,1),DMu(1:N,0:1,1),nordB,IdecB(1),N,
-     .                             phiE(minI:maxI),DphiE(1:N,minI:maxI))
-        call AncPhiE(Mu(0:1,2),DMu(1:N,0:1,2),nordB,IdecB(2),N,
-     .                           phiE2(minJ:maxJ),DphiE2(1:N,minJ:maxJ))
+!    ...construct shape functions, no need to orient
+        call AncPhiE(Mu(0:1,1),DMu(1:N,0:1,1),nordB,IdecB(1),N, &
+                                   phiE(minI:maxI),DphiE(1:N,minI:maxI))
+        call AncPhiE(Mu(0:1,2),DMu(1:N,0:1,2),nordB,IdecB(2),N, &
+                                 phiE2(minJ:maxJ),DphiE2(1:N,minJ:maxJ))
         do j=minJ,maxJ
           do i=minI,maxI
             m=m+1
-c
+!
             call cross(N,DphiE(1:N,i),DphiE2(1:N,j), vectmp1)
-            call cross(N,DMuZ(1:N,0),phiE(i)*DphiE2(1:N,j)
-     .                                 - DphiE(1:N,i)*phiE2(j), vectmp2)
+            call cross(N,DMuZ(1:N,0),phiE(i)*DphiE2(1:N,j) &
+                                       - DphiE(1:N,i)*phiE2(j), vectmp2)
             vectmp = MuZ(0)*(MuZ(0)*vectmp1+vectmp2)
             ShapV(1:N,m) = MuZ(1)**(i-1)*vectmp
             call dot_product(DMuZ(1:N,1),vectmp, tmp)
@@ -1040,43 +1040,43 @@ c
           enddo
         enddo
       endif
-c  ...FAMILY 6 AND 7
+!  ...FAMILY 6 AND 7
       ndofB = nordB-1
-c  ...if necessary, create bubbles
+!  ...if necessary, create bubbles
       if (ndofB.gt.0) then
-c    ...local parameters (again)
+!    ...local parameters (again)
         IdecB(1:2) = .TRUE.
         minI = 2
         maxI = nordB
         do fam=0,1
           ab = cshift((/1,2/),fam)
           a = ab(1); b = ab(2)
-c      ...construct shape functions, no need to orient
-          call AncPhiE(Mu(0:1,a),DMu(1:N,0:1,a),nordB,IdecB(a),N,
-     .                             phiE(minI:maxI),DphiE(1:N,minI:maxI))
+!      ...construct shape functions, no need to orient
+          call AncPhiE(Mu(0:1,a),DMu(1:N,0:1,a),nordB,IdecB(a),N, &
+                                   phiE(minI:maxI),DphiE(1:N,minI:maxI))
           do i=minI,maxI
             m=m+1
-c
-            call cross(N,DphiE(1:N,i)*MuZ(0)**2
-     .              + 2*MuZ(0)*phiE(i)*DMuZ(1:N,0),DMu(1:N,b,1), vectmp)
+!
+            call cross(N,DphiE(1:N,i)*MuZ(0)**2 &
+                    + 2*MuZ(0)*phiE(i)*DMuZ(1:N,0),DMu(1:N,b,1), vectmp)
             ShapV(1:N,m) = MuZ(1)**(i-1)*vectmp
             call dot_product(DMuZ(1:N,1),vectmp, tmp)
             DivV(m)      = (i-1)*MuZ(1)**(i-2)*tmp
           enddo
         enddo
       endif
-c
-c  ...total degrees of freedom
+!
+!  ...total degrees of freedom
       NrdofV = m
-c
+!
 #if HP3D_DEBUG
-c  ...print this when debugging
+!  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001)Xi(1:3),Nord(1:14),NoriF(1:5),NrdofV
- 7001   format('shape3DVPyra: Xi = ',3f8.3,/,
-     .         'Norder = ',4i3,1x,4i3,3x,i3,1x,4i3,3x,i3,/,
-     .         'orient = ',i3,1x,4i3,/,
-     .         'NrdofV = ',3i3)
+ 7001   format('shape3DVPyra: Xi = ',3f8.3,/, &
+               'Norder = ',4i3,1x,4i3,3x,i3,1x,4i3,3x,i3,/, &
+               'orient = ',i3,1x,4i3,/, &
+               'NrdofV = ',3i3)
         m=0
         call decod(Nord(9),MODORDER,2, nordQF)
         ndofQF = nordQF(1)*nordQF(2)
@@ -1150,37 +1150,37 @@ c  ...print this when debugging
         call pause
       endif
 #endif
-c
-c
-      end subroutine shape3DVPyra
+!
+!
+   end subroutine shape3DVPyra
 
 
-c--------------------------------------------------------------------
-c
-c     routine name      - shape3DQPyra
-c
-c--------------------------------------------------------------------
-c
-c     latest revision:  - Jan 15, Apr 17
-c
-c     purpose:          - routine returns values of 3D pyramid
-c                         element L2 shape functions
-c
-c     arguments:
-c
-c     in:
-c          Xi           - master pyramid coordinates from (0,1)^3
-c          Nord         - polynomial order for the nodes (H1 sense)
-c          Nsize        - relevant sizes of local arrays
-c
-c     out:
-c          NrdofQ       - number of dof
-c          ShapQ        - values of the shape functions at the point
-c
-c-----------------------------------------------------------------------
-c
-      subroutine shape3DQPyra(Xi,Nord,Nsize, NrdofQ,ShapQ)
-c
+!--------------------------------------------------------------------
+!
+!     routine name      - shape3DQPyra
+!
+!--------------------------------------------------------------------
+!
+!     latest revision:  - Jan 15, Apr 17
+!
+!     purpose:          - routine returns values of 3D pyramid
+!                         element L2 shape functions
+!
+!     arguments:
+!
+!     in:
+!          Xi           - master pyramid coordinates from (0,1)^3
+!          Nord         - polynomial order for the nodes (H1 sense)
+!          Nsize        - relevant sizes of local arrays
+!
+!     out:
+!          NrdofQ       - number of dof
+!          ShapQ        - values of the shape functions at the point
+!
+!-----------------------------------------------------------------------
+!
+   subroutine shape3DQPyra(Xi,Nord,Nsize, NrdofQ,ShapQ)
+!
       implicit none
       integer, intent(in)  :: Nord(14),Nsize(2)
       integer, intent(out) :: NrdofQ
@@ -1193,23 +1193,23 @@ c
       double precision :: Nu(0:2,2),DNu(3,0:2,2)
       double precision :: MuZ(0:1),DMuZ(3,0:1)
       double precision :: homP(0:Nsize(1)-1,3)
-c
+!
 #if HP3D_DEBUG
-c  ...debugging flag
+!  ...debugging flag
       integer :: iprint
       iprint=0
 #endif
-c
-c  ...spatial dimensions
+!
+!  ...spatial dimensions
       N=3
-c
-c  ...initiate counter for shape functions
+!
+!  ...initiate counter for shape functions
       m=0
-c
-c  ...Define affine coordinates and gradients
+!
+!  ...Define affine coordinates and gradients
       call AffinePyramid(Xi, Lam,DLam,Mu,DMu,Nu,DNu,MuZ,DMuZ)
-c
-c  ...local parameters
+!
+!  ...local parameters
       nordB = Nord(14)
       ndofB = nordB**3
       minI = 0
@@ -1218,32 +1218,32 @@ c  ...local parameters
       maxI = Nord(14)-1
       maxJ = Nord(14)-1
       maxK = Nord(14)-1
-c
-c  ...get homogenized Legendre polynomials, homP
+!
+!  ...get homogenized Legendre polynomials, homP
       call HomLegendre(Mu(0:1,1),maxI, homP(minI:maxI,1))
       call HomLegendre(Mu(0:1,2),maxJ, homP(minJ:maxJ,2))
       call HomLegendre(MuZ,maxK, homP(minK:maxK,3))
-c
-c  ...construct shape functions
+!
+!  ...construct shape functions
       do k=minK,maxK
         do j=minJ,maxJ
           do i=minI,maxI
             m=m+1
-c
+!
             ShapQ(m) = homP(i,1)*homP(j,2)*homP(k,3)
           enddo
         enddo
       enddo
-c
-c  ...give total degrees of freedom
+!
+!  ...give total degrees of freedom
       NrdofQ = m
-c
+!
 #if HP3D_DEBUG
-c  ...print this when debugging
+!  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001) Xi(1:3),Nord(14)
- 7001   format('shape3DQPyra: Xi = ',3f8.3,/,
-     .         'Norder = ',i2)
+ 7001   format('shape3DQPyra: Xi = ',3f8.3,/, &
+               'Norder = ',i2)
         nordB = Nord(14)
         ndofB = nordB**3
         if (ndofB.gt.0) then
@@ -1259,5 +1259,5 @@ c  ...print this when debugging
         call pause
       endif
 #endif
-c
-      end subroutine shape3DQPyra
+!
+   end subroutine shape3DQPyra

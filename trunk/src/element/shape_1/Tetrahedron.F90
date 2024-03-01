@@ -1,38 +1,38 @@
-c Routines:
-c  - shape3DHTet
-c  - shape3DETet
-c  - shape3DVTet
-c  - shape3DQTet
-c--------------------------------------------------------------------
-c
-c     routine name      - shape3DHTet
-c
-c--------------------------------------------------------------------
-c
-c     latest revision:  - Oct 14, Apr 17, Jul 21
-c
-c     purpose:          - routine returns values of 3D tetrahedron element
-c                         H1 shape functions and their derivatives
-c
-c     arguments:
-c
-c     in:
-c          X            - master tetrahedron coordinates from (0,1)^3
-c          Nord         - polynomial order for the nodes (H1 sense)
-c          NoriE        - edge orientation
-c          NoriF        - face orientation
-c          Nsize        - relevant sizes of local arrays
-c
-c     out:
-c          NrdofH       - number of dof
-c          ShapH        - values of the shape functions at the point
-c          GradH        - gradients of the shape functions
-c
-c-----------------------------------------------------------------------
-c
-      subroutine shape3DHTet(X,Nord,NoriE,NoriF,Nsize,
-     .                                              NrdofH,ShapH,GradH)
-c
+! Routines:
+!  - shape3DHTet
+!  - shape3DETet
+!  - shape3DVTet
+!  - shape3DQTet
+!--------------------------------------------------------------------
+!
+!     routine name      - shape3DHTet
+!
+!--------------------------------------------------------------------
+!
+!     latest revision:  - Oct 14, Apr 17, Jul 21
+!
+!     purpose:          - routine returns values of 3D tetrahedron element
+!                         H1 shape functions and their derivatives
+!
+!     arguments:
+!
+!     in:
+!          X            - master tetrahedron coordinates from (0,1)^3
+!          Nord         - polynomial order for the nodes (H1 sense)
+!          NoriE        - edge orientation
+!          NoriF        - face orientation
+!          Nsize        - relevant sizes of local arrays
+!
+!     out:
+!          NrdofH       - number of dof
+!          ShapH        - values of the shape functions at the point
+!          GradH        - gradients of the shape functions
+!
+!-----------------------------------------------------------------------
+!
+   subroutine shape3DHTet(X,Nord,NoriE,NoriF,Nsize, &
+                                                    NrdofH,ShapH,GradH)
+!
       implicit none
       integer, intent(in)  :: Nord(11),NoriE(6),NoriF(4),Nsize(2)
       integer, intent(out) :: NrdofH
@@ -54,51 +54,51 @@ c
       double precision :: DphiTri(3,2:Nsize(1)-1,1:Nsize(1)-2)
       double precision :: homLbet(3:Nsize(1)-1,1:Nsize(1)-3)
       double precision :: DhomLbet(3,3:Nsize(1)-1,1:Nsize(1)-3)
-c
+!
 #if HP3D_DEBUG
-c  ...debugging flag
+!  ...debugging flag
       integer :: iprint
       iprint=0
 #endif
-c
-c  ...spatial dimensions
+!
+!  ...spatial dimensions
       N=3
-c
-c  ...local parameters
+!
+!  ...local parameters
       minI = 2; minJ = 1; minK = 1
       minIJ = minI+minJ;
       minIJK = minIJ+minK
-c
-c  ...initiate counter for shape functions
+!
+!  ...initiate counter for shape functions
       m=0
-c
-c  ...Define affine coordinates and gradients
+!
+!  ...Define affine coordinates and gradients
       call AffineTetrahedron(X, Lam,DLam)
-c
-c  ...VERTEX SHAPE FUNCTIONS
+!
+!  ...VERTEX SHAPE FUNCTIONS
       call BlendTetV(Lam,DLam, LambV,DLambV)
       do v=1,4
        m=m+1
        ShapH(m) = LambV(v)
        GradH(1:N,m) = DLambV(1:N,v)
       enddo
-c
-c  ...EDGE SHAPE FUNCTIONS
+!
+!  ...EDGE SHAPE FUNCTIONS
       call ProjectTetE(Lam,DLam, LampE,DLampE,IdecE)
-c  ...loop over edges
+!  ...loop over edges
       do e=1,6
-c    ...local parameters
+!    ...local parameters
         nordE = Nord(e)
         ndofE = nordE-1
         if (ndofE.gt.0) then
-c      ...local parameters (again)
+!      ...local parameters (again)
           maxI = nordE
-c      ...orient first
-          call OrientE(LampE(0:1,e),DLampE(1:N,0:1,e),NoriE(e),N,
-     .                                                   GLampE,GDLampE)
-c      ...construct the shape functions
-          call AncPhiE(GLampE,GDLampE,nordE,IdecE,N,
-     .                             phiE(minI:maxI),DphiE(1:N,minI:maxI))
+!      ...orient first
+          call OrientE(LampE(0:1,e),DLampE(1:N,0:1,e),NoriE(e),N, &
+                                                         GLampE,GDLampE)
+!      ...construct the shape functions
+          call AncPhiE(GLampE,GDLampE,nordE,IdecE,N, &
+                                   phiE(minI:maxI),DphiE(1:N,minI:maxI))
           do i=minI,maxI
             m=m+1
             ShapH(m) = phiE(i)
@@ -106,45 +106,45 @@ c      ...construct the shape functions
           enddo
         endif
       enddo
-c
-c  ...FACE SHAPE FUNCTIONS
+!
+!  ...FACE SHAPE FUNCTIONS
       call ProjectTetF(Lam,DLam, LampF,DLampF,IdecF)
-c  ...loop over faces
+!  ...loop over faces
       do f=1,4
-c    ...local parameters
+!    ...local parameters
         nordF = Nord(6+f)
         ndofF = (nordF-1)*(nordF-2)/2
         if (ndofF.gt.0) then
-c      ...local parameters (again)
+!      ...local parameters (again)
           maxIJ = nordF
           maxI = maxIJ-minJ
           maxJ = maxIJ-minI
-c      ...orient first
-          call OrientTri(LampF(0:2,f),DLampF(1:N,0:2,f),NoriF(f),N,
-     .                                                  GLampF,GDLampF)
-c      ...construct the shape functions
-          call AncPhiTri(GLampF,GDLampF,nordF,IdecF,N,
-     .                                     phiTri(minI:maxI,minJ:maxJ),
-     .                                DphiTri(1:N,minI:maxI,minJ:maxJ))
+!      ...orient first
+          call OrientTri(LampF(0:2,f),DLampF(1:N,0:2,f),NoriF(f),N, &
+                                                        GLampF,GDLampF)
+!      ...construct the shape functions
+          call AncPhiTri(GLampF,GDLampF,nordF,IdecF,N, &
+                                           phiTri(minI:maxI,minJ:maxJ), &
+                                      DphiTri(1:N,minI:maxI,minJ:maxJ))
             do nij=minIJ,maxIJ
               do i=minI,nij-minJ
                 j=nij-i
                 m=m+1
-c
+!
                 ShapH(m) = phiTri(i,j)
                 GradH(1:N,m) = DphiTri(1:N,i,j)
               enddo
             enddo
         endif
       enddo
-c
-c  ...BUBBLE FUNCTIONS
-c  ...local parameters
+!
+!  ...BUBBLE FUNCTIONS
+!  ...local parameters
       nordB = Nord(11)
       ndofB = (nordB-1)*(nordB-2)*(nordB-3)/6
-c  ...if necessary, create bubbles
+!  ...if necessary, create bubbles
       if (ndofB.gt.0) then
-c    ...local parameters (again)
+!    ...local parameters (again)
         IdecB(1) = IdecF; IdecB(2) = .TRUE.
         minbeta = 2*minIJ
         maxIJK = nordB
@@ -152,40 +152,40 @@ c    ...local parameters (again)
         maxI = maxIJ-minJ
         maxJ = maxIJ-minI
         maxK = maxIJK-minIJ
-c    ...call phiTri and HomIJacobi - no need to orient
-        call AncPhiTri(Lam(0:2),DLam(1:N,0:2),nordB-minK,IdecB(1),N,
-     .                                     phiTri(minI:maxI,minJ:maxJ),
-     .                                DphiTri(1:N,minI:maxI,minJ:maxJ))
-        call HomIJacobi((/1-Lam(3),Lam(3)/),
-     .           (/-DLam(1:N,3),DLam(1:N,3)/),maxK,minbeta,IdecB(2),N,
-     .                                  homLbet(minIJ:maxIJ,minK:maxK),
-     .                             DhomLbet(1:N,minIJ:maxIJ,minK:maxK))
+!    ...call phiTri and HomIJacobi - no need to orient
+        call AncPhiTri(Lam(0:2),DLam(1:N,0:2),nordB-minK,IdecB(1),N, &
+                                           phiTri(minI:maxI,minJ:maxJ), &
+                                      DphiTri(1:N,minI:maxI,minJ:maxJ))
+        call HomIJacobi((/1-Lam(3),Lam(3)/), &
+                 (/-DLam(1:N,3),DLam(1:N,3)/),maxK,minbeta,IdecB(2),N, &
+                                        homLbet(minIJ:maxIJ,minK:maxK), &
+                                   DhomLbet(1:N,minIJ:maxIJ,minK:maxK))
         do nijk=minIJK,maxIJK
           do nij=minIJ,nijk-minK
             do i=minI,nij-minJ
                 j=nij-i
                 k=nijk-nij
                 m=m+1
-c
+!
                 ShapH(m) = phiTri(i,j)*homLbet(nij,k)
-                GradH(1:N,m) = homLbet(nij,k)*DphiTri(1:N,i,j)
-     .                       + phiTri(i,j)*DhomLbet(1:N,nij,k)
+                GradH(1:N,m) = homLbet(nij,k)*DphiTri(1:N,i,j) &
+                             + phiTri(i,j)*DhomLbet(1:N,nij,k)
               enddo
             enddo
           enddo
       endif
-c
-c  ...give total degrees of freedom
+!
+!  ...give total degrees of freedom
       NrdofH = m
-c
+!
 #if HP3D_DEBUG
-c  ...print this when debugging
+!  ...print this when debugging
       if (iprint.ge.1) then
-        write(*,7001) X(1:3),Nord(1:11),
-     .                NoriE(1:6),NoriF(1:4)
- 7001   format('shape3DHTet: Xi = ',3f8.3,/,
-     .         'Norder = ',6i2,3x,4i2,3x,i2,/,
-     .         'orient = ',6i2,3x,4i2)
+        write(*,7001) X(1:3),Nord(1:11), &
+                      NoriE(1:6),NoriF(1:4)
+ 7001   format('shape3DHTet: Xi = ',3f8.3,/, &
+               'Norder = ',6i2,3x,4i2,3x,i2,/, &
+               'orient = ',6i2,3x,4i2)
         write(*,7010)
  7010   format('VERTEX SHAPE FUNCTIONS = ')
         do v=1,4
@@ -229,41 +229,41 @@ c  ...print this when debugging
         call pause
       endif
 #endif
-c
-c
-      end subroutine shape3DHTet
-c
-c
-c--------------------------------------------------------------------
-c
-c     routine name      - shape3DETet
-c
-c--------------------------------------------------------------------
-c
-c     latest revision:  - Oct 14, Apr 17, Jul 21
-c
-c     purpose:          - routine returns values of 3D tetrahedron element
-c                         H(curl) shape functions and their derivatives
-c
-c     arguments:
-c
-c     in:
-c          X            - master tetrahedron coordinates from (0,1)^3
-c          Nord         - polynomial order for the nodes (H1 sense)
-c          NoriE        - edge orientation
-c          NoriF        - face orientation
-c          Nsize        - relevant sizes of local arrays
-c
-c     out:
-c          NrdofE       - number of dof
-c          ShapE        - values of the shape functions at the point
-c          CurlE        - cur lof the shape functions
-c
-c-----------------------------------------------------------------------
-c
-      subroutine shape3DETet(X,Nord,NoriE,NoriF,Nsize,
-     .                                              NrdofE,ShapE,CurlE)
-c
+!
+!
+   end subroutine shape3DHTet
+!
+!
+!--------------------------------------------------------------------
+!
+!     routine name      - shape3DETet
+!
+!--------------------------------------------------------------------
+!
+!     latest revision:  - Oct 14, Apr 17, Jul 21
+!
+!     purpose:          - routine returns values of 3D tetrahedron element
+!                         H(curl) shape functions and their derivatives
+!
+!     arguments:
+!
+!     in:
+!          X            - master tetrahedron coordinates from (0,1)^3
+!          Nord         - polynomial order for the nodes (H1 sense)
+!          NoriE        - edge orientation
+!          NoriF        - face orientation
+!          Nsize        - relevant sizes of local arrays
+!
+!     out:
+!          NrdofE       - number of dof
+!          ShapE        - values of the shape functions at the point
+!          CurlE        - cur lof the shape functions
+!
+!-----------------------------------------------------------------------
+!
+   subroutine shape3DETet(X,Nord,NoriE,NoriF,Nsize, &
+                                                    NrdofE,ShapE,CurlE)
+!
       implicit none
       integer, intent(in)  :: Nord(11),NoriE(6),NoriF(4),Nsize(2)
       integer, intent(out) :: NrdofE
@@ -285,82 +285,82 @@ c
       double precision :: homLbet(1:Nsize(1)-1,1:Nsize(1)-1)
       double precision :: DhomLbet(1:3,1:Nsize(1)-1,1:Nsize(1)-1)
       double precision :: DhomLbetxETri(3)
-c
+!
 #if HP3D_DEBUG
-c  ...debugging flag
+!  ...debugging flag
       integer :: iprint
       iprint=0
 #endif
-c
-c  ...spatial dimension
+!
+!  ...spatial dimension
       N=3
-c
-c  ...local parameters
+!
+!  ...local parameters
       minI = 0; minJ = 1; minK = 1
       minIJ = minI+minJ
       minIJK = minIJ+minK
-c
-c  ...initiate counter for shape functions
+!
+!  ...initiate counter for shape functions
       m=0
-c
-c  ...Define affine coordinates and gradients
+!
+!  ...Define affine coordinates and gradients
       call AffineTetrahedron(X, Lam,DLam)
-c
-c  ...EDGE SHAPE FUNCTIONS
+!
+!  ...EDGE SHAPE FUNCTIONS
       call ProjectTetE(Lam,DLam, LampE,DLampE,IdecE)
-c  ...loop over edges
+!  ...loop over edges
       do e=1,6
-c    ...local parameters
+!    ...local parameters
         nordE = Nord(e)
         ndofE = nordE
         if (ndofE.gt.0) then
-c      ...local parameters (again)
+!      ...local parameters (again)
           maxI = nordE-1
-c      ...orient
-          call OrientE(LampE(0:1,e),DLampE(1:N,0:1,e),NoriE(e),N,
-     .                                                   GLampE,GDLampE)
-c      ...construct the shape functions
-          call AncEE(GLampE,GDLampE,nordE,IdecE,N, EE(1:N,minI:maxI),
-     .                                            CurlEE(1:N,minI:maxI))
+!      ...orient
+          call OrientE(LampE(0:1,e),DLampE(1:N,0:1,e),NoriE(e),N, &
+                                                         GLampE,GDLampE)
+!      ...construct the shape functions
+          call AncEE(GLampE,GDLampE,nordE,IdecE,N, EE(1:N,minI:maxI), &
+                                                  CurlEE(1:N,minI:maxI))
           do i=minI,maxI
             m=m+1
-c
+!
             ShapE(1:N,m) = EE(1:N,i)
             CurlE(1:N,m) = CurlEE(1:N,i)
           enddo
         endif
       enddo
-c
-c  ...FACE SHAPE FUNCTIONS
+!
+!  ...FACE SHAPE FUNCTIONS
       call ProjectTetF(Lam,DLam, LampF,DLampF,IdecF)
-c
-c  ...loop over faces
+!
+!  ...loop over faces
       do f=1,4
-c    ...local parameters
+!    ...local parameters
         nordF = Nord(6+f)
         ndofF = nordF*(nordF-1)/2
         if (ndofF.gt.0) then
-c      ...local parameters (again)
+!      ...local parameters (again)
           maxIJ = nordF-1
           maxI = maxIJ-minJ
           maxJ = maxIJ-minI
-c      ...orient
-          call OrientTri(LampF(0:2,f),DLampF(1:N,0:2,f),NoriF(f),N,
-     .                                                   GLampF,GDLampF)
-c      ...loop over families
+!      ...orient
+          call OrientTri(LampF(0:2,f),DLampF(1:N,0:2,f),NoriF(f),N, &
+                                                         GLampF,GDLampF)
+!      ...loop over families
           famctr=m
           do fam=0,1
             m=famctr+fam-1
             abc = cshift((/0,1,2/),fam)
-c        ...construct the shape functions
-            call AncETri(GLampF(abc),GDLampF(1:N,abc),nordF,IdecF,N,
-     .                                    ETri(1:N,minI:maxI,minJ:maxJ),
-     .                                CurlETri(1:N,minI:maxI,minJ:maxJ))
+!        ...construct the shape functions
+            call AncETri(GLampF(abc),GDLampF(1:N,abc),nordF,IdecF,N, &
+                                          ETri(1:N,minI:maxI,minJ:maxJ), &
+                                      CurlETri(1:N,minI:maxI,minJ:maxJ))
             do nij=minIJ,maxIJ
               do i=minI,nij-minJ
                 j=nij-i
                 m=m+2
-c
+!
                 ShapE(1:N,m) = ETri(1:N,i,j)
                 CurlE(1:N,m) = CurlETri(1:N,i,j)
               enddo
@@ -368,14 +368,14 @@ c
           enddo
         endif
       enddo
-c
-c  ...BUBBLE FUNCTIONS
-c  ...local parameters
+!
+!  ...BUBBLE FUNCTIONS
+!  ...local parameters
       nordB = Nord(11)
       ndofB = nordB*(nordB-1)*(nordB-2)/6
-c  ...if necessary, create bubbles
+!  ...if necessary, create bubbles
       if (ndofB.gt.0) then
-c    ...local parameters (again)
+!    ...local parameters (again)
         IdecB(1) = IdecF; IdecB(2) = .TRUE.
         minbeta = 2*minIJ
         maxIJK = nordB-1
@@ -383,21 +383,21 @@ c    ...local parameters (again)
         maxI = maxIJ-minJ
         maxJ = maxIJ-minI
         maxK = maxIJK-minIJ
-c    ...loop over families
+!    ...loop over families
         famctr=m
         do fam=0,2
           m=famctr+fam-2
           abcd = cshift((/0,1,2,3/),fam)
           abc = abcd(1:3)
           d = abcd(4)
-c      ...now construct the shape functions (no need to orient)
-          call AncETri(Lam(abc),DLam(1:N,abc),NordB-minK,IdecB(1),N,
-     .                                    ETri(1:N,minI:maxI,minJ:maxJ),
-     .                                CurlETri(1:N,minI:maxI,minJ:maxJ))
-          call HomIJacobi((/1-Lam(d),Lam(d)/),
-     .             (/-DLam(1:N,d),DLam(1:N,d)/),maxK,minbeta,IdecB(2),N,
-     .                                   homLbet(minIJ:maxIJ,minK:maxK),
-     .                              DhomLbet(1:N,minIJ:maxIJ,minK:maxK))
+!      ...now construct the shape functions (no need to orient)
+          call AncETri(Lam(abc),DLam(1:N,abc),NordB-minK,IdecB(1),N, &
+                                          ETri(1:N,minI:maxI,minJ:maxJ), &
+                                      CurlETri(1:N,minI:maxI,minJ:maxJ))
+          call HomIJacobi((/1-Lam(d),Lam(d)/), &
+                   (/-DLam(1:N,d),DLam(1:N,d)/),maxK,minbeta,IdecB(2),N, &
+                                         homLbet(minIJ:maxIJ,minK:maxK), &
+                                    DhomLbet(1:N,minIJ:maxIJ,minK:maxK))
 
           do nijk=minIJK,maxIJK
             do nij=minIJ,nijk-minK
@@ -405,31 +405,31 @@ c      ...now construct the shape functions (no need to orient)
                 j=nij-i
                 k=nijk-nij
                 m=m+3
-c
+!
                 ShapE(1:N,m) = ETri(1:N,i,j)*homLbet(nij,k)
-c
-                call cross(N,DhomLbet(1:N,nij,k),ETri(1:N,i,j),
-     .                                                   DhomLbetxETri)
-c
-                CurlE(1:N,m) = homLbet(nij,k)*CurlETri(1:N,i,j)
-     .                       + DhomLbetxETri
+!
+                call cross(N,DhomLbet(1:N,nij,k),ETri(1:N,i,j), &
+                                                         DhomLbetxETri)
+!
+                CurlE(1:N,m) = homLbet(nij,k)*CurlETri(1:N,i,j) &
+                             + DhomLbetxETri
               enddo
             enddo
           enddo
         enddo
       endif
-c
-c  ...give total degrees of freedom
+!
+!  ...give total degrees of freedom
       NrdofE = m
-c
+!
 #if HP3D_DEBUG
-c  ...print this when debugging
+!  ...print this when debugging
       if (iprint.ge.1) then
-        write(*,7001) X(1:3),Nord(1:11),
-     .                NoriE(1:6),NoriF(1:4)
- 7001   format('shape3DETet: Xi = ',3f8.3,/,
-     .         'Norder = ',6i2,3x,4i2,3x,i2,/,
-     .         'orient = ',6i2,3x,4i2)
+        write(*,7001) X(1:3),Nord(1:11), &
+                      NoriE(1:6),NoriF(1:4)
+ 7001   format('shape3DETet: Xi = ',3f8.3,/, &
+               'Norder = ',6i2,3x,4i2,3x,i2,/, &
+               'orient = ',6i2,3x,4i2)
         m=0
         do e=1,6
           ndofE = Nord(e)
@@ -479,39 +479,39 @@ c  ...print this when debugging
         call pause
       endif
 #endif
-c
-c
-      end subroutine shape3DETet
-c
-c
-c--------------------------------------------------------------------
-c
-c     routine name      - shape3DVTet
-c
-c--------------------------------------------------------------------
-c
-c     latest revision:  - Oct 14, Apr 17, Jul 21
-c
-c     purpose:          - routine returns values of 3D tetrahedron element
-c                         H(div) shape functions and their divergences
-c
-c     arguments:
-c
-c     in:
-c          X            - master tetrahedron coordinates from (0,1)^3
-c          Nord         - polynomial order for the nodes (H1 sense)
-c          NoriF        - face orientation
-c          Nsize        - relevant sizes of local arrays
-c
-c     out:
-c          NrdofV       - number of dof
-c          ShapV        - values of the shape functions at the point
-c          DivV         - divergence of the shape functions
-c
-c-----------------------------------------------------------------------
-c
-      subroutine shape3DVTet(X,Nord,NoriF,Nsize, NrdofV,ShapV,DivV)
-c
+!
+!
+   end subroutine shape3DETet
+!
+!
+!--------------------------------------------------------------------
+!
+!     routine name      - shape3DVTet
+!
+!--------------------------------------------------------------------
+!
+!     latest revision:  - Oct 14, Apr 17, Jul 21
+!
+!     purpose:          - routine returns values of 3D tetrahedron element
+!                         H(div) shape functions and their divergences
+!
+!     arguments:
+!
+!     in:
+!          X            - master tetrahedron coordinates from (0,1)^3
+!          Nord         - polynomial order for the nodes (H1 sense)
+!          NoriF        - face orientation
+!          Nsize        - relevant sizes of local arrays
+!
+!     out:
+!          NrdofV       - number of dof
+!          ShapV        - values of the shape functions at the point
+!          DivV         - divergence of the shape functions
+!
+!-----------------------------------------------------------------------
+!
+   subroutine shape3DVTet(X,Nord,NoriF,Nsize, NrdofV,ShapV,DivV)
+!
       implicit none
       integer, intent(in)  :: Nord(11),NoriF(4),Nsize(2)
       integer, intent(out) :: NrdofV
@@ -530,63 +530,63 @@ c
       double precision :: homLbet(0:Nsize(1)-2,1:Nsize(1)-1)
       double precision :: DhomLbet(3,0:Nsize(1)-2,1:Nsize(1)-1)
       double precision :: DhomLbetVTri
-c
+!
 #if HP3D_DEBUG
-c  ...debugging flag
+!  ...debugging flag
       integer :: iprint
       iprint=0
 #endif
-c
-c  ...spatial dimensions
+!
+!  ...spatial dimensions
       N=3
-c
-c  ...local parameters
+!
+!  ...local parameters
       minI = 0; minJ = 0; minK = 1
       minIJ = minI+minJ;
       minIJK = minIJ+minK
-c  ...initiate counter for shape functions
+!  ...initiate counter for shape functions
       m=0
-c
-c  ...Define affine coordinates and gradients
+!
+!  ...Define affine coordinates and gradients
       call AffineTetrahedron(X, Lam,DLam)
-c
-c  ...FACE SHAPE FUNCTIONS
+!
+!  ...FACE SHAPE FUNCTIONS
       call ProjectTetF(Lam,DLam, LampF,DLampF,IdecF)
       do f=1,4
-c    ...local parameters
+!    ...local parameters
         nordF = Nord(6+f)
         ndofF = (nordF+1)*nordF/2
         if (ndofF.gt.0) then
-c      ...local parameters (again)
+!      ...local parameters (again)
           maxIJ = nordF-1
           maxI = maxIJ-minJ
           maxJ = maxIJ-minI
-c      ...orient
-          call OrientTri(LampF(0:2,f),DLampF(1:N,0:2,f),NoriF(f),N,
-     .                                                   GLampF,GDLampF)
-c      ...construct the shape functions
-          call AncVTri(GLampF,GDLampF,nordF,IdecF,N,
-     .                                    VTri(1:N,minI:maxI,minJ:maxJ),
-     .                                     DivVTri(minI:maxI,minJ:maxJ))
+!      ...orient
+          call OrientTri(LampF(0:2,f),DLampF(1:N,0:2,f),NoriF(f),N, &
+                                                         GLampF,GDLampF)
+!      ...construct the shape functions
+          call AncVTri(GLampF,GDLampF,nordF,IdecF,N, &
+                                          VTri(1:N,minI:maxI,minJ:maxJ), &
+                                           DivVTri(minI:maxI,minJ:maxJ))
           do nij=minIJ,maxIJ
             do i=minI,nij-minJ
               j=nij-i
               m=m+1
-c
+!
               ShapV(1:N,m) = VTri(1:N,i,j)
               DivV(m) = DivVTri(i,j)
             enddo
           enddo
         endif
       enddo
-c
-c  ...BUBBLE FUNCTIONS
-c  ...local parameters
+!
+!  ...BUBBLE FUNCTIONS
+!  ...local parameters
       nordB = Nord(11)
       ndofB = (nordB+1)*nordB*(nordB-1)/6
-c  ...if necessary, create bubbles
+!  ...if necessary, create bubbles
       if (ndofB.gt.0) then
-c    ...local parameters (again)
+!    ...local parameters (again)
         IdecB(1) = IdecF; IdecB(2) = .TRUE.
         minbeta = 2*(minIJ+1)
         maxIJK = nordB-1
@@ -594,50 +594,50 @@ c    ...local parameters (again)
         maxI = maxIJ-minJ
         maxJ = maxIJ-minI
         maxK = maxIJK-minIJ
-c    ...loop over families
+!    ...loop over families
         famctr=m
         do fam=0,2
           m=famctr+fam-2
           abcd = cshift((/0,1,2,3/),fam)
           abc = abcd(1:3)
           d = abcd(4)
-c      ...construct the shape functions (no need to orient)
-          call AncVTri(Lam(abc),DLam(1:N,abc),nordB-minK,IdecB(1),N,
-     .                                    VTri(1:N,minI:maxI,minJ:maxJ),
-     .                                     DivVTri(minI:maxI,minJ:maxJ))
-          call HomIJacobi((/1-Lam(d),Lam(d)/),
-     .             (/-DLam(1:N,d),DLam(1:N,d)/),maxK,minbeta,IdecB(2),N,
-     .                                   homLbet(minIJ:maxIJ,minK:maxK),
-     .                              DhomLbet(1:N,minIJ:maxIJ,minK:maxK))
+!      ...construct the shape functions (no need to orient)
+          call AncVTri(Lam(abc),DLam(1:N,abc),nordB-minK,IdecB(1),N, &
+                                          VTri(1:N,minI:maxI,minJ:maxJ), &
+                                           DivVTri(minI:maxI,minJ:maxJ))
+          call HomIJacobi((/1-Lam(d),Lam(d)/), &
+                   (/-DLam(1:N,d),DLam(1:N,d)/),maxK,minbeta,IdecB(2),N, &
+                                         homLbet(minIJ:maxIJ,minK:maxK), &
+                                    DhomLbet(1:N,minIJ:maxIJ,minK:maxK))
           do nijk=minIJK,maxIJK
             do nij=minIJ,nijk-minK
               do i=minI,nij-minJ
                 j=nij-i
                 k=nijk-nij
                 m=m+3
-c
+!
                 ShapV(1:N,m) = VTri(1:N,i,j)*homLbet(nij,k)
-c
-                call dot_product(DhomLbet(1:N,nij,k),VTri(1:N,i,j),
-     .                                                     DhomLbetVTri)
-c
+!
+                call dot_product(DhomLbet(1:N,nij,k),VTri(1:N,i,j), &
+                                                           DhomLbetVTri)
+!
                 DivV(m) = homLbet(nij,k)*DivVTri(i,j)+DhomLbetVTri
               enddo
             enddo
           enddo
         enddo
       endif
-c
-c  ...give total degrees of freedom
+!
+!  ...give total degrees of freedom
       NrdofV = m
-c
+!
 #if HP3D_DEBUG
-c  ...print this when debugging
+!  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001) X(1:3),Nord(7:11),NoriF(1:4)
- 7001   format('shape3DVTet: Xi = ',3f8.3,/,
-     .         'Norder = ',3(4i2,2x),2i3,2x,4i3,3x,i4,/,
-     .         'orient = ',3(4i2,2x),2i3,2x,4i3)
+ 7001   format('shape3DVTet: Xi = ',3f8.3,/, &
+               'Norder = ',3(4i2,2x),2i3,2x,4i3,3x,i4,/, &
+               'orient = ',3(4i2,2x),2i3,2x,4i3)
         m=0
         do f=1,4
           nordF = Nord(6+f)
@@ -671,37 +671,37 @@ c  ...print this when debugging
         call pause
       endif
 #endif
-c
-c
-      end subroutine shape3DVTet
-c
-c
-c--------------------------------------------------------------------
-c
-c     routine name      - shape3DQTet
-c
-c--------------------------------------------------------------------
-c
-c     latest revision:  - Oct 14, Apr 17
-c
-c     purpose:          - routine returns values of 3D tetrahedron
-c                         element L2 shape functions
-c
-c     arguments:
-c
-c     in:
-c          X            - master tetrahedron coordinates from (0,1)^3
-c          Nord         - polynomial order for the nodes (H1 sense)
-c          Nsize        - relevant sizes of local arrays
-c
-c     out:
-c          NrdofQ       - number of dof
-c          ShapQ        - values of the shape functions at the point
-c
-c-----------------------------------------------------------------------
-c
-      subroutine shape3DQTet(X,Nord,Nsize, NrdofQ,ShapQ)
-c
+!
+!
+   end subroutine shape3DVTet
+!
+!
+!--------------------------------------------------------------------
+!
+!     routine name      - shape3DQTet
+!
+!--------------------------------------------------------------------
+!
+!     latest revision:  - Oct 14, Apr 17
+!
+!     purpose:          - routine returns values of 3D tetrahedron
+!                         element L2 shape functions
+!
+!     arguments:
+!
+!     in:
+!          X            - master tetrahedron coordinates from (0,1)^3
+!          Nord         - polynomial order for the nodes (H1 sense)
+!          Nsize        - relevant sizes of local arrays
+!
+!     out:
+!          NrdofQ       - number of dof
+!          ShapQ        - values of the shape functions at the point
+!
+!-----------------------------------------------------------------------
+!
+   subroutine shape3DQTet(X,Nord,Nsize, NrdofQ,ShapQ)
+!
       implicit none
       integer, intent(in)  :: Nord(11),Nsize(2)
       integer, intent(out) :: NrdofQ
@@ -713,22 +713,22 @@ c
       double precision :: homP(0:Nsize(1)-1)
       double precision :: homPal(0:Nsize(1)-1,0:Nsize(1)-1)
       double precision :: homPbet(0:Nsize(1)-1,0:Nsize(1)-1)
-c
+!
 #if HP3D_DEBUG
-c  ...debugging flag
+!  ...debugging flag
       integer :: iprint
       iprint=0
 #endif
-c
-c  ...spatial dimensions
+!
+!  ...spatial dimensions
       N=3
-c  ...initiate counter for shape functions
+!  ...initiate counter for shape functions
       m=0
-c
-c  ...Define affine coordinates and gradients
+!
+!  ...Define affine coordinates and gradients
       call AffineTetrahedron(X, Lam,DLam)
-c
-c  ...local parameters
+!
+!  ...local parameters
       nordB = Nord(11)
       ndofB = (nordB+2)*(nordB+1)*nordB/6
       minI = 0; minJ = 0; minK = 0
@@ -741,39 +741,39 @@ c  ...local parameters
       maxI = maxIJ-minJ
       maxJ = maxIJ-minI
       maxK = maxIJK-minIJ
-c
-c  ...get homogenized Legendre polynomials, homP
+!
+!  ...get homogenized Legendre polynomials, homP
       call HomLegendre(Lam(0:1),maxI, homP(minI:maxI))
-c
-c  ...get homogenized Jacobi polynomials, homPal
-      call HomJacobi((/Lam(0)+Lam(1),Lam(2)/),maxIJ,minalpha,
-     .                                      homPal(minI:maxI,minJ:maxJ))
-c  ...get homogenized Jacobi polynomials, homPbet
-      call HomJacobi((/1-Lam(3),Lam(3)/),maxK,minbeta,
-     .                                   homPbet(minIJ:maxIJ,minK:maxK))
-c
-c  ...construct shape functions
+!
+!  ...get homogenized Jacobi polynomials, homPal
+      call HomJacobi((/Lam(0)+Lam(1),Lam(2)/),maxIJ,minalpha, &
+                                            homPal(minI:maxI,minJ:maxJ))
+!  ...get homogenized Jacobi polynomials, homPbet
+      call HomJacobi((/1-Lam(3),Lam(3)/),maxK,minbeta, &
+                                         homPbet(minIJ:maxIJ,minK:maxK))
+!
+!  ...construct shape functions
       do nijk=minIJK,maxIJK
         do nij=minIJ,nijk-minK
           do i=minI,nij-minJ
             j=nij-i
             k=nijk-nij
             m=m+1
-c
+!
             ShapQ(m) = homP(i)*homPal(i,j)*homPbet(nij,k)
           enddo
         enddo
       enddo
-c
-c  ...give total degrees of freedom
+!
+!  ...give total degrees of freedom
       NrdofQ = m
-c
+!
 #if HP3D_DEBUG
-c  ...print this when debugging
+!  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7001) X(1:3),Nord(11)
- 7001   format('shape3DQTet: Xi = ',3f8.3,/,
-     .         'Norder = ',i2)
+ 7001   format('shape3DQTet: Xi = ',3f8.3,/, &
+               'Norder = ',i2)
         nordB = Nord(11)
         ndofB = (nordB+2)*(nordB+1)*nordB/6
         if (ndofB.gt.0) then
@@ -789,5 +789,5 @@ c  ...print this when debugging
         call pause
       endif
 #endif
-c
-      end subroutine shape3DQTet
+!
+   end subroutine shape3DQTet

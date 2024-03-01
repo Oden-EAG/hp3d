@@ -1,39 +1,39 @@
-c Routines:
-c  - checkorder
-c----------------------------------------------------------------------
-c
-c     routine name      - checkorder
-c
-c----------------------------------------------------------------------
-c
-c     latest revision:  - Feb 2023
-c
-c     purpose:          - routine checks whether polynomial orders of
-c                         edges, faces and bubbles are within
-c                         appropriate bounds. Returns values that help
-c                         to more efficiently size temporary arrays in
-c                         other routines in order to save memory.
-c
-c     arguments:
-c
-c     in:
-c       Ntype           - element type
-c       Dtype           - discretization type (H1,H(curl),H(div),L2)
-c       Norder          - polynomial order for the nodes (H1 sense)
-c       MaxOrd          - maximum polynomial order allowed
-c
-c     out:
-c       Nsize           - highest polynomial order in Norder and other
-c                         values that help appropriately size arrays
-c
-c----------------------------------------------------------------------
-c
-      subroutine checkorder(Ntype,Dtype,Norder,MaxOrd, Nsize)
-c
+! Routines:
+!  - checkorder
+!----------------------------------------------------------------------
+!
+!     routine name      - checkorder
+!
+!----------------------------------------------------------------------
+!
+!     latest revision:  - Feb 2023
+!
+!     purpose:          - routine checks whether polynomial orders of
+!                         edges, faces and bubbles are within
+!                         appropriate bounds. Returns values that help
+!                         to more efficiently size temporary arrays in
+!                         other routines in order to save memory.
+!
+!     arguments:
+!
+!     in:
+!       Ntype           - element type
+!       Dtype           - discretization type (H1,H(curl),H(div),L2)
+!       Norder          - polynomial order for the nodes (H1 sense)
+!       MaxOrd          - maximum polynomial order allowed
+!
+!     out:
+!       Nsize           - highest polynomial order in Norder and other
+!                         values that help appropriately size arrays
+!
+!----------------------------------------------------------------------
+!
+   subroutine checkorder(Ntype,Dtype,Norder,MaxOrd, Nsize)
+!
       use parameters , only : MODORDER
       use node_types
       use physics
-c
+!
       implicit none
       integer, intent(in)  :: Ntype
       integer, intent(in)  :: Dtype
@@ -42,23 +42,23 @@ c
       integer, intent(out) :: Nsize(2)
       integer :: minp,maxp,nps(27),m,f,nordF(2),nordB(3)
       logical :: confident
-c
+!
 #if HP3D_DEBUG
       integer :: iprint
       iprint = 0
 #endif
-c
-c  ...initialize output variable
+!
+!  ...initialize output variable
       Nsize = 0
-c
-c  ...The flag confident determines whether you are confident enough to
-c     NOT make a check to Norder. In that case, it is assumed all orders
-c     are less than MaxOrd, and the size of the arrays assume the worst
-c     case scenario (with MaxOrd).
-c  ...If you are not confident enough (default), this routine will check
-c     whether the values in Norder lie below MaxOrd, and will determine
-c     the maximum order in Norder and size temporary arrays accordingly
-c     in the shape element routines.
+!
+!  ...The flag confident determines whether you are confident enough to
+!     NOT make a check to Norder. In that case, it is assumed all orders
+!     are less than MaxOrd, and the size of the arrays assume the worst
+!     case scenario (with MaxOrd).
+!  ...If you are not confident enough (default), this routine will check
+!     whether the values in Norder lie below MaxOrd, and will determine
+!     the maximum order in Norder and size temporary arrays accordingly
+!     in the shape element routines.
       confident=.FALSE.
       if (confident) then
         minp=1
@@ -120,9 +120,9 @@ c     in the shape element routines.
         case default
           write(*,*) 'checkorder'; stop
         end select
-c
+!
 #if HP3D_DEBUG
-c    ...print this when debugging
+!    ...print this when debugging
         if (iprint.ge.1) then
           write(*,7006) S_Type(Ntype),S_DType(Dtype)
  7006     format('checkorder: Type, Dtype = ',1A6,2x,1A6)
@@ -130,12 +130,12 @@ c    ...print this when debugging
  7007     format('checkorder: nps = ',27i2)
         endif
 #endif
-c
-c    ...Find the values of minp and maxp inside nps.
+!
+!    ...Find the values of minp and maxp inside nps.
         minp=minval(nps(1:m))
         maxp=maxval(nps(1:m))
-c    ...Determine if minp and maxp are within the bounds.
-c       Otherwise stop the code as order is too low or too high.
+!    ...Determine if minp and maxp are within the bounds.
+!       Otherwise stop the code as order is too low or too high.
         if (minp.lt.1) then
           write(*,7001) minp
           write(*,7002)
@@ -152,10 +152,10 @@ c       Otherwise stop the code as order is too low or too high.
           stop 1
         endif
       endif
-c
-c  ...The sizing of the arrays is based on the value of maxp and is
-c     dependent on element type and discretization type (H1,Hcurl,...).
-c     Compare these values with module parameters.
+!
+!  ...The sizing of the arrays is based on the value of maxp and is
+!     dependent on element type and discretization type (H1,Hcurl,...).
+!     Compare these values with module parameters.
       Nsize(1)=maxp
       select case(NType)
       case(BRIC,MDLB)
@@ -175,20 +175,20 @@ c     Compare these values with module parameters.
       case(PRIS,MDLP)
         select case(Dtype)
         case(CONTIN);Nsize(2)=(maxp+1)*(maxp+2)*(maxp+1)/2
-        case(TANGEN);Nsize(2)=maxp*(maxp+2)*(maxp+1)
-     .                        +(maxp+1)*(maxp+2)*maxp/2
-        case(NORMAL);Nsize(2)=maxp*(maxp+2)*maxp
-     .                        +maxp*(maxp+1)*(maxp+1)/2
+        case(TANGEN);Nsize(2)=maxp*(maxp+2)*(maxp+1) &
+                              +(maxp+1)*(maxp+2)*maxp/2
+        case(NORMAL);Nsize(2)=maxp*(maxp+2)*maxp &
+                              +maxp*(maxp+1)*(maxp+1)/2
         case(DISCON);Nsize(2)=maxp*(maxp+1)*maxp/2
         end select
       case(PYRA,MDLD)
         select case(Dtype)
-        case(CONTIN);Nsize(2)=5+8*(maxp-1)+(maxp-1)**2
-     .                        +2*(maxp-2)*(maxp-1)+(maxp-1)**3
-        case(TANGEN);Nsize(2)=8*maxp+2*maxp*(maxp-1)
-     .                        +4*maxp*(maxp-1)+3*(maxp-1)**2*maxp
-        case(NORMAL);Nsize(2)=maxp**2+2*maxp*(maxp+1)
-     .                        +3*(maxp-1)*maxp**2
+        case(CONTIN);Nsize(2)=5+8*(maxp-1)+(maxp-1)**2 &
+                              +2*(maxp-2)*(maxp-1)+(maxp-1)**3
+        case(TANGEN);Nsize(2)=8*maxp+2*maxp*(maxp-1) &
+                              +4*maxp*(maxp-1)+3*(maxp-1)**2*maxp
+        case(NORMAL);Nsize(2)=maxp**2+2*maxp*(maxp+1) &
+                              +3*(maxp-1)*maxp**2
         case(DISCON);Nsize(2)=maxp**3
         end select
       case(QUAD,MDLQ,RECT)
@@ -209,13 +209,13 @@ c     Compare these values with module parameters.
         case(TANGEN,NORMAL,DISCON);Nsize(2)=maxp
         end select
       end select
-c
+!
 #if HP3D_DEBUG
-c  ...print this when debugging
+!  ...print this when debugging
       if (iprint.ge.1) then
         write(*,7008) Nsize(1),Nsize(2)
  7008   format('checkorder: Nsize(1:2) = ',i2,i5)
       endif
 #endif
-c
-      end subroutine checkorder
+!
+   end subroutine checkorder

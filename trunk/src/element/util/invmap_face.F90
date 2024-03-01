@@ -1,85 +1,85 @@
 #if HP3D_USE_X11
 
-c----------------------------------------------------------------------
-c
-c   routine name       - invmap_face
-c
-c----------------------------------------------------------------------
-c
-c   latest revision    - Feb 2023
-c
-c   purpose            - given an element face and a point, both
-c                        projected onto a plane, find the correspon-
-c                        ding master element coordinates for a point
-c                        on the element face such that the projection
-c                        of the point coincides with the given point
-c
-c   arguments :
-c     in:
-c                Mdle  - An element (middle node)
-c                Ifc   - face number
-c                Xy_in - coordinates of a projected point
-c     out
-c                T     - master face coordinates of the point
-c                X     - physical coordinates of the point (before
-c                        the projection)
-c                Ierr  = 0, if the procedure has converged
-c                        1  otherwise
-c
-c----------------------------------------------------------------------
-c
-      subroutine invmap_face(Mdle,Ifc,Xy_in, T,X,Ierr)
-c
+!----------------------------------------------------------------------
+!
+!   routine name       - invmap_face
+!
+!----------------------------------------------------------------------
+!
+!   latest revision    - Feb 2024
+!
+!   purpose            - given an element face and a point, both
+!                        projected onto a plane, find the correspon-
+!                        ding master element coordinates for a point
+!                        on the element face such that the projection
+!                        of the point coincides with the given point
+!
+!   arguments :
+!     in:
+!                Mdle  - An element (middle node)
+!                Ifc   - face number
+!                Xy_in - coordinates of a projected point
+!     out
+!                T     - master face coordinates of the point
+!                X     - physical coordinates of the point (before
+!                        the projection)
+!                Ierr  = 0, if the procedure has converged
+!                        1  otherwise
+!
+!----------------------------------------------------------------------
+!
+   subroutine invmap_face(Mdle,Ifc,Xy_in, T,X,Ierr)
+!
       use graphmod
       use data_structure3D
-c
+!
       implicit none
-c
+!
       integer, intent(in)  :: Mdle,Ifc
       real(8), intent(in)  :: Xy_in(2)
       real(8), intent(out) :: T(2),X(3)
       integer, intent(out) :: Ierr
-c
-c  ...geometry dof
+!
+!  ...geometry dof
       real(8) :: xnod(3,MAXbrickH)
-c
-c  ...orientation for element nodes, order
+!
+!  ...orientation for element nodes, order
       integer :: nedge_orient(12),nface_orient(6),norder(19)
-c
-c  ...geometry
-      real(8) :: xi(3),dxdxi(3,3),
-     .           dt(2),dXidt(3,2),dxdt(3,2),xp(3),dxpdt(3,2)
-c
-c  ...shape functions
+!
+!  ...geometry
+      real(8) :: xi(3),dxdxi(3,3), &
+                 dt(2),dXidt(3,2),dxdt(3,2),xp(3),dxpdt(3,2)
+!
+!  ...shape functions
       real(8) :: vshapH(MAXbrickH),dvshapH(3,MAXbrickH)
-c
-c  ...miscellanea
+!
+!  ...miscellanea
       real(8) :: s,det,det1,det2
       integer :: nrdofH
       integer :: iter,i,j,k
-c
-c  ...tolerance for Newton-Raphson iterations
+!
+!  ...tolerance for Newton-Raphson iterations
       real(8), parameter :: epsilon = 1.d-4
-c
+!
 #if HP3D_DEBUG
       integer :: ivar
       integer :: iprint
       iprint = 0
 #endif
-c
-c  ...find order of approXimation for the element
+!
+!  ...find order of approXimation for the element
       call find_order(Mdle, norder)
-c
-c  ...determine geometry dof
+!
+!  ...determine geometry dof
       call nodcor(Mdle, xnod)
-c
-c  ...determine node orientation
+!
+!  ...determine node orientation
       call find_orient(Mdle, nedge_orient,nface_orient)
-c
-c  ...use origin for the initial guess
+!
+!  ...use origin for the initial guess
       T(1:2) = 0.d0
-c
-c  ...start NR iterations
+!
+!  ...start NR iterations
       do iter=1,10
 #if HP3D_DEBUG
         if (iprint.eq.1) then
@@ -87,29 +87,29 @@ c  ...start NR iterations
  7001     format('invmap_face: iter = ',i2)
         endif
 #endif
-c
-c  .....determine master element coordinates of the point and their
-c       derivatives wrt master face coordinates
+!
+!  .....determine master element coordinates of the point and their
+!       derivatives wrt master face coordinates
         call face_param(NODES(Mdle)%ntype,Ifc,t, Xi,dxidt)
 #if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,7002) S_Type(NODES(Mdle)%ntype),Ifc,T
- 7002     format('invmap_face: NODES(Mdle)%type,Ifc,T = ',
-     .           a5,i2,2x,2f8.3)
+ 7002     format('invmap_face: NODES(Mdle)%type,Ifc,T = ', &
+                 a5,i2,2x,2f8.3)
           do ivar=1,3
             write(*,7003) ivar,Xi(ivar),dxidt(ivar,1:2)
  7003       format('ivar,Xi,dxidt = ',i2,f8.3,2x,2f8.3)
           enddo
         endif
 #endif
-c
-c  .....evaluate shape functions at the point
-        call shape3DH(NODES(Mdle)%ntype,
-     .                Xi,norder,nedge_orient,nface_orient,
-     .                nrdofH,vshapH,dvshapH)
-c
-c  .....compute physical coordinates and their derivatives wrt
-c       master element coordinates
+!
+!  .....evaluate shape functions at the point
+        call shape3DH(NODES(Mdle)%ntype, &
+                      Xi,norder,nedge_orient,nface_orient, &
+                      nrdofH,vshapH,dvshapH)
+!
+!  .....compute physical coordinates and their derivatives wrt
+!       master element coordinates
         X(1:3) = 0.d0; dxdxi(1:3,1:3) = 0.d0
         do k=1,nrdofH
           X(1:3) = X(1:3) + xnod(1:3,k)*vshapH(k)
@@ -125,9 +125,9 @@ c       master element coordinates
           enddo
         endif
 #endif
-c
-c  .....compute derivatives of the physical coordinates wrt master face
-c       coordinates
+!
+!  .....compute derivatives of the physical coordinates wrt master face
+!       coordinates
         dxdt(1:3,1:2) = 0.d0
         do i=1,2
           do j=1,3
@@ -142,9 +142,9 @@ c       coordinates
           enddo
         endif
 #endif
-c
-c  .....compute the coordinates of the projected point and their
-c       derivatives wrt master face coordinates
+!
+!  .....compute the coordinates of the projected point and their
+!       derivatives wrt master face coordinates
         xp(1:3)=0.d0; dxpdt(1:3,1:2) = 0.d0
         do j=1,3
           xp(1:3) = xp(1:3)+RMTR(1:3,j)*X(j)
@@ -154,7 +154,7 @@ c       derivatives wrt master face coordinates
             dxpdt(1:3,i) = dxpdt(1:3,i)+RMTR(1:3,j)*dxdt(j,i)
           enddo
         enddo
-c
+!
 #if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,*) 'invmap_face: dxpdt,Xy_in-xp = '
@@ -164,7 +164,7 @@ c
           enddo
         endif
 #endif
-c  .....solve for the next iterate
+!  .....solve for the next iterate
         det  = dxpdt(1,1)*dxpdt(2,2) - dxpdt(1,2)*dxpdt(2,1)
         if (abs(det).lt.1.0d-10) then
           Ierr=1; return
@@ -178,18 +178,18 @@ c  .....solve for the next iterate
  7007     format('invmap_face: dt = ',2f8.3)
         endif
 #endif
-c
-c  .....update
+!
+!  .....update
         T(1:2) = T(1:2) + dt(1:2)
         s = max(abs(dt(1)),abs(dt(2)))
         if (s.lt.epsilon) go to 20
       enddo
-c
+!
       Ierr=1; return
-c
+!
  20   Ierr=0; return
-c
-c
-      end subroutine invmap_face
+!
+!
+   end subroutine invmap_face
 
 #endif
