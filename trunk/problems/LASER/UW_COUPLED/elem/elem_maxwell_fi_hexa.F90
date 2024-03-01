@@ -255,6 +255,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
    real(8), dimension(3,6) :: nfce
 !
    integer, external :: ij_upper_to_packed
+   logical, external :: dnear
 !
 #if HP3D_DEBUG
    integer :: icomp,iphys
@@ -660,7 +661,7 @@ subroutine elem_maxwell_fi_hexa(Mdle,Fld_flag,                &
                endif
 !
 !           ...update background polarization with thermal perturbation
-               if(delta_n .ne. 0.d0) then
+               if(.not. dnear(delta_n,0.d0)) then
                   call get_bgPol(dom_flag,Fld_flag,delta_n,x, bg_pol)
                endif
 !

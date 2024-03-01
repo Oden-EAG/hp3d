@@ -234,8 +234,9 @@ subroutine pyram_TI(No,Eta, Xp,Dxdeta)
         end select
 ! ......this is needed for face contributions...
         if (ie.le.4) then
-          blend_edge(ie) = blend
-          dblend_edge(1:3,ie) = dblend(1:3)
+          i = ie ! suppresses gfortran W-do-subscript warning
+          blend_edge(i) = blend
+          dblend_edge(1:3,i) = dblend(1:3)
         endif
 !
 !  .....add edge contribution
