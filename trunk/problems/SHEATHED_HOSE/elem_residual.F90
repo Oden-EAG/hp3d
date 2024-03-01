@@ -675,7 +675,7 @@
       rwork(2,ivis) = rate
 !
 !  ...display the convergence history
-      if (.NOT. QUIET_MODE) then
+      if (.not. QUIET_MODE) then
         write(*,*)''
         write(*,*)'         -- Error Report --'
         write(*,7100)

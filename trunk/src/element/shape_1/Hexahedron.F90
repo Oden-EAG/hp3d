@@ -134,7 +134,7 @@
 !  ...find order
       call decod(Nord(19),MODORDER,3, nordB)
       ndofB = (nordB(1)-1)*(nordB(2)-1)*(nordB(3)-1)
-      IdecB(1) = .TRUE.; IdecB(2) = .TRUE.; IdecB(3) = .TRUE.
+      IdecB(1) = .true.; IdecB(2) = .true.; IdecB(3) = .true.
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...call phiQuad and phiE - no need to orient
@@ -348,7 +348,7 @@
 !  ...Finally the bubbles
 !  ...find order
       call decod(Nord(19),MODORDER,3, nordB)
-      IdecB(1) = .TRUE.; IdecB(2) = .TRUE.; IdecB(3) = .TRUE.
+      IdecB(1) = .true.; IdecB(2) = .true.; IdecB(3) = .true.
 !  ...loop over the three families
       do fam=0,2
 !    ...get the interior axis indexing for the family (a,b,c)
@@ -530,7 +530,7 @@
 !  ...Finally the bubbles
 !  ...find order
       call decod(Nord(19),MODORDER,3, nordB)
-      IdecB(1) = .TRUE.; IdecB(2) = .TRUE.; IdecB(3) = .TRUE.
+      IdecB(1) = .true.; IdecB(2) = .true.; IdecB(3) = .true.
 !  ...loop over the three families
       do fam=0,2
 !    ...get the interior axis indexing for the family (a,b,c)

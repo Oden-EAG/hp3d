@@ -333,7 +333,7 @@
       call AncEE(ST(0:1,2),DST(1:N,0:1,2),Nord(2),Idec(2),N, &
                  EET,curlEET)
 !
-!      ...slight speedup when Idec=(.TRUE.,.TRUE.)
+!      ...slight speedup when Idec=(.true.,.true.)
       if (Idec(1).and.Idec(2)) then
         do j=minJ,maxJ
           do i=minI,maxI
@@ -413,7 +413,7 @@
       minJ = 1; maxJ = Nord-2
       minIJ = minI+minJ; maxIJ = Nord
       minalpha = 2*minI
-      IdecE = .FALSE.
+      IdecE = .false.
 !
       if (N.lt.2) then
         write(*,7001) N
@@ -490,7 +490,7 @@
       minIJ = minI+minJ; maxIJ = Nord-1
       minalpha = 2*minI+1
       Ncurl = 2*N-3
-      IdecE = .FALSE.
+      IdecE = .false.
 !
       if (N.lt.2) then
         write(*,7001) N

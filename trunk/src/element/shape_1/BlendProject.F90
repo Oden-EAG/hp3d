@@ -129,7 +129,7 @@
       DMupE(1:N,0,e) = DMu(1:N,0,2); DMupE(1:N,1,e) = DMu(1:N,1,2)
 !
 !  ...projected coordinates are Mu, so IdecE=true for all edges
-      IdecE = .TRUE.
+      IdecE = .true.
 !
    end subroutine BlendProjectQuadE
 !----------------------------------------------------------------------
@@ -190,7 +190,7 @@
       DNupE(1:N,0,e) = DNu(1:N,0); DNupE(1:N,1,e) = DNu(1:N,2)
 !
 !  ...projected coordinates are Nu, so IdecE=false for all edges
-      IdecE = .FALSE.
+      IdecE = .false.
 !
    end subroutine ProjectTriE
 !----------------------------------------------------------------------
@@ -358,7 +358,7 @@
       DMupE(1:N,0,e) = DMu(1:N,0,3); DMupE(1:N,1,e) = DMu(1:N,1,3)
 !
 !  ...projected coordinates are Mu, so IdecE=true for all edges
-      IdecE = .TRUE.
+      IdecE = .true.
 !
    end subroutine BlendProjectHexaE
 !----------------------------------------------------------------------
@@ -434,7 +434,7 @@
 !
 !  ...projected coordinates are Mu and Mu, so IdecF=(true,true) for
 !     all faces
-      IdecF(1) = .TRUE.; IdecF(2) = .TRUE.
+      IdecF(1) = .true.; IdecF(2) = .true.
 !
    end subroutine BlendProjectHexaF
 !----------------------------------------------------------------------
@@ -511,7 +511,7 @@
       DLampE(1:N,0,e) = DLam(1:N,2); DLampE(1:N,1,e) = DLam(1:N,3)
 !
 !  ...projected coordinates are Lam, so IdecE=false for all edges
-      IdecE = .FALSE.
+      IdecE = .false.
 !
    end subroutine ProjectTetE
 !----------------------------------------------------------------------
@@ -555,7 +555,7 @@
                                          DLampF(1:N,2,f) = DLam(1:N,3)
 !
 !  ...projected coordinates are Lam, so IdecF=false for all faces
-      IdecF = .FALSE.
+      IdecF = .false.
 !
    end subroutine ProjectTetF
 !----------------------------------------------------------------------
@@ -662,7 +662,7 @@
       DNupE(1:N,0,e) = DNu(1:N,0); DNupE(1:N,1,e) = DNu(1:N,2)
 !
 !  ...projected coordinates are Nu, so IdecME=false for all edges
-      IdecME = .FALSE.
+      IdecME = .false.
 !
    end subroutine BlendProjectPrisME
 !----------------------------------------------------------------------
@@ -707,7 +707,7 @@
       DMupE(1:N,0,e) = DMu(1:N,0); DMupE(1:N,1,e) = DMu(1:N,1)
 !
 !  ...projected coordinates are Mu, so IdecQE=true for all edges
-      IdecQE = .TRUE.
+      IdecQE = .true.
 !
    end subroutine BlendProjectPrisQE
 !----------------------------------------------------------------------
@@ -748,7 +748,7 @@
                                          DNupF(1:N,2,f) = DNu(1:N,2)
 !
 !  ...projected coordinates are Nu, so IdecTF=true for all faces
-      IdecTF = .TRUE.
+      IdecTF = .true.
 !
    end subroutine BlendProjectPrisTF
 !----------------------------------------------------------------------
@@ -781,7 +781,7 @@
       DSTpF(1:N,0,1,f) = DNu(1:N,0); DSTpF(1:N,1,1,f) = DNu(1:N,1)
       DSTpF(1:N,0,2,f) = DMu(1:N,0); DSTpF(1:N,1,2,f) = DMu(1:N,1)
 !     ...simplification flags: projection (Nu;Mu)=>(false,true)
-      IdecQF(1,f) = .FALSE.; IdecQF(2,f) = .TRUE.
+      IdecQF(1,f) = .false.; IdecQF(2,f) = .true.
 !  ...f=2 --> face1254 with local orientation v1->v2->v5->v4
       f=2
 !     ...locally oriented quadruple representing projection
@@ -790,7 +790,7 @@
       DSTpF(1:N,0,1,f) = DNu(1:N,1); DSTpF(1:N,1,1,f) = DNu(1:N,2)
       DSTpF(1:N,0,2,f) = DMu(1:N,0); DSTpF(1:N,1,2,f) = DMu(1:N,1)
 !     ...simplification flags: projection (Nu;Mu)=>(false,true)
-      IdecQF(1,f) = .FALSE.; IdecQF(2,f) = .TRUE.
+      IdecQF(1,f) = .false.; IdecQF(2,f) = .true.
 !  ...f=3 --> face0253 with local orientation v0->v2->v5->v3
       f=3
 !     ...locally oriented quadruple representing projection
@@ -799,7 +799,7 @@
       DSTpF(1:N,0,1,f) = DNu(1:N,0); DSTpF(1:N,1,1,f) = DNu(1:N,2)
       DSTpF(1:N,0,2,f) = DMu(1:N,0); DSTpF(1:N,1,2,f) = DMu(1:N,1)
 !     ...simplification flags: projection (Nu;Mu)=>(false,true)
-      IdecQF(1,f) = .FALSE.; IdecQF(2,f) = .TRUE.
+      IdecQF(1,f) = .false.; IdecQF(2,f) = .true.
 !
    end subroutine ProjectPrisQF
 !----------------------------------------------------------------------
@@ -881,7 +881,7 @@
       DNupE(1:N,0,e) = DNu(1:N,0,2); DNupE(1:N,1,e) = DNu(1:N,1,2)
 !
 !  ...projected coordinates are Nu, so IdecME=false for all edges
-      IdecME = .FALSE.
+      IdecME = .false.
 !
    end subroutine BlendProjectPyraME
 !----------------------------------------------------------------------
@@ -921,7 +921,7 @@
       DLampE(1:N,0,e) = DLam(1:N,4); DLampE(1:N,1,e) = DLam(1:N,5)
 !
 !  ...projected coordinates are Lam, so IdecTE=false for all edges
-      IdecTE = .FALSE.
+      IdecTE = .false.
 !
    end subroutine ProjectPyraTE
 !----------------------------------------------------------------------
@@ -951,7 +951,7 @@
 !
 !  ...projected coordinates are (Mu;Mu), so IdecQF=(true,true) for
 !     the face
-      IdecQF(1) = .TRUE.; IdecQF(2) = .TRUE.
+      IdecQF(1) = .true.; IdecQF(2) = .true.
 !
    end subroutine ProjectPyraQF
 !----------------------------------------------------------------------
@@ -1005,7 +1005,7 @@
                                           DNupF(1:N,2,f) = DNu(1:N,2,2)
 !
 !  ...projected coordinates are Nu, so IdecTF=true for all faces
-      IdecTF = .TRUE.
+      IdecTF = .true.
 !
    end subroutine BlendProjectPyraTF
 !----------------------------------------------------------------------
@@ -1050,6 +1050,6 @@
                                           DLampF(1:N,2,f) = DLam(1:N,5)
 !
 !  ...projected coordinates are Lam, so IdecTF=false for all faces
-      IdecTF = .FALSE.
+      IdecTF = .false.
 !
    end subroutine ProjectPyraLamTF

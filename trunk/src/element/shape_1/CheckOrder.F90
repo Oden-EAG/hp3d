@@ -59,7 +59,7 @@
 !     whether the values in Norder lie below MaxOrd, and will determine
 !     the maximum order in Norder and size temporary arrays accordingly
 !     in the shape element routines.
-      confident=.FALSE.
+      confident=.false.
       if (confident) then
         minp=1
         maxp=MaxOrd

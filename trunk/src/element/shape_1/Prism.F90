@@ -878,7 +878,7 @@
       if (ndofB.gt.0) then
 !    ...local parameters (again)
         IdecB(1) = IdecTF
-        IdecB(2) = .TRUE.
+        IdecB(2) = .true.
         minI  = 0
         minJ  = 1
         minK  = 0
@@ -918,7 +918,7 @@
       if (ndofB.gt.0) then
 !    ...local parameters (again)
         IdecB(1) = IdecTF
-        IdecB(2) = .TRUE.
+        IdecB(2) = .true.
         minI  = 0
         minJ  = 0
         minK  = 2

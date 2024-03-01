@@ -19,7 +19,7 @@
 #include "typedefs.h"
    subroutine solin1(Iel, Numdes,Zaldest)
 !
-      use frsolmod , ONLY: IDESVE, NDESVE
+      use frsolmod , only: IDESVE, NDESVE
       implicit none
 !
       integer, intent(in)  :: Iel

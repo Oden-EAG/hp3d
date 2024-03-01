@@ -66,13 +66,13 @@ program main
       if (RANK == i .and. RANK == ROOT) then
          write(6,*)
          write(6,1020) "Master proc [", RANK, "], initialize.."
-         QUIET_MODE = .FALSE.
+         QUIET_MODE = .false.
          call initialize
       else if (RANK == i) then
          write(6,1020) "Worker proc [", RANK, "], initialize.."
-         QUIET_MODE = .TRUE.
+         QUIET_MODE = .true.
          call initialize
-         QUIET_MODE = .FALSE.
+         QUIET_MODE = .false.
       else
       endif
       flush(6)

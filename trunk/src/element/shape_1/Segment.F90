@@ -69,7 +69,7 @@
 !    ...local parameters
         minI  = 2
         maxI  = Nord
-        IdecE = .TRUE.
+        IdecE = .true.
 !    ...construct the shape functions
         call AncPhiE(Mu,DMu,Nord,IdecE,N, &
                                       phiE(minI:maxI),DphiE(minI:maxI))

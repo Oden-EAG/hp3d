@@ -110,7 +110,7 @@
 !
 !  ...FACE BUBBLE FUNCTIONS
 !  ...local parameters
-      IdecF(1:2) = .TRUE.
+      IdecF(1:2) = .true.
       call decod(Nord(5),MODORDER,2, nordF)
       ndofF = (nordF(1)-1)*(nordF(2)-1)
       if (ndofF.gt.0) then
@@ -266,7 +266,7 @@
 !
 !  ...FACE BUBBLE FUNCTIONS
 !  ...local parameters
-      IdecF(1:2) = .TRUE.
+      IdecF(1:2) = .true.
       call decod(Nord(5),MODORDER,2, nordF)
 !    ...loop over families
       do fam=0,1

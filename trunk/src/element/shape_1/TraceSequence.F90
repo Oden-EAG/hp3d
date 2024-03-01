@@ -81,7 +81,7 @@
 !    ...local parameters
         minI  = 2
         maxI  = Nord
-        IdecE = .TRUE.
+        IdecE = .true.
 !    ...orient -- this is important for traces!!!
         call OrientE(Mu,DMu,Nori,N, GMu,GDMu)
 !    ...construct the shape functions
@@ -414,7 +414,7 @@
 !    ...TRACE OF 3D FACE FUNCTIONS
         call checkpolyorder(Nord)
         ndofF = (Nord-1)*(Nord-2)/2
-        IdecF = .TRUE.
+        IdecF = .true.
         if (ndofF.gt.0) then
 !      ...local parameters
           minI  = 2
@@ -488,7 +488,7 @@
         call AffineQuadrilateral(T, Mu,DMu)
 !
 !    ...TRACE OF 3D FACE FUNCTIONS
-        IdecF(1:2) = .TRUE.
+        IdecF(1:2) = .true.
         call decod(Nord,MODORDER,2, nordF)
         call checkpolyorder(nordF(1))
         call checkpolyorder(nordF(2))
@@ -639,7 +639,7 @@
 !    ...TRACE OF 3D FACE FUNCTIONS
         call checkpolyorder(Nord)
         ndofF = Nord*(Nord-1)/2
-        IdecF = .TRUE.
+        IdecF = .true.
         if (ndofF.gt.0) then
 !    ...local parameters
           minI  = 0
@@ -728,7 +728,7 @@
         call AffineQuadrilateral(T, Mu,DMu)
 !
 !    ...TRACE OF 3D FACE FUNCTIONS
-        IdecF(1:2) = .TRUE.
+        IdecF(1:2) = .true.
         call decod(Nord,MODORDER,2, nordF)
         call checkpolyorder(nordF(1))
         call checkpolyorder(nordF(2))
@@ -973,7 +973,7 @@
         call AffineQuadrilateral(T, Mu,DMu)
 !
 !    ...TRACE OF 3D FACE FUNCTIONS
-        IdecF(1:2) = .TRUE.
+        IdecF(1:2) = .true.
         call decod(Nord,MODORDER,2, nordF)
         call checkpolyorder(nordF(1))
         call checkpolyorder(nordF(2))

@@ -20,7 +20,7 @@
 !
       use GMP , only: NRDOMAIN
       use physics , only : NR_PHYSA,PHYSA
-      use data_structure3D , ONLY: NRELES
+      use data_structure3D , only: NRELES
       use graphmod
 !
       implicit none

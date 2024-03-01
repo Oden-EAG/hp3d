@@ -15,6 +15,6 @@ subroutine init_cnstr
    call setcnstr_trian_hcurl
    call setcnstr_trian_hdiv
 !
-   INITIALIZED_CONSTR = .TRUE.
+   INITIALIZED_CONSTR = .true.
 !
 end subroutine init_cnstr

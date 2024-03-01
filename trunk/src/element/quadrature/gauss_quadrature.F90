@@ -2,7 +2,7 @@
 
       implicit none
 !
-      logical :: INITIALIZED = .FALSE.
+      logical :: INITIALIZED = .false.
 !$OMP THREADPRIVATE (INITIALIZED)
 !
 !======================================================================
@@ -842,7 +842,7 @@
         enddo
       enddo
 !
-      INITIALIZED = .TRUE.
+      INITIALIZED = .true.
 !
 !
    end subroutine init_gauss_quadrature

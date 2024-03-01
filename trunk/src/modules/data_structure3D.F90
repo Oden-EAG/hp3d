@@ -931,8 +931,8 @@ module data_structure3D
       logical Is_leaf
       integer Nod
       select case(NODES(Nod)%ref_kind)
-         case(0);       Is_leaf = .TRUE.
-         case default;  Is_leaf = .FALSE.
+         case(0);       Is_leaf = .true.
+         case default;  Is_leaf = .false.
       end select
       end function Is_leaf
 !
@@ -942,9 +942,9 @@ module data_structure3D
       logical Is_root
       integer Nod
       if (NODES(Nod)%father.lt.0) then
-         Is_root = .TRUE.
+         Is_root = .true.
       else
-         Is_root = .FALSE.
+         Is_root = .false.
       endif
       end function Is_root
 !
@@ -954,8 +954,8 @@ module data_structure3D
       logical Is_middle
       integer Nod
       select case(NODES(Nod)%ntype)
-         case(MDLB,MDLP,MDLN,MDLD); Is_middle = .TRUE.
-         case default;              Is_middle = .FALSE.
+         case(MDLB,MDLP,MDLN,MDLD); Is_middle = .true.
+         case default;              Is_middle = .false.
       end select
       end function Is_middle
 !

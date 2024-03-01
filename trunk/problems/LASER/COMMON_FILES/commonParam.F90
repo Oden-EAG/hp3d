@@ -135,7 +135,7 @@ module commonParam
 !
 !..paraview parameters
    !integer                            :: IPARADAP
-   !integer, dimension(:), ALLOCATABLE :: ISEL_PARAVIEW
+   !integer, dimension(:), allocatable :: ISEL_PARAVIEW
    !integer :: IDOMAIN_SMOOTHE = 0
 !
    contains

@@ -106,7 +106,7 @@
 !  ...local parameters
       nordF = Nord(4)
       ndofF = (nordF-1)*(nordF-2)/2
-      IdecF = .TRUE.
+      IdecF = .true.
       if (ndofF.gt.0) then
 !    ...local parameters (again)
         maxIJ = nordF
@@ -262,7 +262,7 @@
 !  ...local parameters
       nordF = Nord(4)
       ndofF = nordF*(nordF-1)/2
-      IdecF = .TRUE.
+      IdecF = .true.
       if (ndofF.gt.0) then
 !    ...local parameters (again)
         maxIJ = nordF-1

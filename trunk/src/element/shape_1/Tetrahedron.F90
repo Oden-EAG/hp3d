@@ -145,7 +145,7 @@
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...local parameters (again)
-        IdecB(1) = IdecF; IdecB(2) = .TRUE.
+        IdecB(1) = IdecF; IdecB(2) = .true.
         minbeta = 2*minIJ
         maxIJK = nordB
         maxIJ = maxIJK-minK
@@ -376,7 +376,7 @@
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...local parameters (again)
-        IdecB(1) = IdecF; IdecB(2) = .TRUE.
+        IdecB(1) = IdecF; IdecB(2) = .true.
         minbeta = 2*minIJ
         maxIJK = nordB-1
         maxIJ = maxIJK-minK
@@ -587,7 +587,7 @@
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...local parameters (again)
-        IdecB(1) = IdecF; IdecB(2) = .TRUE.
+        IdecB(1) = IdecF; IdecB(2) = .true.
         minbeta = 2*(minIJ+1)
         maxIJK = nordB-1
         maxIJ = maxIJK-minK

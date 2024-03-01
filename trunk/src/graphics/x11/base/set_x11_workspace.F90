@@ -23,7 +23,7 @@ subroutine set_x11_workspace(Nxigtr, Nxigstr, Nxrgtrz)
   MXIGSTR = Nxigstr
   MXRGTRZ = Nxrgtrz
 
-  INITIALIZED = .TRUE.
+  INITIALIZED = .true.
 
 end subroutine set_x11_workspace
 

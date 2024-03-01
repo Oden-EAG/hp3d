@@ -34,7 +34,7 @@ module refinements
   integer, parameter :: PYRAM_REF(1) = (/10/)
   integer, parameter :: BRICK_REF(7) = (/111,110,101,011,100,010,001/)
 !
-  logical :: ISO_ONLY = .FALSE.
+  logical :: ISO_ONLY = .false.
 !
 !
 #if HP3D_DEBUG
@@ -63,13 +63,13 @@ module refinements
 !-----------------------------------------------------------------------
 !< @date Mar 2023
   subroutine disable_iso_only
-    ISO_ONLY = .FALSE.
+    ISO_ONLY = .false.
   end subroutine disable_iso_only
 !
 !-----------------------------------------------------------------------
 !< @date Mar 2023
   subroutine enable_iso_only
-    ISO_ONLY = .TRUE.
+    ISO_ONLY = .true.
   end subroutine enable_iso_only
 !
 !-----------------------------------------------------------------------

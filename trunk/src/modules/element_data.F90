@@ -1064,7 +1064,7 @@
 !
       integer,save,dimension(4,4) :: AUX
 !$OMP THREADPRIVATE(AUX)
-      logical,save                :: INITIALIZED=.FALSE.
+      logical,save                :: INITIALIZED=.false.
 !$OMP THREADPRIVATE(INITIALIZED)
       integer,       dimension(2) :: iedge1,iedge2,list
       integer                     :: i,j,i1,i2,ifound
@@ -1107,7 +1107,7 @@
 !!      enddo    ; enddo
 !
 !  ...update initialization flag
-      INITIALIZED=.TRUE.
+      INITIALIZED=.true.
 !
       endif
 !
@@ -1163,7 +1163,7 @@
 !
       integer,save,dimension(8,8) :: AUX
 !$OMP THREADPRIVATE(AUX)
-      logical,save                :: INITIALIZED=.FALSE.
+      logical,save                :: INITIALIZED=.false.
 !$OMP THREADPRIVATE(INITIALIZED)
       integer,       dimension(3) :: iface1,iface2,list
       integer                     :: i,i1,i2,ifound
@@ -1212,7 +1212,7 @@
 #endif
 !
 !  ...update initialization flag
-      INITIALIZED=.TRUE.
+      INITIALIZED=.true.
 !
       endif
 !

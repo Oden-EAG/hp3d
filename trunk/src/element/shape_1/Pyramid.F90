@@ -213,7 +213,7 @@
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...local parameters (again)
-        IdecB(1:2) = IdecQF; IdecB(3) = .TRUE.
+        IdecB(1:2) = IdecQF; IdecB(3) = .true.
         minI = 2
         minJ = 2
         minK = 2
@@ -547,7 +547,7 @@
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...local parameters (again)
-        IdecB(1:2) = .TRUE.; IdecB(3) = .TRUE.
+        IdecB(1:2) = .true.; IdecB(3) = .true.
         minI = 2
         minJ = 2
         minK = 2
@@ -577,7 +577,7 @@
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...local parameters
-        IdecB(1:2) = .TRUE.; IdecB(3) = .TRUE.
+        IdecB(1:2) = .true.; IdecB(3) = .true.
         minF(1) = 0
         minF(2) = 2
         minK    = 2
@@ -620,7 +620,7 @@
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...local parameters (again)
-        IdecB(1:2) = .TRUE.
+        IdecB(1:2) = .true.
         minI = 2
         minJ = 2
         maxI = nordB
@@ -916,7 +916,7 @@
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...local parameters
-        IdecB(1:2) = .TRUE.; IdecB(3) = .TRUE.
+        IdecB(1:2) = .true.; IdecB(3) = .true.
         minF(1) = 0
         minF(2) = 2
         minK    = 2
@@ -959,7 +959,7 @@
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...local parameters (again)
-        IdecB(1:2) = .TRUE.; IdecB(3) = .TRUE.
+        IdecB(1:2) = .true.; IdecB(3) = .true.
         minI = 2
         minJ = 2
         maxI = nordB
@@ -984,7 +984,7 @@
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...local parameters (again)
-        IdecB(1:2) = .TRUE.
+        IdecB(1:2) = .true.
         minI = 0
         minJ = 0
         minK = 2
@@ -1016,7 +1016,7 @@
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...local parameters (again)
-        IdecB(1:2) = .TRUE.
+        IdecB(1:2) = .true.
         minI = 2
         minJ = 2
         maxI = nordB
@@ -1045,7 +1045,7 @@
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...local parameters (again)
-        IdecB(1:2) = .TRUE.
+        IdecB(1:2) = .true.
         minI = 2
         maxI = nordB
         do fam=0,1

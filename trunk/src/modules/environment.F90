@@ -26,18 +26,18 @@ module environment
                             PREFIX
 !
 !     operation mode
-      logical :: IVERBOSE_  = .FALSE.
-      logical :: IDRY_      = .FALSE.
-      logical :: QUIET_MODE = .FALSE.
-      logical :: L2PROJ     = .FALSE.
-      logical :: L2GEOM     = .FALSE.
+      logical :: IVERBOSE_  = .false.
+      logical :: IDRY_      = .false.
+      logical :: QUIET_MODE = .false.
+      logical :: L2PROJ     = .false.
+      logical :: L2GEOM     = .false.
 !
 !
    contains
 !
 !
 !----------------------------------------------------------------------------
-!> @brief Determines value of a BOOLEAN option variable (.TRUE. if present)
+!> @brief Determines value of a BOOLEAN option variable (.true. if present)
 !> @note  If option is not present, value is set to a user-provided default
 !!
 !! @param[in ] Aopt  - name of BOOLEAN option
@@ -79,8 +79,8 @@ module environment
           else if (LGT(ARGS_(i),Aopt)) then
              cycle
           else
-             ! if found, set to .TRUE.
-             Nval = .TRUE. ; ifound = i
+             ! if found, set to .true.
+             Nval = .true. ; ifound = i
              exit
           endif
        enddo
@@ -350,8 +350,8 @@ module environment
     end do
 
     ! set up options : -help , -verbose
-    call get_option_bool('-help'   ,'Dry run'       ,.FALSE., IDRY_)
-    call get_option_bool('-verbose','Verbose output',.FALSE., IVERBOSE_)
+    call get_option_bool('-help'   ,'Dry run'       ,.false., IDRY_)
+    call get_option_bool('-verbose','Verbose output',.false., IVERBOSE_)
 
   end subroutine begin_environment
 !
