@@ -63,8 +63,8 @@
       integer :: In(*), Ia(*), Ibb(*), Ic(*)
       integer :: Ntot
 !
-      integer :: i,id,ides,iel,ifrst,inic,ip,ipc,ips
-      integer :: j,jd,jdes,jdn,jjd,jp,n,ne,nt,ntt
+      integer :: id,ides,i,iel,ifrst,inic,ip,ipc,ips
+      integer :: jd,jdes,jdn,jjd,jp,n,ne,nt,ntt
 !
 #if HP3D_DEBUG
       integer :: iprint
