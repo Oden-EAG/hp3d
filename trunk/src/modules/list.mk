@@ -5,7 +5,7 @@ constrained_nodes.F90
 constraints.F90
 control.F90
 data_structure3D.F90
-element_data.F
+element_data.F90
 environment.F90
 error.F90
 hdf5_wrapper.F90
