@@ -90,7 +90,6 @@ CCDEFS    = -D"HP3D_COMPLEX=$(HP3D_COMPLEX)" \
 
 # -- Includes --
 CCINCS   += -I./$(SRC_PATH) \
-            -I./$(SRC_PATH)/common/graphics \
             -I./$(SRC_PATH)/common/hp3d \
             -I./$(MODULE_PATH)
 ifdef HP3D_LIB_EXTRA_INCS

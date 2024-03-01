@@ -162,7 +162,7 @@ subroutine ficheracornerdirichlet(X,Icase, ValH,DvalH,D2valH, &
             theta = atan2(x2,x1) - pi/2.d0
         elseif (x2<0.d0) then
             theta = atan2(x2,x1) + 3.d0*pi/2.d0
-        elseif (x2==0.d0) then
+        elseif (dabs(x2)<eps) then
             theta = 3.d0*pi/2.d0
         else
             goto 103

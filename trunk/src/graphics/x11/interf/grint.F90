@@ -39,6 +39,7 @@
 !**************************************************************
 
    subroutine closwind(Iwin)
+      use wvglob
       implicit none
 !
 !-----------------------------------------------------------------------!
@@ -64,7 +65,6 @@
 !
 !----------------------------------------------------------------------
 !
-#include "wvglob.blk"
 !
       integer :: Iwin
       integer :: ic,i,k,ilepf
@@ -143,12 +143,11 @@
 !---------------------------------------------------------------------
 !
    subroutine openwind(Iwtype,Iwsize,Iwin)
+      use wvglob
+      use wvscrn
       implicit none
 !
       integer(4) :: Iwtype,Iwsize(4),Iwin
-!
-#include "wvglob.blk"
-#include "wvscrn.blk"
 !
 !     dumpfile maxx and maxy
 !
@@ -266,6 +265,8 @@
 !
 !
    subroutine selwind(Iwin)
+      use wvglob
+      use wvscrn
       implicit none
 !
 !-----------------------------------------------------------------------
@@ -289,9 +290,6 @@
 !   required  routines - wvwarn,wverr,wvpscl,wvsccl
 !
 !-----------------------------------------------------------------------
-!
-#include "wvglob.blk"
-#include "wvscrn.blk"
 !
       integer :: Iwin
 !
@@ -336,6 +334,8 @@
 !
 !
    subroutine drawline(X1,Y1,X2,Y2,Ilcol)
+      use wvglob
+      use wvscrn
       implicit none
 !
 !---------------------------------------------------------------------
@@ -369,9 +369,6 @@
       real(8) :: xx1,xx2,xy1,xy2
       integer :: sx1,sx2,sy1,sy2
       integer :: il
-!
-#include "wvglob.blk"
-#include "wvscrn.blk"
 !
       il = Ilcol
 !
@@ -462,6 +459,8 @@
 !
 !
    subroutine fillpoly(Nin,Coor,Ifcol,Ilcol)
+      use wvscrn
+      use wvglob
       implicit none
 !
 !-----------------------------------------------------------------------
@@ -498,9 +497,6 @@
       real(8) :: xcoor(2,65)
       integer :: i,if,il,n
       real(8) :: xmult
-!
-#include "wvscrn.blk"
-#include "wvglob.blk"
 !
       if (Nin.gt.65) call wvwarn(2)
       n=min(65,Nin)
@@ -550,6 +546,8 @@
 !
 !
    subroutine symbol(X1,Y1,Height,Mess,Angle,N,Icol)
+      use wvglob
+      use wvscrn
       implicit none
 !
 !-----------------------------------------------------------------------!
@@ -584,9 +582,6 @@
       real(8) :: xx1,xy1,xx2
       integer :: h,a,sx1,sy1
       integer :: nn,ic
-!
-#include "wvglob.blk"
-#include "wvscrn.blk"
 !
 !      write(*,*) 'in symbol'
 !      write(*,*) 'Mess',Mess
@@ -639,6 +634,7 @@
 !
 !
    subroutine setpost(Ionoff)
+      use wvglob
       implicit none
 !
 !-----------------------------------------------------------------------!
@@ -664,8 +660,6 @@
 !
 !-----------------------------------------------------------------------!
 !
-#include "wvglob.blk"
-!
       integer :: Ionoff
 !
       if(IOPEN.ne.1) call wverr(2)
@@ -688,6 +682,7 @@
 !
 !
    subroutine clrwind(Iback)
+      use wvglob
       implicit none
 !
 !-----------------------------------------------------------------------!
@@ -709,7 +704,6 @@
 !   required  routines -
 !
 !-----------------------------------------------------------------------!
-#include "wvglob.blk"
 !
       integer :: Iback
 !
@@ -734,6 +728,7 @@
 !
 !
    subroutine scaleon(Ionoff)
+      use wvglob
       implicit none
 !
 !-----------------------------------------------------------------------!
@@ -757,8 +752,6 @@
 !
 !-----------------------------------------------------------------------!
 !
-#include "wvglob.blk"
-!
       integer :: Ionoff
 !
       if (IOPEN.ne.1) call wverr(2)
@@ -769,6 +762,7 @@
 !
 !
    subroutine newscale(Range)
+      use wvglob
       implicit none
 !
 !-----------------------------------------------------------------------!
@@ -792,8 +786,6 @@
 !-----------------------------------------------------------------------!
       real(8) :: Range(4)
       integer :: i
-!
-#include "wvglob.blk"
 !
       if (IOPEN.ne.1) call wverr(2)
       do 10 i=1,2
@@ -936,6 +928,7 @@
 !
 ! ********************************************************************
    subroutine wvsccl(Iclip)
+      use rastcom
       implicit none
 !
 !-----------------------------------------------------------------------
@@ -960,8 +953,6 @@
 !   required  routines -
 !
 !-----------------------------------------------------------------------
-!
-#include "rastcom.blk"
 !
       integer :: Iclip(4)
 !
@@ -991,9 +982,9 @@
 !
 !========================================================
    subroutine WVSCDL(X1,Y1,X2,Y2,IC)
-        implicit none
+      use rastcom
+      implicit none
 !========================================================
-#include "rastcom.blk"
         integer :: X1,X2,Y1,Y2,IC
 
         if (IFILE.eq.1001) then
@@ -1008,9 +999,9 @@
 !
 !========================================================
    subroutine WVSCFP(N,XC,ICF,ICL)
-        implicit none
+      use rastcom
+      implicit none
 !========================================================
-#include "rastcom.blk"
         integer :: N,XC(*),ICF,ICL
         integer i,ix(100),iy(100)
 !
@@ -1034,9 +1025,9 @@
 !
 !========================================================
    subroutine WVSCPX(X,Y,IC)
-        implicit none
+      use rastcom
+      implicit none
 !=======================================================
-#include "rastcom.blk"
         integer X,Y,IC
         if (IFILE.eq.1001) then
             call xgsetcol(IC)
@@ -1049,9 +1040,9 @@
 !
 !========================================================
    subroutine WVSCTE(X1,Y1,H,MESS,A,N,ICOL)
-        implicit none
+      use rastcom
+      implicit none
 !========================================================
-#include "rastcom.blk"
         integer   :: X1,Y1,H
         character :: MESS*(*)
         integer   :: A,N,ICOL
@@ -1175,11 +1166,10 @@
 !---------------------------------------------------------------------
 !
    subroutine wvgrph
-        use graphmod, only: IWINDL, IWINDH
-        implicit none
-!
-#include "rastcom.blk"
-#include "wvscrn.blk"
+      use graphmod, only: IWINDL, IWINDH
+      use rastcom
+      use wvscrn
+      implicit none
 !
         integer             :: xglength
         character(len=1024) :: res_string
@@ -1256,10 +1246,10 @@
 !
 !========================================================
    subroutine wvtext
-        implicit none
+      use rastcom
+      use wvscrn
+      implicit none
 !======================================================
-#include "rastcom.blk"
-#include "wvscrn.blk"
 !
 !               performs QUIT
         integer :: xglength

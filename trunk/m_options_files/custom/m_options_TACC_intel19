@@ -173,7 +173,6 @@ HP3D_LINK_LIBS    = -Wl,--start-group \
 #HP3D_LINK_LIBS   += $(HP3D_COMMON) $(HP3D_GMP)
 HP3D_LINK_LIBS   += -Wl,--end-group
 HP3D_LINK_INCS    = -I$(HP3D_PATH)/common/hp3d \
-                    -I$(HP3D_PATH)/common/graphics \
                     -I$(HP3D_PATH)/module
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
