@@ -461,7 +461,7 @@ end subroutine cylinder_geodesic
 !
 !
 !----------------------------------------------------------------------
-!!!      subroutine check_cyl_geodesic(Nc, Iflag)
+!!!   subroutine check_cyl_geodesic(Nc, Iflag)
 !!!!
 !!!      use control
 !!!      use GMP

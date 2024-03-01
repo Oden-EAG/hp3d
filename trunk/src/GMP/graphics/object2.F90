@@ -12,7 +12,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine object2(Iwind)
+   subroutine object2(Iwind)
 !
       use graphmod
       use GMP
@@ -170,6 +170,6 @@
 !
       go to 100
 !
-      end subroutine object2
+   end subroutine object2
 
 #endif

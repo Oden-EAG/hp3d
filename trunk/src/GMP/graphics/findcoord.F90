@@ -27,7 +27,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine findcoord(No,Lab,Xp, Eta,X,Nfl)
+   subroutine findcoord(No,Lab,Xp, Eta,X,Nfl)
 !
       use control
       use GMP
@@ -98,6 +98,6 @@
 !
       end select
 !
-      end subroutine findcoord
+   end subroutine findcoord
 
 #endif

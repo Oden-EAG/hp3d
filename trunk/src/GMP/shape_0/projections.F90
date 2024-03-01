@@ -10,7 +10,7 @@
 !
 !  @revision Nov 12
 !----------------------------------------------------------------------
-      subroutine proj_t2e(Iv1,Iv2,Vshape,Dvshape, T,Dtdxi)
+   subroutine proj_t2e(Iv1,Iv2,Vshape,Dvshape, T,Dtdxi)
 !
       implicit none
       integer               ,intent(in ) :: Iv1,Iv2
@@ -23,7 +23,7 @@
       T = (Vshape(Iv2)-Vshape(Iv1)+1.d0)*.5d0
       Dtdxi(1:2) = (Dvshape(1:2,Iv2)-Dvshape(1:2,Iv1))*.5d0
 !
-      end subroutine proj_t2e
+   end subroutine proj_t2e
 !
 !
 !----------------------------------------------------------------------
@@ -38,7 +38,7 @@
 !
 !  @revision Nov 12
 !----------------------------------------------------------------------
-      subroutine proj_r2e(Iv1,Iv2,Vshape,Dvshape, T,Dtdxi)
+   subroutine proj_r2e(Iv1,Iv2,Vshape,Dvshape, T,Dtdxi)
 !
       use element_data , only : QUADR_EDGE_TO_VERT
 !
@@ -62,7 +62,7 @@
         Dtdxi(1:2) = Dtdxi(1:2) + Dvshape(1:2,iv)
       enddo
 !
-      end subroutine proj_r2e
+   end subroutine proj_r2e
 !
 !
 !----------------------------------------------------------------------
@@ -77,7 +77,7 @@
 !
 !  @revision Nov 12
 !----------------------------------------------------------------------
-      subroutine proj_n2e(Iv1,Iv2,Vshape,Dvshape, T,Dtdxi)
+   subroutine proj_n2e(Iv1,Iv2,Vshape,Dvshape, T,Dtdxi)
 !
       implicit none
       integer               ,intent(in ) :: Iv1,Iv2
@@ -90,7 +90,7 @@
       T         =( Vshape(    Iv2)- Vshape(    Iv1)+1.d0)*0.5d0
       Dtdxi(1:3)=(Dvshape(1:3,Iv2)-Dvshape(1:3,Iv1)     )*0.5d0
 !
-      end subroutine proj_n2e
+   end subroutine proj_n2e
 !
 !
 !----------------------------------------------------------------------
@@ -105,7 +105,7 @@
 !
 !  @revision Nov 12
 !----------------------------------------------------------------------
-      subroutine proj_n2f(Iv1,Iv2,Iv3,Vshape,Dvshape, T,Dtdxi)
+   subroutine proj_n2f(Iv1,Iv2,Iv3,Vshape,Dvshape, T,Dtdxi)
 !
       implicit none
       integer               ,intent(in ) :: Iv1,Iv2,Iv3
@@ -125,23 +125,23 @@
       T(2) = Vshape(Iv3) + tsum/3.d0
       Dtdxi(2,1:3) = Dvshape(1:3,Iv3) + dtsum(1:3)/3.d0
 !
-cc      T(1) = Vshap(Iv2); Dtdxi(1,1:3) = Dvshap(1:3,Iv2)
-cc      T(2) = Vshap(Iv3); Dtdxi(2,1:3) = Dvshap(1:3,Iv3)
-cc      do iv=1,4
-cc        if ((iv.ne.Iv1).and.(iv.ne.Iv2).and.(iv.ne.Iv3)) then
-cc        T(1) = T(1) + Vshap(iv)/3.d0
-cc          Dtdxi(1,1:3) = Dtdxi(1,1:3) + Dvshap(1:3,iv)/3.d0
-cc          T(2) = T(2) + Vshap(iv)/3.d0
-cc          Dtdxi(2,1:3) = Dtdxi(2,1:3) + Dvshap(1:3,iv)/3.d0
-cc        endif
-cc      enddo
-cc      if (iprint.eq.1) then
-cc        write(*,7001) Xi(1:3),T(1:2)
-cc 7001   format('proj_n2f: Xi = ',3e12.5,' T = ',2e12.5)
-cc        call pause
-cc      endif
+!!      T(1) = Vshap(Iv2); Dtdxi(1,1:3) = Dvshap(1:3,Iv2)
+!!      T(2) = Vshap(Iv3); Dtdxi(2,1:3) = Dvshap(1:3,Iv3)
+!!      do iv=1,4
+!!        if ((iv.ne.Iv1).and.(iv.ne.Iv2).and.(iv.ne.Iv3)) then
+!!        T(1) = T(1) + Vshap(iv)/3.d0
+!!          Dtdxi(1,1:3) = Dtdxi(1,1:3) + Dvshap(1:3,iv)/3.d0
+!!          T(2) = T(2) + Vshap(iv)/3.d0
+!!          Dtdxi(2,1:3) = Dtdxi(2,1:3) + Dvshap(1:3,iv)/3.d0
+!!        endif
+!!      enddo
+!!      if (iprint.eq.1) then
+!!        write(*,7001) Xi(1:3),T(1:2)
+!! 7001   format('proj_n2f: Xi = ',3e12.5,' T = ',2e12.5)
+!!        call pause
+!!      endif
 !
-      end subroutine proj_n2f
+   end subroutine proj_n2f
 !
 !
 !----------------------------------------------------------------------
@@ -169,7 +169,7 @@ cc      endif
 !
 !----------------------------------------------------------------------
 !
-      subroutine proj_d2e(Xi,Ie,Vshap,Dvshap, T,Dtdxi)
+   subroutine proj_d2e(Xi,Ie,Vshap,Dvshap, T,Dtdxi)
 !
       implicit none
 !
@@ -193,7 +193,7 @@ cc      endif
       end select
 !
 !
-      end subroutine proj_d2e
+   end subroutine proj_d2e
 !
 !----------------------------------------------------------------------
 !
@@ -218,7 +218,7 @@ cc      endif
 !
 !----------------------------------------------------------------------
 !
-      subroutine proj_d2f(Xi,If, T,Dtdxi)
+   subroutine proj_d2f(Xi,If, T,Dtdxi)
 !
       implicit none
 !
@@ -241,7 +241,7 @@ cc      endif
       end select
 !
 !
-      end subroutine proj_d2f
+   end subroutine proj_d2f
 !
 !
 !----------------------------------------------------------------------
@@ -256,7 +256,7 @@ cc      endif
 !
 !  @revision Nov 12
 !----------------------------------------------------------------------
-      subroutine proj_b2e(Iv1,Iv2,Vshape,Dvshape, T,Dtdxi)
+   subroutine proj_b2e(Iv1,Iv2,Vshape,Dvshape, T,Dtdxi)
 !
       use element_data , only : BRICK_FACE_TO_VERT
 !
@@ -281,7 +281,7 @@ cc      endif
       enddo
 !
 !
-      end subroutine proj_b2e
+   end subroutine proj_b2e
 !
 !
 !----------------------------------------------------------------------
@@ -296,7 +296,7 @@ cc      endif
 !
 !  @revision Nov 12
 !----------------------------------------------------------------------
-      subroutine proj_b2f(Iv1,Iv2,Iv4,Vshape,Dvshape, T,Dtdxi)
+   subroutine proj_b2f(Iv1,Iv2,Iv4,Vshape,Dvshape, T,Dtdxi)
 !
       implicit none
       integer               ,intent(in ) :: Iv1,Iv2,Iv4
@@ -312,4 +312,4 @@ cc      endif
       call proj_b2e(Iv1,Iv4,Vshape,Dvshape, T(2),Dtdxi(2,1:3))
 !
 !
-      end subroutine proj_b2f
+   end subroutine proj_b2f

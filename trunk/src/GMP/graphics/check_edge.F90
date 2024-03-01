@@ -19,7 +19,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine check_edge(Ncu, Idec)
+   subroutine check_edge(Ncu, Idec)
 !
       use GMP
       use control
@@ -152,7 +152,7 @@
 !  .......end of loop over attached figures
           enddo
           if (nr_trian.ne.2) then
-            write(*,*)'check_edge: have found an Hermite curve' &
+            write(*,*)'check_edge: have found an Hermite curve', &
                       ' without 2 adjacent G1RecTri'
             write(*,*)'nc,nr_trian = ',nc,nr_trian
             write(*,*)'     itrian = ',itrian
@@ -415,6 +415,6 @@
       if (ifound.ne.0) Idec = 2
 !
 !
-      end subroutine check_edge
+   end subroutine check_edge
 
 #endif

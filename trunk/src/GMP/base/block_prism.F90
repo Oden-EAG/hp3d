@@ -72,7 +72,7 @@ subroutine prism(No,Eta, X,Dxdeta)
       endselect
 !
 !
-      end subroutine prism
+   end subroutine prism
 !
 !
 !

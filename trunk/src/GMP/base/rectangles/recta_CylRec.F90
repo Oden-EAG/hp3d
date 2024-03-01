@@ -27,7 +27,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine recta_CylRec(No,Eta, X,Dxdeta)
+   subroutine recta_CylRec(No,Eta, X,Dxdeta)
 !
       use control
       use GMP          , only : RECTANGLES,POINTS,NDIM
@@ -128,5 +128,5 @@
       endif
 !
 !
-      end subroutine recta_CylRec
+   end subroutine recta_CylRec
 

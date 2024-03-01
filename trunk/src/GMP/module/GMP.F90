@@ -522,7 +522,7 @@
       contains
 !
 !  ...allocates GMP data structures
-      subroutine alloc_GMP
+   subroutine alloc_GMP
       integer :: i
 !
       allocate(SURFACES(MAXSU))
@@ -611,13 +611,13 @@
         nullify(PYRAMIDS(i)%Idata)
       enddo
 !
-      end subroutine alloc_GMP
+   end subroutine alloc_GMP
 !
 !
 !----------------------------------------------------------------------
 !
 !  ...dump out GMP data structure
-      subroutine dumpout_GMP
+   subroutine dumpout_GMP
 !
       integer, parameter :: ndump=31
 !
@@ -878,12 +878,12 @@
       if (iprint.eq.1) write(*,*) 'dumpGMP: closing file'
       close(ndump)
 !
-      end subroutine dumpout_GMP
+   end subroutine dumpout_GMP
 !
 !----------------------------------------------------------------------
 !
 !  ...dump in GMP data structure
-      subroutine dumpin_GMP(Fp)
+   subroutine dumpin_GMP(Fp)
 !
       character(len=*), intent(in)  :: Fp
       integer, parameter :: ndump=31
@@ -1167,11 +1167,11 @@
 !
       close(ndump)
 !
-      end subroutine dumpin_GMP
+   end subroutine dumpin_GMP
 !
 !----------------------------------------------------------------------
 !
-      subroutine print_GMP
+   subroutine print_GMP
 !
       use control
       implicit none
@@ -1381,11 +1381,11 @@
       end select
       goto 10
 !
-      end subroutine print_GMP
+   end subroutine print_GMP
 !
 !----------------------------------------------------------------------
 !
-      subroutine set_gmp_parameters(NDIM_loc,   &
+   subroutine set_gmp_parameters(NDIM_loc,   &
                                     MANDIM_loc, &
                                     MAXSU_loc,  &
                                     MAXNP_loc,  &
@@ -1459,11 +1459,11 @@
         write(*,*)''
       endif
 !
-      end subroutine set_gmp_parameters
+   end subroutine set_gmp_parameters
 !
 !----------------------------------------------------------------------
 !
-      subroutine print_GMP_parameters
+   subroutine print_GMP_parameters
       use environment , only : QUIET_MODE
 !
       if (.not. QUIET_MODE) then
@@ -1493,7 +1493,7 @@
         write(*,*)''
       endif
 !
-      end subroutine print_GMP_parameters
+   end subroutine print_GMP_parameters
 !
 !----------------------------------------------------------------------
 !

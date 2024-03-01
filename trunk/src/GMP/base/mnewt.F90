@@ -19,7 +19,7 @@
 !> @revision Mar 2023
 !-----------------------------------------------------------------------
 !
-      subroutine mnewt(Nusf,Nsurf,Eta,Feta,Xs,Sfact, X)
+   subroutine mnewt(Nusf,Nsurf,Eta,Feta,Xs,Sfact, X)
 !
       implicit none
 !
@@ -147,7 +147,7 @@
 !  ...end of loop through iterations
       enddo
 !
-      end subroutine mnewt
+   end subroutine mnewt
 !
 !
 !
@@ -175,7 +175,7 @@
 !> @date Mar 2023
 !-----------------------------------------------------------------------
 !
-      subroutine usrfun(Nusf,Nsurf,Eta,Feta,X,Sfact, Alpha,Beta)
+   subroutine usrfun(Nusf,Nsurf,Eta,Feta,X,Sfact, Alpha,Beta)
 !
       implicit none
 !
@@ -364,4 +364,4 @@
         enddo
       endif
 !
-      end subroutine usrfun
+   end subroutine usrfun

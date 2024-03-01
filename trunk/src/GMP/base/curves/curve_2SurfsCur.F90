@@ -21,7 +21,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine curve_2SurfsCur(No,I1,I2,Eta, X,Dxdeta,Ierror)
+   subroutine curve_2SurfsCur(No,I1,I2,Eta, X,Dxdeta,Ierror)
 !
       use control
       use GMP
@@ -178,4 +178,4 @@
       enddo
 !
 !
-      end subroutine curve_2SurfsCur
+   end subroutine curve_2SurfsCur

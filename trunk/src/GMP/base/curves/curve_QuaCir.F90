@@ -20,7 +20,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine curve_QuaCir(No,Eta, X,Dxdeta)
+   subroutine curve_QuaCir(No,Eta, X,Dxdeta)
 !
       use GMP
 !
@@ -132,4 +132,4 @@
       endif
 !
 !
-      end subroutine curve_QuaCir
+   end subroutine curve_QuaCir

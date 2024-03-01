@@ -9,7 +9,7 @@
 !> @date Mar 2023
 !----------------------------------------------------------------------
 !
-      subroutine trian_TransTri(No,Eta, X,Dxdeta)
+   subroutine trian_TransTri(No,Eta, X,Dxdeta)
 !
       use control
       use GMP
@@ -108,4 +108,4 @@
       endif
 !
 !
-      end subroutine trian_TransTri
+   end subroutine trian_TransTri

@@ -17,7 +17,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine GMPwireframe(Iwind)
+   subroutine GMPwireframe(Iwind)
 !
       use graphmod
       use GMP
@@ -365,6 +365,6 @@
       end select
 !
       goto 10
-      end subroutine GMPwireframe
+   end subroutine GMPwireframe
 
 #endif

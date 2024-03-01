@@ -17,7 +17,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine dpvistr(Nof)
+   subroutine dpvistr(Nof)
 !
       use graphmod
 !
@@ -113,6 +113,6 @@
       enddo
 !
 !
-      end subroutine dpvistr
+   end subroutine dpvistr
 
 #endif

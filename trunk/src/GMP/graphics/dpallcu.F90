@@ -10,7 +10,7 @@
 !   purpose            - routine draws all blocks' edges
 !
 !-----------------------------------------------------------------------!
-      subroutine dpallcu
+   subroutine dpallcu
 !
       use graphmod
       use GMP
@@ -58,6 +58,6 @@
       enddo
 !
 !
-      end subroutine dpallcu
+   end subroutine dpallcu
 
 #endif

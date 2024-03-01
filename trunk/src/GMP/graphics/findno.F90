@@ -20,7 +20,7 @@
 !                      = 0 otherwise
 !----------------------------------------------------------------------
 !
-      subroutine findno(Xy_in, Number)
+   subroutine findno(Xy_in, Number)
 !
       use GMP
       use graphmod
@@ -146,6 +146,6 @@
 !
       write(*,*)'findno: NUMBER = ',NUMBER
 !
-      end subroutine findno
+   end subroutine findno
 
 #endif

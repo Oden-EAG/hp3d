@@ -23,7 +23,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine tetra(No,Eta, X,Dxdeta)
+   subroutine tetra(No,Eta, X,Dxdeta)
 !
       use GMP
       use node_types, only: TETR
@@ -121,7 +121,7 @@
       endif
 !
 !
-      end subroutine tetra
+   end subroutine tetra
 !
 !
 !-----------------------------------------------------------------------
@@ -149,7 +149,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine tetra_TraTet(No,Eta, X,Dxdeta)
+   subroutine tetra_TraTet(No,Eta, X,Dxdeta)
 !
       use control
       use GMP
@@ -363,7 +363,7 @@
 !!!        endif
 !!!      endif
 !
-      end subroutine tetra_TraTet
+   end subroutine tetra_TraTet
 !
 !-----------------------------------------------------------------------
 !
@@ -394,7 +394,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine tetra_CylTet(No,Eta, X,Dxdeta)
+   subroutine tetra_CylTet(No,Eta, X,Dxdeta)
 !
       use control
       use GMP
@@ -478,6 +478,6 @@
       Dxdeta(3,3) = dr_deta3*sinthet + r*costhet*dthet_deta3
 !
 !
-      end subroutine tetra_CylTet
+   end subroutine tetra_CylTet
 
 

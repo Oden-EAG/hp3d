@@ -14,7 +14,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine dpblno
+   subroutine dpblno
 !
       use graphmod
       use GMP
@@ -157,6 +157,6 @@
   190 continue
 !
 !
-      end subroutine dpblno
+   end subroutine dpblno
 
 #endif

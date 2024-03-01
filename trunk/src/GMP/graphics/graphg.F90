@@ -15,7 +15,7 @@
 #if HP3D_USE_X11
 
 !
-      subroutine graphg
+   subroutine graphg
 !
       use GMP
       use graphmod
@@ -68,16 +68,16 @@
 !
       go to 10
 !
-      end subroutine graphg
+   end subroutine graphg
 
 #else
 
-      subroutine graphg
+   subroutine graphg
       
       implicit none
       
       write(*,*) 'graphg is only supported with HP3D_USE_X11 enabled.'
       
-      end subroutine graphg
+   end subroutine graphg
 
 #endif

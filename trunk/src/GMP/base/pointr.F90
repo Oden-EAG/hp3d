@@ -12,7 +12,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine pointr(No, X)
+   subroutine pointr(No, X)
 !
       use GMP
       implicit none
@@ -70,4 +70,4 @@
  7002   format('pointr: X = ',3f8.3)
       endif
 !
-      end subroutine pointr
+   end subroutine pointr

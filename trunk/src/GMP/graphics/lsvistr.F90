@@ -17,7 +17,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine lsvistr
+   subroutine lsvistr
 !
       use GMP
       use graphmod
@@ -408,7 +408,7 @@
 !======================================================================
                 call encodg(nplotb,2,3, nickb)
 !
-cldem, encoding of curve numbers disabled
+!ldem, encoding of curve numbers disabled
 !!!                IGTRCU(NRVISTR) = IGTRCU(NRVISTR)+10000*nick
                 IGTRCU(NRVISTR) = IGTRCU(NRVISTR)+nickb
               endif
@@ -852,6 +852,6 @@ cldem, encoding of curve numbers disabled
 !  ...sort a!!ording to z-coordinate in order back-to-front
       call sortz
 !
-      end subroutine lsvistr
+   end subroutine lsvistr
 
 #endif

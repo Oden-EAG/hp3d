@@ -16,7 +16,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine object3(Iwind)
+   subroutine object3(Iwind)
 !
       use GMP
       use graphmod
@@ -75,8 +75,8 @@
       theta = pi/5.d0+pi
       psi   = pi/6.d0
 
-C       theta = pi/4.d0
-C       psi = pi/4.d0
+!       theta = pi/4.d0
+!       psi = pi/4.d0
       RN(1) = cos(psi)*cos(theta)
       RN(2) = cos(psi)*sin(theta)
       RN(3) = sin(psi)
@@ -442,6 +442,6 @@ C       psi = pi/4.d0
       goto 10
 !
 !
-      end subroutine object3
+   end subroutine object3
 
 #endif

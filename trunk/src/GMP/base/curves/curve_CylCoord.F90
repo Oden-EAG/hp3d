@@ -24,7 +24,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine curve_CylCoord(No,Eta, X,Dxdeta)
+   subroutine curve_CylCoord(No,Eta, X,Dxdeta)
 !
       use GMP
 !
@@ -94,5 +94,5 @@
       endif
 !
 !
-      end subroutine curve_CylCoord
+   end subroutine curve_CylCoord
 

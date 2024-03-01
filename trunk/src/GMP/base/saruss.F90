@@ -22,7 +22,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine saruss(A,B, C,Nfl)
+   subroutine saruss(A,B, C,Nfl)
 !
       implicit none
 !
@@ -78,4 +78,4 @@
       C(3) = detZ/detA
 !
 !
-      end subroutine saruss
+   end subroutine saruss

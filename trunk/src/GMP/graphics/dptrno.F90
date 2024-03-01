@@ -13,7 +13,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine dptrno
+   subroutine dptrno
 !
       use graphmod
       use GMP
@@ -154,6 +154,6 @@
         call symbol(xtext,ytext,height,text,angle,3,ncol)
   190 continue
 !
-      end subroutine dptrno
+   end subroutine dptrno
 
 #endif

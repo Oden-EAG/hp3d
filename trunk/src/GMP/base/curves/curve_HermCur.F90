@@ -19,7 +19,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine curve_HermCur(No,Eta, X,Dxdeta)
+   subroutine curve_HermCur(No,Eta, X,Dxdeta)
 !
       use GMP
       use parameters , only : MAXP
@@ -83,4 +83,4 @@
       endif
 !
 !
-      end subroutine curve_HermCur
+   end subroutine curve_HermCur

@@ -19,7 +19,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine curve_3HermCur(No,Eta, X,Dxdeta)
+   subroutine curve_3HermCur(No,Eta, X,Dxdeta)
 !
       use GMP
       use parameters , only : MAXP
@@ -82,12 +82,12 @@
       endif
 !
 !
-      end subroutine curve_3HermCur
+   end subroutine curve_3HermCur
 !
 !
 !----------------------------------------------------------------------
 !
-      subroutine cubic_Hermite(Eta, Vshap,Dvshap)
+   subroutine cubic_Hermite(Eta, Vshap,Dvshap)
 !
 !----------------------------------------------------------------------
 !
@@ -107,4 +107,4 @@
       Dvshap(4) = 3.d0*Eta**2 - 2.d0*Eta
 !
 !
-      end subroutine cubic_Hermite
+   end subroutine cubic_Hermite

@@ -22,7 +22,7 @@
 !
 !------------------------------------------------------------------------
 !
-      subroutine recta_linear(No,Eta, X,Dxdeta)
+   subroutine recta_linear(No,Eta, X,Dxdeta)
 !
       use GMP
 !
@@ -63,4 +63,4 @@
       enddo
 !
 !
-      end subroutine recta_linear
+   end subroutine recta_linear

@@ -19,7 +19,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine curve_ImpCir(No,Eta, X,Dxdeta)
+   subroutine curve_ImpCir(No,Eta, X,Dxdeta)
 !
       use GMP
       use control
@@ -145,4 +145,4 @@
       endif
 !
 !
-      end subroutine curve_ImpCir
+   end subroutine curve_ImpCir
