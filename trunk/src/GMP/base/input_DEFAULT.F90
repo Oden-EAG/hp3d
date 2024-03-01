@@ -69,7 +69,7 @@
 !
 !  Remarks:
 !
-!  1. Refer to "modules/GMP.F" for a detailed description of each
+!  1. Refer to "modules/GMP.F90" for a detailed description of each
 !     0,1,2,3D object.
 !
 !  2. Connectivities explicitly listed in the file are:

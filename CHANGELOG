@@ -19,7 +19,7 @@ Version 1.0 (dev)
   Dirichlet flags of (at most 31) H1, H(div), and H(curl) components.
   This parameter replaces the previous global parameter MAX_NRINDEX.
 
-- Updated all of the remaining fixed-format (F77) legacy code
+- Updated all of the remaining fixed-format (F77) legacy code.
 
 ==========================================
 Version 1.0-beta, released on Sep 24, 2023
