@@ -19,6 +19,9 @@
 !********************************************************
 
       subroutine wvopps
+      use wvglob
+      use wvpost
+      use wvscrn
       implicit none
 !---------------------------------------------------------
 !      AUTHOR(S)        - Satish Chavva,Tadeusz Liszka and others
@@ -30,10 +33,6 @@
 !========================================================
 ! wr07.08.99
 ! wr03.14.02
-!
-#include "wvglob.blk"
-#include "wvpost.blk"
-#include "wvscrn.blk"
 !
       character(10) :: name
       integer       :: iflag
@@ -85,6 +84,9 @@
 
 !-----------------------------------------------------------------
       subroutine wvpscl(Clip)
+      use wvglob
+      use wvpost
+      use wvscrn
       implicit none
 !
 !----------------------------------------------------------------------
@@ -99,10 +101,6 @@
 !----------------------------------------------------------------------
 !
       real(8) :: Clip(4)
-!
-#include "wvglob.blk"
-#include "wvpost.blk"
-#include "wvscrn.blk"
 !
       real(8) :: dum1,dum2
 !
@@ -131,6 +129,9 @@
 
 !========================================================
       subroutine WVPSDL(X1,Y1,X2,Y2,IC)
+      use wvglob
+      use wvpost
+      use wvscrn
       implicit none
 !========================================================
 !
@@ -143,10 +144,6 @@
 !  arguments - X1,Y1,X2,Y2-coordinates of the two endpoints
 !              IC - line color
 !---------------------------------------------------------
-!
-#include "wvglob.blk"
-#include "wvpost.blk"
-#include "wvscrn.blk"
 !
         real(8) :: X1,Y1,X2,Y2
         integer :: IC
@@ -164,6 +161,9 @@
 
 
       subroutine wvpsfp(N,Xc,Icf,Icl)
+      use wvglob
+      use wvpost
+      use wvscrn
       implicit none
 !
 !----------------------------------------------------------------------
@@ -194,10 +194,6 @@
 !   required routines  - wvpsfp,wvwarn
 !
 !----------------------------------------------------------------------
-!
-#include "wvglob.blk"
-#include "wvpost.blk"
-#include "wvscrn.blk"
 !
       integer :: N
       real(8) :: Xc(2,N)
@@ -244,11 +240,10 @@
 !     draw pixel in postcript
 !========================================================
       subroutine WVPSPX(X,Y,IC)
+      use wvglob
+      use wvpost
+      use wvscrn
       implicit none
-!
-#include "wvglob.blk"
-#include "wvpost.blk"
-#include "wvscrn.blk"
 !
         real(8) :: X,Y
         integer :: IC
@@ -269,7 +264,10 @@
 !========================================================
 
       subroutine WVPSTE(X1,Y1,H,MESS,A,N,ICOL)
-        implicit none
+      use wvglob
+      use wvpost
+      use wvscrn
+      implicit none
 !
         real(8)   :: X1,Y1
         integer   :: H,A
@@ -278,10 +276,6 @@
 !
         integer   :: k
         real(8)   :: dum
-!
-#include "wvglob.blk"
-#include "wvpost.blk"
-#include "wvscrn.blk"
 !
         if (IFILE.eq.0) return
         call wvpsout(X1,Y1,3)
@@ -298,6 +292,9 @@
 !-------------------------------------------------------------------
 
       subroutine wvpsout(X,Y,Icode)
+      use wvglob
+      use wvpost
+      use wvscrn
       implicit none
 !
 !=====================================================================
@@ -322,10 +319,6 @@
 !       initialization - in wvopps
 !
 !=====================================================================
-!
-#include "wvglob.blk"
-#include "wvpost.blk"
-#include "wvscrn.blk"
 !
       real(8) :: X,Y
       integer :: Icode
@@ -403,11 +396,10 @@
 !-----------------------------------------------------------------------
 !
       use graphmod
+      use wvglob
+      use wvpost
+      use wvscrn
       implicit none
-!
-#include "wvglob.blk"
-#include "wvpost.blk"
-#include "wvscrn.blk"
 !
       character(len=100) :: line,lineout
       character(len=20)  :: text
@@ -551,11 +543,10 @@
 
 !========================================================
       subroutine wvclps
+      use wvglob
+      use wvpost
+      use wvscrn
       implicit none
-!
-#include "wvglob.blk"
-#include "wvpost.blk"
-#include "wvscrn.blk"
 !
         integer :: i
 !

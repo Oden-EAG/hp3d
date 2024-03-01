@@ -1,11 +1,11 @@
-        common /wvglob1/ IOPEN,LWTYPE,LWSIZE,LSCALE, &
-                         IGPSP,ILEPSP,ILESCR,ILEDF,ICURRWIN
-        common /wvglob2/ XGSCAL
-!
-        integer IOPEN,LWTYPE(10),LWSIZE(10,4),LSCALE(10), &
-                IGPSP(10),ILEPSP,ILESCR,ILEDF,ICURRWIN
-        real(8) XGSCAL(10,4)
-!
+!>@brief This module replaces common file "wvglob.blk"
+!>@date  Feb 2024
+module wvglob
+
+   integer :: IOPEN,LWTYPE(10),LWSIZE(10,4),LSCALE(10), &
+              IGPSP(10),ILEPSP,ILESCR,ILEDF,ICURRWIN
+   real(8) :: XGSCAL(10,4)
+
 !  explanation of variables:
 !
 !       IOPEN           .ne.0 if windows initialized at all
@@ -16,4 +16,5 @@
 !       ILEPSP          no of pspactive windows
 !       ILESCR          no of screen windows
 !       ILEDF           no of dump file windows
-!
+
+end module wvglob

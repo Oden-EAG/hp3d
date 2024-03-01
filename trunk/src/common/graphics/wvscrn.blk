@@ -1,3 +1,0 @@
-        common /wvscrn/ MAXSCX,MAXSCY,MAXCOL,MAXDFX,MAXDFY
-
-        integer MAXSCX,MAXSCY,MAXCOL,MAXDFX,MAXDFY
