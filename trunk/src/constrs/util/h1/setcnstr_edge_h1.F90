@@ -342,7 +342,7 @@
 !
       write(*,*) 'setcnstr_edge_h1: CONTINUE ?(1/0)'
       read(*,*) ians
-      if (ians.eq.1) go to 10
+      if (ians.eq.1) goto 10
 !
 #endif
 !

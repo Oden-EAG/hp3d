@@ -824,7 +824,7 @@ subroutine rectaB_back(No,T,Norient, X,Dxdt)
  9000     format(' trianB: rerunning rountine for triangle No = ', &  !
                            I6,' with printing flag on.')              !
 !!!          call pause                                               !
-!!!          go to 10                                                 !
+!!!          goto 10                                                 !
         endif                                                         !
 !======================================================================
 !

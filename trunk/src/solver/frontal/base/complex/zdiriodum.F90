@@ -101,7 +101,7 @@
 ! unknown file
 !
       else
-         go to 9999
+         goto 9999
       endif
 !
       ntape = lbuf(iunit)
@@ -119,7 +119,7 @@
 !wb ! unknown file
 !wb !
 !wb        else
-!wb          go to 9999
+!wb          goto 9999
 !wb        endif
 !wb <
 !-----------------------------------------------------------------------
@@ -161,7 +161,7 @@
 !
 ! normal return
 !
-         go to 1111
+         goto 1111
 !-----------------------------------------------------------------------
 ! check for WRITE command
 ! ==========*****========
@@ -187,7 +187,7 @@
 !        ---------------------------------------------
 ! normal return
 !
-         if (Len .eq. lenw) go to 1111
+         if (Len .eq. lenw) goto 1111
 !
 ! write out the rest of the records
 !
@@ -205,9 +205,9 @@
 ! ------------------------------------------------------
 ! normal return
 !
-         if (Len .eq. iend) go to 1111
+         if (Len .eq. iend) goto 1111
 !
-         go to 10
+         goto 10
 !        --------
 !-----------------------------------------------------------------------
 ! check for READ command
@@ -238,7 +238,7 @@
 !        ---------------------------------------------------------
 ! normal exit
 !
-         if (Len .eq. lenr) go to 1111
+         if (Len .eq. lenr) goto 1111
 !
 ! read in the rest of the records
 !
@@ -255,9 +255,9 @@
 !        --------------------------------------------------
 ! normal exit
 !
-         if (Len .eq. iend) go to 1111
+         if (Len .eq. iend) goto 1111
 !
-         go to 20
+         goto 20
 !        --------
 !-----------------------------------------------------------------------
 ! check for CLOSE
@@ -271,13 +271,13 @@
          nbuf(iunit) = 0
          lenf(iunit) = 0
 !wb <
-         go to 1111
+         goto 1111
       endif
 !-----------------------------------------------------------------------
 ! unknown command
 ! ===============
 !
-      go to 9999
+      goto 9999
 !
 ! NORMAL EXIT
 ! ===========

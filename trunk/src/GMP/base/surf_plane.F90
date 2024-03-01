@@ -23,15 +23,15 @@ subroutine plane1(X,X0,Rn, Fval,Dfdx)
 !------------------------------------------------------------------------------------
 !
       dRn=0.d0
-      do 10 i=1,3
+      do i=1,3
         dRh = Rn(i)*Rn(i)
         dRn = dRn+dRh
- 10   continue
+      enddo
 !
       dRn = dsqrt(dRn)
-      do 20 i=1,3
+      do i=1,3
         Rn(i) = Rn(i)/dRn
- 20   continue
+      enddo
 !
 !  ...caculate coefficients of the plane
       d = -( X0(1)*Rn(1) + X0(2)*Rn(2) + X0(3)*Rn(3) )

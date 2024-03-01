@@ -44,7 +44,7 @@
         write(nfsout,*) 'ZEROR: NRHS,MFW,NFW,LFW = ',NRHS,MFW,NFW,LFW
       endif
 #endif
-      do 120 in  =1,NRHS
+      do in=1,NRHS
 !
          ia = (in-1) * MFW
          m = LFW + 1
@@ -54,11 +54,11 @@
 ! ARDENT directives
 !$doit VBEST
 !
-         do 20 i = m,NFW
+         do i = m,NFW
             Frhs(ia+i) = zero
-20       continue
+         enddo
 !
-120   continue
+      enddo
 !
 !
    end subroutine zeror

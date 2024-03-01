@@ -81,9 +81,9 @@
 !
 ! initialize the destination vector storage
 !
-      do 10 i = 1,NFN
+      do i = 1,NFN
          Ibb(i) = 0
-   10 continue
+      enddo
 #if HP3D_DEBUG
       iprint = 0
       if (iprint.eq.1) write(NFSOUT,*) 'in desvec: numelm=',numelm
@@ -91,7 +91,7 @@
 !
 ! loop thru the elements
 !
-      do 100 iel = 1,NUMELM
+      do iel = 1,NUMELM
 !     **********************
 !
 ! if the element contains no nodes or multipliers, then skip it
@@ -102,7 +102,7 @@
          endif
 #endif
          n = In(iel)
-         if (n .eq. 0) go to 100
+         if (n .eq. 0) cycle
 !
 ! initialize
 !
@@ -114,7 +114,7 @@
 !
 ! loop thru the nicknames
 !
-         do 60 id = 1,n
+         do id = 1,n
 !        ***************
 !
 #if HP3D_DEBUG
@@ -176,7 +176,7 @@
 !
 ! loop thru all the remaining nicknames and search for the next matching
 ! ----------------------------------------------------------------------
-               do 40 jjd = jp,nfn
+               do jjd = jp,nfn
 !              ******************
                   jd = jjd
 !
@@ -197,10 +197,10 @@
 !
 ! skip to the next nickname
 !
-                     go to 60
+                     goto 60
                   endif
 !
-   40          continue
+               enddo
 !  ********************
             endif
 !
@@ -226,7 +226,7 @@
 !
             ntt = ntt + NDOFM
 !
-   60    continue
+   60    enddo
 !  ***************
 !
 ! increment the total number of dof for the model
@@ -253,7 +253,7 @@
 !
 ! search thru the remaining nicknames
 !
-               do 80 jd = jp,jdn
+               do jd = jp,jdn
 !
 ! check if this nickname was given a front dest already
 !
@@ -264,14 +264,14 @@
 !
 ! look thru those front dests which are being eliminated
 !
-                     do 70 i = 1,ne
+                     do i = 1,ne
 !
 ! if the front dest of this nickname is ge than the one we are eliminati
 !  then increment the number of dof by that being eliminated
 !
                         if (Ibb(jd) .ge. Ic(ipc))  nt = nt + Ic(ipc+1)
                         ipc = ipc + 2
-   70                continue
+                     enddo
 !
 ! reduce the front dest of this nickname by the number of dof eliminated
 !  below it in the front
@@ -279,7 +279,7 @@
                      Ibb(jd) = Ibb(jd) - nt
                   endif
 !
-   80          continue
+               enddo
             endif
          endif
 !
@@ -303,7 +303,7 @@
            call pause
          endif
 !
-  100 continue
+      enddo
 !
 !
    end subroutine desvec

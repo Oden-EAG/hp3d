@@ -50,7 +50,7 @@
 !
 ! loop thru the dof in the element
 !
-      do 100 i = 1,NDOFM
+      do i = 1,NDOFM
 !     ------------------
 ! pull the dof destination vector (for this row)
 !
@@ -67,9 +67,9 @@
 !
 ! to remove vector dependencies, we fill a temporary vector with values
 !
-         do 45 j = 1, NDOFM
+         do j = 1, NDOFM
             ntemp(j) = n + j - 1
-  45     continue
+         enddo
 !
 ! ALLIANT directives
 !vd$ nodepchk
@@ -80,7 +80,7 @@
 !
 ! loop thru the dof in the element
 !
-        do 50 j = 1,NDOFM
+        do j = 1,NDOFM
 !        -------------
 ! pull the dof destination vector (for this column)
 !
@@ -104,12 +104,12 @@
             Flhs(ml) = Flhs(ml) + Ellhs(ntemp(j))
 !wb <
 !
-   50   continue
+        enddo
 !wb >
         n = n + NDOFM
 !wb <
 !
-100   continue
+      enddo
 !
 !
    end subroutine unsasm

@@ -47,18 +47,18 @@
 
 !      write(*,*) 'in symasm ellhs = '
 !      kk=0
-!      do 44 ii=1,NDOFM
-!        do 43 jj=1,ii
+!      do ii=1,NDOFM
+!        do jj=1,ii
 !          kk=kk+1
 !          write(*,*) Ellhs(kk)
-!   43   continue
+!        enddo
 !        pause
-!   44 continue
+!      enddo
 
 !
 ! loop thru the dof in the element
 !
-      do 100 i = 1,NDOFM
+      do i = 1,NDOFM
 !     ------------------
 ! pull the dof destination vector (for this row)
 !
@@ -75,9 +75,9 @@
 !
 ! to remove vector dependencies, we fill a temporary vector with values
 !
-         do 45 j = 1, i
+         do j = 1, i
             ntemp(j) = n + j - 1
-  45     continue
+         enddo
 !
 ! ALLIANT directives
 !vd$ nodepchk
@@ -87,7 +87,7 @@
 !wb <
 ! becuz its symmetric loop thru lower triangular dof for this element
 !
-         do 50 j = 1, i
+         do j = 1, i
 !        -------------
 ! pull the dof destination vector (for this column)
 !
@@ -110,12 +110,12 @@
             Flhs(mk) = Flhs(mk) + Ellhs(ntemp(j))
 !wb <
 !
- 50      continue
+         enddo
 !wb >
          n = n + i
 !wb <
 !
-100   continue
+      enddo
 !
 !
    end subroutine symasm

@@ -204,10 +204,10 @@
 #endif
 !
 !  .......loop through the lower/upper triangle
-          do 20 l=1,2
+          do l=1,2
 !
 !  .........check if the triangle is to be displayed
-            if (mpcol(l).eq.0) go to 20
+            if (mpcol(l).eq.0) goto 20
 !
 !  .........find coordinates of vertices
             do k=1,3
@@ -290,18 +290,18 @@
                 enddo
 !
 !  .............skip not visible small triangles
-                if (iclip.eq.0) go to 20
+                if (iclip.eq.0) goto 20
                 select case (Ifc)
 !
 !  ...............orientation of the face consistent with the external
 !                 normal
                   case(2,3,4)
-                    if (vis.lt.small) go to 20
+                    if (vis.lt.small) goto 20
 !
 !  ...............orientation of the face opposite to the external
 !                 normal
                   case(1,5,6)
-                    if (-vis.lt.small) go to 20
+                    if (-vis.lt.small) goto 20
                 end select
 !
 !
@@ -330,8 +330,8 @@
                 write(*,*) 'display_face: iclip,vis = ',iclip,vis
               endif
 #endif
-              if (iclip.eq.0) go to 20
-!!!              if (vis.lt.small) go to 20
+              if (iclip.eq.0) goto 20
+!!!              if (vis.lt.small) goto 20
 !
 !  ...........store display information
               NRVISTR = NRVISTR+1
@@ -572,7 +572,7 @@
             enddo
 !
 !  .......end of loop through lower/upper triangle
-   20     continue
+   20     enddo
 !
 !  .....end of loop through the vertical integer coordinate
         enddo

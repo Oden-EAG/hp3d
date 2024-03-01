@@ -75,7 +75,7 @@
 !
 ! loop over the Elements (we are actually looping thru them backwards)
 ! **********************
-      do 200 iel = 1,NUMELM
+      do iel = 1,NUMELM
 !     *******************
 ! set to loop backwards thru the Elems
 
@@ -118,7 +118,7 @@
 
 
 !
-         if (numdes .eq. 0) go to 200
+         if (numdes .eq. 0) goto 200
 !
 ! convert the nodal destination vectors to dof destination vectors (Amde
 !  also determine the number of dof to eliminate from the front (ne)
@@ -152,7 +152,7 @@
 !
 ! backsubstitute those equations possible from the current front
 ! **********************************************************
-         do 150 ie = 1,ne
+         do ie = 1,ne
 !        ****************
             j = j - 1
 
@@ -286,7 +286,7 @@
             endif
 !
             NFW = NFW + 1
-  150    continue
+         enddo
 !
 ! pass the solution to the driving program for storage
 ! ----------------------------------------------------
@@ -305,36 +305,36 @@
 !            2) we also should switch the loop parameters below
 !
             k = 1
-            do 180 j = 1, NRHS
+            do j = 1, NRHS
 !
 ! ALLIANT directives
 !vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
-               do 160 i = 1,NDOFM
+               do i = 1,NDOFM
                   md = int(Amdest(i))
                   md = abs(md)
                   l = (j-1)*MFW + md
                   Elem(k) = Frnt(l)
                   k = k + 1
-  160          continue
+               enddo
 !
-  180       continue
+            enddo
 !
-!wb             do 180 i = 1,NDOFM
+!wb             do i = 1,NDOFM
 !wb                k = 0
 !wb !
 !wb !vd$ select (vector)
 !wb !
-!wb                do 160 j = 1,NRHS
+!wb                do j = 1,NRHS
 !wb                   md = int(Amdest(i))
 !wb                   l = locr(j,md)
 !wb                   Elem(k+i) = Frnt(l)
 !wb                   k = k + NDOFM
-!wb   160          continue
+!wb                enddo
 !wb !
-!wb   180       continue
+!wb             enddo
 !wb <
 !
 #if HP3D_DEBUG
@@ -356,7 +356,7 @@
 !
          endif
 !
-  200 continue
+  200 enddo
 ! ************
 !
       IFU = ifui

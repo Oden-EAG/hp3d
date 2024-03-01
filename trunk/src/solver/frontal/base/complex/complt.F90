@@ -124,7 +124,7 @@
       if (ISYM .eq. 3) call zdirio ('L', 'OPEN', 0, MBUF, Awrk, IERR)
 !                     -------------------------------------------
       IERR = 10*IERR
-      if (IERR .ne. 0) go to 9100
+      if (IERR .ne. 0) goto 9100
 !
 ! debug print
 !
@@ -156,7 +156,7 @@
          write(NFSOUT,7060) minn
  7060    format(2(/), 5x,'ERROR IN SURFS: NOT ENOUGH ROOM IN BUFFER', &
                    /,12x,'MINIMUM SIZE OF WORK ARRAY  = ',i7)
-         go to 9100
+         goto 9100
       endif
 !
 ! set pointers into the workspace (note: relative pointers)
@@ -222,7 +222,7 @@
  7100     format(10x,'BUFFER DUMPS:',i4)
       endif
 !
-      if (IERR .ne. 0) go to 9100
+      if (IERR .ne. 0) goto 9100
 !
       if (NRHS .ne. 0) then
 

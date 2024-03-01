@@ -79,7 +79,7 @@
 !  ...loop through elements
       NRVISTR = 0
       mdle=0
-      do 20 iel=1,NRELES
+      do iel=1,NRELES
         call nelcon(mdle, mdle)
 #if HP3D_DEBUG
         if (iprint.eq.1) then
@@ -94,18 +94,18 @@
           if (IBOX_CUT.gt.0) then
             if (xcenter(IBOX_CUT).gt.BOX_CUT(IBOX_CUT,1)) then
 !!              write(*,*) 'box mdle ', mdle
-              go to 20
+              goto 20
             endif
           else
             if (xcenter(-IBOX_CUT).lt.BOX_CUT(-IBOX_CUT,1)) then
 !!              write(*,*) 'box mdle ', mdle
-              go to 20
+              goto 20
             endif
           endif
         endif
 !
         call locate(mdle,IGINV,NRINVBL, loc)
-        if (loc.gt.0) go to 20
+        if (loc.gt.0) goto 20
         call find_domain(mdle, ndom)
 #if HP3D_DEBUG
         if (iprint.eq.1) then
@@ -113,7 +113,7 @@
  7056     format('lsvisidb: mdle,ndom,NDOMAIN(ndom) = ',i6,i3,i2)
         endif
 #endif
-        if (NDOMAIN(ndom).eq.0) go to 20
+        if (NDOMAIN(ndom).eq.0) goto 20
 !
         call find_orient(mdle, nedge_orient,nface_orient)
         call find_order(mdle, norder)
@@ -164,12 +164,12 @@
         enddo
 !
 !  .....skip elements totally in front of the cutting plane
-        if ((icut.eq.0).and.(cl.gt.0)) go to 20
+        if ((icut.eq.0).and.(cl.gt.0)) goto 20
 !
         nrintertot=0
 !
 !  .....loop through element faces
-        do 10 ifc=1,nface(NODES(mdle)%ntype)
+        do ifc=1,nface(NODES(mdle)%ntype)
 #if HP3D_DEBUG
           if (iprint.eq.1) then
             write(*,7003) ifc
@@ -202,7 +202,7 @@
                 if (NDOMAIN(ndom).eq.0) ivis=0
               enddo
             endif
-            if (ivis.eq.1) go to 10
+            if (ivis.eq.1) goto 10
 !
 !  .......end for uncut elements
           endif
@@ -214,7 +214,7 @@
                             solev,xmin,xmax,                         &
                             nrintertot,nrinter(ifc),xlocinter)
 !
-   10   continue
+   10   enddo
 !
         if ((icut.eq.1).and.(nrintertot.gt.0)) then
 !
@@ -229,7 +229,7 @@
 !!                       ,nrintertot,nrinter,xlocinter)
 
         endif
-   20 continue
+   20 enddo
 !
 !  ...compute objects dimensions and coordinates of its
 !     central point

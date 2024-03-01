@@ -224,18 +224,18 @@ module refinements_2D
       case(MEDG)
         select case(Kref)
         case(1); Nrsons=3
-        case default; go to 10
+        case default; goto 10
         end select
       case(MDLT)
         select case(Kref)
         case(1); Nrsons=7
-        case default; go to 10
+        case default; goto 10
         end select
       case(MDLQ)
         select case(Kref)
         case(11)   ; Nrsons=9
         case(10,01); Nrsons=3
-        case default; go to 10
+        case default; goto 10
         end select
       end select
 !

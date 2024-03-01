@@ -70,7 +70,7 @@
 !-----------------------------------------------------------------------
 ! loop thru all the elements
 !
-      do 10 i = 1,NUMELM
+      do i = 1,NUMELM
 !
 ! simply pick up the maximum number of nodes+multipliers/element
 !
@@ -80,7 +80,7 @@
 !
          NFN = NFN + In(i)
 !
-   10 continue
+      enddo
 !
 ! check if there is enuf space in ia() to perform the prefront
 !

@@ -93,7 +93,7 @@ subroutine update_Ddof
       nod_flg = .false.
 !
 !  ...loop through active elements
-      do 100 iel=1,NRELES_SUBD
+      do iel=1,NRELES_SUBD
 !
          mdle = ELEM_SUBD(iel)
 !
@@ -254,7 +254,7 @@ subroutine update_Ddof
          NODES(mdle)%visit=1
 !
 !  ...end of loop through elements
- 100  continue
+ 100  enddo
 !
       if (nr_up_elem.eq.0) exit
 !

@@ -54,7 +54,7 @@ subroutine set_initial_mesh(Nelem_order)
 !
 !..boundary domain "1" (BC depends on IBCFLAG)
    bdom = 1 ! set on all exterior faces with boundary domain "1"
-   if (IBCFLAG.eq.2..or.IBCFLAG.eq.3) then
+   if (IBCFLAG.eq.2 .or. IBCFLAG.eq.3) then
 !  ...impedance BC on H-trace
       comp = 2       ! H-trace
       flag = IBCFLAG ! impedance BC flag

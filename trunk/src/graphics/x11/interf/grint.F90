@@ -98,13 +98,13 @@
 !!!!        if (iwind+1.eq.ic) then
 !
 !.........switch to any active window
-          do 10 i=1,10
+          do i=1,10
             if (LWTYPE(i).ge.0) then
               k=i-1
               call selwind(k)
               return
             endif
-   10     continue
+          enddo
         endif
       endif
 !
@@ -165,10 +165,10 @@
       if (IOPEN.ne.1.or.Iwtype.le.-1) then
 !
 !.......initialize window system
-        do 10 i=1,10
+        do i=1,10
           IGPSP(i)=0
           LWTYPE(i)=-1
-   10   continue
+        enddo
         IOPEN=1
         ILEPSP=0
         ILESCR=0
@@ -238,9 +238,9 @@
       endif
 !
 !.....adjust Iwsize on output
-      do 45 i=1,4
+      do i=1,4
         Iwsize(i)=LWSIZE(kwin,i)
-   45 continue
+      enddo
       LWTYPE(kwin)=Iwtype
       if (iprint.eq.1) then
         write(*,*)'in openwind after label 45 kwin,LWTYPE(kwin) = ', &
@@ -304,24 +304,24 @@
         call wvwarn(1)
       else
         ICURRWIN = Iwin + 1
-        do 10 i=1,4
+        do i=1,4
           iclip(i) = LWSIZE(ICURRWIN,i)
-   10   continue
+        enddo
         if (LWTYPE(ICURRWIN).eq.0) call wvsccl(iclip)
 !        if (LWTYPE(ICURRWIN).eq.1) call wvdfcl(iclip)
         if (LWTYPE(ICURRWIN).eq.2) then
-          do 20 i=1,4
+          do i=1,4
             clip(i)=LWSIZE(ICURRWIN,i)
-   20     continue
+          enddo
           if (iprint.eq.1) then
             write(*,*) 'SELWIND: clip = ',clip
           endif
           call wvpscl(clip)
         endif
         if (IGPSP(ICURRWIN).eq.1) then
-          do 30 i=1,4
+          do i=1,4
             clip(i)=int(iclip(i)*10.d0/MAXSCX)
-   30     continue
+          enddo
           if (iprint.eq.1) then
             write(*,*) 'SELWIND: clip = ',clip
           endif
@@ -505,17 +505,17 @@
 !
       if (LWTYPE(ICURRWIN).le.1) then
         if (LSCALE(ICURRWIN).eq.0) then
-          do 17 i=1,n
+          do i=1,n
             scoor(1,i)=int(Coor(1,i))
             scoor(2,i)=int(Coor(2,i))
-   17     continue
+          enddo
         else
-          do 20 i=1,n
+          do i=1,n
             scoor(1,i)=int(XGSCAL(ICURRWIN,1)*Coor(1,i)+ &
                            XGSCAL(ICURRWIN,3))
             scoor(2,i)=int(XGSCAL(ICURRWIN,2)*Coor(2,i)+ &
                            XGSCAL(ICURRWIN,4))
-   20     continue
+          enddo
         endif
         if (LWTYPE(ICURRWIN).eq.0) call wvscfp(n,scoor,il,if)
 !        if (LWTYPE(ICURRWIN).eq.1) call wvdffp(n,scoor,il,if)
@@ -525,17 +525,17 @@
         xmult = 1.d0
         if (IGPSP(ICURRWIN).eq.1) xmult = 10.0/maxscx
         if (LSCALE(ICURRWIN).eq.0) then
-          do 30 i=1,n
+          do i=1,n
             xcoor(1,i)=Coor(1,i)*xmult
             xcoor(2,i)=Coor(2,i)*xmult
-   30     continue
+          enddo
         else
-          do 40 i=1,n
+          do i=1,n
             xcoor(1,i)=(XGSCAL(ICURRWIN,1)*Coor(1,i)+ &
                         XGSCAL(ICURRWIN,3))*xmult
             xcoor(2,i)=(XGSCAL(ICURRWIN,2)*Coor(2,i)+ &
                         XGSCAL(ICURRWIN,4))*xmult
-   40     continue
+          enddo
         endif
 !..ldem        call wvpsfp(n,xcoor,il,if)
         call wvpsfp(n,xcoor,if,il)
@@ -788,12 +788,12 @@
       integer :: i
 !
       if (IOPEN.ne.1) call wverr(2)
-      do 10 i=1,2
+      do i=1,2
         XGSCAL(ICURRWIN,i)  =(LWSIZE(ICURRWIN,i+2)-LWSIZE(ICURRWIN,i))/ &
                              (Range(2+i)-Range(i))
         XGSCAL(ICURRWIN,i+2)=LWSIZE(ICURRWIN,i)-   &
                              Range(i)*XGSCAL(ICURRWIN,i)
-10    continue
+      enddo
 !
       call scaleon(1)
 !
@@ -845,10 +845,10 @@
 !##          ncol = 14
 !##          if (Iset.gt.10 ) ncol = Iset
 !##          ndcol = 255 / (ncol+1)
-!##          do 30 i = 1,ncol
+!##          do i = 1,ncol
 !##              irgb = 255-ndcol*i
 !##              call xgsetcm(nshft+i,irgb,irgb,irgb)
-!##   30     continue
+!##          enddo
 !##          return
 !##      endif
 !##!
@@ -902,7 +902,7 @@
       nrrow = 1
       iset = 51
 
-      do 10 i=0,iset
+      do i=0,iset
         if (nrcol.ge.iram(1,nrrow+1)) nrrow = nrrow + 1
         alfa = float(nrcol-iram(1,nrrow))/   &
               (iram(1,nrrow+1)-iram(1,nrrow))
@@ -911,7 +911,7 @@
         ib = int(alfa*iram(4,nrrow+1)+(1-alfa)*iram(4,nrrow))
         call xgsetcm(16+i,ir,ig,ib)
         nrcol = nrcol + 1000/iset
-   10 continue
+      enddo
 !
 !##      endif
 !
@@ -1008,10 +1008,10 @@
         if (IFILE.eq.1001) then
 !           fillpoly for X
             call xgsetcol(ICF)
-            do 5 i=1,N
+            do i=1,N
                 ix(i)=XC(2*i-1)
                 iy(i)=XC(2*i)
-    5       continue
+            enddo
             call xgdrfpoly(N,ix,iy)
             if (ICF.ne.ICL) then
                 call xgsetcol(ICL)
@@ -1133,9 +1133,9 @@
         integer :: N
         integer :: i
 !
-        do 10 i=0,9
+        do i=0,9
           call closwind(i)
-     10 continue
+        enddo
 !
         write(*,*) 'GRAPHICS ERROR : '
         if (N.eq.0) write(*,*) ' END OF PROGRAM '
@@ -1188,7 +1188,7 @@
     110   continue
           if (xglength().gt.0) then
             call xgnxtev(i1,i2,i3,i4)
-            go to 110
+            goto 110
           endif
           if (xglength().ne.0) write(*,*) 'Events !!'
           call xginfo(MAXSCX,MAXSCY,MAXCOL,idum1,idum2)

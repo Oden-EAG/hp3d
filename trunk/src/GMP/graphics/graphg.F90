@@ -66,7 +66,7 @@
         call print_GMP
       end select
 !
-      go to 10
+      goto 10
 !
    end subroutine graphg
 

@@ -75,7 +75,7 @@
 !
 !  ...loop through GMP triangles
       NRVISTR = 0
-      do 60 nt=1,NRTRIAN
+      do nt=1,NRTRIAN
 !
         if (MANDIM.eq.3) then
 !
@@ -142,13 +142,13 @@
 !
 !  .........skip the triangle, there is no visible block on
 !           either side
-            go to 60
+            goto 60
           case(11)
 !
 !  .........skip the triangle, it is in between two visible
 !           blocks (an interior face) and, therefore, it is
 !           invisible
-            go to 60
+            goto 60
           case(01)
 !
 !  .........the block on the first side is visible, on the second
@@ -252,7 +252,7 @@
           do inv2 = 1,NRINVBL
 !
 !  .........skip if on the list
-            if ((nt*10+1).eq.IGINV(inv2)) go to 60
+            if ((nt*10+1).eq.IGINV(inv2)) goto 60
           enddo
           sign = one
 !
@@ -263,9 +263,9 @@
 !
 !
 !  .....loop through subtriangles...
-        do 50 j=1,NRSUB
-          do 40 i=1,NRSUB-j+1
-            do 30 l=1,2
+        do j=1,NRSUB
+          do i=1,NRSUB-j+1
+            do l=1,2
               if (iprint.eq.2) then
                 write(*,7039) j,i,l
  7039           format('lsvistr: LOOPING THROUGH SUBTRIANGLES j,i,l = ', &
@@ -295,7 +295,7 @@
 !  ..........."upper" triangle
               case(2)
               if (j.eq.NRSUB-i+1) then
-                go to 30
+                goto 30
               else
                 xi(1) = i*DX
                 xi(2) = (j-1)*DX
@@ -327,12 +327,12 @@
               do k = 1,3
                 cl = CLPL(1)*xcoord(1,k) + CLPL(2)*xcoord(2,k) &
                    + CLPL(3)*xcoord(3,k) + CLPL(4)
-                if (cl.gt.0.d0) go to 30
+                if (cl.gt.0.d0) goto 30
               enddo
 !
 !      .......next 2D clipping wrt the current window
               call clip2(xtro,iclip)
-              if (iclip.eq.0) go to 30
+              if (iclip.eq.0) goto 30
 !
 !  ...........and finally check the orientation in space
               do ivar=1,2
@@ -341,7 +341,7 @@
               enddo
               vis = pm(1)*pn(2)-pm(2)*pn(1)
               vis = vis*sign
-!!!              if ((vis.lt.small).and.(MANDIM.eq.3)) go to 30
+!!!              if ((vis.lt.small).and.(MANDIM.eq.3)) goto 30
 !
 !
 !  ...........update list of visible facets and bounds for the picture
@@ -412,15 +412,15 @@
 !!!                IGTRCU(NRVISTR) = IGTRCU(NRVISTR)+10000*nick
                 IGTRCU(NRVISTR) = IGTRCU(NRVISTR)+nickb
               endif
-   30       continue
-   40     continue
-   50   continue
-   60 continue
+   30       enddo
+          enddo
+        enddo
+   60 enddo
 !
 !-----------------------------------------------------------------------
 !
 !  ...loop through GMP rectangles
-      do 160 nr=1,NRRECTA
+      do nr=1,NRRECTA
 !
         if (MANDIM.eq.3) then
 !
@@ -498,13 +498,13 @@
 !
 !  .........skip the rectangle, there is no visible block on
 !           either side
-            go to 160
+            goto 160
           case(11)
 !
 !  .........skip the rectangle, it is in between two visible
 !           blocks (an interior face) and, therefore, it is
 !           invisible
-            go to 160
+            goto 160
           case(01)
 !
 !  .........the block on the first side is visible, on the second
@@ -611,7 +611,7 @@
           do inv2 = 1,NRINVBL
 !
 !  .........skip if on the list
-            if ((nr*10+abs(nr)).eq.IGINV(inv2)) go to 160
+            if ((nr*10+abs(nr)).eq.IGINV(inv2)) goto 160
           enddo
           sign = one
 !
@@ -837,7 +837,7 @@
 !
 !  .....end of loop through i
         enddo
-  160 continue
+  160 enddo
 !
 !
 !  ...compute object's dimensions and coordinates of its

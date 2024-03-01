@@ -202,7 +202,7 @@
 #endif
 !
 !----------------------------------------------------------------------
-      if (Idec.eq.1) go to 100
+      if (Idec.eq.1) goto 100
 !
 !     initialize
       NrconH=0 ; NacH=0 ; ConstrH=0.d0

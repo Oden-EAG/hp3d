@@ -656,42 +656,42 @@
 !  Gauss points and weights for a triangle in terms of baricentrical  |
 !  coordinates                                                        |
 !======================================================================
-      do 210 np=1,19
+      do np=1,19
       i=1
       j=1
  100  continue
-      do 111 k=1,3
+      do k=1,3
         x(k) = barcoo(k+1,j,np)
         x(k+3) = x(k)
         XIGAUSS(k,i,np) = x(k)
- 111  continue
+      enddo
       w = barcoo(1,j,np)
       WAGAUSS(i,np) = w
       i = i+1
       if(nnod(j,np).eq.1) goto 150
-      do 121 k=1,3
+      do k=1,3
          XIGAUSS(k,i,np) = x(k+1)
          XIGAUSS(k,i+1,np) = x(k+2)
- 121  continue
+      enddo
       WAGAUSS(i,np) = w
       WAGAUSS(i+1,np) = w
       i=i+2
       if(nnod(j,np).eq.3) goto 150
-      do 140 l=1,3
-        do 130 k=1,3
+      do l=1,3
+        do k=1,3
           XIGAUSS(k,i+l-1,np) = x(3+l-k)
- 130    continue
+        enddo
         WAGAUSS(i+l-1,np) = w
- 140  continue
+      enddo
       i = i+3
  150  continue
       j = j+1
       if(i.le.NRGAUPO(np)) goto 100
       n1 = nw(np)
       nsum = 0
-      do 160 j=1,n1
+      do j=1,n1
         nsum = nsum + nnod(j,np)
- 160  continue
+      enddo
       if(nsum.ne.NRGAUPO(np))then
         write(*,1003) np,NRGAUPO(np),nsum
  1003   format('FOR THE ',i2,'ORDER OF INTEGRATION',/, &
@@ -702,11 +702,11 @@
       n2 = NRGAUPO(np)
       sum1 = 0.0d0
       sum2 = 0.0d0
-      do 180 j=1,n2
+      do j=1,n2
         sum1 = sum1 + WAGAUSS(j,np)
-        do 170 k=1,3
+        do k=1,3
             sum2 = sum2 + XIGAUSS(k,j,np)
- 170    continue
+        enddo
         ab = dabs(sum2 - 1.0d0)
         if(ab.gt.1.0d-13) then
             write(*,1004) np,j,sum2
@@ -716,7 +716,7 @@
         else
         endif
         sum2 = 0.0d0
- 180  continue
+      enddo
       ab = dabs(sum1 - 1.0d0)
       if(ab.gt.1.0d-13) then
           write(*,1005) np,sum1
@@ -728,12 +728,12 @@
         if(kwrite.gt.1) then
           write(*,1001) np,np,np,np,np
           write(*,1001) np,np,np,np,np
-          do 200 k=1,NRGAUPO(np)
+          do k=1,NRGAUPO(np)
             write(*,1002) WAGAUSS(k,np),(XIGAUSS(l,k,np),l=1,3)
- 200      continue
+          enddo
         else
         endif
- 210  continue
+      enddo
  1001 format('ORDER OF INTEGRATION NP =',I2,/, 'WAGAUSS(.,',i2, &
              ') ',7X,'XIGAUSS(1,.,',i2,')     XIGAUSS(2,.,',i2, &
              ') =   XIGAUSS(3,.,',i2,') =')

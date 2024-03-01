@@ -1219,7 +1219,7 @@
       case(2)
         write(*,*) 'SET POINT NUMBER'
         read(*,*) np
-        if ((np.le.0).or.(np.gt.NRPOINT)) go to 10
+        if ((np.le.0).or.(np.gt.NRPOINT)) goto 10
         write(*,7101) np, POINTS(np)%Type
  7101   format(' POINT = ',i8,' TYPE = ',a10)
         nrcurv = POINTS(np)%NrCurv
@@ -1235,7 +1235,7 @@
       case(3)
         write(*,*) 'SET CURVE NUMBER'
         read(*,*) nc
-        if ((nc.le.0).or.(nc.gt.NRCURVE)) go to 10
+        if ((nc.le.0).or.(nc.gt.NRCURVE)) goto 10
         write(*,7201) nc, CURVES(nc)%Type
  7201   format(' CURVE = ',i8,' TYPE = ',a10)
         write(*,7202) CURVES(nc)%EndPoNo(1:2)
@@ -1266,7 +1266,7 @@
       case(4)
         write(*,*) 'SET TRIANGLE NUMBER'
         read(*,*) nt
-        if ((nt.le.0).or.(nt.gt.NRTRIAN)) go to 10
+        if ((nt.le.0).or.(nt.gt.NRTRIAN)) goto 10
         write(*,7501) nt,TRIANGLES(nt)%Type
  7501   format(' TRIANGLE = ',i8,' TYPE = ',a10)
         write(*,7402) TRIANGLES(nt)%VertNo(1:3)
@@ -1288,7 +1288,7 @@
       case(5)
         write(*,*) 'SET RECTANGLE NUMBER'
         read(*,*) nr
-        if ((nr.le.0).or.(nr.gt.NRRECTA)) go to 10
+        if ((nr.le.0).or.(nr.gt.NRRECTA)) goto 10
         write(*,7401) nr,RECTANGLES(nr)%Type
  7401   format(' RECTANGLE = ',i8,' TYPE = ',a10)
         write(*,7402) RECTANGLES(nr)%VertNo(1:4)
@@ -1307,7 +1307,7 @@
       case(6)
         write(*,*) 'SET PRISM NUMBER'
         read(*,*) npri
-        if ((npri.le.0).or.(npri.gt.NRPRISM)) go to 10
+        if ((npri.le.0).or.(npri.gt.NRPRISM)) goto 10
         write(*,7701) npri,PRISMS(npri)%Type
  7701   format(' PRISM = ',i8,' TYPE = ',a10)
         write(*,7602) PRISMS(npri)%VertNo(1:6)
@@ -1336,7 +1336,7 @@
       case(8)
         write(*,*) 'SET TETRAHEDRON NUMBER'
         read(*,*) ntet
-        if ((ntet.le.0).or.(ntet.gt.NRTETRA)) go to 10
+        if ((ntet.le.0).or.(ntet.gt.NRTETRA)) goto 10
         write(*,7801) ntet,TETRAS(ntet)%Type
  7801   format(' TETRA = ',i8,' TYPE = ',a10)
         write(*,7602) TETRAS(ntet)%VertNo(1:4)
@@ -1350,7 +1350,7 @@
       case(9)
         write(*,*) 'SET PYRAMID NUMBER'
         read(*,*) npyr
-        if ((npyr.le.0).or.(npyr.gt.NRPYRAM)) go to 10
+        if ((npyr.le.0).or.(npyr.gt.NRPYRAM)) goto 10
         write(*,7901) npyr,PYRAMIDS(npyr)%Type
  7901   format(' PYRAMID = ',i8,' TYPE = ',a10)
         write(*,7602) PYRAMIDS(npyr)%VertNo(1:5)
@@ -1364,7 +1364,7 @@
       case(10)
         write(*,*) 'SET SURFACES NUMBER'
         read(*,*) ns
-        if ((ns.le.0).or.(ns.gt.NRSURFS)) go to 10
+        if ((ns.le.0).or.(ns.gt.NRSURFS)) goto 10
         write(*,8001) ns,SURFACES(ns)%Type
  8001   format(' SURFACE = ',i8,' TYPE = ',a10)
         if (associated(SURFACES(ns)%Idata)) then

@@ -120,7 +120,7 @@
 !  .....if system is not solved
         if (ifl .ne. 0) then
           iprint = 1
-          go to 10
+          goto 10
         endif
 !
         beta(1) = aux(1)

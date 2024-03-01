@@ -182,7 +182,7 @@
 !  .....update
         T(1:2) = T(1:2) + dt(1:2)
         s = max(abs(dt(1)),abs(dt(2)))
-        if (s.lt.epsilon) go to 20
+        if (s.lt.epsilon) goto 20
       enddo
 !
       Ierr=1; return
