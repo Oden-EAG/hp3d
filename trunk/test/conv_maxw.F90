@@ -370,7 +370,7 @@ end subroutine elem_maxwell
 !> @brief Returns Dirichlet data
 subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
 !
-   use parameters, only : MAXEQNH,MAXEQNE,MAXEQNV,MAXEQNQ,ZERO
+   use parameters, only : MAXEQNH,MAXEQNE,MAXEQNV,MAXEQNQ
 !
    implicit none
 !
