@@ -28,7 +28,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape2DHBrokenTri(Xi,NordM,Nsize, NrdofH,ShapH,GradH)
+   subroutine shape2DHBrokenTri(Xi,NordM,Nsize, NrdofH,ShapH,GradH)
 !
       implicit none
       integer, intent(in)  :: NordM,Nsize(2)
@@ -47,7 +47,7 @@
 !  ...Option 2: Write more efficient routine for enriched functions
 !
 !
-      end subroutine shape2DHBrokenTri
+   end subroutine shape2DHBrokenTri
 !
 !
 !--------------------------------------------------------------------
@@ -75,7 +75,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape2DEBrokenTri(Xi,NordM,Nsize, NrdofE,ShapE,CurlE)
+   subroutine shape2DEBrokenTri(Xi,NordM,Nsize, NrdofE,ShapE,CurlE)
 !
       implicit none
       integer, intent(in)  :: NordM,Nsize(2)
@@ -94,7 +94,7 @@
 !  ...Option 2: Write more efficient routine for enriched functions
 !
 !
-      end subroutine shape2DEBrokenTri
+   end subroutine shape2DEBrokenTri
 !
 !
 !--------------------------------------------------------------------
@@ -122,7 +122,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape2DVBrokenTri(Xi,NordM,Nsize, NrdofV,ShapV,DivV)
+   subroutine shape2DVBrokenTri(Xi,NordM,Nsize, NrdofV,ShapV,DivV)
 !
       implicit none
       integer, intent(in)  :: NordM,Nsize(2)
@@ -140,7 +140,7 @@
 !  ...Option 2: Write more efficient routine for enriched functions
 !
 !
-      end subroutine shape2DVBrokenTri
+   end subroutine shape2DVBrokenTri
 !
 !
 !--------------------------------------------------------------------
@@ -167,7 +167,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape2DQBrokenTri(Xi,NordM,Nsize, NrdofQ,ShapQ)
+   subroutine shape2DQBrokenTri(Xi,NordM,Nsize, NrdofQ,ShapQ)
 !
       implicit none
       integer, intent(in)  :: NordM,Nsize(2)
@@ -184,4 +184,4 @@
 !  ...Option 2: Write a separate routine for enriched functions
 !
 !
-      end subroutine shape2DQBrokenTri
+   end subroutine shape2DQBrokenTri

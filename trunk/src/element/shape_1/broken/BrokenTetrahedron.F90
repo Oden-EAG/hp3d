@@ -28,7 +28,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape3DHBrokenTet(Xi,NordM,Nsize, NrdofH,ShapH,GradH)
+   subroutine shape3DHBrokenTet(Xi,NordM,Nsize, NrdofH,ShapH,GradH)
 !
       implicit none
       integer, intent(in)  :: NordM,Nsize(2)
@@ -49,7 +49,7 @@
 !  ...Option 2: Write more efficient routine for enriched functions
 !
 !
-      end subroutine shape3DHBrokenTet
+   end subroutine shape3DHBrokenTet
 !
 !
 !--------------------------------------------------------------------
@@ -77,7 +77,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape3DEBrokenTet(Xi,NordM,Nsize, NrdofE,ShapE,CurlE)
+   subroutine shape3DEBrokenTet(Xi,NordM,Nsize, NrdofE,ShapE,CurlE)
 !
       implicit none
       integer, intent(in)  :: NordM,Nsize(2)
@@ -98,7 +98,7 @@
 !  ...Option 2: Write more efficient routine for enriched functions
 !
 !
-      end subroutine shape3DEBrokenTet
+   end subroutine shape3DEBrokenTet
 !
 !
 !--------------------------------------------------------------------
@@ -126,7 +126,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape3DVBrokenTet(Xi,NordM,Nsize, NrdofV,ShapV,DivV)
+   subroutine shape3DVBrokenTet(Xi,NordM,Nsize, NrdofV,ShapV,DivV)
 !
       implicit none
       integer, intent(in)  :: NordM,Nsize(2)
@@ -145,7 +145,7 @@
 !  ...Option 2: Write more efficient routine for enriched functions
 !
 !
-      end subroutine shape3DVBrokenTet
+   end subroutine shape3DVBrokenTet
 !
 !
 !--------------------------------------------------------------------
@@ -172,7 +172,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape3DQBrokenTet(Xi,NordM,Nsize, NrdofQ,ShapQ)
+   subroutine shape3DQBrokenTet(Xi,NordM,Nsize, NrdofQ,ShapQ)
 !
       implicit none
       integer, intent(in)  :: NordM,Nsize(2)
@@ -189,4 +189,4 @@
 !  ...Option 2: Write a separate routine for enriched functions
 !
 !
-      end subroutine shape3DQBrokenTet
+   end subroutine shape3DQBrokenTet

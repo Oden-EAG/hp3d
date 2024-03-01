@@ -28,7 +28,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape2DHBrokenQuad(Xi,NordM,Nsize, NrdofH,ShapH,GradH)
+   subroutine shape2DHBrokenQuad(Xi,NordM,Nsize, NrdofH,ShapH,GradH)
 !
       use parameters , only : MODORDER
 !
@@ -74,7 +74,7 @@
 !  ...give total degrees of freedom
       NrdofH = m
 !
-      end subroutine shape2DHBrokenQuad
+   end subroutine shape2DHBrokenQuad
 !
 !
 !--------------------------------------------------------------------
@@ -102,7 +102,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape2DEBrokenQuad(Xi,NordM,Nsize, NrdofE,ShapE,CurlE)
+   subroutine shape2DEBrokenQuad(Xi,NordM,Nsize, NrdofE,ShapE,CurlE)
 !
       use parameters , only : MODORDER
 !
@@ -164,7 +164,7 @@
       NrdofE = m
 !
 !
-      end subroutine shape2DEBrokenQuad
+   end subroutine shape2DEBrokenQuad
 !
 !
 !--------------------------------------------------------------------
@@ -192,7 +192,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape2DVBrokenQuad(Xi,NordM,Nsize, NrdofV,ShapV,DivV)
+   subroutine shape2DVBrokenQuad(Xi,NordM,Nsize, NrdofV,ShapV,DivV)
 !
       use parameters , only : MODORDER
 !
@@ -253,7 +253,7 @@
       NrdofV = m
 !
 !
-      end subroutine shape2DVBrokenQuad
+   end subroutine shape2DVBrokenQuad
 !
 !
 !--------------------------------------------------------------------
@@ -280,7 +280,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape2DQBrokenQuad(Xi,NordM,Nsize, NrdofQ,ShapQ)
+   subroutine shape2DQBrokenQuad(Xi,NordM,Nsize, NrdofQ,ShapQ)
 !
       implicit none
       integer, intent(in)  :: NordM,Nsize(2)
@@ -297,4 +297,4 @@
 !  ...Option 2: Write a separate routine for enriched functions
 !
 !
-      end subroutine shape2DQBrokenQuad
+   end subroutine shape2DQBrokenQuad

@@ -26,7 +26,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape1DHBrokenSeg(Xi,NordM,Nsize, NrdofH,ShapH,GradH)
+   subroutine shape1DHBrokenSeg(Xi,NordM,Nsize, NrdofH,ShapH,GradH)
 !
       implicit none
       integer, intent(in)  :: NordM,Nsize(2)
@@ -41,7 +41,7 @@
 !  ...Option 2: Write more efficient routine for enriched functions
 !
 !
-      end subroutine shape1DHBrokenSeg
+   end subroutine shape1DHBrokenSeg
 !
 !
 !--------------------------------------------------------------------
@@ -68,7 +68,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape1DQBrokenSeg(Xi,NordM,Nsize, NrdofQ,ShapQ)
+   subroutine shape1DQBrokenSeg(Xi,NordM,Nsize, NrdofQ,ShapQ)
 !
       implicit none
       integer, intent(in)  :: NordM,Nsize(2)
@@ -82,4 +82,4 @@
 !  ...Option 2: Write a separate routine for enriched functions
 !
 !
-      end subroutine shape1DQBrokenSeg
+   end subroutine shape1DQBrokenSeg

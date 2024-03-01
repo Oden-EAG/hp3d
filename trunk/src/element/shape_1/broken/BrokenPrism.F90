@@ -28,7 +28,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape3DHBrokenPris(Xi,NordM,Nsize, NrdofH,ShapH,GradH)
+   subroutine shape3DHBrokenPris(Xi,NordM,Nsize, NrdofH,ShapH,GradH)
 !
       use parameters , only : MODORDER
       use node_types
@@ -82,7 +82,7 @@
 !  ...total degrees of freedom
       NrdofH = m
 !
-      end subroutine shape3DHBrokenPris
+   end subroutine shape3DHBrokenPris
 !
 !
 !--------------------------------------------------------------------
@@ -110,7 +110,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape3DEBrokenPris(Xi,NordM,Nsize, NrdofE,ShapE,CurlE)
+   subroutine shape3DEBrokenPris(Xi,NordM,Nsize, NrdofE,ShapE,CurlE)
 !
       use parameters , only : MODORDER
       use node_types
@@ -196,7 +196,7 @@
 !  ...total degrees of freedom
       NrdofE = m
 !
-      end subroutine shape3DEBrokenPris
+   end subroutine shape3DEBrokenPris
 !
 !
 !--------------------------------------------------------------------
@@ -224,7 +224,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape3DVBrokenPris(Xi,NordM,Nsize, NrdofV,ShapV,DivV)
+   subroutine shape3DVBrokenPris(Xi,NordM,Nsize, NrdofV,ShapV,DivV)
 !
       use parameters , only : MODORDER
       use node_types
@@ -301,7 +301,7 @@
 !  ...total degrees of freedom
       NrdofV = m
 !
-      end subroutine shape3DVBrokenPris
+   end subroutine shape3DVBrokenPris
 !
 !
 !--------------------------------------------------------------------
@@ -328,7 +328,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape3DQBrokenPris(Xi,NordM,Nsize, NrdofQ,ShapQ)
+   subroutine shape3DQBrokenPris(Xi,NordM,Nsize, NrdofQ,ShapQ)
 !
       use parameters , only : MODORDER
 !
@@ -349,4 +349,4 @@
 !  ...Option 2: Write a separate routine for enriched functions
 !
 !
-      end subroutine shape3DQBrokenPris
+   end subroutine shape3DQBrokenPris

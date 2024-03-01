@@ -28,7 +28,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape3DHBrokenHexa(Xi,NordM,Nsize, NrdofH,ShapH,GradH)
+   subroutine shape3DHBrokenHexa(Xi,NordM,Nsize, NrdofH,ShapH,GradH)
 !
       use parameters , only : MODORDER
 !
@@ -108,7 +108,7 @@
 #endif
 !
 !
-      end subroutine shape3DHBrokenHexa
+   end subroutine shape3DHBrokenHexa
 !
 !
 !--------------------------------------------------------------------
@@ -136,7 +136,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape3DEBrokenHexa(Xi,NordM,Nsize, NrdofE,ShapE,CurlE)
+   subroutine shape3DEBrokenHexa(Xi,NordM,Nsize, NrdofE,ShapE,CurlE)
 !
       use parameters , only : MODORDER
 !
@@ -255,7 +255,7 @@
 #endif
 !
 !
-      end subroutine shape3DEBrokenHexa
+   end subroutine shape3DEBrokenHexa
 !
 !
 !--------------------------------------------------------------------
@@ -283,7 +283,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape3DVBrokenHexa(Xi,NordM,Nsize, NrdofV,ShapV,DivV)
+   subroutine shape3DVBrokenHexa(Xi,NordM,Nsize, NrdofV,ShapV,DivV)
 !
       use parameters , only : MODORDER
 !
@@ -392,7 +392,7 @@
 #endif
 !
 !
-      end subroutine shape3DVBrokenHexa
+   end subroutine shape3DVBrokenHexa
 !
 !
 !--------------------------------------------------------------------
@@ -419,7 +419,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape3DQBrokenHexa(Xi,NordM,Nsize, NrdofQ,ShapQ)
+   subroutine shape3DQBrokenHexa(Xi,NordM,Nsize, NrdofQ,ShapQ)
 !
       use parameters , only : MODORDER
 !
@@ -440,5 +440,5 @@
 !  ...Option 2: Write a separate routine for enriched functions
 !
 !
-      end subroutine shape3DQBrokenHexa
+   end subroutine shape3DQBrokenHexa
 

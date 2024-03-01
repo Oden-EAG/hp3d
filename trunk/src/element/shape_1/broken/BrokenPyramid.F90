@@ -28,7 +28,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape3DHBrokenPyra(Xi,NordM,Nsize, NrdofH,ShapH,GradH)
+   subroutine shape3DHBrokenPyra(Xi,NordM,Nsize, NrdofH,ShapH,GradH)
 !
       use parameters , only : MODORDER
 !
@@ -55,7 +55,7 @@
 !  ...Option 2: Write more efficient routine for enriched functions
 !
 !
-      end subroutine shape3DHBrokenPyra
+   end subroutine shape3DHBrokenPyra
 !
 !
 !--------------------------------------------------------------------
@@ -83,7 +83,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape3DEBrokenPyra(Xi,NordM,Nsize, NrdofE,ShapE,CurlE)
+   subroutine shape3DEBrokenPyra(Xi,NordM,Nsize, NrdofE,ShapE,CurlE)
 !
       use parameters , only : MODORDER
 !
@@ -110,7 +110,7 @@
 !  ...Option 2: Write more efficient routine for enriched functions
 !
 !
-      end subroutine shape3DEBrokenPyra
+   end subroutine shape3DEBrokenPyra
 !
 !
 !--------------------------------------------------------------------
@@ -138,7 +138,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape3DVBrokenPyra(Xi,NordM,Nsize, NrdofV,ShapV,DivV)
+   subroutine shape3DVBrokenPyra(Xi,NordM,Nsize, NrdofV,ShapV,DivV)
 !
       use parameters , only : MODORDER
 !
@@ -162,7 +162,7 @@
 !  ...Option 2: Write more efficient routine for enriched functions
 !
 !
-      end subroutine shape3DVBrokenPyra
+   end subroutine shape3DVBrokenPyra
 !
 !
 !--------------------------------------------------------------------
@@ -189,7 +189,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape3DQBrokenPyra(Xi,NordM,Nsize, NrdofQ,ShapQ)
+   subroutine shape3DQBrokenPyra(Xi,NordM,Nsize, NrdofQ,ShapQ)
 !
       use parameters , only : MODORDER
 !
@@ -211,4 +211,4 @@
 !  ...Option 2: Write a separate routine for enriched functions
 !
 !
-      end subroutine shape3DQBrokenPyra
+   end subroutine shape3DQBrokenPyra

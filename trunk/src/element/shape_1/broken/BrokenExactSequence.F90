@@ -42,7 +42,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine shape1HH(Xi,NordM, NrdofH,ShapH,GradH)
+   subroutine shape1HH(Xi,NordM, NrdofH,ShapH,GradH)
 !
       use parametersDPG , only : MAXPP
       use node_types
@@ -61,7 +61,7 @@
       call checkorder(SEGM,CONTIN,norder,MAXPP, nsize)
       call shape1DHBrokenSeg(Xi,NordM,nsize, NrdofH,ShapH,GradH)
 !
-      end subroutine shape1HH
+   end subroutine shape1HH
 !
 !----------------------------------------------------------------------
 !                                 1D L2
@@ -87,7 +87,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine shape1QQ(Xi,NordM, NrdofQ,ShapQ)
+   subroutine shape1QQ(Xi,NordM, NrdofQ,ShapQ)
 !
       use parametersDPG , only : MAXPP
       use node_types
@@ -105,7 +105,7 @@
       call checkorder(SEGM,DISCON,norder,MAXPP, nsize)
       call shape1DQBrokenSeg(Xi,NordM,nsize, NrdofQ,ShapQ)
 !
-      end subroutine shape1QQ
+   end subroutine shape1QQ
 !
 !----------------------------------------------------------------------
 !----------------------------------------------------------------------
@@ -143,7 +143,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine shape2HH(Ntype,Xi,NordM, NrdofH,ShapH,GradH)
+   subroutine shape2HH(Ntype,Xi,NordM, NrdofH,ShapH,GradH)
 !
       use parametersDPG , only : MAXPP,MAXquadHH
       use node_types
@@ -176,7 +176,7 @@
         stop 1
       end select
 !
-      end subroutine shape2HH
+   end subroutine shape2HH
 !
 !----------------------------------------------------------------------
 !                                2D Hcurl
@@ -205,7 +205,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine shape2EE(Ntype,Xi,NordM, NrdofE,ShapE,CurlE)
+   subroutine shape2EE(Ntype,Xi,NordM, NrdofE,ShapE,CurlE)
 !
       use parametersDPG , only : MAXPP,MAXquadEE
       use node_types
@@ -238,7 +238,7 @@
         stop 1
       end select
 !
-      end subroutine shape2EE
+   end subroutine shape2EE
 !
 !----------------------------------------------------------------------
 !                          2D Hdiv (rotated Hcurl)
@@ -268,7 +268,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine shape2VV(Ntype,Xi,NordM, NrdofV,ShapV,DivV)
+   subroutine shape2VV(Ntype,Xi,NordM, NrdofV,ShapV,DivV)
 !
       use parametersDPG , only : MAXPP,MAXquadVV
       use node_types
@@ -301,7 +301,7 @@
         stop 1
       end select
 !
-      end subroutine shape2VV
+   end subroutine shape2VV
 !
 !----------------------------------------------------------------------
 !                                 2D L2
@@ -329,7 +329,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine shape2QQ(Ntype,Xi,NordM, NrdofQ,ShapQ)
+   subroutine shape2QQ(Ntype,Xi,NordM, NrdofQ,ShapQ)
 !
       use parametersDPG , only : MAXPP,MAXquadQQ
       use node_types
@@ -361,7 +361,7 @@
         stop 1
       end select
 !
-      end subroutine shape2QQ
+   end subroutine shape2QQ
 !
 !----------------------------------------------------------------------
 !----------------------------------------------------------------------
@@ -398,7 +398,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine shape3HH(Ntype,Xi,NordM, NrdofH,ShapH,GradH)
+   subroutine shape3HH(Ntype,Xi,NordM, NrdofH,ShapH,GradH)
 !
       use parameters    , only : MODORDER
       use parametersDPG , only : MAXPP,MAXbrickHH
@@ -449,7 +449,7 @@
         stop
       end select
 !
-      end subroutine shape3HH
+   end subroutine shape3HH
 !
 !----------------------------------------------------------------------
 !                                3D Hcurl
@@ -478,7 +478,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine shape3EE(Ntype,Xi,NordM, NrdofE,ShapE,CurlE)
+   subroutine shape3EE(Ntype,Xi,NordM, NrdofE,ShapE,CurlE)
 !
       use parameters , only : MODORDER
       use parametersDPG , only : MAXPP,MAXbrickEE
@@ -529,7 +529,7 @@
         stop 1
       end select
 !
-      end subroutine shape3EE
+   end subroutine shape3EE
 !
 !----------------------------------------------------------------------
 !                                3D Hdiv
@@ -558,7 +558,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine shape3VV(Ntype,Xi,NordM, NrdofV,ShapV,DivV)
+   subroutine shape3VV(Ntype,Xi,NordM, NrdofV,ShapV,DivV)
 !
       use parameters , only : MODORDER
       use parametersDPG , only : MAXPP,MAXbrickVV
@@ -609,7 +609,7 @@
         stop 1
       end select
 !
-      end subroutine shape3VV
+   end subroutine shape3VV
 !
 !----------------------------------------------------------------------
 !                                 3D L2
@@ -637,7 +637,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine shape3QQ(Ntype,Xi,NordM, NrdofQ,ShapQ)
+   subroutine shape3QQ(Ntype,Xi,NordM, NrdofQ,ShapQ)
 !
       use parameters , only : MODORDER
       use parametersDPG , only : MAXPP,MAXbrickQQ
@@ -687,5 +687,5 @@
         stop 1
       end select
 !
-      end subroutine shape3QQ
+   end subroutine shape3QQ
 !

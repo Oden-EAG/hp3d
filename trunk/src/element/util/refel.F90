@@ -85,8 +85,8 @@
           write(*,7002)igen,nfath,nson,S_Type(father_type(igen)), &
                        S_Type(son_type(igen)),                    &
                        nfather_ref_kind(igen),noson(igen)
-7002      format(' igen,nfath,nson,nfath_type,nson_type,nfath_refk, &
-                   ison = ',i2,4x,i8,2x,i8,2x,a4,2x,a4,2x,i2,2x,i2)
+7002      format(' igen,nfath,nson,nfath_type,nson_type,nfath_refk,' &
+                 ,'ison = ',i2,4x,i8,2x,i8,2x,a4,2x,a4,2x,i2,2x,i2)
         endif
 #endif
 !
