@@ -4,7 +4,7 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - Mar 2023
+!   latest revision    - Feb 2024
 !
 !   purpose            - routine flags ancestors of parents of
 !                        constrained nodes of an element that
@@ -245,7 +245,7 @@
 !
 !----------------------------------------------------------------------
 !
-!   latest revision    - Mar 2023
+!   latest revision    - Feb 2024
 !
 !   purpose            - routine flags all ancestors of a node
 !
