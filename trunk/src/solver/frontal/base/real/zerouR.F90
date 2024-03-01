@@ -23,7 +23,7 @@
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 !
-      subroutine zerou (Flhs)
+   subroutine zerou (Flhs)
 !
       use surfsc2
 !
@@ -86,4 +86,4 @@
    50 continue
 !
 !
-      end subroutine zerou
+   end subroutine zerou

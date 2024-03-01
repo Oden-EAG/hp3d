@@ -26,7 +26,7 @@
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 !
-      subroutine dest (Nd, Aldest, Nee, Amdest, Andest)
+   subroutine dest (Nd, Aldest, Nee, Amdest, Andest)
 !
       use surfsc1
       use surfsc2
@@ -191,4 +191,4 @@ cld,aug,1991 wrong!!!  desvec = (destflag + NICMUL*ndof + 100*frontdest)
 7020    format(9x,'ELIM. DESTINATION VECTORS',10i7,10(/,35x,10i7))
 !
 !
-      end subroutine dest
+   end subroutine dest

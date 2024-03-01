@@ -28,7 +28,7 @@
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 !
-      subroutine unselm (Iel, Aidx, Flhs, Ubuf)
+   subroutine unselm (Iel, Aidx, Flhs, Ubuf)
 !
       use surfsc1
       use surfsc2
@@ -241,4 +241,4 @@
    70 continue
 !
 !
-      end subroutine unselm
+   end subroutine unselm

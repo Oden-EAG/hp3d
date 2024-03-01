@@ -53,7 +53,7 @@
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 !
-      subroutine desvec (In, Ia, Ibb, Ic, Ntot)
+   subroutine desvec (In, Ia, Ibb, Ic, Ntot)
 !
       use surfsc1
       use surfsc2
@@ -271,4 +271,4 @@
   100 continue
 !
 !
-      end subroutine desvec
+   end subroutine desvec

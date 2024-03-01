@@ -22,7 +22,7 @@
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 !
-      subroutine zeros (Flhs)
+   subroutine zeros (Flhs)
 !
       use surfsc2
 !
@@ -54,4 +54,4 @@
    10 continue
 !
 !
-      end subroutine zeros
+   end subroutine zeros

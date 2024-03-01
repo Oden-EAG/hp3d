@@ -28,7 +28,7 @@
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 !
-      subroutine elmrhs (Aid, Inc, Frhs, Ubuf, Bbuf)
+   subroutine elmrhs (Aid, Inc, Frhs, Ubuf, Bbuf)
 !
       use surfsc1
       use surfsc2
@@ -157,4 +157,4 @@ ccccc       if (Cdabs(s) .le. CDABS(sml2)) then
    60 continue
 !
 !
-      end subroutine elmrhs
+   end subroutine elmrhs

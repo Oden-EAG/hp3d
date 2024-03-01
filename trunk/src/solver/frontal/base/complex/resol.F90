@@ -17,7 +17,7 @@
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 !
-      subroutine resol (Awrk)
+   subroutine resol (Awrk)
 !
       use surfsc1
       use surfsc2
@@ -246,4 +246,4 @@
  9100 continue
 !
 !
-      end subroutine resol
+   end subroutine resol

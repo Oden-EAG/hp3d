@@ -47,7 +47,7 @@ cc*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=
 !        ones become new destinations in Xfrnt() based on Aidx
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 !
-      subroutine elmsol (Aidx, Ubuf, Bbuf, Xfrnt)
+   subroutine elmsol (Aidx, Ubuf, Bbuf, Xfrnt)
 !
       use surfsc1
       use surfsc2
@@ -184,4 +184,4 @@ cc*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=
    40 continue
 !
 !
-      end subroutine elmsol
+   end subroutine elmsol

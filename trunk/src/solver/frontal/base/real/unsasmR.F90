@@ -24,7 +24,7 @@
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 !
-      subroutine unsasm (Amdest, Ellhs, Flhs)
+   subroutine unsasm (Amdest, Ellhs, Flhs)
 !
       use surfsc1
       use surfsc2
@@ -107,4 +107,4 @@
 100   continue
 !
 !
-      end subroutine unsasm
+   end subroutine unsasm

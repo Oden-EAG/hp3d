@@ -53,7 +53,7 @@
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 !
-      subroutine desvec (In, Ia, Ibb, Ic, Ntot)
+   subroutine desvec (In, Ia, Ibb, Ic, Ntot)
 !
       use surfsc1
       use surfsc2
@@ -306,4 +306,4 @@ czka000811         write(30,*)(Ibb(ii),ii=ips+1,ips+n)
   100 continue
 !
 !
-      end subroutine desvec
+   end subroutine desvec

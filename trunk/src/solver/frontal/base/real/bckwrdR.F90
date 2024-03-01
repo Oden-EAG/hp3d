@@ -36,7 +36,7 @@
 !         7xxx    FORMAT Statements
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
-      subroutine bckwrd (Alelm, Aldest, Amdest, &
+   subroutine bckwrd (Alelm, Aldest, Amdest, &
      .                   Andest, Elem, Frnt, Bbuf, Ubuf)
 !
       use surfsc1
@@ -311,4 +311,4 @@
       IFB = ifbi
 !
 !
-      end subroutine bckwrd
+   end subroutine bckwrd

@@ -23,7 +23,7 @@
 !
 !----------------------------------------------------------------------
 #include "typedefs.h"
-      subroutine solin2(Iel,Mdum,Ifg,Nrhs0,Mdest, Zalhs,Zarhs)
+   subroutine solin2(Iel,Mdum,Ifg,Nrhs0,Mdest, Zalhs,Zarhs)
 !
       use control         , only: ISTC_FLAG
       use physics         , only: NR_PHYSA
@@ -93,4 +93,4 @@
          enddo
       endif
 #endif
-      end subroutine solin2
+   end subroutine solin2

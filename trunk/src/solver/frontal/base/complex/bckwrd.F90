@@ -37,7 +37,7 @@
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 !
-      subroutine bckwrd (Alelm, Aldest, Amdest, &
+   subroutine bckwrd (Alelm, Aldest, Amdest, &
                          Andest, Elem, Frnt, Bbuf, Ubuf)
 !
       use surfsc1
@@ -363,4 +363,4 @@ ccc      integer :: ndest1(100)
       IFB = ifbi
 !
 !
-      end subroutine bckwrd
+   end subroutine bckwrd

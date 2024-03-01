@@ -31,7 +31,7 @@
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 !
-      subroutine symelm (Iel, Aidx, Flhs, Ubuf)
+   subroutine symelm (Iel, Aidx, Flhs, Ubuf)
 !
       use surfsc1
       use surfsc2
@@ -232,4 +232,4 @@
    80 continue
 !  ------------
 !
-      end subroutine symelm
+   end subroutine symelm

@@ -28,7 +28,7 @@
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 !
-      subroutine unselm (Iel, Aidx, Flhs ,Ubuf)
+   subroutine unselm (Iel, Aidx, Flhs ,Ubuf)
 !
       use surfsc1
       use surfsc2
@@ -264,4 +264,4 @@ ccccc    if (Cdabs(s) .le. CDABS(sml2)) then
    70 continue
 !
 !
-      end subroutine unselm
+   end subroutine unselm

@@ -18,7 +18,7 @@
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 !
-      subroutine semrhs (Amdest, Elrhs, Frhs)
+   subroutine semrhs (Amdest, Elrhs, Frhs)
 !
       use surfsc1
       use surfsc2
@@ -64,4 +64,4 @@
    70 continue
 !
 !
-      end subroutine semrhs
+   end subroutine semrhs

@@ -20,7 +20,7 @@
 !         7xxx    FORMAT Statements
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
-      subroutine surfss (Awrk)
+   subroutine surfss (Awrk)
 !
       use surfsc1
 !
@@ -45,4 +45,4 @@
 !
       if (IRESOL .eq. 1) call resol (Awrk)
 !
-      end subroutine surfss
+   end subroutine surfss

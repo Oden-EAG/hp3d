@@ -27,7 +27,7 @@
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 !
-      subroutine dest (Nd, Aldest, Nee, Amdest, Andest)
+   subroutine dest (Nd, Aldest, Nee, Amdest, Andest)
 !
       use surfsc1
       use surfsc2
@@ -221,4 +221,4 @@ cwr07.12.00 - above: back to original "nint"
 7020    format(9x,'ELIM. DESTINATION VECTORS',10i7,10(/,35x,10i7))
 !
 !
-      end subroutine dest
+   end subroutine dest

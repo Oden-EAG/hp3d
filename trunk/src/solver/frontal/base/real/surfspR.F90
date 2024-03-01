@@ -36,7 +36,7 @@
 !         7xxx    FORMAT Statements
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
-      subroutine surfsp (In, Ia, Ms, Mu, Mr)
+   subroutine surfsp (In, Ia, Ms, Mu, Mr)
 !
       use surfsc1
       use surfsc2
@@ -144,4 +144,4 @@
 !
 #endif
 !
-      end subroutine surfsp
+   end subroutine surfsp

@@ -16,7 +16,7 @@
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 !
-      subroutine zeror (Frhs)
+   subroutine zeror (Frhs)
 !
       use surfsc1
       use surfsc2
@@ -61,4 +61,4 @@
 120   continue
 !
 !
-      end subroutine zeror
+   end subroutine zeror

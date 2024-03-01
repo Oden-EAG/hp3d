@@ -16,7 +16,7 @@
 !
 !------------------------------------------------------------------
 #include "typedefs.h"
-      subroutine solve1(Number_of_RHS)
+   subroutine solve1(Number_of_RHS)
 !
       use data_structure3D
       use element_data
@@ -504,4 +504,4 @@ ccc        write(*,7004) mu+mr
       if (iprint.eq.1) write(*,*) 'solve1: EXIT ROUTINE SOLVE1'
 #endif
 !
-      end subroutine solve1
+   end subroutine solve1

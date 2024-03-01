@@ -19,7 +19,7 @@
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 !
-      subroutine complt (Awrk)
+   subroutine complt (Awrk)
 !
       use surfsc1
       use surfsc2
@@ -252,4 +252,4 @@ C open L : The additional eliminated LHS buffer for unsymmetric w/ resol
  9100 continue
 !
 !
-      end subroutine complt
+   end subroutine complt

@@ -29,7 +29,7 @@
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 !
-      subroutine zdiriodum (Unname, Commnd, Irec, Len, Sbuf, Jerr)
+   subroutine zdiriodum (Unname, Commnd, Irec, Len, Sbuf, Jerr)
 !
       use surfsc1
 !
@@ -338,4 +338,4 @@ ccccc    read (ntape, rec=irecp, err=9300) (Sbuf(i),i=inow,iend)
        'UNNAME,COMMND,IREC,LEN,NTAPE ',a1,2x,a8,2x,a1,a8,3i6)
 !
 !
-      end subroutine zdiriodum
+   end subroutine zdiriodum

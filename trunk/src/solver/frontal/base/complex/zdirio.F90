@@ -29,7 +29,7 @@
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 !
-      subroutine zdirio (Unname, Commnd, Irec, Len, Sbuf, Jerr)
+   subroutine zdirio (Unname, Commnd, Irec, Len, Sbuf, Jerr)
 !
       use surfsc1
 !
@@ -399,4 +399,4 @@ cwr07.12.00
        'UNNAME,COMMND,IREC,LEN,NTAPE ',a1,2x,a8,2x,a1,a8,3i6)
       return
 !
-      end subroutine zdirio
+   end subroutine zdirio

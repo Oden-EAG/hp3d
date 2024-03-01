@@ -27,7 +27,7 @@
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 !
-      subroutine frwrs (Alelm, Aldest, Amdest, Andest, &
+   subroutine frwrs (Alelm, Aldest, Amdest, Andest, &
                         Elem, Frnt, Bbuf, Buf)
 !
       use surfsc1
@@ -353,4 +353,4 @@ ccccc          Amdest(id) = Cdabs(Amdest(id))
       endif
 !
 !
-      end subroutine frwrs
+   end subroutine frwrs

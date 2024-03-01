@@ -23,7 +23,7 @@
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 !
-      subroutine symasm (Amdest, Ellhs, Flhs)
+   subroutine symasm (Amdest, Ellhs, Flhs)
 !
       use surfsc1
       use surfsc2
@@ -118,4 +118,4 @@
 100   continue
 !
 !
-      end subroutine symasm
+   end subroutine symasm

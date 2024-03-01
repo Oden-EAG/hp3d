@@ -28,7 +28,7 @@
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 !
-      subroutine frwcp (Alelm, Aldest, Amdest, Andest, Elem, Frnt, Buf)
+   subroutine frwcp (Alelm, Aldest, Amdest, Andest, Elem, Frnt, Buf)
 !
       use surfsc1
       use surfsc2
@@ -549,4 +549,4 @@ ccccc          Amdest(id) = Cdabs(Amdest(id))
       endif
 !
 !
-      end subroutine frwcp
+   end subroutine frwcp

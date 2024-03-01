@@ -17,7 +17,7 @@
 !
 !----------------------------------------------------------------------
 #include "typedefs.h"
-      subroutine solin1(Iel, Numdes,Zaldest)
+   subroutine solin1(Iel, Numdes,Zaldest)
 !
       use frsolmod , ONLY: IDESVE, NDESVE
       implicit none
@@ -78,4 +78,4 @@
       endif
 #endif
 !
-      end subroutine solin1
+   end subroutine solin1

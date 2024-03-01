@@ -27,7 +27,7 @@
 !         7xxx    FORMAT Statements
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
-      subroutine frwcp (Alelm, Aldest, Amdest, Andest, Elem, Frnt, Buf)
+   subroutine frwcp (Alelm, Aldest, Amdest, Andest, Elem, Frnt, Buf)
 !
       use surfsc1
       use surfsc2
@@ -442,4 +442,4 @@
       endif
 !
 !
-      end subroutine frwcp
+   end subroutine frwcp
