@@ -1,149 +1,149 @@
-c***===***===***===***===***===***===***===***===***===***===***===***==
-c FUNCTION:
-c Elimination of rhs's for equation (id)
-c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
-c ARGUMENTS:  (I : input, O : output, IO : input & output, W : workspace
-c
-c Typ Name      Function
-c
-c I   Aid    transfer loc for active dof in the front after eliminating
-c             this is the equation to be eliminated
-c
-c I   Inc    for unsymmetric this is the Increment to shift for picking
-c             the correct entries in Ubuf()
-c
-c IO  Frhs   the assembled front rhs
-c
-c IO  Ubuf   the buffer to hold eliminated lhs equations
-c IO  Bbuf   the buffer to hold eliminated rhs equations
-c
-c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c LATEST REVISION: Mar 2023
-c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
-c NAMING CONVENTIONS:
-c     AAAAAAAA    Variables in COMMON & PARAMETERS
-c     Aaaaaaaa    Variables as ARGUMENTS
-c     aaaaaaaa    LOCAL Variables
-c         7xxx    FORMAT Statements
-c         9xxx    ERROR Handling
-c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
-c
+!***===***===***===***===***===***===***===***===***===***===***===***==
+! FUNCTION:
+! Elimination of rhs's for equation (id)
+!**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
+! ARGUMENTS:  (I : input, O : output, IO : input & output, W : workspace
+!
+! Typ Name      Function
+!
+! I   Aid    transfer loc for active dof in the front after eliminating
+!             this is the equation to be eliminated
+!
+! I   Inc    for unsymmetric this is the Increment to shift for picking
+!             the correct entries in Ubuf()
+!
+! IO  Frhs   the assembled front rhs
+!
+! IO  Ubuf   the buffer to hold eliminated lhs equations
+! IO  Bbuf   the buffer to hold eliminated rhs equations
+!
+!*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+! LATEST REVISION: Mar 2023
+!++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
+! NAMING CONVENTIONS:
+!     AAAAAAAA    Variables in COMMON & PARAMETERS
+!     Aaaaaaaa    Variables as ARGUMENTS
+!     aaaaaaaa    LOCAL Variables
+!         7xxx    FORMAT Statements
+!         9xxx    ERROR Handling
+!+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+!
       subroutine elmrhs (Aid, Inc, Frhs, Ubuf, Bbuf)
-c
+!
       use surfsc1
       use surfsc2
-c
+!
       implicit none
-c
+!
       complex(8) :: Aid
       integer    :: Inc
       complex(8) :: Frhs(*), Ubuf(*), Bbuf(*)
-c
+!
       complex(8) :: s
       integer    :: ii,ii1,ii2,id,idm,idp,im,iuu,in
-c
+!
       real(8), parameter :: sml2 = 1.d-15
-c
+!
       id = INT(Aid)
       idm = id - 1
       idp = id + 1
       im = 0
-c
-c perform the rhs elimination:
-c-----------------------------
-c   f(i)' = f(i) - [k(i,m)/k(m,m)]*f(m)
-c
-c  where m is the row being eliminated
-c
-c
-c loop over the number of rhs in the model
-c
+!
+! perform the rhs elimination:
+!-----------------------------
+!   f(i)' = f(i) - [k(i,m)/k(m,m)]*f(m)
+!
+!  where m is the row being eliminated
+!
+!
+! loop over the number of rhs in the model
+!
       do 60 in = 1,NRHS
-c     -----------------
-c
+!     -----------------
+!
          iuu = 1
-c
-c pull f(m)
-c
+!
+! pull f(m)
+!
          s = Frhs(im+id)
 
-c
-c ***note: we load the rhs elimination buffer with the last  f(i)'
-c           (ie: f(i)" = (f(i)'-[k(i,m)/k(m,m)]*f(m))....)
-c
+!
+! ***note: we load the rhs elimination buffer with the last  f(i)'
+!           (ie: f(i)" = (f(i)'-[k(i,m)/k(m,m)]*f(m))....)
+!
          Bbuf(in) = s
-c        ----------
-cwb >
-c dont operate on zero elements
-c -----------------------------
+!        ----------
+!cwb >
+! dont operate on zero elements
+! -----------------------------
 ccccc    if (Cdabs(s) .le. CDABS(sml2)) then
          if (  abs(s) .le.   ABS(sml2)) then
             iuu = iuu + idm*Inc
             go to 25
          endif
-cwb <
-c
+!cwb <
+!
          ii1 = im + 1
          ii2 = im + idm
-c
-c loop over the front dof, up to the dof we are eliminating
-c note: u() contains already the entries [k(i,m)/k(m,m)]
-c and eliminate
-c     ---------
-c ALLIANT directives
-cvd$ select (vector)
-c ARDENT directives
-c$doit VBEST
-c
-c
+!
+! loop over the front dof, up to the dof we are eliminating
+! note: u() contains already the entries [k(i,m)/k(m,m)]
+! and eliminate
+!     ---------
+! ALLIANT directives
+!cvd$ select (vector)
+! ARDENT directives
+!$doit VBEST
+!
+!
 
          do 20 ii = ii1,ii2
             Frhs(ii) = Frhs(ii) - s*Ubuf(iuu)
             iuu = iuu + Inc
    20    continue
 
-c
+!
    25    if (ISYM.eq.1 .or. ISYM.eq.4) iuu = iuu + 1
-c
-c
-c loop thru the dof below the elimination dof in the front
-c----------------------------------------------------------
-c **note: we are suffling the equations forward as we perform the calcs
-c
+!
+!
+! loop thru the dof below the elimination dof in the front
+!----------------------------------------------------------
+! **note: we are suffling the equations forward as we perform the calcs
+!
         if (idp .le. NFW) then
-c
+!
             ii1 = im + idp
             ii2 = im + NFW
 
-c
-cwb >
-c dont operate on zero elements
-c -----------------------------
+!
+!cwb >
+! dont operate on zero elements
+! -----------------------------
 cwr10.07.99
 ccccc       if (Cdabs(s) .le. CDABS(sml2)) then
             if (  abs(s) .le.   ABS(sml2)) then
-c
-c ALLIANT directives
-cvd$ select (vector)
-c ARDENT directives
-c$doit VBEST
+!
+! ALLIANT directives
+!cvd$ select (vector)
+! ARDENT directives
+!$doit VBEST
 
-c
-c
+!
+!
                do 27 ii = ii1,ii2
                   Frhs(ii-1) = Frhs(ii)
    27          continue
-c
+!
                iuu = iuu + (NFW - idp + 1)*Inc
             else
-cwb <
-c ALLIANT directives
-cvd$ select (vector)
-c ARDENT directives
-c$doit VBEST
+!cwb <
+! ALLIANT directives
+!cvd$ select (vector)
+! ARDENT directives
+!$doit VBEST
 
-c
-c
+!
+!
                do 30 ii = ii1,ii2
                   Frhs(ii-1) = Frhs(ii) - s*Ubuf(iuu)
                   iuu = iuu + Inc
@@ -152,9 +152,9 @@ c
 
             endif
          endif
-c
+!
          im = im + MFW
    60 continue
-c
-c
+!
+!
       end subroutine elmrhs

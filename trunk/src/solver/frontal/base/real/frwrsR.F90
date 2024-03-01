@@ -213,7 +213,7 @@
 !
             else
 !
-! read back the eliminated lhs equations from Buffers; for unsymmetric !
+! read back the eliminated lhs equations from Buffers; for unsymmetric c
 !-----------------------------------------------------------------------
 ! **Note: for unsymmetric we use both Ubuf and Lbuf for holding the
 !          eliminated lhs equations, where Lbuf holds the form of the el
