@@ -94,7 +94,7 @@
 
       irecp = 0
 !
-!cwb >
+!wb >
 ! No resolution
 ! --------------
       ioffst = 0
@@ -126,22 +126,22 @@
 !
       ntape = lbuf(iunit)
 !
-!cwb        if (Unname.eq.'U') then
-!cwb          iunit = 1
-!cwb          ntape = lubufu
-!cwb       elseif (Unname.eq.'B') then
-!cwb          iunit = 2
-!cwb          ntape = lubufb
-!cwb       elseif (Unname.eq.'L') then
-!cwb          iunit = 3
-!cwb          ntape = lubufl
-!cwb !
-!cwb ! unknown file
-!cwb !
-!cwb        else
-!cwb          go to 9999
-!cwb        endif
-!cwb <
+!wb        if (Unname.eq.'U') then
+!wb          iunit = 1
+!wb          ntape = lubufu
+!wb       elseif (Unname.eq.'B') then
+!wb          iunit = 2
+!wb          ntape = lubufb
+!wb       elseif (Unname.eq.'L') then
+!wb          iunit = 3
+!wb          ntape = lubufl
+!wb !
+!wb ! unknown file
+!wb !
+!wb        else
+!wb          go to 9999
+!wb        endif
+!wb <
 !-----------------------------------------------------------------------
 ! check for OPEN command
 ! ==========****========
@@ -162,9 +162,9 @@
             nbuf(iunit) = 1
             lenf(iunit) = Len
          endif
-!cwb >
+!wb >
          irsave(iunit) = 0
-!cwb <
+!wb <
 ! open the file
 !
          close (ntape,err=5)
@@ -187,12 +187,12 @@
 ! ==========*****========
 !
       elseif (Commnd.eq.'WRITE') then
-!cwb >
+!wb >
 ! Store the number of buffer records written
 !   This is for resolution and setting the proper value of IFU,etc.
 !
          irsave(iunit) = max(irsave(iunit),Irec)
-!cwb <
+!wb <
 ! calculate the first buffer to write
 !
          irecp = 1 + (Irec-1)*nbuf(iunit)
@@ -234,13 +234,13 @@
 !===========****=========
 !
       elseif (Commnd .eq. 'READ') then
-!cwb >
+!wb >
 ! Pick up the number of buffer records from the previous solution
 !   This is for resolution and setting the proper value of IFU,etc.
 !
          irecsv = irsave(iunit)
          if (Irec .lt. 0) Irec = irecsv
-!cwb <
+!wb <
 ! calculate the first buffer to read
 !
          irecp = 1 + (Irec-1)*nbuf(iunit)
@@ -286,11 +286,11 @@
       elseif (Commnd .eq. 'CLOSE') then
          close (ntape)
 !        -------------
-!cwb >
+!wb >
          irsave(iunit) = 0
          nbuf(iunit) = 0
          lenf(iunit) = 0
-!cwb <
+!wb <
          go to 1111
       endif
 !-----------------------------------------------------------------------
@@ -305,7 +305,7 @@
  1111 Jerr = 0
 
 
-cwr07.12.00
+!wr07.12.00
 !  ...test......test......test......test......test......test......test...
 !  ...test......test......test......test......test......test......test...
 !************************************************************************

@@ -86,20 +86,20 @@
 !
 ! check for zero pivots
 !
-cwr10.07.99
-ccccc if (Cdabs(pivot) .le. CDABS(sml)) then
+!wr10.07.99
+!!!!! if (Cdabs(pivot) .le. CDABS(sml)) then
       if (  abs(pivot) .le.   ABS(sml)) then
          IERR=2
          return
       endif
 !
-cwr10.07.99
-ccccc if(CDABS(pivot) .lt. CDABS(zero)) NNEGP = NNEGP+1
-ccccc if(CDABS(pivot) .gt. CDABS(zero)) NPOSP = NPOSP+1
+!wr10.07.99
+!!!!! if(CDABS(pivot) .lt. CDABS(zero)) NNEGP = NNEGP+1
+!!!!! if(CDABS(pivot) .gt. CDABS(zero)) NPOSP = NPOSP+1
       if(  ABS(pivot) .lt.   ABS(zero)) NNEGP = NNEGP+1
       if(  ABS(pivot) .gt.   Abs(zero)) NPOSP = NPOSP+1
 !
-!cvd$ select (vector)
+!vd$ select (vector)
 !
 !*** for the unsymmetric case we copy the assembled Flhs row into Ubuf()
 !====================================================================
@@ -143,18 +143,18 @@ ccccc if(CDABS(pivot) .gt. CDABS(zero)) NPOSP = NPOSP+1
 !        and Ubuf(j) represents * above
 !
          s = Flhs(id+k)/pivot
-!cwb >
+!wb >
 ! dont operate on zero elements
 ! -----------------------------
-cwr10.07.99
-ccccc    if (Cdabs(s) .le. CDABS(sml2)) then
+!wr10.07.99
+!!!!!    if (Cdabs(s) .le. CDABS(sml2)) then
          if (  abs(s) .le.   ABS(sml2)) then
             m = k + idm
          else
-!cwb <
+!wb <
 ! elimination for block b1 (as shown in the figure above)
 ! ------------------------
-!cvd$ select (vector)
+!vd$ select (vector)
 !
             do 10 j = 1,idm
                m = j + k
@@ -164,23 +164,23 @@ ccccc    if (Cdabs(s) .le. CDABS(sml2)) then
 !
          m = k - 1
 !
-!cwb >
+!wb >
 ! dont operate on zero elements
 ! -----------------------------
-cwr10.07.99
-ccccc    if (Cdabs(s) .le. CDABS(sml2)) then
+!wr10.07.99
+!!!!!    if (Cdabs(s) .le. CDABS(sml2)) then
          if (  abs(s) .le.   ABS(sml2)) then
 !
-!cvd$ select (vector)
+!vd$ select (vector)
 !
             do 15 j = idp,NFW
                Flhs(j+m) = Flhs(j+k)
    15       continue
          else
-!cwb <
+!wb <
 ! elimination for block b2 (as shown in the figure above)
 ! ------------------------
-!cvd$ select (vector)
+!vd$ select (vector)
 !
             do 20 j = idp,NFW
                Flhs(j+m) = Flhs(j+k) - s*Ubuf(j)
@@ -204,24 +204,24 @@ ccccc    if (Cdabs(s) .le. CDABS(sml2)) then
 !    -------------------
          s = Flhs(id+k)/pivot
          m = k - KFW
-!cwb >
+!wb >
 ! dont operate on zero elements
 ! -----------------------------
-cwr10.07.99
-ccccc    if (Cdabs(s) .le. CDABS(sml2)) then
+!wr10.07.99
+!!!!!    if (Cdabs(s) .le. CDABS(sml2)) then
          if (  abs(s) .le.   ABS(sml2)) then
 !
-!cvd$ select (vector)
+!vd$ select (vector)
 !
             do 40 j = 1,idm
               Flhs(j+m) = Flhs(k+j)
    40       continue
          else
-!cwb <
+!wb <
 !
 ! elimination for block b3 (as shown in the figure above)
 ! ------------------------
-!cvd$ select (vector)
+!vd$ select (vector)
 !
             do 50 j = 1,idm
               Flhs(j+m) = Flhs(k+j) - s*Ubuf(j)
@@ -230,24 +230,24 @@ ccccc    if (Cdabs(s) .le. CDABS(sml2)) then
 !
          m = m - 1
 !
-!cwb >
+!wb >
 ! dont operate on zero elements
 ! -----------------------------
-cwr10.07.99
-ccccc    if (Cdabs(s) .le. CDABS(sml2)) then
+!wr10.07.99
+!!!!!    if (Cdabs(s) .le. CDABS(sml2)) then
          if (  abs(s) .le.   ABS(sml2)) then
 !
-!cvd$ select (vector)
+!vd$ select (vector)
 !
             do 55 j = idp,NFW
                Flhs(m+j) = Flhs(k+j)
    55       continue
          else
-!cwb <
+!wb <
 !
 ! elimination for block b4 (as shown in the figure above)
 ! ------------------------
-!cvd$ select (vector)
+!vd$ select (vector)
 !
             do 60 j = idp,NFW
                Flhs(m+j) = Flhs(k+j) - s*Ubuf(j)

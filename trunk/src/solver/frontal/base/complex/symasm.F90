@@ -55,11 +55,11 @@
 ! pull the dof destination vector (for this row)
 !
           mi = int(Amdest(i))
-!cwb >
+!wb >
 ! ALLIANT directives
-!cvd$ select (vector)
-!cvd$ nodepchk
-!cvd$ nosync
+!vd$ select (vector)
+!vd$ nodepchk
+!vd$ nosync
 ! ARDENT directives
 !$doit VBEST
 !$doit IVDEP
@@ -72,11 +72,11 @@
   45     continue
 !
 ! ALLIANT directives
-!cvd$ nodepchk
-!cvd$ nosync
+!vd$ nodepchk
+!vd$ nosync
 ! ARDENT directives
 !$doit IVDEP
-!cwb <
+!wb <
 ! becuz its symmetric loop thru lower triangular dof for this element
 !
          do 50 j = 1, i
@@ -84,28 +84,28 @@
 ! pull the dof destination vector (for this column)
 !
             mj = int(Amdest(j))
-!cwb >
+!wb >
 ! determine the position in the front (function locls)
-!cwb   (**note: we may wish to inline this code)
+!wb   (**note: we may wish to inline this code)
 !
-!cwb             mk = locls(mi,mj)
+!wb             mk = locls(mi,mj)
             k = max0(mi,mj)
             l = min0(mi,mj)
 !
             mk = k*(k-1)/2 + l
-!cwb <
+!wb <
 !
 ! assemble into the front
-!cwb >
-!cwb             Flhs(mk) = Flhs(mk) + Ellhs(n)
-!cwb             n = n + 1
+!wb >
+!wb             Flhs(mk) = Flhs(mk) + Ellhs(n)
+!wb             n = n + 1
             Flhs(mk) = Flhs(mk) + Ellhs(ntemp(j))
-!cwb <
+!wb <
 !
  50      continue
-!cwb >
+!wb >
          n = n + i
-!cwb <
+!wb <
 !
 100   continue
 !

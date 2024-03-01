@@ -344,8 +344,8 @@
 #if HP3D_DEBUG
       if (iprint.eq.1) then
    10   write(*,7002) NRELES
- 7002   format(' solve1: SET ELEMENT NUMBER TO REVIEW NICKNAMES, ', &
-     ,         'NRELES = ',i8)
+ 7002   format(' solve1: SET ELEMENT NUMBER TO REVIEW NICKNAMES,', &
+               ' NRELES = ',i8)
         read(*,*) mdle
         if (mdle.eq.0) then
           goto 20
@@ -410,7 +410,7 @@
       allocate(NDESVE(2,NRELES))
 !
 !  ...call prefront
-ccc      write(*,*) 'solve1: nrnick,MAXDOFC = ',nrnick,MAXDOFC
+!!!      write(*,*) 'solve1: nrnick,MAXDOFC = ',nrnick,MAXDOFC
       MA = 2*nrnick+3*MAXDOFC
 #if HP3D_DEBUG
       if (iprint.eq.1) write(*,*) 'solve1: CALLING PREFRONT'
@@ -442,14 +442,14 @@ ccc      write(*,*) 'solve1: nrnick,MAXDOFC = ',nrnick,MAXDOFC
 !  ...check the size of workspace for surfss:
 !     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       if (ISYM.eq.1 .or. ISYM.eq.4) then
-ccc        write(*,7004) ms+mr
-ccc 7004   format('solve1: MINIMUM MEMORY  = ',i10)
+!!!        write(*,7004) ms+mr
+!!! 7004   format('solve1: MINIMUM MEMORY  = ',i10)
         if (ms+mr.gt.MFRSOL) then
           write(*,*)'solve1: MFRSOL TOO SMALL',ms,mr,MFRSOL
           stop 1
         endif
       else
-ccc        write(*,7004) mu+mr
+!!!        write(*,7004) mu+mr
         if (mu+mr.gt.MFRSOL) then
           write(*,*)'solve1: MFRSOL TOO SMALL',mu,mr,MFRSOL
           stop 1

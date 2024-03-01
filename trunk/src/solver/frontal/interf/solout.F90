@@ -156,7 +156,7 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
       do i=nrnodm,1,-1
          nod = nodm(i)
 !
-!     ...compute the number of active H1 variables for the node
+!      ..compute the number of active H1 variables for the node
          call get_index(nod, index)
 #if HP3D_DEBUG
          if (iprint.eq.1) then
@@ -178,7 +178,7 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
          enddo
          if (nvarH.eq.0) cycle
 !
-!     ...loop through the nodal dof (potentially NONE)
+!      ..loop through the nodal dof (potentially NONE)
          do j=1,ndofmH(i)/nvarH
             ivar=mvarH(i); k=0
 !
@@ -218,10 +218,10 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
                enddo
 !        ...end loop over physics variables
             enddo
-!     ...end loop over nodal dof
+!      ..end loop over nodal dof
          enddo
 !
-!     ...update the number of components stored so far
+!      ..update the number of components stored so far
          mvarH(i) = ivar
 !  ...end loop over nodes
       enddo
@@ -235,7 +235,7 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
       do i=nrnodm,1,-1
          nod = nodm(i)
 !
-!     ...compute the number of active H(curl) variables for the node
+!      ..compute the number of active H(curl) variables for the node
          call get_index(nod, index)
 #if HP3D_DEBUG
          if (iprint.eq.1) write(*,7100) nod,index
@@ -254,7 +254,7 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
          enddo
          if (nvarE.eq.0) cycle
 !
-!     ...loop through the nodal dof
+!      ..loop through the nodal dof
          do j=1,ndofmE(i)/nvarE
             ivar=mvarE(i); k=NRHVAR
 !
@@ -292,9 +292,9 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
                enddo
 !        ...end loop over physics variables
             enddo
-!     ...end loop over nodal dof
+!      ..end loop over nodal dof
          enddo
-!     ...update the number of components stored so far
+!      ..update the number of components stored so far
          mvarE(i) = ivar
 !  ...end loop over nodes
       enddo
@@ -308,7 +308,7 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
       do i=nrnodm,1,-1
          nod = nodm(i)
 !
-!     ...compute the number of active H(div) variables for the node
+!      ..compute the number of active H(div) variables for the node
          call get_index(nod, index)
 #if HP3D_DEBUG
          if (iprint.eq.1) write(*,7100) nod,index
@@ -327,7 +327,7 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
          enddo
          if (nvarV.eq.0) cycle
 !
-!     ...loop through the nodal dof
+!      ..loop through the nodal dof
          do j=1,ndofmV(i)/nvarV
 !
 !        ...loop through the components
@@ -367,9 +367,9 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
                enddo
 !        ...end loop over physics variables
             enddo
-!     ...end loop over nodal dof
+!      ..end loop over nodal dof
          enddo
-!     ...update the number of components stored so far
+!      ..update the number of components stored so far
          mvarV(i) = ivar
 !  ...end loop over nodes
       enddo
@@ -403,10 +403,10 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
 !  ...loop through the nodal dof
       do j=1,ndofmQ(i)/nvarQ
 !
-!     ...loop through the components
+!      ..loop through the components
          ivar=mvarQ; k=nrVarHEV
 !
-!     ...loop through physics variables
+!      ..loop through physics variables
          do iphys=nrPhysHEV+1,NR_PHYSA
             il = NR_COMP(iphys)
             if (index(k+1) .eq. 0) then
@@ -437,7 +437,7 @@ subroutine solout(Iel,Ndof,Nrhs,Mdest,Zele)
                end select
 !        ...end loop over components
             enddo
-!     ...end loop over physics variables
+!      ..end loop over physics variables
          enddo
 !  ...end loop over nodal dof
       enddo

@@ -28,7 +28,7 @@
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
 !
    subroutine frwrs (Alelm, Aldest, Amdest, Andest, &
-     .                  Elem, Frnt, Bbuf, Buf)
+                        Elem, Frnt, Bbuf, Buf)
 !
       use surfsc1
       use surfsc2
@@ -42,26 +42,26 @@
       integer :: md,n,ne,negiel,numdes
 !
       IB = 1
-!cwb >
+!wb >
 ! In order to allow resolution non-sequentially we need to allow IFU to
 !  counted herein, not picked up off the common block
 !
-!cwb       ifui = IFU
-!cwb       ifli = IFL
-!cwb       IFU = 0
+!wb       ifui = IFU
+!wb       ifli = IFL
+!wb       IFU = 0
       if (isym .eq. 4) IFU = 0
-!cwb <
+!wb <
 !
       IFL = 0
       IFB = 0
 !
       NFW = 0
       LFW = 0
-!cwb >
+!wb >
       IDUMP = 1
       LENU = 0
       NRHSF = NRHS
-!cwb <
+!wb <
 !
 ! for symmetric case: we move forward thru the Ubuf buffer to pick up [k
 ! for unsymmetric case: we move backward thru the Lbuf buffer to pick up
@@ -119,7 +119,7 @@
          if (IPFSST .eq. 1 .or. IPFSST.eq.negiel) then
             write (NFSOUT,7701) iel,NRHS,NDOFM,NFW,LFW,NE
  7701        format(1x,'FRWRS: iel,NRHS,NDOFM,NFW,LFW,NE', &
-     .              /,10x,10i8)
+                    /,10x,10i8)
          endif
          if (IPFSRH .eq. 1 .or. IPFSRH.eq.negiel) then
             write (NFSOUT,7703) ((Elem(i),i=1,NDOFM),j=1,NRHS)
@@ -129,21 +129,21 @@
 ! assemble the Element rhs & lhs into the front
 ! ---------------------------------------------
          if (IASSEM .ne. 0) then
-!cwb >
+!wb >
 ! to save having to do abs() repeatedly, do it now
 !  **note: sub.dest is recalled in sub.bckwrd so this wont screw it up
 !          BUT the negative amdest info is now lost herein
 !
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
             do 133 id = 1,NDOFM
                Amdest(id) = dabs(Amdest(id))
   133       continue
-!cwb <
+!wb <
 !
             call semrhs (Amdest, Elem, Frnt)
 !           -----------------------------
@@ -191,7 +191,7 @@
                if (IPFSBF .eq. 1) then
                   write (NFSOUT,7704) (Bbuf(i),i=1,40)
  7704              format(1x,'FRWCP: First 40 items in Bbuf:',/, &
-     .                     (10x,1p,10e12.5))
+                           (10x,1p,10e12.5))
                endif
 !
             endif
@@ -237,7 +237,7 @@
            if (IPFSBF .eq. 1 .and. igot.eq.1) then
               write (NFSOUT,7705) (Buf(i),i=1,40)
  7705          format(1x,'FRWCP: First 40 items in Buf: ',/, &
-     .                     (10x,1p,10e12.5))
+                           (10x,1p,10e12.5))
            endif
 !
 !
@@ -250,10 +250,10 @@
 !
              if (IPFSRE .eq. 1 .or. IPFSRE.eq.negiel) then
                 write (NFSOUT,7706) iel,Andest(ie), &
-     .                                ((Frnt(i),i=1,NFW),j=1,NRHS)
+                                      ((Frnt(i),i=1,NFW),j=1,NRHS)
  7706            format(1x,'FRWRS:  iel,Andest(ie):',i8,1p,e12.4, &
-     .                   /,10x,'Frnt: Eliminated RHS',/, &
-     .                   (10x,1p,10e12.5))
+                         /,10x,'Frnt: Eliminated RHS',/, &
+                         (10x,1p,10e12.5))
              endif
 !
 ! increment the rhs Buffer pointer
@@ -290,17 +290,17 @@
       IERR = 10*jerr
 !
       IB = 1
-!cwb >
-!cwb       IFU = ifui
-!cwb       IFL = ifli
-!cwb
+!wb >
+!wb       IFU = ifui
+!wb       IFL = ifli
+!wb
 !
 ! debug print
 !
       if (IPFSBF .eq. 1) then
          write (NFSOUT,7707) (Bbuf(i),i=1,40)
  7707     format(1x,'FRWRS: First 40 items in Bbuf: ',/, &
-     .                     (10x,1p,10e12.5))
+                           (10x,1p,10e12.5))
       endif
 !
 !

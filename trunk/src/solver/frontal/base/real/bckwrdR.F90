@@ -37,7 +37,7 @@
 !         9xxx    ERROR Handling
 !+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
    subroutine bckwrd (Alelm, Aldest, Amdest, &
-     .                   Andest, Elem, Frnt, Bbuf, Ubuf)
+                         Andest, Elem, Frnt, Bbuf, Ubuf)
 !
       use surfsc1
       use surfsc2
@@ -45,7 +45,7 @@
       implicit none
 !
       real(8) :: Aldest(*), Amdest(*), Andest(*), Elem(*), Frnt(*), &
-     .           Bbuf(*), Ubuf(*), Alelm(*)
+                 Bbuf(*), Ubuf(*), Alelm(*)
 !
       integer :: i,ie,iel,ifbi,ifui,ill,iuu,iuuold
       integer :: j,jel,jerr,k,l,lenx,md,n,ne,negiel,numdes
@@ -116,7 +116,7 @@
          if (IPFSST .eq. 1 .or. IPFSST.eq.negiel) then
             write (NFSOUT,7701) jel,NRHS,NDOFM,NFW,LFW,NE
  7701        format(1x,'BCKWRD: jel,NRHS,NDOFM,NFW,LFW,NE', &
-     .              /,10x,10i8)
+                    /,10x,10i8)
          endif
 !
 ! backsubstitute those equations possible from the current front
@@ -139,30 +139,30 @@
 !  Note: for resolution w/ unsymmetric we dont know IFU apriori
 !         and zdirio passes it back
 !
-!cwb >
+!wb >
                if (IDUMP.eq.1 .or. IRESOL.eq.1) then
-!cwb <
+!wb <
                  IFU = IFU - 1
                  call zdirio ('U', 'READ', IFU, ill, Ubuf, jerr)
 !                -----------------------------------------------
-!cwb >
+!wb >
 ! for unsymmetric during resolution we didnt know IFU apriori
 !  and it is sent back from zdirio
 !
                  if (ISYM.eq.3 .and. IRESOL.eq.1)  ifui = IFU
-!cwb <
+!wb <
                  IERR = 10*jerr
                  if (jerr .ne. 0) return
 !
                  iuu = ill + 1
-!cwb >
+!wb >
 ! if we didnt dump buffers, just set the read flags
 !
               else
                  IFU = IFU - 1
                  iuu = LENU + 1
               endif
-!cwb <
+!wb <
             endif
 !
 ! calculate the solution for this dof
@@ -181,7 +181,7 @@
  7702           format(1x,'BCKWRD: jel,ie,Andest(j)',2i8,1p,e12.5)
                write(NFSOUT,7703) (Ubuf(i),i=iuu,iuuold)
  7703           format(1x,'BCKWRD: (Ubuf(i),i=iuu,iuuold)',/, &
-     .                (10x,1p,10e12.5))
+                      (10x,1p,10e12.5))
             endif
 !
             if (IRESOL .ne. 1) then
@@ -196,7 +196,7 @@
                if (IPFSBK .eq. 1 .or. IPFSBK.eq.negiel) then
                   write(NFSOUT,7704) (Ubuf(n+i),i=1,NRHS)
  7704              format(1x,'BCKWRD: (Ubuf(n+i),i=1,NRHS)', &
-     .                    (/,10x,1p,10e12.5))
+                          (/,10x,1p,10e12.5))
                endif
 !
             else
@@ -211,7 +211,7 @@
 ! error out
 !
                   IERR = 10*jerr
-                  if (jerr .ne .0) return
+                  if (jerr .ne. 0) return
 !
                   IB = ill - NRHS + 1
                endif
@@ -225,7 +225,7 @@
                if (IPFSBK .eq. 1 .or. IPFSBK.eq.negiel) then
                   write(NFSOUT,7705) (Bbuf(IB+i),i=1,NRHS)
  7705              format(1x,'BCKWRD: (Bbuf(IB+i),i=1,NRHS)',/, &
-     .                    (10x,1p,10e12.5))
+                          (10x,1p,10e12.5))
                endif
 !
                IB = IB - NRHS
@@ -245,17 +245,17 @@
 !           ---------------------------------------------
          else
 !
-!cwb >
+!wb >
 ! transfer x from the solution front to the
 !  local Element numbering based on the dest vecs
-!cwb* **note: 1) we may want to inline locr below for greater speed
+!wb* **note: 1) we may want to inline locr below for greater speed
 !            2) we also should switch the loop parameters below
 !
             k = 1
             do 180 j = 1, NRHS
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
@@ -269,20 +269,20 @@
 !
   180       continue
 !
-!cwb             do 180 i = 1,NDOFM
-!cwb                k = 0
-!cwb !
-!cwb !cvd$ select (vector)
-!cwb !
-!cwb                do 160 j = 1,NRHS
-!cwb                   md = int(Amdest(i))
-!cwb                   l = locr(j,md)
-!cwb                   Elem(k+i) = Frnt(l)
-!cwb                   k = k + NDOFM
-!cwb   160          continue
-!cwb !
-!cwb   180       continue
-!cwb <
+!wb             do 180 i = 1,NDOFM
+!wb                k = 0
+!wb !
+!wb !vd$ select (vector)
+!wb !
+!wb                do 160 j = 1,NRHS
+!wb                   md = int(Amdest(i))
+!wb                   l = locr(j,md)
+!wb                   Elem(k+i) = Frnt(l)
+!wb                   k = k + NDOFM
+!wb   160          continue
+!wb !
+!wb   180       continue
+!wb <
 !
 #if HP3D_DEBUG
             if (iprint.eq.1) then
@@ -299,7 +299,7 @@
                   lenx = NDOFM*NRHS
                   write(NFSOUT,7706) (Elem(i),i=1,lenx)
  7706              format(1x,'BCKWRD: (Elem(i),i=1,lenx)',/, &
-     .                    (10x,1p,10e12.5))
+                          (10x,1p,10e12.5))
                endif
 !
          endif

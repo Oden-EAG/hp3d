@@ -73,15 +73,15 @@
 !
          Bbuf(in) = s
 !        ----------
-!cwb >
+!wb >
 ! dont operate on zero elements
 ! -----------------------------
-ccccc    if (Cdabs(s) .le. CDABS(sml2)) then
+!!!!!    if (Cdabs(s) .le. CDABS(sml2)) then
          if (  abs(s) .le.   ABS(sml2)) then
             iuu = iuu + idm*Inc
             go to 25
          endif
-!cwb <
+!wb <
 !
          ii1 = im + 1
          ii2 = im + idm
@@ -91,7 +91,7 @@ ccccc    if (Cdabs(s) .le. CDABS(sml2)) then
 ! and eliminate
 !     ---------
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
@@ -116,15 +116,15 @@ ccccc    if (Cdabs(s) .le. CDABS(sml2)) then
             ii2 = im + NFW
 
 !
-!cwb >
+!wb >
 ! dont operate on zero elements
 ! -----------------------------
-cwr10.07.99
-ccccc       if (Cdabs(s) .le. CDABS(sml2)) then
+!wr10.07.99
+!!!!!       if (Cdabs(s) .le. CDABS(sml2)) then
             if (  abs(s) .le.   ABS(sml2)) then
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 
@@ -136,9 +136,9 @@ ccccc       if (Cdabs(s) .le. CDABS(sml2)) then
 !
                iuu = iuu + (NFW - idp + 1)*Inc
             else
-!cwb <
+!wb <
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 

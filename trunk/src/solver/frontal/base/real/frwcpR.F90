@@ -116,7 +116,7 @@
          if (IPFSST .eq. 1 .or. IPFSST.eq.negiel) then
             write (NFSOUT,7701) iel,NRHS,NDOFM,NFW,KFW,LFW,NE,mke,mkf
  7701        format(1x,'FRWCP: iel,NRHS,NDOFM,NFW,KFW,LFW,NE,mke,mkf', &
-     .              /,10x,10i8)
+                    /,10x,10i8)
          endif
          if (IPFSLH .eq. 1 .or. IPFSLH.eq.negiel) then
             write (NFSOUT,7702) (Elem(i),i=1,mke)
@@ -130,20 +130,20 @@
 ! assemble the Element rhs & lhs into the front
 ! ---------------------------------------------
          if (IASSEM .ne. 0) then
-! !cwb >
+! !wb >
 ! to save having to do abs() repeatedly, do it now
 !  **note: sub.dest is recalled in sub.bckwrd so this wont screw it up
 !          BUT the negative amdest info is now lost herein
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
             do 133 id = 1,NDOFM
                Amdest(id) = dabs(Amdest(id))
   133       continue
-!cwb <
+!wb <
 !
 ! symmetric
 !
@@ -156,12 +156,12 @@
                call unsasm (Amdest, Elem, Frnt)
 !              --------------------------------
             endif
-!cwb >
+!wb >
             if (IERR .ne. 0) return
-!cwb <
+!wb <
 !
             if(NRHS .ne. 0) call semrhs (Amdest, Elem(mke+1), &
-     .                                           Frnt(MKF+1))
+                                                 Frnt(MKF+1))
 !                           ---------------------------------
 ! debug print
 !
@@ -170,12 +170,12 @@
                if (ISYM.eq.2 .or. ISYM.eq.3) lenf = NFW*NFW
                write (NFSOUT,7704) (Frnt(i),i=1,lenf)
  7704           format(1x,'FRWCP: Frnt: Assembled LHS',/, &
-     .                 (10x,1p,10e12.5))
+                       (10x,1p,10e12.5))
             endif
             if (IPFSRF .eq. 1 .or. IPFSRF.eq.negiel) then
                write (NFSOUT,7705) ((Frnt(MKF+i),i=1,NFW),j=1,NRHS)
  7705           format(1x,'FRWCP: Frnt: Assembled RHS',/, &
-     .                 (10x,1p,10e12.5))
+                       (10x,1p,10e12.5))
             endif
 !
          endif
@@ -194,10 +194,10 @@
 !
 !
             newu = IU + NFW + NRHS - 1
-!cwb >
-!cwb             newl = IL + 1 - NFW * ISYM/3
+!wb >
+!wb             newl = IL + 1 - NFW * ISYM/3
             newl = IL + 1 - NFW * iunsr
-!cwb <
+!wb <
 !
             if (newu .ge. newl) then
 !
@@ -243,12 +243,12 @@
                if (IPFSBF .eq. 1) then
                   write (NFSOUT,7711) (Buf(i),i=1,40)
  7711              format(1x,'FRWCP: First 40 items in Buf:',/, &
-     .                     (10x,1p,10e12.5))
+                           (10x,1p,10e12.5))
 !
                   if (ISYM .eq. 3) write (NFSOUT,7712) &
-     .                             (Buf(i),i=IL+1,il+40)
+                                   (Buf(i),i=IL+1,il+40)
  7712              format(1x,'FRWCP: First 40 items in Buf(IL+1):',/, &
-     .                    (10x,1p,10e12.5))
+                          (10x,1p,10e12.5))
 !
                endif
 !
@@ -277,8 +277,8 @@
                if (ISYM.eq.2 .or. ISYM.eq.3) lenf = NFW*NFW
                write (NFSOUT,7707) iel,Andest(ie),(Frnt(i),i=1,lenf)
  7707           format(1x,'FRWCP: iel,Andest(ie):',i8,1p,e12.4, &
-     .                  /,10x,'Frnt: Eliminated LHS',/, &
-     .                  (10x,1p,10e12.5))
+                        /,10x,'Frnt: Eliminated LHS',/, &
+                        (10x,1p,10e12.5))
             endif
 !
 ! increment the equation Buffer pointer
@@ -289,7 +289,7 @@
             if (IERR .eq. 2) then
                write (NFSOUT,7000) iel
  7000           format(2(/), 5x,'ERROR IN FRWCP:', &
-     .                ' ZERO PIVOT IN ELEMENT:',i4)
+                      ' ZERO PIVOT IN ELEMENT:',i4)
                return
             endif
 !
@@ -301,13 +301,13 @@
 !
                if (ISYM.eq.1 .or. ISYM.eq.4) then
                   call elmrhs (Andest(ie),   1, Frnt(MKF+1), Buf(m), &
-     .                         Buf(m+NFW))
+                               Buf(m+NFW))
 !                 ---------------------------------------------------
 ! unsymmetric
 !
                else
                   call elmrhs (Andest(ie), KFW, Frnt(MKF+1), Frnt(NFW), &
-     .                         Buf(m+NFW))
+                               Buf(m+NFW))
 !                 -----------------------------------------------------
                endif
 !
@@ -315,10 +315,10 @@
 !
                if (IPFSRE .eq. 1 .or. IPFSRE.eq.negiel) then
                   write (NFSOUT,7708) iel,Andest(ie), &
-     .                                ((Frnt(MKF+i),i=1,NFW),j=1,NRHS)
+                                      ((Frnt(MKF+i),i=1,NFW),j=1,NRHS)
  7708              format(1x,'FRWCP:  iel,Andest(ie):',i8,1p,e12.4, &
-     .                     /,10x,'Frnt: Eliminated RHS',/, &
-     .                     (10x,1p,10e12.5))
+                           /,10x,'Frnt: Eliminated RHS',/, &
+                           (10x,1p,10e12.5))
                endif
 !
             endif
@@ -336,7 +336,7 @@
                n = max0(n,1)
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
@@ -376,7 +376,7 @@
             do 170 i = 2,NFW
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
@@ -399,10 +399,10 @@
 !---------------------------------------------------------------
 !
       IFU = IFU + 1
-!cwb >
-!cwb       call zdirio ( 'u', 'write', IFU, iu-1, Buf, jerr)
-!cwb !     --------------------------------------------------
-!cwb
+!wb >
+!wb       call zdirio ( 'u', 'write', IFU, iu-1, Buf, jerr)
+!wb !     --------------------------------------------------
+!wb
       jerr = 0
 !
 ! if we are not going to do a resolution (ISYM=3 OR 4)
@@ -416,7 +416,7 @@
       else
          LENU = IU - 1
       endif
-!cwb <
+!wb <
       IERR = 10*jerr
       if(jerr .ne. 0) return
 !
@@ -433,11 +433,11 @@
       if (IPFSBF .eq. 1) then
          write (NFSOUT,7709) (Buf(i),i=1,40)
  7709     format(1x,'FRWCP: First 40 items in Buf: ',/, &
-     .                     (10x,1p,10e12.5))
+                           (10x,1p,10e12.5))
 !
          if (ISYM .eq. 3) write (NFSOUT,7710) (Buf(i),i=il+1,il+40)
  7710                   format(1x,'FRWCP: First 40 items in Buf(il+1):', &
-     .                         /,(10x,1p,10e12.5))
+                               /,(10x,1p,10e12.5))
 !
       endif
 !

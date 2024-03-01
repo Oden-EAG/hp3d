@@ -32,11 +32,11 @@ end module surfsc1
 ! DESCRIPTION OF VARIABLES
 !
 !      COMMON /SURFC1/ ISYM, NUMELM, IRESOL, NRHS, MA, IWRT,
-!     .                IASSEM, IERR, NNEGP, NPOSP, IPRSTR,
-!     .                IPRPIV, IPRDES, NFSOUT, NICMUL,
-!     .                IPFSDB, IPFSS1, IPFSST, IPFSLH, IPFSRH,
-!     .                IPFSLF, IPFSRF, IPFSZD, IPFSLE, IPFSRE,
-!     .                IPFSBF, IPFSBK, IPFSXX
+!                      IASSEM, IERR, NNEGP, NPOSP, IPRSTR,
+!                      IPRPIV, IPRDES, NFSOUT, NICMUL,
+!                      IPFSDB, IPFSS1, IPFSST, IPFSLH, IPFSRH,
+!                      IPFSLF, IPFSRF, IPFSZD, IPFSLE, IPFSRE,
+!                      IPFSBF, IPFSBK, IPFSXX
 !
 ! Frontal Solver Common Block
 ! ---------------------------

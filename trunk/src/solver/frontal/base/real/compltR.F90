@@ -78,7 +78,7 @@
         write(*,*) 'COMPLT:TOO LITTLE BUFFER !! MBUF = ',MBUF
         stop 1
       endif
-!cwb >
+!wb >
 ! save the value of MBUF & MW to check against during resolution
 ! *** Note: we cannot let the size of MBUF shrink during resolution
 !            because then the stuff that was buffered out will not fit b
@@ -90,7 +90,7 @@
          MBUFSV(2,1) = MBUF
          MBUFSV(2,2) = MW
       endif
-!cwb <
+!wb <
 !
 ! open direct access buffer files
 ! ===============================
@@ -99,9 +99,9 @@
       call zdirio ('U', 'OPEN', 0, MBUF, Awrk, IERR)
 !     --------------------------------------------
 !
-C open L : The additional eliminated LHS buffer for unsymmetric w/ resol
+! open L : The additional eliminated LHS buffer for unsymmetric w/ resol
 !
-      if (ISYM .eq .3) call zdirio ('L', 'OPEN', 0, MBUF, Awrk, IERR)
+      if (ISYM .eq. 3) call zdirio ('L', 'OPEN', 0, MBUF, Awrk, IERR)
 !                     -------------------------------------------
       IERR = 10*IERR
       if (IERR .ne. 0) go to 9100
@@ -121,10 +121,10 @@ C open L : The additional eliminated LHS buffer for unsymmetric w/ resol
  7010    format(2(/), 5x,'UNSYMMETRIC FORWARD ELIMINATION',/)
  7020    format(      5x,'RESOLUTION INACTIVATED',/)
  7030    format(     4x,'            OVER HEAD:',i7,/, &
-     .               4x,'              ELEMENT:',i7,/, &
-     .               4x,'                FRONT:',i7,/, &
-     .               4x,'               BUFFER:',i7,/, &
-     .               4x,'        TOTAL STORAGE:',i7)
+                     4x,'              ELEMENT:',i7,/, &
+                     4x,'                FRONT:',i7,/, &
+                     4x,'               BUFFER:',i7,/, &
+                     4x,'        TOTAL STORAGE:',i7)
       endif
 !
 ! check that the buffer workspace is large enuf
@@ -135,7 +135,7 @@ C open L : The additional eliminated LHS buffer for unsymmetric w/ resol
          minn = MA + MFW + NRHS - MBUF
          write(NFSOUT,7060) minn
  7060    format(2(/), 5x,'ERROR IN SURFS: NOT ENOUGH ROOM IN BUFFER', &
-     .             /,12x,'MINIMUM SIZE OF WORK ARRAY  = ',i7)
+                   /,12x,'MINIMUM SIZE OF WORK ARRAY  = ',i7)
          go to 9100
       endif
 !
@@ -177,17 +177,17 @@ C open L : The additional eliminated LHS buffer for unsymmetric w/ resol
       if (IPFSST .eq. 1) then
          write(NFSOUT,7701) NUMELM,MLDEST,MDOF,NRHS,MELEM,MKF,MFWR
  7701     format(1x,'COMPLT: NUMELM,MLDEST,MDOF,NRHS,MELEM,MKF,MFWR', &
-     .           /,10x,8i8)
+                 /,10x,8i8)
          write(NFSOUT,7702) MBUF,MA,MW,ia1,ial,iam,ian,iae,iaf,iab
  7702     format(1x,'COMPLT: MBUF,MA,MW,ia1,ial,iam,ian,iae,iaf,iab', &
-     .           /,10x,10i8)
+                 /,10x,10i8)
       endif
 !
 ! forward elimination of all elements  (lhs and rhs)
 ! ====================================
 !
       call frwcp (Awrk(ia1), Awrk(ial), Awrk(iam), Awrk(ian), &
-     .            Awrk(iae), Awrk(iaf), Awrk(iab))
+                  Awrk(iae), Awrk(iaf), Awrk(iab))
 !     --------------------------------------------------------
 !
       call zecond(tf)
@@ -210,7 +210,7 @@ C open L : The additional eliminated LHS buffer for unsymmetric w/ resol
 ! ====================================
 !
          call bckwrd (Awrk(ia1), Awrk(ial), Awrk(iam), Awrk(ian), &
-     .                Awrk(iae), Awrk(iaf), Awrk(iab), Awrk(iab))
+                      Awrk(iae), Awrk(iaf), Awrk(iab), Awrk(iab))
 !        --------------------------------------------------------
 !
          call zecond(tb)

@@ -45,7 +45,7 @@
       mj = (NFW*(NFW+1))/2
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !

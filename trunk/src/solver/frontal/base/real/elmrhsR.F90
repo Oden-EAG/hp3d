@@ -72,14 +72,14 @@
 !
          Bbuf(in) = s
 !        ----------
-!cwb >
+!wb >
 ! dont operate on zero elements
 ! -----------------------------
          if (dabs(s) .le. sml2) then
             iuu = iuu + idm*Inc
             go to 25
          endif
-!cwb <
+!wb <
 !
          ii1 = im + 1
          ii2 = im + idm
@@ -89,7 +89,7 @@
 ! and eliminate
 !     ---------
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
@@ -101,7 +101,7 @@
 !
    25    if (ISYM.eq.1 .or. ISYM.eq.4) iuu = iuu + 1
 !
-!cwb          if (idp .gt. NFW) go to 50
+!wb          if (idp .gt. NFW) go to 50
 !
 ! loop thru the dof below the elimination dof in the front
 !----------------------------------------------------------
@@ -112,13 +112,13 @@
             ii1 = im + idp
             ii2 = im + NFW
 !
-!cwb >
+!wb >
 ! dont operate on zero elements
 ! -----------------------------
             if (dabs(s) .le. sml2) then
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
@@ -129,9 +129,9 @@
 !
                iuu = iuu + (NFW - idp + 1)*Inc
             else
-!cwb <
+!wb <
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !

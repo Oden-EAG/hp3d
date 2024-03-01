@@ -66,11 +66,11 @@
 !
 ! set up pointers into Flhs
 !
-cwr10.07.99
-ccccc id = nint(CDABS(Aidx))
-ccccc id =  int(  ABS(Aidx))
+!wr10.07.99
+!!!!! id = nint(CDABS(Aidx))
+!!!!! id =  int(  ABS(Aidx))
       id = idnint(  ABS(Aidx))
-cwr07.12.00 - above back to original "nint"
+!wr07.12.00 - above back to original "nint"
 
       mp = (id*(id+1))/2
       idm = id - 1
@@ -93,16 +93,16 @@ cwr07.12.00 - above back to original "nint"
 !
 ! check for zero pivots
 !
-cwr10.07.99
-ccccc if (Cdabs(pivot) .le. CDABS(sml)) then
+!wr10.07.99
+!!!!! if (Cdabs(pivot) .le. CDABS(sml)) then
       if (  abs(pivot) .le.   ABS(sml)) then
          IERR=2
          return
       endif
 !
-cwr10.07.99
-ccccc if(CDABS(pivot) .lt. CDABS(zero)) NNEGP = NNEGP+1
-ccccc if(CDABS(pivot) .gt. CDABS(zero)) NPOSP = NPOSP+1
+!wr10.07.99
+!!!!! if(CDABS(pivot) .lt. CDABS(zero)) NNEGP = NNEGP+1
+!!!!! if(CDABS(pivot) .gt. CDABS(zero)) NPOSP = NPOSP+1
       if(  ABS(pivot) .lt.   ABS(zero)) NNEGP = NNEGP+1
       if(  ABS(pivot) .gt.   ABS(zero)) NPOSP = NPOSP+1
 !
@@ -125,20 +125,20 @@ ccccc if(CDABS(pivot) .gt. CDABS(zero)) NPOSP = NPOSP+1
 ! compute k(i,m)/k(m,m)
 !
          Ubuf(i) = s/pivot
-!cwb >
+!wb >
 ! dont operate on zero elements
 ! -----------------------------
-cwr10.07.99
-ccccc    if (Cdabs(s) .le. CDABS(sml2)) then
+!wr10.07.99
+!!!!!    if (Cdabs(s) .le. CDABS(sml2)) then
          if (  abs(s) .le.   ABS(sml2)) then
             m = m + 1
             k = k + i
             go to 20
           endif
-!cwb <
+!wb <
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
@@ -175,15 +175,15 @@ ccccc    if (Cdabs(s) .le. CDABS(sml2)) then
 ! compute k(m,i)/k(m,m)
 !
          Ubuf(i) = s/pivot
-!cwb >
+!wb >
 ! dont operate on zero elements, just shuffle entries forward
 ! ------------------------------------------------------------
-cwr10.07.99
-ccccc    if (Cdabs(s) .le. CDABS(sml2)) then
+!wr10.07.99
+!!!!!    if (Cdabs(s) .le. CDABS(sml2)) then
          if (  abs(s) .le.   ABS(sml2)) then
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
@@ -193,7 +193,7 @@ ccccc    if (Cdabs(s) .le. CDABS(sml2)) then
             nn = nn - 1
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
@@ -204,7 +204,7 @@ ccccc    if (Cdabs(s) .le. CDABS(sml2)) then
             k = k + 1
             go to 80
           endif
-!cwb <
+!wb <
 !
 ! eliminate
 ! ---------
@@ -224,7 +224,7 @@ ccccc    if (Cdabs(s) .le. CDABS(sml2)) then
 !  ie: k14' = k14 - [k13/k33]*k34
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
@@ -235,7 +235,7 @@ ccccc    if (Cdabs(s) .le. CDABS(sml2)) then
          nn = nn - 1
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !

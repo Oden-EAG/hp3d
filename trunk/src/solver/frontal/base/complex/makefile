@@ -18,7 +18,7 @@ SRC_FILE = bckwrd.F90 complt.F90 dest.F90 desvec.F90 elmrhs.F90 elmsol.F90 \
 	   zecond.F90 zeror.F90 zeros.F90 zerou.F90
 
 SRC      = $(addprefix $(SRC_PATH)/.$(SRC_FILE))
-OBJ      = $(addprefix $(OBJ_PATH)/,$(SRC_FILE:.F=.o))
+OBJ      = $(addprefix $(OBJ_PATH)/,$(SRC_FILE:.F90=.o))
 
 # Introduce ranlib flag to suppress warnings on Mac OS
 ARFLAG :=
@@ -39,7 +39,7 @@ $(OBJ_PATH)/.dummy :
 	@echo "Creating directory " $(OBJ_PATH)
 	@mkdir -p $(OBJ_PATH); touch $@;
 
-$(OBJ_PATH)/%.o : $(SRC_PATH)/%.F
+$(OBJ_PATH)/%.o : $(SRC_PATH)/%.F90
 	@echo "Compiling $<"
 	$(FC_WORK) -o $@ -c $<
 

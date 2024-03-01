@@ -118,22 +118,22 @@
 !
       ntape = lbuf(iunit)
 !
-!cwb        if (Unname.eq.'U') then
-!cwb          iunit = 1
-!cwb          ntape = lubufu
-!cwb       elseif (Unname.eq.'B') then
-!cwb          iunit = 2
-!cwb          ntape = lubufb
-!cwb       elseif (Unname.eq.'L') then
-!cwb          iunit = 3
-!cwb          ntape = lubufl
-!cwb !
-!cwb ! unknown file
-!cwb !
-!cwb        else
-!cwb          go to 9999
-!cwb        endif
-!cwb <
+!wb        if (Unname.eq.'U') then
+!wb          iunit = 1
+!wb          ntape = lubufu
+!wb       elseif (Unname.eq.'B') then
+!wb          iunit = 2
+!wb          ntape = lubufb
+!wb       elseif (Unname.eq.'L') then
+!wb          iunit = 3
+!wb          ntape = lubufl
+!wb !
+!wb ! unknown file
+!wb !
+!wb        else
+!wb          go to 9999
+!wb        endif
+!wb <
 !-----------------------------------------------------------------------
 ! check for OPEN command
 ! ==========****========
@@ -154,9 +154,9 @@
             nbuf(iunit) = 1
             lenf(iunit) = Len
          endif
-!cwb >
+!wb >
          irsave(iunit) = 0
-!cwb <
+!wb <
 ! open the file
 !
          close (ntape,err=5)
@@ -170,7 +170,7 @@
 !         call pause
 
          open (ntape,access='direct',form='unformatted', &
-     .                          recl=lenop,err=9000)
+                                recl=lenop,err=9000)
 !
       if(ntape.eq.19)then
         lenop19 = lenop
@@ -193,35 +193,35 @@
 
       elseif (Commnd.eq.'WRITE') then
 
-!     ...Store the number of buffer records written
-!     ...This is for resolution and setting the proper value of IFU,etc.
+!      ..Store the number of buffer records written
+!      ..This is for resolution and setting the proper value of IFU,etc.
 !        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          irsave(iunit) = max(irsave(iunit),Irec)
 
 
-!     ...calculate the first buffer to write
+!      ..calculate the first buffer to write
 !        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          irecp = 1 + (Irec-1)*nbuf(iunit)
          lenw = min0(lenf(iunit),Len)
 
 
-!     ...write the first buffer
+!      ..write the first buffer
 !        ~~~~~~~~~~~~~~~~~~~~~~
          slen = Len
 
 !---------------------------------------------------------------
 !         write(ntape,rec=irecp,err=9200,iostat=iostat) &
-!     .                            slen,(Sbuf(i),i=1,lenw)
+!                                  slen,(Sbuf(i),i=1,lenw)
 !---------------------------------------------------------------
          if(irecp.eq.1)then
            numfile = 1
            ntape0 = ntape
          endif
 
-!     ...close old file, open new file
+!      ..close old file, open new file
 !        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          if((irecp-1)/irecpmax*irecpmax.eq.(irecp-1) .and. irecp.ne.1) &
-     .     then
+           then
            numfile_old = (irecp-1)/irecpmax
            numfile = numfile_old+1
 
@@ -232,7 +232,7 @@
            ntape0 = ntape + (numfile-1) + 11*min(numfile-1,1)
 !           write(*,*)'1 ZDIRIO: new open, ntape0=',ntape0
            open (ntape0,access='direct',form='unformatted', &
-     .                          recl=lenop19,err=9000)
+                                recl=lenop19,err=9000)
 !           call pause
          endif
 
@@ -243,15 +243,15 @@
 !         write(*,*)'1 irecp,irecp0,lenw=',irecp,irecp0,lenw
 !         call pause
          write(ntape0,rec=irecp0,err=9200,iostat=iostat) &
-     .                            slen,(Sbuf(i),i=1,lenw)
+                                  slen,(Sbuf(i),i=1,lenw)
 !---------------------------------------------------------------
 
-!     ...normal return
+!      ..normal return
          if (Len .eq. lenw) go to 1111
 
 
 
-!     ...write out the rest of the records
+!      ..write out the rest of the records
          iend = lenw
 !
  10      continue
@@ -264,12 +264,12 @@
 
 !---------------------------------------------------------------
 !         write (ntape,rec=irecp,err=9200,iostat=iostat) &
-!     .                               (Sbuf(i),i=inow,iend)
+!                                     (Sbuf(i),i=inow,iend)
 !---------------------------------------------------------------
-!     ...close old file, open new file
+!      ..close old file, open new file
 !        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          if((irecp-1)/irecpmax*irecpmax.eq.(irecp-1) .and. irecp.ne.1) &
-     .     then
+           then
            numfile_old = (irecp-1)/irecpmax
            numfile = numfile_old+1
 
@@ -280,7 +280,7 @@
            ntape0 = ntape + (numfile-1) + 11*min(numfile-1,1)
 !           write(*,*)'2 ZDIRIO: new open, ntape0=',ntape0
            open (ntape0,access='direct',form='unformatted', &
-     .                          recl=lenop19,err=9000)
+                                recl=lenop19,err=9000)
 !           call pause
 
          endif
@@ -292,12 +292,12 @@
 !         write(*,*)'2 irecp,irecp0,lenw=',irecp,irecp0,lenw
 !         call pause
          write(ntape0,rec=irecp0,err=9200,iostat=iostat) &
-     .                               (Sbuf(i),i=inow,iend)
+                                     (Sbuf(i),i=inow,iend)
 !---------------------------------------------------------------
 
 
 
-!     ...normal return
+!      ..normal return
          if (Len .eq. iend) go to 1111
 
 
@@ -312,13 +312,13 @@
 !
       elseif (Commnd .eq. 'READ') then
 
-!     ...Pick up the number of buffer records from the previous solution
-!     ...This is for resolution and setting the proper value of IFU,etc.
+!      ..Pick up the number of buffer records from the previous solution
+!      ..This is for resolution and setting the proper value of IFU,etc.
 !        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          irecsv = irsave(iunit)
          if (Irec .lt. 0) Irec = irecsv
 
-!     ...calculate the first buffer to read
+!      ..calculate the first buffer to read
 !        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
          irecp = 1 + (Irec-1)*nbuf(iunit)
 
@@ -337,7 +337,7 @@
 !         call pause
 
 !-------------------------------------------------------------
-!     ...close old file, open new file
+!      ..close old file, open new file
 !        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -356,7 +356,7 @@
 
 !           write(*,*)'1 ZDIRIO: new open, ntape0=',ntape0
            open (ntape0,access='direct',form='unformatted', &
-     .                          recl=lenop19,err=9000)
+                                recl=lenop19,err=9000)
 !           call pause
 
          endif
@@ -366,13 +366,13 @@
 
 !---------------------------------------------------------------
 
-!     ...read the buffer length
+!      ..read the buffer length
          read (ntape0, rec=irecp0, err=9300) slen
          Len = slen
          lenr = min0(lenf(iunit),Len)
 
 
-!     ...read the first buffer
+!      ..read the first buffer
 !        ~~~~~~~~~~~~~~~~~~~~~
 !         write(*,*)'1 read, ntape0,irecp,irecp0=',ntape0,irecp,irecp0
 !         call pause
@@ -381,11 +381,11 @@
 
 
 
-!     ...normal exit
+!      ..normal exit
          if (Len .eq. lenr) go to 1111
 
 
-!     ...read in the rest of the records
+!      ..read in the rest of the records
          iend = lenr
 
 
@@ -402,7 +402,7 @@
 !!!!!    read (ntape, rec=irecp, err=9300) (Sbuf(i),i=inow,iend)
 !         read (ntape, rec=irecp, err=9300) (Sbuf0(i),i=inow,iend)
 !-----------------------------------------------------------------
-!     ...close old file, open new file
+!      ..close old file, open new file
 !        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
          numfile_new = (irecp-1)/irecpmax + 1
@@ -411,7 +411,7 @@
 !         write(*,*)'2 read, numfile,numfile_new=',numfile,numfile_new
 !         call pause
 
-cwr09.05.03
+!wr09.05.03
 !!!!!    if(numfile.ne.mumfile_new)then
          if(numfile.ne.numfile_new)then
 
@@ -425,7 +425,7 @@ cwr09.05.03
            ntape0 = ntape + (numfile-1) + 11*min(numfile-1,1)
 !           write(*,*)'2 ZDIRIO: new open, ntape0=',ntape0
            open (ntape0,access='direct',form='unformatted', &
-     .                          recl=lenop19,err=9000)
+                                recl=lenop19,err=9000)
 !           call pause
 
          endif
@@ -440,7 +440,7 @@ cwr09.05.03
 
 
 
-!     ...normal exit
+!      ..normal exit
          if (Len .eq. iend) go to 1111
 !
          go to 20
@@ -461,11 +461,11 @@ cwr09.05.03
 !         call pause
          close (ntape)
 !        -------------
-!cwb >
+!wb >
          irsave(iunit) = 0
          nbuf(iunit) = 0
          lenf(iunit) = 0
-!cwb <
+!wb <
          go to 1111
       endif
 !-----------------------------------------------------------------------
@@ -483,9 +483,9 @@ cwr09.05.03
 !
       if (IPFSZD .eq. 1) then
          write(NFSOUT,7701) Unname,Commnd,ntape,Irec, &
-     .                       Len,irecp,nbuf(iunit),lenf(iunit)
+                             Len,irecp,nbuf(iunit),lenf(iunit)
  7701     format(1x,'ZDIRIO: Unname,Commnd,ntape,Irec,', &
-     .           'Len,irecp,nbuf(iunit),lenf(iunit)',/,10x,a1,1x,a8,6i8)
+                 'Len,irecp,nbuf(iunit),lenf(iunit)',/,10x,a1,1x,a8,6i8)
       endif
       return
 !

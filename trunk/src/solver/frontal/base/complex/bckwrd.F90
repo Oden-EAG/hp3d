@@ -53,7 +53,7 @@
       integer :: md,n,ne,negiel,numdes
 !
 !  ...test......test......test......test......test......test......test...
-ccc      integer :: ndest1(100)
+!!!      integer :: ndest1(100)
 !  ...test......test......test......test......test......test......test...
 
 !
@@ -173,9 +173,9 @@ ccc      integer :: ndest1(100)
 !  Note: for resolution w/ unsymmetric we dont know IFU apriori
 !         and zdirio passes it back
 !
-!cwb >
+!wb >
                if (IDUMP.eq.1 .or. IRESOL.eq.1) then
-!cwb <
+!wb <
                  IFU = IFU - 1
 
                  if(IDUMPWR.eq.1)then
@@ -188,24 +188,24 @@ ccc      integer :: ndest1(100)
                      call zdirio    ('U', 'READ', IFU, ill, Ubuf, jerr)
                  endif
 
-!cwb >
+!wb >
 ! for unsymmetric during resolution we didnt know IFU apriori
 !  and it is sent back from zdirio
 !
                  if (ISYM.eq.3 .and. IRESOL.eq.1)  ifui = IFU
-!cwb <
+!wb <
                  IERR = 10*jerr
                  if (jerr .ne. 0) return
 !
                  iuu = ill + 1
-!cwb >
+!wb >
 ! if we didnt dump buffers, just set the read flags
 !
               else
                  IFU = IFU - 1
                  iuu = LENU + 1
               endif
-!cwb <
+!wb <
             endif
 !
 ! calculate the solution for this dof
@@ -264,7 +264,7 @@ ccc      integer :: ndest1(100)
 ! error out
 !
                   IERR = 10*jerr
-                  if (jerr .ne .0) return
+                  if (jerr .ne. 0) return
 !
                   IB = ill - NRHS + 1
                endif
@@ -298,17 +298,17 @@ ccc      integer :: ndest1(100)
 !           ---------------------------------------------
          else
 !
-!cwb >
+!wb >
 ! transfer x from the solution front to the
 !  local Element numbering based on the dest vecs
-!cwb* **note: 1) we may want to inline locr below for greater speed
+!wb* **note: 1) we may want to inline locr below for greater speed
 !            2) we also should switch the loop parameters below
 !
             k = 1
             do 180 j = 1, NRHS
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
@@ -322,20 +322,20 @@ ccc      integer :: ndest1(100)
 !
   180       continue
 !
-!cwb             do 180 i = 1,NDOFM
-!cwb                k = 0
-!cwb !
-!cwb !cvd$ select (vector)
-!cwb !
-!cwb                do 160 j = 1,NRHS
-!cwb                   md = int(Amdest(i))
-!cwb                   l = locr(j,md)
-!cwb                   Elem(k+i) = Frnt(l)
-!cwb                   k = k + NDOFM
-!cwb   160          continue
-!cwb !
-!cwb   180       continue
-!cwb <
+!wb             do 180 i = 1,NDOFM
+!wb                k = 0
+!wb !
+!wb !vd$ select (vector)
+!wb !
+!wb                do 160 j = 1,NRHS
+!wb                   md = int(Amdest(i))
+!wb                   l = locr(j,md)
+!wb                   Elem(k+i) = Frnt(l)
+!wb                   k = k + NDOFM
+!wb   160          continue
+!wb !
+!wb   180       continue
+!wb <
 !
 #if HP3D_DEBUG
             if (iprint.eq.1) then

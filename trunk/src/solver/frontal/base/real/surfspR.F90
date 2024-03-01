@@ -88,8 +88,8 @@
       if (maxia .gt. MA) then
          write(NFSOUT,7010) maxia,MA
  7010     format(2(/),'ERROR IN SURFSP: NOT ENOUGH ROOM IN ARRAY IA',/, &
-     .         5x,'STORAGE REQUIRED ',i7,/, &
-     .         5x,'STORAGE AVAILABLE ',i7)
+               5x,'STORAGE REQUIRED ',i7,/, &
+               5x,'STORAGE AVAILABLE ',i7)
          IERR = 1
          return
       endif
@@ -111,7 +111,7 @@
 !
       Mr = IASSEM*MDOF + MFW + 1
       Ms = NUMELM + MLDEST + 2*MDOF + IASSEM*MDOF*(MDOF+1)/2 &
-     .            + mfw*(MFW+1)/2 + MFW
+                  + mfw*(MFW+1)/2 + MFW
       Mu = NUMELM + MLDEST + 2*MDOF + IASSEM*MDOF*MDOF + MFW*MFW + MFW
 !
 ! pick up the final time
@@ -133,13 +133,13 @@
       endif
 !
  7020 format(2(/), 5x,'COMPLETED PREFRONT ',// &
-     .            10x,'MAXIMUM FRONT WIDTH =  ',i5,/ &
-     .            10x,'MAXIMUM ELEMENT DOF =  ',i5,/ &
-     .            10x,'MAXIMUM ELEMENT DESTINATION VECTORS =  ',i2)
+                  10x,'MAXIMUM FRONT WIDTH =  ',i5,/ &
+                  10x,'MAXIMUM ELEMENT DOF =  ',i5,/ &
+                  10x,'MAXIMUM ELEMENT DESTINATION VECTORS =  ',i2)
  7030 format(10x,'SYMMETRIC PROBLEM MIN. STORAGE =  ',i6,' + ', &
-     .            i4,'*NRHS '   )
+                  i4,'*NRHS '   )
  7040 format(10x,'UNSYMMETRIC PROBLEM MIN. STORAGE =  ',i6, &
-     .            ' + ',i4,'*NRHS'   )
+                  ' + ',i4,'*NRHS'   )
  7050 format(10x,'TIME IN PREFRONT =   ',f6.3,/)
 !
 #endif

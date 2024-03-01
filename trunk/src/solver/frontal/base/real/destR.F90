@@ -69,7 +69,7 @@
 ! set the nodal dest vec to an integer
 ! note: destination vecs are packed as:
 !
-cld,aug,1991 wrong!!!  desvec = (destflag + NICMUL*ndof + 100*frontdest)
+!ld,aug,1991 wrong!!!  desvec = (destflag + NICMUL*ndof + 100*frontdest)
 !  desvec = (destflag + 10*ndof + NICMUL*10*frontdest)
 !
          ldest = int(Aldest(i))
@@ -83,10 +83,10 @@ cld,aug,1991 wrong!!!  desvec = (destflag + NICMUL*ndof + 100*frontdest)
          m = modr(ldest,10)
 !
 ! pull the number of dof associatted with this node
-!cwb >
-!cwb          n = modr(ldest,100)/10
+!wb >
+!wb          n = modr(ldest,100)/10
          n = modr(ldest,10*NICMUL)/10
-!cwb <
+!wb <
 ! increment the local total of dof for this elem
 !
          NDOFM = NDOFM + n
@@ -96,10 +96,10 @@ cld,aug,1991 wrong!!!  desvec = (destflag + NICMUL*ndof + 100*frontdest)
          if (m .ge. 2) ne = ne + n
 !
 ! pull the destination in the front (and set to a zero pointer)
-!cwb >
-!cwb          l = ldest/100 - 1
+!wb >
+!wb          l = ldest/100 - 1
          l = ldest/(10*NICMUL) - 1
-!cwb <
+!wb <
 ! loop over dof
 !
          do 10 j = 1,n
@@ -127,10 +127,10 @@ cld,aug,1991 wrong!!!  desvec = (destflag + NICMUL*ndof + 100*frontdest)
    10    continue
 !
 ! set the current frontwidth number
-!cwb >
+!wb >
          l = abs(nint(Amdest(km-1)))
-!cwb           l = abs(idnint(Amdest(km-1)))
-!cwb <
+!wb           l = abs(idnint(Amdest(km-1)))
+!wb <
          if (l .gt. NFW) NFW = l
 !
    50 continue
@@ -152,7 +152,7 @@ cld,aug,1991 wrong!!!  desvec = (destflag + NICMUL*ndof + 100*frontdest)
          j = i + 1
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
@@ -177,16 +177,16 @@ cld,aug,1991 wrong!!!  desvec = (destflag + NICMUL*ndof + 100*frontdest)
 ! debug print
 !
       if(IPRDES .ne. 1) return
-!cwb >
-!cwb       write(NFSOUT,7000) (idnint(Aldest(i)),i=1,nd)
-!cwb       write(NFSOUT,7010) (idnint(Amdest(i)),i=1,NDOFM)
-!cwb       if (ne .ne. 0) write(NFSOUT,7020) (idnint(Andest(i)),i=1,ne)
+!wb >
+!wb       write(NFSOUT,7000) (idnint(Aldest(i)),i=1,nd)
+!wb       write(NFSOUT,7010) (idnint(Amdest(i)),i=1,NDOFM)
+!wb       if (ne .ne. 0) write(NFSOUT,7020) (idnint(Andest(i)),i=1,ne)
       write(NFSOUT,7000) (nint(Aldest(i)),i=1,nd)
       write(NFSOUT,7010) (nint(Amdest(i)),i=1,NDOFM)
       if (ne .ne. 0) write(NFSOUT,7020) (nint(Andest(i)),i=1,ne)
-!cwb <
+!wb <
 7000    format(/,1x,'IN DEST: NODAL DESTINATION VECTORS',10i7, &
-     .        10(/,34x,10i7))
+              10(/,34x,10i7))
 7010    format(11x,'DOF DESTINATION VECTORS',10i7,10(/,35x,10i7))
 7020    format(9x,'ELIM. DESTINATION VECTORS',10i7,10(/,35x,10i7))
 !

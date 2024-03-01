@@ -47,8 +47,8 @@
          IERR=3
          write(NFSOUT,7020)
  7020    format(2(/),5x, &
-     .     'ERROR IN SURFS: ATTEMPTED RESOLUTION WITH', &
-     .     ' RESOLUTION INACTIVATED (IE: ISYM=2 OR 1)')
+           'ERROR IN SURFS: ATTEMPTED RESOLUTION WITH', &
+           ' RESOLUTION INACTIVATED (IE: ISYM=2 OR 1)')
          return
       endif
 !
@@ -56,7 +56,7 @@
          IERR=4
          write (NFSOUT,7040)
  7040    format(2(/), 5x, &
-     .     'ERROR IN SURFS: ATTEMPTED RESOLUTION WITH 0 RHS')
+           'ERROR IN SURFS: ATTEMPTED RESOLUTION WITH 0 RHS')
          return
       endif
 !
@@ -66,7 +66,7 @@
       n = NUMELM + MLDEST + 2*MDOF
 !
 !
-!cwb >
+!wb >
 !  Pull up the old values of MBUF & MW to check against for resolution
 ! *** Note: we cannot let the size of MBUF shrink during resolution
 !            because then the stuff that was buffered out will not fit b
@@ -86,12 +86,12 @@
          IERR=6
          write(NFSOUT,7027)
  7027    format(2(/),5x, &
-     .     'ERROR IN SURFS: ATTEMPTED RESOLUTION WITH', &
-     .     ' LESS WORKSPACE THAN WAS PREVIOUSLY ALLOCATED')
+           'ERROR IN SURFS: ATTEMPTED RESOLUTION WITH', &
+           ' LESS WORKSPACE THAN WAS PREVIOUSLY ALLOCATED')
          return
       endif
 !
-!cwb <
+!wb <
 !
 !
 ! set up storage cut lengths
@@ -130,11 +130,11 @@
  7060    format(2(/), 5x,'SYMMETRIC RESOLUTION WITH',i3,' RHS',/)
  7080    format(2(/), 5x,'UNSYMMETRIC RESOLUTION WITH',i3,' RHS',/)
  7100    format(     4x,'          OVER HEAD:',i7,/, &
-     .               4x,'            ELEMENT:',i7,/, &
-     .               4x,'              FRONT:',i7,/, &
-     .               4x,'         RHS BUFFER:',i7,/, &
-     .               4x,'         LHS BUFFER:',i7,/, &
-     .               4x,'      TOTAL STORAGE:',i7)
+                     4x,'            ELEMENT:',i7,/, &
+                     4x,'              FRONT:',i7,/, &
+                     4x,'         RHS BUFFER:',i7,/, &
+                     4x,'         LHS BUFFER:',i7,/, &
+                     4x,'      TOTAL STORAGE:',i7)
       endif
 !
 ! not enuf space to buffer even 1 equation
@@ -144,7 +144,7 @@
          minn = max0(0,MB)
          write (NFSOUT,7120) minn
  7120    format(2(/),5x,'ERROR: TOO MANY RHS', &
-     .             /,12x,'MAXIMUM NUMBER OF RHS =',i2)
+                   /,12x,'MAXIMUM NUMBER OF RHS =',i2)
          go to 9100
       endif
 !
@@ -191,7 +191,7 @@
 ! ====================================
 !
       call frwrs (Awrk(ia1), Awrk(ial), Awrk(iam), Awrk(ian), &
-     .            Awrk(iae), Awrk(iaf), Awrk(iabr),Awrk(iabf))
+                  Awrk(iae), Awrk(iaf), Awrk(iabr),Awrk(iabf))
 !     ---------------------------------------------
 !
       call zecond(tf)
@@ -204,13 +204,13 @@
  7160     format(10x,'RHS BUFFER DUMPS:',i4)
       endif
 !
-      if (IERR .ne .0) go to 9100
+      if (IERR .ne. 0) go to 9100
 !
 ! backward substitution of all elements
 ! ====================================
 !
       call bckwrd ( Awrk(ia1), Awrk(ial), Awrk(iam), Awrk(ian), &
-     .              Awrk(iae) ,Awrk(iaf), Awrk(iabr),Awrk(iabf))
+                    Awrk(iae) ,Awrk(iaf), Awrk(iabr),Awrk(iabf))
 !      ----------------------------------------------
 !
       call zecond(tb)

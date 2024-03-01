@@ -31,13 +31,13 @@
       integer :: machk,minn,n
 !
       call zecond(t0)
-!cwb >
+!wb >
       NNEGP = -1
       NPOSP = -1
 !
       IFU = -1
       IFL = -1
-!cwb <
+!wb <
       IERR = 0
       IFB = 0
 !
@@ -66,7 +66,7 @@
       n = NUMELM + MLDEST + 2*MDOF
 !
 !
-!cwb >
+!wb >
 !  Pull up the old values of MBUF & MW to check against for resolution
 ! *** Note: we cannot let the size of MBUF shrink during resolution
 !            because then the stuff that was buffered out will not fit b
@@ -94,7 +94,7 @@
          return
       endif
 !
-!cwb <
+!wb <
 !
 !
 ! set up storage cut lengths
@@ -219,7 +219,7 @@
  7160     format(10x,'RHS BUFFER DUMPS:',i4)
       endif
 !
-      if (IERR .ne .0) go to 9100
+      if (IERR .ne. 0) go to 9100
 !
 
 

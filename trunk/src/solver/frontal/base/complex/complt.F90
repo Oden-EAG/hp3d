@@ -91,7 +91,7 @@
         write(NFSOUT,*) 'COMPLT:TOO LITTLE BUFFER !! MBUF = ',MBUF
         stop 'complt 1'
       endif
-!cwb >
+!wb >
 ! save the value of MBUF & MW to check against during resolution
 ! *** Note: we cannot let the size of MBUF shrink during resolution
 !            because then the stuff that was buffered out will not fit b
@@ -104,7 +104,7 @@
          MBUFSV(2,2) = MW
       endif
 
-!cwb <
+!wb <
 !
 ! open direct access buffer files
 ! ===============================
@@ -119,9 +119,9 @@
       endif
 
 !
-C open L : The additional eliminated LHS buffer for unsymmetric w/ resol
+! open L : The additional eliminated LHS buffer for unsymmetric w/ resol
 !
-      if (ISYM .eq .3) call zdirio ('L', 'OPEN', 0, MBUF, Awrk, IERR)
+      if (ISYM .eq. 3) call zdirio ('L', 'OPEN', 0, MBUF, Awrk, IERR)
 !                     -------------------------------------------
       IERR = 10*IERR
       if (IERR .ne. 0) go to 9100

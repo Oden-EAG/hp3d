@@ -42,7 +42,7 @@
       integer :: m,md,mke,n,ne,negiel,newl,newu,numdes
 !
 !  ...test......test......test......test......test......test......test...
-ccc      integer :: ndest1(100)
+!!!      integer :: ndest1(100)
 !  ...test......test......test......test......test......test......test...
 !
 #if HP3D_DEBUG
@@ -180,25 +180,25 @@ ccc      integer :: ndest1(100)
 ! ---------------------------------------------
 
          if (IASSEM .ne. 0) then
-!cwb >
+!wb >
 ! to save having to do abs() repeatedly, do it now
 !  **note: sub.dest is recalled in sub.bckwrd so this wont screw it up
 !          BUT the negative amdest info is now lost herein
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
 
 
             do 133 id = 1,NDOFM
-cwr10.07.99
-ccccc          Amdest(id) = Cdabs(Amdest(id))
+!wr10.07.99
+!!!!!          Amdest(id) = Cdabs(Amdest(id))
                Amdest(id) =   abs(Amdest(id))
   133       continue
 
-!cwb <
+!wb <
 !
 ! symmetric
 !
@@ -213,9 +213,9 @@ ccccc          Amdest(id) = Cdabs(Amdest(id))
                call unsasm (Amdest, Elem, Frnt)
 !              --------------------------------
             endif
-!cwb >
+!wb >
             if (IERR .ne. 0) return
-!cwb <
+!wb <
 !
             if(NRHS .ne. 0) call semrhs (Amdest, Elem(mke+1), &
                                                  Frnt(MKF+1))
@@ -259,10 +259,10 @@ ccccc          Amdest(id) = Cdabs(Amdest(id))
 !
 !
             newu = IU + NFW + NRHS - 1
-!cwb >
-!cwb             newl = IL + 1 - NFW * ISYM/3
+!wb >
+!wb             newl = IL + 1 - NFW * ISYM/3
             newl = IL + 1 - NFW * iunsr
-!cwb <
+!wb <
 
 
 
@@ -410,7 +410,7 @@ ccccc          Amdest(id) = Cdabs(Amdest(id))
                n = max0(n,1)
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
@@ -455,7 +455,7 @@ ccccc          Amdest(id) = Cdabs(Amdest(id))
             do 170 i = 2,NFW
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
@@ -483,10 +483,10 @@ ccccc          Amdest(id) = Cdabs(Amdest(id))
 !---------------------------------------------------------------
 !
       IFU = IFU + 1
-!cwb >
-!cwb       call zdirio ( 'u', 'write', IFU, iu-1, Buf, jerr)
-!cwb !     --------------------------------------------------
-!cwb
+!wb >
+!wb       call zdirio ( 'u', 'write', IFU, iu-1, Buf, jerr)
+!wb !     --------------------------------------------------
+!wb
       jerr = 0
 !
 ! if we are not going to do a resolution (ISYM=3 OR 4)
@@ -523,7 +523,7 @@ ccccc          Amdest(id) = Cdabs(Amdest(id))
       else
          LENU = IU - 1
       endif
-!cwb <
+!wb <
       IERR = 10*jerr
       if(jerr .ne. 0) return
 !

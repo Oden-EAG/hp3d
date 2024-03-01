@@ -41,7 +41,7 @@
       if (NDOFM .gt. 324) then
          write(NFSOUT,7771)
 7771      format(1x,'THE TEMP ARRAY: ntemp MUST ', &
-     .           'BE INCREASED IN UNSASM')
+                 'BE INCREASED IN UNSASM')
          IERR = 1
          return
       endif
@@ -53,11 +53,11 @@
 ! pull the dof destination vector (for this row)
 !
          mdi = int(Amdest(i))
-!cwb >
+!wb >
 ! ALLIANT directives
-!cvd$ select (vector)
-!cvd$ nodepchk
-!cvd$ nosync
+!vd$ select (vector)
+!vd$ nodepchk
+!vd$ nosync
 ! ARDENT directives
 !$doit VBEST
 !$doit IVDEP
@@ -70,11 +70,11 @@
   45     continue
 !
 ! ALLIANT directives
-!cvd$ nodepchk
-!cvd$ nosync
+!vd$ nodepchk
+!vd$ nosync
 ! ARDENT directives
 !$doit IVDEP
-!cwb <
+!wb <
 !
 ! loop thru the dof in the element
 !
@@ -84,25 +84,25 @@
 !
             mdj = int(Amdest(j))
 !
-!cwb >
+!wb >
 ! determine the position in the front (function loclu)
-!cwb   (**note: we may wish to inline this code)
+!wb   (**note: we may wish to inline this code)
 !
-!cwb             ml = loclu(mdi,mdj)
+!wb             ml = loclu(mdi,mdj)
             ml = mdj + (mdi-1)*NFW
-!cwb <
+!wb <
 !
 ! assemble into the front
-!cwb >
-!cwb             Flhs(ml) = Flhs(ml) + Ellhs(n)
-!cwb             n = n + 1
+!wb >
+!wb             Flhs(ml) = Flhs(ml) + Ellhs(n)
+!wb             n = n + 1
             Flhs(ml) = Flhs(ml) + Ellhs(ntemp(j))
-!cwb <
+!wb <
 !
    50   continue
-!cwb >
+!wb >
         n = n + NDOFM
-!cwb <
+!wb <
 !
 100   continue
 !

@@ -42,26 +42,26 @@
       integer :: irout4,irout5,is,j,jerr,md,n,ne,negiel,numdes
 !
       IB = 1
-!cwb >
+!wb >
 ! In order to allow resolution non-sequentially we need to allow IFU to
 !  counted herein, not picked up off the common block
 !
-!cwb       ifui = IFU
-!cwb       ifli = IFL
-!cwb       IFU = 0
+!wb       ifui = IFU
+!wb       ifli = IFL
+!wb       IFU = 0
       if (isym .eq. 4) IFU = 0
-!cwb <
+!wb <
 !
       IFL = 0
       IFB = 0
 !
       NFW = 0
       LFW = 0
-!cwb >
+!wb >
       IDUMP = 1
       LENU = 0
       NRHSF = NRHS
-!cwb <
+!wb <
 !
 ! for symmetric case: we move forward thru the Ubuf buffer to pick up [k
 ! for unsymmetric case: we move backward thru the Lbuf buffer to pick up
@@ -137,28 +137,28 @@
 ! assemble the Element rhs & lhs into the front
 ! ---------------------------------------------
          if (IASSEM .ne. 0) then
-!cwb >
+!wb >
 ! to save having to do abs() repeatedly, do it now
 !  **note: sub.dest is recalled in sub.bckwrd so this wont screw it up
 !          BUT the negative amdest info is now lost herein
 !
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
 
 
             do 133 id = 1,NDOFM
-cwr10.07.99
-ccccc          Amdest(id) = Cdabs(Amdest(id))
+!wr10.07.99
+!!!!!          Amdest(id) = Cdabs(Amdest(id))
                Amdest(id) =   abs(Amdest(id))
   133       continue
 
 
 
-!cwb <
+!wb <
 !
             call semrhs (Amdest, Elem, Frnt)
 !           -----------------------------
@@ -339,10 +339,10 @@ ccccc          Amdest(id) = Cdabs(Amdest(id))
       IERR = 10*jerr
 !
       IB = 1
-!cwb >
-!cwb       IFU = ifui
-!cwb       IFL = ifli
-!cwb
+!wb >
+!wb       IFU = ifui
+!wb       IFL = ifli
+!wb
 !
 ! debug print
 !

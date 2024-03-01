@@ -130,7 +130,7 @@
             inic = Ia(ip)
 !
 ! unpack the number of dof associated w/ this nickname
-!cwb >
+!wb >
 #if HP3D_DEBUG
             if (iprint.eq.1) then
               write(*,*) 'desvec: inic,NICMUL = ',inic,NICMUL
@@ -142,8 +142,8 @@
               write(*,*) 'desvec: NDOFM = ',NDOFM
             endif
 #endif
-!cwb             NDOFM = modr(inic,10)
-!cwb <
+!wb             NDOFM = modr(inic,10)
+!wb <
             nt = nt + NDOFM
 !
 ! set the front destination
@@ -167,10 +167,10 @@
             endif
 !
 ! pack the destination vector (preliminary; destflag is not set)
-!cwb >
+!wb >
             Ibb(ip) = jdes*10*NICMUL + NDOFM*10
-!cwb             Ibb(ip) = jdes*100 + NDOFM*10
-!cwb <
+!wb             Ibb(ip) = jdes*100 + NDOFM*10
+!wb <
             jp = ip + 1
             if (jp .le. nfn) then
 !
@@ -289,9 +289,9 @@
          call preout (iel, n, Ia(ips+1), Ibb(ips+1))
 !        --------------------------------------------
 
-czka000811         write(30,*)iel,'  =IEL'
-czka000811         write(30,*)n
-czka000811         write(30,*)(Ibb(ii),ii=ips+1,ips+n)
+!zka000811         write(30,*)iel,'  =IEL'
+!zka000811         write(30,*)n
+!zka000811         write(30,*)(Ibb(ii),ii=ips+1,ips+n)
  1000    format(1x,10i12)
 
 ! debug print

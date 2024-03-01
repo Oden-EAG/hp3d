@@ -112,10 +112,10 @@
             inic = Ia(ip)
 !
 ! unpack the number of dof associated w/ this nickname
-!cwb >
+!wb >
             NDOFM = modr(inic,NICMUL)
-!cwb             NDOFM = modr(inic,10)
-!cwb <
+!wb             NDOFM = modr(inic,10)
+!wb <
             nt = nt + NDOFM
 !
 ! set the front destination
@@ -139,10 +139,10 @@
             endif
 !
 ! pack the destination vector (preliminary; destflag is not set)
-!cwb >
+!wb >
             Ibb(ip) = jdes*10*NICMUL + NDOFM*10
-!cwb             Ibb(ip) = jdes*100 + NDOFM*10
-!cwb <
+!wb             Ibb(ip) = jdes*100 + NDOFM*10
+!wb <
             jp = ip + 1
             if (jp .le. nfn) then
 !
@@ -265,7 +265,7 @@
          if (IPRDES .eq. 1) then
             write(NFSOUT,7701) iel,n,(Ibb(ips+i),i=1,n)
  7701        format(1x,'DESVEC: iel,nnod',2i8,'  (Ibb(ips+i),i=1,n)', &
-     .              (/,10x,10i8))
+                    (/,10x,10i8))
          endif
 !
   100 continue

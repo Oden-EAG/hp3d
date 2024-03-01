@@ -113,7 +113,7 @@
 ! compute k(i,m)/k(m,m)
 !
          Ubuf(i) = s/pivot
-!cwb >
+!wb >
 ! dont operate on zero elements
 ! -----------------------------
          if (dabs(s) .le. sml2) then
@@ -121,10 +121,10 @@
             k = k + i
             go to 20
           endif
-!cwb <
+!wb <
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
@@ -161,13 +161,13 @@
 ! compute k(m,i)/k(m,m)
 !
          Ubuf(i) = s/pivot
-!cwb >
+!wb >
 ! dont operate on zero elements, just shuffle entries forward
 ! ------------------------------------------------------------
          if (dabs(s) .le. sml2) then
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
@@ -177,7 +177,7 @@
             nn = nn - 1
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
@@ -188,7 +188,7 @@
             k = k + 1
             go to 80
           endif
-!cwb <
+!wb <
 !
 ! eliminate
 ! ---------
@@ -208,7 +208,7 @@
 !  ie: k14' = k14 - [k13/k33]*k34
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
@@ -219,7 +219,7 @@
          nn = nn - 1
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !

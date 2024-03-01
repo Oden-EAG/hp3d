@@ -37,7 +37,7 @@
 !     ---------------
 !
 ! ALLIANT directives
-!cvd$ select (vector)
+!vd$ select (vector)
 ! ARDENT directives
 !$doit VBEST
 !
@@ -49,13 +49,13 @@
 !
             md = int(Amdest(i))
 !
-!cwb >
+!wb >
 ! determine the position in the front (function locr)
-!cwb   (**note: we may wish to inline this code)
+!wb   (**note: we may wish to inline this code)
 !
-!cwb             j = locr(in,md)
+!wb             j = locr(in,md)
             j = (in-1)*MFW + md
-!cwb <
+!wb <
 !
             Frhs(j) = Frhs(j) + Elrhs(n)
             n = n + 1

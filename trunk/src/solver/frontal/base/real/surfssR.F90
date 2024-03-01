@@ -30,9 +30,9 @@
 !
       if (IPFSS1 .eq. 1) then
          write(NFSOUT,7701) ISYM,NUMELM,IRESOL,NRHS,MA,IWRT, &
-     .                      IASSEM,NFSOUT,NICMUL
+                            IASSEM,NFSOUT,NICMUL
 7701     format(1x,'SURFSS: ISYM,NUMELM,IRESOL,NRHS,MA,IWRT,', &
-     .                     'IASSEM,NFSOUT,NICMUL',/,10x,9i8)
+                           'IASSEM,NFSOUT,NICMUL',/,10x,9i8)
       endif
 !
 ! for no resolution, solve the system of equations
