@@ -1,274 +1,274 @@
-c***===***===***===***===***===***===***===***===***===***===***===***==
-c FUNCTION:
-c calculation of nodal destination vectors from nicknames
-c------------------------------------------------------------------
-c
-c note: destination vecs are packed as:
-c
-c        desvec = (destflag + 10*ndof + NICMUL*10*frontdest)
-c
-c where : destflag  = 0 : first occurance of this node
-c                   = 1 : intermediate occurance of this node
-c                   = 2 : final and only occurance of this node
-c                   = 3 : final occurance of this node
-c
-c         ndof      = number of dof associated w/ this nickname
-c
-c         frontdest = destination into the current front
-c
-c
-c**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
-c ARGUMENTS:  (I : input, O : output, IO : input & output, W : workspace
-c
-c Typ Name      Function
-c I   In    array (length NUMELM) containing the number of nodes+multipli
-c             essentially the number of nicknames/element
-c             **note: this must be pre-built by the calling program
-c
-c I   Ia    array that contains element nick names
-c             nicknames are packed as:
-c
-c            nick = (ndof + NICMUL*nodenum)
-c
-c            where :   ndof    = number of dof associated w/ this nickna
-c                      nodenum = node number or some other unique identi
-c                                 reflecting the connectivity or relatio
-c                                 to the system of equations
-c
-c           **note: this must be pre-built by the calling program
-c
-c W   Ibb    array for destination vectors
-c I   Ntot   total number of degrees of freedom
-c
-c W   Ic     temporary workspace for calculating the front elimination
-c..........................................................
-c*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-c LATEST REVISION: Mar 2023
-c++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
-c NAMING CONVENTIONS:
-c     AAAAAAAA    Variables in COMMON & PARAMETERS
-c     Aaaaaaaa    Variables as ARGUMENTS
-c     aaaaaaaa    LOCAL Variables
-c         7xxx    FORMAT Statements
-c         9xxx    ERROR Handling
-c+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
-c
+!***===***===***===***===***===***===***===***===***===***===***===***==
+! FUNCTION:
+! calculation of nodal destination vectors from nicknames
+!------------------------------------------------------------------
+!
+! note: destination vecs are packed as:
+!
+!        desvec = (destflag + 10*ndof + NICMUL*10*frontdest)
+!
+! where : destflag  = 0 : first occurance of this node
+!                   = 1 : intermediate occurance of this node
+!                   = 2 : final and only occurance of this node
+!                   = 3 : final occurance of this node
+!
+!         ndof      = number of dof associated w/ this nickname
+!
+!         frontdest = destination into the current front
+!
+!
+!**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**==**=
+! ARGUMENTS:  (I : input, O : output, IO : input & output, W : workspace
+!
+! Typ Name      Function
+! I   In    array (length NUMELM) containing the number of nodes+multipli
+!             essentially the number of nicknames/element
+!             **note: this must be pre-built by the calling program
+!
+! I   Ia    array that contains element nick names
+!             nicknames are packed as:
+!
+!            nick = (ndof + NICMUL*nodenum)
+!
+!            where :   ndof    = number of dof associated w/ this nickna
+!                      nodenum = node number or some other unique identi
+!                                 reflecting the connectivity or relatio
+!                                 to the system of equations
+!
+!           **note: this must be pre-built by the calling program
+!
+! W   Ibb    array for destination vectors
+! I   Ntot   total number of degrees of freedom
+!
+! W   Ic     temporary workspace for calculating the front elimination
+!..........................................................
+!*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+! LATEST REVISION: Mar 2023
+!++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++==++=
+! NAMING CONVENTIONS:
+!     AAAAAAAA    Variables in COMMON & PARAMETERS
+!     Aaaaaaaa    Variables as ARGUMENTS
+!     aaaaaaaa    LOCAL Variables
+!         7xxx    FORMAT Statements
+!         9xxx    ERROR Handling
+!+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+!
       subroutine desvec (In, Ia, Ibb, Ic, Ntot)
-c
+!
       use surfsc1
       use surfsc2
-c
+!
       implicit none
-c
+!
       integer :: In(*), Ia(*), Ibb(*), Ic(*)
       integer :: Ntot
-c
+!
       integer :: i,id,ides,iel,ifrst,inic,ip,ipc,ips
       integer :: jd,jdes,jdn,jjd,jp,n,ne,nt,ntt
-c
-c initialize
-c
+!
+! initialize
+!
       MDOF = 0
       MFW = 0
       ides = 1
       ip = 0
       jdn = 0
       Ntot=0
-c
-c initialize the destination vector storage
-c
+!
+! initialize the destination vector storage
+!
       do 10 i = 1,NFN
          Ibb(i) = 0
    10 continue
-c
-c loop thru the elements
-c
+!
+! loop thru the elements
+!
       do 100 iel = 1,NUMELM
-c     **********************
-c
-c if the element contaions no nodes or multipliers, then skip it
-c
+!     **********************
+!
+! if the element contaions no nodes or multipliers, then skip it
+!
          n = In(iel)
          if (n .eq. 0) go to 100
-c
-c initialize
-c
+!
+! initialize
+!
          nt = 0
          ips = ip
          ipc = 1
          ne = 0
          ntt = 0
-c
-c loop thru the nicknames
-c
+!
+! loop thru the nicknames
+!
          do 60 id = 1,n
-c        ***************
-c
+!        ***************
+!
             ifrst = 0
-c
-c pull up the nickname
-c
+!
+! pull up the nickname
+!
             ip = ip + 1
             inic = Ia(ip)
-c
-c unpack the number of dof associated w/ this nickname
-cwb >
+!
+! unpack the number of dof associated w/ this nickname
+!cwb >
             NDOFM = modr(inic,NICMUL)
-cwb             NDOFM = modr(inic,10)
-cwb <
+!cwb             NDOFM = modr(inic,10)
+!cwb <
             nt = nt + NDOFM
-c
-c set the front destination
-c---------------------------
-c if there is a destvec already associated with this nickname
-c   then the front dest is what it was previously
-c
+!
+! set the front destination
+!---------------------------
+! if there is a destvec already associated with this nickname
+!   then the front dest is what it was previously
+!
             if (Ibb(ip) .gt. 0) then
                jdes = Ibb(ip)
                ifrst = 1
-c
-c if there is not a destvec associated with this nickname
-c  then pick up the next location in the front
-c  also if this is greater than the current max frontwidth
-c  then update the current max frontwidth
-c
+!
+! if there is not a destvec associated with this nickname
+!  then pick up the next location in the front
+!  also if this is greater than the current max frontwidth
+!  then update the current max frontwidth
+!
             else
                jdes = ides
                ides = ides + NDOFM
                if(ides-1 .gt. mfw) mfw = ides-1
             endif
-c
-c pack the destination vector (preliminary; destflag is not set)
-cwb >
+!
+! pack the destination vector (preliminary; destflag is not set)
+!cwb >
             Ibb(ip) = jdes*10*NICMUL + NDOFM*10
-cwb             Ibb(ip) = jdes*100 + NDOFM*10
-cwb <
+!cwb             Ibb(ip) = jdes*100 + NDOFM*10
+!cwb <
             jp = ip + 1
             if (jp .le. nfn) then
-c
-c loop thru all the remaining nicknames and search for the next matching
-c ----------------------------------------------------------------------
+!
+! loop thru all the remaining nicknames and search for the next matching
+! ----------------------------------------------------------------------
                do 40 jjd = jp,nfn
-c              ******************
+!              ******************
                   jd = jjd
-c
-c check for a matching nickname
-c
+!
+! check for a matching nickname
+!
                   if (inic .eq. Ia(jd)) then
-c
-c a match was found,
-c   so set the next occurance to the current destination
-c
+!
+! a match was found,
+!   so set the next occurance to the current destination
+!
                      Ibb(jd) = jdes
-c
-c set the destflag for this dest vec
-c  (either the first or intermediate occurance)    (ie: ifrst=0 or 1)
-c
+!
+! set the destflag for this dest vec
+!  (either the first or intermediate occurance)    (ie: ifrst=0 or 1)
+!
                      Ibb(ip) = Ibb(ip) + ifrst
                      if(jd .gt. jdn) jdn = jd
-c
-c skip to the next nickname
-c
+!
+! skip to the next nickname
+!
                      go to 60
                   endif
-c
+!
    40          continue
-c  ********************
+!  ********************
             endif
-c
-c no matching nickname was found, so this one is to exit the front
-c-----------------------------------------------------------------
-c  set the final occurance flag in destvec
-c  (ifrst=0 or 1) so we are setting destflag=2 or 3
-c
+!
+! no matching nickname was found, so this one is to exit the front
+!-----------------------------------------------------------------
+!  set the final occurance flag in destvec
+!  (ifrst=0 or 1) so we are setting destflag=2 or 3
+!
             Ibb(ip) = Ibb(ip) + 2 + ifrst
-c
-c stick the front dest and number of dof for each elimination node
-c  in this element into temp storage
-c
+!
+! stick the front dest and number of dof for each elimination node
+!  in this element into temp storage
+!
             Ic(ipc) = jdes
             Ic(ipc+1) = NDOFM
             ipc = ipc + 2
-c
-c increment the number of nodes to eliminate
-c
+!
+! increment the number of nodes to eliminate
+!
             ne = ne + 1
-c
-c increment the total number of dof to eliminate for this element
-c
+!
+! increment the total number of dof to eliminate for this element
+!
             ntt = ntt + NDOFM
-c
+!
    60    continue
-c  ***************
-c
-c increment the total number of dof for the model
-c
+!  ***************
+!
+! increment the total number of dof for the model
+!
          Ntot = Ntot + ntt
-c
-c check if there is a new max dof/node
-c
+!
+! check if there is a new max dof/node
+!
          if (nt .gt. MDOF) MDOF = nt
-c
-c if this isnt the last elem and we need to eliminate nodes from the fro
-c
+!
+! if this isnt the last elem and we need to eliminate nodes from the fro
+!
          if (iel.lt.NUMELM .and. ne.ne.0) then
-c
-c set the new total number of number of dof in the front
-c
+!
+! set the new total number of number of dof in the front
+!
             ides = ides - ntt
             jp = ips + n + 1
-c
-c for nodes in later elements which we given front destinations
-c  we must now change their front dests to reflect that some nodes are e
-c-----------------------------------------------------------------------
+!
+! for nodes in later elements which we given front destinations
+!  we must now change their front dests to reflect that some nodes are e
+!-----------------------------------------------------------------------
             if (jp .le. jdn) then
-c
-c search thru the remaining nicknames
-c
+!
+! search thru the remaining nicknames
+!
                do 80 jd = jp,jdn
-c
-c check if this nickname was given a front dest already
-c
+!
+! check if this nickname was given a front dest already
+!
                   if(Ibb(jd) .ne. 0) then
-c
+!
                      ipc = 1
                      nt = 0
-c
-c look thru those front dests which are being eliminated
-c
+!
+! look thru those front dests which are being eliminated
+!
                      do 70 i = 1,ne
-c
-c if the front dest of this nickname is ge than the one we are eliminati
-c  then increment the number of dof by that being eliminated
-c
+!
+! if the front dest of this nickname is ge than the one we are eliminati
+!  then increment the number of dof by that being eliminated
+!
                         if (Ibb(jd) .ge. Ic(ipc))  nt = nt + Ic(ipc+1)
                         ipc = ipc + 2
    70                continue
-c
-c reduce the front dest of this nickname by the number of dof eliminated
-c  below it in the front
-c
+!
+! reduce the front dest of this nickname by the number of dof eliminated
+!  below it in the front
+!
                      Ibb(jd) = Ibb(jd) - nt
                   endif
-c
+!
    80          continue
             endif
          endif
-c
-c call the user-supplied routine which stores the element destination ve
-c  into some global storage scheme
-c
+!
+! call the user-supplied routine which stores the element destination ve
+!  into some global storage scheme
+!
          call preout (iel, n, Ia(ips+1), Ibb(ips+1))
-c        --------------------------------------------
-c debug print
-c
+!        --------------------------------------------
+! debug print
+!
          if (IPRDES .eq. 1) then
             write(NFSOUT,7701) iel,n,(Ibb(ips+i),i=1,n)
- 7701        format(1x,'DESVEC: iel,nnod',2i8,'  (Ibb(ips+i),i=1,n)',
+ 7701        format(1x,'DESVEC: iel,nnod',2i8,'  (Ibb(ips+i),i=1,n)', &
      .              (/,10x,10i8))
          endif
-c
+!
   100 continue
-c
-c
+!
+!
       end subroutine desvec
