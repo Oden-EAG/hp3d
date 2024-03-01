@@ -1,11 +1,11 @@
 !----------------------------------------------------------------------
-!> Purpose : function computes the modulus of i/m . Differently than
+!> @brief function computes the modulus of i/m . Differently than
 !!           the built-in function "mod", for i > 0, function imod sets
 !!           representative for equivalence class of 0 equal to m,
 !!           instead of 0; example :
 !!             imod(3,3) = 3     ;     mod(3,3) = 0
 !!
-!> @revision Nov 12
+!> @date Nov 12
 !----------------------------------------------------------------------
 integer function imod(i,m)
       implicit none

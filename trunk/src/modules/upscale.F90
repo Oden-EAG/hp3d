@@ -35,7 +35,7 @@ contains
 
 
 !> @brief return cell type for vis object
-!! @note XDMF 2 or VTU depending upon VIS_VTU Flag
+!> @note XDMF 2 or VTU depending upon VIS_VTU Flag
 !> @param[in] Etype - Element type
 !> @date Mar 2023
    integer function ivis_type(Etype)

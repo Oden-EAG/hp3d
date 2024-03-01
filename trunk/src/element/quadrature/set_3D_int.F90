@@ -134,7 +134,7 @@ end subroutine set_3D_int_DPG
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - routine sets up quadrature data for a 3D
+!> @brief         - routine sets up quadrature data for a 3D
 !                         element, accouting for different element
 !                         types and orders of approximation
 !
@@ -398,7 +398,7 @@ end subroutine set_3Dint_aux
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - routine tests quadrature data for a 3D
+!> @brief         - routine tests quadrature data for a 3D
 !                         standard element
 !
 !     arguments         - none

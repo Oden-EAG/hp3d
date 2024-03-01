@@ -2,7 +2,7 @@
 
 !> @brief     print nodal connectivity
 !!
-!! @param[in] Mdle - middle node
+!> @param[in] Mdle - middle node
 !!
 !> @date      Feb 2023
 subroutine elem_show_var1(Mdle)
@@ -52,10 +52,10 @@ end subroutine elem_show_var1
 !
 !> @brief     print nodal connectivity
 !!
-!! @param[in] Mdle     - middle node
-!! @param[in] Ntype    - middle type
-!! @param[in] Nodesl   - nodes
-!! @param[in] Norientl - orientation
+!> @param[in] Mdle     - middle node
+!> @param[in] Ntype    - middle type
+!> @param[in] Nodesl   - nodes
+!> @param[in] Norientl - orientation
 !!
 !> @date      Feb 2023
 subroutine elem_show_var2(Mdle,Ntype,Nodesl,Norientl)

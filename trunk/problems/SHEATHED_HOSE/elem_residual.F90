@@ -1,9 +1,9 @@
 !--------------------------------------------------------------------------
-!> Purpose : return stiffness matrix and Residual vector for element
+!> @brief return stiffness matrix and Residual vector for element
 !!
-!! @param[in]  Mdle      - an element (middle node) number
-!! @param[out] Resid     - element residual (squared)
-!! @param[out] Nref_flag - suggested h-refinement flag
+!> @param[in]  Mdle      - an element (middle node) number
+!> @param[out] Resid     - element residual (squared)
+!> @param[out] Nref_flag - suggested h-refinement flag
 !--------------------------------------------------------------------------
 !
    subroutine elem_residual(Mdle, Resid,Nref_flag)
@@ -573,7 +573,7 @@
    end subroutine elem_residual
 
 !--------------------------------------------------------------------------
-!> Purpose : returns global residual
+!> @brief returns global residual
 !!
 !--------------------------------------------------------------------------
 !

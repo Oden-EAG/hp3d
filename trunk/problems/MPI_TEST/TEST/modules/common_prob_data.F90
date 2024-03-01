@@ -6,7 +6,7 @@
 !
 !     latest revision:  - July 17
 !
-!     purpose:          - module setting up the parameters for the
+!> @brief         - module setting up the parameters for the
 !                         acoustics problem
 !
 !

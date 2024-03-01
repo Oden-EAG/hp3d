@@ -5,21 +5,21 @@
 !> @brief    determine H(curl) face dof interpolating H(curl) Dirichlet
 !!           data using PB interpolation
 !!
-!! @param[in]  Mdle         - element (middle node) number
-!! @param[in]  Iflag        - a flag specifying the GMP object
+!> @param[in]  Mdle         - element (middle node) number
+!> @param[in]  Iflag        - a flag specifying the GMP object
 !!                            5 pris, 6 hexa, 7 tetr, 8 pyra
-!! @param[in]  No           - number of a specific object
-!! @param[in]  Etav         - GMP reference coordinates of the element vertices
-!! @param[in]  Ntype        - element (middle node) type
-!! @param[in]  Icase        - the face node case
-!! @param[in]  Bcond        - the edge node BC flag
-!! @param[in]  Nedge_orient - edge orientation
-!! @param[in]  Nface_orient - face orientation
-!! @param[in]  Norder       - element order
-!! @param[in]  Iface        - face number
-!! @param[in]  ZdofE        - H(curl) dof for the element (edge values only)
+!> @param[in]  No           - number of a specific object
+!> @param[in]  Etav         - GMP reference coordinates of the element vertices
+!> @param[in]  Ntype        - element (middle node) type
+!> @param[in]  Icase        - the face node case
+!> @param[in]  Bcond        - the edge node BC flag
+!> @param[in]  Nedge_orient - edge orientation
+!> @param[in]  Nface_orient - face orientation
+!> @param[in]  Norder       - element order
+!> @param[in]  Iface        - face number
+!> @param[in]  ZdofE        - H(curl) dof for the element (edge values only)
 !!
-!! @param[in,out] ZnodE     - H(curl) dof for the face
+!> @param[in,out] ZnodE     - H(curl) dof for the face
 !!
 !> @date Sep 2023
 !-----------------------------------------------------------------------

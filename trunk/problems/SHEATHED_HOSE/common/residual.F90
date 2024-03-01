@@ -6,7 +6,7 @@
 !
 !     latest revision:  - Oct 2021
 !
-!     purpose:          - compute and print residual
+!> @brief         - compute and print residual
 !
 !----------------------------------------------------------------------
 subroutine residual(res)

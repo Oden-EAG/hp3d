@@ -1,4 +1,4 @@
-!> Purpose : read input file and set physics and data structure
+!> @brief read input file and set physics and data structure
 subroutine read_input(Fp)
   use data_structure3D , only: MAXNODS
   use environment      , only: QUIET_MODE

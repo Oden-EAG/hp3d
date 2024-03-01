@@ -1,10 +1,10 @@
 !----------------------------------------------------------------------------
-!> Purpose : define options for main file specific to the problem. These can
+!> @brief define options for main file specific to the problem. These can
 !!           be consulted with the -help option when running the executable.
 !!           It is especially important to define the global environment
 !!           variables in module/environment.
 !!           The other options are problem specific.
-!! @date Jun 15
+!> @date Jun 15
 !----------------------------------------------------------------------------
 subroutine set_environment
   use environment

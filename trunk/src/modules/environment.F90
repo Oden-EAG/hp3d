@@ -40,10 +40,10 @@ module environment
 !> @brief Determines value of a BOOLEAN option variable (.true. if present)
 !> @note  If option is not present, value is set to a user-provided default
 !!
-!! @param[in ] Aopt  - name of BOOLEAN option
-!! @param[in ] Atext - text explanation of option
-!! @param[in ] Ndef  - default value of BOOLEAN option
-!! @param[out] Nval  - actual value of BOOLEAN option
+!> @param[in ] Aopt  - name of BOOLEAN option
+!> @param[in ] Atext - text explanation of option
+!> @param[in ] Ndef  - default value of BOOLEAN option
+!> @param[out] Nval  - actual value of BOOLEAN option
 !!
 !> @date Mar 2023
 !----------------------------------------------------------------------------
@@ -101,10 +101,10 @@ module environment
 !> @brief Determines value of an INTEGER option variable
 !> @note  If option is not present, value is set to a user-provided default
 !!
-!! @param[in ] Aopt  - name of INTEGER option
-!! @param[in ] Atext - text explanation of option
-!! @param[in ] Ndef  - default value of INTEGER option
-!! @param[out] Nval  - actual value of INTEGER option
+!> @param[in ] Aopt  - name of INTEGER option
+!> @param[in ] Atext - text explanation of option
+!> @param[in ] Ndef  - default value of INTEGER option
+!> @param[out] Nval  - actual value of INTEGER option
 !!
 !> @date Mar 2023
 !----------------------------------------------------------------------------
@@ -162,10 +162,10 @@ module environment
 !> @brief Determines value of a REAL option variable
 !> @note  If option is not present, value is set to a user-provided default
 !!
-!! @param[in ] Aopt  - name of REAL option
-!! @param[in ] Atext - text explanation of option
-!! @param[in ] Def   - default value of REAL option
-!! @param[out] Val   - actual value of REAL option
+!> @param[in ] Aopt  - name of REAL option
+!> @param[in ] Atext - text explanation of option
+!> @param[in ] Def   - default value of REAL option
+!> @param[out] Val   - actual value of REAL option
 !!
 !> @date Mar 2023
 !----------------------------------------------------------------------------
@@ -223,10 +223,10 @@ module environment
 !> @brief Determines value of a COMPLEX option variable
 !> @note  If option is not present, value is set to a user-provided default
 !!
-!! @param[in ] Aopt  - name of COMPLEX option
-!! @param[in ] Atext - text explanation of option
-!! @param[in ] Def   - default value of COMPLEX option
-!! @param[out] Val   - actual value of COMPLEX option
+!> @param[in ] Aopt  - name of COMPLEX option
+!> @param[in ] Atext - text explanation of option
+!> @param[in ] Def   - default value of COMPLEX option
+!> @param[out] Val   - actual value of COMPLEX option
 !!
 !> @date Mar 2023
 !----------------------------------------------------------------------------
@@ -276,10 +276,10 @@ module environment
 !> @brief Determines value of a STRING option variable
 !> @note  If option is not present, value is set to a user-provided default
 !!
-!! @param[in ] Aopt  - name of STRING option
-!! @param[in ] Atext - text explanation of option
-!! @param[in ] Adef  - defaul value of STRING option
-!! @param[out] Aval  - actual value of STRING option
+!> @param[in ] Aopt  - name of STRING option
+!> @param[in ] Atext - text explanation of option
+!> @param[in ] Adef  - defaul value of STRING option
+!> @param[out] Aval  - actual value of STRING option
 !!
 !> @date Mar 2023
 !----------------------------------------------------------------------------

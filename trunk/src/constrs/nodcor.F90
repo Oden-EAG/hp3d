@@ -196,7 +196,7 @@ subroutine nodcor(Mdle, Xnod)
 end subroutine nodcor
 !
 !----------------------------------------------------------------------
-! routine: test_nodcor
+!> @name test_nodcor
 !----------------------------------------------------------------------
 subroutine test_nodcor(Mdle)
 !

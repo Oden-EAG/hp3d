@@ -16,7 +16,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - routine returns values of shifted scaled
+!> @brief         - routine returns values of shifted scaled
 !                         Legendre polynomials
 !
 !     arguments:
@@ -85,7 +85,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - routine returns values of shifted scaled
+!> @brief         - routine returns values of shifted scaled
 !                         integrated Legendre polynomials and their
 !                         derivatives starting with p=2
 !
@@ -175,7 +175,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - routine returns values of shifted scaled
+!> @brief         - routine returns values of shifted scaled
 !                         Jacobi polynomials P^\alpha_i. Result is a
 !                         'half' of a  matrix with each row
 !                         associated to a fixed alpha. Alpha grows
@@ -275,7 +275,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - routine returns values of integrated
+!> @brief         - routine returns values of integrated
 !                         shifted scaled Jacobi polynomials and
 !                         their derivatives starting with p=1
 !                         Result is 'half' of a  matrix
@@ -438,7 +438,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - routine returns values of homogenized
+!> @brief         - routine returns values of homogenized
 !                         Legendre polynomials
 !
 !     arguments:
@@ -473,7 +473,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - routine returns values of homogenized
+!> @brief         - routine returns values of homogenized
 !                         integrated Legendre polynomials and their
 !                         gradient (wrt to affine like coordinates)
 !
@@ -532,7 +532,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - routine returns values of homogenized
+!> @brief         - routine returns values of homogenized
 !                         Jacobi polynomials P^\alpha_i. Result is a
 !                         'half' of a  matrix with each row
 !                         associated to a fixed alpha. Alpha grows
@@ -576,7 +576,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - routine returns values of integrated
+!> @brief         - routine returns values of integrated
 !                         homogenized Jacobi polynomials and
 !                         their gradients.
 !                         Result is 'half' of a  matrix

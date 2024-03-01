@@ -1,12 +1,12 @@
 !------------------------------------------------------------------------------------
-!> Purpose : implicit surface parameterization
+!> @brief implicit surface parameterization
 !!
-!! @param[in]  No   - surface number
-!! @param[in]  X    - physical coordinates of a point
-!! @param[out] Fval - function value
-!! @param[out] Dfdx - function gradient
+!> @param[in]  No   - surface number
+!> @param[in]  X    - physical coordinates of a point
+!> @param[out] Fval - function value
+!> @param[out] Dfdx - function gradient
 !!
-!! @revision Nov 12
+!> @date Nov 12
 !------------------------------------------------------------------------------------
 subroutine surf(No,X, Fval,Dfdx)
 !

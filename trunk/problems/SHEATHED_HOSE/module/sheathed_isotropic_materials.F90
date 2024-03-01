@@ -1,5 +1,5 @@
 !--------------------------------------------------------------------------------
-!> Purpose : define all necessary problem dependent variables
+!> @brief define all necessary problem dependent variables
 !--------------------------------------------------------------------------------
 !
 module sheathed_isotropic_materials
@@ -37,11 +37,11 @@ module sheathed_isotropic_materials
 contains
 
   !------------------------------------------------------------------------------
-  !> Purpose : return stiffness tensor for linear elasticity
+  !> @brief return stiffness tensor for linear elasticity
   !!
-  !! @param[in]  X    - physical coordinates
-  !! @param[in]  Dom  - Domain number
-  !! @param[out] C    - stiffness tensor
+  !> @param[in]  X    - physical coordinates
+  !> @param[in]  Dom  - Domain number
+  !> @param[out] C    - stiffness tensor
   !------------------------------------------------------------------------------
   !
   subroutine getC(X,Dom, C)
@@ -77,11 +77,11 @@ contains
   end subroutine getC
 
   !------------------------------------------------------------------------------
-  !> Purpose : return compliance tensor for linear elasticity
+  !> @brief return compliance tensor for linear elasticity
   !!
-  !! @param[in]  X    - physical coordinates
-  !! @param[in]  Dom  - Domain number
-  !! @param[out] A    - compliance tensor
+  !> @param[in]  X    - physical coordinates
+  !> @param[in]  Dom  - Domain number
+  !> @param[out] A    - compliance tensor
   !------------------------------------------------------------------------------
   !
   subroutine getA(X,Dom, A)
@@ -117,10 +117,10 @@ contains
   end subroutine getA
 
   !------------------------------------------------------------------------------
-  !> Purpose : return A:A for linear elasticity
+  !> @brief return A:A for linear elasticity
   !!
-  !! @param[in]  X    - physical coordinates
-  !! @param[out] AA   - tensor
+  !> @param[in]  X    - physical coordinates
+  !> @param[out] AA   - tensor
   !------------------------------------------------------------------------------
   !
   subroutine getAA(X, AA)
@@ -151,9 +151,9 @@ contains
   end subroutine getAA
 
   !------------------------------------------------------------------------------
-  !> Purpose : return symmetric product tensor
+  !> @brief return symmetric product tensor
   !!
-  !! @param[out] Symm - tensor
+  !> @param[out] Symm - tensor
   !------------------------------------------------------------------------------
   !
   subroutine getSymm(Symm)
@@ -172,9 +172,9 @@ contains
   end subroutine getSymm
 
   !------------------------------------------------------------------------------
-  !> Purpose : return skew-symmetric product tensor
+  !> @brief return skew-symmetric product tensor
   !!
-  !! @param[out] Skew - tensor
+  !> @param[out] Skew - tensor
   !------------------------------------------------------------------------------
   !
   subroutine getSkew(Skew)
@@ -193,10 +193,10 @@ contains
   end subroutine getSkew
 
   !------------------------------------------------------------------------------
-  !> Purpose : return skew-symmetric product tensor
+  !> @brief return skew-symmetric product tensor
   !!
-  !! @param[in]  X    - physical coordinates
-  !! @param[out] Skew - tensor
+  !> @param[in]  X    - physical coordinates
+  !> @param[out] Skew - tensor
   !------------------------------------------------------------------------------
   !
   subroutine getWeightedSkew(X, Skew)
@@ -225,10 +225,10 @@ contains
   end subroutine getWeightedSkew
 
   !------------------------------------------------------------------------------
-  !> Purpose : return Young's modulus
+  !> @brief return Young's modulus
   !!
-  !! @param[in]  X    - physical coordinates
-  !! @param[out] E    - Young's modulus
+  !> @param[in]  X    - physical coordinates
+  !> @param[out] E    - Young's modulus
   !------------------------------------------------------------------------------
   !
   subroutine getYoungsModulus(X, E)

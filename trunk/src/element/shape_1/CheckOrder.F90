@@ -8,7 +8,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - routine checks whether polynomial orders of
+!> @brief         - routine checks whether polynomial orders of
 !                         edges, faces and bubbles are within
 !                         appropriate bounds. Returns values that help
 !                         to more efficiently size temporary arrays in

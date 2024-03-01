@@ -2,13 +2,13 @@
 !> @brief Physical coordinates for a curve parametrization,
 !!        and their derivative wrt to a GIVEN coordinate
 !!
-!! @param[in ] No      - curve number
-!! @param[in ] Norient - orientation of GLOBAL REFERENCE coordinate
+!> @param[in ] No      - curve number
+!> @param[in ] Norient - orientation of GLOBAL REFERENCE coordinate
 !!                       wrt a GIVEN coordinate system
-!! @param[in ] T       - coordinate of a point on the curve
+!> @param[in ] T       - coordinate of a point on the curve
 !!                       according to GIVEN system
-!! @param[out] X       - physical coordinates
-!! @param[out] Dxdt    - derivatives of physical coordinate
+!> @param[out] X       - physical coordinates
+!> @param[out] Dxdt    - derivatives of physical coordinate
 !!
 !> @date Mar 2023
 !-----------------------------------------------------------------------
@@ -54,10 +54,10 @@ end subroutine curve_local
 !> @brief Physical coordinates for a curve parametrization, and
 !!        their derivative wrt to reference coordinate
 !!
-!! @param[in ] No     - curve number
-!! @param[in ] Eta    - reference coordinate  (between 0 and 1)
-!! @param[out] X      - physical coordinates of the point
-!! @param[out] Dxdeta - derivatives of the physical coordinates
+!> @param[in ] No     - curve number
+!> @param[in ] Eta    - reference coordinate  (between 0 and 1)
+!> @param[out] X      - physical coordinates of the point
+!> @param[out] Dxdeta - derivatives of the physical coordinates
 !!
 !> @date Mar 2023
 !----------------------------------------------------------------------------

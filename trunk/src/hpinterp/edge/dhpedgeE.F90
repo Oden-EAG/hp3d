@@ -2,20 +2,20 @@
 !> @brief    update H(curl) edge dof interpolating H1 Dirichlet data
 !            using PB interpolation
 !!
-!! @param[in]  Mdle         - element (middle node) number
-!! @param[in]  Iflag        - a flag specifying which of the objects the
+!> @param[in]  Mdle         - element (middle node) number
+!> @param[in]  Iflag        - a flag specifying which of the objects the
 !!                            edge is on: 5 pris, 6 hexa, 7 tetr, 8 pyra
-!! @param[in]  No           - number of a specific object
-!! @param[in]  Etav         - reference coordinates of the element vertices
-!! @param[in]  Ntype        - element (middle node) type
-!! @param[in]  Icase        - the edge node case
-!! @param[in]  Bcond        - the edge node BC flag
-!! @param[in]  Nedge_orient - edge orientation
-!! @param[in]  Nface_orient - face orientation (not used)
-!! @param[in]  Norder       - element order
-!! @param[in]  Iedge        - edge number
+!> @param[in]  No           - number of a specific object
+!> @param[in]  Etav         - reference coordinates of the element vertices
+!> @param[in]  Ntype        - element (middle node) type
+!> @param[in]  Icase        - the edge node case
+!> @param[in]  Bcond        - the edge node BC flag
+!> @param[in]  Nedge_orient - edge orientation
+!> @param[in]  Nface_orient - face orientation (not used)
+!> @param[in]  Norder       - element order
+!> @param[in]  Iedge        - edge number
 !!
-!! @param[in,out] ZnodE     - H(curl) dof for the edge
+!> @param[in,out] ZnodE     - H(curl) dof for the edge
 !!
 !> @date Sep 2023
 !-----------------------------------------------------------------------

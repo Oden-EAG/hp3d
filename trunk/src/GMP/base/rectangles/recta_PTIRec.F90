@@ -1,13 +1,13 @@
 !-----------------------------------------------------------------------
-!> Purpose : routine evaluates physical coordinates and derivatives of
+!> @brief routine evaluates physical coordinates and derivatives of
 !!           a parametric transfinite interpolation rectangle
 !!
-!! @param[in]  No     - rectangle number
-!! @param[in]  Eta    - reference coordinates of a point
-!! @param[out] X      - physical coordinates of the point
-!! @param[out] Dxdeta - derivatives of the physical coordinates
+!> @param[in]  No     - rectangle number
+!> @param[in]  Eta    - reference coordinates of a point
+!> @param[out] X      - physical coordinates of the point
+!> @param[out] Dxdeta - derivatives of the physical coordinates
 !!
-!! @revision Mar 2023
+!> @date Mar 2023
 !-----------------------------------------------------------------------
 !
 subroutine recta_PTIRec(No,Eta, X,Dxdeta)
@@ -81,15 +81,15 @@ end subroutine recta_PTIRec
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : parametric transfinite interpolation for a rectangle on
+!> @brief parametric transfinite interpolation for a rectangle on
 !!           a sphere
 !!
-!! @param[in]  No     - retangle number
-!! @param[in]  Eta    - reference coordinates of a point
-!! @param[out] X      - physical coordinates of the point
-!! @param[out] Dxdeta - derivatives wrt reference coordinates
+!> @param[in]  No     - retangle number
+!> @param[in]  Eta    - reference coordinates of a point
+!> @param[out] X      - physical coordinates of the point
+!> @param[out] Dxdeta - derivatives wrt reference coordinates
 !!
-!! @revision Mar 2023
+!> @date Mar 2023
 !----------------------------------------------------------------------
 !
 subroutine recta_sphere(No,Eta, X,Dxdeta)
@@ -464,15 +464,15 @@ end subroutine recta_sphere
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : parametric transfinite interpolation for a rectangle
+!> @brief parametric transfinite interpolation for a rectangle
 !!            on a cylinder
 !!
-!! @param[in]  No     - triangle number
-!! @param[in]  Eta    - reference coordinates of a point
-!! @param[out] X      - physical coordinates of the point
-!! @param[out] Dxdeta - derivatives wrt reference coordinates
+!> @param[in]  No     - triangle number
+!> @param[in]  Eta    - reference coordinates of a point
+!> @param[out] X      - physical coordinates of the point
+!> @param[out] Dxdeta - derivatives wrt reference coordinates
 !!
-!! @revision Mar 2023
+!> @date Mar 2023
 !----------------------------------------------------------------------
 !
 subroutine recta_cylinder(No,Eta, X,Dxdeta)
@@ -793,15 +793,15 @@ end subroutine recta_cylinder
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : parametric transfinite interpolation for a rectangle on
+!> @brief parametric transfinite interpolation for a rectangle on
 !!           a cone
 !!
-!! @param[in]  No        - triangle number
-!! @param[in]  Eta       - reference coordinates of a point
-!! @param[out] X         - physical coordinates of the point
-!! @param[out] Dxdeta    - derivatives wrt reference coordinates
+!> @param[in]  No        - triangle number
+!> @param[in]  Eta       - reference coordinates of a point
+!> @param[out] X         - physical coordinates of the point
+!> @param[out] Dxdeta    - derivatives wrt reference coordinates
 !!
-!! @date Mar 2023
+!> @date Mar 2023
 !----------------------------------------------------------------------
 !
 subroutine recta_cone(No,Eta, X,Dxdeta)

@@ -1,9 +1,9 @@
 !-------------------------------------------------------------------------------
-!>@brief       Set physical attributes to be supported by the all elements
-!>@param[in]   NrAttr   - number of supported attributes: 1,...,NR_PHYSA
-!>@param[in]   AttrList - list of supported attributes:
+!> @brief       Set physical attributes to be supported by the all elements
+!> @param[in]   NrAttr   - number of supported attributes: 1,...,NR_PHYSA
+!> @param[in]   AttrList - list of supported attributes:
 !!                        AttrList(i) \in {1,...,NR_PHYSA}, i = 1,...,NrAttr
-!>@date        Sep 2023
+!> @date        Sep 2023
 !-------------------------------------------------------------------------------
 subroutine set_attr(NrAttr,AttrList)
 !
@@ -27,12 +27,12 @@ end subroutine set_attr
 
 
 !-------------------------------------------------------------------------------
-!>@brief       Set physical attributes to be supported by the element
-!>@param[in]   Iel      - initial mesh element: 1,...,NRELIS
-!>@param[in]   NrAttr   - number of supported attributes: 1,...,NR_PHYSA
-!>@param[in]   AttrList - list of supported attributes:
+!> @brief       Set physical attributes to be supported by the element
+!> @param[in]   Iel      - initial mesh element: 1,...,NRELIS
+!> @param[in]   NrAttr   - number of supported attributes: 1,...,NR_PHYSA
+!> @param[in]   AttrList - list of supported attributes:
 !!                        AttrList(i) \in {1,...,NR_PHYSA}, i = 1,...,NrAttr
-!>@date        Sep 2023
+!> @date        Sep 2023
 !-------------------------------------------------------------------------------
 subroutine set_attr_elem(Iel,NrAttr,AttrList)
 !

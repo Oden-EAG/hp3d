@@ -1,19 +1,19 @@
 !---------------------------------------------------------------------------------------
-!> Purpose : display user-defined quantity
+!> @brief display user-defined quantity
 !
-!! @param[in] Mdle   - element (middle node) number
-!! @param[in] Xi     - master element coordinates
-!! @param[in] X      - physical coordinates
-!! @param[in] Rn     - outward normal unit vector
-!! @param[in] RsolH  - H1    sol
-!! @param[in] RgradH - H1    grad
-!! @param[in] RsolE  - Hcurl sol
-!! @param[in] RcurlE - Hcurl curl
-!! @param[in] RsolV  - Hdiv  sol
-!! @param[in] RdivV  - Hdiv  div
-!! @param[in] RsolQ  - L2    sol
+!> @param[in] Mdle   - element (middle node) number
+!> @param[in] Xi     - master element coordinates
+!> @param[in] X      - physical coordinates
+!> @param[in] Rn     - outward normal unit vector
+!> @param[in] RsolH  - H1    sol
+!> @param[in] RgradH - H1    grad
+!> @param[in] RsolE  - Hcurl sol
+!> @param[in] RcurlE - Hcurl curl
+!> @param[in] RsolV  - Hdiv  sol
+!> @param[in] RdivV  - Hdiv  div
+!> @param[in] RsolQ  - L2    sol
 !
-!! @param[out] Val   - quantity to display
+!> @param[out] Val   - quantity to display
 !---------------------------------------------------------------------------------------
 !
 #include "typedefs.h"

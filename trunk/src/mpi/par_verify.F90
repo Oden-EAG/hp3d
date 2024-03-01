@@ -6,9 +6,9 @@
 !
 !      subroutine:          par_verify
 !
-!     last modified:       Oct 2019
+!> @date       Oct 2019
 !
-!     purpose:             verify the par_mesh module functionality
+!> @brief            verify the par_mesh module functionality
 !
 !----------------------------------------------------------------------
 subroutine par_verify()
@@ -57,9 +57,9 @@ end subroutine par_verify
 !
 !      subroutine:          mesh_consistency
 !
-!     last modified:       July 2019
+!> @date       July 2019
 !
-!     purpose:             check mesh consistency for distributed mesh
+!> @brief            check mesh consistency for distributed mesh
 !
 !     arguments:
 !         out              ipass = 0 (test passed)
@@ -237,9 +237,9 @@ end subroutine mesh_consistency
 !
 !      subroutine:          verify_dof
 !
-!     last modified:       July 2019
+!> @date       July 2019
 !
-!     purpose:             verify collection and distribution of dofs
+!> @brief            verify collection and distribution of dofs
 !
 !     arguments:
 !         out              ipass = 0 (test passed)

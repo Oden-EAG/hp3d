@@ -6,7 +6,7 @@
 !
 !     latest revision:  - Apr 2019
 !
-!     purpose:          - routine sets up quadrature data for a 3D
+!> @brief         - routine sets up quadrature data for a 3D
 !                         element, accounting for different element
 !                         types and orders of approximation
 !

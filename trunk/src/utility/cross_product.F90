@@ -7,7 +7,7 @@
 !
 !     latest revision:  - Mar 2023
 !
-!     purpose:          - compute 3D cross product of real-valued
+!> @brief         - compute 3D cross product of real-valued
 !                         vectors
 !
 !--------------------------------------------------------------------
@@ -34,7 +34,7 @@
 !
 !     latest revision:  - Mar 2023
 !
-!     purpose:          - compute 3D cross product of real and
+!> @brief         - compute 3D cross product of real and
 !                         (possibly) complex-valued vectors
 !
 !---------------------------------------------------------------------
@@ -61,7 +61,7 @@
 !
 !     latest revision:  - Mar 2023
 !
-!     purpose:          - compute cross product of (possibly)
+!> @brief         - compute cross product of (possibly)
 !                         complex-valued vectors
 !
 !               in:     - Za, Zb
@@ -90,7 +90,7 @@
 !
 !     latest revision:  - Mar 2023
 !
-!     purpose:          - compute 2D cross product of real-valued
+!> @brief         - compute 2D cross product of real-valued
 !                         vectors
 !
 !---------------------------------------------------------------------

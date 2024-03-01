@@ -1,11 +1,11 @@
 !----------------------------------------------------------------------
 !> @brief Curve kernel parametrization
 !!
-!! @param[in ] No      - curve number
-!! @param[in ] T       - local curve coordinate
-!! @param[in ] Norient - curve orientation
-!! @param[out] X       - physical coordinates of the point
-!! @param[out] Dxdt    - derivatives of the physical coordinates wrt
+!> @param[in ] No      - curve number
+!> @param[in ] T       - local curve coordinate
+!> @param[in ] Norient - curve orientation
+!> @param[out] X       - physical coordinates of the point
+!> @param[out] Dxdt    - derivatives of the physical coordinates wrt
 !!                       to the local curve coordinate
 !!
 !> @date Mar 2023
@@ -47,16 +47,16 @@ end subroutine curveK
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : curve bubble parametrization
+!> @brief curve bubble parametrization
 !!
-!! @param[in ] No      - curve number
-!! @param[in ] T       - local curve coordinate
-!! @param[in ] Norient - curve orientation
-!! @param[out] X       - physical coordinates of the point
-!! @param[out] Dxdt    - derivatives of the physical coordinates wrt
+!> @param[in ] No      - curve number
+!> @param[in ] T       - local curve coordinate
+!> @param[in ] Norient - curve orientation
+!> @param[out] X       - physical coordinates of the point
+!> @param[out] Dxdt    - derivatives of the physical coordinates wrt
 !!                       to the local curve coordinate
 !!
-!> @revision Nov 12
+!> @date Nov 12
 !----------------------------------------------------------------------
 subroutine curveB(No,T,Norient, X,Dxdt)
 !
@@ -117,16 +117,16 @@ end subroutine curveB
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : triangle kernel parameterization
+!> @brief triangle kernel parameterization
 !!
-!! @param[in ] No      - triangle number
-!! @param[in ] T       - local triangle coordinates
-!! @param[in ] Norient - triangle orientation
-!! @param[out] X       - physical coordinates of the point
-!! @param[out] Dxdt    - derivatives of the physical coordinates wrt
+!> @param[in ] No      - triangle number
+!> @param[in ] T       - local triangle coordinates
+!> @param[in ] Norient - triangle orientation
+!> @param[out] X       - physical coordinates of the point
+!> @param[out] Dxdt    - derivatives of the physical coordinates wrt
 !!                       to the local curve coordinate
 !!
-!> @revision Nov 12
+!> @date Nov 12
 !----------------------------------------------------------------------
 subroutine trianK(No,T,Norient, X,Dxdt)
 !
@@ -164,16 +164,16 @@ end subroutine trianK
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : triangle bubble parameterization
+!> @brief triangle bubble parameterization
 !!
-!! @param[in ] No      - triangle number
-!! @param[in ] T       - local triangle coordinates
-!! @param[in ] Norient - triangle orientation
-!! @param[out] X       - physical coordinates of the point
-!! @param[out] Dxdt    - derivatives of the physical coordinates wrt
+!> @param[in ] No      - triangle number
+!> @param[in ] T       - local triangle coordinates
+!> @param[in ] Norient - triangle orientation
+!> @param[out] X       - physical coordinates of the point
+!> @param[out] Dxdt    - derivatives of the physical coordinates wrt
 !!                       to the local curve coordinate
 !!
-!> @revision Nov 12
+!> @date Nov 12
 !----------------------------------------------------------------------
 subroutine trianB(No,T,Norient, X,Dxdt)
 !
@@ -376,16 +376,16 @@ end subroutine trianB
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : rectangle bubble parameterization
+!> @brief rectangle bubble parameterization
 !!
-!! @param[in ] No      - rectangle number
-!! @param[in ] T       - local rectangle coordinates
-!! @param[in ] Norient - rectangle orientation
-!! @param[out] X       - physical coordinates of the point
-!! @param[out] Dxdt    - derivatives of the physical coordinates wrt
+!> @param[in ] No      - rectangle number
+!> @param[in ] T       - local rectangle coordinates
+!> @param[in ] Norient - rectangle orientation
+!> @param[out] X       - physical coordinates of the point
+!> @param[out] Dxdt    - derivatives of the physical coordinates wrt
 !!                       to the local curve coordinate
 !!
-!> @revision Nov 12
+!> @date Nov 12
 !----------------------------------------------------------------------
 subroutine rectaB(No,T,Norient, X,Dxdt)
 !

@@ -3,8 +3,8 @@
 !
 !----------------------------------------------------------------------
 !
-!     module:              zoltan_wrapper
-!     last modified:       Feb 2023
+!> @name       zoltan_wrapper
+!> @date       Feb 2023
 !
 !----------------------------------------------------------------------
 module zoltan_wrapper
@@ -44,8 +44,8 @@ module zoltan_wrapper
    contains
 !
 !----------------------------------------------------------------------
-!     routine:    zoltan_w_init
-!     purpose:    initialize zoltan environment, and set parameters'
+!> @name    zoltan_w_init
+!> @brief   initialize zoltan environment, and set parameters'
 !
 !     The following parameters [default values] are available:
 !        (general)
@@ -168,8 +168,8 @@ module zoltan_wrapper
    end subroutine zoltan_w_init
 !
 !----------------------------------------------------------------------
-!     routine:    zoltan_w_finalize
-!     purpose:    close zoltan environment
+!> @name    zoltan_w_finalize
+!> @brief   close zoltan environment
 !----------------------------------------------------------------------
    subroutine zoltan_w_finalize()
 !
@@ -185,8 +185,8 @@ module zoltan_wrapper
    end subroutine zoltan_w_finalize
 !
 !----------------------------------------------------------------------
-!     routine:    zoltan_w_set_lb
-!     purpose:    set load balancing strategy
+!> @name    zoltan_w_set_lb
+!> @brief   set load balancing strategy
 !----------------------------------------------------------------------
    subroutine zoltan_w_set_lb(LB)
       integer, intent(in) :: LB
@@ -223,9 +223,9 @@ module zoltan_wrapper
    end function zoltan_w_query_dim
 !
 !----------------------------------------------------------------------
-!     routine:    zoltan_w_query_coords
+!> @name    zoltan_w_query_coords
 !                 Zoltan query function (ZOLTAN_GEOM_FN_TYPE)
-!     purpose:    returns the coordinates of an element
+!> @brief   returns the coordinates of an element
 !----------------------------------------------------------------------
    subroutine zoltan_w_query_coords(Dat,NrGIDs,NrLIDs,GID,LID, Coords,Ierr)
       integer(Zoltan_int) :: Dat(1) ! dummy declaration, do not use
@@ -252,9 +252,9 @@ module zoltan_wrapper
    end subroutine zoltan_w_query_coords
 !
 !----------------------------------------------------------------------
-!     routine:    zoltan_w_query_coords_omp
+!> @name    zoltan_w_query_coords_omp
 !                 Zoltan query function (ZOLTAN_GEOM_MULTI_FN_TYPE)
-!     purpose:    returns the coordinates of each element in list
+!> @brief   returns the coordinates of each element in list
 !----------------------------------------------------------------------
    subroutine zoltan_w_query_coords_omp(Dat,NrGIDs,NrLIDs,NumObj, &
                                             GIDs,LIDs,NumDim, Coords,Ierr)
@@ -305,9 +305,9 @@ module zoltan_wrapper
    end function zoltan_w_query_subd
 !
 !----------------------------------------------------------------------
-!     routine:    zoltan_w_query_elems
+!> @name    zoltan_w_query_elems
 !                 Zoltan query function (ZOLTAN_OBJ_LIST_FN_TYPE)
-!     purpose:    returns elements within subdomain, and their
+!> @brief   returns elements within subdomain, and their
 !                 respective weights for load balancing
 !----------------------------------------------------------------------
    subroutine zoltan_w_query_elems(Dat,NrGIDs,NrLIDs, GIDs,LIDs, &
@@ -557,8 +557,8 @@ module zoltan_wrapper
    end subroutine zoltan_w_query_neig_list_omp
 !
 !----------------------------------------------------------------------
-!     routine:    zoltan_w_partition
-!     purpose:    perform partitioning of current domain
+!> @name    zoltan_w_partition
+!> @brief   perform partitioning of current domain
 !----------------------------------------------------------------------
    subroutine zoltan_w_partition(Mdle_subd)
       integer, intent(out) :: Mdle_subd(NRELES)
@@ -630,8 +630,8 @@ module zoltan_wrapper
    end subroutine zoltan_w_partition
 !
 !----------------------------------------------------------------------
-!     routine:    zoltan_w_eval
-!     purpose:    evaluates the quality of the current partition
+!> @name    zoltan_w_eval
+!> @brief   evaluates the quality of the current partition
 !----------------------------------------------------------------------
    subroutine zoltan_w_eval()
       logical :: print_stats
@@ -644,8 +644,8 @@ module zoltan_wrapper
    end subroutine zoltan_w_eval
 !
 !----------------------------------------------------------------------
-!     routine:    zoltan_w_handle_err
-!     purpose:    handle error code returned by a Zoltan function
+!> @name    zoltan_w_handle_err
+!> @brief   handle error code returned by a Zoltan function
 !----------------------------------------------------------------------
    subroutine zoltan_w_handle_err(Ierr,Str)
       integer(Zoltan_int), intent(in) :: Ierr
@@ -662,8 +662,8 @@ module zoltan_wrapper
 !
 !--------------------------------------------------------------------------
 !> @brief Finds neighbors (up to 4, for an h4 refined face) across faces
-!! @param[in]  Mdle      - middle node
-!! @param[out] Neig_list - neighbors
+!> @param[in]  Mdle      - middle node
+!> @param[out] Neig_list - neighbors
 !!
 !> @date Mar 2023
 !--------------------------------------------------------------------------
@@ -760,8 +760,8 @@ module zoltan_wrapper
    end subroutine zoltan_w_find_neig
 !
 !----------------------------------------------------------------------
-!     routine:    zoltan_w_get_nrdofb
-!     purpose:    computes number of bubble dofs to be used for vertex
+!> @name    zoltan_w_get_nrdofb
+!> @brief   computes number of bubble dofs to be used for vertex
 !                 weights in graph partitioning
 !----------------------------------------------------------------------
    subroutine zoltan_w_get_nrdofb(Mdle, Nrdofb)

@@ -1,13 +1,13 @@
 !-----------------------------------------------------------------------------------------
-!> Purpose : routine determines domain number of an initial mesh element using
+!> @brief routine determines domain number of an initial mesh element using
 !!           the information contained in the ELEMS array (cf. subroutine
 !!           find_domain to determine domain of a refined element).
 !!
-!! @param[in]  N_elem - element number
-!! @param[out] N_dom  - domain number (= 0, if element N_elem does not exits, e.g., N_elem
+!> @param[in]  N_elem - element number
+!> @param[out] N_dom  - domain number (= 0, if element N_elem does not exits, e.g., N_elem
 !!                      is the non-existing neighbor of an element on the boundary)
 !!
-!! @revision Oct 12
+!> @date Oct 12
 !-----------------------------------------------------------------------------------------
 !
 subroutine domain_number(N_elem, N_dom)
@@ -15,7 +15,7 @@ subroutine domain_number(N_elem, N_dom)
   use data_structure3D
   use GMP
 !
-  IMPLICIT NONE
+  implicit none
 !
 ! DUMMY ARGUMENTS
   integer, intent(in)  :: N_elem

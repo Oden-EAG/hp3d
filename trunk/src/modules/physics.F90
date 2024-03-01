@@ -167,7 +167,7 @@ end subroutine index_to_attr
 
 
 
-  !> Purpose : allocate data structure for multiphysics
+  !> @brief allocate data structure for multiphysics
   subroutine alloc_physics
     !
     if (allocated(PHYSA)) then
@@ -190,7 +190,7 @@ end subroutine index_to_attr
     !
   end subroutine alloc_physics
 
-  !> Purpose : deallocate data structure for multiphysics
+  !> @brief deallocate data structure for multiphysics
   subroutine dealloc_physics
     if (allocated(PHYSA)) then
        deallocate(PHYSA,PHYSAm,NR_COMP,D_TYPE,PHYSAi,PHYSAd,ADRES, &
@@ -198,8 +198,8 @@ end subroutine index_to_attr
     endif
   end subroutine dealloc_physics
   !
-  !> Purpose : routine dumps out multiphysics data structure
-  !! @param fp file to dumpout
+  !> @brief routine dumps out multiphysics data structure
+  !> @param fp file to dumpout
   subroutine dumpout_physics_to_file(fp)
     implicit none
     character(len=*), intent(in) :: fp
@@ -227,13 +227,13 @@ end subroutine index_to_attr
     close(ndump)
   end subroutine dumpout_physics_to_file
 
-  !> Purpose : dumpout to default location "files/dumpPHYS".
+  !> @brief dumpout to default location "files/dumpPHYS".
   subroutine dumpout_physics_to_default
     call dumpout_physics_to_file('files/dumpPHYS')
   end subroutine dumpout_physics_to_default
   !
-  !> Purpose : routine dumps in multiphysics data structure
-  !! @param fp file to dumpout
+  !> @brief routine dumps in multiphysics data structure
+  !> @param fp file to dumpout
   subroutine dumpin_physics_from_file(fp)
     implicit none
     character(len=*), intent(in) :: fp
@@ -271,7 +271,7 @@ end subroutine index_to_attr
     close(ndump)
   end subroutine dumpin_physics_from_file
 
-  !> Purpose : dumpin to default location "files/dumpPHYS".
+  !> @brief dumpin to default location "files/dumpPHYS".
   subroutine dumpin_physics_from_default
     call dumpin_physics_from_file('files/dumpPHYS')
   end subroutine dumpin_physics_from_default

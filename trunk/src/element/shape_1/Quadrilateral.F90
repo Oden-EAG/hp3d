@@ -12,7 +12,7 @@
 !
 !     latest revision:  - Nov 14, Apr 17, Jul 21
 !
-!     purpose:          - evaluate quad H1 shape functions and their
+!> @brief         - evaluate quad H1 shape functions and their
 !                         gradient
 !
 !     arguments:
@@ -182,7 +182,7 @@
 !
 !     latest revision:  - Nov 14, Apr 17, Jul 21
 !
-!     purpose:          - evaluate quad H(curl) shape functions and
+!> @brief         - evaluate quad H(curl) shape functions and
 !                         their curls
 !
 !     arguments:
@@ -353,7 +353,7 @@
 !
 !     latest revision:  - Nov 14, Apr 17
 !
-!     purpose:          - evaluate quad H(div) shape functions and
+!> @brief         - evaluate quad H(div) shape functions and
 !                         their divergences
 !
 !     arguments :
@@ -449,7 +449,7 @@
 !
 !     latest revision:  - Nov 14, Apr 17
 !
-!     purpose:          - evaluate quad L2 shape functions
+!> @brief         - evaluate quad L2 shape functions
 !
 !     arguments :
 !

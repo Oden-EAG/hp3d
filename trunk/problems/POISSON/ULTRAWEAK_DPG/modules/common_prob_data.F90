@@ -6,7 +6,7 @@
 !
 !     latest revision:  - May 2023
 !
-!     purpose:          - module setting up the parameters for the
+!> @brief         - module setting up the parameters for the
 !                         Poisson problem
 !
 !

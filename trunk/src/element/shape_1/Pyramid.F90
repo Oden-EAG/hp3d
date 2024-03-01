@@ -11,7 +11,7 @@
 !
 !     latest revision:  - Jan 15, Apr 17, Jul 21
 !
-!     purpose:          - routine returns values of 3D pyramid element
+!> @brief         - routine returns values of 3D pyramid element
 !                         H1 shape functions and their derivatives
 !
 !     arguments:
@@ -325,7 +325,7 @@
 !
 !     latest revision:  - Jan 15, Apr 17, Jul 21
 !
-!     purpose:          - routine returns values of 3D pyramid element
+!> @brief         - routine returns values of 3D pyramid element
 !                         H(curl) shape functions and their curls
 !
 !     arguments:
@@ -756,7 +756,7 @@
 !
 !     latest revision:  - Jan 15, Apr 17, Jul 21
 !
-!     purpose:          - routine returns values of 3D pyramid element
+!> @brief         - routine returns values of 3D pyramid element
 !                         H(div) shape functions and their divergences
 !
 !     arguments:
@@ -1163,7 +1163,7 @@
 !
 !     latest revision:  - Jan 15, Apr 17
 !
-!     purpose:          - routine returns values of 3D pyramid
+!> @brief         - routine returns values of 3D pyramid
 !                         element L2 shape functions
 !
 !     arguments:

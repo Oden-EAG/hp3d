@@ -1,6 +1,6 @@
 !----------------------------------------------------------------------
-!     module:              hdf5_wrapper
-!     last modified:       Oct 2019
+!> @name       hdf5_wrapper
+!> @date       Oct 2019
 !----------------------------------------------------------------------
 module hdf5_wrapper
 !
@@ -14,8 +14,8 @@ module hdf5_wrapper
    contains
 !
 !----------------------------------------------------------------------
-!     routine:    hdf5_w_init
-!     purpose:    initialize HDF5 environment, and set parameters
+!> @name     hdf5_w_init
+!> @brief    initialize HDF5 environment, and set parameters
 !----------------------------------------------------------------------
    subroutine hdf5_w_init()
 !
@@ -42,8 +42,8 @@ module hdf5_wrapper
 !
 !
 !----------------------------------------------------------------------
-!     routine:    hdf5_w_finalize
-!     purpose:    close HDF5 environment
+!> @name    hdf5_w_finalize
+!> @brief   close HDF5 environment
 !----------------------------------------------------------------------
    subroutine hdf5_w_finalize()
       integer :: ierr
@@ -67,8 +67,8 @@ module hdf5_wrapper
    end subroutine hdf5_w_finalize
 !
 !----------------------------------------------------------------------
-!     routine:    hdf5_w_handle_err
-!     purpose:    handle error code returned by an HDF5 function
+!> @name    hdf5_w_handle_err
+!> @brief   handle error code returned by an HDF5 function
 !----------------------------------------------------------------------
    subroutine hdf5_w_handle_err(Ierr,Str)
       integer         , intent(in) :: Ierr

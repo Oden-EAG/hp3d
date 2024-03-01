@@ -1,5 +1,5 @@
 !----------------------------------------------------------------------
-!> Purpose : triangle to edge projection
+!> @brief triangle to edge projection
 !
 !  @param[in ] Iv1,2   - vertices defining the edge
 !  @param[in ] Vshape  - master triangle vertex shape functions,
@@ -8,7 +8,7 @@
 !  @param[out] T       - edge coordinate
 !  @param[out] Dtdxi   - derivative of edge coordinate
 !
-!  @revision Nov 12
+!  @date Nov 12
 !----------------------------------------------------------------------
    subroutine proj_t2e(Iv1,Iv2,Vshape,Dvshape, T,Dtdxi)
 !
@@ -27,7 +27,7 @@
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : quad to edge projection
+!> @brief quad to edge projection
 !
 !  @param[in ] Iv1,2   - vertices defining the edge
 !  @param[in ] Vshape  - master quad vertex shape functions, computed
@@ -36,7 +36,7 @@
 !  @param[out] T       - edge coordinate
 !  @param[out] Dtdxi   - derivative of edge coordinate
 !
-!  @revision Nov 12
+!  @date Nov 12
 !----------------------------------------------------------------------
    subroutine proj_r2e(Iv1,Iv2,Vshape,Dvshape, T,Dtdxi)
 !
@@ -66,7 +66,7 @@
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : tetrahedroN to edge projection
+!> @brief tetrahedroN to edge projection
 !
 !  @param[in ] Iv1,2   - vertices defining the edge
 !  @param[in ] Vshape  - master tet vertex shape functions, computed
@@ -75,7 +75,7 @@
 !  @param[out] T       - edge coordinate
 !  @param[out] Dtdxi   - derivative of edge coordinate
 !
-!  @revision Nov 12
+!  @date Nov 12
 !----------------------------------------------------------------------
    subroutine proj_n2e(Iv1,Iv2,Vshape,Dvshape, T,Dtdxi)
 !
@@ -94,7 +94,7 @@
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : tetrahedroN to face projection
+!> @brief tetrahedroN to face projection
 !
 !  @param[in ] Iv1,2,3   - vertices defining the face
 !  @param[in ] Vshape    - master tet vertex shape functions, computed
@@ -103,7 +103,7 @@
 !  @param[out] T         - face coordinate
 !  @param[out] Dtdxi     - derivative of face coordinate
 !
-!  @revision Nov 12
+!  @date Nov 12
 !----------------------------------------------------------------------
    subroutine proj_n2f(Iv1,Iv2,Iv3,Vshape,Dvshape, T,Dtdxi)
 !
@@ -245,7 +245,7 @@
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : brick to edge projection
+!> @brief brick to edge projection
 !
 !  @param[in ] Iv1,2   - vertices defining the edge
 !  @param[in ] Vshape  - master brick vertex shape functions, computed
@@ -254,7 +254,7 @@
 !  @param[out] T       - edge coordinate
 !  @param[out] Dtdxi   - derivative of edge coordinate
 !
-!  @revision Nov 12
+!  @date Nov 12
 !----------------------------------------------------------------------
    subroutine proj_b2e(Iv1,Iv2,Vshape,Dvshape, T,Dtdxi)
 !
@@ -285,7 +285,7 @@
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : brick to face projection
+!> @brief brick to face projection
 !
 !  @param[in ] Iv1,2,4 - vertices defining the face orientation
 !  @param[in ] Vshape  - master brick vertex shape functions, computed
@@ -294,7 +294,7 @@
 !  @param[out] T       - face coordinates
 !  @param[out] Dtdxi   - derivative of face coordinates
 !
-!  @revision Nov 12
+!  @date Nov 12
 !----------------------------------------------------------------------
    subroutine proj_b2f(Iv1,Iv2,Iv4,Vshape,Dvshape, T,Dtdxi)
 !

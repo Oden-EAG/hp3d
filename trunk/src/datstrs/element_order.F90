@@ -2,11 +2,11 @@
 !> @brief  Given order of an element middle node, determine the implied order for
 !!         its edges and faces accounting for the orientation of the nodes
 !!
-!! @param[in]  Mdle      - element middle node
-!! @param[in]  Norientl  - element nodes orientations
-!! @param[out] Norder    - order for the element nodes
+!> @param[in]  Mdle      - element middle node
+!> @param[in]  Norientl  - element nodes orientations
+!> @param[out] Norder    - order for the element nodes
 !!
-!! @date Feb 2023
+!> @date Feb 2023
 !---------------------------------------------------------------------------------
 subroutine element_order(Mdle,Norientl, Norder)
 !
@@ -122,12 +122,12 @@ end subroutine element_order
 !!         determine the necessary new order for the middle node
 !!
 !!
-!! @param[in]  Mdle        - element middle node
-!! @param[in]  Norientl    - element nodes orientations
-!! @param[in]  Norder      - order for the element nodes
-!! @param[out] Nordm       - order for the middle node
+!> @param[in]  Mdle        - element middle node
+!> @param[in]  Norientl    - element nodes orientations
+!> @param[in]  Norder      - order for the element nodes
+!> @param[out] Nordm       - order for the middle node
 !!
-!! @date Feb 2023
+!> @date Feb 2023
 !---------------------------------------------------------------------------------
 subroutine element_middle_node_order(Mdle,Norientl,Norder, Nordm)
 !

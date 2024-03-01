@@ -1,6 +1,6 @@
 !------------------------------------------------------------------------------------------
-!> Purpose : element stiffness matrix and load vector for primal DPG elasticity problem
-!! @param[in]  Mdle      - middle node number
+!> @brief element stiffness matrix and load vector for primal DPG elasticity problem
+!> @param[in]  Mdle      - middle node number
 !------------------------------------------------------------------------------------------
 !
 !   3 equations.

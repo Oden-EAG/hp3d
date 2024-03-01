@@ -11,7 +11,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 3D hexahedron
+!> @brief         - routine returns values of 3D hexahedron
 !                         BROKEN H1 shape functions
 !
 !     arguments:
@@ -119,7 +119,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 3D hexahedron
+!> @brief         - routine returns values of 3D hexahedron
 !                         BROKEN H(curl) shape functions
 !
 !     arguments:
@@ -266,7 +266,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 3D hexahedron
+!> @brief         - routine returns values of 3D hexahedron
 !                         BROKEN H(div) shape functions
 !
 !     arguments:
@@ -403,7 +403,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 3D hexahedron
+!> @brief         - routine returns values of 3D hexahedron
 !                         BROKEN L2 shape functions
 !
 !     arguments:

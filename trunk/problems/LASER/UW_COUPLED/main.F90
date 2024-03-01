@@ -6,7 +6,7 @@
 !
 !     latest revision:  - Oct 2021
 !
-!     purpose:          - main driver for MPI LASER Application
+!> @brief         - main driver for MPI LASER Application
 !                         Coupled Ultraweak Maxwell/Primal Heat
 !
 !----------------------------------------------------------------------

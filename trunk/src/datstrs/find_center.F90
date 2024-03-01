@@ -1,6 +1,6 @@
 !> @brief      find out center coordinate of middle node
-!! @param[in]  Mdle - middle node
-!! @param[out] X    - center coordinate
+!> @param[in]  Mdle - middle node
+!> @param[out] X    - center coordinate
 !> @date       Feb 2023
 subroutine find_center(Mdle, X)
    use data_structure3D

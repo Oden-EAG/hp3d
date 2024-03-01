@@ -110,7 +110,7 @@ end subroutine activate
 !
 !
 !-------------------------------------------------------------------------
-!> Purpose : deactivate a node.
+!> @brief deactivate a node.
 !            note: dofs are only deallocated if node was in subdomain,
 !                  i.e., if dof pointers were associated with data.
 !

@@ -1,5 +1,5 @@
 !-------------------------------------------------------------------------------------------
-!> Purpose : driver for writing scalar attribute to .h5 file
+!> @brief driver for writing scalar attribute to .h5 file
 !!
 !> @param[in] Id  - integer to be converted to file postfix
 !> @param[in] Idx - index identifying scalar attribute

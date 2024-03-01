@@ -6,7 +6,7 @@
 !
 !     latest revision:  - July 2023
 !
-!     purpose:          - main driver for UW Maxwell application
+!> @brief         - main driver for UW Maxwell application
 !
 !----------------------------------------------------------------------
 program main

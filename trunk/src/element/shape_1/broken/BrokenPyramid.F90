@@ -11,7 +11,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 3D pyramid
+!> @brief         - routine returns values of 3D pyramid
 !                         BROKEN H1 shape functions
 !
 !     arguments:
@@ -66,7 +66,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 3D pyramid
+!> @brief         - routine returns values of 3D pyramid
 !                         BROKEN H(curl) shape functions
 !
 !     arguments:
@@ -121,7 +121,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 3D pyramid
+!> @brief         - routine returns values of 3D pyramid
 !                         BROKEN H(div) shape functions
 !
 !     arguments:
@@ -173,7 +173,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 3D pyramid
+!> @brief         - routine returns values of 3D pyramid
 !                         BROKEN L2 shape functions
 !
 !     arguments:

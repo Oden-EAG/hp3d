@@ -1,13 +1,13 @@
 !-----------------------------------------------------------------------
-!> Purpose : routine evaluates physical coordinates and derivatives of
+!> @brief routine evaluates physical coordinates and derivatives of
 !!           of an implicit rectangle
 !!
-!! @param[in ] No     - rectangle number
-!! @param[in ] Eta    - reference coordinates of a point
-!! @param[out] X      - physical coordinates of the point
-!! @param[out] Dxdeta - derivatives of the physical coordinates
+!> @param[in ] No     - rectangle number
+!> @param[in ] Eta    - reference coordinates of a point
+!> @param[out] X      - physical coordinates of the point
+!> @param[out] Dxdeta - derivatives of the physical coordinates
 !!
-!! @revision Nov 12
+!> @date Nov 12
 !-----------------------------------------------------------------------
 !  System of equations:
 !

@@ -6,7 +6,7 @@
 !
 !     latest revision:  - May 2020
 !
-!     purpose:          - main driver for MPI Test Program
+!> @brief         - main driver for MPI Test Program
 !                         Poisson Primal DPG implementation
 !
 !----------------------------------------------------------------------

@@ -1,18 +1,18 @@
 !---------------------------------------------------------------------------------------
-!> Purpose : display user-defined quantity
-!! @param[in] Mdle   - element (middle node) number
-!! @param[in] Xi     - master element coordinates
-!! @param[in] X      - physical coordinates
-!! @param[in] Rn     - outward normal unit vector
-!! @param[in] ZsolH  - H1    sol
-!! @param[in] ZgradH - H1    grad
-!! @param[in] ZsolE  - Hcurl sol
-!! @param[in] ZcurlE - Hcurl curl
-!! @param[in] ZsolV  - Hdiv  sol
-!! @param[in] ZdivV  - Hdiv  div
-!! @param[in] ZsolQ  - L2    sol
+!> @brief display user-defined quantity
+!> @param[in] Mdle   - element (middle node) number
+!> @param[in] Xi     - master element coordinates
+!> @param[in] X      - physical coordinates
+!> @param[in] Rn     - outward normal unit vector
+!> @param[in] ZsolH  - H1    sol
+!> @param[in] ZgradH - H1    grad
+!> @param[in] ZsolE  - Hcurl sol
+!> @param[in] ZcurlE - Hcurl curl
+!> @param[in] ZsolV  - Hdiv  sol
+!> @param[in] ZdivV  - Hdiv  div
+!> @param[in] ZsolQ  - L2    sol
 !!
-!! @param[out] val   - quantity to display
+!> @param[out] val   - quantity to display
 !---------------------------------------------------------------------------------------
 !
 subroutine soldis(Mdle,Xi,X,Rn,ZsolH,ZgradH,ZsolE,ZcurlE,ZsolV,ZdivV,ZsolQ, Val)
@@ -85,7 +85,7 @@ end subroutine soldis
 !
 !
 !---------------------------------------------------------------------------------------
-!> Purpose : show the quantities to display
+!> @brief show the quantities to display
 !---------------------------------------------------------------------------------------
 subroutine soldis_select
   use parameters, only : NSTD_OUT
@@ -116,7 +116,7 @@ subroutine soldis_select
 !
 !
 !---------------------------------------------------------------------------------------
-!> Purpose : Soldis display interface
+!> @brief Soldis display interface
 !---------------------------------------------------------------------------------------
 end subroutine soldis_select
 

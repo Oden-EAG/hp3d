@@ -1,7 +1,7 @@
 !> @brief Return nodal connectivity
-!! @param[in]  Mdle     - middle node number
-!! @param[out] Nodesl   - element nodes
-!! @param[out] Norientl - their orientations
+!> @param[in]  Mdle     - middle node number
+!> @param[out] Nodesl   - element nodes
+!> @param[out] Norientl - their orientations
 !> @date Feb 2023
 !-----------------------------------------------------------------------
 subroutine elem_nodes(Mdle, Nodesl,Norientl)

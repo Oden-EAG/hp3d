@@ -7,7 +7,7 @@
 !
 !     latest revision:  - July 17
 !
-!     purpose:          - routine returns performs diagonal scaling
+!> @brief         - routine returns performs diagonal scaling
 !                         of the form
 !                         GP ---> D^-1/2 * GP * D^-1/2
 !                         B  ---> D^-1/2 * B
@@ -81,7 +81,7 @@
 !
 !     latest revision:  - July 17
 !
-!     purpose:          - routine returns performs diagonal scaling
+!> @brief         - routine returns performs diagonal scaling
 !                         of the form
 !                         GP ---> D^-1/2 * GP * D^-1/2
 !                         B  ---> D^-1/2 * B
@@ -150,7 +150,7 @@
 !
 !     latest revision:  - July 17
 !
-!     purpose:          - routine returns performs diagonal scaling
+!> @brief         - routine returns performs diagonal scaling
 !                         of the form
 !                         SA   ---> D^-1/2 * SA * D^-1/2
 !                         Rhs  ---> D^-1/2 * Rhs

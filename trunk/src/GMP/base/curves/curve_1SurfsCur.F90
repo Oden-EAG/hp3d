@@ -1,12 +1,12 @@
 !----------------------------------------------------------------------------
-!> Purpose : parametrization of a curve lying on a single algebraic surface
+!> @brief parametrization of a curve lying on a single algebraic surface
 !!
-!! @param[in ] No     - the curve number
-!! @param[in ] Eta    - reference coordinate  (between 0 and 1)
-!! @param[out] X      - physical coordinates of the point
-!! @param[out] Dxdeta - derivatives of the physical coordinates
+!> @param[in ] No     - the curve number
+!> @param[in ] Eta    - reference coordinate  (between 0 and 1)
+!> @param[out] X      - physical coordinates of the point
+!> @param[out] Dxdeta - derivatives of the physical coordinates
 !!
-!! @revision Nov 12
+!> @date Nov 12
 !----------------------------------------------------------------------------
 subroutine curve_1SurfsCur(Nc,Eta, R,Dr)
 !
@@ -46,15 +46,15 @@ end subroutine curve_1SurfsCur
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : parametrization for a curve lying on a yz plane
+!> @brief parametrization for a curve lying on a yz plane
 !            parametrized with cylindrical coordinates
 !!
-!! @param[in]  No     - curve number
-!! @param[in]  Eta    - reference coordinates of a point
-!! @param[out] X      - physical coordinates of the point
-!! @param[out] Dxdeta - derivatives wrt reference coordinates
+!> @param[in]  No     - curve number
+!> @param[in]  Eta    - reference coordinates of a point
+!> @param[out] X      - physical coordinates of the point
+!> @param[out] Dxdeta - derivatives wrt reference coordinates
 !!
-!! @date Mar 2023
+!> @date Mar 2023
 !----------------------------------------------------------------------
 subroutine diag_segment(Nc,Eta, X,dX_dEta)
 !
@@ -179,14 +179,14 @@ end subroutine diag_segment
 !
 !!
 !----------------------------------------------------------------------
-!> Purpose : parametrization for a geodesics on a sphere
+!> @brief parametrization for a geodesics on a sphere
 !!
-!! @param[in]  No     - curve number
-!! @param[in]  Eta    - reference coordinates of a point
-!! @param[out] X      - physical coordinates of the point
-!! @param[out] Dxdeta - derivatives wrt reference coordinates
+!> @param[in]  No     - curve number
+!> @param[in]  Eta    - reference coordinates of a point
+!> @param[out] X      - physical coordinates of the point
+!> @param[out] Dxdeta - derivatives wrt reference coordinates
 !!
-!! @date Mar 2023
+!> @date Mar 2023
 !----------------------------------------------------------------------
 subroutine circular_segment(Nc,Eta, X,dX_dEta)
 !
@@ -263,14 +263,14 @@ end subroutine circular_segment
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : parametrization for a geodesics on a cone
+!> @brief parametrization for a geodesics on a cone
 !!
-!! @param[in]  No     - curve number
-!! @param[in]  Eta    - reference coordinates of a point
-!! @param[out] X      - physical coordinates of the point
-!! @param[out] Dxdeta - derivatives wrt reference coordinates
+!> @param[in]  No     - curve number
+!> @param[in]  Eta    - reference coordinates of a point
+!> @param[out] X      - physical coordinates of the point
+!> @param[out] Dxdeta - derivatives wrt reference coordinates
 !!
-!! @date Mar 2023
+!> @date Mar 2023
 !----------------------------------------------------------------------
 subroutine cylinder_geodesic(No,Eta, X,Dxdeta)
 !
@@ -536,14 +536,14 @@ end subroutine cylinder_geodesic
 !
 !
 !----------------------------------------------------------------------
-!> Purpose : parametrization for a geodesics on a cone
+!> @brief parametrization for a geodesics on a cone
 !!
-!! @param[in]  No     - curve number
-!! @param[in]  Eta    - reference coordinates of a point
-!! @param[out] X      - physical coordinates of the point
-!! @param[out] Dxdeta - derivatives wrt reference coordinates
+!> @param[in]  No     - curve number
+!> @param[in]  Eta    - reference coordinates of a point
+!> @param[out] X      - physical coordinates of the point
+!> @param[out] Dxdeta - derivatives wrt reference coordinates
 !!
-!! @date Mar 2023
+!> @date Mar 2023
 !----------------------------------------------------------------------
 subroutine cone_geodesic(No,Eta, X,Dxdeta)
 !

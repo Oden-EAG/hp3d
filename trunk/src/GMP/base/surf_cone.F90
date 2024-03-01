@@ -1,14 +1,14 @@
 !------------------------------------------------------------------------------------
-!> Purpose : cone parameterization
+!> @brief cone parameterization
 !!
-!! @param[in]  X      - physical coordinates of a point
-!! @param[in]  Center - center
-!! @param[in]  Dirvec - direction vector
-!! @param[in]  Alpha  - aperture
-!! @param[out] Fval   - function value
-!! @param[out] Dfdx   - function gradient
+!> @param[in]  X      - physical coordinates of a point
+!> @param[in]  Center - center
+!> @param[in]  Dirvec - direction vector
+!> @param[in]  Alpha  - aperture
+!> @param[out] Fval   - function value
+!> @param[out] Dfdx   - function gradient
 !!
-!! @revision Nov 12
+!> @date Nov 12
 !------------------------------------------------------------------------------------
 !
 subroutine cone(X,Center,Dirvec,Alpha,  Fval,Dfdx)

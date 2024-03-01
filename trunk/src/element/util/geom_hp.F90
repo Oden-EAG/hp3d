@@ -1,12 +1,12 @@
 !-------------------------------------------------------------------------
-!> Purpose : element map of isoparametric element
+!> @brief element map of isoparametric element
 !!
-!! @param[in ] Mdle  - an (element) middle node number
-!! @param[in ] Xi    - master element coordinates
-!! @param[out] X     - physical coordinates
-!! @param[in ] Dxdxi - derivative of physical coordinates
+!> @param[in ] Mdle  - an (element) middle node number
+!> @param[in ] Xi    - master element coordinates
+!> @param[out] X     - physical coordinates
+!> @param[in ] Dxdxi - derivative of physical coordinates
 !!
-!! @revision Nov 12
+!> @date Nov 12
 !-------------------------------------------------------------------------
 !  Remark: the structure on an element routine is
 !

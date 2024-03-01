@@ -6,7 +6,7 @@
 !
 !     latest revision:  - May 2023
 !
-!     purpose:          - main driver for example problem:
+!> @brief         - main driver for example problem:
 !                         Poisson ULTRAWEAK DPG implementation
 !
 !----------------------------------------------------------------------

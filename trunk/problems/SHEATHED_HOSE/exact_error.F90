@@ -1,8 +1,8 @@
 !---------------------------------------------------------------------------------------
-!> Purpose : computes norm of the error and the exact solution
+!> @brief computes norm of the error and the exact solution
 !!
-!! @param[out]  Err   - norm of the error
-!! @param[out]  Rnorm - norm of the exact solution
+!> @param[out]  Err   - norm of the error
+!> @param[out]  Rnorm - norm of the exact solution
 !---------------------------------------------------------------------------------------
 subroutine exact_error
   use control          , only : NEXACT

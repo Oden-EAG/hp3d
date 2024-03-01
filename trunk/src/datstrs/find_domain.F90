@@ -1,13 +1,13 @@
 !-----------------------------------------------------------------------------
-!> Purpose : routine determines the domain of an element possibly originated
+!> @brief routine determines the domain of an element possibly originated
 !!           from refinements. Remark: array NODES must have been previously
 !!           created. Routine domain_number can be used for initial mesh
 !!           elements, when nodes have not been created yet.
 !!
-!! @param[in]  Mdle    - an element middle node
-!! @param[out] Ndomain - domain number
+!> @param[in]  Mdle    - an element middle node
+!> @param[out] Ndomain - domain number
 !!
-!! @revision Oct 12
+!> @date Oct 12
 !-----------------------------------------------------------------------------
 !
 subroutine find_domain(Mdle, Ndom)

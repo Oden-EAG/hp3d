@@ -485,9 +485,9 @@ end subroutine get_elem_L2NormAttr
 !
 !
 !-------------------------------------------------------------------
-!  routine: get_Norm
+!> @name get_Norm
 !
-!  purpose: evaluates the norm of specified physical attributes
+!> @brief evaluates the norm of specified physical attributes
 !           and specified component by integrating the current
 !           solution over the entire domain
 !
@@ -599,9 +599,9 @@ end subroutine get_Norm
 !
 !-------------------------------------------------------------------
 !
-!  routine: get_elem_Norm
+!> @name get_elem_Norm
 !
-!  purpose: evaluates the magnitude of a physical attribute and
+!> @brief evaluates the magnitude of a physical attribute and
 !           component by integrating the current solution over a
 !           given middle node
 !

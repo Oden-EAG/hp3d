@@ -14,7 +14,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - compute edge H1 ancillary functions and
+!> @brief         - compute edge H1 ancillary functions and
 !                         their gradients
 !
 !     arguments:
@@ -65,7 +65,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - compute edge Hcurl ancillary functions and
+!> @brief         - compute edge Hcurl ancillary functions and
 !                         their curls
 !
 !     arguments:
@@ -147,7 +147,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - compute quadrilateral face H1 ancillary
+!> @brief         - compute quadrilateral face H1 ancillary
 !                         functions and their gradients
 !
 !     arguments:
@@ -213,7 +213,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - compute quadrilateral face Hcurl ancillary
+!> @brief         - compute quadrilateral face Hcurl ancillary
 !                         functions and their curls
 !
 !     arguments:
@@ -283,7 +283,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - compute quadrilateral face Hdiv ancillary
+!> @brief         - compute quadrilateral face Hdiv ancillary
 !                         functions and their divergences
 !
 !     arguments:
@@ -373,7 +373,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - compute triangle face H1 ancillary
+!> @brief         - compute triangle face H1 ancillary
 !                         functions and their gradients
 !
 !     arguments:
@@ -449,7 +449,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - compute triangle face Hcurl ancillary
+!> @brief         - compute triangle face Hcurl ancillary
 !                         functions and their curls
 !
 !     arguments:
@@ -529,7 +529,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - compute triangle face Hcurl ancillary
+!> @brief         - compute triangle face Hcurl ancillary
 !                         functions and their curls (family II)
 !
 !     arguments:

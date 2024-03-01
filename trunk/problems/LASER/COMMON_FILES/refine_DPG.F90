@@ -4,9 +4,9 @@
 !
 !--------------------------------------------------------------------
 !
-!     last revision:    - Oct 2019
+!> @date                - Oct 2019
 !
-!     purpose:          - refines elements assuming problem has
+!> @brief               - refines elements assuming problem has
 !                         already been solved. If uniform refinements
 !                         it refines everything. Otherwise it follows
 !                         greedy strategy based on residual to
@@ -432,7 +432,7 @@ end subroutine refine_DPG
 !
 !
 !-----------------------------------------------------------------------
-! subroutine: href_solve (uniform refinements and solve)
+!> @name href_solve (uniform refinements and solve)
 !-----------------------------------------------------------------------
 subroutine href_solve(Nflag,PhysNick, Nstop)
 !
@@ -507,13 +507,13 @@ end subroutine href_solve
 !
 !-----------------------------------------------------------------------
 !
-!    routine name:      - qsort_duplet
+!> @name                - qsort_duplet
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision:   - Oct 2019
+!> @date                - Oct 2019
 !
-!    purpose:           - sorts an array of duplets (iel,residual) with
+!> @brief               - sorts an array of duplets (iel,residual) with
 !                         residual (sort key) in descending order
 !                         (initial call needs: First = 1, Last = N)
 !

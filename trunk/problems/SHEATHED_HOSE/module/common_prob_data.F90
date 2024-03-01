@@ -1,5 +1,5 @@
-!> Purpose : Define problem specific parameters and constants
-!! @rev - Feb.2012
+!> @brief Define problem specific parameters and constants
+!> @rev - Feb.2012
 !------------------------------------------------------------------------------
 module common_prob_data
 !

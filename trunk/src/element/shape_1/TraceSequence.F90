@@ -28,7 +28,7 @@
 !
 !     latest revision:  - Nov 14
 !
-!     purpose:          - 1D edge trace of 2D H1 edge functions
+!> @brief         - 1D edge trace of 2D H1 edge functions
 !                         (these happen to be oriented 1D H1 'bubbles')
 !
 !     arguments:
@@ -146,7 +146,7 @@
 !
 !     latest revision:  - Nov 14
 !
-!     purpose:          - 1D edge trace of 2D H(curl) edge functions
+!> @brief         - 1D edge trace of 2D H(curl) edge functions
 !                         (these are oriented 1D L2 functions -
 !                         not 'bubbles')
 !
@@ -263,7 +263,7 @@
 !
 !     latest revision:  - Nov 14
 !
-!     purpose:          - 1D edge trace of 2D H(div) edge functions
+!> @brief         - 1D edge trace of 2D H(div) edge functions
 !                         (these are oriented 1D L2 functions -
 !                         not 'bubbles')
 !
@@ -342,7 +342,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - 2D face trace of 3D H1 face functions
+!> @brief         - 2D face trace of 3D H1 face functions
 !                         (these happen to be oriented 2D H1 'bubbles')
 !
 !     arguments:
@@ -566,7 +566,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - 2D face trace of 3D H(curl) face functions
+!> @brief         - 2D face trace of 3D H(curl) face functions
 !                         (these happen to be oriented 2D H(curl)
 !                         'bubbles')
 !
@@ -825,7 +825,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - 2D face trace of 3D H(div) face functions
+!> @brief         - 2D face trace of 3D H(div) face functions
 !                         these are oriented 2D L2 face funtions
 !
 !     arguments:

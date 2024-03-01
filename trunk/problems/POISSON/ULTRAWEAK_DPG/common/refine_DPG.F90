@@ -1,12 +1,12 @@
 !--------------------------------------------------------------------
 !
-!     routine name      - refine_DPG
+!@ name           - refine_DPG
 !
 !--------------------------------------------------------------------
 !
-!     last revision:    - May 2023
+!> @date          - May 2023
 !
-!     purpose:          - refines elements assuming problem has
+!> @brief         - refines elements assuming problem has
 !                         already been solved. If uniform refinements
 !                         it refines everything. Otherwise it follows
 !                         greedy strategy based on residual to
@@ -349,13 +349,13 @@ end subroutine refine_DPG
 
 !-----------------------------------------------------------------------
 !
-!    routine name:      - qsort_duplet
+!> @name                - qsort_duplet
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision:   - Oct 2019
+!> @date                - Oct 2019
 !
-!    purpose:           - sorts an array of duplets (iel,residual) with
+!> @brief               - sorts an array of duplets (iel,residual) with
 !                         residual (sort key) in descending order
 !                         (initial call needs: First = 1, Last = N)
 !
@@ -408,7 +408,7 @@ recursive subroutine qsort_duplet(Iel_array,Residuals,N,First,Last)
 end subroutine qsort_duplet
 
 !-----------------------------------------------------------------------
-! subroutine: adap_solve (adaptive refinements and solve)
+!> @name adap_solve (adaptive refinements and solve)
 !-----------------------------------------------------------------------
 subroutine adap_solve
 !
@@ -463,4 +463,4 @@ subroutine adap_solve
       endif
    enddo
 !
-   end subroutine adap_solve
+end subroutine adap_solve

@@ -6,7 +6,7 @@
 !
 !     latest revision:  - Oct 2021
 !
-!     purpose:          - return exact solution value at a point X
+!> @brief         - return exact solution value at a point X
 !
 !     arguments:
 !        in:

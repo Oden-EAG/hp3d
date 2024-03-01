@@ -7,7 +7,7 @@
 !
 !     latest revision:  - Mar 2019
 !
-!     purpose:          - routine returns unconstrained DPG
+!> @brief         - routine returns unconstrained DPG
 !                         stiffness matrix and load vector
 !                         for the primal DPG formulation for a single
 !                         step of the transient heat equation

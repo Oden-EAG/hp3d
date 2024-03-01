@@ -6,7 +6,7 @@
 !
 !     latest revision:  - Oct 2021
 !
-!     purpose:          - main driver for MPI Test Program
+!> @brief         - main driver for MPI Test Program
 !                         Maxwell Galerkin implementation
 !
 !----------------------------------------------------------------------

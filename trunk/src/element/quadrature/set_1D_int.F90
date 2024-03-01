@@ -6,7 +6,7 @@
 !
 !     latest revision:  - Oct 2019
 !
-!     purpose:          - routine sets up quadrature data for a 2D
+!> @brief         - routine sets up quadrature data for a 2D
 !                         standard element, accounting for different
 !                         element types and orders of approximation
 !
@@ -57,7 +57,7 @@ end subroutine set_1Dint
 !
 !     latest revision:  - Oct 2019
 !
-!     purpose:          - routine sets up quadrature data for a 1D
+!> @brief         - routine sets up quadrature data for a 1D
 !                         DPG element, accounting for different
 !                         element types and orders of approximation
 !

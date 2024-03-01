@@ -1,8 +1,8 @@
 !---------------------------------------------------------------------------------
 !> @brief return isotropic refinement flag
 !!
-!! @param[in ] Nod  - a node number
-!! @param[out] Kref - isotropic refinement flag
+!> @param[in ] Nod  - a node number
+!> @param[out] Kref - isotropic refinement flag
 !!
 !> @date Feb 2023
 !---------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 !----------------------------------------------------------------------------------------
-!> Purpose : write scalar attribute to .h5 file
+!> @brief write scalar attribute to .h5 file
 !!
 !> @param[in ] Sname   - "Scalar"
 !> @param[in ] Sfile   - attribute file name (e.g., ../output/paraview/scalar_00000.h5)

@@ -12,7 +12,7 @@
 !
 !     latest revision:  - Nov 14, Apr 17, Jul 21
 !
-!     purpose:          - evaluate triangle H1 shape functions and
+!> @brief         - evaluate triangle H1 shape functions and
 !                         their gradient
 !
 !     arguments:
@@ -178,7 +178,7 @@
 !
 !     latest revision:  - Nov 14, Apr 17, Jul 21
 !
-!     purpose:          - evaluate triangle H(curl) shape functions and
+!> @brief         - evaluate triangle H(curl) shape functions and
 !                         their curls
 !
 !     arguments:
@@ -341,7 +341,7 @@
 !
 !     latest revision:  - Nov 14, Apr 17
 !
-!     purpose:          - evaluate triangle H(div) shape functions and
+!> @brief         - evaluate triangle H(div) shape functions and
 !                         their divergences
 !
 !     arguments :
@@ -440,7 +440,7 @@
 !
 !     latest revision:  - Nov 14, Apr 17
 !
-!     purpose:          - evaluate triangle L2 shape functions
+!> @brief         - evaluate triangle L2 shape functions
 !
 !     arguments :
 !

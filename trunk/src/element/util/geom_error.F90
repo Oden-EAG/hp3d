@@ -1,13 +1,13 @@
 #if HP3D_DEBUG
 
 !------------------------------------------------------------------------
-!> Purpose : calculate geometry error. Refer to hp book, vol. 2,
+!> @brief calculate geometry error. Refer to hp book, vol. 2,
 !!           page 103, formula 5.4.
 !!
-!! @param[out] Err   - norm of the error
-!! @param[out] Rnorm - norm of the exact geometry map
+!> @param[out] Err   - norm of the error
+!> @param[out] Rnorm - norm of the exact geometry map
 !!
-!! @date Dec 14
+!> @date Dec 14
 !------------------------------------------------------------------------
 !  REMARK
 !
@@ -212,7 +212,7 @@ end subroutine geom_error
 !
 !
 !-------------------------------------------------------------------------
-!> Purpose : geometry error square on element Mdle
+!> @brief geometry error square on element Mdle
 !!
 !> @param[in   ] Mdle  - middle node number
 !> @param[in   ] Ierr  - 0 : L2 error only; 1 : full H1 error

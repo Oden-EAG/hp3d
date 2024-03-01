@@ -1,5 +1,5 @@
 !--------------------------------------------------------------------
-!> Purpose : routine performs a global isotropic h-refinement
+!> @brief routine performs a global isotropic h-refinement
 !
 !> @date Aug 2019
 !--------------------------------------------------------------------
@@ -77,7 +77,7 @@ end subroutine global_href_omp
 !
 !
 !--------------------------------------------------------------------
-!> Purpose : routine performs a global anisotropic h-refinement
+!> @brief routine performs a global anisotropic h-refinement
 !            note: works only for meshes with hexas/prisms,
 !                  and breaking along the same axis
 !                  (no mesh irregularity checks are done here)

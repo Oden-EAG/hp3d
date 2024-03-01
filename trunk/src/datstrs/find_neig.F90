@@ -1,9 +1,9 @@
 !--------------------------------------------------------------------------
 !> @brief      find neighbors (up to 4 for an h4 refined face) across faces
-!! @param[in]  Mdle      - middle node
-!! @param[out] Neig_list - neighbors
+!> @param[in]  Mdle      - middle node
+!> @param[out] Neig_list - neighbors
 !!
-!! @date       Feb 2023
+!> @date       Feb 2023
 !--------------------------------------------------------------------------
 !
 subroutine find_neig(Mdle, Neig_list)

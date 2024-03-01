@@ -6,7 +6,7 @@
 !
 !     latest revision:  - Sep 15
 !
-!     purpose:          - refines elements assuming problem has
+!> @brief         - refines elements assuming problem has
 !                         already been solved. If uniform refinements
 !                         it refines everything. Otherwise it follows
 !                         greedy strategy based on residual to

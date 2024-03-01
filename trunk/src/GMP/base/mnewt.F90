@@ -1,5 +1,5 @@
 !-----------------------------------------------------------------------
-!> Purpose : routine uses Newton-Raphson iterations to solve a nonlinear
+!> @brief routine uses Newton-Raphson iterations to solve a nonlinear
 !            system of equations defining an implicit parametrization
 !            for a GMP point, curve, triangle or rectangle.
 !
@@ -16,7 +16,7 @@
 !> @param[in ]  Sfact   - renormalization factors for the surfaces
 !> @param[out]  X       - physical coordinates of the point
 !
-!> @revision Mar 2023
+!> @date Mar 2023
 !-----------------------------------------------------------------------
 !
    subroutine mnewt(Nusf,Nsurf,Eta,Feta,Xs,Sfact, X)
@@ -152,7 +152,7 @@
 !
 !
 !-----------------------------------------------------------------------
-!> Purpose : routine formulates a system of linear equations for the
+!> @brief routine formulates a system of linear equations for the
 !            NR solution of a system of algebraic equations defining
 !            an implicit point, curve, triangle or rectangle
 !

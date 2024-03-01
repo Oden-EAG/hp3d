@@ -6,7 +6,7 @@
 !
 !     latest revision:  - July 2019
 !
-!     purpose:          - main driver for MPI Poisson Test Program
+!> @brief         - main driver for MPI Poisson Test Program
 !
 !----------------------------------------------------------------------
 !

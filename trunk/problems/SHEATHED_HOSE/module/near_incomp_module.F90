@@ -1,5 +1,5 @@
 !--------------------------------------------------------------------------------
-!> Purpose : define all necessary problem dependent variables
+!> @brief define all necessary problem dependent variables
 !--------------------------------------------------------------------------------
 !
 module near_incomp_module

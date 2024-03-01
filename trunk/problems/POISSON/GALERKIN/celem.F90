@@ -6,7 +6,7 @@
 !
 !     latest revision:  - July 2019
 !
-!     purpose:          - calculate modified stiffness matrix and load vector
+!> @brief         - calculate modified stiffness matrix and load vector
 !
 !     arguments:
 !        in:

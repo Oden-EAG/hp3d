@@ -6,7 +6,7 @@
 !
 !     latest revision:  - June 2021
 !
-!     purpose:          - routine returns unconstrained (ordinary)
+!> @brief         - routine returns unconstrained (ordinary)
 !                         stiffness matrix and load vector for the
 !                         UW DPG formulation for Maxwell equations
 !                       - Uses sum factorization for fast integration
@@ -939,7 +939,7 @@ end subroutine elem_maxwell
 !
 !     latest revision:  - June 2021
 !
-!     purpose:          - routine adds impedance L2 penalty terms to the
+!> @brief         - routine adds impedance L2 penalty terms to the
 !                         stiffness matrix and load vector for the
 !                         UW DPG formulation for Maxwell equations
 !

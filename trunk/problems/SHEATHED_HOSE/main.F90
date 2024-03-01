@@ -6,7 +6,7 @@
 !
 !     latest revision:  - Oct 2022
 !
-!     purpose:          - main driver for sheathed hose application
+!> @brief         - main driver for sheathed hose application
 !
 !----------------------------------------------------------------------
 !

@@ -11,7 +11,7 @@
 !
 !     latest revision:  - Oct 14, Apr 17, Jul 21
 !
-!     purpose:          - routine returns values of 3D tetrahedron element
+!> @brief         - routine returns values of 3D tetrahedron element
 !                         H1 shape functions and their derivatives
 !
 !     arguments:
@@ -242,7 +242,7 @@
 !
 !     latest revision:  - Oct 14, Apr 17, Jul 21
 !
-!     purpose:          - routine returns values of 3D tetrahedron element
+!> @brief         - routine returns values of 3D tetrahedron element
 !                         H(curl) shape functions and their derivatives
 !
 !     arguments:
@@ -492,7 +492,7 @@
 !
 !     latest revision:  - Oct 14, Apr 17, Jul 21
 !
-!     purpose:          - routine returns values of 3D tetrahedron element
+!> @brief         - routine returns values of 3D tetrahedron element
 !                         H(div) shape functions and their divergences
 !
 !     arguments:
@@ -684,7 +684,7 @@
 !
 !     latest revision:  - Oct 14, Apr 17
 !
-!     purpose:          - routine returns values of 3D tetrahedron
+!> @brief         - routine returns values of 3D tetrahedron
 !                         element L2 shape functions
 !
 !     arguments:

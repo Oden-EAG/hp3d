@@ -1,10 +1,10 @@
 #include "typedefs.h"
 
 !> @brief   copy dof for a node from data structure into local arrays
-!! @param[in]     Nod                     - a node number
-!! @param[in]     Ncoms                   - solution component set: 1,...,NRCOMS
-!! @param[in,out] KdofH,KdofE,KdofV,KdofQ - dof counters for the local arrays
-!! @param[out]    ZvalH,ZvalE,ZvalV,ZvalQ - H1,H(curl),H(div) and L2 dof from the
+!> @param[in]     Nod                     - a node number
+!> @param[in]     Ncoms                   - solution component set: 1,...,NRCOMS
+!> @param[in,out] KdofH,KdofE,KdofV,KdofQ - dof counters for the local arrays
+!> @param[out]    ZvalH,ZvalE,ZvalV,ZvalQ - H1,H(curl),H(div) and L2 dof from the
 !!                                          data structure in the expanded mode
 !> @date    Sep 2023
 subroutine dof_out( Nod,Ncoms,               &

@@ -1,9 +1,9 @@
 !-------------------------------------------------------------------------------
-!> Purpose : set the
+!> @brief set the
 !!
-!! @param[in]  Nxigtr
-!! @param[in]  Nxigstr
-!! @param[in]  Nxrgtrz
+!> @param[in]  Nxigtr
+!> @param[in]  Nxigstr
+!> @param[in]  Nxrgtrz
 !!
 !-------------------------------------------------------------------------------
 !

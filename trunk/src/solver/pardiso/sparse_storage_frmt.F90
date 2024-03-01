@@ -1,13 +1,13 @@
 #include "typedefs.h"
 !-----------------------------------------------------------------------
 !
-!    routine name:      - coo2csc
+!> @name                - coo2csc
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision:   - Jul 2018
+!> @date                - Jul 2018
 !
-!    purpose:           - sparse coo format to csc
+!> @brief               - sparse coo format to csc
 !
 !    arguments:
 !           in/out
@@ -46,9 +46,9 @@ end subroutine coo2csc
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision:   - Jul 2018
+!> @date                - Jul 2018
 !
-!    purpose:           - sparse coo format to csr
+!> @brief               - sparse coo format to csr
 !
 !    arguments:
 !           in/out
@@ -86,9 +86,9 @@ end subroutine coo2csr
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision:   - Aug 2018
+!> @date                - Aug 2018
 !
-!    purpose:           - convert row vector indices to pointers
+!> @brief               - convert row vector indices to pointers
 !                         (compatible to CSR format)
 !
 !    arguments:
@@ -124,13 +124,13 @@ end subroutine get_pointers
 !
 !-----------------------------------------------------------------------
 !
-!    routine name:      - assemble_triplet
+!> @name                - assemble_triplet
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision:   - Jul 2018
+!> @date                - Jul 2018
 !
-!    purpose:           - sorts an array of triplets (row,col,val) and
+!> @brief               - sorts an array of triplets (row,col,val) and
 !                         subsequently removes (row,col) duplicates by
 !                         reduction (sum) over val
 !
@@ -195,13 +195,13 @@ end subroutine assemble_triplet
 !
 !-----------------------------------------------------------------------
 !
-!    routine name:      - qsort_triplet_old
+!> @name                - qsort_triplet_old
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision:   - Jul 2018
+!> @date                - Jul 2018
 !
-!    purpose:           - sorts an array of triplets (IA,JA,XA) with
+!> @brief               - sorts an array of triplets (IA,JA,XA) with
 !                         sort key IA, in ascending order
 !
 !    arguments:
@@ -257,13 +257,13 @@ end subroutine qsort_triplet_old
 !
 !-----------------------------------------------------------------------
 !
-!    routine name:      - qsort_triplet
+!> @name                - qsort_triplet
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision:   - Jul 2018
+!> @date                - Jul 2018
 !
-!    purpose:           - sorts an array of triplets (IA,JA,Val) with
+!> @brief               - sorts an array of triplets (IA,JA,Val) with
 !                         IA (major), JA (minor), in ascending order
 !
 !    arguments:
@@ -319,13 +319,13 @@ end subroutine qsort_triplet
 !
 !-----------------------------------------------------------------------
 !
-!    routine name:      - partition_triplet_omp
+!> @name                - partition_triplet_omp
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision:   - Jul 2018
+!> @date                - Jul 2018
 !
-!    purpose:           - partitions an array of triples around a pivot
+!> @brief               - partitions an array of triples around a pivot
 !
 !    arguments:
 !           in/out
@@ -405,13 +405,13 @@ end subroutine partition_triplet_omp
 !
 !-----------------------------------------------------------------------
 !
-!    routine name:      - qsort_triplet_omp
+!> @name                - qsort_triplet_omp
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision:   - Jul 2018
+!> @date                - Jul 2018
 !
-!    purpose:           - sorts an array of triplets (IA,JA,Val) with
+!> @brief               - sorts an array of triplets (IA,JA,Val) with
 !                         IA (major), JA (minor), in ascending order
 !
 !    arguments:
@@ -475,13 +475,13 @@ end subroutine qsort_triplet_omp
 !
 !-----------------------------------------------------------------------
 !
-!    routine name:      - assemble_double
+!> @name                - assemble_double
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision:   - Nov 2016
+!> @date                - Nov 2016
 !
-!    purpose:           -
+!> @brief               -
 !
 !    arguments:         -
 !

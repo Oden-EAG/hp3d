@@ -1,5 +1,5 @@
 !-------------------------------------------------------------------------------------
-!> Purpose : find YOUNGEST middle node neighbors across a mid-face node
+!> @brief find YOUNGEST middle node neighbors across a mid-face node
 !            who own the whole face
 !!
 !!
@@ -22,13 +22,13 @@
 !!           *************************************************
 !!
 !!
-!! @param[in]  Mface        - face node
-!! @param[out] Nrneig       - number of neighbors (2 or 1)
-!! @param[out] Neig         - middle node neighbors (0 if no neighbor)
-!! @param[out] Nsid_list    - local face numbers in neighbors' local enumeration
-!! @param[out] Norient_list - orientations of the mid-face node wrt to the neighbors
+!> @param[in]  Mface        - face node
+!> @param[out] Nrneig       - number of neighbors (2 or 1)
+!> @param[out] Neig         - middle node neighbors (0 if no neighbor)
+!> @param[out] Nsid_list    - local face numbers in neighbors' local enumeration
+!> @param[out] Norient_list - orientations of the mid-face node wrt to the neighbors
 !!
-!! @date Mar 2023
+!> @date Mar 2023
 !-------------------------------------------------------------------------------------
 subroutine neig_face(Mface, Nrneig,Neig,Nsid_list,Norient_list)
   use error
