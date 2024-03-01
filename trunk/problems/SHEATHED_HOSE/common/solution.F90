@@ -1,13 +1,13 @@
 !-----------------------------------------------------------------------------------
-!> Purpose : compute all relevant quantities of the exact solution for the
+!> @brief compute all relevant quantities of the exact solution for the
 !            linear elasticty problem
 !!
-!! @param[in]  X        - a point in physical space
-!! @param[out] U        - value of the solution displacement
-!! @param[out] GradU    - corresponding first derivatives
-!! @param[out] Epsilon  - value of the solution strain
-!! @param[out] Sigma    - value of the solution stress
-!! @param[out] DivSigma - divergence of the solution stress
+!> @param[in]  X        - a point in physical space
+!> @param[out] U        - value of the solution displacement
+!> @param[out] GradU    - corresponding first derivatives
+!> @param[out] Epsilon  - value of the solution strain
+!> @param[out] Sigma    - value of the solution stress
+!> @param[out] DivSigma - divergence of the solution stress
 !-----------------------------------------------------------------------------------
 !
 subroutine elast_solution(X, U,GradU,Epsilon,Sigma,DivSigma)
@@ -43,13 +43,13 @@ subroutine elast_solution(X, U,GradU,Epsilon,Sigma,DivSigma)
 end subroutine elast_solution
 
 !-----------------------------------------------------------------------------------
-!> Purpose : evaluate an exact solution for the sheathed materials problem
+!> @brief evaluate an exact solution for the sheathed materials problem
 !!
-!! @param[in]  X       - a point in physical space
-!! @param[out] U       - value of the solution displacement
-!! @param[out] GradU   - corresponding first derivatives
-!! @param[out] Epsilon - value of the solution strain
-!! @param[out] Sigma   - value of the solution stress
+!> @param[in]  X       - a point in physical space
+!> @param[out] U       - value of the solution displacement
+!> @param[out] GradU   - corresponding first derivatives
+!> @param[out] Epsilon - value of the solution strain
+!> @param[out] Sigma   - value of the solution stress
 !
 !-----------------------------------------------------------------------------------
 !

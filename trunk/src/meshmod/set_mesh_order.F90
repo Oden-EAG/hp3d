@@ -37,10 +37,10 @@ end subroutine set_mesh_order
 !--------------------------------------------------------------------
 !> @brief modify the order of approximation of a node.
 !!
-!! @param[in] Nod - node number
-!! @param[in] P   - new order of approximation in the x1-direction
-!! @param[in] Q   - new order of approximation in the x2-direction
-!! @param[in] R   - new order of approximation in the x3-direction
+!> @param[in] Nod - node number
+!> @param[in] P   - new order of approximation in the x1-direction
+!> @param[in] Q   - new order of approximation in the x2-direction
+!> @param[in] R   - new order of approximation in the x3-direction
 !!
 !> @date Feb 2023
 !--------------------------------------------------------------------

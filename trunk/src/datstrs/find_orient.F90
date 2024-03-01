@@ -1,9 +1,9 @@
 !----------------------------------------------------------------------
 !> @brief      compute the orientation with a given Mdle;
 !!             remark: this routine calls elem_nodes
-!! @param[in]  Mdle         - middle node number
-!! @param[out] Nedge_orient - edge orientation
-!! @param[out] Nface_orient - face orientation
+!> @param[in]  Mdle         - middle node number
+!> @param[out] Nedge_orient - edge orientation
+!> @param[out] Nface_orient - face orientation
 !> @date       Feb 2023
 subroutine find_orient(Mdle, Nedge_orient,Nface_orient)
    use data_structure3D
@@ -19,11 +19,11 @@ end subroutine find_orient
 !
 !----------------------------------------------------------------------
 !> @brief      compute the orientation from list
-!! @param[in]  Ntype         - middle node type
-!! @param[in]  Nodesl        - nodal connectivity (node list)
-!! @param[in]  Norientl      - nodal connectivity (orientations)
-!! @param[out] Nedge_orient  - edge orientation
-!! @param[out] Nface_orient  - face orientation
+!> @param[in]  Ntype         - middle node type
+!> @param[in]  Nodesl        - nodal connectivity (node list)
+!> @param[in]  Norientl      - nodal connectivity (orientations)
+!> @param[out] Nedge_orient  - edge orientation
+!> @param[out] Nface_orient  - face orientation
 !> @date       Feb 2023
 subroutine find_orient_from_list(Ntype,Norientl, Nedge_orient,Nface_orient)
    use data_structure3D

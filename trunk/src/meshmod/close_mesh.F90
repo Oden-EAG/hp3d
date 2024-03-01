@@ -93,7 +93,7 @@ subroutine close_mesh()
          call elem_nodes(mdle, nodesl,norientl)
 !
          ntype = NODES(mdle)%ntype
-         nflag = .FALSE.
+         nflag = .false.
 !
 !        check edges
 !        ~~~~~~~~~~~~
@@ -108,7 +108,7 @@ subroutine close_mesh()
             nod = nodesl(nv+j)
             if (visited(nod)) then
                krefe(j)=1
-               nflag=.TRUE.
+               nflag=.true.
             endif
          enddo
 !
@@ -119,7 +119,7 @@ subroutine close_mesh()
             nod = nodesl(nve+j)
             if (visited(nod)) then
                call get_isoref(nod, kreff(j))
-               nflag=.TRUE.
+               nflag=.true.
             endif
          enddo
 !
@@ -314,7 +314,7 @@ subroutine close_mesh_par()
          call elem_nodes(mdle, nodesl,norientl)
 !
          ntype = NODES(mdle)%ntype
-         nflag = .FALSE.
+         nflag = .false.
 !
 !        check edges
 !        ~~~~~~~~~~~~
@@ -329,7 +329,7 @@ subroutine close_mesh_par()
             nod = nodesl(nv+j)
             if (visited(nod)) then
                krefe(j)=1
-               nflag=.TRUE.
+               nflag=.true.
             endif
          enddo
 !
@@ -340,7 +340,7 @@ subroutine close_mesh_par()
             nod = nodesl(nve+j)
             if (visited(nod)) then
                call get_isoref(nod, kreff(j))
-               nflag=.TRUE.
+               nflag=.true.
             endif
          enddo
 !

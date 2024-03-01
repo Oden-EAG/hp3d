@@ -23,7 +23,7 @@
 !                      = 5 color monitors with 256 colors
 !
 !----------------------------------------------------------------------
-      subroutine colorset(Iwind)
+   subroutine colorset(Iwind)
 !
       use graphmod
 !
@@ -209,7 +209,7 @@
       endif
 #endif
 !
-      end subroutine colorset
+   end subroutine colorset
 !
 !
 !----------------------------------------------------------------------
@@ -224,7 +224,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine afill(index1,ir1,ig1,ib1)
+   subroutine afill(index1,ir1,ig1,ib1)
 !
       use graphmod
 !
@@ -237,6 +237,6 @@
       IBLUE (index1)=ib1
 !
 !
-      end subroutine afill
+   end subroutine afill
 
 #endif

@@ -16,7 +16,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - routine returns values of shifted scaled
+!> @brief         - routine returns values of shifted scaled
 !                         Legendre polynomials
 !
 !     arguments:
@@ -85,7 +85,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - routine returns values of shifted scaled
+!> @brief         - routine returns values of shifted scaled
 !                         integrated Legendre polynomials and their
 !                         derivatives starting with p=2
 !
@@ -152,7 +152,7 @@
                ' X,T = ',2F8.3)
         do i=2,Nord
           select case(Idec)
-          case(.TRUE.)
+          case(.true.)
             write(*,7003) i,L(i),P(i)
  7003       format('i = ',i2,' L,P = ',2e25.15)
           case default
@@ -175,7 +175,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - routine returns values of shifted scaled
+!> @brief         - routine returns values of shifted scaled
 !                         Jacobi polynomials P^\alpha_i. Result is a
 !                         'half' of a  matrix with each row
 !                         associated to a fixed alpha. Alpha grows
@@ -275,7 +275,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - routine returns values of integrated
+!> @brief         - routine returns values of integrated
 !                         shifted scaled Jacobi polynomials and
 !                         their derivatives starting with p=1
 !                         Result is 'half' of a  matrix
@@ -438,7 +438,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - routine returns values of homogenized
+!> @brief         - routine returns values of homogenized
 !                         Legendre polynomials
 !
 !     arguments:
@@ -473,7 +473,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - routine returns values of homogenized
+!> @brief         - routine returns values of homogenized
 !                         integrated Legendre polynomials and their
 !                         gradient (wrt to affine like coordinates)
 !
@@ -505,14 +505,14 @@
       double precision ::       homP(1:Nord-1),homR(1:Nord-1),DS01(1:N)
 !
 !  ...Idec is the flag to compute x AND t derivatives
-!  ...If sum of S equal 1 -> Idec=.TRUE.
+!  ...If sum of S equal 1 -> Idec=.true.
       if (Idec) then
         call PolyILegendre(S(1),1.d0,Nord,Idec, HomL,homP,homR)
         do i=2,Nord
           DHomL(1:N,i) = homP(i-1)*DS(1:N,1)
         enddo
 !
-!  ...If sum of S different from 1 -> Idec=.FALSE.
+!  ...If sum of S different from 1 -> Idec=.false.
       else
         call PolyILegendre(S(1),S(0)+S(1),Nord,Idec, HomL,homP,homR)
         DS01 = DS(1:N,0)+DS(1:N,1)
@@ -532,7 +532,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - routine returns values of homogenized
+!> @brief         - routine returns values of homogenized
 !                         Jacobi polynomials P^\alpha_i. Result is a
 !                         'half' of a  matrix with each row
 !                         associated to a fixed alpha. Alpha grows
@@ -576,7 +576,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - routine returns values of integrated
+!> @brief         - routine returns values of integrated
 !                         homogenized Jacobi polynomials and
 !                         their gradients.
 !                         Result is 'half' of a  matrix
@@ -618,7 +618,7 @@
       minI = 1; maxI = minI+Nord-1
 !
 !  ...Idec is the flag to compute x AND t derivatives
-!  ...If sum of S equal 1 -> Idec=.TRUE.
+!  ...If sum of S equal 1 -> Idec=.true.
       if (Idec) then
         call PolyIJacobi(S(1),1.d0,Nord,Minalpha,Idec, HomL,homP,homR)
         ni = -1
@@ -629,7 +629,7 @@
           enddo
         enddo
 !
-!  ...If sum of S different from 1 -> Idec=.FALSE.
+!  ...If sum of S different from 1 -> Idec=.false.
       else
         call PolyIJacobi(S(1),S(0)+S(1),Nord,Minalpha,Idec, &
                                                        HomL,homP,homR)

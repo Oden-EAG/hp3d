@@ -5,7 +5,7 @@
 !> @param[in]  Vec2 - 2nd vector
 !> @param[out] Prod - dot product
 !
-!> @revision Feb 13
+!> @date Feb 13
 !
 !! Remark : the intrinsic Fortran fuction dot_product( , ) could be
 !!          used instead

@@ -1,12 +1,12 @@
 !--------------------------------------------------------------------------
-!> Purpose : return stiffness matrix and Residual vector for element
+!> @brief return stiffness matrix and Residual vector for element
 !!
-!! @param[in]  Mdle      - an element (middle node) number
-!! @param[out] Resid     - element residual (squared)
-!! @param[out] Nref_flag - suggested h-refinement flag
+!> @param[in]  Mdle      - an element (middle node) number
+!> @param[out] Resid     - element residual (squared)
+!> @param[out] Nref_flag - suggested h-refinement flag
 !--------------------------------------------------------------------------
 !
-      subroutine elem_residual(Mdle, Resid,Nref_flag)
+   subroutine elem_residual(Mdle, Resid,Nref_flag)
 !
       use control, only : INTEGRATION
       use uweak_module, only : Gram
@@ -570,14 +570,14 @@
 !  ...if anisotropic h refinements -> missing
 !
 !
-      end subroutine elem_residual
+   end subroutine elem_residual
 
 !--------------------------------------------------------------------------
-!> Purpose : returns global residual
+!> @brief returns global residual
 !!
 !--------------------------------------------------------------------------
 !
-      subroutine compute_residual
+   subroutine compute_residual
 !
       use data_structure3D
       use environment, only : QUIET_MODE
@@ -675,7 +675,7 @@
       rwork(2,ivis) = rate
 !
 !  ...display the convergence history
-      if (.NOT. QUIET_MODE) then
+      if (.not. QUIET_MODE) then
         write(*,*)''
         write(*,*)'         -- Error Report --'
         write(*,7100)
@@ -688,4 +688,4 @@
       endif
 !
 !
-      end subroutine compute_residual
+   end subroutine compute_residual

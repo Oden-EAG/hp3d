@@ -12,7 +12,7 @@
 !
 !     latest revision:  - Nov 14, Apr 17, Jul 21
 !
-!     purpose:          - evaluate triangle H1 shape functions and
+!> @brief         - evaluate triangle H1 shape functions and
 !                         their gradient
 !
 !     arguments:
@@ -106,7 +106,7 @@
 !  ...local parameters
       nordF = Nord(4)
       ndofF = (nordF-1)*(nordF-2)/2
-      IdecF = .TRUE.
+      IdecF = .true.
       if (ndofF.gt.0) then
 !    ...local parameters (again)
         maxIJ = nordF
@@ -178,7 +178,7 @@
 !
 !     latest revision:  - Nov 14, Apr 17, Jul 21
 !
-!     purpose:          - evaluate triangle H(curl) shape functions and
+!> @brief         - evaluate triangle H(curl) shape functions and
 !                         their curls
 !
 !     arguments:
@@ -262,7 +262,7 @@
 !  ...local parameters
       nordF = Nord(4)
       ndofF = nordF*(nordF-1)/2
-      IdecF = .TRUE.
+      IdecF = .true.
       if (ndofF.gt.0) then
 !    ...local parameters (again)
         maxIJ = nordF-1
@@ -341,7 +341,7 @@
 !
 !     latest revision:  - Nov 14, Apr 17
 !
-!     purpose:          - evaluate triangle H(div) shape functions and
+!> @brief         - evaluate triangle H(div) shape functions and
 !                         their divergences
 !
 !     arguments :
@@ -440,7 +440,7 @@
 !
 !     latest revision:  - Nov 14, Apr 17
 !
-!     purpose:          - evaluate triangle L2 shape functions
+!> @brief         - evaluate triangle L2 shape functions
 !
 !     arguments :
 !

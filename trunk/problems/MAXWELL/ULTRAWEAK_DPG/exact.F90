@@ -5,7 +5,7 @@
 ! REMARK 1: THIS ROUTINE MUST BE OMP THREAD-SAFE
 !           DUE TO OMP PARALLELIZATION OF UPDATE_DDOF->DIRICHLET->EXACT
 !-------------------------------------------------------------------------------
-!> Purpose : exact (manufactured) solution
+!> @brief exact (manufactured) solution
 !> last mod: June 2021
 !!
 !> @param[in]  X      - a point in physical space

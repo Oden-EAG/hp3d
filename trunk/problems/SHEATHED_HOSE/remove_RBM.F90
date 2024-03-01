@@ -1,4 +1,4 @@
-!> Purpose : eliminate infinitesimal rigid body motions from problem
+!> @brief eliminate infinitesimal rigid body motions from problem
 !!
 subroutine remove_RBM
   use physics

@@ -11,7 +11,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 3D tetrahedron
+!> @brief         - routine returns values of 3D tetrahedron
 !                         BROKEN H1 shape functions
 !
 !     arguments:
@@ -60,7 +60,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 3D tetrahedron
+!> @brief         - routine returns values of 3D tetrahedron
 !                         BROKEN H(curl) shape functions
 !
 !     arguments:
@@ -109,7 +109,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 3D tetrahedron
+!> @brief         - routine returns values of 3D tetrahedron
 !                         BROKEN H(div) shape functions
 !
 !     arguments:
@@ -156,7 +156,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 3D tetrahedron
+!> @brief         - routine returns values of 3D tetrahedron
 !                         BROKEN L2 shape functions
 !
 !     arguments:

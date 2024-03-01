@@ -22,7 +22,7 @@
 !
 !----------------------------------------------------------------------
 #include "typedefs.h"
-      subroutine lsvisidb(Numlev,Iflagn)
+   subroutine lsvisidb(Numlev,Iflagn)
 !
       use element_data
       use data_structure3D
@@ -254,6 +254,6 @@
 #endif
 !
 !
-      end subroutine lsvisidb
+   end subroutine lsvisidb
 
 #endif

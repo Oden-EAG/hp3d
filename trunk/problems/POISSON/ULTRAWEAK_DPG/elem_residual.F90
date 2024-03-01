@@ -6,7 +6,7 @@
 !
 !     latest revision:  - May 2023
 !
-!     purpose:          - routine returns element residual (squared)
+!> @brief         - routine returns element residual (squared)
 !                         for the Ultraweak Poisson.
 !
 !
@@ -87,7 +87,7 @@ end subroutine elem_residual
 !
 !     latest revision:  - May 2023
 !
-!     purpose:          - routine returns element residual (squared)
+!> @brief         - routine returns element residual (squared)
 !                         for the UltraWeak DPG formulation of the Poisson Problem
 !
 !     arguments:

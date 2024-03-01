@@ -86,7 +86,7 @@
    10 continue
 #if HP3D_DEBUG
       iprint = 0
-      if (iprint.eq.1) write(NFSOUT,*) 'in desvec.f, numelm=',numelm
+      if (iprint.eq.1) write(NFSOUT,*) 'in desvec: numelm=',numelm
 #endif
 !
 ! loop thru the elements

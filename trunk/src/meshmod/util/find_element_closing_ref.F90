@@ -1,8 +1,8 @@
 !> @brief      find out the minimum refinement for closing
-!! @param[in]  Ntype - middle node type
-!! @param[in]  Kreff - refinement flags for faces
-!! @param[in]  Krefe - refinement flags for edges
-!! @param[out] Kref  - refinement flag for the middle node
+!> @param[in]  Ntype - middle node type
+!> @param[in]  Kreff - refinement flags for faces
+!> @param[in]  Krefe - refinement flags for edges
+!> @param[out] Kref  - refinement flag for the middle node
 !> @date       Feb 2023
 subroutine find_element_closing_ref(Ntype,Kreff,Krefe, Kref)
   use refinements

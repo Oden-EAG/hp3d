@@ -11,7 +11,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 2D quadrilateral
+!> @brief         - routine returns values of 2D quadrilateral
 !                         BROKEN H1 shape functions
 !
 !     arguments:
@@ -85,7 +85,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 2D quadrilateral
+!> @brief         - routine returns values of 2D quadrilateral
 !                         BROKEN H(curl) shape functions
 !
 !     arguments:
@@ -175,7 +175,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 2D quadrilateral
+!> @brief         - routine returns values of 2D quadrilateral
 !                         BROKEN H(div) shape functions
 !
 !     arguments:
@@ -264,7 +264,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 2D quadrilateral
+!> @brief         - routine returns values of 2D quadrilateral
 !                         BROKEN L2 shape functions
 !
 !     arguments:

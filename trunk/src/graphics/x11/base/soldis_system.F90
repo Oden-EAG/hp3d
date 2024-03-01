@@ -70,7 +70,7 @@ end subroutine soldis_select_system
 !
 !
 !-------------------------------------------------------------------------------------
-!> Purpose - Compute quantity to be displayed by graphics
+!> @brief - Compute quantity to be displayed by graphics
 !!
 !> @param[in]  Mdle   - middle node
 !> @param[in]  Xi     - master element coordinates

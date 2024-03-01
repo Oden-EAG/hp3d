@@ -6,7 +6,7 @@
 !
 !     latest revision:  - Oct 2021
 !
-!     purpose:          - routine returns element residual (squared)
+!> @brief         - routine returns element residual (squared)
 !                         for the Primal Poisson and UW Time Harmonic
 !                         Maxwell equation
 !
@@ -87,7 +87,7 @@ end subroutine elem_residual
 !
 !     latest revision:  - Oct 2021
 !
-!     purpose:          - routine returns element residual (squared)
+!> @brief         - routine returns element residual (squared)
 !                         for the Primal DPG Poisson equation
 !
 !     arguments:

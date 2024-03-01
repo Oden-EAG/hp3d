@@ -7,7 +7,7 @@
 !> @param[in] Lab  = 1 (prism), 2(hexa), 3(tet), 4(pyramid)
 !> @param[in] Nb   - block number
 !
-!> @revision Feb 13
+!> @date Feb 13
 !---------------------------------------------------------------------
 subroutine check_orientation(Lab,Nb)
 !

@@ -345,7 +345,7 @@
 !----------------------------------------------------------------------
 !
 !  ...return vertex numbers endpoints of an edge......
-      subroutine edge_to_vert(Ntype,Ie, Nv1,Nv2)
+   subroutine edge_to_vert(Ntype,Ie, Nv1,Nv2)
 !
       integer, intent(in)  :: Ntype,Ie
       integer, intent(out) :: Nv1,Nv2
@@ -365,12 +365,12 @@
         Nv1 = PYRAM_EDGE_TO_VERT(1,Ie); Nv2 = PYRAM_EDGE_TO_VERT(2,Ie)
       end select
 !
-      end subroutine edge_to_vert
+   end subroutine edge_to_vert
 !
 !----------------------------------------------------------------------
 !
 !  ...return vertex numbers for a face
-      subroutine face_to_vert(Ntype,Ifc, Nv1,Nv2,Nv3,Nv4)
+   subroutine face_to_vert(Ntype,Ifc, Nv1,Nv2,Nv3,Nv4)
 !
       integer, intent(in)  :: Ntype,Ifc
       integer, intent(out) :: Nv1,Nv2,Nv3,Nv4
@@ -390,12 +390,12 @@
         Nv3 = PYRAM_FACE_TO_VERT(3,Ifc);Nv4 = PYRAM_FACE_TO_VERT(4,Ifc);
       end select
 !
-      end subroutine face_to_vert
+   end subroutine face_to_vert
 !
 !----------------------------------------------------------------------
 !
 !  ...return edge numbers for a face
-      subroutine face_to_edge(Ntype,Ifc, Ne1,Ne2,Ne3,Ne4)
+   subroutine face_to_edge(Ntype,Ifc, Ne1,Ne2,Ne3,Ne4)
 !
       integer, intent(in)  :: Ntype,Ifc
       integer, intent(out) :: Ne1,Ne2,Ne3,Ne4
@@ -415,7 +415,7 @@
         Ne3 = PYRAM_FACE_TO_EDGE(3,Ifc);Ne4 = PYRAM_FACE_TO_EDGE(4,Ifc);
       end select
 !
-      end subroutine face_to_edge
+   end subroutine face_to_edge
 !
 !----------------------------------------------------------------------
 !
@@ -425,7 +425,7 @@
 !                         of the face
 !> @date       Feb 2023
 !----------------------------------------------------------------------
-      subroutine face_to_vert_nos(Ftype,Nface_or, Nfver)
+   subroutine face_to_vert_nos(Ftype,Nface_or, Nfver)
 !
       integer, intent(in ) :: Ftype,Nface_or
       integer, intent(out) :: Nfver(4)
@@ -443,11 +443,11 @@
         enddo
       end select
 !
-      end subroutine face_to_vert_nos
+   end subroutine face_to_vert_nos
 !
 !----------------------------------------------------------------------
 !
-      subroutine face_to_edge_nos(Ftype,Nface_or, Nfedg)
+   subroutine face_to_edge_nos(Ftype,Nface_or, Nfedg)
 !
       integer, intent(in ) :: Ftype,Nface_or
       integer, intent(out) :: Nfedg(4)
@@ -465,7 +465,7 @@
         enddo
       end select
 !
-      end subroutine face_to_edge_nos
+   end subroutine face_to_edge_nos
 !
 !----------------------------------------------------------------------
 !
@@ -477,7 +477,7 @@
 !                         the face point of view
 !> @date       Feb 2023
 !----------------------------------------------------------------------
-      subroutine face_to_edge_orient(Ftype,Nface_or,Nedge_or, Nfedg_or)
+   subroutine face_to_edge_orient(Ftype,Nface_or,Nedge_or, Nfedg_or)
 !
       integer, intent(in ) :: Ftype
       integer, intent(in ) :: Nface_or
@@ -500,12 +500,12 @@
         enddo
       end select
 !
-      end subroutine face_to_edge_orient
+   end subroutine face_to_edge_orient
 !
 !----------------------------------------------------------------------
 !
 !  ...return local edge parametrizations......
-      subroutine edge_param(Ntype,Ie,T, Xi,Dxidt)
+   subroutine edge_param(Ntype,Ie,T, Xi,Dxidt)
 !
       integer, intent(in)  :: Ntype,Ie
       real(8), intent(in)  :: T
@@ -546,12 +546,12 @@
       Dxidt(1:nvar) = xi2(1:nvar) - xi1(1:nvar)
       Xi(1:nvar) = xi1(1:nvar) + T*Dxidt(1:nvar)
 !
-      end subroutine edge_param
+   end subroutine edge_param
 !
 !----------------------------------------------------------------------
 !
 !  ...return local face parametrizations......
-      subroutine face_param(Ntype,Iface,T, Xi,Dxidt)
+   subroutine face_param(Ntype,Iface,T, Xi,Dxidt)
 !
       use control , only : GEOM_TOL
 !
@@ -608,7 +608,7 @@
       Dxidt(1:3,2) = xi3(1:3)-xi1(1:3)
       Xi(1:3) = xi1(1:3) + T(1)*Dxidt(1:3,1) + T(2)*Dxidt(1:3,2)
 !
-      end subroutine face_param
+   end subroutine face_param
 !
 !----------------------------------------------------------------------
 !
@@ -697,7 +697,7 @@
 !----------------------------------------------------------------------
 !
 !  ...return local face node numbers
-      subroutine face_nodes(Ntype,Iface, Nface_nodes,Nrfn)
+   subroutine face_nodes(Ntype,Iface, Nface_nodes,Nrfn)
 !
       integer, intent(in)  :: Ntype,Iface
       integer, intent(out) :: Nface_nodes(9),Nrfn
@@ -742,12 +742,12 @@
         end select
       end select
 !
-      end subroutine face_nodes
+   end subroutine face_nodes
 !
 !----------------------------------------------------------------------
 !
 !  ...return local face order of approximation
-      subroutine face_order(Ntype,Iface,Norder, Nordf)
+   subroutine face_order(Ntype,Iface,Norder, Nordf)
 !
       integer, intent(in)  :: Ntype,Iface,Norder(19)
       integer, intent(out) :: Nordf(5)
@@ -800,12 +800,12 @@
         end select
       end select
 !
-      end subroutine face_order
+   end subroutine face_order
 !
 !----------------------------------------------------------------------
 !
 !  ...return number of dof for a single component
-      subroutine ndof_nod(Ntype,Nord, NdofH,NdofE,NdofV,NdofQ)
+   subroutine ndof_nod(Ntype,Nord, NdofH,NdofE,NdofV,NdofQ)
 !
       integer, intent(in)  :: Ntype,Nord
       integer, intent(out) :: NdofH,NdofE,NdofV,NdofQ
@@ -878,7 +878,7 @@
 !!!                            S_Type(NType),Nord, NdofH,NdofE,NdofV,NdofQ
 !!!      call pause
 !
-      end subroutine ndof_nod
+   end subroutine ndof_nod
 !
 !
    end module element_data
@@ -1064,7 +1064,7 @@
 !
       integer,save,dimension(4,4) :: AUX
 !$OMP THREADPRIVATE(AUX)
-      logical,save                :: INITIALIZED=.FALSE.
+      logical,save                :: INITIALIZED=.false.
 !$OMP THREADPRIVATE(INITIALIZED)
       integer,       dimension(2) :: iedge1,iedge2,list
       integer                     :: i,j,i1,i2,ifound
@@ -1107,7 +1107,7 @@
 !!      enddo    ; enddo
 !
 !  ...update initialization flag
-      INITIALIZED=.TRUE.
+      INITIALIZED=.true.
 !
       endif
 !
@@ -1163,7 +1163,7 @@
 !
       integer,save,dimension(8,8) :: AUX
 !$OMP THREADPRIVATE(AUX)
-      logical,save                :: INITIALIZED=.FALSE.
+      logical,save                :: INITIALIZED=.false.
 !$OMP THREADPRIVATE(INITIALIZED)
       integer,       dimension(3) :: iface1,iface2,list
       integer                     :: i,i1,i2,ifound
@@ -1212,7 +1212,7 @@
 #endif
 !
 !  ...update initialization flag
-      INITIALIZED=.TRUE.
+      INITIALIZED=.true.
 !
       endif
 !

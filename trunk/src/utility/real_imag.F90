@@ -1,7 +1,7 @@
 #include "typedefs.h"
 
-!>@brief Returns real part of complex number
-!>@date Feb 2023
+!> @brief Returns real part of complex number
+!> @date Feb 2023
 real(8) function dreal_part(Z)
 !
    implicit none
@@ -16,8 +16,8 @@ real(8) function dreal_part(Z)
 end function dreal_part
 !
 !
-!>@brief Returns imag part of complex number
-!>@date Feb 2023
+!> @brief Returns imag part of complex number
+!> @date Feb 2023
 real(8) function dimag_part(Z)
 !
    implicit none

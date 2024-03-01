@@ -7,7 +7,7 @@
 #if HP3D_USE_X11
 
 !
-      subroutine graphb
+   subroutine graphb
 !
       use graphmod
 !
@@ -79,16 +79,16 @@
       goto 10
 !
 !
-      end subroutine graphb
+   end subroutine graphb
 
 #else
 
-      subroutine graphb
+   subroutine graphb
       
       implicit none
       
       write(*,*) 'graphb is only supported with HP3D_USE_X11 enabled.'
       
-      end subroutine graphb
+   end subroutine graphb
 
 #endif

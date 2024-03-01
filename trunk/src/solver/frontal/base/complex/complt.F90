@@ -52,7 +52,7 @@
 !
 #if HP3D_DEBUG
       if (iprint.eq.1) then
-         write(NFSOUT,*) 'in complt.f'
+         write(NFSOUT,*) 'in complt:'
          write(NFSOUT,*) 'mdof,numelm,mldest,n',mdof,numelm,mldest,n
       endif
 #endif

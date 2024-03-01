@@ -19,7 +19,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine draw_line(X1,Y1,X2,Y2,Ic,Itype)
+   subroutine draw_line(X1,Y1,X2,Y2,Ic,Itype)
 !
       use graphmod
 !
@@ -78,6 +78,6 @@
         endif
       enddo
 !
-      end subroutine draw_line
+   end subroutine draw_line
 
 #endif

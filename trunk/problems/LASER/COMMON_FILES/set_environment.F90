@@ -6,7 +6,7 @@
 !
 !     latest revision:  - Apr 2019
 !
-!     purpose:          - define options for main file specific to the problem.
+!> @brief         - define options for main file specific to the problem.
 !                         These can be consulted with the -help option when running
 !                         the executable. It is especially important to define
 !                         the global environment variables in module/environment.
@@ -177,7 +177,7 @@ end subroutine set_environment_maxwell
 !
 !     latest revision:  - Mar 2019
 !
-!     purpose:          -
+!> @brief         -
 !
 !     arguments:        - none
 !

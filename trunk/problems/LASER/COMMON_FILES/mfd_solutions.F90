@@ -1,5 +1,5 @@
 !--------------------------------------------------------------------------------
-!> Purpose : exact (manufactured) solution
+!> @brief exact (manufactured) solution
 !
 !> @param[in]  Xp  - a point in physical space
 !> @param[in]  Fld - 0: pump field, 1: signal field

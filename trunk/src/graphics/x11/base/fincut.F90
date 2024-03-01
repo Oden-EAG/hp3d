@@ -24,7 +24,7 @@
 !                        1   -new triangles
 !
 !---------------------------------------------------------------------
-      subroutine fincut(Xtro,Usol, Nstrl,Costr,Isflag)
+   subroutine fincut(Xtro,Usol, Nstrl,Costr,Isflag)
 !
       implicit none
 !
@@ -134,6 +134,6 @@
       endif
 !
 !
-      end subroutine fincut
+   end subroutine fincut
 
 #endif

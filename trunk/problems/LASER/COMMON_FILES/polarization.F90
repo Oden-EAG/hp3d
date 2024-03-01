@@ -2,7 +2,7 @@
 #include "typedefs.h"
 !
 !-------------------------------------------------------------------------------
-! Routine: get_bgPol
+!> @name get_bgPol
 !
 ! last modified: June 2021
 !
@@ -144,7 +144,7 @@ end subroutine get_bgPol
 !
 !-------------------------------------------------------------------------------
 !
-! Routine: get_activePol
+!> @name get_activePol
 !
 ! last modified: June 2021
 !
@@ -251,11 +251,11 @@ end subroutine get_activePol
 !
 !
 !-------------------------------------------------------------------------------
-!  subroutine: get_ramanPol
+!> @name get_ramanPol
 !
-!  last modified: Mar 2019
+!> @date Mar 2019
 !
-!  purpose:    returns the Raman polarization
+!> @brief    returns the Raman polarization
 !
 !  input:      E,H        : electric and magnetic fields (L2 variables)
 !              domain flag: core - 1, cladding - 0

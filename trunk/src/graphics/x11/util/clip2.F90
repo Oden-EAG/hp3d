@@ -16,7 +16,7 @@
 !           out : Imod - clipping indicator
 !
 !----------------------------------------------------------------------
-      subroutine clip2(Trc, Imod)
+   subroutine clip2(Trc, Imod)
 !
       use graphmod, only: XY,DIMIM,XCIM
 !
@@ -42,6 +42,6 @@
 !  .....if visible
       Imod = 1
 !
-      end subroutine clip2
+   end subroutine clip2
 
 #endif

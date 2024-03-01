@@ -6,18 +6,18 @@
 !!             PB interpolation; NOTE: the interpolation (projection)
 !!             is done in the reference space
 !!
-!! @param[in]  Iflag        - a flag specifying which of the objects the
+!> @param[in]  Iflag        - a flag specifying which of the objects the
 !!                            face is on: 5 pris, 6 hexa, 7 tetr, 8 pyra
-!! @param[in]  No           - number of a specific object
-!! @param[in]  Etav         - reference coordinates of the element vertices
-!! @param[in]  Ntype        - element (middle node) type
-!! @param[in]  Nedge_orient - edge orientation
-!! @param[in]  Nface_orient - face orientation
-!! @param[in]  Norder       - element order
-!! @param[in]  Iface        - face number
-!! @param[in]  Xnod         - geometry dof for the element (vertex and edge values)
+!> @param[in]  No           - number of a specific object
+!> @param[in]  Etav         - reference coordinates of the element vertices
+!> @param[in]  Ntype        - element (middle node) type
+!> @param[in]  Nedge_orient - edge orientation
+!> @param[in]  Nface_orient - face orientation
+!> @param[in]  Norder       - element order
+!> @param[in]  Iface        - face number
+!> @param[in]  Xnod         - geometry dof for the element (vertex and edge values)
 !!
-!! @param[out] Xdof         - geometry dof for the face
+!> @param[out] Xdof         - geometry dof for the face
 !!
 !> @date       Feb 2023
 !-----------------------------------------------------------------------

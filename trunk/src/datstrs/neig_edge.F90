@@ -21,7 +21,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine neig_edge(Medge,Maxn, &
+   subroutine neig_edge(Medge,Maxn, &
                            Neig,Nedg_list,Norient_list,Nrneig)
 !
       use GMP
@@ -138,4 +138,4 @@
       endif
 #endif
 !
-      end subroutine neig_edge
+   end subroutine neig_edge

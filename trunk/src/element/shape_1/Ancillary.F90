@@ -14,7 +14,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - compute edge H1 ancillary functions and
+!> @brief         - compute edge H1 ancillary functions and
 !                         their gradients
 !
 !     arguments:
@@ -65,7 +65,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - compute edge Hcurl ancillary functions and
+!> @brief         - compute edge Hcurl ancillary functions and
 !                         their curls
 !
 !     arguments:
@@ -147,7 +147,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - compute quadrilateral face H1 ancillary
+!> @brief         - compute quadrilateral face H1 ancillary
 !                         functions and their gradients
 !
 !     arguments:
@@ -213,7 +213,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - compute quadrilateral face Hcurl ancillary
+!> @brief         - compute quadrilateral face Hcurl ancillary
 !                         functions and their curls
 !
 !     arguments:
@@ -283,7 +283,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - compute quadrilateral face Hdiv ancillary
+!> @brief         - compute quadrilateral face Hdiv ancillary
 !                         functions and their divergences
 !
 !     arguments:
@@ -333,7 +333,7 @@
       call AncEE(ST(0:1,2),DST(1:N,0:1,2),Nord(2),Idec(2),N, &
                  EET,curlEET)
 !
-!      ...slight speedup when Idec=(.TRUE.,.TRUE.)
+!      ...slight speedup when Idec=(.true.,.true.)
       if (Idec(1).and.Idec(2)) then
         do j=minJ,maxJ
           do i=minI,maxI
@@ -373,7 +373,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - compute triangle face H1 ancillary
+!> @brief         - compute triangle face H1 ancillary
 !                         functions and their gradients
 !
 !     arguments:
@@ -413,7 +413,7 @@
       minJ = 1; maxJ = Nord-2
       minIJ = minI+minJ; maxIJ = Nord
       minalpha = 2*minI
-      IdecE = .FALSE.
+      IdecE = .false.
 !
       if (N.lt.2) then
         write(*,7001) N
@@ -449,7 +449,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - compute triangle face Hcurl ancillary
+!> @brief         - compute triangle face Hcurl ancillary
 !                         functions and their curls
 !
 !     arguments:
@@ -490,7 +490,7 @@
       minIJ = minI+minJ; maxIJ = Nord-1
       minalpha = 2*minI+1
       Ncurl = 2*N-3
-      IdecE = .FALSE.
+      IdecE = .false.
 !
       if (N.lt.2) then
         write(*,7001) N
@@ -529,7 +529,7 @@
 !
 !     latest revision:  - Oct 14
 !
-!     purpose:          - compute triangle face Hcurl ancillary
+!> @brief         - compute triangle face Hcurl ancillary
 !                         functions and their curls (family II)
 !
 !     arguments:

@@ -11,7 +11,7 @@
 !
 !     latest revision:  - Oct 14, Apr 17, Jul 21
 !
-!     purpose:          - routine returns values of 3D tetrahedron element
+!> @brief         - routine returns values of 3D tetrahedron element
 !                         H1 shape functions and their derivatives
 !
 !     arguments:
@@ -145,7 +145,7 @@
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...local parameters (again)
-        IdecB(1) = IdecF; IdecB(2) = .TRUE.
+        IdecB(1) = IdecF; IdecB(2) = .true.
         minbeta = 2*minIJ
         maxIJK = nordB
         maxIJ = maxIJK-minK
@@ -242,7 +242,7 @@
 !
 !     latest revision:  - Oct 14, Apr 17, Jul 21
 !
-!     purpose:          - routine returns values of 3D tetrahedron element
+!> @brief         - routine returns values of 3D tetrahedron element
 !                         H(curl) shape functions and their derivatives
 !
 !     arguments:
@@ -376,7 +376,7 @@
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...local parameters (again)
-        IdecB(1) = IdecF; IdecB(2) = .TRUE.
+        IdecB(1) = IdecF; IdecB(2) = .true.
         minbeta = 2*minIJ
         maxIJK = nordB-1
         maxIJ = maxIJK-minK
@@ -492,7 +492,7 @@
 !
 !     latest revision:  - Oct 14, Apr 17, Jul 21
 !
-!     purpose:          - routine returns values of 3D tetrahedron element
+!> @brief         - routine returns values of 3D tetrahedron element
 !                         H(div) shape functions and their divergences
 !
 !     arguments:
@@ -587,7 +587,7 @@
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...local parameters (again)
-        IdecB(1) = IdecF; IdecB(2) = .TRUE.
+        IdecB(1) = IdecF; IdecB(2) = .true.
         minbeta = 2*(minIJ+1)
         maxIJK = nordB-1
         maxIJ = maxIJK-minK
@@ -684,7 +684,7 @@
 !
 !     latest revision:  - Oct 14, Apr 17
 !
-!     purpose:          - routine returns values of 3D tetrahedron
+!> @brief         - routine returns values of 3D tetrahedron
 !                         element L2 shape functions
 !
 !     arguments:

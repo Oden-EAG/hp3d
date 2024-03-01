@@ -6,7 +6,7 @@
 !
 !     latest revision:  - May 2023
 !
-!     purpose:          - main driver for example problem:
+!> @brief         - main driver for example problem:
 !                         Poisson ULTRAWEAK DPG implementation
 !
 !----------------------------------------------------------------------
@@ -64,10 +64,10 @@ program main
       if ((RANK .eq. i) .and. (RANK .eq. ROOT)) then
          write(6,*)
          write(6,1020) "Master proc [", RANK, "], initialize.."
-         QUIET_MODE = .FALSE.
+         QUIET_MODE = .false.
       else if ((RANK .eq. i) .and. (RANK .ne. ROOT)) then
          write(6,1020) "Worker proc [", RANK, "], initialize.."
-         QUIET_MODE = .TRUE.
+         QUIET_MODE = .true.
       endif
    enddo
  1020 format (A,I3,A)

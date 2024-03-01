@@ -18,7 +18,7 @@
 !
 !********************************************************
 
-      subroutine wvopps
+   subroutine wvopps
       use wvglob
       use wvpost
       use wvscrn
@@ -79,11 +79,11 @@
       write(*,*) ' File ',name,' exists !!'
       write(*,*) ' I will not overwrite it !!'
       goto 110
-      end subroutine wvopps
+   end subroutine wvopps
 
 
 !-----------------------------------------------------------------
-      subroutine wvpscl(Clip)
+   subroutine wvpscl(Clip)
       use wvglob
       use wvpost
       use wvscrn
@@ -125,10 +125,10 @@
       endif
 !
       return
-      end subroutine wvpscl
+   end subroutine wvpscl
 
 !========================================================
-      subroutine WVPSDL(X1,Y1,X2,Y2,IC)
+   subroutine WVPSDL(X1,Y1,X2,Y2,IC)
       use wvglob
       use wvpost
       use wvscrn
@@ -157,10 +157,10 @@
         call wvpsout(x2,y2,4)
         call wvpsout(dum1,dum2,6)
         return
-      end subroutine WVPSDL
+   end subroutine WVPSDL
 
 
-      subroutine wvpsfp(N,Xc,Icf,Icl)
+   subroutine wvpsfp(N,Xc,Icf,Icl)
       use wvglob
       use wvpost
       use wvscrn
@@ -234,12 +234,12 @@
 !
 !
       return
-      end subroutine wvpsfp
+   end subroutine wvpsfp
 
 !========================================================
 !     draw pixel in postcript
 !========================================================
-      subroutine WVPSPX(X,Y,IC)
+   subroutine WVPSPX(X,Y,IC)
       use wvglob
       use wvpost
       use wvscrn
@@ -256,14 +256,14 @@
         call wvpsout(X,Y,4)
         call wvpsout(dum1,dum2,6)
         return
-      end subroutine WVPSPX
+   end subroutine WVPSPX
 
 
 !========================================================
 !     draw text in postscript
 !========================================================
 
-      subroutine WVPSTE(X1,Y1,H,MESS,A,N,ICOL)
+   subroutine WVPSTE(X1,Y1,H,MESS,A,N,ICOL)
       use wvglob
       use wvpost
       use wvscrn
@@ -286,12 +286,12 @@
         write(IFILE,1000) ' (',mess(1:N),') show'
  1000   format(A)
         return
-      end subroutine WVPSTE
+   end subroutine WVPSTE
 
 
 !-------------------------------------------------------------------
 
-      subroutine wvpsout(X,Y,Icode)
+   subroutine wvpsout(X,Y,Icode)
       use wvglob
       use wvpost
       use wvscrn
@@ -371,11 +371,11 @@
       IBUFC(ILBUF)=Icode
       if (ILBUF.eq.5) call flushps
       return
-      end subroutine wvpsout
+   end subroutine wvpsout
 !
 !-----------------------------------------------------------------------
 !
-      subroutine flushps
+   subroutine flushps
 !
 !-----------------------------------------------------------------------
 !
@@ -538,11 +538,11 @@
       endif
 !
       return
-      end subroutine flushps
+   end subroutine flushps
 
 
 !========================================================
-      subroutine wvclps
+   subroutine wvclps
       use wvglob
       use wvpost
       use wvscrn
@@ -561,6 +561,6 @@
         close(IFILE)
         write(*,*)' PostScript file closed'
         return
-      end subroutine wvclps
+   end subroutine wvclps
 
 #endif

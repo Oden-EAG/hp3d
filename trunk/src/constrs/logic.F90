@@ -110,7 +110,7 @@
       integer :: ncflag(4)
 !
 !  ...H(div) constrained approximation flag
-      logical :: CONSTRAINED_HDIV = .TRUE.
+      logical :: CONSTRAINED_HDIV = .true.
 !
 !  ...miscellanea
       integer :: i,ie,ip,iref,is,ish,isv,iv,ivp,jp,k,kp

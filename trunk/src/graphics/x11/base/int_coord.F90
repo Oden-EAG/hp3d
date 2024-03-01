@@ -31,7 +31,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine int_coord(Numlev,Nsub,Ntype,Norder,I,J, &
+   subroutine int_coord(Numlev,Nsub,Ntype,Norder,I,J, &
                            Ixi1,Ixi2,Np1,Np2,Nsid1,Nsid2)
 !
       use node_types
@@ -358,6 +358,6 @@
       endif
 #endif
 !
-      end subroutine int_coord
+   end subroutine int_coord
 
 #endif

@@ -10,19 +10,19 @@
 !           The remaining fields are assumed not to be written by update_Ddof,
 !           since the corresponding attributes are deactivated via PHYSAm.
 !-------------------------------------------------------------------------------
-!> Purpose : calculate Dirichlet boundary condition
+!> @brief calculate Dirichlet boundary condition
 !> last mod: June 2021
 !!
-!! @param[in]  Mdle  - an element (middle node) number
-!! @param[in]  X     - physical coordinates of a point
-!! @param[in]  Icase - node case
+!> @param[in]  Mdle  - an element (middle node) number
+!> @param[in]  X     - physical coordinates of a point
+!> @param[in]  Icase - node case
 !!
-!! @param[out] ValH  - value of the H1 solution
-!! @param[out] DvalH - H1 corresponding first derivatives
-!! @param[out] ValE  - value of the H(curl) solution
-!! @param[out] DvalE - H(curl) corresponding first derivatives
-!! @param[out] ValV  - value of the H(div) solution
-!! @param[out] DvalV - H(div) corresponding first derivatives
+!> @param[out] ValH  - value of the H1 solution
+!> @param[out] DvalH - H1 corresponding first derivatives
+!> @param[out] ValE  - value of the H(curl) solution
+!> @param[out] DvalE - H(curl) corresponding first derivatives
+!> @param[out] ValV  - value of the H(div) solution
+!> @param[out] DvalV - H(div) corresponding first derivatives
 !-------------------------------------------------------------------------------
 !
 #include "typedefs.h"

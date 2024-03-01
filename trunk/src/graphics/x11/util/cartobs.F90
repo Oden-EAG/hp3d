@@ -14,7 +14,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine cartobs
+   subroutine cartobs
 !
       use graphmod
 !
@@ -78,6 +78,6 @@
       enddo
 !
 !
-      end subroutine cartobs
+   end subroutine cartobs
 
 #endif

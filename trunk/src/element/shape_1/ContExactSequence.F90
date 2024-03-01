@@ -28,7 +28,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - evaluate 1D H1 shape functions
+!> @brief         - evaluate 1D H1 shape functions
 !
 !     arguments:
 !
@@ -74,7 +74,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - evaluate 1D L2 shape functions
+!> @brief         - evaluate 1D L2 shape functions
 !
 !     arguments:
 !
@@ -127,7 +127,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - routine returns values of a 2D element
+!> @brief         - routine returns values of a 2D element
 !                         H1 shape functions and their derivatives
 !
 !     arguments:
@@ -188,7 +188,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - routine returns values of a 2D element
+!> @brief         - routine returns values of a 2D element
 !                         H(curl) shape functions and their curl
 !
 !     arguments:
@@ -248,7 +248,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - routine returns values of a 2D element
+!> @brief         - routine returns values of a 2D element
 !                         H(div) shape functions and their divergence
 !                         NOTE: only relevant in 2D problems!!
 !
@@ -310,7 +310,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - routine returns values of a 2D element
+!> @brief         - routine returns values of a 2D element
 !                         L2 shape functions
 !
 !     arguments:
@@ -375,7 +375,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - routine evaluates H1 shape functions for 3D
+!> @brief         - routine evaluates H1 shape functions for 3D
 !                         elements of various types
 !
 !     arguments:
@@ -446,7 +446,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - routine evaluates H(curl) shape functions for
+!> @brief         - routine evaluates H(curl) shape functions for
 !                         3D elements of various types
 !
 !     arguments:
@@ -517,7 +517,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - routine evaluates H(div) shape functions for
+!> @brief         - routine evaluates H(div) shape functions for
 !                         3D elements of various types
 !
 !     arguments:
@@ -581,7 +581,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - routine evaluates L2 shape functions for 3D
+!> @brief         - routine evaluates L2 shape functions for 3D
 !                         elements of various types
 !
 !     arguments:

@@ -15,7 +15,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine sortz
+   subroutine sortz
 !
       use graphmod
 !
@@ -81,6 +81,6 @@
       IGTR(i) = index
       go to 20
 !
-      end subroutine sortz
+   end subroutine sortz
 
 #endif

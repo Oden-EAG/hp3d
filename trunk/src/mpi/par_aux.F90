@@ -5,11 +5,11 @@
 !
 !----------------------------------------------------------------------
 !
-!     subroutine:          partition_fiber
+!      subroutine:          partition_fiber
 !
-!     last modified:       Aug 2019
+!> @date       Aug 2019
 !
-!     purpose:             partition a waveguide structure into slabs
+!> @brief            partition a waveguide structure into slabs
 !                          along z-axis (with equal size per proc)
 !
 !----------------------------------------------------------------------
@@ -84,11 +84,11 @@ subroutine partition_fiber(subd_next)
 end subroutine partition_fiber
 !----------------------------------------------------------------------
 !
-!     subroutine:          partition_fiber
+!      subroutine:          partition_fiber
 !
-!     last modified:       Aug 2019
+!> @date       Aug 2019
 !
-!     purpose:             partition a waveguide structure into slabs
+!> @brief            partition a waveguide structure into slabs
 !                          along z-axis (with equal size per proc)
 !
 !----------------------------------------------------------------------
@@ -178,9 +178,9 @@ end subroutine repartition_fiber
 !
 !-----------------------------------------------------------------------
 !
-!    latest revision:   - Oct 2019
+!> @date                - Oct 2019
 !
-!    purpose:           - sorts an array of duplets (iel,residual) with
+!> @brief               - sorts an array of duplets (iel,residual) with
 !                         residual (sort key) in ascending order
 !                         (initial call needs: First = 1, Last = N)
 !
@@ -235,11 +235,11 @@ end subroutine qsort_duplet_z
 !
 !----------------------------------------------------------------------
 !
-!     subroutine:          collect_dofs
+!      subroutine:          collect_dofs
 !
-!     last modified:       July 2019
+!> @date       July 2019
 !
-!     purpose:             collect solution degrees of freedom from all
+!> @brief            collect solution degrees of freedom from all
 !                          processors into the ROOT processor
 !
 !----------------------------------------------------------------------
@@ -345,11 +345,11 @@ end subroutine collect_dofs
 !
 !----------------------------------------------------------------------
 !
-!     subroutine:          print_partition
+!      subroutine:          print_partition
 !
-!     last modified:       July 2019
+!> @date       July 2019
 !
-!     purpose:             print current partition of distributed mesh
+!> @brief            print current partition of distributed mesh
 !
 !----------------------------------------------------------------------
 subroutine print_partition()
@@ -401,11 +401,11 @@ end subroutine print_partition
 !
 !----------------------------------------------------------------------
 !
-!     subroutine:          print_subd
+!      subroutine:          print_subd
 !
-!     last modified:       Mar 2023
+!> @date       Mar 2023
 !
-!     purpose:             print current subdomain for each process
+!> @brief            print current subdomain for each process
 !
 !----------------------------------------------------------------------
 subroutine print_subd()
@@ -458,11 +458,11 @@ end subroutine print_subd
 !
 !----------------------------------------------------------------------
 !
-!     subroutine:          print_coord
+!      subroutine:          print_coord
 !
-!     last modified:       Mar 2023
+!> @date       Mar 2023
 !
-!     purpose:             print current subdomain for each process
+!> @brief            print current subdomain for each process
 !
 !----------------------------------------------------------------------
 subroutine print_coord()

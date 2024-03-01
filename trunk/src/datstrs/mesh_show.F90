@@ -1,6 +1,6 @@
 #if HP3D_DEBUG
 
-!> Purpose : show the mesh data structure
+!> @brief show the mesh data structure
 subroutine mesh_show
   use data_structure3D
   use refinements

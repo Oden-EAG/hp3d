@@ -2,13 +2,13 @@
 !> @brief Physical coordinates for a triangle parametrization, and
 !!        their derivatives wrt to a GIVEN system of coordinates
 !!
-!! @param[in ] No      - triangle number
-!! @param[in ] T       - coordinates of a point in the triangle
+!> @param[in ] No      - triangle number
+!> @param[in ] T       - coordinates of a point in the triangle
 !!                       according to a GIVEN system
-!! @param[in ] Norient - orientation of GLOBAL REFERENCE coordinates
+!> @param[in ] Norient - orientation of GLOBAL REFERENCE coordinates
 !!                       wrt GIVEN coordinates
-!! @param[out] X       - physical coordinates
-!! @param[out] Dxdt    - derivatives of physical coordinates
+!> @param[out] X       - physical coordinates
+!> @param[out] Dxdt    - derivatives of physical coordinates
 !!
 !> @date Nov 2012
 !-----------------------------------------------------------------------
@@ -63,10 +63,10 @@ end subroutine trian_local
 !> @brief Evaluates physical coordinates and its derivatives
 !!        wrt to reference coordinates
 !!
-!! @param[in]  No     - a GMP triangle number
-!! @param[in]  Eta    - reference coordinates of a point
-!! @param[out] X      - physical coordinates of the point
-!! @param[out] Dxdeta - derivatives of the physical coordinates
+!> @param[in]  No     - a GMP triangle number
+!> @param[in]  Eta    - reference coordinates of a point
+!> @param[out] X      - physical coordinates of the point
+!> @param[out] Dxdeta - derivatives of the physical coordinates
 !!
 !> @date Mar 2023
 !-----------------------------------------------------------------------

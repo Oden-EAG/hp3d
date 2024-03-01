@@ -528,7 +528,7 @@ end subroutine stc_fwd_gen
 !----------------------------------------------------------------------
 subroutine stc_bwd_wrapper(Iel)
 !
-   use assembly, ONLY:  MAXbrickH,MAXmdlbH,MAXEQNH, &
+   use assembly, only:  MAXbrickH,MAXmdlbH,MAXEQNH, &
                         MAXbrickE,MAXmdlbE,MAXEQNE, &
                         MAXbrickV,MAXmdlbV,MAXEQNV
 !

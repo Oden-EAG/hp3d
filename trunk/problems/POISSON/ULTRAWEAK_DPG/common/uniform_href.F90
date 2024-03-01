@@ -6,7 +6,7 @@
 !
 !     latest revision:  - May 2023
 !
-!     purpose:          - performs single uniform h-refinement
+!> @brief         - performs single uniform h-refinement
 !
 !     arguments:
 !        in:

@@ -1,13 +1,13 @@
 !----------------------------------------------------------------------------
 !> @brief Reconstruct nodal connectivity with given parent connectivity
 !!
-!! @param[in]  Nfath         - father node
-!! @param[in]  Nodesl_fath   - nodal connectivity of father
-!! @param[in]  Norientl_fath - orientation of father
-!! @param[in]  Ison          - son number of this node
-!! @param[out] Nod           - node number
-!! @param[out] Nodesl        - nodal connectivity of node
-!! @param[out] Norientl      - orientation of node
+!> @param[in]  Nfath         - father node
+!> @param[in]  Nodesl_fath   - nodal connectivity of father
+!> @param[in]  Norientl_fath - orientation of father
+!> @param[in]  Ison          - son number of this node
+!> @param[out] Nod           - node number
+!> @param[out] Nodesl        - nodal connectivity of node
+!> @param[out] Norientl      - orientation of node
 !
 !> @date Feb 2023
 !----------------------------------------------------------------------------

@@ -1,12 +1,12 @@
 !------------------------------------------------------------------------------------
-!> Purpose : parametrization of the hexahedron
+!> @brief parametrization of the hexahedron
 !!
-!! @param[in ] No     - hexa number
-!! @param[in ] Eta    - reference coordinates of a point in the reference hexahedron
-!! @param[out] X      - physical coordinates of the point
-!! @param[out] Dxdeta - derivatives of the physical coordinates
+!> @param[in ] No     - hexa number
+!> @param[in ] Eta    - reference coordinates of a point in the reference hexahedron
+!> @param[out] X      - physical coordinates of the point
+!> @param[out] Dxdeta - derivatives of the physical coordinates
 !!
-!! @revision Nov 12
+!> @date Nov 12
 !------------------------------------------------------------------------------------
 !
 subroutine hexa(No,Eta, X,Dxdeta)
@@ -84,14 +84,14 @@ end subroutine hexa
 !
 !
 !------------------------------------------------------------------------------------
-!> Purpose : parametrization of the transfinite interpolation hexahedron
+!> @brief parametrization of the transfinite interpolation hexahedron
 !!
-!! @param[in ] No     - hexa number
-!! @param[in ] Eta    - reference coordinates of a point in the reference hexahedron
-!! @param[out] X      - physical coordinates of the point
-!! @param[out] Dxdeta - derivatives of the physical coordinates
+!> @param[in ] No     - hexa number
+!> @param[in ] Eta    - reference coordinates of a point in the reference hexahedron
+!> @param[out] X      - physical coordinates of the point
+!> @param[out] Dxdeta - derivatives of the physical coordinates
 !!
-!! @revision Nov 12
+!> @date Nov 12
 !------------------------------------------------------------------------------------
 !
 subroutine hexa_TraHex(No,Eta, X,Dxdeta)

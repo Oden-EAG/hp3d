@@ -1,18 +1,18 @@
 !---------------------------------------------------------------------------------------
-!> Purpose : display user-defined quantity
-!! @param[in] Mdle   - element (middle node) number
-!! @param[in] Xi     - master element coordinates
-!! @param[in] X      - physical coordinates
-!! @param[in] Rn     - outward normal unit vector
-!! @param[in] ZsolH  - H1    sol
-!! @param[in] ZgradH - H1    grad
-!! @param[in] ZsolE  - Hcurl sol
-!! @param[in] ZcurlE - Hcurl curl
-!! @param[in] ZsolV  - Hdiv  sol
-!! @param[in] ZdivV  - Hdiv  div
-!! @param[in] ZsolQ  - L2    sol
+!> @brief display user-defined quantity
+!> @param[in] Mdle   - element (middle node) number
+!> @param[in] Xi     - master element coordinates
+!> @param[in] X      - physical coordinates
+!> @param[in] Rn     - outward normal unit vector
+!> @param[in] ZsolH  - H1    sol
+!> @param[in] ZgradH - H1    grad
+!> @param[in] ZsolE  - Hcurl sol
+!> @param[in] ZcurlE - Hcurl curl
+!> @param[in] ZsolV  - Hdiv  sol
+!> @param[in] ZdivV  - Hdiv  div
+!> @param[in] ZsolQ  - L2    sol
 !!
-!! @param[out] val   - quantity to display
+!> @param[out] val   - quantity to display
 !---------------------------------------------------------------------------------------
 !
 #include "typedefs.h"
@@ -311,7 +311,7 @@ end subroutine soldis
 !
 !
 !---------------------------------------------------------------------------------------
-!> Purpose : select quantities to display
+!> @brief select quantities to display
 !---------------------------------------------------------------------------------------
 subroutine soldis_select
 !
@@ -356,7 +356,7 @@ subroutine soldis_select
 end subroutine soldis_select
 !
 !---------------------------------------------------------------------------------------
-!> Purpose : show the quantities selected to display
+!> @brief show the quantities selected to display
 !---------------------------------------------------------------------------------------
 
 subroutine disp_soldis(Nstream)

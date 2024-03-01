@@ -1,16 +1,16 @@
 !---------------------------------------------------------------------------------------------
 !> @brief determine the infos necessary for node breaking
 !!
-!! @param[in ] Ntype      - node type
-!! @param[in ] Kref       - refinement kind
-!! @param[in ] Nord       - order of approximation for the node
-!! @param[in ] Nbc        - BC flags
-!! @param[in ] Subd       - subdomain of node
-!! @param[out] Nrsons     - number of sons
-!! @param[out] Ntype_sons - son type
-!! @param[out] Norder     - order of approximation for sons
-!! @param[out] Nbcond     - BC flags for sons
-!! @param[out] Nsubd      - subdomain for sons
+!> @param[in ] Ntype      - node type
+!> @param[in ] Kref       - refinement kind
+!> @param[in ] Nord       - order of approximation for the node
+!> @param[in ] Nbc        - BC flags
+!> @param[in ] Subd       - subdomain of node
+!> @param[out] Nrsons     - number of sons
+!> @param[out] Ntype_sons - son type
+!> @param[out] Norder     - order of approximation for sons
+!> @param[out] Nbcond     - BC flags for sons
+!> @param[out] Nsubd      - subdomain for sons
 !!
 !> @date Feb 2023
 !---------------------------------------------------------------------------------------------

@@ -6,7 +6,7 @@
 !
 !     latest revision:     - June 2021
 !
-!     purpose:             - routine returns element residual (squared)
+!> @brief            - routine returns element residual (squared)
 !                            for UW time-harmonic Maxwell equation
 !
 !     arguments:

@@ -21,7 +21,7 @@
 !
    subroutine preout(Iel,N,Ia,Ib)
 !
-      use frsolmod , ONLY: IDESVE, NDESVE, NPDESV
+      use frsolmod , only: IDESVE, NDESVE, NPDESV
 !
       implicit none
 !

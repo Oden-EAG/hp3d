@@ -27,7 +27,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine finstr(Xtro,Usol,Slev,Slevup, Nstrl,Costr,Nsid_flag)
+   subroutine finstr(Xtro,Usol,Slev,Slevup, Nstrl,Costr,Nsid_flag)
 !
       implicit none
 !
@@ -165,6 +165,6 @@
         endif
       endif
 !
-      end subroutine finstr
+   end subroutine finstr
 
 #endif

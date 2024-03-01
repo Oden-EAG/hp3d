@@ -7,7 +7,7 @@
 !
 !     latest revision:  - June 2021
 !
-!     purpose:          - routine returns unconstrained (ordinary)
+!> @brief         - routine returns unconstrained (ordinary)
 !                         stiffness matrix and load vector for the
 !                         UW DPG formulation for Maxwell equations
 !                       - uses sum factorization for fast integration

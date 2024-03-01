@@ -1,6 +1,6 @@
 !----------------------------------------------------------------------------
-!> Purpose : finalize the program
-!! @date Aug 2019
+!> @brief finalize the program
+!> @date Aug 2019
 !----------------------------------------------------------------------------
 subroutine finalize
   use data_structure3D

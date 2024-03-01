@@ -6,7 +6,7 @@
 !
 !     latest revision:  - May 2023
 !
-!     purpose:          - returns Boundary conditions for Fichera Corner Problem
+!> @brief         - returns Boundary conditions for Fichera Corner Problem
 !
 !     arguments:
 !        in:

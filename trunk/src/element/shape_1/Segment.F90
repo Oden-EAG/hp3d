@@ -10,7 +10,7 @@
 !
 !     latest revision:  - Nov 14, Apr 17
 !
-!     purpose:          - routine returns values of 1D Segment H1
+!> @brief         - routine returns values of 1D Segment H1
 !                         shape functions
 !
 !     arguments:
@@ -69,7 +69,7 @@
 !    ...local parameters
         minI  = 2
         maxI  = Nord
-        IdecE = .TRUE.
+        IdecE = .true.
 !    ...construct the shape functions
         call AncPhiE(Mu,DMu,Nord,IdecE,N, &
                                       phiE(minI:maxI),DphiE(minI:maxI))
@@ -119,7 +119,7 @@
 !
 !     latest revision:  - Nov 14, Aor 17
 !
-!     purpose:          - routine returns values of 1D Segment L2
+!> @brief         - routine returns values of 1D Segment L2
 !                         shape functions
 !
 !     arguments:

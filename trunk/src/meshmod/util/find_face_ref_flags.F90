@@ -1,8 +1,8 @@
 !> @brief      given an element refinement flag,
 !!             return the face refinements
-!! @param[in]  Ntype    - middle node type
-!! @param[in]  Kref     - refinement flag for the middle node
-!! @param[out] Kreff    - refinement flags for the element faces
+!> @param[in]  Ntype    - middle node type
+!> @param[in]  Kref     - refinement flag for the middle node
+!> @param[out] Kreff    - refinement flags for the element faces
 !!
 !> @date       Feb 2023
 subroutine find_face_ref_flags(Ntype,Kref, Kreff)

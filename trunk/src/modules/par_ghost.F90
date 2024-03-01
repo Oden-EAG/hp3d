@@ -413,21 +413,21 @@ contains
    contains
 !
 !  ...Subroutines defined to have coherent critical between different calls
-      subroutine add_elem_interf(mdle)
+   subroutine add_elem_interf(mdle)
          integer, intent(in) :: mdle
 !$omp critical
          NRELES_INTERF = NRELES_INTERF + 1
          ELEM_INTERF(NRELES_INTERF) = mdle
 !$omp end critical
-      end subroutine add_elem_interf
+   end subroutine add_elem_interf
 
-      subroutine add_elem_ghost(mdle)
+   subroutine add_elem_ghost(mdle)
          integer, intent(in) :: mdle
 !$omp critical
          NRELES_GHOST = NRELES_GHOST + 1
          ELEM_GHOST(NRELES_GHOST) = mdle
 !$omp end critical
-      end subroutine add_elem_ghost
+   end subroutine add_elem_ghost
 !
    end subroutine get_ghost_subd
 

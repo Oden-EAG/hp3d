@@ -1,13 +1,13 @@
 !----------------------------------------------------------------------------
-!> Purpose : parametrization of a curve lying on intersection of 2 algebraic
+!> @brief parametrization of a curve lying on intersection of 2 algebraic
 !!           surfaces
 !!
-!! @param[in ] No     - the curve number
-!! @param[in ] Eta    - reference coordinate  (between 0 and 1)
-!! @param[out] X      - physical coordinates of the point
-!! @param[out] Dxdeta - derivatives of the physical coordinates
+!> @param[in ] No     - the curve number
+!> @param[in ] Eta    - reference coordinate  (between 0 and 1)
+!> @param[out] X      - physical coordinates of the point
+!> @param[out] Dxdeta - derivatives of the physical coordinates
 !!
-!! @revision Nov 12
+!> @date Nov 12
 !----------------------------------------------------------------------------
 subroutine curve_3SurfsCur(Nc,Eta, R,Dr)
 !

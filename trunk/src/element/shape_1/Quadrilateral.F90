@@ -12,7 +12,7 @@
 !
 !     latest revision:  - Nov 14, Apr 17, Jul 21
 !
-!     purpose:          - evaluate quad H1 shape functions and their
+!> @brief         - evaluate quad H1 shape functions and their
 !                         gradient
 !
 !     arguments:
@@ -110,7 +110,7 @@
 !
 !  ...FACE BUBBLE FUNCTIONS
 !  ...local parameters
-      IdecF(1:2) = .TRUE.
+      IdecF(1:2) = .true.
       call decod(Nord(5),MODORDER,2, nordF)
       ndofF = (nordF(1)-1)*(nordF(2)-1)
       if (ndofF.gt.0) then
@@ -182,7 +182,7 @@
 !
 !     latest revision:  - Nov 14, Apr 17, Jul 21
 !
-!     purpose:          - evaluate quad H(curl) shape functions and
+!> @brief         - evaluate quad H(curl) shape functions and
 !                         their curls
 !
 !     arguments:
@@ -266,7 +266,7 @@
 !
 !  ...FACE BUBBLE FUNCTIONS
 !  ...local parameters
-      IdecF(1:2) = .TRUE.
+      IdecF(1:2) = .true.
       call decod(Nord(5),MODORDER,2, nordF)
 !    ...loop over families
       do fam=0,1
@@ -353,7 +353,7 @@
 !
 !     latest revision:  - Nov 14, Apr 17
 !
-!     purpose:          - evaluate quad H(div) shape functions and
+!> @brief         - evaluate quad H(div) shape functions and
 !                         their divergences
 !
 !     arguments :
@@ -449,7 +449,7 @@
 !
 !     latest revision:  - Nov 14, Apr 17
 !
-!     purpose:          - evaluate quad L2 shape functions
+!> @brief         - evaluate quad L2 shape functions
 !
 !     arguments :
 !

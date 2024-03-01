@@ -1,10 +1,10 @@
 !-------------------------------------------------------------------------------
 !> @brief Parametric transfinite interpolation for a triangle
 !!
-!! @param[in]  No     - a GMP triangle number
-!! @param[in]  Eta    - reference coordinates of a point
-!! @param[out] X      - physical coordinates of the point
-!! @param[out] Dxdeta - derivatives of the physical coordinates
+!> @param[in]  No     - a GMP triangle number
+!> @param[in]  Eta    - reference coordinates of a point
+!> @param[out] X      - physical coordinates of the point
+!> @param[out] Dxdeta - derivatives of the physical coordinates
 !!
 !> @date Mar 2023
 !-------------------------------------------------------------------------------
@@ -55,10 +55,10 @@ end subroutine trian_PTITri
 !----------------------------------------------------------------------
 !> @brief Parametric transfinite interpolation for a triangle on a sphere
 !!
-!! @param[in]  No        - triangle number
-!! @param[in]  Eta       - reference coordinates of a point
-!! @param[out] X         - physical coordinates of the point
-!! @param[out] Dxdeta    - derivatives wrt reference coordinates
+!> @param[in]  No        - triangle number
+!> @param[in]  Eta       - reference coordinates of a point
+!> @param[out] X         - physical coordinates of the point
+!> @param[out] Dxdeta    - derivatives wrt reference coordinates
 !!
 !> @date Mar 2023
 !----------------------------------------------------------------------
@@ -418,10 +418,10 @@ end subroutine spherical_triangle
 !> @brief Parametric transfinite interpolation for a triangle
 !!        on a cylinder
 !!
-!! @param[in]  No     - triangle number
-!! @param[in]  Eta    - reference coordinates of a point
-!! @param[out] X      - physical coordinates of the point
-!! @param[out] Dxdeta - derivatives wrt reference coordinates
+!> @param[in]  No     - triangle number
+!> @param[in]  Eta    - reference coordinates of a point
+!> @param[out] X      - physical coordinates of the point
+!> @param[out] Dxdeta - derivatives wrt reference coordinates
 !!
 !> @date Mar 2023
 !----------------------------------------------------------------------
@@ -738,10 +738,10 @@ end subroutine cylindrical_triangle
 !----------------------------------------------------------------------
 !> @brief Parametric transfinite interpolation for a triangle on a cone
 !!
-!! @param[in]  No     - triangle number
-!! @param[in]  Eta    - reference coordinates of a point
-!! @param[out] X      - physical coordinates of the point
-!! @param[out] Dxdeta - derivatives wrt reference coordinates
+!> @param[in]  No     - triangle number
+!> @param[in]  Eta    - reference coordinates of a point
+!> @param[out] X      - physical coordinates of the point
+!> @param[out] Dxdeta - derivatives wrt reference coordinates
 !!
 !> @date Mar 2023
 !----------------------------------------------------------------------
@@ -1026,10 +1026,10 @@ end subroutine conic_triangle
 !> @note  This is a ``dirty'' routine, as it works only
 !!        for a very specific class of triangles
 !!
-!! @param[in]  No        - triangle number
-!! @param[in]  Eta       - reference coordinates of a point
-!! @param[out] X         - physical coordinates of the point
-!! @param[out] Dxdeta    - derivatives wrt reference coordinates
+!> @param[in]  No        - triangle number
+!> @param[in]  Eta       - reference coordinates of a point
+!> @param[out] X         - physical coordinates of the point
+!> @param[out] Dxdeta    - derivatives wrt reference coordinates
 !!
 !> @date Mar 2023
 !----------------------------------------------------------------------

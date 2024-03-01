@@ -1,20 +1,20 @@
 !------------------------------------------------------------------------------
-!> Purpose : exact (manufactured, no miracle!) solution
+!> @brief exact (manufactured, no miracle!) solution
 !!
-!! @param[in]  X       - a point in physical space
-!! @param[in]  Icase   - node case (specifies what variables are supported)
-!! @param[out] zvalH   - value of the H1 solution
-!! @param[out] ZdvalH  - corresponding first derivatives
-!! @param[out] Zd2valH - corresponding second derivatives
-!! @param[out] ZvalE   - value of the H(curl) solution
-!! @param[out] ZdvalE  - corresponding first derivatives
-!! @param[out] Zd2valE - corresponding second derivatives
-!! @param[out] ZvalV   - value of the H(div) solution
-!! @param[out] ZdvalV  - corresponding first derivatives
-!! @param[out] Zd2valV - corresponding second derivatives
-!! @param[out] ZvalQ   - value of the H(div) solution
-!! @param[out] ZdvalQ  - corresponding first derivatives
-!! @param[out] Zd2valQ - corresponding second derivatives
+!> @param[in]  X       - a point in physical space
+!> @param[in]  Icase   - node case (specifies what variables are supported)
+!> @param[out] zvalH   - value of the H1 solution
+!> @param[out] ZdvalH  - corresponding first derivatives
+!> @param[out] Zd2valH - corresponding second derivatives
+!> @param[out] ZvalE   - value of the H(curl) solution
+!> @param[out] ZdvalE  - corresponding first derivatives
+!> @param[out] Zd2valE - corresponding second derivatives
+!> @param[out] ZvalV   - value of the H(div) solution
+!> @param[out] ZdvalV  - corresponding first derivatives
+!> @param[out] Zd2valV - corresponding second derivatives
+!> @param[out] ZvalQ   - value of the H(div) solution
+!> @param[out] ZdvalQ  - corresponding first derivatives
+!> @param[out] Zd2valQ - corresponding second derivatives
 !------------------------------------------------------------------------------
 !
 subroutine exact(X,Icase, ValH,DvalH,D2valH, &

@@ -6,7 +6,7 @@
 !
 !     latest revision:  - Oct 2019
 !
-!     purpose:          - routine returns element Gram matrix
+!> @brief         - routine returns element Gram matrix
 !                         for the ultraweak Maxwell formulation
 !                         using fast integration for hexahedra
 !

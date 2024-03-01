@@ -20,7 +20,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine mat3prod(Ma,Mb,Mc)
+   subroutine mat3prod(Ma,Mb,Mc)
 !
       implicit none
 !
@@ -40,6 +40,6 @@
          enddo
       enddo
 !
-      end subroutine
+   end subroutine
 
 #endif

@@ -11,7 +11,7 @@
 !
 !     latest revision:  - Oct 14, Apr 17, Jul 21
 !
-!     purpose:          - routine returns values of 3D triangular prism
+!> @brief         - routine returns values of 3D triangular prism
 !                         element H1 shape functions and their derivatives
 !
 !     arguments:
@@ -334,7 +334,7 @@
 !
 !     latest revision:  - Oct 14, Apr 17, Jul 21
 !
-!     purpose:          - routine returns values of 3D triangular prism
+!> @brief         - routine returns values of 3D triangular prism
 !                         element H(curl) shape functions and their
 !                         derivatives
 !
@@ -740,7 +740,7 @@
 !
 !     latest revision:  - Nov 14, Apr 17, Jul 21
 !
-!     purpose:          - routine returns values of 3D Prism element
+!> @brief         - routine returns values of 3D Prism element
 !                         H(div) shape functions and their divergences
 !
 !     arguments:
@@ -878,7 +878,7 @@
       if (ndofB.gt.0) then
 !    ...local parameters (again)
         IdecB(1) = IdecTF
-        IdecB(2) = .TRUE.
+        IdecB(2) = .true.
         minI  = 0
         minJ  = 1
         minK  = 0
@@ -918,7 +918,7 @@
       if (ndofB.gt.0) then
 !    ...local parameters (again)
         IdecB(1) = IdecTF
-        IdecB(2) = .TRUE.
+        IdecB(2) = .true.
         minI  = 0
         minJ  = 0
         minK  = 2
@@ -1024,7 +1024,7 @@
 !
 !     latest revision:  - Nov 14, Apr 17
 !
-!     purpose:          - routine returns values of 3D Prism
+!> @brief         - routine returns values of 3D Prism
 !                         element L2 shape functions
 !
 !     arguments:

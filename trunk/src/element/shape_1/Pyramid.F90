@@ -11,7 +11,7 @@
 !
 !     latest revision:  - Jan 15, Apr 17, Jul 21
 !
-!     purpose:          - routine returns values of 3D pyramid element
+!> @brief         - routine returns values of 3D pyramid element
 !                         H1 shape functions and their derivatives
 !
 !     arguments:
@@ -213,7 +213,7 @@
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...local parameters (again)
-        IdecB(1:2) = IdecQF; IdecB(3) = .TRUE.
+        IdecB(1:2) = IdecQF; IdecB(3) = .true.
         minI = 2
         minJ = 2
         minK = 2
@@ -325,7 +325,7 @@
 !
 !     latest revision:  - Jan 15, Apr 17, Jul 21
 !
-!     purpose:          - routine returns values of 3D pyramid element
+!> @brief         - routine returns values of 3D pyramid element
 !                         H(curl) shape functions and their curls
 !
 !     arguments:
@@ -547,7 +547,7 @@
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...local parameters (again)
-        IdecB(1:2) = .TRUE.; IdecB(3) = .TRUE.
+        IdecB(1:2) = .true.; IdecB(3) = .true.
         minI = 2
         minJ = 2
         minK = 2
@@ -577,7 +577,7 @@
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...local parameters
-        IdecB(1:2) = .TRUE.; IdecB(3) = .TRUE.
+        IdecB(1:2) = .true.; IdecB(3) = .true.
         minF(1) = 0
         minF(2) = 2
         minK    = 2
@@ -620,7 +620,7 @@
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...local parameters (again)
-        IdecB(1:2) = .TRUE.
+        IdecB(1:2) = .true.
         minI = 2
         minJ = 2
         maxI = nordB
@@ -756,7 +756,7 @@
 !
 !     latest revision:  - Jan 15, Apr 17, Jul 21
 !
-!     purpose:          - routine returns values of 3D pyramid element
+!> @brief         - routine returns values of 3D pyramid element
 !                         H(div) shape functions and their divergences
 !
 !     arguments:
@@ -916,7 +916,7 @@
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...local parameters
-        IdecB(1:2) = .TRUE.; IdecB(3) = .TRUE.
+        IdecB(1:2) = .true.; IdecB(3) = .true.
         minF(1) = 0
         minF(2) = 2
         minK    = 2
@@ -959,7 +959,7 @@
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...local parameters (again)
-        IdecB(1:2) = .TRUE.; IdecB(3) = .TRUE.
+        IdecB(1:2) = .true.; IdecB(3) = .true.
         minI = 2
         minJ = 2
         maxI = nordB
@@ -984,7 +984,7 @@
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...local parameters (again)
-        IdecB(1:2) = .TRUE.
+        IdecB(1:2) = .true.
         minI = 0
         minJ = 0
         minK = 2
@@ -1016,7 +1016,7 @@
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...local parameters (again)
-        IdecB(1:2) = .TRUE.
+        IdecB(1:2) = .true.
         minI = 2
         minJ = 2
         maxI = nordB
@@ -1045,7 +1045,7 @@
 !  ...if necessary, create bubbles
       if (ndofB.gt.0) then
 !    ...local parameters (again)
-        IdecB(1:2) = .TRUE.
+        IdecB(1:2) = .true.
         minI = 2
         maxI = nordB
         do fam=0,1
@@ -1163,7 +1163,7 @@
 !
 !     latest revision:  - Jan 15, Apr 17
 !
-!     purpose:          - routine returns values of 3D pyramid
+!> @brief         - routine returns values of 3D pyramid
 !                         element L2 shape functions
 !
 !     arguments:

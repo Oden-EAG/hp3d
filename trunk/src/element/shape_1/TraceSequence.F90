@@ -28,7 +28,7 @@
 !
 !     latest revision:  - Nov 14
 !
-!     purpose:          - 1D edge trace of 2D H1 edge functions
+!> @brief         - 1D edge trace of 2D H1 edge functions
 !                         (these happen to be oriented 1D H1 'bubbles')
 !
 !     arguments:
@@ -81,7 +81,7 @@
 !    ...local parameters
         minI  = 2
         maxI  = Nord
-        IdecE = .TRUE.
+        IdecE = .true.
 !    ...orient -- this is important for traces!!!
         call OrientE(Mu,DMu,Nori,N, GMu,GDMu)
 !    ...construct the shape functions
@@ -120,7 +120,7 @@
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !     Check polynomial order
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     subroutine checkpolyorder(Norder)
+      subroutine checkpolyorder(Norder)
 !
         integer, intent(in) :: Norder
 !
@@ -132,7 +132,7 @@
           stop 1
         endif
 !
-     end subroutine checkpolyorder
+      end subroutine checkpolyorder
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    end subroutine TraceEshapeH
 !
@@ -146,7 +146,7 @@
 !
 !     latest revision:  - Nov 14
 !
-!     purpose:          - 1D edge trace of 2D H(curl) edge functions
+!> @brief         - 1D edge trace of 2D H(curl) edge functions
 !                         (these are oriented 1D L2 functions -
 !                         not 'bubbles')
 !
@@ -237,7 +237,7 @@
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !     Check polynomial order
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     subroutine checkpolyorder(Norder)
+      subroutine checkpolyorder(Norder)
 !
         integer, intent(in) :: Norder
 !
@@ -249,7 +249,7 @@
           stop 1
         endif
 !
-     end subroutine checkpolyorder
+      end subroutine checkpolyorder
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    end subroutine TraceEshapeE
 !
@@ -263,7 +263,7 @@
 !
 !     latest revision:  - Nov 14
 !
-!     purpose:          - 1D edge trace of 2D H(div) edge functions
+!> @brief         - 1D edge trace of 2D H(div) edge functions
 !                         (these are oriented 1D L2 functions -
 !                         not 'bubbles')
 !
@@ -342,7 +342,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - 2D face trace of 3D H1 face functions
+!> @brief         - 2D face trace of 3D H1 face functions
 !                         (these happen to be oriented 2D H1 'bubbles')
 !
 !     arguments:
@@ -386,7 +386,7 @@
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !     Triangle traces
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     subroutine traceTriFshapeH
+      subroutine traceTriFshapeH
 !
         integer :: i,j,nij,m,N,ndofF
         integer :: minI,minJ,minIJ,maxI,maxJ,maxIJ
@@ -414,7 +414,7 @@
 !    ...TRACE OF 3D FACE FUNCTIONS
         call checkpolyorder(Nord)
         ndofF = (Nord-1)*(Nord-2)/2
-        IdecF = .TRUE.
+        IdecF = .true.
         if (ndofF.gt.0) then
 !      ...local parameters
           minI  = 2
@@ -459,11 +459,11 @@
         endif
 #endif
 !
-     end subroutine traceTriFshapeH
+      end subroutine traceTriFshapeH
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !     Quadrilateral traces
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     subroutine traceQuadFshapeH
+      subroutine traceQuadFshapeH
 !
         integer :: N,m,i,j,nordF(2),ndofF,minI,minJ,maxI,maxJ
         logical :: IdecF(2),GIdecF(2)
@@ -488,7 +488,7 @@
         call AffineQuadrilateral(T, Mu,DMu)
 !
 !    ...TRACE OF 3D FACE FUNCTIONS
-        IdecF(1:2) = .TRUE.
+        IdecF(1:2) = .true.
         call decod(Nord,MODORDER,2, nordF)
         call checkpolyorder(nordF(1))
         call checkpolyorder(nordF(2))
@@ -536,11 +536,11 @@
         endif
 #endif
 !
-     end subroutine traceQuadFshapeH
+      end subroutine traceQuadFshapeH
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !     Check polynomial order
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     subroutine checkpolyorder(Norder)
+      subroutine checkpolyorder(Norder)
 !
         integer, intent(in) :: Norder
 !
@@ -552,7 +552,7 @@
           stop 1
         endif
 !
-     end subroutine checkpolyorder
+      end subroutine checkpolyorder
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    end subroutine TraceFshapeH
 !
@@ -566,7 +566,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - 2D face trace of 3D H(curl) face functions
+!> @brief         - 2D face trace of 3D H(curl) face functions
 !                         (these happen to be oriented 2D H(curl)
 !                         'bubbles')
 !
@@ -611,7 +611,7 @@
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !     Triangle traces
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     subroutine traceTriFshapeE
+      subroutine traceTriFshapeE
 !
         integer :: i,j,nij,m,N,ndofF
         integer :: minI,minJ,minIJ,maxI,maxJ,maxIJ,abc(3),fam,famctr
@@ -639,7 +639,7 @@
 !    ...TRACE OF 3D FACE FUNCTIONS
         call checkpolyorder(Nord)
         ndofF = Nord*(Nord-1)/2
-        IdecF = .TRUE.
+        IdecF = .true.
         if (ndofF.gt.0) then
 !    ...local parameters
           minI  = 0
@@ -698,11 +698,11 @@
         endif
 #endif
 !
-     end subroutine traceTriFshapeE
+      end subroutine traceTriFshapeE
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !     Quadrilateral traces
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     subroutine traceQuadFshapeE
+      subroutine traceQuadFshapeE
 !
         integer :: N,m,i,j,ij(2),ig,jg,a,b,ab(2),fam
         integer :: nordF(2),ndofF(0:1),minF(2),maxF(2)
@@ -728,7 +728,7 @@
         call AffineQuadrilateral(T, Mu,DMu)
 !
 !    ...TRACE OF 3D FACE FUNCTIONS
-        IdecF(1:2) = .TRUE.
+        IdecF(1:2) = .true.
         call decod(Nord,MODORDER,2, nordF)
         call checkpolyorder(nordF(1))
         call checkpolyorder(nordF(2))
@@ -795,11 +795,11 @@
         endif
 #endif
 !
-     end subroutine traceQuadFshapeE
+      end subroutine traceQuadFshapeE
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !     Check polynomial order
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     subroutine checkpolyorder(Norder)
+      subroutine checkpolyorder(Norder)
 !
         integer, intent(in) :: Norder
 !
@@ -811,7 +811,7 @@
           stop 1
         endif
 !
-     end subroutine checkpolyorder
+      end subroutine checkpolyorder
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    end subroutine TraceFshapeE
 !
@@ -825,7 +825,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - 2D face trace of 3D H(div) face functions
+!> @brief         - 2D face trace of 3D H(div) face functions
 !                         these are oriented 2D L2 face funtions
 !
 !     arguments:
@@ -867,7 +867,7 @@
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !     Triangle traces
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     subroutine traceTriFshapeV
+      subroutine traceTriFshapeV
 !
         integer :: i,j,nij,m,N,ndofF
         integer :: minalpha,minI,minJ,minIJ,maxI,maxJ,maxIJ
@@ -943,11 +943,11 @@
         endif
 #endif
 !
-     end subroutine traceTriFshapeV
+      end subroutine traceTriFshapeV
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !     Quadrilateral traces
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     subroutine traceQuadFshapeV
+      subroutine traceQuadFshapeV
 !
         integer :: i,j,m,N,nordF(2),ndofF
         integer :: minI,minJ,maxI,maxJ
@@ -973,7 +973,7 @@
         call AffineQuadrilateral(T, Mu,DMu)
 !
 !    ...TRACE OF 3D FACE FUNCTIONS
-        IdecF(1:2) = .TRUE.
+        IdecF(1:2) = .true.
         call decod(Nord,MODORDER,2, nordF)
         call checkpolyorder(nordF(1))
         call checkpolyorder(nordF(2))
@@ -1020,11 +1020,11 @@
         endif
 #endif
 !
-     end subroutine traceQuadFshapeV
+      end subroutine traceQuadFshapeV
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !     Check polynomial order
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     subroutine checkpolyorder(Norder)
+      subroutine checkpolyorder(Norder)
 !
         integer, intent(in) :: Norder
 !
@@ -1036,7 +1036,7 @@
           stop 1
         endif
 !
-     end subroutine checkpolyorder
+      end subroutine checkpolyorder
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    end subroutine TraceFshapeV
 !

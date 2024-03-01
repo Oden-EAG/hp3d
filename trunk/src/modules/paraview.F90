@@ -25,17 +25,17 @@ module paraview
    character(len=2  ) :: VLEVEL = '2'
    character(len=128) :: PARAVIEW_DIR = 'vtk/'
    integer,parameter  :: PARAVIEW_IO = 22
-   logical            :: PARAVIEW_DUMP_GEOM = .TRUE.
-   logical            :: PARAVIEW_DUMP_ATTR = .TRUE.
+   logical            :: PARAVIEW_DUMP_GEOM = .true.
+   logical            :: PARAVIEW_DUMP_ATTR = .true.
 !
 !..Flag for enabling second-order geometry output (both XDMF and VTU)
 !  NOTE: Only VTU supports higher-order geometry for hybrid meshes
-   logical            :: SECOND_ORDER_VIS   = .FALSE.
+   logical            :: SECOND_ORDER_VIS   = .false.
 !
 !..Flag for switching between different formats for output meshes and solution fields
-!  ...VIS_VTU = .FALSE. : uses XDMF format (default)
-!  ...VIS_VTU = .TRUE.  : uses VTU format
-   logical            :: VIS_VTU = .FALSE.
+!  ...VIS_VTU = .false. : uses XDMF format (default)
+!  ...VIS_VTU = .true.  : uses VTU format
+   logical            :: VIS_VTU = .false.
 !
 !..PVD_IO: File identifier for writting pvd file.
    integer,parameter  :: PVD_IO  = 23
@@ -206,7 +206,7 @@ module paraview
 
 
 !-----------------------------------------------------------------------------
-!> Purpose : initialize paraview output (open hdf5 file)
+!> @brief initialize paraview output (open hdf5 file)
 !!
 !> @date Mar 2023
 !-----------------------------------------------------------------------------
@@ -218,7 +218,7 @@ module paraview
 
 
 !-----------------------------------------------------------------------------
-!> Purpose : finalize paraview output (close hdf5; deallocate data arrays)
+!> @brief finalize paraview output (close hdf5; deallocate data arrays)
 !!
 !> @date Mar 2023
 !-----------------------------------------------------------------------------
@@ -233,7 +233,7 @@ module paraview
 
 
 !-----------------------------------------------------------------------------
-!> Purpose : initialize data arrays for outputting paraview mesh
+!> @brief initialize data arrays for outputting paraview mesh
 !!
 !> @date Feb 2023
 !-----------------------------------------------------------------------------
@@ -251,7 +251,7 @@ module paraview
 
 
 !-----------------------------------------------------------------------------
-!> Purpose : finalize geometry data arrays
+!> @brief finalize geometry data arrays
 !!
 !> @date Feb 2023
 !-----------------------------------------------------------------------------
@@ -263,7 +263,7 @@ module paraview
 
 
 !-----------------------------------------------------------------------------
-!> Purpose : write mesh to paraview (xdmf)
+!> @brief write mesh to paraview (xdmf)
 !!
 !> @date Feb 2023
 !-----------------------------------------------------------------------------
@@ -360,7 +360,7 @@ module paraview
 
 
 !-----------------------------------------------------------------------------
-!> Purpose : initialize data arrays for outputting attribute fields
+!> @brief initialize data arrays for outputting attribute fields
 !!
 !> @date Feb 2023
 !-----------------------------------------------------------------------------
@@ -376,7 +376,7 @@ module paraview
 
 
 !-----------------------------------------------------------------------------
-!> Purpose : deallocate attribute arrays
+!> @brief deallocate attribute arrays
 !!
 !> @date Feb 2023
 !-----------------------------------------------------------------------------
@@ -387,7 +387,7 @@ module paraview
 
 
 !-----------------------------------------------------------------------------
-!> Purpose : write attribute field data to paraview (xdmf)
+!> @brief write attribute field data to paraview (xdmf)
 !!
 !> @date Feb 2023
 !-----------------------------------------------------------------------------

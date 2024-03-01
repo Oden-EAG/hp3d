@@ -1,6 +1,6 @@
 !> @brief routine generates an initial FE mesh interfacing with GMP
 !!
-!! @param[in]  Fp - Path to input file (physics attributes)
+!> @param[in]  Fp - Path to input file (physics attributes)
 !!
 !> @date Mar 2023
 subroutine hp3gen(Fp)
@@ -833,9 +833,9 @@ end subroutine hp3gen
 
 !> @brief copies a BC flag from elem to node, obeying Dirichlet hierarchy
 !!
-!! @param[in]    Nflag   - 1 vertex; 2 mid-edge node; 3 mid-face node
-!! @param[in]    IBCelem - BC flag for an element face (from element)
-!! @param[inout] IBCnod  - BC flag for node
+!> @param[in]    Nflag   - 1 vertex; 2 mid-edge node; 3 mid-face node
+!> @param[in]    IBCelem - BC flag for an element face (from element)
+!> @param[inout] IBCnod  - BC flag for node
 !!
 !> @date Mar 2023
 subroutine copyBCflag(Nflag,IBCelem, IBCnod)

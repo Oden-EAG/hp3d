@@ -4,15 +4,15 @@
 !-----------------------------------------------------------------------
 !> @brief      determine Dirichlet dof for a vertex
 !!
-!! @param[in]  Mdle  - element (middle node) number
-!! @param[in]  Iflag - a flag specifying which of the objects the vertex
+!> @param[in]  Mdle  - element (middle node) number
+!> @param[in]  Iflag - a flag specifying which of the objects the vertex
 !!                     is on: 5 pris, 6 hexa, 7 tetr, 8 pyra
-!! @param[in]  No    - number of a specific object
-!! @param[in]  Xi    - reference coordinates of the point
-!! @param[in]  Icase - node case
-!! @param[in]  Bcond - node BC flags
+!> @param[in]  No    - number of a specific object
+!> @param[in]  Xi    - reference coordinates of the point
+!> @param[in]  Icase - node case
+!> @param[in]  Bcond - node BC flags
 !!
-!! @param[out] ZdofH - updated Dirichlet BC dof
+!> @param[out] ZdofH - updated Dirichlet BC dof
 !!
 !> @date Sep 2023
 !-----------------------------------------------------------------------

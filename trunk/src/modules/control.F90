@@ -1,4 +1,4 @@
-!> Purpose : module stores a number of control parameters
+!> @brief module stores a number of control parameters
 module control
 !
    use environment , only : QUIET_MODE
@@ -56,13 +56,13 @@ module control
 contains
 !
 !--------------------------------------------------------------------------
-!> Purpose : routine reads in global control parameters from 'file/control'
+!> @brief routine reads in global control parameters from 'file/control'
    subroutine read_control_from_default
       call read_control_from_file('files/control')
    end subroutine read_control_from_default
 !
 !--------------------------------------------------------------------------
-!> Purpose : routine reads in global control parameters from file
+!> @brief routine reads in global control parameters from file
    subroutine read_control_from_file(fp)
 !
       implicit none

@@ -12,7 +12,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine selwin(Iwind)
+   subroutine selwin(Iwind)
 !
       use graphmod
 !
@@ -53,6 +53,6 @@
       call clrwind(npcol(1))
 !
 !
-      end subroutine selwin
+   end subroutine selwin
 
 #endif

@@ -6,7 +6,7 @@
 !
 !     latest revision:  - Mar 2019
 !
-!     purpose:          - routine returns element residual (squared)
+!> @brief         - routine returns element residual (squared)
 !                         for the Primal Heat equation (Poisson)
 !
 !     arguments:

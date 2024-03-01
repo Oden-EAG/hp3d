@@ -16,7 +16,7 @@
 !   required routines  - openwind, closwind, clrwind
 !
 !----------------------------------------------------------------------
-      subroutine initwin(Iwind)
+   subroutine initwin(Iwind)
 !
       use graphmod
 !
@@ -73,6 +73,6 @@
 !
       call closwind(IWINDNUM)
 !
-      end subroutine initwin
+   end subroutine initwin
 
 #endif

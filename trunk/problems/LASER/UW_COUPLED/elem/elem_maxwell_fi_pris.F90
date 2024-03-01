@@ -6,7 +6,7 @@
 !
 !     latest revision:  - June 2021
 !
-!     purpose:          - routine returns unconstrained (ordinary)
+!> @brief         - routine returns unconstrained (ordinary)
 !                         stiffness matrix and load vector for the
 !                         UW DPG formulation for Maxwell equations
 !                       - Uses sum factorization for fast integration
@@ -1589,7 +1589,7 @@ subroutine elem_maxwell_fi_pris(Mdle,Fld_flag,                &
 end subroutine elem_maxwell_fi_pris
 !
 !----------------------------------------------------------------------
-! routine: tens_hexa_ordEE
+!> @name tens_hexa_ordEE
 !----------------------------------------------------------------------
 subroutine tens_hexa_ordEE(p,q, mapEE)
    use parametersDPG
@@ -1639,7 +1639,7 @@ end subroutine tens_hexa_ordEE
 !
 !
 !----------------------------------------------------------------------
-! routine: tens_prism_ordEE
+!> @name tens_prism_ordEE
 !----------------------------------------------------------------------
 subroutine tens_prism_ordEE(p,q, mapEE)
    use parametersDPG

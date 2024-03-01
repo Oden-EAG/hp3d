@@ -27,7 +27,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - evaluate 1D BROKEN H1 shape functions
+!> @brief         - evaluate 1D BROKEN H1 shape functions
 !
 !     arguments:
 !
@@ -73,7 +73,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - evaluate 1D BROKEN L2 shape functions
+!> @brief         - evaluate 1D BROKEN L2 shape functions
 !
 !     arguments:
 !
@@ -126,7 +126,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - routine evaluates BROKEN H1 shape
+!> @brief         - routine evaluates BROKEN H1 shape
 !                         functions for 2D elements of various types
 !
 !     arguments:
@@ -188,7 +188,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - routine evaluates BROKEN H(curl) shape
+!> @brief         - routine evaluates BROKEN H(curl) shape
 !                         functions for 2D elements of various types
 !
 !     arguments:
@@ -250,7 +250,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - routine evaluates BROKEN H(div) shape
+!> @brief         - routine evaluates BROKEN H(div) shape
 !                         functions for 2D elements of various types
 !                         NOTE: only relevant in 2D problems!!
 !
@@ -313,7 +313,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - routine evaluates BROKEN L2 shape
+!> @brief         - routine evaluates BROKEN L2 shape
 !                         functions for 2D elements of various types
 !
 !     arguments:
@@ -381,7 +381,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - routine evaluates BROKEN H1 shape
+!> @brief         - routine evaluates BROKEN H1 shape
 !                         functions for 3D elements of various types
 !
 !     arguments:
@@ -461,7 +461,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - routine evaluates BROKEN H(curl) shape
+!> @brief         - routine evaluates BROKEN H(curl) shape
 !                         functions for 3D elements of various types
 !
 !     arguments:
@@ -541,7 +541,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - routine evaluates BROKEN H(div) shape
+!> @brief         - routine evaluates BROKEN H(div) shape
 !                         functions for 3D elements of various types
 !
 !     arguments:
@@ -621,7 +621,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - routine evaluates BROKEN L2 shape
+!> @brief         - routine evaluates BROKEN L2 shape
 !                         functions for 3D elements of various types
 !
 !     arguments:

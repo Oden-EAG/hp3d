@@ -11,7 +11,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 3D prism
+!> @brief         - routine returns values of 3D prism
 !                         BROKEN H1 shape functions
 !
 !     arguments:
@@ -93,7 +93,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 3D prism
+!> @brief         - routine returns values of 3D prism
 !                         BROKEN H(curl) shape functions
 !
 !     arguments:
@@ -207,7 +207,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 3D prism
+!> @brief         - routine returns values of 3D prism
 !                         BROKEN H(div) shape functions
 !
 !     arguments:
@@ -312,7 +312,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 3D prism
+!> @brief         - routine returns values of 3D prism
 !                         BROKEN L2 shape functions
 !
 !     arguments:

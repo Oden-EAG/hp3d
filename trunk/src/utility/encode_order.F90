@@ -6,7 +6,7 @@
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - routine encodes order of approximation for
+!> @brief         - routine encodes order of approximation for
 !                         a brick middle node
 !
 !     arguments:
@@ -52,7 +52,7 @@ end subroutine encode_orderb
 !
 !     latest revision:  - Feb 2023
 !
-!     purpose:          - routine encodes order of approximation for
+!> @brief         - routine encodes order of approximation for
 !                         a quad middle node
 !
 !     arguments:

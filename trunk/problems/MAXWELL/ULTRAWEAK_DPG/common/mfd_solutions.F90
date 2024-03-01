@@ -7,7 +7,7 @@
 !
 !     latest revision:  - June 18
 !
-!     purpose:          - compute all relevant quantities of the exact
+!> @brief         - compute all relevant quantities of the exact
 !                         solutions for the Maxwell problem
 !
 !     arguments:

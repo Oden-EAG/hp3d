@@ -1,14 +1,14 @@
 !--------------------------------------------------------------------
-!> Purpose : calculate dirichlet boundary condition
-!! @param[in]  X      - physical coordinates of a point
-!! @param[in]  Icase  - node case
+!> @brief calculate dirichlet boundary condition
+!> @param[in]  X      - physical coordinates of a point
+!> @param[in]  Icase  - node case
 !!
-!! @param[out] ValH   - value of the H1 solution
-!! @param[out] DvalH  - H1 corresponding first derivatives
-!! @param[out] ValE   - value of the H(curl) solution
-!! @param[out] DvalE  - H(curl) corresponding first derivatives
-!! @param[out] ValV   - value of the H(div) solution
-!! @param[out] DvalV  - H(div) corresponding first derivatives
+!> @param[out] ValH   - value of the H1 solution
+!> @param[out] DvalH  - H1 corresponding first derivatives
+!> @param[out] ValE   - value of the H(curl) solution
+!> @param[out] DvalE  - H(curl) corresponding first derivatives
+!> @param[out] ValV   - value of the H(div) solution
+!> @param[out] DvalV  - H(div) corresponding first derivatives
 !--------------------------------------------------------------------
 subroutine dirichlet(Mdle,X,Icase, ValH,DvalH,ValE,DvalE,ValV,DvalV)
   use sheathed_isotropic_materials, only : P_inner,P_outer,X_1,X_2

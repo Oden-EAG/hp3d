@@ -11,7 +11,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 2D triangle
+!> @brief         - routine returns values of 2D triangle
 !                         BROKEN H1 shape functions
 !
 !     arguments:
@@ -58,7 +58,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 2D triangle
+!> @brief         - routine returns values of 2D triangle
 !                         BROKEN H(curl) shape functions
 !
 !     arguments:
@@ -105,7 +105,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 2D triangle
+!> @brief         - routine returns values of 2D triangle
 !                         BROKEN H(div) shape functions
 !
 !     arguments:
@@ -151,7 +151,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 2D triangle
+!> @brief         - routine returns values of 2D triangle
 !                         BROKEN L2 shape functions
 !
 !     arguments:

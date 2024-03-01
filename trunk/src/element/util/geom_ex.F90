@@ -12,15 +12,15 @@ end subroutine geom_ex
 !
 !
 !------------------------------------------------------------------------
-!> Purpose : routine computes physical coordinates for a point in the
+!> @brief routine computes physical coordinates for a point in the
 !!           master element using the exact geometry maps
 !!
-!! @param[in]  Mdle  - middle node
-!! @param[in]  Xi    - a point within the corresponding master element
-!! @param[out] X     - coordinates of the corresponding physical point
-!! @param[out] Dxdxi - derivatives wrt master element coordinates
+!> @param[in]  Mdle  - middle node
+!> @param[in]  Xi    - a point within the corresponding master element
+!> @param[out] X     - coordinates of the corresponding physical point
+!> @param[out] Dxdxi - derivatives wrt master element coordinates
 !!
-!! @revision Feb 2023
+!> @date Feb 2023
 !------------------------------------------------------------------------
 subroutine exact_geom(Mdle,Xi, X,Dxdxi)
 !

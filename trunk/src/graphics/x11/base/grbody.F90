@@ -16,11 +16,11 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine grbody(Iwind)
+   subroutine grbody(Iwind)
 !
       use GMP , only: NRDOMAIN
       use physics , only : NR_PHYSA,PHYSA
-      use data_structure3D , ONLY: NRELES
+      use data_structure3D , only: NRELES
       use graphmod
 !
       implicit none
@@ -420,6 +420,6 @@
       goto 10
 !
 !
-      end subroutine grbody
+   end subroutine grbody
 
 #endif

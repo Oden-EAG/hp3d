@@ -6,7 +6,7 @@
 !
 !     latest revision:  - Aug 2019
 !
-!     purpose:          - driver for the element routine
+!> @brief         - driver for the element routine
 !
 !     arguments:
 !        in:
@@ -55,7 +55,7 @@ end subroutine elem
 !
 !     latest revision:  - July 2019
 !
-!     purpose:          - compute element stiffness and load
+!> @brief         - compute element stiffness and load
 !
 !     arguments:
 !        in:

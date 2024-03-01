@@ -1,8 +1,8 @@
 !-------------------------------------------------------------------------------
 !> @brief      routine determines BC flags for faces of an element
 !!
-!! @param[in]  Mdle - middle node
-!! @param[out] Ibc  - BC flags; for each variable component ivar supported by
+!> @param[in]  Mdle - middle node
+!> @param[out] Ibc  - BC flags; for each variable component ivar supported by
 !!                    the element (and its initial mesh ancestor), and iface;
 !!             Ibc(iface,ivar) = 0 if the face is interior to the domain,
 !!                             = the corresponding flag (1-9) for the element

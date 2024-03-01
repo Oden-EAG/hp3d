@@ -212,9 +212,9 @@ end subroutine my_sizetest
 !
 !
 !-------------------------------------------------------------------------------
-!  routine:          set_PML
-!  purpose:          sets the PML data
-!  last modified:    Jan 2018
+!> @name             set_PML
+!> @brief            sets the PML data
+!> @date             Jan 2018
 !-------------------------------------------------------------------------------
 subroutine set_PML
    use commonParam
@@ -224,11 +224,10 @@ end subroutine set_PML
 !
 !
 !-------------------------------------------------------------------------------
-!   routine:            get_Beta
+!> @name             get_Beta
+!> @date             Oct 2018
 !
-!   last modified:      Oct 2018
-!
-!   purpose:            returns the PML function at a point Xp
+!> @brief            returns the PML function at a point Xp
 !
 !   arguments:
 !       in:             Xp       - coordinates (x,y,z) at a physical point

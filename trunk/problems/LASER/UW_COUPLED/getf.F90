@@ -1,12 +1,12 @@
 !------------------------------------------------------------------------------
 !                       subroutine getf
 !------------------------------------------------------------------------------
-!> Purpose : source term
+!> @brief source term
 !!
-!! @param[in]  Mdle  - element (middle node) number
-!! @param[in]  X     - physical coordinates
-!! @param[out] Zfval - rhs f
-!! @param[out] ZJval - rhs J
+!> @param[in]  Mdle  - element (middle node) number
+!> @param[in]  X     - physical coordinates
+!> @param[out] Zfval - rhs f
+!> @param[out] ZJval - rhs J
 !------------------------------------------------------------------------------
 !
 #include "typedefs.h"

@@ -9,7 +9,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 1D segment
+!> @brief         - routine returns values of 1D segment
 !                         BROKEN H1 shape functions
 !
 !     arguments:
@@ -52,7 +52,7 @@
 !
 !     latest revision:  - Apr 17
 !
-!     purpose:          - routine returns values of 1D segment
+!> @brief         - routine returns values of 1D segment
 !                         BROKEN L2 shape functions
 !
 !     arguments:

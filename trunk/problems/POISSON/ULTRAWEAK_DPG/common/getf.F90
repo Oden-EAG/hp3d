@@ -6,7 +6,7 @@
 !
 !     latest revision:  - May 2023
 !
-!     purpose:          - return source term value at a point X
+!> @brief         - return source term value at a point X
 !
 !     arguments:
 !

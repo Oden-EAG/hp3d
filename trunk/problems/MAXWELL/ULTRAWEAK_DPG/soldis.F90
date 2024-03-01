@@ -2,7 +2,7 @@
 #include "typedefs.h"
 !
 !---------------------------------------------------------------------------------------
-!> Purpose     Display user-defined quantity
+!> @brief     Display user-defined quantity
 !!
 !> @param[in]  Mdle   - element (middle node) number
 !> @param[in]  Xi     - master element coordinates
@@ -164,7 +164,7 @@
 !
 !
 !---------------------------------------------------------------------------------------
-!> Purpose : select quantities to display
+!> @brief select quantities to display
 !---------------------------------------------------------------------------------------
    subroutine soldis_select
 !
@@ -208,7 +208,7 @@
 !
 !
 !---------------------------------------------------------------------------------------
-!> Purpose : show the quantities selected to display
+!> @brief show the quantities selected to display
 !---------------------------------------------------------------------------------------
    subroutine disp_soldis(Nstream)
 !
