@@ -1,23 +1,23 @@
-c------------------------------------------------------------------
-c
-c   routine name       - solve1
-c
-c------------------------------------------------------------------
-c
-c   latest revision    - Feb 2023
-c
-c   purpose            - routine solves a user defined system
-c                        of equations interfacing with the
-c                        frontal solver routines
-c
-c   arguments
-c   in:
-c        Number_of_RHS  - number of right-hand sides (load vectors)
-c
-c------------------------------------------------------------------
+!------------------------------------------------------------------
+!
+!   routine name       - solve1
+!
+!------------------------------------------------------------------
+!
+!   latest revision    - Feb 2023
+!
+!   purpose            - routine solves a user defined system
+!                        of equations interfacing with the
+!                        frontal solver routines
+!
+!   arguments
+!   in:
+!        Number_of_RHS  - number of right-hand sides (load vectors)
+!
+!------------------------------------------------------------------
 #include "typedefs.h"
       subroutine solve1(Number_of_RHS)
-c
+!
       use data_structure3D
       use element_data
       use assembly
@@ -27,104 +27,104 @@ c
       use stc,         only: stc_alloc, stc_dealloc, stc_get_nrdof
       use par_mesh,    only: DISTRIBUTED,HOST_MESH
       use mpi_param,   only: RANK,ROOT
-c
-c  ...frontal solver common blocks
+!
+!  ...frontal solver common blocks
       use surfsc1
       use surfsc2
-c
+!
       implicit none
-c
+!
       integer, intent(in) :: Number_of_RHS
-c
-c  ...nodes for a modified element and the corresponding number
-c     of H1,H(curl),H(div) and L2 dof
-      integer :: nodm(MAXNODM),ndofmH(MAXNODM),ndofmE(MAXNODM),
-     .                         ndofmV(MAXNODM),ndofmQ(MAXNODM)
-c
-c  ...number of variables for each physics attribute for an element
+!
+!  ...nodes for a modified element and the corresponding number
+!     of H1,H(curl),H(div) and L2 dof
+      integer :: nodm(MAXNODM),ndofmH(MAXNODM),ndofmE(MAXNODM), &
+                               ndofmV(MAXNODM),ndofmQ(MAXNODM)
+!
+!  ...number of variables for each physics attribute for an element
       integer :: nrdofs(NR_PHYSA)
-c
-c  ...element geometry dof, direction vector
+!
+!  ...element geometry dof, direction vector
       real(8) :: xnod(3,MAXbrickH),xc(3),direction(3)
-c
-c  ...number of local element dof for each physics variable
+!
+!  ...number of local element dof for each physics variable
       integer :: nrdofi(NR_PHYSA),nrdofb(NR_PHYSA)
-c
+!
       integer :: inick,iel,iel1,i,j,iv,kk,kel
       integer :: max_active_node_no,mdle,mr,ms,mu,nod,nrnodm
       integer :: nrnick,nrdof,nrdofm,nrdofc,nrnod1,nrdof_mdl
       VTYPE   :: zvoid
-c
+!
 #if HP3D_DEBUG
       integer :: iprint
       iprint=0
 #endif
-c
-c-----------------------------------------------------------------------
-c
+!
+!-----------------------------------------------------------------------
+!
       if (RANK .ne. ROOT) return
       if (DISTRIBUTED .and. (.not. HOST_MESH)) then
         write(*,*) 'solve1: mesh is distributed. returning...'
         return
       endif
-c
+!
 #if HP3D_COMPLEX
       IDUMPWR = 0
 #endif
-c
+!
 #if HP3D_DEBUG
       if (iprint.eq.1) then
-        write(*,*) 'solve1: NRELES,Number_of_RHS = ',
-     .                      NRELES,Number_of_RHS
+        write(*,*) 'solve1: NRELES,Number_of_RHS = ', &
+                            NRELES,Number_of_RHS
         call pause
       endif
 #endif
-c
-c  ...save the number of right-hand sides (load vectors)
+!
+!  ...save the number of right-hand sides (load vectors)
       NR_RHS = Number_of_RHS
       if (NR_RHS .ne. NRRHS) then
          write(*,*) 'NR_RHS, NRRHS = ',NR_RHS,NRRHS
          stop
       endif
-c
-c  ...preliminary loop through elements to collect the necessary data
-c     for allocating memory
+!
+!  ...preliminary loop through elements to collect the necessary data
+!     for allocating memory
       nrnick = 0
       allocate(MAXDOFS(NR_PHYSA)); MAXDOFS = 0
-c
-c  ...use the potential maximum number of dofs for extraction and
-c     Dirichlet dof vectors
-c
-c  ...case with static condensation
+!
+!  ...use the potential maximum number of dofs for extraction and
+!     Dirichlet dof vectors
+!
+!  ...case with static condensation
       if (ISTC_FLAG) then
-        MAXDOFM = (MAXbrickH-MAXmdlbH)*NRHVAR
-     .          + (MAXbrickE-MAXmdlbE)*NREVAR
-     .          + (MAXbrickV-MAXmdlbV)*NRVVAR
-c
-c  ...no static condensation
+        MAXDOFM = (MAXbrickH-MAXmdlbH)*NRHVAR &
+                + (MAXbrickE-MAXmdlbE)*NREVAR &
+                + (MAXbrickV-MAXmdlbV)*NRVVAR
+!
+!  ...no static condensation
       else
-        MAXDOFM = MAXbrickH*NRHVAR
-     .          + MAXbrickE*NREVAR
-     .          + MAXbrickV*NRVVAR
-     .          + MAXbrickQ*NRQVAR
+        MAXDOFM = MAXbrickH*NRHVAR &
+                + MAXbrickE*NREVAR &
+                + MAXbrickV*NRVVAR &
+                + MAXbrickQ*NRQVAR
       endif
-c
+!
       allocate(NEXTRACT(MAXDOFM))
       allocate(IDBC(MAXDOFM))
       allocate(ZDOFD(MAXDOFM,NR_RHS))
-c
-c  ...initiate maximum active node number
+!
+!  ...initiate maximum active node number
       max_active_node_no = 0
-c
-c  ...determine the actual maximum number of element dof to allocate
-c     element matrices
+!
+!  ...determine the actual maximum number of element dof to allocate
+!     element matrices
       MAXDOFM = 0; MAXDOFC=0
       nrdof=0; nrdof_mdl=0
       call reset_visit
       do iel=1,NRELES
         mdle = ELEM_ORDER(iel)
-c
-c  .....determine nodes of the modified element
+!
+!  .....determine nodes of the modified element
 #if HP3D_DEBUG
         if (iprint.eq.1) then
           write(*,*) 'solve1: iel', iel, 'mdle', mdle
@@ -132,60 +132,60 @@ c  .....determine nodes of the modified element
         endif
 #endif
         if (ISTC_FLAG) then
-          call celem_systemI(iel,mdle,1,
-     .               nrdofs,nrdofm,nrdofc,
-     .               nodm,ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,
-     .               zvoid,zvoid)
+          call celem_systemI(iel,mdle,1, &
+                     nrdofs,nrdofm,nrdofc, &
+                     nodm,ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm, &
+                     zvoid,zvoid)
         else
-          call celem(mdle,1,
-     .               nrdofs,nrdofm,nrdofc,
-     .               nodm,ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,
-     .               zvoid,zvoid)
+          call celem(mdle,1, &
+                     nrdofs,nrdofm,nrdofc, &
+                     nodm,ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm, &
+                     zvoid,zvoid)
         endif
-c
-c  .....compute the total number of mdle node dof
+!
+!  .....compute the total number of mdle node dof
         if (ISTC_FLAG) then
            call stc_get_nrdof(mdle, nrdofi,nrdofb)
            nrdof_mdl = nrdof_mdl + sum(nrdofb)
         endif
-c
-c  .....compute the number of node nicknames for the element
+!
+!  .....compute the number of node nicknames for the element
         nrnod1=0
         do i=1,nrnodm
           if (ndofmH(i).ne.0) nrnod1 = nrnod1+1
           if (ndofmE(i).ne.0) nrnod1 = nrnod1+1
           if (ndofmV(i).ne.0) nrnod1 = nrnod1+1
           if (ndofmQ(i).ne.0) nrnod1 = nrnod1+1
-c
+!
           nod = nodm(i)
           if (NODES(nod)%visit .eq. 0) then
             nrdof = nrdof+ndofmH(i)+ndofmE(i)+ndofmV(i)+ndofmQ(i)
             NODES(nod)%visit = 1
           endif
-c
-c  .......update the maximum active node number
+!
+!  .......update the maximum active node number
           max_active_node_no = max(max_active_node_no,nodm(i))
         enddo
         nrnick = nrnick + nrnod1
-c
-c  .....update the maximum number of local dof
+!
+!  .....update the maximum number of local dof
         do i=1,NR_PHYSA
           MAXDOFS(i) = max0(MAXDOFS(i),nrdofs(i))
         enddo
-c
-c  .....update the maximum number of modified element dof
+!
+!  .....update the maximum number of modified element dof
         MAXDOFM = max0(MAXDOFM,nrdofm)
-c
-c  .....update the maximum number of modified element dof after
-c       compression
+!
+!  .....update the maximum number of modified element dof after
+!       compression
         MAXDOFC = max0(MAXDOFC,nrdofc)
-c
-c  ...end of loop through elements
+!
+!  ...end of loop through elements
       enddo
-c
+!
       NRDOF_CON = nrdof
       NRDOF_TOT = nrdof + nrdof_mdl
-c
+!
 #if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,7006) NR_PHYSA
@@ -198,13 +198,13 @@ c
  7007   format('solve1: max_active_node_no = ',i8)
       endif
 #endif
-c
-c-----------------------------------------------------------------------
-c
+!
+!-----------------------------------------------------------------------
+!
       if (REORDER) then
         if (.not.allocated(NEW_ELEM_ORDER)) then
-c
-c  .......reorder the elements in order to minimize the bandwidth...
+!
+!  .......reorder the elements in order to minimize the bandwidth...
           direction(1:3) = 0.d0; direction(1) = 1.d0;
           write(*,*) 'solve1: REORDERING ELEMENTS ALONG x DIRECTION'
           allocate(NEW_ELEM_ORDER(NRELES))
@@ -223,8 +223,8 @@ c  .......reorder the elements in order to minimize the bandwidth...
           do iel=1,NRELES
             iel1=NEW_ELEM_ORDER(iel)
             NEW_ELEM_ORDER(iel) = ELEM_ORDER(iel1)
-            write(*,*) 'iel,NEW_ELEM_ORDER(iel) = ',
-     .                  iel,NEW_ELEM_ORDER(iel)
+            write(*,*) 'iel,NEW_ELEM_ORDER(iel) = ', &
+                        iel,NEW_ELEM_ORDER(iel)
             if (iel/20*20.eq.iel) call pause
           enddo
           deallocate(ELEM_CENTER)
@@ -235,46 +235,46 @@ c  .......reorder the elements in order to minimize the bandwidth...
           NEW_ELEM_ORDER(1:NRELES) = ELEM_ORDER(1:NRELES)
         endif
       endif
-c
-c-----------------------------------------------------------------------
-c
-c  ...define nicknames.....
+!
+!-----------------------------------------------------------------------
+!
+!  ...define nicknames.....
       allocate(IN(NRELES))
       allocate(IAWORK(2*nrnick+3*MAXDOFC))
-c
-c  ...initiate the sequential element number
+!
+!  ...initiate the sequential element number
       kel = 0
-c
-c  ...initiate the node nickname counter
+!
+!  ...initiate the node nickname counter
       kk=0
-c
-c  ...loop through elements
+!
+!  ...loop through elements
       do iel=1,NRELES
         mdle = NEW_ELEM_ORDER(iel)
-c
-c  .....determine nodes of the modified element
+!
+!  .....determine nodes of the modified element
         if (ISTC_FLAG) then
-          call celem_systemI(iel,mdle,1,
-     .               nrdofs,nrdofm,nrdofc,
-     .               nodm,ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,
-     .               zvoid,zvoid)
+          call celem_systemI(iel,mdle,1, &
+                     nrdofs,nrdofm,nrdofc, &
+                     nodm,ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm, &
+                     zvoid,zvoid)
 
         else
-          call celem(mdle,1,
-     .               nrdofs,nrdofm,nrdofc,
-     .               nodm,ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm,
-     .               zvoid,zvoid)
+          call celem(mdle,1, &
+                     nrdofs,nrdofm,nrdofc, &
+                     nodm,ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm, &
+                     zvoid,zvoid)
         endif
-c
-c  .....update the sequential element number
+!
+!  .....update the sequential element number
         kel = kel+1
-c
-c  .....initiate the element counter for the nodes
+!
+!  .....initiate the element counter for the nodes
         inick=0
-c
-c  .....H1 dof ........
-c
-c  .....loop through nodes in the reversed order
+!
+!  .....H1 dof ........
+!
+!  .....loop through nodes in the reversed order
         do i=nrnodm,1,-1
           if (ndofmH(i).gt.0) then
             inick = inick+1
@@ -285,10 +285,10 @@ c  .....loop through nodes in the reversed order
             endif
           endif
         enddo
-c
-c  .....H(curl) dof ........
-c
-c  .....loop through nodes in the reversed order
+!
+!  .....H(curl) dof ........
+!
+!  .....loop through nodes in the reversed order
         do i=nrnodm,1,-1
           if (ndofmE(i).gt.0) then
             inick = inick+1
@@ -299,10 +299,10 @@ c  .....loop through nodes in the reversed order
             endif
           endif
         enddo
-c
-c  .....H(div) dof ........
-c
-c  .....loop through nodes in the reversed order
+!
+!  .....H(div) dof ........
+!
+!  .....loop through nodes in the reversed order
         do i=nrnodm,1,-1
           if (ndofmV(i).gt.0) then
             inick = inick+1
@@ -313,11 +313,11 @@ c  .....loop through nodes in the reversed order
             endif
           endif
         enddo
-c
-c  .....L2 dof ........
+!
+!  .....L2 dof ........
         if (.not.ISTC_FLAG) then
-c
-c  .......middle node only
+!
+!  .......middle node only
           i=nrnodm
           if (ndofmQ(i).gt.0) then
             inick = inick+1
@@ -328,23 +328,23 @@ c  .......middle node only
             endif
           endif
         endif
-c
+!
         IN(kel) = inick
-c
-c  ...end of the loop through elements
+!
+!  ...end of the loop through elements
       enddo
-c
-c  ...exit if no free dof
+!
+!  ...exit if no free dof
       write(*,*) 'solve1: TOTAL NUMBER OF NICKNAMES = ',kk
       if (kk.eq.0) then
         deallocate(MAXDOFS,NEXTRACT,IDBC,ZDOFD,IN,IAWORK,NEW_ELEM_ORDER)
         return
       endif
-c
+!
 #if HP3D_DEBUG
       if (iprint.eq.1) then
    10   write(*,7002) NRELES
- 7002   format(' solve1: SET ELEMENT NUMBER TO REVIEW NICKNAMES, ',
+ 7002   format(' solve1: SET ELEMENT NUMBER TO REVIEW NICKNAMES, ', &
      ,         'NRELES = ',i8)
         read(*,*) mdle
         if (mdle.eq.0) then
@@ -369,15 +369,15 @@ c
         go to 10
       endif
 #endif
-c
+!
  20   continue
-c
-c----------------------------------------------------------------------
-c
-c  filling up common surfs1 (input for frontal solver)
-c
+!
+!----------------------------------------------------------------------
+!
+!  filling up common surfs1 (input for frontal solver)
+!
       NFSOUT = 0
-c  ...hardwire ISYM to symmetry flag from control file
+!  ...hardwire ISYM to symmetry flag from control file
       ISYM   = ISYM_FLAG
       IRESOL = 0
       NRHS   = NR_RHS
@@ -391,25 +391,25 @@ c  ...hardwire ISYM to symmetry flag from control file
       IPFSLE = 0
       IPFSXX = 0
       IPFSBK = 0
-c
-c  ...set these parameters to negative sequential element number
-c     for debugging forward elimination
+!
+!  ...set these parameters to negative sequential element number
+!     for debugging forward elimination
       IPFSST = 0
       IPFSLH = 0
       IPFSRH = 0
       IPFSLE = 0
       IPFSLF = 0
       IPFSRF = 0
-c
+!
       NICMUL = 1000
-c
+!
       NUMELM = NRELES
-c
+!
       NPDESV = 1
       allocate(IDESVE(nrnick))
       allocate(NDESVE(2,NRELES))
-c
-c  ...call prefront
+!
+!  ...call prefront
 ccc      write(*,*) 'solve1: nrnick,MAXDOFC = ',nrnick,MAXDOFC
       MA = 2*nrnick+3*MAXDOFC
 #if HP3D_DEBUG
@@ -418,8 +418,8 @@ ccc      write(*,*) 'solve1: nrnick,MAXDOFC = ',nrnick,MAXDOFC
       call surfsp(IN,IAWORK, ms,mu,mr)
       if (IERR.eq.1) stop 1
       deallocate(IN, IAWORK)
-c
-c  ...allocate element matrices
+!
+!  ...allocate element matrices
       allocate(BLOC(NR_PHYSA))
       allocate(AAUX(NR_PHYSA))
       allocate(ALOC(NR_PHYSA,NR_PHYSA))
@@ -438,9 +438,9 @@ c  ...allocate element matrices
       enddo
       allocate(ZBMOD(MAXDOFM,NR_RHS))
       allocate(ZAMOD(MAXDOFM,MAXDOFM))
-c
-c  ...check the size of workspace for surfss:
-c     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!
+!  ...check the size of workspace for surfss:
+!     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       if (ISYM.eq.1 .or. ISYM.eq.4) then
 ccc        write(*,7004) ms+mr
 ccc 7004   format('solve1: MINIMUM MEMORY  = ',i10)
@@ -455,39 +455,39 @@ ccc        write(*,7004) mu+mr
           stop 1
         endif
       endif
-c
-c  ...allocate work space
+!
+!  ...allocate work space
 #if HP3D_DEBUG
       if (iprint.eq.1) write(*,*) 'solve1: MFRSOL = ',MFRSOL
 #endif
       allocate(ZWORKFRS(MFRSOL))
-c
-c  ...allocate static condensation data structures
+!
+!  ...allocate static condensation data structures
       if (ISTC_FLAG) call stc_alloc
-c
-c  ...call frontal solver
+!
+!  ...call frontal solver
       MA = MFRSOL
       ZWORKFRS(1:MFRSOL) = ZERO
 #if HP3D_DEBUG
       if (iprint.eq.1) write(*,*) 'solve1: CALLING FRONTAL SOLVER'
 #endif
-c
+!
       call surfss(ZWORKFRS)
       if (IERR.ne.0) then
         write(*,*) 'ERROR IN SURFSS'
         stop 1
       endif
-c
+!
 #if HP3D_DEBUG
       if (iprint.eq.1) then
         write(*,*) 'solve1: SURFSS COMPLETED'
       endif
 #endif
-c
-c  ...deallocate static condensation data structures
+!
+!  ...deallocate static condensation data structures
       if (ISTC_FLAG) call stc_dealloc
-c
-c  ...deallocate ALL arrays used by frontal solver
+!
+!  ...deallocate ALL arrays used by frontal solver
       do i=1,NR_PHYSA
         if (allocated(BLOC(i)%array)) deallocate(BLOC(i)%array)
         do j=1,NR_PHYSA
@@ -499,9 +499,9 @@ c  ...deallocate ALL arrays used by frontal solver
       deallocate(IDESVE,NDESVE)
       deallocate(ZWORKFRS)
       deallocate(NEW_ELEM_ORDER)
-c
+!
 #if HP3D_DEBUG
       if (iprint.eq.1) write(*,*) 'solve1: EXIT ROUTINE SOLVE1'
 #endif
-c
+!
       end subroutine solve1
