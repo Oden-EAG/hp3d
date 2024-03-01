@@ -11,11 +11,11 @@ LIBS     =
 
 FC_WORK  =  $(FC) $(CCINCS) $(FFLAGS)
 
-SRC_FILE = bckwrd.F complt.F dest.F desvec.F elmrhs.F elmsol.F \
-	   frwcp.F frwrs.F locls.F loclu.F locr.F \
-	   resol.F semrhs.F surfsp.F surfss.F symasm.F \
-	   symelm.F unsasm.F unselm.F zdirio.F zdiriodum.F \
-	   zecond.F zeror.F zeros.F zerou.F
+SRC_FILE = bckwrd.F90 complt.F90 dest.F90 desvec.F90 elmrhs.F90 elmsol.F90 \
+	   frwcp.F90 frwrs.F90 locls.F90 loclu.F90 locr.F90 \
+	   resol.F90 semrhs.F90 surfsp.F90 surfss.F90 symasm.F90 \
+	   symelm.F90 unsasm.F90 unselm.F90 zdirio.F90 zdiriodum.F90 \
+	   zecond.F90 zeror.F90 zeros.F90 zerou.F90
 
 SRC      = $(addprefix $(SRC_PATH)/.$(SRC_FILE))
 OBJ      = $(addprefix $(OBJ_PATH)/,$(SRC_FILE:.F=.o))
