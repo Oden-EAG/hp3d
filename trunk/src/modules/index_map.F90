@@ -92,7 +92,7 @@
 !! @param[in]  this - Indmap instance to destroy
 !> @date  Feb 2023
 !-----------------------------------------------------------------------
-      subroutine Index_map_finalize(this)
+   subroutine Index_map_finalize(this)
 !
          type(Indmap) :: this
 !
@@ -101,7 +101,7 @@
             deallocate(this%sorted_list, this%index)
          endif
 !
-      end subroutine Index_map_finalize
+   end subroutine Index_map_finalize
 
 
 

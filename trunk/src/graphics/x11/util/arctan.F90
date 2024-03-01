@@ -18,7 +18,7 @@
 !                        point and x-axis ( 0 < Ang < 2*Pi )
 !
 !----------------------------------------------------------------------
-      subroutine arctan(Xc,Yc,Ang)
+   subroutine arctan(Xc,Yc,Ang)
 !
       implicit none
 !
@@ -46,6 +46,6 @@
          endif
       endif
 !
-      end subroutine arctan
+   end subroutine arctan
 
 #endif

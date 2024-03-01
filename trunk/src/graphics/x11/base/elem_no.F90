@@ -23,7 +23,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine elem_no(Xy_in, Mdle)
+   subroutine elem_no(Xy_in, Mdle)
 !
       use data_structure3D
       use graphmod
@@ -177,6 +177,6 @@
 #endif
 !
 !
-      end subroutine elem_no
+   end subroutine elem_no
 
 #endif

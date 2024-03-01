@@ -19,7 +19,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine execute_pref(List,Nlist)
+   subroutine execute_pref(List,Nlist)
 !
       use data_structure3D
       use element_data
@@ -263,7 +263,7 @@
 
       call reset_visit
 !
-      end subroutine execute_pref
+   end subroutine execute_pref
 !
 !---------------------------------------------------------------------
 !
@@ -284,7 +284,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine find_new_order(Nod, Newp)
+   subroutine find_new_order(Nod, Newp)
 !
       use data_structure3D
       implicit none
@@ -303,5 +303,5 @@
         Newp = NODES(Nod)%order+111
       end select
 !
-      end subroutine find_new_order
+   end subroutine find_new_order
 

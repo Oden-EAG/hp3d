@@ -16,7 +16,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine grbody(Iwind)
+   subroutine grbody(Iwind)
 !
       use GMP , only: NRDOMAIN
       use physics , only : NR_PHYSA,PHYSA
@@ -420,6 +420,6 @@
       goto 10
 !
 !
-      end subroutine grbody
+   end subroutine grbody
 
 #endif

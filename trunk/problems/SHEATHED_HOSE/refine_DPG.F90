@@ -31,7 +31,7 @@
 !
 !---------------------------------------------------------------------
 !
-      subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
+   subroutine refine_DPG(Irefine,Nreflag,Factor, Nstop)
 !
       use control
       use data_structure3D
@@ -522,4 +522,4 @@
 !
         end subroutine custom_display
 !
-      end subroutine refine_DPG
+   end subroutine refine_DPG

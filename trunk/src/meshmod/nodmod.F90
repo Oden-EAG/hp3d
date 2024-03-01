@@ -20,7 +20,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine nodmod(Nod,Nordn)
+   subroutine nodmod(Nod,Nordn)
 !
       use data_structure3D
       use mpi_param, only: RANK
@@ -272,7 +272,7 @@
 #endif
 !
 !
-      end subroutine nodmod
+   end subroutine nodmod
 !
 !---------------------------------------------------------------------
 !
@@ -295,7 +295,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_dofG(Ntype,Nordo,Nordn,NdofGo,NdofGn, &
+   subroutine copy_dofG(Ntype,Nordo,Nordn,NdofGo,NdofGn, &
                            Xnodo,Xnodn)
 !
       use node_types
@@ -356,7 +356,7 @@
 #endif
 !
 !
-      end subroutine copy_dofG
+   end subroutine copy_dofG
 !
 !---------------------------------------------------------------------
 !
@@ -380,7 +380,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_dofH(Ntype,Nordo,Nordn,NdofHo,NdofHn, &
+   subroutine copy_dofH(Ntype,Nordo,Nordn,NdofHo,NdofHn, &
                            NvarH,ZdofHo,ZdofHn)
 !
       use node_types
@@ -441,7 +441,7 @@
 #endif
 !
 !
-      end subroutine copy_dofH
+   end subroutine copy_dofH
 !
 !---------------------------------------------------------------------
 !
@@ -465,7 +465,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_dofE(Ntype,Nordo,Nordn,NdofEo,NdofEn, &
+   subroutine copy_dofE(Ntype,Nordo,Nordn,NdofEo,NdofEn, &
                            NvarE,ZdofEo,ZdofEn)
 !
       use node_types
@@ -636,7 +636,7 @@
 #endif
 !
 !
-      end subroutine copy_dofE
+   end subroutine copy_dofE
 !
 !---------------------------------------------------------------------
 !
@@ -660,7 +660,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_dofV(Ntype,Nordo,Nordn,NdofVo,NdofVn, &
+   subroutine copy_dofV(Ntype,Nordo,Nordn,NdofVo,NdofVn, &
                            NvarV,ZdofVo,ZdofVn)
 !
       use node_types
@@ -824,7 +824,7 @@
 #endif
 !
 !
-      end subroutine copy_dofV
+   end subroutine copy_dofV
 !
 !---------------------------------------------------------------------
 !
@@ -848,7 +848,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_dofQ(Ntype,Nordo,Nordn,NdofQo,NdofQn, &
+   subroutine copy_dofQ(Ntype,Nordo,Nordn,NdofQo,NdofQn, &
                            NvarQ,ZdofQo,ZdofQn)
 !
       use node_types
@@ -912,11 +912,11 @@
 #endif
 !
 !
-      end subroutine copy_dofQ
+   end subroutine copy_dofQ
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_1array(M,A,Ia, B,Ib)
+   subroutine copy_1array(M,A,Ia, B,Ib)
 !
       use parameters, only: ZERO
       implicit none
@@ -928,11 +928,11 @@
       i = min(Ia,Ib)
       B(1:M,1:i) = A(1:M,1:i)
 !
-      end subroutine copy_1array
+   end subroutine copy_1array
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_2array(M,A,Ia,Ja, B,Ib,Jb)
+   subroutine copy_2array(M,A,Ia,Ja, B,Ib,Jb)
 !
       use parameters, only: ZERO
       implicit none
@@ -945,11 +945,11 @@
       j = min(Ja,Jb)
       B(1:M,1:i,1:j) = A(1:M,1:i,1:j)
 !
-      end subroutine copy_2array
+   end subroutine copy_2array
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_3array(M,A,Ia,Ja,Ka, B,Ib,Jb,Kb)
+   subroutine copy_3array(M,A,Ia,Ja,Ka, B,Ib,Jb,Kb)
 !
       use parameters, only: ZERO
       implicit none
@@ -963,11 +963,11 @@
       k = min(Ka,Kb)
       B(1:M,1:i,1:j,1:k) = A(1:M,1:i,1:j,1:k)
 !
-      end subroutine copy_3array
+   end subroutine copy_3array
 
 !-----------------------------------------------------------------------
 !
-      subroutine copy_1array_r(M,A,Ia, B,Ib)
+   subroutine copy_1array_r(M,A,Ia, B,Ib)
 !
       implicit none
       integer :: M,Ia,Ib,i
@@ -978,11 +978,11 @@
       i = min(Ia,Ib)
       B(1:M,1:i) = A(1:M,1:i)
 !
-      end subroutine copy_1array_r
+   end subroutine copy_1array_r
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_2array_r(M,A,Ia,Ja, B,Ib,Jb)
+   subroutine copy_2array_r(M,A,Ia,Ja, B,Ib,Jb)
 !
       implicit none
       integer :: M,Ia,Ja,Ib,Jb,i,j
@@ -994,11 +994,11 @@
       j = min(Ja,Jb)
       B(1:M,1:i,1:j) = A(1:M,1:i,1:j)
 !
-      end subroutine copy_2array_r
+   end subroutine copy_2array_r
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_3array_r(M,A,Ia,Ja,Ka, B,Ib,Jb,Kb)
+   subroutine copy_3array_r(M,A,Ia,Ja,Ka, B,Ib,Jb,Kb)
 !
       implicit none
       integer :: M,Ia,Ja,Ka,Ib,Jb,Kb,i,j,k
@@ -1011,5 +1011,5 @@
       k = min(Ka,Kb)
       B(1:M,1:i,1:j,1:k) = A(1:M,1:i,1:j,1:k)
 !
-      end subroutine copy_3array_r
+   end subroutine copy_3array_r
 

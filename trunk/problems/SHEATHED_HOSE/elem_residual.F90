@@ -6,7 +6,7 @@
 !! @param[out] Nref_flag - suggested h-refinement flag
 !--------------------------------------------------------------------------
 !
-      subroutine elem_residual(Mdle, Resid,Nref_flag)
+   subroutine elem_residual(Mdle, Resid,Nref_flag)
 !
       use control, only : INTEGRATION
       use uweak_module, only : Gram
@@ -570,14 +570,14 @@
 !  ...if anisotropic h refinements -> missing
 !
 !
-      end subroutine elem_residual
+   end subroutine elem_residual
 
 !--------------------------------------------------------------------------
 !> Purpose : returns global residual
 !!
 !--------------------------------------------------------------------------
 !
-      subroutine compute_residual
+   subroutine compute_residual
 !
       use data_structure3D
       use environment, only : QUIET_MODE
@@ -688,4 +688,4 @@
       endif
 !
 !
-      end subroutine compute_residual
+   end subroutine compute_residual

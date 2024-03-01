@@ -18,7 +18,7 @@
 !
 !********************************************************
 
-      subroutine wvopps
+   subroutine wvopps
       implicit none
 !---------------------------------------------------------
 !      AUTHOR(S)        - Satish Chavva,Tadeusz Liszka and others
@@ -80,11 +80,11 @@
       write(*,*) ' File ',name,' exists !!'
       write(*,*) ' I will not overwrite it !!'
       goto 110
-      end subroutine wvopps
+   end subroutine wvopps
 
 
 !-----------------------------------------------------------------
-      subroutine wvpscl(Clip)
+   subroutine wvpscl(Clip)
       implicit none
 !
 !----------------------------------------------------------------------
@@ -127,10 +127,10 @@
       endif
 !
       return
-      end subroutine wvpscl
+   end subroutine wvpscl
 
 !========================================================
-      subroutine WVPSDL(X1,Y1,X2,Y2,IC)
+   subroutine WVPSDL(X1,Y1,X2,Y2,IC)
       implicit none
 !========================================================
 !
@@ -160,10 +160,10 @@
         call wvpsout(x2,y2,4)
         call wvpsout(dum1,dum2,6)
         return
-      end subroutine WVPSDL
+   end subroutine WVPSDL
 
 
-      subroutine wvpsfp(N,Xc,Icf,Icl)
+   subroutine wvpsfp(N,Xc,Icf,Icl)
       implicit none
 !
 !----------------------------------------------------------------------
@@ -238,12 +238,12 @@
 !
 !
       return
-      end subroutine wvpsfp
+   end subroutine wvpsfp
 
 !========================================================
 !     draw pixel in postcript
 !========================================================
-      subroutine WVPSPX(X,Y,IC)
+   subroutine WVPSPX(X,Y,IC)
       implicit none
 !
 #include "wvglob.blk"
@@ -261,14 +261,14 @@
         call wvpsout(X,Y,4)
         call wvpsout(dum1,dum2,6)
         return
-      end subroutine WVPSPX
+   end subroutine WVPSPX
 
 
 !========================================================
 !     draw text in postscript
 !========================================================
 
-      subroutine WVPSTE(X1,Y1,H,MESS,A,N,ICOL)
+   subroutine WVPSTE(X1,Y1,H,MESS,A,N,ICOL)
         implicit none
 !
         real(8)   :: X1,Y1
@@ -292,12 +292,12 @@
         write(IFILE,1000) ' (',mess(1:N),') show'
  1000   format(A)
         return
-      end subroutine WVPSTE
+   end subroutine WVPSTE
 
 
 !-------------------------------------------------------------------
 
-      subroutine wvpsout(X,Y,Icode)
+   subroutine wvpsout(X,Y,Icode)
       implicit none
 !
 !=====================================================================
@@ -378,11 +378,11 @@
       IBUFC(ILBUF)=Icode
       if (ILBUF.eq.5) call flushps
       return
-      end subroutine wvpsout
+   end subroutine wvpsout
 !
 !-----------------------------------------------------------------------
 !
-      subroutine flushps
+   subroutine flushps
 !
 !-----------------------------------------------------------------------
 !
@@ -546,11 +546,11 @@
       endif
 !
       return
-      end subroutine flushps
+   end subroutine flushps
 
 
 !========================================================
-      subroutine wvclps
+   subroutine wvclps
       implicit none
 !
 #include "wvglob.blk"
@@ -570,6 +570,6 @@
         close(IFILE)
         write(*,*)' PostScript file closed'
         return
-      end subroutine wvclps
+   end subroutine wvclps
 
 #endif

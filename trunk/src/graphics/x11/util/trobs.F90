@@ -23,7 +23,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine trobs(Xcart, Xobs)
+   subroutine trobs(Xcart, Xobs)
 !
       use graphmod, only: RMTR
 !
@@ -43,6 +43,6 @@
         Xobs(i) = s
       enddo
 !
-      end subroutine trobs
+   end subroutine trobs
 
 #endif

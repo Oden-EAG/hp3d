@@ -24,7 +24,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine perform_pref(List_elem,List_nord,Nlist)
+   subroutine perform_pref(List_elem,List_nord,Nlist)
 !
       use data_structure3D
       use element_data
@@ -286,7 +286,7 @@
 !  ...reset the visitation flags
       call reset_visit
 !
-      end subroutine perform_pref
+   end subroutine perform_pref
 !
 !---------------------------------------------------------------------
 !
@@ -307,7 +307,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine enforce_order(Nod,Newp)
+   subroutine enforce_order(Nod,Newp)
 !
       use data_structure3D
 !
@@ -334,4 +334,4 @@
       end select
       call nodmod(Nod,nord)
 !
-      end subroutine enforce_order
+   end subroutine enforce_order

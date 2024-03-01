@@ -18,7 +18,7 @@
 !                        flag whether to display elements numbers
 !
 !-----------------------------------------------------------------------
-      subroutine dpvisid(Nf)
+   subroutine dpvisid(Nf)
 !
       use graphmod
 !
@@ -204,6 +204,6 @@
       enddo
 !
 !
-      end subroutine dpvisid
+   end subroutine dpvisid
 
 #endif

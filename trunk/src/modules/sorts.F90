@@ -106,14 +106,14 @@ module sorts
       end do
 
 
-   CONTAINS
+   contains
 
 
 !> Purpose - sorts two elements
 !! @param[inout]  i - first index
 !! @param[inout]  j - second index
 !-----------------------------------------------------------------------
-     subroutine exchangeIndex(i,j)
+      subroutine exchangeIndex(i,j)
 !
          implicit none
 !
@@ -126,7 +126,7 @@ module sorts
              j=swp
          end if
 !
-     end subroutine exchangeIndex
+      end subroutine exchangeIndex
 
 
 
@@ -145,7 +145,7 @@ module sorts
          a=b
          b=dum
 !
-     end subroutine swap
+      end subroutine swap
 !
    end subroutine sortIndex
 

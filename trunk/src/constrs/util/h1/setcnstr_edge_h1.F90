@@ -27,7 +27,7 @@
 !
 !---------------------------------------------------------------------
 !
-      subroutine setcnstr_edge_h1
+   subroutine setcnstr_edge_h1
 !
       use parameters
       use constraints
@@ -346,4 +346,4 @@
 !
 #endif
 !
-      end subroutine setcnstr_edge_h1
+   end subroutine setcnstr_edge_h1

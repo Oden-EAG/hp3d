@@ -4,7 +4,7 @@
 #include "typedefs.h"
 !----------------------------------------------------------------------
 !
-!     subroutine:          par_verify
+!      subroutine:          par_verify
 !
 !     last modified:       Oct 2019
 !
@@ -55,7 +55,7 @@ end subroutine par_verify
 !
 !----------------------------------------------------------------------
 !
-!     subroutine:          mesh_consistency
+!      subroutine:          mesh_consistency
 !
 !     last modified:       July 2019
 !
@@ -235,7 +235,7 @@ end subroutine mesh_consistency
 !
 !----------------------------------------------------------------------
 !
-!     subroutine:          verify_dof
+!      subroutine:          verify_dof
 !
 !     last modified:       July 2019
 !

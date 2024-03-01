@@ -15,7 +15,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine verify_orient
+   subroutine verify_orient
 !
       use data_structure3D
       use element_data
@@ -137,7 +137,7 @@
       deallocate(node_orient)
 !
 !
-      end subroutine verify_orient
+   end subroutine verify_orient
 !
 !
 !----------------------------------------------------------------------
@@ -152,7 +152,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine apply_orient(Norient,Ntype,Nv1, Nv2)
+   subroutine apply_orient(Norient,Ntype,Nv1, Nv2)
 !
       use element_data , only : EDGE_L2G , TRIAN_L2G , QUADR_L2G
       use node_types
@@ -183,6 +183,6 @@
         enddo
       end select
 !
-      end subroutine apply_orient
+   end subroutine apply_orient
 
 #endif

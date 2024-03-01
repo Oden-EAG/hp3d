@@ -74,7 +74,7 @@
 !
 !--------------------------------------------------------------------
 !
-      subroutine setcnstr_trian_aniso_h1(Iref)
+   subroutine setcnstr_trian_aniso_h1(Iref)
 !
       use parameters
       use constraints
@@ -270,4 +270,4 @@
 !
 !!!      call test_trian_aniso_h1(Iref)
 !
-      end subroutine setcnstr_trian_aniso_h1
+   end subroutine setcnstr_trian_aniso_h1

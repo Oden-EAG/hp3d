@@ -13,7 +13,7 @@
 !
 !----------------------------------------------------------------------
 !
-      subroutine setcnstr_trian_hcurl
+   subroutine setcnstr_trian_hcurl
 !
       use parameters
       use constraints
@@ -23,4 +23,4 @@
 !
       call setcnstr_trian_iso_hcurl
 !
-      end subroutine setcnstr_trian_hcurl
+   end subroutine setcnstr_trian_hcurl

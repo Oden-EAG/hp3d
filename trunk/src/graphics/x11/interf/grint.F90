@@ -38,7 +38,7 @@
 !
 !**************************************************************
 
-      subroutine closwind(Iwin)
+   subroutine closwind(Iwin)
       implicit none
 !
 !-----------------------------------------------------------------------!
@@ -109,7 +109,7 @@
       endif
 !
       return
-      end subroutine closwind
+   end subroutine closwind
 !
 !----------------------------------------------------------------------
 !
@@ -142,7 +142,7 @@
 !
 !---------------------------------------------------------------------
 !
-      subroutine openwind(Iwtype,Iwsize,Iwin)
+   subroutine openwind(Iwtype,Iwsize,Iwin)
       implicit none
 !
       integer(4) :: Iwtype,Iwsize(4),Iwin
@@ -262,10 +262,10 @@
   123 continue
 !
       return
-      end subroutine openwind
+   end subroutine openwind
 !
 !
-      subroutine selwind(Iwin)
+   subroutine selwind(Iwin)
       implicit none
 !
 !-----------------------------------------------------------------------
@@ -332,10 +332,10 @@
       endif
 !
       return
-      end subroutine selwind
+   end subroutine selwind
 !
 !
-      subroutine drawline(X1,Y1,X2,Y2,Ilcol)
+   subroutine drawline(X1,Y1,X2,Y2,Ilcol)
       implicit none
 !
 !---------------------------------------------------------------------
@@ -422,10 +422,10 @@
       endif
 !
       return
-      end subroutine drawline
+   end subroutine drawline
 !
 !
-      subroutine drawpoly(N,Coor,Ilcol)
+   subroutine drawpoly(N,Coor,Ilcol)
       implicit none
 !
 !-----------------------------------------------------------------------!
@@ -458,10 +458,10 @@
       call fillpoly(N,Coor,-1,Ilcol)
 !
       return
-      end subroutine drawpoly
+   end subroutine drawpoly
 !
 !
-      subroutine fillpoly(Nin,Coor,Ifcol,Ilcol)
+   subroutine fillpoly(Nin,Coor,Ifcol,Ilcol)
       implicit none
 !
 !-----------------------------------------------------------------------
@@ -546,10 +546,10 @@
       endif
 !
       return
-      end subroutine fillpoly
+   end subroutine fillpoly
 !
 !
-      subroutine symbol(X1,Y1,Height,Mess,Angle,N,Icol)
+   subroutine symbol(X1,Y1,Height,Mess,Angle,N,Icol)
       implicit none
 !
 !-----------------------------------------------------------------------!
@@ -635,10 +635,10 @@
 !      write(*,*) 'symbol3'
 !
       return
-      end subroutine symbol
+   end subroutine symbol
 !
 !
-      subroutine setpost(Ionoff)
+   subroutine setpost(Ionoff)
       implicit none
 !
 !-----------------------------------------------------------------------!
@@ -684,10 +684,10 @@
       endif
 !
       return
-      end subroutine setpost
+   end subroutine setpost
 !
 !
-      subroutine clrwind(Iback)
+   subroutine clrwind(Iback)
       implicit none
 !
 !-----------------------------------------------------------------------!
@@ -730,10 +730,10 @@
       LSCALE(ICURRWIN)=is
 !
       return
-      end subroutine clrwind
+   end subroutine clrwind
 !
 !
-      subroutine scaleon(Ionoff)
+   subroutine scaleon(Ionoff)
       implicit none
 !
 !-----------------------------------------------------------------------!
@@ -765,10 +765,10 @@
       LSCALE(ICURRWIN) = Ionoff
 !
       return
-      end subroutine scaleon
+   end subroutine scaleon
 !
 !
-      subroutine newscale(Range)
+   subroutine newscale(Range)
       implicit none
 !
 !-----------------------------------------------------------------------!
@@ -806,10 +806,10 @@
       call scaleon(1)
 !
       return
-      end subroutine newscale
+   end subroutine newscale
 !
 !
-      subroutine initcm
+   subroutine initcm
       implicit none
 !
 !-----------------------------------------------------------------------!
@@ -924,18 +924,18 @@
 !##      endif
 !
       return
-      end subroutine initcm
+   end subroutine initcm
 !
 !
 ! ********************************************************************
-      subroutine flushx
+   subroutine flushx
         implicit none
         return
-      end subroutine flushx
+   end subroutine flushx
 !
 !
 ! ********************************************************************
-      subroutine wvsccl(Iclip)
+   subroutine wvsccl(Iclip)
       implicit none
 !
 !-----------------------------------------------------------------------
@@ -986,11 +986,11 @@
       endif
 !
       return
-      end subroutine wvsccl
+   end subroutine wvsccl
 !
 !
 !========================================================
-      subroutine WVSCDL(X1,Y1,X2,Y2,IC)
+   subroutine WVSCDL(X1,Y1,X2,Y2,IC)
         implicit none
 !========================================================
 #include "rastcom.blk"
@@ -1003,11 +1003,11 @@
             return
         endif
         return
-      end subroutine WVSCDL
+   end subroutine WVSCDL
 !
 !
 !========================================================
-      subroutine WVSCFP(N,XC,ICF,ICL)
+   subroutine WVSCFP(N,XC,ICF,ICL)
         implicit none
 !========================================================
 #include "rastcom.blk"
@@ -1029,11 +1029,11 @@
             return
         endif
         return
-      end subroutine WVSCFP
+   end subroutine WVSCFP
 !
 !
 !========================================================
-      subroutine WVSCPX(X,Y,IC)
+   subroutine WVSCPX(X,Y,IC)
         implicit none
 !=======================================================
 #include "rastcom.blk"
@@ -1044,11 +1044,11 @@
             return
         endif
         return
-      end subroutine WVSCPX
+   end subroutine WVSCPX
 !
 !
 !========================================================
-      subroutine WVSCTE(X1,Y1,H,MESS,A,N,ICOL)
+   subroutine WVSCTE(X1,Y1,H,MESS,A,N,ICOL)
         implicit none
 !========================================================
 #include "rastcom.blk"
@@ -1068,10 +1068,10 @@
             return
         endif
         return
-      end subroutine WVSCTE
+   end subroutine WVSCTE
 !
 !
-      subroutine wvwarn(N)
+   subroutine wvwarn(N)
         implicit none
 !
 !----------------------------------------------------------------------
@@ -1113,10 +1113,10 @@
       if (N.eq.2) write(*,*) 'Last message : FILLPOLY size'
       call wverr(0)
 !
-      end subroutine wvwarn
+   end subroutine wvwarn
 
 
-      subroutine wverr(N)
+   subroutine wverr(N)
         implicit none
 !
 !-----------------------------------------------------------------------!
@@ -1152,7 +1152,7 @@
         if (N.eq.2) write(*,*) ' INITIALIZE GRAPHIC'
 !
         stop 1
-      end subroutine wverr
+   end subroutine wverr
 !---------------------------------------------------------------------
 !
 !   routine name       - wvgrph
@@ -1174,7 +1174,7 @@
 !
 !---------------------------------------------------------------------
 !
-      subroutine wvgrph
+   subroutine wvgrph
         use graphmod, only: IWINDL, IWINDH
         implicit none
 !
@@ -1252,10 +1252,10 @@
 !---------------------------------------------------------------------
 !
         return
-      end subroutine wvgrph
+   end subroutine wvgrph
 !
 !========================================================
-      subroutine wvtext
+   subroutine wvtext
         implicit none
 !======================================================
 #include "rastcom.blk"
@@ -1285,6 +1285,6 @@
         endif
         MAXCOL=0
         return
-      end subroutine wvtext
+   end subroutine wvtext
 
 #endif

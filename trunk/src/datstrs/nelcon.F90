@@ -100,7 +100,7 @@ end subroutine nelcon
 
 
 !! Alternate routine
-!      subroutine nelcon(Mdle, Mdle_next)
+!   subroutine nelcon(Mdle, Mdle_next)
 !      integer, intent(in)  :: Mdle
 !      integer, intent(out) :: Mdle_next
 !
@@ -136,4 +136,4 @@ end subroutine nelcon
 !! Assign next middle node
 !      Mdle_next = Mdle
 !
-!      end subroutine nelcon
+!   end subroutine nelcon

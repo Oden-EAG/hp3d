@@ -16,7 +16,7 @@
 !                  Ibf - a flag whether to display color table
 !
 !----------------------------------------------------------------------
-      subroutine dpborder(Ibf)
+   subroutine dpborder(Ibf)
 !
       use graphmod
 !
@@ -185,6 +185,6 @@
         enddo
       endif
 !
-      end subroutine dpborder
+   end subroutine dpborder
 
 #endif

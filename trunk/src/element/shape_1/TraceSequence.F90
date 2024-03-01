@@ -120,7 +120,7 @@
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !     Check polynomial order
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     subroutine checkpolyorder(Norder)
+      subroutine checkpolyorder(Norder)
 !
         integer, intent(in) :: Norder
 !
@@ -132,7 +132,7 @@
           stop 1
         endif
 !
-     end subroutine checkpolyorder
+      end subroutine checkpolyorder
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    end subroutine TraceEshapeH
 !
@@ -237,7 +237,7 @@
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !     Check polynomial order
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     subroutine checkpolyorder(Norder)
+      subroutine checkpolyorder(Norder)
 !
         integer, intent(in) :: Norder
 !
@@ -249,7 +249,7 @@
           stop 1
         endif
 !
-     end subroutine checkpolyorder
+      end subroutine checkpolyorder
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    end subroutine TraceEshapeE
 !
@@ -386,7 +386,7 @@
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !     Triangle traces
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     subroutine traceTriFshapeH
+      subroutine traceTriFshapeH
 !
         integer :: i,j,nij,m,N,ndofF
         integer :: minI,minJ,minIJ,maxI,maxJ,maxIJ
@@ -459,11 +459,11 @@
         endif
 #endif
 !
-     end subroutine traceTriFshapeH
+      end subroutine traceTriFshapeH
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !     Quadrilateral traces
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     subroutine traceQuadFshapeH
+      subroutine traceQuadFshapeH
 !
         integer :: N,m,i,j,nordF(2),ndofF,minI,minJ,maxI,maxJ
         logical :: IdecF(2),GIdecF(2)
@@ -536,11 +536,11 @@
         endif
 #endif
 !
-     end subroutine traceQuadFshapeH
+      end subroutine traceQuadFshapeH
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !     Check polynomial order
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     subroutine checkpolyorder(Norder)
+      subroutine checkpolyorder(Norder)
 !
         integer, intent(in) :: Norder
 !
@@ -552,7 +552,7 @@
           stop 1
         endif
 !
-     end subroutine checkpolyorder
+      end subroutine checkpolyorder
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    end subroutine TraceFshapeH
 !
@@ -611,7 +611,7 @@
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !     Triangle traces
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     subroutine traceTriFshapeE
+      subroutine traceTriFshapeE
 !
         integer :: i,j,nij,m,N,ndofF
         integer :: minI,minJ,minIJ,maxI,maxJ,maxIJ,abc(3),fam,famctr
@@ -698,11 +698,11 @@
         endif
 #endif
 !
-     end subroutine traceTriFshapeE
+      end subroutine traceTriFshapeE
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !     Quadrilateral traces
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     subroutine traceQuadFshapeE
+      subroutine traceQuadFshapeE
 !
         integer :: N,m,i,j,ij(2),ig,jg,a,b,ab(2),fam
         integer :: nordF(2),ndofF(0:1),minF(2),maxF(2)
@@ -795,11 +795,11 @@
         endif
 #endif
 !
-     end subroutine traceQuadFshapeE
+      end subroutine traceQuadFshapeE
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !     Check polynomial order
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     subroutine checkpolyorder(Norder)
+      subroutine checkpolyorder(Norder)
 !
         integer, intent(in) :: Norder
 !
@@ -811,7 +811,7 @@
           stop 1
         endif
 !
-     end subroutine checkpolyorder
+      end subroutine checkpolyorder
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    end subroutine TraceFshapeE
 !
@@ -867,7 +867,7 @@
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !     Triangle traces
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     subroutine traceTriFshapeV
+      subroutine traceTriFshapeV
 !
         integer :: i,j,nij,m,N,ndofF
         integer :: minalpha,minI,minJ,minIJ,maxI,maxJ,maxIJ
@@ -943,11 +943,11 @@
         endif
 #endif
 !
-     end subroutine traceTriFshapeV
+      end subroutine traceTriFshapeV
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !     Quadrilateral traces
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     subroutine traceQuadFshapeV
+      subroutine traceQuadFshapeV
 !
         integer :: i,j,m,N,nordF(2),ndofF
         integer :: minI,minJ,maxI,maxJ
@@ -1020,11 +1020,11 @@
         endif
 #endif
 !
-     end subroutine traceQuadFshapeV
+      end subroutine traceQuadFshapeV
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 !     Check polynomial order
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     subroutine checkpolyorder(Norder)
+      subroutine checkpolyorder(Norder)
 !
         integer, intent(in) :: Norder
 !
@@ -1036,7 +1036,7 @@
           stop 1
         endif
 !
-     end subroutine checkpolyorder
+      end subroutine checkpolyorder
 ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    end subroutine TraceFshapeV
 !

@@ -36,7 +36,7 @@
 !
 !----------------------------------------------------------------------
 #include "typedefs.h"
-      subroutine display_face(Numlev,Mdle,Ifc,Nodesl,                   &
+   subroutine display_face(Numlev,Mdle,Ifc,Nodesl,                   &
                               Nedge_orient,Nface_orient,Norder,Iflagn,  &
                               Xnod,ZdofH,ZdofE,ZdofV,ZdofQ,             &
                               Solev,Xmin,Xmax,                          &
@@ -587,6 +587,6 @@
 #endif
 !
 !
-      end subroutine display_face
+   end subroutine display_face
 
 #endif

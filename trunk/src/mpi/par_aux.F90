@@ -5,7 +5,7 @@
 !
 !----------------------------------------------------------------------
 !
-!     subroutine:          partition_fiber
+!      subroutine:          partition_fiber
 !
 !     last modified:       Aug 2019
 !
@@ -84,7 +84,7 @@ subroutine partition_fiber(subd_next)
 end subroutine partition_fiber
 !----------------------------------------------------------------------
 !
-!     subroutine:          partition_fiber
+!      subroutine:          partition_fiber
 !
 !     last modified:       Aug 2019
 !
@@ -235,7 +235,7 @@ end subroutine qsort_duplet_z
 !
 !----------------------------------------------------------------------
 !
-!     subroutine:          collect_dofs
+!      subroutine:          collect_dofs
 !
 !     last modified:       July 2019
 !
@@ -345,7 +345,7 @@ end subroutine collect_dofs
 !
 !----------------------------------------------------------------------
 !
-!     subroutine:          print_partition
+!      subroutine:          print_partition
 !
 !     last modified:       July 2019
 !
@@ -401,7 +401,7 @@ end subroutine print_partition
 !
 !----------------------------------------------------------------------
 !
-!     subroutine:          print_subd
+!      subroutine:          print_subd
 !
 !     last modified:       Mar 2023
 !
@@ -458,7 +458,7 @@ end subroutine print_subd
 !
 !----------------------------------------------------------------------
 !
-!     subroutine:          print_coord
+!      subroutine:          print_coord
 !
 !     last modified:       Mar 2023
 !
