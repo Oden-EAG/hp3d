@@ -293,7 +293,8 @@
 !
       integer :: Iwin
 !
-      integer :: iclip(4),clip(4)
+      integer :: iclip(4)
+      real(8) :: clip(4)
 !
       integer :: i
       integer :: iprint
@@ -311,7 +312,7 @@
 !        if (LWTYPE(ICURRWIN).eq.1) call wvdfcl(iclip)
         if (LWTYPE(ICURRWIN).eq.2) then
           do i=1,4
-            clip(i)=LWSIZE(ICURRWIN,i)
+            clip(i) = real(LWSIZE(ICURRWIN,i),8)
           enddo
           if (iprint.eq.1) then
             write(*,*) 'SELWIND: clip = ',clip
@@ -320,7 +321,7 @@
         endif
         if (IGPSP(ICURRWIN).eq.1) then
           do i=1,4
-            clip(i)=int(iclip(i)*10.d0/MAXSCX)
+            clip(i) = iclip(i)*10.d0/MAXSCX
           enddo
           if (iprint.eq.1) then
             write(*,*) 'SELWIND: clip = ',clip

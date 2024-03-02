@@ -53,7 +53,7 @@
       integer :: inick,iel,iel1,i,j,iv,kk,kel
       integer :: max_active_node_no,mdle,mr,ms,mu,nod,nrnodm
       integer :: nrnick,nrdof,nrdofm,nrdofc,nrnod1,nrdof_mdl
-      VTYPE   :: zvoid
+      VTYPE   :: zvoid1(1),zvoid2(1)
 !
 #if HP3D_DEBUG
       integer :: iprint
@@ -135,12 +135,12 @@
           call celem_systemI(iel,mdle,1, &
                      nrdofs,nrdofm,nrdofc, &
                      nodm,ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm, &
-                     zvoid,zvoid)
+                     zvoid1,zvoid2)
         else
           call celem(mdle,1, &
                      nrdofs,nrdofm,nrdofc, &
                      nodm,ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm, &
-                     zvoid,zvoid)
+                     zvoid1,zvoid2)
         endif
 !
 !  .....compute the total number of mdle node dof
@@ -257,13 +257,13 @@
           call celem_systemI(iel,mdle,1, &
                      nrdofs,nrdofm,nrdofc, &
                      nodm,ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm, &
-                     zvoid,zvoid)
+                     zvoid1,zvoid2)
 
         else
           call celem(mdle,1, &
                      nrdofs,nrdofm,nrdofc, &
                      nodm,ndofmH,ndofmE,ndofmV,ndofmQ,nrnodm, &
-                     zvoid,zvoid)
+                     zvoid1,zvoid2)
         endif
 !
 !  .....update the sequential element number
