@@ -226,8 +226,7 @@
 !       NODE IS UNCONSTRAINED                                         |
 !======================================================================
 !         if (Is_active(nod)) then
-        if ((Is_active(nod)) .or. &
-            (Is_inactive(nod) .and. NODES(nod)%ref_kind /= 0)) then
+        if (Is_active(nod) .or. NODES(nod)%ref_kind.ne.0) then
 !
 !         node location on the list of modified element's nodes
 !!!       loc=NODES(nod)%visit

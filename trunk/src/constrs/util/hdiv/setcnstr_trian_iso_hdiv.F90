@@ -68,11 +68,11 @@
       integer :: i,j,icl,info
       integer :: n,nord,nel,nrdofQ
 !
-      real(8), parameter :: eps = 1.0d-13
-!
 #if HP3D_DEBUG
       real(8) :: diff,val
       integer :: i1,i2,ians,mp,np
+!
+      real(8), parameter :: eps = 1.0d-13
 #endif
 !
 !  ...set up order

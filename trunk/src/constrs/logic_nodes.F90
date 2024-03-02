@@ -68,8 +68,7 @@
         nod = Nodesl(j)
 !
 !  .....if nod is active
-        if ((Is_active(nod)).or. &
-            (Is_inactive(nod) .and. NODES(nod)%ref_kind.ne.0)) then
+        if (Is_active(nod) .or. NODES(nod)%ref_kind.ne.0) then
 !
           if (j.le.Nvert(ntype)) then
             call add_to_list(list_v,16,icv,nod)

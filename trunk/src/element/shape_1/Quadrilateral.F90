@@ -373,7 +373,9 @@
 !
    subroutine shape2DVQuad(Xi,Nord,NoriE,Nsize, NrdofV,ShapV,DivV)
 !
+#if HP3D_DEBUG
       use parameters , only : MODORDER
+#endif
 !
       implicit none
       integer, intent(in)  :: Nord(5),NoriE(4),Nsize(2)

@@ -114,7 +114,7 @@ one : $(OBJ_PATH)/.dummy $(OBJ_PATH)/$(TEST).o
 seq :
 	@seq_pass=0; seq_fail=0; \
 	for e in $(TEST_SEQ) ; do \
-		pass=1; make one run TEST=$$e || pass=0; \
+		pass=1; $(MAKE) one run TEST=$$e || pass=0; \
 		if [ $$((pass)) -eq 1 ]; then \
 			seq_pass=$$((seq_pass+1)); \
 		else \
@@ -138,7 +138,7 @@ seq :
 par :
 	@par_pass=0; par_fail=0; \
 	for e in $(TEST_PAR) ; do \
-		pass=1; make one run-par TEST=$$e || pass=0; \
+		pass=1; $(MAKE) one run-par TEST=$$e || pass=0; \
 		if [ $$((pass)) -eq 1 ]; then \
 			par_pass=$$((par_pass+1)); \
 		else \
