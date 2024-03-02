@@ -21,12 +21,13 @@ hp3d - A Scalable MPI/OpenMP hp-Adaptive Finite Element Software Library
 
  - METIS
    Versions: 5.1.0
-   
+
  - ParMETIS
    Versions: 4.0.3
 
  - PT-Scotch
-   (requires bison version >= 3.0)
+   (macOS: requires recent versions of bison and flex;
+           e.g. bison version >= 3.0, flex version 2.64)
    Versions: 6.0.9
              7.0.1 - 7.0.3
 

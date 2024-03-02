@@ -1,7 +1,10 @@
 
-=================
-Version 1.0 (dev)
-=================
+====================================
+Version 1.0, released on Mar 2, 2024
+====================================
+
+- Release tag:
+  https://github.com/Oden-EAG/hp3d/releases/tag/v1.0
 
 - Renamed preprocessor flags:
   `C_MODE` --> `HP3D_COMPLEX`, `DEBUG_MODE` --> `HP3D_DEBUG`
