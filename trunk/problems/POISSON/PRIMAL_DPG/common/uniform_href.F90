@@ -227,8 +227,8 @@ subroutine href_solve()
          read(*,*) nsteps
       enddo
    else
-      write(6,405) '[', RANK, '] : ','Waiting for broadcast from master...'
- 405  format(A,I4,A,A)
+!      write(6,405) '[', RANK, '] : ','Waiting for broadcast from master...'
+! 405  format(A,I4,A,A)
    endif
    count = 1; src = ROOT
    call MPI_BCAST (nsteps,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)

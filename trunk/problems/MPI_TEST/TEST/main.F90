@@ -282,11 +282,11 @@ subroutine worker_main()
    idec = 1
    do while(idec /= 0)
 !
-      write(6,9030) '[', RANK, '] : ','Waiting for broadcast from master...'
+      !write(6,9030) '[', RANK, '] : ','Waiting for broadcast from master...'
       count = 1; src = ROOT
       call MPI_BCAST (idec,count,MPI_INTEGER,src,MPI_COMM_WORLD,ierr)
-      write(6,9010) '[', RANK, '] : ','Broadcast: idec = ', idec
-      flush(6)
+      !write(6,9010) '[', RANK, '] : ','Broadcast: idec = ', idec
+      !flush(6)
       call MPI_BARRIER (MPI_COMM_WORLD, ierr)
 !
       select case(idec)
